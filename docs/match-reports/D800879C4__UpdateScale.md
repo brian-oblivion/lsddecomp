@@ -1,9 +1,11 @@
-# func_80057DF4 -- MATCHED (81/81)
+# D800879C4__UpdateScale -- MATCHED (81/81)
+
+> Renamed from `func_80057DF4` on 2026-09-25 (tools/rename.py). Address 0x80057df4.
 
 Round 47 (runner charlie). Unit: `src/class_3bb8c_q.c`, a BRAND NEW carve
 (this unit did not exist before round 47). Class: table `D_800879C4` (49
 slots, resolved with `tools/classtable.py 0x800879C4`) -- this is slot48,
-immediately after `func_80057DBC` (slot40, same unit, see its own
+immediately after `D800879C4__SetVariantClut` (slot40, same unit, see its own
 report).
 
 Frameless leaf, zero `addiu $sp, $sp, -N`. The unit's carve-note history
@@ -14,7 +16,7 @@ function blocker-clean.
 ## Signature
 
 ```c
-void func_80057DF4(D_800879C4Obj_q *self, s32 arg1, s16 *pair);
+void D800879C4__UpdateScale(D_800879C4Obj_q *self, s32 arg1, s16 *pair);
 ```
 
 `arg1` ($a1) is read by NOTHING in the whole function body -- retail
@@ -31,7 +33,7 @@ not a shared type").
 ## Body
 
 ```c
-void func_80057DF4(D_800879C4Obj_q *self, s32 arg1, s16 *pair) {
+void D800879C4__UpdateScale(D_800879C4Obj_q *self, s32 arg1, s16 *pair) {
     s32 q1, r1, q2, ratio1;
     s32 q3, r3, q4, ratio2;
     s16 short1, short2;
@@ -59,7 +61,7 @@ void func_80057DF4(D_800879C4Obj_q *self, s32 arg1, s16 *pair) {
 ```
 
 Struct `D_800879C4Obj_q` is defined once, shared by both functions in
-this unit -- see `func_80057DBC`'s report for its full text and the
+this unit -- see `D800879C4__SetVariantClut`'s report for its full text and the
 multiple-independent-local-views note.
 
 ## Derivation
@@ -89,7 +91,7 @@ executable by 4 (found because `build-and-verify.sh` still went green
 with `INCLUDE_ASM` at this point in the debugging session, but a manual
 per-function `funcdiff.py` run on the wrong intermediate C showed a
 145-KB "outside range" drift and a `build/lsdde.map` symbol,
-`D_80087AA4`, landing 4 bytes off its documented address). Hoisting the
+`gD800879C4ClutX`, landing 4 bytes off its documented address). Hoisting the
 truncation to right after each ratio's computation reproduces the extra
 `move` and closes the drift to zero.
 
@@ -97,7 +99,7 @@ truncation to right after each ratio's computation reproduces the extra
 
 `./build-and-verify.sh` -- whole-image SHA1 matches retail (0 bytes
 differ outside or inside the function's range). Committed alongside
-`func_80057DBC` (same unit, same commit, ROM-address order preserved).
+`D800879C4__SetVariantClut` (same unit, same commit, ROM-address order preserved).
 
 ### Proposed learning
 
@@ -112,3 +114,19 @@ already-computed value into a second register, and the question to ask
 is not "is this value used on both paths" but "is it computed once,
 early, regardless of path, even though only one path consumes the
 COPY".
+
+## Naming
+
+Round 79 naming pass (runner echo). The body above is the round-47 match;
+the live source now reads `D800879C4__UpdateScale(D800879C4Obj *self, s32
+set, s16 *ratios)` with `spriteScaleX`/`spriteScaleY`, byte-identical.
+
+| name | tier | evidence |
+| --- | --- | --- |
+| `D800879C4__UpdateScale` (was `func_80057DF4`) | A | Slot `+0x048` of `D_800879C4`; `tools/classtable.py D_800879C4 --vs gClass6B5CCMethods` shows it overriding `Class6B5CC__UpdateScale`, and the name follows the slot. Every caller agrees it is a scale: class_3bb8c_s.c calls it through `updateScale` on the sprites with `gSpriteScaleLarge` ({6,5},{6,5},{1,1}) / `gSpriteScaleSmall` ({4,6},{4,6},{1,1}) or a caller-supplied table (`Class876FC__SpawnSprites`), always `set = 1`. The body turns two num/den ratios into 20.12 and (unk58 == 0) stores them at `+0x80`/`+0x82`, which are GsSPRITE.scalex/scaley at `+0x64` (layout evidence in `D800879C4__SetVariantClut`'s report). |
+| param `set` | A | The base method's name for `$a1` (1 = assign, 0 = accumulate); this override never reads it. |
+| param `ratios` | A | Two s16 {num, den} pairs, x then y. The round-47 description "`{s16 whole; s16 frac;}`" was wrong: the body computes `num / den` in 20.12, and the caller tables hold {6,5} and {4,6}. |
+| fields `spriteScaleX` / `spriteScaleY` (`+0x80`/`+0x82`) | A | GsSPRITE.scalex/scaley. Unit-local struct: renamed in place. |
+| fields `unk58`, `unk5C`, `unk60` | C (kept) | Known: the base init `func_8004202C` zeroes `+0x58`; when `+0x58` is non-zero this method multiplies the s32s at `+0x5C`/`+0x60` by the x/y ratios (`>> 12`) instead of setting the sprite scale. The draw path `func_80012064` does not read them. Nothing found that sets `+0x58` non-zero, so no name. |
+
+Could not name: `unk58`/`unk5C`/`unk60`, above.

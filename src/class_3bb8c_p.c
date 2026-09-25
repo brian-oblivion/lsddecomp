@@ -420,7 +420,7 @@ typedef struct D800879C4Methods {
     /* +0x00C..+0x03C not yet needed by this unit. */
     u8 pad0C[0x40 - 0xC];
     /* This class's OWN slot, resolved via `tools/classtable.py
-     * D_800879C4`: `func_80057DBC`, the FIRST function of this unit's
+     * D_800879C4`: `D800879C4__SetVariantClut`, the FIRST function of this unit's
      * successor `class_3bb8c_q` -- out of this unit/runner's range.
      * Tail-called by this unit's own `D800879C4__D800879C4` (its own ctor, see
      * that function's report) as (self, arg1) once construction is

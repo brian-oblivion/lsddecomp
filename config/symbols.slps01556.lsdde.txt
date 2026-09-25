@@ -2430,3 +2430,7 @@ SpuVmSetVol = 0x80030980; // type:func
 Class6D4E8__Class6D4E8 = 0x80027228; // type:func
 Class6D4E8__Destroy = 0x80027274; // type:func
 Class6D4E8__NoOpSlot40 = 0x800272C8; // type:func
+D800879C4__SetVariantClut = 0x80057DBC; // type:func
+D800879C4__UpdateScale = 0x80057DF4; // type:func
+gD800879C4ClutX = 0x80087AA4;
+gD800879C4ClutY = 0x80087AA6;
