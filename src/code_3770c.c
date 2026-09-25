@@ -72,7 +72,18 @@ void func_800470C8(CdStreamObj *self, u32 *ring, u32 size) {
     }
 }
 INCLUDE_ASM("asm/nonmatchings/code_3770c", func_80047114);
-INCLUDE_ASM("asm/nonmatchings/code_3770c", func_80047240);
+s32 func_80047240(CdStreamObj *self) {
+    SpuCommonAttr attr;
+
+    attr.mask = 0x2C3;
+    attr.mvol.left = 0x3FFF;
+    attr.mvol.right = 0x3FFF;
+    attr.cd.volume.left = 0x7FFF;
+    attr.cd.volume.right = 0x7FFF;
+    attr.cd.mix = 1;
+    SpuSetCommonAttr(&attr);
+    return 1;
+}
 INCLUDE_ASM("asm/nonmatchings/code_3770c", func_8004728C);
 INCLUDE_ASM("asm/nonmatchings/code_3770c", func_800472EC);
 INCLUDE_ASM("asm/nonmatchings/code_3770c", func_80047388);
