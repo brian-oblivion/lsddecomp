@@ -39,7 +39,7 @@
 
 /* The class's method table down to +0x058: the one slot
  * Class6D4E8__RequestLoadFile dispatches. `tools/classtable.py D_8006D4E8`
- * resolves that slot to func_80027800 (code_179d8_s), which loads a named
+ * resolves that slot to Class6D4E8__LoadFile (code_179d8_s), which loads a named
  * file off the disc, so the slot is named for the method it dispatches to.
  * The sibling class D_8006D430 (include/code_171e0.h's
  * Class6D430Methods) leaves the identical offset unnamed -- this
@@ -454,7 +454,7 @@ extern void VSyncCallback(void (*cb)(void));
  * class-map comment above); only the one slot this call site dispatches is
  * typed, following the pad-to-offset convention include/code_171e0.h uses
  * for D_8006D430's own table. tools/classtable.py resolves +0x068 to
- * func_80027A24 (code_179d8_s), which walks the gCdRequestQueue request list,
+ * Class6D4E8__RunRequestQueue (code_179d8_s), which walks the gCdRequestQueue request list,
  * dispatches each request through its owner's own slots and frees it with
  * FreeCdRequestNode -- so the slot is named for what that method does. */
 typedef struct Methods6D4E8_80EC Methods6D4E8_80EC;

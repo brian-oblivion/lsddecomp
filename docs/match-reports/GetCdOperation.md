@@ -37,9 +37,9 @@ Round 51 (alpha), FINISHING-PLAN track 3.
 **Evidence.** The global has exactly one writer that sets it non-zero:
 `StartCdOperation(arg0, arg1)` (code_179d8_r), which stores `arg0` into it. Its
 five call sites are the five methods of this class in `code_179d8_s`, each
-passing a distinct constant -- `func_80027480` 0 (close), `func_800272D0` 1
-(open by name), `func_80027528` 2 (seek), `func_800276D0` 3 (read),
-`func_80027800` 4 (load file). `ResetCdStateMachine` (reset) clears it. A per-method
+passing a distinct constant -- `Class6D4E8__Close` 0 (close), `Class6D4E8__Open` 1
+(open by name), `Class6D4E8__Seek` 2 (seek), `Class6D4E8__Read` 3 (read),
+`Class6D4E8__LoadFile` 4 (load file). `ResetCdStateMachine` (reset) clears it. A per-method
 constant written at operation start and cleared at the end is an
 "operation in progress" code, which is what the name says.
 

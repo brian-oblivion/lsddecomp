@@ -18,7 +18,7 @@ carries the evidence for each one.
 ```c
 /* The class's method table down to +0x058: the one slot
  * Class6D4E8__RequestLoadFile dispatches. `tools/classtable.py D_8006D4E8`
- * resolves that slot to func_80027800 (code_179d8_s), which loads a named
+ * resolves that slot to Class6D4E8__LoadFile (code_179d8_s), which loads a named
  * file off the disc, so the slot is named for the method it dispatches to.
  * The sibling class D_8006D430 (include/code_171e0.h's
  * Class6D430Methods) leaves the identical offset unnamed -- this
@@ -184,7 +184,7 @@ Round 51 (alpha), FINISHING-PLAN track 3.
 file name, it either enqueues a `CD_OP_LOAD_FILE` (7) request through
 `EnqueueCdRequest` with `FindCdFileIndex`'s file-table index, or -- when
 `gCdAsyncEnabled` is 0 -- calls the class's own `+0x058` slot
-(`func_80027800`, code_179d8_s) directly, which is the synchronous
+(`Class6D4E8__LoadFile`, code_179d8_s) directly, which is the synchronous
 load-this-file-by-name method that enqueues the identical op 7 on its own
 async path. So both arms request the same thing, which is what `Request`
 names; `LoadFile` is the op, read off the slot it dispatches to and off the
@@ -220,4 +220,4 @@ views; proposing rather than renaming, since those units are not mine:
 | unit | type | field | proposed | tier | evidence |
 | --- | --- | --- | --- | --- | --- |
 | code_179d8_s | `Obj80027480` | `unk22` | `pendingRequests` | A | `EnqueueCdRequest` increments it per queued request; `Class6D4E8__CancelRequests` decrements it once per node it unlinks |
-| code_179d8_s | `Obj80027480` | `unk24` | `flags` | A | only ever `|=` a bit (4 here, 0x200 in `func_80027800`) or cleared |
+| code_179d8_s | `Obj80027480` | `unk24` | `flags` | A | only ever `|=` a bit (4 here, 0x200 in `Class6D4E8__LoadFile`) or cleared |

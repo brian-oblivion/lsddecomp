@@ -31,7 +31,7 @@ without the branch at all).
 ## Naming (round 64, runner alpha)
 
 - `func_80028A34` -> `CloseCdFile`, tier B. `src/code_179d8_s.c`'s
-  `func_80027480` calls this function directly when CD-async mode is off,
+  `Class6D4E8__Close` calls this function directly when CD-async mode is off,
   and otherwise (async path) does the same `self->unk0C = 0` clear plus
   `StartCdOperation(0, 0)`/`ResetCdStateMachine()` -- i.e. this is the
   sync-mode half of a close/cancel operation. Paired with `OpenCdFile`/

@@ -1,242 +1,292 @@
 /*
- * code_179d8_s -- the last 7 functions of the original `code_179d8` monolith's
- * head, 0x17AD0..0x18480 (620 words).  Carved round 47 (2026-09-16); with
- * class_3bb8c_q this was the last uncarved game code in the executable.
+ * code_179d8_s -- the CD-ROM read driver's per-object methods: slots +0x44..
+ * +0x58 and +0x68 of D_8006D4E8 (`tools/classtable.py D_8006D4E8`), the
+ * class whose constructor is code_179d8_o and whose module-level half
+ * (request queue, service pump, file table) is code_179d8_q/_r.
  *
- * Census 2026-09-16, `tools/uncarved.py --functions`: 7 of 7 blocker-clean.
- * The `gp_rel` tags that tool prints for six of them are
- * RESOLVED-not-a-blocker (maspsx --gp-symbols, round 42) -- an ordinary
- * `lw $v0, %gp_rel(sym)($gp)` is a plain global access here, not a wall.
- * Gate 2 boundary checks all zero: no `jr $t2` trampoline, no `alabel`, no
- * non-`.L` alt-entry label, no function with two prologues.
- *
- * func_80027A24 owns this unit's only jump tables (jtbl_80010810 and
- * jtbl_80010828).  The 0xFD8 rodata slot was SPLIT at 0x1010 to attach them:
- * the two strings in the same slot belong to code_179d8_q and code_179d8_h
- * and stay standalone.  You do not need to do anything about this -- it is
- * recorded so that a link error mentioning either symbol is attributable.
- *
- * Expect this slice to span more than one class; identify each with
- * `tools/classtable.py` rather than assuming the unit has one.
+ * Open/Close/Seek/Read/LoadFile share one shape. With the driver in plain
+ * synchronous mode (gCdAsyncEnabled and D_8008A860 both 0) each forwards to
+ * code_179d8_h.c's blocking OpenCdFile/CloseCdFile/GetCdFileSize/ReadCdFile
+ * (LoadFile to the base class's Class6D430__AllocBuffer). Otherwise a call
+ * from outside the queue only enqueues a CD_OP_* request; when
+ * RunRequestQueue (slot +0x68, ticked by ServiceCdDriver) dispatches that
+ * request back through the same slot with inQueueDispatch set, the method
+ * starts the operation: on code_179d8_r's state machine if async, or by a
+ * CdControl/CdSync/CdRead spin if not. RunRequestQueue then reports the
+ * finished request through `flags` (CD_FLAG_*) and frees its node. Slot
+ * +0x50 (NoOpSlot50) is empty. RunRequestQueue's two switches own this
+ * unit's only jump tables, jtbl_80010810/jtbl_80010828 (carved round 47).
  */
-
 #include "common.h"
 
-/* Local view of the object func_80027480/EnqueueCdRequest/CloseCdFile read
- * through -- the real struct is ObjA34_179D8H (src/code_179d8_h.c), but that
- * type is that unit's own local reading, not a shared header, so this unit
- * carries its own minimal view of the two offsets it actually touches. */
-typedef struct Pos18 {
+/* A disc position in the shape of Psy-Q's CdlLOC, declared as two s16 so the
+ * struct is 2-aligned and a whole-struct copy compiles to lwl/lwr + swl/swr
+ * (the idiom CLAUDE.md documents). The halves are never read apart here.
+ * Same shape and name as code_179d8_q.c's own local CdLoc16. */
+typedef struct CdLoc16 {
     s16 unk0;
     s16 unk2;
-} Pos18; /* alignment 2, matches the project's lwl/lwr+swl/swr idiom */
+} CdLoc16;
 
-typedef struct Obj80027480 Obj80027480;
+typedef struct Class6D4E8 Class6D4E8;
 
-/* This class's own methods table -- the slots func_80027800 and
- * func_80027A24 dispatch through (offsets 0x44/0x48/0x4C/0x54/0x58/0x64/
- * 0x70). */
-typedef struct Methods80027480 {
+/* D_8006D4E8, this class's own method table, down to the last slot this
+ * unit dispatches. Each slot is named for the method `tools/classtable.py
+ * D_8006D4E8` resolves it to. */
+typedef struct Class6D4E8Methods {
     u8 pad0[0x44];
-    s32 (*slot44)(Obj80027480 *self, void *arg1, s32 arg2, s32 arg3);
-    s32 (*onError)(Obj80027480 *self);
-    s32 (*slot4C)(Obj80027480 *self, s32 arg1, s32 arg2);
-    u8 pad50[0x54 - 0x50];
-    s32 (*slot54)(Obj80027480 *self, s32 arg1, s32 arg2);
-    s32 (*slot58)(Obj80027480 *self, void *arg1);
+    /* +0x44 */ s32 (*open)(Class6D4E8 *self, void *name, s32 arg2, s32 arg3); /* Class6D4E8__Open */
+    /* +0x48 */ s32 (*close)(Class6D4E8 *self);                    /* Class6D4E8__Close */
+    /* +0x4C */ s32 (*seek)(Class6D4E8 *self, s32 offset, s32 mode); /* Class6D4E8__Seek */
+    u8 pad50[0x54 - 0x50];                                         /* Class6D4E8__NoOpSlot50 */
+    /* +0x54 */ s32 (*read)(Class6D4E8 *self, s32 buf, s32 size);  /* Class6D4E8__Read */
+    /* +0x58 */ s32 (*loadFile)(Class6D4E8 *self, void *name);     /* Class6D4E8__LoadFile */
     u8 pad5C[0x64 - 0x5C];
-    s32 (*slot64)(Obj80027480 *self);
+    /* +0x64 */ s32 (*setFlag)(Class6D4E8 *self);                  /* Class6D430__SetFlag */
     u8 pad68[0x70 - 0x68];
-    s32 (*slot70)(Obj80027480 *self);
-} Methods80027480;
+    /* +0x70 */ s32 (*stopCdService)(Class6D4E8 *self);            /* Class6D4E8__StopCdService */
+} Class6D4E8Methods;
 
-struct Obj80027480 {
-    Methods80027480 *methods;
+/* An instance of the D_8006D4E8 class, this unit's own local view. The same
+ * object is ObjA34_179D8H to code_179d8_h.c's synchronous OpenCdFile/
+ * CloseCdFile/GetCdFileSize/ReadCdFile, Obj6D4E8 to its constructor
+ * (code_179d8_o.c), three Obj6D4E8_* views in code_179d8_q.c, and -- the
+ * class derives from D_8006D430, whose ctor it chains -- Class6D430 in
+ * include/code_171e0.h. Field names agree with those views where they
+ * name the field. */
+struct Class6D4E8 {
+    /* +0x00 */ Class6D4E8Methods *methods;
     u8 pad4[0xC - 0x4];
-    s32 unk0C;
-    void *unk10; /* CdRead target buffer */
-    u32 unk14;
-    Pos18 unk18; /* CdlLOC-shaped position */
-    u32 unk1C;
-    u16 unk20;
-    u16 unk22;
-    s32 unk24;
-    u16 unk28;
+    /* +0x0C */ s32 isOpen;          /* 1 after Open resolves the file, 0 after Close */
+    /* +0x10 */ void *buffer;        /* LoadFile's destination: BMemPMgrAlloc'd if NULL */
+    /* +0x14 */ u32 bufferSize;      /* LoadFile's sector-rounded read size */
+    /* +0x18 */ CdLoc16 pos;         /* the open file's disc position */
+    /* +0x1C */ u32 size;            /* the open file's byte size */
+    /* +0x20 */ u16 freeGuard;       /* nonzero: LoadFile reuses an existing buffer */
+    /* +0x22 */ u16 pendingRequests; /* ++ per EnqueueCdRequest, -- per completion */
+    /* +0x24 */ s32 flags;           /* CD_FLAG_* completion bits, see below */
+    /* +0x28 */ u16 inQueueDispatch; /* 1 only while RunRequestQueue calls a slot */
 };
+
+/* Request op codes, carried in a queue node's `op` (EnqueueCdRequest's third
+ * argument) and dispatched back by Class6D4E8__RunRequestQueue to the slot of
+ * the same name. CD_OP_LOAD_FILE has the same spelling in code_179d8_q.c. */
+#define CD_OP_OPEN      2
+#define CD_OP_CLOSE     3
+#define CD_OP_SEEK      4
+#define CD_OP_READ      5
+#define CD_OP_LOAD_FILE 7
+
+/* Bits Class6D4E8__RunRequestQueue ORs into `flags` when a request completes.
+ * Bit 0 (1) is left a literal: it is also Class6D430__SetFlag's bit, and the
+ * queue node field that sets it here (`unk4`) has no established meaning. */
+#define CD_FLAG_DONE           0x002 /* some request completed */
+#define CD_FLAG_NONE_PENDING   0x004 /* ... and pendingRequests reached 0 */
+#define CD_FLAG_OPEN_DONE      0x010
+#define CD_FLAG_CLOSE_DONE     0x020
+#define CD_FLAG_SEEK_DONE      0x040
+#define CD_FLAG_READ_DONE      0x080
+#define CD_FLAG_LOAD_FILE_DONE 0x200
+
+/* gCdState values StartCdOperation's second argument sets
+ * (code_179d8_r.c): 1 issues a CdlSetloc seek, 7 issues a CdRead. */
+#define CD_STATE_IDLE   0
+#define CD_STATE_SETLOC 1
+#define CD_STATE_READ   7
+
+/* gCdTickStep values: which of code_179d8_r.c's two state machines
+ * ServiceCdDriver ticks. */
+#define CD_TICK_STATE_MACHINE 1 /* TickCdStateMachine */
+#define CD_TICK_LOAD_FILE     2 /* TickCdLoadFileStateMachine */
+
+/* Psy-Q libcd values, spelled locally as code_179d8_q.c/_r.c do: CdlSetloc
+ * (command 2), CdlModeSpeed (0x80, double speed) and CdSync's CdlDiskError
+ * (5). */
+#define CD_CMD_SETLOC        2
+#define CD_MODE_DOUBLE_SPEED 0x80
+#define CD_SYNC_DISK_ERROR   5
 
 extern s32 gCdAsyncEnabled;
 extern s32 D_8008A860;
 extern s32 gCdBusy;
 
-extern void CloseCdFile(Obj80027480 *self);
+extern void CloseCdFile(Class6D4E8 *self);
 extern void LockCd(void);
-extern void StartCdOperation(s32 arg0, s32 arg1);
+/* StartCdOperation(op, state): op is the value GetCdOperation later reports
+ * (0 Close, 1 Open, 2 Seek, 3 Read, 4 LoadFile, each used by exactly one
+ * method below and left literal), state is the first CD_STATE_*. */
+extern void StartCdOperation(s32 op, s32 state);
 extern void ResetCdStateMachine(void);
-extern void EnqueueCdRequest(Obj80027480 *arg0, s32 arg1, s32 arg2, s32 arg3,
+extern void EnqueueCdRequest(Class6D4E8 *arg0, s32 arg1, s32 arg2, s32 arg3,
                            s32 arg4);
 extern void UnlockCd(void);
 
-/* Linear-scan table lookups over the 0x1C-byte string records at
- * gFileTable (src/code_179d8_r.c). Declared LOCAL here (own reading of the
- * trailing fields this function reads), not via a shared header. */
-typedef struct Rec80028448 {
-    u8 pad0[0x14];
-    Pos18 unk14;
-    u32 unk18;
-} Rec80028448;
+/* One 0x1C-byte record of the file table at gFileTable, which
+ * FindCdFileEntry/GetCdFileEntry (code_179d8_r.c) return: the same layout
+ * and name as code_179d8_q.c's own local CdFileEntry. */
+typedef struct CdFileEntry {
+    /* +0x00 */ char name[0x14];
+    /* +0x14 */ CdLoc16 pos;
+    /* +0x18 */ u32 size;
+} CdFileEntry;
 
 extern void *FindCdFileEntry(char *arg0);
 extern s32 FindCdFileIndex(char *arg0);
 extern void *gCdSeekParam;
 extern s32 gCdTickStep;
 
-extern void OpenCdFile(Obj80027480 *self, char *suffix);
+extern void OpenCdFile(Class6D4E8 *self, char *suffix);
 extern char *BuildCdFilePath(char *dest, char *suffix);
 extern s32 CdSearchFile(void *statBuf, char *path);
 extern void CdControl(s32 arg0, void *buf, s32 arg2);
 extern s32 CdSync(s32 mode, void *result);
 
-typedef struct StatBuf80027 {
-    Pos18 unk0;
-    u32 unk4;
+/* CdSearchFile's output buffer (Sony's CdlFILE, 0x18 bytes); the same name
+ * as code_179d8_q.c's own local view. Only the two fields copied out are
+ * typed. */
+typedef struct CdFileInfo {
+    /* +0x00 */ CdLoc16 pos;
+    /* +0x04 */ u32 size;
     u8 pad8[0x18 - 8];
-} StatBuf80027;
+} CdFileInfo;
 
-void func_800272D0(Obj80027480 *self, char *suffix, s32 arg2, s32 arg3) {
+void Class6D4E8__Open(Class6D4E8 *self, char *name, s32 arg2, s32 arg3) {
     char path[0x40];
-    StatBuf80027 statBuf;
-    Rec80028448 *rec;
-    s32 temp;
+    CdFileInfo statBuf;
+    CdFileEntry *rec;
+    s32 size;
     s32 v0;
 
     if (gCdAsyncEnabled == 0 && D_8008A860 == 0) {
-        OpenCdFile(self, suffix);
+        OpenCdFile(self, name);
         return;
     }
     LockCd();
-    if (self->unk28 != 0) {
-        if (gCdBusy == 0 && self->unk0C == 0) {
-            StartCdOperation(1, 1);
+    if (self->inQueueDispatch != 0) {
+        if (gCdBusy == 0 && self->isOpen == 0) {
+            StartCdOperation(1, CD_STATE_SETLOC);
             if (gCdAsyncEnabled != 0) {
-                rec = FindCdFileEntry(suffix);
+                rec = FindCdFileEntry(name);
                 gCdSeekParam = rec;
                 if (rec == NULL) {
                     return;
                 }
-                self->unk18 = rec->unk14;
-                temp = ((Rec80028448 *)gCdSeekParam)->unk18;
-                gCdTickStep = 1;
-                self->unk0C = 1;
-                self->unk1C = temp;
+                self->pos = rec->pos;
+                size = ((CdFileEntry *)gCdSeekParam)->size;
+                gCdTickStep = CD_TICK_STATE_MACHINE;
+                self->isOpen = 1;
+                self->size = size;
             } else {
-                BuildCdFilePath(path, suffix);
+                BuildCdFilePath(path, name);
                 do {
                 } while (CdSearchFile(&statBuf, path) == 0);
-                self->unk18 = statBuf.unk0;
-                self->unk1C = statBuf.unk4;
+                self->pos = statBuf.pos;
+                self->size = statBuf.size;
                 do {
-                    CdControl(2, &self->unk18, 0);
+                    CdControl(CD_CMD_SETLOC, &self->pos, 0);
                     do {
                         v0 = CdSync(0, 0);
                     } while (v0 == 0);
-                } while (v0 == 5);
-                self->unk0C = 1;
+                } while (v0 == CD_SYNC_DISK_ERROR);
+                self->isOpen = 1;
                 ResetCdStateMachine();
             }
         }
     } else {
-        EnqueueCdRequest(self, FindCdFileIndex(suffix), 2, arg2, arg3);
+        EnqueueCdRequest(self, FindCdFileIndex(name), CD_OP_OPEN, arg2, arg3);
     }
     UnlockCd();
 }
 
-void func_80027480(Obj80027480 *self) {
+void Class6D4E8__Close(Class6D4E8 *self) {
     if (gCdAsyncEnabled == 0 && D_8008A860 == 0) {
         CloseCdFile(self);
         return;
     }
     LockCd();
-    if (self->unk28 != 0) {
+    if (self->inQueueDispatch != 0) {
         if (gCdBusy == 0) {
-            StartCdOperation(0, 0);
-            self->unk0C = 0;
+            StartCdOperation(0, CD_STATE_IDLE);
+            self->isOpen = 0;
             ResetCdStateMachine();
         }
     } else {
-        EnqueueCdRequest(self, 0, 3, 0, 0);
+        EnqueueCdRequest(self, 0, CD_OP_CLOSE, 0, 0);
     }
     UnlockCd();
 }
 
-extern u8 D_8006D574[8];
+extern u8 gCdSeekLoc[8];
 extern void *gCdSeekParam;
 extern s32 gCdTickStep;
 
-extern s32 GetCdFileSize(Obj80027480 *self);
+extern s32 GetCdFileSize(Class6D4E8 *self);
 extern s32 CdPosToInt(void *pos);
 extern void CdIntToPos(s32 i, void *pos);
 extern void CdControl(s32 arg0, void *buf, s32 arg2);
 extern s32 CdSync(s32 mode, void *result);
 
-s32 func_80027528(Obj80027480 *self, u32 arg1, s32 arg2) {
+s32 Class6D4E8__Seek(Class6D4E8 *self, u32 offset, s32 mode) {
     s32 v0;
-    u32 s0tmp;
+    u32 sectors;
 
     if (gCdAsyncEnabled == 0 && D_8008A860 == 0) {
         return GetCdFileSize(self);
     }
     LockCd();
-    if (self->unk28 != 0) {
-        if (gCdBusy == 0 && self->unk0C != 0) {
-            StartCdOperation(2, 1);
-            s0tmp = arg1 >> 11;
-            if ((arg1 & 0x7FF) != 0) {
-                s0tmp = s0tmp + 1;
+    if (self->inQueueDispatch != 0) {
+        if (gCdBusy == 0 && self->isOpen != 0) {
+            StartCdOperation(2, CD_STATE_SETLOC);
+            sectors = offset >> 11;
+            if ((offset & 0x7FF) != 0) {
+                sectors = sectors + 1;
             }
-            v0 = CdPosToInt(&self->unk18);
-            CdIntToPos(v0 + s0tmp, D_8006D574);
-            if (arg2 == 0) {
+            v0 = CdPosToInt(&self->pos);
+            CdIntToPos(v0 + sectors, gCdSeekLoc);
+            if (mode == 0) {
                 if (gCdAsyncEnabled != 0) {
-                    gCdSeekParam = D_8006D574 - 0x14;
-                    gCdTickStep = 1;
+                    /* the state machine seeks to gCdSeekParam + 0x14 (a
+                     * CdFileEntry's pos), so point it 0x14 before the loc */
+                    gCdSeekParam = gCdSeekLoc - 0x14;
+                    gCdTickStep = CD_TICK_STATE_MACHINE;
                 } else {
                     do {
-                        CdControl(2, D_8006D574, 0);
+                        CdControl(CD_CMD_SETLOC, gCdSeekLoc, 0);
                         do {
                             v0 = CdSync(0, 0);
                         } while (v0 == 0);
-                    } while (v0 == 5);
+                    } while (v0 == CD_SYNC_DISK_ERROR);
                     ResetCdStateMachine();
                 }
             } else {
                 ResetCdStateMachine();
                 UnlockCd();
-                if ((self->unk1C & 0x7FF) != 0) {
-                    return ((self->unk1C >> 11) + 1) << 11;
+                if ((self->size & 0x7FF) != 0) {
+                    return ((self->size >> 11) + 1) << 11;
                 }
-                return self->unk1C;
+                return self->size;
             }
         }
     } else {
-        EnqueueCdRequest(self, 0, 4, (s32)arg1, arg2);
+        EnqueueCdRequest(self, 0, CD_OP_SEEK, (s32)offset, mode);
     }
     UnlockCd();
     return 0;
 }
 
-void func_800276C8(void) {
+void Class6D4E8__NoOpSlot50(void) {
 }
 
 extern s32 gCdReadSectorCount; /* CdRead sector count */
 extern void *gCdReadBuffer; /* CdRead target buffer */
 extern s32 gCdTickStep;
 
-extern void ReadCdFile(Obj80027480 *self, void *arg1, s32 arg2);
+extern void ReadCdFile(Class6D4E8 *self, void *arg1, s32 arg2);
 extern s32 CdRead(s32 sectors, void *buf, s32 mode);
 extern s32 CdReadSync(s32 mode, s32 result);
 extern void ResetCdStateMachine(void);
 
-s32 func_800276D0(Obj80027480 *self, void *buf, u32 size) {
+s32 Class6D4E8__Read(Class6D4E8 *self, void *buf, u32 size) {
     s32 v1;
 
     if (gCdAsyncEnabled == 0 && D_8008A860 == 0) {
@@ -244,16 +294,16 @@ s32 func_800276D0(Obj80027480 *self, void *buf, u32 size) {
         return 0;
     }
     LockCd();
-    if (self->unk28 != 0) {
-        if (gCdBusy == 0 && self->unk0C != 0) {
-            StartCdOperation(3, 7);
+    if (self->inQueueDispatch != 0) {
+        if (gCdBusy == 0 && self->isOpen != 0) {
+            StartCdOperation(3, CD_STATE_READ);
             if (gCdAsyncEnabled != 0) {
                 gCdReadSectorCount = size >> 11;
                 gCdReadBuffer = buf;
-                gCdTickStep = 1;
+                gCdTickStep = CD_TICK_STATE_MACHINE;
             } else {
             retry:
-                CdRead(size >> 11, buf, 0x80);
+                CdRead(size >> 11, buf, CD_MODE_DOUBLE_SPEED);
                 do {
                     v1 = CdReadSync(0, 0);
                 } while (v1 > 0);
@@ -264,168 +314,168 @@ s32 func_800276D0(Obj80027480 *self, void *buf, u32 size) {
             }
         }
     } else {
-        EnqueueCdRequest(self, 0, 5, (s32)buf, size);
+        EnqueueCdRequest(self, 0, CD_OP_READ, (s32)buf, size);
     }
     UnlockCd();
     return 0;
 }
 
-extern void Class6D430__AllocBuffer(void); /* arity-ok: the definition takes (Class6D430 *this, s32 arg1) and reads both, but func_80027800 passes NEITHER -- retail's jal at 0x80027834 has a bare nop delay slot and leaves its own incoming $a0/$a1 in place */
+extern void Class6D430__AllocBuffer(void); /* arity-ok: the definition takes (Class6D430 *this, s32 arg1) and reads both, but Class6D4E8__LoadFile passes NEITHER -- retail's jal at 0x80027834 has a bare nop delay slot and leaves its own incoming $a0/$a1 in place */
 extern void *gCdSavedSeekParam;
 
-/* generic doubly-linked-list node, 0x24 bytes (src/code_179d8_r.c's own
- * reading) -- declared LOCAL, per the project's multiple-local-views
- * convention. func_80027800 only touches unk0; func_80027A24 (below) reads
- * the rest of this unit's own fields, up through unk18. */
-typedef struct Node8008A894 {
-    s32 unk0;
-    s32 unk4;
-    s32 unk8;
-    Obj80027480 *unkC;
-    s32 unk10;
-    s32 unk14;
-    s32 unk18;
-} Node8008A894;
+/* A gCdRequestQueue node, 0x24 bytes: this unit's own local view of
+ * code_179d8_r.c's CdRequestNode, down to the last field read here (the
+ * list links sit past it). Field names are the ones code_179d8_q.c's
+ * EnqueueCdRequest writes and code_179d8_r.c's StartCdOperation sets. */
+typedef struct CdRequestNode {
+    /* +0x00 */ s32 active;         /* set by StartCdOperation when the op starts */
+    /* +0x04 */ s32 unk4;           /* zeroed at allocation; nonzero ORs flags bit 0 */
+    /* +0x08 */ s32 op;             /* CD_OP_* */
+    /* +0x0C */ Class6D4E8 *owner;  /* the requesting object */
+    /* +0x10 */ s32 fileIndex;      /* FindCdFileIndex's index, 0 if none */
+    /* +0x14 */ s32 param0;
+    /* +0x18 */ s32 param1;
+} CdRequestNode;
 
-extern Node8008A894 *gCdRequestQueue;
+extern CdRequestNode *gCdRequestQueue;
 extern void *BMemPMgrAlloc(s32 size);
 
-void func_80027800(Obj80027480 *self, char *arg1) {
-    Rec80028448 *rec;
+void Class6D4E8__LoadFile(Class6D4E8 *self, char *name) {
+    CdFileEntry *rec;
     s32 sectorCount;
-    s32 pos;
+    s32 readSize;
     void *ret;
     s32 v1;
 
     if (gCdAsyncEnabled == 0 && D_8008A860 == 0) {
         Class6D430__AllocBuffer();
-        self->unk24 |= 0x200;
-        self->methods->slot64(self);
+        self->flags |= CD_FLAG_LOAD_FILE_DONE;
+        self->methods->setFlag(self);
         return;
     }
     LockCd();
-    if (self->unk28 != 0) {
-        if (gCdBusy == 0 && (self->unk10 == NULL || self->unk20 != 0)) {
-            StartCdOperation(4, 1);
+    if (self->inQueueDispatch != 0) {
+        if (gCdBusy == 0 && (self->buffer == NULL || self->freeGuard != 0)) {
+            StartCdOperation(4, CD_STATE_SETLOC);
             gCdSavedSeekParam = gCdSeekParam;
-            rec = FindCdFileEntry(arg1);
+            rec = FindCdFileEntry(name);
             gCdSeekParam = rec;
             if (rec == NULL) {
                 return;
             }
             {
-                sectorCount = rec->unk18 >> 11;
+                sectorCount = rec->size >> 11;
                 gCdReadSectorCount = sectorCount;
-                if ((rec->unk18 & 0x7FF) != 0) {
+                if ((rec->size & 0x7FF) != 0) {
                     gCdReadSectorCount = sectorCount + 1;
                 }
-                pos = gCdReadSectorCount << 11;
-                if (self->unk10 == NULL) {
-                    ret = BMemPMgrAlloc(pos);
+                readSize = gCdReadSectorCount << 11;
+                if (self->buffer == NULL) {
+                    ret = BMemPMgrAlloc(readSize);
                     if (ret == NULL) {
-                        self->methods->onError(self);
+                        self->methods->close(self);
                         return;
                     }
                     gCdReadBuffer = ret;
-                    self->unk10 = ret;
+                    self->buffer = ret;
                 } else {
-                    gCdReadBuffer = self->unk10;
+                    gCdReadBuffer = self->buffer;
                 }
                 if (gCdAsyncEnabled != 0) {
-                    self->unk14 = pos;
-                    gCdTickStep = 2;
+                    self->bufferSize = readSize;
+                    gCdTickStep = CD_TICK_LOAD_FILE;
                 } else {
                 retry:
                     do {
-                        CdControl(2, (u8 *)gCdSeekParam + 0x14, 0);
+                        CdControl(CD_CMD_SETLOC, (u8 *)gCdSeekParam + 0x14, 0);
                         do {
                             v1 = CdSync(0, 0);
                         } while (v1 == 0);
-                    } while (v1 == 5);
-                    CdRead(gCdReadSectorCount, self->unk10, 0x80);
+                    } while (v1 == CD_SYNC_DISK_ERROR);
+                    CdRead(gCdReadSectorCount, self->buffer, CD_MODE_DOUBLE_SPEED);
                     do {
                         v1 = CdReadSync(0, 0);
                     } while (v1 > 0);
                     if (v1 == -1) {
                         goto retry;
                     }
-                    self->unk14 = pos;
-                    gCdRequestQueue->unk0 = 1;
+                    self->bufferSize = readSize;
+                    gCdRequestQueue->active = 1;
                     ResetCdStateMachine();
                 }
             }
         }
     } else {
-        EnqueueCdRequest(self, FindCdFileIndex(arg1), 7, 0, 0);
+        EnqueueCdRequest(self, FindCdFileIndex(name), CD_OP_LOAD_FILE, 0, 0);
     }
     UnlockCd();
 }
 
 extern s32 gCdIdle; /* "idle"/"ready" flag, 0/1 */
-extern void FreeCdRequestNode(Node8008A894 *node);
+extern void FreeCdRequestNode(CdRequestNode *node);
 extern void *GetCdFileEntry(s32 index);
 
-void func_80027A24(void) {
-    Node8008A894 *node;
-    Obj80027480 *self;
-    s32 code;
+void Class6D4E8__RunRequestQueue(void) {
+    CdRequestNode *node;
+    Class6D4E8 *self;
+    s32 op;
 
     LockCd();
     node = gCdRequestQueue;
     if (node != NULL) {
-        self = node->unkC;
-        code = node->unk8;
-        if (node->unk0 == 0) {
-            self->unk28 = 1;
-            switch (code) {
-            case 2:
-                self->methods->slot44(self, GetCdFileEntry(node->unk10),
-                                      node->unk14, node->unk18);
+        self = node->owner;
+        op = node->op;
+        if (node->active == 0) {
+            self->inQueueDispatch = 1;
+            switch (op) {
+            case CD_OP_OPEN:
+                self->methods->open(self, GetCdFileEntry(node->fileIndex),
+                                  node->param0, node->param1);
                 break;
-            case 3:
-                self->methods->onError(self);
+            case CD_OP_CLOSE:
+                self->methods->close(self);
                 break;
-            case 4:
-                self->methods->slot4C(self, node->unk14, node->unk18);
+            case CD_OP_SEEK:
+                self->methods->seek(self, node->param0, node->param1);
                 break;
-            case 5:
-                self->methods->slot54(self, node->unk14, node->unk18);
+            case CD_OP_READ:
+                self->methods->read(self, node->param0, node->param1);
                 break;
-            case 7:
-                self->methods->slot58(self, GetCdFileEntry(node->unk10));
+            case CD_OP_LOAD_FILE:
+                self->methods->loadFile(self, GetCdFileEntry(node->fileIndex));
                 break;
             }
-            self->unk28 = 0;
+            self->inQueueDispatch = 0;
         } else if (gCdIdle != 0) {
             if (node->unk4 != 0) {
-                self->unk24 |= 1;
+                self->flags |= 1;
             }
-            self->unk22 -= 1;
-            self->unk24 = *(volatile s32 *)&self->unk24 | 2;
-            if (self->unk22 == 0) {
-                self->unk24 = *(volatile s32 *)&self->unk24 | 4;
+            self->pendingRequests -= 1;
+            self->flags = *(volatile s32 *)&self->flags | CD_FLAG_DONE;
+            if (self->pendingRequests == 0) {
+                self->flags = *(volatile s32 *)&self->flags | CD_FLAG_NONE_PENDING;
             }
-            switch (code) {
-            case 2:
-                self->unk24 |= 0x10;
+            switch (op) {
+            case CD_OP_OPEN:
+                self->flags |= CD_FLAG_OPEN_DONE;
                 break;
-            case 3:
-                self->unk24 |= 0x20;
+            case CD_OP_CLOSE:
+                self->flags |= CD_FLAG_CLOSE_DONE;
                 break;
-            case 4:
-                self->unk24 |= 0x40;
+            case CD_OP_SEEK:
+                self->flags |= CD_FLAG_SEEK_DONE;
                 break;
-            case 5:
-                self->unk24 |= 0x80;
+            case CD_OP_READ:
+                self->flags |= CD_FLAG_READ_DONE;
                 break;
-            case 7:
-                self->unk24 |= 0x200;
+            case CD_OP_LOAD_FILE:
+                self->flags |= CD_FLAG_LOAD_FILE_DONE;
                 break;
             }
-            self->methods->slot64(self);
+            self->methods->setFlag(self);
             FreeCdRequestNode(node);
             if (gCdRequestQueue == NULL) {
-                self->methods->slot70(self);
+                self->methods->stopCdService(self);
             }
         }
     }

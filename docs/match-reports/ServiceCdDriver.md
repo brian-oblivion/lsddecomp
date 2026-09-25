@@ -29,7 +29,7 @@ extern void VSyncCallback(void (*cb)(void));
  * class-map comment above); only the one slot this call site dispatches is
  * typed, following the pad-to-offset convention include/code_171e0.h uses
  * for D_8006D430's own table. tools/classtable.py resolves +0x068 to
- * func_80027A24 (code_179d8_s), which walks the gCdRequestQueue request list,
+ * Class6D4E8__RunRequestQueue (code_179d8_s), which walks the gCdRequestQueue request list,
  * dispatches each request through its owner's own slots and frees it with
  * FreeCdRequestNode -- so the slot is named for what that method does. */
 typedef struct Methods6D4E8_80EC Methods6D4E8_80EC;
@@ -134,7 +134,7 @@ is the one word that covers a tick that both advances a state machine and
 drains a queue.
 
 **`gCdQueueEnabled`.** Its only reader is the guard on the `+0x068` dispatch
-here, and `tools/classtable.py` resolves that slot to `func_80027A24`
+here, and `tools/classtable.py` resolves that slot to `Class6D4E8__RunRequestQueue`
 (code_179d8_s), which walks `gCdRequestQueue`, dispatches each request and frees
 it with `FreeCdRequestNode`. So the flag gates queue processing specifically --
 not the tick, which still runs the state machine while the flag is clear.

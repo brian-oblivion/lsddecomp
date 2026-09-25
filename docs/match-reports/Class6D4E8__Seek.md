@@ -1,11 +1,13 @@
-# func_80027528 -- MATCHED (round 47, alpha)
+# Class6D4E8__Seek -- MATCHED (round 47, alpha)
+
+> Renamed from `func_80027528` on 2026-09-25 (tools/rename.py). Address 0x80027528.
 
 104/104 words, byte-exact, file 0x17D28-0x17EC8. Cold ground.
 
 ## Source
 
 ```c
-extern u8 D_8006D574[8];
+extern u8 gCdSeekLoc[8];
 extern void *gCdSeekParam;
 extern s32 gCdTickStep;
 
@@ -15,7 +17,7 @@ extern void CdIntToPos(s32 i, void *pos);
 extern void CdControl(s32 arg0, void *buf, s32 arg2);
 extern s32 CdSync(s32 mode, void *result);
 
-s32 func_80027528(Obj80027480 *self, u32 arg1, s32 arg2) {
+s32 Class6D4E8__Seek(Obj80027480 *self, u32 arg1, s32 arg2) {
     s32 v0;
     u32 s0tmp;
 
@@ -31,14 +33,14 @@ s32 func_80027528(Obj80027480 *self, u32 arg1, s32 arg2) {
                 s0tmp = s0tmp + 1;
             }
             v0 = CdPosToInt(self->unk18);
-            CdIntToPos(v0 + s0tmp, D_8006D574);
+            CdIntToPos(v0 + s0tmp, gCdSeekLoc);
             if (arg2 == 0) {
                 if (gCdAsyncEnabled != 0) {
-                    gCdSeekParam = D_8006D574 - 0x14;
+                    gCdSeekParam = gCdSeekLoc - 0x14;
                     gCdTickStep = 1;
                 } else {
                     do {
-                        CdControl(2, D_8006D574, 0);
+                        CdControl(2, gCdSeekLoc, 0);
                         do {
                             v0 = CdSync(0, 0);
                         } while (v0 == 0);
@@ -70,8 +72,8 @@ below.
 
 1. **`if (arg2 != 0) { ...; return X; } if (gCdAsyncEnabled...) {...} else {...}`
    vs `if (arg2 == 0) {...} else { ...; return X; }`** -- the same
-   nested-if/else-if-vs-nested-if POLARITY lever as `func_80027480` and
-   `func_800276D0`, on a THIRD shape this time (an early-return `if` next to
+   nested-if/else-if-vs-nested-if POLARITY lever as `Class6D4E8__Close` and
+   `Class6D4E8__Read`, on a THIRD shape this time (an early-return `if` next to
    unconditional fall-through code, not two sibling `if`s). The fall-through
    arm (immediately after the `bnez`/`beqz` test) must be the `arg2==0`
    branch (the CdControl retry / gp_rel-store code); the branch TARGET,
@@ -83,10 +85,10 @@ below.
    duplicates a call pair that also appears on the fall-through path is this
    same polarity bug, not two independent residues.
 
-2. **The `func_800276D0` goto-instead-of-do-while lever does NOT apply here,
+2. **The `Class6D4E8__Read` goto-instead-of-do-while lever does NOT apply here,
    and this is the important negative.** This function has a SECOND
    CdControl/CdSync retry loop, structurally identical in shape to
-   `func_800276D0`'s CdRead/CdReadSync loop (a `do { call; do { v = call2();
+   `Class6D4E8__Read`'s CdRead/CdReadSync loop (a `do { call; do { v = call2();
    } while (v cond); } while (v == CONST);` retry pattern). Reflexively
    applying the same `goto`-based rewrite (to defeat GCC's loop-invariant
    hoist of the retry constant) produced the WRONG shape here: retail's own
@@ -101,7 +103,7 @@ below.
    vs `goto`, rather than carrying the previous function's answer forward.
 
 3. Everything else (the `srl` vs `sra` unsigned-shift lever from
-   `func_800276D0`, applied to `arg1 >> 11`/`self->unk1C >> 11`; the
+   `Class6D4E8__Read`, applied to `arg1 >> 11`/`self->unk1C >> 11`; the
    round-up-to-sector idiom `x>>11; if (x&0x7FF) x++;`; the
    `EnqueueCdRequest`/`StartCdOperation` call shapes) matched on the first
    build once 1 and 2 above were fixed.
@@ -113,10 +115,10 @@ passed to `CdPosToInt`) and `self->unk1C` is a `u32` byte-length field
 (rounded up to a 0x800-byte sector boundary, same formula as
 `GetCdFileSize`'s own `((self->unk1C >> 11) + 1) << 11`, code_179d8_h.c) --
 this is the SAME struct as `ObjA34_179D8H` there, and that unit already
-names offset 0x1C the same way, independently. `D_8006D574` is an 8-byte
+names offset 0x1C the same way, independently. `gCdSeekLoc` is an 8-byte
 zero-initialized buffer (`asm/data/5DB70.data.s`); this function only ever
 takes its address, so it's declared as a plain byte array locally.
-`gCdSeekParam = D_8006D574 - 0x14` matches `code_179d8_r.c`'s existing reads of
+`gCdSeekParam = gCdSeekLoc - 0x14` matches `code_179d8_r.c`'s existing reads of
 that global (`(u8 *)gCdSeekParam + 0x14`) -- the same pointer, offset the other
 direction.
 
@@ -124,10 +126,40 @@ direction.
 
 **Do not generalize a loop-shape lever across two structurally-identical
 loops in the SAME function without checking each one's own retail bytes.**
-`func_80027528` has two nearly-identical retry loops in spirit (both
+`Class6D4E8__Seek` has two nearly-identical retry loops in spirit (both
 "do a CD op, poll for completion, retry on a specific status code"), and
 retail hoists the retry constant in ONE of them and not the other analog
 found in the previous function. The `goto`-defeats-loop.c's-invariant-motion
-lever from `func_800276D0` is real, but its APPLICATION is per-loop: read
+lever from `Class6D4E8__Read` is real, but its APPLICATION is per-loop: read
 whether retail's own `.s` shows a `li $sN,<const>` sitting above the retry
 label before reaching for `goto` instead of `do`/`while`.
+
+## Naming
+
+Round 79 (charlie), FINISHING-PLAN track 3.
+
+| was | now | tier |
+| --- | --- | --- |
+| `func_80027528` | `Class6D4E8__Seek` | B |
+
+**Evidence.** `(self, offset, mode)`. Inside a queue dispatch on an open
+file it converts `self->pos` to a sector number (`CdPosToInt`), adds
+`offset` rounded up to whole 0x800-byte sectors, and writes the result to
+`gCdSeekLoc` (`CdIntToPos`). With `mode == 0` it then seeks there
+(CdlSetloc, or queues the seek on the state machine) and returns 0; with
+`mode != 0` it instead returns `self->size` rounded up to a whole sector.
+Outside a dispatch it enqueues op 4 with both arguments. The base-class
+caller agrees with that reading: `Class6D430__AllocBuffer` calls this slot
+as `(0, 2)` to get the size it allocates and `(0, 0)` to rewind before
+reading, the shape of `lseek(fd, 0, SEEK_END)` / `lseek(fd, 0, SEEK_SET)`.
+
+**Why tier B.** The sync-mode path does not seek at all: it forwards to
+`GetCdFileSize` and ignores both arguments. And only `mode` 0 and "nonzero"
+are distinguished, so the lseek analogy is a description of the two
+callers, not an established `whence` enumeration. The name covers the
+async body and the rewind use; the size query is the other half of it.
+
+**Class prefix.** `Class6D4E8` is the placeholder token for the method
+table `D_8006D4E8` (the convention `Class6D4E8__RequestLoadFile` and its two
+siblings already use); `tools/classtable.py D_8006D4E8` lists this function
+at slot `+0x04C`. The prefix names the table, not the developers' class.

@@ -136,8 +136,8 @@ what reproduces the exact branch/block layout, not just the logic.
 (code_179d8_q.c) when `gCdTickStep == 1`. This is the *default* of the two
 tick functions: cross-referencing every `gCdTickStep = 1` assignment in
 code_179d8_s.c shows it backs three different request paths --
-`func_800272D0` (open/resolve), `func_80027528` (explicit seek) and
-`func_800276D0` (straight read from the current position, which starts at
+`Class6D4E8__Open` (open/resolve), `Class6D4E8__Seek` (explicit seek) and
+`Class6D4E8__Read` (straight read from the current position, which starts at
 phase 7 directly, so this function's phase-2 branch is never exercised on
 that path). Named for the mechanics (a generic state-machine tick); which
 of those three call sites is *the* reason for its behaviour (as opposed to

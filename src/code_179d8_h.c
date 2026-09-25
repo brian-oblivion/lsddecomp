@@ -45,8 +45,8 @@
  *     `ObjA34_179D8H` quad, all four matched): resolves a CD-ROM file
  *     by name, tracks whether it is open, reports its sector-rounded size,
  *     and reads from it.  Not inferred from this unit alone --
- *     `src/code_179d8_s.c`'s `func_800272D0`/`func_80027480`/
- *     `func_80027528`/`func_800276D0` call the sync version of exactly one
+ *     `src/code_179d8_s.c`'s `Class6D4E8__Open`/`Class6D4E8__Close`/
+ *     `Class6D4E8__Seek`/`Class6D4E8__Read` call the sync version of exactly one
  *     of these apiece when CD-async mode is off, and independently
  *     reimplement the identical algorithm (same field offsets) for the
  *     async path otherwise -- see `OpenCdFile.md` for the full mapping.
@@ -62,7 +62,7 @@
  * The 43 functions in FRONT of this slice (still `code_179d8`) are
  * gp_rel-saturated -- 33 of 43 blocked, RESOLVED per the ROUND 42 CORRECTION
  * -- and that remainder also owns this segment's ONLY switch jump table
- * (func_80027A24, which will need the Gate 2 rodata attach/split when it is
+ * (Class6D4E8__RunRequestQueue, which will need the Gate 2 rodata attach/split when it is
  * carved).  The cut is placed here to leave both debts behind: THIS slice
  * owns no jump table and needs no rodata attach.
  *
@@ -121,7 +121,7 @@ typedef struct ObjA34_179D8H ObjA34_179D8H;
  * after adding it. Named `onError`: the ONE confirmed dispatch (ReadCdFile,
  * when `self->isOpen == 0`) matches the SAME slot number (+0x48) that
  * src/code_179d8_s.c's independent local view (Methods80027480::slot48)
- * dispatches on ITS OWN allocation-failure path (func_80027800) -- two
+ * dispatches on ITS OWN allocation-failure path (Class6D4E8__LoadFile) -- two
  * unrelated call sites landing on the identical offset for a give-up path
  * is evidence for "error/failure handler", not a guess at a specific
  * message; PROPOSED for code_179d8_s.c under the same name, not applied
@@ -138,7 +138,7 @@ struct ObjA34_179D8H {
                    * CdSearchFile, cleared by CloseCdFile; GetCdFileSize
                    * returns 0 when this is 0. Named from src/code_179d8_s.c's
                    * independent async reimplementation of the same three
-                   * operations (func_800272D0/func_80027480/func_80027528),
+                   * operations (Class6D4E8__Open/Class6D4E8__Close/Class6D4E8__Seek),
                    * which sets/clears the identical field (its own
                    * Obj80027480::unk0C) around the identical CD-search /
                    * CdControl+CdSync sequence -- not guessed from this unit

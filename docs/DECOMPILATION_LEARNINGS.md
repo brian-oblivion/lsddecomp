@@ -219,7 +219,7 @@ load through a runtime-indexed global", §"BLOCKED: the `nop_mflo_mfhi` screen r
   written as real per-case source, 2.6.3 cross-jumps the `default:` copy onto the first identical
   tail, moving ONLY the bounds-check branch target and the jump-table slot for the unhandled
   in-range value — presenting as a 3-byte whole-image diff at 150/151. (a round 67,
-  `func_80027A24`)
+  `Class6D4E8__RunRequestQueue`)
 
 ### 3c. Struct layout, types and widths
 

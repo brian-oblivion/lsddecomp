@@ -220,6 +220,6 @@ which is the procedure working in the direction where it can work.
 | unit | type | field | proposed | tier | evidence |
 | --- | --- | --- | --- | --- | --- |
 | code_179d8_s | `Rec80028448` | `unk14` | `pos` | A | same 0x1C record; filled from `CdSearchFile`'s `CdlFILE.pos` |
-| code_179d8_s | `Rec80028448` | `unk18` | `size` | A | same record; `func_80027800` divides it by 0x800 to get a sector count |
+| code_179d8_s | `Rec80028448` | `unk18` | `size` | A | same record; `Class6D4E8__LoadFile` divides it by 0x800 to get a sector count |
 | code_179d8_s | `StatBuf80027` | `unk0`/`unk4` | `pos`/`size` | A | it is `CdlFILE`; see above |
 | code_179d8_h | `StatBuf179D8H` | `unk0`/`unk4` | `pos`/`size` | A | same Sony struct, same call |

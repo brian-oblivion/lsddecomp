@@ -1,4 +1,6 @@
-# func_800276D0 -- MATCHED (round 47, alpha)
+# Class6D4E8__Read -- MATCHED (round 47, alpha)
+
+> Renamed from `func_800276D0` on 2026-09-25 (tools/rename.py). Address 0x800276d0.
 
 76/76 words, byte-exact, file 0x17ED0-0x18000. Cold ground.
 
@@ -14,7 +16,7 @@ extern s32 CdRead(s32 sectors, void *buf, s32 mode);
 extern s32 CdReadSync(s32 mode, s32 result);
 extern void ResetCdStateMachine(void);
 
-s32 func_800276D0(Obj80027480 *self, void *buf, u32 size) {
+s32 Class6D4E8__Read(Obj80027480 *self, void *buf, u32 size) {
     s32 v1;
 
     if (gCdAsyncEnabled == 0 && D_8008A860 == 0) {
@@ -51,11 +53,11 @@ s32 func_800276D0(Obj80027480 *self, void *buf, u32 size) {
 
 (`Obj80027480`, `gCdAsyncEnabled`, `D_8008A860`, `gCdBusy`, `LockCd`,
 `StartCdOperation`, `EnqueueCdRequest`, `UnlockCd` are all declared earlier in
-the unit, ahead of `func_80027480`.)
+the unit, ahead of `Class6D4E8__Close`.)
 
 ## What it took, in order
 
-1. **The nested-if-vs-if/else-if polarity lever from `func_80027480` applied
+1. **The nested-if-vs-if/else-if polarity lever from `Class6D4E8__Close` applied
    again unchanged**: `if (self->unk28 != 0) { if (gCdBusy==0 && ...) {...}
    } else { EnqueueCdRequest(...); }`, not the flattened else-if form. Same
    reasoning as that report.
@@ -108,3 +110,23 @@ does not. Discriminator for when to reach for it: the diff shows an EXTRA
 that copies a call's return value into its own register inside the loop --
 that pairing is the hoist's signature, not a generic register-identity
 residue.
+
+## Naming
+
+Round 79 (charlie), FINISHING-PLAN track 3.
+
+| was | now | tier |
+| --- | --- | --- |
+| `func_800276D0` | `Class6D4E8__Read` | A |
+
+**Evidence.** `(self, buf, size)`. Sync mode forwards to `ReadCdFile`;
+otherwise it enqueues op 5 with `buf`/`size`, or inside a queue dispatch on
+an open file reads `size >> 11` sectors into `buf` (CdRead + CdReadSync
+retry loop, or hands `gCdReadSectorCount`/`gCdReadBuffer` to the state
+machine). `Class6D430__AllocBuffer` calls this slot with the buffer it just
+allocated and its size, between the rewind and the close.
+
+**Class prefix.** `Class6D4E8` is the placeholder token for the method
+table `D_8006D4E8` (the convention `Class6D4E8__RequestLoadFile` and its two
+siblings already use); `tools/classtable.py D_8006D4E8` lists this function
+at slot `+0x054`. The prefix names the table, not the developers' class.

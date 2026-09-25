@@ -54,6 +54,6 @@ this unit.
 table, `strstr`-matching `name` against each 0x1C-byte record; returns the
 matching record pointer or `NULL`. Distinguished from `GetCdFileEntry`
 (direct index-to-pointer, no search) by the Find/Get convention. Caller
-`func_80027800` (code_179d8_s.c, the `Class6D4E8__RequestLoadFile` worker)
+`Class6D4E8__LoadFile` (code_179d8_s.c, the `Class6D4E8__RequestLoadFile` worker)
 uses the returned record's `pos`/`size` fields to seek to and size the read,
 confirming "find the file's table entry by name" as the purpose.

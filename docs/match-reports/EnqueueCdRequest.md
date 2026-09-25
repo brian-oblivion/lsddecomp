@@ -114,7 +114,7 @@ service runs: tier A.
 
 | field | name | tier | evidence |
 | --- | --- | --- | --- |
-| `+0x08` | `op` | A | the five call sites pass 2, 3, 4, 5, 7 -- one constant per class method, and `func_80027A24` switches on it when it drains the queue |
+| `+0x08` | `op` | A | the five call sites pass 2, 3, 4, 5, 7 -- one constant per class method, and `Class6D4E8__RunRequestQueue` switches on it when it drains the queue |
 | `+0x0C` | `owner` | A | the requesting object; `Class6D4E8__CancelRequests` matches on it to cancel one object's requests |
 | `+0x10` | `fileIndex` | A | `FindCdFileIndex`'s return -- an index into `gFileTable` -- at the two ops that name a file, 0 at the others |
 | `+0x14` | `param0` | B | the op's first extra argument: `arg2` for op 2, a byte count for op 4, a buffer for op 5 |

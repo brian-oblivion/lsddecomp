@@ -435,7 +435,7 @@ from check (b)), not as a spent, failed search.
 - **`func_80028A84` -> `ReadCdFile`, tier B.** Mechanics: if not open,
   dispatches the object's own error/failure slot and returns; otherwise
   loops issuing `CdControl`/`CdSync` then `CdRead`/`CdReadSync` to fill the
-  caller's buffer. Confirmed by `src/code_179d8_s.c`'s `func_800276D0`,
+  caller's buffer. Confirmed by `src/code_179d8_s.c`'s `Class6D4E8__Read`,
   which calls this function directly when CD-async mode is off and
   otherwise reimplements the identical `CdRead`/`CdReadSync` retry loop for
   its async path. Paired with `OpenCdFile`/`CloseCdFile`/`GetCdFileSize`
@@ -443,7 +443,7 @@ from check (b)), not as a spent, failed search.
 - `MethodsA34_179D8H::slot48` -> `onError` (tier B): the slot NUMBER (+0x48)
   matches `src/code_179d8_s.c`'s own independent view
   (`Methods80027480::slot48`), dispatched there on an unrelated
-  allocation-failure path (`func_80027800`) -- two unrelated give-up paths
+  allocation-failure path (`Class6D4E8__LoadFile`) -- two unrelated give-up paths
   at the identical offset. Not applied in `code_179d8_s.c` (out of unit);
   PROPOSED there under the same name. Recorded in full in
   `src/code_179d8_h.c`'s own field comment and in `OpenCdFile.md`.
@@ -454,7 +454,7 @@ from check (b)), not as a spent, failed search.
   local view of what appears to be the SAME table this unit calls through
   `MethodsA34_179D8H`) -> `onError`, tier B. Same evidence as above: two
   unrelated give-up paths (this unit's `ReadCdFile` on "not open",
-  `code_179d8_s.c`'s own `func_80027800` on allocation failure) dispatch the
+  `code_179d8_s.c`'s own `Class6D4E8__LoadFile` on allocation failure) dispatch the
   identical slot number. `code_179d8_s.c` is out of unit and not staffed
   this round; posted to the broadcast for the head to apply at merge time
   per FINISHING-PLAN.md track 3 step 3 (rename the field in the struct
