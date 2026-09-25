@@ -96,7 +96,21 @@ SeqObj *func_800398E0(s32 vabArg, s32 seqArg, s32 autoPlay) {
     }
     return NULL;
 }
-INCLUDE_ASM("asm/nonmatchings/code_2a0e0", func_8003995C);
+void func_8003995C(SeqObj *self, s32 vabArg, s32 seqArg, s32 autoPlay) {
+    Get_vtable_BasicClass()->ctor((BasicClass *)self);
+    self->methods = func_8003A04C();
+    self->unkC = NULL;
+    self->unk10 = NULL;
+    self->seqId = 0;
+    self->state = 0;
+    self->paused = 0;
+    self->playing = 0;
+    self->unk20 = autoPlay;
+    D_8008A8D8 = 1;
+    self->methods->setSeq(self, seqArg);
+    self->methods->setVab(self, vabArg);
+    self->methods->addChild(self, func_80020C5C());
+}
 INCLUDE_ASM("asm/nonmatchings/code_2a0e0", func_80039A34);
 INCLUDE_ASM("asm/nonmatchings/code_2a0e0", func_80039B04);
 void func_80039B90(SeqObj *self, s32 arg1, s32 arg2) {
