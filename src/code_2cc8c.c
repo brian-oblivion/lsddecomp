@@ -52,19 +52,19 @@ void TaskCore__OnPadEvent(TaskCore *self, BasicClass *sender, s32 event)
     if (self->inputMode != 0) {
         switch (event) {
         case 0x12:
-            methods->onPadPrev(self, sender);
+            methods->onPadPrev(self);
             break;
         case 0x13:
-            methods->onPadNext(self, sender);
+            methods->onPadNext(self);
             break;
         case 0x21:
-            methods->onPad21(self, sender);
+            methods->onPad21(self);
             break;
         case 0x17:
-            methods->onPadCancel(self, sender);
+            methods->onPadCancel(self);
             break;
         case 0x19:
-            methods->onPadConfirm(self, sender);
+            methods->onPadConfirm(self);
             break;
         }
     }
@@ -167,7 +167,7 @@ void TaskCore__PlaySound(TaskCore *self, s32 tone)
     }
 }
 
-void TaskCore__func_8003C7F4(TaskCore *self, BasicClass *sender)
+void TaskCore__func_8003C7F4(TaskCore *self)
 {
     if (self->target != NULL) {
         self->methods->playSound(self, 0x10);
@@ -175,7 +175,7 @@ void TaskCore__func_8003C7F4(TaskCore *self, BasicClass *sender)
     }
 }
 
-void TaskCore__OnPadConfirm(TaskCore *self, BasicClass *sender)
+void TaskCore__OnPadConfirm(TaskCore *self)
 {
     s32 reason;
 
@@ -189,7 +189,7 @@ void TaskCore__OnPadConfirm(TaskCore *self, BasicClass *sender)
     }
 }
 
-void TaskCore__OnPadCancel(TaskCore *self, BasicClass *sender)
+void TaskCore__OnPadCancel(TaskCore *self)
 {
     if (self->target != NULL && self->inputMode != 1) {
         self->methods->playSound(self, 0x10);
@@ -197,7 +197,7 @@ void TaskCore__OnPadCancel(TaskCore *self, BasicClass *sender)
     }
 }
 
-void TaskCore__OnPadPrev(TaskCore *self, BasicClass *sender)
+void TaskCore__OnPadPrev(TaskCore *self)
 {
     void (*handler)(TaskCore *self);
 
@@ -214,7 +214,7 @@ void TaskCore__OnPadPrev(TaskCore *self, BasicClass *sender)
     handler(self);
 }
 
-void TaskCore__OnPadNext(TaskCore *self, BasicClass *sender)
+void TaskCore__OnPadNext(TaskCore *self)
 {
     void (*handler)(TaskCore *self);
 

@@ -7,14 +7,14 @@ StreamTaskObj *New_StreamTaskObj(s32 a1, s32 a2, s32 a3, s32 a4)
 
     self = BMemPMgrAlloc(0xDC);
     if (self != NULL) {
-        Get_vtable_StreamTaskObj()->slot08(self, a1, a2, a3, a4);
+        Get_vtable_StreamTaskObj()->ctor(self, a1, a2, a3, (StreamTaskInitData *)a4);
         return self;
     }
     return NULL;
 }
 
 void StreamTaskObj__StreamTaskObj(StreamTaskObj *self, s32 a1, s32 a2, s32 a3, StreamTaskInitData *a4) {
-    Get_vtable_TaskCore()->slot08(self, a1, a2, a3);
+    Get_vtable_TaskCore()->ctor((TaskCore *)self, (TaskCoreTarget *)a1, (char *)a2, (BasicClass *)a3);
     self->methods = Get_vtable_StreamTaskObj();
     if (a4 != NULL) {
         self->unkA8 = *a4;
@@ -23,12 +23,12 @@ void StreamTaskObj__StreamTaskObj(StreamTaskObj *self, s32 a1, s32 a2, s32 a3, S
     }
     self->unkB4 = New_MoviePlayer(GetDefaultStreamTaskInitData(), 0, 0);
     self->unkB8 = 0;
-    self->methods->slot40(self);
+    self->methods->resetCounters(self);
 }
 
 void StreamTaskObj__Destroy(StreamTaskObj *self) {
     self->unkB4->methods->slot04(self->unkB4);
-    Get_vtable_TaskCore()->slot0C(self);
+    Get_vtable_TaskCore()->finalize((TaskCore *)self);
 }
 
 void StreamTaskObj__Reset(StreamTaskObj *self) {
@@ -43,20 +43,22 @@ void StreamTaskObj__Configure(StreamTaskObj *self, s32 a1, s32 arg2, s32 typeLoo
     self->unkB8 = arg2;
     self->unkBC = typeLookup;
     self->unkC0 = flag;
-    Get_vtable_TaskCore()->slot44(self, a1, 0);
+    Get_vtable_TaskCore()->init((TaskCore *)self, (IntermediateBaseInitArgs *)a1, 0);
 }
 
 void StreamTaskObj__func_8003BAB4(StreamTaskObj *self) {
-    Get_vtable_TaskCore()->slot4C(self);
+    /* IntermediateBase's onInit slot names init's (0, 0, 0); TaskCore__OnInit
+     * takes self alone, and this up-call passes nothing else. */
+    ((void (*)(TaskCore *))Get_vtable_TaskCore()->onInit)((TaskCore *)self);
     self->unkA4 = 0;
     self->unkB4->methods->slot6C(self->unkB4, self->unkC0);
     if (self->unkB4->methods->slot40(self->unkB4, self->unkB8, self->unkBC, self->unkC4, self->unkC8) != 0) {
-        self->methods->slot6C(self, 0);
+        self->methods->setFrameBound(self, 0);
     }
 }
 
 void StreamTaskObj__func_8003BB5C(StreamTaskObj *self, s32 a1, s32 a2) {
-    Get_vtable_TaskCore()->slot5C(self, a1, a2);
+    Get_vtable_TaskCore()->update((TaskCore *)self, (BasicClass *)a1, a2);
     if (self->unkA4 != 0) {
         return;
     }
@@ -67,11 +69,11 @@ void StreamTaskObj__func_8003BB5C(StreamTaskObj *self, s32 a1, s32 a2) {
     if (self->unkD8 != 0) {
         return;
     }
-    self->methods->slot60(self, 7);
+    self->methods->setState(self, 7);
 }
 
 void StreamTaskObj__func_8003BC14(StreamTaskObj *self, s32 a1) {
-    Get_vtable_TaskCore()->slot60(self, a1);
+    Get_vtable_TaskCore()->setState((TaskCore *)self, a1);
     switch (a1) {
     case 5:
         self->unkD8 = 0;
@@ -85,32 +87,32 @@ void StreamTaskObj__func_8003BC14(StreamTaskObj *self, s32 a1) {
         }
         break;
     case 0x12:
-        self->methods->slot94(self);
+        self->methods->refreshViewValue(self);
         break;
     }
 }
 
 void StreamTaskObj__SetUnk40(StreamTaskObj *self, s32 a1) {
-    self->unk40 = a1;
+    self->frameBound = a1;
     if (a1 >= 0) {
-        self->unk40 = a1 * 15;
+        self->frameBound = a1 * 15;
     }
 }
 
 void StreamTaskObj__func_8003BD10(StreamTaskObj *self) {
-    Get_vtable_TaskCore()->slot78(self);
+    Get_vtable_TaskCore()->onPadConfirm((TaskCore *)self);
     if (self->unkCC != 0) {
-        self->unk38 = 2;
-        self->methods->slot60(self, 0x12);
+        self->result = 2;
+        self->methods->setState(self, 0x12);
     }
 }
 
 void StreamTaskObj__func_8003BD74(StreamTaskObj *self) {
-    Get_vtable_TaskCore()->slot80(self);
+    Get_vtable_TaskCore()->onPadPrev((TaskCore *)self);
 }
 
 void StreamTaskObj__func_8003BDAC(StreamTaskObj *self) {
-    Get_vtable_TaskCore()->slot84(self);
+    Get_vtable_TaskCore()->onPadNext((TaskCore *)self);
 }
 
 void StreamTaskObj__NoOpSlot88(void) {
@@ -123,7 +125,7 @@ void StreamTaskObj__func_8003BDF4(StreamTaskObj *self) {
     if (self->unkD4 != 0) {
         self->unkB4->methods->slot4C(self->unkB4);
     } else {
-        self->methods->slot60(self, 7);
+        self->methods->setState(self, 7);
     }
 }
 
@@ -151,109 +153,110 @@ StreamTaskObjMethods *Get_vtable_StreamTaskObj(void) {
     return &gStreamTaskObjMethods;
 }
 
-/* The TaskCore allocator: 0xA4 bytes, constructed through the base class's
- * own slot +0x008. The cast is because TaskCoreMethods::slot08 is typed for
- * StreamTaskObj (its usual caller) rather than for the base object. */
-TaskCoreObj *New_TaskCore(s32 a1, s32 a2, s32 a3)
+/* The TaskCore allocator: 0xA4 bytes, constructed through its own ctor. */
+TaskCore *New_TaskCore(TaskCoreTarget *target, char *soundBankPath, BasicClass *sound)
 {
-    TaskCoreObj *self;
+    TaskCore *self;
 
     self = BMemPMgrAlloc(0xA4);
     if (self != NULL) {
-        Get_vtable_TaskCore()->slot08((StreamTaskObj *)self, a1, a2, a3);
+        Get_vtable_TaskCore()->ctor(self, target, soundBankPath, sound);
         return self;
     }
     return NULL;
 }
 
-void TaskCore__TaskCore(StreamTaskObj *self, s32 a1, s32 a2, StreamTaskUnkB4Obj *a3) {
+void TaskCore__TaskCore(TaskCore *self, TaskCoreTarget *target, char *soundBankPath, BasicClass *sound) {
     StreamTaskUnkB4Obj *tmp;
     TaskCoreMethods *core;
 
     Get_vtable_IntermediateBase()->ctor((IntermediateBase *)self);
     core = Get_vtable_TaskCore();
-    self->methods = (StreamTaskObjMethods *)core;
-    core->slotD8(self, a1);
-    if (a2 != 0) {
-        self->unk48 = New_VabStreamObj(a2);
+    self->methods = core;
+    core->setTarget(self, target);
+    if (soundBankPath != 0) {
+        self->sound = (BasicClass *)New_VabStreamObj(soundBankPath);
     } else {
-        self->unk48 = a3;
+        self->sound = sound;
     }
-    self->unk44 = a2;
-    self->methods->slotD4(self, 0, 0);
+    self->soundBankPath = soundBankPath;
+    self->methods->setSubHandle(self, 0, 0);
     tmp = New_TileAtlas(0);
-    self->unk80 = tmp;
+    self->tileAtlas = (BasicClass *)tmp;
     tmp = New_TileMap(0, tmp);
-    self->unk7C = tmp;
-    self->unk78 = New_BgLayer(tmp, 1);
-    self->methods->slot40(self);
+    self->tileMap = (BasicClass *)tmp;
+    self->bgLayer = (BasicClass *)New_BgLayer(tmp, 1);
+    self->methods->resetCounters(self);
 }
 
-void TaskCore__Finalize(StreamTaskObj *self) {
-    self->unk78->methods->slot04(self->unk78);
-    self->unk7C->methods->slot04(self->unk7C);
-    self->unk80->methods->slot04(self->unk80);
-    if (self->unk44 != 0) {
-        self->unk48->methods->slot04(self->unk48);
+void TaskCore__Finalize(TaskCore *self) {
+    self->bgLayer->methods->release(self->bgLayer);
+    self->tileMap->methods->release(self->tileMap);
+    self->tileAtlas->methods->release(self->tileAtlas);
+    if (self->soundBankPath != 0) {
+        self->sound->methods->release(self->sound);
     }
-    if (self->unk70 != 0) {
-        self->unk74->methods->slot04(self->unk74);
+    if (self->subHandlePath != 0) {
+        self->subHandle->methods->release(self->subHandle);
     }
-    self->methods->slotDC(self);
+    self->methods->releaseTarget(self);
     Get_vtable_IntermediateBase()->finalize((IntermediateBase *)self);
 }
 
-void TaskCore__Reset(StreamTaskObj *self) {
-    StreamTaskObjMethods *methods = self->methods;
-    methods->slot6C(self, -1);
-    methods->slotA4(self, &D_8006E860[0], &D_8006E860[3], &D_8006E860[6]);
-    methods->slot9C(self, 1);
-    methods->slotA0(self, 1);
-    self->unk84 = 9;
+void TaskCore__Reset(TaskCore *self) {
+    TaskCoreMethods *methods = self->methods;
+    methods->setFrameBound(self, -1);
+    methods->setColors(self, &D_8006E860[0], &D_8006E860[3], &D_8006E860[6]);
+    methods->setFadeCallbackEnabled(self, 1);
+    methods->setFadeOutCallbackEnabled(self, 1);
+    self->fadeRate = 9;
     self->unk28 = 3;
     self->unk2C = 0x12C;
     self->unk30 = 0x40;
-    self->unk9C = 0;
-    self->unkA0 = 0;
+    self->viewCallback = NULL;
+    self->viewCallbackCtx = NULL;
     self->unk34 = 1;
-    self->unk3C = 0;
+    self->inputMode = 0;
 }
 
-s32 TaskCore__Init(StreamTaskObj *self, s32 a1, s32 a2) {
-    Get_vtable_IntermediateBase()->init((IntermediateBase *)self, (IntermediateBaseInitArgs *)a1, a2);
-    return self->unk38;
+s32 TaskCore__Init(TaskCore *self, IntermediateBaseInitArgs *args, s32 mode) {
+    Get_vtable_IntermediateBase()->init((IntermediateBase *)self, args, mode);
+    return self->result;
 }
 
-void TaskCore__OnInit(StreamTaskObj *self) {
+/* initArgs->unk0 is reached through this unit's TaskTextObj view, the
+ * viewport through StreamTaskUnk18Obj (Unk18Obj) and bgLayer through
+ * StreamTaskUnk78Obj (BgLayer): TaskCore.h types all three BasicClass *. */
+void TaskCore__OnInit(TaskCore *self) {
     StreamTaskUnk18Obj *unk18;
     StreamTaskUnk18Methods *core;
 
-    unk18 = self->unk18;
+    unk18 = (StreamTaskUnk18Obj *)self->viewport;
     core = unk18->methods;
-    self->methods->slotE0(self, self->unk14);
-    self->unk78->methods->slot4C(self->unk78, self->unk14, 0);
-    if (self->unk88 != 0) {
-        self->methods->slotE4(self, &self->unk90);
-        self->unk78->methods->slotB8(self->unk78, 1, &self->unk90);
+    self->methods->updateSlotElements(self, self->unk14);
+    ((StreamTaskUnk78Obj *)self->bgLayer)->methods->slot4C((StreamTaskUnk78Obj *)self->bgLayer, self->unk14, 0);
+    if (self->fadeInCallback != 0) {
+        self->methods->broadcastToSlots(self, self->baseColor);
+        ((StreamTaskUnk78Obj *)self->bgLayer)->methods->slotB8((StreamTaskUnk78Obj *)self->bgLayer, 1, self->baseColor);
     }
-    if (self->unk74 == 0) {
-        self->unkC->unk0->methods->slot78(self->unkC->unk0, &self->unk90, gDefaultStreamTaskInitData);
+    if (self->subHandle == 0) {
+        ((TaskTextObj *)self->initArgs->unk0)->methods->slot78((TaskTextObj *)self->initArgs->unk0, self->baseColor, gDefaultStreamTaskInitData);
     }
-    self->unkC->unk0->methods->slot78(self->unkC->unk0, &self->unk90, 0);
+    ((TaskTextObj *)self->initArgs->unk0)->methods->slot78((TaskTextObj *)self->initArgs->unk0, self->baseColor, 0);
     core->slot48(unk18, self->unk28);
     core->slot4C(unk18, self->unk2C);
     core->slot50(unk18, self->unk30);
     core->slot70(unk18, self->unk14, D_8006E86C, D_8006E86C, 0);
     core->slot8C(unk18);
-    self->unk38 = 0;
+    self->result = 0;
 }
 
-void TaskCore__OnDeinit(StreamTaskObj *self) {
-    StreamTaskUnk18Obj *obj = self->unk18;
+void TaskCore__OnDeinit(TaskCore *self) {
+    StreamTaskUnk18Obj *obj = (StreamTaskUnk18Obj *)self->viewport;
     obj->methods->slot90(obj);
     obj->methods->slot74(obj);
-    self->unk78->methods->slot50(self->unk78);
+    ((StreamTaskUnk78Obj *)self->bgLayer)->methods->slot50((StreamTaskUnk78Obj *)self->bgLayer);
     if (self->unk34 != 0) {
-        self->unkC->unk0->methods->slot78(self->unkC->unk0, &self->unk93, 0);
+        ((TaskTextObj *)self->initArgs->unk0)->methods->slot78((TaskTextObj *)self->initArgs->unk0, self->unk93, 0);
     }
 }

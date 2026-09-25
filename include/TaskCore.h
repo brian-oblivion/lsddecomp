@@ -85,11 +85,14 @@ struct TaskCoreTarget {
     INTERMEDIATEBASE_SLOTS(Self, CtorParams);                                                      \
     /* +0x06C */ void (*setFrameBound)(Self *self, s32 bound);   /* TaskCore__SetFrameBound: frameBound = bound * 20 (negative: kept) */ \
     /* +0x070 */ void (*playSound)(Self *self, s32 tone);        /* TaskCore__PlaySound */         \
-    /* +0x074 */ void (*onPad21)(Self *self, BasicClass *sender);      /* TaskCore__func_8003C7F4: onPadEvent's 0x21 */ \
-    /* +0x078 */ void (*onPadConfirm)(Self *self, BasicClass *sender); /* TaskCore__OnPadConfirm: 0x19 */ \
-    /* +0x07C */ void (*onPadCancel)(Self *self, BasicClass *sender);  /* TaskCore__OnPadCancel: 0x17 */ \
-    /* +0x080 */ void (*onPadPrev)(Self *self, BasicClass *sender);    /* TaskCore__OnPadPrev: 0x12 */ \
-    /* +0x084 */ void (*onPadNext)(Self *self, BasicClass *sender);    /* TaskCore__OnPadNext: 0x13 */ \
+    /* +0x074..+0x084: onPadEvent's cases. Called with self alone: $a1 still  \
+     * holds the sender at that call, but no occupant in any of the four     \
+     * tables reads it, and StreamTaskObj's overrides up-call with self only. */ \
+    /* +0x074 */ void (*onPad21)(Self *self);      /* TaskCore__func_8003C7F4: onPadEvent's 0x21 */ \
+    /* +0x078 */ void (*onPadConfirm)(Self *self); /* TaskCore__OnPadConfirm: 0x19 */ \
+    /* +0x07C */ void (*onPadCancel)(Self *self);  /* TaskCore__OnPadCancel: 0x17 */ \
+    /* +0x080 */ void (*onPadPrev)(Self *self);    /* TaskCore__OnPadPrev: 0x12 */ \
+    /* +0x084 */ void (*onPadNext)(Self *self);    /* TaskCore__OnPadNext: 0x13 */ \
     /* +0x088 */ void *slot88;                                   /* NULL; StreamTaskObj__NoOpSlot88 */ \
     /* +0x08C */ void *slot8C;                                   /* NULL; StreamTaskObj__NoOpSlot8C */ \
     /* +0x090 */ void (*tick)(Self *self);                       /* TaskCore__Tick: setState(0xB) */ \
@@ -188,11 +191,11 @@ void TaskCore__Update(TaskCore *self, BasicClass *sender, s32 event);
 void TaskCore__SetState(TaskCore *self, s32 state);
 void TaskCore__SetFrameBound(TaskCore *self, s32 bound);
 void TaskCore__PlaySound(TaskCore *self, s32 tone);
-void TaskCore__func_8003C7F4(TaskCore *self, BasicClass *sender);
-void TaskCore__OnPadConfirm(TaskCore *self, BasicClass *sender);
-void TaskCore__OnPadCancel(TaskCore *self, BasicClass *sender);
-void TaskCore__OnPadPrev(TaskCore *self, BasicClass *sender);
-void TaskCore__OnPadNext(TaskCore *self, BasicClass *sender);
+void TaskCore__func_8003C7F4(TaskCore *self);
+void TaskCore__OnPadConfirm(TaskCore *self);
+void TaskCore__OnPadCancel(TaskCore *self);
+void TaskCore__OnPadPrev(TaskCore *self);
+void TaskCore__OnPadNext(TaskCore *self);
 void TaskCore__Tick(TaskCore *self);
 void TaskCore__RefreshViewValue(TaskCore *self);
 void TaskCore__SetCallback(TaskCore *self, void (*callback)(void *ctx), void *ctx);
