@@ -7,7 +7,7 @@ Round 82, runner charlie (matching slot). Unit `src/code_fa50.c`. Fresh ground (
 - **Where:** slot +0x04C of D_8006BEA0 (`tools/classtable.py D_8006BEA0`).
 - **What:** empty method (`jr $ra; nop`)
 - **Result:** byte-exact; 2/2 words, 0 insertions / 0 deletions, whole-image SHA1 green (`./build-and-verify.sh` OK). First build.
-- **Types:** local views (`Class6BEA0`, `ModelData_fa50`, `Quad_fa50`, `Rec28_fa50`, `Outer_fa50`/`Inner_fa50`/`Target_fa50`) and prototypes live in the unit; no shared header was touched.
+- **Types:** local views (`TmdModel`, `ModelData_fa50`, `Quad_fa50`, `TmdObject_fa50`, `Outer_fa50`/`Inner_fa50`/`Target_fa50`) and prototypes live in the unit; no shared header was touched.
 - **Lever:** An empty body is `void f(void) {}` (broadcast lever).
 
 ## Source

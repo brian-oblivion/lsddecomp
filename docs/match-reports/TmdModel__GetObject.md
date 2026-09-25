@@ -7,13 +7,13 @@ Round 82, runner charlie (matching slot). Unit `src/code_fa50.c`. Fresh ground (
 - **Where:** slot +0x048 of D_8006BEA0 (`tools/classtable.py D_8006BEA0`).
 - **What:** returns `&self->data->recs[i]`: a 28-byte record array at +0x0C of the model data at object +0x0C. `sll 3; subu; sll 2` = i*28, then `addiu 0xC` for the array offset.
 - **Result:** byte-exact; 7/7 words, 0 insertions / 0 deletions, whole-image SHA1 green (`./build-and-verify.sh` OK). First build.
-- **Types:** local views (`Class6BEA0`, `ModelData_fa50`, `Quad_fa50`, `Rec28_fa50`, `Outer_fa50`/`Inner_fa50`/`Target_fa50`) and prototypes live in the unit; no shared header was touched.
+- **Types:** local views (`TmdModel`, `ModelData_fa50`, `Quad_fa50`, `TmdObject_fa50`, `Outer_fa50`/`Inner_fa50`/`Target_fa50`) and prototypes live in the unit; no shared header was touched.
 
 
 ## Source
 
 ```c
-Rec28_fa50 *TmdModel__GetObject(Class6BEA0 *self, s32 i) {
+TmdObject_fa50 *TmdModel__GetObject(TmdModel *self, s32 i) {
     return &self->data->recs[i];
 }
 ```

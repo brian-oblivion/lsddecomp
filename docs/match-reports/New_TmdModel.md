@@ -6,28 +6,28 @@ Round 82, runner charlie (matching slot, second pass on the unit). Unit `src/cod
 
 - **What:** the allocator of class D_8006BEA0: `p = BMemPMgrAlloc(0x24); if (p != NULL) { Get_vtable_TmdModel()->ctor(p, arg); return p; } return NULL;`. The ctor (slot +0x008, `TmdModel__TmdModel`) takes the allocator's argument as its second parameter.
 - **Result:** byte-exact; 24/24 words, whole-image SHA1 green. First build (the broadcast allocator shape).
-- **Types:** the unit's local `Class6BEA0` view is now `BASICCLASS_FIELDS(Class6BEA0Methods)` + its own fields, with `Class6BEA0Methods` = `BASICCLASS_SLOTS(Class6BEA0, (Class6BEA0 *self, void *arg))` (unit includes `BasicClass.h`, the UNIFIED header, unchanged). The previous view had `void *vtable; u8 pad4[8];` at the same offsets. `Get_vtable_TmdModel` (matched earlier this round) was retyped in this unit from `void *` to `Class6BEA0Methods *` (same bytes; no other unit declares it).
+- **Types:** the unit's local `TmdModel` view is now `BASICCLASS_FIELDS(TmdModelMethods)` + its own fields, with `TmdModelMethods` = `BASICCLASS_SLOTS(TmdModel, (TmdModel *self, void *arg))` (unit includes `BasicClass.h`, the UNIFIED header, unchanged). The previous view had `void *vtable; u8 pad4[8];` at the same offsets. `Get_vtable_TmdModel` (matched earlier this round) was retyped in this unit from `void *` to `TmdModelMethods *` (same bytes; no other unit declares it).
 
 ## Source
 
 ```c
 #include "BasicClass.h"
-typedef struct Class6BEA0 Class6BEA0;
-typedef struct Class6BEA0Methods Class6BEA0Methods;
-struct Class6BEA0Methods {
-    BASICCLASS_SLOTS(Class6BEA0, (Class6BEA0 *self, void *arg));
+typedef struct TmdModel TmdModel;
+typedef struct TmdModelMethods TmdModelMethods;
+struct TmdModelMethods {
+    BASICCLASS_SLOTS(TmdModel, (TmdModel *self, void *arg));
 };
-struct Class6BEA0 {
-    BASICCLASS_FIELDS(Class6BEA0Methods);
+struct TmdModel {
+    BASICCLASS_FIELDS(TmdModelMethods);
     void *data;             /* +0x00C, ModelData_fa50 * in the unit */
     void *unk10;            /* +0x010 */
     s32 quad[4];            /* +0x014 */
 };
 extern void *BMemPMgrAlloc(s32 size);
-Class6BEA0Methods *Get_vtable_TmdModel(void);
+TmdModelMethods *Get_vtable_TmdModel(void);
 
-Class6BEA0 *New_TmdModel(void *arg) {
-    Class6BEA0 *p = BMemPMgrAlloc(0x24);
+TmdModel *New_TmdModel(void *arg) {
+    TmdModel *p = BMemPMgrAlloc(0x24);
 
     if (p != NULL) {
         Get_vtable_TmdModel()->ctor(p, arg);

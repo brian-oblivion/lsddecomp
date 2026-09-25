@@ -16,9 +16,9 @@ typedef struct Vec3_fa50 { s16 x, y, z; } Vec3_fa50;
 typedef struct Box_fa50 { Vec3_fa50 min; Vec3_fa50 max; } Box_fa50;
 typedef struct TypedBox_fa50 { s32 type; Box_fa50 box; } TypedBox_fa50;
 typedef struct Hull_fa50 { s32 type; Vec3_fa50 v[8]; } Hull_fa50;
-/* Class6BEA0 and TmdModel__ComputeBounds: see TmdModel__ComputeBounds.md */
+/* TmdModel and TmdModel__ComputeBounds: see TmdModel__ComputeBounds.md */
 
-void TmdModel__GetHull(Class6BEA0 *self, Hull_fa50 *out) {
+void TmdModel__GetHull(TmdModel *self, Hull_fa50 *out) {
     TypedBox_fa50 b;
 
     TmdModel__ComputeBounds(self, &b.box);

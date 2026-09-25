@@ -14,7 +14,7 @@ Round 82, runner charlie (matching slot, second pass on the unit). Unit `src/cod
   5. **`goto tri;` from every 3-vertex case, with `tri:` placed at the tail of the LAST 3-vertex case (0x35), where retail's shared block sits**: 287/288. Fewer `*n` refs before allocation lowered `n`'s priority and fixed the t4/t5 swap. Left: `addu v0,v0,t4` where retail has `addu v0,t4,v0`.
   6. `verts + idx[i]`, `idx[i] + verts`, `(u8 *)verts + idx[i] * 8`, `u32 idx[]`: all 287.
   7. **`(u8 *)verts + (idx[i] << 3)`**: 288/288.
-- **Types:** `Rec28_fa50` got its remaining fields (`normals`, `nnormals`, `prims`, `nprims` (u32: retail compares with `sltu`), `scale`). New `TmdPrim_fa50` (4 header bytes + u16 words). All in this unit.
+- **Types:** `TmdObject_fa50` got its remaining fields (`normals`, `nnormals`, `prims`, `nprims` (u32: retail compares with `sltu`), `scale`). New `TmdPrim_fa50` (4 header bytes + u16 words). All in this unit.
 
 ## Source
 
@@ -22,15 +22,15 @@ Round 82, runner charlie (matching slot, second pass on the unit). Unit `src/cod
 typedef struct SVec_fa50 { s16 x, y, z, pad; } SVec_fa50;
 typedef struct Vec3_fa50 { s16 x, y, z; } Vec3_fa50;
 typedef struct TmdPrim_fa50 { u8 olen; u8 ilen; u8 flag; u8 mode; u16 h[20]; } TmdPrim_fa50;
-typedef struct Rec28_fa50 {
+typedef struct TmdObject_fa50 {
     SVec_fa50 *verts; s32 nverts; void *normals; s32 nnormals;
     TmdPrim_fa50 *prims; u32 nprims; s32 scale;
-} Rec28_fa50;
-/* Class6BEA0: +0x010 Rec28_fa50 *unk10 (see New_TmdModel.md) */
+} TmdObject_fa50;
+/* TmdModel: +0x010 TmdObject_fa50 *unk10 (see New_TmdModel.md) */
 
-TmdPrim_fa50 *TmdModel__NextPrimitive(Class6BEA0 *self, TmdPrim_fa50 *p, s32 *n, Vec3_fa50 *out, u32 *count) {
+TmdPrim_fa50 *TmdModel__NextPrimitive(TmdModel *self, TmdPrim_fa50 *p, s32 *n, Vec3_fa50 *out, u32 *count) {
     s32 idx[4];
-    Rec28_fa50 *rec = self->unk10;
+    TmdObject_fa50 *rec = self->unk10;
     SVec_fa50 *verts;
     s32 size;
     s32 i;

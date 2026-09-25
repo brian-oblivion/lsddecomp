@@ -30,9 +30,9 @@ typedef union VecBox_fa50 { Vec4_fa50 v; Box_fa50 b; } VecBox_fa50;
 extern void OuterProduct0(Vec4_fa50 *v0, Vec4_fa50 *v1, Vec4_fa50 *v2);
 extern void Square0(Vec4_fa50 *v0, Vec4_fa50 *v1);
 extern s32 SquareRoot0(s32 a);
-/* TmdPrim_fa50 / Class6BEA0 / TmdModel__NextPrimitive: see TmdModel__NextPrimitive.md */
+/* TmdPrim_fa50 / TmdModel / TmdModel__NextPrimitive: see TmdModel__NextPrimitive.md */
 
-s32 TmdModel__RaycastFaces(Class6BEA0 *self, s32 *best, Vec3_fa50 *hitOut, s32 *height, Vec3_fa50 *origin, Vec3_fa50 *end) {
+s32 TmdModel__RaycastFaces(TmdModel *self, s32 *best, Vec3_fa50 *hitOut, s32 *height, Vec3_fa50 *origin, Vec3_fa50 *end) {
     Vec3_fa50 tri[4];
     Vec4_fa50 plane;
     Ray_fa50 ray;

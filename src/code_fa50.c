@@ -85,7 +85,7 @@ typedef struct TmdPrim_fa50 {
 } TmdPrim_fa50;
 
 /* One TMD object-table entry (28 bytes). */
-typedef struct Rec28_fa50 {
+typedef struct TmdObject_fa50 {
     SVec_fa50 *verts;       /* +0x000 */
     s32 nverts;             /* +0x004 */
     void *normals;          /* +0x008 */
@@ -93,24 +93,24 @@ typedef struct Rec28_fa50 {
     TmdPrim_fa50 *prims;    /* +0x010 */
     u32 nprims;             /* +0x014 */
     s32 scale;              /* +0x018 */
-} Rec28_fa50;
+} TmdObject_fa50;
 
 typedef struct ModelData_fa50 {
     u32 head[3];            /* +0x000; GsMapModelingData gets &head[1] */
-    Rec28_fa50 recs[1];     /* +0x00C */
+    TmdObject_fa50 recs[1];     /* +0x00C */
 } ModelData_fa50;
 
-typedef struct Class6BEA0 Class6BEA0;
-typedef struct Class6BEA0Methods Class6BEA0Methods;
+typedef struct TmdModel TmdModel;
+typedef struct TmdModelMethods TmdModelMethods;
 
-struct Class6BEA0Methods {
-    BASICCLASS_SLOTS(Class6BEA0, (Class6BEA0 *self, void *arg));
+struct TmdModelMethods {
+    BASICCLASS_SLOTS(TmdModel, (TmdModel *self, void *arg));
 };
 
-struct Class6BEA0 {
-    BASICCLASS_FIELDS(Class6BEA0Methods);
+struct TmdModel {
+    BASICCLASS_FIELDS(TmdModelMethods);
     ModelData_fa50 *data;   /* +0x00C */
-    Rec28_fa50 *unk10;      /* +0x010 */
+    TmdObject_fa50 *unk10;      /* +0x010 */
     Quad_fa50 quad;         /* +0x014 */
 };
 
@@ -133,16 +133,16 @@ extern void GsMapModelingData(unsigned long *p);
 extern void OuterProduct0(Vec4_fa50 *v0, Vec4_fa50 *v1, Vec4_fa50 *v2);
 extern void Square0(Vec4_fa50 *v0, Vec4_fa50 *v1);
 extern s32 SquareRoot0(s32 a);
-TmdPrim_fa50 *TmdModel__NextPrimitive(Class6BEA0 *self, TmdPrim_fa50 *p, s32 *n, Vec3_fa50 *out, u32 *count);
+TmdPrim_fa50 *TmdModel__NextPrimitive(TmdModel *self, TmdPrim_fa50 *p, s32 *n, Vec3_fa50 *out, u32 *count);
 extern s32 gTmdModelConstructed;
 extern s32 gTmdModelBoundsBuf[];
 extern s32 D_8006BEA0[];
 extern void *BMemPMgrAlloc(s32 size);
-void MarkTmdModelConstructed(Class6BEA0 *self);
-Class6BEA0Methods *Get_vtable_TmdModel(void);
+void MarkTmdModelConstructed(TmdModel *self);
+TmdModelMethods *Get_vtable_TmdModel(void);
 
-Class6BEA0 *New_TmdModel(void *arg) {
-    Class6BEA0 *p = BMemPMgrAlloc(0x24);
+TmdModel *New_TmdModel(void *arg) {
+    TmdModel *p = BMemPMgrAlloc(0x24);
 
     if (p != NULL) {
         Get_vtable_TmdModel()->ctor(p, arg);
@@ -150,34 +150,34 @@ Class6BEA0 *New_TmdModel(void *arg) {
     }
     return NULL;
 }
-void TmdModel__TmdModel(Class6BEA0 *self, void *arg) {
+void TmdModel__TmdModel(TmdModel *self, void *arg) {
     Get_vtable_BasicClass()->ctor((BasicClass *)self);
     self->methods = Get_vtable_TmdModel();
     self->unk10 = arg;
     self->data = (ModelData_fa50 *)((u8 *)arg - 0xC);
     MarkTmdModelConstructed(self);
 }
-void TmdModel__SetQuad(Class6BEA0 *self, Quad_fa50 *src) {
+void TmdModel__SetQuad(TmdModel *self, Quad_fa50 *src) {
     self->quad = *src;
 }
-void TmdModel__MapModelingData(Class6BEA0 *self) {
+void TmdModel__MapModelingData(TmdModel *self) {
     GsMapModelingData((unsigned long *)&self->data->head[1]);
 }
-Rec28_fa50 *TmdModel__GetObject(Class6BEA0 *self, s32 i) {
+TmdObject_fa50 *TmdModel__GetObject(TmdModel *self, s32 i) {
     return &self->data->recs[i];
 }
 void TmdModel__func_8001F37C(void) {
 }
-Class6BEA0Methods *Get_vtable_TmdModel(void) {
-    return (Class6BEA0Methods *)D_8006BEA0;
+TmdModelMethods *Get_vtable_TmdModel(void) {
+    return (TmdModelMethods *)D_8006BEA0;
 }
-void MarkTmdModelConstructed(Class6BEA0 *self) {
+void MarkTmdModelConstructed(TmdModel *self) {
     gTmdModelConstructed = 1;
 }
 s32 func_8001F3A4(void *self) {
     return gTmdModelConstructed;
 }
-void TmdModel__ComputeBounds(Class6BEA0 *self, Box_fa50 *box) {
+void TmdModel__ComputeBounds(TmdModel *self, Box_fa50 *box) {
     s32 i;
     s32 n;
     SVec_fa50 *v;
@@ -203,13 +203,13 @@ void TmdModel__ComputeBounds(Class6BEA0 *self, Box_fa50 *box) {
         if (*maxz < v->z) *maxz = v->z;
     }
 }
-void UpdateTmdModelBoundsBuffer(Class6BEA0 *self) {
+void UpdateTmdModelBoundsBuffer(TmdModel *self) {
     TmdModel__ComputeBounds(self, (Box_fa50 *)gTmdModelBoundsBuf);
 }
 void *GetTmdModelBoundsBuffer(void *self, s32 i) {
     return gTmdModelBoundsBuf;
 }
-void TmdModel__GetHull(Class6BEA0 *self, Hull_fa50 *out) {
+void TmdModel__GetHull(TmdModel *self, Hull_fa50 *out) {
     TypedBox_fa50 b;
 
     TmdModel__ComputeBounds(self, &b.box);
@@ -289,7 +289,7 @@ void func_8001F66C(HullList_fa50 *h, s32 turn, s32 back, s32 d) {
  * VECTOR locals are scratch named by their frame slot; v60 is never used but
  * holds retail's slot, and dist is an 8-byte array because retail keeps it in
  * memory at the slot after uF0. */
-s32 TmdModel__RaycastFaces(Class6BEA0 *self, s32 *best, Vec3_fa50 *hitOut, s32 *height, Vec3_fa50 *origin, Vec3_fa50 *end) {
+s32 TmdModel__RaycastFaces(TmdModel *self, s32 *best, Vec3_fa50 *hitOut, s32 *height, Vec3_fa50 *origin, Vec3_fa50 *end) {
     Vec3_fa50 tri[4];
     Vec4_fa50 plane;
     Ray_fa50 ray;
@@ -446,9 +446,9 @@ s32 TmdModel__RaycastFaces(Class6BEA0 *self, s32 *best, Vec3_fa50 *hitOut, s32 *
     }
     return found;
 }
-TmdPrim_fa50 *TmdModel__NextPrimitive(Class6BEA0 *self, TmdPrim_fa50 *p, s32 *n, Vec3_fa50 *out, u32 *count) {
+TmdPrim_fa50 *TmdModel__NextPrimitive(TmdModel *self, TmdPrim_fa50 *p, s32 *n, Vec3_fa50 *out, u32 *count) {
     s32 idx[4];
-    Rec28_fa50 *rec = self->unk10;
+    TmdObject_fa50 *rec = self->unk10;
     SVec_fa50 *verts;
     s32 size;
     s32 i;
