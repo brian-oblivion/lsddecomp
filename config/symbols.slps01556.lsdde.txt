@@ -2635,3 +2635,4 @@ D8006ED4C__AttachToParent = 0x80041DAC; // type:func
 D8006ED4C__SetPosition = 0x80041E2C; // type:func
 D8006ED4C__SetPivotAnchor = 0x80041E58; // type:func
 Get_vtable_D8006ED4C = 0x80041ED8; // type:func
+New_D8006EED8 = 0x800422CC; // type:func

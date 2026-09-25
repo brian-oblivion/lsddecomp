@@ -382,7 +382,7 @@ SpriteMethods *GetSpriteMethods(void) {
     return &gSpriteMethods;
 }
 /* Allocate and construct a D_8006EED8 object (0x30 bytes). */
-void *func_800422CC(s32 arg) {
+void *New_D8006EED8(s32 arg) {
     void *obj = BMemPMgrAlloc(0x30);
 
     if (obj != NULL) {

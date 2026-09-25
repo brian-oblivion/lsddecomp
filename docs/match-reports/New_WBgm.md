@@ -73,7 +73,7 @@ typedef struct SeqVab {
     /* +0x058 */ u16 ready;
 } SeqVab;
 
-/* What +0x10 holds: a func_800422CC object. Only the fields read here. */
+/* What +0x10 holds: a New_D8006EED8 object. Only the fields read here. */
 typedef struct SeqData {
     BASICCLASS_FIELDS(BasicClassMethods);
     /* +0x00C */ u8 padC[0x10 - 0xC];
@@ -106,7 +106,7 @@ extern short SsSeqOpen(unsigned long *addr, short vab_id);
 
 extern void *BMemPMgrAlloc(s32 size);
 extern BasicClass *GetDrawSystem(void);
-extern SeqData *func_800422CC(s32 arg);
+extern SeqData *New_D8006EED8(s32 arg);
 extern SeqVab *New_VabStreamObj(s32 arg0);
 extern void printf(const char *fmt);
 extern const char D_80010FEC[]; /* "Seq Open error in WBgmHandleMonitorEvent" */
