@@ -3,6 +3,7 @@
 
 #include "common.h"
 #include "DreamSys.h"
+#include "TaskCore.h"
 
 /*
  * The class allocated by New_Class6D3C8 / constructed by Class6D3C8__Class6D3C8.
@@ -169,10 +170,14 @@ extern void *New_LinkResource(void *arg); /* defined in code_33808.c (LinkResour
  * typed; everything else about this class is unknown. */
 typedef struct StreamTaskMethods {
     s32 header;                                                    /* +0x000 */
-    void (*start)(void *self);                                      /* +0x004: always the LAST call in every
-                                                                         use site here, after every other slot
-                                                                         (configure/setChannel/etc.) has run --
-                                                                         a fire-and-forget "go" trigger. */
+    void *(*release)(void *self);                                   /* +0x004: BasicClass's release, the LAST call
+                                                                         at every use site: configure runs the task
+                                                                         to its end (init, mode 0), release frees it.
+                                                                         Was `void (*start)`; round 84 retyped it to
+                                                                         BasicClass's void * because
+                                                                         StartCinematicStream's two branches
+                                                                         cross-jump into ONE release call only when
+                                                                         this and TaskCore's release return alike. */
     u8 pad08[0x044 - 0x008];                                          /* +0x008 .. +0x043 */
     /* +0x044, named `configure`: called with (self, a fixed word from the
      * caller's own object, a second word whose meaning varies by call site --
@@ -226,44 +231,11 @@ extern const char sLogoPathOsd[]; /* "ETC\OSDLOGO.TIM" */
  * order) is called by Class6D3C8__LoadIntroLogoSequence, which comes first in the file. */
 void Class6D3C8__StartLoaderTask(Class6D3C8 *self, const char *path);
 
-/* A second "New_X"-shaped task object, allocated by New_TaskCore -- 0xA4
- * bytes, constructed through Get_vtable_TaskCore's slot +0x008. `TaskCoreObj`
- * is matched in src/code_2c054.c (a separate real class, its own base under
- * StreamTaskObj in that unit's inheritance chain -- see that file's own
- * `TaskCore__TaskCore`). Different class from StreamTaskMethods above
- * (different allocator, different slot signatures at the same offsets), used
- * by Class6D3C8__StartLoaderTask to register a named resource with a
- * completion callback. */
-typedef struct LoaderTaskMethods {
-    s32 header;                                              /* +0x000 */
-    void (*start)(void *self);                                 /* +0x004, same fire-and-forget "go" trigger
-                                                                    shape as StreamTaskMethods::start above --
-                                                                    always the last call at this unit's one
-                                                                    LoaderTask use site (Class6D3C8__StartLoaderTask). */
-    u8 pad08[0x044 - 0x008];                                     /* +0x008 .. +0x043 */
-    /* +0x044: RETURNS s32, not void. This slot's occupant is TaskCore__Init
-     * (matched in code_2c054), and its own body loads self->unk38 into $v0
-     * immediately before the epilogue with nothing else consuming it -- a
-     * load whose only purpose is to be the return value. The earlier `void`
-     * came from THIS header's caller, which discards the result; that
-     * describes what the caller does with the value, not what the callee
-     * computes. Harmless at the ABI level either way (a discarding caller
-     * simply never reads $v0), which is why correcting it changes zero bytes.
-     * Matches PollTaskMethods::slot44 below, as the comment there predicts. */
-    s32 (*slot44)(void *self, s32 a1, s32 a2);                     /* +0x044 */
-    u8 pad48[0x06C - 0x048];                                         /* +0x048 .. +0x06B */
-    void (*slot6C)(void *self, s32 a1);                                /* +0x06C */
-    u8 pad70[0x098 - 0x070];                                             /* +0x070 .. +0x097 */
-    void (*slot98)(void *self, s32 (*callback)(void), void *ctx);         /* +0x098 */
-    u8 pad9C[0x0D4 - 0x09C];                                                /* +0x09C .. +0x0D3 */
-    void (*slotD4)(void *self, const char *path, s32 a2);                    /* +0x0D4 */
-} LoaderTaskMethods;
-
-typedef struct LoaderTask {
-    LoaderTaskMethods *methods;
-} LoaderTask;
-
-extern LoaderTask *New_TaskCore(s32 a0, s32 a1, s32 a2);
+/* The "loader" task Class6D3C8__StartLoaderTask and __StartCinematicStream
+ * build is a plain TaskCore (New_TaskCore, include/TaskCore.h); this header
+ * viewed it as `LoaderTask` until track 4 (round 84). Its old `start` slot
+ * (+0x004) is BasicClass's release: init with mode 0 runs the task to its
+ * end, and release finalizes and frees it. */
 
 /* Forward declaration: Class6D3C8__LoaderTaskDoneCallback (this unit, defined right after
  * Class6D3C8__StartLoaderTask in ROM order) is used by Class6D3C8__StartLoaderTask as a completion
