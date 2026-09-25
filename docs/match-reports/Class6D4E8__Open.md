@@ -1,10 +1,12 @@
-# func_800272D0 -- MATCHED (round 47, alpha)
+# Class6D4E8__Open -- MATCHED (round 47, alpha)
+
+> Renamed from `func_800272D0` on 2026-09-25 (tools/rename.py). Address 0x800272d0.
 
 108/108 words, byte-exact, file 0x17AD0-0x17C80. Cold ground. First function
 in ROM order in this unit, so the shared `Obj80027480` local struct and
 `gCdAsyncEnabled`/`D_8008A860`/`gCdBusy`/`LockCd`/`StartCdOperation`/
 `ResetCdStateMachine`/`EnqueueCdRequest`/`UnlockCd` externs were moved ahead of
-it (they were previously declared between it and `func_80027480`).
+it (they were previously declared between it and `Class6D4E8__Close`).
 
 ## Source
 
@@ -40,7 +42,7 @@ typedef struct StatBuf80027 {
     u8 pad8[0x18 - 8];
 } StatBuf80027;
 
-void func_800272D0(Obj80027480 *self, char *suffix, s32 arg2, s32 arg3) {
+void Class6D4E8__Open(Obj80027480 *self, char *suffix, s32 arg2, s32 arg3) {
     char path[0x40];
     StatBuf80027 statBuf;
     Rec80028448 *rec;
@@ -97,8 +99,8 @@ void func_800272D0(Obj80027480 *self, char *suffix, s32 arg2, s32 arg3) {
    established alignment-2 `lwl`/`lwr` + `swl`/`swr` idiom), matching
    retail's unaligned 4-byte copies at both call sites. This is a shared-file
    type used by three OTHER already-matched functions in the unit
-   (`func_80027480`, `func_800276D0`, `func_80027528`); only
-   `func_80027528`'s `CdPosToInt(self->unk18)` needed updating to
+   (`Class6D4E8__Close`, `Class6D4E8__Read`, `Class6D4E8__Seek`); only
+   `Class6D4E8__Seek`'s `CdPosToInt(self->unk18)` needed updating to
    `CdPosToInt(&self->unk18)` since the field no longer decays to a pointer
    on its own. Re-verified all three still match after the type change.
 
@@ -135,7 +137,7 @@ void func_800272D0(Obj80027480 *self, char *suffix, s32 arg2, s32 arg3) {
    in the sibling `else` branch. That produced an EXTRA `move v1,v0` right
    after the `CdSync` call, with the loop's own comparisons then reading
    `$v1` -- retail reads `$v0` directly, with no move at all (like
-   `func_80027528`'s analogous loop). Isolated through the pinned pipeline
+   `Class6D4E8__Seek`'s analogous loop). Isolated through the pinned pipeline
    (`/tmp/.../t6.c` through `t8.c`): the SAME retry-loop code, byte-for-byte,
    produces the extra `move` when the sibling branch also assigns into a
    variable named `v0`, and produces retail's exact no-move shape when that

@@ -172,7 +172,7 @@ arm and both compiled to the same (wrong) encoding; hoisting it above the
 
 **Tier B.** The state machine's other tick function, selected by
 `ServiceCdDriver` when `gCdTickStep == 2`. Grepping every `gCdTickStep = 2`
-assignment in code_179d8_s.c finds exactly one: `func_80027800`, which
+assignment in code_179d8_s.c finds exactly one: `Class6D4E8__LoadFile`, which
 `docs/match-reports` for the class's method table (`GetClass6D4E8Methods`'s
 own comment, code_179d8_q.c) identifies via `tools/classtable.py` as the
 `loadFile` slot (+0x58) of class `D_6D4E8` -- i.e. the
@@ -181,7 +181,7 @@ own comment, code_179d8_q.c) identifies via `tools/classtable.py` as the
 phase-2 "still busy" signal it proceeds straight into the read phase
 (`newstate = 7`) instead of resetting, because a LoadFile always intends a
 read to follow the seek; and on a successful read it restores
-`gCdSeekParam` from `gCdSavedSeekParam`, because `func_80027800` is the one
+`gCdSeekParam` from `gCdSavedSeekParam`, because `Class6D4E8__LoadFile` is the one
 call site that stashes the caller's previous `gCdSeekParam` there before
 overwriting it with the file it looked up (`gCdSavedSeekParam =
 gCdSeekParam; ... gCdSeekParam = rec;`). "LoadFile" names the operation this

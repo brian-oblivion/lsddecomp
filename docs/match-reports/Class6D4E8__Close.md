@@ -1,4 +1,6 @@
-# func_80027480 -- MATCHED (round 47, alpha)
+# Class6D4E8__Close -- MATCHED (round 47, alpha)
+
+> Renamed from `func_80027480` on 2026-09-25 (tools/rename.py). Address 0x80027480.
 
 42/42 words, byte-exact, file 0x17C80-0x17D28. Cold ground, first attempt to
 diverge; second attempt (after fixing an if/else-if inversion) matched.
@@ -6,7 +8,7 @@ diverge; second attempt (after fixing an if/else-if inversion) matched.
 ## Source
 
 ```c
-/* Local view of the object func_80027480/EnqueueCdRequest/CloseCdFile read
+/* Local view of the object Class6D4E8__Close/EnqueueCdRequest/CloseCdFile read
  * through -- the real struct is ObjA34_179D8H (src/code_179d8_h.c), but that
  * type is that unit's own local reading, not a shared header, so this unit
  * carries its own minimal view of the two offsets it actually touches. */
@@ -29,7 +31,7 @@ extern void EnqueueCdRequest(Obj80027480 *arg0, s32 arg1, s32 arg2, s32 arg3,
                            s32 arg4);
 extern void UnlockCd(void);
 
-void func_80027480(Obj80027480 *self) {
+void Class6D4E8__Close(Obj80027480 *self) {
     if (gCdAsyncEnabled == 0 && D_8008A860 == 0) {
         CloseCdFile(self);
         return;

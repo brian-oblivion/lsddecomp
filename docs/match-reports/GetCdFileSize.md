@@ -108,7 +108,7 @@ reasoning.
 ## Naming (round 64, runner alpha)
 
 - `func_80028A50` -> `GetCdFileSize`, tier B. `src/code_179d8_s.c`'s
-  `func_80027528` calls this function directly (ignoring its own `arg1`,
+  `Class6D4E8__Seek` calls this function directly (ignoring its own `arg1`,
   `arg2`) when CD-async mode is off; its async path, when asked to just
   query size (`arg2 != 0`), does the IDENTICAL `self->unk1C` rounding as a
   fallthrough of the same seek function. Paired with `OpenCdFile`/
@@ -118,7 +118,7 @@ reasoning.
   Evidence is cross-unit: `src/code_179d8_s.c`'s `Obj80027480` is an
   independent local view of what is very likely the SAME object (see the
   coincidence note above and `CloseCdFile.md`), and its own
-  `func_800272D0`/`func_80027480`/`func_80027528` async bodies set/clear
+  `Class6D4E8__Open`/`Class6D4E8__Close`/`Class6D4E8__Seek` async bodies set/clear
   the identical offsets (`self->unk0C = 1` on a successful CD lookup,
   `self->unk0C = 0` on close, `self->unk1C` fed the identical
   `(x >> 11) + 1) << 11` rounding on a size query) around the identical

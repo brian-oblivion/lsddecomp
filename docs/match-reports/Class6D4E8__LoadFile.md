@@ -1,12 +1,14 @@
-# func_80027800 -- MATCHED (round 47, alpha)
+# Class6D4E8__LoadFile -- MATCHED (round 47, alpha)
+
+> Renamed from `func_80027800` on 2026-09-25 (tools/rename.py). Address 0x80027800.
 
 137/137 words, byte-exact, file 0x18000-0x18224. Cold ground, the largest of
-the six assigned before `func_80027A24`.
+the six assigned before `Class6D4E8__RunRequestQueue`.
 
 ## Source
 
 ```c
-/* This class's own methods table -- only the two slots func_80027800 reads
+/* This class's own methods table -- only the two slots Class6D4E8__LoadFile reads
  * through are named (offsets 0x48/0x64). Added to the unit's shared
  * Obj80027480/Methods80027480 view; re-verified the four sibling functions
  * that already matched against the earlier, narrower Obj80027480 still
@@ -24,7 +26,7 @@ typedef struct Node8008A894 {
 extern Node8008A894 *gCdRequestQueue;
 extern void *BMemPMgrAlloc(s32 size);
 
-void func_80027800(Obj80027480 *self, char *arg1) {
+void Class6D4E8__LoadFile(Obj80027480 *self, char *arg1) {
     Rec80028448 *rec;
     s32 sectorCount;
     s32 pos;
@@ -102,7 +104,7 @@ two slots named: `slot48`, `slot64`), plus `unk10` (`void *`, a CdRead
 target buffer), `unk14` (`u32`), `unk20` (`u16`), and `unk24` (`s32`, a flags
 word, `|=`'d with `0x200`). All purely additive naming of previously-plain
 padding; re-verified the four already-matched sibling functions
-(`func_80027480`, `func_800276D0`, `func_80027528`, `func_800272D0`) still
+(`Class6D4E8__Close`, `Class6D4E8__Read`, `Class6D4E8__Seek`, `Class6D4E8__Open`) still
 match after the extension (whole-image SHA1 passed with all five in the
 unit).
 
@@ -141,12 +143,12 @@ not necessarily the order that matters most:
 
 4. **A fourth, new-to-this-unit finding: an outer retry loop that WRAPS a
    whole nested retry-loop-plus-a-different-retry-loop needs the
-   goto-instead-of-do-while rewrite from `func_800276D0`, even in a unit
+   goto-instead-of-do-while rewrite from `Class6D4E8__Read`, even in a unit
    where the SAME lever was already shown NOT to transfer to a
-   structurally-simpler sibling loop (`func_80027528`'s report).** This
+   structurally-simpler sibling loop (`Class6D4E8__Seek`'s report).** This
    function's outermost retry (`while (v1 == -1)`, wrapping a CdControl/
    CdSync retry loop AND a CdRead/CdReadSync retry loop back to back) is
-   MORE complex than `func_80027528`'s CdControl/CdSync-only retry, which
+   MORE complex than `Class6D4E8__Seek`'s CdControl/CdSync-only retry, which
    matched as a plain `do`/`while`. Written as a plain `do`/`while` here,
    GCC's scheduler filled the back-edge branch's delay slot with a
    RECOMPUTED `a0=2` (the next iteration's `CdControl` argument setup) that
@@ -176,8 +178,8 @@ slots: `slot48` and `slot64`, both `s32 (*)(Obj80027480 *self)` by inference
 (neither call's return value is used by this function, so the byte match
 does not itself certify the return type -- see the standing wrapper
 caution). `rec` (`FindCdFileEntry`'s return) reuses `Rec80028448` from
-`func_800272D0`'s report; its `unk18` field (`u32`) is read here in the same
-shape as there. No caller of `func_80027800` exists yet in carved C, so its
+`Class6D4E8__Open`'s report; its `unk18` field (`u32`) is read here in the same
+shape as there. No caller of `Class6D4E8__LoadFile` exists yet in carved C, so its
 own return type is likewise UNCERTIFIED by any call site; `void` was chosen
 because every path either explicitly returns via a callee's forwarded value
 (itself never captured anywhere) or falls off the end with `v0` left
@@ -189,8 +191,8 @@ epilogue.
 **A goto-vs-do-while choice for a retry loop is not fully explained by
 "check this loop's own bytes" (round 47's earlier correction) -- loop BODY
 SIZE/complexity is a second axis worth testing directly.** Two nearly
-same-shaped CdControl/CdSync retry loops in this unit (`func_80027528`'s
-simple one, `func_80027800`'s one nested inside a larger combined retry)
+same-shaped CdControl/CdSync retry loops in this unit (`Class6D4E8__Seek`'s
+simple one, `Class6D4E8__LoadFile`'s one nested inside a larger combined retry)
 took OPPOSITE answers for the SAME inner shape, and the difference tracked
 with how much additional code (a second nested retry, more surrounding
 statements) the outer loop's body carried. When a retry loop's plain

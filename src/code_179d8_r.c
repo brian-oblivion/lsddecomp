@@ -22,7 +22,7 @@
  *     steps ServiceCdDriver (code_179d8_q) dispatches on gCdTickStep (1 / 2).
  *     TickCdStateMachine is the default, used by code_179d8_s.c's open,
  *     explicit-seek and straight-read call sites. TickCdLoadFileStateMachine
- *     is used exclusively by that unit's func_80027800 (the
+ *     is used exclusively by that unit's Class6D4E8__LoadFile (the
  *     Class6D4E8__RequestLoadFile worker, per its own report): on the
  *     "still busy" signal at phase 2 it proceeds straight into the read
  *     phase instead of resetting, and on a successful read it restores the

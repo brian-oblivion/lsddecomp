@@ -1,4 +1,6 @@
-# func_80027528 -- MATCHED (round 47, alpha)
+# Class6D4E8__Seek -- MATCHED (round 47, alpha)
+
+> Renamed from `func_80027528` on 2026-09-25 (tools/rename.py). Address 0x80027528.
 
 104/104 words, byte-exact, file 0x17D28-0x17EC8. Cold ground.
 
@@ -15,7 +17,7 @@ extern void CdIntToPos(s32 i, void *pos);
 extern void CdControl(s32 arg0, void *buf, s32 arg2);
 extern s32 CdSync(s32 mode, void *result);
 
-s32 func_80027528(Obj80027480 *self, u32 arg1, s32 arg2) {
+s32 Class6D4E8__Seek(Obj80027480 *self, u32 arg1, s32 arg2) {
     s32 v0;
     u32 s0tmp;
 
@@ -70,8 +72,8 @@ below.
 
 1. **`if (arg2 != 0) { ...; return X; } if (gCdAsyncEnabled...) {...} else {...}`
    vs `if (arg2 == 0) {...} else { ...; return X; }`** -- the same
-   nested-if/else-if-vs-nested-if POLARITY lever as `func_80027480` and
-   `func_800276D0`, on a THIRD shape this time (an early-return `if` next to
+   nested-if/else-if-vs-nested-if POLARITY lever as `Class6D4E8__Close` and
+   `Class6D4E8__Read`, on a THIRD shape this time (an early-return `if` next to
    unconditional fall-through code, not two sibling `if`s). The fall-through
    arm (immediately after the `bnez`/`beqz` test) must be the `arg2==0`
    branch (the CdControl retry / gp_rel-store code); the branch TARGET,
@@ -83,10 +85,10 @@ below.
    duplicates a call pair that also appears on the fall-through path is this
    same polarity bug, not two independent residues.
 
-2. **The `func_800276D0` goto-instead-of-do-while lever does NOT apply here,
+2. **The `Class6D4E8__Read` goto-instead-of-do-while lever does NOT apply here,
    and this is the important negative.** This function has a SECOND
    CdControl/CdSync retry loop, structurally identical in shape to
-   `func_800276D0`'s CdRead/CdReadSync loop (a `do { call; do { v = call2();
+   `Class6D4E8__Read`'s CdRead/CdReadSync loop (a `do { call; do { v = call2();
    } while (v cond); } while (v == CONST);` retry pattern). Reflexively
    applying the same `goto`-based rewrite (to defeat GCC's loop-invariant
    hoist of the retry constant) produced the WRONG shape here: retail's own
@@ -101,7 +103,7 @@ below.
    vs `goto`, rather than carrying the previous function's answer forward.
 
 3. Everything else (the `srl` vs `sra` unsigned-shift lever from
-   `func_800276D0`, applied to `arg1 >> 11`/`self->unk1C >> 11`; the
+   `Class6D4E8__Read`, applied to `arg1 >> 11`/`self->unk1C >> 11`; the
    round-up-to-sector idiom `x>>11; if (x&0x7FF) x++;`; the
    `EnqueueCdRequest`/`StartCdOperation` call shapes) matched on the first
    build once 1 and 2 above were fixed.
@@ -124,10 +126,10 @@ direction.
 
 **Do not generalize a loop-shape lever across two structurally-identical
 loops in the SAME function without checking each one's own retail bytes.**
-`func_80027528` has two nearly-identical retry loops in spirit (both
+`Class6D4E8__Seek` has two nearly-identical retry loops in spirit (both
 "do a CD op, poll for completion, retry on a specific status code"), and
 retail hoists the retry constant in ONE of them and not the other analog
 found in the previous function. The `goto`-defeats-loop.c's-invariant-motion
-lever from `func_800276D0` is real, but its APPLICATION is per-loop: read
+lever from `Class6D4E8__Read` is real, but its APPLICATION is per-loop: read
 whether retail's own `.s` shows a `li $sN,<const>` sitting above the retry
 label before reaching for `goto` instead of `do`/`while`.

@@ -1,4 +1,6 @@
-# func_80027A24 -- MATCHED (round 67, bravo): length exact (0x25C/151 words), 151/151 words match, no diff
+# Class6D4E8__RunRequestQueue -- MATCHED (round 67, bravo): length exact (0x25C/151 words), 151/151 words match, no diff
+
+> Renamed from `func_80027A24` on 2026-09-25 (tools/rename.py). Address 0x80027a24.
 
 REVISITED, round 67: MATCHED 151/151, whole-image SHA1 green; names/types not relevant
 (the round-47 structs and locals were already correct -- the gap was one statement's
@@ -17,8 +19,8 @@ Round 47's preserved body was rebuilt verbatim (its `slot48` is the in-tree
 ```
 build exit=2
  17 off=0x018268 vram=0x80027A68 DIFF retail=35004010 built=13004010
-func_80027A24: 150/151 words match (file 0x18224-0x18480)
-func_80027A24: insertions 0 / deletions 0 (opcode-level; positional skeleton diffs 0)
+Class6D4E8__RunRequestQueue: 150/151 words match (file 0x18224-0x18480)
+Class6D4E8__RunRequestQueue: insertions 0 / deletions 0 (opcode-level; positional skeleton diffs 0)
 WARNING: the build differs OUTSIDE this range too (2 bytes)
 ```
 
@@ -26,7 +28,7 @@ So: **insertions 0 / deletions 0, positional skeleton diffs 0.** Round 47's repr
 is exact.
 
 **The `len-off` tag was wrong and the round-47 title was right.** Measured three ways:
-the splat header says `nonmatching func_80027A24, 0x25C` (= 151 words); the rebuilt body
+the splat header says `nonmatching Class6D4E8__RunRequestQueue, 0x25C` (= 151 words); the rebuilt body
 assembled to 151 words; and `cmp -l build/SLPS_015.56 disk/SLPS_015.56` returned exactly
 **three bytes** across the whole image, so there was no size change and no address drift
 anywhere. `len-off` is an artifact of `plan.py`'s `EXACT_RE`
@@ -60,7 +62,7 @@ maspsx | as`, maspsx flags `sed`-ed out of the Makefile per CLAUDE.md, plus `-Ii
 on `as` for `labels.inc` -- with only the struct/extern declarations it needs:
 
 ```
-  44:	10400013 	beqz	v0,94 <func_80027A24+0x94>
+  44:	10400013 	beqz	v0,94 <Class6D4E8__RunRequestQueue+0x94>
 ```
 
 151 words, and `beqz` to +0x94 = 0x80027AB8: **the isolated compile reproduces the wrong
@@ -146,8 +148,8 @@ source constructs, and are unaffected.
 
 ```
 build exit=0
-func_80027A24: 151/151 words match (file 0x18224-0x18480)
-func_80027A24: insertions 0 / deletions 0 (positional skeleton diffs 0)
+Class6D4E8__RunRequestQueue: 151/151 words match (file 0x18224-0x18480)
+Class6D4E8__RunRequestQueue: insertions 0 / deletions 0 (positional skeleton diffs 0)
 OK: build matches retail SLPS_015.56
 ```
 
@@ -158,7 +160,7 @@ whole-image build above.
 
 ## Naming
 
-Left as `func_80027A24`. It is the CD request-queue pump: under `LockCd`/`UnlockCd` it
+Left as `Class6D4E8__RunRequestQueue`. It is the CD request-queue pump: under `LockCd`/`UnlockCd` it
 takes the head node of `gCdRequestQueue` and, on `node->unk0 == 0`, dispatches
 `node->unk8` (2/3/4/5/7) to one of five method slots with `unk28` held at 1 across the
 call; otherwise, once `gCdIdle` is set, it folds per-request status bits into
@@ -180,7 +182,7 @@ the unit's naming pass rather than guessed here.
    is right. What tells you is where the `default:` label lands: with the copies real,
    GCC 2.6.3 cross-jumps `default:`'s copy onto the first identical tail, moving the
    switch's bounds-check branch target and the jump-table slot for the unhandled in-range
-   value, and nothing else. Round 67, `func_80027A24`.
+   value, and nothing else. Round 67, `Class6D4E8__RunRequestQueue`.
 
 2. **A "both directions" reading of Gate 3 check 3 is only as good as the scaffold, and a
    direct pinned-pipeline isolation is cheaper and more trustworthy than a permuter base

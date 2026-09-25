@@ -206,7 +206,7 @@ forwarded to `this->methods->configureBuffer(this, arg1, 1, 0)` at `0x80026B48`
 real arguments.
 
 **Why the `(void)` extern is right anyway.** The one caller,
-`func_80027800` (this unit, matched), passes nothing at all:
+`Class6D4E8__LoadFile` (this unit, matched), passes nothing at all:
 
 ```
 8002780c:  move  s0,a0          <- its own self, only spilled
@@ -215,7 +215,7 @@ real arguments.
 80027838:  nop                  <- no argument setup, in retail
 ```
 
-`$a0` and `$a1` still hold `func_80027800`'s own incoming arguments, which the
+`$a0` and `$a1` still hold `Class6D4E8__LoadFile`'s own incoming arguments, which the
 callee then consumes. This is the textbook dead-argument idiom: byte-exact
 either way, and writing the two arguments out at the call site would change
 nothing *only* if the values happened to match — they do here by accident of

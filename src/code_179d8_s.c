@@ -10,7 +10,7 @@
  * Gate 2 boundary checks all zero: no `jr $t2` trampoline, no `alabel`, no
  * non-`.L` alt-entry label, no function with two prologues.
  *
- * func_80027A24 owns this unit's only jump tables (jtbl_80010810 and
+ * Class6D4E8__RunRequestQueue owns this unit's only jump tables (jtbl_80010810 and
  * jtbl_80010828).  The 0xFD8 rodata slot was SPLIT at 0x1010 to attach them:
  * the two strings in the same slot belong to code_179d8_q and code_179d8_h
  * and stay standalone.  You do not need to do anything about this -- it is
@@ -22,7 +22,7 @@
 
 #include "common.h"
 
-/* Local view of the object func_80027480/EnqueueCdRequest/CloseCdFile read
+/* Local view of the object Class6D4E8__Close/EnqueueCdRequest/CloseCdFile read
  * through -- the real struct is ObjA34_179D8H (src/code_179d8_h.c), but that
  * type is that unit's own local reading, not a shared header, so this unit
  * carries its own minimal view of the two offsets it actually touches. */
@@ -33,8 +33,8 @@ typedef struct Pos18 {
 
 typedef struct Obj80027480 Obj80027480;
 
-/* This class's own methods table -- the slots func_80027800 and
- * func_80027A24 dispatch through (offsets 0x44/0x48/0x4C/0x54/0x58/0x64/
+/* This class's own methods table -- the slots Class6D4E8__LoadFile and
+ * Class6D4E8__RunRequestQueue dispatch through (offsets 0x44/0x48/0x4C/0x54/0x58/0x64/
  * 0x70). */
 typedef struct Methods80027480 {
     u8 pad0[0x44];
@@ -102,7 +102,7 @@ typedef struct StatBuf80027 {
     u8 pad8[0x18 - 8];
 } StatBuf80027;
 
-void func_800272D0(Obj80027480 *self, char *suffix, s32 arg2, s32 arg3) {
+void Class6D4E8__Open(Obj80027480 *self, char *suffix, s32 arg2, s32 arg3) {
     char path[0x40];
     StatBuf80027 statBuf;
     Rec80028448 *rec;
@@ -150,7 +150,7 @@ void func_800272D0(Obj80027480 *self, char *suffix, s32 arg2, s32 arg3) {
     UnlockCd();
 }
 
-void func_80027480(Obj80027480 *self) {
+void Class6D4E8__Close(Obj80027480 *self) {
     if (gCdAsyncEnabled == 0 && D_8008A860 == 0) {
         CloseCdFile(self);
         return;
@@ -178,7 +178,7 @@ extern void CdIntToPos(s32 i, void *pos);
 extern void CdControl(s32 arg0, void *buf, s32 arg2);
 extern s32 CdSync(s32 mode, void *result);
 
-s32 func_80027528(Obj80027480 *self, u32 arg1, s32 arg2) {
+s32 Class6D4E8__Seek(Obj80027480 *self, u32 arg1, s32 arg2) {
     s32 v0;
     u32 s0tmp;
 
@@ -224,7 +224,7 @@ s32 func_80027528(Obj80027480 *self, u32 arg1, s32 arg2) {
     return 0;
 }
 
-void func_800276C8(void) {
+void Class6D4E8__NoOpSlot50(void) {
 }
 
 extern s32 gCdReadSectorCount; /* CdRead sector count */
@@ -236,7 +236,7 @@ extern s32 CdRead(s32 sectors, void *buf, s32 mode);
 extern s32 CdReadSync(s32 mode, s32 result);
 extern void ResetCdStateMachine(void);
 
-s32 func_800276D0(Obj80027480 *self, void *buf, u32 size) {
+s32 Class6D4E8__Read(Obj80027480 *self, void *buf, u32 size) {
     s32 v1;
 
     if (gCdAsyncEnabled == 0 && D_8008A860 == 0) {
@@ -270,12 +270,12 @@ s32 func_800276D0(Obj80027480 *self, void *buf, u32 size) {
     return 0;
 }
 
-extern void Class6D430__AllocBuffer(void); /* arity-ok: the definition takes (Class6D430 *this, s32 arg1) and reads both, but func_80027800 passes NEITHER -- retail's jal at 0x80027834 has a bare nop delay slot and leaves its own incoming $a0/$a1 in place */
+extern void Class6D430__AllocBuffer(void); /* arity-ok: the definition takes (Class6D430 *this, s32 arg1) and reads both, but Class6D4E8__LoadFile passes NEITHER -- retail's jal at 0x80027834 has a bare nop delay slot and leaves its own incoming $a0/$a1 in place */
 extern void *gCdSavedSeekParam;
 
 /* generic doubly-linked-list node, 0x24 bytes (src/code_179d8_r.c's own
  * reading) -- declared LOCAL, per the project's multiple-local-views
- * convention. func_80027800 only touches unk0; func_80027A24 (below) reads
+ * convention. Class6D4E8__LoadFile only touches unk0; Class6D4E8__RunRequestQueue (below) reads
  * the rest of this unit's own fields, up through unk18. */
 typedef struct Node8008A894 {
     s32 unk0;
@@ -290,7 +290,7 @@ typedef struct Node8008A894 {
 extern Node8008A894 *gCdRequestQueue;
 extern void *BMemPMgrAlloc(s32 size);
 
-void func_80027800(Obj80027480 *self, char *arg1) {
+void Class6D4E8__LoadFile(Obj80027480 *self, char *arg1) {
     Rec80028448 *rec;
     s32 sectorCount;
     s32 pos;
@@ -365,7 +365,7 @@ extern s32 gCdIdle; /* "idle"/"ready" flag, 0/1 */
 extern void FreeCdRequestNode(Node8008A894 *node);
 extern void *GetCdFileEntry(s32 index);
 
-void func_80027A24(void) {
+void Class6D4E8__RunRequestQueue(void) {
     Node8008A894 *node;
     Obj80027480 *self;
     s32 code;
