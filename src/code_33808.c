@@ -941,7 +941,78 @@ void func_8004575C(Obj4575C *self) {
         BMemPMgrFree(self->unk1C);
     }
 }
-INCLUDE_ASM("asm/nonmatchings/code_33808", func_800457C0);
+/* D_8006F614 +0x040: start playing -- only when no movie is active
+ * (D_8008A940): optionally func_800458AC first (+0x68), keep `arg2` at
+ * +0x5C, open `name` on the stream object at +0x60 (its +0x044, 100); 1 when
+ * that fails. Otherwise become the active movie, reset the state words, keep
+ * `arg3`/`arg4` at +0x54/+0x58 and register D_8008A944 with the frame
+ * rectangle (+0x20) through DrawSystem +0x078. 0. */
+typedef struct StreamMethods457C0 {
+    /* +0x000 */ u8 pad0[0x44];
+    /* +0x044 */ s32 (*open)();
+} StreamMethods457C0;
+
+typedef struct Stream457C0 {
+    /* +0x000 */ StreamMethods457C0 *methods;
+} Stream457C0;
+
+typedef struct Obj457C0 {
+    /* +0x000 */ u8 pad0[0x20];
+    /* +0x020 */ s16 rect[4];
+    /* +0x028 */ u8 pad28[0x14];
+    /* +0x03C */ s32 unk3C;
+    /* +0x040 */ s32 unk40;
+    /* +0x044 */ s32 unk44;
+    /* +0x048 */ s32 unk48;
+    /* +0x04C */ s32 unk4C;
+    /* +0x050 */ s32 unk50;
+    /* +0x054 */ s32 unk54;
+    /* +0x058 */ s32 unk58;
+    /* +0x05C */ s32 unk5C;
+    /* +0x060 */ Stream457C0 *unk60;
+    /* +0x064 */ s32 unk64;
+    /* +0x068 */ s32 unk68;
+} Obj457C0;
+
+typedef struct DrawSysMethods457C0 {
+    /* +0x000 */ u8 pad0[0x78];
+    /* +0x078 */ void (*slot78)();
+} DrawSysMethods457C0;
+
+typedef struct DrawSys457C0 {
+    /* +0x000 */ DrawSysMethods457C0 *methods;
+} DrawSys457C0;
+
+extern DataSrc33808 *D_8008A940;
+extern s32 D_8008A944;
+extern void *GetDrawSystem(void);
+void func_800458AC();
+
+s32 func_800457C0(Obj457C0 *self, char *name, s32 arg2, s32 arg3, s32 arg4) {
+    DrawSys457C0 *ds;
+
+    if (D_8008A940 == NULL) {
+        if (self->unk68 != 0) {
+            func_800458AC(self);
+        }
+        self->unk5C = arg2;
+        if (self->unk60->methods->open(self->unk60, name, 100) == 0) {
+            D_8008A940 = (DataSrc33808 *)self;
+            self->unk40 = 0;
+            self->unk3C = 0;
+            self->unk4C = 1;
+            self->unk48 = 0;
+            self->unk44 = 0;
+            self->unk54 = arg3;
+            self->unk58 = arg4;
+            ds = GetDrawSystem();
+            ds->methods->slot78(ds, &D_8008A944, self->rect);
+            return 0;
+        }
+        return 1;
+    }
+    return 0;
+}
 /* A class with an s32 at +0x50, set to 1 / -1 by the two setters below;
  * the class is not yet identified (neither setter sits in a method table). */
 typedef struct Obj33808_50 {
@@ -1117,13 +1188,12 @@ typedef struct Obj45BC8 {
     /* +0x04C */ s32 unk4C;
 } Obj45BC8;
 
-extern DrawSys45BC8 *GetDrawSystem(void);
 /* LIBGPU.H / LIBPRESS.H */
 extern int DrawSync(int mode);
 extern void DecDCTout(u32 *buf, int size);
 
 void func_80045BC8(Obj45BC8 *self) {
-    DrawSys45BC8 *ds = GetDrawSystem();
+    DrawSys45BC8 *ds = (DrawSys45BC8 *)GetDrawSystem();
 
     ds->methods->loadImage(ds, &self->rect, self->strip);
     self->rect.x += self->rect.w;
