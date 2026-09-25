@@ -106,3 +106,7 @@ Seventh build. Levers, each measured: (1) the colour held in a `u32 c` read ONCE
 ## Naming
 
 - **FadeClutRow**, tier B. Free function: blends one 256-colour CLUT row toward a target colour over `mask-1` steps and uploads each step via LIBGPU StoreImage/LoadImage; a pure mechanics leaf (tier B since 'fade' is a purpose word, but the blend math itself is the whole body).
+
+## Track 4 (2026-09-25, round 83, bravo)
+
+Takes `TimBlockSrcEntry *` (merged from the unit's Ent43068/Ent6F0B8 views); +0x0A is `clutH`, set to `mask` here, +0x0C `color`. The class (id 0xF03, table `D_8006F0B8`) is unified as `TimBlockSrc` in `include/TimBlockSrc.h`. Any source block above is the pre-unification spelling; the live body in `src/code_33808.c` takes the unified types, byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).

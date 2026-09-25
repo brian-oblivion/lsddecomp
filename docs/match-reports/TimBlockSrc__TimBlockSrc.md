@@ -99,3 +99,7 @@ Twenty-ninth build (four families of levers, all needed together): (1) an `s16 s
 ## Naming
 
 - **TimBlockSrc__TimBlockSrc**, tier B. Constructs a sector-header + block loader with 4 CLUT palette-fade channel entries at +0x40; mechanics described, no external caller names this class (class_3bb8c_l.c's own caller comment calls its return type opaque).
+
+## Track 4 (2026-09-25, round 83, bravo)
+
+Occupant of +0x008. Fields now named: +0x2C `blockCount`, +0x30 `blocks`, +0x38 `sectorSize`, +0x3C `loaded`, +0x80 `failed`; each entry's +0x04..+0x0A the RECT `clutX`/`clutY`/`clutW`/`clutH` this ctor lays out (0, 0x1E0 + i * mask, 0x100, 1). The class (id 0xF03, table `D_8006F0B8`) is unified as `TimBlockSrc` in `include/TimBlockSrc.h`. Any source block above is the pre-unification spelling; the live body in `src/code_33808.c` takes the unified types, byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).

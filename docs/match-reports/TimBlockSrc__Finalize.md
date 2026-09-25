@@ -40,3 +40,7 @@ void TimBlockSrc__Finalize(DataSrc33808 *self) {
 ## Naming
 
 - **TimBlockSrc__Finalize**, tier B. Class6D430 finalize override for TimBlockSrc: releases the block array and the active driver's finalize.
+
+## Track 4 (2026-09-25, round 83, bravo)
+
+Occupant of +0x00C: releases `blocks` (`blockCount` entries), frees it, then the active driver's finalize. The class (id 0xF03, table `D_8006F0B8`) is unified as `TimBlockSrc` in `include/TimBlockSrc.h`. Any source block above is the pre-unification spelling; the live body in `src/code_33808.c` takes the unified types, byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).

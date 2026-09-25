@@ -108,3 +108,7 @@ Second build (the first was already 183/183; the second only added local Lock/Un
 ## Naming
 
 - **TimBlockSrc__AdvanceLoadState**, tier B. setFlag override implementing the two-state (9 header-read, 10 block-read) loader state machine described in the function's own header comment.
+
+## Track 4 (2026-09-25, round 83, bravo)
+
+Occupant of Class6D430's `setFlag` slot (+0x064); keeps its name because the body is the whole loader state machine, not a flag set. Correction to the prose above: the 0x24-byte header is a count, four file offsets (+0x04) and four sizes (+0x14, what MaxOfBufferWords maximises), not eight offsets. The class (id 0xF03, table `D_8006F0B8`) is unified as `TimBlockSrc` in `include/TimBlockSrc.h`. Any source block above is the pre-unification spelling; the live body in `src/code_33808.c` takes the unified types, byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).

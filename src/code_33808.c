@@ -45,6 +45,7 @@
 #include "BasicClass.h"
 #include "Class6B5CC.h"
 #include "Class6D430.h"
+#include "TimBlockSrc.h"
 
 typedef struct DataSrc33808 DataSrc33808;
 
@@ -76,7 +77,6 @@ extern Class6D430Methods *GetActiveDataSourceMethods(void);
 extern void ReleaseBasicClassArray(BasicClass **array, s32 count);
 extern void BMemPMgrFree(void *arg);
 extern void *BMemPMgrAlloc(s32 size);
-void *GetTimBlockSrcMethods(void);
 void *GetLinkResourceMethods(void);
 void *GetTimArraySrcMethods(void);
 void *GetTodMethods(void);
@@ -100,7 +100,7 @@ void *New_TimBlockSrc(s32 arg0) {
     void *obj = BMemPMgrAlloc(0x84);
 
     if (obj != NULL) {
-        ((Ctor33808 *)GetTimBlockSrcMethods())->ctor(obj, arg0);
+        GetTimBlockSrcMethods()->ctor(obj, (char *)arg0);
         return obj;
     }
     return NULL;
@@ -110,31 +110,10 @@ void *New_TimBlockSrc(s32 arg0) {
  * gTimBlockClutShift, its mask, consecutive slots from 0x1E0); then adopt a 0x24-byte
  * header buffer (state 9 at +0x2A), allocate the 0x800-byte sector buffer
  * at +0x34, open `name` and read the first sector into it. */
-typedef struct Ent43068 {
-    /* +0x00 */ u16 shift;
-    /* +0x02 */ u16 mask;
-    /* +0x04 */ u16 unk4;
-    /* +0x06 */ u16 addr;
-    /* +0x08 */ u16 unk8;
-    /* +0x0A */ u16 unkA;
-    /* +0x0C */ u8 padC[4];
-} Ent43068;
-
-typedef struct Obj43068 {
-    CLASS6D430_FIELDS(DataSrc33808Methods);
-    /* +0x02C */ s32 unk2C;
-    /* +0x030 */ s32 unk30;
-    /* +0x034 */ void *sector;
-    /* +0x038 */ s32 unk38;
-    /* +0x03C */ s32 unk3C;
-    /* +0x040 */ Ent43068 entries[4];
-    /* +0x080 */ s32 unk80;
-} Obj43068;
-
 extern s16 gTimBlockClutShift;
 
-void TimBlockSrc__TimBlockSrc(Obj43068 *self, char *name) {
-    Ent43068 *e;
+void TimBlockSrc__TimBlockSrc(TimBlockSrc *self, char *name) {
+    TimBlockSrcEntry *e;
     void *hdr;
     s32 i;
     u16 addr;
@@ -143,11 +122,11 @@ void TimBlockSrc__TimBlockSrc(Obj43068 *self, char *name) {
 
     GetActiveDataSourceMethods()->ctor((Class6D430 *)self);
     self->methods = GetTimBlockSrcMethods();
-    self->unk2C = 0;
-    self->unk30 = 0;
-    self->unk3C = 0;
+    self->blockCount = 0;
+    self->blocks = NULL;
+    self->loaded = 0;
     self->sector = NULL;
-    self->unk38 = 0;
+    self->sectorSize = 0;
     addr = 0;
     mask = 1 << gTimBlockClutShift;
     shift = gTimBlockClutShift;
@@ -155,11 +134,11 @@ void TimBlockSrc__TimBlockSrc(Obj43068 *self, char *name) {
         e = &self->entries[i];
         e->shift = shift;
         e->mask = mask;
-        e->unk4 = 0;
-        e->addr = addr + 0x1E0;
+        e->clutX = 0;
+        e->clutY = addr + 0x1E0;
         addr += mask;
-        e->unk8 = 0x100;
-        e->unkA = 1;
+        e->clutW = 0x100;
+        e->clutH = 1;
     }
     hdr = BMemPMgrAlloc(0x24);
     if (hdr != NULL) {
@@ -168,17 +147,17 @@ void TimBlockSrc__TimBlockSrc(Obj43068 *self, char *name) {
             self->bufferSize = 0x24;
             self->buffer = hdr;
             self->unk2A = 9;
-            self->unk80 = 0;
-            self->methods->open((DataSrc33808 *)self, name, 1, 0);
-            self->methods->read((DataSrc33808 *)self, self->sector, 0x800);
+            self->failed = 0;
+            self->methods->open(self, name, 1, 0);
+            self->methods->read(self, self->sector, 0x800);
         }
     }
 }
 /* D_8006F0B8 +0x00C: finalize -- release the object array at +0x30 (+0x2C
  * entries), free it, then the active driver's. */
-void TimBlockSrc__Finalize(DataSrc33808 *self) {
-    ReleaseBasicClassArray((BasicClass **)self->unk30, self->unk2C);
-    BMemPMgrFree(self->unk30);
+void TimBlockSrc__Finalize(TimBlockSrc *self) {
+    ReleaseBasicClassArray((BasicClass **)self->blocks, self->blockCount);
+    BMemPMgrFree(self->blocks);
     GetActiveDataSourceMethods()->finalize((Class6D430 *)self);
 }
 /* D_8006F0B8 +0x064: the loader's state machine, under the data-source
@@ -200,7 +179,7 @@ extern void UnlockActiveDataSource(void);
 u32 MaxOfBufferWords(Class6D430 *self);
 void *New_TimArraySrc(s32 arg0);
 
-void TimBlockSrc__AdvanceLoadState(Obj43068 *self) {
+void TimBlockSrc__AdvanceLoadState(TimBlockSrc *self) {
     DataSrc33808 **p;
     s32 max;
     s32 n;
@@ -212,24 +191,24 @@ void TimBlockSrc__AdvanceLoadState(Obj43068 *self) {
                 *(Hdr43200 *)self->buffer = *(Hdr43200 *)self->sector;
                 BMemPMgrFree(self->sector);
                 max = MaxOfBufferWords((Class6D430 *)self);
-                self->unk30 = (s32)BMemPMgrAlloc(*(u32 *)self->buffer * 4);
-                if (self->unk30 == 0) {
+                self->blocks = BMemPMgrAlloc(*(u32 *)self->buffer * 4);
+                if (self->blocks == NULL) {
                     goto fail;
                 }
                 self->sector = BMemPMgrAlloc(max);
                 if (self->sector == NULL) {
                     goto fail;
                 }
-                self->unk38 = max;
-                self->methods->seek((DataSrc33808 *)self, ((u32 *)self->buffer)[1], 0);
-                self->methods->read((DataSrc33808 *)self, self->sector, max);
+                self->sectorSize = max;
+                self->methods->seek(self, ((u32 *)self->buffer)[1], 0);
+                self->methods->read(self, self->sector, max);
                 self->unk2A = 10;
             }
             break;
         case 10:
             if (self->flags & 0x80) {
-                n = self->unk2C;
-                p = (DataSrc33808 **)self->unk30 + n;
+                n = self->blockCount;
+                p = (DataSrc33808 **)self->blocks + n;
                 *p = New_TimArraySrc(0);
                 (*p)->buffer = self->sector;
                 (*p)->bufferSize = 0;
@@ -237,17 +216,17 @@ void TimBlockSrc__AdvanceLoadState(Obj43068 *self) {
                 n++;
                 (*p)->methods->setFlag(*p);
                 ((void (*)())(*p)->methods->slot78)(*p);
-                self->unk2C = n;
+                self->blockCount = n;
                 if (n < *(u32 *)self->buffer) {
-                    self->methods->seek((DataSrc33808 *)self, ((u32 *)self->buffer)[n + 1], 0);
-                    self->methods->read((DataSrc33808 *)self, self->sector, self->unk38);
+                    self->methods->seek(self, ((u32 *)self->buffer)[n + 1], 0);
+                    self->methods->read(self, self->sector, self->sectorSize);
                     self->unk2A = 10;
                 } else {
                     BMemPMgrFree(self->sector);
                     self->sector = NULL;
-                    self->unk38 = 0;
+                    self->sectorSize = 0;
                     self->unk2A = 0;
-                    self->unk3C = 1;
+                    self->loaded = 1;
                     GetActiveDataSourceMethods()->setFlag((Class6D430 *)self);
                 }
             }
@@ -255,7 +234,7 @@ void TimBlockSrc__AdvanceLoadState(Obj43068 *self) {
     }
     goto out;
 fail:
-    self->unk80 = 1;
+    self->failed = 1;
 out:
     UnlockActiveDataSource();
 }
@@ -286,22 +265,8 @@ typedef struct Vec3S8 {
 } Vec3S8;
 
 /* D_8006F0B8 +0x078: set entry `index`'s shift, and its mask from it. */
-typedef struct Ent6F0B8 {
-    /* +0x00 */ u16 shift;
-    /* +0x02 */ u16 mask;
-    /* +0x04 */ u8 pad4[6];
-    /* +0x0A */ u16 unkA;         /* set to the mask by FadeClutRow */
-    /* +0x0C */ Vec3S8 vec;
-    /* +0x0F */ u8 padF;
-} Ent6F0B8;
-
-typedef struct Obj6F0B8 {
-    /* +0x000 */ u8 pad0[0x40];
-    /* +0x040 */ Ent6F0B8 entries[1];
-} Obj6F0B8;
-
-void TimBlockSrc__SetEntryShift(Obj6F0B8 *self, s32 index, s32 shift) {
-    Ent6F0B8 *e = &self->entries[index];
+void TimBlockSrc__SetEntryShift(TimBlockSrc *self, s32 index, s32 shift) {
+    TimBlockSrcEntry *e = &self->entries[index];
 
     e->shift = shift;
     e->mask = 1 << e->shift;
@@ -311,25 +276,23 @@ void TimBlockSrc__SetEntryShift(Obj6F0B8 *self, s32 index, s32 shift) {
 extern void LockActiveDataSource(void);
 extern void UnlockActiveDataSource(void);
 
-void TimBlockSrc__FadeAllEntries(DataSrc33808 *self, s32 arg) {
+void TimBlockSrc__FadeAllEntries(TimBlockSrc *self, TimBlockSrcColor *color) {
     s32 i;
 
     LockActiveDataSource();
     for (i = 0; i < 4; i++) {
-        self->methods->slot80(self, i, arg);
+        self->methods->fadeEntry(self, i, color);
     }
     UnlockActiveDataSource();
 }
 /* D_8006F0B8 +0x080: under the data-source lock, set entry `index`'s
  * three-byte vector and hand the entry to FadeClutRow. */
-void FadeClutRow(Ent6F0B8 *entry, s32 index);
-
-void TimBlockSrc__FadeEntry(Obj6F0B8 *self, s32 index, Vec3S8 *src) {
-    Ent6F0B8 *e;
+void TimBlockSrc__FadeEntry(TimBlockSrc *self, s32 index, TimBlockSrcColor *src) {
+    TimBlockSrcEntry *e;
 
     LockActiveDataSource();
     e = &self->entries[index];
-    e->vec = *src;
+    e->color = *src;
     FadeClutRow(e, index);
     UnlockActiveDataSource();
 }
@@ -349,7 +312,7 @@ extern int StoreImage(Rect43648 *rect, u32 *p);
 extern int LoadImage(Rect43648 *rect, u32 *p);
 extern int DrawSync(int mode);
 
-void FadeClutRow(Ent6F0B8 *e, s32 index) {
+void FadeClutRow(TimBlockSrcEntry *e, s32 index) {
     Rect43648 dst;
     Rect43648 src;
     u16 out[256];
@@ -379,11 +342,11 @@ void FadeClutRow(Ent6F0B8 *e, s32 index) {
     dst.x = 0;
     dst.y = 0;
     dst.w = 0x100;
-    r = (u8)e->vec.x;
-    g = (u8)e->vec.y;
-    b = (u8)e->vec.z;
+    r = (u8)e->color.r;
+    g = (u8)e->color.g;
+    b = (u8)e->color.b;
     shift = 12 - e->shift;
-    e->unkA = e->mask;
+    e->clutH = e->mask;
     for (i = 0; i < e->mask - 1; i++) {
         f = (i + 1) << shift;
         rr = r * f;
@@ -409,10 +372,8 @@ void FadeClutRow(Ent6F0B8 *e, s32 index) {
         LoadImage(&dst, (u32 *)out);
     }
 }
-extern s32 D_8006F0B8[];
-
-void *GetTimBlockSrcMethods(void) {
-    return D_8006F0B8;
+TimBlockSrcMethods *GetTimBlockSrcMethods(void) {
+    return &D_8006F0B8;
 }
 /* Allocate and construct a D_8006F13C object; freed and NULL when the constructor fails. */
 void *New_LinkResource(s32 arg0) {
