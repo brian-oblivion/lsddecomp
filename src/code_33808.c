@@ -270,12 +270,7 @@ void *func_800441B4(s32 arg0, s32 arg1) {
     }
     return NULL;
 }
-INCLUDE_ASM("asm/nonmatchings/code_33808", func_80044220);
-INCLUDE_ASM("asm/nonmatchings/code_33808", func_80044294);
-INCLUDE_ASM("asm/nonmatchings/code_33808", func_80044380);
-INCLUDE_ASM("asm/nonmatchings/code_33808", func_8004441C);
-/* D_8006F2C4 (a Class6B5CC subclass) +0x0B8: when `enable`, copy a
- * three-byte vector to +0x54. */
+/* A three-byte vector, and the D_8006F2C4 object (a Class6B5CC subclass). */
 typedef struct Vec3S8 {
     s8 x;
     s8 y;
@@ -288,6 +283,18 @@ typedef struct Obj6F2C4 {
     /* +0x054 */ Vec3S8 unk54;
 } Obj6F2C4;
 
+/* D_8006F2C4 +0x008: constructor -- Class6B5CC's, then this table, then
+ * slot +0x040 with the two arguments. */
+void func_80044220(Obj6F2C4 *self, s32 arg1, s32 arg2) {
+    GetClass6B5CCMethods()->ctor((Class6B5CC *)self);
+    self->methods = func_8004467C();
+    ((void (*)())self->methods->reset)(self, arg1, arg2);
+}
+INCLUDE_ASM("asm/nonmatchings/code_33808", func_80044294);
+INCLUDE_ASM("asm/nonmatchings/code_33808", func_80044380);
+INCLUDE_ASM("asm/nonmatchings/code_33808", func_8004441C);
+/* D_8006F2C4 (a Class6B5CC subclass) +0x0B8: when `enable`, copy a
+ * three-byte vector to +0x54. */
 void func_8004464C(Obj6F2C4 *self, s32 enable, Vec3S8 *src) {
     if (enable) {
         self->unk54 = *src;
