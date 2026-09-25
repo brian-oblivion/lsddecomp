@@ -89,8 +89,10 @@ reason" rather than another round.
 Tracks 1 and 2 are OPEN again (revision 18): the "every game function
 matches" track 1 closed on was measured over segment names, and ten `psyq_*`
 segments held game code, now fresh ground in `code_<fileoff>` units. Their
-`jal`s reach Sony functions still named `func_`, and `plan.py` now counts
-calls from INCLUDE_ASM game code, so track 2 lists them at once.
+`jal`s reached Sony functions still named `func_`, and `plan.py` counts
+calls from INCLUDE_ASM game code, so track 2 listed them at once; round 81
+named them and track 2 is done again (the §4.4 prompt's "§3 track 2" is the
+archive's section).
 
 Fresh ground is never parked by the stall stop rule. `plan.py` lists one job
 per unit, up to ten functions cheapest first; staff it with the matching

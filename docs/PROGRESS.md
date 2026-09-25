@@ -6,6 +6,54 @@ stale, prose elsewhere is not.
 
 ---
 
+## 2026-09-25 — round 81: 86/86 fresh matches, track 2 done, Class6B5CC unified, four units named
+
+**Opus head (not premium), five slots, three waves, 16 runner sessions** (11 Opus
+matching, 4 Sonnet track-3/track-2, 1 Opus track-4), filled from `plan.py`'s list
+top-down; every slot was re-filled from the list the moment its runner merged.
+
+| track | moved |
+| --- | --- |
+| 1 | 86 fresh revision-18 functions attempted, **86 byte-exact**, 0 stalls, 0 permuter searches (code_3311c, code_2b78c, code_2bb9c, code_2a0e0 now whole; code_10ee0, code_39094, code_3770c partial; code_2864's single 449-word `Unk18Obj__DrawNode` in 6 builds). Recorded `--not-calibration`. |
+| 2 | the 14 unnamed SDK callees named (libgpu/sys image calls, GsInitGraph, GetTPage, GsGetActiveBuff, SsSeqOpen, libpress DecDCT*, CdRead2); **done** again. Two AMBIGUOUS ties settled by position plus what the wrapper does with its forwarded registers. |
+| 3 | code_3311c (FlatLightObj), code_2b78c (Class6E4F0), code_2864, code_2bb9c (TimImage) passed head review and were marked. All four were Sonnet units; none sent back. |
+| 4 | Class6B5CC (gClass6B5CCMethods) unified into `include/Class6B5CC.h` and marked; 3 typeviews warnings GONE. |
+
+**Why fresh ground went 86/86.** The revision-18 units are small class methods
+(setters, getters, empty overrides, slot forwarders) whose neighbours were
+matched long ago, so levers already written down covered every residue. The
+one giant (`func_80012064`, 449 words) needed five: a pointer local for a
+callee-saved stack-struct address, inner-block aggregate placement, an unused
+inner `SVECTOR` for 8 frame bytes, a single ternary store, and operand order.
+
+**Merges.** Three `symbols.slps01556.lsdde.txt` conflicts, all two `rename.py`
+branches appending at end of file: union, no duplicate names, `make extract`,
+oracle. One new typeviews warning, code_2864's deliberately unused `scr`,
+baselined in its own commit.
+
+**Escalated, not acted on:**
+- `tools/rename.py` cannot rename a `func_` placeholder that has an EXPLICIT
+  symbols-file line: `symbol_address()` takes the address from the name first,
+  never finds the line, and appends a duplicate (`make extract`: "Duplicate
+  symbol"). The explicit lines are stale track-2 `// unidentified:` records on
+  functions revision 18 moved to game units (~48 such lines; 11 in code_39094).
+  It blocked 3 renames this round (`func_8003B20C`, `func_8003B39C`,
+  `func_8003B624`, proposed names in their reports) and will block part of every
+  naming pass on those units.
+- charlie added `BASICCLASS_SLOTS_R(Self, CtorRet, CtorParams)` to the unified
+  `include/BasicClass.h` (Class6B5CC's ctor returns self/NULL; its callers test
+  it) and a banner sentence allowing the ctor return type to differ between a
+  class and its subclasses. Byte-identical, additive, inside track 4's type-change
+  rule, but it is a sentence in the worked-example header.
+
+**Doc maintenance.** Four idioms promoted to DECOMPILATION_LEARNINGS (cross-jump
+target = rejoin point, filler follows the block rule, delay-slot address = pointer
+local, callee-saved stack address = pointer local) plus one citation; two process
+entries distilled to the archive to hold the budget. FINISHING-PLAN's track-2
+status line fixed.
+
+---
+
 ## 2026-09-25 — premium session: ten psyq_* segments were game code; 299 functions carved; plan revision 18
 
 **One premium session, no runners**, from an operator handover: game code sat

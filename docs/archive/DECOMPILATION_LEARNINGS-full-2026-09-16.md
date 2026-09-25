@@ -9192,3 +9192,25 @@ already covered elsewhere in the sheet.
   is not HARD RULE 6's banned construct. Cheaper still, **try REORDERING first**. (a §"Negatives
   worth not re-deriving", §"A repeated-global-address CSE is defeatable from C89")
 
+## Distilled round 81 (2026-09-25)
+
+Moved verbatim from §3c to meet the word budget after round 81 promoted four idioms.
+
+- **A type-scoped field rename is enumerated by the COMPILER, and the compiler cannot see a body the
+  default build does not compile** — neither a `#if 0` preserved body nor an `#ifdef NON_MATCHING`
+  one. Rename in the DEFINITION only, fix exactly the accessors the build reports (a whole-tree
+  replace of `slotA4` mislabels five other classes), then sweep what the compiler skipped:
+  `tools/check-nonmatching.sh` RED against a GREEN oracle is the tell, and `tools/stalesyms.py`
+  scans match REPORTS, not `src/`. Round 54 left four accessors in `#if 0` bodies; round 67 left six
+  in a NON_MATCHING body and check-nonmatching stayed red a whole round. Track 1b converts the
+  former shape into the latter, so a `^#if 0`-only grep now misses the growing half.
+  (a rounds 54, 68)
+- **A preserved `#if 0` body carries the declarations of the round that WROTE it, and a later
+  naming pass may have moved the same symbol into the unit's prelude under a different typedef or
+  field name.** Redeclaring it is a real `conflicting types` error, not a harmless duplicate, so
+  promoting a body to `#ifdef NON_MATCHING` means deleting its own typedef/extern and re-pointing
+  its field accesses. Reconcile by OFFSET, never by the field's semantic label — round 67 found
+  `bendCurveUp`/`bendCurveDown` whose comment polarity disagrees with how both accessors use them.
+  Read the report's own earlier stale-symbol write-up before trusting the block to compile as
+  literally written: `stalesyms.py` scans report TEXT, so it cannot see what a promoted `.c` body
+  needs. (a round 67, `code_179d8_m`)

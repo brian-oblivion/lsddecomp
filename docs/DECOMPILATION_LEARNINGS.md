@@ -188,6 +188,11 @@ load through a runtime-indexed global", §"BLOCKED: the `nop_mflo_mfhi` screen r
   The MIRROR: when retail DOES preset (`li v0,1` ahead of every test), write the tests as one `&&`
   chain whose then-arm returns the other constant (`if (a && b && c) return 0; return 1;`); an `||`
   chain or separate `if`s never preset (`IsPointOutOfBounds`, 2/27 -> 27/27, round 77).
+- **A one-word `j`-target diff onto a DIFFERENT copy of an identical call tail is a cross-jump
+  choice, and the C's rejoin point decides it.** Retail's target is where its source's control
+  flow goes next. `if (s == 1) { A(); continue; }` inside `for (;;)` with a
+  trailing `if (s == 0) break;` jumps to the loop head's call; `do { ... } while (s != 0)` jumps to
+  the tail before the test (`Class6E4F0__RunMainLoop`, 62/63 -> 63/63, round 81).
 
 ### 3b. Switch and jump tables
 
@@ -223,24 +228,6 @@ load through a runtime-indexed global", §"BLOCKED: the `nop_mflo_mfhi` screen r
 
 ### 3c. Struct layout, types and widths
 
-- **A type-scoped field rename is enumerated by the COMPILER, and the compiler cannot see a body the
-  default build does not compile** — neither a `#if 0` preserved body nor an `#ifdef NON_MATCHING`
-  one. Rename in the DEFINITION only, fix exactly the accessors the build reports (a whole-tree
-  replace of `slotA4` mislabels five other classes), then sweep what the compiler skipped:
-  `tools/check-nonmatching.sh` RED against a GREEN oracle is the tell, and `tools/stalesyms.py`
-  scans match REPORTS, not `src/`. Round 54 left four accessors in `#if 0` bodies; round 67 left six
-  in a NON_MATCHING body and check-nonmatching stayed red a whole round. Track 1b converts the
-  former shape into the latter, so a `^#if 0`-only grep now misses the growing half.
-  (a rounds 54, 68)
-- **A preserved `#if 0` body carries the declarations of the round that WROTE it, and a later
-  naming pass may have moved the same symbol into the unit's prelude under a different typedef or
-  field name.** Redeclaring it is a real `conflicting types` error, not a harmless duplicate, so
-  promoting a body to `#ifdef NON_MATCHING` means deleting its own typedef/extern and re-pointing
-  its field accesses. Reconcile by OFFSET, never by the field's semantic label — round 67 found
-  `bendCurveUp`/`bendCurveDown` whose comment polarity disagrees with how both accessors use them.
-  Read the report's own earlier stale-symbol write-up before trusting the block to compile as
-  literally written: `stalesyms.py` scans report TEXT, so it cannot see what a promoted `.c` body
-  needs. (a round 67, `code_179d8_m`)
 - **A local's DECLARED WIDTH is a codegen decision and `s16` is the expensive default.** An
   `s16`/`u16` local compared or indexed is re-sign-extended at each use — `sll 0x10`/`sra 0x10`
   PAIRS, never scheduling, never movable by a barrier. Declare the LOCAL `s32`, keep the FIELD
@@ -291,7 +278,8 @@ load through a runtime-indexed global", §"BLOCKED: the `nop_mflo_mfhi` screen r
   RELOAD of a word just stored.** That is a whole-struct copy (`pos = *src;`), opaque to later
   passes, so the field is re-read from the stack. It closed `Obj86B60__RefreshSlotView`/`Obj86B60__CommitElementScroll` (8-byte
   pair; the "name it, then barrier it" pair this entry used to recommend was imitating it by
-  hand), `Class86B60__TickNameFieldCursor` (3 signed bytes) and `DreamSys__TryStaircaseLink` (10 bytes). (round 75)
+  hand), `Class86B60__TickNameFieldCursor` (3 signed bytes) and `DreamSys__TryStaircaseLink` (10 bytes). (round 75; again round 81,
+  `FlatLightObj__SetColor`: 3 `s8` bytes; the per-field copy is 3 words longer)
 - **Write an expression twice rather than naming it before a branch, and walk a parameter rather
   than a copy of it.** CSE supplies retail's `move sN,sM` for a second `&tab[idx]`, while a name
   taken before the branch swapped the first address computation (`DriftModelChildren`); an
@@ -428,6 +416,10 @@ load through a runtime-indexed global", §"BLOCKED: the `nop_mflo_mfhi` screen r
   exact, word count unmoved. Use it FIRST as a cheap diagnostic realignment, then look for a
   separate companion fix. An allocated-but-unused frame on a leaf function is not a residue at all.
   (a §"The frame-padding idiom recovers frame ALIGNMENT", §"An allocated-but-unused stack frame")
+- **The filler follows the block rule too.** Untouched frame bytes ABOVE an inner-block aggregate
+  are an unused aggregate declared in that SAME inner block, after it: outer-block address-taken
+  scalars get the lower slots, inner-block aggregates stack above them in declaration order
+  (`Unk18Obj__DrawNode`, an unused `SVECTOR` beside `VECTOR pos`, frame 0x90 -> 0x98, round 81).
 
 ### 3f. Calls, arguments and return types
 
@@ -517,6 +509,12 @@ load through a runtime-indexed global", §"BLOCKED: the `nop_mflo_mfhi` screen r
   (`SetActiveDataSource`). Fix the slot or prototype once its callers are checked. (round 75)
 
 ### 3g. Delay slots, arithmetic, one-instruction residues
+
+- **A call argument's address (`&self->f`) sitting in the delay slot of an EARLIER guard branch is
+  a pointer local assigned before the test.** Inline at the call it is one word short
+  (`func_8003B4A8`, round 81).
+- **A callee-saved register holding a stack struct's address from the prologue on is an explicit
+  pointer local** (`MATRIX *ls = &lsBuf;`): `Unk18Obj__DrawNode` 19 -> 150 of 449, round 81.
 
 - **A delay-slot instruction executes on the TAKEN path too, and a delay-slot store is
   UNCONDITIONAL.** Evaluate the value at the TARGET: `li $v0, 0x1` in a slot with `sw $v0, 0x24(s1)`
@@ -741,4 +739,4 @@ is a lone scheduling difference, sweep one statement's PLACEMENT", §"Inherited 
 statements must be tested in BOTH directions". Distilled out rounds 71-72: §"A narrow signed field may need an `s32` LOCAL", §"A missing `andi 0xff`" (getintr). Distilled out round 73: §"An INCOMPLETE-ARRAY global declaration" (contextual, single
 instance), §"A same-size pointer cast in a FUNCTION-SCOPE local", §"A permuter run that plateaus
 with NO MOVEMENT AT ALL", §"The frame size bounds how many spilled locals"; the 3j local-count entry
-folded into 3d's. Distilled out round 77: §"`volatile` is the WRONG tool for an ADDRESS CSE" (the asm-label alias lever).
+folded into 3d's. Distilled out round 77: §"`volatile` is the WRONG tool for an ADDRESS CSE" (the asm-label alias lever). Distilled out round 81 (process, carried by FINISHING-PLAN track 3 step 3 and `check-nonmatching.sh`): §"A type-scoped field rename is enumerated by the COMPILER", §"A preserved `#if 0` body carries the declarations of the round that WROTE it".

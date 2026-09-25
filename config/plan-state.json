@@ -320,6 +320,16 @@
           "note": "REVISIT-2 runner (1 session): class_3bb8c_b 1/1 (IsPointOutOfBounds 27/27: negated && chain returning 0 then return 1, so jump.c presets 1 in v0 and bounds lands in a2). func_80030980 not staffed (ownership escalated round 76). No permuter.",
           "round": 77,
           "runners": 1
+        },
+        {
+          "attempts": 86,
+          "calibration": false,
+          "date": "2026-09-25",
+          "matches": 86,
+          "model": "opus",
+          "note": "fresh revision-18 ground: 11 opus matching sessions over code_3311c, code_2b78c, code_2bb9c, code_39094, code_2864, code_10ee0, code_2a0e0, code_3770c; 86/86 byte-exact, no stalls, no searches",
+          "round": 81,
+          "runners": 11
         }
       ],
       "status": "open"
@@ -760,6 +770,9 @@
         "code_179d8_q": "2026-09-17",
         "code_179d8_r": "2026-09-18",
         "code_179d8_s": "2026-09-25",
+        "code_2864": "2026-09-25",
+        "code_2b78c": "2026-09-25",
+        "code_2bb9c": "2026-09-25",
         "code_2c054": "2026-09-23",
         "code_2cc8c": "2026-09-24",
         "code_2cc8c_b": "2026-09-24",
@@ -769,6 +782,7 @@
         "code_2cc8c_e0": "2026-09-24",
         "code_2cc8c_e1": "2026-09-24",
         "code_2cc8c_f": "2026-09-18",
+        "code_3311c": "2026-09-25",
         "code_4cd08": "2026-09-21",
         "code_55dd4": "2026-09-24",
         "code_8220": "2026-09-24",
@@ -791,6 +805,11 @@
           "class": "Class6D430",
           "date": "2026-09-25",
           "header": "include/Class6D430.h"
+        },
+        "gClass6B5CCMethods": {
+          "class": "Class6B5CC",
+          "date": "2026-09-25",
+          "header": "include/Class6B5CC.h"
         },
         "gPadMethods": {
           "class": "Pad",
