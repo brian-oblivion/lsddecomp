@@ -1,4 +1,6 @@
-# func_80041C9C -- MATCHED (31/31 words), round 82
+# New_D8006ED4C -- MATCHED (31/31 words), round 82
+
+> Renamed from `func_80041C9C` on 2026-09-25 (tools/rename.py). Address 0x80041c9c.
 
 Round 82, runner alpha (fourth slot on code_322b4). Unit `src/code_322b4.c`. Fresh ground, no prior attempt.
 
@@ -16,7 +18,7 @@ typedef struct CtorArg3Methods_322b4 {
     void *(*ctor)(void *self, void *a1, void *a2, void *a3); /* +0x008 = func_80041D18 */
 } CtorArg3Methods_322b4;
 
-void *func_80041C9C(void *a1, void *a2, void *a3) {
+void *New_D8006ED4C(void *a1, void *a2, void *a3) {
     void *obj = BMemPMgrAlloc(0xA8);
 
     if (obj != NULL) {

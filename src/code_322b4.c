@@ -227,7 +227,7 @@ void GetCellRect(SpriteRect *dst, u32 cell) {
     dst->v += (cell >> 5) * 8;
 }
 /* Allocate and construct a D_8006ED4C object (0xA8 bytes). */
-void *func_80041C9C(void *a1, void *a2, void *a3) {
+void *New_D8006ED4C(void *a1, void *a2, void *a3) {
     void *obj = BMemPMgrAlloc(0xA8);
 
     if (obj != NULL) {
