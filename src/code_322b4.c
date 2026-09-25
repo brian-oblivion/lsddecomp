@@ -196,7 +196,15 @@ INCLUDE_ASM("asm/nonmatchings/code_322b4", func_80041D18);
 /* D_8006ED4C slot +0x040 (reset): empty override. */
 void func_80041DA4(Class6B5CC *self) {
 }
-INCLUDE_ASM("asm/nonmatchings/code_322b4", func_80041DAC);
+/* D_8006EC74 and D_8006ED4C slot +0x04C (attachToParent): when not yet
+ * attached, attach through Sprite's with a zero offset, then hand the
+ * caller's third argument to slot +0x0BC. */
+void func_80041DAC(SpriteView_322b4 *self, Class6B5CC *parent, Pair_322b4 *pos) {
+    if (self->unkC == 0) {
+        GetSpriteMethods()->attachToParent((Sprite *)self, parent, &D_8006EE10);
+        self->methods->slotBC(self, pos);
+    }
+}
 /* D_8006EC74 and D_8006ED4C slot +0x0BC. */
 void func_80041E2C(SpriteView_322b4 *self, Pair_322b4 *src) {
     if (self->unkC != 0) {
