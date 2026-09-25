@@ -1,4 +1,6 @@
-# new_class_6bea0 -- MATCHED (24/24 words), round 82
+# New_TmdModel -- MATCHED (24/24 words), round 82
+
+> Renamed from `new_class_6bea0` on 2026-09-25 (tools/rename.py). Address 0x8001f250.
 
 Round 82, runner charlie (matching slot, second pass on the unit). Unit `src/code_fa50.c`. Fresh ground, no prior attempt.
 
@@ -24,7 +26,7 @@ struct Class6BEA0 {
 extern void *BMemPMgrAlloc(s32 size);
 Class6BEA0Methods *func_8001F384(void);
 
-Class6BEA0 *new_class_6bea0(void *arg) {
+Class6BEA0 *New_TmdModel(void *arg) {
     Class6BEA0 *p = BMemPMgrAlloc(0x24);
 
     if (p != NULL) {

@@ -4,7 +4,7 @@
  * as Psy-Q SDK by segment name; tools/gameinsdk.py measured it as game (a call
  * into game code, a method-table entry beside game methods, or contiguity with
  * those, and no Sony fingerprint). What it holds: the class of method table
- * D_8006BEA0 (new_class_6bea0 allocates it with BMemPMgrAlloc and chains to
+ * D_8006BEA0 (New_TmdModel allocates it with BMemPMgrAlloc and chains to
  * Get_vtable_BasicClass) and helpers called only from Class6B5CC/BaseObjO
  * code. Owns jtbl_80010354 (attached rodata sub-slot 0xB54).
  *
@@ -141,7 +141,7 @@ extern void *BMemPMgrAlloc(s32 size);
 void func_8001F394(Class6BEA0 *self);
 Class6BEA0Methods *func_8001F384(void);
 
-Class6BEA0 *new_class_6bea0(void *arg) {
+Class6BEA0 *New_TmdModel(void *arg) {
     Class6BEA0 *p = BMemPMgrAlloc(0x24);
 
     if (p != NULL) {
