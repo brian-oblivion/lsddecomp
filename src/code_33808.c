@@ -415,7 +415,42 @@ void func_80044808(DataSrc33808 *self) {
     GetActiveDataSourceMethods()->setFlag((Class6D430 *)self);
     ((s32 (*)())self->methods->slot78)(self);
 }
-INCLUDE_ASM("asm/nonmatchings/code_33808", func_80044858);
+/* D_8006F384 +0x078: when +0x34 is set, build a D_8006F13C source over the
+ * buffer's sub-block (at the offset in its third word) and a D_8006F590 one
+ * over the buffer past +0x0C, into +0x2C and +0x30; 0 when both exist,
+ * otherwise slot +0x07C (release) and 1. */
+typedef struct Req44858 {
+    /* +0x00 */ void *buffer;
+    /* +0x04 */ s32 unk4;
+    /* +0x08 */ s32 unk8;
+} Req44858;
+
+typedef struct Buf44858 {
+    /* +0x00 */ u8 pad0[8];
+    /* +0x08 */ s32 offset;
+} Buf44858;
+
+extern void *SetVec3();
+
+s32 func_80044858(DataSrc33808 *self) {
+    Req44858 req;
+
+    if (self->unk34 != 0) {
+        SetVec3(&req, (u8 *)self->buffer + ((Buf44858 *)self->buffer)->offset, 0, 1);
+        self->unk2C = (s32)func_80043840((s32)&req);
+        if ((void *)self->unk2C != NULL) {
+            req.buffer = (u8 *)self->buffer + 0xC;
+            self->unk30 = func_800451B8((s32)&req);
+            if (self->unk30 != NULL) {
+                return 0;
+            }
+            self->unk30 = NULL;
+        }
+        self->methods->slot7C(self);
+        return 1;
+    }
+    return 0;
+}
 /* D_8006F384 +0x07C: when +0x34 is set, release the objects at +0x30 and
  * +0x2C (each when there is one). */
 void func_800448F8(DataSrc33808 *self) {
