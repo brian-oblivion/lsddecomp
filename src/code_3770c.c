@@ -143,7 +143,13 @@ void func_800475C8(CdStreamObj *self) {
 void func_800475D0(CdStreamObj *self) {
 }
 INCLUDE_ASM("asm/nonmatchings/code_3770c", func_800475D8);
-INCLUDE_ASM("asm/nonmatchings/code_3770c", func_80047638);
+void func_80047638(CdStreamObj *self) {
+    if (self->muted != 0 && D_8008A950 == self) {
+        while (CdControl(0xC, 0, 0) == 0) {
+        }
+        self->muted = 0;
+    }
+}
 INCLUDE_ASM("asm/nonmatchings/code_3770c", func_80047694);
 INCLUDE_ASM("asm/nonmatchings/code_3770c", func_800477B0);
 INCLUDE_ASM("asm/nonmatchings/code_3770c", func_80047810);
