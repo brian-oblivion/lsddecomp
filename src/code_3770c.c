@@ -89,7 +89,9 @@ u32 func_80047870(CdStreamObj *self, u32 *base) {
 void func_80047890(CdStreamObj *self) {
     StUnSetRing();
 }
-INCLUDE_ASM("asm/nonmatchings/code_3770c", func_800478B0);
+void func_800478B0(CdStreamObj *self) {
+    StClearRing();
+}
 INCLUDE_ASM("asm/nonmatchings/code_3770c", func_800478D0);
 void func_800478F8(CdStreamObj *self) {
 }
