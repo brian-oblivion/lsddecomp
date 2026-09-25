@@ -1,4 +1,6 @@
-# func_80042550 -- MATCHED (34/34 words), round 82
+# D8006EF50__NotifyParents -- MATCHED (34/34 words), round 82
+
+> Renamed from `func_80042550` on 2026-09-25 (tools/rename.py). Address 0x80042550.
 
 Round 82, runner alpha (fifth slot on code_322b4). Unit `src/code_322b4.c`. Fresh ground, no prior body attempt.
 
@@ -17,7 +19,7 @@ Retail has ONE `jal GetNextBasicClass` site, entered by a `j` to the bottom of t
 /* D_8006EF50 slot +0x030 (notifyParents): walk the parent refs with the
  * cursor at +0x018 (which removeParentRef keeps valid) and pass each the
  * event through its onNotify. */
-void func_80042550(D_8006EF50Obj *self, s32 event) {
+void D8006EF50__NotifyParents(D_8006EF50Obj *self, s32 event) {
     BasicClass *parent;
 
     self->unk18 = self->parentRefs;

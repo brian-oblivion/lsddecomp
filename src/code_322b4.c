@@ -31,7 +31,7 @@ typedef struct D_8006EF50Obj {
 } D_8006EF50Obj;
 struct D_8006EF50Methods {
     u8 pad00[0x30];
-    void (*notifyParents)(D_8006EF50Obj *self, s32 event); /* +0x030 = func_80042550 */
+    void (*notifyParents)(D_8006EF50Obj *self, s32 event); /* +0x030 = D8006EF50__NotifyParents */
     u8 pad34[0x40 - 0x34];
     void (*reset)(D_8006EF50Obj *self, s32 a1); /* +0x040 = func_800425D8 */
 };
@@ -448,7 +448,7 @@ void D8006EF50__RemoveParentRef(D_8006EF50Obj *self, BasicClass *parent) {
 /* D_8006EF50 slot +0x030 (notifyParents): walk the parent refs with the
  * cursor at +0x018 (which removeParentRef keeps valid) and pass each the
  * event through its onNotify. */
-void func_80042550(D_8006EF50Obj *self, s32 event) {
+void D8006EF50__NotifyParents(D_8006EF50Obj *self, s32 event) {
     BasicClass *parent;
 
     self->unk18 = self->parentRefs;
