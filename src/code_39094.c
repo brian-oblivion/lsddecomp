@@ -105,7 +105,20 @@ void func_80048A68(D_80081940Obj *self) {
     self->unk2E = 0;
     self->unk2A = 0;
 }
-INCLUDE_ASM("asm/nonmatchings/code_39094", func_80048AAC);
+/* slot +0x078 of D_80081940: start streaming a file into the buffer */
+void func_80048AAC(D_80081940Obj *self, char *name) {
+    if (self->buffer != NULL && name != NULL) {
+        if (self->unk2A == 0) {
+            self->unk2C = 0;
+        } else {
+            self->methods->cancelRequests(self);
+        }
+        self->unk2A = 9;
+        self->methods->close(self);
+        self->methods->open(self, name, 1, 0);
+        self->methods->read(self, self->buffer, 0xB358);
+    }
+}
 void func_80048B78(D_80081940Obj *self) {
     self->methods->freeBuffer(self);
     self->unk2C = 0;
