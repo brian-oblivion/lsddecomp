@@ -52,10 +52,10 @@ together.
 ## Provenance
 
 round 13 (2026-09-03), runner alpha, unit code_2cc8c_c. Matched on the
-first build. Last function in this round's queue -- see `Obj86B60__OnNotify.md`
+first build. Last function in this round's queue -- see `IntermediateBase__OnNotify.md`
 and `New_Unk18Obj.md` for the two shared-table classtable dumps
 (`gIntermediateBaseMethods`, `D_8006E8E4`) that resolved this and every other function in
-this round except the register-identity stall `Obj86B60__NotifyParents`.
+this round except the register-identity stall `IntermediateBase__SetState`.
 
 ## Naming
 

@@ -1,4 +1,6 @@
-# Obj86B60__ResetCounters — MATCH (3/3 words)
+# IntermediateBase__ResetCounters — MATCH (3/3 words)
+
+> Renamed from `Obj86B60__ResetCounters` on 2026-09-25 (tools/rename.py). Address 0x8003e100.
 
 > Renamed from `func_8003E100` on 2026-09-19 (tools/rename.py). Address 0x8003e100.
 
@@ -12,7 +14,7 @@ Zeroes two `Obj86B60` fields, both already documented in
 ## The C
 
 ```c
-void Obj86B60__ResetCounters(Obj86B60 *self)
+void IntermediateBase__ResetCounters(Obj86B60 *self)
 {
     self->unk1C = 0;
     self->unk20 = 0;
@@ -26,7 +28,7 @@ first build.
 
 ## Naming
 
-**Obj86B60__ResetCounters** (renamed from `func_8003E100`, round 55, runner
+**IntermediateBase__ResetCounters** (renamed from `func_8003E100`, round 55, runner
 alpha). Tier B: mechanics fully known (zeroes `self->unk1C` and
 `self->unk20`) and dispatched as `Obj86B60Methods::resetCounters`
 (`+0x040`, exclusive to this unit, renamed from `slot40`) right after the

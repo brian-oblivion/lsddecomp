@@ -84,4 +84,4 @@ assuming a scheduling quirk.
 
 ## Naming
 
-`Class86668__CheckTimeout` -- tier B. Occupies +0x05C. Forwards to the base's own +0x05C (`Obj86B60__IncrementFrameCounter`, code_2cc8c.h) then compares `frameCounter > timeoutFrames`, triggering `onEventArg(self, 4)` on overflow -- a timeout check by construction, though what the timeout gates in-game is not established.
+`Class86668__CheckTimeout` -- tier B. Occupies +0x05C. Forwards to the base's own +0x05C (`IntermediateBase__IncrementFrameCounter`, code_2cc8c.h) then compares `frameCounter > timeoutFrames`, triggering `onEventArg(self, 4)` on overflow -- a timeout check by construction, though what the timeout gates in-game is not established.

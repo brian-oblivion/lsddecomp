@@ -1,4 +1,6 @@
-# Obj86B60__IncrementFrameCounter — MATCH (5/5 words)
+# IntermediateBase__IncrementFrameCounter — MATCH (5/5 words)
+
+> Renamed from `Obj86B60__IncrementFrameCounter` on 2026-09-25 (tools/rename.py). Address 0x8003e4a4.
 
 > Renamed from `func_8003E4A4` on 2026-09-19 (tools/rename.py). Address 0x8003e4a4.
 
@@ -18,7 +20,7 @@ simpler, unforced reading.
 ## The C
 
 ```c
-void Obj86B60__IncrementFrameCounter(Obj86B60 *self)
+void IntermediateBase__IncrementFrameCounter(Obj86B60 *self)
 {
     self->unk1C++;
 }
@@ -31,7 +33,7 @@ first build.
 
 ## Naming
 
-**Obj86B60__IncrementFrameCounter** (renamed from `func_8003E4A4`, round 55,
+**IntermediateBase__IncrementFrameCounter** (renamed from `func_8003E4A4`, round 55,
 runner alpha). Tier A: a pure leaf increment (`self->unk1C++`) -- tier A by
 the same "mechanics ARE the purpose" rule as a getter/clamp/list-push.
 "FrameCounter" reuses the already-established cross-function reading of
@@ -44,9 +46,9 @@ itself is PROPOSED for rename to `frameCounter` in this unit's
 
 - `Obj86B60::unk1C` -> `frameCounter` (tier B). Mechanics established across
   three independent sources: incremented here unconditionally
-  (`Obj86B60__IncrementFrameCounter`), zeroed on state-reset paths
-  (`Obj86B60__ResetCounters`, `Obj86B60__NotifyTargetReset`,
-  `Obj86B60__NotifyChildReset`, and `Obj86B60__SetState` in `code_2cc8c.c` on
+  (`IntermediateBase__IncrementFrameCounter`), zeroed on state-reset paths
+  (`IntermediateBase__ResetCounters`, `IntermediateBase__OnState2`,
+  `IntermediateBase__OnState3`, and `Obj86B60__SetState` in `code_2cc8c.c` on
   several message codes), and consumed as a multiplier in `Obj86B60__TickColorFade`
   (code_2cc8c.c) against `unk84` -- consistent with a per-instance
   frame/tick counter. What in-game effect the resulting product drives is

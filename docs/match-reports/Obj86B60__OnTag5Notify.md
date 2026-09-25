@@ -154,6 +154,6 @@ design for this function).
 **Tier A.** `func_8003C51C` -> `Obj86B60__OnTag5Notify`. Occupies slot5C in
 `gTaskCoreMethods` and `gClass86B60Methods` identically (only `GraphRoomObj`
 overrides this slot, with its own `GraphRoomObj__UpdateFromLog`).
-`Obj86B60__OnNotify` dispatches `EventArg`s with `target->header & 0xF == 5`
+`IntermediateBase__OnNotify` dispatches `EventArg`s with `target->header & 0xF == 5`
 through `self->methods->slot5C`, same evidence shape as `OnTag2Notify` above.
 Tier A.

@@ -1,4 +1,6 @@
-# Obj86B60__NotifyChildReset — MATCH (20/20 words)
+# IntermediateBase__OnState3 — MATCH (20/20 words)
+
+> Renamed from `Obj86B60__NotifyChildReset` on 2026-09-25 (tools/rename.py). Address 0x8003e578.
 
 > Renamed from `func_8003E578` on 2026-09-19 (tools/rename.py). Address 0x8003e578.
 
@@ -7,16 +9,16 @@
 ## What it does
 
 `gIntermediateBaseMethods+0x068` (and `gClass86B60Methods`'s own verbatim-inherited `+0x068`,
-`Obj86B60__NotifyParents`'s `slot68` occupant): dereferences `self->unkC->unk0` (the
-`Obj86B60InitArgs` field `Obj86B60__Init`/`Obj86B60__Deinit` only ever forward
-opaquely, and the same field `Obj86B60__NotifyTargetReset` reaches independently through
+`IntermediateBase__SetState`'s `slot68` occupant): dereferences `self->unkC->unk0` (the
+`Obj86B60InitArgs` field `IntermediateBase__Init`/`IntermediateBase__Deinit` only ever forward
+opaquely, and the same field `IntermediateBase__OnState2` reaches independently through
 the completely unrelated `Obj86B60UnkC->target` reading) as a real class
 instance and dispatches its `slot4C`, then zeroes `self->unk1C`.
 
 ## The C
 
 ```c
-void Obj86B60__NotifyChildReset(Obj86B60 *self)
+void IntermediateBase__OnState3(Obj86B60 *self)
 {
     Unk0ArgObj *obj0;
 
@@ -31,10 +33,10 @@ Matched on the first build.
 ## Struct/table knowledge established
 
 - New type `Unk0ArgObj`/`Unk0ArgObjMethods` (slot `slot4C`) --
-  `Obj86B60InitArgs->unk0`'s real pointee type, same shape as `Obj86B60__OnTag1Notify`
+  `Obj86B60InitArgs->unk0`'s real pointee type, same shape as `IntermediateBase__OnTag1Notify`
   round's `Unk4ArgObj` for the adjacent `unk4` field. Retyped
   `Obj86B60InitArgs.unk0` from `void *` to `Unk0ArgObj *`; the already-matched
-  `Obj86B60__Init`'s `methods->slot10(self, arg1->unk0)` call site is
+  `IntermediateBase__Init`'s `methods->slot10(self, arg1->unk0)` call site is
   unaffected (implicit conversion to `void *`, same register, same bytes).
 
 ### Proposed learning
@@ -62,11 +64,11 @@ first build.
 
 ## Naming
 
-**Obj86B60__NotifyChildReset** (renamed from `func_8003E578`, round 55,
+**IntermediateBase__OnState3** (renamed from `func_8003E578`, round 55,
 runner alpha). Tier B: `Obj86B60Methods::slot68` occupant (dispatched by
-`Obj86B60__NotifyParents` on mode 3), mirroring `Obj86B60__NotifyTargetReset`'s
+`IntermediateBase__SetState` on mode 3), mirroring `IntermediateBase__OnState2`'s
 shape exactly but forwarding to `self->initArgs->unk0` instead --
-`initArgs->unk0` is the SAME field `Obj86B60__Init` registers as a child
+`initArgs->unk0` is the SAME field `IntermediateBase__Init` registers as a child
 via `addChild` (see `Obj86B60InitArgs`'s own header comment), which is why
 "Child" rather than "Target" here; the notification's game-level meaning
 remains unestablished (tier B).

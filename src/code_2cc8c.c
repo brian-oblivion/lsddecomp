@@ -34,7 +34,7 @@
  * overrides SetState/Tick/RefreshViewValue; see the header's own top
  * comment for the round-78 correction and the evidence). The first two
  * functions (`Obj86B60__OnTag2Notify`/`Obj86B60__OnTag5Notify`) are
- * `EventArg`-tag dispatchers reached from `Obj86B60__OnNotify`
+ * `EventArg`-tag dispatchers reached from `IntermediateBase__OnNotify`
  * (code_2cc8c_c.c); the five `Obj86B60__func_8003Cxxx` handlers they
  * dispatch to are undifferentiated leaf state-transition helpers (tier C --
  * see each one's own match report); `Obj86B60__SetState` is the base

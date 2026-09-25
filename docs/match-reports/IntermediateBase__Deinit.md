@@ -1,4 +1,6 @@
-# Obj86B60__Deinit — MATCH (102/102 words)
+# IntermediateBase__Deinit — MATCH (102/102 words)
+
+> Renamed from `Obj86B60__Deinit` on 2026-09-25 (tools/rename.py). Address 0x8003e280.
 
 > Renamed from `func_8003E280` on 2026-09-19 (tools/rename.py). Address 0x8003e280.
 
@@ -8,23 +10,23 @@ round's queue)
 ## What it does
 
 `gIntermediateBaseMethods+0x048` (and `gClass86B60Methods`'s own verbatim-inherited `+0x048`, per
-`tools/classtable.py`): the teardown counterpart to `Obj86B60__Init`'s
+`tools/classtable.py`): the teardown counterpart to `IntermediateBase__Init`'s
 init/registration -- calls `slot50` (external, unobserved elsewhere),
-unconditionally removes the three children `Obj86B60__Init` added
+unconditionally removes the three children `IntermediateBase__Init` added
 (`self->unk10`, `self->unkC->unk4`, `self->unkC->unk0`, via the inherited
 BasicClass `removeChild`), and, only when `self->unk24 == 0`, also removes
 `self->unk10` and `self->unkC->unk0` through `self->unk14`'s/`self->unk18`'s
 OWN `removeChild` slots first. Finally, for each of `self->unk10`/`unk14`/
 `unk18`, releases it (inherited BasicClass "release", offset +0x004) ONLY IF
 it was not the one explicitly supplied via `self->unkC` (the cached
-`Obj86B60InitArgs *` from `Obj86B60__Init`) -- the standard "free only what
+`Obj86B60InitArgs *` from `IntermediateBase__Init`) -- the standard "free only what
 you allocated yourself" ownership idiom, mirroring that function's own
 "use if given, else allocate" construction.
 
 ## The C
 
 ```c
-void Obj86B60__Deinit(Obj86B60 *self)
+void IntermediateBase__Deinit(Obj86B60 *self)
 {
     Obj86B60Methods *methods;
     Unk18Obj *obj18;
@@ -73,10 +75,10 @@ without a register-pressure iteration this time.
   established "keep the general field, cast locally" convention -- see
   `Unk14Obj`'s own comment). Only `slot4` (release) is modelled; this
   function is the only place it is dereferenced as a pointer at all in this
-  unit outside `Obj86B60__Init`'s own (non-dereferencing) forwards.
+  unit outside `IntermediateBase__Init`'s own (non-dereferencing) forwards.
 - This confirms `self->unkC`'s runtime identity across BOTH functions that
-  touch it: it is the `Obj86B60InitArgs *` `Obj86B60__Init` stored there, not
-  the unrelated `Obj86B60UnkC *` reading `Obj86B60__NotifyTargetReset` uses at the same
+  touch it: it is the `Obj86B60InitArgs *` `IntermediateBase__Init` stored there, not
+  the unrelated `Obj86B60UnkC *` reading `IntermediateBase__OnState2` uses at the same
   offset from a completely different call path -- consistent with this
   project's established "one struct offset, multiple independent readings by
   different call paths" pattern (`Unk4CObj->unk24`, `Unk64Elem`'s own
@@ -84,7 +86,7 @@ without a register-pressure iteration this time.
 
 ### Proposed learning
 
-`Obj86B60__Init`'s "construct with an optional override" idiom
+`IntermediateBase__Init`'s "construct with an optional override" idiom
 (`field = arg ? arg : helper()`) has a predictable TEARDOWN counterpart one
 function away in the same vtable: "release `field` only if
 `storedInitArgs->correspondingField != field`". When a match report
@@ -108,8 +110,8 @@ first build.
 
 ## Naming
 
-**Obj86B60__Deinit** (renamed from `func_8003E280`, round 55, runner
-alpha). Tier A: exact mirror of `Obj86B60__Init` -- removes the children
+**IntermediateBase__Deinit** (renamed from `func_8003E280`, round 55, runner
+alpha). Tier A: exact mirror of `IntermediateBase__Init` -- removes the children
 `Init` added (`removeChild`), then releases (`Unk14ObjMethods::release`/
 `Unk10ObjMethods::release`, both renamed this round, and
 `Unk18ObjMethods::release` (also renamed this round, exclusive --
@@ -119,5 +121,5 @@ current value still differs from the caller-supplied `initArgs` field --
 i.e. only the ones this object actually owns. `Obj86B60Methods::deinit`
 (`+0x048`, exclusive to this unit, renamed from `slot48`) IS this function,
 confirmed by `tools/classtable.py`/direct table read (see the header's own
-"IS" attribution) and independently by `Obj86B60__Init` calling
+"IS" attribution) and independently by `IntermediateBase__Init` calling
 `methods->deinit(self)` on its own mode-0 path.

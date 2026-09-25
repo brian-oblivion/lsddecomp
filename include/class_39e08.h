@@ -91,7 +91,7 @@ typedef struct Class865C8Methods {
     /* Occupied here by Obj865C8__OnNotify itself; only reachable from THIS
      * struct via GetClass86668Methods()'s own gClass86668Methods view of the same offset
      * (Class86668Methods::slot38 below), where it forwards to the inherited
-     * Obj86B60__OnNotify. */
+     * IntermediateBase__OnNotify. */
     void (*slot38)(Obj865C8 *self, EventArg *arg1, s32 arg2); /* +0x038 Obj865C8__OnNotify */
     void *unk3C;                                   /* +0x03C null slot */
     void (*resetState)(Obj865C8 *self);            /* +0x040 Obj865C8__ResetState */
@@ -105,7 +105,7 @@ typedef struct Class865C8Methods {
     /* Shared with gClass86668Methods (see Class86668Methods below) -- literally the
      * same function address at the same offset in both tables. */
     void (*onEventArg)(Obj865C8 *self, s32 arg1);  /* +0x060 Class86668__OnEventArg */
-    void *unk64, *unk68;                           /* shared base slots (Obj86B60__NotifyTargetReset / Obj86B60__NotifyChildReset) */
+    void *unk64, *unk68;                           /* shared base slots (IntermediateBase__OnState2 / IntermediateBase__OnState3) */
     /* Also shared with gClass86668Methods at the same offset. */
     void (*setTimeout)(Obj865C8 *self, s32 arg1);    /* +0x06C Class86668__SetTimeout */
     void *unk70;                                   /* Class86668__SetChildFlag8 */
@@ -401,9 +401,9 @@ typedef struct Class86668Methods {
     u8 pad10[0x38 - 0x10];
     /* Inherited, shared verbatim with D_800865C8's own occupant of this
      * offset (Obj865C8__OnNotify, this unit): gClass86668Methods's own +0x038 is
-     * Obj86B60__OnNotify (a base/inherited slot, out of this unit's scope).
+     * IntermediateBase__OnNotify (a base/inherited slot, out of this unit's scope).
      * Called by Obj865C8__OnNotify as GetClass86668Methods()->slot38(self, arg1, arg2). */
-    void (*slot38)(Obj865C8 *self, EventArg *arg1, s32 arg2); /* +0x038 Obj86B60__OnNotify */
+    void (*slot38)(Obj865C8 *self, EventArg *arg1, s32 arg2); /* +0x038 IntermediateBase__OnNotify */
     u8 pad3C[0x44 - 0x3C];
     /* Class86668__Init (this unit, matched): zeroes self->eventCode, forwards to
      * the base's own slot44, returns self->eventCode. Called by Obj865C8__Init
@@ -416,10 +416,10 @@ typedef struct Class86668Methods {
     u8 pad4C[0x54 - 0x4C];
     /* Inherited, shared verbatim with D_800865C8's own occupant of this
      * offset (Obj865C8__AdvanceState, this unit): gClass86668Methods's own +0x054 is
-     * Obj86B60__OnTag1Notify (a base/inherited slot, out of this unit's scope).
+     * IntermediateBase__OnTag1Notify (a base/inherited slot, out of this unit's scope).
      * Called by Obj865C8__AdvanceState as GetClass86668Methods()->slot54(self, arg1,
      * arg2), return discarded. */
-    void (*slot54)(Obj865C8 *self, s32 arg1, s32 arg2);    /* +0x054 Obj86B60__OnTag1Notify */
+    void (*slot54)(Obj865C8 *self, s32 arg1, s32 arg2);    /* +0x054 IntermediateBase__OnTag1Notify */
 } Class86668Methods;
 
 /* A plain accessor with no parameters, returning &gClass86668Methods. Defined in the

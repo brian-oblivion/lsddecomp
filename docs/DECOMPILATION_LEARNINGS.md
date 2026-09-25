@@ -376,7 +376,7 @@ load through a runtime-indexed global", §"BLOCKED: the `nop_mflo_mfhi` screen r
   it**: `floor_log2(refs) * refs / live_length` per pseudo, highest takes `$s0`. Two separate
   `methods->slotNN(self)` calls gave `self` one reference too many; retail picks `fn` per arm and
   makes ONE `fn(self)` call (its tell: a shared `jalr; move a0,sN` tail), so `arg1` outranks it
-  (`Obj86B60__NotifyParents` 32/32, "unreachable" since round 13). (round 72)
+  (`IntermediateBase__SetState` 32/32, "unreachable" since round 13). (round 72)
 - **Split a variable REUSED for two unrelated values** — the inverse of the delete-a-local lever.
   Discriminator: an equal-length rotation among saved registers, one local assigned in two
   independent halves. Closed `Class86F88__LoadResources` (three-way rotation, 75/95) on the

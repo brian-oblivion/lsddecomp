@@ -1,11 +1,11 @@
 /* code_2cc8c_c -- third slice of the 0x2CC8C block (0x8003DFA0..0x8003E874,
  * 19 functions plus one stall), continuing directly from code_2cc8c_b.
  *
- * The first 10 functions (through Obj86B60__OnTag1Notify) are the tail of
+ * The first 10 functions (through IntermediateBase__OnTag1Notify) are the tail of
  * `Obj86B60` (base vtable gClass86B60Methods, override gGraphRoomMethods -- see
  * code_2cc8c.h's own header comment and code_2cc8c.c's unit comment for the
  * class-framework shape and the carve provenance). They cover the class's
- * two-argument constructor pair (`Obj86B60__Init`/`Obj86B60__Deinit`, which
+ * two-argument constructor pair (`IntermediateBase__Init`/`IntermediateBase__Deinit`, which
  * install and later release up to three externally- or default-supplied
  * helper objects), its `OnNotify` override (dispatches on an incoming
  * `EventArg`'s dynamic class tag to `onTag1Notify`/an external Obj86B60__OnTag2Notify
@@ -70,7 +70,7 @@ void IntermediateBase__IntermediateBase(Obj86B60 *self)
     self->methods->resetCounters(self);
 }
 
-void Obj86B60__OnNotify(Obj86B60 *self, EventArg *arg1, s32 arg2)
+void IntermediateBase__OnNotify(Obj86B60 *self, EventArg *arg1, s32 arg2)
 {
     s32 header;
 
@@ -85,13 +85,13 @@ void Obj86B60__OnNotify(Obj86B60 *self, EventArg *arg1, s32 arg2)
     }
 }
 
-void Obj86B60__ResetCounters(Obj86B60 *self)
+void IntermediateBase__ResetCounters(Obj86B60 *self)
 {
     self->frameCounter = 0;
     self->unk20 = 0;
 }
 
-void Obj86B60__Init(Obj86B60 *self, Obj86B60InitArgs *arg1, s32 arg2)
+void IntermediateBase__Init(Obj86B60 *self, Obj86B60InitArgs *arg1, s32 arg2)
 {
     Obj86B60Methods *methods;
     Unk18Obj *obj18;
@@ -128,7 +128,7 @@ void Obj86B60__Init(Obj86B60 *self, Obj86B60InitArgs *arg1, s32 arg2)
     }
 }
 
-void Obj86B60__Deinit(Obj86B60 *self)
+void IntermediateBase__Deinit(Obj86B60 *self)
 {
     Obj86B60Methods *methods;
     Unk18Obj *obj18;
@@ -155,7 +155,7 @@ void Obj86B60__Deinit(Obj86B60 *self)
     }
 }
 
-void Obj86B60__OnTag1Notify(Obj86B60 *self, EventArg *arg1, s32 arg2)
+void IntermediateBase__OnTag1Notify(Obj86B60 *self, EventArg *arg1, s32 arg2)
 {
     Unk4ArgObj *obj4;
 
@@ -167,7 +167,7 @@ void Obj86B60__OnTag1Notify(Obj86B60 *self, EventArg *arg1, s32 arg2)
     }
 }
 
-void Obj86B60__IncrementFrameCounter(Obj86B60 *self)
+void IntermediateBase__IncrementFrameCounter(Obj86B60 *self)
 {
     self->frameCounter++;
 }
@@ -176,7 +176,7 @@ void Obj86B60__IncrementFrameCounter(Obj86B60 *self)
  * slot picked per arm (self then has 5 refs, not 6, so global-alloc ranks
  * arg1 above it: arg1 -> $s0, self -> $s1).  The barrier only moves arg1's
  * copy into the prologue (instruction order, not register identity). */
-void Obj86B60__NotifyParents(Obj86B60 *self, s32 arg1)
+void IntermediateBase__SetState(Obj86B60 *self, s32 arg1)
 {
     Obj86B60Methods *methods;
     void (*fn)(Obj86B60 *);
@@ -195,7 +195,7 @@ void Obj86B60__NotifyParents(Obj86B60 *self, s32 arg1)
     fn(self);
 }
 
-void Obj86B60__NotifyTargetReset(Obj86B60 *self)
+void IntermediateBase__OnState2(Obj86B60 *self)
 {
     Obj86B60UnkCTarget *target;
 
@@ -204,7 +204,7 @@ void Obj86B60__NotifyTargetReset(Obj86B60 *self)
     target->methods->slot48(target);
 }
 
-void Obj86B60__NotifyChildReset(Obj86B60 *self)
+void IntermediateBase__OnState3(Obj86B60 *self)
 {
     Unk0ArgObj *obj0;
 

@@ -63,7 +63,7 @@ Recognise this shape (`lw v,0(x); lw v,0(v); andi v,v,K`) on sight rather
 than deriving it fresh each time it recurs -- it will likely reappear
 anywhere a class hierarchy dispatches on "what kind of thing was just added
 as a child", which this specific vtable/BasicClass-derived family does
-often (compare `Obj86B60__OnNotify`'s own `arg1->target->header & 0xF` dispatch,
+often (compare `IntermediateBase__OnNotify`'s own `arg1->target->header & 0xF` dispatch,
 a close cousin one level of indirection removed).
 
 ## Head-broadcast levers (round 13): applicability check

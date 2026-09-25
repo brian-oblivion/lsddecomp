@@ -102,4 +102,4 @@ this function was reconfirmed at 41/41 after the change.
 
 ## Naming
 
-`Obj865C8__Init` -- tier B. Occupies +0x044 -- compared against `gIntermediateBaseMethods`'s own +0x044 slot, which forwards to `Obj86B60__Init` (code_2cc8c.h), the established base-class Init slot at this exact offset. This override configures the `subD` sub-object and forwards to the sibling class's own +0x044 (`Class86668__Init`); what 'init' accomplishes for THIS class beyond that is not established.
+`Obj865C8__Init` -- tier B. Occupies +0x044 -- compared against `gIntermediateBaseMethods`'s own +0x044 slot, which forwards to `IntermediateBase__Init` (code_2cc8c.h), the established base-class Init slot at this exact offset. This override configures the `subD` sub-object and forwards to the sibling class's own +0x044 (`Class86668__Init`); what 'init' accomplishes for THIS class beyond that is not established.
