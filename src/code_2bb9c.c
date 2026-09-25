@@ -113,7 +113,31 @@ void func_8003B3FC(D_8006E558Obj *self, char *name) {
 void func_8003B470(D_8006E558Obj *self) {
     GetActiveDataSourceMethods()->finalize((Class6D430 *)self);
 }
-INCLUDE_ASM("asm/nonmatchings/code_2bb9c", func_8003B4A8);
+/* D_8006E558 +0x078: describe the TIM, then upload its pixel block and, when
+ * pmode bit 3 says it has one, its CLUT. */
+void func_8003B4A8(D_8006E558Obj *self) {
+    DrawObj *draw;
+    DrawRect rect;
+    GsIMAGE *tim;
+
+    draw = func_80020C5C();
+    tim = &self->tim;
+    if (self->buffer != NULL) {
+        self->methods->getTimInfo(self, tim);
+        rect.x = self->tim.px;
+        rect.y = self->tim.py;
+        rect.w = self->tim.pw;
+        rect.h = self->tim.ph;
+        draw->methods->loadImage(draw, &rect, self->tim.pixel);
+        if ((self->tim.pmode >> 3) & 1) {
+            rect.x = self->tim.cx;
+            rect.y = self->tim.cy;
+            rect.w = self->tim.cw;
+            rect.h = self->tim.ch;
+            draw->methods->loadImage(draw, &rect, self->tim.clut);
+        }
+    }
+}
 /* D_8006E558 slot (tools/classtable.py); empty body. */
 void func_8003B5AC(void) {
 }
