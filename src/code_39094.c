@@ -73,7 +73,11 @@ char **func_80048DF8(void) {
 }
 INCLUDE_ASM("asm/nonmatchings/code_39094", func_80048E08);
 INCLUDE_ASM("asm/nonmatchings/code_39094", func_80048E2C);
-INCLUDE_ASM("asm/nonmatchings/code_39094", func_80048E80);
+void *func_80048E2C(s32 index);
+
+void *func_80048E80(s32 index) {
+    return func_80048E2C(index);
+}
 INCLUDE_ASM("asm/nonmatchings/code_39094", func_80048EA0);
 INCLUDE_ASM("asm/nonmatchings/code_39094", func_80048F60);
 INCLUDE_ASM("asm/nonmatchings/code_39094", func_80048F84);
