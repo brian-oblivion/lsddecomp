@@ -1071,7 +1071,57 @@ s32 func_80045C94(Obj45C94 *self) {
     D_8008A940 = NULL;
     return 1;
 }
-INCLUDE_ASM("asm/nonmatchings/code_33808", func_80045CFC);
+/* D_8006F614 +0x068: when this is the object in D_8008A940 -- with a
+ * finished frame pending (+0x44) run its own +0x064 and return that;
+ * otherwise, when a frame is going (+0x40), wait for its last strip (+0x4C),
+ * clear the flag, DrawSync when +0x34 is under 0x80, and feed the next
+ * frame's bitstream (+0x14[+0x3C]) to DecDCTin and the first strip to
+ * DecDCTout; then +0x40 = its own +0x058 returned 0, and 0. */
+typedef struct Methods45CFC {
+    /* +0x000 */ u8 pad0[0x58];
+    /* +0x058 */ s32 (*slot58)();
+    /* +0x05C */ u8 pad5C[8];
+    /* +0x064 */ s32 (*slot64)();
+} Methods45CFC;
+
+typedef struct Obj45CFC {
+    /* +0x000 */ Methods45CFC *methods;
+    /* +0x004 */ u8 pad4[0x10];
+    /* +0x014 */ u32 *frames[2];
+    /* +0x01C */ u32 *strip;
+    /* +0x020 */ u8 pad20[0x14];
+    /* +0x034 */ s32 unk34;
+    /* +0x038 */ s32 stripSize;
+    /* +0x03C */ s32 frameIndex;
+    /* +0x040 */ s32 unk40;
+    /* +0x044 */ s32 unk44;
+    /* +0x048 */ u8 pad48[4];
+    /* +0x04C */ s32 unk4C;
+} Obj45CFC;
+
+/* LIBPRESS.H */
+extern void DecDCTin(u32 *buf, int mode);
+
+s32 func_80045CFC(Obj45CFC *self) {
+    Obj45CFC *cur = (Obj45CFC *)D_8008A940;
+
+    if (cur == self) {
+        if (cur->unk44 == 0) {
+            if (cur->unk40 != 0) {
+                func_80045E18(cur);
+                cur->unk4C = 0;
+                if (cur->unk34 < 0x80) {
+                    DrawSync(0);
+                }
+                DecDCTin(cur->frames[cur->frameIndex], 2);
+                DecDCTout(cur->strip, cur->stripSize);
+            }
+            self->unk40 = self->methods->slot58(self) == 0;
+            return 0;
+        }
+        return cur->methods->slot64(cur);
+    }
+}
 extern DataSrc33808 *D_8008A940;
 
 /* Slot +0x060 of the object in D_8008A940, when there is one. */

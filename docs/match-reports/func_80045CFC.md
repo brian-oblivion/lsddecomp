@@ -1,0 +1,77 @@
+# func_80045CFC -- MATCHED (57/57 words)
+
+Round 82, runner echo (code_33808 session, echo #9), 2026-09-25. Unit `code_33808`.
+Byte-exact; whole-image SHA1 green (`./build-and-verify.sh`:
+`OK: build matches retail SLPS_015.56`), funcdiff 57/57 words, no out-of-range
+drift. Fresh ground (carved revision 18, no prior report).
+
+## What it does
+
+Per-frame step of the MDEC movie player, active only when `self` is the object in D_8008A940: when a finished frame is pending (+0x44) it tail-returns its own +0x064; otherwise, when a frame is running (+0x40) it waits for the last strip (func_80045E18 spins on +0x4C), clears +0x4C, DrawSyncs when +0x34 is under 0x80, feeds the bitstream at +0x14[+0x3C] to DecDCTin (mode 2) and the first strip buffer (+0x1C, +0x38 words) to DecDCTout; then stores (own +0x058 returned 0) at +0x40 and returns 0. When not the active object it falls off the end (no return value set).
+
+Table slot (`tools/classtable.py`): D_8006F614 +0x068.
+
+## Source
+
+The unit-local views `DataSrc33808` (Class6D430 subclass via the unified
+`CLASS6D430_SLOTS`/`CLASS6D430_FIELDS` macros plus `slot7C`/`slot80` and own
+fields +0x2C..+0x38), `Ctor33808`, `CountedBuf33808` and `Req44858` sit at the
+top of / earlier in `src/code_33808.c`.
+
+```c
+/* D_8006F614 +0x068: when this is the object in D_8008A940 -- with a
+ * finished frame pending (+0x44) run its own +0x064 and return that;
+ * otherwise, when a frame is going (+0x40), wait for its last strip (+0x4C),
+ * clear the flag, DrawSync when +0x34 is under 0x80, and feed the next
+ * frame's bitstream (+0x14[+0x3C]) to DecDCTin and the first strip to
+ * DecDCTout; then +0x40 = its own +0x058 returned 0, and 0. */
+typedef struct Methods45CFC {
+    /* +0x000 */ u8 pad0[0x58];
+    /* +0x058 */ s32 (*slot58)();
+    /* +0x05C */ u8 pad5C[8];
+    /* +0x064 */ s32 (*slot64)();
+} Methods45CFC;
+
+typedef struct Obj45CFC {
+    /* +0x000 */ Methods45CFC *methods;
+    /* +0x004 */ u8 pad4[0x10];
+    /* +0x014 */ u32 *frames[2];
+    /* +0x01C */ u32 *strip;
+    /* +0x020 */ u8 pad20[0x14];
+    /* +0x034 */ s32 unk34;
+    /* +0x038 */ s32 stripSize;
+    /* +0x03C */ s32 frameIndex;
+    /* +0x040 */ s32 unk40;
+    /* +0x044 */ s32 unk44;
+    /* +0x048 */ u8 pad48[4];
+    /* +0x04C */ s32 unk4C;
+} Obj45CFC;
+
+/* LIBPRESS.H */
+extern void DecDCTin(u32 *buf, int mode);
+
+s32 func_80045CFC(Obj45CFC *self) {
+    Obj45CFC *cur = (Obj45CFC *)D_8008A940;
+
+    if (cur == self) {
+        if (cur->unk44 == 0) {
+            if (cur->unk40 != 0) {
+                func_80045E18(cur);
+                cur->unk4C = 0;
+                if (cur->unk34 < 0x80) {
+                    DrawSync(0);
+                }
+                DecDCTin(cur->frames[cur->frameIndex], 2);
+                DecDCTout(cur->strip, cur->stripSize);
+            }
+            self->unk40 = self->methods->slot58(self) == 0;
+            return 0;
+        }
+        return cur->methods->slot64(cur);
+    }
+}
+```
+
+## Notes
+
+Second build. The first shape, `if (cur->unk44 != 0) return slot64(cur);` ahead of the rest, measured 1/57: the early return put the slot64 call inline, AND cc1 merged `cur` and `self` into one register (the compare's equivalence). Nesting the body under `if (cur->unk44 == 0) { ...; return 0; } return cur->methods->slot64(cur);` fixed both at once -- the global then stays in s0 and self in s1, exactly retail. The function has no return on the `cur != self` path (retail leaves v0 unset). Local views `Methods45CFC`/`Obj45CFC` are unit-local and declared just above it; DecDCTin is Sony's (LIBPRESS), extern only.
