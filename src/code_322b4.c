@@ -10,7 +10,9 @@
  * 0x1A90).
  *
  * Round 82 matched the one- to eight-word bodies (getters, accessors, empty
- * overrides); the larger bodies are still INCLUDE_ASM.
+ * overrides), then a third batch of 11- to 20-word bodies (the sprite
+ * attribute-bit setters, cell selection, finalize chains, the D_8006EF50
+ * allocator); the remaining bodies are still INCLUDE_ASM.
  */
 #include "common.h"
 #include "Class6B5CC.h"
@@ -61,6 +63,55 @@ typedef struct D_8006EED8Obj {
     s32 unk2C;
 } D_8006EED8Obj;
 
+/* Local view of a sprite-class object (D_8006EC74/ED4C/EE1C/879C4/EB90) as
+ * the round-82 batch-3 methods see it: an embedded GsSPRITE at +0x064 whose
+ * attribute word is the packed flags GetSetBitField edits, and whose u,v
+ * bytes sit at +0x072/+0x073. */
+typedef struct SpriteMethods_322b4 SpriteMethods_322b4;
+typedef struct Pair_322b4 {
+    s32 a, b;
+} Pair_322b4;
+typedef struct SpriteView_322b4 {
+    SpriteMethods_322b4 *methods; /* +0x000 */
+    u8 pad04[0xC - 0x4];
+    s32 unkC;                     /* +0x00C, tested by func_80041E2C */
+    u8 pad10[0x64 - 0x10];
+    u32 attribute;                /* +0x064, GsSPRITE.attribute */
+    u8 pad68[0x72 - 0x68];
+    u8 u;                         /* +0x072, GsSPRITE.u */
+    u8 v;                         /* +0x073, GsSPRITE.v */
+    u8 pad74[0xA0 - 0x74];
+    Pair_322b4 unkA0;             /* +0x0A0, set by func_80041E2C */
+    u8 unkA8;                     /* +0x0A8, the cell index func_80041BDC stores */
+} SpriteView_322b4;
+struct SpriteMethods_322b4 {
+    u8 pad00[0xC4];
+    void (*setCell)(SpriteView_322b4 *self, u8 cell); /* +0x0C4 = func_80041BDC */
+};
+
+/* The 12-byte record func_80041C4C copies from D_8006ED40 = {0, 0, 8, 8}. */
+typedef struct CellRect_322b4 {
+    u16 u, v;
+    s32 w, h;
+} CellRect_322b4;
+extern CellRect_322b4 D_8006ED40;
+
+extern u32 GetSetBitField(u32 *word, s32 shift, s32 width, u32 value);
+extern void *BMemPMgrAlloc(s32 size);
+
+typedef struct Slot0CMethods_322b4 {
+    u8 pad00[0xC];
+    void (*slot0C)(void *self); /* +0x00C */
+} Slot0CMethods_322b4;
+extern Slot0CMethods_322b4 *GetActiveDataSourceMethods(void);
+
+typedef struct Slot08Methods_322b4 {
+    u8 pad00[0x8];
+    void (*init)(void *self); /* +0x008 */
+} Slot08Methods_322b4;
+void *func_80042684(void);
+void func_80041C4C(CellRect_322b4 *dst, u32 cell);
+
 INCLUDE_ASM("asm/nonmatchings/code_322b4", func_80041AB4);
 INCLUDE_ASM("asm/nonmatchings/code_322b4", func_80041B20);
 INCLUDE_ASM("asm/nonmatchings/code_322b4", func_80041BAC);
@@ -82,7 +133,12 @@ INCLUDE_ASM("asm/nonmatchings/code_322b4", func_80041D18);
 void func_80041DA4(Class6B5CC *self) {
 }
 INCLUDE_ASM("asm/nonmatchings/code_322b4", func_80041DAC);
-INCLUDE_ASM("asm/nonmatchings/code_322b4", func_80041E2C);
+/* D_8006EC74 and D_8006ED4C slot +0x0BC. */
+void func_80041E2C(SpriteView_322b4 *self, Pair_322b4 *src) {
+    if (self->unkC != 0) {
+        self->unkA0 = *src;
+    }
+}
 INCLUDE_ASM("asm/nonmatchings/code_322b4", func_80041E58);
 /* Returns the D_8006ED4C method table. */
 void *func_80041ED8(void) {
