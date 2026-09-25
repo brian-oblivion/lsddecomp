@@ -244,7 +244,7 @@ void D8006ED4C__D8006ED4C(Sprite *self, void *texture, SpriteRect *rect, s32 arg
     self->methods->reset(self);
 }
 /* D_8006ED4C slot +0x040 (reset): empty override. */
-void func_80041DA4(Class6B5CC *self) {
+void D8006ED4C__Reset(Class6B5CC *self) {
 }
 /* D_8006EC74 and D_8006ED4C slot +0x04C (attachToParent): when not yet
  * attached, attach through Sprite's with a zero offset, then hand the

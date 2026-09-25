@@ -1,4 +1,6 @@
-# func_80041DA4 -- MATCHED (2/2 words), round 82
+# D8006ED4C__Reset -- MATCHED (2/2 words), round 82
+
+> Renamed from `func_80041DA4` on 2026-09-25 (tools/rename.py). Address 0x80041da4.
 
 Round 82, runner alpha (re-staffed slot). Unit `src/code_322b4.c`. Fresh
 ground (carved in FINISHING-PLAN revision 18), no prior attempt.
@@ -16,6 +18,6 @@ ground (carved in FINISHING-PLAN revision 18), no prior attempt.
 
 ```c
 /* D_8006ED4C slot +0x040 (reset): empty override. */
-void func_80041DA4(Class6B5CC *self) {
+void D8006ED4C__Reset(Class6B5CC *self) {
 }
 ```
