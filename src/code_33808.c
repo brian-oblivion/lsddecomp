@@ -223,7 +223,11 @@ void *func_800449FC(void) {
 }
 INCLUDE_ASM("asm/nonmatchings/code_33808", func_80044A0C);
 INCLUDE_ASM("asm/nonmatchings/code_33808", func_80044A7C);
-INCLUDE_ASM("asm/nonmatchings/code_33808", func_80044B04);
+/* D_8006F40C +0x00C: finalize -- slot +0x07C, then the parent D_8006F384's. */
+void func_80044B04(DataSrc33808 *self) {
+    self->methods->slot7C();
+    ((DataSrc33808Methods *)func_800449FC())->finalize(self);
+}
 /* D_8006F40C +0x064: slot +0x078. */
 void func_80044B58(DataSrc33808 *self) {
     ((s32 (*)())self->methods->slot78)(self);
