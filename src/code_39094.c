@@ -7,7 +7,8 @@
  * and helpers called only from Class6D3C8, Obj865C8 and ObjM code (stream
  * tasks, the intro logo sequence).
  *
- * Nothing here is matched yet: every function is fresh track-1 ground.
+ * Round 82 matched ten of the small methods and record accessors; the rest
+ * are still INCLUDE_ASM.
  */
 #include "common.h"
 #include "Class6D430.h"
