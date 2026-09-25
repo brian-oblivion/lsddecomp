@@ -25,6 +25,7 @@
  */
 #include "common.h"
 #include "class_3bb8c.h"
+#include "ScreenSprite.h"
 
 void Obj86ED0__AdvanceCountdown(Obj86ED0 *self)
 {
@@ -405,11 +406,10 @@ void Class86F88__ResetCounters(Class86F88_3bb8c_j *self)
 
 extern char *BuildFileName(char *dest, const char *arg1, const char *arg2, const char *arg3);
 extern Class86F88Handle_3bb8c_j *func_8003B39C(char *path);
-extern Class86F88Handle_3bb8c_j *New_ScreenSprite(Class86F88Handle_3bb8c_j *arg0, void *arg1, s32 arg2);
 extern const char D_8008AB14[]; /* "SELECT" */
 extern const char D_8008AB1C[]; /* "CARD\\" */
 extern const char D_8008AB24[]; /* ".TIM" */
-extern s32 D_80087028;
+extern s32 D_80087028; /* 3 words, New_ScreenSprite's rect: a SpriteRect {0, 0, 256, 160} */
 extern s32 D_8008AAF8;
 extern const char D_800116E4[]; /* "FONTICON" */
 
@@ -439,7 +439,7 @@ void Class86F88__LoadResources(Class86F88_3bb8c_j *self, void *arg1)
 
     handle1 = func_8003B39C(BuildFileName(path, D_8008AB14, dir, ext));
     handle1->methods->slot78(handle1);
-    self->unk50 = New_ScreenSprite(handle1, &D_80087028, 0);
+    self->unk50 = (Class86F88Handle_3bb8c_j *)New_ScreenSprite(handle1, (SpriteRect *)&D_80087028, 0);
     handle1->methods->slot4(handle1);
     self->unk50->methods->slot4C(self->unk50, arg1, &D_8008AAF8);
 
