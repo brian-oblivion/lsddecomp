@@ -666,7 +666,57 @@ void func_80043F78(Class6D430 *self) {
 u8 func_80043FB0(DataSrc33808 *self, s32 arg1, s32 arg2) {
     return self->methods->slot7C(self, arg1, arg2, (u8 *)self->buffer + 8);
 }
-INCLUDE_ASM("asm/nonmatchings/code_33808", func_80043FE4);
+/* D_8006F240/D_8006F590 +0x07C: walk the packet words after the u16 count
+ * at data +2 (from data +8), each decoded by +0x080 into a value, a type, a
+ * sub-type and a length in words. Type 8 sub-type 0 appends the value to
+ * `out` (when given) and counts it; type 2 either, with `out`, looks the
+ * value up among the ones appended so far when its halfword at +4 matches
+ * `*sel` -- keeping its index -- or, without `out`, counts it. The index /
+ * count goes back through `sel`; returns the number appended. */
+u8 func_80043FE4(DataSrc33808 *self, u8 *out, u32 *sel, u32 *data) {
+    u8 value;
+    u8 type;
+    u8 sub;
+    u8 len;
+    u32 n;
+    u32 i;
+    s32 j;
+    u8 cnt;
+    s32 found;
+
+    n = ((u16 *)data)[1];
+    data += 2;
+    i = 0;
+    cnt = 0;
+    found = 0;
+    for (; i < n; i++) {
+        func_8004416C(self, data, &value, &type, &sub, &len);
+        if (type == 8 && sub == 0) {
+            cnt++;
+            if (out != NULL) {
+                *out++ = value;
+            }
+        } else if (type == 2) {
+            if (out != NULL) {
+                if (sel != NULL && ((u16 *)data)[2] == *sel) {
+                    for (j = 0, out -= cnt; j < cnt; j++) {
+                        if (*out++ == value) {
+                            found = j;
+                            break;
+                        }
+                    }
+                }
+            } else if (sel != NULL) {
+                found++;
+            }
+        }
+        data += len;
+    }
+    if (sel != NULL) {
+        *sel = found;
+    }
+    return cnt;
+}
 /* D_8006F240/D_8006F590 +0x080: decode one packet word -- the low byte, then
  * the two nibbles at bits 16 and 20, then the top byte -- and return the
  * pointer past it. */
