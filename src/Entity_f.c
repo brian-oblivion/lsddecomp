@@ -1,3 +1,26 @@
+/* Entity_f -- one of the Entity class's split units (Entity_c..Entity_g
+ * hold its 97-function remainder after Entity/Entity_b), 0x800634A8..
+ * 0x80064618, fully matched.
+ *
+ * 15 of the 17 functions are `gEntityMoodHandlerTable` callbacks
+ * (Entity.h), `Entity__MoodCueNN` for the row whose `handler` word holds
+ * their address: rows 82-96, consecutive and in address order here, read
+ * from disk/SLPS_015.56 (base 0x80089EB0, stride 0x10). `Entity__MoodCue93`
+ * also occupies row 107, named for its lower row as in Entity_c/_e/_g.
+ * ServiceSoundCueSet calls each once per tick with the entity's SoundCueSet
+ * (`EntityMoodHandlerArg`); they request tones and step the entity's pose
+ * and TOD animation on moodTimer / TOD-frame thresholds.
+ *
+ * The other two, `SetCueTones7_7_7` and `SetCueTones18_3_3`, are private
+ * helpers of Entity__MoodCue85/86 that take only the SoundCueSet and write
+ * a fixed three-voice tone request into it.
+ *
+ * Entity derives from Class65650 (code_55dd4.h), whose TOD fields and slots
+ * it inherits at the same offsets: this round renamed the two only this unit
+ * touches (`todFramePtr` +0x88, `applyTodFrame` +0x134) and proposed the
+ * shared ones (setTod/playTod/stopTod, todIndex/todFrame, and
+ * moodDuration -> todFrameCount) in Entity__MoodCue93.md.
+ */
 #include "common.h"
 #include "Entity.h"
 
