@@ -30,6 +30,7 @@
 #include "common.h"
 #include "code_2cc8c.h"
 #include "Viewport.h"
+#include "LightRig.h"
 
 s32 TaskCore__GetActiveSlotCount(TaskCore *self)
 {
@@ -109,7 +110,7 @@ void IntermediateBase__Init(IntermediateBase *self, IntermediateBaseInitArgs *ar
     if (args->unkC != NULL) {
         self->unk14 = args->unkC;
     } else {
-        self->unk14 = New_LightRig();
+        self->unk14 = (BasicClass *)New_LightRig();
     }
     if (args->viewport != NULL) {
         self->viewport = args->viewport;
