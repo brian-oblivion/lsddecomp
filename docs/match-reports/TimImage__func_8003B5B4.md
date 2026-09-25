@@ -1,20 +1,22 @@
-# func_8003B5D4 -- MATCHED (2/2 words), round 81
+# TimImage__func_8003B5B4 -- MATCHED (2/2 words), round 81
+
+> Renamed from `func_8003B5B4` on 2026-09-25 (tools/rename.py). Address 0x8003b5b4.
 
 Round 81, runner echo. Unit `src/code_2bb9c.c` (carved from `psyq_2bb9c` in
 FINISHING-PLAN revision 18). This was fresh ground with no prior attempt.
 
-- **Where:** D_8006E558 slot +0x090 (resolved with `tools/classtable.py D_8006E558`).
+- **Where:** gTimImageMethods slot +0x080 (resolved with `tools/classtable.py gTimImageMethods`).
 - **What:** empty slot override: `jr $ra; nop`.
 - **Result:** byte-exact on the first build. `funcdiff.py` reports 2/2,
   and the whole-image SHA1 is green (`OK: build matches retail`).
-- **Name:** kept as the bare `func_` name. The class (D_8006E558, a Class6D430
+- **Name:** kept as the bare `func_` name. The class (gTimImageMethods, a Class6D430
   data-source subclass) has no confirmed name yet, so no class prefix is
   justified.
 
 ## Source
 
 ```c
-void func_8003B5D4(void) {
+void TimImage__func_8003B5B4(void) {
 }
 ```
 
@@ -31,5 +33,5 @@ typedef struct D_8006E558Obj {
 
 typedef struct GsIMAGE GsIMAGE;
 void GsGetTimInfo(u32 *im, GsIMAGE *tim);
-extern Class6D430Methods D_8006E558;
+extern Class6D430Methods gTimImageMethods;
 ```

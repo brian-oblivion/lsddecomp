@@ -1,9 +1,11 @@
-# func_8003B4A8 -- MATCHED (65/65 words), round 81
+# TimImage__Upload -- MATCHED (65/65 words), round 81
+
+> Renamed from `func_8003B4A8` on 2026-09-25 (tools/rename.py). Address 0x8003b4a8.
 
 Round 81, runner echo. Unit `src/code_2bb9c.c`. Fresh ground, no prior attempt.
 Three builds.
 
-- **Where:** D_8006E558 slot +0x078 (`tools/classtable.py D_8006E558`).
+- **Where:** gTimImageMethods slot +0x078 (`tools/classtable.py gTimImageMethods`).
 - **What:** fetches the draw singleton (`func_80020C5C()`), and when the
   buffer is loaded has slot +0x09C describe the TIM into `self->tim`
   (+0x02C, a full `GsIMAGE`), then passes `{px, py, pw, ph}` and the pixel
@@ -35,7 +37,7 @@ typedef struct DrawRect {
 /* DrawObj: methods at +0; slot +0x058 loadImage(self, DrawRect *, u32 *). */
 extern DrawObj *func_80020C5C(void);
 
-void func_8003B4A8(D_8006E558Obj *self) {
+void TimImage__Upload(D_8006E558Obj *self) {
     DrawObj *draw;
     DrawRect rect;
     GsIMAGE *tim;

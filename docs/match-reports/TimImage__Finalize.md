@@ -1,8 +1,10 @@
-# func_8003B470 -- MATCHED (14/14 words), round 81
+# TimImage__Finalize -- MATCHED (14/14 words), round 81
+
+> Renamed from `func_8003B470` on 2026-09-25 (tools/rename.py). Address 0x8003b470.
 
 Round 81, runner echo. Unit `src/code_2bb9c.c`. Fresh ground, no prior attempt.
 
-- **Where:** D_8006E558 slot +0x00C (finalize; `tools/classtable.py D_8006E558`).
+- **Where:** gTimImageMethods slot +0x00C (finalize; `tools/classtable.py gTimImageMethods`).
 - **What:** forwards to the active data-source driver's finalize
   (`GetActiveDataSourceMethods()->finalize(self)`). Written `void`: the
   base's `finalize` slot is `void`, and a byte match of a forwarder says
@@ -12,7 +14,7 @@ Round 81, runner echo. Unit `src/code_2bb9c.c`. Fresh ground, no prior attempt.
 ## Source
 
 ```c
-void func_8003B470(D_8006E558Obj *self) {
+void TimImage__Finalize(D_8006E558Obj *self) {
     GetActiveDataSourceMethods()->finalize((Class6D430 *)self);
 }
 ```

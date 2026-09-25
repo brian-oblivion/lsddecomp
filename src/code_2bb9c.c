@@ -3,7 +3,7 @@
  * revision 18). 0x2BB9C..0x2BF70 (vram 0x8003B39C..0x8003B770). It was counted
  * as Psy-Q SDK by segment name; tools/gameinsdk.py measured it as game (a call
  * into game code, a method-table entry beside game methods, or contiguity with
- * those, and no Sony fingerprint). What it holds: 12 methods of D_8006E558, a
+ * those, and no Sony fingerprint). What it holds: 12 methods of gTimImageMethods, a
  * Class6D430 (data-source) subclass calling GetActiveDataSourceMethods.
  *
  * Fully matched in round 81 (runner echo): no INCLUDE_ASM left.
@@ -12,7 +12,7 @@
 #include "Class6D430.h"
 
 /* LIBGS.H GsIMAGE, laid out as the SDK declares it: GsGetTimInfo fills it
- * and func_8003B4A8 reads it field by field. */
+ * and TimImage__Upload reads it field by field. */
 typedef struct GsIMAGE {
     /* +0x00 */ u32 pmode;
     /* +0x04 */ s16 px;
@@ -29,8 +29,8 @@ typedef struct GsIMAGE {
 
 typedef struct D_8006E558Obj D_8006E558Obj;
 
-/* D_8006E558's own table: Class6D430's slots with this class's two-argument
- * ctor, then its own +0x07C..+0x09C (tools/classtable.py D_8006E558). */
+/* gTimImageMethods's own table: Class6D430's slots with this class's two-argument
+ * ctor, then its own +0x07C..+0x09C (tools/classtable.py gTimImageMethods). */
 typedef struct D_8006E558Methods {
     CLASS6D430_SLOTS(D_8006E558Obj, (D_8006E558Obj *self, char *name));
     /* +0x07C */ void (*slot7C)(void);
@@ -44,11 +44,11 @@ typedef struct D_8006E558Methods {
     /* +0x09C */ void (*getTimInfo)(D_8006E558Obj *self, GsIMAGE *tim);
 } D_8006E558Methods;
 
-/* Unit-local view of the D_8006E558 class: a Class6D430 data source whose
- * buffer holds a TIM image (func_8003B5F0 hands buffer+4, past the TIM id
- * word, to GsGetTimInfo). func_8003B4A8 has the TIM described into +0x02C
+/* Unit-local view of the gTimImageMethods class: a Class6D430 data source whose
+ * buffer holds a TIM image (TimImage__GetTimInfo hands buffer+4, past the TIM id
+ * word, to GsGetTimInfo). TimImage__Upload has the TIM described into +0x02C
  * and uploads its pixel and CLUT blocks from there. +0x048 is cleared by the
- * ctor and set to 1 by func_8003B5E4; the ctor also clears +0x04C. The
+ * ctor and set to 1 by TimImage__func_8003B5E4; the ctor also clears +0x04C. The
  * object is 0x50 bytes (func_8003B39C's allocation). */
 struct D_8006E558Obj {
     CLASS6D430_FIELDS(D_8006E558Methods);
@@ -90,38 +90,38 @@ struct DrawObj {
 extern DrawObj *func_80020C5C(void); /* returns the draw singleton */
 extern void *BMemPMgrAlloc(s32 size);
 extern Class6D430Methods *GetActiveDataSourceMethods(void);
-D_8006E558Methods *func_8003B614(void);
+D_8006E558Methods *GetTimImageMethods(void);
 
-extern D_8006E558Methods D_8006E558;
+extern D_8006E558Methods gTimImageMethods;
 
-/* new D_8006E558(name). */
+/* new gTimImageMethods(name). */
 D_8006E558Obj *func_8003B39C(char *name) {
     D_8006E558Obj *self;
 
     self = BMemPMgrAlloc(0x50);
     if (self != NULL) {
-        func_8003B614()->ctor(self, name);
+        GetTimImageMethods()->ctor(self, name);
         return self;
     }
     return NULL;
 }
-/* D_8006E558 +0x008: the ctor. */
-void func_8003B3FC(D_8006E558Obj *self, char *name) {
+/* gTimImageMethods +0x008: the ctor. */
+void TimImage__TimImage(D_8006E558Obj *self, char *name) {
     GetActiveDataSourceMethods()->ctor((Class6D430 *)self);
-    self->methods = func_8003B614();
+    self->methods = GetTimImageMethods();
     self->unk48 = 0;
     self->unk4C = 0;
     if (name != NULL) {
         self->methods->requestLoadFile(self, name);
     }
 }
-/* D_8006E558 +0x00C: finalize, straight to the active driver's. */
-void func_8003B470(D_8006E558Obj *self) {
+/* gTimImageMethods +0x00C: finalize, straight to the active driver's. */
+void TimImage__Finalize(D_8006E558Obj *self) {
     GetActiveDataSourceMethods()->finalize((Class6D430 *)self);
 }
-/* D_8006E558 +0x078: describe the TIM, then upload its pixel block and, when
+/* gTimImageMethods +0x078: describe the TIM, then upload its pixel block and, when
  * pmode bit 3 says it has one, its CLUT. */
-void func_8003B4A8(D_8006E558Obj *self) {
+void TimImage__Upload(D_8006E558Obj *self) {
     DrawObj *draw;
     DrawRect rect;
     GsIMAGE *tim;
@@ -144,40 +144,40 @@ void func_8003B4A8(D_8006E558Obj *self) {
         }
     }
 }
-/* D_8006E558 slot (tools/classtable.py); empty body. */
-void func_8003B5AC(void) {
+/* gTimImageMethods slot (tools/classtable.py); empty body. */
+void TimImage__func_8003B5AC(void) {
 }
-/* D_8006E558 slot (tools/classtable.py); empty body. */
-void func_8003B5B4(void) {
+/* gTimImageMethods slot (tools/classtable.py); empty body. */
+void TimImage__func_8003B5B4(void) {
 }
-/* D_8006E558 slot (tools/classtable.py); empty body. */
-void func_8003B5BC(void) {
+/* gTimImageMethods slot (tools/classtable.py); empty body. */
+void TimImage__func_8003B5BC(void) {
 }
-/* D_8006E558 slot (tools/classtable.py); empty body. */
-void func_8003B5C4(void) {
+/* gTimImageMethods slot (tools/classtable.py); empty body. */
+void TimImage__func_8003B5C4(void) {
 }
-/* D_8006E558 slot (tools/classtable.py); empty body. */
-void func_8003B5CC(void) {
+/* gTimImageMethods slot (tools/classtable.py); empty body. */
+void TimImage__func_8003B5CC(void) {
 }
-/* D_8006E558 slot (tools/classtable.py); empty body. */
-void func_8003B5D4(void) {
+/* gTimImageMethods slot (tools/classtable.py); empty body. */
+void TimImage__func_8003B5D4(void) {
 }
-/* D_8006E558 slot (tools/classtable.py); empty body. */
-void func_8003B5DC(void) {
+/* gTimImageMethods slot (tools/classtable.py); empty body. */
+void TimImage__func_8003B5DC(void) {
 }
-/* D_8006E558 +0x098. */
-void func_8003B5E4(D_8006E558Obj *self) {
+/* gTimImageMethods +0x098. */
+void TimImage__func_8003B5E4(D_8006E558Obj *self) {
     self->unk48 = 1;
 }
-/* D_8006E558 +0x09C: describe the TIM held in the buffer. */
-void func_8003B5F0(D_8006E558Obj *self, GsIMAGE *tim) {
+/* gTimImageMethods +0x09C: describe the TIM held in the buffer. */
+void TimImage__GetTimInfo(D_8006E558Obj *self, GsIMAGE *tim) {
     GsGetTimInfo((u32 *)self->buffer + 1, tim);
 }
-/* The class's table getter (called by func_8003B39C and func_8003B3FC). */
-D_8006E558Methods *func_8003B614(void) {
-    return &D_8006E558;
+/* The class's table getter (called by func_8003B39C and TimImage__TimImage). */
+D_8006E558Methods *GetTimImageMethods(void) {
+    return &gTimImageMethods;
 }
-/* Not in D_8006E558's table. Three calls to the draw singleton's slot
+/* Not in gTimImageMethods's table. Three calls to the draw singleton's slot
  * +0x064 per iteration, built from r's edges and p; nothing but i changes
  * between iterations. */
 void func_8003B624(DrawRect *r, s32 count, DrawPoint *p) {

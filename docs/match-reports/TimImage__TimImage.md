@@ -1,8 +1,10 @@
-# func_8003B3FC -- MATCHED (29/29 words), round 81
+# TimImage__TimImage -- MATCHED (29/29 words), round 81
+
+> Renamed from `func_8003B3FC` on 2026-09-25 (tools/rename.py). Address 0x8003b3fc.
 
 Round 81, runner echo. Unit `src/code_2bb9c.c`. Fresh ground, no prior attempt.
 
-- **Where:** D_8006E558 slot +0x008 (the ctor; `tools/classtable.py D_8006E558`).
+- **Where:** gTimImageMethods slot +0x008 (the ctor; `tools/classtable.py gTimImageMethods`).
 - **What:** runs the active data-source driver's ctor on `self`
   (`GetActiveDataSourceMethods()->ctor`), installs this class's table, clears
   +0x048 and +0x04C, and when `name` is non-NULL issues
@@ -14,9 +16,9 @@ Round 81, runner echo. Unit `src/code_2bb9c.c`. Fresh ground, no prior attempt.
 ## Source
 
 ```c
-void func_8003B3FC(D_8006E558Obj *self, char *name) {
+void TimImage__TimImage(D_8006E558Obj *self, char *name) {
     GetActiveDataSourceMethods()->ctor((Class6D430 *)self);
-    self->methods = func_8003B614();
+    self->methods = GetTimImageMethods();
     self->unk48 = 0;
     self->unk4C = 0;
     if (name != NULL) {
