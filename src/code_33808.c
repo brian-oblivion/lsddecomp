@@ -155,7 +155,84 @@ void func_800431A8(DataSrc33808 *self) {
     BMemPMgrFree(self->unk30);
     GetActiveDataSourceMethods()->finalize((Class6D430 *)self);
 }
-INCLUDE_ASM("asm/nonmatchings/code_33808", func_80043200);
+/* D_8006F0B8 +0x064: the loader's state machine, under the data-source
+ * lock. State 9 (header sector read): copy the 0x24-byte header (a count
+ * and eight file offsets) out of the sector buffer into the buffer, free
+ * the sector, allocate the object array (+0x30) and a sector buffer of the
+ * largest offset (+0x34/+0x38), seek to the first block and read it: state
+ * 10. State 10 (a block read): hand the block to a new D_8006F1C4 source
+ * (its CLUT base the entries at +0x40), run its setFlag and +0x078, and
+ * read the next block -- or, after the last, free the sector buffer, mark
+ * +0x3C done and run the active driver's setFlag. An allocation failure
+ * sets +0x80. */
+typedef struct Hdr43200 {
+    u8 bytes[0x24];
+} Hdr43200;
+
+extern void LockActiveDataSource(void);
+extern void UnlockActiveDataSource(void);
+u32 func_800434DC(Class6D430 *self);
+void *func_80043B88(s32 arg0);
+
+void func_80043200(Obj43068 *self) {
+    DataSrc33808 **p;
+    s32 max;
+    s32 n;
+
+    LockActiveDataSource();
+    switch (self->unk2A) {
+        case 9:
+            if (self->flags & 0x80) {
+                *(Hdr43200 *)self->buffer = *(Hdr43200 *)self->sector;
+                BMemPMgrFree(self->sector);
+                max = func_800434DC((Class6D430 *)self);
+                self->unk30 = (s32)BMemPMgrAlloc(*(u32 *)self->buffer * 4);
+                if (self->unk30 == 0) {
+                    goto fail;
+                }
+                self->sector = BMemPMgrAlloc(max);
+                if (self->sector == NULL) {
+                    goto fail;
+                }
+                self->unk38 = max;
+                self->methods->seek((DataSrc33808 *)self, ((u32 *)self->buffer)[1], 0);
+                self->methods->read((DataSrc33808 *)self, self->sector, max);
+                self->unk2A = 10;
+            }
+            break;
+        case 10:
+            if (self->flags & 0x80) {
+                n = self->unk2C;
+                p = (DataSrc33808 **)self->unk30 + n;
+                *p = func_80043B88(0);
+                (*p)->buffer = self->sector;
+                (*p)->bufferSize = 0;
+                (*p)->unk34 = (s32)self->entries;
+                n++;
+                (*p)->methods->setFlag(*p);
+                ((void (*)())(*p)->methods->slot78)(*p);
+                self->unk2C = n;
+                if (n < *(u32 *)self->buffer) {
+                    self->methods->seek((DataSrc33808 *)self, ((u32 *)self->buffer)[n + 1], 0);
+                    self->methods->read((DataSrc33808 *)self, self->sector, self->unk38);
+                    self->unk2A = 10;
+                } else {
+                    BMemPMgrFree(self->sector);
+                    self->sector = NULL;
+                    self->unk38 = 0;
+                    self->unk2A = 0;
+                    self->unk3C = 1;
+                    GetActiveDataSourceMethods()->setFlag((Class6D430 *)self);
+                }
+            }
+            break;
+    }
+    goto out;
+fail:
+    self->unk80 = 1;
+out:
+    UnlockActiveDataSource();
+}
 /* The largest of the buffer's `count` words from +0x14. */
 typedef struct Buf434DC {
     /* +0x00 */ u32 count;
