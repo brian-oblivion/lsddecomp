@@ -193,7 +193,10 @@ void *func_800449FC(void) {
 INCLUDE_ASM("asm/nonmatchings/code_33808", func_80044A0C);
 INCLUDE_ASM("asm/nonmatchings/code_33808", func_80044A7C);
 INCLUDE_ASM("asm/nonmatchings/code_33808", func_80044B04);
-INCLUDE_ASM("asm/nonmatchings/code_33808", func_80044B58);
+/* D_8006F40C +0x064: slot +0x078. */
+void func_80044B58(DataSrc33808 *self) {
+    ((s32 (*)())self->methods->slot78)(self);
+}
 INCLUDE_ASM("asm/nonmatchings/code_33808", func_80044B88);
 INCLUDE_ASM("asm/nonmatchings/code_33808", func_80044C58);
 INCLUDE_ASM("asm/nonmatchings/code_33808", func_80044C90);
