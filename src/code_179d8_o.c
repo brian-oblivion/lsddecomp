@@ -33,7 +33,7 @@ struct Class6D4E8Methods {
                                            * still holds Class6D4E8__Destroy's own `self` there (the entry
                                            * `move s0,a0` leaves it intact), so passing `self` is
                                            * byte-identical -- the same shape as Class6D430__Destroy's
-                                           * `onBufferChanged(this)` in code_171e0.c. */
+                                           * `close(this)` in code_171e0.c. */
 };
 
 typedef struct {
@@ -41,7 +41,7 @@ typedef struct {
                                      * (GetClass6D4E8Methods()'s return value) -- the table-pointer-at-offset-0
                                      * convention CLAUDE.md documents for this project's class framework */
     u8 pad004[0x028 - 0x004];
-    s16 unk28;                     /* +0x028, cleared by the constructor (a halfword store, `sh`); Class6D430's
+    s16 inQueueDispatch;                     /* +0x028, cleared by the constructor (a halfword store, `sh`); Class6D430's
                                      * own ctor already clears it too (code_171e0.h: u16 unk28). No reader
                                      * in this unit, so no name. */
 } Class6D4E8;
@@ -83,7 +83,7 @@ void Class6D4E8__Class6D4E8(Class6D4E8 *self)
 {
     GetClass6D430Methods(self)->ctor(self);
     self->methods = GetClass6D4E8Methods();
-    self->unk28 = 0;
+    self->inQueueDispatch = 0;
     InitCdDrive();
 }
 

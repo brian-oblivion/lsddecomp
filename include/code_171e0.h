@@ -74,11 +74,11 @@ struct Class6D430Methods {
     /* +0x08 */ void (*ctor)(Class6D430 *self);          /* Class6D430__Class6D430 */
     /* +0x0C */ void *(*dtor)(Class6D430 *self);         /* Class6D430__Destroy */
     /* +0x10 */ u8 pad10[0x44 - 0x10];      /* inherited BasicClass slots + null slots */
-    /* +0x44 */ void (*configureBuffer)(Class6D430 *self, s32 arg1, s32 arg2, s32 arg3);
-    /* +0x48 */ void (*onBufferChanged)(Class6D430 *self);
-    /* +0x4C */ s32 (*bufferControl)(Class6D430 *self, s32 arg1, s32 arg2);
+    /* +0x44 */ void (*open)(Class6D430 *self, s32 arg1, s32 arg2, s32 arg3);
+    /* +0x48 */ void (*close)(Class6D430 *self);
+    /* +0x4C */ s32 (*seek)(Class6D430 *self, s32 arg1, s32 arg2);
     /* +0x50 */ u8 pad50[0x54 - 0x50];      /* null slot */
-    /* +0x54 */ void (*installBuffer)(Class6D430 *self, void *arg1, s32 arg2);
+    /* +0x54 */ void (*read)(Class6D430 *self, void *arg1, s32 arg2);
     /* +0x58 */ u8 pad58[0x5C - 0x58];      /* Class6D430__AllocBuffer's own slot, unused here */
     /* +0x5C */ void *(*freeBuffer)(Class6D430 *self);       /* Class6D430__FreeBuffer, dispatched
                                                                   * indirectly even though this
@@ -88,22 +88,22 @@ struct Class6D430Methods {
 /* An instance of the D_8006D430 class. Class6D430's own name and the
  * flags field (formerly unknown_value_0x24) predate this unit's work (see
  * Class6D430__SetFlag); fields below it are new, derived from Class6D430__Class6D430 (the ctor, which
- * zeroes them), Class6D430__AllocBuffer/Class6D430__FreeBuffer (pendingGeneration/buffer/bufferSize/freeGuard) and
+ * zeroes them), Class6D430__AllocBuffer/Class6D430__FreeBuffer (isOpen/buffer/bufferSize/freeGuard) and
  * Class6D430__CopyFields (the unk40..unk74 block, a field-by-field copy -- retail
  * copies +0x40..+0x58 then jumps a 0xC-byte gap to +0x68..+0x74, so that gap
  * is left unnamed rather than guessed at). */
 struct Class6D430 {
     /* +0x00 */ Class6D430Methods *methods;
     /* +0x04 */ u8 pad04[0x0C - 0x04];       /* BasicClass instance fields; owned elsewhere */
-    /* +0x0C */ s32 pendingGeneration;                   /* saved/restored around the buffer (re)alloc */
+    /* +0x0C */ s32 isOpen;                   /* saved/restored around the buffer (re)alloc */
     /* +0x10 */ void *buffer;                 /* resource from BMemPMgrAlloc; freed via BMemPMgrFree */
     /* +0x14 */ s32 bufferSize;                   /* buffer's allocation size */
     /* +0x18 */ u8 pad18[0x20 - 0x18];       /* unknown, 8 bytes */
     /* +0x20 */ u16 freeGuard;                   /* nonzero blocks the buffer free in Class6D430__FreeBuffer */
-    /* +0x22 */ u16 unk22;
+    /* +0x22 */ u16 pendingRequests;
     /* +0x24 */ s32 flags;                   /* bit 0 set by Class6D430__SetFlag; only bit
                                                   established so far, meaning unknown */
-    /* +0x28 */ u16 unk28;
+    /* +0x28 */ u16 inQueueDispatch;
     /* +0x2A */ u16 unk2A;
     /* +0x2C */ u8 pad2C[0x40 - 0x2C];       /* unknown, 0x14 bytes */
     /* +0x40 */ s32 unk40;

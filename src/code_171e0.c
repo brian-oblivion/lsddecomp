@@ -48,18 +48,18 @@ void *DestroyChained(Class6D430 *this) {
 void Class6D430__Class6D430(Class6D430 *this) {
     Get_vtable_BasicClass()->ctor(this);
     this->methods = (Class6D430Methods *) GetClass6D430Methods();
-    this->pendingGeneration = 0;
+    this->isOpen = 0;
     this->buffer = NULL;
     this->bufferSize = 0;
     this->freeGuard = 0;
-    this->unk22 = 0;
+    this->pendingRequests = 0;
     this->flags = 0;
-    this->unk28 = 0;
+    this->inQueueDispatch = 0;
     this->unk2A = 0;
 }
 
 void *Class6D430__Destroy(Class6D430 *this) {
-    this->methods->onBufferChanged(this);
+    this->methods->close(this);
     return this->methods->freeBuffer(this);
 }
 
@@ -71,21 +71,21 @@ void Class6D430__AllocBuffer(Class6D430 *this, s32 arg1) {
     if (this->buffer != NULL) {
         return;
     }
-    savedPendingGeneration = this->pendingGeneration;
-    this->pendingGeneration = 0;
-    this->methods->configureBuffer(this, arg1, 1, 0);
-    size = this->methods->bufferControl(this, 0, 2);
+    savedPendingGeneration = this->isOpen;
+    this->isOpen = 0;
+    this->methods->open(this, arg1, 1, 0);
+    size = this->methods->seek(this, 0, 2);
     newRes = BMemPMgrAlloc(size);
     if (newRes != NULL) {
-        this->methods->bufferControl(this, 0, 0);
-        this->methods->installBuffer(this, newRes, size);
-        this->methods->onBufferChanged(this);
+        this->methods->seek(this, 0, 0);
+        this->methods->read(this, newRes, size);
+        this->methods->close(this);
         this->buffer = newRes;
         this->bufferSize = size;
-        this->pendingGeneration = savedPendingGeneration;
+        this->isOpen = savedPendingGeneration;
     } else {
         BMemPMgrFree(NULL);
-        this->methods->onBufferChanged(this);
+        this->methods->close(this);
     }
 }
 

@@ -74,7 +74,7 @@
  * `Class6D430__InstallCdReadDriver`/`Class6D430__DestroyCdReadDriver`
  * dispatch through both via `GetClass6D430Methods()`/`GetClass6D4E8Methods()`.
  * `ObjA34_179D8H` additionally carries its OWN per-instance `methods`
- * pointer (dispatched by `ReadCdFile`'s `onError` slot), not yet tied to
+ * pointer (dispatched by `ReadCdFile`'s `close` slot), not yet tied to
  * either scanned table.  The sibling slice code_179d8_e also contains two
  * class-table accessors -- so "code_179d8 is not class-framework code" was
  * never true of this neighbourhood; run the check for your own functions
@@ -118,17 +118,14 @@ typedef struct ObjA34_179D8H ObjA34_179D8H;
  * unchanged from before this slot was identified (0x4 + 0x8 = 0xC), so
  * this is not a shifting edit -- confirmed by re-verifying CloseCdFile
  * and GetCdFileSize (both already matched, both readers of this struct)
- * after adding it. Named `onError`: the ONE confirmed dispatch (ReadCdFile,
- * when `self->isOpen == 0`) matches the SAME slot number (+0x48) that
- * src/code_179d8_s.c's independent local view (Methods80027480::slot48)
- * dispatches on ITS OWN allocation-failure path (Class6D4E8__LoadFile) -- two
- * unrelated call sites landing on the identical offset for a give-up path
- * is evidence for "error/failure handler", not a guess at a specific
- * message; PROPOSED for code_179d8_s.c under the same name, not applied
- * there (out of unit). */
+ * after adding it. Named `onError` in round 64 from two give-up call sites
+ * at +0x48; renamed `close` in round 79 (charlie's code_179d8_s pass):
+ * `tools/classtable.py D_8006D4E8` resolves +0x48 to Class6D4E8__Close,
+ * and Class6D430__AllocBuffer also calls it on its SUCCESS path, so the
+ * give-up paths were closing the file, not reporting an error. */
 typedef struct MethodsA34_179D8H {
     u8 pad000[0x48];
-    void (*onError)(ObjA34_179D8H *self);
+    void (*close)(ObjA34_179D8H *self);
 } MethodsA34_179D8H;
 
 struct ObjA34_179D8H {
@@ -195,7 +192,7 @@ extern char gCdFileVersionSuffix[]; /* ";1", the ISO9660 CD file-version suffix 
 void Class6D430__InstallCdReadDriver(Class6D430 *self) {
     ((Class6D430Methods *)GetClass6D430Methods())->ctor(self);
     self->methods = GetClass6D4E8Methods();
-    self->pendingGeneration = 0;
+    self->isOpen = 0;
 }
 
 void *Class6D430__DestroyCdReadDriver(Class6D430 *self) {
@@ -303,7 +300,7 @@ s32 ReadCdFile(ObjA34_179D8H *self, char *arg1, s32 arg2) {
             return 0;
         }
     } else {
-        self->methods->onError(self);
+        self->methods->close(self);
     }
     return 0;
 }
