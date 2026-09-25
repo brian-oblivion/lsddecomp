@@ -1,4 +1,6 @@
-# func_80045C94 -- MATCHED (26/26 words)
+# MoviePlayer__PollActive -- MATCHED (26/26 words)
+
+> Renamed from `func_80045C94` on 2026-09-25 (tools/rename.py). Address 0x80045c94.
 
 Round 82, runner echo (code_33808 session, echo #7), 2026-09-25. Unit `code_33808`.
 Byte-exact; whole-image SHA1 green (`./build-and-verify.sh`:
@@ -36,7 +38,7 @@ typedef struct Obj45C94 {
 extern s32 D_8008A948;
 extern DataSrc33808 *D_8008A940;
 
-s32 func_80045C94(Obj45C94 *self) {
+s32 MoviePlayer__PollActive(Obj45C94 *self) {
     if (self->unk54 != 0) {
         if (D_8008A948++ > 100) {
             D_8008A948 = 1;
@@ -63,5 +65,5 @@ A slot call through an unprototyped pointer whose `$a0` already holds `self`
 is NOT neutral between `f()` and `f(self)` even though no `move a0` appears in
 either: the argument's liveness changes the scheduling of the surrounding
 block (here a constant left the branch delay slot and an extra word appeared).
-TileMap__Load matched with `f()` in the same situation and func_80045C94 only
+TileMap__Load matched with `f()` in the same situation and MoviePlayer__PollActive only
 with `f(self)`, so when one form misses, flip it before anything else.

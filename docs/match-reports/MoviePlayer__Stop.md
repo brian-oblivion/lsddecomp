@@ -1,4 +1,6 @@
-# func_800458B8 -- MATCHED (33/33 words)
+# MoviePlayer__Stop -- MATCHED (33/33 words)
+
+> Renamed from `func_800458B8` on 2026-09-25 (tools/rename.py). Address 0x800458b8.
 
 Round 82, runner echo (code_33808 session, echo #8), 2026-09-25. Unit `code_33808`.
 Byte-exact; whole-image SHA1 green (`./build-and-verify.sh`:
@@ -7,7 +9,7 @@ drift. Fresh ground (carved revision 18, no prior report).
 
 ## What it does
 
-Only when self is the object held in the global D_8008A940: zero +0x3C/+0x40/+0x44/+0x48, set +0x4C = 1, call the +0x60 object's slot +0x07C with (obj, func_8004593C, self) -- func_8004593C sets +0x50 = -1, so it is a completion callback --, clear +0x64, then call the +0x60 object's slot +0x058 with it alone. This is the slot +0x044 that func_80045C94 calls every ~100 polls.
+Only when self is the object held in the global D_8008A940: zero +0x3C/+0x40/+0x44/+0x48, set +0x4C = 1, call the +0x60 object's slot +0x07C with (obj, MoviePlayer__MarkStopped, self) -- MoviePlayer__MarkStopped sets +0x50 = -1, so it is a completion callback --, clear +0x64, then call the +0x60 object's slot +0x058 with it alone. This is the slot +0x044 that MoviePlayer__PollActive calls every ~100 polls.
 
 Table slot (`tools/classtable.py`): D_8006F614 +0x044.
 
@@ -46,7 +48,7 @@ typedef struct Obj458B8 {
     /* +0x064 */ s32 unk64;
 } Obj458B8;
 
-void func_800458B8(Obj458B8 *self) {
+void MoviePlayer__Stop(Obj458B8 *self) {
     Obj458B8 *cur = (Obj458B8 *)D_8008A940;
 
     if (cur == self) {
@@ -55,7 +57,7 @@ void func_800458B8(Obj458B8 *self) {
         cur->unk4C = 1;
         cur->unk48 = 0;
         cur->unk44 = 0;
-        cur->unk60->methods->slot7C(cur->unk60, func_8004593C, cur);
+        cur->unk60->methods->slot7C(cur->unk60, MoviePlayer__MarkStopped, cur);
         cur->unk64 = 0;
         cur->unk60->methods->slot58(cur->unk60);
     }
@@ -64,4 +66,4 @@ void func_800458B8(Obj458B8 *self) {
 
 ## Notes
 
-First build. Written through a local copy of the global (`cur`) -- retail keeps the global in s0 and reads every field through it, not through self. Stores written in retail's order (0x40, 0x3C, 0x4C, 0x48, 0x44). The +0x60 object's class is not identified; a per-function methods view with unprototyped slots. (The views gained slot48/unk54 additively for func_80045A38; this report's inlined copy is the current one.)
+First build. Written through a local copy of the global (`cur`) -- retail keeps the global in s0 and reads every field through it, not through self. Stores written in retail's order (0x40, 0x3C, 0x4C, 0x48, 0x44). The +0x60 object's class is not identified; a per-function methods view with unprototyped slots. (The views gained slot48/unk54 additively for MoviePlayer__Abort; this report's inlined copy is the current one.)

@@ -1,4 +1,6 @@
-# func_800457C0 -- MATCHED (59/59 words)
+# MoviePlayer__Play -- MATCHED (59/59 words)
+
+> Renamed from `func_800457C0` on 2026-09-25 (tools/rename.py). Address 0x800457c0.
 
 Round 82, runner echo (code_33808 session, echo #9), 2026-09-25. Unit `code_33808`.
 Byte-exact; whole-image SHA1 green (`./build-and-verify.sh`:
@@ -7,7 +9,7 @@ drift. Fresh ground (carved revision 18, no prior report).
 
 ## What it does
 
-Start a movie: only when no movie is active (D_8008A940 NULL). Calls func_800458AC(self) first when +0x68 is set, keeps arg2 at +0x5C and opens `name` on the stream object at +0x60 (its +0x044, with 100). On success it becomes the active movie (D_8008A940 = self), clears +0x40/+0x3C/+0x48/+0x44, sets +0x4C, keeps arg3/arg4 at +0x54/+0x58 and calls DrawSystem +0x078 with (&D_8008A944, &self->rect at +0x20); returns 0. Returns 1 when the open fails, 0 when a movie is already active.
+Start a movie: only when no movie is active (D_8008A940 NULL). Calls MoviePlayer__MarkPlaying(self) first when +0x68 is set, keeps arg2 at +0x5C and opens `name` on the stream object at +0x60 (its +0x044, with 100). On success it becomes the active movie (D_8008A940 = self), clears +0x40/+0x3C/+0x48/+0x44, sets +0x4C, keeps arg3/arg4 at +0x54/+0x58 and calls DrawSystem +0x078 with (&D_8008A944, &self->rect at +0x20); returns 0. Returns 1 when the open fails, 0 when a movie is already active.
 
 Table slot (`tools/classtable.py`): D_8006F614 +0x040.
 
@@ -20,7 +22,7 @@ top of / earlier in `src/code_33808.c`.
 
 ```c
 /* D_8006F614 +0x040: start playing -- only when no movie is active
- * (D_8008A940): optionally func_800458AC first (+0x68), keep `arg2` at
+ * (D_8008A940): optionally MoviePlayer__MarkPlaying first (+0x68), keep `arg2` at
  * +0x5C, open `name` on the stream object at +0x60 (its +0x044, 100); 1 when
  * that fails. Otherwise become the active movie, reset the state words, keep
  * `arg3`/`arg4` at +0x54/+0x58 and register D_8008A944 with the frame
@@ -64,14 +66,14 @@ typedef struct DrawSys457C0 {
 extern DataSrc33808 *D_8008A940;
 extern s32 D_8008A944;
 extern void *GetDrawSystem(void);
-void func_800458AC();
+void MoviePlayer__MarkPlaying();
 
-s32 func_800457C0(Obj457C0 *self, char *name, s32 arg2, s32 arg3, s32 arg4) {
+s32 MoviePlayer__Play(Obj457C0 *self, char *name, s32 arg2, s32 arg3, s32 arg4) {
     DrawSys457C0 *ds;
 
     if (D_8008A940 == NULL) {
         if (self->unk68 != 0) {
-            func_800458AC(self);
+            MoviePlayer__MarkPlaying(self);
         }
         self->unk5C = arg2;
         if (self->unk60->methods->open(self->unk60, name, 100) == 0) {
@@ -95,4 +97,4 @@ s32 func_800457C0(Obj457C0 *self, char *name, s32 arg2, s32 arg3, s32 arg4) {
 
 ## Notes
 
-Ninth build. Every shape with the failing open as an early `if (open(...) != 0) return 1;` measured 41/59, 2 words short: retail keeps TWO separate `move v0,zero` returns (the body's tail `j <epi>; move v0,zero` and the `D_8008A940 != NULL` target right before the epilogue), mine merged them. Tried and unchanged (41/59): no return at the end of the body; a `ret` variable for either or both returns; `goto done` to a label at the end; an explicit `else { return 0; }`. The early `if (D_8008A940 != NULL) return 0;` first is far worse (25/59, it inlines the return). What matches is the SUCCESS path nested under `if (open(...) == 0) { ...; return 0; } return 1;`: the `return 1` block then sits between the two `return 0`s when jump optimisation runs, so they cannot be merged, and reorg afterwards steals its `li v0,1` into the `bnez` delay slot and deletes the block -- leaving exactly retail's layout. The matched-already func_80045BC8 lost its unit-local `extern DrawSys45BC8 *GetDrawSystem(void);` in favour of one `extern void *GetDrawSystem(void);` declared here (first use), with a cast at its call; its bytes are unchanged (whole image green).
+Ninth build. Every shape with the failing open as an early `if (open(...) != 0) return 1;` measured 41/59, 2 words short: retail keeps TWO separate `move v0,zero` returns (the body's tail `j <epi>; move v0,zero` and the `D_8008A940 != NULL` target right before the epilogue), mine merged them. Tried and unchanged (41/59): no return at the end of the body; a `ret` variable for either or both returns; `goto done` to a label at the end; an explicit `else { return 0; }`. The early `if (D_8008A940 != NULL) return 0;` first is far worse (25/59, it inlines the return). What matches is the SUCCESS path nested under `if (open(...) == 0) { ...; return 0; } return 1;`: the `return 1` block then sits between the two `return 0`s when jump optimisation runs, so they cannot be merged, and reorg afterwards steals its `li v0,1` into the `bnez` delay slot and deletes the block -- leaving exactly retail's layout. The matched-already MoviePlayer__DrawStrip lost its unit-local `extern DrawSys45BC8 *GetDrawSystem(void);` in favour of one `extern void *GetDrawSystem(void);` declared here (first use), with a cast at its call; its bytes are unchanged (whole image green).

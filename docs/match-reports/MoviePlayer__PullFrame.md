@@ -1,4 +1,6 @@
-# func_80045AD8 -- MATCHED (58/58 words)
+# MoviePlayer__PullFrame -- MATCHED (58/58 words)
+
+> Renamed from `func_80045AD8` on 2026-09-25 (tools/rename.py). Address 0x80045ad8.
 
 Round 82, runner echo (code_33808 session, echo #9), 2026-09-25. Unit `code_33808`.
 Byte-exact; whole-image SHA1 green (`./build-and-verify.sh`:
@@ -50,7 +52,7 @@ typedef struct Obj45AD8 {
 /* LIBPRESS.H */
 extern int DecDCTvlc(u32 *bs, u32 *buf);
 
-s32 func_80045AD8(Obj45AD8 *self) {
+s32 MoviePlayer__PullFrame(Obj45AD8 *self) {
     u32 *data;
     s32 size;
     s32 r;

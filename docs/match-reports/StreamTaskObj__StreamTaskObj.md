@@ -20,7 +20,7 @@ void StreamTaskObj__StreamTaskObj(StreamTaskObj *self, s32 a1, s32 a2, s32 a3, S
     } else {
         self->unkA8 = *GetDefaultStreamTaskInitData();
     }
-    self->unkB4 = func_80045438(GetDefaultStreamTaskInitData(), 0, 0);
+    self->unkB4 = New_MoviePlayer(GetDefaultStreamTaskInitData(), 0, 0);
     self->unkB8 = 0;
     self->methods->slot40(self);
 }
@@ -44,10 +44,10 @@ void StreamTaskObj__StreamTaskObj(StreamTaskObj *self, s32 a1, s32 a2, s32 a3, S
   separate `s32` fields `unkA8`/`unkAC`/`unkB0` — see residue.
 - New externs: `GetDefaultStreamTaskInitData(void)` (returns `StreamTaskInitData *`, a
   "default init data" singleton accessor, called twice — once for the `a4 ==
-  NULL` fallback copy, once again fresh as `func_80045438`'s first argument;
+  NULL` fallback copy, once again fresh as `New_MoviePlayer`'s first argument;
   each call's result is consumed immediately, so no local caching needed
   between them, unlike the `self->field`-across-`jalr` case) and
-  `func_80045438(StreamTaskInitData *, s32, s32)` (returns
+  `New_MoviePlayer(StreamTaskInitData *, s32, s32)` (returns
   `StreamTaskUnkB4Obj *`, allocates/inits `self->unkB4`; not in this unit).
 
 ## The one real residue and its fix
@@ -76,7 +76,7 @@ load-all-then-store-all form exactly.
 **Not needed here** in the "value read then re-read after a `jalr`" sense —
 `self->methods` IS written mid-function (`self->methods = Get_vtable_StreamTaskObj();`)
 and read again at the very end after two more calls
-(`GetDefaultStreamTaskInitData`/`func_80045438`) for `self->methods->slot40(self)`, but that
+(`GetDefaultStreamTaskInitData`/`New_MoviePlayer`) for `self->methods->slot40(self)`, but that
 final read is a **plain, single, natural field dereference** with no earlier
 same-expression read to conflict with — nothing needed caching because
 nothing was read twice. The lever from `TaskCoreObj__func_8003C3D0`/`TaskCoreObj__Reset` is

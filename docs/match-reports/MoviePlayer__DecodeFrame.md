@@ -1,4 +1,6 @@
-# func_80045CFC -- MATCHED (57/57 words)
+# MoviePlayer__DecodeFrame -- MATCHED (57/57 words)
+
+> Renamed from `func_80045CFC` on 2026-09-25 (tools/rename.py). Address 0x80045cfc.
 
 Round 82, runner echo (code_33808 session, echo #9), 2026-09-25. Unit `code_33808`.
 Byte-exact; whole-image SHA1 green (`./build-and-verify.sh`:
@@ -7,7 +9,7 @@ drift. Fresh ground (carved revision 18, no prior report).
 
 ## What it does
 
-Per-frame step of the MDEC movie player, active only when `self` is the object in D_8008A940: when a finished frame is pending (+0x44) it tail-returns its own +0x064; otherwise, when a frame is running (+0x40) it waits for the last strip (func_80045E18 spins on +0x4C), clears +0x4C, DrawSyncs when +0x34 is under 0x80, feeds the bitstream at +0x14[+0x3C] to DecDCTin (mode 2) and the first strip buffer (+0x1C, +0x38 words) to DecDCTout; then stores (own +0x058 returned 0) at +0x40 and returns 0. When not the active object it falls off the end (no return value set).
+Per-frame step of the MDEC movie player, active only when `self` is the object in D_8008A940: when a finished frame is pending (+0x44) it tail-returns its own +0x064; otherwise, when a frame is running (+0x40) it waits for the last strip (MoviePlayer__WaitFrameReady spins on +0x4C), clears +0x4C, DrawSyncs when +0x34 is under 0x80, feeds the bitstream at +0x14[+0x3C] to DecDCTin (mode 2) and the first strip buffer (+0x1C, +0x38 words) to DecDCTout; then stores (own +0x058 returned 0) at +0x40 and returns 0. When not the active object it falls off the end (no return value set).
 
 Table slot (`tools/classtable.py`): D_8006F614 +0x068.
 
@@ -50,13 +52,13 @@ typedef struct Obj45CFC {
 /* LIBPRESS.H */
 extern void DecDCTin(u32 *buf, int mode);
 
-s32 func_80045CFC(Obj45CFC *self) {
+s32 MoviePlayer__DecodeFrame(Obj45CFC *self) {
     Obj45CFC *cur = (Obj45CFC *)D_8008A940;
 
     if (cur == self) {
         if (cur->unk44 == 0) {
             if (cur->unk40 != 0) {
-                func_80045E18(cur);
+                MoviePlayer__WaitFrameReady(cur);
                 cur->unk4C = 0;
                 if (cur->unk34 < 0x80) {
                     DrawSync(0);

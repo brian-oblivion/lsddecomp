@@ -1,4 +1,6 @@
-# func_80045E44 -- MATCHED (4/4 words)
+# GetMoviePlayerMethods -- MATCHED (4/4 words)
+
+> Renamed from `func_80045E44` on 2026-09-25 (tools/rename.py). Address 0x80045e44.
 
 Round 82, runner echo (code_33808 session, echo #5), 2026-09-25. Unit `code_33808`.
 Byte-exact on the FIRST build; whole-image SHA1 green (`./build-and-verify.sh`:
@@ -16,7 +18,7 @@ Table slot (`tools/classtable.py`): none: no data word references it (reached so
 ```c
 extern s32 D_8006F614[];
 
-void *func_80045E44(void) {
+void *GetMoviePlayerMethods(void) {
     return D_8006F614;
 }
 ```

@@ -440,7 +440,7 @@ load through a runtime-indexed global", §"BLOCKED: the `nop_mflo_mfhi` screen r
   ZERO-argument call in the source**: 2.6.3 emits `move $a0,$s0` for an explicit `self` even when
   `$a0` already holds it. Declare the slot UNPROTOTYPED (`T (*slot)();`) in the local view so
   callers passing `self` stay legal C. **Neither form is a safe default**: the same situation matched
-  as `slot(self)` in `func_80045C94` (the zero-argument form moved a constant out of the delay slot
+  as `slot(self)` in `MoviePlayer__PollActive` (the zero-argument form moved a constant out of the delay slot
   and ran one word long) and as `slot()` in `func_80048BC0` and `TileMap__Load`. Try the other
   first when one misses. (round 82, code_39094 and code_33808)
 - **The same forward trace applies to a DEAD PARAMETER's register, which 2.6.3 reuses as scratch.**

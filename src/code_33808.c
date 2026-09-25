@@ -1401,13 +1401,13 @@ void *GetTodSetMethods(void) {
 }
 /* Allocate and construct a D_8006F614 object; freed and NULL when the
  * constructor returns nonzero (this ctor reports failure, not self). */
-void *func_80045E44(void);
+void *GetMoviePlayerMethods(void);
 
-void *func_80045438(s32 arg0, s32 arg1, s32 arg2) {
+void *New_MoviePlayer(s32 arg0, s32 arg1, s32 arg2) {
     void *obj = BMemPMgrAlloc(0x6C);
 
     if (obj != NULL) {
-        if (((Ctor33808 *)func_80045E44())->ctor(obj, arg0, arg1, arg2) == 0) {
+        if (((Ctor33808 *)GetMoviePlayerMethods())->ctor(obj, arg0, arg1, arg2) == 0) {
             return obj;
         }
         BMemPMgrFree(obj);
@@ -1416,9 +1416,9 @@ void *func_80045438(s32 arg0, s32 arg1, s32 arg2) {
 }
 /* D_8006F614 +0x008: constructor -- BasicClass's, then this table; open a
  * CD stream object (New_CdStreamObj(arg2, 15, 0)) at +0x60 and set up the
- * decode buffers (func_8004564C); 1 when either fails. Then reset the MDEC
+ * decode buffers (MoviePlayer__InitFrame); 1 when either fails. Then reset the MDEC
  * the first time any player is built (D_8008A93C), route its output
- * callback to func_80045DE0, hand the stream the ring buffer at +0x10
+ * callback to OnMdecFrameReady, hand the stream the ring buffer at +0x10
  * (0x12000), clear +0x50 and store 1 through its own +0x06C. 0. */
 typedef struct StreamMethods454C4 {
     /* +0x000 */ u8 pad0[0x40];
@@ -1445,23 +1445,23 @@ typedef struct Obj454C4 {
 } Obj454C4;
 
 extern void *New_CdStreamObj(s32 arg1, s32 arg2, s32 arg3);
-s32 func_8004564C();
+s32 MoviePlayer__InitFrame();
 extern s32 D_8008A93C;
 extern void DecDCTReset(int mode);
 extern int DecDCToutCallback(void (*func)());
-void func_80045DE0(void);
+void OnMdecFrameReady(void);
 
-s32 func_800454C4(Obj454C4 *self, s32 arg1, s32 arg2, s32 arg3) {
+s32 MoviePlayer__MoviePlayer(Obj454C4 *self, s32 arg1, s32 arg2, s32 arg3) {
     Get_vtable_BasicClass()->ctor((BasicClass *)self);
-    self->methods = func_80045E44();
+    self->methods = GetMoviePlayerMethods();
     self->stream = New_CdStreamObj(arg2, 15, 0);
     if (self->stream != NULL) {
-        if (func_8004564C(self, arg1, arg3) == 0) {
+        if (MoviePlayer__InitFrame(self, arg1, arg3) == 0) {
             if (D_8008A93C == 0) {
                 DecDCTReset(0);
             }
             D_8008A93C = 1;
-            DecDCToutCallback(func_80045DE0);
+            DecDCToutCallback(OnMdecFrameReady);
             self->stream->methods->slot40(self->stream, self->ring, 0x12000);
             self->unk50 = 0;
             self->methods->slot6C(self, 1);
@@ -1471,7 +1471,7 @@ s32 func_800454C4(Obj454C4 *self, s32 arg1, s32 arg2, s32 arg3) {
     return 1;
 }
 /* D_8006F614 +0x00C: finalize -- release the object at +0x60, detach and
- * reset the MDEC decoder, free the four buffers (func_8004575C), then
+ * reset the MDEC decoder, free the four buffers (MoviePlayer__FreeFrameBuffers), then
  * BasicClass's finalize. */
 typedef struct Obj455D4 {
     /* +0x000 */ u8 pad0[0x60];
@@ -1481,19 +1481,19 @@ typedef struct Obj455D4 {
 /* LIBPRESS.H */
 extern void DecDCTReset(int mode);
 extern int DecDCToutCallback(void (*func)());
-void func_8004575C();
+void MoviePlayer__FreeFrameBuffers();
 
-void func_800455D4(Obj455D4 *self) {
+void MoviePlayer__Finalize(Obj455D4 *self) {
     self->unk60 = self->unk60->methods->release(self->unk60);
     DecDCToutCallback(NULL);
     DecDCTReset(0);
-    func_8004575C(self);
+    MoviePlayer__FreeFrameBuffers(self);
     Get_vtable_BasicClass()->finalize((BasicClass *)self);
 }
 /* Set up the MDEC player's frame: keep `external` at +0x0C and, unless the
  * caller provides the buffers, allocate the two decode buffers (w * h * 2 +
  * 0x1000 each), the 0x12000 ring and the h * 32 strip buffer -- on a failure
- * free what was allocated (func_8004575C) and return 1. Then the frame
+ * free what was allocated (MoviePlayer__FreeFrameBuffers) and return 1. Then the frame
  * descriptor goes to +0x2C and +0x20, the strip at +0x2C is 16 wide and
  * +0x38 is its size in words. 0. */
 typedef struct Frame4564C {
@@ -1514,7 +1514,7 @@ typedef struct Obj4564C {
     /* +0x038 */ s32 stripSize;
 } Obj4564C;
 
-s32 func_8004564C(Obj4564C *self, Frame4564C *desc, s32 external) {
+s32 MoviePlayer__InitFrame(Obj4564C *self, Frame4564C *desc, s32 external) {
     s32 size;
     s32 unused[2];
 
@@ -1544,7 +1544,7 @@ s32 func_8004564C(Obj4564C *self, Frame4564C *desc, s32 external) {
     self->stripSize = (self->cur.h << 4) >> 1;
     return 0;
 fail:
-    func_8004575C(self);
+    MoviePlayer__FreeFrameBuffers(self);
     return 1;
 }
 /* Unless +0x0C is set, free the four allocations at +0x14, +0x18, +0x10,
@@ -1558,7 +1558,7 @@ typedef struct Obj4575C {
     /* +0x01C */ void *unk1C;
 } Obj4575C;
 
-void func_8004575C(Obj4575C *self) {
+void MoviePlayer__FreeFrameBuffers(Obj4575C *self) {
     if (self->unkC == 0) {
         BMemPMgrFree(self->unk14);
         BMemPMgrFree(self->unk18);
@@ -1567,7 +1567,7 @@ void func_8004575C(Obj4575C *self) {
     }
 }
 /* D_8006F614 +0x040: start playing -- only when no movie is active
- * (D_8008A940): optionally func_800458AC first (+0x68), keep `arg2` at
+ * (D_8008A940): optionally MoviePlayer__MarkPlaying first (+0x68), keep `arg2` at
  * +0x5C, open `name` on the stream object at +0x60 (its +0x044, 100); 1 when
  * that fails. Otherwise become the active movie, reset the state words, keep
  * `arg3`/`arg4` at +0x54/+0x58 and register D_8008A944 with the frame
@@ -1611,14 +1611,14 @@ typedef struct DrawSys457C0 {
 extern DataSrc33808 *D_8008A940;
 extern s32 D_8008A944;
 extern void *GetDrawSystem(void);
-void func_800458AC();
+void MoviePlayer__MarkPlaying();
 
-s32 func_800457C0(Obj457C0 *self, char *name, s32 arg2, s32 arg3, s32 arg4) {
+s32 MoviePlayer__Play(Obj457C0 *self, char *name, s32 arg2, s32 arg3, s32 arg4) {
     DrawSys457C0 *ds;
 
     if (D_8008A940 == NULL) {
         if (self->unk68 != 0) {
-            func_800458AC(self);
+            MoviePlayer__MarkPlaying(self);
         }
         self->unk5C = arg2;
         if (self->unk60->methods->open(self->unk60, name, 100) == 0) {
@@ -1645,11 +1645,11 @@ typedef struct Obj33808_50 {
     s32 unk50;
 } Obj33808_50;
 
-void func_800458AC(Obj33808_50 *self) {
+void MoviePlayer__MarkPlaying(Obj33808_50 *self) {
     self->unk50 = 1;
 }
 /* D_8006F614 +0x044: when this is the object in D_8008A940, reset its
- * state words, hand the object at +0x60 func_8004593C (and self) through
+ * state words, hand the object at +0x60 MoviePlayer__MarkStopped (and self) through
  * that object's +0x07C, clear +0x64, and call its +0x058. */
 typedef struct Methods458B8 {
     /* +0x000 */ u8 pad0[0x48];
@@ -1679,9 +1679,9 @@ typedef struct Obj458B8 {
 } Obj458B8;
 
 extern DataSrc33808 *D_8008A940;
-void func_8004593C();
+void MoviePlayer__MarkStopped();
 
-void func_800458B8(Obj458B8 *self) {
+void MoviePlayer__Stop(Obj458B8 *self) {
     Obj458B8 *cur = (Obj458B8 *)D_8008A940;
 
     if (cur == self) {
@@ -1690,12 +1690,12 @@ void func_800458B8(Obj458B8 *self) {
         cur->unk4C = 1;
         cur->unk48 = 0;
         cur->unk44 = 0;
-        cur->unk60->methods->slot7C(cur->unk60, func_8004593C, cur);
+        cur->unk60->methods->slot7C(cur->unk60, MoviePlayer__MarkStopped, cur);
         cur->unk64 = 0;
         cur->unk60->methods->slot58(cur->unk60);
     }
 }
-void func_8004593C(Obj33808_50 *self) {
+void MoviePlayer__MarkStopped(Obj33808_50 *self) {
     self->unk50 = -1;
 }
 /* D_8006F614 +0x048: when this is the object in D_8008A940 -- with the
@@ -1730,7 +1730,7 @@ typedef struct Obj45948 {
     /* +0x064 */ s32 unk64;
 } Obj45948;
 
-s32 func_80045948(Obj45948 *self) {
+s32 MoviePlayer__Advance(Obj45948 *self) {
     Obj45948 *cur = (Obj45948 *)D_8008A940;
 
     if (cur == self) {
@@ -1757,7 +1757,7 @@ out:
 /* D_8006F614 +0x04C: when this is the object in D_8008A940, set +0x48,
  * clear +0x54, call the +0x60 object's +0x048, set +0x44, and the first
  * time (+0x64 clear) clear that object's +0x07C callback and set +0x64. */
-void func_80045A38(Obj458B8 *self) {
+void MoviePlayer__Abort(Obj458B8 *self) {
     Obj458B8 *cur = (Obj458B8 *)D_8008A940;
 
     if (cur == self) {
@@ -1772,9 +1772,9 @@ void func_80045A38(Obj458B8 *self) {
         }
     }
 }
-void func_80045AC8(void) {
+void MoviePlayer__NoOpSlot50(void) {
 }
-void func_80045AD0(void) {
+void MoviePlayer__NoOpSlot54(void) {
 }
 /* D_8006F614 +0x058: unless the stream has ended (+0x48), pull the next
  * frame from the object at +0x60 (its +0x06C); 1 when there is none. With
@@ -1807,7 +1807,7 @@ typedef struct Obj45AD8 {
 /* LIBPRESS.H */
 extern int DecDCTvlc(u32 *bs, u32 *buf);
 
-s32 func_80045AD8(Obj45AD8 *self) {
+s32 MoviePlayer__PullFrame(Obj45AD8 *self) {
     u32 *data;
     s32 size;
     s32 r;
@@ -1829,7 +1829,7 @@ s32 func_80045AD8(Obj45AD8 *self) {
     }
     return 1;
 }
-void func_80045BC0(void) {
+void MoviePlayer__NoOpFreeBuffer(void) {
 }
 /* D_8006F614 +0x060: upload the decoded strip at +0x1C into the rectangle
  * at +0x2C (DrawSystem +0x058), step the rectangle right by its width, and
@@ -1872,7 +1872,7 @@ typedef struct Obj45BC8 {
 extern int DrawSync(int mode);
 extern void DecDCTout(u32 *buf, int size);
 
-void func_80045BC8(Obj45BC8 *self) {
+void MoviePlayer__DrawStrip(Obj45BC8 *self) {
     DrawSys45BC8 *ds = (DrawSys45BC8 *)GetDrawSystem();
 
     ds->methods->loadImage(ds, &self->rect, self->strip);
@@ -1909,7 +1909,7 @@ typedef struct Obj45C94 {
 extern s32 D_8008A948;
 extern DataSrc33808 *D_8008A940;
 
-s32 func_80045C94(Obj45C94 *self) {
+s32 MoviePlayer__PollActive(Obj45C94 *self) {
     if (self->unk54 != 0) {
         if (D_8008A948++ > 100) {
             D_8008A948 = 1;
@@ -1951,15 +1951,15 @@ typedef struct Obj45CFC {
 /* LIBPRESS.H */
 extern void DecDCTin(u32 *buf, int mode);
 
-void func_80045E18(Obj45CFC *self);  /* defined below (ROM order) */
+void MoviePlayer__WaitFrameReady(Obj45CFC *self);  /* defined below (ROM order) */
 
-s32 func_80045CFC(Obj45CFC *self) {
+s32 MoviePlayer__DecodeFrame(Obj45CFC *self) {
     Obj45CFC *cur = (Obj45CFC *)D_8008A940;
 
     if (cur == self) {
         if (cur->unk44 == 0) {
             if (cur->unk40 != 0) {
-                func_80045E18(cur);
+                MoviePlayer__WaitFrameReady(cur);
                 cur->unk4C = 0;
                 if (cur->unk34 < 0x80) {
                     DrawSync(0);
@@ -1976,14 +1976,14 @@ s32 func_80045CFC(Obj45CFC *self) {
 extern DataSrc33808 *D_8008A940;
 
 /* Slot +0x060 of the object in D_8008A940, when there is one. */
-void func_80045DE0(void) {
+void OnMdecFrameReady(void) {
     if (D_8008A940 != NULL) {
         ((void (*)())D_8008A940->methods->slot60)(D_8008A940);
     }
 }
-/* Hang until +0x4C is nonzero (it is read once). func_80045CFC's only call
+/* Hang until +0x4C is nonzero (it is read once). MoviePlayer__DecodeFrame's only call
  * passes its D_8008A940 object, so the parameter is that Obj45CFC view. */
-void func_80045E18(Obj45CFC *self) {
+void MoviePlayer__WaitFrameReady(Obj45CFC *self) {
     while (self->unk4C == 0) {
     }
 }
@@ -1993,11 +1993,11 @@ typedef struct Obj6F614 {
     s32 unk68;
 } Obj6F614;
 
-void func_80045E3C(Obj6F614 *self, s32 value) {
+void MoviePlayer__SetResult(Obj6F614 *self, s32 value) {
     self->unk68 = value;
 }
 extern s32 D_8006F614[];
 
-void *func_80045E44(void) {
+void *GetMoviePlayerMethods(void) {
     return D_8006F614;
 }

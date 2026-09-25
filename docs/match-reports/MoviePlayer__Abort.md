@@ -1,4 +1,6 @@
-# func_80045A38 -- MATCHED (36/36 words)
+# MoviePlayer__Abort -- MATCHED (36/36 words)
+
+> Renamed from `func_80045A38` on 2026-09-25 (tools/rename.py). Address 0x80045a38.
 
 Round 82, runner echo (code_33808 session, echo #8), 2026-09-25. Unit `code_33808`.
 Byte-exact; whole-image SHA1 green (`./build-and-verify.sh`:
@@ -7,7 +9,7 @@ drift. Fresh ground (carved revision 18, no prior report).
 
 ## What it does
 
-Only when self is the object in D_8008A940: set +0x48 = 1, clear +0x54, call the +0x60 object's +0x048 with it, set +0x44 = 1; then, if +0x64 is clear, call the +0x60 object's +0x07C with (obj, 0, 0) (clearing the callback func_800458B8 installed), set +0x64 = 1 and +0x44 = 1 again.
+Only when self is the object in D_8008A940: set +0x48 = 1, clear +0x54, call the +0x60 object's +0x048 with it, set +0x44 = 1; then, if +0x64 is clear, call the +0x60 object's +0x07C with (obj, 0, 0) (clearing the callback MoviePlayer__Stop installed), set +0x64 = 1 and +0x44 = 1 again.
 
 Table slot (`tools/classtable.py`): D_8006F614 +0x04C.
 
@@ -49,7 +51,7 @@ typedef struct Obj458B8 {
 /* D_8006F614 +0x04C: when this is the object in D_8008A940, set +0x48,
  * clear +0x54, call the +0x60 object's +0x048, set +0x44, and the first
  * time (+0x64 clear) clear that object's +0x07C callback and set +0x64. */
-void func_80045A38(Obj458B8 *self) {
+void MoviePlayer__Abort(Obj458B8 *self) {
     Obj458B8 *cur = (Obj458B8 *)D_8008A940;
 
     if (cur == self) {
@@ -68,4 +70,4 @@ void func_80045A38(Obj458B8 *self) {
 
 ## Notes
 
-First build. The same through-the-global shape as func_800458B8 (a local `cur` copy of D_8008A940). The duplicated `unk44 = 1` is real source: retail stores it in the bnez delay slot (both paths) and again inside the if. Views Methods458B8/Obj458B8 (defined at func_800458B8) gained slot48 and unk54 additively.
+First build. The same through-the-global shape as MoviePlayer__Stop (a local `cur` copy of D_8008A940). The duplicated `unk44 = 1` is real source: retail stores it in the bnez delay slot (both paths) and again inside the if. Views Methods458B8/Obj458B8 (defined at MoviePlayer__Stop) gained slot48 and unk54 additively.

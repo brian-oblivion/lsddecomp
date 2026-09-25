@@ -21,7 +21,7 @@ void StreamTaskObj__StreamTaskObj(StreamTaskObj *self, s32 a1, s32 a2, s32 a3, S
     } else {
         self->unkA8 = *GetDefaultStreamTaskInitData();
     }
-    self->unkB4 = func_80045438(GetDefaultStreamTaskInitData(), 0, 0);
+    self->unkB4 = New_MoviePlayer(GetDefaultStreamTaskInitData(), 0, 0);
     self->unkB8 = 0;
     self->methods->slot40(self);
 }

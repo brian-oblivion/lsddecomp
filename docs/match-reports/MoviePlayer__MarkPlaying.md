@@ -1,4 +1,6 @@
-# func_8004593C -- MATCHED (3/3 words)
+# MoviePlayer__MarkPlaying -- MATCHED (3/3 words)
+
+> Renamed from `func_800458AC` on 2026-09-25 (tools/rename.py). Address 0x800458ac.
 
 Round 82, runner echo (code_33808 session), 2026-09-25. Unit `code_33808`.
 Byte-exact on the FIRST build; whole-image SHA1 green (`./build-and-verify.sh`:
@@ -7,15 +9,22 @@ deletions, no out-of-range drift. Fresh ground (carved revision 18, no prior rep
 
 ## What it does
 
-Setter: `li v0,-1; jr ra; sw v0,0x50(a0)` = `self->unk50 = -1;`, same view as func_800458AC.
+Setter: `li v0,1; jr ra; sw v0,0x50(a0)` = `self->unk50 = 1;` through a minimal unit-local view.
 
 Table slot (`tools/classtable.py`): none (in no method table; called directly).
 
 ## Source
 
 ```c
-void func_8004593C(Obj33808_50 *self) {
-    self->unk50 = -1;
+/* A class with an s32 at +0x50, set to 1 / -1 by the two setters below;
+ * the class is not yet identified (neither setter sits in a method table). */
+typedef struct Obj33808_50 {
+    u8 pad0[0x50];
+    s32 unk50;
+} Obj33808_50;
+
+void MoviePlayer__MarkPlaying(Obj33808_50 *self) {
+    self->unk50 = 1;
 }
 ```
 

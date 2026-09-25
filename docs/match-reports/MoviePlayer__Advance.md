@@ -1,4 +1,6 @@
-# func_80045948 -- MATCHED (60/60 words)
+# MoviePlayer__Advance -- MATCHED (60/60 words)
+
+> Renamed from `func_80045948` on 2026-09-25 (tools/rename.py). Address 0x80045948.
 
 Round 82, runner echo (code_33808 session, echo #9), 2026-09-25. Unit `code_33808`.
 Byte-exact; whole-image SHA1 green (`./build-and-verify.sh`:
@@ -51,7 +53,7 @@ typedef struct Obj45948 {
     /* +0x064 */ s32 unk64;
 } Obj45948;
 
-s32 func_80045948(Obj45948 *self) {
+s32 MoviePlayer__Advance(Obj45948 *self) {
     Obj45948 *cur = (Obj45948 *)D_8008A940;
 
     if (cur == self) {

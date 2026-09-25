@@ -1,4 +1,6 @@
-# func_800455D4 -- MATCHED (30/30 words)
+# MoviePlayer__Finalize -- MATCHED (30/30 words)
+
+> Renamed from `func_800455D4` on 2026-09-25 (tools/rename.py). Address 0x800455d4.
 
 Round 82, runner echo (code_33808 session, echo #8), 2026-09-25. Unit `code_33808`.
 Byte-exact; whole-image SHA1 green (`./build-and-verify.sh`:
@@ -7,7 +9,7 @@ drift. Fresh ground (carved revision 18, no prior report).
 
 ## What it does
 
-Finalize: releases the object at +0x60 through its own release slot (+0x004) and stores the result (NULL) back, DecDCToutCallback(NULL), DecDCTReset(0) (libpress, Sony), func_8004575C(self) (frees four buffers), then Get_vtable_BasicClass()->finalize(self).
+Finalize: releases the object at +0x60 through its own release slot (+0x004) and stores the result (NULL) back, DecDCToutCallback(NULL), DecDCTReset(0) (libpress, Sony), MoviePlayer__FreeFrameBuffers(self) (frees four buffers), then Get_vtable_BasicClass()->finalize(self).
 
 Table slot (`tools/classtable.py`): D_8006F614 +0x00C.
 
@@ -24,15 +26,15 @@ typedef struct Obj455D4 {
     /* +0x060 */ BasicClass *unk60;
 } Obj455D4;
 
-void func_800455D4(Obj455D4 *self) {
+void MoviePlayer__Finalize(Obj455D4 *self) {
     self->unk60 = self->unk60->methods->release(self->unk60);
     DecDCToutCallback(NULL);
     DecDCTReset(0);
-    func_8004575C(self);
+    MoviePlayer__FreeFrameBuffers(self);
     Get_vtable_BasicClass()->finalize((BasicClass *)self);
 }
 ```
 
 ## Notes
 
-First build. DecDCT* declared locally with LIBPRESS.H's prototypes; func_8004575C forward-declared unprototyped (its definition later in the file takes the unit-local Obj4575C *).
+First build. DecDCT* declared locally with LIBPRESS.H's prototypes; MoviePlayer__FreeFrameBuffers forward-declared unprototyped (its definition later in the file takes the unit-local Obj4575C *).

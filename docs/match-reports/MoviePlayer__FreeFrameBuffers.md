@@ -1,4 +1,6 @@
-# func_8004575C -- MATCHED (25/25 words)
+# MoviePlayer__FreeFrameBuffers -- MATCHED (25/25 words)
+
+> Renamed from `func_8004575C` on 2026-09-25 (tools/rename.py). Address 0x8004575c.
 
 Round 82, runner echo (code_33808 session, echo #7), 2026-09-25. Unit `code_33808`.
 Byte-exact; whole-image SHA1 green (`./build-and-verify.sh`:
@@ -29,7 +31,7 @@ typedef struct Obj4575C {
     /* +0x01C */ void *unk1C;
 } Obj4575C;
 
-void func_8004575C(Obj4575C *self) {
+void MoviePlayer__FreeFrameBuffers(Obj4575C *self) {
     if (self->unkC == 0) {
         BMemPMgrFree(self->unk14);
         BMemPMgrFree(self->unk18);

@@ -1,4 +1,6 @@
-# func_800454C4 -- MATCHED (68/68 words)
+# MoviePlayer__MoviePlayer -- MATCHED (68/68 words)
+
+> Renamed from `func_800454C4` on 2026-09-25 (tools/rename.py). Address 0x800454c4.
 
 Round 82, runner echo (code_33808 session, echo #9), 2026-09-25. Unit `code_33808`.
 Byte-exact; whole-image SHA1 green (`./build-and-verify.sh`:
@@ -7,9 +9,9 @@ drift. Fresh ground (carved revision 18, no prior report).
 
 ## What it does
 
-Constructor of the MDEC movie player: BasicClass's ctor, install D_8006F614, open a CD stream object with New_CdStreamObj(arg2, 15, 0) into +0x60, then func_8004564C(self, arg1, arg3) sets up the decode buffers. Returns 1 if either fails. Otherwise DecDCTReset(0) the first time any player is built (D_8008A93C latch), set the DecDCTout callback to func_80045DE0, hand the stream the ring buffer at +0x10 with size 0x12000 (its +0x040), clear +0x50, call its own +0x06C with 1 (func_80045E3C stores it at +0x68) and return 0.
+Constructor of the MDEC movie player: BasicClass's ctor, install D_8006F614, open a CD stream object with New_CdStreamObj(arg2, 15, 0) into +0x60, then MoviePlayer__InitFrame(self, arg1, arg3) sets up the decode buffers. Returns 1 if either fails. Otherwise DecDCTReset(0) the first time any player is built (D_8008A93C latch), set the DecDCTout callback to OnMdecFrameReady, hand the stream the ring buffer at +0x10 with size 0x12000 (its +0x040), clear +0x50, call its own +0x06C with 1 (MoviePlayer__SetResult stores it at +0x68) and return 0.
 
-Table slot (`tools/classtable.py`): D_8006F614 +0x008 (its allocator func_80045438 treats 0 as success).
+Table slot (`tools/classtable.py`): D_8006F614 +0x008 (its allocator New_MoviePlayer treats 0 as success).
 
 ## Source
 
@@ -21,9 +23,9 @@ top of / earlier in `src/code_33808.c`.
 ```c
 /* D_8006F614 +0x008: constructor -- BasicClass's, then this table; open a
  * CD stream object (New_CdStreamObj(arg2, 15, 0)) at +0x60 and set up the
- * decode buffers (func_8004564C); 1 when either fails. Then reset the MDEC
+ * decode buffers (MoviePlayer__InitFrame); 1 when either fails. Then reset the MDEC
  * the first time any player is built (D_8008A93C), route its output
- * callback to func_80045DE0, hand the stream the ring buffer at +0x10
+ * callback to OnMdecFrameReady, hand the stream the ring buffer at +0x10
  * (0x12000), clear +0x50 and store 1 through its own +0x06C. 0. */
 typedef struct StreamMethods454C4 {
     /* +0x000 */ u8 pad0[0x40];
@@ -50,23 +52,23 @@ typedef struct Obj454C4 {
 } Obj454C4;
 
 extern void *New_CdStreamObj(s32 arg1, s32 arg2, s32 arg3);
-s32 func_8004564C();
+s32 MoviePlayer__InitFrame();
 extern s32 D_8008A93C;
 extern void DecDCTReset(int mode);
 extern int DecDCToutCallback(void (*func)());
-void func_80045DE0(void);
+void OnMdecFrameReady(void);
 
-s32 func_800454C4(Obj454C4 *self, s32 arg1, s32 arg2, s32 arg3) {
+s32 MoviePlayer__MoviePlayer(Obj454C4 *self, s32 arg1, s32 arg2, s32 arg3) {
     Get_vtable_BasicClass()->ctor((BasicClass *)self);
-    self->methods = func_80045E44();
+    self->methods = GetMoviePlayerMethods();
     self->stream = New_CdStreamObj(arg2, 15, 0);
     if (self->stream != NULL) {
-        if (func_8004564C(self, arg1, arg3) == 0) {
+        if (MoviePlayer__InitFrame(self, arg1, arg3) == 0) {
             if (D_8008A93C == 0) {
                 DecDCTReset(0);
             }
             D_8008A93C = 1;
-            DecDCToutCallback(func_80045DE0);
+            DecDCToutCallback(OnMdecFrameReady);
             self->stream->methods->slot40(self->stream, self->ring, 0x12000);
             self->unk50 = 0;
             self->methods->slot6C(self, 1);
@@ -79,4 +81,4 @@ s32 func_800454C4(Obj454C4 *self, s32 arg1, s32 arg2, s32 arg3) {
 
 ## Notes
 
-First build, written straight away in the nested success-path shape (`if (stream != NULL) { if (func_8004564C(...) == 0) { ...; return 0; } } return 1;`) that this session's func_800457C0/func_80045AD8 established: retail's two failure exits share one `return 1` block, whose `li v0,1` reorg stole into the second branch's delay slot. Local views `Obj454C4`/`Methods454C4`/`Stream454C4` just above; New_CdStreamObj (code_3770c.c) is prototyped locally with void * return. DecDCTReset/DecDCToutCallback are Sony's (LIBPRESS), extern only.
+First build, written straight away in the nested success-path shape (`if (stream != NULL) { if (MoviePlayer__InitFrame(...) == 0) { ...; return 0; } } return 1;`) that this session's MoviePlayer__Play/MoviePlayer__PullFrame established: retail's two failure exits share one `return 1` block, whose `li v0,1` reorg stole into the second branch's delay slot. Local views `Obj454C4`/`Methods454C4`/`Stream454C4` just above; New_CdStreamObj (code_3770c.c) is prototyped locally with void * return. DecDCTReset/DecDCToutCallback are Sony's (LIBPRESS), extern only.

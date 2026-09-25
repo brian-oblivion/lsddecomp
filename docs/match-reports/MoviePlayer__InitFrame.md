@@ -1,4 +1,6 @@
-# func_8004564C -- MATCHED (68/68 words)
+# MoviePlayer__InitFrame -- MATCHED (68/68 words)
+
+> Renamed from `func_8004564C` on 2026-09-25 (tools/rename.py). Address 0x8004564c.
 
 Round 82, runner echo (code_33808 session, echo #9), 2026-09-25. Unit `code_33808`.
 Byte-exact; whole-image SHA1 green (`./build-and-verify.sh`:
@@ -7,9 +9,9 @@ drift. Fresh ground (carved revision 18, no prior report).
 
 ## What it does
 
-Set up the MDEC player's buffers and frame: store `external` at +0x0C; unless external, zero +0x1C/+0x18/+0x14/+0x10, then allocate the two decode buffers (w * h * 2 + 0x1000 each) at +0x14/+0x18, the 0x12000 stream ring at +0x10 and the h * 32 strip buffer at +0x1C, any failure going to func_8004575C (free them) and return 1. Then copy the 12-byte frame descriptor {s16 x, y; s32 w, h} to +0x2C and from there to +0x20, set the strip width (+0x30) to 16 and +0x38 = (h << 4) >> 1 (the strip's size in words, the DecDCTout size func_80045BC8 uses). 0.
+Set up the MDEC player's buffers and frame: store `external` at +0x0C; unless external, zero +0x1C/+0x18/+0x14/+0x10, then allocate the two decode buffers (w * h * 2 + 0x1000 each) at +0x14/+0x18, the 0x12000 stream ring at +0x10 and the h * 32 strip buffer at +0x1C, any failure going to MoviePlayer__FreeFrameBuffers (free them) and return 1. Then copy the 12-byte frame descriptor {s16 x, y; s32 w, h} to +0x2C and from there to +0x20, set the strip width (+0x30) to 16 and +0x38 = (h << 4) >> 1 (the strip's size in words, the DecDCTout size MoviePlayer__DrawStrip uses). 0.
 
-Table slot (`tools/classtable.py`): not in any method table (called by the D_8006F614 ctor func_800454C4).
+Table slot (`tools/classtable.py`): not in any method table (called by the D_8006F614 ctor MoviePlayer__MoviePlayer).
 
 ## Source
 
@@ -22,7 +24,7 @@ top of / earlier in `src/code_33808.c`.
 /* Set up the MDEC player's frame: keep `external` at +0x0C and, unless the
  * caller provides the buffers, allocate the two decode buffers (w * h * 2 +
  * 0x1000 each), the 0x12000 ring and the h * 32 strip buffer -- on a failure
- * free what was allocated (func_8004575C) and return 1. Then the frame
+ * free what was allocated (MoviePlayer__FreeFrameBuffers) and return 1. Then the frame
  * descriptor goes to +0x2C and +0x20, the strip at +0x2C is 16 wide and
  * +0x38 is its size in words. 0. */
 typedef struct Frame4564C {
@@ -43,7 +45,7 @@ typedef struct Obj4564C {
     /* +0x038 */ s32 stripSize;
 } Obj4564C;
 
-s32 func_8004564C(Obj4564C *self, Frame4564C *desc, s32 external) {
+s32 MoviePlayer__InitFrame(Obj4564C *self, Frame4564C *desc, s32 external) {
     s32 size;
     s32 unused[2];
 
@@ -73,7 +75,7 @@ s32 func_8004564C(Obj4564C *self, Frame4564C *desc, s32 external) {
     self->stripSize = (self->cur.h << 4) >> 1;
     return 0;
 fail:
-    func_8004575C(self);
+    MoviePlayer__FreeFrameBuffers(self);
     return 1;
 }
 ```

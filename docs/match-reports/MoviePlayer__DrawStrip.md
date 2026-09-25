@@ -1,4 +1,6 @@
-# func_80045BC8 -- MATCHED (51/51 words)
+# MoviePlayer__DrawStrip -- MATCHED (51/51 words)
+
+> Renamed from `func_80045BC8` on 2026-09-25 (tools/rename.py). Address 0x80045bc8.
 
 Round 82, runner echo (code_33808 session, echo #8), 2026-09-25. Unit `code_33808`.
 Byte-exact; whole-image SHA1 green (`./build-and-verify.sh`:
@@ -51,7 +53,7 @@ typedef struct Obj45BC8 {
     /* +0x04C */ s32 unk4C;
 } Obj45BC8;
 
-void func_80045BC8(Obj45BC8 *self) {
+void MoviePlayer__DrawStrip(Obj45BC8 *self) {
     DrawSys45BC8 *ds = GetDrawSystem();
 
     ds->methods->loadImage(ds, &self->rect, self->strip);

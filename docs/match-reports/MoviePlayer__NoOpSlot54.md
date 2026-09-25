@@ -1,4 +1,6 @@
-# func_80045E3C -- MATCHED (2/2 words)
+# MoviePlayer__NoOpSlot54 -- MATCHED (2/2 words)
+
+> Renamed from `func_80045AD0` on 2026-09-25 (tools/rename.py). Address 0x80045ad0.
 
 Round 82, runner echo (code_33808 session), 2026-09-25. Unit `code_33808`.
 Byte-exact on the FIRST build; whole-image SHA1 green (`./build-and-verify.sh`:
@@ -7,21 +9,14 @@ deletions, no out-of-range drift. Fresh ground (carved revision 18, no prior rep
 
 ## What it does
 
-One-line setter: `sw a1, 0x68(a0)` in the jr delay slot = `self->unk68 = value;` (s32 field; the class of D_8006F614 has no header yet, so a minimal unit-local view `Obj6F614`).
+Empty method (`jr ra; nop`).
 
-Table slot (`tools/classtable.py`): `D_8006F614` +0x06C.
+Table slot (`tools/classtable.py`): `D_8006F614` +0x054.
 
 ## Source
 
 ```c
-/* D_8006F614 +0x06C: stores its argument at +0x68. */
-typedef struct Obj6F614 {
-    u8 pad0[0x68];
-    s32 unk68;
-} Obj6F614;
-
-void func_80045E3C(Obj6F614 *self, s32 value) {
-    self->unk68 = value;
+void MoviePlayer__NoOpSlot54(void) {
 }
 ```
 

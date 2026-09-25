@@ -1,4 +1,6 @@
-# func_80045DE0 -- MATCHED (14/14 words)
+# OnMdecFrameReady -- MATCHED (14/14 words)
+
+> Renamed from `func_80045DE0` on 2026-09-25 (tools/rename.py). Address 0x80045de0.
 
 Round 82, runner echo (code_33808 session, echo #6), 2026-09-25. Unit `code_33808`.
 Byte-exact on the FIRST build; whole-image SHA1 green (`./build-and-verify.sh`:
@@ -22,7 +24,7 @@ Slot +0x078 is `void *slot78` in the unified macro, so calls cast it.
 extern DataSrc33808 *D_8008A940;
 
 /* Slot +0x060 of the object in D_8008A940, when there is one. */
-void func_80045DE0(void) {
+void OnMdecFrameReady(void) {
     if (D_8008A940 != NULL) {
         ((void (*)())D_8008A940->methods->slot60)(D_8008A940);
     }

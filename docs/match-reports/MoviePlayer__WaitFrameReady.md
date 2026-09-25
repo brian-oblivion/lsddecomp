@@ -1,4 +1,6 @@
-# func_80045E18 -- MATCHED (9/9 words)
+# MoviePlayer__WaitFrameReady -- MATCHED (9/9 words)
+
+> Renamed from `func_80045E18` on 2026-09-25 (tools/rename.py). Address 0x80045e18.
 
 Round 82, runner echo (code_33808 session, echo #6), 2026-09-25. Unit `code_33808`.
 Byte-exact on the FIRST build; whole-image SHA1 green (`./build-and-verify.sh`:
@@ -19,9 +21,9 @@ fields +0x2C..+0x38) and `CountedBuf33808` sit at the top of `src/code_33808.c`.
 Slot +0x078 is `void *slot78` in the unified macro, so calls cast it.
 
 ```c
-/* Hang until +0x4C is nonzero (it is read once). func_80045CFC's only call
+/* Hang until +0x4C is nonzero (it is read once). MoviePlayer__DecodeFrame's only call
  * passes its D_8008A940 object, so the parameter is that Obj45CFC view. */
-void func_80045E18(Obj45CFC *self) {
+void MoviePlayer__WaitFrameReady(Obj45CFC *self) {
     while (self->unk4C == 0) {
     }
 }
@@ -30,8 +32,8 @@ void func_80045E18(Obj45CFC *self) {
 ## Declaration (round 82, alpha)
 
 Was matched with its own view `Obj45E18` and no prototype, so its only
-caller func_80045CFC (defined earlier in ROM order) declared it implicitly
-as `int` and cc1 warned six times. The parameter is now func_80045CFC's own
+caller MoviePlayer__DecodeFrame (defined earlier in ROM order) declared it implicitly
+as `int` and cc1 warned six times. The parameter is now MoviePlayer__DecodeFrame's own
 `Obj45CFC` (whose +0x4C is the same `unk4C`), with a prototype above that
 caller. Byte-identical.
 

@@ -1,4 +1,6 @@
-# func_80045AC8 -- MATCHED (2/2 words)
+# MoviePlayer__NoOpFreeBuffer -- MATCHED (2/2 words)
+
+> Renamed from `func_80045BC0` on 2026-09-25 (tools/rename.py). Address 0x80045bc0.
 
 Round 82, runner echo (code_33808 session), 2026-09-25. Unit `code_33808`.
 Byte-exact on the FIRST build; whole-image SHA1 green (`./build-and-verify.sh`:
@@ -9,12 +11,12 @@ deletions, no out-of-range drift. Fresh ground (carved revision 18, no prior rep
 
 Empty method (`jr ra; nop`).
 
-Table slot (`tools/classtable.py`): `D_8006F614` +0x050.
+Table slot (`tools/classtable.py`): `D_8006F614` +0x05C.
 
 ## Source
 
 ```c
-void func_80045AC8(void) {
+void MoviePlayer__NoOpFreeBuffer(void) {
 }
 ```
 
