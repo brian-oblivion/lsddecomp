@@ -1,58 +1,52 @@
 /*
- * code_2cc8c_f -- the `Obj6EAC0` class (base table `gBoxFillMethods`, override
- * table `D_8006EB90`; see include/code_2cc8c.h for the full derivation)
- * plus three unrelated free functions that happen to live in this file
- * (`DecodeFullWidthSjis`/`EncodeFullWidthSjis`/`FormatFullWidthNumber`,
- * confirmed by their OWN callers elsewhere to take a plain buffer, not an
- * `Obj6EAC0 *`, despite matching this file's dominant `self`-typed style).
+ * code_2cc8c_f -- two classes and three free functions.
  *
- * Named round 54 (runner alpha, track 3); every non-`func_` symbol below
- * is new this round. Working hypothesis (tier B, this unit's own evidence
- * only -- see include/code_2cc8c.h's own `Obj6EAC0` comment for the full
- * case): a small on-screen text/digit display. A leaf instance
- * (`hasChildren`==0) is one character glyph (`SetChar`); a container
- * instance holds a `children` array laid out along one axis, `posX`/
- * `posY` as a running cursor advanced by `childPitch` per child, with one
- * extra gap inserted at `gapIndex` (plausibly a decimal point). `SetText`
- * walks a string dispatching one child per byte, and this file's own
- * `FormatFullWidthNumber` builds exactly the padded, Shift-JIS-encoded
- * digit string `SetText` would consume.
+ * BoxFill (class id 0x64, gBoxFillMethods, include/BoxFill.h), the
+ * functions from BoxFill__AttachToParent to GetBoxFillMethods: a GsBOXF
+ * screen rectangle's attach, attribute bits, colour, position, size,
+ * priority and mask (its allocator, ctor and Reset close code_2cc8c_e).
  *
- * All 20 non-trivial functions in this unit are MATCHED; zero live
- * INCLUDE_ASM, zero NON_MATCHING bodies. `Obj6EAC0__NoOpSetter`/
- * `Obj6EAC0__NoOpSlotD0` are splat-generated `jr $ra; nop` occupants.
+ * D_8006EB90's class (id 0x11144, below D_8006EC74 and ScreenSprite, NOT
+ * below BoxFill), from New_Obj6EAC0 to Obj6EAC0__GetDerivedMethods, through
+ * include/code_2cc8c.h's `Obj6EAC0` view: a row of D_8006EC74 character
+ * cells (tier B; that view's banner).
+ *
+ * Then `DecodeFullWidthSjis`/`EncodeFullWidthSjis`/`FormatFullWidthNumber`,
+ * confirmed by their OWN callers elsewhere to take a plain buffer.
+ *
+ * All non-trivial functions are MATCHED; zero live INCLUDE_ASM, zero
+ * NON_MATCHING bodies. `Obj6EAC0__NoOpSetter`/`Obj6EAC0__NoOpSlotD0` are
+ * splat-generated `jr $ra; nop` occupants.
  */
 #include "common.h"
 #include "code_2cc8c.h"
 
-void BoxFill__AttachToParent(Obj6EAC0 *self, s32 a1, void *a2) {
-    if (self->hasChildren == 0) {
-        GetClass6B5CCMethods()->attachToParent((Class6B5CC *)self, (Class6B5CC *)a1, 0);
-        self->methods->slotBC(self, a2);
+void BoxFill__AttachToParent(BoxFill *self, Class6B5CC *parent, Pair32E99C *pos) {
+    if (self->parent == NULL) {
+        GetClass6B5CCMethods()->attachToParent((Class6B5CC *)self, parent, 0);
+        self->methods->setPosition(self, pos);
     }
 }
 
-s32 BoxFill__SetDisplay(Obj6EAC0 *self, s32 a1) {
-    return GetSetBitField(&self->flags, 0x1F, 1, a1 == 0) == 0;
+s32 BoxFill__SetDisplay(BoxFill *self, s32 on) {
+    return GetSetBitField(&self->boxAttribute, 0x1F, 1, on == 0) == 0;
 }
 
-s32 BoxFill__SetSemiTrans(Obj6EAC0 *self, s32 a1) {
-    return GetSetBitField(&self->flags, 0x1E, 1, a1 != 0);
+s32 BoxFill__SetSemiTrans(BoxFill *self, s32 on) {
+    return GetSetBitField(&self->boxAttribute, 0x1E, 1, on != 0);
 }
 
-s32 BoxFill__SetSemiTransRate(Obj6EAC0 *self, s32 a1) {
-    return GetSetBitField(&self->flags, 0x1C, 2, a1);
+s32 BoxFill__SetSemiTransRate(BoxFill *self, s32 rate) {
+    return GetSetBitField(&self->boxAttribute, 0x1C, 2, rate);
 }
 
-void BoxFill__ApplyColor(Obj6EAC0 *self, u8 *dst, u8 *src, s32 overwrite);
-
-void BoxFill__SetColor(Obj6EAC0 *self, s32 overwrite, u8 *src) {
-    BoxFill__ApplyColor(self, self->color, src, overwrite);
+void BoxFill__SetColor(BoxFill *self, s32 overwrite, u8 *rgb) {
+    BoxFill__ApplyColor(self, self->color, rgb, overwrite);
 }
 
 typedef struct { s8 r, g, b; } RGB80040790;
 
-void BoxFill__ApplyColor(Obj6EAC0 *self, u8 *dst, u8 *src, s32 overwrite) {
+void BoxFill__ApplyColor(BoxFill *self, u8 *dst, u8 *src, s32 overwrite) {
     u8 *d;
     d = dst;
     if (overwrite) {
@@ -64,45 +58,48 @@ void BoxFill__ApplyColor(Obj6EAC0 *self, u8 *dst, u8 *src, s32 overwrite) {
     }
 }
 
-void BoxFill__SetPosition(Obj6EAC0 *self, Pair32E99C *a1) {
-    if (self->hasChildren != 0) {
-        *(Pair32E99C *)&self->posX = *a1;
+void BoxFill__SetPosition(BoxFill *self, Pair32E99C *pos) {
+    if (self->parent != NULL) {
+        *(Pair32E99C *)&self->posX = *pos;
     }
 }
 
-void BoxFill__SetSize(Obj6EAC0 *self, s32 *a1) {
-    if (self->hasChildren != 0) {
-        self->unk60 = ((u16 *)a1)[0];
-        self->unk62 = ((u16 *)&a1[1])[0];
+void BoxFill__SetSize(BoxFill *self, s32 *size) {
+    if (self->parent != NULL) {
+        self->boxW = ((u16 *)size)[0];
+        self->boxH = ((u16 *)&size[1])[0];
     }
 }
 
-void BoxFill__AttachAbsolute(Obj6EAC0 *self, s32 a1, s32 a2, s32 a3)
+/* +0x04C is called with FOUR arguments through an unprototyped pointer: its
+ * occupant reads three, and the fourth is this function's own a3, already in
+ * $a3 (BoxFill.h's banner). */
+void BoxFill__AttachAbsolute(BoxFill *self, Class6B5CC *parent, Pair32E99C *pos, s32 arg3)
 {
     void (*fn)();
-    Obj6EAC0 *q;
+    BoxFill *q;
 
     q = self;
-    fn = q->methods->slot4C;
+    fn = (void (*)())q->methods->attachToParent;
     /* The do/while(0) wrapper is a no-op scoping device, load-bearing for
      * delay-slot scheduling only -- see the match report. Without it GCC
      * swaps the prologue's $ra/$s1 callee-save STORE ORDER. */
     do {
-        fn(q, a1, a2, a3);
-        q->unk48 = 0;
-        q->unk4C = a3;
+        fn(q, parent, pos, arg3);
+        q->relative = 0;
+        q->unk4C = arg3;
     } while (0);
 }
 
-void BoxFill__SetPri(Obj6EAC0 *self, s32 a1) {
-    self->unk44 = a1;
+void BoxFill__SetPri(BoxFill *self, s32 pri) {
+    self->pri = pri;
 }
 
-s32 BoxFill__SetMask(Obj6EAC0 *self, s32 a1) {
-    return self->mask = (1 << a1) - 1;
+s32 BoxFill__SetMask(BoxFill *self, s32 bits) {
+    return self->mask = (1 << bits) - 1;
 }
 
-Obj6EAC0Methods *GetBoxFillMethods(void) {
+BoxFillMethods *GetBoxFillMethods(void) {
     return &gBoxFillMethods;
 }
 

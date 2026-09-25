@@ -34,35 +34,21 @@
  */
 
 /*
- * WHAT THIS UNIT IS (round 61, track 3 naming pass). This file's own 17
- * functions are the bottom two links of a three-class chain rooted in
- * `include/Class6B5CC.h`'s `Class6B5CC`: `Class6B5CC -> ClassEAC0Obj ->
- * Class6E99CObj` (`tools/classtable.py D_8006E99C --vs D_8006B58C`,
- * round 14; see `include/code_2cc8c.h`'s own header comment above
- * `struct ClassEAC0Obj` for the full derivation). Critically, `ClassEAC0Obj`
- * is THIS unit's own local view of the SAME table family that
- * `code_2cc8c_f` (bravo's unit) views as `Obj6EAC0` -- `ClassEAC0Methods`'s
- * `slotB8`/`slotCC` dispatch to bravo's own `BoxFill__SetColor`/
- * `BoxFill__SetMask` -- so `Class6E99CObj` is a further-derived subclass
- * of bravo's "on-screen text/digit display" class (round 54's own
- * working hypothesis for `Obj6EAC0`).
+ * WHAT THIS UNIT IS (round 61, track 3; revised round 85, track 4). Its 17
+ * functions are the bottom two links of `Class6B5CC -> BoxFill ->
+ * Class6E99C`: first Class6E99C's (D_8006E99C, 0x164, `New_Class6E99C` to
+ * `GetClass6E99CMethods`, through this unit family's own Class6E99CObj view
+ * in include/code_2cc8c.h), then BoxFill's allocator, ctor and Reset (0x64,
+ * include/BoxFill.h, a GsBOXF screen rectangle; the rest of its methods open
+ * code_2cc8c_f).
  *
- * `Class6E99CObj`'s own functions (`New_Class6E99C` onward) add a
- * start/stop pair over an indexed and a fixed color table
- * (`Class6E99C__StartFadeToIndex`/`Class6E99C__StartFadeDefault`/
- * `Class6E99C__Stop`), a per-tick `step`-driven RGB-channel accumulator
- * gated by a countdown (`Class6E99C__Update`), and a save/restore-of-one
- * position pair (`Class6E99C__PushPosition`/`Class6E99C__PopPosition`).
- * Read together this looks like a COLOR-FADE CONTROLLER layered on top of
- * bravo's digit display -- plausibly driving a transition when an
- * on-screen digit/counter's value or color changes -- but that reading is
- * this unit's own working hypothesis (tier B throughout), not confirmed
- * against any caller outside this file: nothing else in `src/*.c`
- * constructs or touches a `Class6E99CObj`/`ClassEAC0Obj` (only
- * `New_Class6E99C`/`New_BoxFill` themselves are called elsewhere, always
- * through a caller's own differently-typed local view -- see each
- * function's own match report). See each function's own `## Naming`
- * section for the specific evidence behind its name.
+ * `Class6E99C`'s own functions add a start/stop pair over an indexed and a
+ * fixed color table (`Class6E99C__StartFadeToIndex`/
+ * `Class6E99C__StartFadeDefault`/`Class6E99C__Stop`), a per-tick
+ * `step`-driven accumulator into BoxFill's r/g/b bytes gated by a countdown
+ * (`Class6E99C__Update`), and a save/restore of BoxFill's position and size
+ * (`Class6E99C__PushPosition`/`Class6E99C__PopPosition`): a colour fade over
+ * the box (tier B). See each function's own `## Naming` section.
  */
 
 Class6E99CObj *New_Class6E99C(void *a1, s32 a2, s32 a3) {
@@ -77,16 +63,16 @@ Class6E99CObj *New_Class6E99C(void *a1, s32 a2, s32 a3) {
 }
 
 void Class6E99C__Class6E99C(Class6E99CObj *self, void *a1, s32 a2, s32 a3) {
-    ClassEAC0Methods *base;
+    BoxFillMethods *base;
     void *tableEntry;
 
-    base = (ClassEAC0Methods *)GetBoxFillMethods();
+    base = GetBoxFillMethods();
     if (a2 != 0) {
         tableEntry = &D_8006EA90[a2 * 3];
     } else {
         tableEntry = D_8006EAA8;
     }
-    base->ctor((ClassEAC0Obj *)self, a1, tableEntry, a3);
+    base->ctor((BoxFill *)self, a1, tableEntry, a3);
     self->methods = GetClass6E99CMethods();
     self->methods->finishConstruct(self, a2);
 }
@@ -279,38 +265,38 @@ Class6E99CMethods *GetClass6E99CMethods(void) {
     return &D_8006E99C;
 }
 
-ClassEAC0Obj *New_BoxFill(void *a0, void *a1, s32 a2) {
-    ClassEAC0Obj *self;
+BoxFill *New_BoxFill(void *size, void *color, s32 pri) {
+    BoxFill *self;
 
     self = BMemPMgrAlloc(0x6C);
     if (self != NULL) {
-        ((ClassEAC0Methods *)GetBoxFillMethods())->ctor(self, a0, a1, a2);
+        GetBoxFillMethods()->ctor(self, size, color, pri);
         return self;
     }
     return NULL;
 }
 
-void BoxFill__BoxFill(ClassEAC0Obj *self, SkipShort2 *a1, void *a2, s32 a3) {
+void BoxFill__BoxFill(BoxFill *self, SkipShort2 *size, void *color, s32 pri) {
     GetClass6B5CCMethods()->ctor((Class6B5CC *)self);
-    self->methods = (ClassEAC0Methods *)GetBoxFillMethods();
-    self->methods->finishConstruct(self, a1, a2, a3);
+    self->methods = GetBoxFillMethods();
+    ((BoxFillResetFn)self->methods->reset)(self, size, color, pri);
 }
 
-void BoxFill__Reset(ClassEAC0Obj *self, SkipShort2 *a1, void *a2, s32 a3) {
-    ClassEAC0Methods *methods;
+void BoxFill__Reset(BoxFill *self, SkipShort2 *size, void *color, s32 pri) {
+    BoxFillMethods *methods;
 
-    self->unk44 = a3;
-    self->unk48 = 1;
+    self->pri = pri;
+    self->relative = 1;
     self->unk4C = 0;
-    self->unk58 = 0;
-    self->unk5C = 0;
-    self->unk5E = 0;
-    self->unk60 = a1->x;
-    self->unk62 = a1->y;
+    self->boxAttribute = 0;
+    self->boxX = 0;
+    self->boxY = 0;
+    self->boxW = size->x;
+    self->boxH = size->y;
     methods = self->methods;
-    if (a2 == NULL) {
-        a2 = D_8008A924;
+    if (color == NULL) {
+        color = D_8008A924;
     }
-    methods->slotB8(self, 1, a2);
-    self->methods->slotCC(self, 0xD);
+    methods->setColor(self, 1, color);
+    self->methods->setMask(self, 0xD);
 }

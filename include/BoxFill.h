@@ -58,7 +58,9 @@ typedef struct Pair32E99C Pair32E99C;
 
 /* The ctor's (and Reset's) size argument: two words of which only the low
  * halfwords are read (lhu at +0x000 and +0x004), into boxW and boxH. The
- * callers pass s32 pairs (class_3bb8c_n's PairXY, D_8008A8E8[2]). */
+ * callers pass s32 pairs of their own types (class_3bb8c_n's PairXY,
+ * D_8008A8E8[2]), so New_BoxFill and the ctor slot take `void *` and the
+ * occupants read it as this. */
 struct SkipShort2 {
     s16 x;             /* +0x000, the width */
     u8 pad2[0x004 - 0x002];
@@ -104,7 +106,7 @@ struct Pair32E99C {
     /* +0x068 */ s32 mask          /* setMask. The object is 0x6C bytes (New_BoxFill) */
 
 struct BoxFillMethods {
-    BOXFILL_SLOTS(BoxFill, (BoxFill *self, SkipShort2 *size, void *color, s32 pri));
+    BOXFILL_SLOTS(BoxFill, (BoxFill *self, void *size, void *color, s32 pri));
 };
 
 struct BoxFill {
@@ -121,7 +123,7 @@ typedef void (*BoxFillAttachToParentFn)(BoxFill *self, Class6B5CC *parent, Pair3
 
 /* The class's own methods, in ROM order (code_2cc8c_e, then code_2cc8c_f).
  * A subclass reaches the base ones through GetBoxFillMethods() and upcasts. */
-BoxFill *New_BoxFill(SkipShort2 *size, void *color, s32 pri);
+BoxFill *New_BoxFill(void *size, void *color, s32 pri);
 void BoxFill__BoxFill(BoxFill *self, SkipShort2 *size, void *color, s32 pri);
 void BoxFill__Reset(BoxFill *self, SkipShort2 *size, void *color, s32 pri);
 void BoxFill__AttachToParent(BoxFill *self, Class6B5CC *parent, Pair32E99C *pos);
