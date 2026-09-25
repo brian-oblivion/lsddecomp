@@ -154,7 +154,10 @@ INCLUDE_ASM("asm/nonmatchings/code_322b4", func_8004220C);
 s32 func_8004223C(SpriteView_322b4 *self, s32 a1) {
     return GetSetBitField(&self->attribute, 0x1E, 1, a1 != 0);
 }
-INCLUDE_ASM("asm/nonmatchings/code_322b4", func_80042268);
+/* Sprite classes slot +0x068: attribute bits 28..29. */
+s32 func_80042268(SpriteView_322b4 *self, s32 a1) {
+    return GetSetBitField(&self->attribute, 0x1C, 2, a1);
+}
 /* D_8006EB90 and D_8006EC74 slot +0x098 (update): empty override. */
 void func_80042294(Class6B5CC *self, void *sender, s32 event) {
 }
