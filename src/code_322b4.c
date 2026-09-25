@@ -263,7 +263,7 @@ void D8006ED4C__SetPosition(SpriteView_322b4 *self, Pair_322b4 *src) {
 }
 /* D_8006EC74 and D_8006ED4C slot +0x0C0: when attached, move the sprite's
  * pivot: 0 centre, 1 left, 2 right, 3 top, 4 bottom. */
-void func_80041E58(Sprite *self, u32 anchor) {
+void D8006ED4C__SetPivotAnchor(Sprite *self, u32 anchor) {
     if (self->parent != NULL) {
         switch (anchor) {
         case 0:

@@ -2633,3 +2633,4 @@ D8006ED4C__D8006ED4C = 0x80041D18; // type:func
 D8006ED4C__Reset = 0x80041DA4; // type:func
 D8006ED4C__AttachToParent = 0x80041DAC; // type:func
 D8006ED4C__SetPosition = 0x80041E2C; // type:func
+D8006ED4C__SetPivotAnchor = 0x80041E58; // type:func

@@ -1,4 +1,6 @@
-# func_80041E58 -- MATCHED (32/32 words), round 82
+# D8006ED4C__SetPivotAnchor -- MATCHED (32/32 words), round 82
+
+> Renamed from `func_80041E58` on 2026-09-25 (tools/rename.py). Address 0x80041e58.
 
 Round 82, runner alpha (fifth slot on code_322b4). Unit `src/code_322b4.c`. Fresh ground, no prior body attempt.
 
@@ -12,7 +14,7 @@ Round 82, runner alpha (fifth slot on code_322b4). Unit `src/code_322b4.c`. Fres
 ```c
 /* D_8006EC74 and D_8006ED4C slot +0x0C0: when attached, move the sprite's
  * pivot: 0 centre, 1 left, 2 right, 3 top, 4 bottom. */
-void func_80041E58(Sprite *self, u32 anchor) {
+void D8006ED4C__SetPivotAnchor(Sprite *self, u32 anchor) {
     if (self->parent != NULL) {
         switch (anchor) {
         case 0:
