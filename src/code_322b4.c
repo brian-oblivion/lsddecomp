@@ -18,10 +18,10 @@
  * project's address-derived pseudo-class-name convention (`D8006EC74__X`,
  * matching the existing `D800879C4__X` precedent in class_3bb8c_p.c) rather
  * than inventing a real name ahead of the types pass:
- *   - D_8006ED4C (0x144): the screen-space sprite -- Sprite's direct
+ *   - gScreenSpriteMethods (0x144): the screen-space sprite -- Sprite's direct
  *     subclass, adding setPosition (+0x0BC, screenPos) and a pivot-anchor
  *     setter (+0x0C0, centre/left/right/top/bottom).
- *   - D_8006EC74 (0x1144): one 8x8 cell of a 32-wide grid -- D_8006ED4C's
+ *   - D_8006EC74 (0x1144): one 8x8 cell of a 32-wide grid -- ScreenSprite's
  *     subclass, adding setCell (+0x0C4); GetCellRect is the free helper both
  *     its ctor and setCell use to turn a cell index into a rect.
  *   - D_8006EB90 (0x11144) and D_800879C4 (0x1F44, class_3bb8c_p/q/t) are
@@ -104,7 +104,7 @@ extern u16 GetTPage(s32 tp, s32 abr, s32 x, s32 y);
 
 /* The method tables the getters below return. */
 extern s32 D_8006EC74[];
-extern s32 D_8006ED4C[];
+extern s32 gScreenSpriteMethods[];
 extern s32 D_8006EED8[];
 extern s32 D_8006EF50[];
 extern s32 D_8006EFAC[];
@@ -117,7 +117,7 @@ typedef struct D_8006EED8Obj {
     s32 flag2C;
 } D_8006EED8Obj;
 
-/* Local view of a D_8006EC74/D_8006ED4C object (subclasses of Sprite,
+/* Local view of a D_8006EC74/gScreenSpriteMethods object (subclasses of Sprite,
  * include/Sprite.h) as their round-82 methods see it. attribute and u,v are
  * Sprite's sprite.attribute/u/v; this view is the subclasses' to unify. */
 typedef struct SpriteMethods_322b4 SpriteMethods_322b4;
@@ -127,26 +127,26 @@ typedef struct Pair_322b4 {
 typedef struct SpriteView_322b4 {
     SpriteMethods_322b4 *methods; /* +0x000 */
     u8 pad04[0xC - 0x4];
-    Class6B5CC *parent;           /* +0x00C, Class6B5CC's own field (include/Class6B5CC.h); tested by D8006ED4C__SetPosition */
+    Class6B5CC *parent;           /* +0x00C, Class6B5CC's own field (include/Class6B5CC.h); tested by ScreenSprite__SetPosition */
     u8 pad10[0x64 - 0x10];
     u32 attribute;                /* +0x064, GsSPRITE.attribute */
     u8 pad68[0x72 - 0x68];
     u8 u;                         /* +0x072, GsSPRITE.u */
     u8 v;                         /* +0x073, GsSPRITE.v */
     u8 pad74[0xA0 - 0x74];
-    Pair_322b4 screenPos;         /* +0x0A0, set by D8006ED4C__SetPosition */
+    Pair_322b4 screenPos;         /* +0x0A0, set by ScreenSprite__SetPosition */
     u8 cellIndex;                 /* +0x0A8, the cell index D8006EC74__SetCell stores */
 } SpriteView_322b4;
 struct SpriteMethods_322b4 {
     u8 pad00[0x40];
     void (*reset)(SpriteView_322b4 *self, u8 cell);            /* +0x040 = D8006EC74__Reset (D_8006EC74) */
     u8 pad44[0xBC - 0x44];
-    void (*setPosition)(SpriteView_322b4 *self, Pair_322b4 *src); /* +0x0BC = D8006ED4C__SetPosition */
+    void (*setPosition)(SpriteView_322b4 *self, Pair_322b4 *src); /* +0x0BC = ScreenSprite__SetPosition */
     u8 padC0[0xC4 - 0xC0];
     void (*setCell)(SpriteView_322b4 *self, u8 cell); /* +0x0C4 = D8006EC74__SetCell */
 };
 
-/* The zero offset D8006ED4C__AttachToParent attaches with. */
+/* The zero offset ScreenSprite__AttachToParent attaches with. */
 extern Vec3_d294 gVec3Zero;
 extern char *strcpy(char *dst, char *src);
 
@@ -175,10 +175,10 @@ typedef struct CellCtorMethods_322b4 {
     void *(*ctor)(void *self, void *texture, u8 cell); /* +0x008 = D8006EC74__D8006EC74 */
 } CellCtorMethods_322b4;
 
-void *Get_vtable_D8006ED4C(void);
+void *GetScreenSpriteMethods(void);
 typedef struct CtorArg3Methods_322b4 {
     u8 pad00[0x8];
-    void *(*ctor)(void *self, void *a1, void *a2, void *a3); /* +0x008 = D8006ED4C__D8006ED4C */
+    void *(*ctor)(void *self, void *a1, void *a2, void *a3); /* +0x008 = ScreenSprite__ScreenSprite */
 } CtorArg3Methods_322b4;
 
 struct D_8006EED8Methods {
@@ -208,13 +208,13 @@ void *New_D8006EC74(void *texture, u8 cell) {
     }
     return NULL;
 }
-/* D_8006EC74 slot +0x008 (ctor): the D_8006ED4C ctor with cell 0x20's rect,
+/* D_8006EC74 slot +0x008 (ctor): the ScreenSprite ctor with cell 0x20's rect,
  * install the table, then reset to the caller's cell. */
 void D8006EC74__D8006EC74(SpriteView_322b4 *self, void *texture, u8 cell) {
     SpriteRect r;
 
     GetCellRect(&r, 0x20);
-    ((CtorArg3Methods_322b4 *)Get_vtable_D8006ED4C())->ctor(self, texture, &r, NULL);
+    ((CtorArg3Methods_322b4 *)GetScreenSpriteMethods())->ctor(self, texture, &r, NULL);
     self->methods = Get_vtable_D8006EC74();
     self->methods->reset(self, cell);
 }
@@ -248,44 +248,44 @@ void GetCellRect(SpriteRect *dst, u32 cell) {
     dst->u += (cell & 0x1F) * 8;
     dst->v += (cell >> 5) * 8;
 }
-/* Allocate and construct a D_8006ED4C object (0xA8 bytes). */
-void *New_D8006ED4C(void *a1, void *a2, void *a3) {
+/* Allocate and construct a gScreenSpriteMethods object (0xA8 bytes). */
+void *New_ScreenSprite(void *a1, void *a2, void *a3) {
     void *obj = BMemPMgrAlloc(0xA8);
 
     if (obj != NULL) {
-        ((CtorArg3Methods_322b4 *)Get_vtable_D8006ED4C())->ctor(obj, a1, a2, a3);
+        ((CtorArg3Methods_322b4 *)GetScreenSpriteMethods())->ctor(obj, a1, a2, a3);
         return obj;
     }
     return NULL;
 }
-/* D_8006ED4C slot +0x008 (ctor): the Sprite ctor with abr 0 and arg4 NULL,
+/* gScreenSpriteMethods slot +0x008 (ctor): the Sprite ctor with abr 0 and arg4 NULL,
  * install the table, then reset. */
-void D8006ED4C__D8006ED4C(Sprite *self, void *texture, SpriteRect *rect, s32 arg3) {
+void ScreenSprite__ScreenSprite(Sprite *self, void *texture, SpriteRect *rect, s32 arg3) {
     GetSpriteMethods()->ctor(self, texture, 0, rect, NULL, arg3);
-    self->methods = Get_vtable_D8006ED4C();
+    self->methods = GetScreenSpriteMethods();
     self->methods->reset(self);
 }
-/* D_8006ED4C slot +0x040 (reset): empty override. */
-void D8006ED4C__Reset(Class6B5CC *self) {
+/* gScreenSpriteMethods slot +0x040 (reset): empty override. */
+void ScreenSprite__Reset(Class6B5CC *self) {
 }
-/* D_8006EC74 and D_8006ED4C slot +0x04C (attachToParent): when not yet
+/* D_8006EC74 and gScreenSpriteMethods slot +0x04C (attachToParent): when not yet
  * attached, attach through Sprite's with a zero offset, then hand the
  * caller's third argument to slot +0x0BC. */
-void D8006ED4C__AttachToParent(SpriteView_322b4 *self, Class6B5CC *parent, Pair_322b4 *pos) {
+void ScreenSprite__AttachToParent(SpriteView_322b4 *self, Class6B5CC *parent, Pair_322b4 *pos) {
     if (self->parent == NULL) {
         GetSpriteMethods()->attachToParent((Sprite *)self, parent, &gVec3Zero);
         self->methods->setPosition(self, pos);
     }
 }
-/* D_8006EC74 and D_8006ED4C slot +0x0BC. */
-void D8006ED4C__SetPosition(SpriteView_322b4 *self, Pair_322b4 *src) {
+/* D_8006EC74 and gScreenSpriteMethods slot +0x0BC. */
+void ScreenSprite__SetPosition(SpriteView_322b4 *self, Pair_322b4 *src) {
     if (self->parent != NULL) {
         self->screenPos = *src;
     }
 }
-/* D_8006EC74 and D_8006ED4C slot +0x0C0: when attached, move the sprite's
+/* D_8006EC74 and gScreenSpriteMethods slot +0x0C0: when attached, move the sprite's
  * pivot: 0 centre, 1 left, 2 right, 3 top, 4 bottom. */
-void D8006ED4C__SetPivotAnchor(Sprite *self, u32 anchor) {
+void ScreenSprite__SetPivotAnchor(Sprite *self, u32 anchor) {
     if (self->parent != NULL) {
         switch (anchor) {
         case 0:
@@ -307,9 +307,9 @@ void D8006ED4C__SetPivotAnchor(Sprite *self, u32 anchor) {
         }
     }
 }
-/* Returns the D_8006ED4C method table. */
-void *Get_vtable_D8006ED4C(void) {
-    return D_8006ED4C;
+/* Returns the gScreenSpriteMethods method table. */
+void *GetScreenSpriteMethods(void) {
+    return gScreenSpriteMethods;
 }
 /* Allocate and construct a Sprite (0xA0 bytes). */
 Sprite *New_Sprite(void *texture, s32 abr, SpriteRect *rect, void *arg3, s32 arg4) {
@@ -391,7 +391,7 @@ s32 Sprite__SetSemiTransRate(Sprite *self, s32 a1) {
 /* D_8006EB90 and D_8006EC74 slot +0x098 (update): empty override. */
 void Sprite__Update(Sprite *self, void *sender, s32 event) {
 }
-/* Slot +0x0B8 of D_8006EC74, D_8006ED4C, gSpriteMethods and D_800879C4 (the
+/* Slot +0x0B8 of D_8006EC74, gScreenSpriteMethods, gSpriteMethods and D_800879C4 (the
  * sprite classes): copy three bytes into the embedded GsSPRITE's r,g,b. */
 void Sprite__SetColor(Sprite *self, SpriteRgb *rgb) {
     self->sprite.rgb = *rgb;

@@ -194,20 +194,20 @@ void Obj86ED0__SetName(Obj86ED0 *self, char *arg1, s32 mode)
  * memory-card icon/font resource paths (BuildFileName, already matched in
  * code_171e0.c) and loads each through func_8003B39C, then converts/wraps
  * the loaded handle into a ChildObj86ED0-shaped resource object (unk48 via
- * New_D8006ED4C, unk44/unk40 via New_Obj6EAC0/New_D8006EC74 -- both still
+ * New_ScreenSprite, unk44/unk40 via New_Obj6EAC0/New_D8006EC74 -- both still
  * uncarved elsewhere, typed purely from this call site's own register
  * usage, same convention as DecodeFullWidthSjis above).
  */
 extern char *BuildFileName(char *dest, char *arg1, char *arg2, char *arg3);
 extern ChildObj86ED0 *func_8003B39C(char *path);
-extern ChildObj86ED0 *New_D8006ED4C(ChildObj86ED0 *arg0, void *arg1, s32 arg2);
+extern ChildObj86ED0 *New_ScreenSprite(ChildObj86ED0 *arg0, void *arg1, s32 arg2);
 extern ChildObj86ED0 *New_D8006EC74(ChildObj86ED0 *arg0, s32 arg1);
 
 extern const char sStrComInput[]; /* "COMINPUT" */
 extern const char sStrFontIcon[]; /* "FONTICON" */
 extern const char sCardPathPrefix[]; /* "CARD\\" */
 extern const char sTimExt[]; /* ".TIM" */
-extern s32 D_80086F7C; /* 3-word opaque block, New_D8006ED4C's arg1, address-only here */
+extern s32 D_80086F7C; /* 3-word opaque block, New_ScreenSprite's arg1, address-only here */
 extern s32 D_8008AAC8; /* opaque block, slotB8's arg1, address-only here */
 extern s32 D_8008AACC; /* opaque block, self->unk48's slot4C arg2, address-only here */
 extern s32 D_8008AAD4; /* opaque block, self->unk44's slot4C arg2, address-only here */
@@ -233,7 +233,7 @@ void Obj86ED0__LoadCardResources(Obj86ED0 *self, void *arg1)
 
     handle1 = func_8003B39C(BuildFileName(path, sStrComInput, dir, ext));
     handle1->methods->slot78(handle1);
-    self->unk48 = New_D8006ED4C(handle1, (void *)&D_80086F7C, 0);
+    self->unk48 = New_ScreenSprite(handle1, (void *)&D_80086F7C, 0);
     handle1->methods->release(handle1);
     self->unk48->methods->slot4C(self->unk48, arg1, (void *)&D_8008AACC);
 

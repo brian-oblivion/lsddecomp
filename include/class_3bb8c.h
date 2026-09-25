@@ -2536,7 +2536,7 @@ struct ChildMethods86ED0 {
      * parameter; arg2 is a small opaque data blob passed only by address. */
     void (*slot4C)(ChildObj86ED0 *self, void *arg1, void *arg2);
     u8 pad050[0x078 - 0x050];
-    void (*slot78)(ChildObj86ED0 *self); /* +0x078, Obj86ED0__LoadCardResources, on the short-lived handle before New_D8006ED4C/New_Obj6EAC0 consume it */
+    void (*slot78)(ChildObj86ED0 *self); /* +0x078, Obj86ED0__LoadCardResources, on the short-lived handle before New_ScreenSprite/New_Obj6EAC0 consume it */
     u8 pad07C[0x0B8 - 0x07C];
     void (*slotB8)(ChildObj86ED0 *self, void *arg1); /* +0x0B8, Obj86ED0__LoadCardResources, self->unk44 only */
     /* +0x0BC/+0x0C4, added round 75 (class_3bb8c_j, track 3 naming):

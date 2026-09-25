@@ -12,12 +12,12 @@ the derived object into `self->unk70`.
 
 ```c
 extern ChildObj86ED0 *func_8003B39C(char *path);
-extern ChildObj86ED0 *New_D8006ED4C(ChildObj86ED0 *arg0, void *arg1, s32 arg2);
+extern ChildObj86ED0 *New_ScreenSprite(ChildObj86ED0 *arg0, void *arg1, s32 arg2);
 
 extern char *gCardIconNames[];
 extern const char gCardPathPrefix[]; /* "CARD\\" */
 extern const char gCardPathSuffix[]; /* ".TIM" */
-extern s32 D_80086EC4; /* 3-word opaque block, New_D8006ED4C's arg1, address-only here */
+extern s32 D_80086EC4; /* 3-word opaque block, New_ScreenSprite's arg1, address-only here */
 extern s32 D_8008AA94; /* opaque block, the fresh unk70's own slot4C arg2, address-only here */
 
 void TaskObjF__LoadCardIcon(Class86E00_3bb8c_g *self, s32 arg1)
@@ -47,7 +47,7 @@ void TaskObjF__LoadCardIcon(Class86E00_3bb8c_g *self, s32 arg1)
 
     handle = func_8003B39C(buf);
     handle->methods->slot78(handle);
-    newVal = New_D8006ED4C(handle, (void *)&D_80086EC4, 0);
+    newVal = New_ScreenSprite(handle, (void *)&D_80086EC4, 0);
     self->unk70 = newVal;
     handle->methods->release(handle);
     newVal->methods->slot4C(newVal, self->unk68, (void *)&D_8008AA94);
@@ -81,7 +81,7 @@ reaches for the `arg1` values this function is actually invoked with --
 declared as a plain `extern char *gCardIconNames[];`, which is enough to index
 without needing the full contents.
 
-The `func_8003B39C` / `slot78` / `New_D8006ED4C` / `release` sequence on
+The `func_8003B39C` / `slot78` / `New_ScreenSprite` / `release` sequence on
 the temp `handle` is the exact idiom already established by
 `Obj86ED0__LoadCardResources` (`docs/match-reports/Obj86ED0__LoadCardResources.md`, a DIFFERENT unit,
 `class_3bb8c_i`) using the SAME shared `ChildObj86ED0`/`ChildMethods86ED0`
@@ -89,7 +89,7 @@ type from `class_3bb8c.h` (`slot78`/`release` already declared there).
 
 `self->unk70` is ALREADY typed `Class86E00Unk70Obj_3bb8c_g *` in this unit
 (established by the already-matched `TaskObjF__TickCardIcon`, same file). Assigning
-`New_D8006ED4C`'s `ChildObj86ED0 *` return into it is the same
+`New_ScreenSprite`'s `ChildObj86ED0 *` return into it is the same
 implicit-pointer-type-mismatch-is-harmless pattern already documented in
 `Obj86ED0__LoadCardResources`'s own report (`self->unk44 = New_Obj6EAC0(...)` there) --
 a warning, not an error, zero byte cost. Extended
@@ -105,7 +105,7 @@ dereferenced in this unit") and `arg2` as an address-only opaque block
 ## The one real residue: buffer/handle register reuse and a discarded call result
 
 First working version (semantically identical, `path` used directly with
-no `buf`/`name` locals, and `self->unk70 = New_D8006ED4C(...)` assigned
+no `buf`/`name` locals, and `self->unk70 = New_ScreenSprite(...)` assigned
 straight into the struct field with no intermediate local) scored 62/71:
 retail keeps the temp-buffer address AND the `func_8003B39C` handle in the
 SAME callee-saved register across all four calls that need it (computed
@@ -116,7 +116,7 @@ each call site instead let the compiler recompute `addiu $a0,$sp,0x10`
 fresh every time rather than keeping one persistent register. Introducing
 `buf = path;` and always calling through `buf` fixed this half.
 
-The remaining 9-word gap: retail keeps `New_D8006ED4C`'s return value in a
+The remaining 9-word gap: retail keeps `New_ScreenSprite`'s return value in a
 register (`s1`) both for the `self->unk70 = ...` store AND for every
 subsequent use (`handle->methods->release(handle)`'s own... no, actually
 for the following `newVal->methods->slot4C(newVal, ...)` call's `a0`) --
