@@ -61,7 +61,14 @@ void func_800429E8(FlatLightObj *self, s32 update, FlatLightColor *rgb) {
     }
     GsSetFlatLight(self->lightId, &self->light);
 }
-INCLUDE_ASM("asm/nonmatchings/code_3311c", func_80042A2C);
+void func_80042A2C(FlatLightObj *self, s32 update, s16 *dir) {
+    if (update) {
+        self->light.vx = dir[0];
+        self->light.vy = dir[1];
+        self->light.vz = dir[2];
+    }
+    GsSetFlatLight(self->lightId, &self->light);
+}
 FlatLightObjMethods *func_80042A7C(void) {
     return &D_8006F06C;
 }
