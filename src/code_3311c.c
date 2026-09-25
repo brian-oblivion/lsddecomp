@@ -9,10 +9,52 @@
  * Nothing here is matched yet: every function is fresh track-1 ground.
  */
 #include "common.h"
+#include "BasicClass.h"
+
+/*
+ * The class of D_8006F06C: a BasicClass that owns one Psy-Q flat light.
+ * 0x20 bytes (func_8004291C's allocation). Fields past BasicClass's are a
+ * GsF_LIGHT (LIBGS.H) at +0x010, handed to GsSetFlatLight by address.
+ * LIBGS.H is not included: its prototypes collide in shared headers, so the
+ * one used here is declared locally with a local copy of the struct.
+ */
+typedef struct FlatLightObj FlatLightObj;
+typedef struct FlatLightObjMethods FlatLightObjMethods;
+
+/* The colour triple. Copied as a whole struct (func_800429E8): GCC's block
+ * move is what loads all three bytes before storing any. */
+typedef struct {
+    s8 r, g, b;
+} FlatLightColor;
+
+typedef struct {
+    /* +0x000 */ s32 vx, vy, vz;
+    /* +0x00C */ FlatLightColor rgb;
+} FlatLightParams; /* == GsF_LIGHT */
+
+struct FlatLightObjMethods {
+    BASICCLASS_SLOTS(FlatLightObj, (FlatLightObj *self, s32 lightId));
+    /* +0x040 */ void (*setLightId)(FlatLightObj *self, s32 lightId);
+    /* +0x044 */ void (*setColor)(FlatLightObj *self, s32 update, FlatLightColor *rgb);
+    /* +0x048 */ void (*setDirection)(FlatLightObj *self, s32 update, s16 *dir);
+};
+
+struct FlatLightObj {
+    BASICCLASS_FIELDS(FlatLightObjMethods);
+    /* +0x00C */ s32 lightId;
+    /* +0x010 */ FlatLightParams light;
+};
+
+extern void *BMemPMgrAlloc(s32 size);
+extern int GsSetFlatLight(int id, FlatLightParams *lt);
+extern FlatLightObjMethods D_8006F06C;
+FlatLightObjMethods *func_80042A7C(void);
 
 INCLUDE_ASM("asm/nonmatchings/code_3311c", func_8004291C);
 INCLUDE_ASM("asm/nonmatchings/code_3311c", func_8004297C);
-INCLUDE_ASM("asm/nonmatchings/code_3311c", func_800429E0);
+void func_800429E0(FlatLightObj *self, s32 lightId) {
+    self->lightId = lightId;
+}
 INCLUDE_ASM("asm/nonmatchings/code_3311c", func_800429E8);
 INCLUDE_ASM("asm/nonmatchings/code_3311c", func_80042A2C);
 INCLUDE_ASM("asm/nonmatchings/code_3311c", func_80042A7C);
