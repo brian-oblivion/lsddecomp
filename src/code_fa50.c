@@ -11,6 +11,7 @@
  * Nothing here is matched yet: every function is fresh track-1 ground.
  */
 #include "common.h"
+#include "BasicClass.h"
 
 /* The four words the class copies in through its slot +0x040. */
 typedef struct Quad_fa50 {
@@ -27,13 +28,19 @@ typedef struct ModelData_fa50 {
     Rec28_fa50 recs[1];     /* +0x00C */
 } ModelData_fa50;
 
-typedef struct Class6BEA0 {
-    void *vtable;           /* +0x000 */
-    u8 pad4[0x8];           /* +0x004 */
+typedef struct Class6BEA0 Class6BEA0;
+typedef struct Class6BEA0Methods Class6BEA0Methods;
+
+struct Class6BEA0Methods {
+    BASICCLASS_SLOTS(Class6BEA0, (Class6BEA0 *self, void *arg));
+};
+
+struct Class6BEA0 {
+    BASICCLASS_FIELDS(Class6BEA0Methods);
     ModelData_fa50 *data;   /* +0x00C */
     void *unk10;            /* +0x010 */
     Quad_fa50 quad;         /* +0x014 */
-} Class6BEA0;
+};
 
 typedef struct Target_fa50 {
     u8 pad0[0x6];
@@ -55,8 +62,18 @@ extern s32 func_8001F3B0(void *self, void *buf);
 extern s32 D_8008AC4C;
 extern s32 D_8008B21C[];
 extern s32 D_8006BEA0[];
+extern void *BMemPMgrAlloc(s32 size);
+Class6BEA0Methods *func_8001F384(void);
 
-INCLUDE_ASM("asm/nonmatchings/code_fa50", new_class_6bea0);
+Class6BEA0 *new_class_6bea0(void *arg) {
+    Class6BEA0 *p = BMemPMgrAlloc(0x24);
+
+    if (p != NULL) {
+        func_8001F384()->ctor(p, arg);
+        return p;
+    }
+    return NULL;
+}
 INCLUDE_ASM("asm/nonmatchings/code_fa50", func_8001F2B0);
 void func_8001F314(Class6BEA0 *self, Quad_fa50 *src) {
     self->quad = *src;
@@ -69,8 +86,8 @@ Rec28_fa50 *func_8001F360(Class6BEA0 *self, s32 i) {
 }
 void func_8001F37C(void) {
 }
-void *func_8001F384(void) {
-    return D_8006BEA0;
+Class6BEA0Methods *func_8001F384(void) {
+    return (Class6BEA0Methods *)D_8006BEA0;
 }
 void func_8001F394(void) {
     D_8008AC4C = 1;
