@@ -1,4 +1,6 @@
-# func_8003B108
+# Class6E4F0__NoOpSlot48
+
+> Renamed from `func_8003B108` on 2026-09-25 (tools/rename.py). Address 0x8003b108.
 
 **Round 81 (delta)** · **Unit:** code_2b78c · **Size:** 2 words · **Status:** MATCHED (2/2 words, whole-image SHA1 green)
 
@@ -9,7 +11,7 @@ slots; Class6D3C8 inherits it unchanged. No caller dispatches it in carved
 code that this unit sees.
 
 ```c
-void func_8003B108(Class6E4F0 *self) {
+void Class6E4F0__NoOpSlot48(Class6E4F0 *self) {
 }
 ```
 
