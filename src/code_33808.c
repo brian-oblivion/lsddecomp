@@ -196,7 +196,11 @@ void *func_8004467C(void) {
 }
 INCLUDE_ASM("asm/nonmatchings/code_33808", func_8004468C);
 INCLUDE_ASM("asm/nonmatchings/code_33808", func_800446FC);
-INCLUDE_ASM("asm/nonmatchings/code_33808", func_800447B4);
+/* D_8006F384 +0x00C: finalize -- slot +0x07C, then the active driver's. */
+void func_800447B4(DataSrc33808 *self) {
+    self->methods->slot7C();
+    GetActiveDataSourceMethods()->finalize((Class6D430 *)self);
+}
 /* D_8006F384 +0x064: the active driver's setFlag, then slot +0x078. */
 void func_80044808(DataSrc33808 *self) {
     GetActiveDataSourceMethods()->setFlag((Class6D430 *)self);
