@@ -74,3 +74,14 @@ state-machine slots" is evident from the body alone; "main loop" is
 corroborated by `include/Class6D3C8.h`'s own note that this is the slot
 "first dispatched by main" (`src/main.c`), but that is one caller, not two
 agreeing ones, so it stays B rather than A.
+
+## Track 4
+
+**2026-09-25, round 84 (echo).** The class is declared once, in
+`include/Class6E4F0.h`. The six slots this function calls, +0x050..+0x064,
+are NULL words in D_8006E4F0's own data (the table is 0x68 bytes, past the 19
+slots classtable.py prints); they are named for the subclass's occupants
+(`loadIntroLogoSequence`, `startWeeklyStreamTask`, `pollGraphRoomStatus`,
+`slot5C` for the no-op, `pollStatusObj`, `startStreamTaskWithInit`). +0x060
+stays `s32`: this body tests its return, and the occupant,
+Class6D3C8__PollStatusObj, returns `s32`. Bytes unchanged.

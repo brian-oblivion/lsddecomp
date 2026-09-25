@@ -54,3 +54,17 @@ own display-setup slot and allocating the aux block) guarded by
 the body. It stops short of A because the overall GAME purpose of this
 one-time setup -- what it is initializing the game system FOR -- is not
 established, only which SDK calls it makes.
+
+## Track 4
+
+**2026-09-25, round 84 (echo).** The class is declared once, in
+`include/Class6E4F0.h`. The parameters are now `drawSystem` and `pad`, and
+the aux block's first two fields likewise: the one caller chain is main()
+-> Class6D3C8's +0x044 override -> this slot, and main passes
+`New_DrawSystem()` and `New_Pad(0, 0)` (src/main.c). The draw system's
++0x044 slot is `initGraph` (DrawSystem__InitGraph), `dimsArg` is `vramMode`.
+The slot type (`CLASS6E4F0_SLOTS`) carries a fourth `s32` argument this body
+does not declare: Class6D3C8__ForwardToBaseSlot44UnlessFlagged calls the slot
+with `(self, a1, a2, 0)`, and the `move a3,zero` in its jalr delay slot is
+retail's. The slot's return is `void`, the occupant's; the old subclass view
+typed it `s32`, and its one caller ignores $v0. Bytes unchanged.

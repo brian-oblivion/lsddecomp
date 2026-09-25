@@ -57,3 +57,11 @@ per the field/global rule.
 `func_8003B20C` (the table getter) is **NOT renamed this round**: proposed
 `GetClass6E4F0Methods`, but `tools/rename.py` cannot apply it -- see that
 function's own report for the blocker and the broadcast post.
+
+## Track 4
+
+**2026-09-25, round 84 (echo).** The class is declared once, in
+`include/Class6E4F0.h`. The parameter is now `dataSource`: it goes straight
+to `SetActiveDataSource`, and the one caller passes `gClass6D3C8CtorArgs`'s
+first word, 0x13 (the CD driver's class id, D_8006D4E8). The table getter is
+`GetClass6E4F0Methods` (renamed from `func_8003B20C`). Bytes unchanged.
