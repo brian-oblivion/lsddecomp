@@ -56,34 +56,34 @@ typedef struct {
 struct Class6C070Methods {
     BASICCLASS_SLOTS(Class6C070, (Class6C070 *self));
     /* +0x040 */ void (*init)(Class6C070 *self);                 /* func_80020784 */
-    /* +0x044 */ void *slot44;
-    /* +0x048 */ void *slot48;
-    /* +0x04C */ void *slot4C;
-    /* +0x050 */ void *slot50;
-    /* +0x054 */ void *slot54;
-    /* +0x058 */ void *slot58;
-    /* +0x05C */ void *slot5C;
-    /* +0x060 */ void *slot60;
-    /* +0x064 */ void *slot64;
-    /* +0x068 */ void (*slot68)(Class6C070 *self);               /* func_80020A74 */
-    /* +0x06C */ void *slot6C;
-    /* +0x070 */ void (*slot70)(Class6C070 *self, s32 value);    /* func_80020B4C */
-    /* +0x074 */ void *slot74;
-    /* +0x078 */ void (*slot78)(Class6C070 *self, u8 *color, Class6C070Rect *src); /* func_80020B74 */
-    /* +0x07C */ Class6C070Size *(*slot7C)(Class6C070 *self, Class6C070Dims *out); /* func_80020C08 */
-    /* +0x080 */ void (*slot80)(Class6C070 *self, s32 value);    /* func_80020C3C */
+    /* +0x044 */ void *initGraph;                                /* func_800207DC */
+    /* +0x048 */ void *start;                                    /* func_8002085C */
+    /* +0x04C */ void *stop;                                     /* func_8002089C */
+    /* +0x050 */ void *swapBuffers;                               /* func_800208B8 */
+    /* +0x054 */ void *getActiveBuffer;                          /* func_800208D8 */
+    /* +0x058 */ void *loadImage;                                /* func_800208F8 */
+    /* +0x05C */ void *storeImage;                                /* func_800209A0 */
+    /* +0x060 */ void *slot60;                                   /* func_80020A1C, always returns 0 */
+    /* +0x064 */ void *moveImage;                                /* func_80020A24 */
+    /* +0x068 */ void (*runLoop)(Class6C070 *self);              /* func_80020A74 */
+    /* +0x06C */ void *countFrames;                              /* func_80020AF4 */
+    /* +0x070 */ void (*setVSyncCount)(Class6C070 *self, s32 value); /* func_80020B4C */
+    /* +0x074 */ void *getVSyncCount;                            /* func_80020B68 */
+    /* +0x078 */ void (*clearImage)(Class6C070 *self, u8 *color, Class6C070Rect *src); /* func_80020B74 */
+    /* +0x07C */ Class6C070Size *(*getDims)(Class6C070 *self, Class6C070Dims *out); /* func_80020C08 */
+    /* +0x080 */ void (*setSyncMode)(Class6C070 *self, s32 value); /* func_80020C3C */
 };
 
 struct Class6C070 {
     BASICCLASS_FIELDS(Class6C070Methods);
     /* +0x00C */ s32 unkC;            /* 80020AF4 sets to 1 once unk24 reaches unk20 */
-    /* +0x010 */ s32 unk10;           /* cleared by 8002089C; 80020B4C stores unk20 only while 0 */
+    /* +0x010 */ s32 running;         /* cleared by 8002089C; 80020B4C stores unk20 only while 0; 80020A74's while condition */
     /* +0x014 */ Class6C070Size size; /* 80020C08 returns its address */
-    /* +0x01C */ s32 unk1C;           /* 800207DC: GsInitGraph vram mode */
-    /* +0x020 */ s32 unk20;           /* 80020B4C sets, 80020B68 gets */
+    /* +0x01C */ s32 vramMode;        /* 800207DC: GsInitGraph vram mode */
+    /* +0x020 */ s32 unk20;           /* 80020B4C sets, 80020B68 gets; also 80020A74's VSync() argument and 80020AF4's threshold -- one field, two uses, neither fully pinned down */
     /* +0x024 */ s32 unk24;           /* 80020AF4 counts up to unk20 */
     /* +0x028 */ u8 pad28[0x2C - 0x28];
-    /* +0x02C */ s32 unk2C;           /* 80020C3C sets */
+    /* +0x02C */ s32 syncMode;        /* 80020C3C sets; gates the post-transfer DrawSync(0) in LoadImage/StoreImage and the running-bypass there and in ClearImage's dispatch */
     /* +0x030 */ void (*callback)(void); /* 80020C44 sets, 80020A74 calls each VSync */
 };
 
@@ -124,26 +124,26 @@ void func_80020730(Class6C070 *self) {
     self->methods->init(self);
 }
 void func_80020784(Class6C070 *self) {
-    self->unk10 = 0;
-    self->methods->slot70(self, 3);
-    self->methods->slot80(self, 1);
+    self->running = 0;
+    self->methods->setVSyncCount(self, 3);
+    self->methods->setSyncMode(self, 1);
     self->callback = NULL;
 }
 void func_800207DC(Class6C070 *self, Class6C070Size *size, s32 vramMode) {
     GsInitGraph(size->w, size->h, 0, 1, vramMode);
     GsDefDispBuff(0, 0, 0, size->h);
     self->size = *size;
-    self->unk1C = vramMode;
+    self->vramMode = vramMode;
 }
 void func_8002085C(Class6C070 *self) {
-    if (self->unk10 == 0) {
-        self->unk10 = 1;
-        self->methods->slot68(self);
+    if (self->running == 0) {
+        self->running = 1;
+        self->methods->runLoop(self);
     }
 }
 void func_8002089C(Class6C070 *self) {
-    if (self->unk10 != 0) {
-        self->unk10 = 0;
+    if (self->running != 0) {
+        self->running = 0;
     }
 }
 void func_800208B8(Class6C070 *self) {
@@ -155,10 +155,10 @@ s32 func_800208D8(Class6C070 *self) {
 void func_800208F8(Class6C070 *self, Class6C070Rect *src, u_long *pixels) {
     RECT rect;
 
-    if (self->unk10 == 0 || self->unk2C != 0) {
+    if (self->running == 0 || self->syncMode != 0) {
         func_80020970(&rect, src);
         LoadImage(&rect, pixels);
-        if (self->unk2C != 0) {
+        if (self->syncMode != 0) {
             DrawSync(0);
         }
     }
@@ -172,10 +172,10 @@ void func_80020970(RECT *dst, Class6C070Rect *src) {
 void func_800209A0(Class6C070 *self, u_long *pixels, Class6C070Rect *src) {
     RECT rect;
 
-    if (self->unk10 == 0 || self->unk2C != 0) {
+    if (self->running == 0 || self->syncMode != 0) {
         func_80020970(&rect, src);
         StoreImage(&rect, pixels);
-        if (self->unk2C != 0) {
+        if (self->syncMode != 0) {
             DrawSync(0);
         }
     }
@@ -190,7 +190,7 @@ void func_80020A24(Class6C070 *self, Class6C070Rect *src, s16 x, s16 y) {
     MoveImage(&rect, x, y);
 }
 void func_80020A74(Class6C070 *self) {
-    while (self->unk10 != 0) {
+    while (self->running != 0) {
         VSync(self->unk20);
         if (self->callback != NULL) {
             self->callback();
@@ -208,7 +208,7 @@ void func_80020AF4(Class6C070 *self) {
     }
 }
 void func_80020B4C(Class6C070 *self, s32 value) {
-    if (self->unk10 == 0) {
+    if (self->running == 0) {
         self->unk20 = value;
     }
 }
@@ -220,8 +220,8 @@ void func_80020B74(Class6C070 *self, u8 *color, Class6C070Rect *src) {
     RECT rect;
 
     if (src == NULL) {
-        self->methods->slot7C(self, &dims);
-        self->methods->slot78(self, color, (Class6C070Rect *)&dims);
+        self->methods->getDims(self, &dims);
+        self->methods->clearImage(self, color, (Class6C070Rect *)&dims);
     } else {
         func_80020970(&rect, src);
         ClearImage(&rect, color[0], color[1], color[2]);
@@ -237,7 +237,7 @@ Class6C070Size *func_80020C08(Class6C070 *self, Class6C070Dims *out) {
     return &self->size;
 }
 void func_80020C3C(Class6C070 *self, s32 value) {
-    self->unk2C = value;
+    self->syncMode = value;
 }
 void func_80020C44(Class6C070 *self, void (*callback)(void)) {
     self->callback = callback;
