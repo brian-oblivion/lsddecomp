@@ -1,4 +1,6 @@
-# func_8001F360 -- MATCHED (7/7 words), round 82
+# TmdModel__GetObject -- MATCHED (7/7 words), round 82
+
+> Renamed from `func_8001F360` on 2026-09-25 (tools/rename.py). Address 0x8001f360.
 
 Round 82, runner charlie (matching slot). Unit `src/code_fa50.c`. Fresh ground (carved in FINISHING-PLAN revision 18), no prior attempt, no report before this one.
 
@@ -11,7 +13,7 @@ Round 82, runner charlie (matching slot). Unit `src/code_fa50.c`. Fresh ground (
 ## Source
 
 ```c
-Rec28_fa50 *func_8001F360(Class6BEA0 *self, s32 i) {
+Rec28_fa50 *TmdModel__GetObject(Class6BEA0 *self, s32 i) {
     return &self->data->recs[i];
 }
 ```

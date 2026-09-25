@@ -163,7 +163,7 @@ void TmdModel__SetQuad(Class6BEA0 *self, Quad_fa50 *src) {
 void TmdModel__MapModelingData(Class6BEA0 *self) {
     GsMapModelingData((unsigned long *)&self->data->head[1]);
 }
-Rec28_fa50 *func_8001F360(Class6BEA0 *self, s32 i) {
+Rec28_fa50 *TmdModel__GetObject(Class6BEA0 *self, s32 i) {
     return &self->data->recs[i];
 }
 void func_8001F37C(void) {
