@@ -105,21 +105,21 @@ typedef struct Pair_322b4 {
 typedef struct SpriteView_322b4 {
     SpriteMethods_322b4 *methods; /* +0x000 */
     u8 pad04[0xC - 0x4];
-    s32 unkC;                     /* +0x00C, tested by func_80041E2C */
+    s32 unkC;                     /* +0x00C, tested by D8006ED4C__SetPosition */
     u8 pad10[0x64 - 0x10];
     u32 attribute;                /* +0x064, GsSPRITE.attribute */
     u8 pad68[0x72 - 0x68];
     u8 u;                         /* +0x072, GsSPRITE.u */
     u8 v;                         /* +0x073, GsSPRITE.v */
     u8 pad74[0xA0 - 0x74];
-    Pair_322b4 unkA0;             /* +0x0A0, set by func_80041E2C */
+    Pair_322b4 unkA0;             /* +0x0A0, set by D8006ED4C__SetPosition */
     u8 unkA8;                     /* +0x0A8, the cell index D8006EC74__SetCell stores */
 } SpriteView_322b4;
 struct SpriteMethods_322b4 {
     u8 pad00[0x40];
     void (*reset)(SpriteView_322b4 *self, u8 cell);            /* +0x040 = D8006EC74__Reset (D_8006EC74) */
     u8 pad44[0xBC - 0x44];
-    void (*slotBC)(SpriteView_322b4 *self, Pair_322b4 *src);   /* +0x0BC = func_80041E2C */
+    void (*slotBC)(SpriteView_322b4 *self, Pair_322b4 *src);   /* +0x0BC = D8006ED4C__SetPosition */
     u8 padC0[0xC4 - 0xC0];
     void (*setCell)(SpriteView_322b4 *self, u8 cell); /* +0x0C4 = D8006EC74__SetCell */
 };
@@ -256,7 +256,7 @@ void D8006ED4C__AttachToParent(SpriteView_322b4 *self, Class6B5CC *parent, Pair_
     }
 }
 /* D_8006EC74 and D_8006ED4C slot +0x0BC. */
-void func_80041E2C(SpriteView_322b4 *self, Pair_322b4 *src) {
+void D8006ED4C__SetPosition(SpriteView_322b4 *self, Pair_322b4 *src) {
     if (self->unkC != 0) {
         self->unkA0 = *src;
     }
