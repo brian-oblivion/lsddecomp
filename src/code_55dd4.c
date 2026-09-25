@@ -17,6 +17,7 @@
  */
 #include "common.h"
 #include "code_55dd4.h"
+#include "ModelData.h"
 
 void *New_Class65650(void *arg1, void *arg2)
 {
@@ -178,7 +179,7 @@ s32 Class65650__AcquireModelData(Class65650 *self, UnkArg1Obj *other)
         self->modelData = other->modelData;
         self->ownsModelData = 0;
     } else {
-        self->modelData = New_ModelData(other);
+        self->modelData = (Unk5CObj *)New_ModelData((struct Src6F240 *)other);
         self->ownsModelData = 1;
     }
     if (self->modelData == NULL) {

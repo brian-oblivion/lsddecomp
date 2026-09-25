@@ -16,10 +16,10 @@ Table slot (`tools/classtable.py`): `D_8006D430` +0x0AC.
 ## Source
 
 ```c
-extern s32 D_8006F384[];
+#include "ModelData.h"
 
-void *GetModelDataMethods(void) {
-    return D_8006F384;
+ModelDataMethods *GetModelDataMethods(void) {
+    return &D_8006F384;
 }
 ```
 
@@ -31,3 +31,7 @@ void *GetModelDataMethods(void) {
 ## Naming
 
 - **GetModelDataMethods**, tier A. Table getter.
+
+## Track 4
+
+2026-09-25, round 84 (delta): ModelData (D_8006F384) is unified in `include/ModelData.h`; the unit-shared `DataSrc33808` view no longer types it. The getter returns `ModelDataMethods *` from `&D_8006F384`, where it used to return `void *` from a local `extern s32 D_8006F384[]` that is now deleted. The code is the same lui/addiu. Image byte-identical.

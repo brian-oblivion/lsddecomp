@@ -20,12 +20,14 @@ The unit-local view `DataSrc33808` (a Class6D430 subclass built with the unified
 fields +0x2C..+0x38) and `CountedBuf33808` sit at the top of `src/code_33808.c`.
 
 ```c
+#include "ModelData.h"
+
 /* Allocate and construct a D_8006F384 object (second constructor argument 1); freed and NULL when the constructor fails. */
-void *New_ModelData(s32 arg0) {
+ModelData *New_ModelData(Src6F240 *src) {
     void *obj = BMemPMgrAlloc(0x38);
 
     if (obj != NULL) {
-        if (((Ctor33808 *)GetModelDataMethods())->ctor(obj, arg0, 1)) {
+        if (((Ctor33808 *)GetModelDataMethods())->ctor(obj, src, 1)) {
             return obj;
         }
         BMemPMgrFree(obj);
@@ -45,3 +47,7 @@ void *New_ModelData(s32 arg0) {
 ## Naming
 
 - **New_ModelData**, tier A. include/code_55dd4.h's Unk5CObj already names this object's own +0x2C/+0x30 fields "tmd"/"tods" (populated by New_LinkResource/New_TodSet), and src/code_55dd4.c's own header comment calls this allocator's result "modelData".
+
+## Track 4
+
+2026-09-25, round 84 (delta): ModelData (D_8006F384) is unified in `include/ModelData.h`; the unit-shared `DataSrc33808` view no longer types it. The allocator now reads `ModelData *New_ModelData(Src6F240 *src)` (was `void *` from `s32 arg0`): its argument is the ctor's descriptor, passed through unchanged in $a1, so the bytes are the same. Its callers cast: TriggerWorld__BuildParts, InitDreamAux (code_4cd08) and Class65650__AcquireModelData (code_55dd4), whose local externs of it are deleted. The ctor is still reached through the unprototyped Ctor33808 view, because CLASS6D430_SLOTS declares +0x008 returning void. Image byte-identical.

@@ -72,7 +72,7 @@ audio-stream-request object:
    `name="ETC\\SYMSPY.MOM"`, `mode=1`.
 3. A `for (i = 0; i < 1; i++)` loop (see the "loop that only runs once" note
    in `TickDreamAuxSlots`'s report -- same confirmed idiom) that calls
-   `New_ModelData(&req)` and stores the result into `gDreamAuxSlots[0].obj`,
+   `New_ModelData((struct Src6F240 *)&req)` and stores the result into `gDreamAuxSlots[0].obj`,
    then overwrites `req.name` with `"ETC\\SYMDOG.MOM"`. Because the loop
    only runs once, that second name write is dead in THIS retail build --
    likely a leftover of an original 2-iteration loop (SYMSPY then SYMDOG)
@@ -105,7 +105,7 @@ void InitDreamAux(void)
     SetVec3(&req, 0, gMomPathSymSpy, 1);
 
     for (i = 0; i < 1; i++) {
-        gDreamAuxSlots[i].obj = New_ModelData(&req);
+        gDreamAuxSlots[i].obj = New_ModelData((struct Src6F240 *)&req);
         req.name = gMomPathSymDog;
     }
 }
@@ -224,3 +224,7 @@ into `gDreamAuxSlots[0].obj`. "Init" fits the one-shot, construction-time
 call site; the broader game reason (why THIS unit's state resets alongside
 that particular object's construction) is not established from this unit
 alone, hence tier B rather than A.
+
+## Track 4
+
+2026-09-25, round 84 (delta): ModelData (D_8006F384) is unified in `include/ModelData.h`. code_4cd08 includes it, and include/code_4cd08.h's local `extern void *New_ModelData(DreamAuxLoadReq *req)` is deleted. The call reads `New_ModelData((struct Src6F240 *)&req)`, a pointer cast with no code. DreamAuxLoadReq {flag, name, mode} has the descriptor's own shape: word 0 is the buffer to adopt, and it is 0 here, so ModelData__ModelData requests the MOM file named in word 1. Image byte-identical.

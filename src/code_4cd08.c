@@ -1,6 +1,7 @@
 #include "common.h"
 #include "code_4cd08.h"
 #include "Class6B5CC.h"
+#include "ModelData.h"
 
 const char gMomPathSymSpy[] = "ETC\\SYMSPY.MOM";
 const char gMomPathSymDog[] = "ETC\\SYMDOG.MOM";
@@ -20,7 +21,7 @@ void InitDreamAux(void)
     SetVec3(&req, 0, gMomPathSymSpy, 1);
 
     for (i = 0; i < 1; i++) {
-        gDreamAuxSlots[i].obj = New_ModelData(&req);
+        gDreamAuxSlots[i].obj = New_ModelData((struct Src6F240 *)&req);
         req.name = gMomPathSymDog;
     }
 }

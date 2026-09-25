@@ -21,15 +21,17 @@ fields +0x2C..+0x38), `Ctor33808` and `CountedBuf33808` sit at the top of
 `src/code_33808.c`.
 
 ```c
+#include "ModelData.h"
+
 /* D_8006F384 +0x07C: when +0x34 is set, release the objects at +0x30 and
  * +0x2C (each when there is one). */
-void ModelData__ReleaseResources(DataSrc33808 *self) {
-    if (self->unk34 != 0) {
-        if (self->unk30 != NULL) {
-            self->unk30->methods->release(self->unk30);
+void ModelData__ReleaseResources(ModelData *self) {
+    if (self->ownsResources != 0) {
+        if (self->todSet != NULL) {
+            self->todSet->methods->release(self->todSet);
         }
-        if ((DataSrc33808 *)self->unk2C != NULL) {
-            ((DataSrc33808 *)self->unk2C)->methods->release((DataSrc33808 *)self->unk2C);
+        if (self->linkResource != NULL) {
+            self->linkResource->methods->release(self->linkResource);
         }
     }
 }
@@ -42,3 +44,7 @@ First build. +0x2C is `s32` in the unit-local DataSrc33808 view (other classes s
 ## Naming
 
 - **ModelData__ReleaseResources**, tier A. Slot +0x07C: releases the tmd/tods sub-objects when owned.
+
+## Track 4
+
+2026-09-25, round 84 (delta): ModelData (D_8006F384) is unified in `include/ModelData.h`; the unit-shared `DataSrc33808` view no longer types it. Its slot, +0x07C, is named `releaseResources` for this function. Both releases now go through the unified Class6D430 table (`linkResource->methods->release`, `todSet->methods->release`); before, they went through `DataSrc33808` casts. Image byte-identical.

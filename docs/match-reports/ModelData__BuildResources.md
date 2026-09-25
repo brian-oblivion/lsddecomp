@@ -21,6 +21,8 @@ fields +0x2C..+0x38), `Ctor33808` and `CountedBuf33808` sit at the top of
 `src/code_33808.c`.
 
 ```c
+#include "ModelData.h"
+
 typedef struct Req44858 {
     /* +0x00 */ void *buffer;
     /* +0x04 */ s32 unk4;
@@ -32,21 +34,21 @@ typedef struct Buf44858 {
     /* +0x08 */ s32 offset;
 } Buf44858;
 
-s32 ModelData__BuildResources(DataSrc33808 *self) {
+s32 ModelData__BuildResources(ModelData *self) {
     Req44858 req;
 
-    if (self->unk34 != 0) {
+    if (self->ownsResources != 0) {
         SetVec3(&req, (u8 *)self->buffer + ((Buf44858 *)self->buffer)->offset, 0, 1);
-        self->unk2C = (s32)New_LinkResource((s32)&req);
-        if ((void *)self->unk2C != NULL) {
+        self->linkResource = New_LinkResource((s32)&req);
+        if (self->linkResource != NULL) {
             req.buffer = (u8 *)self->buffer + 0xC;
-            self->unk30 = New_TodSet((s32)&req);
-            if (self->unk30 != NULL) {
+            self->todSet = New_TodSet((s32)&req);
+            if (self->todSet != NULL) {
                 return 0;
             }
-            self->unk30 = NULL;
+            self->todSet = NULL;
         }
-        self->methods->slot7C(self);
+        self->methods->releaseResources(self);
         return 1;
     }
     return 0;
@@ -60,3 +62,7 @@ First build. The redundant `sw zero, 0x30` on the second failure is an explicit 
 ## Naming
 
 - **ModelData__BuildResources**, tier A. Slot +0x078: builds the LinkResource (tmd) and TodSet (tods) sub-objects over the buffer's two sub-blocks.
+
+## Track 4
+
+2026-09-25, round 84 (delta): ModelData (D_8006F384) is unified in `include/ModelData.h`; the unit-shared `DataSrc33808` view no longer types it. +0x02C is `linkResource` (`Class6D430 *`, New_LinkResource's result; the `(s32)` and `(void *)` casts are gone), +0x030 is `todSet` (`Class6D430 *`, New_TodSet's result) and +0x034 is `ownsResources`. The failure path calls `releaseResources(self)` (slot +0x07C). Image byte-identical.

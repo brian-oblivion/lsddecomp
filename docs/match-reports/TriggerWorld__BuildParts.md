@@ -40,7 +40,7 @@ s32 TriggerWorld__BuildParts(DataSrc33808 *self) {
     self->unk38 = 0;
     for (; i < n; i++) {
         req.buffer = (u8 *)self->buffer + ((CountedBuf33808 *)self->buffer)->entries[i];
-        *p = (s32)New_ModelData((s32)&req);
+        *p = (s32)New_ModelData((Src6F240 *)&req);
         if (*p == 0) {
             goto fail;
         }
@@ -61,3 +61,7 @@ First build. The loop pointer walks `buf->entries` while the offset is re-read t
 ## Naming
 
 - **TriggerWorld__BuildParts**, tier A. Slot +0x078: builds a ModelData (not owning) over each sub-block of the buffer's counted offset table, counting them at +0x38.
+
+## Track 4
+
+2026-09-25, round 84 (delta): Its parent ModelData (D_8006F384) is unified in `include/ModelData.h` (this class is still its own job). The part allocation reads `*p = (s32)New_ModelData((Src6F240 *)&req)` (was `(s32)&req`), a pointer cast with no code. Image byte-identical.
