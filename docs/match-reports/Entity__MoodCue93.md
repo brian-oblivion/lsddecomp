@@ -72,3 +72,5 @@ The accessor column is the first unit outside Entity_f that failed to compile
 with the definition renamed and Entity_f's own accessors fixed (make stops
 at the first failing unit, so it is a witness, not the full list); the head's
 type-scope apply lists the rest.
+
+**Applied by the head at merge, round 79**, by type scope, each field separately with both oracles green. `moodDuration` (round 78) is now `todFrameCount`.

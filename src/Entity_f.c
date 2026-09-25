@@ -18,8 +18,9 @@
  * Entity derives from Class65650 (code_55dd4.h), whose TOD fields and slots
  * it inherits at the same offsets: this round renamed the two only this unit
  * touches (`todFramePtr` +0x88, `applyTodFrame` +0x134) and proposed the
- * shared ones (setTod/playTod/stopTod, todIndex/todFrame, and
- * moodDuration -> todFrameCount) in Entity__MoodCue93.md.
+ * shared ones (setTod/playTod/stopTod, todIndex/todFrame, companion2, and
+ * moodDuration -> todFrameCount) in Entity__MoodCue93.md; the head applied
+ * all of them by type scope at merge.
  */
 #include "common.h"
 #include "Entity.h"
@@ -67,7 +68,7 @@ void Entity__MoodCue82(Entity *this, EntityMoodHandlerArg *out) {
             this->methods->notifyParents(this, 0xA);
         }
     } else if (this->moodState == 0xB) {
-        this->methods->slot130(this);
+        this->methods->stopTod(this);
         if (this->methods->distanceToRegion(this, this->target) < 0x200) {
             if (rand() % 3 != 0) {
                 this->methods->deactivate(this);
@@ -79,12 +80,12 @@ void Entity__MoodCue82(Entity *this, EntityMoodHandlerArg *out) {
 }
 
 void Entity__MoodCue83(Entity *this, EntityMoodHandlerArg *out) {
-    if (this->unk84 % 15 == 0) {
+    if (this->todFrame % 15 == 0) {
         out->unk10 = 0;
         out->unk1C = 0xC;
         out->unk20 = 2;
     }
-    if (this->moodTimer == this->moodDuration) {
+    if (this->moodTimer == this->todFrameCount) {
         out->unk1C = -2;
         this->methods->stopSoundCue(this);
         this->moodState = 1;
@@ -93,28 +94,28 @@ void Entity__MoodCue83(Entity *this, EntityMoodHandlerArg *out) {
 
 void Entity__MoodCue84(Entity *this, EntityMoodHandlerArg *out) {
     out->unk10 = this->methods->getProximityRatio(this);
-    if (this->unk84 < 0x28) {
+    if (this->todFrame < 0x28) {
         out->unk1C = 0xC;
         out->unk20 = -2;
         out->unk44 = 5;
         out->unk48 = -1;
         return;
     }
-    if (this->unk84 == 0x28) {
+    if (this->todFrame == 0x28) {
         out->unk1C = -2;
         out->unk44 = -2;
         return;
     }
-    if (this->unk84 == 0x2D) {
+    if (this->todFrame == 0x2D) {
         out->unk30 = 0x12;
         out->unk34 = 1;
         return;
     }
-    if (this->unk84 == 0x40) {
+    if (this->todFrame == 0x40) {
         out->unk1C = 7;
         return;
     }
-    if (this->unk84 == 0x59) {
+    if (this->todFrame == 0x59) {
         this->methods->stopSoundCue(this);
         this->moodState = 1;
     }
@@ -122,11 +123,11 @@ void Entity__MoodCue84(Entity *this, EntityMoodHandlerArg *out) {
 
 void Entity__MoodCue85(Entity *this, EntityMoodHandlerArg *out) {
     if (this->moodState == 0) {
-        if (this->unk84 == 5) {
+        if (this->todFrame == 5) {
             SetCueTones7_7_7(out);
         }
-        if (this->moodTimer == this->moodDuration) {
-            this->methods->slot130(this);
+        if (this->moodTimer == this->todFrameCount) {
+            this->methods->stopTod(this);
             this->moodState = 0xA;
             this->moodTimer = -1;
         }
@@ -150,7 +151,7 @@ void Entity__MoodCue85(Entity *this, EntityMoodHandlerArg *out) {
         } else {
             SetCueTones7_7_7(out);
             if (Entity__GetOrCreateUnk100(this, NULL, NULL, (void *)0x1E, 0) != NULL) {
-                this->unk100->methods->slotD4(this->unk100, this->unk50, 7, 0);
+                this->unk100->methods->slotD4(this->unk100, this->companion2, 7, 0);
             }
             this->moodState = 0xD;
             this->moodTimer = -1;
@@ -159,7 +160,7 @@ void Entity__MoodCue85(Entity *this, EntityMoodHandlerArg *out) {
         if (this->moodTimer < 0x5A) {
             if (this->moodTimer == 0x1E) {
                 if (Entity__GetOrCreateUnk100(this, NULL, NULL, (void *)0xA, 0) != NULL) {
-                    this->unk100->methods->slotD8(this->unk100, this->unk50, 0, 0);
+                    this->unk100->methods->slotD8(this->unk100, this->companion2, 0, 0);
                 }
             }
             this->target->methods->slot44(this->target, 0, ROTATION_ZPLUS1);
@@ -182,14 +183,14 @@ void Entity__MoodCue85(Entity *this, EntityMoodHandlerArg *out) {
 
 void Entity__MoodCue86(Entity *this, EntityMoodHandlerArg *out) {
     if (this->moodTimer < 0xA) {
-        this->methods->slot130(this);
+        this->methods->stopTod(this);
     } else if (this->moodTimer == 0xA) {
-        this->methods->slot12C(this);
+        this->methods->playTod(this);
     }
-    if (this->unk84 == 0xA) {
+    if (this->todFrame == 0xA) {
         SetCueTones18_3_3(out);
     }
-    if (this->moodTimer == this->moodDuration + 0xA) {
+    if (this->moodTimer == this->todFrameCount + 0xA) {
         this->methods->stopSoundCue(this);
         this->moodState = 1;
     }
@@ -217,17 +218,17 @@ void Entity__MoodCue87(Entity *this, EntityMoodHandlerArg *out) {
     if (out->unk4 == 0) {
         out->unk1C = 0x12;
     }
-    if (out->unk4 >= this->moodDuration - 1) {
+    if (out->unk4 >= this->todFrameCount - 1) {
         out->unk4 = -1;
     }
 }
 
 void Entity__MoodCue88(Entity *this, EntityMoodHandlerArg *out) {
     out->unk10 = this->methods->getProximityRatio(this);
-    if (out->unk4 == this->moodDuration / 2) {
+    if (out->unk4 == this->todFrameCount / 2) {
         out->unk1C = 0x12;
     }
-    if (out->unk4 >= this->moodDuration - 1) {
+    if (out->unk4 >= this->todFrameCount - 1) {
         out->unk4 = -1;
     }
 }
@@ -239,7 +240,7 @@ void Entity__MoodCue89(Entity *this, EntityMoodHandlerArg *out) {
         out->unk30 = 3;
         return;
     }
-    if (this->moodTimer == this->moodDuration) {
+    if (this->moodTimer == this->todFrameCount) {
         this->methods->stopSoundCue(this);
         this->moodState = 1;
         if (rand() & 1) {
@@ -262,17 +263,17 @@ void Entity__MoodCue91(Entity *this, EntityMoodHandlerArg *out) {
             if (rand() & 1) {
                 this->methods->addVec14(this, TRANSLATE_Y_MINUS256);
             }
-            this->unk100->methods->slotD4(this->unk100, this->unk50, 0, 0);
+            this->unk100->methods->slotD4(this->unk100, this->companion2, 0, 0);
         }
     } else {
-        if (this->unk84 == 0) {
+        if (this->todFrame == 0) {
             do {
                 this->todFramePtr = this->methods->applyTodFrame(this, this->todFramePtr, 0);
-                this->unk84 += 1;
-            } while (this->unk84 < 0x18);
+                this->todFrame += 1;
+            } while (this->todFrame < 0x18);
         }
     }
-    if (this->unk84 >= 0x19) {
+    if (this->todFrame >= 0x19) {
         this->methods->slotC4(this, -0x14, 0);
         this->target->methods->slot130(this->target, 1);
     }
@@ -286,22 +287,22 @@ void Entity__MoodCue91(Entity *this, EntityMoodHandlerArg *out) {
 }
 
 void Entity__MoodCue92(Entity *this, EntityMoodHandlerArg *out) {
-    if (this->unk7C == 0) {
+    if (this->todIndex == 0) {
         if (this->targetReached != 0) {
             Class6B5CC__FaceTarget(this, this->target, 1, 0, 0);
-            this->methods->slot128(this, 1);
+            this->methods->setTod(this, 1);
             this->target->methods->slot130(this->target, 1);
-        } else if (this->unk84 == 0) {
+        } else if (this->todFrame == 0) {
             do {
                 this->todFramePtr = this->methods->applyTodFrame(this, this->todFramePtr, 0);
-                this->unk84 += 1;
-            } while (this->unk84 < 0x18);
+                this->todFrame += 1;
+            } while (this->todFrame < 0x18);
         }
     } else {
-        if (this->unk84 == 0) {
+        if (this->todFrame == 0) {
             out->unk10 = 0;
             out->unk1C = 0x16;
-        } else if (this->unk84 == this->moodDuration - 1) {
+        } else if (this->todFrame == this->todFrameCount - 1) {
             out->unk10 = 0;
             out->unk30 = 0x12;
             this->methods->notifyParents(this, 0xA);
@@ -315,10 +316,10 @@ void Entity__MoodCue93(Entity *this, EntityMoodHandlerArg *out) {
     if (out->unk4 % 10 == 0) {
         out->unk1C = 3;
     }
-    if (this->moodTimer == this->moodDuration) {
-        this->methods->slot128(this, 1);
+    if (this->moodTimer == this->todFrameCount) {
+        this->methods->setTod(this, 1);
     }
-    if (this->unk7C == 1) {
+    if (this->todIndex == 1) {
         this->methods->slotC4(this, -0x80, 1);
     }
 }
@@ -333,8 +334,8 @@ void Entity__MoodCue94(Entity *this, EntityMoodHandlerArg *out) {
     if (out->unk4 % 10 == 0) {
         out->unk1C = 0xE;
     }
-    if (this->moodTimer == this->moodDuration) {
-        this->methods->slot128(this, 1);
+    if (this->moodTimer == this->todFrameCount) {
+        this->methods->setTod(this, 1);
         if (this->moodState != 0) {
             if ((rand() & 1) == 0) {
                 this->methods->updateScale(this, 1, SCALE_SIX);
@@ -345,29 +346,29 @@ void Entity__MoodCue94(Entity *this, EntityMoodHandlerArg *out) {
             this->methods->updateRotation(this, 0, ROTATION_YAW_PLUS180);
         }
     }
-    if (this->unk7C != 0) {
+    if (this->todIndex != 0) {
         this->methods->slotC4(this, -0x80, 1);
     }
 }
 
 void Entity__MoodCue95(Entity *this, EntityMoodHandlerArg *out) {
     if (this->moodTimer == 0) {
-        this->methods->slot128(this, 3);
-    } else if (this->moodTimer == this->moodDuration) {
-        this->methods->slot128(this, 1);
+        this->methods->setTod(this, 3);
+    } else if (this->moodTimer == this->todFrameCount) {
+        this->methods->setTod(this, 1);
     }
-    if (this->unk7C == 1) {
+    if (this->todIndex == 1) {
         this->methods->slotC4(this, -0x80, 0);
     }
 }
 
 void Entity__MoodCue96(Entity *this, EntityMoodHandlerArg *out) {
     if (this->moodTimer == 0) {
-        this->methods->slot128(this, rand() % 4);
+        this->methods->setTod(this, rand() % 4);
         return;
     }
-    if (this->moodTimer % this->moodDuration == 0) {
-        this->methods->slot128(this, rand() % 4);
+    if (this->moodTimer % this->todFrameCount == 0) {
+        this->methods->setTod(this, rand() % 4);
         out->unk10 = this->methods->getProximityRatio(this);
         out->unk1C = 0x16;
         out->unk20 = 2;

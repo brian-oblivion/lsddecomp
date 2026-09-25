@@ -290,7 +290,7 @@ extern void InitSoundCueSet(s32 arg0, void *arg1, s32 arg2, Entity *arg3, void *
 void Entity__StartSoundCue(Entity *this) {
     InitSoundCueSet(this->soundCueChannel, &this->soundCueSet, this->moodIndex + 1, this,
                   gEntityMoodHandlerTable[this->moodIndex].handler);
-    this->methods->slot12C(this);
+    this->methods->playTod(this);
     this->methods->slot110(this);
     this->moodTimer = 0;
     this->soundCueActive = 1;
@@ -298,7 +298,7 @@ void Entity__StartSoundCue(Entity *this) {
 
 void Entity__StopSoundCue(Entity *this) {
     FlushSoundCueSet(this->soundCueChannel, &this->soundCueSet);
-    this->methods->slot130(this);
+    this->methods->stopTod(this);
     this->methods->slot114(this);
     this->soundCueActive = 0;
 }

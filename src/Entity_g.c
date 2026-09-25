@@ -75,7 +75,7 @@ extern void Entity__StepYawInWindowsThenDeactivate(Entity *this, EntityMoodHandl
 void Entity__MoodCue98(Entity *this, EntityMoodHandlerArg *out) {
     if (this->targetReached != 0) {
         if (Entity__GetOrCreateUnk100(this, NULL, 0, 0xA, 0) != 0) {
-            this->unk100->methods->slotD4(this->unk100, this->unk50, 7, 0);
+            this->unk100->methods->slotD4(this->unk100, this->companion2, 7, 0);
             this->methods->deactivate(this);
             this->target->methods->slot21C(this->target);
         }
@@ -90,7 +90,7 @@ void Entity__MoodCue102(Entity *this, EntityMoodHandlerArg *out) {
         this->methods->slotCC(this, -0x200, 0);
     }
     out->unk10 = this->methods->getProximityRatio(this);
-    if (this->unk84 == this->moodDuration / 2) {
+    if (this->todFrame == this->todFrameCount / 2) {
         out->unk1C = 7;
         out->unk20 = -2;
         out->unk30 = 3;
@@ -174,14 +174,14 @@ void Entity__MoodCue106(Entity *this, EntityMoodHandlerArg *out) {
         void *fn;
 
         if (this->moodTimer == 0) {
-            this->methods->slot130(this);
+            this->methods->stopTod(this);
         }
         fn = this->methods->updateScale;
         ((void (*)(Entity *, s32, void *))fn)(this, 1, D_80089E2C);
         return;
     }
     if (this->moodTimer == 0) {
-        this->methods->slot128(this, 1);
+        this->methods->setTod(this, 1);
     }
     this->methods->slotC8(this, (this->moodTimer % 20 < 10) ? 0x20 : -0x20, 0);
 }
@@ -198,7 +198,7 @@ void Entity__MoodCue109(Entity *this, EntityMoodHandlerArg *out) {
 
 void Entity__MoodCue110(Entity *this, EntityMoodHandlerArg *out) {
     this->methods->updateScale(this, 1, D_80089E44);
-    this->methods->slot130(this);
+    this->methods->stopTod(this);
     if (this->moodState == 0) {
         if (this->methods->distanceToRegion(this, this->target) < 0x800) {
             this->moodState = 0xA;
@@ -224,7 +224,7 @@ void Entity__MoodCue111(Entity *this, EntityMoodHandlerArg *out) {
     if (this->moodState != 0 && this->moodTimer >= 0x870) {
         if ((u32)(this->moodTimer - 0x870) < 0x191) {
             if (this->moodTimer == 0x870) {
-                this->methods->slot130(this);
+                this->methods->stopTod(this);
                 out->unk1C = -2;
                 out->unk30 = -2;
                 out->unk44 = -2;
@@ -236,7 +236,7 @@ void Entity__MoodCue111(Entity *this, EntityMoodHandlerArg *out) {
                 return;
             }
             if (this->moodTimer == 0xA00) {
-                this->methods->slot12C(this);
+                this->methods->playTod(this);
                 out->unk4 = 1;
                 return;
             }
@@ -330,7 +330,7 @@ void Entity__MoodCue123(Entity *this, EntityMoodHandlerArg *out) {
             this->moodState = 0xB;
         }
     }
-    this->methods->slot130(this);
+    this->methods->stopTod(this);
     this->methods->slotC4(this, 0x64, 0);
     if (this->moodTimer == 0x3E8) {
         this->methods->stopSoundCue(this);
@@ -359,7 +359,7 @@ trigger:
 merge:
     this->methods->updateScale(this, 1, D_80089E44);
     out->unk10 = this->methods->getProximityRatio(this);
-    if (out->unk4 % (this->moodDuration / 2) == 0) {
+    if (out->unk4 % (this->todFrameCount / 2) == 0) {
         out->unk1C = 0xA;
         out->unk20 = 1;
     }
@@ -376,7 +376,7 @@ void Entity__MoodCue129(Entity *this, EntityMoodHandlerArg *out) {
     if (this->moodTimer == 0) {
         this->moodState = rand() % 2 + 0xA;
     }
-    this->methods->slot130(this);
+    this->methods->stopTod(this);
     if (this->moodTimer >= 0xC9) {
         Class6B5CC__FaceTarget(this, this->target, 1, 0, 0);
         if (this->moodState == 0xA) {

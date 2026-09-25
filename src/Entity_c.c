@@ -21,14 +21,16 @@
  * (same precedent as `Entity__MoodCue81`, Entity_e).
  *
  * Every field and vtable slot this unit's functions touch (`moodTimer`,
- * `moodState`, `target`, `moodDuration`, `unk28`, `targetReached`, the `out->unkNN`
+ * `moodState`, `target`, `todFrameCount`, `unk28`, `targetReached`, the `out->unkNN`
  * `EntityMoodHandlerArg` members, `slotC4`/`slotC8`/`slotCC`/`slotD0`,
- * `slot130`/`distanceToRegion`/`slot200`) is shared with at least one sibling
+ * `stopTod`/`distanceToRegion`/`slot200`) is shared with at least one sibling
  * Entity_x unit, so the runner renamed none of it; the head applied three
  * by type scope in round 78 (`unk80` -> `moodDuration`, `unkF4` ->
  * `targetReached`, `slot144` -> `distanceToRegion`; evidence in
  * `Entity__MoodCue21.md`, `Entity__UpdateTargetProximity.md`,
- * `Entity__MoodCue11.md`).
+ * `Entity__MoodCue11.md`). Round 79 corrected `moodDuration` to
+ * `todFrameCount` (Entity inherits it from Class65650) and renamed
+ * `slot130` to `stopTod`; see `Entity__MoodCue93.md`.
  */
 #include "common.h"
 #include "Entity.h"
@@ -73,7 +75,7 @@ void Entity__MoodCue21(Entity *this, EntityMoodHandlerArg *out) {
     s32 rem;
 
     out->unk10 = this->methods->getProximityRatio(this);
-    half = this->moodDuration / 2;
+    half = this->todFrameCount / 2;
     rem = out->unk4 % half;
     if (rem == 0) {
         out->unk1C = 0xA;
@@ -164,7 +166,7 @@ void Entity__MoodCue26(Entity *this, EntityMoodHandlerArg *out) {
      * swaps which callee-saved register holds `this` vs `out` for the
      * whole function. */
     do {
-        if (out->unk4 % this->moodDuration == 0) {
+        if (out->unk4 % this->todFrameCount == 0) {
             out->unk10 = this->methods->getProximityRatio(this);
             out->unk1C = 0x1A;
             __asm__("");
@@ -249,8 +251,8 @@ void Entity__MoodCue31(Entity *this, EntityMoodHandlerArg *out) {
         out->unk30 = 0xD;
         out->unk44 = 0xD;
     }
-    if (this->moodTimer == this->moodDuration) {
-        this->methods->slot130(this);
+    if (this->moodTimer == this->todFrameCount) {
+        this->methods->stopTod(this);
         this->methods->notifyParents(this, 0xA);
     }
 }
