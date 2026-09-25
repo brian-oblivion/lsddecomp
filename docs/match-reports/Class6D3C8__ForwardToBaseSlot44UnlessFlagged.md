@@ -81,7 +81,7 @@ the name describes the forwarding mechanism only, not why a caller would
 set the flag.
 
 **Field `Class6D3C8Methods.slot44` was NOT renamed** despite this
-function's clear mechanics, because `src/main.c` (`func_800118DC`, another
+function's clear mechanics, because `src/main.c` (`GameMain`, another
 unit) dispatches it by field name directly
 (`D_8008AC20->methods->slot44(D_8008AC20, obj, pad)`) -- renaming the
 struct definition here would break that unit's build, which is outside this

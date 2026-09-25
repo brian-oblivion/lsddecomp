@@ -104,7 +104,7 @@ typedef struct Class6D3C8Methods {
                                                              * unit's ownership -- see the header's top comment
                                                              * and the round 77 proposed-field-names note. */
     void *unk48;                                            /* +0x048 func_8003B108 */
-    void (*slot4C)(Class6D3C8 *self);                       /* +0x04C func_8003B110, first dispatched by func_800118DC
+    void (*slot4C)(Class6D3C8 *self);                       /* +0x04C func_8003B110, first dispatched by GameMain
                                                              * (src/main.c) -- same cross-unit-slot44 reason, not renamed. */
     void (*loadIntroLogoSequence)(Class6D3C8 *self);        /* +0x050 Class6D3C8__LoadIntroLogoSequence */
     void (*startWeeklyStreamTask)(Class6D3C8 *self);        /* +0x054 Class6D3C8__StartWeeklyStreamTask */

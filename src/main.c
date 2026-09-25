@@ -45,7 +45,7 @@ extern Class6D3C8CtorArgs D_80066828;
  * caller existed until now). */
 extern Class6D3C8 *New_Class6D3C8(Class6D3C8CtorArgs *arg);
 
-void func_800118DC(void)
+void GameMain(void)
 {
     void *obj;
     Pad *pad;

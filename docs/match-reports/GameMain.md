@@ -1,4 +1,6 @@
-# func_800118DC (round 47)
+# GameMain (round 47)
+
+> Renamed from `func_800118DC` on 2026-09-25 (tools/rename.py). Address 0x800118dc.
 
 **Unit:** main · **Size:** 46 instructions · **Status:** MATCHED (46/46 words, whole-image SHA1 OK)
 
@@ -68,7 +70,7 @@ extern Class6D3C8CtorArgs D_80066828;
  * caller existed until now). */
 extern Class6D3C8 *New_Class6D3C8(Class6D3C8CtorArgs *arg);
 
-void func_800118DC(void)
+void GameMain(void)
 {
     void *obj;
     Pad *pad;
