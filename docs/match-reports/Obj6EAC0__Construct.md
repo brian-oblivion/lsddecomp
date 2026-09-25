@@ -15,7 +15,7 @@ void Obj6EAC0__Construct(Obj6EAC0 *self, s32 a1, s32 a2, s32 a3) {
     s32 i;
     Obj6EAC0 **cursor;
 
-    ((void (*)(Obj6EAC0 *, s32, s32))func_80041C3C()->slot08)(self, a1, 0x20);
+    ((void (*)(Obj6EAC0 *, s32, s32))Get_vtable_D8006EC74()->slot08)(self, a1, 0x20);
     self->methods = Obj6EAC0__GetDerivedMethods();
     self->unkA9 = a2;
     self->unkAB = a2;
@@ -41,7 +41,7 @@ The derived table's constructor (`Obj6EAC0Methods::slot08`), called by
 this unit's own `New_Obj6EAC0` via
 `Obj6EAC0__GetDerivedMethods()->slot08(self, ctx, len, name)`. Chains to the THIRD
 sibling table's own `slot08` (a base-class-style constructor call
-through `func_80041C3C()`, same shape as `New_Obj6EAC0` calling
+through `Get_vtable_D8006EC74()`, same shape as `New_Obj6EAC0` calling
 `Obj6EAC0__GetDerivedMethods()->slot08`), then sets up `self->methods` to the
 DERIVED table, zeroes/initialises the slice-index fields, allocates an
 `a2`-element child array via `BMemPMgrAlloc`, fills each slot by
@@ -54,7 +54,7 @@ to attempt), and — only if the array allocation succeeded — dispatches
 
 The residue, once the loop and allocation shape were right, was ONE
 extra instruction: `move $a3, $s5` immediately before the
-`func_80041C3C()->slot08` call, which retail does not have. Every
+`Get_vtable_D8006EC74()->slot08` call, which retail does not have. Every
 straightforward call written as `slot08(self, a1, 0x20, a3)` (passing
 `a3` explicitly, matching the struct's WIDEST declared arity) forces
 GCC to reload `a3` from its callee-saved cache back into the argument
@@ -71,7 +71,7 @@ exactly the "leftover register implicit argument" shape already
 documented for other functions in this project. Casting the slot
 pointer down to a narrower, 3-parameter function-pointer type for
 THIS call site only —
-`((void (*)(Obj6EAC0 *, s32, s32))func_80041C3C()->slot08)(self, a1, 0x20)`
+`((void (*)(Obj6EAC0 *, s32, s32))Get_vtable_D8006EC74()->slot08)(self, a1, 0x20)`
 — removes the compiler's obligation to materialise `a3` into the
 argument register at all, and the leftover value in `$a3` (never
 touched since function entry) does the rest for free. Zero-attempt
@@ -126,7 +126,7 @@ still goes through the struct's own canonical 4-arg field, untouched.
 - **The "leftover register implicit argument" idiom generalises to
   chained/inherited constructor calls, not just ordinary method
   calls.** When a constructor forwards to a "base class" constructor
-  through a SIBLING vtable (here, `func_80041C3C()`'s third table)
+  through a SIBLING vtable (here, `Get_vtable_D8006EC74()`'s third table)
   using fewer arguments than the slot's own widest declared arity, the
   fix is a per-call-site cast to a NARROWER function-pointer type
   (leaving the struct's canonical field type at its widest use) —

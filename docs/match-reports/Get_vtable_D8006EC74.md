@@ -1,4 +1,6 @@
-# func_80041C3C -- MATCHED (4/4 words), round 82
+# Get_vtable_D8006EC74 -- MATCHED (4/4 words), round 82
+
+> Renamed from `func_80041C3C` on 2026-09-25 (tools/rename.py). Address 0x80041c3c.
 
 Round 82, runner alpha (second re-staffed slot of the round). Unit `src/code_322b4.c`. Fresh ground (carved in FINISHING-PLAN revision 18), no prior attempt, no report before this one.
 
@@ -11,7 +13,7 @@ Round 82, runner alpha (second re-staffed slot of the round). Unit `src/code_322
 
 ```c
 /* Returns the D_8006EC74 method table. */
-void *func_80041C3C(void) {
+void *Get_vtable_D8006EC74(void) {
     return D_8006EC74;
 }
 ```

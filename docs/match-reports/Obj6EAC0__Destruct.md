@@ -8,13 +8,13 @@ Unit: `src/code_2cc8c_f.c`. First attempt.
 void Obj6EAC0__Destruct(Obj6EAC0 *self) {
     ReleaseBasicClassArray(self->unkB4, self->unkA9);
     self->unkB4 = BMemPMgrFree(self->unkB4);
-    func_80041C3C()->slot0C(self);
+    Get_vtable_D8006EC74()->slot0C(self);
 }
 ```
 
 Derived-table occupant of `Obj6EAC0Methods::slot0C`. Retail's own
-delay slot after the `func_80041C3C()` call stores the PRECEDING
-call's return (`BMemPMgrFree`'s), not `func_80041C3C`'s own -- read
+delay slot after the `Get_vtable_D8006EC74()` call stores the PRECEDING
+call's return (`BMemPMgrFree`'s), not `Get_vtable_D8006EC74`'s own -- read
 per the established "a delay slot after a `jal` carries the value from
 the PRECEDING call's return" idiom, and it is what motivated retyping
 `BMemPMgrFree`'s shared declaration (see below).

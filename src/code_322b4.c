@@ -147,7 +147,7 @@ typedef struct Slot08Methods_322b4 {
 void *func_80042684(void);
 void *func_800423F0(void);
 
-void *func_80041C3C(void);
+void *Get_vtable_D8006EC74(void);
 typedef struct CellCtorMethods_322b4 {
     u8 pad00[0x8];
     void *(*ctor)(void *self, void *texture, u8 cell); /* +0x008 = D8006EC74__D8006EC74 */
@@ -181,7 +181,7 @@ void *New_D8006EC74(void *texture, u8 cell) {
     void *obj = BMemPMgrAlloc(0xAC);
 
     if (obj != NULL) {
-        ((CellCtorMethods_322b4 *)func_80041C3C())->ctor(obj, texture, cell);
+        ((CellCtorMethods_322b4 *)Get_vtable_D8006EC74())->ctor(obj, texture, cell);
         return obj;
     }
     return NULL;
@@ -193,7 +193,7 @@ void D8006EC74__D8006EC74(SpriteView_322b4 *self, void *texture, u8 cell) {
 
     func_80041C4C(&r, 0x20);
     ((CtorArg3Methods_322b4 *)func_80041ED8())->ctor(self, texture, &r, NULL);
-    self->methods = func_80041C3C();
+    self->methods = Get_vtable_D8006EC74();
     self->methods->reset(self, cell);
 }
 /* D_8006EC74 slot +0x040 (reset): re-select the cell through slot +0x0C4. */
@@ -216,7 +216,7 @@ u8 D8006EC74__GetCell(D_8006EC74Obj *self) {
     return self->unkA8;
 }
 /* Returns the D_8006EC74 method table. */
-void *func_80041C3C(void) {
+void *Get_vtable_D8006EC74(void) {
     return D_8006EC74;
 }
 /* Cell index -> 8x8 rect in a 32-wide grid, offset from D_8006ED40. */

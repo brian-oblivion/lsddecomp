@@ -121,7 +121,7 @@ void Obj6EAC0__Construct(Obj6EAC0 *self, s32 a1, s32 a2, s32 a3) {
     s32 i;
     Obj6EAC0 **cursor;
 
-    ((void (*)(Obj6EAC0 *, s32, s32))func_80041C3C()->slot08)(self, a1, 0x20);
+    ((void (*)(Obj6EAC0 *, s32, s32))Get_vtable_D8006EC74()->slot08)(self, a1, 0x20);
     self->methods = Obj6EAC0__GetDerivedMethods();
     self->totalChildCount = a2;
     self->childCount = a2;
@@ -145,7 +145,7 @@ void Obj6EAC0__Construct(Obj6EAC0 *self, s32 a1, s32 a2, s32 a3) {
 void Obj6EAC0__Destruct(Obj6EAC0 *self) {
     ReleaseBasicClassArray(self->children, self->totalChildCount);
     self->children = BMemPMgrFree(self->children);
-    func_80041C3C()->slot0C(self);
+    Get_vtable_D8006EC74()->slot0C(self);
 }
 
 void Obj6EAC0__FinishConstruct(Obj6EAC0 *self, s32 a1) {
@@ -161,7 +161,7 @@ void Obj6EAC0__LayoutChildrenWithGap(Obj6EAC0 *self, s32 a1, Pair32E99C *a2) {
     if (self->hasChildren != 0) {
         return;
     }
-    func_80041C3C()->slot4C(self, a1, a2);
+    Get_vtable_D8006EC74()->slot4C(self, a1, a2);
     buf = *a2;
     elemp = self->children + self->childStart;
     i = self->childStart;
@@ -198,7 +198,7 @@ void func_80040C00(Obj6EAC0 *self) {
                 } while (i < bound + self->childCount);
             }
         }
-        func_80041C3C()->slot50(self);
+        Get_vtable_D8006EC74()->slot50(self);
     }
 }
 
@@ -245,7 +245,7 @@ void Obj6EAC0__LayoutChildren(Obj6EAC0 *self, Pair32E99C *a1) {
         s32 bound;
         Obj6EAC0 **elemp;
 
-        func_80041C3C()->slotBC(self, a1);
+        Get_vtable_D8006EC74()->slotBC(self, a1);
         buf = *a1;
         i = 0;
         elemp = self->children;
