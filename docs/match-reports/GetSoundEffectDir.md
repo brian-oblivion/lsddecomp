@@ -31,6 +31,14 @@ char *GetSoundEffectDir(void) {
   class_39e08.h / class_3bb8c.h); those are independent declarations and were
   not touched.
 
+## Arity (round 82, alpha, track 3 externcheck)
+
+externcheck flags class_39e08.h's 1-parameter extern against this 0-parameter
+definition. It is not the forwarding idiom (the body reads no argument
+register) and the extern cannot drop the argument: the caller's
+`move a0,zero` at 0x800496A8 is retail. The extern line carries
+`/* arity-ok: ... */` saying so.
+
 ## Naming
 
 - **Name:** `GetSoundEffectDir`
