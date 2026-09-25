@@ -6,6 +6,63 @@ stale, prose elsewhere is not.
 
 ---
 
+## 2026-09-25 — round 84: five classes unified in sequence (track 4)
+
+Opus head (not premium), operator cap 5. `plan.py` listed one ready job at a
+time (track 4's top class), so the head ran revision 20's sequential rule: one
+Opus types runner per class, merged, sampled and `mark-class`ed before the next
+was staffed, a fresh worktree name each time (alpha..echo). Every merge was
+followed by `make extract`, `build-and-verify.sh`, `typeviews.py --warnings`
+and `check-nonmatching.sh`: byte-identical, 0 new warnings, green, every time.
+Each runner checked its class's ctor chain (head note from revision 20) and
+every edge held. Three names per class were sampled against their accessors.
+
+- **TaskCore (gTaskCoreMethods, 0x130; alpha).** `include/TaskCore.h` with
+  `TASKCORE_FIELDS`/`_SLOTS` over IntermediateBase's; 0xA4 bytes. 48 renames
+  (Obj86B60__*/TaskCoreObj__* -> TaskCore__*; overrides for their slots;
+  PlaySound, OnPad{Confirm,Cancel,Prev,Next}, SetFadeOutCallbackEnabled,
+  TickFadeOutCallback on evidence). Views gone from code_2cc8c.h, code_2c054.h,
+  class_3bb8c.h, class_3bb8c_t.c and Class6D3C8.h (LoaderTask, found through
+  the allocator extern, which `--census` missed). StreamTaskObj expands the
+  new macros. Two baseline warnings gone (retreatSlotCursor's return type,
+  refreshSlotView's argument). Bytes forced Class6D3C8.h's StreamTask +0x004
+  to return `void *`: with `void`, StartCinematicStream's two branches stop
+  cross-jumping (+6 instructions).
+- **Class86668 (0x230; bravo).** `include/Class86668.h`, 0x38 bytes, table 0x80
+  (three NULL words past what `classtable.py` prints; SetState calls +0x07C).
+  Fields result/timeoutFrames/soundBankPath/sound; `SetChildFlag8` was really
+  `PlaySound` (VabStreamObj +0x080 PlayTone, TaskCore's shape).
+- **ScreenSprite (D_8006ED4C, 0x144; charlie).** A behaviour name with the
+  banner's evidence: `Unk18Obj__DrawNode` takes a screen-space path for tag
+  0x144, placing the sprite at `screenPos` as a percentage of half the screen;
+  the class's own two slots set `screenPos` and the pivot. 0xA8 bytes.
+- **ModelData (D_8006F384, 0x5F03; delta).** Expands `CLASS6D430_*`, not
+  TimBlockSrc's (round 83's ctor-chain finding). Fields linkResource, todSet,
+  ownsResources; TriggerWorld's ctor chains to it. The table symbol keeps its
+  `D_` name.
+- **Class6E4F0 (D_8006E4F0, 0x60; echo).** Table 0x68: six NULL slots
+  RunMainLoop calls, named for Class6D3C8's occupants as Class6D430's are for
+  the CD driver's. `func_8003B20C` -> `GetClass6E4F0Methods`: round 81's
+  rename.py blocker no longer reproduces.
+- **Head at merge.** MATCHING-GUIDE.md still cited `Obj86B60__RefreshSlotView`
+  / `CommitElementScroll` (rename.py does not rewrite it): fixed.
+  IntermediateBase.h's banner called Class86668's +0x028 `eventCode`: now
+  `result`.
+- **Open, for the subclasses' own jobs (all in the runners' reports):**
+  IntermediateBase's onInit is `(self, s32, s32, s32)`, but TaskCore's and
+  Obj865C8's occupants take self alone while ObjM's takes three;
+  StreamTaskObj__Configure and ObjM__AttachTarget override init(args, mode)
+  with other parameter lists; Class6D3C8's +0x040 override takes self alone
+  against Class6E4F0's setScreenDims(self, dims, vramMode); several ctors
+  return self while their SLOTS macro says void (GraphRoomObj, ModelData);
+  views `--census` does not see: Class86E00's `cardIcon` (a ScreenSprite),
+  code_2864's DrawNode union, Entity.h/code_55dd4.h `Unk5CObj` (ModelData);
+  `gDreamAuxWorld` is probably not a TriggerWorld (it calls table +0x200).
+- **Next.** `plan.py` lists gClass65650Methods (0x234). The track 4b premium
+  job is still open and reported.
+
+---
+
 ## 2026-09-25 — premium session: plan revision 20 (rounds 82 and 83)
 
 - **The class id tree is not always inheritance (round 83).** Verified. Under

@@ -910,6 +910,16 @@
           "note": "TimBlockSrc (D_8006F0B8, 0xF03) unified by bravo in include/TimBlockSrc.h, no subclass macros: the four id-tree children (Tod 0x4F03, TodSet, ModelData 0x5F03, TriggerWorld) are smaller than TimBlockSrc's 0x84 and their ctors chain to GetActiveDataSourceMethods(), not TimBlockSrc. Escalated: nibble-path id is not inheritance in this family. One class this round per track 4 staffing.",
           "round": 83,
           "runners": 1
+        },
+        {
+          "attempts": 5,
+          "calibration": false,
+          "date": "2026-09-25",
+          "matches": 5,
+          "model": "opus",
+          "note": "Five classes unified in sequence, one Opus runner each, merged and marked before the next was staffed: TaskCore (gTaskCoreMethods 0x130, alpha; 48 renames, Obj86B60/TaskCoreObj/LoaderTask views gone, StreamTaskObj expands TASKCORE_*), Class86668 (0x230, bravo), ScreenSprite (D_8006ED4C 0x144, charlie; behaviour name, evidence Unk18Obj__DrawNode's screen-space path), ModelData (D_8006F384 0x5F03, delta; expands CLASS6D430_* per the ctor chain), Class6E4F0 (D_8006E4F0 0x60, echo). Every ctor chain checked by its runner and held. All merges byte-identical, 0 new warnings, nonmatching green.",
+          "round": 84,
+          "runners": 5
         }
       ],
       "status": "auto"
