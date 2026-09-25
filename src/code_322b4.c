@@ -95,7 +95,10 @@ INCLUDE_ASM("asm/nonmatchings/code_322b4", func_80042268);
 void func_80042294(Class6B5CC *self, void *sender, s32 event) {
 }
 INCLUDE_ASM("asm/nonmatchings/code_322b4", func_8004229C);
-INCLUDE_ASM("asm/nonmatchings/code_322b4", func_800422BC);
+/* Returns the D_8006EE1C method table. */
+void *func_800422BC(void) {
+    return D_8006EE1C;
+}
 INCLUDE_ASM("asm/nonmatchings/code_322b4", func_800422CC);
 INCLUDE_ASM("asm/nonmatchings/code_322b4", func_8004232C);
 INCLUDE_ASM("asm/nonmatchings/code_322b4", func_800423A8);
