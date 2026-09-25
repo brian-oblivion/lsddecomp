@@ -270,7 +270,13 @@ INCLUDE_ASM("asm/nonmatchings/code_33808", func_800451B8);
 INCLUDE_ASM("asm/nonmatchings/code_33808", func_80045228);
 INCLUDE_ASM("asm/nonmatchings/code_33808", func_800452AC);
 INCLUDE_ASM("asm/nonmatchings/code_33808", func_800452FC);
-INCLUDE_ASM("asm/nonmatchings/code_33808", func_800453DC);
+/* D_8006F590 +0x078: slot +0x07C over the data past the buffer's counted
+ * array. */
+u8 func_800453DC(DataSrc33808 *self, s32 arg1, s32 arg2) {
+    CountedBuf33808 *buf = self->buffer;
+
+    return self->methods->slot7C(self, arg1, arg2, &buf->entries[buf->count] + 2);
+}
 extern s32 D_8006F590[];
 
 void *func_80045428(void) {
