@@ -3,12 +3,31 @@
  * revision 18). 0xFA50..0x10D48 (vram 0x8001F250..0x80020548). It was counted
  * as Psy-Q SDK by segment name; tools/gameinsdk.py measured it as game (a call
  * into game code, a method-table entry beside game methods, or contiguity with
- * those, and no Sony fingerprint). What it holds: the class of method table
- * D_8006BEA0 (New_TmdModel allocates it with BMemPMgrAlloc and chains to
- * Get_vtable_BasicClass) and helpers called only from Class6B5CC/BaseObjO
- * code. Owns jtbl_80010354 (attached rodata sub-slot 0xB54).
+ * those, and no Sony fingerprint).
  *
- * Nothing here is matched yet: every function is fresh track-1 ground.
+ * Holds the TmdModel class (method table D_8006BEA0, class tag 9): a thin
+ * wrapper around one TMD file plus its object-table entry ("the model"
+ * Class6B5CC__LinkModel, src/code_d294_c.c, links into a GsDOBJ2). Its
+ * methods map the TMD to the GS (TmdModel__MapModelingData), walk its
+ * primitives (TmdModel__NextPrimitive, owns jtbl_80010354), compute an
+ * axis-aligned bounding box or its eight corners (TmdModel__ComputeBounds,
+ * TmdModel__GetHull, and the shared-buffer pair UpdateTmdModelBoundsBuffer /
+ * GetTmdModelBoundsBuffer), and ray-cast a segment against every face
+ * (TmdModel__RaycastFaces) for Class6B5CC's own collision helpers in
+ * code_d294_b.c/code_d294_c.c.
+ *
+ * func_8001F3A4 and func_8001F66C are kept unrenamed: both are called from
+ * src/class_3bb8c_o.c, a live types-runner unit as of this pass, so
+ * renaming them would rewrite that unit's own file out from under it.
+ * Proposed names and evidence are in their own match reports.
+ *
+ * The tail of the file (AccumulateTargetOffset, func_80020510) is NOT
+ * TmdModel: a separate Outer_fa50/Inner_fa50/Target_fa50 pointer chain with
+ * no confirmed owning class and, for func_80020510, a live caller in
+ * class_3bb8c_o.c -- kept unrenamed for the same reason.
+ *
+ * All 18 functions matched, round 82 (runner charlie); tiers and evidence
+ * in each function's own docs/match-reports/ file.
  */
 #include "common.h"
 #include "BasicClass.h"
