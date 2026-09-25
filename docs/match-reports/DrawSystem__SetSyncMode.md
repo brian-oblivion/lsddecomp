@@ -45,3 +45,10 @@ extern Class6C070Methods D_8006C070;
 extern Class6C070 *D_8008A83C;
 extern void GsSwapDispBuff(void);
 ```
+
+## Naming
+
+`DrawSystem__SetSyncMode`, tier B. Sets the field that gates the
+post-transfer `DrawSync(0)` in LoadImage/StoreImage and the running-bypass
+there and in ClearImage's dispatch (`src/code_10ee0.c`'s `syncMode`
+comment); "sync mode" describes the mechanic, not a confirmed in-game name.

@@ -45,3 +45,9 @@ extern Class6C070Methods D_8006C070;
 extern Class6C070 *D_8008A83C;
 extern void GsSwapDispBuff(void);
 ```
+
+## Naming
+
+`DrawSystem__GetVSyncCount`, tier A. A pure getter of the field
+`DrawSystem__SetVSyncCount` writes; per FINISHING-PLAN track 3, a getter's
+mechanics ARE its purpose.

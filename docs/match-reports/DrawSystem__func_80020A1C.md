@@ -45,3 +45,10 @@ extern Class6C070Methods D_8006C070;
 extern Class6C070 *D_8008A83C;
 extern void GsSwapDispBuff(void);
 ```
+
+## Naming
+
+Kept the tier-C `DrawSystem__func_80020A1C` form (class known, function
+purpose not): the body is `return 0;` with no caller in this unit and no
+other evidence of what the constant answers. A guessed name (e.g. "CanX")
+would be worse than the placeholder.

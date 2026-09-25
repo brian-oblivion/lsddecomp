@@ -60,4 +60,7 @@ struct Class6C070 {
 
 ## Naming
 
-Kept func_.
+`DrawSystem__GetDims`, tier B. Returns `&self->size` and, when asked,
+describes the whole-screen rect `{0, 0, w, h*2}` (the doubled height reads
+as an interlaced-field convention, unconfirmed); mechanics are clear, the
+"why double height" isn't.

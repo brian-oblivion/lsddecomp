@@ -49,3 +49,9 @@ extern void GsSwapDispBuff(void);
 ## Round 82 note
 
 Round 82 (alpha) retyped +0x030 from `s32 unk30` to `void (*callback)(void)`: DrawSystem__RunLoop calls it (`jalr`) once per VSync. The live source now reads `self->callback = ...`; DrawSystem__SetCallback takes `void (*callback)(void)`. Still byte-exact (whole-image SHA1 green).
+
+## Naming
+
+`DrawSystem__SetCallback`, tier A. A pure setter of the `callback` field
+`DrawSystem__RunLoop` invokes once per VSync; mechanics ARE the purpose for
+a plain setter.

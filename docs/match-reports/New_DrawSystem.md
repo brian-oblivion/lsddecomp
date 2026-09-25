@@ -74,4 +74,8 @@ struct Class6C070Methods {
 
 ## Naming
 
-Proposed name `New_Class6C070` (tier B: shape of every other New_* allocator); not applied, class unnamed.
+`New_DrawSystem`, tier A. The class is named `DrawSystem` this round (see
+`src/code_10ee0.c`'s header comment for the cross-unit evidence); the
+`New_<Class>` allocator shape (alloc + call the ctor slot) is a pure
+mechanic, so once the class has a name the allocator's name follows by the
+project's own convention (`BasicClass.h`; matches `New_WBgm`, round 81).

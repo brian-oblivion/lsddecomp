@@ -47,3 +47,9 @@ extern Class6C070Methods D_8006C070;
 extern Class6C070 *D_8008A83C;
 extern void GsSwapDispBuff(void);
 ```
+
+## Naming
+
+`DrawSystem__Stop`, tier B. Clears the `running` flag; pairs with
+`DrawSystem__Start`. Mechanics are clear, purpose in the game (what stops
+it, and why) isn't established from this unit alone.

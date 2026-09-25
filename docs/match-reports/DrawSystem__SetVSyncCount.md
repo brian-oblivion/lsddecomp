@@ -47,3 +47,12 @@ extern Class6C070Methods D_8006C070;
 extern Class6C070 *D_8008A83C;
 extern void GsSwapDispBuff(void);
 ```
+
+## Naming
+
+`DrawSystem__SetVSyncCount`, tier B. A guarded setter (only stores while not
+`running`) of the field `DrawSystem__RunLoop` passes to `VSync()` and
+`DrawSystem__CountFrames` compares a counter against; the field's exact
+in-game meaning (a VSync wait mode vs. a frame-count threshold -- see
+`src/code_10ee0.c`'s `unk20` comment) isn't pinned down, so the setter's
+name follows the field's more literal reading rather than asserting one.

@@ -47,4 +47,7 @@ struct Class6C070 {
 
 ## Naming
 
-Proposed `Class6C070__GetActiveBuff` (tier B).
+`DrawSystem__GetActiveBuffer`, tier B. A tail-call wrapper of LIBGS.H's
+`GsGetActiveBuff`; the bytes cannot distinguish `void` from `int` for a
+tail call (CLAUDE.md), so the `s32` return is carried from the SDK
+prototype, not confirmed as used by any caller.

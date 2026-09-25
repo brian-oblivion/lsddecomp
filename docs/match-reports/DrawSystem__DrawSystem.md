@@ -70,4 +70,7 @@ struct Class6C070Methods {
 
 ## Naming
 
-Proposed `Class6C070__Class6C070` (tier A once the class is named: it is the +0x008 slot).
+`DrawSystem__DrawSystem`, tier A. The class is named `DrawSystem` this round
+(see `src/code_10ee0.c`'s header comment); this function occupies the +0x008
+ctor slot, and `Class__Class` is the project's ctor-naming convention
+(`BasicClass.h`).

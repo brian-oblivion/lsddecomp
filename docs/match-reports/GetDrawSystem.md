@@ -45,3 +45,11 @@ extern Class6C070Methods D_8006C070;
 extern Class6C070 *D_8008A83C;
 extern void GsSwapDispBuff(void);
 ```
+
+## Naming
+
+`GetDrawSystem`, tier A. The singleton getter for `D_8008A83C`; three other
+units (`code_2bb9c.c`, `code_179d8_q.c`, `code_2a0e0.c`) independently
+called this function's return "the draw singleton" in their own comments
+before this rename -- convergent naming from callers that never saw each
+other's code.

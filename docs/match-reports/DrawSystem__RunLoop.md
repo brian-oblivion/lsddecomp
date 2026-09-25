@@ -39,5 +39,10 @@ Needs the unit-local `Class6C070` view at the top of `src/code_10ee0.c`, with
 
 ## Naming
 
-Proposed `Class6C070__RunLoop` (tier B); +0x10 reads as a "running" flag
-(DrawSystem__Start sets it and enters this loop, DrawSystem__Stop clears it).
+`DrawSystem__RunLoop`, tier B. The VSync-synced frame loop: while `running`,
+`VSync(unk20)`, an optional per-frame callback, then `notifyParents(self, 2)`
+(BasicClass's own tick-broadcast slot) -- so every BasicClass object that
+`addChild`s this singleton gets event 2 once per VSync (`code_2a0e0.c`'s
+`WBgm__WBgm`, `class_3ac78.c`'s `Class866E8__Class866E8`, both do). +0x10 is
+named `running`: `DrawSystem__Start` sets it and enters this loop,
+`DrawSystem__Stop` clears it.

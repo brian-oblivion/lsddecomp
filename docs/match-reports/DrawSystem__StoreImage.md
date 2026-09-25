@@ -38,4 +38,7 @@ The declarations it needs are the unit-local `Class6C070`, `RECT` and
 
 ## Naming
 
-Proposed `Class6C070__StoreImage` (tier B).
+`DrawSystem__StoreImage`, tier B. Wraps LIBGPU.H's `StoreImage`, the mirror
+of `DrawSystem__LoadImage`; unlike LoadImage/MoveImage, no other unit's
+local view names this slot (+0x05C), so it rests on the SDK-wrapper
+mechanic alone rather than cross-unit agreement.

@@ -45,3 +45,11 @@ extern Class6C070Methods D_8006C070;
 extern Class6C070 *D_8008A83C;
 extern void GsSwapDispBuff(void);
 ```
+
+## Naming
+
+`SetDrawSystem`, tier A. The singleton setter paired with `GetDrawSystem`;
+called exactly once, from `code_2b78c.c`'s `Class6E4F0__InitSystems`, with
+the object `main.c` constructs (`New_DrawSystem`) -- the startup wiring that
+also confirms the class's identity (see `src/code_10ee0.c`'s header
+comment).

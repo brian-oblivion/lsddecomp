@@ -53,4 +53,9 @@ struct Class6C070 {
 
 ## Naming
 
-Kept func_.
+`DrawSystem__CountFrames`, tier B. Ignores its own `self` and instead
+increments the SINGLETON's frame counter (+0x24) toward a threshold (+0x20,
+shared with `DrawSystem__SetVSyncCount`'s field), setting a "done" flag
+(+0xC) once. It occupies a real vtable slot (+0x06C) but is never dispatched
+through `->methods->` from within this unit; what calls it, and what the
++0xC flag then gates, isn't established here.

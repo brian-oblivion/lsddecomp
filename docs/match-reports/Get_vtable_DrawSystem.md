@@ -45,3 +45,10 @@ extern Class6C070Methods D_8006C070;
 extern Class6C070 *D_8008A83C;
 extern void GsSwapDispBuff(void);
 ```
+
+## Naming
+
+`Get_vtable_DrawSystem`, tier A. The class's own method-table getter
+(returns `&D_8006C070`); matches the project's `Get_vtable_<Class>`
+convention for this exact role (`BasicClass.h`'s `Get_vtable_BasicClass`,
+round 81's `Get_vtable_WBgm`).

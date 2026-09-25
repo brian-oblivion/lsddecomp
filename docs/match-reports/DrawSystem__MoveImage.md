@@ -63,4 +63,8 @@ struct Class6C070 {
 
 ## Naming
 
-Proposed `Class6C070__MoveImage` (tier B).
+`DrawSystem__MoveImage`, tier A. Wraps LIBGPU.H's `MoveImage`; confirmed by
+convergent naming -- `code_179d8_q.c`'s own independent local view of this
+class's method table names this exact slot (+0x064) `moveImage`, and
+`code_2bb9c.c`'s `func_8003B624` calls it through a local `moveImage`
+function-pointer variable read from the same slot.

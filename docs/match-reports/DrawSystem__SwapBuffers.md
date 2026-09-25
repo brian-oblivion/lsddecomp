@@ -45,3 +45,9 @@ extern Class6C070Methods D_8006C070;
 extern Class6C070 *D_8008A83C;
 extern void GsSwapDispBuff(void);
 ```
+
+## Naming
+
+`DrawSystem__SwapBuffers`, tier A. A pure wrapper around `GsSwapDispBuff`
+(LIBGS.H double-buffer swap); mechanics ARE the purpose for a one-line SDK
+wrapper.

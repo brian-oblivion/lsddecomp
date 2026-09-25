@@ -48,4 +48,8 @@ Needs the unit-local `Class6C070`, `Class6C070Methods`, `RECT`,
 
 ## Naming
 
-Proposed `Class6C070__ClearImage` (tier B).
+`DrawSystem__ClearImage`, tier A. The non-fallback branch is a direct wrap
+of LIBGPU.H's `ClearImage`, consistent with the LoadImage/StoreImage/
+MoveImage wrapper set; mechanics ARE the purpose for this half. The
+whole-screen self-dispatch branch (via `getDims`) is the same function, so
+the name covers both.

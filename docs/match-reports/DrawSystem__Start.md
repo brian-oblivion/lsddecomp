@@ -71,4 +71,7 @@ struct Class6C070Methods {
 
 ## Naming
 
-Kept func_.
+`DrawSystem__Start`, tier B. Sets the `running` flag and enters the frame
+loop (+0x068, `runLoop`) if not already running; pairs with `DrawSystem__Stop`,
+which clears the same flag. Mechanics are clear; what triggers a Start/Stop
+call in the game isn't established from this unit alone.

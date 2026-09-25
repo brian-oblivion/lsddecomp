@@ -71,7 +71,10 @@ struct Class6C070Methods {
 
 ## Naming
 
-Kept func_.
+`DrawSystem__Init`, tier B. It occupies the +0x040 slot dispatched by the
+ctor and sets up default state (running=0, VSync count=3, sync mode=1,
+callback=NULL); "init" describes what it does, but why these particular
+defaults isn't established.
 
 ## Round 82 note
 

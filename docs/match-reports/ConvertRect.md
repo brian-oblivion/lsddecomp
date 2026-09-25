@@ -45,4 +45,7 @@ typedef struct {
 
 ## Naming
 
-Kept func_. The source struct (h at +8, unknown s16 at +6) is unidentified.
+`ConvertRect`, tier A. A pure field-by-field copy from the class's own
+odd-shaped rect record (`DrawSystemRect`) into LIBGPU.H's `RECT`; mechanics
+ARE the purpose. Not a method (no table slot); the source struct's unknown
+`+0x6` short is still unidentified.
