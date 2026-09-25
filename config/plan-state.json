@@ -838,6 +838,11 @@
           "date": "2026-09-25",
           "header": "include/TimBlockSrc.h"
         },
+        "D_8006F384": {
+          "class": "ModelData",
+          "date": "2026-09-25",
+          "header": "include/ModelData.h"
+        },
         "gActorMethods": {
           "class": "Actor",
           "date": "2026-09-25",
