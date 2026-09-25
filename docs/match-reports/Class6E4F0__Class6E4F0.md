@@ -7,10 +7,10 @@
 ## What it does
 
 The D_8006E4F0 constructor (slot `+0x008`). Class6D3C8__Class6D3C8
-(code_1677c) calls it through `func_8003B20C()->ctor(self, arg->unk00)`.
+(code_1677c) calls it through `GetClass6E4F0Methods()->ctor(self, arg->unk00)`.
 
 1. base ctor through BasicClass's table;
-2. installs its own table (func_8003B20C);
+2. installs its own table (GetClass6E4F0Methods);
 3. one-time `CdInit()`, guarded by the sdata flag gCdInitDone (gp_rel);
 4. clears `initialized` (+0x18) and calls `SetActiveDataSource(source)`;
 5. calls its own `+0x040` slot with the {320, 240} default (gDefaultScreenDims).
@@ -18,7 +18,7 @@ The D_8006E4F0 constructor (slot `+0x008`). Class6D3C8__Class6D3C8
 ```c
 void Class6E4F0__Class6E4F0(Class6E4F0 *self, s32 source) {
     Get_vtable_BasicClass()->ctor((BasicClass *)self);
-    self->methods = func_8003B20C();
+    self->methods = GetClass6E4F0Methods();
     if (gCdInitDone == 0) {
         CdInit();
         gCdInitDone = 1;
@@ -41,7 +41,7 @@ by the scheduler. `gCdInitDone` is gp-relative through
 (constructor convention, `Class__Class`). **Tier A**: it is the +0x008 ctor
 slot (`classtable.py 0x8006E4F0 --vs 0x8006B58C`), confirmed by
 `Class6D3C8__Class6D3C8` (code_1677c) calling it through
-`func_8003B20C()->ctor(self, arg->unk00)` as the base-constructor step
+`GetClass6E4F0Methods()->ctor(self, arg->unk00)` as the base-constructor step
 before installing its own vtable -- the base-ctor-through-slot+8 shape from
 docs/research/class-framework.md. The body is substantive ctor work (base
 ctor, install own table, one-time CdInit, clear `initialized`,

@@ -20,7 +20,7 @@
  * six more of its own from +0x050). Confirmed by `classtable.py 0x8006D3C8
  * --vs 0x8006E4F0` sharing +0x00C/+0x048/+0x04C exactly where the earlier
  * `--vs 0x8006B58C` comparison did not, and by Class6D3C8__Class6D3C8 itself calling
- * the intermediate class's ctor slot (via func_8003B20C -> &D_8006E4F0)
+ * the intermediate class's ctor slot (via GetClass6E4F0Methods -> &D_8006E4F0)
  * before installing its own vtable — the base-constructor-through-slot+8
  * shape from docs/research/class-framework.md.
  *
@@ -63,7 +63,7 @@ typedef struct MiddleClassMethods {
     void *unk4C;                                                     /* +0x04C Class6E4F0__RunMainLoop, shared with Class6D3C8 */
 } MiddleClassMethods;
 
-extern MiddleClassMethods *func_8003B20C(void);
+extern MiddleClassMethods *GetClass6E4F0Methods(void);
 
 /* The constructor argument block for Class6D3C8 (Class6D3C8__Class6D3C8). Observed
  * from its one call site (asm/main.s, gClass6D3C8CtorArgs: {0x13, 0, 1, 1, 1, 1}) --

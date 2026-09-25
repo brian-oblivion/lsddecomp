@@ -18,12 +18,13 @@
  * unit-local globals (`gCdInitDone`, `gDefaultScreenDims`) named -- tiers
  * and evidence in each function's own match report's `## Naming` section.
  * One exception: `func_8003B20C` (the table getter, proposed
- * `GetClass6E4F0Methods`) is NOT renamed -- `tools/rename.py` cannot apply
+ * `GetClass6E4F0Methods`) was NOT renamed -- `tools/rename.py` cannot apply
  * it because this address already carried an explicit, now-stale, track-2
  * "unidentified" line in the symbols file and the tool's placeholder-name
  * address resolution never finds it to replace; see
- * docs/match-reports/func_8003B20C.md and the round-81 broadcast for the
- * head to apply by hand.
+ * docs/match-reports/GetClass6E4F0Methods.md and the round-81 broadcast for the
+ * head to apply by hand. Round 84 (echo, track 4): applied with rename.py,
+ * which now replaces the existing symbols line.
  */
 #include "common.h"
 #include "BasicClass.h"
@@ -92,7 +93,7 @@ extern Class6E4F0Methods D_8006E4F0;
 extern s32 gCdInitDone;           /* CdInit has been called */
 extern ScreenDims gDefaultScreenDims;    /* {320, 240} */
 
-Class6E4F0Methods *func_8003B20C(void);
+Class6E4F0Methods *GetClass6E4F0Methods(void);
 
 /* Psy-Q LIBCD.H / LIBSND.H / LIBGS.H prototypes. */
 extern int CdInit(void);
@@ -105,7 +106,7 @@ extern void *BMemPMgrAlloc(s32 size);
 
 void Class6E4F0__Class6E4F0(Class6E4F0 *self, s32 source) {
     Get_vtable_BasicClass()->ctor((BasicClass *)self);
-    self->methods = func_8003B20C();
+    self->methods = GetClass6E4F0Methods();
     if (gCdInitDone == 0) {
         CdInit();
         gCdInitDone = 1;
@@ -168,6 +169,6 @@ void Class6E4F0__RunMainLoop(Class6E4F0 *self) {
     }
 }
 
-Class6E4F0Methods *func_8003B20C(void) {
+Class6E4F0Methods *GetClass6E4F0Methods(void) {
     return &D_8006E4F0;
 }
