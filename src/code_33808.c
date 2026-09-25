@@ -976,7 +976,7 @@ typedef struct Buf44858 {
     /* +0x08 */ s32 offset;
 } Buf44858;
 
-extern void *SetVec3();
+extern Req44858 *SetVec3(Req44858 *req, void *buffer, s32 unk4, s32 unk8);  /* code_171e0.c: stores its three words into *req, returns req */
 void *func_800451B8(s32 arg0);  /* defined below (ROM order) */
 
 s32 func_80044858(DataSrc33808 *self) {
