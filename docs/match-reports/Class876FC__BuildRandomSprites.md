@@ -168,7 +168,7 @@ Round 70 (alpha). `func_80056BBC` -> `Class876FC__BuildRandomSprites`, **tier B*
 
 Only caller Class876FC__InitByKind, kind 2. Body: parity = rand() % 2;
 Class876FC__SpawnSprites with gSpriteScaleHalf on parity 0, NULL otherwise;
-then tableIndex >= 2: sprites[1] gets BaseObjO__AddVec14 by
+then tableIndex >= 2: sprites[1] gets Actor__AddTranslation by
 (gSpriteShiftX[tableIndex], 0, 0) and slotB8 with altColor or color; else
 sprites[1] gets setSemiTrans(1), setSemiTransRate(0) and updateScale(set,
 parity ? gSpriteScaleLarge : gSpriteScaleSmall); finally sprites[2]

@@ -8,11 +8,11 @@
 ## What it does
 
 The destructor override for the class at `gClass65650Methods` (table slot `+0x00C`,
-overriding the intermediate class `D_800878D4`'s own dtor at the same
+overriding the intermediate class `gActorMethods`'s own dtor at the same
 offset). Calls this class's own teardown helper (`self->methods->slot0xF8`,
 i.e. `Class65650__TeardownModelData`, the guarded teardown for the `+0x5C` sub-object — still
 `INCLUDE_ASM` this round), then chains to the base class's dtor
-(`DreamSys__GetBaseMethods()->dtor(self)`), matching the "destructor calls its own
+(`GetActorMethods()->dtor(self)`), matching the "destructor calls its own
 cleanup, then the base dtor through the base table's own slot" idiom from
 `docs/research/class-framework.md`.
 
@@ -20,7 +20,7 @@ cleanup, then the base dtor through the base table's own slot" idiom from
 void Class65650__Destructor(Class65650 *self)
 {
     self->methods->slot_teardown5C(self);
-    DreamSys__GetBaseMethods()->dtor(self);
+    GetActorMethods()->dtor(self);
 }
 ```
 

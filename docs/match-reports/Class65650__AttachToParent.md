@@ -20,7 +20,7 @@ void Class65650__AttachToParent(Class65650 *self, Class65650 *other, void *arg2,
     D800878D4Methods *base;
 
     if (self->unk0C == 0) {
-        base = DreamSys__GetBaseMethods();
+        base = GetActorMethods();
         base->slot4C(self, arg3, arg4);
         if (arg2 != NULL && self->unk50 == NULL) {
             self->methods->slot10(self, arg2);

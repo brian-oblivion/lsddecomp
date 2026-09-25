@@ -1,0 +1,60 @@
+# Actor__AddLocalTranslation -- MATCHED (18/18 words)
+
+> Renamed from `BaseObjO__ApplyRotatedVec14` on 2026-09-25 (tools/rename.py). Address 0x80057444.
+
+> Renamed from `func_80057444` on 2026-09-18 (tools/rename.py). Address 0x80057444.
+
+Unit: `class_3bb8c_o` (round 17). Converts a source `s16` triple into a
+stack `Vec3O` via `Class6B5CC__RotateLocalVector`, then forwards it to `self`'s own
+`slotBC` (= `Actor__AddTranslation`, this unit) through the vtable.
+
+## Final source
+
+```c
+extern void Class6B5CC__RotateLocalVector(BaseObjO *self, Vec3O *dst, s16 *src);
+
+void Actor__AddLocalTranslation(BaseObjO *self, s16 *arg1) {
+    Vec3O buf;
+
+    Class6B5CC__RotateLocalVector(self, &buf, arg1);
+    self->methods->slotBC(self, &buf);
+}
+```
+
+## Derivation
+
+`Class6B5CC__RotateLocalVector` is called with `$a0` = this function's own `self`
+(untouched since entry), `$a1` = the local buffer's address (freshly set
+in the `jal`'s own delay slot, overwriting whatever `$a1` held), and `$a2`
+= this function's own SECOND parameter (copied into `$a2` BEFORE the call,
+via `addu $a2,$a1,zero` -- note this reads the OLD `$a1`, i.e. `arg1`,
+ahead of the delay slot's overwrite). This establishes `arg1`'s type as
+`s16 *`, matching `Class6B5CC__RotateLocalVector`'s own already-decompiled signature
+elsewhere (`code_d294_c.c`:
+`void Class6B5CC__RotateLocalVector(Class6B5CCObj *self, Class6B5CCSub44 *dst, s16 *src)`)
+-- declared locally here with this unit's own generic types rather than
+pulling in `code_d294.h`'s `Class6B5CCObj`/`Class6B5CCSub44`, per the
+project's per-call-site-typing convention for cross-unit calls.
+
+The second call, `self->methods->slotBC(self, &buf)`, dispatches through
+`self`'s OWN vtable (not a fixed/global table) at `+0xBC` -- the exact slot
+`Actor__AddTranslation` (this unit) already occupies per `DreamSys.h`'s
+`vtable_DreamSys::Actor__AddTranslation`. This is a self-referential virtual call
+(the class calling its own overridable slot rather than jumping to
+`Actor__AddTranslation` by name), matched by adding `slotBC` to `BaseObjOMethods`
+and calling through it rather than `jal`-ing the symbol directly.
+
+### Proposed learning
+
+None -- straightforward once `Class6B5CC__RotateLocalVector`'s established signature and
+`BaseObjOMethods`'s `slotBC` slot were both in place.
+
+## Naming
+
+**`Actor__AddLocalTranslation` -- tier A.** Mechanics ARE the purpose:
+rotates a source `s16` triple through the already-established
+`Class6B5CC__RotateLocalVector` into a stack `Vec3O`, then forwards that
+buffer to `self`'s own `addVec14` slot (`Actor__AddTranslation`, a
+self-referential virtual dispatch to a function this same unit defines).
+"Apply a rotated vector" is exactly the composition of "rotate" then
+"add".

@@ -351,7 +351,7 @@ struct Class876FC {
 };
 
 /* The shared base-class table getter, SAME symbol `class_3bb8c_o.c`
- * already established as `DreamSys__GetBaseMethods` there (also MEASURED to take no
+ * already established as `GetActorMethods` there (also MEASURED to take no
  * real arguments). Fresh local reading here: this unit needs both `ctor`
  * (+0x008, checked against NULL) and `dtor` (+0x00C, its return value
  * forwarded by Class876FC__Finalize). */
@@ -360,7 +360,7 @@ typedef struct FixedBaseTableR {
     void *(*ctor)(void *self); /* +0x008 */
     void *(*dtor)(void *self);   /* +0x00C */
 } FixedBaseTableR;
-extern FixedBaseTableR *DreamSys__GetBaseMethods(void);
+extern FixedBaseTableR *GetActorMethods(void);
 
 extern void *BMemPMgrAlloc(s32 size);
 extern void *BMemPMgrFree(void *ptr);
@@ -382,7 +382,7 @@ void *New_Class876FC(void *arg0, void *arg1, void *arg2, void *arg3) {
 }
 
 void *Class876FC__Class876FC(Class876FC *self, void *arg1, void *arg2, void *arg3, void *arg4) {
-    if (DreamSys__GetBaseMethods()->ctor(self) == NULL) {
+    if (GetActorMethods()->ctor(self) == NULL) {
         goto fail;
     }
     self->methods = GetClass876FCMethods();
@@ -397,7 +397,7 @@ fail:
 
 void *Class876FC__Finalize(Class876FC *self) {
     Class876FC__ReleaseByKind(self);
-    return DreamSys__GetBaseMethods()->dtor(self);
+    return GetActorMethods()->dtor(self);
 }
 
 void Class876FC__SetParams(Class876FC *self, Block24 *src) {

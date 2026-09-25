@@ -39,4 +39,4 @@ Round 70 (alpha). `func_80056794` -> `AddVec3`, **tier A**.
 
 Pure leaf, `dst = a + b` over three s32 components; the mechanics are its
 purpose. Free function (no `self`), VerbNoun. Checked no `AddVec3` or
-similar existed in the symbols file (only BaseObjO__AddVec14, a method).
+similar existed in the symbols file (only Actor__AddTranslation, a method).

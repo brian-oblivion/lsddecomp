@@ -4,7 +4,7 @@
 
 Unit: `class_3bb8c_r` (round 17 continuation). `Class876FCMethods::dtor`
 (vtable offset `+0x00C` of `gClass876FCMethods`) -- calls a teardown helper, then
-tail-calls the shared base class's own dtor (`DreamSys__GetBaseMethods()->dtor`) and
+tail-calls the shared base class's own dtor (`GetActorMethods()->dtor`) and
 forwards its return.
 
 ## Final source
@@ -12,7 +12,7 @@ forwards its return.
 ```c
 void *Class876FC__Finalize(Class876FC *self) {
     Class876FC__ReleaseByKind(self);
-    return DreamSys__GetBaseMethods()->dtor(self);
+    return GetActorMethods()->dtor(self);
 }
 ```
 
@@ -20,7 +20,7 @@ void *Class876FC__Finalize(Class876FC *self) {
 
 `Class876FC__ReleaseByKind` (a plain teardown helper, still `INCLUDE_ASM` outside
 this unit's range, declared as a local extern) is called first as a
-statement, THEN `DreamSys__GetBaseMethods()->dtor(self)`'s return value genuinely IS
+statement, THEN `GetActorMethods()->dtor(self)`'s return value genuinely IS
 forwarded here (unlike `Class876FC__Class876FC`'s tail call to `Class876FC__InitByKind` --
 confirmed by the disassembly falling straight through the epilogue with
 `$v0` untouched after the `jalr`, no extra `move` the way

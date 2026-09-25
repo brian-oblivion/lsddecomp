@@ -32,7 +32,7 @@ Round 79 (delta).
   leaf whose mechanics are its purpose: it does nothing). It is D_8006D4E8
   slot +0x040, which is null in Class6D430's table, so Class6D4E8 fills an
   abstract slot with an empty body. Naming follows the existing
-  `ObjM__NoOpSlot40` / `DreamSys__NoOpSlotD8` convention. What the slot is
+  `ObjM__NoOpSlot40` / `Actor__NoOpSlotD8` convention. What the slot is
   FOR is not established here: no caller of +0x040 has been traced.
 - Not Sony: `sdkname.py` reports EXACT hits (SsUtVibrateOff, __nulldev,
   KeyOnCheck, ...), but every empty 2-word Sony function matches any empty

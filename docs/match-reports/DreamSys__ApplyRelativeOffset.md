@@ -8,7 +8,7 @@
 
 Builds a full-word `(x,y,z)` difference vector from two `RelativePos`
 (s16-triplet) points, forces the y component to 0, and calls
-`this->vt->BaseObjO__AddVec14(this, &diff)`.
+`this->vt->Actor__AddTranslation(this, &diff)`.
 
 ## The C
 
@@ -21,7 +21,7 @@ void DreamSys__ApplyRelativeOffset(DreamSys *this, struct RelativePos *a, struct
 	diff.y = a->y - b->y;
 	diff.z = a->z - b->z;
 	diff.y = 0;
-	this->vt->BaseObjO__AddVec14(this, &diff);
+	this->vt->Actor__AddTranslation(this, &diff);
 }
 ```
 
@@ -54,4 +54,4 @@ round 2026-08-30-d, runner ALPHA, unit DreamSys (whole-unit, third pass).
 
 ## Naming
 
-- **Tier A.** Pure leaf: computes an xz-only (a-b) relative vector (y forced to 0) and applies it via BaseObjO__AddVec14. Mechanics are the whole story.
+- **Tier A.** Pure leaf: computes an xz-only (a-b) relative vector (y forced to 0) and applies it via Actor__AddTranslation. Mechanics are the whole story.

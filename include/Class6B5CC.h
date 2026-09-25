@@ -8,7 +8,7 @@
  * gClass6B5CCMethods): a BasicClass subclass wrapping a libgs GsDOBJ2 and its
  * GsCOORDINATE2 (the identification is in include/code_d294.h's PSY-Q block).
  * Methods in src/code_d294.c, code_d294_b.c and code_d294_c.c; sixteen classes
- * derive from it (`typeviews.py --tree`), among them D_800878D4 (0x34, the
+ * derive from it (`typeviews.py --tree`), among them gActorMethods (0x34, the
  * base of Class65650, Entity and DreamSys), Class86AA0 (0x24), D_8006EAC0
  * (0x64) and D_8006EFAC (0x14, the base of Class866E8).
  *

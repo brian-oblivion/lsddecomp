@@ -1,4 +1,4 @@
-# Class65650__CreateParts -- MATCHED 68/68 (round 75): lever = store-and-increment in one expression, `if ((*p++ = New_BaseObjO()) == NULL) goto fail;` (was STALL: length EXACT 68/68, 49/68 raw, first diff vram 0x80065E20)
+# Class65650__CreateParts -- MATCHED 68/68 (round 75): lever = store-and-increment in one expression, `if ((*p++ = New_Actor()) == NULL) goto fail;` (was STALL: length EXACT 68/68, 49/68 raw, first diff vram 0x80065E20)
 
 > Renamed from `func_80065E1C` on 2026-09-24 (tools/rename.py). Address 0x80065e1c.
 
@@ -49,7 +49,7 @@ s32 Class65650__CreateParts(Class65650 *self)
     self->unk6C = 0;
     if (count != 0) {
         do {
-            *p = New_BaseObjO();
+            *p = New_Actor();
             if (*p == NULL) {
                 goto fail;
             }
@@ -72,7 +72,7 @@ fail:
 New types/fields, all confirmed by byte-identical surrounding code:
 `Unk5CMethods::slot80` (`s32 (*)(Unk5CObj *, void *, s32 *)`, called twice
 with different second arguments — `NULL` to probe, `self->unk74` to
-populate), and `New_BaseObjO` (`extern void *New_BaseObjO(void);` — a
+populate), and `New_Actor` (`extern void *New_Actor(void);` — a
 plain function, not a vtable dispatch, called with literally no arguments
 set up in `$a0`). The `goto`-based control flow mirrors the disassembly
 exactly: two allocation-failure paths converge on a shared
@@ -89,7 +89,7 @@ aftermath.
 
 ### 1. Store-before-branch ordering (CLOSED with a barrier)
 
-A straightforward `*p = New_BaseObjO(); if (*p == NULL) goto fail; p++;`
+A straightforward `*p = New_Actor(); if (*p == NULL) goto fail; p++;`
 compiled with the store folded directly into the `beqz`'s delay slot
 (replacing `p++`, which then migrated to the loop's `bnez` delay slot
 instead) — one instruction SHORTER than retail, which has a standalone
@@ -102,7 +102,7 @@ output, not just the printed score.
 
 Tried and rejected: a named `result` temp instead of `*p` directly (no
 effect, same 35/68-with-drift baseline); the barrier moved to right after
-`New_BaseObjO()`'s call instead of after the store (worse, 26/68 with
+`New_Actor()`'s call instead of after the store (worse, 26/68 with
 drift); the barrier at the very top of the function instead of inside the
 loop (worse, 35/68 with drift — does not generalize to fixing this
 specific merge); replacing the pointer-walk (`*p`, `p++`) with array
@@ -161,7 +161,7 @@ s32 Class65650__CreateParts(Class65650 *self)
     self->unk6C = 0;
     if (count != 0) {
         do {
-            *p = New_BaseObjO();
+            *p = New_Actor();
             __asm__("");
             if (*p == NULL) {
                 goto fail;
@@ -183,7 +183,7 @@ fail:
 #endif
 ```
 
-(`Unk5CMethods::slot80` and `New_BaseObjO` are kept live in
+(`Unk5CMethods::slot80` and `New_Actor` are kept live in
 `include/code_55dd4.h` — both confirmed correct by the byte-identical
 setup/allocation section and teardown call, independent of this stall.)
 
@@ -286,7 +286,7 @@ same offsets as every prior round -- no drift, no contamination.
 
 **Screened against the round-20 outgoing-arg dead-code lever:** this
 function is not a candidate. It has four real `jal`s (`BMemPMgrAlloc`
-x2, `New_BaseObjO`, `Class65650__DestroyParts`) and does not appear in round 19's
+x2, `New_Actor`, `Class65650__DestroyParts`) and does not appear in round 19's
 live census of unexplained-outgoing-area functions -- its residue is a
 whole-function register-IDENTITY swap, not a frame-size question, so the
 lever's mechanism (a wider dead call inflating
@@ -339,7 +339,7 @@ targets** (`func_8003F848`'s report: "a register-pair swap in a loop body
 wants [the pointer] deleted"), so this was the most promising untried axis
 in the project's current catalogue for this specific residue shape. Rewrote
 the per-element loop to drop the `Unk70ElemObj **p` local entirely and index
-`self->unk70[i]` at each use site (`self->unk70[i] = New_BaseObjO(); ...
+`self->unk70[i]` at each use site (`self->unk70[i] = New_Actor(); ...
 if (self->unk70[i] == NULL) ...`), keeping the barrier and everything else
 identical. **Result: 2/68, WITH size drift (60109 bytes outside range) —
 dramatically worse**, not better. Reverted immediately; confirmed clean
@@ -489,7 +489,7 @@ barrier (which closes the store-before-branch ordering sub-issue but
 introduces the whole-function `$s1`/`$s2` swap as a side effect) was
 replaced with a `volatile`-qualified walk pointer,
 `Unk70ElemObj * volatile *p;`, removing the barrier and relying on the
-qualifier to fence the `*p = New_BaseObjO();` / `if (*p == NULL)` pair
+qualifier to fence the `*p = New_Actor();` / `if (*p == NULL)` pair
 instead — the theory being that a narrower per-access fence might close
 the ordering sub-issue without perturbing the whole-function register
 allocation the way a barrier does. **Result: 33/68, WORSE, WITH size
@@ -585,7 +585,7 @@ own file, not inferred)**. Four candidates found below the base score of
 - **220, real-oracle-checked (round 47 outcome-3 material) — translated,
   built, and it regresses.** Wraps the `if (count != 0) { do {...} while
   (...); }` block in `do { ... } while (0);` and moves the `__asm__("")`
-  barrier from right after the `*p = New_BaseObjO();` store to right
+  barrier from right after the `*p = New_Actor();` store to right
   after the null check instead (a genuinely new, previously-untried
   barrier position — round 14's table only tried "first statement",
   "right after the call", "top of function", never "after the null
@@ -660,7 +660,7 @@ bug (round 49) and never built or merged.
 NON_MATCHING body promoted, round 71.
 
 Head, round 71 merge: the `src/` NON_MATCHING body is written without the
-order-only `__asm__("")` after `*p = New_BaseObjO();` (track 1b: byte-only
+order-only `__asm__("")` after `*p = New_Actor();` (track 1b: byte-only
 constructs stay in the report, round 66). The byte-shaped form, with the
 barrier, is the preserved body above.
 
@@ -670,7 +670,7 @@ REVISITED, round 75: MATCHED; names/types not relevant (no name or type
 changed; `buf[4]`, `s32 count`, `s32 i` all kept).
 
 **First measurement, before any change:** the preserved body (with its
-`__asm__("")` after `*p = New_BaseObjO();`) rebuilt live: 49/68, length
+`__asm__("")` after `*p = New_Actor();`) rebuilt live: 49/68, length
 exact, `insertions 6 / deletions 6`, **positional skeleton diffs 19** — so
 the N/N was not an honest alignment: the store/branch/`p++` region was
 still structurally different, not only renamed.
@@ -678,12 +678,12 @@ still structurally different, not only renamed.
 **The lever: write the store and the increment as one expression.**
 
 ```c
-            if ((*p++ = New_BaseObjO()) == NULL) {
+            if ((*p++ = New_Actor()) == NULL) {
                 goto fail;
             }
 ```
 
-in place of `*p = New_BaseObjO(); __asm__(""); if (*p == NULL) goto fail; p++;`.
+in place of `*p = New_Actor(); __asm__(""); if (*p == NULL) goto fail; p++;`.
 That is retail's instruction sequence read literally: `sw v0,0(s1)` right
 after the call, then `beqz v0` with `addiu s1,s1,4` in its delay slot — the
 increment happens BEFORE the test, unconditionally. With the store and
@@ -734,4 +734,4 @@ shape is wrong, not that the remainder is register allocation.
 
 Round 75 (charlie), track 3.
 
-- `Class65650__CreateParts` (was `func_80065E1C`), tier A. Asks modelData->getObjectIds (D_8006F384 +0x080) for the count, allocates parts (count pointers) and partIds (count bytes), fills partIds, creates one New_BaseObjO per entry counting partCount up, sets mainPart = parts[buf[0]]; on any failure DestroyParts and return 1.
+- `Class65650__CreateParts` (was `func_80065E1C`), tier A. Asks modelData->getObjectIds (D_8006F384 +0x080) for the count, allocates parts (count pointers) and partIds (count bytes), fills partIds, creates one New_Actor per entry counting partCount up, sets mainPart = parts[buf[0]]; on any failure DestroyParts and return 1.

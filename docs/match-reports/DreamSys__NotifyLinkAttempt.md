@@ -50,7 +50,7 @@ Both blocker screens are clean: no `gp_rel` hit and no
 - `vtable_DreamSys::DreamSys__NotifyLinkAttempt` (was inside `unknown_functions_0x64[13]`)
   — this function's own slot, `+0x088`, split out of that array.
 - `DreamSysBaseMethods::slot0x88` (the SHARED base table returned by
-  `DreamSys__GetBaseMethods()`, a DIFFERENT table from DreamSys's own vtable despite
+  `GetActorMethods()`, a DIFFERENT table from DreamSys's own vtable despite
   the coincidentally-identical offset) — called unconditionally as
   `(this, arg1)`, return discarded.
 - `DreamSysUnk4CMethods::slot0x11C` — new slot, `DreamSysUnk11CResult
@@ -73,7 +73,7 @@ void DreamSys__NotifyLinkAttempt(DreamSys *this, s32 arg1)
 {
 	s32 v;
 
-	DreamSys__GetBaseMethods()->slot0x88(this, arg1);
+	GetActorMethods()->slot0x88(this, arg1);
 	if (arg1 == -2)
 		goto handle_neg2;
 	if (arg1 != -1)
@@ -143,4 +143,4 @@ an arbitrary number of blocks that converge on one shared tail.
 
 ## Naming
 
-- **Tier B.** Forwards `arg1` to the base class's generic +0x88 notify slot unconditionally, then handles two DreamSys-specific sentinel values: -1 and -2, called with exactly those literals by DreamSys__FindNearbyLink (class_3bb8c_p.c) on link-found / link-not-found, and with a small positive mode code by DreamSys__ApplyOffsetSlotAndNotify (same unit).
+- **Tier B.** Forwards `arg1` to the base class's generic +0x88 notify slot unconditionally, then handles two DreamSys-specific sentinel values: -1 and -2, called with exactly those literals by Actor__FindNearbyLink (class_3bb8c_p.c) on link-found / link-not-found, and with a small positive mode code by Actor__MoveAlongLocalAxis (same unit).

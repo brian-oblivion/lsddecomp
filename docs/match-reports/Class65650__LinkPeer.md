@@ -29,7 +29,7 @@ This corrects `self->unk94`'s type: the first pass (before any function
 that touched it beyond zeroing it) guessed `s32`, matching the `sw
 $zero, 0x94(...)` in the constructor. It is actually a `Class65650 *` —
 retyped in `include/code_55dd4.h`, along with newly typing `slot10`'s
-sibling `slot14` (`+0x014`, inherited from `D_800878D4`, "unlink" companion,
+sibling `slot14` (`+0x014`, inherited from `gActorMethods`, "unlink" companion,
 see `Class65650__UnlinkPeer`).
 
 Matched on the direct translation, no reshaping.

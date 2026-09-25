@@ -24,7 +24,7 @@ void Class65650__DetachFromParent(Class65650 *self)
         if (self->unk50 != NULL) {
             self->methods->slot14(self, self->unk50);
         }
-        DreamSys__GetBaseMethods()->slot50(self);
+        GetActorMethods()->slot50(self);
     }
 }
 ```
@@ -33,7 +33,7 @@ Matched on the direct translation, no reshaping.
 
 `self->unk0C`'s name and gating role echo `DreamSys`'s own `unk_0xC` gate
 field (`include/DreamSys.h`) — both classes share the same intermediate
-base `D_800878D4`, so a coincidence at the same low offset is plausible,
+base `gActorMethods`, so a coincidence at the same low offset is plausible,
 but nothing here proves the two fields are the same base-class field
 rather than each subclass's own; noted, not claimed.
 

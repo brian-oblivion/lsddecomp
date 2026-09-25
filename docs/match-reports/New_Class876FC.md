@@ -30,7 +30,7 @@ void *New_Class876FC(void *arg0, void *arg1, void *arg2, void *arg3) {
 The `New_X` allocator sub-shape #3 from `DECOMPILATION_LEARNINGS.md`
 ("tests BOTH the allocation and the constructor's return, freeing on
 constructor failure -- plain `if`/`return`"), same shape as
-`class_3bb8c_o.c`'s own `New_BaseObjO` from the previous pass. The
+`class_3bb8c_o.c`'s own `New_Actor` from the previous pass. The
 constructor is reached THROUGH THE VTABLE (`GetClass876FCMethods()->ctor(...)`,
 where `GetClass876FCMethods` is `class_3bb8c_o.c`'s already-matched getter for
 `&gClass876FCMethods`) rather than by a direct `jal` to `Class876FC__Class876FC` -- both
@@ -48,4 +48,4 @@ this time reached through a vtable dispatch rather than a bare `jal`.
 
 ## Naming
 
-**Tier A.** `New_X` allocator convention (`New_BaseObjO`, `New_Class6B5CC`, `New_Class866E8`, `New_ClassEAC0`, `New_VabStreamObj`), matching this unit's own established allocator shape and `Class876FC` (see below).
+**Tier A.** `New_X` allocator convention (`New_Actor`, `New_Class6B5CC`, `New_Class866E8`, `New_ClassEAC0`, `New_VabStreamObj`), matching this unit's own established allocator shape and `Class876FC` (see below).

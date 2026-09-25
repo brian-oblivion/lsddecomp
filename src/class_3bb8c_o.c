@@ -15,11 +15,11 @@
  *    SAME node `class_3bb8c_s.c` independently calls `LinkNode` -- kept as
  *    this unit's own local view per the multiple-independent-local-views
  *    convention, unrelated to the class below.
- *  - `BaseObjO`/`BaseObjOMethods` (`New_BaseObjO` onward): the shared
+ *  - `BaseObjO`/`BaseObjOMethods` (`New_Actor` onward): the shared
  *    INTERMEDIATE BASE class of `DreamSys` (`DreamSys.h`), `Class65650`
  *    (`code_55dd4.h`'s `D800878D4Methods`), and `gClass876FCMethods`'s own sibling
  *    concrete class (`GetClass876FCMethods` is that sibling's own vtable getter,
- *    named in round 73 by class_3bb8c_r's naming pass). `BaseObjO__BaseObjO` is proven to be the BASE's
+ *    named in round 73 by class_3bb8c_r's naming pass). `Actor__Actor` is proven to be the BASE's
  *    own constructor, not `Class65650`'s: `code_55dd4.c`'s real
  *    `Class65650__Class65650` calls it to chain to the base FIRST, then
  *    overwrites `self->methods` with `Class65650`'s own, more specific
@@ -122,8 +122,8 @@ typedef struct TagWordObjO {
     TagWordMethodsO *methods;
 } TagWordObjO;
 
-/* A different tag check (DispatchObjO__func_57320's arg1, and self->unk28 in
- * BaseObjO__func_571f8): only the vtable header's LOW BYTE is read. */
+/* A different tag check (Actor__DispatchLinkCommand's arg1, and self->unk28 in
+ * Actor__NotifyMove): only the vtable header's LOW BYTE is read. */
 typedef struct TagByteObjO TagByteObjO;
 typedef struct TagByteMethodsO {
     u8 tag;                              /* +0x000 */
@@ -134,7 +134,7 @@ struct TagByteObjO {
     TagByteMethodsO *methods;
 };
 
-/* Scratch buffer BaseObjO__func_571f8 builds on its own stack and forwards to
+/* Scratch buffer Actor__NotifyMove builds on its own stack and forwards to
  * slot8C/slot90/func_8001F66C.  Retail's own frame layout requires it to
  * be 0x38 bytes (sp+0x10 .. sp+0x47, with the saved registers starting at
  * sp+0x48) -- a plain `Vec3O` (0xC bytes) undersizes the frame and
@@ -144,7 +144,7 @@ typedef struct Buf38O {
     u8 raw[0x38];
 } Buf38O;
 
-/* self->vecTarget's pointee (BaseObjO__UpdateVec14): +0x000 is a word cleared after
+/* self->vecTarget's pointee (Actor__UpdateTranslation): +0x000 is a word cleared after
  * the vector at +0x018 is written/accumulated into. */
 typedef struct Unk14ObjO {
     s32 unk0;      /* +0x000 */
@@ -157,20 +157,20 @@ typedef struct Unk14ObjO {
 struct BaseObjOMethods {
     s32 header;                                       /* +0x000 */
     void *unk04;                                         /* +0x004 */
-    BaseObjO *(*ctor)(BaseObjO *self);                     /* +0x008 BaseObjO__BaseObjO (this unit) */
+    BaseObjO *(*ctor)(BaseObjO *self);                     /* +0x008 Actor__Actor (this unit) */
     void (*dtor)(BaseObjO *self);                            /* +0x00C */
-    void (*linkCompanion)(BaseObjO *self, TagWordObjO *arg);   /* +0x010 BaseObjO__LinkCompanion (this unit) */
-    void (*unlinkCompanion)(BaseObjO *self, TagWordObjO *arg); /* +0x014 BaseObjO__UnlinkCompanion (this unit) */
-    void (*clearCompanions)(BaseObjO *self);                   /* +0x018 BaseObjO__ClearCompanions (this unit) */
+    void (*linkCompanion)(BaseObjO *self, TagWordObjO *arg);   /* +0x010 Actor__AddChild (this unit) */
+    void (*unlinkCompanion)(BaseObjO *self, TagWordObjO *arg); /* +0x014 Actor__RemoveChild (this unit) */
+    void (*clearCompanions)(BaseObjO *self);                   /* +0x018 Actor__RemoveAllChildren (this unit) */
     u8 pad1C[0x40 - 0x1C];                                            /* +0x01C .. +0x03F */
-    void (*slot40)(BaseObjO *self);                                     /* +0x040, called by BaseObjO__BaseObjO's own ctor; occupant outside this unit */
+    void (*slot40)(BaseObjO *self);                                     /* +0x040, called by Actor__Actor's own ctor; occupant outside this unit */
     u8 pad44[0x80 - 0x44];                                                /* +0x044 .. +0x07F */
-    void *(*slot80)(BaseObjO *self, s32 arg1);                              /* +0x080, called by BaseObjO__func_56f5c (this unit); occupant outside this unit (gClass876FCMethods's slot80 is Class6B5CC__GetSetUnk10Flag8, a BasicClass-range function) */
+    void *(*slot80)(BaseObjO *self, s32 arg1);                              /* +0x080, called by Actor__func_56f5c (this unit); occupant outside this unit (gClass876FCMethods's slot80 is Class6B5CC__GetSetUnk10Flag8, a BasicClass-range function) */
     u8 pad84[0x8C - 0x84];                                                /* +0x084 .. +0x08B */
-    void (*slot8C)(BaseObjO *self, Buf38O *arg1);                            /* +0x08C, called by BaseObjO__func_571f8 */
-    void (*slot90)(BaseObjO *self, Buf38O *arg1, s32 arg2);                    /* +0x090, called by BaseObjO__func_571f8 */
+    void (*slot8C)(BaseObjO *self, Buf38O *arg1);                            /* +0x08C, called by Actor__NotifyMove */
+    void (*slot90)(BaseObjO *self, Buf38O *arg1, s32 arg2);                    /* +0x090, called by Actor__NotifyMove */
     u8 pad94[0xBC - 0x94];                                                       /* +0x094 .. +0x0BB */
-    void (*addVec14)(BaseObjO *self, Vec3O *arg1);                                /* +0x0BC BaseObjO__AddVec14 (this unit), called by BaseObjO__ApplyRotatedVec14 */
+    void (*addVec14)(BaseObjO *self, Vec3O *arg1);                                /* +0x0BC Actor__AddTranslation (this unit), called by Actor__AddLocalTranslation */
 };
 
 struct BaseObjO {
@@ -204,7 +204,7 @@ extern s32 D_8008AB94;
 
 extern void func_80020510(void *arg0, void *arg1);
 
-void BaseObjO__func_56f5c(s32 arg0, BaseObjO *self, s32 arg2, s32 arg3) {
+void Actor__func_56f5c(s32 arg0, BaseObjO *self, s32 arg2, s32 arg3) {
     s32 i;
     void *ret;
 
@@ -221,13 +221,13 @@ void BaseObjO__func_56f5c(s32 arg0, BaseObjO *self, s32 arg2, s32 arg3) {
 
 extern void *BMemPMgrAlloc(s32 size);
 extern void *BMemPMgrFree(void *ptr);
-extern BaseObjOMethods *DreamSys__GetBaseMethods(void);
+extern BaseObjOMethods *GetActorMethods(void);
 
-void *New_BaseObjO(void) {
+void *New_Actor(void) {
     BaseObjO *self = BMemPMgrAlloc(0x58);
 
     if (self != NULL) {
-        if (DreamSys__GetBaseMethods()->ctor(self) != NULL) {
+        if (GetActorMethods()->ctor(self) != NULL) {
             return self;
         }
         BMemPMgrFree(self);
@@ -236,11 +236,11 @@ void *New_BaseObjO(void) {
     return NULL;
 }
 
-BaseObjO *BaseObjO__BaseObjO(BaseObjO *self) {
+BaseObjO *Actor__Actor(BaseObjO *self) {
     if (GetClass6B5CCMethods()->ctor((Class6B5CC *)self) == NULL) {
         goto fail;
     }
-    self->methods = DreamSys__GetBaseMethods();
+    self->methods = GetActorMethods();
     self->unk44 = 0;
     self->companion1 = NULL;
     self->companion2 = NULL;
@@ -250,7 +250,7 @@ fail:
     return NULL;
 }
 
-void BaseObjO__LinkCompanion(BaseObjO *self, TagWordObjO *arg) {
+void Actor__AddChild(BaseObjO *self, TagWordObjO *arg) {
     s32 tag;
 
     GetClass6B5CCMethods()->addChild((Class6B5CC *)self, (BasicClass *)arg);
@@ -262,7 +262,7 @@ void BaseObjO__LinkCompanion(BaseObjO *self, TagWordObjO *arg) {
     }
 }
 
-void BaseObjO__UnlinkCompanion(BaseObjO *self, TagWordObjO *arg) {
+void Actor__RemoveChild(BaseObjO *self, TagWordObjO *arg) {
     s32 tag = arg->methods->header;
 
     if ((tag & 0xFFF) == 0x114) {
@@ -273,13 +273,13 @@ void BaseObjO__UnlinkCompanion(BaseObjO *self, TagWordObjO *arg) {
     GetClass6B5CCMethods()->removeChild((Class6B5CC *)self, (BasicClass *)arg);
 }
 
-void BaseObjO__ClearCompanions(BaseObjO *self) {
+void Actor__RemoveAllChildren(BaseObjO *self) {
     self->companion1 = NULL;
     self->companion2 = NULL;
     GetClass6B5CCMethods()->removeAllChildren((Class6B5CC *)self);
 }
 
-void BaseObjO__InitDefaults(BaseObjO *self) {
+void Actor__Reset(BaseObjO *self) {
     self->unk48 = 0x12C;
     self->unk54 = 0;
 }
@@ -287,7 +287,7 @@ void BaseObjO__InitDefaults(BaseObjO *self) {
 extern s32 func_8001F3A4(void *arg0);
 extern void func_8001F66C(Buf38O *out, s32 arg1, s32 arg2, s32 arg3);
 
-void BaseObjO__func_571f8(BaseObjO *self, s32 arg1) {
+void Actor__NotifyMove(BaseObjO *self, s32 arg1) {
     GetClass6B5CCMethods()->notifyIfUnk20Active((Class6B5CC *)self, arg1);
     /* Written as two nested guards, not a combined `arg1 >= 5 && arg1 < 9`
      * range test -- the combined form optimizes into a single unsigned
@@ -338,7 +338,7 @@ struct DispatchObjO {
     DispatchObjOMethods *methods;
 };
 
-void DispatchObjO__func_57320(DispatchObjO *self, TagByteObjO *arg1) {
+void Actor__DispatchLinkCommand(DispatchObjO *self, TagByteObjO *arg1) {
     if (arg1->methods->tag == 0x34) {
         self->methods->slotDC(self);
     } else if (arg1->methods->tag == 0x24) {
@@ -346,17 +346,17 @@ void DispatchObjO__func_57320(DispatchObjO *self, TagByteObjO *arg1) {
     }
 }
 
-extern void BaseObjO__UpdateVec14(BaseObjO *self, s32 flag, Vec3O *v);
+extern void Actor__UpdateTranslation(BaseObjO *self, s32 flag, Vec3O *v);
 
-void BaseObjO__SetVec14(BaseObjO *self, Vec3O *arg1) {
-    BaseObjO__UpdateVec14(self, 1, arg1);
+void Actor__SetTranslation(BaseObjO *self, Vec3O *arg1) {
+    Actor__UpdateTranslation(self, 1, arg1);
 }
 
-void BaseObjO__AddVec14(BaseObjO *self, Vec3O *arg1) {
-    BaseObjO__UpdateVec14(self, 0, arg1);
+void Actor__AddTranslation(BaseObjO *self, Vec3O *arg1) {
+    Actor__UpdateTranslation(self, 0, arg1);
 }
 
-void BaseObjO__UpdateVec14(BaseObjO *self, s32 flag, Vec3O *v) {
+void Actor__UpdateTranslation(BaseObjO *self, s32 flag, Vec3O *v) {
     BaseObjO *t = self;
     Unk14ObjO *u = t->vecTarget;
 
@@ -370,7 +370,7 @@ void BaseObjO__UpdateVec14(BaseObjO *self, s32 flag, Vec3O *v) {
     t->vecTarget->unk0 = 0;
 }
 
-void BaseObjO__ApplyRotatedVec14(BaseObjO *self, s16 *arg1) {
+void Actor__AddLocalTranslation(BaseObjO *self, s16 *arg1) {
     Vec3O buf;
 
     Class6B5CC__RotateLocalVector((Class6B5CC *)self, (Vec3_d294 *)&buf, arg1);
@@ -378,8 +378,8 @@ void BaseObjO__ApplyRotatedVec14(BaseObjO *self, s16 *arg1) {
 }
 
 extern s32 D_8008ABA8;
-extern void DreamSys__ApplyOffsetSlotAndNotify(BaseObjO *self, void *arg0, s32 arg1, s32 arg2, s32 arg3);
+extern void Actor__MoveAlongLocalAxis(BaseObjO *self, void *arg0, s32 arg1, s32 arg2, s32 arg3);
 
-void BaseObjO__func_5748c(BaseObjO *self, s32 arg1, s32 arg2) {
-    DreamSys__ApplyOffsetSlotAndNotify(self, &D_8008ABA8, arg1, arg2, 6);
+void Actor__MoveLocalZ(BaseObjO *self, s32 arg1, s32 arg2) {
+    Actor__MoveAlongLocalAxis(self, &D_8008ABA8, arg1, arg2, 6);
 }

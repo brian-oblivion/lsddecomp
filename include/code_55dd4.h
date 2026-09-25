@@ -11,9 +11,9 @@
  * (80 slots, header word 0x234). Entity (ENTITY_METHODS) derives from it.
  *
  * Inheritance, resolved with tools/classtable.py (never by counting):
- * BasicClass -> Class6B5CC -> BaseObjO (D_800878D4, 59 slots, header 0x34;
+ * BasicClass -> Class6B5CC -> BaseObjO (gActorMethods, 59 slots, header 0x34;
  * DreamSys's base too) -> Class65650. `classtable.py gClass65650Methods --vs
- * D_800878D4` says it overrides +0x008 ctor, +0x00C dtor, +0x038 OnNotify,
+ * gActorMethods` says it overrides +0x008 ctor, +0x00C dtor, +0x038 OnNotify,
  * +0x040 InitDefaults, +0x04C AttachToParent, +0x050 DetachFromParent,
  * +0x060 SetDisplay, +0x070 SetLightMode and +0x098 (tag-5 notify), and adds
  * +0x0F0..+0x140. Instance offsets below +0x58 are the base classes'
@@ -27,19 +27,19 @@
 
 typedef struct Class65650 Class65650;
 
-/* BaseObjO's method table (D_800878D4), this class's immediate base. Same
+/* BaseObjO's method table (gActorMethods), this class's immediate base. Same
  * policy as Class6D3C8.h's MiddleClassMethods: only slots this unit
  * dispatches through are typed, named for their classtable occupant.
- * Resolved via DreamSys__GetBaseMethods, which returns &D_800878D4 (a plain
+ * Resolved via GetActorMethods, which returns &gActorMethods (a plain
  * lui/addiu address-of, not a gp_rel load). */
 typedef struct D800878D4Methods {
     s32 header;                                    /* +0x000 */
     void *unk04;                                    /* +0x004 BasicClass__Release, inherited */
-    Class65650 *(*ctor)(Class65650 *self);            /* +0x008 BaseObjO__BaseObjO */
+    Class65650 *(*ctor)(Class65650 *self);            /* +0x008 Actor__Actor */
     void (*dtor)(Class65650 *self);                    /* +0x00C Class6B5CC__Finalize */
-    void (*linkCompanion)(void *self, void *arg);             /* +0x010 BaseObjO__LinkCompanion */
-    void *unk14;                                        /* +0x014 BaseObjO__UnlinkCompanion */
-    void *unk18;                                         /* +0x018 BaseObjO__ClearCompanions */
+    void (*linkCompanion)(void *self, void *arg);             /* +0x010 Actor__AddChild */
+    void *unk14;                                        /* +0x014 Actor__RemoveChild */
+    void *unk18;                                         /* +0x018 Actor__RemoveAllChildren */
     u8 pad1C[0x1C];                                       /* +0x01C .. +0x037, not yet needed */
     void (*onNotify)(Class65650 *self, void *arg1, s32 arg2); /* +0x038 Class6B5CC__OnNotify, chained by Class65650__OnNotify */
     u8 pad3C[0x10];                                         /* +0x03C .. +0x04B, not yet needed */
@@ -51,7 +51,7 @@ typedef struct D800878D4Methods {
     void (*setLightMode)(Class65650 *self, void *arg);              /* +0x070 Class6B5CC__SetLightMode, chained by Class65650__SetLightMode */
 } D800878D4Methods;
 
-extern D800878D4Methods *DreamSys__GetBaseMethods(void);
+extern D800878D4Methods *GetActorMethods(void);
 
 /* Class65650__OnNotify's sender: any object. Only its method table's header
  * word is read (the low 16 bits), compared with MODEL_DATA_CLASS_HEADER. */
@@ -78,11 +78,11 @@ typedef struct UnkArg2Obj {
     UnkArg2Methods *methods;
 } UnkArg2Obj;
 
-/* self->mainPart: one of self->parts (a BaseObjO from New_BaseObjO), picked
+/* self->mainPart: one of self->parts (a BaseObjO from New_Actor), picked
  * by the index modelData->getObjectIds writes to buf[0]. */
 typedef struct Unk68Methods {
     u8 pad00[0x88];                                    /* +0x000 .. +0x084, unknown */
-    void (*slot88)(void *self, s32 arg);                /* +0x088 BaseObjO__func_571f8; Class65650__TickCallbackA calls it with 6 */
+    void (*slot88)(void *self, s32 arg);                /* +0x088 Actor__NotifyMove; Class65650__TickCallbackA calls it with 6 */
 } Unk68Methods;
 
 typedef struct Unk68Obj {
@@ -91,8 +91,8 @@ typedef struct Unk68Obj {
     s32 unk20;                  /* +0x20 Class6B5CC's +0x20 (what Class6B5CC__LinkModel stores); Class65650__InitDefaults links self to the same value */
 } Unk68Obj;
 
-/* Each self->parts[i]: a BaseObjO allocated by New_BaseObjO, so these slots
- * are D_800878D4's (tools/classtable.py). */
+/* Each self->parts[i]: a BaseObjO allocated by New_Actor, so these slots
+ * are gActorMethods's (tools/classtable.py). */
 typedef struct Unk70ElemMethods {
     u8 pad00[0x04];                          /* +0x000, unknown */
     void (*release)(void *self);                /* +0x004 BasicClass__Release; Class65650__DestroyParts */
@@ -211,14 +211,14 @@ typedef struct Class65650Methods {
     void (*release)(Class65650 *self);                               /* +0x004 BasicClass__Release */
     Class65650 *(*ctor)(Class65650 *self, void *arg1, void *arg2);   /* +0x008 Class65650__Class65650 */
     void (*dtor)(Class65650 *self);                                   /* +0x00C Class65650__Destructor */
-    void (*linkCompanion)(Class65650 *self, void *arg);                       /* +0x010 BaseObjO__LinkCompanion */
-    void (*unlinkCompanion)(Class65650 *self, void *arg);                        /* +0x014 BaseObjO__UnlinkCompanion */
+    void (*linkCompanion)(Class65650 *self, void *arg);                       /* +0x010 Actor__AddChild */
+    void (*unlinkCompanion)(Class65650 *self, void *arg);                        /* +0x014 Actor__RemoveChild */
     u8 pad18[0x28];                                                      /* +0x018 .. +0x03F, not yet needed */
     void (*initDefaults)(Class65650 *self);                                    /* +0x040 Class65650__InitDefaults */
     u8 pad44[0x80];                                                       /* +0x044 .. +0x0C3, not yet needed */
-    void (*slotC4)(Class65650 *self, s32 arg1, s32 arg2);                  /* +0x0C4 BaseObjO__func_5748c; Class65650__TickCallbackA calls it with (-0x1E, 0) */
+    void (*slotC4)(Class65650 *self, s32 arg1, s32 arg2);                  /* +0x0C4 Actor__MoveLocalZ; Class65650__TickCallbackA calls it with (-0x1E, 0) */
     u8 padC8[0x1C];                                                        /* +0x0C8 .. +0x0E3, not yet needed */
-    void (*setLastOffsetValue)(Class65650 *self, s32 arg);                              /* +0x0E4 DreamSys__SetLastOffsetValue */
+    void (*setLastOffsetValue)(Class65650 *self, s32 arg);                              /* +0x0E4 Actor__SetLastOffsetValue */
     u8 padE8[0x08];                                                          /* +0x0E8 .. +0x0EF, not yet needed */
     void (*setUnk64)(Class65650 *self, s32 arg);                                /* +0x0F0 Class65650__SetUnk64 */
     s32 (*setupModelData)(Class65650 *self, void *arg1);                     /* +0x0F4 Class65650__SetupModelData */
@@ -288,7 +288,7 @@ extern Class65650Methods *Get_vtable_Class65650(void);
 extern void *BMemPMgrAlloc(s32 size);
 extern void *BMemPMgrFree(void *ptr);
 /* Class6B5CC__LinkModel: include/Class6B5CC.h. Class65650__InitDefaults passes a Class65650 *, Class65650__ApplyTodPacket an Unk70ElemObj *; both upcast. */
-extern void *New_BaseObjO(void);
+extern void *New_Actor(void);
 
 /* Same-unit helpers called by name ahead of their definitions. AcquireModelData
  * / ReleaseModelData are the bodies behind setupModelData/teardownModelData;

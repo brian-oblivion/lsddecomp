@@ -298,8 +298,8 @@ Round 70 (alpha). `func_800569A8` -> `Class876FC__DriftModelChildren`, **tier B*
 Named from its preserved body and asm (still a stall, so B): gated on
 modelChildLayout != 0, gModelChildDriftZ[tableIndex] != 0 and tick >= 501;
 adds gSpinRotStep via updateRotation(.., 0, ..) to self and both children,
-adds a z delta via each child's slot +0x0BC (BaseObjO__AddVec14 in
-D_800878D4), and every 24500 / step frames calls
+adds a z delta via each child's slot +0x0BC (Actor__AddTranslation in
+gActorMethods), and every 24500 / step frames calls
 Class876FC__PlaceModelChildren(self, 1) to snap them back. Always stores 0
 to `*coord2` (GsCOORDINATE2.flg). Caller: Class876FC__UpdateByKind, kind 0.
 

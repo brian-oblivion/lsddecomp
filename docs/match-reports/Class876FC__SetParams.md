@@ -27,7 +27,7 @@ void Class876FC__SetParams(Class876FC *self, Block24 *src) {
 
 - **This closes the identity of `BaseObjOMethods::slot40`, left as
   "occupant outside this unit" in `class_3bb8c_o.c`'s own
-  `BaseObjO__BaseObjO` report last pass.** That function called
+  `Actor__Actor` report last pass.** That function called
   `self->methods->slot40(self)` (a plain no-argument dispatch, since its
   OWN concrete class -- a different sibling -- happens to call slot40
   with no extra argument); THIS class's own ctor

@@ -53,5 +53,5 @@ with set = 1 (Class6B5CC__UpdateRotation assigns GsCOORD2PARAM.rotate from a deg
 triple; Class6B5CC__UpdateScale assigns .scale). Both callers
 (Class876FC__InitByKind on the owner, Class876FC__PlaceModelChildren on
 each BaseObjO child) pass objects whose tables resolve those three slots to
-exactly those functions (tools/classtable.py on gClass876FCMethods and D_800878D4).
+exactly those functions (tools/classtable.py on gClass876FCMethods and gActorMethods).
 Free function because `node` is not always the owner.

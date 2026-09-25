@@ -4,9 +4,9 @@
 
 Unit: `class_3bb8c_r` (round 17 continuation). `Class876FCMethods::ctor`
 (vtable offset `+0x008` of `gClass876FCMethods`) -- chains to the shared base
-class's own ctor (`DreamSys__GetBaseMethods()->ctor`, the SAME shared-base getter
-`class_3bb8c_o.c` already used for its own `BaseObjO__BaseObjO`/
-`New_BaseObjO` last pass), installs this class's own vtable, sets two
+class's own ctor (`GetActorMethods()->ctor`, the SAME shared-base getter
+`class_3bb8c_o.c` already used for its own `Actor__Actor`/
+`New_Actor` last pass), installs this class's own vtable, sets two
 fields, dispatches its own `slot40`, and tail-calls `Class876FC__InitByKind` for
 its return value's side effect only.
 
@@ -14,7 +14,7 @@ its return value's side effect only.
 
 ```c
 void *Class876FC__Class876FC(Class876FC *self, void *arg1, void *arg2, void *arg3, void *arg4) {
-    if (DreamSys__GetBaseMethods()->ctor(self) == NULL) {
+    if (GetActorMethods()->ctor(self) == NULL) {
         goto fail;
     }
     self->methods = GetClass876FCMethods();
@@ -30,16 +30,16 @@ fail:
 
 ## Derivation
 
-- **`DreamSys__GetBaseMethods()`, not `GetClass6B5CCMethods()`.** Both are fixed-table
+- **`GetActorMethods()`, not `GetClass6B5CCMethods()`.** Both are fixed-table
   getters `class_3bb8c_o.c` already resolved last pass for the SAME
   shared intermediate base class, but they are DIFFERENT symbols with
   DIFFERENT call sites in that unit (`GetClass6B5CCMethods` for the ctor CHAIN
-  inside `BaseObjO__BaseObjO`; `DreamSys__GetBaseMethods` for the plain-allocator
-  `New_BaseObjO`'s own ctor dispatch). This function's own disassembly
-  calls `DreamSys__GetBaseMethods`, confirmed directly rather than assumed from
+  inside `Actor__Actor`; `GetActorMethods` for the plain-allocator
+  `New_Actor`'s own ctor dispatch). This function's own disassembly
+  calls `GetActorMethods`, confirmed directly rather than assumed from
   surface similarity to last pass's ctor.
 - **`goto fail; ... fail: return NULL;`, not `if (cond) return NULL;`.**
-  Same lever as `class_3bb8c_o.c`'s own `BaseObjO__BaseObjO` (documented
+  Same lever as `class_3bb8c_o.c`'s own `Actor__Actor` (documented
   there): with a plain `if`/`return NULL`, the return-`self` path needs
   its own explicit `j` to reach the shared epilogue, costing one word.
   `goto` collapses both exits onto ONE epilogue.
@@ -73,4 +73,4 @@ fail:
 
 ## Naming
 
-**Tier A.** `Class876FC` is the class name class_3bb8c_s.c already uses for `gClass876FCMethods` (its own comment: "`Class876FC` here; class_3bb8c_r.c's `Obj876FC`" -- confirmed via `tools/classtable.py 0x800876FC`, whose slot list mixes `Class6B5CC__`/`BaseObjO__`/`DreamSys__`-prefixed inherited slots with this unit's own `+0x008`/`+0x00C`/`+0x040`/`+0x0EC`). Ctor naming follows the `Class__Class` convention already used for `BaseObjO__BaseObjO`/`Class6B5CC__Class6B5CC`. The body is a constructor by construction (chains the shared base ctor, installs the vtable, dispatches init) -- purpose evident from the body.
+**Tier A.** `Class876FC` is the class name class_3bb8c_s.c already uses for `gClass876FCMethods` (its own comment: "`Class876FC` here; class_3bb8c_r.c's `Obj876FC`" -- confirmed via `tools/classtable.py 0x800876FC`, whose slot list mixes `Class6B5CC__`/`BaseObjO__`/`DreamSys__`-prefixed inherited slots with this unit's own `+0x008`/`+0x00C`/`+0x040`/`+0x0EC`). Ctor naming follows the `Class__Class` convention already used for `Actor__Actor`/`Class6B5CC__Class6B5CC`. The body is a constructor by construction (chains the shared base ctor, installs the vtable, dispatches init) -- purpose evident from the body.

@@ -19,7 +19,7 @@ void DreamSys__SpawnAtLink(DreamSys *this, DreamSysFunc58968ArgObj *arg1)
 	s32 local[4];
 
 	arg1->methods->slot0xE4(arg1, local, this, &this->linkCoordinates);
-	DreamSys__GetBaseMethods()->slot4C(this, arg1, local);
+	GetActorMethods()->slot4C(this, arg1, local);
 	this->vt->slot10(this, arg1);
 	if (this->unknwon_int_0x44 == 0xE) {
 		FlashbackEntry *entry = &this->storedFlasbacks[this->currentFlashbackIndex];
@@ -52,7 +52,7 @@ closed the last 3 words immediately.
 
 ## New knowledge
 
-- **`DreamSysBaseMethods` (this unit's local view of the shared `D_800878D4`
+- **`DreamSysBaseMethods` (this unit's local view of the shared `gActorMethods`
   base table) gets a new slot at `+0x04C`: `slot4C`.** Cross-confirmed
   against `code_55dd4.h`'s `D800878D4Methods`, which already names this exact
   slot (same offset in the same shared table) and describes its call shape
@@ -92,7 +92,7 @@ Renamed from `DreamSys__func_58968`.
 Places the object into the world at `this->linkCoordinates`
 (`arg1->methods->slot0xE4(arg1, local, this, &this->linkCoordinates)`), hands the
 result to the shared base's +0x4C slot, links the companion through `slot10`
-(`BaseObjO__LinkCompanion`), and then applies whichever pending orientation the link
+(`Actor__AddChild`), and then applies whichever pending orientation the link
 type calls for: when `pendingLinkType == 0xE` (the flashback type `ExecuteLink` is
 given by `DreamSys__LoadNextFlashback`) it applies the stored flashback's own
 `rotation` and time limit and advances `currentFlashbackIndex`; otherwise, while

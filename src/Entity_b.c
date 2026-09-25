@@ -20,7 +20,7 @@
 /* Constant transform triples passed to updateRotation (slot +0x44,
  * func_8001CEB4: three {s16 num, s16 den} ratios in degrees), updateScale
  * (+0x48, func_8001D008: three ratios) and addVec14 (+0xBC,
- * BaseObjO__AddVec14: three s32 deltas), named by value. Only the address
+ * Actor__AddTranslation: three s32 deltas), named by value. Only the address
  * is taken here, so a byte array is enough; the RotationRatios type in
  * DreamSys.h is the real shape of the rotation and scale ones.
  * TRANSLATE_Y_MINUS64's label also holds a second triple, (0, -0x20, 0). */
