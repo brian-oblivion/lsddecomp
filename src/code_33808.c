@@ -345,7 +345,18 @@ extern s32 D_8006F384[];
 void *func_800449FC(void) {
     return D_8006F384;
 }
-INCLUDE_ASM("asm/nonmatchings/code_33808", func_80044A0C);
+/* Allocate and construct a D_8006F40C object; freed and NULL when the constructor fails. */
+void *func_80044A0C(s32 arg0) {
+    void *obj = BMemPMgrAlloc(0x3C);
+
+    if (obj != NULL) {
+        if (((Ctor33808 *)func_80044CC4())->ctor(obj, arg0)) {
+            return obj;
+        }
+        BMemPMgrFree(obj);
+    }
+    return NULL;
+}
 INCLUDE_ASM("asm/nonmatchings/code_33808", func_80044A7C);
 /* D_8006F40C +0x00C: finalize -- slot +0x07C, then the parent D_8006F384's. */
 void func_80044B04(DataSrc33808 *self) {
