@@ -88,7 +88,7 @@ declarations; same shape and same discriminator as `GetClass6B5CCMethods`.
 No argument register is read. The definition is
 `void *GetClass6D430Methods(void)`.
 
-**The extra argument is not byte-load-bearing.** `func_80027228`
+**The extra argument is not byte-load-bearing.** `Class6D4E8__Class6D4E8`
 (src/code_179d8_o.c) calls it as `GetClass6D430Methods(self)->ctor(self)`:
 
 ```
@@ -97,7 +97,7 @@ No argument register is read. The definition is
                                           self, not argument setup
 ```
 
-`$a0` still holds `func_80027228`'s incoming `self` at the `jal` either way, so
+`$a0` still holds `Class6D4E8__Class6D4E8`'s incoming `self` at the `jal` either way, so
 the declaration's parameter list is free and must agree with the definition.
 
 **Declaration site changed:** `src/code_179d8_o.c:99` —

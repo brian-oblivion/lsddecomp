@@ -1,4 +1,6 @@
-# func_80027228 -- MATCHED (19/19 words)
+# Class6D4E8__Class6D4E8 -- MATCHED (19/19 words)
+
+> Renamed from `func_80027228` on 2026-09-25 (tools/rename.py). Address 0x80027228.
 
 Unit `code_179d8_o`, round 26 (2026-09-09). This class's constructor --
 confirmed via `tools/classtable.py 0x8006D4E8 --vs 0x8006B58C` as the
@@ -9,7 +11,7 @@ this whole unit.
 ## What it is
 
 ```c
-void func_80027228(Obj6D4E8 *self)
+void Class6D4E8__Class6D4E8(Obj6D4E8 *self)
 {
     GetClass6D430Methods(self)->ctor(self);
     self->methods = GetClass6D4E8Methods();

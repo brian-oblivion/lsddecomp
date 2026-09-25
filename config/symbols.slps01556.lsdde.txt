@@ -2427,3 +2427,4 @@ Obj86B60__func_8003CCDC = 0x8003CCDC; // type:func
 // position right after placed libsnd/vm_prog in the SsUt*/SpuVm* run; best
 // shape SpuVmSetVol (0.51, 3.5). No disc carries this build.
 SpuVmSetVol = 0x80030980; // type:func
+Class6D4E8__Class6D4E8 = 0x80027228; // type:func

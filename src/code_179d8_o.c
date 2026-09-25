@@ -18,7 +18,7 @@
  * Blocker census at carve time, four screens per function (gp_rel, forward
  * nop_mflo_mfhi, `jr $t2` trampoline, jtbl):
  *   New_Class6D4E8 (20w)  CLEAN
- *   func_80027228   (19w)  CLEAN
+ *   Class6D4E8__Class6D4E8   (19w)  CLEAN
  *   func_80027274   (21w)  CLEAN
  *   func_800272C8    (2w)  CLEAN  -- a bare `jr $ra; nop` leaf
  * 4 of 4 clean, and the window references NO rodata or data symbol at all
@@ -42,7 +42,7 @@
  * 0x8006B58C`.  D_8006D4E8 (this class's own 29-slot method table, the
  * address the FirecatFG name is drawn from) overrides BasicClass's table
  * (D_8006B58C, 14 slots, header 0) at exactly three slots: +0x004
- * (DestroyChained), +0x008 (func_80027228) and +0x00C (func_80027274);
+ * (DestroyChained), +0x008 (Class6D4E8__Class6D4E8) and +0x00C (func_80027274);
  * slots +0x010..+0x038 are inherited verbatim (same BasicClass__func_*
  * addresses in both tables) and the rest (+0x040 upward, including
  * func_800272C8) are new slots BasicClass's own table does not have at
@@ -50,10 +50,10 @@
  * (BasicClass__BasicClass sits there) -- CONFIRMED by that lookup, not
  * assumed from the FirecatFG name.  So: `New_Class6D4E8` is a genuine
  * "allocate + construct" pair, and its constructor IS this same unit's
- * `func_80027228`, dispatched back through the class's own table (the
- * generic `new` doesn't call func_80027228 by name -- it fetches
+ * `Class6D4E8__Class6D4E8`, dispatched back through the class's own table (the
+ * generic `new` doesn't call Class6D4E8__Class6D4E8 by name -- it fetches
  * GetClass6D4E8Methods()'s table and calls whatever sits at the ctor slot, which
- * happens to resolve to func_80027228 for this class).
+ * happens to resolve to Class6D4E8__Class6D4E8 for this class).
  *
  * This unit's own local view of the class-table framework it participates
  * in: NOT the same shape as include/class_3ac78.h's GenericObject /
@@ -100,10 +100,10 @@ extern void *BMemPMgrAlloc(s32 size);              /* Psy-Q allocator, matched s
  * is NOT still INCLUDE_ASM -- it is defined in src/code_171e0.c as
  * `void *GetClass6D430Methods(void)`, and the callee at 0x80026C9C is
  * lui/addiu/jr reading no argument register. Measured before changing it:
- * func_80027228's `jal 80026c9c` (0x80027234) carries `move s0,a0` in the
+ * Class6D4E8__Class6D4E8's `jal 80026c9c` (0x80027234) carries `move s0,a0` in the
  * delay slot -- a callee-save spill, not argument setup -- so the `self`
  * passed below costs zero bytes and the one-parameter prototype was simply
- * false. Unspecified parameters keep func_80027228's call site untouched. */
+ * false. Unspecified parameters keep Class6D4E8__Class6D4E8's call site untouched. */
 extern BaseCtorTable6D4E8 *GetClass6D430Methods();
 extern Obj6D4E8Methods *GetClass6D4E8Methods(void);        /* still INCLUDE_ASM in the code_179d8 remainder;
                                                        returns this class's own table, &D_8006D4E8 */
@@ -122,7 +122,7 @@ Obj6D4E8 *New_Class6D4E8(void)
     return NULL;
 }
 
-void func_80027228(Obj6D4E8 *self)
+void Class6D4E8__Class6D4E8(Obj6D4E8 *self)
 {
     GetClass6D430Methods(self)->ctor(self);
     self->methods = GetClass6D4E8Methods();
