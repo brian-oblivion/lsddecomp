@@ -20,7 +20,7 @@ struct TmdModelMethods {
 struct TmdModel {
     BASICCLASS_FIELDS(TmdModelMethods);
     void *data;             /* +0x00C, ModelData_fa50 * in the unit */
-    void *unk10;            /* +0x010 */
+    TmdObject_fa50 *object;  /* +0x010 */
     s32 quad[4];            /* +0x014 */
 };
 extern void *BMemPMgrAlloc(s32 size);
@@ -43,3 +43,12 @@ TmdModel *New_TmdModel(void *arg) {
 standard `BMemPMgrAlloc` + ctor-through-vtable allocator shape, chained to
 `Get_vtable_TmdModel()->ctor`; the class it allocates is named from its
 table's role (see `Get_vtable_TmdModel.md`).
+
+## Naming (field)
+
+`TmdModel::object` (was `unk10`) -- tier A. The pointer `New_TmdModel`'s own
+argument becomes: `self->object = arg;` in the ctor, and every reader
+(`TmdModel__ComputeBounds`, `TmdModel__NextPrimitive`) treats it as the TMD
+object-table entry (`TmdObject_fa50 *`) the class wraps. Unit-local field;
+renamed in the struct definition only, compiler-verified accessor list
+(5 sites, all in this unit), build and check-nonmatching.sh green.

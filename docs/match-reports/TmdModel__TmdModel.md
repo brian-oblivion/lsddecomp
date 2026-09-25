@@ -4,7 +4,7 @@
 
 Round 82, runner charlie (matching slot, second pass on the unit). Unit `src/code_fa50.c`. Fresh ground, no prior attempt.
 
-- **What:** the constructor of class D_8006BEA0 (its slot +0x008): base ctor through `Get_vtable_BasicClass()->ctor`, install the method table, `unk10 = arg`, `data = (u8 *)arg - 0xC`, then `MarkTmdModelConstructed(self)` (sets the flag `gTmdModelConstructed = 1`).
+- **What:** the constructor of class D_8006BEA0 (its slot +0x008): base ctor through `Get_vtable_BasicClass()->ctor`, install the method table, `object = arg`, `data = (u8 *)arg - 0xC`, then `MarkTmdModelConstructed(self)` (sets the flag `gTmdModelConstructed = 1`).
 - **Result:** byte-exact; 25/25 words, whole-image SHA1 green. Second build.
 - **Build 1:** `MarkTmdModelConstructed();` with no argument -- one word short (the `addu a0, s0, zero` before the stores was missing, and every later function shifted). Retail loads `$a0 = self` BEFORE the three stores and then stores through `$a0`: the call's argument was computed early and reused as the store base. So the callee takes `self` even though its body never reads it.
 - **Change to an existing declaration:** `MarkTmdModelConstructed` (matched earlier this round, this unit, no other declarer) is now `void MarkTmdModelConstructed(TmdModel *self)` instead of `(void)`; identical bytes.
@@ -17,7 +17,7 @@ void MarkTmdModelConstructed(TmdModel *self);
 void TmdModel__TmdModel(TmdModel *self, void *arg) {
     Get_vtable_BasicClass()->ctor((BasicClass *)self);
     self->methods = Get_vtable_TmdModel();
-    self->unk10 = arg;
+    self->object = arg;
     self->data = (ModelData_fa50 *)((u8 *)arg - 0xC);
     MarkTmdModelConstructed(self);
 }

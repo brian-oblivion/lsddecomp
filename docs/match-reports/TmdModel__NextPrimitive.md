@@ -4,12 +4,12 @@
 
 Round 82, runner charlie (matching slot, second pass on the unit). Unit `src/code_fa50.c`. Fresh ground, no prior attempt.
 
-- **What:** a TMD primitive iterator over the object `self->unk10` (TMD object-table entry: +0x10 `prims`, +0x14 `nprims`). Returns NULL once `*count` reaches `nprims`; on `*count == 0` it restarts at `prims`. It switches on the primitive's mode byte (0x20..0x3F, `jtbl_80010354`, which this function owns). Each case picks the three or four vertex-index words out of the primitive (their position depends on the mode and on `flag & 4`) and the primitive's size. It then copies the indexed vertices' x,y,z into `out`, sets `*n` (3, 4, or 0 for an unknown mode), bumps `*count`, and returns `p + size`. `size` is uninitialised on the default path, as in retail.
+- **What:** a TMD primitive iterator over the object `self->object` (TMD object-table entry: +0x10 `prims`, +0x14 `nprims`). Returns NULL once `*count` reaches `nprims`; on `*count == 0` it restarts at `prims`. It switches on the primitive's mode byte (0x20..0x3F, `jtbl_80010354`, which this function owns). Each case picks the three or four vertex-index words out of the primitive (their position depends on the mode and on `flag & 4`) and the primitive's size. It then copies the indexed vertices' x,y,z into `out`, sets `*n` (3, 4, or 0 for an unknown mode), bumps `*count`, and returns `p + size`. `size` is uninitialised on the default path, as in retail.
 - **Result:** byte-exact; 288/288 words, whole-image SHA1 green. Build 14 on this function.
 - **Builds / levers, measured:**
   1. natural switch (`*n = 3;` written in every 3-vertex case): 280/288. Right length, and cross-jumping already produced retail's shared tails, including the 0x38-with-flag case jumping into case 0x3C's body. The only residue was `n` (a2 copy) and `verts` swapped between t4/t5.
   2. `verts` declared first / `rec` removed / `verts` in an inner block / `*out++` / a `{Vec3 v; s16 pad;}` vertex view: all 280, no change.
-  3. reading `self->unk10->verts` inside the loop (no local): 5/288, size changed.
+  3. reading `self->object->verts` inside the loop (no local): 5/288, size changed.
   4. `goto tri;` with `tri: *n = 3;` as a separate label at the END of the switch: 60/288, block order changed.
   5. **`goto tri;` from every 3-vertex case, with `tri:` placed at the tail of the LAST 3-vertex case (0x35), where retail's shared block sits**: 287/288. Fewer `*n` refs before allocation lowered `n`'s priority and fixed the t4/t5 swap. Left: `addu v0,v0,t4` where retail has `addu v0,t4,v0`.
   6. `verts + idx[i]`, `idx[i] + verts`, `(u8 *)verts + idx[i] * 8`, `u32 idx[]`: all 287.
@@ -26,11 +26,11 @@ typedef struct TmdObject_fa50 {
     SVec_fa50 *verts; s32 nverts; void *normals; s32 nnormals;
     TmdPrim_fa50 *prims; u32 nprims; s32 scale;
 } TmdObject_fa50;
-/* TmdModel: +0x010 TmdObject_fa50 *unk10 (see New_TmdModel.md) */
+/* TmdModel: +0x010 TmdObject_fa50 *object (see New_TmdModel.md) */
 
 TmdPrim_fa50 *TmdModel__NextPrimitive(TmdModel *self, TmdPrim_fa50 *p, s32 *n, Vec3_fa50 *out, u32 *count) {
     s32 idx[4];
-    TmdObject_fa50 *rec = self->unk10;
+    TmdObject_fa50 *rec = self->object;
     SVec_fa50 *verts;
     s32 size;
     s32 i;
@@ -203,7 +203,7 @@ TmdPrim_fa50 *TmdModel__NextPrimitive(TmdModel *self, TmdPrim_fa50 *p, s32 *n, V
         *n = 0;
         break;
     }
-    verts = self->unk10->verts;
+    verts = self->object->verts;
     for (i = 0; i < *n; i++) {
         out[i] = *(Vec3_fa50 *)((u8 *)verts + (idx[i] << 3));
     }
@@ -220,7 +220,7 @@ TmdPrim_fa50 *TmdModel__NextPrimitive(TmdModel *self, TmdPrim_fa50 *p, s32 *n, V
 ## Naming
 
 `TmdModel__NextPrimitive` -- tier A. A TMD primitive iterator over
-`self->unk10` (the object-table entry): decodes the current primitive's mode
+`self->object` (the object-table entry): decodes the current primitive's mode
 byte, extracts its vertex indices, writes their positions to `out`, advances
 `*count`, and returns the next primitive pointer (or NULL when exhausted).
 Owns `jtbl_80010354`.

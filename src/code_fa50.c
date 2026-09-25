@@ -129,7 +129,7 @@ struct TmdModelMethods {
 struct TmdModel {
     BASICCLASS_FIELDS(TmdModelMethods);
     ModelData_fa50 *data;   /* +0x00C */
-    TmdObject_fa50 *unk10;      /* +0x010 */
+    TmdObject_fa50 *object; /* +0x010, self->object == arg from New_TmdModel */
     Quad_fa50 quad;         /* +0x014 */
 };
 
@@ -172,7 +172,7 @@ TmdModel *New_TmdModel(void *arg) {
 void TmdModel__TmdModel(TmdModel *self, void *arg) {
     Get_vtable_BasicClass()->ctor((BasicClass *)self);
     self->methods = Get_vtable_TmdModel();
-    self->unk10 = arg;
+    self->object = arg;
     self->data = (ModelData_fa50 *)((u8 *)arg - 0xC);
     MarkTmdModelConstructed(self);
 }
@@ -206,8 +206,8 @@ void TmdModel__ComputeBounds(TmdModel *self, Box_fa50 *box) {
     s16 *maxy = &box->max.y;
     s16 *maxz = &box->max.z;
 
-    v = self->unk10->verts;
-    n = self->unk10->nverts - 1;
+    v = self->object->verts;
+    n = self->object->nverts - 1;
     box->min.x = v->x;
     box->min.y = v->y;
     box->min.z = v->z;
@@ -467,7 +467,7 @@ s32 TmdModel__RaycastFaces(TmdModel *self, s32 *best, Vec3_fa50 *hitOut, s32 *he
 }
 TmdPrim_fa50 *TmdModel__NextPrimitive(TmdModel *self, TmdPrim_fa50 *p, s32 *n, Vec3_fa50 *out, u32 *count) {
     s32 idx[4];
-    TmdObject_fa50 *rec = self->unk10;
+    TmdObject_fa50 *rec = self->object;
     SVec_fa50 *verts;
     s32 size;
     s32 i;
@@ -640,7 +640,7 @@ TmdPrim_fa50 *TmdModel__NextPrimitive(TmdModel *self, TmdPrim_fa50 *p, s32 *n, V
         *n = 0;
         break;
     }
-    verts = self->unk10->verts;
+    verts = self->object->verts;
     for (i = 0; i < *n; i++) {
         out[i] = *(Vec3_fa50 *)((u8 *)verts + (idx[i] << 3));
     }
