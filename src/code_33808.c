@@ -56,7 +56,8 @@ INCLUDE_ASM("asm/nonmatchings/code_33808", func_80044294);
 INCLUDE_ASM("asm/nonmatchings/code_33808", func_80044380);
 INCLUDE_ASM("asm/nonmatchings/code_33808", func_8004441C);
 INCLUDE_ASM("asm/nonmatchings/code_33808", func_8004464C);
-INCLUDE_ASM("asm/nonmatchings/code_33808", func_80044674);
+void func_80044674(void) {
+}
 INCLUDE_ASM("asm/nonmatchings/code_33808", func_8004467C);
 INCLUDE_ASM("asm/nonmatchings/code_33808", func_8004468C);
 INCLUDE_ASM("asm/nonmatchings/code_33808", func_800446FC);
