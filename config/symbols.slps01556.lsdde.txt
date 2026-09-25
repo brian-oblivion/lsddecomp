@@ -1379,7 +1379,13 @@ SsStart2 = 0x800329B8; // type:func
 // (disc 3.3). Superseded game-style name CancelSeqTimer. Round 71
 // (bravo, track 2).
 SsEnd = 0x800329D8; // type:func
-QuitSpu = 0x80032A7C; // type:func
+// identified: fingerprint EXACT masked 1.00 vs libsnd/ssinit SsQuit (disc
+// 3.3); AMBIGUOUS alone (18-way tie), settled by position -- bracketed with
+// zero gap by SsEnd (0x800329D8) before and _SsTrapIntrVSync (0x80032A9C)
+// after, both already libsnd/ssinit@3.3. Body calls SpuQuit(), matching
+// SsQuit's documented role. Superseded game-style name QuitSpu. Round 79
+// (bravo, track 2).
+SsQuit = 0x80032A7C; // type:func
 // identified: fingerprint EXACT masked 1.00 vs libsnd/ssinit's internal
 // _SsTrapIntrVSync (disc 3.3). Superseded game-style name SeqTimerCallback.
 // Round 71 (bravo, track 2).

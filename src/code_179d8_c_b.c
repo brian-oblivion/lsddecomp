@@ -11,7 +11,7 @@
  * `SetRCnt`/`GetRCnt`/`StartRCnt`/`StopRCnt`/`ResetRCnt` are Sony's
  * libapi/counter module compiled into game text from a library build the
  * SDK discs do not carry (identified by module order and KERNEL.H; see the
- * symbols file), and everything above is built on them. `QuitSpu` is
+ * symbols file), and everything above is built on them. `SsQuit` is
  * unrelated -- a one-line forwarder to Sony's `SpuQuit` (libspu/s_q) -- kept
  * here only because it falls in this address range.
  *
@@ -179,7 +179,7 @@ void SsEnd(void)
 
 extern void SpuQuit(void);
 
-void QuitSpu(void)
+void SsQuit(void)
 {
     SpuQuit();
 }

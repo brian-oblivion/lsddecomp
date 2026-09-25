@@ -21,7 +21,7 @@ s32 VabStreamObj__Close(VabStreamObj *self) {
         gVabVolumeInited = 0;
         gVabStreamInited = 0;
         SsEnd();
-        QuitSpu();
+        SsQuit();
     }
     BMemPMgrFree(self->vagAttrPool);
     BMemPMgrFree(self->progVagTable);
