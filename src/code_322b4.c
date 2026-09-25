@@ -118,7 +118,15 @@ INCLUDE_ASM("asm/nonmatchings/code_322b4", func_80041B20);
 void func_80041BAC(SpriteView_322b4 *self, u8 cell) {
     self->methods->setCell(self, cell);
 }
-INCLUDE_ASM("asm/nonmatchings/code_322b4", func_80041BDC);
+/* D_8006EC74 slot +0x0C4: store the cell index and point u,v at its 8x8 cell. */
+void func_80041BDC(SpriteView_322b4 *self, u8 cell) {
+    CellRect_322b4 r;
+
+    self->unkA8 = cell;
+    func_80041C4C(&r, cell);
+    self->u = r.u;
+    self->v = r.v;
+}
 /* D_8006EC74 slot +0x0C8: read the byte at +0x0A8. */
 u8 func_80041C28(D_8006EC74Obj *self) {
     u8 pad[16]; /* unused: it is what gives retail its 0x10-byte frame */
