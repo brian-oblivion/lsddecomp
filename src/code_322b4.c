@@ -137,7 +137,10 @@ s32 func_8004266C(D_8006EF50Obj *self) {
 void func_80042678(D_8006EF50Obj *self) {
     self->unk14 = 1;
 }
-INCLUDE_ASM("asm/nonmatchings/code_322b4", func_80042684);
+/* Returns the D_8006EF50 method table. */
+void *func_80042684(void) {
+    return D_8006EF50;
+}
 INCLUDE_ASM("asm/nonmatchings/code_322b4", func_80042694);
 INCLUDE_ASM("asm/nonmatchings/code_322b4", func_800426E4);
 INCLUDE_ASM("asm/nonmatchings/code_322b4", func_80042790);
