@@ -1,4 +1,6 @@
-# func_8001F314 -- MATCHED (10/10 words), round 82
+# TmdModel__SetQuad -- MATCHED (10/10 words), round 82
+
+> Renamed from `func_8001F314` on 2026-09-25 (tools/rename.py). Address 0x8001f314.
 
 Round 82, runner charlie (matching slot). Unit `src/code_fa50.c`. Fresh ground (carved in FINISHING-PLAN revision 18), no prior attempt, no report before this one.
 
@@ -11,7 +13,7 @@ Round 82, runner charlie (matching slot). Unit `src/code_fa50.c`. Fresh ground (
 ## Source
 
 ```c
-void func_8001F314(Class6BEA0 *self, Quad_fa50 *src) {
+void TmdModel__SetQuad(Class6BEA0 *self, Quad_fa50 *src) {
     self->quad = *src;
 }
 ```

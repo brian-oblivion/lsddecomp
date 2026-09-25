@@ -157,7 +157,7 @@ void TmdModel__TmdModel(Class6BEA0 *self, void *arg) {
     self->data = (ModelData_fa50 *)((u8 *)arg - 0xC);
     MarkTmdModelConstructed(self);
 }
-void func_8001F314(Class6BEA0 *self, Quad_fa50 *src) {
+void TmdModel__SetQuad(Class6BEA0 *self, Quad_fa50 *src) {
     self->quad = *src;
 }
 void func_8001F33C(Class6BEA0 *self) {
