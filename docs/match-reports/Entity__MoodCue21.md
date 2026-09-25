@@ -56,7 +56,7 @@ per-instance "how long this mood state runs" constant, distinct from
 `moodTimer` (the live counter) and `moodIndex` (the row selector). Not
 proposing `unk84` alongside it: `Entity__MoodCue47`'s report (round 76)
 already found `unk84` carries a SECOND, unrelated loop-counter meaning in
-`Entity_f.c` (`func_80063ED4`/`func_80064078`), so a single name would
+`Entity_f.c` (`Entity__MoodCue91`/`Entity__MoodCue92`), so a single name would
 misdescribe one of its two uses; that objection does not apply to `unk80`
 itself, which this unit's three call sites and every sibling unit's reads
 treat uniformly.

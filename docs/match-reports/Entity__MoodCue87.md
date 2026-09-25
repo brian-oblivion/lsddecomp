@@ -1,4 +1,6 @@
-# func_80063CC8
+# Entity__MoodCue87
+
+> Renamed from `func_80063CC8` on 2026-09-25 (tools/rename.py). Address 0x80063cc8.
 
 **Unit:** Entity_f · **Size:** 30 words · **Status:** MATCHED (30/30 words)
 

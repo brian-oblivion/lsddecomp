@@ -1,4 +1,6 @@
-# func_80064078
+# Entity__MoodCue92
+
+> Renamed from `func_80064078` on 2026-09-25 (tools/rename.py). Address 0x80064078.
 
 **Unit:** Entity_f · **Size:** 82 words · **Status:** MATCHED (82/82 words)
 
@@ -7,7 +9,7 @@
 On `this->unk7C == 0`: if `this->unkF4 != 0`, calls `Class6B5CC__FaceTarget`,
 `slot128(this,1)`, and `this->unk94->methods->slot130(this->unk94,1)`;
 else if `this->unk84 == 0`, runs the same `slot134` do-while loop as
-`func_80063ED4` (this unit). On `this->unk7C != 0`: if `this->unk84 == 0`,
+`Entity__MoodCue91` (this unit). On `this->unk7C != 0`: if `this->unk84 == 0`,
 sets `out->unk10=0; out->unk1C=0x16;`; else if `this->unk84 ==
 this->unk80 - 1`, sets `out->unk10=0; out->unk30=0x12;` and calls
 `slot30(this, 0xA)`. Unconditionally, `slot48(this, 1, D_80089DE4)`.
@@ -15,5 +17,5 @@ this->unk80 - 1`, sets `out->unk10=0; out->unk30=0x12;` and calls
 ## Derivation
 
 Direct transcription, reusing `EntityMethods::slot134`/`Entity::unk88`
-established by `func_80063ED4` (earlier in ROM order, same unit). No new
+established by `Entity__MoodCue91` (earlier in ROM order, same unit). No new
 header entries needed here. No residue.

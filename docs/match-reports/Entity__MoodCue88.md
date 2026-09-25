@@ -1,10 +1,12 @@
-# func_80063D40
+# Entity__MoodCue88
+
+> Renamed from `func_80063D40` on 2026-09-25 (tools/rename.py). Address 0x80063d40.
 
 **Unit:** Entity_f · **Size:** 34 words · **Status:** MATCHED (34/34 words)
 
 ## What it does
 
-Near-sibling of `func_80063CC8`: `out->unk10 = this->methods->slot148(this);
+Near-sibling of `Entity__MoodCue87`: `out->unk10 = this->methods->slot148(this);
 if (out->unk4 == this->unk80 / 2) { out->unk1C = 0x12; } if (out->unk4 >=
 this->unk80 - 1) { out->unk4 = -1; }`.
 

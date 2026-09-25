@@ -14,12 +14,12 @@ extern u8 D_80089DE4[];
 extern u8 SCALE_SIX[];
 
 /* Forward declarations: both are defined later in this file (in ROM
- * order), but func_80063874 and func_80063BC0 call them before their own
+ * order), but Entity__MoodCue85 and Entity__MoodCue86 call them before their own
  * definitions appear -- same convention as Entity_d.c's own forward calls. */
 void func_80063C84(EntityMoodHandlerArg *out);
 void func_80063CAC(EntityMoodHandlerArg *out);
 
-void func_800634A8(Entity *this, EntityMoodHandlerArg *out) {
+void Entity__MoodCue82(Entity *this, EntityMoodHandlerArg *out) {
     if (this->moodState == 0 && this->moodTimer == 0) {
         if (rand() % 3 != 0) {
             this->moodState = (rand() & 1) ? 0xB : 0xC;
@@ -55,7 +55,7 @@ void func_800634A8(Entity *this, EntityMoodHandlerArg *out) {
     }
 }
 
-void func_800636E4(Entity *this, EntityMoodHandlerArg *out) {
+void Entity__MoodCue83(Entity *this, EntityMoodHandlerArg *out) {
     if (this->unk84 % 15 == 0) {
         out->unk10 = 0;
         out->unk1C = 0xC;
@@ -68,7 +68,7 @@ void func_800636E4(Entity *this, EntityMoodHandlerArg *out) {
     }
 }
 
-void func_80063784(Entity *this, EntityMoodHandlerArg *out) {
+void Entity__MoodCue84(Entity *this, EntityMoodHandlerArg *out) {
     out->unk10 = this->methods->getProximityRatio(this);
     if (this->unk84 < 0x28) {
         out->unk1C = 0xC;
@@ -97,7 +97,7 @@ void func_80063784(Entity *this, EntityMoodHandlerArg *out) {
     }
 }
 
-void func_80063874(Entity *this, EntityMoodHandlerArg *out) {
+void Entity__MoodCue85(Entity *this, EntityMoodHandlerArg *out) {
     if (this->moodState == 0) {
         if (this->unk84 == 5) {
             func_80063C84(out);
@@ -157,7 +157,7 @@ void func_80063874(Entity *this, EntityMoodHandlerArg *out) {
     }
 }
 
-void func_80063BC0(Entity *this, EntityMoodHandlerArg *out) {
+void Entity__MoodCue86(Entity *this, EntityMoodHandlerArg *out) {
     if (this->moodTimer < 0xA) {
         this->methods->slot130(this);
     } else if (this->moodTimer == 0xA) {
@@ -189,7 +189,7 @@ void func_80063CAC(EntityMoodHandlerArg *out) {
     out->unk44 = 3;
 }
 
-void func_80063CC8(Entity *this, EntityMoodHandlerArg *out) {
+void Entity__MoodCue87(Entity *this, EntityMoodHandlerArg *out) {
     out->unk10 = this->methods->getProximityRatio(this);
     if (out->unk4 == 0) {
         out->unk1C = 0x12;
@@ -199,7 +199,7 @@ void func_80063CC8(Entity *this, EntityMoodHandlerArg *out) {
     }
 }
 
-void func_80063D40(Entity *this, EntityMoodHandlerArg *out) {
+void Entity__MoodCue88(Entity *this, EntityMoodHandlerArg *out) {
     out->unk10 = this->methods->getProximityRatio(this);
     if (out->unk4 == this->moodDuration / 2) {
         out->unk1C = 0x12;
@@ -209,7 +209,7 @@ void func_80063D40(Entity *this, EntityMoodHandlerArg *out) {
     }
 }
 
-void func_80063DC8(Entity *this, EntityMoodHandlerArg *out) {
+void Entity__MoodCue89(Entity *this, EntityMoodHandlerArg *out) {
     if (this->moodTimer == 0x14) {
         out->unk1C = 0x12;
         out->unk10 = 0;
@@ -225,7 +225,7 @@ void func_80063DC8(Entity *this, EntityMoodHandlerArg *out) {
     }
 }
 
-void func_80063E68(Entity *this, EntityMoodHandlerArg *out) {
+void Entity__MoodCue90(Entity *this, EntityMoodHandlerArg *out) {
     out->unk10 = this->methods->getProximityRatio(this);
     if (out->unk4 == 0) {
         out->unk1C = (rand() & 1) ? 2 : 1;
@@ -233,7 +233,7 @@ void func_80063E68(Entity *this, EntityMoodHandlerArg *out) {
     }
 }
 
-void func_80063ED4(Entity *this, EntityMoodHandlerArg *out) {
+void Entity__MoodCue91(Entity *this, EntityMoodHandlerArg *out) {
     if (this->moodTimer == 0) {
         if (Entity__GetOrCreateUnk100(this, NULL, NULL, (void *)5, 0) != NULL) {
             if (rand() & 1) {
@@ -262,7 +262,7 @@ void func_80063ED4(Entity *this, EntityMoodHandlerArg *out) {
     this->methods->updateScale(this, 1, D_80089DE4);
 }
 
-void func_80064078(Entity *this, EntityMoodHandlerArg *out) {
+void Entity__MoodCue92(Entity *this, EntityMoodHandlerArg *out) {
     if (this->unk7C == 0) {
         if (this->targetReached != 0) {
             Class6B5CC__FaceTarget(this, this->target, 1, 0, 0);
@@ -287,7 +287,7 @@ void func_80064078(Entity *this, EntityMoodHandlerArg *out) {
     this->methods->updateScale(this, 1, D_80089DE4);
 }
 
-void func_800641C0(Entity *this, EntityMoodHandlerArg *out) {
+void Entity__MoodCue93(Entity *this, EntityMoodHandlerArg *out) {
     out->unk10 = this->methods->getProximityRatio(this);
     if (out->unk4 % 10 == 0) {
         out->unk1C = 3;
@@ -300,7 +300,7 @@ void func_800641C0(Entity *this, EntityMoodHandlerArg *out) {
     }
 }
 
-void func_80064294(Entity *this, EntityMoodHandlerArg *out) {
+void Entity__MoodCue94(Entity *this, EntityMoodHandlerArg *out) {
     if (this->moodTimer == 0) {
         if (this->target->methods->slot200(this->target) != 7) {
             this->moodState = 0xB;
@@ -327,7 +327,7 @@ void func_80064294(Entity *this, EntityMoodHandlerArg *out) {
     }
 }
 
-void func_80064450(Entity *this, EntityMoodHandlerArg *out) {
+void Entity__MoodCue95(Entity *this, EntityMoodHandlerArg *out) {
     if (this->moodTimer == 0) {
         this->methods->slot128(this, 3);
     } else if (this->moodTimer == this->moodDuration) {
@@ -338,7 +338,7 @@ void func_80064450(Entity *this, EntityMoodHandlerArg *out) {
     }
 }
 
-void func_800644E8(Entity *this, EntityMoodHandlerArg *out) {
+void Entity__MoodCue96(Entity *this, EntityMoodHandlerArg *out) {
     if (this->moodTimer == 0) {
         this->methods->slot128(this, rand() % 4);
         return;

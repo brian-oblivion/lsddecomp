@@ -1,4 +1,6 @@
-# func_800644E8
+# Entity__MoodCue96
+
+> Renamed from `func_800644E8` on 2026-09-25 (tools/rename.py). Address 0x800644e8.
 
 **Unit:** Entity_f · **Size:** 76 words · **Status:** MATCHED (76/76 words)
 
@@ -18,4 +20,4 @@ this->unk80` (a RUNTIME divisor, not a compile-time constant) compiles to
 retail's `div`/`break 7`/`break 6`/`mfhi` sequence automatically, matching
 this project's documented maspsx-expansion policy for non-constant
 divisors (see CLAUDE.md's "maspsx-expanded macros" residue class and
-`func_800644E8`'s own use of `mfhi` for the remainder). No residue.
+`Entity__MoodCue96`'s own use of `mfhi` for the remainder). No residue.

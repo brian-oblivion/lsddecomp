@@ -1,4 +1,6 @@
-# func_80063784
+# Entity__MoodCue84
+
+> Renamed from `func_80063784` on 2026-09-25 (tools/rename.py). Address 0x80063784.
 
 **Unit:** Entity_f · **Size:** 60 words · **Status:** MATCHED (60/60 words)
 
@@ -49,8 +51,8 @@ unconditional, sets up the comparison value for wherever control goes
 next); the constant this link actually tests against was set in the
 PREVIOUS link's delay slot. Getting this backwards doesn't just mis-time a
 value, it silently relabels which literal belongs to which branch —
-confirmed on a real function this round (`func_80063784`) and again, more
-severely, in `func_80063874` in this same unit (see that report, where it
+confirmed on a real function this round (`Entity__MoodCue84`) and again, more
+severely, in `Entity__MoodCue85` in this same unit (see that report, where it
 swapped which of two ENTIRE CODE BLOCKS belonged to which `this->unk44`
 value). When a function has 3+ chained equality checks on one field, write
 out the delay-slot-carried value at each link explicitly before writing

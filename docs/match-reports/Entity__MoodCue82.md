@@ -1,4 +1,6 @@
-# func_800634A8
+# Entity__MoodCue82
+
+> Renamed from `func_800634A8` on 2026-09-25 (tools/rename.py). Address 0x800634a8.
 
 **Unit:** Entity_f · **Size:** 143 words · **Status:** MATCHED (143/143 words)
 
@@ -49,7 +51,7 @@ suspecting anything else.** This is not the same as the existing
 about arm SIZE); here both arms were single-statement-scale and still hit
 this, so **size is not the discriminator — try the swap whenever a
 straightforward `if`/`else` mismatches only in polarity.** Confirmed twice
-in one function this round, and again in `func_80063874`'s
+in one function this round, and again in `Entity__MoodCue85`'s
 `rand() % 5` ternary in the same unit (see that report) — cheap enough
 (a rebuild is under a
 second) to just try before writing up a residue.

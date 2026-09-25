@@ -1,4 +1,6 @@
-# func_80063ED4
+# Entity__MoodCue91
+
+> Renamed from `func_80063ED4` on 2026-09-25 (tools/rename.py). Address 0x80063ed4.
 
 **Unit:** Entity_f · **Size:** 105 words · **Status:** MATCHED (105/105 words)
 
@@ -29,7 +31,7 @@ not an `else` branch" idiom already established in this project for
 functions with a similar shared-tail shape (see e.g. Entity_d's
 `Entity__MoodCue58` report).
 
-The `slot134` loop is byte-identical in shape to `func_80064078`'s own
+The `slot134` loop is byte-identical in shape to `Entity__MoodCue92`'s own
 (this unit, later in ROM order) — both establish the new
 `EntityMethods::slot134` slot and `Entity::unk88` field; this function is
 first in ROM order, so both are added here.

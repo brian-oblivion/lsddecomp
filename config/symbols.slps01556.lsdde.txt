@@ -2427,3 +2427,18 @@ Obj86B60__func_8003CCDC = 0x8003CCDC; // type:func
 // position right after placed libsnd/vm_prog in the SsUt*/SpuVm* run; best
 // shape SpuVmSetVol (0.51, 3.5). No disc carries this build.
 SpuVmSetVol = 0x80030980; // type:func
+Entity__MoodCue82 = 0x800634A8; // type:func
+Entity__MoodCue83 = 0x800636E4; // type:func
+Entity__MoodCue84 = 0x80063784; // type:func
+Entity__MoodCue85 = 0x80063874; // type:func
+Entity__MoodCue86 = 0x80063BC0; // type:func
+Entity__MoodCue87 = 0x80063CC8; // type:func
+Entity__MoodCue88 = 0x80063D40; // type:func
+Entity__MoodCue89 = 0x80063DC8; // type:func
+Entity__MoodCue90 = 0x80063E68; // type:func
+Entity__MoodCue91 = 0x80063ED4; // type:func
+Entity__MoodCue92 = 0x80064078; // type:func
+Entity__MoodCue93 = 0x800641C0; // type:func
+Entity__MoodCue94 = 0x80064294; // type:func
+Entity__MoodCue95 = 0x80064450; // type:func
+Entity__MoodCue96 = 0x800644E8; // type:func

@@ -1,4 +1,6 @@
-# func_80063874
+# Entity__MoodCue85
+
+> Renamed from `func_80063874` on 2026-09-25 (tools/rename.py). Address 0x80063874.
 
 **Unit:** Entity_f · **Size:** 211 words · **Status:** MATCHED (211/211 words)
 
@@ -15,7 +17,7 @@ setters, matched separately) at several transition points, plus
 ## Derivation
 
 **The same delay-slot-carried-comparison-value trap documented in
-`func_80063784`'s report, but this time it swapped which of TWO WHOLE
+`Entity__MoodCue84`'s report, but this time it swapped which of TWO WHOLE
 CODE BLOCKS belonged to `this->unk44 == 0xC` vs `== 0xD`** — a much more
 consequential instance of the same mechanism, worth its own writeup.
 
@@ -44,7 +46,7 @@ getting a large word-count mismatch, only resolved by swapping to the
 retail-verified `0xD`-before-`0xC` order.
 
 Also hit, independently, the branch-polarity residue from
-`func_800634A8`'s report: `this->methods->slot30(this, (rand() % 5 == 0)
+`Entity__MoodCue82`'s report: `this->methods->slot30(this, (rand() % 5 == 0)
 ? 0xC : 0xA)` compiled with the ternary's internal branch inverted
 relative to retail. Fixed the same way — write the negated condition
 (`!= 0`) with the arms swapped, no other change:
@@ -60,7 +62,7 @@ relative to retail. Fixed the same way — write the negated condition
 
 ## Proposed learning
 
-See `func_80063784`'s report for the general delay-slot-chain lesson; this
+See `Entity__MoodCue84`'s report for the general delay-slot-chain lesson; this
 function is the sharper example because the mislabeling swapped two
 entire bodies rather than one stored constant, and because a chain's
 LABELING error compounds with an ORDERING error if the C is written with
