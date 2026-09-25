@@ -1,4 +1,6 @@
-# func_800424A8 -- MATCHED (14/14 words), round 82
+# D8006EF50__Finalize -- MATCHED (14/14 words), round 82
+
+> Renamed from `func_800424A8` on 2026-09-25 (tools/rename.py). Address 0x800424a8.
 
 Round 82, runner alpha (third re-staffed slot of the round). Unit `src/code_322b4.c`. Fresh ground (carved in FINISHING-PLAN revision 18), no prior attempt, no report before this one.
 
@@ -11,7 +13,7 @@ Round 82, runner alpha (third re-staffed slot of the round). Unit `src/code_322b
 
 ```c
 /* D_8006EF50 slot +0x00C (finalize): the BasicClass finalize. */
-void func_800424A8(BasicClass *self) {
+void D8006EF50__Finalize(BasicClass *self) {
     Get_vtable_BasicClass()->finalize(self);
 }
 ```

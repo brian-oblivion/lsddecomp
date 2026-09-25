@@ -434,7 +434,7 @@ void D8006EF50__D8006EF50(D_8006EF50Obj *self) {
     self->methods->reset(self, 0);
 }
 /* D_8006EF50 slot +0x00C (finalize): the BasicClass finalize. */
-void func_800424A8(BasicClass *self) {
+void D8006EF50__Finalize(BasicClass *self) {
     Get_vtable_BasicClass()->finalize(self);
 }
 /* D_8006EF50 slot +0x024 (removeParentRef): step the cursor past the parent
