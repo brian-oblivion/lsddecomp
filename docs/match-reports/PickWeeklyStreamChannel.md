@@ -37,5 +37,5 @@ unused), so the call passes an uninitialised local: it emits no instruction.
 ## Naming
 
 - **Name:** `PickWeeklyStreamChannel`
-- **Tier:** A
+- **Tier:** B (head review, round 82: was A. The mechanics are this body's; the purpose word comes from the callers' inherited names in code_1677c.c / Class6D3C8.h, which are themselves hypotheses, so the name is consistent but not established)
 - **Evidence:** its one caller, Class6D3C8__StartWeeklyStreamTask, uses the return value as the StreamTask's group id directly; matches exactly.

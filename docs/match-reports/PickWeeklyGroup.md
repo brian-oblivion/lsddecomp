@@ -69,5 +69,5 @@ shift.
 ## Naming
 
 - **Name:** `PickWeeklyGroup`
-- **Tier:** A
+- **Tier:** B (head review, round 82: was A. The mechanics are this body's; the purpose word comes from the callers' inherited names in code_1677c.c / Class6D3C8.h, which are themselves hypotheses, so the name is consistent but not established)
 - **Evidence:** leaf picker: forced-or-random index into GetWeeklyGroupTable(), gated by gForcedWeeklyGroup; a picker is tier A by the leaf-mechanics rule.

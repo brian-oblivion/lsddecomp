@@ -57,5 +57,5 @@ extends (`len += start`) rather than a fresh `end`.
 ## Naming
 
 - **Name:** `GetGraphRoomStreamChannel`
-- **Tier:** A
+- **Tier:** B (head review, round 82: was A. The mechanics are this body's; the purpose word comes from the callers' inherited names in code_1677c.c / Class6D3C8.h, which are themselves hypotheses, so the name is consistent but not established)
 - **Evidence:** its one caller, Class6D3C8__StartGraphRoomStreamTask, uses the returned record and *total (divided by 15) as the StreamTask's channel and ring size; matches exactly.

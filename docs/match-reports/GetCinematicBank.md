@@ -42,5 +42,5 @@ Rec1C *GetCinematicBank(s32 *countOut, s32 n) {
 ## Naming
 
 - **Name:** `GetCinematicBank`
-- **Tier:** A
+- **Tier:** B (head review, round 82: was A. The mechanics are this body's; the purpose word comes from the callers' inherited names in code_1677c.c / Class6D3C8.h, which are themselves hypotheses, so the name is consistent but not established)
 - **Evidence:** used by both ResolveCinematicChannel (bank/entry resolve) and GetGraphRoomStreamChannel with a bank id `n`; base 0x23E, stride 6 records, matches both callers' own naming.
