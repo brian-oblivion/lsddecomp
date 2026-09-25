@@ -65,7 +65,7 @@ void FlatLightObj__FlatLightObj(FlatLightObj *self, s32 lightId) {
     self->methods = func_80042A7C();
     self->methods->setLightId(self, lightId);
 }
-void func_800429E0(FlatLightObj *self, s32 lightId) {
+void FlatLightObj__SetLightId(FlatLightObj *self, s32 lightId) {
     self->lightId = lightId;
 }
 void func_800429E8(FlatLightObj *self, s32 update, FlatLightColor *rgb) {
