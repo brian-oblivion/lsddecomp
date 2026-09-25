@@ -202,7 +202,16 @@ void func_80044B58(DataSrc33808 *self) {
 }
 INCLUDE_ASM("asm/nonmatchings/code_33808", func_80044B88);
 INCLUDE_ASM("asm/nonmatchings/code_33808", func_80044C58);
-INCLUDE_ASM("asm/nonmatchings/code_33808", func_80044C90);
+/* D_8006F40C +0x088: entry `index` of the buffer's counted word array, 0 when
+ * out of range. */
+s32 func_80044C90(DataSrc33808 *self, u32 index) {
+    CountedBuf33808 *buf = self->buffer;
+
+    if (index < buf->count) {
+        return buf->entries[index];
+    }
+    return 0;
+}
 extern s32 D_8006F40C[];
 
 void *func_80044CC4(void) {
