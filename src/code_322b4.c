@@ -345,7 +345,18 @@ void InitGsSprite(SpriteGs *sprite, s32 abr, SpriteRect *rect, struct GsIMAGE *i
     sprite->scalex = 0x1000;
     sprite->scaley = 0x1000;
 }
-INCLUDE_ASM("asm/nonmatchings/code_322b4", Sprite__UpdateRotation);
+/* gSpriteMethods slot +0x044 (updateRotation): table[2] as a fraction of
+ * degrees, in 4096ths; set or add to the GsSPRITE's rotate. */
+void Sprite__UpdateRotation(Sprite *self, s32 set, WholeFrac_d294 *table) {
+    s32 angle;
+
+    angle = ((table[2].whole / table[2].frac) << 12) + ((table[2].whole % table[2].frac) << 12) / table[2].frac;
+    if (set) {
+        self->sprite.rotate = angle;
+    } else {
+        self->sprite.rotate += angle;
+    }
+}
 /* Sprite classes slot +0x060: display on/off (attribute bit 31, inverted). */
 s32 Sprite__SetDisplay(Sprite *self, s32 a1) {
     return GetSetBitField(&self->sprite.attribute, 0x1F, 1, a1 == 0) == 0;
