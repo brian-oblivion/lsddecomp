@@ -10,7 +10,7 @@ same GPU-trampoline region as `ClearImage`/`DrawSync`/`GsSortClear` above.
 - **Fingerprint**: EXACT masked 1.00, shape 1.00, against `libgpu/sys` on
   all three discs. The only close competitor is `StoreImage` (SHAPE masked
   0.96) -- its sibling function immediately after this one at
-  `func_800213A0`, which is the mirror-image swap (see that report); the
+  `StoreImage`, which is the mirror-image swap (see that report); the
   EXACT tie for THIS address is unique to `LoadImage`.
 - **Position**: same bracket as `ClearImage` (after `libgte/msc01` 3.3,
   before `libapi/c73` 3.3).

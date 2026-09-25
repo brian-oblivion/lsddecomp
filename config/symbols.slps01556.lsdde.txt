@@ -2578,3 +2578,14 @@ DecDCTReset = 0x80045E54; // type:func  (Psy-Q libpress/libpress, fingerprint)
 // `extern void DecDCTin(u_long *buf, int mode);`, no C call site yet.
 // Round 81 (bravo, track 2), not yet linked from an SDK object.
 DecDCTin = 0x80045F84; // type:func  (Psy-Q libpress/libpress, fingerprint)
+// identified: fingerprint AMBIGUOUS (18-way tie masked 1.00, 8w); narrowed
+// to the 4 libpress/libpress candidates by position inside the confirmed
+// DecDCT run (DecDCTReset/DecDCTin below, DecDCTvlc above), then to
+// DecDCTout specifically by call-target semantics: forwards $a0/$a1
+// unchanged into helper func_80046244, which stores $a0 as a buffer
+// pointer and right-shifts $a1 by 5 (a byte-count -> 32-byte-DMA-block
+// conversion) -- the (buf, size) shape, ruling out the single-int
+// DecDCTinSync/DecDCToutSync and single-pointer DecDCTvlcSize. Header
+// LIBPRESS.H `extern void DecDCTout(u_long *buf, int size);`. No C call
+// site yet. Round 81 (bravo, track 2), not yet linked from an SDK object.
+DecDCTout = 0x80046000; // type:func  (Psy-Q libpress/libpress, fingerprint+position+semantics)
