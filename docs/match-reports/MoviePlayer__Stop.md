@@ -9,7 +9,7 @@ drift. Fresh ground (carved revision 18, no prior report).
 
 ## What it does
 
-Only when self is the object held in the global D_8008A940: zero +0x3C/+0x40/+0x44/+0x48, set +0x4C = 1, call the +0x60 object's slot +0x07C with (obj, MoviePlayer__MarkStopped, self) -- MoviePlayer__MarkStopped sets +0x50 = -1, so it is a completion callback --, clear +0x64, then call the +0x60 object's slot +0x058 with it alone. This is the slot +0x044 that MoviePlayer__PollActive calls every ~100 polls.
+Only when self is the object held in the global gActiveMoviePlayer: zero +0x3C/+0x40/+0x44/+0x48, set +0x4C = 1, call the +0x60 object's slot +0x07C with (obj, MoviePlayer__MarkStopped, self) -- MoviePlayer__MarkStopped sets +0x50 = -1, so it is a completion callback --, clear +0x64, then call the +0x60 object's slot +0x058 with it alone. This is the slot +0x044 that MoviePlayer__PollActive calls every ~100 polls.
 
 Table slot (`tools/classtable.py`): D_8006F614 +0x044.
 
@@ -49,7 +49,7 @@ typedef struct Obj458B8 {
 } Obj458B8;
 
 void MoviePlayer__Stop(Obj458B8 *self) {
-    Obj458B8 *cur = (Obj458B8 *)D_8008A940;
+    Obj458B8 *cur = (Obj458B8 *)gActiveMoviePlayer;
 
     if (cur == self) {
         cur->unk40 = 0;

@@ -9,7 +9,7 @@ drift. Fresh ground (carved revision 18, no prior report).
 
 ## What it does
 
-Reset a GsBG embedded at +0x044 of the D_8006F2C4 object over a map source whose +0x2C is a GsMAP (the D_8006F498 object lays one out: cellw/cellh 16, ncellw 20, ncellh 15). Mode 0: attribute 0x1000000, w/h = cell size x cell count; mode 1: attribute 0x2000000, 320 x 240. Then x/y/scroll 0, r,g,b from D_8008A938, map = &src->cellw, scale 0x1000/0x1000, rotate 0, mx/my = w/2, h/2.
+Reset a GsBG embedded at +0x044 of the D_8006F2C4 object over a map source whose +0x2C is a GsMAP (the D_8006F498 object lays one out: cellw/cellh 16, ncellw 20, ncellh 15). Mode 0: attribute 0x1000000, w/h = cell size x cell count; mode 1: attribute 0x2000000, 320 x 240. Then x/y/scroll 0, r,g,b from gBgLayerDefaultColor, map = &src->cellw, scale 0x1000/0x1000, rotate 0, mx/my = w/2, h/2.
 
 Table slot (`tools/classtable.py`): D_8006F2C4 +0x040 (the Class6B5CC `reset` slot, called by BgLayer__BgLayer with its two arguments).
 
@@ -24,7 +24,7 @@ top of / earlier in `src/code_33808.c`.
 /* D_8006F2C4 +0x040: reset -- lay out the GsBG at +0x044 over a map
  * source: mode 0 sizes it to the map (cell size x cell count), mode 1 to a
  * 320 x 240 screen (with its own attribute); then zero position and
- * scroll, take the colour in D_8008A938, point it at the source's GsMAP
+ * scroll, take the colour in gBgLayerDefaultColor, point it at the source's GsMAP
  * (+0x2C), unit scale, no rotation, and centre the pivot. */
 typedef struct Map44294 {
     /* +0x00 */ u8 pad0[0x2C];
@@ -34,7 +34,7 @@ typedef struct Map44294 {
     /* +0x30 */ u16 ncellh;
 } Map44294;
 
-extern Vec3S8 D_8008A938;
+extern Vec3S8 gBgLayerDefaultColor;
 
 void BgLayer__Reset(Obj6F2C4 *self, Map44294 *src, s32 mode) {
     if (mode == 0) {
@@ -50,7 +50,7 @@ void BgLayer__Reset(Obj6F2C4 *self, Map44294 *src, s32 mode) {
     self->y = 0;
     self->scrollx = 0;
     self->scrolly = 0;
-    self->unk54 = D_8008A938;
+    self->unk54 = gBgLayerDefaultColor;
     self->map = &src->cellw;
     self->scalex = 0x1000;
     self->scaley = 0x1000;

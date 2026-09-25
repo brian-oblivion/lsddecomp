@@ -9,7 +9,7 @@ drift. Fresh ground (carved revision 18, no prior report).
 
 ## What it does
 
-`if (D_8008A940 != NULL) D_8008A940->methods->slot60(D_8008A940);` -- gp-relative global (resolved `gp_rel`, --gp-symbols), slot +0x060 cast to an unprototyped pointer (the unified macro declares it `void (*)(void)`).
+`if (gActiveMoviePlayer != NULL) gActiveMoviePlayer->methods->slot60(gActiveMoviePlayer);` -- gp-relative global (resolved `gp_rel`, --gp-symbols), slot +0x060 cast to an unprototyped pointer (the unified macro declares it `void (*)(void)`).
 
 Table slot (`tools/classtable.py`): none (no method table lists it).
 
@@ -21,12 +21,12 @@ fields +0x2C..+0x38) and `CountedBuf33808` sit at the top of `src/code_33808.c`.
 Slot +0x078 is `void *slot78` in the unified macro, so calls cast it.
 
 ```c
-extern DataSrc33808 *D_8008A940;
+extern DataSrc33808 *gActiveMoviePlayer;
 
-/* Slot +0x060 of the object in D_8008A940, when there is one. */
+/* Slot +0x060 of the object in gActiveMoviePlayer, when there is one. */
 void OnMdecFrameReady(void) {
-    if (D_8008A940 != NULL) {
-        ((void (*)())D_8008A940->methods->slot60)(D_8008A940);
+    if (gActiveMoviePlayer != NULL) {
+        ((void (*)())gActiveMoviePlayer->methods->slot60)(gActiveMoviePlayer);
     }
 }
 ```

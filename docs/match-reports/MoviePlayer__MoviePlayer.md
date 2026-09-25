@@ -9,7 +9,7 @@ drift. Fresh ground (carved revision 18, no prior report).
 
 ## What it does
 
-Constructor of the MDEC movie player: BasicClass's ctor, install D_8006F614, open a CD stream object with New_CdStreamObj(arg2, 15, 0) into +0x60, then MoviePlayer__InitFrame(self, arg1, arg3) sets up the decode buffers. Returns 1 if either fails. Otherwise DecDCTReset(0) the first time any player is built (D_8008A93C latch), set the DecDCTout callback to OnMdecFrameReady, hand the stream the ring buffer at +0x10 with size 0x12000 (its +0x040), clear +0x50, call its own +0x06C with 1 (MoviePlayer__SetResult stores it at +0x68) and return 0.
+Constructor of the MDEC movie player: BasicClass's ctor, install D_8006F614, open a CD stream object with New_CdStreamObj(arg2, 15, 0) into +0x60, then MoviePlayer__InitFrame(self, arg1, arg3) sets up the decode buffers. Returns 1 if either fails. Otherwise DecDCTReset(0) the first time any player is built (gMdecInitialized latch), set the DecDCTout callback to OnMdecFrameReady, hand the stream the ring buffer at +0x10 with size 0x12000 (its +0x040), clear +0x50, call its own +0x06C with 1 (MoviePlayer__SetResult stores it at +0x68) and return 0.
 
 Table slot (`tools/classtable.py`): D_8006F614 +0x008 (its allocator New_MoviePlayer treats 0 as success).
 
@@ -24,7 +24,7 @@ top of / earlier in `src/code_33808.c`.
 /* D_8006F614 +0x008: constructor -- BasicClass's, then this table; open a
  * CD stream object (New_CdStreamObj(arg2, 15, 0)) at +0x60 and set up the
  * decode buffers (MoviePlayer__InitFrame); 1 when either fails. Then reset the MDEC
- * the first time any player is built (D_8008A93C), route its output
+ * the first time any player is built (gMdecInitialized), route its output
  * callback to OnMdecFrameReady, hand the stream the ring buffer at +0x10
  * (0x12000), clear +0x50 and store 1 through its own +0x06C. 0. */
 typedef struct StreamMethods454C4 {
@@ -53,7 +53,7 @@ typedef struct Obj454C4 {
 
 extern void *New_CdStreamObj(s32 arg1, s32 arg2, s32 arg3);
 s32 MoviePlayer__InitFrame();
-extern s32 D_8008A93C;
+extern s32 gMdecInitialized;
 extern void DecDCTReset(int mode);
 extern int DecDCToutCallback(void (*func)());
 void OnMdecFrameReady(void);
@@ -64,10 +64,10 @@ s32 MoviePlayer__MoviePlayer(Obj454C4 *self, s32 arg1, s32 arg2, s32 arg3) {
     self->stream = New_CdStreamObj(arg2, 15, 0);
     if (self->stream != NULL) {
         if (MoviePlayer__InitFrame(self, arg1, arg3) == 0) {
-            if (D_8008A93C == 0) {
+            if (gMdecInitialized == 0) {
                 DecDCTReset(0);
             }
-            D_8008A93C = 1;
+            gMdecInitialized = 1;
             DecDCToutCallback(OnMdecFrameReady);
             self->stream->methods->slot40(self->stream, self->ring, 0x12000);
             self->unk50 = 0;

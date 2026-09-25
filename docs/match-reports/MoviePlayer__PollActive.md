@@ -9,7 +9,7 @@ drift. Fresh ground (carved revision 18, no prior report).
 
 ## What it does
 
-If +0x54 is set: post-increments the global D_8008A948 and, when its old value was over 100, resets it to 1 and calls slot +0x044 with self; returns 0. Otherwise clears D_8008A940 and returns 1.
+If +0x54 is set: post-increments the global gMoviePollCounter and, when its old value was over 100, resets it to 1 and calls slot +0x044 with self; returns 0. Otherwise clears gActiveMoviePlayer and returns 1.
 
 Table slot (`tools/classtable.py`): D_8006F614 +0x064.
 
@@ -20,10 +20,10 @@ The unit-local view `DataSrc33808` (a Class6D430 subclass built with the unified
 fields +0x2C..+0x38) and `CountedBuf33808` sit at the top of `src/code_33808.c`.
 
 ```c
-/* D_8006F614 +0x064: while +0x54 is set, count calls in D_8008A948 and
+/* D_8006F614 +0x064: while +0x54 is set, count calls in gMoviePollCounter and
  * once the count before the increment passes 100, resets it to 1 and calls
  * slot +0x044; returns 0. Otherwise
- * clears D_8008A940 and returns 1. */
+ * clears gActiveMoviePlayer and returns 1. */
 typedef struct Methods45C94 {
     /* +0x000 */ u8 pad0[0x44];
     /* +0x044 */ void (*slot44)();
@@ -35,18 +35,18 @@ typedef struct Obj45C94 {
     /* +0x054 */ s32 unk54;
 } Obj45C94;
 
-extern s32 D_8008A948;
-extern DataSrc33808 *D_8008A940;
+extern s32 gMoviePollCounter;
+extern DataSrc33808 *gActiveMoviePlayer;
 
 s32 MoviePlayer__PollActive(Obj45C94 *self) {
     if (self->unk54 != 0) {
-        if (D_8008A948++ > 100) {
-            D_8008A948 = 1;
+        if (gMoviePollCounter++ > 100) {
+            gMoviePollCounter = 1;
             self->methods->slot44(self);
         }
         return 0;
     }
-    D_8008A940 = NULL;
+    gActiveMoviePlayer = NULL;
     return 1;
 }
 ```

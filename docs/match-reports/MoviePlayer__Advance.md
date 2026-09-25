@@ -9,7 +9,7 @@ drift. Fresh ground (carved revision 18, no prior report).
 
 ## What it does
 
-Per-tick stream step, active only when `self` is the object in D_8008A940. With the stream running (+0x50 nonzero): call the stream object's +0x050 with (1, +0x5C); if +0x50 then reads negative, the loop count at +0x58 is consumed (`loops == 0 || --loops == 0`) and at the end the stream's +0x064 is called; then self->+0x50 = 0, +0x64 = 1, return 0. Stopped (+0x50 zero) with +0x64 set: tail-return its own +0x068. Otherwise falls off the end (v0 unset -- on the +0x64 path it happens to hold that zero).
+Per-tick stream step, active only when `self` is the object in gActiveMoviePlayer. With the stream running (+0x50 nonzero): call the stream object's +0x050 with (1, +0x5C); if +0x50 then reads negative, the loop count at +0x58 is consumed (`loops == 0 || --loops == 0`) and at the end the stream's +0x064 is called; then self->+0x50 = 0, +0x64 = 1, return 0. Stopped (+0x50 zero) with +0x64 set: tail-return its own +0x068. Otherwise falls off the end (v0 unset -- on the +0x64 path it happens to hold that zero).
 
 Table slot (`tools/classtable.py`): D_8006F614 +0x048.
 
@@ -21,7 +21,7 @@ fields +0x2C..+0x38), `Ctor33808`, `CountedBuf33808` and `Req44858` sit at the
 top of / earlier in `src/code_33808.c`.
 
 ```c
-/* D_8006F614 +0x048: when this is the object in D_8008A940 -- with the
+/* D_8006F614 +0x048: when this is the object in gActiveMoviePlayer -- with the
  * stream running (+0x50), call the stream object's +0x050 (1, +0x5C); if
  * +0x50 then went negative, count down the loops left at +0x58 and at the
  * last one (or with none) call the stream's +0x064; clear +0x50, set +0x64,
@@ -54,7 +54,7 @@ typedef struct Obj45948 {
 } Obj45948;
 
 s32 MoviePlayer__Advance(Obj45948 *self) {
-    Obj45948 *cur = (Obj45948 *)D_8008A940;
+    Obj45948 *cur = (Obj45948 *)gActiveMoviePlayer;
 
     if (cur == self) {
         if (cur->unk50 == 0) {
