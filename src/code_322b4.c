@@ -244,7 +244,30 @@ void func_80041E2C(SpriteView_322b4 *self, Pair_322b4 *src) {
         self->unkA0 = *src;
     }
 }
-INCLUDE_ASM("asm/nonmatchings/code_322b4", func_80041E58);
+/* D_8006EC74 and D_8006ED4C slot +0x0C0: when attached, move the sprite's
+ * pivot: 0 centre, 1 left, 2 right, 3 top, 4 bottom. */
+void func_80041E58(Sprite *self, u32 anchor) {
+    if (self->parent != NULL) {
+        switch (anchor) {
+        case 0:
+            self->sprite.mx = self->sprite.w >> 1;
+            self->sprite.my = self->sprite.h >> 1;
+            break;
+        case 1:
+            self->sprite.mx = 0;
+            break;
+        case 2:
+            self->sprite.mx = self->sprite.w;
+            break;
+        case 3:
+            self->sprite.my = 0;
+            break;
+        case 4:
+            self->sprite.my = self->sprite.h;
+            break;
+        }
+    }
+}
 /* Returns the D_8006ED4C method table. */
 void *func_80041ED8(void) {
     return D_8006ED4C;
