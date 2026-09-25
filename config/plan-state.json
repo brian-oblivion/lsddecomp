@@ -848,6 +848,11 @@
           "date": "2026-09-25",
           "header": "include/Class6B5CC.h"
         },
+        "gClass86668Methods": {
+          "class": "Class86668",
+          "date": "2026-09-25",
+          "header": "include/Class86668.h"
+        },
         "gIntermediateBaseMethods": {
           "class": "IntermediateBase",
           "date": "2026-09-25",
