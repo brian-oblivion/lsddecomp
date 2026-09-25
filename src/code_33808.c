@@ -49,10 +49,36 @@ typedef struct CountedBuf33808 {
 extern Class6D430Methods *GetActiveDataSourceMethods(void);
 extern void ReleaseBasicClassArray(BasicClass **array, s32 count);
 extern void BMemPMgrFree(void *arg);
+extern void *BMemPMgrAlloc(s32 size);
+void *func_80043830(void);
+void *func_80043B78(void);
+void *func_80043E74(void);
 void *func_800441A4(void);
+void *func_8004467C(void);
 void *func_800449FC(void);
+void *func_80044CC4(void);
+void *func_80044F20(void);
+void *func_800451A8(void);
+void *func_80045428(void);
 
-INCLUDE_ASM("asm/nonmatchings/code_33808", func_80043008);
+/* The allocators below reach a class's constructor through its table
+ * getter; the constructor's parameters vary, so the slot is unprototyped. */
+typedef struct Ctor33808 {
+    /* +0x000 */ s32 header;
+    /* +0x004 */ void *release;
+    /* +0x008 */ s32 (*ctor)();
+} Ctor33808;
+
+/* Allocate and construct a D_8006F0B8 object. */
+void *func_80043008(s32 arg0) {
+    void *obj = BMemPMgrAlloc(0x84);
+
+    if (obj != NULL) {
+        ((Ctor33808 *)func_80043830())->ctor(obj, arg0);
+        return obj;
+    }
+    return NULL;
+}
 INCLUDE_ASM("asm/nonmatchings/code_33808", func_80043068);
 /* D_8006F0B8 +0x00C: finalize -- release the object array at +0x30 (+0x2C
  * entries), free it, then the active driver's. */
