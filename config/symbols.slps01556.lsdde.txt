@@ -1568,6 +1568,16 @@ note2pitch2 = 0x8002E038; // type:func
 // pervasive local-variable/field name elsewhere in src/, a false-positive
 // collision -- those are a different C namespace and shadow harmlessly).
 // Round 71 (bravo, track 2). Still NON_MATCHING (30/56 words); unaffected.
+// unidentified: TINY (4w), EXACT tie across unrelated libraries
+// (CD_set_test_parmnum libcd/bios, GsSetNearClip libgs/gs_101,
+// GsSetFarClip libgs/gs_102, GsSetWorkBase libgs/gs_124, srand libc2/rand,
+// ChangeClearSIO libcomb/comb) on a "store one word to a global" shape;
+// none reaches the shape bar and position (a wide gap between
+// libcd/sys@3.3 ending 0x80029478 and libcd/iso9660@3.3 starting
+// 0x8002B640, with game code -- CD_getsector, this function -- in
+// between) does not cluster on any one candidate's library. Round 79
+// (bravo, track 2).
+func_8002B3E4 = 0x8002B3E4; // type:func
 callback = 0x8002B3F4; // type:func
 // identified: fingerprint EXACT masked 1.00 vs libsnd/vmanager SpuVmSeKeyOn
 // (discs 3.3,3.5; libsnd/vm_key on 3.6). Round 71 (bravo, track 2).
