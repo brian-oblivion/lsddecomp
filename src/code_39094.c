@@ -193,7 +193,21 @@ INCLUDE_ASM("asm/nonmatchings/code_39094", func_80048EA0);
 Rec1C *func_80048F60(s32 index) {
     return &func_80048E2C(index)[4];
 }
-INCLUDE_ASM("asm/nonmatchings/code_39094", func_80048F84);
+Rec1C *func_80048F84(s32 index) {
+    s32 unused;
+    u32 r = (u32)func_80048CFC(0, unused) % 5;
+    Rec1C *rec;
+    if (index == 9) {
+        if (r == 2) {
+            r = 3;
+        }
+        if (D_8008A968 == 3) {
+            D_8008A968 = 4;
+        }
+    }
+    rec = func_80048F60(index);
+    return &rec[D_8008A968 != 0 ? D_8008A968 - 1 : r];
+}
 Rec1C *func_8004903C(s32 index) {
     return &func_80048E2C(index)[9];
 }
