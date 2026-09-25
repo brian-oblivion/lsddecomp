@@ -6,7 +6,7 @@
  * those, and no Sony fingerprint). What it holds: 12 methods of D_8006E558, a
  * Class6D430 (data-source) subclass calling GetActiveDataSourceMethods.
  *
- * Nothing here is matched yet: every function is fresh track-1 ground.
+ * Fully matched in round 81 (runner echo): no INCLUDE_ASM left.
  */
 #include "common.h"
 #include "Class6D430.h"
@@ -68,6 +68,12 @@ typedef struct DrawRect {
     /* +0x04 */ s32 w;
     /* +0x08 */ s32 h;
 } DrawRect;
+
+/* An s16 point. */
+typedef struct DrawPoint {
+    /* +0x00 */ s16 x;
+    /* +0x02 */ s16 y;
+} DrawPoint;
 
 typedef struct DrawObj DrawObj;
 /* Only the two slots this unit reaches. */
@@ -171,4 +177,34 @@ void func_8003B5F0(D_8006E558Obj *self, GsIMAGE *tim) {
 D_8006E558Methods *func_8003B614(void) {
     return &D_8006E558;
 }
-INCLUDE_ASM("asm/nonmatchings/code_2bb9c", func_8003B624);
+/* Not in D_8006E558's table. Three calls to the draw singleton's slot
+ * +0x064 per iteration, built from r's edges and p; nothing but i changes
+ * between iterations. */
+void func_8003B624(DrawRect *r, s32 count, DrawPoint *p) {
+    DrawObj *draw;
+    void (*fn)(DrawObj *, DrawRect *, s32, s32);
+    DrawRect rect;
+    s32 i;
+
+    draw = func_80020C5C();
+    fn = draw->methods->slot64;
+    if (count != 0) {
+        for (i = 0; i < count; i++) {
+            rect.x = r->x + r->w - 1;
+            rect.y = r->y;
+            rect.w = 1;
+            rect.h = r->h;
+            fn(draw, &rect, p->x, p->y);
+            rect.x = r->x;
+            rect.y = r->y;
+            rect.w = r->w - 1;
+            rect.h = r->h;
+            fn(draw, &rect, r->x + 1, r->y);
+            rect.x = p->x;
+            rect.y = p->y;
+            rect.w = 1;
+            rect.h = r->h;
+            fn(draw, &rect, r->x, r->y);
+        }
+    }
+}
