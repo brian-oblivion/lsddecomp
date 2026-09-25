@@ -83,7 +83,9 @@ INCLUDE_ASM("asm/nonmatchings/code_3770c", func_80047638);
 INCLUDE_ASM("asm/nonmatchings/code_3770c", func_80047694);
 INCLUDE_ASM("asm/nonmatchings/code_3770c", func_800477B0);
 INCLUDE_ASM("asm/nonmatchings/code_3770c", func_80047810);
-INCLUDE_ASM("asm/nonmatchings/code_3770c", func_80047870);
+u32 func_80047870(CdStreamObj *self, u32 *base) {
+    return StFreeRing(base);
+}
 INCLUDE_ASM("asm/nonmatchings/code_3770c", func_80047890);
 INCLUDE_ASM("asm/nonmatchings/code_3770c", func_800478B0);
 INCLUDE_ASM("asm/nonmatchings/code_3770c", func_800478D0);
