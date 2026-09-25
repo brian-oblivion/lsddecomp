@@ -1,4 +1,6 @@
-# func_80041BDC -- MATCHED (19/19 words), round 82
+# D8006EC74__SetCell -- MATCHED (19/19 words), round 82
+
+> Renamed from `func_80041BDC` on 2026-09-25 (tools/rename.py). Address 0x80041bdc.
 
 Round 82, runner alpha (third re-staffed slot of the round). Unit `src/code_322b4.c`. Fresh ground (carved in FINISHING-PLAN revision 18), no prior attempt, no report before this one.
 
@@ -11,7 +13,7 @@ Round 82, runner alpha (third re-staffed slot of the round). Unit `src/code_322b
 
 ```c
 /* D_8006EC74 slot +0x0C4: store the cell index and point u,v at its 8x8 cell. */
-void func_80041BDC(SpriteView_322b4 *self, u8 cell) {
+void D8006EC74__SetCell(SpriteView_322b4 *self, u8 cell) {
     SpriteRect r;
 
     self->unkA8 = cell;

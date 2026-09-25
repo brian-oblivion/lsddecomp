@@ -113,7 +113,7 @@ typedef struct SpriteView_322b4 {
     u8 v;                         /* +0x073, GsSPRITE.v */
     u8 pad74[0xA0 - 0x74];
     Pair_322b4 unkA0;             /* +0x0A0, set by func_80041E2C */
-    u8 unkA8;                     /* +0x0A8, the cell index func_80041BDC stores */
+    u8 unkA8;                     /* +0x0A8, the cell index D8006EC74__SetCell stores */
 } SpriteView_322b4;
 struct SpriteMethods_322b4 {
     u8 pad00[0x40];
@@ -121,7 +121,7 @@ struct SpriteMethods_322b4 {
     u8 pad44[0xBC - 0x44];
     void (*slotBC)(SpriteView_322b4 *self, Pair_322b4 *src);   /* +0x0BC = func_80041E2C */
     u8 padC0[0xC4 - 0xC0];
-    void (*setCell)(SpriteView_322b4 *self, u8 cell); /* +0x0C4 = func_80041BDC */
+    void (*setCell)(SpriteView_322b4 *self, u8 cell); /* +0x0C4 = D8006EC74__SetCell */
 };
 
 /* The zero offset func_80041DAC attaches with. */
@@ -201,7 +201,7 @@ void D8006EC74__Reset(SpriteView_322b4 *self, u8 cell) {
     self->methods->setCell(self, cell);
 }
 /* D_8006EC74 slot +0x0C4: store the cell index and point u,v at its 8x8 cell. */
-void func_80041BDC(SpriteView_322b4 *self, u8 cell) {
+void D8006EC74__SetCell(SpriteView_322b4 *self, u8 cell) {
     SpriteRect r;
 
     self->unkA8 = cell;
