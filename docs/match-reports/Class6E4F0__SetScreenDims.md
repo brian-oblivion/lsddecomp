@@ -9,7 +9,7 @@
 Slot `+0x040` of D_8006E4F0. Copies an 8-byte pair into `self+0x0C` and
 stores the third argument at `self+0x14`. The ctor (Class6E4F0__Class6E4F0) calls it
 as `setDims(self, &D_8008A8E0, 0)`, and D_8008A8E0 in sdata is
-`{0x140, 0xF0}` = {320, 240}: a screen size. func_8003B044 later hands
+`{0x140, 0xF0}` = {320, 240}: a screen size. Class6E4F0__InitSystems later hands
 `&self->dims` and `self->dimsArg` to its source object's `+0x044` slot.
 
 ```c

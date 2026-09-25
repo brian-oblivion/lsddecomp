@@ -57,7 +57,7 @@ typedef struct MiddleClassMethods {
     void *unk10, *unk14, *unk18, *unk1C, *unk20, *unk24, *unk28, *unk2C, *unk30, *unk34, *unk38; /* BasicClass, inherited */
     void *unk3C;                                                /* +0x03C null slot */
     void *unk40;                                                 /* +0x040 Class6E4F0__SetScreenDims */
-    s32 (*slot44)(void *self, void *a1, void *a2, s32 a3);         /* +0x044 func_8003B044 */
+    s32 (*slot44)(void *self, void *a1, void *a2, s32 a3);         /* +0x044 Class6E4F0__InitSystems */
     void *unk48;                                                    /* +0x048 func_8003B108, shared with Class6D3C8 */
     void *unk4C;                                                     /* +0x04C func_8003B110, shared with Class6D3C8 */
 } MiddleClassMethods;

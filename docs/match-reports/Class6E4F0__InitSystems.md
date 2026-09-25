@@ -1,4 +1,6 @@
-# func_8003B044
+# Class6E4F0__InitSystems
+
+> Renamed from `func_8003B044` on 2026-09-25 (tools/rename.py). Address 0x8003b044.
 
 **Round 81 (delta)** · **Unit:** code_2b78c · **Size:** 49 words · **Status:** MATCHED (49/49 words, whole-image SHA1 green, first build)
 
@@ -16,7 +18,7 @@ guarded by `self->initialized` (+0x18):
 - sets `initialized = 1`.
 
 ```c
-void func_8003B044(Class6E4F0 *self, Class6E4F0Source *source, s32 arg) {
+void Class6E4F0__InitSystems(Class6E4F0 *self, Class6E4F0Source *source, s32 arg) {
     if (self->initialized == 0) {
         func_80020C68(source);
         source->methods->slot44(source, &self->dims, self->dimsArg);

@@ -32,16 +32,16 @@ typedef struct ScreenDims {
     s32 h;
 } ScreenDims;
 
-/* The 0x14-byte block func_8003B044 allocates. */
+/* The 0x14-byte block Class6E4F0__InitSystems allocates. */
 typedef struct Class6E4F0Aux {
-    void *source; /* +0x00 func_8003B044's a1 */
-    s32 arg;      /* +0x04 func_8003B044's a2 */
+    void *source; /* +0x00 Class6E4F0__InitSystems's a1 */
+    s32 arg;      /* +0x04 Class6E4F0__InitSystems's a2 */
     s32 unk08;
     s32 unk0C;
     s32 unk10;
 } Class6E4F0Aux;
 
-/* func_8003B044's a1: an object dispatched through its own +0x044 slot. */
+/* Class6E4F0__InitSystems's a1: an object dispatched through its own +0x044 slot. */
 typedef struct Class6E4F0SourceMethods {
     u8 pad00[0x44];
     void (*slot44)(void *self, ScreenDims *dims, s32 arg); /* +0x044 */
@@ -54,7 +54,7 @@ typedef struct Class6E4F0Source {
 struct Class6E4F0Methods {
     BASICCLASS_SLOTS(Class6E4F0, (Class6E4F0 *self, s32 source));
     /* +0x040 */ void (*setDims)(Class6E4F0 *self, ScreenDims *dims, s32 arg); /* Class6E4F0__SetScreenDims */
-    /* +0x044 */ void (*init)(Class6E4F0 *self, Class6E4F0Source *source, s32 arg); /* func_8003B044 */
+    /* +0x044 */ void (*init)(Class6E4F0 *self, Class6E4F0Source *source, s32 arg); /* Class6E4F0__InitSystems */
     /* +0x048 */ void (*slot48)(Class6E4F0 *self);                             /* func_8003B108, empty */
     /* +0x04C */ void (*run)(Class6E4F0 *self);                                /* func_8003B110 */
     /* +0x050.. the subclass's slots, called by func_8003B110 */
@@ -109,7 +109,7 @@ void Class6E4F0__SetScreenDims(Class6E4F0 *self, ScreenDims *dims, s32 arg) {
     self->dimsArg = arg;
 }
 
-void func_8003B044(Class6E4F0 *self, Class6E4F0Source *source, s32 arg) {
+void Class6E4F0__InitSystems(Class6E4F0 *self, Class6E4F0Source *source, s32 arg) {
     if (self->initialized == 0) {
         func_80020C68(source);
         source->methods->slot44(source, &self->dims, self->dimsArg);
