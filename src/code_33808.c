@@ -151,7 +151,25 @@ INCLUDE_ASM("asm/nonmatchings/code_33808", func_80044220);
 INCLUDE_ASM("asm/nonmatchings/code_33808", func_80044294);
 INCLUDE_ASM("asm/nonmatchings/code_33808", func_80044380);
 INCLUDE_ASM("asm/nonmatchings/code_33808", func_8004441C);
-INCLUDE_ASM("asm/nonmatchings/code_33808", func_8004464C);
+/* D_8006F2C4 (a Class6B5CC subclass) +0x0B8: when `enable`, copy a
+ * three-byte vector to +0x54. */
+typedef struct Vec3S8 {
+    s8 x;
+    s8 y;
+    s8 z;
+} Vec3S8;
+
+typedef struct Obj6F2C4 {
+    CLASS6B5CC_FIELDS(Class6B5CCMethods);
+    /* +0x044 */ u8 pad44[0x10];
+    /* +0x054 */ Vec3S8 unk54;
+} Obj6F2C4;
+
+void func_8004464C(Obj6F2C4 *self, s32 enable, Vec3S8 *src) {
+    if (enable) {
+        self->unk54 = *src;
+    }
+}
 void func_80044674(void) {
 }
 extern s32 D_8006F2C4[];
