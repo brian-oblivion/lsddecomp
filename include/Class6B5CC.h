@@ -209,7 +209,7 @@ void func_8001E49C(void);
 void Class6B5CC__NotifyTaggedParents(Class6B5CC *self, void *node);
 
 void Class6B5CC__RotateLocalVector(Class6B5CC *self, Vec3_d294 *dst, s16 *src);
-void Class6B5CC__LocalOffsetToWorldPos(Class6B5CC *self, s32 *dst, s32 *src);
+void Class6B5CC__LocalOffsetToWorldPos(Class6B5CC *self, s32 *dst, s32 *src, s32 unused); /* both callers set $a3 = 0 (0x80059460, 0x8005CF7C); the body never reads it */
 void Class6B5CC__GetRotationDegrees(Class6B5CC *self, WholeFrac_d294 *out);
 void Class6B5CC__LinkModel(Class6B5CC *self, void *model);
 void Class6B5CC__UnlinkModel(Class6B5CC *self);

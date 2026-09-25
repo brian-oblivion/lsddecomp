@@ -344,7 +344,7 @@ void DreamSys__ResetLinkState(DreamSys *this, s32 arg1, s32 arg2)
 	this->staircaseMoveGate = 0;
 	this->staircaseTickFn = 0;
 	this->unk_0x78 = 0;
-	Class6B5CC__GetRotationDegrees(this, &local);
+	Class6B5CC__GetRotationDegrees((Class6B5CC *)this, (WholeFrac_d294 *)&local);
 
 	local.field_0x8 = 0;
 	local.field_0xA = 1;
@@ -405,9 +405,8 @@ void DreamSys__RunTickCallbacks(DreamSys *this)
  * already-matched function taking an unrelated class as arg0; InterpolateKeyframeValue
  * is this unit's own next-in-queue function, forward-declared per
  * CLAUDE.md's convention for calling into a not-yet-preceding definition).
- * arg4 on Class6B5CC__LocalOffsetToWorldPos is unused by its own body but IS set (to 0) by this
- * call site's own disassembly, so it is declared here to reproduce that. */
-extern void Class6B5CC__LocalOffsetToWorldPos(void *self, s32 *dst, s32 *src, s32 arg4); /* arity-ok: definition is 3-parameter, but arg4 is byte-load-bearing HERE -- retail emits `move a3,zero` at 0x80059460 */
+ * Class6B5CC__LocalOffsetToWorldPos's unused 4th parameter IS set (to 0) by
+ * this call site's own disassembly; include/Class6B5CC.h declares it. */
 extern s32 InterpolateKeyframeValue(DreamSysInterpPoint *a, DreamSysInterpPoint *b, s32 at);
 extern s32 IsVec3WithinRange(s32 *a, s32 range, s32 *b);
 
@@ -427,7 +426,7 @@ s32 DreamSys__ProjectPointAtDistance(DreamSys *this, s32 *out, s32 dist, s32 *re
 
 	p = &gProjectOffsetZ;
 	*p = dist;
-	Class6B5CC__LocalOffsetToWorldPos(this, local, p - 2, 0);
+	Class6B5CC__LocalOffsetToWorldPos((Class6B5CC *)this, local, p - 2, 0);
 
 	ret = InterpolateKeyframeValue((void *)((u8 *)this->heightCurve + 0x14),
 	                     (void *)((u8 *)this->heightCurve + 0x20), dist);
@@ -1050,7 +1049,7 @@ bool DreamSys__TryTunnelLink(DreamSys *this, PlayerSpawnPoint *currentPos)
 	result = Test4TunnelLinks(&this->linkCoordinates, currentPos, this->currentStage);
 	if (result < 0)
 		return false;
-	Class6B5CC__GetRotationDegrees(this, local);
+	Class6B5CC__GetRotationDegrees((Class6B5CC *)this, (WholeFrac_d294 *)local);
 	if (!DreamSys__CheckTunnelHeading(&this->exitRotation, &this->enterRotation, local))
 		return false;
 	if (this->moveCommandLatch == 0)
@@ -1146,7 +1145,7 @@ bool DreamSys__TryStaircaseLink(DreamSys *this, PlayerSpawnPoint *currentPos)
 				}
 			}
 		} else if (Test4StaircaseNodes(&this->linkCoordinates, currentPos, this->currentStage) >= 0) {
-			Class6B5CC__GetRotationDegrees(this, local);
+			Class6B5CC__GetRotationDegrees((Class6B5CC *)this, (WholeFrac_d294 *)local);
 			if (DreamSys__CheckStaircaseHeading(&this->exitRotation, &this->enterRotation, local)
 			    && this->moveCommandLatch != 0) {
 				*(PlayerSpawnPoint *)&this->staircaseGridPos = *currentPos;
@@ -1542,7 +1541,7 @@ void DreamSys__FlashbackSaving(DreamSys *this, s32 arg1, s32 arg2)
 
 	if (this->linkMgr != NULL && rand() % 3 == 0) {
 		pos = this->linkMgr->methods->slot0x10C(this->linkMgr, 0, 0);
-		Class6B5CC__GetRotationDegrees(this, local);
+		Class6B5CC__GetRotationDegrees((Class6B5CC *)this, (WholeFrac_d294 *)local);
 		this->vt->AddFlashback(this, this->currentStage, pos, local, arg1, arg2, this->currentDay);
 	}
 }

@@ -28,6 +28,7 @@
  *    the same slots and are not this unit's to edit.
  */
 #include "common.h"
+#include "Class6B5CC.h"
 
 void NoOpIgnoreArgs(void) {
 }
@@ -151,25 +152,7 @@ typedef struct Unk14ObjO {
     Vec3O vec18;      /* +0x018 .. +0x023 */
 } Unk14ObjO;
 
-/* The FIXED base table returned by GetClass6B5CCMethods(), which -- MEASURED
- * elsewhere (class_3bb8c.h, code_d294.h) -- takes no real arguments and
- * always returns the same global regardless of what garbage is in $a0 at
- * the call site.  This unit's own reading needs slots +0x008 (ctor,
- * checked against NULL -- so unlike class_3bb8c.h's existing
- * `BaseCtorTableB_3bb8c_c` this one is NOT void), +0x010, +0x014, +0x018
- * and +0x088. */
-typedef struct FixedBaseTable {
-    u8 pad0[0x8];                                     /* +0x000 .. +0x007 */
-    void *(*ctor)(void *self);                          /* +0x008 */
-    u8 pad0C[0x10 - 0xC];                                 /* +0x00C .. +0x00F */
-    void (*slot10)(BaseObjO *self, TagWordObjO *arg);       /* +0x010 */
-    void (*slot14)(BaseObjO *self, TagWordObjO *arg);        /* +0x014 */
-    void (*slot18)(BaseObjO *self);                             /* +0x018 */
-    u8 pad1C[0x88 - 0x1C];                                        /* +0x01C .. +0x087 */
-    void (*slot88)(BaseObjO *self, s32 arg1);                       /* +0x088 */
-} FixedBaseTable;
-
-extern FixedBaseTable *GetClass6B5CCMethods(void);
+/* GetClass6B5CCMethods() is the base class's table: include/Class6B5CC.h. */
 
 struct BaseObjOMethods {
     s32 header;                                       /* +0x000 */
@@ -254,7 +237,7 @@ void *New_BaseObjO(void) {
 }
 
 BaseObjO *BaseObjO__BaseObjO(BaseObjO *self) {
-    if (GetClass6B5CCMethods()->ctor(self) == NULL) {
+    if (GetClass6B5CCMethods()->ctor((Class6B5CC *)self) == NULL) {
         goto fail;
     }
     self->methods = DreamSys__GetBaseMethods();
@@ -270,7 +253,7 @@ fail:
 void BaseObjO__LinkCompanion(BaseObjO *self, TagWordObjO *arg) {
     s32 tag;
 
-    GetClass6B5CCMethods()->slot10(self, arg);
+    GetClass6B5CCMethods()->addChild((Class6B5CC *)self, (BasicClass *)arg);
     tag = arg->methods->header;
     if ((tag & 0xFFF) == 0x114) {
         self->companion1 = arg;
@@ -287,13 +270,13 @@ void BaseObjO__UnlinkCompanion(BaseObjO *self, TagWordObjO *arg) {
     } else if ((tag & 0xF) == 5) {
         self->companion2 = NULL;
     }
-    GetClass6B5CCMethods()->slot14(self, arg);
+    GetClass6B5CCMethods()->removeChild((Class6B5CC *)self, (BasicClass *)arg);
 }
 
 void BaseObjO__ClearCompanions(BaseObjO *self) {
     self->companion1 = NULL;
     self->companion2 = NULL;
-    GetClass6B5CCMethods()->slot18(self);
+    GetClass6B5CCMethods()->removeAllChildren((Class6B5CC *)self);
 }
 
 void BaseObjO__InitDefaults(BaseObjO *self) {
@@ -305,7 +288,7 @@ extern s32 func_8001F3A4(void *arg0);
 extern void func_8001F66C(Buf38O *out, s32 arg1, s32 arg2, s32 arg3);
 
 void BaseObjO__func_571f8(BaseObjO *self, s32 arg1) {
-    GetClass6B5CCMethods()->slot88(self, arg1);
+    GetClass6B5CCMethods()->notifyIfUnk20Active((Class6B5CC *)self, arg1);
     /* Written as two nested guards, not a combined `arg1 >= 5 && arg1 < 9`
      * range test -- the combined form optimizes into a single unsigned
      * `(arg1-5) < 4` comparison, which is not what retail does (two
@@ -387,12 +370,10 @@ void BaseObjO__UpdateVec14(BaseObjO *self, s32 flag, Vec3O *v) {
     t->vecTarget->unk0 = 0;
 }
 
-extern void Class6B5CC__RotateLocalVector(BaseObjO *self, Vec3O *dst, s16 *src);
-
 void BaseObjO__ApplyRotatedVec14(BaseObjO *self, s16 *arg1) {
     Vec3O buf;
 
-    Class6B5CC__RotateLocalVector(self, &buf, arg1);
+    Class6B5CC__RotateLocalVector((Class6B5CC *)self, (Vec3_d294 *)&buf, arg1);
     self->methods->addVec14(self, &buf);
 }
 

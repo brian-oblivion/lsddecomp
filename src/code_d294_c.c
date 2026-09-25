@@ -50,7 +50,7 @@ void Class6B5CC__RotateLocalVector(Class6B5CC *self, Vec3_d294 *dst, s16 *src) {
  * three additions rather than hoisted: retail genuinely redoes the NULL
  * test and the address computation three times. When `unkC` is NULL the
  * resulting NULL is still dereferenced, exactly as retail does. */
-void Class6B5CC__LocalOffsetToWorldPos(Class6B5CC *self, s32 *dst, s32 *src) {
+void Class6B5CC__LocalOffsetToWorldPos(Class6B5CC *self, s32 *dst, s32 *src, s32 unused) {
     u8 buf[0x20];
     s32 *table;
 
