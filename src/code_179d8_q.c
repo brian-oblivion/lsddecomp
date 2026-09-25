@@ -182,7 +182,7 @@ void Class6D4E8__CancelRequests(Obj6D4E8_D70 *self)
 
 /* D_8006D4E8's own method table, 29 slots per tools/classtable.py (header
  * word 0x13 at +0x000, DestroyChained at +0x004/own-slot, Class6D4E8__Class6D4E8 at
- * +0x008/ctor, func_80027274 at +0x00C/dtor, the 13 inherited BasicClass
+ * +0x008/ctor, Class6D4E8__Destroy at +0x00C/dtor, the 13 inherited BasicClass
  * slots at +0x010..+0x038, then own slots at +0x040..+0x074 -- this unit
  * defines Class6D4E8__RequestLoadFile (+0x06C), Class6D4E8__StopCdService
  * (+0x070) and Class6D4E8__CancelRequests (+0x074)). This function is this

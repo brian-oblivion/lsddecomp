@@ -19,7 +19,7 @@
  * nop_mflo_mfhi, `jr $t2` trampoline, jtbl):
  *   New_Class6D4E8 (20w)  CLEAN
  *   Class6D4E8__Class6D4E8   (19w)  CLEAN
- *   func_80027274   (21w)  CLEAN
+ *   Class6D4E8__Destroy   (21w)  CLEAN
  *   func_800272C8    (2w)  CLEAN  -- a bare `jr $ra; nop` leaf
  * 4 of 4 clean, and the window references NO rodata or data symbol at all
  * (zero `%hi`/`%lo` in the whole slice), so no rodata sub-slot is attached.
@@ -42,7 +42,7 @@
  * 0x8006B58C`.  D_8006D4E8 (this class's own 29-slot method table, the
  * address the FirecatFG name is drawn from) overrides BasicClass's table
  * (D_8006B58C, 14 slots, header 0) at exactly three slots: +0x004
- * (DestroyChained), +0x008 (Class6D4E8__Class6D4E8) and +0x00C (func_80027274);
+ * (DestroyChained), +0x008 (Class6D4E8__Class6D4E8) and +0x00C (Class6D4E8__Destroy);
  * slots +0x010..+0x038 are inherited verbatim (same BasicClass__func_*
  * addresses in both tables) and the rest (+0x040 upward, including
  * func_800272C8) are new slots BasicClass's own table does not have at
@@ -70,9 +70,9 @@ struct Obj6D4E8Methods {
     void (*ctor)(void *self);      /* +0x008, confirmed via classtable.py: BasicClass's OWN table has
                                      * BasicClass__BasicClass at this exact slot */
     u8 pad00C[0x05C - 0x00C];
-    void (*slot5C)(void *self);    /* +0x05C, func_80027274's second vtable call */
+    void (*slot5C)(void *self);    /* +0x05C, Class6D4E8__Destroy's second vtable call */
     u8 pad060[0x074 - 0x060];
-    void (*slot74)(void);          /* +0x074, func_80027274's first vtable call -- confirmed zero-argument:
+    void (*slot74)(void);          /* +0x074, Class6D4E8__Destroy's first vtable call -- confirmed zero-argument:
                                      * retail's jalr for this slot carries a plain `nop` delay slot with no
                                      * register load anywhere above it, unlike the +0x05C call three
                                      * instructions later which explicitly sets $a0 = self. */
@@ -130,7 +130,7 @@ void Class6D4E8__Class6D4E8(Obj6D4E8 *self)
     InitCdDrive();
 }
 
-void func_80027274(Obj6D4E8 *self)
+void Class6D4E8__Destroy(Obj6D4E8 *self)
 {
     self->methods->slot74();
     self->methods->slot5C(self);

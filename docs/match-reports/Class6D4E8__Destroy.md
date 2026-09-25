@@ -1,4 +1,6 @@
-# func_80027274 -- MATCHED (21/21 words)
+# Class6D4E8__Destroy -- MATCHED (21/21 words)
+
+> Renamed from `func_80027274` on 2026-09-25 (tools/rename.py). Address 0x80027274.
 
 Unit `code_179d8_o`, round 26 (2026-09-09). A two-call vtable dispatcher on
 `self`, both calls through `self->methods` (the class table set up by
@@ -7,7 +9,7 @@ Unit `code_179d8_o`, round 26 (2026-09-09). A two-call vtable dispatcher on
 ## What it is
 
 ```c
-void func_80027274(Obj6D4E8 *self)
+void Class6D4E8__Destroy(Obj6D4E8 *self)
 {
     self->methods->slot74();
     self->methods->slot5C(self);
