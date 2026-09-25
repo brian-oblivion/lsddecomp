@@ -58,7 +58,12 @@ void func_80048D28(s32 a, s32 b) {
         D_8008A968 = b;
     }
 }
-INCLUDE_ASM("asm/nonmatchings/code_39094", func_80048D48);
+void *func_80048D48(s32 *out) {
+    if (out != NULL) {
+        *out = 0x230;
+    }
+    return D_80081A04;
+}
 INCLUDE_ASM("asm/nonmatchings/code_39094", func_80048D64);
 INCLUDE_ASM("asm/nonmatchings/code_39094", func_80048D74);
 INCLUDE_ASM("asm/nonmatchings/code_39094", func_80048DF8);
