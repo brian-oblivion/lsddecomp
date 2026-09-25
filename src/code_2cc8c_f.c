@@ -27,7 +27,7 @@
 
 void Obj6EAC0__Layout(Obj6EAC0 *self, s32 a1, void *a2) {
     if (self->hasChildren == 0) {
-        GetClass6B5CCMethods()->slot4C(self, a1, 0);
+        GetClass6B5CCMethods()->attachToParent((Class6B5CC *)self, (Class6B5CC *)a1, 0);
         self->methods->slotBC(self, a2);
     }
 }

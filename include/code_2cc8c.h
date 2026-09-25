@@ -3,6 +3,7 @@
 
 #include "common.h"
 #include "BasicClass.h"
+#include "Class6B5CC.h"
 
 /* Forward typedefs, used by `extern` declarations further up this file
  * than their own struct bodies (round 14, code_2cc8c_e's own local views,
@@ -73,8 +74,6 @@ typedef struct Unk18Obj Unk18Obj;
 typedef struct Unk18ObjMethods Unk18ObjMethods;
 typedef struct SubHandleObj SubHandleObj;
 typedef struct SubHandleObjMethods SubHandleObjMethods;
-typedef struct Unk18AcObj Unk18AcObj;
-typedef struct Unk18AcObjMethods Unk18AcObjMethods;
 typedef struct GenericObj GenericObj;
 typedef struct GenericObjMethods GenericObjMethods;
 typedef struct Obj86B60InitArgs Obj86B60InitArgs;
@@ -470,12 +469,7 @@ struct SubHandleObj {
    warning at the assignment, not the compiled bytes. Verified with a full
    rebuild. */
 extern Class6E99CObj *New_Class6E99C(void *a1, s32 a2, s32 a3);
-extern Unk18AcObj *New_Class6B5CC(void); /* local view of include/code_d294.h's
-                                    own `New_Class6B5CC` allocator, returning
-                                    `Class6B5CCObj *` there -- this unit's
-                                    own view retyped (round 13) once
-                                    Unk18Obj__Finalize dereferenced it, see
-                                    Unk18AcObj's own comment */
+/* New_Class6B5CC: include/Class6B5CC.h (it was a local Unk18AcObj view). */
 extern u8 D_8008A90C[]; /* address-taken only by this unit, passed as
                             New_Class6E99C's "name" argument */
 extern u8 D_8008A904[]; /* address-taken only by this unit, passed as
@@ -484,30 +478,6 @@ extern u8 D_8008A8F4[]; /* round 14, code_2cc8c_d (asm/data/7B008.sdata.s,
                             not decompiled): address-taken only, passed as
                             Unk18Obj__AttachViewChild's own default value for slot80's
                             2nd argument when its own arg5 is NULL. */
-
-/*
- * `Unk18Obj->unkAC`'s pointee (round 13, Unk18Obj__Finalize) -- the return of
- * `New_Class6B5CC`, first stored opaquely by `Unk18Obj__Unk18Obj` and here
- * dereferenced and released through the inherited BasicClass "release"
- * slot. Only that one slot is modelled.
- */
-struct Unk18AcObjMethods {
-    u8 pad000[0x004];
-    void *(*release)(Unk18AcObj *self); /* +0x004, inherited BasicClass
-                                          "release"; OBSERVED: Unk18Obj__Finalize.
-                                          Renamed from slot4, round 55 --
-                                          exclusive to this unit (only
-                                          Unk18Obj__Finalize dereferences
-                                          `self->unkAC->methods`;
-                                          code_2cc8c_d.c passes `unkAC` along
-                                          opaquely without going through its
-                                          own vtable). Matches the canonical
-                                          BasicClassMethods name at this
-                                          offset (include/code_8220.h). */
-};
-struct Unk18AcObj {
-    Unk18AcObjMethods *methods; /* +0x000 */
-};
 
 /*
  * A generic class-instance view (round 13, Unk18Obj__AddChild): every class's
@@ -770,12 +740,10 @@ struct Unk18Obj {
     s32 unk98;                  /* +0x098, OBSERVED: Unk18Obj__Update (round 14),
                                     a running count incremented by 1 each call */
     u8 pad09C[0x0AC - 0x09C];
-    Unk18AcObj *unkAC;          /* +0x0AC, OBSERVED: Unk18Obj__Unk18Obj (round 13,
-                                  set from `New_Class6B5CC()`, a
-                                  `New_Class6B5CC` allocator, `code_d294.c`)
-                                  and Unk18Obj__Finalize (round 13, dereferenced
-                                  and released -- see `Unk18AcObj`'s own
-                                  comment) */
+    Class6B5CC *unkAC;          /* +0x0AC, OBSERVED: Unk18Obj__Unk18Obj (round 13,
+                                  set from `New_Class6B5CC()`) and
+                                  Unk18Obj__Finalize (released through the
+                                  inherited BasicClass `release` slot) */
     SubHandleObj *unkB0;        /* +0x0B0, OBSERVED: Unk18Obj__Unk18Obj (round
                                   13) -- set from `New_Class6E99C`; also read
                                   back by Unk18Obj__GetSubHandle (round 13, this
@@ -1833,22 +1801,7 @@ extern Obj6EAC0 *func_80041AB4(s32 a1, s32 a2); /* another New_X-shaped
  * the same symbol -- see class_3ac78.c's comment on GetClass6B5CCMethods for
  * why that is expected.
  */
-/* GetClass6B5CCMethods's return type, UNIFIED by the head at merge time. Runners
- * alpha and bravo each built a local view of it in the same round, with
- * different names AND different members -- bravo's had only `slot4C` at
- * +0x04C, alpha's only `ctor` at +0x008 -- which collided as `conflicting
- * types` the moment both landed in this one header. Merged here at the
- * correct offsets rather than picked between, so both units' call sites keep
- * working. The canonical definition is src/code_d294_b.c's
- * `Class6B5CCMethods *GetClass6B5CCMethods(void)`. */
-typedef struct D6B5CCGetterMethodsCC8C D6B5CCGetterMethodsCC8C;
-struct D6B5CCGetterMethodsCC8C {
-    u8 pad000[0x008];
-    void *(*ctor)(void *self);                      /* +0x008, code_2cc8c_e */
-    u8 pad00C[0x04C - 0x00C];
-    void (*slot4C)(Obj6EAC0 *self, s32 a1, s32 a2); /* +0x04C, code_2cc8c_f */
-};
-extern D6B5CCGetterMethodsCC8C *GetClass6B5CCMethods(void);
+/* GetClass6B5CCMethods and its table: include/Class6B5CC.h (track 4, round 81). */
 
 /*
  * Round 14 (code_2cc8c_e): a THIRD independent class pair, found while
