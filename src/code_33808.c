@@ -111,7 +111,9 @@ void func_800458AC(Obj33808_50 *self) {
     self->unk50 = 1;
 }
 INCLUDE_ASM("asm/nonmatchings/code_33808", func_800458B8);
-INCLUDE_ASM("asm/nonmatchings/code_33808", func_8004593C);
+void func_8004593C(Obj33808_50 *self) {
+    self->unk50 = -1;
+}
 INCLUDE_ASM("asm/nonmatchings/code_33808", func_80045948);
 INCLUDE_ASM("asm/nonmatchings/code_33808", func_80045A38);
 void func_80045AC8(void) {
