@@ -128,7 +128,31 @@ void func_8003B044(Class6E4F0 *self, Class6E4F0Source *source, s32 arg) {
 void func_8003B108(Class6E4F0 *self) {
 }
 
-INCLUDE_ASM("asm/nonmatchings/code_2b78c", func_8003B110);
+void func_8003B110(Class6E4F0 *self) {
+    s32 status;
+
+    if (self->initialized) {
+        self->methods->slot50(self);
+        for (;;) {
+            self->methods->slot54(self);
+            for (;;) {
+                status = self->methods->slot58(self);
+                if (status == 1) {
+                    self->methods->slot5C(self);
+                    continue;
+                }
+                if (status == 2) {
+                    if (self->methods->slot60(self)) {
+                        self->methods->slot64(self);
+                    }
+                }
+                if (status == 0) {
+                    break;
+                }
+            }
+        }
+    }
+}
 
 Class6E4F0Methods *func_8003B20C(void) {
     return &D_8006E4F0;
