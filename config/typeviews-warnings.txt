@@ -10,7 +10,6 @@ DreamSys: warning: previous implicit declaration of `DreamSys__ApplyRelativeOffs
 DreamSys: warning: type mismatch with previous external decl
 DreamSys: warning: type mismatch with previous implicit declaration
 DreamSys: warning: which is probably not what you want.
-Entity_d: warning: passing arg 1 of `Class6B5CC__FaceTarget' from incompatible pointer type
 Entity_g: warning: passing arg 4 of `Entity__GetOrCreateUnk100' makes pointer from integer without a cast
 class_3ac78: warning: unused variable `unused'
 class_3bb8c: src/class_3bb8c.c: At top level:
@@ -170,8 +169,6 @@ code_8220_c: warning: passing arg 6 of `CopyPolyVtx4' from incompatible pointer 
 code_8220_c: warning: passing arg 6 of `CopyPolyVtx4' from incompatible pointer type
 code_8220_c: warning: passing arg 6 of `CopyPolyVtx4' from incompatible pointer type
 code_8220_c: warning: passing arg 6 of `CopyPolyVtx4' from incompatible pointer type
-code_d294: warning: assignment makes integer from pointer without a cast
-code_d294_b: warning: assignment makes pointer from integer without a cast
 code_d294_b: warning: unused variable `pad'
 code_d294_b: warning: unused variable `unused'
 main: warning: `struct DreamSys' declared inside parameter list

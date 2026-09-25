@@ -66,3 +66,12 @@ Round 71 (alpha). `func_8001D280` -> `Class6B5CC__GetNextAttachedChild`, **tier 
 For the head to apply by type scope. Each one fails to compile in another unit when renamed in the definition, so this unit did not apply it.
 
 - `GenericObj_d294.unkC` -> `parent` (tier A): the same +0x00C parent pointer on the child, compared against self to pick attached children. Accessors: code_d294, code_d294_c, plus a NON_MATCHING body in code_d294_b.
+
+## Track 4 (2026-09-25, round 81, charlie)
+
+The signature is now `(Class6B5CC *self, Class6B5CC **entry,
+BasicClassListNode **cursor)`. The entries it returns are tag-4 children
+whose `parent` is `self`, and Class6B5CC__DetachAttachedChildren calls their
+detachFromParent, so they are Class6B5CCs. `cursor` is the BasicClass child
+list cursor. DetachAttachedChildren's `s32 cont` became that cursor, which
+it only tests for NULL. Byte-identical.

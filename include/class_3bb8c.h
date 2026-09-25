@@ -923,68 +923,10 @@ struct Class86AA0 {
 extern Class86AA0Methods gClass86AA0Methods;
 extern Class86AA0Methods *GetClass86AA0Methods(void);
 
-/* MEASURED, round 9: GetClass6B5CCMethods TAKES NO ARGUMENTS. Its whole body is
- * `lui/addiu %hi/%lo(gClass6B5CCMethods); jr $ra` (asm/code_d294.s) -- it reads
- * neither $a0 nor $a1, and just returns &gClass6B5CCMethods. It is the plain
- * no-parameter vtable getter documented in docs/research/class-framework.md,
- * the same shape as GetClass6D3C8Methods.
- *
- * The arg list below is therefore NOT the callee's signature; it is what THIS
- * call site passes, and it is what this unit's bytes need. src/class_3ac78.c
- * passes TWO args to the same symbol and is equally byte-exact. Both are
- * right about their own codegen and both are wrong about the function.
- * Do not "reconcile" them and do not reduce either to (void) -- that changes
- * the argument setup the caller emits and breaks the match. See
- * docs/match-reports/Class86AA0__Class86AA0.md.
- *
- * Return type: round 10 split this OFF `BaseCtorTable_3bb8c_c` (GetUnk18ObjMethods's
- * own return type) into its own `BaseCtorTableB_3bb8c_c`. (The split is round
- * 10's -- round 9 settled only the ARITY question above. The comment here
- * originally credited round 9 with both, which would have made this a settled
- * precedent rather than a fresh judgement open to challenge.)
- *
- * The reason for the split: Class86AA0__ForwardIfArg2InRange (this unit) reaches +0x09C on THIS
- * getter's table with a 3-argument call (self, arg1, arg2) -- a genuine arity
- * conflict with
- * `BaseCtorTable_3bb8c_c::slot9C` (1-argument, established from
- * Class869D8__ForwardIfUnk10AndUnk70 via the OTHER getter, GetUnk18ObjMethods). Same-offset arity
- * conflict means different table/different class, per this project's
- * established split policy (see e.g. TaskCoreObjMethods in
- * include/code_2c054.h). Purely a type-name change here -- Class86AA0__Class86AA0's
- * own already-matched call (`GetClass6B5CCMethods(self)->ctor(self)`) only touches
- * the +0x008 `ctor` slot, whose layout is identical in both names, so this
- * renaming changes no bytes.
- *
- * Head-verified round 10 by measuring both callees rather than reasoning from
- * the arity conflict: GetClass6B5CCMethods returns &gClass6B5CCMethods (asm/code_d294.s) and
- * GetUnk18ObjMethods returns &D_8006E8E4 (asm/code_2cc8c_b.s). Different globals,
- * so genuinely different tables -- one type could not have carried both, and
- * the split would have been right even without the arity conflict that
- * prompted it.
- *
- * NOTE: Class86AA0__ForwardIfArg2InRange itself is STALLED, not matched, so the 3-argument
- * `slot9C` below is read off its disassembly rather than proven by a byte
- * match. The offset and the argument count are observed; the parameter TYPES
- * are inferred. */
-typedef struct BaseCtorTableB_3bb8c_c BaseCtorTableB_3bb8c_c;
-struct BaseCtorTableB_3bb8c_c {
-    u8 pad0[0x008];
-    void (*ctor)(void *self);                     /* +0x008, Class86AA0__Class86AA0 */
-    u8 pad00C[0x09C - 0x00C];
-    /* Class86AA0__ForwardIfArg2InRange's forward target (self, arg1 opaque, arg2 int),
-     * unconditional first statement of that function. */
-    void (*slot9C)(void *self, void *arg1, s32 arg2); /* +0x09C */
-};
-
-/* ROUND 59 (extern review): parameter list only, return type untouched.
- * Measured first -- Class86AA0__Class86AA0's `jal 8001e57c` (0x8004D3E8) carries
- * `move s0,a0` in the delay slot, a callee-save spill and not argument setup,
- * so the `self` this unit passes costs zero bytes. The definition
- * (src/code_d294_b.c:736) is `(void)` and the callee at 0x8001E57C reads no
- * argument register at all, so the one-parameter prototype was simply false.
- * Unspecified parameters is what round 9's own "no prototype in scope" reading
- * means, and it keeps class_3bb8c_c.c's call sites exactly as they are. */
-extern BaseCtorTableB_3bb8c_c *GetClass6B5CCMethods();
+/* GetClass6B5CCMethods and its table: include/Class6B5CC.h (track 4, round
+ * 81). The local BaseCtorTableB_3bb8c_c view and the unprototyped getter that
+ * lived here are gone; round 59 measured both arguments class_3bb8c_c.c passed
+ * to the no-argument getter as zero-cost (docs/match-reports/Class86AA0__Class86AA0.md). */
 
 /*
  * Generic class-instance shape used only to read another object's own

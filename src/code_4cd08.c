@@ -1,5 +1,6 @@
 #include "common.h"
 #include "code_4cd08.h"
+#include "Class6B5CC.h"
 
 const char gMomPathSymSpy[] = "ETC\\SYMSPY.MOM";
 const char gMomPathSymDog[] = "ETC\\SYMDOG.MOM";
@@ -433,16 +434,6 @@ bool SpawnDreamAuxTriggerEntity(s32 kind, void *out, void *ctx, s32 entry)
     return true;
 }
 
-/* Local view of Class6B5CC__LocalOffsetToWorldPos/Class6B5CC__FaceTarget (both already matched in
- * code_d294_c.c, a different unit): their own headers type `self`/`target`
- * as this game's class-framework specifics (Class6B5CCObj*, Entity*), which
- * this unit has no reason to pull in for two calls. `Class6B5CC__LocalOffsetToWorldPos`'s own
- * disassembly at every known call site (see DreamSys.c) sets a 4th argument
- * register to 0 even though its 3-parameter C signature never reads it --
- * declared here to reproduce that register content, same as DreamSys.c's
- * own local prototype. */
-extern void Class6B5CC__LocalOffsetToWorldPos(void *self, s32 *dst, s32 *src, s32 arg4); /* arity-ok: definition is 3-parameter, but arg4 is byte-load-bearing HERE -- retail emits `move a3,zero` at 0x8005CF7C */
-extern void Class6B5CC__FaceTarget(void *self, void *target, s32 arg2, s32 arg3, void *arg4);
 
 void DespawnDreamAuxEntity(DreamAuxSlot *a0)
 {
@@ -450,8 +441,8 @@ void DespawnDreamAuxEntity(DreamAuxSlot *a0)
         s32 localPos[3];
 
         ((DreamAuxObjFn14)a0->entity->vtable[0x14])(a0->entity);
-        Class6B5CC__LocalOffsetToWorldPos((void *)gDreamAuxWorld, localPos, a0->pos, 0);
+        Class6B5CC__LocalOffsetToWorldPos((Class6B5CC *)gDreamAuxWorld, localPos, a0->pos, 0);
         ((DreamAuxObjFn13)a0->entity->vtable[0x13])(a0->entity, gDreamAuxWorld, D_8008AC08, (void *)D_8008ABFC, localPos);
-        Class6B5CC__FaceTarget(a0->entity, (void *)gDreamAuxWorld, 1, 0, 0);
+        Class6B5CC__FaceTarget((Class6B5CC *)a0->entity, (Class6B5CC *)gDreamAuxWorld, 1, 0, 0);
     }
 }

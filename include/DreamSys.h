@@ -40,6 +40,7 @@
  * Per-name evidence and tiers are in docs/match-reports/<func>.md. */
 
 #include "common.h"
+#include "Class6B5CC.h"
 /* For StageChunk / GetMoodFromStageChunk, used by DreamSys__LogChunkMood
    (round 2026-08-30-d). */
 #include "StageGrid.h"
@@ -1298,16 +1299,8 @@ extern s32 Test4StageTransition(PlayerSpawnPoint *target, s32 stage, PlayerSpawn
    blocker resolved; see docs/match-reports/GetStageLinkAngle.md). */
 extern s32 GetStageLinkAngle(void);
 
-/* Called by DreamSys__TryTunnelLink as (this, &local) where `local` is a 0x10-byte
-   stack buffer also forwarded to DreamSys__CheckTunnelHeading below; return value is
-   discarded at this call site (round 2026-09-02). NOT in this unit at all --
-   its body disassembles into asm/code_d294.s, an uncarved segment -- so this
-   prototype only types this one call site, per the "calling into a function
-   that is still INCLUDE_ASM elsewhere is fine" convention
-   (DECOMPILATION_LEARNINGS.md). A discarded return is not evidence of
-   `void` (same doc); kept `void` here only because nothing at this call
-   site constrains it further. */
-extern void Class6B5CC__GetRotationDegrees(DreamSys *this, void *arg1);
+/* Class6B5CC__GetRotationDegrees (DreamSys__TryTunnelLink fills its 0x10-byte
+   `local` with it): include/Class6B5CC.h. */
 
 /* Called by DreamSys__TryTunnelLink as (&this->exitRotation, &this->enterRotation, &local) --
    same `local` buffer Class6B5CC__GetRotationDegrees fills above; result used as a truth

@@ -64,7 +64,7 @@ void Entity__MoodCue62(Entity *this, EntityMoodHandlerArg *out) {
         out->unk20 = -2;
     }
     if (this->moodTimer >= 0x65) {
-        Class6B5CC__FaceTarget(this, this->target, 1, 0, 0);
+        Class6B5CC__FaceTarget((Class6B5CC *)this, (Class6B5CC *)this->target, 1, 0, 0);
     }
     this->methods->slotC4(this, -5, 0);
     if (this->moodTimer == 0x12C && this->methods->distanceToRegion(this, this->target) < 0x1000) {
@@ -143,7 +143,7 @@ void Entity__MoodCue67(Entity *this, EntityMoodHandlerArg *out) {
     if (this->moodState == 0xB) {
         if (this->moodTimer == 0x1F6) {
             this->methods->slotCC(this, 0x800, 0);
-            Class6B5CC__FaceTarget(this, this->target, 1, 0, 0);
+            Class6B5CC__FaceTarget((Class6B5CC *)this, (Class6B5CC *)this->target, 1, 0, 0);
         }
         if (this->moodTimer >= 0x1F5) {
             this->methods->slotC4(this, -0x200, 0);
@@ -179,7 +179,7 @@ void Entity__MoodCue68(Entity *this, EntityMoodHandlerArg *out) {
                 out->unk1C = 0x12;
             }
         }
-        Class6B5CC__FaceTarget(this, this->target, 1, 0, 0);
+        Class6B5CC__FaceTarget((Class6B5CC *)this, (Class6B5CC *)this->target, 1, 0, 0);
         this->methods->slotC4(this, this->unk48, 1);
     } else if (this->moodState == 0xA) {
         if (this->moodTimer < 8) {
@@ -242,7 +242,7 @@ void Entity__MoodCue71(Entity *this, EntityMoodHandlerArg *out) {
         this->methods->slotC8(this, r * 51200, 0);
     }
     if (this->moodTimer >= 0x961) {
-        Class6B5CC__FaceTarget(this, this->target, 1, 0, 0);
+        Class6B5CC__FaceTarget((Class6B5CC *)this, (Class6B5CC *)this->target, 1, 0, 0);
     }
     this->methods->slotC4(this, -0x1E, 0);
 }
@@ -298,7 +298,7 @@ void Entity__MoodCue75(Entity *this, EntityMoodHandlerArg *out) {
         out->unk1C = 0x19;
         out->unk30 = 0x19;
         out->unk44 = 0x19;
-        Class6B5CC__FaceTarget(this, this->target, 1, 0, 0);
+        Class6B5CC__FaceTarget((Class6B5CC *)this, (Class6B5CC *)this->target, 1, 0, 0);
     }
     if (this->moodTimer == this->todFrameCount) {
         this->methods->stopTod(this);
@@ -469,7 +469,7 @@ void Entity__MoodCue80(Entity *this, EntityMoodHandlerArg *out) {
         this->methods->stopTod(this);
         this->methods->addVec14(this, TRANSLATE_Y_MINUS512);
     }
-    Class6B5CC__FaceTarget(this, this->target, 1, 0, 0);
+    Class6B5CC__FaceTarget((Class6B5CC *)this, (Class6B5CC *)this->target, 1, 0, 0);
 }
 
 extern u8 D_80089E08[];
@@ -497,7 +497,7 @@ void Entity__MoodCue81(Entity *this, EntityMoodHandlerArg *out) {
             out->unk30 = -2;
             out->unk44 = -2;
         }
-        Class6B5CC__FaceTarget(this, this->target, 1, 0, 0);
+        Class6B5CC__FaceTarget((Class6B5CC *)this, (Class6B5CC *)this->target, 1, 0, 0);
         mood = this->moodState;
         if (mood == 1) {
             this->methods->updateScale(this, 0, D_80089E08);
@@ -508,7 +508,7 @@ void Entity__MoodCue81(Entity *this, EntityMoodHandlerArg *out) {
             }
         } else {
             this->target->methods->slot130(this->target, 1);
-            Class6B5CC__FaceTarget((Entity *)this->target, this, 1, 1, 0);
+            Class6B5CC__FaceTarget((Class6B5CC *)this->target, (Class6B5CC *)this, 1, 1, 0);
             if (this->moodState == 2) {
                 if (this->methods->distanceToRegion(this, this->target) < 0x960) {
                     this->moodState = 0xB;
@@ -525,7 +525,7 @@ void Entity__MoodCue81(Entity *this, EntityMoodHandlerArg *out) {
             out->unk1C = 0x1C;
         }
         if (this->moodTimer >= 0x1F5) {
-            Class6B5CC__FaceTarget(this, this->target, 1, 0, 0);
+            Class6B5CC__FaceTarget((Class6B5CC *)this, (Class6B5CC *)this->target, 1, 0, 0);
         }
         if (this->methods->distanceToRegion(this, this->target) < 0x800) {
             this->target->methods->slotC4(this->target, -0x800, 0);

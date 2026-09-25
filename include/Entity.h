@@ -2,6 +2,7 @@
 #define ENTITY_H
 
 #include "common.h"
+#include "Class6B5CC.h"
 
 /* The Entity class. `src/Entity.c` is the first 25 of a 142-function block
  * split at Entity__UpdateTargetProximity; the remainder is Entity_b, still a monolithic asm
@@ -401,14 +402,8 @@ s32 Entity__GetLinkStage(Entity *this);
  * extern of the right TYPE is needed here, the bytes stay splat-generated. */
 extern EntityMethods ENTITY_METHODS;
 
-/* Still uncarved (code_d294.s). Entity__UpdateTargetProximity calls it with this->target as
- * the second argument, a literal 1 as the third, and 0 for both the fourth
- * argument and a fifth argument passed on the stack; the callee itself
- * dereferences that second argument at +0xC/+0x14, confirming it is a
- * pointer, not a plain word. Return value unused at this call site, so void
- * is a safe read regardless of the real return type (same caveat as
- * ServiceSoundCueSet/FlushSoundCueSet above). */
-extern void Class6B5CC__FaceTarget(Entity *this, void *arg1, s32 arg2, s32 arg3, s32 arg4);
+/* Class6B5CC__FaceTarget (this, this->target, 1, 0, 0) and its swapped
+ * (target, this, 1, 1, 0) form: include/Class6B5CC.h; callers upcast. */
 
 /* Already matched in Entity_b.c (not INCLUDE_ASM), but not previously called
  * from outside that unit -- Entity__MoodCue115 (Entity_d) is its first cross-unit

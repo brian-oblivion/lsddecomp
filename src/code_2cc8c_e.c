@@ -36,7 +36,7 @@
 /*
  * WHAT THIS UNIT IS (round 61, track 3 naming pass). This file's own 17
  * functions are the bottom two links of a three-class chain rooted in
- * `code_d294.h`'s `Class6B5CCObj`: `Class6B5CCObj -> ClassEAC0Obj ->
+ * `include/Class6B5CC.h`'s `Class6B5CC`: `Class6B5CC -> ClassEAC0Obj ->
  * Class6E99CObj` (`tools/classtable.py D_8006E99C --vs D_8006B58C`,
  * round 14; see `include/code_2cc8c.h`'s own header comment above
  * `struct ClassEAC0Obj` for the full derivation). Critically, `ClassEAC0Obj`
@@ -291,7 +291,7 @@ ClassEAC0Obj *New_ClassEAC0(void *a0, void *a1, s32 a2) {
 }
 
 void ClassEAC0__ClassEAC0(ClassEAC0Obj *self, SkipShort2 *a1, void *a2, s32 a3) {
-    GetClass6B5CCMethods()->ctor(self);
+    GetClass6B5CCMethods()->ctor((Class6B5CC *)self);
     self->methods = (ClassEAC0Methods *)Obj6EAC0__GetBaseMethods();
     self->methods->finishConstruct(self, a1, a2, a3);
 }

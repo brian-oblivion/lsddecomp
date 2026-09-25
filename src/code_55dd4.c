@@ -89,7 +89,7 @@ void Class65650__InitDefaults(Class65650 *self)
     self->methods->stopTod(self);
     self->methods->setTod(self, 0);
     if (self->mainPart != NULL) {
-        Class6B5CC__LinkModel(self, self->mainPart->unk20);
+        Class6B5CC__LinkModel((Class6B5CC *)self, (void *)self->mainPart->unk20);
     }
 }
 
@@ -509,7 +509,7 @@ void *Class65650__ApplyTodPacket(Class65650 *self, void *acc, void *extra)
             s32 v;
 
             v = self->modelData->tmd->methods->getModel(self->modelData->tmd, count - 1);
-            Class6B5CC__LinkModel(elem, v);
+            Class6B5CC__LinkModel((Class6B5CC *)elem, (void *)v);
         }
         break;
     }

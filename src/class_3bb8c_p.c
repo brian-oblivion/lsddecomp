@@ -346,27 +346,9 @@ void *DreamSys__AcceptGridElem(void *arg0, void *arg1, void *arg2) {
     return NULL;
 }
 
-/* This unit's own local view of GetClass6B5CCMethods()'s return, matching only
- * the one slot this unit's own functions dispatch through directly (the
- * OTHER slot these functions use, +0xA0, is reached through the object's
- * OWN vtable instead -- see include/DreamSys.h's `slotA0`) -- per the
- * project's established "per-call-site signature" precedent
- * (include/code_d294.h's own file banner; that header's `Class6B5CCMethods`
- * types this SAME slot with a different argument count for ITS OWN call
- * sites, which is fine because the actual callee ignores unused trailing
- * register arguments). Kept local rather than added to code_d294.h.
- *
- * `+0x09C` resolves via `tools/classtable.py gClass6B5CCMethods` (the fixed table
- * GetClass6B5CCMethods() returns) to `Class6B5CC__DispatchLinkCommand` --
- * named `dispatchLinkCommand` here to match (round 57 naming pass). */
-typedef struct Class6B5CCBaseTable {
-    u8 pad00[0x9C];
-    void (*dispatchLinkCommand)(DreamSys *self, void *arg1, s32 count);
-} Class6B5CCBaseTable;
-extern Class6B5CCBaseTable *GetClass6B5CCMethods(void);
 
 void DreamSys__DispatchLinkCommandAndTryAttach(DreamSys *self, void *arg1, s32 count) {
-    GetClass6B5CCMethods()->dispatchLinkCommand(self, arg1, count);
+    GetClass6B5CCMethods()->dispatchLinkCommand((Class6B5CC *)self, arg1, count);
     if (count < 9) {
         if (count >= 5) {
             self->vt->tryAttachNearby(self, arg1, count);
@@ -375,7 +357,7 @@ void DreamSys__DispatchLinkCommandAndTryAttach(DreamSys *self, void *arg1, s32 c
 }
 
 void DreamSys__DispatchLinkCommand(DreamSys *self, void *arg1, s32 count) {
-    GetClass6B5CCMethods()->dispatchLinkCommand(self, arg1, count);
+    GetClass6B5CCMethods()->dispatchLinkCommand((Class6B5CC *)self, arg1, count);
 }
 
 void DreamSys__SetLastOffsetValue(DreamSys *self, s16 val) {

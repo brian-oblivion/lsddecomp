@@ -28,7 +28,7 @@
  * GsCOORD2PARAM.rotate; its `0` argument selects the un-negated angles,
  * i.e. local -> parent, not the inverse. `dst` is a bare 3-word vector:
  * class_3bb8c_o's own call site (BaseObjO__ApplyRotatedVec14) passes a local `Vec3O`. */
-void Class6B5CC__RotateLocalVector(Class6B5CCObj *self, Vec3_d294 *dst, s16 *src) {
+void Class6B5CC__RotateLocalVector(Class6B5CC *self, Vec3_d294 *dst, s16 *src) {
     u8 buf[0x20];
 
     self->methods->getRotMatrix(self, buf, 0);
@@ -50,7 +50,7 @@ void Class6B5CC__RotateLocalVector(Class6B5CCObj *self, Vec3_d294 *dst, s16 *src
  * three additions rather than hoisted: retail genuinely redoes the NULL
  * test and the address computation three times. When `unkC` is NULL the
  * resulting NULL is still dereferenced, exactly as retail does. */
-void Class6B5CC__LocalOffsetToWorldPos(Class6B5CCObj *self, s32 *dst, s32 *src) {
+void Class6B5CC__LocalOffsetToWorldPos(Class6B5CC *self, s32 *dst, s32 *src, s32 unused) {
     u8 buf[0x20];
     s32 *table;
 
@@ -78,7 +78,7 @@ void Class6B5CC__LocalOffsetToWorldPos(Class6B5CCObj *self, s32 *dst, s32 *src) 
  * written BEFORE `.frac` even though retail EMITS the `frac` store first
  * (the compiler sinks the constant store into the delay slot itself).
  * See docs/match-reports/Class6B5CC__GetRotationDegrees.md. */
-void Class6B5CC__GetRotationDegrees(Class6B5CCObj *self, WholeFrac_d294 *out) {
+void Class6B5CC__GetRotationDegrees(Class6B5CC *self, WholeFrac_d294 *out) {
     Class6B5CCSub44 *src;
 
     src = self->coord2->param;
@@ -90,27 +90,35 @@ void Class6B5CC__GetRotationDegrees(Class6B5CCObj *self, WholeFrac_d294 *out) {
     out[2].frac = 1;
 }
 
-/* Attaches model data to the object and hands it to the GS. `&self->unk10`
+/* Attaches model data to the object and hands it to the GS. `&self->attribute`
  * is the GsDOBJ2 embedded in every Class6B5CC instance (attribute at +0x10,
  * coord2 at +0x14, tmd at +0x18), and Sony's GsLinkObject4(tmd_base, objp,
  * n) links object `n` of a TMD to it -- the `+ 0xC` skips the TMD file
- * header. `self->unk20` keeps the object the data came from.
+ * header. `self->model` keeps the object the data came from.
  *
- * Retail RE-READS `self->unk20` for the call's first argument instead of
- * reusing the `other` register it stored one statement earlier; writing it
+ * Retail RE-READS `self->model` for the call's first argument instead of
+ * reusing the `model` register it stored one statement earlier; writing it
  * through the field is what matches. */
-void Class6B5CC__LinkModel(Class6B5CCObj *self, GenericObj_d294 *other) {
-    self->unk20 = other;
-    self->unk18 = other->unk10;
-    GsLinkObject4((u8 *)((GenericObj_d294 *)self->unk20)->parent + 0xC, &self->attribute, 0);
+/* The model: a D_8006BEA0 (class 9) child. Only the two words LinkModel
+ * reads are modelled; the class has no C yet. */
+typedef struct ModelObj_d294 {
+    u8 pad0[0x00C];
+    u8 *tmdFile;    /* +0x00C, the TMD file; object data starts 0xC in */
+    s32 tmd;        /* +0x010, copied into the GsDOBJ2 */
+} ModelObj_d294;
+
+void Class6B5CC__LinkModel(Class6B5CC *self, void *model) {
+    self->model = model;
+    self->tmd = ((ModelObj_d294 *)model)->tmd;
+    GsLinkObject4(((ModelObj_d294 *)self->model)->tmdFile + 0xC, &self->attribute, 0);
 }
 
 /* Clears exactly the two fields Class6B5CC__LinkModel sets: the GsDOBJ2's
  * tmd pointer (+0x18) and the source object (+0x20). No GS call -- the
  * pairing with LinkModel is by construction, not by a Sony API. */
-void Class6B5CC__UnlinkModel(Class6B5CCObj *self) {
-    self->unk18 = 0;
-    self->unk20 = 0;
+void Class6B5CC__UnlinkModel(Class6B5CC *self) {
+    self->tmd = 0;
+    self->model = 0;
 }
 
 extern s32 func_8001F8B8(void *arg0, void *arg1, void *arg2, s32 arg3, void *arg4, s16 *arg5);
@@ -152,7 +160,7 @@ extern void SubVec3S16(s32 *dest, s16 *from, s16 *to);
  *    displacement.
  *  - The success body is written out twice, once per probe, with the bare
  *    `return 0` last and the null-`unk20` guard as an enclosing
- *    `if (self->unk20 != NULL)` rather than an early return. jump.c
+ *    `if (self->model != NULL)` rather than an early return. jump.c
  *    cross-jumps the two copies into the single `jal SubVec3S16` retail
  *    has (the giveaway is `move a0,s5` appearing in BOTH probe delay
  *    slots), and that placement is what puts the shared `v0 = 0` block
@@ -160,16 +168,16 @@ extern void SubVec3S16(s32 *dest, s16 *from, s16 *to);
  *
  * `(u8 *)node + 0x38 != NULL` is retail's own check, not a typo for
  * `node != NULL`: the disassembly forms the sum first and tests THAT. */
-s32 func_8001E7BC(Class6B5CCObj *self, s32 *arg1, s32 *arg2) {
+s32 func_8001E7BC(Class6B5CC *self, s32 *arg1, s32 *arg2) {
     s32 *table;
     s16 buf18[4];
     s16 delta[4];
     s16 buf28[4];
     s16 buf30[4];
     Class6B5CCSub14 *node;
-    UnkOwner_d294 *cur;
+    Class6B5CC *cur;
 
-    if (self->unk20 != NULL) {
+    if (self->model != NULL) {
         if ((s32)self->attribute < 0 && self->parent != NULL) {
             node = self->coord2;
             if ((u8 *)node + 0x38 != NULL) {
@@ -185,7 +193,7 @@ s32 func_8001E7BC(Class6B5CCObj *self, s32 *arg1, s32 *arg2) {
                         ((Vec3_d294 *)(self->parent != 0 ? self->coord2->unk38 : (s32 *)0))->z =
                             ((Vec3_d294 *)(self->parent != 0 ? self->coord2->unk38 : (s32 *)0))->z + cur->coord2->tz;
 
-                        cur = cur->next;
+                        cur = cur->parent;
                     } while (cur != NULL);
                 }
             }
@@ -201,12 +209,12 @@ s32 func_8001E7BC(Class6B5CCObj *self, s32 *arg1, s32 *arg2) {
         delta[0] = buf18[0];
         delta[1] = (u16)buf18[1] - 0x400;
         delta[2] = buf18[2];
-        if (func_8001F8B8(self->unk20, buf30, buf28, 0, buf18, delta)) {
+        if (func_8001F8B8(self->model, buf30, buf28, 0, buf18, delta)) {
             SubVec3S16(arg1, buf18, buf28);
             return 1;
         }
         delta[1] = (u16)buf18[1] + 0x400;
-        if (func_8001F8B8(self->unk20, buf30, buf28, 0, buf18, delta)) {
+        if (func_8001F8B8(self->model, buf30, buf28, 0, buf18, delta)) {
             SubVec3S16(arg1, buf18, buf28);
             return 1;
         }
@@ -239,7 +247,7 @@ void SubVec3S16(s32 *dest, s16 *from, s16 *to) {
  * correction for a caller that already swapped the two at the call site.
  * That is the mechanism behind the argument-swap correlation Entity.h
  * records; see docs/match-reports/Class6B5CC__FaceTarget.md. */
-void Class6B5CC__FaceTarget(Class6B5CCObj *self, Class6B5CCObj *target, s32 arg2, s32 arg3, void *arg4) {
+void Class6B5CC__FaceTarget(Class6B5CC *self, Class6B5CC *target, s32 arg2, s32 arg3, void *arg4) {
     s32 *pos;
     s32 *table;
     s32 dx;
