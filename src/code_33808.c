@@ -13,7 +13,7 @@
  * and GetClass6B5CCMethods. libpress starts right after, at DecDCTReset
  * (now psyq_36654).
  *
- * Nothing here is matched yet: every function is fresh track-1 ground.
+ * Matching began in round 82: `grep -c INCLUDE_ASM` gives what is left.
  */
 #include "common.h"
 
@@ -26,7 +26,11 @@ INCLUDE_ASM("asm/nonmatchings/code_33808", func_80043538);
 INCLUDE_ASM("asm/nonmatchings/code_33808", func_8004355C);
 INCLUDE_ASM("asm/nonmatchings/code_33808", func_800435D0);
 INCLUDE_ASM("asm/nonmatchings/code_33808", func_80043648);
-INCLUDE_ASM("asm/nonmatchings/code_33808", func_80043830);
+extern s32 D_8006F0B8[];
+
+void *func_80043830(void) {
+    return D_8006F0B8;
+}
 INCLUDE_ASM("asm/nonmatchings/code_33808", func_80043840);
 INCLUDE_ASM("asm/nonmatchings/code_33808", func_800438B0);
 INCLUDE_ASM("asm/nonmatchings/code_33808", func_80043954);
@@ -34,8 +38,13 @@ INCLUDE_ASM("asm/nonmatchings/code_33808", func_800439EC);
 INCLUDE_ASM("asm/nonmatchings/code_33808", func_80043B18);
 INCLUDE_ASM("asm/nonmatchings/code_33808", func_80043B3C);
 INCLUDE_ASM("asm/nonmatchings/code_33808", func_80043B58);
-INCLUDE_ASM("asm/nonmatchings/code_33808", func_80043B70);
-INCLUDE_ASM("asm/nonmatchings/code_33808", func_80043B78);
+void func_80043B70(void) {
+}
+extern s32 D_8006F13C[];
+
+void *func_80043B78(void) {
+    return D_8006F13C;
+}
 INCLUDE_ASM("asm/nonmatchings/code_33808", func_80043B88);
 INCLUDE_ASM("asm/nonmatchings/code_33808", func_80043BE8);
 INCLUDE_ASM("asm/nonmatchings/code_33808", func_80043C60);
@@ -55,7 +64,8 @@ INCLUDE_ASM("asm/nonmatchings/code_33808", func_80044294);
 INCLUDE_ASM("asm/nonmatchings/code_33808", func_80044380);
 INCLUDE_ASM("asm/nonmatchings/code_33808", func_8004441C);
 INCLUDE_ASM("asm/nonmatchings/code_33808", func_8004464C);
-INCLUDE_ASM("asm/nonmatchings/code_33808", func_80044674);
+void func_80044674(void) {
+}
 INCLUDE_ASM("asm/nonmatchings/code_33808", func_8004467C);
 INCLUDE_ASM("asm/nonmatchings/code_33808", func_8004468C);
 INCLUDE_ASM("asm/nonmatchings/code_33808", func_800446FC);
@@ -98,19 +108,41 @@ INCLUDE_ASM("asm/nonmatchings/code_33808", func_800455D4);
 INCLUDE_ASM("asm/nonmatchings/code_33808", func_8004564C);
 INCLUDE_ASM("asm/nonmatchings/code_33808", func_8004575C);
 INCLUDE_ASM("asm/nonmatchings/code_33808", func_800457C0);
-INCLUDE_ASM("asm/nonmatchings/code_33808", func_800458AC);
+/* A class with an s32 at +0x50, set to 1 / -1 by the two setters below;
+ * the class is not yet identified (neither setter sits in a method table). */
+typedef struct Obj33808_50 {
+    u8 pad0[0x50];
+    s32 unk50;
+} Obj33808_50;
+
+void func_800458AC(Obj33808_50 *self) {
+    self->unk50 = 1;
+}
 INCLUDE_ASM("asm/nonmatchings/code_33808", func_800458B8);
-INCLUDE_ASM("asm/nonmatchings/code_33808", func_8004593C);
+void func_8004593C(Obj33808_50 *self) {
+    self->unk50 = -1;
+}
 INCLUDE_ASM("asm/nonmatchings/code_33808", func_80045948);
 INCLUDE_ASM("asm/nonmatchings/code_33808", func_80045A38);
-INCLUDE_ASM("asm/nonmatchings/code_33808", func_80045AC8);
-INCLUDE_ASM("asm/nonmatchings/code_33808", func_80045AD0);
+void func_80045AC8(void) {
+}
+void func_80045AD0(void) {
+}
 INCLUDE_ASM("asm/nonmatchings/code_33808", func_80045AD8);
-INCLUDE_ASM("asm/nonmatchings/code_33808", func_80045BC0);
+void func_80045BC0(void) {
+}
 INCLUDE_ASM("asm/nonmatchings/code_33808", func_80045BC8);
 INCLUDE_ASM("asm/nonmatchings/code_33808", func_80045C94);
 INCLUDE_ASM("asm/nonmatchings/code_33808", func_80045CFC);
 INCLUDE_ASM("asm/nonmatchings/code_33808", func_80045DE0);
 INCLUDE_ASM("asm/nonmatchings/code_33808", func_80045E18);
-INCLUDE_ASM("asm/nonmatchings/code_33808", func_80045E3C);
+/* D_8006F614 +0x06C: stores its argument at +0x68. */
+typedef struct Obj6F614 {
+    u8 pad0[0x68];
+    s32 unk68;
+} Obj6F614;
+
+void func_80045E3C(Obj6F614 *self, s32 value) {
+    self->unk68 = value;
+}
 INCLUDE_ASM("asm/nonmatchings/code_33808", func_80045E44);
