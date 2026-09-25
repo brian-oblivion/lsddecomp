@@ -587,8 +587,14 @@ void *func_80044CD4(s32 arg0, s32 arg1) {
 /* The D_8006F498 object. */
 typedef struct Obj6F498 {
     CLASS6D430_FIELDS(DataSrc33808Methods);
-    /* +0x02C */ u8 pad2C[0x10];
-    /* +0x03C */ s32 unk3C;
+    /* +0x02C */ u8 unk2C;
+    /* +0x02D */ u8 unk2D;
+    /* +0x02E */ u16 unk2E;
+    /* +0x030 */ u16 unk30;
+    /* +0x032 */ u8 pad32[2];
+    /* +0x034 */ s32 unk34;
+    /* +0x038 */ u16 *unk38;
+    /* +0x03C */ s32 unk3C;       /* an object: its +0x2C is read */
     /* +0x040 */ u16 unk40;
     /* +0x042 */ u16 unk42;
 } Obj6F498;
@@ -622,7 +628,33 @@ void func_80044E10(Obj6F498 *self) {
         self->unk42 = 1;
     }
 }
-INCLUDE_ASM("asm/nonmatchings/code_33808", func_80044E64);
+/* D_8006F498 +0x078: copy +0x2C of the object at +0x3C to +0x34; when +0x40
+ * is set, lay out a 20 x 15 grid (16 x 16 cells) and fill an allocated
+ * index table 0..n-1 at +0x38; otherwise, or when the allocation fails,
+ * free the buffer (own +0x05C). */
+void func_80044E64(Obj6F498 *self) {
+    s32 n;
+    s32 i;
+    u16 *p;
+
+    self->unk34 = ((DataSrc33808 *)self->unk3C)->unk2C;
+    if (self->unk40 != 0) {
+        self->unk2E = 20;
+        self->unk2C = 16;
+        self->unk2D = 16;
+        self->unk30 = 15;
+        n = self->unk2E * self->unk30;
+        self->unk38 = BMemPMgrAlloc(n * 2);
+        if (self->unk38 != NULL) {
+            p = self->unk38;
+            for (i = 0; i < n; i++) {
+                *p++ = i;
+            }
+            return;
+        }
+    }
+    self->methods->freeBuffer((DataSrc33808 *)self);
+}
 extern s32 D_8006F498[];
 
 void *func_80044F20(void) {
