@@ -174,8 +174,8 @@ struct TaskTextObj {
 
 
 /* The viewport's class (TaskCore::viewport, IntermediateBase.h's
- * `BasicClass *viewport`; it is code_2cc8c's Unk18Obj, D_8006E8E4) as
- * TaskCore__OnInit/OnDeinit call it: +0x048..+0x050 Unk18Obj__SetUnk3C/
+ * `BasicClass *viewport`; it is code_2cc8c's Unk18Obj, gViewportMethods) as
+ * TaskCore__OnInit/OnDeinit call it: +0x048..+0x050 Viewport__SetOtLength/
  * SetUnk44/SetUnk48, +0x070/+0x074 AttachViewChild/DetachViewChild,
  * +0x08C/+0x090 InitOt/DeinitOt. Once modelled as TaskCore's own table
  * (round 1), split off when round 2's three setters could not fit it. */

@@ -871,7 +871,7 @@ typedef struct BaseCtorTable_3bb8c_c {
                                       Class869D8::unk10/unk70 both being nonzero) */
 } BaseCtorTable_3bb8c_c;
 
-extern BaseCtorTable_3bb8c_c *GetUnk18ObjMethods(void);
+extern BaseCtorTable_3bb8c_c *GetViewportMethods(void);
 
 extern void *BMemPMgrAlloc(s32 size);
 

@@ -42,7 +42,7 @@ void IntermediateBase__Init(Obj86B60 *self, Obj86B60InitArgs *arg1, s32 arg2)
     if (arg1->unk10 != NULL) {
         self->unk18 = arg1->unk10;
     } else {
-        self->unk18 = New_Unk18Obj();
+        self->unk18 = New_Viewport();
     }
     self->unkC = (Obj86B60UnkC *)arg1;
     obj18 = self->unk18;
@@ -86,7 +86,7 @@ the next build.
   child pointers forwarded to `addChild`; `unk8`/`unkC`/`unk10` are the
   three optional overrides for `self->unk10`/`unk14`/`unk18`.
 - `Obj86B60.unk10`/`unk14`: BOTH were previously modelled as opaque
-  generic words (`Obj86B60__ResetAndRemoveAllChildren`/`TaskCore__BeginElementScroll` in a sibling unit). This
+  generic words (`Viewport__RemoveAllChildren`/`TaskCore__BeginElementScroll` in a sibling unit). This
   function CONFIRMS both are pointer-valued in this unit's own reading too
   -- `unk10` is forwarded as an `addChild`-style child and as `Unk14Obj::
   slot10`'s 2nd arg; `unk14` is dispatched through as `Unk14Obj *`. Kept
@@ -95,7 +95,7 @@ the next build.
   `Unk14Obj`'s own header comment.
 - `Obj86B60.unk18`: newly typed `Unk18Obj *` (was unobserved padding).
   Constructed either from `arg1->unk10` or from this unit's own New_X
-  allocator `New_Unk18Obj` (queued later this round).
+  allocator `New_Viewport` (queued later this round).
 - `Obj86B60.unk24`: new field, `s32`, set to `arg2`; also the gate for this
   function's second half.
 - `Unk18Obj`/`Unk18ObjMethods`, `Unk14Obj`/`Unk14ObjMethods`: new minimal

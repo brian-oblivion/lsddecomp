@@ -8,7 +8,7 @@
  * table gScreenSpriteMethods): Sprite's direct subclass, adding a screen
  * position and a pivot anchor. Methods in src/code_322b4.c. The name is for
  * what the class does, and the evidence is this:
- *  - Unk18Obj__DrawNode (code_2864.c) takes a separate path for
+ *  - Viewport__DrawNode (code_2864.c) takes a separate path for
  *    `(tag & 0xFFF) == 0x144`, i.e. this class and everything below it: the
  *    GsSPRITE's x/y are `screenPos` read as a percentage of half the screen
  *    width/height from the centre, plus the pivot (mx, my), with no
@@ -41,7 +41,7 @@ typedef struct ScreenSpriteMethods ScreenSpriteMethods;
 typedef struct ScreenSpritePos ScreenSpritePos;
 
 /* A screen position: percent of half the screen width/height, from the
- * centre (Unk18Obj__DrawNode). */
+ * centre (Viewport__DrawNode). */
 struct ScreenSpritePos {
     s32 x;
     s32 y;
@@ -58,7 +58,7 @@ struct ScreenSpritePos {
 
 #define SCREENSPRITE_FIELDS(Methods)                                                               \
     SPRITE_FIELDS(Methods);                                                                        \
-    /* +0x0A0 */ ScreenSpritePos screenPos /* setPosition; Unk18Obj__DrawNode places the sprite from it. The object is 0xA8 bytes (New_ScreenSprite): D_8006EC74's own fields start at +0x0A8 */
+    /* +0x0A0 */ ScreenSpritePos screenPos /* setPosition; Viewport__DrawNode places the sprite from it. The object is 0xA8 bytes (New_ScreenSprite): D_8006EC74's own fields start at +0x0A8 */
 
 struct ScreenSpriteMethods {
     SCREENSPRITE_SLOTS(ScreenSprite, (ScreenSprite *self, void *texture, SpriteRect *rect, s32 arg3));

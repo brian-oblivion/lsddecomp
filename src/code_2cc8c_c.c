@@ -9,8 +9,8 @@
  * round 82); these functions take `IntermediateBase *self`.
  *
  * The remaining functions are `Unk18Obj`'s own constructor chain (`New_
- * Unk18Obj`, `Unk18Obj__Unk18Obj`, `Unk18Obj__Finalize`) and its `addChild`/
- * `removeChild` overrides (`Unk18Obj__AddChild`/`Unk18Obj__RemoveChild`,
+ * Unk18Obj`, `Viewport__Viewport`, `Viewport__Finalize`) and its `addChild`/
+ * `removeChild` overrides (`Viewport__AddChild`/`Viewport__RemoveChild`,
  * which cache a child's pointer by its dynamic class tag) -- `Unk18Obj` is
  * SHARED with code_2cc8c_d.c, which carves the rest of its own vtable slots;
  * see include/code_2cc8c.h's own struct comment for what evidence is
@@ -116,7 +116,7 @@ void IntermediateBase__Init(IntermediateBase *self, IntermediateBaseInitArgs *ar
     if (args->viewport != NULL) {
         self->viewport = args->viewport;
     } else {
-        self->viewport = (BasicClass *)New_Unk18Obj();
+        self->viewport = (BasicClass *)New_Viewport();
     }
     self->initArgs = args;
     viewport = self->viewport;
@@ -224,24 +224,24 @@ IntermediateBaseMethods *Get_vtable_IntermediateBase(void)
     return &gIntermediateBaseMethods;
 }
 
-Unk18Obj *New_Unk18Obj(void)
+Unk18Obj *New_Viewport(void)
 {
     Unk18Obj *self;
 
     self = BMemPMgrAlloc(0xBC);
     if (self != NULL) {
-        GetUnk18ObjMethods()->ctor(self);
+        GetViewportMethods()->ctor(self);
         return self;
     }
     return NULL;
 }
 
-void Unk18Obj__Unk18Obj(Unk18Obj *self)
+void Viewport__Viewport(Unk18Obj *self)
 {
     SubHandleObj *obj;
 
     Get_vtable_BasicClass()->ctor((BasicClass *)self);
-    self->methods = GetUnk18ObjMethods();
+    self->methods = GetViewportMethods();
     self->unkC = 0;
     self->unk10 = 0;
     self->unkAC = New_Class6B5CC();
@@ -251,7 +251,7 @@ void Unk18Obj__Unk18Obj(Unk18Obj *self)
     self->methods->slot40(self);
 }
 
-void Unk18Obj__Finalize(Unk18Obj *self)
+void Viewport__Finalize(Unk18Obj *self)
 {
     self->methods->slot90(self);
     self->methods->slot74(self);
@@ -260,7 +260,7 @@ void Unk18Obj__Finalize(Unk18Obj *self)
     Get_vtable_BasicClass()->finalize((BasicClass *)self);
 }
 
-void Unk18Obj__AddChild(Unk18Obj *self, GenericObj *arg1)
+void Viewport__AddChild(Unk18Obj *self, GenericObj *arg1)
 {
     s32 header;
 
@@ -274,7 +274,7 @@ void Unk18Obj__AddChild(Unk18Obj *self, GenericObj *arg1)
     }
 }
 
-void Unk18Obj__RemoveChild(Unk18Obj *self, GenericObj *arg1)
+void Viewport__RemoveChild(Unk18Obj *self, GenericObj *arg1)
 {
     s32 header;
 
@@ -288,10 +288,10 @@ void Unk18Obj__RemoveChild(Unk18Obj *self, GenericObj *arg1)
     Get_vtable_BasicClass()->removeChild((BasicClass *)self, (BasicClass *)arg1);
 }
 
-/* Unk18Obj's removeAllChildren override (+0x018 of D_8006E8E4 and of
+/* Unk18Obj's removeAllChildren override (+0x018 of gViewportMethods and of
  * gClass869D8Methods), not TaskCore's: the name predates that reading. The
- * three fields are Unk18Obj's child caches (see Unk18Obj__AddChild above). */
-void Obj86B60__ResetAndRemoveAllChildren(Unk18Obj *self)
+ * three fields are Unk18Obj's child caches (see Viewport__AddChild above). */
+void Viewport__RemoveAllChildren(Unk18Obj *self)
 {
     self->unk30 = 0;
     self->unk10 = 0;

@@ -9,7 +9,7 @@ same shape as `func_8003EA6C`/`func_8003EA74`).
 void func_8003ECC0(void);
 ```
 
-Not a `D_8006E8E4` vtable slot occupant, not a method (no `self`), no caller
+Not a `gViewportMethods` vtable slot occupant, not a method (no `self`), no caller
 found anywhere in `src/` or the remaining `asm/*.s` segments.
 
 ## What it does

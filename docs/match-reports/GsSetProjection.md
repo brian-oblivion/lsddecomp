@@ -12,7 +12,7 @@ Unit: `code_2cc8c_d`. Round 14, runner delta. 8/8 words, full match.
 void GsSetProjection(Unk18Obj *self);
 ```
 
-Not a `D_8006E8E4` vtable slot — called directly by symbol.
+Not a `gViewportMethods` vtable slot — called directly by symbol.
 
 ## What it does
 
@@ -47,7 +47,7 @@ relocation-masked fingerprint, because "call one function with one argument,
 return" is a common trivial shape. `libgs/gs_106` (`GsSetProjection`) is
 never placed as an object anywhere in this executable, so it supplies no
 position evidence either. The function's real neighbours are game code
-immediately before (`Unk18Obj__GetTail`, this class's own getter, at
+immediately before (`GetRootNode`, this class's own getter, at
 0x8003F25C) and Sony's `libgs/gs_131` (`GsSetRefView2`) immediately after
 with zero gap (0x8003F2AC == 0x8003F28C + 8 words) -- neither side is
 `gs_106`. This is an ordinary, already-matched (round 14) member of the
@@ -65,7 +65,7 @@ NEIGHBOURS, not from the candidate object: this function is the last word
 before the placed libgs run (zero gap to gs_131's `GsSetRefView2` at
 0x8003F2AC), and of `sdkname.py`'s 18 exact ties `GsSetProjection` is the only
 libgs one. The header prototype agrees: LIBGS.H's `GsSetProjection(long h)`.
-The one caller, `Unk18Obj__Update`, passed `self->unk40` through a cast to
+The one caller, `Viewport__Update`, passed `self->unk40` through a cast to
 `Unk18Obj *`, and hands the same field to `SetFogNear(a, h)` as `h` a few
 lines later, so the argument is the projection distance and the method typing
 was the misread. No class table holds 0x8003F28C, unlike every other

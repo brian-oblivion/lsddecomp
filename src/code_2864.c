@@ -4,11 +4,11 @@
  * as Psy-Q SDK by segment name; tools/gameinsdk.py measured it as game (a call
  * into game code, a method-table entry beside game methods, or contiguity with
  * those, and no Sony fingerprint). What it holds: one 449-word function,
- * Unk18Obj__DrawNode, listed in D_8006E8E4 and gClass869D8Methods and calling
+ * Viewport__DrawNode, listed in gViewportMethods and gClass869D8Methods and calling
  * GetNextBasicClass and ApplyMatrixToLVArray.
  *
- * MATCHED round 81 (alpha; docs/match-reports/Unk18Obj__DrawNode.md). It is slot
- * +0x0A0 of Unk18Obj's table (tools/classtable.py D_8006E8E4): the view
+ * MATCHED round 81 (alpha; docs/match-reports/Viewport__DrawNode.md). It is slot
+ * +0x0A0 of Unk18Obj's table (tools/classtable.py gViewportMethods): the view
  * draws one scene node and recurses into the node's children. Every type
  * below is a LOCAL view (DrawView is this function's reading of Unk18Obj,
  * whose shared view lives in include/code_2cc8c.h and is not touched here).
@@ -65,7 +65,7 @@ typedef struct {
 } GsDOBJ2_2864;
 
 /* A drawable scene node: a BasicClass whose +0x00C is its parent and whose
- * class-id low byte picks the draw path in Unk18Obj__DrawNode (0x54 background,
+ * class-id low byte picks the draw path in Viewport__DrawNode (0x54 background,
  * 0x64 box fill, 0x44 sprite -- 0x144 screen-space, otherwise world-space --
  * and anything else a GsDOBJ2 model). */
 typedef struct DrawNode DrawNode;
@@ -95,7 +95,7 @@ struct DrawNode {
     } u;
 };
 
-/* Unk18Obj__DrawNode's reading of its `self` (Unk18Obj). */
+/* Viewport__DrawNode's reading of its `self` (Unk18Obj). */
 typedef struct {
     u8 pad0[0x34];
     s32 width;                  /* +0x34 */
@@ -136,7 +136,7 @@ extern void func_80018464(void *objIn, void *otSrc, s32 otShift, void *ctxIn);
  *    the ratio ternaries are one store each (the second copy of the store
  *    is the delay-slot filler's); `~v + 1` is retail's nor/addiu negate.
  */
-void Unk18Obj__DrawNode(DrawView *self, DrawNode *node)
+void Viewport__DrawNode(DrawView *self, DrawNode *node)
 {
     MATRIX_2864 lsBuf;
     MATRIX_2864 lwBuf;
@@ -195,7 +195,7 @@ void Unk18Obj__DrawNode(DrawView *self, DrawNode *node)
             if (dirty) {
                 child->obj.coord2->flg = 0;
             }
-            Unk18Obj__DrawNode(self, child);
+            Viewport__DrawNode(self, child);
         }
     } while (cursor != NULL);
 

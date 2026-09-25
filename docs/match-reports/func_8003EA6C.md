@@ -11,7 +11,7 @@ without any hand-written C being required).
 void func_8003EA6C(void);
 ```
 
-Not a `D_8006E8E4` vtable slot occupant (`tools/classtable.py D_8006E8E4`
+Not a `gViewportMethods` vtable slot occupant (`tools/classtable.py gViewportMethods`
 lists no entry at any offset resolving to this address) and not a method --
 it takes no `self` at all. No caller found anywhere in `src/` or the
 remaining `asm/*.s` segments as of this round.

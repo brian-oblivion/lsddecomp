@@ -320,21 +320,21 @@ extern s32 D_8008A8E8[2];   /* address-taken only by this unit */
 extern char D_8008A8F0[4];  /* address-taken only by this unit */
 
 /*
- * The pointee of `Unk18Obj->unkB0` (round 13, Unk18Obj__Unk18Obj), returned by
+ * The pointee of `Unk18Obj->unkB0` (round 13, Viewport__Viewport), returned by
  * `New_Class6E99C` -- a function already known elsewhere in this project
  * (`include/Entity.h`'s own `Unk100Obj`/`New_Class6E99C`), kept here under a
  * unit-local name per this project's established "independent local views"
- * convention. Only the one slot this unit's `Unk18Obj__Unk18Obj` dispatches
+ * convention. Only the one slot this unit's `Viewport__Viewport` dispatches
  * through is modelled.
  */
 struct SubHandleObjMethods {
     u8 pad000[0x004];
-    void (*slot4)(SubHandleObj *self); /* +0x004, OBSERVED: Unk18Obj__SetSubHandle
+    void (*slot4)(SubHandleObj *self); /* +0x004, OBSERVED: Viewport__SetSubHandle
                                     (round 14) -- release-shaped, no extra
                                     args */
     u8 pad008[0x04C - 0x008];
     void (*slot4C)(SubHandleObj *self, void *arg1, void *arg2); /* +0x04C,
-                                    OBSERVED: Unk18Obj__Unk18Obj */
+                                    OBSERVED: Viewport__Viewport */
 };
 struct SubHandleObj {
     SubHandleObjMethods *methods; /* +0x000 */
@@ -363,14 +363,14 @@ extern u8 D_8008A904[]; /* address-taken only by this unit, passed as
                             SubHandleObjMethods::slot4C's 3rd argument */
 extern u8 D_8008A8F4[]; /* round 14, code_2cc8c_d (asm/data/7B008.sdata.s,
                             not decompiled): address-taken only, passed as
-                            Unk18Obj__AttachViewChild's own default value for slot80's
+                            Viewport__AttachViewChild's own default value for slot80's
                             2nd argument when its own arg5 is NULL. */
 
 /*
- * A generic class-instance view (round 13, Unk18Obj__AddChild): every class's
+ * A generic class-instance view (round 13, Viewport__AddChild): every class's
  * vtable in this game begins with a "header" word (`tools/classtable.py`'s
  * own label for it, "not a pointer; varies per class -- id/flags"), and
- * `Unk18Obj__AddChild` discriminates its 2nd parameter's DYNAMIC CLASS by
+ * `Viewport__AddChild` discriminates its 2nd parameter's DYNAMIC CLASS by
  * reading `arg1->methods->header & 0xF` -- i.e. runtime type identification
  * through the vtable header nibble, not a struct field of `arg1` itself.
  * Only that one field, plus the one instance field (`unk14`) this function
@@ -379,7 +379,7 @@ extern u8 D_8008A8F4[]; /* round 14, code_2cc8c_d (asm/data/7B008.sdata.s,
  */
 struct GenericObjMethods {
     s32 header; /* +0x000 */
-    /* +0x050/+0x054, round 14 (Unk18Obj__Flip's own call site): dispatched
+    /* +0x050/+0x054, round 14 (Viewport__Flip's own call site): dispatched
        as `(self)` only. Occupants unknown (self->unkC's real class is not
        otherwise identified in this unit). */
     u8 pad004[0x050 - 0x004];
@@ -389,24 +389,24 @@ struct GenericObjMethods {
 struct GenericObj {
     GenericObjMethods *methods; /* +0x000 */
     u8 pad004[0x00C - 0x004];
-    void *unkC;                 /* +0x00C, OBSERVED: Unk18Obj__Update (round 14),
+    void *unkC;                 /* +0x00C, OBSERVED: Viewport__Update (round 14),
                                     truthy-tested only */
     u8 pad010[0x014 - 0x010];
-    s32 unk14;                  /* +0x014, OBSERVED: Unk18Obj__AddChild */
+    s32 unk14;                  /* +0x014, OBSERVED: Viewport__AddChild */
 };
 
 /*
  * self->viewport's pointee (field renamed from unk18 round 55), round 13
  * (IntermediateBase__Init). Constructed by a
- * New_X allocator this unit itself carves (New_Unk18Obj, 0xBC bytes) via
- * `GetUnk18ObjMethods()->ctor(self)` -- GetUnk18ObjMethods lives in a still-uncarved
+ * New_X allocator this unit itself carves (New_Viewport, 0xBC bytes) via
+ * `GetViewportMethods()->ctor(self)` -- GetViewportMethods lives in a still-uncarved
  * remainder of this segment (not this unit's function to write), so it is
  * declared here only as an external returning this unit's own local view
  * of the class table it constructs. Only the one slot IntermediateBase__Init
  * dispatches through is modelled.
  */
 /* Round 14 (code_2cc8c_d): a plain 3-word vector, copied wholesale from a
- * caller-supplied source into Unk18Obj::unk14 (Unk18Obj__SetViewPos). Local view,
+ * caller-supplied source into Unk18Obj::unk14 (Viewport__SetViewPoint). Local view,
  * same shape as code_d294.h's own Vec3_d294 but this project's convention
  * is not to unify independent per-unit views of an unnamed shape. Declared
  * here (ahead of Unk18ObjMethods) since that struct's own slot78 needs it.
@@ -437,7 +437,7 @@ struct Unk18ObjMethods {
                                                     this offset
                                                     (include/code_8220.h). */
     void (*ctor)(Unk18Obj *self);              /* +0x008, called by
-                                                    New_Unk18Obj with only
+                                                    New_Viewport with only
                                                     `self` set up */
     u8 pad00C[0x010 - 0x00C];
     void (*addChild)(Unk18Obj *self, void *a1);  /* +0x010, inherited
@@ -449,49 +449,49 @@ struct Unk18ObjMethods {
                                                     (round 13) */
     u8 pad018[0x040 - 0x018];
     void (*slot40)(Unk18Obj *self);            /* +0x040, OBSERVED:
-                                                    Unk18Obj__Unk18Obj (round 13)
+                                                    Viewport__Viewport (round 13)
                                                     -- a DIFFERENT table from
                                                     TaskCoreMethods's own
-                                                    slot40 (`D_8006E8E4`'s
+                                                    slot40 (`gViewportMethods`'s
                                                     own occupant here is
-                                                    `Unk18Obj__InitDefaults`, not
+                                                    `Viewport__InitDefaults`, not
                                                     `IntermediateBase__ResetCounters`) */
     u8 pad044[0x074 - 0x044];
     void (*slot74)(Unk18Obj *self);            /* +0x074, OBSERVED:
-                                                    Unk18Obj__Finalize (round 13) */
-    /* +0x078/+0x07C/+0x080, round 14 (Unk18Obj__AttachViewChild's own call site,
+                                                    Viewport__Finalize (round 13) */
+    /* +0x078/+0x07C/+0x080, round 14 (Viewport__AttachViewChild's own call site,
        guarded by `self->unk10 == NULL`): dispatched as `(self, a2)`,
        `(self, a3)`, `(self, a1_or_default)` respectively. Occupants (this
-       unit, per tools/classtable.py D_8006E8E4): Unk18Obj__SetViewPos (+0x078,
-       still queued), Unk18Obj__SetUnk20 (+0x07C, still queued), Unk18Obj__SetRatio12
+       unit, per tools/classtable.py gViewportMethods): Viewport__SetViewPoint (+0x078,
+       still queued), Viewport__SetViewRef (+0x07C, still queued), Viewport__SetTwist
        (+0x080, the documented gp_rel blocker -- NOT decompiled here). */
-    void (*slot78)(Unk18Obj *self, Vec3_2cc8c *a1); /* +0x078, retyped round 14 once Unk18Obj__SetViewPos (its own occupant) confirmed the shape */
-    void (*slot7C)(Unk18Obj *self, Vec3_2cc8c *a1); /* +0x07C, retyped round 14 once Unk18Obj__SetUnk20 (its own occupant) confirmed the shape */
+    void (*slot78)(Unk18Obj *self, Vec3_2cc8c *a1); /* +0x078, retyped round 14 once Viewport__SetViewPoint (its own occupant) confirmed the shape */
+    void (*slot7C)(Unk18Obj *self, Vec3_2cc8c *a1); /* +0x07C, retyped round 14 once Viewport__SetViewRef (its own occupant) confirmed the shape */
     void (*slot80)(Unk18Obj *self, void *a1); /* +0x080 */
     u8 pad084[0x090 - 0x084];
     void (*slot90)(Unk18Obj *self);            /* +0x090, OBSERVED:
-                                                    Unk18Obj__Finalize (round 13) */
-    /* +0x094/+0x098, round 14 (code_2cc8c_d): Unk18Obj__OnNotify's own call
+                                                    Viewport__Finalize (round 13) */
+    /* +0x094/+0x098, round 14 (code_2cc8c_d): Viewport__OnNotify's own call
        site -- dispatched as `(self, arg1, arg2)` when a GenericObj arg1's
        header tag is 5 (slot94) or 1 (slot98). Occupants (this unit, still
-       queued as of this comment): Unk18Obj__OnNotifyTag5 (+0x094), Unk18Obj__OnNotifyTag1
+       queued as of this comment): Viewport__OnNotifyTag5 (+0x094), Viewport__OnNotifyTag1
        (+0x098). */
     void (*slot94)(Unk18Obj *self, GenericObj *arg1, s32 arg2); /* +0x094 */
     void (*slot98)(Unk18Obj *self, GenericObj *arg1, s32 arg2); /* +0x098 */
-    void (*slot9C)(Unk18Obj *self); /* +0x09C, occupant Unk18Obj__Update (round 14); dispatched by Unk18Obj__OnNotifyTag5 */
-    /* +0x0A0, occupant Unk18Obj__DrawNode (asm/psyq_2864.s, PsyQ library that no
+    void (*slot9C)(Unk18Obj *self); /* +0x09C, occupant Viewport__Update (round 14); dispatched by Viewport__OnNotifyTag5 */
+    /* +0x0A0, occupant Viewport__DrawNode (asm/psyq_2864.s, PsyQ library that no
        SDK disc places, so it stays disassembly -- not
-       decompiled) -- dispatched by Unk18Obj__Update (round 14) at three call
+       decompiled) -- dispatched by Viewport__Update (round 14) at three call
        sites with different arities (self alone; self+unkAC; self+another
        Unk18Obj*), so kept as an untyped function pointer and cast per
        call site rather than picking one fixed signature. */
     void *slotA0;
-    void (*slotA4)(Unk18Obj *self); /* +0x0A4, occupant Unk18Obj__Flip (round 14, still queued as of this comment); dispatched by Unk18Obj__OnNotifyTag1 */
+    void (*slotA4)(Unk18Obj *self); /* +0x0A4, occupant Viewport__Flip (round 14, still queued as of this comment); dispatched by Viewport__OnNotifyTag1 */
     void (*slotA8)(Unk18Obj *self, s32 a1);    /* +0x0A8, OBSERVED:
-                                                    Unk18Obj__Finalize (round 13) */
+                                                    Viewport__Finalize (round 13) */
 };
 /* Round 14 (code_2cc8c_d): a plain 2-word record, copied as one whole-
-   struct assignment (see Unk18Obj::unk34/unk38, Unk18Obj__SetUnk34) --
+   struct assignment (see Unk18Obj::unk34/unk38, Viewport__SetScreenSize) --
    MEASURED, retail loads both source words before storing either, ruling
    out sequential per-field copies same as the SByte3_d294 tell below. */
 typedef struct Pair32_d294 {
@@ -511,23 +511,23 @@ struct Unk18Obj {
     Unk18ObjMethods *methods; /* +0x000 */
     u8 pad004[0x00C - 0x004];
     GenericObj *unkC;          /* +0x00C, zeroed by the ctor
-                                  (Unk18Obj__Unk18Obj); OBSERVED (round 13,
-                                  set to `arg1`) by Unk18Obj__AddChild when
+                                  (Viewport__Viewport); OBSERVED (round 13,
+                                  set to `arg1`) by Viewport__AddChild when
                                   `arg1->methods->header & 0xF == 1` */
     GenericObj *unk10;         /* +0x010, zeroed by the ctor
-                                  (Unk18Obj__Unk18Obj); OBSERVED (round 13,
-                                  set to `arg1`) by Unk18Obj__AddChild when
+                                  (Viewport__Viewport); OBSERVED (round 13,
+                                  set to `arg1`) by Viewport__AddChild when
                                   `arg1->methods->header & 0xF == 4` */
-    /* +0x014, round 14: a Vec3, written wholesale by Unk18Obj__SetViewPos from
+    /* +0x014, round 14: a Vec3, written wholesale by Viewport__SetViewPoint from
        its own arg1 -- RETYPED from an opaque byte span once
-       Unk18Obj__SetViewPos's own store pattern (3 plain word stores at +0x14/
-       +0x18/+0x1C) confirmed the shape; Unk18Obj__AttachViewChild's own use (only the
+       Viewport__SetViewPoint's own store pattern (3 plain word stores at +0x14/
+       +0x18/+0x1C) confirmed the shape; Viewport__AttachViewChild's own use (only the
        address, forwarded to GsSetRefView2) is unaffected by the retype. */
     Vec3_2cc8c unk14;
-    /* +0x020, round 14: another Vec3, written wholesale by Unk18Obj__SetUnk20
+    /* +0x020, round 14: another Vec3, written wholesale by Viewport__SetViewRef
        from its own arg1 -- same shape/evidence as unk14 just above. */
     Vec3_2cc8c unk20;
-    /* +0x02C, round 44 (Unk18Obj__SetRatio12): a 20.12 fixed-point value, set from
+    /* +0x02C, round 44 (Viewport__SetTwist): a 20.12 fixed-point value, set from
        a caller-supplied `{s16 whole; s16 frac;}` pair via the same
        split-division idiom as code_d294_c's RatioToFixed12 (divide once for
        quotient+remainder, then divide the shifted remainder again for the
@@ -535,28 +535,28 @@ struct Unk18Obj {
        rather than reusing code_d294.h's `WholeFrac_d294` -- a different
        unit's own local view of the same shape, not a shared type. */
     s32 unk2C;
-    s32 unk30;                 /* +0x030, OBSERVED: Unk18Obj__AddChild (round
+    s32 unk30;                 /* +0x030, OBSERVED: Viewport__AddChild (round
                                   13), set from `arg1->unk14` on the same
                                   `header == 4` path that sets `unk10` */
-    /* +0x034, round 14 (Unk18Obj__SetUnk34): copied wholesale from a caller-
+    /* +0x034, round 14 (Viewport__SetScreenSize): copied wholesale from a caller-
        supplied Pair32_d294 -- MEASURED, retail loads both source words
        before storing either, ruling out sequential per-field stores. */
     Pair32_d294 unk34;
     /* +0x03C..+0x048, round 13 (code_2cc8c_d): four plain field setters
-       (Unk18Obj__SetUnk3C/SetUnk44/SetUnk48/SetUnk40), all `sw $a1, N($a0)`
+       (Viewport__SetOtLength/SetUnk44/SetUnk48/SetUnk40), all `sw $a1, N($a0)`
        or the same guarded by `if (self->otReady == 0)`. No further evidence
        of real type/meaning beyond "a stored word", so kept `s32`. */
-    s32 unk3C;                  /* +0x03C, OBSERVED: Unk18Obj__SetUnk3C (round 13) */
-    s32 unk40;                  /* +0x040, OBSERVED: Unk18Obj__SetUnk40 (round 13) */
-    s32 unk44;                  /* +0x044, OBSERVED: Unk18Obj__SetUnk44 (round 13),
+    s32 unk3C;                  /* +0x03C, OBSERVED: Viewport__SetOtLength (round 13) */
+    s32 unk40;                  /* +0x040, OBSERVED: Viewport__SetProjection (round 13) */
+    s32 unk44;                  /* +0x044, OBSERVED: Viewport__SetUnk44 (round 13),
                                     only written when `self->otReady == 0` */
-    s32 unk48;                  /* +0x048, OBSERVED: Unk18Obj__SetUnk48 (round 13),
+    s32 unk48;                  /* +0x048, OBSERVED: Viewport__SetUnk48 (round 13),
                                     only written when `self->otReady == 0` */
-    s32 unk4C;                  /* +0x04C, OBSERVED: Unk18Obj__Update (round 14) */
-    s32 unk50;                  /* +0x050, OBSERVED: Unk18Obj__Update (round 14) */
-    s32 lightMode;              /* +0x054, OBSERVED: Unk18Obj__SetLightMode (round 13).
+    s32 unk4C;                  /* +0x04C, OBSERVED: Viewport__Update (round 14) */
+    s32 unk50;                  /* +0x050, OBSERVED: Viewport__Update (round 14) */
+    s32 lightMode;              /* +0x054, OBSERVED: Viewport__SetLightMode (round 13).
                                     RENAMED round 73 (charlie): the sole real
-                                    consumer is Unk18Obj__Update's own
+                                    consumer is Viewport__Update's own
                                     `GsSetLightMode(self->lightMode)` call,
                                     which also gates the far-color/fog-near
                                     dispatch there (`if (lightMode == 1 ||
@@ -564,50 +564,50 @@ struct Unk18Obj {
                                     code_2cc8c_d.c. */
     /* +0x058/+0x05B, round 13 (code_2cc8c_d): two 3-byte fields, each
        copied wholesale from a caller-supplied 3-byte source via a WHOLE
-       struct assignment (Unk18Obj__SetClearColor/Unk18Obj__SetFarColor -- MEASURED:
+       struct assignment (Viewport__SetClearColor/Viewport__SetFarColor -- MEASURED:
        retail loads all three source bytes before storing any of them, ruling
        out a sequential per-field copy). Bytes are signed (`lb`, not `lbu`),
        though both are also READ unsigned (`lbu`) at their one real consumer
        each. RENAMED round 73 (charlie): each field's own name comes from its
-       one identified consumer in Unk18Obj__Flip/Unk18Obj__Update
+       one identified consumer in Viewport__Flip/Viewport__Update
        respectively (see each field's own comment) -- tier B, not tier A,
        since the RGB-triple reading is inferred from the consuming Sony API's
        own shape, not proven for the field's bit-level meaning. */
-    SByte3_d294 clearColor;     /* +0x058, OBSERVED: Unk18Obj__SetClearColor (round
-                                   13). Sole real consumer: Unk18Obj__Flip's
+    SByte3_d294 clearColor;     /* +0x058, OBSERVED: Viewport__SetClearColor (round
+                                   13). Sole real consumer: Viewport__Flip's
                                    `GsSortClear(rawBytes[0..2], ...)` --
                                    Sony's own screen-clear-color argument. */
-    SByte3_d294 farColor;       /* +0x05B, OBSERVED: Unk18Obj__SetFarColor (round
-                                   13). Sole real consumer: Unk18Obj__Update's
+    SByte3_d294 farColor;       /* +0x05B, OBSERVED: Viewport__SetFarColor (round
+                                   13). Sole real consumer: Viewport__Update's
                                    `SetFarColor(rawBytes[0..2])` -- Sony's own
                                    GTE far-color register writer. */
     u8 pad05E[0x060 - 0x05E];
-    s32 fogNear;                /* +0x060, OBSERVED: Unk18Obj__SetFogNear (round
+    s32 fogNear;                /* +0x060, OBSERVED: Viewport__SetFogNear (round
                                    13). RENAMED round 73 (charlie): sole real
-                                   consumer is Unk18Obj__Update's own
+                                   consumer is Viewport__Update's own
                                    `SetFogNear(self->fogNear, self->unk40)`
                                    call -- Sony's own near-fog-distance
                                    setter's first argument. Exclusive to
                                    code_2cc8c_d.c. */
     u8 pad064[0x070 - 0x064];
-    /* +0x070, round 13 (code_2cc8c_d): a guard flag -- Unk18Obj__SetUnk44/
-       Unk18Obj__SetUnk48 (above) only write unk44/unk48 when this is
+    /* +0x070, round 13 (code_2cc8c_d): a guard flag -- Viewport__SetUnk44/
+       Viewport__SetUnk48 (above) only write unk44/unk48 when this is
        zero/NULL, i.e. an "already initialized" latch. RESOLVED round 14:
-       Unk18Obj__InitOt is its own set site -- a one-time allocator/init
+       Viewport__InitOt is its own set site -- a one-time allocator/init
        routine, guarded by this same flag, that sets it to 1 (and zeroes
        otIndex) once it succeeds. RENAMED round 73 (charlie): the whole
-       field IS this latch (Unk18Obj__InitOt/Unk18Obj__DeinitOt are its only
+       field IS this latch (Viewport__InitOt/Viewport__DeinitOt are its only
        set sites), so `otReady` names the mechanics directly rather than
        guessing what it gates conceptually. Exclusive to code_2cc8c_d.c. */
     s32 otReady;
-    s32 otIndex;                /* +0x074, OBSERVED: Unk18Obj__InitOt (round
+    s32 otIndex;                /* +0x074, OBSERVED: Viewport__InitOt (round
                                    14), zeroed alongside otReady. RENAMED
-                                   round 73 (charlie): Unk18Obj__Flip both
+                                   round 73 (charlie): Viewport__Flip both
                                    READS it (to pick which OT half to drain)
                                    and TOGGLES it (0<->1) every call -- the
                                    double-buffer index, named after that
                                    mechanic. Exclusive to code_2cc8c_d.c. */
-    /* +0x078..+0x08C, round 14 (Unk18Obj__InitOt): seven `s32`-typed
+    /* +0x078..+0x08C, round 14 (Viewport__InitOt): seven `s32`-typed
        addresses/sizes carved out of one `BMemPMgrAlloc` allocation --
        MEASURED, not modeled as real pointer types since retail computes
        every one of them via plain word arithmetic (not pointer-typed
@@ -621,28 +621,28 @@ struct Unk18Obj {
     s32 unk84;
     s32 unk88;
     s32 unk8C;
-    s32 unk90;                  /* +0x090, OBSERVED: Unk18Obj__OnNotifyTag5 (round 14),
+    s32 unk90;                  /* +0x090, OBSERVED: Viewport__OnNotifyTag5 (round 14),
                                     incremented unconditionally every call */
     u8 pad094[0x098 - 0x094];
-    s32 unk98;                  /* +0x098, OBSERVED: Unk18Obj__Update (round 14),
+    s32 unk98;                  /* +0x098, OBSERVED: Viewport__Update (round 14),
                                     a running count incremented by 1 each call */
     u8 pad09C[0x0AC - 0x09C];
-    Class6B5CC *unkAC;          /* +0x0AC, OBSERVED: Unk18Obj__Unk18Obj (round 13,
+    Class6B5CC *unkAC;          /* +0x0AC, OBSERVED: Viewport__Viewport (round 13,
                                   set from `New_Class6B5CC()`) and
-                                  Unk18Obj__Finalize (released through the
+                                  Viewport__Finalize (released through the
                                   inherited BasicClass `release` slot) */
-    SubHandleObj *unkB0;        /* +0x0B0, OBSERVED: Unk18Obj__Unk18Obj (round
+    SubHandleObj *unkB0;        /* +0x0B0, OBSERVED: Viewport__Viewport (round
                                   13) -- set from `New_Class6E99C`; also read
-                                  back by Unk18Obj__GetSubHandle (round 13, this
+                                  back by Viewport__GetSubHandle (round 13, this
                                   unit) as a plain getter */
-    s32 unkB4;                  /* +0x0B4, OBSERVED: Unk18Obj__SetUnkB4 (round 13) */
-    s32 unkB8;                  /* +0x0B8, OBSERVED: Unk18Obj__SetUnkB8 (round 13) */
+    s32 unkB4;                  /* +0x0B4, OBSERVED: Viewport__SetUnkB4 (round 13) */
+    s32 unkB8;                  /* +0x0B8, OBSERVED: Viewport__SetDrawEnabled (round 13) */
 };
 
-extern Unk18ObjMethods D_8006E8E4; /* the table itself (Unk18ObjMethods, resolved via tools/classtable.py D_8006E8E4), so GetUnk18ObjMethods's own definition (code_2cc8c_d.c) can return &D_8006E8E4 */
-extern Unk18ObjMethods *GetUnk18ObjMethods(void); /* getter for Unk18Obj's own
-                                    class table (returns &D_8006E8E4);
-                                    used by New_Unk18Obj's own New_X
+extern Unk18ObjMethods gViewportMethods; /* the table itself (Unk18ObjMethods, resolved via tools/classtable.py gViewportMethods), so GetViewportMethods's own definition (code_2cc8c_d.c) can return &gViewportMethods */
+extern Unk18ObjMethods *GetViewportMethods(void); /* getter for Unk18Obj's own
+                                    class table (returns &gViewportMethods);
+                                    used by New_Viewport's own New_X
                                     allocator. RETARGETED round 13: this
                                     used to live in a still-uncarved
                                     remainder, alpha's own comment said
@@ -650,7 +650,7 @@ extern Unk18ObjMethods *GetUnk18ObjMethods(void); /* getter for Unk18Obj's own
                                     the round-13 carve of code_2cc8c_d
                                     brought it in, so it is matched there
                                     now. */
-extern Unk18Obj *New_Unk18Obj(void); /* this unit's own New_X allocator for
+extern Unk18Obj *New_Viewport(void); /* this unit's own New_X allocator for
                                     Unk18Obj, 0xBC bytes; forward-declared
                                     here since IntermediateBase__Init (earlier in ROM
                                     order) calls it */
@@ -659,14 +659,14 @@ extern Unk18Obj *New_Unk18Obj(void); /* this unit's own New_X allocator for
    occupants this unit carves. Trivial setters/getters typed straight to
    Unk18Obj's own newly-discovered fields above; see the field comments
    for what each was OBSERVED from. */
-void Unk18Obj__OnNotify(Unk18Obj *self, GenericObj *arg1, s32 arg2);
+void Viewport__OnNotify(Unk18Obj *self, GenericObj *arg1, s32 arg2);
 
 /* GsSetRefView2 is NO LONGER DECLARED HERE, round 33. It is Sony's
    (`libgs/gs_131.o`, linked from the SDK object) and will one day sit next to
    `include/psyq/LIBGS.H`'s own prototype for it -- two declarations of one
    Sony name in a header six units include is the `conflicting types` failure
    that CLAUDE.md and the SDK guide both warn about, and it would surface in a
-   unit that never touched this line. Its one caller, Unk18Obj__AttachViewChild, now
+   unit that never touched this line. Its one caller, Viewport__AttachViewChild, now
    declares it locally in src/code_2cc8c_d.c with that call site's own shape. */
 
 /* func_8003FC18 is NO LONGER DECLARED HERE, round 34 -- exactly the
@@ -685,10 +685,10 @@ void Unk18Obj__OnNotify(Unk18Obj *self, GenericObj *arg1, s32 arg2);
    GsClearOt above: LIBGPU.H carries its own prototype (`extern int
    DrawSync(int mode);`), and a second declaration of that name in a header
    six units include is the `conflicting types` failure CLAUDE.md and the SDK
-   guide both warn about. Its one caller, Unk18Obj__DeinitOt, now declares it
+   guide both warn about. Its one caller, Viewport__DeinitOt, now declares it
    locally in src/code_2cc8c_d.c with that call site's own shape. */
 
-/* The following are called only from Unk18Obj__Update (this unit). They are
+/* The following are called only from Viewport__Update (this unit). They are
    plain `void *` global setters (this call site happens to pass an
    already-`s32`-shaped value, which is an ordinary int-to-pointer conversion
    with identical codegen, same precedent as Class6B5CC__DispatchLinkCommand/Class6B5CC__TryAttachNearby in
@@ -713,7 +713,7 @@ void Unk18Obj__OnNotify(Unk18Obj *self, GenericObj *arg1, s32 arg2);
 /* ResetGraph (asm/psyq_10ee0.s, PsyQ library, LIBGPU.H's own
    declared signature is `extern int ResetGraph(int mode);` -- declared
    locally here rather than including the whole SDK header, matching this
-   unit's existing PsyQ-declaration style). Unk18Obj__Flip calls it with a
+   unit's existing PsyQ-declaration style). Viewport__Flip calls it with a
    literal 1 and ignores the return. */
 extern s32 ResetGraph(s32 mode);
 
@@ -723,46 +723,46 @@ extern s32 ResetGraph(s32 mode);
    LIBGS.H carries its own prototype (`void GsSortClear(u_char r, u_char g,
    u_char b, GsOT *ot);`), and a second declaration of that name in a header
    six units include is the `conflicting types` failure CLAUDE.md and the SDK
-   guide both warn about. Its one caller, Unk18Obj__Flip, now declares it
+   guide both warn about. Its one caller, Viewport__Flip, now declares it
    locally in src/code_2cc8c_d.c with that call site's own shape (self->unk58's
    three bytes read unsigned, same "writer reads signed, this reader reads
-   unsigned" situation as unk5B/Unk18Obj__Update, plus one more word). */
+   unsigned" situation as unk5B/Viewport__Update, plus one more word). */
 
 /* func_8003FBF4 is NO LONGER DECLARED HERE, round 34. It is Sony's
    `GsDrawOt` (`libgs/gs_111.o`, linked from the SDK object) -- same
    collision reason as GsSetRefView2/GsClearOt above. Its one caller,
-   Unk18Obj__Flip, declares it locally in src/code_2cc8c_d.c with that call
+   Viewport__Flip, declares it locally in src/code_2cc8c_d.c with that call
    site's own shape. */
 
-void Unk18Obj__AttachViewChild(Unk18Obj *self, void *a1, void *a2, void *a3, void *arg5);
-void Unk18Obj__DetachViewChild(Unk18Obj *self);
-void Unk18Obj__SetViewPos(Unk18Obj *self, Vec3_2cc8c *a1);
-void Unk18Obj__SetUnk20(Unk18Obj *self, Vec3_2cc8c *a1);
-void Unk18Obj__InitOt(Unk18Obj *self);
-void Unk18Obj__DeinitOt(Unk18Obj *self);
-void Unk18Obj__OnNotifyTag5(Unk18Obj *self, GenericObj *arg1, s32 arg2);
-void Unk18Obj__OnNotifyTag1(Unk18Obj *self, GenericObj *arg1, s32 arg2);
-void Unk18Obj__Update(Unk18Obj *self);
-void Unk18Obj__Flip(Unk18Obj *self);
-void Unk18Obj__SetSubHandle(Unk18Obj *self, SubHandleObj *arg1);
-void Unk18Obj__SetUnk34(Unk18Obj *self, Pair32_d294 *pair);
-void Unk18Obj__SetUnk3C(Unk18Obj *self, s32 a1);
-void Unk18Obj__SetUnk44(Unk18Obj *self, s32 a1);
-void Unk18Obj__SetUnk48(Unk18Obj *self, s32 a1);
-void Unk18Obj__SetUnk40(Unk18Obj *self, s32 a1);
-void Unk18Obj__SetLightMode(Unk18Obj *self, s32 a1);
-void Unk18Obj__SetClearColor(Unk18Obj *self, SByte3_d294 *src);
-void Unk18Obj__SetFarColor(Unk18Obj *self, SByte3_d294 *src);
-void Unk18Obj__SetFogNear(Unk18Obj *self, s32 a1);
-SubHandleObj *Unk18Obj__GetSubHandle(Unk18Obj *self);
-void Unk18Obj__SetUnkB4(Unk18Obj *self, s32 a1);
-void Unk18Obj__SetUnkB8(Unk18Obj *self, s32 a1);
-Unk18Obj *Unk18Obj__GetTail(Unk18Obj *self);
+void Viewport__AttachViewChild(Unk18Obj *self, void *a1, void *a2, void *a3, void *arg5);
+void Viewport__DetachViewChild(Unk18Obj *self);
+void Viewport__SetViewPoint(Unk18Obj *self, Vec3_2cc8c *a1);
+void Viewport__SetViewRef(Unk18Obj *self, Vec3_2cc8c *a1);
+void Viewport__InitOt(Unk18Obj *self);
+void Viewport__DeinitOt(Unk18Obj *self);
+void Viewport__OnNotifyTag5(Unk18Obj *self, GenericObj *arg1, s32 arg2);
+void Viewport__OnNotifyTag1(Unk18Obj *self, GenericObj *arg1, s32 arg2);
+void Viewport__Update(Unk18Obj *self);
+void Viewport__Flip(Unk18Obj *self);
+void Viewport__SetSubHandle(Unk18Obj *self, SubHandleObj *arg1);
+void Viewport__SetScreenSize(Unk18Obj *self, Pair32_d294 *pair);
+void Viewport__SetOtLength(Unk18Obj *self, s32 a1);
+void Viewport__SetUnk44(Unk18Obj *self, s32 a1);
+void Viewport__SetUnk48(Unk18Obj *self, s32 a1);
+void Viewport__SetProjection(Unk18Obj *self, s32 a1);
+void Viewport__SetLightMode(Unk18Obj *self, s32 a1);
+void Viewport__SetClearColor(Unk18Obj *self, SByte3_d294 *src);
+void Viewport__SetFarColor(Unk18Obj *self, SByte3_d294 *src);
+void Viewport__SetFogNear(Unk18Obj *self, s32 a1);
+SubHandleObj *Viewport__GetSubHandle(Unk18Obj *self);
+void Viewport__SetUnkB4(Unk18Obj *self, s32 a1);
+void Viewport__SetDrawEnabled(Unk18Obj *self, s32 a1);
+Unk18Obj *GetRootNode(Unk18Obj *self);
 
 /* GsSetProjection is NO LONGER DECLARED HERE, round 79. It was
    `Unk18Obj__SetGeomScreen`, typed as a method; it is Sony's (libgs/gs_106,
    identified at merge from position and LIBGS.H's prototype) and its one
-   caller, Unk18Obj__Update in src/code_2cc8c_d.c, declares it
+   caller, Viewport__Update in src/code_2cc8c_d.c, declares it
    locally with LIBGS.H's own shape. */
 
 extern void *New_D8006EF50(void); /* external, no args; local view returns

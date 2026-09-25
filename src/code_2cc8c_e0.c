@@ -16,7 +16,7 @@
  * into [c code_2cc8c_e0][o libgs/gs_123][c ...]. gs_101 itself never placed
  * as an object (no .o segment here), so the function stays as C.
  *
- * Deliberately includes only common.h. The one caller, Unk18Obj__Update
+ * Deliberately includes only common.h. The one caller, Viewport__Update
  * (src/code_2cc8c_d.c), declares it locally from LIBGS.H; no shared header
  * carries a Sony prototype (FINISHING-PLAN track 2).
  */

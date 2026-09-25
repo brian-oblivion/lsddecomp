@@ -110,7 +110,7 @@ void Class6D4E8__Open(Obj80027480 *self, char *suffix, s32 arg2, s32 arg3) {
    the callee's void-ness was already on file, unlike the general wrapper
    caution.
 
-3. **The `NEW STALL CLASS` from round 44 (`Unk18Obj__InitDefaults`): retail
+3. **The `NEW STALL CLASS` from round 44 (`Viewport__InitDefaults`): retail
    recomputes/re-reads an address our GCC CSEs away.** After
    `gCdSeekParam = rec;`, retail reloads `gCdSeekParam` from memory a second
    time (`lw v0,%gp_rel(gCdSeekParam)`) to read `->unk18`, instead of reusing

@@ -38,7 +38,7 @@ Class869D8 *New_Class869D8(void)
 
 void Class869D8__Class869D8(Class869D8 *self)
 {
-    GetUnk18ObjMethods()->ctor(self);
+    GetViewportMethods()->ctor(self);
     self->methods = GetClass869D8Methods();
     self->methods->onConstruct(self);
 }
@@ -49,7 +49,7 @@ void func_8004D2F8(void) {
 void Class869D8__ForwardIfUnk10AndUnk70(Class869D8 *self)
 {
     if (self->unk10 != 0 && self->unk70 != 0) {
-        GetUnk18ObjMethods()->slot9C(self);
+        GetViewportMethods()->slot9C(self);
     }
 }
 

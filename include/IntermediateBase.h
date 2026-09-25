@@ -42,7 +42,7 @@ struct IntermediateBaseInitArgs {
     /* +0x004 */ BasicClass *unk4;     /* added as a child; onTag1Notify's event 2 calls its +0x044, +0x048 */
     /* +0x008 */ BasicClass *unk8;     /* becomes unk10; NULL: init makes one with New_D8006EF50() */
     /* +0x00C */ BasicClass *unkC;     /* becomes unk14; NULL: init makes one with New_D8006EFAC() */
-    /* +0x010 */ BasicClass *viewport; /* becomes viewport; NULL: init makes one with New_Unk18Obj() */
+    /* +0x010 */ BasicClass *viewport; /* becomes viewport; NULL: init makes one with New_Viewport() */
 };
 
 #define INTERMEDIATEBASE_SLOTS(Self, CtorParams)                                                   \
@@ -64,7 +64,7 @@ struct IntermediateBaseInitArgs {
     /* +0x00C */ IntermediateBaseInitArgs *initArgs; /* init's argument, kept */                   \
     /* +0x010 */ BasicClass *unk10;     /* initArgs->unk8, or init's own New_D8006EF50() object */ \
     /* +0x014 */ BasicClass *unk14;     /* initArgs->unkC, or init's own New_D8006EFAC() object */ \
-    /* +0x018 */ BasicClass *viewport;  /* initArgs->viewport, or init's own New_Unk18Obj() */     \
+    /* +0x018 */ BasicClass *viewport;  /* initArgs->viewport, or init's own New_Viewport() */     \
     /* +0x01C */ s32 frameCounter;      /* update adds 1; resetCounters, onState2, onState3 clear it */ \
     /* +0x020 */ s32 state;             /* setState's argument; resetCounters clears it */         \
     /* +0x024 */ s32 initMode           /* init's mode: 0 attaches to the viewport and runs to the end */
