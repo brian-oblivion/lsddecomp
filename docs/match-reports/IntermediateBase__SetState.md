@@ -1,4 +1,6 @@
-# Obj86B60__NotifyParents — MATCHED round 72 (32/32, length exact; was STALL 23/32 "register identity")
+# IntermediateBase__SetState — MATCHED round 72 (32/32, length exact; was STALL 23/32 "register identity")
+
+> Renamed from `Obj86B60__NotifyParents` on 2026-09-25 (tools/rename.py). Address 0x8003e4b8.
 
 REVISITED, round 72: MATCHED 32/32, whole image green; names/types not relevant (the lever was call structure, not a type or a name).
 
@@ -31,7 +33,7 @@ and the order flips.
 **The match:**
 
 ```c
-void Obj86B60__NotifyParents(Obj86B60 *self, s32 arg1)
+void IntermediateBase__SetState(Obj86B60 *self, s32 arg1)
 {
     Obj86B60Methods *methods;
     void (*fn)(Obj86B60 *);
@@ -151,7 +153,7 @@ diffed against the seed and checked, and the most tempting one
 to idiomatic C and rebuilt through the REAL pinned toolchain:
 
 ```c
-void Obj86B60__NotifyParents(Obj86B60 *self, s32 arg1)
+void IntermediateBase__SetState(Obj86B60 *self, s32 arg1)
 {
     Obj86B60Methods *methods;
     Obj86B60Methods *methods2;
@@ -205,7 +207,7 @@ change) -- should collapse the scheduling half of the residue even if it
 cannot fix the register-identity half.
 
 ```c
-void Obj86B60__NotifyParents(Obj86B60 *self, s32 arg1)
+void IntermediateBase__SetState(Obj86B60 *self, s32 arg1)
 {
     Obj86B60Methods *methods;
 
@@ -303,7 +305,7 @@ compile errors in a fresh build.
 ## Blocker screen (mandatory, round 13 head broadcast)
 
 ```
-grep -nE 'gp_rel|addiu *\$at, *\$at, *%lo' asm/nonmatchings/code_2cc8c_c/Obj86B60__NotifyParents.s
+grep -nE 'gp_rel|addiu *\$at, *\$at, *%lo' asm/nonmatchings/code_2cc8c_c/IntermediateBase__SetState.s
 ```
 
 No hits. NOT toolchain-blocked -- this is a genuine register-identity
@@ -314,8 +316,8 @@ residue, verified against the actual instructions below, not assumed.
 `gIntermediateBaseMethods+0x060` (and `gClass86B60Methods`'s own verbatim-inherited `+0x060`):
 records `arg1` into `self->unk20`, dispatches `self->methods->slot30`
 (inherited BasicClass slot, `BasicClass__NotifyParents`) unconditionally, then
-`self->methods->slot64` (`Obj86B60__NotifyTargetReset`, already matched) if `arg1 == 2`,
-or `self->methods->slot68` (`Obj86B60__NotifyChildReset`, next in this queue) if
+`self->methods->slot64` (`IntermediateBase__OnState2`, already matched) if `arg1 == 2`,
+or `self->methods->slot68` (`IntermediateBase__OnState3`, next in this queue) if
 `arg1 == 3`. Fully understood -- the control flow, every field, and every
 slot identity all check out and are not in question.
 
@@ -323,7 +325,7 @@ slot identity all check out and are not in question.
 
 ```c
 #if 0
-void Obj86B60__NotifyParents(Obj86B60 *self, s32 arg1)
+void IntermediateBase__SetState(Obj86B60 *self, s32 arg1)
 {
     Obj86B60Methods *methods;
 
@@ -341,7 +343,7 @@ void Obj86B60__NotifyParents(Obj86B60 *self, s32 arg1)
 
 ## The residue
 
-21/32 words match. `tools/asm-differ/diff.py Obj86B60__NotifyParents` shows the ENTIRE
+21/32 words match. `tools/asm-differ/diff.py IntermediateBase__SetState` shows the ENTIRE
 diff is one thing: retail assigns `self` (the `a0` parameter) to `$s1` and
 `arg1` (`a1`) to `$s0`; every build of mine assigns `self`->`$s0` and
 `arg1`->`$s1` -- the "natural" ascending parameter-index order. Every
@@ -431,17 +433,17 @@ round 13 (2026-09-03), runner alpha, unit code_2cc8c_c. 5 attempts,
 
 ## Naming (round 55, runner alpha)
 
-**Obj86B60__NotifyParents** (renamed from `func_8003E4B8`; still a STALL,
+**IntermediateBase__SetState** (renamed from `func_8003E4B8`; still a STALL,
 23/32 -- naming applies to NON_MATCHING/stalled functions exactly as to
 matched ones, per track 3). Tier A: `Obj86B60Methods::slot30` (this
-function's own occupant, "IS Obj86B60__NotifyParents" per the header) is
+function's own occupant, "IS IntermediateBase__SetState" per the header) is
 documented as "inherited BasicClass slot (`BasicClass__NotifyParents`)" --
 this function overrides `NotifyParents`, forwarding to the base slot
 unconditionally (`methods->slot30(self)`, itself still `slot30` since the
 occupant/dispatcher pair sits one level up this project doesn't rename
 without a clearer base-vs-derived split) and then, based on its own `arg1`
 parameter (stored into `self->unk20`), forwarding again to
-`Obj86B60__NotifyTargetReset` (mode 2) or `Obj86B60__NotifyChildReset`
+`IntermediateBase__OnState2` (mode 2) or `IntermediateBase__OnState3`
 (mode 3) -- fully understood control flow per the report's own "What it
 does" section above, independent of the register-identity residue that
 stalls the byte match.
@@ -465,3 +467,7 @@ SLPS_015.56` -- no bytes changed, the verified build never compiles the
 linked symbols`). The report's recorded 23/32 figure and residue class
 (pure register identity, self/arg1 swapped `$s0`/`$s1` vs retail's
 `$s1`/`$s0`) matched the body exactly; no discrepancy to flag.
+
+## Track 4 (2026-09-25, round 82, charlie)
+
+The class is IntermediateBase (class id 0x30, gIntermediateBaseMethods; `tools/classtable.py gIntermediateBaseMethods` lists this function as one of its own occupants), declared once in include/IntermediateBase.h. `self` is now `IntermediateBase *`, not TaskCore's `Obj86B60` view; byte-identical. Renamed from Obj86B60__NotifyParents. The round-55 name rested on the header's claim that this function is `slot30`'s occupant; it occupies +0x060 (`classtable.py gIntermediateBaseMethods`), and +0x030 is BasicClass__NotifyParents, which it CALLS. It stores its argument in +0x020 (now `state`), passes it to notifyParents, and runs +0x064 (`onState2`) on 2 and +0x068 (`onState3`) on 3. The overrides of +0x060 are named SetState (Obj86B60__SetState, Class86B60__SetState) and forward to this base, so the slot is `setState` and so is this occupant. Tier B. The base call is now the inherited `methods->notifyParents(self, state)` rather than a one-argument `slot30(self)`: byte-identical, the state is already in $a1.

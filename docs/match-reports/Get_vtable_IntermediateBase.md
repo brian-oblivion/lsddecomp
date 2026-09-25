@@ -49,3 +49,7 @@ precedent already established in this project for this exact shape. Called
 from `code_2c054.c`, `class_39e08.c` and this unit (`code_2cc8c_c.c`) --
 confirming, independently of `IntermediateBase__IntermediateBase`'s own evidence, that this
 accessor's table is genuinely shared across unrelated class hierarchies.
+
+## Track 4 (2026-09-25, round 82, charlie)
+
+The class is IntermediateBase (class id 0x30, gIntermediateBaseMethods; `tools/classtable.py gIntermediateBaseMethods` lists this function as one of its own occupants), declared once in include/IntermediateBase.h. `self` is now `IntermediateBase *`, not TaskCore's `Obj86B60` view; byte-identical. The getter, returning `IntermediateBaseMethods *`. Its three local declarations (code_2cc8c.h, class_39e08.h, code_2c054.h's TaskUtilMethods) are gone; include/IntermediateBase.h declares it.

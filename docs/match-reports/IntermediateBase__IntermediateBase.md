@@ -11,10 +11,10 @@ utility class's constructor (`tools/classtable.py gIntermediateBaseMethods` show
 `+0x008 IntermediateBase__IntermediateBase`). Runs the BasicClass ctor through `Get_vtable_BasicClass()`,
 installs this class's own vtable (`&gIntermediateBaseMethods`, via the already-matched
 getter `Get_vtable_IntermediateBase`), then dispatches its own freshly-installed slot40
-(`Obj86B60__ResetCounters`, already matched, void-returning) once.
+(`IntermediateBase__ResetCounters`, already matched, void-returning) once.
 
 Same self-typing convention as this unit's other already-matched siblings
-from the same shared table (`Obj86B60__ResetCounters`, `Obj86B60__IncrementFrameCounter`, `Obj86B60__NotifyTargetReset`):
+from the same shared table (`IntermediateBase__ResetCounters`, `IntermediateBase__IncrementFrameCounter`, `IntermediateBase__OnState2`):
 `Obj86B60 *self`, even though the class is generically shared across many
 unrelated tables (`code_2c054.h`'s `TaskUtilMethods` names the same function
 `gIntermediateBaseMethods+0x008`, called there as `Get_vtable_IntermediateBase()->slot08(self)` on a
@@ -39,7 +39,7 @@ void IntermediateBase__IntermediateBase(Obj86B60 *self)
   already matched there).
 - Added `slot40` to `Obj86B60Methods` (`Obj86B60 *self`), the slot this
   function calls through after installing its own vtable -- it IS
-  `Obj86B60__ResetCounters`, already matched elsewhere in this unit.
+  `IntermediateBase__ResetCounters`, already matched elsewhere in this unit.
 - The explicit cast `(Obj86B60Methods *)Get_vtable_IntermediateBase()` mirrors
   `src/class_39e08.c`'s own `self->methods = (Class865C8Methods *)
   GetClass86668Methods();` -- assigning a shared/generic table getter's return
@@ -51,7 +51,7 @@ void IntermediateBase__IntermediateBase(Obj86B60 *self)
 round 13 (2026-09-03), runner alpha, unit code_2cc8c_c. Matched on the first
 build. Classtable dump of `gIntermediateBaseMethods` (26 slots) resolved this and six
 sibling queue functions' exact slot identities in one pass; see
-`Obj86B60__OnNotify.md` for the full table.
+`IntermediateBase__OnNotify.md` for the full table.
 
 ## Naming
 
@@ -69,3 +69,7 @@ only because its address (0x8003DFDC) falls in this unit's window; the
 function itself is the shared ancestor's own ctor, called from at least
 three unrelated class hierarchies (`code_2c054.c`, `class_39e08.c`, and this
 unit).
+
+## Track 4 (2026-09-25, round 82, charlie)
+
+The class is IntermediateBase (class id 0x30, gIntermediateBaseMethods; `tools/classtable.py gIntermediateBaseMethods` lists this function as one of its own occupants), declared once in include/IntermediateBase.h. `self` is now `IntermediateBase *`, not TaskCore's `Obj86B60` view; byte-identical. The ctor (+0x008). `self->methods = Get_vtable_IntermediateBase()` needs no cast now.

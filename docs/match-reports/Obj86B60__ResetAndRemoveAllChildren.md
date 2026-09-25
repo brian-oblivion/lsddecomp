@@ -7,7 +7,7 @@
 ## What it does
 
 A ctor-shaped function: zeroes three `Obj86B60` fields (`unk30`, `unk10`,
-`unkC` -- all new, only observed here and by `Obj86B60__NotifyTargetReset`, which
+`unkC` -- all new, only observed here and by `IntermediateBase__OnState2`, which
 dereferences `unkC`), then forwards unconditionally to the shared
 `BasicClass` ancestor's own `+0x018` slot, `Get_vtable_BasicClass()->slot18(self)`
 -- the same no-argument-getter idiom already established independently in

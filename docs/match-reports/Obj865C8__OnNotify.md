@@ -79,7 +79,7 @@ void Obj865C8__OnNotify(Obj865C8 *self, EventArg *arg1, s32 arg2) {
   larger offset.
 - `Class865C8Methods::slot38` typed (was an untyped `void *`, this
   function's own slot). `Class86668Methods::slot38` added (the sibling's
-  inherited occupant, `Obj86B60__OnNotify`, out of this unit's scope) — same
+  inherited occupant, `IntermediateBase__OnNotify`, out of this unit's scope) — same
   signature, needed because this function calls through THAT table via
   `GetClass86668Methods()`, not its own.
 - **`Class865C8Methods::slot80` and `::slot84` retyped** from `void
@@ -121,4 +121,4 @@ the full signature before trusting an empty-body occupant's parameter count.
 
 ## Naming
 
-`Obj865C8__OnNotify` -- tier B. Overrides the base's +0x038 `Obj86B60__OnNotify` slot (confirmed by `tools/classtable.py` diff) and, after forwarding to the base, dispatches by `arg1->target->header` tag (0x1F34 / 0x2F230) to the class's own `Noop80`/`OnTag2Notify`. The dispatch mechanism is evident from the body; what the two tag values MEAN in-game is not.
+`Obj865C8__OnNotify` -- tier B. Overrides the base's +0x038 `IntermediateBase__OnNotify` slot (confirmed by `tools/classtable.py` diff) and, after forwarding to the base, dispatches by `arg1->target->header` tag (0x1F34 / 0x2F230) to the class's own `Noop80`/`OnTag2Notify`. The dispatch mechanism is evident from the body; what the two tag values MEAN in-game is not.

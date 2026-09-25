@@ -100,4 +100,4 @@ matches.
 
 ## Naming
 
-`Obj865C8__Deinit` -- tier B. Occupies +0x048, the mirror of Init's slot (`gIntermediateBaseMethods`'s +0x048 forwards to `Obj86B60__Deinit`). Undoes what Init configured on the sub-object and forwards to `Class86668__Deinit`; the same caveat as Init applies to its specific purpose here.
+`Obj865C8__Deinit` -- tier B. Occupies +0x048, the mirror of Init's slot (`gIntermediateBaseMethods`'s +0x048 forwards to `IntermediateBase__Deinit`). Undoes what Init configured on the sub-object and forwards to `Class86668__Deinit`; the same caveat as Init applies to its specific purpose here.

@@ -1,4 +1,6 @@
-# Obj86B60__NotifyTargetReset — MATCH (16/16 words, 2 attempts)
+# IntermediateBase__OnState2 — MATCH (16/16 words, 2 attempts)
+
+> Renamed from `Obj86B60__NotifyTargetReset` on 2026-09-25 (tools/rename.py). Address 0x8003e538.
 
 > Renamed from `func_8003E538` on 2026-09-19 (tools/rename.py). Address 0x8003e538.
 
@@ -8,7 +10,7 @@
 
 A shared "base-class" method, reached through `Obj86B60Methods::slot64`
 -- and, per `include/class_39e08.h`'s own note on an UNRELATED class
-(`Obj865C8Methods`/`Class86668Methods` both list `Obj86B60__NotifyTargetReset` at their
+(`Obj865C8Methods`/`Class86668Methods` both list `IntermediateBase__OnState2` at their
 own `+0x064`), this function is genuinely shared across multiple otherwise-
 unrelated classes at the same vtable slot, not something `Obj86B60`
 introduces itself.
@@ -20,7 +22,7 @@ header): `self->unkC->target->methods->slot48(target)`.
 ## The C
 
 ```c
-void Obj86B60__NotifyTargetReset(Obj86B60 *self)
+void IntermediateBase__OnState2(Obj86B60 *self)
 {
     Obj86B60UnkCTarget *target;
 
@@ -72,12 +74,16 @@ round 12 (2026-09-03), runner alpha, unit code_2cc8c_c. 2 attempts.
 
 ## Naming
 
-**Obj86B60__NotifyTargetReset** (renamed from `func_8003E538`, round 55,
+**IntermediateBase__OnState2** (renamed from `func_8003E538`, round 55,
 runner alpha). Tier B: `Obj86B60Methods::slot64` occupant (dispatched by
-`Obj86B60__NotifyParents` on mode 2). Mechanics fully known: zeroes
+`IntermediateBase__SetState` on mode 2). Mechanics fully known: zeroes
 `self->unk1C` (the frame counter) then forwards a notification to
 `self->initArgs->target` (the retained InitArgs' own target object,
 `Obj86B60UnkCTargetMethods::slot48`). The game-level MEANING of "target"
-and of mode 2 vs mode 3 (see `Obj86B60__NotifyChildReset`) is not
+and of mode 2 vs mode 3 (see `IntermediateBase__OnState3`) is not
 established, hence tier B; the name records the confirmed mechanic
 (reset the counter, then notify the target) rather than a guessed role.
+
+## Track 4 (2026-09-25, round 82, charlie)
+
+The class is IntermediateBase (class id 0x30, gIntermediateBaseMethods; `tools/classtable.py gIntermediateBaseMethods` lists this function as one of its own occupants), declared once in include/IntermediateBase.h. `self` is now `IntermediateBase *`, not TaskCore's `Obj86B60` view; byte-identical. Renamed from Obj86B60__NotifyTargetReset. It occupies +0x064, which IntermediateBase__SetState runs on state 2, so the slot is `onState2` and so is this occupant. "Target" was the Obj86B60UnkC view's name for initArgs +0x000, the same field IntermediateBase__OnState3 reaches (which was called "Child"): both clear frameCounter and call that object, this one at its +0x048. Tier B.

@@ -1,4 +1,6 @@
-# Obj86B60__OnNotify — MATCH (52/52 words)
+# IntermediateBase__OnNotify — MATCH (52/52 words)
+
+> Renamed from `Obj86B60__OnNotify` on 2026-09-25 (tools/rename.py). Address 0x8003e030.
 
 > Renamed from `func_8003E030` on 2026-09-19 (tools/rename.py). Address 0x8003e030.
 
@@ -15,13 +17,13 @@ for header values 1/2/5 respectively; any other value is a no-op.
 
 `gClass86B60Methods`'s own `+0x038` is this same function (verbatim inherit, no
 override) -- confirmed with `tools/classtable.py gClass86B60Methods`, which is also
-how `slot54`/`slot58`/`slot5C`'s occupants (`Obj86B60__OnTag1Notify`,
+how `slot54`/`slot58`/`slot5C`'s occupants (`IntermediateBase__OnTag1Notify`,
 `Obj86B60__OnTag2Notify`, `Obj86B60__OnTag5Notify`) were identified.
 
 ## The C
 
 ```c
-void Obj86B60__OnNotify(Obj86B60 *self, EventArg *arg1, s32 arg2)
+void IntermediateBase__OnNotify(Obj86B60 *self, EventArg *arg1, s32 arg2)
 {
     s32 header;
 
@@ -43,9 +45,9 @@ void Obj86B60__OnNotify(Obj86B60 *self, EventArg *arg1, s32 arg2)
   shape `include/class_39e08.h` independently derived (`arg1->target->header`).
   Only the one field each touches is modelled.
 - `Obj86B60Methods`: added `slot10` (BasicClass addChild, inherited,
-  `Obj86B60__Init`), `slot40` (`Obj86B60__ResetCounters`, `IntermediateBase__IntermediateBase`), `slot48`
-  (`Obj86B60__Deinit`, `Obj86B60__Init`), `slot4C` (external `TaskCoreObj__func_8003C238`,
-  `Obj86B60__Init`), `slot54` (`Obj86B60__OnTag1Notify`), `slot58` (external
+  `IntermediateBase__Init`), `slot40` (`IntermediateBase__ResetCounters`, `IntermediateBase__IntermediateBase`), `slot48`
+  (`IntermediateBase__Deinit`, `IntermediateBase__Init`), `slot4C` (external `TaskCoreObj__func_8003C238`,
+  `IntermediateBase__Init`), `slot54` (`IntermediateBase__OnTag1Notify`), `slot58` (external
   `Obj86B60__OnTag2Notify`, STALL in unit `code_2cc8c` -- its own report confirms
   signature `(Obj86B60 *, s32 a1, s32 a2)`; this call site's `a1` is
   genuinely `EventArg *`, an independent local view of the same shared
@@ -56,11 +58,11 @@ void Obj86B60__OnNotify(Obj86B60 *self, EventArg *arg1, s32 arg2)
 
 **One classtable dump resolved this function plus six more of this round's
 queue in one pass** -- `gIntermediateBaseMethods` (`tools/classtable.py gIntermediateBaseMethods`) is
-literally this unit's queue: `+0x008 IntermediateBase__IntermediateBase`, `+0x038 Obj86B60__OnNotify`,
-`+0x040 Obj86B60__ResetCounters` (already matched), `+0x044 Obj86B60__Init`,
-`+0x048 Obj86B60__Deinit`, `+0x054 Obj86B60__OnTag1Notify`, `+0x05C Obj86B60__IncrementFrameCounter`
-(already matched), `+0x060 Obj86B60__NotifyParents`, `+0x064 Obj86B60__NotifyTargetReset` (already
-matched), `+0x068 Obj86B60__NotifyChildReset`. Every one of this round's 12 fresh
+literally this unit's queue: `+0x008 IntermediateBase__IntermediateBase`, `+0x038 IntermediateBase__OnNotify`,
+`+0x040 IntermediateBase__ResetCounters` (already matched), `+0x044 IntermediateBase__Init`,
+`+0x048 IntermediateBase__Deinit`, `+0x054 IntermediateBase__OnTag1Notify`, `+0x05C IntermediateBase__IncrementFrameCounter`
+(already matched), `+0x060 IntermediateBase__SetState`, `+0x064 IntermediateBase__OnState2` (already
+matched), `+0x068 IntermediateBase__OnState3`. Every one of this round's 12 fresh
 functions except `New_Unk18Obj`/`Unk18Obj__Unk18Obj`/`Unk18Obj__Finalize`/
 `Unk18Obj__AddChild`/`Unk18Obj__RemoveChild` (a SECOND, unrelated shared table,
 `D_8006E8E4`, see `New_Unk18Obj.md`) is a slot of this one table.
@@ -85,7 +87,7 @@ build.
 
 ## Naming
 
-**Obj86B60__OnNotify** (renamed from `func_8003E030`, round 55, runner
+**IntermediateBase__OnNotify** (renamed from `func_8003E030`, round 55, runner
 alpha). Tier A: forwards to `Get_vtable_BasicClass()->slot38` first (that
 slot IS `BasicClass__OnNotify` per `include/code_2cc8c.h`'s own
 `BasicClassMethodsCC8C` struct, offset-verified against
@@ -109,3 +111,7 @@ confirmed. `Get_vtable_BasicClass()->slot38` is PROPOSED for rename to
   the field in `BasicClassMethodsCC8C`'s own definition,
   `include/code_2cc8c.h`, rebuild, fix the compiler-listed accessors in
   both `code_2cc8c_c.c` and `code_2cc8c_d.c`, oracle).
+
+## Track 4 (2026-09-25, round 82, charlie)
+
+The class is IntermediateBase (class id 0x30, gIntermediateBaseMethods; `tools/classtable.py gIntermediateBaseMethods` lists this function as one of its own occupants), declared once in include/IntermediateBase.h. `self` is now `IntermediateBase *`, not TaskCore's `Obj86B60` view; byte-identical. Renamed from Obj86B60__OnNotify (class prefix). Occupies +0x038 (BasicClass's onNotify). The argument called `EventArg *arg1` is the SENDER, a BasicClass: `arg1->target->header` was `sender->methods->header`, the class id word, so the parameter is `BasicClass *sender`. The three cases are the sender's root class nibble (typeviews.py --tree): 1 D_8006C070 -> onTag1Notify (+0x054), 2 gPadMethods -> onPadEvent (+0x058, NULL here), 5 D_8006EF50 -> update (+0x05C), the same split Class6B5CC's onNotify makes (include/Class6B5CC.h names its tag-2/5 slots onPadEvent/update).

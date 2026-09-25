@@ -8,7 +8,7 @@
 
 The `New_X` allocator for the class whose table is returned by
 `GetUnk18ObjMethods` (external, still-uncarved remainder of this segment): the
-same allocator `Obj86B60__Init` calls to fill `self->unk18` when no override
+same allocator `IntermediateBase__Init` calls to fill `self->unk18` when no override
 was supplied. Allocates a 0xBC-byte instance and, on success, runs the
 class's own constructor through the table's slot +0x008
 (`GetUnk18ObjMethods()->ctor(self)`), returning the new instance; returns `NULL`
@@ -19,7 +19,7 @@ D_8006E8E4`, 45 slots) is the table `GetUnk18ObjMethods` returns and this
 function constructs an instance of, and it accounts for the rest of this
 round's queue (`Unk18Obj__Unk18Obj`/`Unk18Obj__Finalize`/`Unk18Obj__AddChild`/
 `Unk18Obj__RemoveChild` = its own slots `+0x008`/`+0x00C`/`+0x010`/`+0x014`) --
-`gIntermediateBaseMethods` (see `Obj86B60__OnNotify.md`) explained everything else.
+`gIntermediateBaseMethods` (see `IntermediateBase__OnNotify.md`) explained everything else.
 
 ## The C
 

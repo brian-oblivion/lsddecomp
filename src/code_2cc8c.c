@@ -34,7 +34,7 @@
  * overrides SetState/Tick/RefreshViewValue; see the header's own top
  * comment for the round-78 correction and the evidence). The first two
  * functions (`Obj86B60__OnTag2Notify`/`Obj86B60__OnTag5Notify`) are
- * `EventArg`-tag dispatchers reached from `Obj86B60__OnNotify`
+ * `EventArg`-tag dispatchers reached from `IntermediateBase__OnNotify`
  * (code_2cc8c_c.c); the five `Obj86B60__func_8003Cxxx` handlers they
  * dispatch to are undifferentiated leaf state-transition helpers (tier C --
  * see each one's own match report); `Obj86B60__SetState` is the base
@@ -88,7 +88,7 @@ void Obj86B60__OnTag5Notify(Obj86B60 *self, s32 a1, s32 a2)
     Obj86B60Methods *methods;
 
     methods = self->methods;
-    Get_vtable_IntermediateBase()->slot5C(self, a1, a2);
+    Get_vtable_IntermediateBase()->update((IntermediateBase *)self, (BasicClass *)a1, a2);
     if (self->unk3C != 0) {
         u32 bound;
 
@@ -118,7 +118,7 @@ void Obj86B60__SetState(Obj86B60 *self, s32 a1)
     Obj86B60Methods *methods;
 
     methods = self->methods;
-    Get_vtable_IntermediateBase()->slot60(self, a1);
+    Get_vtable_IntermediateBase()->setState((IntermediateBase *)self, a1);
     switch (a1) {
     case 5:
         methods->slotE4(self, self->target->unselectedColor);

@@ -184,7 +184,7 @@ double-branch tail, or vice versa:
 
 - `Class86668Methods::slot54` added — inherited, shared verbatim with
   `D_800865C8`'s own occupant of this slot (this function itself); the
-  sibling's own occupant is `Obj86B60__OnTag1Notify`, out of this unit's scope.
+  sibling's own occupant is `IntermediateBase__OnTag1Notify`, out of this unit's scope.
 - `SubObjDMethods` extended with `slot1B4` (`s32 (*)(SubObjD *self)`,
   return value used — genuinely non-void) and `slot1B8` (`void (*)(SubObjD
   *self, s32 arg1)`), and `slot1E0` (`s32 (*)(SubObjD *self)`, return value
@@ -222,4 +222,4 @@ the visible cases is itself informative about a missing empty case.
 
 ## Naming
 
-`Obj865C8__AdvanceState` -- tier B. Occupies +0x054, `Obj86B60__OnTag1Notify`'s slot in the base -- the state machine's main per-tag transition function (cases on `state` 1/2/3, transitioning via `Obj865C8__EnterState2`). The state machine's shape is clear from the body; what each state represents in-game is not.
+`Obj865C8__AdvanceState` -- tier B. Occupies +0x054, `IntermediateBase__OnTag1Notify`'s slot in the base -- the state machine's main per-tag transition function (cases on `state` 1/2/3, transitioning via `Obj865C8__EnterState2`). The state machine's shape is clear from the body; what each state represents in-game is not.

@@ -60,10 +60,10 @@ before the byte-level score did.
 - `Unk18ObjMethods`: added `slot40` -- a DIFFERENT function from
   `Obj86B60Methods::slot40` despite the identical offset; `D_8006E8E4`'s own
   `+0x040` occupant is `Unk18Obj__InitDefaults` (per `tools/classtable.py
-  D_8006E8E4`), not `Obj86B60__ResetCounters`. Two unrelated tables, same offset,
+  D_8006E8E4`), not `IntermediateBase__ResetCounters`. Two unrelated tables, same offset,
   different occupants -- ordinary vtable-layout coincidence, not evidence
   of a shared ancestor at this slot (contrast with the GENUINELY shared
-  slots this unit has documented elsewhere, e.g. `Obj86B60__NotifyTargetReset`).
+  slots this unit has documented elsewhere, e.g. `IntermediateBase__OnState2`).
 - New type `SubHandleObj`/`SubHandleObjMethods` (`slot4C`) -- this unit's own
   local view of `include/Entity.h`'s `Unk100Obj`/`New_Class6E99C`, per this
   project's independent-local-views convention.

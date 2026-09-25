@@ -271,7 +271,7 @@ Obj865C8 *New_Class86668(s32 arg1, SubObjB *arg2)
 }
 
 void Class86668__Class86668(Obj865C8 *self, s32 arg1, SubObjB *arg2) {
-    Get_vtable_IntermediateBase()->ctor(self);
+    Get_vtable_IntermediateBase()->ctor((IntermediateBase *)self);
     self->methods = (Class865C8Methods *)GetClass86668Methods();
     if (arg1 != 0) {
         self->subB = New_VabStreamObj(arg1);
@@ -286,7 +286,7 @@ void Class86668__Dtor(Obj865C8 *self) {
     if (self->unk30 != 0) {
         self->subB->methods->slot4(self->subB);
     }
-    Get_vtable_IntermediateBase()->dtor(self);
+    Get_vtable_IntermediateBase()->finalize((IntermediateBase *)self);
 }
 
 void Class86668__CancelTimeout(Obj865C8 *self) {
@@ -295,26 +295,26 @@ void Class86668__CancelTimeout(Obj865C8 *self) {
 
 s32 Class86668__Init(Obj865C8 *self, s32 arg1, s32 arg2) {
     self->eventCode = 0;
-    Get_vtable_IntermediateBase()->slot44(self, arg1, arg2);
+    Get_vtable_IntermediateBase()->init((IntermediateBase *)self, (IntermediateBaseInitArgs *)arg1, arg2);
     return self->eventCode;
 }
 
 void Class86668__Deinit(Obj865C8 *self) {
-    Get_vtable_IntermediateBase()->slot48(self);
+    Get_vtable_IntermediateBase()->deinit((IntermediateBase *)self);
 }
 
 void Class86668__Noop58(void) {
 }
 
 void Class86668__CheckTimeout(Obj865C8 *self, s32 arg1, s32 arg2) {
-    Get_vtable_IntermediateBase()->slot5C(self, arg1, arg2);
+    Get_vtable_IntermediateBase()->update((IntermediateBase *)self, (BasicClass *)arg1, arg2);
     if ((u32)self->frameCounter > (u32)self->timeoutFrames) {
         self->methods->onEventArg(self, 4);
     }
 }
 
 void Class86668__OnEventArg(Obj865C8 *self, s32 arg1) {
-    Get_vtable_IntermediateBase()->slot60(self, arg1);
+    Get_vtable_IntermediateBase()->setState((IntermediateBase *)self, arg1);
     if (arg1 == 4) {
         self->eventCode = 1;
         self->methods->noop7C(self);
