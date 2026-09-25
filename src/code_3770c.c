@@ -92,7 +92,9 @@ void func_80047890(CdStreamObj *self) {
 void func_800478B0(CdStreamObj *self) {
     StClearRing();
 }
-INCLUDE_ASM("asm/nonmatchings/code_3770c", func_800478D0);
+int func_800478D0(CdStreamObj *self, int mode) {
+    return CdSync(mode, self->cdResult);
+}
 void func_800478F8(CdStreamObj *self) {
 }
 CdStreamObjMethods *func_80047900(void) {
