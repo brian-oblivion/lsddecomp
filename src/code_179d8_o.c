@@ -63,8 +63,8 @@
  */
 #include "common.h"
 
-typedef struct Obj6D4E8Methods Obj6D4E8Methods;
-struct Obj6D4E8Methods {
+typedef struct Class6D4E8Methods Class6D4E8Methods;
+struct Class6D4E8Methods {
     s32 header;                    /* +0x000, not a pointer -- 0x13 (DATASOURCE_CD in code_171e0.c) for D_8006D4E8 */
     void *ownDtorChain;            /* +0x004, DestroyChained -- unused by this unit's own functions */
     void (*ctor)(void *self);      /* +0x008, Class6D4E8__Class6D4E8 (classtable.py; BasicClass__BasicClass
@@ -82,21 +82,22 @@ struct Obj6D4E8Methods {
 };
 
 typedef struct {
-    Obj6D4E8Methods *methods;      /* +0x000, set by the constructor to this class's own table
+    Class6D4E8Methods *methods;      /* +0x000, set by the constructor to this class's own table
                                      * (GetClass6D4E8Methods()'s return value) -- the table-pointer-at-offset-0
                                      * convention CLAUDE.md documents for this project's class framework */
     u8 pad004[0x028 - 0x004];
-    s16 unk28;                     /* +0x028, cleared by the constructor (a halfword store, `sh`) */
-} Obj6D4E8;
+    s16 unk28;                     /* +0x028, cleared by the constructor (a halfword store, `sh`); Class6D430's
+                                     * own ctor already clears it too (code_171e0.h: u16 unk28). No reader
+                                     * in this unit, so no name. */
+} Class6D4E8;
 
-/* A further-base class's ctor-dispatch table, shape confirmed only for the
- * one slot this unit's constructor uses -- same "ctor at +0x008" convention
- * as Obj6D4E8Methods above, mirroring class_3ac78.c's own local
- * BaseCtorTable_3ac78 for the identical "further-base ctor first" idiom. */
+/* The parent class's table (D_8006D430, Class6D430Methods in
+ * include/code_171e0.h), viewed only down to the one slot this unit's
+ * constructor uses: +0x008 is Class6D430__Class6D430. */
 typedef struct {
     u8 pad0[0x008];
     void (*ctor)(void *self);      /* +0x008 */
-} BaseCtorTable6D4E8;
+} Class6D430CtorView;
 
 extern void *BMemPMgrAlloc(s32 size);              /* Psy-Q allocator, matched signature used project-wide */
 /* ROUND 59 (extern review): parameter list only, return type untouched. This
@@ -107,15 +108,13 @@ extern void *BMemPMgrAlloc(s32 size);              /* Psy-Q allocator, matched s
  * delay slot -- a callee-save spill, not argument setup -- so the `self`
  * passed below costs zero bytes and the one-parameter prototype was simply
  * false. Unspecified parameters keep Class6D4E8__Class6D4E8's call site untouched. */
-extern BaseCtorTable6D4E8 *GetClass6D430Methods();
-extern Obj6D4E8Methods *GetClass6D4E8Methods(void);        /* still INCLUDE_ASM in the code_179d8 remainder;
-                                                       returns this class's own table, &D_8006D4E8 */
-extern void InitCdDrive(void);                    /* still INCLUDE_ASM in the code_179d8 remainder;
-                                                       confirmed zero-argument the same way slot74 is above */
+extern Class6D430CtorView *GetClass6D430Methods();
+extern Class6D4E8Methods *GetClass6D4E8Methods(void); /* code_179d8_q: returns &D_8006D4E8, this class's table */
+extern void InitCdDrive(void);                        /* code_179d8_q: one-shot CdSetDebug(0) + CdlSetmode double speed */
 
-Obj6D4E8 *New_Class6D4E8(void)
+Class6D4E8 *New_Class6D4E8(void)
 {
-    Obj6D4E8 *self;
+    Class6D4E8 *self;
 
     self = BMemPMgrAlloc(0x2C);
     if (self != NULL) {
@@ -125,7 +124,7 @@ Obj6D4E8 *New_Class6D4E8(void)
     return NULL;
 }
 
-void Class6D4E8__Class6D4E8(Obj6D4E8 *self)
+void Class6D4E8__Class6D4E8(Class6D4E8 *self)
 {
     GetClass6D430Methods(self)->ctor(self);
     self->methods = GetClass6D4E8Methods();
@@ -133,7 +132,7 @@ void Class6D4E8__Class6D4E8(Obj6D4E8 *self)
     InitCdDrive();
 }
 
-void Class6D4E8__Destroy(Obj6D4E8 *self)
+void Class6D4E8__Destroy(Class6D4E8 *self)
 {
     self->methods->cancelRequests(self);
     self->methods->freeBuffer(self);
