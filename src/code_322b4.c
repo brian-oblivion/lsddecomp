@@ -27,7 +27,7 @@ typedef struct D_8006EF50Obj {
     s32 unkC;  /* +0x00C, read by func_8004264C */
     s32 unk10; /* +0x010, set to 1 by func_80042658, cleared by func_80042664, read by func_8004266C */
     s32 unk14; /* +0x014, set to 1 by func_80042678, cleared by func_800425D8 */
-    BasicClassListNode *unk18; /* +0x018, cleared by func_800425D8; a parentRefs cursor func_800424E0 steps past a removed parent */
+    BasicClassListNode *unk18; /* +0x018, cleared by func_800425D8; a parentRefs cursor D8006EF50__RemoveParentRef steps past a removed parent */
 } D_8006EF50Obj;
 struct D_8006EF50Methods {
     u8 pad00[0x30];
@@ -439,7 +439,7 @@ void D8006EF50__Finalize(BasicClass *self) {
 }
 /* D_8006EF50 slot +0x024 (removeParentRef): step the cursor past the parent
  * being removed, then the BasicClass removeParentRef. */
-void func_800424E0(D_8006EF50Obj *self, BasicClass *parent) {
+void D8006EF50__RemoveParentRef(D_8006EF50Obj *self, BasicClass *parent) {
     if (self->unk18 != NULL && parent == self->unk18->value) {
         self->unk18 = self->unk18->next;
     }

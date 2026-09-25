@@ -1,4 +1,6 @@
-# func_800424E0 -- MATCHED (28/28 words), round 82
+# D8006EF50__RemoveParentRef -- MATCHED (28/28 words), round 82
+
+> Renamed from `func_800424E0` on 2026-09-25 (tools/rename.py). Address 0x800424e0.
 
 Round 82, runner alpha (fourth slot on code_322b4). Unit `src/code_322b4.c`. Fresh ground, no prior attempt.
 
@@ -10,7 +12,7 @@ Round 82, runner alpha (fourth slot on code_322b4). Unit `src/code_322b4.c`. Fre
 ## Source
 
 ```c
-void func_800424E0(D_8006EF50Obj *self, BasicClass *parent) {
+void D8006EF50__RemoveParentRef(D_8006EF50Obj *self, BasicClass *parent) {
     if (self->unk18 != NULL && parent == self->unk18->value) {
         self->unk18 = self->unk18->next;
     }
