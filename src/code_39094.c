@@ -63,7 +63,11 @@ void func_80048A68(D_80081940Obj *self) {
     self->unk2A = 0;
 }
 INCLUDE_ASM("asm/nonmatchings/code_39094", func_80048AAC);
-INCLUDE_ASM("asm/nonmatchings/code_39094", func_80048B78);
+void func_80048B78(D_80081940Obj *self) {
+    self->methods->freeBuffer(self);
+    self->unk2C = 0;
+    self->unk30 = -1;
+}
 INCLUDE_ASM("asm/nonmatchings/code_39094", func_80048BC0);
 /* slot +0x084 of D_80081940 */
 void func_80048C98(D_80081940Obj *self) {
