@@ -137,7 +137,13 @@ u8 func_80041C28(D_8006EC74Obj *self) {
 void *func_80041C3C(void) {
     return D_8006EC74;
 }
-INCLUDE_ASM("asm/nonmatchings/code_322b4", func_80041C4C);
+/* Cell index -> 8x8 rect in a 32-wide grid, offset from D_8006ED40. */
+void func_80041C4C(CellRect_322b4 *dst, u32 cell) {
+    *dst = D_8006ED40;
+    cell &= 0xFF;
+    dst->u += (cell & 0x1F) * 8;
+    dst->v += (cell >> 5) * 8;
+}
 INCLUDE_ASM("asm/nonmatchings/code_322b4", func_80041C9C);
 INCLUDE_ASM("asm/nonmatchings/code_322b4", func_80041D18);
 /* D_8006ED4C slot +0x040 (reset): empty override. */
