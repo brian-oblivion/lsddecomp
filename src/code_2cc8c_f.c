@@ -20,6 +20,7 @@
  */
 #include "common.h"
 #include "code_2cc8c.h"
+#include "CharSprite.h"
 
 void BoxFill__AttachToParent(BoxFill *self, Class6B5CC *parent, Pair32E99C *pos) {
     if (self->parent == NULL) {
@@ -118,7 +119,7 @@ void Obj6EAC0__Construct(Obj6EAC0 *self, s32 a1, s32 a2, s32 a3) {
     s32 i;
     Obj6EAC0 **cursor;
 
-    ((void (*)(Obj6EAC0 *, s32, s32))GetCharSpriteMethods()->slot08)(self, a1, 0x20);
+    GetCharSpriteMethods()->ctor((CharSprite *)self, (void *)a1, 0x20);
     self->methods = Obj6EAC0__GetDerivedMethods();
     self->totalChildCount = a2;
     self->childCount = a2;
@@ -130,7 +131,7 @@ void Obj6EAC0__Construct(Obj6EAC0 *self, s32 a1, s32 a2, s32 a3) {
         i = 0;
         if (i < a2) {
             do {
-                *cursor = New_CharSprite(a1, 0x20);
+                *cursor = (Obj6EAC0 *)New_CharSprite((void *)a1, 0x20);
                 i++;
                 cursor++;
             } while (i < a2);
@@ -142,7 +143,7 @@ void Obj6EAC0__Construct(Obj6EAC0 *self, s32 a1, s32 a2, s32 a3) {
 void Obj6EAC0__Destruct(Obj6EAC0 *self) {
     ReleaseBasicClassArray(self->children, self->totalChildCount);
     self->children = BMemPMgrFree(self->children);
-    GetCharSpriteMethods()->slot0C(self);
+    GetCharSpriteMethods()->finalize((CharSprite *)self);
 }
 
 void Obj6EAC0__FinishConstruct(Obj6EAC0 *self, s32 a1) {
@@ -158,7 +159,7 @@ void Obj6EAC0__LayoutChildrenWithGap(Obj6EAC0 *self, s32 a1, Pair32E99C *a2) {
     if (self->hasChildren != 0) {
         return;
     }
-    GetCharSpriteMethods()->slot4C(self, a1, a2);
+    GetCharSpriteMethods()->attachToParent((CharSprite *)self, (Class6B5CC *)a1, (Vec3_d294 *)a2);
     buf = *a2;
     elemp = self->children + self->childStart;
     i = self->childStart;
@@ -195,7 +196,7 @@ void func_80040C00(Obj6EAC0 *self) {
                 } while (i < bound + self->childCount);
             }
         }
-        GetCharSpriteMethods()->slot50(self);
+        GetCharSpriteMethods()->detachFromParent((CharSprite *)self);
     }
 }
 
@@ -242,7 +243,7 @@ void Obj6EAC0__LayoutChildren(Obj6EAC0 *self, Pair32E99C *a1) {
         s32 bound;
         Obj6EAC0 **elemp;
 
-        GetCharSpriteMethods()->slotBC(self, a1);
+        GetCharSpriteMethods()->setPosition((CharSprite *)self, (ScreenSpritePos *)a1);
         buf = *a1;
         i = 0;
         elemp = self->children;

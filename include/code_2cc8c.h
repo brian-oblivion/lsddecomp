@@ -560,24 +560,9 @@ extern u32 GetSetBitField(u32 *word, s32 shift, s32 width, u32 value);
 extern Obj6EAC0Methods D_8006EB90; /* the override table itself, so
                                        Obj6EAC0__GetDerivedMethods's own definition
                                        (this unit) can return &D_8006EB90 */
-extern Obj6EAC0Methods *GetCharSpriteMethods(void); /* returns &gCharSpriteMethods, a
-                                       third sibling table sharing this
-                                       layout; external to this unit
-                                       (asm/psyq_memset.s @ 0x80041C3C,
-                                       almost certainly misclassified
-                                       game code rather than real SDK --
-                                       see the open question in
-                                       DECOMPILATION_LEARNINGS about the
-                                       psyq_memset boundary) */
-
-extern Obj6EAC0 *New_CharSprite(s32 a1, s32 a2); /* another New_X-shaped
-                                       allocator over this same class
-                                       family (0xAC bytes, ctor via
-                                       GetCharSpriteMethods()->slot08, "return-
-                                       regardless" variant); external to
-                                       this unit (asm/psyq_memset.s @
-                                       0x80041AB4); OBSERVED:
-                                       Obj6EAC0__Construct */
+/* GetCharSpriteMethods, New_CharSprite and their table: include/CharSprite.h
+ * (track 4, round 86), included by code_2cc8c_f, the one unit that calls
+ * them. */
 
 /*
  * MEASURED elsewhere (round 9, include/class_3bb8c.h / src/class_3ac78.c):
