@@ -19,6 +19,10 @@ ground (carved in FINISHING-PLAN revision 18), no prior attempt.
 ```c
 /* D_8006EF50 slot +0x04C. */
 void D8006EF50__SetFlag10(D_8006EF50Obj *self) {
-    self->unk10 = 1;
+    self->flag10 = 1;
 }
 ```
+
+## Naming
+
+- `D8006EF50__SetFlag10` -- tier A. Slot +0x04C: sets flag10 = 1. Pure setter.

@@ -21,3 +21,7 @@ ground (carved in FINISHING-PLAN revision 18), no prior attempt.
 void D8006ED4C__Reset(Class6B5CC *self) {
 }
 ```
+
+## Naming
+
+- `D8006ED4C__Reset` -- tier A. Reset override (slot +0x040): empty body. A pure leaf whose mechanics (do nothing) ARE its purpose.

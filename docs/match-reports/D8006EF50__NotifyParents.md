@@ -22,14 +22,18 @@ Retail has ONE `jal GetNextBasicClass` site, entered by a `j` to the bottom of t
 void D8006EF50__NotifyParents(D_8006EF50Obj *self, s32 event) {
     BasicClass *parent;
 
-    self->unk18 = self->parentRefs;
-    for (GetNextBasicClass(&parent, &self->unk18); parent != NULL; GetNextBasicClass(&parent, &self->unk18)) {
+    self->parentCursor = self->parentRefs;
+    for (GetNextBasicClass(&parent, &self->parentCursor); parent != NULL; GetNextBasicClass(&parent, &self->parentCursor)) {
         parent->methods->onNotify(parent, self, event);
     }
-    self->unk18 = NULL;
+    self->parentCursor = NULL;
 }
 ```
 
 ### Proposed learning
 
 A loop whose only call site sits at the bottom, reached by an entry `j` (`j L; ... L: jal f; ...; bnez body`), where `f` is also the loop's first action, is `for (f(); cond; f())` with the call written twice: cross-jumping merges the copies. The comma-expression `while (f(), cond)` gives a top exit test and is shorter.
+
+## Naming
+
+- `D8006EF50__NotifyParents` -- tier A. Slot +0x030: walks parentRefs via parentCursor and calls each parent's onNotify with the event. Matches the struct field's existing name `notifyParents`.

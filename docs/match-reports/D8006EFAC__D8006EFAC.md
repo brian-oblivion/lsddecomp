@@ -35,3 +35,7 @@ void D8006EFAC__D8006EFAC(D_8006EFACObj *self) {
 ### Proposed learning
 
 With a counter and a pointer walking together, the order of the comma operands in BOTH the for-init and the for-increment is visible in the schedule: init order decides which of the two setup instructions lands in the preceding call's delay slot, and increment order decides whether the counter bump is scheduled before the store or after the method-pointer load.
+
+## Naming
+
+- `D8006EFAC__D8006EFAC` -- tier A. Ctor (slot +0x008): the Class6B5CC ctor, installs the table, creates and adds three FlatLightObj children (round-82 broadcast: "holds three FlatLightObj children"), then resets.

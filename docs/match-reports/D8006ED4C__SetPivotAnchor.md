@@ -37,3 +37,7 @@ void D8006ED4C__SetPivotAnchor(Sprite *self, u32 anchor) {
     }
 }
 ```
+
+## Naming
+
+- `D8006ED4C__SetPivotAnchor` -- tier A. New slot +0x0C0: when attached, moves the embedded GsSPRITE's pivot (mx/my) per a 0..4 anchor code (centre/left/right/top/bottom) -- matches the round-82 broadcast note "pivot setter at +0x0C0" and the round-82 header comment. A plain switch whose mechanics are its purpose.

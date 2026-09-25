@@ -17,3 +17,7 @@ void *Get_vtable_D8006EC74(void) {
     return D_8006EC74;
 }
 ```
+
+## Naming
+
+- `Get_vtable_D8006EC74` -- tier A. Table getter ("return D_8006EC74;"), the Get_vtable_<Class> convention already used for anonymous classes (Get_vtable_BasicClass, Get_vtable_Pad, Get_vtable_Entity).

@@ -17,3 +17,7 @@ void *Get_vtable_D8006EED8(void) {
     return D_8006EED8;
 }
 ```
+
+## Naming
+
+- `Get_vtable_D8006EED8` -- tier A. Table getter ("return D_8006EED8;").

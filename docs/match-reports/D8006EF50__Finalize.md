@@ -17,3 +17,7 @@ void D8006EF50__Finalize(BasicClass *self) {
     Get_vtable_BasicClass()->finalize(self);
 }
 ```
+
+## Naming
+
+- `D8006EF50__Finalize` -- tier A. Finalize (slot +0x00C): the BasicClass finalize, no local state to release.

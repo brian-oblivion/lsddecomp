@@ -20,10 +20,14 @@ The frame comes from an UNUSED local `u8 pad[16];`. Measured: deleting that line
 u8 D8006EC74__GetCell(D_8006EC74Obj *self) {
     u8 pad[16]; /* unused: it is what gives retail its 0x10-byte frame */
 
-    return self->unkA8;
+    return self->cellIndex;
 }
 ```
 
 ### Proposed learning
 
 `addiu $sp,-0x10` ... `addiu $sp,+0x10` around a leaf body with no stack access at all is an unused local array (`u8 pad[16];`): GCC 2.6.3 -O2 still reserves its frame. Measured both ways here.
+
+## Naming
+
+- `D8006EC74__GetCell` -- tier A. Slot +0x0C8: returns the stored cell index (self->cellIndex). Pure getter.

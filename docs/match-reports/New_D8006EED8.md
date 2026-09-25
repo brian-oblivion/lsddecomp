@@ -28,3 +28,7 @@ void *New_D8006EED8(s32 arg) {
     return NULL;
 }
 ```
+
+## Naming
+
+- `New_D8006EED8` -- tier A. Allocator: BMemPMgrAlloc(0x30) then the ctor slot.

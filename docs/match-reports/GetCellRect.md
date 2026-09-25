@@ -32,3 +32,7 @@ Retail `andi a1,a1,0xFF` emitted mid-body (after unrelated work), followed by `s
 ## Track 4 (2026-09-25, round 82, alpha)
 
 `CellRect_322b4` became `SpriteRect` (include/Sprite.h), the Sprite class's texture-cell type; D_8006ED40 is declared `SpriteRect`. The the class is unified as `Sprite` in `include/Sprite.h` (the base sprite class, id 0x44, table `gSpriteMethods`, formerly `D_8006EE1C`); the Source block above is the unified spelling, byte-identical (whole image green, 0 new `-Wall` warnings).
+
+## Naming
+
+- `GetCellRect` -- tier A. Free function: cell index -> 8x8 rect in a 32-wide grid, offset from the D_8006ED40 origin table. Pure computation, called by both D8006EC74__D8006EC74 (fixed cell) and D8006EC74__SetCell (caller's cell); not a method of one class.

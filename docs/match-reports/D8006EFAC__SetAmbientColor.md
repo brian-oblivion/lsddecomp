@@ -27,3 +27,7 @@ void D8006EFAC__SetAmbientColor(D_8006EFACObj *self, SpriteRgb *rgb, s32 swap) {
     GsSetAmbient((u8)self->ambient.r << 4, (u8)self->ambient.g << 4, (u8)self->ambient.b << 4);
 }
 ```
+
+## Naming
+
+- `D8006EFAC__SetAmbientColor` -- tier A. Slot +0x0BC: sets the ambient colour (optionally swapping the previous one out to the caller) and forwards it to GsSetAmbient. Round-82 broadcast: "GsSetAmbient" evidence.

@@ -22,3 +22,7 @@ void D8006EFAC__Reset(Class6B5CC *self) {
     self->coord2->flg = 0;
 }
 ```
+
+## Naming
+
+- `D8006EFAC__Reset` -- tier A. Reset override (slot +0x040): marks the Class6B5CC coordinate dirty (coord2->flg = 0, include/Class6B5CC.h's documented "0 = recompute").

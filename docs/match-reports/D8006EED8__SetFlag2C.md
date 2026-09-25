@@ -19,6 +19,10 @@ ground (carved in FINISHING-PLAN revision 18), no prior attempt.
 ```c
 /* D_8006EED8 slot +0x064. */
 void D8006EED8__SetFlag2C(D_8006EED8Obj *self) {
-    self->unk2C = 1;
+    self->flag2C = 1;
 }
 ```
+
+## Naming
+
+- `D8006EED8__SetFlag2C` -- tier A. Slot +0x064: sets flag2C = 1. A pure setter; the deeper game meaning of flag2C is not established (kept as flagNN rather than invented), but the setter's own mechanics ARE its purpose.

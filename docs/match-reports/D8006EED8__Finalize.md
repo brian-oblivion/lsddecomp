@@ -14,7 +14,11 @@ Round 82, runner alpha (third re-staffed slot of the round). Unit `src/code_322b
 ```c
 /* D_8006EED8 slot +0x00C (finalize): clear +0x2C, then the base finalize. */
 void D8006EED8__Finalize(D_8006EED8Obj *self) {
-    self->unk2C = 0;
+    self->flag2C = 0;
     GetActiveDataSourceMethods()->slot0C(self);
 }
 ```
+
+## Naming
+
+- `D8006EED8__Finalize` -- tier A. Finalize (slot +0x00C): clears flag2C then calls the base (GetActiveDataSourceMethods) finalize.

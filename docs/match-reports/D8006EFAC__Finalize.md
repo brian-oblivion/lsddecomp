@@ -25,3 +25,7 @@ void D8006EFAC__Finalize(D_8006EFACObj *self) {
     GetClass6B5CCMethods()->finalize((Class6B5CC *)self);
 }
 ```
+
+## Naming
+
+- `D8006EFAC__Finalize` -- tier A. Finalize (slot +0x00C): releases the three light children then calls the Class6B5CC finalize.

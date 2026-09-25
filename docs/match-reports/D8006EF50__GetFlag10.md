@@ -19,6 +19,10 @@ ground (carved in FINISHING-PLAN revision 18), no prior attempt.
 ```c
 /* D_8006EF50 slot +0x054. */
 s32 D8006EF50__GetFlag10(D_8006EF50Obj *self) {
-    return self->unk10;
+    return self->flag10;
 }
 ```
+
+## Naming
+
+- `D8006EF50__GetFlag10` -- tier A. Slot +0x054: returns flag10. Pure getter.

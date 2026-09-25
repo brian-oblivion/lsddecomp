@@ -28,3 +28,7 @@ void *New_D8006ED4C(void *a1, void *a2, void *a3) {
     return NULL;
 }
 ```
+
+## Naming
+
+- `New_D8006ED4C` -- tier A. Allocator: BMemPMgrAlloc(0xA8) then the ctor slot. Same New_<Class> convention.

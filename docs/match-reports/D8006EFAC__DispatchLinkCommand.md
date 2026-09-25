@@ -21,3 +21,7 @@ ground (carved in FINISHING-PLAN revision 18), no prior attempt.
 void D8006EFAC__DispatchLinkCommand(Class6B5CC *self, void *sender, s32 event) {
 }
 ```
+
+## Naming
+
+- `D8006EFAC__DispatchLinkCommand` -- tier A. Override of Class6B5CC's dispatchLinkCommand (slot +0x09C): empty body.

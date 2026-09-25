@@ -19,6 +19,10 @@ ground (carved in FINISHING-PLAN revision 18), no prior attempt.
 ```c
 /* D_8006EF50 slot +0x048. */
 s32 D8006EF50__GetCount(D_8006EF50Obj *self) {
-    return self->unkC;
+    return self->count;
 }
 ```
+
+## Naming
+
+- `D8006EF50__GetCount` -- tier A. Slot +0x048: returns count. Pure getter.

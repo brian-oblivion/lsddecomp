@@ -23,3 +23,7 @@ void *New_D8006EFAC(void) {
     return NULL;
 }
 ```
+
+## Naming
+
+- `New_D8006EFAC` -- tier A. Allocator: BMemPMgrAlloc(0x54) then the ctor slot.

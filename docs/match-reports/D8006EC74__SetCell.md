@@ -16,7 +16,7 @@ Round 82, runner alpha (third re-staffed slot of the round). Unit `src/code_322b
 void D8006EC74__SetCell(SpriteView_322b4 *self, u8 cell) {
     SpriteRect r;
 
-    self->unkA8 = cell;
+    self->cellIndex = cell;
     GetCellRect(&r, cell);
     self->u = r.u;
     self->v = r.v;
@@ -26,3 +26,7 @@ void D8006EC74__SetCell(SpriteView_322b4 *self, u8 cell) {
 ## Track 4 (2026-09-25, round 82, alpha)
 
 `CellRect_322b4` became `SpriteRect` (include/Sprite.h): the same 12-byte {u16 u, v; s32 w, h} cell Sprite__Reset copies into Sprite.rect. This function belongs to D_8006EC74 (a Sprite subclass) and keeps its unit-local `SpriteView_322b4` self type. The the class is unified as `Sprite` in `include/Sprite.h` (the base sprite class, id 0x44, table `gSpriteMethods`, formerly `D_8006EE1C`); the Source block above is the unified spelling, byte-identical (whole image green, 0 new `-Wall` warnings).
+
+## Naming
+
+- `D8006EC74__SetCell` -- tier A. Slot +0x0C4: stores the cell index and derives u,v from GetCellRect. Pure setter, mechanics is the purpose.

@@ -17,3 +17,7 @@ void D8006EC74__Reset(SpriteView_322b4 *self, u8 cell) {
     self->methods->setCell(self, cell);
 }
 ```
+
+## Naming
+
+- `D8006EC74__Reset` -- tier A. Reset override (slot +0x040): forwards to the class's own setCell slot with the caller's cell. Pure leaf, mechanics is the purpose.
