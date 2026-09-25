@@ -40,7 +40,11 @@ INCLUDE_ASM("asm/nonmatchings/code_33808", func_80043B3C);
 INCLUDE_ASM("asm/nonmatchings/code_33808", func_80043B58);
 void func_80043B70(void) {
 }
-INCLUDE_ASM("asm/nonmatchings/code_33808", func_80043B78);
+extern s32 D_8006F13C[];
+
+void *func_80043B78(void) {
+    return D_8006F13C;
+}
 INCLUDE_ASM("asm/nonmatchings/code_33808", func_80043B88);
 INCLUDE_ASM("asm/nonmatchings/code_33808", func_80043BE8);
 INCLUDE_ASM("asm/nonmatchings/code_33808", func_80043C60);
