@@ -666,6 +666,9 @@ void func_80043F78(Class6D430 *self) {
 u8 func_80043FB0(DataSrc33808 *self, s32 arg1, s32 arg2) {
     return self->methods->slot7C(self, arg1, arg2, (u8 *)self->buffer + 8);
 }
+/* Defined below (ROM order); called directly here, not through slot +0x080. */
+u32 *func_8004416C(DataSrc33808 *self, u32 *acc, u8 *out0, u8 *out1, u8 *out2, u8 *out3);
+
 /* D_8006F240/D_8006F590 +0x07C: walk the packet words after the u16 count
  * at data +2 (from data +8), each decoded by +0x080 into a value, a type, a
  * sub-type and a length in words. Type 8 sub-type 0 appends the value to
