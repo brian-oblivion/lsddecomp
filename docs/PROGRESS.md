@@ -6,6 +6,64 @@ stale, prose elsewhere is not.
 
 ---
 
+## 2026-09-25 — round 85: track 4b opened (premium head), three classes unified
+
+Premium head (Opus 5.5; the operator started it as premium), operator cap 5.
+`plan.py` listed one runner job at a time (track 4's top class) plus the
+premium 4b job, so the head ran the class sequence with one Opus types runner
+each (alpha, bravo, charlie; merged, sampled and `mark-class`ed before the next)
+and did 4b itself in its own worktree. Every merge: `make extract`, oracle,
+`--warnings` 0 new, nonmatching green.
+
+- **4b's named largest case was Sony's.** The 0x34-byte table at D_8008D988
+  is libsnd's `_svm_voice`: vmanager.o's bss (`_svm_sreg_buf` +0,
+  `_svm_sreg_dirty` +0x180, `_svm_voice` +0x198 = 24 x 0x34, `_svm_envx_ptr`,
+  `_svm_envx_hist`) anchored at D_8008D7F0 lands every address, and every
+  accessor is a `SpuVm*`/`SsUt*` function `progress.py` counts as library.
+  Measured by relocation over the built objects: 35 of the 45 globals
+  `--globals` listed were read only by Sony code (libsnd vmanager and
+  sequencer, libcd bios.o). `typeviews.shared_globals()` now leaves them out
+  (printed on a separate line); `plan.py` also leaves out a not-yet-unified
+  class's own table (D_8006D3C8 is Class6D3C8's job).
+- **4b's first instances (head).** `include/CdDriver.h`: CdLoc16,
+  CdFileEntry, CdRequestNode (r's, s's and q's CdRequest_D70 views unioned,
+  0x24), CD_OP_*/CD_TICK_*, and the 15 loader globals two or more of
+  code_179d8_h/q/r/s declared (48 local externs gone; types from the
+  accessors: gFileTable walked at the 0x1C stride, gCdSeekParam read for
+  `->size` and sought at +0x14). gMcDevicePath0/1: class_3bb8c_e now includes
+  class_3bb8c.h. D_8008ACA4..AC: Actor * / void * / void * in both units.
+  0 game globals with more than one type remain. Plan revision 21 writes the
+  recipe; `set-track 4b open`.
+- **Symbols hygiene.** 27 data symbols (dlabel in asm/data) carried
+  `// type:func`; removed, byte-identical, and splat now reads "#" and ".VH"
+  as strings.
+- **Class65650 (0x234; alpha).** `include/Class65650.h` over Actor's macros,
+  0x98 bytes; three overrides renamed for their slots (Finalize, Reset,
+  Update); code_55dd4.h's views of Actor, Class6B5CCSub14 and ModelData
+  deleted too. +0x04C AttachToParent takes two extra leading arguments: the
+  table keeps the inherited type, Entity__AttachUnk4C casts (revision 21
+  makes this the rule, track 4 step 6).
+- **Viewport (ex D_8006E8E4, 0x7; bravo).** Behaviour name with banner
+  evidence: a GsRVIEW2 at +0x014, projection/near clip, a double-buffered
+  GsOT pair, Flip. 0xBC bytes. Views gone from code_2cc8c.h, code_2864.c,
+  class_3bb8c.h and code_2c054.h (the last found by grep, not the census).
+- **BoxFill (ex D_8006EAC0, 0x64; charlie).** Viewport__DrawNode's tag-0x64
+  path draws a GsBOXF at +0x058 with GsSortBoxFill; the class's slots set
+  exactly those fields. 0x6C bytes. Views the census missed, found by grep:
+  TaskCore's listView (Unk68Obj), class_3bb8c_m/n/t locals. A stray `/* /*`
+  in code_2cc8c.h cost 19 warnings (baseline 184 -> 165).
+- **Open, for later jobs:** `Obj6EAC0` in code_2cc8c.h is class 0x11144
+  (D_8006EB90, under D_8006EC74), not BoxFill, since round 14; Class6E99C's
+  view is flat; gStyleDecorObj/gStyleDecorSlots hold BoxFills as s32/void *
+  (single-typed, so `--globals` cannot see them); TaskCore::listView and
+  IntermediateBase::viewport are still `BasicClass *`. The libsnd voice
+  table's field symbols carry game names (gVoiceEnv*, gVoiceFade*,
+  gVoiceActivityRing/Idx = `_svm_envx_hist`/`_ptr`) against track 3's
+  Sony rule: reported, not acted on.
+- **Next.** `plan.py` lists D_8006EC74 (0x1144).
+
+---
+
 ## 2026-09-25 — round 84: five classes unified in sequence (track 4)
 
 Opus head (not premium), operator cap 5. `plan.py` listed one ready job at a

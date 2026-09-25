@@ -853,6 +853,11 @@
           "date": "2026-09-25",
           "header": "include/Actor.h"
         },
+        "gBoxFillMethods": {
+          "class": "BoxFill",
+          "date": "2026-09-26",
+          "header": "include/BoxFill.h"
+        },
         "gClass65650Methods": {
           "class": "Class65650",
           "date": "2026-09-25",
@@ -930,6 +935,16 @@
           "note": "Five classes unified in sequence, one Opus runner each, merged and marked before the next was staffed: TaskCore (gTaskCoreMethods 0x130, alpha; 48 renames, Obj86B60/TaskCoreObj/LoaderTask views gone, StreamTaskObj expands TASKCORE_*), Class86668 (0x230, bravo), ScreenSprite (D_8006ED4C 0x144, charlie; behaviour name, evidence Unk18Obj__DrawNode's screen-space path), ModelData (D_8006F384 0x5F03, delta; expands CLASS6D430_* per the ctor chain), Class6E4F0 (D_8006E4F0 0x60, echo). Every ctor chain checked by its runner and held. All merges byte-identical, 0 new warnings, nonmatching green.",
           "round": 84,
           "runners": 5
+        },
+        {
+          "attempts": 3,
+          "calibration": false,
+          "date": "2026-09-26",
+          "matches": 3,
+          "model": "opus",
+          "note": "Three classes unified in sequence, one Opus runner each: Class65650 (gClass65650Methods 0x234, alpha), Viewport (ex D_8006E8E4 0x7, bravo; behaviour name: GsRVIEW2, GsOT pair, Flip), BoxFill (ex D_8006EAC0 0x64, charlie; DrawNode's GsSortBoxFill path). Ctor chains held. Premium head did track 4b's first instances (CdDriver.h, gMcDevicePath0/1, D_8008ACA4..AC), wrote its recipe (plan revision 21), opened 4b; --globals now excludes Sony-only data (35 of 45). All merges byte-identical, 0 new warnings, nonmatching green.",
+          "round": 85,
+          "runners": 3
         }
       ],
       "status": "auto"
