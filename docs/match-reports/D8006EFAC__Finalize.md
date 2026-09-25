@@ -1,4 +1,6 @@
-# func_80042790 -- MATCHED (33/33 words), round 82
+# D8006EFAC__Finalize -- MATCHED (33/33 words), round 82
+
+> Renamed from `func_80042790` on 2026-09-25 (tools/rename.py). Address 0x80042790.
 
 Round 82, runner alpha (fifth slot on code_322b4). Unit `src/code_322b4.c`. Fresh ground, no prior body attempt.
 
@@ -12,7 +14,7 @@ Round 82, runner alpha (fifth slot on code_322b4). Unit `src/code_322b4.c`. Fres
 ```c
 /* D_8006EFAC slot +0x00C (finalize): release the three lights, then the
  * Class6B5CC finalize. */
-void func_80042790(D_8006EFACObj *self) {
+void D8006EFAC__Finalize(D_8006EFACObj *self) {
     s32 i;
     BasicClass *light;
 

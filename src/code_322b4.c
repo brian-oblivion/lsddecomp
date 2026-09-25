@@ -529,7 +529,7 @@ void D8006EFAC__D8006EFAC(D_8006EFACObj *self) {
 }
 /* D_8006EFAC slot +0x00C (finalize): release the three lights, then the
  * Class6B5CC finalize. */
-void func_80042790(D_8006EFACObj *self) {
+void D8006EFAC__Finalize(D_8006EFACObj *self) {
     s32 i;
     BasicClass *light;
 
