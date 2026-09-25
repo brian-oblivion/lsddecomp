@@ -978,7 +978,59 @@ void func_80045AC8(void) {
 }
 void func_80045AD0(void) {
 }
-INCLUDE_ASM("asm/nonmatchings/code_33808", func_80045AD8);
+/* D_8006F614 +0x058: unless the stream has ended (+0x48), pull the next
+ * frame from the object at +0x60 (its +0x06C); 1 when there is none. With
+ * data, flip the frame index at +0x3C and VLC-decode into that frame's
+ * buffer, then hand the sector buffer back (+0x070); a negative result
+ * marks the end (+0x48) and calls that object's +0x054. 0. */
+typedef struct StreamMethods45AD8 {
+    /* +0x000 */ u8 pad0[0x54];
+    /* +0x054 */ void (*slot54)();
+    /* +0x058 */ u8 pad58[0x14];
+    /* +0x06C */ s32 (*slot6C)();
+    /* +0x070 */ void (*slot70)();
+} StreamMethods45AD8;
+
+typedef struct Stream45AD8 {
+    /* +0x000 */ StreamMethods45AD8 *methods;
+} Stream45AD8;
+
+typedef struct Obj45AD8 {
+    /* +0x000 */ u8 pad0[0x14];
+    /* +0x014 */ u32 *frames[2];
+    /* +0x01C */ u8 pad1C[0x20];
+    /* +0x03C */ s32 frameIndex;
+    /* +0x040 */ u8 pad40[8];
+    /* +0x048 */ s32 unk48;
+    /* +0x04C */ u8 pad4C[0x14];
+    /* +0x060 */ Stream45AD8 *unk60;
+} Obj45AD8;
+
+/* LIBPRESS.H */
+extern int DecDCTvlc(u32 *bs, u32 *buf);
+
+s32 func_80045AD8(Obj45AD8 *self) {
+    u32 *data;
+    s32 size;
+    s32 r;
+
+    if (self->unk48 == 0) {
+        r = self->unk60->methods->slot6C(self->unk60, &data, &size, 0x800000);
+        if (r != 0) {
+            if (size != 0) {
+                self->frameIndex ^= 1;
+                DecDCTvlc(data, self->frames[self->frameIndex]);
+            }
+            self->unk60->methods->slot70(self->unk60, data);
+            if (r < 0) {
+                self->unk48 = 1;
+                self->unk60->methods->slot54(self->unk60);
+            }
+            return 0;
+        }
+    }
+    return 1;
+}
 void func_80045BC0(void) {
 }
 /* D_8006F614 +0x060: upload the decoded strip at +0x1C into the rectangle
