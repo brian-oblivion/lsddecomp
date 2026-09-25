@@ -45,3 +45,7 @@ u32 *DecodeTodPacketWord(DataSrc33808 *self, u32 *acc, u8 *out0, u8 *out1, u8 *o
 ## Naming
 
 - **DecodeTodPacketWord**, tier A. Free function occupying slot80, shared between Tod and TodSet: decodes one packet word into value/type/sub-type/length fields.
+
+## Track 4 (2026-09-26, round 86, charlie)
+
+`self` is now `Tod *` (include/Tod.h), and the function is Tod's +0x080 `decodePacketWord` slot (TodSet inherits it). Bytes unchanged.

@@ -31,3 +31,7 @@ void *GetTodMethods(void) {
 ## Naming
 
 - **GetTodMethods**, tier A. Table getter.
+
+## Track 4 (2026-09-26, round 86, charlie)
+
+The local `extern s32 D_8006F240[];` is gone: the table is `extern TodMethods D_8006F240;` in include/Tod.h and the getter returns `TodMethods *` (`return &D_8006F240;`). Bytes unchanged.

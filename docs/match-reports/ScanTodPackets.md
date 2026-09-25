@@ -85,3 +85,7 @@ A loop pre-test that retail does as a SIGNED compare (`blez`) on a value cc1 can
 ## Naming
 
 - **ScanTodPackets**, tier A. Free function occupying slot7C, shared between Tod and TodSet: walks the TOD packet stream counting/looking up type-8/type-2 packets; the packet shape matches include/code_55dd4.h's TOD-packet description exactly.
+
+## Track 4 (2026-09-26, round 86, charlie)
+
+`self` is now `Tod *` (include/Tod.h), and the function is Tod's +0x07C `scanTodPackets` slot (TodSet inherits it). The forward prototype of DecodeTodPacketWord above it moved into the header. Bytes unchanged.

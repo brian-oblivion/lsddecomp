@@ -37,3 +37,7 @@ u8 Tod__ScanPackets(DataSrc33808 *self, s32 arg1, s32 arg2) {
 ## Naming
 
 - **Tod__ScanPackets**, tier A. Slot +0x078: forwards to slot7C (ScanTodPackets) over the buffer's packet data (past its first two words).
+
+## Track 4 (2026-09-26, round 86, charlie)
+
+Now `u8 Tod__ScanPackets(Tod *self, u8 *out, u32 *sel)` (include/Tod.h): the two pass-through arguments are ScanTodPackets' `out`/`sel`, and it calls the named slot `scanTodPackets` (+0x07C) instead of the unprototyped `slot7C`. The slot is typed `u8` as its occupant is; cc1 still emits the trailing `andi 0xFF` over a u8 slot result, so the s32 the old view gave it was not what the bytes needed. The function itself sits in Class6D430's `slot78`, which keeps its name; ModelData__ForwardScanPackets casts it. Bytes unchanged.
