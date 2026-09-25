@@ -225,14 +225,14 @@ s32 TaskCore__Init(TaskCore *self, IntermediateBaseInitArgs *args, s32 mode) {
 }
 
 /* initArgs->unk0 is reached through this unit's TaskTextObj view, the
- * viewport through StreamTaskUnk18Obj (Unk18Obj) and bgLayer through
+ * viewport as a Viewport (include/Viewport.h) and bgLayer through
  * StreamTaskUnk78Obj (BgLayer): TaskCore.h types all three BasicClass *. */
 void TaskCore__OnInit(TaskCore *self) {
-    StreamTaskUnk18Obj *unk18;
-    StreamTaskUnk18Methods *core;
+    Viewport *viewport;
+    ViewportMethods *core;
 
-    unk18 = (StreamTaskUnk18Obj *)self->viewport;
-    core = unk18->methods;
+    viewport = (Viewport *)self->viewport;
+    core = viewport->methods;
     self->methods->updateSlotElements(self, self->unk14);
     ((StreamTaskUnk78Obj *)self->bgLayer)->methods->slot4C((StreamTaskUnk78Obj *)self->bgLayer, self->unk14, 0);
     if (self->fadeInCallback != 0) {
@@ -243,18 +243,18 @@ void TaskCore__OnInit(TaskCore *self) {
         ((TaskTextObj *)self->initArgs->unk0)->methods->slot78((TaskTextObj *)self->initArgs->unk0, self->baseColor, gDefaultStreamTaskInitData);
     }
     ((TaskTextObj *)self->initArgs->unk0)->methods->slot78((TaskTextObj *)self->initArgs->unk0, self->baseColor, 0);
-    core->slot48(unk18, self->unk28);
-    core->slot4C(unk18, self->unk2C);
-    core->slot50(unk18, self->unk30);
-    core->slot70(unk18, self->unk14, D_8006E86C, D_8006E86C, 0);
-    core->slot8C(unk18);
+    core->setOtLength(viewport, self->unk28);
+    core->setUnk44(viewport, self->unk2C);
+    core->setUnk48(viewport, self->unk30);
+    core->attachViewChild(viewport, self->unk14, &D_8006E86C, &D_8006E86C, 0);
+    core->initOt(viewport);
     self->result = 0;
 }
 
 void TaskCore__OnDeinit(TaskCore *self) {
-    StreamTaskUnk18Obj *obj = (StreamTaskUnk18Obj *)self->viewport;
-    obj->methods->slot90(obj);
-    obj->methods->slot74(obj);
+    Viewport *viewport = (Viewport *)self->viewport;
+    viewport->methods->deinitOt(viewport);
+    viewport->methods->detachViewChild(viewport);
     ((StreamTaskUnk78Obj *)self->bgLayer)->methods->slot50((StreamTaskUnk78Obj *)self->bgLayer);
     if (self->unk34 != 0) {
         ((TaskTextObj *)self->initArgs->unk0)->methods->slot78((TaskTextObj *)self->initArgs->unk0, self->unk93, 0);

@@ -3,6 +3,7 @@
 
 #include "common.h"
 #include "TaskCore.h"
+#include "Viewport.h"
 
 /*
  * code_2c054: StreamTaskObj (class id 0x1130, gStreamTaskObjMethods), the
@@ -30,8 +31,6 @@ typedef struct StreamTaskUnkB4Obj StreamTaskUnkB4Obj;
 typedef struct StreamTaskUnkB4Methods StreamTaskUnkB4Methods;
 typedef struct StreamTaskUnk78Obj StreamTaskUnk78Obj;
 typedef struct StreamTaskUnk78Methods StreamTaskUnk78Methods;
-typedef struct StreamTaskUnk18Obj StreamTaskUnk18Obj;
-typedef struct StreamTaskUnk18Methods StreamTaskUnk18Methods;
 typedef struct TaskTextObj TaskTextObj;
 typedef struct TaskTextMethods TaskTextMethods;
 typedef struct StreamTaskInitData StreamTaskInitData;
@@ -102,11 +101,11 @@ extern u8 D_8006E860[];
 
 /* Two more rodata symbols reached only by address (round 2, TaskCore__OnInit):
  * `gDefaultStreamTaskInitData`, passed as `TaskTextMethods::slot78`'s 3rd argument, and
- * `D_8006E86C`, passed TWICE (same address) as `StreamTaskUnk18Methods::slot70`'s
- * 3rd AND 4th arguments. Neither is ever dereferenced by this unit's queued
- * functions. */
+ * `D_8006E86C`, a zero Vec3_d294 passed TWICE (same address) as the
+ * viewport's attachViewChild viewpoint AND reference point (Viewport.h
+ * +0x070). Neither is dereferenced by this unit. */
 extern u8 gDefaultStreamTaskInitData[];
-extern u8 D_8006E86C[];
+extern Vec3_d294 D_8006E86C;
 
 /* self->unkB4's class (New_MoviePlayer), dispatched through by
  * StreamTaskObj__Destroy, __func_8003BAB4, __func_8003BB5C and
@@ -173,30 +172,9 @@ struct TaskTextObj {
 };
 
 
-/* The viewport's class (TaskCore::viewport, IntermediateBase.h's
- * `BasicClass *viewport`; it is code_2cc8c's Unk18Obj, gViewportMethods) as
- * TaskCore__OnInit/OnDeinit call it: +0x048..+0x050 Viewport__SetOtLength/
- * SetUnk44/SetUnk48, +0x070/+0x074 AttachViewChild/DetachViewChild,
- * +0x08C/+0x090 InitOt/DeinitOt. Once modelled as TaskCore's own table
- * (round 1), split off when round 2's three setters could not fit it. */
-struct StreamTaskUnk18Methods {
-    u8 pad00[0x048];
-    void (*slot48)(StreamTaskUnk18Obj *self, s32 a1); /* +0x048, TaskCore__OnInit's forward target */
-    void (*slot4C)(StreamTaskUnk18Obj *self, s32 a1); /* +0x04C, TaskCore__OnInit's forward target */
-    void (*slot50)(StreamTaskUnk18Obj *self, s32 a1); /* +0x050, TaskCore__OnInit's forward target */
-    u8 pad54[0x070 - 0x054];
-    void (*slot70)(StreamTaskUnk18Obj *self, BasicClass *parent, u8 *a2, u8 *a3, s32 a4); /* +0x070,
-                                        TaskCore__OnInit's forward target; a2 and a3 are
-                                        the SAME address (&D_8006E86C) at that call site */
-    void (*slot74)(StreamTaskUnk18Obj *self); /* +0x074, TaskCore__OnDeinit's forward target */
-    u8 pad78[0x08C - 0x078];
-    void (*slot8C)(StreamTaskUnk18Obj *self); /* +0x08C, TaskCore__OnInit's forward target */
-    void (*slot90)(StreamTaskUnk18Obj *self); /* +0x090, TaskCore__OnDeinit's forward target */
-};
-
-struct StreamTaskUnk18Obj {
-    StreamTaskUnk18Methods *methods; /* +0x000 */
-};
+/* The viewport (TaskCore::viewport, `BasicClass *` in IntermediateBase.h) is a
+ * Viewport: TaskCore__OnInit/OnDeinit cast it to include/Viewport.h's type.
+ * Its local view here (StreamTaskUnk18Obj) was merged there in round 85. */
 
 
 /* Allocates/initializes self->unkB4 (a StreamTaskUnkB4Obj); called by
