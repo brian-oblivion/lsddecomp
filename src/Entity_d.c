@@ -242,7 +242,7 @@ skip48:
         out->unk10 = 0;
         out->unk1C = 0x12;
     }
-    Class6B5CC__FaceTarget(this, this->target, 1, 0, 0);
+    Class6B5CC__FaceTarget((Class6B5CC *)this, (Class6B5CC *)this->target, 1, 0, 0);
 }
 
 void Entity__MoodCue47(Entity *this) {
@@ -279,7 +279,7 @@ void Entity__MoodCue48(Entity *this, EntityMoodHandlerArg *out) {
     EntityMethods *methods;
 
     if (this->todFrame == 0x26) {
-        Class6B5CC__FaceTarget(this, this->target, 1, 0, 0);
+        Class6B5CC__FaceTarget((Class6B5CC *)this, (Class6B5CC *)this->target, 1, 0, 0);
         out->unk10 = this->methods->getProximityRatio(this);
         out->unk1C = 6;
     }
@@ -520,8 +520,8 @@ void Entity__MoodCue115(Entity *this, EntityMoodHandlerArg *out) {
     if (this->moodState == 0) {
         if (Entity__IsTargetInRange(this, 0x800) != 0) {
             this->moodState = 0xB;
-            Class6B5CC__FaceTarget(this, this->target, 1, 0, 0);
-            Class6B5CC__FaceTarget(this->target, this, 1, 1, 0);
+            Class6B5CC__FaceTarget((Class6B5CC *)this, (Class6B5CC *)this->target, 1, 0, 0);
+            Class6B5CC__FaceTarget((Class6B5CC *)this->target, (Class6B5CC *)this, 1, 1, 0);
             this->methods->activate(this);
             this->methods->startSoundCue(this);
             this->target->methods->slot130(this->target, 1);
@@ -560,7 +560,7 @@ void Entity__MoodCue115(Entity *this, EntityMoodHandlerArg *out) {
         } else if (this->moodTimer < 0x12D) {
             /* nothing */
         } else {
-            Class6B5CC__FaceTarget(this, this->target, 1, 0, 0);
+            Class6B5CC__FaceTarget((Class6B5CC *)this, (Class6B5CC *)this->target, 1, 0, 0);
             this->methods->slotC4(this, -0x1E, 0);
         }
     }

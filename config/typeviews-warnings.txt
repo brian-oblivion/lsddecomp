@@ -10,7 +10,6 @@ DreamSys: warning: previous implicit declaration of `DreamSys__ApplyRelativeOffs
 DreamSys: warning: type mismatch with previous external decl
 DreamSys: warning: type mismatch with previous implicit declaration
 DreamSys: warning: which is probably not what you want.
-Entity_d: warning: passing arg 1 of `Class6B5CC__FaceTarget' from incompatible pointer type
 Entity_g: warning: passing arg 4 of `Entity__GetOrCreateUnk100' makes pointer from integer without a cast
 class_3ac78: warning: unused variable `unused'
 class_3bb8c: src/class_3bb8c.c: At top level:

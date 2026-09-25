@@ -53,7 +53,7 @@ s32 Entity__UpdateTargetProximity(Entity *this) {
             }
         }
         if (row->proximityRange < 0) {
-            Class6B5CC__FaceTarget(this, this->target, 1, 0, 0);
+            Class6B5CC__FaceTarget((Class6B5CC *)this, (Class6B5CC *)this->target, 1, 0, 0);
         }
     }
     return this->targetReached;
@@ -188,7 +188,7 @@ void Entity__MoodCue01(Entity *this, EntityMoodHandlerArg *out) {
         out->unk44 = 0x14;
         this->target->methods->slot130(this->target, 1);
     }
-    Class6B5CC__FaceTarget(this, this->target, 1, 0, 0);
+    Class6B5CC__FaceTarget((Class6B5CC *)this, (Class6B5CC *)this->target, 1, 0, 0);
     this->methods->slotC4(this, -0x5A, 0);
     if (this->moodTimer == 0x1E) {
         this->methods->notifyParents(this, 0xA);
@@ -221,10 +221,10 @@ void Entity__MoodCue07(Entity *this, EntityMoodHandlerArg *out) {
                Entity__IsNearTarget(this, &this->unk14->x, 1, 1) != 0) {
         this->methods->addVec14(this, TRANSLATE_Y_MINUS64);
     } else if (this->moodTimer >= 0xA) {
-        Class6B5CC__FaceTarget(this, this->target, 1, 0, 0);
+        Class6B5CC__FaceTarget((Class6B5CC *)this, (Class6B5CC *)this->target, 1, 0, 0);
         this->methods->slotC4(this, -0x100, 0);
     } else {
-        Class6B5CC__FaceTarget(this, this->target, 1, 0, 0);
+        Class6B5CC__FaceTarget((Class6B5CC *)this, (Class6B5CC *)this->target, 1, 0, 0);
     }
 }
 
@@ -283,7 +283,7 @@ void Entity__MoodCue11(Entity *this, EntityMoodHandlerArg *out) {
         }
     } else if (this->moodState == 0xD) {
         this->unk48 = -0x78;
-        Class6B5CC__FaceTarget(this, this->target, 1, 0, 0);
+        Class6B5CC__FaceTarget((Class6B5CC *)this, (Class6B5CC *)this->target, 1, 0, 0);
         this->methods->updateScale(this, 1, SCALE_HALF);
         if (this->methods->distanceToRegion(this, this->target) < 0x400) {
             this->methods->notifyParents(this, 0xB);
@@ -321,7 +321,7 @@ void Entity__MoodCue12(Entity *this) {
     }
     y = this->unk14->y;
     if (y < 0x7D0) {
-        Class6B5CC__FaceTarget(this, this->target, 1, 0, 0);
+        Class6B5CC__FaceTarget((Class6B5CC *)this, (Class6B5CC *)this->target, 1, 0, 0);
     }
     if (this->moodState == 0xB) {
         result = this->methods->distanceToRegion(this, this->target);

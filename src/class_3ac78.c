@@ -31,6 +31,7 @@
  */
 #include "common.h"
 #include "class_3ac78.h"
+#include "Class6B5CC.h"
 
 void Class86668__SetChildFlag8(Class86668 *self, s32 value)
 {
@@ -203,34 +204,13 @@ void Class866E8__Finalize(Class866E8 *self)
     func_800428E4()->dtor(self);
 }
 
-/* MEASURED, round 9: GetClass6B5CCMethods TAKES NO ARGUMENTS -- its body is
- * `lui/addiu %hi/%lo(gClass6B5CCMethods); jr $ra` and it reads neither $a0 nor $a1
- * (asm/code_d294.s). The two args below are what THIS call site passes, not
- * the callee's signature; include/class_3bb8c.h passes ONE to the same symbol
- * and is equally byte-exact. Retail's source called one zero-argument getter
- * with different argument counts from different files, which is what C89 does
- * with no prototype in scope. Do not reconcile the two declarations. */
-/* ROUND 59 (extern review), refining the paragraph above rather than
- * overturning it. Round 9's own conclusion is "no prototype in scope", and
- * the faithful spelling of that is an UNSPECIFIED parameter list, not a
- * fabricated two-parameter prototype -- which is what the line below now is.
- * Measured before changing it: the two arguments this unit passes cost ZERO
- * bytes. Retail's `jal 8001e57c` in Class866E8__OnNotify (0x8004A9A0) and
- * Class866E8__OnElementEvent (0x8004AA88) both carry `move s2,a2` in the delay slot -- a
- * callee-save spill, NOT argument setup -- and $a0/$a1 still hold each
- * caller's own incoming arguments. So unlike the other round-59 findings,
- * nothing here is byte-load-bearing, and the arity claim was simply false
- * against the definition (src/code_d294_b.c:736, `(void)`). The call sites
- * below are UNCHANGED; only this declaration is. */
-extern void *GetClass6B5CCMethods();
+/* GetClass6B5CCMethods: include/Class6B5CC.h. Round 59 measured the two
+ * arguments these calls used to pass the no-argument getter as zero-cost (the
+ * jal's delay slot holds a callee-save spill); track 4 dropped them. */
 
 void Class866E8__OnNotify(Class866E8 *self, GenericObject *sender, s32 command)
 {
-    void (*fn)(Class866E8 *self, GenericObject *sender, s32 command);
-
-    fn = *(void (**)(Class866E8 *, GenericObject *, s32))
-        ((u8 *)GetClass6B5CCMethods(self, (s32)sender) + 0x38);
-    fn(self, sender, command);
+    GetClass6B5CCMethods()->onNotify((Class6B5CC *)self, sender, command);
 
     if ((sender->methods->header & 0xF) == 1) {
         self->methods->slot100(self, sender, command);
@@ -253,10 +233,7 @@ void Class866E8__Reset(Class866E8 *self)
 
 void Class866E8__OnElementEvent(Class866E8 *self, s32 command, UnkSlotEntry_3ac78 *elem)
 {
-    void (*fn)(Class866E8 *self, s32 command);
-
-    fn = *(void (**)(Class866E8 *, s32))((u8 *)GetClass6B5CCMethods(self, command) + 0x88);
-    fn(self, command);
+    GetClass6B5CCMethods()->notifyIfUnk20Active((Class6B5CC *)self, command);
 
     if (command == 6)
         goto handle6;

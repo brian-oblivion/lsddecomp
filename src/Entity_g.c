@@ -100,7 +100,7 @@ void Entity__MoodCue102(Entity *this, EntityMoodHandlerArg *out) {
         this->methods->updateRotation(this, 0, D_80089CAC);
     }
     if (this->moodTimer >= 0x30D) {
-        Class6B5CC__FaceTarget(this, this->target, 1, 0, 0);
+        Class6B5CC__FaceTarget((Class6B5CC *)this, (Class6B5CC *)this->target, 1, 0, 0);
         if (this->moodTimer >= 0x790) {
             a2 = D_80089E14;
         } else if (this->moodTimer >= 0x78B) {
@@ -367,7 +367,7 @@ merge:
 }
 
 void Entity__MoodCue128(Entity *this, EntityMoodHandlerArg *out) {
-    Class6B5CC__FaceTarget(this, this->target, 1, 0, 0);
+    Class6B5CC__FaceTarget((Class6B5CC *)this, (Class6B5CC *)this->target, 1, 0, 0);
     this->methods->updateScale(this, 1, SCALE_THIRTY_SECOND);
     this->methods->slotC4(this, -0x1E, 1);
 }
@@ -378,7 +378,7 @@ void Entity__MoodCue129(Entity *this, EntityMoodHandlerArg *out) {
     }
     this->methods->stopTod(this);
     if (this->moodTimer >= 0xC9) {
-        Class6B5CC__FaceTarget(this, this->target, 1, 0, 0);
+        Class6B5CC__FaceTarget((Class6B5CC *)this, (Class6B5CC *)this->target, 1, 0, 0);
         if (this->moodState == 0xA) {
             this->methods->slotD0(this, -0x200, 0);
         }

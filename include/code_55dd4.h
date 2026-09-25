@@ -2,6 +2,7 @@
 #define CODE_55DD4_H
 
 #include "common.h"
+#include "Class6B5CC.h"
 
 /*
  * Class65650: an articulated model that owns one BaseObjO "part" per TOD
@@ -286,7 +287,7 @@ extern Class65650Methods *Get_vtable_Class65650(void);
 
 extern void *BMemPMgrAlloc(s32 size);
 extern void *BMemPMgrFree(void *ptr);
-extern void Class6B5CC__LinkModel(void *self, s32 arg); /* first param confirmed generic: Class65650__InitDefaults passes a Class65650 *, Class65650__ApplyTodPacket passes an Unk70ElemObj * */
+/* Class6B5CC__LinkModel: include/Class6B5CC.h. Class65650__InitDefaults passes a Class65650 *, Class65650__ApplyTodPacket an Unk70ElemObj *; both upcast. */
 extern void *New_BaseObjO(void);
 
 /* Same-unit helpers called by name ahead of their definitions. AcquireModelData

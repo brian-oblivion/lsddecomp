@@ -14,6 +14,7 @@
  * Named round 70; tiers in the reports. Game-level role unknown.
  */
 #include "common.h"
+#include "Class6B5CC.h"
 
 /* ------------------------------------------------------------------ *
  * LinkNode is this unit's ONE local view of every object it touches: the
@@ -95,7 +96,6 @@ void Class876FC__ReleaseModelChildren(Class876FC *self);
 void Class876FC__PlaceModelChildren(Class876FC *self, s32 reuse);
 void AddVec3(Vec3S *dst, Vec3S *a, Vec3S *b);
 void AttachWithRotScale(LinkNode *node, void *parent, void *trans, s32 rotation, void *scale);
-extern void Class6B5CC__LinkModel(void *self, s32 arg); /* established, code_55dd4.h */
 
 /* NoOpIgnoreArgs/LinkOwnerObj__func_56e1c/LinkOwnerObj__RandomizeLinks are defined in class_3bb8c_o.c
  * (own their addresses, own local view "LinkOwnerObj"/"LinkElemObj") with
@@ -155,7 +155,7 @@ void Class876FC__InitByKind(Class876FC *self, void *parent, Vec3S *pos) {
     state = self->kind;
     if (state < 2) {
         s32 ret = D_8008ACA4->methods->slot80(D_8008ACA4, D_8008AB98[state]);
-        Class6B5CC__LinkModel(self, ret);
+        Class6B5CC__LinkModel((Class6B5CC *)self, (void *)ret);
         state = self->kind;
     }
 
@@ -242,7 +242,6 @@ void AttachWithRotScale(LinkNode *node, void *parent, void *trans, s32 rotation,
  * reuse = 1 only resets their translation (their slotB8 is
  * BaseObjO__SetVec14). */
 extern void *New_BaseObjO(void);        /* class_3bb8c_o.c, New_X allocator */
-extern void Class6B5CC__LinkModel(void *self, s32 arg); /* established, code_55dd4.h */
 extern Vec3S gModelChildOffsetInit;
 extern s32 gModelChildSpacing[];
 
@@ -269,7 +268,7 @@ void Class876FC__PlaceModelChildren(Class876FC *self, s32 reuse) {
         } else {
             LinkNode *child = New_BaseObjO();
             *p = child;
-            Class6B5CC__LinkModel(child, self->model);
+            Class6B5CC__LinkModel((Class6B5CC *)child, (void *)self->model);
             AttachWithRotScale(*p, self, &accum, self->rotation, self->scale);
         }
     }

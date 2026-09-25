@@ -54,7 +54,7 @@ void Entity__MoodCue82(Entity *this, EntityMoodHandlerArg *out) {
         }
     }
     if (this->moodState == 0xC) {
-        Class6B5CC__FaceTarget(this, this->target, 1, 0, 0);
+        Class6B5CC__FaceTarget((Class6B5CC *)this, (Class6B5CC *)this->target, 1, 0, 0);
         if (this->moodTimer == 0x14) {
             out->unk1C = 0x12;
             out->unk10 = 0;
@@ -145,7 +145,7 @@ void Entity__MoodCue85(Entity *this, EntityMoodHandlerArg *out) {
             this->moodTimer = -1;
         }
     } else if (this->moodState == 0xB) {
-        Class6B5CC__FaceTarget(this, this->target, 1, 0, 0);
+        Class6B5CC__FaceTarget((Class6B5CC *)this, (Class6B5CC *)this->target, 1, 0, 0);
         if (this->moodTimer < 0x1E) {
             this->methods->slotC4(this, -0xA, 0);
         } else {
@@ -289,7 +289,7 @@ void Entity__MoodCue91(Entity *this, EntityMoodHandlerArg *out) {
 void Entity__MoodCue92(Entity *this, EntityMoodHandlerArg *out) {
     if (this->todIndex == 0) {
         if (this->targetReached != 0) {
-            Class6B5CC__FaceTarget(this, this->target, 1, 0, 0);
+            Class6B5CC__FaceTarget((Class6B5CC *)this, (Class6B5CC *)this->target, 1, 0, 0);
             this->methods->setTod(this, 1);
             this->target->methods->slot130(this->target, 1);
         } else if (this->todFrame == 0) {
