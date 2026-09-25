@@ -17,3 +17,9 @@ void TmdModel__MapModelingData(TmdModel *self) {
     GsMapModelingData((unsigned long *)&self->data->head[1]);
 }
 ```
+
+## Naming
+
+`TmdModel__MapModelingData` -- tier A. Slot +0x044: `GsMapModelingData(&self->data->head[1])`,
+a thin wrapper naming the Sony API it calls (the Psy-Q idiom `GsMapModelingData(tmd + 1)`,
+skipping the TMD's own header word).

@@ -19,3 +19,11 @@ void *Get_vtable_TmdModel(void) {
     return D_8006BEA0;
 }
 ```
+
+## Naming
+
+`TmdModel__func_8001F37C` -- tier C, class known. Slot +0x04C is an empty
+override (`jr $ra; nop`) with no callers found in this unit and no other
+information about what the slot means. Per FINISHING-PLAN track 3's tier-C
+form for a method whose class is known (`Class__func_xxxxx`), kept as such
+rather than guessing a purpose from an empty body.

@@ -17,3 +17,9 @@ TmdObject_fa50 *TmdModel__GetObject(TmdModel *self, s32 i) {
     return &self->data->recs[i];
 }
 ```
+
+## Naming
+
+`TmdModel__GetObject` -- tier A. Slot +0x048: `return &self->data->recs[i];`,
+a plain indexed getter over the model's TMD object table
+(`TmdObject_fa50 recs[]`).

@@ -17,3 +17,11 @@ void *GetTmdModelBoundsBuffer(void *self, s32 i) {
     return gTmdModelBoundsBuf;
 }
 ```
+
+## Naming
+
+`GetTmdModelBoundsBuffer` -- tier A. Free helper: ignores both its
+arguments and returns `&gTmdModelBoundsBuf`, the buffer
+`UpdateTmdModelBoundsBuffer` fills. Parameters are kept in the definition
+only to document the call shape callers use (per the function's own
+`## Source` note); they do not affect the name.

@@ -36,3 +36,10 @@ TmdModel *New_TmdModel(void *arg) {
     return NULL;
 }
 ```
+
+## Naming
+
+`New_TmdModel` -- tier A. Convention: `New_Class` allocator. Evidence: the
+standard `BMemPMgrAlloc` + ctor-through-vtable allocator shape, chained to
+`Get_vtable_TmdModel()->ctor`; the class it allocates is named from its
+table's role (see `Get_vtable_TmdModel.md`).

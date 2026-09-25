@@ -50,3 +50,11 @@ void TmdModel__GetHull(TmdModel *self, Hull_fa50 *out) {
     out->type = 1;
 }
 ```
+
+## Naming
+
+`TmdModel__GetHull` -- tier A. Computes the model's bounding box
+(`TmdModel__ComputeBounds`) and writes its eight corners into a
+caller-supplied `Hull_fa50`, setting `out->type = 1` (the count). "Hull"
+names the mechanics (an 8-corner box for a hit test) without claiming a
+specific in-game role.

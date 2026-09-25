@@ -17,3 +17,19 @@ void *Get_vtable_TmdModel(void) {
     return D_8006BEA0;
 }
 ```
+
+## Naming
+
+`Get_vtable_TmdModel` -- tier B. Convention: `Get_vtable_<Class>` (matches
+`Get_vtable_BasicClass`, `Get_vtable_CdStreamObj`, `Get_vtable_DrawSystem`).
+Class name `TmdModel`: D_8006BEA0 is class tag 9, the object
+`Class6B5CC__LinkModel` (src/code_d294_c.c) links as `self->model` -- that
+unit's own `ModelObj_d294` local view (pad to +0xC, `tmdFile` at +0xC, `tmd`
+at +0x10) lines up field-for-field with this class's own `data`/`unk10` at
+the same offsets, and this class's own methods (`TmdModel__MapModelingData`,
+`TmdModel__GetObject`, `TmdModel__NextPrimitive`, `TmdModel__RaycastFaces`)
+all operate on a TMD file + its object table. Tier B, not A: what wraps a TMD
+is certain; why the game needs a standalone "model" object distinct from
+Class6B5CC itself is not established. Only the getter is renamed; the table
+symbol D_8006BEA0 is kept, matching the WBgm/DrawSystem precedent (round 82
+broadcast, bravo).

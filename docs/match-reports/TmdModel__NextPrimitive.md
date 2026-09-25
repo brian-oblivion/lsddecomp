@@ -216,3 +216,11 @@ TmdPrim_fa50 *TmdModel__NextPrimitive(TmdModel *self, TmdPrim_fa50 *p, s32 *n, V
 
 - A multiply-by-power-of-two index where retail's `addu` has the BASE register first (`addu v0, base, v0`) is an explicit shift on byte arithmetic, `(u8 *)base + (i << 3)`: `&base[i]`, `base + i`, `i + base` and `(u8 *)base + i * 8` all give the canonical `addu v0, v0, base`.
 - In a switch whose several cases end in the same statement, a register swap involving that statement's pointer can come from its reference COUNT before allocation (cross-jumping merges the copies only after reload). Writing it once, behind a label at the tail of the case where retail's shared block physically sits, with `goto` from the others, keeps the layout and lowers the count. A label at the end of the switch moves the block and costs the layout.
+
+## Naming
+
+`TmdModel__NextPrimitive` -- tier A. A TMD primitive iterator over
+`self->unk10` (the object-table entry): decodes the current primitive's mode
+byte, extracts its vertex indices, writes their positions to `out`, advances
+`*count`, and returns the next primitive pointer (or NULL when exhausted).
+Owns `jtbl_80010354`.

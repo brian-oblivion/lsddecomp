@@ -27,3 +27,10 @@ void TmdModel__TmdModel(TmdModel *self, void *arg) {
 ### Proposed learning
 
 Stores after a call that go through `$a0` (freshly `move a0, sN` just before them) rather than through the saved `sN` mean the NEXT call takes that value as its first argument: GCC computed the argument early and used it as the base. A `void f(void)` callee with this pattern really takes `self` (unused). Dropping the argument costs exactly one word.
+
+## Naming
+
+`TmdModel__TmdModel` -- tier A. Convention: `Class__Class` constructor. The
+ctor at slot +0x008 of the TmdModel class table (D_8006BEA0): base ctor
+through `Get_vtable_BasicClass`, installs the method table, stores the
+object-table entry and the TMD data header, marks the class constructed.

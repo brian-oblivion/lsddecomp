@@ -17,3 +17,10 @@ void UpdateTmdModelBoundsBuffer(void *self) {
     TmdModel__ComputeBounds(self, gTmdModelBoundsBuf);
 }
 ```
+
+## Naming
+
+`UpdateTmdModelBoundsBuffer` -- tier A. Free helper (VerbNoun, not vtable-
+dispatched): forwards `self` and the shared static buffer
+`gTmdModelBoundsBuf` into `TmdModel__ComputeBounds`. Paired with
+`GetTmdModelBoundsBuffer`, which returns that same buffer.

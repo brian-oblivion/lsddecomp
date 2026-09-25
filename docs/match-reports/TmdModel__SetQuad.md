@@ -17,3 +17,9 @@ void TmdModel__SetQuad(TmdModel *self, Quad_fa50 *src) {
     self->quad = *src;
 }
 ```
+
+## Naming
+
+`TmdModel__SetQuad` -- tier A. Slot +0x040: `self->quad = *src;`, a plain
+4-word struct setter. A setter's mechanics are its purpose (FINISHING-PLAN
+track 3's tier-A rule for a pure leaf).

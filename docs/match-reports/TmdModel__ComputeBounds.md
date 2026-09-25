@@ -56,3 +56,10 @@ void TmdModel__ComputeBounds(TmdModel *self, Box_fa50 *box) {
 ### Proposed learning
 
 A leaf that computes `addiu tN, box, K` for several struct fields at entry and then compares/stores through `0(tN)` inside a loop (instead of `K(box)`) was written with explicit pointer locals to those fields; GCC 2.6.3 does not hoist field addresses on its own, and a `static __inline__` helper taking `&box->f` folds them back. And a loop count kept in the dead first-argument register (`$a0`) came from `n = x - 1;` in one expression, not `n = x; n--;` (which shifted every register by one).
+
+## Naming
+
+`TmdModel__ComputeBounds` -- tier A. Axis-aligned bounding box over the
+model's vertex list (`self->unk10->verts`, count `self->unk10->nverts`); a
+pure computation whose mechanics are its purpose. Called by
+`UpdateTmdModelBoundsBuffer` and `TmdModel__GetHull`.

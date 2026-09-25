@@ -197,3 +197,14 @@ s32 TmdModel__RaycastFaces(TmdModel *self, s32 *best, Vec3_fa50 *hitOut, s32 *he
 - A scalar that retail keeps in a frame slot with no address-take, while an equivalent `s32` gets a callee-saved register, can be an 8-byte `s32 x[2]`. It is BLKmode under STRICT_ALIGNMENT (4-byte alignment < DImode's 8), so it lives in memory. `s32 x[1]` gets SImode and a register.
 - Dead reload slots (pseudos with `sp+K` equivalences) enlarge the frame with no access to them. Measure them from cc1's `.frame ... vars=` comment by deleting uses, before padding a frame gap with invented locals.
 - Locals whose frame slots sit AFTER address-taken scalars used in a `while` condition were declared inside the loop body.
+
+## Naming
+
+`TmdModel__RaycastFaces` -- tier A. Casts a segment (`origin`..`end`)
+against every primitive of the model (via `TmdModel__NextPrimitive`),
+rejects a parallel or out-of-range hit, checks the candidate hit against the
+face's own bounding box (grown by 24), and keeps the nearest one:
+`*best`/`*hitOut`/`*height`. Returns whether anything was hit. Mechanics
+fully describe the function; the game-level purpose (what calls this with
+what segment) is settled by its callers in `code_d294_b.c`/`code_d294_c.c`,
+not touched by this pass.
