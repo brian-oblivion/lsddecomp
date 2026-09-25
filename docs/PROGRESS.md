@@ -6,6 +6,105 @@ stale, prose elsewhere is not.
 
 ---
 
+## 2026-09-25 — round 79: track 3 done, and four more "game" functions were Sony's
+
+**Seven sessions in two waves, all merged green.** The head ran on Opus 5.5 as an
+ordinary head (not premium). Gate 0 was clean. Wave 1 filled five slots from the
+top of the list; wave 2 took the last two naming jobs after the operator asked
+mid-round for the remaining task to be taken too.
+
+| track | session | model | outcome |
+| --- | --- | --- | --- |
+| 3 | alpha | opus | Entity_f: `gEntityMoodHandlerTable` rows 82-96 as `Entity__MoodCueNN` (93 also row 107), two `SetCueTones*` helpers, three data tables; **Entity inherits Class65650's TOD fields and slots** |
+| 2 | bravo | sonnet | `QuitSpu` -> `SsQuit` (libsnd/ssinit, position); `func_8002B3E4` unidentified; `GsSetProjection` lead rejected, **overturned by the head** |
+| 3 | charlie | opus | code_179d8_s: Class6D4E8 CD read driver `Open/Close/Seek/Read/LoadFile/RunRequestQueue`, `CD_OP_*`/`CD_FLAG_*` constants, local views |
+| 3 | delta | opus | code_179d8_o: `New_Class6D4E8`, ctor, `Destroy`, `NoOpSlot40`; a `cancelRequests` arity fix |
+| 3 | echo | opus | class_3bb8c_q: `D800879C4__SetVariantClut`/`UpdateScale` (GsSPRITE cx/cy/scalex/scaley) |
+| 3 | alpha (w2) | sonnet | main: entry point and three startup globals; `__main` lead |
+| 3 | bravo (w2) | sonnet | code_179d8_j: Sony check only; all eight functions are libsnd/vmanager's |
+
+All seven units were reviewed and marked, and **track 3 now reads done**, as does
+track 2 (238 named, 0 unnamed). plan.py's ready list is empty; the only job left
+is track 4's first class, which is a premium session's. The game count fell
+from 1151 to 1149 as functions moved to library. The naming runner went to
+Sonnet by the two-clean-Opus-units rule: four Opus units reviewed, none sent back.
+
+### Sony code the queues still counted as game
+
+- **`GsSetProjection` (libgs/gs_106)**, was `Unk18Obj__SetGeomScreen`. Bravo
+  rejected the LEAD because gs_106 is never placed, reading position evidence
+  as needing the candidate's own object. It needs the NEIGHBOURS: the function is
+  the last word before the placed libgs run (zero gap to gs_131), gs_106 is the
+  only libgs module among 18 exact ties, no class table holds the address, and
+  its one caller cast an `s32` to `Unk18Obj *` that it also passes as
+  `SetFogNear`'s `h`, so LIBGS.H's `GsSetProjection(long h)` fits. Retyped, with the
+  prototype moved out of `code_2cc8c.h` per round 78's `GsSetNearClip`.
+- **`KeyOnCheck` (libsnd/vmanager, internal)**, was `func_800303FC`: TINY exact,
+  and vmanager.o's own layout reproduces retail's 0xEC/0x34/0x8 gaps between
+  two already-identified neighbours. Bravo found it in wave 2.
+- **`__main` (_obj/none)**, was `func_80011994`. Alpha found that spelling the
+  entry point `main` fails to link because cc1 inserts `jal __main`. The head
+  measured the conclusion in a worktree: renaming the stub `__main`, renaming
+  `GameMain` to `main`, and DELETING main's explicit first call is byte-identical.
+  The source said `main` and never wrote the call; `GameMain` is withdrawn.
+- None of the three passed plan.py's library screens. `KeyOnCheck` and `__main`
+  are 2-word bodies below the adjacency-lead bar (4+ words), and all three were
+  found only because the brief said to run `sdkname.py` first.
+
+### Head review and fixes at merge
+
+- Every slot claim was checked with `classtable.py`, and alpha's MoodCue rows
+  82-96 and 107 were read from retail.
+- **Round 78's head-applied `moodDuration` was wrong.** Entity is a Class65650
+  subclass (`ENTITY_METHODS --vs gClass65650Methods` keeps +0x128..+0x138), and
+  `Class65650__SetTod` writes +0x80 as the TOD frame count. It is now
+  `todFrameCount`.
+- **Field and slot names applied by type scope** (definition first, compiler
+  lists the accessors, both oracles green each; about 135 accessors in all):
+  - Entity: `slot128/12C/130` -> `setTod/playTod/stopTod`, `unk7C/unk84` ->
+    `todIndex/todFrame`, `unk50` -> `companion2` (B), and `moodDuration` ->
+    `todFrameCount`. Unk94's own `slot130` was checked and not touched.
+  - `Class6D430Methods` `configureBuffer/onBufferChanged/bufferControl/installBuffer`
+    -> `open/close/seek/read`. `Class6D430__AllocBuffer` calls them in exactly
+    that file-load order.
+  - `Class6D430` `pendingGeneration/unk22/unk28` -> `isOpen/pendingRequests/inQueueDispatch` (B).
+  - `MethodsA34_179D8H::onError` -> `close`, correcting a round-64 misreading.
+    `Class6D4E8::unk28` -> `inQueueDispatch`.
+  - `D800879C4Methods::postConstruct` -> `setVariantClut`.
+- Every merge conflicted only on the symbols-file append; each time the head kept
+  both sides and checked for duplicate addresses. One chained merge command ran
+  build and extract on top of MERGE_HEAD. Its red result was discarded and the
+  build re-run after resolution; no green was ever read off it.
+- One head slip, recovered: `rename.py GameMain main` failed its own verify, as
+  expected before the explicit call was deleted. The partial rewrite left two
+  report lines naming `GameMain`, which the head fixed by hand.
+- LEARNINGS: echo's parallel-arrays nuance was folded into the stride clause.
+  Delta's arity learning is already the round-76 3f entry, so it was not re-added.
+  MATCHING-GUIDE's one stale `func_80063144` citation was fixed.
+
+### ESCALATED (operator decisions; the head did not act)
+
+1. **Track 4's first class needs a premium session.** It is the only job
+   plan.py lists.
+2. **Track 3 reads done with 88 `func_` definitions, 1754 `unk` refs and 848
+   `slotNN` calls still in game code.** Done means every unit with game code
+   was marked, not every name settled. Whether a second naming pass exists,
+   or whether these stay as documented tier-C placeholders for tracks 4 and 5,
+   is a plan decision. The "66/75 units passed" display also counts the nine
+   units that hold no game code in its denominator. It is cosmetic, because
+   the done test excludes them.
+3. **2-word Sony stubs escape every screen.** `KeyOnCheck` and `__main` sat
+   below revision 16's 4+-word adjacency-lead bar. §4.2's naming prompt still
+   does not carry "run `sdkname.py` first" (round 78's item 2). The head put it
+   in both wave-2 briefs, and both runners found Sony code with it.
+4. **A Sonnet track-2 runner misapplied the position rule** (see
+   `GsSetProjection` above), and plan.py reported track 2 done on that false
+   negative until the head overturned it. Whether §3 track 2 should say that
+   position comes from placed NEIGHBOURS, not from the candidate's object, is a
+   plan change.
+
+---
+
 ## 2026-09-24 — round 78: ten units named, five "game" functions were Sony's, and track 4 opens
 
 **Ten Sonnet naming sessions in two waves of five, all merged green.** The head

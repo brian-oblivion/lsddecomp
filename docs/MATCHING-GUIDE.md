@@ -580,7 +580,7 @@ Two consequences, both paid for in round 18:
   a report as a result. A false zero written down as a real one is the kind of
   finding that misleads every later round.
 - Where a number is load-bearing, re-measure it with the flag and SAY you did.
-  `func_80063144`'s two-divergence finding was re-run this way and came back an
+  `Entity__MoodCue81` (was `func_80063144`)'s two-divergence finding was re-run this way and came back an
   identical 465 with `Stack Differences: 0` genuinely measured, which is what
   makes it trustworthy rather than merely plausible. Round 59 matched that
   function and the number held — but its residue CLASS did not, and the
