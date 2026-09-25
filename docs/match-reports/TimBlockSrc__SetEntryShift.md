@@ -51,3 +51,7 @@ void TimBlockSrc__SetEntryShift(Obj6F0B8 *self, s32 index, s32 shift) {
 ## Naming
 
 - **TimBlockSrc__SetEntryShift**, tier B. Occupies slot +0x078: sets one CLUT-fade entry's shift and derives its mask.
+
+## Track 4 (2026-09-25, round 83, bravo)
+
+Occupant of +0x078, which is Class6D430's untyped `slot78`; not given a TimBlockSrc slot of its own because the slot belongs to the parent's layout. Writes `entries[index].shift`/`.mask`. The class (id 0xF03, table `D_8006F0B8`) is unified as `TimBlockSrc` in `include/TimBlockSrc.h`. Any source block above is the pre-unification spelling; the live body in `src/code_33808.c` takes the unified types, byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).

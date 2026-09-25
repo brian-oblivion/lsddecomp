@@ -32,3 +32,7 @@ void *GetTimBlockSrcMethods(void) {
 ## Naming
 
 - **GetTimBlockSrcMethods**, tier A. Table getter -- pure `return &table` stub, tier A by the getter convention.
+
+## Track 4 (2026-09-25, round 83, bravo)
+
+Now `TimBlockSrcMethods *GetTimBlockSrcMethods(void) { return &D_8006F0B8; }` against `extern TimBlockSrcMethods D_8006F0B8;` in the header (was `void *` over `extern s32 D_8006F0B8[]`), byte-identical. The class (id 0xF03, table `D_8006F0B8`) is unified as `TimBlockSrc` in `include/TimBlockSrc.h`. Any source block above is the pre-unification spelling; the live body in `src/code_33808.c` takes the unified types, byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).

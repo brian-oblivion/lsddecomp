@@ -46,3 +46,7 @@ void TimBlockSrc__FadeAllEntries(DataSrc33808 *self, s32 arg) {
 ## Naming
 
 - **TimBlockSrc__FadeAllEntries**, tier B. Slot +0x07C: loops the 4 CLUT-fade entries under the data-source lock, calling slot80 (TimBlockSrc__FadeEntry) on each.
+
+## Track 4 (2026-09-25, round 83, bravo)
+
+Occupant of +0x07C, now the `fadeAllEntries` slot. Its second argument is retyped `TimBlockSrcColor *` (was `s32`): it is passed straight on as `fadeEntry`'s colour; the slot call is now prototyped (`self->methods->fadeEntry(self, i, color)`, was the unprototyped `slot80`), byte-identical. The class (id 0xF03, table `D_8006F0B8`) is unified as `TimBlockSrc` in `include/TimBlockSrc.h`. Any source block above is the pre-unification spelling; the live body in `src/code_33808.c` takes the unified types, byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).

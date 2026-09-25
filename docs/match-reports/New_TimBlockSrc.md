@@ -43,3 +43,7 @@ void *New_TimBlockSrc(s32 arg0) {
 ## Naming
 
 - **New_TimBlockSrc**, tier B. Allocator for D_8006F0B8; class named for its own mechanics (see TimBlockSrc__TimBlockSrc).
+
+## Track 4 (2026-09-25, round 83, bravo)
+
+The allocator; 0x84 is the class size the header records. It now reaches the ctor through the typed getter (`GetTimBlockSrcMethods()->ctor(obj, (char *)arg0)`) instead of the unit's `Ctor33808` cast; its own signature is unchanged because `src/class_3bb8c_l.c` declares it `s32 New_TimBlockSrc(s32)` locally. The class (id 0xF03, table `D_8006F0B8`) is unified as `TimBlockSrc` in `include/TimBlockSrc.h`. Any source block above is the pre-unification spelling; the live body in `src/code_33808.c` takes the unified types, byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).
