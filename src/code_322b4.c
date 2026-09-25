@@ -125,7 +125,7 @@ struct SpriteMethods_322b4 {
 };
 
 /* The zero offset D8006ED4C__AttachToParent attaches with. */
-extern Vec3_d294 D_8006EE10;
+extern Vec3_d294 gVec3Zero;
 extern char *strcpy(char *dst, char *src);
 
 /* The cell origin GetCellRect copies: {0, 0, 8, 8}. */
@@ -251,7 +251,7 @@ void D8006ED4C__Reset(Class6B5CC *self) {
  * caller's third argument to slot +0x0BC. */
 void D8006ED4C__AttachToParent(SpriteView_322b4 *self, Class6B5CC *parent, Pair_322b4 *pos) {
     if (self->parent == NULL) {
-        GetSpriteMethods()->attachToParent((Sprite *)self, parent, &D_8006EE10);
+        GetSpriteMethods()->attachToParent((Sprite *)self, parent, &gVec3Zero);
         self->methods->setPosition(self, pos);
     }
 }
