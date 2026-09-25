@@ -2536,3 +2536,9 @@ StoreImage = 0x800213A0; // type:func  (Psy-Q libgpu/sys, fingerprint)
 // `extern int MoveImage(RECT *rect, int x, int y);`, no C call site yet.
 // Round 81 (bravo, track 2), not yet linked from an SDK object.
 MoveImage = 0x80021404; // type:func  (Psy-Q libgpu/sys, fingerprint)
+// identified: fingerprint 1.00 (EXACT) vs libgs/gs_001.o (disc 3.3/3.5),
+// unique (next candidate __fixdfdi, masked 0.17). Header LIBGS.H
+// `void GsInitGraph(u_short x, u_short y, u_short intmode, u_short dith,
+// u_short vrammode);`, no C call site yet. Round 81 (bravo, track 2), not
+// yet linked from an SDK object.
+GsInitGraph = 0x800238DC; // type:func  (Psy-Q libgs/gs_001, fingerprint)
