@@ -101,7 +101,15 @@ Class6C070Methods *func_80020C4C(void);
 Class6C070 *func_80020C5C(void);
 void func_80020970(RECT *dst, Class6C070Rect *src);
 
-INCLUDE_ASM("asm/nonmatchings/code_10ee0", new_class_6c078);
+Class6C070 *new_class_6c078(void) {
+    Class6C070 *p = BMemPMgrAlloc(0x34);
+
+    if (p != NULL) {
+        func_80020C4C()->ctor(p);
+        return p;
+    }
+    return NULL;
+}
 INCLUDE_ASM("asm/nonmatchings/code_10ee0", func_80020730);
 INCLUDE_ASM("asm/nonmatchings/code_10ee0", func_80020784);
 INCLUDE_ASM("asm/nonmatchings/code_10ee0", func_800207DC);
