@@ -863,6 +863,11 @@
           "date": "2026-09-25",
           "header": "include/Pad.h"
         },
+        "gScreenSpriteMethods": {
+          "class": "ScreenSprite",
+          "date": "2026-09-25",
+          "header": "include/ScreenSprite.h"
+        },
         "gSpriteMethods": {
           "class": "Sprite",
           "date": "2026-09-25",
