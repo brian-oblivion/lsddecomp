@@ -194,7 +194,25 @@ void func_80039DF4(SeqObj *self, s16 left, s16 right) {
 void func_80039E24(SeqObj *self, s16 vol, s32 scale) {
     SsSeqSetCrescendo(self->seqId, vol, func_8002CC28() * scale);
 }
-INCLUDE_ASM("asm/nonmatchings/code_2a0e0", func_80039E7C);
+void func_80039E7C(SeqObj *self, s32 arg) {
+    if (self->playing != 0) {
+        self->methods->stop(self);
+    }
+    if (self->unk10 != NULL) {
+        self->unk10->methods->release((BasicClass *)self->unk10);
+        self->unk10 = NULL;
+    }
+    if (arg != 0) {
+        self->unk10 = func_800422CC(arg);
+        if (func_80039C04(self)) {
+            if (self->unk20 != 0) {
+                self->methods->play(self);
+            }
+        } else if (self->state == 0) {
+            self->state = 1;
+        }
+    }
+}
 INCLUDE_ASM("asm/nonmatchings/code_2a0e0", func_80039F64);
 SeqObjMethods *func_8003A04C(void) {
     return &D_8006E48C;
