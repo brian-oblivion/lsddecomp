@@ -532,6 +532,16 @@
           "note": "23 identified (shape >=0.93 + position; libsnd vmanager x20, ssinit _SsInit, seqread _SsSetControlChange, libcard _card_clear), incl. 6 game-worded names superseded (StepVoiceEnvelope->SetAutoVol, BeginVoiceFade->SeAutoPan, StepVoiceFade->SetAutoPan, InitSpuDriver->SpuVmInit, ClearNoiseVoices->SpuVmNoiseOff, StopNote->SpuVmKeyOff). 2 parked unidentified: func_8001F4E4 (best AddCOMB 0.80, position contradicts), func_8001F50C (TINY 4w, PadVersion/CdLastPos tie). Findings: SsUtKeyOn extern in code_179d8_e disagrees with header and definition; SsUtAllKeyOff preserved body void(void) but header/call site pass one arg.",
           "round": 74,
           "runners": 1
+        },
+        {
+          "attempts": 43,
+          "calibration": false,
+          "date": "2026-09-26",
+          "matches": 43,
+          "model": "premium",
+          "note": "Game names off Sony DATA (operator request). tools/sonydata.py lists gName/sName data whose every accessor is library code and aligns each accessor against the SDK objects for Sony's name (lead until anchored). 43 symbols: alpha merged libsnd vmanager's per-field symbols into _svm_voice/_svm_sreg_buf/_svm_sreg_dirty (include/SvmData.h; 12 gVoiceEnv*/gVoiceFade* gone, one struct = zero bytes, three NON_MATCHING bodies closer); head: gVoiceActivityRing/Idx -> _svm_envx_hist/_ptr, ssinit gSeqTimer*/gVideoMode -> _snd_* (7), gDisableVoiceStarveScan -> _svm_auto_kof_mode, gMasterVolL/R + D_8008E258/5C -> _svm_rattr fields (reverb depth), 5 statics to placeholders (counter.o x3, ssinit, _ss_spu_vm_rec+8). rename.py now refuses the pattern; plan.py tracks it. Track 2 done again.",
+          "round": 86,
+          "runners": 1
         }
       ],
       "status": "open"
@@ -959,6 +969,16 @@
           "model": "opus",
           "note": "Three classes unified in sequence, one Opus runner each: Class65650 (gClass65650Methods 0x234, alpha), Viewport (ex D_8006E8E4 0x7, bravo; behaviour name: GsRVIEW2, GsOT pair, Flip), BoxFill (ex D_8006EAC0 0x64, charlie; DrawNode's GsSortBoxFill path). Ctor chains held. Premium head did track 4b's first instances (CdDriver.h, gMcDevicePath0/1, D_8008ACA4..AC), wrote its recipe (plan revision 21), opened 4b; --globals now excludes Sony-only data (35 of 45). All merges byte-identical, 0 new warnings, nonmatching green.",
           "round": 85,
+          "runners": 3
+        },
+        {
+          "attempts": 3,
+          "calibration": false,
+          "date": "2026-09-26",
+          "matches": 3,
+          "model": "opus",
+          "note": "Premium head, cap 5, classes in sequence one Opus runner each: CharSprite (ex D_8006EC74; bravo), Tod (ex D_8006F240; charlie), LightRig (ex D_8006EFAC; delta). All merged, sampled, mark-class'ed; 0 new warnings throughout.",
+          "round": 86,
           "runners": 3
         }
       ],

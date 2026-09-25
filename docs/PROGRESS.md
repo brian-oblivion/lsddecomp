@@ -6,6 +6,81 @@ stale, prose elsewhere is not.
 
 ---
 
+## 2026-09-26 — round 86: game names off Sony data (premium head), three classes unified
+
+Premium head (Opus 5.5; the operator started it as premium), operator cap 5.
+The operator asked first for the libsnd voice table's game names to come off
+(round 85 had reported them, not acted). That ran as alpha (Opus, the five
+code_179d8 libsnd units) beside track 4's class sequence (bravo, charlie,
+delta, one Opus runner each, kept off code_179d8_*), while the head built the
+tooling and did the rest of the Sony data in `main`. Every merge: `make
+extract`, oracle, `--warnings` 0 new, nonmatching green.
+
+- **The ring pair (head).** `gVoiceActivityRing/Idx` -> `_svm_envx_hist` /
+  `_svm_envx_ptr`: libsnd/vmanager.o bss on disc 3.5 (+0x67C/+0x678 from
+  `_svm_sreg_buf`, anchored at 0x8008D7F0; 3.3's 0x30 voice stride does not land).
+- **The voice table (alpha).** The per-field symbols (D_8008D988..D9A3 and the
+  12 `gVoiceEnv*`/`gVoiceFade*`) are `_svm_voice[24]` of `SvmVoice` (0x34),
+  plus `_svm_sreg_buf`/`_svm_sreg_dirty`, in `include/SvmData.h`: fields by
+  offset only, mechanics in comments. One struct compiled to the separate
+  symbols' bytes everywhere (cc1 at -G0 never CSEs the record address); three
+  NON_MATCHING bodies came closer (SpuVmAlloc 0.64 -> 0.78 mnemonic ratio).
+  splat still prints the per-field `D_` labels in asm/: it ignores `size:` past
+  the last segment's vram, and the yaml has no bss segment (escalated).
+- **The other 15 (head), found by the new tool.** `tools/sonydata.py` lists
+  game-style data names every accessor of which is library code (relocations
+  in the built objects) and proposes Sony's name by aligning each accessor
+  with the same function in every SDK object, section-relative targets
+  resolved by addend. Every answer is a lead until anchored. Applied:
+  ssinit.o's `_snd_use_vsync_cb/_snd_use_interrupt_id/_snd_1per2/
+  _snd_video_mode/_snd_vsync_cb/_snd_seq_tick_mode/_snd_seq_no_tick`
+  (ex gSeqTimer*, gVideoMode; 1.00 alignment and the object's declaration
+  order in retail); `_svm_auto_kof_mode` (ex gDisableVoiceStarveScan; every
+  disc agrees); `gMasterVolL/R` and D_8008E258/5C were `_svm_rattr`'s
+  `SpuReverbAttr` fields, reverb DEPTH, not a master volume; placeholders for
+  Sony statics no disc names (counter.o's .data, whose bytes are at
+  0x8006DCAC: D_8006DCAC/B0/B4; ssinit's D_8006DCA0) and for
+  `_ss_spu_vm_rec + 8` (D_8008DEB0: splat names only an exactly-referenced
+  address). 29 game names removed in all (the track 2 ledger note says 43;
+  that figure is wrong, plan.py cannot amend a round). `sonydata.py --check`: 0.
+- **Guards.** `rename.py` refuses a `gName`/`sName` for such data and accepts
+  OLD's own placeholder as NEW (an unname); `plan.py` keeps track 2 open with a
+  job line while any remain. Plan revision 22 writes the rule.
+- **CharSprite (ex D_8006EC74, 0x1144; bravo).** One 8x8 cell of a 32-wide
+  grid picked by a byte code; default cell 0x20 (space), fed string bytes and
+  FONTICON.TIM by its callers. setCell/getCell, `cellIndex` +0x0A8, 0xAC bytes.
+- **Tod (ex D_8006F240, 0x4F03; charlie).** Walks TOD packet words; no own
+  fields (0x2C); scanTodPackets/decodePacketWord at +0x07C/+0x080; sibling of
+  TimBlockSrc by ctor chain.
+- **LightRig (ex D_8006EFAC, 0x14; delta).** Three FlatLightObj children in
+  `lights[3]` (+0x044) and an ambient colour set through GsSetAmbient (+0x050).
+  0x54 bytes. `D8006EFAC__GetChild` -> `LightRig__GetLight` (it returns
+  `lights[i]`, not a children-list entry).
+- **Learnings.** Two promoted (per-field Sony tables merge at zero bytes, with
+  value casts not address casts; splat names only exactly-referenced bss), two
+  register-identity entries distilled to the archive for the word budget.
+- **Open, for later jobs:** Class866E8's view (`Obj866E8` in class_3bb8c.h)
+  names +0x044/+0x048 inside LightRig's `lights[3]`, and four Obj86ED0
+  functions read `unk48` as a gate: those functions may belong to another
+  class. TodSet's ctor returns a value that `CLASS6D430_SLOTS`' ctor type
+  cannot express. `IntermediateBase::unk14` holds a LightRig as
+  `BasicClass *`. Obj6EAC0 (0x11144) fills its `children` with CharSprites.
+
+### ESCALATED (operator decisions; the head did not act)
+
+1. **A bss segment (or `global_vram_end`) in the splat yaml** would let
+   `size:` fold `_svm_voice`'s per-field `D_` labels in asm/ and name
+   `_ss_spu_vm_rec` itself. A segmentation change.
+2. **Retail's ssinit data layout matches no disc**: 3.3's code aligns 1.00
+   and its declaration order holds, but the values are initialised as in 3.5,
+   which folds tick_mode/no_tick into `_snd_seq_tick_env`. The 3.3 names were
+   taken; the 3.5 reading is recorded as the alternative in the symbols file.
+3. **`plan.py record-round` has no amend** (see the 43/29 note above).
+
+- **Next.** `plan.py` lists gVabDriverMethods (0x23, code_179d8_e).
+
+---
+
 ## 2026-09-25 — round 85: track 4b opened (premium head), three classes unified
 
 Premium head (Opus 5.5; the operator started it as premium), operator cap 5.
