@@ -4,22 +4,22 @@
 
 Round 82, runner charlie (matching slot, second pass on the unit). Unit `src/code_fa50.c`. Fresh ground, no prior attempt.
 
-- **What:** the constructor of class D_8006BEA0 (its slot +0x008): base ctor through `Get_vtable_BasicClass()->ctor`, install the method table, `unk10 = arg`, `data = (u8 *)arg - 0xC`, then `func_8001F394(self)` (sets the flag `D_8008AC4C = 1`).
+- **What:** the constructor of class D_8006BEA0 (its slot +0x008): base ctor through `Get_vtable_BasicClass()->ctor`, install the method table, `unk10 = arg`, `data = (u8 *)arg - 0xC`, then `MarkTmdModelConstructed(self)` (sets the flag `D_8008AC4C = 1`).
 - **Result:** byte-exact; 25/25 words, whole-image SHA1 green. Second build.
-- **Build 1:** `func_8001F394();` with no argument -- one word short (the `addu a0, s0, zero` before the stores was missing, and every later function shifted). Retail loads `$a0 = self` BEFORE the three stores and then stores through `$a0`: the call's argument was computed early and reused as the store base. So the callee takes `self` even though its body never reads it.
-- **Change to an existing declaration:** `func_8001F394` (matched earlier this round, this unit, no other declarer) is now `void func_8001F394(Class6BEA0 *self)` instead of `(void)`; identical bytes.
+- **Build 1:** `MarkTmdModelConstructed();` with no argument -- one word short (the `addu a0, s0, zero` before the stores was missing, and every later function shifted). Retail loads `$a0 = self` BEFORE the three stores and then stores through `$a0`: the call's argument was computed early and reused as the store base. So the callee takes `self` even though its body never reads it.
+- **Change to an existing declaration:** `MarkTmdModelConstructed` (matched earlier this round, this unit, no other declarer) is now `void MarkTmdModelConstructed(Class6BEA0 *self)` instead of `(void)`; identical bytes.
 
 ## Source
 
 ```c
-void func_8001F394(Class6BEA0 *self);
+void MarkTmdModelConstructed(Class6BEA0 *self);
 
 void TmdModel__TmdModel(Class6BEA0 *self, void *arg) {
     Get_vtable_BasicClass()->ctor((BasicClass *)self);
     self->methods = Get_vtable_TmdModel();
     self->unk10 = arg;
     self->data = (ModelData_fa50 *)((u8 *)arg - 0xC);
-    func_8001F394(self);
+    MarkTmdModelConstructed(self);
 }
 ```
 (types as in `New_TmdModel.md`.)

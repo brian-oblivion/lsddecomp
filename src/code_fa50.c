@@ -138,7 +138,7 @@ extern s32 D_8008AC4C;
 extern s32 D_8008B21C[];
 extern s32 D_8006BEA0[];
 extern void *BMemPMgrAlloc(s32 size);
-void func_8001F394(Class6BEA0 *self);
+void MarkTmdModelConstructed(Class6BEA0 *self);
 Class6BEA0Methods *Get_vtable_TmdModel(void);
 
 Class6BEA0 *New_TmdModel(void *arg) {
@@ -155,7 +155,7 @@ void TmdModel__TmdModel(Class6BEA0 *self, void *arg) {
     self->methods = Get_vtable_TmdModel();
     self->unk10 = arg;
     self->data = (ModelData_fa50 *)((u8 *)arg - 0xC);
-    func_8001F394(self);
+    MarkTmdModelConstructed(self);
 }
 void func_8001F314(Class6BEA0 *self, Quad_fa50 *src) {
     self->quad = *src;
@@ -171,7 +171,7 @@ void func_8001F37C(void) {
 Class6BEA0Methods *Get_vtable_TmdModel(void) {
     return (Class6BEA0Methods *)D_8006BEA0;
 }
-void func_8001F394(Class6BEA0 *self) {
+void MarkTmdModelConstructed(Class6BEA0 *self) {
     D_8008AC4C = 1;
 }
 s32 func_8001F3A4(void *self) {

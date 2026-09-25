@@ -2626,3 +2626,4 @@ Get_vtable_DrawSystem = 0x80020C4C; // type:func
 SetDrawSystem = 0x80020C68; // type:func
 Get_vtable_TmdModel = 0x8001F384; // type:func
 TmdModel__TmdModel = 0x8001F2B0; // type:func
+MarkTmdModelConstructed = 0x8001F394; // type:func
