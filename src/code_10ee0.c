@@ -140,7 +140,15 @@ s32 func_80020B68(Class6C070 *self) {
     return self->unk20;
 }
 INCLUDE_ASM("asm/nonmatchings/code_10ee0", func_80020B74);
-INCLUDE_ASM("asm/nonmatchings/code_10ee0", func_80020C08);
+Class6C070Size *func_80020C08(Class6C070 *self, Class6C070Dims *out) {
+    if (out != NULL) {
+        out->x = 0;
+        out->y = 0;
+        out->w = self->size.w;
+        out->h = self->size.h * 2;
+    }
+    return &self->size;
+}
 void func_80020C3C(Class6C070 *self, s32 value) {
     self->unk2C = value;
 }
