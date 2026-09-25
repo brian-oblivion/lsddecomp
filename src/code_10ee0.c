@@ -118,7 +118,12 @@ s32 func_800208D8(Class6C070 *self) {
     return GsGetActiveBuff();
 }
 INCLUDE_ASM("asm/nonmatchings/code_10ee0", func_800208F8);
-INCLUDE_ASM("asm/nonmatchings/code_10ee0", func_80020970);
+void func_80020970(RECT *dst, Class6C070Rect *src) {
+    dst->x = src->x;
+    dst->y = src->y;
+    dst->w = src->w;
+    dst->h = src->h;
+}
 INCLUDE_ASM("asm/nonmatchings/code_10ee0", func_800209A0);
 s32 func_80020A1C(Class6C070 *self) {
     return 0;
