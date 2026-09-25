@@ -115,7 +115,12 @@ void func_80020730(Class6C070 *self) {
     self->methods = func_80020C4C();
     self->methods->init(self);
 }
-INCLUDE_ASM("asm/nonmatchings/code_10ee0", func_80020784);
+void func_80020784(Class6C070 *self) {
+    self->unk10 = 0;
+    self->methods->slot70(self, 3);
+    self->methods->slot80(self, 1);
+    self->unk30 = 0;
+}
 INCLUDE_ASM("asm/nonmatchings/code_10ee0", func_800207DC);
 void func_8002085C(Class6C070 *self) {
     if (self->unk10 == 0) {
