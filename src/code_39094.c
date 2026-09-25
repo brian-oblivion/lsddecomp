@@ -286,9 +286,8 @@ Rec1C *GetWeeklyStreamPool(s32 *countOut) {
     }
     return &((Rec1C *)GetRecordTable(NULL))[0x230];
 }
-Rec1C *PickWeeklyStreamChannel(s32 *countOut) {
-    s32 unused;
-    u32 r = (u32)SeedAndRandom(0, unused) % 7;
+Rec1C *PickWeeklyStreamChannel(s32 *countOut, s32 arg1) {
+    u32 r = (u32)SeedAndRandom(0, arg1) % 7;  /* arg1 only forwarded, like PickDailyVariant's */
     s32 count;
     Rec1C *rec = GetWeeklyStreamPool(&count);
     if (countOut != NULL) {
