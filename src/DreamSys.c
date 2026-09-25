@@ -79,7 +79,7 @@ DreamSys *DreamSys__DreamSys(DreamSys *this, void *arg1, s32 arg2, s32 arg3)
 {
 	void *val;
 
-	GetActorMethods()->ctor(this);
+	GetActorMethods()->ctor((Actor *)this);
 	this->vt = Get_vtable_DreamSys();
 	this->soundObj = arg2;
 	this->heightCurve = (DreamSysUnk5C *)arg3;
@@ -114,7 +114,7 @@ void DreamSys__SpawnAtLink(DreamSys *this, DreamSysSpawnArgObj *arg1)
 	s32 local[4];
 
 	arg1->methods->slot0xE4(arg1, local, this, &this->linkCoordinates);
-	GetActorMethods()->slot4C(this, arg1, local);
+	GetActorMethods()->attachToParent((Actor *)this, (Class6B5CC *)arg1, (Vec3_d294 *)local);
 	this->vt->slot10(this, arg1);
 	if (this->pendingLinkType == 0xE) {
 		FlashbackEntry *entry = &this->storedFlasbacks[this->currentFlashbackIndex];
@@ -131,14 +131,14 @@ void DreamSys__UnlinkLinkMgr(DreamSys *this)
 {
 	this->linkMgr->methods->slot0xF0(this->linkMgr);
 	this->vt->Actor__RemoveChild(this, this->linkMgr);
-	GetActorMethods()->slot0x50(this);
+	GetActorMethods()->detachFromParent((Actor *)this);
 }
 
 void DreamSys__NotifyLinkAttempt(DreamSys *this, s32 arg1)
 {
 	s32 v;
 
-	GetActorMethods()->slot0x88(this, arg1);
+	GetActorMethods()->notifyIfUnk20Active((Actor *)this, arg1);
 	if (arg1 == -2)
 		goto handle_neg2;
 	if (arg1 != -1)
@@ -255,7 +255,7 @@ tick_only:
 
 void DreamSys__DispatchChunkChange(DreamSys *this, void *arg1, s32 arg2)
 {
-	GetActorMethods()->slot0x9C(this, arg1, arg2);
+	GetActorMethods()->dispatchLinkCommand((Actor *)this, arg1, arg2);
 	if ((*(s32 *)(*(void **)arg1) & 0xFFF) == 0x114) {
 		this->vt->ProcessChunkChange(this, arg1, arg2);
 	}
@@ -263,7 +263,7 @@ void DreamSys__DispatchChunkChange(DreamSys *this, void *arg1, s32 arg2)
 
 void DreamSys__DispatchInstanceEffect(DreamSys *this, void *arg1, s32 arg2)
 {
-	GetActorMethods()->slot0xDC(this, arg1, arg2);
+	GetActorMethods()->onActorLinkCommand((Actor *)this, arg1, arg2);
 	if ((*(s32 *)(*(void **)arg1) & 0xFFFFF) == 0x1F234) {
 		this->vt->InstanceEffectsOnJournal(this, arg1, arg2);
 	}
@@ -271,7 +271,7 @@ void DreamSys__DispatchInstanceEffect(DreamSys *this, void *arg1, s32 arg2)
 
 void DreamSys__WallLink(DreamSys *this, void* unk_class_86aa0, int arg2)
 {
-	GetActorMethods()->slot0xE0(this, unk_class_86aa0, arg2);
+	GetActorMethods()->onClass86AA0LinkCommand((Actor *)this, unk_class_86aa0, arg2);
 	if (arg2 != 4)
 		return;
 	if (this->pendingLinkType != 0)

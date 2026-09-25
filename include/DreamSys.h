@@ -40,7 +40,7 @@
  * Per-name evidence and tiers are in docs/match-reports/<func>.md. */
 
 #include "common.h"
-#include "Class6B5CC.h"
+#include "Actor.h"
 /* For StageChunk / GetMoodFromStageChunk, used by DreamSys__LogChunkMood
    (round 2026-08-30-d). */
 #include "StageGrid.h"
@@ -398,56 +398,13 @@ typedef struct DreamSysUnk4CObj {
 	DreamSysUnk4C68Obj *unk_0x68;
 } DreamSysUnk4CObj;
 
-/* Shared intermediate base class table (gActorMethods -- see
-   docs/research/class-framework.md and code_55dd4.h's D800878D4Methods,
-   which types the same table for Class65650, a sibling of DreamSys under
-   this same base). Declared locally here rather than pulled in from
-   code_55dd4.h to avoid a cross-unit include; only slot +0x050 is needed by
-   this unit (DreamSys__UnlinkLinkMgr, this round). */
-typedef struct DreamSysBaseMethods {
-	u8 pad00[0x8];
-	/* Shared with Class65650's own inherited "ctor" slot at the same offset
-	   in the SAME base table (code_55dd4.h's D800878D4Methods, which already
-	   names and resolves this exact slot as `Actor__Actor`, taking/
-	   returning `Class65650 *self`). Called by DreamSys__DreamSys as
-	   (this), its return value discarded (round 2026-09-02) -- consistent
-	   with the base ctor returning `self` for chaining, unneeded here since
-	   the caller already has `this`. */
-	struct DreamSys *(*ctor)(struct DreamSys *self);
-	u8 pad0C[0x4C - 0xC];
-	/* Shared with Class65650's own inherited "slot4C" at the same offset in
-	   the SAME base table (code_55dd4.h's D800878D4Methods: "called by
-	   Class65650__AttachToParent as slot4C(self, arg3, arg5)"). Called by
-	   DreamSys__SpawnAtLink as (this, arg1, &local) (round 2026-09-02). */
-	void (*slot4C)(struct DreamSys *self, void *arg1, void *arg2);
-	/* Deliberately `struct DreamSys *`, not `DreamSys *` -- this precedes
-	   the real `typedef struct DreamSys {...}` below, so GCC 2.6.3 warns
-	   "declared inside parameter list ... probably not what you want" and
-	   scopes a distinct tag here. A forward `typedef struct DreamSys
-	   DreamSys;` to avoid the warning does NOT work: this compiler treats
-	   the later real typedef as a "redefinition of DreamSys" error instead.
-	   The warning is cosmetic -- both tags are pointer-compatible at the
-	   ABI level, and the call site casts implicitly with no codegen
-	   difference (round 2026-08-30-b). */
-	void (*slot0x50)(struct DreamSys *self);
-	u8 pad54[0x88 - 0x54];
-	/* Called by DreamSys__NotifyLinkAttempt (this unit's own +0x088 slot) as
-	   (this, arg1), return value discarded (round 2026-09-02). */
-	void (*slot0x88)(struct DreamSys *self, s32 arg1);
-	u8 pad8C[0x9C - 0x8C];
-	/* Called by DreamSys__DispatchChunkChange as (this, arg1, arg2) -- round 2026-08-30-d. */
-	void (*slot0x9C)(struct DreamSys *self, void *arg1, s32 arg2);
-	u8 padA0[0xDC - 0xA0];
-	/* Called unconditionally by DreamSys__DispatchInstanceEffect (this unit's own +0xDC slot)
-	   as (this, arg1, arg2) -- same argument shape as slot0x9C above
-	   (round 2026-09-02). Resolves to Actor__OnActorLinkCommand in gActorMethods, out of
-	   this unit's scope. */
-	void (*slot0xDC)(struct DreamSys *self, void *arg1, s32 arg2);
-	/* Called by DreamSys__WallLink as (this, arg1, arg2) -- same argument
-	   shape as slot0x9C/slot0xDC above (round 2026-09-02). */
-	void (*slot0xE0)(struct DreamSys *self, void *arg1, s32 arg2);
-} DreamSysBaseMethods;
-extern DreamSysBaseMethods *GetActorMethods(void);
+/* DreamSys's base class is Actor (include/Actor.h): DreamSys's own methods
+   reach the base implementations through GetActorMethods() and upcast. */
+/* A file-scope declaration of the tag. The table view this replaces
+   declared it as a side effect (its ctor slot RETURNED `struct DreamSys *`,
+   which is not a parameter list), so every `struct DreamSys *` parameter
+   below refers to this one type, as it did before. */
+struct DreamSys;
 
 /* Opaque view of whatever object DreamSys__ProcessChunkChange's `entity`
    parameter points to -- almost certainly an `Entity*` (include/Entity.h),
@@ -456,7 +413,7 @@ extern DreamSysBaseMethods *GetActorMethods(void);
    for this unit's own call sites only (round 2026-08-30-d;
    +0x38/+0x14C/+0x150/+0x154/+0x158 added round 2026-09-06 by
    DreamSys__InstanceEffectsOnJournal). +0x38 takes the DreamSys instance
-   as its own second argument, same shape as DreamSysBaseMethods::slot0x50
+   as its own second argument, same shape as ActorMethods::detachFromParent (+0x050)
    above; +0x14C returns a pointer forwarded straight into
    LogInstanceMood, so `MoodGraphPoint *`; +0x150/+0x154 return plain s32
    (added to/negated into DreamSys fields); +0x158's return is stored with
