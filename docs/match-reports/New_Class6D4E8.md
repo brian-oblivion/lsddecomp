@@ -78,3 +78,22 @@ a function.
   which of the two logical outcomes is written as the trailing statement
   before concluding the residue is unfixable -- cheap to test on a 20-word
   function, and it closed this one on the very next attempt.
+
+## Naming
+
+Round 79 (delta).
+
+- **`New_Class6D4E8`** (was FirecatFG's `new_class_6d4e8`) -- **tier A**.
+  Body alone: `BMemPMgrAlloc(0x2C)`, and on success dispatches
+  `GetClass6D4E8Methods()->ctor` (table +0x008, which classtable.py
+  resolves to `Class6D4E8__Class6D4E8`) on the new block, returning it, or
+  NULL. The inherited hypothesis is confirmed; only the spelling changes to
+  the project's `New_Class` convention. No direct caller in `asm/` or `src/`
+  (grep for the name and for `800271D8`), so the caller is not known; the
+  name rests on the body.
+- `0x2C` is now `CLASS6D4E8_SIZE`, the allocation size. The unit's
+  `Class6D4E8` struct is a partial view and is NOT claimed to be complete,
+  which is why this is a constant and not `sizeof`.
+- Local types renamed to the tree's class prefix: `Obj6D4E8` ->
+  `Class6D4E8`, `Obj6D4E8Methods` -> `Class6D4E8Methods` (the prefix every
+  other method of this class already carries in code_179d8_q.c).

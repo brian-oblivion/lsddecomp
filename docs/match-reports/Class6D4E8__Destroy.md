@@ -9,7 +9,7 @@ Unit `code_179d8_o`, round 26 (2026-09-09). A two-call vtable dispatcher on
 ## What it is
 
 ```c
-void Class6D4E8__Destroy(Obj6D4E8 *self)
+void Class6D4E8__Destroy(Obj6D4E8 *self)   /* round-26 text; see "Naming" for the current source */
 {
     self->methods->slot74();
     self->methods->slot5C(self);
@@ -34,3 +34,41 @@ distinguishes the two slots here, and both readings were confirmed by the
 byte-exact result.
 
 Matched on the first attempt.
+
+## Naming
+
+Round 79 (delta).
+
+- **`Class6D4E8__Destroy`** (was `func_80027274`) -- **tier A**. Table slot
+  +0x00C of D_8006D4E8, overriding `Class6D430__Destroy` in the parent
+  table (and `BasicClass__Finalize` in the root). The body cancels this
+  object's queued CD requests (+0x074, `Class6D4E8__CancelRequests`) and
+  then frees its buffer (+0x05C, inherited `Class6D430__FreeBuffer`) -- the
+  same two-dispatch shape as `Class6D430__Destroy` (`onBufferChanged` then
+  `freeBuffer`). Named after the slot it overrides, following the parent.
+- Slots, in the unit's local `Class6D4E8Methods` view (only this unit
+  accesses it, so renamed directly; both oracles green): `slot74` ->
+  `cancelRequests`, `slot5C` -> `freeBuffer` (the parent header's own name
+  for +0x05C), `unk04` -> `ownDtorChain` (the parent header's name for
+  +0x004).
+
+### Round 79 correction: the +0x074 call passes `self`
+
+The section above types `slot74` as `void (*)(void)` because its `jalr` has
+a nop delay slot. That reading is wrong about the callee: at that `jalr`,
+`$a0` still holds this function's own `self` (the prologue's `move s0,a0`
+copies it and leaves `$a0` intact), and `Class6D4E8__CancelRequests`
+(code_179d8_q.c) reads `self` from `$a0`. So the call does pass `self`.
+Retyped to `void (*cancelRequests)(void *self)` and called as
+`self->methods->cancelRequests(self)`: **byte-identical** (build exit 0,
+SHA1 OK, check-nonmatching green). `Class6D430__Destroy` in code_171e0.c
+has the identical compiled shape with `this` passed explicitly, which is
+the precedent. The nop delay slot said only that no argument register
+needed LOADING, not that none was read.
+
+### Proposed learning
+
+- A `jalr` whose delay slot is a `nop`, in a function that saved `$a0`
+  into an s-register with `move sN,a0` and has not called anything since,
+  is still passing its own first argument. Check the callee before typing
+  the slot zero-argument.

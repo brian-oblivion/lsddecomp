@@ -34,3 +34,24 @@ be attributed to).
 
 Matched on the first attempt -- a direct, source-order translation of the
 retail instruction sequence (no scheduling residue to fight).
+
+## Naming
+
+Round 79 (delta).
+
+- **`Class6D4E8__Class6D4E8`** (was `func_80027228`) -- **tier A**. It is
+  table slot +0x008 of D_8006D4E8 (`tools/classtable.py 0x8006D4E8 --vs
+  0x8006D430`), the slot that holds `Class6D430__Class6D430` in the parent
+  table and `BasicClass__BasicClass` in the root table. The body is the
+  project's constructor shape exactly: parent ctor first
+  (`GetClass6D430Methods()->ctor(self)`), then install its own table
+  (`self->methods = GetClass6D4E8Methods()`), then its own fields
+  (`unk28 = 0`), then `InitCdDrive()` (code_179d8_q: one-shot
+  `CdSetDebug(0)` + set double-speed mode). `New_Class6D4E8` dispatches it.
+- The two externs' notes that `GetClass6D4E8Methods` and `InitCdDrive` are
+  "still INCLUDE_ASM" were stale (both are matched C in code_179d8_q.c) and
+  are corrected in the unit.
+- `unk28` (+0x28, s16) is kept: cleared here and by Class6D430's own ctor,
+  read nowhere in this unit, so nothing establishes a meaning.
+- The parent-table view `BaseCtorTable6D4E8` is renamed `Class6D430CtorView`
+  (it IS D_8006D430 seen down to +0x008).

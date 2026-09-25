@@ -23,3 +23,19 @@ produces identical bytes for any parameter list, so the true arity (if any)
 is undetermined by this function alone and not needed to match it.
 
 Matched on the first attempt.
+
+## Naming
+
+Round 79 (delta).
+
+- **`Class6D4E8__NoOpSlot40`** (was `func_800272C8`) -- **tier A** (a pure
+  leaf whose mechanics are its purpose: it does nothing). It is D_8006D4E8
+  slot +0x040, which is null in Class6D430's table, so Class6D4E8 fills an
+  abstract slot with an empty body. Naming follows the existing
+  `ObjM__NoOpSlot40` / `DreamSys__NoOpSlotD8` convention. What the slot is
+  FOR is not established here: no caller of +0x040 has been traced.
+- Not Sony: `sdkname.py` reports EXACT hits (SsUtVibrateOff, __nulldev,
+  KeyOnCheck, ...), but every empty 2-word Sony function matches any empty
+  body, so those hits carry no evidence. The function is referenced from a
+  game class table, sits between two game methods of the same class, and
+  `progress.py`/`config/sdk-in-game.txt` count it as game code.
