@@ -97,7 +97,10 @@ INCLUDE_ASM("asm/nonmatchings/code_322b4", func_80042684);
 INCLUDE_ASM("asm/nonmatchings/code_322b4", func_80042694);
 INCLUDE_ASM("asm/nonmatchings/code_322b4", func_800426E4);
 INCLUDE_ASM("asm/nonmatchings/code_322b4", func_80042790);
-INCLUDE_ASM("asm/nonmatchings/code_322b4", func_80042814);
+/* D_8006EFAC slot +0x040 (reset): mark the coordinate for recompute. */
+void func_80042814(Class6B5CC *self) {
+    self->coord2->flg = 0;
+}
 /* D_8006EFAC slot +0x09C (dispatchLinkCommand): empty override. */
 void func_80042820(Class6B5CC *self, void *sender, s32 event) {
 }
