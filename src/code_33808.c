@@ -272,7 +272,19 @@ void func_80044DC8(DataSrc33808 *self) {
     BMemPMgrFree((void *)self->unk38);
     GetActiveDataSourceMethods()->finalize((Class6D430 *)self);
 }
-INCLUDE_ASM("asm/nonmatchings/code_33808", func_80044E10);
+/* D_8006F498 +0x064: unless +0x2A is set, slot +0x078 and mark +0x42. */
+typedef struct Obj6F498 {
+    CLASS6D430_FIELDS(DataSrc33808Methods);
+    /* +0x02C */ u8 pad2C[0x16];
+    /* +0x042 */ u16 unk42;
+} Obj6F498;
+
+void func_80044E10(Obj6F498 *self) {
+    if (self->unk2A == 0) {
+        ((void (*)())self->methods->slot78)();
+        self->unk42 = 1;
+    }
+}
 INCLUDE_ASM("asm/nonmatchings/code_33808", func_80044E64);
 extern s32 D_8006F498[];
 
