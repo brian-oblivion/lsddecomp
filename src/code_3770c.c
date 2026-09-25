@@ -59,6 +59,8 @@ struct CdStreamObj {
 extern CdStreamObjMethods D_800817E0;  /* the class's method table */
 CdStreamObjMethods *func_80047900(void);
 void func_80047388(u8 status, u8 *result);
+void func_800477B0(CdStreamObj *self, u32 *base, u32 frame);
+void func_80047810(CdStreamObj *self);
 
 /* LIBCD.H */
 extern void StSetRing(u32 *ring_addr, u32 ring_size);
@@ -70,6 +72,7 @@ extern void *CdSyncCallback(void (*func)(u8 status, u8 *result));
 extern int CdControl(u8 com, u8 *param, u8 *result);
 extern int CdControlF(u8 com, u8 *param);
 extern int CdRead2(u32 mode);
+extern int StGetNext(u32 **addr, u32 **header);
 extern void StSetStream(u32 mode, u32 start_frame, u32 end_frame, void (*func1)(), void (*func2)());
 
 extern void *BMemPMgrAlloc(s32 size);
@@ -234,8 +237,36 @@ void func_80047638(CdStreamObj *self) {
         self->muted = 0;
     }
 }
-INCLUDE_ASM("asm/nonmatchings/code_3770c", func_80047694);
-void func_800477B0(CdStreamObj *self, u32 *base) {
+s32 func_80047694(CdStreamObj *self, u32 **addr, u32 *frame, s32 tries) {
+    u32 *header;
+    u32 n;
+
+    if (tries < 0) {
+        tries = 0x800000;
+    }
+    while (StGetNext(addr, &header) != 0) {
+        if (--tries < 0) {
+            self->methods->freeRing(self, (u32 *)addr);
+            return 0;
+        }
+    }
+    n = header[2];
+    *frame = n;
+    if (self->unk40 > 0) {
+        if (n >= self->unk40 || n < self->unk58) {
+            if (n < self->unk58) {
+                *frame = 0;
+            }
+            func_800477B0(self, *addr, *frame);
+            func_80047810(self);
+            return -1;
+        }
+        self->unk58 = n;
+    }
+    func_800477B0(self, *addr, *frame);
+    return 1;
+}
+void func_800477B0(CdStreamObj *self, u32 *base, u32 frame) {
     if (self->cb48 != NULL) {
         self->cb48(self->cbArg);
         self->methods->freeRing(self, base);
