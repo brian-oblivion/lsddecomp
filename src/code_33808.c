@@ -110,7 +110,8 @@ void func_80045AC8(void) {
 void func_80045AD0(void) {
 }
 INCLUDE_ASM("asm/nonmatchings/code_33808", func_80045AD8);
-INCLUDE_ASM("asm/nonmatchings/code_33808", func_80045BC0);
+void func_80045BC0(void) {
+}
 INCLUDE_ASM("asm/nonmatchings/code_33808", func_80045BC8);
 INCLUDE_ASM("asm/nonmatchings/code_33808", func_80045C94);
 INCLUDE_ASM("asm/nonmatchings/code_33808", func_80045CFC);
