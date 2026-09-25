@@ -150,7 +150,7 @@ Class6BEA0 *New_TmdModel(void *arg) {
     }
     return NULL;
 }
-void func_8001F2B0(Class6BEA0 *self, void *arg) {
+void TmdModel__TmdModel(Class6BEA0 *self, void *arg) {
     Get_vtable_BasicClass()->ctor((BasicClass *)self);
     self->methods = Get_vtable_TmdModel();
     self->unk10 = arg;

@@ -1,4 +1,6 @@
-# func_8001F2B0 -- MATCHED (25/25 words), round 82
+# TmdModel__TmdModel -- MATCHED (25/25 words), round 82
+
+> Renamed from `func_8001F2B0` on 2026-09-25 (tools/rename.py). Address 0x8001f2b0.
 
 Round 82, runner charlie (matching slot, second pass on the unit). Unit `src/code_fa50.c`. Fresh ground, no prior attempt.
 
@@ -12,7 +14,7 @@ Round 82, runner charlie (matching slot, second pass on the unit). Unit `src/cod
 ```c
 void func_8001F394(Class6BEA0 *self);
 
-void func_8001F2B0(Class6BEA0 *self, void *arg) {
+void TmdModel__TmdModel(Class6BEA0 *self, void *arg) {
     Get_vtable_BasicClass()->ctor((BasicClass *)self);
     self->methods = Get_vtable_TmdModel();
     self->unk10 = arg;
