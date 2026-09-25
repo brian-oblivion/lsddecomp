@@ -1,0 +1,33 @@
+# CdStreamObj__Close -- MATCHED (exact length, 24/24 words), round 82
+
+> Renamed from `func_8004728C` on 2026-09-25 (tools/rename.py). Address 0x8004728c.
+
+Round 82, runner delta. Unit `src/code_3770c.c` (carved from psyq_3770c in
+FINISHING-PLAN revision 18). Fresh ground, no prior attempt. Byte-exact on
+the first build of the real body; whole-image SHA1 green.
+
+- **Where:** slot +0x048 of gCdStreamObjMethods.
+- **What:** if state (+0x2C) is non-zero and this is the active object, call slot +0x54 on it, reset state, and clear `gActiveCdStreamObj`.
+- **Levers:** use a local for the loaded global (`$s0` holds it across the call).
+- **Context:** round 82 extended the unit's local `CdStreamObj` view: `loc` (+0x0C, the seek location passed to slot +0x4C), `s32 muted` (+0x30), `void *cbArg` (+0x44), callbacks `cb48`/`cb4C`/`cb54` (+0x48/+0x4C/+0x54, each called with `cbArg`), object size 0x5C (the allocator's request); method slots +0x040..+0x070 typed; ctor slot takes `(self, s32, s32, s32)`. The active stream object is the sdata global `gActiveCdStreamObj` (`CdStreamObj *`). libcd externs `CdSyncCallback`, `CdControl`, `CdControlF` declared in the unit from the Psy-Q prototypes.
+
+## Naming
+
+Kept `func_`. Not renamed this round (brief: no renames).
+
+## Source
+
+```c
+void CdStreamObj__Close(CdStreamObj *self) {
+    CdStreamObj *cur;
+
+    if (self->unk2C != 0) {
+        cur = gActiveCdStreamObj;
+        if (cur == self) {
+            cur->methods->slot54(cur);
+            cur->unk2C = 0;
+            gActiveCdStreamObj = NULL;
+        }
+    }
+}
+```

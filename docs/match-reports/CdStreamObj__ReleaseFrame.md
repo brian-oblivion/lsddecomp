@@ -1,0 +1,27 @@
+# CdStreamObj__ReleaseFrame -- MATCHED (exact length, 24/24 words), round 82
+
+> Renamed from `func_800477B0` on 2026-09-25 (tools/rename.py). Address 0x800477b0.
+
+Round 82, runner delta. Unit `src/code_3770c.c` (carved from psyq_3770c in
+FINISHING-PLAN revision 18). Fresh ground, no prior attempt. Byte-exact on
+the first build of the real body; whole-image SHA1 green.
+
+- **Where:** not in the table (between slot +0x06C `CdStreamObj__GetNextFrame` and +0x070); reached from elsewhere.
+- **What:** if the +0x48 callback is set, call it with +0x44, then `freeRing(self, base)` through slot +0x70.
+- **Levers:** none needed.
+- **Context:** round 82 extended the unit's local `CdStreamObj` view: `loc` (+0x0C, the seek location passed to slot +0x4C), `s32 muted` (+0x30), `void *cbArg` (+0x44), callbacks `cb48`/`cb4C`/`cb54` (+0x48/+0x4C/+0x54, each called with `cbArg`), object size 0x5C (the allocator's request); method slots +0x040..+0x070 typed; ctor slot takes `(self, s32, s32, s32)`. The active stream object is the sdata global `gActiveCdStreamObj` (`CdStreamObj *`). libcd externs `CdSyncCallback`, `CdControl`, `CdControlF` declared in the unit from the Psy-Q prototypes.
+
+## Naming
+
+Kept `func_`. Not renamed this round (brief: no renames).
+
+## Source
+
+```c
+void CdStreamObj__ReleaseFrame(CdStreamObj *self, u32 *base) {
+    if (self->cb48 != NULL) {
+        self->cb48(self->cbArg);
+        self->methods->freeRing(self, base);
+    }
+}
+```

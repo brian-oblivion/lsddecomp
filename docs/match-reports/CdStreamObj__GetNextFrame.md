@@ -1,25 +1,27 @@
-# func_80047694 -- MATCHED (exact length, 71/71 words), round 82
+# CdStreamObj__GetNextFrame -- MATCHED (exact length, 71/71 words), round 82
+
+> Renamed from `func_80047694` on 2026-09-25 (tools/rename.py). Address 0x80047694.
 
 Round 82, runner delta (second session). Unit `src/code_3770c.c`. Fresh
 ground, no prior attempt. Byte-exact on the first build; whole-image SHA1
 green.
 
-- **Where:** slot +0x06C of D_800817E0 (get next stream frame).
+- **Where:** slot +0x06C of gCdStreamObjMethods (get next stream frame).
 - **What:** retry `StGetNext(addr, &header)` up to `tries` times (a
   negative `tries` means 0x800000). On timeout, `freeRing(self, (u32 *)addr)`
   and return 0. Otherwise `*frame = header[2]` (StHEADER's frame count).
   When `unk40 > 0`, a frame at or past `unk40`, or before the last seen frame
   `unk58`, ends the stream: zero `*frame` if it went backwards, release the
-  sector (`func_800477B0`), finish (`func_80047810`), return -1. Otherwise
+  sector (`CdStreamObj__ReleaseFrame`), finish (`CdStreamObj__OnStreamEnd`), return -1. Otherwise
   record `unk58 = frame`. Normal path: release and return 1.
 - **Levers:** none. The `lui s0,0x80` / `addiu s0,s0,-1` pair splat shows as
   `%hi/%lo(D_7FFFFF)` is just `tries = 0x800000` plus the loop's `--tries`
   sitting in the beqz delay slot. It is not a symbol.
-- **Declaration change (unit-local):** `func_800477B0` gained an unused third
+- **Declaration change (unit-local):** `CdStreamObj__ReleaseFrame` gained an unused third
   parameter `u32 frame`. Retail calls it with `(self, *addr, *frame)`, and
   its body leaves a1/a2 untouched across the `cb48(cbArg)` call. Its bytes
-  are unchanged (24/24, image green). Prototypes for `func_800477B0` and
-  `func_80047810` were added near the top of the unit. `StGetNext` extern
+  are unchanged (24/24, image green). Prototypes for `CdStreamObj__ReleaseFrame` and
+  `CdStreamObj__OnStreamEnd` were added near the top of the unit. `StGetNext` extern
   added (Psy-Q prototype, `u_long` spelled `u32`).
 
 ## Naming
@@ -29,7 +31,7 @@ Kept `func_`. Not renamed this round (brief: no renames).
 ## Source
 
 ```c
-s32 func_80047694(CdStreamObj *self, u32 **addr, u32 *frame, s32 tries) {
+s32 CdStreamObj__GetNextFrame(CdStreamObj *self, u32 **addr, u32 *frame, s32 tries) {
     u32 *header;
     u32 n;
 
@@ -49,20 +51,20 @@ s32 func_80047694(CdStreamObj *self, u32 **addr, u32 *frame, s32 tries) {
             if (n < self->unk58) {
                 *frame = 0;
             }
-            func_800477B0(self, *addr, *frame);
-            func_80047810(self);
+            CdStreamObj__ReleaseFrame(self, *addr, *frame);
+            CdStreamObj__OnStreamEnd(self);
             return -1;
         }
         self->unk58 = n;
     }
-    func_800477B0(self, *addr, *frame);
+    CdStreamObj__ReleaseFrame(self, *addr, *frame);
     return 1;
 }
 ```
 
 ### Proposed learning
 
-`func_800477B0` shows how an unused parameter looks in the bytes: a
+`CdStreamObj__ReleaseFrame` shows how an unused parameter looks in the bytes: a
 callback call that sets only a0 while a1/a2 still hold the caller's
 arguments. Its matched C had two parameters. A caller passing three was
 what exposed it.

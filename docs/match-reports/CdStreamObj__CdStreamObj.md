@@ -1,9 +1,11 @@
-# func_80046F88 -- MATCHED (exact length, 59/59 words), round 82
+# CdStreamObj__CdStreamObj -- MATCHED (exact length, 59/59 words), round 82
+
+> Renamed from `func_80046F88` on 2026-09-25 (tools/rename.py). Address 0x80046f88.
 
 Round 82, runner delta (second session). Unit `src/code_3770c.c`. Fresh
 ground, no prior attempt. Byte-exact on build 8; whole-image SHA1 green.
 
-- **Where:** slot +0x008 (ctor) of D_800817E0; `func_80046F0C` (the
+- **Where:** slot +0x008 (ctor) of gCdStreamObjMethods; `New_CdStreamObj` (the
   allocator) calls it with `(obj, arg1, arg2, arg3)`.
 - **What:** BasicClass ctor; install the method table; +0x34 = arg1 (a
   speed/mode selector: `< 4` unsigned picks 300, else 150); muted = 0;
@@ -37,9 +39,9 @@ Kept `func_`. Not renamed this round (brief: no renames).
 ## Source
 
 ```c
-void func_80046F88(CdStreamObj *self, u32 arg1, s32 arg2, s32 arg3) {
+void CdStreamObj__CdStreamObj(CdStreamObj *self, u32 arg1, s32 arg2, s32 arg3) {
     Get_vtable_BasicClass()->ctor((BasicClass *)self);
-    self->methods = func_80047900();
+    self->methods = Get_vtable_CdStreamObj();
     self->unk34 = arg1;
     self->muted = 0;
     self->unk38 = (((arg1 < 4) ? 300 : 150) / arg2 / 2) * 2054;
