@@ -96,6 +96,9 @@ void func_8003B024(Class6E4F0 *self) {
 
 INCLUDE_ASM("asm/nonmatchings/code_2b78c", func_8003B02C);
 INCLUDE_ASM("asm/nonmatchings/code_2b78c", func_8003B044);
-INCLUDE_ASM("asm/nonmatchings/code_2b78c", func_8003B108);
+
+void func_8003B108(Class6E4F0 *self) {
+}
+
 INCLUDE_ASM("asm/nonmatchings/code_2b78c", func_8003B110);
 INCLUDE_ASM("asm/nonmatchings/code_2b78c", func_8003B20C);
