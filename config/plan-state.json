@@ -728,6 +728,16 @@
           "note": "code_8220 (Sonnet): BMemPMgr allocator (SetDefaultBMemPMgr, FreeMem, SetupBMemPMgrFreeList, BMemPMgrAlloc, BMemPMgrFree, gDefaultBMemPMgr) and BasicClass root methods named by vtable slot (Release, Finalize, Add/RemoveChild, RemoveAllChildren, GetNextChild, Add/Remove/ClearParentRefs, GetNextParentRef, Push/RemoveBasicClassListNode); func_80017EA8 kept (empty, zero callers). Reviewed, no wrong tier A; head added SetDefaultBMemPMgr's missing Naming section and restored FINISHING-PLAN's tier-C example rename.py had rewritten.",
           "round": 74,
           "runners": 1
+        },
+        {
+          "attempts": 1,
+          "calibration": false,
+          "date": "2026-09-25",
+          "matches": 1,
+          "model": "sonnet",
+          "note": "code_33808 (Sonnet, alpha): 97/97 defs and 7 globals named; 11 tables -> TimBlockSrc, LinkResource, TimArraySrc, Tod, TodSet, ModelData, TriggerWorld, TileMap, TileAtlas, BgLayer, MoviePlayer. Reviewed, not sent back; head downgraded five tier-A names to B (LinkResource/TriggerWorld class names rest on callers' local view types from rounds 20/43; TileMap__Load's purpose word). Track 3 done.",
+          "round": 83,
+          "runners": 1
         }
       ],
       "status": "open",
@@ -865,6 +875,16 @@
           "note": "premium head: first classes of track 4 (BasicClass, Pad, Class6D430); attempts/matches = classes attempted/unified",
           "round": 80,
           "runners": 0
+        },
+        {
+          "attempts": 1,
+          "calibration": false,
+          "date": "2026-09-25",
+          "matches": 1,
+          "model": "opus",
+          "note": "TimBlockSrc (D_8006F0B8, 0xF03) unified by bravo in include/TimBlockSrc.h, no subclass macros: the four id-tree children (Tod 0x4F03, TodSet, ModelData 0x5F03, TriggerWorld) are smaller than TimBlockSrc's 0x84 and their ctors chain to GetActiveDataSourceMethods(), not TimBlockSrc. Escalated: nibble-path id is not inheritance in this family. One class this round per track 4 staffing.",
+          "round": 83,
+          "runners": 1
         }
       ],
       "status": "auto"
