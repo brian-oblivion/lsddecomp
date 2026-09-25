@@ -200,7 +200,10 @@ INCLUDE_ASM("asm/nonmatchings/code_33808", func_800447B4);
 INCLUDE_ASM("asm/nonmatchings/code_33808", func_80044808);
 INCLUDE_ASM("asm/nonmatchings/code_33808", func_80044858);
 INCLUDE_ASM("asm/nonmatchings/code_33808", func_800448F8);
-INCLUDE_ASM("asm/nonmatchings/code_33808", func_8004497C);
+/* D_8006F384/D_8006F40C +0x080: forwarded to slot +0x078 of the object at +0x30. */
+u8 func_8004497C(DataSrc33808 *self, s32 arg1, s32 arg2) {
+    return ((s32 (*)())self->unk30->methods->slot78)(self->unk30, arg1, arg2);
+}
 INCLUDE_ASM("asm/nonmatchings/code_33808", func_800449B8);
 extern s32 D_8006F384[];
 
