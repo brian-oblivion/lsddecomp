@@ -133,7 +133,12 @@ void *func_80043B78(void) {
 }
 INCLUDE_ASM("asm/nonmatchings/code_33808", func_80043B88);
 INCLUDE_ASM("asm/nonmatchings/code_33808", func_80043BE8);
-INCLUDE_ASM("asm/nonmatchings/code_33808", func_80043C60);
+/* D_8006F1C4 +0x00C: finalize -- same shape as D_8006F0B8's. */
+void func_80043C60(DataSrc33808 *self) {
+    ReleaseBasicClassArray((BasicClass **)self->unk30, self->unk2C);
+    BMemPMgrFree(self->unk30);
+    GetActiveDataSourceMethods()->finalize((Class6D430 *)self);
+}
 INCLUDE_ASM("asm/nonmatchings/code_33808", func_80043CB8);
 INCLUDE_ASM("asm/nonmatchings/code_33808", func_80043DFC);
 extern s32 D_8006F1C4[];
