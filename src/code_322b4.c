@@ -9,7 +9,8 @@
  * the BasicClass framework. Owns jtbl_80011290 (attached rodata sub-slot
  * 0x1A90).
  *
- * Nothing here is matched yet: every function is fresh track-1 ground.
+ * Round 82 matched the one- to eight-word bodies (getters, accessors, empty
+ * overrides); the larger bodies are still INCLUDE_ASM.
  */
 #include "common.h"
 #include "Class6B5CC.h"
@@ -20,8 +21,39 @@ typedef struct D_8006EF50Obj {
     u8 pad00[0xC];
     s32 unkC;  /* +0x00C, read by func_8004264C */
     s32 unk10; /* +0x010, set to 1 by func_80042658, cleared by func_80042664, read by func_8004266C */
-    s32 unk14; /* +0x014, set to 1 by func_80042678 */
+    s32 unk14; /* +0x014, set to 1 by func_80042678, cleared by func_800425D8 */
+    s32 unk18; /* +0x018, cleared by func_800425D8 */
 } D_8006EF50Obj;
+
+/* Local view of a D_8006EC74 object: func_80041C28 reads the byte at +0xA8. */
+typedef struct D_8006EC74Obj {
+    u8 pad00[0xA8];
+    u8 unkA8;
+} D_8006EC74Obj;
+
+/* Local view of a sprite object (D_8006EC74/ED4C/EE1C/879C4): the embedded
+ * GsSPRITE's r,g,b bytes at +0x78..+0x7A. */
+typedef struct Rgb_322b4 {
+    s8 r, g, b;
+} Rgb_322b4;
+typedef struct SpriteObj_322b4 {
+    u8 pad00[0x78];
+    Rgb_322b4 rgb;
+} SpriteObj_322b4;
+
+/* Local view of a D_8006EFAC/D_800866E8 object: a child array at +0x44. */
+typedef struct ChildArrayObj_322b4 {
+    u8 pad00[0x44];
+    void *children[1];
+} ChildArrayObj_322b4;
+
+/* The method tables the getters below return. */
+extern s32 D_8006EC74[];
+extern s32 D_8006ED4C[];
+extern s32 D_8006EE1C[];
+extern s32 D_8006EED8[];
+extern s32 D_8006EF50[];
+extern s32 D_8006EFAC[];
 
 /* Local view of a D_8006EED8 (class id 0xB03) object: func_800423E4 sets +0x2C. */
 typedef struct D_8006EED8Obj {
@@ -34,7 +66,10 @@ INCLUDE_ASM("asm/nonmatchings/code_322b4", func_80041B20);
 INCLUDE_ASM("asm/nonmatchings/code_322b4", func_80041BAC);
 INCLUDE_ASM("asm/nonmatchings/code_322b4", func_80041BDC);
 INCLUDE_ASM("asm/nonmatchings/code_322b4", func_80041C28);
-INCLUDE_ASM("asm/nonmatchings/code_322b4", func_80041C3C);
+/* Returns the D_8006EC74 method table. */
+void *func_80041C3C(void) {
+    return D_8006EC74;
+}
 INCLUDE_ASM("asm/nonmatchings/code_322b4", func_80041C4C);
 INCLUDE_ASM("asm/nonmatchings/code_322b4", func_80041C9C);
 INCLUDE_ASM("asm/nonmatchings/code_322b4", func_80041D18);
