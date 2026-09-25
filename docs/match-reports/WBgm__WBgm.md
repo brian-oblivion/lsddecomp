@@ -30,8 +30,8 @@ this pass started). Recorded as proposals for the head to apply with
   child of that singleton for lifecycle notification -- the same pattern
   `class_3ac78.c` and `code_2bb9c.c` use it for. No WBgm-specific evidence for
   its own name; not proposing one.
-- `func_800422CC` (defined `src/code_322b4.c`, an un-matched `INCLUDE_ASM`
-  stall, signature `SeqData *func_800422CC(s32 arg)`): the only function that
+- `New_D8006EED8` (defined `src/code_322b4.c`, an un-matched `INCLUDE_ASM`
+  stall, signature `SeqData *New_D8006EED8(s32 arg)`): the only function that
   produces a `SeqData` object (the +0x10 child this unit reads `addr`/`loaded`
   from). A name like `GetSeqData`/`LoadSeqData` is plausible from this call
   site alone but not confirmed -- the function itself is still assembly, so
@@ -99,7 +99,7 @@ typedef struct SeqVab {
     /* +0x058 */ u16 ready;
 } SeqVab;
 
-/* What +0x10 holds: a func_800422CC object. Only the fields read here. */
+/* What +0x10 holds: a New_D8006EED8 object. Only the fields read here. */
 typedef struct SeqData {
     BASICCLASS_FIELDS(BasicClassMethods);
     /* +0x00C */ u8 padC[0x10 - 0xC];
@@ -132,7 +132,7 @@ extern short SsSeqOpen(unsigned long *addr, short vab_id);
 
 extern void *BMemPMgrAlloc(s32 size);
 extern BasicClass *GetDrawSystem(void);
-extern SeqData *func_800422CC(s32 arg);
+extern SeqData *New_D8006EED8(s32 arg);
 extern SeqVab *New_VabStreamObj(s32 arg0);
 extern void printf(const char *fmt);
 extern const char D_80010FEC[]; /* "Seq Open error in WBgmHandleMonitorEvent" */

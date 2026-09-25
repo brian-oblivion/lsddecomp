@@ -874,11 +874,11 @@ Unk18Obj *Unk18Obj__GetTail(Unk18Obj *self);
    caller, Unk18Obj__Update in src/code_2cc8c_d.c, declares it
    locally with LIBGS.H's own shape. */
 
-extern void *func_80042400(void); /* external, no args; local view returns
+extern void *New_D8006EF50(void); /* external, no args; local view returns
                                     void* (used as a generic word/child
                                     pointer here); same callee as
                                     class_39e08.h's own `SubObjG *` view */
-extern void *func_80042694(void); /* external, no args; not yet seen
+extern void *New_D8006EFAC(void); /* external, no args; not yet seen
                                     elsewhere in this project */
 
 
@@ -1412,7 +1412,7 @@ struct Obj86B60 {
  * (code_2cc8c_f): base table D_8006EAC0 ("d") and its override table
  * D_8006EB90, resolved with `tools/classtable.py D_8006EAC0 --vs
  * D_8006EB90`. A third sibling table, D_8006EC74 (returned by the
- * external getter func_80041C3C), shares the identical slot layout and
+ * external getter Get_vtable_D8006EC74), shares the identical slot layout and
  * is reached only through that getter, never dereferenced by address
  * here. No FirecatFG name survives; named `Obj6EAC0` after the base
  * table's own address, per this project's naming-by-table-address
@@ -1610,7 +1610,7 @@ extern Obj6EAC0Methods D_8006EAC0; /* the base table itself, so
 extern Obj6EAC0Methods D_8006EB90; /* the override table itself, so
                                        Obj6EAC0__GetDerivedMethods's own definition
                                        (this unit) can return &D_8006EB90 */
-extern Obj6EAC0Methods *func_80041C3C(void); /* returns &D_8006EC74, a
+extern Obj6EAC0Methods *Get_vtable_D8006EC74(void); /* returns &D_8006EC74, a
                                        third sibling table sharing this
                                        layout; external to this unit
                                        (asm/psyq_memset.s @ 0x80041C3C,
@@ -1620,10 +1620,10 @@ extern Obj6EAC0Methods *func_80041C3C(void); /* returns &D_8006EC74, a
                                        DECOMPILATION_LEARNINGS about the
                                        psyq_memset boundary) */
 
-extern Obj6EAC0 *func_80041AB4(s32 a1, s32 a2); /* another New_X-shaped
+extern Obj6EAC0 *New_D8006EC74(s32 a1, s32 a2); /* another New_X-shaped
                                        allocator over this same class
                                        family (0xAC bytes, ctor via
-                                       func_80041C3C()->slot08, "return-
+                                       Get_vtable_D8006EC74()->slot08, "return-
                                        regardless" variant); external to
                                        this unit (asm/psyq_memset.s @
                                        0x80041AB4); OBSERVED:

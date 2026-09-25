@@ -158,7 +158,7 @@ typedef struct Class86F88_3bb8c_j Class86F88_3bb8c_j;
 
 /*
  * Class86F88_3bb8c_j's own opaque "handle" object (self->unk50's pointee, built by
- * Class86F88__LoadResources via BuildFileName/func_8003B39C/func_80041C9C: a
+ * Class86F88__LoadResources via BuildFileName/func_8003B39C/New_D8006ED4C: a
  * "CARD\\<name>.TIM" path is built and loaded, as in class_3bb8c_i's
  * Obj86ED0__LoadCardResources). Only the three slots this unit's own
  * functions dispatch through are named.
@@ -405,7 +405,7 @@ void Class86F88__ResetCounters(Class86F88_3bb8c_j *self)
 
 extern char *BuildFileName(char *dest, const char *arg1, const char *arg2, const char *arg3);
 extern Class86F88Handle_3bb8c_j *func_8003B39C(char *path);
-extern Class86F88Handle_3bb8c_j *func_80041C9C(Class86F88Handle_3bb8c_j *arg0, void *arg1, s32 arg2);
+extern Class86F88Handle_3bb8c_j *New_D8006ED4C(Class86F88Handle_3bb8c_j *arg0, void *arg1, s32 arg2);
 extern const char D_8008AB14[]; /* "SELECT" */
 extern const char D_8008AB1C[]; /* "CARD\\" */
 extern const char D_8008AB24[]; /* ".TIM" */
@@ -439,7 +439,7 @@ void Class86F88__LoadResources(Class86F88_3bb8c_j *self, void *arg1)
 
     handle1 = func_8003B39C(BuildFileName(path, D_8008AB14, dir, ext));
     handle1->methods->slot78(handle1);
-    self->unk50 = func_80041C9C(handle1, &D_80087028, 0);
+    self->unk50 = New_D8006ED4C(handle1, &D_80087028, 0);
     handle1->methods->slot4(handle1);
     self->unk50->methods->slot4C(self->unk50, arg1, &D_8008AAF8);
 

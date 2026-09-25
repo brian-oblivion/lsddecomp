@@ -3,16 +3,38 @@
  * revision 18). 0x322B4..0x330F4 (vram 0x80041AB4..0x800428F4). It was counted
  * as Psy-Q SDK by segment name; tools/gameinsdk.py measured it as game (a call
  * into game code, a method-table entry beside game methods, or contiguity with
- * those, and no Sony fingerprint). What it holds: methods of D_8006EC74,
- * D_8006ED4C, gSpriteMethods, D_8006EF50, D_8006EFAC, D_8006EB90, D_8006EED8,
- * D_800879C4 and D_800866E8, calling GetClass6B5CCMethods, GetSetBitField and
- * the BasicClass framework. Owns jtbl_80011290 (attached rodata sub-slot
- * 0x1A90).
+ * those, and no Sony fingerprint). Owns jtbl_80011290 (attached rodata
+ * sub-slot 0x1A90).
  *
- * Round 82 matched the one- to eight-word bodies (getters, accessors, empty
- * overrides), then a third batch of 11- to 20-word bodies (the sprite
- * attribute-bit setters, cell selection, finalize chains, the D_8006EF50
- * allocator), and then the rest: every function in the unit is C.
+ * Round 82 matched every function in the unit (getters, accessors, empty
+ * overrides, then the 11- to 20-word bodies: the sprite attribute-bit
+ * setters, cell selection, finalize chains, the D_8006EF50 allocator), then
+ * named it (track 3): every function is real C, not `func_`.
+ *
+ * Sprite (include/Sprite.h, gSpriteMethods) is already unified; its own
+ * methods (New_Sprite, Sprite__*, InitGsSprite, GetSpriteMethods) live here
+ * and keep their names. Its four subclasses are still pending track 4's
+ * unification, so their tables stay `D_<addr>` and their own methods use the
+ * project's address-derived pseudo-class-name convention (`D8006EC74__X`,
+ * matching the existing `D800879C4__X` precedent in class_3bb8c_p.c) rather
+ * than inventing a real name ahead of the types pass:
+ *   - D_8006ED4C (0x144): the screen-space sprite -- Sprite's direct
+ *     subclass, adding setPosition (+0x0BC, screenPos) and a pivot-anchor
+ *     setter (+0x0C0, centre/left/right/top/bottom).
+ *   - D_8006EC74 (0x1144): one 8x8 cell of a 32-wide grid -- D_8006ED4C's
+ *     subclass, adding setCell (+0x0C4); GetCellRect is the free helper both
+ *     its ctor and setCell use to turn a cell index into a rect.
+ *   - D_8006EB90 (0x11144) and D_800879C4 (0x1F44, class_3bb8c_p/q/t) are
+ *     Sprite subclasses too but own no methods in this unit.
+ * D_8006EF50 (class id 0x5) is a BasicClass subclass holding a parentRefs
+ * cursor; NotifyParents walks it, picking event 4/3/2 from two flags and a
+ * counter. D_8006EED8 (class id 0xB03) is a GetActiveDataSourceMethods
+ * subclass that copies a name string to slot +0x06C. D_8006EFAC (class id
+ * 0x14, "the base of Class866E8" per include/Class6B5CC.h) is a Class6B5CC
+ * subclass owning three FlatLightObj children and an ambient colour
+ * (SetAmbientColor -> GsSetAmbient); its GetChild (+0x0B8) is inherited
+ * unchanged by Class866E8's own table (D_800866E8), which is why one
+ * function occupies the same slot in both.
  */
 #include "common.h"
 #include "Sprite.h"
@@ -24,22 +46,22 @@ typedef struct D_8006EF50Obj {
     D_8006EF50Methods *methods; /* +0x000 */
     u8 pad04[0x8 - 0x4];
     BasicClassListNode *parentRefs; /* +0x008, BasicClass's */
-    s32 unkC;  /* +0x00C, read by func_8004264C */
-    s32 unk10; /* +0x010, set to 1 by func_80042658, cleared by func_80042664, read by func_8004266C */
-    s32 unk14; /* +0x014, set to 1 by func_80042678, cleared by func_800425D8 */
-    BasicClassListNode *unk18; /* +0x018, cleared by func_800425D8; a parentRefs cursor func_800424E0 steps past a removed parent */
+    s32 count;  /* +0x00C, read by D8006EF50__GetCount */
+    s32 flag10; /* +0x010, set to 1 by D8006EF50__SetFlag10, cleared by D8006EF50__ClearFlag10, read by D8006EF50__GetFlag10 */
+    s32 flag14; /* +0x014, set to 1 by D8006EF50__SetFlag14, cleared by D8006EF50__Reset */
+    BasicClassListNode *parentCursor; /* +0x018, cleared by D8006EF50__Reset; a parentRefs cursor D8006EF50__RemoveParentRef steps past a removed parent */
 } D_8006EF50Obj;
 struct D_8006EF50Methods {
     u8 pad00[0x30];
-    void (*notifyParents)(D_8006EF50Obj *self, s32 event); /* +0x030 = func_80042550 */
+    void (*notifyParents)(D_8006EF50Obj *self, s32 event); /* +0x030 = D8006EF50__NotifyParents */
     u8 pad34[0x40 - 0x34];
-    void (*reset)(D_8006EF50Obj *self, s32 a1); /* +0x040 = func_800425D8 */
+    void (*reset)(D_8006EF50Obj *self, s32 a1); /* +0x040 = D8006EF50__Reset */
 };
 
-/* Local view of a D_8006EC74 object: func_80041C28 reads the byte at +0xA8. */
+/* Local view of a D_8006EC74 object: D8006EC74__GetCell reads the byte at +0xA8. */
 typedef struct D_8006EC74Obj {
     u8 pad00[0xA8];
-    u8 unkA8;
+    u8 cellIndex;
 } D_8006EC74Obj;
 
 /* Local view of a D_8006EFAC/D_800866E8 object: a child array at +0x44. */
@@ -58,7 +80,7 @@ typedef struct D_8006EFACObj {
 } D_8006EFACObj;
 struct D_8006EFACMethods {
     CLASS6B5CC_SLOTS(D_8006EFACObj, (D_8006EFACObj *self));
-    /* +0x0B8 */ BasicClass *(*getChild)(D_8006EFACObj *self, s32 index); /* func_80042828 */
+    /* +0x0B8 */ BasicClass *(*getChild)(D_8006EFACObj *self, s32 index); /* D8006EFAC__GetChild */
 };
 extern BasicClass *New_FlatLightObj(s32 lightId);
 extern void GsSetAmbient(long r, long g, long b);
@@ -87,12 +109,12 @@ extern s32 D_8006EED8[];
 extern s32 D_8006EF50[];
 extern s32 D_8006EFAC[];
 
-/* Local view of a D_8006EED8 (class id 0xB03) object: func_800423E4 sets +0x2C. */
+/* Local view of a D_8006EED8 (class id 0xB03) object: D8006EED8__SetFlag2C sets +0x2C. */
 typedef struct D_8006EED8Methods D_8006EED8Methods;
 typedef struct D_8006EED8Obj {
     D_8006EED8Methods *methods; /* +0x000 */
     u8 pad04[0x2C - 0x4];
-    s32 unk2C;
+    s32 flag2C;
 } D_8006EED8Obj;
 
 /* Local view of a D_8006EC74/D_8006ED4C object (subclasses of Sprite,
@@ -100,35 +122,35 @@ typedef struct D_8006EED8Obj {
  * Sprite's sprite.attribute/u/v; this view is the subclasses' to unify. */
 typedef struct SpriteMethods_322b4 SpriteMethods_322b4;
 typedef struct Pair_322b4 {
-    s32 a, b;
+    s32 x, y;
 } Pair_322b4;
 typedef struct SpriteView_322b4 {
     SpriteMethods_322b4 *methods; /* +0x000 */
     u8 pad04[0xC - 0x4];
-    s32 unkC;                     /* +0x00C, tested by func_80041E2C */
+    Class6B5CC *parent;           /* +0x00C, Class6B5CC's own field (include/Class6B5CC.h); tested by D8006ED4C__SetPosition */
     u8 pad10[0x64 - 0x10];
     u32 attribute;                /* +0x064, GsSPRITE.attribute */
     u8 pad68[0x72 - 0x68];
     u8 u;                         /* +0x072, GsSPRITE.u */
     u8 v;                         /* +0x073, GsSPRITE.v */
     u8 pad74[0xA0 - 0x74];
-    Pair_322b4 unkA0;             /* +0x0A0, set by func_80041E2C */
-    u8 unkA8;                     /* +0x0A8, the cell index func_80041BDC stores */
+    Pair_322b4 screenPos;         /* +0x0A0, set by D8006ED4C__SetPosition */
+    u8 cellIndex;                 /* +0x0A8, the cell index D8006EC74__SetCell stores */
 } SpriteView_322b4;
 struct SpriteMethods_322b4 {
     u8 pad00[0x40];
-    void (*reset)(SpriteView_322b4 *self, u8 cell);            /* +0x040 = func_80041BAC (D_8006EC74) */
+    void (*reset)(SpriteView_322b4 *self, u8 cell);            /* +0x040 = D8006EC74__Reset (D_8006EC74) */
     u8 pad44[0xBC - 0x44];
-    void (*slotBC)(SpriteView_322b4 *self, Pair_322b4 *src);   /* +0x0BC = func_80041E2C */
+    void (*setPosition)(SpriteView_322b4 *self, Pair_322b4 *src); /* +0x0BC = D8006ED4C__SetPosition */
     u8 padC0[0xC4 - 0xC0];
-    void (*setCell)(SpriteView_322b4 *self, u8 cell); /* +0x0C4 = func_80041BDC */
+    void (*setCell)(SpriteView_322b4 *self, u8 cell); /* +0x0C4 = D8006EC74__SetCell */
 };
 
-/* The zero offset func_80041DAC attaches with. */
-extern Vec3_d294 D_8006EE10;
+/* The zero offset D8006ED4C__AttachToParent attaches with. */
+extern Vec3_d294 gVec3Zero;
 extern char *strcpy(char *dst, char *src);
 
-/* The cell origin func_80041C4C copies: {0, 0, 8, 8}. */
+/* The cell origin GetCellRect copies: {0, 0, 8, 8}. */
 extern SpriteRect D_8006ED40;
 
 extern u32 GetSetBitField(u32 *word, s32 shift, s32 width, u32 value);
@@ -144,19 +166,19 @@ typedef struct Slot08Methods_322b4 {
     u8 pad00[0x8];
     void (*init)(void *self); /* +0x008 */
 } Slot08Methods_322b4;
-void *func_80042684(void);
-void *func_800423F0(void);
+void *Get_vtable_D8006EF50(void);
+void *Get_vtable_D8006EED8(void);
 
-void *func_80041C3C(void);
+void *Get_vtable_D8006EC74(void);
 typedef struct CellCtorMethods_322b4 {
     u8 pad00[0x8];
-    void *(*ctor)(void *self, void *texture, u8 cell); /* +0x008 = func_80041B20 */
+    void *(*ctor)(void *self, void *texture, u8 cell); /* +0x008 = D8006EC74__D8006EC74 */
 } CellCtorMethods_322b4;
 
-void *func_80041ED8(void);
+void *Get_vtable_D8006ED4C(void);
 typedef struct CtorArg3Methods_322b4 {
     u8 pad00[0x8];
-    void *(*ctor)(void *self, void *a1, void *a2, void *a3); /* +0x008 = func_80041D18 */
+    void *(*ctor)(void *self, void *a1, void *a2, void *a3); /* +0x008 = D8006ED4C__D8006ED4C */
 } CtorArg3Methods_322b4;
 
 struct D_8006EED8Methods {
@@ -173,97 +195,97 @@ typedef struct CtorArg1Methods_322b4 {
     u8 pad00[0x8];
     void (*ctor)(void *self, s32 arg); /* +0x008 */
 } CtorArg1Methods_322b4;
-void *func_800428E4(void);
-void func_80041C4C(SpriteRect *dst, u32 cell);
+void *Get_vtable_D8006EFAC(void);
+void GetCellRect(SpriteRect *dst, u32 cell);
 
 /* Allocate and construct a D_8006EC74 object (0xAC bytes): one cell. */
-void *func_80041AB4(void *texture, u8 cell) {
+void *New_D8006EC74(void *texture, u8 cell) {
     void *obj = BMemPMgrAlloc(0xAC);
 
     if (obj != NULL) {
-        ((CellCtorMethods_322b4 *)func_80041C3C())->ctor(obj, texture, cell);
+        ((CellCtorMethods_322b4 *)Get_vtable_D8006EC74())->ctor(obj, texture, cell);
         return obj;
     }
     return NULL;
 }
 /* D_8006EC74 slot +0x008 (ctor): the D_8006ED4C ctor with cell 0x20's rect,
  * install the table, then reset to the caller's cell. */
-void func_80041B20(SpriteView_322b4 *self, void *texture, u8 cell) {
+void D8006EC74__D8006EC74(SpriteView_322b4 *self, void *texture, u8 cell) {
     SpriteRect r;
 
-    func_80041C4C(&r, 0x20);
-    ((CtorArg3Methods_322b4 *)func_80041ED8())->ctor(self, texture, &r, NULL);
-    self->methods = func_80041C3C();
+    GetCellRect(&r, 0x20);
+    ((CtorArg3Methods_322b4 *)Get_vtable_D8006ED4C())->ctor(self, texture, &r, NULL);
+    self->methods = Get_vtable_D8006EC74();
     self->methods->reset(self, cell);
 }
 /* D_8006EC74 slot +0x040 (reset): re-select the cell through slot +0x0C4. */
-void func_80041BAC(SpriteView_322b4 *self, u8 cell) {
+void D8006EC74__Reset(SpriteView_322b4 *self, u8 cell) {
     self->methods->setCell(self, cell);
 }
 /* D_8006EC74 slot +0x0C4: store the cell index and point u,v at its 8x8 cell. */
-void func_80041BDC(SpriteView_322b4 *self, u8 cell) {
+void D8006EC74__SetCell(SpriteView_322b4 *self, u8 cell) {
     SpriteRect r;
 
-    self->unkA8 = cell;
-    func_80041C4C(&r, cell);
+    self->cellIndex = cell;
+    GetCellRect(&r, cell);
     self->u = r.u;
     self->v = r.v;
 }
 /* D_8006EC74 slot +0x0C8: read the byte at +0x0A8. */
-u8 func_80041C28(D_8006EC74Obj *self) {
+u8 D8006EC74__GetCell(D_8006EC74Obj *self) {
     u8 pad[16]; /* unused: it is what gives retail its 0x10-byte frame */
 
-    return self->unkA8;
+    return self->cellIndex;
 }
 /* Returns the D_8006EC74 method table. */
-void *func_80041C3C(void) {
+void *Get_vtable_D8006EC74(void) {
     return D_8006EC74;
 }
 /* Cell index -> 8x8 rect in a 32-wide grid, offset from D_8006ED40. */
-void func_80041C4C(SpriteRect *dst, u32 cell) {
+void GetCellRect(SpriteRect *dst, u32 cell) {
     *dst = D_8006ED40;
     cell &= 0xFF;
     dst->u += (cell & 0x1F) * 8;
     dst->v += (cell >> 5) * 8;
 }
 /* Allocate and construct a D_8006ED4C object (0xA8 bytes). */
-void *func_80041C9C(void *a1, void *a2, void *a3) {
+void *New_D8006ED4C(void *a1, void *a2, void *a3) {
     void *obj = BMemPMgrAlloc(0xA8);
 
     if (obj != NULL) {
-        ((CtorArg3Methods_322b4 *)func_80041ED8())->ctor(obj, a1, a2, a3);
+        ((CtorArg3Methods_322b4 *)Get_vtable_D8006ED4C())->ctor(obj, a1, a2, a3);
         return obj;
     }
     return NULL;
 }
 /* D_8006ED4C slot +0x008 (ctor): the Sprite ctor with abr 0 and arg4 NULL,
  * install the table, then reset. */
-void func_80041D18(Sprite *self, void *texture, SpriteRect *rect, s32 arg3) {
+void D8006ED4C__D8006ED4C(Sprite *self, void *texture, SpriteRect *rect, s32 arg3) {
     GetSpriteMethods()->ctor(self, texture, 0, rect, NULL, arg3);
-    self->methods = func_80041ED8();
+    self->methods = Get_vtable_D8006ED4C();
     self->methods->reset(self);
 }
 /* D_8006ED4C slot +0x040 (reset): empty override. */
-void func_80041DA4(Class6B5CC *self) {
+void D8006ED4C__Reset(Class6B5CC *self) {
 }
 /* D_8006EC74 and D_8006ED4C slot +0x04C (attachToParent): when not yet
  * attached, attach through Sprite's with a zero offset, then hand the
  * caller's third argument to slot +0x0BC. */
-void func_80041DAC(SpriteView_322b4 *self, Class6B5CC *parent, Pair_322b4 *pos) {
-    if (self->unkC == 0) {
-        GetSpriteMethods()->attachToParent((Sprite *)self, parent, &D_8006EE10);
-        self->methods->slotBC(self, pos);
+void D8006ED4C__AttachToParent(SpriteView_322b4 *self, Class6B5CC *parent, Pair_322b4 *pos) {
+    if (self->parent == NULL) {
+        GetSpriteMethods()->attachToParent((Sprite *)self, parent, &gVec3Zero);
+        self->methods->setPosition(self, pos);
     }
 }
 /* D_8006EC74 and D_8006ED4C slot +0x0BC. */
-void func_80041E2C(SpriteView_322b4 *self, Pair_322b4 *src) {
-    if (self->unkC != 0) {
-        self->unkA0 = *src;
+void D8006ED4C__SetPosition(SpriteView_322b4 *self, Pair_322b4 *src) {
+    if (self->parent != NULL) {
+        self->screenPos = *src;
     }
 }
 /* D_8006EC74 and D_8006ED4C slot +0x0C0: when attached, move the sprite's
  * pivot: 0 centre, 1 left, 2 right, 3 top, 4 bottom. */
-void func_80041E58(Sprite *self, u32 anchor) {
+void D8006ED4C__SetPivotAnchor(Sprite *self, u32 anchor) {
     if (self->parent != NULL) {
         switch (anchor) {
         case 0:
@@ -286,7 +308,7 @@ void func_80041E58(Sprite *self, u32 anchor) {
     }
 }
 /* Returns the D_8006ED4C method table. */
-void *func_80041ED8(void) {
+void *Get_vtable_D8006ED4C(void) {
     return D_8006ED4C;
 }
 /* Allocate and construct a Sprite (0xA0 bytes). */
@@ -316,9 +338,6 @@ void Sprite__Reset(Sprite *self, void *texture, s32 abr, SpriteRect *rect) {
     InitGsSprite(&self->sprite, abr, rect, self->image);
     self->unk58 = 0;
 }
-/* Fill a GsSPRITE from a texture image and a cell: colour mode and tpage
- * from the image, size and u,v from the cell, the pivot at its centre,
- * neutral colour, scale 1.0 and no rotation. */
 /* Fill a GsSPRITE from a texture image and a cell: colour mode and tpage
  * from the image, size and u,v from the cell, the pivot at its centre,
  * neutral colour, scale 1.0 and no rotation. */
@@ -382,145 +401,145 @@ SpriteMethods *GetSpriteMethods(void) {
     return &gSpriteMethods;
 }
 /* Allocate and construct a D_8006EED8 object (0x30 bytes). */
-void *func_800422CC(s32 arg) {
+void *New_D8006EED8(s32 arg) {
     void *obj = BMemPMgrAlloc(0x30);
 
     if (obj != NULL) {
-        ((CtorArg1Methods_322b4 *)func_800423F0())->ctor(obj, arg);
+        ((CtorArg1Methods_322b4 *)Get_vtable_D8006EED8())->ctor(obj, arg);
         return obj;
     }
     return NULL;
 }
 /* D_8006EED8 slot +0x008 (ctor): the base ctor, install the table, clear
  * +0x2C, and pass a stack copy of the name to slot +0x06C. */
-void func_8004232C(D_8006EED8Obj *self, char *name) {
+void D8006EED8__D8006EED8(D_8006EED8Obj *self, char *name) {
     char buf[32];
 
     ((Slot08Arg0Methods_322b4 *)GetActiveDataSourceMethods())->ctor(self);
-    self->methods = func_800423F0();
-    self->unk2C = 0;
+    self->methods = Get_vtable_D8006EED8();
+    self->flag2C = 0;
     if (name != NULL) {
         strcpy(buf, name);
         self->methods->slot6C(self, buf);
     }
 }
 /* D_8006EED8 slot +0x00C (finalize): clear +0x2C, then the base finalize. */
-void func_800423A8(D_8006EED8Obj *self) {
-    self->unk2C = 0;
+void D8006EED8__Finalize(D_8006EED8Obj *self) {
+    self->flag2C = 0;
     GetActiveDataSourceMethods()->slot0C(self);
 }
 /* D_8006EED8 slot +0x064. */
-void func_800423E4(D_8006EED8Obj *self) {
-    self->unk2C = 1;
+void D8006EED8__SetFlag2C(D_8006EED8Obj *self) {
+    self->flag2C = 1;
 }
 /* Returns the D_8006EED8 method table. */
-void *func_800423F0(void) {
+void *Get_vtable_D8006EED8(void) {
     return D_8006EED8;
 }
 /* Allocate and construct a D_8006EF50 object (0x1C bytes). */
-void *func_80042400(void) {
+void *New_D8006EF50(void) {
     void *obj = BMemPMgrAlloc(0x1C);
 
     if (obj != NULL) {
-        ((Slot08Methods_322b4 *)func_80042684())->init(obj);
+        ((Slot08Methods_322b4 *)Get_vtable_D8006EF50())->init(obj);
         return obj;
     }
     return NULL;
 }
 /* D_8006EF50 slot +0x008 (ctor): the BasicClass ctor, install the table, reset(0). */
-void func_80042450(D_8006EF50Obj *self) {
+void D8006EF50__D8006EF50(D_8006EF50Obj *self) {
     Get_vtable_BasicClass()->ctor((BasicClass *)self);
-    self->methods = func_80042684();
+    self->methods = Get_vtable_D8006EF50();
     self->methods->reset(self, 0);
 }
 /* D_8006EF50 slot +0x00C (finalize): the BasicClass finalize. */
-void func_800424A8(BasicClass *self) {
+void D8006EF50__Finalize(BasicClass *self) {
     Get_vtable_BasicClass()->finalize(self);
 }
 /* D_8006EF50 slot +0x024 (removeParentRef): step the cursor past the parent
  * being removed, then the BasicClass removeParentRef. */
-void func_800424E0(D_8006EF50Obj *self, BasicClass *parent) {
-    if (self->unk18 != NULL && parent == self->unk18->value) {
-        self->unk18 = self->unk18->next;
+void D8006EF50__RemoveParentRef(D_8006EF50Obj *self, BasicClass *parent) {
+    if (self->parentCursor != NULL && parent == self->parentCursor->value) {
+        self->parentCursor = self->parentCursor->next;
     }
     Get_vtable_BasicClass()->removeParentRef((BasicClass *)self, parent);
 }
 /* D_8006EF50 slot +0x030 (notifyParents): walk the parent refs with the
  * cursor at +0x018 (which removeParentRef keeps valid) and pass each the
  * event through its onNotify. */
-void func_80042550(D_8006EF50Obj *self, s32 event) {
+void D8006EF50__NotifyParents(D_8006EF50Obj *self, s32 event) {
     BasicClass *parent;
 
-    self->unk18 = self->parentRefs;
-    for (GetNextBasicClass(&parent, &self->unk18); parent != NULL; GetNextBasicClass(&parent, &self->unk18)) {
+    self->parentCursor = self->parentRefs;
+    for (GetNextBasicClass(&parent, &self->parentCursor); parent != NULL; GetNextBasicClass(&parent, &self->parentCursor)) {
         parent->methods->onNotify(parent, self, event);
     }
-    self->unk18 = NULL;
+    self->parentCursor = NULL;
 }
 /* D_8006EF50 slot +0x040 (reset). */
-void func_800425D8(D_8006EF50Obj *self, s32 a1) {
-    self->unkC = a1;
-    self->unk14 = 0;
-    self->unk10 = 0;
-    self->unk18 = 0;
+void D8006EF50__Reset(D_8006EF50Obj *self, s32 a1) {
+    self->count = a1;
+    self->flag14 = 0;
+    self->flag10 = 0;
+    self->parentCursor = 0;
 }
-/* D_8006EF50 slot +0x044: notify event 4 if unk14, else 3 if unk10, else
- * count unkC up and notify 2. */
-void func_800425EC(D_8006EF50Obj *self) {
+/* D_8006EF50 slot +0x044: notify event 4 if flag14, else 3 if flag10, else
+ * count up and notify 2. */
+void D8006EF50__Tick(D_8006EF50Obj *self) {
     s32 event;
 
-    if (self->unk14 != 0) {
+    if (self->flag14 != 0) {
         event = 4;
-    } else if (self->unk10 != 0) {
+    } else if (self->flag10 != 0) {
         event = 3;
     } else {
-        self->unkC++;
+        self->count++;
         event = 2;
     }
     self->methods->notifyParents(self, event);
 }
 /* D_8006EF50 slot +0x048. */
-s32 func_8004264C(D_8006EF50Obj *self) {
-    return self->unkC;
+s32 D8006EF50__GetCount(D_8006EF50Obj *self) {
+    return self->count;
 }
 /* D_8006EF50 slot +0x04C. */
-void func_80042658(D_8006EF50Obj *self) {
-    self->unk10 = 1;
+void D8006EF50__SetFlag10(D_8006EF50Obj *self) {
+    self->flag10 = 1;
 }
 /* D_8006EF50 slot +0x050. */
-void func_80042664(D_8006EF50Obj *self) {
-    self->unk10 = 0;
+void D8006EF50__ClearFlag10(D_8006EF50Obj *self) {
+    self->flag10 = 0;
 }
 /* D_8006EF50 slot +0x054. */
-s32 func_8004266C(D_8006EF50Obj *self) {
-    return self->unk10;
+s32 D8006EF50__GetFlag10(D_8006EF50Obj *self) {
+    return self->flag10;
 }
 /* D_8006EF50 slot +0x058. */
-void func_80042678(D_8006EF50Obj *self) {
-    self->unk14 = 1;
+void D8006EF50__SetFlag14(D_8006EF50Obj *self) {
+    self->flag14 = 1;
 }
 /* Returns the D_8006EF50 method table. */
-void *func_80042684(void) {
+void *Get_vtable_D8006EF50(void) {
     return D_8006EF50;
 }
 /* Allocate and construct a D_8006EFAC object (0x54 bytes). */
-void *func_80042694(void) {
+void *New_D8006EFAC(void) {
     void *obj = BMemPMgrAlloc(0x54);
 
     if (obj != NULL) {
-        ((Slot08Methods_322b4 *)func_800428E4())->init(obj);
+        ((Slot08Methods_322b4 *)Get_vtable_D8006EFAC())->init(obj);
         return obj;
     }
     return NULL;
 }
 /* D_8006EFAC slot +0x008 (ctor): the Class6B5CC ctor, install the table,
  * create and add the three flat lights, then reset. */
-void func_800426E4(D_8006EFACObj *self) {
+void D8006EFAC__D8006EFAC(D_8006EFACObj *self) {
     s32 i;
     BasicClass **light;
 
     GetClass6B5CCMethods()->ctor((Class6B5CC *)self);
-    self->methods = func_800428E4();
+    self->methods = Get_vtable_D8006EFAC();
     for (i = 0, light = self->lights; i < 3; i++, light++) {
         *light = New_FlatLightObj(i);
         self->methods->addChild(self, *light);
@@ -529,7 +548,7 @@ void func_800426E4(D_8006EFACObj *self) {
 }
 /* D_8006EFAC slot +0x00C (finalize): release the three lights, then the
  * Class6B5CC finalize. */
-void func_80042790(D_8006EFACObj *self) {
+void D8006EFAC__Finalize(D_8006EFACObj *self) {
     s32 i;
     BasicClass *light;
 
@@ -540,19 +559,19 @@ void func_80042790(D_8006EFACObj *self) {
     GetClass6B5CCMethods()->finalize((Class6B5CC *)self);
 }
 /* D_8006EFAC slot +0x040 (reset): mark the coordinate for recompute. */
-void func_80042814(Class6B5CC *self) {
+void D8006EFAC__Reset(Class6B5CC *self) {
     self->coord2->flg = 0;
 }
 /* D_8006EFAC slot +0x09C (dispatchLinkCommand): empty override. */
-void func_80042820(Class6B5CC *self, void *sender, s32 event) {
+void D8006EFAC__DispatchLinkCommand(Class6B5CC *self, void *sender, s32 event) {
 }
 /* D_8006EFAC and D_800866E8 slot +0x0B8 (getChild). */
-void *func_80042828(ChildArrayObj_322b4 *self, s32 index) {
+void *D8006EFAC__GetChild(ChildArrayObj_322b4 *self, s32 index) {
     return self->children[index];
 }
 /* D_8006EFAC slot +0x0BC: set the ambient colour (swapping the old one out
  * into *rgb when asked) and hand it to GsSetAmbient. */
-void func_8004283C(D_8006EFACObj *self, SpriteRgb *rgb, s32 swap) {
+void D8006EFAC__SetAmbientColor(D_8006EFACObj *self, SpriteRgb *rgb, s32 swap) {
     SpriteRgb old;
 
     if (swap) {
@@ -565,6 +584,6 @@ void func_8004283C(D_8006EFACObj *self, SpriteRgb *rgb, s32 swap) {
     GsSetAmbient((u8)self->ambient.r << 4, (u8)self->ambient.g << 4, (u8)self->ambient.b << 4);
 }
 /* Returns the D_8006EFAC method table. */
-void *func_800428E4(void) {
+void *Get_vtable_D8006EFAC(void) {
     return D_8006EFAC;
 }

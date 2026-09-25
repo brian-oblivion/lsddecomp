@@ -91,7 +91,7 @@ void TaskObjF__SetState(Class86E00_3bb8c_g *self, s32 arg1)
 extern ChildObj86ED0 *func_8003B39C(char *path);
 /* Not this round's function -- consumes the short-lived handle above and
  * produces the object stored into `self->cardIcon`. */
-extern ChildObj86ED0 *func_80041C9C(ChildObj86ED0 *arg0, void *arg1, s32 arg2);
+extern ChildObj86ED0 *New_D8006ED4C(ChildObj86ED0 *arg0, void *arg1, s32 arg2);
 
 /* 0x11 (17) entries, indexed by `arg1` (range-checked `< 0x11` below);
  * mostly `char *` string pointers into rodata, a few raw literal words at
@@ -99,7 +99,7 @@ extern ChildObj86ED0 *func_80041C9C(ChildObj86ED0 *arg0, void *arg1, s32 arg2);
 extern char *gCardIconNames[];
 extern const char gCardPathPrefix[]; /* "CARD\\" */
 extern const char gCardPathSuffix[]; /* ".TIM" */
-/* 3-word opaque block, `func_80041C9C`'s arg1, address-only here. */
+/* 3-word opaque block, `New_D8006ED4C`'s arg1, address-only here. */
 extern s32 D_80086EC4;
 /* opaque block, the fresh `cardIcon`'s own `slot4C` arg2, address-only here. */
 extern s32 D_8008AA94;
@@ -131,7 +131,7 @@ void TaskObjF__LoadCardIcon(Class86E00_3bb8c_g *self, s32 arg1)
 
     handle = func_8003B39C(buf);
     handle->methods->slot78(handle);
-    newVal = func_80041C9C(handle, (void *)&D_80086EC4, 0);
+    newVal = New_D8006ED4C(handle, (void *)&D_80086EC4, 0);
     self->cardIcon = newVal;
     handle->methods->release(handle);
     newVal->methods->slot4C(newVal, self->childReady, (void *)&D_8008AA94);
