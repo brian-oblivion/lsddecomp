@@ -3,13 +3,14 @@
  * gTmdModelMethods, class tag 9): one object of a TMD file (the "model"
  * SceneNode__LinkModel, src/code_d294_c.c, links into a GsDOBJ2). Its
  * methods map the TMD to the GS (TmdModel__MapModelingData), walk its
- * primitives (TmdModel__NextPrimitive, owns jtbl_80010354), compute an
- * axis-aligned bounding box or its eight corners (TmdModel__ComputeBounds,
- * TmdModel__GetHull, and the shared buffer of gTmdModelBoundsCount boxes,
- * TmdModel__UpdateBoundsBuffer / TmdModel__GetBoundsBuffer /
- * TmdModel__GetBoundsCount), and ray-cast a segment against every face
- * (TmdModel__RaycastFaces) for SceneNode's own collision helpers in
- * code_d294_b.c/code_d294_c.c.
+ * primitives one packet at a time (TmdModel__NextPrimitive, which reads
+ * each packet through Sony's own <libgs.h> layouts: GPU_COM_* mode codes,
+ * TMD_P_* structs, GsTMDFlagGRD), compute an axis-aligned bounding box or
+ * its eight corners (TmdModel__ComputeBounds, TmdModel__GetHull, and the
+ * shared buffer of gTmdModelBoundsCount boxes, TmdModel__UpdateBoundsBuffer /
+ * TmdModel__GetBoundsBuffer / TmdModel__GetBoundsCount), and ray-cast a
+ * segment against every face (TmdModel__RaycastFaces) for SceneNode's own
+ * collision helpers in code_d294_b.c/code_d294_c.c.
  *
  * RotateAndOffsetHullList takes a hull list, not a TmdModel, and is a free
  * function; the tail of the file (AccumulateTargetOffset, SetTargetOffset)
@@ -18,7 +19,7 @@
  * caller is class_3bb8c_o.c.
  *
  * Tiers and match evidence for every function are in each function's own
- * docs/match-reports/ file.
+ * docs/match-reports/ file; the unit's own history is in New_TmdModel's.
  */
 #include "common.h"
 #include <libgte.h>
