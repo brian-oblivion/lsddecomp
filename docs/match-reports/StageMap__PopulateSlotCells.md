@@ -1,4 +1,6 @@
-# StageMap__LoadElementResources -- MATCHED round 73 (150/150, exact length, whole-image SHA1 green)
+# StageMap__PopulateSlotCells -- MATCHED round 73 (150/150, exact length, whole-image SHA1 green)
+
+> Renamed from `StageMap__LoadElementResources` on 2026-09-26 (tools/rename.py). Address 0x8004be54.
 
 > Renamed from `Class866E8__LoadElementResources` on 2026-09-26 (tools/rename.py). Address 0x8004be54.
 
@@ -50,7 +52,7 @@ rotation, so the tell is a caller-saved register mismatch instead.
 
 ## Earlier history (superseded by the match above)
 
-#### Old title: StageMap__LoadElementResources -- STALL, close (142/150 words; round 40 permuter-found improvement, up from 132/150)
+#### Old title: StageMap__PopulateSlotCells -- STALL, close (142/150 words; round 40 permuter-found improvement, up from 132/150)
 
 > **ROUND 47 (charlie): Gate 1b re-verified 142/150, no drift** (rebuild
 > via `make clean && make extract` then the standard `#if 0`->`#if 1`
@@ -269,7 +271,7 @@ function's own signature exactly -- confirmed via the vtable data at
 `0x800867EC` in `asm/data/76DC8.data.s`, `0x104` past the table base
 `0x800866E8`). Not toolchain-blocked: no `gp_rel` hit, no
 `addiu $at,$at,%lo` hit, no dense-`switch`/`jr $v0` dispatch in
-`asm/nonmatchings/class_3bb8c/StageMap__LoadElementResources.s`.
+`asm/nonmatchings/class_3bb8c/StageMap__PopulateSlotCells.s`.
 
 **This is the first C ever attempted against this function.** The previous
 round's report (structural analysis only) is superseded by this one -- every
@@ -423,7 +425,7 @@ typedef struct BE54LoadReq {
 extern LinkResource *New_LinkResource(BE54LoadReq *req);
 extern void GsLinkObject4(s32 tmd, void *objp, s32 n);
 
-void StageMap__LoadElementResources(Obj866E8 *self, Elem *entry) {
+void StageMap__PopulateSlotCells(Obj866E8 *self, Elem *entry) {
     ResInfo866E8 *info;
     ElemTarget *hdr;
     LinkTarget866E8 *target;
@@ -712,7 +714,7 @@ drift-free claim, plus one body that could never have linked at all (it
 called a symbol since renamed, so its figure had measured nothing). **All
 four preserved bodies in `class_3bb8c` were rebuilt this round and all four
 are honest** — `StageMap__FindSlotForPosition` 68/70, `ComputeCellWorldOffsets` 58/73,
-`StageMap__LoadChunksAround` 125/140, `StageMap__LoadElementResources` 130/150. No stale figure and no
+`StageMap__LoadChunksAround` 125/140, `StageMap__PopulateSlotCells` 130/150. No stale figure and no
 never-linked body in this unit.
 
 No new lever was tried — alpha died before attempting one. This is a
@@ -828,7 +830,7 @@ Round 78 (track 3, naming pass, bravo).
 
 | symbol | name | tier | evidence |
 | --- | --- | --- | --- |
-| `func_8004BE54` | `StageMap__LoadElementResources` | B | Occupant of `gStageMapMethods` +0x104 (`slot104`), and its own identity slot -- `StageMap__OnNotifyTag1` dispatches `self->methods->slot104(self, e)` which resolves to this same function. Body: releases the element's old link resource, issues a new `New_LinkResource` resource-load request, then loops `target->methods->slot78` building `GsLinkObject4`-linked GPU records into the element's cell array (`entry->unk10`). Matches `src/class_3ac78.c`'s own unit-header narrative almost verbatim: "The queries that build those rectangles, and an element's resource AND GPU sides, live in class_3bb8c*" -- this function IS that resource-and-GPU side. |
+| `func_8004BE54` | `StageMap__PopulateSlotCells` | B | Occupant of `gStageMapMethods` +0x104 (`slot104`), and its own identity slot -- `StageMap__OnNotifyTag1` dispatches `self->methods->slot104(self, e)` which resolves to this same function. Body: releases the element's old link resource, issues a new `New_LinkResource` resource-load request, then loops `target->methods->slot78` building `GsLinkObject4`-linked GPU records into the element's cell array (`entry->unk10`). Matches `src/class_3ac78.c`'s own unit-header narrative almost verbatim: "The queries that build those rectangles, and an element's resource AND GPU sides, live in class_3bb8c*" -- this function IS that resource-and-GPU side. |
 
 ## Track 4 (2026-09-26, round 87, echo)
 

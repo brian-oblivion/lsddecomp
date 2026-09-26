@@ -129,7 +129,7 @@ Evidence, all from the code:
   per element as `cellParent`, and 0x668 / 4 = 410 per element as `cells`,
   attached to the cellParent on a 0x800-unit lattice (row stride 20, the
   grid's `gridCells`); StageMap__Finalize releases them;
-- StageMap__LoadElementResources fills each cell from the element's
+- StageMap__PopulateSlotCells fills each cell from the element's
   placement records (TMD linked with GsLinkObject4, coord2 translation and
   y rotation, `flags36`), and chains the overflow cells (index 400 on) off
   a lattice cell through `nextInCell`;

@@ -236,7 +236,7 @@ were all already correct; the stall was one variable too many).
 >    `lo` already hoisted per the existing body) on the `entry->unk0 != 0`
 >    arm's accumulator -- **IDENTICAL 58/63**, same residue.
 >
-> **Unlike `StageMap__FindSlotForPosition` and `StageMap__LoadElementResources`, the combination does NOT
+> **Unlike `StageMap__FindSlotForPosition` and `StageMap__PopulateSlotCells`, the combination does NOT
 > move this residue.** Both `v0`/`v1` swaps here now have FOUR independent
 > negative results each (this report's rounds 24/25 baseline, round 27's
 > unhoisted reversal, round 32's hoisted-natural-order, and this round's

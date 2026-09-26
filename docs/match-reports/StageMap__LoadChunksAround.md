@@ -224,7 +224,7 @@ relevant (no header, symbol or type change -- the fix removed a local).
 > pointer chain inline instead of caching it in `u14` a second time.
 >
 > **Translated as found and re-verified through the full oracle:** isolated
-> single-function test (the sibling `StageMap__LoadElementResources` restored to
+> single-function test (the sibling `StageMap__PopulateSlotCells` restored to
 > `INCLUDE_ASM` while measuring) gives **137/140, no drift** --
 > `funcdiff.py` reports no "differs outside range" warning, confirming the
 > compiled length is still exactly retail's. `asm-differ` confirms every
@@ -252,7 +252,7 @@ relevant (no header, symbol or type change -- the fix removed a local).
 **The same source-level lever (drop a redundant reload-into-named-local,
 re-derive the pointer chain inline at the point of use) closed real residue
 on TWO different functions in the same unit this round**
-(`StageMap__LoadChunksAround` here, `StageMap__LoadElementResources` below) -- both permuter-found, both
+(`StageMap__LoadChunksAround` here, `StageMap__PopulateSlotCells` below) -- both permuter-found, both
 translating directly to idiomatic C with no cleanup needed. Worth adding to
 the standard lever list: when a value is loaded into a local, used once
 immediately, then the SAME expression is re-evaluated a second time into
@@ -330,8 +330,8 @@ its use site instead of caching it.
 > `u14`, the second loop's row pointer -- three separate registers, no
 > instruction shape differences anywhere), the same class independently
 > re-confirmed as unfixable-by-reshaping on three OTHER functions in this
-> unit this round (`StageMap__FindSlotForPosition`, `ComputeCellWorldOffsets`, `StageMap__LoadElementResources`'s
-> `info` residue). Time this round went to `StageMap__LoadElementResources` instead, per
+> unit this round (`StageMap__FindSlotForPosition`, `ComputeCellWorldOffsets`, `StageMap__PopulateSlotCells`'s
+> `info` residue). Time this round went to `StageMap__PopulateSlotCells` instead, per
 > the staffing guidance to move to differently-shaped ground once a
 > register-identity wall is this well established.
 
@@ -583,7 +583,7 @@ drift-free claim, plus one body that could never have linked at all (it
 called a symbol since renamed, so its figure had measured nothing). **All
 four preserved bodies in `class_3bb8c` were rebuilt this round and all four
 are honest** — `StageMap__FindSlotForPosition` 68/70, `ComputeCellWorldOffsets` 58/73,
-`StageMap__LoadChunksAround` 125/140, `StageMap__LoadElementResources` 130/150. No stale figure and no
+`StageMap__LoadChunksAround` 125/140, `StageMap__PopulateSlotCells` 130/150. No stale figure and no
 never-linked body in this unit.
 
 No new lever was tried — alpha died before attempting one. This is a
@@ -602,7 +602,7 @@ entry above is the fuller record and is authoritative; this section is kept
 for the two things it adds: an independent reproduction of the headline
 figure, and two negative variants bravo did not try.
 
-The head's provisional note that the `StageMap__LoadElementResources` sibling lever was
+The head's provisional note that the `StageMap__PopulateSlotCells` sibling lever was
 "UNTESTED" was correct when written and is now superseded -- bravo tested it
 and reached 142/150. See that report.
 

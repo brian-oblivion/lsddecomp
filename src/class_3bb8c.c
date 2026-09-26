@@ -14,7 +14,7 @@
  * / StageMap__ComputeNeighbourMask / StageMap__ComputeChunkLoadEntry /
  * StageMap__ApplyChunkLoads build and apply a per-element rate table from
  * a ChunkSlotSpec key/flag array (sDefaultTargetSpecs); and
- * StageMap__LoadElementResources / StageMap__ResetElementCells own an
+ * StageMap__PopulateSlotCells / StageMap__ResetElementCells own an
  * element's resource-load and GPU-link cell array (the same 0x668-byte grid
  * class_3ac78 calls out) and its teardown. StageMap__Enable/Disable set
  * the `enabled` flag class_3ac78 gates all of this on (cross-confirmed
@@ -383,8 +383,8 @@ void StageMap__OnNotifyTag1(StageMap *self, void *arg1, s32 mode) {
  * round 40 (`info` in $a1 where retail has $v0) was ONE `info` local
  * assigned on both sides of the slot4 call. Two locals (`info`, `info2`)
  * make each block-local, so local-alloc ties each to its addu result.
- * See docs/match-reports/StageMap__LoadElementResources.md. */
-/* StageMap__LoadElementResources (loadElementResources, +0x104) -- own local view of the
+ * See docs/match-reports/StageMap__PopulateSlotCells.md. */
+/* StageMap__PopulateSlotCells (loadElementResources, +0x104) -- own local view of the
  * records reached only from here. Kept in this .c, not class_3bb8c.h: none
  * of the 11 sibling units sharing that header touch these. */
 
@@ -404,7 +404,7 @@ typedef struct BE54LoadReq {
 
 extern void GsLinkObject4(s32 tmd, void *objp, s32 n);
 
-void StageMap__LoadElementResources(StageMap *self, ChunkSlot *entry) {
+void StageMap__PopulateSlotCells(StageMap *self, ChunkSlot *entry) {
     LbdFileHeader *info;
     LbdFileHeader *info2;
     LbdFile *hdr;

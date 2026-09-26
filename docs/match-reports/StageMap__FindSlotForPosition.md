@@ -181,7 +181,7 @@ NON_MATCHING body promoted, round 73
 > favor of never-searched ground. This round staffed it anyway, once the
 > unit's other targets (the dead-reload screen on `StageMap__ApplyChunkLoads`/
 > `StageMap__ComputeFootprintDescriptor`, both negative; two structural probes each on
-> `StageMap__LoadChunksAround`/`StageMap__LoadElementResources`, all four negative) turned up nothing --
+> `StageMap__LoadChunksAround`/`StageMap__PopulateSlotCells`, all four negative) turned up nothing --
 > per this round's own guidance to treat a "permuter-exhausted" verdict as
 > needing a CHANGED state, not a repeat, a **second independent RNG run**
 > (not a rerun of round 38's own search) qualifies, since round 38's run
@@ -228,7 +228,7 @@ NON_MATCHING body promoted, round 73
 > (183k and 184k total iterations respectively) that never beat their own
 > base score -- both single-word/two-register commutative-operand-identity
 > residues. Given this project's confirmed, cross-function
-> commutative-canonicalization class (this function, `StageMap__LoadElementResources`'s
+> commutative-canonicalization class (this function, `StageMap__PopulateSlotCells`'s
 > `or`/`addu` sites, `StageMap__ComputeChunkLoadEntry`'s `$v0`/`$v1` accumulators), a THIRD
 > search on any of these is unlikely to be a good use of a bounded permuter
 > slot; a differently-shaped seed (not just fresh RNG on the same shape)
@@ -276,7 +276,7 @@ NON_MATCHING body promoted, round 73
 > Remaining residue is now ONLY "Residue 1" (2 words): the commutative
 > `addu` register-operand-order class, already confirmed inert (both
 > operand-textual-orders tried, identical wrong output) both here and
-> independently on `StageMap__LoadElementResources` this same project. Not re-attempted --
+> independently on `StageMap__PopulateSlotCells` this same project. Not re-attempted --
 > this is now a stable, twice-confirmed GCC 2.6.3 RTL-canonicalization
 > property, not a per-function coincidence. See the near-miss body below
 > for the current best C (restored to `INCLUDE_ASM` in `src/`, per
@@ -309,7 +309,7 @@ NON_MATCHING body promoted, round 73
 >
 > This same commutative-operand-order class was independently confirmed a
 > SECOND time this round, on a different function and different operator
-> (`or`, plus another `addu`) -- see `StageMap__LoadElementResources`'s report. Two
+> (`or`, plus another `addu`) -- see `StageMap__PopulateSlotCells`'s report. Two
 > confirmations across two functions is enough to treat this as a stable
 > GCC 2.6.3 property, not a per-function coincidence: **do not spend
 > further attempts reordering commutative operands hoping to match a
@@ -489,7 +489,7 @@ drift-free claim, plus one body that could never have linked at all (it
 called a symbol since renamed, so its figure had measured nothing). **All
 four preserved bodies in `class_3bb8c` were rebuilt this round and all four
 are honest** — `StageMap__FindSlotForPosition` 68/70, `ComputeCellWorldOffsets` 58/73,
-`StageMap__LoadChunksAround` 125/140, `StageMap__LoadElementResources` 130/150. No stale figure and no
+`StageMap__LoadChunksAround` 125/140, `StageMap__PopulateSlotCells` 130/150. No stale figure and no
 never-linked body in this unit.
 
 No new lever was tried — alpha died before attempting one. This is a

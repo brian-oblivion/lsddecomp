@@ -395,7 +395,7 @@ load through a runtime-indexed global", §"BLOCKED: the `nop_mflo_mfhi` screen r
 - **Split a variable REUSED for two unrelated values** — the inverse of the delete-a-local lever.
   Discriminator: an equal-length rotation among saved registers, one local assigned in two
   independent halves. Closed `ItemList__LoadResources` (three-way rotation, 75/95) on the
-  first build and `StageMap__LoadElementResources` 142/150. (PROGRESS round 73)
+  first build and `StageMap__PopulateSlotCells` 142/150. (PROGRESS round 73)
 - **An address whose BASE is `$a0` while the object lives in `$s0` means a second C variable
   aliasing `this`.** Scheduling and delay-slot filling move instructions but never change which
   register an address uses. Closed `DreamSys__StepLookYaw` (1 short). (PROGRESS round 73)

@@ -142,7 +142,7 @@ apply by type scope.
   find an element. Accessors: class_3ac78.c, class_3bb8c.c, class_3bb8c_b.c,
   class_3bb8c_p.c (none in code_39094.c; the ctor zeroes it).
 - `LbdFileHeader.gridOffset` / `gridSize` (+0x04 / +0x08) ->
-  `placementsOffset` / `placementsSize`. StageMap__LoadElementResources
+  `placementsOffset` / `placementsSize`. StageMap__PopulateSlotCells
   points the element's Class6D940 (a 20x20 grid of placement records) at
   header + gridOffset and builds its LinkResource from header + gridOffset +
   gridSize, i.e. right after the placements. Accessor: class_3bb8c.c only.

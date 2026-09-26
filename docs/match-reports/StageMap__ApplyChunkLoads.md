@@ -146,7 +146,7 @@ allocation wrong.
 > length, identical `$s3`<->`$s4` residue -- unchanged from round 39.
 >
 > **Read the body for the dead-reload shape before touching anything, per
-> this round's brief.** The lever closed on `StageMap__LoadChunksAround`/`StageMap__LoadElementResources`
+> this round's brief.** The lever closed on `StageMap__LoadChunksAround`/`StageMap__PopulateSlotCells`
 > this same unit last round is "a value already held in a local gets
 > reloaded via the same expression a second time, into the same local, for
 > a second single use" -- a same-block RELOAD of an already-computed value.
@@ -269,7 +269,7 @@ allocation wrong.
 > re-attempted further this round.
 
 > **ROUND 20 (charlie): re-verified, no new attempt.** Confirmed against
-> this round's build (header additions from `StageMap__LoadElementResources` this same
+> this round's build (header additions from `StageMap__PopulateSlotCells` this same
 > round touch DIFFERENT structs -- `Elem::unk8`, `ElemTarget::field10`,
 > `EntryChildObj::unk14`/`unk36` -- none of which this function reads, so
 > no re-check needed beyond the standard `cmp -l`-clean whole-image build
@@ -278,7 +278,7 @@ allocation wrong.
 > already ran against this exact function (round 17, logged below,
 > inconclusive due to a scaffold mismatch, not exhausted) and a second
 > manual pass would only re-tread the same well-documented wall. Time this
-> round went to `StageMap__LoadElementResources` (fresh ground) instead, per the staffing
+> round went to `StageMap__PopulateSlotCells` (fresh ground) instead, per the staffing
 > guidance to move off a register-identity wall once it's this well
 > established.
 

@@ -501,7 +501,7 @@ just a sanity gate to get past before the real work starts.
 ## Round 41 (bravo): dead-reload lever checked by hand, explicit negative
 
 This round's head broadcast a new lever discovered on a different unit
-(`StageMap__LoadChunksAround`/`StageMap__LoadElementResources`, `code_55dd4`): a source-level dead
+(`StageMap__LoadChunksAround`/`StageMap__PopulateSlotCells`, `code_55dd4`): a source-level dead
 reload (`p = x->y; ... p->z = 0;` where `p` already holds `x->y` from
 earlier in the same block) can, once removed, reshape register
 allocation across the WHOLE enclosing block and close unrelated words

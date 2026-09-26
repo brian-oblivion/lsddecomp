@@ -146,7 +146,7 @@ despite ~15 manual attempts) is exactly what caught it.
 >
 > This confirms the report's own diagnosis exactly (retail defers a STORE
 > past independent later LOADS; mine stores immediately), and additionally
-> shows this function shares the SAME idiom `StageMap__LoadElementResources` closed this
+> shows this function shares the SAME idiom `StageMap__PopulateSlotCells` closed this
 > round in one of its own three-field groups: **an independent load can
 > fill a delay slot a nearby dependent load would otherwise need a `nop`
 > for, and WHICH load fills it is a real, GCC 2.6.3 list-scheduling choice
@@ -154,7 +154,7 @@ despite ~15 manual attempts) is exactly what caught it.
 > variations already tried here, per the attempts log below, all converged
 > on 58/73 or worse). Not re-attempted further this round beyond this
 > confirmation -- the two functions differ in one relevant way
-> (`StageMap__LoadElementResources`'s fix worked by giving the LATE-reloaded value its own
+> (`StageMap__PopulateSlotCells`'s fix worked by giving the LATE-reloaded value its own
 > named local positioned to match retail's exact delay-slot filler;
 > attempt 5 below already tried the equivalent for THIS function's
 > `outBuf[0]` reload and regressed to 44/73, so the lever that worked
@@ -285,7 +285,7 @@ drift-free claim, plus one body that could never have linked at all (it
 called a symbol since renamed, so its figure had measured nothing). **All
 four preserved bodies in `class_3bb8c` were rebuilt this round and all four
 are honest** — `StageMap__FindSlotForPosition` 68/70, `ComputeCellWorldOffsets` 58/73,
-`StageMap__LoadChunksAround` 125/140, `StageMap__LoadElementResources` 130/150. No stale figure and no
+`StageMap__LoadChunksAround` 125/140, `StageMap__PopulateSlotCells` 130/150. No stale figure and no
 never-linked body in this unit.
 
 No new lever was tried — alpha died before attempting one. This is a

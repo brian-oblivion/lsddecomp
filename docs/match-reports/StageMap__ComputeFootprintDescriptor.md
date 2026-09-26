@@ -174,7 +174,7 @@ were correct and unchanged -- the stall was purely source SHAPE).
 >
 > **Checked this body specifically for the "already-held value reloaded a
 > second time into the same local" shape** (the lever that closed real
-> residue on `StageMap__LoadChunksAround`/`StageMap__LoadElementResources` last round). `u14a` and `u14b`
+> residue on `StageMap__LoadChunksAround`/`StageMap__PopulateSlotCells` last round). `u14a` and `u14b`
 > both come from `e->unkC->unk14`-shaped expressions, but they are
 > DIFFERENT VALUES: `u14a = self->methods->slot118(self, e->unk4->unk32)
 > ->unkC->unk14` (a *different* `Elem`, resolved via a key lookup) and
@@ -240,7 +240,7 @@ were correct and unchanged -- the stall was purely source SHAPE).
 > store-then-reread narrow-field codegen sensitivity) are unchanged from 16
 > prior attempts across 5 rounds; not re-attempted further -- time went to
 > the two higher-pre-screen-count functions instead
-> (`StageMap__LoadChunksAround`/`StageMap__LoadElementResources`).
+> (`StageMap__LoadChunksAround`/`StageMap__PopulateSlotCells`).
 
 > **ROUND 32 (bravo2): re-verified, no drift; permuter scaffold checked and
 > found UNRELIABLE for this function.** Rebuilt the preserved body: 72/106
@@ -283,10 +283,10 @@ were correct and unchanged -- the stall was purely source SHAPE).
 > further -- both residue classes below (`$a1`/`$a3` register identity for
 > `u14b`, and the store-then-reread narrow-field codegen sensitivity) match
 > patterns independently re-confirmed elsewhere in this unit this round
-> (see `StageMap__LoadElementResources`'s report for a THIRD confirmation of the
+> (see `StageMap__PopulateSlotCells`'s report for a THIRD confirmation of the
 > "reread-from-memory rather than keep-the-register-live" idiom this
 > report's class-2 residue is an instance of). Time this round went to
-> `StageMap__LoadElementResources` (fresh ground) instead, per the staffing guidance.
+> `StageMap__PopulateSlotCells` (fresh ground) instead, per the staffing guidance.
 
 > **ROUND 19 (bravo): drift claim RE-VERIFIED per the head's mid-round
 > broadcast** (two other reports' "clean/drift-free" claims turned out
