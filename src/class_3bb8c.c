@@ -13,7 +13,7 @@
  * to refresh that descriptor and notify on change; Class866E8__BuildRateEntries
  * / Class866E8__ComputeRateFlags / Class866E8__ComputeRateEntry /
  * Class866E8__ApplyRateEntries build and apply a per-element rate table from
- * a TargetSpec866E8 key/flag array (sDefaultTargetSpecs); and
+ * a ChunkSlotSpec key/flag array (sDefaultTargetSpecs); and
  * Class866E8__LoadElementResources / Class866E8__ResetElementCells own an
  * element's resource-load and GPU-link cell array (the same 0x668-byte grid
  * class_3ac78 calls out) and its teardown. Class866E8__Enable/Disable set
@@ -155,7 +155,7 @@ s32 Class866E8__UpdateFootprintTracking(Class866E8 *self) {
  * round.
  * The `__asm__("")` barrier this body used to carry before `u14 = ...` is gone:
  * with `e` merged it is no longer needed, verified by whole-image rebuild. */
-void Class866E8__BuildRateEntries(Class866E8 *self, s32 val, LongVec3 *arg2, TargetSpec866E8 *arg3) {
+void Class866E8__BuildRateEntries(Class866E8 *self, s32 val, LongVec3 *arg2, ChunkSlotSpec *arg3) {
     s32 divisor;
     s32 flag;
     s32 savedResult;

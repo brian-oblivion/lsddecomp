@@ -23,9 +23,9 @@ extern GridSlot866E8 gDefaultElemRateOffset;
 /* The default "enable every element" spec table SetTargetAndBuildRates
  * passes to buildRateEntries: seven entries, every `flag` nonzero
  * (asm/data/76DC8.data.s). */
-extern TargetSpec866E8 sDefaultTargetSpecs[7];
+extern ChunkSlotSpec sDefaultTargetSpecs[7];
 
-/* Indexed by TargetSpec866E8::key in Class866E8__BuildRateEntries: the
+/* Indexed by ChunkSlotSpec::key in Class866E8__BuildRateEntries: the
  * world offset of that neighbour's cellParent from the centre position. Bound unknown (`key` is the caller's
  * byte), so unsized. */
 extern LongVec3 sRateOffsetTable[];
@@ -48,10 +48,10 @@ extern const ChunkNeighbourDelta sRateEntryTable[7];
 extern const s8 sFootprintResultRemap[8];
 
 /* 7 pointers, the first NULL, the rest to the 4-word (seven 2-byte
- * TargetSpec866E8s, padded) tables D_80086914..D_80086964:
+ * ChunkSlotSpecs, padded) tables D_80086914..D_80086964:
  * UpdateFootprintTracking passes the selected one to buildRateEntries as its
  * spec table, as SetTargetAndBuildRates passes sDefaultTargetSpecs. */
-extern TargetSpec866E8 *sFootprintResultPtrTable[7];
+extern ChunkSlotSpec *sFootprintResultPtrTable[7];
 
 /*
  * A GsCOORDINATE2 (SceneNodeSub14) read as the element's origin: an

@@ -111,7 +111,7 @@ typedef struct SplitLongVec3 {
 } SplitLongVec3;
 
 /* The step from a centre chunk's index (row * columns + column) to one of
- * the seven chunks around it, indexed by TargetSpec866E8::key
+ * the seven chunks around it, indexed by ChunkSlotSpec::key
  * (sRateEntryTable, ComputeRateEntry): rowDelta rows, then colDeltaOddRow
  * or colDeltaEvenRow columns by the centre row's parity (odd rows sit half a
  * chunk to -x, ComputeCellWorldOffsets). The table holds the centre (key 3,
@@ -146,10 +146,10 @@ typedef struct ChunkLoadEntryTail {
  * sFootprintResultPtrTable tables hold seven each): the neighbour key the
  * slot takes (0..6, the index into sRateOffsetTable and sRateEntryTable;
  * 3 is the centre) and whether it is (re)loaded and repositioned. */
-typedef struct TargetSpec866E8 {
+typedef struct ChunkSlotSpec {
     u8 neighbour; /* +0x0 */
     u8 load;      /* +0x1 */
-} TargetSpec866E8;
+} ChunkSlotSpec;
 
 /* One element-local rectangle of cells, 0xC bytes, no padding. */
 typedef struct GridSlot866E8 {
@@ -213,7 +213,7 @@ struct Class866E8Methods {
     /* +0x0F0 */ void (*disable)(Class866E8 *self);     /* Class866E8__Disable */
     /* +0x0F4 */ s32 (*updateFootprintTracking)(Class866E8 *self); /* Class866E8__UpdateFootprintTracking */
     /* +0x0F8 */ s32 (*buildRateEntries)(Class866E8 *self, s32 val, LongVec3 *pos,
-                                         TargetSpec866E8 *specs); /* Class866E8__BuildRateEntries (returns nothing; see the banner) */
+                                         ChunkSlotSpec *specs); /* Class866E8__BuildRateEntries (returns nothing; see the banner) */
     /* +0x0FC */ void (*applyRateEntries)(Class866E8 *self, ChunkLoadEntry *entries,
                                           s32 count); /* Class866E8__ApplyRateEntries */
     /* +0x100 */ void (*onNotifyTag1)(Class866E8 *self, void *sender,
@@ -318,7 +318,7 @@ s32 ComputeCellWorldOffsets(s32 *outPos, s32 *outBuf, StageGridDimensions *confi
 void Class866E8__Enable(Class866E8 *self);
 void Class866E8__Disable(Class866E8 *self);
 s32 Class866E8__UpdateFootprintTracking(Class866E8 *self);
-void Class866E8__BuildRateEntries(Class866E8 *self, s32 val, LongVec3 *pos, TargetSpec866E8 *specs);
+void Class866E8__BuildRateEntries(Class866E8 *self, s32 val, LongVec3 *pos, ChunkSlotSpec *specs);
 s32 Class866E8__ComputeRateFlags(Class866E8 *self, s32 val, s32 flag);
 s32 Class866E8__ComputeRateEntry(Class866E8 *self, ChunkLoadEntry *entry, s32 divisor, s32 flag,
                                  s32 val, s32 savedResult, s32 key); /* 0 or 1; BuildRateEntries discards it */

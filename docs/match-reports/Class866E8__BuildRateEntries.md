@@ -340,7 +340,7 @@ first attempt, no issue there.
 
 ## What it does
 
-`void Class866E8__BuildRateEntries(Obj866E8 *self, s32 val, Unk54Struct *arg2, TargetSpec866E8 *arg3)`.
+`void Class866E8__BuildRateEntries(Obj866E8 *self, s32 val, Unk54Struct *arg2, ChunkSlotSpec *arg3)`.
 If `arg3 == 0`, does nothing at all (whole body skipped). Otherwise:
 
 1. `divisor = self->unk68->divisor` (s16); `flag = (val / divisor) & 1`
@@ -365,7 +365,7 @@ If `arg3 == 0`, does nothing at all (whole body skipped). Otherwise:
 
 New header additions (all committed, additive; unchanged from the previous
 draft of this report): `Elem::unk2` (u16 @+0x002), `Unk14Obj::unk0` (s32
-@+0x000), `TargetSpec866E8` (new: `u8 key`@0, `u8 flag`@1, size 2),
+@+0x000), `ChunkSlotSpec` (new: `u8 key`@0, `u8 flag`@1, size 2),
 `extern Unk54Struct sRateOffsetTable[]` (reuses the existing 3-`s32`-word shape),
 `extern void Class866E8__ComputeRateEntry(...)` (7-arg prototype, established from this
 call site only), and `Obj866E8Methods::slotFC` fixed to its real signature
@@ -452,7 +452,7 @@ longer needed once `e` is merged; verified by whole-image rebuild).
 ## HISTORICAL -- best body reached in round 40 (125/140, NO drift warning)
 
 ```c
-void Class866E8__BuildRateEntries(Obj866E8 *self, s32 val, Unk54Struct *arg2, TargetSpec866E8 *arg3) {
+void Class866E8__BuildRateEntries(Obj866E8 *self, s32 val, Unk54Struct *arg2, ChunkSlotSpec *arg3) {
     s32 divisor;
     s32 flag;
     s32 savedResult;
@@ -669,7 +669,7 @@ to be worth reading.
 
 ```c
 #if 0
-void Class866E8__BuildRateEntries(Obj866E8 *self, s32 val, Unk54Struct *arg2, TargetSpec866E8 *arg3) {
+void Class866E8__BuildRateEntries(Obj866E8 *self, s32 val, Unk54Struct *arg2, ChunkSlotSpec *arg3) {
     s32 divisor;
     s32 flag;
     s32 savedResult;
@@ -726,4 +726,4 @@ Round 78 (track 3, naming pass, bravo).
 
 | symbol | name | tier | evidence |
 | --- | --- | --- | --- |
-| `func_8004B700` | `Class866E8__BuildRateEntries` | B | Occupant of `gClass866E8Methods` +0x0F8 (`slotF8`, verified its own identity via classtable -- see the corrected slot comment in `include/class_3bb8c.h`). Iterates a `TargetSpec866E8[7]` (`sDefaultTargetSpecs` at its one known call site), calling `Class866E8__ComputeRateFlags` once and `Class866E8__ComputeRateEntry` per enabled entry to fill a 7-slot `ChunkLoadEntry` stack buffer, then dispatches the filled count through `slotFC` (`Class866E8__ApplyRateEntries`). "Build...RateEntries" names the mechanic (assembling the entry array that the next slot applies), consistent with the sibling already-matched functions in this same vtable region (`Class866E8__ConfigureRateEntry`, `Class866E8__AdvanceRateCountdown`, `Class866E8__FlushRateLatch`). |
+| `func_8004B700` | `Class866E8__BuildRateEntries` | B | Occupant of `gClass866E8Methods` +0x0F8 (`slotF8`, verified its own identity via classtable -- see the corrected slot comment in `include/class_3bb8c.h`). Iterates a `ChunkSlotSpec[7]` (`sDefaultTargetSpecs` at its one known call site), calling `Class866E8__ComputeRateFlags` once and `Class866E8__ComputeRateEntry` per enabled entry to fill a 7-slot `ChunkLoadEntry` stack buffer, then dispatches the filled count through `slotFC` (`Class866E8__ApplyRateEntries`). "Build...RateEntries" names the mechanic (assembling the entry array that the next slot applies), consistent with the sibling already-matched functions in this same vtable region (`Class866E8__ConfigureRateEntry`, `Class866E8__AdvanceRateCountdown`, `Class866E8__FlushRateLatch`). |
