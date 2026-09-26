@@ -4,28 +4,42 @@
 #include "BasicClass.h"
 
 /*
- * FileResource -- the base of the game's data sources (class id 0x3, method
- * table gFileResourceMethods): a BasicClass subclass that owns one file buffer and
- * declares the file-I/O interface its subclasses reach through their tables.
- * Methods in src/code_171e0.c; sixteen classes derive from it
- * (`typeviews.py --tree`), among them the CD-ROM driver (gCdDriverMethods, 0x13,
- * code_179d8_o/q/s) and the SPU/VAB driver (gVabDriverMethods, 0x23).
+ * FileResource -- the base of every class the game loads from a file (class
+ * id 0x3, method table gFileResourceMethods, parent BasicClass). Its own
+ * methods are in src/code_171e0.c.
  *
- * The interface is bound AT RUN TIME. Slots +0x040..+0x058 and +0x068..+0x074
- * are NULL or placeholders in the static tables; SetActiveDataSource copies
- * the active driver's eleven interface slots (CopyDataSourceSlots) into this
- * class's table and into the table of every class gDataSourceClientGetters
- * lists, so `this->methods->read(...)` reaches whichever driver is active.
- * The slot names are the CD driver's occupants.
+ * The object owns one file buffer. FileResource__LoadFile opens a named
+ * file, takes its size from seek(0, 2), allocates that much from the
+ * BMemPMgr heap, reads the whole file into it and closes it; FreeBuffer
+ * releases the buffer unless freeGuard is set. The subclasses are the
+ * game's file-backed assets (TimImage, TileMap, TileAtlas, ModelData, Tod,
+ * VabStreamObj, ...; `typeviews.py --tree` lists all sixteen). A subclass
+ * constructor names its file (loadFile, or requestLoadFile to queue it on
+ * the CD driver), and slot +0x078 is the subclass's own step that consumes
+ * the loaded buffer: TimImage__Upload sends it to VRAM, ModelData and
+ * TriggerWorld build their resources from it, Tod scans its packets. The
+ * usual use is New_<Sub>(name), slot +0x078, freeBuffer, and release when
+ * done. FileResource itself is never created on its own.
+ *
+ * Two subclasses are not assets but the device drivers that implement the
+ * file-I/O slots: CdDriver (0x13, the CD-ROM) and VabDriver (0x23). The
+ * interface is bound at run time: slots +0x040..+0x058 and +0x068..+0x074
+ * are NULL or placeholders in the static tables, and SetActiveDataSource
+ * copies the active driver's eleven interface slots (CopyDataSourceSlots)
+ * into this class's table and into the table of every class
+ * gDataSourceClientGetters lists, so `this->methods->read(...)` reaches
+ * whichever driver is active. The slot names are the CD driver's occupants.
  */
 
-/* A disc position in the shape of Psy-Q's CdlLOC, declared as two s16 so the
- * struct is 2-aligned and a whole-struct copy compiles to lwl/lwr + swl/swr
- * (the idiom CLAUDE.md documents). The halves are never read apart. It is
- * here, not in CdDriver.h, because FileResource's own +0x018 has this type:
- * the CD driver's methods run on every client object (SetActiveDataSource
- * binds them into the client tables), so the open file's position and size
- * are fields of the base, not of CdDriver (round 88). */
+/* A disc position: Psy-Q's CdlLOC (minute, second, sector, track) by
+ * layout and by use (CdControl's setloc argument, CdSearchFile's output,
+ * CdPosToInt's input). The halves are never read apart. Declared here
+ * rather than taken from <libcd.h> only because four CD units
+ * (code_179d8_h/q/r/s) still declare the Cd* functions their own way and
+ * would collide with Sony's prototypes; the whole-struct copies compile to
+ * the same lwl/lwr + swl/swr with Sony's 1-aligned CdlLOC. It lives in this
+ * header because the CD driver's methods run on every client object, so the
+ * open file's position and size are fields of the base. */
 typedef struct CdLoc16 {
     s16 unk0;
     s16 unk2;
@@ -49,9 +63,9 @@ typedef struct FileResourceMethods FileResourceMethods;
     /* +0x064 */ void (*setFlag)(Self *self);                   /* FileResource__SetFlag */          \
     /* +0x068 */ void (*runRequestQueue)(void);                 /* CD: CdDriver__RunRequestQueue */ \
     /* +0x06C */ void (*requestLoadFile)(Self *self, char *name); /* CD: CdDriver__RequestLoadFile */ \
-    /* +0x070 */ void (*stopService)(Self *self);               /* CD: CdDriver__StopService; neither occupant reads self, but CdDriver__RunRequestQueue loads $a0 = self before the jalr (round 88) */ \
+    /* +0x070 */ void (*stopService)(Self *self);               /* CD: CdDriver__StopService; neither occupant reads self, but CdDriver__RunRequestQueue passes it */ \
     /* +0x074 */ void (*cancelRequests)(Self *self);            /* CD: CdDriver__CancelRequests */ \
-    /* +0x078 */ void *slot78                                   /* NULL */
+    /* +0x078 */ void *slot78                                   /* NULL here; each subclass's step that consumes the loaded buffer (TimImage__Upload, ModelData__BuildResources, ...), signature per class */
 /* clang-format on */
 
 /* clang-format off */
@@ -66,7 +80,7 @@ typedef struct FileResourceMethods FileResourceMethods;
     /* +0x022 */ u16 pendingRequests;                                                              \
     /* +0x024 */ s32 flags;           /* bit 0 set by SetFlag */                                   \
     /* +0x028 */ u16 inQueueDispatch;                                                              \
-    /* +0x02A */ u16 unk2A            /* the object is 0x2C bytes: Class6D940's own fields start at +0x02C */
+    /* +0x02A */ u16 unk2A            /* a subclass's load step, 0 when idle (Class81940, VabStreamObj); the object is 0x2C bytes */
 /* clang-format on */
 
 struct FileResourceMethods {
