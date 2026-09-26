@@ -75,3 +75,5 @@ A Class6B5CC subclass whose fields past +0x044 read (u32, s16 x6, three bytes, a
 ## Track 4 (2026-09-26, round 88, alpha)
 
 Class unified in `include/BgLayer.h`. `self` is `BgLayer *` (was `Obj6F2C4`); +0x054 is `color`, a `BgLayerRgb` (was `Vec3S8 unk54`; still signed, which the lb/sb copy needs), +0x064 `rotate` (was unk64); `gBgLayerDefaultColor` is `BgLayerRgb`. The slot +0x040 keeps Class6B5CC's `reset(self)` type; the ctor casts to `BgLayerResetFn`. Byte-identical.
+
+Later the same round (alpha, second class): TileMap unified too (`include/TileMap.h`, same round): `src` is `TileMap *` (was the unit-local `Map44294` view, deleted), and the fields read are `src->map.cellw`/`ncellw`/`cellh`/`ncellh`; `map` points at `&src->map` (was `&src->cellw`). Byte-identical.

@@ -53,6 +53,7 @@
 #include "TriggerWorld.h"
 #include "TimImage.h"
 #include "BgLayer.h"
+#include "TileMap.h"
 #include "TmdModel.h"
 #include "DrawSystem.h"
 #include "CdStream.h"
@@ -92,7 +93,6 @@ extern void BMemPMgrFree(void *arg);
 extern void *BMemPMgrAlloc(s32 size);
 void *GetLinkResourceMethods(void);
 void *GetTimArraySrcMethods(void);
-void *GetTileMapMethods(void);
 void *GetTileAtlasMethods(void);
 
 /* The allocators below reach a class's constructor through its table
@@ -691,7 +691,7 @@ TodMethods *GetTodMethods(void) {
     return &D_8006F240;
 }
 /* Allocate and construct a D_8006F2C4 object. */
-BgLayer *New_BgLayer(struct Map44294 *src, s32 mode) {
+BgLayer *New_BgLayer(TileMap *src, s32 mode) {
     BgLayer *obj = BMemPMgrAlloc(0x68);
 
     if (obj != NULL) {
@@ -702,7 +702,7 @@ BgLayer *New_BgLayer(struct Map44294 *src, s32 mode) {
 }
 /* D_8006F2C4 +0x008: constructor -- Class6B5CC's, then this table, then
  * slot +0x040 with the two arguments. */
-void BgLayer__BgLayer(BgLayer *self, struct Map44294 *src, s32 mode) {
+void BgLayer__BgLayer(BgLayer *self, TileMap *src, s32 mode) {
     GetClass6B5CCMethods()->ctor((Class6B5CC *)self);
     self->methods = GetBgLayerMethods();
     ((BgLayerResetFn)self->methods->reset)(self, src, mode);
@@ -712,21 +712,14 @@ void BgLayer__BgLayer(BgLayer *self, struct Map44294 *src, s32 mode) {
  * 320 x 240 screen (with its own attribute); then zero position and
  * scroll, take the colour in gBgLayerDefaultColor, point it at the source's GsMAP
  * (+0x2C), unit scale, no rotation, and centre the pivot. */
-typedef struct Map44294 {
-    /* +0x00 */ u8 pad0[0x2C];
-    /* +0x2C */ u8 cellw;         /* a GsMAP from here */
-    /* +0x2D */ u8 cellh;
-    /* +0x2E */ u16 ncellw;
-    /* +0x30 */ u16 ncellh;
-} Map44294;
 
 extern BgLayerRgb gBgLayerDefaultColor;
 
-void BgLayer__Reset(BgLayer *self, Map44294 *src, s32 mode) {
+void BgLayer__Reset(BgLayer *self, TileMap *src, s32 mode) {
     if (mode == 0) {
         self->bgAttribute = 0x1000000;
-        self->w = src->cellw * src->ncellw;
-        self->h = src->cellh * src->ncellh;
+        self->w = src->map.cellw * src->map.ncellw;
+        self->h = src->map.cellh * src->map.ncellh;
     } else if (mode == 1) {
         self->bgAttribute = 0x2000000;
         self->w = 320;
@@ -737,7 +730,7 @@ void BgLayer__Reset(BgLayer *self, Map44294 *src, s32 mode) {
     self->scrollx = 0;
     self->scrolly = 0;
     self->color = gBgLayerDefaultColor;
-    self->map = &src->cellw;
+    self->map = &src->map;
     self->scalex = 0x1000;
     self->scaley = 0x1000;
     self->rotate = 0;
@@ -1023,90 +1016,75 @@ TriggerWorldMethods *GetTriggerWorldMethods(void) {
     return &D_8006F40C;
 }
 /* Allocate and construct a D_8006F498 object. */
-void *New_TileMap(s32 arg0, s32 arg1) {
-    void *obj = BMemPMgrAlloc(0x44);
+TileMap *New_TileMap(s32 arg0, Class6D430 *atlas) {
+    TileMap *obj = BMemPMgrAlloc(0x44);
 
     if (obj != NULL) {
-        ((Ctor33808 *)GetTileMapMethods())->ctor(obj, arg0, arg1);
+        GetTileMapMethods()->ctor(obj, arg0, atlas);
         return obj;
     }
     return NULL;
 }
-/* The D_8006F498 object. */
-typedef struct Obj6F498 {
-    CLASS6D430_FIELDS(DataSrc33808Methods);
-    /* +0x02C */ u8 unk2C;
-    /* +0x02D */ u8 unk2D;
-    /* +0x02E */ u16 unk2E;
-    /* +0x030 */ u16 unk30;
-    /* +0x032 */ u8 pad32[2];
-    /* +0x034 */ s32 unk34;
-    /* +0x038 */ u16 *unk38;
-    /* +0x03C */ s32 unk3C;       /* an object: its +0x2C is read */
-    /* +0x040 */ u16 unk40;
-    /* +0x042 */ u16 unk42;
-} Obj6F498;
-
 /* D_8006F498 +0x008: constructor -- the active driver's, then this table;
- * store `arg2` at +0x3C, clear +0x42, and with no `arg1` set +0x40, clear
- * +0x2A and run its own +0x064. */
-void TileMap__TileMap(Obj6F498 *self, s32 arg1, s32 arg2) {
+ * store the atlas, clear `loaded`, and with no `arg1` set defaultGrid,
+ * clear +0x2A and run its own +0x064. */
+void TileMap__TileMap(TileMap *self, s32 arg1, Class6D430 *atlas) {
     s32 unused[8];
 
     GetActiveDataSourceMethods()->ctor((Class6D430 *)self);
     self->methods = GetTileMapMethods();
-    self->unk3C = arg2;
-    self->unk42 = 0;
+    self->atlas = atlas;
+    self->loaded = 0;
     if (arg1 == 0) {
-        self->unk40 = 1;
+        self->defaultGrid = 1;
         self->unk2A = 0;
-        self->methods->setFlag((DataSrc33808 *)self);
+        self->methods->setFlag(self);
     }
 }
-/* D_8006F498 +0x00C: finalize -- free +0x38, then the active driver's. */
-void TileMap__Finalize(DataSrc33808 *self) {
-    BMemPMgrFree((void *)self->unk38);
+/* D_8006F498 +0x00C: finalize -- free the map's index table, then the
+ * active driver's. */
+void TileMap__Finalize(TileMap *self) {
+    BMemPMgrFree(self->map.index);
     GetActiveDataSourceMethods()->finalize((Class6D430 *)self);
 }
-/* D_8006F498 +0x064: unless +0x2A is set, slot +0x078 and mark +0x42. */
+/* D_8006F498 +0x064: unless +0x2A is set, slot +0x078 (BuildMap) and mark
+ * `loaded`. */
 
-void TileMap__Load(Obj6F498 *self) {
+void TileMap__Load(TileMap *self) {
     if (self->unk2A == 0) {
-        ((void (*)())self->methods->slot78)();
-        self->unk42 = 1;
+        ((TileMapBuildMapFn)self->methods->slot78)();
+        self->loaded = 1;
     }
 }
-/* D_8006F498 +0x078: copy +0x2C of the object at +0x3C to +0x34; when +0x40
- * is set, lay out a 20 x 15 grid (16 x 16 cells) and fill an allocated
- * index table 0..n-1 at +0x38; otherwise, or when the allocation fails,
+/* D_8006F498 +0x078: take the atlas's cells (+0x2C) as the map's base;
+ * with defaultGrid, lay out a 20 x 15 grid of 16 x 16 cells and fill an
+ * allocated index table 0..n-1; otherwise, or when the allocation fails,
  * free the buffer (own +0x05C). */
-void TileMap__BuildMap(Obj6F498 *self) {
+void TileMap__BuildMap(TileMap *self) {
     s32 n;
     s32 i;
     u16 *p;
 
-    self->unk34 = ((DataSrc33808 *)self->unk3C)->unk2C;
-    if (self->unk40 != 0) {
-        self->unk2E = 20;
-        self->unk2C = 16;
-        self->unk2D = 16;
-        self->unk30 = 15;
-        n = self->unk2E * self->unk30;
-        self->unk38 = BMemPMgrAlloc(n * 2);
-        if (self->unk38 != NULL) {
-            p = self->unk38;
+    self->map.base = (struct GsCELL *)((DataSrc33808 *)self->atlas)->unk2C;
+    if (self->defaultGrid != 0) {
+        self->map.ncellw = 20;
+        self->map.cellw = 16;
+        self->map.cellh = 16;
+        self->map.ncellh = 15;
+        n = self->map.ncellw * self->map.ncellh;
+        self->map.index = BMemPMgrAlloc(n * 2);
+        if (self->map.index != NULL) {
+            p = self->map.index;
             for (i = 0; i < n; i++) {
                 *p++ = i;
             }
             return;
         }
     }
-    self->methods->freeBuffer((DataSrc33808 *)self);
+    self->methods->freeBuffer(self);
 }
-extern s32 D_8006F498[];
-
-void *GetTileMapMethods(void) {
-    return D_8006F498;
+TileMapMethods *GetTileMapMethods(void) {
+    return &D_8006F498;
 }
 /* Allocate and construct a D_8006F514 object. */
 void *New_TileAtlas(s32 arg0) {

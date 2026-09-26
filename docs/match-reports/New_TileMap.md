@@ -45,3 +45,7 @@ void *New_TileMap(s32 arg0, s32 arg1) {
 ## Naming
 
 - **New_TileMap**, tier A. src/code_2c054.c's TaskCore__TaskCore hands this object to New_BgLayer as its map source; this object's own fields (+0x2C..+0x30) are byte-for-byte Map44294/GsMAP's own layout (cellw/cellh/ncellw/ncellh).
+
+## Track 4 (2026-09-26, round 88, alpha)
+
+Class unified in `include/TileMap.h`. Returns `TileMap *` (was `void *`); the second parameter is `Class6D430 *atlas` (was `s32 arg1`: a TileAtlas, D_8006F514, typed by its nearest unified ancestor); the ctor is reached through `GetTileMapMethods()->ctor` (was the unit-local `Ctor33808` cast). The prototype `extern StreamTaskUnkB4Obj *New_TileMap(...)` in include/code_2c054.h is gone. Byte-identical.

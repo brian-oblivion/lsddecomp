@@ -44,12 +44,12 @@
  * copies them lb/lb/lb, sb/sb/sb (BgLayer__SetColor, BgLayer__Reset), which
  * three u8 members would not give.
  *
- * `struct Map44294` is the map source's view in src/code_33808.c: the
- * TileMap (D_8006F498, not unified), whose GsMAP starts at +0x02C. Only its
- * tag is named here, as include/TriggerWorld.h does for its descriptor.
+ * The map source is a TileMap (D_8006F498, include/TileMap.h, round 88),
+ * whose GsMAP starts at +0x02C. Only its tag is named here, as
+ * include/TriggerWorld.h does for its descriptor.
  */
 
-struct Map44294;
+struct TileMap;
 
 typedef struct BgLayer BgLayer;
 typedef struct BgLayerMethods BgLayerMethods;
@@ -62,14 +62,14 @@ typedef struct BgLayerRgb {
 } BgLayerRgb;
 
 struct BgLayerMethods {
-    CLASS6B5CC_SLOTS(BgLayer, (BgLayer *self, struct Map44294 *src, s32 mode));
+    CLASS6B5CC_SLOTS(BgLayer, (BgLayer *self, struct TileMap *src, s32 mode));
     /* +0x0B8 */ void (*setColor)(BgLayer *self, s32 enable, BgLayerRgb *rgb); /* BgLayer__SetColor */
     /* +0x0BC */ void (*slotBC)(void);                                         /* BgLayer__NoOp, empty; no known caller */
 };
 
 /* BgLayer__Reset's own parameter list, which the inherited +0x040 slot does
  * not carry: BgLayer__BgLayer casts `methods->reset` to it. */
-typedef void (*BgLayerResetFn)(BgLayer *self, struct Map44294 *src, s32 mode);
+typedef void (*BgLayerResetFn)(BgLayer *self, struct TileMap *src, s32 mode);
 
 struct BgLayer {
     CLASS6B5CC_FIELDS(BgLayerMethods);
@@ -82,7 +82,7 @@ struct BgLayer {
     /* +0x052 */ s16 scrolly;
     /* +0x054 */ BgLayerRgb color; /* GsBG r, g, b: gBgLayerDefaultColor at reset; setColor */
     /* +0x057 */ u8 pad57;
-    /* +0x058 */ void *map;        /* GsBG.map: the source's GsMAP (&src->cellw, +0x02C) */
+    /* +0x058 */ void *map;        /* GsBG.map: the source's GsMAP (&src->map, +0x02C) */
     /* +0x05C */ s16 mx;           /* the pivot: w / 2, h / 2 */
     /* +0x05E */ s16 my;
     /* +0x060 */ s16 scalex;       /* 20.12; 0x1000 at reset, clamped to 30000 by updateScale */
@@ -94,9 +94,9 @@ extern BgLayerMethods D_8006F2C4;
 extern BgLayerMethods *GetBgLayerMethods(void); /* returns &D_8006F2C4 */
 
 /* The class's own methods, in address order. */
-BgLayer *New_BgLayer(struct Map44294 *src, s32 mode); /* BMemPMgrAlloc(0x68), then ctor */
-void BgLayer__BgLayer(BgLayer *self, struct Map44294 *src, s32 mode);
-void BgLayer__Reset(BgLayer *self, struct Map44294 *src, s32 mode);
+BgLayer *New_BgLayer(struct TileMap *src, s32 mode); /* BMemPMgrAlloc(0x68), then ctor */
+void BgLayer__BgLayer(BgLayer *self, struct TileMap *src, s32 mode);
+void BgLayer__Reset(BgLayer *self, struct TileMap *src, s32 mode);
 void BgLayer__UpdateRotation(BgLayer *self, s32 set, WholeFrac_d294 *table);
 void BgLayer__UpdateScale(BgLayer *self, s32 set, WholeFrac_d294 *table);
 void BgLayer__SetColor(BgLayer *self, s32 enable, BgLayerRgb *rgb);
