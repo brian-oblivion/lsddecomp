@@ -272,7 +272,7 @@ void Viewport__RemoveChild(Viewport *self, BasicClass *child) {
 }
 
 /* Viewport's removeAllChildren override (+0x018 of gViewportMethods and of
- * gClass869D8Methods): clears the three child caches AddChild fills, then
+ * gNodeGuardedViewportMethods): clears the three child caches AddChild fills, then
  * the base. */
 void Viewport__RemoveAllChildren(Viewport *self) {
     self->refView.super = 0;

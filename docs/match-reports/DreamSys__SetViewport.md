@@ -58,7 +58,7 @@ object is a camera, only that this curve is read out of it.
 Renamed from `DreamSys__SetHeightCurve`, and the field it sets from
 `heightCurve` (DreamSysUnk5C *) to `viewport` (struct Viewport *). The
 object is a Viewport: Class865C8__Init (class_39e08) passes it the
-New_Class869D8 it built (a Viewport subclass) and Class865C8__Deinit passes
+New_NodeGuardedViewport it built (a Viewport subclass) and Class865C8__Deinit passes
 NULL; Entity__MoodCue74 calls +0x064 of its table, Viewport's
 setClearColor; and the offsets DreamSysUnk5C named are refView's (GsRVIEW2
 at +0x014): +0x014/+0x020 the viewpoint and reference point

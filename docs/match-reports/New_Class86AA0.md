@@ -6,7 +6,7 @@
 
 ## What it does
 
-`New_Class86AA0`: the allocator for `Class86AA0`, mirroring New_Class869D8
+`New_Class86AA0`: the allocator for `Class86AA0`, mirroring New_NodeGuardedViewport
 exactly but for the sibling class (`0x3C`-byte allocation, ctor
 `Class86AA0__Class86AA0` fetched through `GetClass86AA0Methods()->ctor`).
 
@@ -28,10 +28,10 @@ Class86AA0 *New_Class86AA0(void)
 
 ## Notes
 
-Matched on the first attempt; same idiom as New_Class869D8. No residue.
+Matched on the first attempt; same idiom as New_NodeGuardedViewport. No residue.
 
 ## Naming
 
 **New_Class86AA0** -- tier A. Same `New_X` allocator idiom as
-`New_Class869D8` (see that report), mirrored exactly for this sibling
+`New_NodeGuardedViewport` (see that report), mirrored exactly for this sibling
 class.

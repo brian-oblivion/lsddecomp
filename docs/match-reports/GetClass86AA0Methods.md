@@ -7,7 +7,7 @@
 ## What it does
 
 Get-vtable helper for a second small sibling class: returns `&gClass86AA0Methods`,
-this unit's `Class86AA0Methods`. Same shape and role as GetClass869D8Methods.
+this unit's `Class86AA0Methods`. Same shape and role as GetNodeGuardedViewportMethods.
 
 ## The C
 
@@ -20,7 +20,7 @@ Class86AA0Methods *GetClass86AA0Methods(void)
 
 ## New type: Class86AA0 / Class86AA0Methods
 
-`gClass86AA0Methods` (asm/data/76DC8.data.s, header word 0x24) is gClass869D8Methods's
+`gClass86AA0Methods` (asm/data/76DC8.data.s, header word 0x24) is gNodeGuardedViewportMethods's
 sibling: same opening shape (header, then `BasicClass__Release` at
 +0x004, ctor at +0x008 -- here Class86AA0__Class86AA0). Only +0x008 (`ctor`) and
 +0x0B8 (dispatched by Class86AA0__DispatchLinkCommand, this unit's own slot +0x09C in the
@@ -28,10 +28,10 @@ same table) are typed; see `include/class_3bb8c.h`.
 
 ## Proposed learning
 
-See GetClass869D8Methods.md -- same finding, second instance.
+See GetNodeGuardedViewportMethods.md -- same finding, second instance.
 
 ## Naming
 
 **GetClass86AA0Methods** -- tier A. Same pure-getter shape and evidence as
-`GetClass869D8Methods` (see that report); `D_80086AA0` renamed alongside
+`GetNodeGuardedViewportMethods` (see that report); `D_80086AA0` renamed alongside
 it to `gClass86AA0Methods` for the same reason.

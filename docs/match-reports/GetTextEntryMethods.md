@@ -31,7 +31,7 @@ Obj86ED0Methods *GetTextEntryMethods(void)
 ```
 
 Plain address-of getter for `Obj86ED0`'s own vtable, same shape as
-`GetClass869D8Methods`/`GetClass86AA0Methods`/`GetSceneNodeMethods` already documented in
+`GetNodeGuardedViewportMethods`/`GetClass86AA0Methods`/`GetSceneNodeMethods` already documented in
 `include/class_3bb8c.h`. Matched first try.
 
 ## Naming

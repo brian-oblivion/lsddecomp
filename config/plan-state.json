@@ -928,11 +928,6 @@
           "date": "2026-09-26",
           "header": "include/Class866E8.h"
         },
-        "gClass869D8Methods": {
-          "class": "Class869D8",
-          "date": "2026-09-26",
-          "header": "include/Class869D8.h"
-        },
         "gClass86AA0Methods": {
           "class": "Class86AA0",
           "date": "2026-09-26",
@@ -1017,6 +1012,11 @@
           "class": "MoviePlayer",
           "date": "2026-09-26",
           "header": "include/MoviePlayer.h"
+        },
+        "gNodeGuardedViewportMethods": {
+          "class": "NodeGuardedViewport",
+          "date": "2026-09-26",
+          "header": "include/NodeGuardedViewport.h"
         },
         "gObjMMethods": {
           "class": "ObjM",

@@ -36,7 +36,7 @@ typedef struct IntermediateBaseInitArgs IntermediateBaseInitArgs;
 
 /* init's argument. The caller owns it; the object keeps the pointer at
  * +0x00C. Class865C8__Class865C8 fills +0x008..+0x010 itself (New_FrameClock(),
- * New_Class866E8(0, 1), New_Class869D8()). */
+ * New_Class866E8(0, 1), New_NodeGuardedViewport()). */
 struct IntermediateBaseInitArgs {
     /* +0x000 */ BasicClass *unk0; /* added as a child; onState2 calls its +0x048, onState3 its +0x04C */
     /* +0x004 */ BasicClass *unk4; /* added as a child; onTag1Notify's event 2 calls its +0x044, +0x048 */

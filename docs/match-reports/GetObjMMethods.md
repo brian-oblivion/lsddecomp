@@ -30,7 +30,7 @@ round 15b (2026-09-04), runner echo, second pass on `class_3bb8c_m`
 
 ## Naming
 
-**GetObjMMethods** -- tier A. Plain vtable getter: whole body is `lui`/`addiu` computing `&gObjMMethods`, matching the `Get<Class>Methods` pattern already established elsewhere in this codebase (`GetClass869D8Methods` etc.). `tools/classtable.py 0x80087034` confirms it is a real class vtable (BasicClass framework fingerprint). A pure getter is tier A by definition; the class's own game-facing name stays unconfirmed, hence `GetObjMMethods` rather than a semantic name.
+**GetObjMMethods** -- tier A. Plain vtable getter: whole body is `lui`/`addiu` computing `&gObjMMethods`, matching the `Get<Class>Methods` pattern already established elsewhere in this codebase (`GetNodeGuardedViewportMethods` etc.). `tools/classtable.py 0x80087034` confirms it is a real class vtable (BasicClass framework fingerprint). A pure getter is tier A by definition; the class's own game-facing name stays unconfirmed, hence `GetObjMMethods` rather than a semantic name.
 
 
 ## Track 4 (2026-09-26, round 89, echo)

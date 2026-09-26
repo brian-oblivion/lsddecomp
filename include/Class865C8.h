@@ -17,7 +17,7 @@
  *  - the ctor passes GetSoundEffectDir() as the base's soundBankPath, loads
  *    "ETC\ETC.TIM" (etcTim), "ETC\DREAMER.TMD" (dreamerTmd) and the
  *    week's BGM (bgm, New_WBgm(PickWeeklyGroup(0), NULL, 1)), fills the init
- *    args' +0x008..+0x010 with a FrameClock, a Class866E8 and a Class869D8
+ *    args' +0x008..+0x010 with a FrameClock, a Class866E8 and a NodeGuardedViewport
  *    viewport, keeps the DreamSys as a child and hands it `sound` and etcTim;
  *  - init hands the DreamSys the init args' children and viewport, onInit
  *    sets up the viewport and attaches the DreamSys to it (phase 1);

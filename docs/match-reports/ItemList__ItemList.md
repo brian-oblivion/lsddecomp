@@ -355,7 +355,7 @@ field. (ItemList__ItemList, one word, 66 -> 98/107.)
 
 ## Naming
 
-- `ItemList__ItemList` -- tier A. The ctor occupant (classtable.py gItemListMethods +0x008), named per the "constructors Class__Class" convention (e.g. Class869D8__Class869D8). Parses arg1 as a NUL-terminated pointer array and allocates two parallel unk10-length arrays -- mechanics well established via asm-differ across rounds 9/13/19/73.
+- `ItemList__ItemList` -- tier A. The ctor occupant (classtable.py gItemListMethods +0x008), named per the "constructors Class__Class" convention (e.g. NodeGuardedViewport__NodeGuardedViewport). Parses arg1 as a NUL-terminated pointer array and allocates two parallel unk10-length arrays -- mechanics well established via asm-differ across rounds 9/13/19/73.
 
 ## History (moved from the unit banners, round 92)
 

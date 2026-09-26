@@ -16,7 +16,7 @@
  * sound, bgm, etcTim, dreamerTmd, stage), added as a child and init'ed with
  * Class865C8's init args and its DreamSys. So the inherited
  * IntermediateBase fields hold that Class865C8's init-arg objects:
- * unk10 its FrameClock, unk14 its Class866E8, viewport its Class869D8, and
+ * unk10 its FrameClock, unk14 its Class866E8, viewport its NodeGuardedViewport, and
  * Class86668's sound its VabStreamObj. Those fields keep their parents'
  * `BasicClass *` types and ObjM's methods cast them (no code).
  *
@@ -66,7 +66,7 @@ struct WBgm;
 struct TimBlockSrc;
 struct TimImage;
 struct LinkResource;
-struct Class869D8;
+struct NodeGuardedViewport;
 struct Class6E99C;
 struct TextRow;
 struct Unk50Struct_3bb8c_l; /* styleConfig's view, include/class_3bb8c.h */
@@ -123,7 +123,7 @@ struct ObjM {
     /* +0x06C */ BasicClass *ctorSound; /* the ctor's sound again (also Class86668::sound); &ctorSound is RegisterStyleConfig's arg2 (see the banner) */
     /* +0x070 */ struct LinkResource *dreamerTmd; /* the ctor's (Class865C8's "ETC\DREAMER.TMD"); no reader */
     /* +0x074 */ struct TimImage *etcTim; /* the ctor's (Class865C8's "ETC\ETC.TIM"); AdvancePauseSetup's New_TextRow font */
-    /* +0x078 */ struct Class869D8 *cachedViewport; /* InitStyleAndWorld: IntermediateBase::viewport */
+    /* +0x078 */ struct NodeGuardedViewport *cachedViewport; /* InitStyleAndWorld: IntermediateBase::viewport */
     /* +0x07C */ struct TextRow *pauseText; /* AdvancePauseSetup's New_TextRow(etcTim, 5, "Pause"); TeardownPauseOverlay releases it */
     /* +0x080 */ s32 pauseSetupStep; /* the ctor zeroes it; AdvancePauseSetup counts 0..4, TeardownPauseOverlay clears it */
     /* +0x084 */ s32 closeReady; /* UpdateCloseReadyFlag sets, ClearCloseReadyFlag clears; CloseAndNotifyC/D test it */

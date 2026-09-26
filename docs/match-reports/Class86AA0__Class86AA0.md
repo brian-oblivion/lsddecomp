@@ -9,7 +9,7 @@
 The constructor (`ctor`, slot +0x008) for `Class86AA0`. Chains to a base
 ctor (fetched via `GetSceneNodeMethods(self)`), installs this class's own vtable,
 then zeroes three of its own fields (`unk34` u16, `unk36` u16, `unk38`
-s32) directly -- unlike Class869D8__Class869D8's sibling ctor, there is no
+s32) directly -- unlike NodeGuardedViewport__NodeGuardedViewport's sibling ctor, there is no
 post-construct hook call here (the retail instruction stream ends right
 after the zero-stores).
 
@@ -103,7 +103,7 @@ question.
 **Class86AA0__Class86AA0** -- tier A. Canonical ctor (`Class__Class`
 convention): chains a base ctor (`GetSceneNodeMethods`), installs this
 class's own vtable, zeroes three of its own fields. Same shape and
-evidence class as `Class869D8__Class869D8`.
+evidence class as `NodeGuardedViewport__NodeGuardedViewport`.
 
 ## Track 4 (2026-09-26, round 88, alpha)
 

@@ -4,7 +4,7 @@
  * as Psy-Q SDK by segment name; tools/gameinsdk.py measured it as game (a call
  * into game code, a method-table entry beside game methods, or contiguity with
  * those, and no Sony fingerprint). What it holds: one 449-word function,
- * Viewport__DrawNode, listed in gViewportMethods and gClass869D8Methods and calling
+ * Viewport__DrawNode, listed in gViewportMethods and gNodeGuardedViewportMethods and calling
  * GetNextBasicClass and ApplyMatrixToLVArray.
  *
  * MATCHED round 81 (alpha; docs/match-reports/Viewport__DrawNode.md). It is slot

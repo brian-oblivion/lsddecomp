@@ -139,4 +139,4 @@ in this session; the reproducers themselves were scratch files under
 
 ## Track 4 (2026-09-26, round 89, echo)
 
-The class is unified as ObjM in include/ObjM.h (table gObjMMethods, was D_80087034); the class_3bb8c_k/_l/_m views (ObjM_3bb8c_k, Obj87034_3bb8c_l, ObjM) and class_39e08.h's Obj4C/SubObjB/EventArg are gone. Byte-identical. Holders now typed: pauseText (+0x07C, TextRow: attachToParent, setColor), etcTim (+0x074, New_TextRow's font), viewport (Class869D8 setDrawEnabled), unk10 (FrameClock pause), bgm (WBgm pause), sound (VabStreamObj mute).
+The class is unified as ObjM in include/ObjM.h (table gObjMMethods, was D_80087034); the class_3bb8c_k/_l/_m views (ObjM_3bb8c_k, Obj87034_3bb8c_l, ObjM) and class_39e08.h's Obj4C/SubObjB/EventArg are gone. Byte-identical. Holders now typed: pauseText (+0x07C, TextRow: attachToParent, setColor), etcTim (+0x074, New_TextRow's font), viewport (NodeGuardedViewport setDrawEnabled), unk10 (FrameClock pause), bgm (WBgm pause), sound (VabStreamObj mute).
