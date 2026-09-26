@@ -78,7 +78,7 @@ void *FindNearestStyleCueEntry(void *arg0, s32 *arg1, void *arg2) {
         gStyleCueRecordIndex++;
         if (entry->count > 0) {
             buf.pos = entry->pos;
-            buf.tab = *(TabEntry *) (D_800874EC + entry->idx * 6);
+            buf.tab = *(TabEntry *) (gStyleCueOffsets + entry->idx * 6);
             self = (void *) gStyleCueSelf;
             ((ObjAB4C *) self)->methods->slotE8((ObjAB4C *) self, arg0, &buf);
             d1 = *(s32 *) arg0 - *(s32 *) arg2;
@@ -105,7 +105,7 @@ fail:
 Needs (already present earlier in the unit, in strict ROM order): the
 `ObjAB4C`/`ObjAB4CMethods`/`Pos4`/`TabEntry`/`EntrySlot`/`LocalBuf` types and
 `extern s32 gStyleKind, gStyleCueRecordIndex, gStyleCueSelf, gStyleCueDistanceTable[];`,
-`extern u8 *D_800876B4[], D_800876EC[], D_800874EC[];` (all already
+`extern u8 *D_800876B4[], D_800876EC[], gStyleCueOffsets[];` (all already
 declared in `src/class_3bb8c_n.c` ahead of this function).
 
 ### Proposed learning
@@ -179,7 +179,7 @@ extern s32 gStyleKind;
 extern s32 gStyleCueRecordIndex;
 extern u8 *D_800876B4[];    /* word array of base pointers, indexed by gStyleKind */
 extern u8 D_800876EC[];    /* byte array of counts, same index */
-extern u8 D_800874EC[];    /* table, 6-byte stride entries */
+extern u8 gStyleCueOffsets[];    /* table, 6-byte stride entries */
 extern s32 gStyleCueDistanceTable[];   /* word table, indexed by entry->count */
 
 typedef struct Pos4 { s16 hi, lo; } Pos4;              /* 4B, alignment 2 */
@@ -210,7 +210,7 @@ void *FindNearestStyleCueEntry(void *arg0, s32 *arg1, void *arg2) {
         gStyleCueRecordIndex++;
         if (entry->count > 0) {
             buf.pos = entry->pos;
-            buf.tab = *(TabEntry *) (D_800874EC + entry->idx * 6);
+            buf.tab = *(TabEntry *) (gStyleCueOffsets + entry->idx * 6);
             self = (void *) gStyleCueSelf;
             ((ObjAB4C *) self)->methods->slotE8((ObjAB4C *) self, arg0, &buf);
             d1 = *(s32 *) arg0 - *(s32 *) arg2;

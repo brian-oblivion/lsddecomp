@@ -2923,3 +2923,4 @@ gStyleStripRectA = 0x80087444;
 gStyleStripScratchA = 0x80087450;
 gStyleStripRectB = 0x8008745C;
 gStyleStripScratchB = 0x80087468;
+gStyleCueOffsets = 0x800874EC;

@@ -651,7 +651,7 @@ extern s32 gStyleKind;
 extern s32 gStyleCueRecordIndex;
 extern u8 *D_800876B4[];
 extern u8 D_800876EC[];
-extern u8 D_800874EC[];
+extern u8 gStyleCueOffsets[];
 extern s32 gStyleCueDistanceTable[];
 
 /* Local view only: `gStyleCueSelf`'s value is another "pointer stored as a
@@ -728,7 +728,7 @@ void *FindNearestStyleCueEntry(void *arg0, s32 *arg1, void *arg2) {
         gStyleCueRecordIndex++;
         if (entry->count > 0) {
             buf.pos = entry->pos;
-            buf.tab = *(TabEntry *)(D_800874EC + entry->idx * 6);
+            buf.tab = *(TabEntry *)(gStyleCueOffsets + entry->idx * 6);
             self = (void *)gStyleCueSelf;
             ((ObjAB4C *)self)->methods->slotE8((ObjAB4C *)self, arg0, &buf);
             d1 = *(s32 *)arg0 - *(s32 *)arg2;
