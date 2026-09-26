@@ -46,7 +46,7 @@ TodActor *TodActor__TodActor(TodActor *self, void *arg1, void *arg2) {
         return NULL;
     }
     self->methods = GetTodActorMethods();
-    self->arg2 = arg2;
+    self->sound = arg2;
     self->modelData = NULL;
     self->mainPart = NULL;
     self->parts = NULL;
@@ -341,7 +341,7 @@ void TodActor__TickCallbackC(void) {}
 void TodActor__PlayTone(TodActor *self, s32 index) {
     VabStreamObj *sound;
 
-    sound = self->arg2;
+    sound = self->sound;
     if (sound != NULL) {
         sound->methods->playTone(sound, index, 0x6E, 0x6E);
     }

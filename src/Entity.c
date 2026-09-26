@@ -111,7 +111,7 @@ void Entity__AttachToParent(Entity *this, TodActor *peer, void *companion,
         return;
     }
     ((TodActorAttachToParentFn)GetTodActorMethods()->attachToParent)((TodActor *)this, peer,
-                                                                          companion, parent, offset);
+                                                                     companion, parent, offset);
     this->grid = parent;
     if (D_80089EA7[this->moodIndex * 0x10] != 0) {
         return;
@@ -176,7 +176,7 @@ void Entity__OnGridCellLinkCommand(Entity *this, void *a1, s32 a2) {
 }
 
 void Entity__TickSoundCue(Entity *this) {
-    ServiceSoundCueSet(this->arg2, &this->soundCueSet);
+    ServiceSoundCueSet(this->sound, &this->soundCueSet);
     this->moodTimer++;
 }
 
@@ -296,7 +296,7 @@ extern EntityMoodHandlerRow gEntityMoodHandlerTable[];
 extern void InitSoundCueSet(void *sound, void *set, s32 tag, Entity *owner, void *callback);
 
 void Entity__StartSoundCue(Entity *this) {
-    InitSoundCueSet(this->arg2, &this->soundCueSet, this->moodIndex + 1, this,
+    InitSoundCueSet(this->sound, &this->soundCueSet, this->moodIndex + 1, this,
                     gEntityMoodHandlerTable[this->moodIndex].handler);
     ((EntityPlayTodFn)this->methods->playTod)(this);
     this->methods->enableTickCallback(this);
@@ -305,7 +305,7 @@ void Entity__StartSoundCue(Entity *this) {
 }
 
 void Entity__StopSoundCue(Entity *this) {
-    FlushSoundCueSet(this->arg2, &this->soundCueSet);
+    FlushSoundCueSet(this->sound, &this->soundCueSet);
     this->methods->stopTod(this);
     this->methods->disableTickCallback(this);
     this->soundCueActive = 0;

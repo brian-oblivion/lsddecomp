@@ -110,7 +110,7 @@ struct TagCheckArg;  /* onNotify's sender, read only for its table's low id half
 /* clang-format off */
 #define TODACTOR_FIELDS(Methods)                                                                 \
     ACTOR_FIELDS(Methods);                                                                         \
-    /* +0x058 */ struct VabStreamObj *arg2;  /* the ctor's second argument, the sound bank playTone plays on; NULL when none */ \
+    /* +0x058 */ struct VabStreamObj *sound; /* the ctor's second argument, the sound bank playTone plays on; NULL when none */ \
     /* +0x05C */ struct ModelData *modelData; /* borrowed from the ctor's descriptor or made by New_ModelData; NULL when none */ \
     /* +0x060 */ s32 ownsModelData;        /* 1 when New_ModelData made modelData; only an owned one is released */ \
     /* +0x064 */ s32 mainPartNotifies;     /* setMainPartNotifies (1 in reset); while 1, TickCallbackA has mainPart send the move notification */ \
