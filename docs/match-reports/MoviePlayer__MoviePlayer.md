@@ -86,3 +86,7 @@ First build, written straight away in the nested success-path shape (`if (stream
 ## Naming
 
 - **MoviePlayer__MoviePlayer**, tier A. Constructor: BasicClass's ctor, opens a CD stream object, sets up decode buffers, resets the MDEC decoder the first time any player is built, and routes the MDEC output callback to OnMdecFrameReady.
+
+## Track 4 (2026-09-26, round 87)
+
+The +0x060 object is a CdStream (include/CdStream.h, unified this round). `Stream454C4`/`StreamMethods454C4` and the local New_CdStream extern are deleted; +0x060 `stream` is `CdStream *` and slot40 is `setRing`. MoviePlayer's own view and field names are unchanged. Zero bytes changed.

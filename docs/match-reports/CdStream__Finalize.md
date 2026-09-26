@@ -25,3 +25,9 @@ void CdStream__Finalize(CdStreamObj *self) {
     Get_vtable_BasicClass()->finalize((BasicClass *)self);
 }
 ```
+
+## Track 4 (2026-09-26, round 87)
+
+Class unified as `CdStream` (include/CdStream.h; table gCdStreamObjMethods -> gCdStreamMethods, type CdStreamObj -> CdStream, the Obj suffix dropped per FINISHING-PLAN track 4 step 2). The unit's local view is gone; slots +0x044 open, +0x050 startRead and +0x06C getNextFrame are typed from their occupants, and the object's +0x00C `seekLoc[0x18]` is the CdlFILE `file` (CdStreamFile) that CdSearchFile fills. Zero bytes changed.
+
+Renamed from CdStreamObj__Finalize (tools/rename.py), the class rename only.

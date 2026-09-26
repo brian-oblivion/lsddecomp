@@ -23,3 +23,9 @@ Tier C. Kept the tier-C `Class__func_xxxxx` form (class known, purpose not): slo
 void CdStream__NoOpSlot5C(CdStreamObj *self) {
 }
 ```
+
+## Track 4 (2026-09-26, round 87)
+
+Class unified as `CdStream` (include/CdStream.h; table gCdStreamObjMethods -> gCdStreamMethods, type CdStreamObj -> CdStream, the Obj suffix dropped per FINISHING-PLAN track 4 step 2). The unit's local view is gone; slots +0x044 open, +0x050 startRead and +0x06C getNextFrame are typed from their occupants, and the object's +0x00C `seekLoc[0x18]` is the CdlFILE `file` (CdStreamFile) that CdSearchFile fills. Zero bytes changed.
+
+Renamed from CdStreamObj__func_800475C8 (tools/rename.py): an empty occupant of slot +0x05C with no caller, named for its slot as VabStreamObj's and MoviePlayer's empty slots are.

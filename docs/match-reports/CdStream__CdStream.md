@@ -93,3 +93,9 @@ as an inline `?:` inside the arithmetic. Writing it through a named local
 changed the schedule of the whole block (the `li` was hoisted and the
 trailing stores moved into the `mflo` shadow), even though it compiles to
 the same instructions.
+
+## Track 4 (2026-09-26, round 87)
+
+Class unified as `CdStream` (include/CdStream.h; table gCdStreamObjMethods -> gCdStreamMethods, type CdStreamObj -> CdStream, the Obj suffix dropped per FINISHING-PLAN track 4 step 2). The unit's local view is gone; slots +0x044 open, +0x050 startRead and +0x06C getNextFrame are typed from their occupants, and the object's +0x00C `seekLoc[0x18]` is the CdlFILE `file` (CdStreamFile) that CdSearchFile fills. Zero bytes changed.
+
+Renamed from CdStreamObj__CdStreamObj (tools/rename.py), the class rename. Parameters named (speed, fps, arg3): speed < 4 selects 300 sectors a second (double speed) and read mode 0x1C0 in StartRead; the second divides sectors a second into sectors a frame.

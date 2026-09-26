@@ -22,9 +22,11 @@
  * | CdlModeRT; else 0x140). `bytesPerFrame` is (sectors a second / fps / 2
  * * 2) * 2054, and open divides the file size by it into `totalFrames`.
  *
- * The four callback words (+0x044..+0x04C, +0x054) are cleared by the ctor
- * and written by nothing else in the image; MoviePlayer hands its callback to
- * slot +0x07C instead, whose occupant is empty.
+ * The callback words (+0x048, +0x04C, +0x054) are cleared by the ctor and
+ * written nowhere else: New_CdStream's one caller is MoviePlayer's ctor and
+ * gActiveCdStream is read only in code_3770c, so the object reaches no other
+ * code, and MoviePlayer only calls slots. It hands its callback to slot
+ * +0x07C instead, whose occupant is empty.
  *
  * NO FIELDS/SLOTS MACROS: no class lies below 0x40 (`typeviews.py --tree`).
  */
@@ -64,7 +66,7 @@ struct CdStreamMethods {
      * (MoviePlayer__MarkStopped, player) and MoviePlayer__Abort (0, 0), in
      * $a1/$a2, so a narrower slot would drop those argument loads. */
     /* +0x07C */ void (*slot7C)(CdStream *self, void (*fn)(), void *arg);
-};                                   /* 32 slots, 0x80 bytes */
+};                                   /* 31 slots, 0x80 bytes */
 
 struct CdStream {
     BASICCLASS_FIELDS(CdStreamMethods);
@@ -76,7 +78,7 @@ struct CdStream {
     /* +0x038 */ s32 bytesPerFrame;             /* the ctor's, from speed and fps */
     /* +0x03C */ s32 unk3C;                     /* the ctor's arg3; nothing reads it */
     /* +0x040 */ s32 totalFrames;               /* file.size / bytesPerFrame (open), or startRead's frameCount */
-    /* +0x044 */ void *cbArg;                   /* the argument onFrameReady and onSeekDone are called with */
+    /* +0x044 */ void *cbArg;                   /* the argument onFrameReady and onSeekDone are called with; never written */
     /* +0x048 */ void (*onFrameReady)(void *arg); /* called before a frame's sectors go back to the ring */
     /* +0x04C */ void (*onStreamEnd)(void *arg);  /* only tested: set, OnStreamEnd calls onFrameReady and closes */
     /* +0x050 */ u32 *ring;                     /* setRing's ring; open fails without one */

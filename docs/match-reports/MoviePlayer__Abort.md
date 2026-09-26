@@ -75,3 +75,7 @@ First build. The same through-the-global shape as MoviePlayer__Stop (a local `cu
 ## Naming
 
 - **MoviePlayer__Abort**, tier A. Slot +0x04C: hard-stops the active movie and clears its frame-ready callback the first time.
+
+## Track 4 (2026-09-26, round 87)
+
+The +0x060 object is a CdStream (include/CdStream.h, unified this round). `Sub458B8`/`Methods458B8` are deleted; `unk60` is `CdStream *`; slot48 is `close`, slot7C stays `slot7C`. MoviePlayer's own view and field names are unchanged. Zero bytes changed.

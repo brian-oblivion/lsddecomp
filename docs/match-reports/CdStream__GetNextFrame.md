@@ -70,3 +70,9 @@ s32 CdStream__GetNextFrame(CdStreamObj *self, u32 **addr, u32 *frame, s32 tries)
 callback call that sets only a0 while a1/a2 still hold the caller's
 arguments. Its matched C had two parameters. A caller passing three was
 what exposed it.
+
+## Track 4 (2026-09-26, round 87)
+
+Class unified as `CdStream` (include/CdStream.h; table gCdStreamObjMethods -> gCdStreamMethods, type CdStreamObj -> CdStream, the Obj suffix dropped per FINISHING-PLAN track 4 step 2). The unit's local view is gone; slots +0x044 open, +0x050 startRead and +0x06C getNextFrame are typed from their occupants, and the object's +0x00C `seekLoc[0x18]` is the CdlFILE `file` (CdStreamFile) that CdSearchFile fills. Zero bytes changed.
+
+Renamed from CdStreamObj__GetNextFrame (tools/rename.py), the class rename only.

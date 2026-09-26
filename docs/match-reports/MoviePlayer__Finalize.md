@@ -42,3 +42,7 @@ First build. DecDCT* declared locally with LIBPRESS.H's prototypes; MoviePlayer_
 ## Naming
 
 - **MoviePlayer__Finalize**, tier A. Releases the CD stream object, detaches and resets the MDEC decoder, frees the frame buffers, then BasicClass's finalize.
+
+## Track 4 (2026-09-26, round 87)
+
+The +0x060 object is a CdStream (include/CdStream.h, unified this round). `Obj455D4::unk60` was `BasicClass *`; it is the CdStream, now `CdStream *` (release is the inherited slot). MoviePlayer's own view and field names are unchanged. Zero bytes changed.

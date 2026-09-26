@@ -106,3 +106,7 @@ Ninth build. Every shape with the failing open as an early `if (open(...) != 0) 
 ## Track 4 (2026-09-26, round 87, bravo)
 
 The `DrawSys457C0` view is gone; the call goes through `include/DrawSystem.h`. DrawSystem +0x078 is `clearImage(self, u8 *color, DrawRect *rect)` (occupant DrawSystem__ClearImage), so this call clears the frame rectangle at +0x20 with `gMovieFrameRect` as the COLOR (a zero word: black), not "registers gMovieFrameRect with the rectangle". The source now reads `ds->methods->clearImage(ds, (u8 *)&gMovieFrameRect, (DrawRect *)self->rect)`; pointer casts only, byte-identical. Proposed (not done, not this class): rename `gMovieFrameRect` -> `gMovieClearColor`.
+
+## Track 4 (2026-09-26, round 87)
+
+The +0x060 object is a CdStream (include/CdStream.h, unified this round). `Stream457C0`/`StreamMethods457C0` are deleted; `unk60` is `CdStream *`, the call is `open`. MoviePlayer's own view and field names are unchanged. Zero bytes changed.

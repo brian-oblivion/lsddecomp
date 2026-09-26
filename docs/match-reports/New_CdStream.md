@@ -30,3 +30,9 @@ CdStreamObj *New_CdStream(s32 arg1, s32 arg2, s32 arg3) {
     return NULL;
 }
 ```
+
+## Track 4 (2026-09-26, round 87)
+
+Class unified as `CdStream` (include/CdStream.h; table gCdStreamObjMethods -> gCdStreamMethods, type CdStreamObj -> CdStream, the Obj suffix dropped per FINISHING-PLAN track 4 step 2). The unit's local view is gone; slots +0x044 open, +0x050 startRead and +0x06C getNextFrame are typed from their occupants, and the object's +0x00C `seekLoc[0x18]` is the CdlFILE `file` (CdStreamFile) that CdSearchFile fills. Zero bytes changed.
+
+Renamed from New_CdStreamObj (tools/rename.py), the class rename. The size 0x5C here is the class's size. One caller, MoviePlayer__MoviePlayer.
