@@ -24,6 +24,9 @@
  */
 
 #include "common.h"
+#include <libgte.h>
+#include <libgpu.h>
+#include <libgs.h>
 #include "code_8220.h"
 #include "gte.h"
 
@@ -109,7 +112,6 @@ s32 GetBMemPMgrBusy(void) {
 extern s32 D_80090C18;
 extern s32 gSortUseGlobalLightMode;
 extern s32 gSortLightMode;
-extern s32 GsLIGHT_MODE;
 
 /* Local views, and each one's STRUCT-ness is load-bearing, not decoration.
  * GCC 2.6.3's alias test lets a struct-field reference pass a store to a
@@ -143,7 +145,6 @@ typedef struct {
         *(u16 *)((p) + 0xE) += (rows) << 6; \
     } while (0)
 extern s8 gTexturedFaceColor[3];
-extern void *GsOUT_PACKET_P;
 
 extern void InitVtxRecordPtrs(void *dst, void *table, s32 count);
 extern void StoreSxyPolyFT4(void *dst, s32 storeFirst3);
