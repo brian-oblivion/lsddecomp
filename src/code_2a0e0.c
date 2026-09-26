@@ -13,42 +13,14 @@
  * of WBgm__HandleMonitorEvent's own matched body (the printf sits right where
  * it is read), so it is body evidence for that function's name and, via its
  * "WBgm" prefix, a lead for the class -- weighed as evidence, not proof.
+ *
+ * Track 4 (round 88): the class is declared once, in include/WBgm.h (table
+ * gWBgmMethods); this unit keeps no view of it.
  */
 #include "common.h"
 #include "BasicClass.h"
 #include "DrawSystem.h"
-#include "VabStreamObj.h"
-#include "Class6EED8.h"
-
-/* Local view of gWBgmMethods's objects: a background-music SEQ player. Fields
- * named from the libsnd calls they feed. */
-typedef struct WBgm WBgm;
-typedef struct WBgmMethods WBgmMethods;
-
-struct WBgmMethods {
-    BASICCLASS_SLOTS(WBgm, (WBgm *self, s32 vabArg, s32 seqArg, s32 autoPlay)); /* WBgm__WBgm */
-    /* +0x040 */ void (*update)(WBgm *self, s32 arg1, s32 arg2); /* WBgm__Update */
-    /* +0x044 */ void (*play)(WBgm *self);                       /* WBgm__Play */
-    /* +0x048 */ void (*stop)(WBgm *self);                       /* WBgm__Stop */
-    /* +0x04C */ void (*pause)(WBgm *self);                      /* WBgm__Pause */
-    /* +0x050 */ void (*resume)(WBgm *self);                     /* WBgm__Resume */
-    /* +0x054 */ void (*setVol)(WBgm *self, s16 l, s16 r);       /* WBgm__SetVol */
-    /* +0x058 */ void (*crescendo)(WBgm *self, s16 v, s32 s);    /* WBgm__Crescendo */
-    /* +0x05C */ void (*setSeq)(WBgm *self, s32 arg);            /* WBgm__SetSeq */
-    /* +0x060 */ void (*setVab)(WBgm *self, s32 arg);            /* WBgm__SetVab */
-};
-
-struct WBgm {
-    BASICCLASS_FIELDS(WBgmMethods);
-    /* +0x00C */ VabStreamObj *vab;   /* New_VabStreamObj(setVab's path) */
-    /* +0x010 */ Class6EED8 *seqData; /* New_Class6EED8(setSeq's name): the SEQ file, SsSeqOpen'd from its buffer once loaded */
-    /* +0x014 */ s16 seqId;
-    /* +0x016 */ u8 pad16[0x1A - 0x16];
-    /* +0x01A */ u16 openState;
-    /* +0x01C */ u16 paused;
-    /* +0x01E */ u16 playing;
-    /* +0x020 */ s32 autoPlay;
-};
+#include "WBgm.h"
 
 /* libsnd (LIBSND.H) */
 extern void SsSeqPlay(short, char, short);
@@ -63,26 +35,22 @@ extern short SsSeqOpen(unsigned long *addr, short vab_id);
 extern void *BMemPMgrAlloc(s32 size);
 extern void printf(const char *fmt);
 extern const char D_80010FEC[]; /* "Seq Open error in WBgmHandleMonitorEvent" */
-WBgmMethods *Get_vtable_WBgm(void);
 
 extern s32 func_8002CC28(void);
-s32 WBgm__HandleMonitorEvent(WBgm *self);
 
-extern WBgmMethods gWBgmMethods;
-extern s32 gWBgmActive;
 extern u8 gSsSizeTableBuf[];
 
-WBgm *New_WBgm(s32 vabArg, s32 seqArg, s32 autoPlay) {
+WBgm *New_WBgm(char *vabPath, char *seqPath, s32 autoPlay) {
     WBgm *self;
 
     self = BMemPMgrAlloc(0x24);
     if (self != NULL) {
-        Get_vtable_WBgm()->ctor(self, vabArg, seqArg, autoPlay);
+        Get_vtable_WBgm()->ctor(self, vabPath, seqPath, autoPlay);
         return self;
     }
     return NULL;
 }
-void WBgm__WBgm(WBgm *self, s32 vabArg, s32 seqArg, s32 autoPlay) {
+void WBgm__WBgm(WBgm *self, char *vabPath, char *seqPath, s32 autoPlay) {
     Get_vtable_BasicClass()->ctor((BasicClass *)self);
     self->methods = Get_vtable_WBgm();
     self->vab = NULL;
@@ -93,8 +61,8 @@ void WBgm__WBgm(WBgm *self, s32 vabArg, s32 seqArg, s32 autoPlay) {
     self->playing = 0;
     self->autoPlay = autoPlay;
     gWBgmActive = 1;
-    self->methods->setSeq(self, seqArg);
-    self->methods->setVab(self, vabArg);
+    self->methods->setSeq(self, seqPath);
+    self->methods->setVab(self, vabPath);
     self->methods->addChild(self, (BasicClass *)GetDrawSystem());
 }
 void WBgm__Finalize(WBgm *self) {
@@ -113,11 +81,11 @@ void WBgm__Finalize(WBgm *self) {
 void WBgm__OnNotify(WBgm *self, void *sender, s32 event) {
     Get_vtable_BasicClass()->onNotify((BasicClass *)self, sender, event);
     if ((((BasicClass *)sender)->methods->header & 0xF) == 1) {
-        self->methods->update(self, (s32)sender, event);
+        self->methods->update(self, (DrawSystem *)sender, event);
     }
 }
-void WBgm__Update(WBgm *self, s32 arg1, s32 arg2) {
-    if (arg2 == 2 && self->openState == 1 && WBgm__HandleMonitorEvent(self) && self->autoPlay != 0) {
+void WBgm__Update(WBgm *self, DrawSystem *sender, s32 event) {
+    if (event == 2 && self->openState == 1 && WBgm__HandleMonitorEvent(self) && self->autoPlay != 0) {
         self->methods->play(self);
     }
 }
@@ -180,7 +148,7 @@ void WBgm__SetVol(WBgm *self, s16 left, s16 right) {
 void WBgm__Crescendo(WBgm *self, s16 vol, s32 scale) {
     SsSeqSetCrescendo(self->seqId, vol, func_8002CC28() * scale);
 }
-void WBgm__SetSeq(WBgm *self, s32 arg) {
+void WBgm__SetSeq(WBgm *self, char *seqPath) {
     if (self->playing != 0) {
         self->methods->stop(self);
     }
@@ -188,8 +156,8 @@ void WBgm__SetSeq(WBgm *self, s32 arg) {
         self->seqData->methods->release(self->seqData);
         self->seqData = NULL;
     }
-    if (arg != 0) {
-        self->seqData = New_Class6EED8((char *)arg); /* setSeq's s32 is the name */
+    if (seqPath != NULL) {
+        self->seqData = New_Class6EED8(seqPath);
         if (WBgm__HandleMonitorEvent(self)) {
             if (self->autoPlay != 0) {
                 self->methods->play(self);
@@ -199,7 +167,7 @@ void WBgm__SetSeq(WBgm *self, s32 arg) {
         }
     }
 }
-void WBgm__SetVab(WBgm *self, s32 arg) {
+void WBgm__SetVab(WBgm *self, char *vabPath) {
     if (self->playing != 0) {
         self->methods->stop(self);
     }
@@ -207,8 +175,8 @@ void WBgm__SetVab(WBgm *self, s32 arg) {
         self->vab->methods->release(self->vab);
         self->vab = NULL;
     }
-    if (arg != 0) {
-        self->vab = New_VabStreamObj((char *)arg);
+    if (vabPath != NULL) {
+        self->vab = New_VabStreamObj(vabPath);
         if (WBgm__HandleMonitorEvent(self)) {
             if (self->autoPlay != 0) {
                 self->methods->play(self);
