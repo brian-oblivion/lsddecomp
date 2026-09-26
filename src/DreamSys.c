@@ -400,7 +400,7 @@ void DreamSys__RunTickCallbacks(DreamSys *this) {
 
 /* InterpolateKeyframeValue is defined right after its caller;
    IsVec3WithinRange is another unit's. */
-extern s32 InterpolateKeyframeValue(DreamSysInterpPoint *a, DreamSysInterpPoint *b, s32 at);
+extern s32 InterpolateKeyframeValue(DreamSysInterpPoint *from, DreamSysInterpPoint *to, s32 at);
 extern s32 IsVec3WithinRange(s32 *a, s32 range, s32 *b);
 
 /* Converts the local offset (0, 0, dist) to a world position, takes its
@@ -409,42 +409,42 @@ extern s32 IsVec3WithinRange(s32 *a, s32 range, s32 *b);
    and when `reference` is given returns whether it lies within `tolerance`
    of it. */
 s32 DreamSys__ProjectPointAtDistance(DreamSys *this, s32 *out, s32 dist, s32 *reference, s32 tolerance) {
-    s32 local[3];
-    s32 ret;
-    s32 *vec;
-    s32 *p;
+    s32 worldPos[3];
+    s32 height;
+    s32 *worldTrans;
+    s32 *offsetZ;
 
-    p = &gProjectOffsetZ;
-    *p = dist;
-    SceneNode__LocalOffsetToWorldPos((SceneNode *)this, local, p - 2, 0);
+    offsetZ = &gProjectOffsetZ;
+    *offsetZ = dist;
+    SceneNode__LocalOffsetToWorldPos((SceneNode *)this, worldPos, offsetZ - 2, 0);
 
-    ret = InterpolateKeyframeValue((void *)&this->viewport->refView.vp,
-                                   (void *)&this->viewport->refView.vr, dist);
+    height = InterpolateKeyframeValue((void *)&this->viewport->refView.vp,
+                                      (void *)&this->viewport->refView.vr, dist);
 
-    vec = this->parent != 0 ? this->coord2->unk38 : 0;
-    local[1] = ret + vec[1];
+    worldTrans = this->parent != 0 ? this->coord2->unk38 : 0;
+    worldPos[1] = height + worldTrans[1];
 
     if (out != NULL) {
-        *(LongVec3 *)out = *(LongVec3 *)local;
+        *(LongVec3 *)out = *(LongVec3 *)worldPos;
     }
 
     if (reference != NULL)
-        return IsVec3WithinRange(local, tolerance, reference);
+        return IsVec3WithinRange(worldPos, tolerance, reference);
     return 0;
 }
 
-s32 InterpolateKeyframeValue(DreamSysInterpPoint *a, DreamSysInterpPoint *b, s32 at) {
+s32 InterpolateKeyframeValue(DreamSysInterpPoint *from, DreamSysInterpPoint *to, s32 at) {
     s32 scaledAt;
     s32 dt;
     s32 dv;
 
     scaledAt = at;
     scaledAt = scaledAt / 1024;
-    dt = (b->position - a->position) / 1024;
+    dt = (to->position - from->position) / 1024;
     if (dt == 0)
         dt = 1;
-    dv = b->value - a->value;
-    return (dv * scaledAt) / dt + a->value;
+    dv = to->value - from->value;
+    return (dv * scaledAt) / dt + from->value;
 }
 
 void DreamSys__func_59590(DreamSys *this) {
