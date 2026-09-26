@@ -776,7 +776,13 @@ s32 _card_clear(s32 chan) {
   this should close in one sitting" directive as an example of a confident
   stale instruction; that example now lives here.
 - Round 90 (track 8): `tools/unitfile.py rename class_3bb8c_v
-  libcard_card`. `tuboundary.py --unit class_3bb8c_v`: "(after
+  libcard_card_clear`. `tuboundary.py --unit class_3bb8c_v`: "(after
   sony:libcard/c171): start edge possible"; both neighbours are placed
   objects, so no merge was possible. Named for the function because the
   object's module id is not measurable from the discs on hand.
+- Round 90 (head): `tools/unitfile.py rename libcard_card_clear
+  libcard_card`, because round 74 had identified the object as
+  `libcard/card` on the 3.3 disc by shape (exact length). That rename also
+  rewrote the line above to quote a command never run; restored by the
+  premium session after round 90, and `unitfile.py` now leaves a report's
+  history sections alone.

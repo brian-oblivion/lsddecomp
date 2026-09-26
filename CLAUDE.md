@@ -729,6 +729,7 @@ python3 tools/plan.py              # the finishing plan, measured: tracks, ready
 python3 tools/rename.py OLD NEW    # rename a symbol everywhere, re-extract, re-verify
 python3 tools/renametype.py OLD NEW   # rename a type or class family everywhere, re-verify
 python3 tools/unitfile.py rename|merge ...   # rename or merge source files, re-verify
+python3 tools/replay.py            # at a merge: re-apply both sides' renames, three-way merge the ledger
 python3 tools/readability.py       # phase 2 debt: placeholder types and files, literals, locals, history
 python3 tools/tuboundary.py        # original file boundaries, from the rodata
 tools/check-nonmatching.sh         # the #ifdef NON_MATCHING bodies still compile and link-resolve

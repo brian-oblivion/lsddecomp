@@ -19,8 +19,8 @@ and wrong for every round after. Run the tool. The mechanics of a round
 the per-function matching loop is CLAUDE.md and `docs/MATCHING-GUIDE.md`.
 This file does not repeat them.
 
-Plan revision: 27 (2026-09-26, premium session: phase 2, tracks 6 to 9,
-the code reads like a game's source; tracks 3 to 5 archived).
+Plan revision: 28 (2026-09-26, premium session after round 90: renames
+replay through `tools/replay.py`; track 8 splits are content-only and park).
 Changing the plan is a premium head task (§2); record the change in
 `docs/PROGRESS.md` and bump this line.
 
@@ -156,9 +156,10 @@ no unit declares its own view of it; `plan.py classes` lists a STRAY VIEW.
 - **Renames go through a tool and replay.** Symbols: `tools/rename.py`.
   Types and class families: `tools/renametype.py`. Files: `tools/unitfile.py`.
   Each tool run is its own commit whose message's first line is the exact
-  command. At merge, a hunk that conflicts only because another branch
-  renamed something is resolved by taking `main`'s side and re-running the
-  command on the merged tree, then the oracle. That is why jobs defer only on
+  command. At merge, take `main`'s side of each hunk that conflicts only by
+  a rename (modify/delete: keep the renamed file), then `python3
+  tools/replay.py`, which re-applies both sides' commands to what the other
+  wrote and three-way merges the ledger, then the oracle. That is why jobs defer only on
   their EDIT sets and a rename touching a hundred units does not serialise
   a round.
 - **Comments explain the code** (operator, 2026-09-26). A unit's banner says
@@ -259,7 +260,8 @@ their names are settled (track 6), because a file is named for its content.
 rodata decides some edges: cc1 emits each function's strings and jump tables
 in function order and the linker lays sections out in object order, so a
 rodata crossing proves two units were one file (merge), and two jump tables
-of different parity mod 8 prove a boundary between their functions (split).
+of different parity mod 8 prove a boundary between their functions (split;
+none exists inside any unit, and a merge never crosses one).
 The tool validates this against every edge between placed Sony objects and
 says so first; if the validation fails, nothing it prints is evidence. Its
 soft signal (single-user data) is a hint with a printed error rate. Where the
@@ -277,8 +279,8 @@ what decided its edges. A files runner may edit its region's yaml lines,
 through `unitfile.py` only (the one exception to PARALLEL-RUNS §2's yaml
 rule). **Head at merge:** `make extract`, then delete `build/src` and rebuild,
 because unit names changed. **Park rule:** a region the evidence and content
-cannot settle keeps its carve edges, content-named, with the reason in each
-banner.
+cannot settle, or that content alone would split (no tool splits a unit),
+keeps its carve edges, content-named, with the reason in each banner.
 
 ### Track 9: close-out
 

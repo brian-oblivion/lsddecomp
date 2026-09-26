@@ -17,7 +17,8 @@ reports) is the last component, which must stay unique (tools/srcpath.py).
 
 rename: the yaml line(s), `git mv` of src/OLD.c (and include/OLD.h when it
 exists), whole-token rewrite of OLD / OLD_H guard in code and docs (not
-PROGRESS.md or the archive, as rename.py), the ledger and the warnings
+PROGRESS.md or the archive, as rename.py, nor a report's history sections,
+which keep the names they were written with), the ledger and the warnings
 baseline; deletes build/src/OLD.c.o; `make extract`; `./build-and-verify.sh`.
 
 merge: B must be the text subsegment IMMEDIATELY after A in the yaml, and if
@@ -74,6 +75,30 @@ def find_unit(rows, unit):
     return (c[0] if c else None), ro
 
 
+HEADING = re.compile(r"^(#+)\s")
+HISTORY = re.compile(r"histor", re.I)
+
+
+def history_spans(text):
+    """[(start, end)] character spans of a report's history sections: a
+    heading naming history ("## File history", "## Earlier history") down to
+    the next heading of its level or above. They record the unit names in use
+    when they were written, and a later rename made them quote commands that
+    never ran (round 90: `_card_clear.md`)."""
+    spans, start, level, pos = [], None, 0, 0
+    for line in text.split("\n"):
+        m = HEADING.match(line)
+        if m and start is not None and len(m.group(1)) <= level:
+            spans.append((start, pos))
+            start = None
+        if m and start is None and HISTORY.search(line):
+            start, level = pos, len(m.group(1))
+        pos += len(line) + 1
+    if start is not None:
+        spans.append((start, len(text)))
+    return spans
+
+
 def rewrite_tokens(mapping, skip=()):
     rxs = [(re.compile(rf"(?<![A-Za-z0-9_]){re.escape(o)}(?![A-Za-z0-9_])"), n)
            for o, n in sorted(mapping.items(), key=lambda kv: -len(kv[0]))]
@@ -82,9 +107,13 @@ def rewrite_tokens(mapping, skip=()):
         if p in skip:
             continue
         text = p.read_text(errors="replace")
-        out = text
-        for rx, n in rxs:
-            out = rx.sub(n, out)
+        keep = history_spans(text) if p.parent.name == "match-reports" else []
+        cuts = [0] + [x for s in keep for x in s] + [len(text)]
+        parts = [text[cuts[i]:cuts[i + 1]] for i in range(len(cuts) - 1)]
+        for i in range(0, len(parts), 2):     # even parts lie outside history
+            for rx, n in rxs:
+                parts[i] = rx.sub(n, parts[i])
+        out = "".join(parts)
         if out != text:
             p.write_text(out)
             touched.append(p.relative_to(ROOT).as_posix())

@@ -35,7 +35,7 @@ WHAT IT DOES, in order:
 
 A commit made from this tool is REPLAYABLE (FINISHING-PLAN §3, "Renames
 replay"): put the exact command in the commit message, and a hunk that
-conflicts at merge is resolved by taking the other side and re-running it.
+conflicts at merge is resolved by taking main's side and `tools/replay.py`.
 
 It does not judge the name: the evidence goes in the class header's banner
 and the reports (FINISHING-PLAN track 6).

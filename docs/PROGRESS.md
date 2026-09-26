@@ -6,6 +6,43 @@ stale, prose elsewhere is not.
 
 ---
 
+## 2026-09-26 — premium session: plan revision 28 (round 90's three escalations)
+
+All three measured before ruling; two accepted as tool fixes, one as wording.
+
+- **Split support: not built.** `tuboundary.py --json` finds no forced
+  boundary inside any unit in the image, and a merge never crosses one, so
+  no split will ever have binary proof. Content-only splits: crossing
+  `sdk-in-game.txt` with the yaml, `libsnd_ssinit_libapi_counter` is the only
+  unit holding two Sony modules. One file does not pay for a carve tool, and
+  done criterion 8 ("where the binary can tell") is met as it stands. The
+  park rule now names content-only splits; alpha's banner is the model.
+- **History comments: accepted, narrowed to reports.** Beyond the src
+  sentence alpha cited, the damage had reached a report: the head's
+  `libcard_card_clear -> libcard_card` rewrote `_card_clear.md`'s File
+  history to quote a command never run. Track 7 moves history into reports,
+  so every track 8 rename would repeat this. `unitfile.py` now skips a
+  report's history sections, meaning a heading containing "histor" down to
+  the next heading of its level. That covers 130 sections, all 5 of round 90's
+  "File history" among them. The line is restored. Src comments are still
+  rewritten, since track 7 empties them. `rename.py` keeps its 90-round
+  convention.
+- **Replay rule: accepted, and it was broken in two more ways.** Re-running
+  a command after the merge is always refused (NEW exists, OLD is gone),
+  for `rename.py` as much as `unitfile.py`. Replaying round 90's alpha merge
+  in a scratch worktree found two more failures. First, a modify/delete: main
+  edited `code_179d8_f_b.c` and alpha renamed it, so main's edit needs
+  replaying onto the branch's file. Second, the ledger's sorted keys: a
+  renamed key's re-addition landed in a hunk whose main side dropped it,
+  losing three entries. The head's by-hand union had got both right.
+  `tools/replay.py` re-applies both sides' commands, read from the commit
+  subjects, to what is LEFT, including lines that never conflicted. It
+  three-way merges the ledger as JSON and then runs the oracle. On that
+  replay it produced the head's merge byte-for-byte, plus a planted
+  non-conflicting mention it caught and fixed. §3's rule now names it.
+
+---
+
 ## 2026-09-26 — round 90: track 8, six regions filed (Opus head)
 
 Opus head, not started as premium; cap 5, two slots filled because
