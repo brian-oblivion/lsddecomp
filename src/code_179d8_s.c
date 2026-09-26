@@ -327,13 +327,6 @@ void CdDriver__LoadFile(CdDriver *self, char *name) {
 extern void FreeCdRequestNode(CdRequestNode *node);
 extern void *GetCdFileEntry(s32 index);
 
-/* Class6D430's +0x070 stopService is `void (*)(void)` (both occupants,
- * CdDriver__StopService and VabDriver__StopService, read no register), but
- * this call passes `self`: retail loads $a0 before the jalr. The cast
- * emits no code. Class6D430's slot type is left alone here (another
- * class's header, round 88); retyping it to take `Self *self`, as its
- * +0x074 cancelRequests does, would retire this typedef. */
-typedef void (*StopServiceSelfFn)(CdDriver *self);
 
 void CdDriver__RunRequestQueue(void) {
     CdRequestNode *node;
@@ -395,7 +388,7 @@ void CdDriver__RunRequestQueue(void) {
             self->methods->setFlag(self);
             FreeCdRequestNode(node);
             if (gCdRequestQueue == NULL) {
-                ((StopServiceSelfFn)self->methods->stopService)(self);
+                self->methods->stopService(self);
             }
         }
     }

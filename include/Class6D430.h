@@ -48,7 +48,7 @@ typedef struct Class6D430Methods Class6D430Methods;
     /* +0x064 */ void (*setFlag)(Self *self);                   /* Class6D430__SetFlag */          \
     /* +0x068 */ void (*runRequestQueue)(void);                 /* CD: CdDriver__RunRequestQueue */ \
     /* +0x06C */ void (*requestLoadFile)(Self *self, char *name); /* CD: CdDriver__RequestLoadFile */ \
-    /* +0x070 */ void (*stopService)(void);                     /* CD: CdDriver__StopService */ \
+    /* +0x070 */ void (*stopService)(Self *self);               /* CD: CdDriver__StopService; neither occupant reads self, but CdDriver__RunRequestQueue loads $a0 = self before the jalr (round 88) */ \
     /* +0x074 */ void (*cancelRequests)(Self *self);            /* CD: CdDriver__CancelRequests */ \
     /* +0x078 */ void *slot78                                   /* NULL */
 
