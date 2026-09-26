@@ -2,7 +2,7 @@
 
 > Renamed from `Class86AA0__OnActorLinkCommand` on 2026-09-26 (tools/rename.py). Address 0x8004d47c.
 
-> Renamed from `GridCell__ForwardIfArg2InRange` on 2026-09-26 (tools/rename.py). Address 0x8004d47c.
+> Renamed from `Class86AA0__ForwardIfArg2InRange` on 2026-09-26 (tools/rename.py). Address 0x8004d47c.
 
 > Renamed from `func_8004D47C` on 2026-09-22 (tools/rename.py). Address 0x8004d47c.
 

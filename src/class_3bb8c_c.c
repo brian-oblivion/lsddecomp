@@ -8,7 +8,10 @@
  *
  * NodeGuardedViewport (include/NodeGuardedViewport.h) is a Viewport whose
  * update skips the frame while no view node is attached; its seven table
- * methods, New_ and the getter are all here. Class86B60
+ * methods, New_ and the getter are all here. GridCell (include/GridCell.h,
+ * a SceneNode) is one cell of Class866E8's grid, carrying the model placed
+ * there; its five table methods, New_ and the getter are all here too.
+ * Class86B60
  * (include/Class86B60.h, a TaskCore) is the largest of the three -- its own
  * vtable (gClass86B60Methods, 78 slots) is occupied mostly by the sibling
  * unit class_3bb8c_d.c; this unit contributes only the allocator and ctor.

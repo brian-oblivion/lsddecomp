@@ -2,7 +2,7 @@
 
 > Renamed from `Class86AA0__DispatchLinkCommand` on 2026-09-26 (tools/rename.py). Address 0x8004d434.
 
-> Renamed from `GridCell__ForwardIfTag34` on 2026-09-26 (tools/rename.py). Address 0x8004d434.
+> Renamed from `Class86AA0__ForwardIfTag34` on 2026-09-26 (tools/rename.py). Address 0x8004d434.
 
 > Renamed from `func_8004D434` on 2026-09-22 (tools/rename.py). Address 0x8004d434.
 
