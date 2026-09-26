@@ -48,7 +48,7 @@
 #include "DreamSys.h"
 #include "LinkResource.h"
 #include "Class866E8.h"
-#include "Class81940.h"
+#include "LbdFile.h"
 #include "VabStreamObj.h"
 #include "Viewport.h"
 

@@ -15,14 +15,14 @@
  * `grid` (include/Actor.h) when addChild sees a class-0x114 child.
  *
  * What its own methods do:
- *  - the ctor makes seven elements (`elems`), each a Class81940 `loader`, a
+ *  - the ctor makes seven elements (`elems`), each a LbdFile `loader`, a
  *    Class6D940 `placements`, a GridCell `cellParent` attached to this
  *    object at `origin`, and a 0x668-byte block of GridCell `cells`
  *    attached to the cellParent on a 0x800-unit lattice. Every grid index
  *    uses a row stride of 20 cells: gDefaultGridSpan (0xA000) >> 11, stored
  *    by setGridSpan in `gridCells`.
  *  - applyRateEntries loads an element's file through its loader
- *    (Class81940 loadHeader); onNotifyTag1 consumes the header when it is
+ *    (LbdFile loadHeader); onNotifyTag1 consumes the header when it is
  *    read and loadElementResources links each cell to its placement's model.
  *  - updateFootprintTracking (every tick while `enabled`) turns `target`'s
  *    world position into a Descriptor10Ext (computeFootprintDescriptor) and
@@ -56,7 +56,7 @@
  * The object is 0x1E8 bytes (New_Class866E8).
  */
 
-struct Class81940;
+struct LbdFile;
 struct Class6D940;
 struct GridCell;
 
@@ -110,7 +110,7 @@ typedef struct Descriptor10Ext {
     s32 unk1C;             /* +0x01C */
     s32 unk20;             /* +0x020 */
     Class866E8Elem *unk24; /* +0x024, the element findElementForPosition resolved */
-    s32 unk28;             /* +0x028, that element's Class81940::ownerRate, sign-extended */
+    s32 unk28;             /* +0x028, that element's LbdFile::ownerRate, sign-extended */
 } Descriptor10Ext;
 
 /* computeFootprintDescriptor's world position: each word is read whole (the
@@ -195,7 +195,7 @@ typedef struct Bounds866E8_3bb8c_b {
 struct Class866E8Elem {
     /* +0x000 */ u16 flag; /* 1 while its load is pending (ApplyRateEntries; OnNotifyTag1 clears it) */
     /* +0x002 */ u16 key; /* the ctor: its index; BuildRateEntries: the spec's key, copied on into loader->ownerKey */
-    /* +0x004 */ struct Class81940 *loader; /* New_Class81940(): the element's file (include/Class81940.h) */
+    /* +0x004 */ struct LbdFile *loader; /* New_LbdFile(): the element's file (include/LbdFile.h) */
     /* +0x008 */ struct Class6D940 *placements; /* New_Class6D940(0): its placement records (include/Class6D940.h) */
     /* +0x00C */ struct GridCell *cellParent; /* New_GridCell(), attached to the Class866E8 at `origin`; every cell's parent */
     /* +0x010 */ struct GridCell **cells; /* BMemPMgrAlloc(0x668): 410 New_GridCell() cells, row stride 20 */

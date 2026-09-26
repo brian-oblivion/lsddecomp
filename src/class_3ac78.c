@@ -38,7 +38,7 @@
 #include "DrawSystem.h"
 #include "Class6D940.h"
 #include "LinkResource.h"
-#include "Class81940.h"
+#include "LbdFile.h"
 #include "GridCell.h"
 #include "FlatLightObj.h"
 
@@ -106,7 +106,7 @@ void Class866E8__Class866E8(Class866E8 *self, Unk54Struct *origin, s32 autoLoad)
     for (i = 0; i < 7; i++) {
         entry = &self->elems[i];
 
-        entry->loader = New_Class81940();
+        entry->loader = New_LbdFile();
         entry->loader->freeGuard = (entry->loader->buffer != NULL);
         entry->loader->ownerKey = i;
         entry->loader->methods->setAutoLoadData(entry->loader, autoLoad);

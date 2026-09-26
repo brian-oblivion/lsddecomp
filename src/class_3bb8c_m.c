@@ -33,7 +33,7 @@
 #include "common.h"
 #include "class_3bb8c.h"
 #include "DreamSys.h"
-#include "Class81940.h"
+#include "LbdFile.h"
 #include "BoxFill.h"
 #include "TextRow.h"
 #include "ObjM.h"

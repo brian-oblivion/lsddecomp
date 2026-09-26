@@ -135,7 +135,7 @@ zeroed and otherwise untouched" from scratch.
   `TileAtlas__BuildCells`, `ModelData__BuildResources`,
   `TriggerWorld__BuildResources`, `Tod__ScanPackets`, `TodSet__ScanPackets`,
   `LinkResource__MapModel`, `TimArraySrc__UploadImages`,
-  `TimBlockSrc__SetEntryShift`, `Class81940__LoadHeader`,
+  `TimBlockSrc__SetEntryShift`, `LbdFile__LoadHeader`,
   `VabStreamObj__OnBodyReady`, `Class6D940__ResolveEntry`). Callers use it
   as New_<Sub>(name), slot +0x078, `freeBuffer` (`TaskCore__SetSubHandle`,
   `class_3bb8c_g.c`). The name was chosen over `DataSource` because in this
@@ -175,7 +175,7 @@ zeroed and otherwise untouched" from scratch.
 | member | proposed | tier | evidence | accessors |
 | --- | --- | --- | --- | --- |
 | slot `+0x078` `slot78` | `processBuffer` | B | every subclass occupant consumes the loaded buffer (list above); callers invoke it right after `New_<Sub>` and before `freeBuffer` | class_3bb8c_g/i/j.c, class_39e08.c, code_2cc8c_b.c, code_179d8_e.c |
-| field `+0x02A` `unk2A` | `loadState` | B | the base ctor zeroes it; Class81940 steps it 0 -> 9 (header) -> 0 / 0 -> 10 (data block) -> 0 and VabStreamObj 1 (VH) -> 6 (VB); both advance it from slot +0x064 on a flags completion bit | code_39094.c, code_179d8_e.c |
+| field `+0x02A` `unk2A` | `loadState` | B | the base ctor zeroes it; LbdFile steps it 0 -> 9 (header) -> 0 / 0 -> 10 (data block) -> 0 and VabStreamObj 1 (VH) -> 6 (VB); both advance it from slot +0x064 on a flags completion bit | code_39094.c, code_179d8_e.c |
 
 The table in the section above lists `unk22`/`unk28`/`unk2A` as write-only:
 that was true of this unit only. `unk22` and `unk28` have since been named

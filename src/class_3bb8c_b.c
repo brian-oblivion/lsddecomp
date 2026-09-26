@@ -22,7 +22,7 @@
  * and this unit's names were chosen to agree with that vocabulary. */
 #include "common.h"
 #include "class_3bb8c.h"
-#include "Class81940.h"
+#include "LbdFile.h"
 #include "GridCell.h"
 
 s32 Class866E8__FindElemIndexByUnk32(Class866E8 *self, s32 key) {
