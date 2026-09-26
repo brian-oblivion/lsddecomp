@@ -111,7 +111,7 @@ void GameApplication__GameApplication(GameApplication *self, GameApplicationConf
 
     GetApplicationMethods()->ctor((Application *)self, arg->dataSource);
     self->methods = GetGameApplicationMethods();
-    self->ctorArgs = arg;
+    self->config = arg;
     func_800270AC(func_80048CF0());
     req.type = 0;
     req.path = sModelPathDreamE5;
@@ -137,7 +137,7 @@ void GameApplication__InitSystems(GameApplication *self, DrawSystem *drawSystem,
     }
 }
 
-/* Optional stream-load block, gated by self->ctorArgs->showIntroLogos: registers a
+/* Optional stream-load block, gated by self->config->showIntroLogos: registers a
  * "loader" task for "ETC\ASMKLOGO.TIM" (GameApplication__StartLoaderTask), then a separate
  * "stream" task for whatever type code GetIntroStreamName hands back
  * ("ETC\ASMK.STR"), then a second loader task for "ETC\OSDLOGO.TIM". */
@@ -147,7 +147,7 @@ void GameApplication__LoadIntroLogoSequence(GameApplication *self) {
     s32 typeLookup;
     StreamTask *task;
 
-    if (self->ctorArgs->showIntroLogos != 0) {
+    if (self->config->showIntroLogos != 0) {
         SetActiveDataSourceDriverMode(0, 0, 0);
         GameApplication__StartLoaderTask(self, sLogoPathAsmk);
         task = New_StreamTask(0, 0, 0, 0);
@@ -183,8 +183,8 @@ s32 GameApplication__LoaderTaskDoneCallback(void) {
     return func_8004A070(0);
 }
 
-/* Optional stream-task init block, gated by self->ctorArgs->playStreams (the same
- * shape as GameApplication__LoadIntroLogoSequence's self->ctorArgs->showIntroLogos gate, minus the two
+/* Optional stream-task init block, gated by self->config->playStreams (the same
+ * shape as GameApplication__LoadIntroLogoSequence's self->config->showIntroLogos gate, minus the two
  * GameApplication__StartLoaderTask loader-task calls, and using PickWeeklyStreamChannel instead of
  * GetIntroStreamName to derive the type code). */
 void GameApplication__StartWeeklyStreamTask(GameApplication *self) {
@@ -193,7 +193,7 @@ void GameApplication__StartWeeklyStreamTask(GameApplication *self) {
     s32 typeLookup;
     StreamTask *task;
 
-    if (self->ctorArgs->playStreams != 0) {
+    if (self->config->playStreams != 0) {
         SetActiveDataSourceDriverMode(0, 0, 0);
         task = New_StreamTask(0, 0, 0, 0);
         derivedValue = PickWeeklyStreamChannel(&typeCode, 0);
@@ -204,7 +204,7 @@ void GameApplication__StartWeeklyStreamTask(GameApplication *self) {
     }
 }
 
-/* Gated by self->ctorArgs->pollGraphRoom. Checks the DreamSys's own status slot
+/* Gated by self->config->pollGraphRoom. Checks the DreamSys's own status slot
  * (+0x1A0); if it isn't already "1" and self->skipGraphRoomPoll hasn't latched, kicks
  * off one PollTask (New_GraphRoom) and, if THAT reports "2", runs
  * GameApplication__StartGraphRoomStreamTask. Then polls a second PollTask (New_Class86B60) in a loop,
@@ -215,14 +215,14 @@ s32 GameApplication__PollGraphRoomStatus(GameApplication *self) {
     s32 status;
     s32 pollDone;
 
-    if (self->ctorArgs->pollGraphRoom != 0) {
+    if (self->config->pollGraphRoom != 0) {
         SetActiveDataSourceDriverMode(0, 0, 0);
 
         status = self->dreamSys->methods->getCurrentDayAndYear(self->dreamSys, 0);
         if (status != 1) {
             if (self->skipGraphRoomPoll == 0) {
                 status = GameApplication__RunPollTask((PollTaskCtor)New_GraphRoom, self->dreamSys,
-                                                 (IntermediateBaseInitArgs *)self->aux);
+                                                      (IntermediateBaseInitArgs *)self->aux);
                 if (status == 2) {
                     GameApplication__StartGraphRoomStreamTask(self);
                 }
@@ -232,10 +232,10 @@ s32 GameApplication__PollGraphRoomStatus(GameApplication *self) {
         pollDone = 2;
     retry:
         status = GameApplication__RunPollTask((PollTaskCtor)New_Class86B60, self->dreamSys,
-                                         (IntermediateBaseInitArgs *)self->aux);
+                                              (IntermediateBaseInitArgs *)self->aux);
         if (status == pollDone) {
             GameApplication__RunPollTask((PollTaskCtor)New_GraphRoom, self->dreamSys,
-                                    (IntermediateBaseInitArgs *)self->aux);
+                                         (IntermediateBaseInitArgs *)self->aux);
             goto retry;
         }
 
@@ -257,7 +257,7 @@ s32 GameApplication__RunPollTask(PollTaskCtor ctor, void *dreamSys, Intermediate
 }
 
 /* Called by GameApplication__PollGraphRoomStatus when its first PollTask reports "2". Gated by
- * self->ctorArgs->playStreams (same gate as GameApplication__StartWeeklyStreamTask). Builds a StreamTask,
+ * self->config->playStreams (same gate as GameApplication__StartWeeklyStreamTask). Builds a StreamTask,
  * derives a count via GetGraphRoomStreamChannel, sets the task's frame bound
  * to that count / 15 and clears skipOnConfirm, then runs its init (stream
  * group -1, unlike the other call sites) and releases it. */
@@ -272,7 +272,7 @@ void GameApplication__StartGraphRoomStreamTask(GameApplication *self) {
 
     s32 extra;
 
-    if (self->ctorArgs->playStreams != 0) {
+    if (self->config->playStreams != 0) {
         SetActiveDataSourceDriverMode(0, 0, 0);
         task = New_StreamTask(0, 0, 0, 0);
         extra = GetGraphRoomStreamChannel(&buf.count, 0, 10);
@@ -319,7 +319,7 @@ s32 GameApplication__PollStatusObj(GameApplication *self) {
     s32 check;
     s32 result;
 
-    obj = New_Class865C8((IntermediateBaseInitArgs *)self->aux, self->dreamSys, self->ctorArgs->unk04);
+    obj = New_Class865C8((IntermediateBaseInitArgs *)self->aux, self->dreamSys, self->config->unk04);
     status = ((Class865C8InitFn)obj->methods->init)(obj);
     obj->methods->release(obj);
 
@@ -342,7 +342,7 @@ s32 GameApplication__PollStatusObj(GameApplication *self) {
 
 /* Reads DreamSys's current cinematic slot, resolves it to a channel index
  * (ResolveCinematicChannel); if that fails (-1), starts a LoaderTask on the fixed
- * "no cinematic" path; otherwise, if self->ctorArgs->playStreams gates it, starts a
+ * "no cinematic" path; otherwise, if self->config->playStreams gates it, starts a
  * StreamTask on the resolved channel. Either branch finishes by starting
  * whichever task it built; if neither branch runs, nothing happens. */
 void GameApplication__StartCinematicStream(GameApplication *self) {
@@ -363,7 +363,7 @@ void GameApplication__StartCinematicStream(GameApplication *self) {
     SetActiveDataSourceDriverMode(0, 0, 0);
 
     if (chanBuf.chan != -1) {
-        if (self->ctorArgs->playStreams != 0) {
+        if (self->config->playStreams != 0) {
             StreamTask *streamTask = New_StreamTask(0, 0, 0, 0);
 
             streamTask->methods->setSkipOnConfirm(streamTask, 0);
@@ -381,7 +381,7 @@ void GameApplication__StartCinematicStream(GameApplication *self) {
     }
 }
 
-/* GameApplicationMethods slot +0x064. Gated by self->ctorArgs->playStreams (same gate as
+/* GameApplicationMethods slot +0x064. Gated by self->config->playStreams (same gate as
  * GameApplication__StartWeeklyStreamTask/GameApplication__StartGraphRoomStreamTask). Builds a StreamTask, clears its skipOnConfirm,
  * derives a type code via GetStreamChannelInit, looks it up via GetStreamGroupForType,
  * initializes the task with it, then starts it -- the same shape as
@@ -393,7 +393,7 @@ void GameApplication__StartStreamTaskWithInit(GameApplication *self) {
     s32 outerValue;
     s32 typeLookup;
 
-    if (self->ctorArgs->playStreams != 0) {
+    if (self->config->playStreams != 0) {
         SetActiveDataSourceDriverMode(0, 0, 0);
         task = New_StreamTask(0, 0, 0, 0);
         task->methods->setSkipOnConfirm(task, 0);
