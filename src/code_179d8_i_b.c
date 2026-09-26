@@ -24,7 +24,7 @@
  * The first half kept `code_179d8_i` and is now Snd_decrescendo alone.
  *
  * A ONE-FUNCTION UNIT IS FINE and has precedent (`class_3bb8c_v`, and
- * `code_179d8_f_b` earlier in this same round).
+ * `libspu_s_ih` earlier in this same round).
  *
  * NO RODATA ATTACH CAME WITH THIS HALF, and that is measured, not assumed:
  * code_179d8_i owned zero `jtbl_` references and the splat yaml's rodata slot

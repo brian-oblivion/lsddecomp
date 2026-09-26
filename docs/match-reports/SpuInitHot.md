@@ -5,7 +5,7 @@
 > Renamed from `func_80036AA8` on 2026-09-24 (tools/rename.py). Address 0x80036aa8.
 
 `asm/nonmatchings/code_179d8_f/SpuInitHot.s`, vram `0x80036AA8`, unit
-`code_179d8_f_b` (split off `code_179d8_f` in round 34; this report predates
+`libspu_s_ih` (split off `code_179d8_f` in round 34; this report predates
 the split and had not been updated). One-line wrapper: `func_80038E44(1)`.
 
 ```c
@@ -50,7 +50,7 @@ Evidence considered and why it falls short of tier A/B:
   function with the constant 1", which says nothing about game purpose.
 - **Callee**: `func_80038E44` is itself unnamed, uncarved, and lives in the
   "game's own libspu build" gap (`0x29644..0x2976C`, no SDK disc covers it;
-  see `src/code_179d8_f_b.c`'s header and `config/splat.slps01556.lsdde.yaml`
+  see `src/libspu_s_ih.c`'s header and `config/splat.slps01556.lsdde.yaml`
   line ~1131). It is not a placed Sony object (`tools/sdkstalls.py` has no
   hit for `SpuInitHot`), so this is not the "give no game name to
   anything Sony owns" case -- but its own purpose is equally undetermined

@@ -68,7 +68,7 @@
  * `SsInit`/`SsInitHot` (its arg=0/arg=1 wrappers) are Sony's too: the
  * head identified them under track 2 (EXACT fingerprint, the ssinit slot
  * position, and the `_SsInit(0)`/`_SsInit(1)` bodies), and `_SsInit`'s
- * mode!=0 arm calls Sony's `SpuInitHot` (code_179d8_f_b), identified the
+ * mode!=0 arm calls Sony's `SpuInitHot` (libspu_s_ih), identified the
  * same way. All three count as library.
  *
  * `_SsInit`'s data: `_snd_openflag`/`_snd_ev_flag` are Sony-pinned in

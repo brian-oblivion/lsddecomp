@@ -1,5 +1,5 @@
 /*
- * code_179d8_f_b -- the TAIL half of the old code_179d8_f slice, split off in
+ * libspu_s_ih -- the TAIL half of the old code_179d8_f slice, split off in
  * round 34 (2026-09-12) when Sony's `libsnd/stop.o` was linked into the middle
  * of it. File 0x272A8..0x272C8, vram 0x80036AA8..0x80036AC8: ONE function.
  *
