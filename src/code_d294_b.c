@@ -132,7 +132,7 @@ void SceneNode__GetModelHull(SceneNode *self, void *dest) {
  * (an inherited BasicClass slot, not this unit's own code), then clears
  * unk30 again. */
 void SceneNode__TransformAndNotifyParents(SceneNode *self, TmdHull *a1, s32 a2) {
-    ApplyMatrixToSVArray(a1->v, a1->v, a1->count * 8, &self->coord2->unk24);
+    ApplyMatrixToSVArray(a1->v, a1->v, a1->count * 8, &self->coord2->workm);
     self->linkTarget = 0;
     self->hitMask = 0;
     self->notifyVerts = a1;
