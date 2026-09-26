@@ -55,3 +55,18 @@ lines above this one. `D_800902E4` is NOT referenced outside
 `GsOUT_PACKET_P` it does not carry a Sony pin as far as this unit can see --
 that's charlie's call to make with `rename.py`, which will say either way.
 Posted to the broadcast for parallel naming.
+
+## File history (moved from the unit banner, round 90)
+
+- Round 34 (2026-09-12): the functions on both sides became linked Sony
+  objects (gs_123 `Gssub_make_matrix` in front, gs_111 `GsDrawOt` behind), so
+  this function got its own one-function unit rather than putting an `o`
+  segment inside a `c` one.
+- Round 78 (head, track 2): identified as Sony's `GsSetWorkBase`
+  (libgs/gs_124): `sdkname.py` EXACT (TINY, 4 words) on discs 3.3/3.5/3.6;
+  its one store target 0x8008E794 is `GsOUT_PACKET_P` (pinned in
+  `config/psyq-objects.ld`; LIBGS.H: "Work Base pointer"). `progress.py`
+  counts it as library through the `identified` comment on its symbols entry.
+- Round 90 (track 8): `tools/unitfile.py rename code_2cc8c_e1 libgs_gs_124`.
+  `tuboundary.py --unit code_2cc8c_e1`: "(after sony:libgs/gs_123): start edge
+  possible"; both neighbours are placed objects, so no merge was possible.
