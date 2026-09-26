@@ -1,11 +1,5 @@
 /*
- * code_fa50 -- GAME code carved from psyq_fa50 on 2026-09-25 (FINISHING-PLAN
- * revision 18). 0xFA50..0x10D48 (vram 0x8001F250..0x80020548). It was counted
- * as Psy-Q SDK by segment name; tools/gameinsdk.py measured it as game (a call
- * into game code, a method-table entry beside game methods, or contiguity with
- * those, and no Sony fingerprint).
- *
- * Holds the TmdModel class (include/TmdModel.h; method table
+ * code_fa50 -- the TmdModel class (include/TmdModel.h; method table
  * gTmdModelMethods, class tag 9): one object of a TMD file (the "model"
  * SceneNode__LinkModel, src/code_d294_c.c, links into a GsDOBJ2). Its
  * methods map the TMD to the GS (TmdModel__MapModelingData), walk its
@@ -15,7 +9,7 @@
  * TmdModel__UpdateBoundsBuffer / TmdModel__GetBoundsBuffer /
  * TmdModel__GetBoundsCount), and ray-cast a segment against every face
  * (TmdModel__RaycastFaces) for SceneNode's own collision helpers in
- * code_d294_b.c/code_d294_c.c. Track 4 unified it in round 87.
+ * code_d294_b.c/code_d294_c.c.
  *
  * RotateAndOffsetHullList takes a hull list, not a TmdModel, and is a free
  * function; the tail of the file (AccumulateTargetOffset, SetTargetOffset)
@@ -23,10 +17,11 @@
  * pointer chain with no confirmed owning class, and SetTargetOffset's one
  * caller is class_3bb8c_o.c.
  *
- * All 18 functions matched, round 82 (runner charlie); tiers and evidence
- * in each function's own docs/match-reports/ file.
+ * Tiers and match evidence for every function are in each function's own
+ * docs/match-reports/ file.
  */
 #include "common.h"
+#include <libgte.h>
 #include "TmdModel.h"
 
 /* A box with a leading word: TmdModel__GetHull's local. */
@@ -52,43 +47,35 @@ typedef struct Ray_fa50 {
     TmdVec3 dir; /* +0x006 */
 } Ray_fa50;
 
-/* LIBGTE's VECTOR, declared locally. */
-typedef struct Vec4_fa50 {
-    s32 vx, vy, vz, pad;
-} Vec4_fa50;
-
 #define ABS_fa50(x) ((x) < 0 ? ~(x) + 1 : (x))
 
 /* The scratch VECTOR that also holds the candidate triangle's box. */
 typedef union VecBox_fa50 {
-    Vec4_fa50 v;
+    VECTOR v;
     TmdBox b;
 } VecBox_fa50;
 
 typedef struct Target_fa50 {
     u8 pad0[0x6];
-    s16 unk6; /* +0x006 */
+    s16 offset; /* +0x006: AccumulateTargetOffset/SetTargetOffset's field */
 } Target_fa50;
 
 typedef struct Inner_fa50 {
     u8 pad0[0x10];
-    Target_fa50 *unk10; /* +0x010 */
+    Target_fa50 *target; /* +0x010 */
 } Inner_fa50;
 
 typedef struct Outer_fa50 {
     u8 pad0[0x10];
-    Inner_fa50 *unk10; /* +0x010 */
+    Inner_fa50 *inner; /* +0x010 */
 } Outer_fa50;
 
 extern void GsMapModelingData(unsigned long *p);
-extern void OuterProduct0(Vec4_fa50 *v0, Vec4_fa50 *v1, Vec4_fa50 *v2);
-extern void Square0(Vec4_fa50 *v0, Vec4_fa50 *v1);
-extern s32 SquareRoot0(s32 a);
 extern TmdBox gTmdModelBoundsBuf[];
 extern void *BMemPMgrAlloc(s32 size);
 
 TmdModel *New_TmdModel(TmdObject *object) {
-    TmdModel *p = BMemPMgrAlloc(0x24);
+    TmdModel *p = BMemPMgrAlloc(sizeof(TmdModel));
 
     if (p != NULL) {
         Get_vtable_TmdModel()->ctor(p, object);
@@ -101,7 +88,7 @@ void TmdModel__TmdModel(TmdModel *self, TmdObject *object) {
     Get_vtable_BasicClass()->ctor((BasicClass *)self);
     self->methods = Get_vtable_TmdModel();
     self->object = object;
-    self->data = (TmdFile *)((u8 *)object - 0xC);
+    self->data = (TmdFile *)((u8 *)object - offsetof(TmdFile, objects));
     TmdModel__InitBoundsCount(self);
 }
 
@@ -257,7 +244,7 @@ void RotateAndOffsetHullList(HullList_fa50 *h, s32 turn, s32 back, s32 d) {
 s32 TmdModel__RaycastFaces(TmdModel *self, s32 *best, TmdVec3 *hitOut, s32 *height, TmdVec3 *origin,
                            TmdVec3 *end) {
     TmdVec3 tri[4];
-    Vec4_fa50 plane;
+    VECTOR plane;
     Ray_fa50 ray;
     TmdVec3 hit;
     s32 nverts;
@@ -275,16 +262,16 @@ s32 TmdModel__RaycastFaces(TmdModel *self, s32 *best, TmdVec3 *hitOut, s32 *heig
     ray.dir.z = end->z - origin->z;
     found = 0;
     while ((p = TmdModel__NextPrimitive(self, p, &nverts, tri, &count)) != NULL) {
-        Vec4_fa50 v60;
+        VECTOR v60;
         TmdVertex e1;
         TmdVertex e2;
-        Vec4_fa50 v80;
-        Vec4_fa50 v90;
-        Vec4_fa50 vA0;
-        Vec4_fa50 vB0;
-        Vec4_fa50 vC0;
-        Vec4_fa50 vD0;
-        Vec4_fa50 vE0;
+        VECTOR v80;
+        VECTOR v90;
+        VECTOR vA0;
+        VECTOR vB0;
+        VECTOR vC0;
+        VECTOR vD0;
+        VECTOR vE0;
         VecBox_fa50 uF0;
         s32 dist[2];
         s32 frac;
@@ -316,9 +303,9 @@ s32 TmdModel__RaycastFaces(TmdModel *self, s32 *best, TmdVec3 *hitOut, s32 *heig
         plane.vx = v80.vx;
         plane.vy = v80.vy;
         plane.vz = v80.vz;
-        plane.vx /= 4096;
-        plane.vy /= 4096;
-        plane.vz /= 4096;
+        plane.vx /= ONE;
+        plane.vy /= ONE;
+        plane.vz /= ONE;
         plane.pad = -(tri[0].x * plane.vx + tri[0].y * plane.vy + tri[0].z * plane.vz);
         vC0.vx = ray.dir.x * plane.vx + ray.dir.y * plane.vy + ray.dir.z * plane.vz;
         if (ABS_fa50(vC0.vx) <= 0) {
@@ -332,9 +319,9 @@ s32 TmdModel__RaycastFaces(TmdModel *self, s32 *best, TmdVec3 *hitOut, s32 *heig
             vB0.vy = 1;
             vB0.vz = vB0.vx * v80.vy;
             vB0.pad = vB0.vy * v80.vx;
-            if (ABS_fa50(vB0.pad) >= 0x1000) {
-                vB0.vz /= 4096;
-                vB0.pad /= 4096;
+            if (ABS_fa50(vB0.pad) >= ONE) {
+                vB0.vz /= ONE;
+                vB0.pad /= ONE;
             }
             frac = ABS_fa50(vB0.vz % vB0.pad) << 16;
             q = vB0.vz / vB0.pad;
@@ -596,6 +583,9 @@ TmdPrim *TmdModel__NextPrimitive(TmdModel *self, TmdPrim *p, s32 *n, TmdVec3 *ou
     }
     verts = self->object->verts;
     for (i = 0; i < *n; i++) {
+        /* MATCHING: verts[idx[i]] and every equivalent pointer-arithmetic
+         * form swap two registers and cost a word (docs/match-reports/
+         * TmdModel__NextPrimitive.md, build 7). */
         out[i] = *(TmdVec3 *)((u8 *)verts + (idx[i] << 3));
     }
     (*count)++;
@@ -603,17 +593,17 @@ TmdPrim *TmdModel__NextPrimitive(TmdModel *self, TmdPrim *p, s32 *n, TmdVec3 *ou
 }
 
 void AccumulateTargetOffset(Outer_fa50 *self, s32 *xy) {
-    Target_fa50 *t = self->unk10->unk10;
+    Target_fa50 *t = self->inner->target;
 
-    t->unk6 += xy[0] / 16;
-    t->unk6 += xy[1] * 64;
+    t->offset += xy[0] / 16;
+    t->offset += xy[1] * 64;
 }
 
 void SetTargetOffset(Outer_fa50 *self, s16 *xy) {
-    Target_fa50 *t = self->unk10->unk10;
+    Target_fa50 *t = self->inner->target;
     s32 v;
 
     v = xy[0] / 16;
-    t->unk6 = v;
-    t->unk6 = v + xy[1] * 64;
+    t->offset = v;
+    t->offset = v + xy[1] * 64;
 }

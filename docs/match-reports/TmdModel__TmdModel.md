@@ -44,3 +44,13 @@ is the only caller of `New_TmdModel`, passing entry `i` of the loaded TMD's
 the ctor, through slot +0x008. The ctor stores the argument in `object` and
 `object - 0xC` in `data` (a TmdFile, the real header when the entry is the
 first).
+
+## Track 7 (2026-09-26, round 94, bravo)
+
+`(TmdFile *)((u8 *)object - 0xC)` -> `(TmdFile *)((u8 *)object - offsetof(TmdFile, objects))`,
+the project's standing idiom for a byte-offset conversion between two
+struct views once the target field is known (`include/common.h`'s
+`offsetof`; precedent `src/class_3bb8c_n.c`, `src/code_8220_b.c`). The `(u8
+*)` cast itself stays: `object` and `TmdFile` are unrelated types with no
+field expressing the relationship, so byte-granularity pointer arithmetic is
+the only C form. Byte-identical, build and check-nonmatching.sh green.

@@ -224,3 +224,12 @@ TmdPrim_fa50 *TmdModel__NextPrimitive(TmdModel *self, TmdPrim_fa50 *p, s32 *n, V
 byte, extracts its vertex indices, writes their positions to `out`, advances
 `*count`, and returns the next primitive pointer (or NULL when exhausted).
 Owns `jtbl_80010354`.
+
+## Track 7 (2026-09-26, round 94, bravo)
+
+Added a `/* MATCHING: ... */` comment on the vertex-copy line per this
+file's build log above (build 7): `verts[idx[i]]` and every other
+pointer-arithmetic spelling tested (`&base[i]`, `base + i`, `i + base`,
+`(u8 *)base + i * 8`) score 287/288, one register swapped from retail; only
+`(u8 *)verts + (idx[i] << 3)` reaches 288/288. No source change, comment
+only.
