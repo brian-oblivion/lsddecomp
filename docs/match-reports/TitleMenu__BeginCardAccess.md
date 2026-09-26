@@ -53,7 +53,7 @@ SLPS_015.56`.
 - `self->unkAC->methods->slot6C(...)` -- a NEW 7-argument slot (4 in
   registers, 3 on the stack) at `TitleMenuUnkACObjMethods_3bb8c_d`'s
   +0x06C, immediately before the already-known `slot70`
-  (`TitleMenu__EndMemcardSave`) with no gap. Every non-`self` argument is forwarded
+  (`TitleMenu__EndCardAccess`) with no gap. Every non-`self` argument is forwarded
   opaquely: `D_8008A9D0` (a NEW `%gp_rel` VALUE-of global, same pattern as
   `D_8008AA10`/`D_8008AA18`/`D_8008AA14` -- holds `0x80011454`, the
   "BISLPS-01556" string in the same unowned `D_80011434` rodata block,

@@ -1,16 +1,18 @@
-# TitleMenu__EndMemcardSave -- MATCH
+# TitleMenu__EndCardAccess -- MATCH
+
+> Renamed from `TitleMenu__EndMemcardSave` on 2026-09-26 (tools/rename.py). Address 0x8004e054.
 
 > Renamed from `Class86B60__EndMemcardSave` on 2026-09-26 (tools/rename.py). Address 0x8004e054.
 
 > Renamed from `func_8004E054` on 2026-09-24 (tools/rename.py). Address 0x8004e054.
 
 Unit `class_3bb8c_d`, round 14. `./build-and-verify.sh` exit 0; whole-image
-SHA1 matches retail. `funcdiff.py TitleMenu__EndMemcardSave`: 36/36 words match.
+SHA1 matches retail. `funcdiff.py TitleMenu__EndCardAccess`: 36/36 words match.
 
 ## Source
 
 ```c
-void TitleMenu__EndMemcardSave(TitleMenu *self)
+void TitleMenu__EndCardAccess(TitleMenu *self)
 {
     self->methods->slot10(self, self->handlerTable->unk4);
     self->methods->slot10(self, self->unk10);
@@ -47,7 +49,7 @@ None new.
 
 ## Naming (round 77, naming runner delta)
 
-Renamed `func_8004E054` -> `TitleMenu__EndMemcardSave`. **Tier B**: Mirror-image teardown of `TitleMenu__BeginCardAccess` -- forwards `self->handlerTable->unk4` and `self->unk10` through `self->methods->slot10`/`slot14`, then `unkAC->methods->slot70(unkAC)`. Named as the paired counterpart by symmetry of the two functions' argument sets, not from independent purpose evidence.
+Renamed `func_8004E054` -> `TitleMenu__EndCardAccess`. **Tier B**: Mirror-image teardown of `TitleMenu__BeginCardAccess` -- forwards `self->handlerTable->unk4` and `self->unk10` through `self->methods->slot10`/`slot14`, then `unkAC->methods->slot70(unkAC)`. Named as the paired counterpart by symmetry of the two functions' argument sets, not from independent purpose evidence.
 
 ## Track 4 (2026-09-26, round 88, bravo)
 

@@ -235,7 +235,7 @@ void TitleMenu__BeginCardAccess(TitleMenu *self) {
     self->methods->removeChild(self, self->unk10);
 }
 
-void TitleMenu__EndMemcardSave(TitleMenu *self) {
+void TitleMenu__EndCardAccess(TitleMenu *self) {
     self->methods->addChild(self, self->initArgs->pad);
     self->methods->addChild(self, self->unk10);
     self->methods->removeChild(self, (BasicClass *)self->saveCtrl);

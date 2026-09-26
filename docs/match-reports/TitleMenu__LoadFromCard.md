@@ -41,7 +41,7 @@ Two calls:
    VALUES, `self->unkBC`, `self->unkC0`), the fifth going to the stack at
    `0x10($sp)` exactly as a 5-argument call requires. `unkAC`'s methods
    table already had `release` (+0x004) and `slot70` (+0x070, from
-   `TitleMenu__EndMemcardSave`); this call reaches +0x074 immediately after `slot70`
+   `TitleMenu__EndCardAccess`); this call reaches +0x074 immediately after `slot70`
    with no gap, so `slot74` was appended there.
 
    The two `%gp_rel` loads (`D_8008AA10`, `D_8008AA18`) read the globals'

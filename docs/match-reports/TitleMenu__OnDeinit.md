@@ -48,7 +48,7 @@ this function).
 ## Struct changes (additive, `include/class_3bb8c.h`)
 
 - New types `TitleMenuUnkCObj_3bb8c_d` (self->handlerTable's pointee: `unk0` a
-  vtable pointer, `unk4` an opaque value used by `TitleMenu__EndMemcardSave`) and
+  vtable pointer, `unk4` an opaque value used by `TitleMenu__EndCardAccess`) and
   `TitleMenuUnkC0Obj_3bb8c_d` / `TitleMenuUnkC0ObjMethods_3bb8c_d` (the
   vtable `unk0` points to, `slot78` the only reached slot).
 - `TitleMenu::handlerTable` -- new field, `TitleMenuUnkCObj_3bb8c_d *`, carved
