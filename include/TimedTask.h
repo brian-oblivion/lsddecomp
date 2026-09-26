@@ -46,7 +46,7 @@ typedef struct TimedTaskMethods TimedTaskMethods;
     INTERMEDIATEBASE_SLOTS(Self, CtorParams);                                                      \
     /* +0x06C */ void (*setTimeout)(Self *self, s32 timeout); /* TimedTask__SetTimeout: timeoutFrames = timeout * 20 (negative: kept, never fires) */ \
     /* +0x070 */ void (*playSound)(Self *self, s32 tone);     /* TimedTask__PlaySound: sound's PlayTone(tone, 0x7F, 0x7F) */ \
-    /* +0x074 */ void (*slot74)(Self *self);                  /* NULL; ObjM__TogglePause */ \
+    /* +0x074 */ void (*togglePause)(Self *self);                 /* NULL; ObjM__TogglePause */ \
     /* +0x078 */ void *slot78;                                /* NULL in all three tables */     \
     /* +0x07C */ void (*onState4)(Self *self)                 /* NULL; setState(4) calls it; empty in both subclasses */
 /* clang-format on */

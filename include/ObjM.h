@@ -32,7 +32,7 @@
  *    Class866E8 has nothing pending, enterStyleSession (`inSession`);
  *  - update (ObjM__Update) counts frames and runs tickStyle, or
  *    advancePauseSetup while the "Pause" overlay is up; onPadEvent maps
- *    pad codes onto togglePause (slot74) and the close-ready slots;
+ *    pad codes onto togglePause and the close-ready slots;
  *  - onNotify splits by the sender's class id: the DreamSys's codes
  *    0xA..0x11 go to enterState4..A, the viewport's fade object
  *    (Class6E99C) reports fade down/up done (5/6), and the Class866E8's
@@ -74,10 +74,10 @@ struct Unk50Struct_3bb8c_l; /* styleConfig's view, include/class_3bb8c.h */
 /* Overridden: ctor, finalize, onNotify, resetCounters (NoOpSlot40), init
  * (AttachTarget), deinit (DetachTarget), onInit (InitStyleAndWorld),
  * onDeinit (TeardownStyle), onTag1Notify, onPadEvent (DispatchPadEvent),
- * update, slot74 (TogglePause) and onState4 (NoOpSlot7C). */
+ * update, togglePause (TogglePause) and onState4 (NoOpSlot7C). */
 struct ObjMMethods {
     TIMEDTASK_SLOTS(ObjM, (ObjM * self, BasicClass *sound, struct WBgm *bgm,
-                            struct TimImage *etcTim, struct LinkResource *dreamerTmd, s32 stage));
+                           struct TimImage *etcTim, struct LinkResource *dreamerTmd, s32 stage));
     /* +0x080 */ void (*setupSceneStyle)(ObjM *self); /* ObjM__SetupSceneStyle: PollTimBlockLoad, once the TimBlockSrc is done */
     /* +0x084 */ void (*exitSceneStyle)(ObjM *self); /* ObjM__ExitSceneStyle: TeardownStyle */
     /* +0x088 */ void (*enterStyleSession)(ObjM *self); /* ObjM__EnterStyleSession: PollTimBlockLoad; sets inSession */

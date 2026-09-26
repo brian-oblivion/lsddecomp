@@ -9,7 +9,7 @@
  * the DreamSys and hooks the Class866E8's callback, DetachTarget), onInit
  * and onDeinit (InitStyleAndWorld, TeardownStyle), onTag1Notify with the
  * TimBlockSrc poll it runs (PollTimBlockLoad), onPadEvent
- * (DispatchPadEvent), update, slot74 (TogglePause), the style scene
+ * (DispatchPadEvent), update, togglePause (ObjM__TogglePause), the style scene
  * slots +0x080..+0x08C, the DreamSys notification dispatcher
  * (OnDreamSysNotify, owning `jtbl_8001174C`) and EnterState4/5/6, which
  * set IntermediateBase::state and start a fade (ObjM__StartFadeUp,
@@ -198,7 +198,7 @@ void ObjM__PollTimBlockLoad(ObjM *self, TimBlockSrc *src) {
     }
 }
 
-/* onPadEvent: 0x21 togglePause (slot74), 0xC updateCloseReadyFlag, 0x2C
+/* onPadEvent: 0x21 togglePause, 0xC updateCloseReadyFlag, 0x2C
  * clearCloseReadyFlag, 0x16 closeAndNotifyD; only in session. */
 void ObjM__DispatchPadEvent(ObjM *self, void *sender, s32 code) {
     ObjMMethods *m = self->methods;
@@ -224,7 +224,7 @@ void ObjM__DispatchPadEvent(ObjM *self, void *sender, s32 code) {
     }
     return;
 case_74:
-    fn = m->slot74;
+    fn = m->togglePause;
     goto call;
 case_c0:
     fn = m->updateCloseReadyFlag;
@@ -253,7 +253,7 @@ void ObjM__Update(ObjM *self) {
     }
 }
 
-/* slot74. */
+/* togglePause. */
 void ObjM__TogglePause(ObjM *self) {
     ObjMMethods *m = self->methods;
 
