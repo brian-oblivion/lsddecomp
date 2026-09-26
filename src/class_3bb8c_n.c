@@ -856,7 +856,7 @@ extern void func_8003B624(void *arg0, s32 arg1, void *arg2);
 extern s32 gStyleStripRectA[];
 extern s32 gStyleStripScratchA[];
 extern s32 gStyleStripRectB[];
-extern s32 D_80087468[];
+extern s32 gStyleStripScratchB[];
 
 void DrawStyleTables(void) {
     void *a0, *a2;
@@ -869,7 +869,7 @@ void DrawStyleTables(void) {
     } else if ((u32)(gStyleKind - 3) < 3) {
         a1 = 1;
         a0 = gStyleStripRectB;
-        a2 = D_80087468;
+        a2 = gStyleStripScratchB;
     } else {
         return;
     }
