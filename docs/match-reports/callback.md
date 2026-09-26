@@ -575,7 +575,7 @@ of the same address to make redundant. The residue here is confirmed
 instruction-SELECTION (folded vs. unfolded addressing for `D_8006D8D8`'s
 loop-body access), not a redundant-load-elimination opportunity -- the
 "dead reload" lever is a different mechanism (it worked on
-`StageMap__BuildRateEntries`/`StageMap__LoadElementResources` in a different unit this round by removing
+`StageMap__LoadChunksAround`/`StageMap__LoadElementResources` in a different unit this round by removing
 an already-redundant fetch, not by changing which addressing mode a fresh
 fetch compiles to) and has no site to attach to here.
 

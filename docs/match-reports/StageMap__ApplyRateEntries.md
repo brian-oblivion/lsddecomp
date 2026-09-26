@@ -144,7 +144,7 @@ allocation wrong.
 > length, identical `$s3`<->`$s4` residue -- unchanged from round 39.
 >
 > **Read the body for the dead-reload shape before touching anything, per
-> this round's brief.** The lever closed on `StageMap__BuildRateEntries`/`StageMap__LoadElementResources`
+> this round's brief.** The lever closed on `StageMap__LoadChunksAround`/`StageMap__LoadElementResources`
 > this same unit last round is "a value already held in a local gets
 > reloaded via the same expression a second time, into the same local, for
 > a second single use" -- a same-block RELOAD of an already-computed value.
@@ -436,7 +436,7 @@ plain count of `self->arr[i].flag != 0`).
 New header additions (all committed, additive): `Obj866E8Methods::slotFC`
 (StageMap__ApplyRateEntries's OWN identity slot, verified via classtable -- signature
 `(self, ChunkLoadEntry *arr1, s32 count)`; later corrected once
-StageMap__BuildRateEntries needed to CALL this slot and the earlier draft signature here
+StageMap__LoadChunksAround needed to CALL this slot and the earlier draft signature here
 turned out to have been copy-pasted from slot88's shape by mistake -- see
 that function's own report) and `::slot108` (split out of the
 `pad0FC`/`pad108` padding gaps -- `pad0FC` was actually TWO slots, `0xFC`
@@ -480,11 +480,11 @@ void StageMap__ApplyRateEntries(Obj866E8 *self, ChunkLoadEntry *arr1, s32 count)
 (Correction from an earlier draft of this report: step 2 dispatches
 `slot88`, an ALREADY-DOCUMENTED slot shared with `StageMap__OnNotifyTag1`
 -- StageMap__ApplyRateEntries's own identity is `slotFC` at `+0xFC`, confirmed via
-`tools/classtable.py`, and is dispatched INTO from `StageMap__BuildRateEntries`
+`tools/classtable.py`, and is dispatched INTO from `StageMap__LoadChunksAround`
 elsewhere in this unit, not from within this function's own body. An
 earlier draft of this report conflated the two and, worse, propagated
 `slot88`'s parameter shape onto the `slotFC` header entry itself -- that
-header mistake was caught and fixed while deriving StageMap__BuildRateEntries's call
+header mistake was caught and fixed while deriving StageMap__LoadChunksAround's call
 site, which needed `slotFC`'s REAL signature, `(self, ChunkLoadEntry*,
 s32 count)`, to compile. If re-deriving this function, `self->methods`
 offset `0xFC` is `slotFC` = StageMap__ApplyRateEntries itself; do not use that name for
@@ -620,4 +620,4 @@ Round 78 (track 3, naming pass, bravo).
 
 | symbol | name | tier | evidence |
 | --- | --- | --- | --- |
-| `func_8004BB3C` | `StageMap__ApplyRateEntries` | B | Occupant of `gStageMapMethods` +0x0FC (`slotFC`), verified via classtable as its own identity slot (already documented in `include/class_3bb8c.h`). Iterates the `ChunkLoadEntry[count]` array `StageMap__BuildRateEntries` just filled, resolving an `Elem` per entry (`slot118`) and either attaching (`ptr0 != 0`: `slot78`, sets `rate`, `flag = 1`) or detaching (`slot74`, `flag = 0`) it, then recomputes `self->unk1B4` via `StageMap__CountFlaggedElements`. "Apply...Entries" mirrors the "Build...Entries" name of its own caller-side producer. |
+| `func_8004BB3C` | `StageMap__ApplyRateEntries` | B | Occupant of `gStageMapMethods` +0x0FC (`slotFC`), verified via classtable as its own identity slot (already documented in `include/class_3bb8c.h`). Iterates the `ChunkLoadEntry[count]` array `StageMap__LoadChunksAround` just filled, resolving an `Elem` per entry (`slot118`) and either attaching (`ptr0 != 0`: `slot78`, sets `rate`, `flag = 1`) or detaching (`slot74`, `flag = 0`) it, then recomputes `self->unk1B4` via `StageMap__CountFlaggedElements`. "Apply...Entries" mirrors the "Build...Entries" name of its own caller-side producer. |

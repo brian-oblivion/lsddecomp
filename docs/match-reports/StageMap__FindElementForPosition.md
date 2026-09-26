@@ -179,7 +179,7 @@ NON_MATCHING body promoted, round 73
 > favor of never-searched ground. This round staffed it anyway, once the
 > unit's other targets (the dead-reload screen on `StageMap__ApplyRateEntries`/
 > `StageMap__ComputeFootprintDescriptor`, both negative; two structural probes each on
-> `StageMap__BuildRateEntries`/`StageMap__LoadElementResources`, all four negative) turned up nothing --
+> `StageMap__LoadChunksAround`/`StageMap__LoadElementResources`, all four negative) turned up nothing --
 > per this round's own guidance to treat a "permuter-exhausted" verdict as
 > needing a CHANGED state, not a repeat, a **second independent RNG run**
 > (not a rerun of round 38's own search) qualifies, since round 38's run
@@ -284,7 +284,7 @@ NON_MATCHING body promoted, round 73
 > prose.** Rebuilt the exact preserved body below from a clean
 > `INCLUDE_ASM` baseline (one fix needed first: `Unk14Obj::unk18`/`unk20`
 > were retyped to `union { s32 w; u16 h; }` by a LATER round's
-> `StageMap__ComputeFootprintDescriptor`/`StageMap__BuildRateEntries` work after this report was written, so
+> `StageMap__ComputeFootprintDescriptor`/`StageMap__LoadChunksAround` work after this report was written, so
 > the preserved body's plain `r->unk18`/`r->unk20` no longer compiled --
 > `.w` added at both sites, a mechanical header-drift fix, not a residue
 > change). Confirmed: still 63/70, no drift, identical residue.
@@ -353,7 +353,7 @@ Elem *StageMap__FindElementForPosition(Obj866E8 *self, Unk54Struct *arg1) {
 
 (`r->unk18`/`r->unk20` are written `.w` here because `Unk14Obj::unk18`/
 `unk20` were retyped to `union { s32 w; u16 h; }` by a later round's work
-on `StageMap__ComputeFootprintDescriptor`/`StageMap__BuildRateEntries`, after this report's original body was
+on `StageMap__ComputeFootprintDescriptor`/`StageMap__LoadChunksAround`, after this report's original body was
 written -- mechanical header-drift fix, not a residue change, same as
 round 20 already noted.)
 
@@ -487,7 +487,7 @@ drift-free claim, plus one body that could never have linked at all (it
 called a symbol since renamed, so its figure had measured nothing). **All
 four preserved bodies in `class_3bb8c` were rebuilt this round and all four
 are honest** — `StageMap__FindElementForPosition` 68/70, `ComputeCellWorldOffsets` 58/73,
-`StageMap__BuildRateEntries` 125/140, `StageMap__LoadElementResources` 130/150. No stale figure and no
+`StageMap__LoadChunksAround` 125/140, `StageMap__LoadElementResources` 130/150. No stale figure and no
 never-linked body in this unit.
 
 No new lever was tried — alpha died before attempting one. This is a

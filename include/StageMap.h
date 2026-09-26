@@ -213,7 +213,7 @@ struct StageMapMethods {
     /* +0x0F0 */ void (*disable)(StageMap *self);     /* StageMap__Disable */
     /* +0x0F4 */ s32 (*updateFootprintTracking)(StageMap *self); /* StageMap__UpdateFootprintTracking */
     /* +0x0F8 */ s32 (*buildRateEntries)(StageMap *self, s32 val, LongVec3 *pos,
-                                         ChunkSlotSpec *specs); /* StageMap__BuildRateEntries (returns nothing; see the banner) */
+                                         ChunkSlotSpec *specs); /* StageMap__LoadChunksAround (returns nothing; see the banner) */
     /* +0x0FC */ void (*applyRateEntries)(StageMap *self, ChunkLoadEntry *entries,
                                           s32 count); /* StageMap__ApplyRateEntries */
     /* +0x100 */ void (*onNotifyTag1)(StageMap *self, void *sender,
@@ -318,7 +318,7 @@ s32 ComputeCellWorldOffsets(s32 *outPos, s32 *outBuf, StageGridDimensions *confi
 void StageMap__Enable(StageMap *self);
 void StageMap__Disable(StageMap *self);
 s32 StageMap__UpdateFootprintTracking(StageMap *self);
-void StageMap__BuildRateEntries(StageMap *self, s32 val, LongVec3 *pos, ChunkSlotSpec *specs);
+void StageMap__LoadChunksAround(StageMap *self, s32 val, LongVec3 *pos, ChunkSlotSpec *specs);
 s32 StageMap__ComputeNeighbourMask(StageMap *self, s32 val, s32 flag);
 s32 StageMap__ComputeChunkLoadEntry(StageMap *self, ChunkLoadEntry *entry, s32 divisor, s32 flag,
                                  s32 val, s32 savedResult, s32 key); /* 0 or 1; BuildRateEntries discards it */

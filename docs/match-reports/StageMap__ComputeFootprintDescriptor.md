@@ -174,7 +174,7 @@ were correct and unchanged -- the stall was purely source SHAPE).
 >
 > **Checked this body specifically for the "already-held value reloaded a
 > second time into the same local" shape** (the lever that closed real
-> residue on `StageMap__BuildRateEntries`/`StageMap__LoadElementResources` last round). `u14a` and `u14b`
+> residue on `StageMap__LoadChunksAround`/`StageMap__LoadElementResources` last round). `u14a` and `u14b`
 > both come from `e->unkC->unk14`-shaped expressions, but they are
 > DIFFERENT VALUES: `u14a = self->methods->slot118(self, e->unk4->unk32)
 > ->unkC->unk14` (a *different* `Elem`, resolved via a key lookup) and
@@ -240,7 +240,7 @@ were correct and unchanged -- the stall was purely source SHAPE).
 > store-then-reread narrow-field codegen sensitivity) are unchanged from 16
 > prior attempts across 5 rounds; not re-attempted further -- time went to
 > the two higher-pre-screen-count functions instead
-> (`StageMap__BuildRateEntries`/`StageMap__LoadElementResources`).
+> (`StageMap__LoadChunksAround`/`StageMap__LoadElementResources`).
 
 > **ROUND 32 (bravo2): re-verified, no drift; permuter scaffold checked and
 > found UNRELIABLE for this function.** Rebuilt the preserved body: 72/106

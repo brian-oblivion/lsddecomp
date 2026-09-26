@@ -153,7 +153,7 @@ rotation, so the tell is a caller-saved register mismatch instead.
 > **Search:** `timeout 900 ... -j 4 --stack-diffs --stop-on-zero
 > --best-only`, backgrounded. **34293 iterations. No `rc` captured** -- the
 > same "wrapping shell torn down before the trailing echo runs" trap as
-> this round's `StageMap__BuildRateEntries` search (and round 17's `StageMap__ApplyRateEntries`
+> this round's `StageMap__LoadChunksAround` search (and round 17's `StageMap__ApplyRateEntries`
 > before it). No permuter workers remained in the process list once
 > checked, consistent with the 900s bound having fired; recorded as
 > uncaptured rather than inferred as `124`.
@@ -163,7 +163,7 @@ rotation, so the tell is a caller-saved register mismatch instead.
 > 0. Two changes, both kept:
 > 1. The `gpu = (*slot)->unk14; gpu->unk0 = 0;` reload-then-store replaced
 >    with a direct `(*slot)->unk14->unk0 = 0;` -- the SAME lever that
->    closed part of `StageMap__BuildRateEntries`'s residue this same round (see that
+>    closed part of `StageMap__LoadChunksAround`'s residue this same round (see that
 >    report's proposed learning).
 > 2. The `found`-path tail's combined pointer-cast-and-dereference,
 >    `(*slot)->unk38 = *(EntryChildObj **)((u8 *)entry->unk10 + off2);`,
@@ -172,7 +172,7 @@ rotation, so the tell is a caller-saved register mismatch instead.
 >    *next;`.
 >
 > **Translated as found and re-verified through the full oracle:** isolated
-> single-function test (sibling `StageMap__BuildRateEntries` restored to `INCLUDE_ASM`
+> single-function test (sibling `StageMap__LoadChunksAround` restored to `INCLUDE_ASM`
 > while measuring) gives **142/150, no drift**. `asm-differ` confirms
 > EVERYTHING from `0x8004BEE0` through the epilogue now matches retail
 > byte-for-byte -- both fixes closed their targeted sites completely, with
@@ -185,7 +185,7 @@ rotation, so the tell is a caller-saved register mismatch instead.
 > found the "redundant reload, re-derive inline instead" lever on a
 > residue this report's own five-round history had filed under plain
 > register identity without ever isolating this specific mechanism. See
-> `StageMap__BuildRateEntries`'s report for the shared proposed learning. **Disposition:
+> `StageMap__LoadChunksAround`'s report for the shared proposed learning. **Disposition:
 > 142/150, exact length, `INCLUDE_ASM` restored, preserved body updated in
 > `src/class_3bb8c.c`.**
 
@@ -549,7 +549,7 @@ fixes, worth recording since each is a small, generalizable lever:
    `idxVal` live. Routing both the `unk18` fill and `GsLinkObject4`'s `tmd`
    argument through `((LinkResEntry *)(*slot)->unk20)->unk10` instead of
    `((LinkResEntry *)idxVal)->unk10` recovered this. Same idiom as
-   `Unk14Obj::unk0` in `StageMap__BuildRateEntries`'s report and `u14b` in
+   `Unk14Obj::unk0` in `StageMap__LoadChunksAround`'s report and `u14b` in
    `StageMap__ComputeFootprintDescriptor`'s -- a THIRD independent confirmation this round.
 4. **A cached pointer needs to be RE-cached (not reused) at each natural
    "batch" boundary, and the boundary is where retail's own delay-slot
@@ -712,7 +712,7 @@ drift-free claim, plus one body that could never have linked at all (it
 called a symbol since renamed, so its figure had measured nothing). **All
 four preserved bodies in `class_3bb8c` were rebuilt this round and all four
 are honest** — `StageMap__FindElementForPosition` 68/70, `ComputeCellWorldOffsets` 58/73,
-`StageMap__BuildRateEntries` 125/140, `StageMap__LoadElementResources` 130/150. No stale figure and no
+`StageMap__LoadChunksAround` 125/140, `StageMap__LoadElementResources` 130/150. No stale figure and no
 never-linked body in this unit.
 
 No new lever was tried — alpha died before attempting one. This is a
@@ -725,7 +725,7 @@ unchanged.
 **This section's verdict is WRONG and the entry above is correct.** While
 runner bravo was between turns, the head read its saved permuter candidate,
 noticed it carried the same dead-reload construct that had just gained 12
-words on the sibling `StageMap__BuildRateEntries`, tried to apply it, and **failed to build**
+words on the sibling `StageMap__LoadChunksAround`, tried to apply it, and **failed to build**
 -- ``LinkResource' undeclared``. The head recorded the lever here as
 **UNTESTED** and flagged it as the next round's cheapest step. Bravo then
 resumed and tested it properly, reaching **142/150**.
@@ -753,7 +753,7 @@ which is what bravo did.
 
 ---
 
-## (superseded) ROUND 40 (bravo's search, head's analysis): first-ever permuter search, no zero -- but the saved candidate carries THE SAME LEVER that gained 12 words on StageMap__BuildRateEntries, and it is UNTESTED here
+## (superseded) ROUND 40 (bravo's search, head's analysis): first-ever permuter search, no zero -- but the saved candidate carries THE SAME LEVER that gained 12 words on StageMap__LoadChunksAround, and it is UNTESTED here
 
 **Provenance.** Runner bravo built the scaffold and ran the search, then ended
 its session waiting on a notification that was never coming, without writing
@@ -778,7 +778,7 @@ next round ranks on cost rather than re-deriving it.
 
 Reduced to statements, the score-65 candidate makes two real changes among a
 great deal of the permuter's own reformatting noise. The first is the
-**identical construct** that took the sibling `StageMap__BuildRateEntries` from 125/140 to
+**identical construct** that took the sibling `StageMap__LoadChunksAround` from 125/140 to
 **137/140** this same round -- eliminating a redundant reload of a pointer
 already held in a local:
 

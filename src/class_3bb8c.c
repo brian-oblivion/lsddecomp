@@ -10,7 +10,7 @@
  * (SplitLongVec3) into a grid-cell descriptor (Descriptor10, byte row/column
  * plus sub-cell halfword offsets); StageMap__UpdateFootprintTracking runs
  * every enabled tick (paired with class_3ac78's StageMap__AdvanceRateCountdown)
- * to refresh that descriptor and notify on change; StageMap__BuildRateEntries
+ * to refresh that descriptor and notify on change; StageMap__LoadChunksAround
  * / StageMap__ComputeNeighbourMask / StageMap__ComputeChunkLoadEntry /
  * StageMap__ApplyRateEntries build and apply a per-element rate table from
  * a ChunkSlotSpec key/flag array (sDefaultTargetSpecs); and
@@ -144,7 +144,7 @@ s32 StageMap__UpdateFootprintTracking(StageMap *self) {
 
 /* MATCH, round 63 (delta): closed a 137/140 stall that had stood since round
  * 40 across four re-verifications, ten inert structural variants and a
- * 37,155-iteration permuter search -- see docs/match-reports/StageMap__BuildRateEntries.md.
+ * 37,155-iteration permuter search -- see docs/match-reports/StageMap__LoadChunksAround.md.
  * The 3-word residue was a genuine pure register-identity difference (funcdiff
  * ins 0 / del 0, no asm-differ markers): retail held the second loop's element
  * pointer in $a2, the build in $v0. The fix was to DELETE a local -- the
@@ -155,7 +155,7 @@ s32 StageMap__UpdateFootprintTracking(StageMap *self) {
  * round.
  * The `__asm__("")` barrier this body used to carry before `u14 = ...` is gone:
  * with `e` merged it is no longer needed, verified by whole-image rebuild. */
-void StageMap__BuildRateEntries(StageMap *self, s32 val, LongVec3 *arg2, ChunkSlotSpec *arg3) {
+void StageMap__LoadChunksAround(StageMap *self, s32 val, LongVec3 *arg2, ChunkSlotSpec *arg3) {
     s32 divisor;
     s32 flag;
     s32 savedResult;

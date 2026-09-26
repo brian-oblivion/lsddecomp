@@ -312,13 +312,13 @@ Unit `class_3bb8c`. FRESH this round (no prior report). Restored to
 `INCLUDE_ASM`; no C left in `src/`.
 
 Only a caller-side prototype existed before this round (in
-`include/class_3bb8c.h`, established by `StageMap__BuildRateEntries`'s own call site --
+`include/class_3bb8c.h`, established by `StageMap__LoadChunksAround`'s own call site --
 see that header's comment). This round implements the body and finds the
 prototype's return type was wrong.
 
 ## What it does
 
-Called once per element from `StageMap__BuildRateEntries`'s outer loop, filling one
+Called once per element from `StageMap__LoadChunksAround`'s outer loop, filling one
 `ChunkLoadEntry` slot (`arg1`, `&stackBuf[count]` at the call site) and
 returning whether it produced a "real" entry (`1`) or a blank one (`0`):
 
@@ -364,23 +364,23 @@ this function.
 - **`StageMap__ComputeChunkLoadEntry`'s own prototype**: return type corrected `void` ->
   `s32`. Retail explicitly sets `$v0` to 0 or 1 on every path before
   returning (see the tail sequence below) -- a `void` function would never
-  do this. `StageMap__BuildRateEntries`, the only caller, discards the result, which is
+  do this. `StageMap__LoadChunksAround`, the only caller, discards the result, which is
   presumably why nobody caught this from the caller side alone.
 
-  **This retype is safe today only because `StageMap__BuildRateEntries` is still
+  **This retype is safe today only because `StageMap__LoadChunksAround` is still
   `INCLUDE_ASM`, and it is a LOAD-BEARING fact for whoever attempts
-  `StageMap__BuildRateEntries` next.** `StageMap__BuildRateEntries` is a live 125/140 stall in this
+  `StageMap__LoadChunksAround` next.** `StageMap__LoadChunksAround` is a live 125/140 stall in this
   same unit that calls `StageMap__ComputeChunkLoadEntry` and discards the result -- exactly
   the condition under which a declared return type controls whether GCC
   tail-merges identical DISCARDED call sites into one shared block or
   keeps them separate (this round's own near-miss queue independently
   measured the same mechanism from the other direction: N calls merging
-  into groups partitions by declared return type). If `StageMap__BuildRateEntries`'s
+  into groups partitions by declared return type). If `StageMap__LoadChunksAround`'s
   own word count doesn't match expectations, or shows an unexplained
   2-or-4-word residue around calls to `StageMap__ComputeChunkLoadEntry`, check this
   prototype before assuming a new residue class -- the `s32` return here
   is evidence-backed (retail's own `$v0` sets, not a guess), so the fix is
-  almost certainly on `StageMap__BuildRateEntries`'s side, not this declaration's.
+  almost certainly on `StageMap__LoadChunksAround`'s side, not this declaration's.
 - **Two new `extern` declarations**: `sRateKeyMask[7]` and
   `sRateEntryTable[7]`. Both sizes are PROVEN, not guessed -- the data file
   (`asm/data/76DC8.data.s`) places exactly 7 words at `sRateKeyMask` before
@@ -552,7 +552,7 @@ already existed.
   Two register swaps in the same function are not interchangeable just
   because they look alike in a diff -- each needs its own search, and a fix
   for one is not evidence about the other.
-- **`StageMap__BuildRateEntries`'s own call-site-derived prototype for a not-yet-matched
+- **`StageMap__LoadChunksAround`'s own call-site-derived prototype for a not-yet-matched
   sibling can still have the wrong RETURN TYPE**, even when every argument
   type is right. The caller discarding the value is exactly the condition
   under which this kind of mistake survives undetected until the callee
@@ -573,4 +573,4 @@ Round 78 (track 3, naming pass, bravo).
 
 | symbol | name | tier | evidence |
 | --- | --- | --- | --- |
-| `func_8004BA40` | `StageMap__ComputeChunkLoadEntry` | B | Fills one `ChunkLoadEntry` slot (`arg1->ptr0`/`arg1->id`) from `sRateEntryTable[key]`/`sRateKeyMask[key]` and `self->unk60(self->unk64, ...)` (a stored resolver callback), called once per enabled `ChunkSlotSpec` by `StageMap__BuildRateEntries`. "Compute...Entry" matches that caller's own "Build...Entries" name (one call computes one entry of the array the caller builds). Return type corrected `void`->`s32` in an earlier round (see the header's own note); not revisited here. |
+| `func_8004BA40` | `StageMap__ComputeChunkLoadEntry` | B | Fills one `ChunkLoadEntry` slot (`arg1->ptr0`/`arg1->id`) from `sRateEntryTable[key]`/`sRateKeyMask[key]` and `self->unk60(self->unk64, ...)` (a stored resolver callback), called once per enabled `ChunkSlotSpec` by `StageMap__LoadChunksAround`. "Compute...Entry" matches that caller's own "Build...Entries" name (one call computes one entry of the array the caller builds). Return type corrected `void`->`s32` in an earlier round (see the header's own note); not revisited here. |

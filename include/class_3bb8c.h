@@ -25,7 +25,7 @@ extern CellRect gDefaultElemRateOffset;
  * (asm/data/76DC8.data.s). */
 extern ChunkSlotSpec sDefaultTargetSpecs[7];
 
-/* Indexed by ChunkSlotSpec::key in StageMap__BuildRateEntries: the
+/* Indexed by ChunkSlotSpec::key in StageMap__LoadChunksAround: the
  * world offset of that neighbour's cellParent from the centre position. Bound unknown (`key` is the caller's
  * byte), so unsized. */
 extern LongVec3 sRateOffsetTable[];
@@ -58,7 +58,7 @@ extern ChunkSlotSpec *sFootprintResultPtrTable[7];
  * element's cellParent->coord2, reached through a cast. tx (+0x018) and tz
  * (+0x020) are unions because StageMap__ComputeFootprintDescriptor reads
  * each whole (the cell) and, later, as its low halfword (the offset):
- * retail reloads at the narrower width. StageMap__BuildRateEntries writes
+ * retail reloads at the narrower width. StageMap__LoadChunksAround writes
  * all three and clears `flg` (+0x000).
  */
 struct Unk14Obj {

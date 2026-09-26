@@ -367,7 +367,7 @@ load through a runtime-indexed global", §"BLOCKED: the `nop_mflo_mfhi` screen r
   asm-differ points where a fresh one was worth 500; ADDING a hoisted base pointer moved
   `SpuVmAlloc`. The delete direction needs a CALL-crossing live range, so it does not apply to
   leaves. A permuter never merges or deletes locals, so local count is a PARAMETER of its search
-  space: `StageMap__ComputeChunkLoadEntry` (four locals into two) and `StageMap__BuildRateEntries` (one deleted) closed after ~330k
+  space: `StageMap__ComputeChunkLoadEntry` (four locals into two) and `StageMap__LoadChunksAround` (one deleted) closed after ~330k
   iterations missed both. (a round 65; round 63)
 
 - **A register swap that REPEATS at every expansion of a `do { } while (0)` macro closes as a

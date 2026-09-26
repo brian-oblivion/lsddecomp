@@ -1,4 +1,6 @@
-# StageMap__BuildRateEntries -- MATCH (140/140 words, ins 0 / del 0, exact length)
+# StageMap__LoadChunksAround -- MATCH (140/140 words, ins 0 / del 0, exact length)
+
+> Renamed from `StageMap__BuildRateEntries` on 2026-09-26 (tools/rename.py). Address 0x8004b700.
 
 > Renamed from `Class866E8__BuildRateEntries` on 2026-09-26 (tools/rename.py). Address 0x8004b700.
 
@@ -19,8 +21,8 @@ relevant (no header, symbol or type change -- the fix removed a local).
 > Rebuilt the preserved `#if 0` body verbatim:
 >
 > ```
-> StageMap__BuildRateEntries: 137/140 words match (file 0x3BF00-0x3C130)
-> StageMap__BuildRateEntries: insertions 0 / deletions 0
+> StageMap__LoadChunksAround: 137/140 words match (file 0x3BF00-0x3C130)
+> StageMap__LoadChunksAround: insertions 0 / deletions 0
 > ```
 >
 > Exact length, no drift, and `asm-differ` shows zero `<`/`>` markers with
@@ -108,7 +110,7 @@ relevant (no header, symbol or type change -- the fix removed a local).
 > is a register-colour difference on a loop's walking pointer and another loop
 > in the same function walks something similar, try reusing that loop's
 > variable before trying anything else. Measured twice this round on the same
-> axis (`StageMap__ComputeChunkLoadEntry`: four locals to two; `StageMap__BuildRateEntries`: `e2` deleted),
+> axis (`StageMap__ComputeChunkLoadEntry`: four locals to two; `StageMap__LoadChunksAround`: `e2` deleted),
 > and bravo's `_SsInit` is a third instance from the other direction.
 >
 > **And the operational form of it: "the permuter found nothing" bounds the
@@ -250,7 +252,7 @@ relevant (no header, symbol or type change -- the fix removed a local).
 **The same source-level lever (drop a redundant reload-into-named-local,
 re-derive the pointer chain inline at the point of use) closed real residue
 on TWO different functions in the same unit this round**
-(`StageMap__BuildRateEntries` here, `StageMap__LoadElementResources` below) -- both permuter-found, both
+(`StageMap__LoadChunksAround` here, `StageMap__LoadElementResources` below) -- both permuter-found, both
 translating directly to idiomatic C with no cleanup needed. Worth adding to
 the standard lever list: when a value is loaded into a local, used once
 immediately, then the SAME expression is re-evaluated a second time into
@@ -315,7 +317,7 @@ its use site instead of caching it.
 > `s3,s5,s2,s1,ra,fp(s8),s7,s6,s4,s0` at offsets `0x8C,0x94,0x88,0x84,0xA4,
 > 0xA0,0x9C,0x98,0x90,0x80` off a `-0xA8` frame -- **the IDENTICAL set, at
 > the IDENTICAL offsets, in the IDENTICAL order**, to retail's own prologue
-> (`asm/nonmatchings/class_3bb8c/StageMap__BuildRateEntries.s`, lines 1-16). Same total
+> (`asm/nonmatchings/class_3bb8c/StageMap__LoadChunksAround.s`, lines 1-16). Same total
 > frame size too (`0xA8` both). **The lever does NOT apply: retail does not
 > save fewer callee-saved registers than this body does, so the
 > register-identity verdict for this function is CONFIRMED, not merely
@@ -335,14 +337,14 @@ its use site instead of caching it.
 
 Unit: `class_3bb8c`. Not toolchain-blocked: no `gp_rel` hit, no
 `addiu $at,$at,%lo` hit, no dense-`switch`/`jr $v0` table dispatch in
-`asm/nonmatchings/class_3bb8c/StageMap__BuildRateEntries.s`. Has a genuine `div`
+`asm/nonmatchings/class_3bb8c/StageMap__LoadChunksAround.s`. Has a genuine `div`
 (integer divide by a non-constant, `self->unk68->divisor`) via the standard
 maspsx-expanded zero/overflow-check sequence -- matched cleanly from the
 first attempt, no issue there.
 
 ## What it does
 
-`void StageMap__BuildRateEntries(Obj866E8 *self, s32 val, Unk54Struct *arg2, ChunkSlotSpec *arg3)`.
+`void StageMap__LoadChunksAround(Obj866E8 *self, s32 val, Unk54Struct *arg2, ChunkSlotSpec *arg3)`.
 If `arg3 == 0`, does nothing at all (whole body skipped). Otherwise:
 
 1. `divisor = self->unk68->divisor` (s16); `flag = (val / divisor) & 1`
@@ -378,7 +380,7 @@ call site only), and `Obj866E8Methods::slotFC` fixed to its real signature
 An earlier pass on this function stalled at 52/140 with a `funcdiff`
 DRIFT WARNING, which turned out to matter: direct `.o` inspection
 (`mipsel-linux-gnu-objdump -d build/src/class_3bb8c.c.o`, function
-`StageMap__BuildRateEntries`, subtracting its start address from the next function's
+`StageMap__LoadChunksAround`, subtracting its start address from the next function's
 start) showed the compiled body was **138 words, 2 words (8 bytes) SHORT**
 of retail's 140 -- `funcdiff`'s own reported byte RANGE is not proof of
 correct length; it can look plausible while a function is short, and the
@@ -454,7 +456,7 @@ longer needed once `e` is merged; verified by whole-image rebuild).
 ## HISTORICAL -- best body reached in round 40 (125/140, NO drift warning)
 
 ```c
-void StageMap__BuildRateEntries(Obj866E8 *self, s32 val, Unk54Struct *arg2, ChunkSlotSpec *arg3) {
+void StageMap__LoadChunksAround(Obj866E8 *self, s32 val, Unk54Struct *arg2, ChunkSlotSpec *arg3) {
     s32 divisor;
     s32 flag;
     s32 savedResult;
@@ -581,7 +583,7 @@ drift-free claim, plus one body that could never have linked at all (it
 called a symbol since renamed, so its figure had measured nothing). **All
 four preserved bodies in `class_3bb8c` were rebuilt this round and all four
 are honest** — `StageMap__FindElementForPosition` 68/70, `ComputeCellWorldOffsets` 58/73,
-`StageMap__BuildRateEntries` 125/140, `StageMap__LoadElementResources` 130/150. No stale figure and no
+`StageMap__LoadChunksAround` 125/140, `StageMap__LoadElementResources` 130/150. No stale figure and no
 never-linked body in this unit.
 
 No new lever was tried — alpha died before attempting one. This is a
@@ -671,7 +673,7 @@ to be worth reading.
 
 ```c
 #if 0
-void StageMap__BuildRateEntries(Obj866E8 *self, s32 val, Unk54Struct *arg2, ChunkSlotSpec *arg3) {
+void StageMap__LoadChunksAround(Obj866E8 *self, s32 val, Unk54Struct *arg2, ChunkSlotSpec *arg3) {
     s32 divisor;
     s32 flag;
     s32 savedResult;
@@ -728,4 +730,4 @@ Round 78 (track 3, naming pass, bravo).
 
 | symbol | name | tier | evidence |
 | --- | --- | --- | --- |
-| `func_8004B700` | `StageMap__BuildRateEntries` | B | Occupant of `gStageMapMethods` +0x0F8 (`slotF8`, verified its own identity via classtable -- see the corrected slot comment in `include/class_3bb8c.h`). Iterates a `ChunkSlotSpec[7]` (`sDefaultTargetSpecs` at its one known call site), calling `StageMap__ComputeNeighbourMask` once and `StageMap__ComputeChunkLoadEntry` per enabled entry to fill a 7-slot `ChunkLoadEntry` stack buffer, then dispatches the filled count through `slotFC` (`StageMap__ApplyRateEntries`). "Build...RateEntries" names the mechanic (assembling the entry array that the next slot applies), consistent with the sibling already-matched functions in this same vtable region (`StageMap__ConfigureRateEntry`, `StageMap__AdvanceRateCountdown`, `StageMap__FlushRateLatch`). |
+| `func_8004B700` | `StageMap__LoadChunksAround` | B | Occupant of `gStageMapMethods` +0x0F8 (`slotF8`, verified its own identity via classtable -- see the corrected slot comment in `include/class_3bb8c.h`). Iterates a `ChunkSlotSpec[7]` (`sDefaultTargetSpecs` at its one known call site), calling `StageMap__ComputeNeighbourMask` once and `StageMap__ComputeChunkLoadEntry` per enabled entry to fill a 7-slot `ChunkLoadEntry` stack buffer, then dispatches the filled count through `slotFC` (`StageMap__ApplyRateEntries`). "Build...RateEntries" names the mechanic (assembling the entry array that the next slot applies), consistent with the sibling already-matched functions in this same vtable region (`StageMap__ConfigureRateEntry`, `StageMap__AdvanceRateCountdown`, `StageMap__FlushRateLatch`). |
