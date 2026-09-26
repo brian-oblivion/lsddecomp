@@ -10,55 +10,17 @@
  * All six functions matched and named in round 81 (alpha).
  */
 #include "common.h"
-#include "BasicClass.h"
+#include "FlatLightObj.h"
 
 /*
- * FlatLightObj: a BasicClass (class id 0x6, direct BasicClass child) that
- * owns one Psy-Q flat light. 0x20 bytes (New_FlatLightObj's allocation).
- * Fields past BasicClass's are a Psy-Q light id at +0x00C and a GsF_LIGHT
- * (LIBGS.H: `int vx,vy,vz; unsigned char r,g,b;`) at +0x010, laid out here
- * as FlatLightParams -- same fields, same offsets -- and handed to
- * GsSetFlatLight by address. "FlatLight" is Sony's own name (GsF_LIGHT,
- * GsSetFlatLight), not a guess. LIBGS.H is not included: its prototypes
- * collide in shared headers, so the one used here is declared locally with
- * a local copy of the struct.
- *
- * The unit's only outside caller, LightRig__LightRig (src/code_322b4.c,
- * include/LightRig.h), calls New_FlatLightObj with light ids 0, 1, 2 and
- * keeps the three in LightRig::lights, the fixed 3-light flat-lighting rig
- * that also sets the ambient colour (round 86).
+ * The class is declared in include/FlatLightObj.h (track 4, round 87): the
+ * object, its table and the evidence for the name live there. The unit's
+ * only outside caller of New_FlatLightObj is LightRig__LightRig
+ * (src/code_322b4.c, include/LightRig.h), with light ids 0, 1, 2.
  */
-typedef struct FlatLightObj FlatLightObj;
-typedef struct FlatLightObjMethods FlatLightObjMethods;
-
-/* The colour triple. Copied as a whole struct (FlatLightObj__SetColor): GCC's block
- * move is what loads all three bytes before storing any. */
-typedef struct {
-    s8 r, g, b;
-} FlatLightColor;
-
-typedef struct {
-    /* +0x000 */ s32 vx, vy, vz;
-    /* +0x00C */ FlatLightColor rgb;
-} FlatLightParams; /* == GsF_LIGHT */
-
-struct FlatLightObjMethods {
-    BASICCLASS_SLOTS(FlatLightObj, (FlatLightObj *self, s32 lightId));
-    /* +0x040 */ void (*setLightId)(FlatLightObj *self, s32 lightId);
-    /* +0x044 */ void (*setColor)(FlatLightObj *self, s32 update, FlatLightColor *rgb);
-    /* +0x048 */ void (*setDirection)(FlatLightObj *self, s32 update, s16 *dir);
-};
-
-struct FlatLightObj {
-    BASICCLASS_FIELDS(FlatLightObjMethods);
-    /* +0x00C */ s32 lightId;
-    /* +0x010 */ FlatLightParams light;
-};
 
 extern void *BMemPMgrAlloc(s32 size);
 extern int GsSetFlatLight(int id, FlatLightParams *lt);
-extern FlatLightObjMethods gFlatLightObjMethods;
-FlatLightObjMethods *Get_vtable_FlatLightObj(void);
 
 FlatLightObj *New_FlatLightObj(s32 lightId) {
     FlatLightObj *self;
