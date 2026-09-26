@@ -11,7 +11,7 @@
  * the slice had to become [c][o][c] and the second `c` needed its own name.
  * The first half kept `code_179d8_f`.
  *
- * A ONE-FUNCTION UNIT IS FINE and has precedent (`libcard_card_clear`). Nothing
+ * A ONE-FUNCTION UNIT IS FINE and has precedent (`libcard_card`). Nothing
  * here is a candidate for folding into a neighbour: `code_179d8_f` ends at the
  * object, and 0x272C8 onward is the psyq_SpuSetMute block.
  *

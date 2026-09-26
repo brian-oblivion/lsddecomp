@@ -1609,7 +1609,7 @@ segments:
       # clusters, so the only way to make it assignable without putting
       # trampolines in a C unit is to give it its own segment.  12 words -- it
       # should close in one sitting and then this unit is finished.
-      - [0x41328, c, libcard_card_clear]
+      - [0x41328, c, libcard_card]
       # class_3bb8c_h_c WAS 5 trampolines (0xB0 x4 at 0x41358/68/78/98, 0xA0 x1
       # at 0x41388), 0x41358..0x413A8.
       # ROUND 34: all five are Sony's, one libcard object each, tiling the

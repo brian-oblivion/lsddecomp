@@ -1,5 +1,5 @@
 /*
- * libcard_card_clear -- Sony's libcard _card_clear, carried as assembly.
+ * libcard_card -- Sony's libcard _card_clear, carried as assembly.
  *
  * _card_clear is memory-card library code: it calls only libcard's _new_card
  * and _card_write. Its Sony object is not on any SDK disc in sdk/, so it
@@ -17,4 +17,4 @@
 #include "common.h"
 
 /* MATCHING: unmatchable as C (Sony-assembled `li` form); keep INCLUDE_ASM. */
-INCLUDE_ASM("asm/nonmatchings/libcard_card_clear", _card_clear);
+INCLUDE_ASM("asm/nonmatchings/libcard_card", _card_clear);
