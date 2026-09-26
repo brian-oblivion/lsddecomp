@@ -490,12 +490,11 @@ s32 CD_readm(s32 arg0, s32 arg1, s32 arg2)
      * (three distinct address computations -- two folded through $at, one
      * unfolded through a real GPR) instead of the single shared store GCC's
      * cross-jump/tail-merge pass produces from the equivalent if/else-if/else
-     * or switch. The barrier on case1 and the local `volatile s32 *` pointers
-     * on case3/case2's-neighbour below are what keeps each store distinct
-     * enough that the merge heuristic can't unify them -- removing any one
-     * of the three re-merges a pair and drops 4-24 bytes. This is a
-     * scheduling/block-identity lever (order/selection), not a register-
-     * identity fix: no operand constraint pins a register here. */
+     * or switch. The match report records how the `goto` layout and the
+     * local `volatile s32 *` pointers below were found to keep the stores
+     * apart. A bare `__asm__("")` after case1's store, once part of that
+     * recipe, was retired in round 89: removing it left the object
+     * byte-identical. */
     if (t == 0) {
         goto case1;
     }
@@ -505,7 +504,6 @@ s32 CD_readm(s32 arg0, s32 arg1, s32 arg2)
     goto case3;
 case1:
     D_8006D8F0 = 0x200;
-    __asm__("");
     goto join;
 case2:
     D_8006D8F0 = 0x249;
