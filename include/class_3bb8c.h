@@ -1164,7 +1164,7 @@ struct Class86B60 {
     u8 pad040[0x048 - 0x040];
     /* Set up by the base ctor chain (Get_vtable_TaskCore()->ctor), read
      * (never written) by Class86B60__Class86B60 right after. Same offset/shape as
-     * `StreamTaskObj::unk48` in include/code_2c054.h (also a base-ctor-
+     * `StreamTask::unk48` in include/StreamTask.h (also a base-ctor-
      * chain output), but kept as its own local type since nothing ties
      * the two classes together and the one slot this unit dispatches
      * through (+0x09C) isn't among that type's own known slots. */

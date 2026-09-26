@@ -10,7 +10,7 @@
  * src/code_2cc8c.c, code_2cc8c_b.c, code_2cc8c_c.c (everything from +0x058
  * on). The object is 0xA4 bytes (New_TaskCore). Three classes derive from
  * it, each ctor calling TaskCore__TaskCore first (`typeviews.py --tree`):
- * StreamTaskObj (0x1130, gStreamTaskObjMethods, code_2c054), Class86B60
+ * StreamTask (0x1130, gStreamTaskMethods, include/StreamTask.h), Class86B60
  * (0x1F130, class_3bb8c_c/_d) and GraphRoom (0x2F130, include/GraphRoom.h).
  *
  * Construction, ctor(target, soundBankPath, sound): the base ctor, then
@@ -46,18 +46,18 @@
  * call playSound(0x10), VabStreamObj's PlayTone on `sound`; setActiveSlot
  * and setSlotCursor call playSound(0) when their last argument is nonzero.
  *
- * The subclasses' own classes are later track-4 jobs. StreamTaskObj's
- * object and table (include/code_2c054.h) already expand these macros:
- * straightforward and byte-identical in round 84, with one contradiction
- * left standing: its +0x044 override, StreamTaskObj__Configure, takes five
- * arguments where IntermediateBase's init takes (args, mode). Class86B60
+ * StreamTask (include/StreamTask.h, round 87) expands these macros; its
+ * +0x044 override StreamTask__Init takes (args, streamName, streamGroup,
+ * autoPlay) where IntermediateBase's init takes (args, mode): the table
+ * keeps the inherited slot and code_1677c's callers cast to
+ * StreamTaskInitFn. Class86B60
  * (include/class_3bb8c.h) keeps its own view: it names +0x058 `state` (this
  * class's activeSlot) and types +0x060 a struct pointer (this class's
  * s32 *slotCounts). GraphRoom (include/GraphRoom.h, round 87) expands these
  * macros; its ctor is void like every other.
  *
  * IntermediateBase's onInit slot is (self, s32, s32, s32), from init's
- * call; TaskCore__OnInit and StreamTaskObj's override take self alone, and
+ * call; TaskCore__OnInit and StreamTask's override take self alone, and
  * the one up-call that passes self alone casts the slot.
  *
  * The objects TaskCore holds from classes with no header yet (VabStreamObj,
@@ -95,14 +95,14 @@ struct TaskCoreTarget {
     /* +0x070 */ void (*playSound)(Self *self, s32 tone);        /* TaskCore__PlaySound */         \
     /* +0x074..+0x084: onPadEvent's cases. Called with self alone: $a1 still  \
      * holds the sender at that call, but no occupant in any of the four     \
-     * tables reads it, and StreamTaskObj's overrides up-call with self only. */ \
+     * tables reads it, and StreamTask's overrides up-call with self only. */ \
     /* +0x074 */ void (*onPad21)(Self *self);      /* TaskCore__func_8003C7F4: onPadEvent's 0x21 */ \
     /* +0x078 */ void (*onPadConfirm)(Self *self); /* TaskCore__OnPadConfirm: 0x19 */ \
     /* +0x07C */ void (*onPadCancel)(Self *self);  /* TaskCore__OnPadCancel: 0x17 */ \
     /* +0x080 */ void (*onPadPrev)(Self *self);    /* TaskCore__OnPadPrev: 0x12 */ \
     /* +0x084 */ void (*onPadNext)(Self *self);    /* TaskCore__OnPadNext: 0x13 */ \
-    /* +0x088 */ void *slot88;                                   /* NULL; StreamTaskObj__NoOpSlot88 */ \
-    /* +0x08C */ void *slot8C;                                   /* NULL; StreamTaskObj__NoOpSlot8C */ \
+    /* +0x088 */ void *slot88;                                   /* NULL; StreamTask__NoOpSlot88 */ \
+    /* +0x08C */ void *slot8C;                                   /* NULL; StreamTask__NoOpSlot8C */ \
     /* +0x090 */ void (*tick)(Self *self);                       /* TaskCore__Tick: setState(0xB) */ \
     /* +0x094 */ void (*refreshViewValue)(Self *self);           /* TaskCore__RefreshViewValue */  \
     /* +0x098 */ void (*setCallback)(Self *self, void (*callback)(void *ctx), void *ctx); /* TaskCore__SetCallback */ \
@@ -174,7 +174,7 @@ struct TaskCoreTarget {
     /* +0x096 */ u8 unk96[3];           /* setColors */                                            \
     /* +0x099 */ u8 pad099[3];                                                                     \
     /* +0x09C */ void (*viewCallback)(void *ctx); /* setCallback; refreshViewValue calls it */     \
-    /* +0x0A0 */ void *viewCallbackCtx  /* the object is 0xA4 bytes: StreamTaskObj's own fields start at +0x0A4 */
+    /* +0x0A0 */ void *viewCallbackCtx  /* the object is 0xA4 bytes: StreamTask's own fields start at +0x0A4 */
 
 struct TaskCoreMethods {
     TASKCORE_SLOTS(TaskCore, (TaskCore *self, TaskCoreTarget *target, char *soundBankPath, BasicClass *sound));

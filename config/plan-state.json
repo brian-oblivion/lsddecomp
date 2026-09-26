@@ -968,6 +968,11 @@
           "date": "2026-09-25",
           "header": "include/Sprite.h"
         },
+        "gStreamTaskMethods": {
+          "class": "StreamTask",
+          "date": "2026-09-26",
+          "header": "include/StreamTask.h"
+        },
         "gTaskCoreMethods": {
           "class": "TaskCore",
           "date": "2026-09-25",
