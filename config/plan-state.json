@@ -852,6 +852,11 @@
           "date": "2026-09-26",
           "header": "include/DrawSystem.h"
         },
+        "D_8006D3C8": {
+          "class": "Class6D3C8",
+          "date": "2026-09-26",
+          "header": "include/Class6D3C8.h"
+        },
         "D_8006D430": {
           "class": "Class6D430",
           "date": "2026-09-25",
