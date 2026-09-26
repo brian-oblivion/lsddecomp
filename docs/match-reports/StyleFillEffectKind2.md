@@ -14,7 +14,7 @@ local. Four separate things were wrong, found in this order:
 | # | change | effect |
 | --- | --- | --- |
 | 1 | `gStyleSpawnTableIndex = randval % 6;` | retail's magic is `0x2AAAAAAB` with no shift = signed **/6**; the preserved `randval - (randval / 3) * 6` computed a different function. 49 -> 51/79 |
-| 2 | first `D_8008E0C0` store through `S32BoxK2 *slot` (`slot->v = ...`) | the whole `% 20` prefix (`lui 0x6666`, `lw gStyleCounter`, `mult`) now interleaves into the `% 3`'s `multu` latency exactly as retail. Same mechanism as StyleFillEffectKind3 this round: a store through a plain `s32 *` is an opaque `(mem (reg))` the scheduler will not hoist a global load above; an in-struct store at a varying address does not conflict with a scalar at a fixed address. Went 1 word short (the if/else, below). |
+| 2 | first `gStyleSpawnColors` store through `S32BoxK2 *slot` (`slot->v = ...`) | the whole `% 20` prefix (`lui 0x6666`, `lw gStyleCounter`, `mult`) now interleaves into the `% 3`'s `multu` latency exactly as retail. Same mechanism as StyleFillEffectKind3 this round: a store through a plain `s32 *` is an opaque `(mem (reg))` the scheduler will not hoist a global load above; an in-struct store at a varying address does not conflict with a scalar at a fixed address. Went 1 word short (the if/else, below). |
 | 3 | `r = rand();` then `(u32) r % 3`, instead of inlining `rand()` or a separate `idx = rand() % 3` | inline put `slot` in `$s0`; `idx` put the remainder in `$a0`. With the rand RESULT in a local, both `$a2` (slot) and `$v0` (remainder) are retail's. |
 | 4 | `val = (gStyleCounter / 20) * 20; if (gStyleCounter != val) val = gStyleKind2AltColor; else val = 0;` | **79/79**, `OK: build matches retail` |
 
@@ -65,7 +65,7 @@ void **StyleFillEffectKind2(void **arg0, void *arg1) {
     u8 **q;
 
     r = rand();
-    slot = (S32BoxK2 *) D_8008E0C0;
+    slot = (S32BoxK2 *) gStyleSpawnColors;
     slot->v = (s32) (gStyleKind2Colors + ((u32) r % 3) * 3);
     slot++;
     val = (gStyleCounter / 20) * 20;
@@ -278,8 +278,8 @@ length-exact, so round 48's negative does not cover it.
 The `Reorderings: 3` matches the diff by eye exactly: retail hoists
 `ori v1,v1,0x6667`, `mfhi a0`, `lw a1,%gp_rel(gStyleCounter)` and `mult a1,v1`
 into the `/3` `multu`'s latency window, *ahead* of the `lui/addiu` for
-`&D_8008E0C0`, and finishes the `/3` chain afterwards. The build computes
-`&D_8008E0C0` first and defers the `/20` `mult` until after the first store.
+`&gStyleSpawnColors`, and finishes the `/3` chain afterwards. The build computes
+`&gStyleSpawnColors` first and defers the `/20` `mult` until after the first store.
 
 **One thing this rules out cheaply:** the `% 20 == 0` test must stay INLINE in
 the `if`. Retail compares `a1 == (a1/20)*20` with no `subu`, which is cc1's
@@ -384,7 +384,7 @@ extern s32 gStyleCueSelf;
 extern s32 gStyleKind2AltColor;
 extern s32 D_80087330;
 extern u8 gStyleKind2Colors[];
-extern s32 D_8008E0C0[];
+extern s32 gStyleSpawnColors[];
 extern u8 *gStyleSpawnRotation;
 extern u8 gStyleSpawnRotations[];
 extern s32 gStyleSpawnTableIndex;
@@ -399,7 +399,7 @@ void **StyleFillEffectKind2(void **arg0, void *arg1) {
     u8 **q;
 
     idx = (u32) rand() % 3;
-    slot = D_8008E0C0;
+    slot = gStyleSpawnColors;
     *slot = (s32) (gStyleKind2Colors + idx * 3);
     slot++;
     if (gStyleCounter % 20 == 0) {

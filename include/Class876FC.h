@@ -15,7 +15,7 @@
  * Construction: class_3bb8c_n.c's StyleFillEffectKind0..3 build one per
  * effect slot (gStyleEffectSlots) as New_Class876FC(kind, params, parent,
  * pos), with `kind` 0..3, `params` the 0x24-byte block at gStyleSpawnOffsetX (seven
- * separately-declared symbols gStyleSpawnOffsetX..D_8008E0C0 in class_3bb8c_n.c;
+ * separately-declared symbols gStyleSpawnOffsetX..gStyleSpawnColors in class_3bb8c_n.c;
  * one Class876FCParams in the bytes: the callers pass `&gStyleSpawnOffsetX` or
  * `&gStyleSpawnRotation - 0xC`), `parent` gStyleCueSelf and `pos` the caller's
  * position. The ctor stores `kind`, copies `params` through the reset slot

@@ -89,7 +89,7 @@ function sat for fourteen rounds.
   It is not a register-colour residue at all.
 - The equal LENGTH was **two defects cancelling**, not zero defects:
   - my build **cross-jumped** (tail-merged) the two arms' shared
-    `D_8008E0C0[0] = ...` store, where retail duplicates it: **2 words short**;
+    `gStyleSpawnColors[0] = ...` store, where retail duplicates it: **2 words short**;
   - my build **recomputed `lui`/`%lo` for `gStyleSpawnOffsetZ` at each of its four
     accesses**, where retail caches `&gStyleSpawnOffsetZ` in `$v1`: **2 words long**.
 
@@ -126,7 +126,7 @@ The `idx` local changed nothing semantically; it changed which registers the
 `idx*3 + &gStyleKind3Colors` into `$v1`; the `idx` local made my build route the
 remainder through `$a0` and build the sum in `$v0`. That single colour
 difference is what enabled the cross-jump: **gcc 2.6.3 cross-jumps after
-reload, comparing HARD registers**, so retail's `sw $v1, %lo(D_8008E0C0)($at)`
+reload, comparing HARD registers**, so retail's `sw $v1, %lo(gStyleSpawnColors)($at)`
 and my `sw $v0, ...` are different instructions in one case and identical in
 the other. With identical ones, jump.c merges the tails and arm 1 loses its
 own copy plus its `li $a0, 3`.
@@ -152,7 +152,7 @@ the answer was forty lines up in the same file.
 
 ```
 458c8  addu v1,v1,v0                 |  addu a2,v1,v0
-458d0  sw   v1,%lo(D_8008E0C0)(at)   |  sw   a2,%lo(D_8008E0C0)(at)
+458d0  sw   v1,%lo(gStyleSpawnColors)(at)   |  sw   a2,%lo(gStyleSpawnColors)(at)
 ```
 
 Nothing else differs. `t`'s pseudo has two disjoint live ranges (the else
@@ -335,7 +335,7 @@ extern u8 gStyleSpawnOffsetX[];
 extern s32 gStyleCueSelf;
 extern s32 D_80087330;
 extern void SetupStyleSpawnParamsA(void *arg0, void *arg1);
-extern s32 D_8008E0C0[];
+extern s32 gStyleSpawnColors[];
 extern u8 *gStyleSpawnRotation;
 extern u8 gStyleSpawnRotations[];
 extern s32 gStyleSpawnOffsetY;
@@ -354,7 +354,7 @@ void **StyleFillEffectKind3(void **arg0, void *arg1) {
         *(s32 *) gStyleSpawnOffsetX = 0xFFFF5000;
         gStyleSpawnOffsetY = -0x2000;
         gStyleSpawnOffsetZ = 0;
-        D_8008E0C0[0] = (s32) (gStyleKind3Colors + 3);
+        gStyleSpawnColors[0] = (s32) (gStyleKind3Colors + 3);
     } else {
         p = &gStyleSpawnOffsetZ;
         if (*p > 0) {
@@ -364,7 +364,7 @@ void **StyleFillEffectKind3(void **arg0, void *arg1) {
             *p = -0x7800;
         }
         t = (s32) (gStyleKind3Colors + ((u32) rand() % 3) * 3);
-        D_8008E0C0[0] = t;
+        gStyleSpawnColors[0] = t;
     }
     t = gStyleCueSelf;
     q = &gStyleSpawnRotation;

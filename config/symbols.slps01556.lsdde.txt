@@ -2934,3 +2934,4 @@ gStyleSpawnRotation = 0x8008E0B0;
 gStyleSpawnScale = 0x8008E0B4;
 gStyleSpawnModelLayout = 0x8008E0B8;
 gStyleSpawnTableIndex = 0x8008E0BC;
+gStyleSpawnColors = 0x8008E0C0;

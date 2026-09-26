@@ -458,7 +458,7 @@ Class876FC **StyleFillEffectKind1(Class876FC **arg0, s32 arg1, LongVec3 *arg2) {
 
 extern s32 D_80087330;
 extern void SetupStyleSpawnParamsA(void *arg0, void *arg1);
-extern s32 D_8008E0C0[];
+extern s32 gStyleSpawnColors[];
 extern u8 *gStyleSpawnRotation;
 extern u8 gStyleSpawnRotations[];
 extern s32 gStyleSpawnOffsetY;
@@ -489,7 +489,7 @@ Class876FC **StyleFillEffectKind3(Class876FC **arg0, LongVec3 *arg1) {
         gStyleSpawnOffsetX = 0xFFFF5000;
         gStyleSpawnOffsetY = -0x2000;
         gStyleSpawnOffsetZ = 0;
-        D_8008E0C0[0] = (s32)(gStyleKind3Colors + 3);
+        gStyleSpawnColors[0] = (s32)(gStyleKind3Colors + 3);
     } else {
         p = &gStyleSpawnOffsetZ;
         if (*p > 0) {
@@ -498,7 +498,7 @@ Class876FC **StyleFillEffectKind3(Class876FC **arg0, LongVec3 *arg1) {
         if (*p < -0x7800) {
             *p = -0x7800;
         }
-        D_8008E0C0[0] = (s32)(gStyleKind3Colors + ((u32)rand() % 3) * 3);
+        gStyleSpawnColors[0] = (s32)(gStyleKind3Colors + ((u32)rand() % 3) * 3);
     }
     q = (PtrBoxK3 *)&gStyleSpawnRotation;
     q->p = gStyleSpawnRotations;
@@ -509,12 +509,12 @@ Class876FC **StyleFillEffectKind3(Class876FC **arg0, LongVec3 *arg1) {
 
 extern s32 gStyleKind2AltColor;
 extern u8 gStyleKind2Colors[];
-extern s32 D_8008E0C0[];
+extern s32 gStyleSpawnColors[];
 extern u8 *gStyleSpawnRotation;
 extern u8 gStyleSpawnRotations[];
 extern s32 gStyleSpawnTableIndex;
 
-/* Local view, same reason as PtrBoxK3 above: the first D_8008E0C0 store goes
+/* Local view, same reason as PtrBoxK3 above: the first gStyleSpawnColors store goes
  * through a pointer to a one-field struct so the gStyleCounter load may
  * schedule above it (retail interleaves the % 20 into the % 3's multu
  * latency).  Round 76; see docs/match-reports/StyleFillEffectKind2.md. */
@@ -535,7 +535,7 @@ Class876FC **StyleFillEffectKind2(Class876FC **arg0, LongVec3 *arg1) {
     u8 **q;
 
     r = rand();
-    slot = (S32BoxK2 *)D_8008E0C0;
+    slot = (S32BoxK2 *)gStyleSpawnColors;
     slot->v = (s32)(gStyleKind2Colors + ((u32)r % 3) * 3);
     slot++;
     val = (gStyleCounter / 20) * 20;
