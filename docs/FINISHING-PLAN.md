@@ -19,8 +19,8 @@ and wrong for every round after. Run the tool. The mechanics of a round
 the per-function matching loop is CLAUDE.md and `docs/MATCHING-GUIDE.md`.
 This file does not repeat them.
 
-Plan revision: 22 (2026-09-26, round 86, premium head: game names off Sony
-data, `tools/sonydata.py` and its `rename.py`/`plan.py` guards).
+Plan revision: 23 (2026-09-26, round 87, premium head: track 4 classes run
+in parallel when `plan.py`'s measured footprints are disjoint).
 Changing the plan is a premium head task (§2); record the change in
 `docs/PROGRESS.md` and bump this line.
 
@@ -314,11 +314,15 @@ contradiction with the parent. Once a class is unified, CLAUDE.md's
 independent-local-views convention ends for it: no unit declares its own
 view again, and `plan.py classes` lists any that appears as a STRAY VIEW.
 
-**Staffing.** Opus runners, classes strictly in SEQUENCE: a class merge
-touches every unit that sees the class, so the next class is staffed only
-after the previous one is merged and marked, as many per round as that
-allows (revision 20; round 82 ran three this way). `plan.py` lists only the
-top ready class (most classes below it first). Prompt §4.6. Head
+**Staffing.** Opus runners, one class each. A class merge touches every
+unit that sees the class, so `plan.py` gives each ready class a measured
+FOOTPRINT (units naming its table, getter, own methods or view types, plus
+every unit including a header that does) and lists every ready class, most
+classes below it first; one whose footprint shares a unit or call-graph
+contention with a class above it is DEFERRED (revision 23: revision 20's
+strict sequence, one runner at a time, was that test unmeasured). Tell each
+runner the others' classes and to post before editing outside its footprint.
+Prompt §4.6. Head
 review before `python3 tools/plan.py mark-class --table <sym> --class
 <Class>`: `plan.py classes` shows no stray view, the three oracles are green,
 and three sampled slot or field names agree with their occupants or
