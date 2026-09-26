@@ -30,8 +30,10 @@
  * no methods in this unit.
  * D_8006EF50 (class id 0x5) is a BasicClass subclass holding a parentRefs
  * cursor; NotifyParents walks it, picking event 4/3/2 from two flags and a
- * counter. D_8006EED8 (class id 0xB03) is a GetActiveDataSourceMethods
- * subclass that copies a name string to slot +0x06C.
+ * counter. Class6EED8 (include/Class6EED8.h, gClass6EED8Methods, id 0xB03)
+ * is unified: a Class6D430 data source that requests one named file and
+ * sets `loaded` when the driver reports it done; its own methods
+ * (New_Class6EED8, Class6EED8__*, GetClass6EED8Methods) live here.
  * LightRig (include/LightRig.h, gLightRigMethods, id 0x14) is unified too: a
  * Class6B5CC subclass owning three FlatLightObj children and an ambient
  * colour (SetAmbientColor -> GsSetAmbient); its own methods (New_LightRig,
@@ -43,6 +45,7 @@
 #include "CharSprite.h"
 #include "LightRig.h"
 #include "FlatLightObj.h"
+#include "Class6EED8.h"
 
 /* Local view of a D_8006EF50 (class id 0x5) object: only the three words its
  * +0x048..+0x058 accessors touch. */
@@ -83,16 +86,8 @@ struct GsIMAGE {
 extern u16 GetTPage(s32 tp, s32 abr, s32 x, s32 y);
 
 /* The method tables the getters below return. */
-extern s32 D_8006EED8[];
 extern s32 D_8006EF50[];
 
-/* Local view of a D_8006EED8 (class id 0xB03) object: D8006EED8__SetFlag2C sets +0x2C. */
-typedef struct D_8006EED8Methods D_8006EED8Methods;
-typedef struct D_8006EED8Obj {
-    D_8006EED8Methods *methods; /* +0x000 */
-    u8 pad04[0x2C - 0x4];
-    s32 flag2C;
-} D_8006EED8Obj;
 
 /* The zero offset ScreenSprite__AttachToParent attaches with. */
 extern Vec3_d294 gVec3Zero;
@@ -104,35 +99,17 @@ extern SpriteRect D_8006ED40;
 extern u32 GetSetBitField(u32 *word, s32 shift, s32 width, u32 value);
 extern void *BMemPMgrAlloc(s32 size);
 
-typedef struct Slot0CMethods_322b4 {
-    u8 pad00[0xC];
-    void (*slot0C)(void *self); /* +0x00C */
-} Slot0CMethods_322b4;
-extern Slot0CMethods_322b4 *GetActiveDataSourceMethods(void);
+extern Class6D430Methods *GetActiveDataSourceMethods(void);
 
 typedef struct Slot08Methods_322b4 {
     u8 pad00[0x8];
     void (*init)(void *self); /* +0x008 */
 } Slot08Methods_322b4;
 void *Get_vtable_D8006EF50(void);
-void *Get_vtable_D8006EED8(void);
 
 
 
-struct D_8006EED8Methods {
-    u8 pad00[0x6C];
-    void (*slot6C)(D_8006EED8Obj *self, char *name); /* +0x06C */
-};
 
-typedef struct Slot08Arg0Methods_322b4 {
-    u8 pad00[0x8];
-    void (*ctor)(void *self); /* +0x008 */
-} Slot08Arg0Methods_322b4;
-
-typedef struct CtorArg1Methods_322b4 {
-    u8 pad00[0x8];
-    void (*ctor)(void *self, s32 arg); /* +0x008 */
-} CtorArg1Methods_322b4;
 
 /* Allocate and construct a CharSprite (0xAC bytes): one character cell. */
 CharSprite *New_CharSprite(void *texture, u8 cell) {
@@ -336,41 +313,44 @@ void Sprite__SetColor(Sprite *self, SpriteRgb *rgb) {
 SpriteMethods *GetSpriteMethods(void) {
     return &gSpriteMethods;
 }
-/* Allocate and construct a D_8006EED8 object (0x30 bytes). */
-void *New_D8006EED8(s32 arg) {
-    void *obj = BMemPMgrAlloc(0x30);
+/* Allocate and construct a Class6EED8 (0x30 bytes). */
+Class6EED8 *New_Class6EED8(char *name) {
+    Class6EED8 *obj = BMemPMgrAlloc(0x30);
 
     if (obj != NULL) {
-        ((CtorArg1Methods_322b4 *)Get_vtable_D8006EED8())->ctor(obj, arg);
+        GetClass6EED8Methods()->ctor(obj, name);
         return obj;
     }
     return NULL;
 }
-/* D_8006EED8 slot +0x008 (ctor): the base ctor, install the table, clear
- * +0x2C, and pass a stack copy of the name to slot +0x06C. */
-void D8006EED8__D8006EED8(D_8006EED8Obj *self, char *name) {
+/* gClass6EED8Methods slot +0x008 (ctor): the active driver's ctor, install
+ * the table, clear `loaded`, and pass a stack copy of the name to
+ * requestLoadFile (+0x06C). */
+void Class6EED8__Class6EED8(Class6EED8 *self, char *name) {
     char buf[32];
 
-    ((Slot08Arg0Methods_322b4 *)GetActiveDataSourceMethods())->ctor(self);
-    self->methods = Get_vtable_D8006EED8();
-    self->flag2C = 0;
+    GetActiveDataSourceMethods()->ctor((Class6D430 *)self);
+    self->methods = GetClass6EED8Methods();
+    self->loaded = 0;
     if (name != NULL) {
         strcpy(buf, name);
-        self->methods->slot6C(self, buf);
+        self->methods->requestLoadFile(self, buf);
     }
 }
-/* D_8006EED8 slot +0x00C (finalize): clear +0x2C, then the base finalize. */
-void D8006EED8__Finalize(D_8006EED8Obj *self) {
-    self->flag2C = 0;
-    GetActiveDataSourceMethods()->slot0C(self);
+/* gClass6EED8Methods slot +0x00C (finalize): clear `loaded`, then the active
+ * driver's finalize. */
+void Class6EED8__Finalize(Class6EED8 *self) {
+    self->loaded = 0;
+    GetActiveDataSourceMethods()->finalize((Class6D430 *)self);
 }
-/* D_8006EED8 slot +0x064. */
-void D8006EED8__SetFlag2C(D_8006EED8Obj *self) {
-    self->flag2C = 1;
+/* gClass6EED8Methods slot +0x064 (setFlag): the driver reports the requested
+ * file loaded. */
+void Class6EED8__SetFlag(Class6EED8 *self) {
+    self->loaded = 1;
 }
-/* Returns the D_8006EED8 method table. */
-void *Get_vtable_D8006EED8(void) {
-    return D_8006EED8;
+/* Returns the gClass6EED8Methods method table. */
+Class6EED8Methods *GetClass6EED8Methods(void) {
+    return &gClass6EED8Methods;
 }
 /* Allocate and construct a D_8006EF50 object (0x1C bytes). */
 void *New_D8006EF50(void) {
