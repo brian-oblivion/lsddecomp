@@ -176,10 +176,10 @@ gSoundEffectDirPtr
 gStartupBMemPMgr
 gStyleColorTable
 gStyleConfigIndex
-gStyleCounter
 gStyleCueRecordIndex
 gStyleCueSelf
 gStyleCueSlots
+gStyleDay
 gStyleDecorColor
 gStyleDecorObj
 gStyleDecorPosAX

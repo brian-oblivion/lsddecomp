@@ -6,7 +6,7 @@
  * NAMING PASS, round 72 (runner alpha).  Every function, and the thirteen
  * globals its functions set up or gate on, renamed via `tools/rename.py`,
  * tree-wide.  The evidence for the `Style` prefix: this unit's global-state
- * cluster (`gStyleStage`/`gStyleCounter`/`gStyleTargetObj`/`gStyleVariant`/
+ * cluster (`gStyleStage`/`gStyleDay`/`gStyleTargetObj`/`gStyleVariant`/
  * `gStyleDecorObj`/`gStyleCueSelf`/`gStyleTickCount`, formerly
  * `D_8008AC6C`/`74`/`7C`/`80`/`94`, `D_8008AB4C`/`70`) is the SAME cluster
  * `class_3bb8c_m.c`'s already-confirmed "Style" subsystem sets
@@ -65,7 +65,7 @@ void StyleFlushDecoration(void) {
     }
 }
 
-extern s32 gStyleCounter;
+extern s32 gStyleDay;
 extern s32 gStyleStage;
 extern s8 gStyleVariantPicks[];
 extern s32 gStyleVariant;
@@ -89,7 +89,7 @@ void *PickStyleFallbackConfig(void) {
     s32 b2;
     u8 *tab;
 
-    sum = gStyleCounter + gStyleStage;
+    sum = gStyleDay + gStyleStage;
     kind = gStyleVariantPicks[sum & 0xF];
     gStyleVariant = kind;
     divisor = gStyleVariantConfigCounts[kind];
@@ -411,7 +411,7 @@ extern void SetupStyleSpawnParamsB(void *arg0, void *arg1);
 
 /* Fills arg1 slots with New_Class876FC(kind 0, ...) objects, first setting
  * up the random style parameters and choosing the per-slot setup function by
- * gStyleCounter % 7; returns the next free slot. Matched round 75: arg0 is
+ * gStyleDay % 7; returns the next free slot. Matched round 75: arg0 is
  * the walking pointer itself (a separate `arr = arg0` copy reordered the
  * prologue's argument moves). */
 Class876FC **StyleFillEffectKind0(Class876FC **arg0, s32 arg1, LongVec3 *arg2) {
@@ -426,7 +426,7 @@ Class876FC **StyleFillEffectKind0(Class876FC **arg0, s32 arg1, LongVec3 *arg2) {
         t3 = gStyleSpawnYChoices[t3];
     }
     fp = SetupStyleSpawnParamsB;
-    if (gStyleCounter % 7 != 0) {
+    if (gStyleDay % 7 != 0) {
         fp = SetupStyleSpawnParamsA;
     }
     for (i = 0; i < arg1; i++) {
@@ -515,7 +515,7 @@ extern u8 gStyleSpawnRotations[];
 extern s32 gStyleSpawnTableIndex;
 
 /* Local view, same reason as PtrBoxK3 above: the first gStyleSpawnColors store goes
- * through a pointer to a one-field struct so the gStyleCounter load may
+ * through a pointer to a one-field struct so the gStyleDay load may
  * schedule above it (retail interleaves the % 20 into the % 3's multu
  * latency).  Round 76; see docs/match-reports/StyleFillEffectKind2.md. */
 typedef struct S32BoxK2 {
@@ -524,7 +524,7 @@ typedef struct S32BoxK2 {
 
 /* Appends one kind-2 New_Class876FC object after picking a random colour
  * triple and a per-20-ticks gStyleKind2AltColor value.  MATCHED round 76 (charlie).
- * `val = (gStyleCounter / 20) * 20; if (gStyleCounter != val)` is the
+ * `val = (gStyleDay / 20) * 20; if (gStyleDay != val)` is the
  * load-bearing spelling of `% 20 != 0`: because the tested variable is also
  * the assigned one, jump.c cannot rewrite the if/else into `val = 0; if (..)
  * val = gStyleKind2AltColor;`, which is what every `% 20` spelling compiles to. */
@@ -538,8 +538,8 @@ Class876FC **StyleFillEffectKind2(Class876FC **arg0, LongVec3 *arg1) {
     slot = (S32BoxK2 *)gStyleSpawnColors;
     slot->v = (s32)(gStyleKind2Colors + ((u32)r % 3) * 3);
     slot++;
-    val = (gStyleCounter / 20) * 20;
-    if (gStyleCounter != val) {
+    val = (gStyleDay / 20) * 20;
+    if (gStyleDay != val) {
         val = gStyleKind2AltColor;
     } else {
         val = 0;
@@ -616,7 +616,7 @@ void SetupStyleSpawnParamsB(void *arg0, void *arg1) {
     rand();
     gStyleSpawnOffsetY = D_8008732C;
     gStyleSpawnOffsetX = (rand() % 20) << 11;
-    mod3 = gStyleCounter % 3;
+    mod3 = gStyleDay % 3;
     gStyleSpawnOffsetZ = 0xA000;
     if (mod3 == 1) {
         gStyleSpawnOffsetZ = -0xA000;

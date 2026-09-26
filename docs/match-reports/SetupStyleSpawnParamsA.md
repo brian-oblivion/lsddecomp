@@ -302,7 +302,7 @@ removed on the way to commit, which is what shipped.
 **`SetupStyleSpawnParamsA`, tier B.**
 
 One of two function-pointer targets `StyleFillEffectKind0` dispatches
-through per iteration, selected when `gStyleCounter % 7 != 0` (the more
+through per iteration, selected when `gStyleDay % 7 != 0` (the more
 common ~6/7 branch; the other is `SetupStyleSpawnParamsB`). Sets a cluster of
 `gStyleE0*`-region scratch globals (spawn range/offset parameters consumed
 by the `New_Class876FC` allocator's `ctx` argument) from `rand()`. Named "A"

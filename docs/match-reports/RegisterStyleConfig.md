@@ -18,7 +18,7 @@ result.
 extern s32 gStyleCueSelf;
 extern s32 gStyleStage;
 extern s32 gStyleTickCount;
-extern s32 gStyleCounter;
+extern s32 gStyleDay;
 extern s32 D_8008AC78;
 extern s32 gStyleTargetObj;
 extern s32 gStyleVariant;
@@ -37,7 +37,7 @@ s32 RegisterStyleConfig(s32 a0, s32 a1, s32 a2, s32 a3, s32 arg4) {
         gStyleStage = a1;
         gStyleTargetObj = a2;
         gStyleVariant = -1;
-        gStyleCounter = a3;
+        gStyleDay = a3;
         D_8008AC78 = arg4;
         gStyleTickCount = 0;
         do {

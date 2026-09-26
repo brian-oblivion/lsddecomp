@@ -148,7 +148,7 @@ void *StyleFillEffectKind0(void *arg0, s32 arg1, void *arg2) {
         t3 = gStyleSpawnYChoices[t3];
     }
     fp = SetupStyleSpawnParamsB;
-    if (gStyleCounter % 7 != 0) {
+    if (gStyleDay % 7 != 0) {
         fp = SetupStyleSpawnParamsA;
     }
     for (i = 0; i < arg1; i++) {
@@ -173,7 +173,7 @@ Every value confirmed directly off the raw bytes:
   `s3` is reused: first as the `%7` magic constant, then unconditionally
   loaded with `&SetupStyleSpawnParamsB` (filling the `mult`'s latency slot for free),
   then conditionally overwritten to `&SetupStyleSpawnParamsA` if
-  `gStyleCounter % 7 != 0`. This is the **same shared-dispatch idiom
+  `gStyleDay % 7 != 0`. This is the **same shared-dispatch idiom
   `TickStyle` uses via `ObjAB4C::slotE8`**, except here the two
   candidates are plain functions (not vtable slots), selected by a modulo
   test rather than a self-object's own state.
@@ -239,7 +239,7 @@ literal FIRST argument of `0`. That argument is confirmed (by reading
 object's `kind` field -- so "Kind0" in the name is the literal tag value
 this function passes, not a guessed category. Selects which of two
 "spawn-parameter" setup functions (`SetupStyleSpawnParamsA`/`B`) to call each
-iteration via a `gStyleCounter % 7` test. STALL, 93/99, whole-function
+iteration via a `gStyleDay % 7` test. STALL, 93/99, whole-function
 3-register rotation; naming from mechanics, unaffected by match state.
 
 ## Track 4 (2026-09-26, round 88, charlie)
