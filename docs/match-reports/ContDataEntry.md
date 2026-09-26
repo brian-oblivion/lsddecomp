@@ -18,11 +18,11 @@ union in `List_800351D0`, a loop counter width).
 Round 66 was right: the preserved body did not compile. It called
 `Snd_setVabAttr` with round 48's guessed slice `(u32 hdr, Blk1, Blk2)`,
 while the callee's own matched definition takes
-`(s16, s16, s16, Scratch_800357B0 scratch, AdsrRaw_800357B0 resolved,
+`(s16, s16, s16, Scratch_800357B0 scratch, AdsrFields resolved,
 s16, u8)`. **Repair (rebuilding, not changing):** moved the two callee
 typedefs above this function (typedefs only; no definition moved), retyped
 `List_800351D0`'s tail from `hdrLo/hdrHi/blk1/blk2` to
-`Scratch_800357B0 scratch; AdsrRaw_800357B0 adsr;` (same 50 bytes at the
+`Scratch_800357B0 scratch; AdsrFields adsr;` (same 50 bytes at the
 same +0x10, as round 49 predicted), re-added the forward declaration, and
 passed `list.scratch, list.adsr` at both call sites. `Blk1_800351D0` and
 `Blk2_800351D0` are gone.
@@ -127,7 +127,7 @@ typedef struct {
     s16 unkC;
     s16 unkE;
     s16 unk10;
-} AdsrRaw_800357B0;
+} AdsrFields;
 
 /* This function's own view of the same VagAtr buffer: only the four bytes
  * its unk29==2 loops touch. */
@@ -152,13 +152,13 @@ typedef struct {
         Scratch_800357B0 s;    /* +0x10: passed by value to Snd_setVabAttr */
         Scratch800351D0 v;     /* +0x10: SsUtGet/SetVagAtr's buffer in the unk29==2 loops */
     } scratch;
-    AdsrRaw_800357B0 adsr;     /* +0x30: passed by value to Snd_setVabAttr */
+    AdsrFields adsr;     /* +0x30: passed by value to Snd_setVabAttr */
 } List_800351D0;
 
 /* Snd_setVabAttr is defined later in this unit; its own definition fixes
  * this signature (round 49). */
 extern void Snd_setVabAttr(s16 channel, s16 slot, s16 kind, Scratch_800357B0 scratch,
-                          AdsrRaw_800357B0 resolved, s16 arg5, u8 arg6);
+                          AdsrFields resolved, s16 arg5, u8 arg6);
 
 void ContDataEntry(s16 a0, s16 a1, u8 a2)
 {
@@ -276,7 +276,7 @@ Old title: ContDataEntry -- STALL (4 words LONG, 380/376; 18/376 raw word-match;
 > calls `Snd_setVabAttr` with its OWN pre-round-49 guessed signature -- an
 > 8-argument slice `(u32 hdr, Blk1_800351D0 blk1, Blk2_800351D0 blk2, ...)`.
 > Round 49 matched `Snd_setVabAttr` byte-exact with a DIFFERENT real
-> signature, `(..., Scratch_800357B0 scratch, AdsrRaw_800357B0 resolved,
+> signature, `(..., Scratch_800357B0 scratch, AdsrFields resolved,
 > ...)`, and removed this function's stale forward declaration as
 > conflicting (see the round-49 section below, "will need reshaping on the
 > next attempt"). The preserved body was never updated to match, so it
@@ -287,9 +287,9 @@ Old title: ContDataEntry -- STALL (4 words LONG, 380/376; 18/376 raw word-match;
 > the cause).
 >
 > Reshaping the two call sites requires constructing real
-> `Scratch_800357B0`/`AdsrRaw_800357B0` by-value arguments from
+> `Scratch_800357B0`/`AdsrFields` by-value arguments from
 > `list.hdrLo`/`hdrHi`/`blk1`/`blk2` -- sizes line up exactly (4+28=32=
-> `sizeof(Scratch_800357B0)`, 18=`sizeof(AdsrRaw_800357B0)`) and both
+> `sizeof(Scratch_800357B0)`, 18=`sizeof(AdsrFields)`) and both
 > parameters' incoming values are provably dead on the callee side (fully
 > overwritten by `SsUtGetVagAtr`/`_SsUtResolveADSR` before any read, per
 > the comment at `src/code_179d8_k.c`'s `Scratch_800357B0` typedef), so a
@@ -833,7 +833,7 @@ CLAUDE.md's mandated preservation form -- so it was not literally
 `src/code_179d8_k.c` needs. No change to the body itself, and see the
 round-49 note above: this body's `Snd_setVabAttr` call sites still use the
 now-stale 3-way (`u32`/`Blk1_800351D0`/`Blk2_800351D0`) argument slice and
-will need reshaping to the real `(Scratch_800357B0, AdsrRaw_800357B0)`
+will need reshaping to the real `(Scratch_800357B0, AdsrFields)`
 two-struct signature before this body can build again.
 
 ```c
@@ -987,7 +987,7 @@ the function off to "look for a missing local" without ever doing so.
 `Snd_setVabAttr` (called from this function's `unk2A==2` dispatch arm, both
 in the preserved body above) matched byte-exact this round (see its own
 report). Its REAL signature is `(s16 channel, s16 slot, s16 kind,
-Scratch_800357B0 scratch, AdsrRaw_800357B0 resolved, s16 arg5, u8 arg6)` --
+Scratch_800357B0 scratch, AdsrFields resolved, s16 arg5, u8 arg6)` --
 a 0x20-byte scratch struct plus an 18-byte ADSR struct, both by value.
 This function's own forward declaration of it (just above this function's
 `#if 0` body in `src/code_179d8_k.c`) instead sliced the same 50 bytes as
@@ -1001,14 +1001,14 @@ referenced it).
 **Whoever next attempts this function will need to:** reshape the two
 call sites (`Snd_setVabAttr(rec->unk4C, p[0x2C], i, (u32)list.hdrLo |
 ((u32)list.hdrHi << 16), list.blk1, list.blk2, rec->unk15, a2 & 0xFF);`
-and its non-loop sibling) to pass a `Scratch_800357B0`/`AdsrRaw_800357B0`
+and its non-loop sibling) to pass a `Scratch_800357B0`/`AdsrFields`
 pair instead of the `u32`/`Blk1_800351D0`/`Blk2_800351D0` triple, and add
-a fresh forward declaration (after `Scratch_800357B0`/`AdsrRaw_800357B0`
+a fresh forward declaration (after `Scratch_800357B0`/`AdsrFields`
 are visible, or with local copies of those typedefs declared earlier).
 Given `List_800351D0`'s own `hdrLo`/`hdrHi`/`blk1`/`blk2` fields already
 total exactly 50 bytes at the same stack-relative position, the most
 likely resolution is that `List_800351D0`'s tail (from `+0x10` onward) IS
-byte-identical to the `Scratch_800357B0`+`AdsrRaw_800357B0` pair, just
+byte-identical to the `Scratch_800357B0`+`AdsrFields` pair, just
 never named that way from this function's side -- worth checking with
 `tools/asm-differ` before re-deriving `blk1`/`blk2`'s "unconstrained"
 internal field breakdown from scratch.

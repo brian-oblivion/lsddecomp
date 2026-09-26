@@ -713,7 +713,7 @@ typedef struct {
     s16 unkC;
     s16 unkE;
     s16 unk10;
-} AdsrRaw_800357B0;
+} AdsrFields;
 
 /* SsUtGetProgAtr's fill at function entry. From +0x10 the SAME memory is
  * both the VagAtr buffer the unk29==2 loops hand to SsUtGet/SetVagAtr
@@ -725,13 +725,13 @@ typedef struct {
     VagAtr vag; /* +0x10: passed by value to Snd_setVabAttr, and the
                  * SsUtGet/SetVagAtr buffer of the unk29==2 loops */
 
-    AdsrRaw_800357B0 adsr; /* +0x30: passed by value to Snd_setVabAttr */
+    AdsrFields adsr; /* +0x30: passed by value to Snd_setVabAttr */
 } List_800351D0;
 
 /* Snd_setVabAttr is defined later in this unit; its own definition fixes
  * this signature (round 49). */
-extern void Snd_setVabAttr(s16 channel, s16 slot, s16 kind, VagAtr scratch,
-                           AdsrRaw_800357B0 resolved, s16 arg5, u8 arg6);
+extern void Snd_setVabAttr(s16 channel, s16 slot, s16 kind, VagAtr scratch, AdsrFields resolved,
+                           s16 arg5, u8 arg6);
 
 #ifdef NON_MATCHING
 /* NON_MATCHING: 380/376 words, 4 LONG; 95/376 raw, frame exact (-0x108).
@@ -843,8 +843,8 @@ INCLUDE_ASM("asm/nonmatchings/code_179d8_k", ContDataEntry);
 /* Both linked from Sony's `libsnd/adsr.o` (round 34) -- see
  * func_80035F3C.md / func_80035F98.md for the derivation of this shape,
  * fixed as those units' independent local views: */
-extern void _SsUtResolveADSR(s32 a0, s32 a1, AdsrRaw_800357B0 *out);
-extern void _SsUtBuildADSR(AdsrRaw_800357B0 *in, u16 *adsr1, u16 *adsr2);
+extern void _SsUtResolveADSR(s32 a0, s32 a1, AdsrFields *out);
+extern void _SsUtBuildADSR(AdsrFields *in, u16 *adsr1, u16 *adsr2);
 
 /* MIDI CC91 (Reverb Depth)/98/99/100/101 (NRPN/RPN LSB/MSB) and friends'
  * per-parameter handler, reached only from ContDataEntry (still a stall;
@@ -855,8 +855,8 @@ extern void _SsUtBuildADSR(AdsrRaw_800357B0 *in, u16 *adsr1, u16 *adsr2);
  * `scratch` and `resolved` arrive by value and serve only as local buffers:
  * SsUtGetVagAtr refills `scratch` before any arm reads it, and
  * _SsUtResolveADSR fills `resolved`. */
-void Snd_setVabAttr(s16 channel, s16 slot, s16 kind, VagAtr scratch, AdsrRaw_800357B0 resolved,
-                    s16 arg5, u8 arg6) {
+void Snd_setVabAttr(s16 channel, s16 slot, s16 kind, VagAtr scratch, AdsrFields resolved, s16 arg5,
+                    u8 arg6) {
     SsUtGetVagAtr(channel, slot, kind, &scratch);
 
     switch (arg5) {
