@@ -1321,7 +1321,7 @@ MoviePlayer *New_MoviePlayer(DrawRect *frame, s32 cdSpeed, s32 external) {
  * (New_CdStream(speed, 15, 0)) and the decode buffers (MoviePlayer__InitFrame);
  * 1 when either fails. Then reset the MDEC the first time any player is built
  * (gMdecInitialized), route its output callback to OnMdecFrameReady, hand the
- * stream the ring (0x12000), clear unk50 and setAutoPlay(1). 0. */
+ * stream the ring (0x12000), clear pendingStart and setAutoPlay(1). 0. */
 s32 MoviePlayer__MoviePlayer(MoviePlayer *self, DrawRect *frame, s32 cdSpeed, s32 external) {
     Get_vtable_BasicClass()->ctor((BasicClass *)self);
     self->methods = GetMoviePlayerMethods();
@@ -1334,7 +1334,7 @@ s32 MoviePlayer__MoviePlayer(MoviePlayer *self, DrawRect *frame, s32 cdSpeed, s3
             gMdecInitialized = 1;
             DecDCToutCallback(OnMdecFrameReady);
             self->stream->methods->setRing(self->stream, self->ring, 0x12000);
-            self->unk50 = 0;
+            self->pendingStart = 0;
             self->methods->setAutoPlay(self, 1);
             return 0;
         }
@@ -1409,7 +1409,7 @@ void MoviePlayer__FreeFrameBuffers(MoviePlayer *self) {
  * on the stream (100 tries); 1 when that fails. Otherwise become the active
  * movie, reset the state words, keep `arg3`/`loops` and clear `frame`
  * through DrawSystem's clearImage, color gMovieClearColor. 0. */
-s32 MoviePlayer__Play(MoviePlayer *self, char *name, s32 frameCount, s32 repeat, s32 loops) {
+s32 MoviePlayer__Play(MoviePlayer *self, char *name, s32 frameCount, s32 keepActive, s32 loops) {
     DrawSystem *ds;
 
     if (gActiveMoviePlayer == NULL) {
@@ -1424,7 +1424,7 @@ s32 MoviePlayer__Play(MoviePlayer *self, char *name, s32 frameCount, s32 repeat,
             self->frameDone = 1;
             self->streamEnded = 0;
             self->finished = 0;
-            self->unk54 = repeat;
+            self->keepActive = keepActive;
             self->loops = loops;
             ds = GetDrawSystem();
             ds->methods->clearImage(ds, gMovieClearColor, &self->frame);
@@ -1436,7 +1436,7 @@ s32 MoviePlayer__Play(MoviePlayer *self, char *name, s32 frameCount, s32 repeat,
 }
 
 void MoviePlayer__MarkPlaying(MoviePlayer *self) {
-    self->unk50 = 1;
+    self->pendingStart = 1;
 }
 
 /* +0x044 stop -- when this is gActiveMoviePlayer, reset its state words,
@@ -1458,30 +1458,30 @@ void MoviePlayer__Stop(MoviePlayer *self) {
 }
 
 void MoviePlayer__MarkStopped(MoviePlayer *self) {
-    self->unk50 = -1;
+    self->pendingStart = -1;
 }
 
-/* +0x048 advance -- when this is gActiveMoviePlayer: with unk50 set, start
- * the stream reading (startRead(1, frameCount)); if unk50 was negative,
+/* +0x048 advance -- when this is gActiveMoviePlayer: with pendingStart set, start
+ * the stream reading (startRead(1, frameCount)); if pendingStart was negative,
  * count down `loops` and at the last one (or with none) mute the stream;
- * clear unk50, set `started`, 0. With unk50 clear and `started` set:
+ * clear pendingStart, set `started`, 0. With pendingStart clear and `started` set:
  * tail-return decodeFrame. */
 s32 MoviePlayer__Advance(MoviePlayer *self) {
     MoviePlayer *cur = gActiveMoviePlayer;
 
     if (cur == self) {
-        if (cur->unk50 == 0) {
+        if (cur->pendingStart == 0) {
             if (cur->started == 0) {
                 goto out;
             }
         } else {
             cur->stream->methods->startRead(cur->stream, 1, cur->frameCount);
-            if (cur->unk50 < 0) {
+            if (cur->pendingStart < 0) {
                 if (cur->loops == 0 || --cur->loops == 0) {
                     cur->stream->methods->mute(cur->stream);
                 }
             }
-            self->unk50 = 0;
+            self->pendingStart = 0;
             self->started = 1;
             return 0;
         }
@@ -1491,14 +1491,14 @@ out:;
 }
 
 /* +0x04C abort -- when this is gActiveMoviePlayer: streamEnded, clear
- * unk54, close the stream, finished, and the first time (`started` clear)
+ * keepActive, close the stream, finished, and the first time (`started` clear)
  * clear the stream's slot7C callback and set `started`. */
 void MoviePlayer__Abort(MoviePlayer *self) {
     MoviePlayer *cur = gActiveMoviePlayer;
 
     if (cur == self) {
         cur->streamEnded = 1;
-        cur->unk54 = 0;
+        cur->keepActive = 0;
         cur->stream->methods->close(cur->stream);
         cur->finished = 1;
         if (cur->started == 0) {
@@ -1569,12 +1569,12 @@ void MoviePlayer__DrawStrip(MoviePlayer *self) {
     }
 }
 
-/* +0x064 pollActive -- while unk54 is set, count calls in gMoviePollCounter
+/* +0x064 pollActive -- while keepActive is set, count calls in gMoviePollCounter
  * and once the count before the increment passes 100, reset it to 1 and
  * stop (which restarts the stream); 0. Otherwise clear gActiveMoviePlayer,
  * 1. */
 s32 MoviePlayer__PollActive(MoviePlayer *self) {
-    if (self->unk54 != 0) {
+    if (self->keepActive != 0) {
         if (gMoviePollCounter++ > 100) {
             gMoviePollCounter = 1;
             self->methods->stop(self);
