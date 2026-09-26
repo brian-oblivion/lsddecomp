@@ -19,7 +19,7 @@ range gates on `unk44==0xA`.
 
 ```c
 void Entity__MoodCue110(Entity *this, EntityMoodHandlerArg *out) {
-    this->methods->slot48(this, 1, D_80089E44);
+    this->methods->slot48(this, 1, SCALE_TWO_FIFTHS);
     this->methods->slot130(this);
     if (this->unk44 == 0) {
         if (this->methods->slot144(this, this->unk94) < 0x800) {
@@ -70,7 +70,7 @@ amount.
 
 ## Data constant left unnamed this round
 
-`D_80089E44` (`updateScale` arg, unconditional at function entry; also
+`SCALE_TWO_FIFTHS` (`updateScale` arg, unconditional at function entry; also
 used by `Entity__MoodCue125`): s16-pair decoded `(2,5, 2,5, 2,5, 1,1)` --
 uniform X=Y=Z=2/5. A non-unit fraction, unlike every currently-named
 `SCALE_*` (`HALF`=1/2, `EIGHTH`=1/8, `QUARTER`=1/4, all unit fractions, or
