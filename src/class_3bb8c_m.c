@@ -209,7 +209,7 @@ extern s32 gStyleStage;
 extern s32 gStyleTickCount;
 extern s32 gStyleDay;
 extern s32 D_8008AC78;
-extern s32 gStyleTargetObj;
+extern s32 gStyleSceneRefs;
 extern s32 gStyleVariant;
 extern s32 D_8008ACA0;
 
@@ -224,7 +224,7 @@ s32 RegisterStyleConfig(s32 a0, s32 a1, s32 a2, s32 a3, s32 arg4) {
         p = &D_8008ACA0;
         gStyleGrid = a0;
         gStyleStage = a1;
-        gStyleTargetObj = a2;
+        gStyleSceneRefs = a2;
         gStyleVariant = -1;
         gStyleDay = a3;
         D_8008AC78 = arg4;
@@ -292,7 +292,7 @@ void FillStyleFromConfig(struct StyleM *style, s8 *cfg) {
 /* gStyleDecorObj is a BoxFill (include/BoxFill.h), kept in an s32 global
  * (track 4b's to retype). */
 
-/* gStyleTargetObj's own local reading here: only its +0xC field (a "self"
+/* gStyleSceneRefs's own local reading here: only its +0xC field (a "self"
  * pointer into a THIRD object, dispatched only through +0xAC) is ever
  * touched by this function. */
 typedef struct LocalSubObj LocalSubObj;
@@ -324,8 +324,8 @@ void ApplyStyleDecorationIfSet(void) {
         ((BoxFill *)gStyleDecorObj)->methods->setSemiTrans((BoxFill *)gStyleDecorObj, 1);
         ((BoxFill *)gStyleDecorObj)->methods->setSemiTransRate((BoxFill *)gStyleDecorObj, 0);
 
-        tmp = ((FieldAC7CHolder *)gStyleTargetObj)
-                  ->unkC->methods->slotAC(((FieldAC7CHolder *)gStyleTargetObj)->unkC);
+        tmp = ((FieldAC7CHolder *)gStyleSceneRefs)
+                  ->unkC->methods->slotAC(((FieldAC7CHolder *)gStyleSceneRefs)->unkC);
 
         ((BoxFillAttachToParentFn)((BoxFill *)gStyleDecorObj)->methods->attachToParent)(
             (BoxFill *)gStyleDecorObj, (SceneNode *)tmp, (Pair32E99C *)&D_8008AB58);

@@ -75,7 +75,7 @@ Notes:
 
 - `gStyleVariantConfigs[kind]` is loaded as a raw `s32` *value* (not an address-of),
   then used as a base address for further byte-granular pointer arithmetic
-  (`+ remainder * 4`) -- exactly the `gStyleTargetObj` "pointer stored as a plain
+  (`+ remainder * 4`) -- exactly the `gStyleSceneRefs` "pointer stored as a plain
   scalar" idiom already established elsewhere in this unit, just for a
   different global.
 - The `sum % divisor` compiles to the standard MIPS `div`/`break 7`

@@ -189,8 +189,8 @@ gStyleDecorSizeW
 gStyleDecorVariant
 gStyleEffectSlotCount
 gStyleGrid
+gStyleSceneRefs
 gStyleStage
-gStyleTargetObj
 gStyleTickCount
 gStyleVariant
 gTexturedFaceColor

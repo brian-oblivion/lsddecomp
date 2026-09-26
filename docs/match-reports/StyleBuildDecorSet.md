@@ -63,7 +63,7 @@ void StyleBuildDecorSet(void) {
         paramB.y -= 7;
     }
 
-    self2 = *(ObjSlotAC **) (gStyleTargetObj + 0xC);
+    self2 = *(ObjSlotAC **) (gStyleSceneRefs + 0xC);
     result = self2->methods->slotAC(self2);
     ((ObjSlot4C *) gStyleDecorSlots[0])->methods->slot4C(gStyleDecorSlots[0], result, &paramA);
 }
@@ -222,7 +222,7 @@ side effect of the image moving. The honest figures are the two in the title:
 
 Needs, already present earlier in the unit in strict ROM order:
 `extern s32 gStyleDecorVariant, gStyleDecorPosX, gStyleDecorPosY, gStyleDecorSizeW, gStyleDecorSizeH,
-gStyleTargetObj, gStyleDecorColors;`, `extern void *gStyleDecorSlots[];`,
+gStyleSceneRefs, gStyleDecorColors;`, `extern void *gStyleDecorSlots[];`,
 `extern void *New_BoxFill(void *a0, void *a1, s32 a2);`, and the
 `ObjSlot4C` / `ObjSlotAC` method-table views. `PairXY` is declared just above
 the function in the unit.
@@ -271,7 +271,7 @@ void StyleBuildDecorSet(void) {
         i++;
     } while (i < 0x12);
 
-    self2 = *(ObjSlotAC **) (gStyleTargetObj + 0xC);
+    self2 = *(ObjSlotAC **) (gStyleSceneRefs + 0xC);
     result = self2->methods->slotAC(self2);
     ((ObjSlot4C *) gStyleDecorSlots[0])->methods->slot4C(gStyleDecorSlots[0], result, &paramA);
 }
@@ -339,7 +339,7 @@ gStyleDecorSlots[] hold BoxFills (include/BoxFill.h); the deleted `ObjSlot4C` vi
 | `0x1FFF` | `STYLE_DECOR_PRI` | A | New_BoxFill's pri argument; 13 bits, the mask BoxFill__Reset's setMask(13) sets. Hex: a mask-shaped value. |
 | `0x1E` | `STYLE_DECOR_VARIANT2_DROP` (30) | B | added to the y position when `gStyleDecorVariant == 2`, here and in StyleUpdateDecorSet. |
 
-Local views replaced by the real classes: the `+0x0AC` slot on `gStyleTargetObj`'s `+0x00C` is Viewport's getSubHandle (that word is ObjM's `cachedViewport`; `StyleSceneRefs`); the band objects are BoxFill. Locals: `pos`, `size`, `band`, `viewport`, `parent`.
+Local views replaced by the real classes: the `+0x0AC` slot on `gStyleSceneRefs`'s `+0x00C` is Viewport's getSubHandle (that word is ObjM's `cachedViewport`; `StyleSceneRefs`); the band objects are BoxFill. Locals: `pos`, `size`, `band`, `viewport`, `parent`.
 
 ### Comments moved here from src/class_3bb8c_n.c
 

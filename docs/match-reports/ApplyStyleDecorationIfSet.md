@@ -14,7 +14,7 @@ elsewhere as returning `ClassEAC0Obj *` from `include/code_2cc8c.h`, a header
 this unit doesn't own -- see below), stashes it in `gStyleDecorObj`, and
 dispatches three method calls on it (`slot64(obj,1)`, `slot68(obj,0)`,
 `slot4C(obj,tmp,&D_8008AB58)`) plus one call on a completely different
-object reached through `gStyleTargetObj->unkC` (`slotAC(sub)`, whose return
+object reached through `gStyleSceneRefs->unkC` (`slotAC(sub)`, whose return
 feeds the `slot4C` call's middle argument).
 
 ```c
@@ -62,8 +62,8 @@ void ApplyStyleDecorationIfSet(void) {
         ((LocalM4D0Obj *) gStyleDecorObj)->methods->slot64((LocalM4D0Obj *) gStyleDecorObj, 1);
         ((LocalM4D0Obj *) gStyleDecorObj)->methods->slot68((LocalM4D0Obj *) gStyleDecorObj, 0);
 
-        tmp = ((FieldAC7CHolder *) gStyleTargetObj)->unkC->methods->slotAC(
-                ((FieldAC7CHolder *) gStyleTargetObj)->unkC);
+        tmp = ((FieldAC7CHolder *) gStyleSceneRefs)->unkC->methods->slotAC(
+                ((FieldAC7CHolder *) gStyleSceneRefs)->unkC);
 
         ((LocalM4D0Obj *) gStyleDecorObj)->methods->slot4C((LocalM4D0Obj *) gStyleDecorObj, tmp, &D_8008AB58);
     }
@@ -126,7 +126,7 @@ logic, only a different way of naming the same values.
 
 ## Naming
 
-**ApplyStyleDecorationIfSet** -- tier B. Gated entirely on `gStyleDecorColor` (set by `ApplyStyleConfig`'s colour-table branch): if non-NULL, builds a `ClassEAC0Obj` via the already-known `New_BoxFill`, configures it (`slot64`/`slot68`), pulls a value from an unrelated holder object (`gStyleTargetObj`'s `unkC`), and feeds both into `slot4C`. Mechanically described; what the conditional decoration represents is not established, hence tier B rather than a guessed "spawn X" name.
+**ApplyStyleDecorationIfSet** -- tier B. Gated entirely on `gStyleDecorColor` (set by `ApplyStyleConfig`'s colour-table branch): if non-NULL, builds a `ClassEAC0Obj` via the already-known `New_BoxFill`, configures it (`slot64`/`slot68`), pulls a value from an unrelated holder object (`gStyleSceneRefs`'s `unkC`), and feeds both into `slot4C`. Mechanically described; what the conditional decoration represents is not established, hence tier B rather than a guessed "spawn X" name.
 
 ## Track 4 (2026-09-25, round 85, charlie)
 

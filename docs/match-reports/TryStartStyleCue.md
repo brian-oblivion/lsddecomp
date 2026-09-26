@@ -40,7 +40,7 @@ the epilogue: the null path sets `v0 = 0`, the success path sets
 ## New externs
 
 ```c
-extern s32 gStyleTargetObj;                                 /* fresh copy -- see below */
+extern s32 gStyleSceneRefs;                                 /* fresh copy -- see below */
 extern void *FindNextStyleCueInRange(void *arg0, s32 *arg1, void *arg2);  /* forward decl, own unit,
                                                           111w, STALL -- widened round 47,
                                                           see FindNextStyleCueInRange.md */
@@ -53,7 +53,7 @@ extern s32 InitSoundCueSet(s32 arg0, void *arg1, s32 arg2, void *arg3, s32 arg4)
 arg4)`); this call site only needs `void *`/`s32` at the ABI level (matches
 the looser local signatures `Entity.c` and `DreamSys.c` already use for the
 same cross-unit call, per the multiple-independent-local-views convention).
-`gStyleTargetObj` is redeclared fresh here (not reusing the copy later in this
+`gStyleSceneRefs` is redeclared fresh here (not reusing the copy later in this
 file for `FlushStyleCue`/`ServiceStyleCueIfNear`) because this function's ROM
 address is earlier -- same pattern as `StyleUpdateEffectSlots`'s fresh `gStyleVariant`
 copy. `gStyleCueCallbacks` is `class_3bb8c_r.c`'s already-identified 14-function
@@ -72,7 +72,7 @@ ObjN14 *TryStartStyleCue(ObjN14 *arg0, s32 *arg1, void *arg2, void *arg3) {
     sub = (ObjN14Sub *) FindNextStyleCueInRange(&arg0->unk4, &arg0->unk10, arg2);
     if (sub != 0) {
         arg0->unk0 = sub;
-        InitSoundCueSet(*(s32 *) gStyleTargetObj, &arg0->unk14, sub->unk6, arg0, gStyleCueCallbacks[sub->unk6]);
+        InitSoundCueSet(*(s32 *) gStyleSceneRefs, &arg0->unk14, sub->unk6, arg0, gStyleCueCallbacks[sub->unk6]);
         if (sub->unk6 == *arg1) {
             *arg1 = -sub->unk6;
         }
