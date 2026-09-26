@@ -1,6 +1,6 @@
 /*
- * class_3bb8c_q -- 0x485BC..0x48738, two methods of class D800879C4 (table
- * gClass879C4Methods, 49 slots; tools/classtable.py). D800879C4 is a 0xA8-byte
+ * class_3bb8c_q -- 0x485BC..0x48738, two methods of Class879C4 (table
+ * gClass879C4Methods, 49 slots; include/Class879C4.h). Class879C4 is a 0xA8-byte
  * sprite object: a subclass of the sprite class whose table is gSpriteMethods
  * (tag 0x44; GsSPRITE embedded at +0x64, drawn by Viewport__DrawNode through
  * GsSortSprite), which is itself a Class6B5CC subclass. Its ctor and
@@ -20,39 +20,7 @@
  */
 
 #include "common.h"
-
-/*
- * This unit's own local view of the object (class_3bb8c_p.c and
- * class_3bb8c_t.c carry theirs, per the multiple-independent-local-views
- * convention). New_Class879C4 allocates 0xA8 bytes; every offset here stays
- * inside.
- */
-typedef struct D800879C4Obj D800879C4Obj;
-struct D800879C4Obj {
-    u8 pad00[0x58];
-    /* +0x058..+0x063: written by the base class's slot +0x040 init
-     * (Sprite__Reset, asm/psyq_322b4.s: unk58 = 0) and read by
-     * Class879C4__UpdateScale below; Viewport__DrawNode's sprite draw path does
-     * not read them. What sets unk58 non-zero is not established. */
-    s32 unk58;                  /* +0x058, UpdateScale: non-zero selects the scale-in-place path */
-    s32 unk5C;                  /* +0x05C, UpdateScale: multiplied by the x ratio when unk58 != 0 */
-    s32 unk60;                  /* +0x060, UpdateScale: multiplied by the y ratio when unk58 != 0 */
-    /* +0x064: an embedded GsSPRITE (layout confirmed by the base init
-     * InitGsSprite, which fills attribute/w/h/tpage/u/v/cx/cy/rgb/mx/my/
-     * scalex/scaley/rotate at their GsSPRITE offsets, and by
-     * Viewport__DrawNode, which hands self+0x64 to GsSortSprite). Only the
-     * members this unit touches are spelled out. */
-    u8 pad64[0x74 - 0x64];
-    s16 spriteClutX;            /* +0x074, GsSPRITE.cx */
-    s16 spriteClutY;            /* +0x076, GsSPRITE.cy */
-    u8 pad78[0x80 - 0x78];
-    s16 spriteScaleX;           /* +0x080, GsSPRITE.scalex (20.12) */
-    s16 spriteScaleY;           /* +0x082, GsSPRITE.scaley (20.12) */
-    u8 pad84[0xA0 - 0x84];
-    /* +0x0A0: the ctor's arg1, which also picks this object's texture cell
-     * (&gClass879C4Cells[arg1], passed to the base ctor by Class879C4__Class879C4). */
-    s32 variant;
-};
+#include "Class879C4.h"
 
 /*
  * Two parallel lookup tables, 2 entries each, stride 4 bytes (indexed as
@@ -66,10 +34,10 @@ struct D800879C4Obj {
 extern const s16 gClass879C4ClutX[];
 extern const s16 gClass879C4ClutY[];
 
-void Class879C4__SetVariantClut(D800879C4Obj *self, s32 variant) {
+void Class879C4__SetVariantClut(Class879C4 *self, s32 variant) {
     self->variant = variant;
-    self->spriteClutX = gClass879C4ClutX[variant * 2];
-    self->spriteClutY = gClass879C4ClutY[variant * 2];
+    self->sprite.cx = gClass879C4ClutX[variant * 2];
+    self->sprite.cy = gClass879C4ClutY[variant * 2];
 }
 
 /*
@@ -82,7 +50,7 @@ void Class879C4__SetVariantClut(D800879C4Obj *self, s32 variant) {
  * Unlike the base method, `set` is never read: every path assigns. Read as
  * a raw `s16 *` per the RatioToFixed12 precedent for this shape.
  */
-void Class879C4__UpdateScale(D800879C4Obj *self, s32 set, s16 *ratios) {
+void Class879C4__UpdateScale(Class879C4 *self, s32 set, s16 *ratios) {
     s32 q1, r1, q2, ratio1;
     s32 q3, r3, q4, ratio2;
     s16 short1, short2;
@@ -103,7 +71,7 @@ void Class879C4__UpdateScale(D800879C4Obj *self, s32 set, s16 *ratios) {
         self->unk5C = ((s16)ratio1 * self->unk5C) >> 12;
         self->unk60 = ((s16)ratio2 * self->unk60) >> 12;
     } else {
-        self->spriteScaleX = short1;
-        self->spriteScaleY = short2;
+        self->sprite.scalex = short1;
+        self->sprite.scaley = short2;
     }
 }
