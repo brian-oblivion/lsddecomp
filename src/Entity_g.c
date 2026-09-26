@@ -22,7 +22,7 @@
  * counts, distances in world units, TOD frame numbers, VAB program
  * numbers, and the `state` values other than 0 and ENTITY_STATE_DONE,
  * which are each handler's own phases. The named motion templates
- * (ROTATION_YAW_PLUS1, ROTATION_ZPLUS4, SCALE_EIGHTH, SCALE_QUARTER,
+ * (ROTATION_YAW_PLUS1, ROTATION_YAW_PLUS4, SCALE_EIGHTH, SCALE_QUARTER,
  * SCALE_THIRTY_SECOND, SCALE_UNIT) are declared once in include/Entity.h.
  * Five more data constants (ROTATION_YAW_MINUS_THIRD, ROTATION_YAW_MINUS_HALF, SCALE_X_FOUR_FIFTHS_Y_SIX_FIFTHS, SCALE_X_EIGHTH_Y2_Z_EIGHTH,
  * SCALE_TWO_FIFTHS) are left unnamed for lack of a naming precedent -- a
@@ -182,7 +182,7 @@ void Entity__MoodCue110(Entity *this, SoundCueSet *out) {
     }
     if (this->state == 10) {
         if (this->moodTimer < 45) {
-            this->methods->updateRotation(this, 0, ROTATION_ZPLUS4);
+            this->methods->updateRotation(this, 0, ROTATION_YAW_PLUS4);
         }
         if (this->moodTimer >= 501) {
             this->state = 0;

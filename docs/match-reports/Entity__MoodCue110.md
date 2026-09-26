@@ -29,7 +29,7 @@ void Entity__MoodCue110(Entity *this, EntityMoodHandlerArg *out) {
     }
     if (this->unk44 == 0xA) {
         if (this->unkFC < 0x2D) {
-            this->methods->slot44(this, 0, ROTATION_ZPLUS4);
+            this->methods->slot44(this, 0, ROTATION_YAW_PLUS4);
         }
         if (this->unkFC >= 0x1F5) {
             this->unk44 = 0;
@@ -59,7 +59,7 @@ names sort in table order.
 
 ## Data constant decoded this round
 
-`ROTATION_ZPLUS4` (0x80089D00), this function's `updateRotation` argument
+`ROTATION_YAW_PLUS4` (0x80089D00), this function's `updateRotation` argument
 inside its `moodState == 0xA` branch, decoded from `disk/SLPS_015.56` as
 four s16 `{num,den}` pairs: `(0,1, 4,1, 0,1, 90,1)` -- only Z is a whole
 degree (4/1), X=Y=0; W=90/1 is ignored per the established precedent that
