@@ -112,7 +112,7 @@ typedef struct SplitLongVec3 {
 
 /* The step from a centre chunk's index (row * columns + column) to one of
  * the seven chunks around it, indexed by ChunkSlotSpec::key
- * (sRateEntryTable, ComputeRateEntry): rowDelta rows, then colDeltaOddRow
+ * (sChunkNeighbourDeltas, ComputeRateEntry): rowDelta rows, then colDeltaOddRow
  * or colDeltaEvenRow columns by the centre row's parity (odd rows sit half a
  * chunk to -x, ComputeCellWorldOffsets). The table holds the centre (key 3,
  * all 0) and its six staggered neighbours. */
@@ -144,7 +144,7 @@ typedef struct ChunkLoadEntryTail {
 
 /* loadChunksAround' per-slot pair (sDefaultTargetSpecs and the
  * sFootprintResultPtrTable tables hold seven each): the neighbour key the
- * slot takes (0..6, the index into sRateOffsetTable and sRateEntryTable;
+ * slot takes (0..6, the index into sRateOffsetTable and sChunkNeighbourDeltas;
  * 3 is the centre) and whether it is (re)loaded and repositioned. */
 typedef struct ChunkSlotSpec {
     u8 neighbour; /* +0x0 */

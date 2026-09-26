@@ -32,13 +32,13 @@ extern LongVec3 sRateOffsetTable[];
 
 /* `key`-indexed bitmask table (`1 << key`) StageMap__ComputeChunkLoadEntry tests
  * against ComputeRateFlags' result. 7 words in the data before
- * sRateEntryTable starts. */
+ * sChunkNeighbourDeltas starts. */
 extern const s32 sRateKeyMask[7];
 
 /* `key`-indexed chunk-index steps to the seven chunks around a centre chunk
  * (ChunkNeighbourDelta, include/StageMap.h), 7 entries
  * (0x800868A8-0x800868FC). */
-extern const ChunkNeighbourDelta sRateEntryTable[7];
+extern const ChunkNeighbourDelta sChunkNeighbourDeltas[7];
 
 /* LbdFile::ownerKey-indexed remap, read signed by
  * StageMap__UpdateFootprintTracking: exactly 8 bytes in the data

@@ -8,7 +8,7 @@
 
 REVISITED, round 63: MATCHED 63/63, whole-image SHA1 green; names/types not
 relevant (no header, symbol or type change was needed -- `sRateKeyMask`,
-`sRateEntryTable`, `Obj866E8::unk60`/`unk64`, `Unk54Struct` and `ChunkLoadEntry`
+`sChunkNeighbourDeltas`, `Obj866E8::unk60`/`unk64`, `Unk54Struct` and `ChunkLoadEntry`
 were all already correct; the stall was one variable too many).
 
 > **ROUND 63 (delta): MATCHED, 58/63 -> 63/63 in two builds.** Stalled at
@@ -165,7 +165,7 @@ were all already correct; the stall was one variable too many).
 >
 > **Split-combined-declaration lever, tried on all three untried
 > candidates in the `self->unk68->unk4 == 0` block:** `const Unk54Struct
-> *entry = &sRateEntryTable[key];`, `s32 fieldVal = entry->unk4;` and `s32 lo =
+> *entry = &sChunkNeighbourDeltas[key];`, `s32 fieldVal = entry->unk4;` and `s32 lo =
 > divisor * entry->unk0;` are all combined declare-plus-initializer forms
 > that this report's history had not previously split (round 40's
 > "separating `fieldVal`/`sum` from `value`" tried a different axis --
@@ -331,7 +331,7 @@ returning whether it produced a "real" entry (`1`) or a blank one (`0`):
    word (see "rodata ownership" note below on why this is written as a raw
    `s32`, not `ChunkLoadEntry::rate`):
    - If `self->unk68->unk4 == 0`: `value = val + key`.
-   - Else, index a second table `sRateEntryTable[key]` (7-entry `Unk54Struct`
+   - Else, index a second table `sChunkNeighbourDeltas[key]` (7-entry `Unk54Struct`
      array, same proof as `sRateKeyMask`'s bound):
      - If `entry->unk0 == 0`: `value = val + entry->unk4`.
      - Else: `value = val + divisor * entry->unk0 + (flag ? entry->unk4 : entry->unk8)`
@@ -382,10 +382,10 @@ this function.
   is evidence-backed (retail's own `$v0` sets, not a guess), so the fix is
   almost certainly on `StageMap__LoadChunksAround`'s side, not this declaration's.
 - **Two new `extern` declarations**: `sRateKeyMask[7]` and
-  `sRateEntryTable[7]`. Both sizes are PROVEN, not guessed -- the data file
+  `sChunkNeighbourDeltas[7]`. Both sizes are PROVEN, not guessed -- the data file
   (`asm/data/76DC8.data.s`) places exactly 7 words at `sRateKeyMask` before
-  `sRateEntryTable` starts, and exactly 7 `Unk54Struct`-shaped (3-word) entries
-  at `sRateEntryTable` before the next symbol (`sFootprintResultRemap`) starts. Comments in
+  `sChunkNeighbourDeltas` starts, and exactly 7 `Unk54Struct`-shaped (3-word) entries
+  at `sChunkNeighbourDeltas` before the next symbol (`sFootprintResultRemap`) starts. Comments in
   the header point at this.
 
 ## SUPERSEDED by round 63 -- the matching body
@@ -398,7 +398,7 @@ round-63 entry at the top.
 
 ```c
     if (self->unk68->unk4 == 0) {
-        const Unk54Struct *entry = &sRateEntryTable[key];
+        const Unk54Struct *entry = &sChunkNeighbourDeltas[key];
         s32 value;
         s32 sum;
 
@@ -433,7 +433,7 @@ s32 StageMap__ComputeChunkLoadEntry(Obj866E8 *self, ChunkLoadEntry *arg1, s32 di
     }
 
     if (self->unk68->unk4 == 0) {
-        const Unk54Struct *entry = &sRateEntryTable[key];
+        const Unk54Struct *entry = &sChunkNeighbourDeltas[key];
         s32 value;
 
         if (entry->unk0 == 0) {
@@ -467,7 +467,7 @@ storeKey:
 ```
 
 Needs (all added to `include/class_3bb8c.h` this round): `sRateKeyMask`,
-`sRateEntryTable`, `Obj866E8::unk60`/`unk64`. `Unk54Struct` and `ChunkLoadEntry`
+`sChunkNeighbourDeltas`, `Obj866E8::unk60`/`unk64`. `Unk54Struct` and `ChunkLoadEntry`
 already existed.
 
 ## What was tried, in order
@@ -573,4 +573,4 @@ Round 78 (track 3, naming pass, bravo).
 
 | symbol | name | tier | evidence |
 | --- | --- | --- | --- |
-| `func_8004BA40` | `StageMap__ComputeChunkLoadEntry` | B | Fills one `ChunkLoadEntry` slot (`arg1->ptr0`/`arg1->id`) from `sRateEntryTable[key]`/`sRateKeyMask[key]` and `self->unk60(self->unk64, ...)` (a stored resolver callback), called once per enabled `ChunkSlotSpec` by `StageMap__LoadChunksAround`. "Compute...Entry" matches that caller's own "Build...Entries" name (one call computes one entry of the array the caller builds). Return type corrected `void`->`s32` in an earlier round (see the header's own note); not revisited here. |
+| `func_8004BA40` | `StageMap__ComputeChunkLoadEntry` | B | Fills one `ChunkLoadEntry` slot (`arg1->ptr0`/`arg1->id`) from `sChunkNeighbourDeltas[key]`/`sRateKeyMask[key]` and `self->unk60(self->unk64, ...)` (a stored resolver callback), called once per enabled `ChunkSlotSpec` by `StageMap__LoadChunksAround`. "Compute...Entry" matches that caller's own "Build...Entries" name (one call computes one entry of the array the caller builds). Return type corrected `void`->`s32` in an earlier round (see the header's own note); not revisited here. |

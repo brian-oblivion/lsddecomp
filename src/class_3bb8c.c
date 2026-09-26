@@ -261,7 +261,7 @@ s32 StageMap__ComputeChunkLoadEntry(StageMap *self, ChunkLoadEntry *arg1, s32 di
     }
 
     if (self->config->isVertical == 0) {
-        const ChunkNeighbourDelta *entry = &sRateEntryTable[key];
+        const ChunkNeighbourDelta *entry = &sChunkNeighbourDeltas[key];
         s32 value;
         s32 sum;
 
