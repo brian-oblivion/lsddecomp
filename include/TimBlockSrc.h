@@ -13,8 +13,8 @@
  * its first 0x24 bytes are a header -- a block count, the blocks' file
  * offsets from +0x04, their sizes from +0x14 (MaxOfBufferWords) -- copied
  * into `buffer`. Each block is then read into `sector` and handed to a new
- * TimArraySrc (D_8006F1C4), whose +0x34 CLUT base is `entries`, into
- * `blocks`.
+ * TimArraySrc (D_8006F1C4, include/TimArraySrc.h), whose clutBase is
+ * `entries`, into `blocks`.
  *
  * Fading. `entries[i]` is CLUT row i's fade ramp: `mask` (1 << shift) rows
  * from VRAM y 0x1E0 + i * mask, the first the CLUT itself and the rest
@@ -66,7 +66,7 @@ struct TimBlockSrcMethods {
 struct TimBlockSrc {
     CLASS6D430_FIELDS(TimBlockSrcMethods); /* unk2A is the load state: 9 header, 10 blocks, 0 done */
     /* +0x02C */ s32 blockCount;      /* TimArraySrcs built so far */
-    /* +0x030 */ Class6D430 **blocks; /* one TimArraySrc per block; ReleaseBasicClassArray'd by Finalize */
+    /* +0x030 */ struct TimArraySrc **blocks; /* one per block; ReleaseBasicClassArray'd by Finalize */
     /* +0x034 */ void *sector;        /* the read buffer: 0x800 for the header, then the largest block size */
     /* +0x038 */ s32 sectorSize;
     /* +0x03C */ s32 loaded;          /* set after the last block */

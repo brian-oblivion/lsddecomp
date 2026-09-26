@@ -38,3 +38,7 @@ void TimArraySrc__Finalize(DataSrc33808 *self) {
 ## Naming
 
 - **TimArraySrc__Finalize**, tier A. Class6D430 finalize override: releases the image array at +0x30.
+
+
+## Track 4 (2026-09-26, round 88, runner alpha)
+Class unified as TimArraySrc (include/TimArraySrc.h); self retyped from DataSrc33808, unk30/unk2C read as images/count. Byte-identical.

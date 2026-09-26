@@ -112,3 +112,7 @@ Second build (the first was already 183/183; the second only added local Lock/Un
 ## Track 4 (2026-09-25, round 83, bravo)
 
 Occupant of Class6D430's `setFlag` slot (+0x064); keeps its name because the body is the whole loader state machine, not a flag set. Correction to the prose above: the 0x24-byte header is a count, four file offsets (+0x04) and four sizes (+0x14, what MaxOfBufferWords maximises), not eight offsets. The class (id 0xF03, table `D_8006F0B8`) is unified as `TimBlockSrc` in `include/TimBlockSrc.h`. Any source block above is the pre-unification spelling; the live body in `src/code_33808.c` takes the unified types, byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).
+
+
+## Track 4 (2026-09-26, round 88, runner alpha)
+TimArraySrc unified (include/TimArraySrc.h): TimBlockSrc's `blocks` is now `struct TimArraySrc **`, so `p` is a TimArraySrc ** with no cast, New_TimArraySrc(NULL), the store to +0x034 is `clutBase`, and slot78 is called through TimArraySrcUploadFn. Byte-identical.

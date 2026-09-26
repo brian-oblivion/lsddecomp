@@ -62,3 +62,7 @@ nothing else writes it. TimImage's +0x078 occupant is TimImage__Upload
 reach is TimBlockSrc__AdvanceLoadState, which calls this slot right after
 setFlag (BuildImages) on each new TimArraySrc. The call goes through
 TimImageUploadFn (no code). Class header: include/TimArraySrc.h.
+
+
+## Track 4 (2026-09-26, round 88, runner alpha)
+Class unified: self is TimArraySrc (include/TimArraySrc.h), images read as TimImage ** and each call goes through TimImageUploadFn. Byte-identical.

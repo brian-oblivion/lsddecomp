@@ -31,3 +31,7 @@ void *GetTimArraySrcMethods(void) {
 ## Naming
 
 - **GetTimArraySrcMethods**, tier A. Table getter.
+
+
+## Track 4 (2026-09-26, round 88, runner alpha)
+Class unified as TimArraySrc: returns `TimArraySrcMethods *` (`&D_8006F1C4`, declared in include/TimArraySrc.h) instead of `void *` over a local `extern s32 D_8006F1C4[]`, which is deleted. Byte-identical.

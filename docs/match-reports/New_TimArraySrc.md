@@ -43,3 +43,7 @@ void *New_TimArraySrc(s32 arg0) {
 ## Naming
 
 - **New_TimArraySrc**, tier A. Allocator for D_8006F1C4, which builds arrays of TimImage objects (New_TimImage, confirmed elsewhere as "new TimImage(name)", src/code_2bb9c.c).
+
+
+## Track 4 (2026-09-26, round 88, runner alpha)
+Class unified as TimArraySrc (include/TimArraySrc.h). Now declared `TimArraySrc *New_TimArraySrc(char *name)` and calls the prototyped `GetTimArraySrcMethods()->ctor(obj, name)` instead of casting the table to the unit-local Ctor33808: the ctor's second parameter is `name` (TimArraySrc__TimArraySrc passes it to requestLoadFile) and the one caller, TimBlockSrc__AdvanceLoadState, passes 0 (now NULL). Byte-identical.
