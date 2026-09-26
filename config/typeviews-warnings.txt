@@ -1,15 +1,11 @@
 DreamSys: src/DreamSys.c: At top level:
 DreamSys: warning: `DreamSys__ApplyRelativeOffset' was previously implicitly declared to return `int'
-DreamSys: warning: `struct DreamSys' declared inside parameter list
 DreamSys: warning: control reaches end of non-void function
 DreamSys: warning: implicit declaration of function `DreamSys__ApplyRelativeOffset'
-DreamSys: warning: its scope is only this definition or declaration,
-DreamSys: warning: passing arg 3 from incompatible pointer type
 DreamSys: warning: previous external decl of `DreamSys__ApplyRelativeOffset'
 DreamSys: warning: previous implicit declaration of `DreamSys__ApplyRelativeOffset'
 DreamSys: warning: type mismatch with previous external decl
 DreamSys: warning: type mismatch with previous implicit declaration
-DreamSys: warning: which is probably not what you want.
 Entity_g: warning: passing arg 4 of `Entity__GetOrCreateUnk100' makes pointer from integer without a cast
 class_3ac78: warning: unused variable `unused'
 class_3bb8c: src/class_3bb8c.c: At top level:
@@ -65,10 +61,7 @@ class_3bb8c_n: warning: previous external decl of `AdjustRgbByDelta'
 class_3bb8c_n: warning: previous implicit declaration of `AdjustRgbByDelta'
 class_3bb8c_n: warning: type mismatch with previous external decl
 class_3bb8c_n: warning: type mismatch with previous implicit declaration
-class_3bb8c_p: warning: `struct DreamSys' declared inside parameter list
-class_3bb8c_p: warning: its scope is only this definition or declaration,
 class_3bb8c_p: warning: unused variable `pad48Tail'
-class_3bb8c_p: warning: which is probably not what you want.
 class_3bb8c_s: warning: implicit declaration of function `rand'
 code_1677c: warning: control reaches end of non-void function
 code_1677c: warning: passing arg 2 makes pointer from integer without a cast
