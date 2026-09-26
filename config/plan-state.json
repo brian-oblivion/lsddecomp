@@ -1007,6 +1007,11 @@
           "date": "2026-09-26",
           "header": "include/TextEntry.h"
         },
+        "gTextRowMethods": {
+          "class": "TextRow",
+          "date": "2026-09-26",
+          "header": "include/TextRow.h"
+        },
         "gTmdModelMethods": {
           "class": "TmdModel",
           "date": "2026-09-26",
