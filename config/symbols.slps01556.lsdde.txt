@@ -2947,3 +2947,4 @@ gStyleEffectTmd = 0x8008ACA4;
 gStyleEffectTim = 0x8008ACA8;
 gStyleEffectViewport = 0x8008ACAC;
 gStyleEffectModelIds = 0x8008AB98;
+SCALE_UNIT = 0x80089E14;

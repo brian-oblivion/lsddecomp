@@ -350,7 +350,7 @@ void Entity__MoodCue77(Entity *this, SoundCueSet *out) {
 
 /* {1/1, 1/1, 1/1}: the identity scale, a copy in .data of the values
  * code_d294.h's SCALE_ONE holds in .rodata. Entity_g passes it too. */
-extern u8 D_80089E14[];
+extern u8 SCALE_UNIT[];
 /* Entity__MoodCue78's: cleared on the cue's first tick, set when its phase
  * 11 ends the cue at tick 510; at tick 520 a set flag ends it again. */
 extern s32 sMoodCue78TransitionDone;
@@ -409,7 +409,7 @@ void Entity__MoodCue78(Entity *this, SoundCueSet *out) {
             rollOrDy = (this->state == 12) ? 400 : 0;
             this->state = 13;
         } else {
-            table = D_80089E14;
+            table = SCALE_UNIT;
             if (this->state == 13) {
                 rollOrDy = -400;
             }

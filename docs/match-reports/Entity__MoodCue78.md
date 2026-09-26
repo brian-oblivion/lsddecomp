@@ -84,7 +84,7 @@ Round 45 wrote the `unk44 >= 0xC` reroll arms as
 old = this->unk44;
 this->unk44 = 0xC;
 if (old == 0xD) { tmp = -0x190; }
-table = D_80089E14;
+table = SCALE_UNIT;
 ```
 
 Retail has no `old` at all, loads the table first, and puts the **store
@@ -92,7 +92,7 @@ after the test**, which is what frees the `bne` delay slot:
 
 ```
 536fc:  lui   a2,0x8009
-53700:  addiu a2,a2,-0x61ec     ; table = D_80089E14
+53700:  addiu a2,a2,-0x61ec     ; table = SCALE_UNIT
 53704:  lw    v1,0x44(s0)
 53708:  li    v0,0xd
 5370c:  bne   v1,v0,53718
@@ -104,7 +104,7 @@ after the test**, which is what frees the `bne` delay slot:
 so:
 
 ```c
-table = D_80089E14;
+table = SCALE_UNIT;
 if (this->unk44 == 0xD) { tmp = -0x190; }
 this->unk44 = 0xC;
 ```
@@ -231,7 +231,7 @@ Reading this function's `out->` writes with the proposed `SoundCueSet` field nam
 
 **Data/global renamed this round:** `D_80089D0C` -> `ROTATION_XPLUS90` (first {num,den} pair = (90,1), the X slot by the same X/Y/Z decoding as `Entity__MoodCue68`'s report), tier B. `D_8008ACCC` -> `sMoodCue78TransitionDone`, tier B: a one-shot s32 flag local to this function -- cleared at `out->unk4==0`, set when the `moodState==0xB` branch fires at `unk4==0x1FE`, read once more at `unk4==0x208` to gate a second `stopSoundCue`/`moodState` reset. No other file in `src/` references it.
 
-**`D_80089E14` left unnamed this round.** s16-pair-decoded it reads (1,1, 1,1, 1,1, 1,8) -- X=Y=Z=1 (no scale change on the three named axes), only the 4th/W pair differs (1,8). Every named `SCALE_*` table so far is named for its X/Y/Z content and ignores W (e.g. `SCALE_HALF`'s own W is (4,5), `SCALE_SIX`'s is (2,5)), so this table reads as an X/Y/Z-identity scale and there is no precedent for naming one on its W value alone.
+**`SCALE_UNIT` left unnamed this round.** s16-pair-decoded it reads (1,1, 1,1, 1,1, 1,8) -- X=Y=Z=1 (no scale change on the three named axes), only the 4th/W pair differs (1,8). Every named `SCALE_*` table so far is named for its X/Y/Z content and ignores W (e.g. `SCALE_HALF`'s own W is (4,5), `SCALE_SIX`'s is (2,5)), so this table reads as an X/Y/Z-identity scale and there is no precedent for naming one on its W value alone.
 
 ## Track 4 (2026-09-26, round 88, echo)
 
@@ -239,4 +239,4 @@ The class (id 0x1F234, table `gEntityMethods`) is unified as `Entity` in `includ
 
 ## Track 7 (round 93, echo)
 
-Every literal in the live body is in its base: decimal for moodTimer and cue-set ticks, TOD frames, distances, VAB programs and `state` phases (the unit has no hex literal left). Local `tmp` is `rollOrDy`: it holds the rand() % 3 roll and later the y move. Splitting it into `roll` and `dy` was measured and changes the register allocation (whole image red), so it stays one local with a `MATCHING:` line. Both `state = 1` after stopSoundCue are ENTITY_STATE_DONE. `sMoodCue78TransitionDone` got a comment on its declaration (what sets and reads it). `D_80089E14` ({1,1} x3, the identity scale) stays a symbol: Entity_g declares it too, so a rename moves a declaration in another unit; proposed to the head. Byte-identical (whole image green).
+Every literal in the live body is in its base: decimal for moodTimer and cue-set ticks, TOD frames, distances, VAB programs and `state` phases (the unit has no hex literal left). Local `tmp` is `rollOrDy`: it holds the rand() % 3 roll and later the y move. Splitting it into `roll` and `dy` was measured and changes the register allocation (whole image red), so it stays one local with a `MATCHING:` line. Both `state = 1` after stopSoundCue are ENTITY_STATE_DONE. `sMoodCue78TransitionDone` got a comment on its declaration (what sets and reads it). `SCALE_UNIT` ({1,1} x3, the identity scale) stays a symbol: Entity_g declares it too, so a rename moves a declaration in another unit; proposed to the head. Byte-identical (whole image green).

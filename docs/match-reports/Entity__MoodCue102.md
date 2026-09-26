@@ -43,7 +43,7 @@ void Entity__MoodCue102(Entity *this, EntityMoodHandlerArg *out) {
     if (this->unkFC >= 0x30D) {
         SceneNode__FaceTarget(this, this->unk94, 1, 0, 0);
         if (this->unkFC >= 0x790) {
-            a2 = D_80089E14;
+            a2 = SCALE_UNIT;
         } else if (this->unkFC >= 0x78B) {
             a2 = D_80089DE4;
         } else if (this->unkFC >= 0x786) {
@@ -153,7 +153,7 @@ elsewhere in this unit -- same symbol, not redecoded per call site.
   fractional-degree rotation constant has a name anywhere in the project
   yet, so inventing one here (`ROTATION_YAW_MINUS_THIRD`-style) would be a
   new naming style, not an application of an existing one.
-- `D_80089E14` (`updateScale` arg, `moodTimer >= 0x790` arm): decoded
+- `SCALE_UNIT` (`updateScale` arg, `moodTimer >= 0x790` arm): decoded
   `(1,1, 1,1, 1,1, 1,8)` -- uniform X=Y=Z=1/1, i.e. the same VALUE as the
   existing (structurally distinct, different address, 0xC-byte/3-entry)
   `SCALE_ONE` used by `SceneNode__UpdateScale`. Not renamed to `SCALE_ONE`
