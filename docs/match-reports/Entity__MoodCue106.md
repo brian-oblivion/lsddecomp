@@ -13,7 +13,7 @@ No hits.
 `gEntityMoodHandlerTable` handler row; `out` unused. Sets `this->unk44 = 0xB` on
 `(rand() & 1) == 0` when `this->unkFC == 0`. If `this->unk44 == 0xB`:
 dispatches `slot130` (guarded by `unkFC==0`) then `slot48(this, 1,
-D_80089E2C)`. Otherwise: dispatches `slot128` (guarded by `unkFC==0`) then
+SCALE_X_EIGHTH_Y2_Z_EIGHTH)`. Otherwise: dispatches `slot128` (guarded by `unkFC==0`) then
 `slotC8(this, unkFC%20<10 ? 0x20 : -0x20, 0)`.
 
 ## The C
@@ -32,7 +32,7 @@ void Entity__MoodCue106(Entity *this, EntityMoodHandlerArg *out) {
             this->methods->slot130(this);
         }
         fn = this->methods->slot48;
-        ((void (*)(Entity *, s32, void *))fn)(this, 1, D_80089E2C);
+        ((void (*)(Entity *, s32, void *))fn)(this, 1, SCALE_X_EIGHTH_Y2_Z_EIGHTH);
         return;
     }
     if (this->unkFC == 0) {
@@ -46,7 +46,7 @@ void Entity__MoodCue106(Entity *this, EntityMoodHandlerArg *out) {
 
 Retail's disassembly reaches a SINGLE `jalr $v0 / nop` instruction pair
 (file `0x55488`/`vram 0x64c88`) from BOTH branches: the `unk44==0xB` path
-sets up `v0`=`slot48`, `a1`=1, `a2`=`&D_80089E2C` and jumps there; the other
+sets up `v0`=`slot48`, `a1`=1, `a2`=`&SCALE_X_EIGHTH_Y2_Z_EIGHTH` and jumps there; the other
 path sets up `v0`=`slotC8`, `a1`=`±0x20`, `a2`=0 and falls into the same
 address. This is GCC 2.6.3's tail/cross-jump merge collapsing two
 DIFFERENT call sites (different vtable offsets, different argument types)
@@ -127,7 +127,7 @@ names sort in table order.
 
 ## Data constant left unnamed this round
 
-`D_80089E2C` (`updateScale` arg, reached through a raw function-pointer
+`SCALE_X_EIGHTH_Y2_Z_EIGHTH` (`updateScale` arg, reached through a raw function-pointer
 indirect call in the `moodState == 0xB` branch): s16-pair decoded
 `(1,8, 2,1, 1,8, 6,1)` -- X=1/8, Y=2/1, Z=1/8, not uniform across X/Y/Z,
 so it is not one of this project's single-ratio `SCALE_*` names.
