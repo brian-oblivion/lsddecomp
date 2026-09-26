@@ -81,3 +81,16 @@ a fraction like 2/5, so left as `D_` rather than inventing a new word
 ## Track 4 (2026-09-26, round 88, echo)
 
 The class (id 0x1F234, table `gEntityMethods`) is unified as `Entity` in `include/Entity.h`: a TodActor subclass whose table and object expand `TODACTOR_SLOTS`/`TODACTOR_FIELDS`. Any source block above is the pre-unification spelling; the live body takes the inherited names (fields `parent`, `coord2`->`tx/ty/tz`, `tick`, `linkTarget`, `state` (was `moodState`), `lastOffsetValue`, `grid` (was `unk4C`), `ticker` (was `companion2`), `arg2` (was `soundCueChannel`), `parts`, `todPlaying`, `peer` (was `target`, cast to the `Unk94Obj` DreamSys view where its own slots are called); slots `reset`, `setDisplay`, `setLightMode`, `setTranslation`/`addTranslation`, `moveLocalZ/X/Y`, `moveLocalZOrFindLink`, `selectTickCallback`, `enableTickCallback`/`disableTickCallback`, `distanceToPeer`, `setTargetReached`, `updateActivationState`/`updateDeactivationState`), byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).
+
+## Track 7 (2026-09-26, round 94, alpha)
+
+### Naming
+
+| old | new | tier | evidence |
+| --- | --- | --- | --- |
+| `D_80089E44` | `SCALE_TWO_FIFTHS` | A (by value) | `.word 0x00050002` x3 = uniform 2/5, like `SCALE_EIGHT_SEVENTHS` |
+| `ROTATION_ZPLUS4` | `ROTATION_YAW_PLUS4` | A (by value) | `.word 0x00010000, 0x00010004, 0x00010000` = {0/1, 4/1, 0/1}: the 4 is the SECOND pair, Y (yaw), as in `ROTATION_YAW_PLUS9` = {0, 9, 0}; `ROTATION_ZPLUS9` = {0, 0, 9} has it third |
+
+**Correction** to "Data constant decoded this round" above: it read
+`(0,1, 4,1, 0,1, ...)` correctly and then called the second pair Z. The
+name followed the misreading; this function is its only user.

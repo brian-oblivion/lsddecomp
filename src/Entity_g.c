@@ -1,5 +1,5 @@
-/* Entity_g: twenty of Entity's MoodCue handlers and the helper one of them
- * shares.
+/* Entity_g: nineteen of Entity's MoodCue handlers and a per-tick helper
+ * one of them shares with Entity_d.
  *
  * Each Entity__MoodCueNN is the `handler` of gEntityMoodHandlerTable's row
  * NN (include/Entity.h): rows 98, 102 to 106, 108 to 111, 113, 114, 117,
@@ -21,14 +21,9 @@
  * The literals are left unnamed where they are one handler's tuning: tick
  * counts, distances in world units, TOD frame numbers, VAB program
  * numbers, and the `state` values other than 0 and ENTITY_STATE_DONE,
- * which are each handler's own phases. The named motion templates
- * (ROTATION_YAW_PLUS1, ROTATION_YAW_PLUS4, SCALE_EIGHTH, SCALE_QUARTER,
- * SCALE_THIRTY_SECOND, SCALE_UNIT) are declared once in include/Entity.h.
- * Five more data constants (ROTATION_YAW_MINUS_THIRD, ROTATION_YAW_MINUS_HALF, SCALE_X_FOUR_FIFTHS_Y_SIX_FIFTHS, SCALE_X_EIGHTH_Y2_Z_EIGHTH,
- * SCALE_TWO_FIFTHS) are left unnamed for lack of a naming precedent -- a
- * non-whole-degree rotation or a non-uniform/non-unit-fraction scale; see
- * each function's match report (`## Naming` / `## Data constant(s) ...
- * unnamed`) for the per-constant evidence.
+ * which are each handler's own phases. The motion templates the handlers
+ * pass to updateRotation and updateScale (ROTATION_*, SCALE_*) are named
+ * by value and declared once in include/Entity.h.
  */
 #include "common.h"
 #include "Entity.h"

@@ -135,3 +135,22 @@ so it is not one of this project's single-ratio `SCALE_*` names.
 ## Track 4 (2026-09-26, round 88, echo)
 
 The class (id 0x1F234, table `gEntityMethods`) is unified as `Entity` in `include/Entity.h`: a TodActor subclass whose table and object expand `TODACTOR_SLOTS`/`TODACTOR_FIELDS`. Any source block above is the pre-unification spelling; the live body takes the inherited names (fields `parent`, `coord2`->`tx/ty/tz`, `tick`, `linkTarget`, `state` (was `moodState`), `lastOffsetValue`, `grid` (was `unk4C`), `ticker` (was `companion2`), `arg2` (was `soundCueChannel`), `parts`, `todPlaying`, `peer` (was `target`, cast to the `Unk94Obj` DreamSys view where its own slots are called); slots `reset`, `setDisplay`, `setLightMode`, `setTranslation`/`addTranslation`, `moveLocalZ/X/Y`, `moveLocalZOrFindLink`, `selectTickCallback`, `enableTickCallback`/`disableTickCallback`, `distanceToPeer`, `setTargetReached`, `updateActivationState`/`updateDeactivationState`), byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).
+
+## Track 7 (2026-09-26, round 94, alpha)
+
+### Naming
+
+| old | new | tier | evidence |
+| --- | --- | --- | --- |
+| `D_80089E2C` | `SCALE_X_EIGHTH_Y2_Z_EIGHTH` | A (by value) | `.word 0x00080001, 0x00010002, 0x00080001` = {1/8, 2/1, 1/8} |
+
+### The shared-`jalr` function pointer is no longer needed
+
+The live body called `updateScale` through a local
+`fn = this->methods->updateScale` cast to `(Entity *, s32, void *)`, which
+the section above found necessary to reproduce retail's single `jalr`
+shared by the `updateScale` and `moveLocalX` paths. With the unified,
+typed Entity slots (track 4) the plain
+`this->methods->updateScale(this, 1, SCALE_X_EIGHTH_Y2_Z_EIGHTH)` is
+byte-exact: funcdiff 73/73, whole image green. The cross-jump happens by
+itself once both calls go through slots of matching shape.
