@@ -35,7 +35,7 @@ void Class86B60__CreateNameField(Class86B60 *self, Arg1DB18_3bb8c_d *arg1)
     size = (size >> 1) + 4;
     buf = BMemPMgrAlloc(size);
     DecodeFullWidthSjis(buf, D_8008AA18);
-    self->nameField = (Class86B60UnkB0Obj_3bb8c_d *)New_Obj6EAC0(arg1->unk4, size, buf);
+    self->nameField = (Class86B60UnkB0Obj_3bb8c_d *)New_TextRow(arg1->unk4, size, buf);
     self->nameField->unkAB = 8;
     self->nameField->unkAC = 4;
     self->nameField->unkAA = 9;
@@ -69,10 +69,10 @@ SLPS_015.56`.
   value unused here, so this unit's own local view stays `void`-returning
   per the project's independent-arities convention (same idiom already
   used for `Get_vtable_TaskCore`/`BaseTaskCtorTable_3bb8c_c`).
-- `self->nameField = (Class86B60UnkB0Obj_3bb8c_d *) New_Obj6EAC0(arg1->unk4,
-  size, buf);` -- `New_Obj6EAC0` is ALREADY declared, unconditionally, in
+- `self->nameField = (Class86B60UnkB0Obj_3bb8c_d *) New_TextRow(arg1->unk4,
+  size, buf);` -- `New_TextRow` is ALREADY declared, unconditionally, in
   this very header (`include/class_3bb8c.h`, a different unit's section)
-  as `extern FieldM7C *New_Obj6EAC0(void *ctx, s32 len, char *name);` --
+  as `extern FieldM7C *New_TextRow(void *ctx, s32 len, char *name);` --
   since that declaration is already visible via the `#include` this unit
   shares, an explicit cast from `FieldM7C *` to this unit's own
   `Class86B60UnkB0Obj_3bb8c_d *` is required at the assignment (both are
@@ -86,7 +86,7 @@ SLPS_015.56`.
   cached pointer) is exactly what three independent field-assignment
   statements through `self->nameField->...` compile to.
 - `BMemPMgrFree(buf);` -- frees the temporary name buffer after
-  `New_Obj6EAC0` has consumed it (already-canonical pool-free).
+  `New_TextRow` has consumed it (already-canonical pool-free).
 
 ## Header changes
 
@@ -99,7 +99,7 @@ SLPS_015.56`.
   `code_2cc8c.h`'s `Unk64ElemMethods`/this header's own `FieldM7CMethods`
   (slot4/slot4C/slotB8 at 0x004/0x04C/0x0B8) -- suggestive that `nameField` is
   the SAME real class those units call `Unk64Elem`/`FieldM7C`, consistent
-  with `New_Obj6EAC0`'s return value landing there.
+  with `New_TextRow`'s return value landing there.
 - New extern `D_8008AA14` (`void *`, VALUE-of `%gp_rel`, same pattern as
   `D_8008AA10`/`D_8008AA18`).
 - Expanded comment on `D_8008AA18`/`D_8008AA10`: this function proves
@@ -128,4 +128,4 @@ matters at runtime -- some other, likely-uncarved code reassigns it first.
 
 ## Naming (round 77, naming runner delta)
 
-Renamed `func_8004DB18` -> `Class86B60__CreateNameField`. **Tier B**: SJIS-decodes `D_8008AA18` (a writable name-text buffer, per its own header comment) into a pool buffer and constructs `self->nameField` through `New_Obj6EAC0`, tagging it with three literal flag bytes. Named for what it builds (a text-field sub-object); the field's role in the larger UI is not established.
+Renamed `func_8004DB18` -> `Class86B60__CreateNameField`. **Tier B**: SJIS-decodes `D_8008AA18` (a writable name-text buffer, per its own header comment) into a pool buffer and constructs `self->nameField` through `New_TextRow`, tagging it with three literal flag bytes. Named for what it builds (a text-field sub-object); the field's role in the larger UI is not established.

@@ -18,7 +18,7 @@ return the same value" idiom already documented for other setters)
 reproduces it with no extra `move`.
 
 Base-table occupant of `Obj6EAC0Methods::slot0xCC`; the derived table's
-slot0xCC is `Obj6EAC0__SetText` (this unit, also queued).
+slot0xCC is `TextRow__SetText` (this unit, also queued).
 
 ### Proposed learning
 

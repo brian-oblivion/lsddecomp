@@ -6,8 +6,8 @@
  * screen rectangle's attach, attribute bits, colour, position, size,
  * priority and mask (its allocator, ctor and Reset close code_2cc8c_e).
  *
- * D_8006EB90's class (id 0x11144, below gCharSpriteMethods and ScreenSprite, NOT
- * below BoxFill), from New_Obj6EAC0 to Obj6EAC0__GetDerivedMethods, through
+ * gTextRowMethods's class (id 0x11144, below gCharSpriteMethods and ScreenSprite, NOT
+ * below BoxFill), from New_TextRow to GetTextRowMethods, through
  * include/code_2cc8c.h's `Obj6EAC0` view: a row of gCharSpriteMethods character
  * cells (tier B; that view's banner).
  *
@@ -15,7 +15,7 @@
  * confirmed by their OWN callers elsewhere to take a plain buffer.
  *
  * All non-trivial functions are MATCHED; zero live INCLUDE_ASM, zero
- * NON_MATCHING bodies. `Obj6EAC0__NoOpSetter`/`Obj6EAC0__NoOpSlotD0` are
+ * NON_MATCHING bodies. `TextRow__NoOpGetCell`/`TextRow__NoOpSlotD0` are
  * splat-generated `jr $ra; nop` occupants.
  */
 #include "common.h"
@@ -104,23 +104,23 @@ BoxFillMethods *GetBoxFillMethods(void) {
     return &gBoxFillMethods;
 }
 
-Obj6EAC0Methods *Obj6EAC0__GetDerivedMethods(void);
+Obj6EAC0Methods *GetTextRowMethods(void);
 
-Unk64Elem *New_Obj6EAC0(void *ctx, s32 len, char *name) {
+Unk64Elem *New_TextRow(void *ctx, s32 len, char *name) {
     Obj6EAC0 *self = BMemPMgrAlloc(0xB8);
     if (self != NULL) {
-        Obj6EAC0__GetDerivedMethods()->slot08(self, (s32)ctx, len, (s32)name);
+        GetTextRowMethods()->slot08(self, (s32)ctx, len, (s32)name);
         return (Unk64Elem *)self;
     }
     return NULL;
 }
 
-void Obj6EAC0__Construct(Obj6EAC0 *self, s32 a1, s32 a2, s32 a3) {
+void TextRow__TextRow(Obj6EAC0 *self, s32 a1, s32 a2, s32 a3) {
     s32 i;
     Obj6EAC0 **cursor;
 
     GetCharSpriteMethods()->ctor((CharSprite *)self, (void *)a1, 0x20);
-    self->methods = Obj6EAC0__GetDerivedMethods();
+    self->methods = GetTextRowMethods();
     self->totalChildCount = a2;
     self->childCount = a2;
     self->childStart = 0;
@@ -140,18 +140,18 @@ void Obj6EAC0__Construct(Obj6EAC0 *self, s32 a1, s32 a2, s32 a3) {
     }
 }
 
-void Obj6EAC0__Destruct(Obj6EAC0 *self) {
+void TextRow__Finalize(Obj6EAC0 *self) {
     ReleaseBasicClassArray(self->children, self->totalChildCount);
     self->children = BMemPMgrFree(self->children);
     GetCharSpriteMethods()->finalize((CharSprite *)self);
 }
 
-void Obj6EAC0__FinishConstruct(Obj6EAC0 *self, s32 a1) {
+void TextRow__Reset(Obj6EAC0 *self, s32 a1) {
     self->methods->slotD4(self, 7);
     self->methods->slotCC(self, a1);
 }
 
-void Obj6EAC0__LayoutChildrenWithGap(Obj6EAC0 *self, s32 a1, Pair32E99C *a2) {
+void TextRow__AttachToParent(Obj6EAC0 *self, s32 a1, Pair32E99C *a2) {
     Pair32E99C buf;
     s32 i, bound;
     Obj6EAC0 **elemp;
@@ -178,7 +178,7 @@ void Obj6EAC0__LayoutChildrenWithGap(Obj6EAC0 *self, s32 a1, Pair32E99C *a2) {
     }
 }
 
-void func_80040C00(Obj6EAC0 *self) {
+void TextRow__DetachFromParent(Obj6EAC0 *self) {
     Obj6EAC0 **elemp;
     s32 i, bound;
 
@@ -200,7 +200,7 @@ void func_80040C00(Obj6EAC0 *self) {
     }
 }
 
-s32 Obj6EAC0__QueryChildren(Obj6EAC0 *self, s32 a1, s32 a2) {
+s32 TextRow__SetDisplay(Obj6EAC0 *self, s32 a1, s32 a2) {
     Obj6EAC0 **elemp = self->children + self->childStart;
     s32 i = self->childStart;
     s32 bound = i;
@@ -218,7 +218,7 @@ s32 Obj6EAC0__QueryChildren(Obj6EAC0 *self, s32 a1, s32 a2) {
     return a2;
 }
 
-void Obj6EAC0__PropagateColor(Obj6EAC0 *self, s32 a1) {
+void TextRow__SetColor(Obj6EAC0 *self, s32 a1) {
     Obj6EAC0 **elemp = self->children + self->childStart;
     s32 i = self->childStart;
     s32 bound = i;
@@ -236,7 +236,7 @@ void Obj6EAC0__PropagateColor(Obj6EAC0 *self, s32 a1) {
     }
 }
 
-void Obj6EAC0__LayoutChildren(Obj6EAC0 *self, Pair32E99C *a1) {
+void TextRow__SetPosition(Obj6EAC0 *self, Pair32E99C *a1) {
     if (self->hasChildren != 0) {
         Pair32E99C buf;
         s32 i;
@@ -259,15 +259,15 @@ void Obj6EAC0__LayoutChildren(Obj6EAC0 *self, Pair32E99C *a1) {
     }
 }
 
-void Obj6EAC0__SetChildChar(Obj6EAC0 *self, s32 a1, s32 a2) {
+void TextRow__SetCellAt(Obj6EAC0 *self, s32 a1, s32 a2) {
     Obj6EAC0 *elem = self->children[a2];
     elem->methods->slotC4(elem, a1 & 0xFF);
 }
 
-void Obj6EAC0__NoOpSetter(void) {
+void TextRow__NoOpGetCell(void) {
 }
 
-void Obj6EAC0__SetText(Obj6EAC0 *self, u8 *a1) {
+void TextRow__SetText(Obj6EAC0 *self, u8 *a1) {
     Obj6EAC0 **elemp = self->children;
     u8 *p = a1;
     if (p != NULL && *p != 0) {
@@ -280,15 +280,15 @@ void Obj6EAC0__SetText(Obj6EAC0 *self, u8 *a1) {
     }
 }
 
-void Obj6EAC0__NoOpSlotD0(void) {
+void TextRow__NoOpSlotD0(void) {
 }
 
-void Obj6EAC0__SetChildPitch(Obj6EAC0 *self, s32 a1) {
+void TextRow__SetCellPitch(Obj6EAC0 *self, s32 a1) {
     self->childPitch = a1;
 }
 
-Obj6EAC0Methods *Obj6EAC0__GetDerivedMethods(void) {
-    return &D_8006EB90;
+Obj6EAC0Methods *GetTextRowMethods(void) {
+    return &gTextRowMethods;
 }
 
 /* DecodeFullWidthSjis -- MATCHED round 38 (24/24). A permuter search (208

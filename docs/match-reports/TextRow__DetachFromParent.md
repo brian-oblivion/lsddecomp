@@ -1,9 +1,11 @@
-# func_80040C00 — MATCHED (52/52), round 19
+# TextRow__DetachFromParent — MATCHED (52/52), round 19
+
+> Renamed from `func_80040C00` on 2026-09-26 (tools/rename.py). Address 0x80040c00.
 
 ## Final body (byte-exact, full oracle green)
 
 ```c
-void func_80040C00(Obj6EAC0 *self) {
+void TextRow__DetachFromParent(Obj6EAC0 *self) {
     Obj6EAC0 **elemp;
     s32 i, bound;
 
@@ -29,7 +31,7 @@ void func_80040C00(Obj6EAC0 *self) {
 ## Round 19: the "register permutation" verdict was a MISFILING, not a genuine class
 
 The round-2 report's "second instance of a register-permutation class"
-framing (paired with `Obj6EAC0__LayoutChildrenWithGap`, both since matched this round) was
+framing (paired with `TextRow__AttachToParent`, both since matched this round) was
 wrong in a way that a raw funcdiff score could not distinguish from a
 genuine register-identity residue: **the near-miss body's cursor
 initialization was structurally wrong, not just register-permuted.**
@@ -39,7 +41,7 @@ AND the loop cursor. Retail instead NULL-checks the RAW pointer
 (`self->unkB4`) but starts the loop cursor at `self->unkB4 +
 self->unkAC` -- the same offset-cursor idiom every OTHER function in
 this unit's `unkB4[unkAC..unkAC+unkAB)` loop family already uses
-(`Obj6EAC0__PropagateColor`, `Obj6EAC0__LayoutChildrenWithGap`, `Obj6EAC0__QueryChildren`, `Obj6EAC0__LayoutChildren`,
+(`TextRow__SetColor`, `TextRow__AttachToParent`, `TextRow__SetDisplay`, `TextRow__SetPosition`,
 all matched). The original report's body was missing this `+
 self->unkAC`, which showed up in the compiled object as an entirely
 different, SHORTER instruction sequence (missing the `sll`/`addu` pair
@@ -57,7 +59,7 @@ whole-image drift** (`WARNING: the build differs OUTSIDE this range
 too`) -- not the drift-free, correct-length claim in the report. The
 "0x50 words" figure in the original text doesn't even arithmetically
 match this function's own declared size (`0x52` words / `0xD0` bytes
-per the `.s` file's `nonmatching func_80040C00, 0xD0`), which in
+per the `.s` file's `nonmatching TextRow__DetachFromParent, 0xD0`), which in
 hindsight was the tell. **This is the SAME failure mode the coordinator
 flagged this round for `DreamSys__AdvanceMoveCycle` and `Entity__MoodCue81`: a
 "clean"/"correct-length" claim in an inherited report was checked and
@@ -67,7 +69,7 @@ the report's word-count framing), so the wrong claim did not propagate
 into this round's result -- but it is worth recording as a fourth
 instance of the pattern.
 
-**Fixing the missing offset (and applying `Obj6EAC0__LayoutChildrenWithGap`'s own
+**Fixing the missing offset (and applying `TextRow__AttachToParent`'s own
 bound-recompute idiom -- bare `self->unkAC` re-read, `+self->unkAB` at
 each comparison site, not pre-summed into a stored variable) closed it
 immediately, 52/52, in the very first attempt this round.** No
@@ -101,7 +103,7 @@ Body reached (near-miss, preserved literally):
 
 ```c
 #if 0
-void func_80040C00(Obj6EAC0 *self) {
+void TextRow__DetachFromParent(Obj6EAC0 *self) {
     Obj6EAC0 **elemp;
     s32 i, count;
 
@@ -141,7 +143,7 @@ other functions in this unit use for `self`), with `$s0` holding the
 loop index `i` and `$s2` holding the cursor `elemp`. Every C shape
 tried puts `self` in `$s2` instead, cascading a full register
 permutation from the very first prologue store onward -- this is the
-SAME class as `Obj6EAC0__LayoutChildrenWithGap`'s stall in this unit (self-and-locals
+SAME class as `TextRow__AttachToParent`'s stall in this unit (self-and-locals
 identity permutation in a loop touching `unkB4`/`unkAB`/`unkAC`), a
 second instance in one sitting.
 
@@ -169,15 +171,15 @@ inside the guarded block (e.g. reading `self->unkAC`/`self->unkAB`
 before `self->unkB4`, or vice versa) to see whether that shifts pseudo
 birth order enough to change which hard register `self` lands in.
 Reason: budget -- this is the second instance of the same permutation
-class found in one sitting (`Obj6EAC0__LayoutChildrenWithGap`), and re-deriving the same
+class found in one sitting (`TextRow__AttachToParent`), and re-deriving the same
 trial-and-error per function is expensive; better spent writing this
 down so whichever lever eventually closes ONE of the pair can be
-retried on the other immediately (see `Obj6EAC0__LayoutChildrenWithGap.md`'s own
+retried on the other immediately (see `TextRow__AttachToParent.md`'s own
 cross-reference).
 
 ### Proposed learning
 
-A second instance (with `Obj6EAC0__LayoutChildrenWithGap`) of a register-PERMUTATION
+A second instance (with `TextRow__AttachToParent`) of a register-PERMUTATION
 class specific to this unit's "loop over `unkB4[unkAC..unkAC+unkAB)`"
 shape: `self` lands in an unexpectedly HIGH-numbered callee-saved
 register (`$s1`/`$s2`) rather than `$s0`, and no declaration-order or
@@ -191,14 +193,14 @@ Round 54 (alpha), FINISHING-PLAN track 3.
 
 | was | now | tier |
 | --- | --- | --- |
-| `func_80040C00` | (kept `func_80040C00`) | C |
+| `TextRow__DetachFromParent` | (kept `TextRow__DetachFromParent`) | C |
 
 **What is known.** Derived occupant of `slot50`: when `self->hasChildren
 != 0`, if `self->children != NULL`, dispatches `elem->methods->slot50(elem)`
 on each child in `[childStart, childStart+childCount)`; then, regardless
 of the array, chains to `GetCharSpriteMethods()`'s own `slot50` on `self`. This
-is a for-each-child dispatch shape like `Obj6EAC0__PropagateColor`/
-`Obj6EAC0__QueryChildren`, but `slot50` itself has no argument and no
+is a for-each-child dispatch shape like `TextRow__SetColor`/
+`TextRow__SetDisplay`, but `slot50` itself has no argument and no
 return value, and nothing in this unit reveals what it accomplishes
 (finalize? hide? a per-frame update?) -- kept `func_` per "when unsure,
 keep func_ and write down what you know" rather than guess between
@@ -206,4 +208,4 @@ those.
 
 ## Track 4
 
-2026-09-26, round 86 (bravo): the parent class 0x1144 is unified as CharSprite (`include/CharSprite.h`, formerly D_8006EC74). The base call is `GetCharSpriteMethods()->detachFromParent((CharSprite *)self)` (was `->slot50(self)`): +0x050 is Class6B5CC's detachFromParent, so this function is D_8006EB90's detachFromParent override; naming it for the slot is the subclass's job. No code. Image byte-identical.
+2026-09-26, round 86 (bravo): the parent class 0x1144 is unified as CharSprite (`include/CharSprite.h`, formerly D_8006EC74). The base call is `GetCharSpriteMethods()->detachFromParent((CharSprite *)self)` (was `->slot50(self)`): +0x050 is Class6B5CC's detachFromParent, so this function is gTextRowMethods's detachFromParent override; naming it for the slot is the subclass's job. No code. Image byte-identical.

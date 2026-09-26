@@ -1,4 +1,6 @@
-# Obj6EAC0__Construct — MATCHED (58/58 words)
+# TextRow__TextRow — MATCHED (58/58 words)
+
+> Renamed from `Obj6EAC0__Construct` on 2026-09-26 (tools/rename.py). Address 0x80040948.
 
 > Renamed from `func_80040948` on 2026-09-18 (tools/rename.py). Address 0x80040948.
 
@@ -11,12 +13,12 @@ pooled census across rounds 13+14 (81 matched, 10 stalled) showed the
 this function proves it.
 
 ```c
-void Obj6EAC0__Construct(Obj6EAC0 *self, s32 a1, s32 a2, s32 a3) {
+void TextRow__TextRow(Obj6EAC0 *self, s32 a1, s32 a2, s32 a3) {
     s32 i;
     Obj6EAC0 **cursor;
 
     GetCharSpriteMethods()->ctor((CharSprite *)self, (void *)a1, 0x20);
-    self->methods = Obj6EAC0__GetDerivedMethods();
+    self->methods = GetTextRowMethods();
     self->unkA9 = a2;
     self->unkAB = a2;
     self->unkAC = 0;
@@ -38,11 +40,11 @@ void Obj6EAC0__Construct(Obj6EAC0 *self, s32 a1, s32 a2, s32 a3) {
 ```
 
 The derived table's constructor (`Obj6EAC0Methods::slot08`), called by
-this unit's own `New_Obj6EAC0` via
-`Obj6EAC0__GetDerivedMethods()->slot08(self, ctx, len, name)`. Chains to the THIRD
+this unit's own `New_TextRow` via
+`GetTextRowMethods()->slot08(self, ctx, len, name)`. Chains to the THIRD
 sibling table's own `slot08` (a base-class-style constructor call
-through `GetCharSpriteMethods()`, same shape as `New_Obj6EAC0` calling
-`Obj6EAC0__GetDerivedMethods()->slot08`), then sets up `self->methods` to the
+through `GetCharSpriteMethods()`, same shape as `New_TextRow` calling
+`GetTextRowMethods()->slot08`), then sets up `self->methods` to the
 DERIVED table, zeroes/initialises the slice-index fields, allocates an
 `a2`-element child array via `BMemPMgrAlloc`, fills each slot by
 calling the external New_X-shaped allocator `New_CharSprite(a1, 0x20)`
@@ -76,7 +78,7 @@ THIS call site only —
 argument register at all, and the leftover value in `$a3` (never
 touched since function entry) does the rest for free. Zero-attempt
 verification that this doesn't disturb the OTHER call through
-`slot08` (`New_Obj6EAC0`, which genuinely does use 4 args): that call
+`slot08` (`New_TextRow`, which genuinely does use 4 args): that call
 still goes through the struct's own canonical 4-arg field, untouched.
 
 ## Attempts (12)
@@ -145,7 +147,7 @@ Round 54 (alpha), FINISHING-PLAN track 3.
 
 | was | now | tier |
 | --- | --- | --- |
-| `func_80040948` | `Obj6EAC0__Construct` | B |
+| `func_80040948` | `TextRow__TextRow` | B |
 
 **Evidence.** Derived occupant of `slot08`: chains to the third sibling
 table's own `slot08` first (base-class-style construction), sets

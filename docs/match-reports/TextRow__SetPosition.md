@@ -1,4 +1,6 @@
-# Obj6EAC0__LayoutChildren — MATCHED (50/50), round 19
+# TextRow__SetPosition — MATCHED (50/50), round 19
+
+> Renamed from `Obj6EAC0__LayoutChildren` on 2026-09-26 (tools/rename.py). Address 0x80040e14.
 
 > Renamed from `func_80040E14` on 2026-09-18 (tools/rename.py). Address 0x80040e14.
 
@@ -8,7 +10,7 @@ below saturation.
 ## Final body (byte-exact, full oracle green)
 
 ```c
-void Obj6EAC0__LayoutChildren(Obj6EAC0 *self, Pair32E99C *a1) {
+void TextRow__SetPosition(Obj6EAC0 *self, Pair32E99C *a1) {
     if (self->unkC != 0) {
         Pair32E99C buf;
         s32 i;
@@ -97,7 +99,7 @@ Round 54 (alpha), FINISHING-PLAN track 3.
 
 | was | now | tier |
 | --- | --- | --- |
-| `func_80040E14` | `Obj6EAC0__LayoutChildren` | B |
+| `func_80040E14` | `TextRow__SetPosition` | B |
 
 **Evidence.** Derived occupant of `slotBC` (same slot
 `BoxFill__SetPosition` fills for the base/leaf case): when
@@ -108,7 +110,7 @@ recursive "place each child along a line, `childPitch` apart" layout
 pass. Mechanics well-established from the loop shape itself; the
 in-game purpose (text layout, per this unit's own header-comment
 hypothesis) is not independently confirmed, hence tier B. Sibling of
-`Obj6EAC0__LayoutChildrenWithGap` (same shape, plus one extra offset at
+`TextRow__AttachToParent` (same shape, plus one extra offset at
 `gapIndex`).
 
 ## Track 4

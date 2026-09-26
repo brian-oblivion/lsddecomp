@@ -75,8 +75,8 @@ Within that scope, though, the evidence is broader than "one struct's
 idiom" and worth stating precisely:
 
 - **Two genuinely independent struct SHAPES.** A 2x`s32`, 4-byte-aligned
-  pair (`Pair32E99C`: `Class6E99C__PushPosition`, `BoxFill__SetPosition`, `Obj6EAC0__LayoutChildren`,
-  `Obj6EAC0__LayoutChildrenWithGap`) and a 3x`s8`, 1-byte-aligned, non-power-of-two triple
+  pair (`Pair32E99C`: `Class6E99C__PushPosition`, `BoxFill__SetPosition`, `TextRow__SetPosition`,
+  `TextRow__AttachToParent`) and a 3x`s8`, 1-byte-aligned, non-power-of-two triple
   (this function's own RGB-shaped struct, and `BoxFill__ApplyColor`'s copy arm
   in the SAME unit). These have nothing in common at the ABI level
   (alignment, size, natural load/store width) -- if the lever only worked

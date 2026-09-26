@@ -1,10 +1,12 @@
+> Renamed from `Obj6EAC0__NoOpSetter` on 2026-09-26 (tools/rename.py). Address 0x80040f20.
+
 ## Naming
 
 Round 54 (alpha), FINISHING-PLAN track 3.
 
 | was | now | tier |
 | --- | --- | --- |
-| `func_80040F20` | `Obj6EAC0__NoOpSetter` | A |
+| `func_80040F20` | `TextRow__NoOpGetCell` | A |
 
 **Evidence.** An empty function body (`{ }`), splat-generated (`jr $ra;
 nop`), the derived table's own occupant of `slotC8` -- the same slot the

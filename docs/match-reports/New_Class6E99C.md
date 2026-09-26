@@ -94,5 +94,5 @@ once the research doc identified that, this function (and its sibling
 a fixed 0xA0 bytes (`Class6E99CObj`'s own size) and, on success, dispatches
 its ctor through `GetClass6E99CMethods()->ctor(...)` before returning it;
 matches the project's established `New_X` convention (`New_Entity`,
-`New_DreamSys`, `New_Obj6EAC0`, etc.) exactly. Mechanics fully determine the
+`New_DreamSys`, `New_TextRow`, etc.) exactly. Mechanics fully determine the
 name; no game-purpose claim beyond "allocate and construct one".

@@ -29,7 +29,7 @@ under the 7+ saturation band this project's `MATCHING-GUIDE.md` flags as
 low-yield. Matched on the first attempt with a direct transliteration of
 the disassembly -- both vtable slot types needed were already established
 by earlier rounds' work on sibling functions in this same unit
-(`BoxFill__SetPosition`/`Obj6EAC0__LayoutChildren` for `slotBC`'s struct shape;
+(`BoxFill__SetPosition`/`TextRow__SetPosition` for `slotBC`'s struct shape;
 `code_2cc8c_e`'s ctor call for `D6B5CCGetterMethodsCC8C::slot4C`), so
 there was no struct derivation left to do here -- just reading the
 existing header carefully enough to recognize both slots were already on
@@ -51,7 +51,7 @@ then dispatches `self->methods->slotBC(self, a2)`
 (`BoxFill__SetPosition`, this unit) -- i.e. for a leaf instance, "lay
 out" reduces to "apply the default handler, then set my own position".
 The derived occupant of the SAME slot
-(`Obj6EAC0__LayoutChildrenWithGap`) does the container-side equivalent
+(`TextRow__AttachToParent`) does the container-side equivalent
 (recursively position every child). Named for the slot's own common
 mechanic across both occupants (position/layout), not for `a1`'s specific
 meaning here, which is not established -- tier B.

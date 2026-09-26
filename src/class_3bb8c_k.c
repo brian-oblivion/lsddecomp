@@ -7,7 +7,7 @@
  *  - Class86F88 (table gClass86F88Methods, slots +0x054..+0x09C, plus the
  *    two non-virtual helpers FormatRowText/SetView and the table getter
  *    GetClass86F88Methods). A scrolling list selector: up to 4 visible
- *    rows of 26-character item text (one New_Obj6EAC0 text object each),
+ *    rows of 26-character item text (one New_TextRow text object each),
  *    a highlighted cursor row (gClass86F88CursorColor, others
  *    gClass86F88RowColor), cursor up/down that scrolls the window at its
  *    edges, and a horizontal column offset. HandleInputCode maps input
@@ -71,7 +71,7 @@ struct ObjM_3bb8c_k {
     s32 unk68;                          /* +0x068, ObjM__ObjM: zeroed */
     SubObjB *unk6C;                     /* +0x06C, ObjM__ObjM: arg1, also forwarded as the base ctor's own arg2 */
     s32 unk70;                          /* +0x070, ObjM__ObjM: arg4 */
-    s32 unk74;                          /* +0x074, ObjM__ObjM: arg3 (shared ObjM view: New_Obj6EAC0's ctx) */
+    s32 unk74;                          /* +0x074, ObjM__ObjM: arg3 (shared ObjM view: New_TextRow's ctx) */
     u8 pad78[0x080 - 0x078];
     s32 pauseSetupStep;                 /* +0x080, ObjM__ObjM: zeroed; ObjM__AdvancePauseSetup's step counter (class_3bb8c_m, shared view unk80) */
     s32 closeReady;                     /* +0x084, ObjM__ObjM: zeroed; set by ObjM__UpdateCloseReadyFlag, cleared by ObjM__ClearCloseReadyFlag, tested by ObjM__CloseAndNotifyC/D (shared view unk84) */
@@ -278,7 +278,7 @@ void Class86F88__CreateRows(Class86F88 *self, s32 parent, s32 font, s32 top, s32
 
     for (i = 0; i < count; i++) {
         Class86F88__FormatRowText(self, buf, i, top, (char *)column);
-        *p = (Class86F88Elem *)New_Obj6EAC0((void *)font, 0x1A, buf);
+        *p = (Class86F88Elem *)New_TextRow((void *)font, 0x1A, buf);
         (*p)->methods->layout(*p, parent, &pos);
         (*p)->methods->setColor(*p, &gClass86F88RowColor);
         pos.y += 0xA;

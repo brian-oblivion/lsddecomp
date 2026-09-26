@@ -24,7 +24,7 @@ override; the mechanics ARE the whole purpose (do nothing when this slot is
 dispatched). Matches the `Class__NoOpSlotNN` convention already established
 in this codebase for the identical shape (`DreamSys.h`'s
 `DreamSys__NoOpSlotE8Default`/`Actor__NoOpSlotD8`, `code_2cc8c.h`'s
-`Obj6EAC0__NoOpSetter`/`Obj6EAC0__NoOpSlotD0`).
+`TextRow__NoOpGetCell`/`TextRow__NoOpSlotD0`).
 
 ## Track 4 (2026-09-26, round 87)
 

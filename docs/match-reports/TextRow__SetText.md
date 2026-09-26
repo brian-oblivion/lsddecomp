@@ -1,11 +1,13 @@
-# Obj6EAC0__SetText — MATCHED (30/30 words)
+# TextRow__SetText — MATCHED (30/30 words)
+
+> Renamed from `Obj6EAC0__SetText` on 2026-09-26 (tools/rename.py). Address 0x80040f28.
 
 > Renamed from `func_80040F28` on 2026-09-18 (tools/rename.py). Address 0x80040f28.
 
 Unit: `src/code_2cc8c_f.c`. First attempt.
 
 ```c
-void Obj6EAC0__SetText(Obj6EAC0 *self, u8 *a1) {
+void TextRow__SetText(Obj6EAC0 *self, u8 *a1) {
     Obj6EAC0 **elemp = self->unkB4;
     u8 *p = a1;
     if (p != NULL && *p != 0) {
@@ -25,8 +27,8 @@ each child's `slotC4` with the current byte. `p != NULL && *p != 0` is
 the guarded-`do`/`while` idiom already established elsewhere in this
 project; matched cleanly with no register-identity surprises, unlike
 this unit's `unkAC..unkAC+unkAB`-indexed loop family (see
-`Obj6EAC0__LayoutChildrenWithGap`/`func_80040C00`/`Obj6EAC0__QueryChildren`/`Obj6EAC0__PropagateColor`/
-`Obj6EAC0__LayoutChildren`'s stall reports) -- this loop's bound is a simple
+`TextRow__AttachToParent`/`TextRow__DetachFromParent`/`TextRow__SetDisplay`/`TextRow__SetColor`/
+`TextRow__SetPosition`'s stall reports) -- this loop's bound is a simple
 NUL check, not a re-read-every-iteration byte-field sum, which may be
 why it was reachable on the first try.
 
@@ -40,7 +42,7 @@ Round 54 (alpha), FINISHING-PLAN track 3.
 
 | was | now | tier |
 | --- | --- | --- |
-| `func_80040F28` | `Obj6EAC0__SetText` | B |
+| `func_80040F28` | `TextRow__SetText` | B |
 
 **Evidence.** Derived occupant of `slotCC` (base occupant is
 `BoxFill__SetMask`, an unrelated bitmask setter -- this slot means

@@ -12,7 +12,7 @@
  * projected from the inherited coordinate. Methods in src/code_322b4.c; four
  * classes derive from it (`typeviews.py --tree`): ScreenSprite (0x144, the
  * screen-space sprite, include/ScreenSprite.h), CharSprite (0x1144, one 8x8
- * font character, include/CharSprite.h), D_8006EB90 (0x11144) and gClass879C4Methods (0x1F44,
+ * font character, include/CharSprite.h), gTextRowMethods (0x11144) and gClass879C4Methods (0x1F44,
  * class_3bb8c_p/q/t).
  *
  * The texture is bound by reset (+0x040), which the ctor calls with its own
@@ -91,7 +91,7 @@ struct SpriteGs {
  * Sprite__SetSemiTrans, Sprite__SetSemiTransRate, Sprite__Update). */
 #define SPRITE_SLOTS(Self, CtorParams)                                                             \
     CLASS6B5CC_SLOTS(Self, CtorParams);                                                            \
-    /* +0x0B8 */ void (*setColor)(Self *self, SpriteRgb *rgb) /* Sprite__SetColor; D_8006EB90: Obj6EAC0__PropagateColor */
+    /* +0x0B8 */ void (*setColor)(Self *self, SpriteRgb *rgb) /* Sprite__SetColor; gTextRowMethods: TextRow__SetColor */
 
 #define SPRITE_FIELDS(Methods)                                                                     \
     CLASS6B5CC_FIELDS(Methods);                                                                    \

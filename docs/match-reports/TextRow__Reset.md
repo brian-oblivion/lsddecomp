@@ -1,11 +1,13 @@
-# Obj6EAC0__FinishConstruct — MATCHED (24/24 words)
+# TextRow__Reset — MATCHED (24/24 words)
+
+> Renamed from `Obj6EAC0__FinishConstruct` on 2026-09-26 (tools/rename.py). Address 0x80040a88.
 
 > Renamed from `func_80040A88` on 2026-09-18 (tools/rename.py). Address 0x80040a88.
 
 Unit: `src/code_2cc8c_f.c`. First attempt.
 
 ```c
-void Obj6EAC0__FinishConstruct(Obj6EAC0 *self, s32 a1) {
+void TextRow__Reset(Obj6EAC0 *self, s32 a1) {
     self->methods->slotD4(self, 7);
     self->methods->slotCC(self, a1);
 }
@@ -28,13 +30,13 @@ Round 54 (alpha), FINISHING-PLAN track 3.
 
 | was | now | tier |
 | --- | --- | --- |
-| `func_80040A88` | `Obj6EAC0__FinishConstruct` | B |
+| `func_80040A88` | `TextRow__Reset` | B |
 
 **Evidence.** Derived occupant of `slot40`, called as the LAST step of
-`Obj6EAC0__Construct` (`self->methods->slot40(self, a3)`, where `a3` is
+`TextRow__TextRow` (`self->methods->slot40(self, a3)`, where `a3` is
 `Construct`'s own last parameter -- itself forwarded from
-`New_Obj6EAC0`'s own `name` argument, see that report). Body:
-`self->methods->slotD4(self, 7)` (`Obj6EAC0__SetChildPitch`, hard-coding
+`New_TextRow`'s own `name` argument, see that report). Body:
+`self->methods->slotD4(self, 7)` (`TextRow__SetCellPitch`, hard-coding
 the pitch to 7) then `self->methods->slotCC(self, a1)` (`SetMask` on a
 base instance, `SetText` on a derived one). Named for its ROLE in the
 construction sequence (the post-allocation finishing step), not for a

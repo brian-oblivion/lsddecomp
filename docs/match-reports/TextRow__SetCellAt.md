@@ -1,11 +1,13 @@
-# Obj6EAC0__SetChildChar — MATCHED (17/17 words)
+# TextRow__SetCellAt — MATCHED (17/17 words)
+
+> Renamed from `Obj6EAC0__SetChildChar` on 2026-09-26 (tools/rename.py). Address 0x80040edc.
 
 > Renamed from `func_80040EDC` on 2026-09-18 (tools/rename.py). Address 0x80040edc.
 
 Unit: `src/code_2cc8c_f.c`. First attempt.
 
 ```c
-void Obj6EAC0__SetChildChar(Obj6EAC0 *self, s32 a1, s32 a2) {
+void TextRow__SetCellAt(Obj6EAC0 *self, s32 a1, s32 a2) {
     Obj6EAC0 *elem = self->unkB4[a2];
     elem->methods->slotC4(elem, a1 & 0xFF);
 }
@@ -20,7 +22,7 @@ function pointer needs no cast for either arity.
 
 ### Proposed learning
 
-Confirms the unprototyped-slot lever from `Obj6EAC0__LayoutChildrenWithGap`'s header
+Confirms the unprototyped-slot lever from `TextRow__AttachToParent`'s header
 change actually pays off at a real call site with no cast needed.
 
 ## Naming
@@ -29,11 +31,11 @@ Round 54 (alpha), FINISHING-PLAN track 3.
 
 | was | now | tier |
 | --- | --- | --- |
-| `func_80040EDC` | `Obj6EAC0__SetChildChar` | B |
+| `func_80040EDC` | `TextRow__SetCellAt` | B |
 
 **Evidence.** Derived occupant of `slotC4`: `elem = self->children[a2];
 elem->methods->slotC4(elem, a1 & 0xFF);` -- dispatches a single 8-bit
 value to ONE child selected by index, through the same slot
-`Obj6EAC0__SetText` (this unit) drives across ALL children one string
+`TextRow__SetText` (this unit) drives across ALL children one string
 byte at a time. See `BoxFill__AttachAbsolute`'s own report for the full
 cross-reference; same tier B.

@@ -15,7 +15,7 @@ list" descriptor (`SrcDesc *a1`, a NULL-terminated array of C strings plus
 one extra word), it counts the strings, allocates a same-sized array of
 `Unk64Elem *`, installs it (and the count, and `a1`'s extra word) into
 `self->unk64[idx]`/`self->unk5C[idx]`/`self->unk60[idx]`, then populates
-the new array by resolving each string through `New_Obj6EAC0` (with its
+the new array by resolving each string through `New_TextRow` (with its
 length from `func_80013348`, a strlen-shaped helper already matched
 elsewhere in the project).
 
@@ -43,7 +43,7 @@ void TaskCore__CreateSlotElements(Obj86B60 *self, SrcDesc *a1, void *a2)
         do {
             s32 len = func_80013348(*list);
 
-            *buf = New_Obj6EAC0(a2, len, *list);
+            *buf = New_TextRow(a2, len, *list);
             list++;
             buf++;
         } while (*list != NULL);
@@ -62,7 +62,7 @@ void TaskCore__CreateSlotElements(Obj86B60 *self, SrcDesc *a1, void *a2)
 - `extern s32 func_80013348(char *s);` — already matched in
   `code_171e0.c`/`src/code_171e0.c` as a strlen-shaped helper; this unit
   keeps its own local view (established convention).
-- `extern Unk64Elem *New_Obj6EAC0(void *ctx, s32 len, char *name);` — not
+- `extern Unk64Elem *New_TextRow(void *ctx, s32 len, char *name);` — not
   previously seen in this project. Typed from this call site: its return
   value is stored directly into the same array `TaskCore__BroadcastToSlotElements`,
   `TaskCore__BroadcastToSlots`, `TaskCore__BeginElementScroll` and `TaskCore__SetSlotCursor` all walk as
@@ -111,7 +111,7 @@ rather than a visible register residue.
 
 ## Naming (round 78, naming runner echo)
 
-Renamed `func_` -> `Obj86B60__CreateSlotElements`. **Tier B**: Builds `self->itemLists[idx]` (allocates an array sized off a NULL-terminated string list, resolves each string through `New_Obj6EAC0`) and installs the count/initial cursor -- the constructor for one slot's own item list, called at whatever slot is currently `activeSlot`. Pairs with TaskCore__ReleaseSlotElements.
+Renamed `func_` -> `Obj86B60__CreateSlotElements`. **Tier B**: Builds `self->itemLists[idx]` (allocates an array sized off a NULL-terminated string list, resolves each string through `New_TextRow`) and installs the count/initial cursor -- the constructor for one slot's own item list, called at whatever slot is currently `activeSlot`. Pairs with TaskCore__ReleaseSlotElements.
 
 ## Track 4 (2026-09-25, round 84, alpha)
 

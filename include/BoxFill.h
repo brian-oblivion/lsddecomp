@@ -69,7 +69,7 @@ struct SkipShort2 {
 };
 
 /* A two-word screen position (setPosition, attachToParent's third argument):
- * copied whole into posX/posY. Class6E99C's position stack and D_8006EB90's
+ * copied whole into posX/posY. Class6E99C's position stack and gTextRowMethods's
  * layout loops use the same record. */
 struct Pair32E99C {
     s32 a; /* +0x000, x */

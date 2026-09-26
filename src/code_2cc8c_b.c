@@ -111,7 +111,7 @@ void TaskCore__SetTarget(TaskCore *self, TaskCoreTarget *a1)
             void *extra = a1->unk24[i];
             s32 len = strlen(*list);
 
-            *arr = New_Obj6EAC0(handle, len, *list);
+            *arr = New_TextRow(handle, len, *list);
             arr++;
             if (extra != NULL) {
                 self->activeSlot = i;
@@ -312,7 +312,7 @@ void TaskCore__CreateSlotElements(TaskCore *self, void *desc, void *a2)
         do {
             s32 len = strlen(*list);
 
-            *buf = New_Obj6EAC0(a2, len, *list);
+            *buf = New_TextRow(a2, len, *list);
             list++;
             buf++;
         } while (*list != NULL);

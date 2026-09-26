@@ -187,7 +187,7 @@ the head to apply by type scope:
 - `unk40`/`unk44`/`unk48` -> `iconRes`/`fontRes`/`inputRes` (tier B).
   Resolved in `TextEntry__LoadCardResources`: `unk48` from the `COMINPUT.TIM`
   handle (also the readiness/"is attached" gate every other function in
-  this unit tests), `unk44` from `New_Obj6EAC0` on the `FONTICON.TIM`
+  this unit tests), `unk44` from `New_TextRow` on the `FONTICON.TIM`
   handle with `nameLen`/`workName` forwarded (renders the name text), `unk40`
   from `New_CharSprite` on the same `FONTICON.TIM` handle with a `0x5F`
   literal (a distinct icon sub-resource of the same TIM). Also accessed by

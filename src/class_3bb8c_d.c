@@ -114,7 +114,7 @@ void Class86B60__RefreshViewValue(Class86B60 *self)
 }
 
 /* Class86B60__CreateNameField's own `arg1`: only its own +0x004 field is read, forwarded
- * opaquely as New_Obj6EAC0's `ctx` argument. */
+ * opaquely as New_TextRow's `ctx` argument. */
 typedef struct Arg1DB18_3bb8c_d Arg1DB18_3bb8c_d;
 struct Arg1DB18_3bb8c_d {
     u8 pad0[0x004];
@@ -150,7 +150,7 @@ void Class86B60__CreateNameField(Class86B60 *self, Arg1DB18_3bb8c_d *arg1)
     size = (size >> 1) + 4;
     buf = BMemPMgrAlloc(size);
     DecodeFullWidthSjis(buf, D_8008AA18);
-    self->nameField = (Class86B60UnkB0Obj_3bb8c_d *)New_Obj6EAC0(arg1->unk4, size, buf);
+    self->nameField = (Class86B60UnkB0Obj_3bb8c_d *)New_TextRow(arg1->unk4, size, buf);
     self->nameField->unkAB = 8;
     self->nameField->unkAC = 4;
     self->nameField->unkAA = 9;

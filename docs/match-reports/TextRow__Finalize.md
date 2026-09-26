@@ -1,11 +1,13 @@
-# Obj6EAC0__Destruct — MATCHED (22/22 words)
+# TextRow__Finalize — MATCHED (22/22 words)
+
+> Renamed from `Obj6EAC0__Destruct` on 2026-09-26 (tools/rename.py). Address 0x80040a30.
 
 > Renamed from `func_80040A30` on 2026-09-18 (tools/rename.py). Address 0x80040a30.
 
 Unit: `src/code_2cc8c_f.c`. First attempt.
 
 ```c
-void Obj6EAC0__Destruct(Obj6EAC0 *self) {
+void TextRow__Finalize(Obj6EAC0 *self) {
     ReleaseBasicClassArray(self->unkB4, self->unkA9);
     self->unkB4 = BMemPMgrFree(self->unkB4);
     GetCharSpriteMethods()->finalize((CharSprite *)self);
@@ -46,13 +48,13 @@ Round 54 (alpha), FINISHING-PLAN track 3.
 
 | was | now | tier |
 | --- | --- | --- |
-| `func_80040A30` | `Obj6EAC0__Destruct` | B |
+| `func_80040A30` | `TextRow__Finalize` | B |
 
 **Evidence.** Derived occupant of `slot0C`: releases the whole
 `children` array (`ReleaseBasicClassArray(self->children,
 self->totalChildCount)`), frees the array pointer itself
 (`BMemPMgrFree`), then chains to the third sibling table's own `slot0C`
--- the mirror-image teardown of `Obj6EAC0__Construct`'s own setup. Tier B
+-- the mirror-image teardown of `TextRow__TextRow`'s own setup. Tier B
 for the same reason as `Construct`: the destructor role is certain from
 the mechanics, the class's broader purpose is not independently
 confirmed.

@@ -26,7 +26,7 @@ typedef struct TexPageDesc TexPageDesc;
  * `BasicClass *` and the accessors here cast to the view (`sound`, a
  * VabStreamObj, is cast to include/VabStreamObj.h's type; `Unk78Obj`: `bgLayer`; `Unk74Obj`: `subHandle`
  * and TaskCoreTarget's `handle`; `Unk64Elem`: the slot and item widgets,
- * New_Obj6EAC0; `listView` is a BoxFill, include/BoxFill.h). `SlotEntry` and
+ * New_TextRow; `listView` is a BoxFill, include/BoxFill.h). `SlotEntry` and
  * `SrcDesc` are two readings of one TaskCoreTarget::unk24[] record.
  */
 typedef struct Unk78Obj Unk78Obj;
@@ -195,12 +195,12 @@ struct SrcDesc {
     char **unk18; /* +0x018, NULL-terminated array of C strings -- each
                       element is passed to strlen (already typed
                       `s32 strlen(char *s)` in code_171e0.h) and to
-                      New_Obj6EAC0 */
+                      New_TextRow */
 };
 
 extern s32 strlen(char *s); /* Psy-Q libc2/strlen, linked from Sony's
                                         own object; local view here */
-extern Unk64Elem *New_Obj6EAC0(void *ctx, s32 len, char *name); /* not
+extern Unk64Elem *New_TextRow(void *ctx, s32 len, char *name); /* not
                                         yet seen elsewhere; typed from
                                         TaskCore__CreateSlotElements's own call site --
                                         its return value is stored directly
@@ -366,11 +366,11 @@ extern void *New_D8006EF50(void); /* external, no args; local view returns
  */
 
 /*
- * `Obj6EAC0` -- code_2cc8c_f's view of D_8006EB90's class (id 0x11144), the
- * methods from New_Obj6EAC0 to Obj6EAC0__GetDerivedMethods. Round 14 read
- * D_8006EB90 as an override table of D_8006EAC0 and named this view after
+ * `Obj6EAC0` -- code_2cc8c_f's view of gTextRowMethods's class (id 0x11144), the
+ * methods from New_TextRow to GetTextRowMethods. Round 14 read
+ * gTextRowMethods as an override table of D_8006EAC0 and named this view after
  * the latter; the class ids say otherwise, and so do the ctors:
- * Obj6EAC0__Construct chains to GetCharSpriteMethods()->ctor, and CharSprite
+ * TextRow__TextRow chains to GetCharSpriteMethods()->ctor, and CharSprite
  * (0x1144) is a ScreenSprite (0x144, include/ScreenSprite.h) subclass. So
  * 0x11144 is NOT below BoxFill (0x64, gBoxFillMethods, include/BoxFill.h):
  * the thirteen 0x64 methods that used this view now use BoxFill, and the
@@ -380,8 +380,8 @@ extern void *New_D8006EF50(void); /* external, no args; local view returns
  * 0x11144's job (FINISHING-PLAN track 4) and is otherwise left as it was.
  *
  * Its reading (round 54, tier B, this unit's evidence only): an N-child
- * text row. `New_Obj6EAC0(ctx, count, text)` makes `count` CharSprite cells
- * (New_CharSprite) in `children`; Obj6EAC0__SetText hands one byte of a
+ * text row. `New_TextRow(ctx, count, text)` makes `count` CharSprite cells
+ * (New_CharSprite) in `children`; TextRow__SetText hands one byte of a
  * NUL-terminated string to each child's +0x0C4; the layout slots walk
  * `children[childStart .. childStart + childCount)`, advancing a running
  * position by `childPitch`, with one extra +0x10 gap at `gapIndex`. The
@@ -396,31 +396,31 @@ struct Obj6EAC0Methods {
     u8 pad000[0x008];
     void (*slot08)(Obj6EAC0 *self, s32 a1, s32 a2, s32 a3); /* +0x008,
                                   ctor-shaped: OBSERVED forwarded 3 raw
-                                  args by New_Obj6EAC0's New_X wrapper.
-                                  IS Obj6EAC0__Construct (this unit, STALL) in
+                                  args by New_TextRow's New_X wrapper.
+                                  IS TextRow__TextRow (this unit, STALL) in
                                   the derived table. */
-    void (*slot0C)(Obj6EAC0 *self); /* +0x00C, IS Obj6EAC0__Destruct (derived,
+    void (*slot0C)(Obj6EAC0 *self); /* +0x00C, IS TextRow__Finalize (derived,
                                   this unit) -- takes no extra args */
     u8 pad010[0x040 - 0x010];
-    void (*slot40)(Obj6EAC0 *self, s32 a1); /* +0x040, IS Obj6EAC0__FinishConstruct
+    void (*slot40)(Obj6EAC0 *self, s32 a1); /* +0x040, IS TextRow__Reset
                                   (derived, this unit) */
     u8 pad044[0x04C - 0x044];
     void (*slot4C)(); /* +0x04C, DELIBERATELY UNPROTOTYPED (K&R style):
                                   call sites in this unit need it at BOTH
                                   3 and 4 explicit arguments
                                   (BoxFill__AttachAbsolute forwards 4;
-                                  Obj6EAC0__LayoutChildrenWithGap calls it at 3, twice, with
+                                  TextRow__AttachToParent calls it at 3, twice, with
                                   different argument MEANINGS each time)
                                   and C requires an exact arg-count match
                                   through a prototyped function-pointer
                                   type, which no single prototype here
                                   could satisfy. IS BoxFill__AttachToParent (base,
-                                  this unit, reads 3) and Obj6EAC0__LayoutChildrenWithGap
+                                  this unit, reads 3) and TextRow__AttachToParent
                                   (derived, this unit, reads 3) */
-    void (*slot50)(Obj6EAC0 *self); /* +0x050, IS func_80040C00 (derived,
+    void (*slot50)(Obj6EAC0 *self); /* +0x050, IS TextRow__DetachFromParent (derived,
                                   this unit) */
     u8 pad054[0x060 - 0x054];
-    s32 (*slot60)(Obj6EAC0 *self, s32 a1); /* +0x060, IS Obj6EAC0__QueryChildren
+    s32 (*slot60)(Obj6EAC0 *self, s32 a1); /* +0x060, IS TextRow__SetDisplay
                                   (derived, this unit), which recurses
                                   into a child's own slot60 with the same
                                   a1 and threads the return value through
@@ -434,7 +434,7 @@ struct Obj6EAC0Methods {
     u8 pad06C[0x0B8 - 0x06C];
     void (*slotB8)(Obj6EAC0 *self, s32 a1); /* +0x0B8, the only OBSERVED
                                   CALL through this slot is
-                                  Obj6EAC0__PropagateColor's own child dispatch, at
+                                  TextRow__SetColor's own child dispatch, at
                                   2 args. BoxFill__SetColor (base occupant)
                                   takes a 3rd (`u8 *src`) in its own
                                   definition, which is fine -- an
@@ -442,7 +442,7 @@ struct Obj6EAC0Methods {
                                   narrower call site (nothing in this
                                   unit calls slotB8 at 3 args) */
     void (*slotBC)(Obj6EAC0 *self, Pair32E99C *a1); /* +0x0BC, IS BoxFill__SetPosition
-                                  (base, this unit) and Obj6EAC0__LayoutChildren
+                                  (base, this unit) and TextRow__SetPosition
                                   (derived, this unit); a1 a 2-word
                                   struct pointer in both -- same shape as
                                   Class6E99C's saved position (see
@@ -452,50 +452,50 @@ struct Obj6EAC0Methods {
                                   struct pointer */
     void (*slotC4)(); /* +0x0C4, DELIBERATELY UNPROTOTYPED, same reason as
                                   slot4C above: BoxFill__AttachAbsolute forwards 4
-                                  args, Obj6EAC0__SetText dispatches a CHILD's
+                                  args, TextRow__SetText dispatches a CHILD's
                                   slotC4 at only 2. IS BoxFill__AttachAbsolute
                                   (base, this unit, reads 3) and
-                                  Obj6EAC0__SetChildChar (derived, this unit,
+                                  TextRow__SetCellAt (derived, this unit,
                                   reads 2) */
     void (*slotC8)(Obj6EAC0 *self, s32 a1); /* +0x0C8, IS BoxFill__SetPri
                                   (base, this unit, setter) and
-                                  Obj6EAC0__NoOpSetter (derived, this unit,
+                                  TextRow__NoOpGetCell (derived, this unit,
                                   splat-generated trivial jr $ra; nop) */
     s32 (*slotCC)(Obj6EAC0 *self, s32 a1); /* +0x0CC, IS BoxFill__SetMask
-                                  (base, this unit) and Obj6EAC0__SetText
+                                  (base, this unit) and TextRow__SetText
                                   (derived, this unit) */
     void (*slotD0)(Obj6EAC0 *self); /* +0x0D0, derived-only, IS
-                                  Obj6EAC0__NoOpSlotD0 (this unit, splat-
+                                  TextRow__NoOpSlotD0 (this unit, splat-
                                   generated trivial) */
     void (*slotD4)(Obj6EAC0 *self, s32 a1); /* +0x0D4, derived-only, IS
-                                  Obj6EAC0__SetChildPitch (this unit, setter) */
+                                  TextRow__SetCellPitch (this unit, setter) */
 };
 
 struct Obj6EAC0 {
     Obj6EAC0Methods *methods; /* +0x000 */
     u8 pad004[0x00C - 0x004];
     s32 hasChildren;           /* +0x00C, OBSERVED: tested by
-                                  Obj6EAC0__LayoutChildrenWithGap, func_80040C00,
-                                  Obj6EAC0__LayoutChildren (Class6B5CC's
+                                  TextRow__AttachToParent, TextRow__DetachFromParent,
+                                  TextRow__SetPosition (Class6B5CC's
                                   `parent` offset; see the banner) */
     u8 pad010[0x0A9 - 0x010];
-    u8 totalChildCount;         /* +0x0A9, OBSERVED: Obj6EAC0__Destruct (passed
+    u8 totalChildCount;         /* +0x0A9, OBSERVED: TextRow__Finalize (passed
                                   as ReleaseBasicClassArray's count arg),
-                                  Obj6EAC0__LayoutChildren (loop bound) */
-    u8 gapIndex;                /* +0x0AA, OBSERVED: Obj6EAC0__LayoutChildrenWithGap -- a
+                                  TextRow__SetPosition (loop bound) */
+    u8 gapIndex;                /* +0x0AA, OBSERVED: TextRow__AttachToParent -- a
                                   one-shot "extra offset" gate compared
                                   against the loop index */
     u8 childCount;               /* +0x0AB, OBSERVED: a per-slice element
                                   COUNT, paired with childStart as the base
-                                  index -- Obj6EAC0__LayoutChildrenWithGap, func_80040C00,
-                                  Obj6EAC0__QueryChildren, Obj6EAC0__PropagateColor */
+                                  index -- TextRow__AttachToParent, TextRow__DetachFromParent,
+                                  TextRow__SetDisplay, TextRow__SetColor */
     u8 childStart;               /* +0x0AC, OBSERVED: a per-slice element
                                   START INDEX into children, paired with
                                   childCount above */
     u8 padAD[0x0B0 - 0x0AD];
-    s32 childPitch;             /* +0x0B0, OBSERVED: Obj6EAC0__SetChildPitch (setter);
+    s32 childPitch;             /* +0x0B0, OBSERVED: TextRow__SetCellPitch (setter);
                                   read and added into a local running total
-                                  by Obj6EAC0__LayoutChildrenWithGap/Obj6EAC0__LayoutChildren */
+                                  by TextRow__AttachToParent/TextRow__SetPosition */
     Obj6EAC0 **children;        /* +0x0B4, OBSERVED: an array of child
                                   objects of this SAME class, indexed by
                                   childStart..childStart+childCount and dispatched
@@ -507,9 +507,9 @@ struct Obj6EAC0 {
 extern u32 GetSetBitField(u32 *word, s32 shift, s32 width, u32 value);
 
 /* gBoxFillMethods and GetBoxFillMethods: include/BoxFill.h. */
-extern Obj6EAC0Methods D_8006EB90; /* the override table itself, so
-                                       Obj6EAC0__GetDerivedMethods's own definition
-                                       (this unit) can return &D_8006EB90 */
+extern Obj6EAC0Methods gTextRowMethods; /* the override table itself, so
+                                       GetTextRowMethods's own definition
+                                       (this unit) can return &gTextRowMethods */
 /* GetCharSpriteMethods, New_CharSprite and their table: include/CharSprite.h
  * (track 4, round 86), included by code_2cc8c_f, the one unit that calls
  * them. */
