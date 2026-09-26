@@ -347,7 +347,7 @@ If `arg3 == 0`, does nothing at all (whole body skipped). Otherwise:
 
 1. `divisor = self->unk68->divisor` (s16); `flag = (val / divisor) & 1`
    (the quotient's low bit).
-2. `savedResult = StageMap__ComputeRateFlags(self, val, flag)` (already-matched sibling,
+2. `savedResult = StageMap__ComputeNeighbourMask(self, val, flag)` (already-matched sibling,
    spilled to the stack and reused later).
 3. Loop `i = 0..6`: resolve `e = self->methods->slot118(self, i)`, copy
    `arg3[i].key` into `Elem::unk2` (new field). If `arg3[i].flag != 0`:
@@ -469,7 +469,7 @@ void StageMap__BuildRateEntries(Obj866E8 *self, s32 val, Unk54Struct *arg2, Chun
     if (arg3 != 0) {
         divisor = self->unk68->divisor;
         flag = (val / divisor) & 1;
-        savedResult = StageMap__ComputeRateFlags(self, val, flag);
+        savedResult = StageMap__ComputeNeighbourMask(self, val, flag);
 
         count = 0;
         for (i = 0; i < 7; i++) {
@@ -686,7 +686,7 @@ void StageMap__BuildRateEntries(Obj866E8 *self, s32 val, Unk54Struct *arg2, Chun
     if (arg3 != 0) {
         divisor = self->unk68->divisor;
         flag = (val / divisor) & 1;
-        savedResult = StageMap__ComputeRateFlags(self, val, flag);
+        savedResult = StageMap__ComputeNeighbourMask(self, val, flag);
 
         count = 0;
         for (i = 0; i < 7; i++) {
@@ -728,4 +728,4 @@ Round 78 (track 3, naming pass, bravo).
 
 | symbol | name | tier | evidence |
 | --- | --- | --- | --- |
-| `func_8004B700` | `StageMap__BuildRateEntries` | B | Occupant of `gStageMapMethods` +0x0F8 (`slotF8`, verified its own identity via classtable -- see the corrected slot comment in `include/class_3bb8c.h`). Iterates a `ChunkSlotSpec[7]` (`sDefaultTargetSpecs` at its one known call site), calling `StageMap__ComputeRateFlags` once and `StageMap__ComputeRateEntry` per enabled entry to fill a 7-slot `ChunkLoadEntry` stack buffer, then dispatches the filled count through `slotFC` (`StageMap__ApplyRateEntries`). "Build...RateEntries" names the mechanic (assembling the entry array that the next slot applies), consistent with the sibling already-matched functions in this same vtable region (`StageMap__ConfigureRateEntry`, `StageMap__AdvanceRateCountdown`, `StageMap__FlushRateLatch`). |
+| `func_8004B700` | `StageMap__BuildRateEntries` | B | Occupant of `gStageMapMethods` +0x0F8 (`slotF8`, verified its own identity via classtable -- see the corrected slot comment in `include/class_3bb8c.h`). Iterates a `ChunkSlotSpec[7]` (`sDefaultTargetSpecs` at its one known call site), calling `StageMap__ComputeNeighbourMask` once and `StageMap__ComputeRateEntry` per enabled entry to fill a 7-slot `ChunkLoadEntry` stack buffer, then dispatches the filled count through `slotFC` (`StageMap__ApplyRateEntries`). "Build...RateEntries" names the mechanic (assembling the entry array that the next slot applies), consistent with the sibling already-matched functions in this same vtable region (`StageMap__ConfigureRateEntry`, `StageMap__AdvanceRateCountdown`, `StageMap__FlushRateLatch`). |

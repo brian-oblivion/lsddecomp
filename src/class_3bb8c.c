@@ -11,7 +11,7 @@
  * plus sub-cell halfword offsets); StageMap__UpdateFootprintTracking runs
  * every enabled tick (paired with class_3ac78's StageMap__AdvanceRateCountdown)
  * to refresh that descriptor and notify on change; StageMap__BuildRateEntries
- * / StageMap__ComputeRateFlags / StageMap__ComputeRateEntry /
+ * / StageMap__ComputeNeighbourMask / StageMap__ComputeRateEntry /
  * StageMap__ApplyRateEntries build and apply a per-element rate table from
  * a ChunkSlotSpec key/flag array (sDefaultTargetSpecs); and
  * StageMap__LoadElementResources / StageMap__ResetElementCells own an
@@ -169,7 +169,7 @@ void StageMap__BuildRateEntries(StageMap *self, s32 val, LongVec3 *arg2, ChunkSl
     if (arg3 != 0) {
         divisor = self->config->columns;
         flag = (val / divisor) & 1;
-        savedResult = StageMap__ComputeRateFlags(self, val, flag);
+        savedResult = StageMap__ComputeNeighbourMask(self, val, flag);
 
         count = 0;
         for (i = 0; i < 7; i++) {
@@ -203,7 +203,7 @@ void StageMap__BuildRateEntries(StageMap *self, s32 val, LongVec3 *arg2, ChunkSl
     }
 }
 
-s32 StageMap__ComputeRateFlags(StageMap *self, s32 val, s32 flag) {
+s32 StageMap__ComputeNeighbourMask(StageMap *self, s32 val, s32 flag) {
     StageGridDimensions *u;
     s32 divisor;
     s32 unk4;

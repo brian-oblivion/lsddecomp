@@ -1,4 +1,6 @@
-# StageMap__ComputeRateFlags
+# StageMap__ComputeNeighbourMask
+
+> Renamed from `StageMap__ComputeRateFlags` on 2026-09-26 (tools/rename.py). Address 0x8004b930.
 
 > Renamed from `Class866E8__ComputeRateFlags` on 2026-09-26 (tools/rename.py). Address 0x8004b930.
 
@@ -9,7 +11,7 @@
 ## Result
 
 ```c
-s32 StageMap__ComputeRateFlags(Obj866E8 *self, s32 val, s32 flag) {
+s32 StageMap__ComputeNeighbourMask(Obj866E8 *self, s32 val, s32 flag) {
     Unk68Struct *u;
     s32 divisor;
     s32 unk4;
@@ -103,4 +105,4 @@ Round 78 (track 3, naming pass, bravo).
 
 | symbol | name | tier | evidence |
 | --- | --- | --- | --- |
-| `func_8004B930` | `StageMap__ComputeRateFlags` | B | Takes `self` as its first parameter (a method, not a free function). Computes a bitmask from `val`/`self->unk68->divisor`/`flag` (boundary tests against the divisor, remainder tests, complemented at every return) with no field write -- a pure computation, its result forwarded by `StageMap__BuildRateEntries` to `StageMap__ComputeRateEntry` as `savedResult`, tested there against `sRateKeyMask[key]`. "Compute...Flags" names the mechanic; the individual bit meanings (0x25/0x60/0x10/0x52/...) are not established. |
+| `func_8004B930` | `StageMap__ComputeNeighbourMask` | B | Takes `self` as its first parameter (a method, not a free function). Computes a bitmask from `val`/`self->unk68->divisor`/`flag` (boundary tests against the divisor, remainder tests, complemented at every return) with no field write -- a pure computation, its result forwarded by `StageMap__BuildRateEntries` to `StageMap__ComputeRateEntry` as `savedResult`, tested there against `sRateKeyMask[key]`. "Compute...Flags" names the mechanic; the individual bit meanings (0x25/0x60/0x10/0x52/...) are not established. |

@@ -33,7 +33,7 @@ separate field reads, no explicit sharing.
 
 This is also the function that pinned down `Unk68Struct`'s first field
 (`divisor`, a signed halfword at `+0x000`) -- corroborated independently by
-`StageMap__ComputeRateFlags` and `ComputeCellWorldOffsets`/`StageMap__ComputeCellOffsets`'s call site later in the
+`StageMap__ComputeNeighbourMask` and `ComputeCellWorldOffsets`/`StageMap__ComputeCellOffsets`'s call site later in the
 same round.
 
 ### Proposed learning
