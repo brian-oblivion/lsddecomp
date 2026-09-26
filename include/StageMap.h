@@ -236,7 +236,7 @@ struct StageMapMethods {
     /* +0x134 */ void (*setBounds)(StageMap *self, CellBounds *bounds); /* StageMap__SetBounds */
     /* +0x138 */ void (*configureRateEntry)(StageMap *self, s32 rate,
                                             s32 flag); /* StageMap__StartScaleRamp */
-    /* +0x13C */ void (*advanceRateCountdown)(StageMap *self); /* StageMap__AdvanceRateCountdown */
+    /* +0x13C */ void (*advanceRateCountdown)(StageMap *self); /* StageMap__StepScaleRamp */
     /* +0x140 */ void (*flushRateLatch)(StageMap *self);       /* StageMap__FlushRateLatch */
 }; /* 80 slots */
 
@@ -347,7 +347,7 @@ void StageMap__SetFootprintCellFlag(StageMap *self, s32 setBit);
 void *StageMap__GetUnk1CC(StageMap *self);
 void StageMap__SetBounds(StageMap *self, CellBounds *bounds);
 void StageMap__StartScaleRamp(StageMap *self, s32 rate, s32 flag);
-void StageMap__AdvanceRateCountdown(StageMap *self);
+void StageMap__StepScaleRamp(StageMap *self);
 void StageMap__FlushRateLatch(StageMap *self);
 void StageMap__ApplyRateToChild(StageMap *self, struct GridCell *cell);
 void StageMap__ResetChildRate(StageMap *self, struct GridCell *cell);

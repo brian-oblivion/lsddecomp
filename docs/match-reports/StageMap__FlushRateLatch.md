@@ -42,7 +42,7 @@ void StageMap__FlushRateLatch(Obj866E8 *self) {
 `StageMap__ForEachElem` is still `INCLUDE_ASM` in this unit; forward-declared per
 the established "calling into a still-INCLUDE_ASM function is fine"
 convention. Its own signature was derived from THIS call site plus
-`StageMap__AdvanceRateCountdown`'s (own report): `(Obj866E8 *self, void
+`StageMap__StepScaleRamp`'s (own report): `(Obj866E8 *self, void
 (*itemCallback)(Obj866E8*, Unk10ChildObj_3bb8c_b*), void
 (*perArrCallback)(Obj866E8*, Elem*))` — both known callers pass 0 for the
 third argument, so its true type is inferred from `StageMap__ForEachElem`'s own
@@ -51,7 +51,7 @@ body (still unmatched) rather than confirmed live.
 ## New struct/global knowledge
 
 - `Obj866E8::unk1E0` (`s32`, +0x1E0) — a gate/countdown value, also used
-  by the sibling `StageMap__AdvanceRateCountdown` (own report).
+  by the sibling `StageMap__StepScaleRamp` (own report).
 - `extern void StageMap__ForEachElem(...)` added (still raw asm in this unit).
 
 ## Attempts
@@ -65,7 +65,7 @@ None new.
 ## Naming
 
 **Tier B.** Not a vtable slot. One-shot sibling of
-`StageMap__AdvanceRateCountdown`: if `self->rateCountdown != 0`, resets
+`StageMap__StepScaleRamp`: if `self->rateCountdown != 0`, resets
 every child's rate (`ForEachElem(self, ResetChildRate, 0)`) and clears the
 latch to 0 in a single call, no per-tick decrement. "Latch" distinguishes
 it from the countdown sibling -- it fires once and clears, rather than

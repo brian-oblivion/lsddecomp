@@ -8,7 +8,7 @@ Iterates `self->arr[0..6]`, invoking an optional per-element callback
 (`arg2`, called `(self, &arr[i])` when non-NULL) and then always forwarding
 `(self, arg1, &arr[i])` to `StageMap__ForEachEntryChild`. Already had a prototype and a
 two-hop derivation in `include/class_3bb8c.h` from a previous round
-(established from `StageMap__AdvanceRateCountdown`/`StageMap__FlushRateLatch`'s call sites); this round
+(established from `StageMap__StepScaleRamp`/`StageMap__FlushRateLatch`'s call sites); this round
 supplied the body.
 
 Matches the "explicit intermediate element pointer in an array loop" idiom

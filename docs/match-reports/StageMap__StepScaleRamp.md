@@ -1,4 +1,6 @@
-# StageMap__AdvanceRateCountdown — MATCHED (24/24 words)
+# StageMap__StepScaleRamp — MATCHED (24/24 words)
+
+> Renamed from `StageMap__AdvanceRateCountdown` on 2026-09-26 (tools/rename.py). Address 0x8004d028.
 
 > Renamed from `Class866E8__AdvanceRateCountdown` on 2026-09-26 (tools/rename.py). Address 0x8004d028.
 
@@ -41,7 +43,7 @@ new value unconditionally, and the branch-not-taken path (decrement hit
 ## Final C
 
 ```c
-void StageMap__AdvanceRateCountdown(Obj866E8 *self) {
+void StageMap__StepScaleRamp(Obj866E8 *self) {
     if (self->unk1E0 > 0) {
         StageMap__ForEachElem(self, StageMap__ApplyRateToChild, 0);
         self->unk1E0 -= 1;

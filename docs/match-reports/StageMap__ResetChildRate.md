@@ -30,7 +30,7 @@ function genuinely ignores its own `self` argument, unlike its sibling
 `StageMap__ApplyRateToChild` which uses it (`self->unk1E4`). Confirmed real, not a
 missing-parameter bug, by cross-checking the only caller
 (`StageMap__FlushRateLatch`, which passes this function's address to
-`StageMap__ForEachElem` exactly like `StageMap__AdvanceRateCountdown` passes `StageMap__ApplyRateToChild`'s —
+`StageMap__ForEachElem` exactly like `StageMap__StepScaleRamp` passes `StageMap__ApplyRateToChild`'s —
 same call shape, same two-parameter signature required by the eventual
 `StageMap__ForEachEntryChild` dispatcher).
 

@@ -9,7 +9,7 @@ obvious from the function's own body alone)
 
 `StageMap__ApplyRateToChild`'s only two references anywhere in the executable are as a
 function-pointer VALUE (`lui`/`addiu` of its address, never a direct
-`jal`) inside `StageMap__AdvanceRateCountdown` (this unit), passed as the second argument
+`jal`) inside `StageMap__StepScaleRamp` (this unit), passed as the second argument
 to `StageMap__ForEachElem`. Reading `StageMap__ForEachElem` in isolation makes it look
 like `StageMap__ApplyRateToChild` is invoked there directly as `callback(self, &arr[i])`
 — but `StageMap__ForEachElem` (own body: `s5 = a1`, forwarded unchanged to
@@ -86,7 +86,7 @@ call site.
 
 **Tier B.** Not a vtable slot -- a callback, passed as a function pointer
 to `StageMap__ForEachElem`/`StageMap__ForEachEntryChild` by
-`StageMap__AdvanceRateCountdown`. Body: `item->methods->slot48(item, 0,
+`StageMap__StepScaleRamp`. Body: `item->methods->slot48(item, 0,
 self->rateEntry)`. Named for what it does to each child entry (forwards
 the parent's current rate entry to it), mirrored by
 `StageMap__ResetChildRate`'s sibling shape.

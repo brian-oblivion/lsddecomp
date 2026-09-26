@@ -401,7 +401,7 @@ merge:
     self->rateCountdown = val;
 }
 
-void StageMap__AdvanceRateCountdown(StageMap *self) {
+void StageMap__StepScaleRamp(StageMap *self) {
     if (self->rateCountdown > 0) {
         StageMap__ForEachElem(self, StageMap__ApplyRateToChild, 0);
         self->rateCountdown -= 1;

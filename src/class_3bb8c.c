@@ -9,7 +9,7 @@
  * StageMap__ComputeFootprintDescriptor converts a world position
  * (SplitLongVec3) into a grid-cell descriptor (Descriptor10, byte row/column
  * plus sub-cell halfword offsets); StageMap__UpdateFootprintTracking runs
- * every enabled tick (paired with class_3ac78's StageMap__AdvanceRateCountdown)
+ * every enabled tick (paired with class_3ac78's StageMap__StepScaleRamp)
  * to refresh that descriptor and notify on change; StageMap__LoadChunksAround
  * / StageMap__ComputeNeighbourMask / StageMap__ComputeChunkLoadEntry /
  * StageMap__ApplyChunkLoads build and apply a per-element rate table from
