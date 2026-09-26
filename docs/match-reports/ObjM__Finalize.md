@@ -45,3 +45,8 @@ Slot +0x00C of gObjMMethods (`tools/classtable.py 0x80087034`). Forwards to the 
 ## Track 4 (2026-09-26, round 88, Class865C8)
 
 ObjM__Finalize's parameter was `Obj865C8 *` (the sibling class's view); it is now `ObjM_3bb8c_k *`, class_3bb8c_k's own view of this method's class (gObjMMethods). Byte-identical.
+
+
+## Track 4 (2026-09-26, round 89, echo)
+
+Renamed from `ObjM__Dtor` (rename.py): it occupies +0x00C, BasicClass's `finalize` slot, and its whole body is the base finalize (`GetClass86668Methods()->finalize`). Tier A. Parameter now `ObjM *` (include/ObjM.h).

@@ -36,3 +36,8 @@ Round 78 (charlie), FINISHING-PLAN track 3.
 | `func_80052EBC` | `ObjM__DetachTarget` | B | see below |
 
 **Evidence.** vtable slot +0x048. Forwards `self->target` through self's own `slot14`, then the shared base accessor's `slot48` -- the structural mirror of `ObjM__AttachTarget` (attach/register at +0x044, teardown counterpart immediately after at +0x048).
+
+
+## Track 4 (2026-09-26, round 89, echo)
+
+The class is unified as ObjM in include/ObjM.h (table gObjMMethods, was D_80087034); the class_3bb8c_k/_l/_m views (ObjM_3bb8c_k, Obj87034_3bb8c_l, ObjM) and class_39e08.h's Obj4C/SubObjB/EventArg are gone. Byte-identical.

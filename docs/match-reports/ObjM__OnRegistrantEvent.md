@@ -64,3 +64,8 @@ Round 78 (charlie), FINISHING-PLAN track 3.
 | `func_80052E7C` | `ObjM__OnRegistrantEvent` | B | see below |
 
 **Evidence.** The callback address-taken by `ObjM__AttachTarget` and handed to the registrant's `slotC8`. Matches `RegistrantMethods_3bb8c_l::slotC8`'s callback shape exactly. Dispatches on the sign of `code` to one of two still-uncarved helpers (`asm/psyq_memset.s`); their own purpose is unknown, so this stays tier B.
+
+
+## Track 4 (2026-09-26, round 89, echo)
+
+The class is unified as ObjM in include/ObjM.h (table gObjMMethods, was D_80087034); the class_3bb8c_k/_l/_m views (ObjM_3bb8c_k, Obj87034_3bb8c_l, ObjM) and class_39e08.h's Obj4C/SubObjB/EventArg are gone. Byte-identical. It is the Class866E8's value callback (Class866E8ValueFn, cast at ObjM__AttachTarget); Class866E8's ComputeRateEntry keeps the callback's return as an entry's name, and this body leaves GetGridRecordAt's result in $v0, so its real return is likely that Rec1C pointer. The return type is left `void` (not changed this round). The first argument of GetGridRecordAt/XY is now `s32 index`, as their definitions take it.

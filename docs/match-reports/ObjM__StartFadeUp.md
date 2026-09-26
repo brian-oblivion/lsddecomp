@@ -53,3 +53,8 @@ round 15 (2026-09-04), runner echo, fresh carve `class_3bb8c_m`.
 ## Naming
 
 **ObjM__StartFadeUp** -- tier B. Shared helper for the three `EnterState*` functions: fetches a `ChildM_AC` from `self->unk18`'s `slotAC`, optionally sets it up (`slotD0`) and notifies the base (`self->methods->slot10`), then dispatches `slotD8(self->unk10, arg1, arg2)`. Mechanically clear; what the pushed value represents in-game is not established.
+
+
+## Track 4 (2026-09-26, round 89, echo)
+
+Renamed from `ObjM__ForwardToSubChild` (rename.py). The "sub child" is the viewport's fade box: IntermediateBase::viewport (+0x018) is the Class869D8 of the building Class865C8's init args, its +0x0AC is Viewport's getSubHandle, whose object is Viewport's New_Class6E99C; +0x0D0 and +0x0D8 on it are Class6E99C's setStep and startFadeUp, the source being IntermediateBase::unk10 (the FrameClock). So: set the fade step (when nonzero), add the box as a child (when asked, so its 5/6 notifications reach ObjM__OnFadeNotify), start a fade up with the given channels. Tier A for the mechanics. Parameters named (channels, arg2, step, addChild).

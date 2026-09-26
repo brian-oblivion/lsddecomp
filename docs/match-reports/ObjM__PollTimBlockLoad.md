@@ -103,3 +103,8 @@ Round 78 (charlie), FINISHING-PLAN track 3.
 | `func_800531CC` | `ObjM__PollTimBlockLoad` | B | see below |
 
 **Evidence.** Private helper (not itself a vtable slot), called only from `ObjM__OnTag1Notify`. The detach-from-current-target / link-to-new-target logic: `other` is confirmed to be the SAME class (`Obj87034_3bb8c_l`) by the identical field offsets both `self` and `other` are read through (`+0x0`, `+0x3C`, `+0x50`, `+0x60`, `+0x68`, `+0x80`).
+
+
+## Track 4 (2026-09-26, round 89, echo)
+
+Renamed from `ObjM__TransferToOther` (rename.py). **The reading above that `other` is an ObjM is wrong**, and the callers show it (track 4 step 5): its only caller passes `self->timBlockSrc` (+0x058), which `ObjM__InitStyleAndWorld` assigns from `New_TimBlockSrc(PickDailyVariant(...))`. The offsets read on it are TimBlockSrc's (include/TimBlockSrc.h): +0x080 `failed`, +0x03C `loaded`, +0x004 `release`, +0x07C `fadeAllEntries(color)`. So: while `timBlockPending` (+0x060), a failed load releases the source, runs setupSceneStyle and adds 0x1E to the DreamSys's dream time limit; a finished load fades the CLUT rows to the styleConfig colour (+0x00C when styleConfig +0x014 is 2, else +0x018), releases it and runs setupSceneStyle. Then, with nothing pending, the Class866E8 idle (`unk1B4 == 0`) and not yet `inSession`, it sets `unk64` and runs enterStyleSession. Called once per onTag1Notify event 2, so a poll. Tier B. Signature now `(ObjM *self, TimBlockSrc *src)`; byte-identical.

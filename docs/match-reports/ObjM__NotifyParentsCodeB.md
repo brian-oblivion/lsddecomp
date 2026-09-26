@@ -33,3 +33,8 @@ round 15 (2026-09-04), runner echo, fresh carve `class_3bb8c_m`.
 ## Naming
 
 **ObjM__NotifyParentsCodeB** -- tier A. Pure one-line dispatch: `self->methods->notifyParents(self, 0xB)`. `notifyParents` is CONFIRMED as `BasicClass__NotifyParents` via `tools/classtable.py 0x80087034` (+0x030), so every byte of this function's behaviour is known even though the game-level meaning of event code 0xB is not -- a pure leaf whose mechanics ARE its purpose, tier A by the FINISHING-PLAN definition.
+
+
+## Track 4 (2026-09-26, round 89, echo)
+
+The class is unified as ObjM in include/ObjM.h (table gObjMMethods, was D_80087034); the class_3bb8c_k/_l/_m views (ObjM_3bb8c_k, Obj87034_3bb8c_l, ObjM) and class_39e08.h's Obj4C/SubObjB/EventArg are gone. Byte-identical.

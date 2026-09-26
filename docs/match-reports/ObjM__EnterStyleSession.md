@@ -168,3 +168,8 @@ Round 78 (charlie), FINISHING-PLAN track 3.
 | `func_80053764` | `ObjM__EnterStyleSession` | B | see below |
 
 **Evidence.** vtable slot +0x088. The largest setup routine in the unit: configures `self->target`, then spawns a NEW `DreamSysObj_3bb8c_l` via `self->unk18`'s own `slotAC` and dispatches it via self's `slot10` -- a heavier "begin" step than `ObjM__SetupSceneStyle`, consistent with the `EnterState`-family naming used for the class's other heavy setup slots.
+
+
+## Track 4 (2026-09-26, round 89, echo)
+
+The class is unified as ObjM in include/ObjM.h (table gObjMMethods, was D_80087034); the class_3bb8c_k/_l/_m views (ObjM_3bb8c_k, Obj87034_3bb8c_l, ObjM) and class_39e08.h's Obj4C/SubObjB/EventArg are gone. Byte-identical. `world` is the viewport (Class869D8: setLightMode, setClearColor, setFogNear, setFarColor, setUnkB4, setDrawEnabled), its getSubHandle the Class6E99C fade box (setDivisorMode +0x0F0, startFadeDown +0x0D4); `attached` is `inSession`.

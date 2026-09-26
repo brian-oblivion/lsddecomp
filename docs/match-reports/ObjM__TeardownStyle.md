@@ -45,3 +45,8 @@ Round 78 (charlie), FINISHING-PLAN track 3.
 | `func_80053134` | `ObjM__TeardownStyle` | B | see below |
 
 **Evidence.** vtable slot +0x050. Calls the global `StyleTeardown()` and `TickDreamAuxSlots2()` directly, then notifies `self->unk54` (another `ObjM` instance) via its own `slot48`. Named for the one global call whose own name is already established.
+
+
+## Track 4 (2026-09-26, round 89, echo)
+
+The class is unified as ObjM in include/ObjM.h (table gObjMMethods, was D_80087034); the class_3bb8c_k/_l/_m views (ObjM_3bb8c_k, Obj87034_3bb8c_l, ObjM) and class_39e08.h's Obj4C/SubObjB/EventArg are gone. Byte-identical.

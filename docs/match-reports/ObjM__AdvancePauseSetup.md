@@ -135,3 +135,8 @@ in this session; the reproducers themselves were scratch files under
 ## Naming
 
 **ObjM__AdvancePauseSetup** -- tier B. A 5-step counter (`self->unk80`, 0..4) driving a state machine: on step 0, builds an object literally named "Pause" (`New_TextRow(self->unk74, 5, &D_8008AB44[0])`, `D_8008AB44` == "Pause", asm/data/7B008.sdata.s); on the final step (4), notifies several sibling components. The literal string is strong, concrete evidence for the "pause overlay" reading, but the class's exact game role stays tier B.
+
+
+## Track 4 (2026-09-26, round 89, echo)
+
+The class is unified as ObjM in include/ObjM.h (table gObjMMethods, was D_80087034); the class_3bb8c_k/_l/_m views (ObjM_3bb8c_k, Obj87034_3bb8c_l, ObjM) and class_39e08.h's Obj4C/SubObjB/EventArg are gone. Byte-identical. Holders now typed: pauseText (+0x07C, TextRow: attachToParent, setColor), etcTim (+0x074, New_TextRow's font), viewport (Class869D8 setDrawEnabled), unk10 (FrameClock pause), bgm (WBgm pause), sound (VabStreamObj mute).

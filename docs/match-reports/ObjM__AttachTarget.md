@@ -57,3 +57,8 @@ Round 78 (charlie), FINISHING-PLAN track 3.
 | `func_80052DE8` | `ObjM__AttachTarget` | B | see below |
 
 **Evidence.** vtable slot +0x044 of `gObjMMethods` (`ObjM`, confirmed via classtable.py's ctor/dtor slots). Registers `ObjM__OnRegistrantEvent` as a callback with `arg1->unkC` (a "registrant" object), stores `arg2` into `self->target`, forwards to the shared base accessor's own slot `+0x44`, then dispatches self's own `AddChild` (slot10). Mechanics -- subscribe + link a target + add a child -- are clear; the in-game reason is not.
+
+
+## Track 4 (2026-09-26, round 89, echo)
+
+The class is unified as ObjM in include/ObjM.h (table gObjMMethods, was D_80087034); the class_3bb8c_k/_l/_m views (ObjM_3bb8c_k, Obj87034_3bb8c_l, ObjM) and class_39e08.h's Obj4C/SubObjB/EventArg are gone. Byte-identical. It is the `init` override (+0x044): `arg1` is the building Class865C8's IntermediateBaseInitArgs, whose +0x00C is its Class866E8 (setCallback +0x0C8, the "registrant"), and `arg2` the DreamSys, which Class865C8__StartObjM passes as init's s32 `mode`; the slot keeps IntermediateBase's type, the occupant takes `(IntermediateBaseInitArgs *, DreamSys *)`.

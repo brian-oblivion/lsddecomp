@@ -136,3 +136,8 @@ project-wide `New_X` allocator shape before assuming it generalizes.
 Round 75 (bravo, track 3). `func_80052B70` -> `New_ObjM`, **tier A**.
 
 New_X allocator: BMemPMgrAlloc(0x88), then GetObjMMethods()->ctor (+0x008 of gObjMMethods, `tools/classtable.py 0x80087034`) with the 5 forwarded arguments; returns the object or NULL. Caller: Class865C8__StartObjM (class_39e08). The class's type name is `ObjM` (include/class_3bb8c.h).
+
+
+## Track 4 (2026-09-26, round 89, echo)
+
+The class is unified as ObjM in include/ObjM.h (table gObjMMethods, was D_80087034); the class_3bb8c_k/_l/_m views (ObjM_3bb8c_k, Obj87034_3bb8c_l, ObjM) and class_39e08.h's Obj4C/SubObjB/EventArg are gone. Byte-identical. Signature now `ObjM *New_ObjM(BasicClass *sound, WBgm *bgm, TimImage *etcTim, LinkResource *dreamerTmd, s32 stage)`: the arguments are Class865C8's `sound`, `bgm`, `etcTim`, `dreamerTmd` (include/Class865C8.h), which StartObjM now passes uncast.

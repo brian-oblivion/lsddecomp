@@ -80,3 +80,8 @@ round 15 (2026-09-04), runner echo, fresh carve `class_3bb8c_m`.
 ## Naming
 
 **ObjM__CheckAuxTrigger** -- tier B. Fetches a `ChildM114` via `self->unk14`'s `slot114`, reads the current day/year from `dreamSys->getCurrentDayAndYear`, calls the uncarved `TryDreamAuxTrigger` with both, stores the result, and finalizes the child (`slot84`) on failure. Named for its one external call; the gameplay trigger itself is still uncarved (`src/code_4cd08.c`), so this stays tier B.
+
+
+## Track 4 (2026-09-26, round 89, echo)
+
+The class is unified as ObjM in include/ObjM.h (table gObjMMethods, was D_80087034); the class_3bb8c_k/_l/_m views (ObjM_3bb8c_k, Obj87034_3bb8c_l, ObjM) and class_39e08.h's Obj4C/SubObjB/EventArg are gone. Byte-identical. `unk14` is the Class866E8: +0x114 is getLastTargetRateSplit, returning a Class866E8Elem whose +0x004 is `loader` (the Class81940) and +0x014 `heldObj`, which takes TryDreamAuxTrigger's result (cast to BasicClass *).

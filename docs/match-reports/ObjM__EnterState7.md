@@ -61,3 +61,8 @@ round 15 (2026-09-04), runner echo, fresh carve `class_3bb8c_m`.
 ## Naming
 
 **ObjM__EnterState7** -- tier B. Sets `ObjM::mode = 7`, queries `dreamSys->getSetFlashbackSession(dreamSys, &val, -1)` (offset +0xF0, confirmed via `tools/classtable.py 0x80087BDC`), forwards the result into `ObjM__StartFadeUp`, then calls `dreamSys->blockMovement`. Mechanics are fully pinned down; the game-level meaning of "mode 7" is not, so this stays tier B rather than a guessed purpose name.
+
+
+## Track 4 (2026-09-26, round 89, echo)
+
+The class is unified as ObjM in include/ObjM.h (table gObjMMethods, was D_80087034); the class_3bb8c_k/_l/_m views (ObjM_3bb8c_k, Obj87034_3bb8c_l, ObjM) and class_39e08.h's Obj4C/SubObjB/EventArg are gone. Byte-identical.

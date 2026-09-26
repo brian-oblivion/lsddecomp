@@ -118,3 +118,8 @@ Round 78 (charlie), FINISHING-PLAN track 3.
 | `func_80053358` | `ObjM__DispatchPadEvent` | B | see below |
 
 **Evidence.** vtable slot +0x058. A generic `eventId` dispatcher: four recognised numeric codes (0xC, 0x16, 0x21, 0x2C) each forward to one of self's own vtable slots; anything else, or `self->unk68 == 0`, is a no-op.
+
+
+## Track 4 (2026-09-26, round 89, echo)
+
+Renamed from `ObjM__DispatchEvent` (rename.py): it occupies IntermediateBase's `onPadEvent` (+0x058, onNotify's Pad case), so the codes are pad codes: 0x21 slot74 (TogglePause), 0xC updateCloseReadyFlag, 0x2C clearCloseReadyFlag, 0x16 closeAndNotifyD; only while `inSession`. Tier B (which buttons the codes are is not established).

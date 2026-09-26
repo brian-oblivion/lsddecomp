@@ -110,3 +110,8 @@ Round 78 (charlie), FINISHING-PLAN track 3.
 | `func_80053984` | `ObjM__OnDreamSysNotify` | B | see below |
 
 **Evidence.** vtable slot +0x090. The class's own state-transition dispatcher: gated on `self->phase == 0`, switches on `code - 0xA` (`jtbl_8001174C`, codes 0xA..0x11) and routes each case onto the SAME class's own `slot94`..`slotAC` -- i.e. `ObjM__EnterState4`, `ObjM__EnterState5`, `ObjM__EnterState6` (this unit) and `ObjM__EnterState7`, `ObjM__EnterState8`, `ObjM__EnterStateA`, `ObjM__NotifyParentsCodeB` (sibling unit class_3bb8c_m) one-to-one, confirmed directly off `tools/classtable.py 0x80087034`'s slot list. When `phase != 0` and `code >= 9` it instead clears `self->target->unk44`.
+
+
+## Track 4 (2026-09-26, round 89, echo)
+
+Renamed from `ObjM__HandleStateCode` (rename.py): it occupies gObjMMethods +0x090, which `ObjM__OnNotify` runs for a sender whose class id is 0x1F34 (DreamSys), as Class865C8's +0x080 is its onDreamSysNotify. While IntermediateBase::state is 0, codes 0xA..0x11 run enterState4..notifyParentsCodeB (0xB none); otherwise a code from 9 up clears the DreamSys's Actor::state. Tier A for the mechanics.

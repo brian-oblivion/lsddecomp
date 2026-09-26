@@ -82,3 +82,8 @@ Round 78 (charlie), FINISHING-PLAN track 3.
 | `func_80053BE8` | `ObjM__EnterState5` | B | see below |
 
 **Evidence.** vtable slot +0x098. Sets `self->phase = 5`; same evidence as `ObjM__EnterState4`.
+
+
+## Track 4 (2026-09-26, round 89, echo)
+
+The class is unified as ObjM in include/ObjM.h (table gObjMMethods, was D_80087034); the class_3bb8c_k/_l/_m views (ObjM_3bb8c_k, Obj87034_3bb8c_l, ObjM) and class_39e08.h's Obj4C/SubObjB/EventArg are gone. Byte-identical.

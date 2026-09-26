@@ -32,3 +32,8 @@ round 15 (2026-09-04), runner echo, fresh carve `class_3bb8c_m`.
 ## Naming
 
 **ObjM__EnterStateA** -- tier B. Same shape again for `ObjM::mode = 0xA`, forwarding request code 6, then `dreamSys->selectCallback98(dreamSys, 2)` and `setMoveOverride(dreamSys, 2)`. Tier B for the same reason as its two siblings.
+
+
+## Track 4 (2026-09-26, round 89, echo)
+
+The class is unified as ObjM in include/ObjM.h (table gObjMMethods, was D_80087034); the class_3bb8c_k/_l/_m views (ObjM_3bb8c_k, Obj87034_3bb8c_l, ObjM) and class_39e08.h's Obj4C/SubObjB/EventArg are gone. Byte-identical.

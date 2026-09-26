@@ -196,3 +196,8 @@ Round 78 (charlie), FINISHING-PLAN track 3.
 | `func_80052F10` | `ObjM__InitStyleAndWorld` | B | see below |
 
 **Evidence.** vtable slot +0x04C. The larger of the two setup routines: calls `RegisterStyleConfig`, wires the target/world fields (`self->unk78`, `self->unk6C`, `self->unk48/unk4C/unk40/unk44`), dispatches `self->target`'s own `slot134`, and ends by marking `self->phase = 5`.
+
+
+## Track 4 (2026-09-26, round 89, echo)
+
+The class is unified as ObjM in include/ObjM.h (table gObjMMethods, was D_80087034); the class_3bb8c_k/_l/_m views (ObjM_3bb8c_k, Obj87034_3bb8c_l, ObjM) and class_39e08.h's Obj4C/SubObjB/EventArg are gone. Byte-identical. The onInit override: `world` was IntermediateBase::viewport (Class869D8: detachViewChild, attachViewChild), `unk54` the bgm (WBgm setSeq), `pendingOther` the New_TimBlockSrc object (`timBlockSrc`), `unk38` the stage, `unk48` gridSpan (the Class866E8's setGridSpan), `unk14` the Class866E8 (setBounds); `&ctorSound` is RegisterStyleConfig's third argument.

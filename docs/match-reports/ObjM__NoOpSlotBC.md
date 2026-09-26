@@ -39,3 +39,8 @@ name on, so it stays `ObjM__NoOpSlotBC` rather than acquiring a guessed
 Originally matched round 15 (2026-09-04), runner echo, fresh carve
 `class_3bb8c_m`, without its own report. Report backfilled round 69,
 runner alpha, naming pass (FINISHING-PLAN track 3).
+
+
+## Track 4 (2026-09-26, round 89, echo)
+
+Renamed from `func_800541CC` (rename.py), after the class's other empty occupants (`ObjM__NoOpSlot40`, `ObjM__NoOpSlot7C`, `Class86668__NoOpSlot58`): the empty body of gObjMMethods +0x0BC, which include/ObjM.h names `slotBC`. Tier A (the mechanics are the whole purpose); what the slot is for is unknown.

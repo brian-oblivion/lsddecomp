@@ -41,3 +41,8 @@ Round 78 (charlie), FINISHING-PLAN track 3.
 | `func_800531A0` | `ObjM__OnTag1Notify` | B | see below |
 
 **Evidence.** vtable slot +0x054. A thin selector: forwards to `ObjM__PollTimBlockLoad` only when `sel == 2`, otherwise a no-op. The meaning of the other `sel` values is not established from this body alone.
+
+
+## Track 4 (2026-09-26, round 89, echo)
+
+Renamed from `ObjM__OnSelectTransfer` (rename.py): it occupies IntermediateBase's `onTag1Notify` (+0x054) and does only what that slot's event 2 asks, running `ObjM__PollTimBlockLoad(self, self->timBlockSrc)`. Tier A for the mechanics. The argument is the TimBlockSrc (below), not another ObjM, so "transfer" is gone.

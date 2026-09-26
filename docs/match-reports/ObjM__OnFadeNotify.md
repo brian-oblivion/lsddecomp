@@ -98,3 +98,8 @@ drift.
 ## Naming
 
 **ObjM__OnFadeNotify** -- tier B. Two-case switch on its own `sel` parameter (5 and 6), each calling `self->methods->slot14` then adjusting `dreamSys`/`ObjM::mode`, ending case 6 by forwarding the (possibly just updated) mode to `notifyParents`. Named for the mechanical shape (a selector-driven event handler on two codes); the codes' own meaning is unknown.
+
+
+## Track 4 (2026-09-26, round 89, echo)
+
+Renamed from `ObjM__HandleEvent5Or6` (rename.py): it occupies +0x0B0, which `ObjM__OnNotify` runs for a sender of class id 0x164, Class6E99C (include/Class6E99C.h), whose stop notifies its parents with 5 after a fade down and 6 after a fade up. The ObjM added that fade box as a child (`ObjM__StartFadeUp`, `ObjM__EnterStyleSession`: the viewport's getSubHandle). On 5 it drops the child, clears the DreamSys's move override and state 0; on 6 it drops the child, sets the viewport's clear colour from the box's getColor (+0x0E4), maps state 0xA to 4 (stopDrift, move override 0) and notifies the parents with the state. Former views ParamM (sender) and FieldM18 (viewport) replaced by Class6E99C and Class869D8. Tier A for the mechanics.

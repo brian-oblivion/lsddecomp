@@ -42,3 +42,8 @@ Round 78 (charlie), FINISHING-PLAN track 3.
 | `func_800533F0` | `ObjM__Update` | B | see below |
 
 **Evidence.** vtable slot +0x05C. Gated on `self->unk68`: increments the `unk1C` counter, then dispatches one of two slots (`slotD0`/`slot8C`) depending on `self->unk80`.
+
+
+## Track 4 (2026-09-26, round 89, echo)
+
+Renamed from `ObjM__TickTarget` (rename.py): it occupies IntermediateBase's `update` (+0x05C, onNotify's FrameClock case) and nothing in it touches the DreamSys. While `inSession` it adds one to IntermediateBase::frameCounter (the base update's own work, inlined) and runs advancePauseSetup while the pause overlay is being built, else tickStyle. Tier A for the slot.
