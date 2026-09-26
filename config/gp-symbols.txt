@@ -182,9 +182,9 @@ gStyleDay
 gStyleDecorColor
 gStyleDecorColors
 gStyleDecorObj
-gStyleDecorPosBY
 gStyleDecorPosX
 gStyleDecorPosY
+gStyleDecorSizeH
 gStyleDecorSizeW
 gStyleDecorVariant
 gStyleEffectSlotCount
