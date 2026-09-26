@@ -386,7 +386,7 @@ void Class866E8__OnNotifyTag1(Class866E8 *self, void *arg1, s32 mode) {
  * of the 11 sibling units sharing that header touch these. */
 
 /* Class6D940__ResolveEntry's non-0/non-(-1) return value (what
- * LinkResource__GetEntry returns) -- a resolved link-target record, read
+ * LinkResource__GetModel returns) -- a resolved link-target record, read
  * only for its `unk10` (tmd base address). */
 typedef struct LinkResEntry {
     u8 pad0[0x10];

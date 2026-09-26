@@ -11,7 +11,7 @@ drift. Fresh ground (carved revision 18, no prior report).
 
 Allocate a (count + 1)-word array (count at buffer +0x08) into +0x2C (1 when that fails), map the TMD through its own +0x078 (LinkResource__MapModel), then build one New_TmdModel object per 0x1C-byte record from buffer +0x0C into the array. On a NULL, walk back releasing (slot +0x004) every one already built, free the array and return 1. Otherwise NULL-terminate the array (the terminator LinkResource__Finalize's finalize walks to), call the active driver's setFlag and return 0.
 
-Table slot (`tools/classtable.py`): D_8006F13C +0x064 (setFlag override).
+Table slot (`tools/classtable.py`): gLinkResourceMethods +0x064 (setFlag override).
 
 ## Source
 
@@ -21,7 +21,7 @@ fields +0x2C..+0x38), `Ctor33808`, `CountedBuf33808` and `Req44858` sit at the
 top of / earlier in `src/code_33808.c`.
 
 ```c
-/* D_8006F13C +0x064: build a NULL-ended array at +0x2C of one
+/* gLinkResourceMethods +0x064: build a NULL-ended array at +0x2C of one
  * New_TmdModel object per 0x1C-byte record of the buffer (from +0x0C,
  * +0x08 of them), after mapping the TMD (own +0x078); 1 when an allocation
  * fails (everything built so far released and the array freed), otherwise

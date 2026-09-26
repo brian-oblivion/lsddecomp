@@ -11,7 +11,7 @@ drift. Fresh ground (carved revision 18, no prior report).
 
 Finalize: walks the NULL-terminated object-pointer array at +0x2C releasing each (own slot +0x004), frees the array (BMemPMgrFree), then the active driver's finalize.
 
-Table slot (`tools/classtable.py`): D_8006F13C +0x00C.
+Table slot (`tools/classtable.py`): gLinkResourceMethods +0x00C.
 
 ## Source
 
@@ -21,7 +21,7 @@ fields +0x2C..+0x38), `Ctor33808` and `CountedBuf33808` sit at the top of
 `src/code_33808.c`.
 
 ```c
-/* D_8006F13C +0x00C: finalize -- release every object in the NULL-ended
+/* gLinkResourceMethods +0x00C: finalize -- release every object in the NULL-ended
  * array at +0x2C, free the array, then the active driver's. */
 void LinkResource__Finalize(DataSrc33808 *self) {
     DataSrc33808 **objs = (DataSrc33808 **)self->unk2C;

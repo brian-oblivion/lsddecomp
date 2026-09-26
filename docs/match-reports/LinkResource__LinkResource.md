@@ -9,9 +9,9 @@ drift. Fresh ground (carved revision 18, no prior report).
 
 ## What it does
 
-Constructor: active driver's ctor, install D_8006F13C (GetLinkResourceMethods); with a non-NULL { buffer, name } descriptor: adopt a given buffer (+0x10, size +0x14 = 0) and call its own +0x064 (LinkResource__BuildModels), returning NULL on a nonzero result; or, with no buffer, call its own requestLoadFile (+0x06C) with the name. Returns self otherwise.
+Constructor: active driver's ctor, install gLinkResourceMethods (GetLinkResourceMethods); with a non-NULL { buffer, name } descriptor: adopt a given buffer (+0x10, size +0x14 = 0) and call its own +0x064 (LinkResource__BuildModels), returning NULL on a nonzero result; or, with no buffer, call its own requestLoadFile (+0x06C) with the name. Returns self otherwise.
 
-Table slot (`tools/classtable.py`): D_8006F13C +0x008.
+Table slot (`tools/classtable.py`): gLinkResourceMethods +0x008.
 
 ## Source
 
@@ -26,7 +26,7 @@ typedef struct Src6F240 {
     /* +0x04 */ char *name;
 } Src6F240;
 
-/* D_8006F13C +0x008: constructor -- the active driver's, then this table;
+/* gLinkResourceMethods +0x008: constructor -- the active driver's, then this table;
  * with a descriptor, adopt its buffer (size 0) and run its own +0x064, whose
  * nonzero result fails the construction (NULL), or else request its file. */
 void *LinkResource__LinkResource(DataSrc33808 *self, Src6F240 *src) {

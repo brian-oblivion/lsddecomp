@@ -13,7 +13,7 @@
  *
  *   - TimBlockSrc  (D_8006F0B8): a sector-header + block loader with four
  *     CLUT palette-fade channels (FadeClutRow).
- *   - LinkResource (D_8006F13C): a NULL-ended array of TMD models
+ *   - LinkResource (gLinkResourceMethods): a NULL-ended array of TMD models
  *     (New_TmdModel); named from external call sites (class_3bb8c.c,
  *     code_55dd4.h) that already declare it `LinkResource *`.
  *   - TimArraySrc  (D_8006F1C4): an array of TimImage objects
@@ -380,7 +380,7 @@ void FadeClutRow(TimBlockSrcEntry *e, s32 index) {
 TimBlockSrcMethods *GetTimBlockSrcMethods(void) {
     return &D_8006F0B8;
 }
-/* Allocate and construct a D_8006F13C object; freed and NULL when the constructor fails. */
+/* Allocate and construct a LinkResource (gLinkResourceMethods) object; freed and NULL when the constructor fails. */
 void *New_LinkResource(s32 arg0) {
     void *obj = BMemPMgrAlloc(0x30);
 
@@ -399,7 +399,7 @@ typedef struct Src6F240 {
     /* +0x04 */ char *name;
 } Src6F240;
 
-/* D_8006F13C +0x008: constructor -- the active driver's, then this table;
+/* gLinkResourceMethods +0x008: constructor -- the active driver's, then this table;
  * with a descriptor, adopt its buffer (size 0) and run its own +0x064, whose
  * nonzero result fails the construction (NULL), or else request its file. */
 void *LinkResource__LinkResource(DataSrc33808 *self, Src6F240 *src) {
@@ -420,7 +420,7 @@ void *LinkResource__LinkResource(DataSrc33808 *self, Src6F240 *src) {
 fail:
     return NULL;
 }
-/* D_8006F13C +0x00C: finalize -- release every object in the NULL-ended
+/* gLinkResourceMethods +0x00C: finalize -- release every object in the NULL-ended
  * array at +0x2C, free the array, then the active driver's. */
 void LinkResource__Finalize(DataSrc33808 *self) {
     DataSrc33808 **objs = (DataSrc33808 **)self->unk2C;
@@ -432,7 +432,7 @@ void LinkResource__Finalize(DataSrc33808 *self) {
     BMemPMgrFree((void *)self->unk2C);
     GetActiveDataSourceMethods()->finalize((Class6D430 *)self);
 }
-/* D_8006F13C +0x064: build a NULL-ended array at +0x2C of one
+/* gLinkResourceMethods +0x064: build a NULL-ended array at +0x2C of one
  * New_TmdModel object per 0x1C-byte record of the buffer (from +0x0C,
  * +0x08 of them), after mapping the TMD (own +0x078); 1 when an allocation
  * fails (everything built so far released and the array freed), otherwise
@@ -473,11 +473,11 @@ s32 LinkResource__BuildModels(DataSrc33808 *self) {
 /* LIBGS.H: void GsMapModelingData(unsigned long *p); */
 void GsMapModelingData(u32 *p);
 
-/* D_8006F13C +0x078: map the TMD in the buffer (past its id word). */
+/* gLinkResourceMethods +0x078: map the TMD in the buffer (past its id word). */
 void LinkResource__MapModel(Class6D430 *self) {
     GsMapModelingData((u32 *)self->buffer + 1);
 }
-/* D_8006F13C +0x07C: the address of record `index`, 0x1C bytes each,
+/* gLinkResourceMethods +0x07C: the address of record `index`, 0x1C bytes each,
  * from +0x0C of the buffer. */
 typedef struct Rec6F13C {
     u8 data[0x1C];
@@ -488,25 +488,25 @@ typedef struct Buf6F13C {
     /* +0x0C */ Rec6F13C recs[1];
 } Buf6F13C;
 
-Rec6F13C *LinkResource__GetRecord(Class6D430 *self, s32 index) {
+Rec6F13C *LinkResource__GetTmdObject(Class6D430 *self, s32 index) {
     return &((Buf6F13C *)self->buffer)->recs[index];
 }
-/* D_8006F13C +0x080: returns entry `index` of the word array at +0x2C
+/* gLinkResourceMethods +0x080: returns entry `index` of the word array at +0x2C
  * (the first field past the 0x2C-byte Class6D430 base). */
 typedef struct Obj6F13C {
     /* +0x000 */ u8 pad0[0x2C];
     /* +0x02C */ s32 *entries;
 } Obj6F13C;
 
-s32 LinkResource__GetEntry(Obj6F13C *self, s32 index) {
+s32 LinkResource__GetModel(Obj6F13C *self, s32 index) {
     return self->entries[index];
 }
 void LinkResource__NoOp(void) {
 }
-extern s32 D_8006F13C[];
+extern s32 gLinkResourceMethods[];
 
 void *GetLinkResourceMethods(void) {
-    return D_8006F13C;
+    return gLinkResourceMethods;
 }
 /* Allocate and construct a D_8006F1C4 object. */
 TimArraySrc *New_TimArraySrc(char *name) {
@@ -866,7 +866,7 @@ void ModelData__Load(ModelData *self) {
     GetActiveDataSourceMethods()->setFlag((Class6D430 *)self);
     ((s32 (*)())self->methods->slot78)(self);
 }
-/* D_8006F384 +0x078: when +0x34 is set, build a D_8006F13C source over the
+/* D_8006F384 +0x078: when +0x34 is set, build a LinkResource source over the
  * buffer's sub-block (at the offset in its third word) and a D_8006F590 one
  * over the buffer past +0x0C, into +0x2C and +0x30; 0 when both exist,
  * otherwise slot +0x07C (release) and 1. */

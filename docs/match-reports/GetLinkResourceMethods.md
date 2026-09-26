@@ -9,17 +9,17 @@ deletions, no out-of-range drift. Fresh ground (carved revision 18, no prior rep
 
 ## What it does
 
-Table getter: returns the method table `D_8006F13C`, declared locally as `extern s32 D_8006F13C[];`.
+Table getter: returns the method table `gLinkResourceMethods`, declared locally as `extern s32 gLinkResourceMethods[];`.
 
 Table slot (`tools/classtable.py`): `D_8006D430` +0x094 (the Class6D430 `Get...Methods` getter list).
 
 ## Source
 
 ```c
-extern s32 D_8006F13C[];
+extern s32 gLinkResourceMethods[];
 
 void *GetLinkResourceMethods(void) {
-    return D_8006F13C;
+    return gLinkResourceMethods;
 }
 ```
 

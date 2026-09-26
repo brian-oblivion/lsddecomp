@@ -98,8 +98,8 @@ extern Class6D430Methods *GetActiveDataSourceMethods(void);
  * this unit does not include either header. */
 extern void *BMemPMgrAlloc(s32 size);
 
-/* LinkResource's (D_8006F13C) table as Class6D940__ResolveEntry reaches it
- * through `linkResource`: only +0x080 (LinkResource__GetEntry), called with
+/* LinkResource's (gLinkResourceMethods) table as Class6D940__ResolveEntry reaches it
+ * through `linkResource`: only +0x080 (LinkResource__GetModel), called with
  * four arguments because retail keeps `placement` in $a3 across the call
  * (the round-76 match). A view of LinkResource, for that class's job to
  * retire, not of this one. */

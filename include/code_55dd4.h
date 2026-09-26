@@ -62,7 +62,7 @@ typedef struct TimeTargetObj {
 #define TOD_COORD_SCALE        4
 #define TOD_COORD_TRANSLATE    8
 
-/* self->modelData->linkResource (D_8006F13C): only its slot +0x080 is
+/* self->modelData->linkResource (gLinkResourceMethods): only its slot +0x080 is
  * needed, by Class65650__ApplyTodPacket's model-id packet. */
 typedef struct Unk2CMethods {
     u8 pad00[0x80];                           /* +0x000 .. +0x07C, unknown */

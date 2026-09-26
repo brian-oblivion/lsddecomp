@@ -11,7 +11,7 @@ drift. Fresh ground (carved revision 18, no prior report).
 
 Tail of `GsMapModelingData((u32 *)self->buffer + 1)`: the buffer holds a TMD, and +4 skips its id word (the TMD `flags` word is what GsMapModelingData expects to start from). Prototype declared locally (LIBGS.H spelling in a comment).
 
-Table slot (`tools/classtable.py`): D_8006F13C +0x078.
+Table slot (`tools/classtable.py`): gLinkResourceMethods +0x078.
 
 ## Source
 
@@ -24,7 +24,7 @@ Slot +0x078 is `void *slot78` in the unified macro, so calls cast it.
 /* LIBGS.H: void GsMapModelingData(unsigned long *p); */
 void GsMapModelingData(u32 *p);
 
-/* D_8006F13C +0x078: map the TMD in the buffer (past its id word). */
+/* gLinkResourceMethods +0x078: map the TMD in the buffer (past its id word). */
 void LinkResource__MapModel(Class6D430 *self) {
     GsMapModelingData((u32 *)self->buffer + 1);
 }

@@ -11,7 +11,7 @@ deletions, no out-of-range drift. Fresh ground (carved revision 18, no prior rep
 
 Empty method (`jr ra; nop`).
 
-Table slot (`tools/classtable.py`): `D_8006F13C` +0x084.
+Table slot (`tools/classtable.py`): `gLinkResourceMethods` +0x084.
 
 ## Source
 

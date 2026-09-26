@@ -1,4 +1,6 @@
-# LinkResource__GetRecord -- MATCHED (7/7 words)
+# LinkResource__GetTmdObject -- MATCHED (7/7 words)
+
+> Renamed from `LinkResource__GetRecord` on 2026-09-26 (tools/rename.py). Address 0x80043b3c.
 
 > Renamed from `func_80043B3C` on 2026-09-25 (tools/rename.py). Address 0x80043b3c.
 
@@ -11,7 +13,7 @@ drift. Fresh ground (carved revision 18, no prior report).
 
 `sll 3; subu; sll 2` (index*28), `lw 0x10(a0)` (Class6D430 `buffer`), `addiu 0xC`, `addu` = `&((Buf6F13C *)self->buffer)->recs[index]` with 0x1C-byte records from +0x0C of the buffer. Same shape as charlie's round-82 lever in code_fa50.
 
-Table slot (`tools/classtable.py`): D_8006F13C +0x07C.
+Table slot (`tools/classtable.py`): gLinkResourceMethods +0x07C.
 
 ## Source
 
@@ -21,7 +23,7 @@ fields +0x2C..+0x38) and `CountedBuf33808` sit at the top of `src/code_33808.c`.
 Slot +0x078 is `void *slot78` in the unified macro, so calls cast it.
 
 ```c
-/* D_8006F13C +0x07C: the address of record `index`, 0x1C bytes each,
+/* gLinkResourceMethods +0x07C: the address of record `index`, 0x1C bytes each,
  * from +0x0C of the buffer. */
 typedef struct Rec6F13C {
     u8 data[0x1C];
@@ -32,7 +34,7 @@ typedef struct Buf6F13C {
     /* +0x0C */ Rec6F13C recs[1];
 } Buf6F13C;
 
-Rec6F13C *LinkResource__GetRecord(Class6D430 *self, s32 index) {
+Rec6F13C *LinkResource__GetTmdObject(Class6D430 *self, s32 index) {
     return &((Buf6F13C *)self->buffer)->recs[index];
 }
 ```
@@ -46,4 +48,15 @@ Rec6F13C *LinkResource__GetRecord(Class6D430 *self, s32 index) {
 
 ## Naming
 
-- **LinkResource__GetRecord**, tier A. Slot +0x07C: address of record `index`, 0x1C bytes each.
+- **LinkResource__GetTmdObject**, tier A. Slot +0x07C: address of record `index`, 0x1C bytes each.
+
+## Track 4
+
+2026-09-26, round 89 (delta): renamed from `LinkResource__GetRecord` with
+`tools/rename.py`. The buffer is a TMD file: LinkResource__MapModel hands
+`buffer + 4` (TmdFile's `flags`) to GsMapModelingData, and
+LinkResource__BuildModels reads the object count at +0x08 (`nobj`) and
+builds one TmdModel per 0x1C-byte record from +0x0C (`objects[]`,
+TmdObject, include/TmdModel.h). Record `index` is therefore
+`&((TmdFile *)buffer)->objects[index]`, a `TmdObject *`; the slot is
+`getTmdObject` (include/LinkResource.h).
