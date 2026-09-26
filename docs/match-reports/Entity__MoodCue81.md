@@ -280,7 +280,7 @@ reshaping tried reproduces that extra register.
 ## due to the one-word drift -- restored to `INCLUDE_ASM` per project rule)
 
 ```c
-extern u8 D_80089E08[];
+extern u8 SCALE_EIGHT_SEVENTHS[];
 
 void Entity__MoodCue81(Entity *this, EntityMoodHandlerArg *out) {
     s32 mod;
@@ -309,7 +309,7 @@ void Entity__MoodCue81(Entity *this, EntityMoodHandlerArg *out) {
         SceneNode__FaceTarget(this, this->unk94, 1, 0, 0);
         mood = this->unk44;
         if (mood == 1) {
-            this->methods->slot48(this, 0, D_80089E08);
+            this->methods->slot48(this, 0, SCALE_EIGHT_SEVENTHS);
             mod = -0x176;
             if (this->methods->slot144(this, this->unk94) < 0x200) {
                 this->methods->slot160(this);
@@ -353,7 +353,7 @@ into `src/Entity_e.c` in place of the current `INCLUDE_ASM`):
 
 ```c
 #if 0
-extern u8 D_80089E08[];
+extern u8 SCALE_EIGHT_SEVENTHS[];
 
 void Entity__MoodCue81(Entity *this, EntityMoodHandlerArg *out) {
     s32 mod;
@@ -382,7 +382,7 @@ void Entity__MoodCue81(Entity *this, EntityMoodHandlerArg *out) {
         SceneNode__FaceTarget(this, this->unk94, 1, 0, 0);
         mood = this->unk44;
         if (mood == 1) {
-            this->methods->slot48(this, 0, D_80089E08);
+            this->methods->slot48(this, 0, SCALE_EIGHT_SEVENTHS);
             mod = -0x176;
             if (this->methods->slot144(this, this->unk94) < 0x200) {
                 this->methods->slot160(this);
@@ -649,7 +649,7 @@ current `INCLUDE_ASM`):
 
 ```c
 #if 0
-extern u8 D_80089E08[];
+extern u8 SCALE_EIGHT_SEVENTHS[];
 
 void Entity__MoodCue81(Entity *this, EntityMoodHandlerArg *out) {
     s32 mod;
@@ -677,7 +677,7 @@ void Entity__MoodCue81(Entity *this, EntityMoodHandlerArg *out) {
         SceneNode__FaceTarget(this, this->unk94, 1, 0, 0);
         mood = this->unk44;
         if (mood == 1) {
-            this->methods->slot48(this, 0, D_80089E08);
+            this->methods->slot48(this, 0, SCALE_EIGHT_SEVENTHS);
             mod = -0x176;
             if (this->methods->slot144(this, this->unk94) < 0x200) {
                 this->methods->slot160(this);
@@ -791,7 +791,7 @@ the report's original best-reached body above, which closed neither):
 
 ```c
 #if 0
-extern u8 D_80089E08[];
+extern u8 SCALE_EIGHT_SEVENTHS[];
 
 void Entity__MoodCue81(Entity *this, EntityMoodHandlerArg *out) {
     s32 mod;
@@ -819,7 +819,7 @@ void Entity__MoodCue81(Entity *this, EntityMoodHandlerArg *out) {
         SceneNode__FaceTarget(this, this->unk94, 1, 0, 0);
         mood = this->unk44;
         if (mood == 1) {
-            this->methods->slot48(this, 0, D_80089E08);
+            this->methods->slot48(this, 0, SCALE_EIGHT_SEVENTHS);
             mod = -0x176;
             if (this->methods->slot144(this, this->unk94) < 0x200) {
                 this->methods->slot160(this);
@@ -1050,7 +1050,7 @@ Reading this function's `out->` writes with the proposed `SoundCueSet` field nam
 
 **This handler also occupies row 120** of `gEntityMoodHandlerTable` (same `handler` word at both `0x80089EB0+0x10*81` and `0x80089EB0+0x10*120`; the row's other three words -- data0/data1/data2 -- differ between the two rows, so it is one function shared by two distinct mood-row configurations, not a naming collision). Named for its lower/first row per the existing convention; not a second name.
 
-**`D_80089E08` left unnamed this round.** s16-pair-decoded it reads (8,7, 8,7, 8,7, 1,1) -- X=Y=Z=8/7, a uniform ~1.14x enlarge, but 8/7 is not one of the round ratios (1/2, 6/1, 3/1, ...) any named `SCALE_*` table uses, so there is no clean `SCALE_EIGHTSEVENTHS`-style name to give it with confidence.
+**`SCALE_EIGHT_SEVENTHS` left unnamed this round.** s16-pair-decoded it reads (8,7, 8,7, 8,7, 1,1) -- X=Y=Z=8/7, a uniform ~1.14x enlarge, but 8/7 is not one of the round ratios (1/2, 6/1, 3/1, ...) any named `SCALE_*` table uses, so there is no clean `SCALE_EIGHTSEVENTHS`-style name to give it with confidence.
 
 ## Track 4 (2026-09-26, round 88, echo)
 

@@ -449,7 +449,7 @@ void Entity__MoodCue80(Entity *this, SoundCueSet *out) {
     SceneNode__FaceTarget((SceneNode *)this, (SceneNode *)this->peer, 1, 0, 0);
 }
 
-extern u8 D_80089E08[];
+extern u8 SCALE_EIGHT_SEVENTHS[];
 
 void Entity__MoodCue81(Entity *this, SoundCueSet *out) {
     s32 mod;
@@ -477,7 +477,7 @@ void Entity__MoodCue81(Entity *this, SoundCueSet *out) {
         SceneNode__FaceTarget((SceneNode *)this, (SceneNode *)this->peer, 1, 0, 0);
         mood = this->state;
         if (mood == 1) {
-            this->methods->updateScale(this, 0, D_80089E08);
+            this->methods->updateScale(this, 0, SCALE_EIGHT_SEVENTHS);
             mod = -0x176;
             if (this->methods->distanceToPeer(this, this->peer) < 0x200) {
                 this->methods->deactivate(this);
