@@ -161,6 +161,15 @@ typedef struct PolyDrawCtx {
     /* +0x0A4 */ SVECTOR *faceVtx[4]; /* the current face's vertices */
 } PolyDrawCtx;
 
+/* The first word of a group's first TMD packet. Sony's TMD_P_* structs
+ * spell it as four bytes (out, in, dummy, cd: olen, ilen, flag, mode); this
+ * renderer reads the first two as the group's packet count and the last two
+ * as one flag | mode << 8 word. */
+typedef struct TmdGroupHeader {
+    u16 count;
+    u16 type;
+} TmdGroupHeader;
+
 /* GsDOBJ2 keeps its TMD object as a u_long *. */
 #define OBJ_TMD(obj) ((struct TMD_STRUCT *)(obj)->tmd)
 
@@ -306,9 +315,9 @@ void SortTmdObject(GsDOBJ2 *obj, GsOT *ot, s32 otShift, void *scratch) {
             s32 count;
 
             prim = GsOUT_PACKET_P;
-            ctx->packetType = *(u16 *)(list + 0x2) & 0xFD07;
-            count = *(u16 *)(list + 0x0);
-            ctx->semiTrans = (*(u32 *)(list + 0x0) >> 25) & 0x1;
+            ctx->packetType = ((TmdGroupHeader *)list)->type & 0xFD07;
+            count = ((TmdGroupHeader *)list)->count;
+            ctx->semiTrans = (*(u32 *)list >> 25) & 0x1;
             remaining -= count;
 
             /* Thirteen Psy-Q primitive flavours, one case each, in ascending
