@@ -588,7 +588,7 @@ void SetupStyleSpawnParamsA(void *arg0, void *arg1) {
     gStyleSpawnModelLayout = rand() % 5;
 }
 
-extern s32 D_8008732C;
+extern s32 gStyleSpawnYChoice1;
 extern s32 gStyleSpawnModelLayout;
 
 /* MATCHED round 64 (charlie), 87/87, ins 0 / del 0.  The round-46..48
@@ -612,7 +612,7 @@ void SetupStyleSpawnParamsB(void *arg0, void *arg1) {
     s32 mod3;
 
     rand();
-    gStyleSpawnOffsetY = D_8008732C;
+    gStyleSpawnOffsetY = gStyleSpawnYChoice1;
     gStyleSpawnOffsetX = (rand() % 20) << 11;
     mod3 = gStyleDay % 3;
     gStyleSpawnOffsetZ = 0xA000;

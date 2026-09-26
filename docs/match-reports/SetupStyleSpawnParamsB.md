@@ -73,7 +73,7 @@ merely holds a value in transit.
 
 ```c
 extern s32 gStyleSpawnOffsetY;
-extern s32 D_8008732C;
+extern s32 gStyleSpawnYChoice1;
 extern s32 gStyleSpawnOffsetX;
 extern s32 gStyleDay;
 extern s32 gStyleSpawnOffsetZ;
@@ -85,7 +85,7 @@ void SetupStyleSpawnParamsB(void *arg0, void *arg1) {
     s32 mod3;
 
     rand();
-    gStyleSpawnOffsetY = D_8008732C;
+    gStyleSpawnOffsetY = gStyleSpawnYChoice1;
     gStyleSpawnOffsetX = (rand() % 20) << 11;
     mod3 = gStyleDay % 3;
     gStyleSpawnOffsetZ = 0xA000;
