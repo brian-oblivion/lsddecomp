@@ -24,6 +24,7 @@
 #include "common.h"
 #include "code_171e0.h"
 #include "VabDriver.h"
+#include "CdDriver.h"
 #include "Class6D3C8.h"
 
 /* gActiveDataSource's two observed values are the header words of the two
@@ -114,7 +115,6 @@ Class6D430Methods *GetClass6D430Methods(void) {
 }
 
 extern s32 gActiveDataSource;
-extern void *GetCdDriverMethods(void);
 
 void *GetActiveDataSourceMethods(void) {
     if (gActiveDataSource == DATASOURCE_SPU) {
@@ -144,7 +144,7 @@ void SetActiveDataSource(s32 arg0) {
     entry = gDataSourceClientGetters;
     gActiveDataSource = arg0;
     if (arg0 == DATASOURCE_CD) {
-        src = GetCdDriverMethods();
+        src = (Class6D430Methods *)GetCdDriverMethods();
     } else {
         src = (Class6D430Methods *)GetVabDriverMethods();
     }
