@@ -2,14 +2,14 @@
 
 ## Round 94 (runner echo, track 6): Sony types
 
-The union of the two VagAtr views in `List_800351D0` (`Scratch_800357B0 s; Scratch800351D0 v;`) is now one Sony `VagAtr vag`, and the leading count byte plus padding is Sony's `ProgAtr prog`. The loop fields: `unk4` = `center`, `unk5` = `shift`, `unkC`/`unkD` = `pbmin`/`pbmax`. `ProgAtr` holds `unsigned long`s, so the struct's alignment went from 2 to 4 and its size from 0x42 to 0x44. That moves nothing in the verified build (this function is `INCLUDE_ASM`); the NON_MATCHING body still compiles. Its frame should be re-measured before the next attempt on this function.
+The union of the two VagAtr views in `DataEntryLocals` (`Scratch_800357B0 s; Scratch800351D0 v;`) is now one Sony `VagAtr vag`, and the leading count byte plus padding is Sony's `ProgAtr prog`. The loop fields: `unk4` = `center`, `unk5` = `shift`, `unkC`/`unkD` = `pbmin`/`pbmax`. `ProgAtr` holds `unsigned long`s, so the struct's alignment went from 2 to 4 and its size from 0x42 to 0x44. That moves nothing in the verified build (this function is `INCLUDE_ASM`); the NON_MATCHING body still compiles. Its frame should be re-measured before the next attempt on this function.
 
 > Renamed from `func_800351D0` on 2026-09-23 (tools/rename.py). Address 0x800351d0.
 
 **REVISITED, round 69: STALL, improved (44/376 rebuilt -> 95/376, ins/del
 21/21 -> 6/6, frame exact) and promoted to `#ifdef NON_MATCHING` in
 `src/code_179d8_k.c`; names/types used** (the callee's real signature, a
-union in `List_800351D0`, a loop counter width).
+union in `DataEntryLocals`, a loop counter width).
 
 ## Round 69 (runner bravo): repaired, rebuilt, three levers
 
@@ -21,7 +21,7 @@ while the callee's own matched definition takes
 `(s16, s16, s16, Scratch_800357B0 scratch, AdsrFields resolved,
 s16, u8)`. **Repair (rebuilding, not changing):** moved the two callee
 typedefs above this function (typedefs only; no definition moved), retyped
-`List_800351D0`'s tail from `hdrLo/hdrHi/blk1/blk2` to
+`DataEntryLocals`'s tail from `hdrLo/hdrHi/blk1/blk2` to
 `Scratch_800357B0 scratch; AdsrFields adsr;` (same 50 bytes at the
 same +0x10, as round 49 predicted), re-added the forward declaration, and
 passed `list.scratch, list.adsr` at both call sites. `Blk1_800351D0` and
@@ -52,7 +52,7 @@ With `dead[24]` the frame is exact again and the score is round 48's
    is at `sp+0x48`, so that is `list.scratch`, not a separate local. The
    old "share stack space" comment was describing the same memory. Put a
    union of the two views (`Scratch_800357B0 s; Scratch800351D0 v;`) in
-   `List_800351D0` and removed the separate `scratch` local. Every stack
+   `DataEntryLocals` and removed the separate `scratch` local. Every stack
    offset in the loops then matched. The frame fell to `-0xF8`, and
    `dead[16]` makes it exact. -> **95/376**, still 380 words.
    (`scratch.unkC = scratch.unkD = ...` puts the two stores in retail's
@@ -153,7 +153,7 @@ typedef struct {
         Scratch800351D0 v;     /* +0x10: SsUtGet/SetVagAtr's buffer in the unk29==2 loops */
     } scratch;
     AdsrFields adsr;     /* +0x30: passed by value to Snd_setVabAttr */
-} List_800351D0;
+} DataEntryLocals;
 
 /* Snd_setVabAttr is defined later in this unit; its own definition fixes
  * this signature (round 49). */
@@ -166,7 +166,7 @@ void ContDataEntry(s16 a0, s16 a1, u8 a2)
     s16 slot = a1;
     Entry90902E8 *rec = &D_800902E8[ch][slot];
     u8 off = rec->unk12;
-    List_800351D0 list;
+    DataEntryLocals list;
     s32 i;
     u8 kind;
     u8 dead[16];
@@ -362,7 +362,7 @@ typedef struct {
     u16 hdrHi;            /* +0x12 */
     Blk1_800351D0 blk1;   /* +0x14 */
     Blk2_800351D0 blk2;   /* +0x30 */
-} List_800351D0;
+} DataEntryLocals;
 ```
 
 `hdrLo`/`hdrHi` are read as TWO SEPARATE `u16` loads (`lhu`+`lhu`, not one
@@ -390,7 +390,7 @@ pair passed by value on the stack (28 + 18 bytes, aligned/padded to a
 `arg6` (the masked value byte) each promoted to a full stack word.
 
 A second, unrelated local record (`Scratch800351D0`, ~0x20 bytes) shares
-the SAME stack address as `List_800351D0`'s `hdrLo`/`blk1`/`blk2` tail,
+the SAME stack address as `DataEntryLocals`'s `hdrLo`/`blk1`/`blk2` tail,
 because the two live ranges never overlap at runtime (the `unk29==2` and
 `unk2A==2` dispatch arms are mutually exclusive, each ending in its own
 `return`):
@@ -417,7 +417,7 @@ void ContDataEntry(s16 a0, s16 a1, u8 a2)
     s16 slot = a1;
     Entry90902E8 *rec = &D_800902E8[ch][slot];
     u8 *p = (u8 *)rec + rec->unk12;
-    List_800351D0 list;
+    DataEntryLocals list;
     Scratch800351D0 scratch;
     s16 i;
     u8 kind;
@@ -651,7 +651,7 @@ scoring the residue anyone thinks it is.
 
 **What this changes about the recommended next step.** The 40-byte frame
 gap means a future attempt should look for a MISSING local (something
-retail allocates ~10 words of stack for that this reading's `List_800351D0`
+retail allocates ~10 words of stack for that this reading's `DataEntryLocals`
 /`Scratch800351D0` pair does not currently account for) before trusting
 ANY of this report's per-block claims about `unk13==1`/`unk13==2` being the
 only residue. The likeliest candidate, given `Snd_setVabAttr.md`'s round-35
@@ -660,7 +660,7 @@ finding that its own two by-value struct parameters (a `VagAtr` and
 no local frame space of their own, is that THIS function's own construction
 of those two by-value arguments (the `lwl`/`lwr`/`swl`/`swr` copy sequence
 already identified at its two `Snd_setVabAttr` call sites) needs MORE stack
-space to stage than this report's `List_800351D0`/`Blk1`/`Blk2` reading
+space to stage than this report's `DataEntryLocals`/`Blk1`/`Blk2` reading
 currently allocates for it -- not investigated further this round; flagged
 for whoever next stages this function.
 
@@ -844,7 +844,7 @@ void ContDataEntry(s16 a0, s16 a1, u8 a2)
     s16 slot = a1;
     Entry90902E8 *rec = &D_800902E8[ch][slot];
     u8 *p = (u8 *)rec + rec->unk12;
-    List_800351D0 list;
+    DataEntryLocals list;
     Scratch800351D0 scratch;
     s16 i;
     u8 kind;
@@ -932,7 +932,7 @@ void ContDataEntry(s16 a0, s16 a1, u8 a2)
 #endif
 ```
 
-(Needs the same `Blk1_800351D0`/`Blk2_800351D0`/`List_800351D0`/
+(Needs the same `Blk1_800351D0`/`Blk2_800351D0`/`DataEntryLocals`/
 `Scratch800351D0` typedefs and the local `Snd_setVabAttr` prototype already
 declared earlier in `src/code_179d8_k.c`, unchanged from before this
 round.)
@@ -1005,9 +1005,9 @@ and its non-loop sibling) to pass a `Scratch_800357B0`/`AdsrFields`
 pair instead of the `u32`/`Blk1_800351D0`/`Blk2_800351D0` triple, and add
 a fresh forward declaration (after `Scratch_800357B0`/`AdsrFields`
 are visible, or with local copies of those typedefs declared earlier).
-Given `List_800351D0`'s own `hdrLo`/`hdrHi`/`blk1`/`blk2` fields already
+Given `DataEntryLocals`'s own `hdrLo`/`hdrHi`/`blk1`/`blk2` fields already
 total exactly 50 bytes at the same stack-relative position, the most
-likely resolution is that `List_800351D0`'s tail (from `+0x10` onward) IS
+likely resolution is that `DataEntryLocals`'s tail (from `+0x10` onward) IS
 byte-identical to the `Scratch_800357B0`+`AdsrFields` pair, just
 never named that way from this function's side -- worth checking with
 `tools/asm-differ` before re-deriving `blk1`/`blk2`'s "unconstrained"

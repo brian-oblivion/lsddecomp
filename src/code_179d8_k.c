@@ -726,7 +726,7 @@ typedef struct {
                  * SsUtGet/SetVagAtr buffer of the unk29==2 loops */
 
     AdsrFields adsr; /* +0x30: passed by value to Snd_setVabAttr */
-} List_800351D0;
+} DataEntryLocals;
 
 /* Snd_setVabAttr is defined later in this unit; its own definition fixes
  * this signature (round 49). */
@@ -747,7 +747,7 @@ void ContDataEntry(s16 a0, s16 a1, u8 a2) {
     s16 slot = a1;
     Entry90902E8 *rec = &D_800902E8[ch][slot];
     u8 off = rec->unk12;
-    List_800351D0 list;
+    DataEntryLocals list;
     s32 i;
     u8 kind;
 
