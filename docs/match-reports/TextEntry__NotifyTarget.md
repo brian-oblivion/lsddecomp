@@ -54,3 +54,7 @@ than the call appears to set explicitly.
 ## Naming
 
 - `TextEntry__NotifyTarget` -- tier B. gTextEntryMethods +0x060 (classtable.py) -- this IS the `slot60` implementation dispatched by both TextEntry__HandleCommand (arg1=0x10) and class_3bb8c_j's TextEntry__SetCursorPos/TextEntry__SetCharAt (arg1=0). Forwards arg1 to the attached `target`'s own slot80(target, arg1, 0x60, 0x60) when target != NULL. Mechanics clear (pings the linked TargetObj86ED0 whenever the name cursor or character selection changes); the on-screen meaning of the two 0x60 literals is not established. Since `slot60` is referenced by both this unit and class_3bb8c_j, the SLOT NAME is left as `slot60` in the shared header (PROPOSED name below), even though the FUNCTION name is confidently renamed here (function renames are tree-wide, not subject to the field-ownership rule).
+
+## Track 4 (2026-09-26, round 87)
+
+Class unified as `TextEntry` (include/TextEntry.h; table gObj86ED0Methods -> gTextEntryMethods, type Obj86ED0 -> TextEntry). The class name is for what its methods do: setText keeps a caller's string buffer and a working copy, the cursor and char methods edit the copy, command 25 writes it back, 23 closes without writing (banner of include/TextEntry.h). Fields renamed from their accessors: unk14 charCount, unk1C charIndex, unk20 altCommands, nameLen textLen, nameBuf textBuf, unk28 editBuf, unk40 cursorSprite (CharSprite *), unk44 textRow, unk48 panelSprite (ScreenSprite *). Zero bytes changed.

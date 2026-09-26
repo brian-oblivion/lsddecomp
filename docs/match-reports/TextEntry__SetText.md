@@ -55,3 +55,9 @@ regardless of which branch runs) before deciding it is conditional.
 ## Naming
 
 - `TextEntry__SetText` -- tier A. gTextEntryMethods +0x040 (setName slot, classtable.py), the ctor's own tail dispatch: sets mode and copies/decodes the name string into unk28 (DecodeFullWidthSjis when mode==1, else plain strcpy). Pure setter, mechanics are the purpose.
+
+## Track 4 (2026-09-26, round 87)
+
+Class unified as `TextEntry` (include/TextEntry.h; table gObj86ED0Methods -> gTextEntryMethods, type Obj86ED0 -> TextEntry). The class name is for what its methods do: setText keeps a caller's string buffer and a working copy, the cursor and char methods edit the copy, command 25 writes it back, 23 closes without writing (banner of include/TextEntry.h). Fields renamed from their accessors: unk14 charCount, unk1C charIndex, unk20 altCommands, nameLen textLen, nameBuf textBuf, unk28 editBuf, unk40 cursorSprite (CharSprite *), unk44 textRow, unk48 panelSprite (ScreenSprite *). Zero bytes changed.
+
+Renamed from Obj86ED0__SetName (tools/rename.py): nothing shows the string is a name, so the method is named for the buffer it takes. Slot +0x040 setText.

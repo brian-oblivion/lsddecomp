@@ -94,3 +94,7 @@ distinguish it from the identically-shaped `AttachChildB`
 (`self->unk7C`, `New_Class86F88`) below -- nothing in either function's own
 body says what makes the two children functionally different, so the
 suffixes are arbitrary labels, not a claim about purpose.
+
+## Track 4 (2026-09-26, round 87)
+
+TaskObjF's childA (+0x078) is now `struct TextEntry *` (it was the Class86E00SubObj_3bb8c_g view shared with childB, a Class86F88). Its calls go through TextEntry's slots: New_TextEntry((char *)..., 1), loadCardResources((void *)childReady), attachTarget((void *)unk60, (void *)unk64, (struct TargetObj86ED0 *)childC); slot10's argument is cast back to the SubObj view. Casts only; zero bytes changed.

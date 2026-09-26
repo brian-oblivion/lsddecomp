@@ -50,3 +50,7 @@ None new.
 teardown counterpart of `TaskObjF__AttachChildA` -- same guard,
 tears down `self->unk78` through the fixed `slot50`/`slot48`/`release`
 sequence, one-shot gated by the same `unk74` flag `AttachChildA` sets.
+
+## Track 4 (2026-09-26, round 87)
+
+TaskObjF's childA is now `struct TextEntry *`: slot50/slot48 are TextEntry's detachTarget/releaseCardResources. Zero bytes changed.

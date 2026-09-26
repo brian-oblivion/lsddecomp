@@ -73,3 +73,9 @@ notify-on-flag-set tail shape common to both siblings.
 ## Naming
 
 - `TextEntry__SetCharAt` -- tier B. slotA8 occupant. Looks up gNameCharTable[arg2], stores it into self->unk28[arg1], forwards the same byte to self->unk44's slotC4, records self->unk18/unk1C, optionally notifies via slot60. Same evidence class as its sibling TextEntry__SetCursorPos. classtable.py gTextEntryMethods +0x0A8.
+
+## Track 4 (2026-09-26, round 87)
+
+Class unified as `TextEntry` (include/TextEntry.h; table gObj86ED0Methods -> gTextEntryMethods, type Obj86ED0 -> TextEntry). The class name is for what its methods do: setText keeps a caller's string buffer and a working copy, the cursor and char methods edit the copy, command 25 writes it back, 23 closes without writing (banner of include/TextEntry.h). Fields renamed from their accessors: unk14 charCount, unk1C charIndex, unk20 altCommands, nameLen textLen, nameBuf textBuf, unk28 editBuf, unk40 cursorSprite (CharSprite *), unk44 textRow, unk48 panelSprite (ScreenSprite *). Zero bytes changed.
+
+Renamed from Obj86ED0__DispatchLookupValue: editBuf[pos] = gNameCharTable[charIndex], the same byte to textRow's +0x0C4 (Obj6EAC0__SetChildChar) at pos, stores cursorIndex/charIndex, notifyTarget(0) when `notify`. Occupant of slot +0x0A8, called by NextChar/PrevChar/ResetChar/ResetAllChars. Tier A.

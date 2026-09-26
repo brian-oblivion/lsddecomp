@@ -156,3 +156,7 @@ three-value swap was resolved by touching only the non-persistent one.
 2026-09-25, round 84 (charlie): The class `New_D8006ED4C` constructs is unified as ScreenSprite in `include/ScreenSprite.h`; the unit includes it and its local extern is gone. The call reads `self->unk48 = (ChildObj86ED0 *)New_ScreenSprite(handle1, (SpriteRect *)&D_80086F7C, 0)`: D_80086F7C is the rect (words 0, 224, 120), and unk48's +0x04C call passes the screen position D_8008AACC = (-70, -60). Image byte-identical.
 
 2026-09-26, round 86 (bravo): CharSprite (class 0x1144, formerly D_8006EC74) is unified in `include/CharSprite.h`. The local `extern ChildObj86ED0 *New_CharSprite(ChildObj86ED0 *, s32)` is gone; the unit includes the header and casts the result to `unk40`'s `ChildObj86ED0 *`, as it does for New_ScreenSprite. The 0x5F cell it asks for on FONTICON.TIM is '_', one of the facts behind the class name. Image byte-identical.
+
+## Track 4 (2026-09-26, round 87)
+
+Class unified as `TextEntry` (include/TextEntry.h; table gObj86ED0Methods -> gTextEntryMethods, type Obj86ED0 -> TextEntry). The class name is for what its methods do: setText keeps a caller's string buffer and a working copy, the cursor and char methods edit the copy, command 25 writes it back, 23 closes without writing (banner of include/TextEntry.h). Fields renamed from their accessors: unk14 charCount, unk1C charIndex, unk20 altCommands, nameLen textLen, nameBuf textBuf, unk28 editBuf, unk40 cursorSprite (CharSprite *), unk44 textRow, unk48 panelSprite (ScreenSprite *). Zero bytes changed.

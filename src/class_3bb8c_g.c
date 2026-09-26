@@ -11,9 +11,10 @@
  * tear the object down; ForceIdleFromState and TickStateDelay drive two
  * more paths into the same shared slot7C/slot8C tail; OnCommand and
  * OnItemSelected forward an externally supplied 2/3 dispatch code the
- * same way. Two lazily-attached child sub-objects (childA/childB, the
- * same real class the sibling units call Obj86ED0/Class86ED0 via
- * gTextEntryMethods) are attached/detached in mirrored pairs. A third,
+ * same way. Two lazily-attached child sub-objects, childA (a TextEntry,
+ * New_TextEntry, include/TextEntry.h) and childB (a Class86F88,
+ * New_Class86F88), are attached/detached in mirrored pairs through the
+ * slots +0x044..+0x050 both classes put at the same offsets. A third,
  * independent child (cardIcon) is a memcard-icon TIM image, loaded once
  * by LoadCardIcon and stepped by TickCardIcon.
  *

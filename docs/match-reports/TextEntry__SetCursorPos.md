@@ -90,3 +90,9 @@ verdict was set aside.
 ## Naming
 
 - `TextEntry__SetCursorPos` -- tier B. slotA4 occupant. Computes arg1*7+D_8008AADC into a 2-word stack block together with the D_8008AAE0 constant, dispatches it through self->unk40's own slotBC, records self->unk18=arg1, and optionally notifies via slot60. "Index"/"Dispatch" describe the mechanics; what the computed value represents in-game is not established. classtable.py gTextEntryMethods +0x0A4 (the real occupant -- corrects this unit's earlier Obj866E8 misattribution, see the ROUND 75 CORRECTION section above).
+
+## Track 4 (2026-09-26, round 87)
+
+Class unified as `TextEntry` (include/TextEntry.h; table gObj86ED0Methods -> gTextEntryMethods, type Obj86ED0 -> TextEntry). The class name is for what its methods do: setText keeps a caller's string buffer and a working copy, the cursor and char methods edit the copy, command 25 writes it back, 23 closes without writing (banner of include/TextEntry.h). Fields renamed from their accessors: unk14 charCount, unk1C charIndex, unk20 altCommands, nameLen textLen, nameBuf textBuf, unk28 editBuf, unk40 cursorSprite (CharSprite *), unk44 textRow, unk48 panelSprite (ScreenSprite *). Zero bytes changed.
+
+Renamed from Obj86ED0__DispatchIndexValue: moves cursorSprite with its setPosition slot (ScreenSprite +0x0BC) to x = pos * 7 + D_8008AADC, y = D_8008AAE0 (the stack block is a ScreenSpritePos), stores cursorIndex, and calls notifyTarget(0) when `notify`. Occupant of slot +0x0A4, called by MoveCursorRight/Left and ResetAllChars. Tier A (the body is the name).

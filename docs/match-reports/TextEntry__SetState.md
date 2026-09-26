@@ -80,3 +80,7 @@ other. Don't spend a second attempt re-testing that particular pair.
 ## Naming
 
 - `TextEntry__SetState` -- tier B. gTextEntryMethods +0x054 (setState slot, classtable.py). arg1-driven: zeroes closeTickCount; arg1<2 no-ops; arg1 in {2,3} detaches childType2, releases card resources, records closeState=arg1; arg1==4 notifies parents with closeState. Mechanics fully traced; the game meaning of the 2/3/4 codes (a close/commit sequence for the name-entry UI) is inferred from data flow, not confirmed by any string or external caller.
+
+## Track 4 (2026-09-26, round 87)
+
+Class unified as `TextEntry` (include/TextEntry.h; table gObj86ED0Methods -> gTextEntryMethods, type Obj86ED0 -> TextEntry). The class name is for what its methods do: setText keeps a caller's string buffer and a working copy, the cursor and char methods edit the copy, command 25 writes it back, 23 closes without writing (banner of include/TextEntry.h). Fields renamed from their accessors: unk14 charCount, unk1C charIndex, unk20 altCommands, nameLen textLen, nameBuf textBuf, unk28 editBuf, unk40 cursorSprite (CharSprite *), unk44 textRow, unk48 panelSprite (ScreenSprite *). Zero bytes changed.
