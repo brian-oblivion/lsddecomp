@@ -379,7 +379,7 @@ typedef struct Unk50Struct_3bb8c_l {
     s32 unk0;   /* +0x000, SetupSceneStyle: the Class866E8's setChildParams `dirs` */
     s32 unk4;   /* +0x004, SetupSceneStyle: setChildParams `colors` */
     s32 unk8;   /* +0x008, SetupSceneStyle: the Class866E8's setAmbientColor rgb (a pointer) */
-    void *unkC; /* +0x00C, a colour: the viewport's setClearColor (EnterStyleSession); the TimBlockSrc's fadeAllEntries when unk14 is 2 (PollTimBlockLoad); StyleM's D_800872C4 entry */
+    void *unkC; /* +0x00C, a colour: the viewport's setClearColor (EnterStyleSession); the TimBlockSrc's fadeAllEntries when unk14 is 2 (PollTimBlockLoad); StyleM's gStylePalette entry */
     u8 pad10[0x014 - 0x010];
     s32 unk14; /* +0x014, selects unkC or unk18: PollTimBlockLoad against 2, EnterStyleSession against 1 */
     void *unk18; /* +0x018, a colour: setFarColor, or fadeAllEntries, when unk14 does not select unkC */

@@ -2905,3 +2905,4 @@ NodeGuardedViewport__NoOpSlotBC = 0x8004D364; // type:func
 NodeGuardedViewport__NoOpSlotC0 = 0x8004D36C; // type:func
 NodeGuardedViewport__NoOpSlotC4 = 0x8004D374; // type:func
 GetTeleportTimeBonus = 0x8005BFC4; // type:func
+gStylePalette = 0x800872C4;

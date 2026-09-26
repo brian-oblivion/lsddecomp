@@ -29,7 +29,7 @@ jr $ra
 
 `gStyleDecorColor` is a `.sdata` pointer, already established in
 `src/class_3bb8c_m.c` as `extern const u8 *gStyleDecorColor;`, and used there as an
-actual colour-table pointer (`gStyleDecorColor = D_800872C4[cfg[2]];`). Here it is
+actual colour-table pointer (`gStyleDecorColor = gStylePalette[cfg[2]];`). Here it is
 only ever tested against zero, so it reads as a one-shot "pending" flag on
 top of the same storage. `gStyleDecorObj` is that unit's `LocalM4D0Obj *`
 (round 15's own local type, unrelated to this unit) with named slots at

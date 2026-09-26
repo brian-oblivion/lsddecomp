@@ -27,8 +27,8 @@ place and now says which screen it was run with and when.
 
 ```c
 void FillStyleFromConfig(struct StyleM *style, s8 *cfg) {
-    style->unkC  = D_800872C4[cfg[3]];
-    style->unk18 = D_800872C4[cfg[2]];
+    style->unkC  = gStylePalette[cfg[3]];
+    style->unk18 = gStylePalette[cfg[2]];
     style->unk1C = D_8008730C[cfg[1]];
     style->unk14 = cfg[0];
 }
@@ -38,12 +38,12 @@ Four fields of a style/appearance descriptor, filled from a four-byte config
 block. Field order in the source is `unkC, unk18, unk1C, unk14` — read off the
 store order in the `.s`, not sorted by offset.
 
-`&D_800872C4` is materialised ONCE into `$a2` and reused by both entries; that
-falls out of two `D_800872C4[...]` references and needed no local.
+`&gStylePalette` is materialised ONCE into `$a2` and reused by both entries; that
+falls out of two `gStylePalette[...]` references and needed no local.
 
 ## Data established from the executable
 
-- **`u8 D_800872C4[][3]`** — 0x48 bytes = 24 three-byte entries. The first four
+- **`u8 gStylePalette[][3]`** — 0x48 bytes = 24 three-byte entries. The first four
   are `00/00/00`, `40/40/40`, `80/80/80`, `FF/FF/FF`: a greyscale ramp, so RGB
   triples. **The `[3]` element type is what produces retail's address
   arithmetic**: `sll $v0, $v1, 1` / `addu $v0, $v0, $v1` / `addu $v0, $v0, $a2`

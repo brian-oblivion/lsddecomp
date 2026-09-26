@@ -15,7 +15,7 @@ cfg)` against the fixed global `D_80087424` (a `StyleM` instance, split by
 splat into two adjacent labels `D_80087424`/`D_80087430` purely because
 something else references the middle of it -- the object is one 0x20-byte
 struct). Then does its own separate raw-byte read of `cfg[1]`/`cfg[2]`: if
-`cfg[1] >= 4`, stores a `D_800872C4[cfg[2]]` colour-table entry pointer into
+`cfg[1] >= 4`, stores a `gStylePalette[cfg[2]]` colour-table entry pointer into
 `gStyleDecorColor`. Always returns `&D_80087424`.
 
 ```c
@@ -26,7 +26,7 @@ extern s32 D_80087424;
 extern s8 *D_800873EC[];
 extern s8 *PickStyleFallbackConfig(void);
 extern void FillStyleFromConfig(struct StyleM *style, s8 *cfg);
-extern u8 D_800872C4[][3];
+extern u8 gStylePalette[][3];
 extern const u8 *gStyleDecorColor;
 
 void *ApplyStyleConfig(void) {
@@ -37,7 +37,7 @@ void *ApplyStyleConfig(void) {
     }
     FillStyleFromConfig((struct StyleM *) &D_80087424, cfg);
     if (cfg[1] >= 4) {
-        gStyleDecorColor = D_800872C4[cfg[2]];
+        gStyleDecorColor = gStylePalette[cfg[2]];
     }
     return &D_80087424;
 }
@@ -51,13 +51,13 @@ First attempt wrote the natural-looking guard form:
 if (cfg[1] < 4) {
     return &D_80087424;
 }
-gStyleDecorColor = D_800872C4[cfg[2]];
+gStyleDecorColor = gStylePalette[cfg[2]];
 return &D_80087424;
 ```
 
 This built 40/41 words with the tail one word SHORT: retail has an extra
 `move v0,s1` immediately before falling into the shared epilogue, which my
-version didn't emit. Cause: retail's `D_800872C4[cfg[2]]` address
+version didn't emit. Cause: retail's `gStylePalette[cfg[2]]` address
 computation clobbers `v0` as scratch (it's a 3-way live register at that
 point -- the delay slot of the `bnez` unconditionally sets `v0 = s1` before
 either path runs), so retail needs to explicitly restore `v0 = s1` before

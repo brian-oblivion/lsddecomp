@@ -83,8 +83,8 @@ void ObjM__NotifyParentsCodeB(ObjM *self) {
 /* The viewport (IntermediateBase::viewport, a NodeGuardedViewport) hands out its fade
  * box (getSubHandle, Viewport's New_Class6E99C). */
 void ObjM__StartFadeUp(ObjM *self, s32 channels, s32 arg2, s32 step, s32 addChild) {
-    Class6E99C *fade =
-        (Class6E99C *)((NodeGuardedViewport *)self->viewport)->methods->getSubHandle((NodeGuardedViewport *)self->viewport);
+    Class6E99C *fade = (Class6E99C *)((NodeGuardedViewport *)self->viewport)
+                           ->methods->getSubHandle((NodeGuardedViewport *)self->viewport);
     if (step != 0) {
         fade->methods->setStep(fade, step);
     }
@@ -243,7 +243,7 @@ extern s32 D_80087424;
 extern s8 *D_800873EC[];
 extern s8 *PickStyleFallbackConfig(void);
 extern void FillStyleFromConfig(struct StyleM *style, s8 *cfg);
-extern u8 D_800872C4[][3];
+extern u8 gStylePalette[][3];
 extern const u8 *gStyleDecorColor;
 
 void *ApplyStyleConfig(void) {
@@ -254,7 +254,7 @@ void *ApplyStyleConfig(void) {
     }
     FillStyleFromConfig((struct StyleM *)&D_80087424, cfg);
     if (cfg[1] >= 4) {
-        gStyleDecorColor = D_800872C4[cfg[2]];
+        gStyleDecorColor = gStylePalette[cfg[2]];
     }
     return &D_80087424;
 }
@@ -266,25 +266,25 @@ void *ApplyStyleConfig(void) {
  * stay separate here: the record is not a class, and merging them is a
  * global's type (track 4b).
  *
- * D_800872C4 is a table of 24 three-byte entries (0x48 bytes; the first four
+ * gStylePalette is a table of 24 three-byte entries (0x48 bytes; the first four
  * are 00/00/00, 40/40/40, 80/80/80, FF/FF/FF -- a greyscale ramp, so RGB
  * triples). Indexing it as `u8[][3]` is what produces retail's `i*2 + i + base`
  * stride-3 address arithmetic. D_8008730C is six words, 0x6800 down to 0x0800. */
 struct StyleM {
     u8 pad000[0x00C];
-    const u8 *unkC; /* +0x00C, a D_800872C4 entry */
+    const u8 *unkC; /* +0x00C, a gStylePalette entry */
     u8 pad010[0x014 - 0x010];
     s32 unk14;       /* +0x014, cfg[0] sign-extended */
-    const u8 *unk18; /* +0x018, a D_800872C4 entry */
+    const u8 *unk18; /* +0x018, a gStylePalette entry */
     s32 unk1C;       /* +0x01C, a D_8008730C value */
 };
 
-extern u8 D_800872C4[][3];
+extern u8 gStylePalette[][3];
 extern s32 D_8008730C[];
 
 void FillStyleFromConfig(struct StyleM *style, s8 *cfg) {
-    style->unkC = D_800872C4[cfg[3]];
-    style->unk18 = D_800872C4[cfg[2]];
+    style->unkC = gStylePalette[cfg[3]];
+    style->unk18 = gStylePalette[cfg[2]];
     style->unk1C = D_8008730C[cfg[1]];
     style->unk14 = cfg[0];
 }

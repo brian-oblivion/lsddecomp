@@ -26,7 +26,7 @@ extern s32 D_8008AC84;
 extern s32 D_800873C8[];       /* array of raw base addresses, indexed by "kind" (scaled x4) */
 extern s32 gStyleFlushColor;
 extern u8 D_8008726C[];        /* address only taken */
-extern u8 D_800872C4[];        /* 3-byte-stride table, indexed by a byte field */
+extern u8 gStylePalette[];        /* 3-byte-stride table, indexed by a byte field */
 extern s32 gStyleColorTable;
 extern u8 D_80087234[];        /* address only taken */
 extern s32 gStyleDecorVariant;
@@ -54,7 +54,7 @@ void *PickStyleFallbackConfig(void) {
     result = (s8 *) D_800873C8[kind] + remainder * 4;
     if (kind == 0) {
         b3 = result[3];
-        gStyleFlushColor = (s32) (D_800872C4 + b3 * 3);
+        gStyleFlushColor = (s32) (gStylePalette + b3 * 3);
         b2 = result[2];
         tab = D_8008726C;
         if (b2 != 0x12) {
