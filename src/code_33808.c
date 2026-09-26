@@ -196,16 +196,15 @@ void TimBlockSrc__Finalize(TimBlockSrc *self) {
     GetActiveDataSourceMethods()->finalize((FileResource *)self);
 }
 
+extern void LockActiveDataSource(void);
+extern void UnlockActiveDataSource(void);
+u32 FindMaxTimBlockSize(FileResource *self);
+
 /* setFlag (+0x064), run when a read completes: once the header sector is
  * in, keep the header and read the first block into a buffer the size of
  * the largest; once a block is in, build a TimArraySrc over it (its images
  * take their CLUTs from `entries`), upload it, and read the next, until the
  * last. An allocation failure sets `failed`. */
-
-extern void LockActiveDataSource(void);
-extern void UnlockActiveDataSource(void);
-u32 FindMaxTimBlockSize(FileResource *self);
-
 void TimBlockSrc__AdvanceLoadState(TimBlockSrc *self) {
     TimArraySrc **p;
     s32 max;
