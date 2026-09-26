@@ -29,7 +29,7 @@ extern s32 D_8008710C;
 
 void ObjM__SetupSceneStyle(Obj87034_3bb8c_l *self) {
     DreamSysObj_3bb8c_l *unk18 = self->unk18;
-    Unk50Struct_3bb8c_l *unk50 = self->unk50;
+    StyleConfig *unk50 = self->unk50;
     UnkCObj_3bb8c_l *obj;
     s32 val;
     Obj14_3bb8c_l *unk14;

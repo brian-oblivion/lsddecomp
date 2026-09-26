@@ -306,7 +306,7 @@ extern s32 CopyMemcardIconTemplate(s32 arg0, s32 arg1); /* TaskObjF__WriteMemcar
  * record, the same memory class_3bb8c_m's local StyleM describes
  * (D_80087424, which ApplyStyleConfig fills and RegisterStyleConfig
  * returns). What ObjM's methods do with each word: */
-typedef struct Unk50Struct_3bb8c_l {
+typedef struct StyleConfig {
     s32 unk0;   /* +0x000, SetupSceneStyle: the StageMap's setChildParams `dirs` */
     s32 unk4;   /* +0x004, SetupSceneStyle: setChildParams `colors` */
     s32 unk8;   /* +0x008, SetupSceneStyle: the StageMap's setAmbientColor rgb (a pointer) */
@@ -315,7 +315,7 @@ typedef struct Unk50Struct_3bb8c_l {
     s32 unk14; /* +0x014, selects unkC or unk18: PollTimBlockLoad against 2, EnterStyleSession against 1 */
     void *unk18; /* +0x018, a colour: setFarColor, or fadeAllEntries, when unk14 does not select unkC */
     s32 unk1C; /* +0x01C, EnterStyleSession: the viewport's setFogNear (StyleM: a D_8008730C value) */
-} Unk50Struct_3bb8c_l;
+} StyleConfig;
 
 /* ObjM__OnRegistrantEvent's own two helpers -- MATCHED, src/code_39094.c.
  * GetGridRecordAt(index, sub) reads both $a0 and $a1. ObjM__OnRegistrantEvent's

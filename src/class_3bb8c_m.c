@@ -261,7 +261,7 @@ void *ApplyStyleConfig(void) {
 
 /* FillStyleFromConfig's destination (D_80087424, via ApplyStyleConfig) is
  * not an ObjM: it is the record ObjM keeps as `styleConfig`, which
- * include/class_3bb8c.h views as Unk50Struct_3bb8c_l (its +0x00C/+0x018
+ * include/class_3bb8c.h views as StyleConfig (its +0x00C/+0x018
  * colours and +0x01C fog value agree with the fields below). The two views
  * stay separate here: the record is not a class, and merging them is a
  * global's type (track 4b).

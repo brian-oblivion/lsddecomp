@@ -64,7 +64,7 @@ its `unknown_functions_0x..` padding arrays there).
 
 ## Residues fixed during matching (both genuine, not toolchain)
 
-1. **`Unk50Struct_3bb8c_l::unk14` padding bug.** First draft put `unk14`
+1. **`StyleConfig::unk14` padding bug.** First draft put `unk14`
    immediately after `unkC` (no gap), landing it at offset 0x10 instead of
    0x14 — one word of missing `u8 pad[...]`. Visible as a wrong field
    offset AND a register-role swap in the diff (retail: `v0`=field value,

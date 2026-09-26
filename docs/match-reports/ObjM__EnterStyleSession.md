@@ -21,7 +21,7 @@ void ObjM__EnterStyleSession(Obj87034_3bb8c_l *self) {
     DreamSysMethods_3bb8c_l *m2;
     DreamSysObj_3bb8c_l *unk18;
     DreamSysObj_3bb8c_l *newObj;
-    Unk50Struct_3bb8c_l *unk50;
+    StyleConfig *unk50;
     s32 local10;
     s32 ret;
     s32 a2;
@@ -68,7 +68,7 @@ void ObjM__EnterStyleSession(Obj87034_3bb8c_l *self) {
   padding-to-field conversion, not a slide.
 - `Obj87034_3bb8c_l::unk40`, `::unk44` (`s32` each, +0x040/+0x044) --
   carved out of the existing `pad40[0x050-0x040]` gap.
-- `Unk50Struct_3bb8c_l::unk1C` (`void *`, +0x01C) -- appended after the
+- `StyleConfig::unk1C` (`void *`, +0x01C) -- appended after the
   existing `unk18` (which was the struct's last field), so this only grows
   the struct, no slide of any existing member.
 - `Obj14Methods_3bb8c_l::slotEC` (`void(void*)`, +0x0EC) -- carved out of

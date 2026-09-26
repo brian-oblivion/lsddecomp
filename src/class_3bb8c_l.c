@@ -73,7 +73,7 @@ extern s32 D_80087118[];
 extern s32 D_80087150;
 
 /* onInit (IntermediateBase__Init passes 0, 0, 0). */
-void ObjM__InitStyleAndWorld(ObjM *self, s32 gridSpan, Unk50Struct_3bb8c_l *style, s32 arg3) {
+void ObjM__InitStyleAndWorld(ObjM *self, s32 gridSpan, StyleConfig *style, s32 arg3) {
     NodeGuardedViewport *vp = (NodeGuardedViewport *)self->viewport;
     s32 ret1;
     s32 flag;
@@ -92,7 +92,7 @@ void ObjM__InitStyleAndWorld(ObjM *self, s32 gridSpan, Unk50Struct_3bb8c_l *styl
 
     self->cachedViewport = vp;
     ret1 = self->dreamSys->methods->getCurrentDayAndYear(self->dreamSys, 0);
-    self->styleConfig = (Unk50Struct_3bb8c_l *)RegisterStyleConfig(self->unk14, self->stage,
+    self->styleConfig = (StyleConfig *)RegisterStyleConfig(self->unk14, self->stage,
                                                                    (s32 *)&self->ctorSound, ret1, 0);
     if (style != 0) {
         self->styleConfig = style;
@@ -296,7 +296,7 @@ extern s32 D_8008710C;
 
 void ObjM__SetupSceneStyle(ObjM *self) {
     NodeGuardedViewport *vp = (NodeGuardedViewport *)self->viewport;
-    Unk50Struct_3bb8c_l *style = self->styleConfig;
+    StyleConfig *style = self->styleConfig;
     UnkCObj_3bb8c_l *obj;
     s32 val;
     StageMap *rig;
@@ -336,7 +336,7 @@ void ObjM__EnterStyleSession(ObjM *self) {
     FadeBoxMethods *m2;
     NodeGuardedViewport *vp;
     FadeBox *fade;
-    Unk50Struct_3bb8c_l *style;
+    StyleConfig *style;
     s32 local10;
     s32 ret;
     s32 a2;

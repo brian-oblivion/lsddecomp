@@ -69,7 +69,7 @@ struct LinkResource;
 struct NodeGuardedViewport;
 struct FadeBox;
 struct TextRow;
-struct Unk50Struct_3bb8c_l; /* styleConfig's view, include/class_3bb8c.h */
+struct StyleConfig; /* styleConfig's view, include/class_3bb8c.h */
 
 /* Overridden: ctor, finalize, onNotify, resetCounters (NoOpSlot40), init
  * (AttachTarget), deinit (DetachTarget), onInit (InitStyleAndWorld),
@@ -113,7 +113,7 @@ struct ObjM {
     /* +0x044 */ s32 unk44; /* InitStyleAndWorld: 2 or 3; resetLinkState's arg1 */
     /* +0x048 */ s32 gridSpan; /* onInit's arg1, 0 meaning 0xA000; the StageMap's setGridSpan (SetupSceneStyle) */
     /* +0x04C */ s32 unk4C;                               /* onInit's arg3; no reader */
-    /* +0x050 */ struct Unk50Struct_3bb8c_l *styleConfig; /* RegisterStyleConfig's result, or onInit's arg2 */
+    /* +0x050 */ struct StyleConfig *styleConfig; /* RegisterStyleConfig's result, or onInit's arg2 */
     /* +0x054 */ struct WBgm *bgm; /* the ctor's (Class865C8's bgm): setSeq, stop, pause, resume */
     /* +0x058 */ struct TimBlockSrc *timBlockSrc; /* InitStyleAndWorld's New_TimBlockSrc; PollTimBlockLoad releases it */
     /* +0x05C */ u8 pad05C[0x060 - 0x05C];
@@ -143,7 +143,7 @@ void ObjM__NoOpSlot40(void);
 void ObjM__AttachTarget(ObjM *self, IntermediateBaseInitArgs *args, struct DreamSys *dreamSys);
 void ObjM__OnRegistrantEvent(ObjM *self, s32 code, s32 arg2, s32 arg3);
 void ObjM__DetachTarget(ObjM *self);
-void ObjM__InitStyleAndWorld(ObjM *self, s32 gridSpan, struct Unk50Struct_3bb8c_l *style, s32 arg3);
+void ObjM__InitStyleAndWorld(ObjM *self, s32 gridSpan, struct StyleConfig *style, s32 arg3);
 void ObjM__TeardownStyle(ObjM *self);
 void ObjM__OnTag1Notify(ObjM *self, void *sender, s32 event);
 void ObjM__PollTimBlockLoad(ObjM *self, struct TimBlockSrc *src);
