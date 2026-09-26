@@ -36,7 +36,7 @@
  * multiple-independent-local-views convention.
  *
  * New_ObjM is declared `Obj4C *New_ObjM(SubObjB *, ...)` by
- * include/class_39e08.h (Obj865C8__EnterState2's call-site view), which
+ * include/class_39e08.h (Class865C8__StartObjM's call-site view), which
  * this file includes, so its definition below must keep that exact return
  * and first-argument type.
  */
@@ -238,7 +238,7 @@ void Class86F88__CursorDown(Class86F88 *self, s32 arg1, s32 arg2, s32 arg3)
 }
 
 /* Defined later in this file (ROM order); forward-declared here since
- * Class86F88__CreateRows calls both, same convention as Obj865C8__EnterState2 in
+ * Class86F88__CreateRows calls both, same convention as Class865C8__StartObjM in
  * src/class_39e08.c. Signatures must match their real definitions below
  * exactly. */
 extern char *Class86F88__FormatRowText(Class86F88 *self, char *dest, s32 row, s32 top, char *column);
@@ -460,7 +460,7 @@ void ObjM__ObjM(ObjM_3bb8c_k *self, SubObjB *arg1, s32 arg2, s32 arg3, s32 arg4,
     self->methods->slot40(self);
 }
 
-void ObjM__Dtor(Obj865C8 *self)
+void ObjM__Dtor(ObjM_3bb8c_k *self)
 {
     GetClass86668Methods()->finalize((Class86668 *)self);
 }

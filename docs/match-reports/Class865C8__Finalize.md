@@ -1,4 +1,6 @@
-# Obj865C8__Dtor — MATCHED (74/74 words)
+# Class865C8__Finalize — MATCHED (74/74 words)
+
+> Renamed from `Obj865C8__Dtor` on 2026-09-26 (tools/rename.py). Address 0x80049830.
 
 > Renamed from `func_80049830` on 2026-09-23 (tools/rename.py). Address 0x80049830.
 
@@ -60,7 +62,7 @@ jr $ra
 ## Final C
 
 ```c
-void Obj865C8__Dtor(Obj865C8 *self) {
+void Class865C8__Finalize(Obj865C8 *self) {
     Obj0C *o = self->unk0C;
     SubObjG *g;
 
@@ -91,7 +93,7 @@ same root cause:
    AFTER the first call (`self->methods->slot14(...)`) rather than before
    it. Retail loads `self->unk0C` into a register in the delay-adjacent
    slot BEFORE the `slot14` call even happens (same "load early since the
-   register is free and needed soon" scheduling `Obj865C8__StartSubA` showed
+   register is free and needed soon" scheduling `Class865C8__OnInit` showed
    earlier this round). My statement order pushed the load after the call,
    and the compiled instruction landed one slot later than retail's,
    shifting everything after it by one word (nop/removed word 8 residue).
@@ -117,28 +119,28 @@ only ever reads the struct field once per step. 74/74 on the rebuild.
   independent call sites in this one function.
 - **Correction to earlier-this-round typings** (see below): `Obj0C::unk8`,
   `Obj0C::unk10`, and `Obj865C8::unk40`/`unk44`/`unk48` were all typed `s32`
-  by `Obj865C8__Init`/`Obj865C8__EnterState2` (earlier this session), whose own call
+  by `Class865C8__Init`/`Class865C8__StartObjM` (earlier this session), whose own call
   sites only ever forward these fields as opaque register values through a
   vtable call that never dereferences them — consistent with either a
   scalar or a pointer at the time. This function dereferences all five
   directly (`->methods->slot4`), settling it: they are `SubObjG *`. Added
   `Obj0C::unkC` (brand new field, same type, same pattern). Both older call
-  sites (`Obj865C8__Init`'s two `unk8`/`unk10` forwards,
-  `Obj865C8__EnterState2`'s three `unk40`/`unk44`/`unk48` forwards) got explicit
+  sites (`Class865C8__Init`'s two `unk8`/`unk10` forwards,
+  `Class865C8__StartObjM`'s three `unk40`/`unk44`/`unk48` forwards) got explicit
   `(s32)` casts added at their existing call sites — same register value
   either way, confirmed by rebuilding all nine of this unit's matched
   functions together (all still full matches).
 
 ## Match reports updated (not replaced) for this correction
 
-- `docs/match-reports/Obj865C8__Init.md` — `Obj0C::unk8`/`unk10` were
+- `docs/match-reports/Class865C8__Init.md` — `Obj0C::unk8`/`unk10` were
   documented there as "plain scalar register-passthrough"; this function
   proves they are pointers. Report NOT rewritten (still an accurate
   description of THAT function's own call sites); adding a short forward
   pointer to this report instead, since CLAUDE.md's per-function report
   policy makes each report a record of what THAT function established, not
   a place to retroactively rewrite once a later function adds evidence.
-- `docs/match-reports/Obj865C8__EnterState2.md` — same note for
+- `docs/match-reports/Class865C8__StartObjM.md` — same note for
   `unk40`/`unk44`/`unk48`.
 
 (Both updates below, appended as a dated addendum rather than editing the
@@ -171,4 +173,8 @@ from memory each time it's used).
 
 ## Naming
 
-`Obj865C8__Dtor` -- tier A. Releases every owned sub-object (`unk0C`'s own three `SubObjG` fields, `unk40`/`unk44`/`unk48`) via their `slot4` release method, then forwards to the base dtor: a pure teardown leaf, mechanics are its purpose.
+`Class865C8__Finalize` -- tier A. Releases every owned sub-object (`unk0C`'s own three `SubObjG` fields, `unk40`/`unk44`/`unk48`) via their `slot4` release method, then forwards to the base dtor: a pure teardown leaf, mechanics are its purpose.
+
+## Track 4 (2026-09-26, round 88, Class865C8)
+
+The class (table D_800865C8, id 0x1F230, Class86668's subclass) is unified as Class865C8 in include/Class865C8.h; the Obj865C8/Class865C8Methods views in class_39e08.h are gone. Renamed from Obj865C8__Dtor: the +0x00C finalize override (it ends in Class86668's finalize). SubObjG's slot4 is BasicClass's release, so the six `x = x->methods->slot4(x)` calls are `release`; slot14 is removeChild.

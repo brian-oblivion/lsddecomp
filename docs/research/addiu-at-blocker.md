@@ -95,7 +95,7 @@ unchanged.
   remaining `gp_rel` hit. Five substantive reports KEPT — their structural
   analysis is still good — with a banner saying the verdict is stale and the
   function is assignable: `func_80018464`, `TaskCore__OnPadEvent`, `TaskCore__SetState`,
-  `FormatFullWidthNumber`, `Obj865C8__OnTag2Notify`.
+  `FormatFullWidthNumber`, `Class865C8__OnObjMNotify`.
 
   `TaskCore__SetState` is worth singling out: CLAUDE.md cites it as the case where
   **seven attempts went into the wrong half** of a two-word residue because an
@@ -419,7 +419,7 @@ lets a runner look at a plain C `switch` with no array in sight and conclude the
 blocker cannot apply.
 
 A dense `switch` compiles to a jump table, and the dispatch is the same indexed
-load through `$at`. Retail, at `Obj865C8__OnTag2Notify` in the newly carved
+load through `$at`. Retail, at `Class865C8__OnObjMNotify` in the newly carved
 `class_39e08`:
 
 ```

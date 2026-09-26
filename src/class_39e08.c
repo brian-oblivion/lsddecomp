@@ -7,205 +7,207 @@
 #include "FrameClock.h"
 #include "DreamSys.h"
 
-Obj865C8 *New_Obj865C8(Obj0C *arg1, DreamSys *arg2, s32 arg3)
+/* The viewpoint and view-reference vectors Class865C8__OnInit hands the
+ * viewport's attachViewChild: (0, -1200, 0) and (0, -1200, 10000), the data
+ * right before gClass86668Methods. */
+extern Vec3_d294 D_80086650;
+extern Vec3_d294 D_8008665C;
+
+Class865C8 *New_Class865C8(IntermediateBaseInitArgs *initArgs, DreamSys *dreamSys, s32 arg3)
 {
-    Obj865C8 *self;
+    Class865C8 *self;
 
     self = BMemPMgrAlloc(0x50);
     if (self != NULL) {
-        GetObj865C8Methods()->ctor(self, arg1, arg2, arg3);
+        GetClass865C8Methods()->ctor(self, initArgs, dreamSys, arg3);
         return self;
     }
     return NULL;
 }
 
-void Obj865C8__Obj865C8(Obj865C8 *self, Obj0C *arg1, DreamSys *arg2, s32 arg3) {
+void Class865C8__Class865C8(Class865C8 *self, IntermediateBaseInitArgs *initArgs, DreamSys *dreamSys, s32 arg3) {
     LoadRequest req;
     s32 tmp;
 
     GetClass86668Methods()->ctor((Class86668 *)self, (char *)GetSoundEffectDir(0), 0);
-    self->methods = GetObj865C8Methods();
+    self->methods = GetClass865C8Methods();
     InitDreamAux();
-    self->unk44 = (SubObjG *)New_TimImage((char *)D_800113EC);
-    ((TimImageUploadFn)((TimImage *)self->unk44)->methods->slot78)((TimImage *)self->unk44);
-    ((TimImage *)self->unk44)->methods->freeBuffer((TimImage *)self->unk44);
+    self->etcTim = New_TimImage((char *)D_800113EC);
+    ((TimImageUploadFn)self->etcTim->methods->slot78)(self->etcTim);
+    self->etcTim->methods->freeBuffer(self->etcTim);
     req.type = 0;
     req.path = D_800113F8;
-    self->unk48 = New_LinkResource(&req);
+    self->dreamerTmd = New_LinkResource(&req);
     tmp = PickWeeklyGroup(0);
-    self->unk40 = (SubObjG *)New_WBgm((char *)tmp, NULL, 1);
+    self->bgm = New_WBgm((char *)tmp, NULL, 1);
     func_8004A070(1);
     SetActiveDataSourceDriverMode((u32)arg3 < 1, 1, 1);
-    self->unk0C = arg1;
-    arg1->unk10 = (SubObjG *)New_Class869D8();
-    arg1->unk8 = (SubObjG *)New_FrameClock();
-    arg1->unkC = (SubObjG *)New_Class866E8(0, 1);
-    self->unk38 = arg2;
-    self->methods->slot10(self, (Obj4C *)arg2);
-    arg2->methods->setSoundObj(arg2, (s32)self->subB);
-    arg2->methods->slot114(arg2, (s32)self->unk44);
-    self->methods->resetState(self);
+    self->initArgs = initArgs;
+    initArgs->viewport = (BasicClass *)New_Class869D8();
+    initArgs->unk8 = (BasicClass *)New_FrameClock();
+    initArgs->unkC = New_Class866E8(0, 1);
+    self->dreamSys = dreamSys;
+    self->methods->addChild(self, (BasicClass *)dreamSys);
+    dreamSys->methods->setSoundObj(dreamSys, (s32)self->sound);
+    dreamSys->methods->slot114(dreamSys, (s32)self->etcTim);
+    self->methods->resetCounters(self);
 }
 
-void Obj865C8__Dtor(Obj865C8 *self) {
-    Obj0C *o = self->unk0C;
-    SubObjG *g;
+void Class865C8__Finalize(Class865C8 *self) {
+    IntermediateBaseInitArgs *o = self->initArgs;
+    BasicClass *g;
 
-    self->methods->slot14(self, self->unk38);
+    self->methods->removeChild(self, (BasicClass *)self->dreamSys);
     g = o->unkC;
-    o->unkC = g->methods->slot4(g);
+    o->unkC = g->methods->release(g);
     g = o->unk8;
-    o->unk8 = g->methods->slot4(g);
-    g = o->unk10;
-    o->unk10 = g->methods->slot4(g);
-    self->unk40->methods->slot4(self->unk40);
-    self->unk48->methods->slot4(self->unk48);
-    self->unk44->methods->slot4(self->unk44);
+    o->unk8 = g->methods->release(g);
+    g = o->viewport;
+    o->viewport = g->methods->release(g);
+    self->bgm->methods->release(self->bgm);
+    self->dreamerTmd->methods->release(self->dreamerTmd);
+    self->etcTim->methods->release(self->etcTim);
     TickDreamAuxSlots();
     GetClass86668Methods()->finalize((Class86668 *)self);
 }
 
-void Obj865C8__OnNotify(Obj865C8 *self, EventArg *arg1, s32 arg2) {
+void Class865C8__OnNotify(Class865C8 *self, BasicClass *sender, s32 event) {
     s32 tag;
 
-    GetClass86668Methods()->onNotify((Class86668 *)self, arg1, arg2);
-    tag = arg1->target->header;
+    GetClass86668Methods()->onNotify((Class86668 *)self, sender, event);
+    tag = sender->methods->header;
     if ((tag & 0xFFFF) == 0x1F34) {
-        self->methods->slot80(self, arg1, arg2);
+        self->methods->onDreamSysNotify(self, sender, event);
     } else if ((tag & 0xFFFFF) == 0x2F230) {
-        self->methods->slot84(self, arg1, arg2);
+        self->methods->onObjMNotify(self, sender, event);
     }
 }
 
-void Obj865C8__ResetState(Obj865C8 *self) {
-    self->state = 0;
+void Class865C8__ResetPhase(Class865C8 *self) {
+    self->phase = 0;
 }
 
-void Obj865C8__Init(Obj865C8 *self) {
-    DreamSys *sub = self->unk38;
+s32 Class865C8__Init(Class865C8 *self) {
+    DreamSys *sub = self->dreamSys;
 
-    sub->methods->addChild(sub, (BasicClass *)self->unk0C->unk4);
-    sub->methods->addChild(sub, (BasicClass *)self->unk0C->unk8);
-    sub->methods->setViewport(sub, (Viewport *)self->unk0C->unk10);
-    GetClass86668Methods()->init((Class86668 *)self, (IntermediateBaseInitArgs *)self->unk0C, 0);
+    sub->methods->addChild(sub, self->initArgs->unk4);
+    sub->methods->addChild(sub, self->initArgs->unk8);
+    sub->methods->setViewport(sub, (Viewport *)self->initArgs->viewport);
+    return GetClass86668Methods()->init((Class86668 *)self, self->initArgs, 0);
 }
 
-void Obj865C8__Deinit(Obj865C8 *self) {
-    DreamSys *sub = self->unk38;
+void Class865C8__Deinit(Class865C8 *self) {
+    DreamSys *sub = self->dreamSys;
 
     GetClass86668Methods()->deinit((Class86668 *)self);
     sub->methods->setViewport(sub, 0);
-    sub->methods->removeChild(sub, (BasicClass *)self->unk0C->unk4);
-    sub->methods->removeChild(sub, (BasicClass *)self->unk10);
+    sub->methods->removeChild(sub, self->initArgs->unk4);
+    sub->methods->removeChild(sub, self->unk10);
 }
 
-void Obj865C8__StartSubA(Obj865C8 *self) {
+void Class865C8__OnInit(Class865C8 *self) {
     SubObjE *obj;
-    SubObjA *subA;
-    SubObjF *ret;
-    s32 result;
+    Viewport *vp;
+    Class6B5CC *ret;
+    ViewportSize *size;
 
-    obj = self->unk0C->obj;
-    subA = self->subA;
-    result = obj->methods->slot7C(obj, 0);
-    subA->methods->slot44(subA, result);
-    ret = subA->methods->slot0xAC(subA);
-    ret->methods->slot60(ret, 1);
-    subA->methods->slot4C(subA, 0x4B0);
-    subA->methods->slot70(subA, self->unk38, D_80086650, D_8008665C, 0);
-    subA->methods->slot8C(subA);
-    self->state = 1;
+    obj = (SubObjE *)self->initArgs->unk0;
+    vp = (Viewport *)self->viewport;
+    size = obj->methods->slot7C(obj, 0);
+    vp->methods->setScreenSize(vp, size);
+    ret = vp->methods->getSubHandle(vp);
+    ret->methods->setDisplay(ret, 1);
+    vp->methods->setUnk44(vp, 0x4B0);
+    vp->methods->attachViewChild(vp, (BasicClass *)self->dreamSys, &D_80086650, &D_8008665C, 0);
+    vp->methods->initOt(vp);
+    self->phase = 1;
 }
 
-void Obj865C8__RunSubUpdates(Obj865C8 *self) {
-    SubObjA *sub = self->subA;
+void Class865C8__OnDeinit(Class865C8 *self) {
+    Viewport *vp = (Viewport *)self->viewport;
 
-    sub->methods->slot90(sub);
-    sub->methods->slot74(sub);
+    vp->methods->deinitOt(vp);
+    vp->methods->detachViewChild(vp);
 }
 
-/* Defined later in this file (ROM order); forward-declared here since
- * Obj865C8__AdvanceState calls it. */
-extern void Obj865C8__EnterState2(Obj865C8 *self, s32 arg1);
-
-void Obj865C8__AdvanceState(Obj865C8 *self, s32 arg1, s32 arg2) {
+void Class865C8__AdvancePhase(Class865C8 *self, BasicClass *sender, s32 event) {
     s32 result;
 
-    GetClass86668Methods()->onTag1Notify((Class86668 *)self, (BasicClass *)arg1, arg2);
-    if (arg2 == 2 && self->state != arg2) {
-        switch (self->state) {
+    GetClass86668Methods()->onTag1Notify((Class86668 *)self, sender, event);
+    if (event == 2 && self->phase != event) {
+        switch (self->phase) {
         case 1:
-            result = self->unk38->methods->startDay(self->unk38);
+            result = self->dreamSys->methods->startDay(self->dreamSys);
             if (result < 0) {
-                self->unk38->methods->endDay(self->unk38, 0);
-                self->eventCode = arg2;
-                self->methods->onEventArg(self, 3);
+                self->dreamSys->methods->endDay(self->dreamSys, 0);
+                self->result = event;
+                self->methods->setState(self, 3);
                 return;
             }
-            Obj865C8__EnterState2(self, result);
+            Class865C8__StartObjM(self, result);
             break;
         case 2:
             break;
         case 3:
-            self->unk4C->methods->slot48(self->unk4C);
-            self->unk4C->methods->slot4(self->unk4C);
-            result = self->unk38->methods->getCurrentStage(self->unk38);
-            Obj865C8__EnterState2(self, result);
+            self->objM->methods->slot48(self->objM);
+            self->objM->methods->slot4(self->objM);
+            result = self->dreamSys->methods->getCurrentStage(self->dreamSys);
+            Class865C8__StartObjM(self, result);
             break;
         }
     }
 }
 
-void Obj865C8__EnterState2(Obj865C8 *self, s32 arg1) {
-    self->unk4C = New_ObjM(self->subB, (s32)self->unk40, (s32)self->unk44, (s32)self->unk48, arg1);
-    self->methods->slot10(self, self->unk4C);
-    self->unk4C->methods->slot44(self->unk4C, (s32)self->unk0C, (s32)self->unk38);
-    self->state = 2;
+void Class865C8__StartObjM(Class865C8 *self, s32 stage) {
+    self->objM = New_ObjM((SubObjB *)self->sound, (s32)self->bgm, (s32)self->etcTim, (s32)self->dreamerTmd, stage);
+    self->methods->addChild(self, (BasicClass *)self->objM);
+    self->objM->methods->slot44(self->objM, (s32)self->initArgs, (s32)self->dreamSys);
+    self->phase = 2;
 }
 
-void Obj865C8__Noop7C(void) {
+void Class865C8__OnState4(void) {
 }
 
-void Obj865C8__Noop80(void) {
+void Class865C8__OnDreamSysNotify(void) {
 }
 
-void Obj865C8__OnTag2Notify(Obj865C8 *self, s32 arg1, s32 arg2) {
+void Class865C8__OnObjMNotify(Class865C8 *self, BasicClass *sender, s32 event) {
     CinematicCall pos;
     s32 result;
 
-    switch (arg2) {
+    switch (event) {
     case 4:
-        self->unk4C->methods->slot48(self->unk4C);
-        self->unk4C->methods->slot4(self->unk4C);
-        result = self->unk38->methods->endDay(self->unk38, 0);
+        self->objM->methods->slot48(self->objM);
+        self->objM->methods->slot4(self->objM);
+        result = self->dreamSys->methods->endDay(self->dreamSys, 0);
         if (result == 0) {
-            pos = self->unk38->methods->getCinematic(self->unk38);
-            self->eventCode = pos.entry < 0 ? 1 : 2;
+            pos = self->dreamSys->methods->getCinematic(self->dreamSys);
+            self->result = pos.entry < 0 ? 1 : 2;
         } else {
-            self->eventCode = 3;
+            self->result = 3;
         }
-        self->methods->onEventArg(self, 3);
+        self->methods->setState(self, 3);
         break;
     case 5:
     case 6:
     case 7:
     case 8:
     case 0xA:
-        self->state = 3;
+        self->phase = 3;
         break;
     case 0xC:
     case 0xD:
-        self->unk4C->methods->slot48(self->unk4C);
-        self->unk4C->methods->slot4(self->unk4C);
-        self->unk38->methods->endDay(self->unk38, arg2 != 0xC ? 2 : 1);
-        self->eventCode = 3;
-        self->methods->onEventArg(self, 3);
+        self->objM->methods->slot48(self->objM);
+        self->objM->methods->slot4(self->objM);
+        self->dreamSys->methods->endDay(self->dreamSys, event != 0xC ? 2 : 1);
+        self->result = 3;
+        self->methods->setState(self, 3);
         break;
     }
 }
 
-Class865C8Methods *GetObj865C8Methods(void) {
-    return &D_800865C8;
+Class865C8Methods *GetClass865C8Methods(void) {
+    return &gClass865C8Methods;
 }
 
 /* Sony's, from the still-uncarved psyq_39094 SDK segment

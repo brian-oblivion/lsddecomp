@@ -10,13 +10,13 @@
  * (New_Class86668 through Class86668__SetTimeout) and src/class_3ac78.c
  * (Class86668__PlaySound, GetClass86668Methods). The object is 0x38 bytes
  * (New_Class86668). Two classes derive from it, each ctor calling
- * Class86668__Class86668 first (`typeviews.py --tree`): D_800865C8
- * (0x1F230, Obj865C8, class_39e08) and D_80087034 (0x2F230, ObjM,
+ * Class86668__Class86668 first (`typeviews.py --tree`): gClass865C8Methods
+ * (0x1F230, Class865C8, class_39e08) and D_80087034 (0x2F230, ObjM,
  * class_3bb8c_k/_l/_m).
  *
  * Construction, ctor(soundBankPath, sound): the base ctor, then `sound` =
- * New_VabStreamObj(soundBankPath) when a path is given (Obj865C8 passes
- * GetSoundEffectDir()) or the caller's object (ObjM passes Obj865C8's), and
+ * New_VabStreamObj(soundBankPath) when a path is given (Class865C8 passes
+ * GetSoundEffectDir()) or the caller's object (ObjM passes Class865C8's), and
  * resetCounters, which here is Class86668__CancelTimeout: setTimeout(-1).
  * Finalize releases `sound` only when the ctor made it, then runs the base
  * finalize. playSound(tone) is the sound's +0x080, VabStreamObj__PlayTone,
@@ -29,8 +29,8 @@
  * timeoutFrames as UNSIGNED, so -1 never fires. setState
  * (Class86668__SetState) runs the base setState and, for 4, sets result = 1
  * and calls onState4. init (Class86668__Init) zeroes `result`, runs the base
- * init and returns `result`: Class6D3C8__PollStatusObj, through Obj865C8,
- * switches on it (2 and 3 are Obj865C8's own codes).
+ * init and returns `result`: Class6D3C8__PollStatusObj, through Class865C8,
+ * switches on it (2 and 3 are Class865C8's own codes).
  *
  * Slots +0x074..+0x07C are NULL in this class's own table (the table is 0x80
  * bytes, its last three words zero; classtable.py stops at the last
@@ -38,7 +38,7 @@
  *
  * IntermediateBase's onInit (+0x04C) is (self, s32, s32, s32). Of this
  * class's two subclasses, ObjM__InitStyleAndWorld takes three arguments
- * after self and Obj865C8__StartSubA takes self alone; neither is retyped
+ * after self and Class865C8__OnInit takes self alone; neither is retyped
  * here.
  */
 

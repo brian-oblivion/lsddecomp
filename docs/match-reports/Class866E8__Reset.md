@@ -76,7 +76,7 @@ Round 67 (track 3, naming pass).
 
 | symbol | name | tier | evidence |
 | --- | --- | --- | --- |
-| `func_8004AA10` | `Class866E8__Reset` | B | Occupant of vtable slot `+0x040`. Body does nothing but put the object back to a known state: clears `config`, `acceptedTags` and `rectCount`, re-applies the default grid span, and writes the four `-1` sentinels at `+0x1CC..+0x1D8`. The sibling table `D_800865C8` names its own `+0x040` occupant `resetUnk3C` (`include/class_39e08.h`), so `+0x040` is a reset slot in this family. Tier B and not A because nothing establishes WHEN a reset is wanted -- its one known caller is `Class866E8__SetConfig`. |
+| `func_8004AA10` | `Class866E8__Reset` | B | Occupant of vtable slot `+0x040`. Body does nothing but put the object back to a known state: clears `config`, `acceptedTags` and `rectCount`, re-applies the default grid span, and writes the four `-1` sentinels at `+0x1CC..+0x1D8`. The sibling table `gClass865C8Methods` names its own `+0x040` occupant `resetUnk3C` (`include/class_39e08.h`), so `+0x040` is a reset slot in this family. Tier B and not A because nothing establishes WHEN a reset is wanted -- its one known caller is `Class866E8__SetConfig`. |
 | `D_8008A980` | `gDefaultGridSpan` | B | Value `0x0000A000`, and this is its only reader in the whole image. It is handed straight to `setGridSpan`, which derives `span >> 11 == 20` -- the byte-verified grid row stride -- and `span >> 12 == 10`. See `Class866E8__SetGridSpan.md` for the full arithmetic. |
 
 Field names established here:

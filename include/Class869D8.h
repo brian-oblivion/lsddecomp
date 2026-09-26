@@ -7,10 +7,10 @@
  * Class869D8 -- class id 0x17, method table gClass869D8Methods: Viewport's
  * subclass (its ctor chains to GetViewportMethods()->ctor first, so the id
  * tree 0x7 -> 0x17 is the ctor chain). Methods in src/class_3bb8c_c.c. No
- * class derives from it. Its one construction site is Obj865C8__Obj865C8
+ * class derives from it. Its one construction site is Class865C8__Class865C8
  * (src/class_39e08.c), which stores it as the viewport of an
  * IntermediateBase init argument block (IntermediateBaseInitArgs +0x010;
- * class_39e08.h's Obj0C::unk10); IntermediateBase reaches it only through
+ * which class_39e08.h once viewed as Obj0C::unk10); IntermediateBase reaches it only through
  * Viewport's slots.
  *
  * What it changes, from its own methods (`classtable.py gClass869D8Methods

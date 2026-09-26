@@ -9,7 +9,7 @@
 ## What it does
 
 Method-table slot +0x00C (the dtor override) of `gClass86668Methods`, a sibling
-class of `D_800865C8` (resolved with
+class of `gClass865C8Methods` (resolved with
 `tools/classtable.py 0x800865C8 --vs 0x8006E878`, then cross-checked against
 `0x80086668` -- both share the same base, `gIntermediateBaseMethods`). If `self->unk30` is
 set, notifies `self->subB` (guarded slot, same pattern as
@@ -57,7 +57,7 @@ void Class86668__Finalize(Obj865C8 *self) {
 ## Proposed learning
 
 **A sibling class can be identified by classtable.py --vs against the SAME
-base twice, not just against each other.** `D_800865C8` and `gClass86668Methods`
+base twice, not just against each other.** `gClass865C8Methods` and `gClass86668Methods`
 share a long run of identical slot values from +0x058 through +0x070 (not
 because one subclasses the other, but because both independently override
 those slots with the SAME shared implementation while diverging elsewhere,
@@ -71,4 +71,4 @@ inherited/override code as a subclass relationship.
 
 ## Track 4
 
-2026-09-25, round 84 (bravo): class unified in `include/Class86668.h`. Renamed from `Class86668__Dtor`, tier A: it occupies +0x00C, BasicClass's `finalize` slot, and its body is a finalize: release `sound` when `soundBankPath` is set (the ctor made it), then the base finalize through `Get_vtable_IntermediateBase()->finalize`. `self` is `Class86668 *`; `unk30`/`subB` are `soundBankPath`/`sound`. Obj865C8__Dtor and ObjM__Dtor reach it as `GetClass86668Methods()->finalize((Class86668 *)self)`. Image byte-identical.
+2026-09-25, round 84 (bravo): class unified in `include/Class86668.h`. Renamed from `Class86668__Dtor`, tier A: it occupies +0x00C, BasicClass's `finalize` slot, and its body is a finalize: release `sound` when `soundBankPath` is set (the ctor made it), then the base finalize through `Get_vtable_IntermediateBase()->finalize`. `self` is `Class86668 *`; `unk30`/`subB` are `soundBankPath`/`sound`. Class865C8__Finalize and ObjM__Dtor reach it as `GetClass86668Methods()->finalize((Class86668 *)self)`. Image byte-identical.

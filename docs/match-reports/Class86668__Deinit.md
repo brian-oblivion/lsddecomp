@@ -39,4 +39,4 @@ None beyond what's already documented.
 
 ## Track 4
 
-2026-09-25, round 84 (bravo): class unified in `include/Class86668.h`. Not renamed. `self` is `Class86668 *`; Obj865C8__Deinit and ObjM__DetachTarget call it as `GetClass86668Methods()->deinit((Class86668 *)self)`. Image byte-identical.
+2026-09-25, round 84 (bravo): class unified in `include/Class86668.h`. Not renamed. `self` is `Class86668 *`; Class865C8__Deinit and ObjM__DetachTarget call it as `GetClass86668Methods()->deinit((Class86668 *)self)`. Image byte-identical.

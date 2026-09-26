@@ -1,4 +1,6 @@
-# New_Obj865C8
+# New_Class865C8
+
+> Renamed from `New_Obj865C8` on 2026-09-26 (tools/rename.py). Address 0x80049608.
 
 > Renamed from `func_80049608` on 2026-09-23 (tools/rename.py). Address 0x80049608.
 
@@ -11,13 +13,13 @@ unchanged. Returns the new object, or NULL.
 ## The match
 
 ```c
-Obj865C8 *New_Obj865C8(Obj0C *arg1, SubObjD *arg2, s32 arg3)
+Obj865C8 *New_Class865C8(Obj0C *arg1, SubObjD *arg2, s32 arg3)
 {
     ...
 
     self = BMemPMgrAlloc(0x50);
     if (self != NULL) {
-        GetObj865C8Methods()->ctor(self, arg1, arg2, arg3);
+        GetClass865C8Methods()->ctor(self, arg1, arg2, arg3);
         return self;
     }
     return NULL;
@@ -48,7 +50,7 @@ now obsolete.
 
 Typing this one needed two small header changes, both recorded in
 `include/class_39e08.h`: `Class865C8Methods::ctor` was `void *` and is now a
-typed pointer carrying Obj865C8__Obj865C8's own signature, and `GetObj865C8Methods`
+typed pointer carrying Class865C8__Class865C8's own signature, and `GetClass865C8Methods`
 gained a prototype because it is defined later in the unit (ROM order) than
 the function that dispatches through it.
 
@@ -60,4 +62,8 @@ updated with what survived and what did not.
 
 ## Naming
 
-`New_Obj865C8` -- tier A. Allocator, matches the established `New_X` idiom used everywhere else in this project (allocate fixed size, ctor via the class's own vtable accessor, return NULL on failure): mechanics are its purpose.
+`New_Class865C8` -- tier A. Allocator, matches the established `New_X` idiom used everywhere else in this project (allocate fixed size, ctor via the class's own vtable accessor, return NULL on failure): mechanics are its purpose.
+
+## Track 4 (2026-09-26, round 88, Class865C8)
+
+The class (table D_800865C8, id 0x1F230, Class86668's subclass) is unified as Class865C8 in include/Class865C8.h; the Obj865C8/Class865C8Methods views in class_39e08.h are gone. Renamed from New_Obj865C8. Parameters retyped from (Obj0C *, DreamSys *, s32) to (IntermediateBaseInitArgs *, DreamSys *, s32): Obj0C was a view of IntermediateBaseInitArgs (the ctor stores it at +0x00C, IntermediateBase's initArgs, and fills its +0x008/+0x00C/+0x010), and the one caller, Class6D3C8__PollStatusObj, already passed IntermediateBaseInitArgs *. Byte-identical.

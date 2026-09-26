@@ -86,7 +86,7 @@ adding a second, conflicting declaration.
 `Class86F88__FormatRowText` and `Class86F88__SetView` are defined LATER in this same file
 (ROM order), so both needed forward `extern` declarations above
 `Class86F88__CreateRows`, matching their real definitions exactly — same convention
-already used for `Obj865C8__EnterState2`/`TextEntry__ClearChildRefs` elsewhere this round.
+already used for `Class865C8__StartObjM`/`TextEntry__ClearChildRefs` elsewhere this round.
 
 **One register-identity trap, closed by reordering two local
 declarations — no logic change.** With `Elem4CArg_3bb8c_k local;` declared

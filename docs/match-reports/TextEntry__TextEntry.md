@@ -74,7 +74,7 @@ strlen` instruction retail does not have.
 
 `TextEntry__ClearChildRefs` (defined later in this same file, ROM order) needed a
 forward `extern` declaration above `TextEntry__TextEntry`, same convention as
-`Obj865C8__EnterState2` in `src/class_39e08.c` — otherwise C89's implicit
+`Class865C8__StartObjM` in `src/class_39e08.c` — otherwise C89's implicit
 `int`-returning declaration would conflict with its real `void` definition
 further down.
 
