@@ -1,4 +1,6 @@
-# StageMap__FindElemIndexByUnk32 — MATCHED (18/18 words)
+# StageMap__FindSlotIndexByNeighbour — MATCHED (18/18 words)
+
+> Renamed from `StageMap__FindElemIndexByUnk32` on 2026-09-26 (tools/rename.py). Address 0x8004c588.
 
 > Renamed from `Class866E8__FindElemIndexByUnk32` on 2026-09-26 (tools/rename.py). Address 0x8004c588.
 
@@ -38,7 +40,7 @@ Second attempt (with `e`) matched immediately.
 ## Final C
 
 ```c
-s32 StageMap__FindElemIndexByUnk32(Obj866E8 *self, s32 key) {
+s32 StageMap__FindSlotIndexByNeighbour(Obj866E8 *self, s32 key) {
     s32 result;
     s32 i;
     Elem *e;

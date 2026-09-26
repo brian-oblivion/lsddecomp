@@ -45,7 +45,7 @@ falling through to `return -1;` if the loop exhausts.
 
 ## Residue and how it closed (1 residue, 2 attempts)
 
-Same class as `StageMap__FindElemIndexByUnk32`'s (own report, matched immediately before
+Same class as `StageMap__FindSlotIndexByNeighbour`'s (own report, matched immediately before
 this one in the queue): the plain indexed form
 (`self->arr[i].unk4->unk30`/`unk2C`) let GCC repurpose `self` as its own
 moving pointer, dropping the separate running-offset register retail
@@ -97,7 +97,7 @@ rules, this is left for the head to reconcile rather than edited directly
 ## Naming
 
 **Tier A.** Vtable slot +0x124. Sibling search leaf to
-`StageMap__FindElemIndexByUnk32`: same loop shape, different field
+`StageMap__FindSlotIndexByNeighbour`: same loop shape, different field
 (`unk4->unk30`) and an extra `unk4->unk2C != 0` gate, returns -1 (not 0)
 on a miss. Named the same way and for the same reason -- by the field it
 searches, since `unk30`/`unk2C` are cross-unit `ElemTarget` fields this

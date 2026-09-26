@@ -25,7 +25,7 @@
 #include "LbdFile.h"
 #include "GridCell.h"
 
-s32 StageMap__FindElemIndexByUnk32(StageMap *self, s32 key) {
+s32 StageMap__FindSlotIndexByNeighbour(StageMap *self, s32 key) {
     s32 result;
     s32 i;
     ChunkSlot *e;
