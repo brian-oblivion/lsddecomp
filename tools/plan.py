@@ -698,8 +698,12 @@ def class_footprint(c):
                             set(re.findall(r'#include\s+"([^"]+)"', t)))
     syms = {c["table"], *c["owned"], *c["objects"], *c["tables"]}
     tre = re.escape(c["table"])
+    ore = "|".join(map(re.escape, c["objects"])) or r"(?!)"
     for t, _ in _fp_texts.values():
         syms |= set(re.findall(rf"\b(\w+)\s*\(\s*(?:void)?\s*\)\s*\{{\s*return\s+&?\s*{tre}\s*;", t))
+        # a function DEFINED returning the object (a singleton getter, an
+        # allocator): round 87's GetDrawSystem, extern'd under other views
+        syms |= set(re.findall(rf"^\s*(?:{ore})\s*\*\s*(\w+)\s*\([^;{{]*\)\s*\{{", t, re.M))
     rx = re.compile(r"\b(?:" + "|".join(sorted(map(re.escape, syms))) + r")\b")
     hit = {f for f, (t, _) in _fp_texts.items() if rx.search(t)}
     hdrs = {f.name for f in hit if f.suffix == ".h"}
