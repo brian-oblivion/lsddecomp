@@ -97,8 +97,8 @@ void ReleaseBasicClassArray(BasicClass **array, s32 count) {
     }
 }
 
-void SetBMemPMgrBusy(s32 val) {
-    gBMemPMgrBusy = val;
+void SetBMemPMgrBusy(s32 busy) {
+    gBMemPMgrBusy = busy;
 }
 
 s32 GetBMemPMgrBusy(void) {
@@ -241,8 +241,8 @@ void StoreSxyPolyG4(void *dst, s32 storeFirst3);
 void SortTmdObject(GsDOBJ2 *obj, GsOT *ot, s32 otShift, void *scratch) {
     PolyDrawCtx *ctx;
     u8 *prim;
-    u8 *list;
-    s32 remaining;
+    u8 *packet;
+    s32 packetsLeft;
     s32 dpShift;
 
     if ((s32)obj->attribute < 0) {
@@ -256,8 +256,8 @@ void SortTmdObject(GsDOBJ2 *obj, GsOT *ot, s32 otShift, void *scratch) {
     InitVtxRecordPtrs(ctx->divVtx3, gPolySubmitTableTri, 3);
     InitVtxRecordPtrs(ctx->divVtx4, gPolySubmitTableQuad, 4);
 
-    remaining = OBJ_TMD(obj)->primn;
-    list = (u8 *)OBJ_TMD(obj)->primtop;
+    packetsLeft = OBJ_TMD(obj)->primn;
+    packet = (u8 *)OBJ_TMD(obj)->primtop;
     ctx->vertices = (SVECTOR *)OBJ_TMD(obj)->vertop;
     ctx->normals = (SVECTOR *)OBJ_TMD(obj)->nortop;
 
@@ -304,21 +304,21 @@ void SortTmdObject(GsDOBJ2 *obj, GsOT *ot, s32 otShift, void *scratch) {
     }
     ctx->dpShift = dpShift;
 
-    if (remaining == 0) {
+    if (packetsLeft == 0) {
         return;
     }
 
     {
-        void (*cbG3)(void *) = StoreSxyPolyG3;
+        void (*storeSxyG3)(void *) = StoreSxyPolyG3;
 
         do {
             s32 count;
 
             prim = GsOUT_PACKET_P;
-            ctx->packetType = ((TmdGroupHeader *)list)->type & 0xFD07;
-            count = ((TmdGroupHeader *)list)->count;
-            ctx->semiTrans = (*(u32 *)list >> 25) & 0x1;
-            remaining -= count;
+            ctx->packetType = ((TmdGroupHeader *)packet)->type & 0xFD07;
+            count = ((TmdGroupHeader *)packet)->count;
+            ctx->semiTrans = (*(u32 *)packet >> 25) & 0x1;
+            packetsLeft -= count;
 
             /* Thirteen Psy-Q primitive flavours, one case each, in ascending
              * tag order. GCC 2.6.3 expands a switch over sparse values as a
@@ -336,7 +336,7 @@ void SortTmdObject(GsDOBJ2 *obj, GsOT *ot, s32 otShift, void *scratch) {
                     prim[3] = 4;
                     prim[7] = 0x20;
                     SetupPrimCode(prim, ctx);
-                    elem = list + offsetof(TMD_P_F3, r0);
+                    elem = packet + offsetof(TMD_P_F3, r0);
                 loopA:
                     if (ProjectTriFace(prim, ctx, PKT->v0, PKT->v1, PKT->v2, StoreSxyPolyF3) == 0) {
                         gte_ldv0(&ctx->normals[PKT->n0]);
@@ -347,7 +347,7 @@ void SortTmdObject(GsDOBJ2 *obj, GsOT *ot, s32 otShift, void *scratch) {
                         prim = SubmitPolyF3(prim, ctx);
                     }
                     elem += sizeof(TMD_P_F3);
-                    list += sizeof(TMD_P_F3);
+                    packet += sizeof(TMD_P_F3);
                     if (--count != 0)
                         goto loopA;
                     break;
@@ -364,15 +364,15 @@ void SortTmdObject(GsDOBJ2 *obj, GsOT *ot, s32 otShift, void *scratch) {
                     prim[3] = 6;
                     prim[7] = 0x30;
                     SetupPrimCode(prim, ctx);
-                    elem = list + offsetof(TMD_P_F3G, r2);
+                    elem = packet + offsetof(TMD_P_F3G, r2);
                 loopB:
-                    if (ProjectTriFace(prim, ctx, PKT->v0, PKT->v1, PKT->v2, cbG3) == 0) {
+                    if (ProjectTriFace(prim, ctx, PKT->v0, PKT->v1, PKT->v2, storeSxyG3) == 0) {
                         gte_ldv0(&ctx->normals[PKT->n0]);
-                        gte_ldrgb(&((TMD_P_F3G *)list)->r0);
+                        gte_ldrgb(&((TMD_P_F3G *)packet)->r0);
                         gte_ncds();
                         gte_strgb(&POLY->r0);
                         prim[7] = ctx->primCode;
-                        gte_ldrgb(&((TMD_P_F3G *)list)->r1);
+                        gte_ldrgb(&((TMD_P_F3G *)packet)->r1);
                         gte_ncds();
                         gte_strgb(&POLY->r1);
                         gte_ldrgb(&PKT->r2);
@@ -381,7 +381,7 @@ void SortTmdObject(GsDOBJ2 *obj, GsOT *ot, s32 otShift, void *scratch) {
                         prim = SubmitPolyG3(prim, ctx);
                     }
                     elem += sizeof(TMD_P_F3G);
-                    list += sizeof(TMD_P_F3G);
+                    packet += sizeof(TMD_P_F3G);
                     if (--count != 0)
                         goto loopB;
                     break;
@@ -398,7 +398,7 @@ void SortTmdObject(GsDOBJ2 *obj, GsOT *ot, s32 otShift, void *scratch) {
                     prim[3] = 4;
                     prim[7] = 0x20;
                     SetupPrimCode(prim, ctx);
-                    elem = list + offsetof(TMD_P_NF3, r0);
+                    elem = packet + offsetof(TMD_P_NF3, r0);
                 loopC:
                     if (ProjectTriFace(prim, ctx, PKT->v0, PKT->v1, PKT->v2, StoreSxyPolyF3) == 0) {
                         gte_ldrgb(&PKT->r0);
@@ -408,7 +408,7 @@ void SortTmdObject(GsDOBJ2 *obj, GsOT *ot, s32 otShift, void *scratch) {
                         prim = SubmitPolyF3(prim, ctx);
                     }
                     elem += sizeof(TMD_P_NF3);
-                    list += sizeof(TMD_P_NF3);
+                    packet += sizeof(TMD_P_NF3);
                     if (--count != 0)
                         goto loopC;
                     break;
@@ -427,7 +427,7 @@ void SortTmdObject(GsDOBJ2 *obj, GsOT *ot, s32 otShift, void *scratch) {
                     prim[7] = 0x24;
                     SetupPrimCode(prim, ctx);
                     gte_ldrgb(&ctx->faceColor);
-                    elem = list + offsetof(TMD_P_TF3, n0);
+                    elem = packet + offsetof(TMD_P_TF3, n0);
                 loopD:
                     if (ProjectTriFace(prim, ctx, PKT->v0, PKT->v1, PKT->v2, StoreSxyPolyFT3) == 0) {
                         *(u32 *)&POLY->u0 = *(u32 *)&PKT->tu0;
@@ -441,7 +441,7 @@ void SortTmdObject(GsDOBJ2 *obj, GsOT *ot, s32 otShift, void *scratch) {
                         prim = SubmitPolyFT3(prim, ctx);
                     }
                     elem += sizeof(TMD_P_TF3);
-                    list += sizeof(TMD_P_TF3);
+                    packet += sizeof(TMD_P_TF3);
                     if (--count != 0)
                         goto loopD;
                     break;
@@ -458,7 +458,7 @@ void SortTmdObject(GsDOBJ2 *obj, GsOT *ot, s32 otShift, void *scratch) {
                     prim[3] = 7;
                     prim[7] = 0x24;
                     SetupPrimCode(prim, ctx);
-                    elem = list + offsetof(TMD_P_TNF3, r0);
+                    elem = packet + offsetof(TMD_P_TNF3, r0);
                 loopE:
                     if (ProjectTriFace(prim, ctx, PKT->v0, PKT->v1, PKT->v2, StoreSxyPolyFT3) == 0) {
                         *(u32 *)&POLY->u0 = *(u32 *)&PKT->tu0;
@@ -472,7 +472,7 @@ void SortTmdObject(GsDOBJ2 *obj, GsOT *ot, s32 otShift, void *scratch) {
                         prim = SubmitPolyFT3(prim, ctx);
                     }
                     elem += sizeof(TMD_P_TNF3);
-                    list += sizeof(TMD_P_TNF3);
+                    packet += sizeof(TMD_P_TNF3);
                     if (--count != 0)
                         goto loopE;
                     break;
@@ -489,7 +489,7 @@ void SortTmdObject(GsDOBJ2 *obj, GsOT *ot, s32 otShift, void *scratch) {
                     prim[3] = 5;
                     prim[7] = 0x28;
                     SetupPrimCode(prim, ctx);
-                    elem = list + offsetof(TMD_P_F4, r0);
+                    elem = packet + offsetof(TMD_P_F4, r0);
                 loopF:
                     if (ProjectQuadFace(prim, ctx, PKT->v0, PKT->v1, PKT->v2, PKT->v3,
                                         StoreSxyPolyF4) == 0) {
@@ -501,7 +501,7 @@ void SortTmdObject(GsDOBJ2 *obj, GsOT *ot, s32 otShift, void *scratch) {
                         prim = SubmitPolyF4(prim, ctx);
                     }
                     elem += sizeof(TMD_P_F4);
-                    list += sizeof(TMD_P_F4);
+                    packet += sizeof(TMD_P_F4);
                     if (--count != 0)
                         goto loopF;
                     break;
@@ -518,7 +518,7 @@ void SortTmdObject(GsDOBJ2 *obj, GsOT *ot, s32 otShift, void *scratch) {
                     prim[3] = 5;
                     prim[7] = 0x28;
                     SetupPrimCode(prim, ctx);
-                    elem = list + offsetof(TMD_P_NF4, r0);
+                    elem = packet + offsetof(TMD_P_NF4, r0);
                 loopG:
                     if (ProjectQuadFace(prim, ctx, PKT->v0, PKT->v1, PKT->v2, PKT->v3,
                                         StoreSxyPolyF4) == 0) {
@@ -529,7 +529,7 @@ void SortTmdObject(GsDOBJ2 *obj, GsOT *ot, s32 otShift, void *scratch) {
                         prim = SubmitPolyF4(prim, ctx);
                     }
                     elem += sizeof(TMD_P_NF4);
-                    list += sizeof(TMD_P_NF4);
+                    packet += sizeof(TMD_P_NF4);
                     if (--count != 0)
                         goto loopG;
                     break;
@@ -547,7 +547,7 @@ void SortTmdObject(GsDOBJ2 *obj, GsOT *ot, s32 otShift, void *scratch) {
                     prim[7] = 0x2C;
                     SetupPrimCode(prim, ctx);
                     gte_ldrgb(&ctx->faceColor);
-                    elem = list + offsetof(TMD_P_TF4, n0);
+                    elem = packet + offsetof(TMD_P_TF4, n0);
                 loopH:
                     if (ProjectQuadFace(prim, ctx, PKT->v0, PKT->v1, PKT->v2, PKT->v3,
                                         StoreSxyPolyFT4) == 0) {
@@ -563,7 +563,7 @@ void SortTmdObject(GsDOBJ2 *obj, GsOT *ot, s32 otShift, void *scratch) {
                         prim = SubmitPolyFT4(prim, ctx);
                     }
                     elem += sizeof(TMD_P_TF4);
-                    list += sizeof(TMD_P_TF4);
+                    packet += sizeof(TMD_P_TF4);
                     if (--count != 0)
                         goto loopH;
                     break;
@@ -580,7 +580,7 @@ void SortTmdObject(GsDOBJ2 *obj, GsOT *ot, s32 otShift, void *scratch) {
                     prim[3] = 9;
                     prim[7] = 0x2C;
                     SetupPrimCode(prim, ctx);
-                    elem = list + offsetof(TMD_P_TNF4, r0);
+                    elem = packet + offsetof(TMD_P_TNF4, r0);
                 loopI:
                     if (ProjectQuadFace(prim, ctx, PKT->v0, PKT->v1, PKT->v2, PKT->v3,
                                         StoreSxyPolyFT4) == 0) {
@@ -596,7 +596,7 @@ void SortTmdObject(GsDOBJ2 *obj, GsOT *ot, s32 otShift, void *scratch) {
                         prim = SubmitPolyFT4(prim, ctx);
                     }
                     elem += sizeof(TMD_P_TNF4);
-                    list += sizeof(TMD_P_TNF4);
+                    packet += sizeof(TMD_P_TNF4);
                     if (--count != 0)
                         goto loopI;
                     break;
@@ -612,9 +612,9 @@ void SortTmdObject(GsDOBJ2 *obj, GsOT *ot, s32 otShift, void *scratch) {
                     prim[3] = 6;
                     prim[7] = 0x30;
                     SetupPrimCode(prim, ctx);
-                    elem = list + offsetof(TMD_P_NG3, r0);
+                    elem = packet + offsetof(TMD_P_NG3, r0);
                 loopJ:
-                    if (ProjectTriFace(prim, ctx, PKT->v0, PKT->v1, PKT->v2, cbG3) == 0) {
+                    if (ProjectTriFace(prim, ctx, PKT->v0, PKT->v1, PKT->v2, storeSxyG3) == 0) {
                         gte_ldrgb3c(&PKT->r0);
                         gte_dpct();
                         gte_strgb3_g3(prim);
@@ -622,7 +622,7 @@ void SortTmdObject(GsDOBJ2 *obj, GsOT *ot, s32 otShift, void *scratch) {
                         prim = SubmitPolyG3(prim, ctx);
                     }
                     elem += sizeof(TMD_P_NG3);
-                    list += sizeof(TMD_P_NG3);
+                    packet += sizeof(TMD_P_NG3);
                     if (--count != 0)
                         goto loopJ;
                     break;
@@ -638,21 +638,21 @@ void SortTmdObject(GsDOBJ2 *obj, GsOT *ot, s32 otShift, void *scratch) {
                     prim[3] = 9;
                     prim[7] = 0x34;
                     SetupPrimCode(prim, ctx);
-                    elem = list + offsetof(TMD_P_TNG3, r2);
+                    elem = packet + offsetof(TMD_P_TNG3, r2);
                 loopK:
                     if (ProjectTriFace(prim, ctx, PKT->v0, PKT->v1, PKT->v2, StoreSxyPolyGT3) == 0) {
                         *(u32 *)&POLY->u0 = *(u32 *)&PKT->tu0;
                         *(u32 *)&POLY->u1 = *(u32 *)&PKT->tu1;
                         *(u32 *)&POLY->u2 = *(u32 *)&PKT->tu2;
                         ADD_CLUT_ROWS(prim, ctx->dp >> ctx->dpShift);
-                        gte_ldrgb3(&((TMD_P_TNG3 *)list)->r0, &((TMD_P_TNG3 *)list)->r1, &PKT->r2);
+                        gte_ldrgb3(&((TMD_P_TNG3 *)packet)->r0, &((TMD_P_TNG3 *)packet)->r1, &PKT->r2);
                         gte_dpct();
                         gte_strgb3(&POLY->r0, &POLY->r1, &POLY->r2);
                         prim[7] = ctx->primCode;
                         prim = SubmitPolyGT3(prim, ctx);
                     }
                     elem += sizeof(TMD_P_TNG3);
-                    list += sizeof(TMD_P_TNG3);
+                    packet += sizeof(TMD_P_TNG3);
                     if (--count != 0)
                         goto loopK;
                     break;
@@ -670,11 +670,11 @@ void SortTmdObject(GsDOBJ2 *obj, GsOT *ot, s32 otShift, void *scratch) {
                     prim[3] = 8;
                     prim[7] = 0x38;
                     SetupPrimCode(prim, ctx);
-                    elem = list + offsetof(TMD_P_NG4, r3);
+                    elem = packet + offsetof(TMD_P_NG4, r3);
                 loopL:
                     if (ProjectQuadFace(prim, ctx, PKT->v0, PKT->v1, PKT->v2, PKT->v3,
                                         StoreSxyPolyG4) == 0) {
-                        gte_ldrgb3c(&((TMD_P_NG4 *)list)->r0);
+                        gte_ldrgb3c(&((TMD_P_NG4 *)packet)->r0);
                         gte_dpct();
                         gte_strgb3_g3(prim);
                         prim[7] = ctx->primCode;
@@ -684,7 +684,7 @@ void SortTmdObject(GsDOBJ2 *obj, GsOT *ot, s32 otShift, void *scratch) {
                         prim = SubmitPolyG4(prim, ctx);
                     }
                     elem += sizeof(TMD_P_NG4);
-                    list += sizeof(TMD_P_NG4);
+                    packet += sizeof(TMD_P_NG4);
                     if (--count != 0)
                         goto loopL;
                     break;
@@ -702,7 +702,7 @@ void SortTmdObject(GsDOBJ2 *obj, GsOT *ot, s32 otShift, void *scratch) {
                     prim[3] = 0xC;
                     prim[7] = 0x3C;
                     SetupPrimCode(prim, ctx);
-                    elem = list + offsetof(TMD_P_TNG4, r3);
+                    elem = packet + offsetof(TMD_P_TNG4, r3);
                 loopM:
                     if (ProjectQuadFace(prim, ctx, PKT->v0, PKT->v1, PKT->v2, PKT->v3,
                                         StoreSxyPolyGT4) == 0) {
@@ -711,8 +711,8 @@ void SortTmdObject(GsDOBJ2 *obj, GsOT *ot, s32 otShift, void *scratch) {
                         *(u32 *)&POLY->u2 = *(u32 *)&PKT->tu2;
                         *(u32 *)&POLY->u3 = *(u32 *)&PKT->tu3;
                         ADD_CLUT_ROWS(prim, ctx->dp >> ctx->dpShift);
-                        gte_ldrgb3(&((TMD_P_TNG4 *)list)->r0, &((TMD_P_TNG4 *)list)->r1,
-                                   &((TMD_P_TNG4 *)list)->r2);
+                        gte_ldrgb3(&((TMD_P_TNG4 *)packet)->r0, &((TMD_P_TNG4 *)packet)->r1,
+                                   &((TMD_P_TNG4 *)packet)->r2);
                         gte_dpct();
                         gte_strgb3(&POLY->r0, &POLY->r1, &POLY->r2);
                         prim[7] = ctx->primCode;
@@ -722,7 +722,7 @@ void SortTmdObject(GsDOBJ2 *obj, GsOT *ot, s32 otShift, void *scratch) {
                         prim = SubmitPolyGT4(prim, ctx);
                     }
                     elem += sizeof(TMD_P_TNG4);
-                    list += sizeof(TMD_P_TNG4);
+                    packet += sizeof(TMD_P_TNG4);
                     if (--count != 0)
                         goto loopM;
                     break;
@@ -735,7 +735,7 @@ void SortTmdObject(GsDOBJ2 *obj, GsOT *ot, s32 otShift, void *scratch) {
             }
 
             GsOUT_PACKET_P = prim;
-        } while (remaining != 0);
+        } while (packetsLeft != 0);
     }
 }
 
