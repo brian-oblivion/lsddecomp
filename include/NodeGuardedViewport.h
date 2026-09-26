@@ -4,31 +4,35 @@
 #include "Viewport.h"
 
 /*
- * NodeGuardedViewport -- class id 0x17, method table gNodeGuardedViewportMethods: Viewport's
- * subclass (its ctor chains to GetViewportMethods()->ctor first, so the id
- * tree 0x7 -> 0x17 is the ctor chain). Methods in src/class_3bb8c_c.c. No
- * class derives from it. Its one construction site is Class865C8__Class865C8
- * (src/class_39e08.c), which stores it as the viewport of an
- * IntermediateBase init argument block (IntermediateBaseInitArgs +0x010;
- * which class_39e08.h once viewed as Obj0C::unk10); IntermediateBase reaches it only through
- * Viewport's slots.
+ * NodeGuardedViewport -- a Viewport that skips its frame while no view node
+ * is attached (class id 0x17, method table gNodeGuardedViewportMethods). Its
+ * ctor chains to Viewport's (GetViewportMethods()->ctor) first. Methods in
+ * src/class_3bb8c_c.c. No class derives from it.
  *
- * What it changes, from its own methods (`classtable.py gNodeGuardedViewportMethods
- * --vs gViewportMethods`):
- *  - +0x040 initDefaults is empty (NodeGuardedViewport__InitDefaults), so the
- *    Viewport ctor's closing initDefaults call writes none of Viewport's
- *    defaults for this class;
- *  - +0x09C update (NodeGuardedViewport__Update) calls Viewport__Update only when
- *    viewNode and otReady are both set. Viewport__Update checks otReady
- *    itself but dereferences viewNode unguarded, so the override's addition
- *    is the NULL viewNode guard;
- *  - four own slots, +0x0B8..+0x0C4, hold empty functions with no known
- *    caller.
- * That is not enough to say what the viewport is for in the game, so the
- * name stays the table's address.
+ * What it changes (`classtable.py gNodeGuardedViewportMethods --vs
+ * gViewportMethods`):
+ *  - update (+0x09C, NodeGuardedViewport__Update) calls Viewport__Update
+ *    only when viewNode and otReady are both set. Viewport__Update checks
+ *    otReady itself but dereferences viewNode and refView.super, which
+ *    RemoveChild clears, so the override is what lets the viewport run
+ *    detached;
+ *  - initDefaults (+0x040) is empty. The Viewport ctor runs under
+ *    Viewport's own table, so Viewport__InitDefaults has already written
+ *    every default by the time this ctor installs its table and calls
+ *    initDefaults again; the override makes that second call a no-op;
+ *  - four own slots, +0x0B8..+0x0C4, hold empty functions nothing calls.
  *
- * The object is 0xDC bytes (New_NodeGuardedViewport); nothing reads or writes the
- * own range +0x0BC..+0x0DC in any C or carved asm that types it.
+ * Lifecycle: Class865C8__Class865C8 (src/class_39e08.c), the one
+ * construction site, builds it as its IntermediateBaseInitArgs' viewport.
+ * Class865C8__Init hands it to the DreamSys (setViewport), and ObjM, built
+ * from the same init args, drives it through Viewport's slots: InitStyleAndWorld
+ * and SetupSceneStyle detach and re-attach the DreamSys as the view node,
+ * EnterStyleSession sets its light mode, clear colour, fog and far colour and
+ * enables drawing, and ExitSceneStyle detaches the view node and leaves it
+ * detached -- the state the update guard covers.
+ *
+ * The object is 0xDC bytes (New_NodeGuardedViewport); nothing reads or
+ * writes the own range +0x0BC..+0x0DC.
  */
 
 typedef struct NodeGuardedViewport NodeGuardedViewport;
@@ -37,18 +41,18 @@ typedef struct NodeGuardedViewportMethods NodeGuardedViewportMethods;
 /* Viewport's slots, then this class's own. The overrides of inherited
  * slots are the ctor, initDefaults and update (see the banner). */
 /* clang-format off */
-#define NODEGUARDEDVIEWPORT_SLOTS(Self, CtorParams)                                                         \
-    VIEWPORT_SLOTS(Self, CtorParams);                                                              \
-    /* +0x0B8 */ void (*slotB8)(void); /* NodeGuardedViewport__NoOpSlotB8, empty; no known caller */                 \
-    /* +0x0BC */ void (*slotBC)(void); /* NodeGuardedViewport__NoOpSlotBC, empty; no known caller */                 \
-    /* +0x0C0 */ void (*slotC0)(void); /* NodeGuardedViewport__NoOpSlotC0, empty; no known caller */                 \
-    /* +0x0C4 */ void (*slotC4)(void)  /* NodeGuardedViewport__NoOpSlotC4, empty; no known caller */
+#define NODEGUARDEDVIEWPORT_SLOTS(Self, CtorParams)                                                   \
+    VIEWPORT_SLOTS(Self, CtorParams);                                                                 \
+    /* +0x0B8 */ void (*slotB8)(void); /* NodeGuardedViewport__NoOpSlotB8, empty; nothing calls it */ \
+    /* +0x0BC */ void (*slotBC)(void); /* NodeGuardedViewport__NoOpSlotBC, empty; nothing calls it */ \
+    /* +0x0C0 */ void (*slotC0)(void); /* NodeGuardedViewport__NoOpSlotC0, empty; nothing calls it */ \
+    /* +0x0C4 */ void (*slotC4)(void)  /* NodeGuardedViewport__NoOpSlotC4, empty; nothing calls it */
 /* clang-format on */
 
 /* clang-format off */
-#define NODEGUARDEDVIEWPORT_FIELDS(Methods)                                                                 \
-    VIEWPORT_FIELDS(Methods);                                                                      \
-    /* +0x0BC */ u8 pad0BC[0x0DC - 0x0BC] /* no accessor; the object is 0xDC bytes (New_NodeGuardedViewport) */
+#define NODEGUARDEDVIEWPORT_FIELDS(Methods)                                           \
+    VIEWPORT_FIELDS(Methods);                                                         \
+    /* +0x0BC */ u8 pad0BC[0x0DC - 0x0BC] /* no accessor; the object is 0xDC bytes */
 /* clang-format on */
 
 struct NodeGuardedViewportMethods {
