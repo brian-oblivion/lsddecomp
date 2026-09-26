@@ -43,9 +43,9 @@ below); retyping the field itself was cleaner and is arguably the more
 honest reading anyway -- nothing suggests this quantity is ever negative.
 
 **`ObjA34_179D8H` is a local type, not an extension of
-`code_171e0.h`'s `Class6D430`**, even though the offsets coincide
+`code_171e0.h`'s `FileResource`**, even though the offsets coincide
 suspiciously well: `self->isOpen` (offset +0x0C) lines up with
-`Class6D430::pendingGeneration` (same offset, "saved/restored around the
+`FileResource::pendingGeneration` (same offset, "saved/restored around the
 buffer (re)alloc"), and `self->size` falls inside that struct's
 `pad18[0x20-0x18]` gap (explicitly documented there as "unknown, 8 bytes").
 Extending the shared header would require splitting that padding without
@@ -124,7 +124,7 @@ reasoning.
   `(x >> 11) + 1) << 11` rounding on a size query) around the identical
   `CdSearchFile`/`CdControl`+`CdSync` sequence this unit's own `OpenCdFile`
   uses. Not derived from this function's body in isolation.
-- **Note on the `Class6D430::pendingGeneration` coincidence (see `## Notes`
+- **Note on the `FileResource::pendingGeneration` coincidence (see `## Notes`
   above): the SEMANTICS now look different, not just the offset.**
   `pendingGeneration` is documented in `code_171e0.h` as "saved/restored
   around the buffer (re)alloc" (implying a counter), while this unit's

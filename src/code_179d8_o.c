@@ -3,17 +3,17 @@
  * of CdDriver, the CD-ROM data source (include/CdDriver.h; method table
  * gCdDriverMethods, header word 0x13 = code_171e0.c's DATASOURCE_CD).
  * vram 0x800271D8..0x800272D0. `tools/classtable.py gCdDriverMethods --vs
- * D_8006D430` shows this unit's four functions as:
+ * gFileResourceMethods` shows this unit's four functions as:
  *   New_CdDriver          allocates 0x2C bytes, dispatches table +0x008
- *   CdDriver__CdDriver    +0x008: Class6D430 ctor, own table, InitCdDrive
+ *   CdDriver__CdDriver    +0x008: FileResource ctor, own table, InitCdDrive
  *   CdDriver__Finalize    +0x00C: cancelRequests (+0x074), freeBuffer (+0x05C)
- *   CdDriver__NoOpSlot40  +0x040: empty; null in Class6D430's table
+ *   CdDriver__NoOpSlot40  +0x040: empty; null in FileResource's table
  * The class's other methods are in code_179d8_s.c and code_179d8_q.c.
  */
 #include "common.h"
 #include "CdDriver.h"
 
-#define CDDRIVER_SIZE 0x2C /* New_CdDriver's BMemPMgrAlloc request: Class6D430's size */
+#define CDDRIVER_SIZE 0x2C /* New_CdDriver's BMemPMgrAlloc request: FileResource's size */
 
 extern void *BMemPMgrAlloc(s32 size); /* Psy-Q allocator, matched signature used project-wide */
 extern void InitCdDrive(void); /* code_179d8_q: one-shot CdSetDebug(0) + CdlSetmode double speed */
@@ -30,7 +30,7 @@ CdDriver *New_CdDriver(void) {
 }
 
 void CdDriver__CdDriver(CdDriver *self) {
-    GetClass6D430Methods()->ctor((Class6D430 *)self);
+    GetFileResourceMethods()->ctor((FileResource *)self);
     self->methods = GetCdDriverMethods();
     self->inQueueDispatch = 0;
     InitCdDrive();

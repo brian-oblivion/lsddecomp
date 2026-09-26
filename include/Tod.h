@@ -1,10 +1,10 @@
 #ifndef TOD_H
 #define TOD_H
 
-#include "Class6D430.h"
+#include "FileResource.h"
 
 /*
- * Tod -- a Class6D430 data source (class id 0x4F03, method table gTodMethods)
+ * Tod -- a FileResource data source (class id 0x4F03, method table gTodMethods)
  * over one TOD animation's packet stream. Methods in src/code_33808.c; one
  * subclass, TodSet (gTodSetMethods, 0x14F03), whose ctor calls this class's
  * first (TodSet__TodSet: GetTodMethods()->ctor(self, arg)) and whose
@@ -21,13 +21,13 @@
  * PARENT BY CTOR CHAIN, NOT BY ID. The id 0x4F03 puts it under TimBlockSrc
  * (0xF03), but Tod__Tod's first call is GetActiveDataSourceMethods()->ctor,
  * as TimBlockSrc__TimBlockSrc's is: it is TimBlockSrc's sibling under
- * Class6D430 and carries none of TimBlockSrc's layout (include/TimBlockSrc.h).
+ * FileResource and carries none of TimBlockSrc's layout (include/TimBlockSrc.h).
  *
- * NO OWN FIELDS. The object is 0x2C bytes (New_Tod), Class6D430's own size;
+ * NO OWN FIELDS. The object is 0x2C bytes (New_Tod), FileResource's own size;
  * TodSet's is 0x2C too (New_TodSet). Everything a Tod reads is in the
  * adopted or loaded `buffer`.
  *
- * +0x078 is Class6D430's slot78 (NULL there): this table's occupant is
+ * +0x078 is FileResource's slot78 (NULL there): this table's occupant is
  * Tod__ScanPackets(self, out, sel), u8, which runs +0x07C over the buffer
  * past its first two words (TodSet's occupant runs it past its counted
  * array); ModelData__ForwardScanPackets casts it (an inherited slot keeps
@@ -49,14 +49,14 @@ typedef struct TodMethods TodMethods;
  * do not need the s32 the unit-local view had (round 86). */
 /* clang-format off */
 #define TOD_SLOTS(Self, CtorParams)                                                                \
-    CLASS6D430_SLOTS(Self, CtorParams);                                                            \
+    FILERESOURCE_SLOTS(Self, CtorParams);                                                            \
     /* +0x07C */ u8 (*scanTodPackets)(Self *self, u8 *out, u32 *sel, u32 *data); /* ScanTodPackets, in both tables */ \
     /* +0x080 */ u32 *(*decodePacketWord)(Self *self, u32 *acc, u8 *out0, u8 *out1, u8 *out2, u8 *out3) /* DecodeTodPacketWord, in both tables */
 /* clang-format on */
 
 /* clang-format off */
 #define TOD_FIELDS(Methods)                                                                        \
-    CLASS6D430_FIELDS(Methods) /* no own fields: the object is 0x2C bytes (New_Tod), and so is TodSet's (New_TodSet) */
+    FILERESOURCE_FIELDS(Methods) /* no own fields: the object is 0x2C bytes (New_Tod), and so is TodSet's (New_TodSet) */
 /* clang-format on */
 
 struct TodMethods {

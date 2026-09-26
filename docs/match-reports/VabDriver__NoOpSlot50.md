@@ -21,7 +21,7 @@ void VabDriver__NoOpSlot50(void)
 ## Naming (round 77, charlie -- track 3, no rename)
 
 `tools/classtable.py 0x8006D9BC` confirms this is the `+0x050` slot of
-`gVabDriverMethods` (29-slot Class6D430-derived table, `code_179d8_e.c`,
+`gVabDriverMethods` (29-slot FileResource-derived table, `code_179d8_e.c`,
 the SPU/VAB driver base class) -- physically carved into code_179d8_d.c by
 ROM address, semantically owned by that other unit. `code_179d8_e.c`'s own
 `VabDriverMethods` struct comment leaves this slot and its siblings
@@ -31,11 +31,11 @@ covers +0x000..+0x054 with no per-slot field). Kept `func_`, not renamed.
 ## Track 4 (2026-09-26, round 87, alpha): renamed `func_8002C400` -> `VabDriver__NoOpSlot50`
 
 Named for its slot, FINISHING-PLAN track 4 step 6. `classtable.py
-gVabDriverMethods --vs D_8006D430` puts this function at `+0x050`, one of
-Class6D430's run-time-bound driver-interface slots (`include/Class6D430.h`
+gVabDriverMethods --vs gFileResourceMethods` puts this function at `+0x050`, one of
+FileResource's run-time-bound driver-interface slots (`include/FileResource.h`
 names it `slot50`; the CD driver's occupant is `CdDriver__NoOpSlot50`).
 `SetActiveDataSource` (code_171e0.c) copies the active driver's interface
-slots into Class6D430's table and every client table, and takes this table
+slots into FileResource's table and every client table, and takes this table
 (`GetVabDriverMethods()`) whenever `gActiveDataSource != DATASOURCE_CD`, so
 when the SPU/VAB source is active every `methods->slot50(...)` in the game
 reaches this body. The purpose evidence the tier-C verdict above lacked is

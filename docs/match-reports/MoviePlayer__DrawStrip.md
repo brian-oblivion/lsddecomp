@@ -15,8 +15,8 @@ Table slot (`tools/classtable.py`): gMoviePlayerMethods +0x060.
 
 ## Source
 
-The unit-local views `DataSrc33808` (Class6D430 subclass via the unified
-`CLASS6D430_SLOTS`/`CLASS6D430_FIELDS` macros plus `slot7C`/`slot80` and own
+The unit-local views `DataSrc33808` (FileResource subclass via the unified
+`FILERESOURCE_SLOTS`/`FILERESOURCE_FIELDS` macros plus `slot7C`/`slot80` and own
 fields +0x2C..+0x38), `Ctor33808` and `CountedBuf33808` sit at the top of
 `src/code_33808.c`.
 

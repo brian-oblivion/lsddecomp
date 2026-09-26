@@ -24,17 +24,17 @@ void TimImage__func_8003B5B4(void) {
 The unit-local view it needs, from the top of `src/code_2bb9c.c`:
 
 ```c
-#include "Class6D430.h"
+#include "FileResource.h"
 
 typedef struct TimImage {
-    CLASS6D430_FIELDS(Class6D430Methods);
+    FILERESOURCE_FIELDS(FileResourceMethods);
     /* +0x02C */ u8 pad2C[0x1C];
     /* +0x048 */ s32 unk48;
 } TimImage;
 
 typedef struct GsIMAGE GsIMAGE;
 void GsGetTimInfo(u32 *im, GsIMAGE *tim);
-extern Class6D430Methods gTimImageMethods;
+extern FileResourceMethods gTimImageMethods;
 ```
 
 ## Naming

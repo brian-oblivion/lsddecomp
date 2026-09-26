@@ -1,16 +1,16 @@
 #ifndef CDDRIVER_H
 #define CDDRIVER_H
 
-#include "Class6D430.h"
+#include "FileResource.h"
 
 /*
  * CdDriver -- the CD-ROM data-source driver (class id 0x13 = DATASOURCE_CD,
- * method table gCdDriverMethods), a Class6D430 subclass and VabDriver's
+ * method table gCdDriverMethods), a FileResource subclass and VabDriver's
  * (gVabDriverMethods, 0x23) sibling; and, below the class, the request
  * queue, the file table and the module state its units share (track 4b,
  * round 85).
  *
- *   src/code_179d8_o.c  New_CdDriver, the ctor (Class6D430's ctor, then
+ *   src/code_179d8_o.c  New_CdDriver, the ctor (FileResource's ctor, then
  *                       InitCdDrive), Finalize, NoOpSlot40
  *   src/code_179d8_s.c  Open, Close, Seek, NoOpSlot50, Read, LoadFile,
  *                       RunRequestQueue: each enqueues a CD_OP_* request, or
@@ -27,19 +27,19 @@
  *
  * THE DRIVER RUNS ON OTHER CLASSES' OBJECTS. Nothing calls New_CdDriver.
  * SetActiveDataSource (src/code_171e0.c) copies this table's eleven
- * interface slots (+0x040..+0x058, +0x068..+0x074) into Class6D430's table
+ * interface slots (+0x040..+0x058, +0x068..+0x074) into FileResource's table
  * and every client table, so `self` in Open/Read/... is whatever
- * Class6D430 object called its own `open`/`read` (a TimImage, a TodSet,
+ * FileResource object called its own `open`/`read` (a TimImage, a TodSet,
  * ...), and a queued request's `owner` is that object. That is why the
  * fields the methods use -- isOpen, buffer, bufferSize, pos, size,
- * freeGuard, pendingRequests, flags, inQueueDispatch -- are all Class6D430's
+ * freeGuard, pendingRequests, flags, inQueueDispatch -- are all FileResource's
  * (pos and size, +0x018/+0x01C, were its pad18 until round 88), and the
- * object has no own fields: New_CdDriver allocates 0x2C bytes, Class6D430's
+ * object has no own fields: New_CdDriver allocates 0x2C bytes, FileResource's
  * size.
  *
  * Every own method is named for its slot (`classtable.py gCdDriverMethods
- * --vs D_8006D430`); the slot names are Class6D430's, which were named for
- * these occupants. Slot types are Class6D430's too. Where the old local
+ * --vs gFileResourceMethods`); the slot names are FileResource's, which were named for
+ * these occupants. Slot types are FileResource's too. Where the old local
  * views disagreed (open/close/loadFile/setFlag/stopService returning s32,
  * read's buf as s32), the occupants return void / take void * and the
  * bytes did not move when the views were replaced.
@@ -51,13 +51,13 @@ typedef struct CdDriver CdDriver;
 typedef struct CdDriverMethods CdDriverMethods;
 
 struct CdDriverMethods {
-    CLASS6D430_SLOTS(CdDriver, (CdDriver * self));
-    /* The table is 29 slots and ends after +0x074 (Class6D430's slot78 is
+    FILERESOURCE_SLOTS(CdDriver, (CdDriver * self));
+    /* The table is 29 slots and ends after +0x074 (FileResource's slot78 is
      * the next table's header). */
 };
 
 struct CdDriver {
-    CLASS6D430_FIELDS(CdDriverMethods);
+    FILERESOURCE_FIELDS(CdDriverMethods);
 }; /* 0x2C bytes: New_CdDriver */
 
 extern CdDriverMethods gCdDriverMethods;
@@ -96,7 +96,7 @@ typedef struct CdRequestNode {
     /* +0x00 */ s32 active;      /* set by StartCdOperation when the op starts */
     /* +0x04 */ s32 unk4;        /* zeroed at allocation; nonzero ORs flags bit 0 */
     /* +0x08 */ s32 op;          /* CD_OP_* */
-    /* +0x0C */ CdDriver *owner; /* the requesting object (any Class6D430 client) */
+    /* +0x0C */ CdDriver *owner; /* the requesting object (any FileResource client) */
     /* +0x10 */ s32 fileIndex;   /* FindCdFileIndex's index, 0 if none */
     /* +0x14 */ s32 param0;
     /* +0x18 */ s32 param1;

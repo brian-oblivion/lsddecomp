@@ -15,8 +15,8 @@ Table slot (`tools/classtable.py`): gTodMethods +0x008.
 
 ## Source
 
-The unit-local views `DataSrc33808` (Class6D430 subclass via the unified
-`CLASS6D430_SLOTS`/`CLASS6D430_FIELDS` macros plus `slot7C`/`slot80` and own
+The unit-local views `DataSrc33808` (FileResource subclass via the unified
+`FILERESOURCE_SLOTS`/`FILERESOURCE_FIELDS` macros plus `slot7C`/`slot80` and own
 fields +0x2C..+0x38), `Ctor33808` and `CountedBuf33808` sit at the top of
 `src/code_33808.c`.
 
@@ -27,7 +27,7 @@ typedef struct Src6F240 {
 } Src6F240;
 
 void Tod__Tod(DataSrc33808 *self, Src6F240 *src) {
-    GetActiveDataSourceMethods()->ctor((Class6D430 *)self);
+    GetActiveDataSourceMethods()->ctor((FileResource *)self);
     self->methods = GetTodMethods();
     if (src->buffer != NULL) {
         self->buffer = src->buffer;
@@ -49,4 +49,4 @@ First build. The else branch reuses the just-stored table pointer (GCC CSE of `s
 
 ## Track 4 (2026-09-26, round 86, charlie)
 
-`self` is now `Tod *` (include/Tod.h), no longer the unit-local `DataSrc33808 *`; `self->methods = GetTodMethods()` is a `TodMethods *` and `setFlag`/`requestLoadFile` are Class6D430's inherited slots. Bytes unchanged.
+`self` is now `Tod *` (include/Tod.h), no longer the unit-local `DataSrc33808 *`; `self->methods = GetTodMethods()` is a `TodMethods *` and `setFlag`/`requestLoadFile` are FileResource's inherited slots. Bytes unchanged.

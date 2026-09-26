@@ -23,7 +23,7 @@ sound (a bare getter returning the class's method table, used as
 `self->methods = ...()` in the ctor), but the SPELLING invented a third
 style for a construct that already has two on `main`: `Get_vtable_X` (5
 occurrences) and `GetXMethods` (7, including `GetClass6B5CCMethods` and
-`GetClass6D430Methods` for address-derived class names). FINISHING-PLAN
+`GetFileResourceMethods` for address-derived class names). FINISHING-PLAN
 track 3 says do not invent a new style, so the head renamed it to
 `GetClass6E99CMethods`, the closer of the two precedents because this
 class's name is address-derived. Tier A unchanged; image byte-identical.

@@ -15,8 +15,8 @@ Table slot (`tools/classtable.py`): gTimArraySrcMethods +0x064 (setFlag override
 
 ## Source
 
-The unit-local views `DataSrc33808` (Class6D430 subclass via the unified
-`CLASS6D430_SLOTS`/`CLASS6D430_FIELDS` macros plus `slot7C`/`slot80` and own
+The unit-local views `DataSrc33808` (FileResource subclass via the unified
+`FILERESOURCE_SLOTS`/`FILERESOURCE_FIELDS` macros plus `slot7C`/`slot80` and own
 fields +0x2C..+0x38), `Ctor33808`, `CountedBuf33808` and `Req44858` sit at the
 top of / earlier in `src/code_33808.c`.
 
@@ -45,19 +45,19 @@ typedef struct Image43CB8 {      /* LIBGS.H GsIMAGE */
 typedef struct Tim43CB8 Tim43CB8;
 
 typedef struct TimMethods43CB8 {
-    CLASS6D430_SLOTS(Tim43CB8, (Tim43CB8 *self, char *name));
+    FILERESOURCE_SLOTS(Tim43CB8, (Tim43CB8 *self, char *name));
     /* +0x07C */ u8 pad7C[0x20];
     /* +0x09C */ void (*getTimInfo)(Tim43CB8 *self, Image43CB8 *info);
 } TimMethods43CB8;
 
 struct Tim43CB8 {                /* TimImage (code_2bb9c.c) */
-    CLASS6D430_FIELDS(TimMethods43CB8);
+    FILERESOURCE_FIELDS(TimMethods43CB8);
     /* +0x02C */ u8 pad2C[0x20];
     /* +0x04C */ s32 clutBase;
 };
 
 typedef struct Obj43CB8 {
-    CLASS6D430_FIELDS(DataSrc33808Methods);
+    FILERESOURCE_FIELDS(DataSrc33808Methods);
     /* +0x02C */ s32 count;
     /* +0x030 */ Tim43CB8 **images;
     /* +0x034 */ s32 base;
@@ -89,7 +89,7 @@ void TimArraySrc__BuildImages(Obj43CB8 *self) {
                 objs++;
             }
             self->ready = 1;
-            GetActiveDataSourceMethods()->setFlag((Class6D430 *)self);
+            GetActiveDataSourceMethods()->setFlag((FileResource *)self);
         }
     }
 }
@@ -97,7 +97,7 @@ void TimArraySrc__BuildImages(Obj43CB8 *self) {
 
 ## Notes
 
-First build. The GsIMAGE local (0x1C bytes) is what gives retail's 0x50 frame. Local views: `Image43CB8` (LIBGS.H GsIMAGE, same layout as code_2bb9c.c's local GsIMAGE), `Tim43CB8`/`TimMethods43CB8` (TimImage as this function sees it: Class6D430 plus +0x09C getTimInfo and +0x04C), `Obj43CB8` (gTimArraySrcMethods's +0x2C..+0x38). New_TimImage is prototyped locally returning the local view, as class_3bb8c_d.c does.
+First build. The GsIMAGE local (0x1C bytes) is what gives retail's 0x50 frame. Local views: `Image43CB8` (LIBGS.H GsIMAGE, same layout as code_2bb9c.c's local GsIMAGE), `Tim43CB8`/`TimMethods43CB8` (TimImage as this function sees it: FileResource plus +0x09C getTimInfo and +0x04C), `Obj43CB8` (gTimArraySrcMethods's +0x2C..+0x38). New_TimImage is prototyped locally returning the local view, as class_3bb8c_d.c does.
 
 ## Naming
 

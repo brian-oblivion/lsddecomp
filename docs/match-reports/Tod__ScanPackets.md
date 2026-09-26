@@ -15,8 +15,8 @@ Table slot (`tools/classtable.py`): gTodMethods +0x078.
 
 ## Source
 
-The unit-local view `DataSrc33808` (a Class6D430 subclass built with the unified
-`CLASS6D430_SLOTS`/`CLASS6D430_FIELDS` macros, plus `slot7C`/`slot80`, and own
+The unit-local view `DataSrc33808` (a FileResource subclass built with the unified
+`FILERESOURCE_SLOTS`/`FILERESOURCE_FIELDS` macros, plus `slot7C`/`slot80`, and own
 fields +0x2C..+0x38) and `CountedBuf33808` sit at the top of `src/code_33808.c`.
 Slot +0x078 is `void *slot78` in the unified macro, so calls cast it.
 
@@ -29,7 +29,7 @@ u8 Tod__ScanPackets(DataSrc33808 *self, s32 arg1, s32 arg2) {
 
 ## Notes
 
-- No shared header was edited. `Class6D430.h`, `Class6B5CC.h`, `BasicClass.h` are
+- No shared header was edited. `FileResource.h`, `Class6B5CC.h`, `BasicClass.h` are
   included; prototypes for other units' functions (GetActiveDataSourceMethods,
   ReleaseBasicClassArray, BMemPMgrFree) are local to the unit.
 - Types of arguments and returns are readings of the registers used, not proven.
@@ -40,4 +40,4 @@ u8 Tod__ScanPackets(DataSrc33808 *self, s32 arg1, s32 arg2) {
 
 ## Track 4 (2026-09-26, round 86, charlie)
 
-Now `u8 Tod__ScanPackets(Tod *self, u8 *out, u32 *sel)` (include/Tod.h): the two pass-through arguments are ScanTodPackets' `out`/`sel`, and it calls the named slot `scanTodPackets` (+0x07C) instead of the unprototyped `slot7C`. The slot is typed `u8` as its occupant is; cc1 still emits the trailing `andi 0xFF` over a u8 slot result, so the s32 the old view gave it was not what the bytes needed. The function itself sits in Class6D430's `slot78`, which keeps its name; ModelData__ForwardScanPackets casts it. Bytes unchanged.
+Now `u8 Tod__ScanPackets(Tod *self, u8 *out, u32 *sel)` (include/Tod.h): the two pass-through arguments are ScanTodPackets' `out`/`sel`, and it calls the named slot `scanTodPackets` (+0x07C) instead of the unprototyped `slot7C`. The slot is typed `u8` as its occupant is; cc1 still emits the trailing `andi 0xFF` over a u8 slot result, so the s32 the old view gave it was not what the bytes needed. The function itself sits in FileResource's `slot78`, which keeps its name; ModelData__ForwardScanPackets casts it. Bytes unchanged.

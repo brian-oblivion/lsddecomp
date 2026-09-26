@@ -15,8 +15,8 @@ Table slot (`tools/classtable.py`): none (not in any table).
 
 ## Source
 
-The unit-local view `DataSrc33808` (a Class6D430 subclass built with the unified
-`CLASS6D430_SLOTS`/`CLASS6D430_FIELDS` macros, plus `slot7C`/`slot80`, and own
+The unit-local view `DataSrc33808` (a FileResource subclass built with the unified
+`FILERESOURCE_SLOTS`/`FILERESOURCE_FIELDS` macros, plus `slot7C`/`slot80`, and own
 fields +0x2C..+0x38) and `CountedBuf33808` sit at the top of `src/code_33808.c`.
 
 ```c
@@ -27,7 +27,7 @@ typedef struct Buf434DC {
     /* +0x14 */ u32 vals[1];
 } Buf434DC;
 
-u32 MaxOfBufferWords(Class6D430 *self) {
+u32 MaxOfBufferWords(FileResource *self) {
     Buf434DC *buf = self->buffer;
     u32 i;
     u32 max = 0;

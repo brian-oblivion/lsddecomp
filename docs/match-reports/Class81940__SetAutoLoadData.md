@@ -9,17 +9,17 @@ FINISHING-PLAN revision 18). Fresh ground, no prior attempt. Byte-exact on
 the first build; whole-image SHA1 green.
 
 - **Where:** slot +0x088 of gClass81940Methods (`tools/classtable.py gClass81940Methods`).
-- **What:** setter: stores the second argument at `self+0x38`. The object is a local view `DataSrc39094` (Class6D430 fields from the unified `include/Class6D430.h`, then `pad2C[0xC]`, `s32 autoLoadData`).
+- **What:** setter: stores the second argument at `self+0x38`. The object is a local view `DataSrc39094` (FileResource fields from the unified `include/FileResource.h`, then `pad2C[0xC]`, `s32 autoLoadData`).
 - **Levers:** none needed.
 - **Name:** kept `func_`; role not yet identified beyond the above.
 
 ## Source
 
 ```c
-/* The gClass81940Methods object: a Class6D430 data source with its own fields from
+/* The gClass81940Methods object: a FileResource data source with its own fields from
  * +0x2C (local view; only this unit's methods read them). */
 typedef struct DataSrc39094 {
-    CLASS6D430_FIELDS(Class6D430Methods);
+    FILERESOURCE_FIELDS(FileResourceMethods);
     /* +0x02C */ u8 pad2C[0xC];
     /* +0x038 */ s32 autoLoadData;
 } DataSrc39094;
@@ -48,4 +48,4 @@ void Class81940__SetAutoLoadData(DataSrc39094 *self, s32 value) {
 
 ## Track 4 (2026-09-26, round 87)
 
-Renamed `DataSrc39094__SetAutoLoadData` -> `Class81940__SetAutoLoadData` with `rename.py` (class rename only; +0x088, the last slot). Its one caller is Class866E8__Class866E8, forwarding its own arg2. The class (method table gClass81940Methods, id 0x903, a Class6D430 subclass) was named `Class81940` for its table address, 0x80081940 (renamed from `D_80081940` to `gClass81940Methods`), as Class6D940 is (FINISHING-PLAN track 4 step 2); the old `DataSrc39094` was the unit's local view name, and dropping its unit suffix leaves `DataSrc`, which every Class6D430 subclass is. The unified definition is `include/Class81940.h`.
+Renamed `DataSrc39094__SetAutoLoadData` -> `Class81940__SetAutoLoadData` with `rename.py` (class rename only; +0x088, the last slot). Its one caller is Class866E8__Class866E8, forwarding its own arg2. The class (method table gClass81940Methods, id 0x903, a FileResource subclass) was named `Class81940` for its table address, 0x80081940 (renamed from `D_80081940` to `gClass81940Methods`), as Class6D940 is (FINISHING-PLAN track 4 step 2); the old `DataSrc39094` was the unit's local view name, and dropping its unit suffix leaves `DataSrc`, which every FileResource subclass is. The unified definition is `include/Class81940.h`.

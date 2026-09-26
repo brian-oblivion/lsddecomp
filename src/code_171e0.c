@@ -1,12 +1,12 @@
 /*
- * code_171e0 -- Class6D430's own module, plus an active-data-source
+ * code_171e0 -- FileResource's own module, plus an active-data-source
  * dispatch layer built on top of it.
  *
- * Class6D430 (include/Class6D430.h) is the data-source base class: a
- * BasicClass subclass holding one file buffer (buffer/bufferSize, managed by
- * Class6D430__LoadFile/FreeBuffer) plus a flags word, and declaring the file-
- * I/O interface the CD driver (gCdDriverMethods) and the SPU/VAB driver
- * (gVabDriverMethods) implement; sixteen classes derive from it.
+ * FileResource (include/FileResource.h) is the base of every class the
+ * game loads from a file: a BasicClass subclass owning one file buffer
+ * (FileResource__LoadFile reads a whole named file into it, FreeBuffer
+ * releases it) and declaring the file-I/O interface that the CD driver
+ * (gCdDriverMethods) and the SPU/VAB driver (gVabDriverMethods) implement.
  *
  * Most of this unit's remaining functions dispatch between those same two
  * sibling classes by `gActiveDataSource` (DATASOURCE_CD/DATASOURCE_SPU,
@@ -37,7 +37,7 @@ Class6D3C8Methods *GetClass6D3C8Methods(void) {
     return &D_8006D3C8;
 }
 
-void *Class6D430__Release(Class6D430 *this) {
+void *FileResource__Release(FileResource *this) {
     this->freeGuard = 0;
     this->methods->finalize(this);
     Get_vtable_BasicClass()->finalize((BasicClass *)this);
@@ -45,9 +45,9 @@ void *Class6D430__Release(Class6D430 *this) {
     return NULL;
 }
 
-void Class6D430__Class6D430(Class6D430 *this) {
+void FileResource__FileResource(FileResource *this) {
     Get_vtable_BasicClass()->ctor((BasicClass *)this);
-    this->methods = GetClass6D430Methods();
+    this->methods = GetFileResourceMethods();
     this->isOpen = 0;
     this->buffer = NULL;
     this->bufferSize = 0;
@@ -58,12 +58,12 @@ void Class6D430__Class6D430(Class6D430 *this) {
     this->unk2A = 0;
 }
 
-void Class6D430__Finalize(Class6D430 *this) {
+void FileResource__Finalize(FileResource *this) {
     this->methods->close(this);
     this->methods->freeBuffer(this);
 }
 
-void Class6D430__LoadFile(Class6D430 *this, char *name) {
+void FileResource__LoadFile(FileResource *this, char *name) {
     s32 savedPendingGeneration;
     s32 size;
     void *newRes;
@@ -89,7 +89,7 @@ void Class6D430__LoadFile(Class6D430 *this, char *name) {
     }
 }
 
-void Class6D430__FreeBuffer(Class6D430 *this) {
+void FileResource__FreeBuffer(FileResource *this) {
     if (this->buffer == NULL) {
         return;
     }
@@ -105,12 +105,12 @@ void Class6D430__FreeBuffer(Class6D430 *this) {
 
 void NoOp(void) {}
 
-void Class6D430__SetFlag(Class6D430 *this) {
+void FileResource__SetFlag(FileResource *this) {
     this->flags |= 1;
 }
 
-Class6D430Methods *GetClass6D430Methods(void) {
-    return &D_8006D430;
+FileResourceMethods *GetFileResourceMethods(void) {
+    return &gFileResourceMethods;
 }
 
 extern s32 gActiveDataSource;
@@ -131,23 +131,23 @@ Vec3_171e0 *SetVec3(Vec3_171e0 *this, s32 x, s32 y, s32 z) {
 }
 
 /* Install a new active data source, then copy its method block
- * (CopyDataSourceSlots) into Class6D430's own table and into the table of
+ * (CopyDataSourceSlots) into FileResource's own table and into the table of
  * every registered client. The label+goto loop is retail's layout (jump into a
  * bottom test); every while/for spelling tried came out top-tested. */
 void SetActiveDataSource(s32 arg0) {
-    Class6D430Methods *src;
-    Class6D430Methods *methods;
+    FileResourceMethods *src;
+    FileResourceMethods *methods;
     void *(*getMethods)(void);
     void *(**entry)(void);
 
     entry = gDataSourceClientGetters;
     gActiveDataSource = arg0;
     if (arg0 == DATASOURCE_CD) {
-        src = (Class6D430Methods *)GetCdDriverMethods();
+        src = (FileResourceMethods *)GetCdDriverMethods();
     } else {
-        src = (Class6D430Methods *)GetVabDriverMethods();
+        src = (FileResourceMethods *)GetVabDriverMethods();
     }
-    methods = GetClass6D430Methods();
+    methods = GetFileResourceMethods();
     goto copy;
 next:
     entry++;
@@ -163,7 +163,7 @@ copy:
 /* Copy the eleven data-source interface slots of one method table into
  * another: SetActiveDataSource's rebinding step. +0x05C..+0x064 are the
  * base's own and are not copied. */
-void CopyDataSourceSlots(Class6D430Methods *dst, Class6D430Methods *src) {
+void CopyDataSourceSlots(FileResourceMethods *dst, FileResourceMethods *src) {
     dst->slot40 = src->slot40;
     dst->open = src->open;
     dst->close = src->close;

@@ -14,7 +14,7 @@ Record lookup: `gRecordIndexTable` is an s16 table of record indices; returns `&
 ## Source
 
 Declarations it needs are the local views at the top of `src/code_39094.c`
-(`D_80081940Obj`, `D_80081940Methods`, `Rec1C`) and `include/Class6D430.h`.
+(`D_80081940Obj`, `D_80081940Methods`, `Rec1C`) and `include/FileResource.h`.
 
 ```c
 Rec1C *GetRecordGroup(s32 index) {
@@ -25,7 +25,7 @@ Rec1C *GetRecordGroup(s32 index) {
 
 ## Notes
 
-- The unit now has a local `D_80081940Methods` view (CLASS6D430_SLOTS plus
+- The unit now has a local `D_80081940Methods` view (FILERESOURCE_SLOTS plus
   slots +0x07C..+0x084, +0x084 = Class81940__ReleaseDataBlock) and the object's
   `pad30[4]` is split into `s16 unk30` (init -1) and `u16 unk32`. Byte-neutral
   for the ten functions matched earlier this round (whole image green).

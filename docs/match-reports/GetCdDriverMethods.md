@@ -12,7 +12,7 @@ This function is the "get my own method table" accessor for the class whose
 vtable is `gCdDriverMethods` (29 slots, header word `0x13`, resolved with
 `tools/classtable.py gCdDriverMethods`). Slot map:
 
-- `+0x004` `Class6D430__Release` (own-class slot, shared with `D_8006D430` at the
+- `+0x004` `FileResource__Release` (own-class slot, shared with `gFileResourceMethods` at the
   identical offset)
 - `+0x008` `CdDriver__CdDriver` (ctor, by the project's `+0x008` convention)
 - `+0x00C` `CdDriver__Finalize` (dtor)
@@ -21,17 +21,17 @@ vtable is `gCdDriverMethods` (29 slots, header word `0x13`, resolved with
   `CdDriver__CancelRequests` (this unit's next three queued functions, at `+0x06C`/
   `+0x070`/`+0x074`)
 
-Compared against `D_8006D430` (`include/code_171e0.h`'s
-`Class6D430Methods`) with `classtable.py gCdDriverMethods --vs D_8006D430`:
-`Class6D430__Release` at `+0x004` and `Class6D430__FreeBuffer`/`NoOp`/
-`Class6D430__SetFlag` at identical offsets (`+0x05C`/`+0x060`/`+0x064`) are shared
+Compared against `gFileResourceMethods` (`include/code_171e0.h`'s
+`FileResourceMethods`) with `classtable.py gCdDriverMethods --vs gFileResourceMethods`:
+`FileResource__Release` at `+0x004` and `FileResource__FreeBuffer`/`NoOp`/
+`FileResource__SetFlag` at identical offsets (`+0x05C`/`+0x060`/`+0x064`) are shared
 between the two tables, strongly suggesting `gCdDriverMethods`'s class is a
-subclass or close sibling of `D_8006D430`'s, inheriting the same BasicClass
+subclass or close sibling of `gFileResourceMethods`'s, inheriting the same BasicClass
 slot block and several of the same concrete method implementations.
 
 `GetCdDriverMethods` itself is the same "return my own vtable's address"
 accessor the project already names elsewhere: `GetClass6D3C8Methods` for
-`D_8006D3C8` and `GetClass6D430Methods` for `D_8006D430` (both in
+`D_8006D3C8` and `GetFileResourceMethods` for `gFileResourceMethods` (both in
 `include/code_171e0.h`'s doc comment).
 
 ## The C
@@ -69,7 +69,7 @@ Round 51 (alpha), FINISHING-PLAN track 3.
 **Evidence.** A two-instruction address-of: it returns `&gCdDriverMethods`, this
 class's own 29-slot method table. A pure leaf whose mechanics are its
 purpose, so tier A by the plan's own rule. The same accessor shape
-`GetClass6D3C8Methods` has for `D_8006D3C8` and `GetClass6D430Methods` for `D_8006D430`.
+`GetClass6D3C8Methods` has for `D_8006D3C8` and `GetFileResourceMethods` for `gFileResourceMethods`.
 
 **The class token `Class6D4E8` is deliberate, and this is the report that
 says why.** What the class IS, is now well evidenced: every method reachable
@@ -101,4 +101,4 @@ worse than a placeholder" bites hardest is exactly here, and the existing
 placeholder CLASS, evidence-based METHOD.
 
 
-Track 4, 2026-09-26 (round 88). The class of gCdDriverMethods (was D_8006D4E8, id 0x13 = DATASOURCE_CD) is CdDriver, in include/CdDriver.h: its ctor calls InitCdDrive, its slots enqueue CD_OP_* requests and drive the CD read state machine, and it is VabDriver's sibling. The object views this function was typed against are replaced by CdDriver, whose fields are all Class6D430's (the driver runs on its clients' objects; Class6D430's +0x018/+0x01C were named pos/size for it). Byte-identical. `GetClass6D4E8Methods` -> `GetCdDriverMethods` by rename.py. Now returns `CdDriverMethods *` (`&gCdDriverMethods`), not `s32 *`.
+Track 4, 2026-09-26 (round 88). The class of gCdDriverMethods (was D_8006D4E8, id 0x13 = DATASOURCE_CD) is CdDriver, in include/CdDriver.h: its ctor calls InitCdDrive, its slots enqueue CD_OP_* requests and drive the CD read state machine, and it is VabDriver's sibling. The object views this function was typed against are replaced by CdDriver, whose fields are all FileResource's (the driver runs on its clients' objects; FileResource's +0x018/+0x01C were named pos/size for it). Byte-identical. `GetClass6D4E8Methods` -> `GetCdDriverMethods` by rename.py. Now returns `CdDriverMethods *` (`&gCdDriverMethods`), not `s32 *`.

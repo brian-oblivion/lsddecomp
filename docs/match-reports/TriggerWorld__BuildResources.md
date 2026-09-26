@@ -17,8 +17,8 @@ Table slot (`tools/classtable.py`): gTriggerWorldMethods +0x078.
 
 ## Source
 
-The unit-local views `DataSrc33808` (Class6D430 subclass via the unified
-`CLASS6D430_SLOTS`/`CLASS6D430_FIELDS` macros plus `slot7C`/`slot80` and own
+The unit-local views `DataSrc33808` (FileResource subclass via the unified
+`FILERESOURCE_SLOTS`/`FILERESOURCE_FIELDS` macros plus `slot7C`/`slot80` and own
 fields +0x2C..+0x38), `Ctor33808`, `CountedBuf33808` and `Req44858` sit at the
 top of / earlier in `src/code_33808.c`.
 
@@ -70,7 +70,7 @@ First build. The loop pointer walks `buf->entries` while the offset is re-read t
 
 ## Track 4 (2026-09-26, round 88, bravo)
 
-Renamed from `TriggerWorld__BuildParts`. It occupies +0x078, Class6D430's
+Renamed from `TriggerWorld__BuildParts`. It occupies +0x078, FileResource's
 unnamed `slot78` that ModelData's own table fills with
 ModelData__BuildResources; this is TriggerWorld's override of that same step
 (build its resources, 0 on success, release and 1 on failure), and its

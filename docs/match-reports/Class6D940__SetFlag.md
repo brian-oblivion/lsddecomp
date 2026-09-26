@@ -33,14 +33,14 @@ table `Class6D940__Finalize` uses.
 
 Renamed `func_8002C238 -> Class6D940__SetFlag`, tier B (mechanics, not
 purpose). Occupies `+0x064` of `D_8006D940` -- the exact slot
-`Class6D430__SetFlag` fills in the base class (`tools/classtable.py
+`FileResource__SetFlag` fills in the base class (`tools/classtable.py
 0x8006D430`) and its own verbatim-shared copy in `gCdDriverMethods`
 (`tools/classtable.py 0x8006D4E8`). Named by SLOT POSITION, not by
 asserted behavior: this override does NOT just OR in a flag bit like the
-base -- it sets `self[0xC]` (offset 0x30, a field beyond `Class6D430`'s
+base -- it sets `self[0xC]` (offset 0x30, a field beyond `FileResource`'s
 own layout) then forwards through `GetActiveDataSourceMethods()->slot64(self)`.
 That mechanics difference is why this is tier B and not A.
 
 ## Track 4 (2026-09-26, round 87, echo)
 
-Now `void Class6D940__SetFlag(Class6D940 *self)`, the type of slot +0x064 (`setFlag`, include/Class6D430.h), byte-identical. `self[0xC]` is `loaded` (+0x030), zeroed by the ctor. `BaseTable6D940` was the active driver's table, `Class6D430Methods`; the call is `GetActiveDataSourceMethods()->setFlag`.
+Now `void Class6D940__SetFlag(Class6D940 *self)`, the type of slot +0x064 (`setFlag`, include/FileResource.h), byte-identical. `self[0xC]` is `loaded` (+0x030), zeroed by the ctor. `BaseTable6D940` was the active driver's table, `FileResourceMethods`; the call is `GetActiveDataSourceMethods()->setFlag`.

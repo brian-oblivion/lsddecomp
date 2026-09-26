@@ -33,7 +33,7 @@ void Class6D940__Class6D940(Obj6D940 *self, s32 arg1)
 Structurally identical to a class-framework ctor-chain (base ctor call,
 own vtable install, field reset, conditional post-init dispatch) --
 **and IS one**: round-77 correction, `D_8006D940` is a real 30-slot
-Class6D430-derived vtable (see the unit header comment). `Obj6D940` (the
+FileResource-derived vtable (see the unit header comment). `Obj6D940` (the
 0x34-byte allocated object, matching `New_Class6D940`'s own alloc size)
 added as a new unit-local type with only the two fields this function
 touches (`unk2C`, `unk30`) plus the `methods` pointer at offset 0.
@@ -43,7 +43,7 @@ touches (`unk2C`, `unk30`) plus the `methods` pointer at offset 0.
 Renamed `func_8002C18C -> Class6D940__Class6D940`, tier A. `+0x008` (ctor)
 slot of `D_8006D940`, confirmed by `tools/classtable.py 0x8006D940`. Matches
 the `Class__Class` ctor convention exactly, same slot position as
-`Class6D430__Class6D430` and `VabStreamObj__VabStreamObj`. Also renamed the
+`FileResource__FileResource` and `VabStreamObj__VabStreamObj`. Also renamed the
 unit-local types `Table6D940 -> Class6D940Methods`, `Obj6D940 -> Class6D940`
 by hand (not splat symbols, so outside `rename.py`'s scope) for consistency
 with the confirmed class-framework reading; this report's code block above
@@ -52,4 +52,4 @@ history.
 
 ## Track 4 (2026-09-26, round 87, echo)
 
-Now `(Class6D940 *self, char *name)`: slot6C is Class6D430's +0x06C `requestLoadFile(self, name)`, and slot08 of the active table is `ctor`. The two zeroed fields are `linkResource` (+0x02C) and `loaded` (+0x030). Byte-identical.
+Now `(Class6D940 *self, char *name)`: slot6C is FileResource's +0x06C `requestLoadFile(self, name)`, and slot08 of the active table is `ctor`. The two zeroed fields are `linkResource` (+0x02C) and `loaded` (+0x030). Byte-identical.

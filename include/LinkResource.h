@@ -1,10 +1,10 @@
 #ifndef LINKRESOURCE_H
 #define LINKRESOURCE_H
 
-#include "Class6D430.h"
+#include "FileResource.h"
 
 /*
- * LinkResource -- a Class6D430 data source (class id 0xD03, method table
+ * LinkResource -- a FileResource data source (class id 0xD03, method table
  * gLinkResourceMethods) over one loaded TMD file: it builds one TmdModel
  * (include/TmdModel.h) per object of the TMD and hands them out by index.
  * Methods in src/code_33808.c; no subclasses.
@@ -26,17 +26,17 @@
  *
  * Its parent ctor is the active driver's (GetActiveDataSourceMethods()->ctor,
  * chosen at run time; see include/ModelData.h), so the fields below assume
- * Class6D430's own 0x2C-byte layout. The object is 0x30 bytes
+ * FileResource's own 0x2C-byte layout. The object is 0x30 bytes
  * (New_LinkResource).
  *
- * Inherited slots keep Class6D430's names and types; this table's occupants
+ * Inherited slots keep FileResource's names and types; this table's occupants
  * differ from them in two places, and the callers cast:
  *   +0x008 ctor: LinkResource__LinkResource returns self, or NULL when the
  *          buffer it adopted fails to build (New_LinkResource tests it,
  *          through code_33808.c's unprototyped Ctor33808 view).
  *   +0x064 setFlag: LinkResource__BuildModels(self), s32: 1 when an
  *          allocation fails, else 0 after the active driver's setFlag.
- *   +0x078 slot78 (NULL in Class6D430): LinkResource__MapModel(self).
+ *   +0x078 slot78 (NULL in FileResource): LinkResource__MapModel(self).
  *
  * The ctor's descriptor is code_33808.c's Src6F240 ({buffer to adopt, file
  * name to request}); only the tag is declared here. The callers outside
@@ -51,14 +51,14 @@ typedef struct LinkResource LinkResource;
 typedef struct LinkResourceMethods LinkResourceMethods;
 
 struct LinkResourceMethods {
-    CLASS6D430_SLOTS(LinkResource, (LinkResource * self, struct Src6F240 *src));
+    FILERESOURCE_SLOTS(LinkResource, (LinkResource * self, struct Src6F240 *src));
     /* +0x07C */ struct TmdObject *(*getTmdObject)(LinkResource *self, s32 index); /* LinkResource__GetTmdObject */
     /* +0x080 */ struct TmdModel *(*getModel)(LinkResource *self, s32 index); /* LinkResource__GetModel */
     /* +0x084 */ void (*slot84)(void); /* LinkResource__NoOp */
 };
 
 struct LinkResource {
-    CLASS6D430_FIELDS(LinkResourceMethods);
+    FILERESOURCE_FIELDS(LinkResourceMethods);
     /* +0x02C */ struct TmdModel **models; /* NULL-ended, one per TMD object (BuildModels); released and freed by Finalize */
 };
 

@@ -1,10 +1,10 @@
 #ifndef CLASS6D940_H
 #define CLASS6D940_H
 
-#include "Class6D430.h"
+#include "FileResource.h"
 
 /*
- * Class6D940 -- a Class6D430 data source (class id 0xE03, method table
+ * Class6D940 -- a FileResource data source (class id 0xE03, method table
  * D_8006D940) over a 20x20 grid of placement records. Methods in
  * src/code_179d8_d.c. No classes derive from it. Its getter is the first
  * entry of gDataSourceClientGetters, so SetActiveDataSource rebinds its
@@ -21,7 +21,7 @@
  * loaded resource, puts a LinkResource (gLinkResourceMethods) of the element's models
  * in `linkResource`, then calls +0x078 once per cell until it returns 0.
  *
- * +0x078 is Class6D430's slot78 (NULL there): this table's occupant is
+ * +0x078 is FileResource's slot78 (NULL there): this table's occupant is
  * Class6D940__ResolveEntry(self, placement, cell), s32. It reads cell
  * `cell`'s Class6D940Record (12 bytes each, from buffer +8; cell / 20 is
  * the row, cell % 20 the column), follows `next` for a second record in
@@ -69,13 +69,13 @@ typedef struct Class6D940Placement {
 typedef s32 (*Class6D940ResolveEntryFn)(Class6D940 *self, Class6D940Placement *placement, s32 cell);
 
 struct Class6D940Methods {
-    CLASS6D430_SLOTS(Class6D940, (Class6D940 * self, char *name));
-    /* +0x078 is Class6D430's slot78; this table's occupant is
+    FILERESOURCE_SLOTS(Class6D940, (Class6D940 * self, char *name));
+    /* +0x078 is FileResource's slot78; this table's occupant is
      * Class6D940__ResolveEntry (Class6D940ResolveEntryFn). */
 };
 
 struct Class6D940 {
-    CLASS6D430_FIELDS(Class6D940Methods);
+    FILERESOURCE_FIELDS(Class6D940Methods);
     /* +0x02C */ struct LinkResource *linkResource; /* the models' LinkResource (include/LinkResource.h); zeroed by the ctor */
     /* +0x030 */ s32 loaded; /* set by Class6D940__SetFlag; zeroed by the ctor */
 }; /* 0x34 bytes: New_Class6D940 */

@@ -15,8 +15,8 @@ Table slot (`tools/classtable.py`): gLinkResourceMethods +0x00C.
 
 ## Source
 
-The unit-local views `DataSrc33808` (Class6D430 subclass via the unified
-`CLASS6D430_SLOTS`/`CLASS6D430_FIELDS` macros plus `slot7C`/`slot80` and own
+The unit-local views `DataSrc33808` (FileResource subclass via the unified
+`FILERESOURCE_SLOTS`/`FILERESOURCE_FIELDS` macros plus `slot7C`/`slot80` and own
 fields +0x2C..+0x38), `Ctor33808` and `CountedBuf33808` sit at the top of
 `src/code_33808.c`.
 
@@ -31,7 +31,7 @@ void LinkResource__Finalize(DataSrc33808 *self) {
         objs++;
     }
     BMemPMgrFree((void *)self->unk2C);
-    GetActiveDataSourceMethods()->finalize((Class6D430 *)self);
+    GetActiveDataSourceMethods()->finalize((FileResource *)self);
 }
 ```
 
@@ -41,7 +41,7 @@ First build. A plain `while (*objs != NULL)` is rotated by GCC into the top-test
 
 ## Naming
 
-- **LinkResource__Finalize**, tier A. Class6D430 finalize override: releases every object in the NULL-ended array at +0x2C.
+- **LinkResource__Finalize**, tier A. FileResource finalize override: releases every object in the NULL-ended array at +0x2C.
 
 ## Track 4
 

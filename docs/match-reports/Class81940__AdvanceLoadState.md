@@ -33,7 +33,7 @@ void Class81940__AdvanceLoadState(DataSrc39094 *self) {
             self->unk2A = 0;
         }
     }
-    GetActiveDataSourceMethods()->setFlag((Class6D430 *)self);
+    GetActiveDataSourceMethods()->setFlag((FileResource *)self);
 }
 ```
 
@@ -56,8 +56,8 @@ does for the setFlag call), so the source call has no arguments.
 
 ## Proposed field names
 
-`self->unk2A` is NOT a `DataSrc39094`-local field: it is Class6D430's own
-last field (`include/Class6D430.h`, `/* +0x02A */ u16 unk2A`), a UNIFIED
+`self->unk2A` is NOT a `DataSrc39094`-local field: it is FileResource's own
+last field (`include/FileResource.h`, `/* +0x02A */ u16 unk2A`), a UNIFIED
 shared header this unit does not own and must not edit. This unit gives it a
 clear, consistent meaning across four of its own functions
 (Class81940__AdvanceLoadState, Class81940__CancelRequests, Class81940__LoadHeader,
@@ -67,12 +67,12 @@ block load in flight.
 - **Proposed name:** `loadState`
 - **Tier:** B (mechanics -- three-value state used consistently as a
   load-in-progress marker -- established only from this one subclass's
-  usage; Class6D430.h's own comment says only that it is the last field
+  usage; FileResource.h's own comment says only that it is the last field
   before a subclass's own fields start, with no meaning of its own).
 - **Evidence:** every read/write of `unk2A` in `src/code_39094.c` (this
   report; Class81940__CancelRequests, Class81940__LoadHeader,
   Class81940__LoadDataBlock).
-- **Caution for the head applying this:** Class6D430 has sixteen
+- **Caution for the head applying this:** FileResource has sixteen
   subclasses (`typeviews.py --tree`); this proposal is evidenced from ONE of
   them. Renaming the shared field is safe for the build (a name change alone
   is byte-neutral) but should be cross-checked against at least one other
@@ -81,4 +81,4 @@ block load in flight.
 
 ## Track 4 (2026-09-26, round 87)
 
-Renamed `DataSrc39094__SetFlag` -> `Class81940__AdvanceLoadState` with `rename.py`. The slot is +0x064, Class6D430's `setFlag`, which the CD driver calls when a request completes (src/code_179d8_s.c); the bit this body tests, 0x80, is that driver's CD_FLAG_READ_DONE. The body advances the load state (`unk2A` 9 -> 0 with the header ready, maybe starting the data block; 10 -> 0 with the data ready), which is what TimBlockSrc__AdvanceLoadState and VabStreamObj__AdvanceLoadState, the same slot's occupants in two siblings, were named for. Its no-argument call of +0x080 is kept through `Class81940LoadDataBlockNoArgFn` (include/Class81940.h): retail sets no $a0 for it. The class (method table gClass81940Methods, id 0x903, a Class6D430 subclass) was named `Class81940` for its table address, 0x80081940 (renamed from `D_80081940` to `gClass81940Methods`), as Class6D940 is (FINISHING-PLAN track 4 step 2); the old `DataSrc39094` was the unit's local view name, and dropping its unit suffix leaves `DataSrc`, which every Class6D430 subclass is. The unified definition is `include/Class81940.h`.
+Renamed `DataSrc39094__SetFlag` -> `Class81940__AdvanceLoadState` with `rename.py`. The slot is +0x064, FileResource's `setFlag`, which the CD driver calls when a request completes (src/code_179d8_s.c); the bit this body tests, 0x80, is that driver's CD_FLAG_READ_DONE. The body advances the load state (`unk2A` 9 -> 0 with the header ready, maybe starting the data block; 10 -> 0 with the data ready), which is what TimBlockSrc__AdvanceLoadState and VabStreamObj__AdvanceLoadState, the same slot's occupants in two siblings, were named for. Its no-argument call of +0x080 is kept through `Class81940LoadDataBlockNoArgFn` (include/Class81940.h): retail sets no $a0 for it. The class (method table gClass81940Methods, id 0x903, a FileResource subclass) was named `Class81940` for its table address, 0x80081940 (renamed from `D_80081940` to `gClass81940Methods`), as Class6D940 is (FINISHING-PLAN track 4 step 2); the old `DataSrc39094` was the unit's local view name, and dropping its unit suffix leaves `DataSrc`, which every FileResource subclass is. The unified definition is `include/Class81940.h`.

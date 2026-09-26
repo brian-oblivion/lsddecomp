@@ -196,7 +196,7 @@ object is not already open, it looks the name up (`FindCdFileEntry` on the
 async path, `BuildCdFilePath` + `CdSearchFile` on the blocking path), copies
 the entry's disc position and byte size into `self->pos`/`self->size`, seeks
 there (CdlSetloc) and sets `self->isOpen = 1`. The base-class caller
-`Class6D430__LoadFile` calls this slot first, with the file name, before
+`FileResource__LoadFile` calls this slot first, with the file name, before
 sizing and reading. Every path is "resolve a file by name and make it the
 open one", hence tier A. `arg2`/`arg3` are only passed through to the
 queued request and are not read otherwise, so they stay unnamed.
@@ -222,11 +222,11 @@ oracles green after.
 | `StatBuf80027` | -- | `CdFileInfo` | A | code_179d8_q's name for CdSearchFile's CdlFILE output |
 | `Node8008A894` | -- | `CdRequestNode` | A | code_179d8_r's name for the queue node |
 | `Class6D4E8` | `unk0C` | `isOpen` | A | set 1 by Open, 0 by Close; Seek/Read require it; code_179d8_h's name |
-| `Class6D4E8` | `unk10` | `buffer` | A | LoadFile's BMemPMgrAlloc result / read target; Class6D430's name |
-| `Class6D4E8` | `unk14` | `bufferSize` | A | LoadFile stores the sector-rounded read size; Class6D430's name |
+| `Class6D4E8` | `unk10` | `buffer` | A | LoadFile's BMemPMgrAlloc result / read target; FileResource's name |
+| `Class6D4E8` | `unk14` | `bufferSize` | A | LoadFile stores the sector-rounded read size; FileResource's name |
 | `Class6D4E8` | `unk18` | `pos` | A | the file's disc position, CdlSetloc target; code_179d8_h's name |
 | `Class6D4E8` | `unk1C` | `size` | A | the file's byte size from the entry / CdSearchFile; code_179d8_h's name |
-| `Class6D4E8` | `unk20` | `freeGuard` | B | Class6D430's name; here only: nonzero lets LoadFile reuse an existing buffer |
+| `Class6D4E8` | `unk20` | `freeGuard` | B | FileResource's name; here only: nonzero lets LoadFile reuse an existing buffer |
 | `Class6D4E8` | `unk22` | `pendingRequests` | A | code_179d8_q's name; RunRequestQueue decrements it per completion |
 | `Class6D4E8` | `unk24` | `flags` | A | code_179d8_q's name; only ORed with CD_FLAG_* bits |
 | `Class6D4E8` | `unk28` | `inQueueDispatch` | A | written only by the ctor (0) and RunRequestQueue (1 around the dispatch call, 0 after); every method starts its operation when set, enqueues when clear |
@@ -235,7 +235,7 @@ oracles green after.
 | `Class6D4E8Methods` | `slot4C` | `seek` | B | resolves to `CdDriver__Seek` |
 | `Class6D4E8Methods` | `slot54` | `read` | A | resolves to `CdDriver__Read` |
 | `Class6D4E8Methods` | `slot58` | `loadFile` | A | resolves to `CdDriver__LoadFile`; code_179d8_q's name |
-| `Class6D4E8Methods` | `slot64` | `setFlag` | A | resolves to `Class6D430__SetFlag` |
+| `Class6D4E8Methods` | `slot64` | `setFlag` | A | resolves to `FileResource__SetFlag` |
 | `Class6D4E8Methods` | `slot70` | `stopCdService` | A | resolves to `CdDriver__StopService` |
 | `CdFileEntry` | `pad0`/`unk14`/`unk18` | `name`/`pos`/`size` | A | code_179d8_q's CdFileEntry |
 | `CdFileInfo` | `unk0`/`unk4` | `pos`/`size` | A | code_179d8_q's CdFileInfo |
@@ -253,4 +253,4 @@ read here is the `gCdAsyncEnabled == 0 && D_8008A860 == 0` sync-mode test and
 nothing names the second mode.
 
 
-Track 4, 2026-09-26 (round 88). The class of gCdDriverMethods (was D_8006D4E8, id 0x13 = DATASOURCE_CD) is CdDriver, in include/CdDriver.h: its ctor calls InitCdDrive, its slots enqueue CD_OP_* requests and drive the CD read state machine, and it is VabDriver's sibling. The object views this function was typed against are replaced by CdDriver, whose fields are all Class6D430's (the driver runs on its clients' objects; Class6D430's +0x018/+0x01C were named pos/size for it). Byte-identical. `Class6D4E8__Open` -> `CdDriver__Open` by rename.py.
+Track 4, 2026-09-26 (round 88). The class of gCdDriverMethods (was D_8006D4E8, id 0x13 = DATASOURCE_CD) is CdDriver, in include/CdDriver.h: its ctor calls InitCdDrive, its slots enqueue CD_OP_* requests and drive the CD read state machine, and it is VabDriver's sibling. The object views this function was typed against are replaced by CdDriver, whose fields are all FileResource's (the driver runs on its clients' objects; FileResource's +0x018/+0x01C were named pos/size for it). Byte-identical. `Class6D4E8__Open` -> `CdDriver__Open` by rename.py.

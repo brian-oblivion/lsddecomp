@@ -15,7 +15,7 @@ the six assigned before `CdDriver__RunRequestQueue`.
  * Obj80027480/Methods80027480 view; re-verified the four sibling functions
  * that already matched against the earlier, narrower Obj80027480 still
  * match after this extension. */
-extern void Class6D430__LoadFile(void);
+extern void FileResource__LoadFile(void);
 extern void *gCdSavedSeekParam;
 
 /* generic doubly-linked-list node, 0x24 bytes (src/code_179d8_r.c's own
@@ -36,7 +36,7 @@ void CdDriver__LoadFile(Obj80027480 *self, char *arg1) {
     s32 v1;
 
     if (gCdAsyncEnabled == 0 && D_8008A860 == 0) {
-        Class6D430__LoadFile();
+        FileResource__LoadFile();
         self->unk24 |= 0x200;
         self->methods->slot64(self);
         return;
@@ -211,7 +211,7 @@ Round 79 (charlie), FINISHING-PLAN track 3.
 | --- | --- | --- |
 | `func_80027800` | `CdDriver__LoadFile` | A |
 
-**Evidence.** Overrides the base class's `+0x058` (`Class6D430__LoadFile`,
+**Evidence.** Overrides the base class's `+0x058` (`FileResource__LoadFile`,
 which does open/size/alloc/rewind/read/close through the slots above). Sync
 mode calls that base method, then ORs `CD_FLAG_LOAD_FILE_DONE` (0x200) and
 calls `setFlag`. Otherwise it enqueues op 7 (`CD_OP_LOAD_FILE`, the name
@@ -229,7 +229,7 @@ at slot `+0x058`. The prefix names the table, not the developers' class.
 
 ## Proposed field names
 
-For the head to apply by type scope (out of unit). `Class6D430__LoadFile`
+For the head to apply by type scope (out of unit). `FileResource__LoadFile`
 (code_171e0), the base method this function overrides and calls in sync
 mode, drives these slots in the order open, size query, alloc, rewind, read,
 close; the one class that fills them (`gCdDriverMethods`) fills them with the
@@ -237,14 +237,14 @@ methods named here.
 
 | unit | type | field | proposed | tier | evidence |
 | --- | --- | --- | --- | --- | --- |
-| include/code_171e0.h | `Class6D430Methods` | `configureBuffer` (+0x44) | `open` | A | called with the file name first; override is `CdDriver__Open` |
-| include/code_171e0.h | `Class6D430Methods` | `bufferControl` (+0x4C) | `seek` | B | called `(0, 2)` for the size and `(0, 0)` to rewind; override is `CdDriver__Seek` |
-| include/code_171e0.h | `Class6D430Methods` | `installBuffer` (+0x54) | `read` | A | called with the new buffer and its size; override is `CdDriver__Read` |
-| include/code_171e0.h | `Class6D430` | `pendingGeneration` (+0x0C) | `isOpen` | B | same offset as `Class6D4E8::isOpen`; AllocBuffer zeroes it before calling `open` (which opens only when it is 0) and restores it after `close` |
+| include/code_171e0.h | `FileResourceMethods` | `configureBuffer` (+0x44) | `open` | A | called with the file name first; override is `CdDriver__Open` |
+| include/code_171e0.h | `FileResourceMethods` | `bufferControl` (+0x4C) | `seek` | B | called `(0, 2)` for the size and `(0, 0)` to rewind; override is `CdDriver__Seek` |
+| include/code_171e0.h | `FileResourceMethods` | `installBuffer` (+0x54) | `read` | A | called with the new buffer and its size; override is `CdDriver__Read` |
+| include/code_171e0.h | `FileResource` | `pendingGeneration` (+0x0C) | `isOpen` | B | same offset as `Class6D4E8::isOpen`; AllocBuffer zeroes it before calling `open` (which opens only when it is 0) and restores it after `close` |
 
-Also noted for whoever names code_171e0 again: `Class6D430__LoadFile`
+Also noted for whoever names code_171e0 again: `FileResource__LoadFile`
 opens, sizes, allocates for, reads and closes a named file, i.e. it is the
 base-class LoadFile. Not renamed here (out of unit).
 
 
-Track 4, 2026-09-26 (round 88). The class of gCdDriverMethods (was D_8006D4E8, id 0x13 = DATASOURCE_CD) is CdDriver, in include/CdDriver.h: its ctor calls InitCdDrive, its slots enqueue CD_OP_* requests and drive the CD read state machine, and it is VabDriver's sibling. The object views this function was typed against are replaced by CdDriver, whose fields are all Class6D430's (the driver runs on its clients' objects; Class6D430's +0x018/+0x01C were named pos/size for it). Byte-identical. `Class6D4E8__LoadFile` -> `CdDriver__LoadFile` by rename.py. The arg-less Class6D430__LoadFile call goes through the LoadFileNoArgsFn cast (no code) now that Class6D430.h's prototype is in scope.
+Track 4, 2026-09-26 (round 88). The class of gCdDriverMethods (was D_8006D4E8, id 0x13 = DATASOURCE_CD) is CdDriver, in include/CdDriver.h: its ctor calls InitCdDrive, its slots enqueue CD_OP_* requests and drive the CD read state machine, and it is VabDriver's sibling. The object views this function was typed against are replaced by CdDriver, whose fields are all FileResource's (the driver runs on its clients' objects; FileResource's +0x018/+0x01C were named pos/size for it). Byte-identical. `Class6D4E8__LoadFile` -> `CdDriver__LoadFile` by rename.py. The arg-less FileResource__LoadFile call goes through the LoadFileNoArgsFn cast (no code) now that FileResource.h's prototype is in scope.

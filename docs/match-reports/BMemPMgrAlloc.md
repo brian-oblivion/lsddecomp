@@ -713,7 +713,7 @@ read, so these are two-argument functions.
 
 **Why the 22 one-parameter declarations are right anyway.** Every carved call
 site passes one argument, and retail emits only `$a0` for it — e.g.
-`Class6D430__LoadFile`'s call:
+`FileResource__LoadFile`'s call:
 
 ```
 80026b70:  jal   80017b34 <BMemPMgrAlloc>

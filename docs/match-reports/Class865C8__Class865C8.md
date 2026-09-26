@@ -261,7 +261,7 @@ TimImage is unified (`include/TimImage.h`); `include/class_39e08.h`'s local
 `extern SubObjG *New_TimImage(const char *)` is deleted. `unk44` is a
 TimImage but keeps Obj865C8's own `SubObjG *` type (Obj865C8's view is that
 class's job): the result is cast to `SubObjG *`, and the two calls cast
-`unk44` back to `TimImage *` -- +0x078 (Class6D430's `void *slot78`,
+`unk44` back to `TimImage *` -- +0x078 (FileResource's `void *slot78`,
 occupant TimImage__Upload) through `TimImageUploadFn`, +0x05C is
 `freeBuffer`. Image byte-identical.
 

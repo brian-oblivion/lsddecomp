@@ -17,14 +17,14 @@ Table slot (`tools/classtable.py`): gTileMapMethods +0x064 (setFlag).
 
 ## Source
 
-The unit-local view `DataSrc33808` (a Class6D430 subclass built with the unified
-`CLASS6D430_SLOTS`/`CLASS6D430_FIELDS` macros, plus `slot7C`/`slot80`, and own
+The unit-local view `DataSrc33808` (a FileResource subclass built with the unified
+`FILERESOURCE_SLOTS`/`FILERESOURCE_FIELDS` macros, plus `slot7C`/`slot80`, and own
 fields +0x2C..+0x38) and `CountedBuf33808` sit at the top of `src/code_33808.c`.
 
 ```c
 /* gTileMapMethods +0x064: unless +0x2A is set, slot +0x078 and mark +0x42. */
 typedef struct Obj6F498 {
-    CLASS6D430_FIELDS(DataSrc33808Methods);
+    FILERESOURCE_FIELDS(DataSrc33808Methods);
     /* +0x02C */ u8 pad2C[0x16];
     /* +0x042 */ u16 unk42;
 } Obj6F498;
@@ -40,7 +40,7 @@ void TileMap__Load(Obj6F498 *self) {
 ## Notes
 
 - Byte-exact on the first build.
-- Unit-local view Obj6F498 (CLASS6D430_FIELDS(DataSrc33808Methods) + u16 at +0x42).
+- Unit-local view Obj6F498 (FILERESOURCE_FIELDS(DataSrc33808Methods) + u16 at +0x42).
 - No shared header was edited; prototypes for other units' functions are local
   to the unit.
 - Types of arguments and returns are readings of the registers used, not proven.
@@ -48,8 +48,8 @@ void TileMap__Load(Obj6F498 *self) {
 ## Naming
 
 - **TileMap__Load**, tier B (head review, round 83: was A). Slot +0x064: unless +0x2A is set, BuildMap and mark +0x42.
-  Head review, round 83: the body builds the map (slot +0x078, TileMap__BuildMap) unless +0x2A is set, then sets +0x42; "Load" is its role in the slot protocol, not shown by the body, so tier B. The base slot is Class6D430__SetFlag.
+  Head review, round 83: the body builds the map (slot +0x078, TileMap__BuildMap) unless +0x2A is set, then sets +0x42; "Load" is its role in the slot protocol, not shown by the body, so tier B. The base slot is FileResource__SetFlag.
 
 ## Track 4 (2026-09-26, round 88, alpha)
 
-Class unified in `include/TileMap.h`. `self` is `TileMap *` (was `Obj6F498`); +0x042 is `loaded`. The no-argument call through Class6D430's `void *slot78` is spelled `((TileMapBuildMapFn)self->methods->slot78)()` (a typedef with an empty parameter list, no code). Byte-identical.
+Class unified in `include/TileMap.h`. `self` is `TileMap *` (was `Obj6F498`); +0x042 is `loaded`. The no-argument call through FileResource's `void *slot78` is spelled `((TileMapBuildMapFn)self->methods->slot78)()` (a typedef with an empty parameter list, no code). Byte-identical.

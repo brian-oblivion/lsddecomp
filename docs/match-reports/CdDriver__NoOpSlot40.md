@@ -32,7 +32,7 @@ Round 79 (delta).
 
 - **`CdDriver__NoOpSlot40`** (was `func_800272C8`) -- **tier A** (a pure
   leaf whose mechanics are its purpose: it does nothing). It is gCdDriverMethods
-  slot +0x040, which is null in Class6D430's table, so Class6D4E8 fills an
+  slot +0x040, which is null in FileResource's table, so Class6D4E8 fills an
   abstract slot with an empty body. Naming follows the existing
   `ObjM__NoOpSlot40` / `Actor__NoOpSlotD8` convention. What the slot is
   FOR is not established here: no caller of +0x040 has been traced.
@@ -43,4 +43,4 @@ Round 79 (delta).
   `progress.py`/`config/sdk-in-game.txt` count it as game code.
 
 
-Track 4, 2026-09-26 (round 88). The class of gCdDriverMethods (was D_8006D4E8, id 0x13 = DATASOURCE_CD) is CdDriver, in include/CdDriver.h: its ctor calls InitCdDrive, its slots enqueue CD_OP_* requests and drive the CD read state machine, and it is VabDriver's sibling. The object views this function was typed against are replaced by CdDriver, whose fields are all Class6D430's (the driver runs on its clients' objects; Class6D430's +0x018/+0x01C were named pos/size for it). Byte-identical. `Class6D4E8__NoOpSlot40` -> `CdDriver__NoOpSlot40` by rename.py.
+Track 4, 2026-09-26 (round 88). The class of gCdDriverMethods (was D_8006D4E8, id 0x13 = DATASOURCE_CD) is CdDriver, in include/CdDriver.h: its ctor calls InitCdDrive, its slots enqueue CD_OP_* requests and drive the CD read state machine, and it is VabDriver's sibling. The object views this function was typed against are replaced by CdDriver, whose fields are all FileResource's (the driver runs on its clients' objects; FileResource's +0x018/+0x01C were named pos/size for it). Byte-identical. `Class6D4E8__NoOpSlot40` -> `CdDriver__NoOpSlot40` by rename.py.

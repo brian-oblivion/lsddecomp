@@ -16,7 +16,7 @@ instead with `tools/classtable.py 0x8006D4E8 --vs 0x8006B58C` (comparing
 against `gBasicClassMethods`, the 14-slot table for the project's "BasicClass"
 hierarchy, whose constructor `BasicClass__BasicClass` sits at `+0x008`).
 `gCdDriverMethods` overrides exactly three slots relative to `gBasicClassMethods`
-(`+0x004`, `+0x008`, `+0x00C` -- `Class6D430__Release`, `CdDriver__CdDriver`,
+(`+0x004`, `+0x008`, `+0x00C` -- `FileResource__Release`, `CdDriver__CdDriver`,
 `CdDriver__Finalize`), inherits `+0x010..+0x038` verbatim (identical
 `BasicClass__func_*` addresses in both tables), and adds new slots from
 `+0x040` up that `gBasicClassMethods` doesn't have at all (including this unit's own
@@ -101,4 +101,4 @@ Round 79 (delta).
   other method of this class already carries in code_179d8_q.c).
 
 
-Track 4, 2026-09-26 (round 88). The class of gCdDriverMethods (was D_8006D4E8, id 0x13 = DATASOURCE_CD) is CdDriver, in include/CdDriver.h: its ctor calls InitCdDrive, its slots enqueue CD_OP_* requests and drive the CD read state machine, and it is VabDriver's sibling. The object views this function was typed against are replaced by CdDriver, whose fields are all Class6D430's (the driver runs on its clients' objects; Class6D430's +0x018/+0x01C were named pos/size for it). Byte-identical. `New_Class6D4E8` -> `New_CdDriver` by rename.py.
+Track 4, 2026-09-26 (round 88). The class of gCdDriverMethods (was D_8006D4E8, id 0x13 = DATASOURCE_CD) is CdDriver, in include/CdDriver.h: its ctor calls InitCdDrive, its slots enqueue CD_OP_* requests and drive the CD read state machine, and it is VabDriver's sibling. The object views this function was typed against are replaced by CdDriver, whose fields are all FileResource's (the driver runs on its clients' objects; FileResource's +0x018/+0x01C were named pos/size for it). Byte-identical. `New_Class6D4E8` -> `New_CdDriver` by rename.py.

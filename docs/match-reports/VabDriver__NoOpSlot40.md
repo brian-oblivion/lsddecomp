@@ -27,7 +27,7 @@ bytes, not a claim about the original source's intent.
 ## Naming (round 77, charlie -- track 3, no rename)
 
 `tools/classtable.py 0x8006D9BC` confirms this is the `+0x040` slot of
-`gVabDriverMethods` (29-slot Class6D430-derived table, `code_179d8_e.c`,
+`gVabDriverMethods` (29-slot FileResource-derived table, `code_179d8_e.c`,
 the SPU/VAB driver base class) -- physically carved into code_179d8_d.c by
 ROM address, semantically owned by that other unit. `code_179d8_e.c`'s own
 `VabDriverMethods` struct comment leaves this and its four siblings
@@ -36,17 +36,17 @@ covers +0x000..+0x054 with no per-slot field even at the struct level, and
 its own written rationale is "no call site in this unit" for the ones it
 does name individually further down. Kept `func_` per that same
 precedent: no purpose evidence beyond "reserved-and-unused stack frame,
-occupies a Class6D430 extension slot the base class leaves for a subclass
+occupies a FileResource extension slot the base class leaves for a subclass
 to fill". Not renamed.
 
 ## Track 4 (2026-09-26, round 87, alpha): renamed `func_8002C3D0` -> `VabDriver__NoOpSlot40`
 
 Named for its slot, FINISHING-PLAN track 4 step 6. `classtable.py
-gVabDriverMethods --vs D_8006D430` puts this function at `+0x040`, one of
-Class6D430's run-time-bound driver-interface slots (`include/Class6D430.h`
+gVabDriverMethods --vs gFileResourceMethods` puts this function at `+0x040`, one of
+FileResource's run-time-bound driver-interface slots (`include/FileResource.h`
 names it `slot40`; the CD driver's occupant is `CdDriver__NoOpSlot40`).
 `SetActiveDataSource` (code_171e0.c) copies the active driver's interface
-slots into Class6D430's table and every client table, and takes this table
+slots into FileResource's table and every client table, and takes this table
 (`GetVabDriverMethods()`) whenever `gActiveDataSource != DATASOURCE_CD`, so
 when the SPU/VAB source is active every `methods->slot40(...)` in the game
 reaches this body. The purpose evidence the tier-C verdict above lacked is

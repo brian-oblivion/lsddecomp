@@ -26,7 +26,7 @@
  * unit) exactly when `gActiveDataSource == 0x23`, and `VabStreamObj`'s own
  * constructor/close (below) chain their base-class calls through that
  * accessor's return.  ROUND 87 CORRECTION (track 4): that does not make
- * gVabDriverMethods VabStreamObj's base.  Both are Class6D430 subclasses
+ * gVabDriverMethods VabStreamObj's base.  Both are FileResource subclasses
  * (ids 0x23 and 0xA03, parent 0x3); VabStreamObj chains to whichever driver
  * is active, as every data source does.  VabDriver is now declared once, in
  * `include/VabDriver.h`: its ctor/dtor (`code_179d8_d.c`) and the eleven
@@ -155,11 +155,11 @@ VabStreamObj *New_VabStreamObj(char *path) {
 
 /* GetActiveDataSourceMethods (code_171e0.c) returns gVabDriverMethods when
  * gActiveDataSource is DATASOURCE_SPU and gCdDriverMethods otherwise; both
- * are CLASS6D430_SLOTS tables, so it is typed Class6D430Methods * as in
+ * are FILERESOURCE_SLOTS tables, so it is typed FileResourceMethods * as in
  * every other unit that calls it. VabStreamObj's ctor and finalize chain
  * through its +0x008 ctor and +0x00C finalize (round 88; this unit's own
  * DriverBaseMethods view, slot08/slot0C, until then). */
-extern Class6D430Methods *GetActiveDataSourceMethods(void);
+extern FileResourceMethods *GetActiveDataSourceMethods(void);
 
 /* Sony's own VAB streaming calls (include/psyq/libsnd.h), declared locally
  * per this project's convention of not sharing Psy-Q prototypes across
@@ -204,7 +204,7 @@ void VabStreamObj__VabStreamObj(VabStreamObj *self, char *path) {
     void *buf;
     char vhPath[0x20];
 
-    GetActiveDataSourceMethods()->ctor((Class6D430 *)self);
+    GetActiveDataSourceMethods()->ctor((FileResource *)self);
     self->methods = GetVabStreamObjMethods();
     self->vagAttrPool = NULL;
     self->progVagTable = NULL;
@@ -252,7 +252,7 @@ void VabStreamObj__Finalize(VabStreamObj *self) {
     BMemPMgrFree(self->vagAttrPool);
     BMemPMgrFree(self->progVagTable);
     BMemPMgrFree(self->baseFilename);
-    GetActiveDataSourceMethods()->finalize((Class6D430 *)self);
+    GetActiveDataSourceMethods()->finalize((FileResource *)self);
 }
 
 void VabStreamObj__AdvanceLoadState(VabStreamObj *self) {

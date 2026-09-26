@@ -58,7 +58,7 @@ Round 52 (alpha), FINISHING-PLAN track 3.
 is already an established type name in `src/code_1677c.c` (that unit's own
 functions are typed against it), and the "return my own vtable" shape is
 already named twice in this project (`GetCdDriverMethods`,
-`GetClass6D430Methods`, this same round). Pure leaf whose mechanics are its
+`GetFileResourceMethods`, this same round). Pure leaf whose mechanics are its
 purpose.
 
 ## Track 4 (2026-09-26, round 88)

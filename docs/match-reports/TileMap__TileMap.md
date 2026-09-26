@@ -17,14 +17,14 @@ Table slot (`tools/classtable.py`): gTileMapMethods +0x008.
 
 ## Source
 
-The unit-local views `DataSrc33808` (Class6D430 subclass via the unified
-`CLASS6D430_SLOTS`/`CLASS6D430_FIELDS` macros plus `slot7C`/`slot80` and own
+The unit-local views `DataSrc33808` (FileResource subclass via the unified
+`FILERESOURCE_SLOTS`/`FILERESOURCE_FIELDS` macros plus `slot7C`/`slot80` and own
 fields +0x2C..+0x38), `Ctor33808` and `CountedBuf33808` sit at the top of
 `src/code_33808.c`.
 
 ```c
 typedef struct Obj6F498 {
-    CLASS6D430_FIELDS(DataSrc33808Methods);
+    FILERESOURCE_FIELDS(DataSrc33808Methods);
     /* +0x02C */ u8 pad2C[0x10];
     /* +0x03C */ s32 unk3C;
     /* +0x040 */ u16 unk40;
@@ -37,7 +37,7 @@ typedef struct Obj6F498 {
 void TileMap__TileMap(Obj6F498 *self, s32 arg1, s32 arg2) {
     s32 unused[8];
 
-    GetActiveDataSourceMethods()->ctor((Class6D430 *)self);
+    GetActiveDataSourceMethods()->ctor((FileResource *)self);
     self->methods = GetTileMapMethods();
     self->unk3C = arg2;
     self->unk42 = 0;
@@ -59,6 +59,6 @@ First build; the gTileAtlasMethods ctor (TileAtlas__TileAtlas) shape with one mo
 
 ## Track 4 (2026-09-26, round 88, alpha)
 
-Class unified in `include/TileMap.h`. `self` is `TileMap *` (was `Obj6F498`); the third parameter is `Class6D430 *atlas` (was `s32 arg2`); +0x03C `atlas` (was unk3C), +0x040 `defaultGrid` (was unk40: set here only when arg1 == 0, and BuildMap lays out the default grid only when it is set), +0x042 `loaded` (was unk42: cleared here, set by TileMap__Load after BuildMap). setFlag is called with `self` uncast. Byte-identical.
+Class unified in `include/TileMap.h`. `self` is `TileMap *` (was `Obj6F498`); the third parameter is `FileResource *atlas` (was `s32 arg2`); +0x03C `atlas` (was unk3C), +0x040 `defaultGrid` (was unk40: set here only when arg1 == 0, and BuildMap lays out the default grid only when it is set), +0x042 `loaded` (was unk42: cleared here, set by TileMap__Load after BuildMap). setFlag is called with `self` uncast. Byte-identical.
 
-Later the same round (alpha, third class): TileAtlas unified; the `atlas` parameter and TileMap::atlas are `TileAtlas *` (were `Class6D430 *`). Byte-identical.
+Later the same round (alpha, third class): TileAtlas unified; the `atlas` parameter and TileMap::atlas are `TileAtlas *` (were `FileResource *`). Byte-identical.

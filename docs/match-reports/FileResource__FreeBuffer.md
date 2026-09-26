@@ -1,4 +1,6 @@
-# Class6D430__FreeBuffer
+# FileResource__FreeBuffer
+
+> Renamed from `FileResource__FreeBuffer` on 2026-09-26 (tools/rename.py). Address 0x80026c20.
 
 > Renamed from `func_80026C20` on 2026-09-18 (tools/rename.py). Address 0x80026c20.
 
@@ -6,8 +8,8 @@
 
 ## What it does
 
-`D_8006D430`'s vtable slot `+0x05C` (also reachable indirectly through
-`Class6D430__Finalize`, the class's own dtor). Frees `this->unk10` via
+`gFileResourceMethods`'s vtable slot `+0x05C` (also reachable indirectly through
+`FileResource__Finalize`, the class's own dtor). Frees `this->unk10` via
 `BMemPMgrFree` and clears it, but only when three conditions all hold:
 the pointer is non-NULL, `this->unk14` (its recorded size) is non-zero, and
 `this->unk20` (a flag cleared in the constructor) is zero.
@@ -34,7 +36,7 @@ than re-fetching it, which is exactly what plain sequential C produces here
 ## Final C
 
 ```c
-void Class6D430__FreeBuffer(Class6D430 *this) {
+void FileResource__FreeBuffer(FileResource *this) {
     if (this->unk10 == NULL) {
         return;
     }
@@ -52,9 +54,9 @@ void Class6D430__FreeBuffer(Class6D430 *this) {
 ## Attempt log
 
 Matched on the first real attempt (once written against the corrected
-`Class6D430` struct). An earlier diff run against this function showed
+`FileResource` struct). An earlier diff run against this function showed
 0/24 and a pure 1-word shift for its entire body — that was **not** a bug in
-this function; it was downstream drift from `Class6D430__LoadFile`'s wrong-sized
+this function; it was downstream drift from `FileResource__LoadFile`'s wrong-sized
 allocator call (see that report) shifting every address after it in the
 unit. Re-diffed clean after the sibling fix, with zero changes to this
 function's own source.
@@ -70,7 +72,7 @@ function's own source.
 
 ## Proposed learning
 
-Reinforces `Class6D430__Class6D430.md`'s note: when a function's `funcdiff` shows a
+Reinforces `FileResource__FileResource.md`'s note: when a function's `funcdiff` shows a
 uniform shift (every word wrong, but the SAME word appearing one slot over)
 with zero words matching, check sibling functions in the same translation
 unit for a genuine size bug before touching this function's own source at
@@ -82,12 +84,12 @@ Round 52 (alpha), FINISHING-PLAN track 3.
 
 | was | now | tier |
 | --- | --- | --- |
-| `func_80026C20` | `Class6D430__FreeBuffer` | B |
+| `func_80026C20` | `FileResource__FreeBuffer` | B |
 
 **Evidence.** `+0x05C` slot: frees `this->unk10` via `BMemPMgrFree` and
 clears it, guarded by three conditions (non-NULL, sized, not busy per
-`unk20`). Also reachable indirectly through `Class6D430__Finalize`. Mirrors
-`Class6D430__LoadFile`'s naming; mechanics known, why the buffer needs
+`unk20`). Also reachable indirectly through `FileResource__Finalize`. Mirrors
+`FileResource__LoadFile`'s naming; mechanics known, why the buffer needs
 this specific guard is not.
 
 ## Proposed field names
@@ -96,12 +98,12 @@ this specific guard is not.
 and all five vtable slots below are now in the tree, each one applied
 separately with `./build-and-verify.sh` green and byte-exact after it. One
 mis-hit had to be resolved by receiver type: `src/code_179d8_h.c:143`
-accesses `pendingGeneration` on a `Class6D430 *self`, while the same file's
+accesses `pendingGeneration` on a `FileResource *self`, while the same file's
 lines 97/174/175/182 are its OWN `ObjA34_179D8H::unk0C` and were left alone.
 The compiler named that mis-hit (`structure has no member named 'unk0C'`),
 which is the procedure working in the direction where it can work.
 
-Same cross-unit exposure as `Class6D430__LoadFile.md` (`Class6D430`
+Same cross-unit exposure as `FileResource__LoadFile.md` (`FileResource`
 is shared with `code_179d8_h.c`/`code_179d8_q.c`), so PROPOSED, not renamed:
 
 | field | proposed name | tier | evidence |

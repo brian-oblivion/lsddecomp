@@ -11,7 +11,7 @@ deletions, no out-of-range drift. Fresh ground (carved revision 18, no prior rep
 
 Table getter: returns the method table `gModelDataMethods` (`lui/addiu; jr; nop`), declared locally as `extern s32 gModelDataMethods[];`.
 
-Table slot (`tools/classtable.py`): `D_8006D430` +0x0AC.
+Table slot (`tools/classtable.py`): `gFileResourceMethods` +0x0AC.
 
 ## Source
 

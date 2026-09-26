@@ -96,6 +96,6 @@ TimImage is unified (`include/TimImage.h`) and `include/code_2cc8c.h`'s
 header's local `extern` of New_TimImage. The handle is cast to
 `TimImage *` (TaskCore.h still types the field `BasicClass *`); its slots are
 TimImage's: +0x004 `release`, +0x05C `freeBuffer` (was `slot5C`), and
-+0x078, Class6D430's `void *slot78` whose occupant is TimImage__Upload,
++0x078, FileResource's `void *slot78` whose occupant is TimImage__Upload,
 called through `TimImageUploadFn`. `path` is cast to `char *` for
 New_TimImage. Image byte-identical.

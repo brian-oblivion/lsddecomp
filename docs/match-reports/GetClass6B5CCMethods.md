@@ -46,7 +46,7 @@ just supplies the getter's own C body.
 (tier A -- "return my own vtable's address" is a pure getter, mechanics
 are its whole purpose), following the exact convention this project
 already uses for the same shape elsewhere: `GetCdDriverMethods`,
-`GetClass6D3C8Methods`, `GetClass6D430Methods` (all
+`GetClass6D3C8Methods`, `GetFileResourceMethods` (all
 `include/code_171e0.h`/`code_179d8_q`'s own file family). Held back
 from an actual rename because this exact symbol is called, BY NAME,
 from a large number of OTHER units with DIFFERENT per-call-site arities

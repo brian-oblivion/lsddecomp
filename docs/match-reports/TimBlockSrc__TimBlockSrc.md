@@ -15,8 +15,8 @@ Table slot (`tools/classtable.py`): gTimBlockSrcMethods +0x008 (its allocator Ne
 
 ## Source
 
-The unit-local views `DataSrc33808` (Class6D430 subclass via the unified
-`CLASS6D430_SLOTS`/`CLASS6D430_FIELDS` macros plus `slot7C`/`slot80` and own
+The unit-local views `DataSrc33808` (FileResource subclass via the unified
+`FILERESOURCE_SLOTS`/`FILERESOURCE_FIELDS` macros plus `slot7C`/`slot80` and own
 fields +0x2C..+0x38), `Ctor33808`, `CountedBuf33808` and `Req44858` sit at the
 top of / earlier in `src/code_33808.c`.
 
@@ -37,7 +37,7 @@ typedef struct Ent43068 {
 } Ent43068;
 
 typedef struct Obj43068 {
-    CLASS6D430_FIELDS(DataSrc33808Methods);
+    FILERESOURCE_FIELDS(DataSrc33808Methods);
     /* +0x02C */ s32 unk2C;
     /* +0x030 */ s32 unk30;
     /* +0x034 */ void *sector;
@@ -57,7 +57,7 @@ void TimBlockSrc__TimBlockSrc(Obj43068 *self, char *name) {
     s16 shift;
     u16 mask;
 
-    GetActiveDataSourceMethods()->ctor((Class6D430 *)self);
+    GetActiveDataSourceMethods()->ctor((FileResource *)self);
     self->methods = GetTimBlockSrcMethods();
     self->unk2C = 0;
     self->unk30 = 0;

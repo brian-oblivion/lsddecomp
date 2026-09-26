@@ -107,7 +107,7 @@ tier B rather than A.
 ## Track 4 (2026-09-26, round 87)
 
 Renamed `VabStreamObj__Update` -> `VabStreamObj__AdvanceLoadState` with
-`rename.py`. The slot is +0x064, Class6D430's `setFlag`. It is not a
+`rename.py`. The slot is +0x064, FileResource's `setFlag`. It is not a
 per-frame poll. The CD driver calls `self->methods->setFlag(self)` when a
 request completes (`src/code_179d8_s.c`: `CdDriver__LoadFile` and the
 request-queue completion, each right after it ORs a `CD_FLAG_*_DONE` bit
@@ -120,5 +120,5 @@ TimBlockSrc's override of the same slot, `TimBlockSrc__AdvanceLoadState`.
 The report above says +0x058 and +0x06C are "null in retail". That is only
 true of the static table. `SetActiveDataSource` copies the active driver's
 interface slots into every table `gDataSourceClientGetters` lists
-(`include/Class6D430.h`), and `GetVabStreamObjMethods` is on that list
-(D_8006D430 +0x098). At run time these calls reach the driver.
+(`include/FileResource.h`), and `GetVabStreamObjMethods` is on that list
+(gFileResourceMethods +0x098). At run time these calls reach the driver.

@@ -1,4 +1,6 @@
-# Class6D430__Release
+# FileResource__Release
+
+> Renamed from `FileResource__Release` on 2026-09-26 (tools/rename.py). Address 0x800269f0.
 
 > Renamed from `DestroyChained` on 2026-09-25 (tools/rename.py). Address 0x800269f0.
 
@@ -8,10 +10,10 @@
 
 ## What it does
 
-Slot `+0x004` of the `D_8006D430` method table (see `include/code_171e0.h`'s
-`Class6D430Methods`). It clears one flag, then explicitly chains
+Slot `+0x004` of the `gFileResourceMethods` method table (see `include/code_171e0.h`'s
+`FileResourceMethods`). It clears one flag, then explicitly chains
 **both** destructors available to it: the class's own (`this->methods->dtor`,
-itself `Class6D430__Finalize`, resolved through the vtable rather than by name) and
+itself `FileResource__Finalize`, resolved through the vtable rather than by name) and
 the base class's (`Get_vtable_BasicClass()->dtor`, `BasicClassMethods.dtor`), then
 calls `BMemPMgrFree(this)` (a still-uncarved release/free routine, address
 only) before returning `NULL` unconditionally.
@@ -50,7 +52,7 @@ disassembly.
 ## Final C
 
 ```c
-void *Class6D430__Release(Class6D430 *this) {
+void *FileResource__Release(FileResource *this) {
     this->unk20 = 0;
     this->methods->dtor(this);
     Get_vtable_BasicClass()->dtor(this);
@@ -69,7 +71,7 @@ void *Class6D430__Release(Class6D430 *this) {
 
 ## Proposed learning
 
-`D_8006D430`'s own vtable follows the exact same convention as
+`gFileResourceMethods`'s own vtable follows the exact same convention as
 `BasicClassMethods` (header @0, an own-class slot @+0x004, ctor @+0x008,
 dtor @+0x00C) — confirmed by dumping the table's raw words directly from
 `disk/SLPS_015.56` rather than trusting a null-slot scan in isolation (see
@@ -85,13 +87,13 @@ Round 52 (alpha), FINISHING-PLAN track 3.
 
 | was | now | tier |
 | --- | --- | --- |
-| `func_800269F0` | `Class6D430__Release` | B |
+| `func_800269F0` | `FileResource__Release` | B |
 
-**Track 4 (2026-09-25, Class6D430 unification): renamed from `DestroyChained`, tier A.** Occupies BasicClass's `release` slot (+0x004), inherited by all sixteen Class6D430 subclasses; like `BasicClass__Release` it finalizes (its own `finalize` slot, then BasicClass's) and frees the object, returning NULL. An override is named for the slot it occupies (FINISHING-PLAN track 4).
+**Track 4 (2026-09-25, FileResource unification): renamed from `DestroyChained`, tier A.** Occupies BasicClass's `release` slot (+0x004), inherited by all sixteen FileResource subclasses; like `BasicClass__Release` it finalizes (its own `finalize` slot, then BasicClass's) and frees the object, returning NULL. An override is named for the slot it occupies (FINISHING-PLAN track 4).
 
-**Evidence.** `D_8006D430`'s `+0x004` own-class slot -- but verbatim-shared
+**Evidence.** `gFileResourceMethods`'s `+0x004` own-class slot -- but verbatim-shared
 with `gCdDriverMethods` at the identical offset (`docs/match-reports/GetCdDriverMethods.md`),
-so it is not really "Class6D430's own" and a `Class6D430__` prefix would
+so it is not really "FileResource's own" and a `FileResource__` prefix would
 misattribute it. Clears the busy flag, then explicitly chains its own dtor
 (`this->methods->dtor`) and the base BasicClass dtor before releasing the
 object -- this function's own report already characterised this as a

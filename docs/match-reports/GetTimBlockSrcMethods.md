@@ -11,7 +11,7 @@ deletions, no out-of-range drift. Fresh ground (carved revision 18, no prior rep
 
 Table getter: returns the method table `gTimBlockSrcMethods` (`lui/addiu; jr; nop`), declared locally as `extern s32 gTimBlockSrcMethods[];`.
 
-Table slot (`tools/classtable.py`): `D_8006D430` +0x090 (the Class6D430 `Get...Methods` getter list).
+Table slot (`tools/classtable.py`): `gFileResourceMethods` +0x090 (the FileResource `Get...Methods` getter list).
 
 ## Source
 

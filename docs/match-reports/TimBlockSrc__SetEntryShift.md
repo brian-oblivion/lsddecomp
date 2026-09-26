@@ -15,8 +15,8 @@ Table slot (`tools/classtable.py`): gTimBlockSrcMethods +0x078.
 
 ## Source
 
-The unit-local view `DataSrc33808` (a Class6D430 subclass built with the unified
-`CLASS6D430_SLOTS`/`CLASS6D430_FIELDS` macros, plus `slot7C`/`slot80`, and own
+The unit-local view `DataSrc33808` (a FileResource subclass built with the unified
+`FILERESOURCE_SLOTS`/`FILERESOURCE_FIELDS` macros, plus `slot7C`/`slot80`, and own
 fields +0x2C..+0x38) and `CountedBuf33808` sit at the top of `src/code_33808.c`.
 Slot +0x078 is `void *slot78` in the unified macro, so calls cast it.
 
@@ -43,7 +43,7 @@ void TimBlockSrc__SetEntryShift(Obj6F0B8 *self, s32 index, s32 shift) {
 
 ## Notes
 
-- No shared header was edited. `Class6D430.h`, `Class6B5CC.h`, `BasicClass.h` are
+- No shared header was edited. `FileResource.h`, `Class6B5CC.h`, `BasicClass.h` are
   included; prototypes for other units' functions (GetActiveDataSourceMethods,
   ReleaseBasicClassArray, BMemPMgrFree) are local to the unit.
 - Types of arguments and returns are readings of the registers used, not proven.
@@ -54,4 +54,4 @@ void TimBlockSrc__SetEntryShift(Obj6F0B8 *self, s32 index, s32 shift) {
 
 ## Track 4 (2026-09-25, round 83, bravo)
 
-Occupant of +0x078, which is Class6D430's untyped `slot78`; not given a TimBlockSrc slot of its own because the slot belongs to the parent's layout. Writes `entries[index].shift`/`.mask`. The class (id 0xF03, table `gTimBlockSrcMethods`) is unified as `TimBlockSrc` in `include/TimBlockSrc.h`. Any source block above is the pre-unification spelling; the live body in `src/code_33808.c` takes the unified types, byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).
+Occupant of +0x078, which is FileResource's untyped `slot78`; not given a TimBlockSrc slot of its own because the slot belongs to the parent's layout. Writes `entries[index].shift`/`.mask`. The class (id 0xF03, table `gTimBlockSrcMethods`) is unified as `TimBlockSrc` in `include/TimBlockSrc.h`. Any source block above is the pre-unification spelling; the live body in `src/code_33808.c` takes the unified types, byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).

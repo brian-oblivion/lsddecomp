@@ -29,7 +29,7 @@ TimImage *New_TimImage(char *name) {
 ```
 
 Declarations (top of `src/code_2bb9c.c`): `TimImageMethods`, a local table
-struct expanding `CLASS6D430_SLOTS(TimImage, (TimImage *self, char *name))`
+struct expanding `FILERESOURCE_SLOTS(TimImage, (TimImage *self, char *name))`
 plus slots +0x07C..+0x09C; `extern void *BMemPMgrAlloc(s32 size);`;
 `TimImageMethods *GetTimImageMethods(void);`.
 
@@ -43,7 +43,7 @@ plus slots +0x07C..+0x09C; `extern void *BMemPMgrAlloc(s32 size);`;
   `code_2cc8c_b.c`) builds a `"...\ .TIM"` path (via `BuildFileName` or
   literal `D_800113EC`/`D_800114F8`/`D_800113F8`/`gCardPathSuffix`) and hands
   it straight to this function, then calls the result's slot78
-  (`TimImage__Upload`) and usually slot5C (`Class6D430__FreeBuffer`) -- the
+  (`TimImage__Upload`) and usually slot5C (`FileResource__FreeBuffer`) -- the
   exact shape the class's own methods implement. The round-81 rename was blocked by a
   `tools/rename.py` explicit-placeholder bug (a stale track-2
   `// unidentified:` line for `func_8003B39C`), fixed in FINISHING-PLAN

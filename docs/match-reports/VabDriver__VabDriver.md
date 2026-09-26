@@ -8,10 +8,10 @@ body); no derivation was spent.
 ## Role
 
 The `+0x008` (ctor) slot of `gVabDriverMethods`, the 29-slot
-Class6D430-derived table that is the SPU/VAB sound-streaming backend's own
+FileResource-derived table that is the SPU/VAB sound-streaming backend's own
 "generic driver interface" base class (code_179d8_e.c's unit header
 comment). Empty: this backend needs no extra generic setup beyond
-Class6D430's own base ctor.
+FileResource's own base ctor.
 
 ```c
 void VabDriver__VabDriver(void) {

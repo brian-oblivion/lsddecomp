@@ -15,8 +15,8 @@ Table slot (`tools/classtable.py`): gModelDataMethods +0x078 (called by ModelDat
 
 ## Source
 
-The unit-local views `DataSrc33808` (Class6D430 subclass via the unified
-`CLASS6D430_SLOTS`/`CLASS6D430_FIELDS` macros plus `slot7C`/`slot80` and own
+The unit-local views `DataSrc33808` (FileResource subclass via the unified
+`FILERESOURCE_SLOTS`/`FILERESOURCE_FIELDS` macros plus `slot7C`/`slot80` and own
 fields +0x2C..+0x38), `Ctor33808` and `CountedBuf33808` sit at the top of
 `src/code_33808.c`.
 
@@ -65,8 +65,8 @@ First build. The redundant `sw zero, 0x30` on the second failure is an explicit 
 
 ## Track 4
 
-2026-09-25, round 84 (delta): ModelData (gModelDataMethods) is unified in `include/ModelData.h`; the unit-shared `DataSrc33808` view no longer types it. +0x02C is `linkResource` (`Class6D430 *`, New_LinkResource's result; the `(s32)` and `(void *)` casts are gone), +0x030 is `todSet` (`Class6D430 *`, New_TodSet's result) and +0x034 is `ownsResources`. The failure path calls `releaseResources(self)` (slot +0x07C). Image byte-identical.
+2026-09-25, round 84 (delta): ModelData (gModelDataMethods) is unified in `include/ModelData.h`; the unit-shared `DataSrc33808` view no longer types it. +0x02C is `linkResource` (`FileResource *`, New_LinkResource's result; the `(s32)` and `(void *)` casts are gone), +0x030 is `todSet` (`FileResource *`, New_TodSet's result) and +0x034 is `ownsResources`. The failure path calls `releaseResources(self)` (slot +0x07C). Image byte-identical.
 
 ## Track 4 (2026-09-26, round 88, delta)
 
-New_TodSet is now prototyped in include/TodSet.h as `TodSet *New_TodSet(struct Src6F240 *)`, so the call reads `self->todSet = (Class6D430 *)New_TodSet((Src6F240 *)&req)`; the forward declaration that stood before this function is gone. Bytes unchanged.
+New_TodSet is now prototyped in include/TodSet.h as `TodSet *New_TodSet(struct Src6F240 *)`, so the call reads `self->todSet = (FileResource *)New_TodSet((Src6F240 *)&req)`; the forward declaration that stood before this function is gone. Bytes unchanged.

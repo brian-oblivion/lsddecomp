@@ -7,7 +7,7 @@
  * echo sessions); named round 82 (bravo). Two independent groups of code:
  *
  * 1. Class81940 (method table gClass81940Methods; include/Class81940.h): a
- *    Class6D430 data source that streams a header block into its own 0xB358
+ *    FileResource data source that streams a header block into its own 0xB358
  *    buffer (state 9, Class81940__LoadHeader), then, once the read completes
  *    (Class81940__AdvanceLoadState), an optional data block the header
  *    describes into a second allocation (state 10, Class81940__LoadDataBlock/
@@ -36,7 +36,7 @@ typedef struct Rec1C {
 extern int rand(void);
 extern void srand(unsigned int seed);
 extern void *BMemPMgrFree(void *ptr);
-extern Class6D430Methods *GetActiveDataSourceMethods(void);
+extern FileResourceMethods *GetActiveDataSourceMethods(void);
 extern void *BMemPMgrAlloc(s32 size);
 
 /* allocator: new Class81940 object */
@@ -51,7 +51,7 @@ Class81940 *New_Class81940(void) {
 
 /* slot +0x008 of gClass81940Methods (ctor) */
 void Class81940__Class81940(Class81940 *self) {
-    GetActiveDataSourceMethods()->ctor((Class6D430 *)self);
+    GetActiveDataSourceMethods()->ctor((FileResource *)self);
     self->methods = GetClass81940Methods();
     self->ownerRate = -1;
     self->headerReady = 0;
@@ -68,7 +68,7 @@ void Class81940__Class81940(Class81940 *self) {
 /* slot +0x00C of gClass81940Methods (finalize) */
 void Class81940__Finalize(Class81940 *self) {
     self->methods->releaseDataBlock(self);
-    GetActiveDataSourceMethods()->finalize((Class6D430 *)self);
+    GetActiveDataSourceMethods()->finalize((FileResource *)self);
 }
 
 /* slot +0x064 of gClass81940Methods (setFlag) */
@@ -87,12 +87,12 @@ void Class81940__AdvanceLoadState(Class81940 *self) {
             self->unk2A = 0;
         }
     }
-    GetActiveDataSourceMethods()->setFlag((Class6D430 *)self);
+    GetActiveDataSourceMethods()->setFlag((FileResource *)self);
 }
 
 /* slot +0x074 of gClass81940Methods (cancelRequests) */
 void Class81940__CancelRequests(Class81940 *self) {
-    GetActiveDataSourceMethods()->cancelRequests((Class6D430 *)self);
+    GetActiveDataSourceMethods()->cancelRequests((FileResource *)self);
     self->headerReady = 0;
     self->dataReady = 0;
     self->unk2A = 0;

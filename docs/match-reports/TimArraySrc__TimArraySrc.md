@@ -15,8 +15,8 @@ Table slot (`tools/classtable.py`): gTimArraySrcMethods +0x008.
 
 ## Source
 
-The unit-local views `DataSrc33808` (Class6D430 subclass via the unified
-`CLASS6D430_SLOTS`/`CLASS6D430_FIELDS` macros plus `slot7C`/`slot80` and own
+The unit-local views `DataSrc33808` (FileResource subclass via the unified
+`FILERESOURCE_SLOTS`/`FILERESOURCE_FIELDS` macros plus `slot7C`/`slot80` and own
 fields +0x2C..+0x38), `Ctor33808` and `CountedBuf33808` sit at the top of
 `src/code_33808.c`.
 
@@ -24,7 +24,7 @@ fields +0x2C..+0x38), `Ctor33808` and `CountedBuf33808` sit at the top of
 /* gTimArraySrcMethods +0x008: constructor -- the active driver's, then this table,
  * clear +0x2C/+0x30/+0x38, and request `name` when there is one. */
 void TimArraySrc__TimArraySrc(DataSrc33808 *self, char *name) {
-    GetActiveDataSourceMethods()->ctor((Class6D430 *)self);
+    GetActiveDataSourceMethods()->ctor((FileResource *)self);
     self->methods = GetTimArraySrcMethods();
     self->unk2C = 0;
     self->unk30 = NULL;

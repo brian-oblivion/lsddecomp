@@ -15,8 +15,8 @@ Table slot (`tools/classtable.py`): gModelDataMethods +0x084 and gTriggerWorldMe
 
 ## Source
 
-The unit-local view `DataSrc33808` (a Class6D430 subclass built with the unified
-`CLASS6D430_SLOTS`/`CLASS6D430_FIELDS` macros, plus `slot7C`/`slot80`, and own
+The unit-local view `DataSrc33808` (a FileResource subclass built with the unified
+`FILERESOURCE_SLOTS`/`FILERESOURCE_FIELDS` macros, plus `slot7C`/`slot80`, and own
 fields +0x2C..+0x38) and `CountedBuf33808` sit at the top of `src/code_33808.c`.
 Slot +0x078 is `void *slot78` in the unified macro, so calls cast it.
 
@@ -31,7 +31,7 @@ void *ModelData__ForwardDecodePacketWord(ModelData *self, s32 arg1, s32 arg2, s3
 
 ## Notes
 
-- No shared header was edited. `Class6D430.h`, `Class6B5CC.h`, `BasicClass.h` are
+- No shared header was edited. `FileResource.h`, `Class6B5CC.h`, `BasicClass.h` are
   included; prototypes for other units' functions (GetActiveDataSourceMethods,
   ReleaseBasicClassArray, BMemPMgrFree) are local to the unit.
 - Types of arguments and returns are readings of the registers used, not proven.
@@ -42,7 +42,7 @@ void *ModelData__ForwardDecodePacketWord(ModelData *self, s32 arg1, s32 arg2, s3
 
 ## Track 4
 
-2026-09-25, round 84 (delta): ModelData (gModelDataMethods) is unified in `include/ModelData.h`; the unit-shared `DataSrc33808` view no longer types it. Slot +0x084 is `decodePacketWord`. The TodSet's slot +0x080 lies past Class6D430's table, and the TodSet class (gTodSetMethods) is not unified, so the call reaches it through `((DataSrc33808 *)self->todSet)->methods->slot80`: a pointer cast, no code. Image byte-identical.
+2026-09-25, round 84 (delta): ModelData (gModelDataMethods) is unified in `include/ModelData.h`; the unit-shared `DataSrc33808` view no longer types it. Slot +0x084 is `decodePacketWord`. The TodSet's slot +0x080 lies past FileResource's table, and the TodSet class (gTodSetMethods) is not unified, so the call reaches it through `((DataSrc33808 *)self->todSet)->methods->slot80`: a pointer cast, no code. Image byte-identical.
 
 ## Track 4 (2026-09-26, round 88, delta)
 

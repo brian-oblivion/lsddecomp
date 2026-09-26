@@ -11,7 +11,7 @@ deletions, no out-of-range drift. Fresh ground (carved revision 18, no prior rep
 
 Table getter: returns the method table `gTileAtlasMethods` (`lui/addiu; jr; nop`), declared locally as `extern s32 gTileAtlasMethods[];`.
 
-Table slot (`tools/classtable.py`): `D_8006D430` +0x084.
+Table slot (`tools/classtable.py`): `gFileResourceMethods` +0x084.
 
 ## Source
 
@@ -34,4 +34,4 @@ void *GetTileAtlasMethods(void) {
 
 ## Track 4 (2026-09-26, round 88, alpha)
 
-Class unified in `include/TileAtlas.h` (gTileAtlasMethods, 0x303, a Class6D430 subclass, 0x38 bytes). Returns `TileAtlasMethods *` and `&gTileAtlasMethods` (was `void *` returning a local `extern s32 gTileAtlasMethods[]`, deleted, as is the unit's own `void *GetTileAtlasMethods(void)` prototype). No rename. Byte-identical.
+Class unified in `include/TileAtlas.h` (gTileAtlasMethods, 0x303, a FileResource subclass, 0x38 bytes). Returns `TileAtlasMethods *` and `&gTileAtlasMethods` (was `void *` returning a local `extern s32 gTileAtlasMethods[]`, deleted, as is the unit's own `void *GetTileAtlasMethods(void)` prototype). No rename. Byte-identical.

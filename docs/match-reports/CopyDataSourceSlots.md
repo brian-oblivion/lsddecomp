@@ -1,6 +1,6 @@
 # CopyDataSourceSlots
 
-> Renamed from `Class6D430__CopyFields` on 2026-09-25 (tools/rename.py). Address 0x80026d88.
+> Renamed from `FileResource__CopyFields` on 2026-09-25 (tools/rename.py). Address 0x80026d88.
 
 > Renamed from `func_80026D88` on 2026-09-18 (tools/rename.py). Address 0x80026d88.
 
@@ -8,7 +8,7 @@
 
 ## What it does
 
-A field-by-field copy from one `Class6D430` instance into another:
+A field-by-field copy from one `FileResource` instance into another:
 `+0x40`..`+0x58` (7 words), then a gap of 3 words (`+0x5C`..`+0x64`, not
 copied), then `+0x68`..`+0x74` (4 words).
 
@@ -34,14 +34,14 @@ which *is* a block copy) — so this is a straight sequence of per-field
 assignments, not a `struct` value copy or a loop. The 3-word gap
 (`+0x5C`..`+0x64`) is real: retail's instruction stream jumps straight from
 `+0x58` to `+0x68` with no intervening load/store, so those offsets are
-deliberately excluded from the copy, not merely unread — `Class6D430`
+deliberately excluded from the copy, not merely unread — `FileResource`
 leaves them as an unnamed `pad5C` array rather than guessing a name for
 them.
 
 ## Final C
 
 ```c
-void CopyDataSourceSlots(Class6D430 *dst, Class6D430 *src) {
+void CopyDataSourceSlots(FileResource *dst, FileResource *src) {
     dst->unk40 = src->unk40;
     dst->unk44 = src->unk44;
     dst->unk48 = src->unk48;
@@ -88,10 +88,10 @@ Round 52 (alpha), FINISHING-PLAN track 3.
 | --- | --- | --- |
 | `func_80026D88` | `CopyDataSourceSlots` | B |
 
-**Track 4 (2026-09-25, Class6D430 unification): renamed from `Class6D430__CopyFields`, tier A.** Its callers pass METHOD TABLES, not objects (`SetActiveDataSource`: `GetClass6D430Methods()` and each `gDataSourceClientGetters` entry, from the CD or SPU driver's table), so the "fields" +0x40..+0x58 and +0x68..+0x74 are the eleven data-source interface slots of `Class6D430Methods`, and the "gap" +0x5C..+0x64 is the base's own freeBuffer/slot60/setFlag. Retyped `(Class6D430Methods *dst, Class6D430Methods *src)`, byte-identical; the Class6D430 object never had fields there (it is 0x2C bytes).
+**Track 4 (2026-09-25, FileResource unification): renamed from `FileResource__CopyFields`, tier A.** Its callers pass METHOD TABLES, not objects (`SetActiveDataSource`: `GetFileResourceMethods()` and each `gDataSourceClientGetters` entry, from the CD or SPU driver's table), so the "fields" +0x40..+0x58 and +0x68..+0x74 are the eleven data-source interface slots of `FileResourceMethods`, and the "gap" +0x5C..+0x64 is the base's own freeBuffer/slot60/setFlag. Retyped `(FileResourceMethods *dst, FileResourceMethods *src)`, byte-identical; the FileResource object never had fields there (it is 0x2C bytes).
 
 **Evidence.** A field-by-field copy of a fixed subset of one
-`Class6D430` instance's fields into another (`+0x40..+0x58`,
+`FileResource` instance's fields into another (`+0x40..+0x58`,
 `+0x68..+0x74`, skipping a real 0xC-byte gap). Mechanics fully derived
 (confirmed instruction-by-instruction, not a struct-value copy); why these
 specific fields travel together and not the gap is not established.
@@ -102,13 +102,13 @@ specific fields travel together and not the gap is not established.
 and all five vtable slots below are now in the tree, each one applied
 separately with `./build-and-verify.sh` green and byte-exact after it. One
 mis-hit had to be resolved by receiver type: `src/code_179d8_h.c:143`
-accesses `pendingGeneration` on a `Class6D430 *self`, while the same file's
+accesses `pendingGeneration` on a `FileResource *self`, while the same file's
 lines 97/174/175/182 are its OWN `ObjA34_179D8H::unk0C` and were left alone.
 The compiler named that mis-hit (`structure has no member named 'unk0C'`),
 which is the procedure working in the direction where it can work.
 
 Same cross-unit exposure (`code_179d8_h.c`/`code_179d8_q.c` include
-`Class6D430`), so PROPOSED, not renamed. None of `unk40`/`unk44`/
+`FileResource`), so PROPOSED, not renamed. None of `unk40`/`unk44`/
 `unk48`/`unk4C`/`unk50`/`unk54`/`unk58`/`unk68`/`unk6C`/`unk70`/`unk74` has
 any evidence beyond "copied together, in this order, with a real 0xC-byte
 gap between the two runs" -- no read or write site elsewhere in this unit

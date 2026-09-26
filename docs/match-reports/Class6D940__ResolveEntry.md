@@ -805,7 +805,7 @@ Two sub-lessons, both independently reusable:
 
 Renamed `func_8002C278 -> Class6D940__ResolveEntry`, tier B (mechanics
 established, purpose not). This is `D_8006D940`'s own `+0x078` slot -- a
-unique extension beyond Class6D430's base layout, confirmed by
+unique extension beyond FileResource's base layout, confirmed by
 `tools/classtable.py 0x8006D940`. Resolves an `Entry278` descriptor for a
 grid-cell-shaped index (cached byte offset, or fresh `index*12+8` lookup),
 and when present computes position-like fields on a 0x800/0x400 lattice
@@ -823,7 +823,7 @@ built and scored).
 
 ## Track 4 (2026-09-26, round 87, echo)
 
-Retyped, byte-identical, with the class unified in `include/Class6D940.h`. `Ctx278` was the Class6D940 object itself: this is slot +0x078 of D_8006D940 (`classtable.py D_8006D940 --vs D_8006D430`), called only by Class866E8__LoadElementResources as `target->methods->slot78(target, &outBuf, i)` on the object New_Class6D940 built. So `unk10` is Class6D430's `buffer` (the caller points it into a loaded resource), `unk2C` is `linkResource` (the caller stores New_LinkResource there), and `Ctx278Sub`'s +0x080 is LinkResource__GetModel (gLinkResourceMethods). `Obj278` is the caller's 0x40-byte stack record, now `Class6D940Placement` (x/y/z at +0x0C..+0x14 go to the GPU coordinate, rotY +0x1A, `chained` +0x30, `next` +0x34 the offset of the cell's next record, which the caller loops on without advancing the cell); `Entry278` is `Class6D940Record`. The cell index splits as row = cell / 20, column = cell % 20, a 20x20 grid of 0x800-unit cells. The four-argument LinkResource call stays: `placement` must be in $a3.
+Retyped, byte-identical, with the class unified in `include/Class6D940.h`. `Ctx278` was the Class6D940 object itself: this is slot +0x078 of D_8006D940 (`classtable.py D_8006D940 --vs gFileResourceMethods`), called only by Class866E8__LoadElementResources as `target->methods->slot78(target, &outBuf, i)` on the object New_Class6D940 built. So `unk10` is FileResource's `buffer` (the caller points it into a loaded resource), `unk2C` is `linkResource` (the caller stores New_LinkResource there), and `Ctx278Sub`'s +0x080 is LinkResource__GetModel (gLinkResourceMethods). `Obj278` is the caller's 0x40-byte stack record, now `Class6D940Placement` (x/y/z at +0x0C..+0x14 go to the GPU coordinate, rotY +0x1A, `chained` +0x30, `next` +0x34 the offset of the cell's next record, which the caller loops on without advancing the cell); `Entry278` is `Class6D940Record`. The cell index splits as row = cell / 20, column = cell % 20, a 20x20 grid of 0x800-unit cells. The four-argument LinkResource call stays: `placement` must be in $a3.
 
 ## Track 4 (LinkResource)
 

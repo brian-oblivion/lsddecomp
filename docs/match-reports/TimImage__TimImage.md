@@ -17,7 +17,7 @@ Round 81, runner echo. Unit `src/code_2bb9c.c`. Fresh ground, no prior attempt.
 
 ```c
 void TimImage__TimImage(TimImage *self, char *name) {
-    GetActiveDataSourceMethods()->ctor((Class6D430 *)self);
+    GetActiveDataSourceMethods()->ctor((FileResource *)self);
     self->methods = GetTimImageMethods();
     self->unk48 = 0;
     self->unk4C = 0;
@@ -27,7 +27,7 @@ void TimImage__TimImage(TimImage *self, char *name) {
 }
 ```
 
-`extern Class6D430Methods *GetActiveDataSourceMethods(void);` is a unit-local
+`extern FileResourceMethods *GetActiveDataSourceMethods(void);` is a unit-local
 declaration (the definition in `code_171e0.c` returns `void *`), following
 the local-view convention `code_179d8_d.c` / `_e.c` already use.
 
@@ -38,7 +38,7 @@ the local-view convention `code_179d8_d.c` / `_e.c` already use.
   a `"...\ .TIM"` path and passes it in; `TimImage__GetTimInfo` calls Sony's
   `GsGetTimInfo` on the loaded buffer; `TimImage__Upload` reads the result
   and uploads the pixel/CLUT blocks. The class is a TIM-image loader/upload
-  handle, not merely "a Class6D430 subclass".
+  handle, not merely "a FileResource subclass".
 - **`TimImage__TimImage`**, tier A (constructor: `Class__Class` convention).
   Slot +0x008, dispatched by `New_TimImage`/the table getter as `ctor`.
 - **`gTimImageMethods`** (was `D_8006E558`), tier A: `g<Class>Methods`
