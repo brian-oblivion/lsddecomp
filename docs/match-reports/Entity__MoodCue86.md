@@ -41,3 +41,9 @@ row mapping is a fact of the binary, which dream object or state a row is
 for is not established. Row kept decimal so names sort in table order.
 
 What it does, in the unit's current field names: `slot130` (StopTod) for the first 10 ticks, `slot12C` (PlayTod) at tick 10, `SetCueTones18_3_3` at frame 10, stops the cue and `moodState = 1` at `moodDuration + 10`.
+
+## Track 4 (2026-09-26, round 88, echo)
+
+Measured: through Class65650's `s32 playTod` slot this function grows 3 words (the playTod call no longer cross-jumps with the void stopTod call). Every Entity playTod call casts the slot to `EntityPlayTodFn` (void), which emits no code.
+
+The class (id 0x1F234, table `ENTITY_METHODS`) is unified as `Entity` in `include/Entity.h`: a Class65650 subclass whose table and object expand `CLASS65650_SLOTS`/`CLASS65650_FIELDS`. Any source block above is the pre-unification spelling; the live body takes the inherited names (fields `parent`, `coord2`->`tx/ty/tz`, `tick`, `linkTarget`, `state` (was `moodState`), `lastOffsetValue`, `grid` (was `unk4C`), `ticker` (was `companion2`), `arg2` (was `soundCueChannel`), `parts`, `todPlaying`, `peer` (was `target`, cast to the `Unk94Obj` DreamSys view where its own slots are called); slots `reset`, `setDisplay`, `setLightMode`, `setTranslation`/`addTranslation`, `moveLocalZ/X/Y`, `moveLocalZOrFindLink`, `selectTickCallback`, `enableTickCallback`/`disableTickCallback`, `distanceToPeer`, `setTargetReached`, `updateActivationState`/`updateDeactivationState`), byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).

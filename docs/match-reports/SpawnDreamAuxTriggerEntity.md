@@ -166,3 +166,9 @@ attach); tier B since the exact game meaning of the coordinate/dispatch
 sequence is not established from this unit alone. Renamed
 `DreamAuxSpawnInfo.val3` to `posIndex` in this pass (definition-only
 rename, confirmed confined to this unit by rebuild).
+
+## Track 4 (2026-09-26, round 88, echo)
+
+The entity is now `Entity *` and its raw `vtable[0x11]`/`vtable[0x13]` calls are the typed slots updateRotation and attachToParent (through Class65650AttachToParentFn: peer gDreamAuxWorld, companion D_8008AC08, parent D_8008ABFC, offset outBuf), same bytes. DreamAuxObjFn11/13 deleted.
+
+Byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).

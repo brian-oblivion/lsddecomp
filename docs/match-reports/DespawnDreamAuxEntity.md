@@ -107,3 +107,9 @@ a trigger normally (culling an existing occupant instead of processing a
 new one). Tier B: the sequence's mechanics are clear, but whether it
 literally removes the entity (vs. repositions/reorients it) is inferred,
 not read directly off any single instruction.
+
+## Track 4 (2026-09-26, round 88, echo)
+
+`a0->entity` is now `Entity *` and its raw `vtable[0x14]`/`vtable[0x13]` calls are detachFromParent and attachToParent (through Class65650AttachToParentFn), same bytes. DreamAuxObjFn13/14 deleted.
+
+Byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).
