@@ -31,7 +31,7 @@ void NoOpIgnoreArgs(void) {}
  * only from its per-kind dispatch in class_3bb8c_s.c. ReleaseSprites and
  * ReleaseSpritesB are two identical, separate ROM functions (see their
  * reports). RandomizeSprites walks sprites[1..4]: each gets a random scale
- * ratio table through its updateScale slot (Class879C4__UpdateScale) and a
+ * ratio table through its updateScale slot (VariantSprite__UpdateScale) and a
  * random sprite.rotate, `(rand() % 360) << 12` (4096 per degree).
  * ------------------------------------------------------------------ */
 
@@ -55,7 +55,7 @@ void Class876FC__SpawnPlainSprites(Class876FC *self) {
 }
 
 void Class876FC__RandomizeSprites(Class876FC *self) {
-    Class879C4 **p = &self->sprites[1];
+    VariantSprite **p = &self->sprites[1];
     s32 i;
 
     for (i = 0; i < 4; i++, p++) {

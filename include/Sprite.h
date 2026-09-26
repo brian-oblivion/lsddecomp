@@ -12,7 +12,7 @@
  * projected from the inherited coordinate. Methods in src/code_322b4.c; four
  * classes derive from it (`typeviews.py --tree`): ScreenSprite (0x144, the
  * screen-space sprite, include/ScreenSprite.h), CharSprite (0x1144, one 8x8
- * font character, include/CharSprite.h), TextRow (0x11144) and gClass879C4Methods (0x1F44,
+ * font character, include/CharSprite.h), TextRow (0x11144) and gVariantSpriteMethods (0x1F44,
  * class_3bb8c_p/q/t).
  *
  * The texture is bound by reset (+0x040), which the ctor calls with its own
@@ -28,7 +28,7 @@
  * the semitrans rate), updateRotation writes sprite.rotate.
  *
  * Not settled here: the ctor passes reset FIVE arguments after self and
- * reset reads three, where SceneNode's reset takes none (Class879C4's
+ * reset reads three, where SceneNode's reset takes none (VariantSprite's
  * ctor, round 87, is void: its +0x040 occupant sets no $v0). The slot keeps
  * SceneNode's type (it is that class's to change), so a C call through it
  * with arguments needs a cast until SceneNode's slot is retyped.
@@ -54,7 +54,7 @@ struct SpriteRgb {
 };
 
 /* A texture cell: 16-bit origin in the texture page, 32-bit extent. The
- * ctor's `rect`, copied to `rect` by reset; gClass879C4Cells (Class879C4's two
+ * ctor's `rect`, copied to `rect` by reset; gVariantSpriteCells (VariantSprite's two
  * cells) and D_8006ED40 (CharSprite's 8x8 cell origin) are these. */
 struct SpriteRect {
     /* +0x000 */ u16 u;
@@ -101,9 +101,9 @@ struct SpriteGs {
     /* +0x044 */ u8 pad44[4];                                                                      \
     /* +0x048 */ struct GsIMAGE *image; /* reset: &texture->tim (the TimImage's +0x02C) */          \
     /* +0x04C */ SpriteRect rect;       /* reset: a copy of the ctor's cell */                     \
-    /* +0x058 */ s32 unk58;             /* zeroed by reset; Class879C4__UpdateScale: non-zero scales unk5C/unk60 instead of the sprite */ \
-    /* +0x05C */ s32 unk5C;             /* Class879C4__UpdateScale: times the x ratio when unk58 != 0 */ \
-    /* +0x060 */ s32 unk60;             /* Class879C4__UpdateScale: times the y ratio when unk58 != 0 */ \
+    /* +0x058 */ s32 unk58;             /* zeroed by reset; VariantSprite__UpdateScale: non-zero scales unk5C/unk60 instead of the sprite */ \
+    /* +0x05C */ s32 unk5C;             /* VariantSprite__UpdateScale: times the x ratio when unk58 != 0 */ \
+    /* +0x060 */ s32 unk60;             /* VariantSprite__UpdateScale: times the y ratio when unk58 != 0 */ \
     /* +0x064 */ SpriteGs sprite;       /* InitGsSprite fills it; Viewport__DrawNode sorts it */    \
     /* +0x088 */ u8 pad88[0xA0 - 0x88]  /* the object is 0xA0 bytes (New_Sprite); ScreenSprite's own fields start at +0x0A0 */
 /* clang-format on */

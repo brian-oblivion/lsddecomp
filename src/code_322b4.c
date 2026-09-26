@@ -23,7 +23,7 @@
  * New_CharSprite, CharSprite__*, GetCharSpriteMethods) live here. Every
  * class owning methods in this unit is now unified (track 4; FrameClock, the
  * last, round 88). gTextRowMethods (0x11144, below CharSprite) and
- * gClass879C4Methods (0x1F44, class_3bb8c_p/q/t) are Sprite subclasses too but own
+ * gVariantSpriteMethods (0x1F44, class_3bb8c_p/q/t) are Sprite subclasses too but own
  * no methods in this unit.
  * FrameClock (include/FrameClock.h, gFrameClockMethods, id 0x5) is unified:
  * a BasicClass subclass ticked once per DrawSystem frame that tells its
@@ -282,7 +282,7 @@ s32 Sprite__SetSemiTransRate(Sprite *self, s32 a1) {
 /* gTextRowMethods and gCharSpriteMethods slot +0x098 (update): empty override. */
 void Sprite__Update(Sprite *self, void *sender, s32 event) {}
 
-/* Slot +0x0B8 of gCharSpriteMethods, gScreenSpriteMethods, gSpriteMethods and gClass879C4Methods (the
+/* Slot +0x0B8 of gCharSpriteMethods, gScreenSpriteMethods, gSpriteMethods and gVariantSpriteMethods (the
  * sprite classes): copy three bytes into the embedded GsSPRITE's r,g,b. */
 void Sprite__SetColor(Sprite *self, SpriteRgb *rgb) {
     self->sprite.rgb = *rgb;

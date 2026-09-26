@@ -5,7 +5,7 @@
  * attaches itself under a parent at pos + offset, links a model for kinds
  * 0-1, and owns up to two child arrays -- two Actor model children laid
  * out in a row that spin and drift along z after frame 500 (kind 0), or
- * five Class879C4 sprites (a GsSPRITE at +0x64) that are randomised at build
+ * five VariantSprite sprites (a GsSPRITE at +0x64) that are randomised at build
  * time (kind 2) or every frame (kind 3, class_3bb8c_o.c). Entry points are
  * the class's ctor, update slot (+0x0EC) and dtor in class_3bb8c_r.c, via
  * Class876FC__InitByKind / __UpdateByKind / __ReleaseByKind.
@@ -15,11 +15,11 @@
  */
 #include "common.h"
 #include "Actor.h"
-#include "Class879C4.h"
+#include "VariantSprite.h"
 #include "Class876FC.h"
 
 /* The class and its children: include/Class876FC.h (the owner),
- * include/Actor.h (modelChildren) and include/Class879C4.h (sprites). */
+ * include/Actor.h (modelChildren) and include/VariantSprite.h (sprites). */
 
 extern void ReleaseBasicClassArray(void **array, s32 count);
 extern s32 gSpriteShiftX[];
@@ -49,13 +49,13 @@ void AttachWithRotScale(Actor *node, void *parent, void *trans, void *rotation, 
  * NoOpIgnoreArgs (class_3bb8c_o.c, empty) is the same idiom. */
 extern void NoOpIgnoreArgs();
 
-/* New_Class879C4: include/Class879C4.h. */
+/* New_VariantSprite: include/VariantSprite.h. */
 
 /* Three globals class_3bb8c_o.c's Actor__func_56f5c captures once from its
  * parameters (declared there with the same types; track 4b, round 85):
  * D_8008ACA4 is the Actor it ran on, called here through SceneNode's
  * +0x080 getSetUnk10Flag8 as that function calls it; D_8008ACA8 is
- * forwarded opaquely to New_Class879C4 as its third argument; D_8008ACAC's
+ * forwarded opaquely to New_VariantSprite as its third argument; D_8008ACAC's
  * pointee has a field at +0x018 that Class876FC__InitByKind and
  * Class876FC__UpdateByKind snapshot/diff via gTrackedYSnapshot. */
 extern Actor *D_8008ACA4; /* the Actor Actor__func_56f5c ran on */
@@ -271,18 +271,18 @@ void Class876FC__ReleaseModelChildren(Class876FC *self) {
 void Class876FC__BuildRandomSprites(Class876FC *self) {
     s32 parity = rand() % 2;
     void *tblOrNull = parity ? NULL : gSpriteScaleHalf;
-    Class879C4 *child;
+    VariantSprite *child;
     SpriteRgb *arg;
 
     Class876FC__SpawnSprites(self, 0, 0, tblOrNull);
 
     if (self->params.tableIndex >= 2) {
-        Class879C4Methods *m;
+        VariantSpriteMethods *m;
 
         child = self->sprites[1];
         gSpriteShiftScratch.x = gSpriteShiftX[self->params.tableIndex];
         /* Called directly, not through the child's table: the child is a
-         * sprite (Class879C4, a Sprite), not an Actor, and the function only
+         * sprite (VariantSprite, a Sprite), not an Actor, and the function only
          * touches the SceneNode coord2 both share. */
         Actor__AddTranslation((Actor *)child, &gSpriteShiftScratch);
         m = child->methods;
@@ -298,18 +298,18 @@ void Class876FC__BuildRandomSprites(Class876FC *self) {
     self->sprites[2]->methods->setDisplay(self->sprites[2], 0);
 }
 
-/* Create the five sprites (New_Class879C4), attach each to self at no offset,
+/* Create the five sprites (New_VariantSprite), attach each to self at no offset,
  * give each self's colour (Sprite's setColor sets GsSPRITE r,g,b), and
  * assign `scale` as their scale when non-NULL. `self` stays `void *`: it is
  * the prototype class_3bb8c_o.c calls through, and a typed local alias of
  * it costs a callee-saved register (see this function's report). */
 void Class876FC__SpawnSprites(void *self, s32 unused, s32 variant, void *scale) {
-    Class879C4 **p = ((Class876FC *)self)->sprites;
-    Class879C4 *node;
+    VariantSprite **p = ((Class876FC *)self)->sprites;
+    VariantSprite *node;
     s32 i;
 
     for (i = 0; i < 5; i++, p++) {
-        node = New_Class879C4(variant, 0, D_8008ACA8);
+        node = New_VariantSprite(variant, 0, D_8008ACA8);
         *p = node;
         node->methods->attachToParent(node, self, 0);
         (*p)->methods->setColor(*p, ((Class876FC *)self)->params.color);

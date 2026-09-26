@@ -2,7 +2,7 @@
 #define CLASS876FC_H
 
 #include "Actor.h"
-#include "Class879C4.h"
+#include "VariantSprite.h"
 
 /*
  * Class876FC -- class id 0xEF34, method table gClass876FCMethods: Actor's
@@ -22,7 +22,7 @@
  * and attaches self under `parent` at pos + params.offset
  * (Class876FC__InitByKind). Per kind: 0 and 1 link a model fetched through
  * D_8008ACA4; 0 also builds two Actor `modelChildren` in a row; 2 and 3 build
- * five Class879C4 `sprites` (2 randomised once, 3 re-randomised every frame).
+ * five VariantSprite `sprites` (2 randomised once, 3 re-randomised every frame).
  *
  * What it changes, from its own methods (`classtable.py gClass876FCMethods
  * --vs gActorMethods`):
@@ -80,7 +80,7 @@ struct Class876FCParams {
     ACTOR_FIELDS(Methods);                                                                         \
     /* +0x058 */ Class876FCParams params; /* the reset slot's copy (Class876FC__SetParams) */      \
     /* +0x07C */ Actor *modelChildren[2]; /* kind 0: New_Actor children (PlaceModelChildren) */    \
-    /* +0x084 */ Class879C4 *sprites[5]   /* kinds 2/3: New_Class879C4 children (SpawnSprites). The object is 0x98 bytes (New_Class876FC) */
+    /* +0x084 */ VariantSprite *sprites[5]   /* kinds 2/3: New_VariantSprite children (SpawnSprites). The object is 0x98 bytes (New_Class876FC) */
 /* clang-format on */
 
 struct Class876FCMethods {

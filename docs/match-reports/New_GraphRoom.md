@@ -4,7 +4,7 @@
 
 > Renamed from `func_80057F68` on 2026-09-24 (tools/rename.py). Address 0x80057f68.
 
-Unit: `src/class_3bb8c_t.c`. Class: `gClass879C4Methods` family -- plain
+Unit: `src/class_3bb8c_t.c`. Class: `gVariantSpriteMethods` family -- plain
 allocator/constructor wrapper (`New_X` shape), not a vtable slot.
 
 ## Signature
@@ -32,7 +32,7 @@ own `GetGraphRoomMethods`, still queued -- forward-declared here) with `(obj,
 arg1)`, return the allocation regardless of the ctor's own return value.
 `return obj;` sits INSIDE the success `if`, with a trailing `return
 NULL;` -- the shape established as necessary for this exact pattern in
-`class_3bb8c_p`'s `New_Class879C4` report.
+`class_3bb8c_p`'s `New_VariantSprite` report.
 
 This introduces this unit's own view of `gGraphRoomMethods` (73 slots,
 `D_80087AACMethods`/`D_80087AACObj`, currently typing only the ctor slot
