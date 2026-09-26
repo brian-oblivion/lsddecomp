@@ -9,7 +9,7 @@
  * It holds two classes:
  *
  * - Four empty leaves plus the table getter (VariantSprite__Update,
- *   VariantSprite__func_57f40/48/50, GetVariantSpriteMethods) of the unrelated
+ *   VariantSprite__NoOpSlotBC/48/50, GetVariantSpriteMethods) of the unrelated
  *   VariantSprite (table `gVariantSpriteMethods`, 49 slots; include/VariantSprite.h;
  *   its ctor is in `class_3bb8c_p`, two more methods in `class_3bb8c_q`).
  * - The WHOLE of `GraphRoom` (round 75 name; table `gGraphRoomMethods`,
@@ -54,7 +54,7 @@ extern void *BMemPMgrAlloc(s32 size);
  * nothing calls, so they keep the tier-C `Class__func_xxxxx` form. */
 void VariantSprite__Update(VariantSprite *self, void *sender, s32 event) {}
 
-void VariantSprite__func_57f40(void) {}
+void VariantSprite__NoOpSlotBC(void) {}
 
 void VariantSprite__func_57f48(void) {}
 
