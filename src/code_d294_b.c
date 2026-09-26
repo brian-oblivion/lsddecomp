@@ -142,7 +142,7 @@ void SceneNode__TransformAndNotifyParents(SceneNode *self, TmdHull *a1, s32 a2) 
 
 void SceneNode__OnPadEvent(void) {}
 
-void func_8001D6AC(void) {}
+void SceneNode__Update(void) {}
 
 /* a2 selects one of three behaviors: 2 or 3 dispatches through the vtable
  * (self->methods->slotA0), exactly 4 stores a1 into self->linkTarget, and

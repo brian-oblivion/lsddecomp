@@ -5,7 +5,7 @@
 Round 82, runner alpha (re-staffed slot). Unit `src/code_322b4.c`. Fresh
 ground (carved in FINISHING-PLAN revision 18), no prior attempt.
 
-- **Where:** gTextRowMethods and gCharSpriteMethods slot +0x098 (update, over func_8001D6AC) (`tools/classtable.py`).
+- **Where:** gTextRowMethods and gCharSpriteMethods slot +0x098 (update, over SceneNode__Update) (`tools/classtable.py`).
 - **What:** empty override: `jr $ra; nop`.
 - **Result:** byte-exact on the FIRST build; 2/2 words, 0 insertions /
   0 deletions, whole-image SHA1 green. No levers needed.
