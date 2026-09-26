@@ -18,6 +18,7 @@
 #include "ItemList.h"
 #include "ScreenSprite.h"
 #include "TimImage.h"
+#include "TextRow.h"
 
 void TextEntry__PrevChar(TextEntry *self) {
     s32 count;
@@ -87,12 +88,12 @@ void TextEntry__SetCursorPos(TextEntry *self, s32 pos, s32 notify) {
 extern u8 *gNameCharTable;
 
 void TextEntry__SetCharAt(TextEntry *self, s32 pos, s32 charIndex, s32 notify) {
-    ChildObj86ED0 *obj;
+    TextRow *obj;
 
     if (self->panelSprite) {
         self->editBuf[pos] = gNameCharTable[charIndex];
         obj = self->textRow;
-        obj->methods->slotC4(obj, gNameCharTable[charIndex], pos);
+        ((TextRowSetCellAtFn)obj->methods->setCell)(obj, gNameCharTable[charIndex], pos);
         self->cursorIndex = pos;
         self->charIndex = charIndex;
         if (notify) {

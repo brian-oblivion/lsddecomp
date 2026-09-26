@@ -38,7 +38,7 @@
 /* Helper views of the objects it holds, defined in include/class_3bb8c.h
  * (not this class; tags only here). */
 struct TargetObj86ED0;
-struct ChildObj86ED0;
+struct TextRow;
 
 typedef struct TextEntry TextEntry;
 typedef struct TextEntryMethods TextEntryMethods;
@@ -88,7 +88,7 @@ struct TextEntry {
     /* +0x038 */ void *childType5; /* ... whose low nibble is 5 */
     /* +0x03C */ struct TargetObj86ED0 *target; /* attachTarget; notifyTarget calls its +0x080 with (arg1, 0x60, 0x60) */
     /* +0x040 */ CharSprite *cursorSprite; /* loadCardResources: New_CharSprite(FONTICON, '_'); setCursorPos moves it to x = pos * 7 */
-    /* +0x044 */ struct ChildObj86ED0 *textRow; /* a TextRow (include/TextRow.h): loadCardResources: New_TextRow(FONTICON, textLen, editBuf); setCharAt sets a cell (+0x0C4) */
+    /* +0x044 */ struct TextRow *textRow; /* a TextRow (include/TextRow.h): loadCardResources: New_TextRow(FONTICON, textLen, editBuf); setCharAt sets a cell (+0x0C4) */
     /* +0x048 */ ScreenSprite *panelSprite; /* loadCardResources: New_ScreenSprite(COMINPUT, 224x120); non-NULL gates every editing method */
 };
 

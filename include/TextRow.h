@@ -32,8 +32,7 @@
  *  - reset (+0x040) takes the text; the ctor, which passes it, casts to
  *    TextRowResetFn (no code), as CharSprite's ctor does for its cell.
  *  - setCell (+0x0C4) is TextRow__SetCellAt(self, cell, index); a caller
- *    that passes the index casts to TextRowSetCellAtFn (TextEntry__SetCharAt
- *    calls it through its own view, include/class_3bb8c.h's ChildObj86ED0).
+ *    that passes the index casts to TextRowSetCellAtFn (TextEntry__SetCharAt).
  *  - setDisplay (+0x060) is TextRow__SetDisplay(self, on, result): the value
  *    it returns with no visible cell is the caller's untouched $a2.
  * attachToParent's position is a ScreenSpritePos where SceneNode's slot

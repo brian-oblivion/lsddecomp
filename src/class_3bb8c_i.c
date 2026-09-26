@@ -197,11 +197,11 @@ void TextEntry__LoadCardResources(TextEntry *self, void *arg1) {
 
     handle2 = New_TimImage(BuildFileName(path, sStrFontIcon, dir, ext));
     ((TimImageUploadFn)handle2->methods->processBuffer)(handle2);
-    self->textRow = (ChildObj86ED0 *)New_TextRow(handle2, self->textLen, self->editBuf);
+    self->textRow = New_TextRow(handle2, self->textLen, self->editBuf);
     self->cursorSprite = New_CharSprite(handle2, 0x5F);
     handle2->methods->release(handle2);
-    self->textRow->methods->slot4C(self->textRow, arg1, (void *)&D_8008AAD4);
-    self->textRow->methods->slotB8(self->textRow, (void *)&D_8008AAC8);
+    self->textRow->methods->attachToParent(self->textRow, (SceneNode *)arg1, (LongVec3 *)&D_8008AAD4);
+    self->textRow->methods->setColor(self->textRow, (SpriteRgb *)&D_8008AAC8);
     self->cursorSprite->methods->attachToParent(self->cursorSprite, (SceneNode *)arg1,
                                                 (LongVec3 *)&D_8008AADC);
 }

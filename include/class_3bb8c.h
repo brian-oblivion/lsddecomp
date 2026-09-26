@@ -359,38 +359,10 @@ extern void StyleTeardown(void);
 
 /*
  * TextEntry (gTextEntryMethods, class_3bb8c_i/j) is declared in
- * include/TextEntry.h (FINISHING-PLAN track 4, round 87). What stays here are
- * two helper views of objects it HOLDS, which are not its class: the
- * resources `cursorSprite`/`textRow`/`panelSprite` and the TIM handles
- * (ChildObj86ED0), and `target` (TargetObj86ED0). The names are kept.
+ * include/TextEntry.h (FINISHING-PLAN track 4, round 87). What stays here is
+ * a helper view of an object it HOLDS, which is not its class: `target`
+ * (TargetObj86ED0). Its `textRow` is a TextRow (include/TextRow.h).
  */
-/* TextEntry's `textRow` (a TextRow, include/TextRow.h): a view of the slots
- * its calls use, not one class. The TIM handles TextEntry__LoadCardResources
- * and TaskObjF__LoadCardIcon load through New_TimImage used this view too
- * until round 88; they are `TimImage *` now (include/TimImage.h). */
-typedef struct ChildObj86ED0 ChildObj86ED0;
-typedef struct ChildMethods86ED0 ChildMethods86ED0;
-
-struct ChildMethods86ED0 {
-    u8 pad000[0x004];
-    void *(*release)(ChildObj86ED0 *self); /* +0x004, TextEntry__ReleaseCardResources */
-    u8 pad008[0x04C - 0x008];
-    /* +0x04C, textRow: (parent, &D_8008AAD4), the attachToParent shape
-     * ScreenSprite's slot has (include/ScreenSprite.h). */
-    void (*slot4C)(ChildObj86ED0 *self, void *arg1, void *arg2);
-    u8 pad050[0x078 - 0x050];
-    void (*slot78)(ChildObj86ED0 *self); /* +0x078; no accessor since round 88 (it was the TIM handles' TimImage__Upload) */
-    u8 pad07C[0x0B8 - 0x07C];
-    void (*slotB8)(ChildObj86ED0 *self, void *arg1); /* +0x0B8, TextEntry__LoadCardResources, textRow */
-    u8 pad0BC[0x0C4 - 0x0BC];
-    void (*slotC4)(ChildObj86ED0 *self, s32 arg1,
-                   s32 arg2); /* +0x0C4, TextEntry__SetCharAt, textRow: (char, pos); TextRow__SetCellAt */
-};
-
-struct ChildObj86ED0 {
-    ChildMethods86ED0 *methods; /* +0x000 */
-};
-
 /* TextEntry's `target` (+0x03C) -- an unrelated class (own vtable, unconnected to
  * gTextEntryMethods; TaskObjF passes its `sound`, a VabStreamObj), reached only through its own +0x080 slot by TextEntry__NotifyTarget.
  * Field meaning beyond that slot is unestablished. */
