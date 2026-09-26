@@ -4,29 +4,30 @@
 #include "FileResource.h"
 
 /*
- * RequestedFile -- a FileResource data source (class id 0xB03, method table
- * gRequestedFileMethods) that requests one named file at construction and
- * records when the load has completed. Methods in src/code_322b4.c. No
- * classes derive from it. Its getter is an entry of
- * gDataSourceClientGetters, so SetActiveDataSource rebinds its interface
- * slots like every other client's.
+ * RequestedFile -- one whole file, requested from the active data-source
+ * driver at construction, with a flag that says when it has arrived (class
+ * id 0xB03, method table gRequestedFileMethods, parent FileResource; methods
+ * in src/code_322b4.c; no subclasses).
  *
- * PARENT BY CTOR CHAIN: RequestedFile__RequestedFile's first call is
- * GetActiveDataSourceMethods()->ctor, and RequestedFile__Finalize forwards to
- * the active driver's finalize, as Class6D940 and TimBlockSrc do.
+ * New_RequestedFile(name) allocates it and the ctor passes a 32-byte stack
+ * copy of the name to requestLoadFile (+0x06C). On the CD driver with async
+ * loading on, that queues a load-file request, which CdDriver__RunRequestQueue
+ * dispatches to loadFile and, once the read completes, reports through
+ * setFlag (+0x064); otherwise loadFile runs at once and calls setFlag itself.
+ * Either way the file lands in FileResource's `buffer`, and setFlag's
+ * occupant here, RequestedFile__MarkLoaded, sets `loaded`. The ctor and
+ * finalize clear it. The class adds no step that consumes the buffer
+ * (+0x078 is not in its table): the owner reads `buffer` itself once
+ * `loaded` is set, and releases the object (FileResource__Release) when done.
  *
- * Own mechanics, all three methods: the ctor clears `loaded` and, given a
- * name, passes a 32-byte stack copy of it to requestLoadFile (+0x06C); the
- * setFlag override (+0x064, RequestedFile__MarkLoaded) sets `loaded` to 1 -- the
- * CD driver calls setFlag when a queued operation completes
- * (CdDriver__LoadFile, the request-queue dispatch in code_179d8_s) --
- * and finalize clears it again. Nothing overrides loadFile (+0x058 is NULL
- * in the static table), so the file lands in FileResource's `buffer`.
+ * Like every FileResource client it runs on the active driver: the ctor and
+ * finalize chain to GetActiveDataSourceMethods()'s first, and
+ * GetRequestedFileMethods is in gDataSourceClientGetters, so
+ * SetActiveDataSource rebinds this table's file-I/O slots.
  *
- * Its one user is WBgm (src/code_2a0e0.c): WBgm__SetSeq makes one per SEQ
- * name, and WBgm__HandleMonitorEvent waits for `loaded` before passing
- * `buffer` to SsSeqOpen. That is the caller's use, not the class's
- * mechanics, so the name stays address-derived.
+ * Its one user is WBgm (include/WBgm.h): WBgm__SetSeq makes one per SEQ
+ * path (`seqData`), and WBgm__HandleMonitorEvent passes its `buffer` to
+ * SsSeqOpen once `loaded` is set.
  */
 
 typedef struct RequestedFile RequestedFile;
