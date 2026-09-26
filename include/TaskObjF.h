@@ -21,7 +21,7 @@
  *    sources (added as children; TaskObjF__AddChild files each child by its
  *    class id: low nibble 2 -> inputSource, 5 -> tickSource, 0x10 ->
  *    textEntry, 0x20 -> itemList), the sprite parent and the sound. Its one
- *    caller is TitleMenu__BeginMemcardSave: initArgs->unk4, unk10 (a
+ *    caller is TitleMenu__BeginCardAccess: initArgs->unk4, unk10 (a
  *    FrameClock, id 0x5), unk14, and TaskCore's `sound` (a VabStreamObj).
  *  - beginLoad (+0x074, opMode 1) lists the save files that exist
  *    (collectExistingMemcardFiles into `titles`/`foundSuffixes`), lets the

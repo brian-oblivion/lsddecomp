@@ -93,12 +93,12 @@ compiler-ownership rule this is a PROPOSAL, not a rename. Also posted to
 the round-77 broadcast.
 
 - **`unkAC` -> `saveCtrl`, tier B.** The `New_TaskObjF`-constructed
-  sub-object (see `TitleMenu__BeginMemcardSave`) that this function
+  sub-object (see `TitleMenu__BeginCardAccess`) that this function
   guards both releases on, and whose `slot6C` dispatch carries
   `D_8008A9D0` ("BISLPS-01556", Sony's memcard save-header game-ID
   string). Named for its role driving the memcard-save sequence this
   unit's own functions establish
-  (`TitleMenu__BeginMemcardSave`/`TitleMenu__EndMemcardSave`/
+  (`TitleMenu__BeginCardAccess`/`TitleMenu__EndMemcardSave`/
   `TitleMenu__SaveToCard`/
   `TitleMenu__LoadFromCard`); the exact protocol is not
   established.

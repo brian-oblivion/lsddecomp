@@ -1,4 +1,6 @@
-# TitleMenu__BeginMemcardSave -- MATCHED 60/60, round 43
+# TitleMenu__BeginCardAccess -- MATCHED 60/60, round 43
+
+> Renamed from `TitleMenu__BeginMemcardSave` on 2026-09-26 (tools/rename.py). Address 0x8004df64.
 
 > Renamed from `Class86B60__BeginMemcardSave` on 2026-09-26 (tools/rename.py). Address 0x8004df64.
 
@@ -13,7 +15,7 @@ and no derivation; this round wrote and matched the function from scratch.
 ```c
 extern GenericReleaseObj_3bb8c_d *New_TimImage(const char *path);
 
-void TitleMenu__BeginMemcardSave(TitleMenu *self)
+void TitleMenu__BeginCardAccess(TitleMenu *self)
 {
     if (self->unkAC == NULL) {
         self->iconHandle = New_TimImage(D_800114F8);
@@ -28,7 +30,7 @@ void TitleMenu__BeginMemcardSave(TitleMenu *self)
 }
 ```
 
-Byte-exact on the first build: `funcdiff.py TitleMenu__BeginMemcardSave` -> `60/60 words
+Byte-exact on the first build: `funcdiff.py TitleMenu__BeginCardAccess` -> `60/60 words
 match (file 0x3E764-0x3E854)`; whole-image `OK: build matches retail
 SLPS_015.56`.
 
@@ -98,7 +100,7 @@ blocker itself was the only thing stopping them.
 
 ## Naming (round 77, naming runner delta)
 
-Renamed `func_8004DF64` -> `TitleMenu__BeginMemcardSave`. **Tier B**: Lazy-inits `self->iconHandle` (`New_TimImage(D_800114F8)`, a real dlabel "CARD\\FILEICN1.TIM") and `self->unkAC` (`New_TaskObjF`), then dispatches `unkAC`'s `slot6C` with `D_8008A9D0` (VALUE-of, holds "BISLPS-01556" -- Sony's memcard save-header game-ID convention) plus filename-related fields. Named from the game-ID string as the strongest evidence this is the start of a memory-card save operation; the exact protocol is not established.
+Renamed `func_8004DF64` -> `TitleMenu__BeginCardAccess`. **Tier B**: Lazy-inits `self->iconHandle` (`New_TimImage(D_800114F8)`, a real dlabel "CARD\\FILEICN1.TIM") and `self->unkAC` (`New_TaskObjF`), then dispatches `unkAC`'s `slot6C` with `D_8008A9D0` (VALUE-of, holds "BISLPS-01556" -- Sony's memcard save-header game-ID convention) plus filename-related fields. Named from the game-ID string as the strongest evidence this is the start of a memory-card save operation; the exact protocol is not established.
 
 ## Track 4 (2026-09-26, round 88)
 

@@ -222,7 +222,7 @@ void TitleMenu__CommitNameEntry(TitleMenu *self) {
     self->dreamSys->methods->getSetScreenShake(self->dreamSys, &buf2);
 }
 
-void TitleMenu__BeginMemcardSave(TitleMenu *self) {
+void TitleMenu__BeginCardAccess(TitleMenu *self) {
     if (self->saveCtrl == NULL) {
         self->iconHandle = New_TimImage((char *)D_800114F8);
         self->saveCtrl = New_TaskObjF(1, 0);

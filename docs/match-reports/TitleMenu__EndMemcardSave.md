@@ -47,7 +47,7 @@ None new.
 
 ## Naming (round 77, naming runner delta)
 
-Renamed `func_8004E054` -> `TitleMenu__EndMemcardSave`. **Tier B**: Mirror-image teardown of `TitleMenu__BeginMemcardSave` -- forwards `self->handlerTable->unk4` and `self->unk10` through `self->methods->slot10`/`slot14`, then `unkAC->methods->slot70(unkAC)`. Named as the paired counterpart by symmetry of the two functions' argument sets, not from independent purpose evidence.
+Renamed `func_8004E054` -> `TitleMenu__EndMemcardSave`. **Tier B**: Mirror-image teardown of `TitleMenu__BeginCardAccess` -- forwards `self->handlerTable->unk4` and `self->unk10` through `self->methods->slot10`/`slot14`, then `unkAC->methods->slot70(unkAC)`. Named as the paired counterpart by symmetry of the two functions' argument sets, not from independent purpose evidence.
 
 ## Track 4 (2026-09-26, round 88, bravo)
 

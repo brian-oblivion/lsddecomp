@@ -181,7 +181,7 @@ extern const char D_800114DC[];
  * only). */
 extern const char D_800114E8[];
 
-/* TitleMenu__BeginMemcardSave's own path string, passed to New_TimImage -- a real
+/* TitleMenu__BeginCardAccess's own path string, passed to New_TimImage -- a real
  * dlabel (`asm/data/1C34.rodata.s`: "CARD\FILEICN1.TIM"), so this is the
  * ONLY correct spelling (CLAUDE.md: never re-write a string splat has
  * already emitted as a symbol). */
@@ -230,13 +230,13 @@ extern void *D_8008AA24;
  * table is not plausible `strcpy` input. */
 extern void *D_8008AA14;
 
-/* Same VALUE-of `%gp_rel` pattern, read only by round 43's `TitleMenu__BeginMemcardSave`
+/* Same VALUE-of `%gp_rel` pattern, read only by round 43's `TitleMenu__BeginCardAccess`
  * as `TitleMenuUnkACObjMethods_3bb8c_d::slot6C`'s own `arg1`. Holds
  * `0x80011454` in the ROM image -- the "BISLPS-01556" string in
  * `D_80011434`, again with no `dlabel` of its own. */
 extern void *D_8008A9D0;
 
-/* Address-of only, round 43's `TitleMenu__BeginMemcardSave`
+/* Address-of only, round 43's `TitleMenu__BeginCardAccess`
  * (`TitleMenuUnkACObjMethods_3bb8c_d::slot6C`'s own `arg2`) -- a real
  * 16-entry pointer table (`asm/data/76DC8.data.s`, `D_8008AA0C` down to
  * `D_8008A9D4` then a NULL terminator), reached only by its own address

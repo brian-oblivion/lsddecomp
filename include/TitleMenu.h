@@ -79,7 +79,7 @@ struct TitleMenuMethods {
     /* +0x124 */ void (*commitNameEntry)(TitleMenu *self, s32 arg1); /* TitleMenu__CommitNameEntry; both callers pass
                                                                          arg1 (setState: 0, onTagBValue: 0x16) and the
                                                                          occupant reads self alone */
-    /* +0x128 */ void (*beginMemcardSave)(TitleMenu *self); /* TitleMenu__BeginMemcardSave; updateMemcardSave* call it first */
+    /* +0x128 */ void (*beginMemcardSave)(TitleMenu *self); /* TitleMenu__BeginCardAccess; updateMemcardSave* call it first */
     /* +0x12C */ void (*endMemcardSave)(TitleMenu *self); /* TitleMenu__EndMemcardSave; onTagBValue's 0x16/0x17 */
     /* +0x130 */ void (*updateMemcardSaveWithIcon)(TitleMenu *self); /* TitleMenu__SaveToCard; tick's activeSlot 2 */
     /* +0x134 */ void (*updateMemcardSaveStatus)(TitleMenu *self); /* TitleMenu__LoadFromCard; tick's activeSlot 3 */
@@ -121,7 +121,7 @@ void TitleMenu__DestroyNameField(TitleMenu *self);
 void TitleMenu__ForwardToNameField(TitleMenu *self, void *parent);
 void TitleMenu__TickNameFieldCursor(TitleMenu *self, struct SpriteRgb *color);
 void TitleMenu__CommitNameEntry(TitleMenu *self);
-void TitleMenu__BeginMemcardSave(TitleMenu *self);
+void TitleMenu__BeginCardAccess(TitleMenu *self);
 void TitleMenu__EndMemcardSave(TitleMenu *self);
 void TitleMenu__SaveToCard(TitleMenu *self);
 void TitleMenu__LoadFromCard(TitleMenu *self);
