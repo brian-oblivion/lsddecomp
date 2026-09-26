@@ -468,7 +468,7 @@ On the revisit hypothesis specifically: this unit's own types and names
 function's own earlier attempts and were already live in
 `src/code_179d8_d.c`, so there was nothing newer to import; the unit's
 other matched functions (`New_Class6D940`, `Class6D940__Class6D940`,
-`Class6D940__Destroy`, `Class6D940__SetFlag`) touch a different object family
+`Class6D940__Finalize`, `Class6D940__SetFlag`) touch a different object family
 (`Obj6D940`/`Table6D940`) and share no field with this one. **Nothing in
 the four rounds of names and types since the stall was filed changed
 anything here.** What moved the score was re-reading the diff instead of

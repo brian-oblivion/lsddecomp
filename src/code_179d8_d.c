@@ -67,7 +67,7 @@
  * `Class6D430__Release`/`Class6D430__FreeBuffer`/`NoOp` symbols the base class and
  * its CD-driver sibling (`D_8006D4E8`, code_179d8_q.c) share verbatim, +0x008
  * is a genuine ctor (`Class6D940__Class6D940`), +0x00C a genuine dtor
- * (`Class6D940__Destroy`), and `D_8006D940`'s own getter (`GetClass6D940Methods`,
+ * (`Class6D940__Finalize`), and `D_8006D940`'s own getter (`GetClass6D940Methods`,
  * ex-`func_8002C3A8`) is registered in `gDataSourceClientGetters` (code_171e0.c) -- the
  * NULL-terminated array of "class-method-table getters of every
  * Class6D430-derived client" -- as that array's FIRST entry
@@ -141,7 +141,7 @@ typedef struct BaseTable6D940 BaseTable6D940;
 struct BaseTable6D940 {
     u8 pad000[0x008];
     void (*slot08)(void *self); /* +0x008, Class6D940__Class6D940's own base-chain call */
-    /* +0x00C, Class6D940__Destroy's own dispatch -- that function's whole body
+    /* +0x00C, Class6D940__Finalize's own dispatch -- that function's whole body
      * is this one call with nothing after it, so its own return type is
      * genuinely ambiguous (a void wrapper around an s32 tail call is
      * byte-identical); typed s32 here per CLAUDE.md's rule to default to
@@ -184,7 +184,7 @@ void Class6D940__Class6D940(Class6D940 *self, s32 arg1)
     }
 }
 
-s32 Class6D940__Destroy(void *self)
+s32 Class6D940__Finalize(void *self)
 {
     return GetActiveDataSourceMethods()->slot0C(self);
 }

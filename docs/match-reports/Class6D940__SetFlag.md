@@ -7,7 +7,7 @@
 
 ## Role
 
-Sets a field then forwards to the same base accessor `Class6D940__Destroy`
+Sets a field then forwards to the same base accessor `Class6D940__Finalize`
 uses, a different slot:
 
 ```c
@@ -22,12 +22,12 @@ s32 Class6D940__SetFlag(s32 *self)
 retail's `sw $v0, 0x30($s0)` exactly, `$v0` having just been loaded with
 the literal `1`.
 
-Same tail-call return-type ambiguity as `Class6D940__Destroy` (this unit, same
+Same tail-call return-type ambiguity as `Class6D940__Finalize` (this unit, same
 round): the call is the function's last action with nothing touching
 `$v0` afterward, so `void` and `s32` compile identically. Typed `s32` and
 returned per the project's default, absent positive void evidence.
 `slot64` (`BaseTable6D940::slot64`, `+0x064`) added to the same unit-local
-table `Class6D940__Destroy` uses.
+table `Class6D940__Finalize` uses.
 
 ## Naming (round 77, charlie -- track 3)
 
