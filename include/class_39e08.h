@@ -7,7 +7,8 @@
 /*
  * Unit class_39e08: the methods of two classes, in ROM order.
  *  - DayTask (gDayTaskMethods, 0x1F230), New_DayTask through
- *    GetDayTaskMethods: include/DayTask.h (track 4, round 88).
+ *    GetDayTaskMethods: the task that runs one dream day
+ *    (include/DayTask.h).
  *  - TimedTask (gTimedTaskMethods, 0x230), its parent, New_TimedTask
  *    through TimedTask__SetTimeout: include/TimedTask.h. Its last two
  *    functions, TimedTask__PlaySound and GetTimedTaskMethods, open
@@ -20,8 +21,7 @@
  *
  * What stays here are the call-site views of objects this unit reaches
  * without a unified class to type them, each with only the slot or word its
- * one caller touches. ObjM (DayTask::objM) is include/ObjM.h (track 4,
- * round 89).
+ * one caller touches. ObjM (DayTask::objM) is include/ObjM.h.
  */
 
 /* Opaque view of whatever object DayTask__OnInit reaches through
