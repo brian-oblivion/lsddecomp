@@ -9,18 +9,18 @@
  *    and GetTextEntryMethods are TextEntry's (gTextEntryMethods slots
  *    +0x094..+0x0A8, `tools/classtable.py gTextEntryMethods`), declared in
  *    include/TextEntry.h; the rest of the class is class_3bb8c_i.
- *  - Everything else is Class86F88's (gClass86F88Methods, a BasicClass
- *    subclass, alloc size 0x54), declared in include/Class86F88.h; the rest
+ *  - Everything else is ItemList's (gItemListMethods, a BasicClass
+ *    subclass, alloc size 0x54), declared in include/ItemList.h; the rest
  *    of the class is class_3bb8c_k.
  *
  * Both attributions were WRONG before round 75 (the first group was typed
  * as Class866E8's `Obj866E8`, the second named after gTextEntryMethods).
- * See `Class86F88__Class86F88.md` for the `tools/classtable.py` evidence.
+ * See `ItemList__ItemList.md` for the `tools/classtable.py` evidence.
  */
 #include "common.h"
 #include "class_3bb8c.h"
 #include "TextEntry.h"
-#include "Class86F88.h"
+#include "ItemList.h"
 #include "ScreenSprite.h"
 #include "TimImage.h"
 
@@ -107,14 +107,14 @@ void TextEntry__SetCharAt(TextEntry *self, s32 pos, s32 charIndex, s32 notify) {
 }
 
 /* TextEntry's own table getter (include/TextEntry.h), defined here in ROM
- * order; not Class86F88's. */
+ * order; not ItemList's. */
 TextEntryMethods *GetTextEntryMethods(void) {
     return &gTextEntryMethods;
 }
 
 /*
- * New_Class86F88 onward: Class86F88's allocator, ctor, child and resource
- * methods (include/Class86F88.h; the rest of the class is class_3bb8c_k).
+ * New_ItemList onward: ItemList's allocator, ctor, child and resource
+ * methods (include/ItemList.h; the rest of the class is class_3bb8c_k).
  *
  * BasicClass's method table and its getter are include/BasicClass.h's
  * (through class_3bb8c.h); the base-class calls below upcast `self`.
@@ -122,13 +122,13 @@ TextEntryMethods *GetTextEntryMethods(void) {
 extern void *BMemPMgrAlloc(s32 size);
 extern void *BMemPMgrFree(void *ptr);
 
-Class86F88 *New_Class86F88(char **items, s32 mode) {
-    Class86F88 *self = BMemPMgrAlloc(0x54);
+ItemList *New_ItemList(char **items, s32 mode) {
+    ItemList *self = BMemPMgrAlloc(0x54);
 
     if (self == NULL) {
         goto fail;
     }
-    GetClass86F88Methods()->ctor(self, items, mode);
+    GetItemListMethods()->ctor(self, items, mode);
     return self;
 fail:
     return NULL;
@@ -149,7 +149,7 @@ extern s32 strlen(void *arg0);
 extern void DecodeFullWidthSjis(void *dst, void *src);
 extern char *strcpy(char *dest, char *src);
 
-void Class86F88__Class86F88(Class86F88 *self, char **items, s32 mode) {
+void ItemList__ItemList(ItemList *self, char **items, s32 mode) {
     char **p;
     s32 i;
     s32 len;
@@ -157,7 +157,7 @@ void Class86F88__Class86F88(Class86F88 *self, char **items, s32 mode) {
     i = 0;
     p = items;
     Get_vtable_BasicClass()->ctor((BasicClass *)self);
-    self->methods = GetClass86F88Methods();
+    self->methods = GetItemListMethods();
 
     while (*p++ != NULL) {
         i++;
@@ -186,17 +186,17 @@ void Class86F88__Class86F88(Class86F88 *self, char **items, s32 mode) {
     }
 
     self->mode = mode;
-    Class86F88__ClearCachedRefs(self);
+    ItemList__ClearCachedRefs(self);
     self->methods->resetView(self);
 }
 
-void Class86F88__ClearCachedRefs(Class86F88 *self) {
+void ItemList__ClearCachedRefs(ItemList *self) {
     self->inputSource = NULL;
     self->tickSource = NULL;
     self->panelSprite = NULL;
 }
 
-void Class86F88__Finalize(Class86F88 *self) {
+void ItemList__Finalize(ItemList *self) {
     s32 i;
 
     for (i = 0; i < self->itemCount; i++) {
@@ -207,7 +207,7 @@ void Class86F88__Finalize(Class86F88 *self) {
     Get_vtable_BasicClass()->finalize((BasicClass *)self);
 }
 
-void Class86F88__AddChild(Class86F88 *self, void *child) {
+void ItemList__AddChild(ItemList *self, void *child) {
     s32 tag;
 
     if (child) {
@@ -221,7 +221,7 @@ void Class86F88__AddChild(Class86F88 *self, void *child) {
     }
 }
 
-void Class86F88__RemoveChild(Class86F88 *self, void *child) {
+void ItemList__RemoveChild(ItemList *self, void *child) {
     s32 tag;
 
     if (child) {
@@ -235,14 +235,14 @@ void Class86F88__RemoveChild(Class86F88 *self, void *child) {
     }
 }
 
-void Class86F88__RemoveAllChildren(Class86F88 *self) {
+void ItemList__RemoveAllChildren(ItemList *self) {
     self->inputSource = NULL;
     self->tickSource = NULL;
     self->panelSprite = NULL;
     Get_vtable_BasicClass()->removeAllChildren((BasicClass *)self);
 }
 
-void Class86F88__OnNotify(Class86F88 *self, void *sender, s32 event) {
+void ItemList__OnNotify(ItemList *self, void *sender, s32 event) {
     s32 tag;
 
     Get_vtable_BasicClass()->onNotify((BasicClass *)self, sender, event);
@@ -254,7 +254,7 @@ void Class86F88__OnNotify(Class86F88 *self, void *sender, s32 event) {
     }
 }
 
-void Class86F88__ResetView(Class86F88 *self) {
+void ItemList__ResetView(ItemList *self) {
     self->topIndex = 0;
     self->column = 0;
     self->cursorIndex = 0;
@@ -274,7 +274,7 @@ extern const char D_800116E4[]; /* "FONTICON" */
  * round-18/19 stall (75/95, both addresses and the handle swapped among
  * $s0-$s2). Same shape as class_3bb8c_i's TextEntry__LoadCardResources.
  */
-void Class86F88__LoadResources(Class86F88 *self, SceneNode *parent) {
+void ItemList__LoadResources(ItemList *self, SceneNode *parent) {
     char path[0x20];
     const char *dir;
     const char *ext;
@@ -303,22 +303,22 @@ void Class86F88__LoadResources(Class86F88 *self, SceneNode *parent) {
     handle2->methods->release(handle2);
 }
 
-void Class86F88__ReleaseResources(Class86F88 *self) {
+void ItemList__ReleaseResources(ItemList *self) {
     if (self->panelSprite) {
         self->methods->releaseRows(self);
         self->panelSprite = self->panelSprite->methods->release(self->panelSprite);
     }
 }
 
-/* The first addChild passes all four words through (Class86F88AddChildWideFn,
+/* The first addChild passes all four words through (ItemListAddChildWideFn,
  * no code): see this function's report for the do/while. */
-void Class86F88__AttachTarget(Class86F88 *self, void *child1, void *child2,
+void ItemList__AttachTarget(ItemList *self, void *child1, void *child2,
                               struct TargetObj86ED0 *target) {
-    Class86F88AddChildWideFn fn;
+    ItemListAddChildWideFn fn;
     s32 zero;
 
     zero = 0;
-    fn = (Class86F88AddChildWideFn)self->methods->addChild;
+    fn = (ItemListAddChildWideFn)self->methods->addChild;
     do {
         fn(self, child1, child2, target);
         self->methods->addChild(self, child2);
@@ -327,7 +327,7 @@ void Class86F88__AttachTarget(Class86F88 *self, void *child1, void *child2,
     } while (0);
 }
 
-void Class86F88__DetachTarget(Class86F88 *self) {
+void ItemList__DetachTarget(ItemList *self) {
     self->methods->removeChild(self, self->inputSource);
     self->methods->removeChild(self, self->tickSource);
     self->target = NULL;

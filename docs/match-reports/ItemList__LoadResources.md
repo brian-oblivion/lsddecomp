@@ -1,18 +1,20 @@
-# Class86F88__LoadResources -- MATCHED (95/95, round 73)
+# ItemList__LoadResources -- MATCHED (95/95, round 73)
 
-> Renamed from `Class86F88_3bb8c_j__LoadResources` on 2026-09-24 (tools/rename.py). Address 0x80051f24.
+> Renamed from `Class86F88__LoadResources` on 2026-09-26 (tools/rename.py). Address 0x80051f24.
+
+> Renamed from `ItemList_3bb8c_j__LoadResources` on 2026-09-24 (tools/rename.py). Address 0x80051f24.
 
 > Renamed from `func_80051F24` on 2026-09-24 (tools/rename.py). Address 0x80051f24.
 
-Unit: `src/class_3bb8c_j.c`. `self` is `Class86F88_3bb8c_j`.
+Unit: `src/class_3bb8c_j.c`. `self` is `ItemList_3bb8c_j`.
 
 ## Semantics (established with reasonable confidence from the disassembly)
 
 ```c
 #if 0
 extern void *BuildFileName(void *out, void *a1, void *a2, void *a3);
-extern Class86F88Handle_3bb8c_j *New_TimImage(void *arg0);
-extern Class86F88Handle_3bb8c_j *New_ScreenSprite(Class86F88Handle_3bb8c_j *arg0, void *arg1, s32 arg2);
+extern ItemListHandle_3bb8c_j *New_TimImage(void *arg0);
+extern ItemListHandle_3bb8c_j *New_ScreenSprite(ItemListHandle_3bb8c_j *arg0, void *arg1, s32 arg2);
 extern s32 D_8008AB14;
 extern s32 D_8008AB1C;
 extern s32 D_8008AB24;
@@ -20,10 +22,10 @@ extern s32 D_80087028;
 extern s32 D_8008AAF8;
 extern s32 D_800116E4;
 
-void Class86F88__LoadResources(Class86F88_3bb8c_j *self, void *arg1)
+void ItemList__LoadResources(ItemList_3bb8c_j *self, void *arg1)
 {
     s32 local[8];
-    Class86F88Handle_3bb8c_j *h;
+    ItemListHandle_3bb8c_j *h;
 
     if (!arg1) {
         return;
@@ -48,8 +50,8 @@ void Class86F88__LoadResources(Class86F88_3bb8c_j *self, void *arg1)
 
 If (`arg1` non-NULL AND `self->unk50` not already set): builds a
 16-byte-ish stack descriptor via `BuildFileName(&local, ...)` fed into
-`New_TimImage`, producing an opaque "handle" (`Class86F88Handle_3bb8c_j *`, the
-same type `Class86F88__ReleaseResources` -- matched this round -- also uses via
+`New_TimImage`, producing an opaque "handle" (`ItemListHandle_3bb8c_j *`, the
+same type `ItemList__ReleaseResources` -- matched this round -- also uses via
 `self->unk50`). Calls the handle's own `slot78` (init?), stores a SECOND
 derived handle into `self->unk50` via `New_ScreenSprite`, releases the FIRST
 handle (`slot4`), then forwards `arg1` and a literal global pointer into
@@ -58,8 +60,8 @@ global, `D_800116E4` instead of `D_8008AB14`) to make a THIRD handle,
 which is passed into `self->methods->slot8C` (established this round)
 alongside `arg1` and three of `self`'s own fields, then released.
 
-This established `Class86F88Handle_3bb8c_j`/`Class86F88HandleMethods_3bb8c_j` (`slot4`,
-`slot4C`, `slot78`) and `Class86F88Methods_3bb8c_j::slot8C` (+0x08C, 6 args).
+This established `ItemListHandle_3bb8c_j`/`ItemListHandleMethods_3bb8c_j` (`slot4`,
+`slot4C`, `slot78`) and `ItemListMethods_3bb8c_j::slot8C` (+0x08C, 6 args).
 
 ## Residue: pure register-identity rotation, NOT a size/instruction defect
 
@@ -94,7 +96,7 @@ differently.
   minutes / ~7800 iterations): did not reach zero, but found a
   score-30 lead (down from the 140 base) whose only structural change
   from this body was caching `h->methods` into a separate local
-  (`Class86F88HandleMethods_3bb8c_j *hm = h->methods; hm->slot4(h);`) before the
+  (`ItemListHandleMethods_3bb8c_j *hm = h->methods; hm->slot4(h);`) before the
   FINAL `slot4` call only. Translating that lead by hand back into the
   real toolchain reproduced NO improvement at all (still 75/95,
   identical diff) -- the permuter's own mutated/stripped scaffold and
@@ -207,7 +209,7 @@ reshaping).
 
 **Three independent functions across two different header families
 (`class_3bb8c_b`'s `Class866E8__BuildFootprintSlots`, `class_3bb8c_f`'s `TaskObjF__WriteMemcardSaveFile`,
-`class_3bb8c_j`'s `Class86F88__LoadResources`) now confirm the same negative result
+`class_3bb8c_j`'s `ItemList__LoadResources`) now confirm the same negative result
 for the SAME lever (declaration/introduction order of the contested
 locals).** This is strong enough evidence to stop treating "try a
 different declaration order" as a live lever for this residue class at
@@ -290,7 +292,7 @@ pure callee-saved rotation, and it is the INVERSE of round 59/64's
 "delete the named local".** A value reassigned in two unrelated halves of a
 function gets one pseudo whose live range spans both, which lowers its
 global-alloc priority. Tell: the rotating value is re-produced by a call in
-each half and never read across the boundary. Split it (Class86F88__LoadResources,
+each half and never read across the boundary. Split it (ItemList__LoadResources,
 75/95 -> 95/95 on the first build, after ten inert ordering attempts
 across rounds 18-19). Discriminator against the dead-parameter-reuse
 lever: that one REMOVES a pseudo, and this one ADDS one. Check a matched
@@ -298,17 +300,17 @@ cross-unit sibling with the same call skeleton first.
 
 ## Naming
 
-- `Class86F88__LoadResources` -- tier B. The slot44 occupant (classtable.py gClass86F88Methods +0x044): builds two "CARD\\<name>.TIM" paths, loads them through New_TimImage/New_D8006ED4C, and dispatches the second through self->methods->slot8C. Mechanics (load a pair of card-icon-shaped resources) are clear from the BuildFileName/CARD path evidence; what the two resources are FOR is not.
+- `ItemList__LoadResources` -- tier B. The slot44 occupant (classtable.py gItemListMethods +0x044): builds two "CARD\\<name>.TIM" paths, loads them through New_TimImage/New_D8006ED4C, and dispatches the second through self->methods->slot8C. Mechanics (load a pair of card-icon-shaped resources) are clear from the BuildFileName/CARD path evidence; what the two resources are FOR is not.
 
 ## Track 4
 
-2026-09-25, round 84 (charlie): The class `New_D8006ED4C` constructs is unified as ScreenSprite in `include/ScreenSprite.h`; the unit includes it and its local extern is gone. The call reads `self->unk50 = (Class86F88Handle_3bb8c_j *)New_ScreenSprite(handle1, (SpriteRect *)&D_80087028, 0)`: D_80087028 is the rect (words 0, 256, 160), and unk50's +0x04C call passes the screen position D_8008AAF8 = (-100, -60). Image byte-identical.
+2026-09-25, round 84 (charlie): The class `New_D8006ED4C` constructs is unified as ScreenSprite in `include/ScreenSprite.h`; the unit includes it and its local extern is gone. The call reads `self->unk50 = (ItemListHandle_3bb8c_j *)New_ScreenSprite(handle1, (SpriteRect *)&D_80087028, 0)`: D_80087028 is the rect (words 0, 256, 160), and unk50's +0x04C call passes the screen position D_8008AAF8 = (-100, -60). Image byte-identical.
 
 ## Track 4 (2026-09-26, round 88)
 
 TimImage is unified (`include/TimImage.h`); this unit's local `extern
-Class86F88Handle_3bb8c_j *New_TimImage(char *)` is deleted. `handle1`/
+ItemListHandle_3bb8c_j *New_TimImage(char *)` is deleted. `handle1`/
 `handle2` are `TimImage *`: +0x078 through `TimImageUploadFn` (occupant
 TimImage__Upload), `slot4` -> the inherited `release`; `handle2` is cast to
-`Class86F88Handle_3bb8c_j *` for slot8C, whose parameter is this class's
+`ItemListHandle_3bb8c_j *` for slot8C, whose parameter is this class's
 own view (not TimImage's to retype). Image byte-identical.

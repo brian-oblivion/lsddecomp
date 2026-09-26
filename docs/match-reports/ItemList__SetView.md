@@ -1,19 +1,21 @@
-# Class86F88__SetView -- MATCH
+# ItemList__SetView -- MATCH
+
+> Renamed from `Class86F88__SetView` on 2026-09-26 (tools/rename.py). Address 0x800529fc.
 
 > Renamed from `func_800529FC` on 2026-09-24 (tools/rename.py). Address 0x800529fc.
 
 Unit `class_3bb8c_k`, round 15. `./build-and-verify.sh` exit 0; whole-image
-SHA1 matches retail. `funcdiff.py Class86F88__SetView`: 23/23 words match.
+SHA1 matches retail. `funcdiff.py ItemList__SetView`: 23/23 words match.
 
-Called (not through a vtable) by `Class86F88__RefreshRows` (this unit, still
-`INCLUDE_ASM`) as `Class86F88__SetView(self, arg1, arg2, arg3, arg4)`.
+Called (not through a vtable) by `ItemList__RefreshRows` (this unit, still
+`INCLUDE_ASM`) as `ItemList__SetView(self, arg1, arg2, arg3, arg4)`.
 
 ## Source
 
 ```c
-void Class86F88__SetView(Class86F88 *self, s32 a1, s32 a2, s32 a3, s32 a4)
+void ItemList__SetView(ItemList *self, s32 a1, s32 a2, s32 a3, s32 a4)
 {
-    Class86F88Elem *elem;
+    ItemListElem *elem;
     s32 flag = a4;
 
     __asm__("");
@@ -25,22 +27,22 @@ void Class86F88__SetView(Class86F88 *self, s32 a1, s32 a2, s32 a3, s32 a4)
     }
     a3 -= a1;
     elem = self->unk40[a3];
-    elem->methods->slotB8(elem, &gClass86F88CursorColor);
+    elem->methods->slotB8(elem, &gItemListCursorColor);
 }
 ```
 
 ## Notes
 
-`a4` is a 5th (stack-passed) parameter -- `Class86F88Methods` slot
+`a4` is a 5th (stack-passed) parameter -- `ItemListMethods` slot
 signatures elsewhere in this unit put the stack argument last, but here
 it's an ordinary call, not a vtable dispatch, so the stack argument comes
-from `INCLUDE_ASM("Class86F88__RefreshRows")`'s own call setup, not a declared
+from `INCLUDE_ASM("ItemList__RefreshRows")`'s own call setup, not a declared
 struct field. Stores `self->unk20`/`unk24`/`unk28` from `a1`/`a2`/`a3`
 UNCONDITIONALLY (all three sit before the `a4 == 0` guard in retail's own
 instruction order -- the `unk28` store is in the guarding branch's delay
 slot, so it always executes even on the early-return path), then, only if
 `a4 != 0`, indexes `self->unk40[a3 - a1]` and dispatches that element's
-own `slotB8(elem, &gClass86F88CursorColor)`.
+own `slotB8(elem, &gItemListCursorColor)`.
 
 **Two independent residues, both register/scheduling, no register or CFG
 value was ever wrong:**
@@ -84,11 +86,11 @@ stall, especially after a permuter search comes back empty.
 
 ## Naming
 
-Round 75 (bravo, track 3). `func_800529FC` -> `Class86F88__SetView`, **tier A**.
+Round 75 (bravo, track 3). `func_800529FC` -> `ItemList__SetView`, **tier A**.
 
-Non-virtual helper. Stores topIndex/column/cursorIndex; if `highlight`, colours row (cursor - top) with gClass86F88CursorColor. Callers: CreateRows (highlight 1), RefreshRows (0).
+Non-virtual helper. Stores topIndex/column/cursorIndex; if `highlight`, colours row (cursor - top) with gItemListCursorColor. Callers: CreateRows (highlight 1), RefreshRows (0).
 
-Class86F88, per the round-75 pass, is a scrolling list selector: up to 4 visible rows of 26-character item text, a highlighted cursor row, a horizontal column offset (see the unit header comment of `src/class_3bb8c_k.c`).
+ItemList, per the round-75 pass, is a scrolling list selector: up to 4 visible rows of 26-character item text, a highlighted cursor row, a horizontal column offset (see the unit header comment of `src/class_3bb8c_k.c`).
 
 ## asm sites
 

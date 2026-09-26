@@ -91,7 +91,7 @@ void TaskObjF__AddChild(TaskObjF *self, BasicClass *child) {
         return;
     }
     if ((tag & 0xFF) == 0x20) {
-        self->itemList = (struct Class86F88 *)child;
+        self->itemList = (struct ItemList *)child;
     }
 }
 

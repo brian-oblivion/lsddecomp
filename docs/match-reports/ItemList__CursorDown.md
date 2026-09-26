@@ -1,18 +1,20 @@
-# Class86F88__CursorDown -- MATCH
+# ItemList__CursorDown -- MATCH
+
+> Renamed from `Class86F88__CursorDown` on 2026-09-26 (tools/rename.py). Address 0x80052598.
 
 > Renamed from `func_80052598` on 2026-09-24 (tools/rename.py). Address 0x80052598.
 
 Unit `class_3bb8c_k`, round 15. `./build-and-verify.sh` exit 0; whole-image
-SHA1 matches retail. `funcdiff.py Class86F88__CursorDown`: 43/43 words match.
+SHA1 matches retail. `funcdiff.py ItemList__CursorDown`: 43/43 words match.
 
-This is vtable slot `+0x088` of `gClass86F88Methods`; `slot94`/`slot98` are this
-unit's own `Class86F88Methods` declarations, confirmed by this call site
-alongside `Class86F88__CursorUp`'s.
+This is vtable slot `+0x088` of `gItemListMethods`; `slot94`/`slot98` are this
+unit's own `ItemListMethods` declarations, confirmed by this call site
+alongside `ItemList__CursorUp`'s.
 
 ## Source
 
 ```c
-void Class86F88__CursorDown(Class86F88 *self, s32 arg1, s32 arg2, s32 arg3)
+void ItemList__CursorDown(ItemList *self, s32 arg1, s32 arg2, s32 arg3)
 {
     s32 newUnk20;
     s32 newUnk28;
@@ -39,11 +41,11 @@ void Class86F88__CursorDown(Class86F88 *self, s32 arg1, s32 arg2, s32 arg3)
 
 ## Notes
 
-The mirror image of `Class86F88__CursorUp` (increment instead of decrement, and a
+The mirror image of `ItemList__CursorUp` (increment instead of decrement, and a
 `unk28 - (unk20 - 1) < 4` guard in place of the plain `unk28 - unk20`
 difference), and it needed the SAME two levers that function's report
 already names -- both discovered independently on this function first,
-then confirmed transferring to `Class86F88__CursorUp` (and vice versa; the two
+then confirmed transferring to `ItemList__CursorUp` (and vice versa; the two
 were derived in the same session, in this order):
 
 1. **The `slot94`/`slot98` `else`-branch register-identity residue closes
@@ -52,7 +54,7 @@ were derived in the same session, in this order):
    passing the named locals rather than re-reading the struct fields
    inline.
 2. **A second, independent residue in the FIRST guard**, not present in
-   `Class86F88__CursorUp`: the natural `self->unk28 - (self->unk20 - 1) < 4`
+   `ItemList__CursorUp`: the natural `self->unk28 - (self->unk20 - 1) < 4`
    compiled to a single fused `subu`, one instruction (and 4 bytes) SHORTER
    than retail's explicit `addiu $v0,$a1,-1` / `subu $v0,$a2,$v0` pair --
    the whole function came out 4 bytes short and every later function in
@@ -63,7 +65,7 @@ were derived in the same session, in this order):
 
 ### Proposed learning
 
-Promotes `Class86F88__ScrollRight`/`Class86F88__CursorUp`'s double-assignment lever from
+Promotes `ItemList__ScrollRight`/`ItemList__CursorUp`'s double-assignment lever from
 "seen twice" to "seen three times, and it generalizes past storing a
 mutated field" -- here it fixes a value that is never stored anywhere,
 purely a guard-condition intermediate. The common thread across all three:
@@ -78,8 +80,8 @@ a call argument.
 
 ## Naming
 
-Round 75 (bravo, track 3). `func_80052598` -> `Class86F88__CursorDown`, **tier A**.
+Round 75 (bravo, track 3). `func_80052598` -> `ItemList__CursorDown`, **tier A**.
 
-Slot +0x088 (`tools/classtable.py gClass86F88Methods`). Mirror of CursorUp: bounded by `itemCount`, steps within the window while cursor-top < 3, else scrolls the window down one item. Dispatched by HandleInputCode on code 19.
+Slot +0x088 (`tools/classtable.py gItemListMethods`). Mirror of CursorUp: bounded by `itemCount`, steps within the window while cursor-top < 3, else scrolls the window down one item. Dispatched by HandleInputCode on code 19.
 
-Class86F88, per the round-75 pass, is a scrolling list selector: up to 4 visible rows of 26-character item text, a highlighted cursor row, a horizontal column offset (see the unit header comment of `src/class_3bb8c_k.c`).
+ItemList, per the round-75 pass, is a scrolling list selector: up to 4 visible rows of 26-character item text, a highlighted cursor row, a horizontal column offset (see the unit header comment of `src/class_3bb8c_k.c`).

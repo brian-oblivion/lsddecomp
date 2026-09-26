@@ -1,4 +1,6 @@
-# Class86F88__CreateRows — MATCHED (round 45, 82/82 words)
+# ItemList__CreateRows — MATCHED (round 45, 82/82 words)
+
+> Renamed from `Class86F88__CreateRows` on 2026-09-26 (tools/rename.py). Address 0x80052644.
 
 > Renamed from `func_80052644` on 2026-09-24 (tools/rename.py). Address 0x80052644.
 
@@ -14,22 +16,22 @@ of the same file; this function is ordinary matching work.
 ## Derivation
 
 ```c
-extern char *Class86F88__FormatRowText(Class86F88 *self, char *dest, s32 arg3, s32 arg4, char *base);
-extern void Class86F88__SetView(Class86F88 *self, s32 a1, s32 a2, s32 a3, s32 a4);
+extern char *ItemList__FormatRowText(ItemList *self, char *dest, s32 arg3, s32 arg4, char *base);
+extern void ItemList__SetView(ItemList *self, s32 a1, s32 a2, s32 a3, s32 a4);
 
-extern s32 gClass86F88RowOriginX;
-extern s32 gClass86F88RowOriginY;
+extern s32 gItemListRowOriginX;
+extern s32 gItemListRowOriginY;
 
 typedef struct {
     s32 a;
     s32 b;
 } Elem4CArg_3bb8c_k;
 
-void Class86F88__CreateRows(Class86F88 *self, s32 arg1, s32 arg2, s32 arg3, s32 arg4, s32 arg5)
+void ItemList__CreateRows(ItemList *self, s32 arg1, s32 arg2, s32 arg3, s32 arg4, s32 arg5)
 {
     char buf[0x20];
     Elem4CArg_3bb8c_k local;
-    Class86F88Elem **p;
+    ItemListElem **p;
     s32 count;
     s32 i;
 
@@ -37,8 +39,8 @@ void Class86F88__CreateRows(Class86F88 *self, s32 arg1, s32 arg2, s32 arg3, s32 
         return;
     }
 
-    local.a = gClass86F88RowOriginX;
-    local.b = gClass86F88RowOriginY;
+    local.a = gItemListRowOriginX;
+    local.b = gItemListRowOriginY;
     count = self->unk10;
     p = &self->unk40[0];
     if (count >= 5) {
@@ -46,27 +48,27 @@ void Class86F88__CreateRows(Class86F88 *self, s32 arg1, s32 arg2, s32 arg3, s32 
     }
 
     for (i = 0; i < count; i++) {
-        Class86F88__FormatRowText(self, buf, i, arg3, (char *)arg4);
-        *p = (Class86F88Elem *)New_TextRow((void *)arg2, 0x1A, buf);
+        ItemList__FormatRowText(self, buf, i, arg3, (char *)arg4);
+        *p = (ItemListElem *)New_TextRow((void *)arg2, 0x1A, buf);
         (*p)->methods->slot4C(*p, arg1, &local);
-        (*p)->methods->slotB8(*p, &gClass86F88RowColor);
+        (*p)->methods->slotB8(*p, &gItemListRowColor);
         local.b += 0xA;
         p++;
     }
 
-    Class86F88__SetView(self, arg3, arg4, arg5, 1);
+    ItemList__SetView(self, arg3, arg4, arg5, 1);
 }
 ```
 
-**A close sibling of the already-matched `Class86F88__RefreshRows`** (same unit, same
+**A close sibling of the already-matched `ItemList__RefreshRows`** (same unit, same
 `self->unk40[]` element array, same `count = self->unk10; if (count >= 5)
-count = 4;` clamp, same `Class86F88__FormatRowText` text-formatting call inside the
+count = 4;` clamp, same `ItemList__FormatRowText` text-formatting call inside the
 loop): the two differ in that this function ALSO calls each freshly-created
 element's own `slot4C` (with a 2-word stack-local argument seeded from
-`gClass86F88RowOriginX`/`gClass86F88RowOriginY`, the second word accumulating by `0xA` per
-iteration) and `slotB8` before `Class86F88__RefreshRows`'s sibling code reaches its
+`gItemListRowOriginX`/`gItemListRowOriginY`, the second word accumulating by `0xA` per
+iteration) and `slotB8` before `ItemList__RefreshRows`'s sibling code reaches its
 own `slotCC`, and this one always passes `1` (not a caller flag) as the
-final `Class86F88__SetView` argument. `Class86F88ElemMethods::slot4C` (offset
+final `ItemList__SetView` argument. `ItemListElemMethods::slot4C` (offset
 0x04C) is a new additive header field, typed `void *arg2` there (the
 concrete 2-word `Elem4CArg_3bb8c_k` struct is kept unit-local, since it's
 this one call site's own reading) — its offset and neighbor (`release` at
@@ -78,20 +80,20 @@ to resolve.
 `New_TextRow` already has a SHARED declaration in `include/class_3bb8c.h`
 (`extern FieldM7C *New_TextRow(void *ctx, s32 len, char *name);`, a
 different unit's own independent view of the same uncarved external
-function) — this unit's `self->unk40[]` is typed `Class86F88Elem *`, a
+function) — this unit's `self->unk40[]` is typed `ItemListElem *`, a
 different local name for what the header comment already notes might be
 the same real object, so the return value is cast explicitly rather than
 adding a second, conflicting declaration.
 
-`Class86F88__FormatRowText` and `Class86F88__SetView` are defined LATER in this same file
+`ItemList__FormatRowText` and `ItemList__SetView` are defined LATER in this same file
 (ROM order), so both needed forward `extern` declarations above
-`Class86F88__CreateRows`, matching their real definitions exactly — same convention
+`ItemList__CreateRows`, matching their real definitions exactly — same convention
 already used for `Class865C8__StartObjM`/`TextEntry__ClearChildRefs` elsewhere this round.
 
 **One register-identity trap, closed by reordering two local
 declarations — no logic change.** With `Elem4CArg_3bb8c_k local;` declared
 before `char buf[0x20];`, GCC decided `buf`'s address (used at two call
-sites, `Class86F88__FormatRowText` and `New_TextRow`) was worth caching in a
+sites, `ItemList__FormatRowText` and `New_TextRow`) was worth caching in a
 callee-saved register across both uses, rather than recomputing the cheap
 `sp`-relative address each time — retail does NOT cache it (two separate
 `addiu $a1/$a2, $sp, 0x18` computations). That one cached register pushed
@@ -118,8 +120,8 @@ shifts register allocation across the whole function").
 
 ## Naming
 
-Round 75 (bravo, track 3). `func_80052644` -> `Class86F88__CreateRows`, **tier A**.
+Round 75 (bravo, track 3). `func_80052644` -> `ItemList__CreateRows`, **tier A**.
 
-Slot +0x08C (`tools/classtable.py gClass86F88Methods`). Called by Class86F88__LoadResources (class_3bb8c_j) as (self, parent, FONTICON handle, topIndex, column, cursorIndex). Builds min(itemCount, 4) row text objects with New_TextRow(font, 26, text), lays each out at (gClass86F88RowOriginX, gClass86F88RowOriginY + 0xA*i), colours it gClass86F88RowColor, then SetView(..., highlight=1).
+Slot +0x08C (`tools/classtable.py gItemListMethods`). Called by ItemList__LoadResources (class_3bb8c_j) as (self, parent, FONTICON handle, topIndex, column, cursorIndex). Builds min(itemCount, 4) row text objects with New_TextRow(font, 26, text), lays each out at (gItemListRowOriginX, gItemListRowOriginY + 0xA*i), colours it gItemListRowColor, then SetView(..., highlight=1).
 
-Class86F88, per the round-75 pass, is a scrolling list selector: up to 4 visible rows of 26-character item text, a highlighted cursor row, a horizontal column offset (see the unit header comment of `src/class_3bb8c_k.c`).
+ItemList, per the round-75 pass, is a scrolling list selector: up to 4 visible rows of 26-character item text, a highlighted cursor row, a horizontal column offset (see the unit header comment of `src/class_3bb8c_k.c`).

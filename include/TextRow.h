@@ -17,7 +17,7 @@
  *    `cellPitch` to the x of a running ScreenSpritePos, with one extra 0x10
  *    before cell `gapIndex`.
  *  - Its callers make one per string: TaskCore's slot and item widgets (one
- *    per name, TaskCore__CreateSlotElements), Class86F88's 26-character rows,
+ *    per name, TaskCore__CreateSlotElements), ItemList's 26-character rows,
  *    Class86B60's name field, TextEntry's `textRow`, ObjM's "Pause".
  *
  * The ctor chains to CharSprite's first (GetCharSpriteMethods()->ctor with

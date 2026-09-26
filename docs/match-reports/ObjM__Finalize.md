@@ -9,7 +9,7 @@ SHA1 matches retail. `funcdiff.py ObjM__Finalize`: 14/14 words match.
 
 This is vtable slot `+0x00C` (`dtor`) of `gObjMMethods` -- a SECOND class
 table this unit's tail overlaps (`tools/classtable.py gObjMMethods`, 53
-slots, header word `0x0002F230`, distinct from `gClass86F88Methods` which covers
+slots, header word `0x0002F230`, distinct from `gItemListMethods` which covers
 this unit's earlier functions). `ObjM__ObjM` (this unit, still
 `INCLUDE_ASM`) is that same table's `ctor` (`+0x008`).
 

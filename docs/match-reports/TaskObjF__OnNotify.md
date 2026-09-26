@@ -71,4 +71,4 @@ dispatcher, directly evident from the body and the established
 
 ## Track 4 (2026-09-26, round 89)
 
-Renamed from `TaskObjF__Notify`: it occupies BasicClass's onNotify slot (+0x038) and calls the base onNotify first, so it takes the slot's name (FINISHING-PLAN track 4 step 6), as TextEntry__OnNotify and Class86F88__OnNotify do for the same tag dispatch. The old +0x088 occupant of that name is now TaskObjF__OnInputEvent.
+Renamed from `TaskObjF__Notify`: it occupies BasicClass's onNotify slot (+0x038) and calls the base onNotify first, so it takes the slot's name (FINISHING-PLAN track 4 step 6), as TextEntry__OnNotify and ItemList__OnNotify do for the same tag dispatch. The old +0x088 occupant of that name is now TaskObjF__OnInputEvent.

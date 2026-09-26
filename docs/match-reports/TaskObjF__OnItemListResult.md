@@ -57,4 +57,4 @@ though which UI concept `arg1` represents is not established.
 
 ## Track 4 (2026-09-26, round 89)
 
-Renamed from `TaskObjF__OnItemSelected`. Slot +0x0B0, which TaskObjF__OnNotify calls for a sender of class id 0x20, the Class86F88 list, whose setState(4) notifies its parents with result 2 or 3. On 2 it reads the list's getCursorIndex (+0x09C) into `selectedIndex` (was `selectedItem`, retyped `s32`: the getter returns cursorIndex and AdvanceState only indexes with it), detaches the list and sets state 0xE; on 3 it detaches and sets 0x17.
+Renamed from `TaskObjF__OnItemSelected`. Slot +0x0B0, which TaskObjF__OnNotify calls for a sender of class id 0x20, the ItemList list, whose setState(4) notifies its parents with result 2 or 3. On 2 it reads the list's getCursorIndex (+0x09C) into `selectedIndex` (was `selectedItem`, retyped `s32`: the getter returns cursorIndex and AdvanceState only indexes with it), detaches the list and sets state 0xE; on 3 it detaches and sets 0x17.

@@ -1,6 +1,8 @@
-# Class86F88__Class86F88 -- MATCHED (107/107, round 73)
+# ItemList__ItemList -- MATCHED (107/107, round 73)
 
-> Renamed from `Class86F88_3bb8c_j__Class86F88_3bb8c_j` on 2026-09-24 (tools/rename.py). Address 0x80051ac8.
+> Renamed from `Class86F88__Class86F88` on 2026-09-26 (tools/rename.py). Address 0x80051ac8.
+
+> Renamed from `ItemList_3bb8c_j__ItemList_3bb8c_j` on 2026-09-24 (tools/rename.py). Address 0x80051ac8.
 
 > Renamed from `func_80051AC8` on 2026-09-24 (tools/rename.py). Address 0x80051ac8.
 
@@ -55,17 +57,17 @@
 
 ---
 
-Unit: `src/class_3bb8c_j.c`. `self` is `Class86F88_3bb8c_j`. This is `Class86F88_3bb8c_j`'s
-own constructor -- the occupant of `Class86F88Methods_3bb8c_j::ctor` (+0x008),
-reached indirectly by `New_Class86F88`
-(`GetClass86F88Methods()->ctor(self, arg0, arg1)`).
+Unit: `src/class_3bb8c_j.c`. `self` is `ItemList_3bb8c_j`. This is `ItemList_3bb8c_j`'s
+own constructor -- the occupant of `ItemListMethods_3bb8c_j::ctor` (+0x008),
+reached indirectly by `New_ItemList`
+(`GetItemListMethods()->ctor(self, arg0, arg1)`).
 
 ## Class identity (ROUND 75 correction -- read this before the rest of the file)
 
 This unit's local type for `self` was originally named `Class86ED0` and
 described as having vtable `gTextEntryMethods`. Both were wrong, and the error
 predates this round: `include/class_3bb8c.h`'s own round-15 HEAD NOTEs
-(search "gTextEntryMethods and gClass86F88Methods") already documented it and deferred
+(search "gTextEntryMethods and gItemListMethods") already documented it and deferred
 the fix. Settled by address, not by guess:
 
 - `func_80051A4C` (this unit, now named `GetTextEntryMethods`) returns
@@ -73,10 +75,10 @@ the fix. Settled by address, not by guess:
   (42 slots, `tools/classtable.py gTextEntryMethods`), a DIFFERENT class
   established independently by class_3bb8c_i. It has NOTHING to do with
   this constructor's class.
-- This class's REAL table is `gClass86F88Methods`, reached through
-  `GetClass86F88Methods()` (class_3bb8c_k, MATCHED) -- `tools/classtable.py
-  gClass86F88Methods` places every one of this unit's remaining functions
-  (this ctor at +0x008, plus `Class86F88__Finalize`/`AddChild`/
+- This class's REAL table is `gItemListMethods`, reached through
+  `GetItemListMethods()` (class_3bb8c_k, MATCHED) -- `tools/classtable.py
+  gItemListMethods` places every one of this unit's remaining functions
+  (this ctor at +0x008, plus `ItemList__Finalize`/`AddChild`/
   `RemoveChild`/`RemoveAllChildren`/`NotifyChild`/`ResetCounters`/
   `LoadResources`/`ReleaseResources`/`AddChildAndSetState`/
   `RemoveCachedChildren` at +0x00C/+0x010/+0x014/+0x018/+0x038/+0x040/
@@ -84,12 +86,12 @@ the fix. Settled by address, not by guess:
   resolvable by `classtable.py` after all -- the earlier "no classtable
   entry exists for it" note was itself part of the same mistake (it
   looked up the wrong global).
-- class_3bb8c_k's OWN local view of this same gClass86F88Methods table already
-  carries the name `Class86F88`/`Class86F88Methods` in the shared header,
+- class_3bb8c_k's OWN local view of this same gItemListMethods table already
+  carries the name `ItemList`/`ItemListMethods` in the shared header,
   established independently from ITS OWN call sites. Reusing that bare
   name here would collide (both visible in this translation unit through
   the shared header), so this unit keeps its own, now-correctly-targeted
-  local name: `Class86F88_3bb8c_j`/`Class86F88Methods_3bb8c_j`.
+  local name: `ItemList_3bb8c_j`/`ItemListMethods_3bb8c_j`.
 
 Nothing about the matched BYTES was ever affected by any of this (a type
 name is not codegen) -- `build-and-verify.sh` and `tools/check-nonmatching.sh`
@@ -104,9 +106,9 @@ this same correction.
 mode flag (0 or 1), also stashed into `self->unkC`.
 
 1. Chain the base ctor: `Get_vtable_BasicClass()->ctor(self);` then
-   `self->methods = GetClass86F88Methods();` (this really is `Class86F88Methods_3bb8c_j
-   *GetClass86F88Methods(void)` -- NOT a separate "ctor table" type: this same
-   getter is what `New_Class86F88` dereferences `->ctor` on, and here its
+   `self->methods = GetItemListMethods();` (this really is `ItemListMethods_3bb8c_j
+   *GetItemListMethods(void)` -- NOT a separate "ctor table" type: this same
+   getter is what `New_ItemList` dereferences `->ctor` on, and here its
    return is assigned DIRECTLY as `self->methods`, so both call sites
    type-check against one declared return type).
 2. Count `arg1`'s entries (walk until a NULL pointer) -> `count`.
@@ -114,7 +116,7 @@ mode flag (0 or 1), also stashed into `self->unkC`.
    `BMemPMgrAlloc`: `self->unk18` (one individually-allocated buffer per
    entry) and `self->unk1C` (a flat `s32[count]` of per-entry lengths --
    NOT individually-allocated; freed as ONE block by the already-matched
-   `Class86F88__Finalize`, which is what fixed this typing).
+   `ItemList__Finalize`, which is what fixed this typing).
 4. If `count > 0`: `self->unk14 = 0` (running max, see below), then for
    each entry `i`: `len = func_80013348(arg1[i])` (a string-length-ish
    helper; when `arg2 == 1`, `len` is HALVED via the standard
@@ -122,7 +124,7 @@ mode flag (0 or 1), also stashed into `self->unkC`.
    `self->unk1C[i] = len`; `self->unk18[i] = BMemPMgrAlloc(len + 4)`;
    fill it via `DecodeFullWidthSjis` (arg2==1) or `strcpy` (otherwise) from
    `arg1[i]`; update `self->unk14` to the running max of `len`.
-5. `self->unkC = arg2; Class86F88__ClearCachedRefs(self);` (the already-matched
+5. `self->unkC = arg2; ItemList__ClearCachedRefs(self);` (the already-matched
    3-field reset) `; self->methods->slot40(self);`.
 
 ## Best body reached (round 19: nominal 6/107, but with a real bug fixed and
@@ -132,7 +134,7 @@ mode flag (0 or 1), also stashed into `self->unkC`.
 ```c
 #if 0
 /* stalesyms --fix 2026-09-22: func_80013348 -> strlen -- names retrofitted so this body links as written; the residue it recorded is unverified until rebuilt. */
-void Class86F88__Class86F88(Class86F88_3bb8c_j *self, void **arg1, s32 arg2)
+void ItemList__ItemList(ItemList_3bb8c_j *self, void **arg1, s32 arg2)
 {
     void **p;
     s32 count;
@@ -140,7 +142,7 @@ void Class86F88__Class86F88(Class86F88_3bb8c_j *self, void **arg1, s32 arg2)
     s32 len;
 
     Get_vtable_BasicClass()->ctor(self);
-    self->methods = GetClass86F88Methods();
+    self->methods = GetItemListMethods();
 
     count = 0;
     for (p = arg1; *p != NULL; p++) {
@@ -174,7 +176,7 @@ void Class86F88__Class86F88(Class86F88_3bb8c_j *self, void **arg1, s32 arg2)
     }
 
     self->unkC = arg2;
-    Class86F88__ClearCachedRefs(self);
+    ItemList__ClearCachedRefs(self);
     self->methods->slot40(self);
 }
 #endif
@@ -189,7 +191,7 @@ conditional `sw`) -- the plain `if (self->unk14 < len) self->unk14 = len;`
 above reproduces that shape with no local needed.
 
 Declarations it needs (all already live in `src/class_3bb8c_j.c`'s
-`Class86F88_3bb8c_j`/`Class86F88Methods_3bb8c_j` definitions, plus these locally-scoped
+`ItemList_3bb8c_j`/`ItemListMethods_3bb8c_j` definitions, plus these locally-scoped
 externs which were removed when the function was restored to
 `INCLUDE_ASM` -- re-add if resuming):
 
@@ -239,7 +241,7 @@ nowhere close. This function's search space (7 local values needing a
 specific register rotation across ~30 live instructions) appears to be
 beyond what an unguided permuter search closes quickly, unlike the
 smaller single-residue functions in this same unit
-(`TextEntry__ResetAllChars`, `Class86F88__AttachTarget`) where 14-5000 iterations sufficed.
+(`TextEntry__ResetAllChars`, `ItemList__AttachTarget`) where 14-5000 iterations sufficed.
 
 **Not re-staffed without a plan beyond "try more permuter time" or "try
 every p/q aliasing permutation by hand."** A structured next step: derive
@@ -349,8 +351,8 @@ size != the `.s`'s declared size means read the control flow first.
 **`x = (x < y) ? y : x;` on a memory lvalue emits an unconditional
 store-back of the old value** (`lw; sw; slt; beqz; sw`). The `if` form
 omits it. Tell: a load of a field immediately stored back to the same
-field. (Class86F88__Class86F88, one word, 66 -> 98/107.)
+field. (ItemList__ItemList, one word, 66 -> 98/107.)
 
 ## Naming
 
-- `Class86F88__Class86F88` -- tier A. The ctor occupant (classtable.py gClass86F88Methods +0x008), named per the "constructors Class__Class" convention (e.g. Class869D8__Class869D8). Parses arg1 as a NUL-terminated pointer array and allocates two parallel unk10-length arrays -- mechanics well established via asm-differ across rounds 9/13/19/73.
+- `ItemList__ItemList` -- tier A. The ctor occupant (classtable.py gItemListMethods +0x008), named per the "constructors Class__Class" convention (e.g. Class869D8__Class869D8). Parses arg1 as a NUL-terminated pointer array and allocates two parallel unk10-length arrays -- mechanics well established via asm-differ across rounds 9/13/19/73.

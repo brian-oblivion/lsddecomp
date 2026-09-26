@@ -25,7 +25,7 @@
  *    FrameClock, id 0x5), unk14, and TaskCore's `sound` (a VabStreamObj).
  *  - beginLoad (+0x074, opMode 1) lists the save files that exist
  *    (collectExistingMemcardFiles into `titles`/`foundSuffixes`), lets the
- *    player pick one in a Class86F88 list (state 0x12), then reads it into
+ *    player pick one in a ItemList list (state 0x12), then reads it into
  *    `data` (state 0x15, readMemcardFile). beginSave (+0x078, opMode 2)
  *    checks for the file and for space, lets the player edit the title in a
  *    TextEntry (state 0x11), then writes the save file with its icon
@@ -45,7 +45,7 @@
  */
 
 struct TextEntry;
-struct Class86F88;
+struct ItemList;
 struct ScreenSprite;
 struct VabStreamObj;
 struct TimImage;
@@ -105,7 +105,7 @@ struct TaskObjFMethods {
                                            s32 result); /* TaskObjF__OnTextEntryResult */
     /* +0x0A8 */ void (*attachItemList)(TaskObjF *self); /* TaskObjF__AttachItemList; setState(0x12) */
     /* +0x0AC */ void (*detachItemList)(TaskObjF *self); /* TaskObjF__DetachItemList */
-    /* +0x0B0 */ void (*onItemListResult)(TaskObjF *self, struct Class86F88 *sender,
+    /* +0x0B0 */ void (*onItemListResult)(TaskObjF *self, struct ItemList *sender,
                                           s32 result); /* TaskObjF__OnItemListResult */
 };
 
@@ -137,7 +137,7 @@ struct TaskObjF {
     /* +0x070 */ struct ScreenSprite *cardIcon; /* loadCardIcon: New_ScreenSprite of a CARD\*.TIM; releaseCardIcon */
     /* +0x074 */ s32 ownsWidget; /* attachTextEntry/attachItemList set it when they made the widget; detach then releases it */
     /* +0x078 */ struct TextEntry *textEntry; /* attachTextEntry: New_TextEntry(title + 2 * titleEditPos, 1); AddChild's class 0x10 */
-    /* +0x07C */ struct Class86F88 *itemList; /* attachItemList: New_Class86F88(titles, 1); AddChild's class 0x20 */
+    /* +0x07C */ struct ItemList *itemList; /* attachItemList: New_ItemList(titles, 1); AddChild's class 0x20 */
     /* +0x080 */ s32 selectedIndex; /* onItemListResult: the list's getCursorIndex */
 };
 
@@ -202,6 +202,6 @@ void TaskObjF__DetachTextEntry(TaskObjF *self);
 void TaskObjF__OnTextEntryResult(TaskObjF *self, void *sender, s32 result);
 void TaskObjF__AttachItemList(TaskObjF *self);
 void TaskObjF__DetachItemList(TaskObjF *self);
-void TaskObjF__OnItemListResult(TaskObjF *self, struct Class86F88 *sender, s32 result);
+void TaskObjF__OnItemListResult(TaskObjF *self, struct ItemList *sender, s32 result);
 
 #endif

@@ -143,7 +143,7 @@ a pointer-cast read, deliberately, to avoid introducing a union into
   header's existing per-class local-view convention (three OTHER classes
   in this same header already have their own `slot30` fields with the
   identical `(self, s32 arg1)` shape at the same offset, for the same
-  reason -- `Class86E00_3bb8c_g`, `ObjM`, `Obj87034_3bb8c_l`, `Class86F88`).
+  reason -- `Class86E00_3bb8c_g`, `ObjM`, `Obj87034_3bb8c_l`, `ItemList`).
 - **`Obj866E8Methods::slot128`** (new field, appended -- no padding
   needed, `slot124` ends exactly at `+0x128`): resolves via classtable to
   `Class866E8__RefreshFootprint`, already matched in the sibling unit `class_3bb8c_b`

@@ -1,18 +1,20 @@
-# Class86F88__ScrollLeft -- MATCH
+# ItemList__ScrollLeft -- MATCH
+
+> Renamed from `Class86F88__ScrollLeft` on 2026-09-26 (tools/rename.py). Address 0x80052498.
 
 > Renamed from `func_80052498` on 2026-09-24 (tools/rename.py). Address 0x80052498.
 
 Unit `class_3bb8c_k`, round 15. `./build-and-verify.sh` exit 0; whole-image
-SHA1 matches retail. `funcdiff.py Class86F88__ScrollLeft`: 24/24 words match.
+SHA1 matches retail. `funcdiff.py ItemList__ScrollLeft`: 24/24 words match.
 
-This is vtable slot `+0x080` of `gClass86F88Methods` (`Class86F88Methods::slot80`),
-dispatched by `Class86F88__ForwardToTarget` (this unit, on a DIFFERENT instance reached
+This is vtable slot `+0x080` of `gItemListMethods` (`ItemListMethods::slot80`),
+dispatched by `ItemList__ForwardToTarget` (this unit, on a DIFFERENT instance reached
 through `self->unk3C`) as `other->methods->slot80(other, arg1, 0x60, 0x60)`.
 
 ## Source
 
 ```c
-void Class86F88__ScrollLeft(Class86F88 *self)
+void ItemList__ScrollLeft(ItemList *self)
 {
     s32 count;
 
@@ -32,8 +34,8 @@ void Class86F88__ScrollLeft(Class86F88 *self)
 
 The occupant's own body ignores every argument past `self` -- it never
 reads what a caller passes in `arg1`/`arg2`/`arg3` -- which is why it
-compiles cleanly as a plain `(Class86F88 *self)` function even though
-`Class86F88__ForwardToTarget`'s call site (a DIFFERENT instance's copy of this same
+compiles cleanly as a plain `(ItemList *self)` function even though
+`ItemList__ForwardToTarget`'s call site (a DIFFERENT instance's copy of this same
 slot) passes 3 more arguments. Per this project's established
 per-call-site-arity convention this is not a contradiction: the slot's
 declared pointer type in the header carries the fuller signature the call
@@ -47,8 +49,8 @@ to `slot94` with no reload -- matched on the first attempt in this shape.
 
 ## Naming
 
-Round 75 (bravo, track 3). `func_80052498` -> `Class86F88__ScrollLeft`, **tier A**.
+Round 75 (bravo, track 3). `func_80052498` -> `ItemList__ScrollLeft`, **tier A**.
 
-Slot +0x080 (`tools/classtable.py gClass86F88Methods`). Decrements `column` if it stays >= 0, then refreshRows. Dispatched by HandleInputCode on code 4.
+Slot +0x080 (`tools/classtable.py gItemListMethods`). Decrements `column` if it stays >= 0, then refreshRows. Dispatched by HandleInputCode on code 4.
 
-Class86F88, per the round-75 pass, is a scrolling list selector: up to 4 visible rows of 26-character item text, a highlighted cursor row, a horizontal column offset (see the unit header comment of `src/class_3bb8c_k.c`).
+ItemList, per the round-75 pass, is a scrolling list selector: up to 4 visible rows of 26-character item text, a highlighted cursor row, a horizontal column offset (see the unit header comment of `src/class_3bb8c_k.c`).

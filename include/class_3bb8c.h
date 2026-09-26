@@ -475,8 +475,8 @@ struct TargetObj86ED0 {
  * call-site typings of one undefined function are exactly the case that
  * must stay unit-local. */
 
-/* Class86F88 (gClass86F88Methods, the 0x54-byte list selector whose methods
- * are in class_3bb8c_j and class_3bb8c_k) is include/Class86F88.h (track 4,
+/* ItemList (gItemListMethods, the 0x54-byte list selector whose methods
+ * are in class_3bb8c_j and class_3bb8c_k) is include/ItemList.h (track 4,
  * round 89). */
 
 /* gObjMMethods and GetObjMMethods: include/ObjM.h (track 4, round 89). */

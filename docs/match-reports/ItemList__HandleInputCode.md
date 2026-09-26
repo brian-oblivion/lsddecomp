@@ -1,4 +1,6 @@
-# Class86F88__HandleInputCode -- MATCHED (69/69 words, first attempt)
+# ItemList__HandleInputCode -- MATCHED (69/69 words, first attempt)
+
+> Renamed from `Class86F88__HandleInputCode` on 2026-09-26 (tools/rename.py). Address 0x800522dc.
 
 > Renamed from `func_800522DC` on 2026-09-24 (tools/rename.py). Address 0x800522dc.
 
@@ -9,12 +11,12 @@ Unit `src/class_3bb8c_k.c`. Round 26, runner delta.
 An event/code dispatcher for this unit's own local view of method table
 `gObjMMethods` (`Obj87034_3bb8c_k` / `Class87034Methods_3bb8c_k`, both
 already declared earlier in this same file for `New_ObjM`/
-`ObjM__ObjM`/`Class86F88__SetState`/`Class86F88__TickClosing`). Owns `jtbl_800116F4`, a
+`ObjM__ObjM`/`ItemList__SetState`/`ItemList__TickClosing`). Owns `jtbl_800116F4`, a
 sparse 22-entry jump table for codes `4..25`, six of which have real
 handlers and the rest fall through doing nothing:
 
 ```c
-void Class86F88__HandleInputCode(Obj87034_3bb8c_k *self, void *arg1, s32 code) {
+void ItemList__HandleInputCode(Obj87034_3bb8c_k *self, void *arg1, s32 code) {
     switch (code) {
     case 25:
         self->methods->slot60(self, 0x10);
@@ -87,7 +89,7 @@ for this unit, and neither was touched.
 
 Two back-to-back same-round data points on HEAD BROADCAST 1
 (`ObjM__OnDreamSysNotify`: table order == ascending value order, lever not needed;
-`Class86F88__HandleInputCode`: table order == source declaration order, lever
+`ItemList__HandleInputCode`: table order == source declaration order, lever
 essential) make the discriminator concrete: **check the jump table's own
 label order against sorted case-value order before writing the switch,
 every time** -- neither "always reorder" nor "never reorder" is safe, and
@@ -95,8 +97,8 @@ the check costs nothing (the labels are right there in the `.s`).
 
 ## Naming
 
-Round 75 (bravo, track 3). `func_800522DC` -> `Class86F88__HandleInputCode`, **tier B**.
+Round 75 (bravo, track 3). `func_800522DC` -> `ItemList__HandleInputCode`, **tier B**.
 
-Slot +0x05C (`tools/classtable.py gClass86F88Methods`), which Class86F88__OnNotify dispatches for notifications from its tag-2 child (the one Class86F88__AddChild caches as `inputSource`). Code 25: forwardToTarget(0x10) then setState(2); 23: forwardToTarget(0x10) then setState(3); 5: scrollRight; 4: scrollLeft; 18: cursorUp; 19: cursorDown (each resolved to its method through the same table). TaskObjF (class_3bb8c_g) also branches on 0x19/0x17. Tier B: that these codes are controller buttons is not established. Retyped round 75 from the unit's ObjM view to `Class86F88 *`: the function's own table is gClass86F88Methods and every slot it calls holds a Class86F88 method.
+Slot +0x05C (`tools/classtable.py gItemListMethods`), which ItemList__OnNotify dispatches for notifications from its tag-2 child (the one ItemList__AddChild caches as `inputSource`). Code 25: forwardToTarget(0x10) then setState(2); 23: forwardToTarget(0x10) then setState(3); 5: scrollRight; 4: scrollLeft; 18: cursorUp; 19: cursorDown (each resolved to its method through the same table). TaskObjF (class_3bb8c_g) also branches on 0x19/0x17. Tier B: that these codes are controller buttons is not established. Retyped round 75 from the unit's ObjM view to `ItemList *`: the function's own table is gItemListMethods and every slot it calls holds a ItemList method.
 
-Class86F88, per the round-75 pass, is a scrolling list selector: up to 4 visible rows of 26-character item text, a highlighted cursor row, a horizontal column offset (see the unit header comment of `src/class_3bb8c_k.c`).
+ItemList, per the round-75 pass, is a scrolling list selector: up to 4 visible rows of 26-character item text, a highlighted cursor row, a horizontal column offset (see the unit header comment of `src/class_3bb8c_k.c`).
