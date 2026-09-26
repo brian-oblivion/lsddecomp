@@ -215,6 +215,8 @@ s32 Class65650__FindPartIndex(Class65650 *self, s32 value)
         return -1;
     }
     arr = self->partIds;
+    /* Keeps arr's register copy above the self->partCount load; without it
+     * GCC moves the copy into the delay slot of the count <= 0 branch. */
     __asm__("");
     count = self->partCount;
     if (count <= 0) {
@@ -498,6 +500,8 @@ void *Class65650__ApplyTodPacket(Class65650 *self, void *acc, void *extra)
             coordB->tx = v1;
             coordB->ty = v2;
             coordB->tz = v3;
+            /* Keeps the coordB->tz store ahead of the break's jump, leaving retail's
+             * nop in its delay slot; without it GCC moves the store into the slot. */
             __asm__("");
         }
         break;
