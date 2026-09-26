@@ -2943,3 +2943,4 @@ gStyleSpawnYChoice2 = 0x80087330;
 gStyleEffectTmd = 0x8008ACA4;
 gStyleEffectTim = 0x8008ACA8;
 gStyleEffectViewport = 0x8008ACAC;
+gStyleEffectModelIds = 0x8008AB98;

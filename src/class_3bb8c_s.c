@@ -62,11 +62,11 @@ extern Actor *gStyleEffectTmd; /* the Actor Actor__func_56f5c ran on */
 extern void *gStyleEffectTim;
 extern void *gStyleEffectViewport;
 extern s32 gTrackedYSnapshot;
-extern s32 D_8008AB98[];
+extern s32 gStyleEffectModelIds[];
 
 /* Called once, from the class's ctor (StyleEffect__StyleEffect): place self under
  * `parent` at pos + offset, then build the per-kind parts. Kinds 0 and 1
- * link a model fetched from gStyleEffectTmd by D_8008AB98[kind]; kind 0 also
+ * link a model fetched from gStyleEffectTmd by gStyleEffectModelIds[kind]; kind 0 also
  * gets two model children, kind 2 five randomised sprites, kind 3 five
  * plain sprites (StyleEffect__SpawnPlainSprites is StyleEffect__SpawnSprites(self,
  * 0, 0, NULL)). */
@@ -80,7 +80,7 @@ void StyleEffect__InitByKind(StyleEffect *self, SceneNode *parent, LongVec3 *pos
 
     state = self->pendingExtra;
     if (state < 2) {
-        s32 ret = gStyleEffectTmd->methods->setBackClip(gStyleEffectTmd, D_8008AB98[state]);
+        s32 ret = gStyleEffectTmd->methods->setBackClip(gStyleEffectTmd, gStyleEffectModelIds[state]);
         SceneNode__LinkModel((SceneNode *)self, (void *)ret);
         state = self->pendingExtra;
     }

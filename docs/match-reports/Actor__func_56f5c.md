@@ -11,7 +11,7 @@ never attempted before this round.
 
 Stashes `self` (arg1) and two more scalar args (arg2, arg3) into `.sbss`
 globals `gStyleEffectTmd`/`gStyleEffectTim`/`gStyleEffectViewport`, then runs a fixed 2-iteration
-loop calling `self->methods->slot80(self, D_8008AB98[i])` and feeding the
+loop calling `self->methods->slot80(self, gStyleEffectModelIds[i])` and feeding the
 result plus `&D_8008AB94` (a 1-word `.sdata` constant, address-only, never
 loaded) to library function `SetTargetOffset` (still `psyq_fa50.s`, unrenamed
 Psy-Q object; called with an unused return value). `arg0` (the function's
@@ -23,7 +23,7 @@ its own unrelated `self` there without any indication of shared meaning.
 extern s32 gStyleEffectTmd;
 extern s32 gStyleEffectTim;
 extern s32 gStyleEffectViewport;
-extern s32 D_8008AB98[3];
+extern s32 gStyleEffectModelIds[3];
 extern s32 D_8008AB94;
 
 extern void SetTargetOffset(void *arg0, void *arg1);
@@ -37,7 +37,7 @@ void Actor__func_56f5c(s32 arg0, BaseObjO *self, s32 arg2, s32 arg3) {
     gStyleEffectViewport = arg3;
     i = 0;
     do {
-        ret = self->methods->slot80(self, D_8008AB98[i]);
+        ret = self->methods->slot80(self, gStyleEffectModelIds[i]);
         SetTargetOffset(ret, &D_8008AB94);
         i++;
     } while (i < 2);

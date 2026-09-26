@@ -35,7 +35,7 @@ void StyleEffect__InitByKind(LinkNode *self, void *arg1, Vec3S *arg2) {
 
     state = self->unk54;
     if (state < 2) {
-        s32 ret = gStyleEffectTmd->methods->slot80(gStyleEffectTmd, D_8008AB98[state]);
+        s32 ret = gStyleEffectTmd->methods->slot80(gStyleEffectTmd, gStyleEffectModelIds[state]);
         SceneNode__LinkModel(self, ret);
         state = self->unk54;
     }
@@ -71,7 +71,7 @@ extern D_8008ACA4Obj *gStyleEffectTmd;
 extern void *gStyleEffectTim;
 extern void *gStyleEffectViewport;
 extern s32 gTrackedYSnapshot;
-extern s32 D_8008AB98[];
+extern s32 gStyleEffectModelIds[];
 ```
 
 `LinkNode`'s `pad58[0xC]` was renamed `Vec3S unk58` (same size, offset and
@@ -138,7 +138,7 @@ Only caller is the class's ctor `StyleEffect__StyleEffect` (class_3bb8c_r.c), wi
 ctor's own arg3/arg4 as (parent, pos). Body: snapshot `*(gStyleEffectViewport + 0x18)`
 into gTrackedYSnapshot; `AttachWithRotScale(self, parent, pos + offset,
 rotation, scale)`; for kind < 2, `SceneNode__LinkModel(self,
-gStyleEffectTmd->slot80(D_8008AB98[kind]))`; then kind 0 ->
+gStyleEffectTmd->slot80(gStyleEffectModelIds[kind]))`; then kind 0 ->
 StyleEffect__PlaceModelChildren(self, 0), 2 -> StyleEffect__BuildRandomSprites,
 3 -> StyleEffect__SpawnPlainSprites (= StyleEffect__SpawnSprites(self, 0, 0, NULL)).
 "Init" rests on the one ctor caller, so B.

@@ -95,7 +95,7 @@ StyleEffectMethods *GetStyleEffectMethods(void) {
 extern Actor *gStyleEffectTmd;
 extern void *gStyleEffectTim;
 extern void *gStyleEffectViewport;
-extern s32 D_8008AB98[3];
+extern s32 gStyleEffectModelIds[3];
 extern s32 D_8008AB94;
 
 extern void SetTargetOffset(void *arg0, void *arg1);
@@ -109,7 +109,7 @@ void Actor__func_56f5c(s32 unused, Actor *self, s32 arg2, s32 arg3) {
     gStyleEffectViewport = (void *)arg3;
     i = 0;
     do {
-        ret = (void *)self->methods->setBackClip(self, D_8008AB98[i]);
+        ret = (void *)self->methods->setBackClip(self, gStyleEffectModelIds[i]);
         SetTargetOffset(ret, &D_8008AB94);
         i++;
     } while (i < 2);
