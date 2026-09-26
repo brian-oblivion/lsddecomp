@@ -127,7 +127,7 @@ throughout.
   (4-element array, zero padding), and its fields renamed
   (`unk0`->`elemIdx` retyped `void*`->`s32`, `unk4`->`col`, `unk6`->`row`,
   `unk8`->`width`, `unkA`->`height`).** Two independent pieces of
-  evidence: `StageMap__FindElemIndexByUnk30` (slot124's real occupant, already retyped
+  evidence: `StageMap__FindSlotIndexByChunk` (slot124's real occupant, already retyped
   round 8 to return an `s32` index) feeds `StageMap__SetFootprintRect`'s write into
   this field; THIS function reads that same first field back and uses it
   exactly as an index -- `&self->unkEC[elemIdx]`, reproduced by retail as

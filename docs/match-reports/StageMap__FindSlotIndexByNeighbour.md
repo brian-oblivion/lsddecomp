@@ -81,7 +81,7 @@ guidance in `docs/DECOMPILATION_LEARNINGS.md`: that entry showed
 opposite-looking fix (adding an explicit per-iteration element pointer)
 serves the same underlying purpose — controlling which value GCC treats
 as the loop's own induction variable. Confirmed again on the very next
-function, `StageMap__FindElemIndexByUnk30` (own report), so this is now a two-instance
+function, `StageMap__FindSlotIndexByChunk` (own report), so this is now a two-instance
 pattern for this project, not a one-off.
 
 ## Naming

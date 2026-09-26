@@ -1,4 +1,6 @@
-# StageMap__FindElemIndexByUnk30 — MATCHED (20/20 words)
+# StageMap__FindSlotIndexByChunk — MATCHED (20/20 words)
+
+> Renamed from `StageMap__FindElemIndexByUnk30` on 2026-09-26 (tools/rename.py). Address 0x8004c5d0.
 
 > Renamed from `Class866E8__FindElemIndexByUnk30` on 2026-09-26 (tools/rename.py). Address 0x8004c5d0.
 
@@ -55,7 +57,7 @@ reads, closed it on the second attempt.
 ## Final C
 
 ```c
-s32 StageMap__FindElemIndexByUnk30(Obj866E8 *self, s32 key) {
+s32 StageMap__FindSlotIndexByChunk(Obj866E8 *self, s32 key) {
     s32 i;
     Elem *e;
 

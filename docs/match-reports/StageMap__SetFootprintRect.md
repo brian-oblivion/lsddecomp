@@ -77,7 +77,7 @@ just happens to always end at `1` by the time it's stored); calls
 
 New struct knowledge added regardless of the function itself stalling
 (verified straight from the disassembly, independent of getting a byte
-match): `StageMapMethods::slot124` (`StageMap__FindElemIndexByUnk30`, not decompiled),
+match): `StageMapMethods::slot124` (`StageMap__FindSlotIndexByChunk`, not decompiled),
 `UnkArgObj_3ac78::unk28` (a `void *`, reread and forwarded to `slot124`),
 and `StageMap`'s `unk88` (`s32`), `unk8C` (`void *`), `unk90`/`unk92`/
 `unk94`/`unk96` (`s16` each).
@@ -257,7 +257,7 @@ within budget for the remaining assigned functions. Restored to
 report's own "Update" section fixed to is now ALSO superseded: it is
 0xC bytes/4-elements, and the field this function writes is renamed
 `elemIdx` and RETYPED `void *` -> `s32` (an index into `self->unkEC[]`,
-not a pointer — confirmed by two independent readers, `StageMap__FindElemIndexByUnk30`'s
+not a pointer — confirmed by two independent readers, `StageMap__FindSlotIndexByChunk`'s
 own retyped return and this function's own read-back in `StageMap__DispatchToRectCells`).
 See `docs/match-reports/StageMap__DispatchToRectCells.md` for the full evidence. This
 function's own write, `self->unk8C = self->methods->slot124(...)`

@@ -41,7 +41,7 @@ s32 StageMap__FindSlotIndexByNeighbour(StageMap *self, s32 key) {
     return result;
 }
 
-s32 StageMap__FindElemIndexByUnk30(StageMap *self, s32 key) {
+s32 StageMap__FindSlotIndexByChunk(StageMap *self, s32 key) {
     s32 i;
     ChunkSlot *e;
 
