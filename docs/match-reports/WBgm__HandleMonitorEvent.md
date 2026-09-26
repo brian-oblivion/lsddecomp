@@ -125,3 +125,14 @@ extern WBgmMethods D_8006E48C;
 extern s32 gWBgmActive;
 extern u8 gSsSizeTableBuf[];
 ```
+
+## Track 4 (2026-09-26, round 87, VabStreamObj)
+
+The unit-local view `SeqVab` and its `extern SeqVab *New_VabStreamObj(s32)`
+are gone. `WBgm::vab` is now `VabStreamObj *` (`include/VabStreamObj.h`),
+and the whole image stays byte-identical. SeqVab's `ready` (+0x058) is
+VabStreamObj's `attrsReady`, which OnBodyReady sets once the VAB body has
+transferred. `vabId` (+0x054) is the same field under the same name. The
+release calls no longer cast, and `WBgm__SetVab` casts its s32 `arg` to
+the `char *` path New_VabStreamObj takes. WBgm's own slot types are
+unchanged.

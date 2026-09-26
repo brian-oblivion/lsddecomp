@@ -76,3 +76,10 @@ table family may read them.
 ## Track 4
 
 2026-09-25, round 84 (bravo): class unified in `include/Class86668.h`. Renamed from `Class86668__SetChildFlag8`, tier A. The ctor settles what +0x034 is: `New_VabStreamObj(soundBankPath)` when the first ctor argument is non-NULL (Obj865C8 passes GetSoundEffectDir()), the caller's object otherwise (ObjM passes Obj865C8's, itself a VabStreamObj); ObjM calls the same field's +0x088/+0x08C, VabStreamObj's Mute/Unmute. gVabStreamObjMethods' +0x080 is VabStreamObj__PlayTone, so this is `sound->PlayTone(tone, 0x7F, 0x7F)`, the shape of TaskCore__PlaySound (which passes 0x60, 0x60). The Class866E8 reading above is withdrawn: the field is `Class86668::sound` (`BasicClass *`), cast in class_3ac78.c to a local SoundObj_3ac78 view with +0x080 `playTone`. Slot +0x070 is named `playSound`. Image byte-identical.
+
+## Track 4 (2026-09-26, round 87, VabStreamObj)
+
+`src/class_3ac78.c`'s `SoundObj_3ac78`/`SoundObjMethods_3ac78` view is
+deleted. `sound` is cast to `VabStreamObj *` (`include/VabStreamObj.h`) and
+calls `playTone`, the same slot at the same type. The whole image stays
+byte-identical. `Class86668::sound` stays `BasicClass *`.

@@ -34,21 +34,14 @@
  * (`VabDriver__Read`/`LoadFile`/`RunRequestQueue`/`RequestLoadFile`/
  * `StopService`/`CancelRequests`), are all empty no-ops.
  *
- * `gVabStreamObjMethods` is the real work: `VabStreamObj__VabStreamObj` is
- * its constructor, `VabStreamObj__Close` its close, `VabStreamObj__Update`
- * its per-frame poll (header/body transfer state machine), and
- * `VabStreamObj__LoadVagAttrs` its post-load VAB attribute-table fetch --
- * confirmed round 43 as a PS1 SPU/VAB sound-streaming object.
- * `VabStreamObj__OnBodyReady`'s and `FlushSoundCueSet`'s self objects load
- * `*self` (offset 0, the methods pointer) and dereference table slots at
- * exactly the offsets `classtable.py gVabStreamObjMethods` prints for
- * `VabStreamObj__LoadVagAttrs` (+0x7C) and `VabStreamObj__StopVoice`
- * (+0x84) -- direct confirmation this is genuine `self->methods->slotN(self,
- * ...)` dispatch, not driver code.  `gVabStreamObjMethods`'s whole vtable
- * was read straight out of `asm/data/5E140.data.s` while matching this
- * cluster -- see `docs/match-reports/VabStreamObj__VabStreamObj.md` for the
- * full slot table, including two slots (+0x58, +0x6C) that are null in
- * retail's own data.
+ * `gVabStreamObjMethods` is the real work. It is the class VabStreamObj,
+ * declared once in `include/VabStreamObj.h` since round 87 (track 4). That
+ * header's banner describes the load sequence and the slots. Two older
+ * readings here were wrong. `VabStreamObj__AdvanceLoadState` (was `Update`)
+ * is not a per-frame poll: it is the setFlag slot, and the CD driver calls
+ * it when a request completes. The "null in retail" slots +0x58 and +0x6C
+ * (loadFile, requestLoadFile) are filled from the active driver by
+ * SetActiveDataSource.
  *
  * `InitSoundCueSet`/`FlushSoundCueSet` are unrelated free functions (NOT
  * `gVabStreamObjMethods` vtable slots -- checked, absent from its slot list)
@@ -71,98 +64,7 @@
  */
 #include "common.h"
 #include "VabDriver.h"
-
-/* ------------------------------------------------------------------------
- * gVabStreamObjMethods's table (gVabDriverMethods is include/VabDriver.h's
- * since round 87).  Only the
- * slots and fields THIS unit's functions actually touch are named;
- * everything else is opaque padding, per this project's local-reading
- * convention (see code_179d8_d.c's Table6D940/Obj6D940 for the same idiom
- * applied to a neighbouring class).  Kept LOCAL to this file -- no shared
- * header, so a sibling slice's independent reading of the same tables
- * cannot collide with this one on merge.
- * ------------------------------------------------------------------------ */
-typedef struct VabStreamObj VabStreamObj;
-
-/* gVabStreamObjMethods's own methods table -- the class VabStreamObj below
- * dispatches through.  Only the slots this unit's own functions call or are
- * assigned to are named.  round 43 added slot58/slot5C/slot6C/slot9C once
- * VabStreamObj__VabStreamObj, VabStreamObj__Update and
- * VabStreamObj__LoadVagAttrs (all round-17 gp_rel stalls, resolved round 42)
- * were actually worked. */
-typedef struct VabStreamObjMethods {
-    u8 pad000[0x008];
-    void (*slot08)(void *self, char *arg1); /* VabStreamObj__VabStreamObj -- this unit's own new_class_da34 dispatch; arg1 is a base filename, not a plain s32 */
-    s32 (*slot0C)(VabStreamObj *self);      /* VabStreamObj__Close, confirmed against gVabStreamObjMethods's own rodata (+0x0C) */
-    u8 pad010[0x058 - 0x010];
-    /* +0x058 and +0x06C are BOTH null in retail's own gVabStreamObjMethods
-     * (confirmed against asm/data/5E140.data.s) -- VabStreamObj__Update and
-     * VabStreamObj__VabStreamObj each dispatch through one of them anyway,
-     * on a path that is apparently never actually taken for an object built
-     * with this exact base table.  That is retail's own behaviour, not a
-     * derivation error: the dispatch still has to compile, whatever sits at
-     * the address at runtime. */
-    void (*slot58)(void *self, char *path); /* VabStreamObj__Update's own dispatch -- begins the VAB body transfer once the ".VB" path is built; null in retail */
-    void (*slot5C)(void *self);             /* Class6D430__FreeBuffer (uncarved, cross-unit) -- VabStreamObj__LoadVagAttrs's own dispatch, called before it re-fetches the VAB header */
-    u8 pad060[0x06C - 0x060];
-    void (*slot6C)(void *self, char *path); /* VabStreamObj__VabStreamObj's own dispatch -- begins the VAB header transfer for the ".VH" path; null in retail */
-    u8 pad070[0x078 - 0x070];
-    s32 (*slot78)(VabStreamObj *self, s32 arg1); /* VabStreamObj__OnBodyReady, and VabStreamObj__Update's own body-complete notify */
-    s32 (*slot7C)(VabStreamObj *self);           /* VabStreamObj__LoadVagAttrs */
-    u8 pad080[0x084 - 0x080];
-    s32 (*slot84)(VabStreamObj *self, s32 arg1); /* VabStreamObj__StopVoice, arg1 is s16-truncated by the callee */
-    u8 pad088[0x09C - 0x088];
-    void (*slot9C)(void *self, s32 arg1);   /* VabStreamObj__SetPitchOffset -- VabStreamObj__VabStreamObj's own dispatch, called with arg1 == 0 right after construction */
-} VabStreamObjMethods;
-extern VabStreamObjMethods gVabStreamObjMethods;
-
-/* This unit's own reduced, local view of Sony's `VagAtr` (include/psyq/
- * LIBSND.H, 32 bytes) -- one entry inside a VabStreamObj::progVagTable
- * sub-array, stride 0x20.  `center`/`shift` land exactly on VagAtr's own
- * same-named bytes (+0x04/+0x05), confirmed round 52 against LIBSND.H;
- * everything else stays opaque padding per the project's independent-
- * local-view convention rather than pulling in the real header (see
- * code_179d8_k.c for the same choice).  Only the two bytes
- * VabStreamObj__PlayTone itself reads are named. */
-typedef struct VagAtrView {
-    u8 pad0[0x4];
-    u8 center; /* +0x04, VagAtr::center -- the VAG's own center note */
-    u8 shift;  /* +0x05, VagAtr::shift -- center note fine tune */
-    u8 pad6[0x20 - 0x6];
-} VagAtrView;
-
-/* This unit's own reduced view of Sony's `VabHdr` (include/psyq/LIBSND.H,
- * 32 bytes) -- only the two fields VabStreamObj__LoadVagAttrs itself reads
- * are named: `ts` (program count) and `vs` (vag count), at the real
- * struct's own offsets +0x12/+0x14. */
-typedef struct VabHdrView {
-    u8 pad0[0x12];
-    u16 ts;  /* +0x12, program count */
-    u16 vs;  /* +0x14, vag count */
-    u8 pad16[0x20 - 0x16];
-} VabHdrView;
-
-/* self for the gVabStreamObjMethods-dispatched methods in this unit.  Only
- * fields this unit's own functions touch are named -- see the unit header
- * comment for how the class was established. */
-struct VabStreamObj {
-    VabStreamObjMethods *methods; /* +0x000 */
-    u8 pad004[0x010 - 0x004];
-    u8 *streamBuffer;              /* +0x010, streaming file buffer -- passed to SsVabOpenHead/SsVabTransBody */
-    u8 pad014[0x024 - 0x014];
-    u32 flags;                      /* +0x024, flag word; bit 0x200 gates the header/body transfer steps */
-    u8 pad028[0x02A - 0x028];
-    u16 loadState;                    /* +0x02A, load state: 0 idle, 1 header pending, 6 body pending -- unsigned (retail loads it lhu) */
-    VabHdrView vabHdr;                  /* +0x02C, filled by SsUtGetVabHdr; 32 bytes, ends exactly at +0x04C */
-    VagAtrView *vagAttrPool;              /* +0x04C, VagAtr pool, vabHdr.vs entries */
-    VagAtrView **progVagTable;             /* +0x050, array of vabHdr.ts pointers into vagAttrPool */
-    s16 vabId;                               /* +0x054 */
-    s16 muted;                                /* +0x056, boolean-ish flag */
-    u16 attrsReady;                             /* +0x058, unsigned (retail loads it lhu in VabStreamObj__LoadVagAttrs) */
-    u16 bodyTransferPending;                      /* +0x05A */
-    void *baseFilename;                             /* +0x05C, malloc'd copy of the base filename */
-    s32 pitchOffset;                                  /* +0x060, set by VabStreamObj__SetPitchOffset; added to a VagAtrView::center in VabStreamObj__PlayTone */
-};
+#include "VabStreamObj.h"
 
 /* Cross-unit calls into the still-uncarved code_179d8_tail monolith --
  * declared LOCAL to this unit, per-call-site typed, since none of them have
@@ -201,10 +103,6 @@ typedef struct SoundCueSet {
     s32 unk14;  /* +0x14, set to the constant 10 by InitSoundCueSet; no further evidence of its role in this unit */
     SoundCueSlot slots[3]; /* +0x18 */
 } SoundCueSet;
-
-/* Forward declaration: GetVabStreamObjMethods is defined later in this file
- * (ROM order), but New_VabStreamObj (earlier in ROM order) calls it. */
-VabStreamObjMethods *GetVabStreamObjMethods(void);
 
 s32 VabDriver__Read(void) {
     return 0;
@@ -250,12 +148,12 @@ s32 func_8002C478(void) {
     return 0;
 }
 
-void *New_VabStreamObj(s32 arg0) {
-    void *self;
+VabStreamObj *New_VabStreamObj(char *path) {
+    VabStreamObj *self;
 
     self = BMemPMgrAlloc(0x64);
     if (self != NULL) {
-        GetVabStreamObjMethods()->slot08(self, arg0);
+        GetVabStreamObjMethods()->ctor(self, path);
         return self;
     }
     return NULL;
@@ -271,9 +169,9 @@ void *New_VabStreamObj(s32 arg0) {
 typedef struct DriverBaseMethods {
     u8 pad000[0x008];
     void (*slot08)(void *self);  /* VabStreamObj__VabStreamObj's own base-chain call */
-    /* VabStreamObj__Close's own base-chain call -- its own return is likewise a
-     * bare tail call with nothing after it, so per CLAUDE.md's rule this
-     * defaults to s32 absent positive void evidence. */
+    /* VabStreamObj__Finalize's own base-chain call. Class6D430's finalize
+     * returns void; VabStreamObj__Finalize is void and discards this s32,
+     * byte-identical (round 87). */
     s32 (*slot0C)(void *self);
 } DriverBaseMethods;
 extern DriverBaseMethods *GetActiveDataSourceMethods(void);
@@ -317,9 +215,9 @@ extern s32 gOpenVabCount;
 extern s32 D_8008A8CC;
 extern void *gPendingVabBuffer;
 
-void VabStreamObj__VabStreamObj(VabStreamObj *self, char *arg1) {
+void VabStreamObj__VabStreamObj(VabStreamObj *self, char *path) {
     void *buf;
-    char path[0x20];
+    char vhPath[0x20];
 
     GetActiveDataSourceMethods()->slot08(self);
     self->methods = GetVabStreamObjMethods();
@@ -327,7 +225,7 @@ void VabStreamObj__VabStreamObj(VabStreamObj *self, char *arg1) {
     self->progVagTable = NULL;
     self->vabId = 0;
     self->muted = 0;
-    self->methods->slot9C(self, 0);
+    self->methods->setPitchOffset(self, 0);
     self->attrsReady = 0;
     self->bodyTransferPending = 0;
     self->baseFilename = NULL;
@@ -342,19 +240,19 @@ void VabStreamObj__VabStreamObj(VabStreamObj *self, char *arg1) {
         gVabStreamInited = 1;
     }
     gOpenVabCount++;
-    if (arg1 != NULL) {
-        buf = BMemPMgrAlloc(strlen(arg1) + 1);
+    if (path != NULL) {
+        buf = BMemPMgrAlloc(strlen(path) + 1);
         if (buf != NULL) {
             self->baseFilename = buf;
-            strcpy(buf, arg1);
-            BuildFileName(path, buf, NULL, gVabHeaderSuffix);
-            self->loadState = 1;
-            self->methods->slot6C(self, path);
+            strcpy(buf, path);
+            BuildFileName(vhPath, buf, NULL, gVabHeaderSuffix);
+            self->unk2A = 1;
+            self->methods->requestLoadFile(self, vhPath);
         }
     }
 }
 
-s32 VabStreamObj__Close(VabStreamObj *self) {
+void VabStreamObj__Finalize(VabStreamObj *self) {
     SsVabClose(self->vabId);
     if (--gOpenVabCount < 0) {
         gOpenVabCount = 0;
@@ -369,23 +267,23 @@ s32 VabStreamObj__Close(VabStreamObj *self) {
     BMemPMgrFree(self->vagAttrPool);
     BMemPMgrFree(self->progVagTable);
     BMemPMgrFree(self->baseFilename);
-    return GetActiveDataSourceMethods()->slot0C(self);
+    GetActiveDataSourceMethods()->slot0C(self);
 }
 
-void VabStreamObj__Update(VabStreamObj *self) {
+void VabStreamObj__AdvanceLoadState(VabStreamObj *self) {
     char path[0x20];
 
-    switch (self->loadState) {
+    switch (self->unk2A) {
     case 0:
         break;
     case 1:
         if (self->flags & 0x200) {
-            self->vabId = SsVabOpenHead(self->streamBuffer, -1);
+            self->vabId = SsVabOpenHead(self->buffer, -1);
             BuildFileName(path, self->baseFilename, NULL, gVabBodySuffix);
-            gPendingVabBuffer = self->streamBuffer;
-            self->loadState = 6;
-            self->streamBuffer = NULL;
-            self->methods->slot58(self, path);
+            gPendingVabBuffer = self->buffer;
+            self->unk2A = 6;
+            self->buffer = NULL;
+            self->methods->loadFile(self, path);
             if (self->baseFilename != NULL) {
                 BMemPMgrFree(self->baseFilename);
                 self->baseFilename = NULL;
@@ -394,10 +292,10 @@ void VabStreamObj__Update(VabStreamObj *self) {
         break;
     case 6:
         if (self->flags & 0x200) {
-            self->vabId = SsVabTransBody(self->streamBuffer, self->vabId);
+            self->vabId = SsVabTransBody(self->buffer, self->vabId);
             if (self->vabId != -1) {
                 self->bodyTransferPending = 1;
-                self->methods->slot78(self, 1);
+                ((VabStreamObjOnBodyReadyFn)self->methods->slot78)(self, 1);
             }
         }
         break;
@@ -406,16 +304,16 @@ void VabStreamObj__Update(VabStreamObj *self) {
     }
 }
 
-s32 VabStreamObj__OnBodyReady(VabStreamObj *self, s32 arg1) {
+s32 VabStreamObj__OnBodyReady(VabStreamObj *self, s32 done) {
     s32 result;
 
     result = 0;
     if (self->bodyTransferPending != 0) {
-        if (arg1 != 0) {
+        if (done != 0) {
             SsVabTransCompleted(1);
             self->bodyTransferPending = 0;
             self->attrsReady = 1;
-            self->methods->slot7C(self);
+            self->methods->loadVagAttrs(self);
             result = 1;
         }
     }
@@ -431,14 +329,10 @@ typedef struct ProgAtrView {
     u8 pad1[0x10 - 0x1];
 } ProgAtrView;
 
-/* Class6D430__FreeBuffer -- uncarved, cross-unit; reached only through
- * gVabStreamObjMethods's own +0x5C slot (declared above as `slot5C`), never
- * called directly by name here. */
-
 void VabStreamObj__LoadVagAttrs(VabStreamObj *self)
 {
     ProgAtrView prog;
-    VagAtrView *pool;
+    VabStreamVagAtr *pool;
     s32 i;
     s32 j;
     s16 result;
@@ -446,8 +340,8 @@ void VabStreamObj__LoadVagAttrs(VabStreamObj *self)
     if (self->attrsReady == 0) {
         return;
     }
-    self->methods->slot5C(self);
-    self->streamBuffer = gPendingVabBuffer;
+    self->methods->freeBuffer(self);
+    self->buffer = gPendingVabBuffer;
     result = SsUtGetVabHdr(self->vabId, &self->vabHdr);
     if (result == -1) {
         return;
@@ -487,11 +381,11 @@ void VabStreamObj__LoadVagAttrs(VabStreamObj *self)
  * folds `index - (index >> 4) * 16` into `index & 0xF` whenever `hi`'s
  * FIRST use is the multiply (flow.c links a set only to its next use), and
  * retail kept the unfolded sll+subu (docs/match-reports/VabStreamObj__PlayTone.md). */
-s32 VabStreamObj__PlayTone(VabStreamObj *self, s32 index, s32 arg2, s32 arg3) {
+s32 VabStreamObj__PlayTone(VabStreamObj *self, s32 index, s32 vol, s32 endVol) {
     s32 hi;
     s32 lo;
-    VagAtrView *entry;
-    VagAtrView *prog;
+    VabStreamVagAtr *entry;
+    VabStreamVagAtr *prog;
     s16 result;
 
     if (index >= 0) {
@@ -500,9 +394,9 @@ s32 VabStreamObj__PlayTone(VabStreamObj *self, s32 index, s32 arg2, s32 arg3) {
         lo = index - hi * 16;
         entry = &prog[lo];
         result = SsUtKeyOn(self->vabId, (s16)hi, (s16)lo, (s16)(entry->center + self->pitchOffset),
-                                entry->shift, (s16)arg2, (s16)arg2);
+                                entry->shift, (s16)vol, (s16)vol);
         if (result >= 0) {
-            SsUtAutoVol(result, (s16)arg2, (s16)arg3, 2);
+            SsUtAutoVol(result, (s16)vol, (s16)endVol, 2);
             return result;
         }
     }
@@ -513,9 +407,9 @@ s32 VabStreamObj__PlayTone(VabStreamObj *self, s32 index, s32 arg2, s32 arg3) {
  * checks `index` against. */
 #define SPU_VOICE_COUNT 0x18
 
-s32 VabStreamObj__StopVoice(VabStreamObj *self, s32 index) {
-    if (index < SPU_VOICE_COUNT) {
-        SsUtKeyOffV(index);
+s32 VabStreamObj__StopVoice(VabStreamObj *self, s32 voice) {
+    if (voice < SPU_VOICE_COUNT) {
+        SsUtKeyOffV(voice);
     } else {
         SsUtAllKeyOff(0);
     }
@@ -545,17 +439,17 @@ s32 VabStreamObj__Unmute(VabStreamObj *self) {
     return flag;
 }
 
-void VabStreamObj__func_2cbdc(void) {
+void VabStreamObj__NoOpSlot90(void) {
 }
 
-void VabStreamObj__func_2cbe4(void) {
+void VabStreamObj__NoOpSlot94(void) {
 }
 
-void VabStreamObj__func_2cbec(void) {
+void VabStreamObj__NoOpSlot98(void) {
 }
 
-void VabStreamObj__SetPitchOffset(VabStreamObj *self, s32 arg1) {
-    self->pitchOffset = arg1 * 12 - 0x18;
+void VabStreamObj__SetPitchOffset(VabStreamObj *self, s32 octave) {
+    self->pitchOffset = octave * 12 - 0x18;
 }
 
 VabStreamObjMethods *GetVabStreamObjMethods(void) {
@@ -605,7 +499,7 @@ void FlushSoundCueSet(VabStreamObj *self, SoundCueSet *set) {
     slot = set->slots;
     for (i = 0; i < 3; i++) {
         if (slot->index >= 0) {
-            slot->index = self->methods->slot84(self, slot->index);
+            slot->index = self->methods->stopVoice(self, slot->index);
         }
         slot++;
     }

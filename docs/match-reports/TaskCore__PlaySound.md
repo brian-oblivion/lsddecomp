@@ -49,3 +49,14 @@ represent in the game is not established, so tier B rather than A.
 ## Track 4 (2026-09-25, round 84, alpha)
 
 Renamed from Obj86B60__ForwardToChild (tools/rename.py). Occupant of +0x070 (`playSound`). The "child" is +0x048, New_VabStreamObj(soundBankPath) with "ETC\ETCSE" at both subclass ctors, and the call is its +0x080, VabStreamObj__PlayTone (tone, 0x60, 0x60). The class (id 0x130, table gTaskCoreMethods) is unified as `TaskCore` in `include/TaskCore.h`; `self` is `TaskCore *` (it was the `Obj86B60` or `StreamTaskObj` view). Any source block above is the pre-unification spelling; the live body takes the unified types and slot names, byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).
+
+## Track 4 (2026-09-26, round 87, VabStreamObj)
+
+`include/code_2cc8c.h`'s `Unk48Obj`/`Unk48ObjMethods` view is deleted.
+`sound` is now cast to `VabStreamObj *` (`include/VabStreamObj.h`), and the
+call is `playTone`. The view had typed the slot `void`, but the occupant
+`VabStreamObj__PlayTone` returns the voice. The whole image stays
+byte-identical with the s32 slot, because the call is this void function's
+last statement and nothing reads `$v0`. `TaskCore::sound` stays
+`BasicClass *`: it is TaskCore's field, and it can also hold the ctor's own
+`sound` argument.

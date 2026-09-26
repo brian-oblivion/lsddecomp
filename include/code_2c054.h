@@ -183,10 +183,10 @@ struct TaskTextObj {
  * and return types are modeled. */
 extern StreamTaskUnkB4Obj *New_MoviePlayer(StreamTaskInitData *a0, s32 a1, s32 a2);
 
-/* Four more externs reached only by TaskCore__TaskCore, none of them in
+/* Three more externs reached only by TaskCore__TaskCore, none of them in
  * this unit; local views of their allocators. The ctor stores each result
- * into a `BasicClass *` field (sound, tileAtlas, tileMap, bgLayer). */
-extern StreamTaskUnkB4Obj *New_VabStreamObj(char *path); /* TaskCore::soundBankPath */
+ * into a `BasicClass *` field (tileAtlas, tileMap, bgLayer); the fourth,
+ * New_VabStreamObj (sound), is include/VabStreamObj.h's. */
 extern StreamTaskUnkB4Obj *New_TileAtlas(s32 a0);
 extern StreamTaskUnkB4Obj *New_TileMap(s32 a0, StreamTaskUnkB4Obj *a1);
 extern StreamTaskUnk78Obj *New_BgLayer(StreamTaskUnkB4Obj *a0, s32 a1);

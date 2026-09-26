@@ -99,7 +99,7 @@ matched.
 
 ### Proposed learning
 
-**Same signedness lesson as `VabStreamObj__VabStreamObj`/`VabStreamObj__Update`, a THIRD field
+**Same signedness lesson as `VabStreamObj__VabStreamObj`/`VabStreamObj__AdvanceLoadState`, a THIRD field
 on the same struct: `attrsReady` (`ObjDA34::unk58` before round 52) is
 `u16`, not `s16`.** The tell was identical -- retail's `lhu v0,0x58(s1)`
 where a signed field compiles to `lh`. Three of this struct's four

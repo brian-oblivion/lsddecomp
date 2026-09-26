@@ -46,6 +46,7 @@
  * reads back, so there is nothing to name them after. */
 #include "common.h"
 #include "DreamSys.h"
+#include "VabStreamObj.h"
 
 /* Forward declarations for two of this unit's OWN functions, both called
    around line 450 but not defined until ~200 lines later, in ROM order.
@@ -714,15 +715,15 @@ s32 DreamSys__AdvanceMoveCycle(DreamSys *this, s32 arg1)
    regression -- see docs/match-reports/DreamSys__StartVoice.md. */
 void DreamSys__StartVoice(DreamSys *this)
 {
-	DreamSysUnk58 *obj;
+	VabStreamObj *obj;
 	s32 idx;
-	DreamSysUnk58Vtable *vt;
+	VabStreamObjMethods *vt;
 	s32 heading;
 	s32 headingArg;
 	s32 scratch;
 
-	obj = (DreamSysUnk58 *)this->soundObj;
-	vt = obj->vt;
+	obj = (VabStreamObj *)this->soundObj;
+	vt = obj->methods;
 	idx = this->voiceSelect;
 	if (idx == 0) {
 		return;
@@ -731,28 +732,28 @@ void DreamSys__StartVoice(DreamSys *this)
 	scratch = VOICE_BY_SELECT[idx];
 	heading = scratch << 4;
 	headingArg = heading;
-	vt->slot0x9C(obj, VOICE_PITCH_BY_SELECT[idx]);
-	this->voiceIndex = vt->slot0x80(obj, headingArg, 0x6E, 0x6E);
+	vt->setPitchOffset(obj, VOICE_PITCH_BY_SELECT[idx]);
+	this->voiceIndex = vt->playTone(obj, headingArg, 0x6E, 0x6E);
 	if (this->voiceSelect != 0x16) {
 		this->voiceIndex = -1;
 	}
 
 	if (this->voiceSelect == 0xB) {
-		vt->slot0x9C(obj, 1);
-		vt->slot0x80(obj, headingArg, 0x6E, 0x6E);
-		vt->slot0x9C(obj, 2);
+		vt->setPitchOffset(obj, 1);
+		vt->playTone(obj, headingArg, 0x6E, 0x6E);
+		vt->setPitchOffset(obj, 2);
 		scratch = 0x90;
-		vt->slot0x80(obj, scratch, 0x6E, 0x6E);
+		vt->playTone(obj, scratch, 0x6E, 0x6E);
 	}
 }
 
 void DreamSys__StopVoice(DreamSys *this)
 {
-	DreamSysUnk58 *obj;
+	VabStreamObj *obj;
 
 	if (this->voiceIndex >= 0) {
-		obj = (DreamSysUnk58 *)this->soundObj;
-		obj->vt->slot0x84(obj, this->voiceIndex);
+		obj = (VabStreamObj *)this->soundObj;
+		obj->methods->stopVoice(obj, this->voiceIndex);
 		this->voiceIndex = -1;
 	}
 }
@@ -1102,7 +1103,7 @@ bool DreamSys__TryInstantTeleportLink(DreamSys *this, PlayerSpawnPoint *currentP
 
 bool ExecuteLink(DreamSys *system, s32 stage, s32 unk1, s32 unk2)
 {
-	DreamSysUnk58 *obj;
+	VabStreamObj *obj;
 
 	system->pendingLinkType = unk1;
 	system->vt->slot30(system, unk1);
@@ -1114,8 +1115,8 @@ bool ExecuteLink(DreamSys *system, s32 stage, s32 unk1, s32 unk2)
 		system->dreamTimer = 0;
 	}
 	if (unk2 != 0) {
-		obj = (DreamSysUnk58 *)system->soundObj;
-		obj->vt->slot0x80(obj, 0x90, 0x6E, 0x6E);
+		obj = (VabStreamObj *)system->soundObj;
+		obj->methods->playTone(obj, 0x90, 0x6E, 0x6E);
 	}
 	return true;
 }

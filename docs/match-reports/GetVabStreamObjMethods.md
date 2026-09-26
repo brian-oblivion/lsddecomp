@@ -20,7 +20,7 @@ Byte-exact, 4/4 words.
 ## Notes
 
 The "get methods table" accessor for the `gVabStreamObjMethods` class -- called from
-`New_VabStreamObj` (this unit) and from `VabStreamObj__VabStreamObj`/`VabStreamObj__Close` (this
+`New_VabStreamObj` (this unit) and from `VabStreamObj__VabStreamObj`/`VabStreamObj__Finalize` (this
 unit) to obtain the constructor/dispatch table before indexing a slot. Same
 idiom as `GetVabDriverMethods` (this unit) for `gVabDriverMethods`.
 

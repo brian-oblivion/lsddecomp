@@ -126,3 +126,14 @@ extern u8 gSsSizeTableBuf[];
 ## Track 4 (2026-09-26, round 87, bravo)
 
 The local GetDrawSystem/New_DrawSystem extern this unit carried is gone; it comes from `include/DrawSystem.h` (D_8006C070 unified), with a pointer cast where this unit's own slot type asks for one. Byte-identical.
+
+## Track 4 (2026-09-26, round 87, VabStreamObj)
+
+The unit-local view `SeqVab` and its `extern SeqVab *New_VabStreamObj(s32)`
+are gone. `WBgm::vab` is now `VabStreamObj *` (`include/VabStreamObj.h`),
+and the whole image stays byte-identical. SeqVab's `ready` (+0x058) is
+VabStreamObj's `attrsReady`, which OnBodyReady sets once the VAB body has
+transferred. `vabId` (+0x054) is the same field under the same name. The
+release calls no longer cast, and `WBgm__SetVab` casts its s32 `arg` to
+the `char *` path New_VabStreamObj takes. WBgm's own slot types are
+unchanged.

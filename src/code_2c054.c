@@ -1,5 +1,6 @@
 #include "common.h"
 #include "code_2c054.h"
+#include "VabStreamObj.h"
 
 StreamTaskObj *New_StreamTaskObj(s32 a1, s32 a2, s32 a3, s32 a4)
 {

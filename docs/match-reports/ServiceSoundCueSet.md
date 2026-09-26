@@ -546,3 +546,16 @@ None of the four above cross a header boundary (both units keep independent
 local views of this struct, per the project's convention), so these are
 recorded here rather than applied -- posted to the broadcast for visibility,
 not because another unit's file needs editing.
+
+## Track 4 (2026-09-26, round 87)
+
+The unit-local `VabStreamObj`/`VabStreamObjMethods` view is gone. The
+function now includes `include/VabStreamObj.h`, and the whole image stays
+byte-identical. Its three calls use the header's own slot names, which the
+local view already had: `playTone` (+0x080), `stopVoice` (+0x084) and
+`setPitchOffset` (+0x09C). The header names playTone's arguments
+`(index, vol, endVol)`: `vol` is SsUtKeyOn's left and right volume and
+SsUtAutoVol's start volume, and `endVol` is SsUtAutoVol's end volume. So
+`word2` is the start volume and `word3` the end volume. The slot fields are
+left unrenamed here because `SoundCueSet` was not part of the track 4 job.
+setPitchOffset's argument is an octave: `pitchOffset = octave * 12 - 24`.
