@@ -2925,3 +2925,4 @@ gStyleStripRectB = 0x8008745C;
 gStyleStripScratchB = 0x80087468;
 gStyleCueOffsets = 0x800874EC;
 gStyleCueRecordLists = 0x800876B4;
+gStyleCueRecordCounts = 0x800876EC;

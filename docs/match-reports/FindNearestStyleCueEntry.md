@@ -72,7 +72,7 @@ void *FindNearestStyleCueEntry(void *arg0, s32 *arg1, void *arg2) {
         goto fail;
     }
     base = gStyleCueRecordLists[gStyleKind];
-    n = D_800876EC[gStyleKind] - gStyleCueRecordIndex;
+    n = gStyleCueRecordCounts[gStyleKind] - gStyleCueRecordIndex;
     entry = (EntrySlot *) (gStyleCueRecordIndex * 8 + (s32) base);
     for (j = 0; j < n; j++, entry++) {
         gStyleCueRecordIndex++;
@@ -105,7 +105,7 @@ fail:
 Needs (already present earlier in the unit, in strict ROM order): the
 `ObjAB4C`/`ObjAB4CMethods`/`Pos4`/`TabEntry`/`EntrySlot`/`LocalBuf` types and
 `extern s32 gStyleKind, gStyleCueRecordIndex, gStyleCueSelf, gStyleCueDistanceTable[];`,
-`extern u8 *gStyleCueRecordLists[], D_800876EC[], gStyleCueOffsets[];` (all already
+`extern u8 *gStyleCueRecordLists[], gStyleCueRecordCounts[], gStyleCueOffsets[];` (all already
 declared in `src/class_3bb8c_n.c` ahead of this function).
 
 ### Proposed learning
@@ -178,7 +178,7 @@ returning the first such record or `NULL`.
 extern s32 gStyleKind;
 extern s32 gStyleCueRecordIndex;
 extern u8 *gStyleCueRecordLists[];    /* word array of base pointers, indexed by gStyleKind */
-extern u8 D_800876EC[];    /* byte array of counts, same index */
+extern u8 gStyleCueRecordCounts[];    /* byte array of counts, same index */
 extern u8 gStyleCueOffsets[];    /* table, 6-byte stride entries */
 extern s32 gStyleCueDistanceTable[];   /* word table, indexed by entry->count */
 
@@ -201,7 +201,7 @@ void *FindNearestStyleCueEntry(void *arg0, s32 *arg1, void *arg2) {
         goto fail;
     }
     base = gStyleCueRecordLists[gStyleKind];
-    n = D_800876EC[gStyleKind] - gStyleCueRecordIndex;
+    n = gStyleCueRecordCounts[gStyleKind] - gStyleCueRecordIndex;
     if (n <= 0) {
         goto fail;
     }
