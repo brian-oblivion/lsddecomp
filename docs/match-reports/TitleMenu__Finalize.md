@@ -99,7 +99,7 @@ the round-77 broadcast.
   string). Named for its role driving the memcard-save sequence this
   unit's own functions establish
   (`TitleMenu__BeginMemcardSave`/`TitleMenu__EndMemcardSave`/
-  `TitleMenu__UpdateMemcardSaveWithIcon`/
+  `TitleMenu__SaveToCard`/
   `TitleMenu__UpdateMemcardSaveStatus`); the exact protocol is not
   established.
 

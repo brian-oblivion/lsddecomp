@@ -242,7 +242,7 @@ void TitleMenu__EndMemcardSave(TitleMenu *self) {
     self->saveCtrl->methods->deinit(self->saveCtrl);
 }
 
-void TitleMenu__UpdateMemcardSaveWithIcon(TitleMenu *self) {
+void TitleMenu__SaveToCard(TitleMenu *self) {
     s32 buf;
 
     buf = self->slotCounts[5];

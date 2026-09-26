@@ -1,4 +1,6 @@
-# TitleMenu__UpdateMemcardSaveWithIcon -- MATCHED 56/56, round 43
+# TitleMenu__SaveToCard -- MATCHED 56/56, round 43
+
+> Renamed from `TitleMenu__UpdateMemcardSaveWithIcon` on 2026-09-26 (tools/rename.py). Address 0x8004e0e4.
 
 > Renamed from `Class86B60__UpdateMemcardSaveWithIcon` on 2026-09-26 (tools/rename.py). Address 0x8004e0e4.
 
@@ -11,7 +13,7 @@ and no derivation; this round wrote and matched the function from scratch.
 ## Body
 
 ```c
-void TitleMenu__UpdateMemcardSaveWithIcon(TitleMenu *self)
+void TitleMenu__SaveToCard(TitleMenu *self)
 {
     s32 buf;
 
@@ -26,7 +28,7 @@ void TitleMenu__UpdateMemcardSaveWithIcon(TitleMenu *self)
 }
 ```
 
-Byte-exact on the first build: `funcdiff.py TitleMenu__UpdateMemcardSaveWithIcon` -> `56/56 words
+Byte-exact on the first build: `funcdiff.py TitleMenu__SaveToCard` -> `56/56 words
 match (file 0x3E8E4-0x3E9C4)`; whole-image `OK: build matches retail
 SLPS_015.56`.
 
@@ -82,7 +84,7 @@ its own new slot immediately after it.
 
 ## Naming (round 77, naming runner delta)
 
-Renamed `func_8004E0E4` -> `TitleMenu__UpdateMemcardSaveWithIcon`. **Tier B, lower confidence**: Refreshes the view (same idiom as `TitleMenu__RefreshViewValue`), calls `slot128`, conditionally clears `D_8008AA10` behind the same `self->unkA4->methods->slot1AC()` gate `TitleMenu__CreateNameField` also tests, then forwards `self->iconHandle` plus literal flags (0xD, 3) through `unkAC`'s `slot78`. It is `TitleMenu__Tick`'s case-2 dispatch target. Purpose beyond "the icon-carrying variant of the two unkAC dispatch calls" is not established.
+Renamed `func_8004E0E4` -> `TitleMenu__SaveToCard`. **Tier B, lower confidence**: Refreshes the view (same idiom as `TitleMenu__RefreshViewValue`), calls `slot128`, conditionally clears `D_8008AA10` behind the same `self->unkA4->methods->slot1AC()` gate `TitleMenu__CreateNameField` also tests, then forwards `self->iconHandle` plus literal flags (0xD, 3) through `unkAC`'s `slot78`. It is `TitleMenu__Tick`'s case-2 dispatch target. Purpose beyond "the icon-carrying variant of the two unkAC dispatch calls" is not established.
 
 ## Proposed field names
 

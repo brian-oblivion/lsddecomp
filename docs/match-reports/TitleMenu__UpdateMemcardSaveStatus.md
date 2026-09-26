@@ -87,7 +87,7 @@ with no `dlabel` of its own) may not even be nameable.
 
 ## Naming (round 77, naming runner delta)
 
-Renamed `func_8004E1C4` -> `TitleMenu__UpdateMemcardSaveStatus`. **Tier B, lower confidence**: Calls `slot128` then forwards `self->unkBC`/`unkC0` (no icon handle, no literal flags) through `unkAC`'s `slot74` -- the simpler sibling of `TitleMenu__UpdateMemcardSaveWithIcon` and the dispatch target for `TitleMenu__Tick`'s case-3. Purpose beyond "the icon-less variant of the two unkAC dispatch calls" is not established.
+Renamed `func_8004E1C4` -> `TitleMenu__UpdateMemcardSaveStatus`. **Tier B, lower confidence**: Calls `slot128` then forwards `self->unkBC`/`unkC0` (no icon handle, no literal flags) through `unkAC`'s `slot74` -- the simpler sibling of `TitleMenu__SaveToCard` and the dispatch target for `TitleMenu__Tick`'s case-3. Purpose beyond "the icon-less variant of the two unkAC dispatch calls" is not established.
 
 ## Track 4 (2026-09-26, round 88, bravo)
 

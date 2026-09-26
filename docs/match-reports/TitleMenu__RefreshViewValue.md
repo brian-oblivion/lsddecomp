@@ -44,7 +44,7 @@ None new.
 
 ## Naming (round 77, naming runner delta)
 
-Renamed `func_8004DABC` -> `TitleMenu__RefreshViewValue`. **Tier B**: Calls the base class's `slot94`, copies `self->unk60->unk14` into a stack buffer, and forwards its address to `DreamSysView::slot19C` -- the same "read a value, push it through the view's slot19C out-parameter call" idiom that recurs in `TitleMenu__UpdateMemcardSaveWithIcon` and `TitleMenu__CommitNameEntry` in this same unit. Also the dispatch target for `TitleMenu__Tick`'s case 1/case 4. Purpose of the value itself not established.
+Renamed `func_8004DABC` -> `TitleMenu__RefreshViewValue`. **Tier B**: Calls the base class's `slot94`, copies `self->unk60->unk14` into a stack buffer, and forwards its address to `DreamSysView::slot19C` -- the same "read a value, push it through the view's slot19C out-parameter call" idiom that recurs in `TitleMenu__SaveToCard` and `TitleMenu__CommitNameEntry` in this same unit. Also the dispatch target for `TitleMenu__Tick`'s case 1/case 4. Purpose of the value itself not established.
 
 ## Track 4 (2026-09-25, round 84, alpha)
 
