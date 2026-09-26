@@ -38,7 +38,7 @@ whoever next resolves a caller of this function.
 - New type `GenericHeaderObj_3bb8c_d` / `GenericHeaderMethods_3bb8c_d` --
   reads a vtable's header word as a full `s32` (`lw` then `andi`), NOT the
   existing `GenericTagInst_3bb8c_c`/`GenericTagMethods_3bb8c_c` (which reads
-  only the low BYTE via `lbu`, established by `Class86AA0__ForwardIfTag34` in
+  only the low BYTE via `lbu`, established by `Class86AA0__DispatchLinkCommand` in
   `class_3bb8c_c`). Reusing the byte-typed struct here would have emitted
   the wrong load width.
 - `BaseTaskCtorTable_3bb8c_c::slot38` -- new slot, `void (*)(void *self,
@@ -53,7 +53,7 @@ the first time this unit's own `slot38`/`slot138` pair exercises it.
 
 ## Naming (round 77, naming runner delta)
 
-Renamed `func_8004D788` -> `Class86B60__ForwardIfTagB`. **Tier B**: Forwards to the base class's `slot38` unconditionally, then to its own `slot138` only when `arg1`'s vtable header low nibble == 0xB -- the same runtime-type-id-gated forward shape already named `Class86AA0__ForwardIfTag34` in `class_3bb8c_c.c`. Purpose of tag 0xB itself not established.
+Renamed `func_8004D788` -> `Class86B60__ForwardIfTagB`. **Tier B**: Forwards to the base class's `slot38` unconditionally, then to its own `slot138` only when `arg1`'s vtable header low nibble == 0xB -- the same runtime-type-id-gated forward shape already named `Class86AA0__DispatchLinkCommand` in `class_3bb8c_c.c`. Purpose of tag 0xB itself not established.
 
 ## Track 4 (2026-09-25, round 84, alpha)
 

@@ -93,17 +93,17 @@ void Class86AA0__Class86AA0(Class86AA0 *self)
     self->unk38 = 0;
 }
 
-void func_8004D42C(void) {
+void Class86AA0__Reset(void) {
 }
 
-void Class86AA0__ForwardIfTag34(Class86AA0 *self, GenericTagInst_3bb8c_c *arg1)
+void Class86AA0__DispatchLinkCommand(Class86AA0 *self, GenericTagInst_3bb8c_c *arg1)
 {
     if (arg1->methods->tag == 0x34) {
         self->methods->slotB8(self);
     }
 }
 
-void Class86AA0__ForwardIfArg2InRange(Class86AA0 *self, GenericTagInst_3bb8c_c *arg1, s32 arg2)
+void Class86AA0__OnActorLinkCommand(Class86AA0 *self, GenericTagInst_3bb8c_c *arg1, s32 arg2)
 {
     GetClass6B5CCMethods()->dispatchLinkCommand((Class6B5CC *)self, arg1, arg2);
     if (arg2 >= 9) {

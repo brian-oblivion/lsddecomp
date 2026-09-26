@@ -1,4 +1,6 @@
-# Class86AA0__ForwardIfArg2InRange -- MATCHED (33/33 words), round 17 permuter pass
+# Class86AA0__OnActorLinkCommand -- MATCHED (33/33 words), round 17 permuter pass
+
+> Renamed from `Class86AA0__ForwardIfArg2InRange` on 2026-09-26 (tools/rename.py). Address 0x8004d47c.
 
 > Renamed from `func_8004D47C` on 2026-09-22 (tools/rename.py). Address 0x8004d47c.
 
@@ -23,7 +25,7 @@ was a single, minimal change: wrapping the SECOND early-return guard in
 a `do { ... } while (0)`:
 
 ```c
-void Class86AA0__ForwardIfArg2InRange(Class86AA0 *self, GenericTagInst_3bb8c_c *arg1, s32 arg2)
+void Class86AA0__OnActorLinkCommand(Class86AA0 *self, GenericTagInst_3bb8c_c *arg1, s32 arg2)
 {
     GetClass6B5CCMethods(self)->slot9C(self, arg1, arg2);
     if (arg2 >= 9) {
@@ -42,7 +44,7 @@ void Class86AA0__ForwardIfArg2InRange(Class86AA0 *self, GenericTagInst_3bb8c_c *
 NOT taken on faith from the permuter's own scorer: the exact candidate was
 recompiled through the pinned pipeline by hand (`cpp | cc1 | maspsx | as`,
 same invocation as CLAUDE.md's own escalation recipe) and `objdump`-diffed
-against `permuter-work/Class86AA0__ForwardIfArg2InRange/target.o` (retail's own bytes,
+against `permuter-work/Class86AA0__OnActorLinkCommand/target.o` (retail's own bytes,
 independently assembled by the setup script) -- byte-identical, not just
 permuter-score-zero. Two plainer-looking alternatives were tried and
 REJECTED because they did NOT reproduce retail: a bare `{ }` compound
@@ -82,7 +84,7 @@ insertion/deletion/reordering penalty).
 
 ## What it does
 
-`Class86AA0`'s own slot +0x0B8 occupant (called by `Class86AA0__ForwardIfTag34`, already
+`Class86AA0`'s own slot +0x0B8 occupant (called by `Class86AA0__DispatchLinkCommand`, already
 matched, as `self->methods->slotB8(self)` -- but see the arity note below).
 Unconditionally forwards `(self, arg1, arg2)` to the base ctor table's own
 `+0x09C` slot, then, if `5 <= arg2 < 9`, forwards the same three arguments
@@ -91,7 +93,7 @@ to `self`'s own `+0x0A0` slot.
 ## The C (closest attempt, 23/33 -- shape-correct, register-identity wrong)
 
 ```c
-void Class86AA0__ForwardIfArg2InRange(Class86AA0 *self, GenericTagInst_3bb8c_c *arg1, s32 arg2)
+void Class86AA0__OnActorLinkCommand(Class86AA0 *self, GenericTagInst_3bb8c_c *arg1, s32 arg2)
 {
     GetClass6B5CCMethods(self)->slot9C(self, arg1, arg2);
     if (arg2 >= 9) {
@@ -153,7 +155,7 @@ near-miss):
   GenericTagInst_3bb8c_c GenericTagInst_3bb8c_c;` ahead of
   `Class86AA0Methods` (needed for `slotA0`'s parameter type; the type's
   full definition, further down the file, already existed from
-  `Class86AA0__ForwardIfTag34`'s round). The later definition's OWN `typedef ... {
+  `Class86AA0__DispatchLinkCommand`'s round). The later definition's OWN `typedef ... {
   } GenericTagInst_3bb8c_c;` had to become a plain `struct
   GenericTagInst_3bb8c_c { ... };` (drop the trailing re-typedef) because
   cc1 (this project's pinned GCC 2.6.3) rejects redefining an existing
@@ -173,7 +175,7 @@ near-miss):
   already-matched call (`GetClass6B5CCMethods(self)->ctor(self)`) only touches the
   `+0x008 ctor` slot, whose layout is byte-identical in both names, so
   renaming changes no bytes and does not disturb that match (confirmed:
-  `./build-and-verify.sh` stays green with `Class86AA0__ForwardIfArg2InRange` back on
+  `./build-and-verify.sh` stays green with `Class86AA0__OnActorLinkCommand` back on
   `INCLUDE_ASM`).
 - New `BaseCtorTableB_3bb8c_c` type: `ctor` at +0x008 (`Class86AA0__Class86AA0`),
   `slot9C` at +0x09C (`void (*)(void *self, void *arg1, s32 arg2)`, this
@@ -207,7 +209,7 @@ like the whole game.
 Both ways of doing it failed:
 
 1. **Block-scope `extern BaseCtorTableB_3bb8c_c *GetClass6B5CCMethods();`** inside
-   `Class86AA0__ForwardIfArg2InRange`, so the zero-argument call could coexist with
+   `Class86AA0__OnActorLinkCommand`, so the zero-argument call could coexist with
    `Class86AA0__Class86AA0`'s one-argument call in the same unit. Does not compile:
    C89 keeps the outer prototype in scope and applies its arity —
    `too few arguments to function 'GetClass6B5CCMethods'`. A block-scope
@@ -215,7 +217,7 @@ Both ways of doing it failed:
 2. **File-scope declaration changed to empty parens** (`GetClass6B5CCMethods()`), no
    prototype, each call site passing its own argument list — which is what
    round 9 concluded retail's own source must have had. This compiles and is
-   *worse*: `Class86AA0__ForwardIfArg2InRange` drops **23/33 -> 15/33**, and it regresses
+   *worse*: `Class86AA0__OnActorLinkCommand` drops **23/33 -> 15/33**, and it regresses
    `Class86AA0__Class86AA0` from **20/20 -> 19/20**. So `Class86AA0__Class86AA0` genuinely needs
    the `$a0` setup that a prototype-less call elides, and round 9's
    do-not-reconcile note on this declaration is load-bearing in the other
@@ -262,14 +264,14 @@ declaration.
 
 ## Naming
 
-**Class86AA0__ForwardIfArg2InRange** -- tier B. Mechanics are fully
+**Class86AA0__OnActorLinkCommand** -- tier B. Mechanics are fully
 established (round 17's permuter pass pinned the byte-exact body):
 unconditionally forwards `(self, arg1, arg2)` to the base ctor table's own
 `slot9C`, then, only when `5 <= arg2 < 9`, forwards the same three
 arguments again to `self`'s own `slotA0`. Purpose is explicitly NOT
 established -- the function's own history section already documents an
 open arity/purpose conflict with its nominal vtable slot (`slotB8`, whose
-call site from `Class86AA0__ForwardIfTag34` passes only `self`, one
+call site from `Class86AA0__DispatchLinkCommand` passes only `self`, one
 argument short of what this function's own body reads) that round 9/10
 deliberately left unreconciled. Named for the one concrete, evidenced
 mechanic (a numeric range gate on `arg2`) rather than for either disputed
@@ -278,3 +280,19 @@ caller's arity or for a guessed meaning of the `[5, 9)` band. `slotA0` and
 occupancy of `slotB8` is itself the open question the report documents, so
 naming the slot after this function's behavior would misstate an
 unresolved fact as settled.
+
+## Track 4 (2026-09-26, round 88, alpha)
+
+Renamed `Class86AA0__ForwardIfArg2InRange` -> `Class86AA0__OnActorLinkCommand`
+(tools/rename.py). It is the sole occupant of gClass86AA0Methods's own slot
++0x0B8, and its only caller is `Class86AA0__DispatchLinkCommand`'s branch for
+a sender whose class id byte is 0x34 (gActorMethods). The body is the same
+as Actor's `onActorLinkCommand` base occupant: chain Class6B5CC's
+dispatchLinkCommand, then for events 5..8 run `tryAttachNearby` with the
+sender and event. The slot is named `onActorLinkCommand` after Actor's
++0x0DC, which handles the same sender class the same way. The call named
+`slotA0` above is Class6B5CC's inherited `tryAttachNearby` (+0x0A0, occupant
+`Class6B5CC__TryAttachNearby`); the unified header keeps Class6B5CC's slot
+type and this caller casts at the call, as `Actor__OnActorLinkCommand` does.
+The 1-argument `slotB8` declaration and the "not reconciled" note above are
+retired: the call site has the three arguments in $a0..$a2 already.

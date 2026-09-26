@@ -23,7 +23,7 @@ Class86AA0Methods *GetClass86AA0Methods(void)
 `gClass86AA0Methods` (asm/data/76DC8.data.s, header word 0x24) is gClass869D8Methods's
 sibling: same opening shape (header, then `BasicClass__Release` at
 +0x004, ctor at +0x008 -- here Class86AA0__Class86AA0). Only +0x008 (`ctor`) and
-+0x0B8 (dispatched by Class86AA0__ForwardIfTag34, this unit's own slot +0x09C in the
++0x0B8 (dispatched by Class86AA0__DispatchLinkCommand, this unit's own slot +0x09C in the
 same table) are typed; see `include/class_3bb8c.h`.
 
 ## Proposed learning

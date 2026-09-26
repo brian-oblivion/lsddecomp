@@ -793,7 +793,7 @@ typedef struct Class86AA0 Class86AA0;
 typedef struct Class86AA0Methods Class86AA0Methods;
 
 /* Forward declaration: full definition (GenericTagMethods_3bb8c_c /
- * GenericTagInst_3bb8c_c) is below, established from Class86AA0__ForwardIfTag34; needed
+ * GenericTagInst_3bb8c_c) is below, established from Class86AA0__DispatchLinkCommand; needed
  * here already for Class86AA0Methods::slotA0's parameter type. */
 typedef struct GenericTagInst_3bb8c_c GenericTagInst_3bb8c_c;
 
@@ -801,30 +801,30 @@ typedef struct GenericTagInst_3bb8c_c GenericTagInst_3bb8c_c;
  * Vtable gClass86AA0Methods (asm/data/76DC8.data.s, header word 0x24). Sibling of
  * Class869D8Methods (include/Class869D8.h), same shape: ctor at +0x008 (Class86AA0__Class86AA0,
  * called by New_Class86AA0/New_Class86AA0). +0x0B8 is dispatched by this
- * class's own Class86AA0__ForwardIfTag34 (slot +0x09C in the same table); its exact
+ * class's own Class86AA0__DispatchLinkCommand (slot +0x09C in the same table); its exact
  * purpose is unestablished beyond "called on self with no other args".
  */
 struct Class86AA0Methods {
     u8 pad000[0x008];
     void (*ctor)(Class86AA0 *self);            /* +0x008, Class86AA0__Class86AA0 */
     u8 pad00C[0x0A0 - 0x00C];
-    /* Called by Class86AA0__ForwardIfArg2InRange (self's own slot +0x0B8 occupant, see below)
+    /* Called by Class86AA0__OnActorLinkCommand (self's own slot +0x0B8 occupant, see below)
      * when its own arg2 is in [5, 9). arg1 is forwarded opaquely; return
      * value unused. */
     void (*slotA0)(Class86AA0 *self, GenericTagInst_3bb8c_c *arg1, s32 arg2); /* +0x0A0 */
     u8 pad0A4[0x0B8 - 0x0A4];
-    /* Declared here 1-argument to match Class86AA0__ForwardIfTag34's own call site
+    /* Declared here 1-argument to match Class86AA0__DispatchLinkCommand's own call site
      * (`self->methods->slotB8(self)`, already matched) -- but this slot's
-     * REAL occupant is Class86AA0__ForwardIfArg2InRange, whose own body reads three args
+     * REAL occupant is Class86AA0__OnActorLinkCommand, whose own body reads three args
      * (self, arg1, arg2). Both are right about their own codegen; see
      * Class86AA0__Class86AA0's report/GetClass6B5CCMethods's declaration below for the
      * identical situation on a different symbol. Not reconciled: widening
-     * this field to 3 args would force Class86AA0__ForwardIfTag34's call site to
+     * this field to 3 args would force Class86AA0__DispatchLinkCommand's call site to
      * synthesize an arg2 it doesn't have, breaking that already-matched
-     * function. Class86AA0__ForwardIfArg2InRange's own C definition is typed independently
+     * function. Class86AA0__OnActorLinkCommand's own C definition is typed independently
      * of this field (the vtable's storage is still raw asm data, so
      * nothing here type-checks it either way). */
-    void (*slotB8)(Class86AA0 *self);          /* +0x0B8, called by Class86AA0__ForwardIfTag34 */
+    void (*slotB8)(Class86AA0 *self);          /* +0x0B8, called by Class86AA0__DispatchLinkCommand */
 };
 
 struct Class86AA0 {
@@ -846,7 +846,7 @@ extern Class86AA0Methods *GetClass86AA0Methods(void);
 /*
  * Generic class-instance shape used only to read another object's own
  * vtable header-tag BYTE (the low byte of the header word at the vtable's
- * own +0x000) -- Class86AA0__ForwardIfTag34's own second argument is dispatched this
+ * own +0x000) -- Class86AA0__DispatchLinkCommand's own second argument is dispatched this
  * way, compared against a literal 0x34.
  */
 typedef struct GenericTagMethods_3bb8c_c {
