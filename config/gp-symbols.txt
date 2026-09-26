@@ -198,7 +198,7 @@ gStyleTickCount
 gStyleVariant
 gTimBlockClutShift
 gTimClutRowShift
-gTmdModelConstructed
+gTmdModelBoundsCount
 gTrackedYSnapshot
 gVabBodySuffix
 gVabDriverMode

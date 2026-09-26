@@ -26,7 +26,7 @@ void Actor__NotifyMove(BaseObjO *self, s32 arg1) {
         if (arg1 >= 5) {
             Buf38O buf;
 
-            if (self->unk20 != NULL && IsTmdModelConstructed(self->unk20)) {
+            if (self->unk20 != NULL && TmdModel__GetBoundsCount(self->unk20)) {
                 self->methods->slot8C(self, &buf);
                 if (arg1 != 5) {
                     s16 h = self->unk48;
@@ -139,7 +139,7 @@ void Actor__NotifyMove(BaseObjO *self, s32 arg1) {
 **`Actor__NotifyMove` -- tier C.** The most structurally involved
 function in this unit (74 words) and the existing report already
 describes its mechanics exhaustively (a range-gated dispatch through
-`slot8C`/`slot90`/`slotE8`, an "armed" check via `IsTmdModelConstructed`, and a
+`slot8C`/`slot90`/`slotE8`, an "armed" check via `TmdModel__GetBoundsCount`, and a
 sign-based adjustment of `unk48` by `unk54`) -- but nothing establishes
 what the `arg1` range `[5,9)` selects between, what "armed" means in the
 game, or what `unk20`/`unk28`/`unk48`/`unk54` actually represent. Kept the

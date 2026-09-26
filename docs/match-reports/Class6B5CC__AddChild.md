@@ -35,7 +35,7 @@ code_d294. Matched on the first build. Established
 
 ## Naming
 
-Round 71 (alpha). `func_8001CC48` -> `Class6B5CC__AddChild`, **tier A**. Overrides BasicClass slot +0x010 `addChild` (include/code_8220.h). Forwards to the base first, then if the child's class tag is 9 (D_8006BEA0) calls Class6B5CC__LinkModel on it. Class6B5CC__AttachToParent reaches this slot on the parent with `self` as the child.
+Round 71 (alpha). `func_8001CC48` -> `Class6B5CC__AddChild`, **tier A**. Overrides BasicClass slot +0x010 `addChild` (include/code_8220.h). Forwards to the base first, then if the child's class tag is 9 (gTmdModelMethods) calls Class6B5CC__LinkModel on it. Class6B5CC__AttachToParent reaches this slot on the parent with `self` as the child.
 
 ## Proposed field names
 

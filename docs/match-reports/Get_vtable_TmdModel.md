@@ -4,8 +4,8 @@
 
 Round 82, runner charlie (matching slot). Unit `src/code_fa50.c`. Fresh ground (carved in FINISHING-PLAN revision 18), no prior attempt, no report before this one.
 
-- **Where:** not in any method table; the D_8006BEA0 table getter, called by `New_TmdModel` and `TmdModel__TmdModel` (`tools/classtable.py D_8006BEA0`).
-- **What:** returns `D_8006BEA0`
+- **Where:** not in any method table; the gTmdModelMethods table getter, called by `New_TmdModel` and `TmdModel__TmdModel` (`tools/classtable.py gTmdModelMethods`).
+- **What:** returns `gTmdModelMethods`
 - **Result:** byte-exact; 4/4 words, 0 insertions / 0 deletions, whole-image SHA1 green (`./build-and-verify.sh` OK). First build.
 - **Types:** local views (`TmdModel`, `ModelData_fa50`, `Quad_fa50`, `TmdObject_fa50`, `Outer_fa50`/`Inner_fa50`/`Target_fa50`) and prototypes live in the unit; no shared header was touched.
 - **Lever:** Table-getter shape `void *f(void) { return D_X; }` with a local `extern s32 D_X[];` (broadcast lever).
@@ -14,7 +14,7 @@ Round 82, runner charlie (matching slot). Unit `src/code_fa50.c`. Fresh ground (
 
 ```c
 void *Get_vtable_TmdModel(void) {
-    return D_8006BEA0;
+    return gTmdModelMethods;
 }
 ```
 
@@ -22,7 +22,7 @@ void *Get_vtable_TmdModel(void) {
 
 `Get_vtable_TmdModel` -- tier B. Convention: `Get_vtable_<Class>` (matches
 `Get_vtable_BasicClass`, `Get_vtable_CdStreamObj`, `Get_vtable_DrawSystem`).
-Class name `TmdModel`: D_8006BEA0 is class tag 9, the object
+Class name `TmdModel`: gTmdModelMethods is class tag 9, the object
 `Class6B5CC__LinkModel` (src/code_d294_c.c) links as `self->model` -- that
 unit's own `ModelObj_d294` local view (pad to +0xC, `tmdFile` at +0xC, `tmd`
 at +0x10) lines up field-for-field with this class's own `data`/`unk10` at
@@ -31,5 +31,5 @@ the same offsets, and this class's own methods (`TmdModel__MapModelingData`,
 all operate on a TMD file + its object table. Tier B, not A: what wraps a TMD
 is certain; why the game needs a standalone "model" object distinct from
 Class6B5CC itself is not established. Only the getter is renamed; the table
-symbol D_8006BEA0 is kept, matching the WBgm/DrawSystem precedent (round 82
+symbol gTmdModelMethods is kept, matching the WBgm/DrawSystem precedent (round 82
 broadcast, bravo).

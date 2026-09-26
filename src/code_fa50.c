@@ -5,70 +5,42 @@
  * into game code, a method-table entry beside game methods, or contiguity with
  * those, and no Sony fingerprint).
  *
- * Holds the TmdModel class (method table D_8006BEA0, class tag 9): a thin
- * wrapper around one TMD file plus its object-table entry ("the model"
+ * Holds the TmdModel class (include/TmdModel.h; method table
+ * gTmdModelMethods, class tag 9): one object of a TMD file (the "model"
  * Class6B5CC__LinkModel, src/code_d294_c.c, links into a GsDOBJ2). Its
  * methods map the TMD to the GS (TmdModel__MapModelingData), walk its
  * primitives (TmdModel__NextPrimitive, owns jtbl_80010354), compute an
  * axis-aligned bounding box or its eight corners (TmdModel__ComputeBounds,
- * TmdModel__GetHull, and the shared-buffer pair UpdateTmdModelBoundsBuffer /
- * GetTmdModelBoundsBuffer), and ray-cast a segment against every face
+ * TmdModel__GetHull, and the shared buffer of gTmdModelBoundsCount boxes,
+ * TmdModel__UpdateBoundsBuffer / TmdModel__GetBoundsBuffer /
+ * TmdModel__GetBoundsCount), and ray-cast a segment against every face
  * (TmdModel__RaycastFaces) for Class6B5CC's own collision helpers in
- * code_d294_b.c/code_d294_c.c.
+ * code_d294_b.c/code_d294_c.c. Track 4 unified it in round 87.
  *
- * IsTmdModelConstructed and RotateAndOffsetHullList are kept unrenamed: both are called from
- * src/class_3bb8c_o.c, a live types-runner unit as of this pass, so
- * renaming them would rewrite that unit's own file out from under it.
- * Proposed names and evidence are in their own match reports.
- *
- * The tail of the file (AccumulateTargetOffset, SetTargetOffset) is NOT
- * TmdModel: a separate Outer_fa50/Inner_fa50/Target_fa50 pointer chain with
- * no confirmed owning class and, for SetTargetOffset, a live caller in
- * class_3bb8c_o.c -- kept unrenamed for the same reason.
+ * RotateAndOffsetHullList takes a hull list, not a TmdModel, and is a free
+ * function; the tail of the file (AccumulateTargetOffset, SetTargetOffset)
+ * is NOT TmdModel either: a separate Outer_fa50/Inner_fa50/Target_fa50
+ * pointer chain with no confirmed owning class, and SetTargetOffset's one
+ * caller is class_3bb8c_o.c.
  *
  * All 18 functions matched, round 82 (runner charlie); tiers and evidence
  * in each function's own docs/match-reports/ file.
  */
 #include "common.h"
-#include "BasicClass.h"
-
-/* The four words the class copies in through its slot +0x040. */
-typedef struct Quad_fa50 {
-    s32 w[4];
-} Quad_fa50;
-
-/* One 28-byte record of the model data slot +0x048 indexes. */
-typedef struct SVec_fa50 {
-    s16 x, y, z, pad;
-} SVec_fa50;
-
-typedef struct Vec3_fa50 {
-    s16 x, y, z;
-} Vec3_fa50;
-
-/* An axis-aligned bounding box over a vertex list. */
-typedef struct Box_fa50 {
-    Vec3_fa50 min;          /* +0x000 */
-    Vec3_fa50 max;          /* +0x006 */
-} Box_fa50;
+#include "TmdModel.h"
 
 /* A box with a leading word: TmdModel__GetHull's local. */
 typedef struct TypedBox_fa50 {
     s32 type;               /* +0x000 */
-    Box_fa50 box;           /* +0x004 */
+    TmdBox box;             /* +0x004 */
 } TypedBox_fa50;
 
 /* The eight corners of a box: v[0..3] one face, v[4..7] the other. */
 typedef struct Corners_fa50 {
-    Vec3_fa50 f[2][4];
+    TmdVec3 f[2][4];
 } Corners_fa50;
 
-/* A counted list of boxes' corners; TmdModel__GetHull writes a list of one. */
-typedef struct Hull_fa50 {
-    s32 type;               /* +0x000, the count */
-    Vec3_fa50 v[8];         /* +0x004 */
-} Hull_fa50;
-
+/* A counted list of boxes' corners (TmdHull is the one-box case). */
 typedef struct HullList_fa50 {
     s32 n;                  /* +0x000 */
     Corners_fa50 c[1];      /* +0x004 */
@@ -76,8 +48,8 @@ typedef struct HullList_fa50 {
 
 /* A segment: start and direction (end - start). */
 typedef struct Ray_fa50 {
-    Vec3_fa50 org;          /* +0x000 */
-    Vec3_fa50 dir;          /* +0x006 */
+    TmdVec3 org;            /* +0x000 */
+    TmdVec3 dir;            /* +0x006 */
 } Ray_fa50;
 
 /* LIBGTE's VECTOR, declared locally. */
@@ -90,48 +62,8 @@ typedef struct Vec4_fa50 {
 /* The scratch VECTOR that also holds the candidate triangle's box. */
 typedef union VecBox_fa50 {
     Vec4_fa50 v;
-    Box_fa50 b;
+    TmdBox b;
 } VecBox_fa50;
-
-/* One TMD primitive: a 4-byte header, then u16 words (vertex indices among
- * them, at mode-dependent positions). */
-typedef struct TmdPrim_fa50 {
-    u8 olen;                /* +0x000 */
-    u8 ilen;                /* +0x001 */
-    u8 flag;                /* +0x002 */
-    u8 mode;                /* +0x003 */
-    u16 h[20];              /* +0x004 */
-} TmdPrim_fa50;
-
-/* One TMD object-table entry (28 bytes). */
-typedef struct TmdObject_fa50 {
-    SVec_fa50 *verts;       /* +0x000 */
-    s32 nverts;             /* +0x004 */
-    void *normals;          /* +0x008 */
-    s32 nnormals;           /* +0x00C */
-    TmdPrim_fa50 *prims;    /* +0x010 */
-    u32 nprims;             /* +0x014 */
-    s32 scale;              /* +0x018 */
-} TmdObject_fa50;
-
-typedef struct ModelData_fa50 {
-    u32 head[3];            /* +0x000; GsMapModelingData gets &head[1] */
-    TmdObject_fa50 recs[1];     /* +0x00C */
-} ModelData_fa50;
-
-typedef struct TmdModel TmdModel;
-typedef struct TmdModelMethods TmdModelMethods;
-
-struct TmdModelMethods {
-    BASICCLASS_SLOTS(TmdModel, (TmdModel *self, void *arg));
-};
-
-struct TmdModel {
-    BASICCLASS_FIELDS(TmdModelMethods);
-    ModelData_fa50 *data;   /* +0x00C */
-    TmdObject_fa50 *object; /* +0x010, self->object == arg from New_TmdModel */
-    Quad_fa50 quad;         /* +0x014 */
-};
 
 typedef struct Target_fa50 {
     u8 pad0[0x6];
@@ -152,54 +84,49 @@ extern void GsMapModelingData(unsigned long *p);
 extern void OuterProduct0(Vec4_fa50 *v0, Vec4_fa50 *v1, Vec4_fa50 *v2);
 extern void Square0(Vec4_fa50 *v0, Vec4_fa50 *v1);
 extern s32 SquareRoot0(s32 a);
-TmdPrim_fa50 *TmdModel__NextPrimitive(TmdModel *self, TmdPrim_fa50 *p, s32 *n, Vec3_fa50 *out, u32 *count);
-extern s32 gTmdModelConstructed;
-extern s32 gTmdModelBoundsBuf[];
-extern s32 D_8006BEA0[];
+extern TmdBox gTmdModelBoundsBuf[];
 extern void *BMemPMgrAlloc(s32 size);
-void MarkTmdModelConstructed(TmdModel *self);
-TmdModelMethods *Get_vtable_TmdModel(void);
 
-TmdModel *New_TmdModel(void *arg) {
+TmdModel *New_TmdModel(TmdObject *object) {
     TmdModel *p = BMemPMgrAlloc(0x24);
 
     if (p != NULL) {
-        Get_vtable_TmdModel()->ctor(p, arg);
+        Get_vtable_TmdModel()->ctor(p, object);
         return p;
     }
     return NULL;
 }
-void TmdModel__TmdModel(TmdModel *self, void *arg) {
+void TmdModel__TmdModel(TmdModel *self, TmdObject *object) {
     Get_vtable_BasicClass()->ctor((BasicClass *)self);
     self->methods = Get_vtable_TmdModel();
-    self->object = arg;
-    self->data = (ModelData_fa50 *)((u8 *)arg - 0xC);
-    MarkTmdModelConstructed(self);
+    self->object = object;
+    self->data = (TmdFile *)((u8 *)object - 0xC);
+    TmdModel__InitBoundsCount(self);
 }
-void TmdModel__SetQuad(TmdModel *self, Quad_fa50 *src) {
+void TmdModel__SetQuad(TmdModel *self, TmdModelQuad *src) {
     self->quad = *src;
 }
 void TmdModel__MapModelingData(TmdModel *self) {
-    GsMapModelingData((unsigned long *)&self->data->head[1]);
+    GsMapModelingData((unsigned long *)&self->data->flags);
 }
-TmdObject_fa50 *TmdModel__GetObject(TmdModel *self, s32 i) {
-    return &self->data->recs[i];
+TmdObject *TmdModel__GetObject(TmdModel *self, s32 i) {
+    return &self->data->objects[i];
 }
 void TmdModel__func_8001F37C(void) {
 }
 TmdModelMethods *Get_vtable_TmdModel(void) {
-    return (TmdModelMethods *)D_8006BEA0;
+    return &gTmdModelMethods;
 }
-void MarkTmdModelConstructed(TmdModel *self) {
-    gTmdModelConstructed = 1;
+void TmdModel__InitBoundsCount(TmdModel *self) {
+    gTmdModelBoundsCount = 1;
 }
-s32 IsTmdModelConstructed(void *self) {
-    return gTmdModelConstructed;
+s32 TmdModel__GetBoundsCount(TmdModel *self) {
+    return gTmdModelBoundsCount;
 }
-void TmdModel__ComputeBounds(TmdModel *self, Box_fa50 *box) {
+void TmdModel__ComputeBounds(TmdModel *self, TmdBox *box) {
     s32 i;
     s32 n;
-    SVec_fa50 *v;
+    TmdVertex *v;
     s16 *miny = &box->min.y;
     s16 *minz = &box->min.z;
     s16 *maxx = &box->max.x;
@@ -222,13 +149,13 @@ void TmdModel__ComputeBounds(TmdModel *self, Box_fa50 *box) {
         if (*maxz < v->z) *maxz = v->z;
     }
 }
-void UpdateTmdModelBoundsBuffer(TmdModel *self) {
-    TmdModel__ComputeBounds(self, (Box_fa50 *)gTmdModelBoundsBuf);
+void TmdModel__UpdateBoundsBuffer(TmdModel *self) {
+    TmdModel__ComputeBounds(self, gTmdModelBoundsBuf);
 }
-void *GetTmdModelBoundsBuffer(void *self, s32 i) {
+TmdBox *TmdModel__GetBoundsBuffer(TmdModel *self, s32 i) {
     return gTmdModelBoundsBuf;
 }
-void TmdModel__GetHull(TmdModel *self, Hull_fa50 *out) {
+void TmdModel__GetHull(TmdModel *self, TmdHull *out) {
     TypedBox_fa50 b;
 
     TmdModel__ComputeBounds(self, &b.box);
@@ -257,7 +184,7 @@ void TmdModel__GetHull(TmdModel *self, Hull_fa50 *out) {
     out->v[7].x = b.box.max.x;
     out->v[7].y = b.box.min.y;
     out->v[7].z = b.box.max.z;
-    out->type = 1;
+    out->count = 1;
 }
 void RotateAndOffsetHullList(HullList_fa50 *h, s32 turn, s32 back, s32 d) {
     Corners_fa50 tmp;
@@ -308,14 +235,14 @@ void RotateAndOffsetHullList(HullList_fa50 *h, s32 turn, s32 back, s32 d) {
  * VECTOR locals are scratch named by their frame slot; v60 is never used but
  * holds retail's slot, and dist is an 8-byte array because retail keeps it in
  * memory at the slot after uF0. */
-s32 TmdModel__RaycastFaces(TmdModel *self, s32 *best, Vec3_fa50 *hitOut, s32 *height, Vec3_fa50 *origin, Vec3_fa50 *end) {
-    Vec3_fa50 tri[4];
+s32 TmdModel__RaycastFaces(TmdModel *self, s32 *best, TmdVec3 *hitOut, s32 *height, TmdVec3 *origin, TmdVec3 *end) {
+    TmdVec3 tri[4];
     Vec4_fa50 plane;
     Ray_fa50 ray;
-    Vec3_fa50 hit;
+    TmdVec3 hit;
     s32 nverts;
     u32 count;
-    TmdPrim_fa50 *p;
+    TmdPrim *p;
     s32 found;
 
     count = 0;
@@ -329,8 +256,8 @@ s32 TmdModel__RaycastFaces(TmdModel *self, s32 *best, Vec3_fa50 *hitOut, s32 *he
     found = 0;
     while ((p = TmdModel__NextPrimitive(self, p, &nverts, tri, &count)) != NULL) {
         Vec4_fa50 v60;
-        SVec_fa50 e1;
-        SVec_fa50 e2;
+        TmdVertex e1;
+        TmdVertex e2;
         Vec4_fa50 v80;
         Vec4_fa50 v90;
         Vec4_fa50 vA0;
@@ -350,7 +277,7 @@ s32 TmdModel__RaycastFaces(TmdModel *self, s32 *best, Vec3_fa50 *hitOut, s32 *he
         s16 *maxx;
         s16 *maxy;
         s16 *maxz;
-        Vec3_fa50 *v;
+        TmdVec3 *v;
         s32 i;
 
         e1.x = tri[1].x - tri[0].x;
@@ -465,10 +392,10 @@ s32 TmdModel__RaycastFaces(TmdModel *self, s32 *best, Vec3_fa50 *hitOut, s32 *he
     }
     return found;
 }
-TmdPrim_fa50 *TmdModel__NextPrimitive(TmdModel *self, TmdPrim_fa50 *p, s32 *n, Vec3_fa50 *out, u32 *count) {
+TmdPrim *TmdModel__NextPrimitive(TmdModel *self, TmdPrim *p, s32 *n, TmdVec3 *out, u32 *count) {
     s32 idx[4];
-    TmdObject_fa50 *rec = self->object;
-    SVec_fa50 *verts;
+    TmdObject *rec = self->object;
+    TmdVertex *verts;
     s32 size;
     s32 i;
 
@@ -642,10 +569,10 @@ TmdPrim_fa50 *TmdModel__NextPrimitive(TmdModel *self, TmdPrim_fa50 *p, s32 *n, V
     }
     verts = self->object->verts;
     for (i = 0; i < *n; i++) {
-        out[i] = *(Vec3_fa50 *)((u8 *)verts + (idx[i] << 3));
+        out[i] = *(TmdVec3 *)((u8 *)verts + (idx[i] << 3));
     }
     (*count)++;
-    return (TmdPrim_fa50 *)((u8 *)p + size);
+    return (TmdPrim *)((u8 *)p + size);
 }
 void AccumulateTargetOffset(Outer_fa50 *self, s32 *xy) {
     Target_fa50 *t = self->unk10->unk10;

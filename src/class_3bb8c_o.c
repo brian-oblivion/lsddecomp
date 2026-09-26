@@ -24,6 +24,7 @@
  */
 #include "common.h"
 #include "Actor.h"
+#include "TmdModel.h"
 
 void NoOpIgnoreArgs(void) {
 }
@@ -209,7 +210,6 @@ void Actor__Reset(Actor *self) {
     self->pendingExtra = 0;
 }
 
-extern s32 IsTmdModelConstructed(void *arg0);
 extern void RotateAndOffsetHullList(Buf38O *out, s32 arg1, s32 arg2, s32 arg3);
 
 void Actor__NotifyMove(Actor *self, s32 event) {
@@ -222,7 +222,7 @@ void Actor__NotifyMove(Actor *self, s32 event) {
         if (event >= 5) {
             Buf38O buf;
 
-            if (self->model != NULL && IsTmdModelConstructed(self->model)) {
+            if (self->model != NULL && TmdModel__GetBoundsCount(self->model)) {
                 self->methods->readUnk20Data(self, &buf);
                 if (event != 5) {
                     s16 h = self->lastOffsetValue;

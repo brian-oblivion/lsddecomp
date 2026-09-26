@@ -59,16 +59,16 @@ idiom from DECOMPILATION_LEARNINGS, applied six times per iteration.
 
 **Pass 2** — after the corner loop, three PsyQ calls:
 ```c
-UpdateTmdModelBoundsBuffer(self->unk20);              /* fills PsyQ global gTmdModelBoundsBuf */
-arr = GetTmdModelBoundsBuffer(self->unk20, 0);     /* IGNORES both args, returns &gTmdModelBoundsBuf */
-cnt2 = IsTmdModelConstructed(self->unk20);       /* returns a count */
+TmdModel__UpdateBoundsBuffer(self->unk20);              /* fills PsyQ global gTmdModelBoundsBuf */
+arr = TmdModel__GetBoundsBuffer(self->unk20, 0);     /* IGNORES both args, returns &gTmdModelBoundsBuf */
+cnt2 = TmdModel__GetBoundsCount(self->unk20);       /* returns a count */
 ```
-**`GetTmdModelBoundsBuffer`'s whole body is `lui/addiu %hi/%lo(gTmdModelBoundsBuf); jr $ra`** —
+**`TmdModel__GetBoundsBuffer`'s whole body is `lui/addiu %hi/%lo(gTmdModelBoundsBuf); jr $ra`** —
 MEASURED (`asm/psyq_GsLinkObject4.s`), it is a plain getter for a PsyQ-
-internal global that `UpdateTmdModelBoundsBuffer` fills one instruction earlier via
+internal global that `TmdModel__UpdateBoundsBuffer` fills one instruction earlier via
 `TmdModel__ComputeBounds`. This resolved what looked at first like a confusing
 "return value used as both a pointer and a scalar simultaneously" — it
-isn't; `GetTmdModelBoundsBuffer`'s return (a pointer) and `IsTmdModelConstructed`'s return (a
+isn't; `TmdModel__GetBoundsBuffer`'s return (a pointer) and `TmdModel__GetBoundsCount`'s return (a
 count) are two DIFFERENT values that happen to both be freshly in `$v0` at
 adjacent points, and a delay-slot register copy that looked like "assign
 the NEW call's return" is actually copying the OLD (pre-call) `$v0` — read
@@ -158,9 +158,9 @@ s32 Class6B5CC__CheckBoundsOverlap(Class6B5CCObj *self, void *arg1, Vec3S16_d294
         } while ((u8 *)cur < end);
     }
 
-    UpdateTmdModelBoundsBuffer(self->unk20);
-    arr = GetTmdModelBoundsBuffer(self->unk20, 0);
-    cnt2 = IsTmdModelConstructed(self->unk20);
+    TmdModel__UpdateBoundsBuffer(self->unk20);
+    arr = TmdModel__GetBoundsBuffer(self->unk20, 0);
+    cnt2 = TmdModel__GetBoundsCount(self->unk20);
 
     track = *arr;
 
@@ -252,7 +252,7 @@ concrete, measured leads for the next attempt:
 `include/code_d294.h`:
 - New `Sixteen6_d294` (12 bytes, 6×`s16`, all-s16-struct-copy idiom) and
   `CornerList_d294` (`{ s32 count; Vec3S16_d294 hdr; }`) types.
-- New externs `UpdateTmdModelBoundsBuffer(void *arg0)` and `GetTmdModelBoundsBuffer(void *arg0,
+- New externs `TmdModel__UpdateBoundsBuffer(void *arg0)` and `TmdModel__GetBoundsBuffer(void *arg0,
   s32 arg1)` returning `Sixteen6_d294 *` (PsyQ library,
   `asm/psyq_GsLinkObject4.s`) — see the `gTmdModelBoundsBuf` finding above.
 - Prototype for `Class6B5CC__CheckBoundsOverlap` itself.
@@ -323,7 +323,7 @@ via `build/lsdde.map`, not just assumed), showing `self` deferred into
 the MIDDLE of the corner-loop setup instead of materializing into `$s0`
 in the prologue like retail -- the same "deferred parameter copy" shape
 this project's OTHER unit (`code_55dd4`) has repeatedly hit. `self` is
-not referenced in this function's source until `UpdateTmdModelBoundsBuffer(self->unk20)`,
+not referenced in this function's source until `TmdModel__UpdateBoundsBuffer(self->unk20)`,
 deep in pass 2, so GCC defers it. A bare `__asm__("")` as the very first
 statement forced early materialization, matching retail's prologue
 exactly (`sw s0`/`move s0,a0`/`move a3,a1` all now byte-identical from
@@ -427,9 +427,9 @@ s32 Class6B5CC__CheckBoundsOverlap(Class6B5CCObj *self, void *arg1, Vec3S16_d294
         } while ((u8 *)cur < end);
     }
 
-    UpdateTmdModelBoundsBuffer(self->unk20);
-    arr = GetTmdModelBoundsBuffer(self->unk20, 0);
-    cnt2 = IsTmdModelConstructed(self->unk20);
+    TmdModel__UpdateBoundsBuffer(self->unk20);
+    arr = TmdModel__GetBoundsBuffer(self->unk20, 0);
+    cnt2 = TmdModel__GetBoundsCount(self->unk20);
 
     track = *arr;
 
@@ -746,7 +746,7 @@ positional skeleton diffs 229, built 222 words. Matches the title.
    `Sixteen6_d294 *` return cast): 243/243, whole-image OK. No header edit.
 
 The round-13 pairing note ("scrambled" `f5<->lo.z` ...) is not scrambled:
-`GetTmdModelBoundsBuffer`'s records are `BoundsBox_d294` boxes (`f0..f2` = lo, `f3..f5`
+`TmdModel__GetBoundsBuffer`'s records are `BoundsBox_d294` boxes (`f0..f2` = lo, `f3..f5`
 = hi), pass 2 grows their union, and the tail is an ordinary per-axis AABB
 overlap in z, x, y order. The header comment on `Sixteen6_d294` still says
 otherwise; left untouched (shared header, comment only).
@@ -758,7 +758,7 @@ No permuter, no Gate 3 search spent. Signature unchanged.
 ```c
 /* Offsets arg1's corner list by `d` and grows a box `mm` over the moved
  * corners, grows a second box `box` over the model's own bounds records
- * (GetTmdModelBoundsBuffer's array), and returns 1 if the two boxes overlap on all
+ * (TmdModel__GetBoundsBuffer's array), and returns 1 if the two boxes overlap on all
  * three axes. Each running min/max is a ternary stored back unconditionally
  * (retail stores every field every iteration), and the source compares
  * with `>` for a min so the slt operands load in retail's order. */
@@ -795,9 +795,9 @@ s32 Class6B5CC__CheckBoundsOverlap(Class6B5CCObj *self, void *arg1, Vec3S16_d294
         b->hi.z = (b->hi.z < v->z) ? v->z : b->hi.z;
     }
 
-    UpdateTmdModelBoundsBuffer(self->unk20);
-    p = (BoundsBox_d294 *)GetTmdModelBoundsBuffer(self->unk20, 0);
-    n = IsTmdModelConstructed(self->unk20);
+    TmdModel__UpdateBoundsBuffer(self->unk20);
+    p = (BoundsBox_d294 *)TmdModel__GetBoundsBuffer(self->unk20, 0);
+    n = TmdModel__GetBoundsCount(self->unk20);
     box = *p;
     end2 = p + n;
     for (p++; p < end2; p++) {

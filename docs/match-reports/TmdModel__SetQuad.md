@@ -4,7 +4,7 @@
 
 Round 82, runner charlie (matching slot). Unit `src/code_fa50.c`. Fresh ground (carved in FINISHING-PLAN revision 18), no prior attempt, no report before this one.
 
-- **Where:** slot +0x040 of D_8006BEA0 (`tools/classtable.py D_8006BEA0`).
+- **Where:** slot +0x040 of gTmdModelMethods (`tools/classtable.py gTmdModelMethods`).
 - **What:** copies four words from `src` into object +0x14..+0x20
 - **Result:** byte-exact; 10/10 words, 0 insertions / 0 deletions, whole-image SHA1 green (`./build-and-verify.sh` OK). First build.
 - **Types:** local views (`TmdModel`, `ModelData_fa50`, `Quad_fa50`, `TmdObject_fa50`, `Outer_fa50`/`Inner_fa50`/`Target_fa50`) and prototypes live in the unit; no shared header was touched.

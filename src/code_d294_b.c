@@ -37,6 +37,7 @@
 
 #include "common.h"
 #include "code_d294.h"
+#include "TmdModel.h"
 
 /* Sibling of Class6B5CC__SetDisplay/D374/D3A0/D3CC/D3F8 (code_d294.c): a thin
  * wrapper around GetSetBitField over &self->unk10, shift 0 width 3. Raw
@@ -87,7 +88,7 @@ void Class6B5CC__GetRotMatrix(Class6B5CC *self, s32 a1, s32 a2) {
 }
 
 /* a1 gates a small range (2 <= a1 < 4). When self->model is set and
- * IsTmdModelConstructed(self->model) reports true, fills a stack buffer through
+ * TmdModel__GetBoundsCount(self->model) reports true, fills a stack buffer through
  * this class's own +0x8C slot (Class6B5CC__ReadUnk20Data, already matched in this
  * unit -- fills it via TmdModel__GetHull(self->model, dest)) then forwards
  * that same buffer, retyped as a GenericCountList_d294, into +0x90
@@ -95,12 +96,10 @@ void Class6B5CC__GetRotMatrix(Class6B5CC *self, s32 a1, s32 a2) {
  * a1 passed through as Class6B5CC__TransformAndNotifyParents's own a2. */
 void Class6B5CC__NotifyIfUnk20Active(Class6B5CC *self, s32 a1) {
     /* Sized to reproduce retail's own frame (0x58): Class6B5CC__ReadUnk20Data's own
-     * target (TmdModel__GetHull, PsyQ, asm/psyq_fa50.s, not
-     * decompiled here) fills fields out past +0x32 of its own `dest`
-     * argument, so the true destination struct is bigger than the 8 bytes
-     * GenericCountList_d294 alone would reserve -- not derived beyond its
-     * size, since the field layout past what Class6B5CC__TransformAndNotifyParents itself reads
-     * (+0x0/+0x4) is PsyQ-internal. */
+     * target (TmdModel__GetHull, code_fa50) writes a TmdHull
+     * (include/TmdModel.h: a count word and eight 6-byte corners, 0x34
+     * bytes) into its `dest`, so the true destination struct is bigger than
+     * the 8 bytes GenericCountList_d294 alone would reserve. */
     u8 buf[0x38];
 
     if (a1 >= 4) {
@@ -112,18 +111,16 @@ void Class6B5CC__NotifyIfUnk20Active(Class6B5CC *self, s32 a1) {
     if (self->model == NULL) {
         return;
     }
-    if (!IsTmdModelConstructed(self->model)) {
+    if (!TmdModel__GetBoundsCount(self->model)) {
         return;
     }
     self->methods->readUnk20Data(self, buf);
     self->methods->transformAndNotifyParents(self, (GenericCountList_d294 *)buf, a1);
 }
 
-/* Forwards self->model (still opaque, retyped `void *` this round -- see
- * include/code_d294.h) and its own 2nd argument straight through to
- * TmdModel__GetHull, untouched. TmdModel__GetHull's own body (psyq_fa50.s)
- * has no deliberate return value -- see the extern's own comment -- so this
- * wrapper is void, not `return TmdModel__GetHull(...)`. */
+/* Forwards self->model (the TmdModel, held as `void *` in Class6B5CC.h) and
+ * its own 2nd argument straight through to TmdModel__GetHull, untouched.
+ * TmdModel__GetHull (code_fa50) is void, so this wrapper is void too. */
 void Class6B5CC__ReadUnk20Data(Class6B5CC *self, void *dest) {
     TmdModel__GetHull(self->model, dest);
 }
@@ -187,7 +184,7 @@ void Class6B5CC__TryAttachNearby(Class6B5CC *self, Class6B5CC *other) {
     if (self->model == NULL) {
         return;
     }
-    if (!IsTmdModelConstructed(self->model)) {
+    if (!TmdModel__GetBoundsCount(self->model)) {
         return;
     }
 
@@ -289,7 +286,7 @@ void Class6B5CC__ComposeAndApplyRotation(Class6B5CC *self, void *arg1, void *arg
 
 /* Offsets arg1's corner list by `d` and grows a box `mm` over the moved
  * corners, grows a second box `box` over the model's own bounds records
- * (GetTmdModelBoundsBuffer's array), and returns 1 if the two boxes overlap on all
+ * (TmdModel__GetBoundsBuffer's array), and returns 1 if the two boxes overlap on all
  * three axes. Each running min/max is a ternary stored back unconditionally
  * (retail stores every field every iteration), and the source compares
  * with `>` for a min so the slt operands load in retail's order. */
@@ -326,9 +323,9 @@ s32 Class6B5CC__CheckBoundsOverlap(Class6B5CC *self, void *arg1, Vec3S16_d294 *d
         b->hi.z = (b->hi.z < v->z) ? v->z : b->hi.z;
     }
 
-    UpdateTmdModelBoundsBuffer(self->model);
-    p = (BoundsBox_d294 *)GetTmdModelBoundsBuffer(self->model, 0);
-    n = IsTmdModelConstructed(self->model);
+    TmdModel__UpdateBoundsBuffer(self->model);
+    p = (BoundsBox_d294 *)TmdModel__GetBoundsBuffer(self->model, 0);
+    n = TmdModel__GetBoundsCount(self->model);
     box = *p;
     end2 = p + n;
     for (p++; p < end2; p++) {
@@ -359,7 +356,6 @@ s32 Class6B5CC__CheckBoundsOverlap(Class6B5CC *self, void *arg1, Vec3S16_d294 *d
  * the D_8008A838 gate is two arms that each set the bit, so loop.c sees two
  * equal constant-1 loads (savings 2) and hoists the 1 into $s1; Part 1 walks
  * `p`, `v` and `hi` as pointers. */
-extern s32 TmdModel__RaycastFaces(void *arg0, s32 *arg1, Vec3S16_d294 *arg2, s32 *arg3, Vec3S16_d294 *arg4, Vec3S16_d294 *arg5);
 extern s32 D_8008A838;
 
 s32 Class6B5CC__ClassifyAgainstPlanes(Class6B5CC *self, s32 *outFlag, Vec3S16_d294 *diff, AttachCornerList_d294b *list) {
@@ -391,12 +387,12 @@ s32 Class6B5CC__ClassifyAgainstPlanes(Class6B5CC *self, s32 *outFlag, Vec3S16_d2
     }
 
     self->hitMask = 0;
-    count1 = IsTmdModelConstructed(self->model);
+    count1 = TmdModel__GetBoundsCount(self->model);
     hit = 0;
     for (i = 0; i < count1; i++) {
-        plane = GetTmdModelBoundsBuffer(self->model, i);
+        plane = (Sixteen6_d294 *)TmdModel__GetBoundsBuffer(self->model, i);
         if (ClipSegmentToBox(NULL, (BoundsBox_d294 *)plane, &mid[0], &mid[1])) {
-            if (TmdModel__RaycastFaces(self->model, &bigConst, diff, &outWord, &mid[0], &mid[1])) {
+            if (TmdModel__RaycastFaces(self->model, &bigConst, (TmdVec3 *)diff, &outWord, (TmdVec3 *)&mid[0], (TmdVec3 *)&mid[1])) {
                 if (D_8008A838 == 0) {
                     self->hitMask |= 1 << i;
                 } else if (outWord >= 0x201) {
@@ -417,13 +413,13 @@ s32 Class6B5CC__ClassifyAgainstPlanes(Class6B5CC *self, s32 *outFlag, Vec3S16_d2
     *outFlag = 0;
     cnt2 = list->count;
     for (i = 0; i < count1; i++) {
-        plane = GetTmdModelBoundsBuffer(self->model, i);
+        plane = (Sixteen6_d294 *)TmdModel__GetBoundsBuffer(self->model, i);
         v = list->v;
         for (k = 0; k < cnt2; k++) {
             for (m = 0; m < 4; m++) {
                 if (m == 1 || m == 2) {
                     if (ClipSegmentToBox(NULL, (BoundsBox_d294 *)plane, v, v + 4)) {
-                        if (TmdModel__RaycastFaces(self->model, &bigConst, diff, &outWord, v, v + 4)) {
+                        if (TmdModel__RaycastFaces(self->model, &bigConst, (TmdVec3 *)diff, &outWord, (TmdVec3 *)v, (TmdVec3 *)(v + 4))) {
                             if (outWord >= 0x201) {
                                 self->hitMask |= 1 << i;
                                 *outFlag |= 1 << k;

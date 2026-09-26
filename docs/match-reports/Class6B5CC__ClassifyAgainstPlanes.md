@@ -14,7 +14,7 @@ a same-length swap. There was real structure to find.
 Twelve builds took it to the match, in this order (`funcdiff` / ins-del):
 
 1. **Argument type, one loop variable for both plane loops, and
-   `self->unk2C = 0` before the `IsTmdModelConstructed` call.** `list` is the same
+   `self->unk2C = 0` before the `TmdModel__GetBoundsCount` call.** `list` is the same
    `{s32 count; Vec3S16_d294 v[8];}` local that TryAttachNearby passes (same
    round). Retail keeps the plane index for Part 2 AND Part 3 in `$s4`, so
    the source uses ONE variable `i` where the old body had `i` and `j`. And
@@ -98,7 +98,7 @@ resolved below.
 Signature `s32 Class6B5CC__ClassifyAgainstPlanes(Class6B5CCObj *self, s32 *outFlag, Vec3S16_d294
 *diff, void *list)`, with Part 1 (a fixed 2-row box-midpoint average into a
 local `Vec3S16_d294 mid[2]`) and Part 2 (a `count1`-driven loop over
-`GetTmdModelBoundsBuffer` planes, gated by `ClipSegmentToBox`/`TmdModel__RaycastFaces`, setting
+`TmdModel__GetBoundsBuffer` planes, gated by `ClipSegmentToBox`/`TmdModel__RaycastFaces`, setting
 bits in `self->unk2C`) both fully derived and high-confidence. Part 3 (a
 second, `list`-driven double loop) was flagged NOT fully decoded: "the
 precise relationship between the middle `k` loop ... and the inner fixed-4
@@ -266,11 +266,11 @@ s32 Class6B5CC__ClassifyAgainstPlanes(Class6B5CCObj *self, s32 *outFlag, Vec3S16
         hiPtr = (s16 *)((u8 *)hiPtr + 0x18);
     }
 
-    count1 = IsTmdModelConstructed(self->unk20);
+    count1 = TmdModel__GetBoundsCount(self->unk20);
     self->unk2C = 0;
     flag2 = 0;
     for (i = 0; i < count1; i++) {
-        plane = GetTmdModelBoundsBuffer(self->unk20, i);
+        plane = TmdModel__GetBoundsBuffer(self->unk20, i);
         if (ClipSegmentToBox(NULL, (BoundsBox_d294 *)plane, &mid[0], &mid[1])) {
             if (TmdModel__RaycastFaces(self->unk20, &bigConst, diff, &outWord, &mid[0], &mid[1])) {
                 if (D_8008A838 == 0 || outWord >= 0x201) {
@@ -291,7 +291,7 @@ s32 Class6B5CC__ClassifyAgainstPlanes(Class6B5CCObj *self, s32 *outFlag, Vec3S16
     *outFlag = 0;
     cnt2 = *(s32 *)list;
     for (j = 0; j < count1; j++) {
-        plane = GetTmdModelBoundsBuffer(self->unk20, j);
+        plane = TmdModel__GetBoundsBuffer(self->unk20, j);
         bitJ = 1 << j;
         rowBase = (u8 *)list + 4;
         for (k = 0; k < cnt2; k++) {
@@ -454,9 +454,9 @@ candidate was read and, where safe, translated to real source and verified
 against `nm -S`/`funcdiff.py` -- not adopted on the permuter's own score:**
 
 - **output-2661 (safest, most plausible):** reorders `self->unk2C = 0;`
-  to BEFORE `count1 = IsTmdModelConstructed(self->unk20);` (matching retail's own
+  to BEFORE `count1 = TmdModel__GetBoundsCount(self->unk20);` (matching retail's own
   disassembly, which places the `self->unk2C` store in the delay slot of
-  the `jal IsTmdModelConstructed`) plus a benign `new_var` split of the `hiPtr`
+  the `jal TmdModel__GetBoundsCount`) plus a benign `new_var` split of the `hiPtr`
   initialization (same "aliased local" shape as `TryAttachNearby`'s own
   successful `countList` lever). Applied both pieces to the real tree:
   **zero effect, still 29/199, length still exactly 199 (`0x31c`).**
@@ -502,8 +502,8 @@ does not have to re-derive which are safe.
 **Explicit answer to the revisit's own question: the round-54 naming gave NO
 new shape here either**, for the same reason as `NotifyTaggedParents` --
 this function's own symbols (`TmdModel__RaycastFaces`, `D_8008A838`,
-`self->unk2C`/`unk20`, `ClipSegmentToBox`, `GetTmdModelBoundsBuffer`,
-`IsTmdModelConstructed`) were untouched by round 54's `Class6B5CCMethods` slot
+`self->unk2C`/`unk20`, `ClipSegmentToBox`, `TmdModel__GetBoundsBuffer`,
+`TmdModel__GetBoundsCount`) were untouched by round 54's `Class6B5CCMethods` slot
 renames. What DID move the investigation forward was reading the
 disassembly's own pointer arithmetic directly rather than trusting the
 round-46 title's "self register identity" summary -- the real structural
