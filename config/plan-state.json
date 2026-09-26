@@ -854,9 +854,9 @@
           "header": "include/Class6D940.h"
         },
         "D_8006E4F0": {
-          "class": "Class6E4F0",
+          "class": "Application",
           "date": "2026-09-25",
-          "header": "include/Class6E4F0.h"
+          "header": "include/Application.h"
         },
         "D_8006E99C": {
           "class": "Class6E99C",

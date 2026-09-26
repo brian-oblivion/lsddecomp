@@ -8,8 +8,8 @@
  * game's own libsnd build".
  *
  * Round 81 (delta): all seven functions matched. They are the whole of one
- * class, D_8006E4F0 (local view Class6E4F0 below, class id 0x60): its ctor
- * (`Class6E4F0__Class6E4F0`), empty finalize override, four own slots
+ * class, D_8006E4F0 (local view Application below, class id 0x60): its ctor
+ * (`Application__Application`), empty finalize override, four own slots
  * (`SetScreenDims`, `InitSystems`, a no-op, and `RunMainLoop` -- the
  * subclass Class6D3C8's per-frame dispatcher, first run from `src/main.c`)
  * and the table getter.
@@ -18,19 +18,19 @@
  * unit-local globals (`gCdInitDone`, `gDefaultScreenDims`) named -- tiers
  * and evidence in each function's own match report's `## Naming` section.
  * One exception: `func_8003B20C` (the table getter, proposed
- * `GetClass6E4F0Methods`) was NOT renamed -- `tools/rename.py` cannot apply
+ * `GetApplicationMethods`) was NOT renamed -- `tools/rename.py` cannot apply
  * it because this address already carried an explicit, now-stale, track-2
  * "unidentified" line in the symbols file and the tool's placeholder-name
  * address resolution never finds it to replace; see
- * docs/match-reports/GetClass6E4F0Methods.md and the round-81 broadcast for the
+ * docs/match-reports/GetApplicationMethods.md and the round-81 broadcast for the
  * head to apply by hand. Round 84 (echo, track 4): applied with rename.py,
  * which now replaces the existing symbols line.
  *
  * Round 84 (echo, track 4): the class is declared once, in
- * include/Class6E4F0.h; this unit's local view of it is gone.
+ * include/Application.h; this unit's local view of it is gone.
  */
 #include "common.h"
-#include "Class6E4F0.h"
+#include "Application.h"
 
 extern s32 gCdInitDone;               /* CdInit has been called */
 extern ScreenDims gDefaultScreenDims; /* {320, 240} */
@@ -43,9 +43,9 @@ extern void GsInit3D(void);
 extern void SetActiveDataSource(s32 arg0); /* code_171e0 */
 extern void *BMemPMgrAlloc(s32 size);
 
-void Class6E4F0__Class6E4F0(Class6E4F0 *self, s32 dataSource) {
+void Application__Application(Application *self, s32 dataSource) {
     Get_vtable_BasicClass()->ctor((BasicClass *)self);
-    self->methods = GetClass6E4F0Methods();
+    self->methods = GetApplicationMethods();
     if (gCdInitDone == 0) {
         CdInit();
         gCdInitDone = 1;
@@ -55,14 +55,14 @@ void Class6E4F0__Class6E4F0(Class6E4F0 *self, s32 dataSource) {
     self->methods->setScreenDims(self, &gDefaultScreenDims, 0);
 }
 
-void Class6E4F0__Finalize(Class6E4F0 *self) {}
+void Application__Finalize(Application *self) {}
 
-void Class6E4F0__SetScreenDims(Class6E4F0 *self, ScreenDims *dims, s32 vramMode) {
+void Application__SetScreenDims(Application *self, ScreenDims *dims, s32 vramMode) {
     self->dims = *dims;
     self->vramMode = vramMode;
 }
 
-void Class6E4F0__InitSystems(Class6E4F0 *self, DrawSystem *drawSystem, struct Pad *pad) {
+void Application__InitSystems(Application *self, DrawSystem *drawSystem, struct Pad *pad) {
     if (self->initialized == 0) {
         SetDrawSystem(drawSystem);
         drawSystem->methods->initGraph(drawSystem, &self->dims, self->vramMode);
@@ -78,9 +78,9 @@ void Class6E4F0__InitSystems(Class6E4F0 *self, DrawSystem *drawSystem, struct Pa
     }
 }
 
-void Class6E4F0__NoOpSlot48(Class6E4F0 *self) {}
+void Application__NoOpSlot48(Application *self) {}
 
-void Class6E4F0__RunMainLoop(Class6E4F0 *self) {
+void Application__RunMainLoop(Application *self) {
     s32 status;
 
     if (self->initialized) {
@@ -106,6 +106,6 @@ void Class6E4F0__RunMainLoop(Class6E4F0 *self) {
     }
 }
 
-Class6E4F0Methods *GetClass6E4F0Methods(void) {
+ApplicationMethods *GetApplicationMethods(void) {
     return &D_8006E4F0;
 }

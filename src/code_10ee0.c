@@ -7,7 +7,7 @@
  * fingerprint). What it holds: the 19 methods of gDrawSystemMethods, the game's
  * screen/graphics singleton, matched as DrawSystem this round. `main.c`
  * builds the one instance (`New_DrawSystem`) and hands it into the game's
- * startup chain, which lands it in `code_2b78c.c`'s `Class6E4F0__InitSystems`
+ * startup chain, which lands it in `code_2b78c.c`'s `Application__InitSystems`
  * as its `source` argument -- that unit dispatches `source`'s own +0x044
  * slot, the address this unit's table lists as `initGraph`
  * (`DrawSystem__InitGraph`, GsInitGraph setup), confirming the two units see

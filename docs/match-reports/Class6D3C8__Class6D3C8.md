@@ -23,7 +23,7 @@ sw    $s0, 0x20($sp)
 addu  $s0, $a0, $zero        ; s0 = self
 sw    $s1, 0x24($sp)
 sw    $ra, 0x28($sp)
-jal   GetClass6E4F0Methods           ; -> &D_8006E4F0 (intermediate base table)
+jal   GetApplicationMethods           ; -> &D_8006E4F0 (intermediate base table)
  addu $s1, $a1, $zero          ; s1 = arg
 lw    $a1, 0x0($s1)             ; a1 = arg->unk00
 lw    $v0, 0x8($v0)              ; base table's ctor slot
@@ -71,7 +71,7 @@ Written as:
 void Class6D3C8__Class6D3C8(Class6D3C8 *self, Class6D3C8CtorArgs *arg) {
     LoadModelRequest req;
 
-    GetClass6E4F0Methods()->ctor(self, arg->unk00);
+    GetApplicationMethods()->ctor(self, arg->unk00);
     self->methods = GetClass6D3C8Methods();
     self->arg = arg;
     func_800270AC(func_80048CF0());
@@ -153,6 +153,6 @@ slot+8 shape documented in `docs/research/class-framework.md`.
 ## Track 4
 
 **2026-09-25, round 84 (echo).** The parent class is declared once, in
-`include/Class6E4F0.h`; the base-ctor call is
-`GetClass6E4F0Methods()->ctor((Class6E4F0 *)self, arg->unk00)`, an upcast
+`include/Application.h`; the base-ctor call is
+`GetApplicationMethods()->ctor((Application *)self, arg->unk00)`, an upcast
 that emits no code. Bytes unchanged.

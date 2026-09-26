@@ -1,4 +1,6 @@
-# GetClass6E4F0Methods
+# GetApplicationMethods
+
+> Renamed from `GetClass6E4F0Methods` on 2026-09-26 (tools/rename.py). Address 0x8003b20c.
 
 > Renamed from `func_8003B20C` on 2026-09-25 (tools/rename.py). Address 0x8003b20c.
 
@@ -9,7 +11,7 @@
 The class-table getter: returns `&D_8006E4F0`.
 
 ```c
-Class6E4F0Methods *GetClass6E4F0Methods(void) {
+ApplicationMethods *GetApplicationMethods(void) {
     return &D_8006E4F0;
 }
 ```
@@ -18,18 +20,18 @@ Class6E4F0Methods *GetClass6E4F0Methods(void) {
 
 `include/Class6D3C8.h` already declares `extern MiddleClassMethods
 *func_8003B20C(void);` with its own view of the table. This unit does NOT
-include that header and declares its own local `Class6E4F0Methods` view,
+include that header and declares its own local `ApplicationMethods` view,
 so the two never meet in one translation unit (the multiple-local-views
 convention). A track-4 unification of D_8006E4F0 would merge the two views:
 MiddleClassMethods types +0x044 as `s32 (*)(void *, void *, void *, s32)`
 (4 args, from code_1677c's call `slot44(self, a1, a2, 0)`), while the
-occupant Class6E4F0__InitSystems reads only three (self, source, arg). A void
+occupant Application__InitSystems reads only three (self, source, arg). A void
 body matches; the bytes cannot say whether callers use a return value.
 
 ## Naming
 
 **Round 81 (delta), track 3. NOT RENAMED -- tool-blocked, see below.**
-Proposed `GetClass6E4F0Methods` (matches the sibling class's
+Proposed `GetApplicationMethods` (matches the sibling class's
 `GetClass6D3C8Methods`). **Tier A**: a pure getter, mechanics is the
 purpose.
 
@@ -60,11 +62,11 @@ applies the rename.
 ## Track 4
 
 **2026-09-25, round 84 (echo).** Renamed `func_8003B20C` ->
-`GetClass6E4F0Methods` with `tools/rename.py`, which now replaces the
+`GetApplicationMethods` with `tools/rename.py`, which now replaces the
 address's existing symbols-file line (the blocker above no longer
 reproduces; the symbols line carried no stale `unidentified` note by this
-round). Evidence unchanged: the body is `return &D_8006E4F0;`, Class6E4F0's
+round). Evidence unchanged: the body is `return &D_8006E4F0;`, Application's
 own table, and both callers use it as the table getter
-(`Class6E4F0__Class6E4F0` installs it; `Class6D3C8__Class6D3C8` and
+(`Application__Application` installs it; `Class6D3C8__Class6D3C8` and
 `Class6D3C8__InitSystems` call the base class's ctor and
 +0x044 slot through it). The name follows `GetClass6D3C8Methods`/`GetFileResourceMethods`.
