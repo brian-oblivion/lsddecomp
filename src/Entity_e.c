@@ -29,6 +29,7 @@
 #include "common.h"
 #include "Entity.h"
 #include "DreamSys.h"
+#include "Viewport.h"
 
 void Entity__MoodCue59(Entity *this, EntityMoodHandlerArg *out) {
     if (this->moodTimer == 0 && rand() % 10 == 0) {
@@ -270,7 +271,7 @@ extern u8 D_8008AC1C[];
 
 void Entity__MoodCue74(Entity *this, EntityMoodHandlerArg *out) {
     if (this->moodTimer == 0) {
-        ((Unk5CObj *)((DreamSys *)this->peer)->heightCurve)->methods->slot64((Unk5CObj *)((DreamSys *)this->peer)->heightCurve, D_8008AC1C);
+        ((DreamSys *)this->peer)->viewport->methods->setClearColor(((DreamSys *)this->peer)->viewport, (ViewportRgb *)D_8008AC1C);
         this->state = rand() % 3;
         if (((DreamSys *)this->peer)->coord2->tz < 0x262) {
             this->state = 0;

@@ -47,6 +47,7 @@
 #include "common.h"
 #include "DreamSys.h"
 #include "VabStreamObj.h"
+#include "Viewport.h"
 
 /* code_179d8_l's SoundCueSet service pair, as this unit calls them
    (DreamSys__TickDrift / DreamSys__StopDrift: (soundObj, soundCueSet)).
@@ -91,7 +92,7 @@ DreamSys *DreamSys__DreamSys(DreamSys *this, void *arg1, s32 arg2, s32 arg3)
 	GetActorMethods()->ctor((Actor *)this);
 	this->methods = Get_vtable_DreamSys();
 	this->soundObj = arg2;
-	this->heightCurve = (DreamSysUnk5C *)arg3;
+	this->viewport = (Viewport *)arg3;
 	this->unk_0x64 = 0;
 	this->unk_0x60 = arg1;
 	val = ((DreamSysCtorArgObj *)arg1)->methods->slot0x80(arg1, 0);
@@ -388,9 +389,9 @@ void DreamSys__SetSoundObj(DreamSys *this, s32 value)
 {
 	this->soundObj = value;
 }
-void DreamSys__SetHeightCurve(DreamSys *this, void *value)
+void DreamSys__SetViewport(DreamSys *this, Viewport *value)
 {
-	this->heightCurve = value;
+	this->viewport = value;
 }
 void DreamSys__func_5938c(DreamSys *this, s32 value)
 {
@@ -423,7 +424,7 @@ extern s32 IsVec3WithinRange(s32 *a, s32 range, s32 *b);
    caller-less m2c signature and is wrong: it is written into the z word of
    the global scratch vector that Class6B5CC__LocalOffsetToWorldPos converts
    from a LOCAL OFFSET to a world position, and it is also the abscissa
-   InterpolateKeyframeValue evaluates heightCurve's two keyframes at -- whose
+   InterpolateKeyframeValue evaluates the viewport's two refView points at -- whose
    own `position` fields are what it is compared against. It is a distance
    along the local axis, not a day index. */
 s32 DreamSys__ProjectPointAtDistance(DreamSys *this, s32 *out, s32 dist, s32 *reference, s32 tolerance)
@@ -437,8 +438,8 @@ s32 DreamSys__ProjectPointAtDistance(DreamSys *this, s32 *out, s32 dist, s32 *re
 	*p = dist;
 	Class6B5CC__LocalOffsetToWorldPos((Class6B5CC *)this, local, p - 2, 0);
 
-	ret = InterpolateKeyframeValue((void *)((u8 *)this->heightCurve + 0x14),
-	                     (void *)((u8 *)this->heightCurve + 0x20), dist);
+	ret = InterpolateKeyframeValue((void *)&this->viewport->refView.vp,
+	                     (void *)&this->viewport->refView.vr, dist);
 
 	vec = this->parent != 0 ? this->coord2->unk38 : 0;
 	local[1] = ret + vec[1];
@@ -566,7 +567,7 @@ void DreamSys__StepLookOffset(DreamSys *this)
 			return;
 		}
 	apply:
-		this->heightCurve->endValue += delta;
+		this->viewport->refView.vr.y += delta;
 		this->lookOffset = sum;
 		this->lookOffsetCommand = 0;
 		return;
@@ -575,7 +576,7 @@ void DreamSys__StepLookOffset(DreamSys *this)
 		delta = -0x258;
 		if (this->lookOffset < 0)
 			delta = 0x258;
-		this->heightCurve->endValue += delta;
+		this->viewport->refView.vr.y += delta;
 		this->lookOffset += delta;
 	}
 }
@@ -675,7 +676,7 @@ s32 DreamSys__AdvanceMoveCycle(DreamSys *this, s32 arg1)
 	s32 doCallback = 0;
 	s32 ret = 0;
 	s32 count;
-	DreamSysUnk5C *p;
+	Viewport *p;
 	s32 delta;
 
 	if (this->moveCommand != 0) {
@@ -692,13 +693,13 @@ s32 DreamSys__AdvanceMoveCycle(DreamSys *this, s32 arg1)
 		if (doCallback)
 			this->methods->startVoice(this);
 
-		p = this->heightCurve;
+		p = this->viewport;
 		if (p != NULL && this->screenShakeOn != 0 && arg1 != 0) {
 			delta = -50;
 			if (this->moveCycleTick >= 3)
 				delta = 50;
-			p->startValue += delta;
-			p->endValue += delta;
+			p->refView.vp.y += delta;
+			p->refView.vr.y += delta;
 		}
 
 		if (this->moveCommand == 0)
@@ -805,7 +806,7 @@ void DreamSys__TickDrift(DreamSys *this)
 {
 	if (this->driftActive != 0) {
 		this->methods->addTranslation(this, &DRIFT_STEP);
-		this->heightCurve->endValue -= 0x258;
+		this->viewport->refView.vr.y -= 0x258;
 	}
 	if (this->cueServiceActive != 0)
 		ServiceSoundCueSet(this->soundObj, this->soundCueSet);

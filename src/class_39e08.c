@@ -85,7 +85,7 @@ void Obj865C8__Init(Obj865C8 *self) {
 
     sub->methods->addChild(sub, (BasicClass *)self->unk0C->unk4);
     sub->methods->addChild(sub, (BasicClass *)self->unk0C->unk8);
-    sub->methods->setHeightCurve(sub, self->unk0C->unk10);
+    sub->methods->setViewport(sub, (Viewport *)self->unk0C->unk10);
     GetClass86668Methods()->init((Class86668 *)self, (IntermediateBaseInitArgs *)self->unk0C, 0);
 }
 
@@ -93,7 +93,7 @@ void Obj865C8__Deinit(Obj865C8 *self) {
     DreamSys *sub = self->unk38;
 
     GetClass86668Methods()->deinit((Class86668 *)self);
-    sub->methods->setHeightCurve(sub, 0);
+    sub->methods->setViewport(sub, 0);
     sub->methods->removeChild(sub, (BasicClass *)self->unk0C->unk4);
     sub->methods->removeChild(sub, (BasicClass *)self->unk10);
 }

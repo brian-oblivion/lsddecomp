@@ -60,8 +60,6 @@
 
 typedef struct Entity Entity;
 typedef struct EntityMethods EntityMethods;
-typedef struct Unk5CObj Unk5CObj;
-typedef struct Unk5CMethods Unk5CMethods;
 typedef struct Unk4CObj Unk4CObj;
 typedef struct Unk4CMethods Unk4CMethods;
 typedef struct EntityMoodRow EntityMoodRow;
@@ -142,18 +140,6 @@ typedef void (*EntityPlayTodFn)(Entity *self);
 
 extern EntityMethods ENTITY_METHODS;
 extern EntityMethods *Get_vtable_Entity(void); /* returns &ENTITY_METHODS */
-
-/* The object at the peer's +0x5C: DreamSys's heightCurve (DreamSys.h's
- * DreamSysUnk5C reads its data fields; nothing there names its table). One
- * slot reached; accessors cast heightCurve to it. */
-struct Unk5CMethods {
-    u8 pad000[0x64];
-    void (*slot64)(Unk5CObj *self, void *arg1); /* Entity__MoodCue74 (Entity_e) as slot64(peer->heightCurve, D_8008AC1C) */
-};
-
-struct Unk5CObj {
-    Unk5CMethods *methods; /* +0x00 */
-};
 
 /* The object Entity__AttachToParent keeps in Actor's `grid` field (+0x04C):
  * its `parent` argument (code_4cd08 passes D_8008ABFC). Actor.h types the

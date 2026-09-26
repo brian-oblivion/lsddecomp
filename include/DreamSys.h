@@ -202,20 +202,16 @@ typedef struct {
 } FlashbackEntry;
 
 
-/* Struct pointed to by DreamSys::heightCurve. +0x14 / +0x20 are a pair of
-   two-word (x,y) points per DreamSys__ProjectPointAtDistance (MATCHED, elsewhere in
-   this unit; not independently re-confirmed this round). +0x24 (the second point's y) is
-   confirmed: DreamSys__StepLookOffset (round 2026-08-30) nudges it. +0x18 (the first
-   point's y) is also now confirmed: DreamSys__AdvanceMoveCycle (round 2026-09-02) nudges
-   it by the SAME delta as +0x24, in the same statement pair. It is an object:
-   Entity__MoodCue74 (Entity_e) calls +0x064 of the table at its +0x000
-   through Entity.h's Unk5CObj view (track 4, round 88). */
-typedef struct DreamSysUnk5C {
-	s8 unknown_values_0x0[0x18];
-	s32 startValue;
-	s8 unknown_values_0x1C[8];
-	s32 endValue;
-} DreamSysUnk5C;
+/* DreamSys::viewport is a Viewport (include/Viewport.h; tag only here,
+   DreamSys.c includes the header). Named heightCurve / DreamSysUnk5C until
+   track 4 (round 88); the offsets that view named are the Viewport's
+   GsRVIEW2 refView: +0x014 vp and +0x020 vr (the two "points"
+   ProjectPointAtDistance interpolates between), +0x018 vp.y and +0x024
+   vr.y (AdvanceMoveCycle's view bob moves both; StepLookOffset, StopDrift
+   and TickDrift move vr.y, i.e. look up and down). Obj865C8__Init installs
+   a New_Class869D8 through setViewport, and Entity__MoodCue74 calls its
+   setClearColor (+0x064). */
+struct Viewport;
 
 /* DreamSys::soundObj is a VabStreamObj (include/VabStreamObj.h): DreamSys.c
    casts it there. StartVoice / ExecuteLink call playTone (+0x080; the voice
@@ -459,9 +455,9 @@ extern RotationRatios ROTATION_YAW_MINUS45;
 /* Argument shape for InterpolateKeyframeValue: two "keyframe" points, each with a
    value (+0x4) and a position/time (+0x8); offset +0x0 unconfirmed
    (unread by this function). Called by still-INCLUDE_ASM DreamSys__ProjectPointAtDistance as
-   InterpolateKeyframeValue(&this->heightCurve->unknown_values_0x0[0x14], arg2, arg3) --
-   the first argument is one of DreamSysUnk5C's two documented "point"
-   fields (round 2026-08-30-d). */
+   InterpolateKeyframeValue(&viewport->refView.vp, &viewport->refView.vr, dist) --
+   the viewpoint and the reference point, read as {x, y = value, z =
+   position} (round 2026-08-30-d; the Viewport identification is round 88). */
 typedef struct DreamSysInterpPoint {
 	s8 unknown_values_0x0[4];
 	s32 value;
@@ -497,10 +493,9 @@ struct DreamSys {
 	/* Set by DreamSys__SetSoundObj(this, value): a VabStreamObj, cast to
 	   one where it is called through (include/VabStreamObj.h). */
 	s32 soundObj;
-	/* Set by DreamSys__SetHeightCurve(this, value); read as a pointer by
-	   DreamSys__ProjectPointAtDistance (this->heightCurve + 0x14 and + 0x20 are passed to
-	   InterpolateKeyframeValue), so it points to a pair of two-word (x,y) points. */
-	DreamSysUnk5C *heightCurve;
+	/* The camera: set by DreamSys__SetViewport (and the ctor's arg3); see
+	   `struct Viewport` above for the refView fields this class moves. */
+	struct Viewport *viewport;
 	/* Set unconditionally to the constructor's `arg1` by DreamSys__DreamSys
 	   (round 2026-09-02) -- see DreamSysCtorArgObj. No other observed use in
 	   this unit's queued functions. */
@@ -535,7 +530,7 @@ struct DreamSys {
 	s32 lookOffsetCommand;
 	/* Running accumulator nudged by lookOffsetCommand's table entry, or decayed by
 	   600/call towards 0 when lookOffsetCommand is 0; also propagated into
-	   heightCurve->endValue. Set by DreamSys__StepLookOffset (round 2026-08-30). */
+	   viewport->refView.vr.y. Set by DreamSys__StepLookOffset (round 2026-08-30). */
 	s32 lookOffset;
 	/* Index into the (LOOK_YAW_STEPS, LOOK_YAW_LIMITS) delta/threshold table pair,
 	   consumed and reset to 0 by DreamSys__StepLookYaw (round 2026-08-30). */
@@ -572,7 +567,7 @@ struct DreamSys {
 	/* Attempt/beat counter incremented (and bounded to [0,4)) by
 	   DreamSys__AdvanceMoveCycle on every call while moveCommand is nonzero; reset to 0 once
 	   moveCommand goes back to 0. Compared against 3 there to pick a +-50
-	   nudge applied to heightCurve's y fields, and against 4 (together with
+	   nudge applied to viewport->refView's vp.y and vr.y, and against 4 (together with
 	   moveMode) to force moveCommand back to 0 (round 2026-09-02). */
 	s32 moveCycleTick;
 	/* Derived from `linkTarget->flags36` masked to 0x7F, or forced to
@@ -759,7 +754,7 @@ struct DreamSysMethods {
 	/* +0x104 */ s32 (*getSetDreamTimeLimit)(DreamSys *self, s32 time);  /* DreamSys__GetSetDreamTimeLimit */
 	/* +0x108 */ s32 (*getDreamTimerScaled)(DreamSys *self);             /* DreamSys__GetDreamTimerScaled: tick / 15 */
 	/* +0x10C */ void (*setSoundObj)(DreamSys *self, s32 value);         /* DreamSys__SetSoundObj */
-	/* +0x110 */ void (*setHeightCurve)(DreamSys *self, void *value);    /* DreamSys__SetHeightCurve */
+	/* +0x110 */ void (*setViewport)(DreamSys *self, struct Viewport *value); /* DreamSys__SetViewport */
 	/* +0x114 */ void (*slot114)(DreamSys *self, s32 value);             /* DreamSys__func_5938c: unk_0x64 = value */
 	/* +0x118 */ void (*updateTickState)(DreamSys *self);                /* DreamSys__UpdateTickState */
 	/* +0x11C */ void (*runTickCallbacks)(DreamSys *self);               /* DreamSys__RunTickCallbacks */
