@@ -23,7 +23,7 @@
  * accidentally 4-aligned -- the compiler only knows the DECLARED alignment
  * of the type, not the runtime address (DECOMPILATION_LEARNINGS, "A struct
  * whose members are all s8/s16 has alignment 2"). Same idiom as
- * FlashbackRotation (include/DreamSys.h), CopyPolyVtx3's PolyXY8/PolyUV4
+ * FlashbackRotation (include/DreamSys.h), FillRVectors3's PolyXY8/PolyUV4
  * (code_8220.h) and Class866E8__SetTargetAndBuildRates. Formerly five separately typedef'd
  * copies (Vec2s16_98/_C04/_EE4/_A64/_268, one per call site, each named
  * for its own file offset); merged into one unit-local type round 77
@@ -60,9 +60,9 @@ void StoreSxyPolyGT4(void *dst, s32 storeFirst3) {
 void *SubmitPolyF3(void *prim, void *ctx) {
     if (*(s32 *)((u8 *)ctx + 0x78) != 0) {
         FillDivPolygonHeader(gDivPolygon3, ctx, (u8 *)prim + 0x4, 0, 0, 0);
-        CopyPolyVtx3((PolyVtx **)((u8 *)ctx + 0x88), (PolyVtx **)((u8 *)ctx + 0xA4),
-                     (PolyUV4 *)((u8 *)prim + 0x8), (PolyUV4 *)((u8 *)prim + 0xC),
-                     (PolyUV4 *)((u8 *)prim + 0x10));
+        FillRVectors3((PolyVtx **)((u8 *)ctx + 0x88), (PolyVtx **)((u8 *)ctx + 0xA4),
+                      (PolyUV4 *)((u8 *)prim + 0x8), (PolyUV4 *)((u8 *)prim + 0xC),
+                      (PolyUV4 *)((u8 *)prim + 0x10));
         return ((void *(*)(void *, void *))RCpolyF3)(prim, gDivPolygon3);
     }
     ((OtTag *)prim)->addr = (*(OtTag **)((u8 *)ctx + 0x30))->addr;
@@ -80,8 +80,8 @@ void *SubmitPolyG3(void *prim, void *ctx) {
 
     if (*(s32 *)(c + 0x78) != 0) {
         FillDivPolygonHeader(gDivPolygon3, c, self + 0x4, 0, 0, 0);
-        CopyPolyVtx3((PolyVtx **)(c + 0x88), (PolyVtx **)(c + 0xA4), (PolyUV4 *)(self + 0x8),
-                     (PolyUV4 *)(self + 0x10), (PolyUV4 *)(self + 0x18));
+        FillRVectors3((PolyVtx **)(c + 0x88), (PolyVtx **)(c + 0xA4), (PolyUV4 *)(self + 0x8),
+                      (PolyUV4 *)(self + 0x10), (PolyUV4 *)(self + 0x18));
 
         *(u16 *)(*(u8 **)(c + 0x88) + 0xA) = *(u8 *)(self + 0xF);
         *(u16 *)(*(u8 **)(c + 0x8C) + 0xA) = *(u8 *)(self + 0xF);
@@ -106,9 +106,9 @@ void *SubmitPolyFT3(void *prim, void *ctx) {
     if (*(s32 *)((u8 *)ctx + 0x78) != 0) {
         FillDivPolygonHeader(gDivPolygon3, ctx, (u8 *)prim + 0x4, 1, *(u16 *)((u8 *)prim + 0xE),
                              *(u16 *)((u8 *)prim + 0x16));
-        CopyPolyVtx3((PolyVtx **)((u8 *)ctx + 0x88), (PolyVtx **)((u8 *)ctx + 0xA4),
-                     (PolyUV4 *)((u8 *)prim + 0x8), (PolyUV4 *)((u8 *)prim + 0x10),
-                     (PolyUV4 *)((u8 *)prim + 0x18));
+        FillRVectors3((PolyVtx **)((u8 *)ctx + 0x88), (PolyVtx **)((u8 *)ctx + 0xA4),
+                      (PolyUV4 *)((u8 *)prim + 0x8), (PolyUV4 *)((u8 *)prim + 0x10),
+                      (PolyUV4 *)((u8 *)prim + 0x18));
 
         *(u16 *)(*(u8 **)((u8 *)ctx + 0x88) + 0xA) = *(u16 *)((u8 *)prim + 0x1E);
         *(u16 *)(*(u8 **)((u8 *)ctx + 0x8C) + 0xA) = *(u16 *)((u8 *)prim + 0x1E);
@@ -206,8 +206,8 @@ void *SubmitPolyGT3(void *prim, void *ctx) {
 
     if (*(s32 *)(c + 0x78) != 0) {
         FillDivPolygonHeader(gDivPolygon3, c, self + 0x4, 1, *(u16 *)(self + 0xE), *(u16 *)(self + 0x1A));
-        CopyPolyVtx3((PolyVtx **)(c + 0x88), (PolyVtx **)(c + 0xA4), (PolyUV4 *)(self + 0x8),
-                     (PolyUV4 *)(self + 0x14), (PolyUV4 *)(self + 0x20));
+        FillRVectors3((PolyVtx **)(c + 0x88), (PolyVtx **)(c + 0xA4), (PolyUV4 *)(self + 0x8),
+                      (PolyUV4 *)(self + 0x14), (PolyUV4 *)(self + 0x20));
 
         *(u16 *)(*(u8 **)(c + 0x88) + 0xA) = *(u16 *)(self + 0x26);
         *(u16 *)(*(u8 **)(c + 0x8C) + 0xA) = *(u16 *)(self + 0x26);
@@ -361,7 +361,7 @@ extern s32 sNdivOverride;
  * sNdivOverrideSet, else the D_80090C18 default), +0x4 sDivClipWidth,
  * +0x8 sDivClipHeight -- these three are UNCONDITIONAL; only the two u16 args
  * at +0xC/+0xE are gated on `hasUv1Codes`. +0x10 is an unaligned PolyUV4
- * copied from `*uv` (same lwl/lwr idiom as CopyPolyVtx3); +0x14 is the
+ * copied from `*uv` (same lwl/lwr idiom as FillRVectors3); +0x14 is the
  * plain word at `ctx + 0x30` (the caller's computed OT bucket pointer,
  * code_8220.h). Pure header-populate leaf, same shape at all 8 call
  * sites: tier A. */
@@ -407,7 +407,7 @@ void FillDivPolygonHeader(void *table, void *ctx, PolyUV4 *uv, s32 hasUv1Codes, 
  * these six assignments, byte-exact, and CLAUDE.md HARD RULE 6 cites it as
  * the example of "hard to type" not being "no C form".
  */
-void CopyPolyVtx3(PolyVtx **dst, PolyVtx **src, PolyUV4 *uv0, PolyUV4 *uv1, PolyUV4 *uv2) {
+void FillRVectors3(PolyVtx **dst, PolyVtx **src, PolyUV4 *uv0, PolyUV4 *uv1, PolyUV4 *uv2) {
     dst[0]->xy = src[0]->xy;
     dst[1]->xy = src[1]->xy;
     dst[2]->xy = src[2]->xy;
@@ -417,7 +417,7 @@ void CopyPolyVtx3(PolyVtx **dst, PolyVtx **src, PolyUV4 *uv0, PolyUV4 *uv1, Poly
 }
 
 void CopyPolyVtx4(PolyVtx **dst, PolyVtx **src, PolyUV4 *uv0, PolyUV4 *uv1, PolyUV4 *uv2, PolyUV4 *uv3) {
-    CopyPolyVtx3(dst, src, uv0, uv1, uv2);
+    FillRVectors3(dst, src, uv0, uv1, uv2);
     dst[3]->xy = src[3]->xy;
     dst[3]->uv = *uv3;
 }

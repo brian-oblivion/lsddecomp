@@ -339,7 +339,7 @@ void SubmitPolyF3(void *arg0, void *arg1) {
         (*(OtTag **)((u8 *)arg1 + 0x30))->addr = (u32)arg0;
     } else {
         FillDivPolygonHeader(gDivPolygon3, arg1, (u8 *)arg0 + 0x4, 0, 0, 0);
-        CopyPolyVtx3((PolyVtx **)((u8 *)arg1 + 0x88), (PolyVtx **)((u8 *)arg1 + 0xA4),
+        FillRVectors3((PolyVtx **)((u8 *)arg1 + 0x88), (PolyVtx **)((u8 *)arg1 + 0xA4),
                       (PolyUV4 *)((u8 *)arg0 + 0x8), (PolyUV4 *)((u8 *)arg0 + 0xC),
                       (PolyUV4 *)((u8 *)arg0 + 0x10));
         RCpolyF3(arg0, gDivPolygon3);
@@ -369,7 +369,7 @@ either splices `arg0` into an OT-style singly-linked list threaded through
 `arg1->0x30` (packed pointer: top byte is a tag preserved across the
 splice, low 24 bits are the address), or — when `arg1->0x78` is set —
 routes through `FillDivPolygonHeader` (gp_rel-blocked, this unit),
-`CopyPolyVtx3` (matched this round, this unit) and `func_8001A564`
+`FillRVectors3` (matched this round, this unit) and `func_8001A564`
 (Psy-Q SDK) instead, passing a shared table `gDivPolygon3`.
 
 ## Best body reached (46/54 words)
@@ -400,7 +400,7 @@ void SubmitPolyF3(void *arg0, void *arg1)
         }
     } else {
         FillDivPolygonHeader(gDivPolygon3, arg1, (u8 *)arg0 + 0x4, 0, 0, 0);
-        CopyPolyVtx3((u8 *)arg1 + 0x88, (u8 *)arg1 + 0xA4, (u8 *)arg0 + 0x8, (u8 *)arg0 + 0xC, (u8 *)arg0 + 0x10);
+        FillRVectors3((u8 *)arg1 + 0x88, (u8 *)arg1 + 0xA4, (u8 *)arg0 + 0x8, (u8 *)arg0 + 0xC, (u8 *)arg0 + 0x10);
         func_8001A564(arg0, gDivPolygon3);
     }
 }
@@ -409,7 +409,7 @@ void SubmitPolyF3(void *arg0, void *arg1)
 
 Build compiles clean, no address drift (in-range comparison, retail's
 declared `0xD8` bytes = 54 words, matched exactly by this body's length).
-The whole `else` branch (the `FillDivPolygonHeader`/`CopyPolyVtx3`/`func_8001A564`
+The whole `else` branch (the `FillDivPolygonHeader`/`FillRVectors3`/`func_8001A564`
 calls) is BYTE-EXACT — every remaining diff is inside the `if` branch (the
 linked-list splice).
 
@@ -571,7 +571,7 @@ happens to evaluate its argument twice.
   load-delay slot, it does not invent one. Something in the real source reads
   or forms `arg0 + 0x14`. Whoever holds this unit knows what lives at `+0x14`
   in this object from the seven siblings and the `FillDivPolygonHeader`/
-  `CopyPolyVtx3` call sites, and is far better placed to name it than a
+  `FillRVectors3` call sites, and is far better placed to name it than a
   cold re-derivation.
 
 ### Why the original conclusion read as exhaustive
@@ -836,7 +836,7 @@ Following the head's lead from the `code_8220_b` read (`SubmitPolyGT4`'s
 filler independently measured as one-past-the-end of 4 stride-0xC records),
 tested the concrete hypothesis that this function's own filler
 (`addiu $v0,$s1,0x14`, one past `uv2` at `arg0+0x10`) comes from a genuine
-one-past-the-end POINTER EXPRESSION for the `CopyPolyVtx3` call's third
+one-past-the-end POINTER EXPRESSION for the `FillRVectors3` call's third
 `PolyUV4 *` argument, rather than the plain `arg0+0x10` offset this body
 already writes.
 
@@ -1072,7 +1072,7 @@ C form all along, misdiagnosed as a scheduling residue) does NOT recur
 anywhere in this nine-function family.** Every one of these nine functions'
 preserved best-body sources (see each one's own report, and the bodies
 still inlined in `src/code_8220_c.c` under `#if 0`) is already ordinary C —
-the `OtTag` bitfield splice plus the `FillDivPolygonHeader`/`CopyPolyVtx3`/
+the `OtTag` bitfield splice plus the `FillDivPolygonHeader`/`FillRVectors3`/
 `CopyPolyVtx4` call sequence — with no asm block anywhere in any of them.
 So the two residue classes on this unit's work list are genuinely distinct:
 `CopyPolyVtx4`'s was a wrong SOURCE SHAPE (asm standing in for a callable

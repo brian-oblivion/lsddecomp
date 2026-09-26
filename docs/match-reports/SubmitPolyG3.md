@@ -205,7 +205,7 @@ void SubmitPolyG3(void *arg0, void *arg1) {
         } while (0);
     } else {
         FillDivPolygonHeader(gDivPolygon3, prim, self + 0x4, 0, 0, 0);
-        CopyPolyVtx3((PolyVtx **)(prim + 0x88), (PolyVtx **)(prim + 0xA4),
+        FillRVectors3((PolyVtx **)(prim + 0x88), (PolyVtx **)(prim + 0xA4),
                       (PolyUV4 *)(self + 0x8), (PolyUV4 *)(self + 0x10),
                       (PolyUV4 *)(self + 0x18));
 
@@ -341,7 +341,7 @@ void SubmitPolyG3(void *arg0, void *arg1) {
         (*(OtTag **)(prim + 0x30))->addr = (u32)self;
     } else {
         FillDivPolygonHeader(gDivPolygon3, prim, self + 0x4, 0, 0, 0);
-        CopyPolyVtx3((PolyVtx **)(prim + 0x88), (PolyVtx **)(prim + 0xA4),
+        FillRVectors3((PolyVtx **)(prim + 0x88), (PolyVtx **)(prim + 0xA4),
                       (PolyUV4 *)(self + 0x8), (PolyUV4 *)(self + 0x10),
                       (PolyUV4 *)(self + 0x18));
 
@@ -367,7 +367,7 @@ INCLUDE_ASM("asm/nonmatchings/code_8220_c", SubmitPolyG3);
 Unit: `src/code_8220_c.c`. Third sibling of `SubmitPolyF3`/`SubmitPolyF4`
 (this unit, both stalled) — same `prim->0x78`-gated OT-splice-or-calls
 shape, this time with MORE post-call work: after
-`FillDivPolygonHeader`(gp_rel-blocked)/`CopyPolyVtx3` (matched), it copies a byte
+`FillDivPolygonHeader`(gp_rel-blocked)/`FillRVectors3` (matched), it copies a byte
 from `self` (widened to `s16`) into three output records' `+0xA` field,
 then an unaligned 4-byte value from three different `self` offsets into
 the same three records' `+0xC` field, then calls `func_8001AD54` (Psy-Q
@@ -411,7 +411,7 @@ void SubmitPolyG3(void *arg0, void *arg1)
         }
     } else {
         FillDivPolygonHeader(gDivPolygon3, prim, self + 0x4, 0, 0, 0);
-        CopyPolyVtx3(prim + 0x88, prim + 0xA4, self + 0x8, self + 0x10, self + 0x18);
+        FillRVectors3(prim + 0x88, prim + 0xA4, self + 0x8, self + 0x10, self + 0x18);
 
         *(u16 *)(*(u8 **)(prim + 0x88) + 0xA) = *(u8 *)(self + 0xF);
         *(u16 *)(*(u8 **)(prim + 0x8C) + 0xA) = *(u8 *)(self + 0xF);
@@ -456,7 +456,7 @@ field, wrong offset, or missing/extra instruction).
    longer "calls" branch — 8 uses vs. `prim`'s 5) ends up in the
    HIGHER-numbered register, register choices for EVERY subsequent
    temporary in the calls branch differ from retail's too (confirmed:
-   the `CopyPolyVtx3` call's own argument setup, otherwise byte-identical
+   the `FillRVectors3` call's own argument setup, otherwise byte-identical
    in the two shorter siblings, differs here in exactly the ADDIU
    destination registers, not the values).
 
@@ -484,8 +484,8 @@ field, wrong offset, or missing/extra instruction).
    three `Vec2s16_98` word copies) as one literal `__asm__` block with `"r"`
    operands for `prim`/`self` and raw `$2`/`$3` scratch, mirroring retail's
    own register choices for the SCRATCH registers exactly (this technique
-   is what made `CopyPolyVtx3` byte-exact) — regressed sharply to 4/84
-   with drift. The difference from `CopyPolyVtx3`'s success: there, the
+   is what made `FillRVectors3` byte-exact) — regressed sharply to 4/84
+   with drift. The difference from `FillRVectors3`'s success: there, the
    whole function's parameters arrived directly in `$a0`-`$a3` (natural
    ABI registers, no prior C code to disturb them); here, `prim`/`self` are
    MID-FUNCTION values already living in whatever callee-saved registers

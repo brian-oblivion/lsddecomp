@@ -11,11 +11,11 @@
 
 Unit: `src/code_8220_c.c`. `void CopyPolyVtx4(PolyVtx **dst, PolyVtx **src,
 PolyUV4 *uv0, PolyUV4 *uv1, PolyUV4 *uv2, PolyUV4 *uv3)` — calls
-`CopyPolyVtx3(dst, src, uv0, uv1, uv2)` (matched round 13, same unit), then
+`FillRVectors3(dst, src, uv0, uv1, uv2)` (matched round 13, same unit), then
 does its own single unaligned 8-byte copy (`src[3]->xy` -> `dst[3]->xy`) and
 a 4-byte unaligned copy (`*uv3` -> `dst[3]->uv`). `arg2`/`arg3` (`uv0`/`uv1`)
 are unused by this function itself — genuinely just forwarded through to
-`CopyPolyVtx3`'s corresponding parameters, per the "unused parameter shows
+`FillRVectors3`'s corresponding parameters, per the "unused parameter shows
 up in the caller as uninitialised" idiom, except here it is not garbage,
 it is a deliberate pass-through.
 
@@ -26,7 +26,7 @@ attempts were run against a whole-function raw-register `__asm__`
 transcription of the tail copy — a HARD RULE 6 violation waiting to happen
 (the rule's own text names this exact case: "an awkward unaligned struct
 copy" has a C form, unlike a GTE/COP2 store). They were never tried against
-plain C using the same idiom that already matched `CopyPolyVtx3` in this
+plain C using the same idiom that already matched `FillRVectors3` in this
 same file, which is what actually closed it. Preserved for the record.
 
 ## Best body reached (28/35 words, attempts 1, 4, 7, 10 landed here)
@@ -39,7 +39,7 @@ void CopyPolyVtx4(void *arg0, void *arg1, void *arg2, void *arg3, void *arg4, vo
     void *p0 = arg0;
     void *p5 = arg5;
 
-    CopyPolyVtx3(p0, p1, arg2, arg3, arg4);
+    FillRVectors3(p0, p1, arg2, arg3, arg4);
 
     __asm__ volatile (
         "lw $3, 0xc(%0)\n\t"
@@ -87,7 +87,7 @@ lw    $v0,0x38($sp)        ; arg4 (needed only for the call)
 sw    $s2,0x20($sp)
 lw    $s2,0x3c($sp)        ; s2 = arg5
 sw    $ra,0x24($sp)
-jal   CopyPolyVtx3
+jal   FillRVectors3
 ```
 
 My best body's built object (`objdump -d build/src/code_8220_c.c.o`)
@@ -196,7 +196,7 @@ diffs, not genuine reshaping: `output-180-1` wraps the whole body in
 `do { ... } while (0);` (semantically identical, no plausible mechanism to
 move a prologue store's schedule), and `output-165-1` introduces a
 self-assignment `new_var = (new_var = p1);` and reuses `new_var` as a bogus
-extra argument to `CopyPolyVtx3` in place of `p1`/`arg4` in a way that
+extra argument to `FillRVectors3` in place of `p1`/`arg4` in a way that
 would change which value is passed -- likely wrong, not just reordered.
 Neither was oracle-tested (unlike `SubmitPolyF3`'s cached-`head`
 candidate, which WAS verified and found to cause address drift -- see that
@@ -216,27 +216,27 @@ absent" component at all, so a candidate that changes the INSTRUCTION COUNT
 exactly what both saved sub-210 candidates here turned out to be under
 inspection.
 
-## ROUND 20: MATCH (35/35 words) — the tail copy is CopyPolyVtx3's own idiom, one element further
+## ROUND 20: MATCH (35/35 words) — the tail copy is FillRVectors3's own idiom, one element further
 
 **The mistake in every attempt above: treating this function as needing a
 hand-written asm transcription at all.** Re-reading `CopyPolyVtx4`'s own
-disassembly side by side with `CopyPolyVtx3`'s (the already-matched sibling
+disassembly side by side with `FillRVectors3`'s (the already-matched sibling
 this function calls) shows the tail copy is not a bespoke unaligned-copy
-routine — it is `CopyPolyVtx3`'s own 4th-vertex case, done inline by the
-caller instead of the callee. `CopyPolyVtx3` copies `dst[i]->xy = src[i]->xy`
+routine — it is `FillRVectors3`'s own 4th-vertex case, done inline by the
+caller instead of the callee. `FillRVectors3` copies `dst[i]->xy = src[i]->xy`
 and `dst[i]->uv = *uvI` for `i = 0,1,2`; `CopyPolyVtx4`'s own body does
 exactly the same two field copies for `i = 3` — `*(arg0+0xC)` and
 `*(arg1+0xC)` are simply `dst[3]` and `src[3]` (pointer-array element 3, at
 byte offset 3*4 = 0xC), and the second copy target `(*(arg0+0xC))+0x10` is
 `dst[3]->uv` (the `PolyVtx` `uv` member is at offset 0x10 — identical layout
-to what `CopyPolyVtx3` already established for elements 0-2).
+to what `FillRVectors3` already established for elements 0-2).
 
 So the function is:
 
 ```c
 void CopyPolyVtx4(PolyVtx **dst, PolyVtx **src, PolyUV4 *uv0, PolyUV4 *uv1,
                    PolyUV4 *uv2, PolyUV4 *uv3) {
-    CopyPolyVtx3(dst, src, uv0, uv1, uv2);
+    FillRVectors3(dst, src, uv0, uv1, uv2);
     dst[3]->xy = src[3]->xy;
     dst[3]->uv = *uv3;
 }
@@ -244,7 +244,7 @@ void CopyPolyVtx4(PolyVtx **dst, PolyVtx **src, PolyUV4 *uv0, PolyUV4 *uv1,
 
 `dst[3]->xy = src[3]->xy` and `dst[3]->uv = *uv3` are whole-struct
 assignments of the SAME alignment-2, all-`s16` types (`PolyXY8`, `PolyUV4`)
-that already make `CopyPolyVtx3` compile to `lwl`/`lwr` + `swl`/`swr` — the
+that already make `FillRVectors3` compile to `lwl`/`lwr` + `swl`/`swr` — the
 exact instruction shapes retail uses here too. Nothing about this residue was
 ever a genuine "no C form exists" case; it was the ordinary struct-copy
 idiom, just not recognised as the same idiom as its own sibling call.
@@ -265,7 +265,7 @@ hand-written asm block's necessarily-different one.
 **Header change:** `CopyPolyVtx4`'s declaration in `include/code_8220.h`
 retyped from six `void *` parameters to `PolyVtx **dst, PolyVtx **src,
 PolyUV4 *uv0, PolyUV4 *uv1, PolyUV4 *uv2, PolyUV4 *uv3` (matching
-`CopyPolyVtx3`'s own signature plus the 4th UV). This is a change to an
+`FillRVectors3`'s own signature plus the 4th UV). This is a change to an
 EXISTING declaration; `include/code_8220.h` is shared by three units this
 round but no other runner holds one this round, and the build after the
 change is `build exit=0` (whole-image SHA1 match), so no other unit's
@@ -287,14 +287,14 @@ C form: don't just ask "can C express this copy" in the abstract, ask "does
 a function three lines above already express this exact copy, just with a
 different index." The tell, in hindsight: `CopyPolyVtx4`'s own preserved
 asm block copied the SAME 8-byte-then-4-byte shape, at the SAME relative
-offsets (`+0x0`/`+0x10`), that `CopyPolyVtx3`'s C body already copies for
+offsets (`+0x0`/`+0x10`), that `FillRVectors3`'s C body already copies for
 elements 0-2 — the index literally differs by one array slot. A register-
 identity/instruction-order residue that resists ten structurally distinct
 manual-declaration-order and barrier-placement attempts is a strong signal
 the C shape itself (not just the declaration order within it) is wrong, and
 "a whole-function raw asm block was substituted for an ordinary call
 sequence + struct copy" is now a second confirmed instance of that shape
-error, alongside CLAUDE.md's own `CopyPolyVtx3` precedent from round 13
+error, alongside CLAUDE.md's own `FillRVectors3` precedent from round 13
 (the six-line struct-copy rewrite of what had been proposed as a
 whole-function raw-register `__asm__`).
 
@@ -343,5 +343,5 @@ only confirmed instance of this mistake found so far project-wide.
 ## Naming (round 77, alpha)
 
 `func_8001A4C0` -> `CopyPolyVtx4`. **Tier A**: same pure-leaf-copy
-reasoning as CopyPolyVtx3, which this function forwards to (elements 0-2)
+reasoning as FillRVectors3, which this function forwards to (elements 0-2)
 before doing its own element-3 copy. Parameters unchanged.

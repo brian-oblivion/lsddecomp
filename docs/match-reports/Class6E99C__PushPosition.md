@@ -431,7 +431,7 @@ insertion/deletion pair in the final field-copy. Where available, run
 `--debug` (or `asm-differ`) BEFORE accepting a "register-identity-only"
 classification, not only before a permuter search -- the classification
 itself can be the thing that is wrong, and CLAUDE.md's own worked example
-for this exact ban (the `CopyPolyVtx3` whole-function `__asm__` reversal)
+for this exact ban (the `FillRVectors3` whole-function `__asm__` reversal)
 is a precedent for exactly this failure mode: an unverified structural
 claim treated as settled fact blocked a real fix. Separately: **a
 statement-level change to one field pair can flip a DIFFERENT, unrelated

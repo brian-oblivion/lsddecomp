@@ -188,7 +188,7 @@ included by the unit.)
 Unit: `src/code_8220_c.c`. Quad-flavored sibling of `SubmitPolyF3` (this
 unit, also stalled at the identical residue) — same OT-splice-or-calls
 structure, `gDivPolygon4` instead of `gDivPolygon3`, `CopyPolyVtx4` (also
-stalled this unit, 6-arg quad-flavored copy) instead of `CopyPolyVtx3`,
+stalled this unit, 6-arg quad-flavored copy) instead of `FillRVectors3`,
 and `func_8001A8D4` (Psy-Q SDK, `asm/psyq_rcpolyf4.s`, quad-flavored
 sibling of `func_8001A564`) instead of `func_8001A564`.
 
@@ -345,7 +345,7 @@ above/in this report's earlier sections as "also stalled this unit") is now
 MATCHED (35/35), round 20 — see `CopyPolyVtx4.md`. Its stall was a wrong
 SOURCE SHAPE (an unnecessary whole-function raw-register `__asm__`
 transcription of what turned out to be ordinary struct-copy C, one array
-element past what `CopyPolyVtx3` already handles), not a residue of this
+element past what `FillRVectors3` already handles), not a residue of this
 family's own register-identity/delay-slot-filler class. This function's own
 remaining residue is unaffected — `CopyPolyVtx4` is called via ordinary
 `jal`, and the whole-image build is `build exit=0` after the retype, so

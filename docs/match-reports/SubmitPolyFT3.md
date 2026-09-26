@@ -173,7 +173,7 @@ void SubmitPolyFT3(void *arg0, void *arg1) {
         (*(OtTag **)((u8 *)arg1 + 0x30))->addr = (u32)arg0;
     } else {
         FillDivPolygonHeader(gDivPolygon3, arg1, (u8 *)arg0 + 0x4, 1, *(u16 *)((u8 *)arg0 + 0xE), *(u16 *)((u8 *)arg0 + 0x16));
-        CopyPolyVtx3((PolyVtx **)((u8 *)arg1 + 0x88), (PolyVtx **)((u8 *)arg1 + 0xA4),
+        FillRVectors3((PolyVtx **)((u8 *)arg1 + 0x88), (PolyVtx **)((u8 *)arg1 + 0xA4),
                       (PolyUV4 *)((u8 *)arg0 + 0x8), (PolyUV4 *)((u8 *)arg0 + 0x10),
                       (PolyUV4 *)((u8 *)arg0 + 0x18));
 
@@ -238,7 +238,7 @@ void SubmitPolyFT3(void *arg0, void *arg1)
         }
     } else {
         FillDivPolygonHeader(gDivPolygon3, prim, self + 0x4, 1, *(u16 *)(self + 0xE), *(u16 *)(self + 0x16));
-        CopyPolyVtx3(prim + 0x88, prim + 0xA4, self + 0x8, self + 0x10, self + 0x18);
+        FillRVectors3(prim + 0x88, prim + 0xA4, self + 0x8, self + 0x10, self + 0x18);
 
         *(u16 *)(*(u8 **)(prim + 0x88) + 0xA) = *(u16 *)(self + 0x1E);
         *(u16 *)(*(u8 **)(prim + 0x8C) + 0xA) = *(u16 *)(self + 0x1E);

@@ -158,7 +158,7 @@ typedef struct OtTag {
     u32 len : 8;
 } OtTag;
 
-/* CopyPolyVtx3's payload types (round 13). Both are ALL-s16 and that is
+/* FillRVectors3's payload types (round 13). Both are ALL-s16 and that is
  * load-bearing: all-s16 members give alignment 2, which is what makes a
  * whole-struct assignment compile to unaligned lwl/lwr + swl/swr instead of
  * aligned lw/sw. See DECOMPILATION_LEARNINGS, "A struct whose members are
@@ -176,7 +176,7 @@ typedef struct PolyUV4 {
     s16 v;
 } PolyUV4;
 
-/* CopyPolyVtx3's element type. Only the 8-byte payload at +0x000 and the
+/* FillRVectors3's element type. Only the 8-byte payload at +0x000 and the
  * 4-byte payload at +0x010 are touched by that function; the span between
  * is opaque from it alone. */
 typedef struct PolyVtx {
@@ -187,7 +187,7 @@ typedef struct PolyVtx {
 
 /* Unaligned struct-field copy helper, code_8220_c (round 13). Takes two
  * 3-element arrays of PolyVtx pointers plus three UV sources. */
-extern void CopyPolyVtx3(PolyVtx **dst, PolyVtx **src, PolyUV4 *uv0, PolyUV4 *uv1, PolyUV4 *uv2);
+extern void FillRVectors3(PolyVtx **dst, PolyVtx **src, PolyUV4 *uv0, PolyUV4 *uv1, PolyUV4 *uv2);
 
 /* Populates a submit table's (`table`, gDivPolygon3/gDivPolygon4):
  * +0x00 an OT/code word (sNdivOverride when sNdivOverrideSet is set, else
@@ -195,7 +195,7 @@ extern void CopyPolyVtx3(PolyVtx **dst, PolyVtx **src, PolyUV4 *uv0, PolyUV4 *uv
  * UNCONDITIONAL (the third rides in the branch's own delay slot in
  * retail); only the two u16 stack args at +0x0C/+0x0E are actually
  * gated on `hasUv1Codes != 0`. +0x10 is an unaligned PolyUV4 copied from
- * `*uv` (same lwl/lwr idiom as CopyPolyVtx3, forced by PolyUV4's
+ * `*uv` (same lwl/lwr idiom as FillRVectors3, forced by PolyUV4's
  * alignment-2 all-s16 layout); +0x14 is the plain word at
  * `ctx + 0x30`. MATCHED round 44 after the gp_rel blocker that
  * stalled it at carve time (round 13) was resolved -- see
@@ -232,7 +232,7 @@ extern u8 gDivPolygon3[];
 extern u8 gDivPolygon4[];
 
 /* Unaligned struct-field copy helper (quad flavor: 4 fields, not 3).
- * Extends CopyPolyVtx3 to a 4th vertex: forwards elements 0-2 to it
+ * Extends FillRVectors3 to a 4th vertex: forwards elements 0-2 to it
  * unchanged, then does its own dst[3]->xy = src[3]->xy / dst[3]->uv = *uv3
  * (round 20). */
 extern void CopyPolyVtx4(PolyVtx **dst, PolyVtx **src, PolyUV4 *uv0, PolyUV4 *uv1, PolyUV4 *uv2,
