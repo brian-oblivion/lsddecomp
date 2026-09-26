@@ -834,7 +834,7 @@ typedef struct Class869D8Methods Class869D8Methods;
  * Vtable gClass869D8Methods (asm/data/76DC8.data.s, header word 0x17). Only the
  * slots this unit's own functions reach are typed: +0x008 (ctor,
  * Class869D8__Class869D8, called by New_Class869D8) and +0x040 (a
- * post-construct hook, func_8004D2F8 -- already matched, empty body, no
+ * post-construct hook, Class869D8__InitDefaults -- already matched, empty body, no
  * established purpose beyond "runs right after self->methods is installed"
  * -- same shape as Class86B60Methods::onConstruct below).
  */
@@ -842,15 +842,15 @@ struct Class869D8Methods {
     u8 pad000[0x008];
     void (*ctor)(Class869D8 *self);            /* +0x008, Class869D8__Class869D8 */
     u8 pad00C[0x040 - 0x00C];
-    void (*onConstruct)(Class869D8 *self);     /* +0x040, func_8004D2F8 (empty body) */
+    void (*onConstruct)(Class869D8 *self);     /* +0x040, Class869D8__InitDefaults (empty body) */
 };
 
 struct Class869D8 {
     Class869D8Methods *methods;                /* +0x000 */
     u8 pad004[0x010 - 0x004];
-    s32 unk10;                                  /* +0x010, Class869D8__ForwardIfUnk10AndUnk70: gates the slot9C call (nonzero test) */
+    s32 unk10;                                  /* +0x010, Class869D8__Update: gates the slot9C call (nonzero test) */
     u8 pad14[0x070 - 0x014];
-    s32 unk70;                                  /* +0x070, Class869D8__ForwardIfUnk10AndUnk70: gates the slot9C call (nonzero test) */
+    s32 unk70;                                  /* +0x070, Class869D8__Update: gates the slot9C call (nonzero test) */
     u8 pad74[0x0DC - 0x074];                     /* struct ends at the New_Class869D8 alloc size, 0xDC */
 };
 

@@ -1,4 +1,6 @@
-# Class869D8__ForwardIfUnk10AndUnk70
+# Class869D8__Update
+
+> Renamed from `Class869D8__ForwardIfUnk10AndUnk70` on 2026-09-26 (tools/rename.py). Address 0x8004d300.
 
 > Renamed from `func_8004D300` on 2026-09-22 (tools/rename.py). Address 0x8004d300.
 
@@ -13,7 +15,7 @@ ctor table's own `+0x09C` slot with `self` as the only argument.
 ## The C
 
 ```c
-void Class869D8__ForwardIfUnk10AndUnk70(Class869D8 *self)
+void Class869D8__Update(Class869D8 *self)
 {
     if (self->unk10 != 0 && self->unk70 != 0) {
         GetViewportMethods()->slot9C(self);
@@ -46,7 +48,7 @@ pattern.
 
 ## Naming
 
-**Class869D8__ForwardIfUnk10AndUnk70** -- tier B. Mechanics are fully
+**Class869D8__Update** -- tier B. Mechanics are fully
 evident from the body (forward to the base ctor table's `slot9C` iff both
 `unk10` and `unk70` are nonzero) but the fields' real meaning, and so the
 forward's in-game purpose, is not established -- only that both gate the
@@ -60,3 +62,16 @@ support. `unk10`/`unk70` themselves are left unnamed -- no evidence beyond
 ## Track 4 (2026-09-25, round 85, bravo)
 
 The forward is Viewport's +0x09C `update` (`GetViewportMethods()->update((Viewport *)self)`, include/Viewport.h, round 85). In Viewport's layout, `unk10` is `viewNode` and `unk70` is `otReady`; Class869D8's own view keeps its names. Byte-identical.
+
+## Track 4 (2026-09-26, round 87)
+
+Renamed from `Class869D8__ForwardIfUnk10AndUnk70` for its slot. It occupies
+gClass869D8Methods +0x09C, Viewport's `update` (gViewportMethods +0x09C holds
+`Viewport__Update`), and forwards to exactly that occupant through
+`GetViewportMethods()->update`. The two gate fields are Viewport's own:
++0x010 is `viewNode` (the class-4 child AddChild caches) and +0x070 is
+`otReady` (InitOt sets it). Viewport__Update already returns early on
+`otReady == 0` but then dereferences `viewNode->parent` unguarded, so what
+the override adds is a NULL `viewNode` guard: the class updates only once a
+view node is attached. That is the slot's job with a precondition, not more
+than the slot name says.

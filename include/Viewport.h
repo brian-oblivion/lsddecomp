@@ -97,7 +97,7 @@ struct ViewportOt {
  * ones (ctor, finalize, addChild, removeChild, removeAllChildren, onNotify). */
 #define VIEWPORT_SLOTS(Self, CtorParams)                                                           \
     BASICCLASS_SLOTS(Self, CtorParams);                                                            \
-    /* +0x040 */ void (*initDefaults)(Self *self);                  /* Viewport__InitDefaults; Class869D8: func_8004D2F8, empty */ \
+    /* +0x040 */ void (*initDefaults)(Self *self);                  /* Viewport__InitDefaults; Class869D8: Class869D8__InitDefaults, empty */ \
     /* +0x044 */ void (*setScreenSize)(Self *self, ViewportSize *size); /* Viewport__SetScreenSize */ \
     /* +0x048 */ void (*setOtLength)(Self *self, s32 length);      /* Viewport__SetOtLength */       \
     /* +0x04C */ void (*setUnk44)(Self *self, s32 value);          /* Viewport__SetUnk44, before InitOt only */ \
@@ -120,7 +120,7 @@ struct ViewportOt {
     /* +0x090 */ void (*deinitOt)(Self *self);                     /* Viewport__DeinitOt */          \
     /* +0x094 */ void (*onNotifyTag5)(Self *self, BasicClass *sender, s32 event); /* Viewport__OnNotifyTag5: onNotify's class-5 (D_8006EF50) case */ \
     /* +0x098 */ void (*onNotifyTag1)(Self *self, BasicClass *sender, s32 event); /* Viewport__OnNotifyTag1: onNotify's DrawSystem (1) case */ \
-    /* +0x09C */ void (*update)(Self *self);                       /* Viewport__Update; Class869D8__ForwardIfUnk10AndUnk70 */ \
+    /* +0x09C */ void (*update)(Self *self);                       /* Viewport__Update; Class869D8__Update */ \
     /* +0x0A0 */ void (*drawNode)(Self *self, Class6B5CC *node);   /* Viewport__DrawNode (code_2864) */ \
     /* +0x0A4 */ void (*flip)(Self *self);                         /* Viewport__Flip */              \
     /* +0x0A8 */ void (*setSubHandle)(Self *self, Class6B5CC *handle); /* Viewport__SetSubHandle */  \

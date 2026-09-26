@@ -44,10 +44,10 @@ void Class869D8__Class869D8(Class869D8 *self)
     self->methods->onConstruct(self);
 }
 
-void func_8004D2F8(void) {
+void Class869D8__InitDefaults(void) {
 }
 
-void Class869D8__ForwardIfUnk10AndUnk70(Class869D8 *self)
+void Class869D8__Update(Class869D8 *self)
 {
     if (self->unk10 != 0 && self->unk70 != 0) {
         GetViewportMethods()->update((Viewport *)self);
