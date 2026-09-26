@@ -73,10 +73,10 @@ identical.
 
 Renamed `func_8002C824` -> `VabStreamObj__OnBodyReady`, tier B. Confirmed
 as `gVabStreamObjMethods`'s own +0x078 slot, and its only caller in this
-unit is `VabStreamObj__Update`'s own case-6 branch, dispatched right after
+unit is `VabStreamObj__AdvanceLoadState`'s own case-6 branch, dispatched right after
 `SsVabTransBody` succeeds (`self->methods->slot78(self, 1)`) -- so this is
 the notification step between "body transfer just finished" and "go load
 the VAG attribute tables" (`slot7C`/`VabStreamObj__LoadVagAttrs`). Tier B,
 not A: this reads as a virtual hook a subclass could override, and nothing
-in this unit shows whether anything OTHER than `VabStreamObj__Update` ever
+in this unit shows whether anything OTHER than `VabStreamObj__AdvanceLoadState` ever
 dispatches through it.

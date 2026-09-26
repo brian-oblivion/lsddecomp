@@ -35,7 +35,7 @@
  * `StopService`/`CancelRequests`), are all empty no-ops.
  *
  * `gVabStreamObjMethods` is the real work: `VabStreamObj__VabStreamObj` is
- * its constructor, `VabStreamObj__Close` its close, `VabStreamObj__Update`
+ * its constructor, `VabStreamObj__Finalize` its close, `VabStreamObj__AdvanceLoadState`
  * its per-frame poll (header/body transfer state machine), and
  * `VabStreamObj__LoadVagAttrs` its post-load VAB attribute-table fetch --
  * confirmed round 43 as a PS1 SPU/VAB sound-streaming object.
@@ -87,27 +87,27 @@ typedef struct VabStreamObj VabStreamObj;
 /* gVabStreamObjMethods's own methods table -- the class VabStreamObj below
  * dispatches through.  Only the slots this unit's own functions call or are
  * assigned to are named.  round 43 added slot58/slot5C/slot6C/slot9C once
- * VabStreamObj__VabStreamObj, VabStreamObj__Update and
+ * VabStreamObj__VabStreamObj, VabStreamObj__AdvanceLoadState and
  * VabStreamObj__LoadVagAttrs (all round-17 gp_rel stalls, resolved round 42)
  * were actually worked. */
 typedef struct VabStreamObjMethods {
     u8 pad000[0x008];
     void (*slot08)(void *self, char *arg1); /* VabStreamObj__VabStreamObj -- this unit's own new_class_da34 dispatch; arg1 is a base filename, not a plain s32 */
-    s32 (*slot0C)(VabStreamObj *self);      /* VabStreamObj__Close, confirmed against gVabStreamObjMethods's own rodata (+0x0C) */
+    s32 (*slot0C)(VabStreamObj *self);      /* VabStreamObj__Finalize, confirmed against gVabStreamObjMethods's own rodata (+0x0C) */
     u8 pad010[0x058 - 0x010];
     /* +0x058 and +0x06C are BOTH null in retail's own gVabStreamObjMethods
-     * (confirmed against asm/data/5E140.data.s) -- VabStreamObj__Update and
+     * (confirmed against asm/data/5E140.data.s) -- VabStreamObj__AdvanceLoadState and
      * VabStreamObj__VabStreamObj each dispatch through one of them anyway,
      * on a path that is apparently never actually taken for an object built
      * with this exact base table.  That is retail's own behaviour, not a
      * derivation error: the dispatch still has to compile, whatever sits at
      * the address at runtime. */
-    void (*slot58)(void *self, char *path); /* VabStreamObj__Update's own dispatch -- begins the VAB body transfer once the ".VB" path is built; null in retail */
+    void (*slot58)(void *self, char *path); /* VabStreamObj__AdvanceLoadState's own dispatch -- begins the VAB body transfer once the ".VB" path is built; null in retail */
     void (*slot5C)(void *self);             /* Class6D430__FreeBuffer (uncarved, cross-unit) -- VabStreamObj__LoadVagAttrs's own dispatch, called before it re-fetches the VAB header */
     u8 pad060[0x06C - 0x060];
     void (*slot6C)(void *self, char *path); /* VabStreamObj__VabStreamObj's own dispatch -- begins the VAB header transfer for the ".VH" path; null in retail */
     u8 pad070[0x078 - 0x070];
-    s32 (*slot78)(VabStreamObj *self, s32 arg1); /* VabStreamObj__OnBodyReady, and VabStreamObj__Update's own body-complete notify */
+    s32 (*slot78)(VabStreamObj *self, s32 arg1); /* VabStreamObj__OnBodyReady, and VabStreamObj__AdvanceLoadState's own body-complete notify */
     s32 (*slot7C)(VabStreamObj *self);           /* VabStreamObj__LoadVagAttrs */
     u8 pad080[0x084 - 0x080];
     s32 (*slot84)(VabStreamObj *self, s32 arg1); /* VabStreamObj__StopVoice, arg1 is s16-truncated by the callee */
@@ -271,7 +271,7 @@ void *New_VabStreamObj(s32 arg0) {
 typedef struct DriverBaseMethods {
     u8 pad000[0x008];
     void (*slot08)(void *self);  /* VabStreamObj__VabStreamObj's own base-chain call */
-    /* VabStreamObj__Close's own base-chain call -- its own return is likewise a
+    /* VabStreamObj__Finalize's own base-chain call -- its own return is likewise a
      * bare tail call with nothing after it, so per CLAUDE.md's rule this
      * defaults to s32 absent positive void evidence. */
     s32 (*slot0C)(void *self);
@@ -354,7 +354,7 @@ void VabStreamObj__VabStreamObj(VabStreamObj *self, char *arg1) {
     }
 }
 
-s32 VabStreamObj__Close(VabStreamObj *self) {
+s32 VabStreamObj__Finalize(VabStreamObj *self) {
     SsVabClose(self->vabId);
     if (--gOpenVabCount < 0) {
         gOpenVabCount = 0;
@@ -372,7 +372,7 @@ s32 VabStreamObj__Close(VabStreamObj *self) {
     return GetActiveDataSourceMethods()->slot0C(self);
 }
 
-void VabStreamObj__Update(VabStreamObj *self) {
+void VabStreamObj__AdvanceLoadState(VabStreamObj *self) {
     char path[0x20];
 
     switch (self->loadState) {
@@ -545,13 +545,13 @@ s32 VabStreamObj__Unmute(VabStreamObj *self) {
     return flag;
 }
 
-void VabStreamObj__func_2cbdc(void) {
+void VabStreamObj__NoOpSlot90(void) {
 }
 
-void VabStreamObj__func_2cbe4(void) {
+void VabStreamObj__NoOpSlot94(void) {
 }
 
-void VabStreamObj__func_2cbec(void) {
+void VabStreamObj__NoOpSlot98(void) {
 }
 
 void VabStreamObj__SetPitchOffset(VabStreamObj *self, s32 arg1) {

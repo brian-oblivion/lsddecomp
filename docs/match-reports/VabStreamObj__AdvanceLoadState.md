@@ -1,4 +1,6 @@
-# VabStreamObj__Update -- MATCHED 74/74 (round 43)
+# VabStreamObj__AdvanceLoadState -- MATCHED 74/74 (round 43)
+
+> Renamed from `VabStreamObj__Update` on 2026-09-26 (tools/rename.py). Address 0x8002c6fc.
 
 > Renamed from `func_8002C6FC` on 2026-09-18 (tools/rename.py). Address 0x8002c6fc.
 
@@ -12,7 +14,7 @@ the VAB header/body streaming state machine.
 ## Derivation
 
 ```c
-void VabStreamObj__Update(VabStreamObj *self) {
+void VabStreamObj__AdvanceLoadState(VabStreamObj *self) {
     char path[0x20];
 
     switch (self->loadState) {
@@ -70,7 +72,7 @@ retyped, same as `gVabHeaderSuffix` in the sibling function.
 First full-image-correct build: byte-exact.
 
 ```
-VabStreamObj__Update: 74/74 words match (file 0x1CEFC-0x1D024)
+VabStreamObj__AdvanceLoadState: 74/74 words match (file 0x1CEFC-0x1D024)
 ```
 
 `./build-and-verify.sh`: `OK: build matches retail SLPS_015.56`.
@@ -83,7 +85,7 @@ own `switch (self->unk2A)` is what surfaced the `lh`-vs-`lhu` mismatch
 against a minimal reproducer, which pinned the field's real type as `u16`
 rather than the `s16` the header comment had assumed before either function
 was attempted. Fixing the one field byte-matched all three functions in this
-cluster (`VabStreamObj__VabStreamObj`, `VabStreamObj__Close`, `VabStreamObj__Update`) simultaneously,
+cluster (`VabStreamObj__VabStreamObj`, `VabStreamObj__Finalize`, `VabStreamObj__AdvanceLoadState`) simultaneously,
 since they all touch the same struct.
 
 **The empty `case 0:` label is load-bearing, not decorative** -- without it
@@ -93,7 +95,7 @@ mechanism.
 
 ## Naming
 
-Renamed `func_8002C6FC` -> `VabStreamObj__Update`, tier B. Confirmed as
+Renamed `func_8002C6FC` -> `VabStreamObj__AdvanceLoadState`, tier B. Confirmed as
 `gVabStreamObjMethods`'s own +0x64 slot. Mechanics are concrete (a
 state-machine switch driving the header-load then body-load steps of VAB
 streaming), matching this unit's header-comment description of it as the
@@ -101,3 +103,22 @@ class's "per-frame poll" -- that specific cadence claim (once per frame,
 rather than on some other trigger) isn't independently re-derived here
 (this unit has no visibility into slot +0x64's own caller), so kept as
 tier B rather than A.
+
+## Track 4 (2026-09-26, round 87)
+
+Renamed `VabStreamObj__Update` -> `VabStreamObj__AdvanceLoadState` with
+`rename.py`. The slot is +0x064, Class6D430's `setFlag`. It is not a
+per-frame poll. The CD driver calls `self->methods->setFlag(self)` when a
+request completes (`src/code_179d8_s.c`: `Class6D4E8__LoadFile` and the
+request-queue completion, each right after it ORs a `CD_FLAG_*_DONE` bit
+into `flags`). The 0x200 this body tests is `CD_FLAG_LOAD_FILE_DONE`. So the
+state machine moves forward once per completed file load. First the `.VH`
+header, requested by the ctor through `requestLoadFile` (+0x06C). Then the
+`.VB` body, requested here through `loadFile` (+0x058). The name follows
+TimBlockSrc's override of the same slot, `TimBlockSrc__AdvanceLoadState`.
+
+The report above says +0x058 and +0x06C are "null in retail". That is only
+true of the static table. `SetActiveDataSource` copies the active driver's
+interface slots into every table `gDataSourceClientGetters` lists
+(`include/Class6D430.h`), and `GetVabStreamObjMethods` is on that list
+(D_8006D430 +0x098). At run time these calls reach the driver.

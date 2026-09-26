@@ -45,6 +45,6 @@ a maspsx-side fix.
 Renamed `func_8002CC1C` -> `GetOpenVabCount`, tier A. The global it reads
 (`gOpenVabCount`, `D_8008A8C4` before round 52) is incremented once per
 object in `VabStreamObj__VabStreamObj` and decremented/clamped-at-zero in
-`VabStreamObj__Close`, with a zero-count check gating the shared subsystem
+`VabStreamObj__Finalize`, with a zero-count check gating the shared subsystem
 teardown -- an unambiguous open-object refcount, so this is a plain getter
 for it.

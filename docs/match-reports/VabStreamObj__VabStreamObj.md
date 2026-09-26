@@ -18,8 +18,8 @@ the WHOLE table, not just this one slot:
 | offset | target | called from |
 | --- | --- | --- |
 | +0x08 | `VabStreamObj__VabStreamObj` | `New_VabStreamObj` (`new_class_da34`) |
-| +0x0C | `VabStreamObj__Close` | data only (a subclass's own "close" chain) |
-| +0x58 | **null in retail** | `VabStreamObj__Update`'s own case-1 dispatch |
+| +0x0C | `VabStreamObj__Finalize` | data only (a subclass's own "close" chain) |
+| +0x58 | **null in retail** | `VabStreamObj__AdvanceLoadState`'s own case-1 dispatch |
 | +0x5C | `Class6D430__FreeBuffer` (uncarved) | `VabStreamObj__LoadVagAttrs`'s own opening call |
 | +0x6C | **null in retail** | `VabStreamObj__VabStreamObj`'s own final dispatch |
 | +0x78 | `VabStreamObj__OnBodyReady` | already matched |
