@@ -89,3 +89,13 @@ Round 75 (bravo, track 3). `func_800529FC` -> `Class86F88__SetView`, **tier A**.
 Non-virtual helper. Stores topIndex/column/cursorIndex; if `highlight`, colours row (cursor - top) with gClass86F88CursorColor. Callers: CreateRows (highlight 1), RefreshRows (0).
 
 Class86F88, per the round-75 pass, is a scrolling list selector: up to 4 visible rows of 26-character item text, a highlighted cursor row, a horizontal column offset (see the unit header comment of `src/class_3bb8c_k.c`).
+
+## asm sites
+
+Round 89 (runner delta, track 5 `asm-sites`): the bare `__asm__("")` that was
+the body's first statement is **retired**. Measured by deleting it alone and
+rebuilding: `build/src/class_3bb8c_k.c.o` came out byte-identical to the object
+built with it (`cmp`), and `./build-and-verify.sh` stayed green. In the current
+source the early load of the `highlight` argument no longer depends on the
+barrier (the `s32 flag = highlight;` copy was already present when this was
+measured). The function now carries no `__asm__`.

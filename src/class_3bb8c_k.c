@@ -322,7 +322,6 @@ void Class86F88__SetView(Class86F88 *self, s32 top, s32 column, s32 cursor, s32 
     TextRow *elem;
     s32 flag = highlight;
 
-    __asm__("");
     self->topIndex = top;
     self->column = column;
     self->cursorIndex = cursor;
