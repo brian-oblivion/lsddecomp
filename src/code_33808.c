@@ -34,7 +34,8 @@
  * Two more classes, not Class6D430 subclasses:
  *
  *   - BgLayer (D_8006F2C4): a Class6B5CC subclass wrapping one GsBG
- *     scrolling background layer (its own fields are GsBG's own layout).
+ *     scrolling background layer (its own fields are GsBG's own layout;
+ *     include/BgLayer.h, track 4, round 88).
  *   - MoviePlayer (D_8006F614): a BasicClass subclass driving CD-streamed,
  *     MDEC-decoded FMV playback (open a CD stream, decode/upload strips,
  *     play/stop/tick controls); called from code_2c054.c.
@@ -51,6 +52,7 @@
 #include "TodSet.h"
 #include "TriggerWorld.h"
 #include "TimImage.h"
+#include "BgLayer.h"
 #include "TmdModel.h"
 #include "DrawSystem.h"
 #include "CdStream.h"
@@ -90,7 +92,6 @@ extern void BMemPMgrFree(void *arg);
 extern void *BMemPMgrAlloc(s32 size);
 void *GetLinkResourceMethods(void);
 void *GetTimArraySrcMethods(void);
-void *GetBgLayerMethods(void);
 void *GetTileMapMethods(void);
 void *GetTileAtlasMethods(void);
 
@@ -264,13 +265,6 @@ u32 MaxOfBufferWords(Class6D430 *self) {
     }
     return max;
 }
-/* A three-byte vector. */
-typedef struct Vec3S8 {
-    s8 x;
-    s8 y;
-    s8 z;
-} Vec3S8;
-
 /* D_8006F0B8 +0x078: set entry `index`'s shift, and its mask from it. */
 void TimBlockSrc__SetEntryShift(TimBlockSrc *self, s32 index, s32 shift) {
     TimBlockSrcEntry *e = &self->entries[index];
@@ -697,41 +691,21 @@ TodMethods *GetTodMethods(void) {
     return &D_8006F240;
 }
 /* Allocate and construct a D_8006F2C4 object. */
-void *New_BgLayer(s32 arg0, s32 arg1) {
-    void *obj = BMemPMgrAlloc(0x68);
+BgLayer *New_BgLayer(struct Map44294 *src, s32 mode) {
+    BgLayer *obj = BMemPMgrAlloc(0x68);
 
     if (obj != NULL) {
-        ((Ctor33808 *)GetBgLayerMethods())->ctor(obj, arg0, arg1);
+        GetBgLayerMethods()->ctor(obj, src, mode);
         return obj;
     }
     return NULL;
 }
-/* The D_8006F2C4 object (a Class6B5CC subclass). */
-typedef struct Obj6F2C4 {
-    CLASS6B5CC_FIELDS(Class6B5CCMethods);
-    /* +0x044 */ u32 bgAttribute; /* +0x044..+0x067 has GsBG's layout */
-    /* +0x048 */ s16 x;
-    /* +0x04A */ s16 y;
-    /* +0x04C */ s16 w;
-    /* +0x04E */ s16 h;
-    /* +0x050 */ s16 scrollx;
-    /* +0x052 */ s16 scrolly;
-    /* +0x054 */ Vec3S8 unk54;    /* GsBG r, g, b */
-    /* +0x057 */ u8 pad57;
-    /* +0x058 */ void *map;
-    /* +0x05C */ s16 mx;
-    /* +0x05E */ s16 my;
-    /* +0x060 */ s16 scalex;
-    /* +0x062 */ s16 scaley;
-    /* +0x064 */ s32 unk64;       /* GsBG rotate, 20.12 fixed point */
-} Obj6F2C4;
-
 /* D_8006F2C4 +0x008: constructor -- Class6B5CC's, then this table, then
  * slot +0x040 with the two arguments. */
-void BgLayer__BgLayer(Obj6F2C4 *self, s32 arg1, s32 arg2) {
+void BgLayer__BgLayer(BgLayer *self, struct Map44294 *src, s32 mode) {
     GetClass6B5CCMethods()->ctor((Class6B5CC *)self);
     self->methods = GetBgLayerMethods();
-    ((void (*)())self->methods->reset)(self, arg1, arg2);
+    ((BgLayerResetFn)self->methods->reset)(self, src, mode);
 }
 /* D_8006F2C4 +0x040: reset -- lay out the GsBG at +0x044 over a map
  * source: mode 0 sizes it to the map (cell size x cell count), mode 1 to a
@@ -746,9 +720,9 @@ typedef struct Map44294 {
     /* +0x30 */ u16 ncellh;
 } Map44294;
 
-extern Vec3S8 gBgLayerDefaultColor;
+extern BgLayerRgb gBgLayerDefaultColor;
 
-void BgLayer__Reset(Obj6F2C4 *self, Map44294 *src, s32 mode) {
+void BgLayer__Reset(BgLayer *self, Map44294 *src, s32 mode) {
     if (mode == 0) {
         self->bgAttribute = 0x1000000;
         self->w = src->cellw * src->ncellw;
@@ -762,45 +736,33 @@ void BgLayer__Reset(Obj6F2C4 *self, Map44294 *src, s32 mode) {
     self->y = 0;
     self->scrollx = 0;
     self->scrolly = 0;
-    self->unk54 = gBgLayerDefaultColor;
+    self->color = gBgLayerDefaultColor;
     self->map = &src->cellw;
     self->scalex = 0x1000;
     self->scaley = 0x1000;
-    self->unk64 = 0;
+    self->rotate = 0;
     self->mx = self->w / 2;
     self->my = self->h / 2;
 }
-/* D_8006F2C4 +0x044: the ratio of two halfwords of `src` (+0x08 over
- * +0x0A) in 20.12 fixed point, stored at +0x64 when `set`, else added. */
-typedef struct Ratio44380 {
-    /* +0x00 */ u8 pad0[8];
-    /* +0x08 */ s16 num;
-    /* +0x0A */ s16 den;
-} Ratio44380;
-
-void BgLayer__SetRotation(Obj6F2C4 *self, s32 set, Ratio44380 *src) {
-    s32 num = src->num;
-    s32 den = src->den;
+/* D_8006F2C4 +0x044 (updateRotation): entry [2] (the z angle) of the
+ * {num, den} ratio table Class6B5CC's updateRotation reads, in 20.12 fixed
+ * point, stored in the GsBG's rotate when `set`, else added. */
+void BgLayer__UpdateRotation(BgLayer *self, s32 set, WholeFrac_d294 *table) {
+    s32 num = table[2].whole;
+    s32 den = table[2].frac;
     s32 v = ((num / den) << 12) + (((num % den) << 12) / den);
 
     if (set) {
-        self->unk64 = v;
+        self->rotate = v;
     } else {
-        self->unk64 += v;
+        self->rotate += v;
     }
 }
-/* D_8006F2C4 +0x048: the two ratios of `src` (+0 over +2, +4 over +6) in
+/* D_8006F2C4 +0x048 (updateScale): ratio-table entries [0] and [1] in
  * 20.12 fixed point become the GsBG's scale -- stored when `set` (0x1000
  * for a zero divisor, at most 30000), else added, a sum over 30000 giving
  * 30000, or 1 when either term of that ratio was negative. */
-typedef struct Scale4441C {
-    /* +0x00 */ s16 xnum;
-    /* +0x02 */ s16 xden;
-    /* +0x04 */ s16 ynum;
-    /* +0x06 */ s16 yden;
-} Scale4441C;
-
-void BgLayer__SetScale(Obj6F2C4 *self, s32 set, Scale4441C *src) {
+void BgLayer__UpdateScale(BgLayer *self, s32 set, WholeFrac_d294 *src) {
     s32 negX;
     s32 negY;
     s32 den;
@@ -810,18 +772,18 @@ void BgLayer__SetScale(Obj6F2C4 *self, s32 set, Scale4441C *src) {
 
     negX = 0;
     negY = 0;
-    if (src->xnum < 0 || src->xden < 0) {
+    if (src[0].whole < 0 || src[0].frac < 0) {
         negX = 1;
     }
-    if (src->ynum < 0 || src->yden < 0) {
+    if (src[1].whole < 0 || src[1].frac < 0) {
         negY = 1;
     }
-    den = src->xden;
+    den = src[0].frac;
     if (den != 0) {
-        sx = ((src->xnum / den) << 12) + (((src->xnum % den) << 12) / den);
+        sx = ((src[0].whole / den) << 12) + (((src[0].whole % den) << 12) / den);
     }
-    if (src->yden != 0) {
-        sy = ((src->ynum / src->yden) << 12) + (((src->ynum % src->yden) << 12) / src->yden);
+    if (src[1].frac != 0) {
+        sy = ((src[1].whole / src[1].frac) << 12) + (((src[1].whole % src[1].frac) << 12) / src[1].frac);
     }
     if (set) {
         if (den == 0) {
@@ -833,7 +795,7 @@ void BgLayer__SetScale(Obj6F2C4 *self, s32 set, Scale4441C *src) {
             }
             self->scalex = v;
         }
-        if (src->yden == 0) {
+        if (src[1].frac == 0) {
             self->scaley = 0x1000;
         } else {
             v = sy;
@@ -865,17 +827,15 @@ void BgLayer__SetScale(Obj6F2C4 *self, s32 set, Scale4441C *src) {
 }
 /* D_8006F2C4 (a Class6B5CC subclass) +0x0B8: when `enable`, copy a
  * three-byte vector to +0x54. */
-void BgLayer__SetColor(Obj6F2C4 *self, s32 enable, Vec3S8 *src) {
+void BgLayer__SetColor(BgLayer *self, s32 enable, BgLayerRgb *rgb) {
     if (enable) {
-        self->unk54 = *src;
+        self->color = *rgb;
     }
 }
 void BgLayer__NoOp(void) {
 }
-extern s32 D_8006F2C4[];
-
-void *GetBgLayerMethods(void) {
-    return D_8006F2C4;
+BgLayerMethods *GetBgLayerMethods(void) {
+    return &D_8006F2C4;
 }
 /* Allocate and construct a D_8006F384 object (second constructor argument 1); freed and NULL when the constructor fails. */
 ModelData *New_ModelData(Src6F240 *src) {

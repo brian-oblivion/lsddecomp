@@ -1,4 +1,6 @@
-# BgLayer__SetScale -- MATCHED (140/140 words)
+# BgLayer__UpdateScale -- MATCHED (140/140 words)
+
+> Renamed from `BgLayer__SetScale` on 2026-09-26 (tools/rename.py). Address 0x8004441c.
 
 > Renamed from `func_8004441C` on 2026-09-25 (tools/rename.py). Address 0x8004441c.
 
@@ -9,7 +11,7 @@ drift. Fresh ground (carved revision 18, no prior report).
 
 ## What it does
 
-Scale of the GsBG at +0x044: with src = four halfwords {xnum, xden, ynum, yden}, sx/sy are xnum/xden and ynum/yden in 20.12 fixed point (integer part << 12 plus (remainder << 12) / den, the same formula BgLayer__SetRotation uses for the rotation). With `set`: scalex (+0x60) = 0x1000 for a zero divisor, else min((s16)sx, 30000); likewise scaley (+0x62). Otherwise each is added, except that a sum over 30000 yields 30000 -- or 1 when either term of that ratio was negative.
+Scale of the GsBG at +0x044: with src = four halfwords {xnum, xden, ynum, yden}, sx/sy are xnum/xden and ynum/yden in 20.12 fixed point (integer part << 12 plus (remainder << 12) / den, the same formula BgLayer__UpdateRotation uses for the rotation). With `set`: scalex (+0x60) = 0x1000 for a zero divisor, else min((s16)sx, 30000); likewise scaley (+0x62). Otherwise each is added, except that a sum over 30000 yields 30000 -- or 1 when either term of that ratio was negative.
 
 Table slot (`tools/classtable.py`): D_8006F2C4 +0x048.
 
@@ -32,7 +34,7 @@ typedef struct Scale4441C {
     /* +0x06 */ s16 yden;
 } Scale4441C;
 
-void BgLayer__SetScale(Obj6F2C4 *self, s32 set, Scale4441C *src) {
+void BgLayer__UpdateScale(Obj6F2C4 *self, s32 set, Scale4441C *src) {
     s32 negX;
     s32 negY;
     s32 den;
@@ -103,4 +105,8 @@ Second build. The first build matched everything but the clamp in the `set` arm 
 
 ## Naming
 
-- **BgLayer__SetScale**, tier B. Slot +0x048: two ratios become the GsBG's x/y scale, clamped to 30000, stored or added.
+- **BgLayer__UpdateScale**, tier B. Slot +0x048: two ratios become the GsBG's x/y scale, clamped to 30000, stored or added.
+
+## Track 4 (2026-09-26, round 88, alpha)
+
+Renamed from `BgLayer__SetScale` for the slot it overrides: D_8006F2C4 +0x048 is Class6B5CC's `updateScale` (Class6B5CC__UpdateScale), set or add from the same `WholeFrac_d294` {num, den} ratio table; this override reads entries [0] and [1] (x, y), which were the `Scale4441C` view's xnum/xden/ynum/yden. That view is gone: the live body takes `WholeFrac_d294 *src` and reads `src[0].whole`, `src[0].frac`, `src[1].whole`, `src[1].frac`; `self` is `BgLayer *` (include/BgLayer.h). The clamp to 30000 is this override's own, the slot name still says what it does. Byte-identical.

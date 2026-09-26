@@ -61,11 +61,12 @@
  * the one up-call that passes self alone casts the slot.
  *
  * The objects TaskCore holds from classes with no header yet (VabStreamObj,
- * BgLayer, TileMap, TileAtlas, the slot and list widgets) are `BasicClass *`,
+ * TileMap, TileAtlas, the slot and list widgets) are `BasicClass *`,
  * the parent every one of them has; a unit that calls one past BasicClass's
  * slots casts to its own view of it. The viewport (IntermediateBase's field)
  * is a Viewport, unified in include/Viewport.h in round 85; its callers cast
- * to that type.
+ * to that type. bgLayer is a `struct BgLayer *` (include/BgLayer.h, round 88),
+ * by tag, so a unit that calls it includes BgLayer.h.
  */
 
 typedef struct TaskCore TaskCore;
@@ -163,7 +164,7 @@ struct TaskCoreTarget {
     /* +0x06C */ u8 pad06C[4];                                                                     \
     /* +0x070 */ const char *subHandlePath; /* setSubHandle's path; nonzero: the handle is owned */ \
     /* +0x074 */ BasicClass *subHandle; /* New_TimImage(subHandlePath), or the caller's; NULL: onInit also passes baseColor with gDefaultStreamTaskInitData */ \
-    /* +0x078 */ BasicClass *bgLayer;   /* New_BgLayer(tileMap, 1) */                              \
+    /* +0x078 */ struct BgLayer *bgLayer; /* New_BgLayer(tileMap, 1); include/BgLayer.h (tag only here) */ \
     /* +0x07C */ BasicClass *tileMap;   /* New_TileMap(0, tileAtlas) */                            \
     /* +0x080 */ BasicClass *tileAtlas; /* New_TileAtlas(0) */                                     \
     /* +0x084 */ s32 fadeRate;          /* setFadeRate; reset: 9 */                                \

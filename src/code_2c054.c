@@ -1,6 +1,7 @@
 #include "common.h"
 #include "code_2c054.h"
 #include "VabStreamObj.h"
+#include "BgLayer.h"
 
 #define PLAYER(self) ((StreamTaskUnkB4Obj *)(self)->player)
 
@@ -188,7 +189,7 @@ void TaskCore__TaskCore(TaskCore *self, TaskCoreTarget *target, char *soundBankP
     self->tileAtlas = (BasicClass *)tmp;
     tmp = New_TileMap(0, tmp);
     self->tileMap = (BasicClass *)tmp;
-    self->bgLayer = (BasicClass *)New_BgLayer(tmp, 1);
+    self->bgLayer = New_BgLayer((struct Map44294 *)tmp, 1);
     self->methods->resetCounters(self);
 }
 
@@ -228,8 +229,8 @@ s32 TaskCore__Init(TaskCore *self, IntermediateBaseInitArgs *args, s32 mode) {
 }
 
 /* initArgs->unk0 is reached through this unit's TaskTextObj view, the
- * viewport as a Viewport (include/Viewport.h) and bgLayer through
- * StreamTaskUnk78Obj (BgLayer): TaskCore.h types all three BasicClass *. */
+ * viewport as a Viewport (include/Viewport.h), both `BasicClass *` in
+ * TaskCore.h; bgLayer is a BgLayer (include/BgLayer.h). */
 void TaskCore__OnInit(TaskCore *self) {
     Viewport *viewport;
     ViewportMethods *core;
@@ -237,10 +238,10 @@ void TaskCore__OnInit(TaskCore *self) {
     viewport = (Viewport *)self->viewport;
     core = viewport->methods;
     self->methods->updateSlotElements(self, self->unk14);
-    ((StreamTaskUnk78Obj *)self->bgLayer)->methods->slot4C((StreamTaskUnk78Obj *)self->bgLayer, self->unk14, 0);
+    self->bgLayer->methods->attachToParent(self->bgLayer, (Class6B5CC *)self->unk14, NULL);
     if (self->fadeInCallback != 0) {
         self->methods->broadcastToSlots(self, self->baseColor);
-        ((StreamTaskUnk78Obj *)self->bgLayer)->methods->slotB8((StreamTaskUnk78Obj *)self->bgLayer, 1, self->baseColor);
+        self->bgLayer->methods->setColor(self->bgLayer, 1, (BgLayerRgb *)self->baseColor);
     }
     if (self->subHandle == 0) {
         ((TaskTextObj *)self->initArgs->unk0)->methods->slot78((TaskTextObj *)self->initArgs->unk0, self->baseColor, gDefaultStreamTaskInitData);
@@ -258,7 +259,7 @@ void TaskCore__OnDeinit(TaskCore *self) {
     Viewport *viewport = (Viewport *)self->viewport;
     viewport->methods->deinitOt(viewport);
     viewport->methods->detachViewChild(viewport);
-    ((StreamTaskUnk78Obj *)self->bgLayer)->methods->slot50((StreamTaskUnk78Obj *)self->bgLayer);
+    self->bgLayer->methods->detachFromParent(self->bgLayer);
     if (self->unk34 != 0) {
         ((TaskTextObj *)self->initArgs->unk0)->methods->slot78((TaskTextObj *)self->initArgs->unk0, self->unk93, 0);
     }

@@ -62,7 +62,7 @@ void BgLayer__Reset(Obj6F2C4 *self, Map44294 *src, s32 mode) {
 
 ## Notes
 
-First build that compiled (the first attempt named the field `attribute`, which Class6B5CC's own fields already use at +0x00?: `duplicate member`, caught by the `*** [...o]` grep -- the funcdiff 59/59 printed alongside it was stale). The layout +0x044..+0x067 is exactly LIBGS.H's GsBG (attribute, x, y, w, h, scrollx, scrolly, r, g, b, map, mx, my, scalex, scaley, rotate), which also explains the `20.12 fixed point` +0x064 that BgLayer__SetRotation accumulates: it is GsBG.rotate. The unit-local `Obj6F2C4` view was extended in place (pad44[0x10] / pad57[0xD] replaced by the named GsBG fields; +0x054 stays `Vec3S8 unk54` because retail copies r,g,b as a signed three-byte struct -- lb/lb/lb, sb/sb/sb -- which GsBG's three u8 fields would not give, and BgLayer__SetColor already matched on it). The fields are named `bgAttribute`, x, y, w, h, scrollx, scrolly, map, mx, my, scalex, scaley. Whole image green after the struct edit (BgLayer__SetRotation/BgLayer__SetColor still byte-exact). No shared header touched.
+First build that compiled (the first attempt named the field `attribute`, which Class6B5CC's own fields already use at +0x00?: `duplicate member`, caught by the `*** [...o]` grep -- the funcdiff 59/59 printed alongside it was stale). The layout +0x044..+0x067 is exactly LIBGS.H's GsBG (attribute, x, y, w, h, scrollx, scrolly, r, g, b, map, mx, my, scalex, scaley, rotate), which also explains the `20.12 fixed point` +0x064 that BgLayer__UpdateRotation accumulates: it is GsBG.rotate. The unit-local `Obj6F2C4` view was extended in place (pad44[0x10] / pad57[0xD] replaced by the named GsBG fields; +0x054 stays `Vec3S8 unk54` because retail copies r,g,b as a signed three-byte struct -- lb/lb/lb, sb/sb/sb -- which GsBG's three u8 fields would not give, and BgLayer__SetColor already matched on it). The fields are named `bgAttribute`, x, y, w, h, scrollx, scrolly, map, mx, my, scalex, scaley. Whole image green after the struct edit (BgLayer__UpdateRotation/BgLayer__SetColor still byte-exact). No shared header touched.
 
 ### Proposed learning
 
@@ -71,3 +71,7 @@ A Class6B5CC subclass whose fields past +0x044 read (u32, s16 x6, three bytes, a
 ## Naming
 
 - **BgLayer__Reset**, tier B. Slot +0x040: lays out the GsBG over a map source, sized either to the map's cell grid or to a 320x240 screen.
+
+## Track 4 (2026-09-26, round 88, alpha)
+
+Class unified in `include/BgLayer.h`. `self` is `BgLayer *` (was `Obj6F2C4`); +0x054 is `color`, a `BgLayerRgb` (was `Vec3S8 unk54`; still signed, which the lb/sb copy needs), +0x064 `rotate` (was unk64); `gBgLayerDefaultColor` is `BgLayerRgb`. The slot +0x040 keeps Class6B5CC's `reset(self)` type; the ctor casts to `BgLayerResetFn`. Byte-identical.

@@ -1,6 +1,7 @@
 #include "common.h"
 #include "code_2cc8c.h"
 #include "TimImage.h"
+#include "BgLayer.h"
 
 /*
  * code_2cc8c_b -- 20 of TaskCore's own methods (gTaskCoreMethods +0x0C4 to
@@ -51,7 +52,7 @@ s32 TaskCore__TickFadeColor(TaskCore *self)
     buf[1] = c;
     buf[2] = c;
     self->methods->broadcastToSlots(self, buf);
-    ((Unk78Obj *)self->bgLayer)->methods->slotB8((Unk78Obj *)self->bgLayer, 1, buf);
+    self->bgLayer->methods->setColor(self->bgLayer, 1, (BgLayerRgb *)buf);
     return (u8)c >= 0x81;
 }
 
