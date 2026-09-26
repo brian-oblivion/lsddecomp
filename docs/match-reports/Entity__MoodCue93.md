@@ -43,7 +43,7 @@ What it does, in the unit's current field names: Attenuation from proximity; voi
 ## Proposed field names
 
 Entity is a TodActor subclass: `Entity__Entity` runs
-`Get_vtable_TodActor()->ctor`, and `tools/classtable.py gEntityMethods`
+`GetTodActorMethods()->ctor`, and `tools/classtable.py gEntityMethods`
 keeps TodActor's TOD slots at +0x128..+0x138. `code_55dd4.h` names both the
 slots and the fields they write; the Entity offsets are the same.
 

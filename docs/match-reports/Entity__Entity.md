@@ -7,7 +7,7 @@
 Entity's constructor, reached both directly (this function) and indirectly
 through the vtable's own `ctor` slot (`Get_vtable_Entity()->ctor`, see
 `New_Entity`). First calls the shared base-class constructor,
-`Get_vtable_TodActor()->ctor(this, arg2, arg3)` — `Get_vtable_TodActor()` (matched in
+`GetTodActorMethods()->ctor(this, arg2, arg3)` — `GetTodActorMethods()` (matched in
 `code_55dd4.c`) returns the SAME shared "BasicClass" ancestor vtable that
 `TodActor` also derives from (see the big comment at the top of
 `include/Entity.h`). Only on success does it finish initializing: assigns
@@ -30,7 +30,7 @@ convention (`docs/research/class-framework.md`).
 
 ```c
 Entity *Entity__Entity(Entity *this, s32 arg1, s32 arg2, s32 arg3) {
-    if (Get_vtable_TodActor()->ctor(this, arg2, arg3) != NULL) {
+    if (GetTodActorMethods()->ctor(this, arg2, arg3) != NULL) {
         this->methods = Get_vtable_Entity();
         this->moodIndex = arg1;
         this->unk9C = 0;

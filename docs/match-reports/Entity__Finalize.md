@@ -12,7 +12,7 @@ Entity's destructor-side teardown: tears down `this->unk100` and
 `this->unk104` (each a `Unk100Obj *`, see `Entity__GetOrCreateUnk100.md`) by calling
 their own `slot04` (a per-object dtor-like slot, not `EntityMethods`'), then
 calls the shared "BasicClass" ancestor's own `dtor` slot,
-`Get_vtable_TodActor()->dtor(this)` (offset `+0x00C` in the shared table — see the
+`GetTodActorMethods()->dtor(this)` (offset `+0x00C` in the shared table — see the
 big comment in `Entity.h`).
 
 ## Final C
@@ -25,7 +25,7 @@ void Entity__Finalize(Entity *this) {
     if (this->unk104 != NULL) {
         this->unk104->methods->slot04(this->unk104);
     }
-    Get_vtable_TodActor()->dtor(this);
+    GetTodActorMethods()->dtor(this);
 }
 ```
 

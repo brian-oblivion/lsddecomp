@@ -23,7 +23,7 @@ void Entity__AttachToParent(Entity *this, s32 arg1, s32 arg2, Unk4CObj *arg3, s3
     if (this->unk0C != 0) {
         return;
     }
-    Get_vtable_TodActor()->slot4C(this, arg1, arg2, arg3, arg4);
+    GetTodActorMethods()->slot4C(this, arg1, arg2, arg3, arg4);
     this->unk4C = arg3;
     if (D_80089EA7[this->moodIndex * 0x10] != 0) {
         return;

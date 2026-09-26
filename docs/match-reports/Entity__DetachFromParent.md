@@ -12,7 +12,7 @@ A conditional teardown: if `this->unk0C` (a gate flag; see the parallel
 noted in `Entity.h`'s struct comment with `TodActor`/`DreamSys`'s own
 shared-base `+0xC` gate) is set, calls this entity's own current
 `methods->slot160(this)`, then the shared "BasicClass" ancestor's own
-`slot50` (`Get_vtable_TodActor()->slot50(this)`, offset `+0x050` in the shared
+`slot50` (`GetTodActorMethods()->slot50(this)`, offset `+0x050` in the shared
 table), then clears `this->unk4C`.
 
 ## Final C
@@ -21,7 +21,7 @@ table), then clears `this->unk4C`.
 void Entity__DetachFromParent(Entity *this) {
     if (this->unk0C != 0) {
         this->methods->slot160(this);
-        Get_vtable_TodActor()->slot50(this);
+        GetTodActorMethods()->slot50(this);
         this->unk4C = 0;
     }
 }
@@ -34,9 +34,9 @@ Matched on the first attempt.
 ## Proposed learning
 
 This function (along with `Entity__OnGridCellLinkCommand`, `Entity__Update`, `Entity__GetOrCreateUnk100`)
-is what established `Get_vtable_TodActor()`'s SHARED-vtable role for this unit —
+is what established `GetTodActorMethods()`'s SHARED-vtable role for this unit —
 see the class-framework comment block now at the top of `Entity.h`. Worth
-flagging for anyone touching `Entity_b` next: `Get_vtable_TodActor()` (matched,
+flagging for anyone touching `Entity_b` next: `GetTodActorMethods()` (matched,
 `code_55dd4.c`) is not TodActor-specific despite living in that unit and
 returning `TodActorMethods*` there — it's the common ancestor's vtable
 accessor, reused verbatim by Entity. A local, Entity-scoped `BasicClassMethods`

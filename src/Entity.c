@@ -42,7 +42,7 @@ Entity *New_Entity(s32 moodIndex, void *desc, void *arg2) {
 }
 
 Entity *Entity__Entity(Entity *this, s32 moodIndex, void *desc, void *arg2) {
-    if (Get_vtable_TodActor()->ctor((TodActor *)this, desc, arg2) != NULL) {
+    if (GetTodActorMethods()->ctor((TodActor *)this, desc, arg2) != NULL) {
         this->methods = Get_vtable_Entity();
         this->moodIndex = moodIndex;
         this->soundCueSet.tag = 0;
@@ -91,7 +91,7 @@ void Entity__Finalize(Entity *this) {
     if (this->unk104 != NULL) {
         this->unk104->methods->release(this->unk104);
     }
-    Get_vtable_TodActor()->finalize((TodActor *)this);
+    GetTodActorMethods()->finalize((TodActor *)this);
 }
 
 void Entity__Reset(Entity *this) {
@@ -110,7 +110,7 @@ void Entity__AttachToParent(Entity *this, TodActor *peer, void *companion,
     if (this->parent != 0) {
         return;
     }
-    ((TodActorAttachToParentFn)Get_vtable_TodActor()->attachToParent)((TodActor *)this, peer,
+    ((TodActorAttachToParentFn)GetTodActorMethods()->attachToParent)((TodActor *)this, peer,
                                                                           companion, parent, offset);
     this->grid = parent;
     if (D_80089EA7[this->moodIndex * 0x10] != 0) {
@@ -126,7 +126,7 @@ void Entity__AttachToParent(Entity *this, TodActor *peer, void *companion,
 void Entity__DetachFromParent(Entity *this) {
     if (this->parent != 0) {
         this->methods->deactivate(this);
-        Get_vtable_TodActor()->detachFromParent((TodActor *)this);
+        GetTodActorMethods()->detachFromParent((TodActor *)this);
         this->grid = NULL;
     }
 }
@@ -139,7 +139,7 @@ void Entity__Update(Entity *this, void *a1, s32 a2) {
         this->methods->updateSoundCueStop(this);
     }
     this->methods->updateTargetProximity(this);
-    Get_vtable_TodActor()->update((TodActor *)this, a1, a2);
+    GetTodActorMethods()->update((TodActor *)this, a1, a2);
 }
 
 void Entity__NotifyLinkStage(Entity *this, void *arg1, s32 arg2) {
@@ -151,7 +151,7 @@ void Entity__NotifyLinkStage(Entity *this, void *arg1, s32 arg2) {
             return;
         }
     }
-    Get_vtable_TodActor()->onActorLinkCommand((TodActor *)this, arg1, arg2);
+    GetTodActorMethods()->onActorLinkCommand((TodActor *)this, arg1, arg2);
     if (arg2 != 4) {
         return;
     }
@@ -169,7 +169,7 @@ void Entity__NotifyLinkStage(Entity *this, void *arg1, s32 arg2) {
 }
 
 void Entity__OnGridCellLinkCommand(Entity *this, void *a1, s32 a2) {
-    Get_vtable_TodActor()->onGridCellLinkCommand((TodActor *)this, a1, a2);
+    GetTodActorMethods()->onGridCellLinkCommand((TodActor *)this, a1, a2);
     if (a2 == 4) {
         this->methods->deactivate(this);
     }

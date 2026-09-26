@@ -13,7 +13,7 @@ The `New_X` allocator for the class whose method table is `gTodActorMethods`
 (resolved with `tools/classtable.py gTodActorMethods --vs 0x800878D4`; see
 `include/code_55dd4.h` for the full inheritance chain). Allocates a 0x98-byte
 instance through the game allocator `BMemPMgrAlloc`, fetches the class's own
-vtable via `Get_vtable_TodActor()` (a `Get_vtable`-style accessor, matched
+vtable via `GetTodActorMethods()` (a `Get_vtable`-style accessor, matched
 separately, see its own report), and calls the constructor slot (`+0x008`)
 with `(self, arg1, arg2)`. Unlike the simpler `New_X` shapes documented
 elsewhere in this project (`New_Pad`, `New_GameApplication`), **this one
@@ -31,7 +31,7 @@ void *New_TodActor(void *arg1, void *arg2)
     if (self == NULL) {
         return NULL;
     }
-    vt = Get_vtable_TodActor();
+    vt = GetTodActorMethods();
     if (vt->ctor(self, arg1, arg2) != NULL) {
         return self;
     }
@@ -89,7 +89,7 @@ required.
 
 Round 75 (charlie), track 3.
 
-- `New_TodActor` (was `New_class_65650`), tier A. Allocates 0x98 bytes with BMemPMgrAlloc, runs `Get_vtable_TodActor()->ctor`, frees on failure: the project's `New_Class` allocator shape. Replaces FirecatFG's `New_class_65650` (same meaning, convention spelling).
+- `New_TodActor` (was `New_class_65650`), tier A. Allocates 0x98 bytes with BMemPMgrAlloc, runs `GetTodActorMethods()->ctor`, frees on failure: the project's `New_Class` allocator shape. Replaces FirecatFG's `New_class_65650` (same meaning, convention spelling).
 
 ## Track 4 (2026-09-25, round 85, alpha)
 

@@ -19,7 +19,7 @@ Signature `(self, arg1, arg2)`, matching `New_TodActor`'s call. Sequence:
    "base constructor called through the base table's slot +0x008" shape). If
    it returns `NULL`, bail out immediately (no partial teardown needed —
    nothing of this class's own has been touched yet).
-2. Install this class's own vtable (`Get_vtable_TodActor()`, a `Get_vtable`-style
+2. Install this class's own vtable (`GetTodActorMethods()`, a `Get_vtable`-style
    accessor — **called, not inlined as `&gTodActorMethods` directly**, because
    retail's own bytes are a `jal` to that function, not a `lui`/`addiu`).
 3. Field init: `self->arg2 = arg2` (the constructor's own third parameter,
@@ -44,7 +44,7 @@ TodActor *TodActor__TodActor(TodActor *self, void *arg1, void *arg2)
     if (base->ctor(self) == NULL) {
         return NULL;
     }
-    self->methods = Get_vtable_TodActor();
+    self->methods = GetTodActorMethods();
     self->arg2 = arg2;
     self->unk5C = NULL;
     self->unk68 = NULL;

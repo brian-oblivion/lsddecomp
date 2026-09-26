@@ -23,7 +23,7 @@ void Entity__Update(Entity *this, s32 a1, s32 a2) {
         this->methods->slot180(this);
     }
     this->methods->slot178(this);
-    Get_vtable_TodActor()->slot98(this, a1, a2);
+    GetTodActorMethods()->slot98(this, a1, a2);
 }
 ```
 

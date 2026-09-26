@@ -26,7 +26,7 @@ void *New_TodActor(void *arg1, void *arg2) {
     if (self == NULL) {
         return NULL;
     }
-    vt = Get_vtable_TodActor();
+    vt = GetTodActorMethods();
     if (vt->ctor(self, arg1, arg2) != NULL) {
         return self;
     }
@@ -41,7 +41,7 @@ TodActor *TodActor__TodActor(TodActor *self, void *arg1, void *arg2) {
     if (base->ctor((Actor *)self) == NULL) {
         return NULL;
     }
-    self->methods = Get_vtable_TodActor();
+    self->methods = GetTodActorMethods();
     self->arg2 = arg2;
     self->modelData = NULL;
     self->mainPart = NULL;
@@ -530,6 +530,6 @@ void TodActor__UnlinkPeer(TodActor *self) {
     }
 }
 
-TodActorMethods *Get_vtable_TodActor(void) {
+TodActorMethods *GetTodActorMethods(void) {
     return &gTodActorMethods;
 }

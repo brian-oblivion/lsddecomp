@@ -11,7 +11,7 @@
  * tables (class id 0x1F234, method table gEntityMethods, getter
  * Get_vtable_Entity): TodActor's one subclass (include/TodActor.h); no
  * class derives from it. The ctor calls TodActor's first
- * (Get_vtable_TodActor()->ctor), so the id parent is the ctor-chain
+ * (GetTodActorMethods()->ctor), so the id parent is the ctor-chain
  * parent. Methods in src/Entity.c (New_Entity .. Entity__UpdateDeactivationState)
  * and src/Entity_b.c (the last three slots, the range helpers, the getter).
  * The MoodCue handlers in Entity_b..Entity_g are not in the table: they are
@@ -159,7 +159,7 @@ extern s8 gEntityProximityThresholdTable[]; /* read by Entity__GetProximityRatio
 extern s8 D_80089EAF[]; /* read by Entity__AttachToParent, own base symbol immediately after gEntityEventVideoTable, moodIndex*0x10-indexed like the rest of this family */
 
 /* The class's own methods, in ROM order (Entity, then Entity_b). A caller
- * reaching the base ones goes through Get_vtable_TodActor() and upcasts. */
+ * reaching the base ones goes through GetTodActorMethods() and upcasts. */
 Entity *New_Entity(s32 moodIndex, void *desc, void *arg2);
 Entity *Entity__Entity(Entity *self, s32 moodIndex, void *desc, void *arg2);
 Class6E99C *Entity__GetOrCreateUnk100(Entity *self, void *name, void *arg2, void *arg3, s32 arg4);

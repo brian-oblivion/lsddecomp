@@ -9,7 +9,7 @@
  * gTodActorMethods): an Actor subclass (include/Actor.h). Methods in
  * src/code_55dd4.c; one class derives from it, Entity (gEntityMethods,
  * 0x1F234, include/Entity.h), whose ctor calls this class's first
- * (Entity__Entity: Get_vtable_TodActor()->ctor).
+ * (Entity__Entity: GetTodActorMethods()->ctor).
  *
  * Its ctor calls Actor's first (TodActor__TodActor:
  * GetActorMethods()->ctor), so the id parent is the ctor-chain parent.
@@ -121,7 +121,7 @@ struct TodActor {
 #define TICK_CALLBACK_C 0x43
 
 extern TodActorMethods gTodActorMethods;
-extern TodActorMethods *Get_vtable_TodActor(void); /* returns &gTodActorMethods */
+extern TodActorMethods *GetTodActorMethods(void); /* returns &gTodActorMethods */
 
 /* +0x04C's occupant in this class's table, as a caller reaching it through
  * the inherited slot casts it (see the banner). */
@@ -129,7 +129,7 @@ typedef void (*TodActorAttachToParentFn)(TodActor *self, TodActor *peer, void *c
                                            void *parent, void *offset);
 
 /* The class's own methods, in ROM order (code_55dd4). A subclass reaches
- * the base ones through Get_vtable_TodActor() and upcasts. */
+ * the base ones through GetTodActorMethods() and upcasts. */
 void *New_TodActor(void *desc, void *arg2);
 TodActor *TodActor__TodActor(TodActor *self, void *desc, void *arg2);
 void TodActor__Finalize(TodActor *self);

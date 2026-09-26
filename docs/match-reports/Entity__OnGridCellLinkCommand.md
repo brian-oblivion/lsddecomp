@@ -19,7 +19,7 @@ through.
 
 ```c
 void Entity__OnGridCellLinkCommand(Entity *this, s32 a1, s32 a2) {
-    Get_vtable_TodActor()->slotE0(this, a1, a2);
+    GetTodActorMethods()->slotE0(this, a1, a2);
     if (a2 == 4) {
         this->methods->slot160(this);
     }

@@ -64,7 +64,7 @@ own broader significance (read by every Entity_x unit) is not established.
 - `EntityMethods::slot30` -> `notifyParents` -- **tier B.** `tools/
   classtable.py` on `gEntityMethods` shows +0x030 occupied by the already-
   named `BasicClass__NotifyParents` (a slot inherited from the shared
-  ancestor `Get_vtable_TodActor()` also returns -- same idiom, confirmed by
+  ancestor `GetTodActorMethods()` also returns -- same idiom, confirmed by
   offset match against that table). CROSS-UNIT: `slot30` is dispatched from
   every one of Entity_b/c/d/e/f/g (`grep -rn -- '->slot30(' src/Entity_*.c`)
   as well as this unit's own `Entity__SetTargetReached`/`Entity__NotifyIfTargetInRange` (the latter
