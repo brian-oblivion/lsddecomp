@@ -326,7 +326,7 @@ void RequestedFile__Finalize(RequestedFile *self) {
 
 /* gRequestedFileMethods slot +0x064 (setFlag): the driver reports the requested
  * file loaded. */
-void RequestedFile__SetFlag(RequestedFile *self) {
+void RequestedFile__MarkLoaded(RequestedFile *self) {
     self->loaded = 1;
 }
 

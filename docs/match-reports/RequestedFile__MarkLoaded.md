@@ -1,4 +1,6 @@
-# RequestedFile__SetFlag -- MATCHED (3/3 words), round 82
+# RequestedFile__MarkLoaded -- MATCHED (3/3 words), round 82
+
+> Renamed from `RequestedFile__SetFlag` on 2026-09-26 (tools/rename.py). Address 0x800423e4.
 
 > Renamed from `Class6EED8__SetFlag` on 2026-09-26 (tools/rename.py). Address 0x800423e4.
 
@@ -22,14 +24,14 @@ ground (carved in FINISHING-PLAN revision 18), no prior attempt.
 
 ```c
 /* gRequestedFileMethods slot +0x064. */
-void RequestedFile__SetFlag(D_8006EED8Obj *self) {
+void RequestedFile__MarkLoaded(D_8006EED8Obj *self) {
     self->flag2C = 1;
 }
 ```
 
 ## Naming
 
-- `RequestedFile__SetFlag` -- tier A. Slot +0x064: sets flag2C = 1. A pure setter; the deeper game meaning of flag2C is not established (kept as flagNN rather than invented), but the setter's own mechanics ARE its purpose.
+- `RequestedFile__MarkLoaded` -- tier A. Slot +0x064: sets flag2C = 1. A pure setter; the deeper game meaning of flag2C is not established (kept as flagNN rather than invented), but the setter's own mechanics ARE its purpose.
 
 ## Track 4 (2026-09-26, round 87, delta)
 

@@ -17,7 +17,7 @@
  *
  * Own mechanics, all three methods: the ctor clears `loaded` and, given a
  * name, passes a 32-byte stack copy of it to requestLoadFile (+0x06C); the
- * setFlag override (+0x064, RequestedFile__SetFlag) sets `loaded` to 1 -- the
+ * setFlag override (+0x064, RequestedFile__MarkLoaded) sets `loaded` to 1 -- the
  * CD driver calls setFlag when a queued operation completes
  * (CdDriver__LoadFile, the request-queue dispatch in code_179d8_s) --
  * and finalize clears it again. Nothing overrides loadFile (+0x058 is NULL
@@ -47,6 +47,6 @@ extern RequestedFileMethods *GetRequestedFileMethods(void);
 RequestedFile *New_RequestedFile(char *name);
 void RequestedFile__RequestedFile(RequestedFile *self, char *name);
 void RequestedFile__Finalize(RequestedFile *self);
-void RequestedFile__SetFlag(RequestedFile *self);
+void RequestedFile__MarkLoaded(RequestedFile *self);
 
 #endif

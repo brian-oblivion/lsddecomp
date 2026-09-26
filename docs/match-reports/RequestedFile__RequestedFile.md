@@ -60,7 +60,7 @@ views `Slot0CMethods_322b4`, `Slot08Arg0Methods_322b4` and
 body in `src/code_322b4.c` is byte-identical.
 
 Renamed from `D8006EED8__D8006EED8` with rename.py (the class name).
-`flag2C` is `loaded`: the only setter of 1 is `RequestedFile__SetFlag`, the
+`flag2C` is `loaded`: the only setter of 1 is `RequestedFile__MarkLoaded`, the
 +0x064 setFlag override, and the CD driver calls setFlag when a queued
 operation completes (`CdDriver__LoadFile`, the request dispatch in
 code_179d8_s); the one reader, `WBgm__HandleMonitorEvent`, waits for it
