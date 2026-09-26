@@ -66,7 +66,7 @@ void **StyleFillEffectKind2(void **arg0, void *arg1) {
 
     r = rand();
     slot = (S32BoxK2 *) D_8008E0C0;
-    slot->v = (s32) (D_80087228 + ((u32) r % 3) * 3);
+    slot->v = (s32) (gStyleKind2Colors + ((u32) r % 3) * 3);
     slot++;
     val = (gStyleCounter / 20) * 20;
     if (gStyleCounter != val) {
@@ -334,7 +334,7 @@ local COUNT (this session's other two matches) or a declaration.
 `output-495-1` made two changes, both using one extra local `new_var`:
 
 - **(a)** an explicit alias for the first store:
-  `new_var = slot; *new_var = (s32) (D_80087228 + idx * 3);`
+  `new_var = slot; *new_var = (s32) (gStyleKind2Colors + idx * 3);`
 - **(b)** a named local for the `gStyleCueSelf` load, passed as
   `New_Class876FC`'s third argument.
 
@@ -383,7 +383,7 @@ extern s32 gStyleCounter;
 extern s32 gStyleCueSelf;
 extern s32 D_80087430;
 extern s32 D_80087330;
-extern u8 D_80087228[];
+extern u8 gStyleKind2Colors[];
 extern s32 D_8008E0C0[];
 extern u8 *D_8008E0B0;
 extern u8 gStyleSpawnRotations[];
@@ -400,7 +400,7 @@ void **StyleFillEffectKind2(void **arg0, void *arg1) {
 
     idx = (u32) rand() % 3;
     slot = D_8008E0C0;
-    *slot = (s32) (D_80087228 + idx * 3);
+    *slot = (s32) (gStyleKind2Colors + idx * 3);
     slot++;
     if (gStyleCounter % 20 == 0) {
         v0 = 0;

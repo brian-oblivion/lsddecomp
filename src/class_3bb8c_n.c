@@ -506,7 +506,7 @@ Class876FC **StyleFillEffectKind3(Class876FC **arg0, LongVec3 *arg1) {
 }
 
 extern s32 D_80087430;
-extern u8 D_80087228[];
+extern u8 gStyleKind2Colors[];
 extern s32 D_8008E0C0[];
 extern u8 *D_8008E0B0;
 extern u8 gStyleSpawnRotations[];
@@ -534,7 +534,7 @@ Class876FC **StyleFillEffectKind2(Class876FC **arg0, LongVec3 *arg1) {
 
     r = rand();
     slot = (S32BoxK2 *)D_8008E0C0;
-    slot->v = (s32)(D_80087228 + ((u32)r % 3) * 3);
+    slot->v = (s32)(gStyleKind2Colors + ((u32)r % 3) * 3);
     slot++;
     val = (gStyleCounter / 20) * 20;
     if (gStyleCounter != val) {
