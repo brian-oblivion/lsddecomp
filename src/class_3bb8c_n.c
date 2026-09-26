@@ -72,7 +72,7 @@ extern s32 gStyleVariant;
 extern s8 gStyleVariantConfigCounts[];
 extern s32 gStyleConfigIndex;
 extern s32 gStyleVariantConfigs[];
-extern s32 gStyleFlushColor;
+extern s32 gStyleClearColor;
 extern u8 gStyleDecorColorsB[];
 extern u8 gStylePalette[];
 extern s32 gStyleColorTable;
@@ -98,7 +98,7 @@ void *PickStyleFallbackConfig(void) {
     result = (s8 *)gStyleVariantConfigs[kind] + remainder * 4;
     if (kind == 0) {
         b3 = result[3];
-        gStyleFlushColor = (s32)(gStylePalette + b3 * 3);
+        gStyleClearColor = (s32)(gStylePalette + b3 * 3);
         b2 = result[2];
         tab = gStyleDecorColorsB;
         if (b2 != 0x12) {
@@ -262,7 +262,7 @@ void StyleUpdateDecorSet(void) {
         pos.y += 3;
         wp++;
     } while (i < 0x12);
-    AdjustRgbByDelta(rgb, (u8 *)gStyleFlushColor, shift);
+    AdjustRgbByDelta(rgb, (u8 *)gStyleClearColor, shift);
     self->methods->slot64(self, rgb);
 }
 

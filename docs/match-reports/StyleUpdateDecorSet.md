@@ -102,7 +102,7 @@ void StyleUpdateDecorSet(void) {
         pos.y += 3;
         wp++;
     } while (i < 0x12);
-    AdjustRgbByDelta(rgb, (u8 *) gStyleFlushColor, shift);
+    AdjustRgbByDelta(rgb, (u8 *) gStyleClearColor, shift);
     self->methods->slot64(self, rgb);
 }
 ```
