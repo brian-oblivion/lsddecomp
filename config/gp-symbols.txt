@@ -152,6 +152,7 @@ gDefaultBMemPMgr
 gDefaultGridSpan
 gDefaultScreenDims
 gDivPolygon3
+gDivPolygon4
 gDrawSystem
 gDreamAuxStage
 gDreamAuxWorld
@@ -175,7 +176,6 @@ gMoviePollCounter
 gNameCharTable
 gOpenVabCount
 gPendingVabBuffer
-gPolySubmitTableQuad
 gSoundEffectDirPtr
 gStartupBMemPMgr
 gStyleColorTable

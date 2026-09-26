@@ -216,7 +216,7 @@ void SubmitPolyG4(void *arg0, void *arg1) {
         ((OtTag *)self)->addr = (*(OtTag **)(prim + 0x30))->addr;
         (*(OtTag **)(prim + 0x30))->addr = (u32)self;
     } else {
-        FillRCPolyHeader(gPolySubmitTableQuad, prim, self + 0x4, 0, 0, 0);
+        FillRCPolyHeader(gDivPolygon4, prim, self + 0x4, 0, 0, 0);
         CopyPolyVtx4(prim + 0x94, prim + 0xA4, self + 0x8, self + 0x10,
                       self + 0x18, self + 0x20);
 
@@ -230,7 +230,7 @@ void SubmitPolyG4(void *arg0, void *arg1) {
         *(Vec2s16_C04 *)(*(u8 **)(prim + 0x9C) + 0xC) = *(Vec2s16_C04 *)(self + 0x14);
         *(Vec2s16_C04 *)(*(u8 **)(prim + 0xA0) + 0xC) = *(Vec2s16_C04 *)(self + 0x1C);
 
-        RCpolyG4(self, gPolySubmitTableQuad);
+        RCpolyG4(self, gDivPolygon4);
     }
 }
 #endif
@@ -285,7 +285,7 @@ void SubmitPolyG4(void *arg0, void *arg1)
             *head1 = (*head1 & 0xFF000000) | ((u32)self & 0xFFFFFF);
         }
     } else {
-        FillRCPolyHeader(gPolySubmitTableQuad, prim, self + 0x4, 0, 0, 0);
+        FillRCPolyHeader(gDivPolygon4, prim, self + 0x4, 0, 0, 0);
         CopyPolyVtx4(prim + 0x94, prim + 0xA4, self + 0x8, self + 0x10, self + 0x18, self + 0x20);
 
         *(u16 *)(*(u8 **)(prim + 0x94) + 0xA) = *(u8 *)(self + 0xF);
@@ -298,7 +298,7 @@ void SubmitPolyG4(void *arg0, void *arg1)
         *(Vec2s16_C04 *)(*(u8 **)(prim + 0x9C) + 0xC) = *(Vec2s16_C04 *)(self + 0x14);
         *(Vec2s16_C04 *)(*(u8 **)(prim + 0xA0) + 0xC) = *(Vec2s16_C04 *)(self + 0x1C);
 
-        func_8001B164(self, gPolySubmitTableQuad);
+        func_8001B164(self, gDivPolygon4);
     }
 }
 #endif

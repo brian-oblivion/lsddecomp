@@ -53,7 +53,7 @@ code, already documented in this report). **Tier B.** Mechanics are
 established (writes a running pointer through `table`'s own per-vertex
 records into two parallel arrays), matched by call site in code_8220_b:
 `InitVtxRecordPtrs(ctx + 0x88, gDivPolygon3, 3)` and
-`InitVtxRecordPtrs(ctx + 0x94, gPolySubmitTableQuad, 4)`, confirming
+`InitVtxRecordPtrs(ctx + 0x94, gDivPolygon4, 4)`, confirming
 `dst`/`table` and that this is a one-time setup of the render context's
 vertex-record pointer slots (the same `ctx+0x88`/`ctx+0x94` the Submit*
 wrappers later read). WHY `table` also keeps its own mirror copy of the

@@ -54,7 +54,7 @@ void FillRCPolyHeader(void *arg0, void *arg1, PolyUV4 *arg2, s32 arg3, u16 arg4,
 }
 ```
 
-Populates a GPU primitive header at `arg0` (`gDivPolygon3`/`gPolySubmitTableQuad`
+Populates a GPU primitive header at `arg0` (`gDivPolygon3`/`gDivPolygon4`
 depending on caller): a selected OT/code word at +0x00, `D_8008A824` at
 +0x04, `D_8008A828` at +0x08, an unaligned `PolyUV4` at +0x10 copied from
 `*arg2`, and the plain word at `arg1 + 0x30` at +0x14. Only the two `u16`

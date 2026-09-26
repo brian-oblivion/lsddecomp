@@ -189,7 +189,7 @@ typedef struct PolyVtx {
  * 3-element arrays of PolyVtx pointers plus three UV sources. */
 extern void CopyPolyVtx3(PolyVtx **dst, PolyVtx **src, PolyUV4 *uv0, PolyUV4 *uv1, PolyUV4 *uv2);
 
-/* Populates a submit table's (`table`, gDivPolygon3/gPolySubmitTableQuad):
+/* Populates a submit table's (`table`, gDivPolygon3/gDivPolygon4):
  * +0x00 an OT/code word (sPolyOtCodeOverride when sPolyOtCodeOverrideSet is set, else
  * D_80090C18), +0x04 D_8008A824, +0x08 D_8008A828 -- these three are
  * UNCONDITIONAL (the third rides in the branch's own delay slot in
@@ -229,7 +229,7 @@ extern u8 gDivPolygon3[];
 
 /* Quad-flavored sibling of gDivPolygon3/FillRCPolyHeader/RCpolyF3,
  * referenced the same way by SubmitPolyF4 (code_8220_c, round 13). */
-extern u8 gPolySubmitTableQuad[];
+extern u8 gDivPolygon4[];
 
 /* Unaligned struct-field copy helper (quad flavor: 4 fields, not 3).
  * Extends CopyPolyVtx3 to a 4th vertex: forwards elements 0-2 to it
