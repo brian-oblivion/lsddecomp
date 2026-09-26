@@ -58,7 +58,10 @@ struct DrawSystemMethods {
     /* +0x058 */ void (*loadImage)(DrawSystem *self, DrawRect *rect, u32 *pixels); /* DrawSystem__LoadImage */
     /* +0x05C */ void (*storeImage)(DrawSystem *self, u32 *pixels, DrawRect *rect); /* DrawSystem__StoreImage */
     /* +0x060 */ s32 (*slot60)(DrawSystem *self);                 /* DrawSystem__func_80020A1C, always returns 0 */
-    /* +0x064 */ void (*moveImage)(DrawSystem *self, DrawRect *rect, s16 x, s16 y); /* DrawSystem__MoveImage */
+    /* +0x064: the occupant takes s16 x, y and sign-extends them itself; the slot passes
+     * s32 because its caller's bytes need it (func_8003B624, code_2bb9c: an s16
+     * prototype adds a caller-side sll/sra per argument). */
+    /* +0x064 */ void (*moveImage)(DrawSystem *self, DrawRect *rect, s32 x, s32 y); /* DrawSystem__MoveImage */
     /* +0x068 */ void (*runLoop)(DrawSystem *self);               /* DrawSystem__RunLoop */
     /* +0x06C */ void (*countFrames)(DrawSystem *self);           /* DrawSystem__CountFrames */
     /* +0x070 */ void (*setVSyncCount)(DrawSystem *self, s32 value); /* DrawSystem__SetVSyncCount */

@@ -15,8 +15,8 @@
  * TimImage is the game's TIM-image loader: `buffer` (inherited from
  * Class6D430) holds the raw file, `TimImage__GetTimInfo` describes it with
  * Sony's `GsGetTimInfo`, and `TimImage__Upload` uploads the pixel block and,
- * when present, the CLUT to the draw singleton (`Class6C070`, `code_10ee0.c`)
- * through its `loadImage`/`MoveImage`-shaped method pair.
+ * when present, the CLUT to the draw singleton (DrawSystem, `include/DrawSystem.h`)
+ * through its loadImage slot.
  *
  * Also holds `func_8003B624`, not a TimImage method (`classtable.py
  * D_8006E558` lists it nowhere): a free function that circularly scrolls a
@@ -35,6 +35,7 @@
  */
 #include "common.h"
 #include "Class6D430.h"
+#include "DrawSystem.h"
 
 /* LIBGS.H GsIMAGE, laid out as the SDK declares it: GsGetTimInfo fills it
  * and TimImage__Upload reads it field by field. */
@@ -86,34 +87,12 @@ struct TimImage {
 /* LIBGS.H: void GsGetTimInfo(unsigned long *im, GsIMAGE *tim); */
 void GsGetTimInfo(u32 *im, GsIMAGE *tim);
 
-/* A rectangle as the draw singleton's methods take it: 16-bit origin,
- * 32-bit extent. */
-typedef struct DrawRect {
-    /* +0x00 */ s16 x;
-    /* +0x02 */ s16 y;
-    /* +0x04 */ s32 w;
-    /* +0x08 */ s32 h;
-} DrawRect;
-
 /* An s16 point. */
 typedef struct DrawPoint {
     /* +0x00 */ s16 x;
     /* +0x02 */ s16 y;
 } DrawPoint;
 
-typedef struct Class6C070 Class6C070;
-/* Only the two slots this unit reaches. */
-typedef struct Class6C070Methods {
-    /* +0x000 */ u8 pad0[0x58];
-    /* +0x058 */ void (*loadImage)(Class6C070 *self, DrawRect *rect, u32 *data);
-    /* +0x05C */ u8 pad5C[0x8];
-    /* +0x064 */ void (*moveImage)(Class6C070 *self, DrawRect *rect, s32 x, s32 y);
-} Class6C070Methods;
-struct Class6C070 {
-    /* +0x000 */ Class6C070Methods *methods;
-};
-
-extern Class6C070 *GetDrawSystem(void); /* returns the draw singleton */
 extern void *BMemPMgrAlloc(s32 size);
 extern Class6D430Methods *GetActiveDataSourceMethods(void);
 TimImageMethods *GetTimImageMethods(void);
@@ -149,7 +128,7 @@ void TimImage__Finalize(TimImage *self) {
 /* TimImage +0x078: describe the TIM, then upload its pixel block and, when
  * pmode bit 3 says it has one, its CLUT. */
 void TimImage__Upload(TimImage *self) {
-    Class6C070 *draw;
+    DrawSystem *draw;
     DrawRect rect;
     GsIMAGE *tim;
 
@@ -209,8 +188,8 @@ TimImageMethods *GetTimImageMethods(void) {
  * +0x064 per iteration, built from r's edges and p; nothing but i changes
  * between iterations. */
 void func_8003B624(DrawRect *r, s32 count, DrawPoint *p) {
-    Class6C070 *draw;
-    void (*fn)(Class6C070 *, DrawRect *, s32, s32);
+    DrawSystem *draw;
+    void (*fn)(DrawSystem *, DrawRect *, s32, s32);
     DrawRect rect;
     s32 i;
 
