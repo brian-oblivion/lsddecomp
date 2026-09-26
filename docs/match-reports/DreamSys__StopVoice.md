@@ -131,3 +131,16 @@ slot +0x84 on `soundObj`'s vtable is `VabStreamObjMethods::slot84` ==
 `VabStreamObj__StopVoice` (src/code_179d8_e.c, matched), at the same offset with
 the same signature, and `FlushSoundCueSet` in that unit guards its own call to it
 with the identical `index >= 0` test.
+
+## Track 4 (2026-09-26, round 87, VabStreamObj)
+
+`include/DreamSys.h`'s `DreamSysUnk58`/`DreamSysUnk58Vtable` view is deleted.
+`DreamSys::soundObj` is cast to `VabStreamObj *` (`include/VabStreamObj.h`),
+and the slots are called by the class's names: `slot0x80` -> `playTone`
+(`VabStreamObj__PlayTone`: index = program << 4 | tone, then vol and
+endVol; it returns the voice), `slot0x84` -> `stopVoice`, and `slot0x9C` ->
+`setPitchOffset` (its argument is an octave: pitchOffset = octave * 12 - 24).
+The view had typed stopVoice `void`, but its occupant returns s32 (always
+-1). The whole image stays byte-identical with the s32 slot, because the one
+call site discards the value. `soundObj` itself stays `s32`: it is
+DreamSys's field.

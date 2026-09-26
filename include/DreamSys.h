@@ -243,40 +243,11 @@ typedef struct DreamSysUnk5C {
 	s32 endValue;
 } DreamSysUnk5C;
 
-/* Object pointed to by DreamSys::soundObj, used by DreamSys__StopVoice (slot
-   +0x84) and, this round, ExecuteLink (slot +0x80): loaded, dereferenced
-   for its own vtable pointer at offset 0, and called through. Everything
-   else about this class -- including whether it is the SAME class as
-   DreamSys::unk_0x4C below -- is unknown. Elsewhere in this unit soundObj
-   is set/read as a plain s32 (DreamSys__SetSoundObj, DreamSys__StopDrift's call into
-   FlushSoundCueSet), which is consistent with it being a pointer value just
-   not typed that way there. slot0x84 takes TWO arguments, not one --
-   head-adjudicated 2026-08-30-c: the guard value (DreamSys::voiceIndex)
-   loaded into $a1 by DreamSys__StopVoice is never overwritten before the jalr, so
-   it is passed through, not just branched on. See DreamSys__StopVoice.md.
-   slot0x80 (ExecuteLink, round 2026-09-02) takes three arguments, all
-   literal constants at that call site (0x90, 0x6E, 0x6E) -- nothing here
-   suggests what they mean.
-
-   DreamSys__StartVoice (round 2026-09-06) adds two more confirmed facts: slot0x80
-   DOES return a value -- it stores the result into DreamSys::voiceIndex on one
-   call path -- so its return type widens from `void` to `s32` here; this is
-   safe for every existing call site (ExecuteLink, DreamSys__DreamSys's own
-   slot0x80 use on the DIFFERENT DreamSysCtorArgObj vtable below) because none
-   of them ever read $v0 after the call, so a discarded s32 return compiles
-   identically to a void one. DreamSys__StartVoice also reaches a new slot at +0x9C,
-   one argument, called three times with a byte-table value and small
-   literal constants (1, 2); nothing here suggests what it does either. */
-typedef struct DreamSysUnk58Vtable {
-	u8 pad00[0x80];
-	s32 (*slot0x80)(void *self, s32 a1, s32 a2, s32 a3);
-	void (*slot0x84)(void *self, s32 flag);
-	u8 pad88[0x14];
-	void (*slot0x9C)(void *self, s32 a1);
-} DreamSysUnk58Vtable;
-typedef struct DreamSysUnk58 {
-	DreamSysUnk58Vtable *vt;
-} DreamSysUnk58;
+/* DreamSys::soundObj is a VabStreamObj (include/VabStreamObj.h): DreamSys.c
+   casts it there. StartVoice / ExecuteLink call playTone (+0x080; the voice
+   it returns goes to voiceIndex), StopVoice calls stopVoice (+0x084), and
+   StartVoice calls setPitchOffset (+0x09C). This header used to carry that
+   view as DreamSysUnk58 / DreamSysUnk58Vtable (deleted round 87, track 4). */
 
 /* Object pointed to by DreamSys__DreamSys's `arg1` constructor parameter --
    same "vtable pointer at offset 0" shape as the other opaque classes in
@@ -329,8 +300,7 @@ typedef struct DreamSysUnk11CResult {
 
 /* Object pointed to by DreamSys::unk_0x4C, used by DreamSys__UnlinkLinkMgr (slot
    +0xF0) and DreamSys__TryInstantTeleportLink (slot +0xE8, this round): same "vtable pointer
-   at offset 0" shape as DreamSysUnk58 above. Unidentified class; unknown if
-   related to DreamSysUnk58. */
+   at offset 0" shape as the other opaque views here. Unidentified class. */
 typedef struct DreamSysUnk4CMethods {
 	u8 pad00[0xD4];
 	/* Called by DreamSys__WallLink as (this->unk_0x4C, arg1), return value
@@ -550,9 +520,9 @@ extern s8 DREAM_COLOR_TABLE[9];
 /* Byte tables indexed by DreamSys::voiceSelect (already bounded to [0,0x18) at
    the write site -- see that field's own comment). DreamSys__StartVoice
    (round 2026-09-06) reads both: VOICE_BY_SELECT[voiceSelect] (values 0..0x1E) feeds
-   DreamSysUnk58Vtable::slot0x80's `a1` argument, left-shifted by 4;
+   VabStreamObj playTone's `index` argument (program << 4, tone 0);
    VOICE_PITCH_BY_SELECT[voiceSelect] (values include -2..2, hence `s8` not `u8`) feeds
-   slot0x9C's `a1` argument directly. VOICE_PITCH_BY_SELECT's real extent is exactly
+   setPitchOffset's `octave` argument directly. VOICE_PITCH_BY_SELECT's real extent is exactly
    these 24 bytes -- the trailing zero bytes splat lumped into its dlabel
    belong to the gProjectOffsetZ vector documented above, not to this table. */
 extern const s8 VOICE_BY_SELECT[0x18];
@@ -620,7 +590,8 @@ typedef struct DreamSys {
 	   from `class_3bb8c_p.c` (round 57 naming pass). */
 	void *pendingExtra;
 
-	/* Set by DreamSys__SetSoundObj(this, value); no other observed use. */
+	/* Set by DreamSys__SetSoundObj(this, value): a VabStreamObj, cast to
+	   one where it is called through (include/VabStreamObj.h). */
 	s32 soundObj;
 	/* Set by DreamSys__SetHeightCurve(this, value); read as a pointer by
 	   DreamSys__ProjectPointAtDistance (this->heightCurve + 0x14 and + 0x20 are passed to
