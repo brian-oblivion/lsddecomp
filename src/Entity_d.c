@@ -1,26 +1,24 @@
-/* Second 20-function slice of the Entity class's 97-function remainder,
- * 0x5077C..0x52290 (Entity_c is the first slice, Entity_e the third).
+/* Entity_d: nineteen of Entity's MoodCue handlers and the helper two of
+ * them share.
  *
- * 19 of the 20 are gEntityMoodHandlerTable callbacks (Entity.h), named
- * Entity__MoodCueNN for the row they occupy -- rows 39-52 and 55-58 are
- * consecutive with Entity_c's own tail, row 115 (Entity__MoodCue115, this
- * unit's last function) is not, confirming row order tracks moodIndex
- * assignment, not code address. The names were confirmed by reading
- * disk/SLPS_015.56 directly rather than trusting address proximity:
- * gEntityMoodHandlerTable's own base plus a fixed per-row stride locates
- * each row's `handler` word (the arithmetic and addresses are in each
- * function's docs/match-reports/Entity__MoodCueNN.md), and it was checked
- * against every candidate function's own address. The one
- * exception, `Entity__RollScaleOrDelayedDrift`, is not itself a table row -- it is a
- * private helper Entity__MoodCue43/44 both call directly (`jal`, not
- * through any vtable or table), tier C because its own purpose beyond
- * "sometimes bump scale, sometimes queue a delayed addTranslation" is not
- * established.
+ * Each Entity__MoodCueNN is the `handler` of gEntityMoodHandlerTable's row
+ * NN (include/Entity.h): rows 39 to 52, 55 to 58 and 115. An Entity whose
+ * moodIndex selects the row installs it as its SoundCueSet callback, so
+ * ServiceSoundCueSet calls it once per tick with the Entity and its cue
+ * set. A handler requests tones by filling the set's slots (a VAB program
+ * of the cue's sound object, or SOUND_CUE_STOP), moves and turns the
+ * entity (or the player, its `peer`) on moodTimer, the ticks since
+ * startSoundCue, or on todFrame, the frame of its TOD animation, and sends
+ * the dream an EntityEffect through notifyParents. Entity__MoodCue45 is
+ * empty: its row has no per-tick effect.
  *
- * `Entity__MoodCue45` is a real, matched, genuinely empty function (`{}`,
- * `jr $ra; nop` after splat's own frame elision) -- row 45 of the table is
- * a legitimate "this mood has no per-tick cue effect" entry, not an
- * unfinished stub.
+ * Entity__RollScaleOrDelayedDrift is not a row: Entity__MoodCue43 and
+ * Entity__MoodCue44 call it first thing every tick.
+ *
+ * The literals are left unnamed where they are one handler's tuning: tick
+ * counts, distances in world units, TOD frame numbers, VAB program numbers,
+ * and the `state` values other than 0 and ENTITY_STATE_DONE, which are each
+ * handler's own phases.
  */
 #include "common.h"
 #include "Entity.h"
@@ -31,24 +29,22 @@
  * bytes). Entity__MoodCue41 writes the den and passes the template. */
 extern s16 sScaleTemplateZDenom;
 
-/* Data tables reached with a raw pointer by this unit's mood-dispatch
- * handlers -- same convention as Entity_c.c's own SCALE_Y2/SCALE_SIX/etc
- * externs (separate local view per translation unit, not shared via the
- * header). */
-extern u8 ROTATION_YAW_PLUS9[];
-extern u8 ROTATION_YAW_MINUS9[];
-extern u8 SCALE_X3[];
+/* The Ratio16[3] rotations (degrees) and scales the handlers pass to
+ * updateRotation and updateScale, and the offset they pass to
+ * addTranslation. */
+extern Ratio16 ROTATION_YAW_PLUS9[];
+extern Ratio16 ROTATION_YAW_MINUS9[];
+extern Ratio16 SCALE_X3[];
 extern LongVec3 TRANSLATE_Z_MINUS256[];
-extern u8 SCALE_Y2[];
-extern u8 SCALE_SIX[];
-extern u8 ROTATION_YAW_PLUS180[];
-extern u8 ROTATION_YAW_MINUS90[];
-extern u8 ROTATION_YAW_PLUS90[];
-extern u8 SCALE_Y4[];
-extern u8 ROTATION_ZMINUS90[];
+extern Ratio16 SCALE_Y2[];
+extern Ratio16 SCALE_SIX[];
+extern Ratio16 ROTATION_YAW_PLUS180[];
+extern Ratio16 ROTATION_YAW_MINUS90[];
+extern Ratio16 ROTATION_YAW_PLUS90[];
+extern Ratio16 SCALE_Y4[];
+extern Ratio16 ROTATION_ZMINUS90[];
 
-/* Forward declaration: Entity__RollScaleOrDelayedDrift is defined later in this file (higher
- * ROM address) but Entity__MoodCue43, at a lower address, calls it directly. */
+/* Defined after Entity__MoodCue43, which calls it. */
 void Entity__RollScaleOrDelayedDrift(Entity *this);
 
 void Entity__MoodCue39(Entity *this, SoundCueSet *out) {
@@ -79,7 +75,7 @@ skipScaleBump:
 }
 
 void Entity__MoodCue40(Entity *this, SoundCueSet *out) {
-    void *table = NULL;
+    Ratio16 *table = NULL;
 
     if (out->tick % 7 == 0) {
         out->attenuation = this->methods->getProximityRatio(this);
@@ -151,7 +147,7 @@ void Entity__MoodCue42(Entity *this, SoundCueSet *out) {
 void Entity__MoodCue43(Entity *this, SoundCueSet *out) {
     s32 dx;
     s32 rotPick;
-    u8 *table;
+    Ratio16 *table;
 
     Entity__RollScaleOrDelayedDrift(this);
     out->attenuation = this->methods->getProximityRatio(this);
@@ -175,7 +171,7 @@ void Entity__MoodCue44(Entity *this, SoundCueSet *out) {
     s32 dx;
     s32 dxPick;
     s32 rotPick;
-    u8 *table;
+    Ratio16 *table;
 
     Entity__RollScaleOrDelayedDrift(this);
     out->attenuation = this->methods->getProximityRatio(this);
@@ -202,6 +198,9 @@ void Entity__MoodCue44(Entity *this, SoundCueSet *out) {
     }
 }
 
+/* At the cue's start, rolls 0..9: 8 or 9 stretches the entity by
+ * SCALE_X3, 5 to 7 arms a drift (state 10) that adds TRANSLATE_Z_MINUS256
+ * every tick from tick 201 on. */
 void Entity__RollScaleOrDelayedDrift(Entity *this) {
     s32 r;
 
@@ -218,6 +217,7 @@ void Entity__RollScaleOrDelayedDrift(Entity *this) {
     }
 }
 
+/* Row 45 has no per-tick effect. */
 void Entity__MoodCue45(void) {}
 
 void Entity__MoodCue46(Entity *this, SoundCueSet *out) {
@@ -340,7 +340,7 @@ void Entity__MoodCue50(Entity *this, SoundCueSet *out) {
 }
 
 void Entity__MoodCue51(Entity *this, SoundCueSet *out) {
-    void *table;
+    Ratio16 *table;
 
     if (this->moodTimer == 0 && rand() % 5 == 0 && this->state == 0) {
         this->methods->updateScale(this, 1, SCALE_SIX);
