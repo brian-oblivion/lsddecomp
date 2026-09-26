@@ -150,7 +150,7 @@ void TitleMenu__DestroySaveTitle(TitleMenu *self) {
     Get_vtable_TaskCore()->releaseTarget((TaskCore *)self);
 }
 
-void TitleMenu__ForwardToNameField(TitleMenu *self, void *parent) {
+void TitleMenu__AttachSaveTitle(TitleMenu *self, void *parent) {
     Get_vtable_TaskCore()->updateSlotElements((TaskCore *)self, parent);
     self->nameField->methods->attachToParent(self->nameField, (SceneNode *)parent,
                                              (LongVec3 *)&D_8008A9B4);

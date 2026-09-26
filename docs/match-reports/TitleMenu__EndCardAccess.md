@@ -40,7 +40,7 @@ cache in a named local" idiom).
   dedicated `TitleMenuUnkACObj_3bb8c_d *` carrying both the shared
   `release` slot at `+0x004` and this function's own `+0x070` slot. Same
   size, no layout change; same shape of retype already done once for
-  `nameField` in `TitleMenu__ForwardToNameField`'s report, for the identical reason (one
+  `nameField` in `TitleMenu__AttachSaveTitle`'s report, for the identical reason (one
   instance needs a second slot the others never reach).
 
 ### Proposed learning

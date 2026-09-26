@@ -193,7 +193,7 @@ extern const char D_800114F8[];
  * itself. Placeholder s32 type; real element layout unknown. */
 extern s32 D_80086DAC;
 
-/* Address-of only in this unit (TitleMenu__ForwardToNameField passes &D_8008A9B4 to
+/* Address-of only in this unit (TitleMenu__AttachSaveTitle passes &D_8008A9B4 to
  * the name field's attachToParent, TextRow +0x04C, as its LongVec3 offset;
  * the words are -4, -23, ...). Placeholder s32 type, cast at the call. */
 extern s32 D_8008A9B4;

@@ -1,16 +1,18 @@
-# TitleMenu__ForwardToNameField -- MATCH
+# TitleMenu__AttachSaveTitle -- MATCH
+
+> Renamed from `TitleMenu__ForwardToNameField` on 2026-09-26 (tools/rename.py). Address 0x8004dc64.
 
 > Renamed from `Class86B60__ForwardToNameField` on 2026-09-26 (tools/rename.py). Address 0x8004dc64.
 
 > Renamed from `func_8004DC64` on 2026-09-24 (tools/rename.py). Address 0x8004dc64.
 
 Unit `class_3bb8c_d`, round 14. `./build-and-verify.sh` exit 0; whole-image
-SHA1 matches retail. `funcdiff.py TitleMenu__ForwardToNameField`: 27/27 words match.
+SHA1 matches retail. `funcdiff.py TitleMenu__AttachSaveTitle`: 27/27 words match.
 
 ## Source
 
 ```c
-void TitleMenu__ForwardToNameField(TitleMenu *self, s32 arg1)
+void TitleMenu__AttachSaveTitle(TitleMenu *self, s32 arg1)
 {
     Get_vtable_TaskCore()->slotE0(self, arg1);
     self->nameField->methods->slot4C(self->nameField, arg1, &D_8008A9B4);
@@ -41,7 +43,7 @@ None new.
 
 ## Naming (round 77, naming runner delta)
 
-Renamed `func_8004DC64` -> `TitleMenu__ForwardToNameField`. **Tier B**: Forwards `arg1` to the base class's `slotE0`, then dispatches `arg1` and a fixed global (`&D_8008A9B4`) through `self->nameField`'s own `slot4C`. Purpose of the forwarded value/event not established.
+Renamed `func_8004DC64` -> `TitleMenu__AttachSaveTitle`. **Tier B**: Forwards `arg1` to the base class's `slotE0`, then dispatches `arg1` and a fixed global (`&D_8008A9B4`) through `self->nameField`'s own `slot4C`. Purpose of the forwarded value/event not established.
 
 ## Track 4 (2026-09-25, round 84, alpha)
 
