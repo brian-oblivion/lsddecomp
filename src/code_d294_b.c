@@ -13,7 +13,7 @@
  * `SceneNode__GetRotMatrix`); a gated read-transform-notify chain
  * (`SceneNode__GetModelHull` -> `SceneNode__NotifyWithHull` ->
  * `SceneNode__TransformAndNotifyParents`); two vtable no-op stubs
- * (`func_8001D6A4`/`D6AC`, kept `func_` per this class's own
+ * (`SceneNode__OnPadEvent`/`D6AC`, kept `func_` per this class's own
  * `SceneNode__func_1d33c` no-op precedent); a command dispatcher over the same
  * "attach" state (`SceneNode__DispatchLinkCommand`, proposed `SceneNode__DispatchLinkCommand`);
  * a proximity-attach attempt (`SceneNode__TryAttachNearby`, MATCHED round
@@ -140,7 +140,7 @@ void SceneNode__TransformAndNotifyParents(SceneNode *self, TmdHull *a1, s32 a2) 
     self->notifyVerts = NULL;
 }
 
-void func_8001D6A4(void) {}
+void SceneNode__OnPadEvent(void) {}
 
 void func_8001D6AC(void) {}
 

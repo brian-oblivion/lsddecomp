@@ -110,7 +110,7 @@ struct SceneNodeSub14 {
     /* +0x088 */ void (*notifyIfUnk20Active)(Self *self, s32 event);       /* SceneNode__NotifyWithHull */ \
     /* +0x08C */ void (*readUnk20Data)(Self *self, void *dest);            /* SceneNode__GetModelHull */ \
     /* +0x090 */ void (*transformAndNotifyParents)(Self *self, TmdHull *verts, s32 event); /* SceneNode__TransformAndNotifyParents */ \
-    /* +0x094 */ void (*onPadEvent)(Self *self, void *sender, s32 event);  /* func_8001D6A4, empty; onNotify's Pad (2) case; DreamSys__OnPadEvent */ \
+    /* +0x094 */ void (*onPadEvent)(Self *self, void *sender, s32 event);  /* SceneNode__OnPadEvent, empty; onNotify's Pad (2) case; DreamSys__OnPadEvent */ \
     /* +0x098 */ void (*update)(Self *self, void *sender, s32 event);      /* func_8001D6AC, empty; onNotify's FrameClock (5) case; Entity__Update, DreamSys__TimerTick */ \
     /* +0x09C */ void (*dispatchLinkCommand)(Self *self, void *sender, s32 event); /* SceneNode__DispatchLinkCommand; onNotify's SceneNode (4) case */ \
     /* +0x0A0 */ void (*tryAttachNearby)(Self *self);                      /* SceneNode__TryAttachNearby; its 2nd parameter arrives as the caller's untouched $a1 */ \
@@ -182,7 +182,7 @@ void SceneNode__GetRotMatrix(SceneNode *self, s32 out, s32 invert);
 void SceneNode__NotifyWithHull(SceneNode *self, s32 event);
 void SceneNode__GetModelHull(SceneNode *self, void *dest);
 void SceneNode__TransformAndNotifyParents(SceneNode *self, TmdHull *verts, s32 event);
-void func_8001D6A4(void);
+void SceneNode__OnPadEvent(void);
 void func_8001D6AC(void);
 void SceneNode__DispatchLinkCommand(SceneNode *self, void *sender, s32 event);
 void SceneNode__TryAttachNearby(SceneNode *self, SceneNode *other);
