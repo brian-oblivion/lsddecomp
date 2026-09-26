@@ -119,7 +119,7 @@ void DreamSys__ResetSessionState(DreamSys *this) {
 void DreamSys__SpawnAtLink(DreamSys *this, StageMap *grid) {
     s32 attachPos[4];
 
-    grid->methods->setTargetAndBuildRates(grid, attachPos, (SceneNode *)this,
+    grid->methods->setTargetAndLoadChunks(grid, attachPos, (SceneNode *)this,
                                           (Descriptor10 *)&this->linkCoordinates);
     GetActorMethods()->attachToParent((Actor *)this, (SceneNode *)grid, (LongVec3 *)attachPos);
     this->methods->addChild(this, (BasicClass *)grid);
@@ -162,8 +162,8 @@ void DreamSys__NotifyLinkAttempt(DreamSys *this, s32 event) {
     goto shared_tail;
 
 handle_neg2:
-    if (this->grid->methods->findElementForPosition(this->grid, (LongVec3 *)&this->coord2->tx)
-            ->loader->headerReady != 2)
+    if (this->grid->methods->findSlotForPosition(this->grid, (LongVec3 *)&this->coord2->tx)->loader->headerReady !=
+        2)
         goto neg2_mismatch;
 
 shared_tail:
@@ -1200,8 +1200,8 @@ void DreamSys__ProcessChunkChange(DreamSys *this, void *entity, s32 effect) {
     PlayerSpawnPoint *pos;
 
     if (effect == 5) {
-        pos = (PlayerSpawnPoint *)((StageMap *)entity)
-                  ->methods->getTargetDescriptor((StageMap *)entity, 0, 0);
+        pos =
+            (PlayerSpawnPoint *)((StageMap *)entity)->methods->getTargetDescriptor((StageMap *)entity, 0, 0);
         this->methods->logChunkMood(this, pos);
     }
 }

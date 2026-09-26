@@ -239,7 +239,7 @@ struct StageMapMethods {
     /* +0x0D8 */ void (*slotD8)(void); /* func_8004B324, empty; never called */
     /* +0x0DC */ void (*setGridSpan)(StageMap *self, s32 span); /* StageMap__SetGridSpan */
     /* +0x0E0 */ void (*setConfig)(StageMap *self, StageGridDimensions *config); /* StageMap__SetConfig */
-    /* +0x0E4 */ s32 (*setTargetAndBuildRates)(StageMap *self, void *outPos, SceneNode *target,
+    /* +0x0E4 */ s32 (*setTargetAndLoadChunks)(StageMap *self, void *outPos, SceneNode *target,
                                                Descriptor10 *cell); /* StageMap__SetTargetAndLoadChunks */
     /* +0x0E8 */ s32 (*computeCellOffsets)(StageMap *self, void *outPos,
                                            void *cell);          /* StageMap__ComputeCellOffsets */
@@ -258,9 +258,9 @@ struct StageMapMethods {
                                                       void **outPos); /* StageMap__GetTargetDescriptor */
     /* +0x110 */ s32 (*computeFootprintDescriptor)(StageMap *self, Descriptor10Ext *out,
                                                    SplitLongVec3 *pos); /* StageMap__ComputeFootprintDescriptor: 0, or 1 when no slot holds pos */
-    /* +0x114 */ ChunkSlot *(*getLastTargetRateSplit)(StageMap *self, u8 *out); /* StageMap__GetLastEventSlotChunk */
-    /* +0x118 */ ChunkSlot *(*findElemByUnk32)(StageMap *self, s32 key); /* StageMap__FindSlotByNeighbour */
-    /* +0x11C */ ChunkSlot *(*findElementForPosition)(StageMap *self, LongVec3 *pos); /* StageMap__FindSlotForPosition */
+    /* +0x114 */ ChunkSlot *(*getLastEventSlotChunk)(StageMap *self, u8 *out); /* StageMap__GetLastEventSlotChunk */
+    /* +0x118 */ ChunkSlot *(*findSlotByNeighbour)(StageMap *self, s32 key); /* StageMap__FindSlotByNeighbour */
+    /* +0x11C */ ChunkSlot *(*findSlotForPosition)(StageMap *self, LongVec3 *pos); /* StageMap__FindSlotForPosition */
     /* +0x120 */ s32 (*findSlotIndexByNeighbour)(StageMap *self, s32 key); /* StageMap__FindSlotIndexByNeighbour */
     /* +0x124 */ s32 (*findSlotIndexByChunk)(StageMap *self, s32 key); /* StageMap__FindSlotIndexByChunk: an index or -1 */
     /* +0x128 */ void (*refreshFootprint)(StageMap *self); /* StageMap__RefreshFootprint */
@@ -268,7 +268,7 @@ struct StageMapMethods {
                                                 s32 command); /* StageMap__ApplyToSenderFootprint */
     /* +0x130 */ void *(*getUnk1CC)(StageMap *self);          /* StageMap__GetUnk1CC */
     /* +0x134 */ void (*setBounds)(StageMap *self, CellBounds *bounds); /* StageMap__SetBounds */
-    /* +0x138 */ void (*configureRateEntry)(StageMap *self, s32 rate, s32 flag); /* StageMap__StartScaleRamp */
+    /* +0x138 */ void (*startScaleRamp)(StageMap *self, s32 rate, s32 flag); /* StageMap__StartScaleRamp */
     /* +0x13C */ void (*stepScaleRamp)(StageMap *self); /* StageMap__StepScaleRamp */
     /* +0x140 */ void (*endScaleRamp)(StageMap *self);  /* StageMap__EndScaleRamp */
 }; /* 80 slots */
@@ -279,7 +279,7 @@ struct StageMap {
     /* +0x060 */ ChunkFileFn chunkFileFn; /* setCallback */
     /* +0x064 */ void *chunkFileCtx;      /* setCallback */
     /* +0x068 */ StageGridDimensions *config; /* setConfig (ObjM: GetStageGridDimensions(stage)); NULL after Reset */
-    /* +0x06C */ SceneNode *target; /* setTargetAndBuildRates (DreamSys__SpawnAtLink passes the DreamSys); its coord2 is the tracked position */
+    /* +0x06C */ SceneNode *target; /* setTargetAndLoadChunks (DreamSys__SpawnAtLink passes the DreamSys); its coord2 is the tracked position */
     /* +0x070 */ s32 enabled;       /* enable/disable; gates UpdateIfEnabled */
     /* +0x074 */ s32 gridSpan;      /* setGridSpan: gDefaultGridSpan = 0xA000 */
     /* +0x078 */ s16 gridHalfCells; /* gridSpan >> 12 = 10 */
@@ -294,7 +294,7 @@ struct StageMap {
     /* +0x0E8 */ s32 *acceptedTags; /* setAcceptedTags: a 0-terminated list of class ids ForwardAcceptedCommand accepts */
     /* +0x0EC */ ChunkSlot slots[7];
     /* +0x1B0 */ s32 loadsPending; /* 1 while chunk loads are pending (ApplyChunkLoads; OnNotifyTag1 clears it) */
-    /* +0x1B4 */ u16 unk1B4; /* CountPendingLoads after ApplyChunkLoads; OnNotifyTag1 counts it down */
+    /* +0x1B4 */ u16 pendingLoadCount; /* CountPendingLoads after ApplyChunkLoads; OnNotifyTag1 counts it down */
     /* +0x1B6 */ u8 pad1B6[0x1B8 - 0x1B6];
     /* +0x1B8 */ s32 chunksLoaded; /* set when that count reaches 0; RefreshFootprint does nothing while it is 0 */
     /* +0x1BC */ ChunkSlot *lastEventSlot; /* OnSlotEvent's slot; GetLastEventSlotChunk reads it */

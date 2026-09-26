@@ -86,7 +86,7 @@ void StageMap__StageMap(StageMap *self, LongVec3 *origin, s32 autoLoad) {
     }
 
     self->loadsPending = 0;
-    self->unk1B4 = 0;
+    self->pendingLoadCount = 0;
     self->chunksLoaded = 0;
     self->enabled = 0;
     self->target = NULL;
@@ -271,7 +271,7 @@ void StageMap__UnloadAllSlots(StageMap *self) {
     }
 
     self->chunksLoaded = 0;
-    self->unk1B4 = 0;
+    self->pendingLoadCount = 0;
     self->methods->endScaleRamp(self);
 }
 

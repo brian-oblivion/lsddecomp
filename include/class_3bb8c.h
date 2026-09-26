@@ -105,7 +105,7 @@ extern void RotMatrix(void *arg0, QueryTemplate866E8 *arg1);
 extern void ApplyMatrixLV(QueryTemplate866E8 *arg0, s32 *arg1,
                           s32 *arg2); /* arity-ok: this IS the callee's real signature (Sony libgte, 0x80015618 reads $a0 matrix / $a1 in / $a2 out); include/code_d294.h's unprototyped copy is round 19's deliberate frame-sizing shape, not a claim about arity */
 
-/* The four scale steps (Ratio16[3], x/y/z) configureRateEntry picks for
+/* The four scale steps (Ratio16[3], x/y/z) startScaleRamp picks for
  * `scaleStep`: y +1/64, +1/4 (rate > 0; flag 0, nonzero), -1/64, -1/4
  * (rate <= 0); x and z 0/1. */
 extern Ratio16 D_8008699C[3];

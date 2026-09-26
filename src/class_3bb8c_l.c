@@ -36,8 +36,7 @@ void ObjM__NoOpSlot40(void) {}
  * becomes ObjM__OnRegistrantEvent. */
 void ObjM__AttachTarget(ObjM *self, IntermediateBaseInitArgs *args, DreamSys *dreamSys) {
     ((StageMap *)args->lightRig)
-        ->methods->setCallback((StageMap *)args->lightRig,
-                               (ChunkFileFn)ObjM__OnRegistrantEvent, self);
+        ->methods->setCallback((StageMap *)args->lightRig, (ChunkFileFn)ObjM__OnRegistrantEvent, self);
     self->dreamSys = dreamSys;
     GetTimedTaskMethods()->init((TimedTask *)self, args, 1);
     self->methods->addChild(self, (BasicClass *)dreamSys);
@@ -131,8 +130,7 @@ void ObjM__InitStyleAndWorld(ObjM *self, s32 gridSpan, Unk50Struct_3bb8c_l *styl
         self->unk40 = 0x10;
         self->unk44 = 2;
         flag = 1;
-        ((StageMap *)self->unk14)
-            ->methods->setBounds((StageMap *)self->unk14, (CellBounds *)&D_80087150);
+        ((StageMap *)self->unk14)->methods->setBounds((StageMap *)self->unk14, (CellBounds *)&D_80087150);
     }
 
     self->gridSpan = gridSpan;
@@ -191,7 +189,7 @@ void ObjM__PollTimBlockLoad(ObjM *self, TimBlockSrc *src) {
         }
     }
     if (self->timBlockPending == 0) {
-        if (((StageMap *)self->unk14)->unk1B4 == 0 && self->inSession == 0) {
+        if (((StageMap *)self->unk14)->pendingLoadCount == 0 && self->inSession == 0) {
             self->unk64 = 1;
             self->methods->enterStyleSession(self);
         }

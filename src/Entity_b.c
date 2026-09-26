@@ -303,7 +303,7 @@ void Entity__MoodCue12(Entity *this) {
     if (this->state == 0xB) {
         result = this->methods->distanceToPeer(this, this->peer);
         if (result < 0xA00) {
-            this->grid->methods->configureRateEntry(this->grid, 1, 1);
+            this->grid->methods->startScaleRamp(this->grid, 1, 1);
             this->moodTimer = 1;
             this->state = 0xC;
         }

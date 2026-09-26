@@ -41,7 +41,7 @@ void Entity__MoodCue59(Entity *this, SoundCueSet *out) {
     }
     this->methods->moveLocalZ(this, -128, 0);
     if (this->state == 12 && this->moodTimer == 300) {
-        this->grid->methods->configureRateEntry(this->grid, 1, 1);
+        this->grid->methods->startScaleRamp(this->grid, 1, 1);
     }
 }
 
@@ -77,7 +77,7 @@ void Entity__MoodCue62(Entity *this, SoundCueSet *out) {
                 out->attenuation = 0;
                 out->slots[1].octave = -1;
                 if (rand() & 1) {
-                    this->grid->methods->configureRateEntry(this->grid, -1, 0);
+                    this->grid->methods->startScaleRamp(this->grid, -1, 0);
                 }
                 this->moodTimer = 0;
                 this->state = 10;

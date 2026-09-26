@@ -134,8 +134,7 @@ typedef struct LinkQueryBuf {
 } LinkQueryBuf;
 
 void *AcceptGridElem(void *arg0, void *arg1, void *arg2);
-s32 Actor__BuildLinkQueries(Actor *self, GridQuery *arr1, ChunkSlot **arr2, LinkQueryBuf *arg3,
-                            s32 arg4);
+s32 Actor__BuildLinkQueries(Actor *self, GridQuery *arr1, ChunkSlot **arr2, LinkQueryBuf *arg3, s32 arg4);
 void *Actor__ScanLinkCandidates(Actor *self, void *arg1, void *arg2, s32 count, GridQuery *arr1,
                                 ChunkSlot **arr2);
 
@@ -170,8 +169,7 @@ s32 Actor__FindNearbyLink(Actor *self) {
     return 0;
 }
 
-s32 Actor__BuildLinkQueries(Actor *self, GridQuery *arr1, ChunkSlot **arr2, LinkQueryBuf *arg3,
-                            s32 arg4) {
+s32 Actor__BuildLinkQueries(Actor *self, GridQuery *arr1, ChunkSlot **arr2, LinkQueryBuf *arg3, s32 arg4) {
     s32 f2 = arg3->queryCol;
     s32 f3 = arg3->queryRow;
     s32 numCols;
@@ -206,13 +204,13 @@ s32 Actor__BuildLinkQueries(Actor *self, GridQuery *arr1, ChunkSlot **arr2, Link
         s3 = src->loader->elemKey;
         pos = s3 + 1;
         if (pos < unk68->rows) {
-            arr2[1] = unk4C->methods->findElemByUnk32(unk4C, pos);
+            arr2[1] = unk4C->methods->findSlotByNeighbour(unk4C, pos);
             idx = 2;
             arr1[1] = arr1[0];
         }
         pos = s3 - 1;
         if (pos >= 0) {
-            arr2[idx] = unk4C->methods->findElemByUnk32(unk4C, pos);
+            arr2[idx] = unk4C->methods->findSlotByNeighbour(unk4C, pos);
             arr1[idx] = arr1[0];
             idx++;
         }
@@ -280,8 +278,7 @@ void *Actor__ScanLinkCandidates(Actor *self, void *arg1, void *arg2, s32 count, 
  * comes up empty. `self` (this function's own first argument) is read
  * from `a0` in the disassembly but never touched by the body -- present
  * only to match its caller's calling convention (round 2026-09-04). */
-void *Actor__ScanGridWindow(Actor *self, void *arg1, void *arg2, GridQuery *query,
-                            ChunkSlot *source) {
+void *Actor__ScanGridWindow(Actor *self, void *arg1, void *arg2, GridQuery *query, ChunkSlot *source) {
     s32 row, col;
     GridCell **bucket;
 

@@ -158,7 +158,7 @@ void StageMap__LoadChunksAround(StageMap *self, s32 val, LongVec3 *arg2, ChunkSl
 
         count = 0;
         for (i = 0; i < 7; i++) {
-            e = self->methods->findElemByUnk32(self, i);
+            e = self->methods->findSlotByNeighbour(self, i);
             e->neighbour = arg3[i].neighbour;
             if (arg3[i].load != 0) {
                 tbl = &sNeighbourOffsets[arg3[i].neighbour];
@@ -295,7 +295,7 @@ void StageMap__ApplyChunkLoads(StageMap *self, ChunkLoadEntry *arr1, s32 count) 
 
     for (i = 0; i < count; i++) {
         sp = (ChunkLoadEntryTail *)&arr1->chunkIndex;
-        e = self->methods->findElemByUnk32(self, sp->neighbour);
+        e = self->methods->findSlotByNeighbour(self, sp->neighbour);
         ((StageMapOnSlotEventFn)self->methods->notifyWithHull)(self, 6, e, i);
         if (arr1->file != 0) {
             if (e->loader->headerReady != 0) {
@@ -316,7 +316,7 @@ void StageMap__ApplyChunkLoads(StageMap *self, ChunkLoadEntry *arr1, s32 count) 
         }
         arr1++;
     }
-    self->unk1B4 = StageMap__CountPendingLoads(self);
+    self->pendingLoadCount = StageMap__CountPendingLoads(self);
 }
 
 s32 StageMap__CountPendingLoads(StageMap *self) {
@@ -352,8 +352,8 @@ void StageMap__OnNotifyTag1(StageMap *self, void *arg1, s32 mode) {
                 self->methods->populateSlotCells(self, e);
                 e->loader->headerReady = 2;
                 e->loadPending = 0;
-                if (--self->unk1B4 == 0) {
-                    self->unk1B4 = 0;
+                if (--self->pendingLoadCount == 0) {
+                    self->pendingLoadCount = 0;
                     self->loadsPending = 0;
                     self->chunksLoaded = curMode;
                 }
@@ -538,13 +538,13 @@ s32 StageMap__ComputeFootprintDescriptor(StageMap *self, Descriptor10Ext *out, S
     s32 b2;
     s32 b3;
 
-    e = self->methods->findElementForPosition(self, (LongVec3 *)in);
+    e = self->methods->findSlotForPosition(self, (LongVec3 *)in);
     if (e != 0) {
         rate = e->loader->chunkIndex;
         out->chunkIndex = rate;
         StageMap__SplitChunkIndex(self, (u8 *)out, rate);
 
-        u14a = (Unk14Obj *)self->methods->findElemByUnk32(self, e->loader->elemKey)->cellParent->coord2;
+        u14a = (Unk14Obj *)self->methods->findSlotByNeighbour(self, e->loader->elemKey)->cellParent->coord2;
         out->chunkCentre.x = u14a->unk18.w + 0x5000;
         out->chunkCentre.y = u14a->unk1C;
         out->chunkCentre.z = u14a->unk20.w + 0x5000;
@@ -621,7 +621,7 @@ ChunkSlot *StageMap__FindSlotForPosition(StageMap *self, LongVec3 *arg1) {
     tol = 0xA000;
     threshold = 0;
     for (; i < 7; i++, threshold -= 0x800) {
-        candidate = self->methods->findElemByUnk32(self, i);
+        candidate = self->methods->findSlotByNeighbour(self, i);
         r = (Unk14Obj *)candidate->cellParent->coord2;
         if (arg1->x >= r->unk18.w && arg1->x < (w = r->unk18.w) + tol) {
             if (arg1->z >= r->unk20.w && arg1->z < (w = r->unk20.w) + tol) {

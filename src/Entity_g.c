@@ -129,7 +129,7 @@ void Entity__MoodCue103(Entity *this, SoundCueSet *out) {
         }
     } else if (this->moodTimer == 0x64 || this->moodTimer == 0x320) {
         if (rand() % 5 == 0) {
-            this->grid->methods->configureRateEntry(this->grid, 4, 0);
+            this->grid->methods->startScaleRamp(this->grid, 4, 0);
         }
     }
     this->methods->moveLocalZ(this, -0x1E, 0);
