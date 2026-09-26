@@ -48,7 +48,7 @@ own `dtor`) are its purpose.
 
 ## Track 4 (2026-09-26, round 87, echo)
 
-`unk100` is a `Class6E99C *` and `unk104` a `BasicClass *` (Entity.h);
+`unk100` is a `FadeBox *` and `unk104` a `BasicClass *` (Entity.h);
 both calls through their +0x004 are now `release` (BasicClass__Release in
 every table). `unk104` is only ever released in Entity code, so it is typed
 no further than the slot it reaches. Image byte-identical.

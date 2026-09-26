@@ -25,7 +25,7 @@
 #include "ObjM.h"
 #include "Class866E8.h"
 #include "NodeGuardedViewport.h"
-#include "Class6E99C.h"
+#include "FadeBox.h"
 #include "TimBlockSrc.h"
 #include "WBgm.h"
 
@@ -335,9 +335,9 @@ void ObjM__ExitSceneStyle(ObjM *self) {
 
 void ObjM__EnterStyleSession(ObjM *self) {
     NodeGuardedViewportMethods *m;
-    Class6E99CMethods *m2;
+    FadeBoxMethods *m2;
     NodeGuardedViewport *vp;
-    Class6E99C *fade;
+    FadeBox *fade;
     Unk50Struct_3bb8c_l *style;
     s32 local10;
     s32 ret;
@@ -363,7 +363,7 @@ void ObjM__EnterStyleSession(ObjM *self) {
     vp->methods->setUnkB4(vp, 0);
     vp->methods->setDrawEnabled(vp, 1);
 
-    fade = (Class6E99C *)vp->methods->getSubHandle(vp);
+    fade = (FadeBox *)vp->methods->getSubHandle(vp);
     self->methods->addChild(self, (BasicClass *)fade);
 
     ret = self->dreamSys->methods->getSetFlashbackSession(self->dreamSys, (DreamColors *)&local10, -1);

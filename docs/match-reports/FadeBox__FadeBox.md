@@ -1,12 +1,14 @@
-# Class6E99C__Class6E99C -- MATCH (43/43 words, first attempt)
+# FadeBox__FadeBox -- MATCH (43/43 words, first attempt)
+
+> Renamed from `Class6E99C__Class6E99C` on 2026-09-26 (tools/rename.py). Address 0x8003fe2c.
 
 > Renamed from `func_8003FE2C` on 2026-09-20 (tools/rename.py). Address 0x8003fe2c.
 
-Unit `code_2cc8c_e`, carved round 14. `Class6E99CObj`'s own constructor
-(`Class6E99CMethods::ctor`, slot `+0x008`).
+Unit `code_2cc8c_e`, carved round 14. `FadeBoxObj`'s own constructor
+(`FadeBoxMethods::ctor`, slot `+0x008`).
 
 ```c
-void Class6E99C__Class6E99C(Class6E99CObj *self, void *a1, s32 a2, s32 a3) {
+void FadeBox__FadeBox(FadeBoxObj *self, void *a1, s32 a2, s32 a3) {
     ClassEAC0Methods *base;
     void *tableEntry;
 
@@ -17,7 +19,7 @@ void Class6E99C__Class6E99C(Class6E99CObj *self, void *a1, s32 a2, s32 a3) {
         tableEntry = D_8006EAA8;
     }
     base->ctor((ClassEAC0Obj *)self, a1, tableEntry, a3);
-    self->methods = GetClass6E99CMethods();
+    self->methods = GetFadeBoxMethods();
     self->methods->finishConstruct(self, a2);
 }
 ```
@@ -41,7 +43,7 @@ entry). See `include/code_2cc8c.h`'s header comment above
 function anchors.
 
 An explicit cast (`(ClassEAC0Obj *)self`) is needed at the base-ctor call:
-`self` really is the SAME memory, but C has no notion that `Class6E99CObj`
+`self` really is the SAME memory, but C has no notion that `FadeBoxObj`
 and `ClassEAC0Obj` are related (they are two independent flat local views,
 per this project's convention -- not a real C `struct` embedding).
 
@@ -52,11 +54,11 @@ already a pointer.
 
 ## Naming (round 61, track 3)
 
-**`Class6E99C__Class6E99C`** -- tier A. `Class6E99CMethods::ctor`
+**`FadeBox__FadeBox`** -- tier A. `FadeBoxMethods::ctor`
 (`+0x008`). Named per the project's `Class__Class` constructor convention
 (see `Entity__Entity`, `DreamSys.c`): calls the further-base ctor
 (`GetBoxFillMethods()->ctor(...)`) first, then installs this class's
-own `&D_8006E99C` table, then redispatches through `finishConstruct` --
+own `&gFadeBoxMethods` table, then redispatches through `finishConstruct` --
 the textbook "base ctor first, then own vtable, then dispatch" idiom
 already documented elsewhere in this project. Mechanics (construct an
 instance of this class) fully determine the name.
@@ -64,3 +66,13 @@ instance of this class) fully determine the name.
 ## Track 4 (2026-09-25, round 85, charlie)
 
 The base call is now typed through BoxFill's header: `BoxFillMethods *base = GetBoxFillMethods(); base->ctor((BoxFill *)self, ...)` (was a cast to the deleted `ClassEAC0Methods`). BoxFill (0x64, include/BoxFill.h) is this class's ctor-chain parent. Zero bytes.
+
+## Track 6 (2026-09-26, round 93, charlie)
+
+Renamed with the class: `Class6E99C` is now `FadeBox`
+(`python3 tools/renametype.py Class6E99C FadeBox`, table
+`python3 tools/rename.py D_8006E99C gFadeBoxMethods`), tier A; the evidence
+is in New_FadeBox.md's Track 6 section. The method's own name was kept: it
+already says what the body does. renametype.py rewrote the old class name in
+this report's earlier history too (known, pending an operator decision).
+

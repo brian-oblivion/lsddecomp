@@ -1,11 +1,13 @@
-# Class6E99C__Update -- MATCH (54/54 words, first attempt)
+# FadeBox__Update -- MATCH (54/54 words, first attempt)
+
+> Renamed from `Class6E99C__Update` on 2026-09-26 (tools/rename.py). Address 0x8003ff44.
 
 > Renamed from `func_8003FF44` on 2026-09-20 (tools/rename.py). Address 0x8003ff44.
 
-Unit `code_2cc8c_e`, carved round 14. `Class6E99CMethods::update` (`+0x098`).
+Unit `code_2cc8c_e`, carved round 14. `FadeBoxMethods::update` (`+0x098`).
 
 ```c
-void Class6E99C__Update(Class6E99CObj *self, void *a1, s32 a2) {
+void FadeBox__Update(FadeBoxObj *self, void *a1, s32 a2) {
     s32 old;
 
     if (a2 != 2) {
@@ -59,11 +61,11 @@ with a non-trivial body on BOTH sides rather than a bare early return.
 - `self->unk64`/`unk65`/`unk66` are three independent `u8` counters, each
   incremented by the LOW BYTE of `self->step` (a full `s32` elsewhere)
   gated by a separate bit of the `unk78` flags word -- named
-  `Class6E99CObj::unk64`/`unk65`/`unk66` in `include/code_2cc8c.h`.
+  `FadeBoxObj::unk64`/`unk65`/`unk66` in `include/code_2cc8c.h`.
 
 ## Naming (round 61, track 3)
 
-**`Class6E99C__Update`** -- tier B. `Class6E99CMethods::update` (`+0x098`).
+**`FadeBox__Update`** -- tier B. `FadeBoxMethods::update` (`+0x098`).
 Mechanics: ignores every call except `a2 == 2`, then decrements a countdown
 (`self->unk80`, still unnamed -- no other function gives it a purpose
 beyond "the thing this loop decrements") and either accumulates a
@@ -81,3 +83,13 @@ The +0x098 override of SceneNode's `update(self, sender, event)`
 slot, parameters named for it. Fields: unk80 -> ticksLeft, unk78 ->
 channels, unk64/65/66 -> BoxFill's color[0..2]; the sender goes to `stop`,
 which removes it as a child. Image byte-identical.
+
+## Track 6 (2026-09-26, round 93, charlie)
+
+Renamed with the class: `Class6E99C` is now `FadeBox`
+(`python3 tools/renametype.py Class6E99C FadeBox`, table
+`python3 tools/rename.py D_8006E99C gFadeBoxMethods`), tier A; the evidence
+is in New_FadeBox.md's Track 6 section. The method's own name was kept: it
+already says what the body does. renametype.py rewrote the old class name in
+this report's earlier history too (known, pending an operator decision).
+

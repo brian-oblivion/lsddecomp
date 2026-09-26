@@ -349,7 +349,7 @@ load through a runtime-indexed global", §"BLOCKED: the `nop_mflo_mfhi` screen r
   a register-identity residue on a pointer used by a run of same-shaped field copies. The mechanism
   (round 73): the inline copy (`movstrsi_internal`) CLOBBERS `$v0`/`$v1`/`$a0`/`$a1`, so a parameter
   live across a whole-struct assignment loses its incoming register; an unexplained entry `move
-  $a3,$a0` next to batched `lw/lw/sw/sw` is the tell (`Class6E99C__PushPosition`). (a
+  $a3,$a0` next to batched `lw/lw/sw/sw` is the tell (`FadeBox__PushPosition`). (a
   docs/match-reports/SceneNode__RaycastVertical.md, round 57)
 - **When a residue is a missing register-to-register COPY, try DELETING the named local and
   inlining the expression** — the inverse of the "name the subexpression" lever. 2.6.3's
@@ -519,7 +519,7 @@ load through a runtime-indexed global", §"BLOCKED: the `nop_mflo_mfhi` screen r
   FORWARDED-PARAMETER arity defect.** Check the previous call: if its callee reads `$aN` and the
   caller never writes it, declare and pass the caller's own parameter (a file-local fn-pointer view
   if the shared slot is under-declared); a `move $tN,$aK` whose `$tN` later takes a call result is
-  the parameter reused as the result (`aK = f(..., aK)`). Closed `Class6E99C__StartFadeDown`/
+  the parameter reused as the result (`aK = f(..., aK)`). Closed `FadeBox__StartFadeDown`/
   `StartFadeDefault` after 94k permuter iterations. (PROGRESS round 73)
 - **Read every call's argument registers in retail before any other lever; round 75's commonest
   defect was the wrong NUMBER of arguments or a missing return, 17 functions.** A "filler"

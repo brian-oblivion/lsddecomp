@@ -245,7 +245,7 @@ restored (never disturbed in `src/`).
 
 ## Round 18 continued: exhaustive type/declaration-axis search (head's requested lever)
 
-Per the head's round-wide broadcast on the `TaskObjF__WriteMemcardSaveFile`/`Class6E99C__PushPosition`
+Per the head's round-wide broadcast on the `TaskObjF__WriteMemcardSaveFile`/`FadeBox__PushPosition`
 overturns (a mistyped parameter masquerading as a register-identity
 residue), built a `PERM_GENERAL`-based seed exploring type/declaration
 axes rather than statement order: (1) `src`'s declaration split across

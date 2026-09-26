@@ -122,9 +122,9 @@ existing names' reading, not re-derived here.
 
 ## Track 4 (2026-09-26, round 87, echo)
 
-`this->unk100` is a `Class6E99C *` (include/Class6E99C.h); the slot
-call through its +0x0D4 and +0x0D8 is now `startFadeDown`/`startFadeUp` (Class6E99C__StartFadeDown/StartFadeUp), with `companion2`, an
-`s32` in Entity.h, cast `(BasicClass *)` as the fade's source (Class6E99C's
+`this->unk100` is a `FadeBox *` (include/FadeBox.h); the slot
+call through its +0x0D4 and +0x0D8 is now `startFadeDown`/`startFadeUp` (FadeBox__StartFadeDown/StartFadeUp), with `companion2`, an
+`s32` in Entity.h, cast `(BasicClass *)` as the fade's source (FadeBox's
 configure adds it as a child; no code). Image byte-identical.
 
 ## Track 4 (2026-09-26, round 88, echo)

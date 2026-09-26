@@ -386,7 +386,7 @@ void ObjM__OnNotify(ObjM *self, BasicClass *sender, s32 event) {
     if ((tag & 0xFFF) == 0x114) {
         self->methods->onClass866E8Notify(self, sender, event);
     } else if ((tag & 0xFFF) == 0x164) {
-        self->methods->onFadeNotify(self, (struct Class6E99C *)sender, event);
+        self->methods->onFadeNotify(self, (struct FadeBox *)sender, event);
     } else if ((tag & 0xFFFF) == 0x1F34) {
         self->methods->onDreamSysNotify(self, sender, event);
     }

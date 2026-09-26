@@ -1,4 +1,6 @@
-# Class6E99C__PushPosition -- MATCHED (25/25, round 73; was STALL 22/25, "permuter-exhausted redundant move")
+# FadeBox__PushPosition -- MATCHED (25/25, round 73; was STALL 22/25, "permuter-exhausted redundant move")
+
+> Renamed from `Class6E99C__PushPosition` on 2026-09-26 (tools/rename.py). Address 0x8004042c.
 
 REVISITED, round 73: MATCHED 25/25 (whole-image SHA1 green); names/types not relevant (the existing `SkipShort2 *a1` / `Pair32E99C *a2` signature was kept; retyping `a1` as `Pair32E99C *` measured byte-identical)
 
@@ -44,7 +46,7 @@ barriers; `a1` back to `SkipShort2 *`), all 25/25 after the lever.
 ### Matched body
 
 ```c
-void Class6E99C__PushPosition(Class6E99CObj *self, SkipShort2 *a1, Pair32E99C *a2) {
+void FadeBox__PushPosition(FadeBoxObj *self, SkipShort2 *a1, Pair32E99C *a2) {
     if (self->unkC != 0) {
         self->unk88 = self->unk60;
         self->unk8C = self->unk62;
@@ -106,7 +108,7 @@ hits, so this was never a masked compile error either -- the "22/25,
 permuter-exhausted" verdict genuinely stands.
 
 Considered whether the "write the expression in place, back into a
-dying operand" lever that closed this round's `Class6E99C__Configure` (a
+dying operand" lever that closed this round's `FadeBox__Configure` (a
 different function in this same unit) would transfer here: it would
 not -- this residue is the OPPOSITE shape. There, retail wanted a value
 kept in ONE register and this compiler split it into two; here, retail
@@ -118,10 +120,10 @@ the same lever applied twice. Given two independent permuter searches
 rounds 18/19, not re-spending a further search without a genuinely new
 angle. Restored to `INCLUDE_ASM`; full oracle re-confirmed green.
 
-Unit `code_2cc8c_e`, carved round 14. `Class6E99CMethods::pushPosition` (`+0x0E8`).
+Unit `code_2cc8c_e`, carved round 14. `FadeBoxMethods::pushPosition` (`+0x0E8`).
 
 **Correction to an earlier version of this report**, which claimed a full
-25/25 match under the stale-build window described in `New_Class6E99C.md`.
+25/25 match under the stale-build window described in `New_FadeBox.md`.
 Re-verified genuinely fresh, this function has a real residue -- but the
 investigation also found and fixed a genuine FIELD-WIDTH bug in
 `include/code_2cc8c.h` along the way (see "Field width correction" below),
@@ -132,12 +134,12 @@ figure below is WRONG, verified by direct rebuild, not by re-reading
 permuter output.** The round-bravo section further down states "this
 final 1-word 'redundant move' residue" and the title inherited that
 language; round 18's own PROGRESS entry and this round's task assignment
-both repeated it as "Class6E99C__PushPosition ... ONE WORD REMAINING." Rebuilding
+both repeated it as "FadeBox__PushPosition ... ONE WORD REMAINING." Rebuilding
 the EXACT preserved body (below, unchanged) against the real oracle
 gives:
 
 ```
-Class6E99C__PushPosition: 22/25 words match (file 0x30C2C-0x30C90)
+FadeBox__PushPosition: 22/25 words match (file 0x30C2C-0x30C90)
 ```
 
 -- three words differ, not one:
@@ -173,8 +175,8 @@ remaining."
 
 ## Field width correction (kept, unlike the stall verdict above)
 
-`Class6E99CObj::unk88`/`unk8C` were originally typed `s16` (from
-`Class6E99C__PopPosition`'s own `lhu` read alone). This function's OWN `sw` (a full
+`FadeBoxObj::unk88`/`unk8C` were originally typed `s16` (from
+`FadeBox__PopPosition`'s own `lhu` read alone). This function's OWN `sw` (a full
 WORD store, not `sh`) at those exact offsets is direct evidence they are
 `s32`, not `s16`:
 
@@ -185,9 +187,9 @@ sw $v1, 0x8c($a3)
 
 Retyped to `s32` in the header (removing an earlier, now-known-wrong 2-byte
 `pad08A` inserted to compensate for the old `s16` typing). This retype is
-what let `Class6E99C__PopPosition` (a SIBLING function, already matched) reach a
+what let `FadeBox__PopPosition` (a SIBLING function, already matched) reach a
 genuine 9/9 -- confirmed by rebuild, not assumed. Separately,
-`Class6E99CObj::unk60`/`unk62` needed retyping `s16` -> `u16`: this
+`FadeBoxObj::unk60`/`unk62` needed retyping `s16` -> `u16`: this
 function's own `lhu` (zero-extending) when WIDENING them into the now-`s32`
 `unk88`/`unk8C` only reproduces with an unsigned source type.
 
@@ -195,7 +197,7 @@ function's own `lhu` (zero-extending) when WIDENING them into the now-`s32`
 
 ```c
 #if 0
-void Class6E99C__PushPosition(Class6E99CObj *self, SkipShort2 *a1, Pair32E99C *a2) {
+void FadeBox__PushPosition(FadeBoxObj *self, SkipShort2 *a1, Pair32E99C *a2) {
     if (self->unkC != 0) {
         self->unk88 = self->unk60;
         self->unk8C = self->unk62;
@@ -235,7 +237,7 @@ instructions, only the register NUMBER differs.
 ### Attempts at the register-identity part (2)
 
 1. Base body above: `$a0`/`$a1` throughout, not `$a3`/`$t0`.
-2. Explicit local copies (`Class6E99CObj *obj = self; SkipShort2 *src =
+2. Explicit local copies (`FadeBoxObj *obj = self; SkipShort2 *src =
    a1;`, then use `obj`/`src` throughout): no change at all -- GCC still
    keeps the values in `$a0`/`$a1`.
 
@@ -247,8 +249,8 @@ which retail does not do -- retail interleaves each load immediately with
 its own store before starting the next pair. A bare
 `__asm__("" ::: "memory")` between pairs is what stops the hoist (a bare
 `__asm__("")` with no clobber did NOT work when tried on the sibling
-`Class6E99C__PopPosition`, memory clobber was required there too). This same lever
-closed `Class6E99C__PopPosition` (now a real, confirmed 9/9 match) and is the reason
+`FadeBox__PopPosition`, memory clobber was required there too). This same lever
+closed `FadeBox__PopPosition` (now a real, confirmed 9/9 match) and is the reason
 this function's own remaining gap is ONLY the register-identity issue, not
 also a structural one.
 
@@ -317,7 +319,7 @@ changed.
 
 ```c
 #if 0
-void Class6E99C__PushPosition(Class6E99CObj *self, SkipShort2 *a1, Pair32E99C *a2) {
+void FadeBox__PushPosition(FadeBoxObj *self, SkipShort2 *a1, Pair32E99C *a2) {
     if (self->unkC != 0) {
         self->unk88 = self->unk60;
         self->unk8C = self->unk62;
@@ -364,7 +366,7 @@ this project.
 the body above): `-j 6 --stop-on-zero --best-only`, bounded with
 `timeout 500`. Base score confirmed 210 via `--debug` before the search.
 Ran to completion (~28,487 iterations; exit code not literally captured,
-see "Anomaly" in `Class6E99C__Stop.md` for the same wrapper issue -- the
+see "Anomaly" in `FadeBox__Stop.md` for the same wrapper issue -- the
 iteration count and log tail are consistent with the 500s bound firing,
 not with `--stop-on-zero`). **No zero reached; best found was 25**, not
 210 -- but every candidate at or below 210 that was inspected used a
@@ -522,13 +524,13 @@ still taking the `#else INCLUDE_ASM` branch. `./build-and-verify.sh` and
 
 ## Naming (round 61, track 3)
 
-**`Class6E99C__PushPosition`** -- tier B (STALL, preserved body unchanged
-by this rename). `Class6E99CMethods::pushPosition` (`+0x0E8`), gated on `unkC`
+**`FadeBox__PushPosition`** -- tier B (STALL, preserved body unchanged
+by this rename). `FadeBoxMethods::pushPosition` (`+0x0E8`), gated on `unkC`
 being non-NULL. Stashes the current `unk60`/`unk62` pair into `unk88`/
 `unk8C` and the current `unk50`/`unk54` pair into `unk90`/`unk94`, then
 installs a NEW position from its own `a1`(x,y)/`a2` arguments into
 `unk60`/`unk62`/`unk50`/`unk54`. Its exact inverse,
-`Class6E99C__PopPosition` (`popPosition`), restores the stashed values back
+`FadeBox__PopPosition` (`popPosition`), restores the stashed values back
 into the live fields -- a save/restore-of-one pair, hence
 "Push"/"Pop". What game event drives the push (an on-screen position
 override, e.g. a highlight or animation) is not established -- tier B.
@@ -537,4 +539,14 @@ override, e.g. a highlight or animation) is not established -- tier B.
 
 Fields under their unified names: unkC -> parent, unk50/54 -> posX/posY,
 unk60/62 -> boxW/boxH (BoxFill's), unk88/8C -> savedW/savedH, unk90/94 ->
-savedPosX/savedPosY (Class6E99C's). Image byte-identical.
+savedPosX/savedPosY (FadeBox's). Image byte-identical.
+
+## Track 6 (2026-09-26, round 93, charlie)
+
+Renamed with the class: `Class6E99C` is now `FadeBox`
+(`python3 tools/renametype.py Class6E99C FadeBox`, table
+`python3 tools/rename.py D_8006E99C gFadeBoxMethods`), tier A; the evidence
+is in New_FadeBox.md's Track 6 section. The method's own name was kept: it
+already says what the body does. renametype.py rewrote the old class name in
+this report's earlier history too (known, pending an operator decision).
+

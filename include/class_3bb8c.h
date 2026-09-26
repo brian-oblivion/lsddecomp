@@ -369,7 +369,7 @@ extern s32 CopyMemcardIconTemplate(s32 arg0, s32 arg1); /* TaskObjF__WriteMemcar
  * their helper views of the objects ObjM holds (FieldM14/18/34/50/7C,
  * ChildM_AC, ChildM114, ParamM, Obj14/StyleWorldObj/RegistrantObj_3bb8c_l)
  * are gone: those objects are the unified Class866E8, NodeGuardedViewport,
- * Class6E99C, TimBlockSrc, VabStreamObj, FrameClock, WBgm and TextRow. */
+ * FadeBox, TimBlockSrc, VabStreamObj, FrameClock, WBgm and TextRow. */
 
 /* ObjM::styleConfig's pointee (include/ObjM.h): not a class, a plain
  * record, the same memory class_3bb8c_m's local StyleM describes

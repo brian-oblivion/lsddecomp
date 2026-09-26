@@ -10,7 +10,7 @@
  * include/ObjM.h; track 4, round 89 unified the class_3bb8c_k/_l/_m views
  * there), and its getter: EnterState7/8/A and NotifyParentsCodeB (the
  * DreamSys codes 0xE..0x11, which set IntermediateBase::state and start a
- * fade), StartFadeUp (the viewport's Class6E99C fade box), the fade box's
+ * fade), StartFadeUp (the viewport's FadeBox fade box), the fade box's
  * and the Class866E8's notification handlers (OnFadeNotify: 5 fade down
  * done, 6 fade up done; OnClass866E8Notify: 7 runs CheckAuxTrigger), and
  * the "Pause" overlay: AdvancePauseSetup builds the TextRow and, four
@@ -39,7 +39,7 @@
 #include "ObjM.h"
 #include "Class866E8.h"
 #include "NodeGuardedViewport.h"
-#include "Class6E99C.h"
+#include "FadeBox.h"
 #include "FrameClock.h"
 #include "WBgm.h"
 #include "VabStreamObj.h"
@@ -81,10 +81,10 @@ void ObjM__NotifyParentsCodeB(ObjM *self) {
 }
 
 /* The viewport (IntermediateBase::viewport, a NodeGuardedViewport) hands out its fade
- * box (getSubHandle, Viewport's New_Class6E99C). */
+ * box (getSubHandle, Viewport's New_FadeBox). */
 void ObjM__StartFadeUp(ObjM *self, s32 channels, s32 arg2, s32 step, s32 addChild) {
-    Class6E99C *fade =
-        (Class6E99C *)((NodeGuardedViewport *)self->viewport)->methods->getSubHandle((NodeGuardedViewport *)self->viewport);
+    FadeBox *fade =
+        (FadeBox *)((NodeGuardedViewport *)self->viewport)->methods->getSubHandle((NodeGuardedViewport *)self->viewport);
     if (step != 0) {
         fade->methods->setStep(fade, step);
     }
@@ -94,7 +94,7 @@ void ObjM__StartFadeUp(ObjM *self, s32 channels, s32 arg2, s32 step, s32 addChil
     fade->methods->startFadeUp(fade, self->unk10, channels, arg2);
 }
 
-void ObjM__OnFadeNotify(ObjM *self, Class6E99C *sender, s32 event) {
+void ObjM__OnFadeNotify(ObjM *self, FadeBox *sender, s32 event) {
     void *color;
     switch (event) {
         case 5:

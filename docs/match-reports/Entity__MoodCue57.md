@@ -158,9 +158,9 @@ callback); which dream object owns the row is not.
 
 ## Track 4 (2026-09-26, round 87, echo)
 
-`this->unk100` is a `Class6E99C *` (include/Class6E99C.h); the slot
-call through its +0x0D4 is now `startFadeDown` (Class6E99C__StartFadeDown), with `companion2`, an
-`s32` in Entity.h, cast `(BasicClass *)` as the fade's source (Class6E99C's
+`this->unk100` is a `FadeBox *` (include/FadeBox.h); the slot
+call through its +0x0D4 is now `startFadeDown` (FadeBox__StartFadeDown), with `companion2`, an
+`s32` in Entity.h, cast `(BasicClass *)` as the fade's source (FadeBox's
 configure adds it as a child; no code). Image byte-identical.
 
 ## Track 4 (2026-09-26, round 88, echo)
@@ -176,9 +176,9 @@ Every literal in the live body is in its base: decimal for moodTimer ticks, dist
 ## Proposed field names
 
 - `Entity::unk100` -> `fade` (and `Entity__GetOrCreateUnk100` ->
-  `Entity__GetOrCreateFade`). It is a Class6E99C, the BoxFill that fades its
-  colour (include/Class6E99C.h); Entity__GetOrCreateUnk100 is its only
-  writer (New_Class6E99C, then setStep from its fourth argument, 10 here),
+  `Entity__GetOrCreateFade`). It is a FadeBox, the BoxFill that fades its
+  colour (include/FadeBox.h); Entity__GetOrCreateUnk100 is its only
+  writer (New_FadeBox, then setStep from its fourth argument, 10 here),
   Entity__Finalize releases it, and every other access (here, Entity_f x3,
   Entity_g x1) calls startFadeDown or startFadeUp on it. Accessors outside
   Entity_d (Entity.c, Entity_f.c, Entity_g.c), so proposed, not applied.

@@ -888,7 +888,7 @@ branch only ever touches `self`'s first word (the `OtTag`) and `arg1`.
 
 Following the head's round-wide broadcast (two other stalls in the corpus
 were overturned by varying TYPE/declaration axes rather than expression
-shape -- `Class6E99C__PushPosition` and `TaskObjF__WriteMemcardSaveFile`, the latter caused by a
+shape -- `FadeBox__PushPosition` and `TaskObjF__WriteMemcardSaveFile`, the latter caused by a
 masked-byte parameter mistyped `s32`), tested the equivalent axes here.
 None combinatorial (each a single concrete hypothesis, `--debug`, fast):
 
