@@ -120,7 +120,7 @@ despite ~15 manual attempts) is exactly what caught it.
 > Confirms round 20's diagnosis stands: this is a genuine GCC 2.6.3
 > list-scheduler choice (batching independent loads ahead of a store),
 > not reachable through source-level reordering or reload-caching
-> placement. Not attempted further this round; time went to `StageMap__FindElementForPosition`
+> placement. Not attempted further this round; time went to `StageMap__FindSlotForPosition`
 > (matched) and a permuter run on `StageMap__ComputeChunkLoadEntry` instead.
 
 > **ROUND 20 (charlie): re-verified, residue mechanism pinned down more
@@ -284,7 +284,7 @@ because round 37 measured roughly one inherited body in six carrying a false
 drift-free claim, plus one body that could never have linked at all (it
 called a symbol since renamed, so its figure had measured nothing). **All
 four preserved bodies in `class_3bb8c` were rebuilt this round and all four
-are honest** — `StageMap__FindElementForPosition` 68/70, `ComputeCellWorldOffsets` 58/73,
+are honest** — `StageMap__FindSlotForPosition` 68/70, `ComputeCellWorldOffsets` 58/73,
 `StageMap__LoadChunksAround` 125/140, `StageMap__LoadElementResources` 130/150. No stale figure and no
 never-linked body in this unit.
 
@@ -338,7 +338,7 @@ evidence now covers every source-level way to phrase "read this value early"
 without changing net register pressure, and none of them move the needle.
 
 **Round 39 did not find a combinatorial lever here analogous to
-`StageMap__FindElementForPosition`'s.** That function's fix combined a hoist with an operand-order
+`StageMap__FindSlotForPosition`'s.** That function's fix combined a hoist with an operand-order
 flip on a commutative op; this function's residue is a straight
 reload-register-and-position choice with no analogous second axis to combine
 against (there is no commutative operator here to flip -- `outBuf[0]`/`outBuf[2]`

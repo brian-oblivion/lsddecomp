@@ -131,7 +131,7 @@ rotation, so the tell is a caller-saved register mismatch instead.
 > computation) independently, and now a THIRD axis (removing the `hdr`
 > local altogether) this round -- all three inert or actively worse. Per
 > project rule 6, not to be forced with a register pin. Not attempted
-> further; time went to `StageMap__FindElementForPosition`'s fresh permuter search instead
+> further; time went to `StageMap__FindSlotForPosition`'s fresh permuter search instead
 > (a one-word residue with a real prior signal is a better use of a
 > bounded permuter run than a fourth structural probe of an
 > already-triple-confirmed register-identity chain).
@@ -196,7 +196,7 @@ rotation, so the tell is a caller-saved register mismatch instead.
 > lever ("hoist both values before either is consumed") does not describe
 > either `|=` site directly -- each is a single field reload OR'd with one
 > already-live constant (`flagBit`), not two independently-loaded values --
-> but `StageMap__FindElementForPosition`'s companion finding (a residue that survives operand-
+> but `StageMap__FindSlotForPosition`'s companion finding (a residue that survives operand-
 > order-alone and hoist-alone independently has not been shown to survive
 > their COMBINATION) does apply, since this report already confirmed
 > operand-order-alone is inert here (round 27/32) and never tried a hoist.
@@ -249,7 +249,7 @@ rotation, so the tell is a caller-saved register mismatch instead.
 > drift, identical residue (register identity for `info` plus the two
 > already-twice-confirmed commutative `or`/`addu` operand-order instances).
 > Not re-attempted -- both classes are proven inert by direct testing
-> already recorded in this report. Time went to `StageMap__FindElementForPosition` (matched)
+> already recorded in this report. Time went to `StageMap__FindSlotForPosition` (matched)
 > instead.
 
 > **ROUND 27 (delta): re-verified, no new attempt.** Rebuilt the exact
@@ -617,12 +617,12 @@ third instance, the `found`-path tail's `entry->unk10 + off2`, compiling to
 `addu v0,s1,v0` in retail vs `addu v0,v0,s1` here. Operand-order-alone was
 **tried and confirmed inert** for all three (rounds 27/32): rewriting a `|=`
 explicitly as `flagBit | (*slot)->unk10` produced the IDENTICAL `or
-v0,s6,v0` -- zero change, matching this round's `StageMap__FindElementForPosition` finding that
+v0,s6,v0` -- zero change, matching this round's `StageMap__FindSlotForPosition` finding that
 a commutative op's compiled register operand order is independent of source
 text order ALONE.
 
 **Round 39 closed BOTH `or` instances by combining that operand-order
-observation with a hoist**, per `StageMap__FindElementForPosition`'s own generalisation (a
+observation with a hoist**, per `StageMap__FindSlotForPosition`'s own generalisation (a
 residue immune to each lever separately has not been shown immune to their
 combination): `s32 t = (*slot)->unk10; (*slot)->unk10 = t | flagBit;` at
 each site, turning the compound assignment's implicit re-dereference into an
@@ -711,7 +711,7 @@ because round 37 measured roughly one inherited body in six carrying a false
 drift-free claim, plus one body that could never have linked at all (it
 called a symbol since renamed, so its figure had measured nothing). **All
 four preserved bodies in `class_3bb8c` were rebuilt this round and all four
-are honest** — `StageMap__FindElementForPosition` 68/70, `ComputeCellWorldOffsets` 58/73,
+are honest** — `StageMap__FindSlotForPosition` 68/70, `ComputeCellWorldOffsets` 58/73,
 `StageMap__LoadChunksAround` 125/140, `StageMap__LoadElementResources` 130/150. No stale figure and no
 never-linked body in this unit.
 

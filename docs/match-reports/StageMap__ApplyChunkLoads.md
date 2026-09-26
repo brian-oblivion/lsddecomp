@@ -179,7 +179,7 @@ allocation wrong.
 > this body anywhere -- confirmed by direct inspection, not inferred. Per
 > project rule 6 this remains a register-identity stall, not to be forced
 > with a register pin. No permuter run this round (time went to
-> `StageMap__FindElementForPosition` instead, per this round's own closer-target priority);
+> `StageMap__FindSlotForPosition` instead, per this round's own closer-target priority);
 > the existing round-17/40 finding that this function's isolated-compile
 > scaffold provably scores a DIFFERENT residue than the real build (0
 > insertions/deletions in context vs 2/2 isolated) still stands and still
@@ -231,7 +231,7 @@ allocation wrong.
 > instruction-adjacency hit -- the pre-screen's 11 adjacent load/mult pairs
 > here are the walker-pointer dereferences (`sp->id`, `sp->rate`, `ep->ptr0`)
 > that the identity swap already touches, not two independently-computed
-> VALUES feeding one later shared consumer the way `StageMap__FindElementForPosition`'s two
+> VALUES feeding one later shared consumer the way `StageMap__FindSlotForPosition`'s two
 > field reads did. The residue here is a swap between the two INDUCTION
 > VARIABLES themselves (`ep`/`sp`), both already live across the whole loop
 > body by construction -- there is no "consume A late, consume B later
@@ -240,7 +240,7 @@ allocation wrong.
 > check, aggregate-assignment check, a permuter run whose scaffold was
 > proven to score a different residue) with nothing left un-checked; not
 > re-attempted further this round. Time went to the higher-yield queue
-> entries instead (`StageMap__FindElementForPosition`, `ComputeCellWorldOffsets`, and the two large
+> entries instead (`StageMap__FindSlotForPosition`, `ComputeCellWorldOffsets`, and the two large
 > multi-load functions with higher pre-screen hit counts).
 
 > **ROUND 32 (bravo2): re-verified, no new attempt.** Rebuilt the exact
@@ -250,7 +250,7 @@ allocation wrong.
 > including a callee-saved-register-order check and a permuter run whose
 > scaffold was found to score a different residue than the real build), no
 > new structural variant was attempted this round; time went to
-> `StageMap__FindElementForPosition` (matched, 63/70 -> 68/70) instead.
+> `StageMap__FindSlotForPosition` (matched, 63/70 -> 68/70) instead.
 
 > **ROUND 27 (delta): callee-saved-register check per the head's broadcast.**
 > Rebuilt the exact preserved body from a clean `INCLUDE_ASM` baseline

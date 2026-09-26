@@ -623,8 +623,8 @@ ChunkSlot *StageMap__FindSlotByNeighbour(StageMap *self, s32 key) {
  * INSIDE the upper-bound test keeps the `arg1` load ahead of the field
  * load, as retail schedules it (a `w = ...;` statement before the `if`
  * fixes the add but swaps those two loads). See
- * docs/match-reports/StageMap__FindElementForPosition.md. */
-ChunkSlot *StageMap__FindElementForPosition(StageMap *self, LongVec3 *arg1) {
+ * docs/match-reports/StageMap__FindSlotForPosition.md. */
+ChunkSlot *StageMap__FindSlotForPosition(StageMap *self, LongVec3 *arg1) {
     s32 i;
     s32 tol;
     s32 threshold;

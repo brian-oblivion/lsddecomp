@@ -1,4 +1,6 @@
-# StageMap__FindElementForPosition -- MATCHED round 73 (70/70, exact length, whole-image SHA1 green)
+# StageMap__FindSlotForPosition -- MATCHED round 73 (70/70, exact length, whole-image SHA1 green)
+
+> Renamed from `StageMap__FindElementForPosition` on 2026-09-26 (tools/rename.py). Address 0x8004c470.
 
 > Renamed from `Class866E8__FindElementForPosition` on 2026-09-26 (tools/rename.py). Address 0x8004c470.
 
@@ -60,7 +62,7 @@ first in insn order.
 
 ## Earlier history (superseded by the match above)
 
-#### Old title: StageMap__FindElementForPosition -- STALL: length EXACT (70/70 words, no drift); **69/70 raw word-match (round 38, up from 68/70)**; first and ONLY real diff at file 0x3CD00 / vram 0x8004C500 -- the `addu` in the SECOND bounds comparison.
+#### Old title: StageMap__FindSlotForPosition -- STALL: length EXACT (70/70 words, no drift); **69/70 raw word-match (round 38, up from 68/70)**; first and ONLY real diff at file 0x3CD00 / vram 0x8004C500 -- the `addu` in the SECOND bounds comparison.
 
 NON_MATCHING body promoted, round 73
 
@@ -188,7 +190,7 @@ NON_MATCHING body promoted, round 73
 > an exhaustion proof" until a SECOND independent search has also failed.
 >
 > **Scaffold, validated before searching:** `tools/setup-permuter.sh
-> StageMap__FindElementForPosition <seed>` (seed = this report's own 69/70 body verbatim),
+> StageMap__FindSlotForPosition <seed>` (seed = this report's own 69/70 body verbatim),
 > `--debug --stack-diffs` reported **base score 10, 2 register differences,
 > 0 reorderings/insertions/deletions/branch/stack differences** --
 > identical to round 38's own recorded residue (the single `addu v0,v1,s4`
@@ -290,7 +292,7 @@ NON_MATCHING body promoted, round 73
 > change). Confirmed: still 63/70, no drift, identical residue.
 >
 > **Correction: Residue 1's prose has retail and built SWAPPED.** Reading
-> `asm/nonmatchings/class_3bb8c/StageMap__FindElementForPosition.s` directly (not a
+> `asm/nonmatchings/class_3bb8c/StageMap__FindSlotForPosition.s` directly (not a
 > diff-tool's relabeled address) shows retail's OWN instruction at
 > `3CCDC`/`3CD00` is `addu $v0, $v1, $s4` (freshly-loaded field FIRST,
 > tolerance SECOND) -- the built object's `addu $v0, $s4, $v1` (verified via
@@ -319,7 +321,7 @@ NON_MATCHING body promoted, round 73
 
 ```c
 #if 0
-Elem *StageMap__FindElementForPosition(Obj866E8 *self, Unk54Struct *arg1) {
+Elem *StageMap__FindSlotForPosition(Obj866E8 *self, Unk54Struct *arg1) {
     s32 i;
     s32 tol;
     s32 threshold;
@@ -362,7 +364,7 @@ round 20 already noted.)
 
 ```c
 #if 0
-Elem *StageMap__FindElementForPosition(Obj866E8 *self, Unk54Struct *arg1) {
+Elem *StageMap__FindSlotForPosition(Obj866E8 *self, Unk54Struct *arg1) {
     s32 i;
     s32 tol;
     s32 threshold;
@@ -486,7 +488,7 @@ because round 37 measured roughly one inherited body in six carrying a false
 drift-free claim, plus one body that could never have linked at all (it
 called a symbol since renamed, so its figure had measured nothing). **All
 four preserved bodies in `class_3bb8c` were rebuilt this round and all four
-are honest** — `StageMap__FindElementForPosition` 68/70, `ComputeCellWorldOffsets` 58/73,
+are honest** — `StageMap__FindSlotForPosition` 68/70, `ComputeCellWorldOffsets` 58/73,
 `StageMap__LoadChunksAround` 125/140, `StageMap__LoadElementResources` 130/150. No stale figure and no
 never-linked body in this unit.
 
@@ -506,7 +508,7 @@ matched this report's 2-instruction/4-register residue exactly.
 
 ### The search
 
-Two searches exist in `permuter-work/StageMap__FindElementForPosition/`: `output-10-1` from the
+Two searches exist in `permuter-work/StageMap__FindSlotForPosition/`: `output-10-1` from the
 first (infrastructure-killed) attempt on 2026-09-12 and `output-10-2` from
 this round. **Both reached score 10 from a base of 20; neither reached zero.**
 This round's ran **89,374 iterations**.
@@ -596,7 +598,7 @@ to call this a confirmed stall rather than an unexplored one.
 
 **The hoist-both-before-either lever has a precondition worth stating
 explicitly: it requires retail to actually LOAD both values before consuming
-either.** `StageMap__FindElementForPosition`'s second field load is gated behind the first
+either.** `StageMap__FindSlotForPosition`'s second field load is gated behind the first
 comparison's branch in retail's own disassembly (checked directly, not
 inferred), so no source shape that computes it unconditionally can be
 length-preserving, let alone byte-exact -- the lever's "adjacent loads,
@@ -610,4 +612,4 @@ Round 78 (track 3, naming pass, bravo).
 
 | symbol | name | tier | evidence |
 | --- | --- | --- | --- |
-| `func_8004C470` | `StageMap__FindElementForPosition` | B | Occupant of `gStageMapMethods` +0x11C (`slot11C`), called by `StageMap__ComputeFootprintDescriptor` with its own `SplitLongVec3` world-position argument. Loops `self->arr[7]` via `slot118`, bounds-testing `arg1->unk0`/`arg1->unk8` against each candidate's `r->unk18`/`r->unk20` within a fixed `0xA000` tolerance (a spatial hit test), with a decreasing `threshold` and `self->unk68->unk4` gating an early-exit shortcut on ties. "Find...ForPosition" names the mechanic (locate the element whose bounds contain/are nearest a world position); the tie-break rule beyond "closer element wins" is not established. |
+| `func_8004C470` | `StageMap__FindSlotForPosition` | B | Occupant of `gStageMapMethods` +0x11C (`slot11C`), called by `StageMap__ComputeFootprintDescriptor` with its own `SplitLongVec3` world-position argument. Loops `self->arr[7]` via `slot118`, bounds-testing `arg1->unk0`/`arg1->unk8` against each candidate's `r->unk18`/`r->unk20` within a fixed `0xA000` tolerance (a spatial hit test), with a decreasing `threshold` and `self->unk68->unk4` gating an early-exit shortcut on ties. "Find...ForPosition" names the mechanic (locate the element whose bounds contain/are nearest a world position); the tie-break rule beyond "closer element wins" is not established. |

@@ -200,7 +200,7 @@ were all already correct; the stall was one variable too many).
 > reconfirmation agrees with. Given this round's staffing priority was the
 > functions with either an untried lever (dead-reload screen on
 > `StageMap__ApplyChunkLoads`/`StageMap__ComputeFootprintDescriptor`) or a real prior permuter signal
-> (`StageMap__FindElementForPosition`, score 10 from base 20, never 0), and this function has
+> (`StageMap__FindSlotForPosition`, score 10 from base 20, never 0), and this function has
 > neither (both accumulator swaps have four independent negative manual
 > results each, plus two flat permuter searches that never beat the base
 > score), no new attempt was made here. Restored unchanged.
@@ -225,7 +225,7 @@ were all already correct; the stall was one variable too many).
 > to round 32's figure. This report's own history already tried "hoist the
 > field into a local" (round 32, natural order) and "reverse the operand
 > order" (round 27, unhoisted) as SEPARATE attempts on the
-> `entry->unk0 == 0` arm -- but per this round's `StageMap__FindElementForPosition` finding,
+> `entry->unk0 == 0` arm -- but per this round's `StageMap__FindSlotForPosition` finding,
 > neither alone being sufficient does not prove their COMBINATION is
 > inert, and that specific combination (hoisted local, reversed order) had
 > not actually been tried here. Tested it directly:
@@ -236,7 +236,7 @@ were all already correct; the stall was one variable too many).
 >    `lo` already hoisted per the existing body) on the `entry->unk0 != 0`
 >    arm's accumulator -- **IDENTICAL 58/63**, same residue.
 >
-> **Unlike `StageMap__FindElementForPosition` and `StageMap__LoadElementResources`, the combination does NOT
+> **Unlike `StageMap__FindSlotForPosition` and `StageMap__LoadElementResources`, the combination does NOT
 > move this residue.** Both `v0`/`v1` swaps here now have FOUR independent
 > negative results each (this report's rounds 24/25 baseline, round 27's
 > unhoisted reversal, round 32's hoisted-natural-order, and this round's
@@ -279,7 +279,7 @@ were all already correct; the stall was one variable too many).
 > improvement on the `entry->unk0==0` arm's `$v0`/`$v1` swap. Read as a
 > genuine negative, not an inconclusive one -- both searches used a
 > scaffold independently confirmed to score the SAME residue as the real
-> build. Not attempted further this round; time went to `StageMap__FindElementForPosition`
+> build. Not attempted further this round; time went to `StageMap__FindSlotForPosition`
 > (matched, 63/70 -> 68/70) instead.
 
 > **ROUND 27 (delta): re-verified, three more attempts, all negative.**

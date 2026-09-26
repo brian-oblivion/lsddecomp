@@ -184,7 +184,7 @@ relevant (no header, symbol or type change -- the fix removed a local).
 > structural axes this round on top of round 39's three (statement order,
 > commutative operand order, declaration order) and round 27's
 > callee-saved-register check. Per project rule 6, not to be forced with a
-> register pin. Not attempted further; time went to `StageMap__FindElementForPosition`'s
+> register pin. Not attempted further; time went to `StageMap__FindSlotForPosition`'s
 > fresh permuter search instead, per this round's own closer-target
 > priority -- a one-word residue with a real prior signal (score 10 from
 > base 20, never 0) is a better use of a bounded permuter run than a third
@@ -272,7 +272,7 @@ its use site instead of caching it.
 > barrier between them, from round 13's own fix.** The lever is already
 > in place and the residue survives it, so this is a case where the lever
 > APPLIES (retail's shape matches the diagnostic) but is not SUFFICIENT on
-> its own -- consistent with `StageMap__FindElementForPosition` needing a second axis
+> its own -- consistent with `StageMap__FindSlotForPosition` needing a second axis
 > combined with its hoist.
 >
 > Three combinatorial variants tried, targeting what that second axis
@@ -303,7 +303,7 @@ its use site instead of caching it.
 > drift, identical residue (`tbl`/`u14`/second-loop-row-pointer register
 > swaps only, no instruction shape differences). Given three prior rounds'
 > confirmation including a callee-saved-register-order check, no new
-> variant was attempted this round; time went to `StageMap__FindElementForPosition` (matched)
+> variant was attempted this round; time went to `StageMap__FindSlotForPosition` (matched)
 > and a permuter run on `StageMap__ComputeChunkLoadEntry` instead.
 
 > **ROUND 27 (delta): callee-saved-register check per the head's broadcast
@@ -330,7 +330,7 @@ its use site instead of caching it.
 > `u14`, the second loop's row pointer -- three separate registers, no
 > instruction shape differences anywhere), the same class independently
 > re-confirmed as unfixable-by-reshaping on three OTHER functions in this
-> unit this round (`StageMap__FindElementForPosition`, `ComputeCellWorldOffsets`, `StageMap__LoadElementResources`'s
+> unit this round (`StageMap__FindSlotForPosition`, `ComputeCellWorldOffsets`, `StageMap__LoadElementResources`'s
 > `info` residue). Time this round went to `StageMap__LoadElementResources` instead, per
 > the staffing guidance to move to differently-shaped ground once a
 > register-identity wall is this well established.
@@ -582,7 +582,7 @@ because round 37 measured roughly one inherited body in six carrying a false
 drift-free claim, plus one body that could never have linked at all (it
 called a symbol since renamed, so its figure had measured nothing). **All
 four preserved bodies in `class_3bb8c` were rebuilt this round and all four
-are honest** — `StageMap__FindElementForPosition` 68/70, `ComputeCellWorldOffsets` 58/73,
+are honest** — `StageMap__FindSlotForPosition` 68/70, `ComputeCellWorldOffsets` 58/73,
 `StageMap__LoadChunksAround` 125/140, `StageMap__LoadElementResources` 130/150. No stale figure and no
 never-linked body in this unit.
 

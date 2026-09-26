@@ -188,7 +188,7 @@ were correct and unchanged -- the stall was purely source SHAPE).
 > documents (register identity for `u14b`, and a GCC 2.6.3 store/reread
 > sign-extension quirk, both isolated with reproducers across 5 prior
 > rounds). Not attempted further this round; time went to the closer
-> targets (`StageMap__FindElementForPosition`, permuter search) instead, per this round's
+> targets (`StageMap__FindSlotForPosition`, permuter search) instead, per this round's
 > staffing priority.
 
 > **ROUND 40 (bravo): Gate 1b re-verified 72/106, no drift; fresh permuter
@@ -232,7 +232,7 @@ were correct and unchanged -- the stall was purely source SHAPE).
 > loaded again at `0x8004C280`) are **34 bytes apart with `u14a`'s entire
 > consumption (`out->unkC`/`unk10`/`unk14`, three stores) in between** --
 > retail loads `u14b` LAZILY, right at its own first use, not adjacently to
-> `u14a`. This is the mirror case of `StageMap__FindElementForPosition`'s finding: the
+> `u14a`. This is the mirror case of `StageMap__FindSlotForPosition`'s finding: the
 > diagnostic ("are the two loads adjacent, with consumers later?") answers
 > NO here, so the lever's own precondition is unmet and no hoist-based
 > restructuring of `u14a`/`u14b` was attempted this round. The two residue
@@ -255,7 +255,7 @@ were correct and unchanged -- the stall was purely source SHAPE).
 > compile schedules a computation differently than the real surrounding
 > file does). Not searched -- a result against a scaffold provably scoring
 > a different residue would not transfer. Scaffold deleted. Not attempted
-> further this round; time went to `StageMap__FindElementForPosition` (matched) instead.
+> further this round; time went to `StageMap__FindSlotForPosition` (matched) instead.
 
 > **ROUND 27 (delta): re-verified, one new attempt on class 2, negative.**
 > Rebuilt the exact preserved body from a clean `INCLUDE_ASM` baseline:
@@ -323,7 +323,7 @@ Unit: `class_3bb8c`. Slot `Obj866E8Methods::slot110` (verified against
 ## What it does
 
 Resolves a query (`in`, a `SplitLongVec3*`) via `self->methods->slot11C`
-(still `INCLUDE_ASM`, `StageMap__FindElementForPosition`). On a miss, returns `1`. On a hit
+(still `INCLUDE_ASM`, `StageMap__FindSlotForPosition`). On a miss, returns `1`. On a hit
 (`e`), fills `out` (`Descriptor10Ext*`):
 
 - `out->base.b0`/`b1` via `StageMap__SplitChunkIndex(self, out, e->unk4->unk30)` (mod/div
@@ -578,4 +578,4 @@ Round 78 (track 3, naming pass, bravo).
 
 | symbol | name | tier | evidence |
 | --- | --- | --- | --- |
-| `func_8004C1C0` | `StageMap__ComputeFootprintDescriptor` | B | Occupant of `gStageMapMethods` +0x110 (`slot110`). `class_3ac78`'s own `StageMap__ApplyToSenderFootprint` (already matched) calls this exact slot to fill a `buf` that is then fed DIRECTLY to `StageMap__SetFootprintFromCell`/`StageMap__SetFootprintRect` as their own `desc` parameter -- i.e. this function's output IS the footprint descriptor those two already-named functions consume. Computes cell row/column (`base.b2`/`base.b3`) and sub-cell offsets (`base.h4`/`h6`/`h8`) from a `SplitLongVec3` world position via `StageMap__FindElementForPosition` and an `Unk14Obj` position pair -- a position-to-grid-cell conversion, matching the caller-side evidence exactly. |
+| `func_8004C1C0` | `StageMap__ComputeFootprintDescriptor` | B | Occupant of `gStageMapMethods` +0x110 (`slot110`). `class_3ac78`'s own `StageMap__ApplyToSenderFootprint` (already matched) calls this exact slot to fill a `buf` that is then fed DIRECTLY to `StageMap__SetFootprintFromCell`/`StageMap__SetFootprintRect` as their own `desc` parameter -- i.e. this function's output IS the footprint descriptor those two already-named functions consume. Computes cell row/column (`base.b2`/`base.b3`) and sub-cell offsets (`base.h4`/`h6`/`h8`) from a `SplitLongVec3` world position via `StageMap__FindSlotForPosition` and an `Unk14Obj` position pair -- a position-to-grid-cell conversion, matching the caller-side evidence exactly. |

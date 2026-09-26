@@ -410,7 +410,7 @@ load through a runtime-indexed global", §"BLOCKED: the `nop_mflo_mfhi` screen r
   whatever the source order; a NAMED local keeps its source position** (`cc1 -dr`). So flipping
   textual order is inert, and a field load FIRST in retail means the source had it in a local;
   assign it inside the expression (`a < (w = r->f) + tol`) to keep load order. Closed
-  `StageMap__FindElementForPosition` 69/70 after ~183k permuter iterations. (PROGRESS round 73)
+  `StageMap__FindSlotForPosition` 69/70 after ~183k permuter iterations. (PROGRESS round 73)
 - **A `+4` walker set up from an ARGUMENT register after a loop's count check is GCC's loop
   optimiser, not a C pointer**: advance the parameter itself and take `&p->field` inside the body; a
   C-initialised second pointer always lands before the check. Closed `StageMap__ApplyChunkLoads`. (round 73)
