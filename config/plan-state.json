@@ -1222,7 +1222,10 @@
       "status": "open"
     },
     "5": {
-      "checklist": {},
+      "checklist": {
+        "docs-budget": true,
+        "nonmatching-clean": true
+      },
       "reason": "",
       "status": "auto"
     }

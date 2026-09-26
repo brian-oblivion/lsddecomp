@@ -19,8 +19,8 @@ and wrong for every round after. Run the tool. The mechanics of a round
 the per-function matching loop is CLAUDE.md and `docs/MATCHING-GUIDE.md`.
 This file does not repeat them.
 
-Plan revision: 25 (2026-09-26, round 88's premium head: track 4's footprint
-counts allocator callers and ignores unified ancestors' types).
+Plan revision: 26 (2026-09-26, round 89's premium head: track 5's runner
+prompt §4.7; a scalar view type is not a footprint symbol).
 Changing the plan is a premium head task (§2); record the change in
 `docs/PROGRESS.md` and bump this line.
 
@@ -366,9 +366,15 @@ Opens when tracks 3 and 4 are done. Items, ticked with `plan.py check --item`:
 | --- | --- |
 | `readme` | a reader-facing README.md: what the game's code is, how it is organised (classes, subsystems, units), how to build, where the SDK comes from |
 | `credits` | CREDITS.md names every inherited name, tool and reference |
-| `asm-sites` | every live `__asm__` justified at the site or retired; the deferred questions from 2026-09-12 (`TransformAndCullPoly` as C or `INCLUDE_ASM`; the bare barriers) answered |
+| `asm-sites` | every live `__asm__` justified at the site or retired: each bare barrier says what order it forces, each GTE block names its macro (`TransformAndCullPoly` is C since 2026-09-14) |
 | `docs-budget` | every doc within its `plan.py` budget |
 | `nonmatching-clean` | `tools/check-nonmatching.sh` green; every stall has a `NON_MATCHING` body or a written reason |
+
+An item already true when measured is ticked by the head with the
+measurement in PROGRESS.md. The rest are Opus runner jobs, one item each,
+prompt §4.7; the head reviews the diff and ticks with `plan.py check --item`.
+README and CREDITS jobs edit only their file; asm-sites edits comments at
+the sites and retires a barrier only when the oracle stays green without it.
 
 ## 4. Prompts
 
@@ -491,6 +497,21 @@ Archived with their tracks: `docs/archive/FINISHING-PLAN-tracks-1-2-2026-09-25.m
 > `extern` you deleted; every function you renamed and why; every `--merge`
 > CONFLICT and how the bytes settled it; anything parked or unsettled; any
 > contradiction you saw in a subclass's views.
+
+### 4.7 Close-out runner prompt (track 5; Opus; head fills in `<>`)
+
+> You are a close-out runner for the LSD: Dream Emulator decomp, round `<N>`,
+> worktree `<path>`, branch `runner/<name>`. Read CLAUDE.md and
+> `docs/FINISHING-PLAN.md` §1 and §3 track 5. Your item is `<item>`: make its
+> "done when" true, editing only `<files>`. State nothing you did not measure:
+> every figure comes from a command you ran (`progress.py`, `plan.py`,
+> `plan.py classes`), and a README states no counts at all, only the command
+> that prints them. Name what the code does, as track 3's rules say.
+> `./build-and-verify.sh` green after every edit to `src/` or `include/`.
+> Commit per logical step; `git status --porcelain` empty when you report;
+> never push; never edit other docs, the ledger or the symbols file. Final
+> summary: what you changed, what you measured, and anything you could not
+> settle.
 
 ## 5. Doc hygiene
 

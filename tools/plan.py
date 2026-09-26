@@ -86,7 +86,7 @@ DOC_BUDGETS = {
 TRACK5_ITEMS = {
     "readme": "reader-facing README.md: what the game's code is, how it is organised, how to build",
     "credits": "CREDITS.md current for every inherited name and tool",
-    "asm-sites": "every live __asm__ site justified or retired (func_800195EC question, the bare barriers)",
+    "asm-sites": "every live __asm__ site justified or retired (the bare barriers, the GTE blocks)",
     "docs-budget": "every doc within its word budget; archive holds the history",
     "nonmatching-clean": "tools/check-nonmatching.sh green and every stall has a NON_MATCHING body or a written reason",
 }
