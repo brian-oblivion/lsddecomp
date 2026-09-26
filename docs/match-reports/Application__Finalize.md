@@ -10,7 +10,7 @@
 
 Empty. It is the `+0x00C` (finalize) override in gApplicationMethods's method table
 (`classtable.py 0x8006E4F0 --vs 0x8006B58C`), inherited verbatim by
-GameApplication (D_8006D3C8). So this class's finalize does NOT chain to
+GameApplication (gGameApplicationMethods). So this class's finalize does NOT chain to
 BasicClass__Finalize.
 
 ```c

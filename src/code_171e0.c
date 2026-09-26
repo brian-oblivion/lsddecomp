@@ -34,7 +34,7 @@
 #define DATASOURCE_SPU 0x23
 
 GameApplicationMethods *GetGameApplicationMethods(void) {
-    return &D_8006D3C8;
+    return &gGameApplicationMethods;
 }
 
 void *FileResource__Release(FileResource *this) {

@@ -78,7 +78,7 @@ extern s32 ResolveCinematicChannel(s32 *out, s32 packedBankEntry); /* psyq_memse
     back as a signed 32-bit number. Also returns its own (separate) s32 value, kept by
     GameApplication__StartCinematicStream. */
 
-/* The `New_X` allocator for the class whose method table is D_8006D3C8:
+/* The `New_X` allocator for the class whose method table is gGameApplicationMethods:
  * allocates a 0x2C-byte instance and, on success, runs the class's own
  * constructor through slot +0x008 of the table GetGameApplicationMethods() returns.
  *

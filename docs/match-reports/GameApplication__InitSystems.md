@@ -12,7 +12,7 @@
 
 ## What it does
 
-A method on the class at `D_8006D3C8` (slot `+0x044`) that falls back to
+A method on the class at `gGameApplicationMethods` (slot `+0x044`) that falls back to
 the base class's own implementation of the same slot when this object
 hasn't been given an override (`self->unk18 == 0`).
 

@@ -8,20 +8,20 @@
 
 ## What it does
 
-Returns the address of `D_8006D3C8`, a 25-slot hand-rolled-class method table
+Returns the address of `gGameApplicationMethods`, a 25-slot hand-rolled-class method table
 (per `tools/classtable.py`, header word `0x00001F60`). It is a "get the method
 table" accessor, the same shape as `Get_vtable_DreamSys` in `include/DreamSys.h`.
 
 ## Derivation
 
 ```
-lui   $v0, %hi(D_8006D3C8)
+lui   $v0, %hi(gGameApplicationMethods)
 jr    $ra
- addiu $v0, $v0, %lo(D_8006D3C8)
+ addiu $v0, $v0, %lo(gGameApplicationMethods)
 ```
 
-Just an address computation, no load — this is `&D_8006D3C8`, not
-`*D_8006D3C8`. Confirmed by its one caller, `New_GameApplication` in
+Just an address computation, no load — this is `&gGameApplicationMethods`, not
+`*gGameApplicationMethods`. Confirmed by its one caller, `New_GameApplication` in
 `asm/nonmatchings/code_1677c/New_GameApplication.s`: it calls this function, then
 does `lw $v0, 0x8($v0)` on the result and `jalr`s that — fetching the
 constructor slot (`+0x008`, `GameApplication__GameApplication`) from the table this function
@@ -29,14 +29,14 @@ returned, exactly the "allocate, get methods, call ctor slot" idiom from
 CLAUDE.md's "Writing a class method".
 
 ```c
-extern s32 D_8006D3C8[];
+extern s32 gGameApplicationMethods[];
 
 void *GetGameApplicationMethods(void) {
-    return D_8006D3C8;
+    return gGameApplicationMethods;
 }
 ```
 
-`D_8006D3C8` is declared `s32[]` (not typed as the owning class's vtable
+`gGameApplicationMethods` is declared `s32[]` (not typed as the owning class's vtable
 struct) because that struct doesn't exist yet — the table itself still lives
 in `asm/data/57070.data.s` as raw words, owned by neither this unit nor any
 carved one yet. Whoever carves that data slot should replace this `extern`
@@ -56,7 +56,7 @@ Round 52 (alpha), FINISHING-PLAN track 3.
 | --- | --- | --- |
 | `func_800269E0` | `GetGameApplicationMethods` | A |
 
-**Evidence.** A two-instruction address-of returning `&D_8006D3C8`. `GameApplication`
+**Evidence.** A two-instruction address-of returning `&gGameApplicationMethods`. `GameApplication`
 is already an established type name in `src/code_1677c.c` (that unit's own
 functions are typed against it), and the "return my own vtable" shape is
 already named twice in this project (`GetCdDriverMethods`,
@@ -66,6 +66,6 @@ purpose.
 ## Track 4 (2026-09-26, round 88)
 
 Retyped to `GameApplicationMethods *GetGameApplicationMethods(void)`, returning
-`&D_8006D3C8`; both are declared once, in `include/GameApplication.h`
-(`include/code_171e0.h`'s `extern s32 D_8006D3C8[]` view is deleted, and
+`&gGameApplicationMethods`; both are declared once, in `include/GameApplication.h`
+(`include/code_171e0.h`'s `extern s32 gGameApplicationMethods[]` view is deleted, and
 New_GameApplication no longer casts the result). Image byte-identical.

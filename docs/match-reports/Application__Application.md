@@ -80,7 +80,7 @@ they stand after the round-92 renames):
  * as Psy-Q SDK by segment name; tools/gameinsdk.py measured it as game (a call
  * into game code, a method-table entry beside game methods, or contiguity with
  * those, and no Sony fingerprint). What it holds: methods of gApplicationMethods and
- * D_8006D3C8, calling SetActiveDataSource; the yaml had called this gap "the
+ * gGameApplicationMethods, calling SetActiveDataSource; the yaml had called this gap "the
  * game's own libsnd build".
  *
  * Round 81 (delta): all seven functions matched. They are the whole of one

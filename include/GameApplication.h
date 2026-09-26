@@ -4,9 +4,9 @@
 #include "Application.h"
 
 /*
- * GameApplication -- class id 0x1F60, method table D_8006D3C8 (25 slots), a
+ * GameApplication -- class id 0x1F60, method table gGameApplicationMethods (25 slots), a
  * subclass of Application (include/Application.h): its ctor calls
- * GetApplicationMethods()->ctor first, and `classtable.py D_8006D3C8 --vs
+ * GetApplicationMethods()->ctor first, and `classtable.py gGameApplicationMethods --vs
  * gApplicationMethods` shares every slot but +0x008/+0x040/+0x044 and the six
  * +0x050..+0x064 slots Application leaves NULL. No class derives from it.
  * Methods in src/code_1677c.c; the table getter is in src/code_171e0.c.
@@ -70,8 +70,8 @@ struct GameApplication {
 typedef void (*GameApplicationSetDayFn)(GameApplication *self);
 typedef void (*GameApplicationInitSystemsFn)(GameApplication *self, DrawSystem *drawSystem, struct Pad *pad);
 
-extern GameApplicationMethods D_8006D3C8;
-extern GameApplicationMethods *GetGameApplicationMethods(void); /* returns &D_8006D3C8 */
+extern GameApplicationMethods gGameApplicationMethods;
+extern GameApplicationMethods *GetGameApplicationMethods(void); /* returns &gGameApplicationMethods */
 
 GameApplication *New_GameApplication(GameApplicationCtorArgs *args);
 void GameApplication__GameApplication(GameApplication *self, GameApplicationCtorArgs *args);

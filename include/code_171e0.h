@@ -4,7 +4,7 @@
 #include "common.h"
 #include "FileResource.h"
 
-/* D_8006D3C8 and its getter GetGameApplicationMethods (defined in this unit) are
+/* gGameApplicationMethods and its getter GetGameApplicationMethods (defined in this unit) are
  * include/GameApplication.h's. */
 
 /* Some class instance (a slot of gFileResourceMethods's table, going by

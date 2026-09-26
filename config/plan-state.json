@@ -843,11 +843,6 @@
     },
     "4": {
       "classes": {
-        "D_8006D3C8": {
-          "class": "GameApplication",
-          "date": "2026-09-26",
-          "header": "include/GameApplication.h"
-        },
         "D_8006D940": {
           "class": "Class6D940",
           "date": "2026-09-26",
@@ -962,6 +957,11 @@
           "class": "FrameClock",
           "date": "2026-09-26",
           "header": "include/FrameClock.h"
+        },
+        "gGameApplicationMethods": {
+          "class": "GameApplication",
+          "date": "2026-09-26",
+          "header": "include/GameApplication.h"
         },
         "gGraphRoomMethods": {
           "class": "GraphRoom",

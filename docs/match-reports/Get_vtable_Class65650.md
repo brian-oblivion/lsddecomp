@@ -11,7 +11,7 @@ Returns the address of `gClass65650Methods`, this class's own 80-slot method tab
 (header word `0x234`, per `tools/classtable.py gClass65650Methods --vs 0x800878D4`).
 The `Get_vtable`-style accessor for this class, same shape as
 `Get_vtable_DreamSys` and `GetGameApplicationMethods` (`code_171e0`'s equivalent for
-`D_8006D3C8`): a plain `lui`/`addiu` address computation, no load — this is
+`gGameApplicationMethods`): a plain `lui`/`addiu` address computation, no load — this is
 `&gClass65650Methods`, not `*gClass65650Methods`.
 
 ```c

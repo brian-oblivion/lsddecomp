@@ -8,7 +8,7 @@
 
 ## What it does
 
-The constructor for the class whose method table is `D_8006D3C8`
+The constructor for the class whose method table is `gGameApplicationMethods`
 (`GameApplication`, slot `+0x008`): runs the intermediate base class's own
 constructor through its ctor slot, installs this class's own vtable, stores
 the ctor argument, loads a 3D model ("ETC\DREAME5.TMD"), builds this
@@ -32,7 +32,7 @@ lw    $v0, 0x8($v0)              ; base table's ctor slot
 nop
 jalr  $v0                         ; base_ctor(self, arg->unk00), return discarded
  addu $a0, $s0, $zero
-jal   GetGameApplicationMethods                ; -> &D_8006D3C8 (own vtable)
+jal   GetGameApplicationMethods                ; -> &gGameApplicationMethods (own vtable)
  nop
 sw    $v0, 0x0($s0)                 ; self->methods = own vtable
 jal   func_80048CF0                  ; reads an unnamed small-data global
