@@ -1,4 +1,6 @@
-# Class86B60__Class86B60
+# TitleMenu__TitleMenu
+
+> Renamed from `Class86B60__Class86B60` on 2026-09-26 (tools/rename.py). Address 0x8004d578.
 
 > Renamed from `func_8004D578` on 2026-09-22 (tools/rename.py). Address 0x8004d578.
 
@@ -6,8 +8,8 @@
 
 ## What it does
 
-The ctor (slot +0x008) for the new `Class86B60` sibling class (allocated by
-`New_Class86B60`, matched alongside this function). Chains to a base ctor
+The ctor (slot +0x008) for the new `TitleMenu` sibling class (allocated by
+`New_TitleMenu`, matched alongside this function). Chains to a base ctor
 (`Get_vtable_TaskCore()->slot08`, 4 args), installs this class's own vtable
 directly (rather than fetching it through another getter -- the base-class
 constructor chaining pattern already documented for
@@ -21,13 +23,13 @@ its own freshly-installed vtable.
 ## The C
 
 ```c
-void Class86B60__Class86B60(Class86B60 *self, void *dreamSys)
+void TitleMenu__TitleMenu(TitleMenu *self, void *dreamSys)
 {
     DreamSysView_3bb8c_c *dream;
-    Class86B60Unk48Obj *obj;
+    TitleMenuUnk48Obj *obj;
 
     Get_vtable_TaskCore()->slot08(self, &D_80086D44, &D_800114DC, 0);
-    self->methods = GetClass86B60Methods();
+    self->methods = GetTitleMenuMethods();
     obj = self->unk48;
     obj->methods->slot9C(obj, -1);
     self->unkA4 = dreamSys;
@@ -42,25 +44,25 @@ void Class86B60__Class86B60(Class86B60 *self, void *dreamSys)
 
 ## New header content (`include/class_3bb8c.h`)
 
-All new declarations -- this class (`Class86B60`) had no prior C-level
+All new declarations -- this class (`TitleMenu`) had no prior C-level
 presence anywhere in the project. Placed as one new block right before the
 `Ctx678_3bb8c_c`/`CheckSaveScoreFlag` section, since ROM order puts
-`New_Class86B60`/`Class86B60__Class86B60` right before `CheckSaveScoreFlag`.
+`New_TitleMenu`/`TitleMenu__TitleMenu` right before `CheckSaveScoreFlag`.
 
-- `Class86B60`/`Class86B60Methods`: `ctor` (+0x008, this function),
+- `TitleMenu`/`TitleMenuMethods`: `ctor` (+0x008, this function),
   `slot40` (+0x040, this function's own last call), `slotD8` (+0x0D8, this
-  function's own second-to-last call). Vtable is `gClass86B60Methods`, resolved
-  via `GetClass86B60Methods` (still raw asm in the uncarved
+  function's own second-to-last call). Vtable is `gTitleMenuMethods`, resolved
+  via `GetTitleMenuMethods` (still raw asm in the uncarved
   `asm/class_3bb8c_d.s`, called directly by `jal` -- same "vtable getter"
   shape as `GetNodeGuardedViewportMethods`/`GetGridCellMethods`).
-- `Class86B60` struct fields: `unk48` (`Class86B60Unk48Obj *`, set up by
+- `TitleMenu` struct fields: `unk48` (`TitleMenuUnk48Obj *`, set up by
   the base ctor chain, read here), `unkA4` (`void *`, stores `dreamSys`
   raw), `unkAC` (`s32`, zeroed), `unkBC` (`s32`, holds `slot1B0`'s return),
   `unkC0` (`s32`, an output buffer whose ADDRESS is passed to `slot1B0` --
   sized to exactly one word because it is the last word of the 0xC4-byte
-  allocation: `0xC0 + 4 == 0xC4`, `New_Class86B60`'s own alloc size, which
+  allocation: `0xC0 + 4 == 0xC4`, `New_TitleMenu`'s own alloc size, which
   is why this is a confident field boundary and not a guess).
-- `Class86B60Unk48Obj`/`Class86B60Unk48ObjMethods`: opaque, only `slot9C`
+- `TitleMenuUnk48Obj`/`TitleMenuUnk48ObjMethods`: opaque, only `slot9C`
   (+0x09C, this function's own call, arg `-1`) typed. Deliberately a
   SEPARATE local type from `include/code_2c054.h`'s `StreamTaskUnkB4Obj`
   (also a base-ctor-chain output at the same +0x048 offset on ITS class)
@@ -107,25 +109,25 @@ call-then-call sequencing word-for-word).
 > **A "base ctor sets self->methods directly rather than fetching it
 > through a getter" ctor can still dispatch through `self->methods`
 > immediately afterward in the SAME function** (here, `slotD8` and
-> `slot40` right after `self->methods = GetClass86B60Methods();`) -- write it as
+> `slot40` right after `self->methods = GetTitleMenuMethods();`) -- write it as
 > a plain sequential assignment-then-dispatch; no getter re-fetch or
 > caching is needed for the match.
 
 ## Naming
 
-**Class86B60__Class86B60** -- tier A. Canonical ctor (`Class__Class`
+**TitleMenu__TitleMenu** -- tier A. Canonical ctor (`Class__Class`
 convention). Same evidence class as the other two ctors in this unit:
-occupies `ctor` (+0x008) on `gClass86B60Methods`, chains a base ctor,
+occupies `ctor` (+0x008) on `gTitleMenuMethods`, chains a base ctor,
 installs its own vtable directly (`self->methods = ...`, the
 "base-ctor-chain sets self->methods directly" pattern already documented
 for `TaskCoreMethods::slotD8`), then dispatches through the freshly
 installed table twice more in the same function (`slotD8`, then
 `onConstruct` -- see the header-edit note below).
 
-## Header edit: Class86B60Methods::slot40 -> onConstruct
+## Header edit: TitleMenuMethods::slot40 -> onConstruct
 
 Renamed following the compiler-ownership recipe (FINISHING-PLAN.md track
-3 step 3), not assumed safe: `Class86B60Methods` is otherwise SHARED with
+3 step 3), not assumed safe: `TitleMenuMethods` is otherwise SHARED with
 `src/class_3bb8c_d.c` (most of its other slots are dispatched from
 functions there). Renamed the field in the struct DEFINITION alone,
 rebuilt, and the compiler's error was confined to this unit's own call
@@ -142,4 +144,4 @@ Its up-calls to TaskCore (include/TaskCore.h, track 4 round 84) now go through `
 
 ## Track 4 (2026-09-26, round 88, bravo)
 
-Class86B60 is unified in include/Class86B60.h (TASKCORE_SLOTS/TASKCORE_FIELDS plus its own). The body now reads at TaskCore's names: `unk48` is TaskCore's `sound`, called at +0x09C through VabStreamObj (setPitchOffset, as GraphRoom's ctor does); `slotD8` is setTarget, with D_80086D44 retyped TaskCoreTarget; `onConstruct` (+0x040) is resetCounters, called through Class86B60ResetCallFn because the call passes dreamSys and the slot (and Class86B60__Reset) take self alone; `unkBC`/`unkC0` are `saveBlock` (`s32 *`, getSaveBlock's result, no cast now) and `saveBlockSize`. Byte-identical (whole image green, 0 new warnings, nonmatching green).
+TitleMenu is unified in include/TitleMenu.h (TASKCORE_SLOTS/TASKCORE_FIELDS plus its own). The body now reads at TaskCore's names: `unk48` is TaskCore's `sound`, called at +0x09C through VabStreamObj (setPitchOffset, as GraphRoom's ctor does); `slotD8` is setTarget, with D_80086D44 retyped TaskCoreTarget; `onConstruct` (+0x040) is resetCounters, called through TitleMenuResetCallFn because the call passes dreamSys and the slot (and TitleMenu__Reset) take self alone; `unkBC`/`unkC0` are `saveBlock` (`s32 *`, getSaveBlock's result, no cast now) and `saveBlockSize`. Byte-identical (whole image green, 0 new warnings, nonmatching green).

@@ -64,7 +64,7 @@ not a subtraction) before trusting it.
 - `Unk4CObj::unkC` (s32, +0x00C), `::unk24` (`void **`, +0x024) -- both
   OBSERVED here.
 - `Obj86B60Methods::slot108` (+0x108, external `TaskCore__BeginElementScroll`) and
-  `::slot94` (+0x094, external `Class86B60__RefreshViewValue`, shared with `TaskCore__SetState`
+  `::slot94` (+0x094, external `TitleMenu__RefreshViewValue`, shared with `TaskCore__SetState`
   STALL's case `a1==6`).
 
 ## Provenance
@@ -74,8 +74,8 @@ round 2026-09-02, runner echo, unit code_2cc8c. 2 attempts.
 ## Naming (round 78, delta)
 
 **Tier A.** `func_8003CA1C` -> `Obj86B60__Tick`. Occupies slot90 in
-`gTaskCoreMethods`; `gClass86B60Methods` overrides the same slot with the
-independently-named `Class86B60__Tick`, settling the name the same way as
+`gTaskCoreMethods`; `gTitleMenuMethods` overrides the same slot with the
+independently-named `TitleMenu__Tick`, settling the name the same way as
 `SetState` above. `GraphRoomObj` inherits this exact function unmodified
 (unoverridden occupant of its own table too).
 

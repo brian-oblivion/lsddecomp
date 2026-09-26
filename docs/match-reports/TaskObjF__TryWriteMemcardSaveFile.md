@@ -529,4 +529,4 @@ a syntax error here).
 
 ## Track 4 (2026-09-26, round 89)
 
-Parameters retyped with TaskObjF's unification (include/TaskObjF.h), byte-identical: `a1` is `char *fileName` (TaskObjF::fileName; BuildMemcardPath's suffix), `handle` is `char *title` (TaskObjF::title; strcpy'd into the header), `arg5` is `struct TimImage *icon` (TaskObjF::iconImage, from Class86B60's iconHandle; the icon source is its FileResource `buffer`, +0x010, so the local McIconSourceRef view is gone), `arg6` is `void *data` and `arg7` is `s32 size`. Only CopyMemcardIconTemplate's own `(s32, s32)` view still takes casts.
+Parameters retyped with TaskObjF's unification (include/TaskObjF.h), byte-identical: `a1` is `char *fileName` (TaskObjF::fileName; BuildMemcardPath's suffix), `handle` is `char *title` (TaskObjF::title; strcpy'd into the header), `arg5` is `struct TimImage *icon` (TaskObjF::iconImage, from TitleMenu's iconHandle; the icon source is its FileResource `buffer`, +0x010, so the local McIconSourceRef view is gone), `arg6` is `void *data` and `arg7` is `s32 size`. Only CopyMemcardIconTemplate's own `(s32, s32)` view still takes casts.

@@ -20,7 +20,7 @@ typedef struct TexPageDesc TexPageDesc;
  * include/TaskCore.h (track 4, round 84): code_2cc8c.c, code_2cc8c_b.c and
  * the first function of code_2cc8c_c.c are its methods from +0x058 on. Its
  * object used to be viewed here as `Obj86B60`, after the address of a
- * SUBCLASS table (gClass86B60Methods); the views are gone.
+ * SUBCLASS table (gTitleMenuMethods); the views are gone.
  *
  * What stays below are this unit family's views of the classes TaskCore
  * holds and has no header for yet: TaskCore.h types those fields

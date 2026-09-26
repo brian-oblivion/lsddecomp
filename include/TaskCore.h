@@ -10,8 +10,8 @@
  * src/code_2cc8c.c, code_2cc8c_b.c, code_2cc8c_c.c (everything from +0x058
  * on). The object is 0xA4 bytes (New_TaskCore). Three classes derive from
  * it, each ctor calling TaskCore__TaskCore first (`typeviews.py --tree`):
- * StreamTask (0x1130, gStreamTaskMethods, include/StreamTask.h), Class86B60
- * (0x1F130, gClass86B60Methods, include/Class86B60.h) and GraphRoom (0x2F130, include/GraphRoom.h).
+ * StreamTask (0x1130, gStreamTaskMethods, include/StreamTask.h), TitleMenu
+ * (0x1F130, gTitleMenuMethods, include/TitleMenu.h) and GraphRoom (0x2F130, include/GraphRoom.h).
  *
  * Construction, ctor(target, soundBankPath, sound): the base ctor, then
  * setTarget(target), `sound` = New_VabStreamObj(soundBankPath) when a path
@@ -50,9 +50,9 @@
  * +0x044 override StreamTask__Init takes (args, streamName, streamGroup,
  * autoPlay) where IntermediateBase's init takes (args, mode): the table
  * keeps the inherited slot and code_1677c's callers cast to
- * StreamTaskInitFn. Class86B60 (include/Class86B60.h, round 88) expands
+ * StreamTaskInitFn. TitleMenu (include/TitleMenu.h, round 88) expands
  * these macros too; its ctor's resetCounters call passes dreamSys and casts
- * the slot to Class86B60ResetCallFn, as GraphRoom's does. GraphRoom
+ * the slot to TitleMenuResetCallFn, as GraphRoom's does. GraphRoom
  * (include/GraphRoom.h, round 87) expands these macros; its ctor is void
  * like every other.
  *
@@ -76,7 +76,7 @@ typedef struct TaskCoreMethods TaskCoreMethods;
 typedef struct TaskCoreTarget TaskCoreTarget;
 
 /* The menu description setTarget builds its slot widgets from (the ctor's
- * first argument; Class86B60 passes &D_80086D44). One slot per `names`
+ * first argument; TitleMenu passes &D_80086D44). One slot per `names`
  * entry. */
 struct TaskCoreTarget {
     /* +0x000 */ const char *path; /* non-NULL: setTarget loads `handle` from it (New_TimImage) and releaseTarget releases that */

@@ -184,7 +184,7 @@ load through a runtime-indexed global", §"BLOCKED: the `nop_mflo_mfhi` screen r
   (`Entity__MoodCue111`, seven words short: its four `li v0,-0x3C` were each block's first instruction
   copied into branch delay slots). A per-branch `return` blocks the merge; a `void` function lets
   three calls merge (`TaskObjF__BeginSave`). Retail's `j` into a shared STORE is likewise two
-  identical stores (`Class86B60__TickNameFieldCursor`). (round 75)
+  identical stores (`TitleMenu__TickNameFieldCursor`). (round 75)
 - **When retail keeps BOTH arms of an if/else and the build presets the constant before the branch,
   test the RESULT variable.** jump.c turns `if (x % 20) v = a; else v = 0;` into "set 0, then maybe
   overwrite"; `v = (x / 20) * 20; if (x != v) ...` blocks it and leaves the product in the result
@@ -293,7 +293,7 @@ load through a runtime-indexed global", §"BLOCKED: the `nop_mflo_mfhi` screen r
   RELOAD of a word just stored.** That is a whole-struct copy (`pos = *src;`), opaque to later
   passes, so the field is re-read from the stack. It closed `TaskCore__RefreshSlotView`/`TaskCore__CommitElementScroll` (8-byte
   pair; the "name it, then barrier it" pair this entry used to recommend was imitating it by
-  hand), `Class86B60__TickNameFieldCursor` (3 signed bytes) and `DreamSys__TryStaircaseLink` (10 bytes). (round 75; again round 81,
+  hand), `TitleMenu__TickNameFieldCursor` (3 signed bytes) and `DreamSys__TryStaircaseLink` (10 bytes). (round 75; again round 81,
   `FlatLightObj__SetColor`: 3 `s8` bytes; the per-field copy is 3 words longer)
 - **Write an expression twice rather than naming it before a branch, and walk a parameter rather
   than a copy of it.** CSE supplies retail's `move sN,sM` for a second `&tab[idx]`, while a name

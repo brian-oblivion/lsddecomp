@@ -8,7 +8,7 @@
 
 ## What it does
 
-`gIntermediateBaseMethods+0x068` (and `gClass86B60Methods`'s own verbatim-inherited `+0x068`,
+`gIntermediateBaseMethods+0x068` (and `gTitleMenuMethods`'s own verbatim-inherited `+0x068`,
 `IntermediateBase__SetState`'s `slot68` occupant): dereferences `self->unkC->unk0` (the
 `Obj86B60InitArgs` field `IntermediateBase__Init`/`IntermediateBase__Deinit` only ever forward
 opaquely, and the same field `IntermediateBase__OnState2` reaches independently through

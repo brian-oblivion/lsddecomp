@@ -75,7 +75,7 @@ because `include/code_2cc8c.h` is shared by six units and any offset movement
 would have changed an already-matched function's codegen elsewhere. Verified by
 the whole-image SHA1, which is the only thing that can see it.
 
-Slot occupants in the base table `gClass86B60Methods`, from the jump table plus
+Slot occupants in the base table `gTitleMenuMethods`, from the jump table plus
 `tools/classtable.py`: `slot74` = `TaskCore__OnPadNext`, `slot78` = `TaskCore__OnPadPrev`,
 `slot7C` = `TaskCore__OnPadCancel`, `slot80` = `TaskCore__func_8003C7F4`,
 `slot84` = `TaskCore__OnPadConfirm`.
@@ -115,9 +115,9 @@ is its first realised match.
 ## Naming (round 78, delta)
 
 **Tier A.** `func_8003C48C` -> `Obj86B60__OnTag2Notify`. Occupies slot58 in
-`gTaskCoreMethods` (the base table), `gClass86B60Methods` and
+`gTaskCoreMethods` (the base table), `gTitleMenuMethods` and
 `gGraphRoomMethods` identically (unoverridden by either derived class --
-`tools/classtable.py gTaskCoreMethods`/`gClass86B60Methods`/`gGraphRoomMethods`).
+`tools/classtable.py gTaskCoreMethods`/`gTitleMenuMethods`/`gGraphRoomMethods`).
 `IntermediateBase__OnNotify` (code_2cc8c_c.c) dispatches an incoming `EventArg` whose
 `target->header & 0xF == 2` through `self->methods->slot58`, matching the
 already-established `onTag1Notify` (header==1, slot54) naming convention one

@@ -74,4 +74,4 @@ score six times worse before the documented lever recovered it.
 
 ## Naming (round 77, naming runner delta)
 
-Renamed `func_8004E2E0` -> `New_TaskObjF`. **Tier A**: Standard `New_X` allocator (pool-alloc 0x84 bytes, null-check, construct through `GetTaskObjFMethods()->ctor`) for the class whose vtable is `gTaskObjFMethods` -- the same real class `class_3bb8c_f.c`/`class_3bb8c_g.c` already name `TaskObjF` tree-wide. Distinct from the already-named `New_Class86B60` (a different class, alloc size 0xC4).
+Renamed `func_8004E2E0` -> `New_TaskObjF`. **Tier A**: Standard `New_X` allocator (pool-alloc 0x84 bytes, null-check, construct through `GetTaskObjFMethods()->ctor`) for the class whose vtable is `gTaskObjFMethods` -- the same real class `class_3bb8c_f.c`/`class_3bb8c_g.c` already name `TaskObjF` tree-wide. Distinct from the already-named `New_TitleMenu` (a different class, alloc size 0xC4).

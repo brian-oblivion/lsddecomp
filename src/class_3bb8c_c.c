@@ -1,7 +1,7 @@
 /*
  * class_3bb8c_c -- three small sibling classes, each built by its own
  * New_X/ctor pair (allocate, chain a base ctor, install the class's own
- * vtable): NodeGuardedViewport, GridCell and Class86B60. All three follow
+ * vtable): NodeGuardedViewport, GridCell and TitleMenu. All three follow
  * the same class-framework shape documented in
  * docs/research/class-framework.md and already used elsewhere in this
  * codebase (e.g. class_3ac78.c's Class866E8).
@@ -11,15 +11,15 @@
  * methods, New_ and the getter are all here. GridCell (include/GridCell.h,
  * a SceneNode) is one cell of Class866E8's grid, carrying the model placed
  * there; its five table methods, New_ and the getter are all here too.
- * Class86B60
- * (include/Class86B60.h, a TaskCore) is the largest of the three -- its own
- * vtable (gClass86B60Methods, 78 slots) is occupied mostly by the sibling
+ * TitleMenu
+ * (include/TitleMenu.h, a TaskCore) is the largest of the three -- its own
+ * vtable (gTitleMenuMethods, 78 slots) is occupied mostly by the sibling
  * unit class_3bb8c_d.c; this unit contributes only the allocator and ctor.
  *
  * Two free functions round out the unit: CheckSaveScoreFlag, called
  * directly (not through any vtable) from
- * Class86B60__CommitNameEntry, computes a 0/1 flag from its save block (Class86B60::saveBlock); and
- * FormatNumberIntoBuffer, called from Class86B60's own ctor, formats a
+ * TitleMenu__CommitNameEntry, computes a 0/1 flag from its save block (TitleMenu::saveBlock); and
+ * FormatNumberIntoBuffer, called from TitleMenu's own ctor, formats a
  * number into a shared buffer whose broader role (nearby rodata strings
  * hint at a memory-card save label) is not established from this unit
  * alone.
@@ -33,7 +33,7 @@
 #include "Viewport.h"
 #include "NodeGuardedViewport.h"
 #include "GridCell.h"
-#include "Class86B60.h"
+#include "TitleMenu.h"
 #include "VabStreamObj.h"
 
 NodeGuardedViewport *New_NodeGuardedViewport(void) {
@@ -125,23 +125,23 @@ GridCellMethods *GetGridCellMethods(void) {
     return &gGridCellMethods;
 }
 
-Class86B60 *New_Class86B60(struct DreamSys *dreamSys) {
-    Class86B60 *self;
+TitleMenu *New_TitleMenu(struct DreamSys *dreamSys) {
+    TitleMenu *self;
 
     self = BMemPMgrAlloc(0xC4);
     if (self != NULL) {
-        GetClass86B60Methods()->ctor(self, dreamSys);
+        GetTitleMenuMethods()->ctor(self, dreamSys);
         return self;
     }
     return NULL;
 }
 
-void Class86B60__Class86B60(Class86B60 *self, struct DreamSys *dreamSys) {
+void TitleMenu__TitleMenu(TitleMenu *self, struct DreamSys *dreamSys) {
     DreamSys *dream;
     VabStreamObj *sound;
 
     Get_vtable_TaskCore()->ctor((TaskCore *)self, &D_80086D44, (char *)D_800114DC, 0);
-    self->methods = GetClass86B60Methods();
+    self->methods = GetTitleMenuMethods();
     sound = (VabStreamObj *)self->sound;
     sound->methods->setPitchOffset(sound, -1);
     self->dreamSys = dreamSys;
@@ -150,7 +150,7 @@ void Class86B60__Class86B60(Class86B60 *self, struct DreamSys *dreamSys) {
     self->saveBlock = dream->methods->getSaveBlock(dream, &self->saveBlockSize);
     FormatNumberIntoBuffer(dream->methods->getCurrentDayAndYear(dream, 0));
     self->methods->setTarget(self, &D_80086D44);
-    ((Class86B60ResetCallFn)self->methods->resetCounters)(self, dreamSys);
+    ((TitleMenuResetCallFn)self->methods->resetCounters)(self, dreamSys);
 }
 
 void CheckSaveScoreFlag(Ctx678_3bb8c_c *ctx, Result678_3bb8c_c *out) {

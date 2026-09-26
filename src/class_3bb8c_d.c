@@ -1,14 +1,14 @@
 /*
- * class_3bb8c_d -- the bulk of `Class86B60`'s own methods (include/Class86B60.h,
+ * class_3bb8c_d -- the bulk of `TitleMenu`'s own methods (include/TitleMenu.h,
  * track 4 round 88; the allocator and ctor are in class_3bb8c_c.c), then the
  * getter, then TaskObjF's allocator and methods.
  *
- * Class86B60 is a TaskCore. Its overrides replace TaskCore's slot widgets
+ * TitleMenu is a TaskCore. Its overrides replace TaskCore's slot widgets
  * with one owned TextRow, `nameField` (setTarget/releaseTarget/
- * updateSlotElements/broadcastToSlots: Class86B60__CreateNameField/
+ * updateSlotElements/broadcastToSlots: TitleMenu__CreateNameField/
  * DestroyNameField/ForwardToNameField/TickNameFieldCursor), and its own
  * slots drive `saveCtrl`, a TaskObjF whose calls carry "BISLPS-01556",
- * Sony's memory-card product code (Class86B60__Begin/EndMemcardSave and the
+ * Sony's memory-card product code (TitleMenu__Begin/EndMemcardSave and the
  * two UpdateMemcardSave* variants that tick runs for activeSlot 2 and 3).
  * Read together this is a memory-card save-naming screen: enter a save
  * name, then write it. The header's banner has the measured detail.
@@ -22,10 +22,10 @@
 #include "DreamSys.h"
 #include "TextRow.h"
 #include "TimImage.h"
-#include "Class86B60.h"
+#include "TitleMenu.h"
 #include "TaskObjF.h"
 
-void Class86B60__Finalize(Class86B60 *self) {
+void TitleMenu__Finalize(TitleMenu *self) {
     if (self->saveCtrl != NULL) {
         self->saveCtrl->methods->release(self->saveCtrl);
         self->iconHandle->methods->release(self->iconHandle);
@@ -33,14 +33,14 @@ void Class86B60__Finalize(Class86B60 *self) {
     Get_vtable_TaskCore()->finalize((TaskCore *)self);
 }
 
-void Class86B60__OnNotify(Class86B60 *self, BasicClass *sender, s32 event) {
+void TitleMenu__OnNotify(TitleMenu *self, BasicClass *sender, s32 event) {
     Get_vtable_TaskCore()->onNotify((TaskCore *)self, sender, event);
     if ((sender->methods->header & 0xF) == 0xB) {
         self->methods->onTagBValue(self, sender, event);
     }
 }
 
-void Class86B60__Reset(Class86B60 *self) {
+void TitleMenu__Reset(TitleMenu *self) {
     self->unk34 = 0;
     self->unk2C = 0x190;
     self->methods->setSubHandle(self, D_800114E8, 0);
@@ -48,21 +48,21 @@ void Class86B60__Reset(Class86B60 *self) {
     self->dreamSys->methods->getSetFlashbackSession(self->dreamSys, 0, 0);
 }
 
-void Class86B60__OnDeinit(Class86B60 *self) {
+void TitleMenu__OnDeinit(TitleMenu *self) {
     u32 i;
     u8 *entry;
 
     i = 0;
     entry = (u8 *)&D_80086DAC;
     for (; i < 2; i++) {
-        ((Class86B60UnkC0Obj_3bb8c_d *)self->initArgs->drawSystem)
-            ->methods->slot78((Class86B60UnkC0Obj_3bb8c_d *)self->initArgs->drawSystem, self->unk93,
+        ((TitleMenuUnkC0Obj_3bb8c_d *)self->initArgs->drawSystem)
+            ->methods->slot78((TitleMenuUnkC0Obj_3bb8c_d *)self->initArgs->drawSystem, self->unk93,
                               entry);
         entry += 0xC;
     }
 }
 
-void Class86B60__SetState(Class86B60 *self, s32 state) {
+void TitleMenu__SetState(TitleMenu *self, s32 state) {
     Get_vtable_TaskCore()->setState((TaskCore *)self, state);
     if (state == 5) {
         self->methods->commitNameEntry(self, 0);
@@ -74,8 +74,8 @@ void Class86B60__SetState(Class86B60 *self, s32 state) {
     }
 }
 
-void Class86B60__Tick(Class86B60 *self) {
-    void (*fn)(Class86B60 *);
+void TitleMenu__Tick(TitleMenu *self) {
+    void (*fn)(TitleMenu *);
 
     Get_vtable_TaskCore()->tick((TaskCore *)self);
     switch (self->activeSlot) {
@@ -100,7 +100,7 @@ void Class86B60__Tick(Class86B60 *self) {
     fn(self);
 }
 
-void Class86B60__RefreshViewValue(Class86B60 *self) {
+void TitleMenu__RefreshViewValue(TitleMenu *self) {
     s32 buf;
 
     Get_vtable_TaskCore()->refreshViewValue((TaskCore *)self);
@@ -123,7 +123,7 @@ extern void DecodeFullWidthSjis(void *dst, void *src);
 
 /* The setTarget override: `target` is the TaskCoreTarget the ctor passes
  * (&D_80086D44); only its `handle` is read, as the TextRow's texture. */
-void Class86B60__CreateNameField(Class86B60 *self, TaskCoreTarget *target) {
+void TitleMenu__CreateNameField(TitleMenu *self, TaskCoreTarget *target) {
     u32 size;
     char *buf;
 
@@ -145,23 +145,23 @@ void Class86B60__CreateNameField(Class86B60 *self, TaskCoreTarget *target) {
     BMemPMgrFree(buf);
 }
 
-void Class86B60__DestroyNameField(Class86B60 *self) {
+void TitleMenu__DestroyNameField(TitleMenu *self) {
     self->nameField->methods->release(self->nameField);
     Get_vtable_TaskCore()->releaseTarget((TaskCore *)self);
 }
 
-void Class86B60__ForwardToNameField(Class86B60 *self, void *parent) {
+void TitleMenu__ForwardToNameField(TitleMenu *self, void *parent) {
     Get_vtable_TaskCore()->updateSlotElements((TaskCore *)self, parent);
     self->nameField->methods->attachToParent(self->nameField, (SceneNode *)parent,
                                              (LongVec3 *)&D_8008A9B4);
 }
 
 /* MATCHED round 75 (was STALL round 43) -- see
- * docs/match-reports/Class86B60__TickNameFieldCursor.md. `base` is taken BEFORE the first call
+ * docs/match-reports/TitleMenu__TickNameFieldCursor.md. `base` is taken BEFORE the first call
  * (so it crosses a call and gets $s1), `buf = *color` is one struct copy
  * (SpriteRgb is three `s8`: three `lb`, then three `sb`), and each arm
  * indexes `base[D_8008AA28]` directly. */
-void Class86B60__TickNameFieldCursor(Class86B60 *self, SpriteRgb *color) {
+void TitleMenu__TickNameFieldCursor(TitleMenu *self, SpriteRgb *color) {
     SpriteRgb buf;
     u8 *base;
 
@@ -199,7 +199,7 @@ void Class86B60__TickNameFieldCursor(Class86B60 *self, SpriteRgb *color) {
 extern void CheckSaveScoreFlag(void *arg0, void *arg1,
                                void *arg2); /* arity-ok: the definition is 2-parameter and the callee WRITES $a2 (`li a2,0x1` at 0x8004D690) before reading it, but the 3rd argument is byte-load-bearing here -- retail emits `lw a2,164(s0)` at 0x8004DE74 */
 
-void Class86B60__CommitNameEntry(Class86B60 *self) {
+void TitleMenu__CommitNameEntry(TitleMenu *self) {
     s32 size;
     s32 origSlot;
     char *buf1;
@@ -222,7 +222,7 @@ void Class86B60__CommitNameEntry(Class86B60 *self) {
     self->dreamSys->methods->getSetScreenShake(self->dreamSys, &buf2);
 }
 
-void Class86B60__BeginMemcardSave(Class86B60 *self) {
+void TitleMenu__BeginMemcardSave(TitleMenu *self) {
     if (self->saveCtrl == NULL) {
         self->iconHandle = New_TimImage((char *)D_800114F8);
         self->saveCtrl = New_TaskObjF(1, 0);
@@ -235,14 +235,14 @@ void Class86B60__BeginMemcardSave(Class86B60 *self) {
     self->methods->removeChild(self, self->unk10);
 }
 
-void Class86B60__EndMemcardSave(Class86B60 *self) {
+void TitleMenu__EndMemcardSave(TitleMenu *self) {
     self->methods->addChild(self, self->initArgs->pad);
     self->methods->addChild(self, self->unk10);
     self->methods->removeChild(self, (BasicClass *)self->saveCtrl);
     self->saveCtrl->methods->deinit(self->saveCtrl);
 }
 
-void Class86B60__UpdateMemcardSaveWithIcon(Class86B60 *self) {
+void TitleMenu__UpdateMemcardSaveWithIcon(TitleMenu *self) {
     s32 buf;
 
     buf = self->slotCounts[5];
@@ -255,13 +255,13 @@ void Class86B60__UpdateMemcardSaveWithIcon(Class86B60 *self) {
                                        self->iconHandle, self->saveBlock, self->saveBlockSize);
 }
 
-void Class86B60__UpdateMemcardSaveStatus(Class86B60 *self) {
+void TitleMenu__UpdateMemcardSaveStatus(TitleMenu *self) {
     self->methods->beginMemcardSave(self);
     self->saveCtrl->methods->beginLoad(self->saveCtrl, D_8008AA10, D_8008AA18, self->saveBlock,
                                        self->saveBlockSize);
 }
 
-void Class86B60__OnTagBValue(Class86B60 *self, BasicClass *sender, s32 event) {
+void TitleMenu__OnTagBValue(TitleMenu *self, BasicClass *sender, s32 event) {
     if (event < 0x18) {
         if (event >= 0x16) {
             self->methods->endMemcardSave(self);
@@ -273,8 +273,8 @@ void Class86B60__OnTagBValue(Class86B60 *self, BasicClass *sender, s32 event) {
     }
 }
 
-Class86B60Methods *GetClass86B60Methods(void) {
-    return &gClass86B60Methods;
+TitleMenuMethods *GetTitleMenuMethods(void) {
+    return &gTitleMenuMethods;
 }
 
 TaskObjF *New_TaskObjF(s32 padEnable, s32 cardSlot) {

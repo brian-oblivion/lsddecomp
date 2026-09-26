@@ -1,14 +1,16 @@
-# Class86B60__OnTagBValue -- MATCH
+# TitleMenu__OnTagBValue -- MATCH
+
+> Renamed from `Class86B60__OnTagBValue` on 2026-09-26 (tools/rename.py). Address 0x8004e230.
 
 > Renamed from `func_8004E230` on 2026-09-24 (tools/rename.py). Address 0x8004e230.
 
 Unit `class_3bb8c_d`, round 14. `./build-and-verify.sh` exit 0; whole-image
-SHA1 matches retail. `funcdiff.py Class86B60__OnTagBValue`: 40/40 words match.
+SHA1 matches retail. `funcdiff.py TitleMenu__OnTagBValue`: 40/40 words match.
 
 ## Source
 
 ```c
-void Class86B60__OnTagBValue(Class86B60 *self, s32 arg1, s32 value)
+void TitleMenu__OnTagBValue(TitleMenu *self, s32 arg1, s32 value)
 {
     if (value < 0x18) {
         if (value >= 0x16) {
@@ -44,13 +46,13 @@ the very next build with no other change.
 
 ## Struct changes (additive, `include/class_3bb8c.h`)
 
-- `Class86B60Methods::slot12C` -- new slot, `void (*)(Class86B60 *self)`.
+- `TitleMenuMethods::slot12C` -- new slot, `void (*)(TitleMenu *self)`.
 - `DreamSysViewMethods_3bb8c_c::slot1A8` -- new slot (declared ahead of
-  this function while deriving `Class86B60__Reset`'s neighbourhood; this is
+  this function while deriving `TitleMenu__Reset`'s neighbourhood; this is
   the function that exercises it), `void (*)(DreamSysView_3bb8c_c *self)`.
 - Fixed a self-inflicted duplicate-member bug introduced while adding
   `slot12C`: an earlier edit accidentally left two identical `slot130`
-  declarations in `Class86B60Methods`, caught immediately by the compile
+  declarations in `TitleMenuMethods`, caught immediately by the compile
   error (`duplicate member 'slot130'`) before any score was read.
 
 ### Proposed learning
@@ -68,8 +70,8 @@ nested-`if` spelling before anything else.
 
 ## Naming (round 77, naming runner delta)
 
-Renamed `func_8004E230` -> `Class86B60__OnTagBValue`. **Tier B**: The exclusive dispatch target of `Class86B60__OnNotify`'s `slot138` forward (called only when `arg1`'s header nibble == 0xB), gating further work on ranges of its own `value` parameter (>= 0x16, < 0x18, == 0x16). Named for its role as the tag-0xB handler; the value ranges' meaning is not established.
+Renamed `func_8004E230` -> `TitleMenu__OnTagBValue`. **Tier B**: The exclusive dispatch target of `TitleMenu__OnNotify`'s `slot138` forward (called only when `arg1`'s header nibble == 0xB), gating further work on ranges of its own `value` parameter (>= 0x16, < 0x18, == 0x16). Named for its role as the tag-0xB handler; the value ranges' meaning is not established.
 
 ## Track 4 (2026-09-26, round 88, bravo)
 
-Class86B60 is unified in include/Class86B60.h (TASKCORE_SLOTS/TASKCORE_FIELDS plus its own). The occupant of this class's own +0x138, `onTagBValue`, which Class86B60__OnNotify calls with its (sender, event): the parameters are retyped `BasicClass *sender, s32 event`. slot12C is endMemcardSave, slot124 commitNameEntry. Byte-identical (whole image green, 0 new warnings, nonmatching green).
+TitleMenu is unified in include/TitleMenu.h (TASKCORE_SLOTS/TASKCORE_FIELDS plus its own). The occupant of this class's own +0x138, `onTagBValue`, which TitleMenu__OnNotify calls with its (sender, event): the parameters are retyped `BasicClass *sender, s32 event`. slot12C is endMemcardSave, slot124 commitNameEntry. Byte-identical (whole image green, 0 new warnings, nonmatching green).

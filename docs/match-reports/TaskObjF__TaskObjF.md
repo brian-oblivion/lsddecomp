@@ -11,7 +11,7 @@ this round wrote and matched the function from scratch.
 `TaskObjF__TaskObjF` is the constructor for the class whose vtable is
 `gTaskObjFMethods` -- `tools/classtable.py 0x80086DC4` places it exactly at that
 table's own **+0x008 ctor slot**. This is the same real class
-`GetClass86B60Methods`/`New_TaskObjF` (already matched, earlier in this unit)
+`GetTitleMenuMethods`/`New_TaskObjF` (already matched, earlier in this unit)
 allocate and construct through `GetTaskObjFMethods()->ctor(self, arg0, arg1)`,
 and the SAME real object `class_3bb8c_e.c` independently names `Node3bb8cE`
 (its own local view, established there round 14 from ITS 19 functions --
@@ -50,7 +50,7 @@ SLPS_015.56`.
 2. `self->methods = GetTaskObjFMethods();` -- `GetTaskObjFMethods()` returns
    `&gTaskObjFMethods`, i.e. this class sets its OWN `methods` pointer directly
    to its own table, the same "base-ctor-chain" pattern already documented
-   for `Class86B60::Class86B60__Class86B60` in this same header.
+   for `TitleMenu::TitleMenu__TitleMenu` in this same header.
 3. A one-shot init guard: `D_8008AA30` (a plain `.sdata` `s32`, zero-
    initialized, `asm/data/7B12C.sdata.s`) is read, incremented
    unconditionally, and the PRE-increment value gates a block that runs
@@ -103,7 +103,7 @@ that table's OWN ctor/method slot (not merely a callee it calls into), the
 function IS that class's identity method -- worth checking early, since it
 explains why the function's first act is often `self->methods =
 <table-getter>()` (the same-table self-assignment idiom already seen for
-`Class86B60`/`Class86B60__Class86B60`) rather than reading `self->methods` from
+`TitleMenu`/`TitleMenu__TitleMenu`) rather than reading `self->methods` from
 somewhere else.
 
 ## Naming (round 77, naming runner delta)

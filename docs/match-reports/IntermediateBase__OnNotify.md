@@ -15,8 +15,8 @@ reads `arg1->target->header & 0xF` and dispatches to one of
 `self->methods->slot54/58/5C` (all three called with `(self, arg1, arg2)`)
 for header values 1/2/5 respectively; any other value is a no-op.
 
-`gClass86B60Methods`'s own `+0x038` is this same function (verbatim inherit, no
-override) -- confirmed with `tools/classtable.py gClass86B60Methods`, which is also
+`gTitleMenuMethods`'s own `+0x038` is this same function (verbatim inherit, no
+override) -- confirmed with `tools/classtable.py gTitleMenuMethods`, which is also
 how `slot54`/`slot58`/`slot5C`'s occupants (`IntermediateBase__OnTag1Notify`,
 `TaskCore__OnPadEvent`, `TaskCore__Update`) were identified.
 

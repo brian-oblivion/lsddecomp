@@ -24,7 +24,7 @@ void TaskCore__func_8003C7F4(Obj86B60 *self, s32 a1)
 `TaskCore__OnPadNext`) that share this exact gate-then-forward shape, all reached
 from the same message dispatcher (`TaskCore__OnPadEvent`, STALL -- see its report)
 via consecutive vtable slots `+0x074`..`+0x084`. `slot70` IS this unit's own
-`TaskCore__PlaySound`; `slot60` is external (`Class86B60__SetState`).
+`TaskCore__PlaySound`; `slot60` is external (`TitleMenu__SetState`).
 
 The parameter `a1` is passed through the caller's own `a1` register into
 these two `slotNN` calls unmodified but is otherwise unused by THIS

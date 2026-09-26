@@ -9,7 +9,7 @@
 ## What it does
 
 Not a `NodeGuardedViewport`/`GridCell` method -- called directly (`jal`) from the
-still-uncarved `Class86B60__CommitNameEntry` in `asm/class_3bb8c_d.s`. Given a caller-side
+still-uncarved `TitleMenu__CommitNameEntry` in `asm/class_3bb8c_d.s`. Given a caller-side
 context struct and a result struct, reaches through the context to an
 `Obj866E8` instance, checks one of its fields against a large constant
 (9999999) and a second field against zero, and writes a 0/1 flag into the
@@ -45,7 +45,7 @@ void CheckSaveScoreFlag(Ctx678_3bb8c_c *ctx, Result678_3bb8c_c *out)
 
 `CheckSaveScoreFlag`'s first argument is NOT `Obj866E8` itself -- it is a
 larger, unrelated caller-side struct (only visible from its one caller,
-`Class86B60__CommitNameEntry`, which reads its own fields at +0x4C/+0x58/+0xA4/+0xB0
+`TitleMenu__CommitNameEntry`, which reads its own fields at +0x4C/+0x58/+0xA4/+0xB0
 around the call) whose own +0x0BC field is a pointer to the `Obj866E8`
 this function actually operates on. This is deliberately NOT the same as
 `Obj866E8`'s own +0x0BC (already documented as the embedded `Descriptor10`
@@ -107,7 +107,7 @@ Two real arguments, exactly as the definition
 (`void CheckSaveScoreFlag(Ctx678_3bb8c_c *ctx, Result678_3bb8c_c *out)`) says.
 `$a2` is a local flag, not an argument.
 
-**Why the extern must keep the third parameter.** `Class86B60__CommitNameEntry`'s call site
+**Why the extern must keep the third parameter.** `TitleMenu__CommitNameEntry`'s call site
 loads it, and retail emits that load:
 
 ```
@@ -120,7 +120,7 @@ loads it, and retail emits that load:
 unambiguous: the instruction exists only because the source passes a third
 argument. Reducing the declaration to the definition's two parameters would be
 a `too many arguments` error, and dropping the argument from the call site would
-delete `lw a2,164(s0)` and break `Class86B60__CommitNameEntry`.
+delete `lw a2,164(s0)` and break `TitleMenu__CommitNameEntry`.
 
 **Declaration sites changed:** none (arity unchanged). `/* arity-ok: ... */`
 added to `src/class_3bb8c_d.c:219`. Oracle green.
@@ -128,7 +128,7 @@ added to `src/class_3bb8c_d.c:219`. Oracle green.
 ## Naming
 
 **CheckSaveScoreFlag** -- tier B. Free function (not a vtable method --
-called directly by `jal` from the still-uncarved `Class86B60__CommitNameEntry`), so named
+called directly by `jal` from the still-uncarved `TitleMenu__CommitNameEntry`), so named
 `VerbNoun`. Mechanics are fully evident: reaches an `Obj866E8` through a
 caller-side context struct, compares one field (`unkC`) against a large
 literal (`9999999`), and writes a computed 0/1 flag into a result block.
@@ -147,8 +147,8 @@ without stronger cause.
 Renamed `CheckObj866E8CountFlag` -> `CheckSaveScoreFlag` with tools/rename.py
 while unifying Class866E8 (include/Class866E8.h). The old name claimed the
 object it reads is a Class866E8; it is not. Its one caller,
-`Class86B60__CommitNameEntry`, passes its own `self` as `ctx`, so
-`ctx->+0x0BC` is `Class86B60::saveBlock` (include/Class86B60.h: the DreamSys's
+`TitleMenu__CommitNameEntry`, passes its own `self` as `ctx`, so
+`ctx->+0x0BC` is `TitleMenu::saveBlock` (include/TitleMenu.h: the DreamSys's
 `getSaveBlock` result, `&saveMagic`), and a Class866E8 is only 0x1E8 bytes
 while this reads +0x2F4. From `saveMagic`, +0x00C is DreamSys's
 `totalFlasbackUnlockScore` (include/DreamSys.h: saveMagic, currentYear,

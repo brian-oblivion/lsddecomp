@@ -9,8 +9,8 @@
 ## What it does
 
 `Obj86B60Methods::slot120` (verified by reading the raw table bytes at
-`gClass86B60Methods+0x120` in `disk/SLPS_015.56` directly, and cross-checked with
-`tools/classtable.py gClass86B60Methods`). Returns the current ring-buffer slot's
+`gTitleMenuMethods+0x120` in `disk/SLPS_015.56` directly, and cross-checked with
+`tools/classtable.py gTitleMenuMethods`). Returns the current ring-buffer slot's
 running count: `self->unk60[self->unk58]`.
 
 ## The C
@@ -30,8 +30,8 @@ whose comment attributed it to `TaskCore__GetActiveSlotCount` (citing `TaskCore_
 was wrong.** Reading the retail table bytes directly:
 
 ```
-gClass86B60Methods+0x118 = 0x8003DE30  (TaskCore__RetreatSlotCursor, NOT TaskCore__GetActiveSlotCount)
-gClass86B60Methods+0x120 = 0x8003DFA0  (TaskCore__GetActiveSlotCount's real slot)
+gTitleMenuMethods+0x118 = 0x8003DE30  (TaskCore__RetreatSlotCursor, NOT TaskCore__GetActiveSlotCount)
+gTitleMenuMethods+0x120 = 0x8003DFA0  (TaskCore__GetActiveSlotCount's real slot)
 ```
 
 The byte OFFSET `TaskCore__OnPadPrev` compiled against (0x118) was and is

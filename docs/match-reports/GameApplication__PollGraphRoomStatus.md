@@ -13,7 +13,7 @@ sibling gate on the ctor argument, alongside `GameApplication__LoadIntroLogoSequ
 `GameApplication__StartWeeklyStreamTask`'s `unk08`). Checks the owned `DreamSys`'s own status slot
 (`+0x1A0`); if it isn't already `1` and `self->unk24` hasn't latched, kicks
 off one `PollTask` (`New_GraphRoom`) and, if *that* reports `2`, runs
-`GameApplication__StartGraphRoomStreamTask`. Then polls a second `PollTask` (`New_Class86B60`) in a loop,
+`GameApplication__StartGraphRoomStreamTask`. Then polls a second `PollTask` (`New_TitleMenu`) in a loop,
 restarting the first `PollTask` each time it reports `2`, until it reports
 anything else; clears `self->unk24` and returns `0` or `2` depending on
 whether that final status was below `1` (unsigned).
@@ -40,7 +40,7 @@ s32 GameApplication__PollGraphRoomStatus(GameApplication *self) {
 
         pollDone = 2;
     retry:
-        status = GameApplication__RunPollTask(New_Class86B60, self->dreamSys, self->unk1C);
+        status = GameApplication__RunPollTask(New_TitleMenu, self->dreamSys, self->unk1C);
         if (status == pollDone) {
             GameApplication__RunPollTask(New_GraphRoom, self->dreamSys, self->unk1C);
             goto retry;
@@ -141,12 +141,12 @@ sequential code, not an early return.
 
 **`GameApplication__PollGraphRoomStatus` -- tier B.** Mechanics: gated by
 `arg->unk10`, checks the owned `DreamSys`'s own status accessor, then loops
-`GameApplication__RunPollTask(New_Class86B60, ...)`, restarting
+`GameApplication__RunPollTask(New_TitleMenu, ...)`, restarting
 `GameApplication__RunPollTask(New_GraphRoom, ...)` on every "2" report, until
 the second poll task reports something else. `New_GraphRoom` is an
 established, evidence-backed name from another unit
 (`src/class_3bb8c_t.c:315`, `GraphRoom__GraphRoom`), so "GraphRoom" is
-real vocabulary, not a guess -- but `New_Class86B60`'s own class is still
+real vocabulary, not a guess -- but `New_TitleMenu`'s own class is still
 unnamed, and this function's ultimate purpose (what "graph room" readiness
 gates) is not established here. The name describes the poll/retry mechanics
 around the one named PollTask class involved.
