@@ -42,7 +42,7 @@
  *
  * Not settled here: subHandle is a Class6E99C (0x164, below gBoxFillMethods,
  * 0x64), whose +0x04C override (BoxFill__AttachToParent) takes a two-word screen
- * position where SceneNode's attachToParent slot takes a Vec3_d294 offset;
+ * position where SceneNode's attachToParent slot takes a LongVec3 offset;
  * the ctor and SetSubHandle pass D_8008A904 (-100, -100) through the
  * inherited slot with a pointer cast. unk44 and unk48 multiply to each
  * buffer's packet area (InitOt; defaults 2000 and 64); which is the count
@@ -79,8 +79,8 @@ struct ViewportRgb {
 
 /* libgs GsRVIEW2, 0x20 bytes: the argument GsSetRefView2 takes. */
 struct ViewportRefView {
-    Vec3_d294 vp;           /* +0x000, viewpoint: setViewPoint */
-    Vec3_d294 vr;           /* +0x00C, reference point: setViewRef */
+    LongVec3 vp;           /* +0x000, viewpoint: setViewPoint */
+    LongVec3 vr;           /* +0x00C, reference point: setViewRef */
     s32 rz;                 /* +0x018, twist, 20.12 (setTwist) */
     SceneNodeSub14 *super; /* +0x01C, the view node's GsCOORDINATE2 (AddChild) */
 };
@@ -110,10 +110,10 @@ struct ViewportOt {
     /* +0x064 */ void (*setClearColor)(Self *self, ViewportRgb *color); /* Viewport__SetClearColor */ \
     /* +0x068 */ void (*setFarColor)(Self *self, ViewportRgb *color);   /* Viewport__SetFarColor */ \
     /* +0x06C */ void (*setFogNear)(Self *self, s32 fogNear);      /* Viewport__SetFogNear */        \
-    /* +0x070 */ void (*attachViewChild)(Self *self, BasicClass *node, Vec3_d294 *vp, Vec3_d294 *vr, WholeFrac_d294 *twist); /* Viewport__AttachViewChild; NULL twist: D_8008A8F4 */ \
+    /* +0x070 */ void (*attachViewChild)(Self *self, BasicClass *node, LongVec3 *vp, LongVec3 *vr, WholeFrac_d294 *twist); /* Viewport__AttachViewChild; NULL twist: D_8008A8F4 */ \
     /* +0x074 */ void (*detachViewChild)(Self *self);              /* Viewport__DetachViewChild */   \
-    /* +0x078 */ void (*setViewPoint)(Self *self, Vec3_d294 *vp);  /* Viewport__SetViewPoint */      \
-    /* +0x07C */ void (*setViewRef)(Self *self, Vec3_d294 *vr);    /* Viewport__SetViewRef */        \
+    /* +0x078 */ void (*setViewPoint)(Self *self, LongVec3 *vp);  /* Viewport__SetViewPoint */      \
+    /* +0x07C */ void (*setViewRef)(Self *self, LongVec3 *vr);    /* Viewport__SetViewRef */        \
     /* +0x080 */ void (*setTwist)(Self *self, WholeFrac_d294 *twist); /* Viewport__SetTwist */       \
     /* +0x084 */ void (*slot84)(void);                             /* func_8003ECC0, empty */        \
     /* +0x088 */ void (*slot88)(void);                             /* func_8003ECC8, empty */        \
@@ -195,11 +195,11 @@ void Viewport__SetLightMode(Viewport *self, s32 mode);
 void Viewport__SetClearColor(Viewport *self, ViewportRgb *color);
 void Viewport__SetFarColor(Viewport *self, ViewportRgb *color);
 void Viewport__SetFogNear(Viewport *self, s32 fogNear);
-void Viewport__AttachViewChild(Viewport *self, BasicClass *node, Vec3_d294 *vp, Vec3_d294 *vr,
+void Viewport__AttachViewChild(Viewport *self, BasicClass *node, LongVec3 *vp, LongVec3 *vr,
                                WholeFrac_d294 *twist);
 void Viewport__DetachViewChild(Viewport *self);
-void Viewport__SetViewPoint(Viewport *self, Vec3_d294 *vp);
-void Viewport__SetViewRef(Viewport *self, Vec3_d294 *vr);
+void Viewport__SetViewPoint(Viewport *self, LongVec3 *vp);
+void Viewport__SetViewRef(Viewport *self, LongVec3 *vr);
 void Viewport__SetTwist(Viewport *self, WholeFrac_d294 *twist);
 void func_8003ECC0(void);
 void func_8003ECC8(void);

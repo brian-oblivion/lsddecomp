@@ -152,7 +152,7 @@ void Class86B60__DestroyNameField(Class86B60 *self) {
 void Class86B60__ForwardToNameField(Class86B60 *self, void *parent) {
     Get_vtable_TaskCore()->updateSlotElements((TaskCore *)self, parent);
     self->nameField->methods->attachToParent(self->nameField, (SceneNode *)parent,
-                                             (Vec3_d294 *)&D_8008A9B4);
+                                             (LongVec3 *)&D_8008A9B4);
 }
 
 /* MATCHED round 75 (was STALL round 43) -- see

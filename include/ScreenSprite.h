@@ -30,7 +30,7 @@
  * Not settled here: the ctor occupant returns nothing where the slot, from
  * SceneNode, returns `void *`; and the attachToParent override's third
  * argument is a ScreenSpritePos where the slot, SceneNode's, types it
- * `Vec3_d294 *offset`, so a call through the slot with a position needs a
+ * `LongVec3 *offset`, so a call through the slot with a position needs a
  * cast. Both slots are SceneNode's to change.
  *
  * The object is 0xA8 bytes (New_ScreenSprite).

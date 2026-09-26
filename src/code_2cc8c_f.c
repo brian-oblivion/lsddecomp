@@ -157,7 +157,7 @@ void TextRow__AttachToParent(TextRow *self, SceneNode *parent, ScreenSpritePos *
     if (self->parent != NULL) {
         return;
     }
-    GetCharSpriteMethods()->attachToParent((CharSprite *)self, parent, (Vec3_d294 *)pos);
+    GetCharSpriteMethods()->attachToParent((CharSprite *)self, parent, (LongVec3 *)pos);
     buf = *pos;
     elemp = self->cells + self->firstVisible;
     i = self->firstVisible;
@@ -167,7 +167,7 @@ void TextRow__AttachToParent(TextRow *self, SceneNode *parent, ScreenSpritePos *
             if (self->gapIndex != 0 && i == self->gapIndex) {
                 buf.x += 0x10;
             }
-            (*elemp)->methods->attachToParent(*elemp, (SceneNode *)self, (Vec3_d294 *)&buf);
+            (*elemp)->methods->attachToParent(*elemp, (SceneNode *)self, (LongVec3 *)&buf);
             buf.x += self->cellPitch;
             bound = self->firstVisible;
             elemp++;

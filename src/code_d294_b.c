@@ -168,9 +168,9 @@ void SceneNode__DispatchLinkCommand(SceneNode *self, void *sender, s32 event) {
  * with the resulting Vec3S16 difference, before registering `other` into
  * self->linkTarget and notifying it via its own +0x038 slot. */
 void SceneNode__TryAttachNearby(SceneNode *self, SceneNode *other) {
-    Vec3_d294 *posA;
-    Vec3_d294 *posB;
-    Vec3_d294 diffRaw;
+    LongVec3 *posA;
+    LongVec3 *posB;
+    LongVec3 diffRaw;
     TmdVec3 diff;
     s32 abs;
     u8 unused[0x20]; /* sp+0x30, never referenced; reserves retail's slot */
@@ -183,10 +183,10 @@ void SceneNode__TryAttachNearby(SceneNode *self, SceneNode *other) {
         return;
     }
 
-    posA = (other->parent != NULL) ? (Vec3_d294 *)other->coord2->unk38 : NULL;
+    posA = (other->parent != NULL) ? (LongVec3 *)other->coord2->unk38 : NULL;
     diffRaw = *posA;
 
-    posB = (self->parent != NULL) ? (Vec3_d294 *)self->coord2->unk38 : NULL;
+    posB = (self->parent != NULL) ? (LongVec3 *)self->coord2->unk38 : NULL;
     diffRaw.x = diffRaw.x - posB->x;
     diffRaw.y = diffRaw.y - posB->y;
     diffRaw.z = diffRaw.z - posB->z;

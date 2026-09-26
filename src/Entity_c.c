@@ -39,11 +39,11 @@ extern u8 ROTATION_YAW_MINUS9[];
 extern u8 D_80089C58[];
 extern u8 D_80089E74[];
 extern u8 ROTATION_YAW_PLUS1[];
-extern Vec3_d294 D_80089DB4[];
-extern Vec3_d294 TRANSLATE_Y_MINUS64[];
-extern Vec3_d294 D_80089D9C[];
-extern Vec3_d294 D_80089D48[];
-extern Vec3_d294 D_80089D60[];
+extern LongVec3 D_80089DB4[];
+extern LongVec3 TRANSLATE_Y_MINUS64[];
+extern LongVec3 D_80089D9C[];
+extern LongVec3 D_80089D48[];
+extern LongVec3 D_80089D60[];
 
 void Entity__MoodCue19(Entity *this, EntityMoodHandlerArg *out) {
     out->unk10 = this->methods->getProximityRatio(this);
@@ -232,7 +232,7 @@ void Entity__MoodCue30(Entity *this) {
                 this->state = 0xD;
             }
         } else if (this->state == 0xD) {
-            this->methods->setTranslation(this, (Vec3_d294 *)&((DreamSys *)this->peer)->coord2->tx);
+            this->methods->setTranslation(this, (LongVec3 *)&((DreamSys *)this->peer)->coord2->tx);
             this->methods->addTranslation(this, D_80089DB4);
         }
     }

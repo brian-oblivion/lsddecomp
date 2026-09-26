@@ -323,7 +323,7 @@ s32 IsStyleVariantEven(void) {
 extern void *BMemPMgrAlloc(s32 size);
 extern void *BMemPMgrFree(void *ptr);
 
-Class876FC *New_Class876FC(s32 kind, Class876FCParams *params, SceneNode *parent, Vec3_d294 *pos) {
+Class876FC *New_Class876FC(s32 kind, Class876FCParams *params, SceneNode *parent, LongVec3 *pos) {
     Class876FC *self = BMemPMgrAlloc(0x98);
 
     if (self != NULL) {
@@ -338,7 +338,7 @@ Class876FC *New_Class876FC(s32 kind, Class876FCParams *params, SceneNode *parent
 
 /* `kind` goes into Actor's pendingExtra (+0x054): see include/Class876FC.h. */
 Class876FC *Class876FC__Class876FC(Class876FC *self, s32 kind, Class876FCParams *params,
-                                   SceneNode *parent, Vec3_d294 *pos) {
+                                   SceneNode *parent, LongVec3 *pos) {
     if (GetActorMethods()->ctor((Actor *)self) == NULL) {
         goto fail;
     }
@@ -366,7 +366,7 @@ void Class876FC__SetParams(Class876FC *self, Class876FCParams *params) {
 
 /* `pos` arrives from StyleUpdateEffectSlots and is forwarded untouched in
  * $a1 (retail's jal at 0x80056508 sets no $a1). */
-void Class876FC__Update(Class876FC *self, Vec3_d294 *pos) {
+void Class876FC__Update(Class876FC *self, LongVec3 *pos) {
     self->tick = self->tick + 1;
     Class876FC__UpdateByKind(self, pos);
 }

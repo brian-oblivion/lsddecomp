@@ -40,7 +40,7 @@
  *    BoxFillResetFn.
  *  - +0x04C attachToParent: BoxFill__AttachToParent's third argument is a
  *    screen position (a Pair32E99C) where the slot, SceneNode's, types a
- *    Vec3_d294 offset; it attaches with a NULL offset, then setPosition.
+ *    LongVec3 offset; it attaches with a NULL offset, then setPosition.
  *    Callers cast to BoxFillAttachToParentFn (class_3bb8c_m/_n,
  *    code_2cc8c_b) or, through a SceneNode pointer, cast the argument
  *    (Viewport__SetSubHandle). BoxFill__AttachAbsolute calls it with FOUR

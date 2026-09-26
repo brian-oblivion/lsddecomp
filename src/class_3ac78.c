@@ -117,7 +117,7 @@ void Class866E8__Class866E8(Class866E8 *self, Unk54Struct *origin, s32 autoLoad)
         entry->placements = New_Class6D940(0);
         entry->cellParent = New_Class86AA0();
         entry->cellParent->methods->attachToParent(entry->cellParent, (SceneNode *)self,
-                                                   (Vec3_d294 *)&self->origin);
+                                                   (LongVec3 *)&self->origin);
 
         entry->cells = (Class86AA0 **)BMemPMgrAlloc(0x668);
         if (entry->cells == NULL) {
@@ -134,7 +134,7 @@ void Class866E8__Class866E8(Class866E8 *self, Unk54Struct *origin, s32 autoLoad)
         while (p < end) {
             obj = New_Class86AA0();
             *(Class86AA0 **)p = obj;
-            obj->methods->attachToParent(obj, (SceneNode *)entry->cellParent, (Vec3_d294 *)buf);
+            obj->methods->attachToParent(obj, (SceneNode *)entry->cellParent, (LongVec3 *)buf);
 
             buf[0] += 0x800;
             if (buf[0] > 0xA400) {

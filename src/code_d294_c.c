@@ -29,7 +29,7 @@
  * GsCOORD2PARAM.rotate; its `0` argument selects the un-negated angles,
  * i.e. local -> parent, not the inverse. `dst` is a bare 3-word vector:
  * class_3bb8c_o's own call site (Actor__AddLocalTranslation) passes a local `Vec3O`. */
-void SceneNode__RotateLocalVector(SceneNode *self, Vec3_d294 *dst, s16 *src) {
+void SceneNode__RotateLocalVector(SceneNode *self, LongVec3 *dst, s16 *src) {
     u8 buf[0x20];
 
     self->methods->getRotMatrix(self, buf, 0);
@@ -140,14 +140,14 @@ extern void SubVec3S16(s32 *dest, s16 *from, s16 *to);
  *  - `(s32)self->unk10 < 0`: `unk10` is a `u32` bitfield word, so without
  *    the cast the comparison is constant-false and GCC deletes the whole
  *    guarded block silently (round 19).
- *  - The backup copy is ONE `Vec3_d294` struct assignment, not three
+ *  - The backup copy is ONE `LongVec3` struct assignment, not three
  *    scalar ones. Both spell lw/lw/lw + sw/sw/sw, but only the struct copy
  *    puts `node` in retail's $a3; the scalar form gives it $a1. That was
  *    the last residue, open since round 44.
  *  - The `self->unkC != 0 ? ... : 0` ternary is written out TWICE per axis
  *    -- once for the store, once for the load -- because retail evaluates
  *    it twice (the diamond blocks it from CSE). Caching it in a variable
- *    costs two instructions per axis. It is also cast to `Vec3_d294 *` and
+ *    costs two instructions per axis. It is also cast to `LongVec3 *` and
  *    reached by FIELD, not indexed as `[i]`: `(cond ? p : NULL)[i]`
  *    distributes the index into both arms, which turns the NULL arm into
  *    the literal `i*4` and folds `0x38 + i*4` into one addiu, where retail
@@ -176,19 +176,19 @@ s32 func_8001E7BC(SceneNode *self, s32 *arg1, s32 *arg2) {
         if ((s32)self->attribute < 0 && self->parent != NULL) {
             node = self->coord2;
             if ((u8 *)node + 0x38 != NULL) {
-                *(Vec3_d294 *)node->unk38 = *(Vec3_d294 *)&node->tx;
+                *(LongVec3 *)node->unk38 = *(LongVec3 *)&node->tx;
 
                 cur = self->parent;
                 if (cur != NULL) {
                     do {
-                        ((Vec3_d294 *)(self->parent != 0 ? self->coord2->unk38 : (s32 *)0))->x =
-                            ((Vec3_d294 *)(self->parent != 0 ? self->coord2->unk38 : (s32 *)0))->x +
+                        ((LongVec3 *)(self->parent != 0 ? self->coord2->unk38 : (s32 *)0))->x =
+                            ((LongVec3 *)(self->parent != 0 ? self->coord2->unk38 : (s32 *)0))->x +
                             cur->coord2->tx;
-                        ((Vec3_d294 *)(self->parent != 0 ? self->coord2->unk38 : (s32 *)0))->y =
-                            ((Vec3_d294 *)(self->parent != 0 ? self->coord2->unk38 : (s32 *)0))->y +
+                        ((LongVec3 *)(self->parent != 0 ? self->coord2->unk38 : (s32 *)0))->y =
+                            ((LongVec3 *)(self->parent != 0 ? self->coord2->unk38 : (s32 *)0))->y +
                             cur->coord2->ty;
-                        ((Vec3_d294 *)(self->parent != 0 ? self->coord2->unk38 : (s32 *)0))->z =
-                            ((Vec3_d294 *)(self->parent != 0 ? self->coord2->unk38 : (s32 *)0))->z +
+                        ((LongVec3 *)(self->parent != 0 ? self->coord2->unk38 : (s32 *)0))->z =
+                            ((LongVec3 *)(self->parent != 0 ? self->coord2->unk38 : (s32 *)0))->z +
                             cur->coord2->tz;
 
                         cur = cur->parent;

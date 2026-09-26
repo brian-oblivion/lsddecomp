@@ -53,7 +53,7 @@ extern u16 GetTPage(s32 tp, s32 abr, s32 x, s32 y);
 
 
 /* The zero offset ScreenSprite__AttachToParent attaches with. */
-extern Vec3_d294 gVec3Zero;
+extern LongVec3 gVec3Zero;
 extern char *strcpy(char *dst, char *src);
 
 /* The cell origin GetCellRect copies: {0, 0, 8, 8}. */

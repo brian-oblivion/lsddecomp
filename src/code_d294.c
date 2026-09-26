@@ -173,7 +173,7 @@ void SceneNode__UpdateScale(SceneNode *self, s32 flag, void *data) {
     self->coord2->flg = 0;
 }
 
-SceneNode *SceneNode__AttachToParent(SceneNode *self, SceneNode *obj, Vec3_d294 *vec) {
+SceneNode *SceneNode__AttachToParent(SceneNode *self, SceneNode *obj, LongVec3 *vec) {
     SceneNodeSub14 *sub;
 
     if (self->parent == NULL) {

@@ -678,7 +678,7 @@ function's last statement reproduces retail exactly, including the early
 branch's own target (`beqz $v0, 0x8001EA60` at 0x8001E7E8, which had been
 wrong since round 19 and was never separately itemised).
 
-### Lever 3 (TYPES): cast the ternary to `Vec3_d294 *` and reach it by FIELD. 164 -> 172
+### Lever 3 (TYPES): cast the ternary to `LongVec3 *` and reach it by FIELD. 164 -> 172
 
 This is round 44's residue 2, and round 44 recorded it as a dead end: "the
 two properties -- correct NULL fallback and un-folded 0x38 base with
@@ -692,7 +692,7 @@ the literal `i*4`. A **COMPONENT_REF offset is not a tree PLUS_EXPR**: it is
 applied at expand time as the MEM's own displacement. So
 
 ```c
-((Vec3_d294 *)(self->unkC != 0 ? self->unk14->unk38 : (s32 *)0))->y
+((LongVec3 *)(self->unkC != 0 ? self->unk14->unk38 : (s32 *)0))->y
 ```
 
 leaves the cond-expr's arms untouched (`addiu $a0, $v0, 0x38` / `addu $a0,
@@ -700,13 +700,13 @@ $zero, $zero`, both exactly retail's) and puts the axis in the `4($a0)`
 displacement. Round 44's two properties are not in tension at all; they were
 only in tension while the axis was expressed as an index.
 
-`Vec3_d294` is the unit's own committed `{s32 x, y, z}` (include/code_d294.h),
+`LongVec3` is the unit's own committed `{s32 x, y, z}` (include/code_d294.h),
 and `SceneNodeSub14::unk38` is deliberately `s32 unk38[3]` rather than a
-`Vec3_d294` because `SceneNode__LocalOffsetToWorldPos` needs to index it.
+`LongVec3` because `SceneNode__LocalOffsetToWorldPos` needs to index it.
 Nothing about the header changed here -- the CAST is local to this function,
 which is exactly the split that header note anticipates.
 
-### Lever 4 (TYPES): the backup copy is ONE `Vec3_d294` struct assignment. 172 -> 180, MATCHED
+### Lever 4 (TYPES): the backup copy is ONE `LongVec3` struct assignment. 172 -> 180, MATCHED
 
 The last residue, open since round 44 and filed as a pure register-identity
 stall (`node` in `$a1` vs retail's `$a3`, 8 words at vram
@@ -728,7 +728,7 @@ node->unk38[2] = node->unk20;
 and the whole-struct assignment
 
 ```c
-*(Vec3_d294 *)node->unk38 = *(Vec3_d294 *)&node->unk18;
+*(LongVec3 *)node->unk38 = *(LongVec3 *)&node->unk18;
 ```
 
 emit the **same six instructions** (`lw`/`lw`/`lw` then `sw`/`sw`/`sw`, same

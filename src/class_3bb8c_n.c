@@ -289,12 +289,12 @@ extern s32 rand(void);
 extern s8 D_80087324[];
 extern s32 gStyleEffectSlotCount;
 extern Class876FC *gStyleEffectSlots[];
-extern Class876FC **StyleFillEffectKind0(Class876FC **arg0, s32 arg1, Vec3_d294 *arg2);
-extern Class876FC **StyleFillEffectKind1(Class876FC **arg0, s32 arg1, Vec3_d294 *arg2);
-extern Class876FC **StyleFillEffectKind3(Class876FC **arg0, Vec3_d294 *arg1);
-extern Class876FC **StyleFillEffectKind2(Class876FC **arg0, Vec3_d294 *arg1);
+extern Class876FC **StyleFillEffectKind0(Class876FC **arg0, s32 arg1, LongVec3 *arg2);
+extern Class876FC **StyleFillEffectKind1(Class876FC **arg0, s32 arg1, LongVec3 *arg2);
+extern Class876FC **StyleFillEffectKind3(Class876FC **arg0, LongVec3 *arg1);
+extern Class876FC **StyleFillEffectKind2(Class876FC **arg0, LongVec3 *arg1);
 
-void StyleBuildEffectSlots(Vec3_d294 *arg0) {
+void StyleBuildEffectSlots(LongVec3 *arg0) {
     s32 base;
     s32 val;
     s32 count;
@@ -326,7 +326,7 @@ extern s32 gStyleEffectSlotCount;
 
 /* Each slot's +0x0EC is Class876FC__Update, called with the position
  * (include/Class876FC.h: the slot keeps Actor's setPendingExtra type). */
-void StyleUpdateEffectSlots(Vec3_d294 *arg0) {
+void StyleUpdateEffectSlots(LongVec3 *arg0) {
     s32 i;
     Class876FC *obj;
 
@@ -414,7 +414,7 @@ extern void SetupStyleSpawnParamsB(void *arg0, void *arg1);
  * gStyleCounter % 7; returns the next free slot. Matched round 75: arg0 is
  * the walking pointer itself (a separate `arr = arg0` copy reordered the
  * prologue's argument moves). */
-Class876FC **StyleFillEffectKind0(Class876FC **arg0, s32 arg1, Vec3_d294 *arg2) {
+Class876FC **StyleFillEffectKind0(Class876FC **arg0, s32 arg1, LongVec3 *arg2) {
     s32 i;
     s32 t3;
     void (*fp)(void *, void *);
@@ -440,7 +440,7 @@ Class876FC **StyleFillEffectKind0(Class876FC **arg0, s32 arg1, Vec3_d294 *arg2) 
 extern s32 D_80087330;
 extern u8 D_80087204[];
 
-Class876FC **StyleFillEffectKind1(Class876FC **arg0, s32 arg1, Vec3_d294 *arg2) {
+Class876FC **StyleFillEffectKind1(Class876FC **arg0, s32 arg1, LongVec3 *arg2) {
     s32 i;
     s32 val;
 
@@ -478,7 +478,7 @@ typedef struct PtrBoxK3 {
  * and the default colour table it pins the spawn parameters, otherwise it
  * clamps D_8008E0AC and picks a random colour triple.  MATCHED round 76
  * (charlie). */
-Class876FC **StyleFillEffectKind3(Class876FC **arg0, Vec3_d294 *arg1) {
+Class876FC **StyleFillEffectKind3(Class876FC **arg0, LongVec3 *arg1) {
     s32 *p;
     PtrBoxK3 *q;
 
@@ -526,7 +526,7 @@ typedef struct S32BoxK2 {
  * load-bearing spelling of `% 20 != 0`: because the tested variable is also
  * the assigned one, jump.c cannot rewrite the if/else into `val = 0; if (..)
  * val = D_80087430;`, which is what every `% 20` spelling compiles to. */
-Class876FC **StyleFillEffectKind2(Class876FC **arg0, Vec3_d294 *arg1) {
+Class876FC **StyleFillEffectKind2(Class876FC **arg0, LongVec3 *arg1) {
     s32 r;
     s32 val;
     S32BoxK2 *slot;

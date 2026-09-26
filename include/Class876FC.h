@@ -59,7 +59,7 @@ typedef struct Class876FCParams Class876FCParams;
  * copies in whole. Every member is 4-aligned, so the whole-struct copy is
  * retail's aligned 4-word-per-iteration block move. */
 struct Class876FCParams {
-    /* +0x000 */ Vec3_d294 offset; /* added to the caller's position (InitByKind, UpdateByKind) */
+    /* +0x000 */ LongVec3 offset; /* added to the caller's position (InitByKind, UpdateByKind) */
     /* +0x00C */ void *rotation;   /* updateRotation's ratio triple (AttachWithRotScale) */
     /* +0x010 */ void *scale; /* updateScale's ratio triple; its first s16 also scales the model-child spacing (PlaceModelChildren) */
     /* +0x014 */ s32 modelChildLayout; /* 0 = no modelChildren, else an index 1..4 into gModelChildSpacing: 1-2 along x, 3-4 along y */
@@ -85,7 +85,7 @@ struct Class876FCParams {
 
 struct Class876FCMethods {
     CLASS876FC_SLOTS(Class876FC, (Class876FC * self, s32 kind, Class876FCParams *params,
-                                  SceneNode *parent, Vec3_d294 *pos));
+                                  SceneNode *parent, LongVec3 *pos));
 };
 
 struct Class876FC {
@@ -94,7 +94,7 @@ struct Class876FC {
 
 /* The reset and +0x0EC occupants as their callers call them (see the banner). */
 typedef void (*Class876FCSetParamsFn)(Class876FC *self, Class876FCParams *params);
-typedef void (*Class876FCUpdateFn)(Class876FC *self, Vec3_d294 *pos);
+typedef void (*Class876FCUpdateFn)(Class876FC *self, LongVec3 *pos);
 
 extern Class876FCMethods gClass876FCMethods;
 extern Class876FCMethods *GetClass876FCMethods(void); /* class_3bb8c_o.c; returns &gClass876FCMethods */
@@ -104,14 +104,14 @@ extern Class876FCMethods *GetClass876FCMethods(void); /* class_3bb8c_o.c; return
  * but a caller in class_3bb8c_s.c passes a dead second argument that is
  * byte-load-bearing (the `arity-ok` notes there and in the reports). */
 Class876FC *New_Class876FC(s32 kind, Class876FCParams *params, SceneNode *parent,
-                           Vec3_d294 *pos); /* BMemPMgrAlloc(0x98), then ctor */
+                           LongVec3 *pos); /* BMemPMgrAlloc(0x98), then ctor */
 Class876FC *Class876FC__Class876FC(Class876FC *self, s32 kind, Class876FCParams *params,
-                                   SceneNode *parent, Vec3_d294 *pos);
+                                   SceneNode *parent, LongVec3 *pos);
 void Class876FC__Finalize(Class876FC *self);
 void Class876FC__SetParams(Class876FC *self, Class876FCParams *params);
-void Class876FC__Update(Class876FC *self, Vec3_d294 *pos);
-void Class876FC__InitByKind(Class876FC *self, SceneNode *parent, Vec3_d294 *pos);
-void Class876FC__UpdateByKind(Class876FC *self, Vec3_d294 *pos);
+void Class876FC__Update(Class876FC *self, LongVec3 *pos);
+void Class876FC__InitByKind(Class876FC *self, SceneNode *parent, LongVec3 *pos);
+void Class876FC__UpdateByKind(Class876FC *self, LongVec3 *pos);
 void Class876FC__ReleaseByKind(Class876FC *self);
 void Class876FC__PlaceModelChildren(Class876FC *self, s32 reuse);
 void Class876FC__DriftModelChildren(); /* (Class876FC *self); see above */

@@ -233,7 +233,7 @@ void Viewport__Viewport(Viewport *self) {
     self->sceneRoot = New_SceneNode();
     obj = (SceneNode *)New_Class6E99C(D_8008A90C, 0, 0);
     self->subHandle = obj;
-    obj->methods->attachToParent(obj, self->sceneRoot, (Vec3_d294 *)D_8008A904);
+    obj->methods->attachToParent(obj, self->sceneRoot, (LongVec3 *)D_8008A904);
     self->methods->initDefaults(self);
 }
 

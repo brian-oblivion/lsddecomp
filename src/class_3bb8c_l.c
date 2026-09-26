@@ -87,8 +87,8 @@ void ObjM__InitStyleAndWorld(ObjM *self, s32 gridSpan, Unk50Struct_3bb8c_l *styl
     ret1 = PickDailyVariant(self->stage, 0, ret1);
     self->timBlockSrc = (TimBlockSrc *)New_TimBlockSrc(ret1);
 
-    vp->methods->attachViewChild(vp, (BasicClass *)self->dreamSys, (Vec3_d294 *)&D_8008715C,
-                                 (Vec3_d294 *)&D_80087168, 0);
+    vp->methods->attachViewChild(vp, (BasicClass *)self->dreamSys, (LongVec3 *)&D_8008715C,
+                                 (LongVec3 *)&D_80087168, 0);
 
     self->cachedViewport = vp;
     ret1 = self->dreamSys->methods->getCurrentDayAndYear(self->dreamSys, 0);
@@ -308,8 +308,8 @@ void ObjM__SetupSceneStyle(ObjM *self) {
     val = *obj->methods->slot7C(obj, 0);
     vp->methods->setProjection(vp, val / 2 * 5 / 3 + D_8008AB34);
 
-    vp->methods->attachViewChild(vp, (BasicClass *)self->dreamSys, (Vec3_d294 *)&D_8008715C,
-                                 (Vec3_d294 *)&D_80087168, 0);
+    vp->methods->attachViewChild(vp, (BasicClass *)self->dreamSys, (LongVec3 *)&D_8008715C,
+                                 (LongVec3 *)&D_80087168, 0);
 
     SetDreamAuxWorld(self->stage, (s32)self->unk14, self->dreamSys, (s32)self->sound, (s32)self->unk10);
 

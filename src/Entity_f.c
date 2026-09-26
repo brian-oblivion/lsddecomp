@@ -34,7 +34,7 @@ extern u8 ROTATION_YAW_PLUS9[];
 extern u8 ROTATION_YAW_PLUS180[];
 extern u8 ROTATION_ZPLUS1[];
 extern u8 ROTATION_ZMINUS9[];
-extern Vec3_d294 TRANSLATE_Y_MINUS256[];
+extern LongVec3 TRANSLATE_Y_MINUS256[];
 extern u8 D_80089DE4[];
 extern u8 SCALE_SIX[];
 

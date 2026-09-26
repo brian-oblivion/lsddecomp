@@ -288,15 +288,15 @@ typedef struct SoundCueCallbackArg {
 } SoundCueCallbackArg;
 
 /* DreamSys__TickDrift's per-tick addTranslation (+0x0BC) step. */
-extern Vec3_d294 DRIFT_STEP;
+extern LongVec3 DRIFT_STEP;
 
-/* gProjectOffsetZ is the LAST word of an unnamed 3-word (Vec3_d294-shaped)
+/* gProjectOffsetZ is the LAST word of an unnamed 3-word (LongVec3-shaped)
    global scratch vector; the other two words are NOT independently named
    -- splat's dlabel boundary put them inside `VOICE_PITCH_BY_SELECT`'s dlabel as
    unlabeled tail bytes (asm/data/783DC.data.s), because nothing took their
    address directly until DreamSys__ProjectPointAtDistance (round 19). Do not rename/resegment
    this round (config/ out of scope); reach the vector's start with pointer
-   arithmetic off this symbol instead: `(Vec3_d294 *)((s32 *)&gProjectOffsetZ
+   arithmetic off this symbol instead: `(LongVec3 *)((s32 *)&gProjectOffsetZ
    - 2)`.
 
    Two independent pieces of evidence pin this down, not a guess:

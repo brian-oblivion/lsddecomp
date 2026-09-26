@@ -58,4 +58,4 @@ Free function because `node` is not always the owner.
 
 ## Track 4 (2026-09-26, round 88, charlie)
 
-Retyped with Class876FC's unification: `Vec3S` is `Vec3_d294`; `node` is `Actor *` (the owner, upcast, and each model child) and `rotation` is `void *`, the type of SceneNode's updateRotation table. Image byte-identical.
+Retyped with Class876FC's unification: `Vec3S` is `LongVec3`; `node` is `Actor *` (the owner, upcast, and each model child) and `rotation` is `void *`, the type of SceneNode's updateRotation table. Image byte-identical.

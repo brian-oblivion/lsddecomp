@@ -37,7 +37,7 @@
  *  - setDisplay (+0x060) is TextRow__SetDisplay(self, on, result): the value
  *    it returns with no visible cell is the caller's untouched $a2.
  * attachToParent's position is a ScreenSpritePos where SceneNode's slot
- * types a Vec3_d294 offset, the cast ScreenSprite's banner describes.
+ * types a LongVec3 offset, the cast ScreenSprite's banner describes.
  *
  * The object is 0xB8 bytes (New_TextRow). Its own fields start at +0x0A9,
  * inside CharSprite's word padding after `cellIndex`, which a flat expansion

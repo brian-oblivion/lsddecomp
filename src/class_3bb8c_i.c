@@ -193,7 +193,7 @@ void TextEntry__LoadCardResources(TextEntry *self, void *arg1) {
     self->panelSprite = New_ScreenSprite(handle1, (SpriteRect *)&D_80086F7C, 0);
     handle1->methods->release(handle1);
     self->panelSprite->methods->attachToParent(self->panelSprite, (SceneNode *)arg1,
-                                               (Vec3_d294 *)&D_8008AACC);
+                                               (LongVec3 *)&D_8008AACC);
 
     handle2 = New_TimImage(BuildFileName(path, sStrFontIcon, dir, ext));
     ((TimImageUploadFn)handle2->methods->slot78)(handle2);
@@ -203,7 +203,7 @@ void TextEntry__LoadCardResources(TextEntry *self, void *arg1) {
     self->textRow->methods->slot4C(self->textRow, arg1, (void *)&D_8008AAD4);
     self->textRow->methods->slotB8(self->textRow, (void *)&D_8008AAC8);
     self->cursorSprite->methods->attachToParent(self->cursorSprite, (SceneNode *)arg1,
-                                                (Vec3_d294 *)&D_8008AADC);
+                                                (LongVec3 *)&D_8008AADC);
 }
 
 void TextEntry__ReleaseCardResources(TextEntry *self) {

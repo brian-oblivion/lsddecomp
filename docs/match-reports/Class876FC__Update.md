@@ -60,4 +60,4 @@ next touches this function or its caller.
 
 ## Track 4 (2026-09-26, round 88, charlie)
 
-Occupies Actor's +0x0EC `setPendingExtra` slot; kept its name because it is the per-frame update, not a setter. Now declared `(Class876FC *self, Vec3_d294 *pos)` and forwards `pos` to Class876FC__UpdateByKind: its only caller, StyleUpdateEffectSlots (class_3bb8c_n.c), passes the position in $a1 and UpdateByKind reads it, so the "arity-ok" 1-argument call above was the same bytes spelled with the argument implicit. Byte-identical with the argument explicit.
+Occupies Actor's +0x0EC `setPendingExtra` slot; kept its name because it is the per-frame update, not a setter. Now declared `(Class876FC *self, LongVec3 *pos)` and forwards `pos` to Class876FC__UpdateByKind: its only caller, StyleUpdateEffectSlots (class_3bb8c_n.c), passes the position in $a1 and UpdateByKind reads it, so the "arity-ok" 1-argument call above was the same bytes spelled with the argument implicit. Byte-identical with the argument explicit.

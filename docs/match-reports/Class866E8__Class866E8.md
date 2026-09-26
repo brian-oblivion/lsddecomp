@@ -255,7 +255,7 @@ slots resolve to SceneNode's: `slot4C` is `attachToParent` (the cellParent
 attached to the Class866E8 at `origin`, each cell attached to the
 cellParent at `buf`), `slot70` is `setLightMode(obj, 1)`, and `unk10` is
 `attribute`. Casts at the two attachToParent calls (`(SceneNode *)`,
-`(Vec3_d294 *)`) emit no code; image byte-identical. `cells` is still
+`(LongVec3 *)`) emit no code; image byte-identical. `cells` is still
 declared `Class866E8 **` although it holds these same Class86AA0 objects:
 that field, NotifyGridCell's parameter and Class866E8__DispatchToRectCells
 are Class866E8's own track 4 job (gClass866E8Methods) and were left alone.

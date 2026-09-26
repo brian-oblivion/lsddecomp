@@ -84,9 +84,9 @@ plus three newly-discovered fields — see below).
 
 ```c
 void SceneNode__TryAttachNearby(SceneNodeObj *self, GenericObj_d294 *other) {
-    Vec3_d294 *posA;
-    Vec3_d294 *posB;
-    Vec3_d294 diffRaw;
+    LongVec3 *posA;
+    LongVec3 *posB;
+    LongVec3 diffRaw;
     Vec3S16_d294 diff;
     s32 count;
     u8 buf54[0x4C];
@@ -98,10 +98,10 @@ void SceneNode__TryAttachNearby(SceneNodeObj *self, GenericObj_d294 *other) {
         return;
     }
 
-    posA = (other->unkC != NULL) ? (Vec3_d294 *)other->unk14->unk38 : NULL;
+    posA = (other->unkC != NULL) ? (LongVec3 *)other->unk14->unk38 : NULL;
     diffRaw = *posA;
 
-    posB = (self->unkC != NULL) ? (Vec3_d294 *)self->unk14->unk38 : NULL;
+    posB = (self->unkC != NULL) ? (LongVec3 *)self->unk14->unk38 : NULL;
     diffRaw.x = diffRaw.x - posB->x;
     diffRaw.y = diffRaw.y - posB->y;
     diffRaw.z = diffRaw.z - posB->z;
@@ -137,7 +137,7 @@ with the resulting `Vec3S16` difference, before registering `other` into
 
 ## New class knowledge (kept — MEASURED, not guessed)
 
-- `SceneNodeSub14` gained `Vec3_d294 pos` at `+0x038` (previously opaque,
+- `SceneNodeSub14` gained `LongVec3 pos` at `+0x038` (previously opaque,
   part of `unk24[0x044-0x024]`). Both `self->unk14->unk38` and
   `other->unk14->unk38` are read through the identical offset in this one
   function — the evidence that established it.
@@ -183,8 +183,8 @@ with the resulting `Vec3S16` difference, before registering `other` into
    from first principles** — reproducing retail's exact frame size is a
    floor, not a proof the buffer's real size/type is known.
 2. **Whole-struct copy before subtraction, not per-field subtraction.**
-   Retail copies `*posA` into a stack-resident `Vec3_d294` WHOLESALE first
-   (3 plain `lw`/`sw` pairs — `Vec3_d294`'s fields are `s32`, so no
+   Retail copies `*posA` into a stack-resident `LongVec3` WHOLESALE first
+   (3 plain `lw`/`sw` pairs — `LongVec3`'s fields are `s32`, so no
    `lwl`/`lwr` needed, unlike the all-`s16` structs elsewhere this round),
    THEN computes `posB` and subtracts field-by-field IN PLACE (`diffRaw.x =
    diffRaw.x - posB->x;`, reading the just-stored value back off the
@@ -244,8 +244,8 @@ correct; the residue is a pure peephole-adjacent merge decision.
 ## Header changes kept
 
 `include/code_d294.h`:
-- `SceneNodeSub14`: added `Vec3_d294 pos` at `+0x038` (see above). Also
-  **moved `Vec3_d294`'s typedef earlier in the file** (it was previously
+- `SceneNodeSub14`: added `LongVec3 pos` at `+0x038` (see above). Also
+  **moved `LongVec3`'s typedef earlier in the file** (it was previously
   defined AFTER `SceneNodeSub14`, which only worked because nothing inside
   that struct referenced it before this round) — purely a reordering, no
   field/offset change.
@@ -286,12 +286,12 @@ matching `SceneNode__LocalOffsetToWorldPos` and `SceneNode__FaceTarget` in `code
 round, measured the SAME 12 bytes and needed them as an INDEXABLE
 `s32 unk38[3]` — it takes the field's address and walks `[i]` for `i` in
 0..2, adding each word into a caller-supplied vector as a per-axis delta.
-A `Vec3_d294` cannot be indexed, and matched code decides: nothing matched
+A `LongVec3` cannot be indexed, and matched code decides: nothing matched
 used the named-vector form, while two matched functions require the array.
 
 The two readings are compatible — a position and a per-axis delta differ in
 interpretation, not in shape — so only the name and the indexability
-changed. The body above has been retargeted with a `(Vec3_d294 *)` cast on
+changed. The body above has been retargeted with a `(LongVec3 *)` cast on
 the array so it still compiles as preserved, which is the point of
 preserving it. If you resume this function, consider whether the cast is
 hiding something: retail reads these 12 bytes both ways, and the honest
@@ -415,9 +415,9 @@ change).
 ```c
 #if 0
 void SceneNode__TryAttachNearby(SceneNodeObj *self, GenericObj_d294 *other) {
-    Vec3_d294 *posA;
-    Vec3_d294 *posB;
-    Vec3_d294 diffRaw;
+    LongVec3 *posA;
+    LongVec3 *posB;
+    LongVec3 diffRaw;
     Vec3S16_d294 diff;
     s32 count;
     u8 buf54[0x4C];
@@ -430,10 +430,10 @@ void SceneNode__TryAttachNearby(SceneNodeObj *self, GenericObj_d294 *other) {
         return;
     }
 
-    posA = (other->unkC != NULL) ? (Vec3_d294 *)other->unk14->unk38 : NULL;
+    posA = (other->unkC != NULL) ? (LongVec3 *)other->unk14->unk38 : NULL;
     diffRaw = *posA;
 
-    posB = (self->unkC != NULL) ? (Vec3_d294 *)self->unk14->unk38 : NULL;
+    posB = (self->unkC != NULL) ? (LongVec3 *)self->unk14->unk38 : NULL;
     diffRaw.x = diffRaw.x - posB->x;
     diffRaw.y = diffRaw.y - posB->y;
     diffRaw.z = diffRaw.z - posB->z;
@@ -893,9 +893,9 @@ experienced hand sweep on the specific expression-level change needed.
 ```c
 #if 0
 void SceneNode__TryAttachNearby(SceneNodeObj *self, GenericObj_d294 *other) {
-    Vec3_d294 *posA;
-    Vec3_d294 *posB;
-    Vec3_d294 diffRaw;
+    LongVec3 *posA;
+    LongVec3 *posB;
+    LongVec3 diffRaw;
     Vec3S16_d294 diff;
     s32 count;
     s32 abs;
@@ -908,10 +908,10 @@ void SceneNode__TryAttachNearby(SceneNodeObj *self, GenericObj_d294 *other) {
         return;
     }
 
-    posA = (other->unkC != NULL) ? (Vec3_d294 *)other->unk14->unk38 : NULL;
+    posA = (other->unkC != NULL) ? (LongVec3 *)other->unk14->unk38 : NULL;
     diffRaw = *posA;
 
-    posB = (self->unkC != NULL) ? (Vec3_d294 *)self->unk14->unk38 : NULL;
+    posB = (self->unkC != NULL) ? (LongVec3 *)self->unk14->unk38 : NULL;
     diffRaw.x = diffRaw.x - posB->x;
     diffRaw.y = diffRaw.y - posB->y;
     diffRaw.z = diffRaw.z - posB->z;

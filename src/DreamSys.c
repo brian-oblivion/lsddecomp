@@ -124,7 +124,7 @@ void DreamSys__SpawnAtLink(DreamSys *this, Class866E8 *arg1) {
 
     arg1->methods->setTargetAndBuildRates(arg1, local, (SceneNode *)this,
                                           (Descriptor10 *)&this->linkCoordinates);
-    GetActorMethods()->attachToParent((Actor *)this, (SceneNode *)arg1, (Vec3_d294 *)local);
+    GetActorMethods()->attachToParent((Actor *)this, (SceneNode *)arg1, (LongVec3 *)local);
     this->methods->addChild(this, (BasicClass *)arg1);
     if (this->state == 0xE) {
         FlashbackEntry *entry = &this->storedFlasbacks[this->currentFlashbackIndex];
@@ -439,7 +439,7 @@ s32 DreamSys__ProjectPointAtDistance(DreamSys *this, s32 *out, s32 dist, s32 *re
     local[1] = ret + vec[1];
 
     if (out != NULL) {
-        *(Vec3_d294 *)out = *(Vec3_d294 *)local;
+        *(LongVec3 *)out = *(LongVec3 *)local;
     }
 
     if (reference != NULL)
@@ -1050,7 +1050,7 @@ bool DreamSys__TryInstantTeleportLink(DreamSys *this, PlayerSpawnPoint *currentP
         if (ExecuteLink(this, result, 0x11, 0)) {
             this->state = 0;
             this->grid->methods->computeCellOffsets(this->grid, local, &this->linkCoordinates);
-            this->methods->setTranslation(this, (Vec3_d294 *)local);
+            this->methods->setTranslation(this, (LongVec3 *)local);
             if (saved != 0 && !this->isFlashbackSession)
                 this->methods->getSetDreamTimeLimit(this, this->methods->getDreamTimerScaled(this) + saved);
         }
@@ -1227,7 +1227,7 @@ s32 DreamSys__TickStaircaseCase3(DreamSys *this) {
 }
 
 void DreamSys__ApplyRelativeOffset(DreamSys *this, struct RelativePos *a, struct RelativePos *b) {
-    Vec3_d294 diff;
+    LongVec3 diff;
 
     diff.x = a->x - b->x;
     diff.y = a->y - b->y;

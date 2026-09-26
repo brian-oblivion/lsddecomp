@@ -194,7 +194,7 @@ extern const char D_800114F8[];
 extern s32 D_80086DAC;
 
 /* Address-of only in this unit (Class86B60__ForwardToNameField passes &D_8008A9B4 to
- * the name field's attachToParent, TextRow +0x04C, as its Vec3_d294 offset;
+ * the name field's attachToParent, TextRow +0x04C, as its LongVec3 offset;
  * the words are -4, -23, ...). Placeholder s32 type, cast at the call. */
 extern s32 D_8008A9B4;
 

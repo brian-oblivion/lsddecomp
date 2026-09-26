@@ -146,7 +146,7 @@ s32 Actor__FindNearbyLink(Actor *self) {
      * see this function's match report). */
     u8 pad48Tail[8];
     Class866E8Elem *sp78[3];
-    Vec3_d294 sp88;
+    LongVec3 sp88;
 
     if (self->grid != NULL) {
         void *pos = &self->coord2->tx;

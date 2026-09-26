@@ -55,8 +55,8 @@ struct Class866E8;
 /* clang-format off */
 #define ACTOR_SLOTS(Self, CtorParams)                                                              \
     SCENENODE_SLOTS(Self, CtorParams);                                                            \
-    /* +0x0B8 */ void (*setTranslation)(Self *self, Vec3_d294 *v);          /* Actor__SetTranslation */ \
-    /* +0x0BC */ void (*addTranslation)(Self *self, Vec3_d294 *delta);      /* Actor__AddTranslation */ \
+    /* +0x0B8 */ void (*setTranslation)(Self *self, LongVec3 *v);          /* Actor__SetTranslation */ \
+    /* +0x0BC */ void (*addTranslation)(Self *self, LongVec3 *delta);      /* Actor__AddTranslation */ \
     /* +0x0C0 */ void (*addLocalTranslation)(Self *self, s16 *local);       /* Actor__AddLocalTranslation */ \
     /* +0x0C4 */ void (*moveLocalZ)(Self *self, s32 val, void *notify);     /* Actor__MoveLocalZ: event 6 */ \
     /* +0x0C8 */ void (*moveLocalX)(Self *self, s32 val, void *notify);     /* Actor__MoveLocalX: event 7 */ \
@@ -105,9 +105,9 @@ void Actor__RemoveAllChildren(Actor *self);
 void Actor__Reset(Actor *self);
 void Actor__NotifyMove(Actor *self, s32 event);
 void Actor__DispatchLinkCommand(Actor *self, BasicClass *sender, s32 event);
-void Actor__SetTranslation(Actor *self, Vec3_d294 *v);
-void Actor__AddTranslation(Actor *self, Vec3_d294 *delta);
-void Actor__UpdateTranslation(Actor *self, s32 set, Vec3_d294 *v);
+void Actor__SetTranslation(Actor *self, LongVec3 *v);
+void Actor__AddTranslation(Actor *self, LongVec3 *delta);
+void Actor__UpdateTranslation(Actor *self, s32 set, LongVec3 *v);
 void Actor__AddLocalTranslation(Actor *self, s16 *local);
 void Actor__MoveLocalZ(Actor *self, s32 val, void *notify);
 void Actor__MoveAlongLocalAxis(Actor *self, s16 *axis, s32 val, void *notify, volatile s32 event);

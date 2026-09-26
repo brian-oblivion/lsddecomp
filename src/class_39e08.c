@@ -13,8 +13,8 @@
 /* The viewpoint and view-reference vectors Class865C8__OnInit hands the
  * viewport's attachViewChild: (0, -1200, 0) and (0, -1200, 10000), the data
  * right before gClass86668Methods. */
-extern Vec3_d294 D_80086650;
-extern Vec3_d294 D_8008665C;
+extern LongVec3 D_80086650;
+extern LongVec3 D_8008665C;
 
 Class865C8 *New_Class865C8(IntermediateBaseInitArgs *initArgs, DreamSys *dreamSys, s32 arg3) {
     Class865C8 *self;

@@ -26,9 +26,9 @@ extern s32 gSpriteShiftX[];
 extern s32 gSpriteScaleLarge[];
 extern s32 gSpriteScaleHalf[];
 extern s32 gSpriteScaleSmall[];
-extern Vec3_d294 gSpriteShiftScratch;
+extern LongVec3 gSpriteShiftScratch;
 
-void AddVec3(Vec3_d294 *dst, Vec3_d294 *a, Vec3_d294 *b);
+void AddVec3(LongVec3 *dst, LongVec3 *a, LongVec3 *b);
 void AttachWithRotScale(Actor *node, void *parent, void *trans, void *rotation, void *scale);
 
 /* Four of the class's one-parameter helpers are called here with a dead
@@ -70,8 +70,8 @@ extern s32 D_8008AB98[];
  * gets two model children, kind 2 five randomised sprites, kind 3 five
  * plain sprites (Class876FC__SpawnPlainSprites is Class876FC__SpawnSprites(self,
  * 0, 0, NULL)). */
-void Class876FC__InitByKind(Class876FC *self, SceneNode *parent, Vec3_d294 *pos) {
-    Vec3_d294 local;
+void Class876FC__InitByKind(Class876FC *self, SceneNode *parent, LongVec3 *pos) {
+    LongVec3 local;
     s32 state;
 
     gTrackedYSnapshot = *(s32 *)((u8 *)D_8008ACAC + 0x18);
@@ -105,8 +105,8 @@ void Class876FC__InitByKind(Class876FC *self, SceneNode *parent, Vec3_d294 *pos)
  * setTranslation) to pos + offset, plus however far D_8008ACAC's +0x018
  * word has moved since Class876FC__InitByKind snapshotted it, then run the
  * per-kind update. */
-void Class876FC__UpdateByKind(Class876FC *self, Vec3_d294 *pos) {
-    Vec3_d294 local;
+void Class876FC__UpdateByKind(Class876FC *self, LongVec3 *pos) {
+    LongVec3 local;
 
     AddVec3(&local, pos, &self->params.offset);
     local.y += *(s32 *)((u8 *)D_8008ACAC + 0x18) - gTrackedYSnapshot;
@@ -147,7 +147,7 @@ void Class876FC__ReleaseByKind(Class876FC *self) {
 }
 
 /* Plain Vec3 add: dst = a + b. Frameless -- no self/vtable involved. */
-void AddVec3(Vec3_d294 *dst, Vec3_d294 *a, Vec3_d294 *b) {
+void AddVec3(LongVec3 *dst, LongVec3 *a, LongVec3 *b) {
     dst->x = a->x + b->x;
     dst->y = a->y + b->y;
     dst->z = a->z + b->z;
@@ -166,11 +166,11 @@ void AttachWithRotScale(Actor *node, void *parent, void *trans, void *rotation, 
  * numerator) for layouts 1-2 and along y for 3-4. reuse = 0 creates them
  * (New_Actor, sharing the owner's model, attached to the owner);
  * reuse = 1 only resets their translation (setTranslation). */
-extern Vec3_d294 gModelChildOffsetInit;
+extern LongVec3 gModelChildOffsetInit;
 extern s32 gModelChildSpacing[];
 
 void Class876FC__PlaceModelChildren(Class876FC *self, s32 reuse) {
-    Vec3_d294 accum;
+    LongVec3 accum;
     Actor **p;
     s32 i;
     s32 count = self->params.modelChildLayout;
@@ -202,8 +202,8 @@ void Class876FC__PlaceModelChildren(Class876FC *self, s32 reuse) {
  * divisor of the 24500 / step reset period below. Same index space as
  * gSpriteShiftX. */
 extern s32 gModelChildDriftZ[];
-/* All-zero Vec3_d294, the start value of each child's per-frame z delta. */
-extern Vec3_d294 gModelChildDriftInit;
+/* All-zero LongVec3, the start value of each child's per-frame z delta. */
+extern LongVec3 gModelChildDriftInit;
 /* Ratio triple {0/1, 1/10, 0/1}: the per-frame rotation increment
  * updateRotation(.., 0, ..) adds to self and to each model child. */
 extern s32 gSpinRotStep[];
@@ -233,7 +233,7 @@ void Class876FC__DriftModelChildren(Class876FC *self) {
         stepZ = &gModelChildDriftZ[idx];
         accumOffset = 0;
         for (; i < 2; i++) {
-            Vec3_d294 local = gModelChildDriftInit;
+            LongVec3 local = gModelChildDriftInit;
             local.z += accumOffset + *stepZ;
             (*p)->methods->addTranslation(*p, &local);
             accumOffset += 3;

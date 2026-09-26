@@ -80,7 +80,7 @@ larger, partially-opaque) extent.
   function is NOT itself a vtable slot (`tools/classtable.py gSceneNodeMethods`
   ends at `SceneNode__NotifyTaggedParents`); the prefix records the receiver, matching
   `BasicClass__*` and `DreamSys__*` already in the symbols file.
-- **Parameter `dst` retyped `SceneNodeSub44 *` -> `Vec3_d294 *`.** Evidence:
+- **Parameter `dst` retyped `SceneNodeSub44 *` -> `LongVec3 *`.** Evidence:
   only three words at +0/+4/+8 are ever written, and `class_3bb8c_o`'s
   `Actor__AddLocalTranslation` -- the one external call site -- passes the address of a
   bare 3-word local (`Vec3O buf`). The old typing matched by offset

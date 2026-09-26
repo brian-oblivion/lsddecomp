@@ -155,7 +155,7 @@ void Entity__MoodCue67(Entity *this, EntityMoodHandlerArg *out) {
 }
 
 extern u8 ROTATION_ZPLUS9[];
-extern Vec3_d294 TRANSLATE_Y_PLUS8[];
+extern LongVec3 TRANSLATE_Y_PLUS8[];
 
 void Entity__MoodCue68(Entity *this, EntityMoodHandlerArg *out) {
     out->unk10 = this->methods->getProximityRatio(this);
@@ -462,7 +462,7 @@ void Entity__MoodCue79(Entity *this, EntityMoodHandlerArg *out) {
     }
 }
 
-extern Vec3_d294 TRANSLATE_Y_MINUS512[];
+extern LongVec3 TRANSLATE_Y_MINUS512[];
 
 void Entity__MoodCue80(Entity *this, EntityMoodHandlerArg *out) {
     if (this->moodTimer < this->todFrameCount) {

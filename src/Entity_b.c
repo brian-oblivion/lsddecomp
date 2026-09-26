@@ -22,19 +22,19 @@
 /* Constant transform triples passed to updateRotation (slot +0x44,
  * func_8001CEB4: three {s16 num, s16 den} ratios in degrees), updateScale
  * (+0x48, func_8001D008: three ratios) and addTranslation (+0xBC,
- * Actor__AddTranslation: three s32 deltas, so Vec3_d294), named by value.
+ * Actor__AddTranslation: three s32 deltas, so LongVec3), named by value.
  * Only the address of the rotation and scale ones is taken here, so a byte
  * array is enough; the RotationRatios type in DreamSys.h is their real
  * shape.
  * TRANSLATE_Y_MINUS64's label also holds a second triple, (0, -0x20, 0). */
 extern u8 SCALE_HALF[];
 extern u8 SCALE_DOUBLE[];
-extern Vec3_d294 TRANSLATE_Y_MINUS64[];
+extern LongVec3 TRANSLATE_Y_MINUS64[];
 extern u8 ROTATION_YAW_PLUS2[];
 extern u8 ROTATION_YAW_MINUS90[];
 extern u8 ROTATION_YAW_PLUS90[];
-extern Vec3_d294 TRANSLATE_Y_PLUS256[];
-extern Vec3_d294 TRANSLATE_Y_PLUS64_Z_MINUS64[];
+extern LongVec3 TRANSLATE_Y_PLUS256[];
+extern LongVec3 TRANSLATE_Y_PLUS64_Z_MINUS64[];
 extern u8 ROTATION_YAW_MINUS120[];
 extern u8 ROTATION_X50_YMINUS120_Z30[];
 

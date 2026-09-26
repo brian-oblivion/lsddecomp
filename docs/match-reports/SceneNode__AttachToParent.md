@@ -21,7 +21,7 @@ zeroes those three fields if `vec` is `NULL`, and finally clears
 ## The C
 
 ```c
-SceneNodeObj *SceneNode__AttachToParent(SceneNodeObj *self, UnkOwner_d294 *obj, Vec3_d294 *vec) {
+SceneNodeObj *SceneNode__AttachToParent(SceneNodeObj *self, UnkOwner_d294 *obj, LongVec3 *vec) {
     SceneNodeSub14 *sub;
 
     if (self->unkC == NULL) {

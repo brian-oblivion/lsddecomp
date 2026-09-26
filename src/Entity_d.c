@@ -33,7 +33,7 @@ extern s16 sScaleTemplateZDenom;
 extern u8 ROTATION_YAW_PLUS9[];
 extern u8 ROTATION_YAW_MINUS9[];
 extern u8 SCALE_X3[];
-extern Vec3_d294 TRANSLATE_Z_MINUS256[];
+extern LongVec3 TRANSLATE_Z_MINUS256[];
 extern u8 SCALE_Y2[];
 extern u8 SCALE_SIX[];
 extern u8 ROTATION_YAW_PLUS180[];

@@ -295,7 +295,7 @@ void Class86F88__LoadResources(Class86F88 *self, SceneNode *parent) {
     ((TimImageUploadFn)handle1->methods->slot78)(handle1);
     self->panelSprite = New_ScreenSprite(handle1, (SpriteRect *)&D_80087028, 0);
     handle1->methods->release(handle1);
-    self->panelSprite->methods->attachToParent(self->panelSprite, parent, (Vec3_d294 *)&D_8008AAF8);
+    self->panelSprite->methods->attachToParent(self->panelSprite, parent, (LongVec3 *)&D_8008AAF8);
 
     handle2 = New_TimImage(BuildFileName(path, D_800116E4, dir, ext));
     ((TimImageUploadFn)handle2->methods->slot78)(handle2);

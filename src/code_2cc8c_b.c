@@ -169,7 +169,7 @@ void TaskCore__UpdateSlotElements(TaskCore *self, void *a1) {
         if (self->target->registrationSlots[i] == NULL) {
             TextRow *elem = *arr;
 
-            elem->methods->attachToParent(elem, a1, (Vec3_d294 *)ptr);
+            elem->methods->attachToParent(elem, a1, (LongVec3 *)ptr);
             if (self->target->unk24[i] != NULL) {
                 self->activeSlot = i;
                 self->methods->refreshSlotView(self, a1, 0);
@@ -356,7 +356,7 @@ void TaskCore__RefreshSlotView(TaskCore *self, void *a1, s32 a2) {
 
     arr = (TextRow **)self->itemLists[idx];
     for (i = 0; i < count; i++) {
-        (*arr)->methods->attachToParent(*arr, a1, (Vec3_d294 *)&pos);
+        (*arr)->methods->attachToParent(*arr, a1, (LongVec3 *)&pos);
         (*arr)->methods->setDisplay(*arr, a2);
         pos.y += 10;
         arr++;

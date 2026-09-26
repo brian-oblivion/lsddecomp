@@ -44,11 +44,11 @@ struct S16Quad_d294 {
 
 /* A plain 3-word vector: SceneNode__AttachToParent's optional offset, and the
  * shape of the coordinate's translations. */
-typedef struct Vec3_d294 {
+typedef struct LongVec3 {
     s32 x;
     s32 y;
     s32 z;
-} Vec3_d294;
+} LongVec3;
 
 /* One `{whole, frac}` entry of the three-entry angle/scale tables
  * updateRotation and updateScale take (ROTATION_ZERO, SCALE_ONE) and
@@ -92,7 +92,7 @@ struct SceneNodeSub14 {
     /* +0x040 */ void (*reset)(Self *self);                                /* SceneNode__Reset */  \
     /* +0x044 */ void (*updateRotation)(Self *self, s32 set, void *table); /* SceneNode__UpdateRotation: WholeFrac_d294[3] degrees; set or add */ \
     /* +0x048 */ void (*updateScale)(Self *self, s32 set, void *table);    /* SceneNode__UpdateScale */ \
-    /* +0x04C */ SceneNode *(*attachToParent)(Self *self, SceneNode *parent, Vec3_d294 *offset); /* SceneNode__AttachToParent */ \
+    /* +0x04C */ SceneNode *(*attachToParent)(Self *self, SceneNode *parent, LongVec3 *offset); /* SceneNode__AttachToParent */ \
     /* +0x050 */ SceneNode *(*detachFromParent)(Self *self);              /* SceneNode__DetachFromParent */ \
     /* +0x054 */ void (*detachAttachedChildren)(Self *self);               /* SceneNode__DetachAttachedChildren */ \
     /* +0x058 */ void (*getNextAttachedChild)(Self *self, SceneNode **entry, BasicClassListNode **cursor); /* SceneNode__GetNextAttachedChild */ \
@@ -164,7 +164,7 @@ void SceneNode__OnNotify(SceneNode *self, BasicClass *sender, s32 event);
 void SceneNode__Reset(SceneNode *self);
 void SceneNode__UpdateRotation(SceneNode *self, s32 set, void *table);
 void SceneNode__UpdateScale(SceneNode *self, s32 set, void *table);
-SceneNode *SceneNode__AttachToParent(SceneNode *self, SceneNode *parent, Vec3_d294 *offset);
+SceneNode *SceneNode__AttachToParent(SceneNode *self, SceneNode *parent, LongVec3 *offset);
 SceneNode *SceneNode__DetachFromParent(SceneNode *self);
 void SceneNode__DetachAttachedChildren(SceneNode *self);
 void SceneNode__GetNextAttachedChild(SceneNode *self, SceneNode **entry, BasicClassListNode **cursor);
@@ -192,7 +192,7 @@ s32 SceneNode__ClassifyAgainstPlanes(SceneNode *self, s32 *outFlag, TmdVec3 *del
 void func_8001E49C(void);
 void SceneNode__NotifyTaggedParents(SceneNode *self, void *node);
 
-void SceneNode__RotateLocalVector(SceneNode *self, Vec3_d294 *dst, s16 *src);
+void SceneNode__RotateLocalVector(SceneNode *self, LongVec3 *dst, s16 *src);
 void SceneNode__LocalOffsetToWorldPos(SceneNode *self, s32 *dst, s32 *src,
                                       s32 unused); /* both callers set $a3 = 0 (0x80059460, 0x8005CF7C); the body never reads it */
 void SceneNode__GetRotationDegrees(SceneNode *self, WholeFrac_d294 *out);

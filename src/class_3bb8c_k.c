@@ -212,7 +212,7 @@ void Class86F88__CreateRows(Class86F88 *self, SceneNode *parent, TimImage *font,
     for (i = 0; i < count; i++) {
         Class86F88__FormatRowText(self, buf, i, top, column);
         *p = New_TextRow(font, 0x1A, buf);
-        (*p)->methods->attachToParent(*p, parent, (Vec3_d294 *)&pos);
+        (*p)->methods->attachToParent(*p, parent, (LongVec3 *)&pos);
         (*p)->methods->setColor(*p, &gClass86F88RowColor);
         pos.y += 0xA;
         p++;

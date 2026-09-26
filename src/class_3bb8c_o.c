@@ -234,23 +234,23 @@ void Actor__DispatchLinkCommand(Actor *self, BasicClass *sender, s32 event) {
     }
 }
 
-void Actor__SetTranslation(Actor *self, Vec3_d294 *v) {
+void Actor__SetTranslation(Actor *self, LongVec3 *v) {
     Actor__UpdateTranslation(self, 1, v);
 }
 
-void Actor__AddTranslation(Actor *self, Vec3_d294 *delta) {
+void Actor__AddTranslation(Actor *self, LongVec3 *delta) {
     Actor__UpdateTranslation(self, 0, delta);
 }
 
 /* coord2->coord.t (+0x018 of the GsCOORDINATE2) is set (set != 0) or added
  * to, then flg is cleared so the coordinate is recomputed. The assignment
  * is a whole-Vec3 copy. */
-void Actor__UpdateTranslation(Actor *self, s32 set, Vec3_d294 *v) {
+void Actor__UpdateTranslation(Actor *self, s32 set, LongVec3 *v) {
     Actor *t = self;
     SceneNodeSub14 *u = t->coord2;
 
     if (set) {
-        *(Vec3_d294 *)&u->tx = *v;
+        *(LongVec3 *)&u->tx = *v;
     } else {
         u->tx += v->x;
         u->ty += v->y;
@@ -260,7 +260,7 @@ void Actor__UpdateTranslation(Actor *self, s32 set, Vec3_d294 *v) {
 }
 
 void Actor__AddLocalTranslation(Actor *self, s16 *local) {
-    Vec3_d294 buf;
+    LongVec3 buf;
 
     SceneNode__RotateLocalVector((SceneNode *)self, &buf, local);
     self->methods->addTranslation(self, &buf);

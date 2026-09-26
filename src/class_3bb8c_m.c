@@ -172,7 +172,7 @@ void ObjM__AdvancePauseSetup(ObjM *self) {
     if (state == 0) {
         self->pauseText = New_TextRow(self->etcTim, 5, &D_8008AB44[0]);
         self->pauseText->methods->attachToParent(self->pauseText, (SceneNode *)self->unk14,
-                                                 (Vec3_d294 *)&D_8008AB38);
+                                                 (LongVec3 *)&D_8008AB38);
         self->pauseText->methods->setColor(self->pauseText, (SpriteRgb *)&D_8008AB40);
         self->pauseSetupStep = state + 1;
         return;
