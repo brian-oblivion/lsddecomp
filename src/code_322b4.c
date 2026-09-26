@@ -8,7 +8,7 @@
  *
  * Round 82 matched every function in the unit (getters, accessors, empty
  * overrides, then the 11- to 20-word bodies: the sprite attribute-bit
- * setters, cell selection, finalize chains, the gFrameClockMethods allocator), then
+ * setters, cell selection, finalize chains, the FrameClock allocator), then
  * named it (track 3): every function is real C, not `func_`.
  *
  * Sprite (include/Sprite.h, gSpriteMethods), its direct subclass
@@ -20,17 +20,15 @@
  * is the free helper its ctor and setCell use to turn a cell index into a
  * rect) are unified; their own methods (New_Sprite, Sprite__*, InitGsSprite,
  * GetSpriteMethods, New_ScreenSprite, ScreenSprite__*, GetScreenSpriteMethods,
- * New_CharSprite, CharSprite__*, GetCharSpriteMethods) live here. The other
- * classes are still pending track 4's unification, so their tables stay
- * `D_<addr>` and their own methods use the project's address-derived
- * pseudo-class-name convention (`D8006EF50__X`, matching the existing
- * `D800879C4__X` precedent, since renamed Class879C4) rather than inventing a real
- * name ahead of the types pass. gTextRowMethods (0x11144, below CharSprite) and
+ * New_CharSprite, CharSprite__*, GetCharSpriteMethods) live here. Every
+ * class owning methods in this unit is now unified (track 4; FrameClock, the
+ * last, round 88). gTextRowMethods (0x11144, below CharSprite) and
  * gClass879C4Methods (0x1F44, class_3bb8c_p/q/t) are Sprite subclasses too but own
  * no methods in this unit.
- * gFrameClockMethods (class id 0x5) is a BasicClass subclass holding a parentRefs
- * cursor; NotifyParents walks it, picking event 4/3/2 from two flags and a
- * counter. Class6EED8 (include/Class6EED8.h, gClass6EED8Methods, id 0xB03)
+ * FrameClock (include/FrameClock.h, gFrameClockMethods, id 0x5) is unified:
+ * a BasicClass subclass ticked once per DrawSystem frame that tells its
+ * parents event 2 (counted), 3 (paused) or 4 (flag14); its own methods
+ * (New_FrameClock, FrameClock__*, Get_vtable_FrameClock) live here. Class6EED8 (include/Class6EED8.h, gClass6EED8Methods, id 0xB03)
  * is unified: a Class6D430 data source that requests one named file and
  * sets `loaded` when the driver reports it done; its own methods
  * (New_Class6EED8, Class6EED8__*, GetClass6EED8Methods) live here.
@@ -47,32 +45,11 @@
 #include "FlatLightObj.h"
 #include "Class6EED8.h"
 #include "TimImage.h"
-
-/* Local view of a gFrameClockMethods (class id 0x5) object: only the three words its
- * +0x048..+0x058 accessors touch. */
-typedef struct D_8006EF50Methods D_8006EF50Methods;
-typedef struct D_8006EF50Obj {
-    D_8006EF50Methods *methods; /* +0x000 */
-    u8 pad04[0x8 - 0x4];
-    BasicClassListNode *parentRefs; /* +0x008, BasicClass's */
-    s32 count;  /* +0x00C, read by FrameClock__GetFrameCount */
-    s32 flag10; /* +0x010, set to 1 by FrameClock__Pause, cleared by FrameClock__Resume, read by FrameClock__IsPaused */
-    s32 flag14; /* +0x014, set to 1 by FrameClock__SetFlag14, cleared by FrameClock__Reset */
-    BasicClassListNode *parentCursor; /* +0x018, cleared by FrameClock__Reset; a parentRefs cursor FrameClock__RemoveParentRef steps past a removed parent */
-} D_8006EF50Obj;
-struct D_8006EF50Methods {
-    u8 pad00[0x30];
-    void (*notifyParents)(D_8006EF50Obj *self, s32 event); /* +0x030 = FrameClock__NotifyParents */
-    u8 pad34[0x40 - 0x34];
-    void (*reset)(D_8006EF50Obj *self, s32 a1); /* +0x040 = FrameClock__Reset */
-};
+#include "FrameClock.h"
 
 extern void GsSetAmbient(long r, long g, long b);
 
 extern u16 GetTPage(s32 tp, s32 abr, s32 x, s32 y);
-
-/* The method tables the getters below return. */
-extern s32 gFrameClockMethods[];
 
 
 /* The zero offset ScreenSprite__AttachToParent attaches with. */
@@ -87,11 +64,6 @@ extern void *BMemPMgrAlloc(s32 size);
 
 extern Class6D430Methods *GetActiveDataSourceMethods(void);
 
-typedef struct Slot08Methods_322b4 {
-    u8 pad00[0x8];
-    void (*init)(void *self); /* +0x008 */
-} Slot08Methods_322b4;
-void *Get_vtable_FrameClock(void);
 
 
 
@@ -338,29 +310,29 @@ void Class6EED8__SetFlag(Class6EED8 *self) {
 Class6EED8Methods *GetClass6EED8Methods(void) {
     return &gClass6EED8Methods;
 }
-/* Allocate and construct a FrameClock object (0x1C bytes). */
-void *New_FrameClock(void) {
-    void *obj = BMemPMgrAlloc(0x1C);
+/* Allocate and construct a FrameClock (0x1C bytes). */
+FrameClock *New_FrameClock(void) {
+    FrameClock *obj = BMemPMgrAlloc(0x1C);
 
     if (obj != NULL) {
-        ((Slot08Methods_322b4 *)Get_vtable_FrameClock())->init(obj);
+        Get_vtable_FrameClock()->ctor(obj);
         return obj;
     }
     return NULL;
 }
 /* gFrameClockMethods slot +0x008 (ctor): the BasicClass ctor, install the table, reset(0). */
-void FrameClock__FrameClock(D_8006EF50Obj *self) {
+void FrameClock__FrameClock(FrameClock *self) {
     Get_vtable_BasicClass()->ctor((BasicClass *)self);
     self->methods = Get_vtable_FrameClock();
     self->methods->reset(self, 0);
 }
 /* gFrameClockMethods slot +0x00C (finalize): the BasicClass finalize. */
-void FrameClock__Finalize(BasicClass *self) {
-    Get_vtable_BasicClass()->finalize(self);
+void FrameClock__Finalize(FrameClock *self) {
+    Get_vtable_BasicClass()->finalize((BasicClass *)self);
 }
 /* gFrameClockMethods slot +0x024 (removeParentRef): step the cursor past the parent
  * being removed, then the BasicClass removeParentRef. */
-void FrameClock__RemoveParentRef(D_8006EF50Obj *self, BasicClass *parent) {
+void FrameClock__RemoveParentRef(FrameClock *self, BasicClass *parent) {
     if (self->parentCursor != NULL && parent == self->parentCursor->value) {
         self->parentCursor = self->parentCursor->next;
     }
@@ -369,7 +341,7 @@ void FrameClock__RemoveParentRef(D_8006EF50Obj *self, BasicClass *parent) {
 /* gFrameClockMethods slot +0x030 (notifyParents): walk the parent refs with the
  * cursor at +0x018 (which removeParentRef keeps valid) and pass each the
  * event through its onNotify. */
-void FrameClock__NotifyParents(D_8006EF50Obj *self, s32 event) {
+void FrameClock__NotifyParents(FrameClock *self, s32 event) {
     BasicClass *parent;
 
     self->parentCursor = self->parentRefs;
@@ -379,50 +351,50 @@ void FrameClock__NotifyParents(D_8006EF50Obj *self, s32 event) {
     self->parentCursor = NULL;
 }
 /* gFrameClockMethods slot +0x040 (reset). */
-void FrameClock__Reset(D_8006EF50Obj *self, s32 a1) {
-    self->count = a1;
+void FrameClock__Reset(FrameClock *self, s32 frameCount) {
+    self->frameCount = frameCount;
     self->flag14 = 0;
-    self->flag10 = 0;
+    self->paused = 0;
     self->parentCursor = 0;
 }
-/* gFrameClockMethods slot +0x044: notify event 4 if flag14, else 3 if flag10, else
+/* gFrameClockMethods slot +0x044: notify event 4 if flag14, else 3 if paused, else
  * count up and notify 2. */
-void FrameClock__Tick(D_8006EF50Obj *self) {
+void FrameClock__Tick(FrameClock *self) {
     s32 event;
 
     if (self->flag14 != 0) {
         event = 4;
-    } else if (self->flag10 != 0) {
+    } else if (self->paused != 0) {
         event = 3;
     } else {
-        self->count++;
+        self->frameCount++;
         event = 2;
     }
     self->methods->notifyParents(self, event);
 }
 /* gFrameClockMethods slot +0x048. */
-s32 FrameClock__GetFrameCount(D_8006EF50Obj *self) {
-    return self->count;
+s32 FrameClock__GetFrameCount(FrameClock *self) {
+    return self->frameCount;
 }
 /* gFrameClockMethods slot +0x04C. */
-void FrameClock__Pause(D_8006EF50Obj *self) {
-    self->flag10 = 1;
+void FrameClock__Pause(FrameClock *self) {
+    self->paused = 1;
 }
 /* gFrameClockMethods slot +0x050. */
-void FrameClock__Resume(D_8006EF50Obj *self) {
-    self->flag10 = 0;
+void FrameClock__Resume(FrameClock *self) {
+    self->paused = 0;
 }
 /* gFrameClockMethods slot +0x054. */
-s32 FrameClock__IsPaused(D_8006EF50Obj *self) {
-    return self->flag10;
+s32 FrameClock__IsPaused(FrameClock *self) {
+    return self->paused;
 }
 /* gFrameClockMethods slot +0x058. */
-void FrameClock__SetFlag14(D_8006EF50Obj *self) {
+void FrameClock__SetFlag14(FrameClock *self) {
     self->flag14 = 1;
 }
 /* Returns the gFrameClockMethods method table. */
-void *Get_vtable_FrameClock(void) {
-    return gFrameClockMethods;
+FrameClockMethods *Get_vtable_FrameClock(void) {
+    return &gFrameClockMethods;
 }
 /* Allocate and construct a LightRig (0x54 bytes). */
 LightRig *New_LightRig(void) {
