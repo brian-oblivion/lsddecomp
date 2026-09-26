@@ -26,6 +26,9 @@
 #include "Entity.h"
 #include "DreamSys.h"
 
+/* The z den of a scale template, three Ratio16s {1/1, 1/1, 1/zDenom} that
+ * end here (the range splat labels SCALE_X3 runs on into its first ten
+ * bytes). Entity__MoodCue41 writes the den and passes the template. */
 extern s16 sScaleTemplateZDenom;
 
 /* Data tables reached with a raw pointer by this unit's mood-dispatch
@@ -119,12 +122,9 @@ void Entity__MoodCue41(Entity *this, SoundCueSet *out) {
             rv = rand();
             tablePtr = &sScaleTemplateZDenom;
             *tablePtr = rv % 32 + 1;
-            /* sScaleTemplateZDenom sits directly after SCALE_X3 in rodata;
-             * this reaches 0xA bytes back into SCALE_X3's tail to reuse it
-             * as the fixed part of a template, with the just-randomized
-             * denominator as its final field (see
-             * docs/match-reports/Entity__MoodCue41.md). */
-            this->methods->updateScale(this, 1, (u8 *)tablePtr - 0xA);
+            /* Back from the den to the start of its template. MATCHING:
+             * retail relocates against sScaleTemplateZDenom, not SCALE_X3. */
+            this->methods->updateScale(this, 1, (Ratio16 *)(tablePtr + 1) - 3);
         }
     }
 }
