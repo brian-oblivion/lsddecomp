@@ -28,10 +28,10 @@
  * FrameClock (include/FrameClock.h, gFrameClockMethods, id 0x5) is unified:
  * a BasicClass subclass ticked once per DrawSystem frame that tells its
  * parents event 2 (counted), 3 (paused) or 4 (flag14); its own methods
- * (New_FrameClock, FrameClock__*, Get_vtable_FrameClock) live here. Class6EED8 (include/Class6EED8.h, gClass6EED8Methods, id 0xB03)
+ * (New_FrameClock, FrameClock__*, Get_vtable_FrameClock) live here. RequestedFile (include/RequestedFile.h, gRequestedFileMethods, id 0xB03)
  * is unified: a FileResource data source that requests one named file and
  * sets `loaded` when the driver reports it done; its own methods
- * (New_Class6EED8, Class6EED8__*, GetClass6EED8Methods) live here.
+ * (New_RequestedFile, RequestedFile__*, GetRequestedFileMethods) live here.
  * LightRig (include/LightRig.h, gLightRigMethods, id 0x14) is unified too: a
  * SceneNode subclass owning three FlatLightObj children and an ambient
  * colour (SetAmbientColor -> GsSetAmbient); its own methods (New_LightRig,
@@ -43,7 +43,7 @@
 #include "CharSprite.h"
 #include "LightRig.h"
 #include "FlatLightObj.h"
-#include "Class6EED8.h"
+#include "RequestedFile.h"
 #include "TimImage.h"
 #include "FrameClock.h"
 
@@ -291,25 +291,25 @@ SpriteMethods *GetSpriteMethods(void) {
     return &gSpriteMethods;
 }
 
-/* Allocate and construct a Class6EED8 (0x30 bytes). */
-Class6EED8 *New_Class6EED8(char *name) {
-    Class6EED8 *obj = BMemPMgrAlloc(0x30);
+/* Allocate and construct a RequestedFile (0x30 bytes). */
+RequestedFile *New_RequestedFile(char *name) {
+    RequestedFile *obj = BMemPMgrAlloc(0x30);
 
     if (obj != NULL) {
-        GetClass6EED8Methods()->ctor(obj, name);
+        GetRequestedFileMethods()->ctor(obj, name);
         return obj;
     }
     return NULL;
 }
 
-/* gClass6EED8Methods slot +0x008 (ctor): the active driver's ctor, install
+/* gRequestedFileMethods slot +0x008 (ctor): the active driver's ctor, install
  * the table, clear `loaded`, and pass a stack copy of the name to
  * requestLoadFile (+0x06C). */
-void Class6EED8__Class6EED8(Class6EED8 *self, char *name) {
+void RequestedFile__RequestedFile(RequestedFile *self, char *name) {
     char buf[32];
 
     GetActiveDataSourceMethods()->ctor((FileResource *)self);
-    self->methods = GetClass6EED8Methods();
+    self->methods = GetRequestedFileMethods();
     self->loaded = 0;
     if (name != NULL) {
         strcpy(buf, name);
@@ -317,22 +317,22 @@ void Class6EED8__Class6EED8(Class6EED8 *self, char *name) {
     }
 }
 
-/* gClass6EED8Methods slot +0x00C (finalize): clear `loaded`, then the active
+/* gRequestedFileMethods slot +0x00C (finalize): clear `loaded`, then the active
  * driver's finalize. */
-void Class6EED8__Finalize(Class6EED8 *self) {
+void RequestedFile__Finalize(RequestedFile *self) {
     self->loaded = 0;
     GetActiveDataSourceMethods()->finalize((FileResource *)self);
 }
 
-/* gClass6EED8Methods slot +0x064 (setFlag): the driver reports the requested
+/* gRequestedFileMethods slot +0x064 (setFlag): the driver reports the requested
  * file loaded. */
-void Class6EED8__SetFlag(Class6EED8 *self) {
+void RequestedFile__SetFlag(RequestedFile *self) {
     self->loaded = 1;
 }
 
-/* Returns the gClass6EED8Methods method table. */
-Class6EED8Methods *GetClass6EED8Methods(void) {
-    return &gClass6EED8Methods;
+/* Returns the gRequestedFileMethods method table. */
+RequestedFileMethods *GetRequestedFileMethods(void) {
+    return &gRequestedFileMethods;
 }
 
 /* Allocate and construct a FrameClock (0x1C bytes). */

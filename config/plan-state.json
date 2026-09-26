@@ -903,11 +903,6 @@
           "date": "2026-09-25",
           "header": "include/Class65650.h"
         },
-        "gClass6EED8Methods": {
-          "class": "Class6EED8",
-          "date": "2026-09-26",
-          "header": "include/Class6EED8.h"
-        },
         "gClass865C8Methods": {
           "class": "Class865C8",
           "date": "2026-09-26",
@@ -1022,6 +1017,11 @@
           "class": "Pad",
           "date": "2026-09-25",
           "header": "include/Pad.h"
+        },
+        "gRequestedFileMethods": {
+          "class": "RequestedFile",
+          "date": "2026-09-26",
+          "header": "include/RequestedFile.h"
         },
         "gSceneNodeMethods": {
           "class": "SceneNode",
