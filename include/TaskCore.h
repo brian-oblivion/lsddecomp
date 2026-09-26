@@ -11,7 +11,7 @@
  * on). The object is 0xA4 bytes (New_TaskCore). Three classes derive from
  * it, each ctor calling TaskCore__TaskCore first (`typeviews.py --tree`):
  * StreamTask (0x1130, gStreamTaskMethods, include/StreamTask.h), Class86B60
- * (0x1F130, class_3bb8c_c/_d) and GraphRoom (0x2F130, include/GraphRoom.h).
+ * (0x1F130, gClass86B60Methods, include/Class86B60.h) and GraphRoom (0x2F130, include/GraphRoom.h).
  *
  * Construction, ctor(target, soundBankPath, sound): the base ctor, then
  * setTarget(target), `sound` = New_VabStreamObj(soundBankPath) when a path
@@ -50,11 +50,11 @@
  * +0x044 override StreamTask__Init takes (args, streamName, streamGroup,
  * autoPlay) where IntermediateBase's init takes (args, mode): the table
  * keeps the inherited slot and code_1677c's callers cast to
- * StreamTaskInitFn. Class86B60
- * (include/class_3bb8c.h) keeps its own view: it names +0x058 `state` (this
- * class's activeSlot) and types +0x060 a struct pointer (this class's
- * s32 *slotCounts). GraphRoom (include/GraphRoom.h, round 87) expands these
- * macros; its ctor is void like every other.
+ * StreamTaskInitFn. Class86B60 (include/Class86B60.h, round 88) expands
+ * these macros too; its ctor's resetCounters call passes dreamSys and casts
+ * the slot to Class86B60ResetCallFn, as GraphRoom's does. GraphRoom
+ * (include/GraphRoom.h, round 87) expands these macros; its ctor is void
+ * like every other.
  *
  * IntermediateBase's onInit slot is (self, s32, s32, s32), from init's
  * call; TaskCore__OnInit and StreamTask's override take self alone, and

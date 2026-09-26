@@ -144,3 +144,7 @@ round 20, just triggered by a same-unit sibling instead of a forgotten
 ## Naming (round 77, naming runner delta)
 
 Renamed `func_8004DE08` -> `Class86B60__CommitNameEntry`. **Tier B**: Allocates/fills/frees a temp buffer via `BMemPMgrAlloc`/`DecodeFullWidthSjis`/`BMemPMgrFree` and pushes it through `self->nameField->methods->slotCC`, then calls `CheckObj866E8CountFlag`, sets `state = 5`, and runs two `Class86B60__SetState` calls (0xB then 0xF) bracketing a refresh of the DreamSysView. Read as committing the entered name-field text and advancing state; the two literal state values are not otherwise established.
+
+## Track 4 (2026-09-26, round 88, bravo)
+
+Class86B60 is unified in include/Class86B60.h (TASKCORE_SLOTS/TASKCORE_FIELDS plus its own). `nameField->unkA9` is TextRow's cellCount and +0x0CC its setText; `state` is TaskCore's activeSlot; slotE0 updateSlotElements, slot60 setState, slot11C setSlotCursor, slotF0 setActiveSlot (origSlot is s32 now, no cast); `unk4C` is TaskCore's `target`. Byte-identical (whole image green, 0 new warnings, nonmatching green).

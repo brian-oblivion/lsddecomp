@@ -43,7 +43,7 @@ constant after the call in either reading.
   only) inserted between `slot6C` and `slotD4`, and `slotF0`/`slot124`
   inserted between `slotD8` and `slot138`. `slotF0` here is `Class86B60`'s
   OWN vtable slot, distinct from `DreamSysViewMethods_3bb8c_c::slotF0`
-  established by `Class86B60__ShowTitleIcon`'s report -- same offset number on two
+  established by `Class86B60__Reset`'s report -- same offset number on two
   unrelated tables, not a conflict.
 - New type `Class86B60Unk4CObj_3bb8c_d` (self->unk4C's pointee, only
   `unk8` reached, an opaque value forwarded verbatim).
@@ -63,3 +63,7 @@ Renamed `func_8004D90C` -> `Class86B60__SetState`. **Tier B**: Forwards `arg1` t
 ## Track 4 (2026-09-25, round 84, alpha)
 
 Its up-calls to TaskCore (include/TaskCore.h, track 4 round 84) now go through `Get_vtable_TaskCore()` with `self` upcast to `TaskCore *` and TaskCore's slot names; byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).
+
+## Track 4 (2026-09-26, round 88, bravo)
+
+Class86B60 is unified in include/Class86B60.h (TASKCORE_SLOTS/TASKCORE_FIELDS plus its own). Slots at their names: slot124 is this class's own `commitNameEntry` (+0x124, Class86B60__CommitNameEntry; the call passes 0 the occupant does not read), slot7C onPadCancel, slotF0 setActiveSlot (its first argument is `target->unk8`, TaskCoreTarget, s32), slot78 onPadConfirm. Byte-identical (whole image green, 0 new warnings, nonmatching green).

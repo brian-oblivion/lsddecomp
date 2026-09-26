@@ -1,14 +1,16 @@
-# Class86B60__ForwardIfTagB -- MATCH
+# Class86B60__OnNotify -- MATCH
+
+> Renamed from `Class86B60__ForwardIfTagB` on 2026-09-26 (tools/rename.py). Address 0x8004d788.
 
 > Renamed from `func_8004D788` on 2026-09-24 (tools/rename.py). Address 0x8004d788.
 
 Unit `class_3bb8c_d`, round 14. `./build-and-verify.sh` exit 0; whole-image
-SHA1 matches retail. `funcdiff.py Class86B60__ForwardIfTagB`: 35/35 words match.
+SHA1 matches retail. `funcdiff.py Class86B60__OnNotify`: 35/35 words match.
 
 ## Source
 
 ```c
-void Class86B60__ForwardIfTagB(Class86B60 *self, GenericHeaderObj_3bb8c_d *arg1, s32 arg2)
+void Class86B60__OnNotify(Class86B60 *self, GenericHeaderObj_3bb8c_d *arg1, s32 arg2)
 {
     Get_vtable_TaskCore()->slot38(self, arg1, arg2);
     if ((arg1->methods->header & 0xF) == 0xB) {
@@ -53,8 +55,20 @@ the first time this unit's own `slot38`/`slot138` pair exercises it.
 
 ## Naming (round 77, naming runner delta)
 
-Renamed `func_8004D788` -> `Class86B60__ForwardIfTagB`. **Tier B**: Forwards to the base class's `slot38` unconditionally, then to its own `slot138` only when `arg1`'s vtable header low nibble == 0xB -- the same runtime-type-id-gated forward shape already named `Class86AA0__DispatchLinkCommand` in `class_3bb8c_c.c`. Purpose of tag 0xB itself not established.
+Renamed `func_8004D788` -> `Class86B60__OnNotify`. **Tier B**: Forwards to the base class's `slot38` unconditionally, then to its own `slot138` only when `arg1`'s vtable header low nibble == 0xB -- the same runtime-type-id-gated forward shape already named `Class86AA0__DispatchLinkCommand` in `class_3bb8c_c.c`. Purpose of tag 0xB itself not established.
 
 ## Track 4 (2026-09-25, round 84, alpha)
 
 Its up-calls to TaskCore (include/TaskCore.h, track 4 round 84) now go through `Get_vtable_TaskCore()` with `self` upcast to `TaskCore *` and TaskCore's slot names; byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).
+
+## Track 4 (2026-09-26, round 88, bravo)
+
+Renamed `Class86B60__ForwardIfTagB` -> `Class86B60__OnNotify` (tools/rename.py):
+it is the occupant of gClass86B60Methods +0x038, BasicClass's `onNotify` slot,
+and its body is an onNotify override -- the base onNotify
+(IntermediateBase__OnNotify, through Get_vtable_TaskCore()), then this class's
+own +0x138 (`onTagBValue`, Class86B60__OnTagBValue) with the same
+(sender, event) when the SENDER's class-id low nibble is 0xB. Its parameters
+are now onNotify's: `BasicClass *sender` (the `GenericHeaderObj_3bb8c_d`
+view is gone; BasicClassMethods::header is the same full `s32` word, `lw`
+then `andi 0xF`) and `s32 event`.

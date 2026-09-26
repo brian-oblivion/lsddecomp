@@ -1,14 +1,16 @@
-# Class86B60__Dtor -- MATCH
+# Class86B60__Finalize -- MATCH
+
+> Renamed from `Class86B60__Dtor` on 2026-09-26 (tools/rename.py). Address 0x8004d704.
 
 > Renamed from `func_8004D704` on 2026-09-24 (tools/rename.py). Address 0x8004d704.
 
 Unit `class_3bb8c_d`, round 14. `./build-and-verify.sh` exit 0; whole-image
-SHA1 matches retail. `funcdiff.py Class86B60__Dtor`: 33/33 words match.
+SHA1 matches retail. `funcdiff.py Class86B60__Finalize`: 33/33 words match.
 
 ## Source
 
 ```c
-void Class86B60__Dtor(Class86B60 *self)
+void Class86B60__Finalize(Class86B60 *self)
 {
     if (self->unkAC != NULL) {
         self->unkAC->methods->release(self->unkAC);
@@ -73,7 +75,7 @@ to a two-statement block instead of one.
 
 ## Naming (round 77, naming runner delta)
 
-Renamed `func_8004D704` -> `Class86B60__Dtor`. **Tier A**: matches the
+Renamed `func_8004D704` -> `Class86B60__Finalize`. **Tier A**: matches the
 BasicClass-family destructor shape (release owned sub-objects, then
 forward to the base class's own dtor slot). Field `unkA8` renamed to
 `iconHandle` in the same round (compiler-ownership check: accessor set
@@ -102,3 +104,11 @@ the round-77 broadcast.
 ## Track 4 (2026-09-25, round 84, alpha)
 
 Its up-calls to TaskCore (include/TaskCore.h, track 4 round 84) now go through `Get_vtable_TaskCore()` with `self` upcast to `TaskCore *` and TaskCore's slot names; byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).
+
+## Track 4 (2026-09-26, round 88, bravo)
+
+Renamed `Class86B60__Dtor` -> `Class86B60__Finalize` (tools/rename.py): it is
+the occupant of gClass86B60Methods +0x00C, BasicClass's `finalize` slot
+(`tools/classtable.py gClass86B60Methods --vs gTaskCoreMethods`), and its body
+is what that slot does -- release what the object owns, then up-call
+TaskCore__Finalize. Named for its slot per FINISHING-PLAN track 4 step 6.

@@ -33,7 +33,7 @@ SLPS_015.56`.
 ## Derivation
 
 - Lazy-init guard: `if (self->unkAC == NULL) { ... }`, the mirror image of
-  `Class86B60__Dtor`'s destructor guard on the same two fields
+  `Class86B60__Finalize`'s destructor guard on the same two fields
   (`iconHandle`/`unkAC`).
 - `New_TimImage(D_800114F8)` -- `New_TimImage` is already matched
   project-wide under many independent local arities/return types (see
@@ -106,3 +106,7 @@ casts its argument to `char *` and its result to
 `GenericReleaseObj_3bb8c_d *`, the type Class86B60's own view gives
 `iconHandle` (a TimImage; retyping Class86B60's field is that class's job).
 Image byte-identical.
+
+## Track 4 (2026-09-26, round 88, bravo)
+
+Class86B60 is unified in include/Class86B60.h (TASKCORE_SLOTS/TASKCORE_FIELDS plus its own). `handlerTable->unk4` is TaskCore's `initArgs->unk4`, `unk48` its `sound`; slot10/slot14 are BasicClass's addChild/removeChild (saveCtrl upcast to BasicClass *); iconHandle is a `struct TimImage *`, so the New_TimImage cast is gone. Byte-identical (whole image green, 0 new warnings, nonmatching green).

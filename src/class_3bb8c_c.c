@@ -4,14 +4,13 @@
  * vtable): Class869D8, Class86AA0 and Class86B60. All three follow the
  * same class-framework shape documented in docs/research/class-framework.md
  * and already used elsewhere in this codebase (e.g. class_3ac78.c's
- * Class866E8). Class86B60 is the largest of the three -- its own vtable
- * (gClass86B60Methods, 78 slots) is mostly dispatched from the sibling
- * unit class_3bb8c_d.c, which shares this file's header
- * (include/class_3bb8c.h) and struct definitions; this unit contributes
- * only the allocator and ctor.
+ * Class866E8). Class86B60 (include/Class86B60.h, a TaskCore) is the
+ * largest of the three -- its own vtable (gClass86B60Methods, 78 slots)
+ * is occupied mostly by the sibling unit class_3bb8c_d.c; this unit
+ * contributes only the allocator and ctor.
  *
  * Two free functions round out the unit: CheckObj866E8CountFlag, called
- * directly (not through any vtable) from the still-uncarved
+ * directly (not through any vtable) from
  * Class86B60__CommitNameEntry, computes a 0/1 flag from an Obj866E8's own fields; and
  * FormatNumberIntoBuffer, called from Class86B60's own ctor, formats a
  * number into a shared buffer whose broader role (nearby rodata strings
@@ -27,6 +26,8 @@
 #include "Viewport.h"
 #include "Class869D8.h"
 #include "Class86AA0.h"
+#include "Class86B60.h"
+#include "VabStreamObj.h"
 
 Class869D8 *New_Class869D8(void)
 {
@@ -133,7 +134,7 @@ Class86AA0Methods *GetClass86AA0Methods(void)
     return &gClass86AA0Methods;
 }
 
-Class86B60 *New_Class86B60(void *dreamSys)
+Class86B60 *New_Class86B60(struct DreamSys *dreamSys)
 {
     Class86B60 *self;
 
@@ -145,22 +146,22 @@ Class86B60 *New_Class86B60(void *dreamSys)
     return NULL;
 }
 
-void Class86B60__Class86B60(Class86B60 *self, void *dreamSys)
+void Class86B60__Class86B60(Class86B60 *self, struct DreamSys *dreamSys)
 {
     DreamSys *dream;
-    Class86B60Unk48Obj *obj;
+    VabStreamObj *sound;
 
-    Get_vtable_TaskCore()->ctor((TaskCore *)self, (TaskCoreTarget *)&D_80086D44, (char *)&D_800114DC, 0);
+    Get_vtable_TaskCore()->ctor((TaskCore *)self, &D_80086D44, (char *)D_800114DC, 0);
     self->methods = GetClass86B60Methods();
-    obj = self->unk48;
-    obj->methods->slot9C(obj, -1);
+    sound = (VabStreamObj *)self->sound;
+    sound->methods->setPitchOffset(sound, -1);
     self->dreamSys = dreamSys;
     self->saveCtrl = 0;
     dream = dreamSys;
-    self->unkBC = (s32)dream->methods->getSaveBlock(dream, &self->unkC0);
+    self->saveBlock = dream->methods->getSaveBlock(dream, &self->saveBlockSize);
     FormatNumberIntoBuffer(dream->methods->getCurrentDayAndYear(dream, 0));
-    self->methods->slotD8(self, &D_80086D44);
-    self->methods->onConstruct(self, dreamSys);
+    self->methods->setTarget(self, &D_80086D44);
+    ((Class86B60ResetCallFn)self->methods->resetCounters)(self, dreamSys);
 }
 
 void CheckObj866E8CountFlag(Ctx678_3bb8c_c *ctx, Result678_3bb8c_c *out)

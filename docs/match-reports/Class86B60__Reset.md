@@ -1,14 +1,16 @@
-# Class86B60__ShowTitleIcon -- MATCH
+# Class86B60__Reset -- MATCH
+
+> Renamed from `Class86B60__ShowTitleIcon` on 2026-09-26 (tools/rename.py). Address 0x8004d814.
 
 > Renamed from `func_8004D814` on 2026-09-24 (tools/rename.py). Address 0x8004d814.
 
 Unit `class_3bb8c_d`, round 14. `./build-and-verify.sh` exit 0; whole-image
-SHA1 matches retail. `funcdiff.py Class86B60__ShowTitleIcon`: 33/33 words match.
+SHA1 matches retail. `funcdiff.py Class86B60__Reset`: 33/33 words match.
 
 ## Source
 
 ```c
-void Class86B60__ShowTitleIcon(Class86B60 *self)
+void Class86B60__Reset(Class86B60 *self)
 {
     self->unk34 = 0;
     self->unk2C = 0x190;
@@ -53,7 +55,7 @@ None new.
 
 ## Naming (round 77, naming runner delta)
 
-Renamed `func_8004D814` -> `Class86B60__ShowTitleIcon`. **Tier B**: Passes `&D_800114E8` (a real dlabel string, "ETC\\TITLE.TIM" -- `asm/data/1C34.rodata.s`) to `slotD4`, sets `slot6C(self, 0xA)`, and resets `unk34`/`unk2C`. Named from the one concrete piece of evidence available (the TIM filename); the rest of the sequence's purpose is not established.
+Renamed `func_8004D814` -> `Class86B60__Reset`. **Tier B**: Passes `&D_800114E8` (a real dlabel string, "ETC\\TITLE.TIM" -- `asm/data/1C34.rodata.s`) to `slotD4`, sets `slot6C(self, 0xA)`, and resets `unk34`/`unk2C`. Named from the one concrete piece of evidence available (the TIM filename); the rest of the sequence's purpose is not established.
 
 ## Proposed field names
 
@@ -68,3 +70,16 @@ PROPOSAL, not a rename. Also posted to the round-77 broadcast.
   `DreamSysView_3bb8c_c *`; this function is the first to dereference it
   through its own vtable (`slotF0`). The name just mirrors the existing,
   already-confirmed type name -- a pure rename, no new claim.
+
+## Track 4 (2026-09-26, round 88, bravo)
+
+Renamed `Class86B60__ShowTitleIcon` -> `Class86B60__Reset` (tools/rename.py): it
+is the occupant of gClass86B60Methods +0x040, IntermediateBase's
+`resetCounters` slot (the ctor's last call), the same override GraphRoom has
+(GraphRoom__Reset: fadeRate, unk2C 0x190, setSubHandle("ETC\HGRAPH.TIM"),
+setFrameBound(10)). This one clears unk34, sets unk2C 0x190, then
+setSubHandle("ETC\TITLE.TIM", NULL), setFrameBound(10) and the DreamSys's
+getSetFlashbackSession(0, 0); no up-call to TaskCore__Reset. The TIM path,
+the old name's only evidence, is the sub-handle setSubHandle loads, which is
+TaskCore's mechanism, not something this function shows. Slot names at each
+call now TaskCore's (setSubHandle, setFrameBound) instead of slotD4/slot6C.

@@ -32,7 +32,7 @@ cache in a named local" idiom).
 - `Class86B60::unk10` -- new field, `void *`, opaque, carved from the
   `pad010` gap.
 - `Class86B60::unkAC` **retyped** again, from the minimal
-  `GenericReleaseObj_3bb8c_d *` (set by `Class86B60__Dtor`'s report) to a new
+  `GenericReleaseObj_3bb8c_d *` (set by `Class86B60__Finalize`'s report) to a new
   dedicated `Class86B60UnkACObj_3bb8c_d *` carrying both the shared
   `release` slot at `+0x004` and this function's own `+0x070` slot. Same
   size, no layout change; same shape of retype already done once for
@@ -46,3 +46,7 @@ None new.
 ## Naming (round 77, naming runner delta)
 
 Renamed `func_8004E054` -> `Class86B60__EndMemcardSave`. **Tier B**: Mirror-image teardown of `Class86B60__BeginMemcardSave` -- forwards `self->handlerTable->unk4` and `self->unk10` through `self->methods->slot10`/`slot14`, then `unkAC->methods->slot70(unkAC)`. Named as the paired counterpart by symmetry of the two functions' argument sets, not from independent purpose evidence.
+
+## Track 4 (2026-09-26, round 88, bravo)
+
+Class86B60 is unified in include/Class86B60.h (TASKCORE_SLOTS/TASKCORE_FIELDS plus its own). slot10/slot14 are BasicClass's addChild/removeChild: this undoes BeginMemcardSave's child swap (initArgs->unk4 and unk10 back in, saveCtrl out) before saveCtrl's +0x070. Byte-identical (whole image green, 0 new warnings, nonmatching green).
