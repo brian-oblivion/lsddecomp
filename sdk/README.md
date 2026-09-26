@@ -13,7 +13,12 @@ committed. `tools/setup.sh` converts what it finds here into `lib/`, and
 The "Programmer Tool — Runtime Library" discs, redump format, from
 <https://archive.org/download/ps1_sdks>:
 
-    Programmer Tool - Runtime Library Version 3.5 (Japan)_DTL-S2300_redump.zip
+    Programmer Tool - Runtime Library Version 3.3 (Japan)_DTL-S2190_redump.zip
+    Programmer Tool - Runtime Library Version 3.5 (Japan) (En,Ja)_DTL-S2300_redump.zip
+    Programmer Tool - Runtime Library Version 3.6 (Japan)_DTL-S2310_redump.zip
+
+These are the versions `config/psyq-objects.txt` names today (its first
+column); most objects come from 3.3.
 
 `python3 tools/psyq_sdk.py install` tells you exactly which version(s) the
 manifest currently needs if one is missing. The version is read from the file
