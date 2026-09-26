@@ -62,3 +62,11 @@ is the only caller of `New_TmdModel`, passing entry `i` of the loaded TMD's
 the ctor, through slot +0x008. The ctor stores the argument in `object` and
 `object - 0xC` in `data` (a TmdFile, the real header when the entry is the
 first).
+
+## Track 7 (2026-09-26, round 94, bravo)
+
+`BMemPMgrAlloc(0x24)` -> `BMemPMgrAlloc(sizeof(TmdModel))`, the codebase-wide
+idiom once a class's allocator size matches its now-real struct (e.g.
+`src/code_33808.c`'s `BMemPMgrAlloc(sizeof(TimBlockSrc))`). `sizeof(TmdModel)`
+is 0x24 (`include/TmdModel.h`'s own banner already states the object is
+0x24 bytes); byte-identical, build and check-nonmatching.sh green.

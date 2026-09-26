@@ -38,3 +38,14 @@ chain is itself unconfirmed (see `AccumulateTargetOffset.md`, its sibling).
 the field from a fresh value, the sibling ACCUMULATES onto the existing
 one. Posted to the broadcast for the head to apply once `class_3bb8c_o.c`
 is not live and the owning class is known.
+
+## Track 7 (2026-09-26, round 94, bravo)
+
+Named the fields (see `AccumulateTargetOffset.md`'s matching entry for the
+full rationale; both functions share the same three structs and both are
+the only readers/writers, all inside this unit): `Target_fa50::unk6` ->
+`offset`, `Inner_fa50::unk10` -> `target`, `Outer_fa50::unk10` -> `inner`.
+`class_3bb8c_o.c`'s call site (`SetTargetOffset(obj, &D_8008AB94)`) passes
+opaque pointers and never names these fields itself, so the field rename
+does not touch it. Compiler-verified accessor list, build and
+check-nonmatching.sh green.

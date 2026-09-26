@@ -208,3 +208,25 @@ face's own bounding box (grown by 24), and keeps the nearest one:
 fully describe the function; the game-level purpose (what calls this with
 what segment) is settled by its callers in `code_d294_b.c`/`code_d294_c.c`,
 not touched by this pass.
+
+## Track 7 (2026-09-26, round 94, bravo)
+
+- The unit-local `Vec4_fa50` (a hand-copy of libgte's `VECTOR`, `{s32 vx,
+  vy, vz, pad;}`) is gone; every local and `VecBox_fa50`'s scratch member
+  now use `VECTOR` from `<libgte.h>` (`tools/sonyheaders.py` flagged this
+  unit's `OuterProduct0`/`Square0`/`SquareRoot0` externs as conflicting with
+  Sony's own declarations in `include/psyq/libgte.h`; the fix is Sony's
+  declaration, so the unit now includes `<libgte.h>` and the three local
+  `extern`s are deleted). Byte-identical.
+- All six occurrences of the GTE fixed-point descale (`/= 4096` x5, `>=
+  0x1000` x1 -- the same value, two bases) are now `ONE` (libgte.h's own
+  `#define ONE 4096`), matching the project's standing use of `ONE` for this
+  exact GTE constant (`src/code_8220_b.c`, `src/code_33808.c`). Decimal/hex
+  consistency was the point: a mixed base on one semantic constant is the
+  round-92 defect this pass exists to catch.
+- The remaining magic literals (`0x7FFFFFFF` sentinel, `0x80000000` sign
+  mask, the `16` fixed-point shift counts, the `24` box-growth tolerance) are
+  already internally consistent in base (hex for the sentinel/mask, decimal
+  for shift counts and the tolerance) and each would only restate itself if
+  named; left as-is per the naming rules' "a literal stays when a name would
+  only restate it."

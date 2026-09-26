@@ -48,3 +48,17 @@ depth, not a confirmed class).
 None from this function beyond the naming above; `Outer_fa50`/`Inner_fa50`/
 `Target_fa50` and their `unk10`/`unk6` fields are left as unit-local
 placeholders pending whichever unit's class actually owns this chain.
+
+## Track 7 (2026-09-26, round 94, bravo)
+
+Named the fields themselves, unlike the types above: every accessor of
+`unk6`/`unk10` is in this unit (`src/code_fa50.c`, `grep -rl` over `src/`
+finds no other file mentioning `Outer_fa50`/`Inner_fa50`/`Target_fa50`), so
+the field rule (unit-local struct, name accessed `unk` fields) applies even
+though the owning CLASS is still unconfirmed -- that is a track-6 question
+about the type name, not this pass's. `Target_fa50::unk6` -> `offset`: the
+one field both this function and `SetTargetOffset` read and write, and the
+literal field this pair of functions is named for. `Inner_fa50::unk10` ->
+`target` and `Outer_fa50::unk10` -> `inner`: each names what it points to,
+the only fact established about a plain link in the chain. Compiler-verified
+accessor list (this unit only), build and check-nonmatching.sh green.
