@@ -14,7 +14,7 @@
  * data (the rate and footprint tables) and the helper views its two units
  * read through casts.
  */
-typedef struct Unk14Obj Unk14Obj;
+typedef struct SplitCoord2 SplitCoord2;
 
 /* The rectangle StageMap__InitFootprintSlot copies into rects[key] before
  * setting its element: no element (-1), the whole 20 x 20 cells from (0, 0). */
@@ -61,7 +61,7 @@ extern ChunkSlotSpec *sFootprintResultPtrTable[7];
  * retail reloads at the narrower width. StageMap__LoadChunksAround writes
  * all three and clears `flg` (+0x000).
  */
-struct Unk14Obj {
+struct SplitCoord2 {
     s32 unk0; /* +0x000, GsCOORDINATE2.flg */
     u8 pad4[0x18 - 0x4];
 

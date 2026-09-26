@@ -6,7 +6,7 @@
 
 > Renamed from `func_8004C470` on 2026-09-24 (tools/rename.py). Address 0x8004c470.
 
-REVISITED, round 73: MATCHED 70/70 (field named at the add, assigned inside the bound test); names/types not relevant (existing Unk14Obj/Unk54Struct views reused unchanged)
+REVISITED, round 73: MATCHED 70/70 (field named at the add, assigned inside the bound test); names/types not relevant (existing SplitCoord2/Unk54Struct views reused unchanged)
 
 ## Round 73 (bravo) -- revisit, MATCHED
 
@@ -284,7 +284,7 @@ NON_MATCHING body promoted, round 73
 
 > **ROUND 20 (charlie): re-verified, one correction to this report's own
 > prose.** Rebuilt the exact preserved body below from a clean
-> `INCLUDE_ASM` baseline (one fix needed first: `Unk14Obj::unk18`/`unk20`
+> `INCLUDE_ASM` baseline (one fix needed first: `SplitCoord2::unk18`/`unk20`
 > were retyped to `union { s32 w; u16 h; }` by a LATER round's
 > `StageMap__ComputeFootprintDescriptor`/`StageMap__LoadChunksAround` work after this report was written, so
 > the preserved body's plain `r->unk18`/`r->unk20` no longer compiled --
@@ -326,7 +326,7 @@ Elem *StageMap__FindSlotForPosition(Obj866E8 *self, Unk54Struct *arg1) {
     s32 tol;
     s32 threshold;
     Elem *candidate;
-    Unk14Obj *r;
+    SplitCoord2 *r;
 
     i = 0;
     tol = 0xA000;
@@ -353,7 +353,7 @@ Elem *StageMap__FindSlotForPosition(Obj866E8 *self, Unk54Struct *arg1) {
 #endif
 ```
 
-(`r->unk18`/`r->unk20` are written `.w` here because `Unk14Obj::unk18`/
+(`r->unk18`/`r->unk20` are written `.w` here because `SplitCoord2::unk18`/
 `unk20` were retyped to `union { s32 w; u16 h; }` by a later round's work
 on `StageMap__ComputeFootprintDescriptor`/`StageMap__LoadChunksAround`, after this report's original body was
 written -- mechanical header-drift fix, not a residue change, same as
@@ -369,7 +369,7 @@ Elem *StageMap__FindSlotForPosition(Obj866E8 *self, Unk54Struct *arg1) {
     s32 tol;
     s32 threshold;
     Elem *candidate;
-    Unk14Obj *r;
+    SplitCoord2 *r;
 
     i = 0;
     tol = 0xA000;

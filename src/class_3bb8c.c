@@ -15,7 +15,7 @@
  *    placements and models into its slot's cells, and clearing them.
  *  - GetTargetDescriptor, ComputeFootprintDescriptor, SplitChunkIndex,
  *    GetLastEventSlotChunk, FindSlotByNeighbour, FindSlotForPosition:
- *    queries. A slot's position is read through Unk14Obj
+ *    queries. A slot's position is read through SplitCoord2
  *    (include/class_3bb8c.h), a GsCOORDINATE2 view with halfword reads.
  */
 #include "common.h"
@@ -147,7 +147,7 @@ void StageMap__LoadChunksAround(StageMap *self, s32 val, LongVec3 *arg2, ChunkSl
     s32 count;
     s32 i;
     ChunkSlot *e;
-    Unk14Obj *u14;
+    SplitCoord2 *u14;
     LongVec3 *tbl;
     ChunkLoadEntry stackBuf[7];
 
@@ -162,7 +162,7 @@ void StageMap__LoadChunksAround(StageMap *self, s32 val, LongVec3 *arg2, ChunkSl
             e->neighbour = arg3[i].neighbour;
             if (arg3[i].load != 0) {
                 tbl = &sNeighbourOffsets[arg3[i].neighbour];
-                u14 = (Unk14Obj *)e->cellParent->coord2;
+                u14 = (SplitCoord2 *)e->cellParent->coord2;
                 if (self->config->isVertical == 0) {
                     u14->unk18.w = arg2->x + tbl->x;
                     u14->unk1C = arg2->y;
@@ -531,8 +531,8 @@ Descriptor10 *StageMap__GetTargetDescriptor(StageMap *self, Descriptor10Ext *arg
  *      h8 store reproduces retail's order. */
 s32 StageMap__ComputeFootprintDescriptor(StageMap *self, Descriptor10Ext *out, SplitLongVec3 *in) {
     ChunkSlot *e;
-    Unk14Obj *u14a;
-    Unk14Obj *u14b;
+    SplitCoord2 *u14a;
+    SplitCoord2 *u14b;
     s32 rate;
     s32 t;
     s32 b2;
@@ -544,12 +544,12 @@ s32 StageMap__ComputeFootprintDescriptor(StageMap *self, Descriptor10Ext *out, S
         out->chunkIndex = rate;
         StageMap__SplitChunkIndex(self, (u8 *)out, rate);
 
-        u14a = (Unk14Obj *)self->methods->findSlotByNeighbour(self, e->loader->elemKey)->cellParent->coord2;
+        u14a = (SplitCoord2 *)self->methods->findSlotByNeighbour(self, e->loader->elemKey)->cellParent->coord2;
         out->chunkCentre.x = u14a->unk18.w + 0x5000;
         out->chunkCentre.y = u14a->unk1C;
         out->chunkCentre.z = u14a->unk20.w + 0x5000;
 
-        u14b = (Unk14Obj *)e->cellParent->coord2;
+        u14b = (SplitCoord2 *)e->cellParent->coord2;
         out->relPos.x = in->x.w - out->chunkCentre.x;
         out->relPos.y = in->y.w;
         out->relPos.z = in->z.w - out->chunkCentre.z;
@@ -614,7 +614,7 @@ ChunkSlot *StageMap__FindSlotForPosition(StageMap *self, LongVec3 *arg1) {
     s32 tol;
     s32 threshold;
     ChunkSlot *candidate;
-    Unk14Obj *r;
+    SplitCoord2 *r;
     s32 w;
 
     i = 0;
@@ -622,7 +622,7 @@ ChunkSlot *StageMap__FindSlotForPosition(StageMap *self, LongVec3 *arg1) {
     threshold = 0;
     for (; i < 7; i++, threshold -= 0x800) {
         candidate = self->methods->findSlotByNeighbour(self, i);
-        r = (Unk14Obj *)candidate->cellParent->coord2;
+        r = (SplitCoord2 *)candidate->cellParent->coord2;
         if (arg1->x >= r->unk18.w && arg1->x < (w = r->unk18.w) + tol) {
             if (arg1->z >= r->unk20.w && arg1->z < (w = r->unk20.w) + tol) {
                 if (self->config->isVertical == 0) {

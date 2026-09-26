@@ -357,7 +357,7 @@ The three units' banners were rewritten as documentation (track 6). What they ca
  * there independently, see docs/match-reports/StageMap__Enable.md).
  *
  * The class is declared once, in include/StageMap.h (track 4, round 89);
- * the element's origin is read through Unk14Obj (include/class_3bb8c.h), a
+ * the element's origin is read through SplitCoord2 (include/class_3bb8c.h), a
  * GsCOORDINATE2 view with halfword reads.
  *
  * Carve notes for whoever takes the NEXT slice: this block holds all 13 of
