@@ -504,7 +504,7 @@ position.
  * other four are this unit's own view and stay local per CLAUDE.md's
  * cross-unit-declaration rule. */
 extern s32 D_80090C18;
-extern s32 D_8008E250;
+extern s32 gSortUseGlobalLightMode;
 extern s32 gSortLightMode;
 extern s32 GsLIGHT_MODE;
 extern s8 D_8008A82C[3];
@@ -615,7 +615,7 @@ void SortTmdObject(void *objIn, void *otSrc, s32 otShift, void *ctxIn)
     *(s32 *)(ctx + 0x8) = 0xA;
     D_80090C18 = (*(u32 *)obj >> 9) & 0x7;
     D_8008E248 = (*(u32 *)obj >> 6) & 0x1;
-    D_8008E250 = (*(u32 *)obj >> 5) & 0x1;
+    gSortUseGlobalLightMode = (*(u32 *)obj >> 5) & 0x1;
     gSortLightMode = (*(u32 *)obj >> 3) & 0x3;
 
     {
@@ -626,7 +626,7 @@ void SortTmdObject(void *objIn, void *otSrc, s32 otShift, void *ctxIn)
         *(s8 *)(ctx + 0x36) = tint[2];
     }
 
-    if (D_8008E250 != 0 && GsLIGHT_MODE != 0) {
+    if (gSortUseGlobalLightMode != 0 && GsLIGHT_MODE != 0) {
         dpShift = 9;
     } else if (gSortLightMode != 0) {
         dpShift = 9;
@@ -1298,7 +1298,7 @@ register" above.
 #if 0
 extern void *GsOUT_PACKET_P;
 extern s32 D_80090C18;
-extern s32 D_8008E250;
+extern s32 gSortUseGlobalLightMode;
 extern s32 gSortLightMode;
 extern s32 GsLIGHT_MODE;
 extern s8 D_8008A82C[3];
@@ -1466,14 +1466,14 @@ void SortTmdObject(void *arg0, void *arg1, s32 arg2, void *arg3)
         *(s32 *)(prim + 0x8) = 0xA;
         D_80090C18 = (raw >> 9) & 0x7;
         D_8008E248 = (raw >> 6) & 0x1;
-        D_8008E250 = (raw >> 5) & 0x1;
+        gSortUseGlobalLightMode = (raw >> 5) & 0x1;
         gSortLightMode = (raw >> 3) & 0x3;
     }
     prim[0x34] = D_8008A82C[0];
     prim[0x35] = D_8008A82C[1];
     prim[0x36] = D_8008A82C[2];
 
-    if (D_8008E250 != 0 && GsLIGHT_MODE != 0) {
+    if (gSortUseGlobalLightMode != 0 && GsLIGHT_MODE != 0) {
         v0 = 9;
     } else if (gSortLightMode != 0) {
         v0 = 9;
