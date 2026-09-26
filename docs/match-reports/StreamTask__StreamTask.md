@@ -1,4 +1,6 @@
-# StreamTaskObj__StreamTaskObj
+# StreamTask__StreamTask
+
+> Renamed from `StreamTaskObj__StreamTaskObj` on 2026-09-26 (tools/rename.py). Address 0x8003b8e4.
 
 > Renamed from `func_8003B8E4` on 2026-09-23 (tools/rename.py). Address 0x8003b8e4.
 
@@ -6,15 +8,15 @@
 
 ## Summary
 
-This is `StreamTaskObj`'s constructor — occupies `gStreamTaskObjMethods`'s own slot
-`+0x008` (per `classtable.py gStreamTaskObjMethods`, confirming the earlier header
+This is `StreamTaskObj`'s constructor — occupies `gStreamTaskMethods`'s own slot
+`+0x008` (per `classtable.py gStreamTaskMethods`, confirming the earlier header
 comment that named this function as the ctor reached through
-`Get_vtable_StreamTaskObj()`'s slot).
+`Get_vtable_StreamTask()`'s slot).
 
 ```c
-void StreamTaskObj__StreamTaskObj(StreamTaskObj *self, s32 a1, s32 a2, s32 a3, StreamTaskInitData *a4) {
+void StreamTask__StreamTask(StreamTaskObj *self, s32 a1, s32 a2, s32 a3, StreamTaskInitData *a4) {
     Get_vtable_TaskCore()->slot08(self, a1, a2, a3);
-    self->methods = Get_vtable_StreamTaskObj();
+    self->methods = Get_vtable_StreamTask();
     if (a4 != NULL) {
         self->unkA8 = *a4;
     } else {
@@ -33,8 +35,8 @@ void StreamTaskObj__StreamTaskObj(StreamTaskObj *self, s32 a1, s32 a2, s32 a3, S
   unit's own next queued function**, confirming the 4-argument
   `(self, a1, a2, a3)` signature ahead of writing that function.
 - `self->methods->slot40(self)`: new `StreamTaskObjMethods` slot `+0x040`,
-  occupied by this unit's own already-matched `StreamTaskObj__Reset` (per
-  `classtable.py gStreamTaskObjMethods`) — confirms single-argument arity.
+  occupied by this unit's own already-matched `StreamTask__Reset` (per
+  `classtable.py gStreamTaskMethods`) — confirms single-argument arity.
 - `StreamTaskInitData` (new type): a plain 3-word struct. Both the
   function's optional 5th (stack) argument `a4` and `GetDefaultStreamTaskInitData()`'s
   return value are this shape — retail copies whichever one applies
@@ -74,7 +76,7 @@ load-all-then-store-all form exactly.
 ## Third-learning check (per head's request)
 
 **Not needed here** in the "value read then re-read after a `jalr`" sense —
-`self->methods` IS written mid-function (`self->methods = Get_vtable_StreamTaskObj();`)
+`self->methods` IS written mid-function (`self->methods = Get_vtable_StreamTask();`)
 and read again at the very end after two more calls
 (`GetDefaultStreamTaskInitData`/`New_MoviePlayer`) for `self->methods->slot40(self)`, but that
 final read is a **plain, single, natural field dereference** with no earlier
@@ -100,7 +102,7 @@ all sources before storing any of them.
 
 ## Naming
 
-**StreamTaskObj__StreamTaskObj** -- tier A. Occupies `gStreamTaskObjMethods`'s
+**StreamTask__StreamTask** -- tier A. Occupies `gStreamTaskMethods`'s
 own ctor slot `+0x008` (`classtable.py`), matching the established
 `Class__Class` constructor convention already used elsewhere in this
 codebase (`IntermediateBase__IntermediateBase`, `Class866E8__Class866E8`).
@@ -108,3 +110,7 @@ codebase (`IntermediateBase__IntermediateBase`, `Class866E8__Class866E8`).
 ## Track 4 (2026-09-25, round 84, alpha)
 
 Its up-calls to TaskCore (include/TaskCore.h, track 4 round 84) now go through `Get_vtable_TaskCore()` with `self` upcast to `TaskCore *` and TaskCore's slot names; byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).
+
+## Track 4 (2026-09-26, round 87)
+
+Renamed with the class unification (gStreamTaskObjMethods -> class StreamTask, include/StreamTask.h): the `Obj` suffix is dropped (track 4 step 2; include/Class6D3C8.h already viewed the class as `StreamTask`). The ctor at +0x008.

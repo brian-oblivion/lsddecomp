@@ -27,7 +27,7 @@ void Class6D3C8__StartStreamTaskWithInit(Class6D3C8 *self) {
 
     if (self->arg->unk08 != 0) {
         SetActiveDataSourceDriverMode(0, 0, 0);
-        task = New_StreamTaskObj(0, 0, 0, 0);
+        task = New_StreamTask(0, 0, 0, 0);
         task->methods->slot12C(task, 0);
         outerValue = GetStreamChannelInit(&typeCode, 0);
         typeLookup = GetStreamGroupForType(typeCode);

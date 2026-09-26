@@ -2,21 +2,21 @@
 #include "code_2c054.h"
 #include "VabStreamObj.h"
 
-StreamTaskObj *New_StreamTaskObj(s32 a1, s32 a2, s32 a3, s32 a4)
+StreamTaskObj *New_StreamTask(s32 a1, s32 a2, s32 a3, s32 a4)
 {
     StreamTaskObj *self;
 
     self = BMemPMgrAlloc(0xDC);
     if (self != NULL) {
-        Get_vtable_StreamTaskObj()->ctor(self, a1, a2, a3, (StreamTaskInitData *)a4);
+        Get_vtable_StreamTask()->ctor(self, a1, a2, a3, (StreamTaskInitData *)a4);
         return self;
     }
     return NULL;
 }
 
-void StreamTaskObj__StreamTaskObj(StreamTaskObj *self, s32 a1, s32 a2, s32 a3, StreamTaskInitData *a4) {
+void StreamTask__StreamTask(StreamTaskObj *self, s32 a1, s32 a2, s32 a3, StreamTaskInitData *a4) {
     Get_vtable_TaskCore()->ctor((TaskCore *)self, (TaskCoreTarget *)a1, (char *)a2, (BasicClass *)a3);
-    self->methods = Get_vtable_StreamTaskObj();
+    self->methods = Get_vtable_StreamTask();
     if (a4 != NULL) {
         self->unkA8 = *a4;
     } else {
@@ -27,12 +27,12 @@ void StreamTaskObj__StreamTaskObj(StreamTaskObj *self, s32 a1, s32 a2, s32 a3, S
     self->methods->resetCounters(self);
 }
 
-void StreamTaskObj__Destroy(StreamTaskObj *self) {
+void StreamTask__Finalize(StreamTaskObj *self) {
     self->unkB4->methods->slot04(self->unkB4);
     Get_vtable_TaskCore()->finalize((TaskCore *)self);
 }
 
-void StreamTaskObj__Reset(StreamTaskObj *self) {
+void StreamTask__Reset(StreamTaskObj *self) {
     self->unkC8 = -1;
     self->unkC4 = 0;
     self->unkCC = 1;
@@ -40,14 +40,14 @@ void StreamTaskObj__Reset(StreamTaskObj *self) {
     self->unkD4 = 1;
 }
 
-void StreamTaskObj__Configure(StreamTaskObj *self, s32 a1, s32 arg2, s32 typeLookup, s32 flag) {
+void StreamTask__Init(StreamTaskObj *self, s32 a1, s32 arg2, s32 typeLookup, s32 flag) {
     self->unkB8 = arg2;
     self->unkBC = typeLookup;
     self->unkC0 = flag;
     Get_vtable_TaskCore()->init((TaskCore *)self, (IntermediateBaseInitArgs *)a1, 0);
 }
 
-void StreamTaskObj__func_8003BAB4(StreamTaskObj *self) {
+void StreamTask__OnInit(StreamTaskObj *self) {
     /* IntermediateBase's onInit slot names init's (0, 0, 0); TaskCore__OnInit
      * takes self alone, and this up-call passes nothing else. */
     ((void (*)(TaskCore *))Get_vtable_TaskCore()->onInit)((TaskCore *)self);
@@ -58,7 +58,7 @@ void StreamTaskObj__func_8003BAB4(StreamTaskObj *self) {
     }
 }
 
-void StreamTaskObj__func_8003BB5C(StreamTaskObj *self, s32 a1, s32 a2) {
+void StreamTask__Update(StreamTaskObj *self, s32 a1, s32 a2) {
     Get_vtable_TaskCore()->update((TaskCore *)self, (BasicClass *)a1, a2);
     if (self->unkA4 != 0) {
         return;
@@ -73,7 +73,7 @@ void StreamTaskObj__func_8003BB5C(StreamTaskObj *self, s32 a1, s32 a2) {
     self->methods->setState(self, 7);
 }
 
-void StreamTaskObj__func_8003BC14(StreamTaskObj *self, s32 a1) {
+void StreamTask__SetState(StreamTaskObj *self, s32 a1) {
     Get_vtable_TaskCore()->setState((TaskCore *)self, a1);
     switch (a1) {
     case 5:
@@ -93,14 +93,14 @@ void StreamTaskObj__func_8003BC14(StreamTaskObj *self, s32 a1) {
     }
 }
 
-void StreamTaskObj__SetUnk40(StreamTaskObj *self, s32 a1) {
+void StreamTask__SetFrameBound(StreamTaskObj *self, s32 a1) {
     self->frameBound = a1;
     if (a1 >= 0) {
         self->frameBound = a1 * 15;
     }
 }
 
-void StreamTaskObj__func_8003BD10(StreamTaskObj *self) {
+void StreamTask__OnPadConfirm(StreamTaskObj *self) {
     Get_vtable_TaskCore()->onPadConfirm((TaskCore *)self);
     if (self->unkCC != 0) {
         self->result = 2;
@@ -108,21 +108,21 @@ void StreamTaskObj__func_8003BD10(StreamTaskObj *self) {
     }
 }
 
-void StreamTaskObj__func_8003BD74(StreamTaskObj *self) {
+void StreamTask__OnPadPrev(StreamTaskObj *self) {
     Get_vtable_TaskCore()->onPadPrev((TaskCore *)self);
 }
 
-void StreamTaskObj__func_8003BDAC(StreamTaskObj *self) {
+void StreamTask__OnPadNext(StreamTaskObj *self) {
     Get_vtable_TaskCore()->onPadNext((TaskCore *)self);
 }
 
-void StreamTaskObj__NoOpSlot88(void) {
+void StreamTask__NoOpSlot88(void) {
 }
 
-void StreamTaskObj__NoOpSlot8C(void) {
+void StreamTask__NoOpSlot8C(void) {
 }
 
-void StreamTaskObj__func_8003BDF4(StreamTaskObj *self) {
+void StreamTask__RefreshViewValue(StreamTaskObj *self) {
     if (self->unkD4 != 0) {
         self->unkB4->methods->slot4C(self->unkB4);
     } else {
@@ -130,28 +130,28 @@ void StreamTaskObj__func_8003BDF4(StreamTaskObj *self) {
     }
 }
 
-void StreamTaskObj__SetUnkC4(StreamTaskObj *self, s32 a1) {
+void StreamTask__SetUnkC4(StreamTaskObj *self, s32 a1) {
     self->unkC4 = a1;
 }
 
-void StreamTaskObj__SetUnkC8(StreamTaskObj *self, s32 a1) {
+void StreamTask__SetLoopCount(StreamTaskObj *self, s32 a1) {
     self->unkC8 = a1;
 }
 
-void StreamTaskObj__SetUnkCC(StreamTaskObj *self, s32 a1) {
+void StreamTask__SetSkipOnConfirm(StreamTaskObj *self, s32 a1) {
     self->unkCC = a1;
 }
 
-void StreamTaskObj__SetUnkD0(StreamTaskObj *self, s32 a1) {
+void StreamTask__SetUnkD0(StreamTaskObj *self, s32 a1) {
     self->unkD0 = a1;
 }
 
-void StreamTaskObj__SetUnkD4(StreamTaskObj *self, s32 a1) {
+void StreamTask__SetAbortBeforeFade(StreamTaskObj *self, s32 a1) {
     self->unkD4 = a1;
 }
 
-StreamTaskObjMethods *Get_vtable_StreamTaskObj(void) {
-    return &gStreamTaskObjMethods;
+StreamTaskObjMethods *Get_vtable_StreamTask(void) {
+    return &gStreamTaskMethods;
 }
 
 /* The TaskCore allocator: 0xA4 bytes, constructed through its own ctor. */

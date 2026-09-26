@@ -1,4 +1,6 @@
-# StreamTaskObj__func_8003BC14
+# StreamTask__SetState
+
+> Renamed from `StreamTaskObj__func_8003BC14` on 2026-09-26 (tools/rename.py). Address 0x8003bc14.
 
 > Renamed from `func_8003BC14` on 2026-09-23 (tools/rename.py). Address 0x8003bc14.
 
@@ -13,7 +15,7 @@ classic binary-search pivot, matches the already-documented
 "switch case order != comparison order" idiom from earlier rounds).
 
 ```c
-void StreamTaskObj__func_8003BC14(StreamTaskObj *self, s32 a1) {
+void StreamTask__SetState(StreamTaskObj *self, s32 a1) {
     Get_vtable_TaskCore()->slot60(self, a1);
     switch (a1) {
     case 5:
@@ -40,12 +42,12 @@ void StreamTaskObj__func_8003BC14(StreamTaskObj *self, s32 a1) {
   `classtable.py gTaskCoreMethods` confirms it's occupied (`TaskCore__SetState`, a
   different unit) — result discarded, typed `void`.
 - `self->methods->slot94(self)`: new `StreamTaskObjMethods` slot `+0x094`.
-  `classtable.py gStreamTaskObjMethods` shows it occupied by **this unit's own,
-  already-matched `StreamTaskObj__func_8003BDF4`** — `void StreamTaskObj__func_8003BDF4(StreamTaskObj
+  `classtable.py gStreamTaskMethods` shows it occupied by **this unit's own,
+  already-matched `StreamTask__RefreshViewValue`** — `void StreamTask__RefreshViewValue(StreamTaskObj
   *self)`, single argument, which is exactly the arity the disassembly here
   needs (only `a0` set before the `jalr`, no `a1`).
 - `case 8`'s `self->unkB4->methods->slot4C(self->unkB4)` reuses the slot
-  established for `StreamTaskObj__func_8003BDF4`'s own body this same round.
+  established for `StreamTask__RefreshViewValue`'s own body this same round.
 - `self->unkD4`/`self->unkD8` are both pre-existing fields.
 
 ## Third-learning check (per head's request)
@@ -66,7 +68,7 @@ pivot choice" idiom, now with a 4-way switch instead of a 2-3 way one.
 
 ## Naming
 
-**StreamTaskObj__func_8003BC14** -- tier C. Occupies `gStreamTaskObjMethods`
+**StreamTask__SetState** -- tier C. Occupies `gStreamTaskMethods`
 slot `+0x060`; a `switch` on its own second argument over four literal codes
 (5/7/8/0x12), each toggling `unkD8` or forwarding through a couple of other
 slots, after up-calling the base slot unconditionally. Reads like a small
@@ -79,3 +81,7 @@ meaning.
 ## Track 4 (2026-09-25, round 84, alpha)
 
 Its up-calls to TaskCore (include/TaskCore.h, track 4 round 84) now go through `Get_vtable_TaskCore()` with `self` upcast to `TaskCore *` and TaskCore's slot names; byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).
+
+## Track 4 (2026-09-26, round 87)
+
+Renamed with the class unification (gStreamTaskObjMethods -> class StreamTask, include/StreamTask.h): the `Obj` suffix is dropped (track 4 step 2; include/Class6D3C8.h already viewed the class as `StreamTask`). Was StreamTaskObj__func_8003BC14. Occupies +0x060 setState and up-calls TaskCore's first: 5 clears `fadingOut`, 7 sets it, 8 aborts the player unless `abortBeforeFade`, 0x12 refreshViewValue.

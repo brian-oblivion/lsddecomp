@@ -1,4 +1,6 @@
-# New_StreamTaskObj
+# New_StreamTask
+
+> Renamed from `New_StreamTaskObj` on 2026-09-26 (tools/rename.py). Address 0x8003b854.
 
 > Renamed from `func_8003B854` on 2026-09-23 (tools/rename.py). Address 0x8003b854.
 
@@ -11,13 +13,13 @@ unchanged. Returns the new object, or NULL.
 ## The match
 
 ```c
-StreamTaskObj *New_StreamTaskObj(s32 a1, s32 a2, s32 a3, s32 a4)
+StreamTaskObj *New_StreamTask(s32 a1, s32 a2, s32 a3, s32 a4)
 {
     ...
 
     self = BMemPMgrAlloc(0xDC);
     if (self != NULL) {
-        Get_vtable_StreamTaskObj()->slot08(self, a1, a2, a3, a4);
+        Get_vtable_StreamTask()->slot08(self, a1, a2, a3, a4);
         return self;
     }
     return NULL;
@@ -57,11 +59,15 @@ updated with what survived and what did not.
 
 ## Naming
 
-**New_StreamTaskObj** -- tier A. Canonical `New_X` allocator shape (allocate,
+**New_StreamTask** -- tier A. Canonical `New_X` allocator shape (allocate,
 dispatch the ctor slot, return); the class is independently established both
-by `gStreamTaskObjMethods`'s own ctor-slot dispatch (`classtable.py`) and by
+by `gStreamTaskMethods`'s own ctor-slot dispatch (`classtable.py`) and by
 `include/Class6D3C8.h`'s cross-unit `StreamTask` view of the same call site.
 
 ## Track 4 (2026-09-25, round 84, alpha)
 
 StreamTaskObj's table now expands TASKCORE_SLOTS (include/TaskCore.h, round 84): the ctor call is `ctor` and its fifth argument is cast to the ctor's `StreamTaskInitData *`. Byte-identical.
+
+## Track 4 (2026-09-26, round 87)
+
+Renamed with the class unification (gStreamTaskObjMethods -> class StreamTask, include/StreamTask.h): the `Obj` suffix is dropped (track 4 step 2; include/Class6D3C8.h already viewed the class as `StreamTask`). The 0xDC-byte allocator.

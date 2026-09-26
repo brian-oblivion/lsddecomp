@@ -1,4 +1,6 @@
-# StreamTaskObj__SetUnkC4
+# StreamTask__SetUnkC4
+
+> Renamed from `StreamTaskObj__SetUnkC4` on 2026-09-26 (tools/rename.py). Address 0x8003be5c.
 
 > Renamed from `func_8003BE5C` on 2026-09-23 (tools/rename.py). Address 0x8003be5c.
 
@@ -7,20 +9,20 @@
 ## What it does
 
 A plain setter: `self->unkC4 = value;`. One of a run of five consecutive
-9-line, 2-instruction `.s` bodies (`StreamTaskObj__SetUnkC4`/`64`/`6C`/`74`/`7C`) that
+9-line, 2-instruction `.s` bodies (`StreamTask__SetUnkC4`/`64`/`6C`/`74`/`7C`) that
 turned out to be ordinary field setters, not BIOS trampolines or anything
 toolchain-blocked (checked first per the runner brief: no `jr $t2`, no
 `gp_rel`, no `addiu $at,$at,%lo`).
 
-All five (plus `Get_vtable_StreamTaskObj` right after them) are consecutive slots
-`+0x124`.."+0x134` of this class's own method table `gStreamTaskObjMethods` (confirmed
-with `tools/classtable.py gStreamTaskObjMethods`), which is how their object type was
-identified: `New_StreamTaskObj`'s allocator call sizes the object at `0xDC`
-bytes and constructs it through `Get_vtable_StreamTaskObj`'s slot `+0x008`, so all five
-setters, plus `Get_vtable_StreamTaskObj` itself, operate on that same `0xDC`-byte
+All five (plus `Get_vtable_StreamTask` right after them) are consecutive slots
+`+0x124`.."+0x134` of this class's own method table `gStreamTaskMethods` (confirmed
+with `tools/classtable.py gStreamTaskMethods`), which is how their object type was
+identified: `New_StreamTask`'s allocator call sizes the object at `0xDC`
+bytes and constructs it through `Get_vtable_StreamTask`'s slot `+0x008`, so all five
+setters, plus `Get_vtable_StreamTask` itself, operate on that same `0xDC`-byte
 class (already named `StreamTask`/`StreamTaskMethods` in
 `include/Class6D3C8.h`, established independently by a different unit from
-`New_StreamTaskObj`'s cross-unit call site).
+`New_StreamTask`'s cross-unit call site).
 
 ## Derivation
 
@@ -30,7 +32,7 @@ jr   $ra
 ```
 
 ```c
-void StreamTaskObj__SetUnkC4(StreamTaskObj *self, s32 a1) {
+void StreamTask__SetUnkC4(StreamTaskObj *self, s32 a1) {
     self->unkC4 = a1;
 }
 ```
@@ -59,7 +61,11 @@ cheaply (all five sit in five consecutive table slots).
 
 ## Naming
 
-**StreamTaskObj__SetUnkC4** -- tier A. Plain single-field setter (one of a
+**StreamTask__SetUnkC4** -- tier A. Plain single-field setter (one of a
 run of five identical-shape setters at consecutive table slots
 `+0x124`..`+0x134`); `Class__SetUnkNN` convention, same precedent as
-`StreamTaskObj__SetUnk40`.
+`StreamTask__SetFrameBound`.
+
+## Track 4 (2026-09-26, round 87)
+
+Renamed with the class unification (gStreamTaskObjMethods -> class StreamTask, include/StreamTask.h): the `Obj` suffix is dropped (track 4 step 2; include/Class6D3C8.h already viewed the class as `StreamTask`). Own slot +0x124. unkC4 is MoviePlayer__Play's third argument (stored at the player's +0x054); left unnamed until MoviePlayer's class is.

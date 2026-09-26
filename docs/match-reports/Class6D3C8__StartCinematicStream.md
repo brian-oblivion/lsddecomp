@@ -36,7 +36,7 @@ void Class6D3C8__StartCinematicStream(Class6D3C8 *self) {
 
     if (chanBuf.chan != -1) {
         if (self->arg->unk08 != 0) {
-            StreamTask *streamTask = New_StreamTaskObj(0, 0, 0, 0);
+            StreamTask *streamTask = New_StreamTask(0, 0, 0, 0);
 
             streamTask->methods->slot12C(streamTask, 0);
             lookup = GetStreamGroupForType(chanBuf.chan);

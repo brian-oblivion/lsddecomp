@@ -42,7 +42,7 @@ void TaskCore__Reset(StreamTaskObj *self) {
   local, or GCC reloads it from memory instead of keeping it live in a
   register, changing the instruction count.
 - Three new `StreamTaskObjMethods` slots, all void-returning (discarded
-  results), confirmed to exist via `tools/classtable.py gStreamTaskObjMethods`:
+  results), confirmed to exist via `tools/classtable.py gStreamTaskMethods`:
   `+0x09C = TaskCore__SetFadeCallbackEnabled`, `+0x0A0 = TaskCore__SetFadeOutCallbackEnabled`,
   `+0x0A4 = TaskCore__SetColors` (all extern, other units).
 - `slotA4`'s three pointer arguments are `&D_8006E860[0]`, `&D_8006E860[3]`,
@@ -70,7 +70,7 @@ occurrences.
 ## Naming
 
 **TaskCoreObj__Reset** -- tier A. Occupies `gTaskCoreMethods` slot `+0x040`,
-the same cross-class "Reset" slot number as `StreamTaskObj__Reset`
+the same cross-class "Reset" slot number as `StreamTask__Reset`
 (`Class866E8__Reset`/`Class6B5CC__Reset` precedent); sets eight fields to
 fixed literal defaults, the same shape as every other confirmed `Reset` in
 this codebase.

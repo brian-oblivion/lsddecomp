@@ -1,4 +1,6 @@
-# StreamTaskObj__Configure
+# StreamTask__Init
+
+> Renamed from `StreamTaskObj__Configure` on 2026-09-26 (tools/rename.py). Address 0x8003ba58.
 
 > Renamed from `func_8003BA58` on 2026-09-23 (tools/rename.py). Address 0x8003ba58.
 
@@ -10,7 +12,7 @@ Stores three of its own arguments (plus a fourth, stack-spilled one) into
 `self`'s fields, then delegates to the sibling class `gTaskCoreMethods`
 (`Get_vtable_TaskCore()`, `LoaderTaskMethods` in `Class6D3C8.h`) at slot `+0x044`,
 passing `self` and its own first argument, hardcoding the third argument to
-0. Occupies `gStreamTaskObjMethods` slot `+0x044` itself.
+0. Occupies `gStreamTaskMethods` slot `+0x044` itself.
 
 **This function's signature was independently cross-checked and confirmed
 against `include/Class6D3C8.h`.** That header already documents
@@ -40,7 +42,7 @@ jalr  $v0
 ```
 
 ```c
-void StreamTaskObj__Configure(StreamTaskObj *self, s32 a1, s32 arg2, s32 typeLookup, s32 flag) {
+void StreamTask__Init(StreamTaskObj *self, s32 a1, s32 arg2, s32 typeLookup, s32 flag) {
     self->unkB8 = arg2;
     self->unkBC = typeLookup;
     self->unkC0 = flag;
@@ -59,13 +61,13 @@ Named `StreamTaskObj::unkB8`/`unkBC`/`unkC0` in `include/code_2c054.h`, and
 see the note below on why this unit's local typing differs from
 `Class6D3C8.h`'s for the FUNCTION `TaskCore__Init` that occupies this same
 `gTaskCoreMethods` slot, as opposed to this function's OWN slot `+0x044` of
-`gStreamTaskObjMethods`, which is void and confirmed by the cross-check above).
+`gStreamTaskMethods`, which is void and confirmed by the cross-check above).
 
 ## Proposed learning
 
 **A slot number and even a matching argument count do not imply a matching
 signature across TWO DIFFERENT tables**, even when one calls straight into
-the other at the identical offset: `gStreamTaskObjMethods::slot44` (this function,
+the other at the identical offset: `gStreamTaskMethods::slot44` (this function,
 void, 5 args including a stack-spilled 5th) forwards to `gTaskCoreMethods::slot44`
 (`TaskCore__Init`, this unit's own local typing says it returns `s32`, only 3
 args) -- the offset coincidence is a delegation convenience, not evidence of
@@ -77,7 +79,7 @@ into a corroborated one.
 
 ## Naming
 
-**StreamTaskObj__Configure** -- tier B. Occupies `gStreamTaskObjMethods` slot
+**StreamTask__Init** -- tier B. Occupies `gStreamTaskMethods` slot
 `+0x044`. Cross-unit call sites in `src/code_1677c.c`
 (`Class6D3C8__LoadIntroLogoSequence`/`Class6D3C8__StartWeeklyStreamTask`, via `include/Class6D3C8.h`'s independent
 `StreamTaskMethods::slot44` view) show this stores a resource
@@ -90,3 +92,7 @@ supported yet.
 ## Track 4 (2026-09-25, round 84, alpha)
 
 Its up-calls to TaskCore (include/TaskCore.h, track 4 round 84) now go through `Get_vtable_TaskCore()` with `self` upcast to `TaskCore *` and TaskCore's slot names; byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green). This function occupies +0x044 with five parameters where TASKCORE_SLOTS (IntermediateBase) types the slot init(args, mode): a contradiction left for StreamTaskObj's own job.
+
+## Track 4 (2026-09-26, round 87)
+
+Renamed with the class unification (gStreamTaskObjMethods -> class StreamTask, include/StreamTask.h): the `Obj` suffix is dropped (track 4 step 2; include/Class6D3C8.h already viewed the class as `StreamTask`). Was StreamTaskObj__Configure. It occupies +0x044, IntermediateBase's init slot (TaskCore__Init in the parent), stores its three extra arguments and up-calls TaskCore's init(args, 0): named for its slot. Its parameter list (self, args, streamName, streamGroup, playerResult) differs from the slot's (self, args, mode), so the table keeps the inherited slot type and code_1677c's five callers cast to `StreamTaskInitFn` (track 4 step 6, round 85's Class65650 +0x04C rule); no code.

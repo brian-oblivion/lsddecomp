@@ -74,7 +74,7 @@ void Class6D3C8__LoadIntroLogoSequence(Class6D3C8 *self) {
     if (self->arg->unk0C != 0) {
         SetActiveDataSourceDriverMode(0, 0, 0);
         Class6D3C8__StartLoaderTask(self, sLogoPathAsmk);
-        task = New_StreamTaskObj(0, 0, 0, 0);
+        task = New_StreamTask(0, 0, 0, 0);
         streamName = GetIntroStreamName(&typeCode);
         typeLookup = GetStreamGroupForType(typeCode);
         task->methods->configure(task, self->unk1C, streamName, typeLookup, 1);
@@ -118,7 +118,7 @@ void Class6D3C8__StartWeeklyStreamTask(Class6D3C8 *self) {
 
     if (self->arg->unk08 != 0) {
         SetActiveDataSourceDriverMode(0, 0, 0);
-        task = New_StreamTaskObj(0, 0, 0, 0);
+        task = New_StreamTask(0, 0, 0, 0);
         derivedValue = PickWeeklyStreamChannel(&typeCode, 0);
         typeLookup = GetStreamGroupForType(typeCode);
         task->methods->configure(task, self->unk1C, derivedValue, typeLookup, 1);
@@ -191,7 +191,7 @@ void Class6D3C8__StartGraphRoomStreamTask(Class6D3C8 *self) {
 
     if (self->arg->unk08 != 0) {
         SetActiveDataSourceDriverMode(0, 0, 0);
-        task = New_StreamTaskObj(0, 0, 0, 0);
+        task = New_StreamTask(0, 0, 0, 0);
         extra = GetGraphRoomStreamChannel(&buf.count, 0, 10);
         task->methods->slot6C(task, buf.count / 15);
         task->methods->slot12C(task, 0);
@@ -278,7 +278,7 @@ void Class6D3C8__StartCinematicStream(Class6D3C8 *self) {
 
     if (chanBuf.chan != -1) {
         if (self->arg->unk08 != 0) {
-            StreamTask *streamTask = New_StreamTaskObj(0, 0, 0, 0);
+            StreamTask *streamTask = New_StreamTask(0, 0, 0, 0);
 
             streamTask->methods->slot12C(streamTask, 0);
             lookup = GetStreamGroupForType(chanBuf.chan);
@@ -308,7 +308,7 @@ void Class6D3C8__StartStreamTaskWithInit(Class6D3C8 *self) {
 
     if (self->arg->unk08 != 0) {
         SetActiveDataSourceDriverMode(0, 0, 0);
-        task = New_StreamTaskObj(0, 0, 0, 0);
+        task = New_StreamTask(0, 0, 0, 0);
         task->methods->slot12C(task, 0);
         outerValue = GetStreamChannelInit(&typeCode, 0);
         typeLookup = GetStreamGroupForType(typeCode);

@@ -18,7 +18,7 @@
 **Unit:** code_2c054 · **Size:** 102 words · **Status:** MATCHED (102/102)
 
 This occupies `TaskCoreMethods`'s (`gTaskCoreMethods`) own slot `+0x04C` (per
-`classtable.py gTaskCoreMethods`, and confirmed by `StreamTaskObj__func_8003BAB4`'s own
+`classtable.py gTaskCoreMethods`, and confirmed by `StreamTask__OnInit`'s own
 single-argument call into this exact function). It is the unit's largest
 queued function and the round's last one; the head flagged it as likely to
 carry a surviving residue. It matched byte-exact on the first real attempt
@@ -69,7 +69,7 @@ of `gTaskCoreMethods` happening to have non-null entries at the two offsets
 slots on `self->unk18` -- `+0x048`, `+0x04C`, `+0x050`, all 2-argument
 setters. `gTaskCoreMethods`'s own `+0x04C` is `TaskCore__OnInit` -- this very
 function -- and it is unambiguously single-argument (confirmed by
-`StreamTaskObj__func_8003BAB4`'s already byte-exact call). A vtable slot's signature has to
+`StreamTask__OnInit`'s already byte-exact call). A vtable slot's signature has to
 agree across every instance of one class; a genuine arity conflict at a
 shared offset is proof `self->unk18` is a sibling class, not the same one.
 Split into a new `TaskCoreObjMethods` type (`include/code_2c054.h`), moving
@@ -83,7 +83,7 @@ discovered" section with a correction note** rather than rewriting it.
 fields all torn down identically via a 1-argument `slot04`. This function
 calls `self->unk78`'s own slot `+0x04C` with **3 arguments**
 (`self->unk78->methods->slot4C(self->unk78, self->unk14, 0)`), where
-`StreamTaskUnkB4Methods::slot4C` (from the already-matched `StreamTaskObj__func_8003BDF4`,
+`StreamTaskUnkB4Methods::slot4C` (from the already-matched `StreamTask__RefreshViewValue`,
 called on `self->unkB4`) is fixed at 1 argument. Same reasoning as above:
 real arity conflict at a shared offset means these are sibling classes that
 happen to agree at `slot04` (likely via a shared base), not one class.

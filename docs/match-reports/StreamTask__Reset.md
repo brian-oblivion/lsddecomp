@@ -1,4 +1,6 @@
-# StreamTaskObj__Reset
+# StreamTask__Reset
+
+> Renamed from `StreamTaskObj__Reset` on 2026-09-26 (tools/rename.py). Address 0x8003ba38.
 
 > Renamed from `func_8003BA38` on 2026-09-23 (tools/rename.py). Address 0x8003ba38.
 
@@ -6,9 +8,9 @@
 
 ## What it does
 
-Resets the five fields the `StreamTaskObj__SetUnkC4`.."`7C`" setters (see that
+Resets the five fields the `StreamTask__SetUnkC4`.."`7C`" setters (see that
 report) write individually: `self->unkC4=0; unkC8=-1; unkCC=1; unkD0=0;
-unkD4=1;`. Slot `+0x040` of `gStreamTaskObjMethods` (`Get_vtable_StreamTaskObj`'s report), so
+unkD4=1;`. Slot `+0x040` of `gStreamTaskMethods` (`Get_vtable_StreamTask`'s report), so
 presumably an "init"/"reset" method for this `StreamTaskObj` class.
 
 ## Derivation
@@ -25,7 +27,7 @@ jr    $ra
 ```
 
 ```c
-void StreamTaskObj__Reset(StreamTaskObj *self) {
+void StreamTask__Reset(StreamTaskObj *self) {
     self->unkC8 = -1;
     self->unkC4 = 0;
     self->unkCC = 1;
@@ -46,13 +48,17 @@ with the setters' report).
 
 ## Proposed learning
 
-None new beyond `StreamTaskObj__SetUnkC4`'s.
+None new beyond `StreamTask__SetUnkC4`'s.
 
 ## Naming
 
-**StreamTaskObj__Reset** -- tier A. Occupies `gStreamTaskObjMethods` slot
+**StreamTask__Reset** -- tier A. Occupies `gStreamTaskMethods` slot
 `+0x040`, the SAME numbered slot independently named `Reset` in two other,
 unrelated classes in this codebase (`Class866E8__Reset`,
 `include/class_3ac78.h`; `Class6B5CC__Reset`, `include/code_d294.h`) --
 both also called from their own class's ctor chain, both also just a run of
 fixed-literal field stores, exactly this function's own shape.
+
+## Track 4 (2026-09-26, round 87)
+
+Renamed with the class unification (gStreamTaskObjMethods -> class StreamTask, include/StreamTask.h): the `Obj` suffix is dropped (track 4 step 2; include/Class6D3C8.h already viewed the class as `StreamTask`). Occupies +0x040 resetCounters, as TaskCore__Reset does: the name follows TaskCore's.

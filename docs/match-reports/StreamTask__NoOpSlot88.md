@@ -1,4 +1,6 @@
-# StreamTaskObj__NoOpSlot88
+# StreamTask__NoOpSlot88
+
+> Renamed from `StreamTaskObj__NoOpSlot88` on 2026-09-26 (tools/rename.py). Address 0x8003bde4.
 
 > Renamed from `func_8003BDE4` on 2026-09-23 (tools/rename.py). Address 0x8003bde4.
 
@@ -6,8 +8,8 @@
 
 ## What it does
 
-Nothing: an empty function body (`{ }`), occupying `gStreamTaskObjMethods`
-slot `+0x088` (confirmed by `tools/classtable.py gStreamTaskObjMethods`; the
+Nothing: an empty function body (`{ }`), occupying `gStreamTaskMethods`
+slot `+0x088` (confirmed by `tools/classtable.py gStreamTaskMethods`; the
 sibling table `gTaskCoreMethods` has a NULL entry at this same offset, so
 this is a real StreamTaskObj-level override of an otherwise-unpopulated
 slot, not an inherited stub). No report existed for this function before
@@ -17,9 +19,13 @@ still needed a name.
 
 ## Naming
 
-**StreamTaskObj__NoOpSlot88** -- tier A. An intentionally empty vtable-slot
+**StreamTask__NoOpSlot88** -- tier A. An intentionally empty vtable-slot
 override; the mechanics ARE the whole purpose (do nothing when this slot is
 dispatched). Matches the `Class__NoOpSlotNN` convention already established
 in this codebase for the identical shape (`DreamSys.h`'s
 `DreamSys__NoOpSlotE8Default`/`Actor__NoOpSlotD8`, `code_2cc8c.h`'s
 `Obj6EAC0__NoOpSetter`/`Obj6EAC0__NoOpSlotD0`).
+
+## Track 4 (2026-09-26, round 87)
+
+Renamed with the class unification (gStreamTaskObjMethods -> class StreamTask, include/StreamTask.h): the `Obj` suffix is dropped (track 4 step 2; include/Class6D3C8.h already viewed the class as `StreamTask`). Occupies +0x088 (NULL in TaskCore's table).

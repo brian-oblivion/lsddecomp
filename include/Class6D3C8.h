@@ -148,8 +148,8 @@ extern s32 func_80048CF0(void);        /* reads a small-data global, unnamed so 
 extern void func_800270AC(s32 value);   /* stores its arg to a small-data global */
 extern void *New_LinkResource(void *arg); /* defined in code_33808.c (LinkResource allocator) */
 
-/* A "New_X"-shaped task object allocated by New_StreamTaskObj -- 0xDC bytes,
- * constructed through Get_vtable_StreamTaskObj's slot +0x008. `New_StreamTaskObj`
+/* A "New_X"-shaped task object allocated by New_StreamTask -- 0xDC bytes,
+ * constructed through Get_vtable_StreamTask's slot +0x008. `New_StreamTask`
  * itself is matched, byte-exact, as `StreamTaskObj` in src/code_2c054.c (same
  * function name, same allocator, same 0xDC size) -- this typedef stays a
  * separate LOCAL view rather than including that unit's header, per this
@@ -179,14 +179,14 @@ typedef struct StreamTaskMethods {
      * call would never need the sp+0x10 store.
      *
      * Tier A, cross-unit evidence: `src/code_2c054.c`'s
-     * `StreamTaskObj__Configure(self, a1, arg2, typeLookup, flag)` has this
+     * `StreamTask__Init(self, a1, arg2, typeLookup, flag)` has this
      * EXACT parameter list, for the exact class this typedef is a local view
-     * of (both go through `New_StreamTaskObj`). */
+     * of (both go through `New_StreamTask`). */
     void (*configure)(void *self, s32 a1, s32 arg2, s32 typeLookup, s32 flag);
     u8 pad48[0x06C - 0x048];                                          /* +0x048 .. +0x06B */
     void (*slot6C)(void *self, s32 a1);                                 /* +0x06C: NOT renamed. Weak correlation
                                                                             only -- `code_2c054.c`'s
-                                                                            `StreamTaskObj__SetUnk40(self, a1)` sets
+                                                                            `StreamTask__SetFrameBound(self, a1)` sets
                                                                             self->unk40 = (a1 >= 0) ? a1*15 : a1,
                                                                             and this unit's only two call sites pass
                                                                             either 0 or `buf.count / 15` -- a
@@ -203,7 +203,7 @@ typedef struct StreamTask {
     StreamTaskMethods *methods;
 } StreamTask;
 
-extern StreamTask *New_StreamTaskObj(s32 a0, s32 a1, s32 a2, s32 a3);
+extern StreamTask *New_StreamTask(s32 a0, s32 a1, s32 a2, s32 a3);
 
 extern s32 SetActiveDataSourceDriverMode(s32 a0, s32 a1, s32 a2); /* code_171e0, still INCLUDE_ASM there; returns
                                                        the last value its internal dispatch loop got --

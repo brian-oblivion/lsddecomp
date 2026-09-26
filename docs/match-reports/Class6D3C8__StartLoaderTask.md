@@ -74,7 +74,7 @@ passed as `slot98`'s callback argument.
 ## Proposed learning
 
 Two different "task" classes in this game (`New_TaskCore`'s and
-`New_StreamTaskObj`'s allocators) share several slot offsets (`+0x004`,
+`New_StreamTask`'s allocators) share several slot offsets (`+0x004`,
 `+0x044`) with *different* signatures -- confirms these are separate
 vtables, not the same class called two ways, and is a reminder not to
 assume a shared offset number implies a shared method signature across
