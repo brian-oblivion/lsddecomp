@@ -1,3 +1,11 @@
+/*
+ * code_1677c -- GameApplication (include/GameApplication.h), the game's
+ * Application subclass: its allocator and ctor, the RNG seed and initSystems
+ * overrides, and the six hooks Application's main loop calls -- the intro
+ * logos, the weekly stream, the GraphRoom poll, the Class865C8 run and the
+ * streams that follow it -- with the loader- and poll-task helpers they share.
+ * The table getter is in src/code_171e0.c.
+ */
 #include "common.h"
 #include "GameApplication.h"
 #include "DreamSys.h"
