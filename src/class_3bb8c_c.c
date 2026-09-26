@@ -11,7 +11,7 @@
  *
  * Two free functions round out the unit: CheckSaveScoreFlag, called
  * directly (not through any vtable) from
- * Class86B60__CommitNameEntry, computes a 0/1 flag from an Obj866E8's own fields; and
+ * Class86B60__CommitNameEntry, computes a 0/1 flag from its save block (Class86B60::saveBlock); and
  * FormatNumberIntoBuffer, called from Class86B60's own ctor, formats a
  * number into a shared buffer whose broader role (nearby rodata strings
  * hint at a memory-card save label) is not established from this unit
@@ -166,7 +166,7 @@ void Class86B60__Class86B60(Class86B60 *self, struct DreamSys *dreamSys)
 
 void CheckSaveScoreFlag(Ctx678_3bb8c_c *ctx, Result678_3bb8c_c *out)
 {
-    Obj866E8 *target = ctx->target;
+    SaveBlock678_3bb8c_c *target = ctx->target;
     s32 flag = 1;
 
     if (target->unkC > 9999999) {

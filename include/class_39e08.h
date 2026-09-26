@@ -127,8 +127,6 @@ extern s32 func_8004A070(s32 arg1);
  * value discarded at this call site. */
 extern s32 SetActiveDataSourceDriverMode(s32 arg1, s32 arg2, s32 arg3);
 
-/* class_3ac78.h declares it `Class866E8 *New_Class866E8(s32, s32)`; the
- * ctor stores it into IntermediateBaseInitArgs::unkC, a BasicClass *. */
-extern void *New_Class866E8(s32 arg1, s32 arg2);
+/* New_Class866E8 is declared in include/Class866E8.h. */
 
 #endif

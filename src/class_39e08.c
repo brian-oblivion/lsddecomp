@@ -2,6 +2,7 @@
 #include "class_39e08.h"
 #include "VabStreamObj.h"
 #include "Class869D8.h"
+#include "Class866E8.h"
 #include "WBgm.h"
 #include "TimImage.h"
 #include "FrameClock.h"
@@ -45,7 +46,7 @@ void Class865C8__Class865C8(Class865C8 *self, IntermediateBaseInitArgs *initArgs
     self->initArgs = initArgs;
     initArgs->viewport = (BasicClass *)New_Class869D8();
     initArgs->unk8 = (BasicClass *)New_FrameClock();
-    initArgs->unkC = New_Class866E8(0, 1);
+    initArgs->unkC = (BasicClass *)New_Class866E8(NULL, 1);
     self->dreamSys = dreamSys;
     self->methods->addChild(self, (BasicClass *)dreamSys);
     dreamSys->methods->setSoundObj(dreamSys, (s32)self->sound);
