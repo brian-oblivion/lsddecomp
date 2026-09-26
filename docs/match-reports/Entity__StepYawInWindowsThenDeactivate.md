@@ -250,7 +250,7 @@ timed-wobble-then-deactivate shape, or what the wobble represents in the
 game, is not established. Named `AdvanceWobbleAndDeactivate` (free-function
 `VerbNoun`-adjacent form, `Entity__` prefix kept because it operates
 directly on `Entity::moodTimer`/`Entity::moodState` the same way
-`Entity__GetOrCreateUnk100`/`Entity__IsTargetInRange` do) rather than the
+`Entity__GetOrCreateFadeBox`/`Entity__IsTargetInRange` do) rather than the
 tier-C `Entity__func_80064FBC` form, because the mechanics description
 above is concrete, not a placeholder.
 

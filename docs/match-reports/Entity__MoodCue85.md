@@ -11,7 +11,7 @@ The biggest function in this unit: a `this->unk44`-keyed state machine
 see below) driving this Entity's mood/AI transitions. Calls
 `SetCueTones7_7_7`/`SetCueTones18_3_3` (this unit's own trivial `out`-only
 setters, matched separately) at several transition points, plus
-`SceneNode__FaceTarget`, `Entity__GetOrCreateUnk100`, and two new `Unk100Methods` slots
+`SceneNode__FaceTarget`, `Entity__GetOrCreateFadeBox`, and two new `Unk100Methods` slots
 (`slotD4`, `slotD8`).
 
 ## Derivation
@@ -27,7 +27,7 @@ first read suggested. The tell: at the link after `0xB`'s `bne`, the
 delay slot loads `ori $v0, $zero, 0xD` — that value is what the NEXT
 link's `bne` compares `this->unk44` against, i.e. the block immediately
 following belongs to `unk44 == 0xD`, not `0xC`. The block's own CONTENT
-(the `unkFC < 0x5A` / `Entity__GetOrCreateUnk100(...,0xA,...)` / `slotD8` /
+(the `unkFC < 0x5A` / `Entity__GetOrCreateFadeBox(...,0xA,...)` / `slotD8` /
 `slot44(unk94,0,ROTATION_ZPLUS1)` logic, vs. the sibling block's `unkFC < 0xA`
 / `slot44(this,0,ROTATION_ZMINUS9)` / `SetCueTones18_3_3`+`slot16C`+`unk44=1`
 logic) was derived correctly on the first pass; only the LABEL — which
@@ -95,7 +95,7 @@ Tier B, same as every sibling `Entity__MoodCueNN` (Entity_b..Entity_g): the
 row mapping is a fact of the binary, which dream object or state a row is
 for is not established. Row kept decimal so names sort in table order.
 
-What it does, in the unit's current field names: Five-state machine (0, 0xA..0xE) that calls `SetCueTones7_7_7`/`SetCueTones18_3_3` at its transitions, yaws with `updateRotation(ROTATION_YAW_PLUS9 / ROTATION_ZMINUS9)`, rotates the target with `target->slot44(ROTATION_ZPLUS1 / ROTATION_YAW_PLUS180)`, drives `unk100` (via `Entity__GetOrCreateUnk100`) with `slotD4(unk50, 7, 0)`/`slotD8(unk50, 0, 0)`, and ends with `notifyParents(0xA or 0xC)` or stopping the cue.
+What it does, in the unit's current field names: Five-state machine (0, 0xA..0xE) that calls `SetCueTones7_7_7`/`SetCueTones18_3_3` at its transitions, yaws with `updateRotation(ROTATION_YAW_PLUS9 / ROTATION_ZMINUS9)`, rotates the target with `target->slot44(ROTATION_ZPLUS1 / ROTATION_YAW_PLUS180)`, drives `unk100` (via `Entity__GetOrCreateFadeBox`) with `slotD4(unk50, 7, 0)`/`slotD8(unk50, 0, 0)`, and ends with `notifyParents(0xA or 0xC)` or stopping the cue.
 
 ### Data constants named (round 79)
 

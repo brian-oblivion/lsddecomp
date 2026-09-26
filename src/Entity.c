@@ -54,7 +54,7 @@ Entity *Entity__Entity(Entity *this, s32 moodIndex, void *desc, void *arg2) {
     return NULL;
 }
 
-FadeBox *Entity__GetOrCreateUnk100(Entity *this, void *name, void *arg2, void *arg3, s32 arg4) {
+FadeBox *Entity__GetOrCreateFadeBox(Entity *this, void *name, void *arg2, void *arg3, s32 arg4) {
     FadeBox *cached;
     FadeBox *sub;
     FadeBoxMethods *m;

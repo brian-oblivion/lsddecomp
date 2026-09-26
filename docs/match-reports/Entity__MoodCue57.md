@@ -15,7 +15,7 @@ fixed `out->unk1C/unk20` pair, calls `slotC4(-0x200, 0)`, and dispatches on an
 nonzero, dispatches on `this->unk84` ("mood") against five constants
 (`<0x1E`, `0x1E`, `0x23`, `0x30`, `0x3B`), the `0x30` arm calling
 `Entity__IsNearTarget` (a vector-taking helper) and, on success, lazily creating/
-reusing `this->unk100` via `Entity__GetOrCreateUnk100` to call its `slotD4`, then
+reusing `this->unk100` via `Entity__GetOrCreateFadeBox` to call its `slotD4`, then
 possibly `slot30(this, 0xB)`.
 
 ## Derivation
@@ -118,7 +118,7 @@ just-loaded `this->unk14`, not a fresh load).
 - `Unk100Methods::slotD4` — new slot at `+0xD4`
   (`void (*)(Unk100Obj *self, s32 arg1, s32 arg2, s32 arg3)`), immediately
   after the existing `slotD0`.
-- `extern Unk100Obj *Entity__GetOrCreateUnk100(...)` — `Entity__GetOrCreateUnk100` was already
+- `extern Unk100Obj *Entity__GetOrCreateFadeBox(...)` — `Entity__GetOrCreateFadeBox` was already
   matched in `src/Entity.c` (defined there, not `INCLUDE_ASM`) but had no
   cross-unit prototype; this is its first caller outside that file.
 - `Entity::unk50` split out of the existing `pad50[0x58-0x50]` padding as a
@@ -175,9 +175,9 @@ Every literal in the live body is in its base: decimal for moodTimer ticks, dist
 
 ## Proposed field names
 
-- `Entity::unk100` -> `fade` (and `Entity__GetOrCreateUnk100` ->
+- `Entity::unk100` -> `fade` (and `Entity__GetOrCreateFadeBox` ->
   `Entity__GetOrCreateFade`). It is a FadeBox, the BoxFill that fades its
-  colour (include/FadeBox.h); Entity__GetOrCreateUnk100 is its only
+  colour (include/FadeBox.h); Entity__GetOrCreateFadeBox is its only
   writer (New_FadeBox, then setStep from its fourth argument, 10 here),
   Entity__Finalize releases it, and every other access (here, Entity_f x3,
   Entity_g x1) calls startFadeDown or startFadeUp on it. Accessors outside

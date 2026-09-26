@@ -1,4 +1,6 @@
-# Entity__GetOrCreateUnk100
+# Entity__GetOrCreateFadeBox
+
+> Renamed from `Entity__GetOrCreateUnk100` on 2026-09-26 (tools/rename.py). Address 0x8005d108.
 
 > Renamed from `func_8005D108` on 2026-09-19 (tools/rename.py). Address 0x8005d108.
 
@@ -32,7 +34,7 @@ return sub
 ## Final C
 
 ```c
-Unk100Obj *Entity__GetOrCreateUnk100(Entity *this, void *name, void *arg2, void *arg3, s32 arg4) {
+Unk100Obj *Entity__GetOrCreateFadeBox(Entity *this, void *name, void *arg2, void *arg3, s32 arg4) {
     Unk100Obj *cached;
     Unk100Obj *sub;
     Unk100Methods *m;

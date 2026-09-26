@@ -97,7 +97,7 @@ struct Entity {
     /* +0x0F4 */ s32 targetReached;  /* setTargetReached; latched by updateTargetProximity */
     /* +0x0F8 */ s32 soundCueActive; /* startSoundCue / stopSoundCue */
     /* +0x0FC */ s32 moodTimer;      /* zeroed by startSoundCue, counted by Entity__TickSoundCue */
-    /* +0x100 */ FadeBox *unk100; /* made by Entity__GetOrCreateUnk100 (New_FadeBox); released by Entity__Finalize */
+    /* +0x100 */ FadeBox *unk100; /* made by Entity__GetOrCreateFadeBox (New_FadeBox); released by Entity__Finalize */
     /* +0x104 */ BasicClass *unk104; /* released by Entity__Finalize, never set in Entity code: nothing shows its class. The object is 0x108 bytes (New_Entity) */
 };
 
@@ -137,7 +137,7 @@ extern EntityMethods *Get_vtable_Entity(void); /* returns &gEntityMethods */
  * is the grid manager, Class866E8 (include/Class866E8.h; code_4cd08 passes
  * D_8008ABFC). Entity_b/_e/_g call its configureRateEntry (+0x138). */
 
-/* Default arguments Entity__GetOrCreateUnk100 substitutes when its own
+/* Default arguments Entity__GetOrCreateFadeBox substitutes when its own
  * `name`/`arg2` parameters are NULL -- both plain 2-word buffers
  * (asm/data/7B3F8.sdata.s): {0x140, 0xF0} (320, 240) and {-100, -100}, the
  * size and offset Viewport gives its FadeBox (FadeBox.h). */
@@ -182,7 +182,7 @@ extern s8 D_80089EAF[]; /* read by Entity__AttachToParent, own base symbol immed
  * reaching the base ones goes through Get_vtable_Class65650() and upcasts. */
 Entity *New_Entity(s32 moodIndex, void *desc, void *arg2);
 Entity *Entity__Entity(Entity *self, s32 moodIndex, void *desc, void *arg2);
-FadeBox *Entity__GetOrCreateUnk100(Entity *self, void *name, void *arg2, void *arg3, s32 arg4);
+FadeBox *Entity__GetOrCreateFadeBox(Entity *self, void *name, void *arg2, void *arg3, s32 arg4);
 void Entity__Finalize(Entity *self);
 void Entity__Reset(Entity *self);
 void Entity__AttachToParent(Entity *self, Class65650 *peer, void *companion,

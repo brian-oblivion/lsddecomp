@@ -9,7 +9,7 @@
 ## What it does
 
 Entity's destructor-side teardown: tears down `this->unk100` and
-`this->unk104` (each a `Unk100Obj *`, see `Entity__GetOrCreateUnk100.md`) by calling
+`this->unk104` (each a `Unk100Obj *`, see `Entity__GetOrCreateFadeBox.md`) by calling
 their own `slot04` (a per-object dtor-like slot, not `EntityMethods`'), then
 calls the shared "BasicClass" ancestor's own `dtor` slot,
 `Get_vtable_Class65650()->dtor(this)` (offset `+0x00C` in the shared table — see the

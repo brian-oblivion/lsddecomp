@@ -26,7 +26,7 @@ unused parameter, not a derivation gap (same "declare it, never reference
 it" shape CLAUDE.md's own guidance describes for an ignored callee
 parameter).
 
-Gated on `this->unkF4 != 0`: if `Entity__GetOrCreateUnk100(this, NULL, 0, 0xA, 0)`
+Gated on `this->unkF4 != 0`: if `Entity__GetOrCreateFadeBox(this, NULL, 0, 0xA, 0)`
 (the cache-or-create accessor, already matched in `Entity.c`) returns
 non-null, dispatches `this->unk100->methods->slotD4` with a literal `7`
 (same slot `Entity__MoodCue57` already established with a literal `4`),
@@ -39,7 +39,7 @@ with `(-0x1E, 1)`.
 ```c
 void Entity__MoodCue98(Entity *this, EntityMoodHandlerArg *out) {
     if (this->unkF4 != 0) {
-        if (Entity__GetOrCreateUnk100(this, NULL, 0, 0xA, 0) != 0) {
+        if (Entity__GetOrCreateFadeBox(this, NULL, 0, 0xA, 0) != 0) {
             this->unk100->methods->slotD4(this->unk100, this->unk50, 7, 0);
             this->methods->slot160(this);
             this->unk94->methods->slot21C(this->unk94);

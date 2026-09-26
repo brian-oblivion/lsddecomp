@@ -40,7 +40,7 @@
  * (-100, -100)), which ObjM fades and whose 5/6 it handles
  * (ObjM__OnFadeNotify; ObjM__EnterStyleSession sets altMode from the
  * DreamSys's flashback session). Entity makes one on demand as its
- * `unk100` (Entity__GetOrCreateUnk100); the MoodCue handlers fade it with
+ * `unk100` (Entity__GetOrCreateFadeBox); the MoodCue handlers fade it with
  * the entity's ticker as the source.
  *
  * Overrides whose parameter list differs from the inherited slot keep the

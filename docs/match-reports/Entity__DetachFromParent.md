@@ -33,7 +33,7 @@ Matched on the first attempt.
 
 ## Proposed learning
 
-This function (along with `Entity__OnGridCellLinkCommand`, `Entity__Update`, `Entity__GetOrCreateUnk100`)
+This function (along with `Entity__OnGridCellLinkCommand`, `Entity__Update`, `Entity__GetOrCreateFadeBox`)
 is what established `Get_vtable_Class65650()`'s SHARED-vtable role for this unit —
 see the class-framework comment block now at the top of `Entity.h`. Worth
 flagging for anyone touching `Entity_b` next: `Get_vtable_Class65650()` (matched,

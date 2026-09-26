@@ -151,7 +151,7 @@ void Entity__MoodCue85(Entity *this, SoundCueSet *out) {
             this->methods->moveLocalZ(this, -0xA, 0);
         } else {
             SetCueTones7_7_7(out);
-            if (Entity__GetOrCreateUnk100(this, NULL, NULL, (void *)0x1E, 0) != NULL) {
+            if (Entity__GetOrCreateFadeBox(this, NULL, NULL, (void *)0x1E, 0) != NULL) {
                 this->unk100->methods->startFadeDown(this->unk100, (BasicClass *)this->ticker, 7, 0);
             }
             this->state = 0xD;
@@ -160,7 +160,7 @@ void Entity__MoodCue85(Entity *this, SoundCueSet *out) {
     } else if (this->state == 0xD) {
         if (this->moodTimer < 0x5A) {
             if (this->moodTimer == 0x1E) {
-                if (Entity__GetOrCreateUnk100(this, NULL, NULL, (void *)0xA, 0) != NULL) {
+                if (Entity__GetOrCreateFadeBox(this, NULL, NULL, (void *)0xA, 0) != NULL) {
                     this->unk100->methods->startFadeUp(this->unk100, (BasicClass *)this->ticker, 0, 0);
                 }
             }
@@ -260,7 +260,7 @@ void Entity__MoodCue90(Entity *this, SoundCueSet *out) {
 
 void Entity__MoodCue91(Entity *this, SoundCueSet *out) {
     if (this->moodTimer == 0) {
-        if (Entity__GetOrCreateUnk100(this, NULL, NULL, (void *)5, 0) != NULL) {
+        if (Entity__GetOrCreateFadeBox(this, NULL, NULL, (void *)5, 0) != NULL) {
             if (rand() & 1) {
                 this->methods->addTranslation(this, TRANSLATE_Y_MINUS256);
             }
