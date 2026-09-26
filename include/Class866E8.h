@@ -163,9 +163,9 @@ typedef struct CellRect {
 /* `rects` as a whole, so ApplyToSenderFootprint can save and restore it
  * with a plain `=` (a batched 4-word block move; an indexed loop does not
  * compile to it). */
-typedef struct GridSlotList866E8 {
+typedef struct CellRectSet {
     CellRect e[4];
-} GridSlotList866E8;
+} CellRectSet;
 
 /* `bounds`' pointee (setBounds): IsPointOutOfBounds' box of cell columns/rows inside a chunk. */
 typedef struct Bounds866E8_3bb8c_b {
@@ -256,7 +256,7 @@ struct Class866E8 {
     /* +0x080 */ s32 footprintWidth;
     /* +0x084 */ s32 footprintHeight;
     /* +0x088 */ s32 rectCount;           /* how many of rects[] are live */
-    /* +0x08C */ GridSlotList866E8 rects; /* BuildFootprintSlots, SetFootprintRect, InitFootprintSlot write; DispatchToRectCells, SetFootprintCellFlag walk */
+    /* +0x08C */ CellRectSet rects; /* BuildFootprintSlots, SetFootprintRect, InitFootprintSlot write; DispatchToRectCells, SetFootprintCellFlag walk */
     /* +0x0BC */ Descriptor10Ext targetCell; /* UpdateFootprintTracking: the target's last descriptor; SetTargetAndBuildRates sets .base; getTargetDescriptor returns &.base */
     /* +0x0E8 */ s32 *acceptedTags; /* setAcceptedTags: a 0-terminated list of class ids ForwardAcceptedCommand accepts */
     /* +0x0EC */ ChunkSlot elems[7];

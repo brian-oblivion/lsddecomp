@@ -339,7 +339,7 @@ void Class866E8__ForwardAcceptedCommand(Class866E8 *self, void *sender, s32 comm
 
 void Class866E8__ApplyToSenderFootprint(Class866E8 *self, SceneNode *sender, s32 command) {
     SplitLongVec3 *pos;
-    GridSlotList866E8 saved;
+    CellRectSet saved;
     Descriptor10Ext buf;
     s32 savedRectCount;
 
