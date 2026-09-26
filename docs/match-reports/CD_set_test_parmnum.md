@@ -1,4 +1,6 @@
-# func_8002B3E4
+# CD_set_test_parmnum
+
+> Renamed from `func_8002B3E4` on 2026-09-26 (tools/rename.py). Address 0x8002b3e4.
 
 **Unit:** libcd_bios · **Size:** 4 words · **Status:** MATCHED (4/4 words)
 
@@ -9,7 +11,7 @@ Trivial setter: stores its argument into `D_8006D8A4`.
 ## The C
 
 ```c
-void func_8002B3E4(s32 arg0)
+void CD_set_test_parmnum(s32 arg0)
 {
     D_8006D8A4 = arg0;
 }
@@ -23,7 +25,7 @@ scalar state).
 
 ## Track 2 screen, round 79
 
-`.venv/bin/python3 tools/sdkname.py func_8002B3E4`: TINY (4 words), EXACT
+`.venv/bin/python3 tools/sdkname.py CD_set_test_parmnum`: TINY (4 words), EXACT
 fingerprint tie across unrelated libraries (`CD_set_test_parmnum`
 `libcd/bios`, `GsSetNearClip` `libgs/gs_101`, `GsSetFarClip` `libgs/gs_102`,
 `GsSetWorkBase` `libgs/gs_124`, `srand` `libc2/rand`, `ChangeClearSIO`

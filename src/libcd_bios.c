@@ -17,7 +17,7 @@
  *     sequence that installs `callback` as the CD interrupt handler;
  *   - cd_read_retry, CD_readm, CD_readsync, CD_datasync, CD_getsector: the
  *     sector-read state machine and its DMA transfer;
- *   - func_8002B3E4, callback, cb_read: a one-word setter, the interrupt
+ *   - CD_set_test_parmnum, callback, cb_read: a one-word setter, the interrupt
  *     handler, and the per-sector read callback.
  *
  * What decided its edges (python3 tools/tuboundary.py):
@@ -1207,7 +1207,7 @@ s32 CD_getsector(s32 arg0, s32 arg1)
     return 0;
 }
 
-void func_8002B3E4(s32 arg0)
+void CD_set_test_parmnum(s32 arg0)
 {
     D_8006D8A4 = arg0;
 }
