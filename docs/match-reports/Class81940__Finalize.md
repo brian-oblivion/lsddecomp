@@ -11,7 +11,7 @@ out-of-range drift.
 
 ## What it does
 
-Slot +0x00C (finalize) of D_80081940: calls its own slot +0x084 (Class81940__ReleaseDataBlock, frees the +0x34 allocation), then the active data source's `finalize(self)` via GetActiveDataSourceMethods().
+Slot +0x00C (finalize) of gClass81940Methods: calls its own slot +0x084 (Class81940__ReleaseDataBlock, frees the +0x34 allocation), then the active data source's `finalize(self)` via GetActiveDataSourceMethods().
 
 ## Source
 
@@ -19,7 +19,7 @@ Declarations it needs are the local views at the top of `src/code_39094.c`
 (`DataSrc39094`, `DataSrc39094Methods`, `Rec1C`) and `include/Class6D430.h`.
 
 ```c
-/* slot +0x00C of D_80081940 (finalize) */
+/* slot +0x00C of gClass81940Methods (finalize) */
 void Class81940__Finalize(DataSrc39094 *self) {
     self->methods->releaseAlloc(self);
     GetActiveDataSourceMethods()->finalize((Class6D430 *)self);
@@ -47,4 +47,4 @@ void Class81940__Finalize(DataSrc39094 *self) {
 
 ## Track 4 (2026-09-26, round 87)
 
-Renamed `DataSrc39094__Finalize` -> `Class81940__Finalize` with `rename.py` (class rename only; +0x00C finalize occupant). The class (method table D_80081940, id 0x903, a Class6D430 subclass) was named `Class81940` for its table address, as Class6D940 is (FINISHING-PLAN track 4 step 2); the old `DataSrc39094` was the unit's local view name, and dropping its unit suffix leaves `DataSrc`, which every Class6D430 subclass is. The unified definition is `include/Class81940.h`.
+Renamed `DataSrc39094__Finalize` -> `Class81940__Finalize` with `rename.py` (class rename only; +0x00C finalize occupant). The class (method table gClass81940Methods, id 0x903, a Class6D430 subclass) was named `Class81940` for its table address, 0x80081940 (renamed from `D_80081940` to `gClass81940Methods`), as Class6D940 is (FINISHING-PLAN track 4 step 2); the old `DataSrc39094` was the unit's local view name, and dropping its unit suffix leaves `DataSrc`, which every Class6D430 subclass is. The unified definition is `include/Class81940.h`.

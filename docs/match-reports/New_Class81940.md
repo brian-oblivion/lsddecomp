@@ -11,7 +11,7 @@ out-of-range drift.
 
 ## What it does
 
-Allocator for the D_80081940 object: BMemPMgrAlloc(0x3C), and when non-NULL runs slot +0x008 (ctor) of the table GetClass81940Methods returns (D_80081940). Delta's round-82 allocator shape (`if (obj != NULL) { ctor; return obj; } return NULL;`) matches as written.
+Allocator for the gClass81940Methods object: BMemPMgrAlloc(0x3C), and when non-NULL runs slot +0x008 (ctor) of the table GetClass81940Methods returns (gClass81940Methods). Delta's round-82 allocator shape (`if (obj != NULL) { ctor; return obj; } return NULL;`) matches as written.
 
 ## Source
 
@@ -19,7 +19,7 @@ Declarations it needs are the local views at the top of `src/code_39094.c`
 (`DataSrc39094`, `DataSrc39094Methods`, `Rec1C`) and `include/Class6D430.h`.
 
 ```c
-/* allocator: new D_80081940 object */
+/* allocator: new gClass81940Methods object */
 DataSrc39094 *New_Class81940(void) {
     DataSrc39094 *obj = BMemPMgrAlloc(0x3C);
     if (obj != NULL) {
@@ -51,4 +51,4 @@ DataSrc39094 *New_Class81940(void) {
 
 ## Track 4 (2026-09-26, round 87)
 
-Renamed `New_DataSrc39094` -> `New_Class81940` with `rename.py`: the allocator of Class81940 (BMemPMgrAlloc(0x3C), then the table's +0x008 ctor). Its one caller is Class866E8__Class866E8, once per grid element. The class (method table D_80081940, id 0x903, a Class6D430 subclass) was named `Class81940` for its table address, as Class6D940 is (FINISHING-PLAN track 4 step 2); the old `DataSrc39094` was the unit's local view name, and dropping its unit suffix leaves `DataSrc`, which every Class6D430 subclass is. The unified definition is `include/Class81940.h`.
+Renamed `New_DataSrc39094` -> `New_Class81940` with `rename.py`: the allocator of Class81940 (BMemPMgrAlloc(0x3C), then the table's +0x008 ctor). Its one caller is Class866E8__Class866E8, once per grid element. The class (method table gClass81940Methods, id 0x903, a Class6D430 subclass) was named `Class81940` for its table address, 0x80081940 (renamed from `D_80081940` to `gClass81940Methods`), as Class6D940 is (FINISHING-PLAN track 4 step 2); the old `DataSrc39094` was the unit's local view name, and dropping its unit suffix leaves `DataSrc`, which every Class6D430 subclass is. The unified definition is `include/Class81940.h`.

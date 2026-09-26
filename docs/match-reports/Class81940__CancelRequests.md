@@ -11,7 +11,7 @@ Byte-exact on the FIRST build; whole-image SHA1 green
 
 ## What it does
 
-Method slot +0x074 of D_80081940 (cancelRequests; table word at 0x800819B4). Calls the ACTIVE data source's `cancelRequests(self)` through GetActiveDataSourceMethods() (declared locally as returning `Class6D430Methods *`, which is the header's slot name at +0x074), then clears +0x2C, +0x2E and Class6D430's own `unk2A`, stores in that order.
+Method slot +0x074 of gClass81940Methods (cancelRequests; table word at 0x800819B4). Calls the ACTIVE data source's `cancelRequests(self)` through GetActiveDataSourceMethods() (declared locally as returning `Class6D430Methods *`, which is the header's slot name at +0x074), then clears +0x2C, +0x2E and Class6D430's own `unk2A`, stores in that order.
 
 ## Source
 
@@ -20,7 +20,7 @@ Method slot +0x074 of D_80081940 (cancelRequests; table word at 0x800819B4). Cal
  * CLASS6D430_FIELDS, then u16 headerReady, u16 dataReady, u8 pad30[4], void *dataBuffer, s32 autoLoadData. */
 extern Class6D430Methods *GetActiveDataSourceMethods(void);
 
-/* slot +0x074 of D_80081940 (cancelRequests) */
+/* slot +0x074 of gClass81940Methods (cancelRequests) */
 void Class81940__CancelRequests(DataSrc39094 *self) {
     GetActiveDataSourceMethods()->cancelRequests((Class6D430 *)self);
     self->headerReady = 0;
@@ -47,4 +47,4 @@ void Class81940__CancelRequests(DataSrc39094 *self) {
 
 ## Track 4 (2026-09-26, round 87)
 
-Renamed `DataSrc39094__CancelRequests` -> `Class81940__CancelRequests` with `rename.py` (class rename only; +0x074 cancelRequests occupant). The class (method table D_80081940, id 0x903, a Class6D430 subclass) was named `Class81940` for its table address, as Class6D940 is (FINISHING-PLAN track 4 step 2); the old `DataSrc39094` was the unit's local view name, and dropping its unit suffix leaves `DataSrc`, which every Class6D430 subclass is. The unified definition is `include/Class81940.h`.
+Renamed `DataSrc39094__CancelRequests` -> `Class81940__CancelRequests` with `rename.py` (class rename only; +0x074 cancelRequests occupant). The class (method table gClass81940Methods, id 0x903, a Class6D430 subclass) was named `Class81940` for its table address, 0x80081940 (renamed from `D_80081940` to `gClass81940Methods`), as Class6D940 is (FINISHING-PLAN track 4 step 2); the old `DataSrc39094` was the unit's local view name, and dropping its unit suffix leaves `DataSrc`, which every Class6D430 subclass is. The unified definition is `include/Class81940.h`.

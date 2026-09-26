@@ -9,7 +9,7 @@ Byte-exact on the first build; whole-image SHA1 green, funcdiff 45/45.
 
 ## What it does
 
-Slot +0x064 (setFlag override) of D_80081940. State `unk2A` 9 with flag bit
+Slot +0x064 (setFlag override) of gClass81940Methods. State `unk2A` 9 with flag bit
 0x80: clear state, `headerReady = 1`, and if `autoLoadData` call slot +0x080
 (Class81940__LoadDataBlock). State 10 with bit 0x80: `dataReady = 1`, clear state. Then the
 active data source's setFlag(self).
@@ -17,7 +17,7 @@ active data source's setFlag(self).
 ## Source
 
 ```c
-/* slot +0x064 of D_80081940 (setFlag) */
+/* slot +0x064 of gClass81940Methods (setFlag) */
 void Class81940__AdvanceLoadState(DataSrc39094 *self) {
     if (self->unk2A == 9) {
         if (self->flags & 0x80) {
@@ -81,4 +81,4 @@ block load in flight.
 
 ## Track 4 (2026-09-26, round 87)
 
-Renamed `DataSrc39094__SetFlag` -> `Class81940__AdvanceLoadState` with `rename.py`. The slot is +0x064, Class6D430's `setFlag`, which the CD driver calls when a request completes (src/code_179d8_s.c); the bit this body tests, 0x80, is that driver's CD_FLAG_READ_DONE. The body advances the load state (`unk2A` 9 -> 0 with the header ready, maybe starting the data block; 10 -> 0 with the data ready), which is what TimBlockSrc__AdvanceLoadState and VabStreamObj__AdvanceLoadState, the same slot's occupants in two siblings, were named for. Its no-argument call of +0x080 is kept through `Class81940LoadDataBlockNoArgFn` (include/Class81940.h): retail sets no $a0 for it. The class (method table D_80081940, id 0x903, a Class6D430 subclass) was named `Class81940` for its table address, as Class6D940 is (FINISHING-PLAN track 4 step 2); the old `DataSrc39094` was the unit's local view name, and dropping its unit suffix leaves `DataSrc`, which every Class6D430 subclass is. The unified definition is `include/Class81940.h`.
+Renamed `DataSrc39094__SetFlag` -> `Class81940__AdvanceLoadState` with `rename.py`. The slot is +0x064, Class6D430's `setFlag`, which the CD driver calls when a request completes (src/code_179d8_s.c); the bit this body tests, 0x80, is that driver's CD_FLAG_READ_DONE. The body advances the load state (`unk2A` 9 -> 0 with the header ready, maybe starting the data block; 10 -> 0 with the data ready), which is what TimBlockSrc__AdvanceLoadState and VabStreamObj__AdvanceLoadState, the same slot's occupants in two siblings, were named for. Its no-argument call of +0x080 is kept through `Class81940LoadDataBlockNoArgFn` (include/Class81940.h): retail sets no $a0 for it. The class (method table gClass81940Methods, id 0x903, a Class6D430 subclass) was named `Class81940` for its table address, 0x80081940 (renamed from `D_80081940` to `gClass81940Methods`), as Class6D940 is (FINISHING-PLAN track 4 step 2); the old `DataSrc39094` was the unit's local view name, and dropping its unit suffix leaves `DataSrc`, which every Class6D430 subclass is. The unified definition is `include/Class81940.h`.

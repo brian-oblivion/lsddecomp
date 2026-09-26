@@ -9,7 +9,7 @@ Byte-exact on the third build; whole-image SHA1 green, funcdiff 54/54.
 
 ## What it does
 
-Slot +0x080 of D_80081940. When the loaded buffer's header says a data block
+Slot +0x080 of gClass81940Methods. When the loaded buffer's header says a data block
 exists (`+0x02` nonzero) and the object is idle (`unk2A == 0`): release the
 previous block (slot +0x084), allocate `header->+0x14` bytes into `dataBuffer`,
 enter state 10, seek to `header->+0x10` and read the block. Returns 1 on
@@ -22,7 +22,7 @@ Needs the local views at the top of `src/code_39094.c`, with
 plus:
 
 ```c
-/* The header at the start of D_80081940's 0xB358 buffer (local view). */
+/* The header at the start of gClass81940Methods's 0xB358 buffer (local view). */
 typedef struct StreamHdr {
     /* +0x00 */ u16 unk0;
     /* +0x02 */ u16 hasData;
@@ -31,7 +31,7 @@ typedef struct StreamHdr {
     /* +0x14 */ s32 dataSize;
 } StreamHdr;
 
-/* slot +0x080 of D_80081940: load the data block the header describes */
+/* slot +0x080 of gClass81940Methods: load the data block the header describes */
 s32 Class81940__LoadDataBlock(DataSrc39094 *self) {
     s32 size;
     if (((StreamHdr *)self->buffer)->hasData == 0) {
@@ -78,4 +78,4 @@ local view when another caller passes arguments.
 
 ## Track 4 (2026-09-26, round 87)
 
-Renamed `DataSrc39094__LoadDataBlock` -> `Class81940__LoadDataBlock` with `rename.py` (class rename only; +0x080). Its no-argument call of +0x084 is kept through `Class81940ReleaseDataBlockNoArgFn` (include/Class81940.h). The class (method table D_80081940, id 0x903, a Class6D430 subclass) was named `Class81940` for its table address, as Class6D940 is (FINISHING-PLAN track 4 step 2); the old `DataSrc39094` was the unit's local view name, and dropping its unit suffix leaves `DataSrc`, which every Class6D430 subclass is. The unified definition is `include/Class81940.h`.
+Renamed `DataSrc39094__LoadDataBlock` -> `Class81940__LoadDataBlock` with `rename.py` (class rename only; +0x080). Its no-argument call of +0x084 is kept through `Class81940ReleaseDataBlockNoArgFn` (include/Class81940.h). The class (method table gClass81940Methods, id 0x903, a Class6D430 subclass) was named `Class81940` for its table address, 0x80081940 (renamed from `D_80081940` to `gClass81940Methods`), as Class6D940 is (FINISHING-PLAN track 4 step 2); the old `DataSrc39094` was the unit's local view name, and dropping its unit suffix leaves `DataSrc`, which every Class6D430 subclass is. The unified definition is `include/Class81940.h`.

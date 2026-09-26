@@ -6,7 +6,7 @@
  * those, and no Sony fingerprint). All 38 functions matched round 82 (three
  * echo sessions); named round 82 (bravo). Two independent groups of code:
  *
- * 1. DataSrc39094 (method table D_80081940, unrenamed -- only the getter is
+ * 1. DataSrc39094 (method table gClass81940Methods, unrenamed -- only the getter is
  *    named, per this project's convention for a Class6D430 subclass with no
  *    established in-game role): a file-streaming state machine that loads a
  *    header block into its own 0xB358 buffer (state 9, Class81940__LoadHeader),
@@ -30,7 +30,7 @@
 
 typedef struct DataSrc39094 DataSrc39094;
 
-/* D_80081940's own method table (local view): the Class6D430 interface plus
+/* gClass81940Methods's own method table (local view): the Class6D430 interface plus
  * this class's extra slots. */
 typedef struct DataSrc39094Methods {
     CLASS6D430_SLOTS(DataSrc39094, (DataSrc39094 *self));
@@ -39,7 +39,7 @@ typedef struct DataSrc39094Methods {
     /* +0x084 */ void (*releaseAlloc)();  /* Class81940__ReleaseDataBlock(self); unprototyped: Class81940__LoadDataBlock calls it with no argument */
 } DataSrc39094Methods;
 
-/* The D_80081940 object: a Class6D430 data source with its own fields from
+/* The gClass81940Methods object: a Class6D430 data source with its own fields from
  * +0x2C (local view; only this unit's methods read them). */
 struct DataSrc39094 {
     CLASS6D430_FIELDS(DataSrc39094Methods);
@@ -64,7 +64,7 @@ extern Class6D430Methods *GetActiveDataSourceMethods(void);
 extern void *BMemPMgrAlloc(s32 size);
 void *GetClass81940Methods(void);
 
-/* allocator: new D_80081940 object */
+/* allocator: new gClass81940Methods object */
 DataSrc39094 *New_Class81940(void) {
     DataSrc39094 *obj = BMemPMgrAlloc(0x3C);
     if (obj != NULL) {
@@ -73,7 +73,7 @@ DataSrc39094 *New_Class81940(void) {
     }
     return NULL;
 }
-/* slot +0x008 of D_80081940 (ctor) */
+/* slot +0x008 of gClass81940Methods (ctor) */
 void Class81940__Class81940(DataSrc39094 *self) {
     GetActiveDataSourceMethods()->ctor((Class6D430 *)self);
     self->methods = GetClass81940Methods();
@@ -88,12 +88,12 @@ void Class81940__Class81940(DataSrc39094 *self) {
         self->bufferSize = 0xB358;
     }
 }
-/* slot +0x00C of D_80081940 (finalize) */
+/* slot +0x00C of gClass81940Methods (finalize) */
 void Class81940__Finalize(DataSrc39094 *self) {
     self->methods->releaseAlloc(self);
     GetActiveDataSourceMethods()->finalize((Class6D430 *)self);
 }
-/* slot +0x064 of D_80081940 (setFlag) */
+/* slot +0x064 of gClass81940Methods (setFlag) */
 void Class81940__AdvanceLoadState(DataSrc39094 *self) {
     if (self->unk2A == 9) {
         if (self->flags & 0x80) {
@@ -111,14 +111,14 @@ void Class81940__AdvanceLoadState(DataSrc39094 *self) {
     }
     GetActiveDataSourceMethods()->setFlag((Class6D430 *)self);
 }
-/* slot +0x074 of D_80081940 (cancelRequests) */
+/* slot +0x074 of gClass81940Methods (cancelRequests) */
 void Class81940__CancelRequests(DataSrc39094 *self) {
     GetActiveDataSourceMethods()->cancelRequests((Class6D430 *)self);
     self->headerReady = 0;
     self->dataReady = 0;
     self->unk2A = 0;
 }
-/* slot +0x078 of D_80081940: start streaming a file into the buffer */
+/* slot +0x078 of gClass81940Methods: start streaming a file into the buffer */
 void Class81940__LoadHeader(DataSrc39094 *self, char *name) {
     if (self->buffer != NULL && name != NULL) {
         if (self->unk2A == 0) {
@@ -137,7 +137,7 @@ void Class81940__ReleaseHeader(DataSrc39094 *self) {
     self->headerReady = 0;
     self->unk30 = -1;
 }
-/* The header at the start of D_80081940's 0xB358 buffer (local view). */
+/* The header at the start of gClass81940Methods's 0xB358 buffer (local view). */
 typedef struct StreamHdr {
     /* +0x00 */ u16 unk0;
     /* +0x02 */ u16 hasData;
@@ -146,7 +146,7 @@ typedef struct StreamHdr {
     /* +0x14 */ s32 dataSize;
 } StreamHdr;
 
-/* slot +0x080 of D_80081940: load the data block the header describes */
+/* slot +0x080 of gClass81940Methods: load the data block the header describes */
 s32 Class81940__LoadDataBlock(DataSrc39094 *self) {
     s32 size;
     if (((StreamHdr *)self->buffer)->hasData == 0) {
@@ -166,14 +166,14 @@ s32 Class81940__LoadDataBlock(DataSrc39094 *self) {
     self->methods->read(self, self->dataBuffer, size);
     return 1;
 }
-/* slot +0x084 of D_80081940 */
+/* slot +0x084 of gClass81940Methods */
 void Class81940__ReleaseDataBlock(DataSrc39094 *self) {
     self->dataReady = 0;
     if (self->dataBuffer != NULL) {
         self->dataBuffer = BMemPMgrFree(self->dataBuffer);
     }
 }
-extern u8 D_80081940[];   /* method table, 34 slots */
+extern u8 gClass81940Methods[];   /* method table, 34 slots */
 extern s32 D_8008A960;
 extern s32 gForcedWeeklyGroup;
 extern s32 gForcedVariant;
@@ -184,12 +184,12 @@ extern const char sAsmkStreamPath[];
 extern s16 gStreamTypeToGroupTable[];
 extern s16 gRecordIndexTable[];
 
-/* slot +0x088 of D_80081940 */
+/* slot +0x088 of gClass81940Methods */
 void Class81940__SetAutoLoadData(DataSrc39094 *self, s32 value) {
     self->autoLoadData = value;
 }
 void *GetClass81940Methods(void) {
-    return D_80081940;
+    return gClass81940Methods;
 }
 s32 func_80048CF0(void) {
     return D_8008A960;
