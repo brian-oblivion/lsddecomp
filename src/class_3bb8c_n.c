@@ -401,7 +401,7 @@ void StyleTeardown(void) {
     }
 }
 
-extern u8 D_800871C8[];
+extern u8 gStyleSpawnScales[];
 extern s32 D_80087328[];
 extern u8 *D_8008E0B4;
 extern s32 D_8008E0BC;
@@ -420,7 +420,7 @@ Class876FC **StyleFillEffectKind0(Class876FC **arg0, s32 arg1, LongVec3 *arg2) {
     void (*fp)(void *, void *);
 
     D_8008E0BC = rand() % 7;
-    D_8008E0B4 = (u8 *)D_800871C8 + ((u32)rand() % 5) * 12;
+    D_8008E0B4 = (u8 *)gStyleSpawnScales + ((u32)rand() % 5) * 12;
     t3 = (u32)rand() % 5;
     if (t3 != 0) {
         t3 = D_80087328[t3];

@@ -124,7 +124,7 @@ the output array walked and returned one slot advanced (the same
 ## What the function does (recovered from the raw disassembly)
 
 ```c
-extern u8 D_800871C8[];
+extern u8 gStyleSpawnScales[];
 extern s32 D_80087328[];
 extern u8 *D_8008E0B4;
 extern s32 D_8008E0BC;
@@ -142,7 +142,7 @@ void *StyleFillEffectKind0(void *arg0, s32 arg1, void *arg2) {
 
     arr = (void **) arg0;
     D_8008E0BC = rand() % 7;
-    D_8008E0B4 = (u8 *) D_800871C8 + ((u32) rand() % 5) * 12;
+    D_8008E0B4 = (u8 *) gStyleSpawnScales + ((u32) rand() % 5) * 12;
     t3 = (u32) rand() % 5;
     if (t3 != 0) {
         t3 = D_80087328[t3];
