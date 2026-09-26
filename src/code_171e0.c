@@ -2,11 +2,11 @@
  * code_171e0 -- FileResource's own module, plus an active-data-source
  * dispatch layer built on top of it.
  *
- * FileResource (include/FileResource.h) is the data-source base class: a
- * BasicClass subclass holding one file buffer (buffer/bufferSize, managed by
- * FileResource__LoadFile/FreeBuffer) plus a flags word, and declaring the file-
- * I/O interface the CD driver (gCdDriverMethods) and the SPU/VAB driver
- * (gVabDriverMethods) implement; sixteen classes derive from it.
+ * FileResource (include/FileResource.h) is the base of every class the
+ * game loads from a file: a BasicClass subclass owning one file buffer
+ * (FileResource__LoadFile reads a whole named file into it, FreeBuffer
+ * releases it) and declaring the file-I/O interface that the CD driver
+ * (gCdDriverMethods) and the SPU/VAB driver (gVabDriverMethods) implement.
  *
  * Most of this unit's remaining functions dispatch between those same two
  * sibling classes by `gActiveDataSource` (DATASOURCE_CD/DATASOURCE_SPU,

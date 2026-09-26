@@ -120,3 +120,67 @@ cross-unit hits) renamed outright. The rest:
 Not posting these three to the broadcast as renames (there is nothing to
 apply); noting them here so the next reader does not re-derive "these are
 zeroed and otherwise untouched" from scratch.
+
+## Track 6 (round 91, charlie): the class is named FileResource
+
+- `Class6D430` -> `FileResource` (`renametype.py`, the whole family: type,
+  `Class6D430Methods`, `CLASS6D430_FIELDS`/`_SLOTS`, the `Class6D430__`
+  methods, `GetClass6D430Methods`, the header `include/FileResource.h`), and
+  `D_8006D430` -> `gFileResourceMethods` (`rename.py`). **Tier A.** Evidence:
+  the body of `FileResource__LoadFile` alone (open a name, size it with
+  `seek(0, 2)`, allocate, read the whole file, close), and every non-driver
+  subclass agrees: each constructor names a file (`loadFile` or
+  `requestLoadFile`), and each fills slot +0x078 with the step that consumes
+  the loaded buffer (`TimImage__Upload`, `TileMap__BuildMap`,
+  `TileAtlas__BuildCells`, `ModelData__BuildResources`,
+  `TriggerWorld__BuildResources`, `Tod__ScanPackets`, `TodSet__ScanPackets`,
+  `LinkResource__MapModel`, `TimArraySrc__UploadImages`,
+  `TimBlockSrc__SetEntryShift`, `Class81940__LoadHeader`,
+  `VabStreamObj__OnBodyReady`, `Class6D940__ResolveEntry`). Callers use it
+  as New_<Sub>(name), slot +0x078, `freeBuffer` (`TaskCore__SetSubHandle`,
+  `class_3bb8c_g.c`). The name was chosen over `DataSource` because in this
+  code's existing vocabulary (`SetActiveDataSource`,
+  `gDataSourceClientGetters`) the data SOURCE is the active driver and the
+  asset classes are its clients.
+- **History moved out of the header** (phase 2 comment rule): the open
+  file's disc position and size (+0x018/+0x01C) were found to be base-class
+  fields, not CdDriver's, in round 88, because the CD driver's methods run on
+  every client object once `SetActiveDataSource` binds them; round 88 also
+  found that `stopService`'s two occupants never read `self` but
+  `CdDriver__RunRequestQueue` loads `$a0 = self` before its `jalr`, which is
+  why the slot keeps a `Self *` parameter.
+- **CdLoc16 is Sony's `CdlLOC`, substitution parked.** Layout (4 bytes at
+  +0x018) and use agree: `CdControl(CdlSetloc, &self->pos, 0)`
+  (code_179d8_h/s), `CdSearchFile`'s `CdlFILE.pos` copied into it
+  (code_179d8_q/s), `CdPosToInt(&self->pos)` (code_179d8_s). The
+  2-alignment of the s16 pair is NOT needed: measured through the pinned
+  pipeline, a whole-struct copy of Sony's 1-aligned
+  `struct { u_char minute, second, sector, track; }` compiles to the same
+  `lwl`/`lwr` + `swl`/`swr` as `CdLoc16`, at a 4-aligned field and from a
+  pointer. The blocker is the include: adding `<libcd.h>` to
+  `include/FileResource.h` (measured with `MAKEFLAGS=-k`) makes exactly four
+  units fail with `conflicting types`, each re-declaring Cd* functions its
+  own way: code_179d8_h (CdSearchFile, CdControl, CdSync, CdRead,
+  CdReadSync), code_179d8_q (CdControlB, CdSearchFile), code_179d8_r
+  (CdControlF, CdRead, CdReadSync, CdSync), code_179d8_s (CdControl,
+  CdIntToPos, CdPosToInt, CdRead, CdReadSync, CdSearchFile, CdSync). Those
+  are those units' polish passes (`sonyheaders.py`). Once they take Sony's
+  prototypes, `CdLoc16` is deleted, `FileResource.h` includes `<libcd.h>`,
+  and `renametype.py --any-stem CdLoc16 CdlLOC` (or a hand edit of the four
+  users: CdDriver.h, code_179d8_h/q/s) finishes it; no field accessor
+  changes, since the halves are never read apart.
+
+### Proposed field and slot names (not applied: accessors outside the job)
+
+| member | proposed | tier | evidence | accessors |
+| --- | --- | --- | --- | --- |
+| slot `+0x078` `slot78` | `processBuffer` | B | every subclass occupant consumes the loaded buffer (list above); callers invoke it right after `New_<Sub>` and before `freeBuffer` | class_3bb8c_g/i/j.c, class_39e08.c, code_2cc8c_b.c, code_179d8_e.c |
+| field `+0x02A` `unk2A` | `loadState` | B | the base ctor zeroes it; Class81940 steps it 0 -> 9 (header) -> 0 / 0 -> 10 (data block) -> 0 and VabStreamObj 1 (VH) -> 6 (VB); both advance it from slot +0x064 on a flags completion bit | code_39094.c, code_179d8_e.c |
+
+The table in the section above lists `unk22`/`unk28`/`unk2A` as write-only:
+that was true of this unit only. `unk22` and `unk28` have since been named
+(`pendingRequests`, `inQueueDispatch`); `unk2A` is the row just above.
+
+`FileResource__LoadFile`'s local `savedPendingGeneration` keeps `isOpen`
+across the load; its name predates the field's and is code_171e0's polish
+work, not a type change.
