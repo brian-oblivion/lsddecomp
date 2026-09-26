@@ -1,11 +1,13 @@
-# D8006EF50__NotifyParents -- MATCHED (34/34 words), round 82
+# FrameClock__NotifyParents -- MATCHED (34/34 words), round 82
+
+> Renamed from `D8006EF50__NotifyParents` on 2026-09-26 (tools/rename.py). Address 0x80042550.
 
 > Renamed from `func_80042550` on 2026-09-25 (tools/rename.py). Address 0x80042550.
 
 Round 82, runner alpha (fifth slot on code_322b4). Unit `src/code_322b4.c`. Fresh ground, no prior body attempt.
 
-- **Where:** D_8006EF50 slot +0x030 (notifyParents override) (`tools/classtable.py`).
-- **What:** Seeds the +0x018 cursor from `parentRefs` (+0x008), walks it with `GetNextBasicClass`, calls each parent's onNotify (+0x038) with (parent, self, event), then clears the cursor. D8006EF50__RemoveParentRef (removeParentRef) keeps that cursor valid when a parent is removed mid-walk.
+- **Where:** gFrameClockMethods slot +0x030 (notifyParents override) (`tools/classtable.py`).
+- **What:** Seeds the +0x018 cursor from `parentRefs` (+0x008), walks it with `GetNextBasicClass`, calls each parent's onNotify (+0x038) with (parent, self, event), then clears the cursor. FrameClock__RemoveParentRef (removeParentRef) keeps that cursor valid when a parent is removed mid-walk.
 - **Result:** byte-exact; 34/34 words, 0 insertions / 0 deletions, whole-image SHA1 green (`./build-and-verify.sh` OK).
 - **Types:** unit-local `D_8006EF50Obj` gains `parentRefs` at +0x008 (was padding); no shared header touched.
 
@@ -16,10 +18,10 @@ Retail has ONE `jal GetNextBasicClass` site, entered by a `j` to the bottom of t
 ## Source
 
 ```c
-/* D_8006EF50 slot +0x030 (notifyParents): walk the parent refs with the
+/* gFrameClockMethods slot +0x030 (notifyParents): walk the parent refs with the
  * cursor at +0x018 (which removeParentRef keeps valid) and pass each the
  * event through its onNotify. */
-void D8006EF50__NotifyParents(D_8006EF50Obj *self, s32 event) {
+void FrameClock__NotifyParents(D_8006EF50Obj *self, s32 event) {
     BasicClass *parent;
 
     self->parentCursor = self->parentRefs;
@@ -36,4 +38,4 @@ A loop whose only call site sits at the bottom, reached by an entry `j` (`j L; .
 
 ## Naming
 
-- `D8006EF50__NotifyParents` -- tier A. Slot +0x030: walks parentRefs via parentCursor and calls each parent's onNotify with the event. Matches the struct field's existing name `notifyParents`.
+- `FrameClock__NotifyParents` -- tier A. Slot +0x030: walks parentRefs via parentCursor and calls each parent's onNotify with the event. Matches the struct field's existing name `notifyParents`.

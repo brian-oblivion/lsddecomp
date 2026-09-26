@@ -8,7 +8,7 @@ Round 82, runner alpha (fourth slot on code_322b4). Unit `src/code_322b4.c`. Fre
 
 - **Where:** not in any method table (allocator).
 - **What:** `BMemPMgrAlloc(0x54)`; if non-NULL, calls slot +0x008 (ctor) of `GetLightRigMethods()` (the gLightRigMethods table) on it and returns it, else NULL.
-- **Result:** byte-exact, 20/20 words, 0 ins / 0 del, whole-image SHA1 green. First build, with the round-82 allocator shape (same as New_D8006EF50).
+- **Result:** byte-exact, 20/20 words, 0 ins / 0 del, whole-image SHA1 green. First build, with the round-82 allocator shape (same as New_FrameClock).
 - **Types:** prototype `void *GetLightRigMethods(void);` added to the unit (defined later in the same unit); no shared header touched.
 
 ## Source

@@ -433,7 +433,7 @@ extern s32 SetActiveDataSourceDriverMode(s32 arg1, s32 arg2, s32 arg3);
 
 /* Same "New_X" shape, zero arguments (uncarved, asm/psyq_memset.s). Stored
  * into `Obj0C::unk8`. */
-extern SubObjG *New_D8006EF50(void);
+extern SubObjG *New_FrameClock(void);
 
 /* Already declared, fully typed, in class_3ac78.h as `Class866E8
  * *New_Class866E8(s32, s32)` (an established New_X allocator for a

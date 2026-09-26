@@ -269,7 +269,7 @@ extern s32 ResetGraph(s32 mode);
    caller, Viewport__Update in src/code_2cc8c_d.c, declares it
    locally with LIBGS.H's own shape. */
 
-extern void *New_D8006EF50(void); /* external, no args; local view returns
+extern void *New_FrameClock(void); /* external, no args; local view returns
                                     void* (used as a generic word/child
                                     pointer here); same callee as
                                     class_39e08.h's own `SubObjG *` view */

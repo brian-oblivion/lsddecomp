@@ -13,7 +13,7 @@
  * Children and companions. addChild/removeChild/removeAllChildren chain
  * Class6B5CC's and also record two companions by the child's class id:
  * `(id & 0xFFF) == 0x114` is the grid manager (Class866E8, include/
- * class_3ac78.h), kept in `grid`; `(id & 0xF) == 5` is a D_8006EF50 object,
+ * class_3ac78.h), kept in `grid`; `(id & 0xF) == 5` is a FrameClock object,
  * kept in `ticker` (Class6B5CC's onNotify routes that class's events to
  * `update`, +0x098, which the subclasses override as Class65650's
  * Update (formerly OnClass6EF50Notify), Entity__Update and DreamSys__TimerTick).
@@ -75,7 +75,7 @@ struct Class866E8;
     /* +0x048 */ s16 lastOffsetValue;     /* MoveAlongLocalAxis's val, setLastOffsetValue; Reset: 300; NotifyMove's magnitude */ \
     /* +0x04A */ u8 pad4A[2];                                                                      \
     /* +0x04C */ struct Class866E8 *grid; /* the class-0x114 child addChild recorded; FindNearbyLink queries it */ \
-    /* +0x050 */ BasicClass *ticker;      /* the class-5 (D_8006EF50) child addChild recorded */   \
+    /* +0x050 */ BasicClass *ticker;      /* the class-5 (FrameClock) child addChild recorded */   \
     /* +0x054 */ s32 pendingExtra         /* setPendingExtra; Reset: 0; NotifyMove adds it to |lastOffsetValue|. The object is 0x58 bytes (New_Actor) */
 
 struct ActorMethods {

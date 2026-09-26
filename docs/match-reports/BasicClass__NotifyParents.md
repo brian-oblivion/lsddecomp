@@ -57,7 +57,7 @@ parent's own `+0x038` slot as `slot38(parent, self, event)`. That is
 "tell everything holding a reference to me that `event` happened", stated
 directly by the code. `tools/classtable.py` across all 60 method tables:
 57 carry this exact address in slot `+0x030`, and the three that do not
-(`StyleCue11`, `D8006EF50__NotifyParents`, `func_80022D0C`) are overrides, so the
+(`StyleCue11`, `FrameClock__NotifyParents`, `func_80022D0C`) are overrides, so the
 slot is genuinely BasicClass's.
 
 `arg1` renamed to `event`: it is passed straight through to `slot38`'s

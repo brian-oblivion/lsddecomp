@@ -16,7 +16,7 @@
  * the coordinate's `super` at the parent's coordinate, and the parent chain is
  * walked through `parent` (ComposeAndApplyRotation, func_8001E7BC). The
  * inherited onNotify is split by the SENDER's class nibble: a Pad (2) goes to
- * onPadEvent, a D_8006EF50 (5) to update, another Class6B5CC (4) to
+ * onPadEvent, a FrameClock (5) to update, another Class6B5CC (4) to
  * dispatchLinkCommand, which on event 2/3 runs tryAttachNearby and on event 4
  * records the sender as `linkTarget`.
  *
@@ -130,7 +130,7 @@ typedef struct AttachCornerList_d294b {
     /* +0x08C */ void (*readUnk20Data)(Self *self, void *dest);            /* Class6B5CC__ReadUnk20Data */ \
     /* +0x090 */ void (*transformAndNotifyParents)(Self *self, GenericCountList_d294 *verts, s32 event); /* Class6B5CC__TransformAndNotifyParents */ \
     /* +0x094 */ void (*onPadEvent)(Self *self, void *sender, s32 event);  /* func_8001D6A4, empty; onNotify's Pad (2) case; DreamSys__ApplyLinkCommand */ \
-    /* +0x098 */ void (*update)(Self *self, void *sender, s32 event);      /* func_8001D6AC, empty; onNotify's D_8006EF50 (5) case; Entity__Update, DreamSys__TimerTick */ \
+    /* +0x098 */ void (*update)(Self *self, void *sender, s32 event);      /* func_8001D6AC, empty; onNotify's FrameClock (5) case; Entity__Update, DreamSys__TimerTick */ \
     /* +0x09C */ void (*dispatchLinkCommand)(Self *self, void *sender, s32 event); /* Class6B5CC__DispatchLinkCommand; onNotify's Class6B5CC (4) case */ \
     /* +0x0A0 */ void (*tryAttachNearby)(Self *self);                      /* Class6B5CC__TryAttachNearby; its 2nd parameter arrives as the caller's untouched $a1 */ \
     /* +0x0A4 */ void (*composeAndApplyRotation)(Self *self, void *vec, void *dst, void *src, s32 count); /* Class6B5CC__ComposeAndApplyRotation */ \
