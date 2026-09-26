@@ -19,7 +19,7 @@ fresh copy (same reasoning as `StyleUpdateEffectSlots`/`TryStartStyleCue`/
 ```c
 extern s32 gStyleCounter;         /* already s32 in class_3bb8c_m.c */
 extern s32 gStyleKind;         /* already s32 in class_3bb8c_m.c and this unit's own DrawStyleTables */
-extern s8 D_800873DC[];        /* 16-entry table, indexed by (gStyleCounter+gStyleKind)&0xF */
+extern s8 gStyleVariantPicks[];        /* 16-entry table, indexed by (gStyleCounter+gStyleKind)&0xF */
 extern s32 gStyleVariant;
 extern s8 gStyleVariantConfigCounts[];        /* divisor table, indexed by "kind" -- raw index, no scale */
 extern s32 D_8008AC84;
@@ -46,7 +46,7 @@ void *PickStyleFallbackConfig(void) {
     u8 *tab;
 
     sum = gStyleCounter + gStyleKind;
-    kind = D_800873DC[sum & 0xF];
+    kind = gStyleVariantPicks[sum & 0xF];
     gStyleVariant = kind;
     divisor = gStyleVariantConfigCounts[kind];
     remainder = sum % divisor;
@@ -84,7 +84,7 @@ Notes:
   only `%`, never `/`, on this pair -- writing an unused `quotient = sum /
   divisor;` alongside it would be wrong (and would very likely emit a
   spurious `mflo`).
-- `gStyleVariantConfigCounts[kind]` and `D_800873DC[idx]` are indexed with NO scale factor
+- `gStyleVariantConfigCounts[kind]` and `gStyleVariantPicks[idx]` are indexed with NO scale factor
   in retail (`addu $at,$at,$a0`, not `sll`+`addu`) because both are `s8`
   arrays -- plain C array indexing on a 1-byte element type already
   reproduces this without any special casting.

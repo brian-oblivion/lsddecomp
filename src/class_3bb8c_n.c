@@ -67,7 +67,7 @@ void StyleFlushDecoration(void) {
 
 extern s32 gStyleCounter;
 extern s32 gStyleKind;
-extern s8 D_800873DC[];
+extern s8 gStyleVariantPicks[];
 extern s32 gStyleVariant;
 extern s8 gStyleVariantConfigCounts[];
 extern s32 D_8008AC84;
@@ -90,7 +90,7 @@ void *PickStyleFallbackConfig(void) {
     u8 *tab;
 
     sum = gStyleCounter + gStyleKind;
-    kind = D_800873DC[sum & 0xF];
+    kind = gStyleVariantPicks[sum & 0xF];
     gStyleVariant = kind;
     divisor = gStyleVariantConfigCounts[kind];
     remainder = sum % divisor;

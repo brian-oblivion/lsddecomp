@@ -2917,3 +2917,4 @@ gStyleKind0Counts = 0x80087324;
 gStyleSpawnYChoices = 0x80087328;
 gStyleVariantConfigs = 0x800873C8;
 gStyleVariantConfigCounts = 0x800873D8;
+gStyleVariantPicks = 0x800873DC;
