@@ -9,9 +9,9 @@
  * It holds two classes:
  *
  * - Four empty leaves plus the table getter (VariantSprite__Update,
- *   VariantSprite__NoOpSlotBC/48/50, GetVariantSpriteMethods) of the unrelated
- *   VariantSprite (table `gVariantSpriteMethods`, 49 slots; include/VariantSprite.h;
- *   its ctor is in `class_3bb8c_p`, two more methods in `class_3bb8c_q`).
+ *   VariantSprite__NoOpSlotBC/C0/C4, GetVariantSpriteMethods) of the
+ *   unrelated VariantSprite (include/VariantSprite.h; its ctor is in
+ *   `class_3bb8c_p`, two more methods in `class_3bb8c_q`).
  * - The WHOLE of `GraphRoom` (round 75 name; table `gGraphRoomMethods`,
  *   73 slots), a TaskCore subclass, unified in include/GraphRoom.h (track 4,
  *   round 87; the header's banner has the slots, fields and evidence).
@@ -51,7 +51,7 @@ extern void *BMemPMgrAlloc(s32 size);
  * (splat matched them itself), and its table getter. VariantSprite__Update is
  * the +0x098 update override of Sprite__Update, typed as that slot; the
  * other three occupy the class's own slots +0x0BC/+0x0C0/+0x0C4, which
- * nothing calls, so they keep the tier-C `Class__func_xxxxx` form. */
+ * nothing calls. */
 void VariantSprite__Update(VariantSprite *self, void *sender, s32 event) {}
 
 void VariantSprite__NoOpSlotBC(void) {}

@@ -18,8 +18,9 @@
  *    table and, for an event in [5,9), the object's own tryAttachNearby.
  *  - Actor__SetLastOffsetValue/SetPendingExtra, GetActorMethods: plain
  *    setters/getter.
- *  - New_VariantSprite + VariantSprite__VariantSprite: allocator and constructor of
- *    an unrelated class, VariantSprite (a Sprite subclass, include/VariantSprite.h).
+ *  - New_VariantSprite + VariantSprite__VariantSprite: allocator and
+ *    constructor of an unrelated class, VariantSprite (a Sprite subclass,
+ *    include/VariantSprite.h).
  *
  * No stalls: Actor__BuildLinkQueries, the last one, matched in round 75
  * (2-argument method call, see its report). No switch jump table in this slice, and no gp_rel/addiu_at/

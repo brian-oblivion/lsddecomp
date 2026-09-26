@@ -1,22 +1,15 @@
 /*
- * class_3bb8c_q -- 0x485BC..0x48738, two methods of VariantSprite (table
- * gVariantSpriteMethods, 49 slots; include/VariantSprite.h). VariantSprite is a 0xA8-byte
- * sprite object: a subclass of the sprite class whose table is gSpriteMethods
- * (tag 0x44; GsSPRITE embedded at +0x64, drawn by Viewport__DrawNode through
- * GsSortSprite), which is itself a SceneNode subclass. Its ctor and
- * allocator (VariantSprite__VariantSprite, New_VariantSprite) are in class_3bb8c_p.c,
- * its empty leaves and table getter in class_3bb8c_t.c; Class876FC
- * (class_3bb8c_s.c) builds five of them per instance.
+ * class_3bb8c_q -- two methods of VariantSprite (include/VariantSprite.h), a
+ * Sprite whose variant, 0 or 1, picks its texture cell and CLUT. The ctor
+ * and allocator are in class_3bb8c_p.c, the empty leaves and table getter
+ * in class_3bb8c_t.c.
  *
- * - VariantSprite__SetVariantClut (slot +0x040, tail-called by the ctor with its
- *   arg1): records the variant and points the sprite's CLUT at that
- *   variant's palette row, overriding the one the base init took from the
+ * - VariantSprite__SetVariantClut (reset, +0x040, called last by the ctor
+ *   with the variant): records the variant and points the GsSPRITE's CLUT
+ *   at that variant's row, replacing the one Sprite's reset took from the
  *   texture.
- * - VariantSprite__UpdateScale (slot +0x048, overrides SceneNode__UpdateScale):
- *   the 2-D version, two num/den ratios into GsSPRITE scalex/scaley.
- *
- * Named round 79; tiers in the reports. Game-level role of the sprites is
- * not established.
+ * - VariantSprite__UpdateScale (+0x048): two num/den ratios into GsSPRITE
+ *   scalex/scaley.
  */
 
 #include "common.h"
