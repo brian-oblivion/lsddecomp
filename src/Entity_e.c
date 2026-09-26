@@ -29,6 +29,7 @@
 #include "common.h"
 #include "Entity.h"
 #include "DreamSys.h"
+#include "Class866E8.h"
 #include "Viewport.h"
 
 void Entity__MoodCue59(Entity *this, EntityMoodHandlerArg *out) {
@@ -47,7 +48,7 @@ void Entity__MoodCue59(Entity *this, EntityMoodHandlerArg *out) {
     }
     this->methods->moveLocalZ(this, -0x80, 0);
     if (this->state == 0xC && this->moodTimer == 0x12C) {
-        ((Unk4CObj *)this->grid)->methods->slot138((Unk4CObj *)this->grid, 1, 1);
+        this->grid->methods->configureRateEntry(this->grid, 1, 1);
     }
 }
 
@@ -81,7 +82,7 @@ void Entity__MoodCue62(Entity *this, EntityMoodHandlerArg *out) {
                 out->unk10 = 0;
                 out->unk34 = -1;
                 if (rand() & 1) {
-                    ((Unk4CObj *)this->grid)->methods->slot138((Unk4CObj *)this->grid, -1, 0);
+                    this->grid->methods->configureRateEntry(this->grid, -1, 0);
                 }
                 this->moodTimer = 0;
                 this->state = 0xA;

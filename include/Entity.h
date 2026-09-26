@@ -60,8 +60,6 @@
 
 typedef struct Entity Entity;
 typedef struct EntityMethods EntityMethods;
-typedef struct Unk4CObj Unk4CObj;
-typedef struct Unk4CMethods Unk4CMethods;
 typedef struct EntityMoodRow EntityMoodRow;
 typedef struct EntityMoodHandlerArg EntityMoodHandlerArg;
 
@@ -141,18 +139,9 @@ typedef void (*EntityPlayTodFn)(Entity *self);
 extern EntityMethods ENTITY_METHODS;
 extern EntityMethods *Get_vtable_Entity(void); /* returns &ENTITY_METHODS */
 
-/* The object Entity__AttachToParent keeps in Actor's `grid` field (+0x04C):
- * its `parent` argument (code_4cd08 passes D_8008ABFC). Actor.h types the
- * field as the grid manager (struct Class866E8); this is the one slot Entity
- * reaches on it. Accessors cast `grid` to it. */
-struct Unk4CMethods {
-    u8 pad000[0x138];
-    void (*slot138)(Unk4CObj *self, s32 arg1, s32 arg2); /* Entity__MoodCue12; result discarded */
-};
-
-struct Unk4CObj {
-    Unk4CMethods *methods; /* +0x00 */
-};
+/* The object Entity__AttachToParent keeps in Actor's `grid` field (+0x04C)
+ * is the grid manager, Class866E8 (include/Class866E8.h; code_4cd08 passes
+ * D_8008ABFC). Entity_b/_e/_g call its configureRateEntry (+0x138). */
 
 /* Default arguments Entity__GetOrCreateUnk100 substitutes when its own
  * `name`/`arg2` parameters are NULL -- both plain 2-word buffers
@@ -202,7 +191,7 @@ Entity *Entity__Entity(Entity *self, s32 moodIndex, void *desc, void *arg2);
 Class6E99C *Entity__GetOrCreateUnk100(Entity *self, void *name, void *arg2, void *arg3, s32 arg4);
 void Entity__Finalize(Entity *self);
 void Entity__Reset(Entity *self);
-void Entity__AttachToParent(Entity *self, Class65650 *peer, void *companion, Unk4CObj *parent, void *offset);
+void Entity__AttachToParent(Entity *self, Class65650 *peer, void *companion, struct Class866E8 *parent, void *offset);
 void Entity__DetachFromParent(Entity *self);
 void Entity__Update(Entity *self, void *sender, s32 event);
 void Entity__NotifyLinkStage(Entity *self, void *sender, s32 event);

@@ -105,13 +105,13 @@ void Entity__Reset(Entity *this) {
     this->methods->deactivate(this);
 }
 
-void Entity__AttachToParent(Entity *this, Class65650 *peer, void *companion, Unk4CObj *parent, void *offset) {
+void Entity__AttachToParent(Entity *this, Class65650 *peer, void *companion, struct Class866E8 *parent, void *offset) {
     if (this->parent != 0) {
         return;
     }
     ((Class65650AttachToParentFn)Get_vtable_Class65650()->attachToParent)((Class65650 *)this, peer, companion, parent,
                                                                           offset);
-    this->grid = (struct Class866E8 *)parent;
+    this->grid = parent;
     if (D_80089EA7[this->moodIndex * 0x10] != 0) {
         return;
     }

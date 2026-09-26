@@ -5,6 +5,7 @@
 #include "ModelData.h"
 #include "TriggerWorld.h"
 #include "DreamSys.h"
+#include "Class866E8.h"
 
 const char gMomPathSymSpy[] = "ETC\\SYMSPY.MOM";
 const char gMomPathSymDog[] = "ETC\\SYMDOG.MOM";
@@ -46,7 +47,7 @@ void TickDreamAuxSlots(void)
 }
 
 extern s32 gDreamAuxStage;
-extern s32 D_8008ABFC;
+extern Class866E8 *D_8008ABFC; /* the grid manager: SetDreamAuxWorld's a1; Entity__AttachToParent keeps it as the entity's grid */
 extern DreamSys *gDreamAuxWorld; /* the player DreamSys: class_3bb8c_l passes its `target` */
 extern s32 D_8008AC04;
 extern s32 D_8008AC08;
@@ -59,7 +60,7 @@ void SetDreamAuxWorld(s32 a0, s32 a1, DreamSys *world, s32 a3, s32 a4)
     u32 i;
 
     gDreamAuxStage = a0;
-    D_8008ABFC = a1;
+    D_8008ABFC = (Class866E8 *)a1;
     gDreamAuxWorld = world;
     D_8008AC04 = a3;
     D_8008AC08 = a4;
@@ -404,8 +405,6 @@ typedef struct {
 extern DreamAuxPos6 gDreamAuxPosTable[];
 extern u8 D_80088F18[];
 
-typedef void (*DreamAuxObjFn3A)(DreamAuxObj *self, void *arg1, void *arg2);
-
 bool SpawnDreamAuxTriggerEntity(s32 kind, void *out, void *ctx, s32 entry)
 {
     Entity *entity = New_Entity(kind, out, (void *)D_8008AC04);
@@ -418,15 +417,13 @@ bool SpawnDreamAuxTriggerEntity(s32 kind, void *out, void *ctx, s32 entry)
             DreamAuxPos6 pos;
         } coords;
         s32 outBuf[4];
-        DreamAuxObj *obj;
 
         coords.ctxVal = *(u16 *)ctx;
         rec = &gDreamAuxSpawnInfo[entry];
         coords.recordVal0 = rec->val0;
         coords.pos = gDreamAuxPosTable[rec->posIndex];
 
-        obj = (DreamAuxObj *)D_8008ABFC;
-        ((DreamAuxObjFn3A)obj->vtable[0x3A])(obj, outBuf, &coords);
+        D_8008ABFC->methods->computeCellOffsets(D_8008ABFC, outBuf, &coords);
         entity->methods->updateRotation(entity, 1, D_80088F18 + rec->val2 * 12);
         ((Class65650AttachToParentFn)entity->methods->attachToParent)((Class65650 *)entity, (Class65650 *)gDreamAuxWorld,
                                                                       (void *)D_8008AC08, (void *)D_8008ABFC, outBuf);

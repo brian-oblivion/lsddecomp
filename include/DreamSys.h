@@ -235,109 +235,9 @@ typedef struct DreamSysCtorArgObj {
 	DreamSysCtorArgMethods *methods;
 } DreamSysCtorArgObj;
 
-/* Object pointed to by DreamSys__SpawnAtLink's `arg1` parameter -- same
-   "vtable pointer at offset 0" shape as this unit's other opaque classes.
-   Unidentified; may or may not be the same class as DreamSysCtorArgObj
-   above (both are eventually forwarded to methods->addChild, but this one is
-   passed through directly rather than via a derived value) -- kept as a
-   separate local view per this unit's "multiple independent views of one
-   table" convention until proven otherwise (round 2026-09-02). */
-typedef struct DreamSysSpawnArgMethods {
-	u8 pad00[0xE4];
-	/* Called by DreamSys__SpawnAtLink as (arg1, &local, this,
-	   &this->linkCoordinates); return value discarded. */
-	void (*slot0xE4)(void *self, void *arg1, struct DreamSys *arg2, PlayerSpawnPoint *arg3);
-} DreamSysSpawnArgMethods;
-typedef struct DreamSysSpawnArgObj {
-	DreamSysSpawnArgMethods *methods;
-} DreamSysSpawnArgObj;
 
-/* Inner struct chased by DreamSys__NotifyLinkAttempt's `arg1 == -2` path: the return of
-   DreamSysUnk4CMethods::slot0x11C (a DreamSysUnk11CResult below) has a
-   pointer at +0x4 to one of THESE, and only +0x2C (a `s16`, compared
-   against the literal 2) is read (round 2026-09-02). */
-typedef struct DreamSysUnk11CInner {
-	s8 unknown_values_0x0[0x2C];
-	s16 unk_0x2C;
-} DreamSysUnk11CInner;
-
-/* Return type of DreamSysUnk4CMethods::slot0x11C. Only +0x4 (a pointer to
-   DreamSysUnk11CInner above) is read, by DreamSys__NotifyLinkAttempt (round 2026-09-02). */
-typedef struct DreamSysUnk11CResult {
-	s8 unknown_values_0x0[4];
-	DreamSysUnk11CInner *unk_0x4;
-} DreamSysUnk11CResult;
-
-/* DreamSys's view of Actor::grid (+0x04C, the Class866E8 grid manager, class 0x114;
-   not unified yet, accessors cast `grid` to this), used by DreamSys__DetachFromParent (slot
-   +0xF0) and DreamSys__TryInstantTeleportLink (slot +0xE8, this round): same "vtable pointer
-   at offset 0" shape as the other opaque views here. Unidentified class. */
-typedef struct DreamSysUnk4CMethods {
-	u8 pad00[0xD4];
-	/* Called by DreamSys__WallLink as (this->grid, arg1), return value
-	   whole-struct-assigned into this->linkCoordinates (a PlayerSpawnPoint)
-	   (round 2026-09-02). */
-	PlayerSpawnPoint *(*slot0xD4)(void *self, void *arg1);
-	u8 pad_0xD8[0xE8 - 0xD8];
-	/* Called by DreamSys__TryInstantTeleportLink as (this->grid, &local, &this->
-	   linkCoordinates) -- `local` is an output buffer also consumed by
-	   methods->setTranslation right after (round 2026-09-02). */
-	void (*slot0xE8)(void *self, void *arg1, PlayerSpawnPoint *arg2);
-	u8 pad_0xEC[0xF0 - 0xEC];
-	void (*slot0xF0)(void *self);
-	u8 pad_0xF4[0x10C - 0xF4];
-	/* Called by DreamSys__FlashbackSaving as (this->grid, 0, 0), return
-	   value forwarded straight into DreamSys::AddFlashback's `pos` argument.
-	   Same slot OFFSET and signature as DreamSysEntityMethods::slot0x10C
-	   below (used for the unrelated `entity` parameter in
-	   DreamSys__ProcessChunkChange) -- plausibly the same underlying class,
-	   but kept as a separate local view per this unit's convention for
-	   "multiple local views of the same table" (round 2026-09-02). */
-	/* Called with (this->grid, 0, 0) by DreamSys__FlashbackSaving (see
-	   above); ALSO called with the identical (0, 0) argument pair by
-	   DreamSys__NotifyLinkAttempt's shared tail block, whose return value is forwarded
-	   straight into vtable slot +0x1D4 (DreamSys__TryStageTimerLink)'s `currentPos`
-	   argument (round 2026-09-02) -- same signature, different caller. */
-	PlayerSpawnPoint *(*slot0x10C)(void *self, s32 arg1, s32 arg2);
-	/* Called by this unit's own Actor__FindNearbyLink as (this->grid, out,
-	   &this->coord2->tx) -- an output buffer (`out`, later read by
-	   Actor__BuildLinkQueries as its own `arg3`) and the same "&self->coord2->tx"
-	   raw byte-offset position pointer as slot0x11C's own call site above
-	   (round 2026-09-04). Named `queryLinkAtPos`: it fills a `LinkQueryBuf`
-	   (`class_3bb8c_p.c`'s own type) from a world position, returning 0 on
-	   success -- accessed only from `class_3bb8c_p.c` (round 57 naming
-	   pass). */
-	s32 (*queryLinkAtPos)(void *self, void *out, void *pos);
-	u8 pad_0x114[0x118 - 0x114];
-	/* Actor__BuildLinkQueries (class_3bb8c_p.c) dispatches to it twice,
-	   both times as (this->grid, pos) with pos an adjacent grid index
-	   (s3 +/- 1), and stores the result into a `GridArrElem *` array slot.
-	   Round 75 corrected the arity: retail sets only a0/a1 at the second
-	   call, and the a2/a3 values visible at the first are the caller's own
-	   leftovers; a 4-argument type kept two extra callee-saved registers
-	   live (Actor__BuildLinkQueries's report). Named `getGridArrElemAt`
-	   in the round 57 naming pass; accessed only from class_3bb8c_p.c. */
-	void *(*getGridArrElemAt)(void *self, s32 pos);
-	/* Called by DreamSys__NotifyLinkAttempt's `arg1 == -2` path as (this->grid,
-	   &this->coord2->tx); the result's `unk_0x4` is chased and its
-	   `unk_0x2C` compared against the literal 2 (round 2026-09-02). */
-	DreamSysUnk11CResult *(*slot0x11C)(void *self, void *arg1);
-} DreamSysUnk4CMethods;
-
-/* Object pointed to by DreamSysUnk4CObj::unk_0x68 -- only the two fields
- * this unit's own Actor__BuildLinkQueries reads are named (round 2026-09-04). */
-typedef struct DreamSysUnk4C68Obj {
-	u8 pad00[0x2];
-	s16 unk_0x2;
-	s32 unk_0x4;
-} DreamSysUnk4C68Obj;
-
-typedef struct DreamSysUnk4CObj {
-	DreamSysUnk4CMethods *methods;
-	u8 pad04[0x68 - 0x4];
-	/* Read by this unit's own Actor__BuildLinkQueries (round 2026-09-04). */
-	DreamSysUnk4C68Obj *unk_0x68;
-} DreamSysUnk4CObj;
+/* Actor::grid is the grid manager, Class866E8 (include/Class866E8.h, track 4
+   round 89); DreamSys.c includes that header and calls it directly. */
 
 /* DreamSys's base class is Actor (include/Actor.h): DreamSys's own methods
    reach the base implementations through GetActorMethods() and upcast. */
@@ -1137,7 +1037,7 @@ MoodGraphPoint *IsDaySpecial(CinematicCall *cinematic, int day);
 /* The occupants of DREAMSYS_METHODS not declared above, in slot order. */
 DreamSys *DreamSys__DreamSys(DreamSys *this, void *arg1, s32 arg2, s32 arg3);
 void DreamSys__ResetSessionState(DreamSys *this);
-void DreamSys__SpawnAtLink(DreamSys *this, DreamSysSpawnArgObj *arg1);
+void DreamSys__SpawnAtLink(DreamSys *this, struct Class866E8 *arg1);
 void DreamSys__DetachFromParent(DreamSys *this);
 void DreamSys__NotifyLinkAttempt(DreamSys *this, s32 arg1);
 void DreamSys__OnPadEvent(DreamSys *this, s32 arg1, s32 mode);

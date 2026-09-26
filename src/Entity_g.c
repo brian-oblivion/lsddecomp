@@ -42,6 +42,7 @@
 #include "common.h"
 #include "Entity.h"
 #include "DreamSys.h"
+#include "Class866E8.h"
 
 /* Data rows this unit's mood-dispatch handlers pass through to a vtable
  * call as an opaque argument -- never dereferenced here, so an opaque byte
@@ -139,7 +140,7 @@ void Entity__MoodCue103(Entity *this, EntityMoodHandlerArg *out) {
         }
     } else if (this->moodTimer == 0x64 || this->moodTimer == 0x320) {
         if (rand() % 5 == 0) {
-            ((Unk4CObj *)this->grid)->methods->slot138((Unk4CObj *)this->grid, 4, 0);
+            this->grid->methods->configureRateEntry(this->grid, 4, 0);
         }
     }
     this->methods->moveLocalZ(this, -0x1E, 0);
