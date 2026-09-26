@@ -31,7 +31,7 @@
  * Its one user is the grid manager (StageMap), which makes one per grid
  * element (New_LbdFile in StageMap__StageMap, with freeGuard set so
  * freeBuffer keeps the fixed buffer), loads each element's chunk through it
- * (StageMap__ApplyRateEntries), links the header block's placements and
+ * (StageMap__ApplyChunkLoads), links the header block's placements and
  * models into the element's cells (StageMap__LoadElementResources), then
  * marks the header consumed (headerReady 2). ObjM__CheckAuxTrigger hands
  * the data block to TryDreamAuxTrigger and releases it when that returns 0.

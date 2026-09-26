@@ -191,7 +191,7 @@ prototype identical to that function's definition.
 > rounds later, with a different absolute count but the same qualitative
 > mismatch. **Per Gate 3, a disagreement means STOP -- no search launched.**
 > This function now belongs in the same class as `StageMap__SplitFootprintSlot`,
-> `StageMap__ComputeFootprintDescriptor` and `StageMap__ApplyRateEntries`: real residue is a clean register
+> `StageMap__ComputeFootprintDescriptor` and `StageMap__ApplyChunkLoads`: real residue is a clean register
 > rotation, but no runner-buildable isolated scaffold reproduces it, so the
 > permuter route needs more surrounding-file context than
 > `setup-permuter.sh` currently provides (head-scale work, not a bounded
@@ -212,7 +212,7 @@ prototype identical to that function's definition.
 > with a provable value range in this function. All five are now
 > individually tested and negative; nothing narrower remains to try here.
 > **A fourth function (`StageMap__BuildFootprintSlots`, joining `StageMap__SplitFootprintSlot`,
-> `StageMap__ComputeFootprintDescriptor`, `StageMap__ApplyRateEntries`) now confirms the same scaffold-mismatch
+> `StageMap__ComputeFootprintDescriptor`, `StageMap__ApplyChunkLoads`) now confirms the same scaffold-mismatch
 > class in this one unit** -- worth flagging as a property of this specific
 > header/class's functions (heavy `Obj866E8` self-pointer traffic, deep
 > call chains through `self->methods->slotNN`) rather than four unrelated

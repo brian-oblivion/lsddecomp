@@ -43,7 +43,7 @@ void LbdFile__LoadHeader(DataSrc39094 *self, char *name) {
 
 ## Track 4 (2026-09-26, round 87)
 
-Renamed `DataSrc39094__LoadHeader` -> `LbdFile__LoadHeader` with `rename.py` (class rename only). It occupies +0x078, FileResource's `void *slot78`; the slot keeps the inherited type and its one caller, StageMap__ApplyRateEntries (src/class_3bb8c.c), calls it through `LbdFileLoadHeaderFn` (track 4 step 6). The class (method table gLbdFileMethods, id 0x903, a FileResource subclass) was named `LbdFile` for its table address, 0x80081940 (renamed from `D_80081940` to `gLbdFileMethods`), as Class6D940 is (FINISHING-PLAN track 4 step 2); the old `DataSrc39094` was the unit's local view name, and dropping its unit suffix leaves `DataSrc`, which every FileResource subclass is. The unified definition is `include/LbdFile.h`.
+Renamed `DataSrc39094__LoadHeader` -> `LbdFile__LoadHeader` with `rename.py` (class rename only). It occupies +0x078, FileResource's `void *slot78`; the slot keeps the inherited type and its one caller, StageMap__ApplyChunkLoads (src/class_3bb8c.c), calls it through `LbdFileLoadHeaderFn` (track 4 step 6). The class (method table gLbdFileMethods, id 0x903, a FileResource subclass) was named `LbdFile` for its table address, 0x80081940 (renamed from `D_80081940` to `gLbdFileMethods`), as Class6D940 is (FINISHING-PLAN track 4 step 2); the old `DataSrc39094` was the unit's local view name, and dropping its unit suffix leaves `DataSrc`, which every FileResource subclass is. The unified definition is `include/LbdFile.h`.
 
 
 ## Track 6 (2026-09-26, round 92, echo)
@@ -57,7 +57,7 @@ says the class "was named `LbdFile` for its table address"; what it named
 then was `Class81940`.
 
 **Class name `LbdFile`, tier A.** The files the class is handed are the
-stage's map chunks, STGnn\Mnnn.LBD: StageMap__ApplyRateEntries calls
+stage's map chunks, STGnn\Mnnn.LBD: StageMap__ApplyChunkLoads calls
 loadHeader (+0x078) with each rate entry's `ptr0`, which
 StageMap__ComputeChunkLoadEntry takes from the grid's callback, and that
 callback is ObjM__OnRegistrantEvent (ObjM__AttachTarget installs it), whose

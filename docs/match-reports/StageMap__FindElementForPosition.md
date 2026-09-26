@@ -177,7 +177,7 @@ NON_MATCHING body promoted, round 73
 >
 > Round 40 explicitly judged this function exhausted and skipped it in
 > favor of never-searched ground. This round staffed it anyway, once the
-> unit's other targets (the dead-reload screen on `StageMap__ApplyRateEntries`/
+> unit's other targets (the dead-reload screen on `StageMap__ApplyChunkLoads`/
 > `StageMap__ComputeFootprintDescriptor`, both negative; two structural probes each on
 > `StageMap__LoadChunksAround`/`StageMap__LoadElementResources`, all four negative) turned up nothing --
 > per this round's own guidance to treat a "permuter-exhausted" verdict as

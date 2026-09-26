@@ -75,4 +75,4 @@ Round 78 (track 3, naming pass, bravo).
 
 | symbol | name | tier | evidence |
 | --- | --- | --- | --- |
-| `func_8004BCE0` | `StageMap__CountFlaggedElements` | A | Pure leaf: loops `self->arr[7]`, counts entries with `flag != 0`, returns the count. A pure count is tier A by the naming rule's own "getter/clamp/list-push" clause -- the mechanics ARE the purpose. Called by `StageMap__ApplyRateEntries` to refresh `self->unk1B4` after flagging/unflagging elements. |
+| `func_8004BCE0` | `StageMap__CountFlaggedElements` | A | Pure leaf: loops `self->arr[7]`, counts entries with `flag != 0`, returns the count. A pure count is tier A by the naming rule's own "getter/clamp/list-push" clause -- the mechanics ARE the purpose. Called by `StageMap__ApplyChunkLoads` to refresh `self->unk1B4` after flagging/unflagging elements. |

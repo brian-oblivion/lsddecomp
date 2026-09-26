@@ -212,7 +212,7 @@ block live after any checkout.
 > function needs a scaffold with more real surrounding-file context before
 > it can be trusted, which is head-scale work, not a bounded runner
 > attempt -- consistent with three other functions in this unit
-> (`StageMap__SplitFootprintSlot`, `StageMap__ComputeFootprintDescriptor`, `StageMap__ApplyRateEntries`, `StageMap__BuildFootprintSlots`)
+> (`StageMap__SplitFootprintSlot`, `StageMap__ComputeFootprintDescriptor`, `StageMap__ApplyChunkLoads`, `StageMap__BuildFootprintSlots`)
 > reaching the identical verdict this round and last.
 >
 > ### Proposed learning

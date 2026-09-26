@@ -413,7 +413,7 @@ load through a runtime-indexed global", §"BLOCKED: the `nop_mflo_mfhi` screen r
   `StageMap__FindElementForPosition` 69/70 after ~183k permuter iterations. (PROGRESS round 73)
 - **A `+4` walker set up from an ARGUMENT register after a loop's count check is GCC's loop
   optimiser, not a C pointer**: advance the parameter itself and take `&p->field` inside the body; a
-  C-initialised second pointer always lands before the check. Closed `StageMap__ApplyRateEntries`. (round 73)
+  C-initialised second pointer always lands before the check. Closed `StageMap__ApplyChunkLoads`. (round 73)
 
 ### 3e. Frames and stack
 

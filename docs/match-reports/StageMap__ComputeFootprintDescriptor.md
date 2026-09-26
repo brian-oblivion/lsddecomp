@@ -149,10 +149,10 @@ were correct and unchanged -- the stall was purely source SHAPE).
 > (round 32's own scaffold: 9 insertions/9 deletions isolated vs 0/0 in
 > context; round 40 rebuilt an independent scaffold from scratch and got
 > the SAME 9/9 mismatch). No search has ever been trusted here either --
-> both rounds correctly declined to search. As with `StageMap__ApplyRateEntries`, there
+> both rounds correctly declined to search. As with `StageMap__ApplyChunkLoads`, there
 > is no inherited "permuter tried, negative" to revert to UNKNOWN, because
 > none was ever recorded as trustworthy in the first place. Family count
-> now stands at 5 confirmed mismatches (`StageMap__ApplyRateEntries`, `StageMap__ComputeFootprintDescriptor`,
+> now stands at 5 confirmed mismatches (`StageMap__ApplyChunkLoads`, `StageMap__ComputeFootprintDescriptor`,
 > `StageMap__SplitFootprintSlot`, `StageMap__BuildFootprintSlots`, `IsPointOutOfBounds`).
 >
 > Checked the 12th lever (hoist a field pair used on every path into
@@ -212,10 +212,10 @@ were correct and unchanged -- the stall was purely source SHAPE).
 > **No search was run** -- per the project's own rule, a result against a
 > scaffold provably scoring a different residue would not transfer, and
 > this scaffold's mismatch (9 vs 0 insertions/deletions) is even larger
-> than `StageMap__ApplyRateEntries`'s sibling case this same round. Not attempted
+> than `StageMap__ApplyChunkLoads`'s sibling case this same round. Not attempted
 > further this round; time went to the three never-searched functions in
 > this unit instead. **Both of this unit's "searched" functions
-> (`StageMap__ApplyRateEntries`, `StageMap__ComputeFootprintDescriptor`) turn out to have scaffolds that do not
+> (`StageMap__ApplyChunkLoads`, `StageMap__ComputeFootprintDescriptor`) turn out to have scaffolds that do not
 > reproduce their real residue** -- worth flagging as a proposed learning:
 > a function whose match report says "permuter searched" should also say
 > whether the scaffold's `--debug` score was ever validated against the
@@ -251,7 +251,7 @@ were correct and unchanged -- the stall was purely source SHAPE).
 > insertions and 9 deletions** -- the real in-context build has ZERO of
 > either (72/106 is purely register-identity + one reread choice, no
 > missing/extra instructions). This is the identical scaffold-context-
-> mismatch trap documented for `StageMap__ApplyRateEntries` in round 17 (an isolated
+> mismatch trap documented for `StageMap__ApplyChunkLoads` in round 17 (an isolated
 > compile schedules a computation differently than the real surrounding
 > file does). Not searched -- a result against a scaffold provably scoring
 > a different residue would not transfer. Scaffold deleted. Not attempted

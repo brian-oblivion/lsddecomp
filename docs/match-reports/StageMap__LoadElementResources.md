@@ -63,7 +63,7 @@ rotation, so the tell is a caller-saved register mismatch instead.
 > real-build residue description (a pure register-allocation choice, no
 > instruction-shape difference) exactly. This function is NOT one of the
 > five confirmed `class_3bb8c`/`Obj866E8` scaffold-mismatch cases
-> (`StageMap__ApplyRateEntries`, `StageMap__ComputeFootprintDescriptor`, `StageMap__SplitFootprintSlot`, `StageMap__BuildFootprintSlots`,
+> (`StageMap__ApplyChunkLoads`, `StageMap__ComputeFootprintDescriptor`, `StageMap__SplitFootprintSlot`, `StageMap__BuildFootprintSlots`,
 > `IsPointOutOfBounds`); its 34,293-iteration search stands as a real,
 > validated negative, not a voided one.
 >
@@ -153,7 +153,7 @@ rotation, so the tell is a caller-saved register mismatch instead.
 > **Search:** `timeout 900 ... -j 4 --stack-diffs --stop-on-zero
 > --best-only`, backgrounded. **34293 iterations. No `rc` captured** -- the
 > same "wrapping shell torn down before the trailing echo runs" trap as
-> this round's `StageMap__LoadChunksAround` search (and round 17's `StageMap__ApplyRateEntries`
+> this round's `StageMap__LoadChunksAround` search (and round 17's `StageMap__ApplyChunkLoads`
 > before it). No permuter workers remained in the process list once
 > checked, consistent with the 900s bound having fired; recorded as
 > uncaptured rather than inferred as `124`.
@@ -603,7 +603,7 @@ reload, one `vec` reload) show the same single-register swap with
 otherwise byte-identical surrounding instructions. Tried and confirmed
 inert: swapping the LOCAL DECLARATION ORDER of `info` relative to
 `hdr`/`target` (moved `info` to declare first) -- zero change in the
-compiled output, consistent with `StageMap__ApplyRateEntries`'s round-13 finding that
+compiled output, consistent with `StageMap__ApplyChunkLoads`'s round-13 finding that
 declaration order does not drive `$s`-register assignment in this
 codebase's GCC 2.6.3 build. Per CLAUDE.md/MATCHING-GUIDE, this is the
 textbook register-identity stall: **not** pursued with `register T v

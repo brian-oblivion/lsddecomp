@@ -67,7 +67,7 @@ says the class "was named `LbdFile` for its table address"; what it named
 then was `Class81940`.
 
 **Class name `LbdFile`, tier A.** The files the class is handed are the
-stage's map chunks, STGnn\Mnnn.LBD: StageMap__ApplyRateEntries calls
+stage's map chunks, STGnn\Mnnn.LBD: StageMap__ApplyChunkLoads calls
 loadHeader (+0x078) with each rate entry's `ptr0`, which
 StageMap__ComputeChunkLoadEntry takes from the grid's callback, and that
 callback is ObjM__OnRegistrantEvent (ObjM__AttachTarget installs it), whose

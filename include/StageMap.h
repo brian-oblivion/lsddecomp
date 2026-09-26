@@ -215,7 +215,7 @@ struct StageMapMethods {
     /* +0x0F8 */ s32 (*buildRateEntries)(StageMap *self, s32 val, LongVec3 *pos,
                                          ChunkSlotSpec *specs); /* StageMap__LoadChunksAround (returns nothing; see the banner) */
     /* +0x0FC */ void (*applyRateEntries)(StageMap *self, ChunkLoadEntry *entries,
-                                          s32 count); /* StageMap__ApplyRateEntries */
+                                          s32 count); /* StageMap__ApplyChunkLoads */
     /* +0x100 */ void (*onNotifyTag1)(StageMap *self, void *sender,
                                       s32 mode); /* StageMap__OnNotifyTag1; OnNotify's class-1 sender case */
     /* +0x104 */ void (*loadElementResources)(StageMap *self, ChunkSlot *elem); /* StageMap__LoadElementResources */
@@ -322,7 +322,7 @@ void StageMap__LoadChunksAround(StageMap *self, s32 val, LongVec3 *pos, ChunkSlo
 s32 StageMap__ComputeNeighbourMask(StageMap *self, s32 val, s32 flag);
 s32 StageMap__ComputeChunkLoadEntry(StageMap *self, ChunkLoadEntry *entry, s32 divisor, s32 flag,
                                  s32 val, s32 savedResult, s32 key); /* 0 or 1; BuildRateEntries discards it */
-void StageMap__ApplyRateEntries(StageMap *self, ChunkLoadEntry *entries, s32 count);
+void StageMap__ApplyChunkLoads(StageMap *self, ChunkLoadEntry *entries, s32 count);
 s32 StageMap__CountFlaggedElements(StageMap *self);
 void StageMap__OnNotifyTag1(StageMap *self, void *sender, s32 mode);
 void StageMap__LoadElementResources(StageMap *self, ChunkSlot *elem);

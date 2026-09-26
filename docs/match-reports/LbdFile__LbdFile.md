@@ -73,7 +73,7 @@ says the class "was named `LbdFile` for its table address"; what it named
 then was `Class81940`.
 
 **Class name `LbdFile`, tier A.** The files the class is handed are the
-stage's map chunks, STGnn\Mnnn.LBD: StageMap__ApplyRateEntries calls
+stage's map chunks, STGnn\Mnnn.LBD: StageMap__ApplyChunkLoads calls
 loadHeader (+0x078) with each rate entry's `ptr0`, which
 StageMap__ComputeChunkLoadEntry takes from the grid's callback, and that
 callback is ObjM__OnRegistrantEvent (ObjM__AttachTarget installs it), whose
@@ -126,7 +126,7 @@ Not applied: every accessor outside `src/code_39094.c` is in StageMap's
 units (class_3bb8c.c, class_3bb8c_b.c), outside this job. For the head to
 apply by type scope.
 
-- `LbdFile.ownerRate` (+0x030) -> `chunkIndex`. StageMap__ApplyRateEntries
+- `LbdFile.ownerRate` (+0x030) -> `chunkIndex`. StageMap__ApplyChunkLoads
   stores in it the same entry value it passed to the grid callback to get
   the file's record (GetGridRecordAt(stage, value)); it is -1 exactly when
   no chunk is held (this ctor, LbdFile__ReleaseHeader; ResetElementCells

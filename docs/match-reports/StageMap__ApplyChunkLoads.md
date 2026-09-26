@@ -1,4 +1,6 @@
-# StageMap__ApplyRateEntries -- MATCHED round 73 (105/105, exact length, whole-image SHA1 green)
+# StageMap__ApplyChunkLoads -- MATCHED round 73 (105/105, exact length, whole-image SHA1 green)
+
+> Renamed from `StageMap__ApplyRateEntries` on 2026-09-26 (tools/rename.py). Address 0x8004bb3c.
 
 > Renamed from `Class866E8__ApplyRateEntries` on 2026-09-26 (tools/rename.py). Address 0x8004bb3c.
 
@@ -57,7 +59,7 @@ allocation wrong.
 
 ## Earlier history (superseded by the match above)
 
-#### Old title: StageMap__ApplyRateEntries -- STALL (register-identity, 90/105 words at correct length)
+#### Old title: StageMap__ApplyChunkLoads -- STALL (register-identity, 90/105 words at correct length)
 
 > **ROUND 47 (charlie): Gate 1b re-verified 90/105, no drift** (rebuild via
 > `make clean && make extract` then the standard `#if 0`->`#if 1` swap,
@@ -76,7 +78,7 @@ allocation wrong.
 > no inherited "permuter tried, negative" to revert to UNKNOWN: the
 > correct prior disposition was already "not searched, scaffold
 > untrustworthy", and it still is. Not re-attempted; the family-wide
-> pattern is now 5 confirmed instances (`StageMap__ApplyRateEntries`, `StageMap__ComputeFootprintDescriptor`,
+> pattern is now 5 confirmed instances (`StageMap__ApplyChunkLoads`, `StageMap__ComputeFootprintDescriptor`,
 > `StageMap__SplitFootprintSlot`, `StageMap__BuildFootprintSlots`, `IsPointOutOfBounds`), reinforcing round
 > 46's own read that this is structural to the family's
 > `self->methods->slotNN` call-chain shape, not a per-function fluke --
@@ -194,7 +196,7 @@ allocation wrong.
 > scoring a DIFFERENT residue than the real build (2 insertions/2 deletions
 > in isolation vs 0/0 in context) -- a permuter-inconclusive result, not an
 > exhausted one. Built a brand-new scaffold from scratch this round
-> (`tools/setup-permuter.sh StageMap__ApplyRateEntries <seed>`, seed = this report's own
+> (`tools/setup-permuter.sh StageMap__ApplyChunkLoads <seed>`, seed = this report's own
 > 90/105 body verbatim) and ran `--debug --stack-diffs` BEFORE searching,
 > per the script's own advice: **base score 480, with 20 stack differences
 > and 2 insertions / 2 deletions** -- the real build has ZERO stack
@@ -255,7 +257,7 @@ allocation wrong.
 > (90/105 confirmed, correct length) and disassembled the compiled `.o`'s
 > prologue directly: saves `s1,s3,s4,s2,s5,ra,s6,s0` at offsets
 > `0x1C,0x24,0x28,0x20,0x2C,0x34,0x30,0x18` off a `-0x38` frame. Retail's
-> own prologue (`asm/nonmatchings/class_3bb8c/StageMap__ApplyRateEntries.s`) saves
+> own prologue (`asm/nonmatchings/class_3bb8c/StageMap__ApplyChunkLoads.s`) saves
 > `s1,s4,s5,s2,ra,s6,s3,s0` at offsets `0x1C,0x28,0x2C,0x20,0x34,0x30,0x24,
 > 0x18` -- **the SAME seven registers (`s0`-`s6`) at the SAME per-register
 > stack slots, no `fp`, same `0x38` frame size, only the ORDER of the `sw`
@@ -286,7 +288,7 @@ allocation wrong.
 > `INCLUDE_ASM` baseline: `funcdiff.py` reports 90/105 with NO "differs
 > outside range" warning, and `objdump -t` confirms the compiled length is
 > `0x1A4` (105 words) -- IDENTICAL to retail's own `.s` header
-> (`nonmatching StageMap__ApplyRateEntries, 0x1A4`). `asm-differ` shows only the
+> (`nonmatching StageMap__ApplyChunkLoads, 0x1A4`). `asm-differ` shows only the
 > already-documented `$s3`<->`$s4` prologue-scheduling difference; no
 > genuine extra or missing instruction. **This report's claim is
 > accurate.** Restored to `INCLUDE_ASM` unchanged; no new attempt made
@@ -298,7 +300,7 @@ allocation wrong.
 > **Checked against the head's second mid-round broadcast, which named
 > this function as "a candidate shape" for a saturated-register-file
 > misdiagnosis (a cross-call cached local inflating the count by one).**
-> `grep -oE 'sw +\$s[0-9]' asm/nonmatchings/class_3bb8c/StageMap__ApplyRateEntries.s | sort -u`
+> `grep -oE 'sw +\$s[0-9]' asm/nonmatchings/class_3bb8c/StageMap__ApplyChunkLoads.s | sort -u`
 > gives exactly **7** distinct registers (`$s0`-`$s6`), both in retail
 > and in this build -- not 8 or 9, so this is NOT a saturated-plus-one
 > case. The register COUNT already matches exactly; the residue is a
@@ -316,7 +318,7 @@ allocation wrong.
 > **UPDATE, round 17, targeted permuter pass.** Still a STALL. Re-verified
 > the preserved 90/105 body against the current build first (per
 > CLAUDE.md's struct-edit/header-merge discipline after a `git merge main`)
-> -- confirmed unchanged: `funcdiff.py StageMap__ApplyRateEntries` reports 90/105 words,
+> -- confirmed unchanged: `funcdiff.py StageMap__ApplyChunkLoads` reports 90/105 words,
 > `build exit=2` (not byte-exact, correctly left as `INCLUDE_ASM`).
 >
 > **A permuter run was attempted and turned out to be measuring a DIFFERENT
@@ -407,12 +409,12 @@ allocation wrong.
 
 Unit: `class_3bb8c`. Slot `Obj866E8Methods::slotFC` (verified against
 `tools/classtable.py 0x800866E8`). Not toolchain-blocked: no `gp_rel` hit,
-no `addiu $at,$at,%lo` hit in `asm/nonmatchings/class_3bb8c/StageMap__ApplyRateEntries.s`,
+no `addiu $at,$at,%lo` hit in `asm/nonmatchings/class_3bb8c/StageMap__ApplyChunkLoads.s`,
 and no dense-`switch`/`jr $v0` table dispatch either.
 
 ## What it does
 
-`void StageMap__ApplyRateEntries(Obj866E8 *self, ChunkLoadEntry *arr1, s32 count)`:
+`void StageMap__ApplyChunkLoads(Obj866E8 *self, ChunkLoadEntry *arr1, s32 count)`:
 iterates `arr1[0..count)` (a 0xC-byte-strided array). Per entry:
 
 1. `e = self->methods->slot118(self, arr1[i].id)` (resolve an `Elem` by
@@ -434,7 +436,7 @@ After the loop: `self->unk1B4 = StageMap__CountFlaggedElements(self)` (already m
 plain count of `self->arr[i].flag != 0`).
 
 New header additions (all committed, additive): `Obj866E8Methods::slotFC`
-(StageMap__ApplyRateEntries's OWN identity slot, verified via classtable -- signature
+(StageMap__ApplyChunkLoads's OWN identity slot, verified via classtable -- signature
 `(self, ChunkLoadEntry *arr1, s32 count)`; later corrected once
 StageMap__LoadChunksAround needed to CALL this slot and the earlier draft signature here
 turned out to have been copy-pasted from slot88's shape by mistake -- see
@@ -449,7 +451,7 @@ and `0x100`; `slot104` sits between them at `0x104`);
 ## Best body reached
 
 ```c
-void StageMap__ApplyRateEntries(Obj866E8 *self, ChunkLoadEntry *arr1, s32 count) {
+void StageMap__ApplyChunkLoads(Obj866E8 *self, ChunkLoadEntry *arr1, s32 count) {
     s32 i;
     Elem *e;
 
@@ -479,7 +481,7 @@ void StageMap__ApplyRateEntries(Obj866E8 *self, ChunkLoadEntry *arr1, s32 count)
 ```
 (Correction from an earlier draft of this report: step 2 dispatches
 `slot88`, an ALREADY-DOCUMENTED slot shared with `StageMap__OnNotifyTag1`
--- StageMap__ApplyRateEntries's own identity is `slotFC` at `+0xFC`, confirmed via
+-- StageMap__ApplyChunkLoads's own identity is `slotFC` at `+0xFC`, confirmed via
 `tools/classtable.py`, and is dispatched INTO from `StageMap__LoadChunksAround`
 elsewhere in this unit, not from within this function's own body. An
 earlier draft of this report conflated the two and, worse, propagated
@@ -487,7 +489,7 @@ earlier draft of this report conflated the two and, worse, propagated
 header mistake was caught and fixed while deriving StageMap__LoadChunksAround's call
 site, which needed `slotFC`'s REAL signature, `(self, ChunkLoadEntry*,
 s32 count)`, to compile. If re-deriving this function, `self->methods`
-offset `0xFC` is `slotFC` = StageMap__ApplyRateEntries itself; do not use that name for
+offset `0xFC` is `slotFC` = StageMap__ApplyChunkLoads itself; do not use that name for
 the offset-`0x88` call above.)
 
 **This body is 104/105 instructions structurally IDENTICAL to retail** --
@@ -620,4 +622,4 @@ Round 78 (track 3, naming pass, bravo).
 
 | symbol | name | tier | evidence |
 | --- | --- | --- | --- |
-| `func_8004BB3C` | `StageMap__ApplyRateEntries` | B | Occupant of `gStageMapMethods` +0x0FC (`slotFC`), verified via classtable as its own identity slot (already documented in `include/class_3bb8c.h`). Iterates the `ChunkLoadEntry[count]` array `StageMap__LoadChunksAround` just filled, resolving an `Elem` per entry (`slot118`) and either attaching (`ptr0 != 0`: `slot78`, sets `rate`, `flag = 1`) or detaching (`slot74`, `flag = 0`) it, then recomputes `self->unk1B4` via `StageMap__CountFlaggedElements`. "Apply...Entries" mirrors the "Build...Entries" name of its own caller-side producer. |
+| `func_8004BB3C` | `StageMap__ApplyChunkLoads` | B | Occupant of `gStageMapMethods` +0x0FC (`slotFC`), verified via classtable as its own identity slot (already documented in `include/class_3bb8c.h`). Iterates the `ChunkLoadEntry[count]` array `StageMap__LoadChunksAround` just filled, resolving an `Elem` per entry (`slot118`) and either attaching (`ptr0 != 0`: `slot78`, sets `rate`, `flag = 1`) or detaching (`slot74`, `flag = 0`) it, then recomputes `self->unk1B4` via `StageMap__CountFlaggedElements`. "Apply...Entries" mirrors the "Build...Entries" name of its own caller-side producer. |

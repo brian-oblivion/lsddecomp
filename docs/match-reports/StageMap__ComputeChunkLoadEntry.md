@@ -131,7 +131,7 @@ were all already correct; the stall was one variable too many).
 > insertions/deletions/reorderings/branch/stack differences, matching the
 > real build's own residue shape exactly -- i.e. check 3 was already run
 > and PASSED, independently, both times. This function's negative is NOT
-> one of the five family members round 46 found voided (`StageMap__ApplyRateEntries`,
+> one of the five family members round 46 found voided (`StageMap__ApplyChunkLoads`,
 > `StageMap__ComputeFootprintDescriptor`, `StageMap__SplitFootprintSlot`, `StageMap__BuildFootprintSlots`, `IsPointOutOfBounds` --
 > all confirmed scaffold-MISMATCHED); `StageMap__ComputeChunkLoadEntry`'s scaffold has twice
 > been confirmed to AGREE with the real build. The ~184,000-iteration
@@ -175,7 +175,7 @@ were all already correct; the stall was one variable too many).
 > fully inert.** Reverted (`git checkout -- src/class_3bb8c.c`; clean
 > build confirmed after).
 >
-> This is a FOURTH confirmed instance (joining `StageMap__ApplyRateEntries`,
+> This is a FOURTH confirmed instance (joining `StageMap__ApplyChunkLoads`,
 > `Snd_setVabAttr`, `NoteOn`) of the same scope limitation: none of
 > `entry`/`fieldVal`/`lo` cross a CALL boundary before their value is
 > consumed (the one call in this function, `self->unk60(...)`, happens
@@ -199,7 +199,7 @@ were all already correct; the stall was one variable too many).
 > residue in this unit, per round 40's own assessment, which this round's
 > reconfirmation agrees with. Given this round's staffing priority was the
 > functions with either an untried lever (dead-reload screen on
-> `StageMap__ApplyRateEntries`/`StageMap__ComputeFootprintDescriptor`) or a real prior permuter signal
+> `StageMap__ApplyChunkLoads`/`StageMap__ComputeFootprintDescriptor`) or a real prior permuter signal
 > (`StageMap__FindElementForPosition`, score 10 from base 20, never 0), and this function has
 > neither (both accumulator swaps have four independent negative manual
 > results each, plus two flat permuter searches that never beat the base

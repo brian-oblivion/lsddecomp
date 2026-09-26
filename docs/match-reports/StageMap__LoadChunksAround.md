@@ -209,7 +209,7 @@ relevant (no header, symbol or type change -- the fix removed a local).
 > --best-only`, backgrounded. **37155 iterations. No `rc` was captured** --
 > the trailing `echo "permuter rc=$?"` never reached the log, the same
 > "wrapping shell torn down before the echo runs" trap round 17 documented
-> for `StageMap__ApplyRateEntries`'s own permuter invocation. The process list showed no
+> for `StageMap__ApplyChunkLoads`'s own permuter invocation. The process list showed no
 > surviving permuter workers when checked after the 900s bound should have
 > elapsed, consistent with the `timeout` bound firing rather than an
 > external kill, but this is inferred from absence, not read off an exit
@@ -365,7 +365,7 @@ If `arg3 == 0`, does nothing at all (whole body skipped). Otherwise:
    `self->arr[i].unk2` into `self->arr[i].unk4->unk32` (field
    `StageMap__ComputeFootprintDescriptor`/`StageMap__FindSlotByNeighbour` already established).
 5. `self->methods->slotFC(self, stackBuf, count)` -- dispatches into
-   `StageMap__ApplyRateEntries` (this unit, also stalled this round).
+   `StageMap__ApplyChunkLoads` (this unit, also stalled this round).
 
 New header additions (all committed, additive; unchanged from the previous
 draft of this report): `Elem::unk2` (u16 @+0x002), `Unk14Obj::unk0` (s32
@@ -373,7 +373,7 @@ draft of this report): `Elem::unk2` (u16 @+0x002), `Unk14Obj::unk0` (s32
 `extern Unk54Struct sRateOffsetTable[]` (reuses the existing 3-`s32`-word shape),
 `extern void StageMap__ComputeChunkLoadEntry(...)` (7-arg prototype, established from this
 call site only), and `Obj866E8Methods::slotFC` fixed to its real signature
-(see `StageMap__ApplyRateEntries`'s report for the mixup that entry had).
+(see `StageMap__ApplyChunkLoads`'s report for the mixup that entry had).
 
 ## Progress this round: 52/140 -> 125/140, and the size-drift bug is FIXED
 
@@ -420,7 +420,7 @@ Both missing instructions were closed this round:
    shorter, and wrong. Applying this project's documented "explicit
    intermediate element pointer" idiom --
    `Elem *e2 = &self->arr[i]; e2->unk4->unk32 = e2->unk2;` -- closed this
-   exactly. (Note this is the SAME idiom that, in `StageMap__ApplyRateEntries`'s stall
+   exactly. (Note this is the SAME idiom that, in `StageMap__ApplyChunkLoads`'s stall
    this round, conspicuously did NOT help an analogous-looking situation;
    see that report. The difference: here the loop genuinely walks ONE
    array via ONE index for BOTH field accesses, so nothing prevents GCC
@@ -730,4 +730,4 @@ Round 78 (track 3, naming pass, bravo).
 
 | symbol | name | tier | evidence |
 | --- | --- | --- | --- |
-| `func_8004B700` | `StageMap__LoadChunksAround` | B | Occupant of `gStageMapMethods` +0x0F8 (`slotF8`, verified its own identity via classtable -- see the corrected slot comment in `include/class_3bb8c.h`). Iterates a `ChunkSlotSpec[7]` (`sDefaultTargetSpecs` at its one known call site), calling `StageMap__ComputeNeighbourMask` once and `StageMap__ComputeChunkLoadEntry` per enabled entry to fill a 7-slot `ChunkLoadEntry` stack buffer, then dispatches the filled count through `slotFC` (`StageMap__ApplyRateEntries`). "Build...RateEntries" names the mechanic (assembling the entry array that the next slot applies), consistent with the sibling already-matched functions in this same vtable region (`StageMap__ConfigureRateEntry`, `StageMap__AdvanceRateCountdown`, `StageMap__FlushRateLatch`). |
+| `func_8004B700` | `StageMap__LoadChunksAround` | B | Occupant of `gStageMapMethods` +0x0F8 (`slotF8`, verified its own identity via classtable -- see the corrected slot comment in `include/class_3bb8c.h`). Iterates a `ChunkSlotSpec[7]` (`sDefaultTargetSpecs` at its one known call site), calling `StageMap__ComputeNeighbourMask` once and `StageMap__ComputeChunkLoadEntry` per enabled entry to fill a 7-slot `ChunkLoadEntry` stack buffer, then dispatches the filled count through `slotFC` (`StageMap__ApplyChunkLoads`). "Build...RateEntries" names the mechanic (assembling the entry array that the next slot applies), consistent with the sibling already-matched functions in this same vtable region (`StageMap__ConfigureRateEntry`, `StageMap__AdvanceRateCountdown`, `StageMap__FlushRateLatch`). |

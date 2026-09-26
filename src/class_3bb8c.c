@@ -12,7 +12,7 @@
  * every enabled tick (paired with class_3ac78's StageMap__AdvanceRateCountdown)
  * to refresh that descriptor and notify on change; StageMap__LoadChunksAround
  * / StageMap__ComputeNeighbourMask / StageMap__ComputeChunkLoadEntry /
- * StageMap__ApplyRateEntries build and apply a per-element rate table from
+ * StageMap__ApplyChunkLoads build and apply a per-element rate table from
  * a ChunkSlotSpec key/flag array (sDefaultTargetSpecs); and
  * StageMap__LoadElementResources / StageMap__ResetElementCells own an
  * element's resource-load and GPU-link cell array (the same 0x668-byte grid
@@ -302,8 +302,8 @@ storeKey:
  * is `arr1` itself (initial value = the incoming argument register).
  * `sp` is therefore assigned from `arr1` inside the body and `arr1` is
  * advanced directly; the old `ep = arr1` copy is what swapped s3/s4.
- * See docs/match-reports/StageMap__ApplyRateEntries.md. */
-void StageMap__ApplyRateEntries(StageMap *self, ChunkLoadEntry *arr1, s32 count) {
+ * See docs/match-reports/StageMap__ApplyChunkLoads.md. */
+void StageMap__ApplyChunkLoads(StageMap *self, ChunkLoadEntry *arr1, s32 count) {
     s32 i;
     ChunkSlot *e;
     ChunkLoadEntryTail *sp;
