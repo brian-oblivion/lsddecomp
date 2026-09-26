@@ -46,6 +46,9 @@
  * libpress starts right after, at DecDCTReset (now psyq_36654).
  */
 #include "common.h"
+#include <libgte.h>
+#include <libgpu.h>
+#include <libpress.h>
 #include "BasicClass.h"
 #include "SceneNode.h"
 #include "FileResource.h"
@@ -290,21 +293,9 @@ void TimBlockSrc__FadeEntry(TimBlockSrc *self, s32 index, TimBlockSrcColor *src)
  * toward the entry's colour: read the row back, then for each of
  * mask - 1 steps blend every non-zero colour (step << (12 - shift)) / 0x1000
  * of the way to the colour and upload the result to the next row down. */
-typedef struct Rect43648 { /* LIBGPU.H RECT */
-    s16 x;
-    s16 y;
-    s16 w;
-    s16 h;
-} Rect43648;
-
-/* LIBGPU.H */
-extern int StoreImage(Rect43648 *rect, u32 *p);
-extern int LoadImage(Rect43648 *rect, u32 *p);
-extern int DrawSync(int mode);
-
 void FadeClutRow(TimBlockSrcEntry *e, s32 index) {
-    Rect43648 dst;
-    Rect43648 src;
+    RECT dst;
+    RECT src;
     u16 out[256];
     u16 in[256];
     s32 i;
@@ -455,8 +446,10 @@ s32 LinkResource__BuildModels(LinkResource *self) {
     return 0;
 }
 
-/* LIBGS.H: void GsMapModelingData(unsigned long *p); */
-void GsMapModelingData(u32 *p);
+/* Sony's LIBGS.H prototype, spelled here until <libgs.h> can be included:
+ * TimImage.h, TileMap.h and TileAtlas.h still define their own GsIMAGE,
+ * GsMAP and GsCELL. */
+void GsMapModelingData(u_long *p);
 
 /* gLinkResourceMethods +0x078: map the TMD in the buffer (past its id word). */
 void LinkResource__MapModel(LinkResource *self) {
@@ -1151,9 +1144,6 @@ void TileAtlas__Load(TileAtlas *self) {
  * new row at x 0x3C0, a new texture page every 64 x (the lower half from v
  * 0x100). */
 
-/* LIBGPU.H */
-extern u16 GetTPage(int tp, int abr, int x, int y);
-
 void TileAtlas__BuildCells(TileAtlas *self) {
     GsCELL *c;
     s32 x = 0x280;
@@ -1299,9 +1289,6 @@ MoviePlayer *New_MoviePlayer(DrawRect *frame, s32 speed, s32 external) {
  * 1 when either fails. Then reset the MDEC the first time any player is built
  * (gMdecInitialized), route its output callback to OnMdecFrameReady, hand the
  * stream the ring (0x12000), clear unk50 and setAutoPlay(1). 0. */
-extern void DecDCTReset(int mode);
-extern int DecDCToutCallback(void (*func)());
-
 s32 MoviePlayer__MoviePlayer(MoviePlayer *self, DrawRect *frame, s32 speed, s32 external) {
     Get_vtable_BasicClass()->ctor((BasicClass *)self);
     self->methods = GetMoviePlayerMethods();
@@ -1498,9 +1485,6 @@ void MoviePlayer__NoOpSlot54(void) {}
  * and VLC-decode into that frame buffer, then hand the sectors back
  * (freeRing); a negative result sets streamEnded and stops the stream. 0. */
 
-/* LIBPRESS.H */
-extern int DecDCTvlc(u32 *bs, u32 *buf);
-
 s32 MoviePlayer__PullFrame(MoviePlayer *self) {
     u32 *data;
     s32 size;
@@ -1531,10 +1515,6 @@ void MoviePlayer__NoOpSlot5C(void) {}
  * decode the next strip (DecDCTout, after a DrawSync when the frame is under
  * 0x80 lines); at the end, frameDone, rewind stripRect to frame's origin,
  * and `finished` once streamEnded. */
-
-/* LIBGPU.H / LIBPRESS.H */
-extern int DrawSync(int mode);
-extern void DecDCTout(u32 *buf, int size);
 
 void MoviePlayer__DrawStrip(MoviePlayer *self) {
     DrawSystem *ds = GetDrawSystem();
@@ -1578,9 +1558,6 @@ s32 MoviePlayer__PollActive(MoviePlayer *self) {
  * frame is under 0x80 lines, and feed frames[frameIndex] to DecDCTin and
  * the first strip to DecDCTout; then haveFrame = pullFrame returned 0, and
  * 0. */
-
-/* LIBPRESS.H */
-extern void DecDCTin(u32 *buf, int mode);
 
 s32 MoviePlayer__DecodeFrame(MoviePlayer *self) {
     MoviePlayer *cur = gActiveMoviePlayer;
