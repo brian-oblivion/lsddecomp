@@ -28,4 +28,15 @@ void LinkResource__NoOp(void) {
 
 ## Naming
 
-- **LinkResource__NoOp**, tier B. Empty body filling LinkResource's own slot78 (called by LinkResource__BuildModels itself); mechanics-only name, no further evidence of purpose.
+- **LinkResource__NoOp**, tier B. Empty body filling LinkResource's own slot +0x084 (`slot84`; the slot LinkResource__BuildModels calls is +0x078, LinkResource__MapModel -- corrected round 89); mechanics-only name, no further evidence of purpose.
+
+## Track 4
+
+2026-09-26, round 89 (delta): LinkResource (table `gLinkResourceMethods`,
+renamed from D_8006F13C) is unified in `include/LinkResource.h`. The
+unit-local views this body used (`DataSrc33808`, `Obj6F13C`, `Buf439EC`,
+`Rec6F13C`/`Buf6F13C`, the `extern s32 D_8006F13C[]` array) are gone:
+`self` is `LinkResource *`, its +0x02C is `TmdModel **models`, the buffer is
+read as `TmdFile *` (include/TmdModel.h), the allocator's descriptor is
+`Src6F240 *`, and the getter returns `&gLinkResourceMethods`.
+Byte-identical.

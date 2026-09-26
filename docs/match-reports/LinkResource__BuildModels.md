@@ -70,3 +70,14 @@ Second build (the first did not compile: `Rec6F13C` is defined later in the unit
 ## Naming
 
 - **LinkResource__BuildModels**, tier A. Slot +0x064: builds the NULL-ended array of New_TmdModel objects LinkResource holds, one per 0x1C-byte record.
+
+## Track 4
+
+2026-09-26, round 89 (delta): LinkResource (table `gLinkResourceMethods`,
+renamed from D_8006F13C) is unified in `include/LinkResource.h`. The
+unit-local views this body used (`DataSrc33808`, `Obj6F13C`, `Buf439EC`,
+`Rec6F13C`/`Buf6F13C`, the `extern s32 D_8006F13C[]` array) are gone:
+`self` is `LinkResource *`, its +0x02C is `TmdModel **models`, the buffer is
+read as `TmdFile *` (include/TmdModel.h), the allocator's descriptor is
+`Src6F240 *`, and the getter returns `&gLinkResourceMethods`.
+Byte-identical.
