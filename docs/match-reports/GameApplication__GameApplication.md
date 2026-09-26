@@ -158,3 +158,52 @@ slot+8 shape documented in `docs/research/class-framework.md`.
 `include/Application.h`; the base-ctor call is
 `GetApplicationMethods()->ctor((Application *)self, arg->unk00)`, an upcast
 that emits no code. Bytes unchanged.
+
+## Track 6 (round 93, echo)
+
+Class `Class6D3C8` renamed `GameApplication` (`tools/renametype.py
+Class6D3C8 GameApplication`), table `D_8006D3C8` renamed
+`gGameApplicationMethods` (`tools/rename.py`). **Tier A.** It is the only
+Application subclass and the one object main() builds (`New_GameApplication(
+&gGameApplicationConfig)` into `gGameApplication`, then initSystems and the
+never-returning runMainLoop); its ctor builds and keeps the game's DreamSys,
+and its own methods are exactly the six hooks Application's main loop calls
+(intro logos, weekly stream, GraphRoom poll, Class865C8 run, cinematic and
+follow-up streams). Main and Application's runMainLoop, its two callers, agree.
+The name claims only "the game's application object", which is what those
+callers make it; it does not name what the sequence is for.
+
+Types renamed with it:
+
+- `Class6D3C8CtorArgs` -> `GameApplicationConfig` (`renametype.py
+  GameApplicationCtorArgs GameApplicationConfig --any-stem`, after the family
+  rename), with `gClass6D3C8CtorArgs` -> `gGameApplicationConfig`. Tier A: one
+  static instance, `{0x13, 0, 1, 1, 1, 1}`, whose words are the data source and
+  on/off switches the hooks test (`playStreams`, `showIntroLogos`,
+  `pollGraphRoom`). The field that keeps it, `ctorArgs`, is now `config`
+  (header edit; the compiler listed 8 accessors, all in code_1677c.c).
+- `Class6D3C8SetDayFn` -> `GameApplicationSeedRandomFn`, following its occupant
+  `GameApplication__SeedRandom` (see that report).
+- `Class6D3C8InitSystemsFn` -> `GameApplicationInitSystemsFn`,
+  `Class6D3C8Methods` -> `GameApplicationMethods`: the family rename.
+- Header guard `CLASS_6D3C8_H` -> `GAMEAPPLICATION_H` by hand: renametype.py's
+  upper-case pattern is `CLASS6D3C8`, so an underscored guard is invisible to it.
+
+Kept: `GameApplicationConfig::unk04` (Class865C8's ctor passes `unk04 == 0` to
+SetActiveDataSourceDriverMode; the driver mode's meaning is not established)
+and `unk14` (handed to DreamSys__func_5ba20, which stores a value >= 0 at the
+still-unnamed DreamSys +0x924). No Sony type applies: the class's fields are a
+config pointer, a flag and a DreamSys pointer.
+
+renametype.py rewrote the old class name inside this and the sibling reports'
+history prose (pending an operator decision; not undone by hand).
+
+Facts the header banner carried, kept here: `classtable.py
+gGameApplicationMethods --vs gApplicationMethods` shares every slot but
++0x008/+0x040/+0x044 and the six +0x050..+0x064 slots Application leaves
+NULL (25 slots, i.e. Application's 0x68-byte table fully populated); the
+object size 0x2C is New_GameApplication's BMemPMgrAlloc(0x2C); the config
+instance is in asm/data/57028.data.s; the previous banner kept the table's
+address as the name because "nothing yet names what the class IS beyond the
+object main runs" -- the pass above is the reading that settles it at the
+level the name claims.

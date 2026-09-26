@@ -90,3 +90,21 @@ inherited `setScreenDims` type; the ctor calls it through
 `GameApplicationSeedRandomFn` (`include/GameApplication.h`). The name is kept rather than
 renamed for the slot: the body seeds the RNG from the day count and does
 nothing a screen-dimensions setter would.
+
+## Track 6 (round 93, echo)
+
+Renamed `GameApplication__SetDayFromTickCount` -> `GameApplication__SeedRandom`
+(`tools/rename.py`); its cast type `GameApplicationSetDayFn` ->
+`GameApplicationSeedRandomFn`. **Tier A**, from the body alone now that the
+callee is matched C (src/code_39094.c): `SeedAndRandom(seed, unused)` is
+`if (seed != 0) srand(seed); return rand();`, and this function discards the
+result, so all it does is seed the C library's RNG with the scratchpad word at
+0x1F800000 reduced mod 365. Nothing stores a day, so "SetDay" claimed more than
+the body shows. What that scratchpad word holds at boot is not established
+(the old name's "TickCount" was a reading, dropped rather than carried).
+
+It fills Application's +0x040 (setScreenDims) with a self-only signature; the
+ctor calls it once through the cast type, after installing this class's table.
+Application's own ctor called the slot earlier under Application's table, so
+the default screen size is still set. The function comment above the body in
+code_1677c.c still says "advances the day cursor": that is track 7's to fix.
