@@ -112,10 +112,15 @@ class Stabs:
                 continue
             if kind == 160:           # N_PSYM: a parameter
                 m = re.match(r"([^:]+):p(.*)", s)
-                if m and cur_fn and self.funcs.get(cur_fn) is None:
+                if m:
+                    # parse EVERY parameter's type: a later parameter can be
+                    # where cc1 first defines a type number (round 88:
+                    # New_TileMap's `atlas:p614=*368` defined TileAtlas * for
+                    # the four TileAtlas methods after it, which then read
+                    # `<t614>`); only the first names the function's `this`
                     t, _ = self.type_at(m.group(2), 0)
-                    self.funcs[cur_fn] = t
-                    cur_fn_param_done = True
+                    if cur_fn and self.funcs.get(cur_fn) is None:
+                        self.funcs[cur_fn] = t
                 continue
             if kind == 128:           # N_LSYM: types and typedefs
                 m = re.match(r"([^:]*):([Tt])(.*)", s)
