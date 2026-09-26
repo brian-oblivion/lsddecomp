@@ -1,8 +1,26 @@
-# ContNrpn1 -- STALL: length ONE WORD SHORT (76/77); 54/77 raw word-match; first real diff at word 55 (vram 0x80034F38)
+# ContNrpn1 -- MATCHED (round 94): 77/77, byte-exact
+
+> Formerly: ContNrpn1 -- STALL: length ONE WORD SHORT (76/77); 54/77 raw word-match; first real diff at word 55 (vram 0x80034F38)
 
 ## Round 94 (runner echo, track 6): Sony types
 
 `Fn80090368` is gone: `D_80090368` is Sony's mark-callback table, and its element type is Sony's `SsMarkCallbackProc` (`void (*)(short, short, short)`, `include/psyq/libsnd.h`). Retail calls the entry with THREE arguments, `(ch, sl, data)`: `$a1` holds the sign-extended slot at the `jalr`. The old two-argument local type dropped `sl`. That is the "slot index used exactly once" residue described below, so the preserved body's call is now `fn(ch, sl, a2 & 0xFF)`.
+
+**That closed it.** With the three-argument call, the round-27 body is 77/77
+and the whole image is byte-exact. A structured rewrite of the same body is
+also 77/77: `&&` in place of the nested `if`/`goto check`, an `if (kind ==
+0x28)` in place of `goto skip_call`, and `fn(ch, sl, a2)` without the
+redundant `& 0xFF`. That rewrite is the live C in `src/code_179d8_k.c`. Every
+residue analysis below, the "slot used exactly once" fusion and the permuter
+and volatile levers, was measuring a body that called the callback with one
+argument too few. None of it is a compiler behaviour worth keeping as a
+learning. The miss was in the TYPE, and it went unseen for as long as the
+function-pointer type was a local guess instead of Sony's
+`SsMarkCallbackProc`.
+
+Verified: `./build-and-verify.sh` gives `OK: build matches retail`,
+`tools/funcdiff.py ContNrpn1` gives 77/77, `typeviews.py --warnings` shows
+0 new and `check-nonmatching.sh` is green.
 
 > Renamed from `func_80034E5C` on 2026-09-23 (tools/rename.py). Address 0x80034e5c.
 

@@ -583,50 +583,37 @@ void ContResetAll(s16 a0, s16 a1) {
  * sequence number); ContNrpn1 calls the entry with (access, seq, data). */
 extern SsMarkCallbackProc D_80090368[][16];
 
-/* STALL -- see docs/match-reports/ContNrpn1.md. Compiled length ONE WORD
- * SHORT (76/77), 54/77 raw word-match, first real content diff at word 55/56:
- * GCC folds the "slot" array-index multiply into the sign-extension in one
- * shift pair because the slot value is used exactly once, where retail
- * materializes the sign-extended slot into its own register first and
- * multiplies separately (the same two-instruction shape retail also uses for
- * the "channel" index, which IS reused later and so never gets fused here
- * either) -- a register/instruction-count residue, not a logic difference. */
-#if 0
-void ContNrpn1(s16 a0, s16 a1, u8 a2)
-{
+/* CC98 (NRPN LSB). While a loop start set by ContNrpn2's kind 0x14 still
+ * waits for its count (unk27 == 1, unk10 == 0), the value becomes the loop
+ * count unk28. Otherwise, unless the current NRPN kind is 0x14 or 0x1E, it
+ * is cached in unk15 and bumps the unk2A step counter. Under kind 0x28 the
+ * value also goes to the sequence's mark callback. */
+void ContNrpn1(s16 a0, s16 a1, u8 a2) {
     Entry90902E8 *rec = &D_800902E8[a0][a1];
     u8 kind;
     SsMarkCallbackProc fn;
 
-    if (rec->unk27 == 1) {
-        if (rec->unk10 == 0) {
-            rec->unk28 = a2;
-            rec->unk10 = 1;
-            goto check;
+    if (rec->unk27 == 1 && rec->unk10 == 0) {
+        rec->unk28 = a2;
+        rec->unk10 = 1;
+    } else {
+        kind = rec->unk16;
+        if (kind != 0x1E && kind != 0x14) {
+            rec->unk15 = a2;
+            rec->unk2A = rec->unk2A + 1;
         }
     }
-    kind = rec->unk16;
-    if (kind != 0x1E && kind != 0x14) {
-        rec->unk15 = a2;
-        rec->unk2A = rec->unk2A + 1;
-    }
-check:
-    if (rec->unk16 != 0x28) {
-        goto skip_call;
-    }
-    {
+    if (rec->unk16 == 0x28) {
         s16 ch = a0;
         s16 sl = a1;
+
         fn = D_80090368[ch][sl];
         if (fn != NULL) {
-            fn(ch, sl, a2 & 0xFF);
+            fn(ch, sl, a2);
         }
     }
-skip_call:
     rec->unk88 = ReadDeltaValue(a0, a1);
 }
-#endif
-INCLUDE_ASM("asm/nonmatchings/code_179d8_k", ContNrpn1);
 
 /* STALL -- see docs/match-reports/ContNrpn2.md. Compiled length EXACT
  * (82/82), 77/82 raw word-match, first real diff at word 40: a single
