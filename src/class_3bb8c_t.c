@@ -56,7 +56,7 @@ void VariantSprite__Update(VariantSprite *self, void *sender, s32 event) {}
 
 void VariantSprite__NoOpSlotBC(void) {}
 
-void VariantSprite__func_57f48(void) {}
+void VariantSprite__NoOpSlotC0(void) {}
 
 void VariantSprite__func_57f50(void) {}
 

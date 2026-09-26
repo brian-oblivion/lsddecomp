@@ -1,4 +1,6 @@
-# VariantSprite__func_57f48 -- MATCHED (2/2)
+# VariantSprite__NoOpSlotC0 -- MATCHED (2/2)
+
+> Renamed from `VariantSprite__func_57f48` on 2026-09-26 (tools/rename.py). Address 0x80057f48.
 
 > Renamed from `Class879C4__func_57f48` on 2026-09-26 (tools/rename.py). Address 0x80057f48.
 
