@@ -291,22 +291,15 @@ void Entity__MoodCue75(Entity *this, SoundCueSet *out) {
 }
 
 void Entity__MoodCue76(Entity *this, SoundCueSet *out) {
-    void (*fn)(Entity *self, s32 set, void *table);
-    void *table;
-
     if (this->targetReached != 0) {
         ((EntityPlayTodFn)this->methods->playTod)(this);
         if (this->todFrame == this->todFrameCount - 1) {
             this->methods->stopTod(this);
-            fn = (void (*)(Entity *, s32, void *))this->methods->updateScale;
-            table = SCALE_MINUS_SIXTY_FOURTH;
-            fn(this, 0, table);
+            this->methods->updateScale(this, 0, SCALE_MINUS_SIXTY_FOURTH);
         }
     } else {
         this->methods->stopTod(this);
-        fn = this->methods->updateRotation;
-        table = ROTATION_YAW_PLUS9;
-        fn(this, 0, table);
+        this->methods->updateRotation(this, 0, ROTATION_YAW_PLUS9);
     }
 }
 
