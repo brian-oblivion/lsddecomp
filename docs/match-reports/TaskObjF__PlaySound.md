@@ -58,7 +58,7 @@ None new.
 `(self->unk6C, arg1, 0x7F, 0x7F)` to `self->unk6C`'s own vtable slot,
 the exact call shape of the already-named `Class86668__SetChildFlag8` (renamed `Class86668__PlaySound` in round 84)
 (`src/class_3ac78.c`: `sub->methods->setFlag8(sub, value, 0x7F, 0x7F)`,
-that slot itself named `SceneNode__GetSetUnk10Flag8`) -- same argument
+that slot itself named `SceneNode__SetBackClip`) -- same argument
 count, same two trailing literals. Named by analogy to that established
 shape rather than from an independent derivation of what `0x7F, 0x7F`
 means here, so kept at tier B rather than A.

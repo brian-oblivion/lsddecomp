@@ -63,7 +63,7 @@ u32 SceneNode__SetSubdivision(SceneNode *self, u32 a1) {
 }
 
 /* Same family as SceneNode__GetSetUnk10Flag7: double-inversion shape, shift 8 width 1. */
-s32 SceneNode__GetSetUnk10Flag8(SceneNode *self, s32 a1) {
+s32 SceneNode__SetBackClip(SceneNode *self, s32 a1) {
     return GetSetBitField(&self->attribute, 8, 1, a1 == 0) == 0;
 }
 

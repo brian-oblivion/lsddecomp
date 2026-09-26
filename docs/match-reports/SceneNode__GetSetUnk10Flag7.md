@@ -36,7 +36,7 @@ sltiu $v0, $v0, 0x1       # result = (raw < 1) = (raw == 0)
 ### Proposed learning
 
 None new -- confirms the double-inversion shape is per-function, not
-per-family (this and `SceneNode__GetSetUnk10Flag8`, matched alongside it, are now 2/9
+per-family (this and `SceneNode__SetBackClip`, matched alongside it, are now 2/9
 siblings that use it; the other 7 don't).
 
 ## Naming (round 54, bravo, track 3)
@@ -50,4 +50,4 @@ qualifies as tier A "by definition" per FINISHING-PLAN.md track 3 even
 though the FIELD's own game-level meaning (what bit 7 of `unk10`
 represents) is not established. Safe to rename directly: the only
 references outside this unit are this unit's own `include/code_d294.h`
-and this unit's own `SceneNode__GetSetUnk10Flag8.md` report.
+and this unit's own `SceneNode__SetBackClip.md` report.

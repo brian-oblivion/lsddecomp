@@ -1,4 +1,6 @@
-# SceneNode__GetSetUnk10Flag8 -- MATCHED (12/12 words)
+# SceneNode__SetBackClip -- MATCHED (12/12 words)
+
+> Renamed from `SceneNode__GetSetUnk10Flag8` on 2026-09-26 (tools/rename.py). Address 0x8001d4ac.
 
 > Renamed from `Class6B5CC__GetSetUnk10Flag8` on 2026-09-26 (tools/rename.py). Address 0x8001d4ac.
 
@@ -13,14 +15,14 @@ Same family as `SceneNode__GetSetUnk10Flag7` (see that report) -- double-inversi
 width 1, `s32` return type.
 
 ```c
-s32 SceneNode__GetSetUnk10Flag8(SceneNodeObj *self, s32 a1) {
+s32 SceneNode__SetBackClip(SceneNodeObj *self, s32 a1) {
     return GetSetBitField(&self->unk10, 8, 1, a1 == 0) == 0;
 }
 ```
 
 ## Evidence
 
-Disassembly (`asm/nonmatchings/code_d294_b/SceneNode__GetSetUnk10Flag8.s`):
+Disassembly (`asm/nonmatchings/code_d294_b/SceneNode__SetBackClip.s`):
 ```
 sltiu $a3, $a1, 0x1       # a3 (value) = (a1 == 0)
 addiu $a0, $a0, 0x10      # a0 = &self->unk10
@@ -31,7 +33,7 @@ sltiu $v0, $v0, 0x1       # result = (raw == 0)
 ```
 
 Note: `include/class_3ac78.h` documents an UNRELATED cross-unit call that
-also names this symbol `SceneNode__GetSetUnk10Flag8` but through a different table
+also names this symbol `SceneNode__SetBackClip` but through a different table
 (`Class86668::unk34`) with a 4-argument `(self, arg1, arg2, arg3)` shape at
 its own local slot `+0x080`. That's the same "same code address, different
 argument count per call site" precedent already established for
@@ -46,7 +48,7 @@ None new -- extends the family census.
 
 ## Naming (round 54, bravo, track 3)
 
-**Not renamed -- PROPOSED only.** Proposed name: `SceneNode__GetSetUnk10Flag8`
+**Not renamed -- PROPOSED only.** Proposed name: `SceneNode__SetBackClip`
 (tier A: pure bitfield accessor, shift 8 width 1, double-inverted
 boolean -- same shape as the renamed `SceneNode__GetSetUnk10Flag7`).
 Held back because this symbol is name-checked (in comments, not calls)
