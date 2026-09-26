@@ -57,6 +57,27 @@
 /* What gStyleTargetObj points at: ObjM's +0x06C..+0x07B block (its one
  * caller, ObjM__InitStyleAndWorld, passes &ctorSound to RegisterStyleConfig,
  * which keeps it here; include/ObjM.h). */
+/* The decoration set: this many BoxFill bands, stacked 3 pixels apart. */
+#define STYLE_DECOR_BANDS 18
+
+/* Every band's draw priority: the largest value BoxFill's default 13-bit
+ * priority mask admits (BoxFill__Reset calls setMask(13)). */
+#define STYLE_DECOR_PRI 0x1FFF
+
+/* How far down (pixels) decor variant 2 draws the set. */
+#define STYLE_DECOR_VARIANT2_DROP 30
+
+/* Camera height (the viewport's view point above its reference point) per
+ * fade step of StyleUpdateDecorSet. */
+#define STYLE_DECOR_FADE_HEIGHT 600
+
+/* Kind-0 plus kind-1 effects built for style variant 2. */
+#define STYLE_VARIANT2_EFFECTS 16
+
+/* The palette entry that, as a kind-0 config's decor colour, selects
+ * gStyleDecorColorsB instead of gStyleDecorColorsA (PickStyleFallbackConfig). */
+#define STYLE_DECOR_B_PALETTE_INDEX 18
+
 typedef struct StyleSceneRefs {
     void *sound;        /* +0x000, ObjM::ctorSound: the sound object the cue functions take first */
     void *dreamerTmd;   /* +0x004, ObjM::dreamerTmd */
@@ -114,7 +135,7 @@ void *PickStyleFallbackConfig(void) {
         gStyleClearColor = gStylePalette[clearIndex];
         decorIndex = config[2];
         decorColors = gStyleDecorColorsB;
-        if (decorIndex != 0x12) {
+        if (decorIndex != STYLE_DECOR_B_PALETTE_INDEX) {
             decorColors = gStyleDecorColorsA;
         }
         gStyleDecorColors = decorColors;
@@ -131,7 +152,7 @@ extern s32 gStyleDecorPosX;
 extern s32 gStyleDecorPosY;
 extern s32 gStyleDecorSizeW;
 extern s32 gStyleDecorSizeH;
-extern BoxFill *gStyleDecorSlots[];
+extern BoxFill *gStyleDecorSlots[STYLE_DECOR_BANDS];
 extern StyleSceneRefs *gStyleTargetObj;
 
 /* Local view: gStyleDecorPosX/gStyleDecorPosY and gStyleDecorSizeW/gStyleDecorSizeH are two
@@ -170,12 +191,12 @@ void StyleBuildDecorSet(void) {
     }
     pos = *(PairXY *)&gStyleDecorPosX;
     if (gStyleDecorVariant == 2) {
-        pos.y += 0x1E;
+        pos.y += STYLE_DECOR_VARIANT2_DROP;
     }
     size = *(PairXY *)&gStyleDecorSizeW;
-    gStyleDecorSlots[0] = New_BoxFill(&size, (void *)gStyleDecorColors, 0x1FFF);
-    for (i = 1; i < 0x12; i++) {
-        band = New_BoxFill(&size, (void *)(gStyleDecorColors + i * 3), 0x1FFF);
+    gStyleDecorSlots[0] = New_BoxFill(&size, (void *)gStyleDecorColors, STYLE_DECOR_PRI);
+    for (i = 1; i < STYLE_DECOR_BANDS; i++) {
+        band = New_BoxFill(&size, (void *)(gStyleDecorColors + i * 3), STYLE_DECOR_PRI);
         gStyleDecorSlots[i] = band;
         ((BoxFillAttachToParentFn)band->methods->attachToParent)(
             band, (SceneNode *)gStyleDecorSlots[0], (Pair32E99C *)&pos);
@@ -212,14 +233,14 @@ void StyleUpdateDecorSet(void) {
     }
     viewport = gStyleTargetObj->viewport;
     height = viewport->refView.vp.y - viewport->refView.vr.y;
-    fade = (height / 600) * 3;
+    fade = (height / STYLE_DECOR_FADE_HEIGHT) * 3;
     if (fade <= 0) {
         return;
     }
     pos = *(PairXY *)&gStyleDecorPosX;
     i = 0;
     if (gStyleDecorVariant == 2) {
-        pos.y += 0x1E;
+        pos.y += STYLE_DECOR_VARIANT2_DROP;
     }
     slot = gStyleDecorSlots;
     colorOfs = 0;
@@ -234,7 +255,7 @@ void StyleUpdateDecorSet(void) {
         band->methods->setPosition(band, (Pair32E99C *)&pos);
         pos.y += 3;
         slot++;
-    } while (i < 0x12);
+    } while (i < STYLE_DECOR_BANDS);
     AdjustRgbByDelta(rgb, (u8 *)gStyleClearColor, fade);
     viewport->methods->setClearColor(viewport, (ViewportRgb *)rgb);
 }
@@ -247,11 +268,11 @@ void AdjustRgbByDelta(u8 *dst, u8 *src, s32 delta) {
 
 extern void ReleaseBasicClassArray(void **array, s32 count);
 extern s32 gStyleDecorVariant;
-extern BoxFill *gStyleDecorSlots[];
+extern BoxFill *gStyleDecorSlots[STYLE_DECOR_BANDS];
 
 void StyleReleaseDecorSet(void) {
     if (gStyleDecorVariant != 0) {
-        ReleaseBasicClassArray((void **)gStyleDecorSlots, 0x12);
+        ReleaseBasicClassArray((void **)gStyleDecorSlots, ARRAY_COUNT(gStyleDecorSlots));
         gStyleDecorVariant = 0;
     }
 }
@@ -279,7 +300,7 @@ void StyleBuildEffectSlots(LongVec3 *pos) {
     refs = gStyleTargetObj;
     Actor__func_56f5c(gStyleVariant, (Actor *)refs->dreamerTmd, (s32)refs->etcTim, (s32)refs->viewport);
     kind0Count = gStyleKind0Counts[rand() & 3];
-    kind1Count = (gStyleVariant == 2) ? 0x10 - kind0Count : 0;
+    kind1Count = (gStyleVariant == 2) ? STYLE_VARIANT2_EFFECTS - kind0Count : 0;
     gStyleEffectSlotCount = kind0Count + kind1Count;
     next = StyleFillEffectKind0(gStyleEffectSlots, kind0Count, pos);
     next = StyleFillEffectKind1(next, kind1Count, pos);
@@ -363,7 +384,7 @@ void StyleTeardown(void) {
     StyleFlushDecoration();
     StyleReleaseDecorSet();
     StyleReleaseEffectSlots();
-    for (i = 0; i < 2; i++) {
+    for (i = 0; i < ARRAY_COUNT(gStyleCueSlots); i++) {
         gStyleCueSlots[i] = FlushStyleCue(gStyleCueSlots[i]);
     }
     if (gStyleGrid != 0) {
@@ -456,8 +477,8 @@ Class876FC **StyleFillEffectKind3(Class876FC **slots, LongVec3 *pos) {
 
     SetupStyleSpawnParamsA(pos, gStyleSpawnYChoice2);
     if (gStyleDecorVariant != 0 && gStyleDecorColors == gStyleDecorColorsB) {
-        gStyleSpawnOffsetX = 0xFFFF5000;
-        gStyleSpawnOffsetY = -0x2000;
+        gStyleSpawnOffsetX = -45056;
+        gStyleSpawnOffsetY = -8192;
         gStyleSpawnOffsetZ = 0;
         gStyleSpawnColors[0] = (s32)gStyleKind3Colors[1];
     } else {
@@ -465,14 +486,16 @@ Class876FC **StyleFillEffectKind3(Class876FC **slots, LongVec3 *pos) {
         if (*offsetZ > 0) {
             *offsetZ = -*offsetZ;
         }
-        if (*offsetZ < -0x7800) {
-            *offsetZ = -0x7800;
+        if (*offsetZ < -30720) {
+            *offsetZ = -30720;
         }
         gStyleSpawnColors[0] = (s32)gStyleKind3Colors[(u32)rand() % 3];
     }
     rotation = (PtrBoxK3 *)&gStyleSpawnRotation;
     rotation->p = gStyleSpawnRotations[0];
-    *slots = New_Class876FC(3, (Class876FCParams *)((u8 *)rotation - 0xC), (SceneNode *)gStyleGrid, pos);
+    *slots =
+        New_Class876FC(3, (Class876FCParams *)((u8 *)rotation - offsetof(Class876FCParams, rotation)),
+                       (SceneNode *)gStyleGrid, pos);
     slots++;
     return slots;
 }
@@ -519,7 +542,9 @@ Class876FC **StyleFillEffectKind2(Class876FC **slots, LongVec3 *pos) {
     rotation = &gStyleSpawnRotation;
     *rotation = gStyleSpawnRotations[0];
     gStyleSpawnTableIndex = rand() % 6;
-    *slots = New_Class876FC(2, (Class876FCParams *)((u8 *)rotation - 0xC), (SceneNode *)gStyleGrid, pos);
+    *slots =
+        New_Class876FC(2, (Class876FCParams *)((u8 *)rotation - offsetof(Class876FCParams, rotation)),
+                       (SceneNode *)gStyleGrid, pos);
     slots++;
     return slots;
 }
@@ -587,11 +612,11 @@ void SetupStyleSpawnParamsB(LongVec3 *pos, s32 offsetY) {
     gStyleSpawnOffsetY = gStyleSpawnYChoice1;
     gStyleSpawnOffsetX = (rand() % 20) << 11;
     dayMod3 = gStyleDay % 3;
-    gStyleSpawnOffsetZ = 0xA000;
+    gStyleSpawnOffsetZ = 40960;
     if (dayMod3 == 1) {
-        gStyleSpawnOffsetZ = -0xA000;
+        gStyleSpawnOffsetZ = -40960;
     } else if (dayMod3 == 2) {
-        gStyleSpawnOffsetZ = 0x800;
+        gStyleSpawnOffsetZ = 2048;
     }
     gStyleSpawnRotation = gStyleSpawnRotations[(u32)rand() % 7];
     gStyleSpawnModelLayout = rand() % 5;
@@ -785,7 +810,7 @@ s32 TickStyle(Descriptor10 *cell, void *unused, s32 lastCue) {
     StyleUpdateEffectSlots(target);
     StyleScrollVramStrips();
     gStyleCueRecordIndex = 0;
-    for (i = 0; i < 2; i++) {
+    for (i = 0; i < ARRAY_COUNT(gStyleCueSlots); i++) {
         if (gStyleCueSlots[i] != 0) {
             if (ServiceStyleCueIfNear(gStyleCueSlots[i], target, unused) == 0) {
                 gStyleCueSlots[i] = FlushStyleCue(gStyleCueSlots[i]);
