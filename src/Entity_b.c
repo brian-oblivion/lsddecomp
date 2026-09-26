@@ -45,7 +45,7 @@ s32 Entity__UpdateTargetProximity(Entity *this) {
             if (dist < 0) {
                 dist = ~dist + 1; /* MATCHING: -dist compiles differently */
             }
-            if (Entity__IsNearTarget(this, pos, dist, row->unk9) != 0) {
+            if (Entity__IsNearTarget(this, pos, dist, row->nearTolerance) != 0) {
                 this->methods->setTargetReached(this, 1);
             }
         }
@@ -69,7 +69,7 @@ s32 Entity__UpdateSoundCueStart(Entity *this) {
             if (dist < 0) {
                 dist = ~dist + 1; /* MATCHING: -dist compiles differently */
             }
-            if (Entity__IsNearTarget(this, pos, dist, row->unk9) != 0) {
+            if (Entity__IsNearTarget(this, pos, dist, row->nearTolerance) != 0) {
                 this->methods->startSoundCue(this);
             }
         }
@@ -124,7 +124,7 @@ s32 Entity__UpdateSoundCueStop(Entity *this) {
         if (dist < 0) {
             dist = ~dist + 1; /* MATCHING: -dist compiles differently */
             pos = &this->coord2->tx;
-            if (Entity__IsNearTarget(this, pos, dist, row->unk9) == 0) {
+            if (Entity__IsNearTarget(this, pos, dist, row->nearTolerance) == 0) {
                 this->methods->stopSoundCue(this);
             }
         }

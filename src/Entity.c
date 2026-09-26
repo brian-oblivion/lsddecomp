@@ -105,8 +105,8 @@ void Entity__Reset(Entity *this) {
     this->methods->deactivate(this);
 }
 
-void Entity__AttachToParent(Entity *this, TodActor *peer, void *companion,
-                            struct StageMap *parent, void *offset) {
+void Entity__AttachToParent(Entity *this, TodActor *peer, void *companion, struct StageMap *parent,
+                            void *offset) {
     if (this->parent != 0) {
         return;
     }
@@ -323,7 +323,7 @@ s32 Entity__UpdateActivationState(Entity *this) {
                 goto randCheck;
             }
             if (row->unk5 != 0) {
-                if (Entity__IsNearTarget(this, &this->coord2->tx, row->unk5, row->unk9) != 0) {
+                if (Entity__IsNearTarget(this, &this->coord2->tx, row->unk5, row->nearTolerance) != 0) {
                     if (row->detachKind == 1) {
                         doDetach = 1;
                     } else if (row->detachKind == 3) {
@@ -366,7 +366,7 @@ s32 Entity__UpdateDeactivationState(Entity *this) {
                     doDetach = 1;
                 }
             } else if (row->unk5 != 0) {
-                dist = Entity__IsNearTarget(this, &this->coord2->tx, row->unk5, row->unk9);
+                dist = Entity__IsNearTarget(this, &this->coord2->tx, row->unk5, row->nearTolerance);
                 if (dist != 0) {
                     if (row->linkKind == 1) {
                         doDetach = 1;

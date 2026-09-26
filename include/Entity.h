@@ -164,7 +164,7 @@ struct EntityMoodRow {
     s8 unk5;           /* +0x05 */
     s8 proximityRange; /* +0x06, read by Entity__UpdateTargetProximity only (compiler-checked, round 71): magnitude (after abs) is Entity__IsNearTarget's distance arg for raising targetReached via setTargetReached; a NEGATIVE value also makes the entity face its target every tick */
     u8 pad07[0x02];
-    s8 unk9; /* +0x09, distance-fixup byte shared by Entity__UpdateTargetProximity/Entity__UpdateSoundCueStart/Entity__UpdateSoundCueStop */
+    s8 nearTolerance; /* +0x09, Entity__IsNearTarget's tolerance for every range test on this row (activation, deactivation, proximity, cue start/stop) */
     u8 pad0A[0x01];
     s8 cueRange; /* +0x0B, read by Entity__UpdateSoundCueStart/Entity__UpdateSoundCueStop only (compiler-checked, round 71): 0 = the cue never auto-starts; magnitude (after abs) is Entity__IsNearTarget's distance arg for starting the sound cue; a NEGATIVE value also stops it again once the target leaves that range. SEPARATE field from proximityRange (+0x06) */
     u8 pad0C[0x04];
