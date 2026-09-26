@@ -1,10 +1,12 @@
-# Class865C8__Finalize — MATCHED (74/74 words)
+# DayTask__Finalize — MATCHED (74/74 words)
+
+> Renamed from `Class865C8__Finalize` on 2026-09-26 (tools/rename.py). Address 0x80049830.
 
 > Renamed from `Obj865C8__Dtor` on 2026-09-26 (tools/rename.py). Address 0x80049830.
 
 > Renamed from `func_80049830` on 2026-09-23 (tools/rename.py). Address 0x80049830.
 
-`Class865C8Methods` slot +0x00C (the dtor).
+`DayTaskMethods` slot +0x00C (the dtor).
 
 ## Disassembly shape
 
@@ -62,7 +64,7 @@ jr $ra
 ## Final C
 
 ```c
-void Class865C8__Finalize(Obj865C8 *self) {
+void DayTask__Finalize(Obj865C8 *self) {
     Obj0C *o = self->unk0C;
     SubObjG *g;
 
@@ -93,7 +95,7 @@ same root cause:
    AFTER the first call (`self->methods->slot14(...)`) rather than before
    it. Retail loads `self->unk0C` into a register in the delay-adjacent
    slot BEFORE the `slot14` call even happens (same "load early since the
-   register is free and needed soon" scheduling `Class865C8__OnInit` showed
+   register is free and needed soon" scheduling `DayTask__OnInit` showed
    earlier this round). My statement order pushed the load after the call,
    and the compiled instruction landed one slot later than retail's,
    shifting everything after it by one word (nop/removed word 8 residue).
@@ -109,7 +111,7 @@ only ever reads the struct field once per step. 74/74 on the rebuild.
 
 ## New/corrected struct knowledge (`include/class_39e08.h`)
 
-- `Class865C8Methods::dtor` (+0x00C) and `::slot14` (+0x014) typed (were
+- `DayTaskMethods::dtor` (+0x00C) and `::slot14` (+0x014) typed (were
   untyped placeholders / grouped `void *` padding).
 - `TimedTaskMethods::dtor` added at +0x00C, typed from this function's own
   `GetTimedTaskMethods()->dtor(self)` call — occupied by `TimedTask__Finalize`
@@ -119,28 +121,28 @@ only ever reads the struct field once per step. 74/74 on the rebuild.
   independent call sites in this one function.
 - **Correction to earlier-this-round typings** (see below): `Obj0C::unk8`,
   `Obj0C::unk10`, and `Obj865C8::unk40`/`unk44`/`unk48` were all typed `s32`
-  by `Class865C8__Init`/`Class865C8__StartObjM` (earlier this session), whose own call
+  by `DayTask__Init`/`DayTask__StartObjM` (earlier this session), whose own call
   sites only ever forward these fields as opaque register values through a
   vtable call that never dereferences them — consistent with either a
   scalar or a pointer at the time. This function dereferences all five
   directly (`->methods->slot4`), settling it: they are `SubObjG *`. Added
   `Obj0C::unkC` (brand new field, same type, same pattern). Both older call
-  sites (`Class865C8__Init`'s two `unk8`/`unk10` forwards,
-  `Class865C8__StartObjM`'s three `unk40`/`unk44`/`unk48` forwards) got explicit
+  sites (`DayTask__Init`'s two `unk8`/`unk10` forwards,
+  `DayTask__StartObjM`'s three `unk40`/`unk44`/`unk48` forwards) got explicit
   `(s32)` casts added at their existing call sites — same register value
   either way, confirmed by rebuilding all nine of this unit's matched
   functions together (all still full matches).
 
 ## Match reports updated (not replaced) for this correction
 
-- `docs/match-reports/Class865C8__Init.md` — `Obj0C::unk8`/`unk10` were
+- `docs/match-reports/DayTask__Init.md` — `Obj0C::unk8`/`unk10` were
   documented there as "plain scalar register-passthrough"; this function
   proves they are pointers. Report NOT rewritten (still an accurate
   description of THAT function's own call sites); adding a short forward
   pointer to this report instead, since CLAUDE.md's per-function report
   policy makes each report a record of what THAT function established, not
   a place to retroactively rewrite once a later function adds evidence.
-- `docs/match-reports/Class865C8__StartObjM.md` — same note for
+- `docs/match-reports/DayTask__StartObjM.md` — same note for
   `unk40`/`unk44`/`unk48`.
 
 (Both updates below, appended as a dated addendum rather than editing the
@@ -173,8 +175,8 @@ from memory each time it's used).
 
 ## Naming
 
-`Class865C8__Finalize` -- tier A. Releases every owned sub-object (`unk0C`'s own three `SubObjG` fields, `unk40`/`unk44`/`unk48`) via their `slot4` release method, then forwards to the base dtor: a pure teardown leaf, mechanics are its purpose.
+`DayTask__Finalize` -- tier A. Releases every owned sub-object (`unk0C`'s own three `SubObjG` fields, `unk40`/`unk44`/`unk48`) via their `slot4` release method, then forwards to the base dtor: a pure teardown leaf, mechanics are its purpose.
 
-## Track 4 (2026-09-26, round 88, Class865C8)
+## Track 4 (2026-09-26, round 88, DayTask)
 
-The class (table D_800865C8, id 0x1F230, TimedTask's subclass) is unified as Class865C8 in include/Class865C8.h; the Obj865C8/Class865C8Methods views in class_39e08.h are gone. Renamed from Obj865C8__Dtor: the +0x00C finalize override (it ends in TimedTask's finalize). SubObjG's slot4 is BasicClass's release, so the six `x = x->methods->slot4(x)` calls are `release`; slot14 is removeChild.
+The class (table D_800865C8, id 0x1F230, TimedTask's subclass) is unified as DayTask in include/DayTask.h; the Obj865C8/DayTaskMethods views in class_39e08.h are gone. Renamed from Obj865C8__Dtor: the +0x00C finalize override (it ends in TimedTask's finalize). SubObjG's slot4 is BasicClass's release, so the six `x = x->methods->slot4(x)` calls are `release`; slot14 is removeChild.

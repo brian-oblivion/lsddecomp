@@ -883,10 +883,10 @@
           "date": "2026-09-26",
           "header": "include/CharSprite.h"
         },
-        "gClass865C8Methods": {
-          "class": "Class865C8",
+        "gDayTaskMethods": {
+          "class": "DayTask",
           "date": "2026-09-26",
-          "header": "include/Class865C8.h"
+          "header": "include/DayTask.h"
         },
         "gDrawSystemMethods": {
           "class": "DrawSystem",

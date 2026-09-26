@@ -114,4 +114,4 @@ Round 78 (charlie), FINISHING-PLAN track 3.
 
 ## Track 4 (2026-09-26, round 89, echo)
 
-Renamed from `ObjM__HandleStateCode` (rename.py): it occupies gObjMMethods +0x090, which `ObjM__OnNotify` runs for a sender whose class id is 0x1F34 (DreamSys), as Class865C8's +0x080 is its onDreamSysNotify. While IntermediateBase::state is 0, codes 0xA..0x11 run enterState4..notifyParentsCodeB (0xB none); otherwise a code from 9 up clears the DreamSys's Actor::state. Tier A for the mechanics.
+Renamed from `ObjM__HandleStateCode` (rename.py): it occupies gObjMMethods +0x090, which `ObjM__OnNotify` runs for a sender whose class id is 0x1F34 (DreamSys), as DayTask's +0x080 is its onDreamSysNotify. While IntermediateBase::state is 0, codes 0xA..0x11 run enterState4..notifyParentsCodeB (0xB none); otherwise a code from 9 up clears the DreamSys's Actor::state. Tier A for the mechanics.

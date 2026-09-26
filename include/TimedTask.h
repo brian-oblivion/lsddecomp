@@ -11,9 +11,9 @@
  *
  * Nothing builds a bare TimedTask (New_TimedTask has no caller); the game
  * uses its two subclasses, whose ctors call TimedTask__TimedTask first:
- * Class865C8 (0x1F230, include/Class865C8.h), built by
+ * DayTask (0x1F230, include/DayTask.h), built by
  * GameApplication__PollStatusObj, which switches on init's return; and ObjM
- * (0x2F230, include/ObjM.h), which Class865C8 builds and hands its sound.
+ * (0x2F230, include/ObjM.h), which DayTask builds and hands its sound.
  *
  * Lifecycle. ctor(soundBankPath, sound): with a path, `sound` is
  * New_VabStreamObj(soundBankPath) and finalize releases it; without one it

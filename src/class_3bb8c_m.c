@@ -16,7 +16,7 @@
  * the "Pause" overlay: AdvancePauseSetup builds the TextRow and, four
  * calls later, pauses the FrameClock, the WBgm and the VabStreamObj and
  * hides the viewport; TeardownPauseOverlay undoes it; the close-ready flag
- * and CloseAndNotifyC/D report 0xC/0xD to the parent (Class865C8's
+ * and CloseAndNotifyC/D report 0xC/0xD to the parent (DayTask's
  * onObjMNotify). NoOpSlotBC is empty. What the state codes mean in the
  * game is not established.
  *

@@ -24,11 +24,11 @@
  * reaches onNotify, which forwards a DrawSystem sender (class id nibble 1)
  * to +0x040 update, which retries on event 2.
  *
- * Its one construction: Class865C8__Class865C8 (src/class_39e08.c),
+ * Its one construction: DayTask__DayTask (src/class_39e08.c),
  * New_WBgm(PickWeeklyGroup(0), NULL, 1): the VAB path is one of the seven
  * gWeeklyGroupTable strings ("SND\\AMBIENT" ... "SND\\STANDERD",
  * asm/data/1B84.rodata.s), no SEQ yet, autoPlay on. That caller keeps the
- * object as Class865C8::bgm (include/Class865C8.h), and
+ * object as DayTask::bgm (include/DayTask.h), and
  * hands it to New_ObjM, whose ObjM keeps it at +0x054 and calls +0x04C
  * pause and +0x050 resume on it (ObjM__AdvancePauseSetup,
  * ObjM__TeardownPauseOverlay; include/ObjM.h).

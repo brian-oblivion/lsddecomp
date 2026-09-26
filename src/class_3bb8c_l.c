@@ -31,7 +31,7 @@
 
 void ObjM__NoOpSlot40(void) {}
 
-/* init. `args` is the building Class865C8's init args: args->unkC is its
+/* init. `args` is the building DayTask's init args: args->unkC is its
  * StageMap (IntermediateBase__Init keeps it as unk14), whose callback
  * becomes ObjM__OnRegistrantEvent. */
 void ObjM__AttachTarget(ObjM *self, IntermediateBaseInitArgs *args, DreamSys *dreamSys) {
@@ -267,7 +267,7 @@ void ObjM__NoOpSlot7C(void) {}
 
 /* initArgs->unk0 as SetupSceneStyle reads it: its +0x07C returns a
  * pointer to one word (class_39e08.h's SubObjE is the same call from
- * Class865C8__OnInit). */
+ * DayTask__OnInit). */
 typedef struct UnkCObj_3bb8c_l UnkCObj_3bb8c_l;
 typedef struct UnkCObjMethods_3bb8c_l UnkCObjMethods_3bb8c_l;
 

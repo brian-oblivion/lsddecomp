@@ -1,4 +1,6 @@
-# Class865C8__Deinit — MATCHED (37/37 words)
+# DayTask__Deinit — MATCHED (37/37 words)
+
+> Renamed from `Class865C8__Deinit` on 2026-09-26 (tools/rename.py). Address 0x80049ac0.
 
 > Renamed from `Obj865C8__Deinit` on 2026-09-26 (tools/rename.py). Address 0x80049ac0.
 
@@ -44,14 +46,14 @@ jr $ra
 `TimedTask__Deinit` (this unit, already matched:
 `void TimedTask__Deinit(Obj865C8 *self) { Get_vtable_IntermediateBase()->slot48(self); }`) —
 i.e. this function forwards to the SIBLING class's slot48 override
-explicitly, not to its own (`Class865C8__Deinit` itself occupies `gClass865C8Methods`'s
+explicitly, not to its own (`DayTask__Deinit` itself occupies `gDayTaskMethods`'s
 +0x048 slot — this is a self-referential-looking but actually cross-class
 call, resolved by `tools/classtable.py`, not by inspection).
 
 ## Final C
 
 ```c
-void Class865C8__Deinit(Obj865C8 *self) {
+void DayTask__Deinit(Obj865C8 *self) {
     SubObjD *sub = self->unk38;
 
     GetTimedTaskMethods()->slot48(self);
@@ -64,16 +66,16 @@ void Class865C8__Deinit(Obj865C8 *self) {
 ## New struct knowledge (`include/class_39e08.h`)
 
 - `Obj865C8::unk0C` retyped from `s32` (its only other use so far,
-  `Class865C8__StartObjM`'s forwarded arg to `Get_vtable_IntermediateBase()->slot44`, a plain
+  `DayTask__StartObjM`'s forwarded arg to `Get_vtable_IntermediateBase()->slot44`, a plain
   register-passthrough that never dereferences it) to `Obj0C *` — this
-  function dereferences it (`->unk4`) directly. Updated `Class865C8__StartObjM`'s
+  function dereferences it (`->unk4`) directly. Updated `DayTask__StartObjM`'s
   call site with an explicit `(s32)` cast; same register value either way,
   confirmed by rebuilding both functions together (33/33 and 37/37 both
   hold).
 - `Obj865C8::unk10` (s32, new) — passed as a plain register value to a
   `slot14` call, never dereferenced.
 - `Obj865C8::unk38` retyped from `s32` to `SubObjD *` for the same reason as
-  `unk0C` — `Class865C8__StartObjM` never dereferences it either, cast added there
+  `unk0C` — `DayTask__StartObjM` never dereferences it either, cast added there
   too.
 - New opaque type `Obj0C` (only field known: `unk4`, plain scalar,
   no vtable dispatch through it in this unit).
@@ -96,14 +98,14 @@ pointer, retype the FIELD and add an explicit `(s32)` cast at the older,
 opaque call site rather than leaving the field typed `s32` project-wide —
 the cast reproduces the identical register move, and the field's real type
 carries forward to every future reader. Confirmed here with two functions
-(`Class865C8__Deinit`, `Class865C8__StartObjM`) sharing `Obj865C8::unk0C`/`unk38` with
+(`DayTask__Deinit`, `DayTask__StartObjM`) sharing `Obj865C8::unk0C`/`unk38` with
 opposite usage shapes; rebuilding both together after the retype held both
 matches.
 
 ## Naming
 
-`Class865C8__Deinit` -- tier B. Occupies +0x048, the mirror of Init's slot (`gIntermediateBaseMethods`'s +0x048 forwards to `IntermediateBase__Deinit`). Undoes what Init configured on the sub-object and forwards to `TimedTask__Deinit`; the same caveat as Init applies to its specific purpose here.
+`DayTask__Deinit` -- tier B. Occupies +0x048, the mirror of Init's slot (`gIntermediateBaseMethods`'s +0x048 forwards to `IntermediateBase__Deinit`). Undoes what Init configured on the sub-object and forwards to `TimedTask__Deinit`; the same caveat as Init applies to its specific purpose here.
 
-## Track 4 (2026-09-26, round 88, Class865C8)
+## Track 4 (2026-09-26, round 88, DayTask)
 
-The class (table D_800865C8, id 0x1F230, TimedTask's subclass) is unified as Class865C8 in include/Class865C8.h; the Obj865C8/Class865C8Methods views in class_39e08.h are gone. Prefix only. Accessors: unk38 -> dreamSys, unk0C->unk4 -> initArgs->unk4, unk10 -> IntermediateBase's unk10.
+The class (table D_800865C8, id 0x1F230, TimedTask's subclass) is unified as DayTask in include/DayTask.h; the Obj865C8/DayTaskMethods views in class_39e08.h are gone. Prefix only. Accessors: unk38 -> dreamSys, unk0C->unk4 -> initArgs->unk4, unk10 -> IntermediateBase's unk10.

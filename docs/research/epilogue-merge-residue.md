@@ -138,7 +138,7 @@ PY
 
 | where | instances |
 | --- | --- |
-| carved, queued now | **5** — `New_Class865C8`, `New_TimedTask` (class_39e08); `New_StageMap` (class_3ac78); `New_StreamTask`, `New_TaskCore` (code_2c054) |
+| carved, queued now | **5** — `New_DayTask`, `New_TimedTask` (class_39e08); `New_StageMap` (class_3ac78); `New_StreamTask`, `New_TaskCore` (code_2c054) |
 | `class_3bb8c` (uncarved) | 11 |
 | `code_2cc8c` (uncarved) | 4 |
 | `code_179d8` (uncarved) | 3 |
@@ -163,7 +163,7 @@ Five instances, all byte-exact, all with `return NULL;` last:
 | --- | --- | --- |
 | `New_StageMap` | class_3ac78 | 27/27 |
 | `New_TimedTask` | class_39e08 | 27/27 |
-| `New_Class865C8` | class_39e08 | 31/31 |
+| `New_DayTask` | class_39e08 | 31/31 |
 | `New_StreamTask` | code_2c054 | 36/36 |
 | `New_TaskCore` | code_2c054 | 31/31 |
 

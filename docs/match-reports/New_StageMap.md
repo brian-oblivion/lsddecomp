@@ -8,7 +8,7 @@
 
 This is the **canonical account of how the `New_X` epilogue-merge residue
 class was closed.** Four other reports point here:
-`New_Class865C8`, `New_TimedTask` (class_39e08), `New_StreamTask`,
+`New_DayTask`, `New_TimedTask` (class_39e08), `New_StreamTask`,
 `New_TaskCore` (code_2c054).
 
 ## What it does
@@ -74,7 +74,7 @@ Five instances closed in one pass, all byte-exact:
 | --- | --- | --- |
 | `New_StageMap` | class_3ac78 | 27/27 |
 | `New_TimedTask` | class_39e08 | 27/27 |
-| `New_Class865C8` | class_39e08 | 31/31 |
+| `New_DayTask` | class_39e08 | 31/31 |
 | `New_StreamTask` | code_2c054 | 36/36 |
 | `New_TaskCore` | code_2c054 | 31/31 |
 
@@ -129,7 +129,7 @@ Round 67 (track 3, naming pass).
 | --- | --- | --- | --- |
 | `func_8004A4C8` | `New_StageMap` | A | Body is the project's established `New_X` shape: allocate `0x1E8` via `BMemPMgrAlloc`, and on success dispatch the class's ctor slot `+0x008` with the caller's two arguments, else return NULL. `New_Class` is the convention named in FINISHING-PLAN.md track 3, and this report already used the phrase before the rename. |
 
-The one call site is `src/class_39e08.c`'s `Class865C8__Class865C8`, the boot path:
+The one call site is `src/class_39e08.c`'s `DayTask__DayTask`, the boot path:
 `arg1->unkC = (SubObjG *)New_StageMap(0, 1);`. So exactly one instance of
 this class exists, created at game start.
 

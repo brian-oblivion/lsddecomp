@@ -304,7 +304,7 @@ The three units' banners were rewritten as documentation (track 6). What they ca
  * gStageMapMethods (80 slots, header 0x114; tools/classtable.py gStageMapMethods). It
  * derives from SceneNode (code_d294) through LightRig (include/LightRig.h,
  * gLightRigMethods: the three flat lights and the ambient colour), whose ctor
- * and finalize its own chain to, and the game builds exactly one, at boot, in class_39e08's Class865C8__Class865C8 via New_StageMap(0, 1).
+ * and finalize its own chain to, and the game builds exactly one, at boot, in class_39e08's DayTask__DayTask via New_StageMap(0, 1).
  *
  * What it manages is a GRID. The object owns seven elements (elems[7]), each
  * pairing a loader, a placement list, a parent node, and a 0x668-byte heap

@@ -36,7 +36,7 @@ plus slots +0x07C..+0x09C; `extern void *BMemPMgrAlloc(s32 size);`;
 ## Naming
 
 - **`New_TimImage`**, tier A (proposed round 81, applied 2026-09-26). Evidence: matches the project's
-  `New_Class` constructor-helper convention (`New_Class865C8`,
+  `New_Class` constructor-helper convention (`New_DayTask`,
   `New_BoxFill`, ...: `alloc(size); if (self) { ctor(); return self; }
   return NULL;`); every project-wide call site (`class_39e08.c`,
   `class_3bb8c_d.c`, `class_3bb8c_g.c`, `class_3bb8c_i.c`, `class_3bb8c_j.c`,

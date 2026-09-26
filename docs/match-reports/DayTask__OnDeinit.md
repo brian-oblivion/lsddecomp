@@ -1,4 +1,6 @@
-# Class865C8__OnDeinit
+# DayTask__OnDeinit
+
+> Renamed from `Class865C8__OnDeinit` on 2026-09-26 (tools/rename.py). Address 0x80049c50.
 
 > Renamed from `Obj865C8__RunSubUpdates` on 2026-09-26 (tools/rename.py). Address 0x80049c50.
 
@@ -8,7 +10,7 @@
 
 ## What it does
 
-Method-table slot +0x050 of `gClass865C8Methods` (`Obj865C8`, see
+Method-table slot +0x050 of `gDayTaskMethods` (`Obj865C8`, see
 `include/class_39e08.h`). Reads `self->subA`, then dispatches two calls
 through THAT sub-object's own vtable, slots +0x090 then +0x074, both with
 just the sub-object as argument.
@@ -30,7 +32,7 @@ jalr  $v0
 Written as:
 
 ```c
-void Class865C8__OnDeinit(Obj865C8 *self) {
+void DayTask__OnDeinit(Obj865C8 *self) {
     SubObjA *sub = self->subA;
 
     sub->methods->slot90(sub);
@@ -41,7 +43,7 @@ void Class865C8__OnDeinit(Obj865C8 *self) {
 `SubObjA` is an opaque, minimally-typed view (vtable pointer at offset 0,
 only the two slots this function dispatches through named) -- same policy as
 `DreamSysEntityObj` in `include/DreamSys.h`. Nothing here identifies which
-concrete class `subA` points to; both slot numbers exceed `gClass865C8Methods`'s own
+concrete class `subA` points to; both slot numbers exceed `gDayTaskMethods`'s own
 33-slot table, so it is a genuinely different class, not a self-dispatch.
 
 ## Proposed learning
@@ -50,8 +52,8 @@ None beyond what's already documented.
 
 ## Naming
 
-`Class865C8__OnDeinit` -- tier A. Ticks `subA` (`slot90`/`slot74`) every call; matches the existing `runSubUpdates` field name already on file. A pure per-frame forwarding leaf: mechanics are its purpose.
+`DayTask__OnDeinit` -- tier A. Ticks `subA` (`slot90`/`slot74`) every call; matches the existing `runSubUpdates` field name already on file. A pure per-frame forwarding leaf: mechanics are its purpose.
 
-## Track 4 (2026-09-26, round 88, Class865C8)
+## Track 4 (2026-09-26, round 88, DayTask)
 
-The class (table D_800865C8, id 0x1F230, TimedTask's subclass) is unified as Class865C8 in include/Class865C8.h; the Obj865C8/Class865C8Methods views in class_39e08.h are gone. Renamed from Obj865C8__RunSubUpdates, which misdescribed it: it is the +0x050 onDeinit override, and the two calls are Viewport's deinitOt and detachViewChild.
+The class (table D_800865C8, id 0x1F230, TimedTask's subclass) is unified as DayTask in include/DayTask.h; the Obj865C8/DayTaskMethods views in class_39e08.h are gone. Renamed from Obj865C8__RunSubUpdates, which misdescribed it: it is the +0x050 onDeinit override, and the two calls are Viewport's deinitOt and detachViewChild.

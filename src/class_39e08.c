@@ -10,30 +10,30 @@
 #include "LinkResource.h"
 #include "ObjM.h"
 
-/* The viewpoint and view-reference vectors Class865C8__OnInit hands the
+/* The viewpoint and view-reference vectors DayTask__OnInit hands the
  * viewport's attachViewChild: (0, -1200, 0) and (0, -1200, 10000), the data
  * right before gTimedTaskMethods. */
 extern LongVec3 D_80086650;
 extern LongVec3 D_8008665C;
 
-Class865C8 *New_Class865C8(IntermediateBaseInitArgs *initArgs, DreamSys *dreamSys, s32 arg3) {
-    Class865C8 *self;
+DayTask *New_DayTask(IntermediateBaseInitArgs *initArgs, DreamSys *dreamSys, s32 arg3) {
+    DayTask *self;
 
     self = BMemPMgrAlloc(0x50);
     if (self != NULL) {
-        GetClass865C8Methods()->ctor(self, initArgs, dreamSys, arg3);
+        GetDayTaskMethods()->ctor(self, initArgs, dreamSys, arg3);
         return self;
     }
     return NULL;
 }
 
-void Class865C8__Class865C8(Class865C8 *self, IntermediateBaseInitArgs *initArgs,
+void DayTask__DayTask(DayTask *self, IntermediateBaseInitArgs *initArgs,
                             DreamSys *dreamSys, s32 arg3) {
     LoadRequest req;
     s32 tmp;
 
     GetTimedTaskMethods()->ctor((TimedTask *)self, (char *)GetSoundEffectDir(0), 0);
-    self->methods = GetClass865C8Methods();
+    self->methods = GetDayTaskMethods();
     InitDreamAux();
     self->etcTim = New_TimImage((char *)D_800113EC);
     ((TimImageUploadFn)self->etcTim->methods->processBuffer)(self->etcTim);
@@ -56,7 +56,7 @@ void Class865C8__Class865C8(Class865C8 *self, IntermediateBaseInitArgs *initArgs
     self->methods->resetCounters(self);
 }
 
-void Class865C8__Finalize(Class865C8 *self) {
+void DayTask__Finalize(DayTask *self) {
     IntermediateBaseInitArgs *o = self->initArgs;
     BasicClass *g;
 
@@ -74,7 +74,7 @@ void Class865C8__Finalize(Class865C8 *self) {
     GetTimedTaskMethods()->finalize((TimedTask *)self);
 }
 
-void Class865C8__OnNotify(Class865C8 *self, BasicClass *sender, s32 event) {
+void DayTask__OnNotify(DayTask *self, BasicClass *sender, s32 event) {
     s32 tag;
 
     GetTimedTaskMethods()->onNotify((TimedTask *)self, sender, event);
@@ -86,11 +86,11 @@ void Class865C8__OnNotify(Class865C8 *self, BasicClass *sender, s32 event) {
     }
 }
 
-void Class865C8__ResetPhase(Class865C8 *self) {
+void DayTask__ResetPhase(DayTask *self) {
     self->phase = 0;
 }
 
-s32 Class865C8__Init(Class865C8 *self) {
+s32 DayTask__Init(DayTask *self) {
     DreamSys *sub = self->dreamSys;
 
     sub->methods->addChild(sub, self->initArgs->pad);
@@ -99,7 +99,7 @@ s32 Class865C8__Init(Class865C8 *self) {
     return GetTimedTaskMethods()->init((TimedTask *)self, self->initArgs, 0);
 }
 
-void Class865C8__Deinit(Class865C8 *self) {
+void DayTask__Deinit(DayTask *self) {
     DreamSys *sub = self->dreamSys;
 
     GetTimedTaskMethods()->deinit((TimedTask *)self);
@@ -108,7 +108,7 @@ void Class865C8__Deinit(Class865C8 *self) {
     sub->methods->removeChild(sub, self->unk10);
 }
 
-void Class865C8__OnInit(Class865C8 *self) {
+void DayTask__OnInit(DayTask *self) {
     SubObjE *obj;
     Viewport *vp;
     SceneNode *ret;
@@ -126,14 +126,14 @@ void Class865C8__OnInit(Class865C8 *self) {
     self->phase = 1;
 }
 
-void Class865C8__OnDeinit(Class865C8 *self) {
+void DayTask__OnDeinit(DayTask *self) {
     Viewport *vp = (Viewport *)self->viewport;
 
     vp->methods->deinitOt(vp);
     vp->methods->detachViewChild(vp);
 }
 
-void Class865C8__AdvancePhase(Class865C8 *self, BasicClass *sender, s32 event) {
+void DayTask__AdvancePhase(DayTask *self, BasicClass *sender, s32 event) {
     s32 result;
 
     GetTimedTaskMethods()->onTag1Notify((TimedTask *)self, sender, event);
@@ -147,7 +147,7 @@ void Class865C8__AdvancePhase(Class865C8 *self, BasicClass *sender, s32 event) {
                     self->methods->setState(self, 3);
                     return;
                 }
-                Class865C8__StartObjM(self, result);
+                DayTask__StartObjM(self, result);
                 break;
             case 2:
                 break;
@@ -155,24 +155,24 @@ void Class865C8__AdvancePhase(Class865C8 *self, BasicClass *sender, s32 event) {
                 self->objM->methods->deinit(self->objM);
                 self->objM->methods->release(self->objM);
                 result = self->dreamSys->methods->getCurrentStage(self->dreamSys);
-                Class865C8__StartObjM(self, result);
+                DayTask__StartObjM(self, result);
                 break;
         }
     }
 }
 
-void Class865C8__StartObjM(Class865C8 *self, s32 stage) {
+void DayTask__StartObjM(DayTask *self, s32 stage) {
     self->objM = New_ObjM(self->sound, self->bgm, self->etcTim, self->dreamerTmd, stage);
     self->methods->addChild(self, (BasicClass *)self->objM);
     self->objM->methods->init(self->objM, self->initArgs, (s32)self->dreamSys);
     self->phase = 2;
 }
 
-void Class865C8__OnState4(void) {}
+void DayTask__OnState4(void) {}
 
-void Class865C8__OnDreamSysNotify(void) {}
+void DayTask__OnDreamSysNotify(void) {}
 
-void Class865C8__OnObjMNotify(Class865C8 *self, BasicClass *sender, s32 event) {
+void DayTask__OnObjMNotify(DayTask *self, BasicClass *sender, s32 event) {
     CinematicCall pos;
     s32 result;
 
@@ -207,8 +207,8 @@ void Class865C8__OnObjMNotify(Class865C8 *self, BasicClass *sender, s32 event) {
     }
 }
 
-Class865C8Methods *GetClass865C8Methods(void) {
-    return &gClass865C8Methods;
+DayTaskMethods *GetDayTaskMethods(void) {
+    return &gDayTaskMethods;
 }
 
 /* Sony's, from the still-uncarved psyq_39094 SDK segment

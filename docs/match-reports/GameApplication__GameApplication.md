@@ -145,7 +145,7 @@ second hidden local.
 ## Naming
 
 **`GameApplication__GameApplication` -- tier A.** Convention `Class__Class` for a
-constructor (compare `Class865C8__Class865C8`, `BasicClass__BasicClass`,
+constructor (compare `DayTask__DayTask`, `BasicClass__BasicClass`,
 `TodActor__TodActor`, etc. -- `grep -rnP '(\w+)__\1\(' src/*.c`). Evident
 from the body itself: dispatched through `GameApplicationMethods.ctor`
 (vtable slot +0x008), calls the base class's own ctor slot first, then
@@ -168,7 +168,7 @@ Application subclass and the one object main() builds (`New_GameApplication(
 &gGameApplicationConfig)` into `gGameApplication`, then initSystems and the
 never-returning runMainLoop); its ctor builds and keeps the game's DreamSys,
 and its own methods are exactly the six hooks Application's main loop calls
-(intro logos, weekly stream, GraphRoom poll, Class865C8 run, cinematic and
+(intro logos, weekly stream, GraphRoom poll, DayTask run, cinematic and
 follow-up streams). Main and Application's runMainLoop, its two callers, agree.
 The name claims only "the game's application object", which is what those
 callers make it; it does not name what the sequence is for.
@@ -189,7 +189,7 @@ Types renamed with it:
 - Header guard `CLASS_6D3C8_H` -> `GAMEAPPLICATION_H` by hand: renametype.py's
   upper-case pattern is `CLASS6D3C8`, so an underscored guard is invisible to it.
 
-Kept: `GameApplicationConfig::unk04` (Class865C8's ctor passes `unk04 == 0` to
+Kept: `GameApplicationConfig::unk04` (DayTask's ctor passes `unk04 == 0` to
 SetActiveDataSourceDriverMode; the driver mode's meaning is not established)
 and `unk14` (handed to DreamSys__func_5ba20, which stores a value >= 0 at the
 still-unnamed DreamSys +0x924). No Sony type applies: the class's fields are a

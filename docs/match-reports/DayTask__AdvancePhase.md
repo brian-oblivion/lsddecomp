@@ -1,12 +1,14 @@
-# Class865C8__AdvancePhase — MATCHED (94/94 words)
+# DayTask__AdvancePhase — MATCHED (94/94 words)
 
-> Renamed from `Class865C8__AdvanceState` on 2026-09-26 (tools/rename.py). Address 0x80049ca8.
+> Renamed from `Class865C8__AdvancePhase` on 2026-09-26 (tools/rename.py). Address 0x80049ca8.
+
+> Renamed from `DayTask__AdvanceState` on 2026-09-26 (tools/rename.py). Address 0x80049ca8.
 
 > Renamed from `Obj865C8__AdvanceState` on 2026-09-26 (tools/rename.py). Address 0x80049ca8.
 
 > Renamed from `func_80049CA8` on 2026-09-23 (tools/rename.py). Address 0x80049ca8.
 
-`Class865C8Methods` slot +0x054.
+`DayTaskMethods` slot +0x054.
 
 ## Disassembly shape
 
@@ -83,8 +85,8 @@ jalr  $v0
  nop                          ; result = self->unk38->methods->slot1E0(self->unk38)
 addu  $a0, $s1, $zero
 .L80049DFC:                  ; shared tail
-jal   Class865C8__StartObjM
- addu $a1, $v0, $zero        ; Class865C8__StartObjM(self, result)
+jal   DayTask__StartObjM
+ addu $a1, $v0, $zero        ; DayTask__StartObjM(self, result)
 END:
 ...
 jr $ra
@@ -93,9 +95,9 @@ jr $ra
 ## Final C
 
 ```c
-extern void Class865C8__StartObjM(Obj865C8 *self, s32 arg1);
+extern void DayTask__StartObjM(Obj865C8 *self, s32 arg1);
 
-void Class865C8__AdvancePhase(Obj865C8 *self, s32 arg1, s32 arg2) {
+void DayTask__AdvancePhase(Obj865C8 *self, s32 arg1, s32 arg2) {
     s32 result;
 
     GetTimedTaskMethods()->slot54(self, arg1, arg2);
@@ -109,7 +111,7 @@ void Class865C8__AdvancePhase(Obj865C8 *self, s32 arg1, s32 arg2) {
                 self->methods->onEventArg(self, 3);
                 return;
             }
-            Class865C8__StartObjM(self, result);
+            DayTask__StartObjM(self, result);
             break;
         case 2:
             break;
@@ -117,14 +119,14 @@ void Class865C8__AdvancePhase(Obj865C8 *self, s32 arg1, s32 arg2) {
             self->unk4C->methods->slot48(self->unk4C);
             self->unk4C->methods->slot4(self->unk4C);
             result = self->unk38->methods->slot1E0(self->unk38);
-            Class865C8__StartObjM(self, result);
+            DayTask__StartObjM(self, result);
             break;
         }
     }
 }
 ```
 
-`Class865C8__StartObjM` is defined LATER in this file (ROM order requires the C
+`DayTask__StartObjM` is defined LATER in this file (ROM order requires the C
 definition to stay where it is), so a local `extern` forward prototype was
 added right above this function -- same "calling into a function that is
 still being written elsewhere" convention CLAUDE.md documents, applied to a
@@ -187,12 +189,12 @@ double-branch tail, or vice versa:
 ## New struct knowledge (`include/class_39e08.h`)
 
 - `TimedTaskMethods::slot54` added — inherited, shared verbatim with
-  `gClass865C8Methods`'s own occupant of this slot (this function itself); the
+  `gDayTaskMethods`'s own occupant of this slot (this function itself); the
   sibling's own occupant is `IntermediateBase__OnTag1Notify`, out of this unit's scope.
 - `SubObjDMethods` extended with `slot1B4` (`s32 (*)(SubObjD *self)`,
   return value used — genuinely non-void) and `slot1B8` (`void (*)(SubObjD
   *self, s32 arg1)`), and `slot1E0` (`s32 (*)(SubObjD *self)`, return value
-  forwarded straight into `Class865C8__StartObjM`'s own argument).
+  forwarded straight into `DayTask__StartObjM`'s own argument).
 - `Obj4CMethods` extended with `slot4` and `slot48` (both `void (*)(Obj4C
   *self)`, return discarded at both call sites here).
 
@@ -226,8 +228,8 @@ the visible cases is itself informative about a missing empty case.
 
 ## Naming
 
-`Class865C8__AdvancePhase` -- tier B. Occupies +0x054, `IntermediateBase__OnTag1Notify`'s slot in the base -- the state machine's main per-tag transition function (cases on `state` 1/2/3, transitioning via `Class865C8__StartObjM`). The state machine's shape is clear from the body; what each state represents in-game is not.
+`DayTask__AdvancePhase` -- tier B. Occupies +0x054, `IntermediateBase__OnTag1Notify`'s slot in the base -- the state machine's main per-tag transition function (cases on `state` 1/2/3, transitioning via `DayTask__StartObjM`). The state machine's shape is clear from the body; what each state represents in-game is not.
 
-## Track 4 (2026-09-26, round 88, Class865C8)
+## Track 4 (2026-09-26, round 88, DayTask)
 
-The class (table D_800865C8, id 0x1F230, TimedTask's subclass) is unified as Class865C8 in include/Class865C8.h; the Obj865C8/Class865C8Methods views in class_39e08.h are gone. Renamed from Obj865C8__AdvanceState (the field is `phase`, see Class865C8__ResetPhase). +0x054 onTag1Notify override: runs the base's, then on event 2 moves phase 1 (startDay) or 3 (release the old objM, getCurrentStage) to 2 through StartObjM. eventCode is TimedTask's `result`; onEventArg is setState.
+The class (table D_800865C8, id 0x1F230, TimedTask's subclass) is unified as DayTask in include/DayTask.h; the Obj865C8/DayTaskMethods views in class_39e08.h are gone. Renamed from Obj865C8__AdvanceState (the field is `phase`, see DayTask__ResetPhase). +0x054 onTag1Notify override: runs the base's, then on event 2 moves phase 1 (startDay) or 3 (release the old objM, getCurrentStage) to 2 through StartObjM. eventCode is TimedTask's `result`; onEventArg is setState.

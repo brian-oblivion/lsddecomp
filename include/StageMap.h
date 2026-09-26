@@ -14,7 +14,7 @@
  * .. FindSlotForPosition) and src/class_3bb8c_b.c
  * (FindSlotIndexByNeighbour .. GetStageMapMethods).
  *
- * Lifecycle. The game makes one, at boot (Class865C8__Class865C8, via
+ * Lifecycle. The game makes one, at boot (DayTask__DayTask, via
  * New_StageMap(NULL, 1)). ObjM configures it for its stage: setConfig
  * with the stage's StageGridDimensions (GetStageGridDimensions),
  * setCallback with ObjM__OnRegistrantEvent (a chunk index -> that chunk's

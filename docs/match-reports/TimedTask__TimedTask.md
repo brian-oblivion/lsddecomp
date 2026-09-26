@@ -49,7 +49,7 @@ jr $ra
 ```c
 void TimedTask__TimedTask(Obj865C8 *self, s32 arg1, SubObjB *arg2) {
     Get_vtable_IntermediateBase()->ctor(self);
-    self->methods = (Class865C8Methods *)GetTimedTaskMethods();
+    self->methods = (DayTaskMethods *)GetTimedTaskMethods();
     if (arg1 != 0) {
         self->subB = New_VabStreamObj(arg1);
     } else {
@@ -63,8 +63,8 @@ void TimedTask__TimedTask(Obj865C8 *self, s32 arg1, SubObjB *arg2) {
 Note: at the point of the last call, `self->methods` has already been
 reassigned to `GetTimedTaskMethods()`'s table (`gTimedTaskMethods`), so the runtime
 target of `self->methods->resetUnk3C(self)` is `gTimedTaskMethods`'s own +0x040
-override (`TimedTask__CancelTimeout`), not `Class865C8__ResetPhase`. The FIELD name
-(`resetUnk3C`, chosen from `gClass865C8Methods`'s occupant of that slot) still
+override (`TimedTask__CancelTimeout`), not `DayTask__ResetPhase`. The FIELD name
+(`resetUnk3C`, chosen from `gDayTaskMethods`'s occupant of that slot) still
 describes the right SIGNATURE for the shared struct layout; only the actual
 function invoked at runtime differs by which vtable `self->methods` points
 at. No behavioral ambiguity, just a naming note for the next reader.
@@ -84,7 +84,7 @@ at. No behavioral ambiguity, just a naming note for the next reader.
   per CLAUDE.md's "a discarded return is never evidence of void").
 - `TimedTaskMethods` instances documented as sharing `Obj865C8`'s own
   layout: this constructor writes `unk30`/`subB` at exactly the offsets
-  `Obj865C8`'s other (gClass865C8Methods-side) functions already use, so no second
+  `Obj865C8`'s other (gDayTaskMethods-side) functions already use, so no second
   parallel struct was introduced.
 - New extern `SubObjB *New_VabStreamObj(s32 arg1)` (uncarved unit
   `code_179d8`): an allocator (0x64 bytes) whose one call site here stores
@@ -111,7 +111,7 @@ particular call site once a subclass's vtable is installed.
 
 ## Track 4
 
-2026-09-25, round 84 (bravo): class unified in `include/TimedTask.h`. Not renamed. Signature `(TimedTask *self, char *soundBankPath, BasicClass *sound)`; `unk30`/`subB` are `soundBankPath`/`sound`, and the final call is IntermediateBase's `resetCounters` slot (was `resetState`), which this class fills with TimedTask__CancelTimeout. Its first call is IntermediateBase's ctor, and both subclass ctors (Class865C8__Class865C8, ObjM__ObjM) call this one first, so the id tree's parent links hold. Image byte-identical.
+2026-09-25, round 84 (bravo): class unified in `include/TimedTask.h`. Not renamed. Signature `(TimedTask *self, char *soundBankPath, BasicClass *sound)`; `unk30`/`subB` are `soundBankPath`/`sound`, and the final call is IntermediateBase's `resetCounters` slot (was `resetState`), which this class fills with TimedTask__CancelTimeout. Its first call is IntermediateBase's ctor, and both subclass ctors (DayTask__DayTask, ObjM__ObjM) call this one first, so the id tree's parent links hold. Image byte-identical.
 
 ## Track 4 (2026-09-26, round 87, VabStreamObj)
 
@@ -142,13 +142,13 @@ subclasses run the dream day, but that is what the subclasses do, not this
 class).
 
 Moved here from the header banner (derivation, not documentation):
-Class865C8 passes `GetSoundEffectDir()` as soundBankPath; ObjM passes a null
-path and Class865C8's own sound, so only Class865C8's copy releases it.
+DayTask passes `GetSoundEffectDir()` as soundBankPath; ObjM passes a null
+path and DayTask's own sound, so only DayTask's copy releases it.
 PlaySound is TaskCore__PlaySound's shape with 0x7F, 0x7F. ObjM calls the
 same object's +0x088/+0x08C, VabStreamObj's Mute/Unmute.
 `tools/classtable.py` stops at the last non-NULL slot, which is why it shows
 the 0x80-byte table as ending at +0x070. GameApplication__PollStatusObj switches
-on init's return through Class865C8; 2 and 3 are Class865C8's own codes.
+on init's return through DayTask; 2 and 3 are DayTask's own codes.
 
 Proposed, not applied (accessors outside this job's units):
 - slot +0x074 `slot74` -> `togglePause`: NULL here, its one occupant is

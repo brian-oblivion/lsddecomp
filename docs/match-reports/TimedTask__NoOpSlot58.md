@@ -6,7 +6,7 @@
 
 > Renamed from `Obj865C8__Noop58` on 2026-09-23 (tools/rename.py). Address 0x8004a35c.
 
-`Class865C8Methods` slot +0x058. Entire function body:
+`DayTaskMethods` slot +0x058. Entire function body:
 
 ```c
 void TimedTask__NoOpSlot58(void) {
