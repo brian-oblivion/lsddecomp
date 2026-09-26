@@ -21,7 +21,7 @@
 #define CLASS_TAG_MASK   0xF
 #define TAG_PAD          2   /* gPadMethods, PadMethods (include/Pad.h) */
 #define TAG_CLASS6B5CC   4   /* this class and every subclass of it */
-#define TAG_CLASS6EF50   5   /* D_8006EF50 */
+#define TAG_CLASS6EF50   5   /* gFrameClockMethods */
 #define TAG_TMDMODEL     9   /* gTmdModelMethods (include/TmdModel.h): the object Class6B5CC__LinkModel links */
 
 /* Bit positions in GsDOBJ2.attribute (self->unk10), include/psyq/LIBGS.H. */

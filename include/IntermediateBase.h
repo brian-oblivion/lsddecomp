@@ -25,7 +25,7 @@
  *
  * onNotify splits by the SENDER's root class nibble, as Class6B5CC's does:
  * a D_8006C070 (1) goes to onTag1Notify, a Pad (2) to onPadEvent, a
- * D_8006EF50 (5) to update, which here only counts frames. setState stores
+ * FrameClock (5) to update, which here only counts frames. setState stores
  * the state, passes it to notifyParents and runs onState2 or onState3 for 2
  * or 3. Both reset the frame counter and call initArgs->unk0.
  */
@@ -35,12 +35,12 @@ typedef struct IntermediateBaseMethods IntermediateBaseMethods;
 typedef struct IntermediateBaseInitArgs IntermediateBaseInitArgs;
 
 /* init's argument. The caller owns it; the object keeps the pointer at
- * +0x00C. Obj865C8__Obj865C8 fills +0x008..+0x010 itself (New_D8006EF50(),
+ * +0x00C. Obj865C8__Obj865C8 fills +0x008..+0x010 itself (New_FrameClock(),
  * New_Class866E8(0, 1), New_Class869D8()). */
 struct IntermediateBaseInitArgs {
     /* +0x000 */ BasicClass *unk0;     /* added as a child; onState2 calls its +0x048, onState3 its +0x04C */
     /* +0x004 */ BasicClass *unk4;     /* added as a child; onTag1Notify's event 2 calls its +0x044, +0x048 */
-    /* +0x008 */ BasicClass *unk8;     /* becomes unk10; NULL: init makes one with New_D8006EF50() */
+    /* +0x008 */ BasicClass *unk8;     /* becomes unk10; NULL: init makes one with New_FrameClock() */
     /* +0x00C */ BasicClass *unkC;     /* becomes unk14; NULL: init makes one with New_LightRig() */
     /* +0x010 */ BasicClass *viewport; /* becomes viewport; NULL: init makes one with New_Viewport() */
 };
@@ -54,7 +54,7 @@ struct IntermediateBaseInitArgs {
     /* +0x050 */ void (*onDeinit)(Self *self);               /* NULL; deinit's first call */     \
     /* +0x054 */ void (*onTag1Notify)(Self *self, BasicClass *sender, s32 event); /* IntermediateBase__OnTag1Notify: onNotify's D_8006C070 (1) case */ \
     /* +0x058 */ void (*onPadEvent)(Self *self, BasicClass *sender, s32 event);   /* NULL; onNotify's Pad (2) case */ \
-    /* +0x05C */ void (*update)(Self *self, BasicClass *sender, s32 event);       /* IntermediateBase__IncrementFrameCounter: onNotify's D_8006EF50 (5) case */ \
+    /* +0x05C */ void (*update)(Self *self, BasicClass *sender, s32 event);       /* IntermediateBase__IncrementFrameCounter: onNotify's FrameClock (5) case */ \
     /* +0x060 */ void (*setState)(Self *self, s32 state);    /* IntermediateBase__SetState; TaskCore__SetState, Class86B60__SetState */ \
     /* +0x064 */ void (*onState2)(Self *self);               /* IntermediateBase__OnState2 */    \
     /* +0x068 */ void (*onState3)(Self *self)                /* IntermediateBase__OnState3 */
@@ -62,7 +62,7 @@ struct IntermediateBaseInitArgs {
 #define INTERMEDIATEBASE_FIELDS(Methods)                                                           \
     BASICCLASS_FIELDS(Methods);                                                                    \
     /* +0x00C */ IntermediateBaseInitArgs *initArgs; /* init's argument, kept */                   \
-    /* +0x010 */ BasicClass *unk10;     /* initArgs->unk8, or init's own New_D8006EF50() object */ \
+    /* +0x010 */ BasicClass *unk10;     /* initArgs->unk8, or init's own New_FrameClock() object */ \
     /* +0x014 */ BasicClass *unk14;     /* initArgs->unkC, or init's own New_LightRig() object */ \
     /* +0x018 */ BasicClass *viewport;  /* initArgs->viewport, or init's own New_Viewport() */     \
     /* +0x01C */ s32 frameCounter;      /* update adds 1; resetCounters, onState2, onState3 clear it */ \

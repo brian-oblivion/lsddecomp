@@ -31,6 +31,7 @@
 #include "code_2cc8c.h"
 #include "Viewport.h"
 #include "LightRig.h"
+#include "FrameClock.h"
 
 s32 TaskCore__GetActiveSlotCount(TaskCore *self)
 {
@@ -105,7 +106,7 @@ void IntermediateBase__Init(IntermediateBase *self, IntermediateBaseInitArgs *ar
     if (args->unk8 != NULL) {
         self->unk10 = args->unk8;
     } else {
-        self->unk10 = New_D8006EF50();
+        self->unk10 = (BasicClass *)New_FrameClock();
     }
     if (args->unkC != NULL) {
         self->unk14 = args->unkC;
@@ -165,7 +166,7 @@ void IntermediateBase__OnTag1Notify(IntermediateBase *self, BasicClass *sender, 
     IntermediateBaseLinked *obj4;
 
     if (event == 2) {
-        ((IntermediateBaseLinked *)self->unk10)->methods->slot44((IntermediateBaseLinked *)self->unk10);
+        ((FrameClock *)self->unk10)->methods->tick((FrameClock *)self->unk10);
         obj4 = (IntermediateBaseLinked *)self->initArgs->unk4;
         obj4->methods->slot44(obj4);
         obj4->methods->slot48(obj4);

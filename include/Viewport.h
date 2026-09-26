@@ -118,7 +118,7 @@ struct ViewportOt {
     /* +0x088 */ void (*slot88)(void);                             /* func_8003ECC8, empty */        \
     /* +0x08C */ void (*initOt)(Self *self);                       /* Viewport__InitOt */            \
     /* +0x090 */ void (*deinitOt)(Self *self);                     /* Viewport__DeinitOt */          \
-    /* +0x094 */ void (*onNotifyTag5)(Self *self, BasicClass *sender, s32 event); /* Viewport__OnNotifyTag5: onNotify's class-5 (D_8006EF50) case */ \
+    /* +0x094 */ void (*onNotifyTag5)(Self *self, BasicClass *sender, s32 event); /* Viewport__OnNotifyTag5: onNotify's class-5 (FrameClock) case */ \
     /* +0x098 */ void (*onNotifyTag1)(Self *self, BasicClass *sender, s32 event); /* Viewport__OnNotifyTag1: onNotify's DrawSystem (1) case */ \
     /* +0x09C */ void (*update)(Self *self);                       /* Viewport__Update; Class869D8__Update */ \
     /* +0x0A0 */ void (*drawNode)(Self *self, Class6B5CC *node);   /* Viewport__DrawNode (code_2864) */ \
