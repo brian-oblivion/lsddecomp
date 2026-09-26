@@ -25,14 +25,13 @@ typedef struct TexPageDesc TexPageDesc;
  * What stays below are this unit family's views of the classes TaskCore
  * holds and has no header for yet: TaskCore.h types those fields
  * `BasicClass *` and the accessors here cast to the view (`sound`, a
- * VabStreamObj, is cast to include/VabStreamObj.h's type; `Unk78Obj`: `bgLayer`;
+ * VabStreamObj, is cast to include/VabStreamObj.h's type; `bgLayer` is a
+ * BgLayer, include/BgLayer.h since round 88 (its `Unk78Obj` view is gone);
  * `subHandle` and TaskCoreTarget's `handle` are TimImages, include/TimImage.h,
  * cast at code_2cc8c_b's accessors; the slot and item widgets are TextRows,
  * include/TextRow.h; `listView` is a BoxFill, include/BoxFill.h). `SlotEntry` and
  * `SrcDesc` are two readings of one TaskCoreTarget::unk24[] record.
  */
-typedef struct Unk78Obj Unk78Obj;
-typedef struct Unk78ObjMethods Unk78ObjMethods;
 typedef struct SrcDesc SrcDesc;
 typedef struct HeaderObj HeaderObj;
 typedef struct EventArg EventArg;
@@ -60,6 +59,8 @@ typedef struct EventArg EventArg;
  *   real evidence, not a framework assumption.
  * - **`Unk4CObj` is now `TaskCoreTarget`** (include/TaskCore.h, round 84):
  *   a plain data record, the menu description the ctor and setTarget take.
+ * - **`Unk78Obj` is now `BgLayer`** (include/BgLayer.h, round 88): 0x68
+ *   bytes (New_BgLayer), its +0x0B8 is BgLayer__SetColor.
  * - **None of the three has a known SIZE.** Each struct below is only as
  *   large as its highest observed field plus that field's own size --
  *   `Unk48Obj` could plausibly be anywhere from 0x084 bytes (just past
@@ -112,17 +113,6 @@ struct SlotEntry {
                     passed by address to a TextRow setPosition call, then
                     incremented by 10 per loop iteration -- see
                     TaskCore__CommitElementScroll/TaskCore__RefreshSlotView */
-};
-
-/* TaskCore::bgLayer's pointee (a BgLayer; +0x0B8 is BgLayer__SetColor). Only TaskCore__TickColorFade touches it, calling one slot
- * with a literal 1 and the same 3-byte colour buffer TaskCore__TickColorFade builds
- * for its own self->methods->broadcastToSlots call just above. */
-struct Unk78ObjMethods {
-    u8 pad000[0x0B8];
-    void (*slotB8)(Unk78Obj *self, s32 a1, u8 *buf); /* +0x0B8 */
-};
-struct Unk78Obj {
-    Unk78ObjMethods *methods; /* +0x000 */
 };
 
 extern void *BMemPMgrAlloc(s32 size);   /* allocator, confirmed across many

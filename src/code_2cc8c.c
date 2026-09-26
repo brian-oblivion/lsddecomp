@@ -44,6 +44,7 @@
 #include "common.h"
 #include "code_2cc8c.h"
 #include "VabStreamObj.h"
+#include "BgLayer.h"
 
 void TaskCore__OnPadEvent(TaskCore *self, BasicClass *sender, s32 event)
 {
@@ -328,7 +329,7 @@ s32 TaskCore__TickColorFade(TaskCore *self)
     buffer[1] = prod + self->baseColor[1];
     buffer[2] = prod + self->baseColor[2];
     self->methods->broadcastToSlots(self, buffer);
-    ((Unk78Obj *)self->bgLayer)->methods->slotB8((Unk78Obj *)self->bgLayer, 1, buffer);
+    self->bgLayer->methods->setColor(self->bgLayer, 1, (BgLayerRgb *)buffer);
     return (u8)prod >= 0x81;
 }
 
