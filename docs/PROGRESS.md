@@ -6,6 +6,76 @@ stale, prose elsewhere is not.
 
 ---
 
+## 2026-09-26 — round 93: nine classes named, four units polished, 4b reopened and closed (premium head, plan revision 31)
+
+Premium head (Opus 5.5), cap 5, slots refilled as runners reported: 14
+jobs, all Opus, none sent back. Gate 0 green.
+
+- **Track 6, nine classes** (three names sampled against the body each):
+  `Class6EED8` to `RequestedFile` (A), `Class6D940` to `PlacementGrid` (A:
+  400 cells of 12-byte records at `cell * 12 + 8`, `CellPlacement`),
+  `Class6D3C8` to `GameApplication` (A; `SetDayFromTickCount` was
+  `SeedRandom`: `SeedAndRandom` seeds and the result is discarded),
+  `Class6E99C` to `FadeBox` (A), `Class879C4` to `VariantSprite` (B),
+  `Class65650` to `TodActor` (A; its `TimeTargetObj` is Sony's
+  `GsCOORD2PARAM`), `Class86B60` to `TitleMenu` (A: its entries are
+  START/FLASHBACK/SAVE/LOAD/GRAPH/SHAKE over `ETC\TITLE.TIM`),
+  `Class876FC` to `StyleEffect` (B), `Class866E8` to `StageMap` (B: seven
+  hex-neighbour chunk slots of the stage's LBD files; `Unk68Struct` is
+  `StageGridDimensions`, `Unk54Struct` is `LongVec3`). One class placeholder
+  is left (`Class865C8`, #1 next).
+- **Track 7, four units marked**, five names or constants sampled each:
+  Entity_d and Entity_e (round 92's two sent-back Sonnet passes, redone on
+  Opus: every literal in its base; `EntityEffect`, `ENTITY_STATE_DONE`,
+  `SOUND_CUE_NONE`/`STOP` added by bravo and reused by echo),
+  class_3bb8c_n (D_ 32 to 0, m2c 46 to 0), code_33808 (Sony's headers in,
+  magic 96 to 6). Four Opus units reviewed with none sent back, so §2 puts
+  the polish runner on Sonnet again (`set-model`).
+- **Track 4b reopened mid-round and closed.** Entity_d's pass retyped its
+  motion-template externs to `Ratio16[]`, leaving seven globals two-typed
+  against the other Entity units; charlie declared all 31 templates once in
+  `include/Entity.h` (echo and the head added three more, `SCALE_UNIT`
+  among them).
+- **Head at merge, by type scope:** `CellPlacement.cellFlags`; Entity's and
+  Viewport's `fadeBox` (Viewport's `getFadeBox`/`setFadeBox` and methods;
+  TaskCore's own `subHandle` is a different field and was reverted out of
+  a too-wide first sweep); `TodActor.sound`; `StageMap.pendingLoadCount`
+  and five slots; `RotateVramRectRight`; stale comments on `SeedRandom`,
+  `ObjM::dreamerTmd` and `TaskObjF`. A hand field rename is not a tool
+  command, so replay cannot carry it into a branch still in flight: delta's
+  merge failed to compile on one `getSubHandle` until fixed by hand.
+- **Plan revision 31 (tools, premium):** (1) `plan.py` gated phase 2 on
+  track 5's LIVE status, so the 4b regression closed tracks 6 to 8 and the
+  ready list showed one job; phase 2 now latches on track 5's ticked
+  checklist. (2) A class job's edit set now includes the units holding its
+  methods: the head had held a class_3bb8c polish by hand while 19 of its
+  21 functions were under `Class866E8`'s job. Also `readability.py`'s
+  `TYPE_UNK` was case-insensitive and counted `Chunk*` as placeholders
+  (alpha); nine names dropped, none added.
+- **Measured** (`plan.py`, against round 92's entry): placeholder type
+  names 139 to 80, placeholder classes 10 to 1, defs under a placeholder
+  prefix 187 to 14; track 7 units 3 to 7 of 68, unk 359 to 254, D_ 195 to
+  146, m2c 279 to 213, history 520 to 461. Typeviews 80 to 72 warnings
+  (delta's pass removed eight), 0 new at every merge.
+- **Deferred proposals** (in the reports): StyleEffect's `gStyleEffectTmd`
+  and `SetStyleEffectSources` self are `LinkResource *`,
+  `gStyleEffectViewport` a `Viewport *` (+0x018 is `refView.vp.y`), the
+  kind switches spelled with `StyleEffectKind` (bravo);
+  `gStyleDecorObj`/`gStyleGrid`/`gStyleSceneRefs` retyped together in
+  class_3bb8c_n and _m (delta); `CD_FLAG_*` to a shared header, Tod's
+  `TOD_PACKET_*` into `Tod.h`, `ModelData` slots typed like Tod's, `<libgs.h>`
+  once TimImage/TileMap/TileAtlas take Sony's GsIMAGE/GsMAP/GsCELL
+  (charlie); `class_3bb8c.h`'s `TitleMenuUnkC0Obj_3bb8c_d` is really the
+  DrawSystem (delta); `CheckSaveScoreFlag` to `UpdateFlashbackLock` (delta).
+
+For the operator: (1) the report-history rewrite by renametype/rename stood
+all round as instructed (every runner flagged it); nine class renames have
+now rewritten history prose in several hundred reports. (2) The polish
+runner model rule has no hysteresis: round 92 moved it to Opus after two
+Sonnet send-backs, and this round's four Opus passes move it straight back.
+
+---
+
 ## 2026-09-26 — round 92: six classes named, SoundCueSet unified, Sonnet polish sent back (premium head, plan revision 30)
 
 Premium head (Opus 5.5), cap 5, two waves of five. Gate 0 green.

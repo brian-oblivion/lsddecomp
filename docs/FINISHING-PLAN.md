@@ -200,7 +200,7 @@ another file defines) with `plan.py flag-type`; its file's job then ranks
 first, since other jobs' debt usually waits on it (round 92: SoundCueSet).
 A class job's edit set is its header plus the units holding the class's own
 methods (their banners and field accessors), so a polish pass on one of those
-units defers behind it (round 93: class_3bb8c behind Class866E8).
+units defers behind it (round 93: class_3bb8c behind StageMap's job).
 
 **The pass, per class** (prompt §4.8):
 1. Read the header banner, every own method and its report, the subclasses

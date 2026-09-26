@@ -107,7 +107,7 @@ python3 tools/classtable.py <table>  # a table's slots and their occupants
 python3 tools/classtable.py <table> --vs <parent-table>   # what a subclass overrides
 ```
 
-A name like `Class6D3C8` is the address of the class's method table: its
+A name like `Class865C8` is the address of the class's method table: its
 mechanics are documented in its header, but no name for what it is has been
 established.
 
@@ -117,7 +117,7 @@ Read each named class's header first; its banner points to the units.
 
 - **Boot and the main loop.** `src/main.c` sets up the `BMemPMgr` pool
   allocator (`src/code_8220.c`), the `DrawSystem` screen singleton and a
-  `Pad`, then runs the root object, `Class6D3C8` (a subclass of `Application`,
+  `Pad`, then runs the root object, `GameApplication` (a subclass of `Application`,
   `src/code_1677c.c`). Its loop plays the intro logos and the day-of-week
   movie, polls the graph-screen tasks against the dream's status, and can
   start a cinematic.
@@ -130,19 +130,19 @@ Read each named class's header first; its banner points to the units.
 - **The dream.** `DreamSys` (`src/DreamSys.c`) is the dream in progress: the
   dream clock, the player's movement, the mood record that picks the next
   day's dream, and the "link" teleport that ends one stage and starts
-  another. `Entity` (`src/Entity*.c`, over `Class65650`) is a TOD-animated
+  another. `Entity` (`src/Entity*.c`, over `TodActor`) is a TOD-animated
   actor driven by per-mood tables. `StageGrid` maps mood-graph values to
   stage chunks; `code_4cd08` spawns and despawns trigger entities;
-  `Class866E8` is the grid manager that tracks its target's position on the
-  stage's cell grid and loads each element's resources (`src/class_3ac78.c`,
+  `StageMap` keeps the seven map chunks around its target loaded, each
+  chunk's `PlacementGrid` linked into a lattice of `GridCell`s (`src/class_3ac78.c`,
   `src/class_3bb8c.c`, `src/class_3bb8c_b.c`). `Class865C8` runs a day's
   loop around the DreamSys and builds an `ObjM`.
 - **Screens and menus.** `IntermediateBase` runs one attached job to a
   result. `TaskCore` (`src/code_2cc8c*.c`) is the base of the menu and screen
   tasks: `StreamTask` (plays one movie), `GraphRoom` (the mood graph) and
-  `Class86B60`. The 2D pieces are `Sprite` and its subclasses (down to
+  `TitleMenu`, the START/FLASHBACK/SAVE/LOAD/GRAPH/SHAKE menu. The 2D pieces are `Sprite` and its subclasses (down to
   `TextRow`), `BoxFill` and `TextEntry`.
-- **Memory-card saves.** `Class86B60` (`src/class_3bb8c_c.c`, `_d.c`) owns a
+- **Memory-card saves.** `TitleMenu` (`src/class_3bb8c_c.c`, `_d.c`) owns a
   `TaskObjF` (`src/class_3bb8c_d.c` to `_g.c`), the save/load controller: a
   state machine over the BIOS memory-card calls, which shows its choices in a
   `ItemList` scrolling list (`src/class_3bb8c_j.c`, `_k.c`).

@@ -399,7 +399,7 @@ three are live rather than transcribed:
   band, four of them after a runner had been told to expect a stall.
 
   **ROUND 16: the 7+ band is no longer 0-matched, so it is a priority order
-  and nothing more.** `Class866E8__Class866E8` matched **163/163 with 8 distinct
+  and nothing more.** `StageMap__StageMap` matched **163/163 with 8 distinct
   callee-saved registers** — sent in *expecting* a stall, on the strength of
   the 0-matched figure this table used to print. Two other runners the same
   round attempted six more large bodies between them and reported, when asked
@@ -407,7 +407,7 @@ three are live rather than transcribed:
   those needed 0 and 1 s-registers anyway.
 
   Read the count as a **correlate** of "large function needing deep struct
-  reconstruction" — that is what actually costs. `Class866E8__Class866E8`'s
+  reconstruction" — that is what actually costs. `StageMap__StageMap`'s
   load-bearing insight was a struct-shape one (a whole-struct copy misread as
   field-by-field), nothing to do with register pressure. **Never skip a
   function on this screen, and never stop on it: if you stop in this band,
@@ -467,7 +467,7 @@ three are live rather than transcribed:
   (see the archive's DECOMPILATION_LEARNINGS entry on entangled residues, where
   a fix that scored *worse* alone was the key unlock in combination).
 
-  **And a low score is not evidence of a distant shape.** `Class866E8__ApplyRateEntries`
+  **And a low score is not evidence of a distant shape.** `StageMap__ApplyChunkLoads`
   scores 14/105 while being structurally 104 of 105 instructions identical to
   retail; one missing `addiu` shifted everything after it. Triaging stalls by
   score alone would have written it off as the unit's worst prospect when it
@@ -568,7 +568,7 @@ rediscovering them.
 **ALWAYS PASS `--stack-diffs`, to `--debug` AND to the real search.** Without
 it `permuter.py` does not measure the stack frame at all, and therefore
 **falsely scores ZERO on any pure frame-size residue**. Round 18 hit exactly
-this: `Class65650__SetLightMode` reported a zero that was really 28/40 with an 8-byte
+this: `TodActor__SetLightMode` reported a zero that was really 28/40 with an 8-byte
 frame overshoot, invisible until the flag was passed. The trap is sharpened by
 the display: **without the flag the output still prints `Stack Differences: 0`**
 — that line is not a measurement saying the frames agree, it is a field that
@@ -597,7 +597,7 @@ improvement found on a register-shaped residue that round was FALSE against
 - an algebraically-identical loop-end rewrite scoring 60 (reproducibly, found
   twice): real result 52/70, **one word WORSE** than the 53/70 it started from,
   an in-range regression the permuter's own diff could not see;
-- the `Class65650__SetLightMode` false zero above.
+- the `TodActor__SetLightMode` false zero above.
 
 The permuter's scorer and the project's oracle do not measure the same thing.
 Verify every candidate through the full chain before believing it, including —

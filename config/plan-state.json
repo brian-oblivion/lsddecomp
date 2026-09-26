@@ -2,7 +2,7 @@
   "models": {
     "match_runner": null,
     "naming_runner": "sonnet",
-    "polish_runner": "opus"
+    "polish_runner": "sonnet"
   },
   "stop_rule": {
     "attempts_per_model": 6,
@@ -1224,6 +1224,16 @@
           "note": "Premium head, cap 5, 6 Opus runner sessions in five waves (the last four classes shared the class_3bb8c hub, so one at a time): Class86F88, MoviePlayer (ex D_8006F614), Class866E8 (ex D_800866E8; class_3ac78.h retired), LinkResource (ex D_8006F13C), ObjM (ex D_80087034), TaskObjF. Track 4 done, 58/58. Head: StreamTask::player retyped MoviePlayer *. Plan revision 26: a scalar view type is not a footprint symbol (D_80087034 86 -> 13 units). All merges byte-identical after clean rebuilds, 0 new warnings (baseline 141 -> 114), nonmatching green.",
           "round": 89,
           "runners": 6
+        },
+        {
+          "attempts": 1,
+          "calibration": false,
+          "date": "2026-09-26",
+          "matches": 1,
+          "model": "opus",
+          "note": "4b reopened by Entity_d's polish (seven motion-template externs retyped Ratio16[] locally); charlie declared all 31 templates once in include/Entity.h. 0 two-typed globals again.",
+          "round": 93,
+          "runners": 1
         }
       ],
       "status": "auto"
@@ -1288,6 +1298,16 @@
           "note": "Premium head, cap 5, two waves. Types (all Opus, all accepted): Class86F88 -> ItemList (A), Class6E4F0 -> Application (A; its aux is IntermediateBaseInitArgs), Class869D8 -> NodeGuardedViewport (B), Class86AA0 -> GridCell (B), Class86668 -> TimedTask (B), Class81940 -> LbdFile (A, STGnn\\Mnnn.LBD record paths checked in retail), and EntityMoodHandlerArg flagged by the head and unified as SoundCueSet (include/SoundCueSet.h; three local views and DreamSys's SoundCueCallbackArg deleted; slots are VAB program/octave/vol/endVol, PlayTone's SsUtKeyOn split checked). Head applied by type scope: IntermediateBaseInitArgs drawSystem/pad/frameClock/lightRig, TimedTask togglePause, LbdFile chunkIndex/elemKey and placementsOffset/Size, DreamSys onto SoundCueSet. plan.py now ranks a head-flagged type's file first in track 6.",
           "round": 92,
           "runners": 7
+        },
+        {
+          "attempts": 9,
+          "calibration": true,
+          "date": "2026-09-26",
+          "matches": 9,
+          "model": "opus",
+          "note": "Premium head, cap 5, rolling slots. Types (all Opus, all accepted, three names sampled each): Class6EED8 -> RequestedFile (A), Class6D940 -> PlacementGrid (A; records 20x20 at cell*12+8; CellPlacement), Class6D3C8 -> GameApplication (A; SetDayFromTickCount -> SeedRandom), Class6E99C -> FadeBox (A), Class879C4 -> VariantSprite (B), Class65650 -> TodActor (A; TimeTargetObj -> Sony GsCOORD2PARAM, UnkArg2Obj -> VabStreamObj), Class86B60 -> TitleMenu (A; START/FLASHBACK/SAVE/LOAD/GRAPH/SHAKE), Class876FC -> StyleEffect (B), Class866E8 -> StageMap (B; seven hex-neighbour chunk slots, Unk68Struct -> StageGridDimensions, Unk54Struct -> LongVec3). Head applied by type scope: CellPlacement cellFlags, Entity/Viewport fadeBox (+ Viewport slots and methods), TodActor sound, StageMap pendingLoadCount and five slots, SCALE_UNIT, RotateVramRectRight. All merges byte-identical, typeviews 0 new, nonmatching green.",
+          "round": 93,
+          "runners": 5
         }
       ],
       "status": "auto"
@@ -1317,6 +1337,16 @@
           "note": "Wave 1 on Sonnet: Entity_e (bravo) and Entity_d (delta) SENT BACK: both left step 4 undone (hex timers/distances, no decimal rewrite, no names) and delta missed the SoundCueSet reading Entity.h spelled out; their local renames and banners merged, units NOT marked. Polish runner back to opus (section 2). Wave 2 on Opus: DreamSys (delta) accepted after sampling five (DreamSysLinkCode against its setters, DREAMSYS_SAVE_SIZE, DREAM_TICKS_PER_SECOND against STAGE_TIME_LIMITS, SetEtcTim, GetTeleportTimeBonus): magic 118->80, rawoff 4->0, m2c 45->7, history 13->0; ARRAY_COUNT added to common.h.",
           "round": 92,
           "runners": 3
+        },
+        {
+          "attempts": 4,
+          "calibration": true,
+          "date": "2026-09-26",
+          "matches": 4,
+          "model": "opus",
+          "note": "All Opus, all accepted after sampling five each, none sent back: Entity_d and Entity_e re-sends (round 92's step 4 done: every literal in base; EntityEffect, ENTITY_STATE_DONE, SOUND_CUE_NONE/STOP added and reused), class_3bb8c_n (D_ 32 -> 0, m2c 46 -> 0, history 21 -> 0), code_33808 (Sony headers in; magic 96 -> 6, m2c 15 -> 0). Four Opus units reviewed, none sent back: polish runner to sonnet per section 2.",
+          "round": 93,
+          "runners": 4
         }
       ],
       "status": "auto",
