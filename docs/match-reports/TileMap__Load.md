@@ -49,3 +49,7 @@ void TileMap__Load(Obj6F498 *self) {
 
 - **TileMap__Load**, tier B (head review, round 83: was A). Slot +0x064: unless +0x2A is set, BuildMap and mark +0x42.
   Head review, round 83: the body builds the map (slot +0x078, TileMap__BuildMap) unless +0x2A is set, then sets +0x42; "Load" is its role in the slot protocol, not shown by the body, so tier B. The base slot is Class6D430__SetFlag.
+
+## Track 4 (2026-09-26, round 88, alpha)
+
+Class unified in `include/TileMap.h`. `self` is `TileMap *` (was `Obj6F498`); +0x042 is `loaded`. The no-argument call through Class6D430's `void *slot78` is spelled `((TileMapBuildMapFn)self->methods->slot78)()` (a typedef with an empty parameter list, no code). Byte-identical.

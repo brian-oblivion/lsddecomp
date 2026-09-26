@@ -56,3 +56,7 @@ First build; the D_8006F514 ctor (TileAtlas__TileAtlas) shape with one more stor
 ## Naming
 
 - **TileMap__TileMap**, tier A. Constructor: stores the companion TileAtlas object at +0x3C and, unowned, runs Load.
+
+## Track 4 (2026-09-26, round 88, alpha)
+
+Class unified in `include/TileMap.h`. `self` is `TileMap *` (was `Obj6F498`); the third parameter is `Class6D430 *atlas` (was `s32 arg2`); +0x03C `atlas` (was unk3C), +0x040 `defaultGrid` (was unk40: set here only when arg1 == 0, and BuildMap lays out the default grid only when it is set), +0x042 `loaded` (was unk42: cleared here, set by TileMap__Load after BuildMap). setFlag is called with `self` uncast. Byte-identical.

@@ -73,3 +73,7 @@ Matched on build 2. **Lever: `mult` by a register holding a constant the functio
 ## Naming
 
 - **TileMap__BuildMap**, tier A. Slot +0x078: copies the TileAtlas's cell array pointer, then lays out a 20x15 grid of 16x16 cells (320x240, a full-screen tile map) and fills an index table 0..n-1.
+
+## Track 4 (2026-09-26, round 88, alpha)
+
+Class unified in `include/TileMap.h`. `self` is `TileMap *` (was `Obj6F498`); +0x02C..+0x03B are the GsMAP `map` (cellw, cellh, ncellw, ncellh, base, index; were unk2C, unk2D, unk2E, unk30, unk34, unk38 -- LIBGS.H's own layout, the pad at +0x032 is its alignment gap), +0x03C `atlas`, +0x040 `defaultGrid`. The atlas's +0x02C is still read through the unit-local `DataSrc33808` cast (TileAtlas, D_8006F514, is not unified) and cast to `struct GsCELL *`. Byte-identical.

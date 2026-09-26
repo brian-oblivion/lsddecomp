@@ -40,3 +40,7 @@ void TileMap__Finalize(DataSrc33808 *self) {
 ## Naming
 
 - **TileMap__Finalize**, tier A. Slot +0x00C: frees the index table and the cell array, then the active driver's finalize.
+
+## Track 4 (2026-09-26, round 88, alpha)
+
+Class unified in `include/TileMap.h`. `self` is `TileMap *` (was the generic `DataSrc33808`); the freed field is `map.index` (was `unk38`, s32), the GsMAP index table BuildMap allocates. Byte-identical.

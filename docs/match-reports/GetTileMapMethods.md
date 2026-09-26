@@ -33,3 +33,7 @@ void *GetTileMapMethods(void) {
 ## Naming
 
 - **GetTileMapMethods**, tier A. Table getter.
+
+## Track 4 (2026-09-26, round 88, alpha)
+
+Class unified in `include/TileMap.h`. Returns `TileMapMethods *` and `&D_8006F498` (was `void *` over `extern s32 D_8006F498[]`). Byte-identical.
