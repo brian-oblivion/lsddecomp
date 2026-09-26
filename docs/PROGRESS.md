@@ -6,6 +6,76 @@ stale, prose elsewhere is not.
 
 ---
 
+## 2026-09-26 — round 87: track 4 in parallel (premium head), sixteen classes unified
+
+Premium head (Opus 5.5; the operator started it as premium), operator cap 5.
+`plan.py` offered one class job (revision 20's strict sequence). The head
+measured instead: most ready classes are leaves whose views sit in their own
+units, so it gave `track4_classes` a FOOTPRINT per ready class
+(`class_footprint`: units whose code names the table, a table getter, a
+function RETURNING the object, an own method or a view type, plus every unit
+including, transitively, a header that does) and listed every ready class,
+letting `select_jobs` defer overlaps. Plan revision 23 writes the rule. Three
+waves, 13 Opus runner sessions; every merge `make extract`, oracle,
+`--warnings` 0 new, nonmatching green; head sampled names before each
+`mark-class`.
+
+- **Wave 1.** VabDriver (0x23, alpha: empty interface overrides named for
+  Class6D430's slots), FlatLightObj (0x6, charlie), TmdModel (0x9, delta:
+  `gTmdModelBoundsCount` is a bounds-box COUNT, not a constructed flag),
+  DrawSystem (D_8006C070, 0x1, bravo: `vsyncCount`/`frameCount`; moveImage
+  keeps s32 because an s16 prototype adds sll/sra at its caller;
+  MoviePlayer__Play's slot78 is clearImage(color, rect)), Class6E99C
+  (0x164, echo: a colour fade over BoxFill; Configure's slot10 is
+  addChild(self, source); Entity::unk100 retyped).
+- **Wave 2.** GraphRoom (0x2F130, alpha: its ctor argument IS the DreamSys,
+  the round-24 note was wrong), TextEntry (ex Obj86ED0, 0x10, bravo:
+  behaviour name from its banner; round 86's unk48-gated functions are all
+  TextEntry's, Obj866E8's +0x010..+0x048 are pre-round-75 leftovers),
+  VabStreamObj (0xA03, delta), Class6D940 (0xE03, echo: a data source over a
+  20x20 placement grid, used only by Class866E8), Class879C4 (0x1F44, alpha).
+- **Wave 3.** Class869D8 (0x17, alpha), CdStream (ex CdStreamObj, 0x40,
+  bravo: +0x00C is a CdlFILE), Class81940 (0x903, charlie), Class6EED8
+  (0xB03, delta: WBgm's SEQ source), StreamTask (0x1130, echo: round 84's
+  five-argument init settled by step 6's cast rule).
+- **Head close-outs.** Two views outside the runners' footprints retired in
+  a head worktree: code_2cc8c.h's GenericObj (DrawSystem; Viewport.drawSystem
+  is now `DrawSystem *`) and class_3bb8c_t's GraphRoomSoundObj (VabStreamObj).
+  Stale prose fixed in TaskCore.h, IntermediateBase.h, BoxFill.h, Sprite.h,
+  Viewport.h, code_2cc8c.c, code_322b4.c. Warnings baseline 165 -> 161.
+- **The footprint, as measured.** Its first cut missed singleton getters
+  (bravo's GetDrawSystem, extern'd under three other view names): fixed the
+  same wave. Runners still found views outside it (census misses them) and
+  posted before editing; no two runners' edits collided. With the
+  call-graph test also applied between class jobs, only one job listed after
+  wave 2; a class job renames only what its footprint already contains, so
+  that test is now skipped between two class jobs. Every merge conflict was
+  the symbols-file tail `rename.py` appends to, or two adjacent `#include`s;
+  resolved per address against the merge base (PARALLEL-RUNS §3.9 now says
+  so), none changed on both sides.
+- **Docs.** PARALLEL-RUNS §3.5's pre-round-58 check-3 paragraph distilled to
+  the archive for the word budget.
+- **Open, for later jobs.** Class866E8: `class_3ac78.h`'s
+  UnkChildObj_3ac78 is a FlatLightObj view (SetChildParams' s32 args would
+  become pointers), Obj866E8's leftover fields should become padding, and
+  its addChild slot is typed `(self, s32)`. LightRig's `lights[3]` could be
+  `struct FlatLightObj *`. Class6B5CC's `model` (+0x020) could be
+  `struct TmdModel *`. `DriverBaseMethods`/`Slot0CMethods` views of the
+  active driver's table remain (Class6D430's). A LinkResource view
+  (`LinkResourceView_179d8_d`) remains for the four-argument GetEntry call.
+  SoundCueSet is not a class and has two local views. D_8008AACC..AAE0,
+  Vec3S16_d294/BoundsBox_d294 (= TmdVec3/TmdBox) are 4b candidates.
+  `gMovieFrameRect` is a clear colour (rename proposed).
+
+### ESCALATED (operator decisions; the head did not act)
+
+None new. Round 86's three stand.
+
+- **Next.** `plan.py` lists five disjoint classes: gClass86AA0Methods,
+  D_8006D3C8, D_8006EB90, D_8006F590, ENTITY_METHODS.
+
+---
+
 ## 2026-09-26 — round 86: game names off Sony data (premium head), three classes unified
 
 Premium head (Opus 5.5; the operator started it as premium), operator cap 5.
