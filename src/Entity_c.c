@@ -31,7 +31,7 @@
 
 extern u8 ROTATION_XPLUS_EIGHTH[];
 extern u8 D_80089E74[];
-extern LongVec3 D_80089DB4[];
+extern LongVec3 TRANSLATE_Y_MINUS1500_Z_PLUS1024[];
 extern LongVec3 TRANSLATE_X_MINUS64[];
 extern LongVec3 TRANSLATE_Y_MINUS4096[];
 extern LongVec3 TRANSLATE_Y_PLUS64[];
@@ -224,7 +224,7 @@ void Entity__MoodCue30(Entity *this) {
             }
         } else if (this->state == 0xD) {
             this->methods->setTranslation(this, (LongVec3 *)&((DreamSys *)this->peer)->coord2->tx);
-            this->methods->addTranslation(this, D_80089DB4);
+            this->methods->addTranslation(this, TRANSLATE_Y_MINUS1500_Z_PLUS1024);
         }
     }
 }
