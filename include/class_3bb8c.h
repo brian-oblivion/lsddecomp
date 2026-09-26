@@ -16,29 +16,29 @@
 typedef struct Unk14Obj Unk14Obj;
 typedef struct QueryTemplate866E8 QueryTemplate866E8;
 
-/* Constant `Unk54Struct` (unk0=-1, unk4=0, unk8=0x140014) whole-struct-copied
- * by Class866E8__InitFootprintSlot into rects[key]. */
-extern Unk54Struct gDefaultElemRateOffset;
+/* The rectangle Class866E8__InitFootprintSlot copies into rects[key] before
+ * setting its element: no element (-1), the whole 20 x 20 cells from (0, 0). */
+extern GridSlot866E8 gDefaultElemRateOffset;
 
 /* The default "enable every element" spec table SetTargetAndBuildRates
  * passes to buildRateEntries: seven entries, every `flag` nonzero
  * (asm/data/76DC8.data.s). */
 extern TargetSpec866E8 sDefaultTargetSpecs[7];
 
-/* Indexed by TargetSpec866E8::key in Class866E8__BuildRateEntries, 0xC
- * stride, read as three plain words. Bound unknown (`key` is the caller's
+/* Indexed by TargetSpec866E8::key in Class866E8__BuildRateEntries: the
+ * world offset of that neighbour's cellParent from the centre position. Bound unknown (`key` is the caller's
  * byte), so unsized. */
-extern Unk54Struct sRateOffsetTable[];
+extern LongVec3 sRateOffsetTable[];
 
 /* `key`-indexed bitmask table (`1 << key`) Class866E8__ComputeRateEntry tests
  * against ComputeRateFlags' result. 7 words in the data before
  * sRateEntryTable starts. */
 extern const s32 sRateKeyMask[7];
 
-/* `key`-indexed, three words each: ComputeRateEntry uses `unk0 * divisor`
- * plus `unk4` or `unk8` (by its `flag`), or `unk4` alone when `unk0` is 0.
- * 7 entries (0x800868A8-0x800868FC). */
-extern const Unk54Struct sRateEntryTable[7];
+/* `key`-indexed chunk-index steps to the seven chunks around a centre chunk
+ * (ChunkNeighbourDelta, include/Class866E8.h), 7 entries
+ * (0x800868A8-0x800868FC). */
+extern const ChunkNeighbourDelta sRateEntryTable[7];
 
 /* LbdFile::ownerKey-indexed remap, read signed by
  * Class866E8__UpdateFootprintTracking: exactly 8 bytes in the data

@@ -162,7 +162,7 @@ void DreamSys__NotifyLinkAttempt(DreamSys *this, s32 event) {
     goto shared_tail;
 
 handle_neg2:
-    if (this->grid->methods->findElementForPosition(this->grid, (Unk54Struct *)&this->coord2->tx)
+    if (this->grid->methods->findElementForPosition(this->grid, (LongVec3 *)&this->coord2->tx)
             ->loader->headerReady != 2)
         goto neg2_mismatch;
 

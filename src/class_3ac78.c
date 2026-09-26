@@ -59,7 +59,7 @@ TimedTaskMethods *GetTimedTaskMethods(void) {
     return &gTimedTaskMethods;
 }
 
-Class866E8 *New_Class866E8(Unk54Struct *origin, s32 autoLoad) {
+Class866E8 *New_Class866E8(LongVec3 *origin, s32 autoLoad) {
     Class866E8 *self;
 
     self = BMemPMgrAlloc(0x1E8);
@@ -75,9 +75,9 @@ Class866E8 *New_Class866E8(Unk54Struct *origin, s32 autoLoad) {
  * purely from this call site's own register usage.
  */
 extern void BMemPMgrFree(void *arg1);
-extern Unk54Struct gDefaultOrigin;
+extern LongVec3 gDefaultOrigin;
 
-void Class866E8__Class866E8(Class866E8 *self, Unk54Struct *origin, s32 autoLoad) {
+void Class866E8__Class866E8(Class866E8 *self, LongVec3 *origin, s32 autoLoad) {
     s32 i;
     Class866E8Elem *entry;
     GridCell *obj;
@@ -118,8 +118,7 @@ void Class866E8__Class866E8(Class866E8 *self, Unk54Struct *origin, s32 autoLoad)
 
         entry->placements = New_Class6D940(0);
         entry->cellParent = New_GridCell();
-        entry->cellParent->methods->attachToParent(entry->cellParent, (SceneNode *)self,
-                                                   (LongVec3 *)&self->origin);
+        entry->cellParent->methods->attachToParent(entry->cellParent, (SceneNode *)self, &self->origin);
 
         entry->cells = (GridCell **)BMemPMgrAlloc(0x668);
         if (entry->cells == NULL) {

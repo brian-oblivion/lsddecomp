@@ -47,7 +47,7 @@ s32 Class866E8__SetTargetAndBuildRates(Class866E8 *self, void *arg1, SceneNode *
     self->target = arg2;
     self->targetCell.base = *arg3;
     ret = ComputeCellWorldOffsets(arg1, stackBuf, self->config, &self->origin, arg3);
-    return self->methods->buildRateEntries(self, ret, (Unk54Struct *)stackBuf, sDefaultTargetSpecs);
+    return self->methods->buildRateEntries(self, ret, (LongVec3 *)stackBuf, sDefaultTargetSpecs);
 }
 
 s32 Class866E8__ComputeCellOffsets(Class866E8 *self, void *arg1, void *arg2) {
@@ -65,7 +65,7 @@ s32 Class866E8__ComputeCellOffsets(Class866E8 *self, void *arg1, void *arg2) {
  * attempts targeted the outBuf[0]/outBuf[2] STORE-vs-LOAD scheduling
  * directly and never touched this constant; the permuter found a
  * completely different axis. See docs/match-reports/ComputeCellWorldOffsets.md. */
-s32 ComputeCellWorldOffsets(s32 *arg0, s32 *outBuf, StageGridDimensions *arg2, Unk54Struct *arg3,
+s32 ComputeCellWorldOffsets(s32 *arg0, s32 *outBuf, StageGridDimensions *arg2, LongVec3 *arg3,
                             Descriptor10 *arg4) {
     s32 idx;
     s32 factor;
@@ -83,13 +83,13 @@ s32 ComputeCellWorldOffsets(s32 *arg0, s32 *outBuf, StageGridDimensions *arg2, U
         idx = 0;
         sum = 0;
     }
-    v1 = (arg3->unk0 - arg2->columns * 0x5000) + arg4->b0 * 0xA000;
-    a0v = arg3->unk8 - factor * 0x5000;
+    v1 = (arg3->x - arg2->columns * 0x5000) + arg4->b0 * 0xA000;
+    a0v = arg3->z - factor * 0x5000;
     outBuf[0] = v1;
     if (idx & 1) {
         outBuf[0] = v1 - 0x5000;
     }
-    outBuf[1] = arg3->unk4;
+    outBuf[1] = arg3->y;
     off = 0x400;
     outBuf[2] = a0v + idx * 0xA000;
     arg0[0] = (arg4->b2 << 11) + outBuf[0] + (arg4->h4 + off);
@@ -126,7 +126,7 @@ s32 Class866E8__UpdateFootprintTracking(Class866E8 *self) {
     result = sFootprintResultRemap[key];
 
     if (self->config->isVertical == 0) {
-        self->methods->buildRateEntries(self, buf.unk28, (Unk54Struct *)&buf.unkC,
+        self->methods->buildRateEntries(self, buf.unk28, (LongVec3 *)&buf.unkC,
                                         sFootprintResultPtrTable[result]);
     }
 
@@ -155,7 +155,7 @@ s32 Class866E8__UpdateFootprintTracking(Class866E8 *self) {
  * round.
  * The `__asm__("")` barrier this body used to carry before `u14 = ...` is gone:
  * with `e` merged it is no longer needed, verified by whole-image rebuild. */
-void Class866E8__BuildRateEntries(Class866E8 *self, s32 val, Unk54Struct *arg2, TargetSpec866E8 *arg3) {
+void Class866E8__BuildRateEntries(Class866E8 *self, s32 val, LongVec3 *arg2, TargetSpec866E8 *arg3) {
     s32 divisor;
     s32 flag;
     s32 savedResult;
@@ -163,7 +163,7 @@ void Class866E8__BuildRateEntries(Class866E8 *self, s32 val, Unk54Struct *arg2, 
     s32 i;
     Class866E8Elem *e;
     Unk14Obj *u14;
-    Unk54Struct *tbl;
+    LongVec3 *tbl;
     SetupEntry866E8 stackBuf[7];
 
     if (arg3 != 0) {
@@ -179,13 +179,13 @@ void Class866E8__BuildRateEntries(Class866E8 *self, s32 val, Unk54Struct *arg2, 
                 tbl = &sRateOffsetTable[arg3[i].key];
                 u14 = (Unk14Obj *)e->cellParent->coord2;
                 if (self->config->isVertical == 0) {
-                    u14->unk18.w = arg2->unk0 + tbl->unk0;
-                    u14->unk1C = arg2->unk4;
-                    u14->unk20.w = arg2->unk8 + tbl->unk8;
+                    u14->unk18.w = arg2->x + tbl->x;
+                    u14->unk1C = arg2->y;
+                    u14->unk20.w = arg2->z + tbl->z;
                 } else {
-                    u14->unk18.w = arg2->unk0 - 0x5000;
-                    u14->unk1C = arg2->unk4 + tbl->unk4;
-                    u14->unk20.w = arg2->unk8 - 0x5000;
+                    u14->unk18.w = arg2->x - 0x5000;
+                    u14->unk1C = arg2->y + tbl->y;
+                    u14->unk20.w = arg2->z - 0x5000;
                 }
                 e->cellParent->coord2->flg = 0;
                 Class866E8__ComputeRateEntry(self, &stackBuf[count], divisor, flag, val,
@@ -261,18 +261,18 @@ s32 Class866E8__ComputeRateEntry(Class866E8 *self, SetupEntry866E8 *arg1, s32 di
     }
 
     if (self->config->isVertical == 0) {
-        const Unk54Struct *entry = &sRateEntryTable[key];
+        const ChunkNeighbourDelta *entry = &sRateEntryTable[key];
         s32 value;
         s32 sum;
 
-        if (entry->unk0 == 0) {
-            sum = entry->unk4;
+        if (entry->rowDelta == 0) {
+            sum = entry->colDeltaOddRow;
         } else {
-            sum = divisor * entry->unk0;
+            sum = divisor * entry->rowDelta;
             if (flag != 0) {
-                sum += entry->unk4;
+                sum += entry->colDeltaOddRow;
             } else {
-                sum += entry->unk8;
+                sum += entry->colDeltaEvenRow;
             }
         }
         value = val + sum;
@@ -553,7 +553,7 @@ s32 Class866E8__ComputeFootprintDescriptor(Class866E8 *self, Descriptor10Ext *ou
     s32 b2;
     s32 b3;
 
-    e = self->methods->findElementForPosition(self, (Unk54Struct *)in);
+    e = self->methods->findElementForPosition(self, (LongVec3 *)in);
     if (e != 0) {
         rate = e->loader->chunkIndex;
         out->unk28 = rate;
@@ -624,7 +624,7 @@ Class866E8Elem *Class866E8__FindElemByUnk32(Class866E8 *self, s32 key) {
  * load, as retail schedules it (a `w = ...;` statement before the `if`
  * fixes the add but swaps those two loads). See
  * docs/match-reports/Class866E8__FindElementForPosition.md. */
-Class866E8Elem *Class866E8__FindElementForPosition(Class866E8 *self, Unk54Struct *arg1) {
+Class866E8Elem *Class866E8__FindElementForPosition(Class866E8 *self, LongVec3 *arg1) {
     s32 i;
     s32 tol;
     s32 threshold;
@@ -638,13 +638,13 @@ Class866E8Elem *Class866E8__FindElementForPosition(Class866E8 *self, Unk54Struct
     for (; i < 7; i++, threshold -= 0x800) {
         candidate = self->methods->findElemByUnk32(self, i);
         r = (Unk14Obj *)candidate->cellParent->coord2;
-        if (arg1->unk0 >= r->unk18.w && arg1->unk0 < (w = r->unk18.w) + tol) {
-            if (arg1->unk8 >= r->unk20.w && arg1->unk8 < (w = r->unk20.w) + tol) {
+        if (arg1->x >= r->unk18.w && arg1->x < (w = r->unk18.w) + tol) {
+            if (arg1->z >= r->unk20.w && arg1->z < (w = r->unk20.w) + tol) {
                 if (self->config->isVertical == 0) {
                     return candidate;
                 }
-                if (threshold >= arg1->unk4) {
-                    if (threshold - 0x800 >= arg1->unk4) {
+                if (threshold >= arg1->y) {
+                    if (threshold - 0x800 >= arg1->y) {
                         continue;
                     }
                     return candidate;

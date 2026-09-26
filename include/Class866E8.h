@@ -65,14 +65,6 @@ typedef struct Class866E8 Class866E8;
 typedef struct Class866E8Methods Class866E8Methods;
 typedef struct Class866E8Elem Class866E8Elem;
 
-/* A 3-word world position: `origin`, the ctor's argument and
- * gDefaultOrigin, FindElementForPosition's query, and the rate tables. */
-typedef struct Unk54Struct {
-    s32 unk0;
-    s32 unk4;
-    s32 unk8;
-} Unk54Struct;
-
 /* A grid-cell descriptor, 10 bytes, alignment 2 (every member s8/s16, so a
  * whole copy is lwl/lwr + swl/swr + sh: SetTargetAndBuildRates). b0/b1 the
  * element column/row (ComputeDivisorSplit: rate % divisor, rate / divisor),
@@ -123,6 +115,18 @@ typedef struct QueryPos866E8 {
         u16 h;
     } unk8; /* +0x008 */
 } QueryPos866E8;
+
+/* The step from a centre chunk's index (row * columns + column) to one of
+ * the seven chunks around it, indexed by TargetSpec866E8::key
+ * (sRateEntryTable, ComputeRateEntry): rowDelta rows, then colDeltaOddRow
+ * or colDeltaEvenRow columns by the centre row's parity (odd rows sit half a
+ * chunk to -x, ComputeCellWorldOffsets). The table holds the centre (key 3,
+ * all 0) and its six staggered neighbours. */
+typedef struct ChunkNeighbourDelta {
+    s32 rowDelta;        /* +0x0 */
+    s32 colDeltaOddRow;  /* +0x4 */
+    s32 colDeltaEvenRow; /* +0x8 */
+} ChunkNeighbourDelta;
 
 /* applyRateEntries' 0xC-byte entries: a file name for the element's
  * loader (NULL: cancel), its rate and the element key. */
@@ -200,7 +204,7 @@ typedef void *(*Class866E8ValueFn)(void *ctx, s32 value, s32 arg2, s32 arg3);
 
 /* LightRig's slots, then this class's own. */
 struct Class866E8Methods {
-    LIGHTRIG_SLOTS(Class866E8, (Class866E8 * self, Unk54Struct *origin, s32 autoLoad));
+    LIGHTRIG_SLOTS(Class866E8, (Class866E8 * self, LongVec3 *origin, s32 autoLoad));
     /* +0x0C0 */ void (*resetAllElements)(Class866E8 *self); /* Class866E8__ResetAllElements */
     /* +0x0C4 */ void (*setChildParams)(Class866E8 *self, s32 count, s32 dirs,
                                         s32 colors); /* Class866E8__SetChildParams */
@@ -219,7 +223,7 @@ struct Class866E8Methods {
     /* +0x0EC */ void (*enable)(Class866E8 *self);      /* Class866E8__Enable */
     /* +0x0F0 */ void (*disable)(Class866E8 *self);     /* Class866E8__Disable */
     /* +0x0F4 */ s32 (*updateFootprintTracking)(Class866E8 *self); /* Class866E8__UpdateFootprintTracking */
-    /* +0x0F8 */ s32 (*buildRateEntries)(Class866E8 *self, s32 val, Unk54Struct *pos,
+    /* +0x0F8 */ s32 (*buildRateEntries)(Class866E8 *self, s32 val, LongVec3 *pos,
                                          TargetSpec866E8 *specs); /* Class866E8__BuildRateEntries (returns nothing; see the banner) */
     /* +0x0FC */ void (*applyRateEntries)(Class866E8 *self, SetupEntry866E8 *entries,
                                           s32 count); /* Class866E8__ApplyRateEntries */
@@ -233,7 +237,7 @@ struct Class866E8Methods {
                                                    QueryPos866E8 *pos); /* Class866E8__ComputeFootprintDescriptor: 0, or 1 when no element holds pos */
     /* +0x114 */ Class866E8Elem *(*getLastTargetRateSplit)(Class866E8 *self, u8 *out); /* Class866E8__GetLastTargetRateSplit */
     /* +0x118 */ Class866E8Elem *(*findElemByUnk32)(Class866E8 *self, s32 key); /* Class866E8__FindElemByUnk32 */
-    /* +0x11C */ Class866E8Elem *(*findElementForPosition)(Class866E8 *self, Unk54Struct *pos); /* Class866E8__FindElementForPosition */
+    /* +0x11C */ Class866E8Elem *(*findElementForPosition)(Class866E8 *self, LongVec3 *pos); /* Class866E8__FindElementForPosition */
     /* +0x120 */ s32 (*findElemIndexByUnk32)(Class866E8 *self, s32 key); /* Class866E8__FindElemIndexByUnk32 */
     /* +0x124 */ s32 (*findElemIndexByUnk30)(Class866E8 *self, s32 key); /* Class866E8__FindElemIndexByUnk30: an index or -1 */
     /* +0x128 */ void (*refreshFootprint)(Class866E8 *self); /* Class866E8__RefreshFootprint */
@@ -249,7 +253,7 @@ struct Class866E8Methods {
 
 struct Class866E8 {
     LIGHTRIG_FIELDS(Class866E8Methods);
-    /* +0x054 */ Unk54Struct origin; /* the ctor: its argument, or gDefaultOrigin; the cellParents attach here */
+    /* +0x054 */ LongVec3 origin; /* the ctor: its argument, or gDefaultOrigin; the cellParents attach here */
     /* +0x060 */ Class866E8ValueFn valueFn; /* setCallback */
     /* +0x064 */ void *valueFnCtx;          /* setCallback */
     /* +0x068 */ StageGridDimensions *config; /* setConfig (ObjM: GetStageGridDimensions(stage)); NULL after Reset */
@@ -295,8 +299,8 @@ extern Class866E8Methods *GetClass866E8Methods(void); /* returns &gClass866E8Met
 
 /* The class's own functions, in address order: the occupants of
  * gClass866E8Methods and their non-slot helpers. */
-Class866E8 *New_Class866E8(Unk54Struct *origin, s32 autoLoad);
-void Class866E8__Class866E8(Class866E8 *self, Unk54Struct *origin, s32 autoLoad);
+Class866E8 *New_Class866E8(LongVec3 *origin, s32 autoLoad);
+void Class866E8__Class866E8(Class866E8 *self, LongVec3 *origin, s32 autoLoad);
 void Class866E8__Finalize(Class866E8 *self);
 void Class866E8__OnNotify(Class866E8 *self, BasicClass *sender, s32 command);
 void Class866E8__Reset(Class866E8 *self);
@@ -320,12 +324,12 @@ void Class866E8__SetConfig(Class866E8 *self, StageGridDimensions *config);
 s32 Class866E8__SetTargetAndBuildRates(Class866E8 *self, void *outPos, SceneNode *target,
                                        Descriptor10 *cell);
 s32 Class866E8__ComputeCellOffsets(Class866E8 *self, void *outPos, void *cell);
-s32 ComputeCellWorldOffsets(s32 *outPos, s32 *outBuf, StageGridDimensions *config,
-                            Unk54Struct *origin, Descriptor10 *cell);
+s32 ComputeCellWorldOffsets(s32 *outPos, s32 *outBuf, StageGridDimensions *config, LongVec3 *origin,
+                            Descriptor10 *cell);
 void Class866E8__Enable(Class866E8 *self);
 void Class866E8__Disable(Class866E8 *self);
 s32 Class866E8__UpdateFootprintTracking(Class866E8 *self);
-void Class866E8__BuildRateEntries(Class866E8 *self, s32 val, Unk54Struct *pos, TargetSpec866E8 *specs);
+void Class866E8__BuildRateEntries(Class866E8 *self, s32 val, LongVec3 *pos, TargetSpec866E8 *specs);
 s32 Class866E8__ComputeRateFlags(Class866E8 *self, s32 val, s32 flag);
 s32 Class866E8__ComputeRateEntry(Class866E8 *self, SetupEntry866E8 *entry, s32 divisor, s32 flag,
                                  s32 val, s32 savedResult, s32 key); /* 0 or 1; BuildRateEntries discards it */
@@ -339,7 +343,7 @@ s32 Class866E8__ComputeFootprintDescriptor(Class866E8 *self, Descriptor10Ext *ou
 void Class866E8__ComputeDivisorSplit(Class866E8 *self, u8 *out, s32 val);
 Class866E8Elem *Class866E8__GetLastTargetRateSplit(Class866E8 *self, u8 *out);
 Class866E8Elem *Class866E8__FindElemByUnk32(Class866E8 *self, s32 key);
-Class866E8Elem *Class866E8__FindElementForPosition(Class866E8 *self, Unk54Struct *pos);
+Class866E8Elem *Class866E8__FindElementForPosition(Class866E8 *self, LongVec3 *pos);
 s32 Class866E8__FindElemIndexByUnk32(Class866E8 *self, s32 key);
 s32 Class866E8__FindElemIndexByUnk30(Class866E8 *self, s32 key);
 void Class866E8__RefreshFootprint(Class866E8 *self);

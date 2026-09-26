@@ -291,11 +291,11 @@ s32 IsPointOutOfBounds(Bounds866E8_3bb8c_b *bounds, s8 *point) {
 }
 
 s32 Class866E8__InitFootprintSlot(Class866E8 *self, s32 unused, s32 key, s32 arg3) {
-    Unk54Struct *slot;
+    GridSlot866E8 *slot;
 
-    slot = (Unk54Struct *)((u8 *)self + 0x8C + key * sizeof(Unk54Struct));
+    slot = &self->rects.e[key];
     *slot = gDefaultElemRateOffset;
-    slot->unk0 = self->methods->findElemIndexByUnk30(self, arg3);
+    slot->elemIdx = self->methods->findElemIndexByUnk30(self, arg3);
     return key + 1;
 }
 
