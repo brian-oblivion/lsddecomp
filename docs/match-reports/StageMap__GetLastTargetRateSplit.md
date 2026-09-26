@@ -24,7 +24,7 @@ after a call to a non-`INCLUDE_ASM` function, not anything that needed a
 barrier or an explicit local.
 
 `self->unk1BC->unk4` turned out to be the same `ElemTarget` type already
-established from `StageMap__ResetElementCells`/`StageMap__FindElemByUnk32` (its own `+0x030` field lines
+established from `StageMap__ResetElementCells`/`StageMap__FindSlotByNeighbour` (its own `+0x030` field lines
 up with `ElemTarget::unk30`, itself first seen in `StageMap__ResetElementCells`'s
 `entry->unk4->unk30` read). New struct: `Unk1BCObj { u8 pad[4]; ElemTarget
 *unk4; }` for `self->unk1BC`'s pointee.

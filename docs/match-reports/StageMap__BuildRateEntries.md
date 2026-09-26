@@ -361,7 +361,7 @@ If `arg3 == 0`, does nothing at all (whole body skipped). Otherwise:
    increment `count`.
 4. A SECOND loop, `i = 0..6` again unconditionally: copies
    `self->arr[i].unk2` into `self->arr[i].unk4->unk32` (field
-   `StageMap__ComputeFootprintDescriptor`/`StageMap__FindElemByUnk32` already established).
+   `StageMap__ComputeFootprintDescriptor`/`StageMap__FindSlotByNeighbour` already established).
 5. `self->methods->slotFC(self, stackBuf, count)` -- dispatches into
    `StageMap__ApplyRateEntries` (this unit, also stalled this round).
 

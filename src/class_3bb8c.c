@@ -603,7 +603,7 @@ ChunkSlot *StageMap__GetLastTargetRateSplit(StageMap *self, u8 *out) {
     return self->lastEventElem;
 }
 
-ChunkSlot *StageMap__FindElemByUnk32(StageMap *self, s32 key) {
+ChunkSlot *StageMap__FindSlotByNeighbour(StageMap *self, s32 key) {
     s32 i;
     ChunkSlot *e;
 
