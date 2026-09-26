@@ -215,12 +215,12 @@ typedef struct SubObjGMethods {
     u8 pad00[0x04];
     SubObjG *(*slot4)(SubObjG *self);
     u8 pad8[0x5C - 0x8];
-    /* Obj865C8__Obj865C8 (ctor): called on a just-constructed instance,
-     * return discarded. */
+    /* No accessor since round 88: Obj865C8__Obj865C8 called it on unk44,
+     * a TimImage, and now calls TimImage's freeBuffer (include/TimImage.h). */
     void (*slot5C)(SubObjG *self);         /* +0x05C */
     u8 pad60[0x78 - 0x60];
-    /* Obj865C8__Obj865C8 (ctor): called immediately after construction on
-     * self->unk44, return discarded. */
+    /* No accessor since round 88: Obj865C8__Obj865C8 called it on unk44,
+     * a TimImage, and now calls TimImage__Upload through TimImageUploadFn. */
     void (*slot78)(SubObjG *self);         /* +0x078 */
 } SubObjGMethods;
 struct SubObjG {
@@ -391,13 +391,7 @@ extern s32 GetSoundEffectDir(s32 arg1); /* arity-ok: the definition takes no par
  * return value (if any) unused here. */
 extern void InitDreamAux(void);
 
-/* "New_X"-shaped allocator (uncarved, in the Psy-Q SPU/SND block at
- * 0x272C8..0x2C054): allocates,
- * ctors with the one forwarded argument, returns the new instance (or 0).
- * Stored into `Obj865C8::unk44` here, which this function's own body then
- * immediately dispatches through `SubObjGMethods::slot78`/`slot5C` --
- * consistent with the existing `SubObjG` family. */
-extern SubObjG *New_TimImage(const char *path);
+/* New_TimImage (include/TimImage.h): Obj865C8::unk44 is a TimImage. */
 
 /* Filenames right next to each other in the same rodata blob
  * (asm/data/1A90.rodata.s): "ETC\\ETC.TIM" and "ETC\\DREAMER.TMD". */
