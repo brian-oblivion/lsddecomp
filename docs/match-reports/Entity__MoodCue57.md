@@ -168,3 +168,17 @@ configure adds it as a child; no code). Image byte-identical.
 Measured: through Class65650's `s32 playTod` slot this function grows 3 words (the final playTod call no longer cross-jumps with void siblings). Every Entity playTod call casts the slot to `EntityPlayTodFn` (void), which emits no code.
 
 The class (id 0x1F234, table `gEntityMethods`) is unified as `Entity` in `include/Entity.h`: a Class65650 subclass whose table and object expand `CLASS65650_SLOTS`/`CLASS65650_FIELDS`. Any source block above is the pre-unification spelling; the live body takes the inherited names (fields `parent`, `coord2`->`tx/ty/tz`, `tick`, `linkTarget`, `state` (was `moodState`), `lastOffsetValue`, `grid` (was `unk4C`), `ticker` (was `companion2`), `arg2` (was `soundCueChannel`), `parts`, `todPlaying`, `peer` (was `target`, cast to the `Unk94Obj` DreamSys view where its own slots are called); slots `reset`, `setDisplay`, `setLightMode`, `setTranslation`/`addTranslation`, `moveLocalZ/X/Y`, `moveLocalZOrFindLink`, `selectTickCallback`, `enableTickCallback`/`disableTickCallback`, `distanceToPeer`, `setTargetReached`, `updateActivationState`/`updateDeactivationState`), byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).
+
+## Track 7 (round 93, bravo)
+
+Every literal in the live body is in its base: decimal for moodTimer ticks, distances, TOD frames, VAB programs, volumes and `state` phases (hex remains only for masks). Named: `ENTITY_EFFECT_EVENT_VIDEO`, `ENTITY_STATE_DONE`, `SOUND_CUE_STOP` (evidence on each definition: EntityEffect and ENTITY_STATE_DONE in include/Entity.h, SOUND_CUE_STOP in include/SoundCueSet.h). The `(u32)(moodTimer - 0x80) < 0xC2` window test reads `moodTimer >= 128 && moodTimer < 322`: the same bytes. The local `mood` (a copy of todFrame) is `frame`. Byte-identical (whole image green).
+
+## Proposed field names
+
+- `Entity::unk100` -> `fade` (and `Entity__GetOrCreateUnk100` ->
+  `Entity__GetOrCreateFade`). It is a Class6E99C, the BoxFill that fades its
+  colour (include/Class6E99C.h); Entity__GetOrCreateUnk100 is its only
+  writer (New_Class6E99C, then setStep from its fourth argument, 10 here),
+  Entity__Finalize releases it, and every other access (here, Entity_f x3,
+  Entity_g x1) calls startFadeDown or startFadeUp on it. Accessors outside
+  Entity_d (Entity.c, Entity_f.c, Entity_g.c), so proposed, not applied.

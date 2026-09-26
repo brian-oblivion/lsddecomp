@@ -110,6 +110,26 @@ struct Entity {
  * no code. */
 typedef void (*EntityPlayTodFn)(Entity *self);
 
+/* The codes an Entity sends its parents through notifyParents. DreamSys's
+ * onActorLinkCommand (DreamSys__DispatchInstanceEffect) passes an Entity
+ * sender's codes to DreamSys__InstanceEffectsOnJournal, whose switch is
+ * what each does; it ignores them all while a link is pending.
+ * Entity__SetTargetReached sends ENTITY_EFFECT_LOG_MOOD, and
+ * Entity__NotifyLinkStage picks one of the other three from the mood row's
+ * gEntityLinkStageTable and gEntityEventVideoTable entries. */
+enum EntityEffect {
+    ENTITY_EFFECT_LOG_MOOD = 9, /* log getMoodEffect's mood, add getUnlockEffect to the unlock score */
+    ENTITY_EFFECT_LINK_STAGE = 10,  /* link to the stage getLinkStage names */
+    ENTITY_EFFECT_EVENT_VIDEO = 11, /* end the dream into the video getEventVideo names */
+    ENTITY_EFFECT_END_DREAM = 12    /* end the dream */
+};
+
+/* Actor::state 1: Entity__UpdateActivationState does not activate an
+ * inactive Entity whose state is 1. The MoodCue handlers store it after
+ * deactivate, when their cue has run its course; the other values they
+ * store are each handler's own phases. */
+#define ENTITY_STATE_DONE 1
+
 extern EntityMethods gEntityMethods;
 extern EntityMethods *Get_vtable_Entity(void); /* returns &gEntityMethods */
 

@@ -3,7 +3,7 @@
 > Renamed from `func_800605D0` on 2026-09-24 (tools/rename.py). Address 0x800605d0.
 
 Unit: `Entity_d` (second pass, round 2026-09-03). Mood-dispatch handler,
-calls `Entity__func_80060710` (already matched, earlier ROM address) as a helper:
+calls `Entity__RollScaleOrDelayedDrift` (already matched, earlier ROM address) as a helper:
 `void Entity__MoodCue44(Entity *this, EntityMoodHandlerArg *out)`.
 
 ## Final source
@@ -15,7 +15,7 @@ void Entity__MoodCue44(Entity *this, EntityMoodHandlerArg *out) {
     s32 r2;
     u8 *table;
 
-    Entity__func_80060710(this);
+    Entity__RollScaleOrDelayedDrift(this);
     out->unk10 = this->methods->slot148(this);
     if (this->unk84 == 7 || this->unk84 == 0x16) {
         out->unk1C = 3;
@@ -115,3 +115,7 @@ track code address once row 115 is reached). Mechanics established
 ## Track 4 (2026-09-26, round 88, echo)
 
 The class (id 0x1F234, table `gEntityMethods`) is unified as `Entity` in `include/Entity.h`: a Class65650 subclass whose table and object expand `CLASS65650_SLOTS`/`CLASS65650_FIELDS`. Any source block above is the pre-unification spelling; the live body takes the inherited names (fields `parent`, `coord2`->`tx/ty/tz`, `tick`, `linkTarget`, `state` (was `moodState`), `lastOffsetValue`, `grid` (was `unk4C`), `ticker` (was `companion2`), `arg2` (was `soundCueChannel`), `parts`, `todPlaying`, `peer` (was `target`, cast to the `Unk94Obj` DreamSys view where its own slots are called); slots `reset`, `setDisplay`, `setLightMode`, `setTranslation`/`addTranslation`, `moveLocalZ/X/Y`, `moveLocalZOrFindLink`, `selectTickCallback`, `enableTickCallback`/`disableTickCallback`, `distanceToPeer`, `setTargetReached`, `updateActivationState`/`updateDeactivationState`), byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).
+
+## Track 7 (round 93, bravo)
+
+Every literal in the live body is in its base: decimal for moodTimer ticks, distances, TOD frames, VAB programs, volumes and `state` phases (hex remains only for masks). The two `(u32)(moodTimer - a) < n` window tests read `moodTimer >= a && moodTimer < a + n`: cc1 folds the pair into the same unsigned test, byte-identical. Byte-identical (whole image green).
