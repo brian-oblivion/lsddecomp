@@ -17,7 +17,7 @@ and on which model.
     python3 tools/plan.py check --item <id> [--undo]              # checklists: track 5, 6/7 setup, track 9
     python3 tools/plan.py set-model --role naming_runner|match_runner|polish_runner --model sonnet|opus
     python3 tools/plan.py mark-unit --unit <unit> --track 7 [--undo]   # track 7 polish pass done
-    python3 tools/plan.py flag-type --name <Type> --reason "..." [--undo]   # track 6: a name the patterns miss
+    python3 tools/plan.py flag-type --name <Type> --reason "..." [--after f1,f2] [--undo]   # track 6: a name the patterns miss
     python3 tools/plan.py park-type --name <Type> --reason "..." [--undo]   # track 6: kept, with the reason
     python3 tools/plan.py regions              # track 8: every region of game units, evidence and state
 
@@ -130,7 +130,7 @@ DEFAULT_STATE = {
         "3": {"status": "open", "reason": "", "units_done": {}},
         "4": {"status": "auto", "reason": "", "classes": {}},
         "5": {"status": "auto", "reason": "", "checklist": {}},
-        "6": {"status": "auto", "reason": "", "checklist": {}, "flagged": {}, "parked": {}},
+        "6": {"status": "auto", "reason": "", "checklist": {}, "flagged": {}, "parked": {}, "after": {}},
         "7": {"status": "auto", "reason": "", "checklist": {}, "units_done": {}},
         "8": {"status": "auto", "reason": "", "parked": {}},
         "9": {"status": "auto", "reason": "", "checklist": {}},
@@ -845,6 +845,7 @@ def collect_phase2(st, info, t5_status, classes, units_meta):
         "9": {"status": s9, "checklist": {k: bool(ticked9.get(k)) for k in TRACK9_ITEMS},
               "history": rd["totals"]["history"] + rd["totals"]["header_history"]},
         "_class_jobs": class_jobs, "_homes": homes, "_types": types, "_todo7": todo7,
+        "_after": {n: fs for n, fs in t6.get("after", {}).items() if n in flagged},
         "_rd": rd, "_regions": region_rows, "_sony": sony, "_sony_left": sony_left,
     }
 
@@ -1156,11 +1157,30 @@ def jobs(d, n):
             # and six Entity_* polish passes read its unk fields).
             def is_flagged(n):
                 return p2["_types"].get(n, ("",))[0].startswith("flagged:")
+            # A header that re-declares a Sony name goes before everything
+            # else: no includer of it can take <libgs.h> and friends until it
+            # does (round 94: ViewportOt -> GsOT broke five of Viewport.h's
+            # eleven includers on TimImage.h's GsIMAGE, TileMap.h's GsMAP,
+            # TileAtlas.h's GsCELL and class_3bb8c.h's RotMatrix, while those
+            # headers' own jobs ranked last).
+            for f, names in sorted(p2["_sony_left"].items()):
+                q6.append(("6", f"use Sony's own declarations in {f}: it re-declares {', '.join(names)} "
+                                f"(FINISHING-PLAN track 6 step 4; tools/sonyheaders.py) (units: {f})",
+                           MODELS["types_runner"]))
+            # A flagged job the head marked `--after` waits until every file it
+            # names has left tools/sonyheaders.py's list: its fix needs Sony's
+            # headers in files those collisions would break.
+            d["_waiting"] = []
+            def waits_on(names):
+                return sorted({w for n in names for w in p2["_after"].get(n, []) if w in p2["_sony"]})
             first = {f for f, names in p2["_homes"].items() if any(is_flagged(n) for n in names)}
             for f in sorted(first):
                 names = p2["_homes"][f]
                 u = Path(f).stem if f.startswith("src/") else f
                 why = "; ".join(p2["_types"][n][0] for n in sorted(names) if is_flagged(n))
+                if waits_on(names):
+                    d["_waiting"].append((f"name {', '.join(sorted(names))} in {f}", waits_on(names)))
+                    continue
                 q6.append(("6", f"name {len(names)} placeholder type(s) defined in {f}: {', '.join(sorted(names))}"
                                 f" ({why}){sony_note(f)} (units: {u})", MODELS["types_runner"]))
             # A class whose own name is fine but whose TABLE is D_/ALLCAPS is one
@@ -1185,10 +1205,6 @@ def jobs(d, n):
                 u = Path(f).stem if f.startswith("src/") else f
                 q6.append(("6", f"name {len(names)} placeholder type(s) defined in {f}: {', '.join(sorted(names))}"
                                 f"{sony_note(f)} (units: {u})", MODELS["types_runner"]))
-            for f, names in sorted(p2["_sony_left"].items()):
-                q6.append(("6", f"use Sony's own declarations in {f}: it re-declares {', '.join(names)} "
-                                f"(FINISHING-PLAN track 6 step 4; tools/sonyheaders.py) (units: {f})",
-                           MODELS["types_runner"]))
     if t["7"]["status"] == "open":
         for k, done in t["7"]["setup"].items():
             if not done:
@@ -1407,6 +1423,10 @@ def print_status(d, n, st):
             ref = f"#{shown.index(tj) + 1}" if tj in shown else "the premium job"
             why = why.replace("{#}", ref)
             print(f"        [{track:<2}] {model:<7} {desc[:90]}{'...' if len(desc) > 90 else ''}  <- {why}")
+    if d.get("_waiting"):
+        print("  WAITING (flagged --after: staff once every file named has left tools/sonyheaders.py's list):")
+        for desc, on in d["_waiting"]:
+            print(f"        [6 ] {desc}  <- waits on {', '.join(on)}")
     review = [u for u in d["_todo3"] if t["3"]["status"] != "done" and not any(d["units"][u][k] for k in
               ("func_named", "unk_refs", "slot_refs", "d_refs"))]
     if review:
@@ -1514,6 +1534,9 @@ def main():
         ft.add_argument("--name", required=True)
         ft.add_argument("--reason", default="")
         ft.add_argument("--undo", action="store_true")
+        if cmd == "flag-type":
+            ft.add_argument("--after", default="", help="comma-separated files whose Sony-name collisions "
+                            "(tools/sonyheaders.py) must clear before this job is staffed")
     s = sub.add_parser("set-track")
     s.add_argument("--track", required=True)
     s.add_argument("--status", required=True, choices=["open", "parked", "done", "auto"])
@@ -1580,6 +1603,11 @@ def main():
             if not a.reason:
                 sys.exit("FATAL: --reason is required (what the name hides, or why it stays)")
             led[a.name] = f"{a.reason} ({today})"
+        after = st["tracks"]["6"].setdefault("after", {})
+        if a.cmd == "flag-type" and (a.undo or a.after):
+            after.pop(a.name, None)
+            if not a.undo:
+                after[a.name] = [f.strip() for f in a.after.split(",") if f.strip()]
         save_state(st)
         print(f"track 6: {a.name} {'un' if a.undo else ''}{key}")
         return

@@ -19,8 +19,8 @@ and wrong for every round after. Run the tool. The mechanics of a round
 the per-function matching loop is CLAUDE.md and `docs/MATCHING-GUIDE.md`.
 This file does not repeat them.
 
-Plan revision: 31 (2026-09-26, round 93's premium head: a reopened phase
-1 track runs beside phase 2; a class job's edit set holds its methods' units).
+Plan revision: 32 (2026-09-26, round 94's premium head: a header that
+re-declares a Sony name ranks first; a flagged job can wait `--after` them).
 Changing the plan is a premium head task (§2); record the change in
 `docs/PROGRESS.md` and bump this line.
 
@@ -198,6 +198,12 @@ one per other file that defines placeholder types. The head adds a name the
 patterns cannot see (an opaque one such as `ObjM`, or a local view of a type
 another file defines) with `plan.py flag-type`; its file's job then ranks
 first, since other jobs' debt usually waits on it (round 92: SoundCueSet).
+Ahead even of that, a header that re-declares a Sony name gets a job of its
+own, because none of its includers can take Sony's headers until it does
+(round 94: `ViewportOt` is Sony's anonymous `GsOT`, and `Viewport.h` could
+not include `<libgs.h>` past four such headers). A flagged fix that needs
+Sony's headers where those collisions sit is flagged `--after <files>`, and
+`plan.py` lists it as WAITING until each has left `tools/sonyheaders.py`.
 A class job's edit set is its header plus the units holding the class's own
 methods (their banners and field accessors), so a polish pass on one of those
 units defers behind it (round 93: class_3bb8c behind StageMap's job).
