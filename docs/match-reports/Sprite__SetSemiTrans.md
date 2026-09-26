@@ -4,7 +4,7 @@
 
 Round 82, runner alpha (third re-staffed slot of the round). Unit `src/code_322b4.c`. Fresh ground (carved in FINISHING-PLAN revision 18), no prior attempt, no report before this one.
 
-- **Where:** slot +0x064 of gCharSpriteMethods, gScreenSpriteMethods, gSpriteMethods, D_8006EB90 and D_800879C4 (`tools/classtable.py`).
+- **Where:** slot +0x064 of gCharSpriteMethods, gScreenSpriteMethods, gSpriteMethods, D_8006EB90 and gClass879C4Methods (`tools/classtable.py`).
 - **What:** `GetSetBitField(&self->sprite.attribute, 0x1E, 1, a1 != 0)` over the GsSPRITE attribute at +0x064; same shape as `BoxFill__SetSemiTrans` in `code_2cc8c_f.c` and the `code_d294.c` +0x10 family. `GetSetBitField` prototype copied locally from `include/code_d294.h`.
 - **Result:** byte-exact; 11/11 words, 0 insertions / 0 deletions, whole-image SHA1 green (`./build-and-verify.sh` OK). First build.
 - **Types:** local views and prototypes live in the unit; no shared header was touched.

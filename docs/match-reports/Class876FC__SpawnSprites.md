@@ -15,7 +15,7 @@ finding and undoing a self-inflicted whole-image size regression (below).
 
 Populates all 5 slots of `self->arr84` (already known from
 `class_3bb8c_o.c`'s `LinkOwnerObj::arr84`) with freshly-allocated nodes via
-`New_D800879C4`, wires each one to `self` through `slot4C`, forwards
+`New_Class879C4`, wires each one to `self` through `slot4C`, forwards
 `self->unk74` through `slotB8`, and — only when the caller passed a non-NULL
 `tbl` — also calls each new node's `slot48` with it.
 
@@ -28,7 +28,7 @@ void Class876FC__SpawnSprites(void *self, s32 a1, s32 a2, void *tbl) {
     s32 i;
 
     for (i = 0; i < 5; i++, p++) {
-        node = New_D800879C4((void *)a2, 0, D_8008ACA8);
+        node = New_Class879C4((void *)a2, 0, D_8008ACA8);
         *p = node;
         node->methods->slot4C(node, self, 0);
         (*p)->methods->slotB8(*p, ((LinkNode *)self)->unk74);
@@ -104,10 +104,10 @@ Round 70 (alpha). `func_80056D18` -> `Class876FC__SpawnSprites`, **tier B**.
 
 Two callers: Class876FC__BuildRandomSprites (tbl = gSpriteScaleHalf or NULL)
 and class_3bb8c_o.c's LinkOwnerObj__func_56e1c (tbl = NULL, kind 3). Body:
-five `New_D800879C4(a2, 0, D_8008ACA8)` into +0x084, each attachToParent(self,
+five `New_Class879C4(a2, 0, D_8008ACA8)` into +0x084, each attachToParent(self,
 no offset), slotB8(self->color), and updateScale(1, tbl) when tbl != NULL.
 
-Why "sprites": in D800879C4's table (tools/classtable.py D_800879C4) slots
+Why "sprites": in D800879C4's table (tools/classtable.py gClass879C4Methods) slots
 +0x060/+0x064/+0x068 set bits 31/30/28-29 of a word at +0x064 (GsDOFF,
 GsALON, semitrans rate: LIBGS.H:303-308), slot +0x0B8 (Sprite__SetColor)
 copies three bytes to +0x078..+0x07A and slot +0x044 writes +0x084. Those

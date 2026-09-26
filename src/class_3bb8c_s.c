@@ -35,13 +35,13 @@ typedef struct Vec3S {
 } Vec3S;
 
 /* Slot names follow the base implementation they dispatch to (resolved with
- * tools/classtable.py on gClass876FCMethods / gActorMethods / D_800879C4). `set` is
+ * tools/classtable.py on gClass876FCMethods / gActorMethods / gClass879C4Methods). `set` is
  * 1 = assign, 0 = accumulate; `data` is a triple of s16 num/den ratios
  * (RatioToFixed12). */
 typedef struct LinkNodeMethods {
     u8 pad0[0x44];
     void (*updateRotation)(LinkNode *self, s32 set, s32 data);  /* +0x044, Class6B5CC__UpdateRotation (degrees; sprites: Sprite__UpdateRotation, rotate) */
-    void (*updateScale)(LinkNode *self, s32 set, void *data);   /* +0x048, Class6B5CC__UpdateScale (GsCOORD2PARAM.scale; sprites: D800879C4__UpdateScale) */
+    void (*updateScale)(LinkNode *self, s32 set, void *data);   /* +0x048, Class6B5CC__UpdateScale (GsCOORD2PARAM.scale; sprites: Class879C4__UpdateScale) */
     void (*attachToParent)(LinkNode *self, void *parent, void *trans); /* +0x04C, Class6B5CC__AttachToParent (coord2 super = parent's, coord.t = trans) */
     u8 pad50[0x60 - 0x50];
     void (*setDisplay)(LinkNode *self, s32 on);                 /* +0x060, Class6B5CC__SetDisplay: GsDOFF = !on */
@@ -116,13 +116,13 @@ extern void Class876FC__DriftModelChildren(); /* arity-ok: the definition is 1-p
 
 /* class_3bb8c_p.c; fully prototyped since every call site here uses all
  * three arguments for real. */
-extern void *New_D800879C4(void *arg1, void *arg2, void *arg3);
+extern void *New_Class879C4(void *arg1, void *arg2, void *arg3);
 
 /* Three globals class_3bb8c_o.c's Actor__func_56f5c captures once from its
  * parameters (declared there with the same types; track 4b, round 85):
  * D_8008ACA4 is the Actor it ran on, called here through Class6B5CC's
  * +0x080 getSetUnk10Flag8 as that function calls it; D_8008ACA8 is
- * forwarded opaquely to New_D800879C4 as its third argument; D_8008ACAC's
+ * forwarded opaquely to New_Class879C4 as its third argument; D_8008ACAC's
  * pointee has a field at +0x018 that Class876FC__InitByKind and
  * Class876FC__UpdateByKind snapshot/diff via gTrackedYSnapshot. */
 extern Actor *D_8008ACA4; /* the Actor Actor__func_56f5c ran on */
@@ -370,7 +370,7 @@ void Class876FC__BuildRandomSprites(Class876FC *self) {
     self->sprites[2]->methods->setDisplay(self->sprites[2], 0);
 }
 
-/* Create the five sprites (New_D800879C4), attach each to self at no offset,
+/* Create the five sprites (New_Class879C4), attach each to self at no offset,
  * give each self's colour (a sprite's slotB8 sets GsSPRITE r,g,b), and
  * assign `tbl` as their scale when non-NULL. `self` stays `void *`: it is
  * the prototype class_3bb8c_o.c calls through, and a typed local alias of
@@ -381,7 +381,7 @@ void Class876FC__SpawnSprites(void *self, s32 a1, s32 a2, void *tbl) {
     s32 i;
 
     for (i = 0; i < 5; i++, p++) {
-        node = New_D800879C4((void *)a2, 0, D_8008ACA8);
+        node = New_Class879C4((void *)a2, 0, D_8008ACA8);
         *p = node;
         node->methods->attachToParent(node, self, 0);
         (*p)->methods->slotB8(*p, ((LinkNode *)self)->color);
