@@ -61,7 +61,9 @@ FUNC_PH = re.compile(r"^(?:\w+__)?func_(?:800)?[0-9A-Fa-f]{5}$")
 # --- placeholder type names -------------------------------------------------
 TYPE_HEX = re.compile(r"(?<![0-9A-F])[0-9A-F]*[0-9][0-9A-F]*(?![0-9A-F])")
 TYPE_UNIT_SUFFIX = re.compile(r"_[0-9a-f]*[0-9][0-9a-f]*[a-z]?(?:_[a-z][0-9a-z]?)*$")
-TYPE_UNK = re.compile(r"(?:^|[a-z0-9_])Unk(?=[A-Z0-9_]|$)|^unk", re.I)
+# An `Unk`/`unk` name COMPONENT, case-sensitive: with re.I the "unk" inside
+# "Chunk" matched (round 93: ChunkSlot, StageChunk counted as placeholders).
+TYPE_UNK = re.compile(r"(?:^|[a-z0-9_])Unk(?=[A-Z0-9_]|$)|(?:^|_)unk(?=[A-Z0-9_]|$)")
 TYPE_SUB = re.compile(r"Sub[0-9A-F]{1,3}$")
 # Headers that are not game types: Sony's SDK, and the project's plumbing.
 NOT_GAME_HEADERS = {"gte.h", "include_asm.h", "types.h"}
