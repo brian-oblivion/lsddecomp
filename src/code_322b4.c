@@ -28,10 +28,12 @@
  * FrameClock (include/FrameClock.h, gFrameClockMethods, id 0x5) is unified:
  * a BasicClass subclass ticked once per DrawSystem frame that tells its
  * parents event 2 (counted), 3 (paused) or 4 (flag14); its own methods
- * (New_FrameClock, FrameClock__*, Get_vtable_FrameClock) live here. RequestedFile (include/RequestedFile.h, gRequestedFileMethods, id 0xB03)
- * is unified: a FileResource data source that requests one named file and
- * sets `loaded` when the driver reports it done; its own methods
- * (New_RequestedFile, RequestedFile__*, GetRequestedFileMethods) live here.
+ * (New_FrameClock, FrameClock__*, Get_vtable_FrameClock) live here.
+ * RequestedFile (include/RequestedFile.h, gRequestedFileMethods, id 0xB03) is
+ * unified: a FileResource that requests one named file from the active driver
+ * at construction and sets `loaded` when the driver's setFlag reports it
+ * read (WBgm's SEQ file); its own methods (New_RequestedFile,
+ * RequestedFile__*, GetRequestedFileMethods) live here.
  * LightRig (include/LightRig.h, gLightRigMethods, id 0x14) is unified too: a
  * SceneNode subclass owning three FlatLightObj children and an ambient
  * colour (SetAmbientColor -> GsSetAmbient); its own methods (New_LightRig,
