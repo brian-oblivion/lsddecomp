@@ -5,6 +5,7 @@
 #include "StreamTask.h"
 #include "GraphRoom.h"
 #include "Class86B60.h"
+#include "Class865C8.h"
 
 /* The game's allocator, in the uncarved code_8220 block. Returns void *
  * rather than a typed pointer because every New_X in the game calls it. */
@@ -77,27 +78,6 @@ extern s32 ResolveCinematicChannel(s32 *out, s32 packedBankEntry); /* psyq_memse
     back as a signed 32-bit number. Also returns its own (separate) s32 value, kept by
     Class6D3C8__StartCinematicStream. */
 
-/* Obj865C8 (include/class_39e08.h), this unit's own minimal view of it:
- * slot4 (BasicClass's release) is called with ONLY self, and slot44's
- * (IntermediateBase's init, here with no further arguments) return is the
- * status code Class6D3C8__PollStatusObj switches on. */
-typedef struct StatusObjMethods {
-    s32 header;                              /* +0x000 */
-    void (*slot4)(void *self);                  /* +0x004 */
-    u8 pad08[0x044 - 0x008];                     /* +0x008 .. +0x043 */
-    s32 (*slot44)(void *self);                    /* +0x044: return value matters -- confirmed by the
-                                                       call site, which keeps THIS return (not slot4's,
-                                                       captured via slot4's own jalr delay slot the same
-                                                       way Class6D3C8__RunPollTask keeps its own slot44 result). */
-} StatusObjMethods;
-
-typedef struct StatusObj {
-    StatusObjMethods *methods;
-} StatusObj;
-
-/* class_39e08.c's New_Class865C8(Obj0C *, DreamSys *, s32); this unit passes
- * the parent's aux (the tasks' IntermediateBaseInitArgs) and its DreamSys. */
-extern StatusObj *New_Class865C8(IntermediateBaseInitArgs *initArgs, DreamSys *dreamSys, s32 a2);
 
 /* The `New_X` allocator for the class whose method table is D_8006D3C8:
  * allocates a 0x2C-byte instance and, on success, runs the class's own
@@ -300,12 +280,13 @@ void Class6D3C8__StartGraphRoomStreamTask(Class6D3C8 *self) {
 void Class6D3C8__NoOpSlot5C(void) {
 }
 
-/* Builds a StatusObj, dispatches slot44(obj) then reads slot4(obj)'s
- * return as a status code: 2 runs Class6D3C8__StartCinematicStream, 3 latches self->skipGraphRoomPoll.
+/* Builds a Class865C8 (include/Class865C8.h), runs its init with self
+ * alone (Class865C8__Init takes nothing else, hence Class865C8InitFn) and
+ * releases it; init's return, Class86668::result, is a status code: 2 runs Class6D3C8__StartCinematicStream, 3 latches self->skipGraphRoomPoll.
  * Then queries the DreamSys status slot again (as Class6D3C8__PollGraphRoomStatus does),
  * this time passing an out-param, and derives a 0/1 result from both the
  * call's return and the out-param. */
-/* Builds a StatusObj for this instance's current state, reads one status
+/* Builds a Class865C8 for this instance's current state, reads one status
  * code off it, tears it down, and reacts to two of the codes. Then asks the
  * owned DreamSys a question and reports whether its answer was 1.
  *
@@ -327,14 +308,14 @@ void Class6D3C8__NoOpSlot5C(void) {
  *    what the source said. */
 s32 Class6D3C8__PollStatusObj(Class6D3C8 *self) {
     s32 status;
-    StatusObj *obj;
+    Class865C8 *obj;
     s32 outVal;
     s32 check;
     s32 result;
 
     obj = New_Class865C8((IntermediateBaseInitArgs *)self->aux, self->dreamSys, self->ctorArgs->unk04);
-    status = obj->methods->slot44(obj);
-    obj->methods->slot4(obj);
+    status = ((Class865C8InitFn)obj->methods->init)(obj);
+    obj->methods->release(obj);
 
     switch (status) {
     case 2:

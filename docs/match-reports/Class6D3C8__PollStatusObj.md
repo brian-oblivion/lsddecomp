@@ -252,3 +252,17 @@ mechanic, matching this unit's `Class6D3C8__PollGraphRoomStatus` naming
 shape (both are "poll an object for a status code and react to it"), since
 what the two status-code values actually MEAN in the game is not
 established from this body alone.
+
+## Track 4 (2026-09-26, round 88, Class865C8)
+
+The "StatusObj" is Class865C8 (gClass865C8Methods, include/Class865C8.h):
+`New_Obj865C8` became `New_Class865C8`, and this unit's local
+`StatusObj`/`StatusObjMethods` view was deleted. The body now reads
+`((Class865C8InitFn)obj->methods->init)(obj)` then
+`obj->methods->release(obj)`: slot +0x044 is IntermediateBase's
+`init(self, args, mode)`, and Class865C8's occupant, `Class865C8__Init`,
+takes self alone, so the call keeps passing only `$a0` through a typedef of
+the override (a pointer cast, no code). The status code is Class86668's
+`result`: 2 and 3 are values `Class865C8__OnObjMNotify` sets when the ObjM
+it built ends the day (`endDay` returned 0 with a cinematic entry: 2;
+`endDay` failed, or events 0xC/0xD: 3). Byte-identical.
