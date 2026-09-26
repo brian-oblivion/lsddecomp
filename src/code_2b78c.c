@@ -69,11 +69,11 @@ void Class6E4F0__InitSystems(Class6E4F0 *self, DrawSystem *drawSystem, struct Pa
         SsInit();
         GsInit3D();
         self->aux = BMemPMgrAlloc(0x14);
-        self->aux->drawSystem = drawSystem;
-        self->aux->pad = pad;
-        self->aux->unk08 = 0;
-        self->aux->unk0C = 0;
-        self->aux->unk10 = 0;
+        self->aux->unk0 = (BasicClass *)drawSystem;
+        self->aux->unk4 = (BasicClass *)pad;
+        self->aux->unk8 = NULL;
+        self->aux->unkC = NULL;
+        self->aux->viewport = NULL;
         self->initialized = 1;
     }
 }

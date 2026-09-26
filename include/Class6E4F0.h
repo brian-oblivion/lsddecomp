@@ -3,6 +3,7 @@
 
 #include "BasicClass.h"
 #include "DrawSystem.h"
+#include "IntermediateBase.h"
 
 /*
  * Class6E4F0 -- class id 0x60, method table D_8006E4F0, a direct BasicClass
@@ -31,19 +32,17 @@
 
 typedef struct Class6E4F0 Class6E4F0;
 typedef struct Class6E4F0Methods Class6E4F0Methods;
+struct Pad; /* initSystems's pad: main()'s New_Pad(0, 0) */
 
 /* ScreenDims ({w, h}; the ctor's default is gDefaultScreenDims = {320, 240})
  * and initSystems's drawSystem argument are DrawSystem's: include/DrawSystem.h
  * (round 87). */
 
-/* The 0x14-byte block initSystems allocates. */
-typedef struct Class6E4F0Aux {
-    /* +0x000 */ DrawSystem *drawSystem; /* initSystems's drawSystem */
-    /* +0x004 */ struct Pad *pad;        /* initSystems's pad: main()'s New_Pad(0, 0) */
-    /* +0x008 */ s32 unk08;              /* cleared by initSystems */
-    /* +0x00C */ s32 unk0C;              /* cleared by initSystems */
-    /* +0x010 */ s32 unk10;              /* cleared by initSystems */
-} Class6E4F0Aux;
+/* The 0x14-byte block initSystems allocates is an IntermediateBaseInitArgs
+ * (include/IntermediateBase.h): {drawSystem, pad, NULL, NULL, NULL}. Every
+ * task the subclass starts receives it as its init argument; NULL in the last
+ * three makes IntermediateBase__Init create its own FrameClock, LightRig and
+ * Viewport. */
 
 /* clang-format off */
 #define CLASS6E4F0_SLOTS(Self, CtorParams)                                                         \
@@ -69,7 +68,7 @@ typedef struct Class6E4F0Aux {
     /* +0x00C */ ScreenDims dims;      /* setScreenDims; initGraph's size */                       \
     /* +0x014 */ s32 vramMode;         /* setScreenDims; initGraph's GsInitGraph vram mode */      \
     /* +0x018 */ s32 initialized;      /* cleared by the ctor, set by initSystems; runMainLoop runs only once set */ \
-    /* +0x01C */ Class6E4F0Aux *aux    /* initSystems's allocation */
+    /* +0x01C */ IntermediateBaseInitArgs *aux /* initSystems's allocation: every task's init argument */
 /* clang-format on */
 
 struct Class6E4F0Methods {
