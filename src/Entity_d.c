@@ -107,8 +107,8 @@ void Entity__MoodCue40(Entity *this, SoundCueSet *out) {
 }
 
 void Entity__MoodCue41(Entity *this, SoundCueSet *out) {
-    s32 rv;
-    s16 *tablePtr;
+    s32 roll;
+    s16 *zDenom;
 
     if (this->moodTimer == 0) {
         this->state = rand() % 5 + 0xA;
@@ -119,12 +119,12 @@ void Entity__MoodCue41(Entity *this, SoundCueSet *out) {
     }
     if (this->state == 0xE) {
         if ((this->moodTimer & 3) == 0) {
-            rv = rand();
-            tablePtr = &sScaleTemplateZDenom;
-            *tablePtr = rv % 32 + 1;
+            roll = rand();
+            zDenom = &sScaleTemplateZDenom;
+            *zDenom = roll % 32 + 1;
             /* Back from the den to the start of its template. MATCHING:
              * retail relocates against sScaleTemplateZDenom, not SCALE_X3. */
-            this->methods->updateScale(this, 1, (Ratio16 *)(tablePtr + 1) - 3);
+            this->methods->updateScale(this, 1, (Ratio16 *)(zDenom + 1) - 3);
         }
     }
 }
@@ -387,7 +387,7 @@ void Entity__MoodCue52(Entity *this, SoundCueSet *out) {
 }
 
 void Entity__MoodCue55(Entity *this, SoundCueSet *out) {
-    s32 mood = this->todFrame;
+    s32 frame = this->todFrame;
 
     if (this->moodTimer == 0) {
         if (rand() % 3 == 0) {
@@ -395,13 +395,13 @@ void Entity__MoodCue55(Entity *this, SoundCueSet *out) {
         }
     }
     out->attenuation = this->methods->getProximityRatio(this);
-    if (mood >= 0x20) {
-        mood -= 0x20;
+    if (frame >= 0x20) {
+        frame -= 0x20;
     }
-    if (mood == 9 || mood == 0x11 || mood == 0x17) {
+    if (frame == 9 || frame == 0x11 || frame == 0x17) {
         out->slots[0].program = 0x13;
     }
-    if (mood == 0x17) {
+    if (frame == 0x17) {
         out->slots[1].program = 0x13;
     }
 }
@@ -413,7 +413,7 @@ void Entity__MoodCue56(Entity *this) {
 }
 
 void Entity__MoodCue57(Entity *this, SoundCueSet *out) {
-    s32 mood;
+    s32 frame;
 
     if (this->moodTimer == 0) {
         this->state = rand() % 3;
@@ -424,16 +424,16 @@ void Entity__MoodCue57(Entity *this, SoundCueSet *out) {
     }
     out->attenuation = this->methods->getProximityRatio(this);
     if (this->state != 0) {
-        mood = this->todFrame;
-        if (mood < 0x1E) {
+        frame = this->todFrame;
+        if (frame < 0x1E) {
             out->slots[0].program = 0xC;
             out->slots[0].octave = -1;
-        } else if (mood == 0x1E) {
+        } else if (frame == 0x1E) {
             out->slots[0].program = -2;
-        } else if (mood == 0x23) {
+        } else if (frame == 0x23) {
             out->slots[2].program = 0x16;
             out->slots[2].octave = -2;
-        } else if (mood == 0x30) {
+        } else if (frame == 0x30) {
             if (Entity__IsNearTarget(this, &this->coord2->tx, 0xF, 0xA)) {
                 if (Entity__GetOrCreateUnk100(this, NULL, NULL, (void *)0xA, 0) != NULL) {
                     this->unk100->methods->startFadeDown(this->unk100, (BasicClass *)this->ticker, 4, 0);
@@ -442,7 +442,7 @@ void Entity__MoodCue57(Entity *this, SoundCueSet *out) {
                     this->methods->notifyParents(this, 0xB);
                 }
             }
-        } else if (mood == 0x3B) {
+        } else if (frame == 0x3B) {
             this->methods->deactivate(this);
             this->state = 1;
         }
