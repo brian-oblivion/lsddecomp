@@ -2,29 +2,20 @@
  * following Entity_c and Entity_d (Entity_d's own header comment names the
  * split). Every function in this unit is a `gEntityMoodHandlerTable`
  * callback (Entity.h), named `Entity__MoodCueNN` for the row it occupies --
- * rows 59, 61-62, 64-71, 73-81, confirmed by reading disk/SLPS_015.56
- * directly (base 0x80089EB0 + 0x10*row is the row's own `handler` word,
- * checked against each candidate function's address; row order does not
- * track code address, same finding as Entity_d/round 76). Rows 60, 63 and
- * 72 have a NULL handler word in the table -- those mood indices legitimately
+ * rows 59, 61-62, 64-71, 73-81; row order does not track code address (see
+ * each function's match report for the row derivation). Rows 60, 63 and 72
+ * have a NULL handler word in the table -- those mood indices legitimately
  * dispatch no per-tick cue callback at all, not a gap in this unit's queue.
  *
- * `Entity__MoodCue81` (0x80063144) also occupies row 120 of the same table
- * (identical `handler` word, different data0/data1/data2) -- one function
- * shared by two mood-row configurations, named for its lower row.
- * `Entity__MoodCue71` (0x80062570) was already cross-unit called (Entity_g's
- * `Entity__MoodCue108` forwards its own args straight through) before this round;
- * its `include/Entity.h` extern is updated by this rename.
+ * `Entity__MoodCue81` also occupies a second row of the same table, under
+ * different tuning data; `Entity__MoodCue71` is also called cross-unit, from
+ * Entity_g (see each function's own match report).
  *
- * Four rotation/translate data constants named this round, decoded from
- * disk/SLPS_015.56 against the existing ROTATION_YAW_PLUS90/ROTATION_ZMINUS90/
- * TRANSLATE_Y_PLUS256/SCALE_HALF tables (rotation/scale: four s16 {num,den}
- * pairs for X/Y(yaw)/Z/W; translate: three consecutive s32 for X/Y/Z):
- * ROTATION_ZPLUS9, ROTATION_XPLUS90, TRANSLATE_Y_PLUS8, TRANSLATE_Y_MINUS512.
- * `sMoodCue78TransitionDone` (formerly D_8008ACCC) is a one-shot s32 flag
- * local to Entity__MoodCue78's own state machine, referenced nowhere else in
- * `src/`. See each function's match report's `## Naming` section for the
- * per-constant evidence.
+ * Rotation/scale tables are three s16 {num,den} pairs for X/Y(yaw)/Z;
+ * translate tables are three consecutive s32 for X/Y/Z. `sMoodCue78TransitionDone`
+ * is a one-shot s32 flag local to Entity__MoodCue78's own state machine,
+ * referenced nowhere else in `src/`. See each function's match report's
+ * `## Naming` section for the per-constant evidence.
  */
 #include "common.h"
 #include "Entity.h"
@@ -317,7 +308,7 @@ extern u8 D_80089DFC[];
 extern u8 ROTATION_YAW_PLUS9[];
 
 void Entity__MoodCue76(Entity *this, EntityMoodHandlerArg *out) {
-    void (*fn)(Entity *self, s32 arg1, void *arg2);
+    void (*fn)(Entity *self, s32 set, void *table);
     void *table;
 
     if (this->targetReached != 0) {
