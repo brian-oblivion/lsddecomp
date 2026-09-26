@@ -14,7 +14,7 @@
  *    codes 25/23 to closing with result 2/3; SetState(4) then reports the
  *    result to the parents, which read the chosen item back through
  *    GetCursorIndex. Its ctor, child and resource methods are in
- *    class_3bb8c_j.
+ *    class_3bb8c_j. Declared in include/Class86F88.h (track 4, round 89).
  *  - ObjM (table D_80087034, slots +0x008/+0x00C/+0x038, plus New_ObjM):
  *    its allocator, ctor, dtor and OnNotify. The rest of ObjM is in
  *    class_3bb8c_l and class_3bb8c_m.
@@ -27,6 +27,8 @@
 #include "class_39e08.h"
 #include "Class86668.h"
 #include "TextRow.h"
+#include "TimImage.h"
+#include "Class86F88.h"
 
 /*
  * class_3bb8c_k's own view of ObjM (method table D_80087034, returned by
@@ -147,7 +149,7 @@ void Class86F88__HandleInputCode(Class86F88 *self, void *source, s32 code) {
 
 void Class86F88__ForwardToTarget(Class86F88 *self, s32 code)
 {
-    Class86F88Target *target = self->target;
+    struct TargetObj86ED0 *target = self->target;
 
     if (target != NULL) {
         target->methods->slot80(target, code, 0x60, 0x60);
@@ -160,7 +162,7 @@ void Class86F88__ScrollRight(Class86F88 *self)
     s32 tmp;
     s32 column;
 
-    if (!self->resource) {
+    if (!self->panelSprite) {
         return;
     }
     tmp = self->column;
@@ -178,7 +180,7 @@ void Class86F88__ScrollLeft(Class86F88 *self)
 {
     s32 column;
 
-    if (!self->resource) {
+    if (!self->panelSprite) {
         return;
     }
     column = self->column - 1;
@@ -195,7 +197,7 @@ void Class86F88__CursorUp(Class86F88 *self, s32 arg1, s32 arg2, s32 arg3)
     s32 newTop;
     s32 newCursor;
 
-    if (!self->resource) {
+    if (!self->panelSprite) {
         return;
     }
     cursor = self->cursorIndex;
@@ -219,7 +221,7 @@ void Class86F88__CursorDown(Class86F88 *self, s32 arg1, s32 arg2, s32 arg3)
     s32 newCursor;
     s32 prevTop;
 
-    if (!self->resource) {
+    if (!self->panelSprite) {
         return;
     }
     if (self->cursorIndex + 1 >= self->itemCount) {
@@ -237,35 +239,20 @@ void Class86F88__CursorDown(Class86F88 *self, s32 arg1, s32 arg2, s32 arg3)
     }
 }
 
-/* Defined later in this file (ROM order); forward-declared here since
- * Class86F88__CreateRows calls both, same convention as Class865C8__StartObjM in
- * src/class_39e08.c. Signatures must match their real definitions below
- * exactly. */
-extern char *Class86F88__FormatRowText(Class86F88 *self, char *dest, s32 row, s32 top, char *column);
-extern void Class86F88__SetView(Class86F88 *self, s32 top, s32 column, s32 cursor, s32 highlight);
-
 /* The first row's position, two sdata words (-0x5C, -0xF). Read by value
  * into Class86F88__CreateRows's `pos`; each further row is 0xA lower. */
 extern s32 gClass86F88RowOriginX;
 extern s32 gClass86F88RowOriginY;
 
-/* Class86F88__CreateRows's stack-local {x, y}, passed by address to each
- * row's `layout` (Class86F88ElemMethods +0x04C, opaque `void *` in the
- * shared header). */
-typedef struct {
-    s32 x;
-    s32 y;
-} Pos_3bb8c_k;
-
-void Class86F88__CreateRows(Class86F88 *self, s32 parent, s32 font, s32 top, s32 column, s32 cursor)
+void Class86F88__CreateRows(Class86F88 *self, Class6B5CC *parent, TimImage *font, s32 top, s32 column, s32 cursor)
 {
     char buf[0x20];
-    Pos_3bb8c_k pos;
-    Class86F88Elem **p;
+    ScreenSpritePos pos;
+    TextRow **p;
     s32 count;
     s32 i;
 
-    if (!self->resource) {
+    if (!self->panelSprite) {
         return;
     }
 
@@ -278,9 +265,9 @@ void Class86F88__CreateRows(Class86F88 *self, s32 parent, s32 font, s32 top, s32
     }
 
     for (i = 0; i < count; i++) {
-        Class86F88__FormatRowText(self, buf, i, top, (char *)column);
-        *p = (Class86F88Elem *)New_TextRow((void *)font, 0x1A, buf);
-        (*p)->methods->layout(*p, parent, &pos);
+        Class86F88__FormatRowText(self, buf, i, top, column);
+        *p = New_TextRow(font, 0x1A, buf);
+        (*p)->methods->attachToParent(*p, parent, (Vec3_d294 *)&pos);
         (*p)->methods->setColor(*p, &gClass86F88RowColor);
         pos.y += 0xA;
         p++;
@@ -295,7 +282,7 @@ void Class86F88__ReleaseRows(Class86F88 *self)
     s32 i;
     u8 unused[8];
 
-    if (!self->resource) {
+    if (!self->panelSprite) {
         return;
     }
     count = self->itemCount;
@@ -336,9 +323,9 @@ void Class86F88__RefreshRows(Class86F88 *self, s32 top, s32 column, s32 cursor, 
     s32 count;
     s32 i;
     char buf[0x20];
-    Class86F88Elem **p;
+    TextRow **p;
 
-    if (!self->resource) {
+    if (!self->panelSprite) {
         return;
     }
     count = self->itemCount;
@@ -347,7 +334,7 @@ void Class86F88__RefreshRows(Class86F88 *self, s32 top, s32 column, s32 cursor, 
         count = 4;
     }
     for (i = 0; i < count; i++) {
-        Class86F88__FormatRowText(self, buf, i, top, (char *)column);
+        Class86F88__FormatRowText(self, buf, i, top, column);
         (*p)->methods->setText(*p, buf);
         p++;
     }
@@ -357,17 +344,17 @@ void Class86F88__RefreshRows(Class86F88 *self, s32 top, s32 column, s32 cursor, 
     }
 }
 
-char *Class86F88__FormatRowText(Class86F88 *self, char *dest, s32 row, s32 top, char *column)
+char *Class86F88__FormatRowText(Class86F88 *self, char *dest, s32 row, s32 top, s32 column)
 {
     s32 idx = top + row;
     s32 len;
     s32 i;
 
-    len = strlen(column + self->texts[idx]);
+    len = strlen(self->texts[idx] + column);
     if (len >= 0x1B) {
         len = 0x1A;
     }
-    memcpy(dest, column + self->texts[idx], len);
+    memcpy(dest, self->texts[idx] + column, len);
     i = len;
     if (i < 0x1A) {
         for (; i < 0x1A; i++) {
@@ -380,7 +367,7 @@ char *Class86F88__FormatRowText(Class86F88 *self, char *dest, s32 row, s32 top, 
 
 void Class86F88__SetView(Class86F88 *self, s32 top, s32 column, s32 cursor, s32 highlight)
 {
-    Class86F88Elem *elem;
+    TextRow *elem;
     s32 flag = highlight;
 
     __asm__("");
@@ -397,10 +384,10 @@ void Class86F88__SetView(Class86F88 *self, s32 top, s32 column, s32 cursor, s32 
 
 void Class86F88__StepCursorInView(Class86F88 *self, s32 dir, s32 notify)
 {
-    Class86F88Elem **p;
+    TextRow **p;
     s32 idx;
 
-    if (!self->resource) {
+    if (!self->panelSprite) {
         return;
     }
     idx = self->cursorIndex - self->topIndex;

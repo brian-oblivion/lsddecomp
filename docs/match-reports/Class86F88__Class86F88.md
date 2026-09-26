@@ -239,7 +239,7 @@ nowhere close. This function's search space (7 local values needing a
 specific register rotation across ~30 live instructions) appears to be
 beyond what an unguided permuter search closes quickly, unlike the
 smaller single-residue functions in this same unit
-(`TextEntry__ResetAllChars`, `Class86F88__AddChildAndSetState`) where 14-5000 iterations sufficed.
+(`TextEntry__ResetAllChars`, `Class86F88__AttachTarget`) where 14-5000 iterations sufficed.
 
 **Not re-staffed without a plan beyond "try more permuter time" or "try
 every p/q aliasing permutation by hand."** A structured next step: derive
