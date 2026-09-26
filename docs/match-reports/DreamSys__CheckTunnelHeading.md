@@ -152,3 +152,31 @@ queue).
 ## Naming
 
 - **Tier B.** Near-identical body to DreamSys__CheckStaircaseHeading, differing only in which per-stage heading table it indexes (TUNNEL_ENTER_HEADINGS/TUNNEL_EXIT_HEADINGS here); called from DreamSys__TryTunnelLink.
+
+## Comment moved from src/DreamSys.c (round 92, track 7)
+
+Replaced in the source by a comment that says what the code does; kept here as written.
+
+```c
+/* TUNNEL_ENTER_HEADINGS: a per-stage table of pointers to byte arrays (4-byte stride,
+   indexed by gLinkSrcStage), each further indexed by gLinkTriggerIndex to read the
+   "heading" byte passed to IsHeadingAligned. TUNNEL_EXIT_HEADINGS is the analogous
+   table for gLinkDstStage/gLinkSpawnIndex. Neither array's own element type is
+   dereferenced beyond a single `u8` here. */
+```
+
+```c
+/* The 12-byte-stride table whose first element sits 4 bytes before the
+   separately-referenced `CARDINAL_ANGLES` -- splat drew the boundary there
+   because `CARDINAL_ANGLES` is independently referenced, not because the
+   underlying data is two different tables. Round 66 types it
+   `RotationRatios` (include/DreamSys.h) rather than as a stride-only
+   placeholder: every entry is three {numerator, denominator} degree ratios
+   in exactly the form SceneNode__UpdateRotation consumes, and the four entries' yaw
+   numerators are 0, 0x5A, 0xB4, 0x10E -- 0, 90, 180 and 270 degrees. That is
+   also what the two functions below do with an element: they store its
+   ADDRESS into DreamSys::enterRotation / ::exitRotation, and the only things
+   those two fields are ever used for are SceneNode__UpdateRotation(this, 1, ptr) calls
+   in DreamSys__SetMoveOverride, DreamSys__SpawnAtLink and
+   DreamSys__TryStaircaseLink. */
+```

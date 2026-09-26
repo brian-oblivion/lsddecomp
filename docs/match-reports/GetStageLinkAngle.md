@@ -92,3 +92,13 @@ which case 0. `DreamSys__TryStageTimerLink` stores the result in
 {numerator 0xB4, denominator 1} degree ratio -- byte-identical to the Y word of
 `ROTATION_YAW_180`, and the same encoding as every `CARDINAL_ANGLES` entry. Tier B:
 no carved code reads `stageLinkAngle` back, so the consumer is unobserved.
+
+## Comment moved from src/DreamSys.c (round 92, track 7)
+
+Replaced in the source by a comment that says what the code does; kept here as written.
+
+```c
+/* Set (whole word) into `this->stageLinkAngle` by DreamSys__TryStageTimerLink just before an
+   ExecuteLink; only ever address-taken here, never dereferenced by this
+   unit's queued functions. */
+```

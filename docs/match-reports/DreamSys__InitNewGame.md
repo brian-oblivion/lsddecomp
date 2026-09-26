@@ -66,3 +66,14 @@ shared header.
 ## Provenance
 
 round 43, runner ALPHA, unit DreamSys.
+
+## Comment moved from src/DreamSys.c (round 92, track 7)
+
+Replaced in the source by a comment that says what the code does; kept here as written.
+
+```c
+/* A constant read out of .sdata and copied whole into
+   this->saveMagic -- naming convention matches (the field's own
+   name already flags it as sdata-sourced). Not dereferenced by this
+   function or any other in this unit's queue. */
+```

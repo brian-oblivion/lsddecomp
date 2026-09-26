@@ -438,3 +438,15 @@ it would not apply here, saving a blind attempt.
 ## Naming
 
 - **Tier B.** STALL (still INCLUDE_ASM). Wraps Test4InstantTeleporters and calls ExecuteLink (type 0x11) on success, per the preserved #if 0 body; same family as DreamSys__TryTunnelLink. Renaming a stall's symbol changes no bytes.
+
+## Comment moved from src/DreamSys.c (round 92, track 7)
+
+Replaced in the source by a comment that says what the code does; kept here as written.
+
+```c
+/* The whole body sits inside `if (result >= 0)` with `return false` last.
+ * The early-return spelling (`if (result < 0) return false;`) compiles to
+ * the same instructions, but reorg fills two branch delay slots
+ * differently: it puts `li v0,1` into both slots, where retail has an
+ * `addiu a1,sp,0x10` and a `nop` (58/63, rounds 2026-08-30..49). Round 73. */
+```

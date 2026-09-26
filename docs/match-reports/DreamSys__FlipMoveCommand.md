@@ -88,3 +88,13 @@ one mover and 3 and 4 the two directions of the other.
 Tier B: the state change is exact; why a move command should alternate direction
 while a yaw command is active (this is only reached from
 `DreamSys__StepLookYaw`'s two active paths) is not established.
+
+## Comment moved from src/DreamSys.c (round 92, track 7)
+
+Replaced in the source by a comment that says what the code does; kept here as written.
+
+```c
+/* DreamSys__StepLookYaw (round 2026-09-08) calls this unit's own DreamSys__FlipMoveCommand,
+   defined immediately after it in ROM order -- same forward-declaration
+   need as the two above. */
+```

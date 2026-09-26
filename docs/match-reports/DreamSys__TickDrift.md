@@ -51,3 +51,15 @@ sound cue set (`ServiceSoundCueSet(soundObj, soundCueSet)`).
 Deliberately NOT called `TickFall` or `TickRise`: this unit never establishes which
 way +Y points, so the name says "drift" and the comment says "+512 on the Y
 axis".
+
+## Comment moved from src/DreamSys.c (round 92, track 7)
+
+Replaced in the source by a comment that says what the code does; kept here as written.
+
+```c
+/* code_179d8_l's SoundCueSet service pair, as this unit calls them
+   (DreamSys__TickDrift / DreamSys__StopDrift: (soundObj, soundCueSet)).
+   Moved here from DreamSys.h in track 4 (round 88): Entity.h declares the
+   same functions with `void *` parameters, and a unit including both
+   headers would see conflicting types. */
+```

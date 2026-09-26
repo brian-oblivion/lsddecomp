@@ -196,3 +196,13 @@ branches to 0x49604, this block's own `j`/`sw zero,0x24(s0)` tail, while the
 barrier-less build branches to 0x49640, the identical tail after the
 `notifyParents(this, 0xA)` call. So what it forces is block identity (no
 cross-jump between two identical tails), not register identity.
+
+## Comment moved from src/DreamSys.c (round 92, track 7)
+
+Replaced in the source by a comment that says what the code does; kept here as written.
+
+```c
+            /* Keeps the `state != 0` branch targeting this block's own
+             * `this->tick = 0` + return tail; without it GCC cross-jumps that
+             * branch to the identical tail after the notifyParents(0xA) call. */
+```

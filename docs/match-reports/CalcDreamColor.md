@@ -489,3 +489,15 @@ that never promoted a candidate -- see "Permuter run" above), not a
 permuter output.
 
 NON_MATCHING body promoted, round 70.
+
+## Comment moved from src/DreamSys.c (round 92, track 7)
+
+Replaced in the source by a comment that says what the code does; kept here as written.
+
+```c
+/* DREAM_COLOR_TABLE is a 3x3 table, [dynamic class][upper class]. The
+ * row-pointer view is load-bearing: indexing the flat s8[9] as
+ * `&TABLE[d * 3]` then `[u]` loads `upper` early and swaps the two final
+ * `addu` registers; a 2-D subscript through a named `s8 (*)[3]` local is
+ * byte-exact (round 73). */
+```
