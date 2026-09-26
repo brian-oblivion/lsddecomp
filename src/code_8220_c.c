@@ -46,9 +46,9 @@ void StoreSxyPolyFT4(POLY_FT4 *prim, s32 storeFirst3) {
     if (storeFirst3) {
         gte_stsxy3_ft4(prim);
     } else {
-        short *p = &prim->x3;
+        short *xy3 = &prim->x3;
 
-        gte_stsxy2(p);
+        gte_stsxy2(xy3);
     }
 }
 
@@ -56,9 +56,9 @@ void StoreSxyPolyGT4(POLY_GT4 *prim, s32 storeFirst3) {
     if (storeFirst3) {
         gte_stsxy3_gt4(prim);
     } else {
-        short *p = &prim->x3;
+        short *xy3 = &prim->x3;
 
-        gte_stsxy2(p);
+        gte_stsxy2(xy3);
     }
 }
 
@@ -217,17 +217,18 @@ u_long *SubmitPolyGT4(POLY_GT4 *prim, PolyDrawCtx *ctx) {
     return (u_long *)(prim + 1);
 }
 
-void InitDivPolygonPtrs(RVECTOR **dst, void *divp, s32 kind) {
-    RVECTOR *src = &((DIVPOLYGON3 *)divp)->r0;
-    RVECTOR **dst0 = dst;
-    RVECTOR **dst1 = (kind == 4) ? &((DIVPOLYGON4 *)divp)->cr[0].r0 : &((DIVPOLYGON3 *)divp)->cr[0].r0;
+void InitDivPolygonPtrs(RVECTOR **vtxPtrs, void *divp, s32 nverts) {
+    RVECTOR *rv = &((DIVPOLYGON3 *)divp)->r0;
+    RVECTOR **ctxPtr = vtxPtrs;
+    RVECTOR **crPtr =
+        (nverts == 4) ? &((DIVPOLYGON4 *)divp)->cr[0].r0 : &((DIVPOLYGON3 *)divp)->cr[0].r0;
 
-    while (kind-- > 0) {
-        *dst1 = src;
-        *dst0 = src;
-        src++;
-        dst1++;
-        dst0++;
+    while (nverts-- > 0) {
+        *crPtr = rv;
+        *ctxPtr = rv;
+        rv++;
+        crPtr++;
+        ctxPtr++;
     }
 }
 
@@ -279,32 +280,32 @@ extern s32 D_80090C18;
 extern s32 sNdivOverrideSet;
 extern s32 sNdivOverride;
 
-void FillDivPolygonHeader(void *divp, PolyDrawCtx *ctx, CVECTOR *rgbc, s32 textured, u_short clut,
+void FillDivPolygonHeader(void *divpIn, PolyDrawCtx *ctx, CVECTOR *rgbc, s32 textured, u_short clut,
                           u_short tpage) {
-    DIVPOLYGON3 *dst = divp;
-    s32 val;
-    s32 code;
-    s32 code2;
+    DIVPOLYGON3 *divp = divpIn;
+    s32 ndiv;
+    s32 pih;
+    s32 piv;
 
     if (sNdivOverrideSet) {
-        val = sNdivOverride;
+        ndiv = sNdivOverride;
     } else {
-        val = D_80090C18;
+        ndiv = D_80090C18;
     }
-    code = sDivClipWidth;
-    code2 = sDivClipHeight;
+    pih = sDivClipWidth;
+    piv = sDivClipHeight;
 
-    dst->ndiv = val;
-    dst->pih = code;
-    dst->piv = code2;
+    divp->ndiv = ndiv;
+    divp->pih = pih;
+    divp->piv = piv;
 
     if (textured != 0) {
-        dst->clut = clut;
-        dst->tpage = tpage;
+        divp->clut = clut;
+        divp->tpage = tpage;
     }
 
-    dst->rgbc = *rgbc;
-    dst->ot = ctx->otSlot;
+    divp->rgbc = *rgbc;
+    divp->ot = ctx->otSlot;
 }
 
 void FillRVectors3(RVECTOR **dst, SVECTOR **src, DVECTOR *sxy0, DVECTOR *sxy1, DVECTOR *sxy2) {
@@ -323,9 +324,9 @@ void FillRVectors4(RVECTOR **dst, SVECTOR **src, DVECTOR *sxy0, DVECTOR *sxy1, D
     dst[3]->sxy = *sxy3;
 }
 
-void SetNdivOverride(s32 enable, s32 code) {
+void SetNdivOverride(s32 enable, s32 ndiv) {
     sNdivOverrideSet = enable;
     if (enable) {
-        sNdivOverride = code;
+        sNdivOverride = ndiv;
     }
 }
