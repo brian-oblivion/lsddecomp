@@ -1,21 +1,25 @@
 /*
- * TodActor (include/TodActor.h): an Actor subclass that owns one
- * Actor "part" per object of a TOD animation and plays TODs over them.
- * Method table gTodActorMethods; Entity derives from it.
+ * TodActor's methods (include/TodActor.h: an Actor that owns one Actor part
+ * per object of a TOD animation and plays the TOD over them), in ROM order,
+ * ending with its getter GetTodActorMethods.
  *
- * - construction: modelData (+0x5C) is borrowed from the ctor's arg1 or made
- *   by New_ModelData; CreateParts allocates partCount parts and their TOD
- *   object ids from it; Destructor/ReleaseModelData undo both.
- * - base-slot overrides: OnNotify, InitDefaults, AttachToParent,
- *   DetachFromParent, SetDisplay/SetLightMode (forwarded to every part), and
- *   Update (+0x098: code 2 -> Tick, 4 -> Release).
- * - Tick: once per call, runs the selected tick callback (A/B/C) and, while
- *   a TOD is playing, applies its next frame and wraps at the frame count.
- * - ApplyTodFrame/ApplyTodPacket: walk a TOD frame's packets and apply the
- *   attribute, coordinate (GsCOORD2PARAM rotate/scale/trans), model-id and
- *   parent packets to the part the packet's object id names.
+ * - construction and teardown: New_TodActor, the ctor, Finalize; the
+ *   ModelData is borrowed from the descriptor or made (AcquireModelData /
+ *   ReleaseModelData), and one part is made per TOD object (CreateParts /
+ *   DestroyParts), each pair behind a Setup/Teardown guard.
+ * - overrides of Actor's slots: OnNotify, Reset, AttachToParent /
+ *   DetachFromParent (with the peer and the companion), SetDisplay and
+ *   SetLightMode (forwarded to every part), Update (event 2 ticks, 4
+ *   releases).
+ * - playback: Tick, the tick callbacks and their selector, SetTod / PlayTod /
+ *   StopTod, and ApplyTodFrame / ApplyTodPacket, which write a frame's
+ *   packets into the parts.
+ * - PlayTone, on the sound bank the ctor was given; LinkPeer / UnlinkPeer.
  */
 #include "common.h"
+#include <libgte.h>
+#include <libgpu.h>
+#include <libgs.h>
 #include "code_55dd4.h"
 
 void *New_TodActor(void *arg1, void *arg2) {
@@ -77,7 +81,7 @@ void TodActor__Reset(TodActor *self) {
 
     base = GetActorMethods();
     base->setDisplay((Actor *)self, 0);
-    self->methods->setUnk64(self, 1);
+    self->methods->setMainPartNotifies(self, 1);
     self->methods->setLastOffsetValue(self, 0x12C);
     self->methods->disableTickCallback(self);
     self->methods->selectTickCallback(self, TICK_CALLBACK_A);
@@ -142,8 +146,8 @@ void TodActor__Update(TodActor *self, void *arg1, s32 val) {
     }
 }
 
-void TodActor__SetMainPartNotifies(TodActor *self, s32 value) {
-    self->unk64 = value;
+void TodActor__SetMainPartNotifies(TodActor *self, s32 on) {
+    self->mainPartNotifies = on;
 }
 
 s32 TodActor__SetupModelData(TodActor *self, void *arg1) {
@@ -295,10 +299,7 @@ void TodActor__Tick(TodActor *self) {
         self->todFrame = self->todFrame + 1;
         if (self->todFrame >= self->todFrameCount) {
             self->todFrame = 0;
-            self->todFramePtr =
-                (u8 *)(*(GroupObj **)((u8 *)self->modelData->todSet->buffer + 8 + self->todIndex * 4))
-                    ->tod +
-                8;
+            self->todFramePtr = (u8 *)TODSET_TOD(self->modelData->todSet, self->todIndex)->buffer + 8;
         }
     }
     self->coord2->flg = 0;
@@ -328,7 +329,7 @@ void TodActor__DisableTickCallback(TodActor *self) {
 
 void TodActor__TickCallbackA(TodActor *self) {
     self->methods->moveLocalZ(self, -0x1E, 0);
-    if (self->unk64 == 1 && self->mainPart != NULL) {
+    if (self->mainPartNotifies == 1 && self->mainPart != NULL) {
         self->mainPart->methods->notifyWithHull(self->mainPart, 6);
     }
 }
@@ -337,21 +338,19 @@ void TodActor__TickCallbackB(void) {}
 
 void TodActor__TickCallbackC(void) {}
 
-void TodActor__PlayTone(TodActor *self, void *arg1) {
-    UnkArg2Obj *obj;
+void TodActor__PlayTone(TodActor *self, s32 index) {
+    VabStreamObj *sound;
 
-    obj = self->arg2;
-    if (obj != NULL) {
-        obj->methods->slot80(obj, arg1, 0x6E, 0x6E);
+    sound = self->arg2;
+    if (sound != NULL) {
+        sound->methods->playTone(sound, index, 0x6E, 0x6E);
     }
 }
 
 void TodActor__SetTod(TodActor *self, s32 index) {
     self->todIndex = index;
-    self->todFrameCount =
-        (*(GroupObj **)((u8 *)self->modelData->todSet->buffer + 8 + index * 4))->tod->frameCount;
-    self->todFramePtr =
-        (u8 *)(*(GroupObj **)((u8 *)self->modelData->todSet->buffer + 8 + self->todIndex * 4))->tod + 8;
+    self->todFrameCount = ((TodHeader *)TODSET_TOD(self->modelData->todSet, index)->buffer)->frameCount;
+    self->todFramePtr = (u8 *)TODSET_TOD(self->modelData->todSet, self->todIndex)->buffer + 8;
     self->todFrame = 0;
     self->methods->applyTodFrame(self, self->todFramePtr, 0);
 }
@@ -383,7 +382,7 @@ void *TodActor__ApplyTodPacket(TodActor *self, void *acc, void *extra) {
     s32 idx;
     Actor *elem;
     SceneNodeSub14 *coord;
-    TimeTargetObj *param;
+    GsCOORD2PARAM *param;
     s32 i;
 
     data = self->modelData->methods->decodePacketWord(
@@ -395,7 +394,7 @@ void *TodActor__ApplyTodPacket(TodActor *self, void *acc, void *extra) {
     elem = self->parts[idx];
     coord = elem->coord2;
     coord->flg = 0;
-    param = (TimeTargetObj *)coord->param;
+    param = (GsCOORD2PARAM *)coord->param;
 
     switch (outbuf[1]) {
         case TOD_PACKET_ATTRIBUTE:
@@ -404,7 +403,7 @@ void *TodActor__ApplyTodPacket(TodActor *self, void *acc, void *extra) {
         case TOD_PACKET_COORDINATE: {
             if (outbuf[2] & TOD_COORD_DIFFERENTIAL) {
                 if (outbuf[2] & TOD_COORD_ROTATE) {
-                    s16 *p16 = param->rotate;
+                    s16 *p16 = &param->rotate.vx;
 
                     for (i = 0; i < 3; i++, p16++) {
                         s16 tmp;
@@ -416,7 +415,7 @@ void *TodActor__ApplyTodPacket(TodActor *self, void *acc, void *extra) {
                     data = (u8 *)data + 0xC;
                 }
                 if (outbuf[2] & TOD_COORD_SCALE) {
-                    s32 *p32 = param->scale;
+                    long *p32 = &param->scale.vx;
 
                     for (i = 0; i < 3; i++, p32++) {
                         *p32 = (((s16 *)data)[i] * *p32) / 4096;
@@ -427,7 +426,7 @@ void *TodActor__ApplyTodPacket(TodActor *self, void *acc, void *extra) {
                     goto end;
                 }
                 {
-                    s32 *p32 = param->trans;
+                    long *p32 = &param->trans.vx;
 
                     for (i = 0; i < 3; i++, p32++) {
                         *p32 += ((s32 *)data)[i];
@@ -435,7 +434,7 @@ void *TodActor__ApplyTodPacket(TodActor *self, void *acc, void *extra) {
                 }
             } else {
                 if (outbuf[2] & TOD_COORD_ROTATE) {
-                    s16 *p16 = param->rotate;
+                    s16 *p16 = &param->rotate.vx;
 
                     for (i = 0; i < 3; i++, p16++) {
                         *p16 = ((s32 *)data)[i] / 360;
@@ -443,7 +442,7 @@ void *TodActor__ApplyTodPacket(TodActor *self, void *acc, void *extra) {
                     data = (u8 *)data + 0xC;
                 }
                 if (outbuf[2] & TOD_COORD_SCALE) {
-                    s32 *p32 = param->scale;
+                    long *p32 = &param->scale.vx;
 
                     for (i = 0; i < 3; i++, p32++) {
                         *p32 = ((s16 *)data)[i];
@@ -454,7 +453,7 @@ void *TodActor__ApplyTodPacket(TodActor *self, void *acc, void *extra) {
                     goto end;
                 }
                 {
-                    s32 *p32 = param->trans;
+                    long *p32 = &param->trans.vx;
 
                     for (i = 0; i < 3; i++, p32++) {
                         *p32 = ((s32 *)data)[i];
@@ -466,9 +465,9 @@ void *TodActor__ApplyTodPacket(TodActor *self, void *acc, void *extra) {
                 s32 v1, v2, v3;
 
                 coordB = elem->coord2;
-                v1 = param->trans[0];
-                v2 = param->trans[1];
-                v3 = param->trans[2];
+                v1 = param->trans.vx;
+                v2 = param->trans.vy;
+                v3 = param->trans.vz;
                 coordB->tx = v1;
                 coordB->ty = v2;
                 coordB->tz = v3;
