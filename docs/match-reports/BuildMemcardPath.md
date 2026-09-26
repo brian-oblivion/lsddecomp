@@ -96,3 +96,20 @@ parameter, already in `$a2`, so no set-up is emitted and it read as a
 two-argument call. `src/class_3bb8c_e.c` now declares
 `extern void *BuildMemcardPath(void *dest, s32 selector, void *suffix);`
 and every call site in both units passes three. See `TaskObjF__OpenAndReadMemcardFile.md`.
+
+## Round 94 (track 6, charlie): history moved from include/class_3bb8c.h
+
+Round 34's note: five of the six prototypes that sat in the header were the
+PSX BIOS file trampolines, Sony's `open`/`read`/`lseek`/`close`/`delete`,
+linked from libapi/a50, a52, a51, a54, a69. They left the SHARED header
+deliberately: a prototype for a function another unit (here a Sony object)
+defines belongs in the `.c` that calls it, and `open`/`read`/`close` are
+generic enough that a future include/psyq prototype (measured 2026-09-12:
+none of the shipped headers declares them, only comments and O_* macros)
+would collide in whichever including unit pulled both in; the two callers
+also disagree about the first argument's type. Each caller (class_3bb8c_e.c,
+class_3bb8c_f.c) carries its own `extern`. CopyMemcardIconTemplate stayed:
+game code, src/class_3bb8c_g.c, matched round 45 (60/60 words; was
+gp_rel-blocked, resolved round 42). `DeviceName866E8` is `McDevicePath`
+(round 94); its comment's pointer to "the same idiom documented for
+Descriptor10 above" was stale and is gone.

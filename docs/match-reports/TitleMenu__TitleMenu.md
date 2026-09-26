@@ -192,3 +192,22 @@ sections above.
 Known, pending an operator decision: renametype.py and rename.py rewrote the
 old names inside the history prose of this class's reports, so earlier
 sections read with today's names.
+
+## Round 94 (track 6, charlie): history moved from include/class_3bb8c.h
+
+The header's comments on this function's data carried their history; the
+comments now say only what the data is. Moved here:
+- `D_80086D44` (the menu description, a TaskCoreTarget: 0x28 bytes in
+  asm/data/76DC8.data.s, a path word, three zero words, the two colour
+  triples and four pointers), `D_800114DC` ("ETC\ETCSE") and `D_800114E8`
+  ("ETC\TITLE.TIM") were RETYPED from placeholder `s32`s in round 88
+  (address-of only; no byte change).
+- The `FormatNumberIntoBuffer` prototype's comment still called it raw asm,
+  gp-relative-blocked, and its argument `slot1A0`'s result. It has been
+  matched since round 45 (gp_rel resolved round 42), and the argument is
+  DreamSys's getCurrentDayAndYear.
+- The unrelated section markers ("class_3bb8c_c additions below ... Named
+  by their vtable's address") and the pointers "X is defined in
+  include/X.h (round 87/88/89, track 4)" for NodeGuardedViewport, GridCell,
+  TitleMenu, TaskObjF, ItemList, TextEntry, ObjM and gObjMMethods are
+  replaced by the unit-to-class table in the header's banner.
