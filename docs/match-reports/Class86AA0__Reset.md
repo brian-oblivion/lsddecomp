@@ -24,7 +24,7 @@ report per function, matched ones included.
 ## Naming
 
 **Class86AA0__Reset** -- tier C, kept deliberately. Same shape and same
-precedent as `NodeGuardedViewport__InitDefaults`/`NodeGuardedViewport__NoOpSlotB8`/`func_8004D364`/
+precedent as `NodeGuardedViewport__InitDefaults`/`NodeGuardedViewport__NoOpSlotB8`/`NodeGuardedViewport__NoOpSlotBC`/
 `func_8004D36C`/`func_8004D374` above (this unit's own `NodeGuardedViewport`
 siblings) and as `func_8004B324`/`SceneNode__NoOpSlot5C` elsewhere in the project:
 a genuinely empty, no-argument, no-established-purpose vtable stub keeps
