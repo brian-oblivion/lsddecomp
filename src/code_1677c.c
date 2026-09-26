@@ -105,7 +105,7 @@ GameApplication *New_GameApplication(GameApplicationCtorArgs *arg) {
  * constructor (through its ctor slot), installs this class's own vtable,
  * stores the ctor argument, loads the "ETC\DREAME5.TMD" model, builds this
  * object's owned DreamSys from it, dispatches one DreamSys init call, then
- * runs this class's own slot40 (GameApplication__SetDayFromTickCount) once. */
+ * runs this class's own slot40 (GameApplication__SeedRandom) once. */
 void GameApplication__GameApplication(GameApplication *self, GameApplicationCtorArgs *arg) {
     LoadModelRequest req;
 
@@ -125,7 +125,7 @@ extern void SeedAndRandom(s32 day, s32 unused);
 
 /* Advances the day cursor: reads the running tick count kept in scratchpad
  * (0x1F800000, the PS-X data-cache-as-RAM region) and reduces it mod 365. */
-void GameApplication__SetDayFromTickCount(GameApplication *self) {
+void GameApplication__SeedRandom(GameApplication *self) {
     SeedAndRandom(*(s32 *)0x1F800000 % 365, 0);
 }
 

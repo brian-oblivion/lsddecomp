@@ -14,7 +14,7 @@ constructor through its ctor slot, installs this class's own vtable, stores
 the ctor argument, loads a 3D model ("ETC\DREAME5.TMD"), builds this
 object's owned `DreamSys` from the loaded model, makes one call into a
 not-yet-understood `DreamSys` vtable slot (`+0x228`), then finally invokes
-its own `slot40` (`GameApplication__SetDayFromTickCount`, the day-cursor advance already matched in
+its own `slot40` (`GameApplication__SeedRandom`, the day-cursor advance already matched in
 this unit).
 
 ## Derivation

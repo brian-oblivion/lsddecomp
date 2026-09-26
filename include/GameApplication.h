@@ -26,7 +26,7 @@
  * +0x050..+0x064 for this class's occupants. Two overrides take a different
  * parameter list from the slot they fill, so the slot keeps the inherited
  * type and the caller casts (FINISHING-PLAN track 4 step 6):
- *   +0x040 setScreenDims <- GameApplication__SetDayFromTickCount (self only);
+ *   +0x040 setScreenDims <- GameApplication__SeedRandom (self only);
  *          the ctor calls it through GameApplicationSetDayFn.
  *   +0x044 initSystems   <- GameApplication__InitSystems (no 4th argument);
  *          main calls it through GameApplicationInitSystemsFn.
@@ -75,7 +75,7 @@ extern GameApplicationMethods *GetGameApplicationMethods(void); /* returns &gGam
 
 GameApplication *New_GameApplication(GameApplicationCtorArgs *args);
 void GameApplication__GameApplication(GameApplication *self, GameApplicationCtorArgs *args);
-void GameApplication__SetDayFromTickCount(GameApplication *self);
+void GameApplication__SeedRandom(GameApplication *self);
 void GameApplication__InitSystems(GameApplication *self, DrawSystem *drawSystem, struct Pad *pad);
 void GameApplication__LoadIntroLogoSequence(GameApplication *self);
 void GameApplication__StartLoaderTask(GameApplication *self, const char *path);

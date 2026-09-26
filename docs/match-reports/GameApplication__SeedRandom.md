@@ -1,4 +1,6 @@
-# GameApplication__SetDayFromTickCount
+# GameApplication__SeedRandom
+
+> Renamed from `GameApplication__SetDayFromTickCount` on 2026-09-26 (tools/rename.py). Address 0x800260a4.
 
 > Renamed from `Class6D3C8__SetDayFromTickCount` on 2026-09-26 (tools/rename.py). Address 0x800260a4.
 
@@ -40,12 +42,12 @@ jal   SeedAndRandom
 `0x1F800000` is the PS-X scratchpad region (data cache used as fast RAM,
 not a hardware register) — some running counter lives there as a plain
 `s32`, read once per call. m2c (`tools/m2ctx.py code_1677c --sig 'void
-GameApplication__SetDayFromTickCount(void)' --run`) independently produced the same `% 365`
+GameApplication__SeedRandom(void)' --run`) independently produced the same `% 365`
 reading, confirming the divisor and that GCC reproduces its own magic
 constant without any hand-tuning needed:
 
 ```c
-void GameApplication__SetDayFromTickCount(void) {
+void GameApplication__SeedRandom(void) {
     SeedAndRandom(*(s32 *)0x1F800000 % 365, 0);
 }
 ```
@@ -69,7 +71,7 @@ assuming it needs special handling.
 
 ## Naming
 
-**`GameApplication__SetDayFromTickCount` -- tier B.** Mechanics: reads the
+**`GameApplication__SeedRandom` -- tier B.** Mechanics: reads the
 running tick count kept at the PS-X scratchpad address `0x1F800000`, reduces
 it mod 365 (a `%` on the day-count range), and forwards the result to
 `SeedAndRandom(day, 0)`. "Set day" describes the mechanical destination
@@ -80,7 +82,7 @@ therefore this function's ultimate game role) is not confirmed here.
 
 ## Track 4 (2026-09-26, round 88)
 
-Now declared `void GameApplication__SetDayFromTickCount(GameApplication *self)`: it
+Now declared `void GameApplication__SeedRandom(GameApplication *self)`: it
 occupies Application's `setScreenDims` slot (+0x040) and its only caller, the
 ctor, passes `self` (in `$a0`), which the body never reads, so the added
 parameter emits nothing (image byte-identical). The slot keeps the
