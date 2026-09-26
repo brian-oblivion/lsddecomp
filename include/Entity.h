@@ -252,6 +252,8 @@ extern LongVec3 TRANSLATE_Z_MINUS256[];
 extern Ratio16 SCALE_QUARTER[];
 extern Ratio16 SCALE_HALF[];
 extern Ratio16 SCALE_DOUBLE[];
+extern Ratio16 SCALE_MINUS_SIXTY_FOURTH[];
+extern Ratio16 SCALE_EIGHT_SEVENTHS[];
 extern Ratio16 SCALE_EIGHTH[];
 extern Ratio16 SCALE_SIX[];
 extern Ratio16 SCALE_Y2[];

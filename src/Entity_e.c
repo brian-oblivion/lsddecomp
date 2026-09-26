@@ -245,13 +245,13 @@ void Entity__MoodCue73(Entity *this, SoundCueSet *out) {
     }
 }
 
-extern u8 sMoodCue74ClearColor[];
+/* {0, 100, 190}: the clear colour Entity__MoodCue74 gives the peer's viewport. */
+extern ViewportRgb sMoodCue74ClearColor;
 
 void Entity__MoodCue74(Entity *this, SoundCueSet *out) {
     if (this->moodTimer == 0) {
         ((DreamSys *)this->peer)
-            ->viewport->methods->setClearColor(((DreamSys *)this->peer)->viewport,
-                                               (ViewportRgb *)sMoodCue74ClearColor);
+            ->viewport->methods->setClearColor(((DreamSys *)this->peer)->viewport, &sMoodCue74ClearColor);
         this->state = rand() % 3;
         if (((DreamSys *)this->peer)->coord2->tz < 0x262) {
             this->state = 0;
@@ -289,8 +289,6 @@ void Entity__MoodCue75(Entity *this, SoundCueSet *out) {
         this->methods->notifyParents(this, 0xA);
     }
 }
-
-extern u8 SCALE_MINUS_SIXTY_FOURTH[];
 
 void Entity__MoodCue76(Entity *this, SoundCueSet *out) {
     void (*fn)(Entity *self, s32 set, void *table);
@@ -448,8 +446,6 @@ void Entity__MoodCue80(Entity *this, SoundCueSet *out) {
     }
     SceneNode__FaceTarget((SceneNode *)this, (SceneNode *)this->peer, 1, 0, 0);
 }
-
-extern u8 SCALE_EIGHT_SEVENTHS[];
 
 void Entity__MoodCue81(Entity *this, SoundCueSet *out) {
     s32 mod;
