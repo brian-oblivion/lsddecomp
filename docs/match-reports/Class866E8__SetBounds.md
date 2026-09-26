@@ -17,14 +17,14 @@ jr   $ra
 ## Final C
 
 ```c
-void Class866E8__SetBounds(Obj866E8 *self, Bounds866E8_3bb8c_b *arg1) {
+void Class866E8__SetBounds(Obj866E8 *self, CellBounds *arg1) {
     self->unk1DC = arg1;
 }
 ```
 
 ## New struct knowledge
 
-- `Obj866E8::unk1DC` (`Bounds866E8_3bb8c_b *`, +0x1DC) — typed from
+- `Obj866E8::unk1DC` (`CellBounds *`, +0x1DC) — typed from
   `IsPointOutOfBounds`'s own body (see that function's report), the only place
   in this unit that reads it back. `IsPointOutOfBounds` itself stalled, but the
   field's TYPE derivation (a 4-field min/max bounding-box struct) does not
@@ -46,4 +46,4 @@ None new.
 Renamed together with the field it writes (`unk1DC` -> `bounds`, this
 round): the field's role IS established, by its only other reader,
 `IsPointOutOfBounds`, which dereferences it as exactly a
-`Bounds866E8_3bb8c_b` bounding box.
+`CellBounds` bounding box.

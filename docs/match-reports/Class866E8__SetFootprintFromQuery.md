@@ -48,7 +48,7 @@ requires writing exactly this.
  * STALL, see docs/match-reports/IsPointOutOfBounds.md) -- calling into it
  * while it is still INCLUDE_ASM is fine, per this unit's established
  * convention. Signature per that report. */
-extern s32 IsPointOutOfBounds(Bounds866E8_3bb8c_b *bounds, s8 *point);
+extern s32 IsPointOutOfBounds(CellBounds *bounds, s8 *point);
 
 /* Forward declaration: defined later in this file (in ROM order, after
  * IsPointOutOfBounds), but Class866E8__SetFootprintFromQuery calls it before its own definition

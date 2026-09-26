@@ -16,7 +16,7 @@ positional skeleton diffs 25** — the same as round 71.
 the `NON_MATCHING` block removed):
 
 ```c
-s32 IsPointOutOfBounds(Bounds866E8_3bb8c_b *bounds, s8 *point) {
+s32 IsPointOutOfBounds(CellBounds *bounds, s8 *point) {
     if (bounds != NULL && point[0] >= bounds->minX && bounds->maxX >= point[0]
         && point[1] >= bounds->minY && bounds->maxY >= point[1]) {
         return 0;
@@ -143,8 +143,8 @@ that local-alloc's temps have already shut out of `$v0`.
 
 ```c
 #if 0
-/* needs: common.h, class_3bb8c.h (Bounds866E8_3bb8c_b) */
-s32 IsPointOutOfBounds(Bounds866E8_3bb8c_b *bounds, s8 *point) {
+/* needs: common.h, class_3bb8c.h (CellBounds) */
+s32 IsPointOutOfBounds(CellBounds *bounds, s8 *point) {
     s32 result;
 
     result = 1;
@@ -273,7 +273,7 @@ jr ra
 This maps directly onto:
 
 ```c
-s32 IsPointOutOfBounds(Bounds866E8_3bb8c_b *bounds, s8 *point) {
+s32 IsPointOutOfBounds(CellBounds *bounds, s8 *point) {
     if (bounds == NULL) return 1;
     if (point[0] < bounds->unk0) return 1;
     if (bounds->unk4 < point[0]) return 1;
@@ -326,7 +326,7 @@ outputs (never mid-way), regardless of surface syntax:
    lowered identically to repeated `return 1;` statements by this
    compiler for this shape, at least here.
 4. **`goto fail;` with `bounds` copied into an explicit local first**
-   (`Bounds866E8_3bb8c_b *bounds = arg0;`), attempting to force retail's
+   (`CellBounds *bounds = arg0;`), attempting to force retail's
    `move a2,a0`. Byte-identical to attempt 3 — the redundant local was
    optimized away with no effect on codegen.
 5. **`goto fail;` with the byte values cached into explicit `s8 x, y;`
@@ -391,7 +391,7 @@ existence.
 #if 0
 /* Shape B (attempt 2) -- matches retail's branch TARGETS for 3 of 4 early
  * exits, closest structural match found, still not byte-exact. */
-s32 IsPointOutOfBounds(Bounds866E8_3bb8c_b *bounds, s8 *point) {
+s32 IsPointOutOfBounds(CellBounds *bounds, s8 *point) {
     if (bounds == NULL || point[0] < bounds->unk0 || bounds->unk4 < point[0] ||
         point[1] < bounds->unk2) {
         return 1;
@@ -403,7 +403,7 @@ s32 IsPointOutOfBounds(Bounds866E8_3bb8c_b *bounds, s8 *point) {
 
 ## New struct knowledge (established despite the stall)
 
-- New type `Bounds866E8_3bb8c_b` (`unk0`/`unk2` s16, `unk4`/`unk8` s32) —
+- New type `CellBounds` (`unk0`/`unk2` s16, `unk4`/`unk8` s32) —
   derived from reading THIS function's own body, independent of whether a
   byte-exact source form for it has been found. Used by `Obj866E8::unk1DC`
   (see `Class866E8__SetBounds`'s report).
@@ -484,7 +484,7 @@ self-stop given the clean iteration count and no crash signature.
 **Two intermediate leads inspected, both hand-tested against the real
 oracle, both negative:**
 
-1. `output-910-1`: introduces a `Bounds866E8_3bb8c_b *new_var = bounds;`
+1. `output-910-1`: introduces a `CellBounds *new_var = bounds;`
    used for ONLY the first (`->unk0`) and last (`->unk8`) struct accesses,
    leaving the null check and the two middle accesses (`->unk4`, `->unk2`)
    on the original `bounds`. Hand-translated to a CONSISTENT form (a
@@ -527,8 +527,8 @@ all four field accesses, matching retail's literal register usage where
 even the null-check reads through the copied register) —
 
 ```c
-s32 IsPointOutOfBounds(Bounds866E8_3bb8c_b *arg0, s8 *point) {
-    Bounds866E8_3bb8c_b *bounds;
+s32 IsPointOutOfBounds(CellBounds *arg0, s8 *point) {
+    CellBounds *bounds;
     bounds = arg0;
     if (bounds == NULL) goto fail;
     if (point[0] < bounds->unk0) goto fail;
@@ -587,7 +587,7 @@ if/`||`/`goto` restatement of the same four-early-exit CFG — might make
 cc1's RTL expansion allocate differently:
 
 ```c
-s32 IsPointOutOfBounds(Bounds866E8_3bb8c_b *bounds, s8 *point) {
+s32 IsPointOutOfBounds(CellBounds *bounds, s8 *point) {
     return (bounds == NULL) ? 1
         : (point[0] < bounds->unk0) ? 1
         : (bounds->unk4 < point[0]) ? 1
@@ -789,5 +789,5 @@ has no entry at this address) -- a plain, non-virtual helper, so it takes
 no `self` and gets no `Class866E8__` prefix. Still `INCLUDE_ASM` (a
 documented STALL), named per this round's brief since the evidence for
 its mechanics is solid: four comparisons of an `[x,y]` point against a
-`Bounds866E8_3bb8c_b`'s four edges, returning nonzero when the point is
+`CellBounds`'s four edges, returning nonzero when the point is
 outside any of them. Mechanics-is-purpose leaf.

@@ -132,7 +132,7 @@ void ObjM__InitStyleAndWorld(ObjM *self, s32 gridSpan, Unk50Struct_3bb8c_l *styl
         self->unk44 = 2;
         flag = 1;
         ((Class866E8 *)self->unk14)
-            ->methods->setBounds((Class866E8 *)self->unk14, (Bounds866E8_3bb8c_b *)&D_80087150);
+            ->methods->setBounds((Class866E8 *)self->unk14, (CellBounds *)&D_80087150);
     }
 
     self->gridSpan = gridSpan;

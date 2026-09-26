@@ -168,12 +168,12 @@ typedef struct CellRectSet {
 } CellRectSet;
 
 /* `bounds`' pointee (setBounds): IsPointOutOfBounds' box of cell columns/rows inside a chunk. */
-typedef struct Bounds866E8_3bb8c_b {
+typedef struct CellBounds {
     s16 minCol; /* +0x000 */
     s16 minRow; /* +0x002 */
     s32 maxCol; /* +0x004 */
     s32 maxRow; /* +0x008 */
-} Bounds866E8_3bb8c_b;
+} CellBounds;
 
 /* One of the seven elements, 0x1C bytes (the ctor, Finalize). */
 struct ChunkSlot {
@@ -233,7 +233,7 @@ struct Class866E8Methods {
     /* +0x12C */ void (*applyToSenderFootprint)(Class866E8 *self, SceneNode *sender,
                                                 s32 command); /* Class866E8__ApplyToSenderFootprint */
     /* +0x130 */ void *(*getUnk1CC)(Class866E8 *self);        /* Class866E8__GetUnk1CC */
-    /* +0x134 */ void (*setBounds)(Class866E8 *self, Bounds866E8_3bb8c_b *bounds); /* Class866E8__SetBounds */
+    /* +0x134 */ void (*setBounds)(Class866E8 *self, CellBounds *bounds); /* Class866E8__SetBounds */
     /* +0x138 */ void (*configureRateEntry)(Class866E8 *self, s32 rate,
                                             s32 flag); /* Class866E8__ConfigureRateEntry */
     /* +0x13C */ void (*advanceRateCountdown)(Class866E8 *self); /* Class866E8__AdvanceRateCountdown */
@@ -271,7 +271,7 @@ struct Class866E8 {
     /* +0x1D0 */ s32 unk1D0;                  /* Reset: -1 */
     /* +0x1D4 */ s32 unk1D4;                  /* Reset: -1 */
     /* +0x1D8 */ s32 unk1D8;                  /* Reset: -1 */
-    /* +0x1DC */ Bounds866E8_3bb8c_b *bounds; /* setBounds; IsPointOutOfBounds */
+    /* +0x1DC */ CellBounds *bounds; /* setBounds; IsPointOutOfBounds */
     /* +0x1E0 */ s32 rateCountdown;  /* configureRateEntry; advanceRateCountdown/flushRateLatch */
     /* +0x1E4 */ Ratio16 *scaleStep; /* configureRateEntry: one of four Ratio16[3] steps (x, y, z) that advanceRateCountdown adds to every cell's scale; only y is nonzero, +-1/64 or +-1/4 */
 }; /* 0x1E8 bytes: New_Class866E8 */
@@ -341,11 +341,11 @@ void Class866E8__BuildFootprintSlots(Class866E8 *self);
 s32 Class866E8__SplitFootprintSlot(Class866E8 *self, CellRect *slot, s32 count, s32 baseIdx,
                                    s32 col, s32 row, s32 width, s32 height);
 void Class866E8__SetFootprintFromQuery(Class866E8 *self);
-s32 IsPointOutOfBounds(Bounds866E8_3bb8c_b *bounds, s8 *point);
+s32 IsPointOutOfBounds(CellBounds *bounds, s8 *point);
 s32 Class866E8__InitFootprintSlot(Class866E8 *self, s32 unused, s32 key, s32 arg3);
 void Class866E8__SetFootprintCellFlag(Class866E8 *self, s32 setBit);
 void *Class866E8__GetUnk1CC(Class866E8 *self);
-void Class866E8__SetBounds(Class866E8 *self, Bounds866E8_3bb8c_b *bounds);
+void Class866E8__SetBounds(Class866E8 *self, CellBounds *bounds);
 void Class866E8__ConfigureRateEntry(Class866E8 *self, s32 rate, s32 flag);
 void Class866E8__AdvanceRateCountdown(Class866E8 *self);
 void Class866E8__FlushRateLatch(Class866E8 *self);

@@ -284,7 +284,7 @@ void Class866E8__SetFootprintFromQuery(Class866E8 *self) {
  * test and stays live across every check block (keeping the block temps out
  * of $v0, and pushing `bounds` to $a2), and the final `>=` folds back into
  * the store-flag `slt`. See docs/match-reports/IsPointOutOfBounds.md. */
-s32 IsPointOutOfBounds(Bounds866E8_3bb8c_b *bounds, s8 *point) {
+s32 IsPointOutOfBounds(CellBounds *bounds, s8 *point) {
     if (bounds != NULL && point[0] >= bounds->minCol && bounds->maxCol >= point[0] &&
         point[1] >= bounds->minRow && bounds->maxRow >= point[1]) {
         return 0;
@@ -344,7 +344,7 @@ void *Class866E8__GetUnk1CC(Class866E8 *self) {
     return &self->unk1CC;
 }
 
-void Class866E8__SetBounds(Class866E8 *self, Bounds866E8_3bb8c_b *arg1) {
+void Class866E8__SetBounds(Class866E8 *self, CellBounds *arg1) {
     self->bounds = arg1;
 }
 
