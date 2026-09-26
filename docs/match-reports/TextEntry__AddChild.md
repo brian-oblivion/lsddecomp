@@ -1,4 +1,6 @@
-# Obj86ED0__AddChild -- MATCHED (33/33 words)
+# TextEntry__AddChild -- MATCHED (33/33 words)
+
+> Renamed from `Obj86ED0__AddChild` on 2026-09-26 (tools/rename.py). Address 0x80050d30.
 
 > Renamed from `func_80050D30` on 2026-09-24 (tools/rename.py). Address 0x80050d30.
 
@@ -14,7 +16,7 @@ typed slots depending on the tag, mirroring the ALREADY-MATCHED
 identical way (`**(s32 **)arg1`, masked `& 0xF`).
 
 ```c
-void Obj86ED0__AddChild(Obj86ED0 *self, void *arg1)
+void TextEntry__AddChild(Obj86ED0 *self, void *arg1)
 {
     s32 tag;
     s32 mask;
@@ -37,4 +39,4 @@ immediately.
 
 ## Naming
 
-- `Obj86ED0__AddChild` -- tier A. gObj86ED0Methods +0x010 (classtable.py), overrides BasicClass's addChild: calls the base addChild, then reads the new child's type tag and stashes it into childType2/childType5 by mask. Mirrors the already-matched TaskObjF__Notify idiom.
+- `TextEntry__AddChild` -- tier A. gTextEntryMethods +0x010 (classtable.py), overrides BasicClass's addChild: calls the base addChild, then reads the new child's type tag and stashes it into childType2/childType5 by mask. Mirrors the already-matched TaskObjF__Notify idiom.

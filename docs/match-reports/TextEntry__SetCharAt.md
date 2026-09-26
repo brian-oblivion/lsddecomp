@@ -1,4 +1,6 @@
-# Obj86ED0__DispatchLookupValue — MATCHED (round 45, 45/45 words)
+# TextEntry__SetCharAt — MATCHED (round 45, 45/45 words)
+
+> Renamed from `Obj86ED0__DispatchLookupValue` on 2026-09-26 (tools/rename.py). Address 0x80051998.
 
 > Renamed from `func_80051998` on 2026-09-24 (tools/rename.py). Address 0x80051998.
 
@@ -7,16 +9,16 @@
 Filed as a `gp_rel`-blocked stub in round 15. That blocker was RESOLVED in
 round 42 (`--gp-symbols`, pinned in the Makefile). Matched on the first
 attempt once rebuilt against the fixed toolchain, alongside its sibling
-`Obj86ED0__DispatchIndexValue`.
+`TextEntry__SetCursorPos`.
 
 ## ROUND 75 CORRECTION
 
 This report originally typed `self` as `Obj866E8` (D_800866E8) and typed
 `self->unk44` through a unit-local `Unk44Obj866E8`/`Unk44Obj866E8Methods`
 duplicate. Both were wrong, for the same reason as its sibling
-`Obj86ED0__DispatchIndexValue` (see that report and
+`TextEntry__SetCursorPos` (see that report and
 `src/class_3bb8c_j.c`'s file header comment): `self` is `Obj86ED0`
-(`tools/classtable.py gObj86ED0Methods` places this function at +0x0A8), whose
+(`tools/classtable.py gTextEntryMethods` places this function at +0x0A8), whose
 shared struct already types `self->unk44` as `ChildObj86ED0 *`. The
 `+0x0C4` slot is now `ChildMethods86ED0::slotC4`, added additively next to
 the sibling's `slotBC`. Zero bytes affected.
@@ -26,7 +28,7 @@ the sibling's `slotBC`. Zero bytes affected.
 ```c
 extern u8 *gNameCharTable;
 
-void Obj86ED0__DispatchLookupValue(Obj86ED0 *self, s32 arg1, s32 arg2, s32 arg3)
+void TextEntry__SetCharAt(Obj86ED0 *self, s32 arg1, s32 arg2, s32 arg3)
 {
     ChildObj86ED0 *obj;
 
@@ -43,7 +45,7 @@ void Obj86ED0__DispatchLookupValue(Obj86ED0 *self, s32 arg1, s32 arg2, s32 arg3)
 }
 ```
 
-Same `Obj86ED0` "countdown/flush" group as `Obj86ED0__DispatchIndexValue` (see that
+Same `Obj86ED0` "countdown/flush" group as `TextEntry__SetCursorPos` (see that
 report): gated on `self->unk48`, this one copies one byte out of a lookup
 table (`gNameCharTable`, VALUE-of `%gp_rel`, ROM image points it at
 still-uncarved rodata `D_800115D0`) into `self->unk28[arg1]`, forwards the
@@ -54,12 +56,12 @@ through the same `self->methods->slot60(self, 0)` as its sibling.
 `self->unk18 = arg1` and `self->unk1C = arg2` both land in retail's branch
 delay slots (of the `beqz arg3, end` branch and its own fallthrough),
 executing unconditionally whenever `self->unk48` is set — ordinary
-plain-statement-before-`if` C, same shape as `Obj86ED0__DispatchIndexValue`.
+plain-statement-before-`if` C, same shape as `TextEntry__SetCursorPos`.
 
 `unk28`/`unk44` were already present on the shared `Obj86ED0` (established
 by class_3bb8c_i); only `ChildMethods86ED0::slotC4` (offset 0x0C4) is a
 new additive field in `include/class_3bb8c.h`, alongside the sibling's
-`slotBC` — see `Obj86ED0__DispatchIndexValue`'s report for the full set.
+`slotBC` — see `TextEntry__SetCursorPos`'s report for the full set.
 
 ### Proposed learning
 
@@ -70,4 +72,4 @@ notify-on-flag-set tail shape common to both siblings.
 
 ## Naming
 
-- `Obj86ED0__DispatchLookupValue` -- tier B. slotA8 occupant. Looks up gNameCharTable[arg2], stores it into self->unk28[arg1], forwards the same byte to self->unk44's slotC4, records self->unk18/unk1C, optionally notifies via slot60. Same evidence class as its sibling Obj86ED0__DispatchIndexValue. classtable.py gObj86ED0Methods +0x0A8.
+- `TextEntry__SetCharAt` -- tier B. slotA8 occupant. Looks up gNameCharTable[arg2], stores it into self->unk28[arg1], forwards the same byte to self->unk44's slotC4, records self->unk18/unk1C, optionally notifies via slot60. Same evidence class as its sibling TextEntry__SetCursorPos. classtable.py gTextEntryMethods +0x0A8.

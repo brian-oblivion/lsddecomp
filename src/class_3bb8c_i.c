@@ -3,15 +3,15 @@
  * carved round 14. include/class_3bb8c.h is SHARED with every other
  * class_3bb8c_* slice; header edits here must be strictly ADDITIVE.
  *
- * All 20 functions are `Obj86ED0` methods (vtable `gObj86ED0Methods`,
- * `D_80086ED0`, 42 slots, `tools/classtable.py gObj86ED0Methods`) -- the
+ * All 20 functions are `Obj86ED0` methods (vtable `gTextEntryMethods`,
+ * `D_80086ED0`, 42 slots, `tools/classtable.py gTextEntryMethods`) -- the
  * ONLY class this unit defines methods for. `Obj86ED0` is a BasicClass
  * subclass that resolves and drives the memory-card save-name-entry UI: it
  * loads the `CARD\COMINPUT.TIM`/`CARD\FONTICON.TIM` icon/font resources
- * (`Obj86ED0__LoadCardResources`), holds both a caller-owned name buffer
+ * (`TextEntry__LoadCardResources`), holds both a caller-owned name buffer
  * (`nameBuf`) and its own half-width working copy (`unk28`, decoded/encoded
  * via `DecodeFullWidthSjis`/`EncodeFullWidthSjis`), and routes a dense
- * numeric command switch (`Obj86ED0__HandleCommand`) to cursor-move
+ * numeric command switch (`TextEntry__HandleCommand`) to cursor-move
  * (`MoveCursorRight`/`Left`), character-select-cycle (`AdvanceCharSelect`)
  * and the countdown/blink group class_3bb8c_j already named
  * (`AdvanceCountdown`/`ToggleFlag20`/`ResetCountdown`/`ResetAllAndFinish`).
@@ -19,18 +19,18 @@
  * `resetAllAndFinish`) resolve to class_3bb8c_j's own functions but are
  * referenced ONLY here, so they are named in the shared header as this
  * unit's own (classtable.py-verified, compiler-checked clean). See
- * `docs/match-reports/Obj86ED0__HandleCommand.md` for the remaining
+ * `docs/match-reports/TextEntry__HandleCommand.md` for the remaining
  * cross-unit fields/slots this unit could not rename alone.
  */
 #include "common.h"
 #include "class_3bb8c.h"
 #include "CharSprite.h"
 
-/* This project's own strcpy (matched elsewhere) -- Obj86ED0__SetName's own
+/* This project's own strcpy (matched elsewhere) -- TextEntry__SetName's own
  * caller, same local-declaration convention as class_3bb8c_e.c/others. */
 extern char *strcpy(char *dest, char *src);
 
-/* Uncarved helper, `code_2cc8c_f`, still INCLUDE_ASM -- Obj86ED0__SetName's own
+/* Uncarved helper, `code_2cc8c_f`, still INCLUDE_ASM -- TextEntry__SetName's own
  * call. Translates each byte of `src` (a name string) into `dest` (folding a
  * couple of special-case byte ranges) and returns `dest`, same convention as
  * `strcpy`. Typed purely from this call site's own register usage. Declared
@@ -44,24 +44,24 @@ extern char *DecodeFullWidthSjis(char *dest, char *src);
  * `Class86ED0Methods` local view, and two incompatible declarations of one
  * symbol in a shared header reach both translation units. See the HEAD NOTE
  * next to Obj86ED0Methods in that header. */
-extern Obj86ED0Methods gObj86ED0Methods;
+extern Obj86ED0Methods gTextEntryMethods;
 
-/* This class's own table getter -- New_Obj86ED0/Obj86ED0__Obj86ED0's shared
+/* This class's own table getter -- New_TextEntry/TextEntry__TextEntry's shared
  * dispatch. DEFINED in src/class_3bb8c_j.c (matched round 15 by runner
  * bravo, which returns it as its own `Class86ED0Methods *` local view of
- * the same table). Returns `&gObj86ED0Methods`; confirmed in the disassembly as
+ * the same table). Returns `&gTextEntryMethods`; confirmed in the disassembly as
  * `lui/addiu` materialising that exact address then `jr $ra`, the same
  * no-argument-getter shape as `Get_vtable_BasicClass`. Declared here rather than
  * in the shared header because the two units' return types differ. */
-extern Obj86ED0Methods *Get_vtable_Obj86ED0(void);
+extern Obj86ED0Methods *GetTextEntryMethods(void);
 
-void *New_Obj86ED0(s32 arg0, s32 arg1)
+void *New_TextEntry(s32 arg0, s32 arg1)
 {
     Obj86ED0 *self;
 
     self = BMemPMgrAlloc(0x4C);
     if (self != NULL) {
-        Get_vtable_Obj86ED0()->ctor(self, arg0, arg1);
+        GetTextEntryMethods()->ctor(self, arg0, arg1);
         return self;
     }
     return NULL;
@@ -79,17 +79,17 @@ extern s32 strlen(char *s);
 extern u8 *gNameCharTable;
 
 /* Defined later in this file (ROM order); forward-declared here since
- * Obj86ED0__Obj86ED0 calls it, same convention as Obj865C8__EnterState2 in
+ * TextEntry__TextEntry calls it, same convention as Obj865C8__EnterState2 in
  * src/class_39e08.c. */
-extern void Obj86ED0__ClearChildRefs(Obj86ED0 *self);
+extern void TextEntry__ClearChildRefs(Obj86ED0 *self);
 
-void Obj86ED0__Obj86ED0(Obj86ED0 *self, char *arg1, s32 arg2)
+void TextEntry__TextEntry(Obj86ED0 *self, char *arg1, s32 arg2)
 {
     u8 *p;
     s32 count;
 
     Get_vtable_BasicClass()->ctor((BasicClass *)self);
-    self->methods = Get_vtable_Obj86ED0();
+    self->methods = GetTextEntryMethods();
     self->nameLen = strlen(arg1);
     self->unk28 = BMemPMgrAlloc(self->nameLen + 4);
 
@@ -101,24 +101,24 @@ void Obj86ED0__Obj86ED0(Obj86ED0 *self, char *arg1, s32 arg2)
     }
     self->unk14 = count;
 
-    Obj86ED0__ClearChildRefs(self);
+    TextEntry__ClearChildRefs(self);
     self->methods->setName(self, arg1, arg2);
 }
 
-void Obj86ED0__ClearChildRefs(Obj86ED0 *self)
+void TextEntry__ClearChildRefs(Obj86ED0 *self)
 {
     self->childType2 = NULL;
     self->childType5 = NULL;
     self->unk48 = NULL;
 }
 
-void Obj86ED0__Finalize(Obj86ED0 *self)
+void TextEntry__Finalize(Obj86ED0 *self)
 {
     BMemPMgrFree(self->unk28);
     Get_vtable_BasicClass()->finalize((BasicClass *)self);
 }
 
-void Obj86ED0__AddChild(Obj86ED0 *self, void *arg1)
+void TextEntry__AddChild(Obj86ED0 *self, void *arg1)
 {
     s32 tag;
     s32 mask;
@@ -135,7 +135,7 @@ void Obj86ED0__AddChild(Obj86ED0 *self, void *arg1)
     }
 }
 
-void Obj86ED0__RemoveChild(Obj86ED0 *self, void *arg1)
+void TextEntry__RemoveChild(Obj86ED0 *self, void *arg1)
 {
     s32 tag;
     s32 mask;
@@ -152,7 +152,7 @@ void Obj86ED0__RemoveChild(Obj86ED0 *self, void *arg1)
     }
 }
 
-void Obj86ED0__RemoveAllChildren(Obj86ED0 *self)
+void TextEntry__RemoveAllChildren(Obj86ED0 *self)
 {
     self->childType2 = NULL;
     self->childType5 = NULL;
@@ -160,7 +160,7 @@ void Obj86ED0__RemoveAllChildren(Obj86ED0 *self)
     Get_vtable_BasicClass()->removeAllChildren((BasicClass *)self);
 }
 
-void Obj86ED0__Notify(Obj86ED0 *self, void *arg1, s32 arg2)
+void TextEntry__OnNotify(Obj86ED0 *self, void *arg1, s32 arg2)
 {
     s32 tag;
     s32 mask;
@@ -176,7 +176,7 @@ void Obj86ED0__Notify(Obj86ED0 *self, void *arg1, s32 arg2)
     }
 }
 
-void Obj86ED0__SetName(Obj86ED0 *self, char *arg1, s32 mode)
+void TextEntry__SetName(Obj86ED0 *self, char *arg1, s32 mode)
 {
     self->mode = mode;
     self->nameBuf = arg1;
@@ -191,7 +191,7 @@ void Obj86ED0__SetName(Obj86ED0 *self, char *arg1, s32 mode)
 }
 
 /*
- * Obj86ED0__LoadCardResources's own helpers/data -- resolves two "CARD\\<name>.TIM"
+ * TextEntry__LoadCardResources's own helpers/data -- resolves two "CARD\\<name>.TIM"
  * memory-card icon/font resource paths (BuildFileName, already matched in
  * code_171e0.c) and loads each through func_8003B39C, then converts/wraps
  * the loaded handle into a ChildObj86ED0-shaped resource object (unk48 via
@@ -213,7 +213,7 @@ extern s32 D_8008AACC; /* opaque block, self->unk48's slot4C arg2, address-only 
 extern s32 D_8008AAD4; /* opaque block, self->unk44's slot4C arg2, address-only here */
 extern s32 D_8008AADC; /* opaque block, self->unk40's slot4C arg2, address-only here */
 
-void Obj86ED0__LoadCardResources(Obj86ED0 *self, void *arg1)
+void TextEntry__LoadCardResources(Obj86ED0 *self, void *arg1)
 {
     char path[0x20];
     const char *dir;
@@ -247,7 +247,7 @@ void Obj86ED0__LoadCardResources(Obj86ED0 *self, void *arg1)
     self->unk40->methods->slot4C(self->unk40, arg1, (void *)&D_8008AADC);
 }
 
-void Obj86ED0__ReleaseCardResources(Obj86ED0 *self)
+void TextEntry__ReleaseCardResources(Obj86ED0 *self)
 {
     if (self->unk48 != NULL) {
         self->unk48 = self->unk48->methods->release(self->unk48);
@@ -256,7 +256,7 @@ void Obj86ED0__ReleaseCardResources(Obj86ED0 *self)
     }
 }
 
-void Obj86ED0__AttachTarget(Obj86ED0 *self, void *arg1, void *arg2, TargetObj86ED0 *arg3)
+void TextEntry__AttachTarget(Obj86ED0 *self, void *arg1, void *arg2, TargetObj86ED0 *arg3)
 {
     self->methods->addChild(self, arg1);
     self->methods->addChild(self, arg2);
@@ -265,14 +265,14 @@ void Obj86ED0__AttachTarget(Obj86ED0 *self, void *arg1, void *arg2, TargetObj86E
     self->unk20 = 0;
 }
 
-void Obj86ED0__DetachTarget(Obj86ED0 *self)
+void TextEntry__DetachTarget(Obj86ED0 *self)
 {
     self->methods->removeChild(self, self->childType2);
     self->methods->removeChild(self, self->childType5);
     self->target = NULL;
 }
 
-void Obj86ED0__SetState(Obj86ED0 *self, s32 arg1)
+void TextEntry__SetState(Obj86ED0 *self, s32 arg1)
 {
     self->closeTickCount = 0;
     if (arg1 < 2) {
@@ -291,7 +291,7 @@ void Obj86ED0__SetState(Obj86ED0 *self, s32 arg1)
     }
 }
 
-void Obj86ED0__TickState(Obj86ED0 *self)
+void TextEntry__TickState(Obj86ED0 *self)
 {
     s32 tag;
     s32 old;
@@ -310,7 +310,7 @@ void Obj86ED0__TickState(Obj86ED0 *self)
     }
 }
 
-/* Obj86ED0__HandleCommand's own name-copy helper -- uncarved elsewhere (`code_2cc8c_f`,
+/* TextEntry__HandleCommand's own name-copy helper -- uncarved elsewhere (`code_2cc8c_f`,
  * still `INCLUDE_ASM`), typed purely from this call site's own register
  * usage: `a0`/`a1` are `self->nameBuf`/`self->unk28` (both `char *`, the same
  * pair `strcpy` is fed in the other arm), return value unused. Same
@@ -319,7 +319,7 @@ void Obj86ED0__TickState(Obj86ED0 *self)
  * call site). */
 extern void EncodeFullWidthSjis(char *dest, char *src);
 
-void Obj86ED0__HandleCommand(Obj86ED0 *self, void *arg1, s32 arg2)
+void TextEntry__HandleCommand(Obj86ED0 *self, void *arg1, s32 arg2)
 {
     switch (arg2) {
     default:
@@ -397,7 +397,7 @@ slot94Call:
     }
 }
 
-void Obj86ED0__NotifyTarget(Obj86ED0 *self, s32 arg1)
+void TextEntry__NotifyTarget(Obj86ED0 *self, s32 arg1)
 {
     TargetObj86ED0 *target;
 
@@ -407,7 +407,7 @@ void Obj86ED0__NotifyTarget(Obj86ED0 *self, s32 arg1)
     }
 }
 
-void Obj86ED0__MoveCursorRight(Obj86ED0 *self)
+void TextEntry__MoveCursorRight(Obj86ED0 *self)
 {
     s32 old;
     s32 v;
@@ -424,7 +424,7 @@ void Obj86ED0__MoveCursorRight(Obj86ED0 *self)
     }
 }
 
-void Obj86ED0__MoveCursorLeft(Obj86ED0 *self)
+void TextEntry__MoveCursorLeft(Obj86ED0 *self)
 {
     s32 old;
     s32 v;
@@ -441,7 +441,7 @@ void Obj86ED0__MoveCursorLeft(Obj86ED0 *self)
     }
 }
 
-void Obj86ED0__AdvanceCharSelect(Obj86ED0 *self)
+void TextEntry__NextChar(Obj86ED0 *self)
 {
     s32 v;
 

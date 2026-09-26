@@ -1,4 +1,6 @@
-# Obj86ED0__LoadCardResources -- MATCH (119/119 words, ~5 attempts)
+# TextEntry__LoadCardResources -- MATCH (119/119 words, ~5 attempts)
+
+> Renamed from `Obj86ED0__LoadCardResources` on 2026-09-26 (tools/rename.py). Address 0x80050f98.
 
 > Renamed from `func_80050F98` on 2026-09-24 (tools/rename.py). Address 0x80050f98.
 
@@ -23,7 +25,7 @@ extern s32 D_8008AACC; /* opaque block, self->unk48's slot4C arg2, address-only 
 extern s32 D_8008AAD4; /* opaque block, self->unk44's slot4C arg2, address-only here */
 extern s32 D_8008AADC; /* opaque block, self->unk40's slot4C arg2, address-only here */
 
-void Obj86ED0__LoadCardResources(Obj86ED0 *self, void *arg1)
+void TextEntry__LoadCardResources(Obj86ED0 *self, void *arg1)
 {
     char path[0x20];
     const char *dir;
@@ -78,7 +80,7 @@ this is the same function by address, given its own local reading here.
 The temp handle (`handle1`/`handle2`) dispatches `slot78` (self only, void)
 right after loading, and `release`/`slot4` (self only, return discarded)
 right before its own scope ends -- this matches `ChildObj86ED0`'s existing
-`release` slot (established elsewhere in this unit, `Obj86ED0__ReleaseCardResources`) in
+`release` slot (established elsewhere in this unit, `TextEntry__ReleaseCardResources`) in
 both offset (+0x004) and shape, so the temp handle and `self->unk40/44/48`
 share the SAME `ChildObj86ED0` type. Extended `ChildMethods86ED0`
 additively with `slot4C` (+0x04C, `(self, void *arg1, void *arg2)`, called
@@ -147,7 +149,7 @@ three-value swap was resolved by touching only the non-persistent one.
 
 ## Naming
 
-- `Obj86ED0__LoadCardResources` -- tier A. gObj86ED0Methods +0x044 (classtable.py). Resolves 'CARD\\COMINPUT.TIM'/'CARD\\FONTICON.TIM' memory-card paths (sCardPathPrefix/sStrComInput/sStrFontIcon/sTimExt, all this unit's own strings) and loads/wraps them into the three resource handles (unk48/unk44/unk40). String evidence is direct, not inferred.
+- `TextEntry__LoadCardResources` -- tier A. gTextEntryMethods +0x044 (classtable.py). Resolves 'CARD\\COMINPUT.TIM'/'CARD\\FONTICON.TIM' memory-card paths (sCardPathPrefix/sStrComInput/sStrFontIcon/sTimExt, all this unit's own strings) and loads/wraps them into the three resource handles (unk48/unk44/unk40). String evidence is direct, not inferred.
 
 ## Track 4
 

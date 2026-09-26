@@ -1,15 +1,17 @@
-# Obj86ED0__AdvanceCharSelect -- MATCH (25/25 words, 2 real attempts after the header fix)
+# TextEntry__NextChar -- MATCH (25/25 words, 2 real attempts after the header fix)
+
+> Renamed from `Obj86ED0__AdvanceCharSelect` on 2026-09-26 (tools/rename.py). Address 0x80051720.
 
 > Renamed from `func_80051720` on 2026-09-24 (tools/rename.py). Address 0x80051720.
 
 Unit `class_3bb8c_i`. Obj86ED0's own "advance `unk1C` counter, clamped at
 `unk14`, dispatch `slotA8` with `unk18`" method. Same family as
-`Obj86ED0__MoveCursorRight`/`Obj86ED0__MoveCursorLeft` (increment/decrement clamp pairs on
+`TextEntry__MoveCursorRight`/`TextEntry__MoveCursorLeft` (increment/decrement clamp pairs on
 `unk18`), but on a different pair of fields (`unk1C`/`unk14`) and resetting
 to 0 rather than restoring the old value on overflow.
 
 ```c
-void Obj86ED0__AdvanceCharSelect(Obj86ED0 *self)
+void TextEntry__NextChar(Obj86ED0 *self)
 {
     s32 v;
 
@@ -26,7 +28,7 @@ void Obj86ED0__AdvanceCharSelect(Obj86ED0 *self)
 ```
 
 Note the store (`self->unk1C = v;`) is UNCONDITIONAL, written before the
-`if` -- the exact same shape as `Obj86ED0__MoveCursorRight`/`Obj86ED0__MoveCursorLeft`'s clamp
+`if` -- the exact same shape as `TextEntry__MoveCursorRight`/`TextEntry__MoveCursorLeft`'s clamp
 idiom, not something written differently inside the true branch. That part
 was right from the very first attempt.
 
@@ -37,7 +39,7 @@ was right from the very first attempt.
 (`self->unk18`) and `$a3` (`1`), while `$a2` is never freshly loaded or
 `li`'d for the call -- it's still holding the just-computed incremented
 `unk1C` value from a few instructions earlier. Same "leftover register is
-actually a forwarded argument" shape as `Obj86ED0__NotifyTarget`'s `slot80` fix
+actually a forwarded argument" shape as `TextEntry__NotifyTarget`'s `slot80` fix
 earlier this round. The first attempt (correct store placement, but the
 call written as `self->methods->slotA8(self, self->unk18, 1)` against the
 stale 2-arg header) scored only 5/25, with a register swap AND a length
@@ -71,4 +73,4 @@ fixed it.
 
 ## Naming
 
-- `Obj86ED0__AdvanceCharSelect` -- tier B. gObj86ED0Methods +0x090 (advanceCharSelect slot, classtable.py -- HandleCommand's case 18/2). Increments the character-picker index unk1C, bounded by unk14 (gNameCharTable's own length, counted by the ctor); WRAPS to 0 on overflow (unlike the cursor pair's revert), forwarding to Obj86ED0__DispatchLookupValue (class_3bb8c_j). Tier B: the wrap-vs-revert asymmetry is measured, exact on-screen semantics (cycling a soft-keyboard character list) is inferred.
+- `TextEntry__NextChar` -- tier B. gTextEntryMethods +0x090 (advanceCharSelect slot, classtable.py -- HandleCommand's case 18/2). Increments the character-picker index unk1C, bounded by unk14 (gNameCharTable's own length, counted by the ctor); WRAPS to 0 on overflow (unlike the cursor pair's revert), forwarding to TextEntry__SetCharAt (class_3bb8c_j). Tier B: the wrap-vs-revert asymmetry is measured, exact on-screen semantics (cycling a soft-keyboard character list) is inferred.

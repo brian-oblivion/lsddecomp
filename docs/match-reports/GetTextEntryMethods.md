@@ -1,4 +1,6 @@
-# Get_vtable_Obj86ED0 -- MATCHED (4/4 words)
+# GetTextEntryMethods -- MATCHED (4/4 words)
+
+> Renamed from `Get_vtable_Obj86ED0` on 2026-09-26 (tools/rename.py). Address 0x80051a4c.
 
 > Renamed from `func_80051A4C` on 2026-09-24 (tools/rename.py). Address 0x80051a4c.
 
@@ -6,13 +8,13 @@ Unit: `src/class_3bb8c_j.c`. ROUND 75 CORRECTION: this is NOT
 `Class86F88_3bb8c_j`'s own getter (an earlier round assumed so, since it was
 the only table getter this unit's C had resolved at the time, and named the
 whole sibling class after it -- see `Class86F88__Class86F88.md`
-and `include/class_3bb8c.h`'s round-15 HEAD NOTEs on gObj86ED0Methods/gClass86F88Methods
-for that history). `tools/classtable.py gObj86ED0Methods` places
-`Obj86ED0__AdvanceCountdown` .. `Obj86ED0__DispatchLookupValue` (this same
+and `include/class_3bb8c.h`'s round-15 HEAD NOTEs on gTextEntryMethods/gClass86F88Methods
+for that history). `tools/classtable.py gTextEntryMethods` places
+`TextEntry__PrevChar` .. `TextEntry__SetCharAt` (this same
 unit's own first six functions) at that table's +0x094..+0x0A8, and
 `include/class_3bb8c.h` already types and shares the WHOLE table as
 `Obj86ED0Methods`, established independently by class_3bb8c_i from its own
-call sites (`New_Obj86ED0` there is the actual `New_X` for THIS class,
+call sites (`New_TextEntry` there is the actual `New_X` for THIS class,
 allocating 0x4C bytes and dispatching its ctor through `->ctor(...)` on the
 pointer this function returns). So this function is `Obj86ED0`'s own
 table getter, simply DEFINED in this unit; `Class86F88_3bb8c_j`'s real
@@ -22,9 +24,9 @@ table is gClass86F88Methods, reached instead through `GetClass86F88Methods()`
 ## Body
 
 ```c
-Obj86ED0Methods *Get_vtable_Obj86ED0(void)
+Obj86ED0Methods *GetTextEntryMethods(void)
 {
-    return &gObj86ED0Methods;
+    return &gTextEntryMethods;
 }
 ```
 
@@ -34,4 +36,4 @@ Plain address-of getter for `Obj86ED0`'s own vtable, same shape as
 
 ## Naming
 
-- `Get_vtable_Obj86ED0` -- tier A. Plain `return &gObj86ED0Methods;` -- a table-getter's purpose IS its mechanics (a pure leaf returning a fixed vtable pointer), same shape as the project's other `Get_vtable_*`/`GetClass*Methods` accessors. Identity of gObj86ED0Methods as Obj86ED0's table is classtable.py gObj86ED0Methods (42 slots) cross-checked against class_3bb8c_i's own already-shared struct.
+- `GetTextEntryMethods` -- tier A. Plain `return &gTextEntryMethods;` -- a table-getter's purpose IS its mechanics (a pure leaf returning a fixed vtable pointer), same shape as the project's other `Get_vtable_*`/`GetClass*Methods` accessors. Identity of gTextEntryMethods as Obj86ED0's table is classtable.py gTextEntryMethods (42 slots) cross-checked against class_3bb8c_i's own already-shared struct.

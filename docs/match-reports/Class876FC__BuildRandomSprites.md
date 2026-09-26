@@ -82,7 +82,7 @@ the head's contribution here is the last word, not the body.
 ## Adjudication: why the class was wrong, and the discriminator that catches it
 
 "Redundant move / dead store" is a real class in this project
-(`strcat`, `Obj86ED0__ResetAllAndFinish`, and the round-16 instance), and it is the class you
+(`strcat`, `TextEntry__ResetAllChars`, and the round-16 instance), and it is the class you
 reach for when an instruction has no visible consumer. **The check that
 separates it from an ordinary hoisted argument is one grep, and it is a
 liveness question, not a similarity question:**

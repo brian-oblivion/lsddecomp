@@ -1,8 +1,10 @@
-# Obj86ED0__HandleCommand -- MATCHED (147/147 words, byte-exact)
+# TextEntry__HandleCommand -- MATCHED (147/147 words, byte-exact)
+
+> Renamed from `Obj86ED0__HandleCommand` on 2026-09-26 (tools/rename.py). Address 0x800513d0.
 
 > Renamed from `func_800513D0` on 2026-09-24 (tools/rename.py). Address 0x800513d0.
 
-Unit `class_3bb8c_i`. `Obj86ED0Methods::slot5C` (called by `Obj86ED0__Notify`'s
+Unit `class_3bb8c_i`. `Obj86ED0Methods::slot5C` (called by `TextEntry__OnNotify`'s
 `tag==2` case). No other caller in this unit. Carved with the rodata slot
 (`jtbl_80011628` at file `0x1E28`) already attached per the splat yaml, so no
 carve work needed here.
@@ -129,7 +131,7 @@ No existing declaration's TYPE changed.
 
 ## Naming
 
-- `Obj86ED0__HandleCommand` -- tier B. gObj86ED0Methods +0x05C (handleCommand slot, classtable.py), dispatched by Obj86ED0__Notify's tag==2 case. Dense switch on a command code (2..32): case 25 commits the edited name back into nameBuf (Encode/strcpy) then setState(2); case 23 setState(3); the remaining paired cases (21/5, 20/4, 18/2, 19/3, plus ungated 32/31/28), CONFIRMED against gObj86ED0Methods's own table (classtable.py), dispatch to moveCursorRight/moveCursorLeft/advanceCharSelect/advanceCountdown/resetAllAndFinish/resetCountdown/toggleFlag20 respectively -- i.e. this is the full input-command router for the name-entry UI (cursor move, character-select cycle, and the countdown/blink group class_3bb8c_j already named). Tier B: the routing mechanics and slot identities are now fully confirmed, but which physical button/event produces each numeric code is not.
+- `TextEntry__HandleCommand` -- tier B. gTextEntryMethods +0x05C (handleCommand slot, classtable.py), dispatched by TextEntry__OnNotify's tag==2 case. Dense switch on a command code (2..32): case 25 commits the edited name back into nameBuf (Encode/strcpy) then setState(2); case 23 setState(3); the remaining paired cases (21/5, 20/4, 18/2, 19/3, plus ungated 32/31/28), CONFIRMED against gTextEntryMethods's own table (classtable.py), dispatch to moveCursorRight/moveCursorLeft/advanceCharSelect/advanceCountdown/resetAllAndFinish/resetCountdown/toggleFlag20 respectively -- i.e. this is the full input-command router for the name-entry UI (cursor move, character-select cycle, and the countdown/blink group class_3bb8c_j already named). Tier B: the routing mechanics and slot identities are now fully confirmed, but which physical button/event produces each numeric code is not.
 
 ## Proposed field names
 
@@ -138,27 +140,27 @@ No existing declaration's TYPE changed.
 Cross-unit fields/slots of `Obj86ED0` (shared header `include/class_3bb8c.h`)
 that this unit's own functions read/write but that class_3bb8c_j ALSO
 accesses -- left unrenamed per the field-ownership rule (compiler-checked:
-class_3bb8c_j's `Obj86ED0__AdvanceCountdown`/`Obj86ED0__ToggleFlag20`/
-`Obj86ED0__ResetCountdown`/`Obj86ED0__ResetAllAndFinish`/
-`Obj86ED0__DispatchIndexValue`/`Obj86ED0__DispatchLookupValue` are the other
+class_3bb8c_j's `TextEntry__PrevChar`/`TextEntry__ToggleAltCommands`/
+`TextEntry__ResetChar`/`TextEntry__ResetAllChars`/
+`TextEntry__SetCursorPos`/`TextEntry__SetCharAt` are the other
 accessors). PROPOSED for whoever next runs track 3 on class_3bb8c_j, or for
 the head to apply by type scope:
 
-- `unk10` -> `nameLen` (tier B). Set by `Obj86ED0__SetName` from
+- `unk10` -> `nameLen` (tier B). Set by `TextEntry__SetName` from
   `strlen(arg1)` (halved when `mode==1`); read as the upper bound in
-  `Obj86ED0__MoveCursorRight`'s `unk18` test.
-- `unk14` -> `charTableLen` (tier B). Set by `Obj86ED0__Obj86ED0`'s own hand
+  `TextEntry__MoveCursorRight`'s `unk18` test.
+- `unk14` -> `charTableLen` (tier B). Set by `TextEntry__TextEntry`'s own hand
   counted walk over `gNameCharTable` until the NUL byte; read as the upper
-  bound in `Obj86ED0__AdvanceCharSelect` and as the countdown's own reset
-  value in class_3bb8c_j's `Obj86ED0__AdvanceCountdown`.
+  bound in `TextEntry__NextChar` and as the countdown's own reset
+  value in class_3bb8c_j's `TextEntry__PrevChar`.
 - `unk18` -> `cursorIndex` (tier B). The name-buffer edit-cursor index,
-  moved by `Obj86ED0__MoveCursorRight`/`Left`, forwarded as `arg1` to both
+  moved by `TextEntry__MoveCursorRight`/`Left`, forwarded as `arg1` to both
   `slotA4`/`slotA8` (class_3bb8c_j's Dispatch* pair) and to `slot60`
-  (`Obj86ED0__NotifyTarget`).
+  (`TextEntry__NotifyTarget`).
 - `unk1C` -- **NOT proposed, dual-use ambiguity found and deliberately left
-  alone.** In this unit (`Obj86ED0__AdvanceCharSelect`) it is INCREMENTED as
+  alone.** In this unit (`TextEntry__NextChar`) it is INCREMENTED as
   a character-picker selection index, capped by `unk14`, wrapping to 0 on
-  overflow. In class_3bb8c_j (`Obj86ED0__AdvanceCountdown`) the SAME field is
+  overflow. In class_3bb8c_j (`TextEntry__PrevChar`) the SAME field is
   DECREMENTED as a countdown, resetting to `unk14` at 0 -- opposite
   direction, same bounds. Whether this is one overloaded "position in
   [0,charTableLen)" value serving both a picker index and a blink/highlight
@@ -166,40 +168,40 @@ the head to apply by type scope:
   is not established from either unit's own call sites alone. A wrong name
   here would assert a purpose the evidence does not support in one of the
   two units, so it stays `unk1C` until someone reads both usages together
-  against the caller of `Obj86ED0__HandleCommand`/`Obj86ED0__Notify` (i.e.
+  against the caller of `TextEntry__HandleCommand`/`TextEntry__OnNotify` (i.e.
   whatever drives the name-entry screen's per-frame tick) to settle it.
 - `unk20` -> tentatively `altInputFlag` (tier C-ish B; NOT confident enough
   to apply even if it were unit-exclusive). Toggled by class_3bb8c_j's
-  `Obj86ED0__ToggleFlag20` (`^= 1`), zeroed by `Obj86ED0__AttachTarget`,
+  `TextEntry__ToggleAltCommands` (`^= 1`), zeroed by `TextEntry__AttachTarget`,
   tested with OPPOSITE polarity by every paired case in this function's own
   switch (`21` vs `5`, `20` vs `4`, `18` vs `2`, `19` vs `3`). Mechanics are
   solid; which real input condition it represents (a mode key held down? an
   edit-vs-insert toggle?) is not established -- offered as a starting point,
   not a confident proposal.
-- `unk28` -> `workName` (tier B). `BMemPMgrAlloc`'d by `Obj86ED0__Obj86ED0`,
-  freed by `Obj86ED0__Finalize`; the decode/copy destination in
-  `Obj86ED0__SetName` and the encode SOURCE in this function's own `case 25`;
-  also the per-index byte array class_3bb8c_j's `Obj86ED0__DispatchLookupValue`
+- `unk28` -> `workName` (tier B). `BMemPMgrAlloc`'d by `TextEntry__TextEntry`,
+  freed by `TextEntry__Finalize`; the decode/copy destination in
+  `TextEntry__SetName` and the encode SOURCE in this function's own `case 25`;
+  also the per-index byte array class_3bb8c_j's `TextEntry__SetCharAt`
   writes through `gNameCharTable`. Working (half-width-decoded) copy of the
   name the caller supplies via `nameBuf`.
 - `unk40`/`unk44`/`unk48` -> `iconRes`/`fontRes`/`inputRes` (tier B).
-  Resolved in `Obj86ED0__LoadCardResources`: `unk48` from the `COMINPUT.TIM`
+  Resolved in `TextEntry__LoadCardResources`: `unk48` from the `COMINPUT.TIM`
   handle (also the readiness/"is attached" gate every other function in
   this unit tests), `unk44` from `New_Obj6EAC0` on the `FONTICON.TIM`
   handle with `nameLen`/`workName` forwarded (renders the name text), `unk40`
   from `New_CharSprite` on the same `FONTICON.TIM` handle with a `0x5F`
   literal (a distinct icon sub-resource of the same TIM). Also accessed by
   class_3bb8c_j's Dispatch* pair (`unk40`/`unk44` only, not `unk48`).
-- `slot60` -> `notifyTarget` (tier B). This IS `Obj86ED0__NotifyTarget`'s own
-  vtable slot (`gObj86ED0Methods +0x060`, classtable.py) -- dispatched by
+- `slot60` -> `notifyTarget` (tier B). This IS `TextEntry__NotifyTarget`'s own
+  vtable slot (`gTextEntryMethods +0x060`, classtable.py) -- dispatched by
   this function's `case 25`/`23` (arg1=`0x10`) and by class_3bb8c_j's
-  `Obj86ED0__DispatchIndexValue`/`Obj86ED0__DispatchLookupValue` (arg1=`0`).
+  `TextEntry__SetCursorPos`/`TextEntry__SetCharAt` (arg1=`0`).
 - `slotA4`/`slotA8` -> `dispatchIndexValue`/`dispatchLookupValue` (tier A --
   these names ALREADY EXIST as the confirmed implementations'
-  `Obj86ED0__DispatchIndexValue`/`Obj86ED0__DispatchLookupValue`,
+  `TextEntry__SetCursorPos`/`TextEntry__SetCharAt`,
   class_3bb8c_j, round 45/75). Dispatched by this unit's own
-  `Obj86ED0__MoveCursorRight`/`Left`/`Obj86ED0__AdvanceCharSelect` AND by
-  class_3bb8c_j's `Obj86ED0__ResetAllAndFinish`/`Obj86ED0__ResetCountdown`.
+  `TextEntry__MoveCursorRight`/`Left`/`TextEntry__NextChar` AND by
+  class_3bb8c_j's `TextEntry__ResetAllChars`/`TextEntry__ResetChar`.
   Naming the slot to match its implementation is the project's own stated
   convention; only left unapplied here because the accessor set spans two
   units' files.

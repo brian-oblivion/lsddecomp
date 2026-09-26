@@ -1,4 +1,6 @@
-# Obj86ED0__ReleaseCardResources -- MATCHED (35/35 words)
+# TextEntry__ReleaseCardResources -- MATCHED (35/35 words)
+
+> Renamed from `Obj86ED0__ReleaseCardResources` on 2026-09-26 (tools/rename.py). Address 0x80051174.
 
 > Renamed from `func_80051174` on 2026-09-24 (tools/rename.py). Address 0x80051174.
 
@@ -12,7 +14,7 @@ matching retail's asymmetric store pattern exactly (`sw v0,0x48(s0)` after
 the first `release` call, no corresponding store after the other two).
 
 ```c
-void Obj86ED0__ReleaseCardResources(Obj86ED0 *self)
+void TextEntry__ReleaseCardResources(Obj86ED0 *self)
 {
     if (self->unk48 != NULL) {
         self->unk48 = self->unk48->methods->release(self->unk48);
@@ -36,4 +38,4 @@ dispatched on an opaque child pointer.
 
 ## Naming
 
-- `Obj86ED0__ReleaseCardResources` -- tier A. gObj86ED0Methods +0x048 (releaseCardResources slot, classtable.py). Symmetric teardown of Obj86ED0__LoadCardResources -- releases unk48/unk44/unk40.
+- `TextEntry__ReleaseCardResources` -- tier A. gTextEntryMethods +0x048 (releaseCardResources slot, classtable.py). Symmetric teardown of TextEntry__LoadCardResources -- releases unk48/unk44/unk40.

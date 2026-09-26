@@ -136,7 +136,7 @@ ASSIGNMENT SCOPE question: retail computes the value regardless of the
 inner test (visible independently as the `-Wall` "might be used
 uninitialized" warning on the naive nested reading), and once hoisted
 to the assignment's true scope, the delay-slot placement followed for
-free. This generalises `Obj86ED0__ResetAllAndFinish`'s own already-recorded lever
+free. This generalises `TextEntry__ResetAllChars`'s own already-recorded lever
 ("moving a later unconditionally-executed store to occur BEFORE rather
 than inside a guard clause that only conditions a loop, not the store
 itself") to a guard that conditions an entire computed VALUE, not just

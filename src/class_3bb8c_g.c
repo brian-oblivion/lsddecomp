@@ -13,7 +13,7 @@
  * OnItemSelected forward an externally supplied 2/3 dispatch code the
  * same way. Two lazily-attached child sub-objects (childA/childB, the
  * same real class the sibling units call Obj86ED0/Class86ED0 via
- * gObj86ED0Methods) are attached/detached in mirrored pairs. A third,
+ * gTextEntryMethods) are attached/detached in mirrored pairs. A third,
  * independent child (cardIcon) is a memcard-icon TIM image, loaded once
  * by LoadCardIcon and stepped by TickCardIcon.
  *
@@ -250,7 +250,7 @@ void TaskObjF__AttachChildA(Class86E00_3bb8c_g *self)
 {
     if (self->childReady != 0 && self->unk60 != 0) {
         if (self->childA == NULL) {
-            self->childA = New_Obj86ED0((self->unk48 << 1) + self->unk44, 1);
+            self->childA = New_TextEntry((self->unk48 << 1) + self->unk44, 1);
             self->childAttached = 1;
         }
         self->methods->slot10(self, self->childA);

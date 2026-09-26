@@ -17,7 +17,7 @@
  *    selects the caller's cell.
  *  - Its callers agree: D_8006EB90 (0x11144, the class below this one) makes
  *    a row of CharSprites and hands each the next byte of a NUL-terminated
- *    string through setCell (Obj6EAC0__SetText), and Obj86ED0__
+ *    string through setCell (Obj6EAC0__SetText), and TextEntry__
  *    LoadCardResources makes one on FONTICON.TIM with 0x5F, '_'.
  *
  * The ctor chains to ScreenSprite's first (GetScreenSpriteMethods()->ctor

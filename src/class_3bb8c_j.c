@@ -5,9 +5,9 @@
  * slice; header edits here must be strictly ADDITIVE.
  *
  * Two unrelated classes' methods live in this address range:
- *  - The first six functions (Obj86ED0__AdvanceCountdown ..
- *    Obj86ED0__DispatchLookupValue, +Get_vtable_Obj86ED0) are `Obj86ED0`
- *    methods -- gObj86ED0Methods, a class ALREADY shared and fully typed in
+ *  - The first six functions (TextEntry__PrevChar ..
+ *    TextEntry__SetCharAt, +GetTextEntryMethods) are `Obj86ED0`
+ *    methods -- gTextEntryMethods, a class ALREADY shared and fully typed in
  *    include/class_3bb8c.h, established by class_3bb8c_i.
  *  - Everything else is `Class86F88_3bb8c_j` (gClass86F88Methods, a BasicClass
  *    subclass, alloc size 0x54, reached through `GetClass86F88Methods()` in
@@ -17,7 +17,7 @@
  *
  * Both attributions were WRONG before round 75 (this unit's own C
  * originally used a locally-defined, differently-tabled `Obj866E8` for
- * the first group, and named the second group after `gObj86ED0Methods` by
+ * the first group, and named the second group after `gTextEntryMethods` by
  * mistake). See `Class86F88__Class86F88.md` for the full
  * `tools/classtable.py` evidence trail -- this file's own git history has
  * the mechanical fix (functions renamed via `tools/rename.py`, types
@@ -27,7 +27,7 @@
 #include "class_3bb8c.h"
 #include "ScreenSprite.h"
 
-void Obj86ED0__AdvanceCountdown(Obj86ED0 *self)
+void TextEntry__PrevChar(Obj86ED0 *self)
 {
     s32 count;
 
@@ -42,14 +42,14 @@ void Obj86ED0__AdvanceCountdown(Obj86ED0 *self)
     }
 }
 
-void Obj86ED0__ToggleFlag20(Obj86ED0 *self)
+void TextEntry__ToggleAltCommands(Obj86ED0 *self)
 {
     if (self->unk48) {
         self->unk20 ^= 1;
     }
 }
 
-void Obj86ED0__ResetCountdown(Obj86ED0 *self)
+void TextEntry__ResetChar(Obj86ED0 *self)
 {
     if (self->unk48) {
         self->unk1C = 0;
@@ -57,7 +57,7 @@ void Obj86ED0__ResetCountdown(Obj86ED0 *self)
     }
 }
 
-void Obj86ED0__ResetAllAndFinish(Obj86ED0 *self)
+void TextEntry__ResetAllChars(Obj86ED0 *self)
 {
     s32 i;
 
@@ -87,7 +87,7 @@ void Obj86ED0__ResetAllAndFinish(Obj86ED0 *self)
  * that ChildMethods86ED0 didn't have a name for yet (additive, see that
  * header's own comment on the change). No local duplicate type needed. */
 
-/* Obj86ED0__DispatchIndexValue's own stack-local argument to slotBC -- a 2-word block
+/* TextEntry__SetCursorPos's own stack-local argument to slotBC -- a 2-word block
  * (D_8008AADC-derived value at +0x0, the D_8008AAE0 constant at +0x4). */
 typedef struct {
     s32 unk0;
@@ -95,9 +95,9 @@ typedef struct {
 } SlotBCArg866E8_3bb8c_j;
 
 extern s32 D_8008AADC; /* VALUE-of here (round 45): see the type comment above */
-extern s32 D_8008AAE0; /* VALUE-of, round 45's Obj86ED0__DispatchIndexValue only */
+extern s32 D_8008AAE0; /* VALUE-of, round 45's TextEntry__SetCursorPos only */
 
-void Obj86ED0__DispatchIndexValue(Obj86ED0 *self, s32 arg1, s32 arg2)
+void TextEntry__SetCursorPos(Obj86ED0 *self, s32 arg1, s32 arg2)
 {
     SlotBCArg866E8_3bb8c_j local;
     ChildObj86ED0 *obj;
@@ -115,14 +115,14 @@ void Obj86ED0__DispatchIndexValue(Obj86ED0 *self, s32 arg1, s32 arg2)
 }
 
 /* round 75 CORRECTION (track 3 naming): self->unk44 is likewise Obj86ED0's
- * own ChildObj86ED0 *unk44 (see the note above Obj86ED0__DispatchIndexValue) -- no local
+ * own ChildObj86ED0 *unk44 (see the note above TextEntry__SetCursorPos) -- no local
  * duplicate type. */
 
-/* VALUE-of `%gp_rel`, round 45's Obj86ED0__DispatchLookupValue only -- a byte lookup table
+/* VALUE-of `%gp_rel`, round 45's TextEntry__SetCharAt only -- a byte lookup table
  * (ROM image initialises it to D_800115D0, still-uncarved rodata). */
 extern u8 *gNameCharTable;
 
-void Obj86ED0__DispatchLookupValue(Obj86ED0 *self, s32 arg1, s32 arg2, s32 arg3)
+void TextEntry__SetCharAt(Obj86ED0 *self, s32 arg1, s32 arg2, s32 arg3)
 {
     ChildObj86ED0 *obj;
 
@@ -143,7 +143,7 @@ void Obj86ED0__DispatchLookupValue(Obj86ED0 *self, s32 arg1, s32 arg2, s32 arg3)
  * unit (see the file header comment for why this is not added to the
  * shared class_3bb8c.h). Alloc size 0x54 (New_Class86F88). Its real
  * vtable is gClass86F88Methods, reached through GetClass86F88Methods() (class_3bb8c_k).
- * `Get_vtable_Obj86ED0`/gObj86ED0Methods immediately below are UNRELATED to this
+ * `GetTextEntryMethods`/gTextEntryMethods immediately below are UNRELATED to this
  * class -- they are Obj86ED0's own table and getter (see the file header
  * comment), merely defined in this same file.
  *
@@ -161,7 +161,7 @@ typedef struct Class86F88_3bb8c_j Class86F88_3bb8c_j;
  * Class86F88_3bb8c_j's own opaque "handle" object (self->unk50's pointee, built by
  * Class86F88__LoadResources via BuildFileName/func_8003B39C/New_ScreenSprite: a
  * "CARD\\<name>.TIM" path is built and loaded, as in class_3bb8c_i's
- * Obj86ED0__LoadCardResources). Only the three slots this unit's own
+ * TextEntry__LoadCardResources). Only the three slots this unit's own
  * functions dispatch through are named.
  */
 typedef struct Class86F88Handle_3bb8c_j Class86F88Handle_3bb8c_j;
@@ -229,14 +229,14 @@ struct Class86F88_3bb8c_j {
     Class86F88Handle_3bb8c_j *unk50;                  /* +0x050 */
 };
 
-/* gObj86ED0Methods is Obj86ED0's OWN table (Obj86ED0Methods, already shared in
+/* gTextEntryMethods is Obj86ED0's OWN table (Obj86ED0Methods, already shared in
  * include/class_3bb8c.h, established by class_3bb8c_i) -- NOT this file's
  * local Class86F88Methods_3bb8c_j. See the file header comment. */
-extern Obj86ED0Methods gObj86ED0Methods;
+extern Obj86ED0Methods gTextEntryMethods;
 
-Obj86ED0Methods *Get_vtable_Obj86ED0(void)
+Obj86ED0Methods *GetTextEntryMethods(void)
 {
-    return &gObj86ED0Methods;
+    return &gTextEntryMethods;
 }
 
 /*
@@ -418,7 +418,7 @@ extern const char D_800116E4[]; /* "FONTICON" */
  * Two handle variables, not one: handle1 and handle2 are disjoint live
  * ranges, and merging them into one `h` gives the rotation filed as the
  * round-18/19 stall (75/95, both addresses and the handle swapped among
- * $s0-$s2). Same shape as class_3bb8c_i's Obj86ED0__LoadCardResources.
+ * $s0-$s2). Same shape as class_3bb8c_i's TextEntry__LoadCardResources.
  */
 void Class86F88__LoadResources(Class86F88_3bb8c_j *self, void *arg1)
 {

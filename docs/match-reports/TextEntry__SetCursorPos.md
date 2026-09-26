@@ -1,4 +1,6 @@
-# Obj86ED0__DispatchIndexValue — MATCHED (round 45, 41/41 words)
+# TextEntry__SetCursorPos — MATCHED (round 45, 41/41 words)
+
+> Renamed from `Obj86ED0__DispatchIndexValue` on 2026-09-26 (tools/rename.py). Address 0x800518f4.
 
 > Renamed from `func_800518F4` on 2026-09-24 (tools/rename.py). Address 0x800518f4.
 
@@ -12,7 +14,7 @@ attempt once rebuilt against the fixed toolchain.
 
 This report originally typed `self` as `Obj866E8` (D_800866E8) and typed
 `self->unk40` through a unit-local `Unk40Obj866E8`/`Unk40Obj866E8Methods`
-duplicate. Both were wrong. `tools/classtable.py gObj86ED0Methods` places this
+duplicate. Both were wrong. `tools/classtable.py gTextEntryMethods` places this
 function at that table's +0x0A4 (`D_800866E8`'s 80 slots hold none of this
 group's six addresses) -- `self` is `Obj86ED0` (class_3bb8c_i's shared
 type), whose OWN struct in `include/class_3bb8c.h` already types
@@ -20,7 +22,7 @@ type), whose OWN struct in `include/class_3bb8c.h` already types
 dispatches through was simply missing a name on the shared
 `ChildMethods86ED0` -- added additively there instead of duplicated
 locally. See `src/class_3bb8c_j.c`'s file header comment and
-`Obj86ED0__AdvanceCountdown.md` for the full evidence trail. Zero bytes
+`TextEntry__PrevChar.md` for the full evidence trail. Zero bytes
 affected (type names are not codegen).
 
 ## Derivation
@@ -34,7 +36,7 @@ typedef struct {
 extern s32 D_8008AADC;
 extern s32 D_8008AAE0;
 
-void Obj86ED0__DispatchIndexValue(Obj86ED0 *self, s32 arg1, s32 arg2)
+void TextEntry__SetCursorPos(Obj86ED0 *self, s32 arg1, s32 arg2)
 {
     SlotBCArg866E8_3bb8c_j local;
     ChildObj86ED0 *obj;
@@ -53,7 +55,7 @@ void Obj86ED0__DispatchIndexValue(Obj86ED0 *self, s32 arg1, s32 arg2)
 ```
 
 Part of the same `Obj86ED0` "countdown/flush" group established in round 15
-(`Obj86ED0__AdvanceCountdown`/`Obj86ED0__ToggleFlag20`/`Obj86ED0__ResetCountdown`/`Obj86ED0__ResetAllAndFinish`, same
+(`TextEntry__PrevChar`/`TextEntry__ToggleAltCommands`/`TextEntry__ResetChar`/`TextEntry__ResetAllChars`, same
 unit): tests `self->unk48` as a readiness gate, then calls through
 `self->unk40`'s own method table at slot `0xBC` with a 2-word stack-local
 argument block, then records `self->unk18 = arg1` and, if `arg2` is
@@ -87,4 +89,4 @@ verdict was set aside.
 
 ## Naming
 
-- `Obj86ED0__DispatchIndexValue` -- tier B. slotA4 occupant. Computes arg1*7+D_8008AADC into a 2-word stack block together with the D_8008AAE0 constant, dispatches it through self->unk40's own slotBC, records self->unk18=arg1, and optionally notifies via slot60. "Index"/"Dispatch" describe the mechanics; what the computed value represents in-game is not established. classtable.py gObj86ED0Methods +0x0A4 (the real occupant -- corrects this unit's earlier Obj866E8 misattribution, see the ROUND 75 CORRECTION section above).
+- `TextEntry__SetCursorPos` -- tier B. slotA4 occupant. Computes arg1*7+D_8008AADC into a 2-word stack block together with the D_8008AAE0 constant, dispatches it through self->unk40's own slotBC, records self->unk18=arg1, and optionally notifies via slot60. "Index"/"Dispatch" describe the mechanics; what the computed value represents in-game is not established. classtable.py gTextEntryMethods +0x0A4 (the real occupant -- corrects this unit's earlier Obj866E8 misattribution, see the ROUND 75 CORRECTION section above).
