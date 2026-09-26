@@ -24,7 +24,7 @@
  * which are each handler's own phases. The named motion templates
  * (ROTATION_YAW_PLUS1, ROTATION_ZPLUS4, SCALE_EIGHTH, SCALE_QUARTER,
  * SCALE_THIRTY_SECOND, SCALE_UNIT) are declared once in include/Entity.h.
- * Five more data constants (ROTATION_YAW_MINUS_THIRD, D_80089CB8, D_80089DE4, D_80089E2C,
+ * Five more data constants (ROTATION_YAW_MINUS_THIRD, ROTATION_YAW_MINUS_HALF, D_80089DE4, D_80089E2C,
  * D_80089E44) are left unnamed for lack of a naming precedent -- a
  * non-whole-degree rotation or a non-uniform/non-unit-fraction scale; see
  * each function's match report (`## Naming` / `## Data constant(s) ...
@@ -43,7 +43,7 @@
  * The named motion templates (ROTATION_*, SCALE_*) are in include/Entity.h. */
 extern u8 ROTATION_YAW_MINUS_THIRD[];
 extern u8 D_80089DE4[];
-extern u8 D_80089CB8[];
+extern u8 ROTATION_YAW_MINUS_HALF[];
 extern u8 D_80089E2C[];
 extern u8 D_80089E44[];
 
@@ -114,7 +114,7 @@ void Entity__MoodCue103(Entity *this, SoundCueSet *out) {
     }
     if (this->state == 11) {
         if (this->moodTimer < 1020) {
-            this->methods->updateRotation(this, 0, D_80089CB8);
+            this->methods->updateRotation(this, 0, ROTATION_YAW_MINUS_HALF);
             this->methods->moveLocalY(this, 30, 0);
         }
         if (this->moodTimer == 930) {
