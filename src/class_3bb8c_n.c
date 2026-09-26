@@ -6,7 +6,7 @@
  * NAMING PASS, round 72 (runner alpha).  Every function, and the thirteen
  * globals its functions set up or gate on, renamed via `tools/rename.py`,
  * tree-wide.  The evidence for the `Style` prefix: this unit's global-state
- * cluster (`gStyleKind`/`gStyleCounter`/`gStyleTargetObj`/`gStyleVariant`/
+ * cluster (`gStyleStage`/`gStyleCounter`/`gStyleTargetObj`/`gStyleVariant`/
  * `gStyleDecorObj`/`gStyleCueSelf`/`gStyleTickCount`, formerly
  * `D_8008AC6C`/`74`/`7C`/`80`/`94`, `D_8008AB4C`/`70`) is the SAME cluster
  * `class_3bb8c_m.c`'s already-confirmed "Style" subsystem sets
@@ -29,7 +29,7 @@
  * everything `TickStyle` builds.
  *
  * What the "Style" subsystem is FOR in gameplay terms -- which dream/link
- * property `gStyleKind` actually selects -- remains UNESTABLISHED; every
+ * property `gStyleStage` actually selects -- remains UNESTABLISHED; every
  * name above describes MECHANICS, not a guessed purpose, per track 3's
  * naming rule. Full evidence and tier per function: `docs/match-reports/
  * <name>.md`, `## Naming`.
@@ -66,7 +66,7 @@ void StyleFlushDecoration(void) {
 }
 
 extern s32 gStyleCounter;
-extern s32 gStyleKind;
+extern s32 gStyleStage;
 extern s8 gStyleVariantPicks[];
 extern s32 gStyleVariant;
 extern s8 gStyleVariantConfigCounts[];
@@ -89,7 +89,7 @@ void *PickStyleFallbackConfig(void) {
     s32 b2;
     u8 *tab;
 
-    sum = gStyleCounter + gStyleKind;
+    sum = gStyleCounter + gStyleStage;
     kind = gStyleVariantPicks[sum & 0xF];
     gStyleVariant = kind;
     divisor = gStyleVariantConfigCounts[kind];
@@ -649,7 +649,7 @@ StyleCueSlot *TryStartStyleCue(StyleCueSlot *arg0, s32 *arg1, void *arg2, void *
     return 0;
 }
 
-extern s32 gStyleKind;
+extern s32 gStyleStage;
 extern s32 gStyleCueRecordIndex;
 extern u8 *gStyleCueRecordLists[];
 extern u8 gStyleCueRecordCounts[];
@@ -723,8 +723,8 @@ void *FindNearestStyleCueEntry(void *arg0, s32 *arg1, void *arg2) {
     if (arg2 == 0) {
         goto fail;
     }
-    base = gStyleCueRecordLists[gStyleKind];
-    n = gStyleCueRecordCounts[gStyleKind] - gStyleCueRecordIndex;
+    base = gStyleCueRecordLists[gStyleStage];
+    n = gStyleCueRecordCounts[gStyleStage] - gStyleCueRecordIndex;
     entry = (EntrySlot *)(gStyleCueRecordIndex * 8 + (s32)base);
     for (j = 0; j < n; j++, entry++) {
         gStyleCueRecordIndex++;
@@ -853,7 +853,7 @@ s32 TickStyle(void *arg0, void *arg1, s32 arg2) {
     return arg2;
 }
 
-extern s32 gStyleKind;
+extern s32 gStyleStage;
 extern void func_8003B624(void *arg0, s32 arg1, void *arg2);
 extern s32 gStyleStripRectA[];
 extern s32 gStyleStripScratchA[];
@@ -864,11 +864,11 @@ void DrawStyleTables(void) {
     void *a0, *a2;
     s32 a1;
 
-    if (gStyleKind == 2) {
+    if (gStyleStage == 2) {
         a0 = gStyleStripRectA;
         a2 = gStyleStripScratchA;
         a1 = 1;
-    } else if ((u32)(gStyleKind - 3) < 3) {
+    } else if ((u32)(gStyleStage - 3) < 3) {
         a1 = 1;
         a0 = gStyleStripRectB;
         a2 = gStyleStripScratchB;

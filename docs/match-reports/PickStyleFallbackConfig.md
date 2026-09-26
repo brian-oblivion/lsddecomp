@@ -18,8 +18,8 @@ fresh copy (same reasoning as `StyleUpdateEffectSlots`/`TryStartStyleCue`/
 
 ```c
 extern s32 gStyleCounter;         /* already s32 in class_3bb8c_m.c */
-extern s32 gStyleKind;         /* already s32 in class_3bb8c_m.c and this unit's own DrawStyleTables */
-extern s8 gStyleVariantPicks[];        /* 16-entry table, indexed by (gStyleCounter+gStyleKind)&0xF */
+extern s32 gStyleStage;         /* already s32 in class_3bb8c_m.c and this unit's own DrawStyleTables */
+extern s8 gStyleVariantPicks[];        /* 16-entry table, indexed by (gStyleCounter+gStyleStage)&0xF */
 extern s32 gStyleVariant;
 extern s8 gStyleVariantConfigCounts[];        /* divisor table, indexed by "kind" -- raw index, no scale */
 extern s32 gStyleConfigIndex;
@@ -45,7 +45,7 @@ void *PickStyleFallbackConfig(void) {
     s32 b2;
     u8 *tab;
 
-    sum = gStyleCounter + gStyleKind;
+    sum = gStyleCounter + gStyleStage;
     kind = gStyleVariantPicks[sum & 0xF];
     gStyleVariant = kind;
     divisor = gStyleVariantConfigCounts[kind];
@@ -132,9 +132,9 @@ inverted branch; second: explicit default-then-override, byte-exact).
 **`PickStyleFallbackConfig`, tier B.**
 
 Literal call site in `ApplyStyleConfig` (class_3bb8c_m.c, already matched):
-`cfg = func_80054758();`, used only when the direct per-`gStyleKind` config
-table entry (`D_800873EC[gStyleKind]`) is NULL -- i.e. this is the fallback
-path. Body hashes `gStyleCounter + gStyleKind` into a 16-entry table to pick
+`cfg = func_80054758();`, used only when the direct per-`gStyleStage` config
+table entry (`D_800873EC[gStyleStage]`) is NULL -- i.e. this is the fallback
+path. Body hashes `gStyleCounter + gStyleStage` into a 16-entry table to pick
 a `gStyleVariant` ("kind"), then a per-variant divisor/remainder select a
 config row. "Fallback" is evidenced by the call site; "kind"/variant
 selection mechanics are evidenced by the body; WHY a fallback is needed, or

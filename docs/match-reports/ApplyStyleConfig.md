@@ -8,7 +8,7 @@ and `addiu_at` are resolved), never attempted before this round.
 ## What it does
 
 Looks up a "cfg" byte-array pointer for the current style index
-(`gStyleKind`, set by `RegisterStyleConfig`) in the 14-entry pointer table
+(`gStyleStage`, set by `RegisterStyleConfig`) in the 14-entry pointer table
 `D_800873EC`; if the slot is NULL, falls back to `PickStyleFallbackConfig()` to
 produce one. Feeds `cfg` into the already-matched `FillStyleFromConfig(style,
 cfg)` against the fixed global `D_80087424` (a `StyleM` instance, split by
@@ -30,7 +30,7 @@ extern u8 gStylePalette[][3];
 extern const u8 *gStyleDecorColor;
 
 void *ApplyStyleConfig(void) {
-    s8 *cfg = D_800873EC[gStyleKind];
+    s8 *cfg = D_800873EC[gStyleStage];
 
     if (cfg == 0) {
         cfg = PickStyleFallbackConfig();
@@ -90,4 +90,4 @@ before anything more invasive.
 
 ## Naming
 
-**ApplyStyleConfig** -- tier B. Looks up the current style's config-byte pointer (`D_800873EC[gStyleKind]`), falling back to the uncarved `PickStyleFallbackConfig` if unset, fills the shared `StyleM` global via `FillStyleFromConfig`, and conditionally sets a colour-table pointer. Same tier and caveat as `RegisterStyleConfig`.
+**ApplyStyleConfig** -- tier B. Looks up the current style's config-byte pointer (`D_800873EC[gStyleStage]`), falling back to the uncarved `PickStyleFallbackConfig` if unset, fills the shared `StyleM` global via `FillStyleFromConfig`, and conditionally sets a colour-table pointer. Same tier and caveat as `RegisterStyleConfig`.

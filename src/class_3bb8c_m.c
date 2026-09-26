@@ -205,7 +205,7 @@ ObjMMethods *GetObjMMethods(void) {
 struct StyleM;
 
 extern s32 gStyleCueSelf;
-extern s32 gStyleKind;
+extern s32 gStyleStage;
 extern s32 gStyleTickCount;
 extern s32 gStyleCounter;
 extern s32 D_8008AC78;
@@ -223,7 +223,7 @@ s32 RegisterStyleConfig(s32 a0, s32 a1, s32 a2, s32 a3, s32 arg4) {
         i = 1;
         p = &D_8008ACA0;
         gStyleCueSelf = a0;
-        gStyleKind = a1;
+        gStyleStage = a1;
         gStyleTargetObj = a2;
         gStyleVariant = -1;
         gStyleCounter = a3;
@@ -247,7 +247,7 @@ extern u8 gStylePalette[][3];
 extern const u8 *gStyleDecorColor;
 
 void *ApplyStyleConfig(void) {
-    s8 *cfg = D_800873EC[gStyleKind];
+    s8 *cfg = D_800873EC[gStyleStage];
 
     if (cfg == 0) {
         cfg = PickStyleFallbackConfig();

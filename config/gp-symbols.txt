@@ -189,7 +189,7 @@ gStyleDecorPosBY
 gStyleDecorVariant
 gStyleEffectSlotCount
 gStyleFlushColor
-gStyleKind
+gStyleStage
 gStyleTargetObj
 gStyleTickCount
 gStyleVariant

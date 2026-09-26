@@ -71,8 +71,8 @@ void *FindNearestStyleCueEntry(void *arg0, s32 *arg1, void *arg2) {
     if (arg2 == 0) {
         goto fail;
     }
-    base = gStyleCueRecordLists[gStyleKind];
-    n = gStyleCueRecordCounts[gStyleKind] - gStyleCueRecordIndex;
+    base = gStyleCueRecordLists[gStyleStage];
+    n = gStyleCueRecordCounts[gStyleStage] - gStyleCueRecordIndex;
     entry = (EntrySlot *) (gStyleCueRecordIndex * 8 + (s32) base);
     for (j = 0; j < n; j++, entry++) {
         gStyleCueRecordIndex++;
@@ -104,7 +104,7 @@ fail:
 
 Needs (already present earlier in the unit, in strict ROM order): the
 `ObjAB4C`/`ObjAB4CMethods`/`Pos4`/`TabEntry`/`EntrySlot`/`LocalBuf` types and
-`extern s32 gStyleKind, gStyleCueRecordIndex, gStyleCueSelf, gStyleCueDistanceTable[];`,
+`extern s32 gStyleStage, gStyleCueRecordIndex, gStyleCueSelf, gStyleCueDistanceTable[];`,
 `extern u8 *gStyleCueRecordLists[], gStyleCueRecordCounts[], gStyleCueOffsets[];` (all already
 declared in `src/class_3bb8c_n.c` ahead of this function).
 
@@ -175,9 +175,9 @@ Scans a run of 8-byte records starting at a base pointer for one whose
 returning the first such record or `NULL`.
 
 ```c
-extern s32 gStyleKind;
+extern s32 gStyleStage;
 extern s32 gStyleCueRecordIndex;
-extern u8 *gStyleCueRecordLists[];    /* word array of base pointers, indexed by gStyleKind */
+extern u8 *gStyleCueRecordLists[];    /* word array of base pointers, indexed by gStyleStage */
 extern u8 gStyleCueRecordCounts[];    /* byte array of counts, same index */
 extern u8 gStyleCueOffsets[];    /* table, 6-byte stride entries */
 extern s32 gStyleCueDistanceTable[];   /* word table, indexed by entry->count */
@@ -200,8 +200,8 @@ void *FindNearestStyleCueEntry(void *arg0, s32 *arg1, void *arg2) {
     if (arg2 == 0) {
         goto fail;
     }
-    base = gStyleCueRecordLists[gStyleKind];
-    n = gStyleCueRecordCounts[gStyleKind] - gStyleCueRecordIndex;
+    base = gStyleCueRecordLists[gStyleStage];
+    n = gStyleCueRecordCounts[gStyleStage] - gStyleCueRecordIndex;
     if (n <= 0) {
         goto fail;
     }
@@ -260,7 +260,7 @@ Notes on the recovery:
 ## The stall: preamble scheduling order
 
 Retail places `j = 0` (as `move $s2,zero`) as the literal first instruction
-after the `ctx == 0` guard, BEFORE either of the two `gStyleKind`-indexed
+after the `ctx == 0` guard, BEFORE either of the two `gStyleStage`-indexed
 lookups. My build computes both lookups first and initializes `j` last
 (as part of the `for`'s own init clause), which is semantically identical
 but produces a different instruction SCHEDULE around the two lookups (see
