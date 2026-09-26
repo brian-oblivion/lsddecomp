@@ -34,6 +34,7 @@
 #include "LightRig.h"
 #include "Class86668.h"
 #include "DrawSystem.h"
+#include "Class6D940.h"
 
 /* Class86668::sound's pointee, a VabStreamObj (New_VabStreamObj): its +0x080 is
  * VabStreamObj__PlayTone. Only Class86668__PlaySound calls through it here. */
@@ -77,7 +78,6 @@ Class866E8 *New_Class866E8(s32 arg1, s32 arg2)
  * purely from this call site's own register usage.
  */
 extern UnkSlotChildObj_3ac78 *New_DataSrc39094(void);
-extern UnkSlotListObj_3ac78 *New_Class6D940(s32 arg1);
 extern GenericObject *New_Class86AA0(void);
 extern void BMemPMgrFree(void *arg1);
 extern Vec3_3ac78 gDefaultOrigin;
@@ -181,10 +181,10 @@ void Class866E8__Finalize(Class866E8 *self)
         }
 
         if (entry->list != NULL) {
-            if (entry->list->unk2C != NULL) {
-                entry->list->unk2C->methods->release(entry->list->unk2C);
+            if (entry->list->linkResource != NULL) {
+                entry->list->linkResource->methods->release(entry->list->linkResource);
             }
-            entry->list = (UnkSlotListObj_3ac78 *)entry->list->methods->release(entry->list);
+            entry->list = entry->list->methods->release(entry->list);
         }
 
         if (entry->cellParent != NULL) {
@@ -278,7 +278,7 @@ void Class866E8__ResetAllElements(Class866E8 *self)
 {
     s32 i;
     UnkSlotEntry_3ac78 *entry;
-    UnkSlotListObj_3ac78 *list;
+    Class6D940 *list;
 
     for (i = 0; i < 7; i++) {
         entry = &self->elems[i];
@@ -286,8 +286,8 @@ void Class866E8__ResetAllElements(Class866E8 *self)
         entry->flag = 0;
         self->methods->slot108(self, entry);
         list = entry->list;
-        if (list->unk2C != NULL) {
-            list->unk2C = list->unk2C->methods->release(list->unk2C);
+        if (list->linkResource != NULL) {
+            list->linkResource = list->linkResource->methods->release(list->linkResource);
         }
         self->methods->onElementEvent(self, 6, entry, i);
         entry->target->methods->slot84(entry->target);
