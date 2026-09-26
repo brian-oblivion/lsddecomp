@@ -2908,3 +2908,4 @@ GetTeleportTimeBonus = 0x8005BFC4; // type:func
 gStylePalette = 0x800872C4;
 gStyleSpawnRotations = 0x80087174;
 gStyleSpawnScales = 0x800871C8;
+gStyleKind1Scale = 0x80087204;

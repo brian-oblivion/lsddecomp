@@ -20,9 +20,9 @@ see `StyleTeardown`'s per-index rewrite of `gStyleCueSlots`).
 
 ```c
 extern s32 D_80087330;             /* only element [0] read here */
-extern u8 D_80087204[];            /* address only taken, never indexed */
+extern u8 gStyleKind1Scale[];            /* address only taken, never indexed */
 extern u8 D_8008E0A4[];            /* address only taken, passed to New_X */
-extern u8 *D_8008E0B4;             /* set to &D_80087204 unconditionally */
+extern u8 *D_8008E0B4;             /* set to &gStyleKind1Scale unconditionally */
 extern void *SetupStyleSpawnParamsA(void *arg0, void *arg1);   /* forward decl, own unit, cold */
 extern void *New_Class876FC(void *arg0, void *arg1, void *arg2, void *arg3); /* class_3bb8c_r.c, ALREADY MATCHED */
 ```
@@ -47,7 +47,7 @@ void **StyleFillEffectKind1(void **arg0, s32 arg1, void *arg2) {
     s32 val;
 
     val = D_80087330;
-    D_8008E0B4 = D_80087204;
+    D_8008E0B4 = gStyleKind1Scale;
     for (i = 0; i < arg1; i++) {
         SetupStyleSpawnParamsA(arg2, (void *) val);
         *arg0 = New_Class876FC((void *) 1, D_8008E0A4, (void *) gStyleCueSelf, arg2);
