@@ -21,18 +21,18 @@
 
 s32 Entity__UpdateTargetProximity(Entity *this) {
     EntityMoodRow *row;
-    s32 *xptr;
+    s32 *pos;
     s32 dist;
 
     row = &gEntityMoodTable[this->moodIndex];
     if (this->active != 0) {
         if (this->targetReached == 0) {
-            xptr = &this->coord2->tx;
+            pos = &this->coord2->tx;
             dist = row->proximityRange;
             if (dist < 0) {
                 dist = ~dist + 1;
             }
-            if (Entity__IsNearTarget(this, xptr, dist, row->unk9) != 0) {
+            if (Entity__IsNearTarget(this, pos, dist, row->unk9) != 0) {
                 this->methods->setTargetReached(this, 1);
             }
         }
@@ -45,18 +45,18 @@ s32 Entity__UpdateTargetProximity(Entity *this) {
 
 s32 Entity__UpdateSoundCueStart(Entity *this) {
     EntityMoodRow *row;
-    s32 *xptr;
+    s32 *pos;
     s32 dist;
 
     if (this->active != 0 && this->soundCueActive == 0 && this->state != 1) {
         row = &gEntityMoodTable[this->moodIndex];
         if (row->cueRange != 0) {
-            xptr = &this->coord2->tx;
+            pos = &this->coord2->tx;
             dist = row->cueRange;
             if (dist < 0) {
                 dist = ~dist + 1;
             }
-            if (Entity__IsNearTarget(this, xptr, dist, row->unk9) != 0) {
+            if (Entity__IsNearTarget(this, pos, dist, row->unk9) != 0) {
                 this->methods->startSoundCue(this);
             }
         }
@@ -67,7 +67,7 @@ s32 Entity__UpdateSoundCueStart(Entity *this) {
 /* arg1 is unused here; the canonical declaration in include/Entity.h has it
  * and its one caller, Entity__UpdateDeactivationState, passes 0. Do not drop
  * it -- `conflicting types`. */
-void Entity__NotifyIfTargetInRange(Entity *this, s32 arg1) {
+void Entity__NotifyIfTargetInRange(Entity *this, s32 unused) {
     if (gEntityLinkStageTable[this->moodIndex * 0x10] < 0 &&
         gEntityEventVideoTable[this->moodIndex * 0x10] != 0 &&
         Entity__IsTargetInRange(this, gEntityEventVideoTable[this->moodIndex * 0x10] << 9)) {
@@ -97,7 +97,7 @@ fail:
 
 s32 Entity__UpdateSoundCueStop(Entity *this) {
     EntityMoodRow *row;
-    s32 *xptr;
+    s32 *pos;
     s32 dist;
 
     if (this->active != 0 && this->soundCueActive != 0) {
@@ -105,8 +105,8 @@ s32 Entity__UpdateSoundCueStop(Entity *this) {
         dist = row->cueRange;
         if (dist < 0) {
             dist = ~dist + 1;
-            xptr = &this->coord2->tx;
-            if (Entity__IsNearTarget(this, xptr, dist, row->unk9) == 0) {
+            pos = &this->coord2->tx;
+            if (Entity__IsNearTarget(this, pos, dist, row->unk9) == 0) {
                 this->methods->stopSoundCue(this);
             }
         }
@@ -229,24 +229,24 @@ void Entity__MoodCue10(Entity *this, SoundCueSet *out) {
 }
 
 void Entity__MoodCue11(Entity *this, SoundCueSet *out) {
-    Ratio16 *row;
+    Ratio16 *turn;
 
     this->lastOffsetValue = -0x14;
     out->attenuation = this->methods->getProximityRatio(this);
-    row = 0;
+    turn = 0;
     if (out->tick % (this->todFrameCount / 2) == 0) {
         out->slots[0].program = 0xA;
         out->slots[0].octave = 1;
     }
     if (this->state == 0xB) {
         if (this->moodTimer == 0xA8C) {
-            row = ROTATION_YAW_MINUS90;
+            turn = ROTATION_YAW_MINUS90;
         }
         if (this->moodTimer == 0xC6C) {
-            row = ROTATION_YAW_PLUS90;
+            turn = ROTATION_YAW_PLUS90;
         }
         if (this->moodTimer == 0xE10) {
-            row = ROTATION_YAW_MINUS90;
+            turn = ROTATION_YAW_MINUS90;
         }
         if ((u32)(this->moodTimer - 0xD5D) < 0x78) {
             if (((DreamSys *)this->peer)->methods->getLinkCommandFlag((DreamSys *)this->peer) != 0) {
@@ -256,7 +256,7 @@ void Entity__MoodCue11(Entity *this, SoundCueSet *out) {
         }
     } else if (this->state == 0xC) {
         if (this->moodTimer == 0x7BC) {
-            row = ROTATION_YAW_MINUS90;
+            turn = ROTATION_YAW_MINUS90;
         }
     } else if (this->state == 0xD) {
         this->lastOffsetValue = -0x78;
@@ -268,15 +268,15 @@ void Entity__MoodCue11(Entity *this, SoundCueSet *out) {
     }
     if (this->moodTimer == 0x618) {
         if ((rand() & 1) != 0) {
-            row = ROTATION_YAW_PLUS90;
+            turn = ROTATION_YAW_PLUS90;
             this->state = 0xB;
         } else {
-            row = ROTATION_YAW_MINUS90;
+            turn = ROTATION_YAW_MINUS90;
             this->state = 0xC;
         }
     }
-    if (row != 0) {
-        this->methods->updateRotation(this, 0, row);
+    if (turn != 0) {
+        this->methods->updateRotation(this, 0, turn);
     }
     this->methods->moveLocalZOrFindLink(this, this->lastOffsetValue, 0);
     if (this->state != 0xC) {
@@ -288,8 +288,8 @@ void Entity__MoodCue11(Entity *this, SoundCueSet *out) {
 
 void Entity__MoodCue12(Entity *this) {
     s32 y;
-    s32 result;
-    s32 oldFC;
+    s32 dist;
+    s32 timer;
 
     if (this->moodTimer == 0) {
         if ((rand() & 1) == 0) {
@@ -301,16 +301,16 @@ void Entity__MoodCue12(Entity *this) {
         SceneNode__FaceTarget((SceneNode *)this, (SceneNode *)this->peer, 1, 0, 0);
     }
     if (this->state == 0xB) {
-        result = this->methods->distanceToPeer(this, this->peer);
-        if (result < 0xA00) {
+        dist = this->methods->distanceToPeer(this, this->peer);
+        if (dist < 0xA00) {
             this->grid->methods->startScaleRamp(this->grid, 1, 1);
             this->moodTimer = 1;
             this->state = 0xC;
         }
     } else if (this->state == 0xC) {
-        oldFC = this->moodTimer;
-        this->moodTimer = oldFC + 1;
-        if (oldFC == 0x12C) {
+        timer = this->moodTimer;
+        this->moodTimer = timer + 1;
+        if (timer == 0x12C) {
             this->methods->notifyParents(this, 0xC);
         }
     }
@@ -347,7 +347,7 @@ void Entity__MoodCue15(Entity *this, SoundCueSet *out) {
 }
 
 void Entity__MoodCue16(Entity *this) {
-    Ratio16 *arg2;
+    Ratio16 *turn;
     s32 roll;
 
     if (this->moodTimer == 0) {
@@ -360,11 +360,11 @@ void Entity__MoodCue16(Entity *this) {
             this->methods->moveLocalZ(this, -0x5A, 0);
         } else if (this->moodTimer == 0x40) {
             roll = rand() & 1;
-            arg2 = ROTATION_YAW_MINUS90;
+            turn = ROTATION_YAW_MINUS90;
             if (roll != 0) {
-                arg2 = ROTATION_YAW_PLUS90;
+                turn = ROTATION_YAW_PLUS90;
             }
-            this->methods->updateRotation(this, 0, arg2);
+            this->methods->updateRotation(this, 0, turn);
             this->methods->addTranslation(this, TRANSLATE_Y_PLUS256);
         } else {
             this->methods->moveLocalZOrFindLink(this, -0x176, (void *)(rand() % 2));
