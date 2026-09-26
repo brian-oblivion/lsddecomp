@@ -46,7 +46,7 @@ struct DreamSys;
 struct WBgm;
 struct TimImage;
 struct LinkResource;
-struct Obj4C; /* gObjMMethods's object as class_39e08.h views it (New_ObjM's result) */
+struct ObjM;  /* include/ObjM.h */
 
 /* Class86668's slots, then this class's own. Overridden: ctor, finalize,
  * onNotify, resetCounters (Class865C8__ResetPhase), init, deinit, onInit,
@@ -63,7 +63,7 @@ struct Obj4C; /* gObjMMethods's object as class_39e08.h views it (New_ObjM's res
     /* +0x040 */ struct WBgm *bgm;          /* New_WBgm(PickWeeklyGroup(0), NULL, 1); New_ObjM's 2nd argument; finalize releases it */ \
     /* +0x044 */ struct TimImage *etcTim;   /* New_TimImage("ETC\ETC.TIM"), uploaded and its buffer freed; DreamSys +0x114; New_ObjM's 3rd */ \
     /* +0x048 */ struct LinkResource *dreamerTmd;    /* New_LinkResource("ETC\DREAMER.TMD"); New_ObjM's 4th; finalize releases it */ \
-    /* +0x04C */ struct Obj4C *objM         /* StartObjM's New_ObjM(...); a child; released by AdvancePhase/OnObjMNotify */
+    /* +0x04C */ struct ObjM *objM          /* StartObjM's New_ObjM(...); a child; released by AdvancePhase/OnObjMNotify */
 
 struct Class865C8Methods {
     CLASS865C8_SLOTS(Class865C8, (Class865C8 *self, IntermediateBaseInitArgs *initArgs, struct DreamSys *dreamSys, s32 arg3));

@@ -771,8 +771,8 @@ extern s32 CopyMemcardIconTemplate(s32 arg0, s32 arg1);                /* TaskOb
  * avoid implying any relationship.
  * ------------------------------------------------------------------- */
 
-typedef struct ObjM ObjM;
-typedef struct ObjMMethods ObjMMethods;
+typedef struct ObjM_3bb8c_m ObjM_3bb8c_m;
+typedef struct ObjMMethods_3bb8c_m ObjMMethods_3bb8c_m;
 typedef struct FieldM14 FieldM14;
 typedef struct FieldM14Methods FieldM14Methods;
 typedef struct FieldM18 FieldM18;
@@ -881,7 +881,7 @@ struct FieldM50 {
  * New_TextRow (src/code_2cc8c_f.c), which returns `TextRow *`
  * (include/TextRow.h); the call site casts. The slots below (0x004/0x04C/
  * 0x0B8) are TextRow's release/attachToParent/setColor; the view is kept
- * (ObjM's, not TextRow's job). */
+ * (ObjM_3bb8c_m's, not TextRow's job). */
 struct FieldM7CMethods {
     u8 pad000[0x004];
     void (*slot4)(FieldM7C *self);                              /* +0x004, ObjM__TeardownPauseOverlay */
@@ -906,24 +906,24 @@ extern s32 D_8008AB40;      /* one-word opaque block, address-only here */
 
 /* The self type for this unit's ObjM__EnterState7..ObjM__CloseAndNotifyC cluster.
  * Only the slots/fields these functions actually reach are typed. */
-struct ObjMMethods {
+struct ObjMMethods_3bb8c_m {
     u8 pad000[0x010];
-    void (*slot10)(ObjM *self, ChildM_AC *arg1);  /* +0x010, ObjM__StartFadeUp */
-    void (*slot14)(ObjM *self, ParamM *arg1);     /* +0x014, ObjM__OnFadeNotify */
+    void (*slot10)(ObjM_3bb8c_m *self, ChildM_AC *arg1);  /* +0x010, ObjM__StartFadeUp */
+    void (*slot14)(ObjM_3bb8c_m *self, ParamM *arg1);     /* +0x014, ObjM__OnFadeNotify */
     u8 pad018[0x030 - 0x018];
     /* +0x030 == BasicClass__NotifyParents's own slot (confirmed with
-     * `tools/classtable.py 0x80087034`, same table as the rest of ObjMMethods
+     * `tools/classtable.py 0x80087034`, same table as the rest of ObjMMethods_3bb8c_m
      * -- self->methods IS gObjMMethods), so this is a plain notify-parents
      * dispatch with a class-specific event code, not an unknown slot. */
-    void (*notifyParents)(ObjM *self, s32 code);   /* +0x030, ObjM__NotifyParentsCodeB/ObjM__OnFadeNotify/ObjM__CloseAndNotifyD/ObjM__CloseAndNotifyC */
+    void (*notifyParents)(ObjM_3bb8c_m *self, s32 code);   /* +0x030, ObjM__NotifyParentsCodeB/ObjM__OnFadeNotify/ObjM__CloseAndNotifyD/ObjM__CloseAndNotifyC */
     u8 pad034[0x0B8 - 0x034];
-    void (*checkAuxTrigger)(ObjM *self);            /* +0x0B8, ObjM__OnClass866E8Notify: this class's OWN ObjM__CheckAuxTrigger, confirmed via classtable.py against gObjMMethods */
+    void (*checkAuxTrigger)(ObjM_3bb8c_m *self);            /* +0x0B8, ObjM__OnClass866E8Notify: this class's OWN ObjM__CheckAuxTrigger, confirmed via classtable.py against gObjMMethods */
     u8 pad0BC[0x0D4 - 0x0BC];
-    void (*teardownPauseOverlay)(ObjM *self);       /* +0x0D4, ObjM__CloseAndNotifyD/ObjM__CloseAndNotifyC: this class's OWN ObjM__TeardownPauseOverlay, confirmed via classtable.py */
+    void (*teardownPauseOverlay)(ObjM_3bb8c_m *self);       /* +0x0D4, ObjM__CloseAndNotifyD/ObjM__CloseAndNotifyC: this class's OWN ObjM__TeardownPauseOverlay, confirmed via classtable.py */
 };
 
-struct ObjM {
-    ObjMMethods *methods;   /* +0x000 */
+struct ObjM_3bb8c_m {
+    ObjMMethods_3bb8c_m *methods;   /* +0x000 */
     u8 pad004[0x010 - 0x004];
     /* RETYPED round 15b (ObjM__AdvancePauseSetup/ObjM__TeardownPauseOverlay): was `s32 unk10`,
      * established from ObjM__StartFadeUp's OWN call site as a plain forwarded
@@ -954,12 +954,12 @@ struct ObjM {
 };
 
 /* -------------------------------------------------------------------
- * HEAD NOTE, round 15 merge: `ObjM` (above, from class_3bb8c_m) and
+ * HEAD NOTE, round 15 merge: `ObjM_3bb8c_m` (above, from class_3bb8c_m) and
  * `Obj87034_3bb8c_l` (below, from class_3bb8c_l) are the SAME CLASS.
  * Both units independently reached method table gObjMMethods, which is
  * exactly the collision runner delta anticipated when it suffixed its
  * type names. The proof is a cross-unit call, not a guess:
- * ObjM__StartFadeUp is DEFINED in class_3bb8c_m.c taking `ObjM *self` and
+ * ObjM__StartFadeUp is DEFINED in class_3bb8c_m.c taking `ObjM_3bb8c_m *self` and
  * CALLED from class_3bb8c_l.c (ObjM__EnterState6) passing its own
  * `Obj87034_3bb8c_l *self` as the same first argument.
  *
@@ -968,7 +968,7 @@ struct ObjM {
  * field maps is a struct edit that reaches 24 matched functions across
  * two units -- the round-13 hazard, and not something to do inside a
  * merge resolution. Unify as its own change, with the whole-image SHA1
- * re-verified after, and fold `ObjM`s offsets in as the more complete
+ * re-verified after, and fold `ObjM_3bb8c_m`s offsets in as the more complete
  * view. Until then, treat a field present in one view and absent in the
  * other as unknown-but-real rather than contradictory.
  * ------------------------------------------------------------------- */
@@ -1155,20 +1155,11 @@ struct Obj87034_3bb8c_l {
     s32 unk80;                                    /* +0x080, ObjM__PollTimBlockLoad (on `other`)/ObjM__Update/ObjM__TogglePause: zero-checked gate */
 };
 
-/* ObjM's parent class, Class86668 (gClass86668Methods), is declared in
+/* ObjM_3bb8c_m's parent class, Class86668 (gClass86668Methods), is declared in
  * include/Class86668.h (track 4, round 84); class_3bb8c_k and class_3bb8c_l
  * include it for their base-table calls. The unit-local
  * `BaseMethods87034_3bb8c_l` view the round-15 head note here described is
  * gone. */
-
-/* ObjM__AttachTarget's own registered callback -- forward-declared here since
- * ObjM__AttachTarget (ROM order earlier) takes its address before its own
- * definition (ROM order later) is reached. */
-extern void ObjM__OnRegistrantEvent(Obj87034_3bb8c_l *self, s32 code, s32 arg2, s32 arg3);
-
-/* ObjM__OnTag1Notify's tail call -- forward-declared for the same ROM-order
- * reason as ObjM__OnRegistrantEvent above (ObjM__PollTimBlockLoad is defined later). */
-extern void ObjM__PollTimBlockLoad(Obj87034_3bb8c_l *self, Obj87034_3bb8c_l *other);
 
 /* ObjM__OnRegistrantEvent's own two helpers -- MATCHED, src/code_39094.c.
  * GetGridRecordAt(index, sub) reads both $a0 and $a1. ObjM__OnRegistrantEvent's
@@ -1258,13 +1249,6 @@ struct TargetObj86ED0 {
  * are in class_3bb8c_j and class_3bb8c_k) is include/Class86F88.h (track 4,
  * round 89). */
 
-/* GetObjMMethods: a plain class-vtable getter (`lui`/`addiu`, no
- * `lw`/`sw`), returns `&gObjMMethods` verbatim. Confirmed a BasicClass-
- * derived vtable with `tools/classtable.py 0x80087034` (header word then
- * `BasicClass__Release` at +4, the class-framework fingerprint) --
- * nothing in this unit dereferences it, so it stays untyped beyond the
- * address itself, same convention as `sDefaultTargetSpecs` above. */
-extern s32 gObjMMethods;
-extern void *GetObjMMethods(void);
+/* gObjMMethods and GetObjMMethods: include/ObjM.h (track 4, round 89). */
 
 #endif

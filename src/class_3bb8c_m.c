@@ -10,7 +10,7 @@
  * every name below, both confirmed with `tools/classtable.py`, never by
  * guessing from a slot number:
  *
- *   - This unit's `self` (`ObjM`) is a subclass whose OWN vtable is
+ *   - This unit's `self` (`ObjM_3bb8c_m`) is a subclass whose OWN vtable is
  *     `gObjMMethods` (`tools/classtable.py 0x80087034`, 53 slots) -- the same
  *     class as class_3bb8c_l's `Obj87034_3bb8c_l` (see that HEAD NOTE in
  *     include/class_3bb8c.h; NOT unified with it here, a struct-merge is its
@@ -18,7 +18,7 @@
  *     table's tail, offsets +0xA0..+0xD4, i.e. this class's own new virtual
  *     methods (the base Class86668/Obj865C8 table --
  *     docs/match-reports/ObjM__Finalize.md -- only goes up to about +0x88).
- *     `ObjMMethods::notifyParents`/`checkAuxTrigger`/`teardownPauseOverlay`
+ *     `ObjMMethods_3bb8c_m::notifyParents`/`checkAuxTrigger`/`teardownPauseOverlay`
  *     (+0x030/+0x0B8/+0x0D4) are confirmed the same way: +0x030 is
  *     `BasicClass__NotifyParents`, and +0x0B8/+0x0D4 are this unit's own
  *     `ObjM__CheckAuxTrigger`/`ObjM__TeardownPauseOverlay`.
@@ -35,9 +35,9 @@
  * `ObjM__AdvancePauseSetup`/`ObjM__TeardownPauseOverlay` build and tear down
  * an object literally constructed with the name "Pause"
  * (`D_8008AB44`, "Pause", asm/data/7B008.sdata.s), gated by a 5-step
- * counter and a `mode` field (`ObjM::mode`, ex-`unk20`) that other
+ * counter and a `mode` field (`ObjM_3bb8c_m::mode`, ex-`unk20`) that other
  * functions here set to fixed small codes (0,4,5,6,7,8,0xA,0xB,0xC,0xD) and
- * forward to `ObjMMethods::notifyParents` -- consistent with a pause/dialog
+ * forward to `ObjMMethods_3bb8c_m::notifyParents` -- consistent with a pause/dialog
  * overlay controller driving a small state machine and notifying its
  * parent object of transitions, but nothing here pins down the exact
  * gameplay meaning of any one mode code. `ObjM__NoOpSlotBC` (vtable slot
@@ -48,7 +48,7 @@
  * ApplyStyleConfig / FillStyleFromConfig / ApplyStyleDecorationIfSet) reads
  * and writes a small set of `.sdata`/`.sbss` globals to configure a
  * `StyleM` colour/config descriptor (struct defined below, own comment) --
- * unrelated to the ObjM/DreamSys machinery above beyond living in the same
+ * unrelated to the ObjM_3bb8c_m/DreamSys machinery above beyond living in the same
  * carved address range.
  *
  * include/class_3bb8c.h is SHARED with every other class_3bb8c_* slice.
@@ -63,9 +63,9 @@
 
 /* Forward declaration: defined later in this same unit, but called by
  * ObjM__EnterState7/ObjM__EnterState8/ObjM__EnterStateA above its own definition. */
-extern void ObjM__StartFadeUp(ObjM *self, s32 arg1, s32 arg2, s32 arg3, s32 arg4);
+extern void ObjM__StartFadeUp(ObjM_3bb8c_m *self, s32 arg1, s32 arg2, s32 arg3, s32 arg4);
 
-void ObjM__EnterState7(ObjM *self) {
+void ObjM__EnterState7(ObjM_3bb8c_m *self) {
     s32 val;
     self->mode = 7;
     self->dreamSys->methods->getSetFlashbackSession(self->dreamSys, (DreamColors *)&val, -1);
@@ -73,24 +73,24 @@ void ObjM__EnterState7(ObjM *self) {
     self->dreamSys->methods->blockMovement(self->dreamSys);
 }
 
-void ObjM__EnterState8(ObjM *self) {
+void ObjM__EnterState8(ObjM_3bb8c_m *self) {
     self->mode = 8;
     ObjM__StartFadeUp(self, 0, 0, 6, 1);
     self->dreamSys->methods->setMoveOverride(self->dreamSys, 1);
 }
 
-void ObjM__EnterStateA(ObjM *self) {
+void ObjM__EnterStateA(ObjM_3bb8c_m *self) {
     self->mode = 0xA;
     ObjM__StartFadeUp(self, 0, 0, 6, 1);
     self->dreamSys->methods->selectCallback98(self->dreamSys, 2);
     self->dreamSys->methods->setMoveOverride(self->dreamSys, 2);
 }
 
-void ObjM__NotifyParentsCodeB(ObjM *self) {
+void ObjM__NotifyParentsCodeB(ObjM_3bb8c_m *self) {
     self->methods->notifyParents(self, 0xB);
 }
 
-void ObjM__StartFadeUp(ObjM *self, s32 arg1, s32 arg2, s32 arg3, s32 arg4) {
+void ObjM__StartFadeUp(ObjM_3bb8c_m *self, s32 arg1, s32 arg2, s32 arg3, s32 arg4) {
     ChildM_AC *obj = self->unk18->methods->slotAC(self->unk18);
     if (arg3 != 0) {
         obj->methods->slotD0(obj, arg3);
@@ -101,7 +101,7 @@ void ObjM__StartFadeUp(ObjM *self, s32 arg1, s32 arg2, s32 arg3, s32 arg4) {
     obj->methods->slotD8(obj, self->unk10, arg1, arg2);
 }
 
-void ObjM__OnFadeNotify(ObjM *self, ParamM *p1, s32 sel) {
+void ObjM__OnFadeNotify(ObjM_3bb8c_m *self, ParamM *p1, s32 sel) {
     s32 v;
     switch (sel) {
     case 5:
@@ -123,13 +123,13 @@ void ObjM__OnFadeNotify(ObjM *self, ParamM *p1, s32 sel) {
     }
 }
 
-void ObjM__OnClass866E8Notify(ObjM *self, s32 arg1, s32 arg2) {
+void ObjM__OnClass866E8Notify(ObjM_3bb8c_m *self, s32 arg1, s32 arg2) {
     if (arg2 == 7) {
         self->methods->checkAuxTrigger(self);
     }
 }
 
-s32 ObjM__CheckAuxTrigger(ObjM *self) {
+s32 ObjM__CheckAuxTrigger(ObjM_3bb8c_m *self) {
     s32 out;
     s32 result;
     ChildM114 *child = self->unk14->methods->slot114(self->unk14, &out);
@@ -146,31 +146,31 @@ s32 ObjM__CheckAuxTrigger(ObjM *self) {
 void ObjM__NoOpSlotBC(void) {
 }
 
-void ObjM__UpdateCloseReadyFlag(ObjM *self) {
+void ObjM__UpdateCloseReadyFlag(ObjM_3bb8c_m *self) {
     if (self->pauseSetupStep != 0 && self->mode == 0) {
         self->closeReady = 1;
     }
 }
 
-void ObjM__ClearCloseReadyFlag(ObjM *self) {
+void ObjM__ClearCloseReadyFlag(ObjM_3bb8c_m *self) {
     self->closeReady = 0;
 }
 
-void ObjM__CloseAndNotifyD(ObjM *self) {
+void ObjM__CloseAndNotifyD(ObjM_3bb8c_m *self) {
     if (self->closeReady) {
         self->methods->teardownPauseOverlay(self);
         self->methods->notifyParents(self, 0xD);
     }
 }
 
-void ObjM__CloseAndNotifyC(ObjM *self) {
+void ObjM__CloseAndNotifyC(ObjM_3bb8c_m *self) {
     if (self->closeReady) {
         self->methods->teardownPauseOverlay(self);
         self->methods->notifyParents(self, 0xC);
     }
 }
 
-void ObjM__AdvancePauseSetup(ObjM *self) {
+void ObjM__AdvancePauseSetup(ObjM_3bb8c_m *self) {
     s32 state = self->pauseSetupStep;
     if (state == 0) {
         self->unk7C = (FieldM7C *)New_TextRow(self->unk74, 5, &D_8008AB44[0]);
@@ -189,7 +189,7 @@ void ObjM__AdvancePauseSetup(ObjM *self) {
     self->unk34->methods->slot88(self->unk34);
 }
 
-void ObjM__TeardownPauseOverlay(ObjM *self) {
+void ObjM__TeardownPauseOverlay(ObjM_3bb8c_m *self) {
     if (self->pauseSetupStep != 0) {
         self->unk7C->methods->slot4(self->unk7C);
     }
@@ -199,6 +199,9 @@ void ObjM__TeardownPauseOverlay(ObjM *self) {
     self->unk18->methods->slotB4(self->unk18, 1);
     self->pauseSetupStep = 0;
 }
+
+/* Until this unit takes include/ObjM.h. */
+extern s32 gObjMMethods;
 
 void *GetObjMMethods(void) {
     return &gObjMMethods;
@@ -261,13 +264,13 @@ void *ApplyStyleConfig(void) {
     return &D_80087424;
 }
 
-/* FillStyleFromConfig's destination is NOT an `ObjM`. That struct's +0x014 and +0x018
+/* FillStyleFromConfig's destination is NOT an `ObjM_3bb8c_m`. That struct's +0x014 and +0x018
  * are already established as unrelated object pointers by five other functions
  * in this unit (`FieldM14 *`/`FieldM18 *`), whereas this function writes a
  * colour-table POINTER to +0x018 and a plain sign-extended byte to +0x014. So
  * this is a separate descriptor, and its view stays LOCAL rather than going
  * into include/class_3bb8c.h -- which eleven units share, and where adding
- * `unkC`/`unk1C` to `ObjM` on this evidence would be a claim the bytes do not
+ * `unkC`/`unk1C` to `ObjM_3bb8c_m` on this evidence would be a claim the bytes do not
  * support.
  *
  * D_800872C4 is a table of 24 three-byte entries (0x48 bytes; the first four

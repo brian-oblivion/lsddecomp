@@ -8,6 +8,7 @@
 #include "FrameClock.h"
 #include "DreamSys.h"
 #include "LinkResource.h"
+#include "ObjM.h"
 
 /* The viewpoint and view-reference vectors Class865C8__OnInit hands the
  * viewport's attachViewChild: (0, -1200, 0) and (0, -1200, 10000), the data
@@ -151,8 +152,8 @@ void Class865C8__AdvancePhase(Class865C8 *self, BasicClass *sender, s32 event) {
         case 2:
             break;
         case 3:
-            self->objM->methods->slot48(self->objM);
-            self->objM->methods->slot4(self->objM);
+            self->objM->methods->deinit(self->objM);
+            self->objM->methods->release(self->objM);
             result = self->dreamSys->methods->getCurrentStage(self->dreamSys);
             Class865C8__StartObjM(self, result);
             break;
@@ -161,9 +162,9 @@ void Class865C8__AdvancePhase(Class865C8 *self, BasicClass *sender, s32 event) {
 }
 
 void Class865C8__StartObjM(Class865C8 *self, s32 stage) {
-    self->objM = New_ObjM((SubObjB *)self->sound, (s32)self->bgm, (s32)self->etcTim, (s32)self->dreamerTmd, stage);
+    self->objM = New_ObjM(self->sound, self->bgm, self->etcTim, self->dreamerTmd, stage);
     self->methods->addChild(self, (BasicClass *)self->objM);
-    self->objM->methods->slot44(self->objM, (s32)self->initArgs, (s32)self->dreamSys);
+    self->objM->methods->init(self->objM, self->initArgs, (s32)self->dreamSys);
     self->phase = 2;
 }
 
@@ -179,8 +180,8 @@ void Class865C8__OnObjMNotify(Class865C8 *self, BasicClass *sender, s32 event) {
 
     switch (event) {
     case 4:
-        self->objM->methods->slot48(self->objM);
-        self->objM->methods->slot4(self->objM);
+        self->objM->methods->deinit(self->objM);
+        self->objM->methods->release(self->objM);
         result = self->dreamSys->methods->endDay(self->dreamSys, 0);
         if (result == 0) {
             pos = self->dreamSys->methods->getCinematic(self->dreamSys);
@@ -199,8 +200,8 @@ void Class865C8__OnObjMNotify(Class865C8 *self, BasicClass *sender, s32 event) {
         break;
     case 0xC:
     case 0xD:
-        self->objM->methods->slot48(self->objM);
-        self->objM->methods->slot4(self->objM);
+        self->objM->methods->deinit(self->objM);
+        self->objM->methods->release(self->objM);
         self->dreamSys->methods->endDay(self->dreamSys, event != 0xC ? 2 : 1);
         self->result = 3;
         self->methods->setState(self, 3);

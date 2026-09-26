@@ -30,6 +30,16 @@
 #include "Class86668.h"
 #include "DreamSys.h"
 
+/* ObjM__AttachTarget's own registered callback -- forward-declared here since
+ * ObjM__AttachTarget (ROM order earlier) takes its address before its own
+ * definition (ROM order later) is reached. */
+extern void ObjM__OnRegistrantEvent(Obj87034_3bb8c_l *self, s32 code, s32 arg2, s32 arg3);
+
+/* ObjM__OnTag1Notify's tail call -- forward-declared for the same ROM-order
+ * reason as ObjM__OnRegistrantEvent above (ObjM__PollTimBlockLoad is defined later). */
+extern void ObjM__PollTimBlockLoad(Obj87034_3bb8c_l *self, Obj87034_3bb8c_l *other);
+
+
 void ObjM__NoOpSlot40(void) {
 }
 

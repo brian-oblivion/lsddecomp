@@ -29,56 +29,7 @@
 #include "TextRow.h"
 #include "TimImage.h"
 #include "Class86F88.h"
-
-/*
- * class_3bb8c_k's own view of ObjM (method table gObjMMethods, returned by
- * GetObjMMethods; the shared `ObjM`/`Obj87034_3bb8c_l` views are in
- * include/class_3bb8c.h). Only what New_ObjM, ObjM__ObjM and
- * ObjM__OnNotify reach is typed. Kept local to this unit per the
- * multiple-independent-local-views convention.
- *
- * New_ObjM is declared `Obj4C *New_ObjM(SubObjB *, ...)` by
- * include/class_39e08.h (Class865C8__StartObjM's call-site view), which
- * this file includes, so its definition below must keep that exact return
- * and first-argument type.
- */
-typedef struct ObjMMethods_3bb8c_k ObjMMethods_3bb8c_k;
-typedef struct ObjM_3bb8c_k ObjM_3bb8c_k;
-
-/* Slot names are the method each slot holds in gObjMMethods. */
-struct ObjMMethods_3bb8c_k {
-    u8 pad000[0x008];
-    /* +0x008 ObjM__ObjM, New_ObjM's ctor call. */
-    void (*ctor)(void *self, SubObjB *a0, s32 a1, s32 a2, s32 a3, s32 a4);
-    u8 pad00C[0x040 - 0x00C];
-    /* +0x040 ObjM__NoOpSlot40 (class_3bb8c_l, an empty body), ObjM__ObjM's last call. */
-    void (*slot40)(void *self);
-    u8 pad044[0x090 - 0x044];
-    /* +0x090/+0x0B0/+0x0B4, ObjM__OnNotify's 3-way dispatch on the event
-     * target's header tag; all get (self, arg1, arg2) forwarded. */
-    void (*slot90)(void *self, EventArg *arg1, s32 arg2);          /* +0x090 ObjM__OnDreamSysNotify */
-    u8 pad094[0x0B0 - 0x094];
-    void (*handleEvent5Or6)(void *self, EventArg *arg1, s32 arg2); /* +0x0B0 ObjM__OnFadeNotify */
-    void (*handleEvent7)(void *self, EventArg *arg1, s32 arg2);    /* +0x0B4 ObjM__OnClass866E8Notify */
-};
-
-struct ObjM_3bb8c_k {
-    ObjMMethods_3bb8c_k *methods;       /* +0x000, ObjM__ObjM */
-    u8 pad004[0x038 - 0x004];
-    s32 unk38;                          /* +0x038, ObjM__ObjM: arg5 */
-    u8 pad3C[0x054 - 0x03C];
-    s32 unk54;                          /* +0x054, ObjM__ObjM: arg2 (shared ObjM view: a FieldM50 *) */
-    u8 pad58[0x060 - 0x058];
-    s32 unk60;                          /* +0x060, ObjM__ObjM: set to 1 */
-    s32 unk64;                          /* +0x064, ObjM__ObjM: zeroed */
-    s32 unk68;                          /* +0x068, ObjM__ObjM: zeroed */
-    SubObjB *unk6C;                     /* +0x06C, ObjM__ObjM: arg1, also forwarded as the base ctor's own arg2 */
-    s32 unk70;                          /* +0x070, ObjM__ObjM: arg4 */
-    s32 unk74;                          /* +0x074, ObjM__ObjM: arg3 (shared ObjM view: New_TextRow's ctx) */
-    u8 pad78[0x080 - 0x078];
-    s32 pauseSetupStep;                 /* +0x080, ObjM__ObjM: zeroed; ObjM__AdvancePauseSetup's step counter (class_3bb8c_m, shared view unk80) */
-    s32 closeReady;                     /* +0x084, ObjM__ObjM: zeroed; set by ObjM__UpdateCloseReadyFlag, cleared by ObjM__ClearCloseReadyFlag, tested by ObjM__CloseAndNotifyC/D (shared view unk84) */
-};
+#include "ObjM.h"
 
 void Class86F88__SetState(Class86F88 *self, s32 state)
 {
@@ -416,53 +367,53 @@ Class86F88Methods *GetClass86F88Methods(void)
     return &gClass86F88Methods;
 }
 
-Obj4C *New_ObjM(SubObjB *a0, s32 a1, s32 a2, s32 a3, s32 a4)
+ObjM *New_ObjM(BasicClass *sound, struct WBgm *bgm, TimImage *etcTim, struct LinkResource *dreamerTmd, s32 stage)
 {
-    Obj4C *self;
-    ObjMMethods_3bb8c_k *methods;
+    ObjM *self;
+    ObjMMethods *methods;
 
     self = BMemPMgrAlloc(0x88);
     if (self != NULL) {
         methods = GetObjMMethods();
-        methods->ctor(self, a0, a1, a2, a3, a4);
+        methods->ctor(self, sound, bgm, etcTim, dreamerTmd, stage);
         return self;
     }
     return NULL;
 }
 
-void ObjM__ObjM(ObjM_3bb8c_k *self, SubObjB *arg1, s32 arg2, s32 arg3, s32 arg4, s32 arg5)
+void ObjM__ObjM(ObjM *self, BasicClass *sound, struct WBgm *bgm, TimImage *etcTim, struct LinkResource *dreamerTmd, s32 stage)
 {
-    GetClass86668Methods()->ctor((Class86668 *)self, 0, (BasicClass *)arg1);
+    GetClass86668Methods()->ctor((Class86668 *)self, 0, sound);
     self->methods = GetObjMMethods();
     self->unk64 = 0;
-    self->unk68 = 0;
-    self->unk60 = 1;
-    self->unk54 = arg2;
-    self->unk38 = arg5;
-    self->unk6C = arg1;
-    self->unk74 = arg3;
-    self->unk70 = arg4;
+    self->inSession = 0;
+    self->timBlockPending = 1;
+    self->bgm = bgm;
+    self->stage = stage;
+    self->ctorSound = sound;
+    self->etcTim = etcTim;
+    self->dreamerTmd = dreamerTmd;
     self->pauseSetupStep = 0;
     self->closeReady = 0;
-    self->methods->slot40(self);
+    self->methods->resetCounters(self);
 }
 
-void ObjM__Finalize(ObjM_3bb8c_k *self)
+void ObjM__Finalize(ObjM *self)
 {
     GetClass86668Methods()->finalize((Class86668 *)self);
 }
 
-void ObjM__OnNotify(ObjM_3bb8c_k *self, EventArg *arg1, s32 arg2)
+void ObjM__OnNotify(ObjM *self, BasicClass *sender, s32 event)
 {
     s32 tag;
 
-    GetClass86668Methods()->onNotify((Class86668 *)self, arg1, arg2);
-    tag = arg1->target->header;
+    GetClass86668Methods()->onNotify((Class86668 *)self, sender, event);
+    tag = sender->methods->header;
     if ((tag & 0xFFF) == 0x114) {
-        self->methods->handleEvent7(self, arg1, arg2);
+        self->methods->onClass866E8Notify(self, sender, event);
     } else if ((tag & 0xFFF) == 0x164) {
-        self->methods->handleEvent5Or6(self, arg1, arg2);
+        self->methods->onFadeNotify(self, (struct Class6E99C *)sender, event);
     } else if ((tag & 0xFFFF) == 0x1F34) {
-        self->methods->slot90(self, arg1, arg2);
+        self->methods->onDreamSysNotify(self, sender, event);
     }
 }
