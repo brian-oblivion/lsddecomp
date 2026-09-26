@@ -76,7 +76,7 @@ struct Class6D940Methods {
 
 struct Class6D940 {
     CLASS6D430_FIELDS(Class6D940Methods);
-    /* +0x02C */ Class6D430 *linkResource; /* the models' LinkResource (gLinkResourceMethods); zeroed by the ctor */
+    /* +0x02C */ struct LinkResource *linkResource; /* the models' LinkResource (include/LinkResource.h); zeroed by the ctor */
     /* +0x030 */ s32 loaded;               /* set by Class6D940__SetFlag; zeroed by the ctor */
 };                                         /* 0x34 bytes: New_Class6D940 */
 
