@@ -155,3 +155,11 @@ reset mirroring `Class6E99C__StartFadeDown`/`StartFadeUp`'s own
 `state = 1`/`state = 2` -- the three functions form a clear
 start/start/stop triad over the same field. Which mode 5 vs 6 MEANS in
 game terms is not established.
+
+## Track 4 (2026-09-26, round 87, echo)
+
+Slots under their unified names: slot14 -> `removeChild` (the argument is
+the `source` Configure added as a child; typed `s32` before, which was the
+"passing arg 2 makes integer from pointer" warning, now GONE), slot30 ->
+`notifyParents` (event 5 after a fade down, 6 after a fade up), slot60/64
+-> setDisplay/setSemiTrans, slotB8 -> setColor. Image byte-identical.

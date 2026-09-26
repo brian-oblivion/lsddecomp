@@ -362,3 +362,18 @@ general-purpose "(re)configure and report" entry point, not a one-shot
 initializer. The a2-garbage-on-1-arg-call nuance is inherited unchanged
 from the matched body and already documented in this function's own
 `## Notes`/report history; not re-derived here.
+
+## Track 4 (2026-09-26, round 87, echo)
+
+Slots under their unified names. The call at +0x010 was `slot10(self)`
+and is now `addChild(self, source)`: the occupant is Class6B5CC__AddChild,
+and this function never writes `$a1` before that jalr, so its own second
+argument (now `BasicClass *source`) is the child; the build stayed
+byte-identical with the argument spelled. The two StartFade functions
+forward their `source` to it, and Class6E99C__Stop removes the same object
+with `removeChild` (its own second argument, which Class6E99C__Update
+passes as the notifying `sender`). The `configure` slot is now typed with
+its occupant's four parameters, so the StartFade callers' file-local
+`Configure6E99CFn` cast is gone. Fields: unk70 -> defaultChannels, unk78 ->
+channels, unk80 -> ticksLeft, unk68 -> BoxFill's `mask`; slot64/68/60 ->
+setSemiTrans/setSemiTransRate/setDisplay.

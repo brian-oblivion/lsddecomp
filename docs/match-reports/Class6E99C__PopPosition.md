@@ -46,3 +46,9 @@ naming note): copies `unk90`/`unk94` back into `unk50`/`unk54` and
 `unk88`/`unk8C` back into `unk60`/`unk62`, with no gate of its own (the
 caller is expected to know a push is outstanding). Named as the matching
 "Pop" to `PushPosition`'s "Push".
+
+## Track 4 (2026-09-26, round 87, echo)
+
+Fields under their unified names: unkC -> parent, unk50/54 -> posX/posY,
+unk60/62 -> boxW/boxH (BoxFill's), unk88/8C -> savedW/savedH, unk90/94 ->
+savedPosX/savedPosY (Class6E99C's). Image byte-identical.
