@@ -214,7 +214,7 @@ sDivClipHeight
 sDivClipWidth
 sMcTempFileSuffix
 sMoodCue78TransitionDone
+sNdivOverrideSet
 sPadRefCount
 sPolyOtCodeOverride
-sPolyOtCodeOverrideSet
 sTimExt

@@ -23,7 +23,7 @@ The function is a straight-line two-field setter with no branches beyond an
 early-out:
 
 ```
-sw   $a0, %gp_rel(sPolyOtCodeOverrideSet)($gp)
+sw   $a0, %gp_rel(sNdivOverrideSet)($gp)
 beqz $a0, .L8001A55C
  nop
 sw   $a1, %gp_rel(sPolyOtCodeOverride)($gp)
@@ -32,7 +32,7 @@ jr   $ra
  nop
 ```
 
-`sPolyOtCodeOverrideSet` and `sPolyOtCodeOverride` (`asm/data/7B018.sdata.s`) are plain `.sdata`
+`sNdivOverrideSet` and `sPolyOtCodeOverride` (`asm/data/7B018.sdata.s`) are plain `.sdata`
 words, initialized to `1` and `2` respectively, and referenced from nowhere
 else in the executable except this function and its `code_8220_c` sibling
 `FillRCPolyHeader` (also assigned this round -- see `FillRCPolyHeader.md`). No
@@ -40,12 +40,12 @@ existing type information anywhere else in the codebase constrains them
 further, so they are declared `s32`.
 
 ```c
-extern s32 sPolyOtCodeOverrideSet;
+extern s32 sNdivOverrideSet;
 extern s32 sPolyOtCodeOverride;
 
 void SetPolyOtCodeOverride(s32 arg0, s32 arg1)
 {
-    sPolyOtCodeOverrideSet = arg0;
+    sNdivOverrideSet = arg0;
     if (arg0) {
         sPolyOtCodeOverride = arg1;
     }
@@ -60,7 +60,7 @@ any GTE macro.
 
 ### Proposed learning
 
-`sPolyOtCodeOverrideSet`/`sPolyOtCodeOverride` are declared locally in `src/code_8220_c.c` (not in
+`sNdivOverrideSet`/`sPolyOtCodeOverride` are declared locally in `src/code_8220_c.c` (not in
 `include/code_8220.h`) per the project convention: nothing outside this unit
 currently references them, so putting the extern in a shared header would
 just be an unused collision surface for a sibling unit that never touches
@@ -73,5 +73,5 @@ them.
 (FillRCPolyHeader, this unit) is fully derived -- `enable` gates whether
 FillRCPolyHeader's header word 0 comes from `code` (stored only when
 `enable` is set) or the per-object D_80090C18 default. Matches the
-globals it writes, `sPolyOtCodeOverrideSet`/`sPolyOtCodeOverride` (named
+globals it writes, `sNdivOverrideSet`/`sPolyOtCodeOverride` (named
 alongside this function).
