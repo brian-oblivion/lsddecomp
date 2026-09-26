@@ -1055,6 +1055,16 @@
           "note": "Premium head, cap 5, classes in sequence one Opus runner each: CharSprite (ex D_8006EC74; bravo), Tod (ex D_8006F240; charlie), LightRig (ex D_8006EFAC; delta). All merged, sampled, mark-class'ed; 0 new warnings throughout.",
           "round": 86,
           "runners": 3
+        },
+        {
+          "attempts": 16,
+          "calibration": false,
+          "date": "2026-09-26",
+          "matches": 16,
+          "model": "opus",
+          "note": "Premium head, cap 5, plan revision 23: classes run in parallel when plan.py's measured footprints are disjoint (class_footprint). Three waves, 13 Opus runner sessions, 16 classes unified: VabDriver, FlatLightObj, TmdModel, DrawSystem, Class6E99C; GraphRoom, TextEntry, VabStreamObj, Class6D940, Class879C4; Class869D8, CdStream, Class81940, Class6EED8, StreamTask. Head close-outs: code_2cc8c.h GenericObj (DrawSystem) and class_3bb8c_t GraphRoomSoundObj (VabStreamObj) views retired. Every conflict was the symbols-file tail or adjacent includes (resolved per address). All merges byte-identical, 0 new warnings (baseline 165 -> 161), nonmatching green.",
+          "round": 87,
+          "runners": 13
         }
       ],
       "status": "auto"
