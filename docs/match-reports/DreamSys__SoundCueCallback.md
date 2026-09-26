@@ -293,3 +293,14 @@ that function (src/code_179d8_e.c, matched) stores it in `SoundCueSet::callback`
 Nothing in any carved unit calls it, so its own parameter struct stays local and
 opaque: the body only picks one of two field pairs to write 9 and -1 into,
 depending on whether `arg1->value` is a multiple of 20.
+
+## Track 6 (round 92, head)
+
+`SoundCueCallbackArg` was a local view of `SoundCueSet` (include/SoundCueSet.h,
+unified this round by alpha) and is deleted: mode is `tag`, value is `tick`,
+field_0x1C/0x20 are `slots[0].program`/`.octave`, field_0x30/0x34 are
+`slots[1].program`/`.octave`. `DreamSys::soundCueSet` is a `SoundCueSet`
+(it follows an s32, so the alignment change moves nothing), and slot +0x194
+takes `(void *owner, SoundCueSet *set)`. Byte-identical; 78 compiler warnings
+before and after on a full rebuild. So the callback, on the set's first tag,
+retunes slot 0 (every 20th tick) or slot 1 to program 9, octave -1.

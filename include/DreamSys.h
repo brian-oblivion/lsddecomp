@@ -47,6 +47,7 @@
 /* For StageChunk / GetMoodFromStageChunk, used by DreamSys__LogChunkMood
    (round 2026-08-30-d). */
 #include "StageGrid.h"
+#include "SoundCueSet.h"
 
 typedef struct DreamSys DreamSys;
 typedef struct DreamSysMethods DreamSysMethods;
@@ -318,22 +319,6 @@ typedef struct DreamSysEntityObj {
     DreamSysEntityMethods *methods;
 } DreamSysEntityObj;
 
-/* Struct pointed to by DreamSys__SoundCueCallback's arg1 -- forwarded (never called) as
-   InitSoundCueSet's 5th argument via DreamSys__SelectCallback98's arg1==2 case, so its
-   real caller/owner lives outside this unit. Only the offsets
-   DreamSys__SoundCueCallback itself touches are named; +0x8..+0x1C and +0x24..+0x30
-   are unconfirmed gaps (round 2026-08-30-d). */
-typedef struct SoundCueCallbackArg {
-    s32 mode;  /* +0x0, compared against literal 1 */
-    s32 value; /* +0x4, divided by 20 */
-    s8 unknown_values_0x8[0x14];
-    s32 field_0x1C;
-    s32 field_0x20;
-    s8 unknown_values_0x24[0xC];
-    s32 field_0x30;
-    s32 field_0x34;
-} SoundCueCallbackArg;
-
 /* DreamSys__TickDrift's per-tick addTranslation (+0x0BC) step. */
 extern LongVec3 DRIFT_STEP;
 
@@ -535,10 +520,9 @@ struct DreamSys {
     /* Set to 1 by DreamSys__SelectCallback98's arg1==2 case, alongside driftActive
 	   (round 2026-08-30). */
     s32 cueServiceActive;
-    /* Struct initialized in-place by InitSoundCueSet (still INCLUDE_ASM, in
-	   the uncarved code_179d8) via DreamSys__SelectCallback98's arg1==2 case; internal
-	   layout unknown beyond that entry point (round 2026-08-30). */
-    s8 soundCueSet[0x54];
+    /* The sound cue drifting runs: SelectCallback98 mode 2 starts it with
+     * soundCueCallback, TickDrift services it, ClearTickCallbacks flushes it. */
+    SoundCueSet soundCueSet;
 
     /* Divisor for DreamSys__UpdateTickState's (tick % tickPeriod) check. */
     s32 tickPeriod;
@@ -743,7 +727,7 @@ struct DreamSysMethods {
     /* +0x188 */ void (*restorePreviousMoveMode)(DreamSys *self); /* DreamSys__RestorePreviousMoveMode */
     /* +0x18C */ void (*setGateFlags)(DreamSys *self, s32 a, s32 b, s32 c, s32 d); /* DreamSys__SetGateFlags */
     /* +0x190 */ void (*setTickPeriod)(DreamSys *self, s32 value); /* DreamSys__SetTickPeriod */
-    /* +0x194 */ void (*soundCueCallback)(void *arg0, SoundCueCallbackArg *arg1); /* DreamSys__SoundCueCallback: only its VALUE is read (InitSoundCueSet's callback) */
+    /* +0x194 */ void (*soundCueCallback)(void *owner, SoundCueSet *set); /* DreamSys__SoundCueCallback: only its VALUE is read (InitSoundCueSet's callback) */
     /* +0x198 */ void (*initNewGame)(DreamSys *self);                    /* DreamSys__InitNewGame */
     /* +0x19C */ void (*getSetScreenShake)(DreamSys *self, bool *value); /* DreamSys__GetSetScreenShake */
     /* +0x1A0 */ s32 (*getCurrentDayAndYear)(DreamSys *self, s32 *outYear); /* DreamSys__GetCurrentDayAndYear */
@@ -1145,7 +1129,7 @@ void DreamSys__ChangeMoveMode(DreamSys *this, s32 value);
 void DreamSys__RestorePreviousMoveMode(DreamSys *this);
 void DreamSys__SetGateFlags(DreamSys *this, s32 a, s32 b, s32 c, s32 d);
 void DreamSys__SetTickPeriod(DreamSys *this, s32 value);
-void DreamSys__SoundCueCallback(void *arg0, SoundCueCallbackArg *arg1);
+void DreamSys__SoundCueCallback(void *owner, SoundCueSet *set);
 s32 DreamSys__GetCurrentDayAndYear(DreamSys *this, s32 *arg1);
 void DreamSys__ClearNewGameFlag(DreamSys *this);
 s32 DreamSys__GetNewGameFlag(DreamSys *this);

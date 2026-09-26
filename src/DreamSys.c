@@ -108,7 +108,7 @@ void DreamSys__ResetSessionState(DreamSys *this) {
     this->methods->updateRotation(this, 1, &ROTATION_YAW_180);
     this->lookCallback = NULL;
     this->moveCallback = NULL;
-    *(s32 *)this->soundCueSet = 0;
+    this->soundCueSet.tag = 0;
     this->staircaseActive = 0;
     this->staircaseMoveGate = 0;
     this->staircaseTickFn = 0;
@@ -509,7 +509,7 @@ void DreamSys__SelectCallback98(DreamSys *this, s32 mode) {
             this->moveCallback = vt->tickDrift;
             this->driftActive = 1;
             this->cueServiceActive = 1;
-            InitSoundCueSet(this->soundObj, this->soundCueSet, 1, this, this->methods->soundCueCallback);
+            InitSoundCueSet(this->soundObj, &this->soundCueSet, 1, this, this->methods->soundCueCallback);
             break;
     }
 }
@@ -754,14 +754,14 @@ void DreamSys__TickDrift(DreamSys *this) {
         this->viewport->refView.vr.y -= 600;
     }
     if (this->cueServiceActive != 0)
-        ServiceSoundCueSet(this->soundObj, this->soundCueSet);
+        ServiceSoundCueSet(this->soundObj, &this->soundCueSet);
 }
 
 void DreamSys__StopDrift(DreamSys *this, s32 keepCues) {
     this->driftActive = 0;
     this->cueServiceActive = keepCues;
     if (keepCues != 0)
-        FlushSoundCueSet(this->soundObj, this->soundCueSet);
+        FlushSoundCueSet(this->soundObj, &this->soundCueSet);
 }
 
 s32 DreamSys__GetSetMoveMode(DreamSys *this, s32 value) {
@@ -804,17 +804,17 @@ void DreamSys__SetTickPeriod(DreamSys *this, s32 value) {
     this->tickPeriod = value;
 }
 
-void DreamSys__SoundCueCallback(void *arg0, SoundCueCallbackArg *arg1) {
+void DreamSys__SoundCueCallback(void *owner, SoundCueSet *set) {
     s32 isDivisible;
 
-    if (arg1->mode == 1) {
-        isDivisible = (arg1->value % 20) == 0;
+    if (set->tag == 1) {
+        isDivisible = (set->tick % 20) == 0;
         if (isDivisible) {
-            arg1->field_0x1C = 9;
-            arg1->field_0x20 = -1;
+            set->slots[0].program = 9;
+            set->slots[0].octave = -1;
         } else {
-            arg1->field_0x30 = 9;
-            arg1->field_0x34 = -1;
+            set->slots[1].program = 9;
+            set->slots[1].octave = -1;
         }
     }
 }
