@@ -105,16 +105,16 @@ extern void RotMatrix(void *arg0, QueryTemplate866E8 *arg1);
 extern void ApplyMatrixLV(QueryTemplate866E8 *arg0, s32 *arg1,
                           s32 *arg2); /* arity-ok: this IS the callee's real signature (Sony libgte, 0x80015618 reads $a0 matrix / $a1 in / $a2 out); include/code_d294.h's unprototyped copy is round 19's deliberate frame-sizing shape, not a claim about arity */
 
-/* The four static EntryDesc866E8 entries (0xC apart) configureRateEntry
- * picks for `rateEntry` by (rate > 0, flag != 0). */
-extern EntryDesc866E8 D_8008699C;
-extern EntryDesc866E8 D_800869A8;
-extern EntryDesc866E8 D_800869B4;
-extern EntryDesc866E8 D_800869C0;
+/* The four scale steps (Ratio16[3], x/y/z) configureRateEntry picks for
+ * `scaleStep`: y +1/64, +1/4 (rate > 0; flag 0, nonzero), -1/64, -1/4
+ * (rate <= 0); x and z 0/1. */
+extern Ratio16 D_8008699C[3];
+extern Ratio16 D_800869A8[3];
+extern Ratio16 D_800869B4[3];
+extern Ratio16 D_800869C0[3];
 
-/* 3-word block Class866E8__ResetChildRate passes to every cell's updateScale
- * (the same 0xC stride as the four above, plausibly a fifth entry). */
-extern s32 D_800869CC[3];
+/* 1/1, 1/1, 1/1: the scale Class866E8__ResetChildRate sets on every cell. */
+extern Ratio16 D_800869CC[3];
 
 /* -------------------------------------------------------------------
  * class_3bb8c_c additions below. Small sibling classes, each built by

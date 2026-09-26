@@ -169,15 +169,6 @@ typedef struct GridSlotList866E8 {
     GridSlot866E8 e[4];
 } GridSlotList866E8;
 
-/* One of the four static 0xC-byte entries configureRateEntry picks for
- * `rateEntry` (D_8008699C..D_800869C0); it is handed to every cell's
- * updateScale (ApplyRateToChild), and +0x006 scales the countdown. */
-typedef struct EntryDesc866E8 {
-    u8 pad0[0x6];
-    s16 scale; /* +0x006 */
-    u8 pad8[0xC - 0x8];
-} EntryDesc866E8;
-
 /* `bounds`' pointee (setBounds): IsPointOutOfBounds' min/max box. */
 typedef struct Bounds866E8_3bb8c_b {
     s16 minX; /* +0x000 */
@@ -283,8 +274,8 @@ struct Class866E8 {
     /* +0x1D4 */ s32 unk1D4;                  /* Reset: -1 */
     /* +0x1D8 */ s32 unk1D8;                  /* Reset: -1 */
     /* +0x1DC */ Bounds866E8_3bb8c_b *bounds; /* setBounds; IsPointOutOfBounds */
-    /* +0x1E0 */ s32 rateCountdown; /* configureRateEntry; advanceRateCountdown/flushRateLatch */
-    /* +0x1E4 */ EntryDesc866E8 *rateEntry; /* configureRateEntry */
+    /* +0x1E0 */ s32 rateCountdown;  /* configureRateEntry; advanceRateCountdown/flushRateLatch */
+    /* +0x1E4 */ Ratio16 *scaleStep; /* configureRateEntry: one of four Ratio16[3] steps (x, y, z) that advanceRateCountdown adds to every cell's scale; only y is nonzero, +-1/64 or +-1/4 */
 }; /* 0x1E8 bytes: New_Class866E8 */
 
 /* +0x088's occupant, which takes the element too (see the banner). */

@@ -11,7 +11,7 @@
  * (via either ComputeFootprintFromRotation or SetFootprintFromQuery, gated
  * on self->config->isVertical) and sets again through SetFootprintCellFlag. A
  * second, unrelated mechanism lives at the tail of the unit: a rate/
- * countdown pair (self->rateCountdown/self->rateEntry) that
+ * countdown pair (self->rateCountdown/self->scaleStep) that
  * AdvanceRateCountdown/FlushRateLatch apply to every cell of every element
  * (their updateScale) via the generic ForEachElem/ForEachEntryChild
  * iterators.
@@ -346,18 +346,18 @@ void Class866E8__SetBounds(Class866E8 *self, Bounds866E8_3bb8c_b *arg1) {
     self->bounds = arg1;
 }
 
-/* Picks one of the four static 0xC-byte EntryDesc866E8 entries by the sign of
+/* Picks one of the four static Ratio16[3] scale steps by the sign of
  * `rate` and by `flag`, then sets rateCountdown to |rate| scaled by the chosen
- * entry's scale field.
+ * step's y denominator (scaleStep[1].den).
  *
  * Two source shapes here are load-bearing and neither is cosmetic:
  *
  *  - The `goto` ladder, and its asymmetry. Retail emits TWO stores to
- *    rateEntry: the rate>0/flag!=0 path has its own (in a `j`'s delay slot at
+ *    scaleStep: the rate>0/flag!=0 path has its own (in a `j`'s delay slot at
  *    0x8004CFDC) and the other three SHARE one (0x8004CFF8). Writing the
  *    field directly on that one path and going through `table` on the other
  *    three is what reproduces that split. Byte-exact since round 9.
- *  - `scale` and `val`. Retail loads the entry's scale field ONCE (`lh $v1,6($v0)`)
+ *  - `scale` and `val`. Retail loads the step's y denominator ONCE (`lh $v1,6($v0)`)
  *    before the sign branch and keeps a single `mflo` after the join, with a
  *    `mult` in each arm. Caching the load in `scale` and letting an explicit
  *    if/else assign a local `val` is what defers that `mflo`; the
@@ -368,29 +368,29 @@ void Class866E8__SetBounds(Class866E8 *self, Bounds866E8_3bb8c_b *arg1) {
  *
  * `~rate + 1` is retail's own negation (`nor`/`addiu`), not `-rate`. */
 void Class866E8__ConfigureRateEntry(Class866E8 *self, s32 rate, s32 flag) {
-    EntryDesc866E8 *table;
+    Ratio16 *table;
     s32 val;
     s32 scale;
 
     if (rate <= 0) {
         goto rate_le;
     }
-    table = &D_8008699C;
+    table = D_8008699C;
     if (flag == 0) {
         goto store;
     }
-    self->rateEntry = &D_800869A8;
+    self->scaleStep = D_800869A8;
     goto merge;
 rate_le:
-    table = &D_800869B4;
+    table = D_800869B4;
     if (flag == 0) {
         goto store;
     }
-    table = &D_800869C0;
+    table = D_800869C0;
 store:
-    self->rateEntry = table;
+    self->scaleStep = table;
 merge:
-    scale = self->rateEntry->scale;
+    scale = self->scaleStep[1].den;
     if (rate >= 0) {
         val = scale * rate;
     } else {
@@ -417,7 +417,7 @@ void Class866E8__FlushRateLatch(Class866E8 *self) {
 }
 
 void Class866E8__ApplyRateToChild(Class866E8 *self, GridCell *item) {
-    item->methods->updateScale(item, 0, self->rateEntry);
+    item->methods->updateScale(item, 0, self->scaleStep);
 }
 
 void Class866E8__ResetChildRate(Class866E8 *self, GridCell *item) {
