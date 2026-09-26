@@ -45,7 +45,7 @@
  *
  * `InitSoundCueSet`/`FlushSoundCueSet` are unrelated free functions (NOT
  * `gVabStreamObjMethods` vtable slots -- checked, absent from its slot list)
- * operating on a small 3-slot `SoundCueSet` that `Entity`/`DreamSys`/
+ * operating on the 3-voice `SoundCueSet` (include/SoundCueSet.h) that `Entity`/`DreamSys`/
  * `class_3bb8c_n` embed and tag with their own context (round 52: Entity.c
  * passes `this->moodIndex + 1` as the tag).  `FlushSoundCueSet` dispatches
  * each populated slot's stored index through the ACTIVE stream object's own
@@ -65,6 +65,7 @@
 #include "common.h"
 #include "VabDriver.h"
 #include "VabStreamObj.h"
+#include "SoundCueSet.h"
 
 /* Cross-unit calls into the still-uncarved code_179d8_tail monolith --
  * declared LOCAL to this unit, per-call-site typed, since none of them have
@@ -84,25 +85,6 @@ extern void SsUtAllKeyOff(s16 mode);
  * must never go into a header these units share. */
 extern void SsVabTransCompleted(s32 arg0);
 extern s32 SsSetMute(s32 arg0);
-
-/* InitSoundCueSet's own "set" (its `arg1`) -- a small slot-table object,
- * unrelated to VabStreamObj (this function is NOT a gVabStreamObjMethods
- * vtable slot; its only callers pass a plain heap/stack struct pointer).
- * Only the fields this unit's own functions touch are named. */
-typedef struct SoundCueSlot {
-    s32 index; /* -1 = free/sentinel after init, else an index FlushSoundCueSet forwards to VabStreamObj__StopVoice */
-    u8 pad4[0x14 - 0x4];
-} SoundCueSlot;
-
-typedef struct SoundCueSet {
-    s32 tag; /* +0x00, guard (0 = uninitialized) AND, once initialized, the caller's own tag (round 52: Entity.c passes this->moodIndex + 1) */
-    s32 unk4;    /* +0x04, zeroed by InitSoundCueSet, never read by this unit's own functions */
-    void *owner; /* +0x08, the caller's own object pointer (Entity, DreamSys, etc -- opaque here) */
-    s32 callback; /* +0x0C, a function-pointer-shaped value from the caller (round 52: DreamSys.c passes a vtable slot, class_3bb8c_n.c indexes a table of them) -- stored, never called by this unit's own functions */
-    u8 pad10[0x14 - 0x10];
-    s32 unk14; /* +0x14, set to the constant 10 by InitSoundCueSet; no further evidence of its role in this unit */
-    SoundCueSlot slots[3]; /* +0x18 */
-} SoundCueSet;
 
 s32 VabDriver__Read(void) {
     return 0;
@@ -449,7 +431,8 @@ s32 func_8002CC28(void) {
     return D_8008A8CC;
 }
 
-s32 InitSoundCueSet(void *unused, SoundCueSet *set, s32 tag, void *owner, s32 callback) {
+s32 InitSoundCueSet(VabStreamObj *sound, SoundCueSet *set, s32 tag, void *owner,
+                    SoundCueCallbackFn callback) {
     SoundCueSlot *slot;
     s32 count;
     s32 sentinel;
@@ -464,12 +447,12 @@ s32 InitSoundCueSet(void *unused, SoundCueSet *set, s32 tag, void *owner, s32 ca
     set->owner = owner;
     set->callback = callback;
     do {
-        slot->index = sentinel;
+        slot->voice = sentinel;
         count--;
         slot++;
     } while (count >= 0);
-    set->unk4 = 0;
-    set->unk14 = 10;
+    set->tick = 0;
+    set->attenuationSteps = 10;
     return 1;
 }
 
@@ -479,8 +462,8 @@ void FlushSoundCueSet(VabStreamObj *self, SoundCueSet *set) {
 
     slot = set->slots;
     for (i = 0; i < 3; i++) {
-        if (slot->index >= 0) {
-            slot->index = self->methods->stopVoice(self, slot->index);
+        if (slot->voice >= 0) {
+            slot->voice = self->methods->stopVoice(self, slot->voice);
         }
         slot++;
     }

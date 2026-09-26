@@ -241,7 +241,7 @@ s32 Entity__GetProximityRatio(Entity *this) {
     if (threshold < result) {
         return -1;
     }
-    return result / (threshold / self->soundCueSet.unk14);
+    return result / (threshold / self->soundCueSet.attenuationSteps);
 }
 
 EntityMoodRow *Entity__GetMoodEffect(Entity *this) {

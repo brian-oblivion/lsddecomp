@@ -4,6 +4,7 @@
 #include "common.h"
 #include "Class65650.h"
 #include "Class6E99C.h"
+#include "SoundCueSet.h"
 
 /*
  * Entity -- a Class65650 (TOD-animated Actor) driven by a per-mood row of
@@ -40,9 +41,9 @@
  * D_8008AC04) as the sound object, itself as the owner and the mood row's
  * handler as the callback, and selects tick callback 'B' in reset
  * (Entity__TickSoundCue, +0x11C), which services the set once per tick. So a
- * MoodCue handler is a SoundCueSet callback: ServiceSoundCueSet calls it as
- * (owner, set), and EntityMoodHandlerArg is the SoundCueSet
- * (src/code_179d8_l.c's view has the same offsets).
+ * MoodCue handler is a SoundCueSet callback (include/SoundCueSet.h):
+ * ServiceSoundCueSet calls it as (owner, set) with this Entity as the owner,
+ * and it requests tones by filling the set's slots.
  *
  * Inherited slot types, settled by callers' bytes (keep them):
  *  - moveLocalZ (+0x0C4) and moveLocalY (+0x0CC) return void. Entity__MoodCue00
@@ -61,7 +62,6 @@
 typedef struct Entity Entity;
 typedef struct EntityMethods EntityMethods;
 typedef struct EntityMoodRow EntityMoodRow;
-typedef struct EntityMoodHandlerArg EntityMoodHandlerArg;
 
 /* Class65650's slots (overrides: +0x008 Entity__Entity, +0x00C
  * Entity__Finalize, +0x040 Entity__Reset, +0x04C Entity__AttachToParent,
@@ -89,37 +89,11 @@ struct EntityMethods {
     /* +0x180 */ void (*updateSoundCueStop)(Entity *self); /* Entity__UpdateSoundCueStop */
 }; /* 97 slots, 0x184 bytes */
 
-/* The MoodCue handlers' second argument: the SoundCueSet they are the
- * callback of (see the banner). In src/code_179d8_l.c's names: +0x04 the
- * service count (unk4), +0x10 the skip word, and from +0x18 three 0x14-byte
- * slots {index, note, pitchOffset, word2, word3}, so unk1C/unk20/unk24/unk28
- * are slot 0's note/pitchOffset/word2/word3, unk30/unk34 slot 1's
- * note/pitchOffset and unk44/unk48 slot 2's. Entity embeds one at +0x09C. */
-struct EntityMoodHandlerArg {
-    s32 tag; /* +0x00, InitSoundCueSet's tag (moodIndex + 1); serviced only while > 0; zeroed by Entity__Entity */
-    s32 unk4; /* +0x04, the service count ServiceSoundCueSet increments; the handlers time their tone requests on it (Entity__MoodCue05/07/09/10/13: `out->unk4 % N`) */
-    u8 pad08[0x08];
-    s32 unk10; /* +0x10, written by Entity__MoodCue15/Entity__MoodCue05/Entity__MoodCue10/... */
-    s32 unk14; /* +0x14, the divisor InitSoundCueSet sets (10); Entity__GetProximityRatio divides by it */
-    u8 pad18[0x04];
-    s32 unk1C; /* +0x1C, written by Entity__MoodCue15/Entity__MoodCue05/Entity__MoodCue10/... */
-    s32 unk20; /* +0x20, written by Entity__MoodCue07 only (paired with unk1C the same round) */
-    s32 unk24; /* +0x24, written by Entity__MoodCue40 (Entity_d) */
-    s32 unk28; /* +0x28, written by Entity__MoodCue40 (Entity_d) */
-    u8 pad2C[0x04];
-    s32 unk30; /* +0x30, written by Entity__MoodCue10/Entity__MoodCue07 */
-    s32 unk34; /* +0x34, written by Entity__MoodCue07 only (paired with unk30) */
-    u8 pad38[0x0C];
-    s32 unk44;             /* +0x44, written by Entity__MoodCue10/Entity__MoodCue07 */
-    s32 unk48;             /* +0x48, written by Entity__MoodCue07 only (paired with unk44) */
-    u8 pad4C[0x54 - 0x4C]; /* slot 2's word2/word3; the set is 0x54 bytes */
-};
-
 struct Entity {
     CLASS65650_FIELDS(EntityMethods);
     /* +0x098 */ s32 moodIndex; /* New_Entity's first argument: the row of gEntityMoodTable and the byte tables */
-    /* +0x09C */ EntityMoodHandlerArg soundCueSet; /* the SoundCueSet startSoundCue initialises and the MoodCue handlers fill */
-    /* +0x0F0 */ s32 active;         /* activate / deactivate */
+    /* +0x09C */ SoundCueSet soundCueSet; /* startSoundCue starts it; the MoodCue handlers are its callback */
+    /* +0x0F0 */ s32 active;              /* activate / deactivate */
     /* +0x0F4 */ s32 targetReached;  /* setTargetReached; latched by updateTargetProximity */
     /* +0x0F8 */ s32 soundCueActive; /* startSoundCue / stopSoundCue */
     /* +0x0FC */ s32 moodTimer;      /* zeroed by startSoundCue, counted by Entity__TickSoundCue */
@@ -219,19 +193,19 @@ s32 Entity__IsTargetInRange(Entity *self, s32 range);
 s32 Entity__UpdateSoundCueStop(Entity *self);
 
 /* MoodCue handlers called from another Entity unit. */
-void Entity__MoodCue51(Entity *self, EntityMoodHandlerArg *out); /* Entity_d; called by Entity__MoodCue113 (Entity_g) */
-void Entity__MoodCue71(Entity *self, EntityMoodHandlerArg *out); /* Entity_e; called by Entity__MoodCue108 (Entity_g) */
-void Entity__StepYawInWindowsThenDeactivate(Entity *self, EntityMoodHandlerArg *out, s32 arg2,
-                                            s32 arg3, s32 arg4); /* Entity_g; called by Entity_d */
+void Entity__MoodCue51(Entity *self, SoundCueSet *out); /* Entity_d; called by Entity__MoodCue113 (Entity_g) */
+void Entity__MoodCue71(Entity *self, SoundCueSet *out); /* Entity_e; called by Entity__MoodCue108 (Entity_g) */
+void Entity__StepYawInWindowsThenDeactivate(Entity *self, SoundCueSet *out, s32 arg2, s32 arg3,
+                                            s32 arg4); /* Entity_g; called by Entity_d */
 
 /* Functions of other units Entity calls directly. The SoundCueSet functions
  * are defined in code_179d8_e/l as (VabStreamObj *, SoundCueSet *); these
- * declarations take Class65650's untyped `arg2` and Entity's `soundCueSet`
- * word, and their results are unused. */
+ * declarations take Class65650's `arg2` untyped, and their results are
+ * unused. */
 extern void *BMemPMgrAlloc(s32 size);
 extern void BMemPMgrFree(void *arg);
-extern void ServiceSoundCueSet(void *sound, void *set);
-extern void FlushSoundCueSet(void *sound, void *set);
+extern void ServiceSoundCueSet(void *sound, SoundCueSet *set);
+extern void FlushSoundCueSet(void *sound, SoundCueSet *set);
 extern s32 rand(void);
 
 #endif
