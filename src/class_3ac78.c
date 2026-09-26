@@ -33,6 +33,7 @@
 #include "class_3ac78.h"
 #include "LightRig.h"
 #include "Class86668.h"
+#include "DrawSystem.h"
 
 /* Class86668::sound's pointee, a VabStreamObj (New_VabStreamObj): its +0x080 is
  * VabStreamObj__PlayTone. Only Class86668__PlaySound calls through it here. */
@@ -78,7 +79,6 @@ Class866E8 *New_Class866E8(s32 arg1, s32 arg2)
 extern UnkSlotChildObj_3ac78 *New_DataSrc39094(void);
 extern UnkSlotListObj_3ac78 *New_Class6D940(s32 arg1);
 extern GenericObject *New_Class86AA0(void);
-extern s32 GetDrawSystem(void);
 extern void BMemPMgrFree(void *arg1);
 extern Vec3_3ac78 gDefaultOrigin;
 
@@ -157,7 +157,7 @@ void Class866E8__Class866E8(Class866E8 *self, Vec3_3ac78 *arg1, s32 arg2)
         }
     }
 
-    self->methods->addChild(self, GetDrawSystem());
+    self->methods->addChild(self, (s32)GetDrawSystem());
     self->methods->reset(self);
 }
 
