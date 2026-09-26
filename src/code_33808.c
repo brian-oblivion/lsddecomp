@@ -68,6 +68,53 @@
 #include "CdStream.h"
 #include "MoviePlayer.h"
 
+/* FileResource `flags` bits the CD driver sets when a request completes
+ * (spelled as src/code_179d8_s.c defines them). */
+#define CD_FLAG_READ_DONE 0x080
+#define CD_FLAG_LOAD_FILE_DONE 0x200
+
+#define CD_SECTOR_SIZE 2048 /* a CD-ROM data sector: TimBlockSrc's first read */
+#define FIX12_SHIFT 12      /* ONE == 1 << FIX12_SHIFT: 20.12 fixed point */
+
+/* The fade CLUTs: 256-colour rows from VRAM y 480. TimBlockSrc lays its
+ * four ramps out there and TimArraySrc maps an image's CLUT row back to
+ * its ramp from it. */
+#define CLUT_FADE_Y 480
+#define CLUT_COLORS 256
+#define CLUT_STP 0x8000 /* a 15-bit colour's semi-transparency bit */
+
+/* GsBG attribute bits 24..25, the colour mode (LIBGS: 0 4-bit CLUT, 1 8-bit
+ * CLUT, 2 15-bit direct). BgLayer's mode 1 is the one New_BgLayer's caller
+ * uses, over TileAtlas's 15-bit texture pages. */
+#define BG_ATTR_8BIT (1 << 24)
+#define BG_ATTR_15BIT (2 << 24)
+#define BG_SCREEN_W 320 /* mode 1's layer size */
+#define BG_SCREEN_H 240
+#define BG_SCALE_MAX 30000 /* BgLayer__UpdateScale's clamp, in 20.12 */
+
+/* TileMap's default grid and TileAtlas's cells: 20 x 15 cells of 16 x 16
+ * texels, one atlas cell per map cell, over 15-bit texture pages (GetTPage
+ * tp 2) from VRAM x 640 to 960. */
+#define TILEMAP_COLS 20
+#define TILEMAP_ROWS 15
+#define TILE_SIZE 16
+#define TILE_ATLAS_CELLS (TILEMAP_COLS * TILEMAP_ROWS)
+#define TILE_ATLAS_X 640
+#define TILE_ATLAS_X_END 960
+#define TPAGE_15BIT 2    /* GetTPage's tp: 15-bit direct */
+#define TPAGE_WIDTH 64   /* a texture page's VRAM width */
+#define TPAGE_HEIGHT 256 /* ... and height */
+#define TPAGE_LOWER 0x10 /* the tpage word's page-y bit: pages from VRAM y 256 */
+
+/* MoviePlayer's stream and decode geometry. */
+#define MOVIE_FPS 15                          /* New_CdStream's fps */
+#define MOVIE_RING_SIZE (36 * CD_SECTOR_SIZE) /* the sector ring handed to setRing */
+#define MOVIE_STRIP_W 16                      /* one DecDCTout strip's pixel width */
+#define MOVIE_OPEN_TRIES 100                  /* CdStream open's tries */
+#define MOVIE_FRAME_TRIES 8388608             /* CdStream getNextFrame's tries */
+#define MOVIE_SYNC_HEIGHT 128       /* frames shorter than this DrawSync before each strip */
+#define MOVIE_KEEP_ACTIVE_POLLS 100 /* pollActive's stop interval while keepActive */
+
 /* A buffer that starts with a word, a count, then that many words. */
 typedef struct CountedBuf33808 {
     /* +0x00 */ u8 pad0[4];
@@ -89,7 +136,7 @@ typedef struct Ctor33808 {
 
 /* Allocate and construct a gTimBlockSrcMethods object. */
 void *New_TimBlockSrc(s32 name) {
-    void *obj = BMemPMgrAlloc(0x84);
+    void *obj = BMemPMgrAlloc(sizeof(TimBlockSrc));
 
     if (obj != NULL) {
         GetTimBlockSrcMethods()->ctor(obj, (char *)name);
@@ -103,6 +150,18 @@ void *New_TimBlockSrc(s32 name) {
  * gTimBlockClutShift, its mask, consecutive slots from 0x1E0); then adopt a 0x24-byte
  * header buffer (state 9 at +0x2A), allocate the 0x800-byte sector buffer
  * at +0x34, open `name` and read the first sector into it. */
+typedef struct Hdr43200 {
+    u8 bytes[36];
+} Hdr43200;
+
+/* The same 0x24-byte header, read: a block count, then the blocks' file
+ * offsets and their sizes. */
+typedef struct Buf434DC {
+    /* +0x00 */ u32 count;
+    /* +0x04 */ u32 offsets[4];
+    /* +0x14 */ u32 sizes[4];
+} Buf434DC;
+
 extern s16 gTimBlockClutShift;
 
 void TimBlockSrc__TimBlockSrc(TimBlockSrc *self, char *name) {
@@ -123,26 +182,26 @@ void TimBlockSrc__TimBlockSrc(TimBlockSrc *self, char *name) {
     addr = 0;
     mask = 1 << gTimBlockClutShift;
     shift = gTimBlockClutShift;
-    for (i = 0; i < 4; i++) {
+    for (i = 0; i < ARRAY_COUNT(self->entries); i++) {
         e = &self->entries[i];
         e->shift = shift;
         e->mask = mask;
         e->clutX = 0;
-        e->clutY = addr + 0x1E0;
+        e->clutY = addr + CLUT_FADE_Y;
         addr += mask;
-        e->clutW = 0x100;
+        e->clutW = CLUT_COLORS;
         e->clutH = 1;
     }
-    hdr = BMemPMgrAlloc(0x24);
+    hdr = BMemPMgrAlloc(sizeof(Hdr43200));
     if (hdr != NULL) {
-        self->sector = BMemPMgrAlloc(0x800);
+        self->sector = BMemPMgrAlloc(CD_SECTOR_SIZE);
         if (self->sector != NULL) {
-            self->bufferSize = 0x24;
+            self->bufferSize = sizeof(Hdr43200);
             self->buffer = hdr;
-            self->loadState = 9;
+            self->loadState = TIMBLOCK_LOAD_HEADER;
             self->failed = 0;
             self->methods->open(self, name, 1, 0);
-            self->methods->read(self, self->sector, 0x800);
+            self->methods->read(self, self->sector, CD_SECTOR_SIZE);
         }
     }
 }
@@ -165,17 +224,6 @@ void TimBlockSrc__Finalize(TimBlockSrc *self) {
  * read the next block -- or, after the last, free the sector buffer, mark
  * +0x3C done and run the active driver's setFlag. An allocation failure
  * sets +0x80. */
-typedef struct Hdr43200 {
-    u8 bytes[0x24];
-} Hdr43200;
-
-/* The same 0x24-byte header, read: a block count, then the blocks' file
- * offsets and their sizes. */
-typedef struct Buf434DC {
-    /* +0x00 */ u32 count;
-    /* +0x04 */ u32 offsets[4];
-    /* +0x14 */ u32 sizes[4];
-} Buf434DC;
 
 extern void LockActiveDataSource(void);
 extern void UnlockActiveDataSource(void);
@@ -188,12 +236,12 @@ void TimBlockSrc__AdvanceLoadState(TimBlockSrc *self) {
 
     LockActiveDataSource();
     switch (self->loadState) {
-        case 9:
-            if (self->flags & 0x80) {
+        case TIMBLOCK_LOAD_HEADER:
+            if (self->flags & CD_FLAG_READ_DONE) {
                 *(Hdr43200 *)self->buffer = *(Hdr43200 *)self->sector;
                 BMemPMgrFree(self->sector);
                 max = FindMaxTimBlockSize((FileResource *)self);
-                self->blocks = BMemPMgrAlloc(((Buf434DC *)self->buffer)->count * 4);
+                self->blocks = BMemPMgrAlloc(((Buf434DC *)self->buffer)->count * sizeof(*self->blocks));
                 if (self->blocks == NULL) {
                     goto fail;
                 }
@@ -204,11 +252,11 @@ void TimBlockSrc__AdvanceLoadState(TimBlockSrc *self) {
                 self->sectorSize = max;
                 self->methods->seek(self, ((Buf434DC *)self->buffer)->offsets[0], 0);
                 self->methods->read(self, self->sector, max);
-                self->loadState = 10;
+                self->loadState = TIMBLOCK_LOAD_BLOCK;
             }
             break;
-        case 10:
-            if (self->flags & 0x80) {
+        case TIMBLOCK_LOAD_BLOCK:
+            if (self->flags & CD_FLAG_READ_DONE) {
                 n = self->blockCount;
                 p = self->blocks + n;
                 *p = New_TimArraySrc(NULL);
@@ -222,12 +270,12 @@ void TimBlockSrc__AdvanceLoadState(TimBlockSrc *self) {
                 if (n < ((Buf434DC *)self->buffer)->count) {
                     self->methods->seek(self, ((Buf434DC *)self->buffer)->offsets[n], 0);
                     self->methods->read(self, self->sector, self->sectorSize);
-                    self->loadState = 10;
+                    self->loadState = TIMBLOCK_LOAD_BLOCK;
                 } else {
                     BMemPMgrFree(self->sector);
                     self->sector = NULL;
                     self->sectorSize = 0;
-                    self->loadState = 0;
+                    self->loadState = TIMBLOCK_LOAD_IDLE;
                     self->loaded = 1;
                     GetActiveDataSourceMethods()->setFlag((FileResource *)self);
                 }
@@ -271,7 +319,7 @@ void TimBlockSrc__FadeAllEntries(TimBlockSrc *self, TimBlockSrcColor *color) {
     s32 i;
 
     LockActiveDataSource();
-    for (i = 0; i < 4; i++) {
+    for (i = 0; i < ARRAY_COUNT(self->entries); i++) {
         self->methods->fadeEntry(self, i, color);
     }
     UnlockActiveDataSource();
@@ -296,8 +344,8 @@ void TimBlockSrc__FadeEntry(TimBlockSrc *self, s32 index, TimBlockSrcColor *src)
 void FadeClutRow(TimBlockSrcEntry *e, s32 index) {
     RECT dst;
     RECT src;
-    u16 out[256];
-    u16 in[256];
+    u16 out[CLUT_COLORS];
+    u16 in[CLUT_COLORS];
     s32 i;
     s32 j;
     s32 shift;
@@ -314,26 +362,26 @@ void FadeClutRow(TimBlockSrcEntry *e, s32 index) {
     s32 cb;
 
     src.x = 0;
-    src.w = 0x100;
+    src.w = CLUT_COLORS;
     src.h = 1;
-    src.y = (index << gTimBlockClutShift) + 0x1E0;
+    src.y = (index << gTimBlockClutShift) + CLUT_FADE_Y;
     StoreImage(&src, (u32 *)in);
     DrawSync(0);
     dst.h = 1;
     dst.x = 0;
     dst.y = 0;
-    dst.w = 0x100;
+    dst.w = CLUT_COLORS;
     r = (u8)e->color.r;
     g = (u8)e->color.g;
     b = (u8)e->color.b;
-    shift = 12 - e->shift;
+    shift = FIX12_SHIFT - e->shift;
     e->clutH = e->mask;
     for (i = 0; i < e->mask - 1; i++) {
         f = (i + 1) << shift;
         rr = r * f;
         gg = g * f;
         bb = b * f;
-        f = 0x1000 - f;
+        f = ONE - f;
         for (j = 0; j < src.w; j++) {
             c = in[j];
             if (c == 0) {
@@ -342,10 +390,10 @@ void FadeClutRow(TimBlockSrcEntry *e, s32 index) {
                 cr = (in[j] & 0x1F) << 3;
                 cg = (c >> 2) & 0xF8;
                 cb = (c >> 7) & 0xF8;
-                cr = (cr * f + rr) >> 15;
-                cg = (cg * f + gg) >> 15;
-                cb = (cb * f + bb) >> 15;
-                out[j] = (in[j] & 0x8000) | cr | (cg << 5) | (cb << 10);
+                cr = (cr * f + rr) >> (FIX12_SHIFT + 3);
+                cg = (cg * f + gg) >> (FIX12_SHIFT + 3);
+                cb = (cb * f + bb) >> (FIX12_SHIFT + 3);
+                out[j] = (in[j] & CLUT_STP) | cr | (cg << 5) | (cb << 10);
             }
         }
         dst.y = src.y + i + src.h;
@@ -367,7 +415,7 @@ typedef struct Src6F240 {
 
 /* Allocate and construct a LinkResource (gLinkResourceMethods) object; freed and NULL when the constructor fails. */
 LinkResource *New_LinkResource(Src6F240 *src) {
-    void *obj = BMemPMgrAlloc(0x30);
+    void *obj = BMemPMgrAlloc(sizeof(LinkResource));
 
     if (obj != NULL) {
         if (((Ctor33808 *)GetLinkResourceMethods())->ctor(obj, src)) {
@@ -422,7 +470,7 @@ s32 LinkResource__BuildModels(LinkResource *self) {
     TmdModel **models;
     u32 i;
 
-    models = BMemPMgrAlloc((((TmdFile *)self->buffer)->nobj + 1) * 4);
+    models = BMemPMgrAlloc((((TmdFile *)self->buffer)->nobj + 1) * sizeof(*models));
     if (models == NULL) {
         return 1;
     }
@@ -476,7 +524,7 @@ LinkResourceMethods *GetLinkResourceMethods(void) {
 
 /* Allocate and construct a gTimArraySrcMethods object. */
 TimArraySrc *New_TimArraySrc(char *name) {
-    void *obj = BMemPMgrAlloc(0x3C);
+    void *obj = BMemPMgrAlloc(sizeof(TimArraySrc));
 
     if (obj != NULL) {
         GetTimArraySrcMethods()->ctor(obj, name);
@@ -527,9 +575,9 @@ void TimArraySrc__BuildImages(TimArraySrc *self) {
     s32 i;
     s32 *offs;
 
-    if ((self->flags & 0x200) || self->buffer != NULL) {
+    if ((self->flags & CD_FLAG_LOAD_FILE_DONE) || self->buffer != NULL) {
         self->count = ((TimArrayBuf *)self->buffer)->count;
-        self->images = BMemPMgrAlloc(((TimArrayBuf *)self->buffer)->count * 4);
+        self->images = BMemPMgrAlloc(((TimArrayBuf *)self->buffer)->count * sizeof(*self->images));
         if (self->images != NULL) {
             objs = self->images;
             offs = ((TimArrayBuf *)self->buffer)->offsets;
@@ -538,7 +586,9 @@ void TimArraySrc__BuildImages(TimArraySrc *self) {
                 (*objs)->buffer = (u8 *)self->buffer + *offs;
                 (*objs)->bufferSize = 0;
                 (*objs)->methods->getTimInfo(*objs, &info);
-                (*objs)->clutBase = ((info.cy - 0x1E0) >> gTimClutRowShift) * 16 + self->clutBase;
+                (*objs)->clutBase =
+                    ((info.cy - CLUT_FADE_Y) >> gTimClutRowShift) * sizeof(TimBlockSrcEntry) +
+                    self->clutBase;
                 offs++;
                 objs++;
             }
@@ -565,7 +615,7 @@ TimArraySrcMethods *GetTimArraySrcMethods(void) {
 
 /* Allocate and construct a gTodMethods object. */
 Tod *New_Tod(Src6F240 *src) {
-    void *obj = BMemPMgrAlloc(0x2C);
+    void *obj = BMemPMgrAlloc(sizeof(Tod));
 
     if (obj != NULL) {
         ((Ctor33808 *)GetTodMethods())->ctor(obj, src);
@@ -645,12 +695,12 @@ u8 ScanTodPackets(Tod *self, u8 *out, u32 *tmdId, u32 *data) {
     index = 0;
     for (; i < packetCount; i++) {
         DecodeTodPacketWord(self, data, &objId, &type, &flag, &len);
-        if (type == 8 && flag == 0) {
+        if (type == TOD_PACKET_OBJECT_CONTROL && flag == TOD_OBJECT_CREATE) {
             created++;
             if (out != NULL) {
                 *out++ = objId;
             }
-        } else if (type == 2) {
+        } else if (type == TOD_PACKET_MODEL_ID) {
             if (out != NULL) {
                 if (tmdId != NULL && ((TodPacket *)data)->tmdId == *tmdId) {
                     for (j = 0, out -= created; j < created; j++) {
@@ -679,9 +729,9 @@ u32 *DecodeTodPacketWord(Tod *self, u32 *packet, u8 *objId, u8 *type, u8 *flag, 
     u32 word = *packet;
 
     *objId = word;
-    *type = (word >> 16) & 0xF;
-    *flag = (word >> 20) & 0xF;
-    *len = word >> 24;
+    *type = (word >> TOD_PACKET_TYPE_SHIFT) & TOD_PACKET_NIBBLE;
+    *flag = (word >> TOD_PACKET_FLAG_SHIFT) & TOD_PACKET_NIBBLE;
+    *len = word >> TOD_PACKET_LEN_SHIFT;
     return packet + 1;
 }
 
@@ -691,7 +741,7 @@ TodMethods *GetTodMethods(void) {
 
 /* Allocate and construct a gBgLayerMethods object. */
 BgLayer *New_BgLayer(TileMap *src, s32 mode) {
-    BgLayer *obj = BMemPMgrAlloc(0x68);
+    BgLayer *obj = BMemPMgrAlloc(sizeof(BgLayer));
 
     if (obj != NULL) {
         GetBgLayerMethods()->ctor(obj, src, mode);
@@ -718,13 +768,13 @@ extern BgLayerRgb gBgLayerDefaultColor;
 
 void BgLayer__Reset(BgLayer *self, TileMap *src, s32 mode) {
     if (mode == 0) {
-        self->bgAttribute = 0x1000000;
+        self->bgAttribute = BG_ATTR_8BIT;
         self->w = src->map.cellw * src->map.ncellw;
         self->h = src->map.cellh * src->map.ncellh;
     } else if (mode == 1) {
-        self->bgAttribute = 0x2000000;
-        self->w = 320;
-        self->h = 240;
+        self->bgAttribute = BG_ATTR_15BIT;
+        self->w = BG_SCREEN_W;
+        self->h = BG_SCREEN_H;
     }
     self->x = 0;
     self->y = 0;
@@ -732,8 +782,8 @@ void BgLayer__Reset(BgLayer *self, TileMap *src, s32 mode) {
     self->scrolly = 0;
     self->color = gBgLayerDefaultColor;
     self->map = &src->map;
-    self->scalex = 0x1000;
-    self->scaley = 0x1000;
+    self->scalex = ONE;
+    self->scaley = ONE;
     self->rotate = 0;
     self->mx = self->w / 2;
     self->my = self->h / 2;
@@ -745,7 +795,7 @@ void BgLayer__Reset(BgLayer *self, TileMap *src, s32 mode) {
 void BgLayer__UpdateRotation(BgLayer *self, s32 set, Ratio16 *table) {
     s32 num = table[2].num;
     s32 den = table[2].den;
-    s32 v = ((num / den) << 12) + (((num % den) << 12) / den);
+    s32 v = ((num / den) << FIX12_SHIFT) + (((num % den) << FIX12_SHIFT) / den);
 
     if (set) {
         self->rotate = v;
@@ -756,8 +806,8 @@ void BgLayer__UpdateRotation(BgLayer *self, s32 set, Ratio16 *table) {
 
 /* gBgLayerMethods +0x048 (updateScale): ratio-table entries [0] and [1] in
  * 20.12 fixed point become the GsBG's scale -- stored when `set` (0x1000
- * for a zero divisor, at most 30000), else added, a sum over 30000 giving
- * 30000, or 1 when either term of that ratio was negative. */
+ * for a zero divisor, at most BG_SCALE_MAX), else added, a sum over BG_SCALE_MAX giving
+ * BG_SCALE_MAX, or 1 when either term of that ratio was negative. */
 void BgLayer__UpdateScale(BgLayer *self, s32 set, Ratio16 *src) {
     s32 negX;
     s32 negY;
@@ -776,45 +826,46 @@ void BgLayer__UpdateScale(BgLayer *self, s32 set, Ratio16 *src) {
     }
     den = src[0].den;
     if (den != 0) {
-        sx = ((src[0].num / den) << 12) + (((src[0].num % den) << 12) / den);
+        sx = ((src[0].num / den) << FIX12_SHIFT) + (((src[0].num % den) << FIX12_SHIFT) / den);
     }
     if (src[1].den != 0) {
-        sy = ((src[1].num / src[1].den) << 12) + (((src[1].num % src[1].den) << 12) / src[1].den);
+        sy = ((src[1].num / src[1].den) << FIX12_SHIFT) +
+             (((src[1].num % src[1].den) << FIX12_SHIFT) / src[1].den);
     }
     if (set) {
         if (den == 0) {
-            self->scalex = 0x1000;
+            self->scalex = ONE;
         } else {
             v = sx;
-            if (v > 30000) {
-                v = 30000;
+            if (v > BG_SCALE_MAX) {
+                v = BG_SCALE_MAX;
             }
             self->scalex = v;
         }
         if (src[1].den == 0) {
-            self->scaley = 0x1000;
+            self->scaley = ONE;
         } else {
             v = sy;
-            if (v > 30000) {
-                v = 30000;
+            if (v > BG_SCALE_MAX) {
+                v = BG_SCALE_MAX;
             }
             self->scaley = v;
         }
     } else {
-        if (self->scalex + sx > 30000) {
+        if (self->scalex + sx > BG_SCALE_MAX) {
             if (negX) {
                 self->scalex = 1;
             } else {
-                self->scalex = 30000;
+                self->scalex = BG_SCALE_MAX;
             }
         } else {
             self->scalex = sx + self->scalex;
         }
-        if (self->scaley + sy > 30000) {
+        if (self->scaley + sy > BG_SCALE_MAX) {
             if (negY) {
                 self->scaley = 1;
             } else {
-                self->scaley = 30000;
+                self->scaley = BG_SCALE_MAX;
             }
         } else {
             self->scaley = sy + self->scaley;
@@ -838,7 +889,7 @@ BgLayerMethods *GetBgLayerMethods(void) {
 
 /* Allocate and construct a gModelDataMethods object (second constructor argument 1); freed and NULL when the constructor fails. */
 ModelData *New_ModelData(Src6F240 *src) {
-    void *obj = BMemPMgrAlloc(0x38);
+    void *obj = BMemPMgrAlloc(sizeof(ModelData));
 
     if (obj != NULL) {
         if (((Ctor33808 *)GetModelDataMethods())->ctor(obj, src, 1)) {
@@ -957,7 +1008,7 @@ ModelDataMethods *GetModelDataMethods(void) {
 
 /* Allocate and construct a TriggerWorld; freed and NULL when the constructor fails. */
 TriggerWorld *New_TriggerWorld(Src6F240 *src) {
-    TriggerWorld *obj = BMemPMgrAlloc(0x3C);
+    TriggerWorld *obj = BMemPMgrAlloc(sizeof(TriggerWorld));
 
     if (obj != NULL) {
         if (((Ctor33808 *)GetTriggerWorldMethods())->ctor(obj, src)) {
@@ -1049,7 +1100,7 @@ TriggerWorldMethods *GetTriggerWorldMethods(void) {
 
 /* Allocate and construct a gTileMapMethods object. */
 TileMap *New_TileMap(s32 source, TileAtlas *atlas) {
-    TileMap *obj = BMemPMgrAlloc(0x44);
+    TileMap *obj = BMemPMgrAlloc(sizeof(TileMap));
 
     if (obj != NULL) {
         GetTileMapMethods()->ctor(obj, source, atlas);
@@ -1103,12 +1154,12 @@ void TileMap__BuildMap(TileMap *self) {
 
     self->map.base = self->atlas->cells;
     if (self->defaultGrid != 0) {
-        self->map.ncellw = 20;
-        self->map.cellw = 16;
-        self->map.cellh = 16;
-        self->map.ncellh = 15;
+        self->map.ncellw = TILEMAP_COLS;
+        self->map.cellw = TILE_SIZE;
+        self->map.cellh = TILE_SIZE;
+        self->map.ncellh = TILEMAP_ROWS;
         n = self->map.ncellw * self->map.ncellh;
-        self->map.index = BMemPMgrAlloc(n * 2);
+        self->map.index = BMemPMgrAlloc(n * sizeof(*self->map.index));
         if (self->map.index != NULL) {
             p = self->map.index;
             for (i = 0; i < n; i++) {
@@ -1126,7 +1177,7 @@ TileMapMethods *GetTileMapMethods(void) {
 
 /* Allocate and construct a gTileAtlasMethods object. */
 TileAtlas *New_TileAtlas(s32 source) {
-    TileAtlas *obj = BMemPMgrAlloc(0x38);
+    TileAtlas *obj = BMemPMgrAlloc(sizeof(TileAtlas));
 
     if (obj != NULL) {
         GetTileAtlasMethods()->ctor(obj, source);
@@ -1179,7 +1230,7 @@ void TileAtlas__Load(TileAtlas *self) {
 
 void TileAtlas__BuildCells(TileAtlas *self) {
     GsCELL *c;
-    s32 x = 0x280;
+    s32 x = TILE_ATLAS_X;
     s32 u;
     s32 v;
     s32 tpage;
@@ -1189,29 +1240,29 @@ void TileAtlas__BuildCells(TileAtlas *self) {
     if (self->defaultCells != 0) {
         v = 0;
         u = 0;
-        tpage = GetTPage(2, 0, 0x280, 0);
-        self->cells = BMemPMgrAlloc(300 * sizeof(GsCELL));
+        tpage = GetTPage(TPAGE_15BIT, 0, TILE_ATLAS_X, 0);
+        self->cells = BMemPMgrAlloc(TILE_ATLAS_CELLS * sizeof(GsCELL));
         if (self->cells != NULL) {
             i = 0;
             c = self->cells;
-            n = 300;
+            n = TILE_ATLAS_CELLS;
             for (; i < n; i++, c++) {
                 c->u = u;
                 c->tpage = tpage;
                 c->v = v;
                 c->cba = 0;
                 c->flag = 0;
-                u += 16;
-                x += 16;
-                if (x >= 0x3C0) {
+                u += TILE_SIZE;
+                x += TILE_SIZE;
+                if (x >= TILE_ATLAS_X_END) {
                     u = 0;
-                    x = 0x280;
-                    v += 16;
+                    x = TILE_ATLAS_X;
+                    v += TILE_SIZE;
                 }
-                if ((x & 0x3F) == 0) {
-                    tpage = x >> 6;
-                    if (v >= 0x100) {
-                        tpage += 16;
+                if ((x & (TPAGE_WIDTH - 1)) == 0) {
+                    tpage = x >> 6; /* x / TPAGE_WIDTH */
+                    if (v >= TPAGE_HEIGHT) {
+                        tpage += TPAGE_LOWER;
                     }
                     u = 0;
                 }
@@ -1226,7 +1277,7 @@ TileAtlasMethods *GetTileAtlasMethods(void) {
 
 /* Allocate and construct a TodSet; freed and NULL when the constructor fails. */
 TodSet *New_TodSet(Src6F240 *src) {
-    void *obj = BMemPMgrAlloc(0x2C);
+    void *obj = BMemPMgrAlloc(sizeof(TodSet));
 
     if (obj != NULL) {
         if (((Ctor33808 *)GetTodSetMethods())->ctor(obj, src)) {
@@ -1306,7 +1357,7 @@ TodSetMethods *GetTodSetMethods(void) {
 /* Allocate and construct a MoviePlayer; freed and NULL when the constructor
  * returns nonzero (this ctor reports failure, not self). */
 MoviePlayer *New_MoviePlayer(DrawRect *frame, s32 cdSpeed, s32 external) {
-    MoviePlayer *obj = BMemPMgrAlloc(0x6C);
+    MoviePlayer *obj = BMemPMgrAlloc(sizeof(MoviePlayer));
 
     if (obj != NULL) {
         if (GetMoviePlayerMethods()->ctor(obj, frame, cdSpeed, external) == 0) {
@@ -1325,7 +1376,7 @@ MoviePlayer *New_MoviePlayer(DrawRect *frame, s32 cdSpeed, s32 external) {
 s32 MoviePlayer__MoviePlayer(MoviePlayer *self, DrawRect *frame, s32 cdSpeed, s32 external) {
     Get_vtable_BasicClass()->ctor((BasicClass *)self);
     self->methods = GetMoviePlayerMethods();
-    self->stream = New_CdStream(cdSpeed, 15, 0);
+    self->stream = New_CdStream(cdSpeed, MOVIE_FPS, 0);
     if (self->stream != NULL) {
         if (MoviePlayer__InitFrame(self, frame, external) == 0) {
             if (gMdecInitialized == 0) {
@@ -1333,7 +1384,7 @@ s32 MoviePlayer__MoviePlayer(MoviePlayer *self, DrawRect *frame, s32 cdSpeed, s3
             }
             gMdecInitialized = 1;
             DecDCToutCallback(OnMdecFrameReady);
-            self->stream->methods->setRing(self->stream, self->ring, 0x12000);
+            self->stream->methods->setRing(self->stream, self->ring, MOVIE_RING_SIZE);
             self->pendingStart = 0;
             self->methods->setAutoPlay(self, 1);
             return 0;
@@ -1369,14 +1420,14 @@ s32 MoviePlayer__InitFrame(MoviePlayer *self, DrawRect *frame, s32 external) {
         self->frames[1] = NULL;
         self->frames[0] = NULL;
         self->ring = NULL;
-        size = frame->w * frame->h * 2 + 0x1000;
+        size = frame->w * frame->h * 2 + 4096;
         if ((self->frames[0] = BMemPMgrAlloc(size)) == NULL) {
             goto fail;
         }
         if ((self->frames[1] = BMemPMgrAlloc(size)) == NULL) {
             goto fail;
         }
-        if ((self->ring = BMemPMgrAlloc(0x12000)) == NULL) {
+        if ((self->ring = BMemPMgrAlloc(MOVIE_RING_SIZE)) == NULL) {
             goto fail;
         }
         if ((self->strip = BMemPMgrAlloc(frame->h << 5)) == NULL) {
@@ -1385,7 +1436,7 @@ s32 MoviePlayer__InitFrame(MoviePlayer *self, DrawRect *frame, s32 external) {
     }
     self->stripRect = *frame;
     self->frame = self->stripRect;
-    self->stripRect.w = 16;
+    self->stripRect.w = MOVIE_STRIP_W;
     self->stripSize = (self->stripRect.h << 4) >> 1;
     return 0;
 fail:
@@ -1417,7 +1468,7 @@ s32 MoviePlayer__Play(MoviePlayer *self, char *name, s32 frameCount, s32 keepAct
             MoviePlayer__MarkPlaying(self);
         }
         self->frameCount = frameCount;
-        if (self->stream->methods->open(self->stream, name, 100) == 0) {
+        if (self->stream->methods->open(self->stream, name, MOVIE_OPEN_TRIES) == 0) {
             gActiveMoviePlayer = self;
             self->haveFrame = 0;
             self->frameIndex = 0;
@@ -1524,7 +1575,7 @@ s32 MoviePlayer__PullFrame(MoviePlayer *self) {
     s32 r;
 
     if (self->streamEnded == 0) {
-        r = self->stream->methods->getNextFrame(self->stream, &data, &size, 0x800000);
+        r = self->stream->methods->getNextFrame(self->stream, &data, &size, MOVIE_FRAME_TRIES);
         if (r != 0) {
             if (size != 0) {
                 self->frameIndex ^= 1;
@@ -1555,7 +1606,7 @@ void MoviePlayer__DrawStrip(MoviePlayer *self) {
     ds->methods->loadImage(ds, &self->stripRect, self->strip);
     self->stripRect.x += self->stripRect.w;
     if (self->stripRect.x < self->frame.x + self->frame.w) {
-        if (self->stripRect.h < 0x80) {
+        if (self->stripRect.h < MOVIE_SYNC_HEIGHT) {
             DrawSync(0);
         }
         DecDCTout(self->strip, self->stripSize);
@@ -1575,7 +1626,7 @@ void MoviePlayer__DrawStrip(MoviePlayer *self) {
  * 1. */
 s32 MoviePlayer__PollActive(MoviePlayer *self) {
     if (self->keepActive != 0) {
-        if (gMoviePollCounter++ > 100) {
+        if (gMoviePollCounter++ > MOVIE_KEEP_ACTIVE_POLLS) {
             gMoviePollCounter = 1;
             self->methods->stop(self);
         }
@@ -1600,7 +1651,7 @@ s32 MoviePlayer__DecodeFrame(MoviePlayer *self) {
             if (cur->haveFrame != 0) {
                 MoviePlayer__WaitFrameReady(cur);
                 cur->frameDone = 0;
-                if (cur->stripRect.h < 0x80) {
+                if (cur->stripRect.h < MOVIE_SYNC_HEIGHT) {
                     DrawSync(0);
                 }
                 DecDCTin(cur->frames[cur->frameIndex], 2);

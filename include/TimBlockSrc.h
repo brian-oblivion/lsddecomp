@@ -32,6 +32,13 @@
  * directly (round 83).
  */
 
+/* TimBlockSrc__AdvanceLoadState's steps, in FileResource's loadState. */
+enum TimBlockLoadState {
+    TIMBLOCK_LOAD_IDLE = 0,   /* done, or not started */
+    TIMBLOCK_LOAD_HEADER = 9, /* the ctor's header-sector read is pending */
+    TIMBLOCK_LOAD_BLOCK = 10  /* a block read into `sector` is pending */
+};
+
 typedef struct TimBlockSrc TimBlockSrc;
 typedef struct TimBlockSrcMethods TimBlockSrcMethods;
 
