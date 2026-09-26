@@ -1213,13 +1213,23 @@
           "note": "Premium head, cap 5, 18 Opus runner sessions in six waves, 18 classes unified: TodSet, Class6D3C8, Class86AA0, TextRow (ex Obj6EAC0), WBgm, TriggerWorld, Entity, TimImage, BgLayer, FrameClock (ex D_8006EF50), Class876FC, TileMap, TileAtlas, DreamSys, TimArraySrc, Class86B60, CdDriver (ex Class6D4E8), Class865C8 (ex Obj865C8). Plan revision 25: class_footprint counts allocator callers and ignores unified ancestors' types (a one-job list became four). Runner tool fixes: typeviews.py parses every parameter stab and local-variable stabs. Head: Class6D430 +0x070 stopService takes self. All merges byte-identical (clean rebuilds after header-heavy merges), 0 new warnings (baseline 161 -> 141), nonmatching green.",
           "round": 88,
           "runners": 18
+        },
+        {
+          "attempts": 6,
+          "calibration": false,
+          "date": "2026-09-26",
+          "matches": 6,
+          "model": "opus",
+          "note": "Premium head, cap 5, 6 Opus runner sessions in five waves (the last four classes shared the class_3bb8c hub, so one at a time): Class86F88, MoviePlayer (ex D_8006F614), Class866E8 (ex D_800866E8; class_3ac78.h retired), LinkResource (ex D_8006F13C), ObjM (ex D_80087034), TaskObjF. Track 4 done, 58/58. Head: StreamTask::player retyped MoviePlayer *. Plan revision 26: a scalar view type is not a footprint symbol (D_80087034 86 -> 13 units). All merges byte-identical after clean rebuilds, 0 new warnings (baseline 141 -> 114), nonmatching green.",
+          "round": 89,
+          "runners": 6
         }
       ],
       "status": "auto"
     },
     "4b": {
-      "reason": "round 85 premium head: recipe written (FINISHING-PLAN track 4b, revision 21); first instances CdDriver.h, gMcDevicePath0/1, D_8008ACA4..AC; 0 game globals left (2026-09-25)",
-      "status": "open"
+      "reason": "round 89: 0 game globals declared with more than one type; track 4 done (58/58 classes) (2026-09-26)",
+      "status": "done"
     },
     "5": {
       "checklist": {
@@ -1230,6 +1240,18 @@
         "readme": true
       },
       "reason": "",
+      "rounds": [
+        {
+          "attempts": 5,
+          "calibration": false,
+          "date": "2026-09-26",
+          "matches": 5,
+          "model": "opus",
+          "note": "Track 5 opened when track 4 closed. Plan revision 26 wrote the close-out prompt (FINISHING-PLAN 4.7). Head ticked nonmatching-clean and docs-budget as measured true; Opus runners did readme (README.md rewritten, no counts), credits (inherited-name tally 146/124/22 with its recipe; tools table from setup.sh) and asm-sites (8 retired, 18 justified at the site, no HARD RULE 6 finding). Head: Small__rand -> D_8008AC68 (libc2/rand.o's seed), sdk/README.md disc list, plan.py closes track 5 when every item is ticked.",
+          "round": 89,
+          "runners": 3
+        }
+      ],
       "status": "auto"
     }
   }

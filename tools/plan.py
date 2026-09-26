@@ -530,6 +530,8 @@ def collect(st):
     ticked = t5["checklist"]
     if t5["status"] == "auto":
         t5_status = "open" if (not todo3 and t4_status in ("done",)) else "waiting (opens when tracks 3 and 4 are done)"
+        if t5_status == "open" and all(ticked.get(k) for k in TRACK5_ITEMS):
+            t5_status = "done"
     else:
         t5_status = t5["status"]
 

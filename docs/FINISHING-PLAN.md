@@ -20,7 +20,8 @@ the per-function matching loop is CLAUDE.md and `docs/MATCHING-GUIDE.md`.
 This file does not repeat them.
 
 Plan revision: 26 (2026-09-26, round 89's premium head: track 5's runner
-prompt §4.7; a scalar view type is not a footprint symbol).
+prompt §4.7; a scalar view type is not a footprint symbol; track 5 closes
+when every item is ticked).
 Changing the plan is a premium head task (§2); record the change in
 `docs/PROGRESS.md` and bump this line.
 

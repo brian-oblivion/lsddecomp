@@ -6,6 +6,86 @@ stale, prose elsewhere is not.
 
 ---
 
+## 2026-09-26 — round 89: track 4 and track 5 done (premium head), every track closed
+
+Premium head (Opus 5.5; the operator started it as premium), operator cap 5.
+`plan.py` offered two disjoint classes and deferred four behind the
+class_3bb8c hub. Nine Opus runner sessions: six types jobs in five waves (the
+last four classes each had a view in include/class_3bb8c.h, so one at a
+time), then three close-out jobs in parallel. Every merge: `make extract`,
+every unit object deleted and rebuilt, oracle byte-identical, `--warnings`
+0 new, nonmatching green. Head sampled slot and field names against their
+occupants and accessors before each `mark-class`. Track 4: 52 -> 58 of 58,
+done; warnings baseline 141 -> 114. Track 5: 0 -> 5 of 5, done.
+
+- **Classes.** Class86F88 (alpha: the scrolling list; four methods renamed
+  for their slots on TextEntry's evidence, `rows[4]`, `panelSprite`),
+  MoviePlayer (ex D_8006F614, bravo: 0x6C bytes, `frames`/`strip`/
+  `stripRect`; `SetResult` -> `SetAutoPlay`, only Play reads +0x68),
+  Class866E8 (ex D_800866E8, charlie: the grid manager; class_3ac78.h
+  retired; D_8008ABFC retyped; `CheckObj866E8CountFlag` ->
+  `CheckSaveScoreFlag`, it reads Class86B60's save block), LinkResource (ex
+  D_8006F13C, delta: `models` holds TmdModels; holders in ModelData,
+  Class6D940, Class865C8, DreamSys retyped), ObjM (ex D_80087034, echo: ctor
+  typed through `dreamerTmd`; `pendingOther` was a TimBlockSrc, not an ObjM,
+  round 24's reading corrected), TaskObjF (alpha: the memory-card save/load
+  controller; `itemList` is only ever a Class86F88, so no common-base cast).
+- **Footprint (plan revision 26).** `extern s32 D_80087034;` made `s32` a
+  view type and `\bs32\b` put all 86 units in ObjM's footprint. Scalars are
+  no longer footprint symbols (86 -> 13); the table symbol finds the extern.
+  It unblocked nothing this round (the hub decided), but a scalar-typed
+  table would have serialised a whole wave.
+- **Track 5 (plan revision 26).** Track 4 closing opened it with no runner
+  prompt; §4.7 added. The asm-sites item still asked round 37's question
+  about func_800195EC, which is TransformAndCullPoly, C since 2026-09-14.
+  Head ticked nonmatching-clean and docs-budget as measured true (tightest
+  budget PARALLEL-RUNS 4281/4300). README (bravo): rewritten for a reader,
+  no counts. CREDITS (charlie): inherited names measured by name and address
+  against the bootstrap commit, 146 / 124 still in use / 22 renamed, with
+  the recipe; tools table from setup.sh. asm-sites (delta): the merge
+  removed 7 `__asm__` lines (dead barriers, one needless `"memory"`
+  clobber, one label alias: build and unit object byte-identical without
+  them); the 16 live barriers left (head's count) and one alias each say
+  at the site what moves without them; every GTE block is a `gte_*`
+  macro; no HARD RULE 6 finding. `plan.py` now closes track 5
+  when every item is ticked (it opened it and never closed it).
+- **Head.** StreamTask::player retyped `MoviePlayer *` (PLAYER() macro
+  retired). sdk/README.md listed only the 3.5 disc; the manifest needs 3.3,
+  3.5 and 3.6. `Small__rand` -> `D_8008AC68`: libc2/rand.o's .sbss (weak
+  `n`), which `sonydata.py` could not see (not g/s-style, no game
+  accessor); a scan of every data name inside a pinned bss section found no
+  other.
+- **Head error, caught by the oracle.** The `identified` note on that
+  symbol went on the symbol's line. splat allows one `;` per line and reads
+  any `//` text there as `key:value` attributes, so `make extract` failed.
+  Its output went to /dev/null, so the head did not see it, and
+  PARALLEL-RUNS §3.9 already warns about that. The build went red on
+  missing `.s` files two merges later. The note now sits on its own line
+  above the symbol.
+- **Open, for a later session.** 52 `func_`, 843 `unk` refs, 40 `slotNN`
+  calls and 214 `D_` globals remain as tier C (track 3's one-pass rule).
+  Leads: TaskObjF is evidently a memory-card save controller and Class86F88
+  a list selector (both banners state the evidence for a descriptive
+  name). TextEntry/Class86F88's `target` view TargetObj86ED0 is
+  TaskObjF's `sound`, a VabStreamObj. The Src6F240 request family
+  (LoadModelRequest, LoadRequest, BE54LoadReq, Req44858) is four names for
+  one record. ObjM__OnRegistrantEvent probably returns a Rec1C pointer. 22
+  barriers in NON_MATCHING and `#if 0` bodies were not measured.
+
+### ESCALATED (operator decisions; the head did not act)
+
+- **Every track is done, so what comes next is the operator's call.**
+  `plan.py` lists no ready jobs. The §1 criteria hold as the tracks measure
+  them. Criterion 1 is met in the sense that every remaining placeholder is
+  tier C "with what is known written down", not in the sense that every name
+  says what the code does. Options: stop; a descriptive-rename pass over the
+  classes that still carry address names (Class86F88, TaskObjF, Class866E8,
+  ...), which would be a new track; or a track-3 second pass, which revision
+  19 ruled out.
+- Round 86's three escalations stand.
+
+---
+
 ## 2026-09-26 — round 88: track 4 (premium head), eighteen classes unified, footprint revision 25
 
 Premium head (Opus 5.5; the operator started it as premium), operator cap 5.
