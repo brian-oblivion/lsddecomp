@@ -1319,6 +1319,16 @@
           "note": "Premium head, cap 5, rolling slots. Types (all Opus, all accepted, three names sampled each): Class6EED8 -> RequestedFile (A), Class6D940 -> PlacementGrid (A; records 20x20 at cell*12+8; CellPlacement), Class6D3C8 -> GameApplication (A; SetDayFromTickCount -> SeedRandom), Class6E99C -> FadeBox (A), Class879C4 -> VariantSprite (B), Class65650 -> TodActor (A; TimeTargetObj -> Sony GsCOORD2PARAM, UnkArg2Obj -> VabStreamObj), Class86B60 -> TitleMenu (A; START/FLASHBACK/SAVE/LOAD/GRAPH/SHAKE), Class876FC -> StyleEffect (B), Class866E8 -> StageMap (B; seven hex-neighbour chunk slots, Unk68Struct -> StageGridDimensions, Unk54Struct -> LongVec3). Head applied by type scope: CellPlacement cellFlags, Entity/Viewport fadeBox (+ Viewport slots and methods), TodActor sound, StageMap pendingLoadCount and five slots, SCALE_UNIT, RotateVramRectRight. All merges byte-identical, typeviews 0 new, nonmatching green.",
           "round": 93,
           "runners": 5
+        },
+        {
+          "attempts": 5,
+          "calibration": true,
+          "date": "2026-09-26",
+          "matches": 4,
+          "model": "opus",
+          "note": "Premium head, cap 5, rolling slots. Types (all Opus, three names sampled each): Class865C8 -> DayTask (B; one DreamSys startDay/endDay pair per day, init's result drives PollStatusObj's cinematic/graph-room branch), code_179d8_k onto libsnd's ProgAtr/VagAtr/SsMarkCallbackProc (AdsrFields, DataEntryLocals; Sony's three-argument callback closed ContNrpn1 77/77, library C), class_3bb8c.h's 13 (MATRIX, DrawSystem, TextRow, VabStreamObj, TitleMenu, TaskCoreTarget views retired; DreamSaveBlock B, McDevicePath, SplitCoord2, StyleConfig B), code_2864's eight all Sony's libgte/libgs types (+ GsBG). ViewportOt -> GsOT NOT done: Viewport.h cannot include <libgs.h> past TimImage.h/TileMap.h/TileAtlas.h/code_2cc8c_d.c's Sony re-declarations; plan revision 32 ranks those first and flags ViewportOt --after them. Head: D_800902E8 -> _ss_score, EntityMoodRow nearTolerance, flag DrawNode.",
+          "round": 94,
+          "runners": 5
         }
       ],
       "status": "auto"
@@ -1358,6 +1368,26 @@
           "note": "All Opus, all accepted after sampling five each, none sent back: Entity_d and Entity_e re-sends (round 92's step 4 done: every literal in base; EntityEffect, ENTITY_STATE_DONE, SOUND_CUE_NONE/STOP added and reused), class_3bb8c_n (D_ 32 -> 0, m2c 46 -> 0, history 21 -> 0), code_33808 (Sony headers in; magic 96 -> 6, m2c 15 -> 0). Four Opus units reviewed, none sent back: polish runner to sonnet per section 2.",
           "round": 93,
           "runners": 4
+        },
+        {
+          "attempts": 3,
+          "calibration": true,
+          "date": "2026-09-26",
+          "matches": 1,
+          "model": "sonnet",
+          "note": "Sonnet polish: Entity_c accepted (six motion templates named by value, five samples held); Entity_g sent back (five D_ templates left unnamed 'for lack of a precedent' against Entity.h's named-by-value rule) and code_fa50 sent back (packet sizes left hex; banner history deleted, not moved). Polish runner back to Opus (section 2).",
+          "round": 94,
+          "runners": 3
+        },
+        {
+          "attempts": 3,
+          "calibration": true,
+          "date": "2026-09-26",
+          "matches": 3,
+          "model": "opus",
+          "note": "Opus polish, all accepted after sampling five each: Entity_b (EntityEffect/DREAM_COLOR_PINK/SOUND_CUE_STOP reuse, 3421..3541 window, nearTolerance proposal applied by head), Entity_g re-send (D_ 5 -> 0, ROTATION_ZPLUS4 was a misdecode, now ROTATION_YAW_PLUS4), code_fa50 re-send (magic 97 -> 18: libgs GPU_COM_*, TMD_P_* sizeof, GsTMDFlagGRD; unit history restored to New_TmdModel.md).",
+          "round": 94,
+          "runners": 3
         }
       ],
       "status": "auto",
