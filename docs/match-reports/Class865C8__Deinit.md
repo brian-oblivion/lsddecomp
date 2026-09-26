@@ -103,3 +103,7 @@ matches.
 ## Naming
 
 `Class865C8__Deinit` -- tier B. Occupies +0x048, the mirror of Init's slot (`gIntermediateBaseMethods`'s +0x048 forwards to `IntermediateBase__Deinit`). Undoes what Init configured on the sub-object and forwards to `Class86668__Deinit`; the same caveat as Init applies to its specific purpose here.
+
+## Track 4 (2026-09-26, round 88, Class865C8)
+
+The class (table D_800865C8, id 0x1F230, Class86668's subclass) is unified as Class865C8 in include/Class865C8.h; the Obj865C8/Class865C8Methods views in class_39e08.h are gone. Prefix only. Accessors: unk38 -> dreamSys, unk0C->unk4 -> initArgs->unk4, unk10 -> IntermediateBase's unk10.

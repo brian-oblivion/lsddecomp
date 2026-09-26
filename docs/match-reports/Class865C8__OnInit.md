@@ -147,3 +147,7 @@ forward-declared struct bodies as a bare `struct X { ... };`, never repeat
 ## Naming
 
 `Class865C8__OnInit` -- tier B. Sets up `subA` with a fixed constant (0x4B0) and two rodata addresses, then unconditionally sets `state = 1`: a clear 'begin' step for the state machine, but what `subA` itself represents in the game is not established (opaque vtable-only view).
+
+## Track 4 (2026-09-26, round 88, Class865C8)
+
+The class (table D_800865C8, id 0x1F230, Class86668's subclass) is unified as Class865C8 in include/Class865C8.h; the Obj865C8/Class865C8Methods views in class_39e08.h are gone. Renamed from Obj865C8__StartSubA: it is the +0x04C onInit override (IntermediateBase__Init calls it). subA was IntermediateBase's viewport (+0x018), which holds the Class869D8 the ctor made, and SubObjA's slots are Viewport's: setScreenSize, getSubHandle (then Class6B5CC setDisplay(1)), setUnk44(0x4B0), attachViewChild(dreamSys, &D_80086650, &D_8008665C, NULL), initOt. It takes self alone; the slot keeps (self, s32, s32, s32).

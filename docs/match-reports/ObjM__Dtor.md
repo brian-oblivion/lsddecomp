@@ -39,3 +39,7 @@ unit). Matched first attempt.
 Round 75 (bravo, track 3). `func_80052CD8` -> `ObjM__Dtor`, **tier A**.
 
 Slot +0x00C of D_80087034 (`tools/classtable.py 0x80087034`). Forwards to the base's dtor (GetClass86668Methods()->dtor). Named after the base family's own +0x00C names (Class86668__Dtor, Class865C8__Finalize; the first renamed `Class86668__Finalize` in round 84).
+
+## Track 4 (2026-09-26, round 88, Class865C8)
+
+ObjM__Dtor's parameter was `Obj865C8 *` (the sibling class's view); it is now `ObjM_3bb8c_k *`, class_3bb8c_k's own view of this method's class (D_80087034). Byte-identical.

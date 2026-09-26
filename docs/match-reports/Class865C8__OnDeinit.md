@@ -51,3 +51,7 @@ None beyond what's already documented.
 ## Naming
 
 `Class865C8__OnDeinit` -- tier A. Ticks `subA` (`slot90`/`slot74`) every call; matches the existing `runSubUpdates` field name already on file. A pure per-frame forwarding leaf: mechanics are its purpose.
+
+## Track 4 (2026-09-26, round 88, Class865C8)
+
+The class (table D_800865C8, id 0x1F230, Class86668's subclass) is unified as Class865C8 in include/Class865C8.h; the Obj865C8/Class865C8Methods views in class_39e08.h are gone. Renamed from Obj865C8__RunSubUpdates, which misdescribed it: it is the +0x050 onDeinit override, and the two calls are Viewport's deinitOt and detachViewChild.

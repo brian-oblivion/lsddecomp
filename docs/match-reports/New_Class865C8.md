@@ -63,3 +63,7 @@ updated with what survived and what did not.
 ## Naming
 
 `New_Class865C8` -- tier A. Allocator, matches the established `New_X` idiom used everywhere else in this project (allocate fixed size, ctor via the class's own vtable accessor, return NULL on failure): mechanics are its purpose.
+
+## Track 4 (2026-09-26, round 88, Class865C8)
+
+The class (table D_800865C8, id 0x1F230, Class86668's subclass) is unified as Class865C8 in include/Class865C8.h; the Obj865C8/Class865C8Methods views in class_39e08.h are gone. Renamed from New_Obj865C8. Parameters retyped from (Obj0C *, DreamSys *, s32) to (IntermediateBaseInitArgs *, DreamSys *, s32): Obj0C was a view of IntermediateBaseInitArgs (the ctor stores it at +0x00C, IntermediateBase's initArgs, and fills its +0x008/+0x00C/+0x010), and the one caller, Class6D3C8__PollStatusObj, already passed IntermediateBaseInitArgs *. Byte-identical.

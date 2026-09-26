@@ -15,3 +15,7 @@ An empty override, byte-exact by construction (`jr $ra` / `nop`). Never had its 
 ## Naming
 
 `Class865C8__OnState4` -- tier A. Empty body (`{}`), occupies the class's own +0x07C override slot (already named `noop7C` in the header before this round). An empty body is direct evidence of a no-op leaf.
+
+## Track 4 (2026-09-26, round 88, Class865C8)
+
+The class (table D_800865C8, id 0x1F230, Class86668's subclass) is unified as Class865C8 in include/Class865C8.h; the Obj865C8/Class865C8Methods views in class_39e08.h are gone. Renamed from Obj865C8__Noop7C: occupant of Class86668's +0x07C onState4 (setState(4) calls it), empty.

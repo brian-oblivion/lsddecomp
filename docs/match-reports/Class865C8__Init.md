@@ -105,3 +105,7 @@ this function was reconfirmed at 41/41 after the change.
 ## Naming
 
 `Class865C8__Init` -- tier B. Occupies +0x044 -- compared against `gIntermediateBaseMethods`'s own +0x044 slot, which forwards to `IntermediateBase__Init` (code_2cc8c.h), the established base-class Init slot at this exact offset. This override configures the `subD` sub-object and forwards to the sibling class's own +0x044 (`Class86668__Init`); what 'init' accomplishes for THIS class beyond that is not established.
+
+## Track 4 (2026-09-26, round 88, Class865C8)
+
+The class (table D_800865C8, id 0x1F230, Class86668's subclass) is unified as Class865C8 in include/Class865C8.h; the Obj865C8/Class865C8Methods views in class_39e08.h are gone. Prefix only. Now returns s32 (the parent init's result, `return GetClass86668Methods()->init(...)`), byte-identical: the slot is s32 and PollStatusObj switches on it. It takes self alone, unlike the slot's (self, args, mode); the slot keeps IntermediateBase's type and PollStatusObj calls through Class865C8InitFn.

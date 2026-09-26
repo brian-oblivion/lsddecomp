@@ -227,3 +227,7 @@ the visible cases is itself informative about a missing empty case.
 ## Naming
 
 `Class865C8__AdvancePhase` -- tier B. Occupies +0x054, `IntermediateBase__OnTag1Notify`'s slot in the base -- the state machine's main per-tag transition function (cases on `state` 1/2/3, transitioning via `Class865C8__StartObjM`). The state machine's shape is clear from the body; what each state represents in-game is not.
+
+## Track 4 (2026-09-26, round 88, Class865C8)
+
+The class (table D_800865C8, id 0x1F230, Class86668's subclass) is unified as Class865C8 in include/Class865C8.h; the Obj865C8/Class865C8Methods views in class_39e08.h are gone. Renamed from Obj865C8__AdvanceState (the field is `phase`, see Class865C8__ResetPhase). +0x054 onTag1Notify override: runs the base's, then on event 2 moves phase 1 (startDay) or 3 (release the old objM, getCurrentStage) to 2 through StartObjM. eventCode is Class86668's `result`; onEventArg is setState.

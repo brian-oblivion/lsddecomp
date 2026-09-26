@@ -174,3 +174,7 @@ from memory each time it's used).
 ## Naming
 
 `Class865C8__Finalize` -- tier A. Releases every owned sub-object (`unk0C`'s own three `SubObjG` fields, `unk40`/`unk44`/`unk48`) via their `slot4` release method, then forwards to the base dtor: a pure teardown leaf, mechanics are its purpose.
+
+## Track 4 (2026-09-26, round 88, Class865C8)
+
+The class (table D_800865C8, id 0x1F230, Class86668's subclass) is unified as Class865C8 in include/Class865C8.h; the Obj865C8/Class865C8Methods views in class_39e08.h are gone. Renamed from Obj865C8__Dtor: the +0x00C finalize override (it ends in Class86668's finalize). SubObjG's slot4 is BasicClass's release, so the six `x = x->methods->slot4(x)` calls are `release`; slot14 is removeChild.

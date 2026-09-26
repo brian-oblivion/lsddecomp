@@ -268,3 +268,7 @@ occupant TimImage__Upload) through `TimImageUploadFn`, +0x05C is
 ## Track 4 (2026-09-26, round 88, delta: FrameClock)
 
 `New_D8006EF50` is now `New_FrameClock` (include/FrameClock.h), returning `FrameClock *`; the store into `Obj0C::unk8` (`SubObjG *`, field unchanged) upcasts it, and class_39e08.h's own `SubObjG *` extern of it is gone. Byte-identical.
+
+## Track 4 (2026-09-26, round 88, Class865C8)
+
+The class (table D_800865C8, id 0x1F230, Class86668's subclass) is unified as Class865C8 in include/Class865C8.h; the Obj865C8/Class865C8Methods views in class_39e08.h are gone. Renamed from Obj865C8__Obj865C8. Accessors now use the parent's names: unk0C -> initArgs, Obj0C::unk8/unkC/unk10 -> IntermediateBaseInitArgs unk8/unkC/viewport, subB -> sound, slot10 -> addChild, resetState -> resetCounters. Own fields named from this body: dreamSys (+0x038, arg2), etcTim (+0x044, New_TimImage("ETC\ETC.TIM"), TimImage *), dreamerTmd (+0x048, New_LinkResource("ETC\DREAMER.TMD")), bgm (+0x040, New_WBgm, WBgm *; the WBgm runner's proposal in New_WBgm.md). Byte-identical.

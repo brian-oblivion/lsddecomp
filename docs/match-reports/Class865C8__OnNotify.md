@@ -124,3 +124,7 @@ the full signature before trusting an empty-body occupant's parameter count.
 ## Naming
 
 `Class865C8__OnNotify` -- tier B. Overrides the base's +0x038 `IntermediateBase__OnNotify` slot (confirmed by `tools/classtable.py` diff) and, after forwarding to the base, dispatches by `arg1->target->header` tag (0x1F34 / 0x2F230) to the class's own `Noop80`/`OnTag2Notify`. The dispatch mechanism is evident from the body; what the two tag values MEAN in-game is not.
+
+## Track 4 (2026-09-26, round 88, Class865C8)
+
+The class (table D_800865C8, id 0x1F230, Class86668's subclass) is unified as Class865C8 in include/Class865C8.h; the Obj865C8/Class865C8Methods views in class_39e08.h are gone. Prefix only. Its sender argument is typed BasicClass * (EventArg/HeaderObj were BasicClass/BasicClassMethods::header views): the two tags it tests are 0x1F34 (DreamSys) and 0x2F230 (D_80087034, the ObjM this class builds), so the slots it dispatches to are named onDreamSysNotify (+0x080) and onObjMNotify (+0x084).

@@ -159,3 +159,7 @@ return this body tests is therefore a CinematicCall {bank, entry}; the
 local 8-byte SubObjDPos is replaced by it and `pos.unk2` is `pos.entry`.
 Byte-identical (107/107): the "8 bytes" was read off the stack frame, and
 the 4-byte struct compiles to the same frame.
+
+## Track 4 (2026-09-26, round 88, Class865C8)
+
+The class (table D_800865C8, id 0x1F230, Class86668's subclass) is unified as Class865C8 in include/Class865C8.h; the Obj865C8/Class865C8Methods views in class_39e08.h are gone. Renamed from Obj865C8__OnTag2Notify: own slot +0x084, which Class865C8__OnNotify calls for a sender whose id & 0xFFFFF is 0x2F230 (D_80087034, the ObjM StartObjM builds). Events 4/0xC/0xD end the day through the DreamSys and set Class86668's `result` then setState(3); 5..8 and 0xA set phase 3.
