@@ -57,3 +57,11 @@ unit-local views this body used (`DataSrc33808`, `Obj6F13C`, `Buf439EC`,
 read as `TmdFile *` (include/TmdModel.h), the allocator's descriptor is
 `Src6F240 *`, and the getter returns `&gLinkResourceMethods`.
 Byte-identical.
+
+## Round 93 polish (charlie, track 7)
+
+### Naming
+
+| old | new | tier | evidence |
+| --- | --- | --- | --- |
+| the size literal | `sizeof(LinkResource)` | A | each equals the object size the class header records (and the allocation retail makes); the image is byte-identical |

@@ -50,3 +50,11 @@ void TimBlockSrc__FadeAllEntries(DataSrc33808 *self, s32 arg) {
 ## Track 4 (2026-09-25, round 83, bravo)
 
 Occupant of +0x07C, now the `fadeAllEntries` slot. Its second argument is retyped `TimBlockSrcColor *` (was `s32`): it is passed straight on as `fadeEntry`'s colour; the slot call is now prototyped (`self->methods->fadeEntry(self, i, color)`, was the unprototyped `slot80`), byte-identical. The class (id 0xF03, table `gTimBlockSrcMethods`) is unified as `TimBlockSrc` in `include/TimBlockSrc.h`. Any source block above is the pre-unification spelling; the live body in `src/code_33808.c` takes the unified types, byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).
+
+## Round 93 polish (charlie, track 7)
+
+### Naming
+
+| old | new | tier | evidence |
+| --- | --- | --- | --- |
+| `4` | `ARRAY_COUNT(self->entries)` | A | one fadeEntry per ramp |

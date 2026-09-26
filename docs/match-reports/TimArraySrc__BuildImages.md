@@ -114,3 +114,15 @@ local `extern` of New_TimImage are deleted; `objs` is `TimImage **`,
 
 ## Track 4 (2026-09-26, round 88, runner alpha)
 Class unified as TimArraySrc (include/TimArraySrc.h); the unit-local Obj43CB8 view is deleted and its fields kept their names except base -> clutBase (+0x034): its one writer, TimBlockSrc__AdvanceLoadState, stores the address of its own four CLUT fade ramps (`entries`) there, and this body adds 16 bytes per CLUT row to it for each TimImage's clutBase. Kept s32, as TimImage's clutBase is. Byte-identical.
+
+## Round 93 polish (charlie, track 7)
+
+### Naming
+
+| old | new | tier | evidence |
+| --- | --- | --- | --- |
+| `0x200` | `CD_FLAG_LOAD_FILE_DONE` | A | src/code_179d8_s.c's name for the bit the driver sets when a loadFile request completes (VabStreamObj__AdvanceLoadState tests the same bit) |
+| `*(s32 *)buffer`, `(s32 *)buffer + 1` | `TimArrayBuf` `count`, `offsets` | A | a count, then that many byte offsets of images in the buffer |
+| `0x1E0` | `CLUT_FADE_Y` | A | as in TimBlockSrc__TimBlockSrc |
+| `16` | `sizeof(TimBlockSrcEntry)` | A | clutBase points at a TimBlockSrc's `entries` (AdvanceLoadState sets it), 16 bytes a ramp |
+| `* 4` | `* sizeof(*self->images)` | A | the TimImage pointer array |

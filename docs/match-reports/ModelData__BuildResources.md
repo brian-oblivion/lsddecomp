@@ -70,3 +70,13 @@ First build. The redundant `sw zero, 0x30` on the second failure is an explicit 
 ## Track 4 (2026-09-26, round 88, delta)
 
 New_TodSet is now prototyped in include/TodSet.h as `TodSet *New_TodSet(struct Src6F240 *)`, so the call reads `self->todSet = (FileResource *)New_TodSet((Src6F240 *)&req)`; the forward declaration that stood before this function is gone. Bytes unchanged.
+
+## Round 93 polish (charlie, track 7)
+
+### Naming
+
+| old | new | tier | evidence |
+| --- | --- | --- | --- |
+| `Buf44858.offset` | `tmdOffset` | A | the sub-block New_LinkResource is built over, which LinkResource__BuildModels reads as a TmdFile |
+| `(u8 *)buffer + 0xC` | `Buf44858.tods` | A | New_TodSet's buffer |
+| `Req44858.unk4`, `unk8` | `pad4[8]` | A | no code here reads them; SetVec3 writes the name (NULL) and a 1 there. Its prototype's parameters are now `(buffer, name, mode)`, as include/code_4cd08.h reads the same call |

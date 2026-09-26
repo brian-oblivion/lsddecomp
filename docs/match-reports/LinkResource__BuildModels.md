@@ -81,3 +81,11 @@ unit-local views this body used (`DataSrc33808`, `Obj6F13C`, `Buf439EC`,
 read as `TmdFile *` (include/TmdModel.h), the allocator's descriptor is
 `Src6F240 *`, and the getter returns `&gLinkResourceMethods`.
 Byte-identical.
+
+## Round 93 polish (charlie, track 7)
+
+### Naming
+
+| old | new | tier | evidence |
+| --- | --- | --- | --- |
+| `* 4` | `* sizeof(*models)` | A | the TmdModel pointer array |

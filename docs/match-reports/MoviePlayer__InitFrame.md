@@ -91,3 +91,15 @@ Second build. The first build was byte-identical except the frame (0x20 against 
 ## Track 4 (2026-09-26, round 89)
 
 Class unified in `include/MoviePlayer.h` (id 0x70, table `gMoviePlayerMethods`, was `D_8006F614`; a direct BasicClass subclass, 0x6C bytes). The unit-local views in `src/code_33808.c` are gone; Obj4564C and Frame4564C are gone: Frame4564C was DrawSystem.h's DrawRect, `cur` is `stripRect` and `frame` stays `frame`. The `--merge` CONFLICT at +0x02C (DrawRect here, all-s16 Rect45BC8 in DrawStrip) is settled by this function's `sw` of w = 16 and the 12-byte whole-struct copy: DrawRect. Byte-identical; `typeviews.py --warnings` 0 new.
+
+## Round 93 polish (charlie, track 7)
+
+### Naming
+
+| old | new | tier | evidence |
+| --- | --- | --- | --- |
+| `0x1000` | `4096` | -- | extra bytes past a frame buffer's w * h * 2; no name is established, so only the base changes (a size) |
+| `0x12000` | `MOVIE_RING_SIZE` | A | as in the ctor |
+| `16` | `MOVIE_STRIP_W` | A | stripRect's width, the strip DrawStrip steps by |
+
+MATCHING line on `s32 unused[2]`: retail's 0x28-byte frame.

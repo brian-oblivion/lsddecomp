@@ -79,3 +79,12 @@ Matched on build 2. **Lever: `mult` by a register holding a constant the functio
 Class unified in `include/TileMap.h`. `self` is `TileMap *` (was `Obj6F498`); +0x02C..+0x03B are the GsMAP `map` (cellw, cellh, ncellw, ncellh, base, index; were unk2C, unk2D, unk2E, unk30, unk34, unk38 -- LIBGS.H's own layout, the pad at +0x032 is its alignment gap), +0x03C `atlas`, +0x040 `defaultGrid`. The atlas's +0x02C is still read through the unit-local `DataSrc33808` cast (TileAtlas, gTileAtlasMethods, is not unified) and cast to `struct GsCELL *`. Byte-identical.
 
 Later the same round (alpha, third class): TileAtlas unified (`include/TileAtlas.h`). TileMap::atlas (+0x03C) is `struct TileAtlas *` (was `FileResource *`), so the base is read as `self->atlas->cells` -- no `DataSrc33808` cast and no `struct GsCELL *` cast. Byte-identical.
+
+## Round 93 polish (charlie, track 7)
+
+### Naming
+
+| old | new | tier | evidence |
+| --- | --- | --- | --- |
+| `20`, `15`, `16` | `TILEMAP_COLS`, `TILEMAP_ROWS`, `TILE_SIZE` | A | the GsMAP's ncellw, ncellh and cellw/cellh |
+| `n * 2` | `n * sizeof(*self->map.index)` | A | the u16 index table |

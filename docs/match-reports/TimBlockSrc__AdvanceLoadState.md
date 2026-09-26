@@ -116,3 +116,16 @@ Occupant of FileResource's `setFlag` slot (+0x064); keeps its name because the b
 
 ## Track 4 (2026-09-26, round 88, runner alpha)
 TimArraySrc unified (include/TimArraySrc.h): TimBlockSrc's `blocks` is now `struct TimArraySrc **`, so `p` is a TimArraySrc ** with no cast, New_TimArraySrc(NULL), the store to +0x034 is `clutBase`, and slot78 is called through TimArraySrcUploadFn. Byte-identical.
+
+## Round 93 polish (charlie, track 7)
+
+### Naming
+
+| old | new | tier | evidence |
+| --- | --- | --- | --- |
+| `9` / `10` / `0` | `TIMBLOCK_LOAD_HEADER` / `TIMBLOCK_LOAD_BLOCK` / `TIMBLOCK_LOAD_IDLE` (enum TimBlockLoadState, include/TimBlockSrc.h) | A | 9 is set by the ctor before the header read and its branch parses the header; 10 is set before each block read and its branch consumes a block; 0 after the last |
+| `0x80` | `CD_FLAG_READ_DONE` | A | src/code_179d8_s.c's name for the flags bit the CD driver sets when a read request completes; both branches wait on it after a read() |
+| `((u32 *)buffer)[0]`, `[1]`, `[n + 1]` | `Buf434DC` `count`, `offsets[0]`, `offsets[n]` | A | the header's words from +0x04 are what each block read seeks to; the words from +0x14 (FindMaxTimBlockSize) size the buffer every block is read into, so they are the sizes |
+| `* 4` | `* sizeof(*self->blocks)` | A | the TimArraySrc pointer array |
+
+MATCHING line kept on the header copy: `Hdr43200` is a byte array so the copy is byte-aligned, which is what gives retail's runtime alignment test (`or; andi 3; beqz`) choosing a word or an lwl/lwr loop.

@@ -62,3 +62,13 @@ First build; the gTileAtlasMethods ctor (TileAtlas__TileAtlas) shape with one mo
 Class unified in `include/TileMap.h`. `self` is `TileMap *` (was `Obj6F498`); the third parameter is `FileResource *atlas` (was `s32 arg2`); +0x03C `atlas` (was unk3C), +0x040 `defaultGrid` (was unk40: set here only when arg1 == 0, and BuildMap lays out the default grid only when it is set), +0x042 `loaded` (was unk42: cleared here, set by TileMap__Load after BuildMap). setFlag is called with `self` uncast. Byte-identical.
 
 Later the same round (alpha, third class): TileAtlas unified; the `atlas` parameter and TileMap::atlas are `TileAtlas *` (were `FileResource *`). Byte-identical.
+
+## Round 93 polish (charlie, track 7)
+
+### Naming
+
+| old | new | tier | evidence |
+| --- | --- | --- | --- |
+| `arg1` | `source` | C | as New_TileMap's |
+
+MATCHING line on `s32 unused[8]`: it gives retail's 0x40-byte frame, which holds nothing.

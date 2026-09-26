@@ -110,3 +110,17 @@ Seventh build. Levers, each measured: (1) the colour held in a `u32 c` read ONCE
 ## Track 4 (2026-09-25, round 83, bravo)
 
 Takes `TimBlockSrcEntry *` (merged from the unit's Ent43068/Ent6F0B8 views); +0x0A is `clutH`, set to `mask` here, +0x0C `color`. The class (id 0xF03, table `gTimBlockSrcMethods`) is unified as `TimBlockSrc` in `include/TimBlockSrc.h`. Any source block above is the pre-unification spelling; the live body in `src/code_33808.c` takes the unified types, byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).
+
+## Round 93 polish (charlie, track 7)
+
+### Naming
+
+| old | new | tier | evidence |
+| --- | --- | --- | --- |
+| `256` / `0x100` | `CLUT_COLORS` | A | one CLUT row: the in/out arrays and both RECT widths |
+| `0x1E0` | `CLUT_FADE_Y` | A | as in TimBlockSrc__TimBlockSrc |
+| `12` | `FIX12_SHIFT` | A | `(i + 1) << (12 - shift)` is (i + 1) * ONE / mask, the blend weight in 20.12 |
+| `0x1000` | `ONE` (libgte) | A | Sony's fixed-point one: the weights are f and ONE - f |
+| `15` | `FIX12_SHIFT + 3` | A | the 5-bit channels were widened by 3 bits (`<< 3`, `& 0xF8`) before the 20.12 blend |
+| `0x8000` | `CLUT_STP` | A | the one bit kept from the source colour: a 15-bit PlayStation colour's semi-transparency bit |
+| `Rect43648` | `RECT` (libgpu.h) | A | the local copy of Sony's RECT and the StoreImage/LoadImage/DrawSync prototypes deleted for <libgpu.h> |

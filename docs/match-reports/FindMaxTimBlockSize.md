@@ -54,3 +54,12 @@ u32 FindMaxTimBlockSize(FileResource *self) {
 ## Naming
 
 - **FindMaxTimBlockSize**, tier B. Free helper: the largest of the buffer's counted words from +0x14; used only by TimBlockSrc__AdvanceLoadState to size the block sector buffer.
+
+## Round 93 polish (charlie, track 7)
+
+### Naming
+
+| old | new | tier | evidence |
+| --- | --- | --- | --- |
+| `MaxOfBufferWords` | `FindMaxTimBlockSize` (rename.py) | A | a pure leaf: the largest of the header's `count` words from +0x14, which are the block sizes (see TimBlockSrc__AdvanceLoadState's row); its one caller sizes the block buffer with it |
+| `Buf434DC` `pad4[0x10]`, `vals[1]` | `offsets[4]`, `sizes[4]` | A | as above |

@@ -51,3 +51,12 @@ void *New_TileMap(s32 arg0, s32 arg1) {
 Class unified in `include/TileMap.h`. Returns `TileMap *` (was `void *`); the second parameter is `FileResource *atlas` (was `s32 arg1`: a TileAtlas, gTileAtlasMethods, typed by its nearest unified ancestor); the ctor is reached through `GetTileMapMethods()->ctor` (was the unit-local `Ctor33808` cast). The prototype `extern StreamTaskUnkB4Obj *New_TileMap(...)` in include/code_2c054.h is gone. Byte-identical.
 
 Later the same round (alpha, third class): TileAtlas unified; the `atlas` parameter is `TileAtlas *` (was `FileResource *`), in the prototype in include/TileMap.h (`struct TileAtlas *`, by tag) and in the ctor slot's parameter list. Byte-identical.
+
+## Round 93 polish (charlie, track 7)
+
+### Naming
+
+| old | new | tier | evidence |
+| --- | --- | --- | --- |
+| the size literal | `sizeof(TileMap)` | A | each equals the object size the class header records (and the allocation retail makes); the image is byte-identical |
+| `arg0` | `source` | C | only its zero test is shown (the ctor builds the default grid when it is 0, the one caller's value); by the other FileResource ctors it is probably a file to load, which no caller shows |

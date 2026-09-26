@@ -94,3 +94,15 @@ The +0x060 object is a CdStream (include/CdStream.h, unified this round). `Strea
 ## Track 4 (2026-09-26, round 89)
 
 Class unified in `include/MoviePlayer.h` (id 0x70, table `gMoviePlayerMethods`, was `D_8006F614`; a direct BasicClass subclass, 0x6C bytes). The unit-local views in `src/code_33808.c` are gone; it takes `(MoviePlayer *self, DrawRect *frame, s32 speed, s32 external)` (BASICCLASS_SLOTS_R with an `s32` return: 0 success, 1 failure). `unk60` -> `stream`, `ring`, `unk50`; the +0x06C call is `setAutoPlay(self, 1)`. Byte-identical; `typeviews.py --warnings` 0 new.
+
+## Round 93 polish (charlie, track 7)
+
+### Naming
+
+| old | new | tier | evidence |
+| --- | --- | --- | --- |
+| `speed` | `cdSpeed` | A | as New_MoviePlayer's |
+| `15` | `MOVIE_FPS` | A | New_CdStream's fps parameter (include/CdStream.h) |
+| `0x12000` | `MOVIE_RING_SIZE` (`36 * CD_SECTOR_SIZE`) | A | setRing hands StSetRing size / 2048 sectors; 0x12000 is 36 of them |
+| `unk50` | `pendingStart` (include/MoviePlayer.h) | B | cleared here; MarkPlaying 1, MarkStopped -1; Advance starts the stream read while it is nonzero, counting loops down when negative, then clears it |
+| DecDCTReset/DecDCToutCallback prototypes | <libpress.h> | A | local copies deleted |
