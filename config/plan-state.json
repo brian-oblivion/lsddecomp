@@ -928,6 +928,11 @@
           "date": "2026-09-25",
           "header": "include/TaskCore.h"
         },
+        "gTmdModelMethods": {
+          "class": "TmdModel",
+          "date": "2026-09-26",
+          "header": "include/TmdModel.h"
+        },
         "gVabDriverMethods": {
           "class": "VabDriver",
           "date": "2026-09-26",
