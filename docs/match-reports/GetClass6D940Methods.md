@@ -55,3 +55,7 @@ array (`GetVabStreamObjMethods`) and elsewhere (`GetClass6D430Methods`,
 report's `## Role` section predates the correction and is left as written
 history rather than edited (the unit header comment and this `## Naming`
 section are authoritative).
+
+## Track 4 (2026-09-26, round 87, echo)
+
+The paragraph above ("NOT class-framework code") is superseded: D_8006D940 is a Class6D430 method table and this is its getter, the first entry of gDataSourceClientGetters. Declared in `include/Class6D940.h`.

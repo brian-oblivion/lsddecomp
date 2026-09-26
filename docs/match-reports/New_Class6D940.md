@@ -60,3 +60,7 @@ Renamed `new_class_6d940 -> New_Class6D940`, tier A. Matches the project's
 code" language in the `## Role` section above predates the round-77
 correction recorded in the unit header comment and is left as written
 history.
+
+## Track 4 (2026-09-26, round 87, echo)
+
+Now `Class6D940 *New_Class6D940(char *name)`, the ctor's parameter; the one caller (Class866E8__Class866E8) passes 0, so nothing is loaded. Byte-identical.

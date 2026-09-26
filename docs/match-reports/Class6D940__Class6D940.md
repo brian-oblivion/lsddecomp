@@ -49,3 +49,7 @@ by hand (not splat symbols, so outside `rename.py`'s scope) for consistency
 with the confirmed class-framework reading; this report's code block above
 still shows the pre-rename type spelling (`Obj6D940`), left as written
 history.
+
+## Track 4 (2026-09-26, round 87, echo)
+
+Now `(Class6D940 *self, char *name)`: slot6C is Class6D430's +0x06C `requestLoadFile(self, name)`, and slot08 of the active table is `ctor`. The two zeroed fields are `linkResource` (+0x02C) and `loaded` (+0x030). Byte-identical.
