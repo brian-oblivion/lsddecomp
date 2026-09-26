@@ -29,7 +29,7 @@
  *    keeps it in `targetCell`, notifying parents with 5 when its leading
  *    halfword (the element row/column pair) changes; refreshFootprint then
  *    rebuilds `rects`, the up to four element-local rectangles the target
- *    covers, and flags their cells through setFootprintCellFlag.
+ *    covers, and flags their cells (Class866E8__SetFootprintCellFlag).
  *  - forwardAcceptedCommand/applyToSenderFootprint re-notify every cell of
  *    a sender's rectangle (DispatchToRectCells, NotifyGridCell).
  * Descriptor10 has the shape of DreamSys.h's PlayerSpawnPoint (chunk
@@ -45,7 +45,7 @@
  * DispatchLinkCommand.
  *
  * +0x088: Class866E8__OnElementEvent takes (self, command, elem); the slot
- * keeps Class6B5CC's (self, event). Its three callers (Finalize,
+ * keeps Class6B5CC's (self, event). Its four callers (Finalize,
  * ResetAllElements, ApplyRateEntries, OnNotifyTag1) pass (self, 6 or 7,
  * elem, index) through Class866E8OnElementEventFn below (no code).
  * +0x0D4 getCurrentCellKey and +0x0F8 buildRateEntries keep their CALLERS'
@@ -99,8 +99,8 @@ typedef struct Descriptor10 {
 } Descriptor10;
 
 /* computeFootprintDescriptor's output, 0x2C bytes: the Descriptor10, the
- * element's origin (+0x00C..+0x014), the position relative to it
- * (+0x018..+0x020), the element and its rate. `targetCell` holds one. */
+ * element's centre (its origin + 0x5000 in x and z, +0x00C..+0x014), the
+ * position relative to that (+0x018..+0x020), the element and its rate. `targetCell` holds one. */
 typedef struct Descriptor10Ext {
     Descriptor10 base;         /* +0x000 */
     s32 unkC;                  /* +0x00C */
