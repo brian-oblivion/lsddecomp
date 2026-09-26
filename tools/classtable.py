@@ -2,9 +2,9 @@
 """Dump and compare the game's hand-rolled class method tables.
 
     tools/classtable.py --scan                 # every method table in .data
-    tools/classtable.py DREAMSYS_METHODS       # one table, entries resolved
+    tools/classtable.py gDreamSysMethods       # one table, entries resolved
     tools/classtable.py 0x80087BDC             # ...by address
-    tools/classtable.py DREAMSYS_METHODS --vs 0x800878D4   # derived vs base
+    tools/classtable.py gDreamSysMethods --vs 0x800878D4   # derived vs base
 
 WHY THIS EXISTS. This game is plain C with a MANUAL class framework — proven,
 not assumed; see docs/research/class-framework.md for the evidence and the

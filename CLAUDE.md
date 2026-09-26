@@ -71,7 +71,7 @@ byte-for-byte to the retail `SLPS_015.56` executable.
    C", and the difference is not a judgement call either.** GTE
    `rtpt`/`nclip`/`cfc2` and COP2 `swc2`/`lwc2` have no C spelling; an
    awkward unaligned struct copy has one. Round 13 matched
-   `func_8001A3EC` (now `CopyPolyVtx3`) with a whole-function raw-register `__asm__` on the
+   `func_8001A3EC` (now `FillRVectors3`) with a whole-function raw-register `__asm__` on the
    reasoning that its body is straight-line and frameless, citing the GTE
    function above as precedent. The head reworked it to six lines of
    ordinary C, byte-exact, using an idiom that was already written down and

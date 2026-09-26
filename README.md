@@ -86,7 +86,7 @@ their first parameter, `self`, and calls go through the table:
 
 Word +0x000 of every table is a **nibble-path class id**: each nibble above
 the lowest is one more level of derivation. TextRow is `0x11144`, below
-CharSprite `0x1144`, ScreenSprite `0x144`, Sprite `0x44`, Class6B5CC `0x4`
+CharSprite `0x1144`, ScreenSprite `0x144`, Sprite `0x44`, SceneNode `0x4`
 and BasicClass `0x0`. The id is a first guess; the constructor chain (each
 ctor calls its parent's first) is the real inheritance, and
 `plan.py classes` marks where the two disagree.
@@ -121,7 +121,7 @@ Read each named class's header first; its banner points to the units.
   `src/code_1677c.c`). Its loop plays the intro logos and the day-of-week
   movie, polls the graph-screen tasks against the dream's status, and can
   start a cinematic.
-- **Scene objects.** `Class6B5CC` is the positioned 3D object, wrapping a
+- **Scene objects.** `SceneNode` is the positioned 3D object, wrapping a
   libgs `GsDOBJ2` and its coordinate system (`src/code_d294*.c`); `Actor`
   adds movement. `LinkResource`, `TmdModel`, `ModelData` and `Tod`/`TodSet`
   load models and TOD animations. `Viewport` renders a scene through libgs;
@@ -146,8 +146,8 @@ Read each named class's header first; its banner points to the units.
   `TaskObjF` (`src/class_3bb8c_d.c` to `_g.c`), the save/load controller: a
   state machine over the BIOS memory-card calls, which shows its choices in a
   `Class86F88` scrolling list (`src/class_3bb8c_j.c`, `_k.c`).
-- **CD and data sources.** `Class6D430` is the data-source base, whose file
-  interface is bound at run time to the active driver: `CdDriver`
+- **CD and data sources.** `FileResource` is the base of every class loaded
+  from a file; its file interface is bound at run time to the active driver: `CdDriver`
   (`src/code_179d8_o.c`, `_q.c`, `_s.c`: the CD request queue and file table)
   or `VabDriver`. `TimImage`, `TimArraySrc`, `TimBlockSrc`, `TileMap` and
   `TileAtlas` load and build textures.

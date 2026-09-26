@@ -136,7 +136,7 @@ body lives only in an `#ifdef NON_MATCHING` block (CLAUDE.md).
 
 ### The class model
 
-`include/BasicClass.h`'s banner is the worked example; `include/Class6D430.h`
+`include/BasicClass.h`'s banner is the worked example; `include/FileResource.h`
 the first class with subclasses. One header per class, `include/<Class>.h`,
 holds the object struct, the method table struct, the table's extern and
 getter, and the class's own method prototypes; a class with subclasses also
