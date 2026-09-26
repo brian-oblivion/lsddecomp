@@ -116,9 +116,7 @@ s32 SsUtChangeADSR(s16 idx, s16 p1, s16 p2, s16 p3, u16 p4, u16 p5) {
             return -1;
         }
         _svm_sreg_buf[idx].unk8 = p4;
-        __asm__("");
         _svm_sreg_buf[idx].unkA = p5;
-        __asm__("");
         _svm_sreg_dirty[idx] |= 0x30;
         return 0;
     }

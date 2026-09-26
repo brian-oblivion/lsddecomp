@@ -141,3 +141,15 @@ The per-field symbols this report names (`D_8008D988`..`D_8008D9BA` at a 0x34 st
 `src/` now compares `_svm_voice[idx].unk16/unk12/unk0C`. Byte-exact.
 
 **_svm_sreg_buf / _svm_sreg_dirty (same round).** `D_8008D7F0` (0x180 bytes, 24 voices x 0x10, halfwords at +0x0..+0xA spelled `D_8008D7F0`..`D_8008D7FA` by splat) is Sony's `_svm_sreg_buf` and `D_8008D970` (24 bytes) is `_svm_sreg_dirty`: libsnd/vmanager.o bss +0x000 and +0x180, anchored at 0x8008D7F0. Both are in the symbols file; the record type is `SvmSreg` in `include/SvmData.h` (fields by offset). `src/` now stores `_svm_sreg_buf[idx].unk8`/`.unkA` in place of the two "independent arrays" `D_8008D7F8`/`D_8008D7FA`: byte-exact. The earlier reason for modeling them apart (each access computes its own address) is reproduced by the one struct as well, with this function's existing `__asm__("")` order barriers left in place.
+
+## asm sites
+
+Round 89 (runner delta, track 5 `asm-sites`): both bare `__asm__("")`
+barriers (levers 2 and 3 above, now between the `_svm_sreg_buf[idx].unk8` and
+`.unkA` stores and before the `_svm_sreg_dirty[idx] |= 0x30`) are **retired**.
+Measured one at a time: deleting the first alone, then the second as well, each
+rebuild left `build/src/code_179d8_j_c.c.o` byte-identical to the object built
+with both (`cmp`), and `./build-and-verify.sh` stayed green both times. In the
+current source the order no longer depends on them (what changed since they
+were needed was not measured; the `SvmSreg` retype above is a candidate); lever 1 (the `dead[2]` frame idiom) was not touched. `SsUtChangeADSR`
+now carries no `__asm__`.
