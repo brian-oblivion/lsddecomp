@@ -1,6 +1,6 @@
 # FileResource__LoadFile
 
-> Renamed from `FileResource__LoadFile` on 2026-09-26 (tools/rename.py). Address 0x80026b08.
+> Renamed from `Class6D430__LoadFile` on 2026-09-26 (tools/rename.py). Address 0x80026b08.
 
 > Renamed from `FileResource__AllocBuffer` on 2026-09-25 (tools/rename.py). Address 0x80026b08.
 

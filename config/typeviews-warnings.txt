@@ -75,38 +75,38 @@ code_33808: warning: unused variable `unused'
 code_55dd4: warning: unused variable `unused'
 code_8220_c: warning: `/*' within comment
 code_8220_c: warning: `/*' within comment
-code_8220_c: warning: passing arg 1 of `CopyPolyVtx4' from incompatible pointer type
-code_8220_c: warning: passing arg 1 of `CopyPolyVtx4' from incompatible pointer type
-code_8220_c: warning: passing arg 1 of `CopyPolyVtx4' from incompatible pointer type
-code_8220_c: warning: passing arg 1 of `CopyPolyVtx4' from incompatible pointer type
-code_8220_c: warning: passing arg 2 of `CopyPolyVtx4' from incompatible pointer type
-code_8220_c: warning: passing arg 2 of `CopyPolyVtx4' from incompatible pointer type
-code_8220_c: warning: passing arg 2 of `CopyPolyVtx4' from incompatible pointer type
-code_8220_c: warning: passing arg 2 of `CopyPolyVtx4' from incompatible pointer type
-code_8220_c: warning: passing arg 3 of `CopyPolyVtx4' from incompatible pointer type
-code_8220_c: warning: passing arg 3 of `CopyPolyVtx4' from incompatible pointer type
-code_8220_c: warning: passing arg 3 of `CopyPolyVtx4' from incompatible pointer type
-code_8220_c: warning: passing arg 3 of `CopyPolyVtx4' from incompatible pointer type
-code_8220_c: warning: passing arg 3 of `FillRCPolyHeader' from incompatible pointer type
-code_8220_c: warning: passing arg 3 of `FillRCPolyHeader' from incompatible pointer type
-code_8220_c: warning: passing arg 3 of `FillRCPolyHeader' from incompatible pointer type
-code_8220_c: warning: passing arg 3 of `FillRCPolyHeader' from incompatible pointer type
-code_8220_c: warning: passing arg 3 of `FillRCPolyHeader' from incompatible pointer type
-code_8220_c: warning: passing arg 3 of `FillRCPolyHeader' from incompatible pointer type
-code_8220_c: warning: passing arg 3 of `FillRCPolyHeader' from incompatible pointer type
-code_8220_c: warning: passing arg 3 of `FillRCPolyHeader' from incompatible pointer type
-code_8220_c: warning: passing arg 4 of `CopyPolyVtx4' from incompatible pointer type
-code_8220_c: warning: passing arg 4 of `CopyPolyVtx4' from incompatible pointer type
-code_8220_c: warning: passing arg 4 of `CopyPolyVtx4' from incompatible pointer type
-code_8220_c: warning: passing arg 4 of `CopyPolyVtx4' from incompatible pointer type
-code_8220_c: warning: passing arg 5 of `CopyPolyVtx4' from incompatible pointer type
-code_8220_c: warning: passing arg 5 of `CopyPolyVtx4' from incompatible pointer type
-code_8220_c: warning: passing arg 5 of `CopyPolyVtx4' from incompatible pointer type
-code_8220_c: warning: passing arg 5 of `CopyPolyVtx4' from incompatible pointer type
-code_8220_c: warning: passing arg 6 of `CopyPolyVtx4' from incompatible pointer type
-code_8220_c: warning: passing arg 6 of `CopyPolyVtx4' from incompatible pointer type
-code_8220_c: warning: passing arg 6 of `CopyPolyVtx4' from incompatible pointer type
-code_8220_c: warning: passing arg 6 of `CopyPolyVtx4' from incompatible pointer type
+code_8220_c: warning: passing arg 1 of `FillRVectors4' from incompatible pointer type
+code_8220_c: warning: passing arg 1 of `FillRVectors4' from incompatible pointer type
+code_8220_c: warning: passing arg 1 of `FillRVectors4' from incompatible pointer type
+code_8220_c: warning: passing arg 1 of `FillRVectors4' from incompatible pointer type
+code_8220_c: warning: passing arg 2 of `FillRVectors4' from incompatible pointer type
+code_8220_c: warning: passing arg 2 of `FillRVectors4' from incompatible pointer type
+code_8220_c: warning: passing arg 2 of `FillRVectors4' from incompatible pointer type
+code_8220_c: warning: passing arg 2 of `FillRVectors4' from incompatible pointer type
+code_8220_c: warning: passing arg 3 of `FillRVectors4' from incompatible pointer type
+code_8220_c: warning: passing arg 3 of `FillRVectors4' from incompatible pointer type
+code_8220_c: warning: passing arg 3 of `FillRVectors4' from incompatible pointer type
+code_8220_c: warning: passing arg 3 of `FillRVectors4' from incompatible pointer type
+code_8220_c: warning: passing arg 3 of `FillDivPolygonHeader' from incompatible pointer type
+code_8220_c: warning: passing arg 3 of `FillDivPolygonHeader' from incompatible pointer type
+code_8220_c: warning: passing arg 3 of `FillDivPolygonHeader' from incompatible pointer type
+code_8220_c: warning: passing arg 3 of `FillDivPolygonHeader' from incompatible pointer type
+code_8220_c: warning: passing arg 3 of `FillDivPolygonHeader' from incompatible pointer type
+code_8220_c: warning: passing arg 3 of `FillDivPolygonHeader' from incompatible pointer type
+code_8220_c: warning: passing arg 3 of `FillDivPolygonHeader' from incompatible pointer type
+code_8220_c: warning: passing arg 3 of `FillDivPolygonHeader' from incompatible pointer type
+code_8220_c: warning: passing arg 4 of `FillRVectors4' from incompatible pointer type
+code_8220_c: warning: passing arg 4 of `FillRVectors4' from incompatible pointer type
+code_8220_c: warning: passing arg 4 of `FillRVectors4' from incompatible pointer type
+code_8220_c: warning: passing arg 4 of `FillRVectors4' from incompatible pointer type
+code_8220_c: warning: passing arg 5 of `FillRVectors4' from incompatible pointer type
+code_8220_c: warning: passing arg 5 of `FillRVectors4' from incompatible pointer type
+code_8220_c: warning: passing arg 5 of `FillRVectors4' from incompatible pointer type
+code_8220_c: warning: passing arg 5 of `FillRVectors4' from incompatible pointer type
+code_8220_c: warning: passing arg 6 of `FillRVectors4' from incompatible pointer type
+code_8220_c: warning: passing arg 6 of `FillRVectors4' from incompatible pointer type
+code_8220_c: warning: passing arg 6 of `FillRVectors4' from incompatible pointer type
+code_8220_c: warning: passing arg 6 of `FillRVectors4' from incompatible pointer type
 code_d294_b: warning: unused variable `pad'
 code_d294_b: warning: unused variable `unused'
 code_fa50: warning: `p' might be used uninitialized in this function

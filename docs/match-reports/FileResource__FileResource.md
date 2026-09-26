@@ -1,6 +1,6 @@
 # FileResource__FileResource
 
-> Renamed from `FileResource__FileResource` on 2026-09-26 (tools/rename.py). Address 0x80026a50.
+> Renamed from `Class6D430__Class6D430` on 2026-09-26 (tools/rename.py). Address 0x80026a50.
 
 > Renamed from `func_80026A50` on 2026-09-18 (tools/rename.py). Address 0x80026a50.
 
@@ -124,8 +124,8 @@ zeroed and otherwise untouched" from scratch.
 ## Track 6 (round 91, charlie): the class is named FileResource
 
 - `Class6D430` -> `FileResource` (`renametype.py`, the whole family: type,
-  `FileResourceMethods`, `FILERESOURCE_FIELDS`/`_SLOTS`, the `FileResource__`
-  methods, `GetFileResourceMethods`, the header `include/FileResource.h`), and
+  `Class6D430Methods`, `CLASS6D430_FIELDS`/`_SLOTS`, the `Class6D430__`
+  methods, `GetClass6D430Methods`, the header `include/FileResource.h`), and
   `D_8006D430` -> `gFileResourceMethods` (`rename.py`). **Tier A.** Evidence:
   the body of `FileResource__LoadFile` alone (open a name, size it with
   `seek(0, 2)`, allocate, read the whole file, close), and every non-driver

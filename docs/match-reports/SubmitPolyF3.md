@@ -95,7 +95,7 @@ full oracle in isolation, reverted: `build exit=2`, zero compile-error hits,
 revert.
 
 Not re-attempted beyond the mandatory reproduction. This round's two sibling
-`gp_rel`-reopened functions in this unit (`SetPolyOtCodeOverride`, `FillRCPolyHeader`)
+`gp_rel`-reopened functions in this unit (`SetNdivOverride`, `FillDivPolygonHeader`)
 both matched clean once the `gp_rel` toolchain fix (round 42) was accounted
 for — but this function's own residue was never a `gp_rel` hit (it carries
 none), so that fix is irrelevant to it and nothing here changes. Per the
@@ -211,7 +211,7 @@ figures EXACTLY, zero drift, zero compile errors:
 
 **Question 1: did the `gte.h` macro layer change anything about these nine
 register-identity verdicts? No, and the reason is structural, not a missed
-search.** Re-inspected all nine bodies (the eight above plus `CopyPolyVtx4`,
+search.** Re-inspected all nine bodies (the eight above plus `FillRVectors4`,
 already matched) directly: none of them contains, calls, or is textually
 adjacent to a single GTE/COP2 mnemonic or `gte_*` macro invocation — the same
 zero-hit result round 20 already established by grep, re-confirmed here by
@@ -338,11 +338,11 @@ void SubmitPolyF3(void *arg0, void *arg1) {
         ((OtTag *)arg0)->addr = (*(OtTag **)((u8 *)arg1 + 0x30))->addr;
         (*(OtTag **)((u8 *)arg1 + 0x30))->addr = (u32)arg0;
     } else {
-        FillRCPolyHeader(gPolySubmitTableTri, arg1, (u8 *)arg0 + 0x4, 0, 0, 0);
-        CopyPolyVtx3((PolyVtx **)((u8 *)arg1 + 0x88), (PolyVtx **)((u8 *)arg1 + 0xA4),
+        FillDivPolygonHeader(gDivPolygon3, arg1, (u8 *)arg0 + 0x4, 0, 0, 0);
+        FillRVectors3((PolyVtx **)((u8 *)arg1 + 0x88), (PolyVtx **)((u8 *)arg1 + 0xA4),
                       (PolyUV4 *)((u8 *)arg0 + 0x8), (PolyUV4 *)((u8 *)arg0 + 0xC),
                       (PolyUV4 *)((u8 *)arg0 + 0x10));
-        RCpolyF3(arg0, gPolySubmitTableTri);
+        RCpolyF3(arg0, gDivPolygon3);
     }
 }
 #endif
@@ -368,9 +368,9 @@ Unit: `src/code_8220_c.c`. `void SubmitPolyF3(void *arg0, void *arg1)` —
 either splices `arg0` into an OT-style singly-linked list threaded through
 `arg1->0x30` (packed pointer: top byte is a tag preserved across the
 splice, low 24 bits are the address), or — when `arg1->0x78` is set —
-routes through `FillRCPolyHeader` (gp_rel-blocked, this unit),
-`CopyPolyVtx3` (matched this round, this unit) and `func_8001A564`
-(Psy-Q SDK) instead, passing a shared table `gPolySubmitTableTri`.
+routes through `FillDivPolygonHeader` (gp_rel-blocked, this unit),
+`FillRVectors3` (matched this round, this unit) and `func_8001A564`
+(Psy-Q SDK) instead, passing a shared table `gDivPolygon3`.
 
 ## Best body reached (46/54 words)
 
@@ -399,9 +399,9 @@ void SubmitPolyF3(void *arg0, void *arg1)
             *head1 = (*head1 & 0xFF000000) | ((u32)arg0 & 0xFFFFFF);
         }
     } else {
-        FillRCPolyHeader(gPolySubmitTableTri, arg1, (u8 *)arg0 + 0x4, 0, 0, 0);
-        CopyPolyVtx3((u8 *)arg1 + 0x88, (u8 *)arg1 + 0xA4, (u8 *)arg0 + 0x8, (u8 *)arg0 + 0xC, (u8 *)arg0 + 0x10);
-        func_8001A564(arg0, gPolySubmitTableTri);
+        FillDivPolygonHeader(gDivPolygon3, arg1, (u8 *)arg0 + 0x4, 0, 0, 0);
+        FillRVectors3((u8 *)arg1 + 0x88, (u8 *)arg1 + 0xA4, (u8 *)arg0 + 0x8, (u8 *)arg0 + 0xC, (u8 *)arg0 + 0x10);
+        func_8001A564(arg0, gDivPolygon3);
     }
 }
 #endif
@@ -409,7 +409,7 @@ void SubmitPolyF3(void *arg0, void *arg1)
 
 Build compiles clean, no address drift (in-range comparison, retail's
 declared `0xD8` bytes = 54 words, matched exactly by this body's length).
-The whole `else` branch (the `FillRCPolyHeader`/`CopyPolyVtx3`/`func_8001A564`
+The whole `else` branch (the `FillDivPolygonHeader`/`FillRVectors3`/`func_8001A564`
 calls) is BYTE-EXACT — every remaining diff is inside the `if` branch (the
 linked-list splice).
 
@@ -570,8 +570,8 @@ happens to evaluate its argument twice.
   it is NOT dead: GCC 2.6.3 hoists an existing independent instruction into a
   load-delay slot, it does not invent one. Something in the real source reads
   or forms `arg0 + 0x14`. Whoever holds this unit knows what lives at `+0x14`
-  in this object from the seven siblings and the `FillRCPolyHeader`/
-  `CopyPolyVtx3` call sites, and is far better placed to name it than a
+  in this object from the seven siblings and the `FillDivPolygonHeader`/
+  `FillRVectors3` call sites, and is far better placed to name it than a
   cold re-derivation.
 
 ### Why the original conclusion read as exhaustive
@@ -634,7 +634,7 @@ concrete hypotheses tried and rejected:
    own length. 0/54, WARNING: drift.
 2. Compute it as a purely local, `(void)`-cast, unused expression scoped
    inside the `if` branch only — eliminated entirely by `-O2`, reproducing
-   exactly what `UpdatePolyBBoxAndCull`'s report already found for a genuinely
+   exactly what `FlagLargePolyForDivide`'s report already found for a genuinely
    unused local: GCC 2.6.3 does perform basic dead-store/dead-expression
    elimination for a value with no read whatsoever, so a plain "mention the
    address and do nothing with it" does not survive to be schedulable.
@@ -836,7 +836,7 @@ Following the head's lead from the `code_8220_b` read (`SubmitPolyGT4`'s
 filler independently measured as one-past-the-end of 4 stride-0xC records),
 tested the concrete hypothesis that this function's own filler
 (`addiu $v0,$s1,0x14`, one past `uv2` at `arg0+0x10`) comes from a genuine
-one-past-the-end POINTER EXPRESSION for the `CopyPolyVtx3` call's third
+one-past-the-end POINTER EXPRESSION for the `FillRVectors3` call's third
 `PolyUV4 *` argument, rather than the plain `arg0+0x10` offset this body
 already writes.
 
@@ -1021,7 +1021,7 @@ This round's assignment asked, for this family specifically, whether the
 "$a2 vs $a1" register-identity residue that all nine OT-splice siblings
 share (`SubmitPolyF3`, `SubmitPolyF4`, `SubmitPolyG3`, `SubmitPolyFT3`,
 `SubmitPolyFT4`, `SubmitPolyG4`, `SubmitPolyGT3`, `SubmitPolyGT4`, plus
-the separately-classified `CopyPolyVtx4` — MATCHED this round, see its own
+the separately-classified `FillRVectors4` — MATCHED this round, see its own
 report) might actually be the COP2-clobber trap CLAUDE.md documents: a GPR
 clobber list on an `lwc2`/`swc2` block naming `$2`-`$5` where the
 instructions target COP2 *data* registers, forcing spurious evictions that
@@ -1033,8 +1033,8 @@ every GTE/COP2 mnemonic.**
 
 ```
 grep -cE 'swc2|lwc2|mfc2|mtc2|cfc2|ctc2|rtps|rtpt|nclip|gte' \
-  asm/nonmatchings/code_8220_c/{CopyPolyVtx4,SubmitPolyF3,SubmitPolyF4,\
-  UpdatePolyBBoxAndCull,SubmitPolyFT3,SubmitPolyG3,SubmitPolyFT4,SubmitPolyG4,\
+  asm/nonmatchings/code_8220_c/{FillRVectors4,SubmitPolyF3,SubmitPolyF4,\
+  FlagLargePolyForDivide,SubmitPolyFT3,SubmitPolyG3,SubmitPolyFT4,SubmitPolyG4,\
   SubmitPolyGT3,SubmitPolyGT4}.s
 ```
 
@@ -1066,20 +1066,20 @@ head-directed pass" section above for why the aggregate-assignment lever
 specifically cannot reach a constant-folded operand.
 
 **This also rules out a DIFFERENT contamination this round specifically
-checked for and did not find: the `CopyPolyVtx4` mistake (a whole-function
+checked for and did not find: the `FillRVectors4` mistake (a whole-function
 raw-register `__asm__` written for an ordinary struct copy that had a plain
 C form all along, misdiagnosed as a scheduling residue) does NOT recur
 anywhere in this nine-function family.** Every one of these nine functions'
 preserved best-body sources (see each one's own report, and the bodies
 still inlined in `src/code_8220_c.c` under `#if 0`) is already ordinary C —
-the `OtTag` bitfield splice plus the `FillRCPolyHeader`/`CopyPolyVtx3`/
-`CopyPolyVtx4` call sequence — with no asm block anywhere in any of them.
+the `OtTag` bitfield splice plus the `FillDivPolygonHeader`/`FillRVectors3`/
+`FillRVectors4` call sequence — with no asm block anywhere in any of them.
 So the two residue classes on this unit's work list are genuinely distinct:
-`CopyPolyVtx4`'s was a wrong SOURCE SHAPE (asm standing in for a callable
+`FillRVectors4`'s was a wrong SOURCE SHAPE (asm standing in for a callable
 sibling's own idiom) and closed completely; this nine-function family's is
 a residue INSIDE already-correct-shape C that six-plus reshaping axes and
 two bounded permuter searches (this function: 40000 iterations, floor 260,
-no zero; `UpdatePolyBBoxAndCull`: ~8600+ iterations, floor 120→60 on a lead later
+no zero; `FlagLargePolyForDivide`: ~8600+ iterations, floor 120→60 on a lead later
 falsified against the real oracle) have not moved. Both are genuine
 findings about this unit, not one contaminating the other.
 
@@ -1095,7 +1095,7 @@ commented out the matching `INCLUDE_ASM` line, ran `build-and-verify.sh` +
 | `SubmitPolyGT4` | 104/112 | **104/112, no drift warning** |
 
 Both check out exactly. The remaining seven siblings' scores
-(`SubmitPolyF3` 46/54, `SubmitPolyF4` 48/56, `UpdatePolyBBoxAndCull` 53/70,
+(`SubmitPolyF3` 46/54, `SubmitPolyF4` 48/56, `FlagLargePolyForDivide` 53/70,
 `SubmitPolyG3` 48/84 or 405/415 permuter-scale depending on section,
 `SubmitPolyFT4` 80/88, `SubmitPolyG4` 88/96, `SubmitPolyGT3` 88/96) were
 not independently re-verified this pass; the two spot-checked here were
@@ -1295,3 +1295,49 @@ This function's own discriminator: the splice arm returns
 `prim + 0x14` = `sizeof(POLY_F3)`, and the calls arm falls straight
 into `jal RCpolyF3`. `prim`/`ctx` match the parameter names code_8220_b's
 own `extern void *SubmitPolyF3(void *prim, void *ctx);` view already used.
+
+## Round 91 polish (bravo): Sony's types, and where the old comments went
+
+The unit now includes `<libgte.h>` and `<libgpu.h>`, and every raw offset in
+the eight SubmitPoly* wrappers is a Sony field: `prim` is libgpu's
+`POLY_F3` (and siblings), the work buffers `gDivPolygon3`/`gDivPolygon4`
+(renamed from `gPolySubmitTableTri`/`gPolySubmitTableQuad`) are libgte's
+`DIVPOLYGON3`/`DIVPOLYGON4`, `ctx+0x88`/`+0x94` are `RVECTOR *[3]`/`[4]`
+pointing at those buffers' `r0..`, and `ctx+0xA4` is `SVECTOR *[4]`. The
+function now reads:
+
+```c
+u_long *SubmitPolyF3(POLY_F3 *prim, PolyDrawCtx *ctx) {
+    if (ctx->divide != 0) {
+        FillDivPolygonHeader(gDivPolygon3, ctx, (CVECTOR *)&prim->r0, 0, 0, 0);
+        FillRVectors3(ctx->triVtx, ctx->srcVtx, (DVECTOR *)&prim->x0, (DVECTOR *)&prim->x1,
+                      (DVECTOR *)&prim->x2);
+        return RCpolyF3(prim, (DIVPOLYGON3 *)gDivPolygon3);
+    }
+    addPrim(ctx->otSlot, prim);
+    return (u_long *)(prim + 1);
+}
+```
+
+Byte-identical on the first build, for all eight wrappers.
+
+- **The RCpoly* return type is settled.** Sony's own prototype is
+  `extern u_long *RCpolyF3(POLY_F3 *s, DIVPOLYGON3 *divp);` (libgte.h,
+  inside a comment block because libgte.h does not include libgpu.h). The
+  unit declares the eight prototypes itself, verbatim, so the
+  `void *(*)(void *, void *)` casts round 75 needed are gone, and so is the
+  `void` extern in include/code_8220.h that carried round 50's
+  return-value lead (removed from the header with the other
+  code_8220_c-only declarations).
+- **The OT splice is libgpu's `addPrim(ot, p)`.** Round 13's head pass found
+  the splice had to be a 24-bit bitfield read-modify-write (a local
+  `OtTag { u32 addr : 24; u32 len : 8; }` in include/code_8220.h, "the same
+  shape as P_TAG"), with the OT expression re-evaluated rather than cached.
+  `addPrim` is exactly that: `setaddr(p, getaddr(ot)), setaddr(ot, p)` over
+  Sony's `P_TAG` bitfield, with `ot` expanded twice. `OtTag` is deleted.
+- `0x14` (sizeof(POLY_F3)) is now `prim + 1`.
+- The `ctx+0x78` flag is named `divide` in this unit's view (`PolyDrawCtx`):
+  its only readers are these eight wrappers, and nonzero sends the face to
+  RCpoly*. Its writers are FlagLargePolyForDivide (screen span) and
+  code_8220_b's TransformAndCullPoly (GTE FLAG 0x40000, screen Z
+  saturated), whose own view calls it `saturated`.

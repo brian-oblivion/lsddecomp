@@ -41,3 +41,8 @@ Byte-exact on the first attempt, offsets `0x8`/`0x14`/`0x20` (if-branch) and
 named this function ahead of time as "func_8001979C ... whenever that unit
 is worked." Offsets `0x8`/`0x10`/`0x18` (true) / `0x2C` (false) match
 POLY_GT4's layout.
+
+## Round 91 polish (bravo)
+
+`dst` is now `POLY_GT4 *prim` (libgpu.h) and the else branch is
+`gte_stsxy2(&prim->x3)` (0x2C); the `char *p` local was not needed.

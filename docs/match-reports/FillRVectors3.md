@@ -1,4 +1,6 @@
-# CopyPolyVtx3 — MATCHED (53/53 words, as ordinary C)
+# FillRVectors3 — MATCHED (53/53 words, as ordinary C)
+
+> Renamed from `CopyPolyVtx3` on 2026-09-26 (tools/rename.py). Address 0x8001a3ec.
 
 > Renamed from `func_8001A3EC` on 2026-09-24 (tools/rename.py). Address 0x8001a3ec.
 
@@ -8,7 +10,7 @@
 > byte-exact, whole image green:
 >
 > ```c
-> void CopyPolyVtx3(PolyVtx **dst, PolyVtx **src, PolyUV4 *uv0, PolyUV4 *uv1,
+> void FillRVectors3(PolyVtx **dst, PolyVtx **src, PolyUV4 *uv0, PolyUV4 *uv1,
 >                    PolyUV4 *uv2) {
 >     dst[0]->xy = src[0]->xy;
 >     dst[1]->xy = src[1]->xy;
@@ -51,7 +53,7 @@ Unit: `src/code_8220_c.c`. Copies three unaligned 8-byte fields
 (`arg1[0]`/`[4]`/`[8]` -> `arg0[0]`/`[4]`/`[8]`, treating `arg0`/`arg1` as
 arrays of 3 pointers) and, for each of the three destinations, an unaligned
 4-byte field from a separate source pointer (`arg2`, `arg3`, `arg4`
-respectively) into `dst+0x10`. Called by `CopyPolyVtx4` (this unit, next
+respectively) into `dst+0x10`. Called by `FillRVectors4` (this unit, next
 in the queue), which forwards its own unused `a2`/`a3` straight through as
 this function's `arg2`/`arg3`.
 
@@ -76,7 +78,7 @@ as a clobber while also relying on it as an input.
  * the o32-ish calling convention (5th integer arg) and is read directly
  * from 0x10($sp) rather than through a C-level operand.
  */
-void CopyPolyVtx3(void *arg0, void *arg1, void *arg2, void *arg3, void *arg4)
+void FillRVectors3(void *arg0, void *arg1, void *arg2, void *arg3, void *arg4)
 {
     (void)arg0;
     (void)arg1;
@@ -173,12 +175,32 @@ inference matching retail's, and there's no way to verify the guess from
 this function's body alone. If the whole function (or the unaligned-copy
 portion) is branch-free, the raw-register whole-block `__asm__` approach
 from `TransformAndCullPoly` is strictly safer: it reproduces the exact bytes by
-construction, with no struct-layout risk at all. (`CopyPolyVtx3`, 53/53 on
+construction, with no struct-layout risk at all. (`FillRVectors3`, 53/53 on
 first attempt.)
 
 ## Naming (round 77, alpha)
 
-`func_8001A3EC` -> `CopyPolyVtx3`. **Tier A**: a pure leaf whose mechanics
+`func_8001A3EC` -> `FillRVectors3`. **Tier A**: a pure leaf whose mechanics
 ARE its purpose (copy 3 vertices' xy+uv from src to dst), already
 documented in this report's HEAD REWORK section. Parameters (`dst`, `src`,
 `uv0..uv2`) were already named at match time; unchanged.
+
+## Round 91 polish (bravo)
+
+Renamed from `CopyPolyVtx3` (`python3 tools/rename.py CopyPolyVtx3
+FillRVectors3`). **Tier A.** The element type round 13 called `PolyVtx` is
+Sony's `RVECTOR` (libgte.h: `SVECTOR v; u_char uv[2]; u_short pad; CVECTOR
+c; DVECTOR sxy; u_long sz;`, 0x18 bytes), its `xy` payload (`PolyXY8`,
+four s16) is `v`, an SVECTOR copied from the model vertex, and its `uv`
+payload (`PolyUV4`, two s16) is `sxy`, the screen XY: the three sources
+the callers pass are the primitive's `x0y0`/`x1y1`/`x2y2`. Signature now
+`void FillRVectors3(RVECTOR **dst, SVECTOR **src, DVECTOR *sxy0, DVECTOR
+*sxy1, DVECTOR *sxy2)`, body `dst[i]->v = *src[i]; ... dst[i]->sxy =
+*sxyi;`, byte-identical. SVECTOR and DVECTOR are all-short, so the
+alignment-2 idiom this report documents still holds with Sony's types; the
+function keeps one `MATCHING:` line saying so. `PolyVtx`, `PolyXY8` and
+`PolyUV4` are deleted from include/code_8220.h (only this unit used them).
+
+`CLAUDE.md` HARD RULE 6 cites this function as "`func_8001A3EC` (now
+`CopyPolyVtx3`)"; rename.py does not rewrite rule docs, so that reference is
+proposed to the head.

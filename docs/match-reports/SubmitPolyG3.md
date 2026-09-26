@@ -153,7 +153,7 @@ The search continued past this lead (per `--best-only`, not
 260 base exactly, consistent with the residue now being identical to the
 6 siblings'). One further candidate, `output-230-1`, scored below 260 but
 is a semantic non-candidate on inspection — it introduces
-`if (gPolySubmitTableTri) { X } else { X }` with byte-identical bodies on both
+`if (gDivPolygon3) { X } else { X }` with byte-identical bodies on both
 arms (branching on a rodata table POINTER as a boolean condition that
 appears nowhere in retail's control flow) plus several dead-value/masking
 tricks (`0xF & 0xFFFFFFFFFFFFFFFF`). Not oracle-tested — the shape itself
@@ -174,7 +174,7 @@ remaining 8-word gap the same way, not as an open lead).
 
 ```c
 #if 0
-/* A 2-s16 pair (alignment 2, not 4) -- see UpdatePolyBBoxAndCull's stall report for
+/* A 2-s16 pair (alignment 2, not 4) -- see FlagLargePolyForDivide's stall report for
  * why this is needed even at accidentally-4-aligned offsets. */
 typedef struct {
     s16 x, y;
@@ -204,8 +204,8 @@ void SubmitPolyG3(void *arg0, void *arg1) {
             (*(OtTag **)(prim + 0x30))->addr = (u32)self;
         } while (0);
     } else {
-        FillRCPolyHeader(gPolySubmitTableTri, prim, self + 0x4, 0, 0, 0);
-        CopyPolyVtx3((PolyVtx **)(prim + 0x88), (PolyVtx **)(prim + 0xA4),
+        FillDivPolygonHeader(gDivPolygon3, prim, self + 0x4, 0, 0, 0);
+        FillRVectors3((PolyVtx **)(prim + 0x88), (PolyVtx **)(prim + 0xA4),
                       (PolyUV4 *)(self + 0x8), (PolyUV4 *)(self + 0x10),
                       (PolyUV4 *)(self + 0x18));
 
@@ -218,7 +218,7 @@ void SubmitPolyG3(void *arg0, void *arg1) {
         *(Vec2s16_98 *)(*(u8 **)(prim + 0x8C) + 0xC) = *(Vec2s16_98 *)(self + 0xC);
         *(Vec2s16_98 *)(*(u8 **)(prim + 0x90) + 0xC) = *(Vec2s16_98 *)(self + 0x14);
 
-        RCpolyG3(self, gPolySubmitTableTri);
+        RCpolyG3(self, gDivPolygon3);
     }
 }
 #endif
@@ -312,7 +312,7 @@ match-report convention):
 
 ```c
 #if 0
-/* A 2-s16 pair (alignment 2, not 4) -- see UpdatePolyBBoxAndCull's stall report for
+/* A 2-s16 pair (alignment 2, not 4) -- see FlagLargePolyForDivide's stall report for
  * why this is needed even at accidentally-4-aligned offsets. */
 typedef struct {
     s16 x, y;
@@ -340,8 +340,8 @@ void SubmitPolyG3(void *arg0, void *arg1) {
         ((OtTag *)self)->addr = (*(OtTag **)(prim + 0x30))->addr;
         (*(OtTag **)(prim + 0x30))->addr = (u32)self;
     } else {
-        FillRCPolyHeader(gPolySubmitTableTri, prim, self + 0x4, 0, 0, 0);
-        CopyPolyVtx3((PolyVtx **)(prim + 0x88), (PolyVtx **)(prim + 0xA4),
+        FillDivPolygonHeader(gDivPolygon3, prim, self + 0x4, 0, 0, 0);
+        FillRVectors3((PolyVtx **)(prim + 0x88), (PolyVtx **)(prim + 0xA4),
                       (PolyUV4 *)(self + 0x8), (PolyUV4 *)(self + 0x10),
                       (PolyUV4 *)(self + 0x18));
 
@@ -353,7 +353,7 @@ void SubmitPolyG3(void *arg0, void *arg1) {
         *(Vec2s16_98 *)(*(u8 **)(prim + 0x8C) + 0xC) = *(Vec2s16_98 *)(self + 0xC);
         *(Vec2s16_98 *)(*(u8 **)(prim + 0x90) + 0xC) = *(Vec2s16_98 *)(self + 0x14);
 
-        RCpolyG3(self, gPolySubmitTableTri);
+        RCpolyG3(self, gDivPolygon3);
     }
 }
 #endif
@@ -367,7 +367,7 @@ INCLUDE_ASM("asm/nonmatchings/code_8220_c", SubmitPolyG3);
 Unit: `src/code_8220_c.c`. Third sibling of `SubmitPolyF3`/`SubmitPolyF4`
 (this unit, both stalled) — same `prim->0x78`-gated OT-splice-or-calls
 shape, this time with MORE post-call work: after
-`FillRCPolyHeader`(gp_rel-blocked)/`CopyPolyVtx3` (matched), it copies a byte
+`FillDivPolygonHeader`(gp_rel-blocked)/`FillRVectors3` (matched), it copies a byte
 from `self` (widened to `s16`) into three output records' `+0xA` field,
 then an unaligned 4-byte value from three different `self` offsets into
 the same three records' `+0xC` field, then calls `func_8001AD54` (Psy-Q
@@ -390,7 +390,7 @@ SDK, `asm/psyq_rcpolyg3.s`, Gouraud-flavored sibling of `func_8001A564`/
 > discusses the rename is fine and is deliberately not marked.
 
 #if 0
-/* A 2-s16 pair (alignment 2, not 4) -- see UpdatePolyBBoxAndCull's stall report for
+/* A 2-s16 pair (alignment 2, not 4) -- see FlagLargePolyForDivide's stall report for
  * why this is needed even at accidentally-4-aligned offsets. */
 typedef struct {
     s16 x, y;
@@ -410,8 +410,8 @@ void SubmitPolyG3(void *arg0, void *arg1)
             *head1 = (*head1 & 0xFF000000) | ((u32)self & 0xFFFFFF);
         }
     } else {
-        FillRCPolyHeader(gPolySubmitTableTri, prim, self + 0x4, 0, 0, 0);
-        CopyPolyVtx3(prim + 0x88, prim + 0xA4, self + 0x8, self + 0x10, self + 0x18);
+        FillDivPolygonHeader(gDivPolygon3, prim, self + 0x4, 0, 0, 0);
+        FillRVectors3(prim + 0x88, prim + 0xA4, self + 0x8, self + 0x10, self + 0x18);
 
         *(u16 *)(*(u8 **)(prim + 0x88) + 0xA) = *(u8 *)(self + 0xF);
         *(u16 *)(*(u8 **)(prim + 0x8C) + 0xA) = *(u8 *)(self + 0xF);
@@ -421,13 +421,13 @@ void SubmitPolyG3(void *arg0, void *arg1)
         *(Vec2s16_98 *)(*(u8 **)(prim + 0x8C) + 0xC) = *(Vec2s16_98 *)(self + 0xC);
         *(Vec2s16_98 *)(*(u8 **)(prim + 0x90) + 0xC) = *(Vec2s16_98 *)(self + 0x14);
 
-        func_8001AD54(self, gPolySubmitTableTri);
+        func_8001AD54(self, gDivPolygon3);
     }
 }
 #endif
 ```
 
-Build compiles clean, no address drift. `UpdatePolyBBoxAndCull`'s `Vec2s16`
+Build compiles clean, no address drift. `FlagLargePolyForDivide`'s `Vec2s16`
 alignment-2-struct-copy idiom reproduced the three unaligned 4-byte copies
 correctly on the first try (confirmed structurally correct against the
 disassembly — the residue below is entirely register CHOICE, never a wrong
@@ -456,7 +456,7 @@ field, wrong offset, or missing/extra instruction).
    longer "calls" branch — 8 uses vs. `prim`'s 5) ends up in the
    HIGHER-numbered register, register choices for EVERY subsequent
    temporary in the calls branch differ from retail's too (confirmed:
-   the `CopyPolyVtx3` call's own argument setup, otherwise byte-identical
+   the `FillRVectors3` call's own argument setup, otherwise byte-identical
    in the two shorter siblings, differs here in exactly the ADDIU
    destination registers, not the values).
 
@@ -484,8 +484,8 @@ field, wrong offset, or missing/extra instruction).
    three `Vec2s16_98` word copies) as one literal `__asm__` block with `"r"`
    operands for `prim`/`self` and raw `$2`/`$3` scratch, mirroring retail's
    own register choices for the SCRATCH registers exactly (this technique
-   is what made `CopyPolyVtx3` byte-exact) — regressed sharply to 4/84
-   with drift. The difference from `CopyPolyVtx3`'s success: there, the
+   is what made `FillRVectors3` byte-exact) — regressed sharply to 4/84
+   with drift. The difference from `FillRVectors3`'s success: there, the
    whole function's parameters arrived directly in `$a0`-`$a3` (natural
    ABI registers, no prior C code to disturb them); here, `prim`/`self` are
    MID-FUNCTION values already living in whatever callee-saved registers
@@ -656,3 +656,26 @@ This function's own discriminator: the splice arm returns
 `prim + 0x1c` = `sizeof(POLY_G3)`, and the calls arm falls straight
 into `jal RCpolyG3`. `prim`/`ctx` match the parameter names code_8220_b's
 own `extern void *SubmitPolyG3(void *prim, void *ctx);` view already used.
+
+## Round 91 polish (bravo)
+
+Retyped with Sony's structs like the rest of the family; SubmitPolyF3's
+report has the details (POLY_*, DIVPOLYGON3/4, RVECTOR, addPrim, Sony's
+RCpoly* prototype, the renamed `gDivPolygon3`/`gDivPolygon4`). Byte-identical
+on the first build. The field reads, for this primitive:
+
+`FillDivPolygonHeader(gDivPolygon3, ctx, (CVECTOR *)&prim->r0, 0, 0, 0)`;
+RVECTOR `pad` from `prim->pad1`, `pad1`, `pad2` (0xF, 0xF, 0x17: vertex 1
+reuses vertex 0's byte, as retail does); RVECTOR `c` from the colour words
+`r0`, `r1`, `r2` (0x4, 0xC, 0x14). Returns `prim + 1` (0x1C).
+
+**Vec2s16 is retired.** The colour copies were `*(Vec2s16 *)` whole-struct
+assignments, using a unit-local `{ s16 x, y; }` type whose only job was
+alignment 2, so that GCC emits lwl/lwr + swl/swr. Its comment's history:
+five separately typedef'd copies (`Vec2s16_98/_C04/_EE4/_A64/_268`, each
+named for its file offset) were merged into one unit-local type in round 77
+(alpha); DECOMPILATION_LEARNINGS, "A struct whose members are all s8/s16 has
+alignment 2", is the idiom. Sony's `CVECTOR` (four `u_char`, alignment 1)
+copies with the same lwl/lwr + swl/swr, measured: the build stayed
+byte-identical with every Vec2s16 copy replaced by a CVECTOR or DVECTOR
+one.

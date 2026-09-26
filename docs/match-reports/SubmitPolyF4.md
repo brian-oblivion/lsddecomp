@@ -14,7 +14,7 @@ live): 48/56, `insertions 0 / deletions 0 (positional skeleton diffs 8)`.
 **Lever, carried unchanged from `SubmitPolyF3` (matched earlier this
 round):** the function returns the next packet pointer. The "missing filler"
 `addiu $v0, $s1, 0x18` is `return (u8 *)arg0 + 0x18` (0x18 = sizeof(POLY_F4))
-in the OT-splice arm; the other arm is `return RCpolyF4(arg0, gPolySubmitTableQuad)`
+in the OT-splice arm; the other arm is `return RCpolyF4(arg0, gDivPolygon4)`
 (through a `void *(*)(void *, void *)` cast, because `RCpolyF4` stays `void`
 in the shared header). The calls arm must come first:
 `if (x != 0) { calls; return RCpolyF4(...); } splice; return arg0 + 0x18;`.
@@ -72,7 +72,7 @@ diff to the recorded figure** (first diff word 12, `retail=00ff063c
 built=00ff053c`). `git status --porcelain` empty after revert. Same residue
 class as `SubmitPolyF3` (see that report for the shared root analysis and
 the two already-falsified fix attempts); not re-attempted this round.
-`FillRCPolyHeader` (this unit's OTHER `gp_rel`-reopened sibling, MATCHED 27/27
+`FillDivPolygonHeader` (this unit's OTHER `gp_rel`-reopened sibling, MATCHED 27/27
 this round) shares no code path with this residue, so its fix does not
 transfer here.
 
@@ -171,10 +171,10 @@ void SubmitPolyF4(void *arg0, void *arg1) {
         ((OtTag *)arg0)->addr = (*(OtTag **)((u8 *)arg1 + 0x30))->addr;
         (*(OtTag **)((u8 *)arg1 + 0x30))->addr = (u32)arg0;
     } else {
-        FillRCPolyHeader(gPolySubmitTableQuad, arg1, (u8 *)arg0 + 0x4, 0, 0, 0);
-        CopyPolyVtx4((u8 *)arg1 + 0x94, (u8 *)arg1 + 0xA4, (u8 *)arg0 + 0x8,
+        FillDivPolygonHeader(gDivPolygon4, arg1, (u8 *)arg0 + 0x4, 0, 0, 0);
+        FillRVectors4((u8 *)arg1 + 0x94, (u8 *)arg1 + 0xA4, (u8 *)arg0 + 0x8,
                       (u8 *)arg0 + 0xC, (u8 *)arg0 + 0x10, (u8 *)arg0 + 0x14);
-        RCpolyF4(arg0, gPolySubmitTableQuad);
+        RCpolyF4(arg0, gDivPolygon4);
     }
 }
 #endif
@@ -187,8 +187,8 @@ included by the unit.)
 
 Unit: `src/code_8220_c.c`. Quad-flavored sibling of `SubmitPolyF3` (this
 unit, also stalled at the identical residue) — same OT-splice-or-calls
-structure, `gPolySubmitTableQuad` instead of `gPolySubmitTableTri`, `CopyPolyVtx4` (also
-stalled this unit, 6-arg quad-flavored copy) instead of `CopyPolyVtx3`,
+structure, `gDivPolygon4` instead of `gDivPolygon3`, `FillRVectors4` (also
+stalled this unit, 6-arg quad-flavored copy) instead of `FillRVectors3`,
 and `func_8001A8D4` (Psy-Q SDK, `asm/psyq_rcpolyf4.s`, quad-flavored
 sibling of `func_8001A564`) instead of `func_8001A564`.
 
@@ -219,9 +219,9 @@ void SubmitPolyF4(void *arg0, void *arg1)
             *head1 = (*head1 & 0xFF000000) | ((u32)arg0 & 0xFFFFFF);
         }
     } else {
-        FillRCPolyHeader(gPolySubmitTableQuad, arg1, (u8 *)arg0 + 0x4, 0, 0, 0);
-        CopyPolyVtx4((u8 *)arg1 + 0x94, (u8 *)arg1 + 0xA4, (u8 *)arg0 + 0x8, (u8 *)arg0 + 0xC, (u8 *)arg0 + 0x10, (u8 *)arg0 + 0x14);
-        func_8001A8D4(arg0, gPolySubmitTableQuad);
+        FillDivPolygonHeader(gDivPolygon4, arg1, (u8 *)arg0 + 0x4, 0, 0, 0);
+        FillRVectors4((u8 *)arg1 + 0x94, (u8 *)arg1 + 0xA4, (u8 *)arg0 + 0x8, (u8 *)arg0 + 0xC, (u8 *)arg0 + 0x10, (u8 *)arg0 + 0x14);
+        func_8001A8D4(arg0, gDivPolygon4);
     }
 }
 #endif
@@ -292,7 +292,7 @@ changes above before spending anything on register-level reshaping.
 ## RUNNER PASS, round 13 continued: applied, instruction-exact, same residue class
 
 Applied both changes with this function's own offsets (quad flavor:
-`FillRCPolyHeader`/`CopyPolyVtx4`/`func_8001A8D4`, table `gPolySubmitTableQuad`). One
+`FillDivPolygonHeader`/`FillRVectors4`/`func_8001A8D4`, table `gDivPolygon4`). One
 attempt, 48/56 words, confirmed via `asm-differ` zero-inserted/zero-deleted.
 The `else` (calls) branch is byte-exact. Remaining residue, identical class
 to `SubmitPolyF3`:
@@ -301,7 +301,7 @@ to `SubmitPolyF3`:
   follow from it).
 - One missing `addiu $v0,$s1,0x18` in a load-delay slot. Per
   `SubmitPolyF3.md`'s verified cross-sibling formula, `0x18` = `0x14 + 4`
-  = one byte past `uv3` (`arg0 + 0x14`, a `PolyUV4`, `CopyPolyVtx4`'s last
+  = one byte past `uv3` (`arg0 + 0x14`, a `PolyUV4`, `FillRVectors4`'s last
   argument and the last `arg0` field this function's calls branch touches).
   Consistent with the formula on the fourth data point now measured
   independently in this function's own disassembly, not by analogy.
@@ -340,14 +340,14 @@ work list, not just this one. Full method and family-wide result in
 remains the register-identity + code-motion-filler class already
 documented above, unaffected by this screen.
 
-**Also: `CopyPolyVtx4` (this function's own `CopyPolyVtx4` call, described
+**Also: `FillRVectors4` (this function's own `FillRVectors4` call, described
 above/in this report's earlier sections as "also stalled this unit") is now
-MATCHED (35/35), round 20 — see `CopyPolyVtx4.md`. Its stall was a wrong
+MATCHED (35/35), round 20 — see `FillRVectors4.md`. Its stall was a wrong
 SOURCE SHAPE (an unnecessary whole-function raw-register `__asm__`
 transcription of what turned out to be ordinary struct-copy C, one array
-element past what `CopyPolyVtx3` already handles), not a residue of this
+element past what `FillRVectors3` already handles), not a residue of this
 family's own register-identity/delay-slot-filler class. This function's own
-remaining residue is unaffected — `CopyPolyVtx4` is called via ordinary
+remaining residue is unaffected — `FillRVectors4` is called via ordinary
 `jal`, and the whole-image build is `build exit=0` after the retype, so
 nothing about this function's own call site needed to change.**
 
@@ -405,3 +405,13 @@ This function's own discriminator: the splice arm returns
 `prim + 0x18` = `sizeof(POLY_F4)`, and the calls arm falls straight
 into `jal RCpolyF4`. `prim`/`ctx` match the parameter names code_8220_b's
 own `extern void *SubmitPolyF4(void *prim, void *ctx);` view already used.
+
+## Round 91 polish (bravo)
+
+Retyped with Sony's structs like the rest of the family; SubmitPolyF3's
+report has the details (POLY_*, DIVPOLYGON3/4, RVECTOR, addPrim, Sony's
+RCpoly* prototype, the renamed `gDivPolygon3`/`gDivPolygon4`). Byte-identical
+on the first build. The field reads, for this primitive:
+
+`FillDivPolygonHeader(gDivPolygon4, ...)` and `FillRVectors4` over
+`ctx->quadVtx`; nothing else. Returns `prim + 1` (0x18).

@@ -1,4 +1,6 @@
-# UpdatePolyBBoxAndCull — MATCHED (70/70, round 75): lever = LOOP KIND (guard + do/while with `yp` set inside the guard) + `end = self + (count << 2) + 0x5C`
+# FlagLargePolyForDivide — MATCHED (70/70, round 75): lever = LOOP KIND (guard + do/while with `yp` set inside the guard) + `end = self + (count << 2) + 0x5C`
+
+> Renamed from `UpdatePolyBBoxAndCull` on 2026-09-26 (tools/rename.py). Address 0x8001a268.
 
 > Renamed from `func_8001A268` on 2026-09-24 (tools/rename.py). Address 0x8001a268.
 
@@ -6,7 +8,7 @@ REVISITED, round 75: MATCHED; names/types not relevant (source shape only).
 
 ## ROUND 75 (bravo): MATCHED
 
-Previous title: "UpdatePolyBBoxAndCull — STALL: length EXACT (70/70 words, no drift); 53/70 raw word-match; first real diff at in-range word 16 (file 0xAAA8 / vram 0x8001A2A8), the stack-frame-adjustment placement residue".
+Previous title: "FlagLargePolyForDivide — STALL: length EXACT (70/70 words, no drift); 53/70 raw word-match; first real diff at in-range word 16 (file 0xAAA8 / vram 0x8001A2A8), the stack-frame-adjustment placement residue".
 
 **Preserved body rebuilt first** (the `#ifdef NON_MATCHING` body compiled
 live): 53/70, `insertions 2 / deletions 2 (positional skeleton diffs 17)`.
@@ -68,7 +70,7 @@ in `src/code_8220_c.c` (noted in rounds 39/44 — it was only ever flipped in
 live temporarily for reproduction). Took the "Best body reached (53/70
 words)" snapshot below verbatim and placed it, wrapped in
 `#ifdef NON_MATCHING ... #else INCLUDE_ASM ... #endif`, in the unit at its
-existing ROM position (immediately before `FillRCPolyHeader`). The local
+existing ROM position (immediately before `FillDivPolygonHeader`). The local
 `Vec2s16` typedef was renamed `Vec2s16_268` to follow this unit's existing
 per-function disambiguation convention (`Vec2s16_98`/`_C04`/`_EE4`/`_A64`
 already exist for the sibling family) and avoid any future name collision
@@ -103,7 +105,7 @@ register-identity/OT-mask class at all — see the title line and the
 artifact (`grep -n '($sp)'` on the function's own `.s` returns nothing in
 either version; the reserved 0x20 bytes are never used for storage).
 `docs/DECOMPILATION_LEARNINGS.md`'s "SCOPE — measured, and it is narrower
-than the paragraph above implies" section (search `UpdatePolyBBoxAndCull` there)
+than the paragraph above implies" section (search `FlagLargePolyForDivide` there)
 is ABOUT this exact function and generalises the finding: **a raw
 `$sp` adjustment with zero data dependency can be scheduled by GCC 2.6.3
 into an early branch's delay slot, and this placement is emitted by the
@@ -130,7 +132,7 @@ this one).
 **"Has this function had a real search" and "would a real search be able
 to reach this residue" are two different questions, and my brief's table
 conflated them by using the same "none recorded" label for both.**
-`UpdatePolyBBoxAndCull` had a real search AND a residue a search structurally
+`FlagLargePolyForDivide` had a real search AND a residue a search structurally
 cannot reach (prologue-generator placement, pre-C-statement). `SubmitPolyG3`
 had NO real search and a residue nothing yet rules unreachable. Screening
 "never searched" functions for search priority should also ask whether the
@@ -213,7 +215,7 @@ finding still holds by checking the built object before touching anything:
 
 ```
 $ tools/binutils/bin/mipsel-linux-gnu-objdump -d build/src/code_8220_c.c.o \
-    | awk '/<UpdatePolyBBoxAndCull>:/,/^$/' | grep 'addiu.*sp,sp'
+    | awk '/<FlagLargePolyForDivide>:/,/^$/' | grep 'addiu.*sp,sp'
 addiu   sp,sp,-32
 ```
 
@@ -227,7 +229,7 @@ adjustment itself (moved into a branch's delay slot), not a register
 identity choice and not a missing/misordered pair of VALUE computations —
 see "Residue" below, unchanged this round. No new attempt made.
 
-Unit: `src/code_8220_c.c`. `void UpdatePolyBBoxAndCull(void *arg0, s32 count)` —
+Unit: `src/code_8220_c.c`. `void FlagLargePolyForDivide(void *arg0, s32 count)` —
 computes `arg0`'s 2D bounding box over `count` vertices: seeds min/max
 (fields `+0x70`/`+0x72`/`+0x74`/`+0x76`, X/Y min/max as `s16`) from a
 2-`s16` value at `+0x60`, walks `count` vertices starting at `+0x64`
@@ -251,7 +253,7 @@ typedef struct {
     s16 x, y;
 } Vec2s16;
 
-void UpdatePolyBBoxAndCull(void *arg0, s32 count)
+void FlagLargePolyForDivide(void *arg0, s32 count)
 {
     u8 *self = (u8 *)arg0;
     s16 *xp, *yp, *end;
@@ -302,7 +304,7 @@ at word 0 where a normal prologue would put it. My best body puts it at
 word 0 (an ordinary immediate prologue), which shifts every following
 instruction earlier by exactly one slot until word 17, where the SAME
 instruction reappears in mine and the two streams re-align (confirmed:
-`grep -n '($sp)' asm/nonmatchings/code_8220_c/UpdatePolyBBoxAndCull.s` returns
+`grep -n '($sp)' asm/nonmatchings/code_8220_c/FlagLargePolyForDivide.s` returns
 NOTHING — this function never reads or writes through `$sp` anywhere, in
 EITHER version; the reserved 0x20 bytes are never used for storage in
 retail either). This is a placement-only difference in an instruction with
@@ -364,7 +366,7 @@ array would produce hits and rule this out. When that grep is empty and a
 loop-shape or declaration-order permutations; the loop body byte-matching
 already on the first attempt (as it did here) is itself strong evidence the
 C model is correct and the residue is purely this scheduling artifact.
-(`UpdatePolyBBoxAndCull`, 53/70 across all 6 structurally distinct attempts,
+(`FlagLargePolyForDivide`, 53/70 across all 6 structurally distinct attempts,
 identical diff on 4 of them.)
 
 ## RUNNER PASS, permuter round (alpha): a real partial lead found, not yet closed
@@ -394,7 +396,7 @@ fluke on the permuter's own metric.
 into `src/code_8220_c.c` in place of the preserved body, ran the real
 oracle: `build-and-verify.sh` reports `build exit=2` (the whole-image
 verification step fails -- SHA1 does not match), and `funcdiff.py
-UpdatePolyBBoxAndCull` reports **52/70**, one word WORSE than this report's
+FlagLargePolyForDivide` reports **52/70**, one word WORSE than this report's
 existing 53/70, with no drift warning (the in-range comparison is trusted,
 it is simply wrong). Reverted immediately; `git diff --stat` confirmed
 clean before continuing.
@@ -480,7 +482,7 @@ residue, not a second hidden instance of the ADDIU/ORI blind spot.
 
 ## Naming (round 77, alpha)
 
-`func_8001A268` -> `UpdatePolyBBoxAndCull`, parameter `arg0` -> `ctx`.
+`func_8001A268` -> `FlagLargePolyForDivide`, parameter `arg0` -> `ctx`.
 **Tier A.** `ctx` is the same per-face draw context TransformAndCullPoly's
 own extern comment documents (code_8220.h): its SXY0-2 cache at
 `+0x60/+0x64/+0x68` and its culled flag at `+0x78` are exactly the fields
@@ -489,3 +491,34 @@ this function reads (`ctx+0x64`..`ctx+0x5C+count*4`) and writes
 running 2D screen bounding box (`ctx+0x70..+0x76`) and set the cull flag
 when either span reaches `0x101`. Purpose (why 0x101, i.e. what draw-time
 constraint a >256px-wide/tall primitive violates) is not established.
+
+## Round 91 polish (bravo)
+
+Renamed from `UpdatePolyBBoxAndCull` (`python3 tools/rename.py
+UpdatePolyBBoxAndCull FlagLargePolyForDivide`). **Tier A.** The body never
+culls: it computes the screen bounding box and sets `ctx+0x78`, and that
+flag's only readers are the eight SubmitPoly* wrappers, which route a
+flagged face to Sony's RCpoly* subdivider instead of `addPrim`. The body now
+reads through a unit-local view of the draw context (`PolyDrawCtx`:
+`DVECTOR sxy[4]` +0x60, `bboxMin` +0x70, `bboxMax` +0x74, `divide` +0x78),
+`0x101` is `> MAX_UNDIVIDED_SPAN` (256; a unit-local `#define`), and the two
+load-bearing shapes keep one `MATCHING:` line each: the guarded do/while
+with `yp` set inside the guard (round 75's lever, above), and the loop end,
+now `(short *)((u8 *)ctx + count * sizeof(DVECTOR) + 0x5C)`. The natural
+`&ctx->sxy[count - 1].vx` folds the 0x5C into the index first and scores
+62/70; `&ctx->sxy[count].vx - 2` and `(short *)(ctx->sxy + count - 1)` score
+69/70.
+
+**Finding, recorded in the function comment: the loop stops one vertex
+short.** `end` is `&sxy[count - 1]` and the loop runs while `xp < end`
+starting from `sxy[1]`, so for a triangle only `sxy[0]`/`sxy[1]` enter the
+box and for a quad `sxy[0..2]`. That is retail's behaviour; nothing here
+changes it.
+
+History moved from include/code_8220.h's prototype comment (rewritten there
+as documentation): `count` is the face's vertex count (3 or 4), not a
+primitive-kind code. An older "3 = triangle, 4 = quad" wording read the
+right numbers off the call sites for the wrong reason, corrected round 51;
+`ctx` was named round 77. From the old .c comment: the 0x20 frame is
+unused, and retail's `addiu $sp,$sp,-0x20` sits in the loop-skip branch's
+delay slot because nothing else before the branch is movable (round 75).

@@ -1,6 +1,6 @@
 # FileResource__Release
 
-> Renamed from `FileResource__Release` on 2026-09-26 (tools/rename.py). Address 0x800269f0.
+> Renamed from `Class6D430__Release` on 2026-09-26 (tools/rename.py). Address 0x800269f0.
 
 > Renamed from `DestroyChained` on 2026-09-25 (tools/rename.py). Address 0x800269f0.
 

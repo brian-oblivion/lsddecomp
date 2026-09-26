@@ -191,7 +191,7 @@ The corrected, LINKABLE snapshot (identical to what's live in
 
 ```c
 #if 0
-/* A 2-s16 pair (alignment 2, not 4) -- see UpdatePolyBBoxAndCull's stall report for
+/* A 2-s16 pair (alignment 2, not 4) -- see FlagLargePolyForDivide's stall report for
  * why this is needed even at accidentally-4-aligned offsets. */
 typedef struct {
     s16 x, y;
@@ -204,7 +204,7 @@ typedef struct {
  * Instruction-exact (asm-differ: zero inserted, zero deleted). Same
  * residue class: $a2 vs $a1 for the OT mask, plus one missing
  * `addiu $v0,$s1,0x24` = one byte past `self+0x20` (the last arg0 field
- * touched, `CopyPolyVtx4`'s last argument, treated as a PolyUV4-width-4
+ * touched, `FillRVectors4`'s last argument, treated as a PolyUV4-width-4
  * pointer per the cross-sibling formula in SubmitPolyF3.md). Not
  * cracked.
  */
@@ -216,8 +216,8 @@ void SubmitPolyG4(void *arg0, void *arg1) {
         ((OtTag *)self)->addr = (*(OtTag **)(prim + 0x30))->addr;
         (*(OtTag **)(prim + 0x30))->addr = (u32)self;
     } else {
-        FillRCPolyHeader(gPolySubmitTableQuad, prim, self + 0x4, 0, 0, 0);
-        CopyPolyVtx4(prim + 0x94, prim + 0xA4, self + 0x8, self + 0x10,
+        FillDivPolygonHeader(gDivPolygon4, prim, self + 0x4, 0, 0, 0);
+        FillRVectors4(prim + 0x94, prim + 0xA4, self + 0x8, self + 0x10,
                       self + 0x18, self + 0x20);
 
         *(u16 *)(*(u8 **)(prim + 0x94) + 0xA) = *(u8 *)(self + 0xF);
@@ -230,7 +230,7 @@ void SubmitPolyG4(void *arg0, void *arg1) {
         *(Vec2s16_C04 *)(*(u8 **)(prim + 0x9C) + 0xC) = *(Vec2s16_C04 *)(self + 0x14);
         *(Vec2s16_C04 *)(*(u8 **)(prim + 0xA0) + 0xC) = *(Vec2s16_C04 *)(self + 0x1C);
 
-        RCpolyG4(self, gPolySubmitTableQuad);
+        RCpolyG4(self, gDivPolygon4);
     }
 }
 #endif
@@ -244,7 +244,7 @@ included by the unit.)
 Unit: `src/code_8220_c.c`. Gouraud-quad-flavored sibling of the same OT-
 splice-or-calls family (`SubmitPolyF3`/`SubmitPolyF4`/`SubmitPolyG3`/
 `SubmitPolyFT3`, all stalled at the identical residue). Calls branch: quad
-output (4 records at `+0x94/0x98/0x9C/0xA0`), `CopyPolyVtx4` (6-arg quad
+output (4 records at `+0x94/0x98/0x9C/0xA0`), `FillRVectors4` (6-arg quad
 copy, itself stalled in this unit but its caller's own bytes still match
 independently), then `func_8001B164` (Psy-Q SDK, same
 `asm/psyq_rcpolyg3.s` file as `func_8001AD54`/`func_8001B6B4`).
@@ -265,7 +265,7 @@ independently), then `func_8001B164` (Psy-Q SDK, same
 > discusses the rename is fine and is deliberately not marked.
 
 #if 0
-/* A 2-s16 pair (alignment 2, not 4) -- see UpdatePolyBBoxAndCull's stall report for
+/* A 2-s16 pair (alignment 2, not 4) -- see FlagLargePolyForDivide's stall report for
  * why this is needed even at accidentally-4-aligned offsets. */
 typedef struct {
     s16 x, y;
@@ -285,8 +285,8 @@ void SubmitPolyG4(void *arg0, void *arg1)
             *head1 = (*head1 & 0xFF000000) | ((u32)self & 0xFFFFFF);
         }
     } else {
-        FillRCPolyHeader(gPolySubmitTableQuad, prim, self + 0x4, 0, 0, 0);
-        CopyPolyVtx4(prim + 0x94, prim + 0xA4, self + 0x8, self + 0x10, self + 0x18, self + 0x20);
+        FillDivPolygonHeader(gDivPolygon4, prim, self + 0x4, 0, 0, 0);
+        FillRVectors4(prim + 0x94, prim + 0xA4, self + 0x8, self + 0x10, self + 0x18, self + 0x20);
 
         *(u16 *)(*(u8 **)(prim + 0x94) + 0xA) = *(u8 *)(self + 0xF);
         *(u16 *)(*(u8 **)(prim + 0x98) + 0xA) = *(u8 *)(self + 0xF);
@@ -298,7 +298,7 @@ void SubmitPolyG4(void *arg0, void *arg1)
         *(Vec2s16_C04 *)(*(u8 **)(prim + 0x9C) + 0xC) = *(Vec2s16_C04 *)(self + 0x14);
         *(Vec2s16_C04 *)(*(u8 **)(prim + 0xA0) + 0xC) = *(Vec2s16_C04 *)(self + 0x1C);
 
-        func_8001B164(self, gPolySubmitTableQuad);
+        func_8001B164(self, gDivPolygon4);
     }
 }
 #endif
@@ -358,7 +358,7 @@ Applied both changes with this function's own offsets (quad flavor). One
 attempt, 88/96 words, confirmed via `asm-differ` zero-inserted/zero-deleted.
 No self/prim swap. Remaining residue: `$a2`/`$a1` on the OT mask plus one
 missing `addiu $v0,$s1,0x24` — one byte past `self+0x20`
-(`CopyPolyVtx4`'s last argument, the last `arg0` field touched, already
+(`FillRVectors4`'s last argument, the last `arg0` field touched, already
 4-aligned so the align-4 refinement doesn't distinguish here). Matches
 `SubmitPolyF3.md`'s formula. Not independently re-attempted.
 
@@ -390,14 +390,14 @@ work list, not just this one. Full method and family-wide result in
 remains the register-identity + code-motion-filler class already
 documented above, unaffected by this screen.
 
-**Also: `CopyPolyVtx4` (this function's own `CopyPolyVtx4` call, described
+**Also: `FillRVectors4` (this function's own `FillRVectors4` call, described
 above/in this report's earlier sections as "also stalled this unit") is now
-MATCHED (35/35), round 20 — see `CopyPolyVtx4.md`. Its stall was a wrong
+MATCHED (35/35), round 20 — see `FillRVectors4.md`. Its stall was a wrong
 SOURCE SHAPE (an unnecessary whole-function raw-register `__asm__`
 transcription of what turned out to be ordinary struct-copy C, one array
-element past what `CopyPolyVtx3` already handles), not a residue of this
+element past what `FillRVectors3` already handles), not a residue of this
 family's own register-identity/delay-slot-filler class. This function's own
-remaining residue is unaffected — `CopyPolyVtx4` is called via ordinary
+remaining residue is unaffected — `FillRVectors4` is called via ordinary
 `jal`, and the whole-image build is `build exit=0` after the retype, so
 nothing about this function's own call site needed to change.**
 
@@ -455,3 +455,13 @@ This function's own discriminator: the splice arm returns
 `prim + 0x24` = `sizeof(POLY_G4)`, and the calls arm falls straight
 into `jal RCpolyG4`. `prim`/`ctx` match the parameter names code_8220_b's
 own `extern void *SubmitPolyG4(void *prim, void *ctx);` view already used.
+
+## Round 91 polish (bravo)
+
+Retyped with Sony's structs like the rest of the family; SubmitPolyF3's
+report has the details (POLY_*, DIVPOLYGON3/4, RVECTOR, addPrim, Sony's
+RCpoly* prototype, the renamed `gDivPolygon3`/`gDivPolygon4`). Byte-identical
+on the first build. The field reads, for this primitive:
+
+RVECTOR `pad` from `pad1`, `pad1`, `pad2`, `pad3`; `c` from `r0`..`r3`.
+Returns `prim + 1` (0x24).

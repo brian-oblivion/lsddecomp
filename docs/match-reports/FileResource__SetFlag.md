@@ -1,6 +1,6 @@
 # FileResource__SetFlag
 
-> Renamed from `FileResource__SetFlag` on 2026-09-26 (tools/rename.py). Address 0x80026c88.
+> Renamed from `Class6D430__SetFlag` on 2026-09-26 (tools/rename.py). Address 0x80026c88.
 
 > Renamed from `func_80026C88` on 2026-09-18 (tools/rename.py). Address 0x80026c88.
 

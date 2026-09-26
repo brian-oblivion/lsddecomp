@@ -1,6 +1,6 @@
 # FileResource__DestroyCdReadDriver -- MATCHED (14/14 words)
 
-> Renamed from `FileResource__DestroyCdReadDriver` on 2026-09-26 (tools/rename.py). Address 0x800288e0.
+> Renamed from `Class6D430__DestroyCdReadDriver` on 2026-09-26 (tools/rename.py). Address 0x800288e0.
 
 > Renamed from `func_800288E0` on 2026-09-21 (tools/rename.py). Address 0x800288e0.
 

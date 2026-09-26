@@ -1,6 +1,6 @@
 # GetFileResourceMethods
 
-> Renamed from `GetFileResourceMethods` on 2026-09-26 (tools/rename.py). Address 0x80026c9c.
+> Renamed from `GetClass6D430Methods` on 2026-09-26 (tools/rename.py). Address 0x80026c9c.
 
 > Renamed from `func_80026C9C` on 2026-09-18 (tools/rename.py). Address 0x80026c9c.
 

@@ -226,7 +226,7 @@ The corrected, LINKABLE snapshot (identical to what's live in
 
 ```c
 #if 0
-/* A 2-s16 pair (alignment 2, not 4) -- see UpdatePolyBBoxAndCull's stall report for
+/* A 2-s16 pair (alignment 2, not 4) -- see FlagLargePolyForDivide's stall report for
  * why this is needed even at accidentally-4-aligned offsets. */
 typedef struct {
     s16 x, y;
@@ -250,8 +250,8 @@ void SubmitPolyGT4(void *arg0, void *arg1) {
         ((OtTag *)self)->addr = (*(OtTag **)(prim + 0x30))->addr;
         (*(OtTag **)(prim + 0x30))->addr = (u32)self;
     } else {
-        FillRCPolyHeader(gPolySubmitTableQuad, prim, self + 0x4, 1, *(u16 *)(self + 0xE), *(u16 *)(self + 0x1A));
-        CopyPolyVtx4(prim + 0x94, prim + 0xA4, self + 0x8, self + 0x14,
+        FillDivPolygonHeader(gDivPolygon4, prim, self + 0x4, 1, *(u16 *)(self + 0xE), *(u16 *)(self + 0x1A));
+        FillRVectors4(prim + 0x94, prim + 0xA4, self + 0x8, self + 0x14,
                       self + 0x20, self + 0x2C);
 
         *(u16 *)(*(u8 **)(prim + 0x94) + 0xA) = *(u16 *)(self + 0x26);
@@ -269,7 +269,7 @@ void SubmitPolyGT4(void *arg0, void *arg1) {
         *(u16 *)(*(u8 **)(prim + 0x9C) + 0x8) = *(u16 *)(self + 0x24);
         *(u16 *)(*(u8 **)(prim + 0xA0) + 0x8) = *(u16 *)(self + 0x30);
 
-        RCpolyGT4(self, gPolySubmitTableQuad);
+        RCpolyGT4(self, gDivPolygon4);
     }
 }
 #endif
@@ -282,7 +282,7 @@ already included by the unit.)
 
 Unit: `src/code_8220_c.c`. Eighth and final sibling of the
 `SubmitPolyF3` OT-splice-or-calls family, and the largest (Gouraud-quad
-flavor: `FillRCPolyHeader` with `a3=1`, `CopyPolyVtx4` quad copy, 4 output
+flavor: `FillDivPolygonHeader` with `a3=1`, `FillRVectors4` quad copy, 4 output
 records, two full passes of `u16` widen-stores). Calls `func_8001C474`
 (Psy-Q SDK, same `asm/psyq_rcpolygt3.s` file as `func_8001BFD4`).
 
@@ -302,7 +302,7 @@ records, two full passes of `u16` widen-stores). Calls `func_8001C474`
 > discusses the rename is fine and is deliberately not marked.
 
 #if 0
-/* A 2-s16 pair (alignment 2, not 4) -- see UpdatePolyBBoxAndCull's stall report for
+/* A 2-s16 pair (alignment 2, not 4) -- see FlagLargePolyForDivide's stall report for
  * why this is needed even at accidentally-4-aligned offsets. */
 typedef struct {
     s16 x, y;
@@ -322,8 +322,8 @@ void SubmitPolyGT4(void *arg0, void *arg1)
             *head1 = (*head1 & 0xFF000000) | ((u32)self & 0xFFFFFF);
         }
     } else {
-        FillRCPolyHeader(gPolySubmitTableQuad, prim, self + 0x4, 1, *(u16 *)(self + 0xE), *(u16 *)(self + 0x1A));
-        CopyPolyVtx4(prim + 0x94, prim + 0xA4, self + 0x8, self + 0x14, self + 0x20, self + 0x2C);
+        FillDivPolygonHeader(gDivPolygon4, prim, self + 0x4, 1, *(u16 *)(self + 0xE), *(u16 *)(self + 0x1A));
+        FillRVectors4(prim + 0x94, prim + 0xA4, self + 0x8, self + 0x14, self + 0x20, self + 0x2C);
 
         *(u16 *)(*(u8 **)(prim + 0x94) + 0xA) = *(u16 *)(self + 0x26);
         *(u16 *)(*(u8 **)(prim + 0x98) + 0xA) = *(u16 *)(self + 0x26);
@@ -340,7 +340,7 @@ void SubmitPolyGT4(void *arg0, void *arg1)
         *(u16 *)(*(u8 **)(prim + 0x9C) + 0x8) = *(u16 *)(self + 0x24);
         *(u16 *)(*(u8 **)(prim + 0xA0) + 0x8) = *(u16 *)(self + 0x30);
 
-        func_8001C474(self, gPolySubmitTableQuad);
+        func_8001C474(self, gDivPolygon4);
     }
 }
 #endif
@@ -451,14 +451,14 @@ work list, not just this one. Full method and family-wide result in
 remains the register-identity + code-motion-filler class already
 documented above, unaffected by this screen.
 
-**Also: `CopyPolyVtx4` (this function's own `CopyPolyVtx4` call, described
+**Also: `FillRVectors4` (this function's own `FillRVectors4` call, described
 above/in this report's earlier sections as "also stalled this unit") is now
-MATCHED (35/35), round 20 — see `CopyPolyVtx4.md`. Its stall was a wrong
+MATCHED (35/35), round 20 — see `FillRVectors4.md`. Its stall was a wrong
 SOURCE SHAPE (an unnecessary whole-function raw-register `__asm__`
 transcription of what turned out to be ordinary struct-copy C, one array
-element past what `CopyPolyVtx3` already handles), not a residue of this
+element past what `FillRVectors3` already handles), not a residue of this
 family's own register-identity/delay-slot-filler class. This function's own
-remaining residue is unaffected — `CopyPolyVtx4` is called via ordinary
+remaining residue is unaffected — `FillRVectors4` is called via ordinary
 `jal`, and the whole-image build is `build exit=0` after the retype, so
 nothing about this function's own call site needed to change.**
 
@@ -526,3 +526,14 @@ This function's own discriminator: the splice arm returns
 `prim + 0x34` = `sizeof(POLY_GT4)`, and the calls arm falls straight
 into `jal RCpolyGT4`. `prim`/`ctx` match the parameter names code_8220_b's
 own `extern void *SubmitPolyGT4(void *prim, void *ctx);` view already used.
+
+## Round 91 polish (bravo)
+
+Retyped with Sony's structs like the rest of the family; SubmitPolyF3's
+report has the details (POLY_*, DIVPOLYGON3/4, RVECTOR, addPrim, Sony's
+RCpoly* prototype, the renamed `gDivPolygon3`/`gDivPolygon4`). Byte-identical
+on the first build. The field reads, for this primitive:
+
+`clut`/`tpage` to the header; RVECTOR `pad` from `pad2`, `pad2`, `pad3`,
+`pad3`; `c` from `r0`..`r3`; `uv` from `u0v0`..`u3v3`. Returns `prim + 1`
+(0x34).

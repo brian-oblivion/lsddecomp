@@ -1,6 +1,6 @@
 # FileResource__InstallCdReadDriver -- MATCHED (18/18 words)
 
-> Renamed from `FileResource__InstallCdReadDriver` on 2026-09-26 (tools/rename.py). Address 0x80028898.
+> Renamed from `Class6D430__InstallCdReadDriver` on 2026-09-26 (tools/rename.py). Address 0x80028898.
 
 > Renamed from `func_80028898` on 2026-09-21 (tools/rename.py). Address 0x80028898.
 

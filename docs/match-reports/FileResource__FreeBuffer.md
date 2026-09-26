@@ -1,6 +1,6 @@
 # FileResource__FreeBuffer
 
-> Renamed from `FileResource__FreeBuffer` on 2026-09-26 (tools/rename.py). Address 0x80026c20.
+> Renamed from `Class6D430__FreeBuffer` on 2026-09-26 (tools/rename.py). Address 0x80026c20.
 
 > Renamed from `func_80026C20` on 2026-09-18 (tools/rename.py). Address 0x80026c20.
 

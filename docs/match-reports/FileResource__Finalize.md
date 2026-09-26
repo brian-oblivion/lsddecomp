@@ -1,6 +1,6 @@
 # FileResource__Finalize
 
-> Renamed from `FileResource__Finalize` on 2026-09-26 (tools/rename.py). Address 0x80026ab4.
+> Renamed from `Class6D430__Finalize` on 2026-09-26 (tools/rename.py). Address 0x80026ab4.
 
 > Renamed from `FileResource__Destroy` on 2026-09-25 (tools/rename.py). Address 0x80026ab4.
 

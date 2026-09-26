@@ -145,7 +145,7 @@ typedef struct {
 extern s8 D_8008A82C[3];
 extern void *GsOUT_PACKET_P;
 
-extern void InitVtxRecordPtrs(void *dst, void *table, s32 count);
+extern void InitDivPolygonPtrs(void *dst, void *table, s32 count);
 extern void StoreSxyPolyFT4(void *dst, s32 storeFirst3);
 extern void StoreSxyPolyGT4(void *dst, s32 storeFirst3);
 
@@ -221,8 +221,8 @@ void func_80018464(void *objIn, void *otSrc, s32 otShift, void *ctxIn) {
 
     *(void **)(ctx + 0x0) = *(void **)((u8 *)otSrc + 0x4);
     *(s32 *)(ctx + 0x4) = otShift;
-    InitVtxRecordPtrs(ctx + 0x88, gPolySubmitTableTri, 3);
-    InitVtxRecordPtrs(ctx + 0x94, gPolySubmitTableQuad, 4);
+    InitDivPolygonPtrs(ctx + 0x88, gDivPolygon3, 3);
+    InitDivPolygonPtrs(ctx + 0x94, gDivPolygon4, 4);
 
     remaining = *(s32 *)(*(u8 **)(obj + 0x8) + 0x14);
     list = *(u8 **)(*(u8 **)(obj + 0x8) + 0x10);
@@ -714,7 +714,7 @@ void SetupPrimCode(void *prim, void *ctx) {
  * Z goes into the sort slot at +0x14 of the three per-vertex records the
  * context lists at +0x88/+0x8C/+0x90, `storeSxy` writes the screen XY into
  * `prim` at that primitive type's own offsets (one of the StoreSxyPoly**
- * leaves at the bottom of this file), and UpdatePolyBBoxAndCull computes the screen
+ * leaves at the bottom of this file), and FlagLargePolyForDivide computes the screen
  * bounding box over the 3 vertices. Returns 0 drawn, 1 culled.
  *
  * `prim` is only ever handed straight through, so it stays void * here.
@@ -738,7 +738,7 @@ s32 ProjectTriFace(void *prim, u8 *ctx, u16 idx0, u16 idx1, u16 idx2, void (*sto
         gte_stsz3(p0, p1, p2);
     }
     storeSxy(prim);
-    UpdatePolyBBoxAndCull(ctx, 3);
+    FlagLargePolyForDivide(ctx, 3);
     return 0;
 fail:
     return 1;
@@ -786,7 +786,7 @@ s32 ProjectQuadFace(void *prim, u8 *ctx, u16 idx0, u16 idx1, u16 idx2, u16 idx3,
 
     gte_stsxy2(ctx + 0x6c);
 
-    UpdatePolyBBoxAndCull(ctx, 4);
+    FlagLargePolyForDivide(ctx, 4);
     return 0;
 fail:
     return 1;

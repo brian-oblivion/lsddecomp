@@ -93,7 +93,7 @@ built=00ff053c`; the "missing filler" residue at word 21 still reads
 `retail=28002226 built=00000000` — `addiu $v0,$s1,0x28`). `git status
 --porcelain` empty after revert. Checked the else-branch disassembly line by
 line against this report's align-4-refined offset formula and against the
-actual `CopyPolyVtx4`/field-store arguments used (0x8/0x10/0x18/0x20 only) —
+actual `FillRVectors4`/field-store arguments used (0x8/0x10/0x18/0x20 only) —
 confirmed `self+0x28` is referenced NOWHERE in either branch of this
 function's own `.s`, so the filler really is a value retail computes and
 never uses anywhere, not a mistranscribed real argument. Same residue class
@@ -194,8 +194,8 @@ void SubmitPolyFT4(void *arg0, void *arg1) {
         ((OtTag *)arg0)->addr = (*(OtTag **)((u8 *)arg1 + 0x30))->addr;
         (*(OtTag **)((u8 *)arg1 + 0x30))->addr = (u32)arg0;
     } else {
-        FillRCPolyHeader(gPolySubmitTableQuad, arg1, (u8 *)arg0 + 0x4, 1, *(u16 *)((u8 *)arg0 + 0xE), *(u16 *)((u8 *)arg0 + 0x16));
-        CopyPolyVtx4((u8 *)arg1 + 0x94, (u8 *)arg1 + 0xA4, (u8 *)arg0 + 0x8,
+        FillDivPolygonHeader(gDivPolygon4, arg1, (u8 *)arg0 + 0x4, 1, *(u16 *)((u8 *)arg0 + 0xE), *(u16 *)((u8 *)arg0 + 0x16));
+        FillRVectors4((u8 *)arg1 + 0x94, (u8 *)arg1 + 0xA4, (u8 *)arg0 + 0x8,
                       (u8 *)arg0 + 0x10, (u8 *)arg0 + 0x18, (u8 *)arg0 + 0x20);
 
         *(u16 *)(*(u8 **)((u8 *)arg1 + 0x94) + 0xA) = *(u16 *)((u8 *)arg0 + 0x1E);
@@ -207,7 +207,7 @@ void SubmitPolyFT4(void *arg0, void *arg1) {
         *(u16 *)(*(u8 **)((u8 *)arg1 + 0x9C) + 0x8) = *(u16 *)((u8 *)arg0 + 0x1C);
         *(u16 *)(*(u8 **)((u8 *)arg1 + 0xA0) + 0x8) = *(u16 *)((u8 *)arg0 + 0x24);
 
-        RCpolyFT4(arg0, gPolySubmitTableQuad);
+        RCpolyFT4(arg0, gDivPolygon4);
     }
 }
 #endif
@@ -220,8 +220,8 @@ already included by the unit.)
 
 Unit: `src/code_8220_c.c`. Sixth sibling of the `SubmitPolyF3` OT-splice-
 or-calls family. Calls-branch shape combines `SubmitPolyFT3`'s
-`FillRCPolyHeader(...,1,self->0xE,self->0x16)` argument pattern with
-`SubmitPolyG4`'s quad (4-record) output and `CopyPolyVtx4` call; tail
+`FillDivPolygonHeader(...,1,self->0xE,self->0x16)` argument pattern with
+`SubmitPolyG4`'s quad (4-record) output and `FillRVectors4` call; tail
 copies are two full passes of four `u16` widen-stores (into `+0xA` from a
 shared `self+0x1E`, then into `+0x8` from four different `self` offsets).
 Calls `func_8001BAB4` (Psy-Q SDK, `asm/psyq_rcpolyft3.s` — a different SDK
@@ -258,8 +258,8 @@ void SubmitPolyFT4(void *arg0, void *arg1)
             *head1 = (*head1 & 0xFF000000) | ((u32)self & 0xFFFFFF);
         }
     } else {
-        FillRCPolyHeader(gPolySubmitTableQuad, prim, self + 0x4, 1, *(u16 *)(self + 0xE), *(u16 *)(self + 0x16));
-        CopyPolyVtx4(prim + 0x94, prim + 0xA4, self + 0x8, self + 0x10, self + 0x18, self + 0x20);
+        FillDivPolygonHeader(gDivPolygon4, prim, self + 0x4, 1, *(u16 *)(self + 0xE), *(u16 *)(self + 0x16));
+        FillRVectors4(prim + 0x94, prim + 0xA4, self + 0x8, self + 0x10, self + 0x18, self + 0x20);
 
         *(u16 *)(*(u8 **)(prim + 0x94) + 0xA) = *(u16 *)(self + 0x1E);
         *(u16 *)(*(u8 **)(prim + 0x98) + 0xA) = *(u16 *)(self + 0x1E);
@@ -270,7 +270,7 @@ void SubmitPolyFT4(void *arg0, void *arg1)
         *(u16 *)(*(u8 **)(prim + 0x9C) + 0x8) = *(u16 *)(self + 0x1C);
         *(u16 *)(*(u8 **)(prim + 0xA0) + 0x8) = *(u16 *)(self + 0x24);
 
-        func_8001BAB4(self, gPolySubmitTableQuad);
+        func_8001BAB4(self, gDivPolygon4);
     }
 }
 #endif
@@ -323,7 +323,7 @@ changes above before spending anything on register-level reshaping.
 ## RUNNER PASS, round 13 continued: applied, instruction-exact, refined the offset formula
 
 Applied both changes with this function's own offsets (gouraud-quad flavor:
-`FillRCPolyHeader` a3=1, `CopyPolyVtx4`, `func_8001BAB4`). One attempt, 80/88
+`FillDivPolygonHeader` a3=1, `FillRVectors4`, `func_8001BAB4`). One attempt, 80/88
 words, confirmed via `asm-differ` zero-inserted/zero-deleted. Calls branch
 byte-exact. Remaining residue: `$a2`/`$a1` register identity plus one
 missing `addiu $v0,$s1,0x28`.
@@ -369,14 +369,14 @@ work list, not just this one. Full method and family-wide result in
 remains the register-identity + code-motion-filler class already
 documented above, unaffected by this screen.
 
-**Also: `CopyPolyVtx4` (this function's own `CopyPolyVtx4` call, described
+**Also: `FillRVectors4` (this function's own `FillRVectors4` call, described
 above/in this report's earlier sections as "also stalled this unit") is now
-MATCHED (35/35), round 20 — see `CopyPolyVtx4.md`. Its stall was a wrong
+MATCHED (35/35), round 20 — see `FillRVectors4.md`. Its stall was a wrong
 SOURCE SHAPE (an unnecessary whole-function raw-register `__asm__`
 transcription of what turned out to be ordinary struct-copy C, one array
-element past what `CopyPolyVtx3` already handles), not a residue of this
+element past what `FillRVectors3` already handles), not a residue of this
 family's own register-identity/delay-slot-filler class. This function's own
-remaining residue is unaffected — `CopyPolyVtx4` is called via ordinary
+remaining residue is unaffected — `FillRVectors4` is called via ordinary
 `jal`, and the whole-image build is `build exit=0` after the retype, so
 nothing about this function's own call site needed to change.**
 
@@ -434,3 +434,13 @@ This function's own discriminator: the splice arm returns
 `prim + 0x28` = `sizeof(POLY_FT4)`, and the calls arm falls straight
 into `jal RCpolyFT4`. `prim`/`ctx` match the parameter names code_8220_b's
 own `extern void *SubmitPolyFT4(void *prim, void *ctx);` view already used.
+
+## Round 91 polish (bravo)
+
+Retyped with Sony's structs like the rest of the family; SubmitPolyF3's
+report has the details (POLY_*, DIVPOLYGON3/4, RVECTOR, addPrim, Sony's
+RCpoly* prototype, the renamed `gDivPolygon3`/`gDivPolygon4`). Byte-identical
+on the first build. The field reads, for this primitive:
+
+`clut`/`tpage` to the header; RVECTOR `pad` from `pad1` for all four; `uv`
+from `u0v0`..`u3v3`. Returns `prim + 1` (0x28).

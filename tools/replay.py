@@ -69,30 +69,56 @@ def mapping(kind, a, b):
     return {b: a}, True              # unitfile merge A B: B's name became A
 
 
-def leftovers(m, unit):
+_TIP_LINES = {}
+
+
+def own_lines(tip, p):
+    """The lines of `p` as the side that ran a command left them at its tip.
+    Such a line kept its OLD token on purpose: the side's own tool skipped it
+    (a report's `> Renamed from OLD`, a quoted command, a history table), so
+    replay must not rewrite it. Only the OTHER side's text is replayed onto
+    (round 91: the charlie and bravo merges rewrote their own reports'
+    history lines)."""
+    if tip is None:
+        return set()
+    key = (tip, p)
+    if key not in _TIP_LINES:
+        r = subprocess.run(["git", "show", f"{tip}:{p.relative_to(ROOT).as_posix()}"], cwd=ROOT,
+                           capture_output=True, text=True, errors="replace")
+        _TIP_LINES[key] = set(r.stdout.split("\n")) if r.returncode == 0 else set()
+    return _TIP_LINES[key]
+
+
+def leftovers(m, unit, tip=None):
     rxs = [re.compile(rf"(?<![A-Za-z0-9_]){re.escape(o)}(?![A-Za-z0-9_])") for o in m]
     hits = []
     for p in [q for q in rename.text_files() if q.exists()] + [unitfile.WARNINGS]:
         text = p.read_text(errors="replace")
         keep = unitfile.history_spans(text) if unit and p.parent.name == "match-reports" else []
+        mine = own_lines(tip, p)
+        lines = text.split("\n")
         for rx in rxs:
             for x in rx.finditer(text):
-                if not any(s <= x.start() < e for s, e in keep):
-                    hits.append(f"{p.relative_to(ROOT)}:{text.count(chr(10), 0, x.start()) + 1}")
+                n = text.count(chr(10), 0, x.start())
+                if not any(s <= x.start() < e for s, e in keep) and lines[n] not in mine:
+                    hits.append(f"{p.relative_to(ROOT)}:{n + 1}")
     return hits
 
 
-def rewrite_symbols(m):
+def rewrite_symbols(m, tip=None):
     """rename.py's rewrite: code whole, prose line by line, leaving a line that
-    already names NEW (it is ABOUT the rename, round 71)."""
+    already names NEW (it is ABOUT the rename, round 71) and a line the side
+    that ran the command left as it is (own_lines)."""
     for p in [q for q in rename.text_files() if q.exists()] + [unitfile.WARNINGS]:
         t = p.read_text(errors="replace")
         o = t
         prose = not p.relative_to(ROOT).as_posix().startswith(("src/", "include/", "config/"))
+        mine = own_lines(tip, p)
         for old, new in sorted(m.items(), key=lambda kv: -len(kv[0])):
             rx = re.compile(rf"(?<![A-Za-z0-9_]){re.escape(old)}(?![A-Za-z0-9_])")
             nx = re.compile(rf"(?<![A-Za-z0-9_]){re.escape(new)}(?![A-Za-z0-9_])")
-            o = "\n".join(l if prose and nx.search(l) else rx.sub(new, l) for l in o.split("\n"))
+            o = "\n".join(l if (prose and nx.search(l)) or l in mine else rx.sub(new, l)
+                          for l in o.split("\n"))
         if o != t:
             p.write_text(o)
 
@@ -153,19 +179,20 @@ def main():
             merge_ledger()
     if subprocess.run(["git", "grep", "-q", "-I", "-e", "^<<<<<<< ", "--", "."], cwd=ROOT).returncode == 0:
         sys.exit("FATAL: conflict markers in the tree; resolve each hunk (main's side) first")
-    cmds = [c for r in rngs for c in commands(r)]
+    # Each command runs with the tip of the side that ran it (`A..B`: B).
+    cmds = [(c, r.split("..")[-1]) for r in rngs for c in commands(r)]
     print(f"replay {' '.join(rngs)}: {len(cmds)} rename command(s)")
     total = 0
-    for kind, x, y in cmds:
+    for (kind, x, y), tip in cmds:
         m, unit = mapping(kind, x, y)
-        hits = leftovers(m, unit) if m else []
+        hits = leftovers(m, unit, tip) if m else []
         total += len(hits)
         print(f"  {kind} {x} {y}: {len(hits)} leftover(s)" + "".join(f"\n      {h}" for h in hits[:12]))
         if hits and not a.dry_run:
             if unit:
                 unitfile.rewrite_tokens(m)
             else:
-                rewrite_symbols(m)
+                rewrite_symbols(m, tip)
         if m and not a.dry_run:
             plan.ledger_rename(m, drop_duplicates=kind == "unitfile merge")
     if a.dry_run or not total:
