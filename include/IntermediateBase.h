@@ -7,7 +7,7 @@
  * IntermediateBase -- class id 0x30, method table gIntermediateBaseMethods: a
  * BasicClass subclass that runs one attached job to a result. Methods in
  * src/code_2cc8c_c.c. Two classes derive from it (`typeviews.py --tree`):
- * TaskCore (0x130, gTaskCoreMethods: StreamTaskObj, Class86B60, GraphRoomObj
+ * TaskCore (0x130, gTaskCoreMethods: StreamTaskObj, Class86B60, GraphRoom
  * below it) and Class86668 (0x230: D_800865C8's Obj865C8 and D_80087034's ObjM
  * below it). It is abstract: +0x04C, +0x050 and +0x058 are NULL in its own
  * table, and init/deinit call the first two. It has no allocator; the object

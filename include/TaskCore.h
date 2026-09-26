@@ -11,7 +11,7 @@
  * on). The object is 0xA4 bytes (New_TaskCore). Three classes derive from
  * it, each ctor calling TaskCore__TaskCore first (`typeviews.py --tree`):
  * StreamTaskObj (0x1130, gStreamTaskObjMethods, code_2c054), Class86B60
- * (0x1F130, class_3bb8c_c/_d) and GraphRoomObj (0x2F130, class_3bb8c_t).
+ * (0x1F130, class_3bb8c_c/_d) and GraphRoom (0x2F130, include/GraphRoom.h).
  *
  * Construction, ctor(target, soundBankPath, sound): the base ctor, then
  * setTarget(target), `sound` = New_VabStreamObj(soundBankPath) when a path
@@ -51,11 +51,10 @@
  * straightforward and byte-identical in round 84, with one contradiction
  * left standing: its +0x044 override, StreamTaskObj__Configure, takes five
  * arguments where IntermediateBase's init takes (args, mode). Class86B60
- * (include/class_3bb8c.h) and GraphRoomObj (src/class_3bb8c_t.c) keep their
- * own views: Class86B60's names +0x058 `state` (this class's activeSlot)
- * and types +0x060 a struct pointer (this class's s32 *slotCounts), and
- * GraphRoomObj's ctor returns a value where INTERMEDIATEBASE_SLOTS fixes the
- * ctor's return type to void. Their objects extend this layout all the same.
+ * (include/class_3bb8c.h) keeps its own view: it names +0x058 `state` (this
+ * class's activeSlot) and types +0x060 a struct pointer (this class's
+ * s32 *slotCounts). GraphRoom (include/GraphRoom.h, round 87) expands these
+ * macros; its ctor is void like every other.
  *
  * IntermediateBase's onInit slot is (self, s32, s32, s32), from init's
  * call; TaskCore__OnInit and StreamTaskObj's override take self alone, and
@@ -121,7 +120,7 @@ struct TaskCoreTarget {
     /* +0x0C8 */ void *slotC8;                                   /* NULL */                        \
     /* +0x0CC */ void *slotCC;                                   /* NULL */                        \
     /* +0x0D0 */ void *slotD0;                                   /* NULL */                        \
-    /* +0x0D4 */ void (*setSubHandle)(Self *self, const char *path, BasicClass *handle); /* TaskCore__SetSubHandle; GraphRoomObj passes "ETC\HGRAPH.TIM" */ \
+    /* +0x0D4 */ void (*setSubHandle)(Self *self, const char *path, BasicClass *handle); /* TaskCore__SetSubHandle; GraphRoom passes "ETC\HGRAPH.TIM" */ \
     /* +0x0D8 */ void (*setTarget)(Self *self, TaskCoreTarget *target); /* TaskCore__SetTarget */  \
     /* +0x0DC */ void (*releaseTarget)(Self *self);              /* TaskCore__ReleaseTarget */     \
     /* +0x0E0 */ void (*updateSlotElements)(Self *self, void *parent); /* TaskCore__UpdateSlotElements */ \
@@ -145,7 +144,7 @@ struct TaskCoreTarget {
 #define TASKCORE_FIELDS(Methods)                                                                   \
     INTERMEDIATEBASE_FIELDS(Methods);                                                              \
     /* +0x028 */ s32 unk28;             /* reset: 3; onInit: the viewport's +0x048 (Viewport__SetOtLength) */ \
-    /* +0x02C */ s32 unk2C;             /* reset: 0x12C (GraphRoomObj 0x190); onInit: viewport +0x04C (SetUnk44) */ \
+    /* +0x02C */ s32 unk2C;             /* reset: 0x12C (GraphRoom 0x190); onInit: viewport +0x04C (SetUnk44) */ \
     /* +0x030 */ s32 unk30;             /* reset: 0x40; onInit: viewport +0x050 (SetUnk48) */      \
     /* +0x034 */ s32 unk34;             /* reset: 1; nonzero: onDeinit hands unk93 to initArgs->unk0's +0x078 */ \
     /* +0x038 */ s32 result;            /* TaskCore__Init returns it; onInit 0, setState(6) 1 */   \

@@ -22,7 +22,7 @@
  *    GsDOBJ2 one.
  *  - Its users: TaskCore's listView (the frame behind a scrolled list:
  *    attached at the list's position, then setSize(40, rows * 12)),
- *    GraphRoomObj's 100 plotted dots, and the style decoration boxes of
+ *    GraphRoom's 100 plotted dots, and the style decoration boxes of
  *    class_3bb8c_m/_n (class_3bb8c_m makes its box semi-transparent:
  *    setSemiTrans(1), setSemiTransRate(0)).
  *
