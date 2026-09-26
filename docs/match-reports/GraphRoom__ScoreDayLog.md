@@ -1,4 +1,6 @@
-# GraphRoomObj__ScoreDayLog -- MATCHED (56/56 words, byte-exact)
+# GraphRoom__ScoreDayLog -- MATCHED (56/56 words, byte-exact)
+
+> Renamed from `GraphRoomObj__ScoreDayLog` on 2026-09-26 (tools/rename.py). Address 0x800585b4.
 
 > Renamed from `func_800585B4` on 2026-09-24 (tools/rename.py). Address 0x800585b4.
 
@@ -123,7 +125,7 @@ extern s16 D_80087BD4[4];
  * 41 confirmed both empirically, byte-exact with them, off by dozens of
  * words without). Do not "simplify" this without re-running
  * ./build-and-verify.sh. */
-s32 GraphRoomObj__ScoreDayLog(D_80087AACObj *self, D_80087AACUnkA4Result *log)
+s32 GraphRoom__ScoreDayLog(D_80087AACObj *self, D_80087AACUnkA4Result *log)
 {
     u32 i;
     s16 *days;
@@ -225,9 +227,13 @@ byte count.
 
 ## Naming (round 75, track 3)
 
-**`GraphRoomObj__ScoreDayLog`** -- tier B (name carried over verbatim from
-its round-41 provenance, `func_800585B4` -> `GraphRoomObj__ScoreDayLog` via
+**`GraphRoom__ScoreDayLog`** -- tier B (name carried over verbatim from
+its round-41 provenance, `func_800585B4` -> `GraphRoom__ScoreDayLog` via
 `tools/rename.py` this round). Scans the day-log's 365-entry ring for four
 fixed day-type targets (`D_80087BD4`) and records, per target, the most
 recent matching day index into `matchedDayIndices` -- exactly "scoring"
-the log against those four targets, feeding `GraphRoomObj__TickHighlight`.
+the log against those four targets, feeding `GraphRoom__TickHighlight`.
+
+## Track 4 (2026-09-26, round 87, alpha): renamed `GraphRoomObj__ScoreDayLog` -> `GraphRoom__ScoreDayLog`
+
+The class is unified in `include/GraphRoom.h` (class id 0x2F130, table `gGraphRoomMethods`, parent TaskCore; `tools/classtable.py gGraphRoomMethods --vs gTaskCoreMethods`). The class name drops round 75's `Obj` suffix (FINISHING-PLAN track 4 step 2); every function prefix moved with it. The unit's GraphRoomObj/GraphRoomMethods views are deleted and `self` is `GraphRoom *`; inherited fields and slots carry TaskCore's and IntermediateBase's names. Zero bytes changed (build-and-verify OK, typeviews --warnings 0 new). Prefix only; not a slot (called by PopulateGraphPoints alone). The log is the DreamSys save block: `days` is moodPreviousDays, `scored` (+0x467 of the block, DreamSys +0x5DF, the last byte of DreamSys's unknown_values_0x5d8) is renamed graphScored in the unit's record. The round-24 "not DreamSys" note compared the offsets against DreamSys's start rather than saveMagic (+0x178).

@@ -1,16 +1,18 @@
-# GraphRoomObj__GraphRoomObj -- MATCHED (44/44)
+# GraphRoom__GraphRoom -- MATCHED (44/44)
+
+> Renamed from `GraphRoomObj__GraphRoomObj` on 2026-09-26 (tools/rename.py). Address 0x80057fc8.
 
 > Renamed from `func_80057FC8` on 2026-09-24 (tools/rename.py). Address 0x80057fc8.
 
 Unit: `src/class_3bb8c_t.c`. Class: `gGraphRoomMethods`, own vtable slot `+0x008`
 -- THIS is `gGraphRoomMethods`'s own ctor (resolved via `tools/classtable.py
-gGraphRoomMethods`), the callee of this unit's own `New_GraphRoomObj`'s `ctor(...)`
+gGraphRoomMethods`), the callee of this unit's own `New_GraphRoom`'s `ctor(...)`
 call.
 
 ## Signature
 
 ```c
-void *GraphRoomObj__GraphRoomObj(D_80087AACObj *self, void *arg1);
+void *GraphRoom__GraphRoom(D_80087AACObj *self, void *arg1);
 ```
 
 ## Body
@@ -18,7 +20,7 @@ void *GraphRoomObj__GraphRoomObj(D_80087AACObj *self, void *arg1);
 ```c
 extern char D_8001176C[];
 
-void *GraphRoomObj__GraphRoomObj(D_80087AACObj *self, void *arg1) {
+void *GraphRoom__GraphRoom(D_80087AACObj *self, void *arg1) {
     Get_vtable_TaskCore()->slot8(self, 0, D_8001176C, 0);
     self->methods = GetGraphRoomMethods();
     self->unk_0x48->methods->slot9C(self->unk_0x48, -1);
@@ -58,12 +60,12 @@ directly at both use sites matched exactly.
 
 ```
 ./build-and-verify.sh   # build exit=0, OK: build matches retail
-tools/funcdiff.py GraphRoomObj__GraphRoomObj   # 44/44
+tools/funcdiff.py GraphRoom__GraphRoom   # 44/44
 ```
 
 ## Naming (round 75, track 3)
 
-**`GraphRoomObj__GraphRoomObj`** -- tier B. `Class__Class` ctor
+**`GraphRoom__GraphRoom`** -- tier B. `Class__Class` ctor
 convention; this IS `GraphRoomObj`'s own vtable slot +0x008
 (`tools/classtable.py gGraphRoomMethods`). Class identity: see
 `src/class_3bb8c_t.c`'s header comment.
@@ -71,3 +73,7 @@ convention; this IS `GraphRoomObj`'s own vtable slot +0x008
 ## Track 4 (2026-09-25, round 84, alpha)
 
 Its up-calls to TaskCore (include/TaskCore.h, track 4 round 84) now go through `Get_vtable_TaskCore()` with `self` upcast to `TaskCore *` and TaskCore's slot names; byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).
+
+## Track 4 (2026-09-26, round 87, alpha): renamed `GraphRoomObj__GraphRoomObj` -> `GraphRoom__GraphRoom`
+
+The class is unified in `include/GraphRoom.h` (class id 0x2F130, table `gGraphRoomMethods`, parent TaskCore; `tools/classtable.py gGraphRoomMethods --vs gTaskCoreMethods`). The class name drops round 75's `Obj` suffix (FINISHING-PLAN track 4 step 2); every function prefix moved with it. The unit's GraphRoomObj/GraphRoomMethods views are deleted and `self` is `GraphRoom *`; inherited fields and slots carry TaskCore's and IntermediateBase's names. Zero bytes changed (build-and-verify OK, typeviews --warnings 0 new). Prefix only. The ctor now returns void: INTERMEDIATEBASE_SLOTS fixes the ctor slot's type, and the tail call it used to return the value of is void resetCounters (+0x040, GraphRoom__Reset); the bytes are the same either way. That call passes `dreamSys` as a second argument (retail loads `$a1` from `$s1`) which the slot does not have, so it casts to `GraphRoomResetCallFn` (no code). The old `unk48->slot9C(-1)` is TaskCore's `sound` (a VabStreamObj) at +0x09C, VabStreamObj__SetPitchOffset (`classtable.py gVabStreamObjMethods`); `slotD8(self, 0)` is `setTarget(self, NULL)`, which this class overrides with BuildGraphPoints. The argument is the DreamSys (see New_GraphRoom), kept as `dreamSys` (+0x0A4, was `dayLog`).

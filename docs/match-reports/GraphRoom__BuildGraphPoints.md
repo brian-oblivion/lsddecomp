@@ -1,4 +1,6 @@
-# GraphRoomObj__BuildGraphPoints — MATCH (56/56 words, whole-image SHA1 confirmed)
+# GraphRoom__BuildGraphPoints — MATCH (56/56 words, whole-image SHA1 confirmed)
+
+> Renamed from `GraphRoomObj__BuildGraphPoints` on 2026-09-26 (tools/rename.py). Address 0x80058228.
 
 > Renamed from `func_80058228` on 2026-09-24 (tools/rename.py). Address 0x80058228.
 
@@ -8,17 +10,17 @@ Unit `class_3bb8c_t`. Byte-exact. History below in arrival order.
 
 Round 19's fourth-pass assignment described this function as "FRESH — no
 prior attempt, no inherited verdict, no preserved body," treating
-`GraphRoomObj__PopulateGraphPoints` as the documented stall. **That is backwards.** This
+`GraphRoom__PopulateGraphPoints` as the documented stall. **That is backwards.** This
 report already existed (committed in `4358700`, "Salvage two in-flight
 bodies...") with a near-complete 52/56 mid-attempt snapshot from runner
-alpha (round 17); `GraphRoomObj__PopulateGraphPoints` is the one with no report file at all
-(`ls docs/match-reports/` confirms only `GraphRoomObj__BuildGraphPoints.md` and
-`GraphRoomObj__ScoreDayLog.md` exist for this unit's three queued functions).
+alpha (round 17); `GraphRoom__PopulateGraphPoints` is the one with no report file at all
+(`ls docs/match-reports/` confirms only `GraphRoom__BuildGraphPoints.md` and
+`GraphRoom__ScoreDayLog.md` exist for this unit's three queued functions).
 `tools/progress.py`'s own `fresh` count for `class_3bb8c_t` (1) is
-correct — it just points at `GraphRoomObj__PopulateGraphPoints`, not this function. Given
+correct — it just points at `GraphRoom__PopulateGraphPoints`, not this function. Given
 this report's near-miss was extremely close and cheap to re-attempt, it
 was worth closing before moving to the genuinely cold function; see this
-round's final summary for the disposition of `GraphRoomObj__PopulateGraphPoints`.
+round's final summary for the disposition of `GraphRoom__PopulateGraphPoints`.
 
 ## What it does
 
@@ -48,7 +50,7 @@ extern u8 D_8008ABB4;
 extern D_8008ABB8Color D_8008ABB8;
 extern D_80087AACEntry *New_BoxFill(void *a0, void *a1, s32 a2);
 
-void GraphRoomObj__BuildGraphPoints(D_80087AACObj *self) {
+void GraphRoom__BuildGraphPoints(D_80087AACObj *self) {
     D_8008ABB8Color rgb;
     s32 i;
 
@@ -141,7 +143,7 @@ Measured by the head, by copying alpha's worktree file into `main`,
 running the full oracle, and restoring:
 
 ```
-GraphRoomObj__BuildGraphPoints: 52/56 words match (file 0x48A28-0x48B08)
+GraphRoom__BuildGraphPoints: 52/56 words match (file 0x48A28-0x48B08)
 ```
 
 ### The residue as originally described (superseded — see above)
@@ -159,7 +161,7 @@ where the build stores at `+0x12`.
 
 ```c
 #if 0
-void GraphRoomObj__BuildGraphPoints(D_80087AACObj *self) {
+void GraphRoom__BuildGraphPoints(D_80087AACObj *self) {
     D_8008ABB8Color rgb;
     s32 i;
 
@@ -190,12 +192,16 @@ staffing mislabeling, fixed the decrement-order bug, MATCHED 56/56.
 
 ## Naming (round 75, track 3)
 
-**`GraphRoomObj__BuildGraphPoints`** -- tier B. Own vtable slot +0x0D8.
+**`GraphRoom__BuildGraphPoints`** -- tier B. Own vtable slot +0x0D8.
 Builds the 100-entry `points` array of small coloured `New_BoxFill`
 objects that the graph plots dream-history onto (see class header
 comment); also allocates the 4-byte `matchedDayIndices` scratch buffer
-`GraphRoomObj__ScoreDayLog` later fills in.
+`GraphRoom__ScoreDayLog` later fills in.
 
 ## Track 4 (2026-09-25, round 85, charlie)
 
 The points are New_BoxFill boxes (include/BoxFill.h): size &D_8008ABAC, colour &D_8008ABB4 then the fading `rgb`, priority 0. Zero bytes.
+
+## Track 4 (2026-09-26, round 87, alpha): renamed `GraphRoomObj__BuildGraphPoints` -> `GraphRoom__BuildGraphPoints`
+
+The class is unified in `include/GraphRoom.h` (class id 0x2F130, table `gGraphRoomMethods`, parent TaskCore; `tools/classtable.py gGraphRoomMethods --vs gTaskCoreMethods`). The class name drops round 75's `Obj` suffix (FINISHING-PLAN track 4 step 2); every function prefix moved with it. The unit's GraphRoomObj/GraphRoomMethods views are deleted and `self` is `GraphRoom *`; inherited fields and slots carry TaskCore's and IntermediateBase's names. Zero bytes changed (build-and-verify OK, typeviews --warnings 0 new). Prefix only. Occupies +0x0D8, TaskCore's `setTarget`, and keeps its own name (step 6: the body sets no target, it builds the 100 BoxFill dots and matchedDayIndices). The ctor reaches it as setTarget(self, NULL).

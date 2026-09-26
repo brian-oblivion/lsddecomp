@@ -262,9 +262,10 @@ s32 Class6D3C8__RunPollTask(PollTaskCtor ctor, void *dreamSys, s32 extra);
  * for Class6D3C8__PollGraphRoomStatus, which comes first). */
 void Class6D3C8__StartGraphRoomStreamTask(Class6D3C8 *self);
 
-/* PollTask constructors, uncarved (not this unit's to write). Called
- * directly (not through any vtable) as Class6D3C8__RunPollTask's `ctor` argument. */
-extern PollTask *New_GraphRoomObj(void *dreamSys);
+/* PollTask constructors (not this unit's to write). Called directly (not
+ * through any vtable) as Class6D3C8__RunPollTask's `ctor` argument.
+ * New_GraphRoom is include/GraphRoom.h's (code_1677c includes it and casts
+ * it to PollTaskCtor). */
 extern PollTask *New_Class86B60(void *dreamSys);
 
 extern s32 GetGraphRoomStreamChannel(s32 *out, s32 a1, s32 a2); /* psyq_memset.s: writes a derived count to *out, returns a separate derived value */
