@@ -147,3 +147,13 @@ polarity and never scheduling.
 ## Naming
 
 `Obj865C8__OnTag2Notify` -- tier B. Occupies +0x084, dispatched by `Obj865C8__OnNotify`'s other tag branch (0x2F230). A `switch` over small integer codes (4, 5-8/0xA, 0xC/0xD) that queries/reconfigures `subD` and sets `eventCode`/`state`; the dispatch shape is clear, the meaning of the tag and its sub-codes is not.
+
+## Track 4 (2026-09-26, round 88)
+
+Obj865C8::unk38 is the game's DreamSys (code_1677c passes
+Class6D3C8::dreamSys to New_Obj865C8), so the SubObjD view is gone and its
+slots are DreamSys's: +0x1B8 endDay, +0x1BC getCinematic. The by-value
+return this body tests is therefore a CinematicCall {bank, entry}; the
+local 8-byte SubObjDPos is replaced by it and `pos.unk2` is `pos.entry`.
+Byte-identical (107/107): the "8 bytes" was read off the stack frame, and
+the 4-byte struct compiles to the same frame.

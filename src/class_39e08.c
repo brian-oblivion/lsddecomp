@@ -4,8 +4,9 @@
 #include "Class869D8.h"
 #include "WBgm.h"
 #include "TimImage.h"
+#include "DreamSys.h"
 
-Obj865C8 *New_Obj865C8(Obj0C *arg1, SubObjD *arg2, s32 arg3)
+Obj865C8 *New_Obj865C8(Obj0C *arg1, DreamSys *arg2, s32 arg3)
 {
     Obj865C8 *self;
 
@@ -17,7 +18,7 @@ Obj865C8 *New_Obj865C8(Obj0C *arg1, SubObjD *arg2, s32 arg3)
     return NULL;
 }
 
-void Obj865C8__Obj865C8(Obj865C8 *self, Obj0C *arg1, SubObjD *arg2, s32 arg3) {
+void Obj865C8__Obj865C8(Obj865C8 *self, Obj0C *arg1, DreamSys *arg2, s32 arg3) {
     LoadRequest req;
     s32 tmp;
 
@@ -40,8 +41,8 @@ void Obj865C8__Obj865C8(Obj865C8 *self, Obj0C *arg1, SubObjD *arg2, s32 arg3) {
     arg1->unkC = (SubObjG *)New_Class866E8(0, 1);
     self->unk38 = arg2;
     self->methods->slot10(self, (Obj4C *)arg2);
-    arg2->methods->slot10C(arg2, self->subB);
-    arg2->methods->slot114(arg2, self->unk44);
+    arg2->methods->setSoundObj(arg2, (s32)self->subB);
+    arg2->methods->slot114(arg2, (s32)self->unk44);
     self->methods->resetState(self);
 }
 
@@ -80,21 +81,21 @@ void Obj865C8__ResetState(Obj865C8 *self) {
 }
 
 void Obj865C8__Init(Obj865C8 *self) {
-    SubObjD *sub = self->unk38;
+    DreamSys *sub = self->unk38;
 
-    sub->methods->slot10(sub, self->unk0C->unk4);
-    sub->methods->slot10(sub, (s32)self->unk0C->unk8);
-    sub->methods->slot110(sub, (s32)self->unk0C->unk10);
+    sub->methods->addChild(sub, (BasicClass *)self->unk0C->unk4);
+    sub->methods->addChild(sub, (BasicClass *)self->unk0C->unk8);
+    sub->methods->setHeightCurve(sub, self->unk0C->unk10);
     GetClass86668Methods()->init((Class86668 *)self, (IntermediateBaseInitArgs *)self->unk0C, 0);
 }
 
 void Obj865C8__Deinit(Obj865C8 *self) {
-    SubObjD *sub = self->unk38;
+    DreamSys *sub = self->unk38;
 
     GetClass86668Methods()->deinit((Class86668 *)self);
-    sub->methods->slot110(sub, 0);
-    sub->methods->slot14(sub, self->unk0C->unk4);
-    sub->methods->slot14(sub, self->unk10);
+    sub->methods->setHeightCurve(sub, 0);
+    sub->methods->removeChild(sub, (BasicClass *)self->unk0C->unk4);
+    sub->methods->removeChild(sub, (BasicClass *)self->unk10);
 }
 
 void Obj865C8__StartSubA(Obj865C8 *self) {
@@ -133,9 +134,9 @@ void Obj865C8__AdvanceState(Obj865C8 *self, s32 arg1, s32 arg2) {
     if (arg2 == 2 && self->state != arg2) {
         switch (self->state) {
         case 1:
-            result = self->unk38->methods->slot1B4(self->unk38);
+            result = self->unk38->methods->startDay(self->unk38);
             if (result < 0) {
-                self->unk38->methods->slot1B8(self->unk38, 0);
+                self->unk38->methods->endDay(self->unk38, 0);
                 self->eventCode = arg2;
                 self->methods->onEventArg(self, 3);
                 return;
@@ -147,7 +148,7 @@ void Obj865C8__AdvanceState(Obj865C8 *self, s32 arg1, s32 arg2) {
         case 3:
             self->unk4C->methods->slot48(self->unk4C);
             self->unk4C->methods->slot4(self->unk4C);
-            result = self->unk38->methods->slot1E0(self->unk38);
+            result = self->unk38->methods->getCurrentStage(self->unk38);
             Obj865C8__EnterState2(self, result);
             break;
         }
@@ -167,29 +168,18 @@ void Obj865C8__Noop7C(void) {
 void Obj865C8__Noop80(void) {
 }
 
-/* Returned BY VALUE from SubObjDMethods::slot1BC. Kept LOCAL to this unit --
- * it encodes only what Obj865C8__OnTag2Notify establishes (8 bytes, an s16 at +2 whose
- * sign selects between two eventCode codes), which is not enough for a sibling to
- * reuse unchanged. */
-struct SubObjDPos {
-    s16 unk0;
-    s16 unk2;
-    s16 unk4;
-    s16 unk6;
-};
-
 void Obj865C8__OnTag2Notify(Obj865C8 *self, s32 arg1, s32 arg2) {
-    struct SubObjDPos pos;
+    CinematicCall pos;
     s32 result;
 
     switch (arg2) {
     case 4:
         self->unk4C->methods->slot48(self->unk4C);
         self->unk4C->methods->slot4(self->unk4C);
-        result = self->unk38->methods->slot1B8(self->unk38, 0);
+        result = self->unk38->methods->endDay(self->unk38, 0);
         if (result == 0) {
-            pos = self->unk38->methods->slot1BC(self->unk38);
-            self->eventCode = pos.unk2 < 0 ? 1 : 2;
+            pos = self->unk38->methods->getCinematic(self->unk38);
+            self->eventCode = pos.entry < 0 ? 1 : 2;
         } else {
             self->eventCode = 3;
         }
@@ -206,7 +196,7 @@ void Obj865C8__OnTag2Notify(Obj865C8 *self, s32 arg1, s32 arg2) {
     case 0xD:
         self->unk4C->methods->slot48(self->unk4C);
         self->unk4C->methods->slot4(self->unk4C);
-        self->unk38->methods->slot1B8(self->unk38, arg2 != 0xC ? 2 : 1);
+        self->unk38->methods->endDay(self->unk38, arg2 != 0xC ? 2 : 1);
         self->eventCode = 3;
         self->methods->onEventArg(self, 3);
         break;
