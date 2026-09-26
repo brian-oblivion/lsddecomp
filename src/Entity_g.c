@@ -47,7 +47,7 @@ void Entity__MoodCue98(Entity *this, SoundCueSet *out) {
 }
 
 void Entity__MoodCue102(Entity *this, SoundCueSet *out) {
-    void *a2;
+    Ratio16 *scale;
 
     if (this->moodTimer == 0) {
         this->methods->moveLocalY(this, -512, 0);
@@ -65,17 +65,17 @@ void Entity__MoodCue102(Entity *this, SoundCueSet *out) {
     if (this->moodTimer >= 781) {
         SceneNode__FaceTarget((SceneNode *)this, (SceneNode *)this->peer, 1, 0, 0);
         if (this->moodTimer >= 1936) {
-            a2 = SCALE_UNIT;
+            scale = SCALE_UNIT;
         } else if (this->moodTimer >= 1931) {
-            a2 = SCALE_X_FOUR_FIFTHS_Y_SIX_FIFTHS;
+            scale = SCALE_X_FOUR_FIFTHS_Y_SIX_FIFTHS;
         } else if (this->moodTimer >= 1926) {
-            a2 = SCALE_HALF;
+            scale = SCALE_HALF;
         } else if (this->moodTimer >= 1921) {
-            a2 = SCALE_QUARTER;
+            scale = SCALE_QUARTER;
         } else {
-            a2 = SCALE_EIGHTH;
+            scale = SCALE_EIGHTH;
         }
-        this->methods->updateScale(this, 1, a2);
+        this->methods->updateScale(this, 1, scale);
         if (this->moodTimer < 2000) {
             this->methods->moveLocalZ(this, -64, 0);
         } else {
@@ -134,13 +134,10 @@ void Entity__MoodCue106(Entity *this, SoundCueSet *out) {
         }
     }
     if (this->state == 11) {
-        void *fn;
-
         if (this->moodTimer == 0) {
             this->methods->stopTod(this);
         }
-        fn = this->methods->updateScale;
-        ((void (*)(Entity *, s32, void *))fn)(this, 1, SCALE_X_EIGHTH_Y2_Z_EIGHTH);
+        this->methods->updateScale(this, 1, SCALE_X_EIGHTH_Y2_Z_EIGHTH);
         return;
     }
     if (this->moodTimer == 0) {
@@ -228,29 +225,11 @@ void Entity__StepYawInWindowsThenDeactivate(Entity *this, SoundCueSet *out, s32 
         out->slots[2].program = 4;
     }
     timer = this->moodTimer;
-    if (timer < windowStart) {
-        goto L18;
+    if ((timer >= windowStart && timer <= windowStart + 91) ||
+        (timer >= windowStart + 341 && timer <= windowStart + 433) ||
+        (timer >= windowStart + 698 && timer <= windowStart + 791)) {
+        this->methods->updateRotation(this, 0, ROTATION_YAW_PLUS1);
     }
-    if (!(windowStart + 91 < timer)) {
-        goto L50;
-    }
-L18:
-    if (timer < windowStart + 341) {
-        goto L34;
-    }
-    if (!(windowStart + 433 < timer)) {
-        goto L50;
-    }
-L34:
-    if (timer < windowStart + 698) {
-        goto L74;
-    }
-    if (windowStart + 791 < timer) {
-        goto L74;
-    }
-L50:
-    this->methods->updateRotation(this, 0, ROTATION_YAW_PLUS1);
-L74:
     this->methods->moveLocalZ(this, zStep, 0);
     if (this->moodTimer == deactivateTimer) {
         this->methods->deactivate(this);
@@ -263,17 +242,17 @@ void Entity__MoodCue113(Entity *this, SoundCueSet *out) {
 }
 
 void Entity__MoodCue114(Entity *this, SoundCueSet *out) {
-    Ratio16 *a2;
+    Ratio16 *rotation;
 
     if (rand() % 3 == 0) {
         return;
     }
     if (rand() % 3 != 0) {
-        a2 = ROTATION_YAW_PLUS9;
+        rotation = ROTATION_YAW_PLUS9;
     } else {
-        a2 = ROTATION_YAW_MINUS9;
+        rotation = ROTATION_YAW_MINUS9;
     }
-    this->methods->updateRotation(this, 0, a2);
+    this->methods->updateRotation(this, 0, rotation);
 }
 
 void Entity__MoodCue117(Entity *this, SoundCueSet *out) {
@@ -309,18 +288,10 @@ void Entity__MoodCue123(Entity *this, SoundCueSet *out) {
 }
 
 void Entity__MoodCue125(Entity *this, SoundCueSet *out) {
-    if (this->moodTimer == 0) {
-        if ((rand() & 3) == 0) {
-            goto trigger;
-        }
+    if ((this->moodTimer == 0 && (rand() & 3) == 0) || this->moodTimer == 3600) {
+        this->methods->deactivate(this);
+        this->state = ENTITY_STATE_DONE;
     }
-    if (this->moodTimer != 3600) {
-        goto merge;
-    }
-trigger:
-    this->methods->deactivate(this);
-    this->state = ENTITY_STATE_DONE;
-merge:
     this->methods->updateScale(this, 1, SCALE_TWO_FIFTHS);
     out->attenuation = this->methods->getProximityRatio(this);
     if (out->tick % (this->todFrameCount / 2) == 0) {
