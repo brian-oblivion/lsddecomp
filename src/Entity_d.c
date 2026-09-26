@@ -29,21 +29,6 @@
  * bytes). Entity__MoodCue41 writes the den and passes the template. */
 extern s16 sScaleTemplateZDenom;
 
-/* The Ratio16[3] rotations (degrees) and scales the handlers pass to
- * updateRotation and updateScale, and the offset they pass to
- * addTranslation. */
-extern Ratio16 ROTATION_YAW_PLUS9[];
-extern Ratio16 ROTATION_YAW_MINUS9[];
-extern Ratio16 SCALE_X3[];
-extern LongVec3 TRANSLATE_Z_MINUS256[];
-extern Ratio16 SCALE_Y2[];
-extern Ratio16 SCALE_SIX[];
-extern Ratio16 ROTATION_YAW_PLUS180[];
-extern Ratio16 ROTATION_YAW_MINUS90[];
-extern Ratio16 ROTATION_YAW_PLUS90[];
-extern Ratio16 SCALE_Y4[];
-extern Ratio16 ROTATION_ZMINUS90[];
-
 /* Defined after Entity__MoodCue43, which calls it. */
 void Entity__RollScaleOrDelayedDrift(Entity *this);
 

@@ -100,10 +100,6 @@ void Entity__MoodCue64(Entity *this, SoundCueSet *out) {
     this->methods->moveLocalZ(this, -0xA, 0);
 }
 
-extern u8 SCALE_HALF[];
-extern u8 ROTATION_YAW_PLUS90[];
-extern u8 ROTATION_YAW_MINUS90[];
-
 void Entity__MoodCue65(Entity *this, SoundCueSet *out) {
     if (this->moodTimer == 0) {
         if (rand() % 3 == 0) {
@@ -144,9 +140,6 @@ void Entity__MoodCue67(Entity *this, SoundCueSet *out) {
         }
     }
 }
-
-extern u8 ROTATION_ZPLUS9[];
-extern LongVec3 TRANSLATE_Y_PLUS8[];
 
 void Entity__MoodCue68(Entity *this, SoundCueSet *out) {
     out->attenuation = this->methods->getProximityRatio(this);
@@ -207,11 +200,6 @@ void Entity__MoodCue69(Entity *this, SoundCueSet *out) {
     }
 }
 
-/* Data tables reached with a raw pointer by this unit's mood-dispatch
- * handlers -- same convention as Entity_c.c/Entity_d.c's own separate
- * per-unit externs, not shared via the header. */
-extern u8 ROTATION_YAW_PLUS180[];
-
 void Entity__MoodCue70(Entity *this, SoundCueSet *out) {
     if (this->moodTimer == 0) {
         if (rand() & 1) {
@@ -240,8 +228,6 @@ void Entity__MoodCue71(Entity *this, SoundCueSet *out) {
     }
     this->methods->moveLocalZ(this, -0x1E, 0);
 }
-
-extern u8 ROTATION_YAW_PLUS90[];
 
 void Entity__MoodCue73(Entity *this, SoundCueSet *out) {
     out->attenuation = 0;
@@ -305,7 +291,6 @@ void Entity__MoodCue75(Entity *this, SoundCueSet *out) {
 }
 
 extern u8 D_80089DFC[];
-extern u8 ROTATION_YAW_PLUS9[];
 
 void Entity__MoodCue76(Entity *this, SoundCueSet *out) {
     void (*fn)(Entity *self, s32 set, void *table);
@@ -365,8 +350,6 @@ void Entity__MoodCue77(Entity *this, SoundCueSet *out) {
     }
 }
 
-extern u8 ROTATION_XPLUS90[];
-extern u8 SCALE_Y2[];
 extern u8 D_80089E14[];
 extern s32 sMoodCue78TransitionDone;
 
@@ -438,8 +421,6 @@ void Entity__MoodCue78(Entity *this, SoundCueSet *out) {
     }
 }
 
-extern u8 ROTATION_YAW_PLUS2[];
-
 void Entity__MoodCue79(Entity *this, SoundCueSet *out) {
     out->attenuation = this->methods->getProximityRatio(this);
     if (out->tick % 10 == 0) {
@@ -452,8 +433,6 @@ void Entity__MoodCue79(Entity *this, SoundCueSet *out) {
         this->state = 0xB;
     }
 }
-
-extern LongVec3 TRANSLATE_Y_MINUS512[];
 
 void Entity__MoodCue80(Entity *this, SoundCueSet *out) {
     if (this->moodTimer < this->todFrameCount) {

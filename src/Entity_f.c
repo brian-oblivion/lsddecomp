@@ -26,17 +26,9 @@
 #include "Entity.h"
 #include "DreamSys.h"
 
-/* Data tables reached with a raw pointer by this unit's mood-dispatch
- * handlers -- same convention as Entity_d.c/Entity_c.c's own SCALE_Y2/
- * SCALE_SIX/etc externs (separate local view per translation unit, not
- * shared via the header). */
-extern u8 ROTATION_YAW_PLUS9[];
-extern u8 ROTATION_YAW_PLUS180[];
-extern u8 ROTATION_ZPLUS1[];
-extern u8 ROTATION_ZMINUS9[];
-extern LongVec3 TRANSLATE_Y_MINUS256[];
+/* An unnamed table from the motion-template range this unit passes to
+ * updateScale; the named templates are declared in include/Entity.h. */
 extern u8 D_80089DE4[];
-extern u8 SCALE_SIX[];
 
 /* Forward declarations: both are defined later in this file (in ROM
  * order), but Entity__MoodCue85 and Entity__MoodCue86 call them before their own

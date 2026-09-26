@@ -19,25 +19,6 @@
 #include "DreamSys.h"
 #include "Class866E8.h"
 
-/* Constant transform triples passed to updateRotation (slot +0x44,
- * func_8001CEB4: three {s16 num, s16 den} ratios in degrees), updateScale
- * (+0x48, func_8001D008: three ratios) and addTranslation (+0xBC,
- * Actor__AddTranslation: three s32 deltas, so LongVec3), named by value.
- * Only the address of the rotation and scale ones is taken here, so a byte
- * array is enough; the RotationRatios type in DreamSys.h is their real
- * shape.
- * TRANSLATE_Y_MINUS64's label also holds a second triple, (0, -0x20, 0). */
-extern u8 SCALE_HALF[];
-extern u8 SCALE_DOUBLE[];
-extern LongVec3 TRANSLATE_Y_MINUS64[];
-extern u8 ROTATION_YAW_PLUS2[];
-extern u8 ROTATION_YAW_MINUS90[];
-extern u8 ROTATION_YAW_PLUS90[];
-extern LongVec3 TRANSLATE_Y_PLUS256[];
-extern LongVec3 TRANSLATE_Y_PLUS64_Z_MINUS64[];
-extern u8 ROTATION_YAW_MINUS120[];
-extern u8 ROTATION_X50_YMINUS120_Z30[];
-
 s32 Entity__UpdateTargetProximity(Entity *this) {
     EntityMoodRow *row;
     s32 *xptr;
@@ -248,7 +229,7 @@ void Entity__MoodCue10(Entity *this, SoundCueSet *out) {
 }
 
 void Entity__MoodCue11(Entity *this, SoundCueSet *out) {
-    u8 *row;
+    Ratio16 *row;
 
     this->lastOffsetValue = -0x14;
     out->attenuation = this->methods->getProximityRatio(this);
@@ -366,7 +347,7 @@ void Entity__MoodCue15(Entity *this, SoundCueSet *out) {
 }
 
 void Entity__MoodCue16(Entity *this) {
-    u8 *arg2;
+    Ratio16 *arg2;
     s32 roll;
 
     if (this->moodTimer == 0) {
