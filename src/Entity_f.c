@@ -26,10 +26,6 @@
 #include "Entity.h"
 #include "DreamSys.h"
 
-/* An unnamed table from the motion-template range this unit passes to
- * updateScale; the named templates are declared in include/Entity.h. */
-extern u8 SCALE_X_FOUR_FIFTHS_Y_SIX_FIFTHS[];
-
 /* Forward declarations: both are defined later in this file (in ROM
  * order), but Entity__MoodCue85 and Entity__MoodCue86 call them before their own
  * definitions appear -- same convention as Entity_d.c's own forward calls. */

@@ -234,6 +234,8 @@ extern Ratio16 ROTATION_YAW_PLUS180[];
 extern Ratio16 ROTATION_YAW_PLUS90[];
 extern Ratio16 ROTATION_YAW_MINUS90[];
 extern Ratio16 ROTATION_YAW_PLUS2[];
+extern Ratio16 ROTATION_YAW_MINUS_THIRD[];
+extern Ratio16 ROTATION_YAW_MINUS_HALF[];
 extern Ratio16 ROTATION_ZPLUS9[];
 extern Ratio16 ROTATION_ZPLUS1[];
 extern Ratio16 ROTATION_ZMINUS9[];
@@ -256,12 +258,15 @@ extern LongVec3 TRANSLATE_Y_MINUS1500_Z_PLUS1024[];
 extern LongVec3 TRANSLATE_Z_MINUS256[];
 extern Ratio16 SCALE_QUARTER[];
 extern Ratio16 SCALE_HALF[];
+extern Ratio16 SCALE_X_FOUR_FIFTHS_Y_SIX_FIFTHS[]; /* {4/5, 6/5, 5/5} */
 extern Ratio16 SCALE_DOUBLE[];
 extern Ratio16 SCALE_MINUS_SIXTY_FOURTH[];
 extern Ratio16 SCALE_EIGHT_SEVENTHS[];
 extern Ratio16 SCALE_UNIT[]; /* {1/1, 1/1, 1/1}, a .data copy of code_d294.h's SCALE_ONE */
 extern Ratio16 SCALE_EIGHTH[];
+extern Ratio16 SCALE_X_EIGHTH_Y2_Z_EIGHTH[];
 extern Ratio16 SCALE_SIX[];
+extern Ratio16 SCALE_TWO_FIFTHS[];
 extern Ratio16 SCALE_Y2[];
 extern Ratio16 SCALE_Y4[];
 extern Ratio16 SCALE_TRIPLE[];

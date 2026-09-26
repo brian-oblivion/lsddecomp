@@ -35,18 +35,6 @@
 #include "DreamSys.h"
 #include "StageMap.h"
 
-/* Data rows this unit's mood-dispatch handlers pass through to a vtable
- * call as an opaque argument -- never dereferenced here, so an opaque byte
- * array is enough to form &D_8008xxxx correctly. Real element type/count
- * unknown. Same per-unit local-declaration convention as Entity_b.c/
- * Entity_c.c/Entity_e.c (each unit keeps its own extern, not shared).
- * The named motion templates (ROTATION_*, SCALE_*) are in include/Entity.h. */
-extern u8 ROTATION_YAW_MINUS_THIRD[];
-extern u8 SCALE_X_FOUR_FIFTHS_Y_SIX_FIFTHS[];
-extern u8 ROTATION_YAW_MINUS_HALF[];
-extern u8 SCALE_X_EIGHTH_Y2_Z_EIGHTH[];
-extern u8 SCALE_TWO_FIFTHS[];
-
 void Entity__MoodCue98(Entity *this, SoundCueSet *out) {
     if (this->targetReached != 0) {
         if (Entity__GetOrCreateFadeBox(this, NULL, 0, 10, 0) != 0) {
