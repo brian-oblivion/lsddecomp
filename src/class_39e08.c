@@ -7,6 +7,7 @@
 #include "TimImage.h"
 #include "FrameClock.h"
 #include "DreamSys.h"
+#include "LinkResource.h"
 
 /* The viewpoint and view-reference vectors Class865C8__OnInit hands the
  * viewport's attachViewChild: (0, -1200, 0) and (0, -1200, 10000), the data
@@ -38,7 +39,7 @@ void Class865C8__Class865C8(Class865C8 *self, IntermediateBaseInitArgs *initArgs
     self->etcTim->methods->freeBuffer(self->etcTim);
     req.type = 0;
     req.path = D_800113F8;
-    self->dreamerTmd = New_LinkResource(&req);
+    self->dreamerTmd = New_LinkResource((struct Src6F240 *)&req);
     tmp = PickWeeklyGroup(0);
     self->bgm = New_WBgm((char *)tmp, NULL, 1);
     func_8004A070(1);

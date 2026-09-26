@@ -45,6 +45,7 @@ typedef struct Class865C8Methods Class865C8Methods;
 struct DreamSys;
 struct WBgm;
 struct TimImage;
+struct LinkResource;
 struct Obj4C; /* D_80087034's object as class_39e08.h views it (New_ObjM's result) */
 
 /* Class86668's slots, then this class's own. Overridden: ctor, finalize,
@@ -61,7 +62,7 @@ struct Obj4C; /* D_80087034's object as class_39e08.h views it (New_ObjM's resul
     /* +0x03C */ s32 phase;                 /* 0 ResetPhase, 1 OnInit, 2 StartObjM, 3 OnObjMNotify; not IntermediateBase::state */ \
     /* +0x040 */ struct WBgm *bgm;          /* New_WBgm(PickWeeklyGroup(0), NULL, 1); New_ObjM's 2nd argument; finalize releases it */ \
     /* +0x044 */ struct TimImage *etcTim;   /* New_TimImage("ETC\ETC.TIM"), uploaded and its buffer freed; DreamSys +0x114; New_ObjM's 3rd */ \
-    /* +0x048 */ BasicClass *dreamerTmd;    /* New_LinkResource("ETC\DREAMER.TMD"); New_ObjM's 4th; finalize releases it */ \
+    /* +0x048 */ struct LinkResource *dreamerTmd;    /* New_LinkResource("ETC\DREAMER.TMD"); New_ObjM's 4th; finalize releases it */ \
     /* +0x04C */ struct Obj4C *objM         /* StartObjM's New_ObjM(...); a child; released by AdvancePhase/OnObjMNotify */
 
 struct Class865C8Methods {

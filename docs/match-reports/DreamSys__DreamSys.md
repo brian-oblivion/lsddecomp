@@ -89,3 +89,12 @@ None beyond what the head's own broadcast already captured for
 of the same lever ("a constructor's tail call already leaves the return value
 in the right place; do not restate it"), which is worth noting only as
 reinforcement, not as a new finding.
+
+## Track 4 (LinkResource)
+
+2026-09-26, round 89 (delta): `arg1` is a LinkResource (include/LinkResource.h:
+Class6D3C8__Class6D3C8 passes New_LinkResource("ETC\DREAME5.TMD")), so the
+DreamSysCtorArgObj/DreamSysCtorArgMethods view is gone and the call is
+`arg1->methods->getModel(arg1, 0)` (+0x080, LinkResource__GetModel: the
+first TmdModel, added as a child). `unk_0x60`, the ctor slot's and
+New_DreamSys's parameter are typed `struct LinkResource *`. Byte-identical.

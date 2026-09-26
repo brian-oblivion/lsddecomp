@@ -46,6 +46,7 @@
  * reads back, so there is nothing to name them after. */
 #include "common.h"
 #include "DreamSys.h"
+#include "LinkResource.h"
 #include "Class866E8.h"
 #include "Class81940.h"
 #include "VabStreamObj.h"
@@ -75,7 +76,7 @@ s32 Test4TunnelLinks(PlayerSpawnPoint *target, PlayerSpawnPoint *currentPos, s32
    need as the two above. */
 void DreamSys__FlipMoveCommand(DreamSys *this);
 
-DreamSys *New_DreamSys(void *arg0, s32 arg1, s32 arg2)
+DreamSys *New_DreamSys(LinkResource *arg0, s32 arg1, s32 arg2)
 {
 	DreamSys *this;
 
@@ -87,7 +88,7 @@ DreamSys *New_DreamSys(void *arg0, s32 arg1, s32 arg2)
 	return NULL;
 }
 
-DreamSys *DreamSys__DreamSys(DreamSys *this, void *arg1, s32 arg2, s32 arg3)
+DreamSys *DreamSys__DreamSys(DreamSys *this, LinkResource *arg1, s32 arg2, s32 arg3)
 {
 	void *val;
 
@@ -97,7 +98,7 @@ DreamSys *DreamSys__DreamSys(DreamSys *this, void *arg1, s32 arg2, s32 arg3)
 	this->viewport = (Viewport *)arg3;
 	this->unk_0x64 = 0;
 	this->unk_0x60 = arg1;
-	val = ((DreamSysCtorArgObj *)arg1)->methods->slot0x80(arg1, 0);
+	val = arg1->methods->getModel(arg1, 0);
 	this->methods->addChild(this, val);
 	this->methods->getSetDreamTimeLimit(this, -1);
 	this->movementBlocked = 1;

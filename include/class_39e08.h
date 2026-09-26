@@ -102,7 +102,8 @@ extern const char D_800113F8[];
 /* Same request-block shape src/code_1677c.c established at
  * `Class6D3C8__Class6D3C8`'s call site (`LoadModelRequest`, learned there to be
  * 0x10 bytes even though only the first two fields are ever written --
- * "local struct SIZE matters, not shape"). */
+ * "local struct SIZE matters, not shape"). New_LinkResource
+ * (include/LinkResource.h) takes it cast to its descriptor, struct Src6F240. */
 typedef struct LoadRequest {
     s32 type;
     const char *path;
@@ -110,9 +111,6 @@ typedef struct LoadRequest {
     s32 unk0C;
 } LoadRequest;
 
-/* src/code_33808.c (LinkResource allocator): loads a resource named by
- * `req->path` and returns the object (Class865C8::dreamerTmd). */
-extern void *New_LinkResource(LoadRequest *req);
 
 /* src/code_39094.c: one of the seven gWeeklyGroupTable words, each a VAB
  * path string ("SND\\AMBIENT" ... "SND\\STANDERD"). Its return value is

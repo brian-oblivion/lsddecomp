@@ -1,6 +1,7 @@
 #include "common.h"
 #include "Class6D3C8.h"
 #include "DreamSys.h"
+#include "LinkResource.h"
 #include "TaskCore.h"
 #include "StreamTask.h"
 #include "GraphRoom.h"
@@ -25,7 +26,6 @@ extern const char sModelPathDreamE5[];       /* "ETC\DREAME5.TMD", asm/data/FA4.
 
 extern s32 func_80048CF0(void);        /* reads a small-data global, unnamed so far */
 extern void func_800270AC(s32 value);   /* stores its arg to a small-data global */
-extern void *New_LinkResource(void *arg); /* defined in code_33808.c (LinkResource allocator) */
 
 extern s32 SetActiveDataSourceDriverMode(s32 a0, s32 a1, s32 a2); /* code_171e0, still INCLUDE_ASM there; returns
                                                        the last value its internal dispatch loop got --
@@ -116,7 +116,7 @@ void Class6D3C8__Class6D3C8(Class6D3C8 *self, Class6D3C8CtorArgs *arg) {
     func_800270AC(func_80048CF0());
     req.type = 0;
     req.path = sModelPathDreamE5;
-    self->dreamSys = New_DreamSys(New_LinkResource(&req), 0, 0);
+    self->dreamSys = New_DreamSys(New_LinkResource((struct Src6F240 *)&req), 0, 0);
     self->skipGraphRoomPoll = 0;
     self->dreamSys->methods->slot228(self->dreamSys, arg->unk14);
     ((Class6D3C8SetDayFn)self->methods->setScreenDims)(self);
