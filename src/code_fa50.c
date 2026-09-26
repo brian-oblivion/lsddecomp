@@ -5,18 +5,18 @@
  * into game code, a method-table entry beside game methods, or contiguity with
  * those, and no Sony fingerprint).
  *
- * Holds the TmdModel class (method table D_8006BEA0, class tag 9): a thin
+ * Holds the TmdModel class (method table gTmdModelMethods, class tag 9): a thin
  * wrapper around one TMD file plus its object-table entry ("the model"
  * Class6B5CC__LinkModel, src/code_d294_c.c, links into a GsDOBJ2). Its
  * methods map the TMD to the GS (TmdModel__MapModelingData), walk its
  * primitives (TmdModel__NextPrimitive, owns jtbl_80010354), compute an
  * axis-aligned bounding box or its eight corners (TmdModel__ComputeBounds,
- * TmdModel__GetHull, and the shared-buffer pair UpdateTmdModelBoundsBuffer /
- * GetTmdModelBoundsBuffer), and ray-cast a segment against every face
+ * TmdModel__GetHull, and the shared-buffer pair TmdModel__UpdateBoundsBuffer /
+ * TmdModel__GetBoundsBuffer), and ray-cast a segment against every face
  * (TmdModel__RaycastFaces) for Class6B5CC's own collision helpers in
  * code_d294_b.c/code_d294_c.c.
  *
- * IsTmdModelConstructed and RotateAndOffsetHullList are kept unrenamed: both are called from
+ * TmdModel__GetBoundsCount and RotateAndOffsetHullList are kept unrenamed: both are called from
  * src/class_3bb8c_o.c, a live types-runner unit as of this pass, so
  * renaming them would rewrite that unit's own file out from under it.
  * Proposed names and evidence are in their own match reports.
@@ -153,11 +153,11 @@ extern void OuterProduct0(Vec4_fa50 *v0, Vec4_fa50 *v1, Vec4_fa50 *v2);
 extern void Square0(Vec4_fa50 *v0, Vec4_fa50 *v1);
 extern s32 SquareRoot0(s32 a);
 TmdPrim_fa50 *TmdModel__NextPrimitive(TmdModel *self, TmdPrim_fa50 *p, s32 *n, Vec3_fa50 *out, u32 *count);
-extern s32 gTmdModelConstructed;
+extern s32 gTmdModelBoundsCount;
 extern s32 gTmdModelBoundsBuf[];
-extern s32 D_8006BEA0[];
+extern s32 gTmdModelMethods[];
 extern void *BMemPMgrAlloc(s32 size);
-void MarkTmdModelConstructed(TmdModel *self);
+void TmdModel__InitBoundsCount(TmdModel *self);
 TmdModelMethods *Get_vtable_TmdModel(void);
 
 TmdModel *New_TmdModel(void *arg) {
@@ -174,7 +174,7 @@ void TmdModel__TmdModel(TmdModel *self, void *arg) {
     self->methods = Get_vtable_TmdModel();
     self->object = arg;
     self->data = (ModelData_fa50 *)((u8 *)arg - 0xC);
-    MarkTmdModelConstructed(self);
+    TmdModel__InitBoundsCount(self);
 }
 void TmdModel__SetQuad(TmdModel *self, Quad_fa50 *src) {
     self->quad = *src;
@@ -188,13 +188,13 @@ TmdObject_fa50 *TmdModel__GetObject(TmdModel *self, s32 i) {
 void TmdModel__func_8001F37C(void) {
 }
 TmdModelMethods *Get_vtable_TmdModel(void) {
-    return (TmdModelMethods *)D_8006BEA0;
+    return (TmdModelMethods *)gTmdModelMethods;
 }
-void MarkTmdModelConstructed(TmdModel *self) {
-    gTmdModelConstructed = 1;
+void TmdModel__InitBoundsCount(TmdModel *self) {
+    gTmdModelBoundsCount = 1;
 }
-s32 IsTmdModelConstructed(void *self) {
-    return gTmdModelConstructed;
+s32 TmdModel__GetBoundsCount(void *self) {
+    return gTmdModelBoundsCount;
 }
 void TmdModel__ComputeBounds(TmdModel *self, Box_fa50 *box) {
     s32 i;
@@ -222,10 +222,10 @@ void TmdModel__ComputeBounds(TmdModel *self, Box_fa50 *box) {
         if (*maxz < v->z) *maxz = v->z;
     }
 }
-void UpdateTmdModelBoundsBuffer(TmdModel *self) {
+void TmdModel__UpdateBoundsBuffer(TmdModel *self) {
     TmdModel__ComputeBounds(self, (Box_fa50 *)gTmdModelBoundsBuf);
 }
-void *GetTmdModelBoundsBuffer(void *self, s32 i) {
+void *TmdModel__GetBoundsBuffer(void *self, s32 i) {
     return gTmdModelBoundsBuf;
 }
 void TmdModel__GetHull(TmdModel *self, Hull_fa50 *out) {

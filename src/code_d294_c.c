@@ -99,7 +99,7 @@ void Class6B5CC__GetRotationDegrees(Class6B5CC *self, WholeFrac_d294 *out) {
  * Retail RE-READS `self->model` for the call's first argument instead of
  * reusing the `model` register it stored one statement earlier; writing it
  * through the field is what matches. */
-/* The model: a D_8006BEA0 (class 9) child. Only the two words LinkModel
+/* The model: a gTmdModelMethods (class 9) child. Only the two words LinkModel
  * reads are modelled; the class has no C yet. */
 typedef struct ModelObj_d294 {
     u8 pad0[0x00C];

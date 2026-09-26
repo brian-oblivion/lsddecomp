@@ -33,7 +33,7 @@ A double store to one s16 field with `lhu` before the first add and no reload be
 `AccumulateTargetOffset` -- tier B. Free function, `VerbNoun`: `t->unk6 +=
 xy[0] / 16; t->unk6 += xy[1] * 64;` on the `Outer_fa50`/`Inner_fa50`/
 `Target_fa50` chain, which is NOT the TmdModel class (a different `self`
-type, unrelated to D_8006BEA0). No caller exists anywhere in `src/` yet (its
+type, unrelated to gTmdModelMethods). No caller exists anywhere in `src/` yet (its
 call site is still undecompiled asm elsewhere), so the class that actually
 owns this chain is unknown -- hence no `Class__` prefix. Named for its one
 settled fact: it is the sibling of `SetTargetOffset` (same field, same two

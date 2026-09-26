@@ -74,9 +74,9 @@ typedef struct BoundsBox_d294 {
 
 /* Round 13 (Class6B5CC__CheckBoundsOverlap): a 12-byte, all-s16, 6-field record -- MEASURED,
  * same all-s16-struct-copy idiom as Vec3S16_d294 (whole-value assignment
- * compiles to unaligned lwl/lwr). Used as GetTmdModelBoundsBuffer's own return-array
+ * compiles to unaligned lwl/lwr). Used as TmdModel__GetBoundsBuffer's own return-array
  * element type and as this function's own second running-tracker. Round 73
- * (the match): the pairing is NOT scrambled -- GetTmdModelBoundsBuffer's records are
+ * (the match): the pairing is NOT scrambled -- TmdModel__GetBoundsBuffer's records are
  * BoundsBox_d294 boxes (f0..f2 = lo, f3..f5 = hi), the matched body reads
  * them through that type, and its tail is an ordinary per-axis AABB overlap
  * (docs/match-reports/Class6B5CC__CheckBoundsOverlap.md). This view is kept
@@ -143,23 +143,23 @@ extern void GsInitCoordinate2(s32 arg0, void *dest);
  * needs. */
 extern void TmdModel__GetHull(void *arg0, void *dest);
 
-/* IsTmdModelConstructed (code_fa50: GAME code since plan revision 18, matched round 82): a
+/* TmdModel__GetBoundsCount (code_fa50: GAME code since plan revision 18, matched round 82): a
  * predicate over the same opaque `self->unk20` pointer Class6B5CC__ReadUnk20Data and
  * TmdModel__GetHull above already treat as `void *` -- Class6B5CC__NotifyIfUnk20Active (round 13,
  * this unit) tests its `$v0` result for non-zero, so declared `s32`
  * (boolean-ish) here. Not decompiled in this project. */
-extern s32 IsTmdModelConstructed(void *arg0);
+extern s32 TmdModel__GetBoundsCount(void *arg0);
 
-/* UpdateTmdModelBoundsBuffer/GetTmdModelBoundsBuffer (code_fa50: GAME code since plan revision 18,
- * matched round 82): UpdateTmdModelBoundsBuffer fills a game global
- * (gTmdModelBoundsBuf, via TmdModel__ComputeBounds) from its own argument; GetTmdModelBoundsBuffer
+/* TmdModel__UpdateBoundsBuffer/TmdModel__GetBoundsBuffer (code_fa50: GAME code since plan revision 18,
+ * matched round 82): TmdModel__UpdateBoundsBuffer fills a game global
+ * (gTmdModelBoundsBuf, via TmdModel__ComputeBounds) from its own argument; TmdModel__GetBoundsBuffer
  * IGNORES both its arguments and just returns `&gTmdModelBoundsBuf` -- MEASURED,
  * its whole body is `lui/addiu %hi/%lo(gTmdModelBoundsBuf); jr $ra`. Class6B5CC__CheckBoundsOverlap
- * (round 13, code_d294_b) calls the pair as `UpdateTmdModelBoundsBuffer(self->unk20);
- * arr = GetTmdModelBoundsBuffer(self->unk20, 0);` -- declared here typed to that
+ * (round 13, code_d294_b) calls the pair as `TmdModel__UpdateBoundsBuffer(self->unk20);
+ * arr = TmdModel__GetBoundsBuffer(self->unk20, 0);` -- declared here typed to that
  * call site's own use of the result (an array of Sixteen6_d294). */
-extern void UpdateTmdModelBoundsBuffer(void *arg0);
-extern Sixteen6_d294 *GetTmdModelBoundsBuffer(void *arg0, s32 arg1);
+extern void TmdModel__UpdateBoundsBuffer(void *arg0);
+extern Sixteen6_d294 *TmdModel__GetBoundsBuffer(void *arg0, s32 arg1);
 
 /* GsLinkObject4 (psyq_GsLinkObject4.s, Psy-Q library, not game code; symbol
  * address per config/symbols.slps01556.lsdde.txt, 0x8001EF70 -- the first

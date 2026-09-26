@@ -87,7 +87,7 @@ void Class6B5CC__GetRotMatrix(Class6B5CC *self, s32 a1, s32 a2) {
 }
 
 /* a1 gates a small range (2 <= a1 < 4). When self->model is set and
- * IsTmdModelConstructed(self->model) reports true, fills a stack buffer through
+ * TmdModel__GetBoundsCount(self->model) reports true, fills a stack buffer through
  * this class's own +0x8C slot (Class6B5CC__ReadUnk20Data, already matched in this
  * unit -- fills it via TmdModel__GetHull(self->model, dest)) then forwards
  * that same buffer, retyped as a GenericCountList_d294, into +0x90
@@ -112,7 +112,7 @@ void Class6B5CC__NotifyIfUnk20Active(Class6B5CC *self, s32 a1) {
     if (self->model == NULL) {
         return;
     }
-    if (!IsTmdModelConstructed(self->model)) {
+    if (!TmdModel__GetBoundsCount(self->model)) {
         return;
     }
     self->methods->readUnk20Data(self, buf);
@@ -187,7 +187,7 @@ void Class6B5CC__TryAttachNearby(Class6B5CC *self, Class6B5CC *other) {
     if (self->model == NULL) {
         return;
     }
-    if (!IsTmdModelConstructed(self->model)) {
+    if (!TmdModel__GetBoundsCount(self->model)) {
         return;
     }
 
@@ -289,7 +289,7 @@ void Class6B5CC__ComposeAndApplyRotation(Class6B5CC *self, void *arg1, void *arg
 
 /* Offsets arg1's corner list by `d` and grows a box `mm` over the moved
  * corners, grows a second box `box` over the model's own bounds records
- * (GetTmdModelBoundsBuffer's array), and returns 1 if the two boxes overlap on all
+ * (TmdModel__GetBoundsBuffer's array), and returns 1 if the two boxes overlap on all
  * three axes. Each running min/max is a ternary stored back unconditionally
  * (retail stores every field every iteration), and the source compares
  * with `>` for a min so the slt operands load in retail's order. */
@@ -326,9 +326,9 @@ s32 Class6B5CC__CheckBoundsOverlap(Class6B5CC *self, void *arg1, Vec3S16_d294 *d
         b->hi.z = (b->hi.z < v->z) ? v->z : b->hi.z;
     }
 
-    UpdateTmdModelBoundsBuffer(self->model);
-    p = (BoundsBox_d294 *)GetTmdModelBoundsBuffer(self->model, 0);
-    n = IsTmdModelConstructed(self->model);
+    TmdModel__UpdateBoundsBuffer(self->model);
+    p = (BoundsBox_d294 *)TmdModel__GetBoundsBuffer(self->model, 0);
+    n = TmdModel__GetBoundsCount(self->model);
     box = *p;
     end2 = p + n;
     for (p++; p < end2; p++) {
@@ -391,10 +391,10 @@ s32 Class6B5CC__ClassifyAgainstPlanes(Class6B5CC *self, s32 *outFlag, Vec3S16_d2
     }
 
     self->hitMask = 0;
-    count1 = IsTmdModelConstructed(self->model);
+    count1 = TmdModel__GetBoundsCount(self->model);
     hit = 0;
     for (i = 0; i < count1; i++) {
-        plane = GetTmdModelBoundsBuffer(self->model, i);
+        plane = TmdModel__GetBoundsBuffer(self->model, i);
         if (ClipSegmentToBox(NULL, (BoundsBox_d294 *)plane, &mid[0], &mid[1])) {
             if (TmdModel__RaycastFaces(self->model, &bigConst, diff, &outWord, &mid[0], &mid[1])) {
                 if (D_8008A838 == 0) {
@@ -417,7 +417,7 @@ s32 Class6B5CC__ClassifyAgainstPlanes(Class6B5CC *self, s32 *outFlag, Vec3S16_d2
     *outFlag = 0;
     cnt2 = list->count;
     for (i = 0; i < count1; i++) {
-        plane = GetTmdModelBoundsBuffer(self->model, i);
+        plane = TmdModel__GetBoundsBuffer(self->model, i);
         v = list->v;
         for (k = 0; k < cnt2; k++) {
             for (m = 0; m < 4; m++) {

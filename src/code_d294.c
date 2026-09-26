@@ -22,7 +22,7 @@
 #define TAG_PAD          2   /* gPadMethods, PadMethods (include/Pad.h) */
 #define TAG_CLASS6B5CC   4   /* this class and every subclass of it */
 #define TAG_CLASS6EF50   5   /* D_8006EF50 */
-#define TAG_CLASS6BEA0   9   /* D_8006BEA0: the object Class6B5CC__LinkModel links */
+#define TAG_CLASS6BEA0   9   /* gTmdModelMethods: the object Class6B5CC__LinkModel links */
 
 /* Bit positions in GsDOBJ2.attribute (self->unk10), include/psyq/LIBGS.H. */
 #define ATTR_LIGHTMODE_SHIFT  3   /* GsFOG|GsMATE|GsLLMOD, 3 bits */

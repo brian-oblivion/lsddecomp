@@ -146,7 +146,7 @@ typedef struct AttachCornerList_d294b {
     /* +0x014 */ Class6B5CCSub14 *coord2; /* GsDOBJ2.coord2: the ctor's 0x50-byte GsCOORDINATE2 */ \
     /* +0x018 */ s32 tmd;                 /* GsDOBJ2.tmd: LinkModel copies the model's +0x10, UnlinkModel clears it */ \
     /* +0x01C */ s32 id;                  /* GsDOBJ2.id; no accessor */                            \
-    /* +0x020 */ void *model;             /* the D_8006BEA0 (class 9) child LinkModel linked; NULL when none */ \
+    /* +0x020 */ void *model;             /* the gTmdModelMethods (class 9) child LinkModel linked; NULL when none */ \
     /* +0x024 */ s32 tick;                /* zeroed by Reset; gClass876FCMethods's update increments it */ \
     /* +0x028 */ Class6B5CC *linkTarget;  /* dispatchLinkCommand's event-4 sender; TryAttachNearby's hit */ \
     /* +0x02C */ s32 hitMask;             /* ClassifyAgainstPlanes: one bit per plane (own) or corner group (the other's) */ \
