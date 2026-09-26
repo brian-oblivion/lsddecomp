@@ -70,7 +70,7 @@
 
 /* A buffer that starts with a word, a count, then that many words. */
 typedef struct CountedBuf33808 {
-    /* +0x00 */ s32 unk0;
+    /* +0x00 */ u8 pad0[4];
     /* +0x04 */ u32 count;
     /* +0x08 */ s32 entries[1];
 } CountedBuf33808;
@@ -83,17 +83,16 @@ extern void *BMemPMgrAlloc(s32 size);
 /* The allocators below reach a class's constructor through its table
  * getter; the constructor's parameters vary, so the slot is unprototyped. */
 typedef struct Ctor33808 {
-    /* +0x000 */ s32 header;
-    /* +0x004 */ void *release;
+    /* +0x000 */ u8 pad0[8];
     /* +0x008 */ s32 (*ctor)();
 } Ctor33808;
 
 /* Allocate and construct a gTimBlockSrcMethods object. */
-void *New_TimBlockSrc(s32 arg0) {
+void *New_TimBlockSrc(s32 name) {
     void *obj = BMemPMgrAlloc(0x84);
 
     if (obj != NULL) {
-        GetTimBlockSrcMethods()->ctor(obj, (char *)arg0);
+        GetTimBlockSrcMethods()->ctor(obj, (char *)name);
         return obj;
     }
     return NULL;
@@ -170,6 +169,14 @@ typedef struct Hdr43200 {
     u8 bytes[0x24];
 } Hdr43200;
 
+/* The same 0x24-byte header, read: a block count, then the blocks' file
+ * offsets and their sizes. */
+typedef struct Buf434DC {
+    /* +0x00 */ u32 count;
+    /* +0x04 */ u32 offsets[4];
+    /* +0x14 */ u32 sizes[4];
+} Buf434DC;
+
 extern void LockActiveDataSource(void);
 extern void UnlockActiveDataSource(void);
 u32 FindMaxTimBlockSize(FileResource *self);
@@ -186,7 +193,7 @@ void TimBlockSrc__AdvanceLoadState(TimBlockSrc *self) {
                 *(Hdr43200 *)self->buffer = *(Hdr43200 *)self->sector;
                 BMemPMgrFree(self->sector);
                 max = FindMaxTimBlockSize((FileResource *)self);
-                self->blocks = BMemPMgrAlloc(*(u32 *)self->buffer * 4);
+                self->blocks = BMemPMgrAlloc(((Buf434DC *)self->buffer)->count * 4);
                 if (self->blocks == NULL) {
                     goto fail;
                 }
@@ -195,7 +202,7 @@ void TimBlockSrc__AdvanceLoadState(TimBlockSrc *self) {
                     goto fail;
                 }
                 self->sectorSize = max;
-                self->methods->seek(self, ((u32 *)self->buffer)[1], 0);
+                self->methods->seek(self, ((Buf434DC *)self->buffer)->offsets[0], 0);
                 self->methods->read(self, self->sector, max);
                 self->loadState = 10;
             }
@@ -212,8 +219,8 @@ void TimBlockSrc__AdvanceLoadState(TimBlockSrc *self) {
                 (*p)->methods->setFlag(*p);
                 ((TimArraySrcUploadFn)(*p)->methods->processBuffer)(*p);
                 self->blockCount = n;
-                if (n < *(u32 *)self->buffer) {
-                    self->methods->seek(self, ((u32 *)self->buffer)[n + 1], 0);
+                if (n < ((Buf434DC *)self->buffer)->count) {
+                    self->methods->seek(self, ((Buf434DC *)self->buffer)->offsets[n], 0);
                     self->methods->read(self, self->sector, self->sectorSize);
                     self->loadState = 10;
                 } else {
@@ -234,21 +241,14 @@ out:
     UnlockActiveDataSource();
 }
 
-/* The largest of the buffer's `count` words from +0x14. */
-typedef struct Buf434DC {
-    /* +0x00 */ u32 count;
-    /* +0x04 */ u8 pad4[0x10];
-    /* +0x14 */ u32 vals[1];
-} Buf434DC;
-
 u32 FindMaxTimBlockSize(FileResource *self) {
     Buf434DC *buf = self->buffer;
     u32 i;
     u32 max = 0;
 
     for (i = 0; i < buf->count; i++) {
-        if (max < buf->vals[i]) {
-            max = buf->vals[i];
+        if (max < buf->sizes[i]) {
+            max = buf->sizes[i];
         }
     }
     return max;
@@ -514,6 +514,13 @@ void TimArraySrc__Finalize(TimArraySrc *self) {
  * and run the active driver's setFlag. */
 extern s16 gTimClutRowShift;
 
+/* A TimArraySrc's buffer: an image count, then each image's byte offset
+ * from the start of the buffer. */
+typedef struct TimArrayBuf {
+    /* +0x00 */ s32 count;
+    /* +0x04 */ s32 offsets[1];
+} TimArrayBuf;
+
 void TimArraySrc__BuildImages(TimArraySrc *self) {
     GsIMAGE info;
     TimImage **objs;
@@ -521,11 +528,11 @@ void TimArraySrc__BuildImages(TimArraySrc *self) {
     s32 *offs;
 
     if ((self->flags & 0x200) || self->buffer != NULL) {
-        self->count = *(s32 *)self->buffer;
-        self->images = BMemPMgrAlloc(*(s32 *)self->buffer * 4);
+        self->count = ((TimArrayBuf *)self->buffer)->count;
+        self->images = BMemPMgrAlloc(((TimArrayBuf *)self->buffer)->count * 4);
         if (self->images != NULL) {
             objs = self->images;
-            offs = (s32 *)self->buffer + 1;
+            offs = ((TimArrayBuf *)self->buffer)->offsets;
             for (i = 0; i < self->count; i++) {
                 *objs = New_TimImage(NULL);
                 (*objs)->buffer = (u8 *)self->buffer + *offs;
@@ -587,9 +594,16 @@ void Tod__Finalize(Tod *self) {
     GetActiveDataSourceMethods()->finalize((FileResource *)self);
 }
 
+/* A TOD file: an 8-byte header (id, version, resolution, frame count),
+ * then the frames. */
+typedef struct TodFile {
+    /* +0x00 */ u8 pad0[8];
+    /* +0x08 */ u32 frames[1];
+} TodFile;
+
 /* gTodMethods +0x078: slot +0x07C over the buffer past its first two words. */
 u8 Tod__ScanPackets(Tod *self, u8 *out, u32 *sel) {
-    return self->methods->scanTodPackets(self, out, sel, (u32 *)((u8 *)self->buffer + 8));
+    return self->methods->scanTodPackets(self, out, sel, ((TodFile *)self->buffer)->frames);
 }
 
 /* gTodMethods/gTodSetMethods +0x07C: walk the packet words after the u16 count
@@ -599,6 +613,20 @@ u8 Tod__ScanPackets(Tod *self, u8 *out, u32 *sel) {
  * value up among the ones appended so far when its halfword at +4 matches
  * `*sel` -- keeping its index -- or, without `out`, counts it. The index /
  * count goes back through `sel`; returns the number appended. */
+/* A TOD frame's header: its size in words, its packet count and its frame
+ * number, then the packets. */
+typedef struct TodFrame {
+    /* +0x00 */ u8 pad0[2];
+    /* +0x02 */ u16 packetCount;
+} TodFrame;
+
+/* A TOD packet: the header word DecodeTodPacketWord splits, then the data;
+ * a TMD-id packet's data starts with the id. */
+typedef struct TodPacket {
+    /* +0x00 */ u8 pad0[4];
+    /* +0x04 */ u16 tmdId;
+} TodPacket;
+
 u8 ScanTodPackets(Tod *self, u8 *out, u32 *sel, u32 *data) {
     u8 value;
     u8 type;
@@ -610,7 +638,7 @@ u8 ScanTodPackets(Tod *self, u8 *out, u32 *sel, u32 *data) {
     u8 cnt;
     s32 found;
 
-    n = ((u16 *)data)[1];
+    n = ((TodFrame *)data)->packetCount;
     data += 2;
     i = 0;
     cnt = 0;
@@ -624,7 +652,7 @@ u8 ScanTodPackets(Tod *self, u8 *out, u32 *sel, u32 *data) {
             }
         } else if (type == 2) {
             if (out != NULL) {
-                if (sel != NULL && ((u16 *)data)[2] == *sel) {
+                if (sel != NULL && ((TodPacket *)data)->tmdId == *sel) {
                     for (j = 0, out -= cnt; j < cnt; j++) {
                         if (*out++ == value) {
                             found = j;
@@ -859,28 +887,32 @@ void ModelData__Load(ModelData *self) {
  * buffer's sub-block (at the offset in its third word) and a gTodSetMethods one
  * over the buffer past +0x0C, into +0x2C and +0x30; 0 when both exist,
  * otherwise slot +0x07C (release) and 1. */
+/* A Src6F240 with a third word: SetVec3 also stores the name (NULL here)
+ * and a 1 that no constructor here reads. */
 typedef struct Req44858 {
     /* +0x00 */ void *buffer;
-    /* +0x04 */ s32 unk4;
-    /* +0x08 */ s32 unk8;
+    /* +0x04 */ u8 pad4[8];
 } Req44858;
 
+/* A ModelData's buffer: the LinkResource's TMD at `tmdOffset`, the TodSet's
+ * data from +0x0C. */
 typedef struct Buf44858 {
     /* +0x00 */ u8 pad0[8];
-    /* +0x08 */ s32 offset;
+    /* +0x08 */ s32 tmdOffset;
+    /* +0x0C */ u8 tods[1];
 } Buf44858;
 
-extern Req44858 *SetVec3(Req44858 *req, void *buffer, s32 unk4,
-                         s32 unk8); /* code_171e0.c: stores its three words into *req, returns req */
+/* code_171e0.c: stores its three words into *req, returns req. */
+extern Req44858 *SetVec3(Req44858 *req, void *buffer, char *name, s32 mode);
 
 s32 ModelData__BuildResources(ModelData *self) {
     Req44858 req;
 
     if (self->ownsResources != 0) {
-        SetVec3(&req, (u8 *)self->buffer + ((Buf44858 *)self->buffer)->offset, 0, 1);
+        SetVec3(&req, (u8 *)self->buffer + ((Buf44858 *)self->buffer)->tmdOffset, 0, 1);
         self->linkResource = New_LinkResource((Src6F240 *)&req);
         if (self->linkResource != NULL) {
-            req.buffer = (u8 *)self->buffer + 0xC;
+            req.buffer = ((Buf44858 *)self->buffer)->tods;
             self->todSet = (FileResource *)New_TodSet((Src6F240 *)&req);
             if (self->todSet != NULL) {
                 return 0;
@@ -995,7 +1027,8 @@ fail:
 /* gTriggerWorldMethods +0x07C: release the ModelData array in the buffer (past its
  * first two words), modelDataCount entries long, and zero the count. */
 void TriggerWorld__ReleaseResources(TriggerWorld *self) {
-    ReleaseBasicClassArray((BasicClass **)((u8 *)self->buffer + 8), self->modelDataCount);
+    ReleaseBasicClassArray((BasicClass **)((CountedBuf33808 *)self->buffer)->entries,
+                           self->modelDataCount);
     self->modelDataCount = 0;
 }
 
@@ -1263,7 +1296,7 @@ s32 TodSet__BuildTods(TodSet *self) {
 u8 TodSet__ScanPackets(TodSet *self, u8 *out, u32 *sel) {
     CountedBuf33808 *buf = self->buffer;
 
-    return self->methods->scanTodPackets(self, out, sel, (u32 *)&buf->entries[buf->count] + 2);
+    return self->methods->scanTodPackets(self, out, sel, ((TodFile *)&buf->entries[buf->count])->frames);
 }
 
 TodSetMethods *GetTodSetMethods(void) {
