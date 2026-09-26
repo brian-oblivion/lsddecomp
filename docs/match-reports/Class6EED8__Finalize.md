@@ -24,3 +24,17 @@ void Class6EED8__Finalize(D_8006EED8Obj *self) {
 ## Naming
 
 - `Class6EED8__Finalize` -- tier A. Finalize (slot +0x00C): clears flag2C then calls the base (GetActiveDataSourceMethods) finalize.
+
+## Track 4 (2026-09-26, round 87, delta)
+
+Class id 0xB03 is unified as `Class6EED8` in `include/Class6EED8.h`
+(CLASS6D430_SLOTS/FIELDS, 0x30 bytes, one own field `loaded` at +0x02C). The
+unit-local views `D_8006EED8Obj`/`D_8006EED8Methods` and the single-slot cast
+views `Slot0CMethods_322b4`, `Slot08Arg0Methods_322b4` and
+`CtorArg1Methods_322b4` are gone; `GetActiveDataSourceMethods` is declared
+`Class6D430Methods *`. The Source block above is the round-82 text; the live
+body in `src/code_322b4.c` is byte-identical.
+
+Renamed from `D8006EED8__Finalize` with rename.py (the class name).
+Accessors: `flag2C` -> `loaded`, `slot0C` -> the inherited `finalize`
+(`GetActiveDataSourceMethods()->finalize((Class6D430 *)self)`).

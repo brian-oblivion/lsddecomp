@@ -128,3 +128,14 @@ extern WBgmMethods D_8006E48C;
 extern s32 gWBgmActive;
 extern u8 gSsSizeTableBuf[];
 ```
+
+## Track 4 (2026-09-26, round 87, Class6EED8)
+
+The unit-local view `SeqData` (BASICCLASS_FIELDS, +0x010 `addr`, +0x02C
+`loaded`) and its `extern SeqData *New_Class6EED8(s32)` are gone: the
+census missed them, as New_Class6EED8's return type. `WBgm::seqData` is
+`Class6EED8 *` (`include/Class6EED8.h`, round 87, delta). `addr` is
+Class6D430's `buffer` (+0x010), `loaded` the same field under the same
+name; the release calls lose their `(BasicClass *)` casts and WBgm__SetSeq
+casts its s32 argument to the ctor's `char *name`. The whole image stays
+byte-identical; the Source block above is the earlier text.

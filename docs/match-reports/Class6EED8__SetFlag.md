@@ -28,3 +28,19 @@ void Class6EED8__SetFlag(D_8006EED8Obj *self) {
 ## Naming
 
 - `Class6EED8__SetFlag` -- tier A. Slot +0x064: sets flag2C = 1. A pure setter; the deeper game meaning of flag2C is not established (kept as flagNN rather than invented), but the setter's own mechanics ARE its purpose.
+
+## Track 4 (2026-09-26, round 87, delta)
+
+Class id 0xB03 is unified as `Class6EED8` in `include/Class6EED8.h`
+(CLASS6D430_SLOTS/FIELDS, 0x30 bytes, one own field `loaded` at +0x02C). The
+unit-local views `D_8006EED8Obj`/`D_8006EED8Methods` and the single-slot cast
+views `Slot0CMethods_322b4`, `Slot08Arg0Methods_322b4` and
+`CtorArg1Methods_322b4` are gone; `GetActiveDataSourceMethods` is declared
+`Class6D430Methods *`. The Source block above is the round-82 text; the live
+body in `src/code_322b4.c` is byte-identical.
+
+Renamed from `D8006EED8__SetFlag2C` with rename.py: the occupant of
+Class6D430's +0x064 `setFlag`, named for its slot as `Class6D940__SetFlag`
+is; the body does nothing beyond what the slot says. The field it sets is
+`loaded` (see Class6EED8__Class6EED8's Track 4 paragraph for the evidence:
+setFlag is the driver's completion callback).

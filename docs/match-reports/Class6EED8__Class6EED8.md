@@ -46,3 +46,22 @@ void Class6EED8__Class6EED8(D_8006EED8Obj *self, char *name) {
 ## Naming
 
 - `Class6EED8__Class6EED8` -- tier A. Ctor (slot +0x008): the base (GetActiveDataSourceMethods) ctor, installs the table, clears flag2C, and if given a name, copies it to a stack buffer and hands it to slot +0x06C.
+
+## Track 4 (2026-09-26, round 87, delta)
+
+Class id 0xB03 is unified as `Class6EED8` in `include/Class6EED8.h`
+(CLASS6D430_SLOTS/FIELDS, 0x30 bytes, one own field `loaded` at +0x02C). The
+unit-local views `D_8006EED8Obj`/`D_8006EED8Methods` and the single-slot cast
+views `Slot0CMethods_322b4`, `Slot08Arg0Methods_322b4` and
+`CtorArg1Methods_322b4` are gone; `GetActiveDataSourceMethods` is declared
+`Class6D430Methods *`. The Source block above is the round-82 text; the live
+body in `src/code_322b4.c` is byte-identical.
+
+Renamed from `D8006EED8__D8006EED8` with rename.py (the class name).
+`flag2C` is `loaded`: the only setter of 1 is `Class6EED8__SetFlag`, the
++0x064 setFlag override, and the CD driver calls setFlag when a queued
+operation completes (`Class6D4E8__LoadFile`, the request dispatch in
+code_179d8_s); the one reader, `WBgm__HandleMonitorEvent`, waits for it
+before handing `buffer` to `SsSeqOpen`. `slot6C` is Class6D430's
+inherited `requestLoadFile` (CD occupant `Class6D4E8__RequestLoadFile`).
+The base ctor call is `GetActiveDataSourceMethods()->ctor((Class6D430 *)self)`.
