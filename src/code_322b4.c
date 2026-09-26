@@ -24,7 +24,7 @@
  * classes are still pending track 4's unification, so their tables stay
  * `D_<addr>` and their own methods use the project's address-derived
  * pseudo-class-name convention (`D8006EF50__X`, matching the existing
- * `D800879C4__X` precedent in class_3bb8c_p.c) rather than inventing a real
+ * `D800879C4__X` precedent, since renamed Class879C4) rather than inventing a real
  * name ahead of the types pass. D_8006EB90 (0x11144, below CharSprite) and
  * gClass879C4Methods (0x1F44, class_3bb8c_p/q/t) are Sprite subclasses too but own
  * no methods in this unit.

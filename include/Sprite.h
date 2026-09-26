@@ -28,8 +28,8 @@
  * the semitrans rate), updateRotation writes sprite.rotate.
  *
  * Not settled here: the ctor passes reset FIVE arguments after self and
- * reset reads three, where Class6B5CC's reset takes none; and D800879C4's
- * ctor returns what its +0x040 occupant returns. The slot keeps
+ * reset reads three, where Class6B5CC's reset takes none (Class879C4's
+ * ctor, round 87, is void: its +0x040 occupant sets no $v0). The slot keeps
  * Class6B5CC's type (it is that class's to change), so a C call through it
  * with arguments needs a cast until Class6B5CC's slot is retyped.
  *
@@ -54,7 +54,7 @@ struct SpriteRgb {
 };
 
 /* A texture cell: 16-bit origin in the texture page, 32-bit extent. The
- * ctor's `rect`, copied to `rect` by reset; gClass879C4Cells (D800879C4's two
+ * ctor's `rect`, copied to `rect` by reset; gClass879C4Cells (Class879C4's two
  * cells) and D_8006ED40 (CharSprite's 8x8 cell origin) are these. */
 struct SpriteRect {
     /* +0x000 */ u16 u;
