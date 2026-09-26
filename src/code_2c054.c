@@ -3,6 +3,7 @@
 #include "VabStreamObj.h"
 #include "BgLayer.h"
 #include "TileMap.h"
+#include "TileAtlas.h"
 
 #define PLAYER(self) ((StreamTaskUnkB4Obj *)(self)->player)
 
