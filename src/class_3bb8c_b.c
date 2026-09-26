@@ -295,7 +295,7 @@ s32 StageMap__InitFootprintSlot(StageMap *self, s32 unused, s32 key, s32 arg3) {
     CellRect *slot;
 
     slot = &self->rects.e[key];
-    *slot = gDefaultElemRateOffset;
+    *slot = gFullSlotRect;
     slot->slotIndex = self->methods->findSlotIndexByChunk(self, arg3);
     return key + 1;
 }
