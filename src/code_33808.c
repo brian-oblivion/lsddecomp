@@ -48,6 +48,7 @@
 #include "TimBlockSrc.h"
 #include "ModelData.h"
 #include "Tod.h"
+#include "TmdModel.h"
 
 typedef struct DataSrc33808 DataSrc33808;
 
@@ -440,8 +441,6 @@ typedef struct Buf439EC {
     /* +0x0C */ u8 recs[1][0x1C];
 } Buf439EC;
 
-extern void *New_TmdModel(void *arg);
-
 s32 LinkResource__BuildModels(DataSrc33808 *self) {
     DataSrc33808 **objs;
     u32 i;
@@ -453,7 +452,7 @@ s32 LinkResource__BuildModels(DataSrc33808 *self) {
     self->unk2C = (s32)objs;
     ((void (*)())self->methods->slot78)(self);
     for (i = 0; i < ((Buf439EC *)self->buffer)->count; i++) {
-        *objs = New_TmdModel(((Buf439EC *)self->buffer)->recs[i]);
+        *objs = (DataSrc33808 *)New_TmdModel((TmdObject *)((Buf439EC *)self->buffer)->recs[i]);
         if (*objs == NULL) {
             while (i != 0) {
                 i--;
