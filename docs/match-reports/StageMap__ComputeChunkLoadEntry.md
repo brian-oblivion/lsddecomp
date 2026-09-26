@@ -7,7 +7,7 @@
 > Renamed from `func_8004BA40` on 2026-09-24 (tools/rename.py). Address 0x8004ba40.
 
 REVISITED, round 63: MATCHED 63/63, whole-image SHA1 green; names/types not
-relevant (no header, symbol or type change was needed -- `sRateKeyMask`,
+relevant (no header, symbol or type change was needed -- `sNeighbourBits`,
 `sChunkNeighbourDeltas`, `Obj866E8::unk60`/`unk64`, `Unk54Struct` and `ChunkLoadEntry`
 were all already correct; the stall was one variable too many).
 
@@ -322,7 +322,7 @@ Called once per element from `StageMap__LoadChunksAround`'s outer loop, filling 
 `ChunkLoadEntry` slot (`arg1`, `&stackBuf[count]` at the call site) and
 returning whether it produced a "real" entry (`1`) or a blank one (`0`):
 
-1. `mask = sRateKeyMask[key]` (a 7-entry `1 << key` bitmask table, proven-sized
+1. `mask = sNeighbourBits[key]` (a 7-entry `1 << key` bitmask table, proven-sized
    -- see below). If `(savedResult & mask) == 0`, the entry is blanked
    (`arg1->ptr0 = NULL`) and the function returns `0` early -- but the
    shared `arg1->id = key` write at the very end still happens (retail
@@ -332,7 +332,7 @@ returning whether it produced a "real" entry (`1`) or a blank one (`0`):
    `s32`, not `ChunkLoadEntry::rate`):
    - If `self->unk68->unk4 == 0`: `value = val + key`.
    - Else, index a second table `sChunkNeighbourDeltas[key]` (7-entry `Unk54Struct`
-     array, same proof as `sRateKeyMask`'s bound):
+     array, same proof as `sNeighbourBits`'s bound):
      - If `entry->unk0 == 0`: `value = val + entry->unk4`.
      - Else: `value = val + divisor * entry->unk0 + (flag ? entry->unk4 : entry->unk8)`
        (the `divisor * entry->unk0` multiply is scheduled in the branch's
@@ -381,9 +381,9 @@ this function.
   prototype before assuming a new residue class -- the `s32` return here
   is evidence-backed (retail's own `$v0` sets, not a guess), so the fix is
   almost certainly on `StageMap__LoadChunksAround`'s side, not this declaration's.
-- **Two new `extern` declarations**: `sRateKeyMask[7]` and
+- **Two new `extern` declarations**: `sNeighbourBits[7]` and
   `sChunkNeighbourDeltas[7]`. Both sizes are PROVEN, not guessed -- the data file
-  (`asm/data/76DC8.data.s`) places exactly 7 words at `sRateKeyMask` before
+  (`asm/data/76DC8.data.s`) places exactly 7 words at `sNeighbourBits` before
   `sChunkNeighbourDeltas` starts, and exactly 7 `Unk54Struct`-shaped (3-word) entries
   at `sChunkNeighbourDeltas` before the next symbol (`sFootprintResultRemap`) starts. Comments in
   the header point at this.
@@ -424,7 +424,7 @@ round-63 entry at the top.
 ```c
 s32 StageMap__ComputeChunkLoadEntry(Obj866E8 *self, ChunkLoadEntry *arg1, s32 divisor, s32 flag, s32 val, s32 savedResult, s32 key)
 {
-    s32 mask = sRateKeyMask[key];
+    s32 mask = sNeighbourBits[key];
     s32 result;
 
     if ((savedResult & mask) == 0) {
@@ -466,7 +466,7 @@ storeKey:
 }
 ```
 
-Needs (all added to `include/class_3bb8c.h` this round): `sRateKeyMask`,
+Needs (all added to `include/class_3bb8c.h` this round): `sNeighbourBits`,
 `sChunkNeighbourDeltas`, `Obj866E8::unk60`/`unk64`. `Unk54Struct` and `ChunkLoadEntry`
 already existed.
 
@@ -499,7 +499,7 @@ already existed.
 3. **Permuter**, `-j 6 --stack-diffs --stop-on-zero --best-only`, seeded
    with (2)'s body. `tools/setup-permuter.sh`'s two known bugs (missing
    `--addiu-at`, and the rodata-stripping `sed 1,4d`) were checked --
-   `sRateKeyMask`'s `%lo(...)` addressing DOES touch `addiu_at`, so
+   `sNeighbourBits`'s `%lo(...)` addressing DOES touch `addiu_at`, so
    `compile.sh`'s `MASPSX_FLAGS` was patched locally in
    `permuter-work/StageMap__ComputeChunkLoadEntry/` (never in the shared script, this round's
    parallel-mode constraint) before trusting any score; no embedded rodata
@@ -573,4 +573,4 @@ Round 78 (track 3, naming pass, bravo).
 
 | symbol | name | tier | evidence |
 | --- | --- | --- | --- |
-| `func_8004BA40` | `StageMap__ComputeChunkLoadEntry` | B | Fills one `ChunkLoadEntry` slot (`arg1->ptr0`/`arg1->id`) from `sChunkNeighbourDeltas[key]`/`sRateKeyMask[key]` and `self->unk60(self->unk64, ...)` (a stored resolver callback), called once per enabled `ChunkSlotSpec` by `StageMap__LoadChunksAround`. "Compute...Entry" matches that caller's own "Build...Entries" name (one call computes one entry of the array the caller builds). Return type corrected `void`->`s32` in an earlier round (see the header's own note); not revisited here. |
+| `func_8004BA40` | `StageMap__ComputeChunkLoadEntry` | B | Fills one `ChunkLoadEntry` slot (`arg1->ptr0`/`arg1->id`) from `sChunkNeighbourDeltas[key]`/`sNeighbourBits[key]` and `self->unk60(self->unk64, ...)` (a stored resolver callback), called once per enabled `ChunkSlotSpec` by `StageMap__LoadChunksAround`. "Compute...Entry" matches that caller's own "Build...Entries" name (one call computes one entry of the array the caller builds). Return type corrected `void`->`s32` in an earlier round (see the header's own note); not revisited here. |

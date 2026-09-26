@@ -252,7 +252,7 @@ s32 StageMap__ComputeNeighbourMask(StageMap *self, s32 val, s32 flag) {
  * image. It was inherited with the near-miss body and is verified here. */
 s32 StageMap__ComputeChunkLoadEntry(StageMap *self, ChunkLoadEntry *arg1, s32 divisor, s32 flag,
                                     s32 val, s32 savedResult, s32 key) {
-    s32 mask = sRateKeyMask[key];
+    s32 mask = sNeighbourBits[key];
     s32 result;
 
     if ((savedResult & mask) == 0) {

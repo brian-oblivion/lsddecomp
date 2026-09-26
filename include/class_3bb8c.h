@@ -33,7 +33,7 @@ extern LongVec3 sNeighbourOffsets[];
 /* `key`-indexed bitmask table (`1 << key`) StageMap__ComputeChunkLoadEntry tests
  * against ComputeRateFlags' result. 7 words in the data before
  * sChunkNeighbourDeltas starts. */
-extern const s32 sRateKeyMask[7];
+extern const s32 sNeighbourBits[7];
 
 /* `key`-indexed chunk-index steps to the seven chunks around a centre chunk
  * (ChunkNeighbourDelta, include/StageMap.h), 7 entries
