@@ -114,7 +114,7 @@ void *PickStyleFallbackConfig(void) {
     return result;
 }
 
-extern s32 gStyleDecorPosAX;
+extern s32 gStyleDecorPosX;
 extern s32 gStyleDecorPosAY;
 extern s32 gStyleDecorPosBX;
 extern s32 gStyleDecorPosBY;
@@ -133,7 +133,7 @@ struct ObjSlotAC {
     ObjSlotACMethods *methods; /* +0x000 */
 };
 
-/* Local view: gStyleDecorPosAX/gStyleDecorPosAY and gStyleDecorPosBX/gStyleDecorPosBY are two
+/* Local view: gStyleDecorPosX/gStyleDecorPosAY and gStyleDecorPosBX/gStyleDecorPosBY are two
  * adjacent 8-byte pairs, and this unit copies each into a local pair as a
  * WHOLE-STRUCT assignment rather than field by field.  That is not a style
  * choice -- it is load-bearing.  A BLKmode set makes gcc 2.6.3's cse.c call
@@ -167,7 +167,7 @@ void StyleBuildDecorSet(void) {
     if (gStyleDecorVariant == 0) {
         return;
     }
-    paramA = *(PairXY *)&gStyleDecorPosAX;
+    paramA = *(PairXY *)&gStyleDecorPosX;
     if (gStyleDecorVariant == 2) {
         paramA.y += 0x1E;
     }
@@ -243,7 +243,7 @@ void StyleUpdateDecorSet(void) {
     if (shift <= 0) {
         return;
     }
-    pos = *(PairXY *)&gStyleDecorPosAX;
+    pos = *(PairXY *)&gStyleDecorPosX;
     i = 0;
     if (gStyleDecorVariant == 2) {
         pos.y += 0x1E;
