@@ -108,7 +108,7 @@ struct BasicClass {
     BASICCLASS_FIELDS(BasicClassMethods);
 };
 
-extern BasicClassMethods gBasicClassMethods;                   /* BasicClass's own method table */
+extern BasicClassMethods gBasicClassMethods;           /* BasicClass's own method table */
 extern BasicClassMethods *Get_vtable_BasicClass(void); /* returns &gBasicClassMethods */
 
 /* BasicClass's methods: the occupants of its own table, code_8220 and

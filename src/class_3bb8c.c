@@ -40,8 +40,7 @@
 #include "Class81940.h"
 #include "Class86AA0.h"
 
-s32 Class866E8__SetTargetAndBuildRates(Class866E8 *self, void *arg1, SceneNode *arg2,
-                                       Descriptor10 *arg3) {
+s32 Class866E8__SetTargetAndBuildRates(Class866E8 *self, void *arg1, SceneNode *arg2, Descriptor10 *arg3) {
     s32 stackBuf[3];
     s32 ret;
 

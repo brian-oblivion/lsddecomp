@@ -61,7 +61,8 @@ void TaskCore__SetSubHandle(TaskCore *self, const char *path, BasicClass *handle
             self->subHandle->methods->release(self->subHandle);
         }
         self->subHandle = (BasicClass *)New_TimImage((char *)path);
-        ((TimImageUploadFn)((TimImage *)self->subHandle)->methods->processBuffer)((TimImage *)self->subHandle);
+        ((TimImageUploadFn)((TimImage *)self->subHandle)->methods->processBuffer)(
+            (TimImage *)self->subHandle);
         ((TimImage *)self->subHandle)->methods->freeBuffer((TimImage *)self->subHandle);
     } else {
         self->subHandle = handle;

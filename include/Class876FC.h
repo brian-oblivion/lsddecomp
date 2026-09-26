@@ -60,7 +60,7 @@ typedef struct Class876FCParams Class876FCParams;
  * retail's aligned 4-word-per-iteration block move. */
 struct Class876FCParams {
     /* +0x000 */ LongVec3 offset; /* added to the caller's position (InitByKind, UpdateByKind) */
-    /* +0x00C */ void *rotation;   /* updateRotation's ratio triple (AttachWithRotScale) */
+    /* +0x00C */ void *rotation;  /* updateRotation's ratio triple (AttachWithRotScale) */
     /* +0x010 */ void *scale; /* updateScale's ratio triple; its first s16 also scales the model-child spacing (PlaceModelChildren) */
     /* +0x014 */ s32 modelChildLayout; /* 0 = no modelChildren, else an index 1..4 into gModelChildSpacing: 1-2 along x, 3-4 along y */
     /* +0x018 */ s32 tableIndex;   /* index into gModelChildDriftZ and gSpriteShiftX */

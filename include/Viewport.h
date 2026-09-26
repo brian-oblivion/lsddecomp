@@ -81,7 +81,7 @@ struct ViewportRgb {
 struct ViewportRefView {
     LongVec3 vp;           /* +0x000, viewpoint: setViewPoint */
     LongVec3 vr;           /* +0x00C, reference point: setViewRef */
-    s32 rz;                 /* +0x018, twist, 20.12 (setTwist) */
+    s32 rz;                /* +0x018, twist, 20.12 (setTwist) */
     SceneNodeSub14 *super; /* +0x01C, the view node's GsCOORDINATE2 (AddChild) */
 };
 
@@ -214,7 +214,7 @@ SceneNode *Viewport__GetSubHandle(Viewport *self);
 void Viewport__SetUnkB4(Viewport *self, s32 value);
 void Viewport__SetDrawEnabled(Viewport *self, s32 on);
 
-Viewport *New_Viewport(void);              /* BMemPMgrAlloc(0xBC), then ctor */
+Viewport *New_Viewport(void);            /* BMemPMgrAlloc(0xBC), then ctor */
 SceneNode *GetRootNode(SceneNode *node); /* follow `parent` to the top */
 
 #endif

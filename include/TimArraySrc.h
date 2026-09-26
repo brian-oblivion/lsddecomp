@@ -55,7 +55,7 @@ struct TimArraySrcMethods {
 
 struct TimArraySrc {
     FILERESOURCE_FIELDS(TimArraySrcMethods); /* buffer: the block (count, then offsets) */
-    /* +0x02C */ s32 count;                /* images built: the block's first word */
+    /* +0x02C */ s32 count;                  /* images built: the block's first word */
     /* +0x030 */ struct TimImage **images; /* BMemPMgrAlloc(count * 4), one New_TimImage(NULL) each */
     /* +0x034 */ s32 clutBase; /* address of TimBlockSrc's entries[]; BuildImages adds 16 per CLUT row to it for each TimImage's clutBase */
     /* +0x038 */ s32 ready;    /* 0 from the ctor, 1 once BuildImages built the array */

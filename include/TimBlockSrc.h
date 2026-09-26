@@ -66,7 +66,7 @@ struct TimBlockSrcMethods {
 
 struct TimBlockSrc {
     FILERESOURCE_FIELDS(TimBlockSrcMethods); /* unk2A is the load state: 9 header, 10 blocks, 0 done */
-    /* +0x02C */ s32 blockCount;           /* TimArraySrcs built so far */
+    /* +0x02C */ s32 blockCount;             /* TimArraySrcs built so far */
     /* +0x030 */ struct TimArraySrc **blocks; /* one per block; ReleaseBasicClassArray'd by Finalize */
     /* +0x034 */ void *sector; /* the read buffer: 0x800 for the header, then the largest block size */
     /* +0x038 */ s32 sectorSize;

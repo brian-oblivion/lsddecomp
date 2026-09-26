@@ -263,10 +263,10 @@ struct Class866E8 {
     /* +0x064 */ void *valueFnCtx;          /* setCallback */
     /* +0x068 */ Unk68Struct *config;       /* setConfig; NULL after Reset */
     /* +0x06C */ SceneNode *target; /* setTargetAndBuildRates (DreamSys__SpawnAtLink passes the DreamSys); its coord2 is the tracked position */
-    /* +0x070 */ s32 enabled;        /* enable/disable; gates UpdateIfEnabled */
-    /* +0x074 */ s32 gridSpan;       /* setGridSpan: gDefaultGridSpan = 0xA000 */
-    /* +0x078 */ s16 gridHalfCells;  /* gridSpan >> 12 = 10 */
-    /* +0x07A */ s16 gridCells;      /* gridSpan >> 11 = 20, the row stride */
+    /* +0x070 */ s32 enabled;       /* enable/disable; gates UpdateIfEnabled */
+    /* +0x074 */ s32 gridSpan;      /* setGridSpan: gDefaultGridSpan = 0xA000 */
+    /* +0x078 */ s16 gridHalfCells; /* gridSpan >> 12 = 10 */
+    /* +0x07A */ s16 gridCells;     /* gridSpan >> 11 = 20, the row stride */
     /* +0x07C */ s16 footprintCol; /* BuildFootprintSlots' input: a signed column, clamped into [0,20) */
     /* +0x07E */ s16 footprintRow; /* the same, vertical */
     /* +0x080 */ s32 footprintWidth;
