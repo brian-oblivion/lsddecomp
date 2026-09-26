@@ -84,3 +84,13 @@ call site out from under it.
 `HullList_fa50`; the game-level purpose of the turn is not established).
 Posted to the broadcast for the head to apply once `class_3bb8c_o.c` is not
 live.
+
+## Track 7, re-send (2026-09-26, round 94, bravo)
+
+Unit-local fields renamed (every accessor is in this function):
+`HullList_fa50::n` -> `count` and `::c` -> `boxes` (the same shape as
+TmdHull's `count`), `Corners_fa50::f` -> `face` (two faces of four corners:
+TmdModel__GetHull's v[0..3] min-z face and v[4..7] max-z face). Parameter
+`d` -> `delta` (added to x or z of one face). `turn` and `back` kept: they
+already say what they select. A `MATCHING:` line marks the per-branch `k`
+(build 5 above). The types themselves are track 6's. Byte-identical.

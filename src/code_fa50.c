@@ -26,21 +26,23 @@
 #include <libgs.h>
 #include "TmdModel.h"
 
-/* A box with a leading word: TmdModel__GetHull's local. */
+/* A counted box list of one: TmdModel__GetHull's local (its count is set
+ * to 1, as the hull's is, and never read). */
 typedef struct TypedBox_fa50 {
-    s32 type;   /* +0x000 */
+    s32 count;  /* +0x000 */
     TmdBox box; /* +0x004 */
 } TypedBox_fa50;
 
-/* The eight corners of a box: v[0..3] one face, v[4..7] the other. */
+/* The eight corners of a box as two faces of four (TmdHull's v[0..3] and
+ * v[4..7]: the min-z face, then the max-z face). */
 typedef struct Corners_fa50 {
-    TmdVec3 f[2][4];
+    TmdVec3 face[2][4];
 } Corners_fa50;
 
 /* A counted list of boxes' corners (TmdHull is the one-box case). */
 typedef struct HullList_fa50 {
-    s32 n;             /* +0x000 */
-    Corners_fa50 c[1]; /* +0x004 */
+    s32 count;             /* +0x000 */
+    Corners_fa50 boxes[1]; /* +0x004 */
 } HullList_fa50;
 
 /* A segment: start and direction (end - start). */
@@ -53,6 +55,8 @@ typedef struct Ray_fa50 {
  * plus this bit for a semi-transparent face (libgpu's setSemiTrans bit). */
 #define TMD_MODE_ABE 0x02
 
+/* MATCHING: ~x + 1, not -x: retail negates with nor/addiu, and -x also
+ * changes what CSE keeps live across the branches. */
 #define ABS_fa50(x) ((x) < 0 ? ~(x) + 1 : (x))
 
 /* TmdModel__RaycastFaces: *best before any face is hit (the largest s32). */
@@ -139,6 +143,8 @@ void TmdModel__ComputeBounds(TmdModel *self, TmdBox *box) {
     s32 i;
     s32 n;
     TmdVertex *v;
+    /* MATCHING: the five field pointers are hoisted in retail; without them
+     * the function changes size. */
     s16 *miny = &box->min.y;
     s16 *minz = &box->min.z;
     s16 *maxx = &box->max.x;
@@ -180,7 +186,7 @@ void TmdModel__GetHull(TmdModel *self, TmdHull *out) {
     TypedBox_fa50 b;
 
     TmdModel__ComputeBounds(self, &b.box);
-    b.type = 1;
+    b.count = 1;
     out->v[0].x = b.box.min.x;
     out->v[0].y = b.box.min.y;
     out->v[0].z = b.box.min.z;
@@ -205,47 +211,49 @@ void TmdModel__GetHull(TmdModel *self, TmdHull *out) {
     out->v[7].x = b.box.max.x;
     out->v[7].y = b.box.min.y;
     out->v[7].z = b.box.max.z;
-    out->count = 1;
+    out->count = 1; /* MATCHING: the literal, not b.count, which is reloaded */
 }
 
-void RotateAndOffsetHullList(HullList_fa50 *h, s32 turn, s32 back, s32 d) {
+void RotateAndOffsetHullList(HullList_fa50 *h, s32 turn, s32 back, s32 delta) {
     Corners_fa50 tmp;
     Corners_fa50 *c;
     s32 i;
 
-    for (i = 0; i < h->n; i++) {
-        c = &h->c[i];
+    for (i = 0; i < h->count; i++) {
+        c = &h->boxes[i];
         if (turn != 0) {
             tmp = *c;
-            c->f[0][3] = tmp.f[0][0];
-            c->f[0][2] = tmp.f[0][1];
-            c->f[1][2] = tmp.f[0][2];
-            c->f[1][3] = tmp.f[0][3];
-            c->f[0][0] = tmp.f[1][0];
-            c->f[0][1] = tmp.f[1][1];
-            c->f[1][1] = tmp.f[1][2];
-            c->f[1][0] = tmp.f[1][3];
+            c->face[0][3] = tmp.face[0][0];
+            c->face[0][2] = tmp.face[0][1];
+            c->face[1][2] = tmp.face[0][2];
+            c->face[1][3] = tmp.face[0][3];
+            c->face[0][0] = tmp.face[1][0];
+            c->face[0][1] = tmp.face[1][1];
+            c->face[1][1] = tmp.face[1][2];
+            c->face[1][0] = tmp.face[1][3];
+            /* MATCHING: a k per branch; a single k at the top swaps the
+             * counter and pointer registers in all four loops. */
             if (back == 0) {
                 s32 k;
                 for (k = 0; k < 4; k++) {
-                    c->f[0][k].x += d;
+                    c->face[0][k].x += delta;
                 }
             } else {
                 s32 k;
                 for (k = 0; k < 4; k++) {
-                    c->f[1][k].x += d;
+                    c->face[1][k].x += delta;
                 }
             }
         } else {
             if (back == 0) {
                 s32 k;
                 for (k = 0; k < 4; k++) {
-                    c->f[0][k].z += d;
+                    c->face[0][k].z += delta;
                 }
             } else {
                 s32 k;
                 for (k = 0; k < 4; k++) {
-                    c->f[1][k].z += d;
+                    c->face[1][k].z += delta;
                 }
             }
         }
@@ -286,6 +294,8 @@ s32 TmdModel__RaycastFaces(TmdModel *self, s32 *best, TmdVec3 *hitOut, s32 *heig
     ray.dir.z = end->z - origin->z;
     found = 0;
     while ((p = TmdModel__NextPrimitive(self, p, &nverts, tri, &count)) != NULL) {
+        /* MATCHING: these are declared in the loop body, which puts their
+         * frame slots after nverts and count. */
         VECTOR unused; /* MATCHING: never read; keeps the frame's layout */
         TmdVertex e1;
         TmdVertex e2;
@@ -302,7 +312,7 @@ s32 TmdModel__RaycastFaces(TmdModel *self, s32 *best, TmdVec3 *hitOut, s32 *heig
         s32 q;
         s32 hi;
         s32 t;
-        s16 *minx;
+        s16 *minx; /* MATCHING: the six box-field pointers set the frame size */
         s16 *miny;
         s16 *minz;
         s16 *maxx;
@@ -569,6 +579,8 @@ TmdPrim *TmdModel__NextPrimitive(TmdModel *self, TmdPrim *p, s32 *n, TmdVec3 *ou
             idx[1] = PRIM(TMD_P_TNG3)->v1;
             idx[2] = PRIM(TMD_P_TNG3)->v2;
             size = sizeof(TMD_P_TNG3);
+        /* MATCHING: every triangle case jumps to this one tail; a copy per
+         * case changes the register allocation. */
         tri:
             *n = 3;
             break;

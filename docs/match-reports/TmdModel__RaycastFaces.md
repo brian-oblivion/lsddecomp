@@ -258,3 +258,7 @@ Byte-identical, first build.
   is tested. The six `24`s are `FACE_BOX_MARGIN` (decimal; each is the box
   grown on one side of one axis). `0x80000000` (the quotient's sign bit,
   a mask) and the 16.16 shift counts `16` stay literals.
+
+Later in the same pass: `MATCHING:` lines on `ABS_fa50` (build 3), the
+loop-body declarations (build 2) and the six box-field pointers (the frame
+measurement above). Comments only.

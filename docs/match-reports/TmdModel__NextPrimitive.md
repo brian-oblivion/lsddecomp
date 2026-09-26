@@ -272,3 +272,6 @@ first build.
 `TmdPrim` itself (`olen`, `ilen`, `flag`, `mode`, `h[20]`) is Sony's packet
 header `out, in, dummy, cd`; replacing it is a type job (track 6), proposed to
 the head.
+
+Later in the same pass: a `MATCHING:` line on the shared `tri:` tail (the
+second proposed learning above). Comment only.
