@@ -19,8 +19,8 @@ and wrong for every round after. Run the tool. The mechanics of a round
 the per-function matching loop is CLAUDE.md and `docs/MATCHING-GUIDE.md`.
 This file does not repeat them.
 
-Plan revision: 28 (2026-09-26, premium session after round 90: renames
-replay through `tools/replay.py`; track 8 splits are content-only and park).
+Plan revision: 29 (2026-09-26, round 91's premium head: both setup items
+done; `tools/sonyheaders.py`; replay leaves each side's own lines alone).
 Changing the plan is a premium head task (§2); record the change in
 `docs/PROGRESS.md` and bump this line.
 
@@ -157,7 +157,8 @@ no unit declares its own view of it; `plan.py classes` lists a STRAY VIEW.
   Types and class families: `tools/renametype.py`. Files: `tools/unitfile.py`.
   Each tool run is its own commit whose message's first line is the exact
   command. At merge, take `main`'s side of each hunk that conflicts only by
-  a rename (modify/delete: keep the renamed file), then `python3
+  a rename (modify/delete: keep the renamed file) and the owning runner's
+  side of a hunk in its own unit that also changes content, then `python3
   tools/replay.py`, which re-applies both sides' commands to what the other
   wrote and three-way merges the ledger, then the oracle. That is why jobs defer only on
   their EDIT sets and a rename touching a hundred units does not serialise

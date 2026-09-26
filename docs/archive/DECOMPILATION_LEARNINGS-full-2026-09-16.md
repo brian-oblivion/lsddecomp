@@ -9238,3 +9238,12 @@ Moved verbatim from §4 to meet the word budget after round 82 promoted two idio
   65 found two one-word padding artifacts sitting on a body two words SHORT, summing to the right
   total. Length is a SUM and cancels; the skeleton figure was 118 at that "exact length". Read the
   skeleton figure before believing a length claim, exactly as for ins/del. (a round 65)
+
+
+## Distilled from the lean guide, round 91 (2026-09-26)
+
+- **A register-identity verdict is a claim about the RESIDUE, not about the function, and it DECAYS
+  as the rest of the function changes.** All three of round 44's residues on `SceneNode__RaycastVertical` were
+  filed as one class; two were ordinary source-shape differences elsewhere in the body. When a stall
+  carries SEVERAL same-class residues, fix the STRUCTURE first and re-measure. (a
+  docs/match-reports/SceneNode__RaycastVertical.md, round 57)

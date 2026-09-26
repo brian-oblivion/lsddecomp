@@ -665,11 +665,6 @@ load through a runtime-indexed global", §"BLOCKED: the `nop_mflo_mfhi` screen r
   ("delay-slot scheduling" both times) had never been re-questioned and was wrong both times; each
   closed in single-digit builds after 14 and 46 rounds. A revisit's first act is to re-derive the
   CLASS from the disassembly. (a round 59)
-- **A register-identity verdict is a claim about the RESIDUE, not about the function, and it DECAYS
-  as the rest of the function changes.** All three of round 44's residues on `SceneNode__RaycastVertical` were
-  filed as one class; two were ordinary source-shape differences elsewhere in the body. When a stall
-  carries SEVERAL same-class residues, fix the STRUCTURE first and re-measure. (a
-  docs/match-reports/SceneNode__RaycastVertical.md, round 57)
 - **A lever's NEGATIVE is scoped to the (function, lever, STATE) triple, and so is a POSITIVE.** A
   guard polarity inert in round 19 closed three words in round 33; a fix rejected in rounds 19 and
   20 closed the function in round 49. **If you have changed anything else since a lever was
@@ -731,4 +726,4 @@ is a lone scheduling difference, sweep one statement's PLACEMENT", §"Inherited 
 statements must be tested in BOTH directions". Distilled out rounds 71-72: §"A narrow signed field may need an `s32` LOCAL", §"A missing `andi 0xff`" (getintr). Distilled out round 73: §"An INCOMPLETE-ARRAY global declaration" (contextual, single
 instance), §"A same-size pointer cast in a FUNCTION-SCOPE local", §"A permuter run that plateaus
 with NO MOVEMENT AT ALL", §"The frame size bounds how many spilled locals"; the 3j local-count entry
-folded into 3d's. Distilled out round 77: §"`volatile` is the WRONG tool for an ADDRESS CSE" (the asm-label alias lever). Distilled out round 81 (process, carried by FINISHING-PLAN track 3 step 3 and `check-nonmatching.sh`): §"A type-scoped field rename is enumerated by the COMPILER", §"A preserved `#if 0` body carries the declarations of the round that WROTE it". Distilled out round 86 (track 1 closed; round 75's 30/31 is in PROGRESS): §"A \"register-identity\" verdict is the least reliable class", §"A register-identity verdict is a HYPOTHESIS".
+folded into 3d's. Distilled out round 77: §"`volatile` is the WRONG tool for an ADDRESS CSE" (the asm-label alias lever). Distilled out round 81 (process, carried by FINISHING-PLAN track 3 step 3 and `check-nonmatching.sh`): §"A type-scoped field rename is enumerated by the COMPILER", §"A preserved `#if 0` body carries the declarations of the round that WROTE it". Distilled out round 86 (track 1 closed; round 75's 30/31 is in PROGRESS): §"A \"register-identity\" verdict is the least reliable class", §"A register-identity verdict is a HYPOTHESIS". Distilled out round 91 (track 1 closed): §"A register-identity verdict is a claim about the RESIDUE".

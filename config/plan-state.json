@@ -1,7 +1,8 @@
 {
   "models": {
     "match_runner": null,
-    "naming_runner": "sonnet"
+    "naming_runner": "sonnet",
+    "polish_runner": "sonnet"
   },
   "stop_rule": {
     "attempts_per_model": 6,
@@ -1259,8 +1260,24 @@
         "sdk-headers": true
       },
       "flagged": {},
-      "parked": {},
+      "parked": {
+        "S16Quad_d294": "IS Sony's SVECTOR by layout and use (echo, round 91, SceneNode__SceneNode.md); substitution blocked while SceneNode.h's includers re-declare Sony names (python3 tools/sonyheaders.py: 24 units broke with <libgs.h> in SceneNode.h). Unpark (--undo) when sonyheaders.py lists none of them, then use Sony's type. (2026-09-26)",
+        "SceneNodeSub14": "IS Sony's GsCOORDINATE2 by layout and use (echo, round 91, SceneNode__SceneNode.md); substitution blocked while SceneNode.h's includers re-declare Sony names (python3 tools/sonyheaders.py: 24 units broke with <libgs.h> in SceneNode.h). Unpark (--undo) when sonyheaders.py lists none of them, then use Sony's type. (2026-09-26)",
+        "SceneNodeSub44": "IS Sony's GsCOORD2PARAM by layout and use (echo, round 91, SceneNode__SceneNode.md); substitution blocked while SceneNode.h's includers re-declare Sony names (python3 tools/sonyheaders.py: 24 units broke with <libgs.h> in SceneNode.h). Unpark (--undo) when sonyheaders.py lists none of them, then use Sony's type. (2026-09-26)"
+      },
       "reason": "",
+      "rounds": [
+        {
+          "attempts": 3,
+          "calibration": false,
+          "date": "2026-09-26",
+          "matches": 3,
+          "model": "opus",
+          "note": "Premium head, cap 5. Head did both setup items first (sdk-headers: include/psyq LF+lowercase, types.h guards, tools/sonyheaders.py; format: .clang-format + make format, byte-identical, every tool's output unchanged). Track 6 runners: alpha (sonnet, mechanical) 13 method tables -> g<Class>Methods; charlie Class6D430 -> FileResource (tier A; CdLoc16=CdlLOC parked on libcd collisions); echo Class6B5CC -> SceneNode (tier A) plus LongVec3, Ratio16, TmdHull/TmdVec3 and 11 methods; SceneNodeSub14/Sub44/S16Quad_d294 are Sony's GsCOORDINATE2/GsCOORD2PARAM/SVECTOR, parked until sonyheaders.py clears their includers. Head applied 5 proposed fields/slots by type scope. replay.py fixed (it rewrote each side's own history lines).",
+          "round": 91,
+          "runners": 3
+        }
+      ],
       "status": "auto"
     },
     "7": {
@@ -1268,8 +1285,23 @@
         "format": true
       },
       "reason": "",
+      "rounds": [
+        {
+          "attempts": 2,
+          "calibration": false,
+          "date": "2026-09-26",
+          "matches": 2,
+          "model": "opus",
+          "note": "First polish round. bravo code_8220_c (magic 239->1, rawoff 101->1: the unit is Sony-typed end to end, DIVPOLYGON3/4, RVECTOR, POLY_*, addPrim); delta code_8220_b (magic 229->11, rawoff 30->1: SortTmdObject named, libgpu macros and GsDOFF/GPU codes adopted). Head reviewed names against evidence (DIVPOLYGON3 size 0x218 and cr[0].r0 at 0xA8 recomputed from libgte.h; GsLIGHT_MODE pin checked), sent none back; polish runner set to sonnet per section 2.",
+          "round": 91,
+          "runners": 2
+        }
+      ],
       "status": "auto",
-      "units_done": {}
+      "units_done": {
+        "code_8220_b": "2026-09-26",
+        "code_8220_c": "2026-09-26"
+      }
     },
     "8": {
       "parked": {},

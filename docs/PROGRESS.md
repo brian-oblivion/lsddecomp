@@ -6,6 +6,64 @@ stale, prose elsewhere is not.
 
 ---
 
+## 2026-09-26 — round 91: phase 2 setup done, first track 6 and 7 runners (premium head, plan revision 29)
+
+Premium head (Opus 5.5), cap 5. Gate 0 green; the only ready jobs were the
+two premium setup items, so the head did them first, then staffed five.
+
+- **`sdk-headers`.** `include/psyq/` is LF and lowercase (Sony's own
+  `#include`s and the pe2/sotn trees spell it so; `<sys/types.h>` now
+  resolves). `types.h` defines `u_char`..`u_long` under `<sys/types.h>`'s
+  guards. `u_long` stays `unsigned int`: Sony's `unsigned long` was tried and
+  made every `u32 *` passed to `LoadImage` an incompatible-pointer warning,
+  cascading into callers. `code_10ee0.c` includes four Sony headers,
+  byte-identical, and `setPolyFT4` expands again. New `tools/sonyheaders.py`
+  lists files that re-declare a Sony name their own way (6 headers, 21 units
+  at setup); `plan.py` attaches each to its job.
+- **`format`.** `.clang-format` (clang-format 22), ColumnLimit 100 with
+  PenaltyExcessCharacter 3: at 10, 73 declarations were split to fit their
+  trailing comments; at 3, 9 are. Unfenced, clang-format deleted
+  `BASICCLASS_FIELDS`'s body and rewrote K&R definitions, so every multi-line
+  `#define` and both K&R definitions carry `/* clang-format off/on */`. Every
+  measuring tool printed identical output before and after, once two
+  layout-dependent tools were fixed (`readability.py` counted `#define`
+  continuation lines; `externcheck.py` wanted `arity-ok:` on the extern's own
+  physical line). splat regenerates `include/include_asm.h` on every extract,
+  undoing its fences in each runner tree; `make format` now skips it.
+- **Runners.** alpha (Sonnet): 13 method tables to `g<Class>Methods`.
+  charlie: `Class6D430` to `FileResource`. echo: `Class6B5CC` to `SceneNode`,
+  plus `LongVec3`, `Ratio16`, `TmdHull`/`TmdVec3` and eleven methods. bravo
+  and delta: polish of `code_8220_c` (magic 239 to 1, rawoff 101 to 1) and
+  `code_8220_b` (229 to 11, 30 to 1), both now Sony-typed (`DIVPOLYGON3`,
+  `RVECTOR`, `POLY_*`, libgpu macros). Review: `DIVPOLYGON3`'s 0x218 size
+  and `cr[0].r0` at 0xA8 recomputed from `libgte.h`; `LoadFile`'s body read
+  for `FileResource`; the `GsLIGHT_MODE` pin checked. Nothing sent back, so
+  the polish runner is Sonnet from round 92 (§2).
+- **Merges.** Four of five conflicted, all rename-only except delta's own
+  unit, which is taken from its owner (the new clause in §3). **replay.py
+  had a bug**: it re-applied a side's renames to that side's own lines that
+  kept the old name on purpose (`> Renamed from OLD`, quoted commands), so
+  reports claimed renames that never happened. Commands now carry their
+  side's tip and skip lines present there. Eleven lines the charlie merge had
+  damaged were restored.
+- **Head at merge.** Applied by type scope: `FileResource.processBuffer`
+  and `.loadState` (charlie, 43 accessors, more units than proposed, each
+  read), and `SceneNode` slots `setBackClip`/`notifyWithHull`/`getModelHull`
+  plus `Ratio16.num`/`.den` (echo, 59 accessors). Typeviews baseline
+  rewritten: 34 gone, none new. One learning promoted (3h: a raw-offset
+  store rewritten as a field store is not byte-neutral), one distilled.
+- **Parked.** `SceneNodeSub14`/`Sub44`/`S16Quad_d294` are Sony's
+  `GsCOORDINATE2`/`GsCOORD2PARAM`/`SVECTOR` by layout and use, but
+  `<libgs.h>` in `SceneNode.h` broke 24 includers. Charlie's `CdLoc16`
+  (= `CdlLOC`) waits on four `code_179d8_*` units' local libcd prototypes.
+
+Open for the operator (see the round report): whether `D_8008E248` to
+`D_8008E250` and `D_80090C18` are libgs `global.o`'s `GsLIOFF`/`GsLMODE`/
+`GsLIGNR`/`GsNDIV` (delta's reading); `rename.py`'s pin sizes, which
+look like gap estimates (`PSDOFSY` is 4 bytes, pinned as 8).
+
+---
+
 ## 2026-09-26 — premium session: plan revision 28 (round 90's three escalations)
 
 All three measured before ruling; two accepted as tool fixes, one as wording.
