@@ -38,7 +38,7 @@ void Entity__MoodCue102(Entity *this, EntityMoodHandlerArg *out) {
         out->unk34 = -2;
     }
     if (this->unkFC >= 0x33) {
-        this->methods->slot44(this, 0, D_80089CAC);
+        this->methods->slot44(this, 0, ROTATION_YAW_MINUS_THIRD);
     }
     if (this->unkFC >= 0x30D) {
         SceneNode__FaceTarget(this, this->unk94, 1, 0, 0);
@@ -146,7 +146,7 @@ elsewhere in this unit -- same symbol, not redecoded per call site.
 
 ## Three constants left unnamed this round
 
-- `D_80089CAC` (`updateRotation` arg, `moodTimer >= 0x33` branch): s16-pair
+- `ROTATION_YAW_MINUS_THIRD` (`updateRotation` arg, `moodTimer >= 0x33` branch): s16-pair
   decoded `(0,1, -1,3, 0,1, 0,1)` -- only Y nonzero, but -1/3 degree is not
   a whole number, so it does not fit the established `ROTATION_YAW_PLUS2`/
   `ROTATION_YAW_PLUS9`/`ROTATION_YAW_PLUS1` whole-degree convention. No
