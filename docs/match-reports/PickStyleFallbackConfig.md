@@ -22,7 +22,7 @@ extern s32 gStyleKind;         /* already s32 in class_3bb8c_m.c and this unit's
 extern s8 gStyleVariantPicks[];        /* 16-entry table, indexed by (gStyleCounter+gStyleKind)&0xF */
 extern s32 gStyleVariant;
 extern s8 gStyleVariantConfigCounts[];        /* divisor table, indexed by "kind" -- raw index, no scale */
-extern s32 D_8008AC84;
+extern s32 gStyleConfigIndex;
 extern s32 gStyleVariantConfigs[];       /* array of raw base addresses, indexed by "kind" (scaled x4) */
 extern s32 gStyleFlushColor;
 extern u8 gStyleDecorColorsB[];        /* address only taken */
@@ -50,7 +50,7 @@ void *PickStyleFallbackConfig(void) {
     gStyleVariant = kind;
     divisor = gStyleVariantConfigCounts[kind];
     remainder = sum % divisor;
-    D_8008AC84 = remainder;
+    gStyleConfigIndex = remainder;
     result = (s8 *) gStyleVariantConfigs[kind] + remainder * 4;
     if (kind == 0) {
         b3 = result[3];
