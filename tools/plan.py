@@ -705,8 +705,28 @@ def class_footprint(c):
         # a function DEFINED returning the object (a singleton getter, an
         # allocator): round 87's GetDrawSystem, extern'd under other views
         syms |= set(re.findall(rf"^\s*(?:{ore})\s*\*\s*(\w+)\s*\([^;{{]*\)\s*\{{", t, re.M))
+    # a function whose BODY calls a getter of the table: the allocator, whatever
+    # type it is declared returning (round 88: New_Obj6EAC0 returned Unk64Elem *
+    # and was extern'd as FieldM7C *, so its four calling units were missed).
+    # Only the .c files naming it count: an extern of it in a widely included
+    # header does not make that header's includers its accessors.
+    getters = {g for t, _ in _fp_texts.values()
+               for g in re.findall(rf"\b(\w+)\s*\(\s*(?:void)?\s*\)\s*\{{\s*return\s+&?\s*{tre}\s*;", t)}
+    alloc = set()
+    if getters:
+        gre = re.compile(r"\b(?:" + "|".join(map(re.escape, sorted(getters))) + r")\s*\(")
+        for t, _ in _fp_texts.values():
+            for m in re.finditer(r"^\w[\w \t\*]*?\b(\w+)\s*\([^;{]*\)\s*\{(.*?)^\}", t, re.M | re.S):
+                if gre.search(m.group(2)):
+                    alloc.add(m.group(1))
+    alloc -= syms
     rx = re.compile(r"\b(?:" + "|".join(sorted(map(re.escape, syms))) + r")\b")
     hit = {f for f, (t, _) in _fp_texts.items() if rx.search(t)}
+    if alloc:
+        arx = re.compile(r"\b(?:" + "|".join(sorted(map(re.escape, alloc))) + r")\b")
+        direct = {f for f, (t, _) in _fp_texts.items() if f.suffix == ".c" and arx.search(t)}
+    else:
+        direct = set()
     hdrs = {f.name for f in hit if f.suffix == ".h"}
     grew = True
     while grew:                                  # headers that include a hit header, transitively
@@ -718,7 +738,7 @@ def class_footprint(c):
     if hdrs & {"common.h", "types.h"}:           # headercontention.UBIQUITOUS: every unit sees it
         return {f.stem for f in _fp_texts if f.suffix == ".c"}
     return {f.stem for f, (_, inc) in _fp_texts.items()
-            if f.suffix == ".c" and (f in hit or inc & hdrs)}
+            if f.suffix == ".c" and (f in hit or f in direct or inc & hdrs)}
 
 
 _nm_cache = {}
