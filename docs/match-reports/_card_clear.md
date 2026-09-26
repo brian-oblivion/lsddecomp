@@ -128,7 +128,7 @@ report recommending a permuter budget on Sony's code.
 > `func_80050B58` -> `_card_write` (both confirmed in
 > `config/symbols.slps01556.lsdde.txt`, `lib/libcard/a80.o` /
 > `lib/libcard/a78.o`), spliced the exact round-32 body into
-> `src/class_3bb8c_v.c` in place of the `INCLUDE_ASM`, and ran the real
+> `src/libcard_card_clear.c` in place of the `INCLUDE_ASM`, and ran the real
 > oracle: **`build exit=0`, whole-image SHA1 matches**, and
 > `funcdiff.py _card_clear` reports **9/12 words, exact length, no
 > drift** -- IDENTICAL to round 32's recorded diff (same three words: the
@@ -233,13 +233,13 @@ report recommending a permuter budget on Sony's code.
 > catches it. When a function is "one word short" with no visible diff,
 > compare the WORDS, not the text.
 
-Unit: `src/class_3bb8c_v.c` (carved this round). Round 27, by the HEAD.
+Unit: `src/libcard_card_clear.c` (carved this round). Round 27, by the HEAD.
 Size: 12 words (0x30 bytes), vram `0x80050B28`, file `0x41328`.
 
 ## Screens (clean)
 
 ```
-grep -n 'gp_rel' asm/nonmatchings/class_3bb8c_v/_card_clear.s            -> no hits
+grep -n 'gp_rel' asm/nonmatchings/libcard_card_clear/_card_clear.s            -> no hits
 grep -A2 -nE '\b(mflo|mfhi)\b' ... | grep -E '\b(mult|multu|div|divu)\b'   -> no hits
 ```
 
@@ -431,7 +431,7 @@ suggested search command omits `--stack-diffs`; running it that way found a
 verified by hand: the permuter's default scorer NORMALIZES stack-offset
 differences away, so a candidate compiling to the WRONG frame size
 (`addiu sp,sp,-0x18`, still 8 bytes short of retail's `-0x20`) scored 0
-against the real target.** Splicing it into `src/class_3bb8c_v.c` and
+against the real target.** Splicing it into `src/libcard_card_clear.c` and
 running `./build-and-verify.sh` gave `5/12`, unchanged — the "zero" was
 purely an artifact of the missing flag. **Re-ran with `--stack-diffs`
 passed explicitly; this is the flag to use whenever the residue under
@@ -575,7 +575,7 @@ before concluding the order is unreachable.**
 With the order fixed, only the stack-frame `ra`-offset residue (`0x18` vs
 retail's `0x1c`, this report's already-documented granularity problem) and
 ONE OTHER instruction should remain. Spliced this exact body into
-`src/class_3bb8c_v.c` and ran the real oracle:
+`src/libcard_card_clear.c` and ran the real oracle:
 
 ```
 build exit=2
@@ -756,3 +756,27 @@ s32 _card_clear(s32 chan) {
 }
 #endif
 ```
+
+## File history (moved from the unit banner, round 90)
+
+- Round 27 (head): carved `class_3bb8c_v` as a one-function unit, because
+  the function sat between two PSX BIOS trampoline clusters inside the old
+  `class_3bb8c_h` segment (2 before, now `class_3bb8c_h_b`; 5 after, now
+  `class_3bb8c_h_c`), and trampolines stay in `asm` segments. Not a
+  class-table slot (`classtable.py --scan`). The canonical declaration is
+  the caller's, `extern s32 _card_clear(s32 arg0);` in
+  `src/class_3bb8c_e.c`, passing `self->unk10`.
+- Round 34: the neighbours became linked libcard objects, so the unit now
+  sits between placed `libcard/c171` and `libcard/a78`.
+- Round 36 (runner charlie): retargeted the preserved body's callees to
+  `_new_card`/`_card_write`, re-measured 9/12, exact length, no drift;
+  restored `INCLUDE_ASM` (body preserved above).
+- Round 39 (head): identified as Sony libcard, unmatchable by construction
+  (this report's top sections). The old banner kept a stale "12 words --
+  this should close in one sitting" directive as an example of a confident
+  stale instruction; that example now lives here.
+- Round 90 (track 8): `tools/unitfile.py rename class_3bb8c_v
+  libcard_card_clear`. `tuboundary.py --unit class_3bb8c_v`: "(after
+  sony:libcard/c171): start edge possible"; both neighbours are placed
+  objects, so no merge was possible. Named for the function because the
+  object's module id is not measurable from the discs on hand.

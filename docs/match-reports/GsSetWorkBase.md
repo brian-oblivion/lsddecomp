@@ -10,8 +10,8 @@
 > function is still game code and still MATCHED; it simply lives in a
 > different file. Seven of `code_2cc8c_e`'s functions turned out to be Sony's
 > and are now linked from SDK objects, which left this one wedged between
-> `o` segments -- so it has its own one-function unit, **`code_2cc8c_e1`**
-> (`src/code_2cc8c_e1.c`). The body below is unchanged and still compiles
+> `o` segments -- so it has its own one-function unit, **`libgs_gs_124`**
+> (`src/libgs_gs_124.c`). The body below is unchanged and still compiles
 > byte-exact. `include/code_2cc8c.h` still declares it for its one caller,
 > but that new file does NOT include the header, so the two are no longer
 > cross-checked by the compiler and must be kept in step by hand.
@@ -42,7 +42,7 @@ shows.
 
 `GsOUT_PACKET_P` is Sony's global (pinned; not renamed -- CLAUDE.md/FINISHING-PLAN
 track 3, "do not rename a Sony symbol"). Referenced from two units
-(`code_2cc8c_e1.c` here, `code_8220_b.c`), so it is a genuine cross-unit
+(`libgs_gs_124.c` here, `code_8220_b.c`), so it is a genuine cross-unit
 global, not unit-static -- moot here since it already carries its Sony name.
 
 ### Sibling note
@@ -55,3 +55,18 @@ lines above this one. `D_800902E4` is NOT referenced outside
 `GsOUT_PACKET_P` it does not carry a Sony pin as far as this unit can see --
 that's charlie's call to make with `rename.py`, which will say either way.
 Posted to the broadcast for parallel naming.
+
+## File history (moved from the unit banner, round 90)
+
+- Round 34 (2026-09-12): the functions on both sides became linked Sony
+  objects (gs_123 `Gssub_make_matrix` in front, gs_111 `GsDrawOt` behind), so
+  this function got its own one-function unit rather than putting an `o`
+  segment inside a `c` one.
+- Round 78 (head, track 2): identified as Sony's `GsSetWorkBase`
+  (libgs/gs_124): `sdkname.py` EXACT (TINY, 4 words) on discs 3.3/3.5/3.6;
+  its one store target 0x8008E794 is `GsOUT_PACKET_P` (pinned in
+  `config/psyq-objects.ld`; LIBGS.H: "Work Base pointer"). `progress.py`
+  counts it as library through the `identified` comment on its symbols entry.
+- Round 90 (track 8): `tools/unitfile.py rename code_2cc8c_e1 libgs_gs_124`.
+  `tuboundary.py --unit code_2cc8c_e1`: "(after sony:libgs/gs_123): start edge
+  possible"; both neighbours are placed objects, so no merge was possible.

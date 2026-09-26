@@ -216,7 +216,7 @@ extern WholeFrac_d294 D_8008A8F4; /* {0, 1}: Viewport__AttachViewChild's twist
    call site's own compiled bytes.
    ROUND 34: both are still GAME CODE, but neither lives in code_2cc8c_e any
    more -- they are the two one-function units src/code_2cc8c_e0.c and
-   src/code_2cc8c_e1.c, wedged between Sony objects. Those files do NOT
+   src/libgs_gs_124.c, wedged between Sony objects. Those files do NOT
    include this header, so these two declarations are not checked against
    their definitions by the compiler; they agree today and must be kept in
    step by hand.
