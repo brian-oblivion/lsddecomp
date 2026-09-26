@@ -57,7 +57,7 @@ s32 Class866E8__FindElemIndexByUnk30(Class866E8 *self, s32 key) {
 void Class866E8__RefreshFootprint(Class866E8 *self) {
     s32 idx;
 
-    if (self->unk1B8 == 0) {
+    if (self->chunksLoaded == 0) {
         return;
     }
     idx = self->gridHalfCells * 2;
@@ -180,7 +180,7 @@ void Class866E8__BuildFootprintSlots(Class866E8 *self) {
         }
     }
     slot = &self->rects.e[0];
-    slot->elemIdx = self->methods->findElemIndexByUnk32(self, quadrant);
+    slot->slotIndex = self->methods->findElemIndexByUnk32(self, quadrant);
     slot->col = (col >= 0) ? col : 0;
     slot->row = row;
     span = col + width;
@@ -190,7 +190,7 @@ void Class866E8__BuildFootprintSlots(Class866E8 *self) {
         count = Class866E8__SplitFootprintSlot(self, slot, 0, quadrant, col, row, width, height);
         count += 1;
         slot = &self->rects.e[count];
-        slot->elemIdx = self->methods->findElemIndexByUnk32(self, quadrant + 1);
+        slot->slotIndex = self->methods->findElemIndexByUnk32(self, quadrant + 1);
         slot->col = 0;
         slot->row = self->rects.e[0].row;
         slot->width = over;
@@ -221,14 +221,14 @@ s32 Class866E8__SplitFootprintSlot(Class866E8 *self, GridSlot866E8 *slot, s32 co
 
         if (col < 10) {
             elemArg = baseIdx + 2;
-            slot->elemIdx = self->methods->findElemIndexByUnk32(self, elemArg);
+            slot->slotIndex = self->methods->findElemIndexByUnk32(self, elemArg);
             slot->col = col + 10;
             /* Stored in BOTH arms: cross-jumping merges the copies, and
              * the join label keeps the col reload below after it. */
             slot->height = span;
         } else {
             elemArg = baseIdx + 3;
-            slot->elemIdx = self->methods->findElemIndexByUnk32(self, elemArg);
+            slot->slotIndex = self->methods->findElemIndexByUnk32(self, elemArg);
             slot->col = col - 10;
             slot->height = span;
         }
@@ -245,7 +245,7 @@ s32 Class866E8__SplitFootprintSlot(Class866E8 *self, GridSlot866E8 *slot, s32 co
             widthLeft = widthLeft - span;
             slot->width = widthLeft;
             slot = &self->rects.e[count];
-            slot->elemIdx = self->methods->findElemIndexByUnk32(self, elemArg + 1);
+            slot->slotIndex = self->methods->findElemIndexByUnk32(self, elemArg + 1);
             slot->col = 0;
             slot->row = 0;
             slot->width = span - 20;
@@ -265,14 +265,16 @@ void Class866E8__SetFootprintFromQuery(Class866E8 *self) {
 
     self->methods->getTargetDescriptor(self, &buf, 0);
     self->rectCount = 0;
-    self->rectCount = Class866E8__InitFootprintSlot(self, junk, 0, buf.unk28);
+    self->rectCount = Class866E8__InitFootprintSlot(self, junk, 0, buf.chunkIndex);
     if (IsPointOutOfBounds(self->bounds, &buf.base.b2) != 0) {
-        if (buf.unk28 + 1 < self->config->rows) {
-            self->rectCount = Class866E8__InitFootprintSlot(self, junk, self->rectCount, buf.unk28 + 1);
+        if (buf.chunkIndex + 1 < self->config->rows) {
+            self->rectCount =
+                Class866E8__InitFootprintSlot(self, junk, self->rectCount, buf.chunkIndex + 1);
         }
     }
-    if (buf.unk28 - 1 >= 0) {
-        self->rectCount = Class866E8__InitFootprintSlot(self, junk, self->rectCount, buf.unk28 - 1);
+    if (buf.chunkIndex - 1 >= 0) {
+        self->rectCount =
+            Class866E8__InitFootprintSlot(self, junk, self->rectCount, buf.chunkIndex - 1);
     }
 }
 
@@ -283,8 +285,8 @@ void Class866E8__SetFootprintFromQuery(Class866E8 *self) {
  * of $v0, and pushing `bounds` to $a2), and the final `>=` folds back into
  * the store-flag `slt`. See docs/match-reports/IsPointOutOfBounds.md. */
 s32 IsPointOutOfBounds(Bounds866E8_3bb8c_b *bounds, s8 *point) {
-    if (bounds != NULL && point[0] >= bounds->minX && bounds->maxX >= point[0] &&
-        point[1] >= bounds->minY && bounds->maxY >= point[1]) {
+    if (bounds != NULL && point[0] >= bounds->minCol && bounds->maxCol >= point[0] &&
+        point[1] >= bounds->minRow && bounds->maxRow >= point[1]) {
         return 0;
     }
     return 1;
@@ -295,7 +297,7 @@ s32 Class866E8__InitFootprintSlot(Class866E8 *self, s32 unused, s32 key, s32 arg
 
     slot = &self->rects.e[key];
     *slot = gDefaultElemRateOffset;
-    slot->elemIdx = self->methods->findElemIndexByUnk30(self, arg3);
+    slot->slotIndex = self->methods->findElemIndexByUnk30(self, arg3);
     return key + 1;
 }
 
@@ -310,7 +312,7 @@ void Class866E8__SetFootprintCellFlag(Class866E8 *self, s32 setBit) {
 
     slot = self->rects.e;
     for (i = 0; i < self->rectCount; slot++, i++) {
-        e = &self->elems[slot->elemIdx];
+        e = &self->elems[slot->slotIndex];
         if (e->loader->headerReady == 0) {
             continue;
         }

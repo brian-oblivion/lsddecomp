@@ -121,12 +121,12 @@ s32 Class866E8__UpdateFootprintTracking(Class866E8 *self) {
         return 0;
     }
 
-    e = buf.unk24;
+    e = buf.slot;
     key = e->loader->elemKey;
     result = sFootprintResultRemap[key];
 
     if (self->config->isVertical == 0) {
-        self->methods->buildRateEntries(self, buf.unk28, (LongVec3 *)&buf.unkC,
+        self->methods->buildRateEntries(self, buf.chunkIndex, &buf.chunkCentre,
                                         sFootprintResultPtrTable[result]);
     }
 
@@ -174,9 +174,9 @@ void Class866E8__BuildRateEntries(Class866E8 *self, s32 val, LongVec3 *arg2, Tar
         count = 0;
         for (i = 0; i < 7; i++) {
             e = self->methods->findElemByUnk32(self, i);
-            e->key = arg3[i].key;
-            if (arg3[i].flag != 0) {
-                tbl = &sRateOffsetTable[arg3[i].key];
+            e->neighbour = arg3[i].neighbour;
+            if (arg3[i].load != 0) {
+                tbl = &sRateOffsetTable[arg3[i].neighbour];
                 u14 = (Unk14Obj *)e->cellParent->coord2;
                 if (self->config->isVertical == 0) {
                     u14->unk18.w = arg2->x + tbl->x;
@@ -189,14 +189,14 @@ void Class866E8__BuildRateEntries(Class866E8 *self, s32 val, LongVec3 *arg2, Tar
                 }
                 e->cellParent->coord2->flg = 0;
                 Class866E8__ComputeRateEntry(self, &stackBuf[count], divisor, flag, val,
-                                             savedResult, arg3[i].key);
+                                             savedResult, arg3[i].neighbour);
                 count++;
             }
         }
 
         for (i = 0; i < 7; i++) {
             e = &self->elems[i];
-            e->loader->elemKey = e->key;
+            e->loader->elemKey = e->neighbour;
         }
 
         self->methods->applyRateEntries(self, stackBuf, count);
@@ -281,17 +281,17 @@ s32 Class866E8__ComputeRateEntry(Class866E8 *self, SetupEntry866E8 *arg1, s32 di
         *(s32 *)((u8 *)arg1 + 4) = val + key;
     }
 
-    arg1->ptr0 = self->valueFn(self->valueFnCtx, *(s32 *)((u8 *)arg1 + 4), 0, 0);
+    arg1->file = self->valueFn(self->valueFnCtx, *(s32 *)((u8 *)arg1 + 4), 0, 0);
     do {
     } while (0);
     result = 1;
     goto storeKey;
 
 nullCase:
-    arg1->ptr0 = NULL;
+    arg1->file = NULL;
 
 storeKey:
-    arg1->id = key;
+    arg1->neighbour = key;
     return result;
 }
 
@@ -309,24 +309,24 @@ void Class866E8__ApplyRateEntries(Class866E8 *self, SetupEntry866E8 *arr1, s32 c
     SetupSub866E8 *sp;
 
     for (i = 0; i < count; i++) {
-        sp = (SetupSub866E8 *)&arr1->rate;
-        e = self->methods->findElemByUnk32(self, sp->id);
+        sp = (SetupSub866E8 *)&arr1->chunkIndex;
+        e = self->methods->findElemByUnk32(self, sp->neighbour);
         ((Class866E8OnElementEventFn)self->methods->notifyWithHull)(self, 6, e, i);
-        if (arr1->ptr0 != 0) {
+        if (arr1->file != 0) {
             if (e->loader->headerReady != 0) {
                 self->methods->resetElementCells(self, e);
             }
-            e->loader->chunkIndex = sp->rate;
-            ((LbdFileLoadHeaderFn)e->loader->methods->processBuffer)(e->loader, arr1->ptr0);
-            e->flag = 1;
-            self->unk1B0 = 1;
+            e->loader->chunkIndex = sp->chunkIndex;
+            ((LbdFileLoadHeaderFn)e->loader->methods->processBuffer)(e->loader, arr1->file);
+            e->loadPending = 1;
+            self->loadsPending = 1;
         } else {
             if (e->loader->headerReady != 0) {
                 self->methods->resetElementCells(self, e);
             }
             if (e->loader->loadState != 0) {
                 e->loader->methods->cancelRequests(e->loader);
-                e->flag = 0;
+                e->loadPending = 0;
             }
         }
         arr1++;
@@ -340,7 +340,7 @@ s32 Class866E8__CountFlaggedElements(Class866E8 *self) {
 
     count = 0;
     for (i = 0; i < 7; i++) {
-        if (self->elems[i].flag != 0) {
+        if (self->elems[i].loadPending != 0) {
             count++;
         }
     }
@@ -361,19 +361,19 @@ void Class866E8__OnNotifyTag1(Class866E8 *self, void *arg1, s32 mode) {
             e->loader->dataReady = 0;
             ((Class866E8OnElementEventFn)self->methods->notifyWithHull)(self, 7, e, i);
         }
-        curMode = self->unk1B0;
-        if (curMode == 1 && e->flag != 0) {
+        curMode = self->loadsPending;
+        if (curMode == 1 && e->loadPending != 0) {
             if (e->loader->headerReady != 0) {
                 self->methods->loadElementResources(self, e);
                 e->loader->headerReady = 2;
-                e->flag = 0;
+                e->loadPending = 0;
                 if (--self->unk1B4 == 0) {
                     self->unk1B4 = 0;
-                    self->unk1B0 = 0;
-                    self->unk1B8 = curMode;
+                    self->loadsPending = 0;
+                    self->chunksLoaded = curMode;
                 }
             } else if (e->loader->loadState == 0) {
-                e->flag = 0;
+                e->loadPending = 0;
             }
         }
     }
@@ -556,37 +556,37 @@ s32 Class866E8__ComputeFootprintDescriptor(Class866E8 *self, Descriptor10Ext *ou
     e = self->methods->findElementForPosition(self, (LongVec3 *)in);
     if (e != 0) {
         rate = e->loader->chunkIndex;
-        out->unk28 = rate;
+        out->chunkIndex = rate;
         Class866E8__ComputeDivisorSplit(self, (u8 *)out, rate);
 
         u14a = (Unk14Obj *)self->methods->findElemByUnk32(self, e->loader->elemKey)->cellParent->coord2;
-        out->unkC = u14a->unk18.w + 0x5000;
-        out->unk10 = u14a->unk1C;
-        out->unk14 = u14a->unk20.w + 0x5000;
+        out->chunkCentre.x = u14a->unk18.w + 0x5000;
+        out->chunkCentre.y = u14a->unk1C;
+        out->chunkCentre.z = u14a->unk20.w + 0x5000;
 
         u14b = (Unk14Obj *)e->cellParent->coord2;
-        out->unk18 = in->unk0.w - out->unkC;
-        out->unk1C = in->unk4.w;
-        out->unk20 = in->unk8.w - out->unk14;
+        out->relPos.x = in->x.w - out->chunkCentre.x;
+        out->relPos.y = in->y.w;
+        out->relPos.z = in->z.w - out->chunkCentre.z;
 
-        t = in->unk0.w - u14b->unk18.w;
+        t = in->x.w - u14b->unk18.w;
         if (t < 0) {
             t += 0x7FF;
         }
         out->base.b2 = t >> 11;
 
-        t = in->unk8.w - u14b->unk20.w;
+        t = in->z.w - u14b->unk20.w;
         if (t < 0) {
             t += 0x7FF;
         }
         out->base.b3 = t >> 11;
 
         b2 = out->base.b2;
-        out->base.h4 = in->unk0.h - (u14b->unk18.h + (b2 << 11) + 0x400);
-        out->base.h6 = in->unk4.h;
+        out->base.h4 = in->x.h - (u14b->unk18.h + (b2 << 11) + 0x400);
+        out->base.h6 = in->y.h;
         b3 = out->base.b3;
-        out->base.h8 = in->unk8.h - (u14b->unk20.h + (b3 << 11) + 0x400);
-        out->unk24 = e;
+        out->base.h8 = in->z.h - (u14b->unk20.h + (b3 << 11) + 0x400);
+        out->slot = e;
 
         return 0;
     }

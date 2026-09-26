@@ -95,9 +95,9 @@ void Class866E8__Class866E8(Class866E8 *self, LongVec3 *origin, s32 autoLoad) {
         self->origin = gDefaultOrigin;
     }
 
-    self->unk1B0 = 0;
+    self->loadsPending = 0;
     self->unk1B4 = 0;
-    self->unk1B8 = 0;
+    self->chunksLoaded = 0;
     self->enabled = 0;
     self->target = NULL;
     self->acceptedTags = 0;
@@ -113,8 +113,8 @@ void Class866E8__Class866E8(Class866E8 *self, LongVec3 *origin, s32 autoLoad) {
 
         entry->heldObj = NULL;
         entry->unk18 = 0;
-        entry->key = i;
-        entry->flag = 0;
+        entry->neighbour = i;
+        entry->loadPending = 0;
 
         entry->placements = New_Class6D940(0);
         entry->cellParent = New_GridCell();
@@ -270,7 +270,7 @@ void Class866E8__ResetAllElements(Class866E8 *self) {
     for (i = 0; i < 7; i++) {
         entry = &self->elems[i];
         entry->loader->methods->cancelRequests(entry->loader);
-        entry->flag = 0;
+        entry->loadPending = 0;
         self->methods->resetElementCells(self, entry);
         list = entry->placements;
         if (list->linkResource != NULL) {
@@ -280,7 +280,7 @@ void Class866E8__ResetAllElements(Class866E8 *self) {
         entry->loader->methods->releaseDataBlock(entry->loader);
     }
 
-    self->unk1B8 = 0;
+    self->chunksLoaded = 0;
     self->unk1B4 = 0;
     self->methods->flushRateLatch(self);
 }
@@ -415,7 +415,7 @@ void Class866E8__SetFootprintRect(Class866E8 *self, Descriptor10Ext *desc, s32 s
     }
 
     self->rectCount = 1;
-    self->rects.e[0].elemIdx = self->methods->findElemIndexByUnk30(self, desc->unk28);
+    self->rects.e[0].slotIndex = self->methods->findElemIndexByUnk30(self, desc->chunkIndex);
     self->rects.e[0].col = col;
     self->rects.e[0].row = row;
     self->rects.e[0].width = width;
@@ -437,7 +437,7 @@ void Class866E8__DispatchToRectCells(Class866E8 *self, SceneNode *sender, s32 co
 
     entry = self->rects.e;
     for (i = 0; i < self->rectCount; entry++, i++) {
-        slot = &self->elems[entry->elemIdx];
+        slot = &self->elems[entry->slotIndex];
         if (slot->loader->headerReady != 0) {
             cell = (slot->cells + entry->col) + entry->row * 20;
             for (row = 0; row < entry->height; row++) {

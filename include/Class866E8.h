@@ -81,19 +81,13 @@ typedef struct Descriptor10 {
     s16 h8;
 } Descriptor10;
 
-/* computeFootprintDescriptor's output, 0x2C bytes: the Descriptor10, the
- * element's centre (its origin + 0x5000 in x and z, +0x00C..+0x014), the
- * position relative to that (+0x018..+0x020), the element and its rate. `targetCell` holds one. */
+/* computeFootprintDescriptor's output, 0x2C bytes. `targetCell` holds one. */
 typedef struct Descriptor10Ext {
-    Descriptor10 base;     /* +0x000 */
-    s32 unkC;              /* +0x00C */
-    s32 unk10;             /* +0x010 */
-    s32 unk14;             /* +0x014 */
-    s32 unk18;             /* +0x018 */
-    s32 unk1C;             /* +0x01C */
-    s32 unk20;             /* +0x020 */
-    Class866E8Elem *unk24; /* +0x024, the element findElementForPosition resolved */
-    s32 unk28;             /* +0x028, that element's LbdFile::ownerRate, sign-extended */
+    Descriptor10 base; /* +0x000 */
+    LongVec3 chunkCentre; /* +0x00C, the slot's cellParent position + 0x5000 in x and z (half a chunk) */
+    LongVec3 relPos; /* +0x018, the queried position less chunkCentre in x and z; y as queried */
+    Class866E8Elem *slot; /* +0x024, the slot findElementForPosition resolved */
+    s32 chunkIndex;       /* +0x028, that slot's LbdFile::chunkIndex, sign-extended */
 } Descriptor10Ext;
 
 /* computeFootprintDescriptor's world position: each word is read whole (the
@@ -103,17 +97,17 @@ typedef struct QueryPos866E8 {
     union {
         s32 w;
         u16 h;
-    } unk0; /* +0x000 */
+    } x; /* +0x000 */
 
     union {
         s32 w;
         u16 h;
-    } unk4; /* +0x004 */
+    } y; /* +0x004 */
 
     union {
         s32 w;
         u16 h;
-    } unk8; /* +0x008 */
+    } z; /* +0x008 */
 } QueryPos866E8;
 
 /* The step from a centre chunk's index (row * columns + column) to one of
@@ -128,38 +122,42 @@ typedef struct ChunkNeighbourDelta {
     s32 colDeltaEvenRow; /* +0x8 */
 } ChunkNeighbourDelta;
 
-/* applyRateEntries' 0xC-byte entries: a file name for the element's
- * loader (NULL: cancel), its rate and the element key. */
+/* applyRateEntries' 0xC-byte entries, one per slot to (re)load: the file
+ * record valueFn returned for the chunk (NULL: cancel the slot's load), the
+ * chunk's index in the stage grid and the neighbour key of the slot that
+ * takes it. ComputeRateEntry writes chunkIndex as a whole word. */
 typedef struct SetupEntry866E8 {
-    void *ptr0; /* +0x0 */
-    s16 rate;   /* +0x4 */
+    void *file;     /* +0x0 */
+    s16 chunkIndex; /* +0x4 */
     u8 pad6[0x8 - 0x6];
-    s32 id; /* +0x8 */
+    s32 neighbour; /* +0x8 */
 } SetupEntry866E8;
 
 /* The same 0xC stride based at +0x4: ApplyRateEntries' second walker
  * (strength-reduced from the parameter; its report). */
 typedef struct SetupSub866E8 {
-    s16 rate; /* +0x4 in SetupEntry866E8 terms */
+    s16 chunkIndex; /* +0x4 in SetupEntry866E8 terms */
     u8 pad2[0x4 - 0x2];
-    s32 id; /* +0x8 */
+    s32 neighbour; /* +0x8 */
     u8 pad8[0xC - 0x8];
 } SetupSub866E8;
 
-/* buildRateEntries' per-element key/enable pair (sDefaultTargetSpecs and
- * the sFootprintResultPtrTable tables hold seven each). */
+/* buildRateEntries' per-slot pair (sDefaultTargetSpecs and the
+ * sFootprintResultPtrTable tables hold seven each): the neighbour key the
+ * slot takes (0..6, the index into sRateOffsetTable and sRateEntryTable;
+ * 3 is the centre) and whether it is (re)loaded and repositioned. */
 typedef struct TargetSpec866E8 {
-    u8 key;  /* +0x0 */
-    u8 flag; /* +0x1 */
+    u8 neighbour; /* +0x0 */
+    u8 load;      /* +0x1 */
 } TargetSpec866E8;
 
 /* One element-local rectangle of cells, 0xC bytes, no padding. */
 typedef struct GridSlot866E8 {
-    s32 elemIdx; /* +0x0, index into elems[] */
-    s16 col;     /* +0x4, starting column */
-    s16 row;     /* +0x6, starting row (row stride 20) */
-    s16 width;   /* +0x8 */
-    s16 height;  /* +0xA */
+    s32 slotIndex; /* +0x0, index into elems[] */
+    s16 col;       /* +0x4, starting column */
+    s16 row;       /* +0x6, starting row (row stride 20) */
+    s16 width;     /* +0x8 */
+    s16 height;    /* +0xA */
 } GridSlot866E8;
 
 /* `rects` as a whole, so ApplyToSenderFootprint can save and restore it
@@ -169,18 +167,18 @@ typedef struct GridSlotList866E8 {
     GridSlot866E8 e[4];
 } GridSlotList866E8;
 
-/* `bounds`' pointee (setBounds): IsPointOutOfBounds' min/max box. */
+/* `bounds`' pointee (setBounds): IsPointOutOfBounds' box of cell columns/rows inside a chunk. */
 typedef struct Bounds866E8_3bb8c_b {
-    s16 minX; /* +0x000 */
-    s16 minY; /* +0x002 */
-    s32 maxX; /* +0x004 */
-    s32 maxY; /* +0x008 */
+    s16 minCol; /* +0x000 */
+    s16 minRow; /* +0x002 */
+    s32 maxCol; /* +0x004 */
+    s32 maxRow; /* +0x008 */
 } Bounds866E8_3bb8c_b;
 
 /* One of the seven elements, 0x1C bytes (the ctor, Finalize). */
 struct Class866E8Elem {
-    /* +0x000 */ u16 flag; /* 1 while its load is pending (ApplyRateEntries; OnNotifyTag1 clears it) */
-    /* +0x002 */ u16 key; /* the ctor: its index; BuildRateEntries: the spec's key, copied on into loader->ownerKey */
+    /* +0x000 */ u16 loadPending; /* 1 while its load is pending (ApplyRateEntries; OnNotifyTag1 clears it) */
+    /* +0x002 */ u16 neighbour; /* the ctor: its index; BuildRateEntries: the spec's neighbour, copied on into loader->elemKey */
     /* +0x004 */ struct LbdFile *loader; /* New_LbdFile(): the element's file (include/LbdFile.h) */
     /* +0x008 */ struct Class6D940 *placements; /* New_Class6D940(0): its placement records (include/Class6D940.h) */
     /* +0x00C */ struct GridCell *cellParent; /* New_GridCell(), attached to the Class866E8 at `origin`; every cell's parent */
@@ -262,10 +260,10 @@ struct Class866E8 {
     /* +0x0BC */ Descriptor10Ext targetCell; /* UpdateFootprintTracking: the target's last descriptor; SetTargetAndBuildRates sets .base; getTargetDescriptor returns &.base */
     /* +0x0E8 */ s32 *acceptedTags; /* setAcceptedTags: a 0-terminated list of class ids ForwardAcceptedCommand accepts */
     /* +0x0EC */ Class866E8Elem elems[7];
-    /* +0x1B0 */ s32 unk1B0; /* 1 while element loads are pending (ApplyRateEntries; OnNotifyTag1 clears it) */
+    /* +0x1B0 */ s32 loadsPending; /* 1 while element loads are pending (ApplyRateEntries; OnNotifyTag1 clears it) */
     /* +0x1B4 */ u16 unk1B4; /* CountFlaggedElements after ApplyRateEntries; OnNotifyTag1 counts it down */
     /* +0x1B6 */ u8 pad1B6[0x1B8 - 0x1B6];
-    /* +0x1B8 */ s32 unk1B8; /* set when that count reaches 0; RefreshFootprint does nothing while it is 0 */
+    /* +0x1B8 */ s32 chunksLoaded; /* set when that count reaches 0; RefreshFootprint does nothing while it is 0 */
     /* +0x1BC */ Class866E8Elem *lastEventElem; /* OnElementEvent's elem; GetLastTargetRateSplit reads it */
     /* +0x1C0 */ Descriptor10 curCell; /* DispatchToRectCells: the cell being notified (b0/b1 copied from targetCell as a u16); getCurrentCellKey returns it */
     /* +0x1CA */ u8 pad1CA[0x1CC - 0x1CA];
