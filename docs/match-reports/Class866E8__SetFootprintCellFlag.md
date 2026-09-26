@@ -18,12 +18,12 @@ the finer-grained field layout from the READ side.
 ## New struct knowledge (`include/class_3bb8c.h`)
 
 - **`Obj866E8::unk88`** (`s32`, +0x088) and **`Obj866E8::slots8C`**
-  (`GridSlot866E8[4]`, +0x08C) carved out of the previous
+  (`CellRect[4]`, +0x08C) carved out of the previous
   `pad7C[0xBC-0x7C]`. The array's capacity (4) is not a guess: `0x8C +
-  4*sizeof(GridSlot866E8)` (`0x8C + 4*0xC = 0xBC`) lands EXACTLY on the
+  4*sizeof(CellRect)` (`0x8C + 4*0xC = 0xBC`) lands EXACTLY on the
   already-established `Descriptor10 unkBC` field with zero slack, so 4 is
   a hard ceiling, not an inferred one.
-- New type **`GridSlot866E8`** (0xC bytes): `elemIdx` (`s32`, +0x0),
+- New type **`CellRect`** (0xC bytes): `elemIdx` (`s32`, +0x0),
   `h4`/`h6`/`h8`/`hA` (`s16` each, +0x4/+0x6/+0x8/+0xA). This is a
   DIFFERENT, more granular view of the same memory `Class866E8__InitFootprintSlot`
   addresses as a flat `Unk54Struct` (3x `s32`) — kept as two independent
@@ -45,7 +45,7 @@ void Class866E8__SetFootprintCellFlag(Obj866E8 *self, s32 setBit) {
     s32 i;
     s32 j;
     s32 k;
-    GridSlot866E8 *slot;
+    CellRect *slot;
     Elem *e;
     EntryChildObj **cell;
     EntryChildObj *next;

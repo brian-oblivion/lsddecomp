@@ -430,7 +430,7 @@ void Class866E8__DispatchToRectCells(Class866E8 *self, SceneNode *sender, s32 co
     s32 i;
     s32 row;
     s32 col;
-    GridSlot866E8 *entry;
+    CellRect *entry;
     ChunkSlot *slot;
     GridCell **cell;
     GridCell *obj;

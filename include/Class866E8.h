@@ -152,19 +152,19 @@ typedef struct ChunkSlotSpec {
 } ChunkSlotSpec;
 
 /* One element-local rectangle of cells, 0xC bytes, no padding. */
-typedef struct GridSlot866E8 {
+typedef struct CellRect {
     s32 slotIndex; /* +0x0, index into elems[] */
     s16 col;       /* +0x4, starting column */
     s16 row;       /* +0x6, starting row (row stride 20) */
     s16 width;     /* +0x8 */
     s16 height;    /* +0xA */
-} GridSlot866E8;
+} CellRect;
 
 /* `rects` as a whole, so ApplyToSenderFootprint can save and restore it
  * with a plain `=` (a batched 4-word block move; an indexed loop does not
  * compile to it). */
 typedef struct GridSlotList866E8 {
-    GridSlot866E8 e[4];
+    CellRect e[4];
 } GridSlotList866E8;
 
 /* `bounds`' pointee (setBounds): IsPointOutOfBounds' box of cell columns/rows inside a chunk. */
@@ -338,7 +338,7 @@ s32 Class866E8__FindElemIndexByUnk30(Class866E8 *self, s32 key);
 void Class866E8__RefreshFootprint(Class866E8 *self);
 void Class866E8__ComputeFootprintFromRotation(Class866E8 *self, s32 width, s32 height);
 void Class866E8__BuildFootprintSlots(Class866E8 *self);
-s32 Class866E8__SplitFootprintSlot(Class866E8 *self, GridSlot866E8 *slot, s32 count, s32 baseIdx,
+s32 Class866E8__SplitFootprintSlot(Class866E8 *self, CellRect *slot, s32 count, s32 baseIdx,
                                    s32 col, s32 row, s32 width, s32 height);
 void Class866E8__SetFootprintFromQuery(Class866E8 *self);
 s32 IsPointOutOfBounds(Bounds866E8_3bb8c_b *bounds, s8 *point);

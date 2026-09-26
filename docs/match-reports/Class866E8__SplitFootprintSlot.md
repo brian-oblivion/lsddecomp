@@ -61,8 +61,8 @@ spent (Gate 3 not run; not needed).
 
 ```c
 #if 0
-/* needs: common.h, class_3bb8c.h (Obj866E8, GridSlot866E8, slots8C, methods->slot120) */
-s32 Class866E8__SplitFootprintSlot(Obj866E8 *self, GridSlot866E8 *slot, s32 count, s32 baseIdx, s32 col, s32 row, s32 width, s32 height) {
+/* needs: common.h, class_3bb8c.h (Obj866E8, CellRect, slots8C, methods->slot120) */
+s32 Class866E8__SplitFootprintSlot(Obj866E8 *self, CellRect *slot, s32 count, s32 baseIdx, s32 col, s32 row, s32 width, s32 height) {
     s32 overflow;
     s32 span;
     s32 elemArg;
@@ -237,14 +237,14 @@ STALL (best 8/92 words; frame size off by 8 bytes)
 
 The biggest attempted this round (97 words) and the one that resisted
 byte-exactness. An 8-parameter function that populates one or two
-`GridSlot866E8` entries (the same type established this round from
+`CellRect` entries (the same type established this round from
 `Class866E8__SetFootprintCellFlag`/`Class866E8__InitFootprintSlot`), advancing and returning `self->unk88`
 (the slot count) as it goes.
 
 ## What the function does (control flow and semantics, not in doubt)
 
 ```c
-s32 Class866E8__SplitFootprintSlot(Obj866E8 *self, GridSlot866E8 *slot, s32 count, s32 baseIdx, s32 p5, s32 p6, s32 p7, s32 p8) {
+s32 Class866E8__SplitFootprintSlot(Obj866E8 *self, CellRect *slot, s32 count, s32 baseIdx, s32 p5, s32 p6, s32 p7, s32 p8) {
     s32 v;
     s32 hSpan;
     s32 h4sum;
@@ -301,7 +301,7 @@ caller's stack at `$sp+0x48/0x4C/0x50/0x54` relative to THIS function's
 own `-0x38` frame, i.e. the 5th-8th arguments):
 
 - `self` (`$a0`)
-- `slot` (`$a1`) — a `GridSlot866E8 *`, already resolved by the caller to
+- `slot` (`$a1`) — a `CellRect *`, already resolved by the caller to
   `&self->slots8C[count]` (the FIRST slot this call may touch)
 - `count` (`$a2`) — the running slot count, also the return value
 - `baseIdx` (`$a3`) — seed passed (with a small per-branch offset) to
@@ -312,7 +312,7 @@ own `-0x38` frame, i.e. the 5th-8th arguments):
 
 Confirmed against the raw asm line-by-line: every branch target, every
 field write (`elemIdx`@0, `h4`@4, `h6`@6, `h8`@8, `hA`@0xA — the SAME
-`GridSlot866E8` layout `Class866E8__SetFootprintCellFlag` established), and every arithmetic
+`CellRect` layout `Class866E8__SetFootprintCellFlag` established), and every arithmetic
 op matches retail's OPERATIONS. The residue is a REGISTER ALLOCATION /
 frame-size difference, not a logic difference.
 
@@ -361,7 +361,7 @@ a pure scheduling residue).
 
 ```c
 #if 0
-s32 Class866E8__SplitFootprintSlot(Obj866E8 *self, GridSlot866E8 *slot, s32 count, s32 baseIdx, s32 p5, s32 p6, s32 p7, s32 p8) {
+s32 Class866E8__SplitFootprintSlot(Obj866E8 *self, CellRect *slot, s32 count, s32 baseIdx, s32 p5, s32 p6, s32 p7, s32 p8) {
     s32 v;
     s32 hSpan;
     s32 h4sum;
@@ -448,7 +448,7 @@ genuinely separate value neither attempt captured), not just the naming.
 
 ```c
 #if 0
-s32 Class866E8__SplitFootprintSlot(Obj866E8 *self, GridSlot866E8 *slot, s32 count, s32 baseIdx, s32 p5, s32 p6, s32 p7, s32 p8) {
+s32 Class866E8__SplitFootprintSlot(Obj866E8 *self, CellRect *slot, s32 count, s32 baseIdx, s32 p5, s32 p6, s32 p7, s32 p8) {
     s32 hSpan;
     s32 hSpan2;
     s32 h4;
@@ -532,7 +532,7 @@ independently-carved function.
 
 **Checked against the head's second mid-round broadcast (aggregate/whole-
 struct assignment closing 5 sibling functions elsewhere this round): does
-NOT apply here.** Every `GridSlot866E8` field written in this function is
+NOT apply here.** Every `CellRect` field written in this function is
 a freshly computed value (`slot->elemIdx = self->methods->slot120(...)`,
 `slot->h4 = h4;`, etc.), never a verbatim copy of several adjacent fields
 from one existing struct instance into another. The shape does not occur.

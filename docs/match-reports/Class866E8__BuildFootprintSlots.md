@@ -57,7 +57,7 @@ void Class866E8__BuildFootprintSlots(Obj866E8 *self) {
     s32 height;
     s32 quadrant;
     s32 h6;
-    GridSlot866E8 *slot;
+    CellRect *slot;
     s32 span;
     s32 count;
     s32 over;
@@ -362,7 +362,7 @@ prototype identical to that function's definition.
 > whole-struct assignment closing 5 sibling functions elsewhere): PARTIALLY
 > present but not in a form the lever applies to.** `slot1->h6 =
 > self->slots8C[0].h6;` and `slot1->hA = self->slots8C[0].hA;` ARE verbatim
-> copies from one `GridSlot866E8` instance to another, but `h8` (sitting
+> copies from one `CellRect` instance to another, but `h8` (sitting
 > between them in memory) is set to a DIFFERENT computed value in the same
 > block, not copied -- so there is no CONTIGUOUS run of fields to fold into
 > one aggregate assignment. Not applicable in this instance; noted in case
@@ -385,7 +385,7 @@ clamped `(h4, h6)` sub-cell offset from `self->unk7C`/`self->unk7E`
 when both axes are negative), fills `self->slots8C[0]` via
 `self->methods->slot120(self, quadrant)`, then decides whether the
 horizontal footprint (`h4 + self->unk80`) fits in one 20-unit grid cell or
-needs a second `GridSlot866E8` — filling that second slot directly when it
+needs a second `CellRect` — filling that second slot directly when it
 does — before calling the documented-STALL `Class866E8__SplitFootprintSlot` (signature per
 its own report, `docs/match-reports/Class866E8__SplitFootprintSlot.md`) to (possibly) append
 further slots on the OTHER axis, and finally writing the total slot count to
@@ -462,7 +462,7 @@ order, boolean-vs-requery, read order, pointer-assignment timing).
 Requires `Class866E8__SplitFootprintSlot`'s forward extern (already declared with this
 exact signature elsewhere in this unit, see
 `docs/match-reports/Class866E8__SplitFootprintSlot.md`) if spliced back in — add
-`extern s32 Class866E8__SplitFootprintSlot(Obj866E8 *self, GridSlot866E8 *slot, s32 count, s32 baseIdx, s32 p5, s32 p6, s32 p7, s32 p8);`
+`extern s32 Class866E8__SplitFootprintSlot(Obj866E8 *self, CellRect *slot, s32 count, s32 baseIdx, s32 p5, s32 p6, s32 p7, s32 p8);`
 before it (this function is defined AFTER `Class866E8__BuildFootprintSlots` in ROM order in
 `src/class_3bb8c_b.c`).
 
@@ -475,10 +475,10 @@ void Class866E8__BuildFootprintSlots(Obj866E8 *self) {
     s32 height;
     s32 quadrant;
     s32 h6;
-    GridSlot866E8 *slot0;
+    CellRect *slot0;
     s32 span;
     s32 count;
-    GridSlot866E8 *slot1;
+    CellRect *slot1;
 
     flag = 0;
     h4 = self->unk7C;
@@ -595,7 +595,7 @@ this round, but not a full re-attempt.
 **Hypothesis tested (1 real-oracle build, reverted):** the two derived
 sub-cell offsets `h4`/`h6` are computed from `s16` struct fields
 (`self->unk7C`/`self->unk7E`) and ultimately stored back into `s16`
-`GridSlot866E8` fields (`slot0->h4`, `slot0->h6`) -- exactly the "narrower
+`CellRect` fields (`slot0->h4`, `slot0->h6`) -- exactly the "narrower
 than declared" shape that closed `TaskObjF__WriteMemcardSaveFile`. Retyping BOTH locals
 from `s32` to `s16` (keeping the rest of the preserved 28/109 body
 unchanged) was tried directly against `src/class_3bb8c_b.c` and

@@ -132,7 +132,7 @@ throughout.
   a multiply-by-0x1C (`UnkSlotEntry_3ac78`'s own confirmed size). The
   four `s16`s that follow are read as a dense, gapless run (offsets
   +4/+6/+8/+0xA, next element starts at +0xC) -- the same shape as the
-  SIBLING unit's `GridSlot866E8` (`include/class_3bb8c.h`: index + col +
+  SIBLING unit's `CellRect` (`include/class_3bb8c.h`: index + col +
   row + width + height), independent view, not a shared C type.
   `HistoryBlock_3ac78`'s total size stays 0x30 (4 x 0xC == 3 x 0x10), so
   `Class866E8__ApplyToSenderFootprint`'s whole-struct copy is unaffected -- confirmed, still

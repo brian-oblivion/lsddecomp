@@ -18,7 +18,7 @@ typedef struct QueryTemplate866E8 QueryTemplate866E8;
 
 /* The rectangle Class866E8__InitFootprintSlot copies into rects[key] before
  * setting its element: no element (-1), the whole 20 x 20 cells from (0, 0). */
-extern GridSlot866E8 gDefaultElemRateOffset;
+extern CellRect gDefaultElemRateOffset;
 
 /* The default "enable every element" spec table SetTargetAndBuildRates
  * passes to buildRateEntries: seven entries, every `flag` nonzero

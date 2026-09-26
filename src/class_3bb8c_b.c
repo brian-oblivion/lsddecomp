@@ -6,7 +6,7 @@
  *
  * Functionally this slice is the class's SPATIAL GRID / FOOTPRINT
  * subsystem: the seven elements (self->elems), each mapped onto up to four
- * GridSlot866E8 rectangles (self->rects), and a per-cell bit (bit 31 of a
+ * CellRect rectangles (self->rects), and a per-cell bit (bit 31 of a
  * GridCell cell's `attribute`) that RefreshFootprint clears, recomputes
  * (via either ComputeFootprintFromRotation or SetFootprintFromQuery, gated
  * on self->config->isVertical) and sets again through SetFootprintCellFlag. A
@@ -150,7 +150,7 @@ void Class866E8__BuildFootprintSlots(Class866E8 *self) {
     s32 height;
     s32 quadrant;
     s32 row;
-    GridSlot866E8 *slot;
+    CellRect *slot;
     s32 span;
     s32 count;
     s32 over;
@@ -203,7 +203,7 @@ void Class866E8__BuildFootprintSlots(Class866E8 *self) {
     self->rectCount = count;
 }
 
-s32 Class866E8__SplitFootprintSlot(Class866E8 *self, GridSlot866E8 *slot, s32 count, s32 baseIdx,
+s32 Class866E8__SplitFootprintSlot(Class866E8 *self, CellRect *slot, s32 count, s32 baseIdx,
                                    s32 col, s32 row, s32 width, s32 height) {
     s32 overflow;
     s32 span;
@@ -293,7 +293,7 @@ s32 IsPointOutOfBounds(Bounds866E8_3bb8c_b *bounds, s8 *point) {
 }
 
 s32 Class866E8__InitFootprintSlot(Class866E8 *self, s32 unused, s32 key, s32 arg3) {
-    GridSlot866E8 *slot;
+    CellRect *slot;
 
     slot = &self->rects.e[key];
     *slot = gDefaultElemRateOffset;
@@ -305,7 +305,7 @@ void Class866E8__SetFootprintCellFlag(Class866E8 *self, s32 setBit) {
     s32 i;
     s32 j;
     s32 k;
-    GridSlot866E8 *slot;
+    CellRect *slot;
     ChunkSlot *e;
     GridCell **cell;
     GridCell *next;
