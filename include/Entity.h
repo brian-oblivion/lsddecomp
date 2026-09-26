@@ -218,7 +218,7 @@ void Entity__MoodCue71(Entity *self, SoundCueSet *out); /* Entity_e; called by E
 void Entity__StepYawInWindowsThenDeactivate(Entity *self, SoundCueSet *out, s32 arg2, s32 arg3,
                                             s32 arg4); /* Entity_g; called by Entity_d */
 
-/* The motion templates (.data, 0x80089C64..0x80089E97, in address order):
+/* The motion templates (.data, 0x80089C58..0x80089E97, in address order):
  * the constant triples the MoodCue handlers in Entity_b..Entity_g pass to
  * updateRotation (+0x044) and updateScale (+0x048) -- three Ratio16s
  * (include/SceneNode.h), degrees or scale factors, {x, y, z} -- and to
@@ -227,6 +227,7 @@ void Entity__StepYawInWindowsThenDeactivate(Entity *self, SoundCueSet *out, s32 
  * Rotation/UpdateScale), not the callers'. TRANSLATE_Y_MINUS64's label also
  * holds a second triple, (0, -0x20, 0); SCALE_X3's z den is Entity_d.c's
  * sScaleTemplateZDenom. */
+extern Ratio16 ROTATION_XPLUS_EIGHTH[];
 extern Ratio16 ROTATION_YAW_PLUS9[];
 extern Ratio16 ROTATION_YAW_MINUS9[];
 extern Ratio16 ROTATION_YAW_PLUS180[];
@@ -243,11 +244,15 @@ extern Ratio16 ROTATION_XPLUS90[];
 extern Ratio16 ROTATION_YAW_PLUS1[];
 extern Ratio16 ROTATION_ZMINUS90[];
 extern LongVec3 TRANSLATE_Y_PLUS256[];
+extern LongVec3 TRANSLATE_Y_MINUS4096[];
 extern LongVec3 TRANSLATE_Y_MINUS512[];
+extern LongVec3 TRANSLATE_Y_PLUS64[];
 extern LongVec3 TRANSLATE_Y_PLUS8[];
 extern LongVec3 TRANSLATE_Y_MINUS64[];
 extern LongVec3 TRANSLATE_Y_MINUS256[];
+extern LongVec3 TRANSLATE_X_MINUS64[];
 extern LongVec3 TRANSLATE_Y_PLUS64_Z_MINUS64[];
+extern LongVec3 TRANSLATE_Y_MINUS1500_Z_PLUS1024[];
 extern LongVec3 TRANSLATE_Z_MINUS256[];
 extern Ratio16 SCALE_QUARTER[];
 extern Ratio16 SCALE_HALF[];
@@ -259,6 +264,7 @@ extern Ratio16 SCALE_EIGHTH[];
 extern Ratio16 SCALE_SIX[];
 extern Ratio16 SCALE_Y2[];
 extern Ratio16 SCALE_Y4[];
+extern Ratio16 SCALE_TRIPLE[];
 extern Ratio16 SCALE_THIRTY_SECOND[];
 extern Ratio16 SCALE_X3[];
 
