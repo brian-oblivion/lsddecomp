@@ -9,8 +9,8 @@
  * Named round 52 (runner bravo). SPANS TWO CLASSES, cut at a ROM address,
  * not a class boundary (`tools/classtable.py`, confirmed round 17/52):
  *
- *  - `LinkOwnerObj`/`LinkElemObj` (`NoOpIgnoreArgs`, `LinkOwnerObj__ReleaseLinks[B]`,
- *    `LinkOwnerObj__RandomizeLinks`, `LinkOwnerObj__func_56e1c`): a small
+ *  - `LinkOwnerObj`/`LinkElemObj` (`NoOpIgnoreArgs`, `Class876FC__ReleaseSprites[B]`,
+ *    `Class876FC__RandomizeSprites`, `Class876FC__SpawnPlainSprites`): a small
  *    object holding an inline 5-element link array (`links`). This is the
  *    SAME node `class_3bb8c_s.c` independently calls `LinkNode` -- kept as
  *    this unit's own local view per the multiple-independent-local-views
@@ -30,8 +30,8 @@ void NoOpIgnoreArgs(void) {
 }
 
 /* ------------------------------------------------------------------ *
- * Group 1: LinkOwnerObj__ReleaseLinks / LinkOwnerObj__ReleaseLinksB /
- * LinkOwnerObj__RandomizeLinks / LinkOwnerObj__func_56e1c.
+ * Group 1: Class876FC__ReleaseSprites / Class876FC__ReleaseSpritesB /
+ * Class876FC__RandomizeSprites / Class876FC__SpawnPlainSprites.
  * Self is some larger object with an inline 5-element `BasicClass *`
  * array at +0x084 (`links`). ReleaseLinks/ReleaseLinksB (two identical,
  * separate ROM functions -- see their own reports) release the whole
@@ -65,7 +65,7 @@ typedef struct LinkElemMethods {
 struct LinkElemObj {
     LinkElemMethods *methods; /* +0x000 */
     u8 pad4[0x80];             /* +0x004 .. +0x083, unknown */
-    s32 angle;                   /* +0x084, a random "angle" set by LinkOwnerObj__RandomizeLinks */
+    s32 angle;                   /* +0x084, a random "angle" set by Class876FC__RandomizeSprites */
 };
 
 typedef struct LinkOwnerObj {
@@ -73,17 +73,17 @@ typedef struct LinkOwnerObj {
     LinkElemObj *links[5];        /* +0x084 .. +0x097 */
 } LinkOwnerObj;
 
-void LinkOwnerObj__ReleaseLinks(LinkOwnerObj *this) {
+void Class876FC__ReleaseSprites(LinkOwnerObj *this) {
     ReleaseBasicClassArray((void **)this->links, 5);
 }
 
 extern void Class876FC__SpawnSprites(void *arg0, s32 arg1, s32 arg2, s32 arg3);
 
-void LinkOwnerObj__func_56e1c(void *this) {
+void Class876FC__SpawnPlainSprites(void *this) {
     Class876FC__SpawnSprites(this, 0, 0, 0);
 }
 
-void LinkOwnerObj__RandomizeLinks(LinkOwnerObj *this) {
+void Class876FC__RandomizeSprites(LinkOwnerObj *this) {
     LinkElemObj **p = &this->links[1];
     s32 i;
 
@@ -95,7 +95,7 @@ void LinkOwnerObj__RandomizeLinks(LinkOwnerObj *this) {
     }
 }
 
-void LinkOwnerObj__ReleaseLinksB(LinkOwnerObj *this) {
+void Class876FC__ReleaseSpritesB(LinkOwnerObj *this) {
     ReleaseBasicClassArray((void **)this->links, 5);
 }
 

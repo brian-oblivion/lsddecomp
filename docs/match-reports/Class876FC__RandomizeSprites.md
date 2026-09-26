@@ -1,4 +1,6 @@
-# LinkOwnerObj__RandomizeLinks -- MATCHED (57/57 words)
+# Class876FC__RandomizeSprites -- MATCHED (57/57 words)
+
+> Renamed from `LinkOwnerObj__RandomizeLinks` on 2026-09-26 (tools/rename.py). Address 0x80056e44.
 
 > Renamed from `func_80056E44` on 2026-09-18 (tools/rename.py). Address 0x80056e44.
 
@@ -13,7 +15,7 @@ random "angle" field.
 extern s32 rand(void);
 extern Vec3O gLinkElemVec3Table[];
 
-void LinkOwnerObj__RandomizeLinks(LinkOwnerObj *this) {
+void Class876FC__RandomizeSprites(LinkOwnerObj *this) {
     LinkElemObj **p = &this->arr84[1];
     s32 i;
 
@@ -76,7 +78,7 @@ void LinkOwnerObj__RandomizeLinks(LinkOwnerObj *this) {
 
 ## Naming
 
-**`LinkOwnerObj__RandomizeLinks` -- tier A.** Mechanics ARE the purpose:
+**`Class876FC__RandomizeSprites` -- tier A.** Mechanics ARE the purpose:
 for each of 4 link elements, calls the element's own `slot48` with a
 random entry from a 6-entry `Vec3O` table and sets the element's own
 `angle` field to a random degrees value -- "randomize" describes exactly
@@ -98,14 +100,14 @@ stays.
 
 **Callee evidence** (`0x80056E44`, and the definition in
 `src/class_3bb8c_o.c`): entry is `addiu s0,a0,136` and `$a1` is never read —
-one real argument, exactly as `void LinkOwnerObj__RandomizeLinks(LinkOwnerObj *this)`
+one real argument, exactly as `void Class876FC__RandomizeSprites(LinkOwnerObj *this)`
 says.
 
 **Why the extern must stay unprototyped.** `Class876FC__UpdateByKind`'s dispatch passes a
 second argument, and retail emits it:
 
 ```
-800566f8:  jal   80056e44 <LinkOwnerObj__RandomizeLinks>
+800566f8:  jal   80056e44 <Class876FC__RandomizeSprites>
 800566fc:  move  a1,s1            <- the dead 2nd argument, in retail
 ```
 
@@ -118,3 +120,17 @@ error, and dropping the argument would delete `move a1,s1`.
 
 **Declaration sites changed:** none (arity unchanged). `/* arity-ok: ... */`
 added to `src/class_3bb8c_s.c:145`. Oracle green.
+
+## Track 4 (2026-09-26, round 88, charlie)
+
+Renamed from the `LinkOwnerObj__` family to `Class876FC__` with the class's
+unification (`include/Class876FC.h`). Evidence: the only caller is
+Class876FC's own per-kind dispatch in `class_3bb8c_s.c`
+(`Class876FC__InitByKind` kind 3, `Class876FC__UpdateByKind` kind 3,
+`Class876FC__ReleaseByKind` kinds 2/3), each passing its own `self`; the
+five-element array at +0x084 ("links") is `Class876FC::sprites`, filled by
+`Class876FC__SpawnSprites` with `New_Class879C4` objects. The old
+`LinkOwnerObj`/`LinkElemObj` views were Class876FC and Class879C4 under
+another name; RandomizeSprites' `slot48` is Class879C4's inherited
+`updateScale` and its `angle` (+0x084) is `sprite.rotate` (Sprite, +0x064 +
+0x020, 4096 per degree -- the `(rand() % 360) << 12` it stores).

@@ -39,7 +39,7 @@ void Class876FC__UpdateByKind(LinkNode *self, void *arg1) {
         NoOpIgnoreArgs(self, arg1);
         break;
     case 3:
-        LinkOwnerObj__RandomizeLinks(self, arg1);
+        Class876FC__RandomizeSprites(self, arg1);
         break;
     default:
         break;
@@ -49,12 +49,12 @@ void Class876FC__UpdateByKind(LinkNode *self, void *arg1) {
 
 ## Notes
 
-- **`NoOpIgnoreArgs` and `LinkOwnerObj__RandomizeLinks` are `class_3bb8c_o.c` functions with
-  narrower real signatures** (`NoOpIgnoreArgs(void)`, `LinkOwnerObj__RandomizeLinks
+- **`NoOpIgnoreArgs` and `Class876FC__RandomizeSprites` are `class_3bb8c_o.c` functions with
+  narrower real signatures** (`NoOpIgnoreArgs(void)`, `Class876FC__RandomizeSprites
   (LinkOwnerObj *this)`) than this call site's two-argument shape. Retail's
   own caller here still sets up the dead second register regardless.
   Declared old-style (`extern void NoOpIgnoreArgs(); extern void
-  LinkOwnerObj__RandomizeLinks();`) local to this file so the extra argument doesn't
+  Class876FC__RandomizeSprites();`) local to this file so the extra argument doesn't
   trigger a parameter-count error against their real definitions elsewhere.
 - **`Class876FC__DriftModelChildren` is defined later in this SAME file** (still
   `INCLUDE_ASM` as of this report) and is likewise called here with a dead
@@ -72,7 +72,7 @@ Same session, same unit: an old-style (`extern void f();`) declaration is
 the right tool whenever a call site sets up more argument registers than a
 callee's real, already-established prototype takes, whether the callee
 lives in this file (forward reference, `Class876FC__DriftModelChildren`) or in a sibling unit
-already matched elsewhere (`NoOpIgnoreArgs`, `LinkOwnerObj__RandomizeLinks`). It reproduces
+already matched elsewhere (`NoOpIgnoreArgs`, `Class876FC__RandomizeSprites`). It reproduces
 retail's caller-side register setup without touching the callee's real
 signature, and avoids the C89 "too many arguments to function" error a full
 prototype would otherwise produce -- one of CLAUDE.md's own listed
@@ -128,5 +128,5 @@ Only caller is `Class876FC__Update`, which sits in gClass876FCMethods's slot +0x
 before the call. Body: owner's slotB8 (Actor__SetTranslation in gClass876FCMethods,
 i.e. set translation) with pos + offset + (D_8008ACAC's +0x018 word now -
 gTrackedYSnapshot); then kind 0 -> Class876FC__DriftModelChildren, 2 ->
-NoOpIgnoreArgs, 3 -> LinkOwnerObj__RandomizeLinks. "Update" rests on the
+NoOpIgnoreArgs, 3 -> Class876FC__RandomizeSprites. "Update" rests on the
 per-frame counter in its one caller, so B.

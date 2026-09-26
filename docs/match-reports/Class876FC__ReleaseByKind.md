@@ -13,7 +13,7 @@ Clean on all four carve-time screens. Trivial once the dispatch shape was
 clear: a `switch` on `self->unk54` (the same state field `Class876FC__InitByKind` and
 `Class876FC__UpdateByKind`, its two siblings in this unit, both also switch on) with
 four cases, two of which forward straight into `class_3bb8c_o.c`'s
-`LinkOwnerObj__ReleaseLinks`/`LinkOwnerObj__ReleaseLinksB`.
+`Class876FC__ReleaseSprites`/`Class876FC__ReleaseSpritesB`.
 
 ## Body
 
@@ -24,10 +24,10 @@ void Class876FC__ReleaseByKind(LinkNode *self) {
         Class876FC__ReleaseModelChildren(self);
         break;
     case 2:
-        LinkOwnerObj__ReleaseLinks(self);
+        Class876FC__ReleaseSprites(self);
         break;
     case 3:
-        LinkOwnerObj__ReleaseLinksB(self);
+        Class876FC__ReleaseSpritesB(self);
         break;
     default:
         break;
@@ -52,7 +52,7 @@ None beyond what's already documented -- a clean, ordinary dispatch.
 Round 70 (alpha). `func_80056718` -> `Class876FC__ReleaseByKind`, **tier A**.
 
 Body releases exactly the child array each kind built (kind 0 ->
-Class876FC__ReleaseModelChildren, 2 and 3 -> LinkOwnerObj__ReleaseLinks[B],
+Class876FC__ReleaseModelChildren, 2 and 3 -> Class876FC__ReleaseSprites[B],
 both `ReleaseBasicClassArray(self+0x84, 5)`), and its only caller is the
 class's dtor `Class876FC__Finalize` (table +0x00C), which calls it before chaining
 to the base dtor. Body and caller agree.

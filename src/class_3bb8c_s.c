@@ -83,8 +83,8 @@ struct LinkNode {
                                    LinkOwnerObj::links is the same array */
 };
 
-extern void LinkOwnerObj__ReleaseLinks(void *self);   /* class_3bb8c_o.c, LinkOwnerObj* */
-extern void LinkOwnerObj__ReleaseLinksB(void *self);   /* class_3bb8c_o.c, LinkOwnerObj* */
+extern void Class876FC__ReleaseSprites(void *self);   /* class_3bb8c_o.c, LinkOwnerObj* */
+extern void Class876FC__ReleaseSpritesB(void *self);   /* class_3bb8c_o.c, LinkOwnerObj* */
 extern void Class876FC__SpawnSprites(void *self, s32 a1, s32 a2, void *tbl); /* below */
 extern s32 gSpriteShiftX[];
 extern s32 gSpriteScaleLarge[];
@@ -97,7 +97,7 @@ void Class876FC__PlaceModelChildren(Class876FC *self, s32 reuse);
 void AddVec3(Vec3S *dst, Vec3S *a, Vec3S *b);
 void AttachWithRotScale(LinkNode *node, void *parent, void *trans, s32 rotation, void *scale);
 
-/* NoOpIgnoreArgs/LinkOwnerObj__func_56e1c/LinkOwnerObj__RandomizeLinks are defined in class_3bb8c_o.c
+/* NoOpIgnoreArgs/Class876FC__SpawnPlainSprites/Class876FC__RandomizeSprites are defined in class_3bb8c_o.c
  * (own their addresses, own local view "LinkOwnerObj"/"LinkElemObj") with
  * signatures of 0 or 1 pointer argument. Every call site in THIS unit still
  * sets up a second argument register that those bodies never read (retail's
@@ -110,8 +110,8 @@ void AttachWithRotScale(LinkNode *node, void *parent, void *trans, s32 rotation,
  * definition). Class876FC__DriftModelChildren is likewise defined later in this file, and
  * Class876FC__UpdateByKind forwards a dead second argument to it the same way. */
 extern void NoOpIgnoreArgs();
-extern void LinkOwnerObj__func_56e1c(); /* arity-ok: definition is 1-parameter and the body WRITES $a1/$a2/$a3 to zero before any read, but Class876FC__InitByKind's dead 2nd argument is byte-load-bearing -- retail emits `move a1,zero` at 0x80056624 */
-extern void LinkOwnerObj__RandomizeLinks(); /* arity-ok: definition is 1-parameter and the body reads only $a0 (`addiu s0,a0,136`), but Class876FC__UpdateByKind's dead 2nd argument is byte-load-bearing -- retail emits `move a1,s1` at 0x800566FC */
+extern void Class876FC__SpawnPlainSprites(); /* arity-ok: definition is 1-parameter and the body WRITES $a1/$a2/$a3 to zero before any read, but Class876FC__InitByKind's dead 2nd argument is byte-load-bearing -- retail emits `move a1,zero` at 0x80056624 */
+extern void Class876FC__RandomizeSprites(); /* arity-ok: definition is 1-parameter and the body reads only $a0 (`addiu s0,a0,136`), but Class876FC__UpdateByKind's dead 2nd argument is byte-load-bearing -- retail emits `move a1,s1` at 0x800566FC */
 extern void Class876FC__BuildRandomSprites(); /* arity-ok: the definition is 1-parameter and LIVES IN THIS FILE (below, ROM-later), the body reading only $a0 (`move s1,a0`); Class876FC__InitByKind's dead 2nd argument is byte-load-bearing -- retail emits `move a1,zero` at 0x80056614 */
 extern void Class876FC__DriftModelChildren(); /* arity-ok: the definition is 1-parameter and LIVES IN THIS FILE (below, ROM-later), the body writing $a1 (`move a1,zero`) before any read; Class876FC__UpdateByKind's dead 2nd argument is byte-load-bearing -- retail emits `move a1,s1` in the jal delay slot at 0x800566D8 (round 75) */
 
@@ -134,7 +134,7 @@ extern s32 D_8008AB98[];
  * `parent` at pos + offset, then build the per-kind parts. Kinds 0 and 1
  * link a model fetched from D_8008ACA4 by D_8008AB98[kind]; kind 0 also
  * gets two model children, kind 2 five randomised sprites, kind 3 five
- * plain sprites (LinkOwnerObj__func_56e1c is Class876FC__SpawnSprites(self,
+ * plain sprites (Class876FC__SpawnPlainSprites is Class876FC__SpawnSprites(self,
  * 0, 0, NULL)). */
 void Class876FC__InitByKind(Class876FC *self, void *parent, Vec3S *pos) {
     Vec3S local;
@@ -159,7 +159,7 @@ void Class876FC__InitByKind(Class876FC *self, void *parent, Vec3S *pos) {
         Class876FC__BuildRandomSprites(self, 0);
         break;
     case 3:
-        LinkOwnerObj__func_56e1c(self, 0);
+        Class876FC__SpawnPlainSprites(self, 0);
         break;
     default:
         break;
@@ -186,7 +186,7 @@ void Class876FC__UpdateByKind(Class876FC *self, void *pos) {
         NoOpIgnoreArgs(self, pos);
         break;
     case 3:
-        LinkOwnerObj__RandomizeLinks(self, pos);
+        Class876FC__RandomizeSprites(self, pos);
         break;
     default:
         break;
@@ -202,10 +202,10 @@ void Class876FC__ReleaseByKind(Class876FC *self) {
         Class876FC__ReleaseModelChildren(self);
         break;
     case 2:
-        LinkOwnerObj__ReleaseLinks(self);
+        Class876FC__ReleaseSprites(self);
         break;
     case 3:
-        LinkOwnerObj__ReleaseLinksB(self);
+        Class876FC__ReleaseSpritesB(self);
         break;
     default:
         break;

@@ -146,7 +146,7 @@ second argument, and retail emits it:
 80056614:  move  a1,zero          <- the dead 2nd argument, in retail
 ```
 
-This is the same uniform `(self, 0)` switch as the `LinkOwnerObj__func_56e1c`
+This is the same uniform `(self, 0)` switch as the `Class876FC__SpawnPlainSprites`
 arm two cases down (`move a1,zero` at `0x80056624`).
 
 **What makes this one different from the rest of the round.** The declaration

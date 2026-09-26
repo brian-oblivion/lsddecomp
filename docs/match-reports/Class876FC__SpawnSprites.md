@@ -103,7 +103,7 @@ merely aliases an existing pointer/value for readability."
 Round 70 (alpha). `func_80056D18` -> `Class876FC__SpawnSprites`, **tier B**.
 
 Two callers: Class876FC__BuildRandomSprites (tbl = gSpriteScaleHalf or NULL)
-and class_3bb8c_o.c's LinkOwnerObj__func_56e1c (tbl = NULL, kind 3). Body:
+and class_3bb8c_o.c's Class876FC__SpawnPlainSprites (tbl = NULL, kind 3). Body:
 five `New_Class879C4(a2, 0, D_8008ACA8)` into +0x084, each attachToParent(self,
 no offset), slotB8(self->color), and updateScale(1, tbl) when tbl != NULL.
 
@@ -112,7 +112,7 @@ Why "sprites": in D800879C4's table (tools/classtable.py gClass879C4Methods) slo
 GsALON, semitrans rate: LIBGS.H:303-308), slot +0x0B8 (Sprite__SetColor)
 copies three bytes to +0x078..+0x07A and slot +0x044 writes +0x084. Those
 are GsSPRITE's attribute, r/g/b and rotate offsets (LIBGS.H:111-122) for a
-GsSPRITE embedded at +0x064; LinkOwnerObj__RandomizeLinks' `angle` at +0x084
+GsSPRITE embedded at +0x064; Class876FC__RandomizeSprites' `angle` at +0x084
 is the same rotate. The D800879C4 class itself is still unnamed, so B.
 
 ## Track 4 (2026-09-26, round 87)
