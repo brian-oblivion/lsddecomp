@@ -23,7 +23,7 @@
  * the slice had to become [c][o][o][c] and the second `c` needed its own name.
  * The first half kept `code_179d8_i` and is now Snd_decrescendo alone.
  *
- * A ONE-FUNCTION UNIT IS FINE and has precedent (`class_3bb8c_v`, and
+ * A ONE-FUNCTION UNIT IS FINE and has precedent (`libcard_card_clear`, and
  * `code_179d8_f_b` earlier in this same round).
  *
  * NO RODATA ATTACH CAME WITH THIS HALF, and that is measured, not assumed:

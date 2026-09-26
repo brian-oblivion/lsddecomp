@@ -37,7 +37,7 @@
  */
 
 /*
- * class_3bb8c_v -- carved round 27 (2026-09-10).  ONE function,
+ * libcard_card_clear -- carved round 27 (2026-09-10).  ONE function,
  * _card_clear (12 words), file 0x41328..0x41358, vram 0x80050B28.
  *
  * A one-function unit is deliberate, not an accident of carving.  This
@@ -88,4 +88,4 @@
  * toolchain-unreachable, frame-offset residue resists all tried levers, see
  * the match report). Restored to INCLUDE_ASM per the no-score-short-of-
  * byte-exact rule; the corrected, linkable body is preserved in the report. */
-INCLUDE_ASM("asm/nonmatchings/class_3bb8c_v", _card_clear);
+INCLUDE_ASM("asm/nonmatchings/libcard_card_clear", _card_clear);
