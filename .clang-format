@@ -1,6 +1,7 @@
 # House style (FINISHING-PLAN track 7). Written for clang-format 22; other
 # majors may format differently, so `make format` is judged on this one.
-# Never applied to include/psyq/ (Sony's headers stay as shipped).
+# Never applied to include/psyq/ (Sony's headers stay as shipped) or to
+# include/include_asm.h (splat regenerates it on every make extract).
 BasedOnStyle: LLVM
 Language: Cpp
 Standard: c++03

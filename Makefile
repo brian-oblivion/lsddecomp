@@ -179,7 +179,7 @@ clean:
 	rm -f $(CONFIG)/undefined_syms_auto.*.txt $(CONFIG)/undefined_funcs_auto.*.txt
 
 format:
-	clang-format -i $$(find src include -name '*.c' -o -name '*.h' | grep -v include/psyq)
+	clang-format -i $$(find src include -name '*.c' -o -name '*.h' | grep -v -e include/psyq -e include/include_asm.h)
 
 expected: check
 	rm -rf expected/build && mkdir -p expected && cp -r $(BUILD_DIR) expected/

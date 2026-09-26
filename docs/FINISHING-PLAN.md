@@ -227,7 +227,8 @@ listed by `plan.py`.
 (clang-format 22): 4-space indent, attached braces, `*` on the name, a blank
 line between definitions, includes never sorted (their order is load-bearing),
 comments never reflowed, strings never split. `make format` formats `src/` and
-`include/` (never `include/psyq/`). A multi-line `#define` and a K&R
+`include/` (never `include/psyq/`, nor `include/include_asm.h`, which splat
+rewrites on every extract). A multi-line `#define` and a K&R
 definition sit between `/* clang-format off */` and `/* clang-format on */`
 (block form: cpp is C89); write a new one the same way. A tool that reads
 `src/` must not depend on layout: the format commit left every tool's output
