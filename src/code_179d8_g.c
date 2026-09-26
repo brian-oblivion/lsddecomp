@@ -217,6 +217,8 @@ void CD_flush(void)
     q = &D_8006D8D9;
     D_8006D61C = 0;
     *q = D_8006D8DA;
+    /* Keeps the D_8006D8C0 pointer load and the D_8006D8D8[0] = 2 store
+     * below the D_8006D61C / D_8006D8D9 stores; without it GCC hoists them above. */
     __asm__("");
     D_8006D8D8[0] = 2;
     *D_8006D8C0 = 0;
@@ -574,6 +576,8 @@ s32 CD_readsync(s32 arg0, s32 arg1)
         puts(D_80010984);
         idx0 = p8D8[0];
         idx1 = p8D8[1];
+        /* Keeps both p8D8 byte loads directly after the puts call, ahead of
+         * the printf argument loads; without it the p8D8[0] load sinks below them. */
         __asm__("");
         /* &D_8008B3EC routed through a local pointer -- forces the same
          * unfolded lui/addiu addressing retail uses for this argument;
