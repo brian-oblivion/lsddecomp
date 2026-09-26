@@ -1,6 +1,8 @@
-# Class6D940__Finalize
+# PlacementGrid__Finalize
 
-> Renamed from `Class6D940__Destroy` on 2026-09-26 (tools/rename.py). Address 0x8002c200.
+> Renamed from `Class6D940__Finalize` on 2026-09-26 (tools/rename.py). Address 0x8002c200.
+
+> Renamed from `PlacementGrid__Destroy` on 2026-09-26 (tools/rename.py). Address 0x8002c200.
 
 > Renamed from `func_8002C200` on 2026-09-24 (tools/rename.py). Address 0x8002c200.
 
@@ -14,7 +16,7 @@ of the "plain forwarding wrapper" shapes flagged as recurring in this
 region by charlie's sibling-slice note.
 
 ```c
-s32 Class6D940__Finalize(void *self)
+s32 PlacementGrid__Finalize(void *self)
 {
     return GetActiveDataSourceMethods()->slot0C(self);
 }
@@ -22,7 +24,7 @@ s32 Class6D940__Finalize(void *self)
 
 This function's WHOLE body is one call with nothing after it -- exactly
 the ambiguous case CLAUDE.md warns about ("a void wrapper around a
-non-void tail call is byte-identical"). No caller of `Class6D940__Finalize`
+non-void tail call is byte-identical"). No caller of `PlacementGrid__Finalize`
 exists in this window, so there is no positive evidence either way; per
 the project's stated default, `slot0C` is typed `s32` and the value is
 returned rather than discarded. Byte-verified identical either way -- this
@@ -30,14 +32,14 @@ is a documented choice, not a measured one.
 
 ## Naming (round 77, charlie -- track 3)
 
-Renamed `func_8002C200 -> Class6D940__Finalize`, tier A. `+0x00C` (dtor)
+Renamed `func_8002C200 -> PlacementGrid__Finalize`, tier A. `+0x00C` (dtor)
 slot of `D_8006D940` (confirmed by `tools/classtable.py 0x8006D940`),
 matching the `FileResource__Finalize` naming precedent at the same slot
 position in the base class.
 
 ## Track 4 (2026-09-26, round 87, echo)
 
-Renamed `Class6D940__Destroy -> Class6D940__Finalize`: it occupies slot
+Renamed `PlacementGrid__Destroy -> PlacementGrid__Finalize`: it occupies slot
 +0x00C of D_8006D940, which is `finalize` in every class
 (`include/BasicClass.h`; `tools/classtable.py D_8006D940 --vs gFileResourceMethods`
 shows it overriding `FileResource__Finalize`), and its body is only the

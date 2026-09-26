@@ -1,4 +1,6 @@
-# New_Class6D940
+# New_PlacementGrid
+
+> Renamed from `New_Class6D940` on 2026-09-26 (tools/rename.py). Address 0x8002c12c.
 
 > Renamed from `new_class_6d940` on 2026-09-24 (tools/rename.py). Address 0x8002c12c.
 
@@ -9,19 +11,19 @@ attempt.
 ## Role
 
 Allocator: `BMemPMgrAlloc(0x34)`, and on success dispatches
-`GetClass6D940Methods()->slot08(self, arg1)` (that slot IS `Class6D940__Class6D940`, this
+`GetPlacementGridMethods()->slot08(self, arg1)` (that slot IS `PlacementGrid__PlacementGrid`, this
 unit, matched this round -- see its own report), returning the new
 instance; returns `NULL` on allocation failure.
 
 ```c
-void *New_Class6D940(s32 arg1)
+void *New_PlacementGrid(s32 arg1)
 {
     void *self;
     Table6D940 *table;
 
     self = BMemPMgrAlloc(0x34);
     if (self != NULL) {
-        table = GetClass6D940Methods();
+        table = GetPlacementGridMethods();
         table->slot08(self, arg1);
         return self;
     }
@@ -53,9 +55,9 @@ since neither shared header is included here.
 
 ## Naming (round 77, charlie -- track 3)
 
-Renamed `new_class_6d940 -> New_Class6D940`, tier A. Matches the project's
+Renamed `new_class_6d940 -> New_PlacementGrid`, tier A. Matches the project's
 `New_Class` allocator convention exactly. This function's own class,
-`D_8006D940`/`Class6D940Methods`, IS real class-framework data
+`D_8006D940`/`PlacementGridMethods`, IS real class-framework data
 (`tools/classtable.py 0x8006D940`, 30 slots) -- the "NOT class-framework
 code" language in the `## Role` section above predates the round-77
 correction recorded in the unit header comment and is left as written
@@ -63,4 +65,4 @@ history.
 
 ## Track 4 (2026-09-26, round 87, echo)
 
-Now `Class6D940 *New_Class6D940(char *name)`, the ctor's parameter; the one caller (Class866E8__Class866E8) passes 0, so nothing is loaded. Byte-identical.
+Now `PlacementGrid *New_PlacementGrid(char *name)`, the ctor's parameter; the one caller (Class866E8__Class866E8) passes 0, so nothing is loaded. Byte-identical.

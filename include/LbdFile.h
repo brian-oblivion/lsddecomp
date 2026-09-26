@@ -55,7 +55,7 @@ typedef struct LbdFileMethods LbdFileMethods;
 typedef struct LbdFileHeader {
     /* +0x00 */ u8 pad0[0x2];
     /* +0x02 */ u16 hasData; /* zero: loadDataBlock returns 0 */
-    /* +0x04 */ s32 placementsOffset; /* Class866E8__LoadElementResources: the element's Class6D940 buffer is header + placementsOffset */
+    /* +0x04 */ s32 placementsOffset; /* Class866E8__LoadElementResources: the element's PlacementGrid buffer is header + placementsOffset */
     /* +0x08 */ s32 placementsSize; /* ... and its LinkResource's data header + placementsOffset + placementsSize */
     /* +0x0C */ u8 padC[0x10 - 0xC];
     /* +0x10 */ u32 dataOffset; /* file offset of the data block (seek mode 0) */

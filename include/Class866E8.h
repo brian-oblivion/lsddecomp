@@ -16,7 +16,7 @@
  *
  * What its own methods do:
  *  - the ctor makes seven elements (`elems`), each a LbdFile `loader`, a
- *    Class6D940 `placements`, a GridCell `cellParent` attached to this
+ *    PlacementGrid `placements`, a GridCell `cellParent` attached to this
  *    object at `origin`, and a 0x668-byte block of GridCell `cells`
  *    attached to the cellParent on a 0x800-unit lattice. Every grid index
  *    uses a row stride of 20 cells: gDefaultGridSpan (0xA000) >> 11, stored
@@ -57,7 +57,7 @@
  */
 
 struct LbdFile;
-struct Class6D940;
+struct PlacementGrid;
 struct GridCell;
 
 typedef struct Class866E8 Class866E8;
@@ -196,7 +196,7 @@ struct Class866E8Elem {
     /* +0x000 */ u16 flag; /* 1 while its load is pending (ApplyRateEntries; OnNotifyTag1 clears it) */
     /* +0x002 */ u16 key; /* the ctor: its index; BuildRateEntries: the spec's key, copied on into loader->ownerKey */
     /* +0x004 */ struct LbdFile *loader; /* New_LbdFile(): the element's file (include/LbdFile.h) */
-    /* +0x008 */ struct Class6D940 *placements; /* New_Class6D940(0): its placement records (include/Class6D940.h) */
+    /* +0x008 */ struct PlacementGrid *placements; /* New_PlacementGrid(0): its placement records (include/PlacementGrid.h) */
     /* +0x00C */ struct GridCell *cellParent; /* New_GridCell(), attached to the Class866E8 at `origin`; every cell's parent */
     /* +0x010 */ struct GridCell **cells; /* BMemPMgrAlloc(0x668): 410 New_GridCell() cells, row stride 20 */
     /* +0x014 */ BasicClass *heldObj; /* zeroed by the ctor; OnElementEvent releases it on event 6 */

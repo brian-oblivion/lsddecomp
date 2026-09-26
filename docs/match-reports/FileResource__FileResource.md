@@ -136,7 +136,7 @@ zeroed and otherwise untouched" from scratch.
   `TriggerWorld__BuildResources`, `Tod__ScanPackets`, `TodSet__ScanPackets`,
   `LinkResource__MapModel`, `TimArraySrc__UploadImages`,
   `TimBlockSrc__SetEntryShift`, `LbdFile__LoadHeader`,
-  `VabStreamObj__OnBodyReady`, `Class6D940__ResolveEntry`). Callers use it
+  `VabStreamObj__OnBodyReady`, `PlacementGrid__ResolveEntry`). Callers use it
   as New_<Sub>(name), slot +0x078, `freeBuffer` (`TaskCore__SetSubHandle`,
   `class_3bb8c_g.c`). The name was chosen over `DataSource` because in this
   code's existing vocabulary (`SetActiveDataSource`,

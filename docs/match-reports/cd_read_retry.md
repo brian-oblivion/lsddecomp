@@ -194,7 +194,7 @@ last use, where retail keeps it in the SAME persistent register (`$s3`)
 it was allocated to earlier in the function. This is the same
 parameter/local-persists-in-one-register-vs-gets-reloaded-fresh
 register-identity question this round's other reports (`GetRCnt`,
-`Class6D940__ResolveEntry`) already document as resistant to reshaping -- not
+`PlacementGrid__ResolveEntry`) already document as resistant to reshaping -- not
 re-attempted here given the round's broader finding that this specific
 class rarely yields to source-level levers, and given the function is
 now at a solid, well-understood baseline rather than an unknown one.

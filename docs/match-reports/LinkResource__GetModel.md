@@ -51,5 +51,5 @@ fills with `New_TmdModel` results, so entry `index` is a TmdModel; the two
 callers that use the value confirm it: code_55dd4.c's TOD model-id packet
 passes it to `SceneNode__LinkModel` (whose `model` field holds a TmdModel,
 include/SceneNode.h), and class_3bb8c.c's Class866E8__LoadElementResources
-reads its +0x010 (TmdModel's `object`) through Class6D940__ResolveEntry. The
+reads its +0x010 (TmdModel's `object`) through PlacementGrid__ResolveEntry. The
 slot is `getModel`, returning `TmdModel *` (include/LinkResource.h).

@@ -849,9 +849,9 @@
           "header": "include/Class6D3C8.h"
         },
         "D_8006D940": {
-          "class": "Class6D940",
+          "class": "PlacementGrid",
           "date": "2026-09-26",
-          "header": "include/Class6D940.h"
+          "header": "include/PlacementGrid.h"
         },
         "D_8006E99C": {
           "class": "Class6E99C",

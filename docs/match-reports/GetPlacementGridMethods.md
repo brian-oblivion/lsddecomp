@@ -1,4 +1,6 @@
-# GetClass6D940Methods
+# GetPlacementGridMethods
+
+> Renamed from `GetClass6D940Methods` on 2026-09-26 (tools/rename.py). Address 0x8002c3a8.
 
 > Renamed from `func_8002C3A8` on 2026-09-24 (tools/rename.py). Address 0x8002c3a8.
 
@@ -13,11 +15,11 @@ project (`docs/research/class-framework.md`), but this unit is NOT
 class-framework code (per the unit's own header comment / charlie's
 sibling-slice finding) -- so this is written as a plain local
 function-pointer-table getter, not claimed to be a real vtable accessor.
-`New_Class6D940` and `Class6D940__Class6D940` (both this unit, this round) dispatch
+`New_PlacementGrid` and `PlacementGrid__PlacementGrid` (both this unit, this round) dispatch
 through the returned table.
 
 ```c
-Table6D940 *GetClass6D940Methods(void)
+Table6D940 *GetPlacementGridMethods(void)
 {
     return &D_8006D940;
 }
@@ -26,22 +28,22 @@ Table6D940 *GetClass6D940Methods(void)
 ## New local types
 
 `Table6D940` (this file only) -- a function-pointer table with two known
-slots: `+0x008` (`slot08`, 2-arg `(self, s32)` -- this IS `Class6D940__Class6D940`
-itself, confirmed by `New_Class6D940`'s own dispatch through this exact
+slots: `+0x008` (`slot08`, 2-arg `(self, s32)` -- this IS `PlacementGrid__PlacementGrid`
+itself, confirmed by `New_PlacementGrid`'s own dispatch through this exact
 slot) and `+0x06C` (`slot6C`, same 2-arg shape, dispatched conditionally
-from inside `Class6D940__Class6D940`'s own body). `D_8006D940` declared `extern
+from inside `PlacementGrid__PlacementGrid`'s own body). `D_8006D940` declared `extern
 Table6D940 D_8006D940;`.
 
 Also added `BaseTable6D940` (this file only) -- a SEPARATE table reached
 only via the uncarved accessor `GetActiveDataSourceMethods()`, with three known slots
-(`+0x008`, `+0x00C`, `+0x064`) used by `Class6D940__Class6D940`/`Class6D940__Finalize`/
-`Class6D940__SetFlag` respectively (all this unit, this round). Kept entirely
+(`+0x008`, `+0x00C`, `+0x064`) used by `PlacementGrid__PlacementGrid`/`PlacementGrid__Finalize`/
+`PlacementGrid__SetFlag` respectively (all this unit, this round). Kept entirely
 local to `code_179d8_d.c`, no shared header, per this round's rule for the
 `code_179d8` slices.
 
 ## Naming (round 77, charlie -- track 3)
 
-Renamed `func_8002C3A8 -> GetClass6D940Methods`, tier A. This unit's earlier
+Renamed `func_8002C3A8 -> GetPlacementGridMethods`, tier A. This unit's earlier
 "NOT class-framework code" finding (round 16) was WRONG for `D_8006D940`
 specifically -- see the unit header comment's round-77 correction.
 `D_8006D940` is a real 30-slot FileResource-derived vtable
@@ -58,4 +60,4 @@ section are authoritative).
 
 ## Track 4 (2026-09-26, round 87, echo)
 
-The paragraph above ("NOT class-framework code") is superseded: D_8006D940 is a FileResource method table and this is its getter, the first entry of gDataSourceClientGetters. Declared in `include/Class6D940.h`.
+The paragraph above ("NOT class-framework code") is superseded: D_8006D940 is a FileResource method table and this is its getter, the first entry of gDataSourceClientGetters. Declared in `include/PlacementGrid.h`.

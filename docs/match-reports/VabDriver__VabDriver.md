@@ -33,9 +33,9 @@ code_179d8_e.c's own header/table comments, which already named the old
 placeholder as exactly this. Per FINISHING-PLAN track 3, FUNCTION renames are
 tree-wide via `rename.py` regardless of which unit's `.s` file the bytes
 live in; only FIELD/SLOT ownership is unit-scoped. Named `VabDriver__X` (not
-`Class6D940__X`) because this table has an established type name already
+`PlacementGrid__X`) because this table has an established type name already
 (`VabDriverMethods`, code_179d8_e.c) distinct from this unit's own
-`D_8006D940`/`Class6D940` table -- confirmed two SEPARATE tables (different
+`D_8006D940`/`PlacementGrid` table -- confirmed two SEPARATE tables (different
 VRAM addresses, different header words: 0x23 vs 0x00000E03).
 `rename.py` mechanically updated code_179d8_e.c's own comments to the new
 name; no manual edit was made to that unit's file.

@@ -13,7 +13,7 @@
  *
  * PARENT BY CTOR CHAIN: Class6EED8__Class6EED8's first call is
  * GetActiveDataSourceMethods()->ctor, and Class6EED8__Finalize forwards to
- * the active driver's finalize, as Class6D940 and TimBlockSrc do.
+ * the active driver's finalize, as PlacementGrid and TimBlockSrc do.
  *
  * Own mechanics, all three methods: the ctor clears `loaded` and, given a
  * name, passes a 32-byte stack copy of it to requestLoadFile (+0x06C); the

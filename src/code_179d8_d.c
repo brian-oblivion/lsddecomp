@@ -21,7 +21,7 @@
  * `libc2/strncmp.o`. Five had been matched as C -- they were Sony's the whole
  * time, and reclassifying them out of the game count is the correction
  * CLAUDE.md asks for, not a regression. The unit is now 0x1C92C..0x1CC08
- * (vram 0x8002C12C..), New_Class6D940 onward, 14 functions. The ISO9660
+ * (vram 0x8002C12C..), New_PlacementGrid onward, 14 functions. The ISO9660
  * directory-record views and diagnostic-string externs that lived here went
  * with the functions; the stall's preserved body is in its report.
  *
@@ -48,7 +48,7 @@
  * Their stub reports are gone.  The previous version of this comment listed
  * both as "blocked, have stub reports", which by round 24 was a stale
  * DIRECTIVE over free ground -- the fourth unit in two rounds to carry one.
- * Class6D940__ResolveEntry was originally screened as a third (nop_mflo_mfhi) but
+ * PlacementGrid__ResolveEntry was originally screened as a third (nop_mflo_mfhi) but
  * that screen was inverted (checked mult/div BEFORE mflo/mfhi instead of
  * after) -- the head corrected it mid-round and deleted the stub report.
  * It is fresh ground; the mult/mfhi pair in its body is retail's signed-
@@ -66,19 +66,19 @@
  * 0x8006D940` -- slots +0x004/+0x05C/+0x060 are the SAME
  * `FileResource__Release`/`FileResource__FreeBuffer`/`NoOp` symbols the base class and
  * its CD-driver sibling (`gCdDriverMethods`, code_179d8_q.c) share verbatim, +0x008
- * is a genuine ctor (`Class6D940__Class6D940`), +0x00C a genuine dtor
- * (`Class6D940__Finalize`), and `D_8006D940`'s own getter (`GetClass6D940Methods`,
+ * is a genuine ctor (`PlacementGrid__PlacementGrid`), +0x00C a genuine dtor
+ * (`PlacementGrid__Finalize`), and `D_8006D940`'s own getter (`GetPlacementGridMethods`,
  * ex-`func_8002C3A8`) is registered in `gDataSourceClientGetters` (code_171e0.c) -- the
  * NULL-terminated array of "class-method-table getters of every
  * FileResource-derived client" -- as that array's FIRST entry
  * (`asm/data/5DB70.data.s`). So this unit's own class (kept address-named
- * `Class6D940`, no game-purpose evidence yet) is a real, registered
+ * `PlacementGrid`, no game-purpose evidence yet) is a real, registered
  * `SetActiveDataSource`-client sibling of `VabStreamObj`
  * (code_179d8_e.c) and the CD-read driver (code_179d8_q.c) -- do go looking
  * for `this->methods->slotN(this, ...)` dispatch here; it is real. This does
  * NOT extend to the REST of the unit's globals: no other classtable.py hit
  * exists in this window, so the "low-level control-word staging" read below
- * may still hold for whatever is not `D_8006D940`/`Class6D940Methods`-shaped.
+ * may still hold for whatever is not `D_8006D940`/`PlacementGridMethods`-shaped.
  *
  * Declarations: keep anything that encodes THIS unit's reading of the region
  * next to the code, in this file. Do NOT create a shared code_179d8*.h --
@@ -87,11 +87,11 @@
  */
 #include "common.h"
 #include "VabDriver.h"
-#include "Class6D940.h"
+#include "PlacementGrid.h"
 #include "LinkResource.h"
 
 /* FileResource's, code_171e0.c: the active driver's table, through which
- * Class6D940's ctor, finalize and setFlag reach their parent's. */
+ * PlacementGrid's ctor, finalize and setFlag reach their parent's. */
 extern FileResourceMethods *GetActiveDataSourceMethods(void);
 
 /* Pool allocator, already established elsewhere (e.g.
@@ -99,29 +99,29 @@ extern FileResourceMethods *GetActiveDataSourceMethods(void);
  * this unit does not include either header. */
 extern void *BMemPMgrAlloc(s32 size);
 
-/* LinkResource__GetModel as Class6D940__ResolveEntry calls it through
+/* LinkResource__GetModel as PlacementGrid__ResolveEntry calls it through
  * `linkResource`'s getModel (+0x080): with four arguments, because retail
  * keeps `placement` in $a3 across the call (the round-76 match). The
  * occupant reads only (self, index); a function-pointer cast, no code. */
-typedef s32 (*Class6D940GetModelFn)(LinkResource *self, s32 model, s32 cell,
-                                    Class6D940Placement *placement);
+typedef s32 (*PlacementGridGetModelFn)(LinkResource *self, s32 model, s32 cell,
+                                    PlacementGridPlacement *placement);
 
-Class6D940 *New_Class6D940(char *name) {
-    Class6D940 *self;
-    Class6D940Methods *table;
+PlacementGrid *New_PlacementGrid(char *name) {
+    PlacementGrid *self;
+    PlacementGridMethods *table;
 
     self = BMemPMgrAlloc(0x34);
     if (self != NULL) {
-        table = GetClass6D940Methods();
+        table = GetPlacementGridMethods();
         table->ctor(self, name);
         return self;
     }
     return NULL;
 }
 
-void Class6D940__Class6D940(Class6D940 *self, char *name) {
+void PlacementGrid__PlacementGrid(PlacementGrid *self, char *name) {
     GetActiveDataSourceMethods()->ctor((FileResource *)self);
-    self->methods = GetClass6D940Methods();
+    self->methods = GetPlacementGridMethods();
     self->linkResource = NULL;
     self->loaded = 0;
     if (name != NULL) {
@@ -129,17 +129,17 @@ void Class6D940__Class6D940(Class6D940 *self, char *name) {
     }
 }
 
-void Class6D940__Finalize(Class6D940 *self) {
+void PlacementGrid__Finalize(PlacementGrid *self) {
     GetActiveDataSourceMethods()->finalize((FileResource *)self);
 }
 
-void Class6D940__SetFlag(Class6D940 *self) {
+void PlacementGrid__SetFlag(PlacementGrid *self) {
     self->loaded = 1;
     GetActiveDataSourceMethods()->setFlag((FileResource *)self);
 }
 
-s32 Class6D940__ResolveEntry(Class6D940 *self, Class6D940Placement *placement, s32 cell) {
-    Class6D940Record *rec;
+s32 PlacementGrid__ResolveEntry(PlacementGrid *self, PlacementGridPlacement *placement, s32 cell) {
+    PlacementGridRecord *rec;
     LinkResource *link;
     s32 row;
     s32 col;
@@ -147,10 +147,10 @@ s32 Class6D940__ResolveEntry(Class6D940 *self, Class6D940Placement *placement, s
 
     if (cell < 0x190) {
         if (placement->next != 0) {
-            rec = (Class6D940Record *)((u8 *)self->buffer + placement->next);
+            rec = (PlacementGridRecord *)((u8 *)self->buffer + placement->next);
             placement->chained = 1;
         } else {
-            rec = (Class6D940Record *)(cell * 12 + 8 + (u8 *)self->buffer);
+            rec = (PlacementGridRecord *)(cell * 12 + 8 + (u8 *)self->buffer);
             placement->chained = 0;
         }
         placement->next = rec->next;
@@ -166,14 +166,14 @@ s32 Class6D940__ResolveEntry(Class6D940 *self, Class6D940Placement *placement, s
             model = rec->model;
             placement->model = model;
             link = self->linkResource;
-            return ((Class6D940GetModelFn)link->methods->getModel)(link, model, cell, placement);
+            return ((PlacementGridGetModelFn)link->methods->getModel)(link, model, cell, placement);
         }
         return -1;
     }
     return 0;
 }
 
-Class6D940Methods *GetClass6D940Methods(void) {
+PlacementGridMethods *GetPlacementGridMethods(void) {
     return &D_8006D940;
 }
 
