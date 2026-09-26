@@ -482,7 +482,7 @@ void Class866E8__LoadElementResources(Class866E8 *self, Class866E8Elem *entry) {
             h1 = outBuf.rotY;
             vec->rotate.z = 0;
             vec->rotate.y = h1;
-            (*slot)->flags36 = outBuf.unk2E;
+            (*slot)->flags36 = outBuf.cellFlags;
             (*slot)->coord2->flg = 0;
             {
                 s32 flags10 = (*slot)->attribute;

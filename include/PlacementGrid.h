@@ -44,7 +44,7 @@ typedef struct PlacementGridRecord {
     /* +0x0 */ u8 present;   /* zero: the cell is empty, ResolveEntry returns -1 */
     /* +0x1 */ u8 unk1;      /* -> CellPlacement.unk2C */
     /* +0x2 */ u16 model;    /* the index passed to linkResource's +0x080 */
-    /* +0x4 */ u8 cellFlags; /* -> CellPlacement.unk2E, which becomes the GridCell's flags36 */
+    /* +0x4 */ u8 cellFlags; /* -> CellPlacement.cellFlags, which becomes the GridCell's flags36 */
     /* +0x5 */ u8 rotY;      /* in 0x400 steps: -> CellPlacement.rotY */
     /* +0x6 */ s16 y;        /* in 0x800 units: -> CellPlacement.y */
     /* +0x8 */ s32 next;     /* buffer offset of the cell's next record, 0 for none */
@@ -61,8 +61,8 @@ typedef struct CellPlacement {
     /* +0x018 */ u8 pad18[0x1A - 0x18];
     /* +0x01A */ u16 rotY; /* record rotY * 0x400 */
     /* +0x01C */ u8 pad1C[0x2C - 0x1C];
-    /* +0x02C */ u16 unk2C;   /* record unk1 */
-    /* +0x02E */ u16 unk2E;   /* record cellFlags; the caller copies it to the GridCell's flags36 */
+    /* +0x02C */ u16 unk2C; /* record unk1 */
+    /* +0x02E */ u16 cellFlags; /* the record's cellFlags; the caller copies it to the GridCell's flags36 */
     /* +0x030 */ s32 chained; /* 1: this record came from the previous one's `next` */
     /* +0x034 */ s32 next; /* in: the offset to follow (0 starts at the cell); out: the record's `next` */
     /* +0x038 */ s32 model; /* record model */

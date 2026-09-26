@@ -83,7 +83,7 @@ s32 PlacementGrid__ResolveEntry(PlacementGrid *self, CellPlacement *placement, s
             placement->z = (row << 11) + 0x400;
             placement->rotY = rec->rotY << 10;
             placement->unk2C = rec->unk1;
-            placement->unk2E = rec->cellFlags;
+            placement->cellFlags = rec->cellFlags;
             model = rec->model;
             placement->model = model;
             link = self->linkResource;
