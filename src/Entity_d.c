@@ -202,13 +202,13 @@ void Entity__MoodCue44(Entity *this, SoundCueSet *out) {
  * SCALE_X3, 5 to 7 arms a drift (state 10) that adds TRANSLATE_Z_MINUS256
  * every tick from tick 201 on. */
 void Entity__RollScaleOrDelayedDrift(Entity *this) {
-    s32 r;
+    s32 roll;
 
     if (this->moodTimer == 0) {
-        r = rand() % 10;
-        if (r >= 8) {
+        roll = rand() % 10;
+        if (roll >= 8) {
             this->methods->updateScale(this, 1, SCALE_X3);
-        } else if (r >= 5) {
+        } else if (roll >= 5) {
             this->state = 10;
         }
     }
