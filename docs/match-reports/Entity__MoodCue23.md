@@ -28,7 +28,7 @@ void Entity__MoodCue23(Entity *this) {
             this->methods->slotBC(this, D_80089D9C);
         }
     } else if (this->unkFC == 0) {
-        this->methods->slotBC(this, D_80089D48);
+        this->methods->slotBC(this, TRANSLATE_Y_MINUS4096);
     } else if (this->unkFC < 0x41) {
         this->methods->slotBC(this, D_80089D60);
     } else if (this->unkFC < 0x47) {
@@ -47,7 +47,7 @@ void Entity__MoodCue23(Entity *this) {
 }
 ```
 
-`TRANSLATE_Y_MINUS64`/`D_80089D9C`/`D_80089D48`/`D_80089D60` are new rodata pointers
+`TRANSLATE_Y_MINUS64`/`D_80089D9C`/`TRANSLATE_Y_MINUS4096`/`D_80089D60` are new rodata pointers
 (`TRANSLATE_Y_MINUS64` used twice, by two different arms), extern-declared alongside
 this unit's other `D_80089*` constants; none yet dereferenced by any carved
 code.

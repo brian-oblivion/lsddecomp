@@ -33,7 +33,7 @@ extern u8 ROTATION_XPLUS_EIGHTH[];
 extern u8 D_80089E74[];
 extern LongVec3 D_80089DB4[];
 extern LongVec3 D_80089D9C[];
-extern LongVec3 D_80089D48[];
+extern LongVec3 TRANSLATE_Y_MINUS4096[];
 extern LongVec3 D_80089D60[];
 
 void Entity__MoodCue19(Entity *this, SoundCueSet *out) {
@@ -90,7 +90,7 @@ void Entity__MoodCue23(Entity *this) {
             this->methods->addTranslation(this, D_80089D9C);
         }
     } else if (this->moodTimer == 0) {
-        this->methods->addTranslation(this, D_80089D48);
+        this->methods->addTranslation(this, TRANSLATE_Y_MINUS4096);
     } else if (this->moodTimer < 0x41) {
         this->methods->addTranslation(this, D_80089D60);
     } else if (this->moodTimer < 0x47) {
