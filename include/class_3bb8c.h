@@ -966,8 +966,8 @@ struct Class86B60UnkB0ObjMethods_3bb8c_d {
     /* +0x0B8, Class86B60__TickNameFieldCursor's own last call: `(self, buf)` where `buf` is
      * that function's own 3-byte stack buffer. Lands at the SAME offset
      * as `include/class_3bb8c.h`'s own `FieldM7CMethods::slotB8` (a
-     * different unit's independent view) and `code_2cc8c.h`'s
-     * `Unk64ElemMethods` -- further confirmation (on top of `release`
+     * different unit's independent view) and TextRow's table
+     * (include/TextRow.h) -- further confirmation (on top of `release`
      * +0x004 and `slot4C` +0x04C already matching both) that `unkB0` is
      * that same real class. */
     void (*slotB8)(Class86B60UnkB0Obj_3bb8c_d *self, void *arg1);
@@ -986,11 +986,8 @@ struct Class86B60UnkB0Obj_3bb8c_d {
     u8 unkA9;
     /* +0x0AA/+0x0AB/+0x0AC, Class86B60__CreateNameField: three literal byte fields
      * (9/8/4) set right after allocation via `New_TextRow` -- this is
-     * the SAME real object as `code_2cc8c.h`'s `Unk64Elem` (matching
-     * slot offsets 0x004/0x04C/0x0B8, see that header's own note), so
-     * these three bytes are almost certainly flags/type-tag data on that
-     * class; kept opaque byte fields since this unit never reads them
-     * back. */
+     * a TextRow (include/TextRow.h): +0x0A9 cellCount, +0x0AA gapIndex,
+     * +0x0AB visibleCount, +0x0AC firstVisible. */
     u8 unkAA;
     u8 unkAB;
     u8 unkAC;
@@ -1998,10 +1995,10 @@ struct FieldM34 {
 };
 
 /* self->unk10/self->unk54's shared target (ObjM__TeardownPauseOverlay/ObjM__AdvancePauseSetup).
- * Distinct from `Unk64Elem` (include/code_2cc8c.h) despite sharing slot
+ * Distinct from TextRow (include/TextRow.h) despite sharing slot
  * NUMBERS with it (0x4C/0x50): self->unk10's own slot4C call site here
  * (ObjM__AdvancePauseSetup) sets up only ONE argument (self), which conflicts with
- * `Unk64ElemMethods::slot4C`'s already-established 3-argument signature
+ * TextRow's attachToParent (+0x04C), a 3-argument slot
  * (from that unit's own call sites) -- real counter-evidence against
  * unifying the two, per this project's established arity-conflict rule.
  * Kept as its own type. */
@@ -2015,15 +2012,10 @@ struct FieldM50 {
 };
 
 /* self->unk7C's target (ObjM__TeardownPauseOverlay/ObjM__AdvancePauseSetup). Returned by
- * New_TextRow, matched elsewhere (src/code_2cc8c_f.c) with return type
- * `Unk64Elem *` (include/code_2cc8c.h). This unit keeps its own
- * independent local view rather than including code_2cc8c.h, per the
- * project's established multiple-independent-local-views convention --
- * every slot below (0x004/0x04C/0x0B8) matches `Unk64ElemMethods` exactly
- * in both offset and signature, which is suggestive (not proof) that this
- * IS that same class. A different translation unit is free to type a
- * shared external function's return differently; this does not disturb
- * code_2cc8c_f.c's already-matched bytes. */
+ * New_TextRow (src/code_2cc8c_f.c), which returns `TextRow *`
+ * (include/TextRow.h); the call site casts. The slots below (0x004/0x04C/
+ * 0x0B8) are TextRow's release/attachToParent/setColor; the view is kept
+ * (ObjM's, not TextRow's job). */
 struct FieldM7CMethods {
     u8 pad000[0x004];
     void (*slot4)(FieldM7C *self);                              /* +0x004, ObjM__TeardownPauseOverlay */
@@ -2374,7 +2366,7 @@ extern void StyleTeardown(void);
  * resources `cursorSprite`/`textRow`/`panelSprite` and the TIM handles
  * (ChildObj86ED0), and `target` (TargetObj86ED0). The names are kept.
  */
-/* TextEntry's `textRow` (an Obj6EAC0, New_TextRow) and the two TIM handles
+/* TextEntry's `textRow` (a TextRow, include/TextRow.h) and the two TIM handles
  * TextEntry__LoadCardResources and TaskObjF__LoadCardIcon load through
  * func_8003B39C: a view of the slots those calls use, not one class. */
 typedef struct ChildObj86ED0 ChildObj86ED0;

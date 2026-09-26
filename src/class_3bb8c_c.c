@@ -170,9 +170,9 @@ void CheckObj866E8CountFlag(Ctx678_3bb8c_c *ctx, Result678_3bb8c_c *out)
 
 /* FormatFullWidthNumber is GAME code (matched round 38, src/code_2cc8c_f.c -- its
  * own C definition, not a Sony object), which formats a1 as a zero-padded
- * `width`-digit decimal string into `self`. This unit's own local view
- * keeps `self` opaque (`void *`) since nothing here touches Obj6EAC0's
- * fields -- the pointer is only passed through. */
+ * `width`-digit decimal string into `self`, the output buffer (the
+ * definition's `u8 *dst`; it was typed as a TextRow view until round 88).
+ * This unit's own local view keeps it `void *`. */
 extern void FormatFullWidthNumber(void *self, s32 a1, s32 width, s32 unpadded);
 
 /* The 6-byte value formatted into D_8008AA24's buffer by FormatFullWidthNumber
