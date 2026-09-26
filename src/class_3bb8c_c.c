@@ -1,13 +1,17 @@
 /*
  * class_3bb8c_c -- three small sibling classes, each built by its own
  * New_X/ctor pair (allocate, chain a base ctor, install the class's own
- * vtable): NodeGuardedViewport, Class86AA0 and Class86B60. All three follow the
- * same class-framework shape documented in docs/research/class-framework.md
- * and already used elsewhere in this codebase (e.g. class_3ac78.c's
- * Class866E8). Class86B60 (include/Class86B60.h, a TaskCore) is the
- * largest of the three -- its own vtable (gClass86B60Methods, 78 slots)
- * is occupied mostly by the sibling unit class_3bb8c_d.c; this unit
- * contributes only the allocator and ctor.
+ * vtable): NodeGuardedViewport, Class86AA0 and Class86B60. All three follow
+ * the same class-framework shape documented in
+ * docs/research/class-framework.md and already used elsewhere in this
+ * codebase (e.g. class_3ac78.c's Class866E8).
+ *
+ * NodeGuardedViewport (include/NodeGuardedViewport.h) is a Viewport whose
+ * update skips the frame while no view node is attached; its seven table
+ * methods, New_ and the getter are all here. Class86B60
+ * (include/Class86B60.h, a TaskCore) is the largest of the three -- its own
+ * vtable (gClass86B60Methods, 78 slots) is occupied mostly by the sibling
+ * unit class_3bb8c_d.c; this unit contributes only the allocator and ctor.
  *
  * Two free functions round out the unit: CheckSaveScoreFlag, called
  * directly (not through any vtable) from
