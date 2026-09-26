@@ -281,7 +281,7 @@ s32 StageMap__ComputeChunkLoadEntry(StageMap *self, ChunkLoadEntry *arg1, s32 di
         *(s32 *)((u8 *)arg1 + 4) = val + key;
     }
 
-    arg1->file = self->valueFn(self->valueFnCtx, *(s32 *)((u8 *)arg1 + 4), 0, 0);
+    arg1->file = self->chunkFileFn(self->chunkFileCtx, *(s32 *)((u8 *)arg1 + 4), 0, 0);
     do {
     } while (0);
     result = 1;

@@ -299,8 +299,8 @@ void StageMap__SetChildParams(StageMap *self, s32 count, s32 dirs, s32 colors) {
 }
 
 void StageMap__SetCallback(StageMap *self, ChunkFileFn fn, void *ctx) {
-    self->valueFn = fn;
-    self->valueFnCtx = ctx;
+    self->chunkFileFn = fn;
+    self->chunkFileCtx = ctx;
 }
 
 void StageMap__SetAcceptedTags(StageMap *self, s32 *tags) {

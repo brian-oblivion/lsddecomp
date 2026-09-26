@@ -154,7 +154,7 @@ typedef struct ChunkNeighbourDelta {
 } ChunkNeighbourDelta;
 
 /* applyChunkLoads' 0xC-byte entries, one per slot to (re)load: the file
- * record valueFn returned for the chunk (NULL: cancel the slot's load), the
+ * record chunkFileFn returned for the chunk (NULL: cancel the slot's load), the
  * chunk's index in the stage grid and the neighbour key of the slot that
  * takes it. ComputeChunkLoadEntry writes chunkIndex as a whole word. */
 typedef struct ChunkLoadEntry {
@@ -219,7 +219,7 @@ struct ChunkSlot {
 };
 
 /* The ctor's callback pair (setCallback): ComputeChunkLoadEntry calls
- * valueFn(valueFnCtx, value, 0, 0) and keeps the result as the entry's file record. */
+ * chunkFileFn(chunkFileCtx, value, 0, 0) and keeps the result as the entry's file record. */
 typedef void *(*ChunkFileFn)(void *ctx, s32 value, s32 arg2, s32 arg3);
 
 /* LightRig's slots, then this class's own. */
@@ -273,8 +273,8 @@ struct StageMapMethods {
 struct StageMap {
     LIGHTRIG_FIELDS(StageMapMethods);
     /* +0x054 */ LongVec3 origin; /* the ctor: its argument, or gDefaultOrigin; the cellParents attach here */
-    /* +0x060 */ ChunkFileFn valueFn; /* setCallback */
-    /* +0x064 */ void *valueFnCtx;    /* setCallback */
+    /* +0x060 */ ChunkFileFn chunkFileFn; /* setCallback */
+    /* +0x064 */ void *chunkFileCtx;      /* setCallback */
     /* +0x068 */ StageGridDimensions *config; /* setConfig (ObjM: GetStageGridDimensions(stage)); NULL after Reset */
     /* +0x06C */ SceneNode *target; /* setTargetAndBuildRates (DreamSys__SpawnAtLink passes the DreamSys); its coord2 is the tracked position */
     /* +0x070 */ s32 enabled;       /* enable/disable; gates UpdateIfEnabled */
