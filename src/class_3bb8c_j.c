@@ -1,21 +1,16 @@
 /*
- * class_3bb8c_j -- fourth carved slice of the class_3bb8c block
- * (0x41F84..0x429D4, vram 0x80051784..0x800521D4), 20 functions, carved
- * round 15. include/class_3bb8c.h is SHARED with every other class_3bb8c_*
- * slice; header edits here must be strictly ADDITIVE.
+ * class_3bb8c_j -- the tail of TextEntry and the first half of ItemList.
+ *  - TextEntry__PrevChar .. TextEntry__SetCharAt and GetTextEntryMethods
+ *    finish TextEntry (include/TextEntry.h), the caller-owned string editor
+ *    whose other methods are in class_3bb8c_i.
+ *  - Everything else is ItemList (include/ItemList.h), the list of strings
+ *    the player picks one from: its allocator and ctor, BasicClass's
+ *    overrides (finalize, child bookkeeping, onNotify), and the view and
+ *    resource methods resetView, loadResources, releaseResources,
+ *    attachTarget and detachTarget. Its list methods are in class_3bb8c_k.
  *
- * Two unrelated classes' methods live in this address range:
- *  - The first six functions (TextEntry__PrevChar .. TextEntry__SetCharAt)
- *    and GetTextEntryMethods are TextEntry's (gTextEntryMethods slots
- *    +0x094..+0x0A8, `tools/classtable.py gTextEntryMethods`), declared in
- *    include/TextEntry.h; the rest of the class is class_3bb8c_i.
- *  - Everything else is ItemList's (gItemListMethods, a BasicClass
- *    subclass, alloc size 0x54), declared in include/ItemList.h; the rest
- *    of the class is class_3bb8c_k.
- *
- * Both attributions were WRONG before round 75 (the first group was typed
- * as Class866E8's `Obj866E8`, the second named after gTextEntryMethods).
- * See `ItemList__ItemList.md` for the `tools/classtable.py` evidence.
+ * include/class_3bb8c.h is shared with every other class_3bb8c_* unit; edits
+ * to it must be strictly additive.
  */
 #include "common.h"
 #include "class_3bb8c.h"
@@ -312,8 +307,7 @@ void ItemList__ReleaseResources(ItemList *self) {
 
 /* The first addChild passes all four words through (ItemListAddChildWideFn,
  * no code): see this function's report for the do/while. */
-void ItemList__AttachTarget(ItemList *self, void *child1, void *child2,
-                              struct TargetObj86ED0 *target) {
+void ItemList__AttachTarget(ItemList *self, void *child1, void *child2, struct TargetObj86ED0 *target) {
     ItemListAddChildWideFn fn;
     s32 zero;
 

@@ -1,27 +1,17 @@
 /*
- * class_3bb8c_k -- fifth carved slice of the class_3bb8c block
- * (0x429D4..0x435E0, vram 0x800521D4..0x80052DE0), 20 functions, carved
- * round 15, all matched. Named round 75 (track 3).
+ * class_3bb8c_k -- the second half of ItemList, and the start of ObjM.
+ *  - ItemList (include/ItemList.h), the list of strings the player picks one
+ *    from: setState, tickClosing, handleInputCode and forwardToTarget, the
+ *    cursor and scroll methods, the four visible rows (createRows,
+ *    releaseRows, refreshRows, and the non-virtual helpers FormatRowText and
+ *    SetView), stepCursorInView, getCursorIndex and the table getter
+ *    GetItemListMethods. Its ctor and resource methods are in class_3bb8c_j.
+ *  - ObjM (include/ObjM.h): its allocator, ctor, finalize and onNotify,
+ *    which dispatches on the sender's class id. The rest of ObjM is in
+ *    class_3bb8c_l and class_3bb8c_m.
  *
- * Methods of two classes (`tools/classtable.py` resolves every one):
- *  - ItemList (table gItemListMethods, slots +0x054..+0x09C, plus the
- *    two non-virtual helpers FormatRowText/SetView and the table getter
- *    GetItemListMethods). A scrolling list selector: up to 4 visible
- *    rows of 26-character item text (one New_TextRow text object each),
- *    a highlighted cursor row (gItemListCursorColor, others
- *    gItemListRowColor), cursor up/down that scrolls the window at its
- *    edges, and a horizontal column offset. HandleInputCode maps input
- *    codes 25/23 to closing with result 2/3; SetState(4) then reports the
- *    result to the parents, which read the chosen item back through
- *    GetCursorIndex. Its ctor, child and resource methods are in
- *    class_3bb8c_j. Declared in include/ItemList.h (track 4, round 89).
- *  - ObjM (table gObjMMethods, slots +0x008/+0x00C/+0x038, plus New_ObjM):
- *    its allocator, ctor, Finalize and OnNotify, which dispatches on the
- *    sender's class id. The rest of ObjM is in class_3bb8c_l and
- *    class_3bb8c_m; the class is include/ObjM.h (track 4, round 89).
- *
- * include/class_3bb8c.h is SHARED with every other class_3bb8c_* slice.
- * Header edits must be strictly ADDITIVE.
+ * include/class_3bb8c.h is shared with every other class_3bb8c_* unit; edits
+ * to it must be strictly additive.
  */
 #include "common.h"
 #include "class_3bb8c.h"
@@ -189,8 +179,8 @@ void ItemList__CursorDown(ItemList *self, s32 arg1, s32 arg2, s32 arg3) {
 extern s32 gItemListRowOriginX;
 extern s32 gItemListRowOriginY;
 
-void ItemList__CreateRows(ItemList *self, SceneNode *parent, TimImage *font, s32 top,
-                            s32 column, s32 cursor) {
+void ItemList__CreateRows(ItemList *self, SceneNode *parent, TimImage *font, s32 top, s32 column,
+                          s32 cursor) {
     char buf[0x20];
     ScreenSpritePos pos;
     TextRow **p;

@@ -356,3 +356,18 @@ field. (ItemList__ItemList, one word, 66 -> 98/107.)
 ## Naming
 
 - `ItemList__ItemList` -- tier A. The ctor occupant (classtable.py gItemListMethods +0x008), named per the "constructors Class__Class" convention (e.g. Class869D8__Class869D8). Parses arg1 as a NUL-terminated pointer array and allocates two parallel unk10-length arrays -- mechanics well established via asm-differ across rounds 9/13/19/73.
+
+## History (moved from the unit banners, round 92)
+
+- `class_3bb8c_j` (0x41F84..0x429D4, vram 0x80051784..0x800521D4, 20
+  functions) and `class_3bb8c_k` (0x429D4..0x435E0, vram
+  0x800521D4..0x80052DE0, 20 functions, all matched) were carved in round 15
+  and named in round 75 (track 3).
+- Both attributions in `class_3bb8c_j` were wrong before round 75: the
+  TextEntry group was typed as Class866E8's `Obj866E8`, and this class's
+  group was named after gTextEntryMethods (the section above has the
+  `tools/classtable.py` evidence). The class was declared in its own header
+  in track 4 (round 89) as `Class86F88`, and named `ItemList` in track 6
+  (round 92, `tools/renametype.py Class86F88 ItemList`): a list of strings
+  with a scrolling cursor whose parent reads the chosen index, made only by
+  TaskObjF__AttachItemList from the memory card's save-file titles.
