@@ -39,7 +39,7 @@
  */
 
 /* The objects it holds, by tag (TargetObj86ED0 is a helper view in
- * include/class_3bb8c.h: TaskObjF's childC, TextEntry's target too). */
+ * include/class_3bb8c.h: TaskObjF's `sound`, a VabStreamObj, TextEntry's target too). */
 struct Class6B5CC;
 struct ScreenSprite;
 struct TextRow;

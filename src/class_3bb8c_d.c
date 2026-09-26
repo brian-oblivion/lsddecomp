@@ -23,6 +23,7 @@
 #include "TextRow.h"
 #include "TimImage.h"
 #include "Class86B60.h"
+#include "TaskObjF.h"
 
 void Class86B60__Finalize(Class86B60 *self)
 {
@@ -234,11 +235,12 @@ void Class86B60__BeginMemcardSave(Class86B60 *self)
 {
     if (self->saveCtrl == NULL) {
         self->iconHandle = New_TimImage((char *)D_800114F8);
-        self->saveCtrl = New_TaskObjF((void *)1, NULL);
+        self->saveCtrl = New_TaskObjF(1, 0);
     }
-    self->saveCtrl->methods->slot6C(self->saveCtrl, D_8008A9D0, &D_80086D6C,
-                                  self->initArgs->unk4, self->unk10, self->unk14,
-                                  self->sound);
+    self->saveCtrl->methods->init(self->saveCtrl, D_8008A9D0, (char **)&D_80086D6C,
+                                  self->initArgs->unk4, self->unk10,
+                                  (struct Class6B5CC *)self->unk14,
+                                  (struct VabStreamObj *)self->sound);
     self->methods->addChild(self, (BasicClass *)self->saveCtrl);
     self->methods->removeChild(self, self->initArgs->unk4);
     self->methods->removeChild(self, self->unk10);
@@ -249,7 +251,7 @@ void Class86B60__EndMemcardSave(Class86B60 *self)
     self->methods->addChild(self, self->initArgs->unk4);
     self->methods->addChild(self, self->unk10);
     self->methods->removeChild(self, (BasicClass *)self->saveCtrl);
-    self->saveCtrl->methods->slot70(self->saveCtrl);
+    self->saveCtrl->methods->deinit(self->saveCtrl);
 }
 
 void Class86B60__UpdateMemcardSaveWithIcon(Class86B60 *self)
@@ -262,15 +264,15 @@ void Class86B60__UpdateMemcardSaveWithIcon(Class86B60 *self)
     if (self->dreamSys->methods->getNewGameFlag(self->dreamSys)) {
         *(u8 *)D_8008AA10 = 0;
     }
-    self->saveCtrl->methods->slot78(self->saveCtrl, D_8008AA10, D_8008AA18, 0xD, 3,
-                                  self->iconHandle, (s32)self->saveBlock, self->saveBlockSize);
+    self->saveCtrl->methods->beginSave(self->saveCtrl, D_8008AA10, D_8008AA18, 0xD, 3,
+                                       self->iconHandle, self->saveBlock, self->saveBlockSize);
 }
 
 void Class86B60__UpdateMemcardSaveStatus(Class86B60 *self)
 {
     self->methods->beginMemcardSave(self);
-    self->saveCtrl->methods->slot74(self->saveCtrl, D_8008AA10, D_8008AA18,
-                                  (s32)self->saveBlock, self->saveBlockSize);
+    self->saveCtrl->methods->beginLoad(self->saveCtrl, D_8008AA10, D_8008AA18,
+                                       self->saveBlock, self->saveBlockSize);
 }
 
 void Class86B60__OnTagBValue(Class86B60 *self, BasicClass *sender, s32 event)
@@ -291,25 +293,19 @@ Class86B60Methods *GetClass86B60Methods(void)
     return &gClass86B60Methods;
 }
 
-void *New_TaskObjF(void *arg0, void *arg1)
+TaskObjF *New_TaskObjF(s32 padEnable, s32 cardSlot)
 {
-    void *self;
+    TaskObjF *self;
 
     self = BMemPMgrAlloc(0x84);
     if (self == NULL) {
         goto fail;
     }
-    GetTaskObjFMethods()->ctor(self, arg0, arg1);
+    GetTaskObjFMethods()->ctor(self, padEnable, cardSlot);
     return self;
 fail:
     return NULL;
 }
-
-/* TaskObjF__ClearResourceSlots is ALREADY MATCHED, but in class_3bb8c_e.c under its own
- * local type (`Node3bb8cE *`) -- this unit's own independent local view
- * of the same real object per the project's convention; only `self` is
- * ever forwarded here, never dereferenced. */
-extern void TaskObjF__ClearResourceSlots(void *self);
 
 /* libcard, linked SDK objects (config/psyq-objects.txt: libcard/a74,
  * libcard/a75, libcard/c112 -- see docs/match-reports/TaskObjF__TaskObjF.md).
@@ -319,7 +315,7 @@ extern void InitCARD(s32 padEnable);
 extern void StartCARD(void);
 extern void _bu_init(void);
 
-void TaskObjF__TaskObjF(GenericCtorObj_3bb8c_d *self, s32 arg1, s32 arg2)
+void TaskObjF__TaskObjF(TaskObjF *self, s32 padEnable, s32 cardSlot)
 {
     s32 count;
 
@@ -328,10 +324,10 @@ void TaskObjF__TaskObjF(GenericCtorObj_3bb8c_d *self, s32 arg1, s32 arg2)
     count = D_8008AA30;
     D_8008AA30 = count + 1;
     if (count == 0) {
-        InitCARD(arg1);
+        InitCARD(padEnable);
         StartCARD();
         _bu_init();
     }
     TaskObjF__ClearResourceSlots(self);
-    self->methods->setCardSlot(self, arg2);
+    self->methods->setCardSlot(self, cardSlot);
 }

@@ -5,14 +5,6 @@ class_3bb8c: warning: control reaches end of non-void function
 class_3bb8c_b: warning: `flag' might be used uninitialized in this function
 class_3bb8c_b: warning: `junk' might be used uninitialized in this function
 class_3bb8c_b: warning: `offset' might be used uninitialized in this function
-class_3bb8c_d: src/class_3bb8c_d.c: At top level:
-class_3bb8c_d: warning: `New_TaskObjF' was previously implicitly declared to return `int'
-class_3bb8c_d: warning: assignment makes pointer from integer without a cast
-class_3bb8c_d: warning: implicit declaration of function `New_TaskObjF'
-class_3bb8c_d: warning: previous external decl of `New_TaskObjF'
-class_3bb8c_d: warning: previous implicit declaration of `New_TaskObjF'
-class_3bb8c_d: warning: type mismatch with previous external decl
-class_3bb8c_d: warning: type mismatch with previous implicit declaration
 class_3bb8c_e: warning: control reaches end of non-void function
 class_3bb8c_f: warning: `code' might be used uninitialized in this function
 class_3bb8c_f: warning: implicit declaration of function `strcpy'

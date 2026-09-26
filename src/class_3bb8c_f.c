@@ -1,31 +1,33 @@
 #include "common.h"
 #include "class_3bb8c.h"
+#include "TaskObjF.h"
+#include "TimImage.h"
 
 /*
- * class_3bb8c_f: `TaskObjF`, a `BasicClass` subclass. Two mostly
- * independent halves share the object:
+ * class_3bb8c_f: `TaskObjF` methods (include/TaskObjF.h, track 4 round 89),
+ * slots +0x064..+0x078 and the +0x038 onNotify override, with the unit's
+ * helpers:
  *
- * - A direct memory-card file API (BuildMemcardPath,
+ * - The memory-card file API (BuildMemcardPath,
  *   TaskObjF__ReadMemcardFile/TryReadMemcardFile,
  *   TaskObjF__WriteMemcardSaveFile/TryWriteMemcardSaveFile): opens BIOS
  *   `bu00:`/`bu10:` paths directly to read save data and to write a save
  *   file whose header is structurally exact to the standard PS1 memory-
  *   card save format (magic, icon-frame count, block count, title, icon
  *   palette, up to three icon frames).
- * - A generic async-task skeleton (TaskObjF__Init/Deinit,
- *   TaskObjF__AllocBuffers/FreeBuffers/FreeUnusedBuffers,
- *   TaskObjF__Validate, TaskObjF__OnNotify, TaskObjF__BeginLoad/
- *   func_8004F8A4) managing a 16-entry buffer pool and dispatching the
- *   actual work through vtable slots a subclass outside this unit
- *   implements -- what those two entry points DO is not established
- *   here (see their own reports' Tier-C naming).
- * - `TaskObjF::events[4]` is corroborated cross-unit: class_3bb8c_e.c's
- *   TaskObjF__OpenEvents populates the identical +0x014 offset via OpenEvent()
- *   and hands the same object to this unit's own TaskObjF__EnableEvents.
+ * - The event helpers over `events[4]` (EnableEvents/DisableEvents/
+ *   TestEvents/ForEachEvent/WaitForReadyEvent).
+ * - The two operations the parent starts, TaskObjF__BeginLoad and
+ *   TaskObjF__BeginSave, with their card check (TaskObjF__Validate) and the
+ *   16-entry title buffer pool (Alloc/FreeUnused/FreeBuffers); TaskObjF__Init
+ *   and Deinit; TaskObjF__OnNotify, which routes a child's notification by
+ *   the child's class id.
  */
 
 /* Forward declarations: these are defined later in this file (strict
- * ROM-address order), but earlier functions call them.
+ * ROM-address order), but earlier functions call them. The class's own
+ * methods are prototyped in include/TaskObjF.h (track 4, round 89); these
+ * two are the unit's plain helpers.
  *
  * `BuildMemcardPath`'s entry here fixes a real Gate-0 warning (round 60):
  * `TaskObjF__TryReadMemcardFile` (line ~52) calls it before its line-226 definition, and
@@ -39,14 +41,7 @@
  * (`TaskObjF__TryReadMemcardFile` is already MATCHED and stays MATCHED): a pointer
  * return value lives in `$v0` either way, so the implicit-int reading
  * never produced different code, only a diagnostic. */
-s32 TaskObjF__Validate(TaskObjF *self);
-void TaskObjF__AllocBuffers(TaskObjF *self);
-void TaskObjF__FreeUnusedBuffers(TaskObjF *self);
-void TaskObjF__FreeBuffers(TaskObjF *self);
-s32 TaskObjF__ForEachEvent(TaskObjF *self, s32 (*callback)(s32), s32 flag);
 s32 WaitForReadyEvent(s32 *arr, s32 count);
-s32 TaskObjF__TryReadMemcardFile(TaskObjF *self, char *suffix, void *outBuf, s32 outSize);
-s32 TaskObjF__TryWriteMemcardSaveFile(TaskObjF *self, s32 a1, s32 handle, u8 a3, s32 arg5, s32 arg6, s32 arg7);
 char *BuildMemcardPath(DeviceName866E8 *dest, s32 selector, char *suffix);
 
 /* PSX BIOS file trampolines, linked from Sony's own objects since round 34
@@ -101,20 +96,20 @@ s32 TaskObjF__TryReadMemcardFile(TaskObjF *self, char *suffix, void *outBuf, s32
     return 1;
 }
 
-s32 TaskObjF__WriteMemcardSaveFile(TaskObjF *self, s32 a1, s32 handle, char a3, s32 arg5, s32 arg6, s32 arg7) {
+s32 TaskObjF__WriteMemcardSaveFile(TaskObjF *self, char *fileName, char *title, char a3, struct TimImage *icon, void *data, s32 size) {
     s32 count;
     s32 result;
 
     count = 10;
-    CopyMemcardIconTemplate(handle, a1);
+    CopyMemcardIconTemplate((s32)title, (s32)fileName);
     do {
-        result = TaskObjF__TryWriteMemcardSaveFile(self, a1, handle, a3 & 0xFF, arg5, arg6, arg7);
+        result = TaskObjF__TryWriteMemcardSaveFile(self, fileName, title, a3 & 0xFF, icon, data, size);
         if (result != 0) {
             break;
         }
     } while (count-- != 0);
     if (result == 0) {
-        CopyMemcardIconTemplate(handle, 0);
+        CopyMemcardIconTemplate((s32)title, 0);
     }
     return result;
 }
@@ -158,10 +153,11 @@ typedef struct IconFrame {
     u8 raw[0x80];
 } IconFrame;
 
-/* arg5->iconSource's pointee -- only the two palette halves (+0x14/+0x24)
- * and the three icon frames (+0x40/+0xC0/+0x140) are ever read by this
- * function; nothing establishes the leading 0x14 bytes or the 0xC-byte
- * gap at +0x34. */
+/* The icon TimImage's file buffer (its Class6D430 `buffer`, +0x010) --
+ * only the two palette halves (+0x14/+0x24) and the three icon frames
+ * (+0x40/+0xC0/+0x140) are ever read by this function; nothing here
+ * establishes the leading 0x14 bytes or the 0xC-byte gap at +0x34 (a TIM's
+ * 8-byte header and 12-byte CLUT block header would put the CLUT at +0x14). */
 typedef struct McIconSource {
     u8 pad0[0x14];
     IconPaletteHalf palette[2];  /* +0x14 */
@@ -171,20 +167,12 @@ typedef struct McIconSource {
     IconFrame frame2;                  /* +0x140 */
 } McIconSource;
 
-/* arg5's own type -- only +0x10 (a McIconSource*) is ever read. */
-typedef struct McIconSourceRef {
-    u8 pad0[0x10];
-    McIconSource *iconSource;
-} McIconSourceRef;
-
 /* The 0x200-byte memory-card save FILE HEADER this function builds and
  * submits -- see the NAMING note above. magic0/magic1 are the literal
  * bytes 'S'/'C'; iconFrameFlag/blockCount are computed size/mode bytes;
- * title is a strcpy target (source: this function's own `handle`
- * parameter, which despite its established `s32` type across this file
- * is used here as a raw C string -- kept `s32` at the parameter per this
- * project's per-site-cast convention, since retyping it risks the
- * ALREADY-MATCHED TaskObjF__WriteMemcardSaveFile's own signature). */
+ * title is a strcpy target (source: this function's own `title`
+ * parameter, TaskObjF::title; typed `char *` in track 4, round 89, where it
+ * had been an `s32` named `handle`, byte-identical). */
 typedef struct McSaveHeader {
     u8 magic0;
     u8 magic1;
@@ -201,7 +189,7 @@ extern const char D_80011530[];  /* rodata string "File not create in WriteFile\
 extern s32 write(s32 handle, void *buf, s32 size);  /* CD/streaming read-request submit; own local view, not yet declared elsewhere in this project */
 extern void printf(const char *fmt);  /* own local view: this call site passes only the format string, no variadic args (code_8220.h's 3-arg view is a DIFFERENT call site's shape) */
 
-s32 TaskObjF__TryWriteMemcardSaveFile(TaskObjF *self, s32 a1, s32 handle, u8 a3, s32 arg5, s32 arg6, s32 arg7) {
+s32 TaskObjF__TryWriteMemcardSaveFile(TaskObjF *self, char *fileName, char *title, u8 a3, struct TimImage *icon, void *data, s32 size) {
     char pathBuf[0x20];
     char *path;
     s32 fileHandle;
@@ -209,9 +197,9 @@ s32 TaskObjF__TryWriteMemcardSaveFile(TaskObjF *self, s32 a1, s32 handle, u8 a3,
     McIconSource *src;
     McSaveHeader *req;
 
-    path = BuildMemcardPath((DeviceName866E8 *)pathBuf, self->cardSlot, (char *)a1);
+    path = BuildMemcardPath((DeviceName866E8 *)pathBuf, self->cardSlot, fileName);
     delete(path);
-    openMode = ((((u32)arg7 + 0x21FF) >> 13) << 16) | 0x200;
+    openMode = ((((u32)size + 0x21FF) >> 13) << 16) | 0x200;
     fileHandle = open(path, openMode);
     if (fileHandle == -1) {
         printf(D_80011530);
@@ -222,13 +210,13 @@ s32 TaskObjF__TryWriteMemcardSaveFile(TaskObjF *self, s32 a1, s32 handle, u8 a3,
     if (fileHandle == -1) {
         return 0;
     }
-    src = ((McIconSourceRef *)arg5)->iconSource;
+    src = (McIconSource *)icon->buffer;
     req = (McSaveHeader *)BMemPMgrAlloc(0x200);
     req->magic0 = 'S';
     req->magic1 = 'C';
     req->iconFrameFlag = a3 + 0x10;
-    req->blockCount = ((u32)arg7 + 0x1FFF) >> 13;
-    strcpy(req->title, (char *)handle);
+    req->blockCount = ((u32)size + 0x1FFF) >> 13;
+    strcpy(req->title, title);
     req->palette[0] = src->palette[0];
     req->palette[1] = src->palette[1];
     req->frame0 = src->frame0;
@@ -236,7 +224,7 @@ s32 TaskObjF__TryWriteMemcardSaveFile(TaskObjF *self, s32 a1, s32 handle, u8 a3,
     req->frame2 = src->frame2;
     write(fileHandle, req, (a3 << 7) + 0x80);
     BMemPMgrFree(req);
-    write(fileHandle, (void *)arg6, (((u32)arg7 + 0x7F) >> 7) << 7);
+    write(fileHandle, data, (((u32)size + 0x7F) >> 7) << 7);
     close(fileHandle);
     return 1;
 }
@@ -323,43 +311,43 @@ s32 WaitForReadyEvent(s32 *arr, s32 count) {
     }
 }
 
-void TaskObjF__Init(TaskObjF *self, s32 a1, s32 a2, s32 a3, s32 a5, s32 a6, s32 a7) {
-    self->unk30 = a1;
-    self->unk34 = a2;
-    self->bufArray = 0;
-    self->unk68 = a6;
-    self->unk6C = a7;
-    self->methods->addChild(self, (void *)a3);
-    self->methods->addChild(self, (void *)a5);
-    self->unk70 = 0;
-    self->statusCode = 0;
+void TaskObjF__Init(TaskObjF *self, char *namePrefix, char **nameSuffixes, BasicClass *inputSource, BasicClass *tickSource, struct Class6B5CC *spriteParent, struct VabStreamObj *sound) {
+    self->namePrefix = namePrefix;
+    self->nameSuffixes = nameSuffixes;
+    self->titles = 0;
+    self->spriteParent = spriteParent;
+    self->sound = sound;
+    self->methods->addChild(self, inputSource);
+    self->methods->addChild(self, tickSource);
+    self->cardIcon = 0;
+    self->state = 0;
     self->opMode = 0;
 }
 
 void TaskObjF__Deinit(TaskObjF *self) {
-    self->unk6C = 0;
-    self->unk68 = 0;
-    self->methods->removeChild(self, (void *)self->unk60);
-    self->methods->removeChild(self, (void *)self->unk64);
+    self->sound = 0;
+    self->spriteParent = 0;
+    self->methods->removeChild(self, self->inputSource);
+    self->methods->removeChild(self, self->tickSource);
 }
 
-void TaskObjF__BeginLoad(TaskObjF *self, s32 a1, s32 a2, s32 a3, s32 a4) {
+void TaskObjF__BeginLoad(TaskObjF *self, char *fileName, char *title, void *data, s32 size) {
     s32 result;
     s32 code;
 
-    self->unk40 = a1;
-    self->unk44 = a2;
-    self->unk54 = a3;
+    self->fileName = fileName;
+    self->title = title;
+    self->data = data;
     self->opMode = 1;
-    self->unk58 = a4;
+    self->dataSize = size;
     if (TaskObjF__Validate(self)) {
         TaskObjF__FreeBuffers(self);
         TaskObjF__AllocBuffers(self);
-        result = self->methods->slot5C(self, self->bufArray, self->scratchBuf, self->unk30, self->unk34);
+        result = self->methods->collectExistingMemcardFiles(self, self->titles, self->foundSuffixes, self->namePrefix, self->nameSuffixes);
         self->bufCount = result;
         if (result != 0) {
             TaskObjF__FreeUnusedBuffers(self);
-            if (self->statusCode == 0xE) {
+            if (self->state == 0xE) {
                 code = 0xF;
             } else {
                 code = 0x12;
@@ -368,19 +356,19 @@ void TaskObjF__BeginLoad(TaskObjF *self, s32 a1, s32 a2, s32 a3, s32 a4) {
             code = 0xD;
             self->bufCount = 0xF;
         }
-        self->methods->slot7C(self, code);
+        self->methods->setState(self, code);
     }
 }
 
 void TaskObjF__AllocBuffers(TaskObjF *self) {
     s32 i;
 
-    if (self->bufArray == 0) {
-        self->bufArray = BMemPMgrAlloc(0x40);
+    if (self->titles == 0) {
+        self->titles = BMemPMgrAlloc(0x40);
         for (i = 0; i < 15; i++) {
-            self->bufArray[i] = BMemPMgrAlloc(0x41);
+            self->titles[i] = BMemPMgrAlloc(0x41);
         }
-        self->scratchBuf = BMemPMgrAlloc(0x40);
+        self->foundSuffixes = BMemPMgrAlloc(0x40);
     }
 }
 
@@ -388,58 +376,58 @@ void TaskObjF__FreeUnusedBuffers(TaskObjF *self) {
     s32 i;
 
     for (i = self->bufCount; i < 15; i++) {
-        self->bufArray[i] = BMemPMgrFree(self->bufArray[i]);
+        self->titles[i] = BMemPMgrFree(self->titles[i]);
     }
-    self->bufArray[i] = 0;
+    self->titles[i] = 0;
 }
 
 void TaskObjF__FreeBuffers(TaskObjF *self) {
     s32 i;
 
-    if (self->bufArray != 0) {
-        BMemPMgrFree(self->scratchBuf);
+    if (self->titles != 0) {
+        BMemPMgrFree(self->foundSuffixes);
         for (i = 0; i < self->bufCount; i++) {
-            BMemPMgrFree(self->bufArray[i]);
+            BMemPMgrFree(self->titles[i]);
         }
-        BMemPMgrFree(self->bufArray);
-        self->bufArray = 0;
+        BMemPMgrFree(self->titles);
+        self->titles = 0;
     }
 }
 
 /* MATCHED round 75 (docs/match-reports/TaskObjF__BeginSave.md): the
  * function returns nothing -- the early exit falls straight into the
  * epilogue with Validate's own $v0 -- and each of the three leaves makes its
- * own slot7C call, which GCC cross-jumps down to one shared `jalr`. */
-void TaskObjF__BeginSave(TaskObjF *self, s32 a1, s32 a2, s32 a3, u8 a5, s32 a6, s32 a7, s32 a8) {
+ * own setState call, which GCC cross-jumps down to one shared `jalr`. */
+void TaskObjF__BeginSave(TaskObjF *self, char *fileName, char *title, s32 titleEditPos, u8 iconFrames, struct TimImage *icon, void *data, s32 size) {
     s32 code;
     TaskObjFMethods *m;
 
-    self->unk40 = a1;
-    self->unk44 = a2;
-    self->unk48 = a3;
+    self->fileName = fileName;
+    self->title = title;
+    self->titleEditPos = titleEditPos;
     self->opMode = 2;
-    self->unk4C = a5;
-    self->unk50 = a6;
-    self->unk54 = a7;
-    self->unk58 = a8;
+    self->iconFrames = iconFrames;
+    self->iconImage = icon;
+    self->data = data;
+    self->dataSize = size;
     if (TaskObjF__Validate(self)) {
-        if (self->methods->slot54(self, 0, a1) != 0) {
+        if (self->methods->probeMemcardFile(self, 0, fileName) != 0) {
             code = 0xA;
-            if (self->statusCode == code) {
+            if (self->state == code) {
                 code = 0x11;
-            } else if (self->statusCode == 0x11) {
+            } else if (self->state == 0x11) {
                 code = 0xB;
             }
-            self->methods->slot7C(self, code);
-        } else if (!self->methods->slot60(self, a5, a8)) {
-            self->methods->slot7C(self, 9);
+            self->methods->setState(self, code);
+        } else if (!self->methods->checkCardSpace(self, iconFrames, size)) {
+            self->methods->setState(self, 9);
         } else {
             m = self->methods;
             code = 0x11;
-            if (self->statusCode == code) {
+            if (self->state == code) {
                 code = 0xB;
             }
-            m->slot7C(self, code);
+            m->setState(self, code);
         }
     }
 }
@@ -452,9 +440,9 @@ s32 TaskObjF__Validate(TaskObjF *self) {
     s32 slot4CRet;
     s32 code;
 
-    self->methods->slot44(self);
-    slot4CRet = self->methods->slot4C(self, &buf10, &buf14, &buf18);
-    self->methods->slot48(self);
+    self->methods->openEvents(self);
+    slot4CRet = self->methods->checkCardStatus(self, &buf10, &buf14, &buf18);
+    self->methods->closeEvents(self);
 
     if (slot4CRet != 0) {
         if (buf14 == 0 && buf18 != 0) {
@@ -477,7 +465,7 @@ s32 TaskObjF__Validate(TaskObjF *self) {
     }
 
 dispatch:
-    self->methods->slot7C(self, code);
+    self->methods->setState(self, code);
     return 0;
 }
 
@@ -494,15 +482,15 @@ void TaskObjF__OnNotify(TaskObjF *self, void *arg1, s32 arg2) {
     tag = **(s32 **)arg1;
     mask = tag & 0xF;
     if (mask == 2) {
-        methods->slot88(self, arg1, arg2);
+        methods->onInputEvent(self, arg1, arg2);
     } else if (mask == 5) {
-        methods->slot98(self, arg1, arg2);
+        methods->tickStateDelay(self, arg1, arg2);
     } else {
         mask = tag & 0xFF;
         if (mask == 0x10) {
-            methods->slotA4(self, arg1, arg2);
+            methods->onTextEntryResult(self, arg1, arg2);
         } else if (mask == 0x20) {
-            methods->slotB0(self, arg1, arg2);
+            methods->onItemListResult(self, arg1, arg2);
         }
     }
 }
