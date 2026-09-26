@@ -49,6 +49,7 @@
 #include "ModelData.h"
 #include "Tod.h"
 #include "TodSet.h"
+#include "TriggerWorld.h"
 #include "TmdModel.h"
 #include "DrawSystem.h"
 #include "CdStream.h"
@@ -58,9 +59,9 @@ typedef struct DataSrc33808 DataSrc33808;
 /* Unit-local view of this unit's Class6D430 data-source subclasses: the
  * interface plus the extra slots their methods call. Unprototyped where a
  * caller passes no argument. Not ModelData's (D_8006F384) nor Tod's
- * (D_8006F240) nor TodSet's (D_8006F590): those classes are
- * include/ModelData.h (track 4, round 84), include/Tod.h (round 86) and
- * include/TodSet.h (round 88). */
+ * (D_8006F240) nor TodSet's (D_8006F590) nor TriggerWorld's (D_8006F40C):
+ * those classes are include/ModelData.h (track 4, round 84), include/Tod.h
+ * (round 86), include/TodSet.h and include/TriggerWorld.h (round 88). */
 typedef struct DataSrc33808Methods {
     CLASS6D430_SLOTS(DataSrc33808, (DataSrc33808 *self));
     /* +0x07C */ s32 (*slot7C)();
@@ -70,9 +71,9 @@ typedef struct DataSrc33808Methods {
 struct DataSrc33808 {
     CLASS6D430_FIELDS(DataSrc33808Methods);
     /* +0x02C */ s32 unk2C;
-    /* +0x030 */ DataSrc33808 *unk30;  /* D_8006F40C: ModelData's todSet, forwarded to by +0x080/+0x084 */
+    /* +0x030 */ DataSrc33808 *unk30;
     /* +0x034 */ s32 unk34;
-    /* +0x038 */ s32 unk38;            /* D_8006F40C: count; D_8006F498: an allocation */
+    /* +0x038 */ s32 unk38;            /* D_8006F498: an allocation */
 };
 
 /* A buffer that starts with a word, a count, then that many words. */
@@ -89,7 +90,6 @@ extern void *BMemPMgrAlloc(s32 size);
 void *GetLinkResourceMethods(void);
 void *GetTimArraySrcMethods(void);
 void *GetBgLayerMethods(void);
-void *GetTriggerWorldMethods(void);
 void *GetTileMapMethods(void);
 void *GetTileAtlasMethods(void);
 
@@ -1007,45 +1007,44 @@ void *ModelData__ForwardDecodePacketWord(ModelData *self, s32 arg1, s32 arg2, s3
 ModelDataMethods *GetModelDataMethods(void) {
     return &D_8006F384;
 }
-/* Allocate and construct a D_8006F40C object; freed and NULL when the constructor fails. */
-void *New_TriggerWorld(s32 arg0) {
-    void *obj = BMemPMgrAlloc(0x3C);
+/* Allocate and construct a TriggerWorld; freed and NULL when the constructor fails. */
+TriggerWorld *New_TriggerWorld(Src6F240 *src) {
+    TriggerWorld *obj = BMemPMgrAlloc(0x3C);
 
     if (obj != NULL) {
-        if (((Ctor33808 *)GetTriggerWorldMethods())->ctor(obj, arg0)) {
+        if (((Ctor33808 *)GetTriggerWorldMethods())->ctor(obj, src)) {
             return obj;
         }
         BMemPMgrFree(obj);
     }
     return NULL;
 }
-/* D_8006F40C +0x008: constructor -- the parent D_8006F384's (third argument
- * 0), then this table; when the argument's first word is set, its own
+/* D_8006F40C +0x008: constructor -- ModelData's (third argument 0: not
+ * owning), then this table; when the descriptor has a buffer, its own
  * +0x064 runs, and a nonzero result fails the construction (NULL). */
-void *TriggerWorld__TriggerWorld(DataSrc33808 *self, s32 *arg) {
-    ((Ctor33808 *)GetModelDataMethods())->ctor(self, arg, 0);
+void *TriggerWorld__TriggerWorld(TriggerWorld *self, Src6F240 *src) {
+    ((Ctor33808 *)GetModelDataMethods())->ctor(self, src, 0);
     self->methods = GetTriggerWorldMethods();
-    if (*arg != 0) {
+    if (src->buffer != NULL) {
         if (((s32 (*)())self->methods->setFlag)(self)) {
             return NULL;
         }
     }
     return self;
 }
-/* D_8006F40C +0x00C: finalize -- slot +0x07C, then the parent D_8006F384's. */
-void TriggerWorld__Finalize(DataSrc33808 *self) {
-    self->methods->slot7C();
-    ((DataSrc33808Methods *)GetModelDataMethods())->finalize(self);
+/* D_8006F40C +0x00C: finalize -- releaseResources, then ModelData's. */
+void TriggerWorld__Finalize(TriggerWorld *self) {
+    self->methods->releaseResources(self);
+    GetModelDataMethods()->finalize((ModelData *)self);
 }
-/* D_8006F40C +0x064: slot +0x078. */
-void TriggerWorld__Load(DataSrc33808 *self) {
+/* D_8006F40C +0x064: slot +0x078 (TriggerWorld__BuildResources). */
+void TriggerWorld__Load(TriggerWorld *self) {
     ((s32 (*)())self->methods->slot78)(self);
 }
-/* D_8006F40C +0x078: build a D_8006F384 source (not owning) over each
- * sub-block of the buffer's counted offset table, into the table's own
- * words, counting them at +0x38; 0 when all exist, otherwise slot +0x07C
- * (release) and 1. */
-s32 TriggerWorld__BuildResources(DataSrc33808 *self) {
+/* D_8006F40C +0x078: build a ModelData (not owning) over each sub-block of
+ * the buffer's counted offset table, into the table's own words, counting
+ * them at +0x38; 0 when all exist, otherwise releaseResources and 1. */
+s32 TriggerWorld__BuildResources(TriggerWorld *self) {
     Req44858 req;
     CountedBuf33808 *buf;
     s32 *p;
@@ -1057,41 +1056,39 @@ s32 TriggerWorld__BuildResources(DataSrc33808 *self) {
     i = 0;
     n = buf->count;
     p = buf->entries;
-    self->unk38 = 0;
+    self->modelDataCount = 0;
     for (; i < n; i++) {
         req.buffer = (u8 *)self->buffer + ((CountedBuf33808 *)self->buffer)->entries[i];
         *p = (s32)New_ModelData((Src6F240 *)&req);
         if (*p == 0) {
             goto fail;
         }
-        self->unk38++;
+        self->modelDataCount++;
         p++;
     }
     return 0;
 fail:
-    self->methods->slot7C(self);
+    self->methods->releaseResources(self);
     return 1;
 }
-/* D_8006F40C +0x07C: release the object array in the buffer (past its first
- * two words), +0x38 entries long, and zero the count. */
-void TriggerWorld__ReleaseResources(DataSrc33808 *self) {
-    ReleaseBasicClassArray((BasicClass **)((u8 *)self->buffer + 8), self->unk38);
-    self->unk38 = 0;
+/* D_8006F40C +0x07C: release the ModelData array in the buffer (past its
+ * first two words), modelDataCount entries long, and zero the count. */
+void TriggerWorld__ReleaseResources(TriggerWorld *self) {
+    ReleaseBasicClassArray((BasicClass **)((u8 *)self->buffer + 8), self->modelDataCount);
+    self->modelDataCount = 0;
 }
-/* D_8006F40C +0x088: entry `index` of the buffer's counted word array, 0 when
- * out of range. */
-s32 TriggerWorld__GetModelData(DataSrc33808 *self, u32 index) {
+/* D_8006F40C +0x088: entry `index` of the buffer's counted word array (a
+ * ModelData once BuildResources has run), 0 when out of range. */
+ModelData *TriggerWorld__GetModelData(TriggerWorld *self, u32 index) {
     CountedBuf33808 *buf = self->buffer;
 
     if (index < buf->count) {
-        return buf->entries[index];
+        return (ModelData *)buf->entries[index];
     }
-    return 0;
+    return NULL;
 }
-extern s32 D_8006F40C[];
-
-void *GetTriggerWorldMethods(void) {
-    return D_8006F40C;
+TriggerWorldMethods *GetTriggerWorldMethods(void) {
+    return &D_8006F40C;
 }
 /* Allocate and construct a D_8006F498 object. */
 void *New_TileMap(s32 arg0, s32 arg1) {
