@@ -4,7 +4,7 @@
 
 Round 81, runner alpha. Unit `src/code_10ee0.c`. Fresh ground, no prior attempt.
 
-- **Where:** allocator (slots resolved with `tools/classtable.py D_8006C070`).
+- **Where:** allocator (slots resolved with `tools/classtable.py gDrawSystemMethods`).
 - **What:** allocates 0x34 bytes with BMemPMgrAlloc and runs the ctor through the class table (Get_vtable_DrawSystem()->ctor); the broadcast alloc-then-ctor shape `if (p != NULL) { ctor; return p; } return NULL;`.
 - **Result:** byte-exact on the FIRST build, no levers; `funcdiff.py` reports
   20/20 words, 0 insertions / 0 deletions, and the whole-image SHA1 is

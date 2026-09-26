@@ -97,4 +97,4 @@ instead.
 
 ## Track 4 (2026-09-26, round 87, bravo)
 
-The local view of the DrawSystem singleton quoted above is gone; the unit takes DrawSystem, its method table and GetDrawSystem from `include/DrawSystem.h` (D_8006C070 unified). Byte-identical.
+The local view of the DrawSystem singleton quoted above is gone; the unit takes DrawSystem, its method table and GetDrawSystem from `include/DrawSystem.h` (gDrawSystemMethods unified). Byte-identical.

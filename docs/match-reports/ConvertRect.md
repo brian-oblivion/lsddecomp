@@ -4,7 +4,7 @@
 
 Round 81, runner alpha. Unit `src/code_10ee0.c`. Fresh ground, no prior attempt.
 
-- **Where:** helper (not a table slot) (slots resolved with `tools/classtable.py D_8006C070`).
+- **Where:** helper (not a table slot) (slots resolved with `tools/classtable.py gDrawSystemMethods`).
 - **What:** copies x/y/w from +0/+2/+4 and h from +8 of a source record into a RECT (lhu/sh pairs from plain s16 member copies).
 - **Result:** byte-exact on the FIRST build, no levers; `funcdiff.py` reports
   12/12 words, 0 insertions / 0 deletions, and the whole-image SHA1 is

@@ -4,7 +4,7 @@
 
 Round 82, runner alpha. Unit `src/code_10ee0.c`. Fresh ground, no prior attempt.
 
-- **Where:** D_8006C070 slot +0x078 (`tools/classtable.py D_8006C070`).
+- **Where:** gDrawSystemMethods slot +0x078 (`tools/classtable.py gDrawSystemMethods`).
 - **What:** clear a rectangle to an RGB colour. With a NULL rect it asks
   slot +0x07C (DrawSystem__GetDims) for the whole-screen dims `{0, 0, w, h*2}` and
   re-dispatches itself through slot +0x078 with that as the rect; otherwise

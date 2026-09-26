@@ -30,7 +30,7 @@
  *    getActiveBuffer and swapBuffers slots.
  *
  * Children are cached by their class-id nibble (AddChild/RemoveChild): 1 is
- * the DrawSystem (D_8006C070, id 0x1), 4 a Class6B5CC, the node the view is
+ * the DrawSystem (gDrawSystemMethods, id 0x1), 4 a Class6B5CC, the node the view is
  * attached to. Each is typed by its class (include/DrawSystem.h,
  * include/Class6B5CC.h); round 87 retired code_2cc8c.h's GenericObj view of
  * the DrawSystem.

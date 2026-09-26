@@ -5,19 +5,19 @@
 Round 81, runner bravo. Unit `src/code_10ee0.c` (carved from `psyq_10ee0` in
 FINISHING-PLAN revision 18). Fresh ground, no prior attempt.
 
-- **Where:** not a method: the table getter (method-table slots resolved with `tools/classtable.py D_8006C070`).
-- **What:** returns &D_8006C070 (`lui/addiu`).
+- **Where:** not a method: the table getter (method-table slots resolved with `tools/classtable.py gDrawSystemMethods`).
+- **What:** returns &gDrawSystemMethods (`lui/addiu`).
 - **Result:** byte-exact on the first build; `funcdiff.py` reports 0
   insertions / 0 deletions and the whole-image SHA1 is green
   (`OK: build matches retail`).
-- **Name:** kept as the bare `func_` name; the class D_8006C070 has no
+- **Name:** kept as the bare `func_` name; the class gDrawSystemMethods has no
   confirmed name yet.
 
 ## Source
 
 ```c
 Class6C070Methods *Get_vtable_DrawSystem(void) {
-    return &D_8006C070;
+    return &gDrawSystemMethods;
 }
 ```
 
@@ -41,7 +41,7 @@ struct Class6C070 {
     /* +0x02C */ s32 unk2C;
     /* +0x030 */ s32 unk30;
 };
-extern Class6C070Methods D_8006C070;
+extern Class6C070Methods gDrawSystemMethods;
 extern Class6C070 *gDrawSystem;
 extern void GsSwapDispBuff(void);
 ```
@@ -49,7 +49,7 @@ extern void GsSwapDispBuff(void);
 ## Naming
 
 `Get_vtable_DrawSystem`, tier A. The class's own method-table getter
-(returns `&D_8006C070`); matches the project's `Get_vtable_<Class>`
+(returns `&gDrawSystemMethods`); matches the project's `Get_vtable_<Class>`
 convention for this exact role (`BasicClass.h`'s `Get_vtable_BasicClass`,
 round 81's `Get_vtable_WBgm`).
 

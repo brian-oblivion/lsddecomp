@@ -4,7 +4,7 @@
 
 Round 81, runner alpha. Unit `src/code_10ee0.c`. Fresh ground, no prior attempt.
 
-- **Where:** D_8006C070 slot +0x040 (init) (slots resolved with `tools/classtable.py D_8006C070`).
+- **Where:** gDrawSystemMethods slot +0x040 (init) (slots resolved with `tools/classtable.py gDrawSystemMethods`).
 - **What:** clears +0x10, calls slot +0x070 (DrawSystem__SetVSyncCount) with 3 and slot +0x080 (DrawSystem__SetSyncMode) with 1, clears +0x30.
 - **Result:** byte-exact on the FIRST build, no levers; `funcdiff.py` reports
   22/22 words, 0 insertions / 0 deletions, and the whole-image SHA1 is

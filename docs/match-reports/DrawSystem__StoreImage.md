@@ -4,7 +4,7 @@
 
 Round 82, runner alpha. Unit `src/code_10ee0.c`. Fresh ground, no prior attempt.
 
-- **Where:** D_8006C070 slot +0x05C (`tools/classtable.py D_8006C070`), the
+- **Where:** gDrawSystemMethods slot +0x05C (`tools/classtable.py gDrawSystemMethods`), the
   sibling of DrawSystem__LoadImage (+0x058).
 - **What:** the StoreImage twin of DrawSystem__LoadImage (LoadImage), with the two
   data arguments in the OTHER order: `(self, pixels, src)`. The asm shows it
