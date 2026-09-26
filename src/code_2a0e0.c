@@ -18,6 +18,7 @@
 #include "BasicClass.h"
 #include "DrawSystem.h"
 #include "VabStreamObj.h"
+#include "Class6EED8.h"
 
 /* Local view of D_8006E48C's objects: a background-music SEQ player. Fields
  * named from the libsnd calls they feed. */
@@ -37,19 +38,10 @@ struct WBgmMethods {
     /* +0x060 */ void (*setVab)(WBgm *self, s32 arg);            /* WBgm__SetVab */
 };
 
-/* What +0x10 holds: a New_Class6EED8 object. Only the fields read here. */
-typedef struct SeqData {
-    BASICCLASS_FIELDS(BasicClassMethods);
-    /* +0x00C */ u8 padC[0x10 - 0xC];
-    /* +0x010 */ unsigned long *addr;
-    /* +0x014 */ u8 pad14[0x2C - 0x14];
-    /* +0x02C */ s32 loaded;
-} SeqData;
-
 struct WBgm {
     BASICCLASS_FIELDS(WBgmMethods);
     /* +0x00C */ VabStreamObj *vab;   /* New_VabStreamObj(setVab's path) */
-    /* +0x010 */ SeqData *seqData;
+    /* +0x010 */ Class6EED8 *seqData; /* New_Class6EED8(setSeq's name): the SEQ file, SsSeqOpen'd from its buffer once loaded */
     /* +0x014 */ s16 seqId;
     /* +0x016 */ u8 pad16[0x1A - 0x16];
     /* +0x01A */ u16 openState;
@@ -69,7 +61,6 @@ extern void SsSeqClose(short);
 extern short SsSeqOpen(unsigned long *addr, short vab_id);
 
 extern void *BMemPMgrAlloc(s32 size);
-extern SeqData *New_Class6EED8(s32 arg);
 extern void printf(const char *fmt);
 extern const char D_80010FEC[]; /* "Seq Open error in WBgmHandleMonitorEvent" */
 WBgmMethods *Get_vtable_WBgm(void);
@@ -114,7 +105,7 @@ void WBgm__Finalize(WBgm *self) {
         self->vab->methods->release(self->vab);
     }
     if (self->seqData != NULL) {
-        self->seqData->methods->release((BasicClass *)self->seqData);
+        self->seqData->methods->release(self->seqData);
     }
     self->methods->removeChild(self, (BasicClass *)GetDrawSystem());
     Get_vtable_BasicClass()->finalize((BasicClass *)self);
@@ -132,7 +123,7 @@ void WBgm__Update(WBgm *self, s32 arg1, s32 arg2) {
 }
 s32 WBgm__HandleMonitorEvent(WBgm *self) {
     VabStreamObj *vab;
-    SeqData *seq;
+    Class6EED8 *seq;
 
     vab = self->vab;
     if (vab == NULL) {
@@ -148,7 +139,7 @@ s32 WBgm__HandleMonitorEvent(WBgm *self) {
     if (seq->loaded == 0) {
         return 0;
     }
-    self->seqId = SsSeqOpen(seq->addr, vab->vabId);
+    self->seqId = SsSeqOpen(seq->buffer, vab->vabId);
     if (self->seqId == -1) {
         printf(D_80010FEC);
     }
@@ -194,11 +185,11 @@ void WBgm__SetSeq(WBgm *self, s32 arg) {
         self->methods->stop(self);
     }
     if (self->seqData != NULL) {
-        self->seqData->methods->release((BasicClass *)self->seqData);
+        self->seqData->methods->release(self->seqData);
         self->seqData = NULL;
     }
     if (arg != 0) {
-        self->seqData = New_Class6EED8(arg);
+        self->seqData = New_Class6EED8((char *)arg); /* setSeq's s32 is the name */
         if (WBgm__HandleMonitorEvent(self)) {
             if (self->autoPlay != 0) {
                 self->methods->play(self);
