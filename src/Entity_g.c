@@ -24,9 +24,8 @@
  * Five rotation/scale data constants named this round, decoded from
  * disk/SLPS_015.56 against the existing ROTATION_YAW_PLUS2/
  * ROTATION_YAW_MINUS120/ROTATION_ZPLUS9/SCALE_HALF/SCALE_SIX tables
- * (rotation/scale: four s16 {num,den} pairs for X/Y(yaw)/Z/W, W never
- * reflected in the name per the ROTATION_YAW_MINUS120/SCALE_HALF/SCALE_SIX
- * precedent): ROTATION_YAW_PLUS1, ROTATION_ZPLUS4, SCALE_EIGHTH,
+ * (rotation/scale: three Ratio16 {num,den} pairs for X/Y(yaw)/Z, per the
+ * ROTATION_YAW_MINUS120/SCALE_HALF/SCALE_SIX precedent): ROTATION_YAW_PLUS1, ROTATION_ZPLUS4, SCALE_EIGHTH,
  * SCALE_QUARTER, SCALE_THIRTY_SECOND. Six more data constants
  * (D_80089CAC, D_80089CB8, D_80089DE4, D_80089E14, D_80089E2C, D_80089E44)
  * were decoded but left unnamed -- either a non-whole-degree rotation
@@ -34,10 +33,9 @@
  * fraction scale (no precedent either). See each function's match
  * report's `## Naming` / `## Data constant(s) ... unnamed` sections for
  * the per-constant evidence. `ROTATION_YAW_PLUS1` and `SCALE_QUARTER`
- * turned out to also be referenced from `src/Entity_c.c` (pre-existing,
- * not new to this round) -- each unit keeps its own local `extern`, per
- * this project's per-unit-local-view convention; the global rename
- * updated both units' externs uniformly.
+ * turned out to also be referenced from `src/Entity_c.c`; since track 4b
+ * (round 93) every named template has one declaration, Ratio16[] in
+ * include/Entity.h.
  */
 #include "common.h"
 #include "Entity.h"
@@ -48,22 +46,14 @@
  * call as an opaque argument -- never dereferenced here, so an opaque byte
  * array is enough to form &D_8008xxxx correctly. Real element type/count
  * unknown. Same per-unit local-declaration convention as Entity_b.c/
- * Entity_c.c/Entity_e.c (each unit keeps its own extern, not shared). */
+ * Entity_c.c/Entity_e.c (each unit keeps its own extern, not shared).
+ * The named motion templates (ROTATION_*, SCALE_*) are in include/Entity.h. */
 extern u8 D_80089CAC[];
 extern u8 D_80089E14[];
 extern u8 D_80089DE4[];
-extern u8 SCALE_HALF[];
-extern u8 SCALE_EIGHTH[];
-extern u8 SCALE_QUARTER[];
 extern u8 D_80089CB8[];
 extern u8 D_80089E2C[];
-extern u8 SCALE_SIX[];
 extern u8 D_80089E44[];
-extern u8 ROTATION_ZPLUS4[];
-extern u8 ROTATION_YAW_PLUS1[];
-extern u8 ROTATION_YAW_MINUS9[];
-extern u8 ROTATION_YAW_PLUS9[];
-extern u8 SCALE_THIRTY_SECOND[];
 
 void Entity__MoodCue98(Entity *this, SoundCueSet *out) {
     if (this->targetReached != 0) {
@@ -292,7 +282,7 @@ void Entity__MoodCue113(Entity *this, SoundCueSet *out) {
 }
 
 void Entity__MoodCue114(Entity *this, SoundCueSet *out) {
-    void *a2;
+    Ratio16 *a2;
 
     if (rand() % 3 == 0) {
         return;

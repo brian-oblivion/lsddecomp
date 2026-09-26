@@ -29,18 +29,9 @@
 #include "Entity.h"
 #include "DreamSys.h"
 
-extern u8 SCALE_SIX[];
-extern u8 SCALE_Y2[];
-extern u8 SCALE_DOUBLE[];
-extern u8 SCALE_QUARTER[];
-extern u8 ROTATION_YAW_PLUS2[];
-extern u8 ROTATION_YAW_PLUS9[];
-extern u8 ROTATION_YAW_MINUS9[];
 extern u8 D_80089C58[];
 extern u8 D_80089E74[];
-extern u8 ROTATION_YAW_PLUS1[];
 extern LongVec3 D_80089DB4[];
-extern LongVec3 TRANSLATE_Y_MINUS64[];
 extern LongVec3 D_80089D9C[];
 extern LongVec3 D_80089D48[];
 extern LongVec3 D_80089D60[];
@@ -334,7 +325,7 @@ void Entity__MoodCue35(Entity *this) {
 }
 
 void Entity__MoodCue36(Entity *this) {
-    u8 *arg2;
+    Ratio16 *arg2;
     s32 roll;
 
     if (this->state == 0) {
