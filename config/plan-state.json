@@ -1223,6 +1223,7 @@
     },
     "5": {
       "checklist": {
+        "credits": true,
         "docs-budget": true,
         "nonmatching-clean": true,
         "readme": true
