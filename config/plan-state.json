@@ -902,6 +902,11 @@
           "date": "2026-09-26",
           "header": "include/TodSet.h"
         },
+        "ENTITY_METHODS": {
+          "class": "Entity",
+          "date": "2026-09-26",
+          "header": "include/Entity.h"
+        },
         "gActorMethods": {
           "class": "Actor",
           "date": "2026-09-25",
