@@ -34,7 +34,7 @@ extern u8 D_80089E74[];
 extern LongVec3 D_80089DB4[];
 extern LongVec3 D_80089D9C[];
 extern LongVec3 TRANSLATE_Y_MINUS4096[];
-extern LongVec3 D_80089D60[];
+extern LongVec3 TRANSLATE_Y_PLUS64[];
 
 void Entity__MoodCue19(Entity *this, SoundCueSet *out) {
     out->attenuation = this->methods->getProximityRatio(this);
@@ -92,7 +92,7 @@ void Entity__MoodCue23(Entity *this) {
     } else if (this->moodTimer == 0) {
         this->methods->addTranslation(this, TRANSLATE_Y_MINUS4096);
     } else if (this->moodTimer < 0x41) {
-        this->methods->addTranslation(this, D_80089D60);
+        this->methods->addTranslation(this, TRANSLATE_Y_PLUS64);
     } else if (this->moodTimer < 0x47) {
         this->methods->addTranslation(this, TRANSLATE_Y_MINUS64);
         this->methods->moveLocalZ(this, -0x1E, 0);
@@ -320,7 +320,7 @@ void Entity__MoodCue35(Entity *this) {
     if (rem500 < 0x20) {
         this->methods->addTranslation(this, TRANSLATE_Y_MINUS64);
     } else if (rem500 < 0x40) {
-        this->methods->addTranslation(this, D_80089D60);
+        this->methods->addTranslation(this, TRANSLATE_Y_PLUS64);
     }
 }
 
