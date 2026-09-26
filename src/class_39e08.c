@@ -1,6 +1,7 @@
 #include "common.h"
 #include "class_39e08.h"
 #include "VabStreamObj.h"
+#include "Class869D8.h"
 
 Obj865C8 *New_Obj865C8(Obj0C *arg1, SubObjD *arg2, s32 arg3)
 {
@@ -32,7 +33,7 @@ void Obj865C8__Obj865C8(Obj865C8 *self, Obj0C *arg1, SubObjD *arg2, s32 arg3) {
     func_8004A070(1);
     SetActiveDataSourceDriverMode((u32)arg3 < 1, 1, 1);
     self->unk0C = arg1;
-    arg1->unk10 = New_Class869D8();
+    arg1->unk10 = (SubObjG *)New_Class869D8();
     arg1->unk8 = New_D8006EF50();
     arg1->unkC = (SubObjG *)New_Class866E8(0, 1);
     self->unk38 = arg2;

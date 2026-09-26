@@ -10,7 +10,7 @@ The constructor (`ctor`, slot +0x008) for `Class869D8`. Standard
 class-framework shape, same as e.g. class_39e08.c's `Class86668__Class86668`: chain
 to a base class's ctor (fetched via `GetViewportMethods()`), install this
 class's own vtable, then call the just-installed vtable's own
-post-construct hook (slot +0x040, currently `func_8004D2F8` -- already
+post-construct hook (slot +0x040, currently `Class869D8__InitDefaults` -- already
 matched, an empty body).
 
 ## The C

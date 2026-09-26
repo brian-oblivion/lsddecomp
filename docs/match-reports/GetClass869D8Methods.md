@@ -29,7 +29,7 @@ reading the table directly (it isn't registered with `tools/classtable.py`,
 since it isn't `D_800866E8`'s own table -- this is a distinct, smaller
 class). Only the slots this unit's own functions reach are typed:
 +0x008 (`ctor`, Class869D8__Class869D8) and +0x040 (a post-construct hook,
-func_8004D2F8, already matched as an empty body). See
+Class869D8__InitDefaults, already matched as an empty body). See
 `include/class_3bb8c.h`.
 
 ## Proposed learning
