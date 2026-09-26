@@ -244,7 +244,9 @@ void Class6E99C__PopPosition(Class6E99C *self) {
     t1 = self->savedPosY;
     self->posX = t0;
     self->posY = t1;
-    __asm__("" ::: "memory");
+    /* Keeps the savedW/savedH loads below the posX/posY stores; without it
+     * GCC hoists both lhu above the two sw. (A "memory" clobber is not needed.) */
+    __asm__("");
     self->boxW = self->savedW;
     self->boxH = self->savedH;
 }
