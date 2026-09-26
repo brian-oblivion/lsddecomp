@@ -53,9 +53,12 @@
  * flat grid it also re-centres: the slot holding the target picks a spec
  * through sFootprintResultRemap and sFootprintResultPtrTable (NULL, no
  * change, for the centre slot) and loadChunksAround reloads the slots that
- * spec marks around the target's chunk. Then refreshFootprint
- * rebuilds `rects`, the up to four cell rectangles the target covers, and
- * flags their cells (SetFootprintCellFlag). forwardAcceptedCommand and
+ * spec marks around the target's chunk. Then refreshFootprint moves the
+ * window of cells that is drawn: it sets GsDOFF (bit 31 of `attribute`) on
+ * the cells of the old `rects`, rebuilds `rects`, the up to four cell
+ * rectangles around the target, and clears it on theirs
+ * (SetFootprintCellFlag); every other cell stays hidden (the ctor and
+ * ClearSlotCells set the bit). forwardAcceptedCommand and
  * applyToSenderFootprint hand a sender's command to every cell under its
  * rectangle (DispatchToRectCells, NotifyGridCell).
  *
