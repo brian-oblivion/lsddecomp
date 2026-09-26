@@ -757,10 +757,11 @@ extern char *strcat(char *dest, char *src);
 extern s32 CopyMemcardIconTemplate(s32 arg0, s32 arg1);                /* TaskObjF__WriteMemcardSaveFile's own retry-loop bracket; also called with (arg,0) after the retry loop gives up */
 
 /* ObjM (gObjMMethods, class_3bb8c_k/_l/_m) is include/ObjM.h (track 4,
- * round 89). The class_3bb8c_m view `ObjM` and its helper views of the
- * objects ObjM holds (FieldM14/18/34/50/7C, ChildM_AC, ChildM114, ParamM)
+ * round 89). The views `ObjM` (class_3bb8c_m) and `Obj87034_3bb8c_l`, and
+ * their helper views of the objects ObjM holds (FieldM14/18/34/50/7C,
+ * ChildM_AC, ChildM114, ParamM, Obj14/StyleWorldObj/RegistrantObj_3bb8c_l)
  * are gone: those objects are the unified Class866E8, Class869D8,
- * Class6E99C, VabStreamObj, FrameClock, WBgm and TextRow. */
+ * Class6E99C, TimBlockSrc, VabStreamObj, FrameClock, WBgm and TextRow. */
 
 /* ObjM::styleConfig's pointee (include/ObjM.h): not a class, a plain
  * record, the same memory class_3bb8c_m's local StyleM describes

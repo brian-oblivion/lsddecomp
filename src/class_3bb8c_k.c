@@ -16,8 +16,9 @@
  *    GetCursorIndex. Its ctor, child and resource methods are in
  *    class_3bb8c_j. Declared in include/Class86F88.h (track 4, round 89).
  *  - ObjM (table gObjMMethods, slots +0x008/+0x00C/+0x038, plus New_ObjM):
- *    its allocator, ctor, dtor and OnNotify. The rest of ObjM is in
- *    class_3bb8c_l and class_3bb8c_m.
+ *    its allocator, ctor, Finalize and OnNotify, which dispatches on the
+ *    sender's class id. The rest of ObjM is in class_3bb8c_l and
+ *    class_3bb8c_m; the class is include/ObjM.h (track 4, round 89).
  *
  * include/class_3bb8c.h is SHARED with every other class_3bb8c_* slice.
  * Header edits must be strictly ADDITIVE.

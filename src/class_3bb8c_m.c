@@ -6,43 +6,19 @@
  * `gp_rel` were resolved project-wide (CLAUDE.md, "Open toolchain
  * blockers"). This unit owns no switch jump table.
  *
- * NAMING PASS, round 69 (runner alpha). Two class identifications drive
- * every name below, both confirmed with `tools/classtable.py`, never by
- * guessing from a slot number:
- *
- *   - This unit's `self` (`ObjM`) is a subclass whose OWN vtable is
- *     `gObjMMethods` (`tools/classtable.py 0x80087034`, 53 slots) -- the same
- *     class as class_3bb8c_l's `Obj87034_3bb8c_l` (see that HEAD NOTE in
- *     include/class_3bb8c.h; NOT unified with it here, a struct-merge is its
- *     own change per that note). This unit's own 14 functions occupy that
- *     table's tail, offsets +0xA0..+0xD4, i.e. this class's own new virtual
- *     methods (the base Class86668/Obj865C8 table --
- *     docs/match-reports/ObjM__Finalize.md -- only goes up to about +0x88).
- *     `ObjMMethods::notifyParents`/`checkAuxTrigger`/`teardownPauseOverlay`
- *     (+0x030/+0x0B8/+0x0D4) are confirmed the same way: +0x030 is
- *     `BasicClass__NotifyParents`, and +0x0B8/+0x0D4 are this unit's own
- *     `ObjM__CheckAuxTrigger`/`ObjM__TeardownPauseOverlay`.
- *   - `self->dreamSys` (formerly `unk3C`) is `DreamSys*`
- *     (`tools/classtable.py 0x80087BDC`, DreamSys's real vtable,
- *     include/DreamSys.h): the six offsets this unit dispatches
- *     (0xF0/0xF4/0xFC/0x13C/0x17C/0x1A0) land EXACTLY on
- *     DreamSys__GetSetFlashbackSession/SetMoveOverride/BlockMovement/
- *     SelectCallback98/StopDrift/GetCurrentDayAndYear, both offset and
- *     argument count. Since track 4 (round 88) it is typed with the
- *     unified header, include/DreamSys.h.
- *
- * What the class itself IS remains TIER B, not asserted further:
- * `ObjM__AdvancePauseSetup`/`ObjM__TeardownPauseOverlay` build and tear down
- * an object literally constructed with the name "Pause"
- * (`D_8008AB44`, "Pause", asm/data/7B008.sdata.s), gated by a 5-step
- * counter and a `mode` field (`ObjM::mode`, ex-`unk20`) that other
- * functions here set to fixed small codes (0,4,5,6,7,8,0xA,0xB,0xC,0xD) and
- * forward to `ObjMMethods::notifyParents` -- consistent with a pause/dialog
- * overlay controller driving a small state machine and notifying its
- * parent object of transitions, but nothing here pins down the exact
- * gameplay meaning of any one mode code. `ObjM__NoOpSlotBC` (vtable slot
- * +0x0BC) is an empty `{}` body with no further evidence and is left
- * unnamed.
+ * ObjM's methods from +0x0A0 to the end of its table (gObjMMethods,
+ * include/ObjM.h; track 4, round 89 unified the class_3bb8c_k/_l/_m views
+ * there), and its getter: EnterState7/8/A and NotifyParentsCodeB (the
+ * DreamSys codes 0xE..0x11, which set IntermediateBase::state and start a
+ * fade), StartFadeUp (the viewport's Class6E99C fade box), the fade box's
+ * and the Class866E8's notification handlers (OnFadeNotify: 5 fade down
+ * done, 6 fade up done; OnClass866E8Notify: 7 runs CheckAuxTrigger), and
+ * the "Pause" overlay: AdvancePauseSetup builds the TextRow and, four
+ * calls later, pauses the FrameClock, the WBgm and the VabStreamObj and
+ * hides the viewport; TeardownPauseOverlay undoes it; the close-ready flag
+ * and CloseAndNotifyC/D report 0xC/0xD to the parent (Class865C8's
+ * onObjMNotify). NoOpSlotBC is empty. What the state codes mean in the
+ * game is not established.
  *
  * A separate, unrelated cluster of free functions (RegisterStyleConfig /
  * ApplyStyleConfig / FillStyleFromConfig / ApplyStyleDecorationIfSet) reads
@@ -280,14 +256,12 @@ void *ApplyStyleConfig(void) {
     return &D_80087424;
 }
 
-/* FillStyleFromConfig's destination is NOT an `ObjM`. That struct's +0x014 and +0x018
- * are already established as unrelated object pointers by five other functions
- * in this unit (`FieldM14 *`/`FieldM18 *`), whereas this function writes a
- * colour-table POINTER to +0x018 and a plain sign-extended byte to +0x014. So
- * this is a separate descriptor, and its view stays LOCAL rather than going
- * into include/class_3bb8c.h -- which eleven units share, and where adding
- * `unkC`/`unk1C` to `ObjM` on this evidence would be a claim the bytes do not
- * support.
+/* FillStyleFromConfig's destination (D_80087424, via ApplyStyleConfig) is
+ * not an ObjM: it is the record ObjM keeps as `styleConfig`, which
+ * include/class_3bb8c.h views as Unk50Struct_3bb8c_l (its +0x00C/+0x018
+ * colours and +0x01C fog value agree with the fields below). The two views
+ * stay separate here: the record is not a class, and merging them is a
+ * global's type (track 4b).
  *
  * D_800872C4 is a table of 24 three-byte entries (0x48 bytes; the first four
  * are 00/00/00, 40/40/40, 80/80/80, FF/FF/FF -- a greyscale ramp, so RGB

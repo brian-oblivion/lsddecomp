@@ -3,24 +3,17 @@
  * (0x435E0..0x44518, vram 0x80052DE0..0x80053D18), 20 functions, ALL
  * MATCHED. Carved round 15; fully matched by round 45.
  *
- * This slice is entirely `ObjM`'s own methods -- confirmed, not guessed:
- * `tools/classtable.py 0x80087034` resolves the class's vtable directly to
- * `ObjM__ObjM` (ctor) and `ObjM__Finalize` (dtor), the SAME class sibling unit
- * class_3bb8c_m independently reached and named. The two units are NOT
- * unified (round-13 struct-edit hazard; see the HEAD NOTE above
- * `Obj87034_3bb8c_l`'s definition in include/class_3bb8c.h) -- this unit
- * keeps its own local struct view, `Obj87034_3bb8c_l`, but round 78 named
- * every function here with the confirmed `ObjM__` prefix to match.
- *
- * Mechanically this is the class's target/child attach-detach pair
- * (`ObjM__AttachTarget`/`ObjM__DetachTarget`), its style/scene/world setup
- * and teardown routines, an event dispatcher, and three of the class's
- * `EnterStateN` handlers (`ObjM__EnterState4/5/6`) -- continuing, on the
- * same `phase` field, the numbering class_3bb8c_m already established for
- * `ObjM__EnterState7/8/A`. `ObjM__OnDreamSysNotify` is the state-transition
- * dispatcher that routes codes 0xA..0x11 onto those `EnterStateN` slots
- * one-to-one (owns `jtbl_8001174C`). Two slots (`ObjM__NoOpSlot40`,
- * `ObjM__NoOpSlot7C`) are splat-generated `jr $ra; nop` stubs, not work.
+ * This slice is entirely ObjM's own methods (gObjMMethods, include/ObjM.h;
+ * track 4, round 89 unified the class_3bb8c_k/_l/_m views there), slots
+ * +0x040..+0x09C in table order: the init/deinit pair (AttachTarget keeps
+ * the DreamSys and hooks the Class866E8's callback, DetachTarget), onInit
+ * and onDeinit (InitStyleAndWorld, TeardownStyle), onTag1Notify with the
+ * TimBlockSrc poll it runs (PollTimBlockLoad), onPadEvent
+ * (DispatchPadEvent), update, slot74 (TogglePause), the style scene
+ * slots +0x080..+0x08C, the DreamSys notification dispatcher
+ * (OnDreamSysNotify, owning `jtbl_8001174C`) and EnterState4/5/6, which
+ * set IntermediateBase::state and start a fade (ObjM__StartFadeUp,
+ * class_3bb8c_m). NoOpSlot40 and NoOpSlot7C are empty.
  *
  * include/class_3bb8c.h is SHARED with every other class_3bb8c_* slice.
  * Header edits must be strictly ADDITIVE.
