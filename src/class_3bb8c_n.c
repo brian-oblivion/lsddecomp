@@ -649,7 +649,7 @@ StyleCueSlot *TryStartStyleCue(StyleCueSlot *arg0, s32 *arg1, void *arg2, void *
 
 extern s32 gStyleKind;
 extern s32 gStyleCueRecordIndex;
-extern u8 *D_800876B4[];
+extern u8 *gStyleCueRecordLists[];
 extern u8 D_800876EC[];
 extern u8 gStyleCueOffsets[];
 extern s32 gStyleCueDistanceTable[];
@@ -721,7 +721,7 @@ void *FindNearestStyleCueEntry(void *arg0, s32 *arg1, void *arg2) {
     if (arg2 == 0) {
         goto fail;
     }
-    base = D_800876B4[gStyleKind];
+    base = gStyleCueRecordLists[gStyleKind];
     n = D_800876EC[gStyleKind] - gStyleCueRecordIndex;
     entry = (EntrySlot *)(gStyleCueRecordIndex * 8 + (s32)base);
     for (j = 0; j < n; j++, entry++) {
