@@ -58,3 +58,11 @@ void TmdModel__GetHull(TmdModel *self, Hull_fa50 *out) {
 caller-supplied `Hull_fa50`, setting `out->type = 1` (the count). "Hull"
 names the mechanics (an 8-corner box for a hit test) without claiming a
 specific in-game role.
+
+## Track 7, re-send (2026-09-26, round 94, bravo)
+
+`TypedBox_fa50::type` -> `count`: the local's leading word is set to 1
+exactly as `out->count` is, and never read, so the local is a counted box
+list of one, not a typed box. `out->count = 1` carries a `MATCHING:` line
+(build 1 above: `out->count = b.count` reloads the word and costs 3 words).
+Byte-identical.

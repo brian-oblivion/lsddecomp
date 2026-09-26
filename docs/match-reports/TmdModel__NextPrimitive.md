@@ -233,3 +233,45 @@ pointer-arithmetic spelling tested (`&base[i]`, `base + i`, `i + base`,
 `(u8 *)base + i * 8`) score 287/288, one register swapped from retail; only
 `(u8 *)verts + (idx[i] << 3)` reaches 288/288. No source change, comment
 only.
+
+## Track 7, re-send (2026-09-26, round 94, bravo)
+
+Constants, all from Sony's `<libgs.h>` (the unit now includes `<libgpu.h>`
+and `<libgs.h>` after `<libgte.h>`, which also supplies the
+`GsMapModelingData` prototype the unit used to declare itself). Byte-identical,
+first build.
+
+- **Case labels.** The `switch` is on the packet's mode byte, which is the GPU
+  command code of the face it draws. Each case pair is one of libgs.h's
+  `GPU_COM_*` codes and the same code with bit 0x02 set: `0x20/0x22` is
+  `GPU_COM_F3`, `0x21` `GPU_COM_NF3`, `0x24` `GPU_COM_TF3`, `0x25`
+  `GPU_COM_NTF3`, `0x28` `GPU_COM_F4`, `0x29` `GPU_COM_NF4`, `0x2C`
+  `GPU_COM_TF4`, `0x2D` `GPU_COM_NTF4`, and the same eight with 0x10 set for
+  gouraud (`GPU_COM_G3` .. `GPU_COM_NTG4`). Bit 0x02 has no Sony constant; it
+  is the bit libgpu's `setSemiTrans` macro sets in a primitive's code byte, so
+  the unit spells it `TMD_MODE_ABE` (Sony's TMD documentation calls the bit
+  ABE), a `#define` with that evidence on its definition.
+- **`flag & 4`** is `GsTMDFlagGRD` (libgs.h), the TMD flag for a face with a
+  colour per vertex: the branch it selects is the `TMD_P_*G` layout.
+- **Packet sizes** are `sizeof` Sony's packet struct for that code, checked
+  one by one against the old literals: F3 16 / F3G 24, NF3 16, TF3 24, TNF3 28,
+  F4 20, NF4 16, TF4 32, TNF4 32, G3 20 / G3G 28, NG3 24, TG3 28, TNG3 36,
+  G4 24, NG4 28, TG4 36, TNG4 44. (Sony's struct for code `NTF3` is spelled
+  `TMD_P_TNF3`, and likewise `TNF4`, `TNG3`, `TNG4`.)
+- **Vertex indices** are read as those structs' own `v0`..`v3` fields through
+  a unit-local `PRIM(type)` cast macro, instead of `p->h[k]`: every `k` was
+  checked to be the struct's `vN` offset (`(offset - 4) / 2`, `h` starting
+  after the 4-byte header).
+- **Two sizes stay literals, in decimal:** the gradated quads (`GPU_COM_F4`
+  and `GPU_COM_G4` with `GsTMDFlagGRD`) have no Sony struct. Their layouts are
+  `TMD_P_F4` / `TMD_P_G4` plus three colour words (rgb1..rgb3, as `TMD_P_F3G`
+  adds two to `TMD_P_F3`): 20 + 12 = 32 and 24 + 12 = 36, with v0..v3 at
+  `h[9..12]` and `h[9], h[11], h[13], h[15]`. These keep `p->h[]` and a
+  one-line comment each; inventing a `TMD_P_F4G` would look like a Sony name.
+
+`TmdPrim` itself (`olen`, `ilen`, `flag`, `mode`, `h[20]`) is Sony's packet
+header `out, in, dummy, cd`; replacing it is a type job (track 6), proposed to
+the head.
+
+Later in the same pass: a `MATCHING:` line on the shared `tri:` tail (the
+second proposed learning above). Comment only.

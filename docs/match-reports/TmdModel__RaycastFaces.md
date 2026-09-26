@@ -230,3 +230,35 @@ not touched by this pass.
   for shift counts and the tolerance) and each would only restate itself if
   named; left as-is per the naming rules' "a literal stays when a name would
   only restate it."
+
+## Track 7, re-send (2026-09-26, round 94, bravo)
+
+Byte-identical, first build.
+
+- **Locals.** The VECTOR locals were named for their retail frame slots
+  (`v60`, `v80` .. `vE0`, `uF0`). Renamed by first role, with the reuses
+  listed in the function comment: `v90` -> `edge1` (then the hit point),
+  `vA0` -> `edge2` (then the hit's offset from the origin), `v80` -> `cross`
+  (OuterProduct0's result, then the quotient's `{denominator, 1}`), `vB0` ->
+  `quot`, `vC0` -> `work`, `vD0` -> `dirVec`, `vE0` -> `dirSq` (Square0 of
+  `dirVec`), `uF0` -> `scratch` (Square0 of the offset, then the face's box),
+  `v60` -> `unused`. The frame-slot correspondence, for reading the build log
+  above: `unused` 0x60, `cross` 0x80, `edge1` 0x90, `edge2` 0xA0, `quot` 0xB0,
+  `work` 0xC0, `dirVec` 0xD0, `dirSq` 0xE0, `scratch` 0xF0. The `unused`
+  rename moves cc1's "unused variable" warning, so the typeviews baseline was
+  rewritten in the same commit (1 gone, 1 new, same line).
+- **The comment on the function** no longer says "retail's slot"; `unused`
+  and `dist[2]` each carry a one-line `MATCHING:` comment instead (build 6/7
+  above is the evidence for `dist[2]`; the frame measurement for `unused`).
+- **Constants.** `*best = 0x7FFFFFFF` -> `DIST_NONE` (the largest s32, hex:
+  a bit pattern, not a count). The per-face result in `work.vy` is
+  `enum RayResult { RAY_MISS = 0, RAY_HIT = 1, RAY_PARALLEL = 2 }`: 2 is set
+  only when `|dir . normal| <= 0`, 0 when `t < 0` or when the hit's distance
+  exceeds `|dir|` (past `end`), 1 on the one success path; only `!= RAY_HIT`
+  is tested. The six `24`s are `FACE_BOX_MARGIN` (decimal; each is the box
+  grown on one side of one axis). `0x80000000` (the quotient's sign bit,
+  a mask) and the 16.16 shift counts `16` stay literals.
+
+Later in the same pass: `MATCHING:` lines on `ABS_fa50` (build 3), the
+loop-body declarations (build 2) and the six box-field pointers (the frame
+measurement above). Comments only.

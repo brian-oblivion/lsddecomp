@@ -63,3 +63,8 @@ A leaf that computes `addiu tN, box, K` for several struct fields at entry and t
 model's vertex list (`self->object->verts`, count `self->object->nverts`); a
 pure computation whose mechanics are its purpose. Called by
 `TmdModel__UpdateBoundsBuffer` and `TmdModel__GetHull`.
+
+## Track 7, re-send (2026-09-26, round 94, bravo)
+
+A `MATCHING:` line on the five hoisted field pointers (builds 3 and 7 above:
+without them the function changes size). Comment only.

@@ -3,13 +3,14 @@
  * gTmdModelMethods, class tag 9): one object of a TMD file (the "model"
  * SceneNode__LinkModel, src/code_d294_c.c, links into a GsDOBJ2). Its
  * methods map the TMD to the GS (TmdModel__MapModelingData), walk its
- * primitives (TmdModel__NextPrimitive, owns jtbl_80010354), compute an
- * axis-aligned bounding box or its eight corners (TmdModel__ComputeBounds,
- * TmdModel__GetHull, and the shared buffer of gTmdModelBoundsCount boxes,
- * TmdModel__UpdateBoundsBuffer / TmdModel__GetBoundsBuffer /
- * TmdModel__GetBoundsCount), and ray-cast a segment against every face
- * (TmdModel__RaycastFaces) for SceneNode's own collision helpers in
- * code_d294_b.c/code_d294_c.c.
+ * primitives one packet at a time (TmdModel__NextPrimitive, which reads
+ * each packet through Sony's own <libgs.h> layouts: GPU_COM_* mode codes,
+ * TMD_P_* structs, GsTMDFlagGRD), compute an axis-aligned bounding box or
+ * its eight corners (TmdModel__ComputeBounds, TmdModel__GetHull, and the
+ * shared buffer of gTmdModelBoundsCount boxes, TmdModel__UpdateBoundsBuffer /
+ * TmdModel__GetBoundsBuffer / TmdModel__GetBoundsCount), and ray-cast a
+ * segment against every face (TmdModel__RaycastFaces) for SceneNode's own
+ * collision helpers in code_d294_b.c/code_d294_c.c.
  *
  * RotateAndOffsetHullList takes a hull list, not a TmdModel, and is a free
  * function; the tail of the file (AccumulateTargetOffset, SetTargetOffset)
@@ -18,27 +19,31 @@
  * caller is class_3bb8c_o.c.
  *
  * Tiers and match evidence for every function are in each function's own
- * docs/match-reports/ file.
+ * docs/match-reports/ file; the unit's own history is in New_TmdModel's.
  */
 #include "common.h"
 #include <libgte.h>
+#include <libgpu.h>
+#include <libgs.h>
 #include "TmdModel.h"
 
-/* A box with a leading word: TmdModel__GetHull's local. */
+/* A counted box list of one: TmdModel__GetHull's local (its count is set
+ * to 1, as the hull's is, and never read). */
 typedef struct TypedBox_fa50 {
-    s32 type;   /* +0x000 */
+    s32 count;  /* +0x000 */
     TmdBox box; /* +0x004 */
 } TypedBox_fa50;
 
-/* The eight corners of a box: v[0..3] one face, v[4..7] the other. */
+/* The eight corners of a box as two faces of four (TmdHull's v[0..3] and
+ * v[4..7]: the min-z face, then the max-z face). */
 typedef struct Corners_fa50 {
-    TmdVec3 f[2][4];
+    TmdVec3 face[2][4];
 } Corners_fa50;
 
 /* A counted list of boxes' corners (TmdHull is the one-box case). */
 typedef struct HullList_fa50 {
-    s32 n;             /* +0x000 */
-    Corners_fa50 c[1]; /* +0x004 */
+    s32 count;             /* +0x000 */
+    Corners_fa50 boxes[1]; /* +0x004 */
 } HullList_fa50;
 
 /* A segment: start and direction (end - start). */
@@ -47,7 +52,25 @@ typedef struct Ray_fa50 {
     TmdVec3 dir; /* +0x006 */
 } Ray_fa50;
 
+/* A TMD packet's mode byte is its GPU command code (<libgs.h>'s GPU_COM_*),
+ * plus this bit for a semi-transparent face (libgpu's setSemiTrans bit). */
+#define TMD_MODE_ABE 0x02
+
+/* MATCHING: ~x + 1, not -x: retail negates with nor/addiu, and -x also
+ * changes what CSE keeps live across the branches. */
 #define ABS_fa50(x) ((x) < 0 ? ~(x) + 1 : (x))
+
+/* TmdModel__RaycastFaces: *best before any face is hit (the largest s32). */
+#define DIST_NONE 0x7FFFFFFF
+
+/* One face's result in TmdModel__RaycastFaces: the segment's line meets the
+ * plane but not between origin and end (t < 0, or farther than end), meets
+ * it there, or is parallel to it (dir . normal is 0). */
+enum RayResult { RAY_MISS = 0, RAY_HIT = 1, RAY_PARALLEL = 2 };
+
+/* How far outside a face's bounding box (each axis, both sides) a plane hit
+ * still counts as on the face. */
+#define FACE_BOX_MARGIN 24
 
 /* The scratch VECTOR that also holds the candidate triangle's box. */
 typedef union VecBox_fa50 {
@@ -70,7 +93,6 @@ typedef struct Outer_fa50 {
     Inner_fa50 *inner; /* +0x010 */
 } Outer_fa50;
 
-extern void GsMapModelingData(unsigned long *p);
 extern TmdBox gTmdModelBoundsBuf[];
 extern void *BMemPMgrAlloc(s32 size);
 
@@ -122,6 +144,8 @@ void TmdModel__ComputeBounds(TmdModel *self, TmdBox *box) {
     s32 i;
     s32 n;
     TmdVertex *v;
+    /* MATCHING: the five field pointers are hoisted in retail; without them
+     * the function changes size. */
     s16 *miny = &box->min.y;
     s16 *minz = &box->min.z;
     s16 *maxx = &box->max.x;
@@ -163,7 +187,7 @@ void TmdModel__GetHull(TmdModel *self, TmdHull *out) {
     TypedBox_fa50 b;
 
     TmdModel__ComputeBounds(self, &b.box);
-    b.type = 1;
+    b.count = 1;
     out->v[0].x = b.box.min.x;
     out->v[0].y = b.box.min.y;
     out->v[0].z = b.box.min.z;
@@ -188,47 +212,49 @@ void TmdModel__GetHull(TmdModel *self, TmdHull *out) {
     out->v[7].x = b.box.max.x;
     out->v[7].y = b.box.min.y;
     out->v[7].z = b.box.max.z;
-    out->count = 1;
+    out->count = 1; /* MATCHING: the literal, not b.count, which is reloaded */
 }
 
-void RotateAndOffsetHullList(HullList_fa50 *h, s32 turn, s32 back, s32 d) {
+void RotateAndOffsetHullList(HullList_fa50 *h, s32 turn, s32 back, s32 delta) {
     Corners_fa50 tmp;
     Corners_fa50 *c;
     s32 i;
 
-    for (i = 0; i < h->n; i++) {
-        c = &h->c[i];
+    for (i = 0; i < h->count; i++) {
+        c = &h->boxes[i];
         if (turn != 0) {
             tmp = *c;
-            c->f[0][3] = tmp.f[0][0];
-            c->f[0][2] = tmp.f[0][1];
-            c->f[1][2] = tmp.f[0][2];
-            c->f[1][3] = tmp.f[0][3];
-            c->f[0][0] = tmp.f[1][0];
-            c->f[0][1] = tmp.f[1][1];
-            c->f[1][1] = tmp.f[1][2];
-            c->f[1][0] = tmp.f[1][3];
+            c->face[0][3] = tmp.face[0][0];
+            c->face[0][2] = tmp.face[0][1];
+            c->face[1][2] = tmp.face[0][2];
+            c->face[1][3] = tmp.face[0][3];
+            c->face[0][0] = tmp.face[1][0];
+            c->face[0][1] = tmp.face[1][1];
+            c->face[1][1] = tmp.face[1][2];
+            c->face[1][0] = tmp.face[1][3];
+            /* MATCHING: a k per branch; a single k at the top swaps the
+             * counter and pointer registers in all four loops. */
             if (back == 0) {
                 s32 k;
                 for (k = 0; k < 4; k++) {
-                    c->f[0][k].x += d;
+                    c->face[0][k].x += delta;
                 }
             } else {
                 s32 k;
                 for (k = 0; k < 4; k++) {
-                    c->f[1][k].x += d;
+                    c->face[1][k].x += delta;
                 }
             }
         } else {
             if (back == 0) {
                 s32 k;
                 for (k = 0; k < 4; k++) {
-                    c->f[0][k].z += d;
+                    c->face[0][k].z += delta;
                 }
             } else {
                 s32 k;
                 for (k = 0; k < 4; k++) {
-                    c->f[1][k].z += d;
+                    c->face[1][k].z += delta;
                 }
             }
         }
@@ -237,10 +263,17 @@ void RotateAndOffsetHullList(HullList_fa50 *h, s32 turn, s32 back, s32 d) {
 
 /* Casts the segment origin..end against every triangle/quad of the model and
  * keeps the nearest hit: *best = its distance, *hitOut = the point, *height =
- * the point's y above the face's box. Returns whether anything was hit. The
- * VECTOR locals are scratch named by their frame slot; v60 is never used but
- * holds retail's slot, and dist is an 8-byte array because retail keeps it in
- * memory at the slot after uF0. */
+ * the point's y above the face's box. Returns whether anything was hit.
+ *
+ * Per face: the plane through its first three vertices (normal = edge1 x
+ * edge2 / ONE, d in plane.pad), the segment's parameter t on it as a 16.16
+ * quotient, the hit point origin + dir * t, kept if it is no farther than
+ * end and inside the face's box grown by FACE_BOX_MARGIN. The VECTOR locals
+ * are reused: edge1 becomes the hit point, edge2 its offset from the origin,
+ * cross the quotient's {denominator, 1}; quot is its {numerator, 1}, then
+ * the cross-multiplied numerator (vz) and denominator (pad); work holds the
+ * denominator then |dir| in vx, the face's RAY_* result in vy, and the
+ * origin's plane distance then |offset| in vz. */
 s32 TmdModel__RaycastFaces(TmdModel *self, s32 *best, TmdVec3 *hitOut, s32 *height, TmdVec3 *origin,
                            TmdVec3 *end) {
     TmdVec3 tri[4];
@@ -253,7 +286,7 @@ s32 TmdModel__RaycastFaces(TmdModel *self, s32 *best, TmdVec3 *hitOut, s32 *heig
     s32 found;
 
     count = 0;
-    *best = 0x7FFFFFFF;
+    *best = DIST_NONE;
     ray.org.x = origin->x;
     ray.org.y = origin->y;
     ray.org.z = origin->z;
@@ -262,23 +295,25 @@ s32 TmdModel__RaycastFaces(TmdModel *self, s32 *best, TmdVec3 *hitOut, s32 *heig
     ray.dir.z = end->z - origin->z;
     found = 0;
     while ((p = TmdModel__NextPrimitive(self, p, &nverts, tri, &count)) != NULL) {
-        VECTOR v60;
+        /* MATCHING: these are declared in the loop body, which puts their
+         * frame slots after nverts and count. */
+        VECTOR unused; /* MATCHING: never read; keeps the frame's layout */
         TmdVertex e1;
         TmdVertex e2;
-        VECTOR v80;
-        VECTOR v90;
-        VECTOR vA0;
-        VECTOR vB0;
-        VECTOR vC0;
-        VECTOR vD0;
-        VECTOR vE0;
-        VecBox_fa50 uF0;
-        s32 dist[2];
+        VECTOR cross;
+        VECTOR edge1;
+        VECTOR edge2;
+        VECTOR quot;
+        VECTOR work;
+        VECTOR dirVec;
+        VECTOR dirSq;
+        VecBox_fa50 scratch;
+        s32 dist[2]; /* MATCHING: an array, so it stays in memory (dist[1] unused) */
         s32 frac;
         s32 q;
         s32 hi;
         s32 t;
-        s16 *minx;
+        s16 *minx; /* MATCHING: the six box-field pointers set the frame size */
         s16 *miny;
         s16 *minz;
         s16 *maxx;
@@ -293,88 +328,88 @@ s32 TmdModel__RaycastFaces(TmdModel *self, s32 *best, TmdVec3 *hitOut, s32 *heig
         e2.x = tri[2].x - tri[0].x;
         e2.y = tri[2].y - tri[0].y;
         e2.z = tri[2].z - tri[0].z;
-        v90.vx = e1.x;
-        v90.vy = e1.y;
-        v90.vz = e1.z;
-        vA0.vx = e2.x;
-        vA0.vy = e2.y;
-        vA0.vz = e2.z;
-        OuterProduct0(&v90, &vA0, &v80);
-        plane.vx = v80.vx;
-        plane.vy = v80.vy;
-        plane.vz = v80.vz;
+        edge1.vx = e1.x;
+        edge1.vy = e1.y;
+        edge1.vz = e1.z;
+        edge2.vx = e2.x;
+        edge2.vy = e2.y;
+        edge2.vz = e2.z;
+        OuterProduct0(&edge1, &edge2, &cross);
+        plane.vx = cross.vx;
+        plane.vy = cross.vy;
+        plane.vz = cross.vz;
         plane.vx /= ONE;
         plane.vy /= ONE;
         plane.vz /= ONE;
         plane.pad = -(tri[0].x * plane.vx + tri[0].y * plane.vy + tri[0].z * plane.vz);
-        vC0.vx = ray.dir.x * plane.vx + ray.dir.y * plane.vy + ray.dir.z * plane.vz;
-        if (ABS_fa50(vC0.vx) <= 0) {
-            vC0.vy = 2;
+        work.vx = ray.dir.x * plane.vx + ray.dir.y * plane.vy + ray.dir.z * plane.vz;
+        if (ABS_fa50(work.vx) <= 0) {
+            work.vy = RAY_PARALLEL;
         } else {
-            vC0.vz = ray.org.x * plane.vx + ray.org.y * plane.vy + ray.org.z * plane.vz;
-            vC0.vz += plane.pad;
-            v80.vx = vC0.vx;
-            v80.vy = 1;
-            vB0.vx = -vC0.vz;
-            vB0.vy = 1;
-            vB0.vz = vB0.vx * v80.vy;
-            vB0.pad = vB0.vy * v80.vx;
-            if (ABS_fa50(vB0.pad) >= ONE) {
-                vB0.vz /= ONE;
-                vB0.pad /= ONE;
+            work.vz = ray.org.x * plane.vx + ray.org.y * plane.vy + ray.org.z * plane.vz;
+            work.vz += plane.pad;
+            cross.vx = work.vx;
+            cross.vy = 1;
+            quot.vx = -work.vz;
+            quot.vy = 1;
+            quot.vz = quot.vx * cross.vy;
+            quot.pad = quot.vy * cross.vx;
+            if (ABS_fa50(quot.pad) >= ONE) {
+                quot.vz /= ONE;
+                quot.pad /= ONE;
             }
-            frac = ABS_fa50(vB0.vz % vB0.pad) << 16;
-            q = vB0.vz / vB0.pad;
+            frac = ABS_fa50(quot.vz % quot.pad) << 16;
+            q = quot.vz / quot.pad;
             if (q != 0) {
                 hi = q << 16;
             } else {
-                hi = (vB0.vz * vB0.pad) & 0x80000000;
+                hi = (quot.vz * quot.pad) & 0x80000000;
             }
-            t = hi | (frac / ABS_fa50(vB0.pad));
+            t = hi | (frac / ABS_fa50(quot.pad));
             if (t < 0) {
-                vC0.vy = 0;
+                work.vy = RAY_MISS;
             } else {
-                vD0.vx = ray.dir.x;
-                vD0.vy = ray.dir.y;
-                vD0.vz = ray.dir.z;
-                vA0.vx = (ray.dir.x * t) >> 16;
-                v90.vx = ray.org.x + vA0.vx;
-                vA0.vx = v90.vx - ray.org.x;
-                vA0.vy = (ray.dir.y * t) >> 16;
-                v90.vy = ray.org.y + vA0.vy;
-                vA0.vy = v90.vy - ray.org.y;
-                vA0.vz = (ray.dir.z * t) >> 16;
-                v90.vz = ray.org.z + vA0.vz;
-                vA0.vz = v90.vz - ray.org.z;
-                Square0(&vD0, &vE0);
-                vC0.vx = vE0.vx + vE0.vy + vE0.vz;
-                vC0.vx = SquareRoot0(vC0.vx);
-                Square0(&vA0, &uF0.v);
-                vC0.vz = uF0.v.vx + uF0.v.vy + uF0.v.vz;
-                vC0.vz = SquareRoot0(vC0.vz);
-                if (vC0.vx >= vC0.vz) {
-                    dist[0] = vC0.vz;
-                    vC0.vy = 1;
-                    hit.x = v90.vx;
-                    hit.y = v90.vy;
-                    hit.z = v90.vz;
+                dirVec.vx = ray.dir.x;
+                dirVec.vy = ray.dir.y;
+                dirVec.vz = ray.dir.z;
+                edge2.vx = (ray.dir.x * t) >> 16;
+                edge1.vx = ray.org.x + edge2.vx;
+                edge2.vx = edge1.vx - ray.org.x;
+                edge2.vy = (ray.dir.y * t) >> 16;
+                edge1.vy = ray.org.y + edge2.vy;
+                edge2.vy = edge1.vy - ray.org.y;
+                edge2.vz = (ray.dir.z * t) >> 16;
+                edge1.vz = ray.org.z + edge2.vz;
+                edge2.vz = edge1.vz - ray.org.z;
+                Square0(&dirVec, &dirSq);
+                work.vx = dirSq.vx + dirSq.vy + dirSq.vz;
+                work.vx = SquareRoot0(work.vx);
+                Square0(&edge2, &scratch.v);
+                work.vz = scratch.v.vx + scratch.v.vy + scratch.v.vz;
+                work.vz = SquareRoot0(work.vz);
+                if (work.vx >= work.vz) {
+                    dist[0] = work.vz;
+                    work.vy = RAY_HIT;
+                    hit.x = edge1.vx;
+                    hit.y = edge1.vy;
+                    hit.z = edge1.vz;
                 } else {
-                    vC0.vy = 0;
+                    work.vy = RAY_MISS;
                 }
             }
         }
-        if (vC0.vy != 1) {
+        if (work.vy != RAY_HIT) {
             continue;
         }
-        minx = &uF0.b.min.x;
-        miny = &uF0.b.min.y;
-        minz = &uF0.b.min.z;
-        maxx = &uF0.b.max.x;
-        maxy = &uF0.b.max.y;
-        maxz = &uF0.b.max.z;
+        minx = &scratch.b.min.x;
+        miny = &scratch.b.min.y;
+        minz = &scratch.b.min.z;
+        maxx = &scratch.b.max.x;
+        maxy = &scratch.b.max.y;
+        maxz = &scratch.b.max.z;
         v = tri;
-        uF0.b.min = *v;
-        uF0.b.max = uF0.b.min;
+        scratch.b.min = *v;
+        scratch.b.max = scratch.b.min;
         for (i = 0; i < nverts - 1; i++) {
             v++;
             if (v->x < *minx)
@@ -390,8 +425,9 @@ s32 TmdModel__RaycastFaces(TmdModel *self, s32 *best, TmdVec3 *hitOut, s32 *heig
             if (*maxz < v->z)
                 *maxz = v->z;
         }
-        if (hit.x < uF0.b.min.x - 24 || hit.y < uF0.b.min.y - 24 || hit.z < uF0.b.min.z - 24 ||
-            uF0.b.max.x + 24 < hit.x || uF0.b.max.y + 24 < hit.y || uF0.b.max.z + 24 < hit.z) {
+        if (hit.x < scratch.b.min.x - FACE_BOX_MARGIN || hit.y < scratch.b.min.y - FACE_BOX_MARGIN ||
+            hit.z < scratch.b.min.z - FACE_BOX_MARGIN || scratch.b.max.x + FACE_BOX_MARGIN < hit.x ||
+            scratch.b.max.y + FACE_BOX_MARGIN < hit.y || scratch.b.max.z + FACE_BOX_MARGIN < hit.z) {
             continue;
         }
         found = 1;
@@ -399,13 +435,21 @@ s32 TmdModel__RaycastFaces(TmdModel *self, s32 *best, TmdVec3 *hitOut, s32 *heig
             *best = dist[0];
             *hitOut = hit;
             if (height != NULL) {
-                *height = hit.y - uF0.b.min.y;
+                *height = hit.y - scratch.b.min.y;
             }
         }
     }
     return found;
 }
 
+/* A primitive's vertex-index fields, read through Sony's layout for its
+ * packet type (<libgs.h>'s TMD_P_*). */
+#define PRIM(type) ((type *)p)
+
+/* Walks the object's primitive list one packet per call: *count is the
+ * cursor (0 starts at the first packet), *n gets the face's vertex count
+ * (3 or 4, 0 for a packet type it does not know) and out[] its vertices.
+ * Returns the packet after this one, NULL past the end. */
 TmdPrim *TmdModel__NextPrimitive(TmdModel *self, TmdPrim *p, s32 *n, TmdVec3 *out, u32 *count) {
     s32 idx[4];
     TmdObject *rec = self->object;
@@ -421,161 +465,167 @@ TmdPrim *TmdModel__NextPrimitive(TmdModel *self, TmdPrim *p, s32 *n, TmdVec3 *ou
     }
     *n = 4;
     switch (p->mode) {
-        case 0x20:
-        case 0x22:
-            if (p->flag & 4) {
-                idx[0] = p->h[7];
-                idx[1] = p->h[8];
-                idx[2] = p->h[9];
-                size = 0x18;
+        case GPU_COM_F3:
+        case GPU_COM_F3 | TMD_MODE_ABE:
+            if (p->flag & GsTMDFlagGRD) {
+                idx[0] = PRIM(TMD_P_F3G)->v0;
+                idx[1] = PRIM(TMD_P_F3G)->v1;
+                idx[2] = PRIM(TMD_P_F3G)->v2;
+                size = sizeof(TMD_P_F3G);
                 goto tri;
             } else {
-                idx[0] = p->h[3];
-                idx[1] = p->h[4];
-                idx[2] = p->h[5];
-                size = 0x10;
+                idx[0] = PRIM(TMD_P_F3)->v0;
+                idx[1] = PRIM(TMD_P_F3)->v1;
+                idx[2] = PRIM(TMD_P_F3)->v2;
+                size = sizeof(TMD_P_F3);
                 goto tri;
             }
             break;
-        case 0x21:
-        case 0x23:
-            idx[0] = p->h[2];
-            idx[1] = p->h[3];
-            idx[2] = p->h[4];
-            size = 0x10;
+        case GPU_COM_NF3:
+        case GPU_COM_NF3 | TMD_MODE_ABE:
+            idx[0] = PRIM(TMD_P_NF3)->v0;
+            idx[1] = PRIM(TMD_P_NF3)->v1;
+            idx[2] = PRIM(TMD_P_NF3)->v2;
+            size = sizeof(TMD_P_NF3);
             goto tri;
-        case 0x24:
-        case 0x26:
-            idx[0] = p->h[7];
-            idx[1] = p->h[8];
-            idx[2] = p->h[9];
-            size = 0x18;
+        case GPU_COM_TF3:
+        case GPU_COM_TF3 | TMD_MODE_ABE:
+            idx[0] = PRIM(TMD_P_TF3)->v0;
+            idx[1] = PRIM(TMD_P_TF3)->v1;
+            idx[2] = PRIM(TMD_P_TF3)->v2;
+            size = sizeof(TMD_P_TF3);
             goto tri;
-        case 0x25:
-        case 0x27:
-            idx[0] = p->h[8];
-            idx[1] = p->h[9];
-            idx[2] = p->h[10];
-            size = 0x1C;
+        case GPU_COM_NTF3:
+        case GPU_COM_NTF3 | TMD_MODE_ABE:
+            idx[0] = PRIM(TMD_P_TNF3)->v0;
+            idx[1] = PRIM(TMD_P_TNF3)->v1;
+            idx[2] = PRIM(TMD_P_TNF3)->v2;
+            size = sizeof(TMD_P_TNF3);
             goto tri;
-        case 0x28:
-        case 0x2A:
-            if (p->flag & 4) {
+        case GPU_COM_F4:
+        case GPU_COM_F4 | TMD_MODE_ABE:
+            if (p->flag & GsTMDFlagGRD) {
+                /* libgs.h has no struct for a gradated flat quad: TMD_P_F4
+                 * plus three colour words, so v0..v3 are h[9..12]. */
                 idx[0] = p->h[9];
                 idx[1] = p->h[10];
                 idx[2] = p->h[11];
                 idx[3] = p->h[12];
-                size = 0x20;
+                size = 32;
             } else {
-                idx[0] = p->h[3];
-                idx[1] = p->h[4];
-                idx[2] = p->h[5];
-                idx[3] = p->h[6];
-                size = 0x14;
+                idx[0] = PRIM(TMD_P_F4)->v0;
+                idx[1] = PRIM(TMD_P_F4)->v1;
+                idx[2] = PRIM(TMD_P_F4)->v2;
+                idx[3] = PRIM(TMD_P_F4)->v3;
+                size = sizeof(TMD_P_F4);
             }
             break;
-        case 0x29:
-        case 0x2B:
-            idx[0] = p->h[2];
-            idx[1] = p->h[3];
-            idx[2] = p->h[4];
-            idx[3] = p->h[5];
-            size = 0x10;
+        case GPU_COM_NF4:
+        case GPU_COM_NF4 | TMD_MODE_ABE:
+            idx[0] = PRIM(TMD_P_NF4)->v0;
+            idx[1] = PRIM(TMD_P_NF4)->v1;
+            idx[2] = PRIM(TMD_P_NF4)->v2;
+            idx[3] = PRIM(TMD_P_NF4)->v3;
+            size = sizeof(TMD_P_NF4);
             break;
-        case 0x2C:
-        case 0x2E:
-            idx[0] = p->h[9];
-            idx[1] = p->h[10];
-            idx[2] = p->h[11];
-            idx[3] = p->h[12];
-            size = 0x20;
+        case GPU_COM_TF4:
+        case GPU_COM_TF4 | TMD_MODE_ABE:
+            idx[0] = PRIM(TMD_P_TF4)->v0;
+            idx[1] = PRIM(TMD_P_TF4)->v1;
+            idx[2] = PRIM(TMD_P_TF4)->v2;
+            idx[3] = PRIM(TMD_P_TF4)->v3;
+            size = sizeof(TMD_P_TF4);
             break;
-        case 0x2D:
-        case 0x2F:
-            idx[0] = p->h[10];
-            idx[1] = p->h[11];
-            idx[2] = p->h[12];
-            idx[3] = p->h[13];
-            size = 0x20;
+        case GPU_COM_NTF4:
+        case GPU_COM_NTF4 | TMD_MODE_ABE:
+            idx[0] = PRIM(TMD_P_TNF4)->v0;
+            idx[1] = PRIM(TMD_P_TNF4)->v1;
+            idx[2] = PRIM(TMD_P_TNF4)->v2;
+            idx[3] = PRIM(TMD_P_TNF4)->v3;
+            size = sizeof(TMD_P_TNF4);
             break;
-        case 0x30:
-        case 0x32:
-            if (p->flag & 4) {
-                idx[0] = p->h[7];
-                idx[1] = p->h[9];
-                idx[2] = p->h[11];
-                size = 0x1C;
+        case GPU_COM_G3:
+        case GPU_COM_G3 | TMD_MODE_ABE:
+            if (p->flag & GsTMDFlagGRD) {
+                idx[0] = PRIM(TMD_P_G3G)->v0;
+                idx[1] = PRIM(TMD_P_G3G)->v1;
+                idx[2] = PRIM(TMD_P_G3G)->v2;
+                size = sizeof(TMD_P_G3G);
                 goto tri;
             } else {
-                idx[0] = p->h[3];
-                idx[1] = p->h[5];
-                idx[2] = p->h[7];
-                size = 0x14;
+                idx[0] = PRIM(TMD_P_G3)->v0;
+                idx[1] = PRIM(TMD_P_G3)->v1;
+                idx[2] = PRIM(TMD_P_G3)->v2;
+                size = sizeof(TMD_P_G3);
                 goto tri;
             }
             break;
-        case 0x31:
-        case 0x33:
-            idx[0] = p->h[6];
-            idx[1] = p->h[7];
-            idx[2] = p->h[8];
-            size = 0x18;
+        case GPU_COM_NG3:
+        case GPU_COM_NG3 | TMD_MODE_ABE:
+            idx[0] = PRIM(TMD_P_NG3)->v0;
+            idx[1] = PRIM(TMD_P_NG3)->v1;
+            idx[2] = PRIM(TMD_P_NG3)->v2;
+            size = sizeof(TMD_P_NG3);
             goto tri;
-        case 0x34:
-        case 0x36:
-            idx[0] = p->h[7];
-            idx[1] = p->h[9];
-            idx[2] = p->h[11];
-            size = 0x1C;
+        case GPU_COM_TG3:
+        case GPU_COM_TG3 | TMD_MODE_ABE:
+            idx[0] = PRIM(TMD_P_TG3)->v0;
+            idx[1] = PRIM(TMD_P_TG3)->v1;
+            idx[2] = PRIM(TMD_P_TG3)->v2;
+            size = sizeof(TMD_P_TG3);
             goto tri;
-        case 0x35:
-        case 0x37:
-            idx[0] = p->h[12];
-            idx[1] = p->h[13];
-            idx[2] = p->h[14];
-            size = 0x24;
+        case GPU_COM_NTG3:
+        case GPU_COM_NTG3 | TMD_MODE_ABE:
+            idx[0] = PRIM(TMD_P_TNG3)->v0;
+            idx[1] = PRIM(TMD_P_TNG3)->v1;
+            idx[2] = PRIM(TMD_P_TNG3)->v2;
+            size = sizeof(TMD_P_TNG3);
+        /* MATCHING: every triangle case jumps to this one tail; a copy per
+         * case changes the register allocation. */
         tri:
             *n = 3;
             break;
-        case 0x38:
-        case 0x3A:
-            if (p->flag & 4) {
+        case GPU_COM_G4:
+        case GPU_COM_G4 | TMD_MODE_ABE:
+            if (p->flag & GsTMDFlagGRD) {
+                /* libgs.h has no struct for a gradated gouraud quad: TMD_P_G4
+                 * plus three colour words, so v0..v3 are h[9], h[11], h[13], h[15]. */
                 idx[0] = p->h[9];
                 idx[1] = p->h[11];
                 idx[2] = p->h[13];
                 idx[3] = p->h[15];
-                size = 0x24;
+                size = 36;
             } else {
-                idx[0] = p->h[3];
-                idx[1] = p->h[5];
-                idx[2] = p->h[7];
-                idx[3] = p->h[9];
-                size = 0x18;
+                idx[0] = PRIM(TMD_P_G4)->v0;
+                idx[1] = PRIM(TMD_P_G4)->v1;
+                idx[2] = PRIM(TMD_P_G4)->v2;
+                idx[3] = PRIM(TMD_P_G4)->v3;
+                size = sizeof(TMD_P_G4);
             }
             break;
-        case 0x39:
-        case 0x3B:
-            idx[0] = p->h[8];
-            idx[1] = p->h[9];
-            idx[2] = p->h[10];
-            idx[3] = p->h[11];
-            size = 0x1C;
+        case GPU_COM_NG4:
+        case GPU_COM_NG4 | TMD_MODE_ABE:
+            idx[0] = PRIM(TMD_P_NG4)->v0;
+            idx[1] = PRIM(TMD_P_NG4)->v1;
+            idx[2] = PRIM(TMD_P_NG4)->v2;
+            idx[3] = PRIM(TMD_P_NG4)->v3;
+            size = sizeof(TMD_P_NG4);
             break;
-        case 0x3C:
-        case 0x3E:
-            idx[0] = p->h[9];
-            idx[1] = p->h[11];
-            idx[2] = p->h[13];
-            idx[3] = p->h[15];
-            size = 0x24;
+        case GPU_COM_TG4:
+        case GPU_COM_TG4 | TMD_MODE_ABE:
+            idx[0] = PRIM(TMD_P_TG4)->v0;
+            idx[1] = PRIM(TMD_P_TG4)->v1;
+            idx[2] = PRIM(TMD_P_TG4)->v2;
+            idx[3] = PRIM(TMD_P_TG4)->v3;
+            size = sizeof(TMD_P_TG4);
             break;
-        case 0x3D:
-        case 0x3F:
-            idx[0] = p->h[16];
-            idx[1] = p->h[17];
-            idx[2] = p->h[18];
-            idx[3] = p->h[19];
-            size = 0x2C;
+        case GPU_COM_NTG4:
+        case GPU_COM_NTG4 | TMD_MODE_ABE:
+            idx[0] = PRIM(TMD_P_TNG4)->v0;
+            idx[1] = PRIM(TMD_P_TNG4)->v1;
+            idx[2] = PRIM(TMD_P_TNG4)->v2;
+            idx[3] = PRIM(TMD_P_TNG4)->v3;
+            size = sizeof(TMD_P_TNG4);
             break;
         default:
             *n = 0;
@@ -584,8 +634,7 @@ TmdPrim *TmdModel__NextPrimitive(TmdModel *self, TmdPrim *p, s32 *n, TmdVec3 *ou
     verts = self->object->verts;
     for (i = 0; i < *n; i++) {
         /* MATCHING: verts[idx[i]] and every equivalent pointer-arithmetic
-         * form swap two registers and cost a word (docs/match-reports/
-         * TmdModel__NextPrimitive.md, build 7). */
+         * form swap two registers and cost a word (its match report). */
         out[i] = *(TmdVec3 *)((u8 *)verts + (idx[i] << 3));
     }
     (*count)++;
