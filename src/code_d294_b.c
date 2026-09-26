@@ -43,7 +43,7 @@
  * wrapper around GetSetBitField over &self->unk10, shift 0 width 3. Raw
  * pass-through value and raw pass-through result -- same shape as
  * SceneNode__SetSemiTrans/D3A0/D3F8 (no `== 0` on either side). */
-u32 SceneNode__GetSetUnk10Field0(SceneNode *self, u32 a1) {
+u32 SceneNode__SetLightDim(SceneNode *self, u32 a1) {
     return GetSetBitField(&self->attribute, 0, 3, a1);
 }
 
@@ -57,7 +57,7 @@ s32 SceneNode__GetSetUnk10Flag7(SceneNode *self, s32 a1) {
     return GetSetBitField(&self->attribute, 7, 1, a1 == 0) == 0;
 }
 
-/* Same family as SceneNode__GetSetUnk10Field0, shift 9 width 3. Raw pass-through. */
+/* Same family as SceneNode__SetLightDim, shift 9 width 3. Raw pass-through. */
 u32 SceneNode__GetSetUnk10Field9(SceneNode *self, u32 a1) {
     return GetSetBitField(&self->attribute, 9, 3, a1);
 }

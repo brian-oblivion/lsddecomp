@@ -8,7 +8,7 @@ Round 12, runner delta. `code_d294_b`.
 
 ## Summary
 
-Same family as `SceneNode__GetSetUnk10Field0` (see that report) -- raw pass-through wrapper
+Same family as `SceneNode__SetLightDim` (see that report) -- raw pass-through wrapper
 around `GetSetBitField(&self->unk10, shift, width, value)`, shift 9, width 3.
 
 ```c
@@ -31,7 +31,7 @@ No post-processing of `$v0`.
 
 ### Proposed learning
 
-None beyond the family census already noted in `SceneNode__GetSetUnk10Field0.md`.
+None beyond the family census already noted in `SceneNode__SetLightDim.md`.
 
 ## Naming (round 54, bravo, track 3)
 

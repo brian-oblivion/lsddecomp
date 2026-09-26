@@ -102,7 +102,7 @@ struct SceneNodeSub14 {
     /* +0x068 */ u32 (*setSemiTransRate)(Self *self, u32 rate);            /* SceneNode__SetSemiTransRate */ \
     /* +0x06C */ u32 (*setLighting)(Self *self, s32 on);                   /* SceneNode__SetLighting */ \
     /* +0x070 */ u32 (*setLightMode)(Self *self, u32 mode);                /* SceneNode__SetLightMode */ \
-    /* +0x074 */ u32 (*getSetUnk10Field0)(Self *self, u32 value);          /* SceneNode__GetSetUnk10Field0 */ \
+    /* +0x074 */ u32 (*getSetUnk10Field0)(Self *self, u32 value);          /* SceneNode__SetLightDim */ \
     /* +0x078 */ s32 (*getSetUnk10Flag7)(Self *self, s32 on);              /* SceneNode__GetSetUnk10Flag7 */ \
     /* +0x07C */ u32 (*getSetUnk10Field9)(Self *self, u32 value);          /* SceneNode__GetSetUnk10Field9 */ \
     /* +0x080 */ s32 (*getSetUnk10Flag8)(Self *self, s32 on);              /* SceneNode__GetSetUnk10Flag8 */ \
@@ -174,7 +174,7 @@ u32 SceneNode__SetSemiTrans(SceneNode *self, s32 on);
 u32 SceneNode__SetSemiTransRate(SceneNode *self, u32 rate);
 u32 SceneNode__SetLighting(SceneNode *self, s32 on);
 u32 SceneNode__SetLightMode(SceneNode *self, u32 mode);
-u32 SceneNode__GetSetUnk10Field0(SceneNode *self, u32 value);
+u32 SceneNode__SetLightDim(SceneNode *self, u32 value);
 s32 SceneNode__GetSetUnk10Flag7(SceneNode *self, s32 on);
 u32 SceneNode__GetSetUnk10Field9(SceneNode *self, u32 value);
 s32 SceneNode__GetSetUnk10Flag8(SceneNode *self, s32 on);

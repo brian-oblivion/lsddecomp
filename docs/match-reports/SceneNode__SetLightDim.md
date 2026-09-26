@@ -1,4 +1,6 @@
-# SceneNode__GetSetUnk10Field0 -- MATCHED (11/11 words)
+# SceneNode__SetLightDim -- MATCHED (11/11 words)
+
+> Renamed from `SceneNode__GetSetUnk10Field0` on 2026-09-26 (tools/rename.py). Address 0x8001d424.
 
 > Renamed from `Class6B5CC__GetSetUnk10Field0` on 2026-09-26 (tools/rename.py). Address 0x8001d424.
 
@@ -15,14 +17,14 @@ value and result both pass straight through (no `== 0` boolean conversion on
 either side -- same shape as `SceneNode__SetSemiTrans`/`D3A0`/`D3F8`).
 
 ```c
-u32 SceneNode__GetSetUnk10Field0(SceneNodeObj *self, u32 a1) {
+u32 SceneNode__SetLightDim(SceneNodeObj *self, u32 a1) {
     return GetSetBitField(&self->unk10, 0, 3, a1);
 }
 ```
 
 ## Evidence
 
-Disassembly (`asm/nonmatchings/code_d294_b/SceneNode__GetSetUnk10Field0.s`):
+Disassembly (`asm/nonmatchings/code_d294_b/SceneNode__SetLightDim.s`):
 ```
 addu $a3, $a1, $zero      # a3 (value) = a1
 addiu $a0, $a0, 0x10      # a0 = &self->unk10
@@ -41,7 +43,7 @@ non-overlapping bitfields at `self->unk10`: shifts 0,3,6,7,8,9,28,30,31).
 
 ## Naming (round 54, bravo, track 3)
 
-**Not renamed -- PROPOSED only.** Proposed name: `SceneNode__GetSetUnk10Field0`
+**Not renamed -- PROPOSED only.** Proposed name: `SceneNode__SetLightDim`
 (tier A: pure bitfield accessor, shift 0 width 3, raw pass-through --
 same reasoning as the renamed siblings `SceneNode__GetSetUnk10Flag7`/
 `Field9`). Held back from an actual `tools/rename.py` run because this
