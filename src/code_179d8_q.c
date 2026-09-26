@@ -30,36 +30,10 @@
 #include "CdDriver.h"
 #include "DrawSystem.h"
 
-/* --- local views of the gCdDriverMethods class ---------------------------------
- * This unit defines three of that class's own method slots (+0x06C, +0x070,
- * +0x074) and sees its objects through three per-call-site views that differ
- * only in which fields they type. They are the same struct; merging them is
- * track-4 work rather than a rename, so they stay split. The `_<addr>`
- * suffix names the function each view was read from -- the convention this
- * unit already used.
- * ------------------------------------------------------------------------ */
-
-/* The class's method table down to +0x058: the one slot
- * CdDriver__RequestLoadFile dispatches. `tools/classtable.py gCdDriverMethods`
- * resolves that slot to CdDriver__LoadFile (code_179d8_s), which loads a named
- * file off the disc, so the slot is named for the method it dispatches to.
- * The sibling class D_8006D430 (include/code_171e0.h's
- * Class6D430Methods) leaves the identical offset unnamed -- this
- * stays an independent local view, per the project's multiple-local-views
- * convention, rather than an edit to that shared header. */
-typedef struct Methods6D4E8_C80 Methods6D4E8_C80;
-struct Methods6D4E8_C80 {
-    u8 pad00[0x58];
-    /* +0x58 */ void (*loadFile)(void *self, char *name);
-};
-
-typedef struct Obj6D4E8_C80 Obj6D4E8_C80;
-struct Obj6D4E8_C80 {
-    /* +0x00 */ Methods6D4E8_C80 *methods;
-    u8 pad04[0x22 - 0x04];
-    /* +0x22 */ u16 pendingRequests; /* ++ per queued request, -- per cancel */
-    /* +0x24 */ s32 flags;           /* OR-ed bit set; no bit is read here */
-};
+/* CdDriver, its table and its methods are include/CdDriver.h's (track 4,
+ * round 88): the per-call-site views this unit declared (Obj6D4E8_C80,
+ * Obj6D4E8_D70, Obj6D4E8_282AC, and the table views Methods6D4E8_C80 /
+ * Methods6D4E8_80EC) were that one class. */
 
 /* +0x04 of whatever object a still-uninitialized local $s2 points at on this
  * path -- see the CdDriver__RequestLoadFile report for why that local is
@@ -72,12 +46,11 @@ struct UnkC80 {
     /* +0x04 */ s32 unk04;
 };
 
-struct Obj6D4E8_282AC;
-extern void EnqueueCdRequest(struct Obj6D4E8_282AC *owner, s32 fileIndex,
+extern void EnqueueCdRequest(CdDriver *owner, s32 fileIndex,
                              s32 op, s32 param0, s32 param1);
 extern s32 FindCdFileIndex(char *name); /* code_179d8_r: name -> table index */
 
-void CdDriver__RequestLoadFile(Obj6D4E8_C80 *self, char *name)
+void CdDriver__RequestLoadFile(CdDriver *self, char *name)
 {
     UnkC80 *s2;
     s32 idx;
@@ -88,7 +61,7 @@ void CdDriver__RequestLoadFile(Obj6D4E8_C80 *self, char *name)
         if (gCdAsyncEnabled != 0) {
             s2->unk04 = 1;
             idx = FindCdFileIndex(name);
-            EnqueueCdRequest((struct Obj6D4E8_282AC *)self, idx,
+            EnqueueCdRequest(self, idx,
                              CD_OP_LOAD_FILE, 0, 0);
         } else {
             self->methods->loadFile(self, name);
@@ -113,18 +86,11 @@ void CdDriver__StopService(void)
     UnlockCd();
 }
 
-typedef struct Obj6D4E8_D70 Obj6D4E8_D70;
-struct Obj6D4E8_D70 {
-    u8 pad00[0x22];
-    /* +0x22 */ u16 pendingRequests;
-    /* +0x24 */ s32 flags;
-};
-
 extern void CdFlush(void);
 extern void ResetCdStateMachine(void); /* code_179d8_r: reset the state machine */
 extern void FreeCdRequestNode(CdRequestNode *req); /* code_179d8_r: unlink+free */
 
-void CdDriver__CancelRequests(Obj6D4E8_D70 *self)
+void CdDriver__CancelRequests(CdDriver *self)
 {
     CdRequestNode *entry;
     CdRequestNode *node;
@@ -138,7 +104,7 @@ void CdDriver__CancelRequests(Obj6D4E8_D70 *self)
     if (entry != NULL && self->pendingRequests != 0) {
         self->flags = 0;
 
-        if (entry->owner == (struct Class6D4E8 *)self && entry->active != 0 && gCdIdle == 0) {
+        if (entry->owner == self && entry->active != 0 && gCdIdle == 0) {
             CdFlush();
             ResetCdStateMachine();
             saved = gCdSavedSeekParam;
@@ -148,7 +114,7 @@ void CdDriver__CancelRequests(Obj6D4E8_D70 *self)
 
         for (node = gCdRequestQueue; node != NULL; node = next) {
             next = node->next;
-            if (node->owner == (struct Class6D4E8 *)self) {
+            if (node->owner == self) {
                 FreeCdRequestNode(node);
                 self->pendingRequests--;
             }
@@ -158,21 +124,11 @@ void CdDriver__CancelRequests(Obj6D4E8_D70 *self)
     UnlockCd();
 }
 
-/* gCdDriverMethods's own method table, 29 slots per tools/classtable.py (header
- * word 0x13 at +0x000, Class6D430__Release at +0x004/own-slot, CdDriver__CdDriver at
- * +0x008/ctor, CdDriver__Finalize at +0x00C/dtor, the 13 inherited BasicClass
- * slots at +0x010..+0x038, then own slots at +0x040..+0x074 -- this unit
- * defines CdDriver__RequestLoadFile (+0x06C), CdDriver__StopService
- * (+0x070) and CdDriver__CancelRequests (+0x074)). This function is this
- * class's "get my own method table" accessor, the same convention
- * GetClass6D3C8Methods uses for D_8006D3C8 and GetClass6D430Methods uses for D_8006D430
- * (see include/code_171e0.h) -- just an address-of, not gp_rel, since
- * gCdDriverMethods lives in .data, not .sdata. */
-extern s32 gCdDriverMethods[];
-
-s32 *GetCdDriverMethods(void)
+/* The class's own table getter (include/CdDriver.h) -- an address-of, not
+ * gp_rel: gCdDriverMethods lives in .data, not .sdata. */
+CdDriverMethods *GetCdDriverMethods(void)
 {
-    return gCdDriverMethods;
+    return &gCdDriverMethods;
 }
 
 /* libcd/sys entry points (lib/libcd/sys.o, linked since round 34) --
@@ -367,19 +323,6 @@ extern void TickCdLoadFileStateMachine(void); /* code_179d8_r: state-machine ste
 extern s32 gCdQueueEnabled;
 extern void VSyncCallback(void (*cb)(void));
 
-/* The class's method table down to +0x068 (see GetCdDriverMethods's
- * class-map comment above); only the one slot this call site dispatches is
- * typed, following the pad-to-offset convention include/code_171e0.h uses
- * for D_8006D430's own table. tools/classtable.py resolves +0x068 to
- * CdDriver__RunRequestQueue (code_179d8_s), which walks the gCdRequestQueue request list,
- * dispatches each request through its owner's own slots and frees it with
- * FreeCdRequestNode -- so the slot is named for what that method does. */
-typedef struct Methods6D4E8_80EC Methods6D4E8_80EC;
-struct Methods6D4E8_80EC {
-    u8 pad00[0x68];
-    void (*runRequestQueue)(void);
-};
-
 s32 ServiceCdDriver(void)
 {
     if (gCdLock != 0) {
@@ -401,7 +344,7 @@ s32 ServiceCdDriver(void)
     }
 
     if (gCdQueueEnabled != 0) {
-        ((Methods6D4E8_80EC *)GetCdDriverMethods())->runRequestQueue();
+        GetCdDriverMethods()->runRequestQueue();
     }
 
     if (gCdUseVSyncCallback != 0) {
@@ -475,17 +418,10 @@ struct CdRequest_282AC {
 };
 extern CdRequest_282AC *AllocCdRequestNode(void); /* code_179d8_r: alloc + link */
 
-typedef struct Obj6D4E8_282AC Obj6D4E8_282AC;
-struct Obj6D4E8_282AC {
-    u8 pad00[0x22];
-    /* +0x22 */ u16 pendingRequests;
-    /* +0x24 */ s32 flags;
-};
-
 /* The store order below is retail's own (+0x08, +0x14, +0x0C, +0x10, +0x18),
  * not ascending offset -- see the match report: this compiler keeps
  * statement order for these, so the statements are in retail's order. */
-void EnqueueCdRequest(Obj6D4E8_282AC *owner, s32 fileIndex, s32 op,
+void EnqueueCdRequest(CdDriver *owner, s32 fileIndex, s32 op,
                       s32 param0, s32 param1)
 {
     CdRequest_282AC *entry = AllocCdRequestNode();

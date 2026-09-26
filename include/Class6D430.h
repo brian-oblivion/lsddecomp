@@ -19,6 +19,18 @@
  * The slot names are the CD driver's occupants.
  */
 
+/* A disc position in the shape of Psy-Q's CdlLOC, declared as two s16 so the
+ * struct is 2-aligned and a whole-struct copy compiles to lwl/lwr + swl/swr
+ * (the idiom CLAUDE.md documents). The halves are never read apart. It is
+ * here, not in CdDriver.h, because Class6D430's own +0x018 has this type:
+ * the CD driver's methods run on every client object (SetActiveDataSource
+ * binds them into the client tables), so the open file's position and size
+ * are fields of the base, not of CdDriver (round 88). */
+typedef struct CdLoc16 {
+    s16 unk0;
+    s16 unk2;
+} CdLoc16;
+
 typedef struct Class6D430 Class6D430;
 typedef struct Class6D430Methods Class6D430Methods;
 
@@ -45,7 +57,8 @@ typedef struct Class6D430Methods Class6D430Methods;
     /* +0x00C */ s32 isOpen;          /* cleared while LoadFile runs, then restored */             \
     /* +0x010 */ void *buffer;        /* LoadFile's allocation, NULL when none */                  \
     /* +0x014 */ s32 bufferSize;                                                                   \
-    /* +0x018 */ u8 pad18[8];                                                                      \
+    /* +0x018 */ CdLoc16 pos;      /* the open file's disc position: the CD driver's Open sets it, */ \
+    /* +0x01C */ u32 size;         /* its byte size; Seek and ReadCdFile seek from pos (CdDriver.h) */ \
     /* +0x020 */ u16 freeGuard;       /* nonzero: FreeBuffer keeps the buffer */                   \
     /* +0x022 */ u16 pendingRequests;                                                              \
     /* +0x024 */ s32 flags;           /* bit 0 set by SetFlag */                                   \

@@ -1,34 +1,82 @@
 #ifndef CDDRIVER_H
 #define CDDRIVER_H
 
-#include "common.h"
+#include "Class6D430.h"
 
 /*
- * CdDriver -- the game's CD-ROM file driver: its request queue, its file
- * table and the module state its three units share (track 4b, round 85).
+ * CdDriver -- the CD-ROM data-source driver (class id 0x13 = DATASOURCE_CD,
+ * method table gCdDriverMethods), a Class6D430 subclass and VabDriver's
+ * (gVabDriverMethods, 0x23) sibling; and, below the class, the request
+ * queue, the file table and the module state its units share (track 4b,
+ * round 85).
  *
- *   src/code_179d8_q.c  queue front end (EnqueueCdRequest, CancelRequests),
- *                       the file table's setters, ResolveFileEntries, the
- *                       lock and the VSync service tick (ServiceCdDriver)
+ *   src/code_179d8_o.c  New_CdDriver, the ctor (Class6D430's ctor, then
+ *                       InitCdDrive), Finalize, NoOpSlot40
+ *   src/code_179d8_s.c  Open, Close, Seek, NoOpSlot50, Read, LoadFile,
+ *                       RunRequestQueue: each enqueues a CD_OP_* request, or
+ *                       starts it when RunRequestQueue dispatches it back
+ *   src/code_179d8_q.c  RequestLoadFile, StopService, CancelRequests, the
+ *                       getter; the queue front end (EnqueueCdRequest), the
+ *                       file table's setters, ResolveFileEntries, the lock
+ *                       and the VSync service tick (ServiceCdDriver)
  *   src/code_179d8_r.c  the read state machine, AllocCdRequestNode /
  *                       FreeCdRequestNode, the file-table lookups
- *   src/code_179d8_s.c  Class6D4E8's methods, which enqueue and run requests
+ *   src/code_179d8_h.c  the synchronous OpenCdFile / CloseCdFile /
+ *                       GetCdFileSize / ReadCdFile the methods call when
+ *                       the driver is not in async mode
  *
- * Every global here was declared in two or more of those units, with up to
- * three different types; the types below are the ones their accessors need.
- * A global only one unit touches stays a local extern in that unit.
- * Class6D4E8 itself is track 4a's and is referred to by tag only.
+ * THE DRIVER RUNS ON OTHER CLASSES' OBJECTS. Nothing calls New_CdDriver.
+ * SetActiveDataSource (src/code_171e0.c) copies this table's eleven
+ * interface slots (+0x040..+0x058, +0x068..+0x074) into Class6D430's table
+ * and every client table, so `self` in Open/Read/... is whatever
+ * Class6D430 object called its own `open`/`read` (a TimImage, a TodSet,
+ * ...), and a queued request's `owner` is that object. That is why the
+ * fields the methods use -- isOpen, buffer, bufferSize, pos, size,
+ * freeGuard, pendingRequests, flags, inQueueDispatch -- are all Class6D430's
+ * (pos and size, +0x018/+0x01C, were its pad18 until round 88), and the
+ * object has no own fields: New_CdDriver allocates 0x2C bytes, Class6D430's
+ * size.
+ *
+ * Every own method is named for its slot (`classtable.py gCdDriverMethods
+ * --vs D_8006D430`); the slot names are Class6D430's, which were named for
+ * these occupants. Slot types are Class6D430's too. Where the old local
+ * views disagreed (open/close/loadFile/setFlag/stopService returning s32,
+ * read's buf as s32), the occupants return void / take void * and the
+ * bytes did not move when the views were replaced.
+ *
+ * NO FIELDS/SLOTS MACROS: no class lies below 0x13 (`typeviews.py --tree`).
  */
 
-struct Class6D4E8;
+typedef struct CdDriver CdDriver;
+typedef struct CdDriverMethods CdDriverMethods;
 
-/* A disc position in the shape of Psy-Q's CdlLOC, declared as two s16 so the
- * struct is 2-aligned and a whole-struct copy compiles to lwl/lwr + swl/swr
- * (the idiom CLAUDE.md documents). The halves are never read apart. */
-typedef struct CdLoc16 {
-    s16 unk0;
-    s16 unk2;
-} CdLoc16;
+struct CdDriverMethods {
+    CLASS6D430_SLOTS(CdDriver, (CdDriver *self));
+    /* The table is 29 slots and ends after +0x074 (Class6D430's slot78 is
+     * the next table's header). */
+};
+
+struct CdDriver {
+    CLASS6D430_FIELDS(CdDriverMethods);
+};                                   /* 0x2C bytes: New_CdDriver */
+
+extern CdDriverMethods gCdDriverMethods;
+extern CdDriverMethods *GetCdDriverMethods(void);
+
+CdDriver *New_CdDriver(void);
+void CdDriver__CdDriver(CdDriver *self);                                /* +0x008 ctor */
+void CdDriver__Finalize(CdDriver *self);                                /* +0x00C finalize: cancelRequests, freeBuffer */
+void CdDriver__NoOpSlot40(void);                                        /* +0x040 slot40 */
+void CdDriver__Open(CdDriver *self, char *name, s32 arg2, s32 arg3);    /* +0x044 open */
+void CdDriver__Close(CdDriver *self);                                   /* +0x048 close */
+s32 CdDriver__Seek(CdDriver *self, u32 offset, s32 mode);               /* +0x04C seek */
+void CdDriver__NoOpSlot50(void);                                        /* +0x050 slot50 */
+s32 CdDriver__Read(CdDriver *self, void *buf, u32 size);                /* +0x054 read: returns 0 */
+void CdDriver__LoadFile(CdDriver *self, char *name);                    /* +0x058 loadFile */
+void CdDriver__RunRequestQueue(void);                                   /* +0x068 runRequestQueue */
+void CdDriver__RequestLoadFile(CdDriver *self, char *name);             /* +0x06C requestLoadFile */
+void CdDriver__StopService(void);                                       /* +0x070 stopService */
+void CdDriver__CancelRequests(CdDriver *self);                          /* +0x074 cancelRequests */
 
 /* One record of the file table: a name resolved once by ResolveFileEntries
  * (CdSearchFile on BuildCdFilePath(name)) and then reused as a seek target.
@@ -48,7 +96,7 @@ typedef struct CdRequestNode {
     /* +0x00 */ s32 active;               /* set by StartCdOperation when the op starts */
     /* +0x04 */ s32 unk4;                 /* zeroed at allocation; nonzero ORs flags bit 0 */
     /* +0x08 */ s32 op;                   /* CD_OP_* */
-    /* +0x0C */ struct Class6D4E8 *owner; /* the requesting object */
+    /* +0x0C */ CdDriver *owner;          /* the requesting object (any Class6D430 client) */
     /* +0x10 */ s32 fileIndex;            /* FindCdFileIndex's index, 0 if none */
     /* +0x14 */ s32 param0;
     /* +0x18 */ s32 param1;
@@ -69,6 +117,10 @@ typedef struct CdRequestNode {
 #define CD_TICK_STATE_MACHINE 1 /* TickCdStateMachine */
 #define CD_TICK_LOAD_FILE     2 /* TickCdLoadFileStateMachine */
 
+/* The module state. Every global here was declared in two or more of the
+ * units above, with up to three different types; the types below are the
+ * ones their accessors need. A global only one unit touches stays a local
+ * extern in that unit (track 4b, round 85). */
 extern s32 gCdAsyncEnabled;
 extern s32 D_8008A860;
 extern s32 gCdBusy;                     /* 0/1 */
