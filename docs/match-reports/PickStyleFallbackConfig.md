@@ -25,7 +25,7 @@ extern s8 D_800873D8[];        /* divisor table, indexed by "kind" -- raw index,
 extern s32 D_8008AC84;
 extern s32 D_800873C8[];       /* array of raw base addresses, indexed by "kind" (scaled x4) */
 extern s32 gStyleFlushColor;
-extern u8 D_8008726C[];        /* address only taken */
+extern u8 gStyleDecorColorsB[];        /* address only taken */
 extern u8 gStylePalette[];        /* 3-byte-stride table, indexed by a byte field */
 extern s32 gStyleColorTable;
 extern u8 gStyleDecorColorsA[];        /* address only taken */
@@ -56,7 +56,7 @@ void *PickStyleFallbackConfig(void) {
         b3 = result[3];
         gStyleFlushColor = (s32) (gStylePalette + b3 * 3);
         b2 = result[2];
-        tab = D_8008726C;
+        tab = gStyleDecorColorsB;
         if (b2 != 0x12) {
             tab = gStyleDecorColorsA;
         }
@@ -92,18 +92,18 @@ Notes:
 ## Lever: a ternary's branch/default assignment ORDER is not guaranteed to
 match source intent -- write it as an explicit default-then-override
 
-First attempt used `tab = (b2 == 0x12) ? D_8008726C : gStyleDecorColorsA;`, which
+First attempt used `tab = (b2 == 0x12) ? gStyleDecorColorsB : gStyleDecorColorsA;`, which
 compiled to the OPPOSITE physical layout from retail: GCC chose
-`gStyleDecorColorsA` as the unconditional default and `D_8008726C` as the
+`gStyleDecorColorsA` as the unconditional default and `gStyleDecorColorsB` as the
 conditional override (with the branch polarity flipped to match, `bne`
 where retail has `beq`) -- functionally identical, but two words differ
 because the *constant addresses* land in the swapped slots and the branch
 test is inverted. Retail's actual shape is imperative, not ternary-shaped:
-compute the default (`D_8008726C`) unconditionally, then overwrite it with
+compute the default (`gStyleDecorColorsB`) unconditionally, then overwrite it with
 `gStyleDecorColorsA` only when `b2 != 0x12`:
 
 ```c
-tab = D_8008726C;
+tab = gStyleDecorColorsB;
 if (b2 != 0x12) {
     tab = gStyleDecorColorsA;
 }

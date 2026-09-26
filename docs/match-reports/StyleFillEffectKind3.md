@@ -330,7 +330,7 @@ done would have produced.
 ```c
 extern s32 gStyleDecorVariant;
 extern s32 gStyleColorTable;
-extern u8 D_8008726C[];
+extern u8 gStyleDecorColorsB[];
 extern u8 D_8008E0A4[];
 extern s32 gStyleCueSelf;
 extern s32 D_80087330;
@@ -350,7 +350,7 @@ void **StyleFillEffectKind3(void **arg0, void *arg1) {
     u8 **q;
 
     SetupStyleSpawnParamsA(arg1, (void *) D_80087330);
-    if (gStyleDecorVariant != 0 && gStyleColorTable == (s32) D_8008726C) {
+    if (gStyleDecorVariant != 0 && gStyleColorTable == (s32) gStyleDecorColorsB) {
         *(s32 *) D_8008E0A4 = 0xFFFF5000;
         D_8008E0A8 = -0x2000;
         D_8008E0AC = 0;

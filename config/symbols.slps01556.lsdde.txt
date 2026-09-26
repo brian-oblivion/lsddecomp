@@ -2912,3 +2912,4 @@ gStyleKind1Scale = 0x80087204;
 gStyleKind3Colors = 0x8008721C;
 gStyleKind2Colors = 0x80087228;
 gStyleDecorColorsA = 0x80087234;
+gStyleDecorColorsB = 0x8008726C;

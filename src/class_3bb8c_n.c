@@ -73,7 +73,7 @@ extern s8 D_800873D8[];
 extern s32 D_8008AC84;
 extern s32 D_800873C8[];
 extern s32 gStyleFlushColor;
-extern u8 D_8008726C[];
+extern u8 gStyleDecorColorsB[];
 extern u8 gStylePalette[];
 extern s32 gStyleColorTable;
 extern u8 gStyleDecorColorsA[];
@@ -100,7 +100,7 @@ void *PickStyleFallbackConfig(void) {
         b3 = result[3];
         gStyleFlushColor = (s32)(gStylePalette + b3 * 3);
         b2 = result[2];
-        tab = D_8008726C;
+        tab = gStyleDecorColorsB;
         if (b2 != 0x12) {
             tab = gStyleDecorColorsA;
         }
@@ -483,7 +483,7 @@ Class876FC **StyleFillEffectKind3(Class876FC **arg0, LongVec3 *arg1) {
     PtrBoxK3 *q;
 
     SetupStyleSpawnParamsA(arg1, (void *)D_80087330);
-    if (gStyleDecorVariant != 0 && gStyleColorTable == (s32)D_8008726C) {
+    if (gStyleDecorVariant != 0 && gStyleColorTable == (s32)gStyleDecorColorsB) {
         D_8008E0A4 = 0xFFFF5000;
         D_8008E0A8 = -0x2000;
         D_8008E0AC = 0;
