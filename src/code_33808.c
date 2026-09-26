@@ -578,7 +578,7 @@ void TimArraySrc__BuildImages(Obj43CB8 *self) {
 }
 /* D_8006F1C4 +0x078: slot +0x078 of every object in the array at +0x30
  * (+0x2C entries). */
-void TimArraySrc__NotifyImages(DataSrc33808 *self) {
+void TimArraySrc__UploadImages(DataSrc33808 *self) {
     TimImage **objs = (TimImage **)self->unk30;
     s32 i;
 
