@@ -698,21 +698,21 @@ void ContRpn2(s16 a0, s16 a1, u8 a2) {
     rec->unk88 = ReadDeltaValue(a0, a1);
 }
 
-/* Same 9-halfword ADSR-decode layout as code_179d8_f.c's independent,
- * already-matched `UnkStruct80035F3C` (docs/match-reports/func_80035F3C.md)
- * -- a fresh LOCAL (uninitialized), filled by `_SsUtResolveADSR` from
- * `scratch.adsr1`/`adsr2` and consumed by `_SsUtBuildADSR`, never by the
- * caller. Renamed per-unit per project convention, not shared. */
+/* The SPU envelope registers ADSR1/ADSR2 (VagAtr.adsr1/adsr2) split into
+ * their bit fields: _SsUtResolveADSR unpacks a pair into one, and
+ * _SsUtBuildADSR packs one back. The rates and the level are the field
+ * values shifted down; the four modes hold the masked bit as-is (nonzero
+ * means exponential, or decreasing for sustainDir). */
 typedef struct {
-    s16 unk0;
-    s16 unk2;
-    s16 unk4;
-    s16 unk6;
-    s16 unk8;
-    s16 unkA;
-    s16 unkC;
-    s16 unkE;
-    s16 unk10;
+    s16 attackRate;   /* ADSR1 bits 14-8 */
+    s16 decayRate;    /* ADSR1 bits 7-4 */
+    s16 sustainLevel; /* ADSR1 bits 3-0 */
+    s16 sustainRate;  /* ADSR2 bits 12-6 */
+    s16 releaseRate;  /* ADSR2 bits 4-0 */
+    s16 attackMode;   /* ADSR1 bit 15 */
+    s16 sustainMode;  /* ADSR2 bit 15 */
+    s16 releaseMode;  /* ADSR2 bit 5 */
+    s16 sustainDir;   /* ADSR2 bit 14 */
 } AdsrFields;
 
 /* SsUtGetProgAtr's fill at function entry. From +0x10 the SAME memory is
@@ -909,44 +909,44 @@ void Snd_setVabAttr(s16 channel, s16 slot, s16 kind, VagAtr scratch, AdsrFields 
             new_var = channel;
             switch (arg5) {
                 case 4:
-                    resolved.unkA = 0;
-                    resolved.unk0 = arg6;
+                    resolved.attackMode = 0;
+                    resolved.attackRate = arg6;
                     break;
                 case 5:
-                    resolved.unkA = 1;
-                    resolved.unk0 = arg6;
+                    resolved.attackMode = 1;
+                    resolved.attackRate = arg6;
                     break;
                 case 6:
-                    resolved.unk2 = arg6;
+                    resolved.decayRate = arg6;
                     break;
                 case 7:
-                    resolved.unk4 = arg6;
+                    resolved.sustainLevel = arg6;
                     break;
                 case 8:
-                    resolved.unkC = 0;
-                    resolved.unk6 = arg6;
+                    resolved.sustainMode = 0;
+                    resolved.sustainRate = arg6;
                     break;
                 case 9:
-                    resolved.unkC = 1;
-                    resolved.unk6 = arg6;
+                    resolved.sustainMode = 1;
+                    resolved.sustainRate = arg6;
                     break;
                 case 10:
-                    resolved.unkE = 0;
-                    resolved.unk8 = arg6;
+                    resolved.releaseMode = 0;
+                    resolved.releaseRate = arg6;
                     break;
                 case 11:
-                    resolved.unkE = 1;
-                    resolved.unk8 = arg6;
+                    resolved.releaseMode = 1;
+                    resolved.releaseRate = arg6;
                     break;
                 case 12: {
                     if (arg6 == 0) {
                         /* nothing -- falls to the shared check below */
                     } else if (arg6 < 0x40) {
-                        resolved.unk10 = 0;
+                        resolved.sustainDir = 0;
                         break;
                     }
                     if ((u32)(arg6 - 0x40) < 0x40) {
-                        resolved.unk10 = 1;
+                        resolved.sustainDir = 1;
                     }
                     break;
                 }

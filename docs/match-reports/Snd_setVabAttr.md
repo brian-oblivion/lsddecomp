@@ -4,6 +4,8 @@
 
 `Scratch_800357B0` is gone: it was already Sony's `VagAtr` field-for-field at the fields it named, so the parameter is now `VagAtr scratch`. Sony's `SsUtGetVagAtr`/`SsUtSetVagAtr`/`SsUtReverbOn`/`SsUtReverbOff`/`SsUtSetReverb*` prototypes come from `<libsnd.h>`. Bytes unchanged; the bodies below keep their original declarations as history.
 
+`AdsrRaw_800357B0` is now `AdsrFields`, and its fields are named for the SPU ADSR1/ADSR2 bit fields that `_SsUtResolveADSR` unpacks and `_SsUtBuildADSR` repacks (`func_80035F3C.md`, `func_80035F98.md`). The mapping: unk0 `attackRate` (ADSR1 14-8), unk2 `decayRate` (7-4), unk4 `sustainLevel` (3-0), unk6 `sustainRate` (ADSR2 12-6), unk8 `releaseRate` (4-0), unkA `attackMode` (ADSR1 bit 15), unkC `sustainMode` (ADSR2 bit 15), unkE `releaseMode` (bit 5), unk10 `sustainDir` (bit 14). This function's arms agree with it: 4/5 set attack rate with linear/exponential mode, 6 decay, 7 sustain level, 8/9 sustain rate+mode, 10/11 release rate+mode, and 12 the sustain direction.
+
 > Renamed from `func_800357B0` on 2026-09-23 (tools/rename.py). Address 0x800357b0.
 
 **ROUND 49: MATCHED.** See the update at the end of this report. Everything
