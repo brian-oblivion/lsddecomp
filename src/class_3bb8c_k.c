@@ -21,6 +21,7 @@
 #include "TimImage.h"
 #include "ItemList.h"
 #include "ObjM.h"
+#include "VabStreamObj.h"
 
 void ItemList__SetState(ItemList *self, s32 state) {
     self->closeTicks = 0;
@@ -88,10 +89,10 @@ void ItemList__HandleInputCode(ItemList *self, void *source, s32 code) {
 }
 
 void ItemList__ForwardToTarget(ItemList *self, s32 code) {
-    struct TargetObj86ED0 *target = self->target;
+    struct VabStreamObj *target = self->target;
 
     if (target != NULL) {
-        target->methods->slot80(target, code, 0x60, 0x60);
+        target->methods->playTone(target, code, 0x60, 0x60);
     }
 }
 

@@ -35,9 +35,8 @@
  * The object is 0x4C bytes (New_TextEntry).
  */
 
-/* Helper views of the objects it holds, defined in include/class_3bb8c.h
- * (not this class; tags only here). */
-struct TargetObj86ED0;
+/* The objects it holds, by tag. */
+struct VabStreamObj;
 struct TextRow;
 
 typedef struct TextEntry TextEntry;
@@ -53,8 +52,8 @@ struct TextEntryMethods {
     /* +0x044 */ void (*loadCardResources)(TextEntry *self, void *parent); /* TextEntry__LoadCardResources */
     /* +0x048 */ void (*releaseCardResources)(TextEntry *self); /* TextEntry__ReleaseCardResources */
     /* +0x04C */ void (*attachTarget)(TextEntry *self, void *child1, void *child2,
-                                      struct TargetObj86ED0 *target); /* TextEntry__AttachTarget */
-    /* +0x050 */ void (*detachTarget)(TextEntry *self);               /* TextEntry__DetachTarget */
+                                      struct VabStreamObj *target); /* TextEntry__AttachTarget */
+    /* +0x050 */ void (*detachTarget)(TextEntry *self);             /* TextEntry__DetachTarget */
     /* +0x054 */ void (*setState)(TextEntry *self, s32 state); /* TextEntry__SetState: 2/3 close, 4 notifies parents */
     /* +0x058 */ void (*tickState)(TextEntry *self, void *sender,
                                    s32 event); /* TextEntry__TickState (reads only self; see the banner) */
@@ -86,7 +85,7 @@ struct TextEntry {
     /* +0x030 */ s32 closeTickCount; /* setState zeroes; tickState counts, and calls setState(4) on the second tick */
     /* +0x034 */ void *childType2; /* addChild/removeChild: the child whose class id's low nibble is 2 */
     /* +0x038 */ void *childType5; /* ... whose low nibble is 5 */
-    /* +0x03C */ struct TargetObj86ED0 *target; /* attachTarget; notifyTarget calls its +0x080 with (arg1, 0x60, 0x60) */
+    /* +0x03C */ struct VabStreamObj *target; /* attachTarget; notifyTarget plays tone arg1 on it (playTone, volume 0x60, 0x60) */
     /* +0x040 */ CharSprite *cursorSprite; /* loadCardResources: New_CharSprite(FONTICON, '_'); setCursorPos moves it to x = pos * 7 */
     /* +0x044 */ struct TextRow *textRow; /* a TextRow (include/TextRow.h): loadCardResources: New_TextRow(FONTICON, textLen, editBuf); setCharAt sets a cell (+0x0C4) */
     /* +0x048 */ ScreenSprite *panelSprite; /* loadCardResources: New_ScreenSprite(COMINPUT, 224x120); non-NULL gates every editing method */
@@ -107,7 +106,7 @@ void TextEntry__OnNotify(TextEntry *self, void *sender, s32 event);
 void TextEntry__SetText(TextEntry *self, char *text, s32 mode);
 void TextEntry__LoadCardResources(TextEntry *self, void *parent);
 void TextEntry__ReleaseCardResources(TextEntry *self);
-void TextEntry__AttachTarget(TextEntry *self, void *child1, void *child2, struct TargetObj86ED0 *target);
+void TextEntry__AttachTarget(TextEntry *self, void *child1, void *child2, struct VabStreamObj *target);
 void TextEntry__DetachTarget(TextEntry *self);
 void TextEntry__SetState(TextEntry *self, s32 state);
 void TextEntry__TickState(TextEntry *self);

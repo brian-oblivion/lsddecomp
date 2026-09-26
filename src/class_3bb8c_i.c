@@ -18,6 +18,7 @@
 #include "CharSprite.h"
 #include "TextRow.h"
 #include "TimImage.h"
+#include "VabStreamObj.h"
 
 /* This project's own strcpy (matched elsewhere) -- TextEntry__SetText's own
  * caller, same local-declaration convention as class_3bb8c_e.c/others. */
@@ -214,7 +215,7 @@ void TextEntry__ReleaseCardResources(TextEntry *self) {
     }
 }
 
-void TextEntry__AttachTarget(TextEntry *self, void *arg1, void *arg2, TargetObj86ED0 *arg3) {
+void TextEntry__AttachTarget(TextEntry *self, void *arg1, void *arg2, VabStreamObj *arg3) {
     self->methods->addChild(self, arg1);
     self->methods->addChild(self, arg2);
     self->target = arg3;
@@ -351,11 +352,11 @@ void TextEntry__HandleCommand(TextEntry *self, void *arg1, s32 arg2) {
 }
 
 void TextEntry__NotifyTarget(TextEntry *self, s32 arg1) {
-    TargetObj86ED0 *target;
+    VabStreamObj *target;
 
     target = self->target;
     if (target != NULL) {
-        target->methods->slot80(target, arg1, 0x60, 0x60);
+        target->methods->playTone(target, arg1, 0x60, 0x60);
     }
 }
 

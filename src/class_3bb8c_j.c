@@ -308,7 +308,7 @@ void ItemList__ReleaseResources(ItemList *self) {
 
 /* The first addChild passes all four words through (ItemListAddChildWideFn,
  * no code): see this function's report for the do/while. */
-void ItemList__AttachTarget(ItemList *self, void *child1, void *child2, struct TargetObj86ED0 *target) {
+void ItemList__AttachTarget(ItemList *self, void *child1, void *child2, struct VabStreamObj *target) {
     ItemListAddChildWideFn fn;
     s32 zero;
 

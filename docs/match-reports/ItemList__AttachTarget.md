@@ -94,3 +94,14 @@ TaskObjF__AttachItemList (class_3bb8c_g), passes `(unk60, unk64, childC)`
 exactly as TaskObjF__AttachTextEntry passes them to TextEntry's attachTarget, and
 `target` is what ForwardToTarget calls. Nothing in it sets a state; the
 cleared word is `result`.
+
+## Round 94 (track 6, charlie): the target is a VabStreamObj
+
+`TargetObj86ED0`/`TargetMethods86ED0` (include/class_3bb8c.h) are deleted.
+Both attachTarget callers (TaskObjF, src/class_3bb8c_g.c) pass TaskObjF's
+`sound`, already typed `struct VabStreamObj *`, and the one slot the view
+named, +0x080, is VabStreamObj's `playTone(self, index, vol, endVol)`
+(include/VabStreamObj.h): the `(code, 0x60, 0x60)` call plays tone `code`
+at volume 0x60. TextEntry::target and ItemList::target (+0x03C) and both
+attachTarget prototypes are `struct VabStreamObj *`, the casts at the call
+sites are gone, and `slot80` is `playTone`. Zero bytes changed.
