@@ -54,7 +54,7 @@ arg4)`); this call site only needs `void *`/`s32` at the ABI level (matches
 the looser local signatures `Entity.c` and `DreamSys.c` already use for the
 same cross-unit call, per the multiple-independent-local-views convention).
 `gStyleTargetObj` is redeclared fresh here (not reusing the copy later in this
-file for `FlushStyleCue`/`StopStyleCueIfNear`) because this function's ROM
+file for `FlushStyleCue`/`ServiceStyleCueIfNear`) because this function's ROM
 address is earlier -- same pattern as `StyleUpdateEffectSlots`'s fresh `gStyleVariant`
 copy. `gStyleCueCallbacks` is `class_3bb8c_r.c`'s already-identified 14-function
 table (its own `ParamMethods` slot list); here it is read as a raw `s32`

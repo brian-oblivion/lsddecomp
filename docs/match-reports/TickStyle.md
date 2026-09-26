@@ -36,7 +36,7 @@ worth translating).
 **The lever, translated and verified against the REAL build (not just the
 scaffold):** a dead `i++; i--;` pair, placed as the LAST two statements
 inside the `if (gStyleCueSlots[i] != 0) { ... }` arm (after the
-`StopStyleCueIfNear`/`FlushStyleCue` handling, before that arm's closing brace),
+`ServiceStyleCueIfNear`/`FlushStyleCue` handling, before that arm's closing brace),
 perturbs GCC 2.6.3's register allocator enough to swap `ctx`/`i` back into
 retail's colours -- with zero net effect on either variable's value at any
 point downstream (`i` is immediately re-read by the `for`'s own increment
@@ -94,11 +94,11 @@ stack slot by hand -- GCC picks that slot on its own once `&arg2` is taken.
 ## Two already-matched sibling functions turned out to take EXTRA dead
 parameters -- both signatures corrected in this file (safe, verified)
 
-Both `StopStyleCueIfNear` and `TryStartStyleCue` (already matched earlier this
+Both `ServiceStyleCueIfNear` and `TryStartStyleCue` (already matched earlier this
 round/sitting) are called here with MORE live argument registers than their
 recorded signatures declare:
 
-- `StopStyleCueIfNear(ObjN14 *arg0, void *arg1)` is called here with `$a2` also
+- `ServiceStyleCueIfNear(ObjN14 *arg0, void *arg1)` is called here with `$a2` also
   set (to this function's own `ctx` local). Confirmed by objdump on the
   already-matched body: `$a2` is never referenced inside it. Added a third,
   genuinely-unused `void *arg2` parameter to its definition -- a dead
@@ -195,7 +195,7 @@ s32 TickStyle(void *arg0, void *arg1, s32 arg2) {
     gStyleCueRecordIndex = 0;
     for (i = 0; i < 2; i++) {
         if (gStyleCueSlots[i] != 0) {
-            if (StopStyleCueIfNear(gStyleCueSlots[i], ctx, arg1) == 0) {
+            if (ServiceStyleCueIfNear(gStyleCueSlots[i], ctx, arg1) == 0) {
                 gStyleCueSlots[i] = (ObjN14 *) FlushStyleCue(gStyleCueSlots[i]);
             }
         } else {
@@ -217,7 +217,7 @@ earlier this unit, this round), `void StyleUpdateEffectSlots(void *arg0);` (matc
 this unit), `extern void StyleScrollVramStrips(void);` (forward, matched, this
 unit, defined later), `extern s32 gStyleCueRecordIndex;`, `extern u8 gStyleCueSlotPool[];`,
 `extern ObjN14 *TryStartStyleCue(ObjN14 *arg0, s32 *arg1, void *arg2, void
-*arg3);`, `extern s32 StopStyleCueIfNear(ObjN14 *arg0, void *arg1, void
+*arg3);`, `extern s32 ServiceStyleCueIfNear(ObjN14 *arg0, void *arg1, void
 *arg2);`.
 
 ### Proposed learning

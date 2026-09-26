@@ -1,4 +1,6 @@
-# StopStyleCueIfNear -- MATCHED, round 46 (2026-09-15)
+# ServiceStyleCueIfNear -- MATCHED, round 46 (2026-09-15)
+
+> Renamed from `StopStyleCueIfNear` on 2026-09-26 (tools/rename.py). Address 0x8005582c.
 
 > Renamed from `func_8005582C` on 2026-09-23 (tools/rename.py). Address 0x8005582c.
 
@@ -45,7 +47,7 @@ right after the call, consistent with `ServiceSoundCueSet`'s existing
 extern s32 IsStyleCueNear(ObjN14 *arg0, void *arg1);
 extern void ServiceSoundCueSet(s32 arg0, void *arg1);
 
-s32 StopStyleCueIfNear(ObjN14 *arg0, void *arg1) {
+s32 ServiceStyleCueIfNear(ObjN14 *arg0, void *arg1) {
     if (IsStyleCueNear(arg0, arg1) != 0) {
         ServiceSoundCueSet(*(s32 *) gStyleTargetObj, &arg0->unk14);
         return 1;
@@ -61,7 +63,7 @@ None -- straightforward given `FlushStyleCue`'s already-established
 
 ## Naming
 
-**`StopStyleCueIfNear`, tier B.**
+**`ServiceStyleCueIfNear`, tier B.**
 
 If `IsStyleCueNear` reports true, calls `ServiceSoundCueSet` (an established
 sibling of `FlushSoundCueSet`, same `(s32, void *)` shape, still unnamed

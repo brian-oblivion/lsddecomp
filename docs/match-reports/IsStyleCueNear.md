@@ -10,9 +10,9 @@ Round 46 (second sitting, alpha). Byte-exact, whole-image SHA1 verified.
 s32 IsStyleCueNear(ObjN14 *arg0, void *arg1);
 ```
 
-Called from `StopStyleCueIfNear` in this unit (already matched, forward-declared
+Called from `ServiceStyleCueIfNear` in this unit (already matched, forward-declared
 this signature). `arg0` is the same `ObjN14 *` local-view type this unit
-carries for `FlushStyleCue`/`StopStyleCueIfNear`; this function is the first to
+carries for `FlushStyleCue`/`ServiceStyleCueIfNear`; this function is the first to
 touch its padding region, so the local struct grows three named fields.
 
 ## Struct: `ObjN14` grows three fields

@@ -52,7 +52,7 @@ used for `ObjM__StartFadeUp` in `src/class_3bb8c_m.c`.
 `gStyleCueSlots` holds two elements of a local per-unit type introduced here,
 `ObjN14` (named for its two accessed fields: `unk0`, address-taken then
 chased for a byte at `+0x6`; `unk14`, only ever address-taken and handed to
-`FlushSoundCueSet`/`ServiceSoundCueSet` by `FlushStyleCue` and `StopStyleCueIfNear`
+`FlushSoundCueSet`/`ServiceSoundCueSet` by `FlushStyleCue` and `ServiceStyleCueIfNear`
 respectively -- see their own reports). `gStyleCueSlots` is `.sbss`
 (`asm/data/7B46C.sbss.s`), adjacent to the other `D_8008ACxx` globals this
 class family already uses.

@@ -23,7 +23,7 @@
  * Class876FC.h, `New_Class876FC`-allocated, kind-tagged 0..3 by
  * `StyleFillEffectKind0`..`3`'s literal first argument), plus a two-slot
  * positional sound-cue subsystem (`gStyleCueSlots`, `TryStartStyleCue`/
- * `FindNearestStyleCueEntry`/`FlushStyleCue`/`StopStyleCueIfNear`/
+ * `FindNearestStyleCueEntry`/`FlushStyleCue`/`ServiceStyleCueIfNear`/
  * `IsStyleCueNear`). `TickStyle` is the per-frame entry point (called from
  * `src/class_3bb8c_l.c`); `StyleTeardown` is the scene-exit release of
  * everything `TickStyle` builds.
@@ -328,7 +328,7 @@ void StyleReleaseEffectSlots(void) {
  * view only ever touches `cue` (+0x6, an `EntrySlot::count`-typed
  * byte, address-taken then chased and toggled), where `EntrySlot` names the
  * rest. `StyleCueSlot::entry` is that claimed record, released by
- * `FlushStyleCue`/`StopStyleCueIfNear`. `posX`/`posZ` are the slot's own 2D
+ * `FlushStyleCue`/`ServiceStyleCueIfNear`. `posX`/`posZ` are the slot's own 2D
  * (X/Z) position, read by `IsStyleCueNear`'s distance check; `lastDist` is
  * that check's own last-computed distance (also the out-parameter
  * `FindNearestStyleCueEntry` writes). `cueSet` is only ever address-taken,
@@ -718,7 +718,7 @@ StyleCueSlot *FlushStyleCue(StyleCueSlot *arg0) {
 extern s32 IsStyleCueNear(StyleCueSlot *arg0, LongVec3 *arg1);
 extern void ServiceSoundCueSet(void *sound, SoundCueSet *set);
 
-s32 StopStyleCueIfNear(StyleCueSlot *arg0, LongVec3 *arg1, void *arg2) {
+s32 ServiceStyleCueIfNear(StyleCueSlot *arg0, LongVec3 *arg1, void *arg2) {
     if (IsStyleCueNear(arg0, arg1) != 0) {
         ServiceSoundCueSet(gStyleTargetObj->sound, &arg0->cueSet);
         return 1;
@@ -762,7 +762,7 @@ extern s32 gStyleTickCount;
 extern s32 gStyleCueRecordIndex;
 extern StyleCueSlot gStyleCueSlotPool[];
 extern StyleCueSlot *TryStartStyleCue(StyleCueSlot *arg0, s32 *arg1, LongVec3 *arg2, void *arg3);
-extern s32 StopStyleCueIfNear(StyleCueSlot *arg0, LongVec3 *arg1, void *arg2);
+extern s32 ServiceStyleCueIfNear(StyleCueSlot *arg0, LongVec3 *arg1, void *arg2);
 
 s32 TickStyle(Descriptor10 *arg0, void *arg1, s32 arg2) {
     LongVec3 *ctx;
@@ -785,7 +785,7 @@ s32 TickStyle(Descriptor10 *arg0, void *arg1, s32 arg2) {
     gStyleCueRecordIndex = 0;
     for (i = 0; i < 2; i++) {
         if (gStyleCueSlots[i] != 0) {
-            if (StopStyleCueIfNear(gStyleCueSlots[i], ctx, arg1) == 0) {
+            if (ServiceStyleCueIfNear(gStyleCueSlots[i], ctx, arg1) == 0) {
                 gStyleCueSlots[i] = FlushStyleCue(gStyleCueSlots[i]);
             }
             /* INERT ON PURPOSE -- DO NOT DELETE. This pair is a semantic
