@@ -53,7 +53,7 @@ Unit: `src/code_8220_c.c`. Copies three unaligned 8-byte fields
 (`arg1[0]`/`[4]`/`[8]` -> `arg0[0]`/`[4]`/`[8]`, treating `arg0`/`arg1` as
 arrays of 3 pointers) and, for each of the three destinations, an unaligned
 4-byte field from a separate source pointer (`arg2`, `arg3`, `arg4`
-respectively) into `dst+0x10`. Called by `CopyPolyVtx4` (this unit, next
+respectively) into `dst+0x10`. Called by `FillRVectors4` (this unit, next
 in the queue), which forwards its own unused `a2`/`a3` straight through as
 this function's `arg2`/`arg3`.
 

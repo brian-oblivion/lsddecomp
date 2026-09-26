@@ -131,8 +131,8 @@ void *SubmitPolyFT3(void *prim, void *ctx) {
 void *SubmitPolyF4(void *prim, void *ctx) {
     if (*(s32 *)((u8 *)ctx + 0x78) != 0) {
         FillDivPolygonHeader(gDivPolygon4, ctx, (u8 *)prim + 0x4, 0, 0, 0);
-        CopyPolyVtx4((u8 *)ctx + 0x94, (u8 *)ctx + 0xA4, (u8 *)prim + 0x8, (u8 *)prim + 0xC,
-                     (u8 *)prim + 0x10, (u8 *)prim + 0x14);
+        FillRVectors4((u8 *)ctx + 0x94, (u8 *)ctx + 0xA4, (u8 *)prim + 0x8, (u8 *)prim + 0xC,
+                      (u8 *)prim + 0x10, (u8 *)prim + 0x14);
         return ((void *(*)(void *, void *))RCpolyF4)(prim, gDivPolygon4);
     }
     ((OtTag *)prim)->addr = (*(OtTag **)((u8 *)ctx + 0x30))->addr;
@@ -150,7 +150,7 @@ void *SubmitPolyG4(void *prim, void *ctx) {
 
     if (*(s32 *)(c + 0x78) != 0) {
         FillDivPolygonHeader(gDivPolygon4, c, self + 0x4, 0, 0, 0);
-        CopyPolyVtx4(c + 0x94, c + 0xA4, self + 0x8, self + 0x10, self + 0x18, self + 0x20);
+        FillRVectors4(c + 0x94, c + 0xA4, self + 0x8, self + 0x10, self + 0x18, self + 0x20);
 
         *(u16 *)(*(u8 **)(c + 0x94) + 0xA) = *(u8 *)(self + 0xF);
         *(u16 *)(*(u8 **)(c + 0x98) + 0xA) = *(u8 *)(self + 0xF);
@@ -177,8 +177,8 @@ void *SubmitPolyFT4(void *prim, void *ctx) {
     if (*(s32 *)((u8 *)ctx + 0x78) != 0) {
         FillDivPolygonHeader(gDivPolygon4, ctx, (u8 *)prim + 0x4, 1, *(u16 *)((u8 *)prim + 0xE),
                              *(u16 *)((u8 *)prim + 0x16));
-        CopyPolyVtx4((u8 *)ctx + 0x94, (u8 *)ctx + 0xA4, (u8 *)prim + 0x8, (u8 *)prim + 0x10,
-                     (u8 *)prim + 0x18, (u8 *)prim + 0x20);
+        FillRVectors4((u8 *)ctx + 0x94, (u8 *)ctx + 0xA4, (u8 *)prim + 0x8, (u8 *)prim + 0x10,
+                      (u8 *)prim + 0x18, (u8 *)prim + 0x20);
 
         *(u16 *)(*(u8 **)((u8 *)ctx + 0x94) + 0xA) = *(u16 *)((u8 *)prim + 0x1E);
         *(u16 *)(*(u8 **)((u8 *)ctx + 0x98) + 0xA) = *(u16 *)((u8 *)prim + 0x1E);
@@ -238,7 +238,7 @@ void *SubmitPolyGT4(void *prim, void *ctx) {
 
     if (*(s32 *)(c + 0x78) != 0) {
         FillDivPolygonHeader(gDivPolygon4, c, self + 0x4, 1, *(u16 *)(self + 0xE), *(u16 *)(self + 0x1A));
-        CopyPolyVtx4(c + 0x94, c + 0xA4, self + 0x8, self + 0x14, self + 0x20, self + 0x2C);
+        FillRVectors4(c + 0x94, c + 0xA4, self + 0x8, self + 0x14, self + 0x20, self + 0x2C);
 
         *(u16 *)(*(u8 **)(c + 0x94) + 0xA) = *(u16 *)(self + 0x26);
         *(u16 *)(*(u8 **)(c + 0x98) + 0xA) = *(u16 *)(self + 0x26);
@@ -416,7 +416,7 @@ void FillRVectors3(PolyVtx **dst, PolyVtx **src, PolyUV4 *uv0, PolyUV4 *uv1, Pol
     dst[2]->uv = *uv2;
 }
 
-void CopyPolyVtx4(PolyVtx **dst, PolyVtx **src, PolyUV4 *uv0, PolyUV4 *uv1, PolyUV4 *uv2, PolyUV4 *uv3) {
+void FillRVectors4(PolyVtx **dst, PolyVtx **src, PolyUV4 *uv0, PolyUV4 *uv1, PolyUV4 *uv2, PolyUV4 *uv3) {
     FillRVectors3(dst, src, uv0, uv1, uv2);
     dst[3]->xy = src[3]->xy;
     dst[3]->uv = *uv3;

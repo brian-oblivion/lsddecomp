@@ -251,7 +251,7 @@ void SubmitPolyGT4(void *arg0, void *arg1) {
         (*(OtTag **)(prim + 0x30))->addr = (u32)self;
     } else {
         FillDivPolygonHeader(gDivPolygon4, prim, self + 0x4, 1, *(u16 *)(self + 0xE), *(u16 *)(self + 0x1A));
-        CopyPolyVtx4(prim + 0x94, prim + 0xA4, self + 0x8, self + 0x14,
+        FillRVectors4(prim + 0x94, prim + 0xA4, self + 0x8, self + 0x14,
                       self + 0x20, self + 0x2C);
 
         *(u16 *)(*(u8 **)(prim + 0x94) + 0xA) = *(u16 *)(self + 0x26);
@@ -282,7 +282,7 @@ already included by the unit.)
 
 Unit: `src/code_8220_c.c`. Eighth and final sibling of the
 `SubmitPolyF3` OT-splice-or-calls family, and the largest (Gouraud-quad
-flavor: `FillDivPolygonHeader` with `a3=1`, `CopyPolyVtx4` quad copy, 4 output
+flavor: `FillDivPolygonHeader` with `a3=1`, `FillRVectors4` quad copy, 4 output
 records, two full passes of `u16` widen-stores). Calls `func_8001C474`
 (Psy-Q SDK, same `asm/psyq_rcpolygt3.s` file as `func_8001BFD4`).
 
@@ -323,7 +323,7 @@ void SubmitPolyGT4(void *arg0, void *arg1)
         }
     } else {
         FillDivPolygonHeader(gDivPolygon4, prim, self + 0x4, 1, *(u16 *)(self + 0xE), *(u16 *)(self + 0x1A));
-        CopyPolyVtx4(prim + 0x94, prim + 0xA4, self + 0x8, self + 0x14, self + 0x20, self + 0x2C);
+        FillRVectors4(prim + 0x94, prim + 0xA4, self + 0x8, self + 0x14, self + 0x20, self + 0x2C);
 
         *(u16 *)(*(u8 **)(prim + 0x94) + 0xA) = *(u16 *)(self + 0x26);
         *(u16 *)(*(u8 **)(prim + 0x98) + 0xA) = *(u16 *)(self + 0x26);
@@ -451,14 +451,14 @@ work list, not just this one. Full method and family-wide result in
 remains the register-identity + code-motion-filler class already
 documented above, unaffected by this screen.
 
-**Also: `CopyPolyVtx4` (this function's own `CopyPolyVtx4` call, described
+**Also: `FillRVectors4` (this function's own `FillRVectors4` call, described
 above/in this report's earlier sections as "also stalled this unit") is now
-MATCHED (35/35), round 20 — see `CopyPolyVtx4.md`. Its stall was a wrong
+MATCHED (35/35), round 20 — see `FillRVectors4.md`. Its stall was a wrong
 SOURCE SHAPE (an unnecessary whole-function raw-register `__asm__`
 transcription of what turned out to be ordinary struct-copy C, one array
 element past what `FillRVectors3` already handles), not a residue of this
 family's own register-identity/delay-slot-filler class. This function's own
-remaining residue is unaffected — `CopyPolyVtx4` is called via ordinary
+remaining residue is unaffected — `FillRVectors4` is called via ordinary
 `jal`, and the whole-image build is `build exit=0` after the retype, so
 nothing about this function's own call site needed to change.**
 

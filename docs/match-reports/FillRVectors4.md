@@ -1,4 +1,6 @@
-# CopyPolyVtx4 — MATCHED (35/35 words)
+# FillRVectors4 — MATCHED (35/35 words)
+
+> Renamed from `CopyPolyVtx4` on 2026-09-26 (tools/rename.py). Address 0x8001a4c0.
 
 > Renamed from `func_8001A4C0` on 2026-09-24 (tools/rename.py). Address 0x8001a4c0.
 
@@ -9,7 +11,7 @@
 > MATCH" at the end for what actually closed it and why the whole prior
 > approach could never have reached retail's own instruction sequence.
 
-Unit: `src/code_8220_c.c`. `void CopyPolyVtx4(PolyVtx **dst, PolyVtx **src,
+Unit: `src/code_8220_c.c`. `void FillRVectors4(PolyVtx **dst, PolyVtx **src,
 PolyUV4 *uv0, PolyUV4 *uv1, PolyUV4 *uv2, PolyUV4 *uv3)` — calls
 `FillRVectors3(dst, src, uv0, uv1, uv2)` (matched round 13, same unit), then
 does its own single unaligned 8-byte copy (`src[3]->xy` -> `dst[3]->xy`) and
@@ -33,7 +35,7 @@ same file, which is what actually closed it. Preserved for the record.
 
 ```c
 #if 0
-void CopyPolyVtx4(void *arg0, void *arg1, void *arg2, void *arg3, void *arg4, void *arg5)
+void FillRVectors4(void *arg0, void *arg1, void *arg2, void *arg3, void *arg4, void *arg5)
 {
     void *p1 = arg1;
     void *p0 = arg0;
@@ -219,12 +221,12 @@ inspection.
 ## ROUND 20: MATCH (35/35 words) — the tail copy is FillRVectors3's own idiom, one element further
 
 **The mistake in every attempt above: treating this function as needing a
-hand-written asm transcription at all.** Re-reading `CopyPolyVtx4`'s own
+hand-written asm transcription at all.** Re-reading `FillRVectors4`'s own
 disassembly side by side with `FillRVectors3`'s (the already-matched sibling
 this function calls) shows the tail copy is not a bespoke unaligned-copy
 routine — it is `FillRVectors3`'s own 4th-vertex case, done inline by the
 caller instead of the callee. `FillRVectors3` copies `dst[i]->xy = src[i]->xy`
-and `dst[i]->uv = *uvI` for `i = 0,1,2`; `CopyPolyVtx4`'s own body does
+and `dst[i]->uv = *uvI` for `i = 0,1,2`; `FillRVectors4`'s own body does
 exactly the same two field copies for `i = 3` — `*(arg0+0xC)` and
 `*(arg1+0xC)` are simply `dst[3]` and `src[3]` (pointer-array element 3, at
 byte offset 3*4 = 0xC), and the second copy target `(*(arg0+0xC))+0x10` is
@@ -234,7 +236,7 @@ to what `FillRVectors3` already established for elements 0-2).
 So the function is:
 
 ```c
-void CopyPolyVtx4(PolyVtx **dst, PolyVtx **src, PolyUV4 *uv0, PolyUV4 *uv1,
+void FillRVectors4(PolyVtx **dst, PolyVtx **src, PolyUV4 *uv0, PolyUV4 *uv1,
                    PolyUV4 *uv2, PolyUV4 *uv3) {
     FillRVectors3(dst, src, uv0, uv1, uv2);
     dst[3]->xy = src[3]->xy;
@@ -249,7 +251,7 @@ exact instruction shapes retail uses here too. Nothing about this residue was
 ever a genuine "no C form exists" case; it was the ordinary struct-copy
 idiom, just not recognised as the same idiom as its own sibling call.
 
-**Result: `build exit=0`, `funcdiff.py CopyPolyVtx4` reports 35/35, no
+**Result: `build exit=0`, `funcdiff.py FillRVectors4` reports 35/35, no
 drift warning.** Both the register-identity component (which registers hold
 `dst`/`src`/`uv3`) and the instruction-ORDER component (the two stack-arg
 fetches vs. the two register-to-register moves in the prologue) that ten
@@ -262,7 +264,7 @@ function's prologue and body together from ordinary C. There was never a
 all; that diagnosis was a symptom of comparing GCC's real prologue against a
 hand-written asm block's necessarily-different one.
 
-**Header change:** `CopyPolyVtx4`'s declaration in `include/code_8220.h`
+**Header change:** `FillRVectors4`'s declaration in `include/code_8220.h`
 retyped from six `void *` parameters to `PolyVtx **dst, PolyVtx **src,
 PolyUV4 *uv0, PolyUV4 *uv1, PolyUV4 *uv2, PolyUV4 *uv3` (matching
 `FillRVectors3`'s own signature plus the 4th UV). This is a change to an
@@ -285,7 +287,7 @@ CLAUDE.md's HARD RULE 6 test ("is there a C form?") for the specific case
 where the function under test CALLS a sibling that already demonstrates the
 C form: don't just ask "can C express this copy" in the abstract, ask "does
 a function three lines above already express this exact copy, just with a
-different index." The tell, in hindsight: `CopyPolyVtx4`'s own preserved
+different index." The tell, in hindsight: `FillRVectors4`'s own preserved
 asm block copied the SAME 8-byte-then-4-byte shape, at the SAME relative
 offsets (`+0x0`/`+0x10`), that `FillRVectors3`'s C body already copies for
 elements 0-2 — the index literally differs by one array slot. A register-
@@ -329,19 +331,19 @@ sibling.
   raw-encoded GTE cofunction op (`rtps`/`rtpt`/`nclip`/`avsz3`) -- real
   COP2 *data* register traffic with no C spelling, exactly the exception
   HARD RULE 6 carves out, not the "awkward-but-expressible" case that was
-  actually wrong in `CopyPolyVtx4`.** None of the 15 is an unaligned GPR
+  actually wrong in `FillRVectors4`.** None of the 15 is an unaligned GPR
   struct copy or any other construct with a plain C form standing in as
   asm -- checked each block's mnemonics individually, not just counted
   them.
 
 **No reworkable instance found anywhere in the audited set.** This
 settles the question for these seven files this round: the
-`CopyPolyVtx4` mistake (raw asm for a plain-C-expressible copy) does not
-recur in any of them. `CopyPolyVtx4` itself, now matched, remains the
+`FillRVectors4` mistake (raw asm for a plain-C-expressible copy) does not
+recur in any of them. `FillRVectors4` itself, now matched, remains the
 only confirmed instance of this mistake found so far project-wide.
 
 ## Naming (round 77, alpha)
 
-`func_8001A4C0` -> `CopyPolyVtx4`. **Tier A**: same pure-leaf-copy
+`func_8001A4C0` -> `FillRVectors4`. **Tier A**: same pure-leaf-copy
 reasoning as FillRVectors3, which this function forwards to (elements 0-2)
 before doing its own element-3 copy. Parameters unchanged.

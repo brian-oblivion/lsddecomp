@@ -211,7 +211,7 @@ figures EXACTLY, zero drift, zero compile errors:
 
 **Question 1: did the `gte.h` macro layer change anything about these nine
 register-identity verdicts? No, and the reason is structural, not a missed
-search.** Re-inspected all nine bodies (the eight above plus `CopyPolyVtx4`,
+search.** Re-inspected all nine bodies (the eight above plus `FillRVectors4`,
 already matched) directly: none of them contains, calls, or is textually
 adjacent to a single GTE/COP2 mnemonic or `gte_*` macro invocation — the same
 zero-hit result round 20 already established by grep, re-confirmed here by
@@ -1021,7 +1021,7 @@ This round's assignment asked, for this family specifically, whether the
 "$a2 vs $a1" register-identity residue that all nine OT-splice siblings
 share (`SubmitPolyF3`, `SubmitPolyF4`, `SubmitPolyG3`, `SubmitPolyFT3`,
 `SubmitPolyFT4`, `SubmitPolyG4`, `SubmitPolyGT3`, `SubmitPolyGT4`, plus
-the separately-classified `CopyPolyVtx4` — MATCHED this round, see its own
+the separately-classified `FillRVectors4` — MATCHED this round, see its own
 report) might actually be the COP2-clobber trap CLAUDE.md documents: a GPR
 clobber list on an `lwc2`/`swc2` block naming `$2`-`$5` where the
 instructions target COP2 *data* registers, forcing spurious evictions that
@@ -1033,7 +1033,7 @@ every GTE/COP2 mnemonic.**
 
 ```
 grep -cE 'swc2|lwc2|mfc2|mtc2|cfc2|ctc2|rtps|rtpt|nclip|gte' \
-  asm/nonmatchings/code_8220_c/{CopyPolyVtx4,SubmitPolyF3,SubmitPolyF4,\
+  asm/nonmatchings/code_8220_c/{FillRVectors4,SubmitPolyF3,SubmitPolyF4,\
   UpdatePolyBBoxAndCull,SubmitPolyFT3,SubmitPolyG3,SubmitPolyFT4,SubmitPolyG4,\
   SubmitPolyGT3,SubmitPolyGT4}.s
 ```
@@ -1066,16 +1066,16 @@ head-directed pass" section above for why the aggregate-assignment lever
 specifically cannot reach a constant-folded operand.
 
 **This also rules out a DIFFERENT contamination this round specifically
-checked for and did not find: the `CopyPolyVtx4` mistake (a whole-function
+checked for and did not find: the `FillRVectors4` mistake (a whole-function
 raw-register `__asm__` written for an ordinary struct copy that had a plain
 C form all along, misdiagnosed as a scheduling residue) does NOT recur
 anywhere in this nine-function family.** Every one of these nine functions'
 preserved best-body sources (see each one's own report, and the bodies
 still inlined in `src/code_8220_c.c` under `#if 0`) is already ordinary C —
 the `OtTag` bitfield splice plus the `FillDivPolygonHeader`/`FillRVectors3`/
-`CopyPolyVtx4` call sequence — with no asm block anywhere in any of them.
+`FillRVectors4` call sequence — with no asm block anywhere in any of them.
 So the two residue classes on this unit's work list are genuinely distinct:
-`CopyPolyVtx4`'s was a wrong SOURCE SHAPE (asm standing in for a callable
+`FillRVectors4`'s was a wrong SOURCE SHAPE (asm standing in for a callable
 sibling's own idiom) and closed completely; this nine-function family's is
 a residue INSIDE already-correct-shape C that six-plus reshaping axes and
 two bounded permuter searches (this function: 40000 iterations, floor 260,

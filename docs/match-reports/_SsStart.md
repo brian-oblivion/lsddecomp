@@ -489,7 +489,7 @@ change kept.
 
 Reviewed fresh this round per the coordinator's "re-derive from scratch,
 skeptical of any not-fixable verdict" standard (the same standard that
-found real progress on `CopyPolyVtx4` in a different unit and on this
+found real progress on `FillRVectors4` in a different unit and on this
 unit's own `GetRCnt`). This function's residue (case-body physical
 ordering plus a register cascade sensitive to how the default case's
 value composition is written) is a different, larger-scoped class than

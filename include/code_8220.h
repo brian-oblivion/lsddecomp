@@ -235,8 +235,8 @@ extern u8 gDivPolygon4[];
  * Extends FillRVectors3 to a 4th vertex: forwards elements 0-2 to it
  * unchanged, then does its own dst[3]->xy = src[3]->xy / dst[3]->uv = *uv3
  * (round 20). */
-extern void CopyPolyVtx4(PolyVtx **dst, PolyVtx **src, PolyUV4 *uv0, PolyUV4 *uv1, PolyUV4 *uv2,
-                         PolyUV4 *uv3);
+extern void FillRVectors4(PolyVtx **dst, PolyVtx **src, PolyUV4 *uv0, PolyUV4 *uv1, PolyUV4 *uv2,
+                          PolyUV4 *uv3);
 
 /* Psy-Q SDK (asm/psyq_rcpolyf4.s, not a carved C unit). Called by
  * SubmitPolyF4 (code_8220_c) with (self, table) -- quad-flavored sibling
