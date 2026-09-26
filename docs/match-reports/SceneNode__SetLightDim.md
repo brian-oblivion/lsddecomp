@@ -45,7 +45,7 @@ non-overlapping bitfields at `self->unk10`: shifts 0,3,6,7,8,9,28,30,31).
 
 **Not renamed -- PROPOSED only.** Proposed name: `SceneNode__SetLightDim`
 (tier A: pure bitfield accessor, shift 0 width 3, raw pass-through --
-same reasoning as the renamed siblings `SceneNode__GetSetUnk10Flag7`/
+same reasoning as the renamed siblings `SceneNode__SetUseZ`/
 `Field9`). Held back from an actual `tools/rename.py` run because this
 exact symbol is name-checked (in a comment, not a call) from
 `include/class_3bb8c.h:2360` -- a DIFFERENT unit's own vtable-slot

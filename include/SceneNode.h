@@ -103,7 +103,7 @@ struct SceneNodeSub14 {
     /* +0x06C */ u32 (*setLighting)(Self *self, s32 on);                   /* SceneNode__SetLighting */ \
     /* +0x070 */ u32 (*setLightMode)(Self *self, u32 mode);                /* SceneNode__SetLightMode */ \
     /* +0x074 */ u32 (*getSetUnk10Field0)(Self *self, u32 value);          /* SceneNode__SetLightDim */ \
-    /* +0x078 */ s32 (*getSetUnk10Flag7)(Self *self, s32 on);              /* SceneNode__GetSetUnk10Flag7 */ \
+    /* +0x078 */ s32 (*getSetUnk10Flag7)(Self *self, s32 on);              /* SceneNode__SetUseZ */ \
     /* +0x07C */ u32 (*getSetUnk10Field9)(Self *self, u32 value);          /* SceneNode__SetSubdivision */ \
     /* +0x080 */ s32 (*getSetUnk10Flag8)(Self *self, s32 on);              /* SceneNode__SetBackClip */ \
     /* +0x084 */ void (*getRotMatrix)(Self *self, void *out, s32 invert);  /* SceneNode__GetRotMatrix: RotMatrix of the (negated) rotation into a MATRIX */ \
@@ -175,7 +175,7 @@ u32 SceneNode__SetSemiTransRate(SceneNode *self, u32 rate);
 u32 SceneNode__SetLighting(SceneNode *self, s32 on);
 u32 SceneNode__SetLightMode(SceneNode *self, u32 mode);
 u32 SceneNode__SetLightDim(SceneNode *self, u32 value);
-s32 SceneNode__GetSetUnk10Flag7(SceneNode *self, s32 on);
+s32 SceneNode__SetUseZ(SceneNode *self, s32 on);
 u32 SceneNode__SetSubdivision(SceneNode *self, u32 value);
 s32 SceneNode__SetBackClip(SceneNode *self, s32 on);
 void SceneNode__GetRotMatrix(SceneNode *self, s32 out, s32 invert);

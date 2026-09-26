@@ -10,7 +10,7 @@ Round 12, runner delta. `code_d294_b`.
 
 ## Summary
 
-Same family as `SceneNode__GetSetUnk10Flag7` (see that report) -- double-inversion
+Same family as `SceneNode__SetUseZ` (see that report) -- double-inversion
 (`a1 == 0` in, `== 0` on the result) wrapper around `GetSetBitField`, shift 8
 width 1, `s32` return type.
 
@@ -50,7 +50,7 @@ None new -- extends the family census.
 
 **Not renamed -- PROPOSED only.** Proposed name: `SceneNode__SetBackClip`
 (tier A: pure bitfield accessor, shift 8 width 1, double-inverted
-boolean -- same shape as the renamed `SceneNode__GetSetUnk10Flag7`).
+boolean -- same shape as the renamed `SceneNode__SetUseZ`).
 Held back because this symbol is name-checked (in comments, not calls)
 from `src/class_3bb8c_o.c:186` and `include/class_3ac78.h:173` -- two
 different units' own vtable-slot census comments, both discussing a

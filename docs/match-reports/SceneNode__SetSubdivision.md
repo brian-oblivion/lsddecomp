@@ -38,6 +38,6 @@ None beyond the family census already noted in `SceneNode__SetLightDim.md`.
 ## Naming (round 54, bravo, track 3)
 
 Renamed from `func_8001D480` via `tools/rename.py`. **Tier A** -- same
-reasoning as `SceneNode__GetSetUnk10Flag7`: a pure bitfield accessor
+reasoning as `SceneNode__SetUseZ`: a pure bitfield accessor
 (shift 9, width 3, raw pass-through), mechanics fully known, field's
 real purpose not established. Purely local to this unit + its header.

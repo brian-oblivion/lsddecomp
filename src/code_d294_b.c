@@ -6,7 +6,7 @@
  * Covers method-table slots +0x074 through +0x0B4 (tools/classtable.py
  * gSceneNodeMethods) -- the table's own LAST 17 slots. In ROM order: four more
  * self->unk10 bitfield accessors (the sibling family code_d294.c starts;
- * two renamed this round, `SceneNode__GetSetUnk10Flag7`/`Field9`, two
+ * two renamed this round, `SceneNode__SetUseZ`/`Field9`, two
  * held back as `func_` -- proposed `Field0`/`Flag8` -- because their
  * symbol is comment-referenced from other units' own vtable census notes);
  * a rotation-matrix builder (`SceneNode__GetRotMatrix`, proposed
@@ -53,7 +53,7 @@ u32 SceneNode__SetLightDim(SceneNode *self, u32 a1) {
  * exactly that double-inversion, at shift 7 width 1, hence the same `s32`
  * return type as SceneNode__SetDisplay rather than the plain `u32` of the other
  * three siblings. */
-s32 SceneNode__GetSetUnk10Flag7(SceneNode *self, s32 a1) {
+s32 SceneNode__SetUseZ(SceneNode *self, s32 a1) {
     return GetSetBitField(&self->attribute, 7, 1, a1 == 0) == 0;
 }
 
@@ -62,7 +62,7 @@ u32 SceneNode__SetSubdivision(SceneNode *self, u32 a1) {
     return GetSetBitField(&self->attribute, 9, 3, a1);
 }
 
-/* Same family as SceneNode__GetSetUnk10Flag7: double-inversion shape, shift 8 width 1. */
+/* Same family as SceneNode__SetUseZ: double-inversion shape, shift 8 width 1. */
 s32 SceneNode__SetBackClip(SceneNode *self, s32 a1) {
     return GetSetBitField(&self->attribute, 8, 1, a1 == 0) == 0;
 }
