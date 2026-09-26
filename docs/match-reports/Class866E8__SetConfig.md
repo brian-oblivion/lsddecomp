@@ -24,7 +24,7 @@ Slot +0x040 is `Class866E8__Reset` — **gp_rel-blocked** (see
 overwrites its incoming `$a1` immediately with a `%gp_rel` global load before
 using it, so it doesn't inform whether this slot's declared type takes a
 second parameter. Since `Class866E8__SetConfig` has no other use of `$a1` besides
-saving it to `self->unk68` (no forwarding evidence, unlike `Class86668__PlaySound`'s
+saving it to `self->unk68` (no forwarding evidence, unlike `TimedTask__PlaySound`'s
 literal-argument pattern — see that report), the call is typed here as
 `slot40(self)`, one argument. The delay-slot `move` saving `arg1` into a
 temp is ordinary scheduling: the same value is needed after the call
@@ -32,7 +32,7 @@ regardless of whether it was also passed into it.
 
 ## Proposed learning
 
-None beyond what's already documented for `Class866E8` in `Class86668__PlaySound.md`.
+None beyond what's already documented for `Class866E8` in `TimedTask__PlaySound.md`.
 
 ## Naming
 

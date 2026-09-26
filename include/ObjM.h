@@ -1,23 +1,23 @@
 #ifndef OBJM_H
 #define OBJM_H
 
-#include "Class86668.h"
+#include "TimedTask.h"
 
 /*
- * ObjM -- class id 0x2F230, method table gObjMMethods: Class86668's second
- * subclass (its ctor calls Class86668__Class86668 first; the first is
+ * ObjM -- class id 0x2F230, method table gObjMMethods: TimedTask's second
+ * subclass (its ctor calls TimedTask__TimedTask first; the first is
  * Class865C8). No class derives from it. Methods, in ROM order:
  * src/class_3bb8c_k.c (New_ObjM, ctor, Finalize, OnNotify),
  * src/class_3bb8c_l.c (NoOpSlot40 through EnterState6) and
  * src/class_3bb8c_m.c (EnterState7 through GetObjMMethods). The object is
- * 0x88 bytes (New_ObjM); its own fields run from Class86668's 0x38.
+ * 0x88 bytes (New_ObjM); its own fields run from TimedTask's 0x38.
  *
  * Built by Class865C8__StartObjM (src/class_39e08.c): New_ObjM(Class865C8's
  * sound, bgm, etcTim, dreamerTmd, stage), added as a child and init'ed with
  * Class865C8's init args and its DreamSys. So the inherited
  * IntermediateBase fields hold that Class865C8's init-arg objects:
  * unk10 its FrameClock, unk14 its Class866E8, viewport its NodeGuardedViewport, and
- * Class86668's sound its VabStreamObj. Those fields keep their parents'
+ * TimedTask's sound its VabStreamObj. Those fields keep their parents'
  * `BasicClass *` types and ObjM's methods cast them (no code).
  *
  * What its methods do, measured:
@@ -76,7 +76,7 @@ struct Unk50Struct_3bb8c_l; /* styleConfig's view, include/class_3bb8c.h */
  * onDeinit (TeardownStyle), onTag1Notify, onPadEvent (DispatchPadEvent),
  * update, slot74 (TogglePause) and onState4 (NoOpSlot7C). */
 struct ObjMMethods {
-    CLASS86668_SLOTS(ObjM, (ObjM * self, BasicClass *sound, struct WBgm *bgm,
+    TIMEDTASK_SLOTS(ObjM, (ObjM * self, BasicClass *sound, struct WBgm *bgm,
                             struct TimImage *etcTim, struct LinkResource *dreamerTmd, s32 stage));
     /* +0x080 */ void (*setupSceneStyle)(ObjM *self); /* ObjM__SetupSceneStyle: PollTimBlockLoad, once the TimBlockSrc is done */
     /* +0x084 */ void (*exitSceneStyle)(ObjM *self); /* ObjM__ExitSceneStyle: TeardownStyle */
@@ -106,7 +106,7 @@ struct ObjMMethods {
 };
 
 struct ObjM {
-    CLASS86668_FIELDS(ObjMMethods);
+    TIMEDTASK_FIELDS(ObjMMethods);
     /* +0x038 */ s32 stage; /* the ctor's; Class865C8__StartObjM's stage. PickVariant, GetGridRecordAt, GetStageGridDimensions, D_80087118[stage], EnterState4 */
     /* +0x03C */ struct DreamSys *dreamSys; /* init's third argument (AttachTarget); a child. Every DreamSys slot ObjM calls */
     /* +0x040 */ s32 unk40; /* InitStyleAndWorld: 0x10; the DreamSys's resetLinkState's arg2 */
@@ -120,7 +120,7 @@ struct ObjM {
     /* +0x060 */ s32 timBlockPending; /* the ctor and InitStyleAndWorld set it; PollTimBlockLoad clears it */
     /* +0x064 */ s32 unk64; /* the ctor zeroes it; PollTimBlockLoad sets 1 before enterStyleSession */
     /* +0x068 */ s32 inSession; /* the ctor zeroes it; EnterStyleSession sets it; gates update, onPadEvent, enterStyleSession */
-    /* +0x06C */ BasicClass *ctorSound; /* the ctor's sound again (also Class86668::sound); &ctorSound is RegisterStyleConfig's arg2 (see the banner) */
+    /* +0x06C */ BasicClass *ctorSound; /* the ctor's sound again (also TimedTask::sound); &ctorSound is RegisterStyleConfig's arg2 (see the banner) */
     /* +0x070 */ struct LinkResource *dreamerTmd; /* the ctor's (Class865C8's "ETC\DREAMER.TMD"); no reader */
     /* +0x074 */ struct TimImage *etcTim; /* the ctor's (Class865C8's "ETC\ETC.TIM"); AdvancePauseSetup's New_TextRow font */
     /* +0x078 */ struct NodeGuardedViewport *cachedViewport; /* InitStyleAndWorld: IntermediateBase::viewport */

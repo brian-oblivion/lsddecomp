@@ -13,8 +13,8 @@ attempt at its final source shape).
 The ctor for the class whose method table is `gObjMMethods` (`GetObjMMethods`'s
 return value) -- this IS the function `New_ObjM`'s `New_X` allocator
 dispatches to through that vtable's `+0x008` slot. First chains to the base
-class's ctor (`GetClass86668Methods()->ctor(self, 0, arg1)`, the shared
-`Class86668Methods` accessor already declared in `include/class_39e08.h`),
+class's ctor (`GetTimedTaskMethods()->ctor(self, 0, arg1)`, the shared
+`TimedTaskMethods` accessor already declared in `include/class_39e08.h`),
 then sets `self->methods` to `GetObjMMethods()`'s vtable, fills several
 fields from its own arguments, and finally dispatches `self->methods->slot40(self)`
 as a post-construct hook.
@@ -46,8 +46,8 @@ void ObjM__ObjM(Obj87034_3bb8c_k *self, SubObjB *arg1, s32 arg2, s32 arg3, s32 a
 ```
 
 `arg1`'s type (`SubObjB *`) is fixed by the base-ctor call
-(`GetClass86668Methods()->ctor(self, 0, arg1)` dispatches through
-`Class86668Methods::ctor`, already typed `(Obj865C8 *, s32, SubObjB *)` in
+(`GetTimedTaskMethods()->ctor(self, 0, arg1)` dispatches through
+`TimedTaskMethods::ctor`, already typed `(Obj865C8 *, s32, SubObjB *)` in
 `include/class_39e08.h`) -- `arg1` is forwarded there verbatim as that
 call's `SubObjB *` argument, and separately stored into `self->unk6C`.
 
@@ -56,7 +56,7 @@ call's `SubObjB *` argument, and separately stored into `self->unk6C`.
 ```c
 void ObjM__ObjM(Obj87034_3bb8c_k *self, SubObjB *arg1, s32 arg2, s32 arg3, s32 arg4, s32 arg5)
 {
-    GetClass86668Methods()->ctor((Obj865C8 *)self, 0, arg1);
+    GetTimedTaskMethods()->ctor((Obj865C8 *)self, 0, arg1);
     self->methods = GetObjMMethods();
     self->unk64 = 0;
     self->unk68 = 0;
@@ -87,7 +87,7 @@ register reuse.
 
 Round 75 (bravo, track 3). `func_80052C10` -> `ObjM__ObjM`, **tier A**.
 
-Slot +0x008 of gObjMMethods (`tools/classtable.py 0x80087034`), the ctor New_ObjM calls. Runs the base Class86668 ctor, sets methods = GetObjMMethods(), stores its arguments and clears fields, then calls +0x040.
+Slot +0x008 of gObjMMethods (`tools/classtable.py 0x80087034`), the ctor New_ObjM calls. Runs the base TimedTask ctor, sets methods = GetObjMMethods(), stores its arguments and clears fields, then calls +0x040.
 
 Local view fields named round 75 (class_3bb8c_k's `ObjM_3bb8c_k` only):
 `pauseSetupStep` (+0x080) and `closeReady` (+0x084), tier B, from the
@@ -109,4 +109,4 @@ class_3bb8c_m, not this unit, so not applied here):
 
 ## Track 4 (2026-09-26, round 89, echo)
 
-The class is unified as ObjM in include/ObjM.h (table gObjMMethods, was D_80087034); the class_3bb8c_k/_l/_m views (ObjM_3bb8c_k, Obj87034_3bb8c_l, ObjM) and class_39e08.h's Obj4C/SubObjB/EventArg are gone. Byte-identical. Fields stored: bgm +0x054, stage +0x038, ctorSound +0x06C (the sound again, beside Class86668::sound), etcTim +0x074, dreamerTmd +0x070 (LinkResource, never read by ObjM), timBlockPending +0x060 = 1, unk64/inSession/pauseSetupStep/closeReady zeroed; the last call is resetCounters (+0x040).
+The class is unified as ObjM in include/ObjM.h (table gObjMMethods, was D_80087034); the class_3bb8c_k/_l/_m views (ObjM_3bb8c_k, Obj87034_3bb8c_l, ObjM) and class_39e08.h's Obj4C/SubObjB/EventArg are gone. Byte-identical. Fields stored: bgm +0x054, stage +0x038, ctorSound +0x06C (the sound again, beside TimedTask::sound), etcTim +0x074, dreamerTmd +0x070 (LinkResource, never read by ObjM), timBlockPending +0x060 = 1, unk64/inSession/pauseSetupStep/closeReady zeroed; the last call is resetCounters (+0x040).

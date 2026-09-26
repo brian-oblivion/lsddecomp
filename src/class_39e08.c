@@ -12,7 +12,7 @@
 
 /* The viewpoint and view-reference vectors Class865C8__OnInit hands the
  * viewport's attachViewChild: (0, -1200, 0) and (0, -1200, 10000), the data
- * right before gClass86668Methods. */
+ * right before gTimedTaskMethods. */
 extern LongVec3 D_80086650;
 extern LongVec3 D_8008665C;
 
@@ -32,7 +32,7 @@ void Class865C8__Class865C8(Class865C8 *self, IntermediateBaseInitArgs *initArgs
     LoadRequest req;
     s32 tmp;
 
-    GetClass86668Methods()->ctor((Class86668 *)self, (char *)GetSoundEffectDir(0), 0);
+    GetTimedTaskMethods()->ctor((TimedTask *)self, (char *)GetSoundEffectDir(0), 0);
     self->methods = GetClass865C8Methods();
     InitDreamAux();
     self->etcTim = New_TimImage((char *)D_800113EC);
@@ -71,13 +71,13 @@ void Class865C8__Finalize(Class865C8 *self) {
     self->dreamerTmd->methods->release(self->dreamerTmd);
     self->etcTim->methods->release(self->etcTim);
     TickDreamAuxSlots();
-    GetClass86668Methods()->finalize((Class86668 *)self);
+    GetTimedTaskMethods()->finalize((TimedTask *)self);
 }
 
 void Class865C8__OnNotify(Class865C8 *self, BasicClass *sender, s32 event) {
     s32 tag;
 
-    GetClass86668Methods()->onNotify((Class86668 *)self, sender, event);
+    GetTimedTaskMethods()->onNotify((TimedTask *)self, sender, event);
     tag = sender->methods->header;
     if ((tag & 0xFFFF) == 0x1F34) {
         self->methods->onDreamSysNotify(self, sender, event);
@@ -96,13 +96,13 @@ s32 Class865C8__Init(Class865C8 *self) {
     sub->methods->addChild(sub, self->initArgs->pad);
     sub->methods->addChild(sub, self->initArgs->frameClock);
     sub->methods->setViewport(sub, (Viewport *)self->initArgs->viewport);
-    return GetClass86668Methods()->init((Class86668 *)self, self->initArgs, 0);
+    return GetTimedTaskMethods()->init((TimedTask *)self, self->initArgs, 0);
 }
 
 void Class865C8__Deinit(Class865C8 *self) {
     DreamSys *sub = self->dreamSys;
 
-    GetClass86668Methods()->deinit((Class86668 *)self);
+    GetTimedTaskMethods()->deinit((TimedTask *)self);
     sub->methods->setViewport(sub, 0);
     sub->methods->removeChild(sub, self->initArgs->pad);
     sub->methods->removeChild(sub, self->unk10);
@@ -136,7 +136,7 @@ void Class865C8__OnDeinit(Class865C8 *self) {
 void Class865C8__AdvancePhase(Class865C8 *self, BasicClass *sender, s32 event) {
     s32 result;
 
-    GetClass86668Methods()->onTag1Notify((Class86668 *)self, sender, event);
+    GetTimedTaskMethods()->onTag1Notify((TimedTask *)self, sender, event);
     if (event == 2 && self->phase != event) {
         switch (self->phase) {
             case 1:
@@ -255,20 +255,20 @@ s32 func_8004A070(s32 arg0) {
     return result;
 }
 
-Class86668 *New_Class86668(char *soundBankPath, BasicClass *sound) {
-    Class86668 *self;
+TimedTask *New_TimedTask(char *soundBankPath, BasicClass *sound) {
+    TimedTask *self;
 
     self = BMemPMgrAlloc(0x38);
     if (self != NULL) {
-        GetClass86668Methods()->ctor(self, soundBankPath, sound);
+        GetTimedTaskMethods()->ctor(self, soundBankPath, sound);
         return self;
     }
     return NULL;
 }
 
-void Class86668__Class86668(Class86668 *self, char *soundBankPath, BasicClass *sound) {
+void TimedTask__TimedTask(TimedTask *self, char *soundBankPath, BasicClass *sound) {
     Get_vtable_IntermediateBase()->ctor((IntermediateBase *)self);
-    self->methods = GetClass86668Methods();
+    self->methods = GetTimedTaskMethods();
     if (soundBankPath != NULL) {
         self->sound = (BasicClass *)New_VabStreamObj(soundBankPath);
     } else {
@@ -278,37 +278,37 @@ void Class86668__Class86668(Class86668 *self, char *soundBankPath, BasicClass *s
     self->methods->resetCounters(self);
 }
 
-void Class86668__Finalize(Class86668 *self) {
+void TimedTask__Finalize(TimedTask *self) {
     if (self->soundBankPath != NULL) {
         self->sound->methods->release(self->sound);
     }
     Get_vtable_IntermediateBase()->finalize((IntermediateBase *)self);
 }
 
-void Class86668__CancelTimeout(Class86668 *self) {
+void TimedTask__CancelTimeout(TimedTask *self) {
     self->methods->setTimeout(self, -1);
 }
 
-s32 Class86668__Init(Class86668 *self, IntermediateBaseInitArgs *args, s32 mode) {
+s32 TimedTask__Init(TimedTask *self, IntermediateBaseInitArgs *args, s32 mode) {
     self->result = 0;
     Get_vtable_IntermediateBase()->init((IntermediateBase *)self, args, mode);
     return self->result;
 }
 
-void Class86668__Deinit(Class86668 *self) {
+void TimedTask__Deinit(TimedTask *self) {
     Get_vtable_IntermediateBase()->deinit((IntermediateBase *)self);
 }
 
-void Class86668__NoOpSlot58(void) {}
+void TimedTask__NoOpSlot58(void) {}
 
-void Class86668__CheckTimeout(Class86668 *self, BasicClass *sender, s32 event) {
+void TimedTask__CheckTimeout(TimedTask *self, BasicClass *sender, s32 event) {
     Get_vtable_IntermediateBase()->update((IntermediateBase *)self, sender, event);
     if ((u32)self->frameCounter > (u32)self->timeoutFrames) {
         self->methods->setState(self, 4);
     }
 }
 
-void Class86668__SetState(Class86668 *self, s32 state) {
+void TimedTask__SetState(TimedTask *self, s32 state) {
     Get_vtable_IntermediateBase()->setState((IntermediateBase *)self, state);
     if (state == 4) {
         self->result = 1;
@@ -316,6 +316,6 @@ void Class86668__SetState(Class86668 *self, s32 state) {
     }
 }
 
-void Class86668__SetTimeout(Class86668 *self, s32 timeout) {
+void TimedTask__SetTimeout(TimedTask *self, s32 timeout) {
     self->timeoutFrames = (timeout < 0) ? timeout : timeout * 20;
 }

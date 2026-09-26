@@ -1,6 +1,8 @@
-# Class86668__SetState
+# TimedTask__SetState
 
-> Renamed from `Class86668__OnEventArg` on 2026-09-25 (tools/rename.py). Address 0x8004a3ec.
+> Renamed from `Class86668__SetState` on 2026-09-26 (tools/rename.py). Address 0x8004a3ec.
+
+> Renamed from `TimedTask__OnEventArg` on 2026-09-25 (tools/rename.py). Address 0x8004a3ec.
 
 > Renamed from `Obj865C8__OnEventArg` on 2026-09-23 (tools/rename.py). Address 0x8004a3ec.
 
@@ -11,8 +13,8 @@
 ## What it does
 
 Method-table slot +0x060, shared VERBATIM (same function address) between
-`gClass865C8Methods` and its sibling `gClass86668Methods` -- confirmed by
-`tools/classtable.py`, both tables list `Class86668__SetState` at +0x060. Always
+`gClass865C8Methods` and its sibling `gTimedTaskMethods` -- confirmed by
+`tools/classtable.py`, both tables list `TimedTask__SetState` at +0x060. Always
 forwards to the BASE class's own +0x060 implementation first (return value
 discarded), then -- based on the ORIGINAL argument, not the base call's
 return -- sets a flag and notifies through the class's own +0x07C slot.
@@ -40,7 +42,7 @@ jalr  $v0
 Written as:
 
 ```c
-void Class86668__SetState(Obj865C8 *self, s32 arg1) {
+void TimedTask__SetState(Obj865C8 *self, s32 arg1) {
     Get_vtable_IntermediateBase()->slot60(self, arg1);
     if (arg1 == 4) {
         self->unk28 = 1;
@@ -67,8 +69,8 @@ not a real retail fact.
 
 ## Naming
 
-`Class86668__OnEventArg` -- tier B. Occupies +0x060 (matches the header's pre-existing `onEventArg` field name, shared verbatim with `gClass86668Methods` at the same offset). Forwards to the base, and on `arg1 == 4` (the code `CheckTimeout` raises) sets `eventCode = 1` and calls `Noop7C`.
+`TimedTask__OnEventArg` -- tier B. Occupies +0x060 (matches the header's pre-existing `onEventArg` field name, shared verbatim with `gTimedTaskMethods` at the same offset). Forwards to the base, and on `arg1 == 4` (the code `CheckTimeout` raises) sets `eventCode = 1` and calls `Noop7C`.
 
 ## Track 4
 
-2026-09-25, round 84 (bravo): class unified in `include/Class86668.h`. Renamed from `Class86668__OnEventArg`, tier A: it occupies +0x060, IntermediateBase's `setState` slot (IntermediateBase__SetState in the parent table), and its first call is the base setState with the same argument. For state 4 it also sets `result` (was `eventCode`) = 1 and calls +0x07C, now named `onState4` (NULL in this class's own 0x80-byte table; empty Class865C8__OnState4 and ObjM__NoOpSlot7C in the subclasses). State 4 is what Class86668__CheckTimeout raises. Signature `(Class86668 *self, s32 state)`. Image byte-identical.
+2026-09-25, round 84 (bravo): class unified in `include/TimedTask.h`. Renamed from `TimedTask__OnEventArg`, tier A: it occupies +0x060, IntermediateBase's `setState` slot (IntermediateBase__SetState in the parent table), and its first call is the base setState with the same argument. For state 4 it also sets `result` (was `eventCode`) = 1 and calls +0x07C, now named `onState4` (NULL in this class's own 0x80-byte table; empty Class865C8__OnState4 and ObjM__NoOpSlot7C in the subclasses). State 4 is what TimedTask__CheckTimeout raises. Signature `(TimedTask *self, s32 state)`. Image byte-identical.

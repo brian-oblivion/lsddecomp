@@ -288,7 +288,7 @@ void Class6D3C8__NoOpSlot5C(void) {}
 
 /* Builds a Class865C8 (include/Class865C8.h), runs its init with self
  * alone (Class865C8__Init takes nothing else, hence Class865C8InitFn) and
- * releases it; init's return, Class86668::result, is a status code: 2 runs Class6D3C8__StartCinematicStream, 3 latches self->skipGraphRoomPoll.
+ * releases it; init's return, TimedTask::result, is a status code: 2 runs Class6D3C8__StartCinematicStream, 3 latches self->skipGraphRoomPoll.
  * Then queries the DreamSys status slot again (as Class6D3C8__PollGraphRoomStatus does),
  * this time passing an out-param, and derives a 0/1 result from both the
  * call's return and the out-param. */

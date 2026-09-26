@@ -1,4 +1,6 @@
-# Class86668__CheckTimeout — MATCHED (34/34 words)
+# TimedTask__CheckTimeout — MATCHED (34/34 words)
+
+> Renamed from `Class86668__CheckTimeout` on 2026-09-26 (tools/rename.py). Address 0x8004a364.
 
 > Renamed from `Obj865C8__CheckTimeout` on 2026-09-23 (tools/rename.py). Address 0x8004a364.
 
@@ -40,7 +42,7 @@ jr $ra
 ## Final C
 
 ```c
-void Class86668__CheckTimeout(Obj865C8 *self, s32 arg1, s32 arg2) {
+void TimedTask__CheckTimeout(Obj865C8 *self, s32 arg1, s32 arg2) {
     Get_vtable_IntermediateBase()->slot5C(self, arg1, arg2);
     if ((u32)self->unk1C > (u32)self->unk2C) {
         self->methods->onEventArg(self, 4);
@@ -84,8 +86,8 @@ assuming a scheduling quirk.
 
 ## Naming
 
-`Class86668__CheckTimeout` -- tier B. Occupies +0x05C. Forwards to the base's own +0x05C (`IntermediateBase__IncrementFrameCounter`, code_2cc8c.h) then compares `frameCounter > timeoutFrames`, triggering `onEventArg(self, 4)` on overflow -- a timeout check by construction, though what the timeout gates in-game is not established.
+`TimedTask__CheckTimeout` -- tier B. Occupies +0x05C. Forwards to the base's own +0x05C (`IntermediateBase__IncrementFrameCounter`, code_2cc8c.h) then compares `frameCounter > timeoutFrames`, triggering `onEventArg(self, 4)` on overflow -- a timeout check by construction, though what the timeout gates in-game is not established.
 
 ## Track 4
 
-2026-09-25, round 84 (bravo): class unified in `include/Class86668.h`. Not renamed. It fills IntermediateBase's `update` slot (+0x05C) and does more than the base's frame count, so the name keeps the part it adds. Signature `(Class86668 *self, BasicClass *sender, s32 event)`, the base update's; the call it makes on timeout is the `setState` slot (was `onEventArg`) with 4. Image byte-identical.
+2026-09-25, round 84 (bravo): class unified in `include/TimedTask.h`. Not renamed. It fills IntermediateBase's `update` slot (+0x05C) and does more than the base's frame count, so the name keeps the part it adds. Signature `(TimedTask *self, BasicClass *sender, s32 event)`, the base update's; the call it makes on timeout is the `setState` slot (was `onEventArg`) with 4. Image byte-identical.

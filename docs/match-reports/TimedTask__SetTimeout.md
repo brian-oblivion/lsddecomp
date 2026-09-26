@@ -1,4 +1,6 @@
-# Class86668__SetTimeout
+# TimedTask__SetTimeout
+
+> Renamed from `Class86668__SetTimeout` on 2026-09-26 (tools/rename.py). Address 0x8004a458.
 
 > Renamed from `Obj865C8__SetTimeout` on 2026-09-23 (tools/rename.py). Address 0x8004a458.
 
@@ -9,7 +11,7 @@
 ## What it does
 
 Method-table slot +0x06C, shared verbatim between `gClass865C8Methods` and
-`gClass86668Methods` (same address in both tables). Sets `self->unk2C` to `arg1`
+`gTimedTaskMethods` (same address in both tables). Sets `self->unk2C` to `arg1`
 unconditionally, then overwrites it with `arg1 * 20` if `arg1` is
 non-negative.
 
@@ -30,7 +32,7 @@ jr    $ra
 Written as:
 
 ```c
-void Class86668__SetTimeout(Obj865C8 *self, s32 arg1) {
+void TimedTask__SetTimeout(Obj865C8 *self, s32 arg1) {
     self->unk2C = (arg1 < 0) ? arg1 : arg1 * 20;
 }
 ```
@@ -47,8 +49,8 @@ None beyond what's already documented.
 
 ## Naming
 
-`Class86668__SetTimeout` -- tier A. Pure setter/converter: stores its argument verbatim if negative, else multiplied by 20 (a units-to-frames conversion) into `timeoutFrames`; mechanics are its purpose.
+`TimedTask__SetTimeout` -- tier A. Pure setter/converter: stores its argument verbatim if negative, else multiplied by 20 (a units-to-frames conversion) into `timeoutFrames`; mechanics are its purpose.
 
 ## Track 4
 
-2026-09-25, round 84 (bravo): class unified in `include/Class86668.h`. Not renamed. Slot +0x06C, `setTimeout`, the first of this class's own slots; parameter `timeout`, stored as `timeout * 20` frames or kept when negative (Class86668__CancelTimeout's -1 never fires, CheckTimeout comparing unsigned). Image byte-identical.
+2026-09-25, round 84 (bravo): class unified in `include/TimedTask.h`. Not renamed. Slot +0x06C, `setTimeout`, the first of this class's own slots; parameter `timeout`, stored as `timeout * 20` frames or kept when negative (TimedTask__CancelTimeout's -1 never fires, CheckTimeout comparing unsigned). Image byte-identical.

@@ -166,7 +166,7 @@ void ObjM__CloseAndNotifyC(ObjM *self) {
 
 /* The pause: step 0 builds the "Pause" TextRow under the Class866E8; the
  * fourth call after it hides the viewport and pauses the FrameClock, the
- * WBgm and the VabStreamObj (IntermediateBase::unk10, bgm, Class86668::sound). */
+ * WBgm and the VabStreamObj (IntermediateBase::unk10, bgm, TimedTask::sound). */
 void ObjM__AdvancePauseSetup(ObjM *self) {
     s32 state = self->pauseSetupStep;
     if (state == 0) {

@@ -15,11 +15,11 @@ addu  $s1, $a0, $zero        ; s1 = self
 sw    $ra, 0x18($sp)
 sw    $s0, 0x10($sp)
 lw    $s0, 0x38($s1)         ; s0 = self->unk38
-jal   GetClass86668Methods
+jal   GetTimedTaskMethods
  nop
-lw    $v0, 0x48($v0)         ; gClass86668Methods's own +0x048
+lw    $v0, 0x48($v0)         ; gTimedTaskMethods's own +0x048
 jalr  $v0
- addu $a0, $s1, $zero        ; GetClass86668Methods()->slot48(self)
+ addu $a0, $s1, $zero        ; GetTimedTaskMethods()->slot48(self)
 lw    $v0, 0x0($s0)          ; s0->methods
 addu  $a0, $s0, $zero
 lw    $v0, 0x110($v0)        ; methods->slot110
@@ -40,9 +40,9 @@ jalr  $v0
 jr $ra
 ```
 
-`GetClass86668Methods()->slot48` is gClass86668Methods's own +0x048, which is
-`Class86668__Deinit` (this unit, already matched:
-`void Class86668__Deinit(Obj865C8 *self) { Get_vtable_IntermediateBase()->slot48(self); }`) —
+`GetTimedTaskMethods()->slot48` is gTimedTaskMethods's own +0x048, which is
+`TimedTask__Deinit` (this unit, already matched:
+`void TimedTask__Deinit(Obj865C8 *self) { Get_vtable_IntermediateBase()->slot48(self); }`) —
 i.e. this function forwards to the SIBLING class's slot48 override
 explicitly, not to its own (`Class865C8__Deinit` itself occupies `gClass865C8Methods`'s
 +0x048 slot — this is a self-referential-looking but actually cross-class
@@ -54,7 +54,7 @@ call, resolved by `tools/classtable.py`, not by inspection).
 void Class865C8__Deinit(Obj865C8 *self) {
     SubObjD *sub = self->unk38;
 
-    GetClass86668Methods()->slot48(self);
+    GetTimedTaskMethods()->slot48(self);
     sub->methods->slot110(sub, 0);
     sub->methods->slot14(sub, self->unk0C->unk4);
     sub->methods->slot14(sub, self->unk10);
@@ -80,8 +80,8 @@ void Class865C8__Deinit(Obj865C8 *self) {
 - New opaque type `SubObjD`/`SubObjDMethods` (vtable at offset 0, slots
   `+0x014` and `+0x110` reached here), same "only the dispatched slots
   named" policy as `SubObjA`/`SubObjB`/`Obj4C`.
-- `Class86668Methods::slot48` added at +0x048, typed `void (*)(Obj865C8
-  *self)` — occupied by this unit's own already-matched `Class86668__Deinit`.
+- `TimedTaskMethods::slot48` added at +0x048, typed `void (*)(Obj865C8
+  *self)` — occupied by this unit's own already-matched `TimedTask__Deinit`.
 
 ## Attempts
 
@@ -102,8 +102,8 @@ matches.
 
 ## Naming
 
-`Class865C8__Deinit` -- tier B. Occupies +0x048, the mirror of Init's slot (`gIntermediateBaseMethods`'s +0x048 forwards to `IntermediateBase__Deinit`). Undoes what Init configured on the sub-object and forwards to `Class86668__Deinit`; the same caveat as Init applies to its specific purpose here.
+`Class865C8__Deinit` -- tier B. Occupies +0x048, the mirror of Init's slot (`gIntermediateBaseMethods`'s +0x048 forwards to `IntermediateBase__Deinit`). Undoes what Init configured on the sub-object and forwards to `TimedTask__Deinit`; the same caveat as Init applies to its specific purpose here.
 
 ## Track 4 (2026-09-26, round 88, Class865C8)
 
-The class (table D_800865C8, id 0x1F230, Class86668's subclass) is unified as Class865C8 in include/Class865C8.h; the Obj865C8/Class865C8Methods views in class_39e08.h are gone. Prefix only. Accessors: unk38 -> dreamSys, unk0C->unk4 -> initArgs->unk4, unk10 -> IntermediateBase's unk10.
+The class (table D_800865C8, id 0x1F230, TimedTask's subclass) is unified as Class865C8 in include/Class865C8.h; the Obj865C8/Class865C8Methods views in class_39e08.h are gone. Prefix only. Accessors: unk38 -> dreamSys, unk0C->unk4 -> initArgs->unk4, unk10 -> IntermediateBase's unk10.

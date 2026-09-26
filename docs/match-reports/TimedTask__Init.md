@@ -1,10 +1,12 @@
-# Class86668__Init — MATCHED (24/24 words)
+# TimedTask__Init — MATCHED (24/24 words)
+
+> Renamed from `Class86668__Init` on 2026-09-26 (tools/rename.py). Address 0x8004a2c4.
 
 > Renamed from `func_8004A2C4` on 2026-09-23 (tools/rename.py). Address 0x8004a2c4.
 
-`Obj865C8`'s vtable slot +0x044 (`Class86668Methods`, i.e. the sibling class
-`gClass86668Methods` overriding `gClass865C8Methods`'s +0x044 — see `class_39e08.h`'s existing
-note that this function is one of gClass86668Methods's known overrides at
+`Obj865C8`'s vtable slot +0x044 (`TimedTaskMethods`, i.e. the sibling class
+`gTimedTaskMethods` overriding `gClass865C8Methods`'s +0x044 — see `class_39e08.h`'s existing
+note that this function is one of gTimedTaskMethods's known overrides at
 +0x008/+0x00C/+0x040/+0x044/+0x048).
 
 ## Disassembly shape
@@ -36,7 +38,7 @@ jr    $ra
 ## Final C
 
 ```c
-s32 Class86668__Init(Obj865C8 *self, s32 arg1, s32 arg2) {
+s32 TimedTask__Init(Obj865C8 *self, s32 arg1, s32 arg2) {
     self->unk28 = 0;
     Get_vtable_IntermediateBase()->slot44(self, arg1, arg2);
     return self->unk28;
@@ -61,8 +63,8 @@ different delegation chain: `Get_vtable_IntermediateBase()->slot44(self, a1, a2)
 self->unk38;` — no pre-zero, just call-then-return. This function pre-zeroes
 `self->unk28` in the `jal`'s own delay slot before the call and reads it back
 after, i.e. "default value, base call may overwrite" rather than "base call
-always sets it" — consistent with `Class86668__Init` being an *override* of this
-slot for `gClass86668Methods` while `TaskCore__Init` is a different class occupying
+always sets it" — consistent with `TimedTask__Init` being an *override* of this
+slot for `gTimedTaskMethods` while `TaskCore__Init` is a different class occupying
 the analogous position in its own chain.
 
 ## Attempts
@@ -75,15 +77,15 @@ the analogous position in its own chain.
 `Get_vtable_IntermediateBase()` (table `gIntermediateBaseMethods`) slot +0x044 is confirmed
 `void (*)(void *self, s32 arg1, s32 arg2)` from two independent call sites in
 two different units (`code_2c054.c`'s `TaskCore__Init`, this unit's
-`Class86668__Init`) — both immediately store the same two register-passed
+`TimedTask__Init`) — both immediately store the same two register-passed
 arguments into the call and immediately read a `self`-relative `s32` field
 back out. Worth typing consistently anywhere else this same accessor/slot
 pair turns up.
 
 ## Naming
 
-`Class86668__Init` -- tier B. Occupies +0x044 (the same Init-slot convention as `Class865C8__Init`, see above): zeroes `eventCode`, forwards to the base's own +0x044, returns `eventCode`. Named by slot-offset convention, not by an established in-game meaning.
+`TimedTask__Init` -- tier B. Occupies +0x044 (the same Init-slot convention as `Class865C8__Init`, see above): zeroes `eventCode`, forwards to the base's own +0x044, returns `eventCode`. Named by slot-offset convention, not by an established in-game meaning.
 
 ## Track 4
 
-2026-09-25, round 84 (bravo): class unified in `include/Class86668.h`. Not renamed. Signature `s32 (Class86668 *self, IntermediateBaseInitArgs *args, s32 mode)`, IntermediateBase's `init` slot; `eventCode` is `result`, which Class6D3C8__PollStatusObj switches on through Obj865C8 (1 is a timeout, Class86668__SetState's state 4). Class865C8__Init and ObjM__AttachTarget call it as `GetClass86668Methods()->init((Class86668 *)self, (IntermediateBaseInitArgs *)..., mode)`. Image byte-identical.
+2026-09-25, round 84 (bravo): class unified in `include/TimedTask.h`. Not renamed. Signature `s32 (TimedTask *self, IntermediateBaseInitArgs *args, s32 mode)`, IntermediateBase's `init` slot; `eventCode` is `result`, which Class6D3C8__PollStatusObj switches on through Obj865C8 (1 is a timeout, TimedTask__SetState's state 4). Class865C8__Init and ObjM__AttachTarget call it as `GetTimedTaskMethods()->init((TimedTask *)self, (IntermediateBaseInitArgs *)..., mode)`. Image byte-identical.

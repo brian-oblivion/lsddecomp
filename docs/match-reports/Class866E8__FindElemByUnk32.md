@@ -89,7 +89,7 @@ comparison against a plain `s32 key`, decoded as signed). 15/15.
 ### Proposed learning
 
 None new — same signed/unsigned halfword lesson already documented
-elsewhere this project (`Class86668__CheckTimeout`, `class_39e08`).
+elsewhere this project (`TimedTask__CheckTimeout`, `class_39e08`).
 
 ## Naming
 

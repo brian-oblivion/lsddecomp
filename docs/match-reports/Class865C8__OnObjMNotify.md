@@ -162,4 +162,4 @@ the 4-byte struct compiles to the same frame.
 
 ## Track 4 (2026-09-26, round 88, Class865C8)
 
-The class (table D_800865C8, id 0x1F230, Class86668's subclass) is unified as Class865C8 in include/Class865C8.h; the Obj865C8/Class865C8Methods views in class_39e08.h are gone. Renamed from Obj865C8__OnTag2Notify: own slot +0x084, which Class865C8__OnNotify calls for a sender whose id & 0xFFFFF is 0x2F230 (gObjMMethods, the ObjM StartObjM builds). Events 4/0xC/0xD end the day through the DreamSys and set Class86668's `result` then setState(3); 5..8 and 0xA set phase 3.
+The class (table D_800865C8, id 0x1F230, TimedTask's subclass) is unified as Class865C8 in include/Class865C8.h; the Obj865C8/Class865C8Methods views in class_39e08.h are gone. Renamed from Obj865C8__OnTag2Notify: own slot +0x084, which Class865C8__OnNotify calls for a sender whose id & 0xFFFFF is 0x2F230 (gObjMMethods, the ObjM StartObjM builds). Events 4/0xC/0xD end the day through the DreamSys and set TimedTask's `result` then setState(3); 5..8 and 0xA set phase 3.

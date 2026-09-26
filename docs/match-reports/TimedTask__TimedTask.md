@@ -1,10 +1,12 @@
-# Class86668__Class86668 — MATCHED (35/35 words)
+# TimedTask__TimedTask — MATCHED (35/35 words)
+
+> Renamed from `Class86668__Class86668` on 2026-09-26 (tools/rename.py). Address 0x8004a19c.
 
 > Renamed from `func_8004A19C` on 2026-09-23 (tools/rename.py). Address 0x8004a19c.
 
-`Class86668Methods` slot +0x008: `gClass86668Methods`'s own constructor, occupying
-the same slot `New_Class86668` (the `New_X` allocator for this class) calls
-as `GetClass86668Methods()->ctor(self, arg1, arg2)`.
+`TimedTaskMethods` slot +0x008: `gTimedTaskMethods`'s own constructor, occupying
+the same slot `New_TimedTask` (the `New_X` allocator for this class) calls
+as `GetTimedTaskMethods()->ctor(self, arg1, arg2)`.
 
 ## Disassembly shape
 
@@ -22,7 +24,7 @@ lw    $v0, 0x8($v0)          ; base ctor slot
 nop
 jalr  $v0
  addu $a0, $s0, $zero        ; base ctor(self) -- only self set up, no other args
-jal   GetClass86668Methods
+jal   GetTimedTaskMethods
  nop
 beqz  $s1, .L8004A1F0
  sw   $v0, 0x0($s0)          ; self->methods = vtable  (delay slot -- unconditional)
@@ -45,9 +47,9 @@ jr $ra
 ## Final C
 
 ```c
-void Class86668__Class86668(Obj865C8 *self, s32 arg1, SubObjB *arg2) {
+void TimedTask__TimedTask(Obj865C8 *self, s32 arg1, SubObjB *arg2) {
     Get_vtable_IntermediateBase()->ctor(self);
-    self->methods = (Class865C8Methods *)GetClass86668Methods();
+    self->methods = (Class865C8Methods *)GetTimedTaskMethods();
     if (arg1 != 0) {
         self->subB = New_VabStreamObj(arg1);
     } else {
@@ -59,9 +61,9 @@ void Class86668__Class86668(Obj865C8 *self, s32 arg1, SubObjB *arg2) {
 ```
 
 Note: at the point of the last call, `self->methods` has already been
-reassigned to `GetClass86668Methods()`'s table (`gClass86668Methods`), so the runtime
-target of `self->methods->resetUnk3C(self)` is `gClass86668Methods`'s own +0x040
-override (`Class86668__CancelTimeout`), not `Class865C8__ResetPhase`. The FIELD name
+reassigned to `GetTimedTaskMethods()`'s table (`gTimedTaskMethods`), so the runtime
+target of `self->methods->resetUnk3C(self)` is `gTimedTaskMethods`'s own +0x040
+override (`TimedTask__CancelTimeout`), not `Class865C8__ResetPhase`. The FIELD name
 (`resetUnk3C`, chosen from `gClass865C8Methods`'s occupant of that slot) still
 describes the right SIGNATURE for the shared struct layout; only the actual
 function invoked at runtime differs by which vtable `self->methods` points
@@ -73,14 +75,14 @@ at. No behavioral ambiguity, just a naming note for the next reader.
   *self)` — called with only `self` set up, matching the base-ctor shape
   elsewhere in the project (e.g. `BasicClassMethods::ctor` in
   `class_16334.h`).
-- `Class86668Methods::ctor` retyped from the placeholder `void *(*ctor)(void
+- `TimedTaskMethods::ctor` retyped from the placeholder `void *(*ctor)(void
   *self, void *arg1, void *arg2)` to the real signature `void (*ctor)(Obj865C8
   *self, s32 arg1, SubObjB *arg2)`. Void: this function's OWN body never
   materializes a return value in `$v0` before its final `jr $ra` — the
-  callee-side reading, independent of `New_Class86668`'s caller-side
+  callee-side reading, independent of `New_TimedTask`'s caller-side
   discarding of the same call (which by itself would NOT be enough evidence,
   per CLAUDE.md's "a discarded return is never evidence of void").
-- `Class86668Methods` instances documented as sharing `Obj865C8`'s own
+- `TimedTaskMethods` instances documented as sharing `Obj865C8`'s own
   layout: this constructor writes `unk30`/`subB` at exactly the offsets
   `Obj865C8`'s other (gClass865C8Methods-side) functions already use, so no second
   parallel struct was introduced.
@@ -105,16 +107,16 @@ particular call site once a subclass's vtable is installed.
 
 ## Naming
 
-`Class86668__Class86668` -- tier A. The sibling class's own ctor (+0x008 of `gClass86668Methods`), matching the `Class__Class` convention; called by `New_Class86668`.
+`TimedTask__TimedTask` -- tier A. The sibling class's own ctor (+0x008 of `gTimedTaskMethods`), matching the `Class__Class` convention; called by `New_TimedTask`.
 
 ## Track 4
 
-2026-09-25, round 84 (bravo): class unified in `include/Class86668.h`. Not renamed. Signature `(Class86668 *self, char *soundBankPath, BasicClass *sound)`; `unk30`/`subB` are `soundBankPath`/`sound`, and the final call is IntermediateBase's `resetCounters` slot (was `resetState`), which this class fills with Class86668__CancelTimeout. Its first call is IntermediateBase's ctor, and both subclass ctors (Class865C8__Class865C8, ObjM__ObjM) call this one first, so the id tree's parent links hold. Image byte-identical.
+2026-09-25, round 84 (bravo): class unified in `include/TimedTask.h`. Not renamed. Signature `(TimedTask *self, char *soundBankPath, BasicClass *sound)`; `unk30`/`subB` are `soundBankPath`/`sound`, and the final call is IntermediateBase's `resetCounters` slot (was `resetState`), which this class fills with TimedTask__CancelTimeout. Its first call is IntermediateBase's ctor, and both subclass ctors (Class865C8__Class865C8, ObjM__ObjM) call this one first, so the id tree's parent links hold. Image byte-identical.
 
 ## Track 4 (2026-09-26, round 87, VabStreamObj)
 
 `include/class_39e08.h`'s local `extern BasicClass *New_VabStreamObj(char *)`
 is deleted. `src/class_39e08.c` now includes `include/VabStreamObj.h`, where
 the allocator returns `VabStreamObj *`, and casts the result to
-`BasicClass *` for `Class86668::sound`. The whole image stays
+`BasicClass *` for `TimedTask::sound`. The whole image stays
 byte-identical.

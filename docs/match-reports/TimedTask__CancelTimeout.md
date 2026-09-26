@@ -1,4 +1,6 @@
-# Class86668__CancelTimeout
+# TimedTask__CancelTimeout
+
+> Renamed from `Class86668__CancelTimeout` on 2026-09-26 (tools/rename.py). Address 0x8004a294.
 
 > Renamed from `func_8004A294` on 2026-09-23 (tools/rename.py). Address 0x8004a294.
 
@@ -6,8 +8,8 @@
 
 ## What it does
 
-Method-table slot +0x040 of `gClass86668Methods` (the sibling class, see
-`Class86668__Finalize.md` for how the sibling relationship was established). A
+Method-table slot +0x040 of `gTimedTaskMethods` (the sibling class, see
+`TimedTask__Finalize.md` for how the sibling relationship was established). A
 one-line wrapper: dispatches through `self->methods` at +0x06C with a
 sentinel argument of -1.
 
@@ -23,19 +25,19 @@ jalr  $v0
 Written as:
 
 ```c
-void Class86668__CancelTimeout(Obj865C8 *self) {
+void TimedTask__CancelTimeout(Obj865C8 *self) {
     self->methods->setUnk2C(self, -1);
 }
 ```
 
 Return type is `void`, not "unknown wrapper, assume the callee's type" --
 this is NOT the ambiguous one-line-wrapper case CLAUDE.md warns about,
-because the callee (`+0x06C`, `Class86668__SetTimeout`, this unit's own function,
+because the callee (`+0x06C`, `TimedTask__SetTimeout`, this unit's own function,
 matched the same round) is confirmed void from its own disassembly: it ends
 `jr $ra` / `nop` with no `$v0` ever set. Positive evidence, not silence.
 
 `self->methods` is typed `Class865C8Methods *` even though the runtime
-object is (per its ctor, `gClass86668Methods`) a sibling-class instance: both
+object is (per its ctor, `gTimedTaskMethods`) a sibling-class instance: both
 tables agree on the field type at +0x06C (confirmed identical function
 address in `tools/classtable.py 0x800865C8 --vs 0x8006E878` /
 `0x80086668 --vs 0x8006E878`), so one struct type serves both call sites
@@ -47,8 +49,8 @@ None beyond what's already documented.
 
 ## Naming
 
-`Class86668__CancelTimeout` -- tier A. Occupies `gClass86668Methods` +0x040; one-line wrapper calling `self->methods->setTimeout(self, -1)` (the sentinel `SetTimeout` itself documents as 'disabled'). Mechanics are its purpose.
+`TimedTask__CancelTimeout` -- tier A. Occupies `gTimedTaskMethods` +0x040; one-line wrapper calling `self->methods->setTimeout(self, -1)` (the sentinel `SetTimeout` itself documents as 'disabled'). Mechanics are its purpose.
 
 ## Track 4
 
-2026-09-25, round 84 (bravo): class unified in `include/Class86668.h`. Not renamed. It fills IntermediateBase's `resetCounters` slot (+0x040) but does not chain to IntermediateBase__ResetCounters: its whole body is `setTimeout(-1)`, so the name says what it does rather than what the slot is. `self` is `Class86668 *`. Image byte-identical.
+2026-09-25, round 84 (bravo): class unified in `include/TimedTask.h`. Not renamed. It fills IntermediateBase's `resetCounters` slot (+0x040) but does not chain to IntermediateBase__ResetCounters: its whole body is `setTimeout(-1)`, so the name says what it does rather than what the slot is. `self` is `TimedTask *`. Image byte-identical.

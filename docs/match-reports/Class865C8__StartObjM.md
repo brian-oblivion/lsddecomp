@@ -129,7 +129,7 @@ was reconfirmed at 33/33 after each retyping pass.
 
 ## Track 4 (2026-09-26, round 88, Class865C8)
 
-The class (table D_800865C8, id 0x1F230, Class86668's subclass) is unified as Class865C8 in include/Class865C8.h; the Obj865C8/Class865C8Methods views in class_39e08.h are gone. Renamed from Obj865C8__EnterState2: builds New_ObjM(sound, bgm, etcTim, dreamerTmd, stage), keeps it at +0x04C (objM), adds it as a child, calls its init (+0x044) with (initArgs, dreamSys), phase = 2. Not a slot.
+The class (table D_800865C8, id 0x1F230, TimedTask's subclass) is unified as Class865C8 in include/Class865C8.h; the Obj865C8/Class865C8Methods views in class_39e08.h are gone. Renamed from Obj865C8__EnterState2: builds New_ObjM(sound, bgm, etcTim, dreamerTmd, stage), keeps it at +0x04C (objM), adds it as a child, calls its init (+0x044) with (initArgs, dreamSys), phase = 2. Not a slot.
 
 
 ## Track 4 (2026-09-26, round 89, echo)

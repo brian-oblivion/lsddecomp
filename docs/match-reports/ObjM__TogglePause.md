@@ -80,4 +80,4 @@ Round 78 (charlie), FINISHING-PLAN track 3.
 
 ## Track 4 (2026-09-26, round 89, echo)
 
-Renamed from `ObjM__DispatchActiveState` (rename.py). The two branches are the pause overlay's: with `pauseSetupStep` (+0x080) nonzero it runs clearCloseReadyFlag (+0x0C4) and teardownPauseOverlay (+0x0D4), else advancePauseSetup (+0x0D0), which builds the "Pause" TextRow. It fills Class86668's `slot74`, which `ObjM__DispatchPadEvent` runs for pad code 0x21. Tier B (a toggle of the pause overlay; which button 0x21 is, is not established).
+Renamed from `ObjM__DispatchActiveState` (rename.py). The two branches are the pause overlay's: with `pauseSetupStep` (+0x080) nonzero it runs clearCloseReadyFlag (+0x0C4) and teardownPauseOverlay (+0x0D4), else advancePauseSetup (+0x0D0), which builds the "Pause" TextRow. It fills TimedTask's `slot74`, which `ObjM__DispatchPadEvent` runs for pad code 0x21. Tier B (a toggle of the pause overlay; which button 0x21 is, is not established).

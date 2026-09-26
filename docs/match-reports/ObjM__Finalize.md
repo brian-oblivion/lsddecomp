@@ -18,29 +18,29 @@ this unit's earlier functions). `ObjM__ObjM` (this unit, still
 ```c
 void ObjM__Finalize(Obj865C8 *self)
 {
-    GetClass86668Methods()->dtor(self);
+    GetTimedTaskMethods()->dtor(self);
 }
 ```
 
 ## Notes
 
 This class's `dtor` override forwards straight to the shared base class
-dtor (`GetClass86668Methods()->dtor(self)`, `Class86668Methods::dtor`,
+dtor (`GetTimedTaskMethods()->dtor(self)`, `TimedTaskMethods::dtor`,
 `include/class_39e08.h`), the same pattern already documented there for
-`Class86668__Finalize` (`class_39e08`'s own sibling override). `Obj865C8` and
-`GetClass86668Methods` are both already declared in `include/class_39e08.h`, so
+`TimedTask__Finalize` (`class_39e08`'s own sibling override). `Obj865C8` and
+`GetTimedTaskMethods` are both already declared in `include/class_39e08.h`, so
 this function needed no new struct at all -- `self` is typed directly as
 the base class's own object type rather than inventing a `Class87034`
 wrapper, since nothing here reads any field specific to this unit's own
 class. `#include "class_39e08.h"` added to this unit's includes for this
-declaration (and `Obj865C8`/`GetClass86668Methods` used by nothing else in this
+declaration (and `Obj865C8`/`GetTimedTaskMethods` used by nothing else in this
 unit). Matched first attempt.
 
 ## Naming
 
 Round 75 (bravo, track 3). `func_80052CD8` -> `ObjM__Finalize`, **tier A**.
 
-Slot +0x00C of gObjMMethods (`tools/classtable.py 0x80087034`). Forwards to the base's dtor (GetClass86668Methods()->dtor). Named after the base family's own +0x00C names (Class86668__Dtor, Class865C8__Finalize; the first renamed `Class86668__Finalize` in round 84).
+Slot +0x00C of gObjMMethods (`tools/classtable.py 0x80087034`). Forwards to the base's dtor (GetTimedTaskMethods()->dtor). Named after the base family's own +0x00C names (TimedTask__Dtor, Class865C8__Finalize; the first renamed `TimedTask__Finalize` in round 84).
 
 ## Track 4 (2026-09-26, round 88, Class865C8)
 
@@ -49,4 +49,4 @@ ObjM__Finalize's parameter was `Obj865C8 *` (the sibling class's view); it is no
 
 ## Track 4 (2026-09-26, round 89, echo)
 
-Renamed from `ObjM__Dtor` (rename.py): it occupies +0x00C, BasicClass's `finalize` slot, and its whole body is the base finalize (`GetClass86668Methods()->finalize`). Tier A. Parameter now `ObjM *` (include/ObjM.h).
+Renamed from `ObjM__Dtor` (rename.py): it occupies +0x00C, BasicClass's `finalize` slot, and its whole body is the base finalize (`GetTimedTaskMethods()->finalize`). Tier A. Parameter now `ObjM *` (include/ObjM.h).

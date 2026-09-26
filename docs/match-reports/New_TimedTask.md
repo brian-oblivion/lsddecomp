@@ -1,4 +1,6 @@
-# New_Class86668
+# New_TimedTask
+
+> Renamed from `New_Class86668` on 2026-09-26 (tools/rename.py). Address 0x8004a130.
 
 > Renamed from `func_8004A130` on 2026-09-23 (tools/rename.py). Address 0x8004a130.
 
@@ -11,13 +13,13 @@ unchanged. Returns the new object, or NULL.
 ## The match
 
 ```c
-Obj865C8 *New_Class86668(s32 arg1, SubObjB *arg2)
+Obj865C8 *New_TimedTask(s32 arg1, SubObjB *arg2)
 {
     ...
 
     self = BMemPMgrAlloc(0x38);
     if (self != NULL) {
-        GetClass86668Methods()->ctor(self, arg1, arg2);
+        GetTimedTaskMethods()->ctor(self, arg1, arg2);
         return self;
     }
     return NULL;
@@ -56,8 +58,8 @@ updated with what survived and what did not.
 
 ## Naming
 
-`New_Class86668` -- tier A. Allocator (0x38 bytes) for the sibling class, dispatching `GetClass86668Methods()->ctor`: matches the `New_X` idiom.
+`New_TimedTask` -- tier A. Allocator (0x38 bytes) for the sibling class, dispatching `GetTimedTaskMethods()->ctor`: matches the `New_X` idiom.
 
 ## Track 4
 
-2026-09-25, round 84 (bravo): class unified in `include/Class86668.h`. Not renamed. Signature `Class86668 *New_Class86668(char *soundBankPath, BasicClass *sound)`, the ctor's parameters; 0x38 is the object size CLASS86668_FIELDS ends at. No C caller. Image byte-identical.
+2026-09-25, round 84 (bravo): class unified in `include/TimedTask.h`. Not renamed. Signature `TimedTask *New_TimedTask(char *soundBankPath, BasicClass *sound)`, the ctor's parameters; 0x38 is the object size TIMEDTASK_FIELDS ends at. No C caller. Image byte-identical.

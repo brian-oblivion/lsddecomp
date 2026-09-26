@@ -918,11 +918,6 @@
           "date": "2026-09-26",
           "header": "include/Class865C8.h"
         },
-        "gClass86668Methods": {
-          "class": "Class86668",
-          "date": "2026-09-25",
-          "header": "include/Class86668.h"
-        },
         "gClass866E8Methods": {
           "class": "Class866E8",
           "date": "2026-09-26",
@@ -1092,6 +1087,11 @@
           "class": "TimImage",
           "date": "2026-09-26",
           "header": "include/TimImage.h"
+        },
+        "gTimedTaskMethods": {
+          "class": "TimedTask",
+          "date": "2026-09-25",
+          "header": "include/TimedTask.h"
         },
         "gTmdModelMethods": {
           "class": "TmdModel",

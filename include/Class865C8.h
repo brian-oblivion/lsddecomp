@@ -1,18 +1,18 @@
 #ifndef CLASS865C8_H
 #define CLASS865C8_H
 
-#include "Class86668.h"
+#include "TimedTask.h"
 
 /*
  * Class865C8 -- class id 0x1F230, method table gClass865C8Methods:
- * Class86668's subclass (its ctor calls Class86668__Class86668 first).
+ * TimedTask's subclass (its ctor calls TimedTask__TimedTask first).
  * Methods in src/class_39e08.c (New_Class865C8 through
  * GetClass865C8Methods). No class derives from it. The object is 0x50 bytes
- * (New_Class865C8); its own fields run from Class86668's 0x38.
+ * (New_Class865C8); its own fields run from TimedTask's 0x38.
  *
  * The game builds one, in Class6D3C8__PollStatusObj (src/code_1677c.c):
  * New_Class865C8(the task's IntermediateBaseInitArgs, the DreamSys, a flag),
- * init, release, and a switch on init's result, Class86668::result (2 and 3
+ * init, release, and a switch on init's result, TimedTask::result (2 and 3
  * are values OnObjMNotify sets). What its methods do, measured:
  *  - the ctor passes GetSoundEffectDir() as the base's soundBankPath, loads
  *    "ETC\ETC.TIM" (etcTim), "ETC\DREAMER.TMD" (dreamerTmd) and the
@@ -48,19 +48,19 @@ struct TimImage;
 struct LinkResource;
 struct ObjM; /* include/ObjM.h */
 
-/* Class86668's slots, then this class's own. Overridden: ctor, finalize,
+/* TimedTask's slots, then this class's own. Overridden: ctor, finalize,
  * onNotify, resetCounters (Class865C8__ResetPhase), init, deinit, onInit,
  * onDeinit, onTag1Notify (Class865C8__AdvancePhase) and onState4. */
 /* clang-format off */
 #define CLASS865C8_SLOTS(Self, CtorParams)                                                         \
-    CLASS86668_SLOTS(Self, CtorParams);                                                            \
+    TIMEDTASK_SLOTS(Self, CtorParams);                                                            \
     /* +0x080 */ void (*onDreamSysNotify)(Self *self, BasicClass *sender, s32 event); /* Class865C8__OnDreamSysNotify, empty; onNotify's 0x1F34 (DreamSys) sender */ \
     /* +0x084 */ void (*onObjMNotify)(Self *self, BasicClass *sender, s32 event)      /* Class865C8__OnObjMNotify; onNotify's 0x2F230 (gObjMMethods) sender */
 /* clang-format on */
 
 /* clang-format off */
 #define CLASS865C8_FIELDS(Methods)                                                                 \
-    CLASS86668_FIELDS(Methods);                                                                    \
+    TIMEDTASK_FIELDS(Methods);                                                                    \
     /* +0x038 */ struct DreamSys *dreamSys; /* the ctor's; a child; init/deinit hand it the init args' objects */ \
     /* +0x03C */ s32 phase;                 /* 0 ResetPhase, 1 OnInit, 2 StartObjM, 3 OnObjMNotify; not IntermediateBase::state */ \
     /* +0x040 */ struct WBgm *bgm;          /* New_WBgm(PickWeeklyGroup(0), NULL, 1); New_ObjM's 2nd argument; finalize releases it */ \

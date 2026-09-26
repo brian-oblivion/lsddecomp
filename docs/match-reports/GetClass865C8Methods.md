@@ -42,8 +42,8 @@ None beyond what's already documented.
 
 ## Naming
 
-`GetClass865C8Methods` -- tier A. Plain accessor, `return &gClass865C8Methods;` -- matches the established `GetXMethods`/`Get_vtable_X` accessor convention used site-wide for vtable getters (e.g. `GetClass86668Methods`, `Get_vtable_IntermediateBase`).
+`GetClass865C8Methods` -- tier A. Plain accessor, `return &gClass865C8Methods;` -- matches the established `GetXMethods`/`Get_vtable_X` accessor convention used site-wide for vtable getters (e.g. `GetTimedTaskMethods`, `Get_vtable_IntermediateBase`).
 
 ## Track 4 (2026-09-26, round 88, Class865C8)
 
-The class (table D_800865C8, id 0x1F230, Class86668's subclass) is unified as Class865C8 in include/Class865C8.h; the Obj865C8/Class865C8Methods views in class_39e08.h are gone. Renamed from GetObj865C8Methods with the class (returns &gClass865C8Methods, was D_800865C8). Tier A.
+The class (table D_800865C8, id 0x1F230, TimedTask's subclass) is unified as Class865C8 in include/Class865C8.h; the Obj865C8/Class865C8Methods views in class_39e08.h are gone. Renamed from GetObj865C8Methods with the class (returns &gClass865C8Methods, was D_800865C8). Tier A.

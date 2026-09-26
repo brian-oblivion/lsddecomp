@@ -9,7 +9,7 @@
 
 Another method of the `gObjMMethods`-vtable class (`New_ObjM`/
 `ObjM__ObjM`'s own class, see those reports) -- forwards to the shared
-base-class event handler (`GetClass86668Methods()->slot38`), then reads the
+base-class event handler (`GetTimedTaskMethods()->slot38`), then reads the
 event's type tag (`arg1->target->header`, both `EventArg`/`HeaderObj`
 already established in `include/class_39e08.h`) and dispatches to ONE of
 three of self's own vtable slots depending on which range the tag falls
@@ -42,7 +42,7 @@ void ObjM__OnNotify(Obj87034_3bb8c_k *self, EventArg *arg1, s32 arg2)
 {
     s32 tag;
 
-    GetClass86668Methods()->slot38((Obj865C8 *)self, arg1, arg2);
+    GetTimedTaskMethods()->slot38((Obj865C8 *)self, arg1, arg2);
     tag = arg1->target->header;
     if ((tag & 0xFFF) == 0x114) {
         self->methods->slotB4(self, arg1, arg2);

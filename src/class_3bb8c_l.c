@@ -20,7 +20,7 @@
  */
 #include "common.h"
 #include "class_3bb8c.h"
-#include "Class86668.h"
+#include "TimedTask.h"
 #include "DreamSys.h"
 #include "ObjM.h"
 #include "Class866E8.h"
@@ -39,7 +39,7 @@ void ObjM__AttachTarget(ObjM *self, IntermediateBaseInitArgs *args, DreamSys *dr
         ->methods->setCallback((Class866E8 *)args->lightRig,
                                (Class866E8ValueFn)ObjM__OnRegistrantEvent, self);
     self->dreamSys = dreamSys;
-    GetClass86668Methods()->init((Class86668 *)self, args, 1);
+    GetTimedTaskMethods()->init((TimedTask *)self, args, 1);
     self->methods->addChild(self, (BasicClass *)dreamSys);
 }
 
@@ -53,7 +53,7 @@ void ObjM__OnRegistrantEvent(ObjM *self, s32 code, s32 arg2, s32 arg3) {
 
 void ObjM__DetachTarget(ObjM *self) {
     self->methods->removeChild(self, (BasicClass *)self->dreamSys);
-    GetClass86668Methods()->deinit((Class86668 *)self);
+    GetTimedTaskMethods()->deinit((TimedTask *)self);
 }
 
 /* Cross-unit helpers, src/code_39094.c (PickVariant, PickDailyVariant:

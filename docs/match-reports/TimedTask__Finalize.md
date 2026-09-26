@@ -1,6 +1,8 @@
-# Class86668__Finalize
+# TimedTask__Finalize
 
-> Renamed from `Class86668__Dtor` on 2026-09-25 (tools/rename.py). Address 0x8004a228.
+> Renamed from `Class86668__Finalize` on 2026-09-26 (tools/rename.py). Address 0x8004a228.
+
+> Renamed from `TimedTask__Dtor` on 2026-09-25 (tools/rename.py). Address 0x8004a228.
 
 > Renamed from `func_8004A228` on 2026-09-23 (tools/rename.py). Address 0x8004a228.
 
@@ -8,7 +10,7 @@
 
 ## What it does
 
-Method-table slot +0x00C (the dtor override) of `gClass86668Methods`, a sibling
+Method-table slot +0x00C (the dtor override) of `gTimedTaskMethods`, a sibling
 class of `gClass865C8Methods` (resolved with
 `tools/classtable.py 0x800865C8 --vs 0x8006E878`, then cross-checked against
 `0x80086668` -- both share the same base, `gIntermediateBaseMethods`). If `self->unk30` is
@@ -41,7 +43,7 @@ jalr  $v0
 Written as:
 
 ```c
-void Class86668__Finalize(Obj865C8 *self) {
+void TimedTask__Finalize(Obj865C8 *self) {
     if (self->unk30 != 0) {
         self->subB->methods->slot4(self->subB);
     }
@@ -57,7 +59,7 @@ void Class86668__Finalize(Obj865C8 *self) {
 ## Proposed learning
 
 **A sibling class can be identified by classtable.py --vs against the SAME
-base twice, not just against each other.** `gClass865C8Methods` and `gClass86668Methods`
+base twice, not just against each other.** `gClass865C8Methods` and `gTimedTaskMethods`
 share a long run of identical slot values from +0x058 through +0x070 (not
 because one subclasses the other, but because both independently override
 those slots with the SAME shared implementation while diverging elsewhere,
@@ -67,8 +69,8 @@ inherited/override code as a subclass relationship.
 
 ## Naming
 
-`Class86668__Dtor` -- tier A. The sibling class's own dtor override (+0x00C), releasing `subB` when owned and forwarding to the base dtor.
+`TimedTask__Dtor` -- tier A. The sibling class's own dtor override (+0x00C), releasing `subB` when owned and forwarding to the base dtor.
 
 ## Track 4
 
-2026-09-25, round 84 (bravo): class unified in `include/Class86668.h`. Renamed from `Class86668__Dtor`, tier A: it occupies +0x00C, BasicClass's `finalize` slot, and its body is a finalize: release `sound` when `soundBankPath` is set (the ctor made it), then the base finalize through `Get_vtable_IntermediateBase()->finalize`. `self` is `Class86668 *`; `unk30`/`subB` are `soundBankPath`/`sound`. Class865C8__Finalize and ObjM__Finalize reach it as `GetClass86668Methods()->finalize((Class86668 *)self)`. Image byte-identical.
+2026-09-25, round 84 (bravo): class unified in `include/TimedTask.h`. Renamed from `TimedTask__Dtor`, tier A: it occupies +0x00C, BasicClass's `finalize` slot, and its body is a finalize: release `sound` when `soundBankPath` is set (the ctor made it), then the base finalize through `Get_vtable_IntermediateBase()->finalize`. `self` is `TimedTask *`; `unk30`/`subB` are `soundBankPath`/`sound`. Class865C8__Finalize and ObjM__Finalize reach it as `GetTimedTaskMethods()->finalize((TimedTask *)self)`. Image byte-identical.
