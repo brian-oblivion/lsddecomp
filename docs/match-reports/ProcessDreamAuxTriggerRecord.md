@@ -168,7 +168,7 @@ established from this unit alone.
 ## Track 4 (2026-09-26, round 88, bravo)
 
 `world` is now the unified `TriggerWorld *` (include/TriggerWorld.h, class
-D_8006F40C), and the slot-0x22 pointer-array call is its own slot +0x088:
+gTriggerWorldMethods), and the slot-0x22 pointer-array call is its own slot +0x088:
 `callResult = world->methods->getModelData(world, record->parity);`
 (TriggerWorld__GetModelData, `ModelData *(TriggerWorld *, u32)`; the s8 parity
 converts to u32 with the same sign-extended register). The result is a

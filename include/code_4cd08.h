@@ -131,7 +131,7 @@ typedef struct TriggerRecord {
     u8 unk8[0x30];
 } TriggerRecord;
 
-/* ProcessDreamAuxTriggerRecord's `world` is a TriggerWorld (D_8006F40C,
+/* ProcessDreamAuxTriggerRecord's `world` is a TriggerWorld (gTriggerWorldMethods,
  * include/TriggerWorld.h; FireDreamAuxTriggerEntries gets it from
  * New_TriggerWorld), unified in track 4 (round 88); code_4cd08.c includes
  * that header. This file's former `TriggerWorld { void **vtable; }` view

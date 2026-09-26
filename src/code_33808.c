@@ -22,7 +22,7 @@
  *   - Tod / TodSet (gTodMethods / gTodSetMethods, TodSet a Tod subclass): one
  *     TOD's packet stream (ScanTodPackets/DecodeTodPacketWord) and an array
  *     of them; named from include/code_55dd4.h's own "TOD set" (Unk30Obj).
- *   - ModelData / TriggerWorld (gModelDataMethods / D_8006F40C, TriggerWorld a
+ *   - ModelData / TriggerWorld (gModelDataMethods / gTriggerWorldMethods, TriggerWorld a
  *     ModelData subclass): a LinkResource+TodSet pair, and an array of
  *     those pairs; ModelData named from code_55dd4.h/.c's own "tmd"/"tods"/
  *     "modelData" fields, TriggerWorld from code_4cd08.c's own declared
@@ -913,12 +913,12 @@ void ModelData__ReleaseResources(ModelData *self) {
     }
 }
 
-/* gModelDataMethods/D_8006F40C +0x080: forwarded to slot +0x078 of the object at +0x30. */
+/* gModelDataMethods/gTriggerWorldMethods +0x080: forwarded to slot +0x078 of the object at +0x30. */
 u8 ModelData__ForwardScanPackets(ModelData *self, s32 arg1, s32 arg2) {
     return ((s32 (*)())self->todSet->methods->slot78)(self->todSet, arg1, arg2);
 }
 
-/* gModelDataMethods/D_8006F40C +0x084: forwarded to slot +0x080 of the object at +0x30. */
+/* gModelDataMethods/gTriggerWorldMethods +0x084: forwarded to slot +0x080 of the object at +0x30. */
 void *ModelData__ForwardDecodePacketWord(ModelData *self, s32 arg1, s32 arg2, s32 arg3, s32 arg4,
                                          s32 arg5) {
     return ((TodSet *)self->todSet)
@@ -943,7 +943,7 @@ TriggerWorld *New_TriggerWorld(Src6F240 *src) {
     return NULL;
 }
 
-/* D_8006F40C +0x008: constructor -- ModelData's (third argument 0: not
+/* gTriggerWorldMethods +0x008: constructor -- ModelData's (third argument 0: not
  * owning), then this table; when the descriptor has a buffer, its own
  * +0x064 runs, and a nonzero result fails the construction (NULL). */
 void *TriggerWorld__TriggerWorld(TriggerWorld *self, Src6F240 *src) {
@@ -957,18 +957,18 @@ void *TriggerWorld__TriggerWorld(TriggerWorld *self, Src6F240 *src) {
     return self;
 }
 
-/* D_8006F40C +0x00C: finalize -- releaseResources, then ModelData's. */
+/* gTriggerWorldMethods +0x00C: finalize -- releaseResources, then ModelData's. */
 void TriggerWorld__Finalize(TriggerWorld *self) {
     self->methods->releaseResources(self);
     GetModelDataMethods()->finalize((ModelData *)self);
 }
 
-/* D_8006F40C +0x064: slot +0x078 (TriggerWorld__BuildResources). */
+/* gTriggerWorldMethods +0x064: slot +0x078 (TriggerWorld__BuildResources). */
 void TriggerWorld__Load(TriggerWorld *self) {
     ((s32 (*)())self->methods->slot78)(self);
 }
 
-/* D_8006F40C +0x078: build a ModelData (not owning) over each sub-block of
+/* gTriggerWorldMethods +0x078: build a ModelData (not owning) over each sub-block of
  * the buffer's counted offset table, into the table's own words, counting
  * them at +0x38; 0 when all exist, otherwise releaseResources and 1. */
 s32 TriggerWorld__BuildResources(TriggerWorld *self) {
@@ -999,14 +999,14 @@ fail:
     return 1;
 }
 
-/* D_8006F40C +0x07C: release the ModelData array in the buffer (past its
+/* gTriggerWorldMethods +0x07C: release the ModelData array in the buffer (past its
  * first two words), modelDataCount entries long, and zero the count. */
 void TriggerWorld__ReleaseResources(TriggerWorld *self) {
     ReleaseBasicClassArray((BasicClass **)((u8 *)self->buffer + 8), self->modelDataCount);
     self->modelDataCount = 0;
 }
 
-/* D_8006F40C +0x088: entry `index` of the buffer's counted word array (a
+/* gTriggerWorldMethods +0x088: entry `index` of the buffer's counted word array (a
  * ModelData once BuildResources has run), 0 when out of range. */
 ModelData *TriggerWorld__GetModelData(TriggerWorld *self, u32 index) {
     CountedBuf33808 *buf = self->buffer;
@@ -1018,7 +1018,7 @@ ModelData *TriggerWorld__GetModelData(TriggerWorld *self, u32 index) {
 }
 
 TriggerWorldMethods *GetTriggerWorldMethods(void) {
-    return &D_8006F40C;
+    return &gTriggerWorldMethods;
 }
 
 /* Allocate and construct a gTileMapMethods object. */

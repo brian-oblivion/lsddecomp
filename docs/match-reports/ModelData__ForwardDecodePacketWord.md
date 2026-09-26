@@ -11,7 +11,7 @@ drift. Fresh ground (carved revision 18, no prior report).
 
 Forwarder with six arguments: `return self->unk30->methods->slot80(self->unk30, arg1..arg5);` -- the incoming stack args 5/6 are copied to the outgoing frame's +0x10/+0x14 and +0x30 is loaded twice (once for the table, once for a0).
 
-Table slot (`tools/classtable.py`): gModelDataMethods +0x084 and D_8006F40C +0x084 (`decodeTodPacket` in include/code_55dd4.h).
+Table slot (`tools/classtable.py`): gModelDataMethods +0x084 and gTriggerWorldMethods +0x084 (`decodeTodPacket` in include/code_55dd4.h).
 
 ## Source
 
@@ -23,7 +23,7 @@ Slot +0x078 is `void *slot78` in the unified macro, so calls cast it.
 ```c
 #include "ModelData.h"
 
-/* gModelDataMethods/D_8006F40C +0x084: forwarded to slot +0x080 of the object at +0x30. */
+/* gModelDataMethods/gTriggerWorldMethods +0x084: forwarded to slot +0x080 of the object at +0x30. */
 void *ModelData__ForwardDecodePacketWord(ModelData *self, s32 arg1, s32 arg2, s32 arg3, s32 arg4, s32 arg5) {
     return ((DataSrc33808 *)self->todSet)->methods->slot80(self->todSet, arg1, arg2, arg3, arg4, arg5);
 }

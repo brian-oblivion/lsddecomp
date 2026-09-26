@@ -5,7 +5,7 @@
 
 /*
  * TriggerWorld -- a ModelData subclass (class id 0x15F03, method table
- * D_8006F40C) over a buffer holding several model files: a counted offset
+ * gTriggerWorldMethods) over a buffer holding several model files: a counted offset
  * table, one ModelData per entry, then the data. Methods in
  * src/code_33808.c; no subclasses. Its parent is its id parent:
  * TriggerWorld__TriggerWorld's first call is GetModelDataMethods()->ctor
@@ -25,7 +25,7 @@
  * getModelData(record->parity) on as New_Entity's descriptor word +0x00C,
  * which Class65650__AcquireModelData borrows as the entity's ModelData.
  *
- * SLOTS (`classtable.py D_8006F40C --vs gModelDataMethods`: 34 against 33): the
+ * SLOTS (`classtable.py gTriggerWorldMethods --vs gModelDataMethods`: 34 against 33): the
  * overrides are +0x008 (ctor), +0x00C (TriggerWorld__Finalize), +0x064
  * (setFlag: TriggerWorld__Load, which only runs +0x078), +0x078 (Class6D430's
  * slot78: TriggerWorld__BuildResources, s32, as ModelData__BuildResources
@@ -60,7 +60,7 @@ struct TriggerWorld {
     /* +0x038 */ s32 modelDataCount; /* ModelData objects BuildResources made into the buffer's table; ReleaseResources releases that many and zeroes it */
 };
 
-extern TriggerWorldMethods D_8006F40C;
+extern TriggerWorldMethods gTriggerWorldMethods;
 extern TriggerWorldMethods *GetTriggerWorldMethods(void);
 
 TriggerWorld *New_TriggerWorld(struct Src6F240 *src);

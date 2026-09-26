@@ -2886,3 +2886,4 @@ gTimBlockSrcMethods = 0x8006F0B8;
 gTodMethods = 0x8006F240;
 gModelDataMethods = 0x8006F384;
 gTodSetMethods = 0x8006F590;
+gTriggerWorldMethods = 0x8006F40C;

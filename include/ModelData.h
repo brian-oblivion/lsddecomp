@@ -8,7 +8,7 @@
  * gModelDataMethods) that splits one loaded file into a LinkResource (gLinkResourceMethods,
  * an array of TMD models) and a TodSet (gTodSetMethods, an array of TOD
  * animations), and forwards TOD packet scanning to the TodSet. Methods in
- * src/code_33808.c; one subclass, TriggerWorld (D_8006F40C, 0x15F03), whose
+ * src/code_33808.c; one subclass, TriggerWorld (gTriggerWorldMethods, 0x15F03), whose
  * ctor calls this class's first (TriggerWorld__TriggerWorld:
  * GetModelDataMethods()->ctor(self, arg, 0)).
  *

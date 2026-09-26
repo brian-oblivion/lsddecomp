@@ -13,7 +13,7 @@ drift. Fresh ground (carved revision 18, no prior report).
 
 Build step: SetVec3 fills a three-word request {buffer, 0, 1}; for each of the buffer's `count` offsets, point the request at buffer+offset, allocate a gModelDataMethods source through New_ModelData and store it over the offset word itself (entries[i]), counting successes at +0x38. On an allocation failure call its own +0x07C (TriggerWorld__ReleaseResources, which releases the ones built and zeroes the count) and return 1; otherwise 0. The sibling of gModelDataMethods's ModelData__BuildResources.
 
-Table slot (`tools/classtable.py`): D_8006F40C +0x078.
+Table slot (`tools/classtable.py`): gTriggerWorldMethods +0x078.
 
 ## Source
 
@@ -23,7 +23,7 @@ fields +0x2C..+0x38), `Ctor33808`, `CountedBuf33808` and `Req44858` sit at the
 top of / earlier in `src/code_33808.c`.
 
 ```c
-/* D_8006F40C +0x078: build a gModelDataMethods source (not owning) over each
+/* gTriggerWorldMethods +0x078: build a gModelDataMethods source (not owning) over each
  * sub-block of the buffer's counted offset table, into the table's own
  * words, counting them at +0x38; 0 when all exist, otherwise slot +0x07C
  * (release) and 1. */

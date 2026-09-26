@@ -9,17 +9,17 @@ deletions, no out-of-range drift. Fresh ground (carved revision 18, no prior rep
 
 ## What it does
 
-Table getter: returns the method table `D_8006F40C` (`lui/addiu; jr; nop`), declared locally as `extern s32 D_8006F40C[];`.
+Table getter: returns the method table `gTriggerWorldMethods` (`lui/addiu; jr; nop`), declared locally as `extern s32 gTriggerWorldMethods[];`.
 
 Table slot (`tools/classtable.py`): `D_8006D430` +0x0B0.
 
 ## Source
 
 ```c
-extern s32 D_8006F40C[];
+extern s32 gTriggerWorldMethods[];
 
 void *GetTriggerWorldMethods(void) {
-    return D_8006F40C;
+    return gTriggerWorldMethods;
 }
 ```
 
@@ -34,4 +34,4 @@ void *GetTriggerWorldMethods(void) {
 
 ## Track 4 (2026-09-26, round 88, bravo)
 
-Now `TriggerWorldMethods *GetTriggerWorldMethods(void)` returning `&D_8006F40C` (include/TriggerWorld.h), replacing the unit-local `extern s32 D_8006F40C[]` and `void *` prototype. Bytes unchanged.
+Now `TriggerWorldMethods *GetTriggerWorldMethods(void)` returning `&gTriggerWorldMethods` (include/TriggerWorld.h), replacing the unit-local `extern s32 gTriggerWorldMethods[]` and `void *` prototype. Bytes unchanged.
