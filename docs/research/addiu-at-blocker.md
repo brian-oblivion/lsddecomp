@@ -74,7 +74,7 @@ unchanged.
    "addiu-$at blocker, not attempted". With the flag it compiles to the
    correct length with no drift, and the previously-impossible sequence
    matches word for word — the build emits `e8022124`
-   (`addiu $at,$at,%lo(D_800902E8)`), which retail has and the old pipeline
+   (`addiu $at,$at,%lo(_ss_score)`), which retail has and the old pipeline
    could not produce at all. It scored 6/21 on a first pass; the residue is
    ordinary instruction scheduling. **That is the whole point: it moved from
    unmatchable to ordinary matching work.** No C was kept — the function is

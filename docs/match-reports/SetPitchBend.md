@@ -28,7 +28,7 @@ way:
 
 ```c
 int new_var;
-Entry90902E8 *rec = &D_800902E8[a0][a1];
+Entry90902E8 *rec = &_ss_score[a0][a1];
 u8 *cursor = rec->unk4;
 u8 b;
 u8 vol;
@@ -84,7 +84,7 @@ choice) in the version actually verified:
 ```c
 void SetPitchBend(s16 a0, s16 a1)
 {
-    Entry90902E8 *rec = &D_800902E8[a0][a1];
+    Entry90902E8 *rec = &_ss_score[a0][a1];
     u8 *cursor = rec->unk4;
     s32 packed;
     u8 b;
@@ -139,7 +139,7 @@ same pattern as every other function in this family.
 ```c
 void SetPitchBend(s16 a0, s16 a1)
 {
-    Entry90902E8 *rec = &D_800902E8[a0][a1];
+    Entry90902E8 *rec = &_ss_score[a0][a1];
     u8 *cursor = rec->unk4;
     u8 b;
     u8 *p;
@@ -154,7 +154,7 @@ void SetPitchBend(s16 a0, s16 a1)
 
 ## Levers that closed most of the gap
 
-1. **`&D_800902E8[a0][a1]`, not a named `tbl` temp** (same fix as
+1. **`&_ss_score[a0][a1]`, not a named `tbl` temp** (same fix as
    `SetProgramChange`'s family) fixed the prologue register-order mismatch.
 2. **Statement order matching retail's own read-byte-AFTER-store-back
    sequence.** The first attempt read `b = *cursor;` in the SAME
@@ -235,7 +235,7 @@ the retail-matching position to an earlier `lhu` + manual sign-extend
 (2 extra words, regressing length to 46/44) OR, once forced back to
 `s32` to avoid the widening, keeps the length correct but ALSO shifts an
 entirely UNRELATED, EARLIER computation (the channel/slot index
-arithmetic for `&D_800902E8[a0][a1]`, words 5-10) that matched perfectly
+arithmetic for `&_ss_score[a0][a1]`, words 5-10) that matched perfectly
 in the baseline. This reproduced identically across all three
 declaration positions, which rules out "declaration order" as the
 mechanism -- **merely giving the compiler an extra independent live
@@ -244,7 +244,7 @@ scheduling decision.** This is a second, DIFFERENT source of instability
 from the one already documented (axes that regress length by adding named
 temporaries for the call arguments) -- that one was about the call-site
 reads specifically; this one shows the disruption reaching backward past
-the entire `&D_800902E8[a0][a1]` computation, three statements earlier in
+the entire `&_ss_score[a0][a1]` computation, three statements earlier in
 the function and with no data dependency on `unk4C` at all. Reverted;
 inlining `rec->unk4C` directly into the call (as in the preserved body)
 avoids both problems but leaves `unk4C`'s own read scheduled ONE position
@@ -263,7 +263,7 @@ instruction can still be diagnostic. Trying every combination of WHICH
 statement gets a name and WHERE it's declared, and getting the identical
 early-region regression regardless, is itself evidence that the
 perturbation is caused by the mere EXISTENCE of an additional live range
-crossing the `&D_800902E8[a0][a1]` computation's own scheduling window,
+crossing the `&_ss_score[a0][a1]` computation's own scheduling window,
 not by any property of statement position CLAUDE.md's existing levers
 (read order, named-temporary placement) address. This may be a case
 where GCC 2.6.3's local list scheduler's tie-breaking is sensitive to

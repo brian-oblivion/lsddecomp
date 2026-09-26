@@ -166,7 +166,7 @@ this is ordinary C control flow, not an unrepresentable GTE/COP2 access.
  */
 void GetSeqData(s16 a0, s16 a1)
 {
-    Entry90902E8 *rec = &D_800902E8[a0][a1];
+    Entry90902E8 *rec = &_ss_score[a0][a1];
     u8 *p;
     u8 raw;
     u8 note, vel;

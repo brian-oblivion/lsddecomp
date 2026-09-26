@@ -52,7 +52,7 @@ typedef struct {
 
 void ContModulation(s16 a0, s16 a1, u8 a2)
 {
-    Entry90902E8 *rec = &D_800902E8[a0][a1];
+    Entry90902E8 *rec = &_ss_score[a0][a1];
     u8 offset;
     NoteList_800349B0 list;
     Scratch_800349B0 scratch;
@@ -123,7 +123,7 @@ extern void func_80036230(s16 a0, u8 a1, s16 a2, void *out);
 
 void ContModulation(s16 a0, s16 a1, u8 a2)
 {
-    Entry90902E8 *rec = &D_800902E8[a0][a1];
+    Entry90902E8 *rec = &_ss_score[a0][a1];
     u8 *p = (u8 *)rec + rec->unk12;
     NoteList_800349B0 list;
     Scratch_800349B0 scratch;

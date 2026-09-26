@@ -51,7 +51,7 @@ explicit `(s16)` cast at its compare site, the same idiom
 the tempo-recompute scaling factor), `unk8C` (s32, the recomputed BPM),
 `unk90` (u32, playback-state flags -- the SAME field name and bit
 positions `code_179d8_i.c`'s independent local view already manipulates
-via `D_800902E8[a0][a1].unk90 &= ~2;` / `&= ~0x100;`, corroborating both
+via `_ss_score[a0][a1].unk90 &= ~2;` / `&= ~0x100;`, corroborating both
 readings).
 
 Cross-unit prototypes added (local guesses, kept in this .c only):
@@ -186,7 +186,7 @@ extern u32 VBLANK_MINUS;
 
 void GetMetaEvent(s16 a0, s16 a1, u8 a2)
 {
-    Entry90902E8 *rec = &D_800902E8[a0][a1];
+    Entry90902E8 *rec = &_ss_score[a0][a1];
 
     if (a2 != 0x2F) {
         if (a2 != 0x51) {
@@ -244,11 +244,11 @@ void GetMetaEvent(s16 a0, s16 a1, u8 a2)
             rec->unkC = rec->unk8;
             return;
         }
-        D_800902E8[a0][a1].unk90 &= ~1;
-        D_800902E8[a0][a1].unk90 &= ~8;
-        D_800902E8[a0][a1].unk90 &= ~2;
-        D_800902E8[a0][a1].unk90 |= 0x200;
-        D_800902E8[a0][a1].unk90 |= 0x4;
+        _ss_score[a0][a1].unk90 &= ~1;
+        _ss_score[a0][a1].unk90 &= ~8;
+        _ss_score[a0][a1].unk90 &= ~2;
+        _ss_score[a0][a1].unk90 |= 0x200;
+        _ss_score[a0][a1].unk90 |= 0x4;
         rec->unkC = rec->unk8;
         rec->unk2B = 0;
         if (rec->unk3C != 0xFF) {
@@ -456,7 +456,7 @@ extern u32 VBLANK_MINUS;
 
 void GetMetaEvent(s16 a0, s16 a1, u8 a2)
 {
-    Entry90902E8 *rec = &D_800902E8[a0][a1];
+    Entry90902E8 *rec = &_ss_score[a0][a1];
 
     if (a2 != 0x2F) {
         if (a2 != 0x51) {
@@ -520,11 +520,11 @@ void GetMetaEvent(s16 a0, s16 a1, u8 a2)
             rec->unkC = rec->unk8;
             return;
         }
-        D_800902E8[a0][a1].unk90 &= ~1;
-        D_800902E8[a0][a1].unk90 &= ~8;
-        D_800902E8[a0][a1].unk90 &= ~2;
-        D_800902E8[a0][a1].unk90 |= 0x200;
-        D_800902E8[a0][a1].unk90 |= 0x4;
+        _ss_score[a0][a1].unk90 &= ~1;
+        _ss_score[a0][a1].unk90 &= ~8;
+        _ss_score[a0][a1].unk90 &= ~2;
+        _ss_score[a0][a1].unk90 |= 0x200;
+        _ss_score[a0][a1].unk90 |= 0x4;
         rec->unkC = rec->unk8;
         rec->unk2B = 0;
         if (rec->unk3C != 0xFF) {
@@ -567,7 +567,7 @@ functions' still-`INCLUDE_ASM` bodies pulls their raw `.s` includes into the
 scaffold verbatim via the `PERMUTER`-gated macro, inflating the base score
 by two orders of magnitude; this was hit and corrected on the SAME function's
 scaffold this round before it was reused here) with only the types/externs
-this function's own body needs (`Entry90902E8`, `D_800902E8`,
+this function's own body needs (`Entry90902E8`, `_ss_score`,
 `ReadDeltaValue`, `SpuVmSeqKeyOff`, `_SsSndNextSep`, `VBLANK_MINUS`). Sanity
 check (`--debug --stack-diffs`): **base score 1425**, **`Stack Differences:
 0`** -- a clean, small, register/reordering-only score consistent with a

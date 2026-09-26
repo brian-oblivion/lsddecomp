@@ -4,14 +4,14 @@
 
 Unit `code_179d8_j`, round 22 (2026-09-06). Not a class method. Sibling of
 `SpuVmGetSeqRVol` and `SpuVmGetSeqVol` -- all three index the same
-`D_800902E8[screen][slot]` array already established in `code_179d8_f.c` /
+`_ss_score[screen][slot]` array already established in `code_179d8_f.c` /
 `code_179d8_i.c` (an array of pointers to 172 (0xAC)-byte records), reading
 the two leading `s16` fields at `+0x74`/`+0x76` this unit hadn't named yet.
 
 ## Shape
 
 Single `s32` parameter packs two indices: the low byte is the outer
-`screen` index (`D_800902E8[screen]`, a table of pointers), the high byte
+`screen` index (`_ss_score[screen]`, a table of pointers), the high byte
 (`(p0 & 0xFF00) >> 8`) is the inner `slot` index into that screen's record
 array. Confirmed against `code_179d8_i.c`'s `func_800339AC`, which builds
 exactly this packing (`(sa1 << 8) | sa0`) before calling into this unit.
@@ -54,7 +54,7 @@ not committed) before applying here.
 ## Final source
 
 ```c
-/* A 172 (0xAC)-byte record; D_800902E8 is an array of pointers to arrays of
+/* A 172 (0xAC)-byte record; _ss_score is an array of pointers to arrays of
  * these, indexed [screen][slot]-style by a packed argument (slot in the
  * high byte, screen in the low byte) -- see code_179d8_i.c's own
  * func_800339AC, which builds exactly this packing before calling into
@@ -68,12 +68,12 @@ typedef struct {
     s16 unk76; /* +0x76 */
     u8 pad78[0xAC - 0x78];
 } Entry90902E8;
-extern Entry90902E8 *D_800902E8[];
+extern Entry90902E8 *_ss_score[];
 
 s32 SpuVmGetSeqLVol(s32 p0)
 {
     s32 channel = p0 & 0xFF;
-    Entry90902E8 *tbl = D_800902E8[channel];
+    Entry90902E8 *tbl = _ss_score[channel];
     s32 recIdx = (p0 & 0xFF00) >> 8;
 
     __asm__("");
@@ -99,6 +99,6 @@ Round 89 (runner delta, track 5 `asm-sites`): the bare `__asm__("")` before
 Measured by deleting it alone: the image went red (49 bytes, same length),
 `funcdiff` 6/21, and asm-differ shows the `sh v1,-0x15de(at)` store to
 `D_8008EA22` hoisted to the second instruction of the function, ahead of the
-`D_800902E8[channel]` load and the `recIdx` multiply chain that retail performs
+`_ss_score[channel]` load and the `recIdx` multiply chain that retail performs
 first (retail's store sits just before the final `addu`/`lh`). The register
 differences in that diff follow from the moved store. Instruction order.

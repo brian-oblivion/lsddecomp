@@ -10,7 +10,7 @@ and `ContRpn1` -- identical shape to `ContRpn1`, writes
 ```c
 void ContRpn2(s16 a0, s16 a1, u8 a2)
 {
-    Entry90902E8 *rec = &D_800902E8[a0][a1];
+    Entry90902E8 *rec = &_ss_score[a0][a1];
     u8 counter = rec->unk29;
 
     rec->unk14 = a2;
@@ -22,7 +22,7 @@ void ContRpn2(s16 a0, s16 a1, u8 a2)
 
 ## The one lever that mattered
 
-Same as `SetProgramChange`/`ContRpn1`: the `&D_800902E8[a0][a1]`
+Same as `SetProgramChange`/`ContRpn1`: the `&_ss_score[a0][a1]`
 single-expression lookup, not a named `tbl` temp. See `SetProgramChange.md`
 for the full writeup.
 

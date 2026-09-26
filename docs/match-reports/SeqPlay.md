@@ -108,7 +108,7 @@ Two new fields on this unit's `Entry90902E8` local struct view:
 ```c
 void SeqPlay(s16 a0, s16 a1, s16 a2)
 {
-    Entry90902E8 *rec = &D_800902E8[a0][a1];
+    Entry90902E8 *rec = &_ss_score[a0][a1];
     s32 dead[2];
     s16 last = rec->unk70;
     s32 elapsed = rec->unk88;

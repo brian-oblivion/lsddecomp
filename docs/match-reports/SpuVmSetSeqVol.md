@@ -29,7 +29,7 @@ symptom of the same early register-allocation difference, not an
 independent thing to hunt for later in the function.
 
 Unit `code_179d8_j`, round 23 (2026-09-07). Not a class method. Looks up
-`D_800902E8[screen][slot]` (screen = low byte of `p0`, slot = high byte),
+`_ss_score[screen][slot]` (screen = low byte of `p0`, slot = high byte),
 writes/clamps two fields of the found `Entry90902E8` record, computes two
 `0x81`-scaled values from `p1`/`p2`, and -- gated on `p3 == 1` -- runs this
 unit's now-familiar "scan `D_8008D996` for a 16-bit key, set two fields of a
@@ -44,7 +44,7 @@ report documents for defeating strength reduction, applied here too).
 s32 SpuVmSetSeqVol(s32 p0, s16 p1, s16 p2, s16 p3)
 {
     s32 dead;
-    Entry90902E8 *tbl = D_800902E8[(u8) p0];
+    Entry90902E8 *tbl = _ss_score[(u8) p0];
     Entry90902E8 *entry;
     u8 recIdx;
     s16 key;
@@ -105,15 +105,15 @@ being "at least one word".
 
 The mismatch (21/96 raw match, compiled length 5 words short even after
 the frame is fixed, first real diff at word 0 per `asm-differ`) starts at
-the FIRST instruction and runs through the `D_800902E8` lookup, the
+the FIRST instruction and runs through the `_ss_score` lookup, the
 `D_8008EA22 = p0` store, and the `recIdx`/`key` extraction from `p0`.
 Retail's actual shape, read directly off the ROM:
 
 ```
 andi  v0, a0, 0xff        ; byte index for the table-of-pointers lookup
 sll   v0, v0, 2
-lui   at, %hi(D_800902E8)
-addiu at, at, %lo(D_800902E8)
+lui   at, %hi(_ss_score)
+addiu at, at, %lo(_ss_score)
 addu  at, at, v0
 lw    t0, 0(at)           ; t0 = tbl (a0/p0 untouched throughout this)
 addiu sp, sp, -8          ; frame instruction scheduled HERE, mid-sequence
@@ -148,7 +148,7 @@ the baseline above):
   (before building the `entry` pointer), matching retail's textual
   adjacency of the two extractions -- no effect.
 - Collapsing the separate `tbl`/`recIdx` locals into one expression,
-  `entry = &D_800902E8[(u8) p0][(p0 & 0xFF00) >> 8];`, computed before
+  `entry = &_ss_score[(u8) p0][(p0 & 0xFF00) >> 8];`, computed before
   the `D_8008EA22` store -- no effect on the residue's shape (same
   extra `move`, same reordered store), though it is arguably cleaner
   source.
@@ -240,7 +240,7 @@ raw match with the expected out-of-range drift warning** -- both figures
 match this report's title exactly.
 
 Noticed this unit's ALREADY-MATCHED siblings `SpuVmGetSeqLVol` and
-`SpuVmGetSeqRVol` (both accessing the same `D_800902E8` table, both storing
+`SpuVmGetSeqRVol` (both accessing the same `_ss_score` table, both storing
 to `D_8008EA22` from their own `p0`) place a bare `__asm__("");` barrier
 immediately before their `D_8008EA22 = ...` store, after computing their
 table pointer/index locals -- and this function's preserved body has that
@@ -389,13 +389,13 @@ The whole remaining residue is a single register-identity difference.
    warning was honoured (the supporting change is material) and is now
    RETRACTED.
 4. **A bare `__asm__("")` immediately AFTER the `D_8008EA22 = p0;` store**
-   stops GCC sinking the `D_800902E8` table load past the shift block, giving
+   stops GCC sinking the `_ss_score` table load past the shift block, giving
    retail's "lookup first, store second, shift third" order. Round 32 tried
    this barrier BEFORE that store (copying matched siblings
    `SpuVmGetSeqLVol`/`SpuVmGetSeqRVol`) and regressed 21/96 -> 16/96; after is
    right and before is still wrong (2145 vs 2085 permuter units on the
    round-56 body). Dropping the `tbl` local and writing
-   `entry = D_800902E8[(u8) p0]; ... entry += (u32) shifted >> 24;` is worth
+   `entry = _ss_score[(u8) p0]; ... entry += (u32) shifted >> 24;` is worth
    a further step -- a separate `tbl` local costs a `move` and regresses.
 5. **Two `u16 *` pointer locals for `_svm_sreg_buf`, declared INSIDE the loop
    body.** Retail hoists `&_svm_sreg_buf` into `a3` and `&_svm_sreg_buf + 2` into
@@ -462,7 +462,7 @@ s32 SpuVmSetSeqVol(s32 p0, s16 p1, s16 p2, s16 p3)
     u16 *slotLo;
     u16 *slotHi;
 
-    entry = D_800902E8[(u8) p0];
+    entry = _ss_score[(u8) p0];
     D_8008EA22 = p0;
     __asm__("");
     shifted = p0 << 16;
@@ -504,7 +504,7 @@ s32 SpuVmSetSeqVol(s32 p0, s16 p1, s16 p2, s16 p3)
 #endif
 ```
 
-`Entry90902E8` and `D_800902E8`/`D_8008EA22` are `src/code_179d8_j.c`'s own
+`Entry90902E8` and `_ss_score`/`D_8008EA22` are `src/code_179d8_j.c`'s own
 existing top-of-file declarations; only the block above is new.
 
 ### The ONE residue that remains

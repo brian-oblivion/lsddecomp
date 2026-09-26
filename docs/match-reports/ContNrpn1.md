@@ -132,7 +132,7 @@ sibling function in this file has.
 ```c
 void ContNrpn1(s16 a0, s16 a1, u8 a2)
 {
-    Entry90902E8 *rec = &D_800902E8[a0][a1];
+    Entry90902E8 *rec = &_ss_score[a0][a1];
     u8 kind;
     Fn80090368 fn;
 
@@ -235,7 +235,7 @@ Retail computes the slot (`a1`/`sl`) index into `D_80090368[ch][sl]` in TWO
 steps: sign-extend into a real register (`sra a1,v0,0x10`), then separately
 multiply by 4 (`sll v0,a1,0x2`). This project's compiler, given the same
 source shape, FUSES those two steps into one `sll`+`sra`-by-14 pair (the
-same fusion trick retail itself uses for `D_800902E8`'s index in this
+same fusion trick retail itself uses for `_ss_score`'s index in this
 function's own preamble), producing one fewer instruction. The channel index
 (`ch`, row multiply by `0x40`) does NOT get this treatment on EITHER side,
 because `ch` is reused later as the call's first argument -- so a full

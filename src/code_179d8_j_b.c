@@ -188,7 +188,7 @@ typedef struct {
     u8 pad78[0xAC - 0x78];
 } D800902E8Entry;
 
-extern D800902E8Entry *D_800902E8[];
+extern D800902E8Entry *_ss_score[];
 
 typedef struct {
     u8 pad0[0x18];
@@ -213,7 +213,7 @@ s32 SpuVmSetVol(s32 a0, s32 a1, s32 a2, s32 a3, u16 a4) {
     u32 pan2;
 
     result = 0;
-    e = &D_800902E8[a0 & 0xFF][(a0 & 0xFF00) >> 8];
+    e = &_ss_score[a0 & 0xFF][(a0 & 0xFF00) >> 8];
     SpuVmVSetUp((s16)a1, (s16)a2);
     D_8008EA22 = (u16)a0;
 

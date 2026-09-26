@@ -833,7 +833,7 @@ typedef struct {
     u8 pad13[0xAC - 0x13];
 } Entry90902E8M;
 
-extern Entry90902E8M *D_800902E8[];
+extern Entry90902E8M *_ss_score[];
 
 extern u8 D_8008EA0C;
 extern u8 D_8008EA0E;
@@ -872,7 +872,7 @@ s32 SpuVmKeyOn(s32 a0, s16 a1, s16 a2, u16 a3, u16 a4, u16 a5) {
     shifted = a0 << 16;
     a0s16 = (s16)(shifted >> 16);
     byte1 = (u32)shifted >> 24;
-    s6 = &D_800902E8[byte0][byte1];
+    s6 = &_ss_score[byte0][byte1];
 
     if (SpuVmVSetUp(a1, a2) != 0) {
         return -1;

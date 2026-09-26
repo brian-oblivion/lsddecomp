@@ -19,13 +19,13 @@ Unit: `src/code_179d8_l.c` (carved round 24, 2026-09-08) · Size: 316 words
 
 ## What it computes
 
-Sibling of `vmNoiseOn` in the same unit (same two-level `D_800902E8`
+Sibling of `vmNoiseOn` in the same unit (same two-level `_ss_score`
 entry table, same three-stage `D_8008EA1A`/`17`/`11` blend cascade, same
 `D_8008E8C0`-gated clamp, same low/high enable-bit split) but a DIFFERENT
 source object and a DIFFERENT tail:
 
 - **Level source**: reads `D_8008E970->unk18` (a per-session "priority"-ish
-  byte, NOT the per-note `D_800902E8` entry) and combines it with
+  byte, NOT the per-note `_ss_score` entry) and combines it with
   `D_8008EA10` through a SIGNED division by `16129` (`=127²`, confirmed
   against the SAME magic constant `0x82061029`/shift-13 the sibling unit's
   own report `SetAutoPan.md` -- `code_179d8_m.c`, read for reference
@@ -39,7 +39,7 @@ source object and a DIFFERENT tail:
   chained `/127`s** -- m2c's own pattern-matcher recognized the first
   (signed) division automatically as `/16129`.
 - **Per-note lookup with an early-out** `vmNoiseOn` does not have: reads
-  `D_8008EA22` (same two-level `D_800902E8[lowbyte][highbyte]` indexing as
+  `D_8008EA22` (same two-level `_ss_score[lowbyte][highbyte]` indexing as
   D8E0) and compares the FULL SIGNED 16-bit value against `0x21` (33) --
   when equal, both channel levels stay at the raw `lvl1` (no per-note
   scaling); otherwise each is separately scaled by the entry's `unk74`/
@@ -108,7 +108,7 @@ typedef struct {
     u16 unk76;
     u8 pad78[0xAC - 0x78];
 } D800902E8Entry;
-extern D800902E8Entry *D_800902E8[];
+extern D800902E8Entry *_ss_score[];
 
 extern u8 D_8008EA16;
 extern u8 D_8008EA19;
@@ -163,7 +163,7 @@ void SpuVmKeyOnNow(s32 a0, s32 a1) {
     lvl0 = D_8008EA10 * prio / 16129;
     lvl1 = (u32)lvl0 * D_8008EA16 * D_8008EA19 / 16129;
 
-    e = &D_800902E8[D_8008EA22 & 0xFF][D_8008EA22 >> 8];
+    e = &_ss_score[D_8008EA22 & 0xFF][D_8008EA22 >> 8];
     pan1 = lvl1;
     pan2 = lvl1;
     if ((s16)D_8008EA22 != 0x21) {
@@ -235,7 +235,7 @@ void SpuVmKeyOnNow(s32 a0, s32 a1) {
 **The opening ~30 instructions match retail BYTE-FOR-BYTE** (confirmed with
 `tools/asm-differ/diff.py SpuVmKeyOnNow`) once the multiply order was fixed
 to an explicit `prio` intermediate (see Attempts) -- including both
-magic-multiply divisions, the two-level `D_800902E8` entry lookup, and the
+magic-multiply divisions, the two-level `_ss_score` entry lookup, and the
 `id != 0x21` early-out branch with its per-note scaling. The gap starts at
 the STACK FRAME ALLOCATION.
 
@@ -322,7 +322,7 @@ Within the 30-attempt cap (9 real builds used):
 **A lever that fixes one function's frame-allocation gap can make a
 structurally-near-identical sibling's gap WORSE, even within the same unit
 and even when both chain the same family of magic-multiply divisions.**
-`vmNoiseOn` and `SpuVmKeyOnNow` share the two-level `D_800902E8`
+`vmNoiseOn` and `SpuVmKeyOnNow` share the two-level `_ss_score`
 lookup, the exact same three-stage blend cascade, and the same
 `D_8008E8C0` clamp shape, and both have unresolved frame-size/position
 gaps -- but marking the chained-division intermediates `volatile` (which
@@ -573,7 +573,7 @@ void SpuVmKeyOnNow(s32 a0, s32 a1) {
 
     chanIdx = D_8008EA26[0] * 8;
 
-    e = &D_800902E8[D_8008EA22 & 0xFF][D_8008EA22 >> 8];
+    e = &_ss_score[D_8008EA22 & 0xFF][D_8008EA22 >> 8];
     pan1 = lvl1;
     pan2 = lvl1;
     if ((s16)D_8008EA22 != 0x21) {
@@ -778,7 +778,7 @@ void SpuVmKeyOnNow(s32 a0, s32 a1) {
 
     chanIdx = D_8008EA26[0] * 8;
 
-    e = &D_800902E8[D_8008EA22 & 0xFF][D_8008EA22 >> 8];
+    e = &_ss_score[D_8008EA22 & 0xFF][D_8008EA22 >> 8];
     pan1 = lvl1;
     pan2 = lvl1;
     if ((s16)D_8008EA22 != 0x21) {

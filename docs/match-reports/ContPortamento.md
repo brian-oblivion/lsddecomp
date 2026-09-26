@@ -53,7 +53,7 @@ constant's own source form, not the mask's. Translated to idiomatic C:
 ```c
 void ContPortamento(s16 a0, s16 a1, s32 a2)
 {
-    Entry90902E8 *rec = &D_800902E8[a0][a1];
+    Entry90902E8 *rec = &_ss_score[a0][a1];
     u8 offset;
     NoteList_800349B0 list;
     Scratch_80034C28 scratch;
@@ -113,7 +113,7 @@ typedef struct {
 
 void ContPortamento(s16 a0, s16 a1, s32 a2)
 {
-    Entry90902E8 *rec = &D_800902E8[a0][a1];
+    Entry90902E8 *rec = &_ss_score[a0][a1];
     u8 *p = (u8 *)rec + rec->unk12;
     NoteList_800349B0 list;    /* shared with ContModulation, see that report */
     Scratch_80034C28 scratch;

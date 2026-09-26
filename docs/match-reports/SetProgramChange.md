@@ -7,7 +7,7 @@
 
 ## What it is
 
-A per-channel/slot sequencer-voice setter. `D_800902E8` is an array of
+A per-channel/slot sequencer-voice setter. `_ss_score` is an array of
 pointers to arrays of `Entry90902E8` (a 172/0xAC-byte record), indexed
 `[channel][slot]`. `rec->unk12` is a byte offset (already scaled, not an
 index) to a currently-active embedded state block; `rec + rec->unk12`
@@ -21,7 +21,7 @@ own last-computed value into.
 ```c
 void SetProgramChange(s16 a0, s16 a1, u8 a2)
 {
-    Entry90902E8 *rec = &D_800902E8[a0][a1];
+    Entry90902E8 *rec = &_ss_score[a0][a1];
     u8 *p = (u8 *)rec + rec->unk12;
 
     p[0x2C] = a2;
@@ -32,7 +32,7 @@ void SetProgramChange(s16 a0, s16 a1, u8 a2)
 ## The one lever that mattered
 
 The FIRST attempt used two statements --
-`Entry90902E8 *tbl = D_800902E8[a0]; Entry90902E8 *rec = &tbl[a1];` --
+`Entry90902E8 *tbl = _ss_score[a0]; Entry90902E8 *rec = &tbl[a1];` --
 and scored 19/31, with the residue being a whole prologue register
 reshuffle: retail keeps the `43*slot` multiply-chain result live in a
 callee-saved `$s0` from early on and only fetches the table pointer into
@@ -41,7 +41,7 @@ pointer FIRST (computing the `%hi`/`%lo`/`addu`/`lw` sequence before the
 multiply chain) and put the multiply-chain result in `$v0` instead,
 swapping which value gets promoted to `$s0`.
 
-Collapsing the lookup into one expression -- `&D_800902E8[a0][a1]`,
+Collapsing the lookup into one expression -- `&_ss_score[a0][a1]`,
 letting the compiler choose its own evaluation order for the two
 independent sub-computations rather than a named `tbl` temp forcing the
 table fetch first -- closed the whole function on the first rebuild after

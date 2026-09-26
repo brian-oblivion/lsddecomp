@@ -24,7 +24,7 @@ value happened to be zero").
 ```c
 s32 ReadDeltaValue(s16 a0, s16 a1)
 {
-    Entry90902E8 *rec = &D_800902E8[a0][a1];
+    Entry90902E8 *rec = &_ss_score[a0][a1];
     u8 *cursor = rec->unk4;
     s32 acc;
     s32 val;

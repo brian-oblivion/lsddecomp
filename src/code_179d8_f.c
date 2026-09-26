@@ -66,7 +66,7 @@
 #include "common.h"
 
 /* A 172 (0xAC)-byte record; only the fields functions in this unit touch
- * are named. D_800902E8 is an array of pointers to arrays of these, indexed
+ * are named. _ss_score is an array of pointers to arrays of these, indexed
  * [screen/player][slot]-style by two signed 16-bit indices. */
 typedef struct {
     u8 pad0[0x4];
@@ -113,7 +113,7 @@ typedef struct {
     u8 pad9C[0xAC - 0x9C];
 } Entry90902E8;
 
-extern Entry90902E8 *D_800902E8[];
+extern Entry90902E8 *_ss_score[];
 
 /* Snd_crescendo: per-slot beat tick. Matched round 70 -- see
  * docs/match-reports/Snd_crescendo.md. The parameters really are s16 (that
@@ -129,8 +129,8 @@ void Snd_crescendo(s16 a0, s16 a1) {
     u16 sp10;
     u16 sp12;
 
-    entry = &D_800902E8[a0][a1];
-    arr = &D_800902E8[a0];
+    entry = &_ss_score[a0][a1];
+    arr = &_ss_score[a0];
     entry->unk98 = entry->unk98 - 1;
     /* unk42 read directly at each use, no local copy: that is what gives
      * retail's `lh a2` + `move v1,a2` (permuter-found, round 70, verified in-tree). */
@@ -146,7 +146,7 @@ void Snd_crescendo(s16 a0, s16 a1) {
                     SpuVmSetSeqVol((s16)(a0 | (a1 << 8)), sp10 + 1, sp12 + 1, 0);
                 } else {
                     SpuVmSetSeqVol((s16)(a0 | (a1 << 8)), 0x7F, 0x7F, 0);
-                    D_800902E8[a0][a1].unk90 &= ~0x10;
+                    _ss_score[a0][a1].unk90 &= ~0x10;
                 }
             } else {
                 SpuVmSetSeqVol((s16)(a0 | (a1 << 8)), 0x7F, 0x7F, 0);
@@ -163,7 +163,7 @@ void Snd_crescendo(s16 a0, s16 a1) {
                     SpuVmSetSeqVol((s16)(a0 | (a1 << 8)), sp10 - thresh, sp12 - thresh, 0);
                 } else {
                     SpuVmSetSeqVol((s16)(a0 | (a1 << 8)), 0x7F, 0x7F, 0);
-                    D_800902E8[a0][a1].unk90 &= ~0x10;
+                    _ss_score[a0][a1].unk90 &= ~0x10;
                 }
             } else {
                 SpuVmSetSeqVol((s16)(a0 | (a1 << 8)), 0x7F, 0x7F, 0);
@@ -172,7 +172,7 @@ void Snd_crescendo(s16 a0, s16 a1) {
         }
     }
     if (entry->unk98 == 0 || entry->unk40 == 0) {
-        D_800902E8[a0][a1].unk90 &= ~0x10;
+        _ss_score[a0][a1].unk90 &= ~0x10;
     }
 end:
     SpuVmGetSeqVol((s16)(a0 | (a1 << 8)), &entry->unk78, &entry->unk7A);

@@ -10,7 +10,7 @@ retrigger counter incremented instead.
 ```c
 void ContRpn1(s16 a0, s16 a1, u8 a2)
 {
-    Entry90902E8 *rec = &D_800902E8[a0][a1];
+    Entry90902E8 *rec = &_ss_score[a0][a1];
     u8 counter = rec->unk29;
 
     rec->unk13 = a2;
@@ -28,8 +28,8 @@ C above reproduces that exactly with no reordering needed.
 
 ## The one lever that mattered
 
-Same as `SetProgramChange`: collapsing `D_800902E8[a0]` + `&tbl[a1]` into one
-`&D_800902E8[a0][a1]` expression fixed a prologue register-order mismatch
+Same as `SetProgramChange`: collapsing `_ss_score[a0]` + `&tbl[a1]` into one
+`&_ss_score[a0][a1]` expression fixed a prologue register-order mismatch
 (retail keeps the slot-multiply result in `$s0` from early on; a named
 `tbl` temp forced the table-pointer fetch to be evaluated first instead).
 See `SetProgramChange.md` for the full writeup; not repeated here.

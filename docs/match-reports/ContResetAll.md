@@ -67,7 +67,7 @@ shared `ReadDeltaValue` VLQ-decode helper, caching its return into
 ```c
 void ContResetAll(s16 a0, s16 a1)
 {
-    Entry90902E8 *rec = &D_800902E8[a0][a1];
+    Entry90902E8 *rec = &_ss_score[a0][a1];
 
     func_80036044();
     func_80036518();
@@ -90,7 +90,7 @@ count.
 
 ## The lever that mattered
 
-Collapsing `D_800902E8[a0]` + `&tbl[a1]` into `&D_800902E8[a0][a1]` (same
+Collapsing `_ss_score[a0]` + `&tbl[a1]` into `&_ss_score[a0][a1]` (same
 fix as `SetProgramChange`, see that report) took this from 37/51 to 49/51.
 
 ## The residue that did not close (2 words, one class)

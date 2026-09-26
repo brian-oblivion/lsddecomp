@@ -40,7 +40,7 @@ REVISITED, round 58: STALL, re-derived from the .s; body rewritten (180 -> 200 o
 
 ## What the function does (round 58 reading, derived from the .s)
 
-A per-slot fade/ramp tick on the `D_800902E8[screen][slot]` record.
+A per-slot fade/ramp tick on the `_ss_score[screen][slot]` record.
 `unk98` is a tick countdown, `unk42` the period/step, `unk3E` an enable gate,
 `unk40` the remaining step count, `unk78`/`unk7A` the live output pair.
 
@@ -59,7 +59,7 @@ Otherwise `SpuVmGetSeqVol` reads the current pair, each half is tested against
 the step (`== 0` for the `-1` step, `< -unk42` for the `+unk42` step), and
 either the stepped pair is written back with `SpuVmSetSeqVol` or the ramp is
 killed. Killing it means `SpuVmSetSeqVol(key, 0, 0, 0)` plus
-`D_800902E8[..][..].unk90 &= ~0x20` — bit 5 of `unk90` is the "this slot is
+`_ss_score[..][..].unk90 &= ~0x20` — bit 5 of `unk90` is the "this slot is
 ramping" flag, and every exit path that is not an off-period tick re-checks
 `unk98 == 0 || unk40 == 0` and clears it there too.
 
@@ -68,13 +68,13 @@ with `code_179d8_j.c`'s established `SpuVmGetSeqVol(s32 p0, s16 *, s16 *)`.
 
 ## Claims of the previous report: what round 58 CONFIRMED
 
-- The `D_800902E8[(s16)a0][(s16)a1]` indexing, the 172-byte stride, and the
+- The `_ss_score[(s16)a0][(s16)a1]` indexing, the 172-byte stride, and the
   field offsets `unk3E/unk40/unk42/unk78/unk7A/unk90/unk98`. All correct.
 - `p` is a CACHED local. `p->unk98` is read after two calls with no reload of
-  `D_800902E8[..]`, so the row load is not being redone — that only happens if
+  `_ss_score[..]`, so the row load is not being redone — that only happens if
   the pointer is in a variable.
 - The three `unk90 &= ~0x20` sites are written as the FULL
-  `D_800902E8[a0][a1]` expression, not through `p` — retail recomputes the
+  `_ss_score[a0][a1]` expression, not through `p` — retail recomputes the
   address at each, which `p->unk90` would not do.
 - `unk42` really is re-read from memory in the `<= 0` arm after the call while
   the `unk40` update uses the cached register.
@@ -146,7 +146,7 @@ build.
 **The asymmetry the old report called "a register's lifetime" is right about
 the mechanism and wrong about what to do with it.** It is not something to
 reproduce by restructuring the whole function; it is one source expression
-(`(*row)[slot]` at negHandler, `D_800902E8[screen][slot]` at the other two).
+(`(*row)[slot]` at negHandler, `_ss_score[screen][slot]` at the other two).
 
 ## The residue: callee-saved register IDENTITY
 
@@ -157,7 +157,7 @@ the permutation:
 | --- | --- | --- |
 | `p` | `$s0` | `$s0` |
 | `off` = 172*slot | `$s1` | `$s1` — **correct** |
-| `row` = `&D_800902E8[screen]` | `$s2` | `$s4` |
+| `row` = `&_ss_score[screen]` | `$s2` | `$s4` |
 | `slot` | `$s3` | `$s2` |
 | `screen` | `$s4` | `$s3` |
 
@@ -275,7 +275,7 @@ three declarations, all already present in `src/code_179d8_i.c`:
 ```c
 extern s32 SpuVmSetSeqVol(s16 a0, u16 a1, u16 a2, s32 a3);
 extern s32 SpuVmGetSeqVol(s32 p0, s16 *out1, s16 *out2);
-extern Entry90902E8 *D_800902E8[];
+extern Entry90902E8 *_ss_score[];
 ```
 
 ### Body A — 200/202 words, 21/202, `regs=6/0`. THE ONE TO BUILD ON.
@@ -288,7 +288,7 @@ callee-saved permutation and the 8-byte `vars` gap.
 #if 0
 void Snd_decrescendo(s16 a0, s16 a1)
 {
-    Entry90902E8 **row = &D_800902E8[a0];
+    Entry90902E8 **row = &_ss_score[a0];
     s32 off = a1 * sizeof(Entry90902E8);
     Entry90902E8 *p = (Entry90902E8 *)((u8 *)*row + off);
     s32 c42 = p->unk42;
@@ -345,7 +345,7 @@ void Snd_decrescendo(s16 a0, s16 a1)
 
 clearHandler:
     SpuVmSetSeqVol((s16)(a0 | (a1 << 8)), 0, 0, 0);
-    D_800902E8[a0][a1].unk90 &= ~0x20;
+    _ss_score[a0][a1].unk90 &= ~0x20;
     goto tailCheck;
 
 negHandler:
@@ -354,7 +354,7 @@ negHandler:
 
 tailCheck:
     if (p->unk98 == 0 || p->unk40 == 0) {
-        D_800902E8[a0][a1].unk90 &= ~0x20;
+        _ss_score[a0][a1].unk90 &= ~0x20;
     }
 
 tailFinal:
@@ -378,7 +378,7 @@ so nobody re-derives it as a discovery.
 #if 0
 void Snd_decrescendo(s16 a0, s16 a1)
 {
-    Entry90902E8 **row = &D_800902E8[a0];
+    Entry90902E8 **row = &_ss_score[a0];
     s32 off = a1 * sizeof(Entry90902E8);
     Entry90902E8 *p = (Entry90902E8 *)((u8 *)*row + off);
     s32 c42 = p->unk42;
@@ -435,7 +435,7 @@ void Snd_decrescendo(s16 a0, s16 a1)
 
 clearHandler:
     SpuVmSetSeqVol((s16)(a0 | (a1 << 8)), 0, 0, 0);
-    D_800902E8[a0][a1].unk90 &= ~0x20;
+    _ss_score[a0][a1].unk90 &= ~0x20;
     goto tailCheck;
 
 negHandler:
@@ -444,7 +444,7 @@ negHandler:
 
 tailCheck:
     if (p->unk98 == 0 || p->unk40 == 0) {
-        D_800902E8[a0][a1].unk90 &= ~0x20;
+        _ss_score[a0][a1].unk90 &= ~0x20;
     }
 
 tailFinal:

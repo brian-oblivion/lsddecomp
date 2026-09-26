@@ -41,7 +41,7 @@ reports:
 ```c
 s32 SpuVmGetSeqVol(s32 p0, s16 *out1, s16 *out2)
 {
-    Entry90902E8 *tbl = D_800902E8[(u8) p0];
+    Entry90902E8 *tbl = _ss_score[(u8) p0];
     s16 *cur = (s16 *) &D_8008EA22;
 
     *cur = (s16) p0;
@@ -51,7 +51,7 @@ s32 SpuVmGetSeqVol(s32 p0, s16 *out1, s16 *out2)
 }
 ```
 
-(`Entry90902E8` typedef and `D_800902E8` extern are declared once, above
+(`Entry90902E8` typedef and `_ss_score` extern are declared once, above
 this function in the unit -- both leading `s16` fields at `+0x74`/`+0x76`.
 Retail reuses ONE computed entry-pointer for both `unk74`/`unk76` reads;
 writing the same `(p0 & 0xFF00) >> 8` index expression at both textual

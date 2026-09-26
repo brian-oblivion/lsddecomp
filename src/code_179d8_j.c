@@ -82,7 +82,7 @@ extern void SeAutoPan(s16 a0, s16 a1, s16 a2, s16 a3);
 
 extern u16 D_8008EA22;
 
-/* A 172 (0xAC)-byte record; D_800902E8 is an array of pointers to arrays of
+/* A 172 (0xAC)-byte record; _ss_score is an array of pointers to arrays of
  * these, indexed [screen][slot]-style by a packed argument (slot in the
  * high byte, screen in the low byte) -- see Sony's `Snd_pause`
  * (`libsnd/pause`, linked since round 34; it was code_179d8_i.c's matched
@@ -98,7 +98,7 @@ typedef struct {
     u8 pad78[0xAC - 0x78];
 } Entry90902E8;
 
-extern Entry90902E8 *D_800902E8[];
+extern Entry90902E8 *_ss_score[];
 
 s32 SpuVmSeKeyOn(s32 p0, s32 p1, s32 p2, s32 p3, u16 p4, u16 p5) {
     u16 outA;
@@ -126,7 +126,7 @@ void KeyOnCheck(void) {}
 INCLUDE_ASM("asm/nonmatchings/code_179d8_j", SpuVmSetSeqVol);
 
 s32 SpuVmGetSeqVol(s32 p0, s16 *out1, s16 *out2) {
-    Entry90902E8 *tbl = D_800902E8[(u8)p0];
+    Entry90902E8 *tbl = _ss_score[(u8)p0];
     s16 *cur = (s16 *)&D_8008EA22;
 
     *cur = (s16)p0;
@@ -137,10 +137,10 @@ s32 SpuVmGetSeqVol(s32 p0, s16 *out1, s16 *out2) {
 
 s32 SpuVmGetSeqLVol(s32 p0) {
     s32 channel = p0 & 0xFF;
-    Entry90902E8 *tbl = D_800902E8[channel];
+    Entry90902E8 *tbl = _ss_score[channel];
     s32 recIdx = (p0 & 0xFF00) >> 8;
 
-    /* Keeps the D_8008EA22 store after the D_800902E8[channel] load and
+    /* Keeps the D_8008EA22 store after the _ss_score[channel] load and
      * the record-index arithmetic; without it GCC hoists the store to the top. */
     __asm__("");
     D_8008EA22 = channel;
@@ -148,9 +148,9 @@ s32 SpuVmGetSeqLVol(s32 p0) {
 }
 
 s32 SpuVmGetSeqRVol(s32 p0) {
-    Entry90902E8 *tbl = D_800902E8[(u8)p0];
+    Entry90902E8 *tbl = _ss_score[(u8)p0];
 
-    /* Keeps the D_800902E8[(u8) p0] load above the D_8008EA22 store;
+    /* Keeps the _ss_score[(u8) p0] load above the D_8008EA22 store;
      * without it the load sinks below the store and the index arithmetic. */
     __asm__("");
     D_8008EA22 = p0;

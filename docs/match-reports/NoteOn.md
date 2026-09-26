@@ -147,7 +147,7 @@ Body as originally reached (round 24/31, 44/70 -- **superseded, see the round
 ```c
 void NoteOn(s16 a0, s16 a1, s32 a2, s32 a3)
 {
-    Entry90902E8 *rec = &D_800902E8[a0][a1];
+    Entry90902E8 *rec = &_ss_score[a0][a1];
     u8 offset = rec->unk12;
     s16 speed = *(s16 *)((u8 *)rec + 0x4E + offset * 2);
     s32 divided = ((u8)a3 * (s32)speed) / 127;
@@ -179,7 +179,7 @@ actually preserves in `#if 0` now):
 ```c
 void NoteOn(s16 a0, s16 a1, s32 a2, s32 a3)
 {
-    Entry90902E8 *rec = &D_800902E8[a0][a1];
+    Entry90902E8 *rec = &_ss_score[a0][a1];
     u8 offset = rec->unk12;
     s16 speed = *(s16 *)((u8 *)rec + 0x4E + offset * 2);
     s32 divided = ((u8)a3 * (s32)speed) / 127;

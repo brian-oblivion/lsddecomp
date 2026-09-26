@@ -29,7 +29,7 @@ this body's length.
 
 ## What it does
 
-Per-slot "beat" tick on `D_800902E8[screen][slot]` (172-byte
+Per-slot "beat" tick on `_ss_score[screen][slot]` (172-byte
 `Entry90902E8`). Decrements `unk98`; if the period `unk42 > 0` and
 `unk98 % unk42 == 0`, decrements `unk40` and pushes an XY step (`+1`) through
 `SpuVmGetSeqVol` (read) / `SpuVmSetSeqVol` (write), clamping to `(0x7F,0x7F)`
@@ -48,7 +48,7 @@ Then, unless the modulo missed, clears bit `0x10` when `unk98 == 0` or
 | 3 | local struct view `unk40` `u16` -> `s16`, drop the `(s16)` casts on it | the `li v1,0xffff; addu` decrement became retail's `addiu -1` |
 | 4 | control flow: the `unk98 == 0 || unk40 == 0` clear is OUTSIDE the `unk42 > 0` if/else, and the modulo miss is `goto end` (skips it) | **1 word short**, ins/del 2/2 |
 | 5 | `s16 count` read AFTER the `unk98` store, guard and divisor on `entry->unk42` directly | exact length (236/240); retail's `lh a2` + `move v1,a2` pair appears |
-| 6 | compute `entry = &D_800902E8[a0][a1]` BEFORE `arr = &D_800902E8[a0]` | 239/240; prologue `lui/addiu` now scheduled between `sll` and `sra 14`, as retail |
+| 6 | compute `entry = &_ss_score[a0][a1]` BEFORE `arr = &_ss_score[a0]` | 239/240; prologue `lui/addiu` now scheduled between `sll` and `sra 14`, as retail |
 | 7 | delete `count`; the `<= 0` arm adds `entry->unk42` (permuter find, below) | last `addu v0,v0,v1` operand order fixed: **240/240, whole image green** |
 
 Evidence for each type from the callee/caller bytes, not from guessing:

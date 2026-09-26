@@ -238,7 +238,7 @@ extern void ContResetAll(s16 a0, s16 a1);
 
 void _SsSetControlChange(s16 a0, s16 a1, u8 a2)
 {
-    Entry90902E8 *rec = &D_800902E8[a0][a1];
+    Entry90902E8 *rec = &_ss_score[a0][a1];
     u8 *p = rec->unk4;
     u8 offset = rec->unk12;
     u8 val;

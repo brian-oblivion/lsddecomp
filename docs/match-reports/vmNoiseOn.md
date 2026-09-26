@@ -36,7 +36,7 @@ SPU voice envelope/pan setup, called with `a0` = channel number (0-255,
 narrowed to a byte in two places: `chanRaw` for two 52-byte-stride table
 index computations, `chan` for the 16-byte-stride pan tables and the
 enable-mask bit). Looks up a per-note entry in a two-level table
-(`D_800902E8`: an array of pointers, each pointing to an array of
+(`_ss_score`: an array of pointers, each pointing to an array of
 0xAC-byte-stride records -- indexed by `D_8008EA22`'s low byte for which
 pointer, high byte for the record within it) to read two `u16` fields
 (`unk74`, `unk76` -- envelope attack/decay levels, each multiplied by 0x81
@@ -104,7 +104,7 @@ typedef struct {
     u16 unk76;
     u8 pad78[0xAC - 0x78];
 } D800902E8Entry;
-extern D800902E8Entry *D_800902E8[];   /* array of pointers, indexed by D_8008EA22's low byte;
+extern D800902E8Entry *_ss_score[];   /* array of pointers, indexed by D_8008EA22's low byte;
                                            each points to a 0xAC-stride array indexed by the high byte */
 
 extern u8 D_8008EA16;
@@ -132,14 +132,14 @@ extern u16 D_8008E234;   /* new */
 extern u8 D_8008EA20;    /* new -- flag byte, bit 2 selects D_8008E230/234 direction */
 ```
 
-`D_800902E8`'s two-level indexing was derived from the raw address
+`_ss_score`'s two-level indexing was derived from the raw address
 arithmetic, not guessed: `lowbyte*4` (pointer-array stride) selects which
-pointer via `D_800902E8[lowbyte]`, and the `highbyte*3*4*4 = highbyte*0xAC`
+pointer via `_ss_score[lowbyte]`, and the `highbyte*3*4*4 = highbyte*0xAC`
 shift-add sequence retail computes by hand (`v1*3 -> <<2 -> -v1 -> <<2 ->
 -v1 -> <<2`, i.e. `((v1*3-1)*4-1)*4 = v1*43*4 = v1*172 = v1*0xAC`) is exactly
 what indexing an array of a 0xAC-byte struct by `highbyte` produces --
 confirmed the shift-add sequence reproduces unchanged when written as plain
-`D_800902E8[lowbyte][highbyte]` array indexing (no need to hand-code the
+`_ss_score[lowbyte][highbyte]` array indexing (no need to hand-code the
 multiply).
 
 ## Best-derived body (309/311 words, preserved for the next attempt)
@@ -151,7 +151,7 @@ typedef struct {
     u16 unk76;
     u8 pad78[0xAC - 0x78];
 } D800902E8Entry;
-extern D800902E8Entry *D_800902E8[];
+extern D800902E8Entry *_ss_score[];
 
 extern u8 D_8008EA16;
 extern u8 D_8008EA19;
@@ -200,7 +200,7 @@ void vmNoiseOn(s32 a0) {
     u16 c64;
 
     chanRaw = a0;
-    e = &D_800902E8[D_8008EA22 & 0xFF][D_8008EA22 >> 8];
+    e = &_ss_score[D_8008EA22 & 0xFF][D_8008EA22 >> 8];
 
     pAttack = e->unk74 * 0x81;
     pDecay = e->unk76 * 0x81;

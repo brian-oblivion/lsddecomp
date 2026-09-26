@@ -9,7 +9,7 @@
  * as game code.
  *
  * Each sequence track is an Entry90902E8 record, reached as
- * D_800902E8[access][seq] (Sony's `_ss_score`, pinned in
+ * _ss_score[access][seq] (Sony's `_ss_score`, pinned in
  * config/psyq-objects.ld). SeqPlay is the per-tick scheduler. GetSeqData
  * decodes one event from the byte stream at rec->unk4 and dispatches it to:
  *   - NoteOn / SetProgramChange / SetPitchBend, the channel-voice events;
@@ -46,7 +46,7 @@ extern s32 SpuVmKeyOff(s32 a0, s16 a1, s16 a2, u16 a3); /* code_179d8_m, not yet
 /* Sony libsnd/vm_doff, internal: no public LIBSND.H prototype. */
 extern void SpuVmDamperOff(void);
 
-/* A 172 (0xAC)-byte record; D_800902E8 is an array of pointers to arrays of
+/* A 172 (0xAC)-byte record; _ss_score is an array of pointers to arrays of
  * these, indexed [channel][slot]-style, same array documented from
  * code_179d8_f/_i/_j's own independent local readings -- see those units'
  * Entry90902E8 for a different reduced view of the same object; each unit
@@ -116,7 +116,7 @@ typedef struct {
     u8 padAA[0xAC - 0xAA];
 } Entry90902E8;
 
-extern Entry90902E8 *D_800902E8[];
+extern Entry90902E8 *_ss_score[];
 
 /* Shared VLQ-style delta-time decoder: reads a 7-bit-per-byte
  * little-endian... no, MIDI-style BIG-endian continuation-bit-first
@@ -139,7 +139,7 @@ extern void GetSeqData(s16 channel, s16 slot);
  * ($a2) to hold rec->unk70 for that store (round 69,
  * docs/match-reports/SeqPlay.md). */
 void SeqPlay(s16 a0, s16 a1, s16 a2) {
-    Entry90902E8 *rec = &D_800902E8[a0][a1];
+    Entry90902E8 *rec = &_ss_score[a0][a1];
     s16 last = rec->unk70;
     s32 elapsed = rec->unk88;
     s32 delta = elapsed - last;
@@ -214,7 +214,7 @@ extern void GetMetaEvent(s16 a0, s16 a1, u8 a2);
  * reshaping tried and did not move it (docs/match-reports/GetSeqData.md).
  * Hand-derived. */
 void GetSeqData(s16 a0, s16 a1) {
-    Entry90902E8 *rec = &D_800902E8[a0][a1];
+    Entry90902E8 *rec = &_ss_score[a0][a1];
     u8 *p;
     u8 raw;
     u8 note, vel;
@@ -303,7 +303,7 @@ INCLUDE_ASM("asm/nonmatchings/code_179d8_k", GetSeqData);
  * `do { return; } while (0);`) is in the report, not here: this body is
  * for the reader and the verified build never compiles it. */
 void NoteOn(s16 a0, s16 a1, s32 a2, s32 a3) {
-    Entry90902E8 *rec = &D_800902E8[a0][a1];
+    Entry90902E8 *rec = &_ss_score[a0][a1];
     u8 offset = rec->unk12;
     s16 speed = *(s16 *)((u8 *)rec + 0x4E + offset * 2);
     s32 divided = ((u8)a3 * (s32)speed) / 127;
@@ -333,7 +333,7 @@ INCLUDE_ASM("asm/nonmatchings/code_179d8_k", NoteOn);
 #endif
 
 void SetProgramChange(s16 a0, s16 a1, u8 a2) {
-    Entry90902E8 *rec = &D_800902E8[a0][a1];
+    Entry90902E8 *rec = &_ss_score[a0][a1];
     u8 *p = (u8 *)rec + rec->unk12;
 
     p[0x2C] = a2;
@@ -387,7 +387,7 @@ extern void ContResetAll(s16 a0, s16 a1);
  * register and gives each case its own callee-saved copy.
  */
 void _SsSetControlChange(s16 a0, s16 a1, u8 a2) {
-    Entry90902E8 *rec = &D_800902E8[a0][a1];
+    Entry90902E8 *rec = &_ss_score[a0][a1];
     u8 *p = rec->unk4;
     u8 offset = rec->unk12;
     u8 val;
@@ -476,7 +476,7 @@ void _SsSetControlChange(s16 a0, s16 a1, u8 a2) {
  * ContModulation: the value becomes every tone's vibrato depth (vibW).
  * Neither it nor ContPortaTime has a caller in this executable. */
 void ContModulation(s16 a0, s16 a1, u8 a2) {
-    Entry90902E8 *rec = &D_800902E8[a0][a1];
+    Entry90902E8 *rec = &_ss_score[a0][a1];
     u8 offset;
     ProgAtr list;
     VagAtr scratch;
@@ -493,7 +493,7 @@ void ContModulation(s16 a0, s16 a1, u8 a2) {
 
 /* The value becomes every tone's portamento time (porT). */
 void ContPortaTime(s16 a0, s16 a1, u8 a2) {
-    Entry90902E8 *rec = &D_800902E8[a0][a1];
+    Entry90902E8 *rec = &_ss_score[a0][a1];
     u8 offset;
     ProgAtr list;
     VagAtr scratch;
@@ -511,7 +511,7 @@ void ContPortaTime(s16 a0, s16 a1, u8 a2) {
 /* CC65 (portamento): a value below 0x40 sets every tone's play mode
  * to 2, a value in 0x40..0x7F sets it to 0, anything else leaves it. */
 void ContPortamento(s16 a0, s16 a1, s32 a2) {
-    Entry90902E8 *rec = &D_800902E8[a0][a1];
+    Entry90902E8 *rec = &_ss_score[a0][a1];
     u8 offset;
     ProgAtr list;
     VagAtr scratch;
@@ -539,7 +539,7 @@ void ContPortamento(s16 a0, s16 a1, s32 a2) {
  * operand-order canonicalization class (2 words). Near-miss body preserved
  * in the report; #if 0 body kept here too so it travels with this .c. */
 void ContResetAll(s16 a0, s16 a1) {
-    Entry90902E8 *rec = &D_800902E8[a0][a1];
+    Entry90902E8 *rec = &_ss_score[a0][a1];
 
     SsUtReverbOff();
     SpuVmDamperOff();
@@ -562,7 +562,7 @@ extern SsMarkCallbackProc D_80090368[][16];
  * is cached in unk15 and bumps the unk2A step counter. Under kind 0x28 the
  * value also goes to the sequence's mark callback. */
 void ContNrpn1(s16 a0, s16 a1, u8 a2) {
-    Entry90902E8 *rec = &D_800902E8[a0][a1];
+    Entry90902E8 *rec = &_ss_score[a0][a1];
     u8 kind;
     SsMarkCallbackProc fn;
 
@@ -595,7 +595,7 @@ void ContNrpn1(s16 a0, s16 a1, u8 a2) {
  * instruction-scheduling residue, not a logic or CFG difference. */
 #if 1
 void ContNrpn2(s16 a0, s16 a1, u8 a2) {
-    Entry90902E8 *rec = &D_800902E8[a0][a1];
+    Entry90902E8 *rec = &_ss_score[a0][a1];
     u8 kind = a2;
     s32 result;
 
@@ -639,7 +639,7 @@ void ContNrpn2(s16 a0, s16 a1, u8 a2) {
 #endif
 
 void ContRpn1(s16 a0, s16 a1, u8 a2) {
-    Entry90902E8 *rec = &D_800902E8[a0][a1];
+    Entry90902E8 *rec = &_ss_score[a0][a1];
     u8 counter = rec->unk29;
 
     rec->unk13 = a2;
@@ -649,7 +649,7 @@ void ContRpn1(s16 a0, s16 a1, u8 a2) {
 }
 
 void ContRpn2(s16 a0, s16 a1, u8 a2) {
-    Entry90902E8 *rec = &D_800902E8[a0][a1];
+    Entry90902E8 *rec = &_ss_score[a0][a1];
     u8 counter = rec->unk29;
 
     rec->unk14 = a2;
@@ -705,7 +705,7 @@ extern void Snd_setVabAttr(s16 channel, s16 slot, s16 kind, VagAtr scratch, Adsr
 void ContDataEntry(s16 a0, s16 a1, u8 a2) {
     s16 ch = a0;
     s16 slot = a1;
-    Entry90902E8 *rec = &D_800902E8[ch][slot];
+    Entry90902E8 *rec = &_ss_score[ch][slot];
     u8 off = rec->unk12;
     DataEntryLocals list;
     s32 i;
@@ -949,7 +949,7 @@ void Snd_setVabAttr(s16 channel, s16 slot, s16 kind, VagAtr scratch, AdsrFields 
  * report for the round-25 head lever's explicit negative answer). */
 #if 1
 void SetPitchBend(s16 a0, s16 a1) {
-    Entry90902E8 *rec = &D_800902E8[a0][a1];
+    Entry90902E8 *rec = &_ss_score[a0][a1];
     u8 *cursor = rec->unk4;
     s32 packed;
     u8 b;
@@ -1028,7 +1028,7 @@ extern u32 VBLANK_MINUS;
  * iterations) found no zero and never beat the base score, residue
  * marked permuter-exhausted. */
 void GetMetaEvent(s16 a0, s16 a1, u8 a2) {
-    Entry90902E8 *rec = &D_800902E8[a0][a1];
+    Entry90902E8 *rec = &_ss_score[a0][a1];
 
     if (a2 != 0x2F) {
         if (a2 != 0x51) {
@@ -1092,11 +1092,11 @@ void GetMetaEvent(s16 a0, s16 a1, u8 a2) {
             rec->unkC = rec->unk8;
             return;
         }
-        D_800902E8[a0][a1].unk90 &= ~1;
-        D_800902E8[a0][a1].unk90 &= ~8;
-        D_800902E8[a0][a1].unk90 &= ~2;
-        D_800902E8[a0][a1].unk90 |= 0x200;
-        D_800902E8[a0][a1].unk90 |= 0x4;
+        _ss_score[a0][a1].unk90 &= ~1;
+        _ss_score[a0][a1].unk90 &= ~8;
+        _ss_score[a0][a1].unk90 &= ~2;
+        _ss_score[a0][a1].unk90 |= 0x200;
+        _ss_score[a0][a1].unk90 |= 0x4;
         rec->unkC = rec->unk8;
         rec->unk2B = 0;
         if (rec->unk3C != 0xFF) {
@@ -1118,7 +1118,7 @@ INCLUDE_ASM("asm/nonmatchings/code_179d8_k", GetMetaEvent);
  * source order) is what makes GCC 2.6.3 choose retail's own register for
  * both. See the round-25 head broadcast on if/else arm ordering. */
 s32 ReadDeltaValue(s16 a0, s16 a1) {
-    Entry90902E8 *rec = &D_800902E8[a0][a1];
+    Entry90902E8 *rec = &_ss_score[a0][a1];
     u8 *cursor = rec->unk4;
     s32 acc;
     s32 val;

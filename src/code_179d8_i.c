@@ -71,7 +71,7 @@
 
 #include "common.h"
 
-/* A 172 (0xAC)-byte record; D_800902E8 is an array of pointers to arrays of
+/* A 172 (0xAC)-byte record; _ss_score is an array of pointers to arrays of
  * these, indexed [screen][slot]-style by two signed 16-bit indices. This is
  * a reduced LOCAL view -- only the fields this unit's functions touch are
  * named. See code_179d8_f.c's own Entry90902E8 for a fuller layout of the
@@ -103,7 +103,7 @@ typedef struct {
     u8 padA8[0xAC - 0xA8];
 } Entry90902E8;
 
-extern Entry90902E8 *D_800902E8[];
+extern Entry90902E8 *_ss_score[];
 
 /* unk3E, unk40, unk42, unk78, unk7A, unk98 added to Entry90902E8 above,
  * in place of existing padding -- no existing field's offset changed.
@@ -123,7 +123,7 @@ extern s32 SpuVmGetSeqVol(s32 p0, s16 *out1, s16 *out2);
 #if 0
 void Snd_decrescendo(s16 a0, s16 a1)
 {
-    Entry90902E8 **row = &D_800902E8[a0];
+    Entry90902E8 **row = &_ss_score[a0];
     s32 off = a1 * sizeof(Entry90902E8);
     Entry90902E8 *p = (Entry90902E8 *)((u8 *)*row + off);
     s32 c42 = p->unk42;
@@ -180,7 +180,7 @@ void Snd_decrescendo(s16 a0, s16 a1)
 
 clearHandler:
     SpuVmSetSeqVol((s16)(a0 | (a1 << 8)), 0, 0, 0);
-    D_800902E8[a0][a1].unk90 &= ~0x20;
+    _ss_score[a0][a1].unk90 &= ~0x20;
     goto tailCheck;
 
 negHandler:
@@ -189,7 +189,7 @@ negHandler:
 
 tailCheck:
     if (p->unk98 == 0 || p->unk40 == 0) {
-        D_800902E8[a0][a1].unk90 &= ~0x20;
+        _ss_score[a0][a1].unk90 &= ~0x20;
     }
 
 tailFinal:

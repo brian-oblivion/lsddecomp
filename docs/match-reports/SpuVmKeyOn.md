@@ -80,8 +80,8 @@ with concrete argument roles:
 - `code_179d8_k.c`'s `NoteOn` (its own report, STALL):
   `SpuVmKeyOn(packed, note, vol, (u8)a3, (u16)divided, status)` where
   `packed = (a1<<8)|a0` is a `[screen | slot<<8]` pair into the SAME
-  `D_800902E8[][]` array this function itself indexes with `a0`. This
-  confirms `a0`'s low byte is a `D_800902E8` row index and its next byte an
+  `_ss_score[][]` array this function itself indexes with `a0`. This
+  confirms `a0`'s low byte is a `_ss_score` row index and its next byte an
   index into that row -- exactly what this function's own disassembly
   does with `a0 & 0xFF` and `(a0<<16)>>>24`.
 
@@ -102,7 +102,7 @@ until you diff registers, not just word counts.
   already documents as `SlotE968` (`unk0`/`unk1`/`unk4`) -- this function's
   own local view, same shape, used here as `&D_8008E968[a2]` (a2 = this
   function's own s16 parameter, NOT a channel id from `func_80032148`).
-- `Entry90902E8M` / `D_800902E8[]`: the SAME 172(0xAC)-byte
+- `Entry90902E8M` / `_ss_score[]`: the SAME 172(0xAC)-byte
   `[screen][slot]`-indexed record array `code_179d8_i/j/k.c` each already
   document with their own reduced view. This function only needs
   `unk12` (a byte OFFSET, per `code_179d8_k.c`'s fuller struct) and reads
@@ -150,7 +150,7 @@ someone touching an adjacent unit has usually already typed half of it.
 ### 1. An early value materializes too soon (byte1/`a0s16` split), ~2-3 words
 
 Retail's `a0` (this function's packed screen/slot id) needs THREE
-different views: its low byte (`a0 & 0xFF`, for the `D_800902E8` row
+different views: its low byte (`a0 & 0xFF`, for the `_ss_score` row
 index), a sign-extended 16-bit copy (`s1` in retail, used later as
 `SpuVmKeyOff`'s first argument), and a second byte (`(u8)((u16)s1 >>
 8)`, the row's slot index) -- and retail computes the LAST TWO from a
@@ -430,7 +430,7 @@ typedef struct {
 } SlotE968M;
 extern SlotE968M *D_8008E968;
 
-/* A 172 (0xAC)-byte record; D_800902E8 is an array of pointers to
+/* A 172 (0xAC)-byte record; _ss_score is an array of pointers to
  * arrays of these, indexed [screen][slot]-style by a packed argument
  * (slot in the high byte, screen in the low byte) -- same array
  * code_179d8_j.c/_k.c/_i.c already document, each with its own reduced
@@ -444,7 +444,7 @@ typedef struct {
     u8 unk12; /* +0x12 */
     u8 pad13[0xAC - 0x13];
 } Entry90902E8M;
-extern Entry90902E8M *D_800902E8[];
+extern Entry90902E8M *_ss_score[];
 
 extern u8 D_8008EA0C;
 extern u8 D_8008EA0D;
@@ -475,7 +475,7 @@ extern u8 SpuVmKeyOff(s16 a0, s16 a1, s16 a2, u16 a3);
  * code_179d8_k.c's NoteOn -- signature confirmed independently
  * by three sibling units' own extern guesses (code_179d8_i/_j/_k all
  * agree on this exact shape). `a0` is a packed [screen | slot<<8]
- * dispatch id into `D_800902E8`; `a1`/`a2` are the "key" values
+ * dispatch id into `_ss_score`; `a1`/`a2` are the "key" values
  * `SpuVmKeyOff`'s own three-field match loop checks; `a4`/`a5` are
  * 7-bit-percentage volume/pan bytes staged into the same
  * D_8008EA10/D_8008EA11 scratch globals the interpolation-setup
@@ -501,7 +501,7 @@ s32 SpuVmKeyOn(s32 a0, s16 a1, s16 a2, u16 a3, u16 a4, u16 a5)
     shifted = a0 << 16;
     a0s16 = (s16) (shifted >> 16);
     byte1 = (u32) shifted >> 24;
-    s6 = &D_800902E8[byte0][byte1];
+    s6 = &_ss_score[byte0][byte1];
 
     if (func_80032148(a1, a2) != 0) {
         return -1;

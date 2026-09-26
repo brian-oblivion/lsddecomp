@@ -187,7 +187,7 @@ s32 SpuVmSetVol(s32 a0, s32 a1, s32 a2, s32 a3, u16 a4) {
     u32 pan2;
 
     result = 0;
-    e = &D_800902E8[a0 & 0xFF][(a0 & 0xFF00) >> 8];
+    e = &_ss_score[a0 & 0xFF][(a0 & 0xFF00) >> 8];
     SpuVmVSetUp((s16)a1, (s16)a2);
     D_8008EA22 = (u16)a0;
 
@@ -278,7 +278,7 @@ s32 SpuVmSetVol(s32 a0, s32 a1, s32 a2, s32 a3, u16 a4) {
 
 Everything the round-45/50 sections say about the COMPUTATION (the division
 chain and its magics, the blend cascade, the clamp, the two-level
-`D_800902E8` indexing) is confirmed again this round and unchanged. The whole
+`_ss_score` indexing) is confirmed again this round and unchanged. The whole
 control-flow shape is confirmed correct against retail instruction by
 instruction: every branch target lines up, the `!=`-arm of the `e968` select is
 the jumping arm and is written first (`beq` skips to the fallthrough `else`),
@@ -440,7 +440,7 @@ typedef struct {
     u16 unk76;
     u8 pad78[0xAC - 0x78];
 } D800902E8Entry;
-extern D800902E8Entry *D_800902E8[];
+extern D800902E8Entry *_ss_score[];
 
 typedef struct {
     u8 pad0[0x18];
@@ -465,7 +465,7 @@ s32 SpuVmSetVol(s32 a0, s32 a1, s32 a2, s32 a3, u16 a4) {
     u32 pan2;
 
     result = 0;
-    e = &D_800902E8[a0 & 0xFF][(u8)(a0 >> 8)];
+    e = &_ss_score[a0 & 0xFF][(u8)(a0 >> 8)];
     SpuVmVSetUp((s16)a1, (s16)a2);
     D_8008EA22 = (u16)a0;
 
@@ -754,7 +754,7 @@ signed 16-bit values). On a match:
 - Calls `SpuVmVSetUp((s16)a1, (s16)a2)` and writes `D_8008EA22 = (u16)a0`
   (write-only here, matching this unit's existing `D_8008EA22` comment
   about which functions write it).
-- Looks up a `D800902E8Entry` via the SAME two-level `D_800902E8[lowbyte]
+- Looks up a `D800902E8Entry` via the SAME two-level `_ss_score[lowbyte]
   [highbyte]` indexing `vmNoiseOn`/`SpuVmKeyOnNow` already established
   (declared locally here, not shared, per this project's convention).
 - Computes a base level through a THREE-STAGE division chain that is a new
@@ -818,7 +818,7 @@ typedef struct {
     u16 unk76;
     u8 pad78[0xAC - 0x78];
 } D800902E8Entry;
-extern D800902E8Entry *D_800902E8[];
+extern D800902E8Entry *_ss_score[];
 
 typedef struct {
     u8 pad0[0x18];
@@ -858,7 +858,7 @@ s32 SpuVmSetVol(s32 a0, s32 a1, s32 a2, s32 a3, u16 a4) {
     s32 result;
 
     result = 0;
-    e = &D_800902E8[a0 & 0xFF][(u8)(a0 >> 8)];
+    e = &_ss_score[a0 & 0xFF][(u8)(a0 >> 8)];
     SpuVmVSetUp((s16)a1, (s16)a2);
     D_8008EA22 = (u16)a0;
 
