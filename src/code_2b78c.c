@@ -1,33 +1,9 @@
 /*
- * code_2b78c -- GAME code carved from psyq_2b78c on 2026-09-25 (FINISHING-PLAN
- * revision 18). 0x2B78C..0x2BA1C (vram 0x8003AF8C..0x8003B21C). It was counted
- * as Psy-Q SDK by segment name; tools/gameinsdk.py measured it as game (a call
- * into game code, a method-table entry beside game methods, or contiguity with
- * those, and no Sony fingerprint). What it holds: methods of gApplicationMethods and
- * D_8006D3C8, calling SetActiveDataSource; the yaml had called this gap "the
- * game's own libsnd build".
- *
- * Round 81 (delta): all seven functions matched. They are the whole of one
- * class, gApplicationMethods (local view Application below, class id 0x60): its ctor
- * (`Application__Application`), empty finalize override, four own slots
- * (`SetScreenDims`, `InitSystems`, a no-op, and `RunMainLoop` -- the
- * subclass Class6D3C8's per-frame dispatcher, first run from `src/main.c`)
- * and the table getter.
- *
- * Round 81 (delta), track 3 naming pass: all seven functions and both
- * unit-local globals (`gCdInitDone`, `gDefaultScreenDims`) named -- tiers
- * and evidence in each function's own match report's `## Naming` section.
- * One exception: `func_8003B20C` (the table getter, proposed
- * `GetApplicationMethods`) was NOT renamed -- `tools/rename.py` cannot apply
- * it because this address already carried an explicit, now-stale, track-2
- * "unidentified" line in the symbols file and the tool's placeholder-name
- * address resolution never finds it to replace; see
- * docs/match-reports/GetApplicationMethods.md and the round-81 broadcast for the
- * head to apply by hand. Round 84 (echo, track 4): applied with rename.py,
- * which now replaces the existing symbols line.
- *
- * Round 84 (echo, track 4): the class is declared once, in
- * include/Application.h; this unit's local view of it is gone.
+ * code_2b78c -- Application (include/Application.h), the application shell:
+ * its ctor (CD init, data source, default screen), its finalize, the screen
+ * size setter, initSystems (display, sound and 3D bring-up, and the shared
+ * task argument block), a no-op slot, the never-returning main loop that
+ * drives the subclass's hooks, and the table getter.
  */
 #include "common.h"
 #include "Application.h"
