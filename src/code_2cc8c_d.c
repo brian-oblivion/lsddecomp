@@ -50,9 +50,13 @@ extern ViewportRgb D_8008A8F8_b __asm__("D_8008A8F8");
 void Viewport__InitDefaults(Viewport *self) {
     self->unk90 = 0;
     self->otReady = 0;
+    /* Keeps the D_8008A8FC / D_8008A900 loads below the unk90 and otReady
+     * zero stores; without it GCC hoists both loads to the top. */
     __asm__("");
     self->screenSize.width = D_8008A8FC;
     self->screenSize.height = D_8008A900;
+    /* Keeps the two screenSize stores directly after their loads; without
+     * it they sink below the otLength..fogNear constant stores. */
     __asm__("");
     self->otLength = 0xD;
     self->unk44 = 0x7D0;

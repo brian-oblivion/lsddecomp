@@ -364,3 +364,28 @@ toolchain question, not a per-function one)?
 ## Track 4 (2026-09-25, round 85, bravo)
 
 Renamed from `Unk18Obj__InitDefaults`. The +0x040 slot's occupant, named `initDefaults`. The defaults name the fields: screenSize 256x240 (D_8008A8FC/D_8008A900), otLength 13, unk44 2000, unk48 64, projH 256, nearZ 10, farZ 0x10000, drawEnabled 1. The class (id 0x7, table `gViewportMethods`, formerly `D_8006E8E4`) is unified as `Viewport` in `include/Viewport.h`, whose banner gives the evidence for the name: its methods hold a GsRVIEW2 (GsSetRefView2), the projection and near clip, a double-buffered GsOT pair, draw the scene tree into it and flip it; IntermediateBase and TaskCore already called the field holding it `viewport`. Any source block above is the pre-unification spelling; the live body takes the unified types and field and slot names, byte-identical.
+
+## asm sites
+
+Round 89 (runner delta, track 5 `asm-sites`), three sites, all kept:
+
+- **First bare `__asm__("")`** (after `self->otReady = 0;`) -- **justified**,
+  now commented at the site. Deleting it alone: image red (12 bytes),
+  `funcdiff` 37/41, asm-differ shows `lw v0,0xf4(gp)` / `lw v1,0xf8(gp)`
+  (`D_8008A8FC`, `D_8008A900`) hoisted above `sw zero,0x90(a0)` and
+  `sw zero,0x70(a0)`. Instruction order.
+- **Second bare `__asm__("")`** (after the two `screenSize` stores) --
+  **justified**, now commented at the site. Deleting it alone: image red
+  (35 bytes), `funcdiff` 22/41, asm-differ shows `sw ...,0x34(a0)` /
+  `sw ...,0x38(a0)` sunk from right after their loads to below the whole run
+  of constant stores (`otLength` through `fogNear`, `+0x3C..+0x60`), with the
+  two loaded values moving to `v1`/`a1` because `v0` is then reused by the
+  constants. The primary change is instruction order.
+- **The asm-label alias** `extern ViewportRgb D_8008A8F8_b
+  __asm__("D_8008A8F8");` -- already justified at the site by the block
+  comment above it (a second textual name defeats GCC's CSE of the two
+  `D_8008A8F8` address computations). Re-measured by spelling the second
+  copy `self->clearColor = D_8008A8F8;`: image red (the function came out two
+  words shorter, 39 against 41, `funcdiff` 17/39, and the whole image after it
+  drifted). So the alias is load-bearing; which instructions went missing was
+  not itemised. Kept.
