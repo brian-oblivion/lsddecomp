@@ -2027,28 +2027,15 @@ typedef struct Obj14_3bb8c_l {
     u16 unk1B4;                     /* +0x1B4, ObjM__TransferToOther */
 } Obj14_3bb8c_l;
 
-/* Whatever self->target/self->world point to. Resolved by cross-checking
- * the exact offsets this unit's functions dispatch (+0x050, +0x074,
- * +0x0FC, +0x104, +0x108, +0x200) against tools/classtable.py's dump of
- * DREAMSYS_METHODS (0x80087BDC, include/DreamSys.h): every one lands on a
- * real occupant there (DreamSys__DetachFromParent, Class6B5CC__GetSetUnk10Field0, DreamSys__BlockMovement,
- * DreamSys__GetSetDreamTimeLimit, DreamSys__GetDreamTimerScaled, DreamSys__GetDreamColor
- * respectively), and the two whose header signatures are pinned down
- * (+0x104 `s32(DreamSys*, s32)`, +0x108 `s32(DreamSys*)`) match this unit's
- * own call-site arities exactly. So this almost certainly IS DreamSys, but
- * declared as this unit's own minimal, independent, offset-only view
- * (rather than including DreamSys.h) since none of DreamSys.h's own named
- * fields cover these particular slots (they sit inside its
- * `unknown_functions_0x..` padding arrays) and DreamSys.h is a different
- * unit's header, not this one's to extend. */
-typedef struct DreamSysMethods_3bb8c_l {
-    u8 pad00[0x04C];
-    /* +0x04C, round 45's ObjM__SetupSceneStyle: `(self, self->unk14)`, dispatched
-     * on the OWNING Obj87034_3bb8c_l's own `target` (a DIFFERENT
-     * DreamSysObj_3bb8c_l instance from the `self->world` this function
-     * dispatches every other slot through). */
-    void (*slot4C)(void *self, void *arg1); /* +0x04C */
-    void (*slot50)(void *self);          /* +0x050, ObjM__ExitSceneStyle */
+/* What self->world points to (and what its +0x0AC returns): an
+ * unidentified class dispatched through style/world-setup slots. Until
+ * round 88 this type was also self->target's, as DreamSysObj_3bb8c_l; the
+ * target is the game's DreamSys (track 4: its +0x04C/+0x050/+0x0EC/+0x0F0/
+ * +0x0F8/+0x0FC/+0x104/+0x108/+0x1A0/+0x200 calls are DreamSys occupants,
+ * and +0x044/+0x164 are Actor's state and DreamSys's currentStage), and
+ * those slots left with it. Nothing ties the world to DreamSys. */
+typedef struct StyleWorldMethods_3bb8c_l {
+    u8 pad00[0x054];
     /* +0x054, round 45's ObjM__SetupSceneStyle: `(self, val)`, `val` a small
      * derived integer (`(*obj->methods->slot7C(obj, 0)) / 2 * 5 / 3 +
      * D_8008AB34`, `obj` being `*(void **)self->unkC`). */
@@ -2058,43 +2045,22 @@ typedef struct DreamSysMethods_3bb8c_l {
     void (*slot64)(void *self, void *arg1);        /* +0x064, ObjM__EnterStyleSession */
     void (*slot68)(void *self, void *arg1);        /* +0x068, ObjM__EnterStyleSession */
     void (*slot6C)(void *self, void *arg1);        /* +0x06C, ObjM__EnterStyleSession */
-    void (*slot70)(void *self, void *arg1, void *arg2, void *arg3, s32 arg4); /* +0x070, ObjM__InitStyleAndWorld */
+    void (*slot70)(void *self, void *arg1, void *arg2, void *arg3, s32 arg4); /* +0x070, ObjM__InitStyleAndWorld: (target, &D_8008715C, &D_80087168, 0) */
     void (*slot74)(void *self);          /* +0x074, ObjM__ExitSceneStyle */
     u8 pad78[0x0AC - 0x078];
-    /* Returns another DreamSysObj_3bb8c_l* -- its return value is dispatched
-     * through methods->slotF0/slotD4 the same way self->target/self->world
-     * themselves are, so it is almost certainly a "related instance"
-     * accessor rather than a plain getter of scalar data. Named via the
-     * elaborated `struct DreamSysObj_3bb8c_l *` (not the typedef, which is
-     * not yet in scope this early in the header) to avoid a forward-typedef
-     * redefinition -- GCC 2.6.3 rejects `typedef struct X X;` twice even
-     * with an identical definition. */
-    struct DreamSysObj_3bb8c_l *(*slotAC)(void *self);    /* +0x0AC, ObjM__EnterStyleSession */
+    /* Returns another object of this view, dispatched through slotF0/slotD4
+     * (elaborated tag: the typedef is not in scope yet). */
+    struct StyleWorldObj_3bb8c_l *(*slotAC)(void *self);    /* +0x0AC, ObjM__EnterStyleSession */
     void (*slotB0)(void *self, s32 arg1);          /* +0x0B0, ObjM__EnterStyleSession */
     void (*slotB4)(void *self, s32 arg1);          /* +0x0B4, ObjM__EnterStyleSession */
     u8 padB8[0x0D4 - 0x0B8];
-    void (*slotD4)(void *self, s32 arg1, s32 arg2, s32 arg3); /* +0x0D4, ObjM__EnterStyleSession */
-    u8 padD8[0x0EC - 0x0D8];
-    s32 (*slotEC)(void *self, s32 arg1);              /* +0x0EC, ObjM__InitStyleAndWorld */
-    s32 (*slotF0)(void *self, s32 *outBuf, s32 arg2); /* +0x0F0, ObjM__EnterState4 (STALLED 28/71 -- offset/signature observed directly from the disassembly, reliable independent of the stall; see docs/match-reports/ObjM__EnterState4.md). ALSO ObjM__EnterStyleSession, on a DIFFERENT instance (the slotAC return value) with a DIFFERENT 2nd-arg shape (plain s32, not a pointer) -- same slot, two call-site views, per this project's established convention; see that function's report. */
-    u8 padF4[0x0F8 - 0x0F4];
-    void (*slotF8)(void *self, s32 arg1, s32 arg2); /* +0x0F8, ObjM__EnterStyleSession */
-    void (*slotFC)(void *self);          /* +0x0FC, ObjM__ExitSceneStyle/ObjM__EnterState6 */
-    u8 pad100[0x104 - 0x100];
-    s32 (*slot104)(void *self, s32 arg1); /* +0x104, ObjM__TransferToOther */
-    s32 (*slot108)(void *self);           /* +0x108, ObjM__TransferToOther */
-    u8 pad10C[0x1A0 - 0x10C];
-    s32 (*slot1A0)(void *self, s32 arg1); /* +0x1A0, ObjM__InitStyleAndWorld (return value forwarded opaquely to two other calls) */
-    u8 pad1A4[0x200 - 0x1A4];
-    s32 (*slot200)(void *self);           /* +0x200, ObjM__EnterState6 */
-} DreamSysMethods_3bb8c_l;
-typedef struct DreamSysObj_3bb8c_l {
-    DreamSysMethods_3bb8c_l *methods;
-    u8 pad04[0x044 - 0x004];
-    s32 unk44;               /* +0x044, ObjM__HandleStateCode: cleared (only reached when self->unk20 != 0 and the event/code is >= 9) */
-    u8 pad48[0x164 - 0x048];
-    s32 unk164;             /* +0x164, ObjM__EnterState5: sign-checked gate */
-} DreamSysObj_3bb8c_l;
+    void (*slotD4)(void *self, s32 arg1, s32 arg2, s32 arg3); /* +0x0D4, ObjM__EnterStyleSession (on slotAC's result) */
+    u8 padD8[0x0F0 - 0x0D8];
+    s32 (*slotF0)(void *self, s32 *outBuf, s32 arg2); /* +0x0F0, ObjM__EnterStyleSession (on slotAC's result, as (s32 *)ret, 0 or 3) */
+} StyleWorldMethods_3bb8c_l;
+typedef struct StyleWorldObj_3bb8c_l {
+    StyleWorldMethods_3bb8c_l *methods;
+} StyleWorldObj_3bb8c_l;
 
 /* Whatever arg1->unkC points to in ObjM__AttachTarget -- a registration sink
  * of some kind (arg1->unkC->methods->slotC8(arg1->unkC, callback,
@@ -2151,13 +2117,13 @@ struct Obj87034_3bb8c_l {
     RegistrantObj_3bb8c_l *unkC;      /* +0x00C, ObjM__AttachTarget's `arg1->unkC` */
     s32 unk10;                        /* +0x010, ObjM__EnterStyleSession */
     Obj14_3bb8c_l *unk14;              /* +0x014, ObjM__TransferToOther/ObjM__TickStyle/ObjM__ExitSceneStyle */
-    DreamSysObj_3bb8c_l *world;         /* +0x018, ObjM__ExitSceneStyle; cached into `cachedWorld` by ObjM__InitStyleAndWorld -- a second DreamSysObj instance distinct from `target`, dispatched through style/world-setup slots (slot74/slotAC/slot60/slot64/slot6C/slot68/slotB0/slotB4) */
+    StyleWorldObj_3bb8c_l *world;         /* +0x018, ObjM__ExitSceneStyle; cached into `cachedWorld` by ObjM__InitStyleAndWorld -- an object distinct from `target`, dispatched through style/world-setup slots (slot74/slotAC/slot60/slot64/slot6C/slot68/slotB0/slotB4) */
     s32 unk1C;                           /* +0x01C, ObjM__TickTarget: incremented once per call */
     s32 phase;                            /* +0x020, ObjM__EnterState6: written 6 (a state/phase tag; also written 4 by ObjM__EnterState4 and 5 by ObjM__EnterState5; read by ObjM__HandleStateCode, which is 0-gated) */
     u8 pad24[0x034 - 0x024];
     s32 unk34;                            /* +0x034, round 45's ObjM__SetupSceneStyle: forwarded opaquely to SetDreamAuxWorld's own arg3 */
     void *unk38;                          /* +0x038, ObjM__OnRegistrantEvent: forwarded opaquely to GetGridRecordAt/GetGridRecordXY */
-    DreamSysObj_3bb8c_l *target;            /* +0x03C, many functions in this unit */
+    struct DreamSys *target;            /* +0x03C, many functions in this unit: the game's DreamSys (include/DreamSys.h), which SetDreamAuxWorld installs as gDreamAuxWorld */
     s32 unk40;                             /* +0x040, ObjM__EnterStyleSession */
     s32 unk44;                              /* +0x044, ObjM__EnterStyleSession */
     s32 unk48;                               /* +0x048, ObjM__InitStyleAndWorld: set from arg1, or 0xA000 if arg1==0 */
@@ -2171,7 +2137,7 @@ struct Obj87034_3bb8c_l {
     s32 attached;                                   /* +0x068, ObjM__TransferToOther/ObjM__DispatchEvent/ObjM__TickTarget: zero-checked gate */
     s32 unk6C;                                    /* +0x06C, ObjM__InitStyleAndWorld: out-parameter address passed to RegisterStyleConfig, own type unknown */
     u8 pad70[0x078 - 0x070];
-    DreamSysObj_3bb8c_l *cachedWorld;                    /* +0x078, ObjM__InitStyleAndWorld: cached copy of self->world */
+    StyleWorldObj_3bb8c_l *cachedWorld;                    /* +0x078, ObjM__InitStyleAndWorld: cached copy of self->world */
     u8 pad7C[0x080 - 0x07C];
     s32 unk80;                                    /* +0x080, ObjM__TransferToOther (on `other`)/ObjM__TickTarget/ObjM__DispatchActiveState: zero-checked gate */
 };

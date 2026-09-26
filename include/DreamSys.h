@@ -754,7 +754,8 @@ typedef enum DreamColors{
  *    (`return this->methods->reset(this)`, a tail position retail keeps), so
  *    it calls through DreamSysResetRetFn below.
  *  - attachToParent (+0x04C): DreamSys__SpawnAtLink takes (self, parent),
- *    no offset; nothing calls it through the slot. */
+ *    no offset; ObjM__SetupSceneStyle calls it through
+ *    DreamSysAttachToParentFn. */
 struct DreamSysMethods {
 	ACTOR_SLOTS(DreamSys, (DreamSys *self, void *arg1, s32 arg2, s32 arg3));
 	/* +0x0F0 */ s32 (*getSetFlashbackSession)(DreamSys *self, DreamColors *out, s32 value); /* DreamSys__GetSetFlashbackSession: value < 0 writes the day's colour to *out */
@@ -840,6 +841,11 @@ struct DreamSysMethods {
 
 /* reset (+0x040) as DreamSys__DreamSys calls it (see above). */
 typedef DreamSys *(*DreamSysResetRetFn)(DreamSys *self);
+
+/* attachToParent (+0x04C) as its occupant, DreamSys__SpawnAtLink, takes it:
+ * (self, parent), no offset. ObjM__SetupSceneStyle (class_3bb8c_l) calls it
+ * through this cast. */
+typedef void (*DreamSysAttachToParentFn)(DreamSys *self, void *parent);
 
 
 typedef struct StageSpawn{
