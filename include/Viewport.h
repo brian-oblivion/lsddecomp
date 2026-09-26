@@ -3,6 +3,7 @@
 
 #include "BasicClass.h"
 #include "Class6B5CC.h"
+#include "DrawSystem.h"
 
 /*
  * Viewport -- the object that renders a scene (class id 0x7, method table
@@ -30,9 +31,9 @@
  *
  * Children are cached by their class-id nibble (AddChild/RemoveChild): 1 is
  * the DrawSystem (D_8006C070, id 0x1), 4 a Class6B5CC, the node the view is
- * attached to. Both are typed by the class that owns the slot they reach
- * through (drawSystem as BasicClass: DrawSystem has no header yet, so
- * code_2cc8c_d casts it to its GenericObj view).
+ * attached to. Each is typed by its class (include/DrawSystem.h,
+ * include/Class6B5CC.h); round 87 retired code_2cc8c.h's GenericObj view of
+ * the DrawSystem.
  *
  * The ctor chains to BasicClass's first (Get_vtable_BasicClass()->ctor),
  * and gClass869D8Methods's (0x17, include/class_3bb8c.h) chains to this one,
@@ -129,7 +130,7 @@ struct ViewportOt {
 
 #define VIEWPORT_FIELDS(Methods)                                                                   \
     BASICCLASS_FIELDS(Methods);                                                                    \
-    /* +0x00C */ BasicClass *drawSystem;  /* the class-1 child (AddChild); Flip's getActiveBuffer/swapBuffers */ \
+    /* +0x00C */ DrawSystem *drawSystem;  /* the class-1 child (AddChild); Flip's getActiveBuffer/swapBuffers */ \
     /* +0x010 */ Class6B5CC *viewNode;    /* the class-4 child (AddChild); refView.super is its coord2 */ \
     /* +0x014 */ ViewportRefView refView; /* GsSetRefView2's argument */                          \
     /* +0x034 */ ViewportSize screenSize;                                                          \

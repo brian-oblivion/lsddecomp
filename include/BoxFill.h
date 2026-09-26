@@ -28,8 +28,8 @@
  *
  * Ctor chain: BoxFill__BoxFill calls GetClass6B5CCMethods()->ctor first, so
  * the id parent (0x4) is the ctor-chain parent. One class derives from it,
- * Class6E99C (D_8006E99C, 0x164, a colour fade over the box; its views are
- * its own, in include/code_2cc8c.h), whose ctor calls this one's first
+ * Class6E99C (D_8006E99C, 0x164, a colour fade over the box; unified in
+ * include/Class6E99C.h, round 87), whose ctor calls this one's first
  * (Class6E99C__Class6E99C: GetBoxFillMethods()->ctor).
  *
  * Overrides whose parameter list differs from the inherited slot keep the
