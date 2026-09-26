@@ -70,3 +70,20 @@ idiom once a class's allocator size matches its now-real struct (e.g.
 `src/code_33808.c`'s `BMemPMgrAlloc(sizeof(TimBlockSrc))`). `sizeof(TmdModel)`
 is 0x24 (`include/TmdModel.h`'s own banner already states the object is
 0x24 bytes); byte-identical, build and check-nonmatching.sh green.
+
+## Unit history
+
+`src/code_fa50.c` has no unit report; its first function's report holds the
+unit-level notes the source banner used to carry (moved here in round 94's
+re-sent track 7 pass, from the banner as it stood at `b7c5a68e^`).
+
+- **Carve.** GAME code carved from `psyq_fa50` on 2026-09-25 (FINISHING-PLAN
+  revision 18): file range 0xFA50..0x10D48, vram 0x8001F250..0x80020548. It
+  had been counted as Psy-Q SDK by segment name; `tools/gameinsdk.py`
+  measured it as game (a call into game code, a method-table entry beside
+  game methods, or contiguity with those, and no Sony fingerprint).
+- **Matching.** All 18 functions matched in round 82 (runner charlie).
+- **Track 4.** The TmdModel class was unified in round 87 (runner delta):
+  the unit's local TmdModel view was deleted for `include/TmdModel.h`.
+- **Jump table.** `TmdModel__NextPrimitive` owns `jtbl_80010354` (its
+  mode `switch`).

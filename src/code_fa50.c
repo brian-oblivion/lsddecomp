@@ -22,6 +22,8 @@
  */
 #include "common.h"
 #include <libgte.h>
+#include <libgpu.h>
+#include <libgs.h>
 #include "TmdModel.h"
 
 /* A box with a leading word: TmdModel__GetHull's local. */
@@ -47,6 +49,10 @@ typedef struct Ray_fa50 {
     TmdVec3 dir; /* +0x006 */
 } Ray_fa50;
 
+/* A TMD packet's mode byte is its GPU command code (<libgs.h>'s GPU_COM_*),
+ * plus this bit for a semi-transparent face (libgpu's setSemiTrans bit). */
+#define TMD_MODE_ABE 0x02
+
 #define ABS_fa50(x) ((x) < 0 ? ~(x) + 1 : (x))
 
 /* The scratch VECTOR that also holds the candidate triangle's box. */
@@ -70,7 +76,6 @@ typedef struct Outer_fa50 {
     Inner_fa50 *inner; /* +0x010 */
 } Outer_fa50;
 
-extern void GsMapModelingData(unsigned long *p);
 extern TmdBox gTmdModelBoundsBuf[];
 extern void *BMemPMgrAlloc(s32 size);
 
@@ -406,6 +411,14 @@ s32 TmdModel__RaycastFaces(TmdModel *self, s32 *best, TmdVec3 *hitOut, s32 *heig
     return found;
 }
 
+/* A primitive's vertex-index fields, read through Sony's layout for its
+ * packet type (<libgs.h>'s TMD_P_*). */
+#define PRIM(type) ((type *)p)
+
+/* Walks the object's primitive list one packet per call: *count is the
+ * cursor (0 starts at the first packet), *n gets the face's vertex count
+ * (3 or 4, 0 for a packet type it does not know) and out[] its vertices.
+ * Returns the packet after this one, NULL past the end. */
 TmdPrim *TmdModel__NextPrimitive(TmdModel *self, TmdPrim *p, s32 *n, TmdVec3 *out, u32 *count) {
     s32 idx[4];
     TmdObject *rec = self->object;
@@ -421,161 +434,165 @@ TmdPrim *TmdModel__NextPrimitive(TmdModel *self, TmdPrim *p, s32 *n, TmdVec3 *ou
     }
     *n = 4;
     switch (p->mode) {
-        case 0x20:
-        case 0x22:
-            if (p->flag & 4) {
-                idx[0] = p->h[7];
-                idx[1] = p->h[8];
-                idx[2] = p->h[9];
-                size = 0x18;
+        case GPU_COM_F3:
+        case GPU_COM_F3 | TMD_MODE_ABE:
+            if (p->flag & GsTMDFlagGRD) {
+                idx[0] = PRIM(TMD_P_F3G)->v0;
+                idx[1] = PRIM(TMD_P_F3G)->v1;
+                idx[2] = PRIM(TMD_P_F3G)->v2;
+                size = sizeof(TMD_P_F3G);
                 goto tri;
             } else {
-                idx[0] = p->h[3];
-                idx[1] = p->h[4];
-                idx[2] = p->h[5];
-                size = 0x10;
+                idx[0] = PRIM(TMD_P_F3)->v0;
+                idx[1] = PRIM(TMD_P_F3)->v1;
+                idx[2] = PRIM(TMD_P_F3)->v2;
+                size = sizeof(TMD_P_F3);
                 goto tri;
             }
             break;
-        case 0x21:
-        case 0x23:
-            idx[0] = p->h[2];
-            idx[1] = p->h[3];
-            idx[2] = p->h[4];
-            size = 0x10;
+        case GPU_COM_NF3:
+        case GPU_COM_NF3 | TMD_MODE_ABE:
+            idx[0] = PRIM(TMD_P_NF3)->v0;
+            idx[1] = PRIM(TMD_P_NF3)->v1;
+            idx[2] = PRIM(TMD_P_NF3)->v2;
+            size = sizeof(TMD_P_NF3);
             goto tri;
-        case 0x24:
-        case 0x26:
-            idx[0] = p->h[7];
-            idx[1] = p->h[8];
-            idx[2] = p->h[9];
-            size = 0x18;
+        case GPU_COM_TF3:
+        case GPU_COM_TF3 | TMD_MODE_ABE:
+            idx[0] = PRIM(TMD_P_TF3)->v0;
+            idx[1] = PRIM(TMD_P_TF3)->v1;
+            idx[2] = PRIM(TMD_P_TF3)->v2;
+            size = sizeof(TMD_P_TF3);
             goto tri;
-        case 0x25:
-        case 0x27:
-            idx[0] = p->h[8];
-            idx[1] = p->h[9];
-            idx[2] = p->h[10];
-            size = 0x1C;
+        case GPU_COM_NTF3:
+        case GPU_COM_NTF3 | TMD_MODE_ABE:
+            idx[0] = PRIM(TMD_P_TNF3)->v0;
+            idx[1] = PRIM(TMD_P_TNF3)->v1;
+            idx[2] = PRIM(TMD_P_TNF3)->v2;
+            size = sizeof(TMD_P_TNF3);
             goto tri;
-        case 0x28:
-        case 0x2A:
-            if (p->flag & 4) {
+        case GPU_COM_F4:
+        case GPU_COM_F4 | TMD_MODE_ABE:
+            if (p->flag & GsTMDFlagGRD) {
+                /* libgs.h has no struct for a gradated flat quad: TMD_P_F4
+                 * plus three colour words, so v0..v3 are h[9..12]. */
                 idx[0] = p->h[9];
                 idx[1] = p->h[10];
                 idx[2] = p->h[11];
                 idx[3] = p->h[12];
-                size = 0x20;
+                size = 32;
             } else {
-                idx[0] = p->h[3];
-                idx[1] = p->h[4];
-                idx[2] = p->h[5];
-                idx[3] = p->h[6];
-                size = 0x14;
+                idx[0] = PRIM(TMD_P_F4)->v0;
+                idx[1] = PRIM(TMD_P_F4)->v1;
+                idx[2] = PRIM(TMD_P_F4)->v2;
+                idx[3] = PRIM(TMD_P_F4)->v3;
+                size = sizeof(TMD_P_F4);
             }
             break;
-        case 0x29:
-        case 0x2B:
-            idx[0] = p->h[2];
-            idx[1] = p->h[3];
-            idx[2] = p->h[4];
-            idx[3] = p->h[5];
-            size = 0x10;
+        case GPU_COM_NF4:
+        case GPU_COM_NF4 | TMD_MODE_ABE:
+            idx[0] = PRIM(TMD_P_NF4)->v0;
+            idx[1] = PRIM(TMD_P_NF4)->v1;
+            idx[2] = PRIM(TMD_P_NF4)->v2;
+            idx[3] = PRIM(TMD_P_NF4)->v3;
+            size = sizeof(TMD_P_NF4);
             break;
-        case 0x2C:
-        case 0x2E:
-            idx[0] = p->h[9];
-            idx[1] = p->h[10];
-            idx[2] = p->h[11];
-            idx[3] = p->h[12];
-            size = 0x20;
+        case GPU_COM_TF4:
+        case GPU_COM_TF4 | TMD_MODE_ABE:
+            idx[0] = PRIM(TMD_P_TF4)->v0;
+            idx[1] = PRIM(TMD_P_TF4)->v1;
+            idx[2] = PRIM(TMD_P_TF4)->v2;
+            idx[3] = PRIM(TMD_P_TF4)->v3;
+            size = sizeof(TMD_P_TF4);
             break;
-        case 0x2D:
-        case 0x2F:
-            idx[0] = p->h[10];
-            idx[1] = p->h[11];
-            idx[2] = p->h[12];
-            idx[3] = p->h[13];
-            size = 0x20;
+        case GPU_COM_NTF4:
+        case GPU_COM_NTF4 | TMD_MODE_ABE:
+            idx[0] = PRIM(TMD_P_TNF4)->v0;
+            idx[1] = PRIM(TMD_P_TNF4)->v1;
+            idx[2] = PRIM(TMD_P_TNF4)->v2;
+            idx[3] = PRIM(TMD_P_TNF4)->v3;
+            size = sizeof(TMD_P_TNF4);
             break;
-        case 0x30:
-        case 0x32:
-            if (p->flag & 4) {
-                idx[0] = p->h[7];
-                idx[1] = p->h[9];
-                idx[2] = p->h[11];
-                size = 0x1C;
+        case GPU_COM_G3:
+        case GPU_COM_G3 | TMD_MODE_ABE:
+            if (p->flag & GsTMDFlagGRD) {
+                idx[0] = PRIM(TMD_P_G3G)->v0;
+                idx[1] = PRIM(TMD_P_G3G)->v1;
+                idx[2] = PRIM(TMD_P_G3G)->v2;
+                size = sizeof(TMD_P_G3G);
                 goto tri;
             } else {
-                idx[0] = p->h[3];
-                idx[1] = p->h[5];
-                idx[2] = p->h[7];
-                size = 0x14;
+                idx[0] = PRIM(TMD_P_G3)->v0;
+                idx[1] = PRIM(TMD_P_G3)->v1;
+                idx[2] = PRIM(TMD_P_G3)->v2;
+                size = sizeof(TMD_P_G3);
                 goto tri;
             }
             break;
-        case 0x31:
-        case 0x33:
-            idx[0] = p->h[6];
-            idx[1] = p->h[7];
-            idx[2] = p->h[8];
-            size = 0x18;
+        case GPU_COM_NG3:
+        case GPU_COM_NG3 | TMD_MODE_ABE:
+            idx[0] = PRIM(TMD_P_NG3)->v0;
+            idx[1] = PRIM(TMD_P_NG3)->v1;
+            idx[2] = PRIM(TMD_P_NG3)->v2;
+            size = sizeof(TMD_P_NG3);
             goto tri;
-        case 0x34:
-        case 0x36:
-            idx[0] = p->h[7];
-            idx[1] = p->h[9];
-            idx[2] = p->h[11];
-            size = 0x1C;
+        case GPU_COM_TG3:
+        case GPU_COM_TG3 | TMD_MODE_ABE:
+            idx[0] = PRIM(TMD_P_TG3)->v0;
+            idx[1] = PRIM(TMD_P_TG3)->v1;
+            idx[2] = PRIM(TMD_P_TG3)->v2;
+            size = sizeof(TMD_P_TG3);
             goto tri;
-        case 0x35:
-        case 0x37:
-            idx[0] = p->h[12];
-            idx[1] = p->h[13];
-            idx[2] = p->h[14];
-            size = 0x24;
+        case GPU_COM_NTG3:
+        case GPU_COM_NTG3 | TMD_MODE_ABE:
+            idx[0] = PRIM(TMD_P_TNG3)->v0;
+            idx[1] = PRIM(TMD_P_TNG3)->v1;
+            idx[2] = PRIM(TMD_P_TNG3)->v2;
+            size = sizeof(TMD_P_TNG3);
         tri:
             *n = 3;
             break;
-        case 0x38:
-        case 0x3A:
-            if (p->flag & 4) {
+        case GPU_COM_G4:
+        case GPU_COM_G4 | TMD_MODE_ABE:
+            if (p->flag & GsTMDFlagGRD) {
+                /* libgs.h has no struct for a gradated gouraud quad: TMD_P_G4
+                 * plus three colour words, so v0..v3 are h[9], h[11], h[13], h[15]. */
                 idx[0] = p->h[9];
                 idx[1] = p->h[11];
                 idx[2] = p->h[13];
                 idx[3] = p->h[15];
-                size = 0x24;
+                size = 36;
             } else {
-                idx[0] = p->h[3];
-                idx[1] = p->h[5];
-                idx[2] = p->h[7];
-                idx[3] = p->h[9];
-                size = 0x18;
+                idx[0] = PRIM(TMD_P_G4)->v0;
+                idx[1] = PRIM(TMD_P_G4)->v1;
+                idx[2] = PRIM(TMD_P_G4)->v2;
+                idx[3] = PRIM(TMD_P_G4)->v3;
+                size = sizeof(TMD_P_G4);
             }
             break;
-        case 0x39:
-        case 0x3B:
-            idx[0] = p->h[8];
-            idx[1] = p->h[9];
-            idx[2] = p->h[10];
-            idx[3] = p->h[11];
-            size = 0x1C;
+        case GPU_COM_NG4:
+        case GPU_COM_NG4 | TMD_MODE_ABE:
+            idx[0] = PRIM(TMD_P_NG4)->v0;
+            idx[1] = PRIM(TMD_P_NG4)->v1;
+            idx[2] = PRIM(TMD_P_NG4)->v2;
+            idx[3] = PRIM(TMD_P_NG4)->v3;
+            size = sizeof(TMD_P_NG4);
             break;
-        case 0x3C:
-        case 0x3E:
-            idx[0] = p->h[9];
-            idx[1] = p->h[11];
-            idx[2] = p->h[13];
-            idx[3] = p->h[15];
-            size = 0x24;
+        case GPU_COM_TG4:
+        case GPU_COM_TG4 | TMD_MODE_ABE:
+            idx[0] = PRIM(TMD_P_TG4)->v0;
+            idx[1] = PRIM(TMD_P_TG4)->v1;
+            idx[2] = PRIM(TMD_P_TG4)->v2;
+            idx[3] = PRIM(TMD_P_TG4)->v3;
+            size = sizeof(TMD_P_TG4);
             break;
-        case 0x3D:
-        case 0x3F:
-            idx[0] = p->h[16];
-            idx[1] = p->h[17];
-            idx[2] = p->h[18];
-            idx[3] = p->h[19];
-            size = 0x2C;
+        case GPU_COM_NTG4:
+        case GPU_COM_NTG4 | TMD_MODE_ABE:
+            idx[0] = PRIM(TMD_P_TNG4)->v0;
+            idx[1] = PRIM(TMD_P_TNG4)->v1;
+            idx[2] = PRIM(TMD_P_TNG4)->v2;
+            idx[3] = PRIM(TMD_P_TNG4)->v3;
+            size = sizeof(TMD_P_TNG4);
             break;
         default:
             *n = 0;
@@ -584,8 +601,7 @@ TmdPrim *TmdModel__NextPrimitive(TmdModel *self, TmdPrim *p, s32 *n, TmdVec3 *ou
     verts = self->object->verts;
     for (i = 0; i < *n; i++) {
         /* MATCHING: verts[idx[i]] and every equivalent pointer-arithmetic
-         * form swap two registers and cost a word (docs/match-reports/
-         * TmdModel__NextPrimitive.md, build 7). */
+         * form swap two registers and cost a word (its match report). */
         out[i] = *(TmdVec3 *)((u8 *)verts + (idx[i] << 3));
     }
     (*count)++;
