@@ -11,7 +11,7 @@ drift. Fresh ground (carved revision 18, no prior report).
 
 Forwarder with six arguments: `return self->unk30->methods->slot80(self->unk30, arg1..arg5);` -- the incoming stack args 5/6 are copied to the outgoing frame's +0x10/+0x14 and +0x30 is loaded twice (once for the table, once for a0).
 
-Table slot (`tools/classtable.py`): D_8006F384 +0x084 and D_8006F40C +0x084 (`decodeTodPacket` in include/code_55dd4.h).
+Table slot (`tools/classtable.py`): gModelDataMethods +0x084 and D_8006F40C +0x084 (`decodeTodPacket` in include/code_55dd4.h).
 
 ## Source
 
@@ -23,7 +23,7 @@ Slot +0x078 is `void *slot78` in the unified macro, so calls cast it.
 ```c
 #include "ModelData.h"
 
-/* D_8006F384/D_8006F40C +0x084: forwarded to slot +0x080 of the object at +0x30. */
+/* gModelDataMethods/D_8006F40C +0x084: forwarded to slot +0x080 of the object at +0x30. */
 void *ModelData__ForwardDecodePacketWord(ModelData *self, s32 arg1, s32 arg2, s32 arg3, s32 arg4, s32 arg5) {
     return ((DataSrc33808 *)self->todSet)->methods->slot80(self->todSet, arg1, arg2, arg3, arg4, arg5);
 }
@@ -42,7 +42,7 @@ void *ModelData__ForwardDecodePacketWord(ModelData *self, s32 arg1, s32 arg2, s3
 
 ## Track 4
 
-2026-09-25, round 84 (delta): ModelData (D_8006F384) is unified in `include/ModelData.h`; the unit-shared `DataSrc33808` view no longer types it. Slot +0x084 is `decodePacketWord`. The TodSet's slot +0x080 lies past Class6D430's table, and the TodSet class (D_8006F590) is not unified, so the call reaches it through `((DataSrc33808 *)self->todSet)->methods->slot80`: a pointer cast, no code. Image byte-identical.
+2026-09-25, round 84 (delta): ModelData (gModelDataMethods) is unified in `include/ModelData.h`; the unit-shared `DataSrc33808` view no longer types it. Slot +0x084 is `decodePacketWord`. The TodSet's slot +0x080 lies past Class6D430's table, and the TodSet class (D_8006F590) is not unified, so the call reaches it through `((DataSrc33808 *)self->todSet)->methods->slot80`: a pointer cast, no code. Image byte-identical.
 
 ## Track 4 (2026-09-26, round 88, delta)
 

@@ -734,7 +734,7 @@ shape is wrong, not that the remainder is register allocation.
 
 Round 75 (charlie), track 3.
 
-- `Class65650__CreateParts` (was `func_80065E1C`), tier A. Asks modelData->getObjectIds (D_8006F384 +0x080) for the count, allocates parts (count pointers) and partIds (count bytes), fills partIds, creates one New_Actor per entry counting partCount up, sets mainPart = parts[buf[0]]; on any failure DestroyParts and return 1.
+- `Class65650__CreateParts` (was `func_80065E1C`), tier A. Asks modelData->getObjectIds (gModelDataMethods +0x080) for the count, allocates parts (count pointers) and partIds (count bytes), fills partIds, creates one New_Actor per entry counting partCount up, sets mainPart = parts[buf[0]]; on any failure DestroyParts and return 1.
 
 ## Track 4 (2026-09-25, round 85, alpha)
 

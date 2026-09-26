@@ -22,7 +22,7 @@
  *   - Tod / TodSet (gTodMethods / D_8006F590, TodSet a Tod subclass): one
  *     TOD's packet stream (ScanTodPackets/DecodeTodPacketWord) and an array
  *     of them; named from include/code_55dd4.h's own "TOD set" (Unk30Obj).
- *   - ModelData / TriggerWorld (D_8006F384 / D_8006F40C, TriggerWorld a
+ *   - ModelData / TriggerWorld (gModelDataMethods / D_8006F40C, TriggerWorld a
  *     ModelData subclass): a LinkResource+TodSet pair, and an array of
  *     those pairs; ModelData named from code_55dd4.h/.c's own "tmd"/"tods"/
  *     "modelData" fields, TriggerWorld from code_4cd08.c's own declared
@@ -815,7 +815,7 @@ BgLayerMethods *GetBgLayerMethods(void) {
     return &gBgLayerMethods;
 }
 
-/* Allocate and construct a D_8006F384 object (second constructor argument 1); freed and NULL when the constructor fails. */
+/* Allocate and construct a gModelDataMethods object (second constructor argument 1); freed and NULL when the constructor fails. */
 ModelData *New_ModelData(Src6F240 *src) {
     void *obj = BMemPMgrAlloc(0x38);
 
@@ -828,7 +828,7 @@ ModelData *New_ModelData(Src6F240 *src) {
     return NULL;
 }
 
-/* D_8006F384 +0x008: constructor -- the active driver's, then this table,
+/* gModelDataMethods +0x008: constructor -- the active driver's, then this table,
  * `owns` at +0x34; adopt the descriptor's buffer (size 0) and run its own
  * +0x064, whose nonzero result fails the construction (NULL), or else
  * request its file. */
@@ -850,19 +850,19 @@ fail:
     return NULL;
 }
 
-/* D_8006F384 +0x00C: finalize -- slot +0x07C, then the active driver's. */
+/* gModelDataMethods +0x00C: finalize -- slot +0x07C, then the active driver's. */
 void ModelData__Finalize(ModelData *self) {
     self->methods->releaseResources(self);
     GetActiveDataSourceMethods()->finalize((Class6D430 *)self);
 }
 
-/* D_8006F384 +0x064: the active driver's setFlag, then slot +0x078. */
+/* gModelDataMethods +0x064: the active driver's setFlag, then slot +0x078. */
 void ModelData__Load(ModelData *self) {
     GetActiveDataSourceMethods()->setFlag((Class6D430 *)self);
     ((s32 (*)())self->methods->slot78)(self);
 }
 
-/* D_8006F384 +0x078: when +0x34 is set, build a LinkResource source over the
+/* gModelDataMethods +0x078: when +0x34 is set, build a LinkResource source over the
  * buffer's sub-block (at the offset in its third word) and a D_8006F590 one
  * over the buffer past +0x0C, into +0x2C and +0x30; 0 when both exist,
  * otherwise slot +0x07C (release) and 1. */
@@ -900,7 +900,7 @@ s32 ModelData__BuildResources(ModelData *self) {
     return 0;
 }
 
-/* D_8006F384 +0x07C: when +0x34 is set, release the objects at +0x30 and
+/* gModelDataMethods +0x07C: when +0x34 is set, release the objects at +0x30 and
  * +0x2C (each when there is one). */
 void ModelData__ReleaseResources(ModelData *self) {
     if (self->ownsResources != 0) {
@@ -913,12 +913,12 @@ void ModelData__ReleaseResources(ModelData *self) {
     }
 }
 
-/* D_8006F384/D_8006F40C +0x080: forwarded to slot +0x078 of the object at +0x30. */
+/* gModelDataMethods/D_8006F40C +0x080: forwarded to slot +0x078 of the object at +0x30. */
 u8 ModelData__ForwardScanPackets(ModelData *self, s32 arg1, s32 arg2) {
     return ((s32 (*)())self->todSet->methods->slot78)(self->todSet, arg1, arg2);
 }
 
-/* D_8006F384/D_8006F40C +0x084: forwarded to slot +0x080 of the object at +0x30. */
+/* gModelDataMethods/D_8006F40C +0x084: forwarded to slot +0x080 of the object at +0x30. */
 void *ModelData__ForwardDecodePacketWord(ModelData *self, s32 arg1, s32 arg2, s32 arg3, s32 arg4,
                                          s32 arg5) {
     return ((TodSet *)self->todSet)
@@ -927,7 +927,7 @@ void *ModelData__ForwardDecodePacketWord(ModelData *self, s32 arg1, s32 arg2, s3
 }
 
 ModelDataMethods *GetModelDataMethods(void) {
-    return &D_8006F384;
+    return &gModelDataMethods;
 }
 
 /* Allocate and construct a TriggerWorld; freed and NULL when the constructor fails. */

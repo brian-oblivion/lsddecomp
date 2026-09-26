@@ -102,7 +102,7 @@ Round 75 (charlie), track 3.
 
 ## Track 4
 
-2026-09-25, round 84 (delta): ModelData (D_8006F384) is unified in `include/ModelData.h`. code_55dd4.c includes it, and include/code_55dd4.h's local `extern Unk5CObj *New_ModelData(UnkArg1Obj *arg)` is deleted. The call reads `self->modelData = (Unk5CObj *)New_ModelData((struct Src6F240 *)other)`, pointer casts with no code. The field's type, Unk5CObj (a view of ModelData), belongs to Class65650 and is left for that class's unification. Image byte-identical.
+2026-09-25, round 84 (delta): ModelData (gModelDataMethods) is unified in `include/ModelData.h`. code_55dd4.c includes it, and include/code_55dd4.h's local `extern Unk5CObj *New_ModelData(UnkArg1Obj *arg)` is deleted. The call reads `self->modelData = (Unk5CObj *)New_ModelData((struct Src6F240 *)other)`, pointer casts with no code. The field's type, Unk5CObj (a view of ModelData), belongs to Class65650 and is left for that class's unification. Image byte-identical.
 
 ## Track 4 (2026-09-25, round 85, alpha)
 

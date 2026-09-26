@@ -32,7 +32,7 @@ void TimBlockSrc__Finalize(DataSrc33808 *self) {
 ## Notes
 
 - Byte-exact on the first build.
-- +0x30 is typed `DataSrc33808 *unk30` in the unit view (its meaning for D_8006F384/D_8006F40C); for this class it is the array, so the call casts.
+- +0x30 is typed `DataSrc33808 *unk30` in the unit view (its meaning for gModelDataMethods/D_8006F40C); for this class it is the array, so the call casts.
 - No shared header was edited; prototypes for other units' functions are local
   to the unit.
 - Types of arguments and returns are readings of the registers used, not proven.

@@ -227,4 +227,4 @@ alone, hence tier B rather than A.
 
 ## Track 4
 
-2026-09-25, round 84 (delta): ModelData (D_8006F384) is unified in `include/ModelData.h`. code_4cd08 includes it, and include/code_4cd08.h's local `extern void *New_ModelData(DreamAuxLoadReq *req)` is deleted. The call reads `New_ModelData((struct Src6F240 *)&req)`, a pointer cast with no code. DreamAuxLoadReq {flag, name, mode} has the descriptor's own shape: word 0 is the buffer to adopt, and it is 0 here, so ModelData__ModelData requests the MOM file named in word 1. Image byte-identical.
+2026-09-25, round 84 (delta): ModelData (gModelDataMethods) is unified in `include/ModelData.h`. code_4cd08 includes it, and include/code_4cd08.h's local `extern void *New_ModelData(DreamAuxLoadReq *req)` is deleted. The call reads `New_ModelData((struct Src6F240 *)&req)`, a pointer cast with no code. DreamAuxLoadReq {flag, name, mode} has the descriptor's own shape: word 0 is the buffer to adopt, and it is 0 here, so ModelData__ModelData requests the MOM file named in word 1. Image byte-identical.

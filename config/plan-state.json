@@ -872,11 +872,6 @@
           "date": "2026-09-26",
           "header": "include/Class6E99C.h"
         },
-        "D_8006F384": {
-          "class": "ModelData",
-          "date": "2026-09-25",
-          "header": "include/ModelData.h"
-        },
         "D_8006F40C": {
           "class": "TriggerWorld",
           "date": "2026-09-26",
@@ -1026,6 +1021,11 @@
           "class": "LinkResource",
           "date": "2026-09-26",
           "header": "include/LinkResource.h"
+        },
+        "gModelDataMethods": {
+          "class": "ModelData",
+          "date": "2026-09-25",
+          "header": "include/ModelData.h"
         },
         "gMoviePlayerMethods": {
           "class": "MoviePlayer",

@@ -11,7 +11,7 @@ drift. Fresh ground (carved revision 18, no prior report).
 
 Forwarder: `return self->unk30->methods->slot78(self->unk30, arg1, arg2);` returning u8 (`andi 0xFF`).
 
-Table slot (`tools/classtable.py`): D_8006F384 +0x080 and D_8006F40C +0x080 (include/code_55dd4.h names this slot `getObjectIds` in its Unk5CObj view).
+Table slot (`tools/classtable.py`): gModelDataMethods +0x080 and D_8006F40C +0x080 (include/code_55dd4.h names this slot `getObjectIds` in its Unk5CObj view).
 
 ## Source
 
@@ -23,7 +23,7 @@ Slot +0x078 is `void *slot78` in the unified macro, so calls cast it.
 ```c
 #include "ModelData.h"
 
-/* D_8006F384/D_8006F40C +0x080: forwarded to slot +0x078 of the object at +0x30. */
+/* gModelDataMethods/D_8006F40C +0x080: forwarded to slot +0x078 of the object at +0x30. */
 u8 ModelData__ForwardScanPackets(ModelData *self, s32 arg1, s32 arg2) {
     return ((s32 (*)())self->todSet->methods->slot78)(self->todSet, arg1, arg2);
 }
@@ -42,4 +42,4 @@ u8 ModelData__ForwardScanPackets(ModelData *self, s32 arg1, s32 arg2) {
 
 ## Track 4
 
-2026-09-25, round 84 (delta): ModelData (D_8006F384) is unified in `include/ModelData.h`; the unit-shared `DataSrc33808` view no longer types it. Slot +0x080 is `scanPackets`, `u8 (*)(ModelData *self, s32 arg1, s32 arg2)`. The forwarded call reads `todSet->methods->slot78` through Class6D430's table, still cast, because the TodSet class (D_8006F590) is not unified. Image byte-identical.
+2026-09-25, round 84 (delta): ModelData (gModelDataMethods) is unified in `include/ModelData.h`; the unit-shared `DataSrc33808` view no longer types it. Slot +0x080 is `scanPackets`, `u8 (*)(ModelData *self, s32 arg1, s32 arg2)`. The forwarded call reads `todSet->methods->slot78` through Class6D430's table, still cast, because the TodSet class (D_8006F590) is not unified. Image byte-identical.

@@ -5,7 +5,7 @@
 
 /*
  * ModelData -- a Class6D430 data source (class id 0x5F03, method table
- * D_8006F384) that splits one loaded file into a LinkResource (gLinkResourceMethods,
+ * gModelDataMethods) that splits one loaded file into a LinkResource (gLinkResourceMethods,
  * an array of TMD models) and a TodSet (D_8006F590, an array of TOD
  * animations), and forwards TOD packet scanning to the TodSet. Methods in
  * src/code_33808.c; one subclass, TriggerWorld (D_8006F40C, 0x15F03), whose
@@ -73,7 +73,7 @@ struct ModelData {
     MODELDATA_FIELDS(ModelDataMethods);
 };
 
-extern ModelDataMethods D_8006F384;
+extern ModelDataMethods gModelDataMethods;
 extern ModelDataMethods *GetModelDataMethods(void);
 
 ModelData *New_ModelData(struct Src6F240 *src);

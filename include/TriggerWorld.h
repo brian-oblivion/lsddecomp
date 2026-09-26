@@ -25,7 +25,7 @@
  * getModelData(record->parity) on as New_Entity's descriptor word +0x00C,
  * which Class65650__AcquireModelData borrows as the entity's ModelData.
  *
- * SLOTS (`classtable.py D_8006F40C --vs D_8006F384`: 34 against 33): the
+ * SLOTS (`classtable.py D_8006F40C --vs gModelDataMethods`: 34 against 33): the
  * overrides are +0x008 (ctor), +0x00C (TriggerWorld__Finalize), +0x064
  * (setFlag: TriggerWorld__Load, which only runs +0x078), +0x078 (Class6D430's
  * slot78: TriggerWorld__BuildResources, s32, as ModelData__BuildResources

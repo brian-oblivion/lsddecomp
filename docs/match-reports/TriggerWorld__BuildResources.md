@@ -11,7 +11,7 @@ drift. Fresh ground (carved revision 18, no prior report).
 
 ## What it does
 
-Build step: SetVec3 fills a three-word request {buffer, 0, 1}; for each of the buffer's `count` offsets, point the request at buffer+offset, allocate a D_8006F384 source through New_ModelData and store it over the offset word itself (entries[i]), counting successes at +0x38. On an allocation failure call its own +0x07C (TriggerWorld__ReleaseResources, which releases the ones built and zeroes the count) and return 1; otherwise 0. The sibling of D_8006F384's ModelData__BuildResources.
+Build step: SetVec3 fills a three-word request {buffer, 0, 1}; for each of the buffer's `count` offsets, point the request at buffer+offset, allocate a gModelDataMethods source through New_ModelData and store it over the offset word itself (entries[i]), counting successes at +0x38. On an allocation failure call its own +0x07C (TriggerWorld__ReleaseResources, which releases the ones built and zeroes the count) and return 1; otherwise 0. The sibling of gModelDataMethods's ModelData__BuildResources.
 
 Table slot (`tools/classtable.py`): D_8006F40C +0x078.
 
@@ -23,7 +23,7 @@ fields +0x2C..+0x38), `Ctor33808`, `CountedBuf33808` and `Req44858` sit at the
 top of / earlier in `src/code_33808.c`.
 
 ```c
-/* D_8006F40C +0x078: build a D_8006F384 source (not owning) over each
+/* D_8006F40C +0x078: build a gModelDataMethods source (not owning) over each
  * sub-block of the buffer's counted offset table, into the table's own
  * words, counting them at +0x38; 0 when all exist, otherwise slot +0x07C
  * (release) and 1. */
@@ -66,7 +66,7 @@ First build. The loop pointer walks `buf->entries` while the offset is re-read t
 
 ## Track 4
 
-2026-09-25, round 84 (delta): Its parent ModelData (D_8006F384) is unified in `include/ModelData.h` (this class is still its own job). The part allocation reads `*p = (s32)New_ModelData((Src6F240 *)&req)` (was `(s32)&req`), a pointer cast with no code. Image byte-identical.
+2026-09-25, round 84 (delta): Its parent ModelData (gModelDataMethods) is unified in `include/ModelData.h` (this class is still its own job). The part allocation reads `*p = (s32)New_ModelData((Src6F240 *)&req)` (was `(s32)&req`), a pointer cast with no code. Image byte-identical.
 
 ## Track 4 (2026-09-26, round 88, bravo)
 

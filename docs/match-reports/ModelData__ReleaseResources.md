@@ -11,7 +11,7 @@ drift. Fresh ground (carved revision 18, no prior report).
 
 When +0x34 is nonzero: releases (own slot +0x004) the object at +0x30 if non-NULL, then the object at +0x2C if non-NULL. The release results are discarded (the fields are not cleared).
 
-Table slot (`tools/classtable.py`): D_8006F384 +0x07C.
+Table slot (`tools/classtable.py`): gModelDataMethods +0x07C.
 
 ## Source
 
@@ -23,7 +23,7 @@ fields +0x2C..+0x38), `Ctor33808` and `CountedBuf33808` sit at the top of
 ```c
 #include "ModelData.h"
 
-/* D_8006F384 +0x07C: when +0x34 is set, release the objects at +0x30 and
+/* gModelDataMethods +0x07C: when +0x34 is set, release the objects at +0x30 and
  * +0x2C (each when there is one). */
 void ModelData__ReleaseResources(ModelData *self) {
     if (self->ownsResources != 0) {
@@ -47,4 +47,4 @@ First build. +0x2C is `s32` in the unit-local DataSrc33808 view (other classes s
 
 ## Track 4
 
-2026-09-25, round 84 (delta): ModelData (D_8006F384) is unified in `include/ModelData.h`; the unit-shared `DataSrc33808` view no longer types it. Its slot, +0x07C, is named `releaseResources` for this function. Both releases now go through the unified Class6D430 table (`linkResource->methods->release`, `todSet->methods->release`); before, they went through `DataSrc33808` casts. Image byte-identical.
+2026-09-25, round 84 (delta): ModelData (gModelDataMethods) is unified in `include/ModelData.h`; the unit-shared `DataSrc33808` view no longer types it. Its slot, +0x07C, is named `releaseResources` for this function. Both releases now go through the unified Class6D430 table (`linkResource->methods->release`, `todSet->methods->release`); before, they went through `DataSrc33808` casts. Image byte-identical.

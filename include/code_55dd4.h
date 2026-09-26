@@ -26,7 +26,7 @@ typedef struct TagCheckArg {
     TaggedObj *methods; /* +0x000 */
 } TagCheckArg;
 
-/* Header word of D_8006F384 (tools/classtable.py), the class New_ModelData
+/* Header word of gModelDataMethods (tools/classtable.py), the class New_ModelData
  * allocates and Class65650.modelData points at. */
 #define MODEL_DATA_CLASS_HEADER 0x5F03
 
