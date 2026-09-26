@@ -2978,3 +2978,11 @@ byte oracle: the callee reads registers the caller already left loaded
 (round 57, `func_8001E7BC` declared `(void)` and called with none while
 taking three). A match is the first moment a real signature exists to check
 against.
+
+## Distilled from §3.5 on 2026-09-26 (round 87, word budget)
+
+A check-3 verdict written before round 58 that says "0/0" without naming how
+the real-build signature was obtained was inferred from length; the head's
+sweep of the 12 such reports found most decided on check 2 alone, which this
+does not touch. Re-run check 3 with the funcdiff line before citing one.
+

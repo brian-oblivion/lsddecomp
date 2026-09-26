@@ -270,11 +270,6 @@ When the two signatures differ and neither decline row applies, objdump both
 objects: identical disassembly means the gap is a diff-alignment artifact and
 the verdict is AGREE (round 66, scaffold 4/4 against funcdiff 10/10).
 
-A check-3 verdict written before round 58 that says "0/0" without naming how
-the real-build signature was obtained was inferred from length; the head's
-sweep of the 12 such reports found most decided on check 2 alone, which this
-does not touch. Re-run check 3 with the funcdiff line before citing one.
-
 Zero-ness is not the discriminator; agreement is. A recorded negative whose
 search never passed check 3 is not evidence about the function, and a
 negative is a verdict about the BODY it was measured on: after a rewrite that
