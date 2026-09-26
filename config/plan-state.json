@@ -1031,6 +1031,11 @@
           "class": "Viewport",
           "date": "2026-09-25",
           "header": "include/Viewport.h"
+        },
+        "gWBgmMethods": {
+          "class": "WBgm",
+          "date": "2026-09-26",
+          "header": "include/WBgm.h"
         }
       },
       "reason": "",
