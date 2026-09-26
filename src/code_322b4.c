@@ -46,6 +46,7 @@
 #include "LightRig.h"
 #include "FlatLightObj.h"
 #include "Class6EED8.h"
+#include "TimImage.h"
 
 /* Local view of a D_8006EF50 (class id 0x5) object: only the three words its
  * +0x048..+0x058 accessors touch. */
@@ -68,21 +69,6 @@ struct D_8006EF50Methods {
 
 extern void GsSetAmbient(long r, long g, long b);
 
-/* libgs GsIMAGE (LIBGS.H), as code_2bb9c.c defines it; Sprite.h keeps only
- * the tag. InitGsSprite reads pmode, px/py and cx/cy. */
-struct GsIMAGE {
-    /* +0x00 */ u32 pmode;
-    /* +0x04 */ s16 px;
-    /* +0x06 */ s16 py;
-    /* +0x08 */ u16 pw;
-    /* +0x0A */ u16 ph;
-    /* +0x0C */ u32 *pixel;
-    /* +0x10 */ s16 cx;
-    /* +0x12 */ s16 cy;
-    /* +0x14 */ u16 cw;
-    /* +0x16 */ u16 ch;
-    /* +0x18 */ u32 *clut;
-};
 extern u16 GetTPage(s32 tp, s32 abr, s32 x, s32 y);
 
 /* The method tables the getters below return. */
@@ -246,7 +232,7 @@ void *Sprite__Sprite(Sprite *self, void *texture, s32 abr, SpriteRect *rect, voi
 }
 /* gSpriteMethods slot +0x040 (reset): bind the texture and cell, rebuild the GsSPRITE. */
 void Sprite__Reset(Sprite *self, void *texture, s32 abr, SpriteRect *rect) {
-    self->image = (struct GsIMAGE *)((u8 *)texture + 0x2C);
+    self->image = &((TimImage *)texture)->tim;
     self->rect = *rect;
     InitGsSprite(&self->sprite, abr, rect, self->image);
     self->unk58 = 0;
