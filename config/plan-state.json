@@ -849,9 +849,9 @@
           "header": "include/Class6D3C8.h"
         },
         "D_8006E99C": {
-          "class": "Class6E99C",
+          "class": "FadeBox",
           "date": "2026-09-26",
-          "header": "include/Class6E99C.h"
+          "header": "include/FadeBox.h"
         },
         "gActorMethods": {
           "class": "Actor",

@@ -32,9 +32,9 @@ void BoxFill__Reset(ClassEAC0Obj *self, SkipShort2 *a1, void *a2, s32 a3) {
 `a2` null-check**, not read fresh at the `slotB8` call site. An earlier
 version of this report read `self->methods` inline at the call and claimed
 37/37 -- taken during the stale-build window described in
-`New_Class6E99C.md`. Genuinely rebuilt, that inline form regressed
-(16/37): after `Class6E99CObj::unk60`/`unk62` were retyped `s16` -> `u16`
-(see `Class6E99C__PushPosition.md`), GCC stopped loading `self->methods` early and
+`New_FadeBox.md`. Genuinely rebuilt, that inline form regressed
+(16/37): after `FadeBoxObj::unk60`/`unk62` were retyped `s16` -> `u16`
+(see `FadeBox__PushPosition.md`), GCC stopped loading `self->methods` early and
 deferred it past the `a2` check instead, where retail loads it right after
 storing `unk62`. Hoisting it into a named local restores retail's early
 load. Worth noting as a SHARED-FIELD side effect: a field TYPE change in
@@ -61,9 +61,9 @@ type" caution, just for a parameter rather than a return.
 **`BoxFill__Reset`** -- tier A. `ClassEAC0Methods::finishConstruct`
 (`+0x040`), dispatched by `BoxFill__BoxFill` immediately after
 installing `self->methods` -- the identical architectural role, at the
-identical offset, as `Class6E99C__Reset` one level up and
+identical offset, as `FadeBox__Reset` one level up and
 `TextRow__Reset` (round 54, this same table family) one level
-further down. See `Class6E99C__Reset.md`'s naming note for the
+further down. See `FadeBox__Reset.md`'s naming note for the
 full three-occupant cross-check.
 
 ## Track 4 (2026-09-25, round 85, charlie)

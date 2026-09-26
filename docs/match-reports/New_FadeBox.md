@@ -1,4 +1,6 @@
-# New_Class6E99C -- MATCHED (31/31 words)
+# New_FadeBox -- MATCHED (31/31 words)
+
+> Renamed from `New_Class6E99C` on 2026-09-26 (tools/rename.py). Address 0x8003fdb0.
 
 > Renamed from `func_8003FDB0` on 2026-09-20 (tools/rename.py). Address 0x8003fdb0.
 
@@ -15,12 +17,12 @@ Unit `code_2cc8c_e`, carved round 14.
 > the first try:
 >
 > ```c
-> Class6E99CObj *New_Class6E99C(void *a1, s32 a2, s32 a3) {
->     Class6E99CObj *self;
+> FadeBoxObj *New_FadeBox(void *a1, s32 a2, s32 a3) {
+>     FadeBoxObj *self;
 >
 >     self = BMemPMgrAlloc(0xA0);
 >     if (self != NULL) {
->         GetClass6E99CMethods()->ctor(self, a1, a2, a3);
+>         GetFadeBoxMethods()->ctor(self, a1, a2, a3);
 >         return self;
 >     }
 >     return NULL;
@@ -32,7 +34,7 @@ Unit `code_2cc8c_e`, carved round 14.
 
 ## Shape
 
-`New_Class6E99C`-shaped allocator, the checked-return-regardless variant.
+`New_FadeBox`-shaped allocator, the checked-return-regardless variant.
 
 ## Residue (closed)
 
@@ -59,7 +61,7 @@ different values" as an earlier draft of that research doc claimed).
 
 ## What actually happened (kept for the record -- a real process lesson)
 
-This function's retype (`SubHandleObj *` -> `Class6E99CObj *`) was
+This function's retype (`SubHandleObj *` -> `FadeBoxObj *`) was
 committed alongside a header change that used `ClassEAC0Obj` at a line
 position ABOVE that type's own forward declaration -- a parse error in
 `code_2cc8c.c` (a DIFFERENT unit) that made `make` skip the final link
@@ -90,9 +92,9 @@ once the research doc identified that, this function (and its sibling
 
 ## Naming (round 61, track 3)
 
-**`New_Class6E99C`** -- tier A. Standard `New_X`-shaped allocator: allocates
-a fixed 0xA0 bytes (`Class6E99CObj`'s own size) and, on success, dispatches
-its ctor through `GetClass6E99CMethods()->ctor(...)` before returning it;
+**`New_FadeBox`** -- tier A. Standard `New_X`-shaped allocator: allocates
+a fixed 0xA0 bytes (`FadeBoxObj`'s own size) and, on success, dispatches
+its ctor through `GetFadeBoxMethods()->ctor(...)` before returning it;
 matches the project's established `New_X` convention (`New_Entity`,
 `New_DreamSys`, `New_TextRow`, etc.) exactly. Mechanics fully determine the
 name; no game-purpose claim beyond "allocate and construct one".

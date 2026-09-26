@@ -42,7 +42,7 @@ differences from the byte-by-byte shape.
 
 ### Proposed learning
 
-A third confirmation, after `Class6E99C__PushPosition` and `BoxFill__SetPosition`, that
+A third confirmation, after `FadeBox__PushPosition` and `BoxFill__SetPosition`, that
 **a scalar-field-by-scalar-field copy and a whole-aggregate copy of the
 same bytes are not interchangeable to this compiler even when they are
 semantically identical** -- and this instance sharpens the class further:
@@ -75,7 +75,7 @@ Within that scope, though, the evidence is broader than "one struct's
 idiom" and worth stating precisely:
 
 - **Two genuinely independent struct SHAPES.** A 2x`s32`, 4-byte-aligned
-  pair (`Pair32E99C`: `Class6E99C__PushPosition`, `BoxFill__SetPosition`, `TextRow__SetPosition`,
+  pair (`Pair32E99C`: `FadeBox__PushPosition`, `BoxFill__SetPosition`, `TextRow__SetPosition`,
   `TextRow__AttachToParent`) and a 3x`s8`, 1-byte-aligned, non-power-of-two triple
   (this function's own RGB-shaped struct, and `BoxFill__ApplyColor`'s copy arm
   in the SAME unit). These have nothing in common at the ABI level
@@ -84,7 +84,7 @@ idiom" and worth stating precisely:
   case should not have closed. It did, on the first attempt, with no
   adjustment.
 - **Two genuinely independent class/vtable families.** `Pair32E99C` copies
-  live in `Obj6EAC0`/`Class6E99CObj` (units `code_2cc8c_e`/`_f`); THIS
+  live in `Obj6EAC0`/`FadeBoxObj` (units `code_2cc8c_e`/`_f`); THIS
   function's 3-byte struct lives in `Obj86B60` (unit `code_2cc8c`,
   matched by a DIFFERENT runner in an EARLIER round before this round's
   fix) while `BoxFill__ApplyColor`'s matching 3-byte case lives in `Obj6EAC0`

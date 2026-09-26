@@ -2,7 +2,7 @@
 #include "code_2cc8c.h"
 
 /* ROUND 34: THIS UNIT LOST ITS FIRST EIGHT FUNCTIONS -- six of them to Sony,
- * two to files of their own -- and now begins at 0x305B0 / New_Class6E99C.
+ * two to files of their own -- and now begins at 0x305B0 / New_FadeBox.
  * The segment it used to be is split three ways:
  *
  *   [c libgs_gs_101]   GsSetNearClip          Sony libgs/gs_101, C file
@@ -13,7 +13,7 @@
  *   [o libgs/gs_108]   GsSetLightMode         was func_8003FC70, matched C
  *   [o libgte/fgo_00]  TransposeMatrix        was func_8003FCFC, a 20w stall
  *   [o libgte/fog_01]  SetFogNear             was func_8003FD4C, matched C
- *   [c code_2cc8c_e]   New_Class6E99C onward   <- this file
+ *   [c code_2cc8c_e]   New_FadeBox onward   <- this file
  *
  * THIS FILE KEEPS THE NAME deliberately: it holds the unit's remaining
  * INCLUDE_ASM stubs and its class, so every
@@ -36,31 +36,31 @@
 /*
  * WHAT THIS UNIT IS (round 61, track 3; revised rounds 85 and 87, track 4).
  * Its 17 functions are the bottom two links of `SceneNode -> BoxFill ->
- * Class6E99C`: first Class6E99C's (D_8006E99C, 0x164, `New_Class6E99C` to
- * `GetClass6E99CMethods`, include/Class6E99C.h), then BoxFill's allocator,
+ * FadeBox`: first FadeBox's (D_8006E99C, 0x164, `New_FadeBox` to
+ * `GetFadeBoxMethods`, include/FadeBox.h), then BoxFill's allocator,
  * ctor and Reset (0x64, include/BoxFill.h, a GsBOXF screen rectangle; the
  * rest of its methods open code_2cc8c_f).
  *
- * Class6E99C fades the box's colour: configure picks the channels (a
+ * FadeBox fades the box's colour: configure picks the channels (a
  * 4/2/1 = r/g/b mask) and a tick count, StartFadeDown/StartFadeUp set the
  * start colour and the step's sign, Update steps the selected channels once
  * per call until Stop, and PushPosition/PopPosition save and restore the
- * box's size and position (tier B; include/Class6E99C.h's banner has the
+ * box's size and position (tier B; include/FadeBox.h's banner has the
  * evidence). See each function's own `## Naming` section.
  */
 
-Class6E99C *New_Class6E99C(void *size, s32 channels, s32 pri) {
-    Class6E99C *self;
+FadeBox *New_FadeBox(void *size, s32 channels, s32 pri) {
+    FadeBox *self;
 
     self = BMemPMgrAlloc(0xA0);
     if (self != NULL) {
-        GetClass6E99CMethods()->ctor(self, size, channels, pri);
+        GetFadeBoxMethods()->ctor(self, size, channels, pri);
         return self;
     }
     return NULL;
 }
 
-void Class6E99C__Class6E99C(Class6E99C *self, void *size, s32 channels, s32 pri) {
+void FadeBox__FadeBox(FadeBox *self, void *size, s32 channels, s32 pri) {
     BoxFillMethods *base;
     void *color;
 
@@ -71,11 +71,11 @@ void Class6E99C__Class6E99C(Class6E99C *self, void *size, s32 channels, s32 pri)
         color = D_8006EAA8;
     }
     base->ctor((BoxFill *)self, size, color, pri);
-    self->methods = GetClass6E99CMethods();
-    ((Class6E99CResetFn)self->methods->reset)(self, channels);
+    self->methods = GetFadeBoxMethods();
+    ((FadeBoxResetFn)self->methods->reset)(self, channels);
 }
 
-void Class6E99C__Reset(Class6E99C *self, s32 channels) {
+void FadeBox__Reset(FadeBox *self, s32 channels) {
     self->defaultChannels = channels;
     self->state = 0;
     self->step = 0xA;
@@ -86,7 +86,7 @@ void Class6E99C__Reset(Class6E99C *self, s32 channels) {
     self->altMode = 0;
 }
 
-void Class6E99C__Update(Class6E99C *self, void *sender, s32 event) {
+void FadeBox__Update(FadeBox *self, void *sender, s32 event) {
     s32 old;
 
     if (event != 2) {
@@ -112,7 +112,7 @@ void Class6E99C__Update(Class6E99C *self, void *sender, s32 event) {
     }
 }
 
-void Class6E99C__SetStep(Class6E99C *self, s32 step) {
+void FadeBox__SetStep(FadeBox *self, s32 step) {
     self->step = step;
 }
 
@@ -120,7 +120,7 @@ void Class6E99C__SetStep(Class6E99C *self, s32 step) {
  * untouched (no argument register is set before that jalr), and spelling
  * the forward is load-bearing: a `(self)`-only call compiles to the same
  * instructions in a different order (29/35; round 73). */
-void Class6E99C__StartFadeDown(Class6E99C *self, BasicClass *source, s32 channels, s32 arg3) {
+void FadeBox__StartFadeDown(FadeBox *self, BasicClass *source, s32 channels, s32 arg3) {
     s32 idx;
 
     if (self->state != 0) {
@@ -132,7 +132,7 @@ void Class6E99C__StartFadeDown(Class6E99C *self, BasicClass *source, s32 channel
     self->step = -self->step;
 }
 
-void Class6E99C__StartFadeUp(Class6E99C *self, BasicClass *source, s32 channels, s32 arg3) {
+void FadeBox__StartFadeUp(FadeBox *self, BasicClass *source, s32 channels, s32 arg3) {
     if (self->state != 0) {
         return;
     }
@@ -145,8 +145,8 @@ void Class6E99C__StartFadeUp(Class6E99C *self, BasicClass *source, s32 channels,
     self->state = 2;
 }
 
-s32 Class6E99C__Configure(Class6E99C *self, BasicClass *source, s32 channels, s32 arg3) {
-    Class6E99CMethods *methods;
+s32 FadeBox__Configure(FadeBox *self, BasicClass *source, s32 channels, s32 arg3) {
+    FadeBoxMethods *methods;
     s32 rate;
     s32 q1, q2;
 
@@ -184,8 +184,8 @@ s32 Class6E99C__Configure(Class6E99C *self, BasicClass *source, s32 channels, s3
     return channels;
 }
 
-void Class6E99C__Stop(Class6E99C *self, BasicClass *source) {
-    Class6E99CMethods *methods;
+void FadeBox__Stop(FadeBox *self, BasicClass *source) {
+    FadeBoxMethods *methods;
     s32 event;
 
     methods = self->methods;
@@ -215,7 +215,7 @@ void Class6E99C__Stop(Class6E99C *self, BasicClass *source) {
     methods->notifyParents(self, event);
 }
 
-void *Class6E99C__GetColor(Class6E99C *self) {
+void *FadeBox__GetColor(FadeBox *self) {
     if (self->channels == 0xF) {
         return D_8006EAA8;
     }
@@ -226,7 +226,7 @@ void *Class6E99C__GetColor(Class6E99C *self) {
  * `movstrsi_internal` clobbers $v0/$v1/$a0/$a1, so `self` and `size`, live
  * across the first copy, cannot stay in their incoming registers: that is
  * retail's entry `move $a3,$a0` / delay-slot `move $t0,$a1` (round 73). */
-void Class6E99C__PushPosition(Class6E99C *self, SkipShort2 *size, Pair32E99C *pos) {
+void FadeBox__PushPosition(FadeBox *self, SkipShort2 *size, Pair32E99C *pos) {
     if (self->parent != 0) {
         self->savedW = self->boxW;
         self->savedH = self->boxH;
@@ -237,7 +237,7 @@ void Class6E99C__PushPosition(Class6E99C *self, SkipShort2 *size, Pair32E99C *po
     }
 }
 
-void Class6E99C__PopPosition(Class6E99C *self) {
+void FadeBox__PopPosition(FadeBox *self) {
     s32 t0, t1;
 
     t0 = self->savedPosX;
@@ -251,12 +251,12 @@ void Class6E99C__PopPosition(Class6E99C *self) {
     self->boxH = self->savedH;
 }
 
-void Class6E99C__SetDivisorMode(Class6E99C *self, s32 altMode, s32 divisor) {
+void FadeBox__SetDivisorMode(FadeBox *self, s32 altMode, s32 divisor) {
     self->altMode = altMode;
     self->divisor = divisor;
 }
 
-Class6E99CMethods *GetClass6E99CMethods(void) {
+FadeBoxMethods *GetFadeBoxMethods(void) {
     return &D_8006E99C;
 }
 

@@ -28,9 +28,9 @@
  *
  * Ctor chain: BoxFill__BoxFill calls GetSceneNodeMethods()->ctor first, so
  * the id parent (0x4) is the ctor-chain parent. One class derives from it,
- * Class6E99C (D_8006E99C, 0x164, a colour fade over the box; unified in
- * include/Class6E99C.h, round 87), whose ctor calls this one's first
- * (Class6E99C__Class6E99C: GetBoxFillMethods()->ctor).
+ * FadeBox (D_8006E99C, 0x164, a colour fade over the box; unified in
+ * include/FadeBox.h, round 87), whose ctor calls this one's first
+ * (FadeBox__FadeBox: GetBoxFillMethods()->ctor).
  *
  * Overrides whose parameter list differs from the inherited slot keep the
  * slot's type (FINISHING-PLAN track 4 step 6); a caller reaching the
@@ -48,7 +48,7 @@
  * The ctor itself returns nothing where SceneNode's slot returns `void *`;
  * every caller ignores the value.
  *
- * The object is 0x6C bytes (New_BoxFill); Class6E99C's own fields start at
+ * The object is 0x6C bytes (New_BoxFill); FadeBox's own fields start at
  * +0x06C.
  */
 
@@ -69,7 +69,7 @@ struct SkipShort2 {
 };
 
 /* A two-word screen position (setPosition, attachToParent's third argument):
- * copied whole into posX/posY. Class6E99C's position stack and gTextRowMethods's
+ * copied whole into posX/posY. FadeBox's position stack and gTextRowMethods's
  * layout loops use the same record. */
 struct Pair32E99C {
     s32 a; /* +0x000, x */
@@ -103,7 +103,7 @@ struct Pair32E99C {
     /* +0x058 */ u32 boxAttribute; /* GsBOXF.attribute: the setDisplay/setSemiTrans/setSemiTransRate bits */ \
     /* +0x05C */ s16 boxX;         /* GsBOXF.x: zeroed by Reset, written by DrawNode */            \
     /* +0x05E */ s16 boxY;         /* GsBOXF.y */                                                  \
-    /* +0x060 */ u16 boxW;         /* GsBOXF.w: Reset and setSize (Class6E99C reads it lhu) */    \
+    /* +0x060 */ u16 boxW;         /* GsBOXF.w: Reset and setSize (FadeBox reads it lhu) */    \
     /* +0x062 */ u16 boxH;         /* GsBOXF.h */                                                  \
     /* +0x064 */ u8 color[3];      /* GsBOXF.r, g, b: setColor (Reset's default D_8008A924) */     \
     /* +0x067 */ u8 pad67;                                                                         \

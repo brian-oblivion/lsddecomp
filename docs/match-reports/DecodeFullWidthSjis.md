@@ -353,13 +353,13 @@ compiler.
 **The idiom is NOT "name a second variable and GCC keeps a second
 register". It requires both variables to be independently MUTATED.**
 
-`Class6E99C__PushPosition` (`code_2cc8c_e`) is the measured boundary, and it was
+`FadeBox__PushPosition` (`code_2cc8c_e`) is the measured boundary, and it was
 already on record before this round: retail copies BOTH its parameters
 into fresh registers at entry (`move $a3,$a0` / `move $t0,$a1`) and never
 touches the originals again -- superficially the identical "retail spends
 a register this build will not spend" shape. That report's **attempt 2**
 tried exactly the fix that worked here, explicit local copies
-(`Class6E99CObj *obj = self; SkipShort2 *src = a1;` used throughout), and
+(`FadeBoxObj *obj = self; SkipShort2 *src = a1;` used throughout), and
 records: *"no change at all -- GCC still keeps the values in `$a0`/`$a1`"*.
 
 The discriminator is mutation, and it is mechanical:
@@ -367,7 +367,7 @@ The discriminator is mutation, and it is mechanical:
 - `DecodeFullWidthSjis` / `EncodeFullWidthSjis`: `d` and `dst` are **both incremented
   every iteration**. Two live induction variables, so two registers. The
   idiom works.
-- `Class6E99C__PushPosition`: the copy is never modified, so it is a pure alias and
+- `FadeBox__PushPosition`: the copy is never modified, so it is a pure alias and
   GCC 2.6.3's copy propagation collapses it no matter how the source
   spells it. The idiom cannot work, and that function's residue really is
   register identity.

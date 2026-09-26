@@ -1,12 +1,12 @@
-#ifndef CLASS6E99C_H
-#define CLASS6E99C_H
+#ifndef FADEBOX_H
+#define FADEBOX_H
 
 #include "BoxFill.h"
 
 /*
- * Class6E99C -- a BoxFill that fades its colour (class id 0x164, method table
+ * FadeBox -- a BoxFill that fades its colour (class id 0x164, method table
  * D_8006E99C). BoxFill's one subclass; no class derives from it. Methods in
- * src/code_2cc8c_e.c, New_Class6E99C to GetClass6E99CMethods. The ctor calls
+ * src/code_2cc8c_e.c, New_FadeBox to GetFadeBoxMethods. The ctor calls
  * GetBoxFillMethods()->ctor first, so the id parent (0x64) is the ctor-chain
  * parent. What its own methods do:
  *  - A channel mask selects the colour: `channels` (4 = r, 2 = g, 1 = b;
@@ -30,39 +30,39 @@
  *
  * Overrides whose parameter list differs from the inherited slot keep the
  * slot's type (FINISHING-PLAN track 4 step 6); the caller casts:
- *  - +0x040 reset: Class6E99C__Reset takes the ctor's channel mask; the ctor
- *    calls it through Class6E99CResetFn.
+ *  - +0x040 reset: FadeBox__Reset takes the ctor's channel mask; the ctor
+ *    calls it through FadeBoxResetFn.
  * The ctor returns nothing where the inherited slot returns `void *`, as
  * BoxFill's does; every caller ignores the value.
  *
- * The object is 0xA0 bytes (New_Class6E99C); BoxFill's fields end at +0x06C.
+ * The object is 0xA0 bytes (New_FadeBox); BoxFill's fields end at +0x06C.
  */
 
-typedef struct Class6E99C Class6E99C;
-typedef struct Class6E99CMethods Class6E99CMethods;
+typedef struct FadeBox FadeBox;
+typedef struct FadeBoxMethods FadeBoxMethods;
 
-/* BoxFill's slots (overrides: +0x008 Class6E99C__Class6E99C, +0x040
- * Class6E99C__Reset, +0x098 Class6E99C__Update; `tools/classtable.py
+/* BoxFill's slots (overrides: +0x008 FadeBox__FadeBox, +0x040
+ * FadeBox__Reset, +0x098 FadeBox__Update; `tools/classtable.py
  * D_8006E99C --vs gBoxFillMethods`), then this class's own. */
-struct Class6E99CMethods {
-    BOXFILL_SLOTS(Class6E99C, (Class6E99C * self, void *size, s32 channels, s32 pri));
-    /* +0x0D0 */ void (*setStep)(Class6E99C *self, s32 step); /* Class6E99C__SetStep */
-    /* +0x0D4 */ void (*startFadeDown)(Class6E99C *self, BasicClass *source, s32 channels,
-                                       s32 arg3); /* Class6E99C__StartFadeDown */
-    /* +0x0D8 */ void (*startFadeUp)(Class6E99C *self, BasicClass *source, s32 channels,
-                                     s32 arg3); /* Class6E99C__StartFadeUp */
-    /* +0x0DC */ s32 (*configure)(Class6E99C *self, BasicClass *source, s32 channels,
-                                  s32 arg3); /* Class6E99C__Configure: returns the mask it stored */
-    /* +0x0E0 */ void (*stop)(Class6E99C *self, BasicClass *source); /* Class6E99C__Stop */
-    /* +0x0E4 */ void *(*getColor)(Class6E99C *self); /* Class6E99C__GetColor: the mask's table entry */
-    /* +0x0E8 */ void (*pushPosition)(Class6E99C *self, SkipShort2 *size,
-                                      Pair32E99C *pos); /* Class6E99C__PushPosition: only while attached */
-    /* +0x0EC */ void (*popPosition)(Class6E99C *self); /* Class6E99C__PopPosition */
-    /* +0x0F0 */ void (*setDivisorMode)(Class6E99C *self, s32 altMode, s32 divisor); /* Class6E99C__SetDivisorMode */
+struct FadeBoxMethods {
+    BOXFILL_SLOTS(FadeBox, (FadeBox * self, void *size, s32 channels, s32 pri));
+    /* +0x0D0 */ void (*setStep)(FadeBox *self, s32 step); /* FadeBox__SetStep */
+    /* +0x0D4 */ void (*startFadeDown)(FadeBox *self, BasicClass *source, s32 channels,
+                                       s32 arg3); /* FadeBox__StartFadeDown */
+    /* +0x0D8 */ void (*startFadeUp)(FadeBox *self, BasicClass *source, s32 channels,
+                                     s32 arg3); /* FadeBox__StartFadeUp */
+    /* +0x0DC */ s32 (*configure)(FadeBox *self, BasicClass *source, s32 channels,
+                                  s32 arg3); /* FadeBox__Configure: returns the mask it stored */
+    /* +0x0E0 */ void (*stop)(FadeBox *self, BasicClass *source); /* FadeBox__Stop */
+    /* +0x0E4 */ void *(*getColor)(FadeBox *self); /* FadeBox__GetColor: the mask's table entry */
+    /* +0x0E8 */ void (*pushPosition)(FadeBox *self, SkipShort2 *size,
+                                      Pair32E99C *pos); /* FadeBox__PushPosition: only while attached */
+    /* +0x0EC */ void (*popPosition)(FadeBox *self); /* FadeBox__PopPosition */
+    /* +0x0F0 */ void (*setDivisorMode)(FadeBox *self, s32 altMode, s32 divisor); /* FadeBox__SetDivisorMode */
 };
 
-struct Class6E99C {
-    BOXFILL_FIELDS(Class6E99CMethods);
+struct FadeBox {
+    BOXFILL_FIELDS(FadeBoxMethods);
     /* +0x06C */ s32 state; /* 0 idle, 1 fading down (startFadeDown), 2 up (startFadeUp); stop returns it to 0 */
     /* +0x070 */ s32 defaultChannels; /* the ctor's mask (Reset); configure uses it when passed a negative mask */
     /* +0x074 */ s32 step; /* per-tick channel delta: 10 from Reset, setStep; negated by startFadeDown */
@@ -78,25 +78,25 @@ struct Class6E99C {
     /* +0x09C */ s32 divisor; /* setDivisorMode */
 };
 
-extern Class6E99CMethods D_8006E99C;
-extern Class6E99CMethods *GetClass6E99CMethods(void); /* returns &D_8006E99C */
+extern FadeBoxMethods D_8006E99C;
+extern FadeBoxMethods *GetFadeBoxMethods(void); /* returns &D_8006E99C */
 
 /* +0x040's occupant, as the ctor calls it through the inherited slot. */
-typedef void (*Class6E99CResetFn)(Class6E99C *self, s32 channels);
+typedef void (*FadeBoxResetFn)(FadeBox *self, s32 channels);
 
 /* The class's own methods, in ROM order (code_2cc8c_e). */
-Class6E99C *New_Class6E99C(void *size, s32 channels, s32 pri);
-void Class6E99C__Class6E99C(Class6E99C *self, void *size, s32 channels, s32 pri);
-void Class6E99C__Reset(Class6E99C *self, s32 channels);
-void Class6E99C__Update(Class6E99C *self, void *sender, s32 event);
-void Class6E99C__SetStep(Class6E99C *self, s32 step);
-void Class6E99C__StartFadeDown(Class6E99C *self, BasicClass *source, s32 channels, s32 arg3);
-void Class6E99C__StartFadeUp(Class6E99C *self, BasicClass *source, s32 channels, s32 arg3);
-s32 Class6E99C__Configure(Class6E99C *self, BasicClass *source, s32 channels, s32 arg3);
-void Class6E99C__Stop(Class6E99C *self, BasicClass *source);
-void *Class6E99C__GetColor(Class6E99C *self);
-void Class6E99C__PushPosition(Class6E99C *self, SkipShort2 *size, Pair32E99C *pos);
-void Class6E99C__PopPosition(Class6E99C *self);
-void Class6E99C__SetDivisorMode(Class6E99C *self, s32 altMode, s32 divisor);
+FadeBox *New_FadeBox(void *size, s32 channels, s32 pri);
+void FadeBox__FadeBox(FadeBox *self, void *size, s32 channels, s32 pri);
+void FadeBox__Reset(FadeBox *self, s32 channels);
+void FadeBox__Update(FadeBox *self, void *sender, s32 event);
+void FadeBox__SetStep(FadeBox *self, s32 step);
+void FadeBox__StartFadeDown(FadeBox *self, BasicClass *source, s32 channels, s32 arg3);
+void FadeBox__StartFadeUp(FadeBox *self, BasicClass *source, s32 channels, s32 arg3);
+s32 FadeBox__Configure(FadeBox *self, BasicClass *source, s32 channels, s32 arg3);
+void FadeBox__Stop(FadeBox *self, BasicClass *source);
+void *FadeBox__GetColor(FadeBox *self);
+void FadeBox__PushPosition(FadeBox *self, SkipShort2 *size, Pair32E99C *pos);
+void FadeBox__PopPosition(FadeBox *self);
+void FadeBox__SetDivisorMode(FadeBox *self, s32 altMode, s32 divisor);
 
 #endif

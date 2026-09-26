@@ -20,7 +20,7 @@ allocation failed.
 ## Derivation
 
 ```
-sub = this->unk100 (cached) OR New_Class6E99C(name-or-default, 0, arg4) (fresh)
+sub = this->unk100 (cached) OR New_FadeBox(name-or-default, 0, arg4) (fresh)
 if (fresh alloc failed) return NULL
 if (fresh) this->unk100 = sub
 sub->methods->slot50(sub)
@@ -43,7 +43,7 @@ Unk100Obj *Entity__GetOrCreateUnk100(Entity *this, void *name, void *arg2, void 
         if (name == NULL) {
             name = gEntityDefaultPos;
         }
-        sub = New_Class6E99C(name, 0, arg4);
+        sub = New_FadeBox(name, 0, arg4);
         if (sub == NULL) {
             return NULL;
         }
@@ -138,15 +138,15 @@ not after a guess about what the object represents.
 
 ## Track 4 (2026-09-26, round 87, echo)
 
-`Entity::unk100` is now typed `Class6E99C *` (include/Class6E99C.h); the
+`Entity::unk100` is now typed `FadeBox *` (include/FadeBox.h); the
 local `Unk100Obj`/`Unk100Methods` view and Entity.h's own
-`extern Unk100Obj *New_Class6E99C` are deleted. This function's four slot
+`extern Unk100Obj *New_FadeBox` are deleted. This function's four slot
 calls resolve through D_8006E99C (`tools/classtable.py D_8006E99C`) and now
 use the unified names: slot50 -> `detachFromParent`
 (SceneNode__DetachFromParent), slot4C -> `attachToParent`
 (BoxFill__AttachToParent, `this` upcast to `SceneNode *`), slotD0 ->
-`setStep` (Class6E99C__SetStep; `arg3` passed `(s32)`, no code). What the
-arguments are, from the occupants: `name` is New_Class6E99C's SIZE (read as
+`setStep` (FadeBox__SetStep; `arg3` passed `(s32)`, no code). What the
+arguments are, from the occupants: `name` is New_FadeBox's SIZE (read as
 two low halfwords into boxW/boxH; the default gEntityDefaultPos is
 {320, 240}), `arg2` is the attach position (BoxFill__AttachToParent's
 Pair32E99C; default {-100, -100}, the relative top-left, the same pair

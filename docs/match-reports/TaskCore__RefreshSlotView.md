@@ -65,7 +65,7 @@ could become one struct member (only `code_2cc8c_b.c` uses `Unk24Elem`).
 value the next call does not take is a missing argument, not a filler.** This
 residue was filed for six rounds as "early materialization of `&local`,
 redundant move, never reproduced by any C-level lever" and classed with
-`Class6E99C__PushPosition`'s permuter-exhausted word. The value was the third
+`FadeBox__PushPosition`'s permuter-exhausted word. The value was the third
 argument of the call immediately after the branch; the prototype had one
 argument too few, so no body could produce it. Check the register class
 before the word: a stray write to `$aN` right before a call site means read
@@ -138,7 +138,7 @@ buckets:
    `addiu $a2,sp,0x10` (the early materialization of `&local`, needed
    only much later at the second loop's `slot4C` call) in the reload's
    own load-delay slot; this body leaves it a `nop`. This is the SAME
-   residue CLASS already on file for `Class6E99C__PushPosition`'s own permuter-
+   residue CLASS already on file for `FadeBox__PushPosition`'s own permuter-
    exhausted final word and (per round-19's own note on this exact
    function) an earlier form of this function's own stall -- an
    early-materialized, delay-slot-filling redundant move that has never
@@ -421,7 +421,7 @@ change.
    parameter was cached into `$s6` at function entry) and the scheduler
    had an empty delay slot to fill. This is the exact "redundant
    move"/early-materialization residue class documented for
-   `Class6E99C__PushPosition`'s own still-open final word (see that report) --
+   `FadeBox__PushPosition`'s own still-open final word (see that report) --
    there, the SAME class of residue was marked PERMUTER-EXHAUSTED after
    an explicit branch-forced-copy trick and a 28k-iteration permuter
    search both failed to reproduce it.
@@ -452,7 +452,7 @@ phrased precisely: not closed in ~27,000 iterations under load.
 **Verdict: STALL, but reclassified and substantially improved.** This is
 no longer the round-12 "9-registers-vs-8, saturated file" problem -- that
 is fixed. What remains is the SAME "redundant early move" class
-`Class6E99C__PushPosition` already carries as its own permuter-exhausted final
+`FadeBox__PushPosition` already carries as its own permuter-exhausted final
 residue, plus the SAME "loaded-field temp register choice" class
 `TaskCore__CommitElementScroll` carries as its own open residue. Both are now confirmed
 present in at least 3 functions across this unit's `Unk24Elem`-touching
@@ -538,10 +538,10 @@ remaining residue is narrower and better-characterized.
 
 ### Proposed learning (round 19)
 
-A THIRD instance (with `Class6E99C__PushPosition`, `TaskCore__CommitElementScroll`) of an
+A THIRD instance (with `FadeBox__PushPosition`, `TaskCore__CommitElementScroll`) of an
 early-materialized "redundant move" filling a delay slot that resists
 every C-level lever tried (explicit early alias regressed hard here;
-`Class6E99C__PushPosition`'s branch-forced-copy trick and permuter both failed on
+`FadeBox__PushPosition`'s branch-forced-copy trick and permuter both failed on
 its own instance). Worth naming as a standing residue class in
 `docs/DECOMPILATION_LEARNINGS.md` once a 4th instance turns up --
 three is close to the threshold this project already uses elsewhere

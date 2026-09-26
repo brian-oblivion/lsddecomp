@@ -1,15 +1,17 @@
-# Class6E99C__Stop -- MATCHED (66/66 words)
+# FadeBox__Stop -- MATCHED (66/66 words)
+
+> Renamed from `Class6E99C__Stop` on 2026-09-26 (tools/rename.py). Address 0x800402f0.
 
 > Renamed from `func_800402F0` on 2026-09-20 (tools/rename.py). Address 0x800402f0.
 
-Unit `code_2cc8c_e`, carved round 14. `Class6E99CMethods::slot14` (`+0x014`,
+Unit `code_2cc8c_e`, carved round 14. `FadeBoxMethods::slot14` (`+0x014`,
 shared with `SceneNodeMethods`'s own inherited slot).
 
 ## Final body
 
 ```c
-void Class6E99C__Stop(Class6E99CObj *self, void *a1) {
-    Class6E99CMethods *methods;
+void FadeBox__Stop(FadeBoxObj *self, void *a1) {
+    FadeBoxMethods *methods;
     s32 mode;
 
     methods = self->methods;
@@ -82,14 +84,14 @@ symmetrically to both arms, not two independent fixes):
 Confirmed via `permuter.py --debug` (score 0, all five penalty
 categories zero) and then the real oracle:
 `./build-and-verify.sh` exits 0, whole-image SHA1 matches, and
-`funcdiff.py Class6E99C__Stop` reports `66/66 words match`.
+`funcdiff.py FadeBox__Stop` reports `66/66 words match`.
 
 ## Attempts (7 total across two rounds)
 
 Round 14/15 (5, all pre-`__asm__`/nested-if shapes; see git history for
 exact text) plus this round's 2:
 
-6. Bare-randomization permuter run (`permuter-work/Class6E99C__Stop`, no
+6. Bare-randomization permuter run (`permuter-work/FadeBox__Stop`, no
    `PERM` macros, `-j 6 --stop-on-zero --best-only`, `timeout 550`):
    score improved from base 410 (both residues open) down to 100 (one
    residue closed -- the `mode = 6` hoist, discovered blind by the
@@ -145,13 +147,13 @@ shape (two symmetric arms, not one loop/merge point).
 
 ## Naming (round 61, track 3)
 
-**`Class6E99C__Stop`** -- tier B. `Class6E99CMethods::stop` (`+0x0E0`).
+**`FadeBox__Stop`** -- tier B. `FadeBoxMethods::stop` (`+0x0E0`).
 Early-returns if `state == 0` (not active); otherwise picks a mode
 (5 or 6) depending on `state`/`altMode`, restores the default color when
 appropriate, forces `step` positive (`abs`), clears `state = 0`
 (deactivating), and dispatches `slot14`/`slot30(mode)` (bravo/base
 occupants) as a finish notification. "Stop" reflects the `state = 0`
-reset mirroring `Class6E99C__StartFadeDown`/`StartFadeUp`'s own
+reset mirroring `FadeBox__StartFadeDown`/`StartFadeUp`'s own
 `state = 1`/`state = 2` -- the three functions form a clear
 start/start/stop triad over the same field. Which mode 5 vs 6 MEANS in
 game terms is not established.

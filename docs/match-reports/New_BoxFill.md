@@ -7,7 +7,7 @@
 Unit `code_2cc8c_e`, carved round 14.
 
 > **UPDATE (targeted permuter pass, round 17).** MATCHED, no permuter
-> needed -- same fix as its sibling `New_Class6E99C`, applied in the same
+> needed -- same fix as its sibling `New_FadeBox`, applied in the same
 > pass. `docs/research/epilogue-merge-residue.md`'s discriminator (`return
 > NULL;` must come textually LAST, after the success return) closed it on
 > the first try once the preserved single-merged-return body was split:
@@ -31,11 +31,11 @@ Unit `code_2cc8c_e`, carved round 14.
 > `include/code_2cc8c.h`), which has no field literally named `ctor` (its
 > ctor-shaped slot is `slot08`, still unidentified as this unit's own). The
 > header's own `ClassEAC0Methods` type (used identically by
-> `Class6E99C__Class6E99C`, a few lines above this function in the same file) DOES
+> `FadeBox__FadeBox`, a few lines above this function in the same file) DOES
 > have a `ctor` field at `+0x008`, and its own doc comment explicitly lists
 > `New_BoxFill` as one of the vtable's callers through that slot -- so the
 > correct call is an explicit cast, `((ClassEAC0Methods *)
-> GetBoxFillMethods())->ctor(...)`, matching the pattern `Class6E99C__Class6E99C` already
+> GetBoxFillMethods())->ctor(...)`, matching the pattern `FadeBox__FadeBox` already
 > uses one statement earlier in this same unit (`base = (ClassEAC0Methods
 > *)GetBoxFillMethods();`). No header change was needed; this is purely a
 > call-site cast that the preserved body's snapshot predates.
@@ -46,34 +46,34 @@ Unit `code_2cc8c_e`, carved round 14.
 ## Shape
 
 Sibling `New_X` allocator one level up the hierarchy, identical shape to
-`New_Class6E99C`.
+`New_FadeBox`.
 
 ## Residue (closed)
 
-Identical single-word residue to `New_Class6E99C`: retail's failure path
+Identical single-word residue to `New_FadeBox`: retail's failure path
 materialises `$v0` as a fresh zero (`addu $v0,$zero,$zero`); the earlier
 merged single-return form produced `move $v0,$s0` instead. Same
 "New_X epilogue-merge residue" class -- see
 `docs/research/epilogue-merge-residue.md` for the discriminator (textual
 order of the two `return`s) that closed both this function and
-`New_Class6E99C` in the same pass.
+`New_FadeBox` in the same pass.
 
 ### Proposed learning
 
-See `New_Class6E99C`'s report for the primary learning (the epilogue-merge
+See `New_FadeBox`'s report for the primary learning (the epilogue-merge
 class is a textual-return-order sensitivity, not an unfixable compiler
 limitation). Specific to this function: when a preserved stall body fails
 to compile against the CURRENT headers, check whether the call needs an
 explicit cast to a sibling type that carries the field the body assumes --
 `ClassEAC0Methods` vs. the accessor's own declared `Obj6EAC0Methods` return
 type here -- rather than assuming the header itself needs changing. A
-sibling function in the same unit (`Class6E99C__Class6E99C`) already demonstrated
+sibling function in the same unit (`FadeBox__FadeBox`) already demonstrated
 the correct cast one statement earlier in the file.
 
 ## Naming (round 61, track 3)
 
 **`New_BoxFill`** -- tier A. `New_X`-shaped allocator, mirroring
-`New_Class6E99C` one level down the chain: allocates 0x6C bytes
+`New_FadeBox` one level down the chain: allocates 0x6C bytes
 (`ClassEAC0Obj`'s own, smaller size) and dispatches
 `((ClassEAC0Methods *)GetBoxFillMethods())->ctor(...)` on success.
 

@@ -81,7 +81,7 @@ The base class is unified as `Sprite` (`include/Sprite.h`, table `gSpriteMethods
 Renamed from `D800879C4__D800879C4` (tools/rename.py). The class is unified
 as `Class879C4` (`include/Class879C4.h`, table `gClass879C4Methods`,
 formerly `D_800879C4`), the `ClassXXXXX` convention of Class876FC and
-Class6E99C: the sprites' role in the game is not established, so no
+FadeBox: the sprites' role in the game is not established, so no
 descriptive name. The unit-local `D800879C4Obj` / `D800879C4Methods` views
 are gone. Current body:
 

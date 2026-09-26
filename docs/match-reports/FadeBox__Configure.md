@@ -1,4 +1,6 @@
-# Class6E99C__Configure -- MATCHED (103/103)
+# FadeBox__Configure -- MATCHED (103/103)
+
+> Renamed from `Class6E99C__Configure` on 2026-09-26 (tools/rename.py). Address 0x80040154.
 
 > Renamed from `func_80040154` on 2026-09-20 (tools/rename.py). Address 0x80040154.
 
@@ -72,7 +74,7 @@ residue, alongside the existing "reuse an existing variable name" and
 Note this is NOT the extended-asm/`register asm("$N")` mechanism CLAUDE.md
 HARD RULE 6 bans -- it is ordinary C whose SHAPE happens to guide the
 allocator's own choice, the same category of lever as the whole-struct-
-assignment fix documented in `func_8003FC70.md`/`Class6E99C__PushPosition.md`.
+assignment fix documented in `func_8003FC70.md`/`FadeBox__PushPosition.md`.
 
 ## Round 20 (runner delta): two more attempts on the third division, both negative
 
@@ -169,15 +171,15 @@ division 3, as the round-bravo report already noted. This strengthens
 before spending further hand attempts on expression-level variants of
 the third division alone.
 
-Unit `code_2cc8c_e`, carved round 14. `Class6E99CMethods::configure` (`+0x0DC`,
+Unit `code_2cc8c_e`, carved round 14. `FadeBoxMethods::configure` (`+0x0DC`,
 shared verbatim with `ClassEAC0Methods::configure`).
 
 ## Shape
 
 ```c
 #if 0
-s32 Class6E99C__Configure(Class6E99CObj *self, s32 a1, s32 a2, s32 a3) {
-    Class6E99CMethods *methods;
+s32 FadeBox__Configure(FadeBoxObj *self, s32 a1, s32 a2, s32 a3) {
+    FadeBoxMethods *methods;
     s32 flag;
     s32 q1, q2;
 
@@ -217,11 +219,11 @@ s32 Class6E99C__Configure(Class6E99CObj *self, s32 a1, s32 a2, s32 a3) {
 ```
 
 Real 3-parameter occupant, NOT the 1-argument shape its two known callers
-(`Class6E99C__StartFadeDown`, `Class6E99C__StartFadeUp`, both this unit) actually invoke it
+(`FadeBox__StartFadeDown`, `FadeBox__StartFadeUp`, both this unit) actually invoke it
 with -- those callers set up only `self` before the `jalr`, so `a1`/`a2`/
 `a3` are leftover register values from whatever preceded the call at each
 site, unused by design at those two call sites. The vtable slot's own
-DECLARED type therefore stays `s32 (*configure)(Class6E99CObj *self);`
+DECLARED type therefore stays `s32 (*configure)(FadeBoxObj *self);`
 (matching what the two known callers actually configure) while this
 function's own top-level definition keeps the real 4-parameter signature
 its body needs -- the two are independent per this project's established
@@ -300,7 +302,7 @@ division 2 has no direct analog to try on division 3 without changing the
 stored value's width. **Best remaining: the 10-scoring body above (2
 words), reported as the new stall state.** Not run further given the
 round's wind-down; flagging the exact remaining instruction pair (division
-3's `mflo` destination, `Class6E99C__Configure.s`'s own third `mflo`/`sw` pair) for
+3's `mflo` destination, `FadeBox__Configure.s`'s own third `mflo`/`sw` pair) for
 the next attempt.
 
 ### Proposed learning (this round)
@@ -349,14 +351,14 @@ a fresh name is neutral.
 
 ## Naming (round 61, track 3)
 
-**`Class6E99C__Configure`** -- tier B. `Class6E99CMethods::configure`
+**`FadeBox__Configure`** -- tier B. `FadeBoxMethods::configure`
 (`+0x0DC`, shared occupant with `ClassEAC0Methods::configure`). Sets up
 `unk78`/`unk7C`/`unk80`/`unk84`/`unk68`-derived state from its own
 `a1`/`a2`/`a3` (mode, count, and a divisor-flag path via `altMode`), then
 dispatches `slot10`/`slot64`/`slot68`/`slot60` (bravo's own occupants).
 Named "Configure" rather than "Start"/"Init" because it is ALSO reachable
 through `configure` with only `self` (no real arguments) from
-`Class6E99C__StartFadeDown`/`Class6E99C__StartFadeUp`, where its
+`FadeBox__StartFadeDown`/`FadeBox__StartFadeUp`, where its
 return value is read back as a color-table index -- i.e. it is a
 general-purpose "(re)configure and report" entry point, not a one-shot
 initializer. The a2-garbage-on-1-arg-call nuance is inherited unchanged
@@ -370,8 +372,8 @@ and is now `addChild(self, source)`: the occupant is SceneNode__AddChild,
 and this function never writes `$a1` before that jalr, so its own second
 argument (now `BasicClass *source`) is the child; the build stayed
 byte-identical with the argument spelled. The two StartFade functions
-forward their `source` to it, and Class6E99C__Stop removes the same object
-with `removeChild` (its own second argument, which Class6E99C__Update
+forward their `source` to it, and FadeBox__Stop removes the same object
+with `removeChild` (its own second argument, which FadeBox__Update
 passes as the notifying `sender`). The `configure` slot is now typed with
 its occupant's four parameters, so the StartFade callers' file-local
 `Configure6E99CFn` cast is gone. Fields: unk70 -> defaultChannels, unk78 ->

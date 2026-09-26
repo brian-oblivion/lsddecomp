@@ -54,10 +54,10 @@ Entity *Entity__Entity(Entity *this, s32 moodIndex, void *desc, void *arg2) {
     return NULL;
 }
 
-Class6E99C *Entity__GetOrCreateUnk100(Entity *this, void *name, void *arg2, void *arg3, s32 arg4) {
-    Class6E99C *cached;
-    Class6E99C *sub;
-    Class6E99CMethods *m;
+FadeBox *Entity__GetOrCreateUnk100(Entity *this, void *name, void *arg2, void *arg3, s32 arg4) {
+    FadeBox *cached;
+    FadeBox *sub;
+    FadeBoxMethods *m;
     void *dispatchArg2;
 
     cached = this->unk100;
@@ -65,7 +65,7 @@ Class6E99C *Entity__GetOrCreateUnk100(Entity *this, void *name, void *arg2, void
         if (name == NULL) {
             name = gEntityDefaultPos;
         }
-        sub = New_Class6E99C(name, 0, arg4);
+        sub = New_FadeBox(name, 0, arg4);
         if (sub == NULL) {
             return NULL;
         }

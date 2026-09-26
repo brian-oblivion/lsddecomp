@@ -35,7 +35,7 @@
  *    pad codes onto togglePause and the close-ready slots;
  *  - onNotify splits by the sender's class id: the DreamSys's codes
  *    0xA..0x11 go to enterState4..A, the viewport's fade object
- *    (Class6E99C) reports fade down/up done (5/6), and the Class866E8's
+ *    (FadeBox) reports fade down/up done (5/6), and the Class866E8's
  *    event 7 runs checkAuxTrigger. The enterState/close methods set
  *    IntermediateBase::state and notifyParents it; Class865C8's
  *    onObjMNotify acts on those codes.
@@ -67,7 +67,7 @@ struct TimBlockSrc;
 struct TimImage;
 struct LinkResource;
 struct NodeGuardedViewport;
-struct Class6E99C;
+struct FadeBox;
 struct TextRow;
 struct Unk50Struct_3bb8c_l; /* styleConfig's view, include/class_3bb8c.h */
 
@@ -91,7 +91,7 @@ struct ObjMMethods {
     /* +0x0A4 */ void (*enterState8)(ObjM *self);        /* ObjM__EnterState8: code 0xF */
     /* +0x0A8 */ void (*enterStateA)(ObjM *self);        /* ObjM__EnterStateA: code 0x10 */
     /* +0x0AC */ void (*notifyParentsCodeB)(ObjM *self); /* ObjM__NotifyParentsCodeB: code 0x11 */
-    /* +0x0B0 */ void (*onFadeNotify)(ObjM *self, struct Class6E99C *sender,
+    /* +0x0B0 */ void (*onFadeNotify)(ObjM *self, struct FadeBox *sender,
                                       s32 event); /* ObjM__OnFadeNotify: onNotify's 0x164 sender; 5 fade down done, 6 up */
     /* +0x0B4 */ void (*onClass866E8Notify)(ObjM *self, BasicClass *sender,
                                             s32 event); /* ObjM__OnClass866E8Notify: onNotify's 0x114 sender */
@@ -164,7 +164,7 @@ void ObjM__EnterState8(ObjM *self);
 void ObjM__EnterStateA(ObjM *self);
 void ObjM__NotifyParentsCodeB(ObjM *self);
 void ObjM__StartFadeUp(ObjM *self, s32 channels, s32 arg2, s32 step, s32 addChild);
-void ObjM__OnFadeNotify(ObjM *self, struct Class6E99C *sender, s32 event);
+void ObjM__OnFadeNotify(ObjM *self, struct FadeBox *sender, s32 event);
 void ObjM__OnClass866E8Notify(ObjM *self, BasicClass *sender, s32 event);
 s32 ObjM__CheckAuxTrigger(ObjM *self);
 void ObjM__NoOpSlotBC(void);

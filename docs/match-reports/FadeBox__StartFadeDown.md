@@ -1,6 +1,8 @@
-# Class6E99C__StartFadeDown -- MATCHED (35/35, round 73; was STALL "scheduling residue, 29/35")
+# FadeBox__StartFadeDown -- MATCHED (35/35, round 73; was STALL "scheduling residue, 29/35")
 
-> Renamed from `Class6E99C__StartFadeToIndex` on 2026-09-26 (tools/rename.py). Address 0x80040024.
+> Renamed from `Class6E99C__StartFadeDown` on 2026-09-26 (tools/rename.py). Address 0x80040024.
+
+> Renamed from `FadeBox__StartFadeToIndex` on 2026-09-26 (tools/rename.py). Address 0x80040024.
 
 REVISITED, round 73: MATCHED 35/35 (whole-image SHA1 green); names/types used
 
@@ -15,7 +17,7 @@ of the diff, not funcdiff's opcode-level figure: at 2/2 the `ori $a1` and the
 
 **Re-derived class.** Retail sets NO argument register before the
 `configure` `jalr` except `$a0` (which already holds `self`), and
-`configure`'s occupant, `Class6E99C__Configure`, reads `$a1`..`$a3` (it is
+`configure`'s occupant, `FadeBox__Configure`, reads `$a1`..`$a3` (it is
 defined `(self, a1, a2, a3)`: a2 is the returned index, a3 is stored to
 `unk7C`). Per LEARNINGS 3f ("MIPS o32 fills argument registers strictly left
 to right... untouched `$a1` with `$a2`/`$a3` set PROVES a forwarded
@@ -32,18 +34,18 @@ this read as scheduling for 59 rounds and why ~94,000 permuter iterations
 could not find it (a permuter never changes a function's parameter list or
 a call's arity).
 
-The shared `Class6E99CMethods::configure` slot (`include/code_2cc8c.h`) is
+The shared `FadeBoxMethods::configure` slot (`include/code_2cc8c.h`) is
 NOT retyped: the call goes through a file-local
-`typedef s32 (*Configure6E99CFn)(Class6E99CObj *, s32, s32, s32)` cast, per
+`typedef s32 (*Configure6E99CFn)(FadeBoxObj *, s32, s32, s32)` cast, per
 3f's "prefer a LOCAL function-pointer view over retyping a shared slot". A
 comment-only note was added under that slot in the header.
 
 ### Matched body
 
 ```c
-typedef s32 (*Configure6E99CFn)(Class6E99CObj *self, s32 a1, s32 a2, s32 a3);
+typedef s32 (*Configure6E99CFn)(FadeBoxObj *self, s32 a1, s32 a2, s32 a3);
 
-void Class6E99C__StartFadeDown(Class6E99CObj *self, s32 a1, s32 a2, s32 a3) {
+void FadeBox__StartFadeDown(FadeBoxObj *self, s32 a1, s32 a2, s32 a3) {
     s32 idx;
 
     if (self->state != 0) {
@@ -65,7 +67,7 @@ parameter pseudos have real live ranges; without them the call has only a
 graph in the block after the call, which is where the `ori $a1,1` landed.
 Discriminator for the class: an argument register the callee's body READS
 is not written before the call. This instance has it (`$a1`-`$a3`, callee
-`Class6E99C__Configure`); the sibling `Class6E99C__StartFadeUp` has it
+`FadeBox__Configure`); the sibling `FadeBox__StartFadeUp` has it
 too and closed on the same lever plus parameter reuse.
 
 ### Proposed learning
@@ -76,8 +78,8 @@ scheduling, check the PREVIOUS call in the function: if its callee reads
 `$aN` and the caller never writes `$aN`, the caller forwards its own
 parameter -- declare it and pass it. Same instruction set, different order,
 so it reads as pure scheduling at ins/del 2/2 and is invisible to the
-permuter (it never edits a parameter list). `Class6E99C__StartFadeDown`
-35/35 and `Class6E99C__StartFadeUp` 41/41, both in one build each,
+permuter (it never edits a parameter list). `FadeBox__StartFadeDown`
+35/35 and `FadeBox__StartFadeUp` 41/41, both in one build each,
 after 94k and 280 s of search respectively.
 
 
@@ -100,7 +102,7 @@ re-confirmed green.
 ## Round 21 (runner delta): re-verified fresh, no new attempt
 
 Restored the exact 29/35 body and rebuilt fresh, isolated (with
-`Class6E99C__StartFadeUp` reverted to `INCLUDE_ASM` at the time, so this
+`FadeBox__StartFadeUp` reverted to `INCLUDE_ASM` at the time, so this
 function's own window cannot be contaminated by that sibling's own
 drift -- see that function's own report for a real instance of this
 project's "one inherited body in six carries a false drift-free claim"
@@ -150,7 +152,7 @@ A "retail materializes a literal argument immediately after an unrelated
 dispatch, before computing an index expression" residue does not yield
 to ~94,000 unguided permuter iterations either, on top of the four
 hand-reshaping attempts the original report already spent. Combined with
-`Class6E99C__StartFadeUp`'s identical-shape residue (see that report), this is now
+`FadeBox__StartFadeUp`'s identical-shape residue (see that report), this is now
 a **confirmed-negative class**, not merely an untried one -- a future
 runner should not re-spend permuter budget on this specific
 `slotXX(self, 1, tableEntry)`-after-a-fresh-dispatch shape without a new
@@ -166,10 +168,10 @@ boundary).
 > a finding about `setup-permuter.sh`'s own behaviour, which is a property
 > of the TOOL and not of whose code it was pointed at.
 
-Unit `code_2cc8c_e`, carved round 14. `Class6E99CMethods::startFadeToIndex` (`+0x0D4`).
+Unit `code_2cc8c_e`, carved round 14. `FadeBoxMethods::startFadeToIndex` (`+0x0D4`).
 
 **Correction to an earlier version of this report**, which claimed a full
-35/35 match under the stale-build window described in `New_Class6E99C.md`
+35/35 match under the stale-build window described in `New_FadeBox.md`
 (same cause, cross-referenced there). Once the build was confirmed genuinely
 fresh (every symbol's linked address checked against `build/lsdde.map`),
 this function turned out to still have a real residue.
@@ -178,7 +180,7 @@ this function turned out to still have a real residue.
 
 ```c
 #if 0
-void Class6E99C__StartFadeDown(Class6E99CObj *self) {
+void FadeBox__StartFadeDown(FadeBoxObj *self) {
     s32 idx;
 
     if (self->state != 0) {
@@ -236,7 +238,7 @@ A trivial constant argument (`1`) to a call reached immediately after a
 DIFFERENT dispatch through the same vtable pointer can resist being pinned
 to retail's early position by any combination of source reordering, naming
 it in a local, or a bare scheduling barrier (which actively regresses it).
-`Class6E99C__StartFadeUp` in this same unit shows the identical pattern on the exact
+`FadeBox__StartFadeUp` in this same unit shows the identical pattern on the exact
 same call shape (`slotB8(self, 1, tableEntry)`) -- worth treating as one
 class rather than two coincidences; see that function's own report.
 
@@ -250,30 +252,30 @@ branch. `./build-and-verify.sh` and `tools/check-nonmatching.sh` both green.
 
 ## Naming (round 61, track 3)
 
-**`Class6E99C__StartFadeDown`** -- tier B (STALL, preserved body
-unchanged by this rename). `Class6E99CMethods::startFadeToIndex` (`+0x0D4`). Guards
+**`FadeBox__StartFadeDown`** -- tier B (STALL, preserved body
+unchanged by this rename). `FadeBoxMethods::startFadeToIndex` (`+0x0D4`). Guards
 on `state == 0` (idle), looks up an index via `configure`, dispatches the
 `slotB8` color-set slot with `&D_8006EA90[idx * 3]` (an INDEXED table
 entry), sets `state = 1`, and negates `step`. Named opposite
-`Class6E99C__StartFadeUp` (`startFadeDefault`, `state = 2`, the FIXED
+`FadeBox__StartFadeUp` (`startFadeDefault`, `state = 2`, the FIXED
 `D_8006EAA8` table) -- the two are a matched pair distinguished by which
 color source they select. "Fade" is inferred from `step` accumulating into
-color-channel bytes over time in `Class6E99C__Update`; "index" from this
+color-channel bytes over time in `FadeBox__Update`; "index" from this
 function's own `idx`-based table lookup versus its sibling's fixed one.
 Game-level purpose (what is fading, and why) is not established.
 
 ## Track 4 (2026-09-26, round 87, echo)
 
-Renamed from `Class6E99C__StartFadeToIndex` to `Class6E99C__StartFadeDown`.
+Renamed from `FadeBox__StartFadeToIndex` to `FadeBox__StartFadeDown`.
 "ToIndex" said the fade goes TO the indexed colour; the body does the
 opposite. It sets the box colour to `D_8006EA90[channels]` (overwrite, via
-`setColor`) and NEGATES `step`, and `Class6E99C__Update` then adds `(u8)step`
+`setColor`) and NEGATES `step`, and `FadeBox__Update` then adds `(u8)step`
 to each selected channel byte once per tick for `0x100 / step` ticks: the
 channels count DOWN from the table colour (0xFF over 25 ticks at the
 default step of 10). `D_8006EA90` is eight 3-byte RGB entries indexed by a
 channel mask (1 = 0000FF, 2 = 00FF00, 4 = FF0000, 7 and 0 = FFFFFF; read
 from the retail bytes), the same mask `Update` tests (4 = r, 2 = g, 1 = b).
-Its sibling counts up; see `Class6E99C__StartFadeUp`. The arguments are
+Its sibling counts up; see `FadeBox__StartFadeUp`. The arguments are
 `configure`'s, forwarded (`source`, `channels`, `unk7C`), and the slot is
 now typed with them. Callers, all through Entity's `unk100`:
 Entity__MoodCue57 (Entity_d) passes (companion2, 4, 0), Entity__MoodCue85

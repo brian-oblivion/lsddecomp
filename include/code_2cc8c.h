@@ -5,7 +5,7 @@
 #include "BasicClass.h"
 #include "SceneNode.h"
 #include "BoxFill.h"
-#include "Class6E99C.h"
+#include "FadeBox.h"
 #include "IntermediateBase.h"
 #include "TaskCore.h"
 #include "TextRow.h"
@@ -172,10 +172,10 @@ extern s32 strlen(char *s); /* Psy-Q libc2/strlen, linked from Sony's
 extern s32 D_8008A8E8[2];  /* address-taken only by this unit */
 extern char D_8008A8F0[4]; /* address-taken only by this unit */
 
-/* New_Class6E99C: include/Class6E99C.h. */
+/* New_FadeBox: include/FadeBox.h. */
 /* New_SceneNode: include/SceneNode.h (it was a local Unk18AcObj view). */
 extern u8 D_8008A90C[];    /* address-taken only by this unit: (320, 240), the
-                            size Viewport's ctor passes New_Class6E99C */
+                            size Viewport's ctor passes New_FadeBox */
 extern u8 D_8008A904[];    /* address-taken only by this unit: (-100, -100), the
                             screen position Viewport's ctor and SetSubHandle
                             attach the sub handle at (include/Viewport.h) */
@@ -292,8 +292,8 @@ extern u32 GetSetBitField(u32 *word, s32 shift, s32 width, u32 value);
 
 /* GetSceneNodeMethods and its table: include/SceneNode.h (track 4, round 81). */
 
-/* Class6E99C (class id 0x164, D_8006E99C): include/Class6E99C.h (track 4,
- * round 87; it was a local Class6E99CObj view here). */
+/* FadeBox (class id 0x164, D_8006E99C): include/FadeBox.h (track 4,
+ * round 87; it was a local FadeBoxObj view here). */
 
 /* SkipShort2 and Pair32E99C: include/BoxFill.h. */
 
@@ -309,11 +309,11 @@ struct TexPageDesc {
     s32 size;   /* +0x010, computed = (4 << shift) + stride - 4 */
 };
 
-/* Class6E99C's colour tables (include/Class6E99C.h), indexed at a 3-byte
+/* FadeBox's colour tables (include/FadeBox.h), indexed at a 3-byte
  * stride by a channel mask (`i*3`, no further scaling). Retail bytes:
  * D_8006EA90 is eight RGB entries (0 and 7 FFFFFF, 1 0000FF, 2 00FF00,
  * 4 FF0000); D_8006EAA8 follows it and its entries are black (0x00), indexed
- * by Class6E99C__StartFadeUp and used whole for mask 0xF. `D_8008A924` is
+ * by FadeBox__StartFadeUp and used whole for mask 0xF. `D_8008A924` is
  * BoxFill__Reset's default colour, 808080, one use. */
 extern u8 D_8006EA90[];
 extern u8 D_8006EAA8[];

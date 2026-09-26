@@ -40,7 +40,7 @@
  * so the id tree (0x0 -> 0x7 -> 0x17) is the ctor chain. NodeGuardedViewport expands
  * these macros (round 87).
  *
- * Not settled here: subHandle is a Class6E99C (0x164, below gBoxFillMethods,
+ * Not settled here: subHandle is a FadeBox (0x164, below gBoxFillMethods,
  * 0x64), whose +0x04C override (BoxFill__AttachToParent) takes a two-word screen
  * position where SceneNode's attachToParent slot takes a LongVec3 offset;
  * the ctor and SetSubHandle pass D_8008A904 (-100, -100) through the
@@ -159,7 +159,7 @@ struct ViewportOt {
     /* +0x098 */ s32 zDiv;                /* Update: the depth per OT tag; drawNode's sprite z */  \
     /* +0x09C */ u8 pad09C[0x0AC - 0x09C];                                                         \
     /* +0x0AC */ SceneNode *sceneRoot;   /* the ctor's New_SceneNode; Update draws it; finalize releases it */ \
-    /* +0x0B0 */ SceneNode *subHandle;   /* the ctor's New_Class6E99C, attached under sceneRoot */ \
+    /* +0x0B0 */ SceneNode *subHandle;   /* the ctor's New_FadeBox, attached under sceneRoot */ \
     /* +0x0B4 */ s32 unkB4;               /* Flip: nonzero swaps once more on buffer 0 */          \
     /* +0x0B8 */ s32 drawEnabled          /* Flip: 0 skips the clear and draw; default 1 */
 /* clang-format on */
