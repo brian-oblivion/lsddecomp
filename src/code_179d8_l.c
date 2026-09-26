@@ -25,6 +25,7 @@
  */
 #include "common.h"
 #include "SvmData.h"
+#include "VabStreamObj.h"
 
 /* Matched round 73 -- docs/match-reports/ServiceSoundCueSet.md.
  * Round 75 (naming): `self`/`set` confirmed the same objects
@@ -34,25 +35,11 @@
  * `VabStreamObj__StopVoice`/`VabStreamObj__SetPitchOffset`, and
  * `SoundCueSlot.index`/`SoundCueSet.tag`/`.owner`/`.slots` match this
  * function's own field usage (the `>= 0`-gated stop-voice call, the `> 0`
- * tag guard, `callback`'s first argument). This is a second, independent
- * LOCAL view of the same struct family `code_179d8_e.c` defines -- per the
- * project's independent-local-view convention, declared again here rather
- * than shared through a header (see FlushSoundCueSet.md / DreamSys__SetSoundObj.md
- * for the cross-unit identification trail). */
-typedef struct VabStreamObj VabStreamObj;
-
-typedef struct {
-    u8 pad0[0x80];
-    s32 (*playTone)(VabStreamObj *self, s32 arg1, s32 arg2, s32 arg3);
-    s32 (*stopVoice)(VabStreamObj *self, s32 index);
-    u8 pad88[0x9C - 0x88];
-    void (*setPitchOffset)(VabStreamObj *self, s32 arg1);
-} VabStreamObjMethods;
-
-struct VabStreamObj {
-    VabStreamObjMethods *methods;
-};
-
+ * tag guard, `callback`'s first argument). VabStreamObj comes from
+ * include/VabStreamObj.h since round 87 (track 4). SoundCueSet below is
+ * still a second LOCAL view of the struct `code_179d8_e.c` defines: it is
+ * not a class, and track 4 did not unify it (see FlushSoundCueSet.md /
+ * DreamSys__SetSoundObj.md for the cross-unit identification trail). */
 typedef struct {
     s32 index;   /* matches code_179d8_e.c's SoundCueSlot.index: -1 sentinel, else a VabStreamObj__StopVoice-forwardable voice index */
     s32 note;    /* packed as note*16 into VabStreamObj__PlayTone's `index` argument (hi=note, lo=0) */
