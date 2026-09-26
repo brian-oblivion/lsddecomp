@@ -30,13 +30,13 @@ void Entity__MoodCue25(Entity *this, EntityMoodHandlerArg *out) {
         out->unk48 = -1;
         this->methods->slotCC(this, -0x100, 0);
     } else {
-        this->methods->slot44(this, 0, D_80089C58);
+        this->methods->slot44(this, 0, ROTATION_XPLUS_EIGHTH);
         this->methods->slotCC(this, -0x200, 0);
     }
 }
 ```
 
-`D_80089C58` is a new rodata pointer, extern-declared alongside this unit's
+`ROTATION_XPLUS_EIGHTH` is a new rodata pointer, extern-declared alongside this unit's
 other `D_80089*` constants — not yet dereferenced by any carved code, so its
 contents are unknown.
 

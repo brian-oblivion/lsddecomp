@@ -29,7 +29,7 @@
 #include "Entity.h"
 #include "DreamSys.h"
 
-extern u8 D_80089C58[];
+extern u8 ROTATION_XPLUS_EIGHTH[];
 extern u8 D_80089E74[];
 extern LongVec3 D_80089DB4[];
 extern LongVec3 D_80089D9C[];
@@ -136,7 +136,7 @@ void Entity__MoodCue25(Entity *this, SoundCueSet *out) {
         out->slots[2].octave = -1;
         this->methods->moveLocalY(this, -0x100, 0);
     } else {
-        this->methods->updateRotation(this, 0, D_80089C58);
+        this->methods->updateRotation(this, 0, ROTATION_XPLUS_EIGHTH);
         this->methods->moveLocalY(this, -0x200, 0);
     }
 }
