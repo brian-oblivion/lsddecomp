@@ -2,6 +2,7 @@
 #include "code_2c054.h"
 #include "VabStreamObj.h"
 #include "BgLayer.h"
+#include "TileMap.h"
 
 #define PLAYER(self) ((StreamTaskUnkB4Obj *)(self)->player)
 
@@ -171,7 +172,7 @@ TaskCore *New_TaskCore(TaskCoreTarget *target, char *soundBankPath, BasicClass *
 }
 
 void TaskCore__TaskCore(TaskCore *self, TaskCoreTarget *target, char *soundBankPath, BasicClass *sound) {
-    StreamTaskUnkB4Obj *tmp;
+    void *tmp; /* the TileAtlas, then the TileMap built over it */
     TaskCoreMethods *core;
 
     Get_vtable_IntermediateBase()->ctor((IntermediateBase *)self);
@@ -186,10 +187,10 @@ void TaskCore__TaskCore(TaskCore *self, TaskCoreTarget *target, char *soundBankP
     self->soundBankPath = soundBankPath;
     self->methods->setSubHandle(self, 0, 0);
     tmp = New_TileAtlas(0);
-    self->tileAtlas = (BasicClass *)tmp;
+    self->tileAtlas = tmp;
     tmp = New_TileMap(0, tmp);
-    self->tileMap = (BasicClass *)tmp;
-    self->bgLayer = New_BgLayer((struct Map44294 *)tmp, 1);
+    self->tileMap = tmp;
+    self->bgLayer = New_BgLayer(tmp, 1);
     self->methods->resetCounters(self);
 }
 
