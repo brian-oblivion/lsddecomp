@@ -1,46 +1,29 @@
 /*
- * libsnd_ssinit_libapi_counter -- the sound-driver "sequencer timer" cluster: a software
- * playback clock built on the PSX root counters (RCnt) and interrupt
- * controller (IRQ), used to pace the game's music sequencer independently
- * of vsync. `SsSetTickMode`/`_SsStart` (the latter still a stall)
- * pick a tick rate and arm a root counter at it; `SsStart`/
- * `SsStart2` are its two callers' one-line wrappers; `_SsTrapIntrVSync`/
- * `_SsSeqCalledTbyT_1per2` are the two interrupt-time handlers it can
- * register (one chains a previously-saved handler, the other halves the
- * firing rate by toggling); `SsEnd` tears the whole thing down.
- * `SetRCnt`/`GetRCnt`/`StartRCnt`/`StopRCnt`/`ResetRCnt` are Sony's
- * libapi/counter module compiled into game text from a library build the
- * SDK discs do not carry (identified by module order and KERNEL.H; see the
- * symbols file), and everything above is built on them. `SsQuit` is
- * unrelated -- a one-line forwarder to Sony's `SpuQuit` (libspu/s_q) -- kept
- * here only because it falls in this address range.
+ * libsnd_ssinit_libapi_counter -- two Sony modules carried as C, both from
+ * library builds no SDK disc carries, so neither can be linked from lib/.
  *
- * the tail half of the old code_179d8_c slice, split off in round 33
- * (2026-09-12) when Sony's `libsnd/sstable.o` was linked into the middle of
- * it. File 0x22D88..0x23500, vram 0x80032588..0x80032D00.
+ * libsnd/ssinit's sequencer clock (Sony's names, identified in the symbols
+ * file against the 3.3 disc): SsSetTickMode picks the tick rate
+ * (VBLANK_MINUS) from a mode and the video mode; _SsStart arms either a
+ * vsync callback or a root-counter interrupt at that rate, and SsStart /
+ * SsStart2 are its two one-line entry points; SsEnd tears it down; SsQuit
+ * forwards to SpuQuit; _SsTrapIntrVSync and _SsSeqCalledTbyT_1per2 are the
+ * two interrupt-time handlers _SsStart can install (one chains the saved
+ * vsync callback, the other runs the sequencer on every second tick).
  *
- * WHY THE SPLIT EXISTS. `func_800323A8` (120w) sat between SsInitHot and
- * SsSetTickMode and is Sony's `SsSetTableSize`; the object covers exactly
- * those 120 words. A placed object cannot live inside a `c` segment, so the
- * slice had to become [c][o][c] and the second `c` needed its own name. The
- * first half kept `code_179d8_c`.
+ * libapi/counter: SetRCnt, GetRCnt, StartRCnt, StopRCnt, ResetRCnt, the
+ * root-counter and interrupt-mask accessors the clock above is built on.
  *
- * THE RODATA ATTACH CAME WITH THIS HALF, AND THAT IS THE WHOLE REASON THIS
- * COMMENT EXISTS. `SsSetTickMode` owns `jtbl_80010CD8`, whose sub-slot of the
- * 0xFD8 rodata region is attached in the splat yaml. That attach pointed at
- * `code_179d8_c`; SsSetTickMode is now HERE, so the attach was moved to
- * `libsnd_ssinit_libapi_counter`. Left behind it would have produced
- * `undefined reference to '.L800325xx'` -- the routine carve failure Gate 2
- * in docs/PARALLEL-RUNS.md documents. Leave it alone.
+ * What decided its edges (python3 tools/tuboundary.py): the placed object
+ * libsnd/sstable precedes it ("start edge possible"), and the placed object
+ * libsnd/vs_vh follows it. Inside, every edge is "boundary possible": the
+ * binary neither proves nor forbids a file boundary. PARKED: the content
+ * says the file splits between _SsSeqCalledTbyT_1per2 and SetRCnt (two Sony
+ * modules), but that split is a new carve, not a merge or rename, so the
+ * file keeps its carve edges and is named for both modules.
  *
- * This slice was cut at ROM-address boundaries, so it has no reason to align
- * with class boundaries -- expect it to span more than one class, and
- * identify each with tools/classtable.py rather than assuming one.
- *
- * Declarations: keep anything that encodes THIS unit's reading of a class
- * next to the code, in this file. Do not create a shared code_179d8*.h -- the
- * sibling slices are staffed independently and a shared header is what makes
- * their merges collide.
+ * The carve history is in docs/match-reports/SsSetTickMode.md, "File
+ * history".
  */
 #include "common.h"
 
