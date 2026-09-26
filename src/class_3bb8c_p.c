@@ -18,9 +18,8 @@
  *    table and, for an event in [5,9), the object's own tryAttachNearby.
  *  - Actor__SetLastOffsetValue/SetPendingExtra, GetActorMethods: plain
  *    setters/getter.
- *  - New_Class879C4 + Class879C4__Class879C4: allocator and constructor for
- *    an unrelated, still-uncarved sibling class (table gClass879C4Methods, in
- *    class_3bb8c_q.s).
+ *  - New_Class879C4 + Class879C4__Class879C4: allocator and constructor of
+ *    an unrelated class, Class879C4 (a Sprite subclass, include/Class879C4.h).
  *
  * No stalls: Actor__BuildLinkQueries, the last one, matched in round 75
  * (2-argument method call, see its report). No switch jump table in this slice, and no gp_rel/addiu_at/
@@ -30,7 +29,7 @@
 #include "common.h"
 #include "Actor.h"
 #include "DreamSys.h"
-#include "Sprite.h"
+#include "Class879C4.h"
 
 /* Two-element s16 array -- Actor__MoveLocalX and Actor__MoveLocalY each write one
  * element (index 0 and 1 respectively) via a plain `sh` through a pointer
@@ -380,63 +379,30 @@ ActorMethods *GetActorMethods(void) {
 
 extern void *BMemPMgrAlloc(s32 size);
 
-/* The class allocated below, table gClass879C4Methods (49 slots, uncarved --
- * lives in the still-monolithic asm/class_3bb8c_q.s, this unit's
- * immediate successor per class_3bb8c_o.c's own file banner). Only the
- * ctor slot (+0x008) is needed here, resolved via `tools/classtable.py
- * gClass879C4Methods` to this unit's own `Class879C4__Class879C4` (see its own report).
- * `GetClass879C4Methods` is a plain no-argument getter for `&gClass879C4Methods` --
- * confirmed by reading its own body directly in asm/class_3bb8c_q.s,
- * which is otherwise off limits (uncarved ground, not this unit's). Type
- * names drop the underscore after `D` per this project's convention for
- * an as-yet-unnamed class (see `include/code_55dd4.h`'s `D800878D4Methods`,
- * round 57 naming pass). */
-typedef struct D800879C4Obj D800879C4Obj;
-typedef struct D800879C4Methods {
-    u8 pad00[0x8];
-    D800879C4Obj *(*ctor)(D800879C4Obj *self, void *arg1, void *arg2, void *arg3);
-    /* +0x00C..+0x03C not yet needed by this unit. */
-    u8 pad0C[0x40 - 0xC];
-    /* This class's OWN slot, resolved via `tools/classtable.py
-     * gClass879C4Methods`: `Class879C4__SetVariantClut`, the FIRST function of this unit's
-     * successor `class_3bb8c_q` -- out of this unit/runner's range.
-     * Tail-called by this unit's own `Class879C4__Class879C4` (its own ctor, see
-     * that function's report) as (self, arg1) once construction is
-     * otherwise complete (round 2026-09-04). Named `postConstruct` in the
-     * round 57 naming pass; renamed after its occupant in round 79. */
-    void *(*setVariantClut)(D800879C4Obj *self, s32 arg1);
-} D800879C4Methods;
-extern D800879C4Methods *GetClass879C4Methods(void);
-
-/* This unit's own view of a gClass879C4Methods instance -- only the vtable
- * pointer (set by this unit's own ctor, `Class879C4__Class879C4`) and `+0xA4`
- * (also written by that ctor) are named; the rest is opaque. */
-struct D800879C4Obj {
-    D800879C4Methods *methods;
-    u8 pad04[0xA4 - 0x4];
-    s32 unk_0xA4;
-};
-
-void *New_Class879C4(void *arg1, void *arg2, void *arg3) {
+/* Class879C4 (include/Class879C4.h, track 4, round 87): its allocator and
+ * ctor. The other methods are in class_3bb8c_q.c and class_3bb8c_t.c. */
+Class879C4 *New_Class879C4(s32 variant, void *arg2, void *texture) {
     void *obj = BMemPMgrAlloc(0xA8);
     if (obj != NULL) {
-        GetClass879C4Methods()->ctor(obj, arg1, arg2, arg3);
+        GetClass879C4Methods()->ctor(obj, variant, arg2, texture);
         return obj;
     }
     return NULL;
 }
 
-/* D800879C4's two texture cells, forwarded as the Sprite ctor's `rect`
+/* Class879C4's two texture cells, forwarded as the Sprite ctor's `rect`
  * (Sprite__Reset copies it into Sprite.rect): u,v = (0x00,0x20) and
  * (0x10,0x20), 16x16. */
 extern SpriteRect gClass879C4Cells[2];
 
-/* The base-class ctor, Sprite__Sprite, through GetSpriteMethods()
- * (include/Sprite.h); `self` is upcast to the Sprite it derives from. */
-
-void *Class879C4__Class879C4(D800879C4Obj *self, s32 arg1, void *arg2, void *arg3) {
-    GetSpriteMethods()->ctor((Sprite *)self, arg3, 0, &gClass879C4Cells[arg1], arg2, 0);
+/* The base-class ctor, Sprite__Sprite, through GetSpriteMethods(), with
+ * `self` upcast; then this class's table, and its reset slot
+ * (Class879C4__SetVariantClut) with the variant, through Class879C4ResetFn.
+ * The retail ctor ends in that call without setting $v0: it returns
+ * nothing. */
+void Class879C4__Class879C4(Class879C4 *self, s32 variant, void *arg2, void *texture) {
+    GetSpriteMethods()->ctor((Sprite *)self, texture, 0, &gClass879C4Cells[variant], arg2, 0);
     self->methods = GetClass879C4Methods();
-    self->unk_0xA4 = 0;
-    return self->methods->setVariantClut(self, arg1);
+    self->unkA4 = 0;
+    ((Class879C4ResetFn)self->methods->reset)(self, variant);
 }
