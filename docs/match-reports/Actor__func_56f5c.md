@@ -10,7 +10,7 @@ never attempted before this round.
 ## What it does
 
 Stashes `self` (arg1) and two more scalar args (arg2, arg3) into `.sbss`
-globals `gStyleEffectTmd`/`gStyleEffectTim`/`D_8008ACAC`, then runs a fixed 2-iteration
+globals `gStyleEffectTmd`/`gStyleEffectTim`/`gStyleEffectViewport`, then runs a fixed 2-iteration
 loop calling `self->methods->slot80(self, D_8008AB98[i])` and feeding the
 result plus `&D_8008AB94` (a 1-word `.sdata` constant, address-only, never
 loaded) to library function `SetTargetOffset` (still `psyq_fa50.s`, unrenamed
@@ -22,7 +22,7 @@ its own unrelated `self` there without any indication of shared meaning.
 ```c
 extern s32 gStyleEffectTmd;
 extern s32 gStyleEffectTim;
-extern s32 D_8008ACAC;
+extern s32 gStyleEffectViewport;
 extern s32 D_8008AB98[3];
 extern s32 D_8008AB94;
 
@@ -34,7 +34,7 @@ void Actor__func_56f5c(s32 arg0, BaseObjO *self, s32 arg2, s32 arg3) {
 
     gStyleEffectTmd = (s32) self;
     gStyleEffectTim = arg2;
-    D_8008ACAC = arg3;
+    gStyleEffectViewport = arg3;
     i = 0;
     do {
         ret = self->methods->slot80(self, D_8008AB98[i]);
@@ -82,7 +82,7 @@ Renamed from `BaseObjO__func_56f5c`. Prefix only: the second parameter is an Act
 
 ## Track 4b (2026-09-25, round 85)
 
-`gStyleEffectTmd`/`gStyleEffectTim`/`D_8008ACAC` were `s32` in class_3bb8c_o.c and
+`gStyleEffectTmd`/`gStyleEffectTim`/`gStyleEffectViewport` were `s32` in class_3bb8c_o.c and
 `D_8008ACA4Obj *`/`void *`/`void *` in class_3bb8c_s.c. Both units now
 declare `Actor *`/`void *`/`void *`: this function stores its own `Actor *self` into the first, the two scalars go in through a `(void *)` cast. Byte-identical; no new `-Wall`
 warning.

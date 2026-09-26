@@ -9,7 +9,7 @@
 ## Provenance
 
 Round-42's "REOPENED -- ASSIGNABLE" banner applies: stub-stalled as
-`gp_rel`-blocked on `D_8008ACAC`/`gTrackedYSnapshot` (and, in an even older revision
+`gp_rel`-blocked on `gStyleEffectViewport`/`gTrackedYSnapshot` (and, in an even older revision
 of this report, `addiu_at`, itself resolved round 21). Both globals were
 already present in `config/gp-symbols.txt`. Matched byte-exact this round.
 
@@ -29,7 +29,7 @@ void StyleEffect__InitByKind(LinkNode *self, void *arg1, Vec3S *arg2) {
     Vec3S local;
     s32 state;
 
-    gTrackedYSnapshot = *(s32 *)((u8 *)D_8008ACAC + 0x18);
+    gTrackedYSnapshot = *(s32 *)((u8 *)gStyleEffectViewport + 0x18);
     AddVec3(&local, arg2, &self->unk58);
     AttachWithRotScale(self, arg1, &local, self->unk64, self->unk68);
 
@@ -69,7 +69,7 @@ typedef struct {
 } D_8008ACA4Obj;
 extern D_8008ACA4Obj *gStyleEffectTmd;
 extern void *gStyleEffectTim;
-extern void *D_8008ACAC;
+extern void *gStyleEffectViewport;
 extern s32 gTrackedYSnapshot;
 extern s32 D_8008AB98[];
 ```
@@ -135,7 +135,7 @@ the wrong function.
 Round 70 (alpha). `func_80056520` -> `StyleEffect__InitByKind`, **tier B**.
 
 Only caller is the class's ctor `StyleEffect__StyleEffect` (class_3bb8c_r.c), with the
-ctor's own arg3/arg4 as (parent, pos). Body: snapshot `*(D_8008ACAC + 0x18)`
+ctor's own arg3/arg4 as (parent, pos). Body: snapshot `*(gStyleEffectViewport + 0x18)`
 into gTrackedYSnapshot; `AttachWithRotScale(self, parent, pos + offset,
 rotation, scale)`; for kind < 2, `SceneNode__LinkModel(self,
 gStyleEffectTmd->slot80(D_8008AB98[kind]))`; then kind 0 ->
@@ -151,7 +151,7 @@ four call sites); `StyleEffect__StyleEffect` (table +0x008, the ctor) stores it 
 `SceneNode`/`TodActor` convention.
 
 Globals named in this pass: `gTrackedYSnapshot` (was D_8008ACB0, tier B:
-written here from D_8008ACAC's +0x018 word, subtracted from it again by
+written here from gStyleEffectViewport's +0x018 word, subtracted from it again by
 StyleEffect__UpdateByKind; only this unit references it).
 
 ### Field and slot names in this unit's local view (applied, round 70)
@@ -204,7 +204,7 @@ For the HEAD, by type scope; none applied here (other units' views).
 
 ## Track 4b (2026-09-25, round 85)
 
-`gStyleEffectTmd`/`gStyleEffectTim`/`D_8008ACAC` were `s32` in class_3bb8c_o.c and
+`gStyleEffectTmd`/`gStyleEffectTim`/`gStyleEffectViewport` were `s32` in class_3bb8c_o.c and
 `D_8008ACA4Obj *`/`void *`/`void *` in class_3bb8c_s.c. Both units now
 declare `Actor *`/`void *`/`void *`: the local `D_8008ACA4Methods` view is gone and the +0x080 call reads `getSetUnk10Flag8`, the name `Actor__func_56f5c` calls the same slot by. Byte-identical; no new `-Wall`
 warning.

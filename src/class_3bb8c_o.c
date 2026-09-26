@@ -94,7 +94,7 @@ StyleEffectMethods *GetStyleEffectMethods(void) {
  * runs on, and two objects passed through. */
 extern Actor *gStyleEffectTmd;
 extern void *gStyleEffectTim;
-extern void *D_8008ACAC;
+extern void *gStyleEffectViewport;
 extern s32 D_8008AB98[3];
 extern s32 D_8008AB94;
 
@@ -106,7 +106,7 @@ void Actor__func_56f5c(s32 unused, Actor *self, s32 arg2, s32 arg3) {
 
     gStyleEffectTmd = self;
     gStyleEffectTim = (void *)arg2;
-    D_8008ACAC = (void *)arg3;
+    gStyleEffectViewport = (void *)arg3;
     i = 0;
     do {
         ret = (void *)self->methods->setBackClip(self, D_8008AB98[i]);

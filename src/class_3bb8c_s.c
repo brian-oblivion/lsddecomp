@@ -55,12 +55,12 @@ extern void NoOpIgnoreArgs();
  * parameters (declared there with the same types; track 4b, round 85):
  * gStyleEffectTmd is the Actor it ran on, called here through SceneNode's
  * +0x080 getSetUnk10Flag8 as that function calls it; gStyleEffectTim is
- * forwarded opaquely to New_VariantSprite as its third argument; D_8008ACAC's
+ * forwarded opaquely to New_VariantSprite as its third argument; gStyleEffectViewport's
  * pointee has a field at +0x018 that StyleEffect__InitByKind and
  * StyleEffect__UpdateByKind snapshot/diff via gTrackedYSnapshot. */
 extern Actor *gStyleEffectTmd; /* the Actor Actor__func_56f5c ran on */
 extern void *gStyleEffectTim;
-extern void *D_8008ACAC;
+extern void *gStyleEffectViewport;
 extern s32 gTrackedYSnapshot;
 extern s32 D_8008AB98[];
 
@@ -74,7 +74,7 @@ void StyleEffect__InitByKind(StyleEffect *self, SceneNode *parent, LongVec3 *pos
     LongVec3 local;
     s32 state;
 
-    gTrackedYSnapshot = *(s32 *)((u8 *)D_8008ACAC + 0x18);
+    gTrackedYSnapshot = *(s32 *)((u8 *)gStyleEffectViewport + 0x18);
     AddVec3(&local, pos, &self->params.offset);
     AttachWithRotScale((Actor *)self, parent, &local, self->params.rotation, self->params.scale);
 
@@ -102,14 +102,14 @@ void StyleEffect__InitByKind(StyleEffect *self, SceneNode *parent, LongVec3 *pos
 
 /* Called every frame from the class's slot +0x0EC (StyleEffect__Update, right
  * after it increments `tick`): set self's translation (Actor's
- * setTranslation) to pos + offset, plus however far D_8008ACAC's +0x018
+ * setTranslation) to pos + offset, plus however far gStyleEffectViewport's +0x018
  * word has moved since StyleEffect__InitByKind snapshotted it, then run the
  * per-kind update. */
 void StyleEffect__UpdateByKind(StyleEffect *self, LongVec3 *pos) {
     LongVec3 local;
 
     AddVec3(&local, pos, &self->params.offset);
-    local.y += *(s32 *)((u8 *)D_8008ACAC + 0x18) - gTrackedYSnapshot;
+    local.y += *(s32 *)((u8 *)gStyleEffectViewport + 0x18) - gTrackedYSnapshot;
     self->methods->setTranslation(self, &local);
 
     switch (self->pendingExtra) {
