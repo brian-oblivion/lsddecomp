@@ -1,18 +1,22 @@
 /*
- * code_2864 -- GAME code carved from psyq_2864 on 2026-09-25 (FINISHING-PLAN
- * revision 18). 0x2864..0x2F68 (vram 0x80012064..0x80012768). It was counted
- * as Psy-Q SDK by segment name; tools/gameinsdk.py measured it as game (a call
- * into game code, a method-table entry beside game methods, or contiguity with
- * those, and no Sony fingerprint). What it holds: one 449-word function,
- * Viewport__DrawNode, listed in gViewportMethods and gNodeGuardedViewportMethods and calling
- * GetNextBasicClass and ApplyMatrixToLVArray.
+ * code_2864 -- Viewport__DrawNode, the scene-graph walk that draws one node
+ * and its drawable children into the Viewport's current ordering table
+ * (vram 0x80012064..0x80012768).
  *
- * MATCHED round 81 (alpha; docs/match-reports/Viewport__DrawNode.md). It is slot
- * +0x0A0 (drawNode) of Viewport's table (include/Viewport.h, gViewportMethods):
- * the viewport draws one scene node into its current ordering table and
- * recurses into the node's children. `self` is the Viewport (its local view,
- * DrawView, was merged into include/Viewport.h in round 85); every other
- * type below is still a LOCAL view.
+ * It is slot +0x0A0 (drawNode) of gViewportMethods, inherited unchanged by
+ * gNodeGuardedViewportMethods (include/Viewport.h); `self` is the Viewport.
+ * The node is read through DrawNode below, a view of a scene node whose
+ * class-id low byte picks what it is: 0x54 a GsBG, 0x64 a GsBOXF placed in
+ * percent of the half-screen, 0x144 a screen-space GsSPRITE, 0x44 a sprite
+ * projected from its GsCOORDINATE2's world position, and anything else a
+ * GsDOBJ2 model sorted by SortTmdObject (code_8220_b.c), the game's
+ * replacement for GsSortObject4. Before drawing, a node whose coord2 is dirty
+ * (flg == 0) rebuilds its matrix from GsCOORD2PARAM's rotate and scale and
+ * marks its children dirty; children (class-id low nibble 4, parent == node)
+ * are drawn first, so the order in the OT is children before parent.
+ *
+ * Types are Sony's (libgte.h, libgs.h). Viewport.h's ViewportOt is a local
+ * view of GsOT, hence the (GsOT *) casts at the sort calls.
  */
 #include "common.h"
 #include <libgte.h>

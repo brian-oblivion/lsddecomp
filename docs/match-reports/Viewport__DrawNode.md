@@ -81,3 +81,19 @@ declaration order).
 ## Track 4 (2026-09-25, round 85, bravo)
 
 Renamed from `Unk18Obj__DrawNode`. Slot +0x0A0 `drawNode`. `self` is now `Viewport *`: DrawView's names were carried into the header at their offsets (width/height -> screenSize.width/height, otLen -> otLength, buf -> otIndex; ot, projH, nearZ, zDiv unchanged). The node keeps code_2864's local DrawNode view, so the method is not prototyped in Viewport.h. The class (id 0x7, table `gViewportMethods`, formerly `D_8006E8E4`) is unified as `Viewport` in `include/Viewport.h`, whose banner gives the evidence for the name: its methods hold a GsRVIEW2 (GsSetRefView2), the projection and near clip, a double-buffered GsOT pair, draw the scene tree into it and flip it; IntermediateBase and TaskCore already called the field holding it `viewport`. Any source block above is the pre-unification spelling; the live body takes the unified types and field and slot names, byte-identical.
+
+## Unit history (moved from the code_2864.c banner, track 6 round 94)
+
+- Carved 2026-09-25 (FINISHING-PLAN revision 18) as GAME code out of the segment then named
+  `psyq_2864`, 0x2864..0x2F68: `tools/gameinsdk.py` measured it as game (a method-table entry
+  beside game methods, calls into GetNextBasicClass and ApplyMatrixToLVArray, no Sony fingerprint).
+- Matched round 81 (alpha). `self`'s local view DrawView was merged into include/Viewport.h in
+  round 85.
+- Round 94 (echo, track 6): the local `*_2864` copies of MATRIX, VECTOR, SVECTOR, GsCOORD2PARAM,
+  GsCOORDINATE2, GsDOBJ2, GsSPRITE and GsBOXF were deleted in favour of Sony's `<libgte.h>` /
+  `<libgs.h>`, with Sony's prototypes for RotMatrix and the Gs* calls; the tag-0x54 arm's
+  `u8 bg[0x28]` became Sony's GsBG. Byte-exact unchanged. Two measured divergences from Sony's
+  declarations survive in the source: the scale loop reads GsCOORD2PARAM.scale (Sony: `VECTOR`, signed
+  long) through a `u32 *`, because retail shifts the products with `srl`; and the ordering-table
+  arguments are cast to `GsOT *` because include/Viewport.h still carries its own ViewportOt view.
+
