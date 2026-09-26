@@ -1,27 +1,24 @@
 /*
- * code_39094 -- GAME code carved from psyq_39094 on 2026-09-25 (FINISHING-PLAN
- * revision 18). 0x39094..0x39C80 (vram 0x80048894..0x80049480). It was counted
- * as Psy-Q SDK by segment name; tools/gameinsdk.py measured it as game (a call
- * into game code, a method-table entry beside game methods, or contiguity with
- * those, and no Sony fingerprint). All 38 functions matched round 82 (three
- * echo sessions); named round 82 (bravo). Two independent groups of code:
+ * code_39094 -- two independent groups of game code:
  *
- * 1. LbdFile (method table gLbdFileMethods; include/LbdFile.h): a
- *    FileResource data source that streams a header block into its own 0xB358
- *    buffer (state 9, LbdFile__LoadHeader), then, once the read completes
- *    (LbdFile__AdvanceLoadState), an optional data block the header
- *    describes into a second allocation (state 10, LbdFile__LoadDataBlock/
- *    dataBuffer), started automatically unless LbdFile__SetAutoLoadData
- *    turned that off.
+ * 1. LbdFile (include/LbdFile.h): the loader for one stage map chunk,
+ *    STGnn\Mnnn.LBD. LbdFile__LoadHeader streams the file's first 0xB358
+ *    bytes into the object's fixed buffer; when that read completes
+ *    (LbdFile__AdvanceLoadState) LbdFile__LoadDataBlock reads the optional
+ *    data block the header locates into a second allocation, unless
+ *    LbdFile__SetAutoLoadData turned that off.
  * 2. Free functions over gRecordTable, a table of 0x230+ fixed 0x1C-byte
- *    records (Rec1C): random-or-forced pickers (SeedAndRandom,
- *    SetPickOverrides/gForcedWeeklyGroup/gForcedVariant), record-group
- *    accessors indexed by gRecordIndexTable and, for GetGridRecordXY, by
- *    StageGrid.h's cell columns, and a family of "stream channel" lookups
- *    (GetIntroStreamName, PickWeeklyStreamChannel, GetStreamChannelInit,
- *    ResolveCinematicChannel, GetGraphRoomStreamChannel) whose shapes match
- *    their exact call sites in code_1677c.c one for one. The records' own
- *    fields and the channels' in-game meaning are not established.
+ *    records (Rec1C) whose first bytes are a file path (the sound banks
+ *    SND\*.VH/VB; then per stage its TEXx.TIX, BGx.SEQ and Mnnn.LBD files;
+ *    then the FILM .STR and IMG .TIM files): random-or-forced
+ *    pickers (SeedAndRandom, SetPickOverrides/gForcedWeeklyGroup/
+ *    gForcedVariant), per-stage record-group accessors indexed by
+ *    gRecordIndexTable and, for GetGridRecordXY, by StageGrid.h's cell
+ *    columns, and a family of "stream channel" lookups (GetIntroStreamName,
+ *    PickWeeklyStreamChannel, GetStreamChannelInit, ResolveCinematicChannel,
+ *    GetGraphRoomStreamChannel) whose shapes match their call sites in
+ *    code_1677c.c one for one. The records' other fields and the channels'
+ *    in-game meaning are not established.
  */
 #include "common.h"
 #include "LbdFile.h"
