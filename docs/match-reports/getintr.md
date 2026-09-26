@@ -175,3 +175,249 @@ store of an if/else-merged local.
 
 None. The round-21 report's `extern u8 D_8006D60C` conflict note is moot
 (the unit holds only this function).
+
+## File history
+
+Round 90 (track 8) merged the carve units code_179d8_b (this function),
+code_179d8_n (CD_sync, CD_ready, CD_cw) and code_179d8_g (CD_vol .. cb_read)
+into `src/libcd_bios.c`, on `tools/tuboundary.py`'s rodata proof that they
+were one file. The three unit banners are moved here verbatim, as they stood
+before the merge (unit names in them are the carve names).
+
+### code_179d8_b banner
+
+```c
+/*
+ * ROUND 42 CORRECTION (2026-09-15) -- READ BEFORE ANY "BLOCKED" LINE BELOW:
+ * every claim in this comment that a function is BLOCKED by `gp_rel`,
+ * `nop_mflo_mfhi` or `addiu_at` is STALE.  All three constructs are RESOLVED
+ * by pinned maspsx flags (CLAUDE.md, "Open toolchain blockers");
+ * `tools/nearmiss.py` reports them tagged (RESOLVED-not-a-blocker) and counts
+ * none of them.  Any "do NOT spend attempts on these" directive below is
+ * therefore RETRACTED: those functions are ordinary matching work, and most
+ * carry a mechanism-correct partial derivation already.  The rest of this
+ * comment still stands -- only the blocker verdicts are withdrawn.
+ * Screen: `python3 tools/nearmiss.py`, round 43 (2026-09-15).
+ *
+ * code_179d8_b -- window [60..79] of the original 274-function code_179d8
+ * monolith, originally 0x194E0..0x1A1BC (vram 0x80028CE0..0x800299BC).
+ *
+ * ROUND 34 (head): NINETEEN of the twenty functions left this unit.  Everything
+ * from func_80028CE0 (CdSetDebug) through func_800293F8 (CdPosToInt) is
+ * `libcd/sys.o` (Psy-Q 3.3), which starts four functions earlier in
+ * code_179d8_h and is now linked from the object.  Sixteen of them had been
+ * matched as C and three -- CdControl (func_80028DF0), CdControlF
+ * (func_80028F38), CdControlB (func_80029074) -- were INCLUDE_ASM stalls with
+ * about 1200 lines of derivation between them that could never have closed.
+ * The C is gone because Sony's object owns those bytes now (CLAUDE.md: never
+ * write C for a function a Sony object owns); the reports are kept, retitled
+ * CONVERTED.  The unit is now 0x19C78..0x1A1BC and holds ONE function,
+ * getintr, which still owns jtbl_800109F8 and so the 0x11F8 rodata
+ * attach.  The "low-level serial/link driver" reading below was written
+ * about the whole window and is now mostly a reading of libcd itself.
+ *
+ * Carved round 16 by blocker DENSITY, not by "next": code_179d8 is 44%
+ * blocked in aggregate but the blockers CLUSTER, so the aggregate says
+ * nothing about any particular window. This one screened 16/20 clean.
+ * NONE OF THE THREE "BLOCKED" FUNCTIONS IS BLOCKED ANY MORE.  All three
+ * were blocked on `addiu_at` ALONE, and `addiu_at` was RESOLVED in round 21
+ * (maspsx `--addiu-at`; docs/research/addiu-at-blocker.md).  Re-screened
+ * with `python3 tools/nearmiss.py` on 2026-09-08 (round 24):
+ *   func_80028CF8  MATCHED    func_80028D30  MATCHED
+ *   getintr  MATCHED round 70 (docs/match-reports/getintr.md)
+ * The previous version of this comment said all three "are already stubbed
+ * as match reports", which by round 24 was a stale DIRECTIVE over free
+ * ground; their stubs are gone.
+ * func_800292F4 was misclassified nop_mflo_mfhi by an inverted screen
+ * (round 16 head correction) -- it is fresh ground, not blocked. It
+ * contains mult->mfhi (the hazard-slot direction, not a blocker), retail's
+ * signed-divide-by-constant idiom.
+ *
+ * getintr owns jtbl_800109F8, whose sub-slot of the 0xFD8 rodata
+ * region is ATTACHED to this unit in the splat yaml. Leave that alone.
+ *
+ * This slice was cut at ROM-address boundaries, so it has no reason to
+ * align with class boundaries -- expect it to span more than one class,
+ * and identify each with tools/classtable.py rather than assuming one.
+ *
+ * Declarations: keep anything that encodes THIS unit's reading of a class
+ * next to the code, in this file. Do not create a shared code_179d8*.h --
+ * the sibling slices are staffed independently and a shared header is what
+ * makes their merges collide.
+ */
+```
+
+### code_179d8_n banner
+
+```c
+/*
+ * ROUND 42 CORRECTION (2026-09-15) -- READ BEFORE ANY "BLOCKED" LINE BELOW:
+ * every claim in this comment that a function is BLOCKED by `gp_rel`,
+ * `nop_mflo_mfhi` or `addiu_at` is STALE.  All three constructs are RESOLVED
+ * by pinned maspsx flags (CLAUDE.md, "Open toolchain blockers");
+ * `tools/nearmiss.py` reports them tagged (RESOLVED-not-a-blocker) and counts
+ * none of them.  Any "do NOT spend attempts on these" directive below is
+ * therefore RETRACTED: those functions are ordinary matching work, and most
+ * carry a mechanism-correct partial derivation already.  The rest of this
+ * comment still stands -- only the blocker verdicts are withdrawn.
+ * Screen: `python3 tools/nearmiss.py`, round 43 (2026-09-15).
+ *
+ * code_179d8_n -- functions 80..82 of the original 274-function code_179d8
+ * monolith, 0x1A1BC..0x1AB78 (vram 0x800299BC..0x8002A378).  Carved round 26
+ * (2026-09-09) out of what had been the `code_179d8_mid` uncarved remainder;
+ * renamed on carve because "mid" named a REMAINDER and this is no longer one
+ * -- the whole remainder was consumed, so no `code_179d8_mid` segment exists
+ * any more.  Do not look for one.
+ *
+ * Blocker census at carve time, four screens per function (gp_rel,
+ * forward nop_mflo_mfhi, `jr $t2` trampoline, jtbl):
+ *   CD_sync (161w)  CLEAN
+ *   CD_ready (180w)  CLEAN
+ *   CD_cw (282w)  CLEAN
+ * 3 of 3 clean, zero trivial `jr $ra` leaves.  These are BIG bodies, so this
+ * unit is far larger in work than 3 suggests -- budget accordingly.
+ *
+ * Owns NO switch jump table (zero `jtbl_` references in the slice), so no
+ * rodata sub-slot is attached to this unit and the 0x120C slot in the splat
+ * yaml stays standalone.
+ *
+ * It DOES reference plain rodata SYMBOLS: D_80010984, D_80010994,
+ * D_80010A0C, D_80010A14, D_80010A20, D_80010A28, D_80010A38.  Several of
+ * those are ASCII.  They are SYMBOLS to reference (`extern const char
+ * D_XXXXXXXX[];`), never strings to re-type as C literals -- splat has
+ * already emitted those bytes and a literal emits a second copy, which
+ * shifts the whole image (see CLAUDE.md, the duplicated-rodata-string
+ * trap).
+ *
+ * This unit's own extern declarations are kept LOCAL to this file per the
+ * project's multiple-independent-local-views convention.  It shares no
+ * project header with any other unit.
+ *
+ * Round 26 (echo): all three functions were worked to near-misses and
+ * STALLED -- see docs/match-reports/CD_sync.md (162/161, 1 word LONG),
+ * CD_ready.md (178/180, 2 words short) and CD_cw.md (278/282,
+ * 4 words short).  Every residue is an already-characterized GCC 2.6.3
+ * quirk (a hoisted-constant register choice, dead-code-eliminated redundant
+ * masks, and delay-slot/addressing-mode scheduling) documented in
+ * docs/DECOMPILATION_LEARNINGS.md as not fixable by hand C restructuring --
+ * read the three reports before re-attempting; they carry the full
+ * near-miss bodies and the exact levers already tried.
+ *
+ * Round 35 (echo): re-screened round 26's stalled bodies against the
+ * current tree before re-attempting -- per CLAUDE.md's "BUILD any inherited
+ * body ONCE" discipline. Four of the six `extern func_XXXXXXXX` helper
+ * declarations round 26's preserved bodies used are now STALE placeholder
+ * names -- SDK-object rounds since renamed them to their real Sony symbols
+ * (`func_80025900` -> `VSync`, `func_80025AE4` -> `puts`,
+ * `func_80024E64` -> `CheckCallback`, `func_80012C20` -> `printf`; see
+ * `src/code_179d8_g.c`'s own already-updated local declarations for the
+ * same globals). Round 26's bodies, spliced verbatim, would not have LINKED
+ * under today's tree -- the "a preserved body's `jal` targets can go STALE
+ * across an SDK-object round" hazard from round 31 (DECOMPILATION_LEARNINGS.md).
+ * `CD_flush` and `getintr` were NOT renamed (still real game
+ * code, still INCLUDE_ASM/matched under those names in sibling units).
+ *
+ * All three bodies were rebuilt this round with the four names corrected,
+ * plus a couple of quick untried levers per rounds 31/33's newer findings
+ * (routing the CD_sync hoisted-constant "2" through a separate named
+ * local; reading CD_ready's two flag bytes through a `volatile u8 *`
+ * cast). All three REPRODUCED their round-26 recorded scores exactly
+ * (162/161, 178/180, 278/282) and neither new lever moved anything --
+ * consistent with round 33's finding that a GCSE/value-availability hoist
+ * (CD_sync's case) and a genuinely-redundant-mask DCE (CD_ready's
+ * case, independently re-confirmed here against the live `.s` rather than
+ * inherited from a citation to the now-SDK-owned `func_8002B94C`) are both
+ * immune to source-level rescue by construction, not by insufficient
+ * effort. Re-filed as STALLS; see the three match reports for the updated
+ * verdicts and the round-35 addenda.
+ *
+ * Round 37 (echo): re-confirmed CD_ready's and CD_cw's
+ * round-35 bodies by rebuilding each live and checking funcdiff/lsdde.map
+ * before trusting either score (both reproduce exactly), then preserved
+ * both verbatim in `#if 0` blocks ahead of a permuter search -- neither had
+ * been permuter-searched before this round. See the two match reports for
+ * the search results.
+ */
+```
+
+### code_179d8_g banner
+
+```c
+/*
+ * ROUND 42 CORRECTION (2026-09-15) -- READ BEFORE ANY "BLOCKED" LINE BELOW:
+ * every claim in this comment that a function is BLOCKED by `gp_rel`,
+ * `nop_mflo_mfhi` or `addiu_at` is STALE.  All three constructs are RESOLVED
+ * by pinned maspsx flags (CLAUDE.md, "Open toolchain blockers");
+ * `tools/nearmiss.py` reports them tagged (RESOLVED-not-a-blocker) and counts
+ * none of them.  Any "do NOT spend attempts on these" directive below is
+ * therefore RETRACTED: those functions are ordinary matching work, and most
+ * carry a mechanism-correct partial derivation already.  The rest of this
+ * comment still stands -- only the blocker verdicts are withdrawn.
+ * Screen: `python3 tools/nearmiss.py`, round 43 (2026-09-15).
+ *
+ * code_179d8_g -- functions 83..99 of the original 274-function code_179d8
+ * monolith, 0x1AB78..0x1C440 (vram 0x8002A378..0x8002BC40).  Carved round 17
+ * (2026-09-04) off the back of what was then `code_179d8_mid`, the three
+ * functions in front of this slice. Those three were left as "all addiu-$at
+ * blocked, so there is nothing left to staff there"; re-censused round 24
+ * (2026-09-08) that is FALSE -- CD_sync (161w), CD_ready (180w)
+ * and CD_cw (282w) are ALL THREE blocker-clean now that `addiu_at`
+ * is resolved. Round 26 (2026-09-09) acted on that and CARVED them as the
+ * C unit `code_179d8_n`; no `code_179d8_mid` segment exists any more.
+ *
+ * Blocker census, three-grep screen run per function at carve time:
+ * 14 of the 17 clean, zero trivial leaves.  These are BIG bodies -- 196,
+ * 223, 186 and 189 instructions among them -- so this unit is smaller in
+ * count and considerably larger in work than 17 suggests.  Budget fewer
+ * functions per pass here than in a leaf-heavy unit.
+ *
+ * NO LONGER BLOCKED -- all three of this unit's blocked functions were
+ * blocked on `addiu_at` ALONE, and `addiu_at` was RESOLVED in round 21
+ * (maspsx `--addiu-at`; docs/research/addiu-at-blocker.md). Re-screened with
+ * `python3 tools/nearmiss.py` on 2026-09-08 (round 24):
+ *   CD_readsync (174w)  func_8002B640 (186w)  func_8002B94C (189w)
+ * The previous version of this comment read "BLOCKED, stub reports already
+ * filed, do NOT spend attempts on these" -- a stale DIRECTIVE over free
+ * ground.
+ *
+ * ROUND 32 (2026-09-12) CORRECTION -- that reopening WORKED, and the
+ * "FRESH and assignable / their stub reports are already gone" wording it
+ * left behind is now stale in the OPPOSITE direction. All three have since
+ * been attempted and all three carry full worked stall reports (174/174
+ * length-exact at 153 words; 3 words short; 2 words long respectively).
+ * They are near-misses, NOT cold ground: read
+ * docs/match-reports/<func>.md before spending an attempt, or you will
+ * re-derive several hundred lines of someone else's derivation. Verified
+ * by `tools/nearmiss.py` and by the presence of the report files, not by
+ * reading this comment.
+ *
+ * AND A SECOND ROUND-32 CORRECTION, made the same day as the one above:
+ * func_8002B640 and func_8002B94C are NOT GAME CODE AT ALL. Both lie fully
+ * inside `libcd/iso9660.o` (Psy-Q 3.3), an object already placed in
+ * config/psyq-objects.txt and verified against retail. No C matches them;
+ * the correct disposition is conversion per docs/SDK-OBJECTS-GUIDE.md.
+ * Only CD_readsync of the three is real game ground.
+ *
+ * ROUND 34 (head): CONVERTED. The unit's last three functions -- CdSearchFile
+ * (func_8002B640), _cmp (func_8002B928, which had been matched as C) and
+ * CD_newmedia (func_8002B94C) -- are linked from `lib/libcd/iso9660.o`, which
+ * runs on into code_179d8_d (CD_searchdir, CD_cachefile, cd_read and a WEAK
+ * memcpy). The unit is now 0x1AB78..0x1BE40 (vram 0x8002A378..0x8002B640),
+ * 14 functions. The iso9660-only declarations that used to sit below (the
+ * CD_* diagnostic strings, the directory-cache views, UWord) went with them.
+ *
+ * Note what happened here, because it is the reason this comment now
+ * carries three verdicts: round 24 reopened all three as free ground and
+ * round 32's first pass "corrected" that to near-misses -- both times
+ * without asking whether Sony owned them. `python3 tools/sdkstalls.py`
+ * answers that in one command and did not exist until round 32.
+ *
+ * Owns NO switch jump table -- zero `jtbl_` references in the slice -- so no
+ * rodata sub-slot is attached to this unit.
+ */
+/* code_179d8_g -- this window's globals continue code_179d8_b's reading:
+ * plain scalar/pointer driver state, not object fields (no classtable.py
+ * hit near D_8006D5FC..D_8006D934). This unit's own extern declarations,
+ * kept local per the project's multiple-independent-local-views convention
+ * -- see code_179d8_b.c's header comment for why no shared header. */
+```
