@@ -329,7 +329,7 @@ void Class65650__DisableTickCallback(Class65650 *self) {
 void Class65650__TickCallbackA(Class65650 *self) {
     self->methods->moveLocalZ(self, -0x1E, 0);
     if (self->unk64 == 1 && self->mainPart != NULL) {
-        self->mainPart->methods->notifyIfUnk20Active(self->mainPart, 6);
+        self->mainPart->methods->notifyWithHull(self->mainPart, 6);
     }
 }
 

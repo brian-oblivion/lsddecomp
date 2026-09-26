@@ -166,7 +166,7 @@ void Class866E8__Finalize(Class866E8 *self) {
 
     for (i = 0; i < 7; i++) {
         entry = &self->elems[i];
-        ((Class866E8OnElementEventFn)self->methods->notifyIfUnk20Active)(self, 6, entry, i);
+        ((Class866E8OnElementEventFn)self->methods->notifyWithHull)(self, 6, entry, i);
 
         if (entry->loader != NULL) {
             entry->loader->methods->release(entry->loader);
@@ -226,7 +226,7 @@ void Class866E8__Reset(Class866E8 *self) {
 }
 
 void Class866E8__OnElementEvent(Class866E8 *self, s32 command, Class866E8Elem *elem) {
-    GetSceneNodeMethods()->notifyIfUnk20Active((SceneNode *)self, command);
+    GetSceneNodeMethods()->notifyWithHull((SceneNode *)self, command);
 
     if (command == 6)
         goto handle6;
@@ -275,7 +275,7 @@ void Class866E8__ResetAllElements(Class866E8 *self) {
         if (list->linkResource != NULL) {
             list->linkResource = list->linkResource->methods->release(list->linkResource);
         }
-        ((Class866E8OnElementEventFn)self->methods->notifyIfUnk20Active)(self, 6, entry, i);
+        ((Class866E8OnElementEventFn)self->methods->notifyWithHull)(self, 6, entry, i);
         entry->loader->methods->releaseDataBlock(entry->loader);
     }
 

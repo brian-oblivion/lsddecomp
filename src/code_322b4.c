@@ -254,8 +254,8 @@ void InitGsSprite(SpriteGs *sprite, s32 abr, SpriteRect *rect, struct GsIMAGE *i
 void Sprite__UpdateRotation(Sprite *self, s32 set, Ratio16 *table) {
     s32 angle;
 
-    angle = ((table[2].whole / table[2].frac) << 12) +
-            ((table[2].whole % table[2].frac) << 12) / table[2].frac;
+    angle = ((table[2].num / table[2].den) << 12) +
+            ((table[2].num % table[2].den) << 12) / table[2].den;
     if (set) {
         self->sprite.rotate = angle;
     } else {

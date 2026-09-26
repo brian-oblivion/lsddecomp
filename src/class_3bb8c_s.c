@@ -80,7 +80,7 @@ void Class876FC__InitByKind(Class876FC *self, SceneNode *parent, LongVec3 *pos) 
 
     state = self->pendingExtra;
     if (state < 2) {
-        s32 ret = D_8008ACA4->methods->getSetUnk10Flag8(D_8008ACA4, D_8008AB98[state]);
+        s32 ret = D_8008ACA4->methods->setBackClip(D_8008ACA4, D_8008AB98[state]);
         SceneNode__LinkModel((SceneNode *)self, (void *)ret);
         state = self->pendingExtra;
     }

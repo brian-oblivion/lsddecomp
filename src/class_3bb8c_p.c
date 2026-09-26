@@ -75,7 +75,7 @@ void Actor__MoveAlongLocalAxis(Actor *self, s16 *axis, s32 val, void *notify, vo
     self->methods->addLocalTranslation(self, &D_8008ABA4[0]);
     *axis = 0;
     if (notify != NULL) {
-        self->methods->notifyIfUnk20Active(self, event);
+        self->methods->notifyWithHull(self, event);
     }
 }
 
@@ -159,10 +159,10 @@ s32 Actor__FindNearbyLink(Actor *self) {
             self->linkTarget = result;
             if (result != NULL) {
                 self->methods->addTranslation(self, &sp88);
-                self->methods->notifyIfUnk20Active(self, -1);
+                self->methods->notifyWithHull(self, -1);
                 return 1;
             }
-            self->methods->notifyIfUnk20Active(self, -2);
+            self->methods->notifyWithHull(self, -2);
             return 0;
         }
     }

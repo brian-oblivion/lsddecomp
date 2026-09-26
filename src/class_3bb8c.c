@@ -312,7 +312,7 @@ void Class866E8__ApplyRateEntries(Class866E8 *self, SetupEntry866E8 *arr1, s32 c
     for (i = 0; i < count; i++) {
         sp = (SetupSub866E8 *)&arr1->rate;
         e = self->methods->findElemByUnk32(self, sp->id);
-        ((Class866E8OnElementEventFn)self->methods->notifyIfUnk20Active)(self, 6, e, i);
+        ((Class866E8OnElementEventFn)self->methods->notifyWithHull)(self, 6, e, i);
         if (arr1->ptr0 != 0) {
             if (e->loader->headerReady != 0) {
                 self->methods->resetElementCells(self, e);
@@ -360,7 +360,7 @@ void Class866E8__OnNotifyTag1(Class866E8 *self, void *arg1, s32 mode) {
         e = &self->elems[i];
         if (e->loader->dataReady != 0) {
             e->loader->dataReady = 0;
-            ((Class866E8OnElementEventFn)self->methods->notifyIfUnk20Active)(self, 7, e, i);
+            ((Class866E8OnElementEventFn)self->methods->notifyWithHull)(self, 7, e, i);
         }
         curMode = self->unk1B0;
         if (curMode == 1 && e->flag != 0) {

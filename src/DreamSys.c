@@ -146,7 +146,7 @@ void DreamSys__DetachFromParent(DreamSys *this) {
 void DreamSys__NotifyLinkAttempt(DreamSys *this, s32 arg1) {
     s32 v;
 
-    GetActorMethods()->notifyIfUnk20Active((Actor *)this, arg1);
+    GetActorMethods()->notifyWithHull((Actor *)this, arg1);
     if (arg1 == -2)
         goto handle_neg2;
     if (arg1 != -1)

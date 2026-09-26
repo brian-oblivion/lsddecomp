@@ -71,12 +71,12 @@ void SceneNode__GetRotationDegrees(SceneNode *self, Ratio16 *out) {
     SceneNodeSub44 *src;
 
     src = self->coord2->param;
-    out[0].whole = src->rotate.x * 45 >> 9;
-    out[0].frac = 1;
-    out[1].whole = src->rotate.y * 45 >> 9;
-    out[1].frac = 1;
-    out[2].whole = src->rotate.z * 45 >> 9;
-    out[2].frac = 1;
+    out[0].num = src->rotate.x * 45 >> 9;
+    out[0].den = 1;
+    out[1].num = src->rotate.y * 45 >> 9;
+    out[1].den = 1;
+    out[2].num = src->rotate.z * 45 >> 9;
+    out[2].den = 1;
 }
 
 /* Attaches model data to the object and hands it to the GS. `&self->attribute`
@@ -242,33 +242,33 @@ void SceneNode__FaceTarget(SceneNode *self, SceneNode *target, s32 arg2, s32 arg
     if (table[0] != pos[0]) {
         dx = table[0] - pos[0];
         dz = table[2] - pos[2];
-        out[1].whole = ratan2(dx, dz);
+        out[1].num = ratan2(dx, dz);
     } else {
         dz = table[2] - pos[2];
-        out[1].whole = ratan2(1, dz);
+        out[1].num = ratan2(1, dz);
     }
 
     if (table[2] != pos[2]) {
         dz = table[2] - pos[2];
         dx = table[1] - pos[1];
-        out[0].whole = ratan2(dz, dx);
+        out[0].num = ratan2(dz, dx);
     } else {
         dx = table[1] - pos[1];
-        out[0].whole = ratan2(1, dx);
+        out[0].num = ratan2(1, dx);
     }
 
-    out[0].whole = (out[0].whole + 0x400) * 360 / 4096;
-    out[1].whole = out[1].whole * 360 / 4096;
+    out[0].num = (out[0].num + 0x400) * 360 / 4096;
+    out[1].num = out[1].num * 360 / 4096;
 
-    out[2].whole = 0;
-    out[2].frac = 1;
-    out[1].frac = 1;
-    out[0].frac = 1;
+    out[2].num = 0;
+    out[2].den = 1;
+    out[1].den = 1;
+    out[0].den = 1;
     if (arg2 != 0) {
-        out[0].whole = 0;
+        out[0].num = 0;
     }
     if (arg3 == 0) {
-        out[1].whole = out[1].whole + 0xB4;
+        out[1].num = out[1].num + 0xB4;
     }
 
     self->methods->updateRotation(self, 1, out);
@@ -291,9 +291,9 @@ s32 RatioToFixed12(void *pair) {
     s32 q1, r1, q2;
 
     p = (Ratio16 *)pair;
-    q1 = p->whole / p->frac;
-    r1 = p->whole % p->frac;
-    q2 = (r1 << 12) / p->frac;
+    q1 = p->num / p->den;
+    r1 = p->num % p->den;
+    q2 = (r1 << 12) / p->den;
     return (q1 << 12) + q2;
 }
 

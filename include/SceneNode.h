@@ -77,8 +77,8 @@ typedef struct LongVec3 {
 typedef struct Ratio16 Ratio16;
 
 struct Ratio16 {
-    s16 whole;
-    s16 frac;
+    s16 num;
+    s16 den;
 };
 
 /* GsCOORD2PARAM, 0x28 bytes: the ctor's second allocation. */
@@ -127,10 +127,10 @@ struct SceneNodeSub14 {
     /* +0x074 */ u32 (*setLightDim)(Self *self, u32 value); /* SceneNode__SetLightDim: GsLDIM0..7 */ \
     /* +0x078 */ s32 (*setUseZ)(Self *self, s32 on); /* SceneNode__SetUseZ: GsZIGNR */ \
     /* +0x07C */ u32 (*setSubdivision)(Self *self, u32 value); /* SceneNode__SetSubdivision: GsDIV1..5 */ \
-    /* +0x080 */ s32 (*getSetUnk10Flag8)(Self *self, s32 on); /* SceneNode__SetBackClip: GsNBACKC */ \
+    /* +0x080 */ s32 (*setBackClip)(Self *self, s32 on); /* SceneNode__SetBackClip: GsNBACKC */ \
     /* +0x084 */ void (*getRotMatrix)(Self *self, void *out, s32 invert); /* SceneNode__GetRotMatrix: RotMatrix of the (negated) rotation into a MATRIX */ \
-    /* +0x088 */ void (*notifyIfUnk20Active)(Self *self, s32 event); /* SceneNode__NotifyWithHull; Actor__NotifyMove, DreamSys__NotifyLinkAttempt */ \
-    /* +0x08C */ void (*readUnk20Data)(Self *self, void *dest); /* SceneNode__GetModelHull: TmdModel__GetHull into dest */ \
+    /* +0x088 */ void (*notifyWithHull)(Self *self, s32 event); /* SceneNode__NotifyWithHull; Actor__NotifyMove, DreamSys__NotifyLinkAttempt */ \
+    /* +0x08C */ void (*getModelHull)(Self *self, void *dest); /* SceneNode__GetModelHull: TmdModel__GetHull into dest */ \
     /* +0x090 */ void (*transformAndNotifyParents)(Self *self, TmdHull *verts, s32 event); /* SceneNode__TransformAndNotifyParents */ \
     /* +0x094 */ void (*onPadEvent)(Self *self, void *sender, s32 event); /* SceneNode__OnPadEvent, empty; DreamSys__OnPadEvent */ \
     /* +0x098 */ void (*update)(Self *self, void *sender, s32 event); /* SceneNode__Update, empty; Sprite__Update, Entity__Update, DreamSys__TimerTick */ \

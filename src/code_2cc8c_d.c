@@ -170,9 +170,9 @@ void Viewport__SetTwist(Viewport *self, Ratio16 *twist) {
     s32 q1, r1, q2;
 
     if (self->viewNode != NULL) {
-        q1 = twist->whole / twist->frac;
-        r1 = twist->whole % twist->frac;
-        q2 = (r1 << 12) / twist->frac;
+        q1 = twist->num / twist->den;
+        r1 = twist->num % twist->den;
+        q2 = (r1 << 12) / twist->den;
         self->refView.rz = (q1 << 12) + q2;
     }
 }

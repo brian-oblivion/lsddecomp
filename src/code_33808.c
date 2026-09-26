@@ -722,8 +722,8 @@ void BgLayer__Reset(BgLayer *self, TileMap *src, s32 mode) {
  * {num, den} ratio table SceneNode's updateRotation reads, in 20.12 fixed
  * point, stored in the GsBG's rotate when `set`, else added. */
 void BgLayer__UpdateRotation(BgLayer *self, s32 set, Ratio16 *table) {
-    s32 num = table[2].whole;
-    s32 den = table[2].frac;
+    s32 num = table[2].num;
+    s32 den = table[2].den;
     s32 v = ((num / den) << 12) + (((num % den) << 12) / den);
 
     if (set) {
@@ -747,18 +747,18 @@ void BgLayer__UpdateScale(BgLayer *self, s32 set, Ratio16 *src) {
 
     negX = 0;
     negY = 0;
-    if (src[0].whole < 0 || src[0].frac < 0) {
+    if (src[0].num < 0 || src[0].den < 0) {
         negX = 1;
     }
-    if (src[1].whole < 0 || src[1].frac < 0) {
+    if (src[1].num < 0 || src[1].den < 0) {
         negY = 1;
     }
-    den = src[0].frac;
+    den = src[0].den;
     if (den != 0) {
-        sx = ((src[0].whole / den) << 12) + (((src[0].whole % den) << 12) / den);
+        sx = ((src[0].num / den) << 12) + (((src[0].num % den) << 12) / den);
     }
-    if (src[1].frac != 0) {
-        sy = ((src[1].whole / src[1].frac) << 12) + (((src[1].whole % src[1].frac) << 12) / src[1].frac);
+    if (src[1].den != 0) {
+        sy = ((src[1].num / src[1].den) << 12) + (((src[1].num % src[1].den) << 12) / src[1].den);
     }
     if (set) {
         if (den == 0) {
@@ -770,7 +770,7 @@ void BgLayer__UpdateScale(BgLayer *self, s32 set, Ratio16 *src) {
             }
             self->scalex = v;
         }
-        if (src[1].frac == 0) {
+        if (src[1].den == 0) {
             self->scaley = 0x1000;
         } else {
             v = sy;

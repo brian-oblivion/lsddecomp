@@ -109,7 +109,7 @@ void Actor__func_56f5c(s32 unused, Actor *self, s32 arg2, s32 arg3) {
     D_8008ACAC = (void *)arg3;
     i = 0;
     do {
-        ret = (void *)self->methods->getSetUnk10Flag8(self, D_8008AB98[i]);
+        ret = (void *)self->methods->setBackClip(self, D_8008AB98[i]);
         SetTargetOffset(ret, &D_8008AB94);
         i++;
     } while (i < 2);
@@ -182,7 +182,7 @@ void Actor__Reset(Actor *self) {
 extern void RotateAndOffsetHullList(Buf38O *out, s32 arg1, s32 arg2, s32 arg3);
 
 void Actor__NotifyMove(Actor *self, s32 event) {
-    GetSceneNodeMethods()->notifyIfUnk20Active((SceneNode *)self, event);
+    GetSceneNodeMethods()->notifyWithHull((SceneNode *)self, event);
     /* Written as two nested guards, not a combined `event >= 5 && event < 9`
      * range test -- the combined form optimizes into a single unsigned
      * `(event-5) < 4` comparison, which is not what retail does (two
@@ -192,7 +192,7 @@ void Actor__NotifyMove(Actor *self, s32 event) {
             Buf38O buf;
 
             if (self->model != NULL && TmdModel__GetBoundsCount(self->model)) {
-                self->methods->readUnk20Data(self, &buf);
+                self->methods->getModelHull(self, &buf);
                 if (event != 5) {
                     s16 h = self->lastOffsetValue;
                     s32 isSeven = (event == 7);

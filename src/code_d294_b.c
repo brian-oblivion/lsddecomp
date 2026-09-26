@@ -89,7 +89,7 @@ void SceneNode__NotifyWithHull(SceneNode *self, s32 a1) {
     if (!TmdModel__GetBoundsCount(self->model)) {
         return;
     }
-    self->methods->readUnk20Data(self, buf);
+    self->methods->getModelHull(self, buf);
     self->methods->transformAndNotifyParents(self, (TmdHull *)buf, a1);
 }
 
