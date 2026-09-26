@@ -34,21 +34,14 @@
 #include "LightRig.h"
 #include "Class86668.h"
 #include "DrawSystem.h"
+#include "VabStreamObj.h"
 
-/* Class86668::sound's pointee, a VabStreamObj (New_VabStreamObj): its +0x080 is
- * VabStreamObj__PlayTone. Only Class86668__PlaySound calls through it here. */
-typedef struct SoundObj_3ac78 SoundObj_3ac78;
-typedef struct SoundObjMethods_3ac78 {
-    u8 pad000[0x080];
-    s32 (*playTone)(SoundObj_3ac78 *self, s32 tone, s32 arg2, s32 arg3); /* +0x080 */
-} SoundObjMethods_3ac78;
-struct SoundObj_3ac78 {
-    SoundObjMethods_3ac78 *methods;
-};
+/* Class86668::sound is BasicClass * (it may be the ctor's own argument); when
+ * it is a New_VabStreamObj object, +0x080 is VabStreamObj__PlayTone. */
 
 void Class86668__PlaySound(Class86668 *self, s32 tone)
 {
-    SoundObj_3ac78 *sound = (SoundObj_3ac78 *)self->sound;
+    VabStreamObj *sound = (VabStreamObj *)self->sound;
 
     if (sound != NULL) {
         sound->methods->playTone(sound, tone, 0x7F, 0x7F);
