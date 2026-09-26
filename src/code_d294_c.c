@@ -21,6 +21,7 @@
 
 #include "common.h"
 #include "code_d294.h"
+#include "TmdModel.h"
 
 /* Rotates a 3-element s16 vector, given in the object's own local frame,
  * by the object's own orientation, widening it into `dst`. `slot84`
@@ -93,24 +94,18 @@ void Class6B5CC__GetRotationDegrees(Class6B5CC *self, WholeFrac_d294 *out) {
 /* Attaches model data to the object and hands it to the GS. `&self->attribute`
  * is the GsDOBJ2 embedded in every Class6B5CC instance (attribute at +0x10,
  * coord2 at +0x14, tmd at +0x18), and Sony's GsLinkObject4(tmd_base, objp,
- * n) links object `n` of a TMD to it -- the `+ 0xC` skips the TMD file
- * header. `self->model` keeps the object the data came from.
+ * n) links object `n` of a TMD to it. `model` is a TmdModel
+ * (include/TmdModel.h): its `data->objects` is the object table past the
+ * 0xC-byte TMD header, and its `object` pointer is what GsDOBJ2.tmd gets.
+ * `self->model` keeps the TmdModel.
  *
  * Retail RE-READS `self->model` for the call's first argument instead of
  * reusing the `model` register it stored one statement earlier; writing it
  * through the field is what matches. */
-/* The model: a gTmdModelMethods (class 9) child. Only the two words LinkModel
- * reads are modelled; the class has no C yet. */
-typedef struct ModelObj_d294 {
-    u8 pad0[0x00C];
-    u8 *tmdFile;    /* +0x00C, the TMD file; object data starts 0xC in */
-    s32 tmd;        /* +0x010, copied into the GsDOBJ2 */
-} ModelObj_d294;
-
 void Class6B5CC__LinkModel(Class6B5CC *self, void *model) {
     self->model = model;
-    self->tmd = ((ModelObj_d294 *)model)->tmd;
-    GsLinkObject4(((ModelObj_d294 *)self->model)->tmdFile + 0xC, &self->attribute, 0);
+    self->tmd = (s32)((TmdModel *)model)->object;
+    GsLinkObject4(((TmdModel *)self->model)->data->objects, &self->attribute, 0);
 }
 
 /* Clears exactly the two fields Class6B5CC__LinkModel sets: the GsDOBJ2's
@@ -121,14 +116,14 @@ void Class6B5CC__UnlinkModel(Class6B5CC *self) {
     self->model = 0;
 }
 
-extern s32 TmdModel__RaycastFaces(void *arg0, void *arg1, void *arg2, s32 arg3, void *arg4, s16 *arg5);
 extern void SubVec3S16(s32 *dest, s16 *from, s16 *to);
 
 /* MATCHED round 57 (revisit) -- see docs/match-reports/func_8001E7BC.md.
  *
  * Kept as `func_8001E7BC` on purpose (track 3, tier C): the whole second
- * half hangs off `TmdModel__RaycastFaces`, which is still undecompiled Psy-Q
- * (`psyq_fa50`), so any verb for the function as a whole would be a guess.
+ * half hangs off `TmdModel__RaycastFaces` (code_fa50, a segment cast against
+ * every face of the model; round 82 found it game code, not Psy-Q), and no
+ * verb for the function as a whole has been established.
  * What it DOES is settled. First it maintains the object's world
  * translation: `unk14->unk38` is GsCOORDINATE2.workm.t, and the guarded
  * block rewrites it as this object's own coord.t plus every owner's
@@ -209,12 +204,12 @@ s32 func_8001E7BC(Class6B5CC *self, s32 *arg1, s32 *arg2) {
         delta[0] = buf18[0];
         delta[1] = (u16)buf18[1] - 0x400;
         delta[2] = buf18[2];
-        if (TmdModel__RaycastFaces(self->model, buf30, buf28, 0, buf18, delta)) {
+        if (TmdModel__RaycastFaces(self->model, (s32 *)buf30, (TmdVec3 *)buf28, NULL, (TmdVec3 *)buf18, (TmdVec3 *)delta)) {
             SubVec3S16(arg1, buf18, buf28);
             return 1;
         }
         delta[1] = (u16)buf18[1] + 0x400;
-        if (TmdModel__RaycastFaces(self->model, buf30, buf28, 0, buf18, delta)) {
+        if (TmdModel__RaycastFaces(self->model, (s32 *)buf30, (TmdVec3 *)buf28, NULL, (TmdVec3 *)buf18, (TmdVec3 *)delta)) {
             SubVec3S16(arg1, buf18, buf28);
             return 1;
         }

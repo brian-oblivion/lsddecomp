@@ -133,33 +133,11 @@ extern u8 SCALE_ONE[0xC];
 extern void GsInitCoordinate2(s32 arg0, void *dest);
 
 
-/* TmdModel__GetHull (code_fa50: GAME code since plan revision 18, matched round 82):
- * fills a caller-supplied struct (its own arg1) from a small on-stack
- * buffer via TmdModel__ComputeBounds (its own arg0 forwarded straight through). Its
- * own last write to $v0 is leftover from an unrelated `lhu` a few
- * instructions earlier, not a deliberate return value -- read as `void`.
- * Class6B5CC__ReadUnk20Data (this unit, round 12) calls it as `TmdModel__GetHull(self->unk20,
- * dest)`; declared here only with the opaque `void *` shape that call site
- * needs. */
-extern void TmdModel__GetHull(void *arg0, void *dest);
-
-/* TmdModel__GetBoundsCount (code_fa50: GAME code since plan revision 18, matched round 82): a
- * predicate over the same opaque `self->unk20` pointer Class6B5CC__ReadUnk20Data and
- * TmdModel__GetHull above already treat as `void *` -- Class6B5CC__NotifyIfUnk20Active (round 13,
- * this unit) tests its `$v0` result for non-zero, so declared `s32`
- * (boolean-ish) here. Not decompiled in this project. */
-extern s32 TmdModel__GetBoundsCount(void *arg0);
-
-/* TmdModel__UpdateBoundsBuffer/TmdModel__GetBoundsBuffer (code_fa50: GAME code since plan revision 18,
- * matched round 82): TmdModel__UpdateBoundsBuffer fills a game global
- * (gTmdModelBoundsBuf, via TmdModel__ComputeBounds) from its own argument; TmdModel__GetBoundsBuffer
- * IGNORES both its arguments and just returns `&gTmdModelBoundsBuf` -- MEASURED,
- * its whole body is `lui/addiu %hi/%lo(gTmdModelBoundsBuf); jr $ra`. Class6B5CC__CheckBoundsOverlap
- * (round 13, code_d294_b) calls the pair as `TmdModel__UpdateBoundsBuffer(self->unk20);
- * arr = TmdModel__GetBoundsBuffer(self->unk20, 0);` -- declared here typed to that
- * call site's own use of the result (an array of Sixteen6_d294). */
-extern void TmdModel__UpdateBoundsBuffer(void *arg0);
-extern Sixteen6_d294 *TmdModel__GetBoundsBuffer(void *arg0, s32 arg1);
+/* The model Class6B5CC keeps at +0x020 is a TmdModel (code_fa50). Its
+ * methods -- TmdModel__GetHull, TmdModel__GetBoundsCount,
+ * TmdModel__UpdateBoundsBuffer/GetBoundsBuffer, TmdModel__RaycastFaces --
+ * are declared once, in include/TmdModel.h, which code_d294_b.c and
+ * code_d294_c.c include themselves (track 4, round 87). */
 
 /* GsLinkObject4 (psyq_GsLinkObject4.s, Psy-Q library, not game code; symbol
  * address per config/symbols.slps01556.lsdde.txt, 0x8001EF70 -- the first

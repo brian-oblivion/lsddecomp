@@ -95,3 +95,22 @@ The object fields are renamed: +0x18 `unk18` is now `tmd` (GsDOBJ2.tmd), and
 +0x20 `unk20` is now `model`. The local externs in `include/code_55dd4.h` and
 `src/class_3bb8c_s.c`, `(void *self, s32 arg)`, are deleted, and their
 callers upcast. Byte-identical.
+
+## Track 4 (2026-09-26, round 87, delta)
+
+The local `ModelObj_d294` view (`tmdFile` at +0x00C, `tmd` at +0x010) was a
+view of TmdModel and is deleted; the body now reads the class header
+(include/TmdModel.h), byte-identical:
+
+```c
+void Class6B5CC__LinkModel(Class6B5CC *self, void *model) {
+    self->model = model;
+    self->tmd = (s32)((TmdModel *)model)->object;
+    GsLinkObject4(((TmdModel *)self->model)->data->objects, &self->attribute, 0);
+}
+```
+
+`data->objects` is `data + 0xC` (TmdFile's object table), the old
+`tmdFile + 0xC`. The `void *model` parameter and Class6B5CC's `void *model`
+field (+0x020) are Class6B5CC's to retype (`struct TmdModel *`); proposed,
+not done here.
