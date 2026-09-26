@@ -21,7 +21,7 @@
  * position. The ctor stores `kind`, copies `params` through the reset slot
  * and attaches self under `parent` at pos + params.offset
  * (StyleEffect__InitByKind). Per kind: 0 and 1 link a model fetched through
- * D_8008ACA4; 0 also builds two Actor `modelChildren` in a row; 2 and 3 build
+ * gStyleEffectTmd; 0 also builds two Actor `modelChildren` in a row; 2 and 3 build
  * five VariantSprite `sprites` (2 randomised once, 3 re-randomised every frame).
  *
  * What it changes, from its own methods (`classtable.py gStyleEffectMethods

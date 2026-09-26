@@ -20,7 +20,7 @@ One of this unit's three `self->unk54`-dispatch handlers (see
 Vec3, forwards it through `AttachWithRotScale`, snapshots a lookup table's current
 value into `gTrackedYSnapshot`, and — only when `unk54` is 0 or 1 — calls through a
 NEW cross-class vtable slot (`+0x080` on the object pointed to by the global
-`D_8008ACA4`) before dispatching on `unk54` a second time.
+`gStyleEffectTmd`) before dispatching on `unk54` a second time.
 
 ## C
 
@@ -35,7 +35,7 @@ void StyleEffect__InitByKind(LinkNode *self, void *arg1, Vec3S *arg2) {
 
     state = self->unk54;
     if (state < 2) {
-        s32 ret = D_8008ACA4->methods->slot80(D_8008ACA4, D_8008AB98[state]);
+        s32 ret = gStyleEffectTmd->methods->slot80(gStyleEffectTmd, D_8008AB98[state]);
         SceneNode__LinkModel(self, ret);
         state = self->unk54;
     }
@@ -67,7 +67,7 @@ typedef struct {
 typedef struct {
     D_8008ACA4Methods *methods;
 } D_8008ACA4Obj;
-extern D_8008ACA4Obj *D_8008ACA4;
+extern D_8008ACA4Obj *gStyleEffectTmd;
 extern void *D_8008ACA8;
 extern void *D_8008ACAC;
 extern s32 gTrackedYSnapshot;
@@ -87,7 +87,7 @@ green).
   original cached value. Writing this as "cache, conditionally refresh,
   then switch on the one variable" was what made the shape land without any
   register-identity residue.
-- **`D_8008ACA4` is declared as a pointer to a tiny local struct** whose only
+- **`gStyleEffectTmd` is declared as a pointer to a tiny local struct** whose only
   named field is the `+0x080` function-pointer slot this call needs; the
   object's true type belongs to a different, uncarved unit and there is no
   shared header to extend, so this stays a local, minimal view (project's
@@ -138,7 +138,7 @@ Only caller is the class's ctor `StyleEffect__StyleEffect` (class_3bb8c_r.c), wi
 ctor's own arg3/arg4 as (parent, pos). Body: snapshot `*(D_8008ACAC + 0x18)`
 into gTrackedYSnapshot; `AttachWithRotScale(self, parent, pos + offset,
 rotation, scale)`; for kind < 2, `SceneNode__LinkModel(self,
-D_8008ACA4->slot80(D_8008AB98[kind]))`; then kind 0 ->
+gStyleEffectTmd->slot80(D_8008AB98[kind]))`; then kind 0 ->
 StyleEffect__PlaceModelChildren(self, 0), 2 -> StyleEffect__BuildRandomSprites,
 3 -> StyleEffect__SpawnPlainSprites (= StyleEffect__SpawnSprites(self, 0, 0, NULL)).
 "Init" rests on the one ctor caller, so B.
@@ -186,7 +186,7 @@ method signatures; zero bytes changed.
 | slot +0x0B8 | slotB8 | kept | C | class-dependent: Actor__SetTranslation (translation) on the owner and model children, RGB on sprites |
 | slot +0x0BC | slotBC | addTranslation | B | Actor__AddTranslation; only called on model children (sprite override is a no-op) |
 
-The unused `D_8008ACA4Methods::slot80` is left alone: D_8008ACA4 is a
+The unused `D_8008ACA4Methods::slot80` is left alone: gStyleEffectTmd is a
 different object (captured by Actor__func_56f5c) whose class is unknown.
 
 ## Proposed field names
@@ -204,7 +204,7 @@ For the HEAD, by type scope; none applied here (other units' views).
 
 ## Track 4b (2026-09-25, round 85)
 
-`D_8008ACA4`/`D_8008ACA8`/`D_8008ACAC` were `s32` in class_3bb8c_o.c and
+`gStyleEffectTmd`/`D_8008ACA8`/`D_8008ACAC` were `s32` in class_3bb8c_o.c and
 `D_8008ACA4Obj *`/`void *`/`void *` in class_3bb8c_s.c. Both units now
 declare `Actor *`/`void *`/`void *`: the local `D_8008ACA4Methods` view is gone and the +0x080 call reads `getSetUnk10Flag8`, the name `Actor__func_56f5c` calls the same slot by. Byte-identical; no new `-Wall`
 warning.

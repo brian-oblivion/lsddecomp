@@ -53,12 +53,12 @@ extern void NoOpIgnoreArgs();
 
 /* Three globals class_3bb8c_o.c's Actor__func_56f5c captures once from its
  * parameters (declared there with the same types; track 4b, round 85):
- * D_8008ACA4 is the Actor it ran on, called here through SceneNode's
+ * gStyleEffectTmd is the Actor it ran on, called here through SceneNode's
  * +0x080 getSetUnk10Flag8 as that function calls it; D_8008ACA8 is
  * forwarded opaquely to New_VariantSprite as its third argument; D_8008ACAC's
  * pointee has a field at +0x018 that StyleEffect__InitByKind and
  * StyleEffect__UpdateByKind snapshot/diff via gTrackedYSnapshot. */
-extern Actor *D_8008ACA4; /* the Actor Actor__func_56f5c ran on */
+extern Actor *gStyleEffectTmd; /* the Actor Actor__func_56f5c ran on */
 extern void *D_8008ACA8;
 extern void *D_8008ACAC;
 extern s32 gTrackedYSnapshot;
@@ -66,7 +66,7 @@ extern s32 D_8008AB98[];
 
 /* Called once, from the class's ctor (StyleEffect__StyleEffect): place self under
  * `parent` at pos + offset, then build the per-kind parts. Kinds 0 and 1
- * link a model fetched from D_8008ACA4 by D_8008AB98[kind]; kind 0 also
+ * link a model fetched from gStyleEffectTmd by D_8008AB98[kind]; kind 0 also
  * gets two model children, kind 2 five randomised sprites, kind 3 five
  * plain sprites (StyleEffect__SpawnPlainSprites is StyleEffect__SpawnSprites(self,
  * 0, 0, NULL)). */
@@ -80,7 +80,7 @@ void StyleEffect__InitByKind(StyleEffect *self, SceneNode *parent, LongVec3 *pos
 
     state = self->pendingExtra;
     if (state < 2) {
-        s32 ret = D_8008ACA4->methods->setBackClip(D_8008ACA4, D_8008AB98[state]);
+        s32 ret = gStyleEffectTmd->methods->setBackClip(gStyleEffectTmd, D_8008AB98[state]);
         SceneNode__LinkModel((SceneNode *)self, (void *)ret);
         state = self->pendingExtra;
     }
