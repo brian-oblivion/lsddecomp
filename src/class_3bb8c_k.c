@@ -265,7 +265,7 @@ void Class86F88__CreateRows(Class86F88 *self, Class6B5CC *parent, TimImage *font
     }
 
     for (i = 0; i < count; i++) {
-        Class86F88__FormatRowText(self, buf, i, top, (char *)column);
+        Class86F88__FormatRowText(self, buf, i, top, column);
         *p = New_TextRow(font, 0x1A, buf);
         (*p)->methods->attachToParent(*p, parent, (Vec3_d294 *)&pos);
         (*p)->methods->setColor(*p, &gClass86F88RowColor);
@@ -334,7 +334,7 @@ void Class86F88__RefreshRows(Class86F88 *self, s32 top, s32 column, s32 cursor, 
         count = 4;
     }
     for (i = 0; i < count; i++) {
-        Class86F88__FormatRowText(self, buf, i, top, (char *)column);
+        Class86F88__FormatRowText(self, buf, i, top, column);
         (*p)->methods->setText(*p, buf);
         p++;
     }
@@ -344,17 +344,17 @@ void Class86F88__RefreshRows(Class86F88 *self, s32 top, s32 column, s32 cursor, 
     }
 }
 
-char *Class86F88__FormatRowText(Class86F88 *self, char *dest, s32 row, s32 top, char *column)
+char *Class86F88__FormatRowText(Class86F88 *self, char *dest, s32 row, s32 top, s32 column)
 {
     s32 idx = top + row;
     s32 len;
     s32 i;
 
-    len = strlen(column + self->texts[idx]);
+    len = strlen(self->texts[idx] + column);
     if (len >= 0x1B) {
         len = 0x1A;
     }
-    memcpy(dest, column + self->texts[idx], len);
+    memcpy(dest, self->texts[idx] + column, len);
     i = len;
     if (i < 0x1A) {
         for (; i < 0x1A; i++) {

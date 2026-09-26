@@ -117,3 +117,11 @@ Round 75 (bravo, track 3). `func_8005292C` -> `Class86F88__FormatRowText`, **tie
 Not a table slot (non-virtual helper). Copies item (top + row)'s text, starting `column` characters in, into `dest`, truncated to 26 characters, pads to 26 with spaces, NUL-terminates, returns dest. Callers: CreateRows, RefreshRows. The matched body types `column` as `char *` and `texts` as `s32 *` (their sum is the source pointer); retyping them the natural way is left alone because it touches a matched body.
 
 Class86F88, per the round-75 pass, is a scrolling list selector: up to 4 visible rows of 26-character item text, a highlighted cursor row, a horizontal column offset (see the unit header comment of `src/class_3bb8c_k.c`).
+
+## Track 4 (2026-09-26, round 89)
+
+`texts` (+0x018) is `char **` in include/Class86F88.h and `column` is an
+`s32` parameter: `strlen(self->texts[idx] + column)` compiles byte-identical
+to the `s32 *texts` / `char *column` spelling above (whole-image SHA1
+green), so the pointer is on the side the ctor allocates and strcpys into,
+and CreateRows/RefreshRows pass `column` without a cast.

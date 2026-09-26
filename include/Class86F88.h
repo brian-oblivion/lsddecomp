@@ -82,8 +82,7 @@ struct Class86F88 {
     /* +0x00C */ s32 mode;           /* the ctor's mode: 1 = the item strings are full-width SJIS */
     /* +0x010 */ s32 itemCount;      /* the ctor counts the NULL-terminated list; rows shown = min(itemCount, 4) */
     /* +0x014 */ s32 maxTextLen;     /* the ctor: the longest item; bounds `column` in scrollRight */
-    /* +0x018 */ s32 *texts;         /* the ctor: one buffer per item. `s32 *` because FormatRowText's matched
-                                      * body adds `column` (a `char *`) to an element; the sum is the same */
+    /* +0x018 */ char **texts;       /* the ctor: one buffer per item */
     /* +0x01C */ s32 *textLens;      /* the ctor: each item's length; finalize frees it */
     /* +0x020 */ s32 topIndex;       /* the item shown in row 0; resetView zeroes, setView sets */
     /* +0x024 */ s32 column;         /* character offset into every item (horizontal scroll) */
@@ -135,7 +134,7 @@ void Class86F88__CursorDown(Class86F88 *self, s32 arg1, s32 arg2, s32 arg3);
 void Class86F88__CreateRows(Class86F88 *self, struct Class6B5CC *parent, struct TimImage *font, s32 top, s32 column, s32 cursor);
 void Class86F88__ReleaseRows(Class86F88 *self);
 void Class86F88__RefreshRows(Class86F88 *self, s32 top, s32 column, s32 cursor, s32 notify);
-char *Class86F88__FormatRowText(Class86F88 *self, char *dest, s32 row, s32 top, char *column);
+char *Class86F88__FormatRowText(Class86F88 *self, char *dest, s32 row, s32 top, s32 column);
 void Class86F88__SetView(Class86F88 *self, s32 top, s32 column, s32 cursor, s32 highlight);
 void Class86F88__StepCursorInView(Class86F88 *self, s32 dir, s32 notify);
 s32 Class86F88__GetCursorIndex(Class86F88 *self);

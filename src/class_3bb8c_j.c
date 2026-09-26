@@ -184,11 +184,11 @@ void Class86F88__Class86F88(Class86F88 *self, char **items, s32 mode)
             len /= 2;
         }
         self->textLens[i] = len;
-        self->texts[i] = (s32)BMemPMgrAlloc(len + 4);
+        self->texts[i] = BMemPMgrAlloc(len + 4);
         if (mode == 1) {
-            DecodeFullWidthSjis((void *)self->texts[i], *p);
+            DecodeFullWidthSjis(self->texts[i], *p);
         } else {
-            strcpy((char *)self->texts[i], *p);
+            strcpy(self->texts[i], *p);
         }
         self->maxTextLen = (self->maxTextLen < len) ? len : self->maxTextLen;
         p++;
@@ -211,7 +211,7 @@ void Class86F88__Finalize(Class86F88 *self)
     s32 i;
 
     for (i = 0; i < self->itemCount; i++) {
-        BMemPMgrFree((void *)self->texts[i]);
+        BMemPMgrFree(self->texts[i]);
     }
     BMemPMgrFree(self->textLens);
     BMemPMgrFree(self->texts);
