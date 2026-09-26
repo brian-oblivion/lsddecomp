@@ -160,3 +160,5 @@ Renamed from TaskCoreObj__TaskCoreObj (tools/rename.py). Occupant of +0x008 (`ct
 TaskCore::bgLayer (+0x078) is `struct BgLayer *` (include/BgLayer.h, was `BasicClass *`), so the New_BgLayer result is stored uncast; the TileMap argument is cast to BgLayer.h's `struct Map44294 *` (no code). include/code_2c054.h's local extern of New_BgLayer is gone. Byte-identical.
 
 Later the same round (alpha, second class): TileMap unified (`include/TileMap.h`): TaskCore::tileMap is `struct TileMap *` (was `BasicClass *`), and the local `tmp` that holds the TileAtlas and then the TileMap is `void *` (was `StreamTaskUnkB4Obj *`), so the three casts on the tileAtlas/tileMap/New_BgLayer lines are gone. Byte-identical.
+
+Later the same round (alpha, third class): TileAtlas unified (`include/TileAtlas.h`): TaskCore::tileAtlas (+0x080) is `struct TileAtlas *` (was `BasicClass *`), and New_TileAtlas is declared by include/TileAtlas.h (include/code_2c054.h's `StreamTaskUnkB4Obj *` view is deleted). `tmp` stays `void *` (it is reused for the TileMap). Byte-identical.

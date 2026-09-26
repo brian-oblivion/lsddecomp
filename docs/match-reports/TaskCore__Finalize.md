@@ -114,3 +114,5 @@ Renamed from TaskCoreObj__Destroy (tools/rename.py). Occupant of +0x00C (`finali
 ## Track 4 (2026-09-26, round 88, alpha)
 
 bgLayer is a `BgLayer *` (include/BgLayer.h, was `BasicClass *`); `release` is the same inherited +0x004 slot. Source unchanged, byte-identical.
+
+Later the same round (alpha, third class): TaskCore::tileAtlas (+0x080) is `struct TileAtlas *` (include/TileAtlas.h, was `BasicClass *`); its release is BasicClass's +0x004 slot, inherited unchanged by TileAtlasMethods. Byte-identical.

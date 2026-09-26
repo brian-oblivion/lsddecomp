@@ -54,3 +54,7 @@ First build. The 0x40 frame with nothing on the stack past ra/s0/s1 is the unuse
 ## Naming
 
 - **TileAtlas__TileAtlas**, tier A. Constructor: clears state and, unowned, runs Load.
+
+## Track 4 (2026-09-26, round 88, alpha)
+
+Class unified in `include/TileAtlas.h` (D_8006F514, 0x303, a Class6D430 subclass, 0x38 bytes). `self` is `TileAtlas *` (was the unit-local `Obj6F514`). +0x030 unk30 -> `defaultCells` (set to 1 here when arg1 == 0; TileAtlas__BuildCells builds only when it is set, the counterpart of TileMap's `defaultGrid`), +0x032 unk32 -> `loaded` (0 here, 1 from TileAtlas__Load), +0x034 `unk34` retyped `s32` -> `void *` (zeroed here, freed by Finalize, set by no TileAtlas method). The setFlag call needs no cast. No rename. Byte-identical.
