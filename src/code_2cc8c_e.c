@@ -1,52 +1,12 @@
 #include "common.h"
 #include "code_2cc8c.h"
 
-/* ROUND 34: THIS UNIT LOST ITS FIRST EIGHT FUNCTIONS -- six of them to Sony,
- * two to files of their own -- and now begins at 0x305B0 / New_FadeBox.
- * The segment it used to be is split three ways:
- *
- *   [c libgs_gs_101]   GsSetNearClip          Sony libgs/gs_101, C file
- *   [o libgs/gs_123]   Gssub_make_matrix      was func_8003FB1C, matched C
- *   [c libgs_gs_124]   GsSetWorkBase          Sony libgs/gs_124, C file
- *   [o libgs/gs_111]   GsDrawOt               was func_8003FBF4, matched C
- *   [o libgs/gs_113]   GsClearOt              was func_8003FC18, matched C
- *   [o libgs/gs_108]   GsSetLightMode         was func_8003FC70, matched C
- *   [o libgte/fgo_00]  TransposeMatrix        was func_8003FCFC, a 20w stall
- *   [o libgte/fog_01]  SetFogNear             was func_8003FD4C, matched C
- *   [c code_2cc8c_e]   New_FadeBox onward   <- this file
- *
- * THIS FILE KEEPS THE NAME deliberately: it holds the unit's remaining
- * INCLUDE_ASM stubs and its class, so every
- * `INCLUDE_ASM("asm/nonmatchings/code_2cc8c_e", ...)` path below and every
- * match report naming this unit stays valid. Only the two one-function heads
- * needed new names.
- *
- * NEITHER RODATA SLOT IS OURS ANY MORE. jtbl_80011108 (0x1908) went with
- * Gssub_make_matrix and D_80011194 (0x1994, "not supported light mode %d\n")
- * went with GsSetLightMode -- both are their own object's `.rdata` section
- * now. This unit needs no `.rodata` attach at all; if a future carve of it
- * hits Gate 2's `undefined reference to '.LXXXXXXXX'`, that is a NEW jump
- * table, not these.
- *
- * The six Sony bodies are gone from this file, not lost -- five matched C
- * bodies and one INCLUDE_ASM stub. Each one's match report is kept and
- * retitled CONVERTED, and carries its derivation verbatim.
- */
-
 /*
- * WHAT THIS UNIT IS (round 61, track 3; revised rounds 85 and 87, track 4).
- * Its 17 functions are the bottom two links of `SceneNode -> BoxFill ->
- * FadeBox`: first FadeBox's (gFadeBoxMethods, 0x164, `New_FadeBox` to
- * `GetFadeBoxMethods`, include/FadeBox.h), then BoxFill's allocator,
- * ctor and Reset (0x64, include/BoxFill.h, a GsBOXF screen rectangle; the
- * rest of its methods open code_2cc8c_f).
- *
- * FadeBox fades the box's colour: configure picks the channels (a
- * 4/2/1 = r/g/b mask) and a tick count, StartFadeDown/StartFadeUp set the
- * start colour and the step's sign, Update steps the selected channels once
- * per call until Stop, and PushPosition/PopPosition save and restore the
- * box's size and position (tier B; include/FadeBox.h's banner has the
- * evidence). See each function's own `## Naming` section.
+ * code_2cc8c_e -- FadeBox's methods (include/FadeBox.h: a BoxFill whose
+ * colour ramps a step per update, the screen fade), New_FadeBox to
+ * GetFadeBoxMethods, then BoxFill's allocator, ctor and Reset
+ * (include/BoxFill.h: a GsBOXF screen rectangle; the rest of its methods
+ * open code_2cc8c_f.c).
  */
 
 FadeBox *New_FadeBox(void *size, s32 channels, s32 pri) {
@@ -116,10 +76,8 @@ void FadeBox__SetStep(FadeBox *self, s32 step) {
     self->step = step;
 }
 
-/* Both StartFade functions forward their own three arguments to configure
- * untouched (no argument register is set before that jalr), and spelling
- * the forward is load-bearing: a `(self)`-only call compiles to the same
- * instructions in a different order (29/35; round 73). */
+/* MATCHING: both StartFade functions pass their own arguments on to
+ * configure; a `(self)`-only call reorders the instructions. */
 void FadeBox__StartFadeDown(FadeBox *self, BasicClass *source, s32 channels, s32 arg3) {
     s32 idx;
 
@@ -222,10 +180,8 @@ void *FadeBox__GetColor(FadeBox *self) {
     return &D_8006EA90[self->channels * 3];
 }
 
-/* Both s32 pairs are copied as whole structs. GCC 2.6.3's MIPS
- * `movstrsi_internal` clobbers $v0/$v1/$a0/$a1, so `self` and `size`, live
- * across the first copy, cannot stay in their incoming registers: that is
- * retail's entry `move $a3,$a0` / delay-slot `move $t0,$a1` (round 73). */
+/* MATCHING: both position pairs are copied as whole structs; the block
+ * copy is what moves `self` and `size` out of their incoming registers. */
 void FadeBox__PushPosition(FadeBox *self, SkipShort2 *size, Pair32E99C *pos) {
     if (self->parent != 0) {
         self->savedW = self->boxW;
@@ -244,8 +200,8 @@ void FadeBox__PopPosition(FadeBox *self) {
     t1 = self->savedPosY;
     self->posX = t0;
     self->posY = t1;
-    /* Keeps the savedW/savedH loads below the posX/posY stores; without it
-     * GCC hoists both lhu above the two sw. (A "memory" clobber is not needed.) */
+    /* MATCHING: without it GCC hoists the savedW/savedH loads above the
+     * posX/posY stores. */
     __asm__("");
     self->boxW = self->savedW;
     self->boxH = self->savedH;

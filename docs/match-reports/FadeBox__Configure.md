@@ -379,3 +379,16 @@ its occupant's four parameters, so the StartFade callers' file-local
 `Configure6E99CFn` cast is gone. Fields: unk70 -> defaultChannels, unk78 ->
 channels, unk80 -> ticksLeft, unk68 -> BoxFill's `mask`; slot64/68/60 ->
 setSemiTrans/setSemiTransRate/setDisplay.
+
+## Track 6 (2026-09-26, round 93, charlie)
+
+Renamed with the class: `Class6E99C` is now `FadeBox`
+(`python3 tools/renametype.py Class6E99C FadeBox`, table
+`python3 tools/rename.py D_8006E99C gFadeBoxMethods`), tier A; the evidence
+is in New_FadeBox.md's Track 6 section. The method's own name was kept: it
+already says what the body does. renametype.py rewrote the old class name in
+this report's earlier history too (known, pending an operator decision).
+
+The field this method writes at +0x084 is now `maskPerTick` (was `unk84`):
+`BoxFill::mask / ticksLeft`, stored and never read by any code.
+

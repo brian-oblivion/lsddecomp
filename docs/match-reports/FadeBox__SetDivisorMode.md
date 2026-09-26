@@ -18,3 +18,13 @@ s32 a2) { self->altMode = a1; self->divisor = a2; }`.
 denominator -- hence "divisor mode" rather than a generic two-arg setter
 name. What selecting the alternate mode represents in-game is not
 established.
+
+## Track 6 (2026-09-26, round 93, charlie)
+
+Renamed with the class: `Class6E99C` is now `FadeBox`
+(`python3 tools/renametype.py Class6E99C FadeBox`, table
+`python3 tools/rename.py D_8006E99C gFadeBoxMethods`), tier A; the evidence
+is in New_FadeBox.md's Track 6 section. The method's own name was kept: it
+already says what the body does. renametype.py rewrote the old class name in
+this report's earlier history too (known, pending an operator decision).
+

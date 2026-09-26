@@ -28,3 +28,13 @@ when `unk78 == 0xF`, else `&D_8006EA90[unk78 * 3]` (the indexed table) --
 the same two tables `FadeBox__StartFadeDown`/`StartFadeUp`
 write through `slotB8`. A pure leaf whose mechanics ARE its purpose (a
 getter) is tier A by this project's own naming rule.
+
+## Track 6 (2026-09-26, round 93, charlie)
+
+Renamed with the class: `Class6E99C` is now `FadeBox`
+(`python3 tools/renametype.py Class6E99C FadeBox`, table
+`python3 tools/rename.py D_8006E99C gFadeBoxMethods`), tier A; the evidence
+is in New_FadeBox.md's Track 6 section. The method's own name was kept: it
+already says what the body does. renametype.py rewrote the old class name in
+this report's earlier history too (known, pending an operator decision).
+

@@ -83,3 +83,13 @@ The +0x098 override of SceneNode's `update(self, sender, event)`
 slot, parameters named for it. Fields: unk80 -> ticksLeft, unk78 ->
 channels, unk64/65/66 -> BoxFill's color[0..2]; the sender goes to `stop`,
 which removes it as a child. Image byte-identical.
+
+## Track 6 (2026-09-26, round 93, charlie)
+
+Renamed with the class: `Class6E99C` is now `FadeBox`
+(`python3 tools/renametype.py Class6E99C FadeBox`, table
+`python3 tools/rename.py D_8006E99C gFadeBoxMethods`), tier A; the evidence
+is in New_FadeBox.md's Track 6 section. The method's own name was kept: it
+already says what the body does. renametype.py rewrote the old class name in
+this report's earlier history too (known, pending an operator decision).
+

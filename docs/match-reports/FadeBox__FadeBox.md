@@ -66,3 +66,13 @@ instance of this class) fully determine the name.
 ## Track 4 (2026-09-25, round 85, charlie)
 
 The base call is now typed through BoxFill's header: `BoxFillMethods *base = GetBoxFillMethods(); base->ctor((BoxFill *)self, ...)` (was a cast to the deleted `ClassEAC0Methods`). BoxFill (0x64, include/BoxFill.h) is this class's ctor-chain parent. Zero bytes.
+
+## Track 6 (2026-09-26, round 93, charlie)
+
+Renamed with the class: `Class6E99C` is now `FadeBox`
+(`python3 tools/renametype.py Class6E99C FadeBox`, table
+`python3 tools/rename.py D_8006E99C gFadeBoxMethods`), tier A; the evidence
+is in New_FadeBox.md's Track 6 section. The method's own name was kept: it
+already says what the body does. renametype.py rewrote the old class name in
+this report's earlier history too (known, pending an operator decision).
+

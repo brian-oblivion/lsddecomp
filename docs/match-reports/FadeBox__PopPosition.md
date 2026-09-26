@@ -66,3 +66,13 @@ length), `funcdiff` 3/9, and asm-differ shows `lhu a1,0x88(a0)` /
 Instruction order. It was spelled `__asm__("" ::: "memory")`; the bare
 `__asm__("")` builds byte-identical (whole image green), so the clobber was
 not what forced the order and the site now uses the bare form.
+
+## Track 6 (2026-09-26, round 93, charlie)
+
+Renamed with the class: `Class6E99C` is now `FadeBox`
+(`python3 tools/renametype.py Class6E99C FadeBox`, table
+`python3 tools/rename.py D_8006E99C gFadeBoxMethods`), tier A; the evidence
+is in New_FadeBox.md's Track 6 section. The method's own name was kept: it
+already says what the body does. renametype.py rewrote the old class name in
+this report's earlier history too (known, pending an operator decision).
+

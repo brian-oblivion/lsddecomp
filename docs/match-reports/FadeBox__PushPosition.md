@@ -540,3 +540,13 @@ override, e.g. a highlight or animation) is not established -- tier B.
 Fields under their unified names: unkC -> parent, unk50/54 -> posX/posY,
 unk60/62 -> boxW/boxH (BoxFill's), unk88/8C -> savedW/savedH, unk90/94 ->
 savedPosX/savedPosY (FadeBox's). Image byte-identical.
+
+## Track 6 (2026-09-26, round 93, charlie)
+
+Renamed with the class: `Class6E99C` is now `FadeBox`
+(`python3 tools/renametype.py Class6E99C FadeBox`, table
+`python3 tools/rename.py D_8006E99C gFadeBoxMethods`), tier A; the evidence
+is in New_FadeBox.md's Track 6 section. The method's own name was kept: it
+already says what the body does. renametype.py rewrote the old class name in
+this report's earlier history too (known, pending an operator decision).
+

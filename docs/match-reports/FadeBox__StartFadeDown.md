@@ -281,3 +281,13 @@ now typed with them. Callers, all through Entity's `unk100`:
 Entity__MoodCue57 (Entity_d) passes (companion2, 4, 0), Entity__MoodCue85
 (Entity_f) and Entity__MoodCue98 (Entity_g) (companion2, 7, 0), and
 Entity__MoodCue91 (Entity_f) (companion2, 0, 0). Tier B: what the fade is for is not shown.
+
+## Track 6 (2026-09-26, round 93, charlie)
+
+Renamed with the class: `Class6E99C` is now `FadeBox`
+(`python3 tools/renametype.py Class6E99C FadeBox`, table
+`python3 tools/rename.py D_8006E99C gFadeBoxMethods`), tier A; the evidence
+is in New_FadeBox.md's Track 6 section. The method's own name was kept: it
+already says what the body does. renametype.py rewrote the old class name in
+this report's earlier history too (known, pending an operator decision).
+
