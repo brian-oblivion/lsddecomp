@@ -51,6 +51,10 @@ typedef struct SoundCueSlot {
     /* +0x10 */ s32 endVol; /* request: playTone's endVol before attenuation; reset to 0x40 each tick */
 } SoundCueSlot;             /* 0x14 bytes */
 
+/* SoundCueSlot::program's two requests that are not a VAB program. */
+#define SOUND_CUE_NONE (-1) /* no request (ServiceSoundCueSet's reset value) */
+#define SOUND_CUE_STOP (-2) /* stop the slot's voice */
+
 struct SoundCueSet {
     /* +0x00 */ s32 tag; /* the owner's tag while running (Entity: moodIndex + 1); 0 when stopped; serviced only while > 0 */
     /* +0x04 */ s32 tick;    /* zeroed by InitSoundCueSet, advanced after each service pass */
