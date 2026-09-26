@@ -301,21 +301,21 @@ void VabDriver__VabDriver(void) {
 void VabDriver__Destroy(void) {
 }
 
-void func_8002C3D0(void)
+void VabDriver__NoOpSlot40(void)
 {
     char buf[0x40];
 }
 
-void func_8002C3E0(void)
+void VabDriver__Open(void)
 {
     char buf[0x40];
 }
 
-void func_8002C3F0(void) {
+void VabDriver__Close(void) {
 }
 
-void func_8002C3F8(void) {
+void VabDriver__Seek(void) {
 }
 
-void func_8002C400(void) {
+void VabDriver__NoOpSlot50(void) {
 }

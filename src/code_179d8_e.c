@@ -29,9 +29,10 @@
  * driver-interface base class this backend's stream object derives from, not
  * an unrelated table that happens to live in the same file.  Its own
  * ctor/dtor (`VabDriver__VabDriver`/`VabDriver__Destroy`, `code_179d8_d.c`, not this
- * unit) and its five extra slots this unit defines
- * (`func_8002C408`/`410`/`418`/`420`/`428`/`430`, kept unnamed -- see their
- * own reports) are all empty no-ops: this backend needs no extra generic
+ * unit) and the six interface slots this unit defines
+ * (`VabDriver__Read`/`LoadFile`/`RunRequestQueue`/`RequestLoadFile`/
+ * `StopService`/`CancelRequests`, named for their slots in round 87) are all
+ * empty no-ops: this backend needs no extra generic
  * setup beyond BasicClass's own, which is exactly what "the base class for
  * whichever data source is active" should look like when the active source
  * needs nothing extra.
@@ -91,13 +92,13 @@ typedef struct VabStreamObj VabStreamObj;
  * unit itself defines are named here. */
 typedef struct VabDriverMethods {
     u8 pad000[0x054];
-    s32 (*slot54)(void);  /* func_8002C408 -- empty (return 0), no call site in this unit */
-    void (*slot58)(void); /* func_8002C410 -- empty, no call site in this unit */
+    s32 (*slot54)(void);  /* VabDriver__Read -- empty (return 0), no call site in this unit */
+    void (*slot58)(void); /* VabDriver__LoadFile -- empty, no call site in this unit */
     u8 pad05C[0x068 - 0x05C];
-    void (*slot68)(void); /* func_8002C418 -- empty, no call site in this unit */
-    void (*slot6C)(void); /* func_8002C420 -- empty, no call site in this unit */
-    void (*slot70)(void); /* func_8002C428 -- empty, no call site in this unit */
-    void (*slot74)(void); /* func_8002C430 -- empty, no call site in this unit */
+    void (*slot68)(void); /* VabDriver__RunRequestQueue -- empty, no call site in this unit */
+    void (*slot6C)(void); /* VabDriver__RequestLoadFile -- empty, no call site in this unit */
+    void (*slot70)(void); /* VabDriver__StopService -- empty, no call site in this unit */
+    void (*slot74)(void); /* VabDriver__CancelRequests -- empty, no call site in this unit */
 } VabDriverMethods;
 extern VabDriverMethods gVabDriverMethods;
 
@@ -223,23 +224,23 @@ typedef struct SoundCueSet {
  * (ROM order), but New_VabStreamObj (earlier in ROM order) calls it. */
 VabStreamObjMethods *GetVabStreamObjMethods(void);
 
-s32 func_8002C408(void) {
+s32 VabDriver__Read(void) {
     return 0;
 }
 
-void func_8002C410(void) {
+void VabDriver__LoadFile(void) {
 }
 
-void func_8002C418(void) {
+void VabDriver__RunRequestQueue(void) {
 }
 
-void func_8002C420(void) {
+void VabDriver__RequestLoadFile(void) {
 }
 
-void func_8002C428(void) {
+void VabDriver__StopService(void) {
 }
 
-void func_8002C430(void) {
+void VabDriver__CancelRequests(void) {
 }
 
 VabDriverMethods *GetVabDriverMethods(void) {
