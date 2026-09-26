@@ -25,7 +25,7 @@
  * PlacementGrid__ResolveEntry(self, placement, cell), s32. It reads cell
  * `cell`'s PlacementGridRecord (12 bytes each, from buffer +8; cell / 20 is
  * the row, cell % 20 the column), follows `next` for a second record in
- * the same cell, fills a PlacementGridPlacement and returns the model
+ * the same cell, fills a CellPlacement and returns the model
  * linkResource's +0x080 (LinkResource__GetModel) gives for the record's
  * model index: 0 past the last cell (400), -1 for an empty record.
  * Class866E8__LoadElementResources calls it through
@@ -39,18 +39,18 @@ typedef struct PlacementGridMethods PlacementGridMethods;
  * cell * 12 + 8. */
 typedef struct PlacementGridRecord {
     /* +0x0 */ u8 present; /* zero: the cell is empty, ResolveEntry returns -1 */
-    /* +0x1 */ u8 unk1;    /* -> PlacementGridPlacement.unk2C */
+    /* +0x1 */ u8 unk1;    /* -> CellPlacement.unk2C */
     /* +0x2 */ u16 model;  /* the index passed to linkResource's +0x080 */
-    /* +0x4 */ u8 unk4;    /* -> PlacementGridPlacement.unk2E */
-    /* +0x5 */ u8 rotY;    /* in 0x400 steps: -> PlacementGridPlacement.rotY */
-    /* +0x6 */ s16 y;      /* in 0x800 units: -> PlacementGridPlacement.y */
+    /* +0x4 */ u8 unk4;    /* -> CellPlacement.unk2E */
+    /* +0x5 */ u8 rotY;    /* in 0x400 steps: -> CellPlacement.rotY */
+    /* +0x6 */ s16 y;      /* in 0x800 units: -> CellPlacement.y */
     /* +0x8 */ s32 next;   /* buffer offset of the cell's next record, 0 for none */
 } PlacementGridRecord;
 
 /* What PlacementGrid__ResolveEntry fills in: the caller's stack record, 0x40
  * bytes (Class866E8__LoadElementResources). x and z are the cell's centre,
  * 0x800 units a cell. */
-typedef struct PlacementGridPlacement {
+typedef struct CellPlacement {
     /* +0x000 */ u8 pad0[0xC];
     /* +0x00C */ s32 x; /* column * 0x800 + 0x400 */
     /* +0x010 */ s32 y; /* record y * 0x800 */
@@ -64,9 +64,9 @@ typedef struct PlacementGridPlacement {
     /* +0x034 */ s32 next; /* in: the offset to follow (0 starts at the cell); out: the record's `next` */
     /* +0x038 */ s32 model; /* record model */
     /* +0x03C */ u8 pad3C[4];
-} PlacementGridPlacement;
+} CellPlacement;
 
-typedef s32 (*PlacementGridResolveEntryFn)(PlacementGrid *self, PlacementGridPlacement *placement, s32 cell);
+typedef s32 (*PlacementGridResolveEntryFn)(PlacementGrid *self, CellPlacement *placement, s32 cell);
 
 struct PlacementGridMethods {
     FILERESOURCE_SLOTS(PlacementGrid, (PlacementGrid * self, char *name));
@@ -87,6 +87,6 @@ PlacementGrid *New_PlacementGrid(char *name);
 void PlacementGrid__PlacementGrid(PlacementGrid *self, char *name);
 void PlacementGrid__Finalize(PlacementGrid *self);
 void PlacementGrid__SetFlag(PlacementGrid *self);
-s32 PlacementGrid__ResolveEntry(PlacementGrid *self, PlacementGridPlacement *placement, s32 cell);
+s32 PlacementGrid__ResolveEntry(PlacementGrid *self, CellPlacement *placement, s32 cell);
 
 #endif

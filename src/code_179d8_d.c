@@ -104,7 +104,7 @@ extern void *BMemPMgrAlloc(s32 size);
  * keeps `placement` in $a3 across the call (the round-76 match). The
  * occupant reads only (self, index); a function-pointer cast, no code. */
 typedef s32 (*PlacementGridGetModelFn)(LinkResource *self, s32 model, s32 cell,
-                                    PlacementGridPlacement *placement);
+                                    CellPlacement *placement);
 
 PlacementGrid *New_PlacementGrid(char *name) {
     PlacementGrid *self;
@@ -138,7 +138,7 @@ void PlacementGrid__SetFlag(PlacementGrid *self) {
     GetActiveDataSourceMethods()->setFlag((FileResource *)self);
 }
 
-s32 PlacementGrid__ResolveEntry(PlacementGrid *self, PlacementGridPlacement *placement, s32 cell) {
+s32 PlacementGrid__ResolveEntry(PlacementGrid *self, CellPlacement *placement, s32 cell) {
     PlacementGridRecord *rec;
     LinkResource *link;
     s32 row;

@@ -423,7 +423,7 @@ void Class866E8__LoadElementResources(Class866E8 *self, Class866E8Elem *entry) {
     s32 i;
     s32 off1;
     s32 off2;
-    PlacementGridPlacement outBuf;
+    CellPlacement outBuf;
     BE54LoadReq req;
 
     hdr = entry->loader;
