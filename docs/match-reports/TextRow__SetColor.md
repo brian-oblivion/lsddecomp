@@ -132,3 +132,7 @@ child. Mechanics fully established (a for-each-child dispatch through the
 identical slot); whether the game actually uses this to recolour a whole
 row of children (vs. some other meaning `a1` carries) is not independently
 confirmed, hence tier B rather than A.
+
+## Track 4 (2026-09-26, round 88, charlie)
+
+2026-09-26, round 88 (charlie): class 0x11144 unified as TextRow in `include/TextRow.h` (a row of CharSprite cells: the ctor makes `count` New_CharSprite cells, setText hands each the next byte of a string, the layout slots step `cellPitch` along x). The view `Obj6EAC0` (named after BoxFill's old table address) is gone; its +0x00C `hasChildren` is Class6B5CC's `parent` (--merge CONFLICT s32 vs pointer: only tested against 0, bytes unchanged), `children` (+0x0B4) is `CharSprite **cells`, and the per-cell calls go through CharSprite's slots by name. Renamed from `Obj6EAC0__PropagateColor`: the +0x0B8 setColor occupant, `(TextRow *self, SpriteRgb *rgb)`, forwarded to each visible cell. Callers pass TaskCoreTarget's 3-byte selected/unselected colours and Class86F88's row colours. Image byte-identical; the current source is src/code_2cc8c_f.c.

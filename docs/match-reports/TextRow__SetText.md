@@ -55,3 +55,7 @@ text/digit-display reading (see the unit header comment): it is a
 literal "for each character in this string, tell the next child glyph
 what it is" loop. Tier B: the loop mechanics are unambiguous, but nothing
 outside this unit confirms the in-game role.
+
+## Track 4 (2026-09-26, round 88, charlie)
+
+2026-09-26, round 88 (charlie): class 0x11144 unified as TextRow in `include/TextRow.h` (a row of CharSprite cells: the ctor makes `count` New_CharSprite cells, setText hands each the next byte of a string, the layout slots step `cellPitch` along x). The view `Obj6EAC0` (named after BoxFill's old table address) is gone; its +0x00C `hasChildren` is Class6B5CC's `parent` (--merge CONFLICT s32 vs pointer: only tested against 0, bytes unchanged), `children` (+0x0B4) is `CharSprite **cells`, and the per-cell calls go through CharSprite's slots by name. Renamed from `Obj6EAC0__SetText` (class prefix only): +0x0CC, the class's first own slot `setText(TextRow *self, char *text)`, handing each cell the next byte of a NUL-terminated string through setCell. The old view typed the slot as BoxFill's SetMask (s32 return); the occupant returns nothing, and reset, its caller, ignores it. Image byte-identical; the current source is src/code_2cc8c_f.c.

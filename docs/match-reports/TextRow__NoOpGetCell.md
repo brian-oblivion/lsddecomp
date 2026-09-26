@@ -16,3 +16,7 @@ project's existing `NoOp`/`NoOpIgnoreArgs` precedent (a pure do-nothing
 leaf, tier A by definition), given a class-prefixed name rather than a
 bare one since it specifically overrides ONE slot of ONE class's table,
 unlike those two shared, class-agnostic fillers.
+
+## Track 4 (2026-09-26, round 88, charlie)
+
+2026-09-26, round 88 (charlie): class 0x11144 unified as TextRow in `include/TextRow.h` (a row of CharSprite cells: the ctor makes `count` New_CharSprite cells, setText hands each the next byte of a string, the layout slots step `cellPitch` along x). The view `Obj6EAC0` (named after BoxFill's old table address) is gone; its +0x00C `hasChildren` is Class6B5CC's `parent` (--merge CONFLICT s32 vs pointer: only tested against 0, bytes unchanged), `children` (+0x0B4) is `CharSprite **cells`, and the per-cell calls go through CharSprite's slots by name. Renamed from `Obj6EAC0__NoOpSetter`: the empty +0x0C8 occupant; the slot is CharSprite's getCell, so the old view's 'setter' reading came from BoxFill's SetPri at the same offset. Image byte-identical; the current source is src/code_2cc8c_f.c.

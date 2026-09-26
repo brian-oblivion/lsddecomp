@@ -560,3 +560,7 @@ arg0, 3, 0)`) passes a plain buffer as the first argument, not an
 `Obj6EAC0 *`, confirming this function (despite living in this file and
 sharing its dominant `self`-typed signature style) is unrelated to the
 `Obj6EAC0` class.
+
+## Track 4 (2026-09-26, round 88, charlie)
+
+The first parameter was typed as the TextRow view `Obj6EAC0 *` and cast to `u8 *` for EncodeFullWidthSjis; it is the output buffer, so it is now `u8 *dst` with no cast (the view is gone: class 0x11144 is TextRow, include/TextRow.h). Image byte-identical.

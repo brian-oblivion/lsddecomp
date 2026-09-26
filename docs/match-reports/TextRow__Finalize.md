@@ -62,3 +62,7 @@ confirmed.
 ## Track 4
 
 2026-09-26, round 86 (bravo): the parent class 0x1144 is unified as CharSprite (`include/CharSprite.h`, formerly D_8006EC74). The base call is `GetCharSpriteMethods()->finalize((CharSprite *)self)` (was `->slot0C(self)`): an upcast, no code. Image byte-identical.
+
+## Track 4 (2026-09-26, round 88, charlie)
+
+2026-09-26, round 88 (charlie): class 0x11144 unified as TextRow in `include/TextRow.h` (a row of CharSprite cells: the ctor makes `count` New_CharSprite cells, setText hands each the next byte of a string, the layout slots step `cellPitch` along x). The view `Obj6EAC0` (named after BoxFill's old table address) is gone; its +0x00C `hasChildren` is Class6B5CC's `parent` (--merge CONFLICT s32 vs pointer: only tested against 0, bytes unchanged), `children` (+0x0B4) is `CharSprite **cells`, and the per-cell calls go through CharSprite's slots by name. Renamed from `Obj6EAC0__Destruct`: the +0x00C finalize occupant. Releases `cellCount` cells (ReleaseBasicClassArray), frees `cells`, then CharSprite's finalize. Image byte-identical; the current source is src/code_2cc8c_f.c.
