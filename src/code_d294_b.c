@@ -11,7 +11,7 @@
  * symbol is comment-referenced from other units' own vtable census notes);
  * a rotation-matrix builder (`SceneNode__GetRotMatrix`, proposed
  * `SceneNode__GetRotMatrix`); a gated read-transform-notify chain
- * (`SceneNode__GetModelHull` -> `SceneNode__NotifyIfUnk20Active` ->
+ * (`SceneNode__GetModelHull` -> `SceneNode__NotifyWithHull` ->
  * `SceneNode__TransformAndNotifyParents`); two vtable no-op stubs
  * (`func_8001D6A4`/`D6AC`, kept `func_` per this class's own
  * `SceneNode__func_1d33c` no-op precedent); a command dispatcher over the same
@@ -94,7 +94,7 @@ void SceneNode__GetRotMatrix(SceneNode *self, s32 a1, s32 a2) {
  * that same buffer, retyped as a TmdHull, into +0x90
  * (SceneNode__TransformAndNotifyParents, also already matched in this unit), with the original
  * a1 passed through as SceneNode__TransformAndNotifyParents's own a2. */
-void SceneNode__NotifyIfUnk20Active(SceneNode *self, s32 a1) {
+void SceneNode__NotifyWithHull(SceneNode *self, s32 a1) {
     /* Sized to reproduce retail's own frame (0x58): SceneNode__GetModelHull's own
      * target (TmdModel__GetHull, code_fa50) writes a TmdHull
      * (include/TmdModel.h: a count word and eight 6-byte corners, 0x34

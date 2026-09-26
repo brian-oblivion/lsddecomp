@@ -274,7 +274,7 @@ the FIRST goto attempt before trying further variations of the same idea.
 an already-matched function's own call arguments, and never read again by
 THIS function can still need real stack space matching retail's frame —
 its "unused-looking" nature does not mean its size is free to guess low.**
-`buf54` (this report) and `SceneNode__NotifyIfUnk20Active`'s own similarly-unread output
+`buf54` (this report) and `SceneNode__NotifyWithHull`'s own similarly-unread output
 buffer (round 13, same unit) are now two independent instances of "size
 the local to close a frame-size gap, not to what this function's own code
 appears to need" — worth a shared idiom entry if a third instance turns up.

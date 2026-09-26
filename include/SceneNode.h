@@ -107,7 +107,7 @@ struct SceneNodeSub14 {
     /* +0x07C */ u32 (*getSetUnk10Field9)(Self *self, u32 value);          /* SceneNode__SetSubdivision */ \
     /* +0x080 */ s32 (*getSetUnk10Flag8)(Self *self, s32 on);              /* SceneNode__SetBackClip */ \
     /* +0x084 */ void (*getRotMatrix)(Self *self, void *out, s32 invert);  /* SceneNode__GetRotMatrix: RotMatrix of the (negated) rotation into a MATRIX */ \
-    /* +0x088 */ void (*notifyIfUnk20Active)(Self *self, s32 event);       /* SceneNode__NotifyIfUnk20Active */ \
+    /* +0x088 */ void (*notifyIfUnk20Active)(Self *self, s32 event);       /* SceneNode__NotifyWithHull */ \
     /* +0x08C */ void (*readUnk20Data)(Self *self, void *dest);            /* SceneNode__GetModelHull */ \
     /* +0x090 */ void (*transformAndNotifyParents)(Self *self, TmdHull *verts, s32 event); /* SceneNode__TransformAndNotifyParents */ \
     /* +0x094 */ void (*onPadEvent)(Self *self, void *sender, s32 event);  /* func_8001D6A4, empty; onNotify's Pad (2) case; DreamSys__OnPadEvent */ \
@@ -179,7 +179,7 @@ s32 SceneNode__SetUseZ(SceneNode *self, s32 on);
 u32 SceneNode__SetSubdivision(SceneNode *self, u32 value);
 s32 SceneNode__SetBackClip(SceneNode *self, s32 on);
 void SceneNode__GetRotMatrix(SceneNode *self, s32 out, s32 invert);
-void SceneNode__NotifyIfUnk20Active(SceneNode *self, s32 event);
+void SceneNode__NotifyWithHull(SceneNode *self, s32 event);
 void SceneNode__GetModelHull(SceneNode *self, void *dest);
 void SceneNode__TransformAndNotifyParents(SceneNode *self, TmdHull *verts, s32 event);
 void func_8001D6A4(void);

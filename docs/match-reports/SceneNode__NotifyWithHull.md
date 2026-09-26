@@ -1,4 +1,6 @@
-# SceneNode__NotifyIfUnk20Active — MATCHED
+# SceneNode__NotifyWithHull — MATCHED
+
+> Renamed from `SceneNode__NotifyIfUnk20Active` on 2026-09-26 (tools/rename.py). Address 0x8001d568.
 
 > Renamed from `Class6B5CC__NotifyIfUnk20Active` on 2026-09-26 (tools/rename.py). Address 0x8001d568.
 
@@ -9,7 +11,7 @@ Unit: `code_d294_b`. Round 13, runner delta. 38/38 words, full match.
 ## Signature
 
 ```c
-void SceneNode__NotifyIfUnk20Active(SceneNodeObj *self, s32 a1);
+void SceneNode__NotifyWithHull(SceneNodeObj *self, s32 a1);
 ```
 
 ## What it does
@@ -22,7 +24,7 @@ slot (`SceneNode__GetModelHull`, already matched in this unit — forwards to
 passed through as `SceneNode__TransformAndNotifyParents`'s own `a2`.
 
 ```c
-void SceneNode__NotifyIfUnk20Active(SceneNodeObj *self, s32 a1) {
+void SceneNode__NotifyWithHull(SceneNodeObj *self, s32 a1) {
     u8 buf[0x38];
 
     if (a1 >= 4) {
@@ -102,7 +104,7 @@ trusting that a natural-looking `&&` will reproduce them.
 **A vtable call's argument buffer can need to be sized for what a
 DIFFERENT, non-decompiled callee (reached transitively through another
 already-matched slot) writes into it, not for what the function you're
-currently writing reads back out of it.** `SceneNode__NotifyIfUnk20Active` itself never reads
+currently writing reads back out of it.** `SceneNode__NotifyWithHull` itself never reads
 `buf`'s contents; it only forwards the pointer twice. The size that makes
 the frame match came from PsyQ's `TmdModel__GetHull`, three calls away. When a
 "send a same buffer to two vtable slots" shape scores an in-range match but
