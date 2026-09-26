@@ -23,10 +23,11 @@
  */
 #include "common.h"
 #include "code_171e0.h"
+#include "VabDriver.h"
 
 /* gActiveDataSource's two observed values are the header words of the two
  * sibling classes it selects between: D_8006D4E8 (the CD-ROM read driver,
- * code_179d8_q.c) and gVabDriverMethods (the SPU/VAB streamer, code_179d8_e.c). */
+ * code_179d8_q.c) and gVabDriverMethods (VabDriver, the SPU/VAB driver, include/VabDriver.h). */
 #define DATASOURCE_CD  0x13
 #define DATASOURCE_SPU 0x23
 
@@ -112,7 +113,6 @@ Class6D430Methods *GetClass6D430Methods(void) {
 }
 
 extern s32 gActiveDataSource;
-extern void *GetVabDriverMethods(void);
 extern void *GetClass6D4E8Methods(void);
 
 void *GetActiveDataSourceMethods(void) {
@@ -145,7 +145,7 @@ void SetActiveDataSource(s32 arg0) {
     if (arg0 == DATASOURCE_CD) {
         src = GetClass6D4E8Methods();
     } else {
-        src = GetVabDriverMethods();
+        src = (Class6D430Methods *)GetVabDriverMethods();
     }
     methods = GetClass6D430Methods();
     goto copy;

@@ -29,7 +29,7 @@
  * Screened 17/20 clean on the three-grep blocker census -- the highest of
  * any window in this monolith -- but that number overstates its value: 9 of
  * the 20 are 4-6 word leaves, and splat matched five of those itself as
- * empty `jr $ra; nop` bodies (VabDriver__VabDriver/C3C8/C3F0/C3F8/C400 below).
+ * empty `jr $ra; nop` bodies (VabDriver__VabDriver/Destroy/Close/Seek/NoOpSlot50 below).
  * Those five count as `matched` in tools/progress.py without having been
  * work, which is exactly the caveat CLAUDE.md attaches to that column.
  *
@@ -86,6 +86,7 @@
  * makes their merges collide.
  */
 #include "common.h"
+#include "VabDriver.h"
 
 /*
  * D_8006D940: a REAL 30-slot Class6D430-derived class-framework vtable
