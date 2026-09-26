@@ -18,14 +18,14 @@
  * when present, the CLUT to the draw singleton (DrawSystem, `include/DrawSystem.h`)
  * through its loadImage slot.
  *
- * Also holds `func_8003B624`, not a TimImage method (`classtable.py
+ * Also holds `RotateVramRectRight`, not a TimImage method (`classtable.py
  * D_8006E558` lists it nowhere): a free function that circularly scrolls a
  * VRAM rectangle right by one column at a time through the draw singleton's
  * `moveImage` slot, called from `class_3bb8c_n.c`'s `StyleScrollVramStrips`.
  *
  * Fully matched in round 81 (runner echo). Naming pass round 81 (runner
  * bravo): every function and the class table named; see each function's
- * report `## Naming` for tier and evidence. `func_8003B624` kept its
+ * report `## Naming` for tier and evidence. `RotateVramRectRight` kept its
  * `func_` name (proposed `ScrollImageRight`, recorded in its report);
  * `New_TimImage` was renamed in track 4 (round 88).
  */
@@ -140,7 +140,7 @@ TimImageMethods *GetTimImageMethods(void) {
 /* Not in gTimImageMethods's table. Three calls to the draw singleton's slot
  * +0x064 per iteration, built from r's edges and p; nothing but i changes
  * between iterations. */
-void func_8003B624(DrawRect *r, s32 count, DrawPoint *p) {
+void RotateVramRectRight(DrawRect *r, s32 count, DrawPoint *p) {
     DrawSystem *draw;
     void (*fn)(DrawSystem *, DrawRect *, s32, s32);
     DrawRect rect;

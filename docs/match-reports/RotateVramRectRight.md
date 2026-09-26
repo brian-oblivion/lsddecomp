@@ -1,4 +1,6 @@
-# func_8003B624 -- MATCHED (83/83 words), round 81
+# RotateVramRectRight -- MATCHED (83/83 words), round 81
+
+> Renamed from `func_8003B624` on 2026-09-26 (tools/rename.py). Address 0x8003b624.
 
 Round 81, runner echo. Unit `src/code_2bb9c.c`. Fresh ground, no prior attempt.
 Byte-exact on the first build.
@@ -27,7 +29,7 @@ typedef struct DrawPoint { s16 x; s16 y; } DrawPoint;
  * confirmed against LIBGPU.H's MoveImage(RECT *rect, int x, int y), see
  * ## Naming below. */
 
-void func_8003B624(DrawRect *r, s32 count, DrawPoint *p) {
+void RotateVramRectRight(DrawRect *r, s32 count, DrawPoint *p) {
     Class6C070 *draw;
     void (*fn)(Class6C070 *, DrawRect *, s32, s32);
     DrawRect rect;
@@ -59,7 +61,7 @@ void func_8003B624(DrawRect *r, s32 count, DrawPoint *p) {
 
 ## Naming
 
-- **`func_8003B624` -- RENAME BLOCKED: rename.py explicit-placeholder bug.**
+- **`RotateVramRectRight` -- RENAME BLOCKED: rename.py explicit-placeholder bug.**
   Proposed name `ScrollImageRight`, tier B. Evidence (mechanics, not the
   in-game purpose): the loop body issues three `moveImage` calls per
   iteration that circularly shift a VRAM rectangle's content right by one

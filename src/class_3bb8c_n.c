@@ -788,13 +788,13 @@ s32 TickStyle(Descriptor10 *cell, void *unused, s32 lastCue) {
 }
 
 extern s32 gStyleStage;
-extern void func_8003B624(DrawRect *rect, s32 count, DrawRect *scratch);
+extern void RotateVramRectRight(DrawRect *rect, s32 count, DrawRect *scratch);
 extern DrawRect gStyleStripRectA;
 extern DrawRect gStyleStripScratchA;
 extern DrawRect gStyleStripRectB;
 extern DrawRect gStyleStripScratchB;
 
-/* One step of func_8003B624's one-column VRAM rotation: stage 2 on the
+/* One step of RotateVramRectRight's one-column VRAM rotation: stage 2 on the
  * strip at y 496, stages 3..5 on the one at y 504. */
 void StyleScrollVramStrips(void) {
     DrawRect *rect, *scratch;
@@ -811,5 +811,5 @@ void StyleScrollVramStrips(void) {
     } else {
         return;
     }
-    func_8003B624(rect, count, scratch);
+    RotateVramRectRight(rect, count, scratch);
 }

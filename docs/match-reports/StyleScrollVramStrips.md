@@ -33,7 +33,7 @@ Fresh ground, carved round 45, never attempted. No blockers.
 /* 46268 80055A68 0880063C */  lui   $a2, %hi(gStyleStripScratchB)
 /* 4626C 80055A6C 6874C624 */  addiu $a2, $a2, %lo(gStyleStripScratchB)
 .L80055A70:
-/* 46270 80055A70 89ED000C */  jal   func_8003B624
+/* 46270 80055A70 89ED000C */  jal   RotateVramRectRight
 .L80055A78:
 ...
 jr $ra
@@ -42,16 +42,16 @@ jr $ra
 `gStyleStage` is a plain `s32` (already established as such in
 `class_3bb8c_m.c`, `RegisterStyleConfig`). `(gStyleStage - 3)` cast to unsigned and
 compared `< 3` is the standard idiom for a closed range test, matching
-retail's `sltiu` exactly. `func_8003B624` is a not-yet-carved,
+retail's `sltiu` exactly. `RotateVramRectRight` is a not-yet-carved,
 still-`INCLUDE_ASM` function in `asm/psyq_2bb9c.s` (a 4-argument draw-style
 routine reading 12-byte tuples through `a0`/`a2` a variable number of times
 via `a1`); this call always passes `a1 = 1`, so only the calling shape
-matters here, declared loosely as `void func_8003B624(void *arg0, s32 arg1,
+matters here, declared loosely as `void RotateVramRectRight(void *arg0, s32 arg1,
 void *arg2);`.
 
 ```c
 extern s32 gStyleStage;
-extern void func_8003B624(void *arg0, s32 arg1, void *arg2);
+extern void RotateVramRectRight(void *arg0, s32 arg1, void *arg2);
 extern s32 gStyleStripRectA[];
 extern s32 gStyleStripScratchA[];
 extern s32 gStyleStripRectB[];
@@ -72,12 +72,12 @@ void StyleScrollVramStrips(void) {
     } else {
         return;
     }
-    func_8003B624(a0, a1, a2);
+    RotateVramRectRight(a0, a1, a2);
 }
 ```
 
 **First attempt passed `1` as a literal straight into the call
-(`func_8003B624(a0, 1, a2);`) and missed by 3 words**, all three the SAME
+(`RotateVramRectRight(a0, 1, a2);`) and missed by 3 words**, all three the SAME
 kind of diff: the literal got materialized once, right at the call site
 (the `jal`'s own delay slot), where retail instead sets it inside EACH
 branch, in each branch's own tail instruction (the unconditional `j`'s delay
@@ -104,7 +104,7 @@ call.
 **`StyleScrollVramStrips`, tier B.**
 
 Selects one of two 12-byte-tuple table pairs by `gStyleStage` (`== 2`, or
-`3..5`) and forwards them to `func_8003B624`, a not-yet-carved routine this
+`3..5`) and forwards them to `RotateVramRectRight`, a not-yet-carved routine this
 unit's OWN header comment (round 45) already characterizes as "a 4-argument
 draw-style routine reading 12-byte tuples through a0/a2" -- that
 characterization, on file before this naming pass, is the evidence for
@@ -116,11 +116,11 @@ every frame. MATCHED, 25/25, second build (one lever: hoist the shared `a1
 
 ### Naming
 
-**Renamed from `DrawStyleTables`, tier B.** The callee, func_8003B624 (code_2bb9c.c), does three DrawSystem moveImage calls per step: the rect's rightmost column to the scratch point, the rest one pixel right, the scratch column back to the rect's left edge -- a one-column rotation of a VRAM rectangle. This function does one step per tick on stage 2 (rect 0,496 248x8 via scratch 256,496) and stages 3 to 5 (rect 0,504 via 256,504). Drawing is not what it does; the "12-byte tuple" reading is `DrawRect`. What the strips hold is not established.
+**Renamed from `DrawStyleTables`, tier B.** The callee, RotateVramRectRight (code_2bb9c.c), does three DrawSystem moveImage calls per step: the rect's rightmost column to the scratch point, the rest one pixel right, the scratch column back to the rect's left edge -- a one-column rotation of a VRAM rectangle. This function does one step per tick on stage 2 (rect 0,496 248x8 via scratch 256,496) and stages 3 to 5 (rect 0,504 via 256,504). Drawing is not what it does; the "12-byte tuple" reading is `DrawRect`. What the strips hold is not established.
 
 | old | new | tier | evidence |
 | --- | --- | --- | --- |
-| `D_80087444`/`D_80087450` | `gStyleStripRectA`/`gStyleStripScratchA` | A | DrawRect {0, 0x1F0, 248, 8} and {256, 0x1F0, 1, 8}: func_8003B624's rect and scratch for stage 2. |
+| `D_80087444`/`D_80087450` | `gStyleStripRectA`/`gStyleStripScratchA` | A | DrawRect {0, 0x1F0, 248, 8} and {256, 0x1F0, 1, 8}: RotateVramRectRight's rect and scratch for stage 2. |
 | `D_8008745C`/`D_80087468` | `gStyleStripRectB`/`gStyleStripScratchB` | A | the same at y 0x1F8, for stages 3..5. |
 
 Locals `rect`, `count`, `scratch`.
