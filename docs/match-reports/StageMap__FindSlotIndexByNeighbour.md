@@ -60,7 +60,7 @@ s32 StageMap__FindSlotIndexByNeighbour(Obj866E8 *self, s32 key) {
 ## New struct knowledge
 
 None new (reuses `Elem`/`ElemTarget::unk32`, both already established by
-`class_3bb8c.c`'s `StageMap__FindSlotByNeighbour`/`StageMap__CountFlaggedElements`).
+`class_3bb8c.c`'s `StageMap__FindSlotByNeighbour`/`StageMap__CountPendingLoads`).
 
 ## Attempts
 

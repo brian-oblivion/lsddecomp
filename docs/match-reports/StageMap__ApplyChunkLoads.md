@@ -346,7 +346,7 @@ allocation wrong.
 > as a low-cost check in case it stumbled onto a transferable lever despite
 > the mismatch. It did not: best score reached was **310** (never
 > approached 0), and the run eventually hit an internal scoring crash
-> (`KeyError: 'StageMap__CountFlaggedElements'`, from the same missing-prototype situation
+> (`KeyError: 'StageMap__CountPendingLoads'`, from the same missing-prototype situation
 > that produces an ordinary, harmless `implicit declaration` warning in the
 > real build) partway through, around iteration 40900. **No exit code was
 > captured** -- the trailing `echo "permuter exit=$?"` after the `timeout`
@@ -432,7 +432,7 @@ iterates `arr1[0..count)` (a 0xC-byte-strided array). Per entry:
    `e->unk4->methods->slot74(e->unk4)` (new `ElemTargetMethods` slot,
    self-only) and clear `e->flag`.
 
-After the loop: `self->unk1B4 = StageMap__CountFlaggedElements(self)` (already matched, a
+After the loop: `self->unk1B4 = StageMap__CountPendingLoads(self)` (already matched, a
 plain count of `self->arr[i].flag != 0`).
 
 New header additions (all committed, additive): `Obj866E8Methods::slotFC`
@@ -476,7 +476,7 @@ void StageMap__ApplyChunkLoads(Obj866E8 *self, ChunkLoadEntry *arr1, s32 count) 
             }
         }
     }
-    self->unk1B4 = StageMap__CountFlaggedElements(self);
+    self->unk1B4 = StageMap__CountPendingLoads(self);
 }
 ```
 (Correction from an earlier draft of this report: step 2 dispatches
@@ -622,4 +622,4 @@ Round 78 (track 3, naming pass, bravo).
 
 | symbol | name | tier | evidence |
 | --- | --- | --- | --- |
-| `func_8004BB3C` | `StageMap__ApplyChunkLoads` | B | Occupant of `gStageMapMethods` +0x0FC (`slotFC`), verified via classtable as its own identity slot (already documented in `include/class_3bb8c.h`). Iterates the `ChunkLoadEntry[count]` array `StageMap__LoadChunksAround` just filled, resolving an `Elem` per entry (`slot118`) and either attaching (`ptr0 != 0`: `slot78`, sets `rate`, `flag = 1`) or detaching (`slot74`, `flag = 0`) it, then recomputes `self->unk1B4` via `StageMap__CountFlaggedElements`. "Apply...Entries" mirrors the "Build...Entries" name of its own caller-side producer. |
+| `func_8004BB3C` | `StageMap__ApplyChunkLoads` | B | Occupant of `gStageMapMethods` +0x0FC (`slotFC`), verified via classtable as its own identity slot (already documented in `include/class_3bb8c.h`). Iterates the `ChunkLoadEntry[count]` array `StageMap__LoadChunksAround` just filled, resolving an `Elem` per entry (`slot118`) and either attaching (`ptr0 != 0`: `slot78`, sets `rate`, `flag = 1`) or detaching (`slot74`, `flag = 0`) it, then recomputes `self->unk1B4` via `StageMap__CountPendingLoads`. "Apply...Entries" mirrors the "Build...Entries" name of its own caller-side producer. |

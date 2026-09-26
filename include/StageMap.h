@@ -323,7 +323,7 @@ s32 StageMap__ComputeNeighbourMask(StageMap *self, s32 val, s32 flag);
 s32 StageMap__ComputeChunkLoadEntry(StageMap *self, ChunkLoadEntry *entry, s32 divisor, s32 flag,
                                  s32 val, s32 savedResult, s32 key); /* 0 or 1; BuildRateEntries discards it */
 void StageMap__ApplyChunkLoads(StageMap *self, ChunkLoadEntry *entries, s32 count);
-s32 StageMap__CountFlaggedElements(StageMap *self);
+s32 StageMap__CountPendingLoads(StageMap *self);
 void StageMap__OnNotifyTag1(StageMap *self, void *sender, s32 mode);
 void StageMap__LoadElementResources(StageMap *self, ChunkSlot *elem);
 void StageMap__ResetElementCells(StageMap *self, ChunkSlot *elem);

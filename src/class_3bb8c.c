@@ -331,10 +331,10 @@ void StageMap__ApplyChunkLoads(StageMap *self, ChunkLoadEntry *arr1, s32 count) 
         }
         arr1++;
     }
-    self->unk1B4 = StageMap__CountFlaggedElements(self);
+    self->unk1B4 = StageMap__CountPendingLoads(self);
 }
 
-s32 StageMap__CountFlaggedElements(StageMap *self) {
+s32 StageMap__CountPendingLoads(StageMap *self) {
     s32 count;
     s32 i;
 

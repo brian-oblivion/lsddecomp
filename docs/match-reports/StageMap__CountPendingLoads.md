@@ -1,10 +1,12 @@
-# StageMap__CountFlaggedElements — MATCHED (13/13 words)
+# StageMap__CountPendingLoads — MATCHED (13/13 words)
+
+> Renamed from `StageMap__CountFlaggedElements` on 2026-09-26 (tools/rename.py). Address 0x8004bce0.
 
 > Renamed from `Class866E8__CountFlaggedElements` on 2026-09-26 (tools/rename.py). Address 0x8004bce0.
 
 > Renamed from `func_8004BCE0` on 2026-09-24 (tools/rename.py). Address 0x8004bce0.
 
-Not a vtable slot — `StageMap__CountFlaggedElements` does not appear in `gStageMapMethods`
+Not a vtable slot — `StageMap__CountPendingLoads` does not appear in `gStageMapMethods`
 (confirmed via `tools/classtable.py 0x800866E8`), so it is a plain,
 non-virtual helper. Takes `self` directly as its only argument.
 
@@ -36,7 +38,7 @@ pointer-walking needed in the source; see the "final C" below.
 ## Final C
 
 ```c
-s32 StageMap__CountFlaggedElements(Obj866E8 *self) {
+s32 StageMap__CountPendingLoads(Obj866E8 *self) {
     s32 count;
     s32 i;
 
@@ -75,4 +77,4 @@ Round 78 (track 3, naming pass, bravo).
 
 | symbol | name | tier | evidence |
 | --- | --- | --- | --- |
-| `func_8004BCE0` | `StageMap__CountFlaggedElements` | A | Pure leaf: loops `self->arr[7]`, counts entries with `flag != 0`, returns the count. A pure count is tier A by the naming rule's own "getter/clamp/list-push" clause -- the mechanics ARE the purpose. Called by `StageMap__ApplyChunkLoads` to refresh `self->unk1B4` after flagging/unflagging elements. |
+| `func_8004BCE0` | `StageMap__CountPendingLoads` | A | Pure leaf: loops `self->arr[7]`, counts entries with `flag != 0`, returns the count. A pure count is tier A by the naming rule's own "getter/clamp/list-push" clause -- the mechanics ARE the purpose. Called by `StageMap__ApplyChunkLoads` to refresh `self->unk1B4` after flagging/unflagging elements. |

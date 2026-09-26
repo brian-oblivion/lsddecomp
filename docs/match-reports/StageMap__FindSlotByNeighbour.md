@@ -7,7 +7,7 @@
 > Renamed from `func_8004C434` on 2026-09-24 (tools/rename.py). Address 0x8004c434.
 
 Not a vtable slot (not in `gStageMapMethods`), a plain non-virtual helper —
-companion to `StageMap__CountFlaggedElements`, walking the same `self->arr` array but
+companion to `StageMap__CountPendingLoads`, walking the same `self->arr` array but
 searching a different field.
 
 ## Disassembly
