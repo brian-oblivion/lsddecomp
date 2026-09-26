@@ -269,7 +269,7 @@ void Viewport__AddChild(Viewport *self, BasicClass *child)
         self->viewNode = (Class6B5CC *)child;
         self->refView.super = ((Class6B5CC *)child)->coord2;
     } else if (header == 1) {
-        self->drawSystem = child;
+        self->drawSystem = (DrawSystem *)child;
     }
 }
 

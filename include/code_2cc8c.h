@@ -40,8 +40,6 @@ typedef struct Unk64ElemMethods Unk64ElemMethods;
 typedef struct SrcDesc SrcDesc;
 typedef struct HeaderObj HeaderObj;
 typedef struct EventArg EventArg;
-typedef struct GenericObj GenericObj;
-typedef struct GenericObjMethods GenericObjMethods;
 
 /*
  * FOR THE NEXT RUNNER (code_2cc8c_b, same 153-function block, same class
@@ -284,25 +282,6 @@ extern u8 D_8008A904[]; /* address-taken only by this unit: (-100, -100), the
                             attach the sub handle at (include/Viewport.h) */
 extern WholeFrac_d294 D_8008A8F4; /* {0, 1}: Viewport__AttachViewChild's twist
                             when its own is NULL (asm/data/7B048.sdata.s) */
-
-/*
- * This unit family's view of the DrawSystem (D_8006C070, class id 0x1),
- * which has no header yet: Viewport caches it as `drawSystem` (typed
- * BasicClass, include/Viewport.h), and Viewport__Flip reaches its
- * +0x050 DrawSystem__SwapBuffers and +0x054 DrawSystem__GetActiveBuffer
- * (`tools/classtable.py D_8006C070`) through this view. Until round 85 it
- * was also the generic reading of Viewport's children; those accessors now
- * use BasicClass and Class6B5CC.
- */
-struct GenericObjMethods {
-    s32 header; /* +0x000 */
-    u8 pad004[0x050 - 0x004];
-    void (*slot50)(GenericObj *self); /* +0x050, DrawSystem__SwapBuffers */
-    s32 (*slot54)(GenericObj *self);  /* +0x054, DrawSystem__GetActiveBuffer: Flip's next otIndex */
-};
-struct GenericObj {
-    GenericObjMethods *methods; /* +0x000 */
-};
 
 /* GsSetRefView2 is NO LONGER DECLARED HERE, round 33. It is Sony's
    (`libgs/gs_131.o`, linked from the SDK object) and will one day sit next to

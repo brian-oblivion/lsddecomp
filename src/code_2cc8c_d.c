@@ -371,17 +371,17 @@ void Viewport__Flip(Viewport *self) {
         return;
     }
 
-    self->otIndex = ((GenericObj *)self->drawSystem)->methods->slot54((GenericObj *)self->drawSystem);
+    self->otIndex = self->drawSystem->methods->getActiveBuffer(self->drawSystem);
     if (self->drawEnabled == 0) {
         goto tail_check;
     }
 
     ResetGraph(1);
-    ((GenericObj *)self->drawSystem)->methods->slot50((GenericObj *)self->drawSystem);
+    self->drawSystem->methods->swapBuffers(self->drawSystem);
 
     if (self->unkB4 != 0) {
         if (self->otIndex == 0) {
-            ((GenericObj *)self->drawSystem)->methods->slot50((GenericObj *)self->drawSystem);
+            self->drawSystem->methods->swapBuffers(self->drawSystem);
         }
     }
 
@@ -394,7 +394,7 @@ void Viewport__Flip(Viewport *self) {
     GsDrawOt(self->ot[idx]);
 
     if (self->unkB4 != 0 && self->otIndex == 0) {
-        ((GenericObj *)self->drawSystem)->methods->slot50((GenericObj *)self->drawSystem);
+        self->drawSystem->methods->swapBuffers(self->drawSystem);
     }
 
 tail_check:
