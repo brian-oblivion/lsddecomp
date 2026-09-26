@@ -144,7 +144,7 @@ typedef struct ChunkLoadEntryTail {
 
 /* loadChunksAround' per-slot pair (sDefaultTargetSpecs and the
  * sFootprintResultPtrTable tables hold seven each): the neighbour key the
- * slot takes (0..6, the index into sRateOffsetTable and sChunkNeighbourDeltas;
+ * slot takes (0..6, the index into sNeighbourOffsets and sChunkNeighbourDeltas;
  * 3 is the centre) and whether it is (re)loaded and repositioned. */
 typedef struct ChunkSlotSpec {
     u8 neighbour; /* +0x0 */

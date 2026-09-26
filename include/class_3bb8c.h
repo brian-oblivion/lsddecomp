@@ -28,7 +28,7 @@ extern ChunkSlotSpec sDefaultTargetSpecs[7];
 /* Indexed by ChunkSlotSpec::key in StageMap__LoadChunksAround: the
  * world offset of that neighbour's cellParent from the centre position. Bound unknown (`key` is the caller's
  * byte), so unsized. */
-extern LongVec3 sRateOffsetTable[];
+extern LongVec3 sNeighbourOffsets[];
 
 /* `key`-indexed bitmask table (`1 << key`) StageMap__ComputeChunkLoadEntry tests
  * against ComputeRateFlags' result. 7 words in the data before

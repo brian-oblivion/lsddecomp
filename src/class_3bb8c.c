@@ -176,7 +176,7 @@ void StageMap__LoadChunksAround(StageMap *self, s32 val, LongVec3 *arg2, ChunkSl
             e = self->methods->findElemByUnk32(self, i);
             e->neighbour = arg3[i].neighbour;
             if (arg3[i].load != 0) {
-                tbl = &sRateOffsetTable[arg3[i].neighbour];
+                tbl = &sNeighbourOffsets[arg3[i].neighbour];
                 u14 = (Unk14Obj *)e->cellParent->coord2;
                 if (self->config->isVertical == 0) {
                     u14->unk18.w = arg2->x + tbl->x;
