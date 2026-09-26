@@ -121,7 +121,7 @@ void TaskObjF__LoadCardIcon(TaskObjF *self, s32 arg1) {
     strcat(buf, gCardPathSuffix);
 
     handle = New_TimImage(buf);
-    ((TimImageUploadFn)handle->methods->slot78)(handle);
+    ((TimImageUploadFn)handle->methods->processBuffer)(handle);
     newVal = New_ScreenSprite(handle, (SpriteRect *)&D_80086EC4, 0);
     self->cardIcon = newVal;
     handle->methods->release(handle);

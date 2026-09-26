@@ -137,7 +137,7 @@ void TimBlockSrc__TimBlockSrc(TimBlockSrc *self, char *name) {
         if (self->sector != NULL) {
             self->bufferSize = 0x24;
             self->buffer = hdr;
-            self->unk2A = 9;
+            self->loadState = 9;
             self->failed = 0;
             self->methods->open(self, name, 1, 0);
             self->methods->read(self, self->sector, 0x800);
@@ -177,7 +177,7 @@ void TimBlockSrc__AdvanceLoadState(TimBlockSrc *self) {
     s32 n;
 
     LockActiveDataSource();
-    switch (self->unk2A) {
+    switch (self->loadState) {
         case 9:
             if (self->flags & 0x80) {
                 *(Hdr43200 *)self->buffer = *(Hdr43200 *)self->sector;
@@ -194,7 +194,7 @@ void TimBlockSrc__AdvanceLoadState(TimBlockSrc *self) {
                 self->sectorSize = max;
                 self->methods->seek(self, ((u32 *)self->buffer)[1], 0);
                 self->methods->read(self, self->sector, max);
-                self->unk2A = 10;
+                self->loadState = 10;
             }
             break;
         case 10:
@@ -207,17 +207,17 @@ void TimBlockSrc__AdvanceLoadState(TimBlockSrc *self) {
                 (*p)->clutBase = (s32)self->entries;
                 n++;
                 (*p)->methods->setFlag(*p);
-                ((TimArraySrcUploadFn)(*p)->methods->slot78)(*p);
+                ((TimArraySrcUploadFn)(*p)->methods->processBuffer)(*p);
                 self->blockCount = n;
                 if (n < *(u32 *)self->buffer) {
                     self->methods->seek(self, ((u32 *)self->buffer)[n + 1], 0);
                     self->methods->read(self, self->sector, self->sectorSize);
-                    self->unk2A = 10;
+                    self->loadState = 10;
                 } else {
                     BMemPMgrFree(self->sector);
                     self->sector = NULL;
                     self->sectorSize = 0;
-                    self->unk2A = 0;
+                    self->loadState = 0;
                     self->loaded = 1;
                     GetActiveDataSourceMethods()->setFlag((FileResource *)self);
                 }
@@ -436,7 +436,7 @@ s32 LinkResource__BuildModels(LinkResource *self) {
         return 1;
     }
     self->models = models;
-    ((LinkResourceMapModelFn)self->methods->slot78)(self);
+    ((LinkResourceMapModelFn)self->methods->processBuffer)(self);
     for (i = 0; i < ((TmdFile *)self->buffer)->nobj; i++) {
         *models = New_TmdModel(&((TmdFile *)self->buffer)->objects[i]);
         if (*models == NULL) {
@@ -554,7 +554,7 @@ void TimArraySrc__UploadImages(TimArraySrc *self) {
     s32 i;
 
     for (i = 0; i < self->count; i++) {
-        ((TimImageUploadFn)(*objs)->methods->slot78)(*objs);
+        ((TimImageUploadFn)(*objs)->methods->processBuffer)(*objs);
         objs++;
     }
 }
@@ -859,7 +859,7 @@ void ModelData__Finalize(ModelData *self) {
 /* gModelDataMethods +0x064: the active driver's setFlag, then slot +0x078. */
 void ModelData__Load(ModelData *self) {
     GetActiveDataSourceMethods()->setFlag((FileResource *)self);
-    ((s32 (*)())self->methods->slot78)(self);
+    ((s32 (*)())self->methods->processBuffer)(self);
 }
 
 /* gModelDataMethods +0x078: when +0x34 is set, build a LinkResource source over the
@@ -915,7 +915,7 @@ void ModelData__ReleaseResources(ModelData *self) {
 
 /* gModelDataMethods/gTriggerWorldMethods +0x080: forwarded to slot +0x078 of the object at +0x30. */
 u8 ModelData__ForwardScanPackets(ModelData *self, s32 arg1, s32 arg2) {
-    return ((s32 (*)())self->todSet->methods->slot78)(self->todSet, arg1, arg2);
+    return ((s32 (*)())self->todSet->methods->processBuffer)(self->todSet, arg1, arg2);
 }
 
 /* gModelDataMethods/gTriggerWorldMethods +0x084: forwarded to slot +0x080 of the object at +0x30. */
@@ -965,7 +965,7 @@ void TriggerWorld__Finalize(TriggerWorld *self) {
 
 /* gTriggerWorldMethods +0x064: slot +0x078 (TriggerWorld__BuildResources). */
 void TriggerWorld__Load(TriggerWorld *self) {
-    ((s32 (*)())self->methods->slot78)(self);
+    ((s32 (*)())self->methods->processBuffer)(self);
 }
 
 /* gTriggerWorldMethods +0x078: build a ModelData (not owning) over each sub-block of
@@ -1044,7 +1044,7 @@ void TileMap__TileMap(TileMap *self, s32 arg1, TileAtlas *atlas) {
     self->loaded = 0;
     if (arg1 == 0) {
         self->defaultGrid = 1;
-        self->unk2A = 0;
+        self->loadState = 0;
         self->methods->setFlag(self);
     }
 }
@@ -1060,8 +1060,8 @@ void TileMap__Finalize(TileMap *self) {
  * `loaded`. */
 
 void TileMap__Load(TileMap *self) {
-    if (self->unk2A == 0) {
-        ((TileMapBuildMapFn)self->methods->slot78)();
+    if (self->loadState == 0) {
+        ((TileMapBuildMapFn)self->methods->processBuffer)();
         self->loaded = 1;
     }
 }
@@ -1121,7 +1121,7 @@ void TileAtlas__TileAtlas(TileAtlas *self, s32 arg1) {
     self->loaded = 0;
     if (arg1 == 0) {
         self->defaultCells = 1;
-        self->unk2A = 0;
+        self->loadState = 0;
         self->methods->setFlag(self);
     }
 }
@@ -1140,8 +1140,8 @@ void TileAtlas__Finalize(TileAtlas *self) {
 void TileAtlas__Load(TileAtlas *self) {
     s32 unused[8];
 
-    if (self->unk2A == 0) {
-        ((TileAtlasBuildCellsFn)self->methods->slot78)();
+    if (self->loadState == 0) {
+        ((TileAtlasBuildCellsFn)self->methods->processBuffer)();
         self->loaded = 1;
     }
 }

@@ -189,14 +189,14 @@ void TextEntry__LoadCardResources(TextEntry *self, void *arg1) {
     ext = sTimExt;
 
     handle1 = New_TimImage(BuildFileName(path, sStrComInput, dir, ext));
-    ((TimImageUploadFn)handle1->methods->slot78)(handle1);
+    ((TimImageUploadFn)handle1->methods->processBuffer)(handle1);
     self->panelSprite = New_ScreenSprite(handle1, (SpriteRect *)&D_80086F7C, 0);
     handle1->methods->release(handle1);
     self->panelSprite->methods->attachToParent(self->panelSprite, (SceneNode *)arg1,
                                                (LongVec3 *)&D_8008AACC);
 
     handle2 = New_TimImage(BuildFileName(path, sStrFontIcon, dir, ext));
-    ((TimImageUploadFn)handle2->methods->slot78)(handle2);
+    ((TimImageUploadFn)handle2->methods->processBuffer)(handle2);
     self->textRow = (ChildObj86ED0 *)New_TextRow(handle2, self->textLen, self->editBuf);
     self->cursorSprite = New_CharSprite(handle2, 0x5F);
     handle2->methods->release(handle2);

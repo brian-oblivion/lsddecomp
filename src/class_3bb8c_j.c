@@ -292,13 +292,13 @@ void Class86F88__LoadResources(Class86F88 *self, SceneNode *parent) {
     ext = D_8008AB24;
 
     handle1 = New_TimImage(BuildFileName(path, D_8008AB14, dir, ext));
-    ((TimImageUploadFn)handle1->methods->slot78)(handle1);
+    ((TimImageUploadFn)handle1->methods->processBuffer)(handle1);
     self->panelSprite = New_ScreenSprite(handle1, (SpriteRect *)&D_80087028, 0);
     handle1->methods->release(handle1);
     self->panelSprite->methods->attachToParent(self->panelSprite, parent, (LongVec3 *)&D_8008AAF8);
 
     handle2 = New_TimImage(BuildFileName(path, D_800116E4, dir, ext));
-    ((TimImageUploadFn)handle2->methods->slot78)(handle2);
+    ((TimImageUploadFn)handle2->methods->processBuffer)(handle2);
     self->methods->createRows(self, parent, handle2, self->topIndex, self->column, self->cursorIndex);
     handle2->methods->release(handle2);
 }

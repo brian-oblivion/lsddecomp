@@ -73,18 +73,18 @@ void Class81940__Finalize(Class81940 *self) {
 
 /* slot +0x064 of gClass81940Methods (setFlag) */
 void Class81940__AdvanceLoadState(Class81940 *self) {
-    if (self->unk2A == 9) {
+    if (self->loadState == 9) {
         if (self->flags & 0x80) {
-            self->unk2A = 0;
+            self->loadState = 0;
             self->headerReady = 1;
             if (self->autoLoadData != 0) {
                 ((Class81940LoadDataBlockNoArgFn)self->methods->loadDataBlock)(); /* retail passes no argument */
             }
         }
-    } else if (self->unk2A == 10) {
+    } else if (self->loadState == 10) {
         if (self->flags & 0x80) {
             self->dataReady = 1;
-            self->unk2A = 0;
+            self->loadState = 0;
         }
     }
     GetActiveDataSourceMethods()->setFlag((FileResource *)self);
@@ -95,18 +95,18 @@ void Class81940__CancelRequests(Class81940 *self) {
     GetActiveDataSourceMethods()->cancelRequests((FileResource *)self);
     self->headerReady = 0;
     self->dataReady = 0;
-    self->unk2A = 0;
+    self->loadState = 0;
 }
 
 /* slot +0x078 of gClass81940Methods: start streaming a file into the buffer */
 void Class81940__LoadHeader(Class81940 *self, char *name) {
     if (self->buffer != NULL && name != NULL) {
-        if (self->unk2A == 0) {
+        if (self->loadState == 0) {
             self->headerReady = 0;
         } else {
             self->methods->cancelRequests(self);
         }
-        self->unk2A = 9;
+        self->loadState = 9;
         self->methods->close(self);
         self->methods->open(self, name, 1, 0);
         self->methods->read(self, self->buffer, 0xB358);
@@ -125,7 +125,7 @@ s32 Class81940__LoadDataBlock(Class81940 *self) {
     if (((Class81940Header *)self->buffer)->hasData == 0) {
         return 0;
     }
-    if (self->unk2A != 0) {
+    if (self->loadState != 0) {
         return 0;
     }
     ((Class81940ReleaseDataBlockNoArgFn)self->methods->releaseDataBlock)(); /* retail passes no argument */
@@ -134,7 +134,7 @@ s32 Class81940__LoadDataBlock(Class81940 *self) {
     if (self->dataBuffer == NULL) {
         return 0;
     }
-    self->unk2A = 10;
+    self->loadState = 10;
     self->methods->seek(self, ((Class81940Header *)self->buffer)->dataOffset, 0);
     self->methods->read(self, self->dataBuffer, size);
     return 1;

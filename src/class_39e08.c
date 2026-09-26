@@ -36,7 +36,7 @@ void Class865C8__Class865C8(Class865C8 *self, IntermediateBaseInitArgs *initArgs
     self->methods = GetClass865C8Methods();
     InitDreamAux();
     self->etcTim = New_TimImage((char *)D_800113EC);
-    ((TimImageUploadFn)self->etcTim->methods->slot78)(self->etcTim);
+    ((TimImageUploadFn)self->etcTim->methods->processBuffer)(self->etcTim);
     self->etcTim->methods->freeBuffer(self->etcTim);
     req.type = 0;
     req.path = D_800113F8;

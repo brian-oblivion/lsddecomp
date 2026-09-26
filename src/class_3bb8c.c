@@ -318,14 +318,14 @@ void Class866E8__ApplyRateEntries(Class866E8 *self, SetupEntry866E8 *arr1, s32 c
                 self->methods->resetElementCells(self, e);
             }
             e->loader->ownerRate = sp->rate;
-            ((Class81940LoadHeaderFn)e->loader->methods->slot78)(e->loader, arr1->ptr0);
+            ((Class81940LoadHeaderFn)e->loader->methods->processBuffer)(e->loader, arr1->ptr0);
             e->flag = 1;
             self->unk1B0 = 1;
         } else {
             if (e->loader->headerReady != 0) {
                 self->methods->resetElementCells(self, e);
             }
-            if (e->loader->unk2A != 0) {
+            if (e->loader->loadState != 0) {
                 e->loader->methods->cancelRequests(e->loader);
                 e->flag = 0;
             }
@@ -373,7 +373,7 @@ void Class866E8__OnNotifyTag1(Class866E8 *self, void *arg1, s32 mode) {
                     self->unk1B0 = 0;
                     self->unk1B8 = curMode;
                 }
-            } else if (e->loader->unk2A == 0) {
+            } else if (e->loader->loadState == 0) {
                 e->flag = 0;
             }
         }
@@ -446,7 +446,7 @@ void Class866E8__LoadElementResources(Class866E8 *self, Class866E8Elem *entry) {
     off1 = 0;
     off2 = 0x640;
     for (;;) {
-        idxVal = ((Class6D940ResolveEntryFn)target->methods->slot78)(target, &outBuf, i);
+        idxVal = ((Class6D940ResolveEntryFn)target->methods->processBuffer)(target, &outBuf, i);
         if (idxVal == 0) {
             return;
         }

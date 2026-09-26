@@ -55,7 +55,7 @@ void FileResource__FileResource(FileResource *this) {
     this->pendingRequests = 0;
     this->flags = 0;
     this->inQueueDispatch = 0;
-    this->unk2A = 0;
+    this->loadState = 0;
 }
 
 void FileResource__Finalize(FileResource *this) {

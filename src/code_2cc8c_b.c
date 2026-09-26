@@ -61,7 +61,7 @@ void TaskCore__SetSubHandle(TaskCore *self, const char *path, BasicClass *handle
             self->subHandle->methods->release(self->subHandle);
         }
         self->subHandle = (BasicClass *)New_TimImage((char *)path);
-        ((TimImageUploadFn)((TimImage *)self->subHandle)->methods->slot78)((TimImage *)self->subHandle);
+        ((TimImageUploadFn)((TimImage *)self->subHandle)->methods->processBuffer)((TimImage *)self->subHandle);
         ((TimImage *)self->subHandle)->methods->freeBuffer((TimImage *)self->subHandle);
     } else {
         self->subHandle = handle;
@@ -97,7 +97,7 @@ void TaskCore__SetTarget(TaskCore *self, TaskCoreTarget *a1) {
 
     if (a1->path != NULL) {
         handle = New_TimImage((char *)a1->path);
-        ((TimImageUploadFn)handle->methods->slot78)(handle);
+        ((TimImageUploadFn)handle->methods->processBuffer)(handle);
         handle->methods->freeBuffer(handle);
     } else {
         handle = (TimImage *)a1->handle;

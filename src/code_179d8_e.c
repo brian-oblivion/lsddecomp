@@ -231,7 +231,7 @@ void VabStreamObj__VabStreamObj(VabStreamObj *self, char *path) {
             self->baseFilename = buf;
             strcpy(buf, path);
             BuildFileName(vhPath, buf, NULL, gVabHeaderSuffix);
-            self->unk2A = 1;
+            self->loadState = 1;
             self->methods->requestLoadFile(self, vhPath);
         }
     }
@@ -258,7 +258,7 @@ void VabStreamObj__Finalize(VabStreamObj *self) {
 void VabStreamObj__AdvanceLoadState(VabStreamObj *self) {
     char path[0x20];
 
-    switch (self->unk2A) {
+    switch (self->loadState) {
         case 0:
             break;
         case 1:
@@ -266,7 +266,7 @@ void VabStreamObj__AdvanceLoadState(VabStreamObj *self) {
                 self->vabId = SsVabOpenHead(self->buffer, -1);
                 BuildFileName(path, self->baseFilename, NULL, gVabBodySuffix);
                 gPendingVabBuffer = self->buffer;
-                self->unk2A = 6;
+                self->loadState = 6;
                 self->buffer = NULL;
                 self->methods->loadFile(self, path);
                 if (self->baseFilename != NULL) {
@@ -280,7 +280,7 @@ void VabStreamObj__AdvanceLoadState(VabStreamObj *self) {
                 self->vabId = SsVabTransBody(self->buffer, self->vabId);
                 if (self->vabId != -1) {
                     self->bodyTransferPending = 1;
-                    ((VabStreamObjOnBodyReadyFn)self->methods->slot78)(self, 1);
+                    ((VabStreamObjOnBodyReadyFn)self->methods->processBuffer)(self, 1);
                 }
             }
             break;

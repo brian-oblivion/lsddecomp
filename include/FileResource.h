@@ -65,7 +65,7 @@ typedef struct FileResourceMethods FileResourceMethods;
     /* +0x06C */ void (*requestLoadFile)(Self *self, char *name); /* CD: CdDriver__RequestLoadFile */ \
     /* +0x070 */ void (*stopService)(Self *self);               /* CD: CdDriver__StopService; neither occupant reads self, but CdDriver__RunRequestQueue passes it */ \
     /* +0x074 */ void (*cancelRequests)(Self *self);            /* CD: CdDriver__CancelRequests */ \
-    /* +0x078 */ void *slot78                                   /* NULL here; each subclass's step that consumes the loaded buffer (TimImage__Upload, ModelData__BuildResources, ...), signature per class */
+    /* +0x078 */ void *processBuffer                                   /* NULL here; each subclass's step that consumes the loaded buffer (TimImage__Upload, ModelData__BuildResources, ...), signature per class */
 /* clang-format on */
 
 /* clang-format off */
@@ -80,7 +80,7 @@ typedef struct FileResourceMethods FileResourceMethods;
     /* +0x022 */ u16 pendingRequests;                                                              \
     /* +0x024 */ s32 flags;           /* bit 0 set by SetFlag */                                   \
     /* +0x028 */ u16 inQueueDispatch;                                                              \
-    /* +0x02A */ u16 unk2A            /* a subclass's load step, 0 when idle (Class81940, VabStreamObj); the object is 0x2C bytes */
+    /* +0x02A */ u16 loadState            /* a subclass's load step, 0 when idle (Class81940, VabStreamObj); the object is 0x2C bytes */
 /* clang-format on */
 
 struct FileResourceMethods {
