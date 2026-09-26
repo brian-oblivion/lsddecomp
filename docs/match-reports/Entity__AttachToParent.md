@@ -1,4 +1,6 @@
-# Entity__AttachUnk4C -- MATCHED (65/65 words)
+# Entity__AttachToParent -- MATCHED (65/65 words)
+
+> Renamed from `Entity__AttachUnk4C` on 2026-09-26 (tools/rename.py). Address 0x8005d314.
 
 > Renamed from `func_8005D314` on 2026-09-19 (tools/rename.py). Address 0x8005d314.
 
@@ -6,7 +8,7 @@
 
 ## What it does
 
-Gated by `this->unk0C` (the same shared-ancestor "gate flag" `Entity__DetachUnk4C`
+Gated by `this->unk0C` (the same shared-ancestor "gate flag" `Entity__DetachFromParent`
 reads), forwards all four of its own arguments straight through to a new
 `BasicClassMethods` slot (`slot4C`), stashes `arg3` into `this->unk4C` (the
 `Unk4CObj *` field), then runs two independent early-out checks against two
@@ -17,7 +19,7 @@ self-only vtable calls.
 ## Final C
 
 ```c
-void Entity__AttachUnk4C(Entity *this, s32 arg1, s32 arg2, Unk4CObj *arg3, s32 arg4) {
+void Entity__AttachToParent(Entity *this, s32 arg1, s32 arg2, Unk4CObj *arg3, s32 arg4) {
     if (this->unk0C != 0) {
         return;
     }
@@ -80,5 +82,11 @@ mechanic is a leaf-simple field set (`this->unk4C = arg3`) past a gate, so
 the name says exactly that -- "Attach" for the store, "Unk4C" because the
 field's own real-world purpose is still open (its only other known reader,
 `Entity__MoodCue12`, dereferences it as a vtable-holding object but that alone
-doesn't say what it IS). Pairs with `Entity__DetachUnk4C` below under the
+doesn't say what it IS). Pairs with `Entity__DetachFromParent` below under the
 same `this->unk0C` gate.
+
+## Track 4 (2026-09-26, round 88, echo)
+
+Renamed from `Entity__AttachUnk4C`: the occupant of +0x04C, whose parameters are Class65650's (self, peer, companion, parent, offset); it now takes them by those names and forwards them to Class65650's occupant without casts. The `parent` it keeps is stored in Actor's `grid` field (was `unk4C`). code_4cd08 is its C caller through the slot (peer gDreamAuxWorld, parent D_8008ABFC). The extra (activate unless D_80089EA7, then startSoundCue unless D_80089EAF) is in the header banner. Tier A: an override named for its slot (FINISHING-PLAN track 4 step 6).
+
+The class (id 0x1F234, table `ENTITY_METHODS`) is unified as `Entity` in `include/Entity.h`: a Class65650 subclass whose table and object expand `CLASS65650_SLOTS`/`CLASS65650_FIELDS`. Any source block above is the pre-unification spelling; the live body takes the inherited names (fields `parent`, `coord2`->`tx/ty/tz`, `tick`, `linkTarget`, `state` (was `moodState`), `lastOffsetValue`, `grid` (was `unk4C`), `ticker` (was `companion2`), `arg2` (was `soundCueChannel`), `parts`, `todPlaying`, `peer` (was `target`, cast to the `Unk94Obj` DreamSys view where its own slots are called); slots `reset`, `setDisplay`, `setLightMode`, `setTranslation`/`addTranslation`, `moveLocalZ/X/Y`, `moveLocalZOrFindLink`, `selectTickCallback`, `enableTickCallback`/`disableTickCallback`, `distanceToPeer`, `setTargetReached`, `updateActivationState`/`updateDeactivationState`), byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).

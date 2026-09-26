@@ -1,4 +1,5 @@
 #include "common.h"
+#include "Entity.h"
 #include "code_4cd08.h"
 #include "Class6B5CC.h"
 #include "ModelData.h"
@@ -43,7 +44,6 @@ void TickDreamAuxSlots(void)
     }
 }
 
-extern void *New_Entity(void *arg0, void *arg1, void *arg2);
 extern s32 gDreamAuxStage;
 extern s32 D_8008ABFC;
 extern s32 gDreamAuxWorld;
@@ -66,7 +66,7 @@ void SetDreamAuxWorld(s32 a0, s32 a1, s32 a2, s32 a3, s32 a4)
     for (i = 0; i < 1; i++) {
         s32 buf[4];
         buf[3] = (s32)slot->obj;
-        slot->entity = New_Entity((void *)(i + 0x62), buf, (void *)D_8008AC04);
+        slot->entity = New_Entity(i + 0x62, buf, (void *)D_8008AC04);
         slot++;
     }
     SetTeleportsEnabled(a0);
@@ -404,12 +404,11 @@ typedef struct {
 extern DreamAuxPos6 gDreamAuxPosTable[];
 extern u8 D_80088F18[];
 
-typedef void (*DreamAuxObjFn11)(DreamAuxObj *self, s32 arg1, void *arg2);
 typedef void (*DreamAuxObjFn3A)(DreamAuxObj *self, void *arg1, void *arg2);
 
 bool SpawnDreamAuxTriggerEntity(s32 kind, void *out, void *ctx, s32 entry)
 {
-    DreamAuxObj *entity = (DreamAuxObj *)New_Entity((void *)kind, out, (void *)D_8008AC04);
+    Entity *entity = New_Entity(kind, out, (void *)D_8008AC04);
 
     if (entity != NULL) {
         DreamAuxSpawnInfo *rec;
@@ -428,8 +427,9 @@ bool SpawnDreamAuxTriggerEntity(s32 kind, void *out, void *ctx, s32 entry)
 
         obj = (DreamAuxObj *)D_8008ABFC;
         ((DreamAuxObjFn3A)obj->vtable[0x3A])(obj, outBuf, &coords);
-        ((DreamAuxObjFn11)entity->vtable[0x11])(entity, 1, D_80088F18 + rec->val2 * 12);
-        ((DreamAuxObjFn13)entity->vtable[0x13])(entity, gDreamAuxWorld, D_8008AC08, (void *)D_8008ABFC, outBuf);
+        entity->methods->updateRotation(entity, 1, D_80088F18 + rec->val2 * 12);
+        ((Class65650AttachToParentFn)entity->methods->attachToParent)((Class65650 *)entity, (Class65650 *)gDreamAuxWorld,
+                                                                      (void *)D_8008AC08, (void *)D_8008ABFC, outBuf);
         return false;
     }
     return true;
@@ -441,9 +441,10 @@ void DespawnDreamAuxEntity(DreamAuxSlot *a0)
     if (a0->entity != NULL) {
         s32 localPos[3];
 
-        ((DreamAuxObjFn14)a0->entity->vtable[0x14])(a0->entity);
+        a0->entity->methods->detachFromParent(a0->entity);
         Class6B5CC__LocalOffsetToWorldPos((Class6B5CC *)gDreamAuxWorld, localPos, a0->pos, 0);
-        ((DreamAuxObjFn13)a0->entity->vtable[0x13])(a0->entity, gDreamAuxWorld, D_8008AC08, (void *)D_8008ABFC, localPos);
+        ((Class65650AttachToParentFn)a0->entity->methods->attachToParent)((Class65650 *)a0->entity, (Class65650 *)gDreamAuxWorld,
+                                                                          (void *)D_8008AC08, (void *)D_8008ABFC, localPos);
         Class6B5CC__FaceTarget((Class6B5CC *)a0->entity, (Class6B5CC *)gDreamAuxWorld, 1, 0, 0);
     }
 }

@@ -115,3 +115,9 @@ routine. "World" reflects `gDreamAuxWorld`'s own established role (cast
 `TriggerWorld*`, dispatched through vtable slots 0x80/0x22 elsewhere in the
 unit) -- but this function's OWN purpose (why these five values, together,
 constitute entering a "world") is inferred from usage, not proven, hence B.
+
+## Track 4 (2026-09-26, round 88, echo)
+
+`DreamAuxSlot::entity` holds New_Entity's result and is now `struct Entity *`; the call passes the mood index without a `(void *)` cast.
+
+Byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).

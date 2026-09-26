@@ -141,3 +141,9 @@ claim.
   every other named slot in this table uses). CROSS-UNIT caller (already
   noted in `Entity.h`'s existing comment: "called by Entity__MoodCue05"),
   proposed rather than applied.
+
+## Track 4 (2026-09-26, round 88, echo)
+
+`proximityDivisor` (+0x0B0) is the embedded SoundCueSet's +0x14 (`soundCueSet.unk14`), the divisor InitSoundCueSet sets (10): the ratio is distance / (threshold / 10).
+
+The class (id 0x1F234, table `ENTITY_METHODS`) is unified as `Entity` in `include/Entity.h`: a Class65650 subclass whose table and object expand `CLASS65650_SLOTS`/`CLASS65650_FIELDS`. Any source block above is the pre-unification spelling; the live body takes the inherited names (fields `parent`, `coord2`->`tx/ty/tz`, `tick`, `linkTarget`, `state` (was `moodState`), `lastOffsetValue`, `grid` (was `unk4C`), `ticker` (was `companion2`), `arg2` (was `soundCueChannel`), `parts`, `todPlaying`, `peer` (was `target`, cast to the `Unk94Obj` DreamSys view where its own slots are called); slots `reset`, `setDisplay`, `setLightMode`, `setTranslation`/`addTranslation`, `moveLocalZ/X/Y`, `moveLocalZOrFindLink`, `selectTickCallback`, `enableTickCallback`/`disableTickCallback`, `distanceToPeer`, `setTargetReached`, `updateActivationState`/`updateDeactivationState`), byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).

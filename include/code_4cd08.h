@@ -31,32 +31,23 @@ typedef DreamAuxObj *(*DreamAuxTickFn)(DreamAuxObj *self);
 
 /* A slot in the 0x80088D28 / 0x80088D2C families: one live-object pointer
  * (ticked once per call by calling obj->vtable[1](obj) and storing the
- * result back into the same slot); a second field at +0x4 that
- * SetDreamAuxWorld (MATCHED round 43) sets to the result of a `New_Entity`
- * call and DespawnDreamAuxEntity (MATCHED round 43) dispatches through its vtable;
+ * result back into the same slot); an Entity at +0x4 (include/Entity.h)
+ * that SetDreamAuxWorld makes with New_Entity and DespawnDreamAuxEntity
+ * detaches and re-attaches (detachFromParent, attachToParent with the
+ * player gDreamAuxWorld as the peer);
  * and a 3-word position vector at +0x8 that DespawnDreamAuxEntity passes as
  * `Class6B5CC__LocalOffsetToWorldPos`'s `src` (that function's own signature, `code_d294.h`,
  * takes `s32 *src` and treats it as a 3-word vector). Stride is 0x14,
  * confirmed by SetDreamAuxWorld's walk over gDreamAuxSlots. */
 typedef struct DreamAuxSlot {
     void *obj;
-    DreamAuxObj *entity;
+    struct Entity *entity;
     s32 pos[3];
 } DreamAuxSlot;
 
 extern DreamAuxSlot gDreamAuxSlots[14];
 extern DreamAuxSlot gDreamAuxSlots2[14];
 
-/* Two more vtable slots on the DreamAuxObj family (see DespawnDreamAuxEntity):
- * slot 0x14 (byte offset 0x50) takes only self, slot 0x13 (byte offset
- * 0x4C) takes self plus four opaque values. This is the SAME slot-0x4C
- * shared-ancestor entry `include/Entity.h` documents on `EntityMethods`'
- * base (`void (*slot4C)(void *self, s32, s32, void *, s32)`) -- but that
- * call site's 4th argument is a scalar where DespawnDreamAuxEntity's is a pointer
- * to a locally-filled 3-word vector, so this unit keeps its own local
- * view rather than importing Entity.h's. */
-typedef void (*DreamAuxObjFn14)(DreamAuxObj *self);
-typedef void (*DreamAuxObjFn13)(DreamAuxObj *self, s32 arg1, s32 arg2, void *arg3, void *arg4);
 
 /* A tiny fixed-size record family read by InitDreamAux: 14 (0xE) parallel
  * groups, gDreamAuxGroupCounts[i] a signed count and gDreamAuxGroupRecords[i] a pointer to an

@@ -1,4 +1,6 @@
-# Entity__InitState -- MATCHED (39/39 words)
+# Entity__Reset -- MATCHED (39/39 words)
+
+> Renamed from `Entity__InitState` on 2026-09-26 (tools/rename.py). Address 0x8005d278.
 
 > Renamed from `func_8005D278` on 2026-09-19 (tools/rename.py). Address 0x8005d278.
 
@@ -15,7 +17,7 @@ unconditionally calls two more vtable slots.
 ## Final C
 
 ```c
-void Entity__InitState(Entity *this) {
+void Entity__Reset(Entity *this) {
     s32 kind;
 
     kind = ((u8 *)gEntityUnlockKindTable)[this->moodIndex * 0x10];
@@ -77,3 +79,9 @@ this is definitely Entity's own post-construction setup step (hence
 gated conditional call plus two unconditional ones) is described in this
 report but not asserted as a specific game concept -- kept at the mechanic
 level.
+
+## Track 4 (2026-09-26, round 88, echo)
+
+Renamed from `Entity__InitState`: the occupant of +0x040, Class6B5CC's `reset` (Entity__Entity calls it through the slot after installing the table). Body: setLightMode(1) for unlock kinds 1..9, selectTickCallback(TICK_CALLBACK_B) -- the 'B' callback slot Entity fills with Entity__TickSoundCue -- then deactivate. Tier A: an override named for its slot (FINISHING-PLAN track 4 step 6).
+
+The class (id 0x1F234, table `ENTITY_METHODS`) is unified as `Entity` in `include/Entity.h`: a Class65650 subclass whose table and object expand `CLASS65650_SLOTS`/`CLASS65650_FIELDS`. Any source block above is the pre-unification spelling; the live body takes the inherited names (fields `parent`, `coord2`->`tx/ty/tz`, `tick`, `linkTarget`, `state` (was `moodState`), `lastOffsetValue`, `grid` (was `unk4C`), `ticker` (was `companion2`), `arg2` (was `soundCueChannel`), `parts`, `todPlaying`, `peer` (was `target`, cast to the `Unk94Obj` DreamSys view where its own slots are called); slots `reset`, `setDisplay`, `setLightMode`, `setTranslation`/`addTranslation`, `moveLocalZ/X/Y`, `moveLocalZOrFindLink`, `selectTickCallback`, `enableTickCallback`/`disableTickCallback`, `distanceToPeer`, `setTargetReached`, `updateActivationState`/`updateDeactivationState`), byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).

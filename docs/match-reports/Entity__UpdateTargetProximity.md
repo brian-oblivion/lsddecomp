@@ -76,7 +76,7 @@ sibling `Entity__UpdateSoundCueStart`) surfaced three reusable residues:
 3. **Negation idiom: `~x + 1`, not `-x`.** `dist = -dist;` compiles to a
    single `negu` (`subu $rd,$zero,$rs`); retail's bytes are the two-instruction
    `nor $v0,$zero,$a2` / `addiu $v0,$v0,1` sequence. Already known from
-   `Entity__DistanceToRegion` in Entity.c, confirmed again here.
+   `Entity__DistanceToPeer` in Entity.c, confirmed again here.
 4. **The position pointer (`&this->unk14->x`) needs a dedicated local,
    computed BEFORE the sign-check on `dist`, evaluated in that order.**
    Retail loads `this->unk14` and adds the `+0x18` field offset back-to-back,
@@ -123,3 +123,7 @@ Cross-unit (the compiler lists accessors outside Entity_b), so these are proposa
 | `EntityMethods::slot164` (+0x164) | `setUnkF4` | B | occupant `Entity__SetTargetReached` (Entity.c); accessors are Entity.c's Entity__Deactivate and this function |
 | `EntityMethods::slot178` (+0x178) | `updateTargetProximity` | B | occupant is this function; only accessor is Entity__Update (Entity.c) |
 | `Entity::unkF4` (+0xF4) | `targetReached` | B | latched to 1 by this function (via setUnkF4, which also notifies parents with 9) once the target is within proximityRange; cleared only by Entity__Deactivate (setUnkF4(0)); returned by this slot |
+
+## Track 4 (2026-09-26, round 88, echo)
+
+The class (id 0x1F234, table `ENTITY_METHODS`) is unified as `Entity` in `include/Entity.h`: a Class65650 subclass whose table and object expand `CLASS65650_SLOTS`/`CLASS65650_FIELDS`. Any source block above is the pre-unification spelling; the live body takes the inherited names (fields `parent`, `coord2`->`tx/ty/tz`, `tick`, `linkTarget`, `state` (was `moodState`), `lastOffsetValue`, `grid` (was `unk4C`), `ticker` (was `companion2`), `arg2` (was `soundCueChannel`), `parts`, `todPlaying`, `peer` (was `target`, cast to the `Unk94Obj` DreamSys view where its own slots are called); slots `reset`, `setDisplay`, `setLightMode`, `setTranslation`/`addTranslation`, `moveLocalZ/X/Y`, `moveLocalZOrFindLink`, `selectTickCallback`, `enableTickCallback`/`disableTickCallback`, `distanceToPeer`, `setTargetReached`, `updateActivationState`/`updateDeactivationState`), byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).

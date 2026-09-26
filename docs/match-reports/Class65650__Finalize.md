@@ -37,7 +37,7 @@ already record for this class.
 
 Round 75 (charlie), track 3.
 
-- `Class65650__Finalize` (was `func_8006573C`), tier A. Occupies +0x00C (overrides Class6B5CC__Finalize): teardownModelData, then the base dtor. Named like Entity__Destructor, the subclass's own +0x00C.
+- `Class65650__Finalize` (was `func_8006573C`), tier A. Occupies +0x00C (overrides Class6B5CC__Finalize): teardownModelData, then the base dtor. Named like Entity__Finalize, the subclass's own +0x00C.
 
 ## Track 4 (2026-09-25, round 85, alpha)
 
