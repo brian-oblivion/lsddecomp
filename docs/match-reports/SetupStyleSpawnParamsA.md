@@ -160,7 +160,7 @@ the retype, so the retype cost it nothing.
 ```c
 extern s32 gStyleSpawnYChoices[];
 extern s32 gStyleSpawnOffsetX;
-extern s32 D_8008E0A8;
+extern s32 gStyleSpawnOffsetY;
 extern s32 D_8008E0AC;
 extern u8 *D_8008E0B0;
 extern u8 gStyleSpawnRotations[];
@@ -170,7 +170,7 @@ void SetupStyleSpawnParamsA(void *arg0, void *arg1) {
     if (arg1 == 0) {
         arg1 = (void *) gStyleSpawnYChoices[rand() & 3];
     }
-    D_8008E0A8 = (s32) arg1;
+    gStyleSpawnOffsetY = (s32) arg1;
     gStyleSpawnOffsetX = (rand() % 23) << 11;
     if (rand() & 1) {
         gStyleSpawnOffsetX = -gStyleSpawnOffsetX;

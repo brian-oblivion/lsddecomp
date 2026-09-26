@@ -461,7 +461,7 @@ extern void SetupStyleSpawnParamsA(void *arg0, void *arg1);
 extern s32 D_8008E0C0[];
 extern u8 *D_8008E0B0;
 extern u8 gStyleSpawnRotations[];
-extern s32 D_8008E0A8;
+extern s32 gStyleSpawnOffsetY;
 extern s32 D_8008E0AC;
 extern u8 gStyleKind3Colors[];
 
@@ -487,7 +487,7 @@ Class876FC **StyleFillEffectKind3(Class876FC **arg0, LongVec3 *arg1) {
     SetupStyleSpawnParamsA(arg1, (void *)D_80087330);
     if (gStyleDecorVariant != 0 && gStyleColorTable == (s32)gStyleDecorColorsB) {
         gStyleSpawnOffsetX = 0xFFFF5000;
-        D_8008E0A8 = -0x2000;
+        gStyleSpawnOffsetY = -0x2000;
         D_8008E0AC = 0;
         D_8008E0C0[0] = (s32)(gStyleKind3Colors + 3);
     } else {
@@ -554,7 +554,7 @@ Class876FC **StyleFillEffectKind2(Class876FC **arg0, LongVec3 *arg1) {
     return arg0;
 }
 
-extern s32 D_8008E0A8;
+extern s32 gStyleSpawnOffsetY;
 extern s32 D_8008E0AC;
 extern u8 *D_8008E0B0;
 extern u8 gStyleSpawnRotations[];
@@ -577,7 +577,7 @@ void SetupStyleSpawnParamsA(void *arg0, void *arg1) {
     if (arg1 == 0) {
         arg1 = (void *)gStyleSpawnYChoices[rand() & 3];
     }
-    D_8008E0A8 = (s32)arg1;
+    gStyleSpawnOffsetY = (s32)arg1;
     gStyleSpawnOffsetX = (rand() % 23) << 11;
     if (rand() & 1) {
         gStyleSpawnOffsetX = -gStyleSpawnOffsetX;
@@ -614,7 +614,7 @@ void SetupStyleSpawnParamsB(void *arg0, void *arg1) {
     s32 mod3;
 
     rand();
-    D_8008E0A8 = D_8008732C;
+    gStyleSpawnOffsetY = D_8008732C;
     gStyleSpawnOffsetX = (rand() % 20) << 11;
     mod3 = gStyleCounter % 3;
     D_8008E0AC = 0xA000;
