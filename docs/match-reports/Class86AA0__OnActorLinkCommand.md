@@ -296,3 +296,21 @@ sender and event. The slot is named `onActorLinkCommand` after Actor's
 type and this caller casts at the call, as `Actor__OnActorLinkCommand` does.
 The 1-argument `slotB8` declaration and the "not reconciled" note above are
 retired: the call site has the three arguments in $a0..$a2 already.
+
+The C since round 88 (byte-identical, whole image verified):
+
+```c
+void Class86AA0__OnActorLinkCommand(Class86AA0 *self, void *sender, s32 event)
+{
+    GetClass6B5CCMethods()->dispatchLinkCommand((Class6B5CC *)self, sender, event);
+    if (event >= 9) {
+        return;
+    }
+    do {
+        if (event < 5) {
+            return;
+        }
+    } while (0);
+    ((void (*)(Class86AA0 *, void *, s32))self->methods->tryAttachNearby)(self, sender, event);
+}
+```

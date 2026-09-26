@@ -25,6 +25,7 @@
 #include "Class6B5CC.h"
 #include "Viewport.h"
 #include "Class869D8.h"
+#include "Class86AA0.h"
 
 Class869D8 *New_Class869D8(void)
 {
@@ -89,35 +90,39 @@ void Class86AA0__Class86AA0(Class86AA0 *self)
     GetClass6B5CCMethods()->ctor((Class6B5CC *)self);
     self->methods = GetClass86AA0Methods();
     self->unk34 = 0;
-    self->unk36 = 0;
-    self->unk38 = 0;
+    self->flags36 = 0;
+    self->nextInCell = NULL;
 }
 
 void Class86AA0__Reset(void) {
 }
 
-void Class86AA0__DispatchLinkCommand(Class86AA0 *self, GenericTagInst_3bb8c_c *arg1)
+/* Only the low byte of the sender's class id is read: 0x34 is an Actor
+ * (Actor__DispatchLinkCommand makes the same test the other way round). */
+void Class86AA0__DispatchLinkCommand(Class86AA0 *self, BasicClass *sender, s32 event)
 {
-    if (arg1->methods->tag == 0x34) {
-        self->methods->slotB8(self);
+    if (*(u8 *)sender->methods == 0x34) {
+        self->methods->onActorLinkCommand(self, sender, event);
     }
 }
 
-void Class86AA0__OnActorLinkCommand(Class86AA0 *self, GenericTagInst_3bb8c_c *arg1, s32 arg2)
+/* tryAttachNearby keeps Class6B5CC's one-parameter slot type; this caller
+ * passes the sender and event too, as Actor__OnActorLinkCommand does. */
+void Class86AA0__OnActorLinkCommand(Class86AA0 *self, void *sender, s32 event)
 {
-    GetClass6B5CCMethods()->dispatchLinkCommand((Class6B5CC *)self, arg1, arg2);
-    if (arg2 >= 9) {
+    GetClass6B5CCMethods()->dispatchLinkCommand((Class6B5CC *)self, sender, event);
+    if (event >= 9) {
         return;
     }
     do {
-        if (arg2 < 5) {
+        if (event < 5) {
             return;
         }
     } while (0);
-    self->methods->slotA0(self, arg1, arg2);
+    ((void (*)(Class86AA0 *, void *, s32))self->methods->tryAttachNearby)(self, sender, event);
 }
 
-void *Class86AA0__ReturnSelf(void *self)
+void *Class86AA0__ReturnSelf(Class86AA0 *self)
 {
     return self;
 }

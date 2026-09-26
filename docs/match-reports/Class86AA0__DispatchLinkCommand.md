@@ -69,3 +69,17 @@ arguments" above is C shape only: $a1/$a2 still hold sender and event at
 the call, and the unified header passes them explicitly
 (`self->methods->onActorLinkCommand(self, sender, event)`), byte-identical,
 as Actor's own override does.
+
+The C since round 88 (byte-identical, whole image verified):
+
+```c
+void Class86AA0__DispatchLinkCommand(Class86AA0 *self, BasicClass *sender, s32 event)
+{
+    if (*(u8 *)sender->methods == 0x34) {
+        self->methods->onActorLinkCommand(self, sender, event);
+    }
+}
+```
+
+`GenericTagInst_3bb8c_c`/`GenericTagMethods_3bb8c_c` are deleted: the
+sender is a BasicClass and the byte is read as Actor's override reads it.
