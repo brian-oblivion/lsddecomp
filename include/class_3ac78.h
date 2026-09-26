@@ -10,7 +10,6 @@ typedef struct UnkChildMethods_3ac78 UnkChildMethods_3ac78;
 typedef struct UnkChildObj_3ac78 UnkChildObj_3ac78;
 typedef struct UnkSlotChildMethods_3ac78 UnkSlotChildMethods_3ac78;
 typedef struct UnkSlotChildObj_3ac78 UnkSlotChildObj_3ac78;
-typedef struct UnkSlotListObj_3ac78 UnkSlotListObj_3ac78;
 typedef struct UnkSlotEntry_3ac78 UnkSlotEntry_3ac78;
 typedef struct GridRect_3ac78 GridRect_3ac78;
 typedef struct GridRectList_3ac78 GridRectList_3ac78;
@@ -22,7 +21,7 @@ typedef struct GenericObject GenericObject;
 /*
  * One entry of Class866E8::elems[7] (Class866E8__ResetAllElements). 0x1C bytes; only the
  * three fields that function touches are typed. Its own two pointer
- * members' full types (UnkSlotChildObj_3ac78, UnkSlotListObj_3ac78) are
+ * members' full types (UnkSlotChildObj_3ac78, Class6D940) are
  * defined further down -- fine, since a pointer only needs the forward
  * `typedef struct X X;` above, not the full body. This struct itself has
  * to come before Class866E8 below because Class866E8::elems is an ARRAY
@@ -32,7 +31,7 @@ struct UnkSlotEntry_3ac78 {
     u16 flag;                        /* zeroed at the top of each loop pass (Class866E8__ResetAllElements) */
     u16 key;                         /* Class866E8__Class866E8 (ctor): set to the loop index (0..6), and copied on into target->key. class_3bb8c's independent view (Elem::unk2) has Class866E8__BuildRateEntries copy a caller-supplied key byte into the same field. */
     UnkSlotChildObj_3ac78 *target;
-    UnkSlotListObj_3ac78 *list;
+    struct Class6D940 *list;         /* New_Class6D940(0); include/Class6D940.h */
     GenericObject *cellParent;             /* Class866E8__Finalize: refreshed (discarded) through ->methods->release when non-NULL */
     /* RETYPED from `GenericObject **` (Class866E8__Finalize's earlier,
      * still-unconfirmed, INCLUDE_ASM-only comment) to `Class866E8 **`: a 2D
@@ -393,18 +392,6 @@ struct UnkSlotChildObj_3ac78 {
     s16 unk2C;    /* Class866E8__DispatchToRectCells: gates the whole per-history-entry grid walk (nonzero test) */
     u8 pad2E[0x32 - 0x2E];
     u16 key;      /* Class866E8__Class866E8 (ctor): set to the outer loop index (0..6) */
-};
-
-/*
- * Opaque "list" object referenced by each Class866E8::elems[] slot entry
- * (Class866E8__ResetAllElements). Only field +0x2C (a GenericObject*, refreshed through
- * its own ->methods->release base-class slot exactly like
- * Class866E8__OnElementEvent's arg2->unk14) is typed.
- */
-struct UnkSlotListObj_3ac78 {
-    GenericMethodsHeader *methods;   /* Class866E8__Finalize: refreshed via ->methods->release(self), stored back into the owning entry's `list` */
-    u8 pad4[0x2C - 0x4];
-    GenericObject *unk2C;
 };
 
 #endif

@@ -468,7 +468,7 @@ On the revisit hypothesis specifically: this unit's own types and names
 function's own earlier attempts and were already live in
 `src/code_179d8_d.c`, so there was nothing newer to import; the unit's
 other matched functions (`New_Class6D940`, `Class6D940__Class6D940`,
-`Class6D940__Destroy`, `Class6D940__SetFlag`) touch a different object family
+`Class6D940__Finalize`, `Class6D940__SetFlag`) touch a different object family
 (`Obj6D940`/`Table6D940`) and share no field with this one. **Nothing in
 the four rounds of names and types since the stall was filed changed
 anything here.** What moved the score was re-reading the diff instead of
@@ -820,3 +820,7 @@ preserved `#if 0` bodies above (Entry278's own comment) predates the
 correction and is left as written history, not edited (rewriting text
 inside a preserved stall body risks silently changing what was actually
 built and scored).
+
+## Track 4 (2026-09-26, round 87, echo)
+
+Retyped, byte-identical, with the class unified in `include/Class6D940.h`. `Ctx278` was the Class6D940 object itself: this is slot +0x078 of D_8006D940 (`classtable.py D_8006D940 --vs D_8006D430`), called only by Class866E8__LoadElementResources as `target->methods->slot78(target, &outBuf, i)` on the object New_Class6D940 built. So `unk10` is Class6D430's `buffer` (the caller points it into a loaded resource), `unk2C` is `linkResource` (the caller stores New_LinkResource there), and `Ctx278Sub`'s +0x080 is LinkResource__GetEntry (D_8006F13C). `Obj278` is the caller's 0x40-byte stack record, now `Class6D940Placement` (x/y/z at +0x0C..+0x14 go to the GPU coordinate, rotY +0x1A, `chained` +0x30, `next` +0x34 the offset of the cell's next record, which the caller loops on without advancing the cell); `Entry278` is `Class6D940Record`. The cell index splits as row = cell / 20, column = cell % 20, a 20x20 grid of 0x800-unit cells. The four-argument LinkResource call stays: `placement` must be in $a3.

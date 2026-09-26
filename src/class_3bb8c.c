@@ -35,6 +35,7 @@
  */
 #include "common.h"
 #include "class_3bb8c.h"
+#include "Class6D940.h"
 
 s32 Class866E8__SetTargetAndBuildRates(Obj866E8 *self, void *arg1, Unk6CObj *arg2, Descriptor10 *arg3) {
     s32 stackBuf[3];
@@ -389,37 +390,13 @@ struct ResInfo866E8 {
     s32 unk8;   /* +0x008 */
 };
 
-/* target->unk2C's pointee -- only its self-only teardown slot is reached. */
-typedef struct LinkResourceMethods LinkResourceMethods;
-typedef struct LinkResource {
-    LinkResourceMethods *methods;   /* +0x000 */
-} LinkResource;
-struct LinkResourceMethods {
-    u8 pad0[0x4];
-    void (*slot4)(LinkResource *self);  /* +0x004 */
-};
-
-/* slot78's own non-0/non-(-1) return value -- a resolved link-target
- * record, read only for its `unk10` (tmd base address). */
+/* Class6D940__ResolveEntry's non-0/non-(-1) return value (what
+ * LinkResource__GetEntry returns) -- a resolved link-target record, read
+ * only for its `unk10` (tmd base address). */
 typedef struct LinkResEntry {
     u8 pad0[0x10];
     s32 unk10;   /* +0x010 */
 } LinkResEntry;
-
-/* Elem::unk8's pointee -- coordinates the per-frame GPU link/load loop. */
-typedef struct LinkTarget866E8Methods LinkTarget866E8Methods;
-struct LinkTarget866E8 {  /* forward-typedef'd in class_3bb8c.h */
-    LinkTarget866E8Methods *methods;  /* +0x000 */
-    u8 pad004[0x010 - 0x004];
-    s32 unk10;                          /* +0x010 */
-    s32 unk14;                            /* +0x014 */
-    u8 pad018[0x02C - 0x018];
-    LinkResource *unk2C;                    /* +0x02C */
-};
-struct LinkTarget866E8Methods {
-    u8 pad000[0x78];
-    s32 (*slot78)(LinkTarget866E8 *self, void *outBuf, s32 arg2); /* +0x078 */
-};
 
 /* EntryChildObj::unk14's pointee. */
 typedef struct EntryGpuVec {
@@ -438,36 +415,20 @@ struct EntryGpu {
     EntryGpuVec *unk44;                  /* +0x044 */
 };
 
-/* slot78's own stack-allocated outBuf, 0x38 bytes -- fields established
- * purely from this function's own reads of it. */
-typedef struct BE54OutBuf {
-    u8 pad0[0xC];
-    s32 b;          /* +0x00C */
-    s32 c;            /* +0x010 */
-    s32 d;              /* +0x014 */
-    u8 pad18[0x1A - 0x18];
-    u16 h1;               /* +0x01A */
-    u8 pad1C[0x2E - 0x1C];
-    u16 h2;                 /* +0x02E */
-    s32 flag2;                /* +0x030 */
-    s32 found;                  /* +0x034 */
-    u8 pad38[0x8];               /* trailing bytes never read/written by this function */
-} BE54OutBuf;
-
 typedef struct BE54LoadReq {
     s32 field0;
     u8 pad4[0xC];
 } BE54LoadReq;
 
-extern LinkResource *New_LinkResource(BE54LoadReq *req);
+extern void *New_LinkResource(BE54LoadReq *req);
 extern void GsLinkObject4(s32 tmd, void *objp, s32 n);
 
 void Class866E8__LoadElementResources(Obj866E8 *self, Elem *entry) {
     ResInfo866E8 *info;
     ResInfo866E8 *info2;
     ElemTarget *hdr;
-    LinkTarget866E8 *target;
-    LinkResource *res;
+    Class6D940 *target;
+    Class6D430 *res;
     EntryChildObj **slot;
     u8 *base;
     EntryGpu *gpu;
@@ -481,29 +442,29 @@ void Class866E8__LoadElementResources(Obj866E8 *self, Elem *entry) {
     s32 i;
     s32 off1;
     s32 off2;
-    BE54OutBuf outBuf;
+    Class6D940Placement outBuf;
     BE54LoadReq req;
 
     hdr = entry->unk4;
     target = entry->unk8;
     info = hdr->field10;
-    target->unk10 = (s32)info + info->unk4;
-    target->unk14 = 0;
-    res = target->unk2C;
+    target->buffer = (u8 *)info + info->unk4;
+    target->bufferSize = 0;
+    res = target->linkResource;
     if (res != 0) {
-        res->methods->slot4(res);
+        res->methods->release(res);
     }
     info2 = hdr->field10;
     req.field0 = (s32)info2 + info2->unk4 + info2->unk8;
-    target->unk2C = New_LinkResource(&req);
-    outBuf.found = 0;
+    target->linkResource = New_LinkResource(&req);
+    outBuf.next = 0;
 
     i = 0;
     flagBit = 0x80000000;
     off1 = 0;
     off2 = 0x640;
     for (;;) {
-        idxVal = target->methods->slot78(target, &outBuf, i);
+        idxVal = ((Class6D940ResolveEntryFn)target->methods->slot78)(target, &outBuf, i);
         if (idxVal == 0) {
             return;
         }
@@ -516,7 +477,7 @@ void Class866E8__LoadElementResources(Obj866E8 *self, Elem *entry) {
             (*slot)->unk18 = 0;
         } else {
             base = (u8 *)entry->unk10;
-            if (outBuf.flag2 != 0) {
+            if (outBuf.chained != 0) {
                 slot = (EntryChildObj **)(base + off2);
                 off2 += 4;
             } else {
@@ -527,25 +488,25 @@ void Class866E8__LoadElementResources(Obj866E8 *self, Elem *entry) {
             GsLinkObject4(((LinkResEntry *)(*slot)->unk20)->unk10, (u8 *)(*slot) + 0x10, 0);
             gpu = (*slot)->unk14;
             __asm__("");
-            b = outBuf.b;
-            c = outBuf.c;
-            d = outBuf.d;
+            b = outBuf.x;
+            c = outBuf.y;
+            d = outBuf.z;
             gpu->unk18 = b;
             gpu->unk1C = c;
             gpu->unk20 = d;
             vec = (*slot)->unk14->unk44;
             vec->unk10 = 0;
-            h1 = outBuf.h1;
+            h1 = outBuf.rotY;
             vec->unk14 = 0;
             vec->unk12 = h1;
-            (*slot)->unk36 = outBuf.h2;
+            (*slot)->unk36 = outBuf.unk2E;
             (*slot)->unk14->unk0 = 0;
             {
                 s32 flags10 = (*slot)->unk10;
                 (*slot)->unk10 = flags10 | flagBit;
             }
         }
-        if (outBuf.found) {
+        if (outBuf.next) {
             EntryChildObj **next = (EntryChildObj **)((u8 *)entry->unk10 + off2);
             (*slot)->unk38 = *next;
             continue;

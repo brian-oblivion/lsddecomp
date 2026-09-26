@@ -34,7 +34,7 @@ Table6D940 D_8006D940;`.
 
 Also added `BaseTable6D940` (this file only) -- a SEPARATE table reached
 only via the uncarved accessor `GetActiveDataSourceMethods()`, with three known slots
-(`+0x008`, `+0x00C`, `+0x064`) used by `Class6D940__Class6D940`/`Class6D940__Destroy`/
+(`+0x008`, `+0x00C`, `+0x064`) used by `Class6D940__Class6D940`/`Class6D940__Finalize`/
 `Class6D940__SetFlag` respectively (all this unit, this round). Kept entirely
 local to `code_179d8_d.c`, no shared header, per this round's rule for the
 `code_179d8` slices.
@@ -55,3 +55,7 @@ array (`GetVabStreamObjMethods`) and elsewhere (`GetClass6D430Methods`,
 report's `## Role` section predates the correction and is left as written
 history rather than edited (the unit header comment and this `## Naming`
 section are authoritative).
+
+## Track 4 (2026-09-26, round 87, echo)
+
+The paragraph above ("NOT class-framework code") is superseded: D_8006D940 is a Class6D430 method table and this is its getter, the first entry of gDataSourceClientGetters. Declared in `include/Class6D940.h`.
