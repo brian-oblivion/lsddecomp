@@ -190,7 +190,7 @@ typedef struct PolyVtx {
 extern void CopyPolyVtx3(PolyVtx **dst, PolyVtx **src, PolyUV4 *uv0, PolyUV4 *uv1, PolyUV4 *uv2);
 
 /* Populates a submit table's (`table`, gDivPolygon3/gDivPolygon4):
- * +0x00 an OT/code word (sPolyOtCodeOverride when sNdivOverrideSet is set, else
+ * +0x00 an OT/code word (sNdivOverride when sNdivOverrideSet is set, else
  * D_80090C18), +0x04 sDivClipWidth, +0x08 sDivClipHeight -- these three are
  * UNCONDITIONAL (the third rides in the branch's own delay slot in
  * retail); only the two u16 stack args at +0x0C/+0x0E are actually

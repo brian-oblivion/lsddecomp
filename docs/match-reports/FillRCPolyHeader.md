@@ -22,7 +22,7 @@ extern s32 sDivClipWidth;
 extern s32 sDivClipHeight;
 extern s32 D_80090C18;
 extern s32 sNdivOverrideSet;
-extern s32 sPolyOtCodeOverride;
+extern s32 sNdivOverride;
 
 void FillRCPolyHeader(void *arg0, void *arg1, PolyUV4 *arg2, s32 arg3, u16 arg4, u16 arg5)
 {
@@ -33,7 +33,7 @@ void FillRCPolyHeader(void *arg0, void *arg1, PolyUV4 *arg2, s32 arg3, u16 arg4,
     s32 code2;
 
     if (sNdivOverrideSet) {
-        val = sPolyOtCodeOverride;
+        val = sNdivOverride;
     } else {
         val = D_80090C18;
     }

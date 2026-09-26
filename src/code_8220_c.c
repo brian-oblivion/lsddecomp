@@ -353,11 +353,11 @@ extern s32 sDivClipHeight;
 extern s32 D_80090C18;
 
 extern s32 sNdivOverrideSet;
-extern s32 sPolyOtCodeOverride;
+extern s32 sNdivOverride;
 
 /* Populates a submit table's (`table`, one of gDivPolygon3/
  * gDivPolygon4) common header fields ahead of a Submit* wrapper's
- * RCpoly* call: +0x0 an OT/code word (sPolyOtCodeOverride when
+ * RCpoly* call: +0x0 an OT/code word (sNdivOverride when
  * sNdivOverrideSet, else the D_80090C18 default), +0x4 sDivClipWidth,
  * +0x8 sDivClipHeight -- these three are UNCONDITIONAL; only the two u16 args
  * at +0xC/+0xE are gated on `hasUv1Codes`. +0x10 is an unaligned PolyUV4
@@ -373,7 +373,7 @@ void FillRCPolyHeader(void *table, void *ctx, PolyUV4 *uv, s32 hasUv1Codes, u16 
     s32 code2;
 
     if (sNdivOverrideSet) {
-        val = sPolyOtCodeOverride;
+        val = sNdivOverride;
     } else {
         val = D_80090C18;
     }
@@ -422,7 +422,7 @@ void CopyPolyVtx4(PolyVtx **dst, PolyVtx **src, PolyUV4 *uv0, PolyUV4 *uv1, Poly
 }
 
 extern s32 sNdivOverrideSet;
-extern s32 sPolyOtCodeOverride;
+extern s32 sNdivOverride;
 
 /* Setter matching FillRCPolyHeader's read side: `enable` gates whether
  * FillRCPolyHeader's header word 0 comes from `code` (this call's second
@@ -431,6 +431,6 @@ extern s32 sPolyOtCodeOverride;
 void SetPolyOtCodeOverride(s32 enable, s32 code) {
     sNdivOverrideSet = enable;
     if (enable) {
-        sPolyOtCodeOverride = code;
+        sNdivOverride = code;
     }
 }
