@@ -107,9 +107,10 @@ python3 tools/classtable.py <table>  # a table's slots and their occupants
 python3 tools/classtable.py <table> --vs <parent-table>   # what a subclass overrides
 ```
 
-A name like `Class865C8` is the address of the class's method table: its
-mechanics are documented in its header, but no name for what it is has been
-established.
+A name of the form `Class<hex>` is the address of the class's method table:
+its mechanics are documented in its header, but no name for what it is has
+been established (`python3 tools/plan.py` lists any such class as a track 6
+job).
 
 ### The main subsystems
 
@@ -135,8 +136,8 @@ Read each named class's header first; its banner points to the units.
   stage chunks; `code_4cd08` spawns and despawns trigger entities;
   `StageMap` keeps the seven map chunks around its target loaded, each
   chunk's `PlacementGrid` linked into a lattice of `GridCell`s (`src/class_3ac78.c`,
-  `src/class_3bb8c.c`, `src/class_3bb8c_b.c`). `Class865C8` runs a day's
-  loop around the DreamSys and builds an `ObjM`.
+  `src/class_3bb8c.c`, `src/class_3bb8c_b.c`). `DayTask` runs one day
+  around the DreamSys's startDay/endDay and builds an `ObjM` per stage.
 - **Screens and menus.** `IntermediateBase` runs one attached job to a
   result. `TaskCore` (`src/code_2cc8c*.c`) is the base of the menu and screen
   tasks: `StreamTask` (plays one movie), `GraphRoom` (the mood graph) and

@@ -6,6 +6,68 @@ stale, prose elsewhere is not.
 
 ---
 
+## 2026-09-26 — round 94: the last placeholder class, Sony types in three files, two Sonnet passes sent back (premium head, plan revision 32)
+
+Premium head (Opus 5.5), cap 5, slots refilled as runners reported: 11
+jobs (8 Opus, 3 Sonnet). Gate 0 green.
+
+- **Track 6, four jobs done** (three names sampled against the body each):
+  `Class865C8` to `DayTask` (B: every path runs exactly one DreamSys
+  startDay/endDay pair with ObjM children between; init's result is what
+  `GameApplication__PollStatusObj` switches on, 2 the cinematic, 3
+  `skipGraphRoomPoll`; B because startDay/endDay are inherited names).
+  code_179d8_k (all Sony's seqread) onto libsnd's `ProgAtr`/`VagAtr`/
+  `SsMarkCallbackProc`, offsets checked against the header; the old local
+  two-argument callback type had dropped `sl`, and with Sony's
+  three-argument type `ContNrpn1` matched 77/77 (library C, not game
+  count). `include/class_3bb8c.h`'s 13: six were views of existing types
+  (`MATRIX`, `DrawSystem` as round 93's delta said, `TextRow`,
+  `VabStreamObj`, `TitleMenu`, `TaskCoreTarget`), four named (`McDevicePath`,
+  `SplitCoord2`, `DreamSaveBlock` B, `StyleConfig` B). code_2864's eight
+  were all Sony's (`MATRIX` to `GsBOXF`, plus `GsBG` for an opaque arm).
+  No class keeps a placeholder name.
+- **Track 6, one job not done, and why it matters (echo).** `ViewportOt`
+  is Sony's `GsOT`, an anonymous typedef, so `Viewport.h` must include
+  `<libgs.h>`; five of its eleven includers then fail on
+  `TimImage.h`'s `GsIMAGE`, `TileMap.h`'s `GsMAP`, `TileAtlas.h`'s
+  `GsCELL`, `class_3bb8c.h`'s `RotMatrix` (cleared this round by charlie)
+  and code_2cc8c_d's local libgs prototypes. Those headers' own jobs were
+  appended last in track 6's queue. **Plan revision 32 (premium):** they
+  now rank first, and `flag-type --after f1,f2` holds a flagged job under
+  WAITING until each named file leaves `tools/sonyheaders.py`.
+- **Track 7, four units marked** (five samples each). Sonnet: Entity_c
+  accepted (six templates named by value); Entity_g sent back (five `D_`
+  templates left "for lack of a precedent" against Entity.h's
+  named-by-value rule), code_fa50 sent back (packet sizes left hex, banner
+  history deleted instead of moved). The polish runner is back on Opus
+  (§2), which redid both and did Entity_b: Entity_g `D_` 5 to 0 and a
+  misdecoded `ROTATION_ZPLUS4` that is really `ROTATION_YAW_PLUS4`;
+  code_fa50 magic 97 to 18 through libgs's own `GPU_COM_*`, `TMD_P_*` and
+  `GsTMDFlagGRD`, history restored to `New_TmdModel.md`.
+- **Head at merge:** `D_800902E8` to `_ss_score` (psyq-objects.ld already
+  pinned it); `EntityMoodRow.unk9` to `nearTolerance` by type scope;
+  `DREAM_COLOR_WHITE`, StepYaw's prototype roles, `ENTITY_STATE_DONE`'s
+  comment; four reports whose history `renametype Unk14Obj SplitCoord2`
+  had rewritten to name the retired `Unk14Obj` again; `DrawNode` flagged.
+  Charlie's merge: replay's edits were left in the working tree, not the
+  index, so the first merge commit held the pre-replay `ObjM.h`; amended
+  before push. Stage everything replay touched before committing it.
+- **Measured** (`plan.py`, against round 93's entry): placeholder type
+  names 80 to 48, placeholder classes 1 to 0, defs under a placeholder
+  prefix 14 to 0; files re-declaring a Sony name 26 to 22; track 7 units 7
+  to 11 of 68, unk 254 to 200, D_ 146 to 133, magic 1636 to 1540, history
+  461 to 436. Typeviews 72, 0 new at every merge.
+- **Deferred proposals** (in the reports): `IntermediateBaseInitArgs::
+  drawSystem` typed `DrawSystem *`; `CheckSaveScoreFlag` to
+  `UpdateFlashbackLock`; `D_80086DAC` to `sDisplayBufferRects`;
+  class_3bb8c_m's `StyleM` is `StyleConfig` (charlie); `Entry90902E8` is
+  Sony's per-track SEQ record, and code_179d8_c's `VoiceState80090368` is
+  the mark-callback table (echo); `TmdPrim` is Sony's TMD packet header,
+  and a shared TMD-constants header for code_fa50 and code_8220_b (bravo);
+  `ENTITY_MOOD_ROW_STRIDE` and a DreamSys pad-event enum (delta, alpha).
+
+---
+
 ## 2026-09-26 — round 93: nine classes named, four units polished, 4b reopened and closed (premium head, plan revision 31)
 
 Premium head (Opus 5.5), cap 5, slots refilled as runners reported: 14
