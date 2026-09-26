@@ -91,7 +91,7 @@ void SceneNode__GetRotMatrix(SceneNode *self, s32 a1, s32 a2) {
  * TmdModel__GetBoundsCount(self->model) reports true, fills a stack buffer through
  * this class's own +0x8C slot (SceneNode__ReadUnk20Data, already matched in this
  * unit -- fills it via TmdModel__GetHull(self->model, dest)) then forwards
- * that same buffer, retyped as a GenericCountList_d294, into +0x90
+ * that same buffer, retyped as a TmdHull, into +0x90
  * (SceneNode__TransformAndNotifyParents, also already matched in this unit), with the original
  * a1 passed through as SceneNode__TransformAndNotifyParents's own a2. */
 void SceneNode__NotifyIfUnk20Active(SceneNode *self, s32 a1) {
@@ -99,7 +99,7 @@ void SceneNode__NotifyIfUnk20Active(SceneNode *self, s32 a1) {
      * target (TmdModel__GetHull, code_fa50) writes a TmdHull
      * (include/TmdModel.h: a count word and eight 6-byte corners, 0x34
      * bytes) into its `dest`, so the true destination struct is bigger than
-     * the 8 bytes GenericCountList_d294 alone would reserve. */
+     * the 8 bytes a count and one corner would reserve. */
     u8 buf[0x38];
 
     if (a1 >= 4) {
@@ -115,7 +115,7 @@ void SceneNode__NotifyIfUnk20Active(SceneNode *self, s32 a1) {
         return;
     }
     self->methods->readUnk20Data(self, buf);
-    self->methods->transformAndNotifyParents(self, (GenericCountList_d294 *)buf, a1);
+    self->methods->transformAndNotifyParents(self, (TmdHull *)buf, a1);
 }
 
 /* Forwards self->model (the TmdModel, held as `void *` in SceneNode.h) and
@@ -131,8 +131,8 @@ void SceneNode__ReadUnk20Data(SceneNode *self, void *dest) {
  * for the duration of a single self->methods->slot30(self, a2) dispatch
  * (an inherited BasicClass slot, not this unit's own code), then clears
  * unk30 again. */
-void SceneNode__TransformAndNotifyParents(SceneNode *self, GenericCountList_d294 *a1, s32 a2) {
-    ApplyMatrixToSVArray(&a1->unk4, &a1->unk4, a1->unk0 * 8, &self->coord2->unk24);
+void SceneNode__TransformAndNotifyParents(SceneNode *self, TmdHull *a1, s32 a2) {
+    ApplyMatrixToSVArray(a1->v, a1->v, a1->count * 8, &self->coord2->unk24);
     self->linkTarget = 0;
     self->hitMask = 0;
     self->notifyVerts = a1;
@@ -159,11 +159,8 @@ void SceneNode__DispatchLinkCommand(SceneNode *self, void *sender, s32 event) {
     }
 }
 
-/* The corner list this function builds and hands to +0xA8/+0xAC: the count
- * header and eight corners are ONE local (count at sp+0x50, corners at
- * sp+0x54); round 76. Same layout as CornerList_d294 with the array made
- * explicit. */
-/* AttachCornerList_d294b: include/SceneNode.h. */
+/* The corner list this function builds and hands to +0xA8/+0xAC is one
+ * TmdHull local: the count header and the eight corners together. */
 
 /* Range-checks `other` against `self` (each axis of position difference
  * must fit in +/-0x4000), then hands off to three vtable slots
@@ -174,10 +171,10 @@ void SceneNode__TryAttachNearby(SceneNode *self, SceneNode *other) {
     Vec3_d294 *posA;
     Vec3_d294 *posB;
     Vec3_d294 diffRaw;
-    Vec3S16_d294 diff;
+    TmdVec3 diff;
     s32 abs;
     u8 unused[0x20]; /* sp+0x30, never referenced; reserves retail's slot */
-    AttachCornerList_d294b list;
+    TmdHull list;
 
     if (self->model == NULL) {
         return;
@@ -238,10 +235,10 @@ z_done:
     diff.y = diffRaw.y;
     diff.z = diffRaw.z;
 
-    list.count = other->notifyVerts->unk0;
+    list.count = other->notifyVerts->count;
     {
-        GenericCountList_d294 *countList = other->notifyVerts;
-        self->methods->composeAndApplyRotation(self, &diff, list.v, &countList->unk4, list.count * 8);
+        TmdHull *countList = other->notifyVerts;
+        self->methods->composeAndApplyRotation(self, &diff, list.v, countList->v, list.count * 8);
     }
 
     if (!self->methods->checkBoundsOverlap(self, &list, &diff)) {
@@ -288,10 +285,10 @@ void SceneNode__ComposeAndApplyRotation(SceneNode *self, void *arg1, void *arg2,
  * three axes. Each running min/max is a ternary stored back unconditionally
  * (retail stores every field every iteration), and the source compares
  * with `>` for a min so the slt operands load in retail's order. */
-s32 SceneNode__CheckBoundsOverlap(SceneNode *self, void *arg1, Vec3S16_d294 *d) {
+s32 SceneNode__CheckBoundsOverlap(SceneNode *self, void *arg1, TmdVec3 *d) {
     CornerList_d294 *list;
-    Vec3S16_d294 *v;
-    Vec3S16_d294 *end;
+    TmdVec3 *v;
+    TmdVec3 *end;
     BoundsBox_d294 mm;
     BoundsBox_d294 *b;
     BoundsBox_d294 *p;
@@ -355,17 +352,16 @@ s32 SceneNode__CheckBoundsOverlap(SceneNode *self, void *arg1, Vec3S16_d294 *d) 
  * `p`, `v` and `hi` as pointers. */
 extern s32 D_8008A838;
 
-s32 SceneNode__ClassifyAgainstPlanes(SceneNode *self, s32 *outFlag, Vec3S16_d294 *diff,
-                                      AttachCornerList_d294b *list) {
-    Vec3S16_d294 mid[2];
-    Vec3S16_d294 *p;
-    Vec3S16_d294 *hi;
+s32 SceneNode__ClassifyAgainstPlanes(SceneNode *self, s32 *outFlag, TmdVec3 *diff, TmdHull *list) {
+    TmdVec3 mid[2];
+    TmdVec3 *p;
+    TmdVec3 *hi;
     s32 count1;
     s32 i;
     Sixteen6_d294 *plane;
     s32 hit;
     s32 cnt2;
-    Vec3S16_d294 *v;
+    TmdVec3 *v;
     s32 k;
     s32 m;
     s32 bigConst;
@@ -450,10 +446,10 @@ s32 SceneNode__ClassifyAgainstPlanes(SceneNode *self, s32 *outFlag, Vec3S16_d294
  * matching retail exactly. Kept because it is what's needed for
  * byte-exactness, not because it means anything; see the report for the
  * hand-lever history this replaced. */
-s32 ClipSegmentToBox(Vec3S16_d294 *out, BoundsBox_d294 *box, Vec3S16_d294 *p1, Vec3S16_d294 *p2) {
+s32 ClipSegmentToBox(TmdVec3 *out, BoundsBox_d294 *box, TmdVec3 *p1, TmdVec3 *p2) {
     u8 r1;
     u8 r2;
-    Vec3S16_d294 mid;
+    TmdVec3 mid;
 
     r1 = CalcBoxOutcode(box, p1);
     r2 = CalcBoxOutcode(box, p2);
@@ -526,10 +522,10 @@ combined:
  * overshot, so it becomes the new `far`, otherwise it becomes the new
  * `near` -- each written into one of two ping-pong stack buffers so the
  * OTHER endpoint's storage is never disturbed. */
-void BisectSegmentToBox(Vec3S16_d294 *out, BoundsBox_d294 *box, Vec3S16_d294 *near, Vec3S16_d294 *far) {
-    Vec3S16_d294 buf0;
-    Vec3S16_d294 buf1;
-    Vec3S16_d294 *dst;
+void BisectSegmentToBox(TmdVec3 *out, BoundsBox_d294 *box, TmdVec3 *near, TmdVec3 *far) {
+    TmdVec3 buf0;
+    TmdVec3 buf1;
+    TmdVec3 *dst;
     u8 flags;
 
     for (;;) {

@@ -320,7 +320,7 @@ s32 RatioToFixed12(void *pair) {
  * minimum (x -> 8/4, y -> 2/1, z -> 0x20/0x10). Returned unmasked; callers
  * do their own `andi ..., 0xFF`. The first axis assigns rather than ORs
  * only because `flags` is provably 0 there. */
-s32 CalcBoxOutcode(BoundsBox_d294 *box, Vec3S16_d294 *point) {
+s32 CalcBoxOutcode(BoundsBox_d294 *box, TmdVec3 *point) {
     s32 flags;
 
     flags = 0;
@@ -379,7 +379,7 @@ extern void ApplyMatrixSV(void *m, void *v0, void *v1);
  * that gives it alignment 2, which is what makes the whole-struct
  * assignment compile to unaligned lwl/lwr + swl/swr (the idiom in
  * DECOMPILATION_LEARNINGS, confirmed here by an isolated toolchain
- * reproducer in round 19). `Vec3S16_d294` is exactly that shape, and is
+ * reproducer in round 19). `TmdVec3` is exactly that shape, and is
  * the right READING too: ApplyMatrixSV consumes SVECTORs, so the 6 bytes
  * are three s16 components, not the "32-bit value + trailing s16" the
  * former local `Rec6_d294` typedef guessed. Byte-identical either way. */
@@ -388,9 +388,9 @@ void ApplyMatrixToSVArray(void *dst, void *src, s32 count, void *m) {
 
     end = (u8 *)dst + count * 6;
     while ((u8 *)dst < end) {
-        Vec3S16_d294 buf;
+        TmdVec3 buf;
 
-        buf = *(Vec3S16_d294 *)src;
+        buf = *(TmdVec3 *)src;
         ApplyMatrixSV(m, &buf, dst);
         src = (u8 *)src + 6;
         dst = (u8 *)dst + 6;

@@ -2,6 +2,7 @@
 #define SCENENODE_H
 
 #include "BasicClass.h"
+#include "TmdModel.h"
 
 /*
  * SceneNode -- a positioned 3D scene object (class id 0x4, method table
@@ -30,7 +31,6 @@ typedef struct SceneNodeMethods SceneNodeMethods;
 typedef struct SceneNodeSub14 SceneNodeSub14;
 typedef struct SceneNodeSub44 SceneNodeSub44;
 typedef struct S16Quad_d294 S16Quad_d294;
-typedef struct GenericCountList_d294 GenericCountList_d294;
 
 /* A plain s16 quad (libgs SVECTOR). All-s16 members give it alignment 2,
  * which is what makes SceneNode__GetRotMatrix's whole-struct copy compile to
@@ -49,13 +49,6 @@ typedef struct Vec3_d294 {
     s32 y;
     s32 z;
 } Vec3_d294;
-
-/* A 6-byte all-s16 vector (alignment 2: whole-value copies are lwl/lwr). */
-typedef struct Vec3S16_d294 {
-    s16 x;
-    s16 y;
-    s16 z;
-} Vec3S16_d294;
 
 /* One `{whole, frac}` entry of the three-entry angle/scale tables
  * updateRotation and updateScale take (ROTATION_ZERO, SCALE_ONE) and
@@ -91,20 +84,6 @@ struct SceneNodeSub14 {
     SceneNodeSub14 *sub; /* +0x04C, GsCOORDINATE2.sub; no accessor */
 };
 
-/* A count and a vertex array (count * 8 Vec3S16_d294 corners from &unk4):
- * TransformAndNotifyParents's argument, held in `notifyVerts` while the
- * parents are notified. */
-struct GenericCountList_d294 {
-    s32 unk0; /* +0x000, multiplied by 8 to form ApplyMatrixToSVArray's count */
-    u8 unk4;  /* +0x004, address only: the first corner */
-};
-
-/* TryAttachNearby's transformed copy of a count list: eight corners per count. */
-typedef struct AttachCornerList_d294b {
-    s32 count;
-    Vec3S16_d294 v[8];
-} AttachCornerList_d294b;
-
 /* Occupants in gSceneNodeMethods named at each slot; `tools/classtable.py
  * <subclass table> --vs gSceneNodeMethods` lists a subclass's overrides. */
 /* clang-format off */
@@ -130,14 +109,14 @@ typedef struct AttachCornerList_d294b {
     /* +0x084 */ void (*getRotMatrix)(Self *self, void *out, s32 invert);  /* SceneNode__GetRotMatrix: RotMatrix of the (negated) rotation into a MATRIX */ \
     /* +0x088 */ void (*notifyIfUnk20Active)(Self *self, s32 event);       /* SceneNode__NotifyIfUnk20Active */ \
     /* +0x08C */ void (*readUnk20Data)(Self *self, void *dest);            /* SceneNode__ReadUnk20Data */ \
-    /* +0x090 */ void (*transformAndNotifyParents)(Self *self, GenericCountList_d294 *verts, s32 event); /* SceneNode__TransformAndNotifyParents */ \
+    /* +0x090 */ void (*transformAndNotifyParents)(Self *self, TmdHull *verts, s32 event); /* SceneNode__TransformAndNotifyParents */ \
     /* +0x094 */ void (*onPadEvent)(Self *self, void *sender, s32 event);  /* func_8001D6A4, empty; onNotify's Pad (2) case; DreamSys__OnPadEvent */ \
     /* +0x098 */ void (*update)(Self *self, void *sender, s32 event);      /* func_8001D6AC, empty; onNotify's FrameClock (5) case; Entity__Update, DreamSys__TimerTick */ \
     /* +0x09C */ void (*dispatchLinkCommand)(Self *self, void *sender, s32 event); /* SceneNode__DispatchLinkCommand; onNotify's SceneNode (4) case */ \
     /* +0x0A0 */ void (*tryAttachNearby)(Self *self);                      /* SceneNode__TryAttachNearby; its 2nd parameter arrives as the caller's untouched $a1 */ \
     /* +0x0A4 */ void (*composeAndApplyRotation)(Self *self, void *vec, void *dst, void *src, s32 count); /* SceneNode__ComposeAndApplyRotation */ \
-    /* +0x0A8 */ s32 (*checkBoundsOverlap)(Self *self, void *corners, Vec3S16_d294 *delta); /* SceneNode__CheckBoundsOverlap */ \
-    /* +0x0AC */ s32 (*classifyAgainstPlanes)(Self *self, void *outFlag, Vec3S16_d294 *delta, void *corners); /* SceneNode__ClassifyAgainstPlanes */ \
+    /* +0x0A8 */ s32 (*checkBoundsOverlap)(Self *self, void *corners, TmdVec3 *delta); /* SceneNode__CheckBoundsOverlap */ \
+    /* +0x0AC */ s32 (*classifyAgainstPlanes)(Self *self, void *outFlag, TmdVec3 *delta, void *corners); /* SceneNode__ClassifyAgainstPlanes */ \
     /* +0x0B0 */ void (*slotB0)(void);                                     /* func_8001E49C, empty; never called */ \
     /* +0x0B4 */ void (*notifyTaggedParents)(Self *self, void *node)       /* SceneNode__NotifyTaggedParents */
 /* clang-format on */
@@ -154,7 +133,7 @@ typedef struct AttachCornerList_d294b {
     /* +0x024 */ s32 tick;                /* zeroed by Reset; gClass876FCMethods's update increments it */ \
     /* +0x028 */ SceneNode *linkTarget;  /* dispatchLinkCommand's event-4 sender; TryAttachNearby's hit */ \
     /* +0x02C */ s32 hitMask;             /* ClassifyAgainstPlanes: one bit per plane (own) or corner group (the other's) */ \
-    /* +0x030 */ GenericCountList_d294 *notifyVerts; /* TransformAndNotifyParents's vertices, set only while the parents are notified */ \
+    /* +0x030 */ TmdHull *notifyVerts; /* TransformAndNotifyParents's vertices, set only while the parents are notified */ \
     /* +0x034 */ u16 unk34;               /* zeroed by Class86AA0's ctor */                        \
     /* +0x036 */ u16 flags36;             /* bit 0x80 tested by Class866E8's NotifyGridCell; zeroed by Class86AA0's ctor */ \
     /* +0x038 */ void *nextInCell;        /* Class866E8's grid-cell chain; zeroed by Class86AA0's ctor */ \
@@ -202,21 +181,20 @@ s32 SceneNode__GetSetUnk10Flag8(SceneNode *self, s32 on);
 void SceneNode__GetRotMatrix(SceneNode *self, s32 out, s32 invert);
 void SceneNode__NotifyIfUnk20Active(SceneNode *self, s32 event);
 void SceneNode__ReadUnk20Data(SceneNode *self, void *dest);
-void SceneNode__TransformAndNotifyParents(SceneNode *self, GenericCountList_d294 *verts, s32 event);
+void SceneNode__TransformAndNotifyParents(SceneNode *self, TmdHull *verts, s32 event);
 void func_8001D6A4(void);
 void func_8001D6AC(void);
 void SceneNode__DispatchLinkCommand(SceneNode *self, void *sender, s32 event);
 void SceneNode__TryAttachNearby(SceneNode *self, SceneNode *other);
 void SceneNode__ComposeAndApplyRotation(SceneNode *self, void *vec, void *dst, void *src, s32 count);
-s32 SceneNode__CheckBoundsOverlap(SceneNode *self, void *corners, Vec3S16_d294 *delta);
-s32 SceneNode__ClassifyAgainstPlanes(SceneNode *self, s32 *outFlag, Vec3S16_d294 *delta,
-                                      AttachCornerList_d294b *corners);
+s32 SceneNode__CheckBoundsOverlap(SceneNode *self, void *corners, TmdVec3 *delta);
+s32 SceneNode__ClassifyAgainstPlanes(SceneNode *self, s32 *outFlag, TmdVec3 *delta, TmdHull *corners);
 void func_8001E49C(void);
 void SceneNode__NotifyTaggedParents(SceneNode *self, void *node);
 
 void SceneNode__RotateLocalVector(SceneNode *self, Vec3_d294 *dst, s16 *src);
 void SceneNode__LocalOffsetToWorldPos(SceneNode *self, s32 *dst, s32 *src,
-                                       s32 unused); /* both callers set $a3 = 0 (0x80059460, 0x8005CF7C); the body never reads it */
+                                      s32 unused); /* both callers set $a3 = 0 (0x80059460, 0x8005CF7C); the body never reads it */
 void SceneNode__GetRotationDegrees(SceneNode *self, WholeFrac_d294 *out);
 void SceneNode__LinkModel(SceneNode *self, void *model);
 void SceneNode__UnlinkModel(SceneNode *self);

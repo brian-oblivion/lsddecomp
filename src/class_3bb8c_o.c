@@ -211,7 +211,7 @@ void Actor__NotifyMove(Actor *self, s32 event) {
                 joinAdjust:
                     RotateAndOffsetHullList(&buf, isSeven, nonneg, adjusted);
                 }
-                self->methods->transformAndNotifyParents(self, (GenericCountList_d294 *)&buf, event);
+                self->methods->transformAndNotifyParents(self, (TmdHull *)&buf, event);
                 /* The link target's class byte: an Actor gets slotE8. */
                 if (self->linkTarget != NULL) {
                     if (*(u8 *)self->linkTarget->methods == 0x34) {

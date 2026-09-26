@@ -68,12 +68,12 @@
  * high corner -- MEASURED from BisectSegmentToBox's own field offsets
  * (+0x0/+0x2/+0x4 = lo.x/y/z, +0x6/+0x8/+0xA = hi.x/y/z). */
 typedef struct BoundsBox_d294 {
-    Vec3S16_d294 lo;
-    Vec3S16_d294 hi;
+    TmdVec3 lo;
+    TmdVec3 hi;
 } BoundsBox_d294;
 
 /* Round 13 (SceneNode__CheckBoundsOverlap): a 12-byte, all-s16, 6-field record -- MEASURED,
- * same all-s16-struct-copy idiom as Vec3S16_d294 (whole-value assignment
+ * same all-s16-struct-copy idiom as TmdVec3 (whole-value assignment
  * compiles to unaligned lwl/lwr). Used as TmdModel__GetBoundsBuffer's own return-array
  * element type and as this function's own second running-tracker. Round 73
  * (the match): the pairing is NOT scrambled -- TmdModel__GetBoundsBuffer's records are
@@ -91,15 +91,15 @@ typedef struct Sixteen6_d294 {
 } Sixteen6_d294;
 
 /* Round 13 (SceneNode__CheckBoundsOverlap): `arg1`'s own struct -- a count followed by the
- * FIRST corner (`hdr`), with `count*8 - 1` more Vec3S16_d294 corners
+ * FIRST corner (`hdr`), with `count*8 - 1` more TmdVec3 corners
  * immediately after (stride 6, walked by raw pointer arithmetic since a
  * C89 flexible array member isn't available). MEASURED: `count*48` is the
  * byte span from `&hdr` to the array's end, i.e. 8 corners per `count`. */
 typedef struct CornerList_d294 CornerList_d294;
 
 struct CornerList_d294 {
-    s32 count;        /* +0x000 */
-    Vec3S16_d294 hdr; /* +0x004, corner[0]; corner[1..] follow at +0x00A */
+    s32 count;   /* +0x000 */
+    TmdVec3 hdr; /* +0x004, corner[0]; corner[1..] follow at +0x00A */
 };
 
 extern void *BMemPMgrAlloc(s32 size);
@@ -236,7 +236,7 @@ extern void RotMatrix(S16Quad_d294 *vec, s32 a1);
  * local buffers; declared only with that shape. */
 extern void MulMatrix2(void *arg0, void *arg1);
 
-void BisectSegmentToBox(Vec3S16_d294 *out, BoundsBox_d294 *box, Vec3S16_d294 *near, Vec3S16_d294 *far);
+void BisectSegmentToBox(TmdVec3 *out, BoundsBox_d294 *box, TmdVec3 *near, TmdVec3 *far);
 
 /* CalcBoxOutcode (round 54 correction: this banner was STALE -- it is
  * now carved and MATCHED in src/code_d294_c.c):
@@ -246,9 +246,9 @@ void BisectSegmentToBox(Vec3S16_d294 *out, BoundsBox_d294 *box, Vec3S16_d294 *ne
  * primitive both functions build on. Returns the accumulated flags in
  * `$v0` unmasked (the mask is the CALLER's job, per ClipSegmentToBox's own
  * repeated `andi ...,0xFF` every time it re-reads a stored result). */
-extern s32 CalcBoxOutcode(BoundsBox_d294 *box, Vec3S16_d294 *point);
+extern s32 CalcBoxOutcode(BoundsBox_d294 *box, TmdVec3 *point);
 
-s32 ClipSegmentToBox(Vec3S16_d294 *out, BoundsBox_d294 *box, Vec3S16_d294 *p1, Vec3S16_d294 *p2);
+s32 ClipSegmentToBox(TmdVec3 *out, BoundsBox_d294 *box, TmdVec3 *p1, TmdVec3 *p2);
 
 /* ratan2 (Psy-Q library, not game code; symbol address per
  * config/symbols.slps01556.lsdde.txt, 0x8001F0C8): arctangent of
