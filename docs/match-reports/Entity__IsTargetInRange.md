@@ -185,3 +185,7 @@ top of the body is **retired**. Measured by deleting it alone and rebuilding:
 (`cmp`), and `./build-and-verify.sh` stayed green. The barrier was dead in the
 current source; the load-delay-slot effect described above no longer depends on
 it. The function now carries no `__asm__`.
+
+## Track 7 (round 94, delta)
+
+The +/-0x200 height window is now decimal 512 (a distance). The two ifs and `goto fail` carry `/* MATCHING */`: measured this round, both `if (a || b) return 0;` followed by `if (dist < range) return 1; return 0;` and the same with `return dist < range;` turn the whole-image SHA1 red.

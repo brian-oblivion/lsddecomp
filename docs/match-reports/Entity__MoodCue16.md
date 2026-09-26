@@ -126,3 +126,7 @@ The class (id 0x1F234, table `gEntityMethods`) is unified as `Entity` in `includ
 ## Track 4b (round 93, charlie) — 2026-09-26
 
 The motion templates are declared once, in `include/Entity.h` (`ROTATION_*`/`SCALE_*` as `Ratio16[]`, `TRANSLATE_*` as `LongVec3[]`); the unit-local `u8[]` externs are gone. The local `arg2`, which holds `ROTATION_YAW_MINUS90` or `ROTATION_YAW_PLUS90` and is passed to `updateRotation`, is now `Ratio16 *` (was `u8 *`). A pointer local's pointee type changes no instruction and the slot takes `void *`, so the bytes held: whole image green, 0 new `-Wall` warnings, nonmatching green.
+
+## Track 7 (round 94, delta)
+
+Local `arg2` (an m2c name) renamed `turn` (tier A: the rotation template picked by the coin flip and passed to updateRotation). Every literal in the live body is in its base: decimal for moodTimer ticks, distances, TOD frames, VAB programs and `state` phases (hex remains only for masks). Byte-identical (whole image green).
