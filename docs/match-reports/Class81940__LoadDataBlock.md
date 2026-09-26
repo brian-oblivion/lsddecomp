@@ -1,4 +1,6 @@
-# DataSrc39094__LoadDataBlock -- MATCHED (54/54 words)
+# Class81940__LoadDataBlock -- MATCHED (54/54 words)
+
+> Renamed from `DataSrc39094__LoadDataBlock` on 2026-09-26 (tools/rename.py). Address 0x80048bc0.
 
 > Renamed from `func_80048BC0` on 2026-09-25 (tools/rename.py). Address 0x80048bc0.
 
@@ -11,7 +13,7 @@ Slot +0x080 of D_80081940. When the loaded buffer's header says a data block
 exists (`+0x02` nonzero) and the object is idle (`unk2A == 0`): release the
 previous block (slot +0x084), allocate `header->+0x14` bytes into `dataBuffer`,
 enter state 10, seek to `header->+0x10` and read the block. Returns 1 on
-start, 0 otherwise. State 10 is completed by DataSrc39094__SetFlag.
+start, 0 otherwise. State 10 is completed by Class81940__AdvanceLoadState.
 
 ## Source
 
@@ -30,7 +32,7 @@ typedef struct StreamHdr {
 } StreamHdr;
 
 /* slot +0x080 of D_80081940: load the data block the header describes */
-s32 DataSrc39094__LoadDataBlock(DataSrc39094 *self) {
+s32 Class81940__LoadDataBlock(DataSrc39094 *self) {
     s32 size;
     if (((StreamHdr *)self->buffer)->hasData == 0) {
         return 0;
@@ -58,8 +60,8 @@ s32 DataSrc39094__LoadDataBlock(DataSrc39094 *self) {
    `self` from entry: retail's call had no argument.
 2. (build 2 was a helper-script duplicate-typedef compile error; no score.)
 3. MATCH: `releaseAlloc` retyped in the local view to the unprototyped
-   `void (*)()` so both call sites are legal C (DataSrc39094__Finalize passes `self`,
-   this one passes nothing). Same fix applied to `loadDataBlock` for DataSrc39094__SetFlag.
+   `void (*)()` so both call sites are legal C (Class81940__Finalize passes `self`,
+   this one passes nothing). Same fix applied to `loadDataBlock` for Class81940__AdvanceLoadState.
 
 ### Proposed learning
 
@@ -70,6 +72,10 @@ local view when another caller passes arguments.
 
 ## Naming
 
-- **Name:** `DataSrc39094__LoadDataBlock`
+- **Name:** `Class81940__LoadDataBlock`
 - **Tier:** A
 - **Evidence:** slot +0x080 (loadDataBlock); matches the unit's own established fact 'state 10 = data block load': allocates dataBuffer sized from the header and issues seek/read.
+
+## Track 4 (2026-09-26, round 87)
+
+Renamed `DataSrc39094__LoadDataBlock` -> `Class81940__LoadDataBlock` with `rename.py` (class rename only; +0x080). Its no-argument call of +0x084 is kept through `Class81940ReleaseDataBlockNoArgFn` (include/Class81940.h). The class (method table D_80081940, id 0x903, a Class6D430 subclass) was named `Class81940` for its table address, as Class6D940 is (FINISHING-PLAN track 4 step 2); the old `DataSrc39094` was the unit's local view name, and dropping its unit suffix leaves `DataSrc`, which every Class6D430 subclass is. The unified definition is `include/Class81940.h`.

@@ -1,4 +1,6 @@
-# DataSrc39094__CancelRequests -- MATCHED (17/17 words)
+# Class81940__CancelRequests -- MATCHED (17/17 words)
+
+> Renamed from `DataSrc39094__CancelRequests` on 2026-09-26 (tools/rename.py). Address 0x80048a68.
 
 > Renamed from `func_80048A68` on 2026-09-25 (tools/rename.py). Address 0x80048a68.
 
@@ -19,7 +21,7 @@ Method slot +0x074 of D_80081940 (cancelRequests; table word at 0x800819B4). Cal
 extern Class6D430Methods *GetActiveDataSourceMethods(void);
 
 /* slot +0x074 of D_80081940 (cancelRequests) */
-void DataSrc39094__CancelRequests(DataSrc39094 *self) {
+void Class81940__CancelRequests(DataSrc39094 *self) {
     GetActiveDataSourceMethods()->cancelRequests((Class6D430 *)self);
     self->headerReady = 0;
     self->dataReady = 0;
@@ -39,6 +41,10 @@ void DataSrc39094__CancelRequests(DataSrc39094 *self) {
 
 ## Naming
 
-- **Name:** `DataSrc39094__CancelRequests`
+- **Name:** `Class81940__CancelRequests`
 - **Tier:** A
 - **Evidence:** slot +0x074 (cancelRequests override); clears headerReady/dataReady/state before chaining the active data source's base cancelRequests.
+
+## Track 4 (2026-09-26, round 87)
+
+Renamed `DataSrc39094__CancelRequests` -> `Class81940__CancelRequests` with `rename.py` (class rename only; +0x074 cancelRequests occupant). The class (method table D_80081940, id 0x903, a Class6D430 subclass) was named `Class81940` for its table address, as Class6D940 is (FINISHING-PLAN track 4 step 2); the old `DataSrc39094` was the unit's local view name, and dropping its unit suffix leaves `DataSrc`, which every Class6D430 subclass is. The unified definition is `include/Class81940.h`.

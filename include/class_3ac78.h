@@ -379,7 +379,7 @@ struct UnkSlotChildMethods_3ac78 {
     void (*slot74)(UnkSlotChildObj_3ac78 *self);
     u8 pad78[0x84 - 0x78];
     void (*slot84)(UnkSlotChildObj_3ac78 *self);
-    void (*slot88)(UnkSlotChildObj_3ac78 *self, s32 arg1); /* +0x088, Class866E8__Class866E8 (ctor): called with self->elems[i].target dispatched right after the object is freshly returned by New_DataSrc39094, arg1 = Class866E8__Class866E8's own arg2 forwarded */
+    void (*slot88)(UnkSlotChildObj_3ac78 *self, s32 arg1); /* +0x088, Class866E8__Class866E8 (ctor): called with self->elems[i].target dispatched right after the object is freshly returned by New_Class81940, arg1 = Class866E8__Class866E8's own arg2 forwarded */
 };
 
 struct UnkSlotChildObj_3ac78 {

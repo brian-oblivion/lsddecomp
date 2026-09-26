@@ -1,4 +1,6 @@
-# DataSrc39094__SetAutoLoadData -- MATCHED (2/2 words), round 81
+# Class81940__SetAutoLoadData -- MATCHED (2/2 words), round 81
+
+> Renamed from `DataSrc39094__SetAutoLoadData` on 2026-09-26 (tools/rename.py). Address 0x80048cd8.
 
 > Renamed from `func_80048CD8` on 2026-09-25 (tools/rename.py). Address 0x80048cd8.
 
@@ -33,13 +35,17 @@ extern const char sAsmkStreamPath[];
 extern s16 gStreamTypeToGroupTable[];
 
 /* slot +0x088 of D_80081940 */
-void DataSrc39094__SetAutoLoadData(DataSrc39094 *self, s32 value) {
+void Class81940__SetAutoLoadData(DataSrc39094 *self, s32 value) {
     self->autoLoadData = value;
 }
 ```
 
 ## Naming
 
-- **Name:** `DataSrc39094__SetAutoLoadData`
+- **Name:** `Class81940__SetAutoLoadData`
 - **Tier:** A
 - **Evidence:** slot +0x088; a one-line field setter (self->autoLoadData = value), a pure setter is tier A by the leaf-mechanics rule.
+
+## Track 4 (2026-09-26, round 87)
+
+Renamed `DataSrc39094__SetAutoLoadData` -> `Class81940__SetAutoLoadData` with `rename.py` (class rename only; +0x088, the last slot). Its one caller is Class866E8__Class866E8, forwarding its own arg2. The class (method table D_80081940, id 0x903, a Class6D430 subclass) was named `Class81940` for its table address, as Class6D940 is (FINISHING-PLAN track 4 step 2); the old `DataSrc39094` was the unit's local view name, and dropping its unit suffix leaves `DataSrc`, which every Class6D430 subclass is. The unified definition is `include/Class81940.h`.

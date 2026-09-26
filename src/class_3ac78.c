@@ -70,7 +70,7 @@ Class866E8 *New_Class866E8(s32 arg1, s32 arg2)
  * Class866E8__Class866E8's own helpers -- all still-uncarved elsewhere, typed
  * purely from this call site's own register usage.
  */
-extern UnkSlotChildObj_3ac78 *New_DataSrc39094(void);
+extern UnkSlotChildObj_3ac78 *New_Class81940(void);
 extern GenericObject *New_Class86AA0(void);
 extern void BMemPMgrFree(void *arg1);
 extern Vec3_3ac78 gDefaultOrigin;
@@ -105,7 +105,7 @@ void Class866E8__Class866E8(Class866E8 *self, Vec3_3ac78 *arg1, s32 arg2)
     for (i = 0; i < 7; i++) {
         entry = &self->elems[i];
 
-        entry->target = New_DataSrc39094();
+        entry->target = New_Class81940();
         entry->target->unk20 = (entry->target->unk10 != 0);
         entry->target->key = i;
         entry->target->methods->slot88(entry->target, arg2);

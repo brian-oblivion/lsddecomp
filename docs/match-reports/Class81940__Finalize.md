@@ -1,4 +1,6 @@
-# DataSrc39094__Finalize -- MATCHED (21/21 words)
+# Class81940__Finalize -- MATCHED (21/21 words)
+
+> Renamed from `DataSrc39094__Finalize` on 2026-09-26 (tools/rename.py). Address 0x80048960.
 
 > Renamed from `func_80048960` on 2026-09-25 (tools/rename.py). Address 0x80048960.
 
@@ -9,7 +11,7 @@ out-of-range drift.
 
 ## What it does
 
-Slot +0x00C (finalize) of D_80081940: calls its own slot +0x084 (DataSrc39094__ReleaseDataBlock, frees the +0x34 allocation), then the active data source's `finalize(self)` via GetActiveDataSourceMethods().
+Slot +0x00C (finalize) of D_80081940: calls its own slot +0x084 (Class81940__ReleaseDataBlock, frees the +0x34 allocation), then the active data source's `finalize(self)` via GetActiveDataSourceMethods().
 
 ## Source
 
@@ -18,7 +20,7 @@ Declarations it needs are the local views at the top of `src/code_39094.c`
 
 ```c
 /* slot +0x00C of D_80081940 (finalize) */
-void DataSrc39094__Finalize(DataSrc39094 *self) {
+void Class81940__Finalize(DataSrc39094 *self) {
     self->methods->releaseAlloc(self);
     GetActiveDataSourceMethods()->finalize((Class6D430 *)self);
 }
@@ -28,7 +30,7 @@ void DataSrc39094__Finalize(DataSrc39094 *self) {
 ## Notes
 
 - The unit now has a local `DataSrc39094Methods` view (CLASS6D430_SLOTS plus
-  slots +0x07C..+0x084, +0x084 = DataSrc39094__ReleaseDataBlock) and the object's
+  slots +0x07C..+0x084, +0x084 = Class81940__ReleaseDataBlock) and the object's
   `pad30[4]` is split into `s16 unk30` (init -1) and `u16 unk32`. Byte-neutral
   for the ten functions matched earlier this round (whole image green).
 - `SeedAndRandom`'s local definition gained an unused second parameter
@@ -39,6 +41,10 @@ void DataSrc39094__Finalize(DataSrc39094 *self) {
 
 ## Naming
 
-- **Name:** `DataSrc39094__Finalize`
+- **Name:** `Class81940__Finalize`
 - **Tier:** A
 - **Evidence:** slot +0x00C (finalize); releases the data-block allocation then chains the active data source's base finalize.
+
+## Track 4 (2026-09-26, round 87)
+
+Renamed `DataSrc39094__Finalize` -> `Class81940__Finalize` with `rename.py` (class rename only; +0x00C finalize occupant). The class (method table D_80081940, id 0x903, a Class6D430 subclass) was named `Class81940` for its table address, as Class6D940 is (FINISHING-PLAN track 4 step 2); the old `DataSrc39094` was the unit's local view name, and dropping its unit suffix leaves `DataSrc`, which every Class6D430 subclass is. The unified definition is `include/Class81940.h`.

@@ -1,4 +1,6 @@
-# DataSrc39094__ReleaseDataBlock -- MATCHED (16/16 words)
+# Class81940__ReleaseDataBlock -- MATCHED (16/16 words)
+
+> Renamed from `DataSrc39094__ReleaseDataBlock` on 2026-09-26 (tools/rename.py). Address 0x80048c98.
 
 > Renamed from `func_80048C98` on 2026-09-25 (tools/rename.py). Address 0x80048c98.
 
@@ -19,7 +21,7 @@ Method slot +0x084 of D_80081940 (table word at 0x800819C4). Clears `dataReady`,
 extern void *BMemPMgrFree(void *ptr);
 
 /* slot +0x084 of D_80081940 */
-void DataSrc39094__ReleaseDataBlock(DataSrc39094 *self) {
+void Class81940__ReleaseDataBlock(DataSrc39094 *self) {
     self->dataReady = 0;
     if (self->dataBuffer != NULL) {
         self->dataBuffer = BMemPMgrFree(self->dataBuffer);
@@ -39,6 +41,10 @@ void DataSrc39094__ReleaseDataBlock(DataSrc39094 *self) {
 
 ## Naming
 
-- **Name:** `DataSrc39094__ReleaseDataBlock`
+- **Name:** `Class81940__ReleaseDataBlock`
 - **Tier:** A
-- **Evidence:** slot +0x084 (releaseAlloc); frees dataBuffer and clears dataReady -- the mirror DataSrc39094__LoadDataBlock itself calls before reallocating.
+- **Evidence:** slot +0x084 (releaseAlloc); frees dataBuffer and clears dataReady -- the mirror Class81940__LoadDataBlock itself calls before reallocating.
+
+## Track 4 (2026-09-26, round 87)
+
+Renamed `DataSrc39094__ReleaseDataBlock` -> `Class81940__ReleaseDataBlock` with `rename.py` (class rename only; +0x084). Callers: Class81940__Finalize, Class81940__LoadDataBlock, Class866E8__ResetAllElements and ObjM__CheckAuxTrigger. The class (method table D_80081940, id 0x903, a Class6D430 subclass) was named `Class81940` for its table address, as Class6D940 is (FINISHING-PLAN track 4 step 2); the old `DataSrc39094` was the unit's local view name, and dropping its unit suffix leaves `DataSrc`, which every Class6D430 subclass is. The unified definition is `include/Class81940.h`.
