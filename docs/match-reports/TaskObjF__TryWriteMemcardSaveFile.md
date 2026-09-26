@@ -54,7 +54,7 @@ s32 TaskObjF__TryWriteMemcardSaveFile(TaskObjF *self, s32 a1, s32 handle, u8 a3,
     McIconSource *src;
     McSaveHeader *req;
 
-    path = BuildMemcardPath((DeviceName866E8 *)pathBuf, self->cardSlot, (char *)a1);
+    path = BuildMemcardPath((McDevicePath *)pathBuf, self->cardSlot, (char *)a1);
     delete(path);
     openMode = ((((u32)arg7 + 0x21FF) >> 13) << 16) | 0x200;
     fileHandle = open(path, openMode);
@@ -322,7 +322,7 @@ s32 TaskObjF__TryWriteMemcardSaveFile(TaskObjF *self, s32 a1, s32 handle, s32 a3
     McSaveHeader *req;
 
     payload = arg6;
-    path = BuildMemcardPath((DeviceName866E8 *)pathBuf, self->cardSlot, (char *)a1);
+    path = BuildMemcardPath((McDevicePath *)pathBuf, self->cardSlot, (char *)a1);
     delete(path);
     openMode = ((((u32)arg7 + 0x21FF) >> 13) << 16) | 0x200;
     fileHandle = open(path, openMode);

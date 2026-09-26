@@ -265,12 +265,12 @@ extern void *BMemPMgrFree(void *ptr);
  * (natural alignment 1) so the whole-struct assignment in BuildMemcardPath
  * reproduces retail's unaligned lwl/lwr + byte-store copy, the same idiom
  * already documented for `Descriptor10` above. */
-typedef struct DeviceName866E8 {
+typedef struct McDevicePath {
     s8 b0, b1, b2, b3, b4, b5;
-} DeviceName866E8;
+} McDevicePath;
 
-extern DeviceName866E8 gMcDevicePath1; /* "bu10:" */
-extern DeviceName866E8 gMcDevicePath0; /* "bu00:" */
+extern McDevicePath gMcDevicePath1; /* "bu10:" */
+extern McDevicePath gMcDevicePath0; /* "bu00:" */
 
 /* This project's own strcat (matched elsewhere, src/code_171e0.c) --
  * BuildMemcardPath is this unit's only caller. */

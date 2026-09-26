@@ -52,7 +52,7 @@ this same unit share the shape).
 ## Track 4b (2026-09-25, round 85)
 
 `gMcDevicePath0`/`gMcDevicePath1` were declared `s32` here and
-`DeviceName866E8` in `include/class_3bb8c.h`. This unit now includes that
-header, `path` is a `DeviceName866E8 *`, and `format()` is declared with the
+`McDevicePath` in `include/class_3bb8c.h`. This unit now includes that
+header, `path` is a `McDevicePath *`, and `format()` is declared with the
 BIOS's device-name parameter (`char *`). Byte-identical; no new `-Wall`
 warning.
