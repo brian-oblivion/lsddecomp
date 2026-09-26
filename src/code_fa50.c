@@ -55,6 +55,18 @@ typedef struct Ray_fa50 {
 
 #define ABS_fa50(x) ((x) < 0 ? ~(x) + 1 : (x))
 
+/* TmdModel__RaycastFaces: *best before any face is hit (the largest s32). */
+#define DIST_NONE 0x7FFFFFFF
+
+/* One face's result in TmdModel__RaycastFaces: the segment's line meets the
+ * plane but not between origin and end (t < 0, or farther than end), meets
+ * it there, or is parallel to it (dir . normal is 0). */
+enum RayResult { RAY_MISS = 0, RAY_HIT = 1, RAY_PARALLEL = 2 };
+
+/* How far outside a face's bounding box (each axis, both sides) a plane hit
+ * still counts as on the face. */
+#define FACE_BOX_MARGIN 24
+
 /* The scratch VECTOR that also holds the candidate triangle's box. */
 typedef union VecBox_fa50 {
     VECTOR v;
@@ -242,10 +254,17 @@ void RotateAndOffsetHullList(HullList_fa50 *h, s32 turn, s32 back, s32 d) {
 
 /* Casts the segment origin..end against every triangle/quad of the model and
  * keeps the nearest hit: *best = its distance, *hitOut = the point, *height =
- * the point's y above the face's box. Returns whether anything was hit. The
- * VECTOR locals are scratch named by their frame slot; v60 is never used but
- * holds retail's slot, and dist is an 8-byte array because retail keeps it in
- * memory at the slot after uF0. */
+ * the point's y above the face's box. Returns whether anything was hit.
+ *
+ * Per face: the plane through its first three vertices (normal = edge1 x
+ * edge2 / ONE, d in plane.pad), the segment's parameter t on it as a 16.16
+ * quotient, the hit point origin + dir * t, kept if it is no farther than
+ * end and inside the face's box grown by FACE_BOX_MARGIN. The VECTOR locals
+ * are reused: edge1 becomes the hit point, edge2 its offset from the origin,
+ * cross the quotient's {denominator, 1}; quot is its {numerator, 1}, then
+ * the cross-multiplied numerator (vz) and denominator (pad); work holds the
+ * denominator then |dir| in vx, the face's RAY_* result in vy, and the
+ * origin's plane distance then |offset| in vz. */
 s32 TmdModel__RaycastFaces(TmdModel *self, s32 *best, TmdVec3 *hitOut, s32 *height, TmdVec3 *origin,
                            TmdVec3 *end) {
     TmdVec3 tri[4];
@@ -258,7 +277,7 @@ s32 TmdModel__RaycastFaces(TmdModel *self, s32 *best, TmdVec3 *hitOut, s32 *heig
     s32 found;
 
     count = 0;
-    *best = 0x7FFFFFFF;
+    *best = DIST_NONE;
     ray.org.x = origin->x;
     ray.org.y = origin->y;
     ray.org.z = origin->z;
@@ -267,18 +286,18 @@ s32 TmdModel__RaycastFaces(TmdModel *self, s32 *best, TmdVec3 *hitOut, s32 *heig
     ray.dir.z = end->z - origin->z;
     found = 0;
     while ((p = TmdModel__NextPrimitive(self, p, &nverts, tri, &count)) != NULL) {
-        VECTOR v60;
+        VECTOR unused; /* MATCHING: never read; keeps the frame's layout */
         TmdVertex e1;
         TmdVertex e2;
-        VECTOR v80;
-        VECTOR v90;
-        VECTOR vA0;
-        VECTOR vB0;
-        VECTOR vC0;
-        VECTOR vD0;
-        VECTOR vE0;
-        VecBox_fa50 uF0;
-        s32 dist[2];
+        VECTOR cross;
+        VECTOR edge1;
+        VECTOR edge2;
+        VECTOR quot;
+        VECTOR work;
+        VECTOR dirVec;
+        VECTOR dirSq;
+        VecBox_fa50 scratch;
+        s32 dist[2]; /* MATCHING: an array, so it stays in memory (dist[1] unused) */
         s32 frac;
         s32 q;
         s32 hi;
@@ -298,88 +317,88 @@ s32 TmdModel__RaycastFaces(TmdModel *self, s32 *best, TmdVec3 *hitOut, s32 *heig
         e2.x = tri[2].x - tri[0].x;
         e2.y = tri[2].y - tri[0].y;
         e2.z = tri[2].z - tri[0].z;
-        v90.vx = e1.x;
-        v90.vy = e1.y;
-        v90.vz = e1.z;
-        vA0.vx = e2.x;
-        vA0.vy = e2.y;
-        vA0.vz = e2.z;
-        OuterProduct0(&v90, &vA0, &v80);
-        plane.vx = v80.vx;
-        plane.vy = v80.vy;
-        plane.vz = v80.vz;
+        edge1.vx = e1.x;
+        edge1.vy = e1.y;
+        edge1.vz = e1.z;
+        edge2.vx = e2.x;
+        edge2.vy = e2.y;
+        edge2.vz = e2.z;
+        OuterProduct0(&edge1, &edge2, &cross);
+        plane.vx = cross.vx;
+        plane.vy = cross.vy;
+        plane.vz = cross.vz;
         plane.vx /= ONE;
         plane.vy /= ONE;
         plane.vz /= ONE;
         plane.pad = -(tri[0].x * plane.vx + tri[0].y * plane.vy + tri[0].z * plane.vz);
-        vC0.vx = ray.dir.x * plane.vx + ray.dir.y * plane.vy + ray.dir.z * plane.vz;
-        if (ABS_fa50(vC0.vx) <= 0) {
-            vC0.vy = 2;
+        work.vx = ray.dir.x * plane.vx + ray.dir.y * plane.vy + ray.dir.z * plane.vz;
+        if (ABS_fa50(work.vx) <= 0) {
+            work.vy = RAY_PARALLEL;
         } else {
-            vC0.vz = ray.org.x * plane.vx + ray.org.y * plane.vy + ray.org.z * plane.vz;
-            vC0.vz += plane.pad;
-            v80.vx = vC0.vx;
-            v80.vy = 1;
-            vB0.vx = -vC0.vz;
-            vB0.vy = 1;
-            vB0.vz = vB0.vx * v80.vy;
-            vB0.pad = vB0.vy * v80.vx;
-            if (ABS_fa50(vB0.pad) >= ONE) {
-                vB0.vz /= ONE;
-                vB0.pad /= ONE;
+            work.vz = ray.org.x * plane.vx + ray.org.y * plane.vy + ray.org.z * plane.vz;
+            work.vz += plane.pad;
+            cross.vx = work.vx;
+            cross.vy = 1;
+            quot.vx = -work.vz;
+            quot.vy = 1;
+            quot.vz = quot.vx * cross.vy;
+            quot.pad = quot.vy * cross.vx;
+            if (ABS_fa50(quot.pad) >= ONE) {
+                quot.vz /= ONE;
+                quot.pad /= ONE;
             }
-            frac = ABS_fa50(vB0.vz % vB0.pad) << 16;
-            q = vB0.vz / vB0.pad;
+            frac = ABS_fa50(quot.vz % quot.pad) << 16;
+            q = quot.vz / quot.pad;
             if (q != 0) {
                 hi = q << 16;
             } else {
-                hi = (vB0.vz * vB0.pad) & 0x80000000;
+                hi = (quot.vz * quot.pad) & 0x80000000;
             }
-            t = hi | (frac / ABS_fa50(vB0.pad));
+            t = hi | (frac / ABS_fa50(quot.pad));
             if (t < 0) {
-                vC0.vy = 0;
+                work.vy = RAY_MISS;
             } else {
-                vD0.vx = ray.dir.x;
-                vD0.vy = ray.dir.y;
-                vD0.vz = ray.dir.z;
-                vA0.vx = (ray.dir.x * t) >> 16;
-                v90.vx = ray.org.x + vA0.vx;
-                vA0.vx = v90.vx - ray.org.x;
-                vA0.vy = (ray.dir.y * t) >> 16;
-                v90.vy = ray.org.y + vA0.vy;
-                vA0.vy = v90.vy - ray.org.y;
-                vA0.vz = (ray.dir.z * t) >> 16;
-                v90.vz = ray.org.z + vA0.vz;
-                vA0.vz = v90.vz - ray.org.z;
-                Square0(&vD0, &vE0);
-                vC0.vx = vE0.vx + vE0.vy + vE0.vz;
-                vC0.vx = SquareRoot0(vC0.vx);
-                Square0(&vA0, &uF0.v);
-                vC0.vz = uF0.v.vx + uF0.v.vy + uF0.v.vz;
-                vC0.vz = SquareRoot0(vC0.vz);
-                if (vC0.vx >= vC0.vz) {
-                    dist[0] = vC0.vz;
-                    vC0.vy = 1;
-                    hit.x = v90.vx;
-                    hit.y = v90.vy;
-                    hit.z = v90.vz;
+                dirVec.vx = ray.dir.x;
+                dirVec.vy = ray.dir.y;
+                dirVec.vz = ray.dir.z;
+                edge2.vx = (ray.dir.x * t) >> 16;
+                edge1.vx = ray.org.x + edge2.vx;
+                edge2.vx = edge1.vx - ray.org.x;
+                edge2.vy = (ray.dir.y * t) >> 16;
+                edge1.vy = ray.org.y + edge2.vy;
+                edge2.vy = edge1.vy - ray.org.y;
+                edge2.vz = (ray.dir.z * t) >> 16;
+                edge1.vz = ray.org.z + edge2.vz;
+                edge2.vz = edge1.vz - ray.org.z;
+                Square0(&dirVec, &dirSq);
+                work.vx = dirSq.vx + dirSq.vy + dirSq.vz;
+                work.vx = SquareRoot0(work.vx);
+                Square0(&edge2, &scratch.v);
+                work.vz = scratch.v.vx + scratch.v.vy + scratch.v.vz;
+                work.vz = SquareRoot0(work.vz);
+                if (work.vx >= work.vz) {
+                    dist[0] = work.vz;
+                    work.vy = RAY_HIT;
+                    hit.x = edge1.vx;
+                    hit.y = edge1.vy;
+                    hit.z = edge1.vz;
                 } else {
-                    vC0.vy = 0;
+                    work.vy = RAY_MISS;
                 }
             }
         }
-        if (vC0.vy != 1) {
+        if (work.vy != RAY_HIT) {
             continue;
         }
-        minx = &uF0.b.min.x;
-        miny = &uF0.b.min.y;
-        minz = &uF0.b.min.z;
-        maxx = &uF0.b.max.x;
-        maxy = &uF0.b.max.y;
-        maxz = &uF0.b.max.z;
+        minx = &scratch.b.min.x;
+        miny = &scratch.b.min.y;
+        minz = &scratch.b.min.z;
+        maxx = &scratch.b.max.x;
+        maxy = &scratch.b.max.y;
+        maxz = &scratch.b.max.z;
         v = tri;
-        uF0.b.min = *v;
-        uF0.b.max = uF0.b.min;
+        scratch.b.min = *v;
+        scratch.b.max = scratch.b.min;
         for (i = 0; i < nverts - 1; i++) {
             v++;
             if (v->x < *minx)
@@ -395,8 +414,9 @@ s32 TmdModel__RaycastFaces(TmdModel *self, s32 *best, TmdVec3 *hitOut, s32 *heig
             if (*maxz < v->z)
                 *maxz = v->z;
         }
-        if (hit.x < uF0.b.min.x - 24 || hit.y < uF0.b.min.y - 24 || hit.z < uF0.b.min.z - 24 ||
-            uF0.b.max.x + 24 < hit.x || uF0.b.max.y + 24 < hit.y || uF0.b.max.z + 24 < hit.z) {
+        if (hit.x < scratch.b.min.x - FACE_BOX_MARGIN || hit.y < scratch.b.min.y - FACE_BOX_MARGIN ||
+            hit.z < scratch.b.min.z - FACE_BOX_MARGIN || scratch.b.max.x + FACE_BOX_MARGIN < hit.x ||
+            scratch.b.max.y + FACE_BOX_MARGIN < hit.y || scratch.b.max.z + FACE_BOX_MARGIN < hit.z) {
             continue;
         }
         found = 1;
@@ -404,7 +424,7 @@ s32 TmdModel__RaycastFaces(TmdModel *self, s32 *best, TmdVec3 *hitOut, s32 *heig
             *best = dist[0];
             *hitOut = hit;
             if (height != NULL) {
-                *height = hit.y - uF0.b.min.y;
+                *height = hit.y - scratch.b.min.y;
             }
         }
     }

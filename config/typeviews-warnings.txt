@@ -68,5 +68,5 @@ code_d294_b: warning: unused variable `pad'
 code_d294_b: warning: unused variable `unused'
 code_fa50: warning: `p' might be used uninitialized in this function
 code_fa50: warning: `size' might be used uninitialized in this function
-code_fa50: warning: unused variable `v60'
+code_fa50: warning: unused variable `unused'
 libcd_bios: warning: passing arg 2 of `CD_cw' makes integer from pointer without a cast
