@@ -28,7 +28,7 @@ by checking its two call sites (`code_171e0/func_80026CAC.s`,
 register set up beforehand.
 
 `VabDriverMethods` is declared in this unit's own top-of-file scaffolding
-(added alongside `func_8002C408`'s match, same commit chain) -- see that
+(added alongside `VabDriver__Read`'s match, same commit chain) -- see that
 struct definition for the class-framework correction this round made to the
 unit's header comment.
 

@@ -1,11 +1,13 @@
-# func_8002C408 -- MATCHED (2/2 words)
+# VabDriver__Read -- MATCHED (2/2 words)
+
+> Renamed from `func_8002C408` on 2026-09-26 (tools/rename.py). Address 0x8002c408.
 
 Unit: `code_179d8_e`. Runner: echo, round 17.
 
 ## Result
 
 ```c
-s32 func_8002C408(void) {
+s32 VabDriver__Read(void) {
     return 0;
 }
 ```
@@ -39,7 +41,7 @@ that slice's own globals.
 
 ## Naming
 
-Kept `func_8002C408`, tier C. The CLASS is now established (round 52:
+Kept `func_8002C408`, tier C (superseded 2026-09-26, Track 4 below). The CLASS is now established (round 52:
 `gVabDriverMethods`, the generic driver-interface base class
 `VabStreamObj` chains its own ctor/close through when
 `gActiveDataSource == 0x23` -- see `src/code_179d8_e.c`'s unit header
@@ -48,3 +50,17 @@ body is `return 0;` and nothing in this unit calls the slot directly (only
 the vtable data references it). No positive evidence for what a caller
 would do with the return value, so no `VabDriverMethods__...` name --
 a wrong tier-A guess here would be worse than the placeholder.
+
+## Track 4 (2026-09-26, round 87, alpha): renamed `func_8002C408` -> `VabDriver__Read`
+
+Named for its slot, FINISHING-PLAN track 4 step 6. `classtable.py
+gVabDriverMethods --vs D_8006D430` puts this function at `+0x054`, one of
+Class6D430's run-time-bound driver-interface slots (`include/Class6D430.h`
+names it `read`; the CD driver's occupant is `Class6D4E8__Read`).
+`SetActiveDataSource` (code_171e0.c) copies the active driver's interface
+slots into Class6D430's table and every client table, and takes this table
+(`GetVabDriverMethods()`) whenever `gActiveDataSource != DATASOURCE_CD`, so
+when the SPU/VAB source is active every `methods->read(...)` in the game
+reaches this body. The purpose evidence the tier-C verdict above lacked is
+the slot's, not the body's: the body does nothing, which is what the VAB
+driver does for that interface call. Unified into `include/VabDriver.h`.
