@@ -176,7 +176,7 @@ s32 FadeBox__Configure(FadeBox *self, BasicClass *source, s32 channels, s32 arg3
     }
     q2 = self->mask;
     q2 = q2 / self->ticksLeft;
-    self->unk84 = q2;
+    self->maskPerTick = q2;
     methods->addChild(self, source);
     methods->setSemiTrans(self, 1);
     methods->setSemiTransRate(self, rate);

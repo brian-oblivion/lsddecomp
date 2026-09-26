@@ -69,11 +69,11 @@ struct FadeBox {
     /* +0x078 */ s32 channels; /* the mask configure stored (0 as 0xF): which bytes update steps, which colour getColor returns */
     /* +0x07C */ s32 unk7C;     /* configure's third argument; update does not step while it is 9 */
     /* +0x080 */ s32 ticksLeft; /* configure: 0x100 / step; update counts it down and stops at 0 */
-    /* +0x084 */ s32 unk84;     /* configure: BoxFill's mask / ticksLeft; no reader */
-    /* +0x088 */ s32 savedW;    /* pushPosition's copy of boxW, restored by popPosition */
-    /* +0x08C */ s32 savedH;    /* ... of boxH */
-    /* +0x090 */ s32 savedPosX; /* ... of posX (copied with posY as one Pair32E99C) */
-    /* +0x094 */ s32 savedPosY; /* ... of posY */
+    /* +0x084 */ s32 maskPerTick; /* configure: BoxFill's mask / ticksLeft; no reader */
+    /* +0x088 */ s32 savedW;      /* pushPosition's copy of boxW, restored by popPosition */
+    /* +0x08C */ s32 savedH;      /* ... of boxH */
+    /* +0x090 */ s32 savedPosX;   /* ... of posX (copied with posY as one Pair32E99C) */
+    /* +0x094 */ s32 savedPosY;   /* ... of posY */
     /* +0x098 */ s32 altMode; /* setDivisorMode: shortens ticksLeft by 1/divisor; startFadeUp keeps the colour */
     /* +0x09C */ s32 divisor; /* setDivisorMode */
 };
