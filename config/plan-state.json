@@ -842,6 +842,11 @@
     },
     "4": {
       "classes": {
+        "DREAMSYS_METHODS": {
+          "class": "DreamSys",
+          "date": "2026-09-26",
+          "header": "include/DreamSys.h"
+        },
         "D_8006B58C": {
           "class": "BasicClass",
           "date": "2026-09-25",
