@@ -109,4 +109,4 @@ green after the change.
 | field | name | tier | evidence |
 | --- | --- | --- | --- |
 | `UnkSlotEntry+0x014` | `heldObj` | B | Released here through the shared BasicClass `release` slot with the store-back shape `x = x->methods->release(x)`, and zeroed by the ctor. The name claims only that the entry holds an object it owns. |
-| `StageMap+0x1BC` | `lastEventElem` | B | Written only here, with the element the event concerned. `class_3bb8c`'s `StageMap__GetLastTargetRateSplit` reads `unk1BC->unk4` and treats it as an `ElemTarget *`, which is exactly `Elem::unk4` -- independent confirmation that the pointer is an element. |
+| `StageMap+0x1BC` | `lastEventElem` | B | Written only here, with the element the event concerned. `class_3bb8c`'s `StageMap__GetLastEventSlotChunk` reads `unk1BC->unk4` and treats it as an `ElemTarget *`, which is exactly `Elem::unk4` -- independent confirmation that the pointer is an element. |

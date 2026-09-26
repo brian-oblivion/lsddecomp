@@ -598,7 +598,7 @@ void StageMap__SplitChunkIndex(StageMap *self, u8 *out, s32 val) {
     out[1] = val / self->config->columns;
 }
 
-ChunkSlot *StageMap__GetLastTargetRateSplit(StageMap *self, u8 *out) {
+ChunkSlot *StageMap__GetLastEventSlotChunk(StageMap *self, u8 *out) {
     StageMap__SplitChunkIndex(self, out, self->lastEventElem->loader->chunkIndex);
     return self->lastEventElem;
 }

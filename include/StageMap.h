@@ -224,7 +224,7 @@ struct StageMapMethods {
                                                       void **outPos); /* StageMap__GetTargetDescriptor */
     /* +0x110 */ s32 (*computeFootprintDescriptor)(StageMap *self, Descriptor10Ext *out,
                                                    SplitLongVec3 *pos); /* StageMap__ComputeFootprintDescriptor: 0, or 1 when no element holds pos */
-    /* +0x114 */ ChunkSlot *(*getLastTargetRateSplit)(StageMap *self, u8 *out); /* StageMap__GetLastTargetRateSplit */
+    /* +0x114 */ ChunkSlot *(*getLastTargetRateSplit)(StageMap *self, u8 *out); /* StageMap__GetLastEventSlotChunk */
     /* +0x118 */ ChunkSlot *(*findElemByUnk32)(StageMap *self, s32 key); /* StageMap__FindSlotByNeighbour */
     /* +0x11C */ ChunkSlot *(*findElementForPosition)(StageMap *self, LongVec3 *pos); /* StageMap__FindElementForPosition */
     /* +0x120 */ s32 (*findElemIndexByUnk32)(StageMap *self, s32 key); /* StageMap__FindSlotIndexByNeighbour */
@@ -330,7 +330,7 @@ void StageMap__ResetElementCells(StageMap *self, ChunkSlot *elem);
 Descriptor10 *StageMap__GetTargetDescriptor(StageMap *self, Descriptor10Ext *out, void **outPos);
 s32 StageMap__ComputeFootprintDescriptor(StageMap *self, Descriptor10Ext *out, SplitLongVec3 *pos);
 void StageMap__SplitChunkIndex(StageMap *self, u8 *out, s32 val);
-ChunkSlot *StageMap__GetLastTargetRateSplit(StageMap *self, u8 *out);
+ChunkSlot *StageMap__GetLastEventSlotChunk(StageMap *self, u8 *out);
 ChunkSlot *StageMap__FindSlotByNeighbour(StageMap *self, s32 key);
 ChunkSlot *StageMap__FindElementForPosition(StageMap *self, LongVec3 *pos);
 s32 StageMap__FindSlotIndexByNeighbour(StageMap *self, s32 key);
