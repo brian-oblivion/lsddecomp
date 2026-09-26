@@ -1,16 +1,18 @@
-# TitleMenu__DestroyNameField -- MATCH
+# TitleMenu__DestroySaveTitle -- MATCH
+
+> Renamed from `TitleMenu__DestroyNameField` on 2026-09-26 (tools/rename.py). Address 0x8004dc08.
 
 > Renamed from `Class86B60__DestroyNameField` on 2026-09-26 (tools/rename.py). Address 0x8004dc08.
 
 > Renamed from `func_8004DC08` on 2026-09-24 (tools/rename.py). Address 0x8004dc08.
 
 Unit `class_3bb8c_d`, round 14. `./build-and-verify.sh` exit 0; whole-image
-SHA1 matches retail. `funcdiff.py TitleMenu__DestroyNameField`: 23/23 words match.
+SHA1 matches retail. `funcdiff.py TitleMenu__DestroySaveTitle`: 23/23 words match.
 
 ## Source
 
 ```c
-void TitleMenu__DestroyNameField(TitleMenu *self)
+void TitleMenu__DestroySaveTitle(TitleMenu *self)
 {
     self->nameField->methods->release(self->nameField);
     Get_vtable_TaskCore()->slotDC(self);
@@ -36,7 +38,7 @@ None new.
 
 ## Naming (round 77, naming runner delta)
 
-Renamed `func_8004DC08` -> `TitleMenu__DestroyNameField`. **Tier B**: Unconditionally releases `self->nameField` (the sub-object `TitleMenu__CreateSaveTitle` constructs) then forwards to the base class's own `slotDC`. Mirror-image counterpart to `CreateNameField`; not the class's own destructor (that is `TitleMenu__Finalize`, a different base slot).
+Renamed `func_8004DC08` -> `TitleMenu__DestroySaveTitle`. **Tier B**: Unconditionally releases `self->nameField` (the sub-object `TitleMenu__CreateSaveTitle` constructs) then forwards to the base class's own `slotDC`. Mirror-image counterpart to `CreateNameField`; not the class's own destructor (that is `TitleMenu__Finalize`, a different base slot).
 
 ## Track 4 (2026-09-25, round 84, alpha)
 

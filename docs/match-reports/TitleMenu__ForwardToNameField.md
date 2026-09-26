@@ -18,15 +18,15 @@ void TitleMenu__ForwardToNameField(TitleMenu *self, s32 arg1)
 ```
 
 First attempt, byte-exact. Two calls: base table forward, then a second
-slot on `self->nameField` (the sub-object `TitleMenu__DestroyNameField` releases).
+slot on `self->nameField` (the sub-object `TitleMenu__DestroySaveTitle` releases).
 
 ## Struct changes (additive, `include/class_3bb8c.h`)
 
 - `TitleMenu::nameField` **retyped** from the generic
-  `GenericReleaseObj_3bb8c_d *` (set by `TitleMenu__DestroyNameField`'s report) to a new
+  `GenericReleaseObj_3bb8c_d *` (set by `TitleMenu__DestroySaveTitle`'s report) to a new
   dedicated `TitleMenuUnkB0Obj_3bb8c_d *`, which carries BOTH the shared
   `release` slot at `+0x004` (same signature as before, so
-  `TitleMenu__DestroyNameField`'s call site is unaffected) and this function's own
+  `TitleMenu__DestroySaveTitle`'s call site is unaffected) and this function's own
   `+0x04C` slot. Done because `iconHandle`/`unkAC` never reach a second slot
   and there is no evidence they share this fuller shape -- keeping
   `nameField` on its own local view avoids projecting one instance's richer

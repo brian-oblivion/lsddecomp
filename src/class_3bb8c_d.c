@@ -145,7 +145,7 @@ void TitleMenu__CreateSaveTitle(TitleMenu *self, TaskCoreTarget *target) {
     BMemPMgrFree(buf);
 }
 
-void TitleMenu__DestroyNameField(TitleMenu *self) {
+void TitleMenu__DestroySaveTitle(TitleMenu *self) {
     self->nameField->methods->release(self->nameField);
     Get_vtable_TaskCore()->releaseTarget((TaskCore *)self);
 }

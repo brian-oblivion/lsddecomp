@@ -117,7 +117,7 @@ void TitleMenu__SetState(TitleMenu *self, s32 state);
 void TitleMenu__Tick(TitleMenu *self);
 void TitleMenu__RefreshViewValue(TitleMenu *self);
 void TitleMenu__CreateSaveTitle(TitleMenu *self, TaskCoreTarget *target);
-void TitleMenu__DestroyNameField(TitleMenu *self);
+void TitleMenu__DestroySaveTitle(TitleMenu *self);
 void TitleMenu__ForwardToNameField(TitleMenu *self, void *parent);
 void TitleMenu__TickNameFieldCursor(TitleMenu *self, struct SpriteRgb *color);
 void TitleMenu__RefreshMenu(TitleMenu *self);
