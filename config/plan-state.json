@@ -968,6 +968,11 @@
           "date": "2026-09-26",
           "header": "include/VabDriver.h"
         },
+        "gVabStreamObjMethods": {
+          "class": "VabStreamObj",
+          "date": "2026-09-26",
+          "header": "include/VabStreamObj.h"
+        },
         "gViewportMethods": {
           "class": "Viewport",
           "date": "2026-09-25",
