@@ -175,13 +175,13 @@ gPendingVabBuffer
 gSoundEffectDirPtr
 gStartupBMemPMgr
 gStyleClearColor
-gStyleColorTable
 gStyleConfigIndex
 gStyleCueRecordIndex
 gStyleCueSelf
 gStyleCueSlots
 gStyleDay
 gStyleDecorColor
+gStyleDecorColors
 gStyleDecorObj
 gStyleDecorPosAX
 gStyleDecorPosAY

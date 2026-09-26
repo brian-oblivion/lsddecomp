@@ -329,7 +329,7 @@ done would have produced.
 
 ```c
 extern s32 gStyleDecorVariant;
-extern s32 gStyleColorTable;
+extern s32 gStyleDecorColors;
 extern u8 gStyleDecorColorsB[];
 extern u8 gStyleSpawnOffsetX[];
 extern s32 gStyleCueSelf;
@@ -350,7 +350,7 @@ void **StyleFillEffectKind3(void **arg0, void *arg1) {
     u8 **q;
 
     SetupStyleSpawnParamsA(arg1, (void *) D_80087330);
-    if (gStyleDecorVariant != 0 && gStyleColorTable == (s32) gStyleDecorColorsB) {
+    if (gStyleDecorVariant != 0 && gStyleDecorColors == (s32) gStyleDecorColorsB) {
         *(s32 *) gStyleSpawnOffsetX = 0xFFFF5000;
         gStyleSpawnOffsetY = -0x2000;
         gStyleSpawnOffsetZ = 0;

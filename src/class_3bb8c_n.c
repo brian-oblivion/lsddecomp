@@ -75,7 +75,7 @@ extern s32 gStyleVariantConfigs[];
 extern s32 gStyleClearColor;
 extern u8 gStyleDecorColorsB[];
 extern u8 gStylePalette[];
-extern s32 gStyleColorTable;
+extern s32 gStyleDecorColors;
 extern u8 gStyleDecorColorsA[];
 extern s32 gStyleDecorVariant;
 
@@ -104,7 +104,7 @@ void *PickStyleFallbackConfig(void) {
         if (b2 != 0x12) {
             tab = gStyleDecorColorsA;
         }
-        gStyleColorTable = (s32)tab;
+        gStyleDecorColors = (s32)tab;
         if (remainder < 4) {
             gStyleDecorVariant = 1;
         } else if (remainder < 6) {
@@ -153,7 +153,7 @@ struct PairXY {
  * (attachToParent, +0x04C) to slot 0, then attaches slot 0 to the target object's slotAC
  * result.  MATCHED round 76 (charlie): an indexed for loop -- loop.c's
  * strength reduction produces both the slot walker and the colour-table
- * stride (`gStyleColorTable + i * 3`), which earlier rounds had written as
+ * stride (`gStyleDecorColors + i * 3`), which earlier rounds had written as
  * hand-rolled pointer/counter variables.  See
  * docs/match-reports/StyleBuildDecorSet.md. */
 void StyleBuildDecorSet(void) {
@@ -172,9 +172,9 @@ void StyleBuildDecorSet(void) {
         paramA.y += 0x1E;
     }
     paramB = *(PairXY *)&gStyleDecorPosBX;
-    gStyleDecorSlots[0] = New_BoxFill(&paramB, (void *)gStyleColorTable, 0x1FFF);
+    gStyleDecorSlots[0] = New_BoxFill(&paramB, (void *)gStyleDecorColors, 0x1FFF);
     for (i = 1; i < 0x12; i++) {
-        obj = New_BoxFill(&paramB, (void *)(gStyleColorTable + i * 3), 0x1FFF);
+        obj = New_BoxFill(&paramB, (void *)(gStyleDecorColors + i * 3), 0x1FFF);
         gStyleDecorSlots[i] = obj;
         ((BoxFillAttachToParentFn)((BoxFill *)obj)->methods->attachToParent)(obj, gStyleDecorSlots[0],
                                                                              (Pair32E99C *)&paramA);
@@ -252,7 +252,7 @@ void StyleUpdateDecorSet(void) {
     srcOfs = 0;
     pos.y += shift * 3;
     do {
-        AdjustRgbByDelta(rgb, (u8 *)(srcOfs + gStyleColorTable), shift);
+        AdjustRgbByDelta(rgb, (u8 *)(srcOfs + gStyleDecorColors), shift);
         obj = (ObjSlotB8B8 *)*wp;
         obj->methods->slotB8(obj, 1, rgb);
         obj = (ObjSlotB8B8 *)*wp;
@@ -485,7 +485,7 @@ Class876FC **StyleFillEffectKind3(Class876FC **arg0, LongVec3 *arg1) {
     PtrBoxK3 *q;
 
     SetupStyleSpawnParamsA(arg1, (void *)D_80087330);
-    if (gStyleDecorVariant != 0 && gStyleColorTable == (s32)gStyleDecorColorsB) {
+    if (gStyleDecorVariant != 0 && gStyleDecorColors == (s32)gStyleDecorColorsB) {
         gStyleSpawnOffsetX = 0xFFFF5000;
         gStyleSpawnOffsetY = -0x2000;
         gStyleSpawnOffsetZ = 0;

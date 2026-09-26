@@ -27,7 +27,7 @@ extern s32 gStyleVariantConfigs[];       /* array of raw base addresses, indexed
 extern s32 gStyleClearColor;
 extern u8 gStyleDecorColorsB[];        /* address only taken */
 extern u8 gStylePalette[];        /* 3-byte-stride table, indexed by a byte field */
-extern s32 gStyleColorTable;
+extern s32 gStyleDecorColors;
 extern u8 gStyleDecorColorsA[];        /* address only taken */
 extern s32 gStyleDecorVariant;
 ```
@@ -60,7 +60,7 @@ void *PickStyleFallbackConfig(void) {
         if (b2 != 0x12) {
             tab = gStyleDecorColorsA;
         }
-        gStyleColorTable = (s32) tab;
+        gStyleDecorColors = (s32) tab;
         if (remainder < 4) {
             gStyleDecorVariant = 1;
         } else if (remainder < 6) {
