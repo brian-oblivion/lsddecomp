@@ -130,16 +130,11 @@ extern s32 D_8008E248;
  * definition in the .c file. */
 extern s32 TransformAndCullPoly(void *arg0, void *arg1);
 
-/* Called by ProjectTriFace/ProjectQuadFace at the end of a face that was not
- * culled. `count` is the face's VERTEX COUNT (3 or 4), not a primitive-kind
- * code: docs/match-reports/FlagLargePolyForDivide.md derives the body, which walks
- * `count` screen-XY pairs from ctx+0x64 to ctx + 0x5C + count*4, tracks the
- * 2D bounding box in +0x70../+0x76 and sets the culled flag at +0x78 when
- * either span reaches 0x101. The older "3 = triangle, 4 = quad" wording here
- * read the right numbers off the call sites for the wrong reason; corrected
- * round 51. `ctx` (named round 77) is the same per-face draw context
- * TransformAndCullPoly above documents -- its SXY0-2 cache and culled flag
- * are exactly the fields this function reads and sets. code_8220_c, round 13. */
+/* code_8220_c. Called by ProjectTriFace/ProjectQuadFace for a face that
+ * survived the cull: takes the screen bounding box of its `count` (3 or 4)
+ * cached XYs and sets ctx+0x78, the flag that makes the SubmitPoly*
+ * wrappers subdivide the face through RCpoly*, when the box is wider or
+ * taller than 256 pixels. */
 extern void FlagLargePolyForDivide(void *ctx, s32 count);
 
 /* The two subdivision work buffers code_8220_c's SubmitPoly* wrappers hand

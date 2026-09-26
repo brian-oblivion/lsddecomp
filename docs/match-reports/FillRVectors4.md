@@ -347,3 +347,13 @@ only confirmed instance of this mistake found so far project-wide.
 `func_8001A4C0` -> `FillRVectors4`. **Tier A**: same pure-leaf-copy
 reasoning as FillRVectors3, which this function forwards to (elements 0-2)
 before doing its own element-3 copy. Parameters unchanged.
+
+## Round 91 polish (bravo)
+
+Renamed from `CopyPolyVtx4` (`python3 tools/rename.py CopyPolyVtx4
+FillRVectors4`). **Tier A.** Same retyping as FillRVectors3 (RVECTOR,
+SVECTOR, DVECTOR); body `FillRVectors3(dst, src, sxy0, sxy1, sxy2);
+dst[3]->v = *src[3]; dst[3]->sxy = *sxy3;`, byte-identical. The shared
+header's old extern comment ("extends CopyPolyVtx3 to a 4th vertex ...
+round 20") is this report's ROUND 20 section; the prototype now lives in
+code_8220_c.c.

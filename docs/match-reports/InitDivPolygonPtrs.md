@@ -61,3 +61,36 @@ vertex-record pointer slots (the same `ctx+0x88`/`ctx+0x94` the Submit*
 wrappers later read). WHY `table` also keeps its own mirror copy of the
 same pointers (at `+0xA8`/`+0xF0`) is not established, so the function
 name states only the mechanics, not that purpose.
+
+## Round 91 polish (bravo): the open question is answered
+
+Renamed from `InitVtxRecordPtrs` (`python3 tools/rename.py InitVtxRecordPtrs
+InitDivPolygonPtrs`). **Tier A.** Round 77 left open WHY the "table" keeps
+its own copy of the pointers. The table is Sony's `DIVPOLYGON3` /
+`DIVPOLYGON4` (libgte.h): `+0x18` is `r0` (RVECTORs are 0x18 bytes, the
+stride), and the mirror array is the first recursion level's vertex
+pointers, `cr[0].r0..` -- `0x18 + 3*0x18 + 0x48 = 0xA8` in a DIVPOLYGON3
+and `0x18 + 4*0x18 + 0x78 = 0xF0` in a DIVPOLYGON4, the two offsets the body
+selects between. Body now:
+
+```c
+void InitDivPolygonPtrs(RVECTOR **vtxPtrs, void *divp, s32 nverts) {
+    RVECTOR *rv = &((DIVPOLYGON3 *)divp)->r0;
+    RVECTOR **ctxPtr = vtxPtrs;
+    RVECTOR **crPtr =
+        (nverts == 4) ? &((DIVPOLYGON4 *)divp)->cr[0].r0 : &((DIVPOLYGON3 *)divp)->cr[0].r0;
+
+    while (nverts-- > 0) {
+        *crPtr = rv;
+        *ctxPtr = rv;
+        rv++;
+        crPtr++;
+        ctxPtr++;
+    }
+}
+```
+
+`kind` -> `nverts` (it is only ever 3 or 4 and is the loop count),
+`dst`/`src`/`dst0`/`dst1` -> `vtxPtrs`/`rv`/`ctxPtr`/`crPtr`. Byte-identical.
+`divp` stays `void *` because code_8220_b passes both buffers through its
+own `void *` prototype.

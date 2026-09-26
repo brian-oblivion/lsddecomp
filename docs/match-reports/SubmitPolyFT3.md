@@ -431,3 +431,16 @@ This function's own discriminator: the splice arm returns
 `prim + 0x20` = `sizeof(POLY_FT3)`, and the calls arm falls straight
 into `jal RCpolyFT3`. `prim`/`ctx` match the parameter names code_8220_b's
 own `extern void *SubmitPolyFT3(void *prim, void *ctx);` view already used.
+
+## Round 91 polish (bravo)
+
+Retyped with Sony's structs like the rest of the family; SubmitPolyF3's
+report has the details (POLY_*, DIVPOLYGON3/4, RVECTOR, addPrim, Sony's
+RCpoly* prototype, the renamed `gDivPolygon3`/`gDivPolygon4`). Byte-identical
+on the first build. The field reads, for this primitive:
+
+`FillDivPolygonHeader(gDivPolygon3, ctx, (CVECTOR *)&prim->r0, 1, prim->clut,
+prim->tpage)`; RVECTOR `pad` from `prim->pad1` for all three; RVECTOR `uv`
+from `u0v0`, `u1v1`, `u2v2` as one `u_short` each
+(`*(u_short *)ctx->triVtx[i]->uv = *(u_short *)&prim->u0`). Returns
+`prim + 1` (0x20).

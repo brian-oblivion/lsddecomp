@@ -50,3 +50,9 @@ below). Offsets `0x8`/`0x10`/`0x18` (true branch) and `0x20` (false
 branch) match POLY_FT4's xy0..xy3 layout exactly as StoreSxyPolyG4's for
 POLY_G4. `storeFirst3` matches the already-established parameter name on
 StoreSxyPolyF4/StoreSxyPolyG4.
+
+## Round 91 polish (bravo)
+
+`dst` is now `POLY_FT4 *prim` (libgpu.h) and the else branch is
+`gte_stsxy2(&prim->x3)`: the `char *p = dst + 0x20` local was not needed
+(byte-identical without it). Parameter names unchanged (`storeFirst3`).

@@ -77,3 +77,13 @@ FillDivPolygonHeader's header word 0 comes from `code` (stored only when
 `enable` is set) or the per-object D_80090C18 default. Matches the
 globals it writes, `sNdivOverrideSet`/`sNdivOverride` (named
 alongside this function).
+
+## Round 91 polish (bravo)
+
+Renamed from `SetPolyOtCodeOverride` (`python3 tools/rename.py
+SetPolyOtCodeOverride SetNdivOverride`), with its globals
+(`sNdivOverrideSet`, `sNdivOverride`). **Tier A.** The word
+FillDivPolygonHeader takes from `sNdivOverride` is stored at DIVPOLYGON
+`+0x0`, which is Sony's `ndiv` (number of subdivisions), not an OT code.
+Parameter `code` -> `ndiv`. No caller anywhere in the image (no `jal`, no
+table word holding 0x8001A54C).

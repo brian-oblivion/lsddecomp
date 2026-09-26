@@ -184,3 +184,23 @@ first attempt.)
 ARE its purpose (copy 3 vertices' xy+uv from src to dst), already
 documented in this report's HEAD REWORK section. Parameters (`dst`, `src`,
 `uv0..uv2`) were already named at match time; unchanged.
+
+## Round 91 polish (bravo)
+
+Renamed from `CopyPolyVtx3` (`python3 tools/rename.py CopyPolyVtx3
+FillRVectors3`). **Tier A.** The element type round 13 called `PolyVtx` is
+Sony's `RVECTOR` (libgte.h: `SVECTOR v; u_char uv[2]; u_short pad; CVECTOR
+c; DVECTOR sxy; u_long sz;`, 0x18 bytes), its `xy` payload (`PolyXY8`,
+four s16) is `v`, an SVECTOR copied from the model vertex, and its `uv`
+payload (`PolyUV4`, two s16) is `sxy`, the screen XY: the three sources
+the callers pass are the primitive's `x0y0`/`x1y1`/`x2y2`. Signature now
+`void FillRVectors3(RVECTOR **dst, SVECTOR **src, DVECTOR *sxy0, DVECTOR
+*sxy1, DVECTOR *sxy2)`, body `dst[i]->v = *src[i]; ... dst[i]->sxy =
+*sxyi;`, byte-identical. SVECTOR and DVECTOR are all-short, so the
+alignment-2 idiom this report documents still holds with Sony's types; the
+function keeps one `MATCHING:` line saying so. `PolyVtx`, `PolyXY8` and
+`PolyUV4` are deleted from include/code_8220.h (only this unit used them).
+
+`CLAUDE.md` HARD RULE 6 cites this function as "`func_8001A3EC` (now
+`CopyPolyVtx3`)"; rename.py does not rewrite rule docs, so that reference is
+proposed to the head.

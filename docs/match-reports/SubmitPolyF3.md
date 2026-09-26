@@ -1295,3 +1295,49 @@ This function's own discriminator: the splice arm returns
 `prim + 0x14` = `sizeof(POLY_F3)`, and the calls arm falls straight
 into `jal RCpolyF3`. `prim`/`ctx` match the parameter names code_8220_b's
 own `extern void *SubmitPolyF3(void *prim, void *ctx);` view already used.
+
+## Round 91 polish (bravo): Sony's types, and where the old comments went
+
+The unit now includes `<libgte.h>` and `<libgpu.h>`, and every raw offset in
+the eight SubmitPoly* wrappers is a Sony field: `prim` is libgpu's
+`POLY_F3` (and siblings), the work buffers `gDivPolygon3`/`gDivPolygon4`
+(renamed from `gPolySubmitTableTri`/`gPolySubmitTableQuad`) are libgte's
+`DIVPOLYGON3`/`DIVPOLYGON4`, `ctx+0x88`/`+0x94` are `RVECTOR *[3]`/`[4]`
+pointing at those buffers' `r0..`, and `ctx+0xA4` is `SVECTOR *[4]`. The
+function now reads:
+
+```c
+u_long *SubmitPolyF3(POLY_F3 *prim, PolyDrawCtx *ctx) {
+    if (ctx->divide != 0) {
+        FillDivPolygonHeader(gDivPolygon3, ctx, (CVECTOR *)&prim->r0, 0, 0, 0);
+        FillRVectors3(ctx->triVtx, ctx->srcVtx, (DVECTOR *)&prim->x0, (DVECTOR *)&prim->x1,
+                      (DVECTOR *)&prim->x2);
+        return RCpolyF3(prim, (DIVPOLYGON3 *)gDivPolygon3);
+    }
+    addPrim(ctx->otSlot, prim);
+    return (u_long *)(prim + 1);
+}
+```
+
+Byte-identical on the first build, for all eight wrappers.
+
+- **The RCpoly* return type is settled.** Sony's own prototype is
+  `extern u_long *RCpolyF3(POLY_F3 *s, DIVPOLYGON3 *divp);` (libgte.h,
+  inside a comment block because libgte.h does not include libgpu.h). The
+  unit declares the eight prototypes itself, verbatim, so the
+  `void *(*)(void *, void *)` casts round 75 needed are gone, and so is the
+  `void` extern in include/code_8220.h that carried round 50's
+  return-value lead (removed from the header with the other
+  code_8220_c-only declarations).
+- **The OT splice is libgpu's `addPrim(ot, p)`.** Round 13's head pass found
+  the splice had to be a 24-bit bitfield read-modify-write (a local
+  `OtTag { u32 addr : 24; u32 len : 8; }` in include/code_8220.h, "the same
+  shape as P_TAG"), with the OT expression re-evaluated rather than cached.
+  `addPrim` is exactly that: `setaddr(p, getaddr(ot)), setaddr(ot, p)` over
+  Sony's `P_TAG` bitfield, with `ot` expanded twice. `OtTag` is deleted.
+- `0x14` (sizeof(POLY_F3)) is now `prim + 1`.
+- The `ctx+0x78` flag is named `divide` in this unit's view (`PolyDrawCtx`):
+  its only readers are these eight wrappers, and nonzero sends the face to
+  RCpoly*. Its writers are FlagLargePolyForDivide (screen span) and
+  code_8220_b's TransformAndCullPoly (GTE FLAG 0x40000, screen Z
+  saturated), whose own view calls it `saturated`.

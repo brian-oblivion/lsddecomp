@@ -656,3 +656,26 @@ This function's own discriminator: the splice arm returns
 `prim + 0x1c` = `sizeof(POLY_G3)`, and the calls arm falls straight
 into `jal RCpolyG3`. `prim`/`ctx` match the parameter names code_8220_b's
 own `extern void *SubmitPolyG3(void *prim, void *ctx);` view already used.
+
+## Round 91 polish (bravo)
+
+Retyped with Sony's structs like the rest of the family; SubmitPolyF3's
+report has the details (POLY_*, DIVPOLYGON3/4, RVECTOR, addPrim, Sony's
+RCpoly* prototype, the renamed `gDivPolygon3`/`gDivPolygon4`). Byte-identical
+on the first build. The field reads, for this primitive:
+
+`FillDivPolygonHeader(gDivPolygon3, ctx, (CVECTOR *)&prim->r0, 0, 0, 0)`;
+RVECTOR `pad` from `prim->pad1`, `pad1`, `pad2` (0xF, 0xF, 0x17: vertex 1
+reuses vertex 0's byte, as retail does); RVECTOR `c` from the colour words
+`r0`, `r1`, `r2` (0x4, 0xC, 0x14). Returns `prim + 1` (0x1C).
+
+**Vec2s16 is retired.** The colour copies were `*(Vec2s16 *)` whole-struct
+assignments, using a unit-local `{ s16 x, y; }` type whose only job was
+alignment 2, so that GCC emits lwl/lwr + swl/swr. Its comment's history:
+five separately typedef'd copies (`Vec2s16_98/_C04/_EE4/_A64/_268`, each
+named for its file offset) were merged into one unit-local type in round 77
+(alpha); DECOMPILATION_LEARNINGS, "A struct whose members are all s8/s16 has
+alignment 2", is the idiom. Sony's `CVECTOR` (four `u_char`, alignment 1)
+copies with the same lwl/lwr + swl/swr, measured: the build stayed
+byte-identical with every Vec2s16 copy replaced by a CVECTOR or DVECTOR
+one.

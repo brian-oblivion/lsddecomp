@@ -491,3 +491,34 @@ this function reads (`ctx+0x64`..`ctx+0x5C+count*4`) and writes
 running 2D screen bounding box (`ctx+0x70..+0x76`) and set the cull flag
 when either span reaches `0x101`. Purpose (why 0x101, i.e. what draw-time
 constraint a >256px-wide/tall primitive violates) is not established.
+
+## Round 91 polish (bravo)
+
+Renamed from `UpdatePolyBBoxAndCull` (`python3 tools/rename.py
+UpdatePolyBBoxAndCull FlagLargePolyForDivide`). **Tier A.** The body never
+culls: it computes the screen bounding box and sets `ctx+0x78`, and that
+flag's only readers are the eight SubmitPoly* wrappers, which route a
+flagged face to Sony's RCpoly* subdivider instead of `addPrim`. The body now
+reads through a unit-local view of the draw context (`PolyDrawCtx`:
+`DVECTOR sxy[4]` +0x60, `bboxMin` +0x70, `bboxMax` +0x74, `divide` +0x78),
+`0x101` is `> MAX_UNDIVIDED_SPAN` (256; a unit-local `#define`), and the two
+load-bearing shapes keep one `MATCHING:` line each: the guarded do/while
+with `yp` set inside the guard (round 75's lever, above), and the loop end,
+now `(short *)((u8 *)ctx + count * sizeof(DVECTOR) + 0x5C)`. The natural
+`&ctx->sxy[count - 1].vx` folds the 0x5C into the index first and scores
+62/70; `&ctx->sxy[count].vx - 2` and `(short *)(ctx->sxy + count - 1)` score
+69/70.
+
+**Finding, recorded in the function comment: the loop stops one vertex
+short.** `end` is `&sxy[count - 1]` and the loop runs while `xp < end`
+starting from `sxy[1]`, so for a triangle only `sxy[0]`/`sxy[1]` enter the
+box and for a quad `sxy[0..2]`. That is retail's behaviour; nothing here
+changes it.
+
+History moved from include/code_8220.h's prototype comment (rewritten there
+as documentation): `count` is the face's vertex count (3 or 4), not a
+primitive-kind code. An older "3 = triangle, 4 = quad" wording read the
+right numbers off the call sites for the wrong reason, corrected round 51;
+`ctx` was named round 77. From the old .c comment: the 0x20 frame is
+unused, and retail's `addiu $sp,$sp,-0x20` sits in the loop-skip branch's
+delay slot because nothing else before the branch is movable (round 75).
