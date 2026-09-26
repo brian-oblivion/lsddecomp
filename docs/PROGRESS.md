@@ -6,6 +6,87 @@ stale, prose elsewhere is not.
 
 ---
 
+## 2026-09-26 — round 88: track 4 (premium head), eighteen classes unified, footprint revision 25
+
+Premium head (Opus 5.5; the operator started it as premium), operator cap 5.
+`plan.py` offered round 87's five disjoint classes. 18 Opus runner sessions
+in six waves, one class each; every merge `make extract`, oracle,
+`--warnings` 0 new, nonmatching green, and after the header-heavy merges
+(DreamSys, Class86B60, CdDriver, Class865C8) every unit object deleted and
+rebuilt, byte-identical. The head sampled slot and field names against
+their parents' slots and their accessors before each `mark-class`. Track 4:
+34 -> 52 of 58 classes. Warnings baseline 161 -> 141 (6 in Class6D3C8's
+header, 14 in DreamSys's).
+
+- **Wave 1.** TodSet (D_8006F590, delta: no own slots or fields; ModelData's
+  `todSet` still `Class6D430 *`), Class6D3C8 (bravo: ctor-args gates
+  `playStreams`/`showIntroLogos`/`pollGraphRoom`, `skipGraphRoomPoll`;
+  `Class6D3C8__ForwardToBaseSlot44UnlessFlagged` -> `__InitSystems`),
+  Class86AA0 (alpha: grid cells; own slots onActorLinkCommand/returnSelf),
+  TextRow (ex Obj6EAC0, charlie: a row of CharSprite cells; `cellPitch`,
+  `visibleCount`/`firstVisible`), Entity (echo: 25 methods; inherited slot
+  and field names at every accessor, `soundCueSet` an embedded SoundCueSet,
+  `playTod` cross-jump cast `EntityPlayTodFn`).
+- **Wave 2.** WBgm (alpha: vab/seq PATHS, `update(DrawSystem *)`),
+  TriggerWorld (bravo: `getModelData`, `modelDataCount`; code_4cd08's old
+  TriggerWorld view also covered gDreamAuxWorld, renamed DreamAuxWorld).
+- **Waves 3 to 6.** TimImage (alpha: `New_TimImage` finally renamed;
+  `clutBase`), BgLayer (a GsBG; TaskCore `bgLayer` retyped), FrameClock (ex
+  D_8006EF50: per-frame counter with pause/resume, its events 2/3/4 read by
+  IntermediateBase, Viewport, DreamSys, Class65650), Class876FC (`params`,
+  `modelChildren`, `sprites`; `gStyleEffectSlots` retyped), DreamSys (bravo:
+  79 own slots named for occupants, +0x05C is the Viewport, gDreamAuxWorld
+  and Entity's peer are DreamSys), TileMap (GsMAP), TileAtlas (GsCELL
+  `cells`), TimArraySrc, Class86B60 (a memcard save-naming screen; own slots
+  begin/end/updateMemcardSave*), CdDriver (ex Class6D4E8; runs on every
+  client object, so its `pos`/`size` are Class6D430's +0x018/+0x01C, a pad
+  split the head accepted), Class865C8 (ex Obj865C8: `phase`, `bgm`,
+  `etcTim`, `objM`).
+- **Footprint (plan revision 25, `tools/plan.py`).** Charlie's TextRow edit
+  reached four class_3bb8c units `class_footprint` never listed: they call
+  the allocator, which was declared returning another view's type. A
+  function whose body calls the table's getter now adds the `.c` units
+  naming it (six classes gained one unit each). Then, with echo live, the
+  list shrank to one job: five ready classes listed a UNIFIED ANCESTOR's
+  type (BasicClass, Class6D430, Class6B5CC, Actor) as their own view, so
+  every includer of that header joined (BgLayer 45 units, D_8006EF50 65).
+  Those types are now ignored (65 -> 3, 45 -> 2, 31 -> 13, 29 -> 3, 28 -> 4)
+  and the list went from one job to four. Still missed, and handled by
+  posting first: private non-slot methods under another view's name
+  (Class876FC's class_3bb8c_s), method-only views the census cannot see
+  (BgLayer's code_2c054.h/code_2cc8c.h).
+- **Runner tool fixes (`tools/typeviews.py`), reviewed at merge.** Stabs
+  parsing skipped every parameter after a function's first and every
+  local-variable stab, so a type cc1 first defined there read `<tNNN>` and
+  the class had no object view (TileAtlas, TimArraySrc; the second fix also
+  surfaced a hidden Class86F88 view). Whole-tree `--census` diffs: +1 and +2
+  lines, nothing removed.
+- **Head.** Class6D430 +0x070 `stopService` takes `self` (RunRequestQueue's
+  bytes pass it; cast retired). Stale prose in class_39e08.h and Actor.h.
+  A zsh `rm build/src/*/*.o` with no match aborted the whole command, so
+  the first "clean" rebuild after DreamSys was not one; redone with `find
+  -delete` (86 objects), green.
+- **Open, for later jobs.** ObjM (D_80087034): +0x054 is the WBgm
+  (`New_WBgm.md` proposal) and +0x010 the FrameClock; Obj4C is its view in
+  class_39e08.h. ModelData `todSet`/`linkResource`, LightRig `lights[3]`,
+  TaskCore `slotElements`/`subHandle`, IntermediateBase `unk10`, Actor
+  `ticker`, Class65650 `peer`/`arg2` (a VabStreamObj) hold unified classes
+  under older types. DreamSys.h's `DreamSysEntityObj` is an Entity view the
+  census does not flag. Actor's moveLocal `notify` is a flag typed `void *`.
+  `Class86B60UnkC0Obj_3bb8c_d` and code_2c054.h's `TaskTextObj` are one class.
+  Class876FC's params block `D_8008E0A4..C0` is a 4b candidate.
+
+### ESCALATED (operator decisions; the head did not act)
+
+None new. Round 86's three stand. Plan revision 25 was made by this
+premium head (§4.1).
+
+- **Next.** `plan.py` lists gClass86F88Methods and D_8006F614; D_800866E8,
+  D_8006F13C, D_80087034 and gTaskObjFMethods defer behind #1 (the
+  class_3bb8c hub).
+
+---
+
 ## 2026-09-26 — premium session: plan revision 24 (operator review of rounds 85 to 87)
 
 - **Revisions 21 to 23 are kept.** They were made by heads the operator
