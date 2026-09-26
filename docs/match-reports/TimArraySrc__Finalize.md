@@ -11,7 +11,7 @@ drift. Fresh ground (carved revision 18, no prior report).
 
 Identical body to TimBlockSrc__Finalize: release the +0x30 array of +0x2C entries, free it, active driver's finalize.
 
-Table slot (`tools/classtable.py`): D_8006F1C4 +0x00C (finalize).
+Table slot (`tools/classtable.py`): gTimArraySrcMethods +0x00C (finalize).
 
 ## Source
 
@@ -20,7 +20,7 @@ The unit-local view `DataSrc33808` (a Class6D430 subclass built with the unified
 fields +0x2C..+0x38) and `CountedBuf33808` sit at the top of `src/code_33808.c`.
 
 ```c
-/* D_8006F1C4 +0x00C: finalize -- same shape as D_8006F0B8's. */
+/* gTimArraySrcMethods +0x00C: finalize -- same shape as D_8006F0B8's. */
 void TimArraySrc__Finalize(DataSrc33808 *self) {
     ReleaseBasicClassArray((BasicClass **)self->unk30, self->unk2C);
     BMemPMgrFree(self->unk30);

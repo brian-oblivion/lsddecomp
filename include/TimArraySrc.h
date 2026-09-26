@@ -5,7 +5,7 @@
 
 /*
  * TimArraySrc -- a Class6D430 data source (class id 0xC03, method table
- * D_8006F1C4) whose buffer holds one block of TIM images -- a count, then
+ * gTimArraySrcMethods) whose buffer holds one block of TIM images -- a count, then
  * that many byte offsets from the block's start -- and which turns it into
  * an array of TimImage objects (include/TimImage.h). Methods in
  * src/code_33808.c. No classes derive from it (`typeviews.py --tree`), so
@@ -25,7 +25,7 @@
  * four CLUT fade ramps, then setFlag (+0x064, BuildImages) and +0x078
  * (UploadImages); the TimBlockSrc keeps it in `blocks` and releases it.
  *
- * SLOTS (`classtable.py D_8006F1C4 --vs D_8006D430`, 30 against 30; the
+ * SLOTS (`classtable.py gTimArraySrcMethods --vs D_8006D430`, 30 against 30; the
  * words from +0x07C on are gDataSourceClientGetters, not this table):
  *  - +0x008 ctor, TimArraySrc__TimArraySrc(self, name): the active
  *    driver's ctor, this table, count/images/ready cleared, and
@@ -65,8 +65,8 @@ struct TimArraySrc {
  * through slot78. */
 typedef void (*TimArraySrcUploadFn)(TimArraySrc *self);
 
-extern TimArraySrcMethods D_8006F1C4;
-extern TimArraySrcMethods *GetTimArraySrcMethods(void); /* returns &D_8006F1C4 */
+extern TimArraySrcMethods gTimArraySrcMethods;
+extern TimArraySrcMethods *GetTimArraySrcMethods(void); /* returns &gTimArraySrcMethods */
 
 TimArraySrc *New_TimArraySrc(char *name); /* BMemPMgrAlloc(0x3C), then ctor */
 void TimArraySrc__TimArraySrc(TimArraySrc *self, char *name);

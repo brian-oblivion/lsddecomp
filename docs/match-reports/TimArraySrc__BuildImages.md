@@ -11,7 +11,7 @@ drift. Fresh ground (carved revision 18, no prior report).
 
 When the buffer is present (or flags bit 0x200 is set): the buffer is a count followed by that many offsets. Store the count at +0x2C, allocate a count-word array at +0x30, and for each offset create a TimImage with New_TimImage(NULL) (no file), point its buffer at buffer+offset (size 0), ask it for its GsIMAGE (its +0x09C, TimImage__GetTimInfo) and set its +0x4C to ((cy - 0x1E0) >> gTimClutRowShift) * 16 + self->+0x34 (a CLUT slot address from the image's CLUT row). Then +0x38 = 1 and the active driver's setFlag.
 
-Table slot (`tools/classtable.py`): D_8006F1C4 +0x064 (setFlag override).
+Table slot (`tools/classtable.py`): gTimArraySrcMethods +0x064 (setFlag override).
 
 ## Source
 
@@ -21,7 +21,7 @@ fields +0x2C..+0x38), `Ctor33808`, `CountedBuf33808` and `Req44858` sit at the
 top of / earlier in `src/code_33808.c`.
 
 ```c
-/* D_8006F1C4 +0x064: when the buffer is there (or flag 0x200 is set),
+/* gTimArraySrcMethods +0x064: when the buffer is there (or flag 0x200 is set),
  * build one TimImage (New_TimImage(NULL)) per image of the buffer -- a
  * count, then that many offsets -- into an array at +0x30 (+0x2C entries),
  * each adopting its image in place (size 0), and set each one's +0x4C from
@@ -97,7 +97,7 @@ void TimArraySrc__BuildImages(Obj43CB8 *self) {
 
 ## Notes
 
-First build. The GsIMAGE local (0x1C bytes) is what gives retail's 0x50 frame. Local views: `Image43CB8` (LIBGS.H GsIMAGE, same layout as code_2bb9c.c's local GsIMAGE), `Tim43CB8`/`TimMethods43CB8` (TimImage as this function sees it: Class6D430 plus +0x09C getTimInfo and +0x04C), `Obj43CB8` (D_8006F1C4's +0x2C..+0x38). New_TimImage is prototyped locally returning the local view, as class_3bb8c_d.c does.
+First build. The GsIMAGE local (0x1C bytes) is what gives retail's 0x50 frame. Local views: `Image43CB8` (LIBGS.H GsIMAGE, same layout as code_2bb9c.c's local GsIMAGE), `Tim43CB8`/`TimMethods43CB8` (TimImage as this function sees it: Class6D430 plus +0x09C getTimInfo and +0x04C), `Obj43CB8` (gTimArraySrcMethods's +0x2C..+0x38). New_TimImage is prototyped locally returning the local view, as class_3bb8c_d.c does.
 
 ## Naming
 

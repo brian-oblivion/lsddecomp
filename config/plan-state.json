@@ -877,11 +877,6 @@
           "date": "2026-09-25",
           "header": "include/TimBlockSrc.h"
         },
-        "D_8006F1C4": {
-          "class": "TimArraySrc",
-          "date": "2026-09-26",
-          "header": "include/TimArraySrc.h"
-        },
         "D_8006F240": {
           "class": "Tod",
           "date": "2026-09-26",
@@ -1101,6 +1096,11 @@
           "class": "TileMap",
           "date": "2026-09-26",
           "header": "include/TileMap.h"
+        },
+        "gTimArraySrcMethods": {
+          "class": "TimArraySrc",
+          "date": "2026-09-26",
+          "header": "include/TimArraySrc.h"
         },
         "gTimImageMethods": {
           "class": "TimImage",

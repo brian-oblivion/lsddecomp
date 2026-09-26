@@ -16,7 +16,7 @@
  *   - LinkResource (gLinkResourceMethods): a NULL-ended array of TMD models
  *     (New_TmdModel), one per object of a loaded TMD (include/LinkResource.h,
  *     track 4, round 89).
- *   - TimArraySrc  (D_8006F1C4): an array of TimImage objects
+ *   - TimArraySrc  (gTimArraySrcMethods): an array of TimImage objects
  *     (code_2bb9c.c's New_TimImage), one per TimBlockSrc block
  *     (include/TimArraySrc.h, track 4, round 88).
  *   - Tod / TodSet (D_8006F240 / D_8006F590, TodSet a Tod subclass): one
@@ -158,7 +158,7 @@ void TimBlockSrc__Finalize(TimBlockSrc *self) {
  * and eight file offsets) out of the sector buffer into the buffer, free
  * the sector, allocate the object array (+0x30) and a sector buffer of the
  * largest offset (+0x34/+0x38), seek to the first block and read it: state
- * 10. State 10 (a block read): hand the block to a new D_8006F1C4 source
+ * 10. State 10 (a block read): hand the block to a new gTimArraySrcMethods source
  * (its CLUT base the entries at +0x40), run its setFlag and +0x078, and
  * read the next block -- or, after the last, free the sector buffer, mark
  * +0x3C done and run the active driver's setFlag. An allocation failure
@@ -481,7 +481,7 @@ LinkResourceMethods *GetLinkResourceMethods(void) {
     return &gLinkResourceMethods;
 }
 
-/* Allocate and construct a D_8006F1C4 object. */
+/* Allocate and construct a gTimArraySrcMethods object. */
 TimArraySrc *New_TimArraySrc(char *name) {
     void *obj = BMemPMgrAlloc(0x3C);
 
@@ -492,7 +492,7 @@ TimArraySrc *New_TimArraySrc(char *name) {
     return NULL;
 }
 
-/* D_8006F1C4 +0x008: constructor -- the active driver's, then this table,
+/* gTimArraySrcMethods +0x008: constructor -- the active driver's, then this table,
  * clear count/images/ready, and request `name` when there is one. */
 void TimArraySrc__TimArraySrc(TimArraySrc *self, char *name) {
     GetActiveDataSourceMethods()->ctor((Class6D430 *)self);
@@ -505,14 +505,14 @@ void TimArraySrc__TimArraySrc(TimArraySrc *self, char *name) {
     }
 }
 
-/* D_8006F1C4 +0x00C: finalize -- same shape as D_8006F0B8's. */
+/* gTimArraySrcMethods +0x00C: finalize -- same shape as D_8006F0B8's. */
 void TimArraySrc__Finalize(TimArraySrc *self) {
     ReleaseBasicClassArray((BasicClass **)self->images, self->count);
     BMemPMgrFree(self->images);
     GetActiveDataSourceMethods()->finalize((Class6D430 *)self);
 }
 
-/* D_8006F1C4 +0x064: when the buffer is there (or flag 0x200 is set),
+/* gTimArraySrcMethods +0x064: when the buffer is there (or flag 0x200 is set),
  * build one TimImage (New_TimImage(NULL)) per image of the buffer -- a
  * count, then that many offsets -- into `images` (`count` entries),
  * each adopting its image in place (size 0), and set each one's clutBase
@@ -548,7 +548,7 @@ void TimArraySrc__BuildImages(TimArraySrc *self) {
     }
 }
 
-/* D_8006F1C4 +0x078: every image's +0x078 (TimImage__Upload). */
+/* gTimArraySrcMethods +0x078: every image's +0x078 (TimImage__Upload). */
 void TimArraySrc__UploadImages(TimArraySrc *self) {
     TimImage **objs = self->images;
     s32 i;
@@ -560,7 +560,7 @@ void TimArraySrc__UploadImages(TimArraySrc *self) {
 }
 
 TimArraySrcMethods *GetTimArraySrcMethods(void) {
-    return &D_8006F1C4;
+    return &gTimArraySrcMethods;
 }
 
 /* Allocate and construct a D_8006F240 object. */

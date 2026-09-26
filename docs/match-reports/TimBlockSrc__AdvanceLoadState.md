@@ -9,7 +9,7 @@ drift. Fresh ground (carved revision 18, no prior report).
 
 ## What it does
 
-The D_8006F0B8 loader's state machine, run under Lock/UnlockActiveDataSource and only once the read has completed (flags bit 0x80). State 9 (header sector read by the ctor TimBlockSrc__TimBlockSrc): copy the 0x24-byte header -- a u32 block count and eight u32 file offsets -- from the sector buffer (+0x34) into the 0x24-byte buffer, free the sector buffer, take the largest offset (MaxOfBufferWords) as the new sector-buffer size, allocate the object array (+0x30, count words) and the sector buffer (+0x34, size at +0x38), seek (own +0x04C) to offset[0] and read (own +0x054) one block: state 10. State 10: wrap the block in a new D_8006F1C4 source (New_TimArraySrc(NULL)), buffer = the sector buffer, size 0, its +0x34 = &self->entries (+0x40, the CLUT base TimArraySrc__BuildImages adds to), run its setFlag (TimArraySrc__BuildImages, which builds the TimImages) and +0x078; count it at +0x2C, then seek/read the next block (state 10 again) or, after the last, free the sector buffer, clear +0x34/+0x38/+0x2A, set +0x3C and call the active driver's setFlag. Either allocation failing sets +0x80.
+The D_8006F0B8 loader's state machine, run under Lock/UnlockActiveDataSource and only once the read has completed (flags bit 0x80). State 9 (header sector read by the ctor TimBlockSrc__TimBlockSrc): copy the 0x24-byte header -- a u32 block count and eight u32 file offsets -- from the sector buffer (+0x34) into the 0x24-byte buffer, free the sector buffer, take the largest offset (MaxOfBufferWords) as the new sector-buffer size, allocate the object array (+0x30, count words) and the sector buffer (+0x34, size at +0x38), seek (own +0x04C) to offset[0] and read (own +0x054) one block: state 10. State 10: wrap the block in a new gTimArraySrcMethods source (New_TimArraySrc(NULL)), buffer = the sector buffer, size 0, its +0x34 = &self->entries (+0x40, the CLUT base TimArraySrc__BuildImages adds to), run its setFlag (TimArraySrc__BuildImages, which builds the TimImages) and +0x078; count it at +0x2C, then seek/read the next block (state 10 again) or, after the last, free the sector buffer, clear +0x34/+0x38/+0x2A, set +0x3C and call the active driver's setFlag. Either allocation failing sets +0x80.
 
 Table slot (`tools/classtable.py`): D_8006F0B8 +0x064 (setFlag override).
 
@@ -26,7 +26,7 @@ top of / earlier in `src/code_33808.c`.
  * and eight file offsets) out of the sector buffer into the buffer, free
  * the sector, allocate the object array (+0x30) and a sector buffer of the
  * largest offset (+0x34/+0x38), seek to the first block and read it: state
- * 10. State 10 (a block read): hand the block to a new D_8006F1C4 source
+ * 10. State 10 (a block read): hand the block to a new gTimArraySrcMethods source
  * (its CLUT base the entries at +0x40), run its setFlag and +0x078, and
  * read the next block -- or, after the last, free the sector buffer, mark
  * +0x3C done and run the active driver's setFlag. An allocation failure

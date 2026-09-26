@@ -23,7 +23,7 @@
  * a ".TIM" path (the ctor requests the file), then +0x078 (upload), then
  * usually freeBuffer (+0x05C) or release (+0x004) once the sprites made
  * from it hold what they need. A Sprite's `texture` is a TimImage: its
- * reset keeps &texture->tim (include/Sprite.h). TimArraySrc (D_8006F1C4,
+ * reset keeps &texture->tim (include/Sprite.h). TimArraySrc (gTimArraySrcMethods,
  * src/code_33808.c) makes them with New_TimImage(NULL), points `buffer`
  * into its own block and sets `clutBase`.
  *
