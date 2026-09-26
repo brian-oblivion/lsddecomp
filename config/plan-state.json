@@ -1087,6 +1087,11 @@
           "date": "2026-09-25",
           "header": "include/TaskCore.h"
         },
+        "gTaskObjFMethods": {
+          "class": "TaskObjF",
+          "date": "2026-09-26",
+          "header": "include/TaskObjF.h"
+        },
         "gTextEntryMethods": {
           "class": "TextEntry",
           "date": "2026-09-26",
