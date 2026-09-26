@@ -89,7 +89,7 @@ instead.
 - **`Class6C070`/`Class6C070Methods`** (was the local placeholder
   `DrawObj`/`DrawObjMethods`), tier B: confirmed as the real class the draw
   singleton (`GetDrawSystem`) returns -- `code_10ee0.c`'s own header comment
-  identifies `D_8008A83C`'s class as `Class6C070` -- replacing the
+  identifies `gDrawSystem`'s class as `Class6C070` -- replacing the
   placeholder name per the round's instruction to confirm or replace it.
   `code_10ee0.c` itself is still mostly `INCLUDE_ASM`, so this unit's struct
   stays a partial two-slot local view (pad + `loadImage` + `moveImage`), not

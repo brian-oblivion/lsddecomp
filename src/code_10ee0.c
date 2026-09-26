@@ -104,7 +104,7 @@ struct DrawSystem {
 };
 
 extern DrawSystemMethods D_8006C070;  /* the class's method table */
-extern DrawSystem *D_8008A83C;        /* sdata: the singleton GetDrawSystem returns */
+extern DrawSystem *gDrawSystem;        /* sdata: the singleton GetDrawSystem returns */
 
 extern void GsSwapDispBuff(void);     /* LIBGS.H */
 extern void GsInitGraph(unsigned short x_res, unsigned short y_res,
@@ -262,8 +262,8 @@ DrawSystemMethods *Get_vtable_DrawSystem(void) {
     return &D_8006C070;
 }
 DrawSystem *GetDrawSystem(void) {
-    return D_8008A83C;
+    return gDrawSystem;
 }
 void SetDrawSystem(DrawSystem *obj) {
-    D_8008A83C = obj;
+    gDrawSystem = obj;
 }

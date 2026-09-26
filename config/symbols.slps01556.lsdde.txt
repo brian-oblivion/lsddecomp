@@ -2842,3 +2842,4 @@ BoxFill__SetSize = 0x80040824; // type:func
 BoxFill__SetPri = 0x800408A0; // type:func
 gCharSpriteMethods = 0x8006EC74;
 gLightRigMethods = 0x8006EFAC;
+gDrawSystem = 0x8008A83C;

@@ -241,7 +241,7 @@ s32 GetCdDriverMode(s32 *outMode2)
     return gCdAsyncEnabled;
 }
 
-extern s32 GetDrawSystem(void); /* returns D_8008A83C, a singleton object */
+extern s32 GetDrawSystem(void); /* returns gDrawSystem, a singleton object */
 extern s32 ServiceCdDriver(void);
 
 /* The singleton GetDrawSystem returns; only the slot this call site

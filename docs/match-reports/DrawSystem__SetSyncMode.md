@@ -42,7 +42,7 @@ struct Class6C070 {
     /* +0x030 */ s32 unk30;
 };
 extern Class6C070Methods D_8006C070;
-extern Class6C070 *D_8008A83C;
+extern Class6C070 *gDrawSystem;
 extern void GsSwapDispBuff(void);
 ```
 
