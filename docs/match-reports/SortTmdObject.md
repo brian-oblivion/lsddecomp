@@ -1,4 +1,6 @@
-# func_80018464 — MATCHED 954/954 (round 76)
+# SortTmdObject — MATCHED 954/954 (round 76)
+
+> Renamed from `func_80018464` on 2026-09-26 (tools/rename.py). Address 0x80018464.
 
 REVISITED, round 76: MATCHED 954/954, whole image OK, 0 permuter iterations (about 45 cc1/whole-image builds); names/types not relevant
 
@@ -82,7 +84,7 @@ plausible reading of the original source.
   extra per-iteration increment, and one more callee-saved register than
   retail, while retail addresses every use off a single pointer. Every
   syntactic loop form splits the same way (round 56 measured twelve).
-  `func_80018464` went from 982 to 954 words in one edit.
+  `SortTmdObject` went from 982 to 954 words in one edit.
 - **Its side effect is a loop-depth level, and that can flip local-alloc.**
   Once a function's loops are goto loops, a residue that is a pure register
   swap between two short-lived quantities can be the missing depth weighting.
@@ -502,10 +504,10 @@ position.
  * other four are this unit's own view and stay local per CLAUDE.md's
  * cross-unit-declaration rule. */
 extern s32 D_80090C18;
-extern s32 D_8008E250;
-extern s32 D_8008E24C;
-extern s32 D_800902E0;
-extern s8 D_8008A82C[3];
+extern s32 gSortUseGlobalLightMode;
+extern s32 gSortLightMode;
+extern s32 GsLIGHT_MODE;
+extern s8 gTexturedFaceColor[3];
 extern void *GsOUT_PACKET_P;
 
 extern void InitDivPolygonPtrs(void *dst, void *table, s32 count);
@@ -559,7 +561,7 @@ void StoreSxyPolyG4(void *dst, s32 storeFirst3);
  * and not `swc2 $22, 0x4(prim)`: the addiu that materialises the sum is part
  * of retail.
  */
-void func_80018464(void *objIn, void *otSrc, s32 otShift, void *ctxIn)
+void SortTmdObject(void *objIn, void *otSrc, s32 otShift, void *ctxIn)
 {
     u8 *obj = (u8 *)objIn;
     u8 *ctx = (u8 *)ctxIn;
@@ -613,20 +615,20 @@ void func_80018464(void *objIn, void *otSrc, s32 otShift, void *ctxIn)
     *(s32 *)(ctx + 0x8) = 0xA;
     D_80090C18 = (*(u32 *)obj >> 9) & 0x7;
     D_8008E248 = (*(u32 *)obj >> 6) & 0x1;
-    D_8008E250 = (*(u32 *)obj >> 5) & 0x1;
-    D_8008E24C = (*(u32 *)obj >> 3) & 0x3;
+    gSortUseGlobalLightMode = (*(u32 *)obj >> 5) & 0x1;
+    gSortLightMode = (*(u32 *)obj >> 3) & 0x3;
 
     {
-        s8 *tint = D_8008A82C;
+        s8 *tint = gTexturedFaceColor;
 
         *(s8 *)(ctx + 0x34) = tint[0];
         *(s8 *)(ctx + 0x35) = tint[1];
         *(s8 *)(ctx + 0x36) = tint[2];
     }
 
-    if (D_8008E250 != 0 && D_800902E0 != 0) {
+    if (gSortUseGlobalLightMode != 0 && GsLIGHT_MODE != 0) {
         dpShift = 9;
-    } else if (D_8008E24C != 0) {
+    } else if (gSortLightMode != 0) {
         dpShift = 9;
     } else {
         dpShift = 0x10;
@@ -1131,7 +1133,7 @@ mnemonic, confirmed with the reproducer" story for all three. Added as
 
 Round 45's report said "roughly nine ~37-word blocks" and asked whether they
 are unrolled named slots or loop iterations. Reading the full phase 3
-disassembly line by line (`asm/nonmatchings/code_8220_b/func_80018464.s`,
+disassembly line by line (`asm/nonmatchings/code_8220_b/SortTmdObject.s`,
 roughly lines 148–940) settles it completely:
 
 - There are **13 distinct dispatch targets**, not 9 (one per PS1 GPU
@@ -1206,7 +1208,7 @@ stale: every one of the eight falls straight from `jal RCpolyXX` into its
 own epilogue with **no intervening store to `$v0`** (checked
 `SubmitPolyF3.s`'s tail directly). That means whatever value Sony's own
 `RCpolyXX` leaves in `$v0` — the well-known Psy-Q `p = RCpolyF3(p);`
-work-buffer-advance idiom — IS this function's return value. `func_80018464`
+work-buffer-advance idiom — IS this function's return value. `SortTmdObject`
 relies on exactly that value (`self = SubmitPolyF3(self, prim);`, advancing
 the packet-buffer write cursor every submit), so this file declares its own
 `void *`-returning prototypes for all eight per CLAUDE.md's cross-unit
@@ -1224,7 +1226,7 @@ per-face cases) using the two resolutions above, per the assignment's
 whole-image SHA1 mismatch) but is **not close to byte-exact**:
 
 ```
-func_80018464: 44/954 words match (file 0x8C64-0x9B4C)
+SortTmdObject: 44/954 words match (file 0x8C64-0x9B4C)
 WARNING: the build differs OUTSIDE this range too (323295 bytes) ...
 ```
 
@@ -1288,7 +1290,7 @@ against the current tree (with the `gte_llir`/`gte_ncds`/`gte_dpcs`/`gte_dpct`
 macros added to `include/gte.h` this round) and needs the forward
 declarations included below (they are NOT installed in the tree — only the
 `include/gte.h` macro additions are committed this round). Building on this
-means placing it back as the body of `func_80018464` in `src/code_8220_b.c`,
+means placing it back as the body of `SortTmdObject` in `src/code_8220_b.c`,
 in the same ROM-order position, and continuing from "one extra saved
 register" above.
 
@@ -1296,10 +1298,10 @@ register" above.
 #if 0
 extern void *GsOUT_PACKET_P;
 extern s32 D_80090C18;
-extern s32 D_8008E250;
-extern s32 D_8008E24C;
-extern s32 D_800902E0;
-extern s8 D_8008A82C[3];
+extern s32 gSortUseGlobalLightMode;
+extern s32 gSortLightMode;
+extern s32 GsLIGHT_MODE;
+extern s8 gTexturedFaceColor[3];
 
 extern void InitDivPolygonPtrs(void *arg0, void *arg1, s32 kind);
 extern s32 ProjectTriFace(void *arg0, u8 *prim, u16 idx0, u16 idx1, u16 idx2, void (*callback)(void *));
@@ -1333,7 +1335,7 @@ extern void *SubmitPolyFT4(void *arg0, void *arg1);
 extern void *SubmitPolyGT3(void *arg0, void *arg1);
 extern void *SubmitPolyGT4(void *arg0, void *arg1);
 
-void func_80018464(void *arg0, void *arg1, s32 arg2, void *arg3)
+void SortTmdObject(void *arg0, void *arg1, s32 arg2, void *arg3)
 {
     u8 *self = (u8 *)arg0;
     u8 *prim = (u8 *)arg3;
@@ -1464,16 +1466,16 @@ void func_80018464(void *arg0, void *arg1, s32 arg2, void *arg3)
         *(s32 *)(prim + 0x8) = 0xA;
         D_80090C18 = (raw >> 9) & 0x7;
         D_8008E248 = (raw >> 6) & 0x1;
-        D_8008E250 = (raw >> 5) & 0x1;
-        D_8008E24C = (raw >> 3) & 0x3;
+        gSortUseGlobalLightMode = (raw >> 5) & 0x1;
+        gSortLightMode = (raw >> 3) & 0x3;
     }
-    prim[0x34] = D_8008A82C[0];
-    prim[0x35] = D_8008A82C[1];
-    prim[0x36] = D_8008A82C[2];
+    prim[0x34] = gTexturedFaceColor[0];
+    prim[0x35] = gTexturedFaceColor[1];
+    prim[0x36] = gTexturedFaceColor[2];
 
-    if (D_8008E250 != 0 && D_800902E0 != 0) {
+    if (gSortUseGlobalLightMode != 0 && GsLIGHT_MODE != 0) {
         v0 = 9;
-    } else if (D_8008E24C != 0) {
+    } else if (gSortLightMode != 0) {
         v0 = 9;
     } else {
         v0 = 0x10;
@@ -1962,12 +1964,12 @@ file, which is out of this round's scope.
 ## Naming (round 51, bravo) — NAME DELIBERATELY NOT CHANGED, and one of the two reasons is a head decision
 
 The track-3 naming pass renamed all 19 other definitions in
-`src/code_8220_b.c`. This one kept `func_80018464`. Two reasons, in order
+`src/code_8220_b.c`. This one kept `SortTmdObject`. Two reasons, in order
 of weight.
 
 ### 1. Its only caller sits in an SDK segment, and that is a head call
 
-`grep -rn 'func_80018464' src/ asm/` finds exactly one call site outside
+`grep -rn 'SortTmdObject' src/ asm/` finds exactly one call site outside
 this function's own `.s`: `asm/psyq_2864.s:225`, inside `Viewport__DrawNode`.
 That caller calls `GsSortBoxFill`, `GsGetLws`, `GsSetLightMatrix` and
 `GsSetLsMatrix` and nothing else identifiable, and it passes
@@ -2038,3 +2040,74 @@ per-group element lists are. Tier B rather than A because what `arg0` and
   here so the block stays greppable under either name. `tools/stalesyms.py`
   reports nothing against this file, i.e. every symbol the preserved body
   calls is still live.
+
+## Round 91 polish (delta, track 7)
+
+Byte-identical after every step; the three oracles green at each commit.
+
+### Naming
+
+- `func_80018464` -> **`SortTmdObject`, tier A.** Round 51 held the name back
+  pending a Sony-ownership ruling. That question is now measured: Sony's
+  `GsSortObject4` exists (`libgs/objt2.o` on the 3.3, 3.5 and 3.6 discs,
+  `objt.o` on 3.0) and is a different body -- it also stores GsTON from
+  attribute bit 30, writes `ndiv`/`HWD0`/`VWD0` into the scratch block and
+  tests GsLIOFF/GsLIGNR/GsLMODE against GsLIGHT_MODE with a different ladder;
+  it has none of this function's InitDivPolygonPtrs calls, TMD-type switch or
+  calls into code_8220_c. `psyq_sdk.py match` never placed it here, and the
+  caller (`Viewport__DrawNode`, formerly in `psyq_2864`) is carved game code
+  now. What the body does is evident from it alone: same four arguments as
+  `GsSortObject4` (`GsDOBJ2 *`, `GsOT *`, shift, scratch), it reads the
+  GsDOBJ2's GsCOORDINATE2 and TMD object at Sony's offsets, walks the TMD's
+  primitive list and writes one POLY_xx per surviving face into the
+  GsOUT_PACKET_P buffer and the OT. "Sort" is libgs's verb for that.
+- `D_800902E0` -> `GsLIGHT_MODE`: Sony's, pinned in `psyq-objects.ld` by eight
+  libgs objects; `rename.py` names it as the only allowed rename.
+- `D_8008E24C` -> `gSortLightMode`, tier B: attribute bits 3-4 (GsFOG|GsMATE).
+- `D_8008E250` -> `gSortUseGlobalLightMode`, tier B: attribute bit 5
+  (GsLLMOD); the object is depth-cued when it is set and GsLIGHT_MODE is
+  non-zero.
+- `D_8008A82C` -> `gTexturedFaceColor`, tier A: `.byte 0x80,0x80,0x80`,
+  copied into the context once per object and loaded as the GTE colour of
+  every lit textured face (the POLY_FT3 and POLY_FT4 cases). Only reader.
+- Sony's `GsSortObject4` (disassembled from `objt2.o`) stores the same four
+  attribute fields as this function -- `(a >> 3) & 3` GsLMODE, `(a >> 5) & 1`
+  GsLIGNR, `(a >> 6) & 1` GsLIOFF, `(a >> 9) & 7` GsNDIV. No linked Sony
+  object references those four names, so the game-style names above are
+  used; whether the addresses ARE Sony's commons (3.3+ `libgs/global.o`
+  defines all four) is left to the head (see the proposals in the round-91
+  summary). `D_8008E248` (GsLOFF) and `D_80090C18` (GsDIV) cannot be renamed
+  by `rename.py`: it reports them inside Sony's `PSDOFSY` and `dc_cb`, whose
+  pinned sizes (8) are distance-to-next-pin estimates -- `PSDOFSY` is 4 bytes
+  in `libgs/gs_010.o`.
+
+### Types and constants
+
+- Arguments are Sony's `GsDOBJ2 *` and `GsOT *`; the TMD object is
+  `struct TMD_STRUCT` (libgs.h) through `OBJ_TMD()`; the rotation block reads
+  `obj->coord2->super->workm` and the three columns of `obj->coord2->workm`.
+- Every scratchpad offset is a field of the unit-local `PolyDrawCtx`
+  (`+0x88`/`+0x94` are `RVECTOR *` into the DIVPOLYGON3/4 tables, `+0xA4`
+  `SVECTOR *[4]`, `+0x78` the subdivide flag, agreeing with code_8220_c).
+- Each case names its packet (`TMD_P_F3` ... `TMD_P_TNG4`) through a per-case
+  `PKT` macro, `(type *)(elem - offsetof(type, member))`, because `elem` has
+  to stay parked on the member retail parks it on; list-relative colour reads
+  cast `packet`. The primitive is `POLY` (`POLY_F3` ... `POLY_GT4`). None of
+  this moved a byte, including the struct-ness of every new field access.
+- libgpu's `setPolyF3` ... `setPolyGT4` replace the `prim[3]`/`prim[7]` pairs
+  and `setcode` the cached-code store; all compile to the same `sb`s.
+- Case labels are `TMD_TYPE(GPU_COM_*, flag)` with libgs's `GPU_COM_*` and
+  `GsTMDFlagGRD`, plus unit-local `TMD_FLAG_LGT`, `TMD_TYPE_MASK` (0xFD07),
+  `TMD_WORD_ABE_SHIFT` (25), `DP_CLUT_SHIFT_CUED`/`_NONE` (9/16) and
+  `GsDOFF` for the early-out (`bltz` unchanged).
+- The old case comments called the lit cases "opaque"; they are the lit
+  (ncds from the face normal) packets, the others unlit and depth-cued.
+  Semi-transparency is the separate ABE bit.
+
+### Moved out of the source
+
+The function comment's derivation of the goto loops, the alias-rule
+explanation of the four attribute reads, the do/while(0) loop-depth note,
+the binary-search switch layout and the "submit wrappers declared void"
+history (round 50) are all in the sections above; the source keeps one
+MATCHING line for each.

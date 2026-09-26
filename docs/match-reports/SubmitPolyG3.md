@@ -33,7 +33,7 @@ needed once it exists**: neither survives into the committed body. That
 lever's "self/prim register swap sub-residue" was the same missing-`$v0`
 artefact seen from a different angle.
 
-**Callers checked:** `func_80018464` in `src/code_8220_b.c` (two call sites,
+**Callers checked:** `SortTmdObject` in `src/code_8220_b.c` (two call sites,
 `prim = (u8 *)SubmitPolyG3(prim, ctx);`), declared there as
 `extern void *SubmitPolyG3(void *prim, void *ctx);`. The return type agrees.
 `RCpolyG3` stays declared `void` in `include/code_8220.h` and is called

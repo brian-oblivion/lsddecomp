@@ -53,3 +53,7 @@ the `storeFirst3` protocol in `docs/match-reports/StoreSxyPolyF4.md`.
    `code_8220_c` and is not this unit's to name; the same two-source
    argument will name it, and `StoreSxyPolyGT4` as POLY_GT4 (`len = 12`,
    `code = 0x3C`), whenever that unit is worked.
+
+## Round 91 polish (delta, track 7)
+
+`p` is now `short *xy3 = &((POLY_G4 *)dst)->x3` (byte-identical).

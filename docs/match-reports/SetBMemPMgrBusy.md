@@ -70,3 +70,7 @@ Renaming the global also made `config/gp-symbols.txt` stale --
 was already right and only the line's position differed.
 `python3 tools/gpsyms.py` fixes it and the build stayed byte-exact either
 way; any naming round touching an sdata/sbss symbol needs the same step.
+
+## Round 91 polish (delta, track 7)
+
+Parameter `val` -> `busy`.

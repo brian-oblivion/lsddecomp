@@ -165,7 +165,7 @@ the GTE, delegates the transform and the cull decision to
 `TransformAndCullPoly`, writes each vertex's screen Z into a sort slot, has
 the caller's callback write the screen XY into the primitive, computes the
 screen bounding box, and returns 0 drawn / 1 culled. That is "project one
-triangle and say whether it survived". Its caller `func_80018464` iterates
+triangle and say whether it survived". Its caller `SortTmdObject` iterates
 a list of records each carrying three or four vertex indices, which is a
 face list.
 
@@ -186,3 +186,13 @@ computes their 2D bounding box (`docs/match-reports/FlagLargePolyForDivide.md`
 derives the body). The old "3 = triangle, 4 = quad" gloss in this report
 and in `include/code_8220.h` had the right numbers for the wrong reason
 and is corrected in both places.
+
+## Round 91 polish (delta, track 7)
+
+`ctx` is the unit's `PolyDrawCtx`: `faceVtx[0..2] = &vertices[idxN]`, the sort
+Zs to `&divVtx3[N]->sz` (Sony's `RVECTOR.sz`, +0x14). **Measured:** writing
+the slots as `ctx->faceVtx[i] = ...` (struct stores) moved the third store
+and its `lw` reload ahead of the `lhu` of the stack argument, 67 bytes off;
+writing them through a plain `SVECTOR **vtx = ctx->faceVtx` (scalar stores,
+as the old `ctx + 0xa4` form was) is byte-exact. The source carries a
+MATCHING line.

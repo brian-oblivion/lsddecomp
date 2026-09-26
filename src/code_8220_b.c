@@ -1,29 +1,27 @@
 /*
- * code_8220_b -- the tail of the BasicClass block, then the game's own
- * per-face polygon renderer. Two unrelated halves, split at func_80018464.
+ * code_8220_b -- the end of BasicClass, then the game's TMD renderer.
  *
- * 0x80018288..0x80018458 finishes BasicClass, the hand-rolled base class
- * whose framework and 14-slot method table live in code_8220.c and
- * include/code_8220.h: the two list primitives BasicClass's own methods
- * call (FreeBasicClassList, GetNextBasicClass), the array release helper,
- * the vtable accessor, the two notification slots (BasicClass__NotifyParents
- * at +0x030 and BasicClass__OnNotify at +0x038) and the empty +0x034 hook,
- * plus the accessor pair for the pool allocator's re-entrancy flag.
+ * BasicClass (include/BasicClass.h; the rest of it is code_8220.c): the list
+ * helpers its methods use (FreeBasicClassList, GetNextBasicClass,
+ * ReleaseBasicClassArray), its table getter, the notification pair
+ * NotifyParents / OnNotify with the empty slot between them, and the pool
+ * allocator's busy-flag accessors.
  *
- * 0x80018464..0x8001974C is the renderer. func_80018464 (the unit's one
- * stall, still INCLUDE_ASM) walks a model's face groups, dispatches on each
- * group's tag to one of 13 cases, and per face calls SetupPrimCode, then
- * ProjectTriFace or ProjectQuadFace, then one of Sony's RCpoly* packers via
- * the wrappers in code_8220_c. ProjectTri/QuadFace index the shared vertex
- * array, hand the vertices to the GTE, call TransformAndCullPoly for the
- * transform-and-cull decision, write each vertex's Z into its sort slot, and
- * call back into one of the six StoreSxyPoly** leaves to write the screen XY
- * into the Psy-Q POLY_xx primitive at that primitive type's own offsets.
- * Every GTE access goes through the gte_* macros in include/gte.h; those are
- * Sony's names and are never renamed.
+ * The renderer: SortTmdObject, the game's replacement for Sony's
+ * GsSortObject4, turns a GsDOBJ2's TMD object into GPU primitives. Per face,
+ * SetupPrimCode finishes the primitive's command byte, ProjectTriFace or
+ * ProjectQuadFace transforms and culls it through TransformAndCullPoly and
+ * writes its screen coordinates with one of the StoreSxyPoly* leaves, and a
+ * submit wrapper in code_8220_c links it into the OT, through Sony's RCpoly*
+ * subdivision when TransformAndCullPoly or FlagLargePolyForDivide flags the
+ * face. All GTE work goes through include/gte.h's gte_* macros (Sony's
+ * names; never <inline.h>).
  */
 
 #include "common.h"
+#include <libgte.h>
+#include <libgpu.h>
+#include <libgs.h>
 #include "code_8220.h"
 #include "gte.h"
 
@@ -38,9 +36,8 @@ void FreeBasicClassList(BasicClassListNode **head) {
 }
 
 /* BasicClassMethods slot +0x030. Tell every object holding a reference to
- * `self` that `event` happened, by calling each one's own +0x038 slot with
- * `self` as the sender. BasicClass__Finalize (finalize, code_8220.c) is
- * the only caller in carved C and passes 1. */
+ * `self` that `event` happened, by calling each one's onNotify slot with
+ * `self` as the sender. BasicClass__Finalize passes 1, "going away". */
 void BasicClass__NotifyParents(BasicClass *self, s32 event) {
     BasicClassListNode *cursor = self->parentRefs;
     BasicClass *parent;
@@ -50,22 +47,16 @@ void BasicClass__NotifyParents(BasicClass *self, s32 event) {
     }
 }
 
-/* BasicClassMethods slot +0x034, and deliberately still a placeholder name.
- * The body is empty, and of the 60 method tables tools/classtable.py finds,
- * 58 have this exact address in slot +0x034; the two that differ
- * (D_8006C0F8, whose header word is a pointer and which is probably a
- * mis-detected table start, and gStyleCueCallbacks, a wholly independent 14-slot
- * class that overrides every slot) are not BasicClass-derived. Nothing in
- * the game overrides it, so nothing establishes what it is for. */
+/* BasicClassMethods slot +0x034. Empty, and no BasicClass-derived table
+ * overrides it, so nothing says what it is for: the name stays a tier-C
+ * placeholder (the table census is in the report). */
 void BasicClass__func_18350(void) {}
 
 /* BasicClassMethods slot +0x038, the receiving half of NotifyParents:
  * `sender` is telling `self` that `event` happened. The base class treats
  * event 1 as "sender is going away" and drops it from its own children.
- * Subclasses override this and forward to the base first -- SceneNode__OnNotify
- * (code_d294) then dispatches on the sender's class tag, Class65650__OnNotify
- * (code_55dd4) then checks the sender's tag and the same event == 1 -- so
- * `event` is a general notification code, not a boolean. */
+ * Subclasses override it, call this first, then look at the sender's class
+ * tag as well, so `event` is a notification code, not a boolean. */
 void BasicClass__OnNotify(BasicClass *self, void *sender, s32 event) {
     if (event == 1) {
         self->methods->removeChild(self, (BasicClass *)sender);
@@ -94,70 +85,123 @@ void ReleaseBasicClassArray(BasicClass **array, s32 count) {
     }
 }
 
-void SetBMemPMgrBusy(s32 val) {
-    gBMemPMgrBusy = val;
+void SetBMemPMgrBusy(s32 busy) {
+    gBMemPMgrBusy = busy;
 }
 
 s32 GetBMemPMgrBusy(void) {
     return gBMemPMgrBusy;
 }
 
-/* Globals this renderer publishes for SetupPrimCode and the code_8220_c
- * submit wrappers to read back. D_8008E248 is already in code_8220.h; the
- * other four are this unit's own view and stay local per CLAUDE.md's
- * cross-unit-declaration rule. */
-extern s32 D_80090C18;
-extern s32 D_8008E250;
-extern s32 D_8008E24C;
-extern s32 D_800902E0;
+/* The drawn object's attribute bits, as SortTmdObject publishes them for
+ * SetupPrimCode and the code_8220_c submit wrappers (D_8008E248, GsLOFF, is
+ * declared in code_8220.h). Sony's GsSortObject4 keeps the same four fields
+ * in GsNDIV, GsLIOFF, GsLIGNR and GsLMODE. */
+extern s32 D_80090C18;              /* GsDIV1..5: subdivision level */
+extern s32 gSortUseGlobalLightMode; /* GsLLMOD */
+extern s32 gSortLightMode;          /* GsFOG | GsMATE */
 
-/* Local views, and each one's STRUCT-ness is load-bearing, not decoration.
- * GCC 2.6.3's alias test lets a struct-field reference pass a store to a
- * scalar at a fixed address, so reading the object's flags word as a field
- * is what lets the scheduler hoist its four loads above the four global
- * stores (retail's four `lw`s back to back); the context's +0x8 store as a
- * field keeps it behind those loads. Rgb8 makes the tint a 3-byte block
- * move: `la`, three `lb`, three `sb`. */
-typedef struct {
-    u32 flags;
-} RenderObjHead;
-
-typedef struct {
-    void *ot;
-    s32 otShift;
-    s32 unk8;
-} RenderCtxHead;
-
+/* MATCHING: three s8s, so SortTmdObject's copy of gTexturedFaceColor is a
+ * 3-byte block move (`la`, three `lb`, three `sb`). */
 typedef struct {
     s8 r, g, b;
 } Rgb8;
 
-/* Advance a primitive's CLUT (the u16 at +0xE) by `rows` palette rows. A
- * statement macro, and its do/while(0) is part of the bytes: the per-element
- * loops below are goto loops (see the function comment), which drops one
- * loop-depth level from flow's reference weighting, and this construct puts
- * it back for the update alone -- without it local-alloc hands the loaded
- * CLUT, not the shifted depth, $v0 at all six sites. */
-#define ADD_CLUT_ROWS(p, rows)              \
-    do {                                    \
-        *(u16 *)((p) + 0xE) += (rows) << 6; \
+/*
+ * The per-object draw context SortTmdObject builds in the PS1 scratchpad
+ * (its caller passes 0x1F800000) and hands to every function below and to
+ * the code_8220_c submit wrappers. Only the fields this unit touches are
+ * named; +0x070..+0x077 are the screen bounding box FlagLargePolyForDivide
+ * keeps.
+ *
+ * MATCHING: the three SXY words are separate fields, not an array, for
+ * gte_stsxy3()'s three independently computed addresses.
+ */
+typedef struct PolyDrawCtx {
+    /* +0x000 */ GsOT_TAG *otBase;  /* the GsOT's org */
+    /* +0x004 */ s32 otShift;       /* otz >> otShift indexes otBase */
+    /* +0x008 */ s32 unk8;          /* set to 10 per object; no reader in carved code */
+    /* +0x00C */ SVECTOR *vertices; /* the TMD object's vertex array */
+    /* +0x010 */ SVECTOR *normals;  /* the TMD object's normal array */
+    /* +0x014 */ u8 primLen;        /* SetupPrimCode's cached P_TAG length byte */
+    /* +0x015 */ u8 primCode;       /* ... and finished GPU command byte */
+    u8 pad016[0x018 - 0x016];
+    /* +0x018 */ u32 packetType;   /* the current group's TMD mode/flag word */
+    /* +0x01C */ s32 semiTrans;    /* the group's ABE bit */
+    /* +0x020 */ s32 otz;          /* avsz3 result */
+    /* +0x024 */ s32 dp;           /* IR0, the depth-cue factor */
+    /* +0x028 */ s32 opz;          /* nclip result (MAC0) */
+    /* +0x02C */ s32 dpShift;      /* dp >> dpShift is the CLUT row offset */
+    /* +0x030 */ GsOT_TAG *otSlot; /* &otBase[otz >> otShift] */
+    /* +0x034 */ Rgb8 faceColor;   /* gTexturedFaceColor's copy */
+    u8 pad037[0x038 - 0x037];
+    /* +0x038 */ MATRIX savedRotMatrix;
+    u8 pad058[0x05C - 0x058];
+    /* +0x05C */ s32 flag; /* GTE FLAG */
+    /* +0x060 */ s32 sxy0;
+    /* +0x064 */ s32 sxy1;
+    /* +0x068 */ s32 sxy2;
+    /* +0x06C */ s32 sxy3; /* a quad's fourth vertex */
+    u8 pad070[0x078 - 0x070];
+    /* +0x078 */ s32 divide; /* set when the face must go through RCpoly* subdivision */
+    u8 pad07C[0x088 - 0x07C];
+    /* +0x088 */ RVECTOR *divVtx3[3]; /* gDivPolygon3's r0..r2 */
+    /* +0x094 */ RVECTOR *divVtx4[4]; /* gDivPolygon4's r0..r3 */
+    /* +0x0A4 */ SVECTOR *faceVtx[4]; /* the current face's vertices */
+} PolyDrawCtx;
+
+/* The first word of a group's first TMD packet. Sony's TMD_P_* structs
+ * spell it as four bytes (out, in, dummy, cd: olen, ilen, flag, mode); this
+ * renderer reads the first two as the group's packet count and the last two
+ * as one flag | mode << 8 word. */
+typedef struct TmdGroupHeader {
+    u16 count;
+    u16 type;
+} TmdGroupHeader;
+
+/* A TMD packet's type as SortTmdObject switches on it: the mode byte
+ * (Sony's GPU_COM_* codes, <libgs.h>) above the flag byte. */
+#define TMD_TYPE(mode, flag) ((mode) << 8 | (flag))
+#define TMD_FLAG_LGT 0x01    /* flag: light source calculation off */
+#define TMD_TYPE_MASK 0xFD07 /* mode less its ABE bit 0x02; flag's LGT, FCE, GRD */
+
+/* The mode byte's ABE (semi-transparency) bit, read in the packet's first
+ * word: mode is its top byte, ABE that byte's bit 1. */
+#define TMD_WORD_ABE_SHIFT 25
+
+/* A textured face's CLUT is moved down dp >> shift palette rows (dp, the
+ * GTE depth-cue factor, is below ONE, 4096): 9 gives 0..7 rows of
+ * depth-cued palettes for an object whose light mode is not plain (GsFOG,
+ * GsMATE, or GsLIGHT_MODE through GsLLMOD), 16 gives none. */
+#define DP_CLUT_SHIFT_CUED 9
+#define DP_CLUT_SHIFT_NONE 16
+
+/* GTE FLAG bit 18: SZ3 or OTZ saturated. The one FLAG state
+ * TransformAndCullPoly keeps a polygon for, routed to subdivision. */
+#define GTE_FLAG_SZ3_OTZ_SAT 0x40000
+
+/* GsDOBJ2 keeps its TMD object as a u_long *. */
+#define OBJ_TMD(obj) ((struct TMD_STRUCT *)(obj)->tmd)
+
+/* Move a textured primitive's CLUT `rows` palette rows down (one row is
+ * 1 << 6 in libgpu's getClut encoding). MATCHING: the do/while(0) gives back
+ * the loop depth SortTmdObject's goto loops drop; without it local-alloc
+ * swaps $v0/$v1 at all six sites. */
+/* clang-format off */
+#define ADD_CLUT_ROWS(p, rows) \
+    do { \
+        ((POLY_FT3 *)(p))->clut += (rows) << 6; \
     } while (0)
-extern s8 D_8008A82C[3];
-extern void *GsOUT_PACKET_P;
+/* clang-format on */
+extern Rgb8 gTexturedFaceColor;
 
 extern void InitDivPolygonPtrs(void *dst, void *table, s32 count);
 extern void StoreSxyPolyFT4(void *dst, s32 storeFirst3);
 extern void StoreSxyPolyGT4(void *dst, s32 storeFirst3);
 
-/*
- * The eight submit wrappers in code_8220_c, which are still INCLUDE_ASM there
- * and declared `void`. That is provably a placeholder: every one of them is a
- * tail call whose last instruction before its epilogue is `jal RCpolyXX` with
- * no intervening store to $v0, so Sony's return value falls straight out --
- * the standard `p = RCpolyF3(p);` work-buffer-advance idiom. This function
- * consumes exactly that value, so this file declares its own view rather than
- * importing the stale one (round 50's finding; see the report).
- */
+/* The eight submit wrappers in code_8220_c. Each links the finished
+ * primitive into the OT (directly, or through its RCpoly* subdivider) and
+ * returns the packet cursor past what it wrote. */
 extern void *SubmitPolyF3(void *prim, void *ctx);
 extern void *SubmitPolyG3(void *prim, void *ctx);
 extern void *SubmitPolyFT3(void *prim, void *ctx);
@@ -167,11 +211,10 @@ extern void *SubmitPolyFT4(void *prim, void *ctx);
 extern void *SubmitPolyGT3(void *prim, void *ctx);
 extern void *SubmitPolyGT4(void *prim, void *ctx);
 
-/* Defined below, in ROM order. Forward-declared because this function comes
- * first in the segment and calls all of them. */
-void SetupPrimCode(void *prim, void *ctx);
-s32 ProjectTriFace(void *prim, u8 *ctx, u16 idx0, u16 idx1, u16 idx2, void (*storeSxy)(void *));
-s32 ProjectQuadFace(void *prim, u8 *ctx, u16 idx0, u16 idx1, u16 idx2, u16 idx3,
+/* Defined below SortTmdObject, which calls them. */
+void SetupPrimCode(void *prim, PolyDrawCtx *ctx);
+s32 ProjectTriFace(void *prim, PolyDrawCtx *ctx, u16 idx0, u16 idx1, u16 idx2, void (*storeSxy)(void *));
+s32 ProjectQuadFace(void *prim, PolyDrawCtx *ctx, u16 idx0, u16 idx1, u16 idx2, u16 idx3,
                     void (*storeSxy)(void *, s32));
 void StoreSxyPolyF3(void *dst);
 void StoreSxyPolyG3(void *dst);
@@ -181,479 +224,498 @@ void StoreSxyPolyF4(void *dst, s32 storeFirst3);
 void StoreSxyPolyG4(void *dst, s32 storeFirst3);
 
 /*
- * Walk one model's face groups and emit a GPU primitive per surviving face.
+ * The game's own GsSortObject4 (same arguments): emit every surviving face of
+ * `obj`'s TMD object into `ot` as a GPU primitive in the GsOUT_PACKET_P
+ * buffer. `otShift` turns a face's Z into its OT slot; `scratch` is where the
+ * PolyDrawCtx goes.
  *
- * `obj` is the drawable, `arg1` supplies the ordering table, `arg2` its shift,
- * and `ctx` is the per-object scratch block the caller places in the PS1
- * scratchpad. Each group header is a 2-byte element count plus a 2-byte
- * primitive tag (and one bit of the same word, the semi-transparency flag);
- * the tag selects one of thirteen case bodies, each with its own element
- * stride, index offsets, GTE colour op and submit wrapper. `prim` is the
- * packet-buffer write cursor, reloaded from GsOUT_PACKET_P at the top of every
- * group and advanced by each submit wrapper's return value.
+ * First the object's attribute bits go to the globals above, and when its
+ * GsCOORDINATE2 has a parent, the object's workm is rotated by the parent's
+ * workm column by column, the GTE rotation matrix saved around it. The TMD's
+ * primitives come in runs of one packet type, the first packet's header
+ * holding the run's length; each type has one case, which sets the
+ * primitive's length and code once, then per packet projects the face and,
+ * if it survives, lights it from its normal (ncds) or depth-cues its own
+ * colours (dpcs, dpct), copies the UVs and hands the primitive to its submit
+ * wrapper. The packet cursor is reloaded from GsOUT_PACKET_P per run and
+ * written back after it; an unknown type ends the object.
  *
- * Every GTE access goes through include/gte.h. The RGB store macros are the
- * one-pointer-at-offset-0 Psy-Q forms, which is why `gte_strgb(prim + 0x4)`
- * and not `swc2 $22, 0x4(prim)`: the addiu that materialises the sum is part
- * of retail.
- *
- * The thirteen per-element loops are goto loops, not do/while: GCC 2.6.3's
- * loop optimiser only runs on syntactic loops, and there it strength-reduces
- * `elem`'s constant-offset uses into a second induction variable (the
- * gte_ldrgb "r" operand keeps the original alive), costing a setup `addiu`,
- * an increment per iteration and an eighth saved register -- +28 words in
- * all. `ctx` is assigned after the early return for the same reason retail
- * copies a3 through a1 into s2 there.
+ * `packet` is the current TMD packet and `elem` walks beside it, parked on
+ * one member; PKT names the packet as seen from `elem`, POLY the primitive.
+ * MATCHING: retail keeps both pointers and addresses fields from each. The
+ * loops are gotos because a do/while strength-reduces `elem` into a third
+ * pointer (+28 words), `ctx` is assigned after the early return for
+ * retail's a3 -> a1 -> s2 copy, and the RGB stores take `&POLY->r0` because
+ * the addiu that forms it is retail's.
  */
-void func_80018464(void *objIn, void *otSrc, s32 otShift, void *ctxIn) {
-    u8 *obj = (u8 *)objIn;
-    u8 *ctx;
+void SortTmdObject(GsDOBJ2 *obj, GsOT *ot, s32 otShift, void *scratch) {
+    PolyDrawCtx *ctx;
     u8 *prim;
-    u8 *list;
-    s32 remaining;
+    u8 *packet;
+    s32 packetsLeft;
     s32 dpShift;
 
-    if (*(s32 *)obj < 0) {
+    if (obj->attribute & GsDOFF) {
         return;
     }
 
-    ctx = (u8 *)ctxIn;
+    ctx = scratch;
 
-    *(void **)(ctx + 0x0) = *(void **)((u8 *)otSrc + 0x4);
-    *(s32 *)(ctx + 0x4) = otShift;
-    InitDivPolygonPtrs(ctx + 0x88, gDivPolygon3, 3);
-    InitDivPolygonPtrs(ctx + 0x94, gDivPolygon4, 4);
+    ctx->otBase = ot->org;
+    ctx->otShift = otShift;
+    InitDivPolygonPtrs(ctx->divVtx3, gDivPolygon3, 3);
+    InitDivPolygonPtrs(ctx->divVtx4, gDivPolygon4, 4);
 
-    remaining = *(s32 *)(*(u8 **)(obj + 0x8) + 0x14);
-    list = *(u8 **)(*(u8 **)(obj + 0x8) + 0x10);
-    *(void **)(ctx + 0xC) = *(void **)(*(u8 **)(obj + 0x8) + 0x0);
-    *(void **)(ctx + 0x10) = *(void **)(*(u8 **)(obj + 0x8) + 0x8);
+    packetsLeft = OBJ_TMD(obj)->primn;
+    packet = (u8 *)OBJ_TMD(obj)->primtop;
+    ctx->vertices = (SVECTOR *)OBJ_TMD(obj)->vertop;
+    ctx->normals = (SVECTOR *)OBJ_TMD(obj)->nortop;
 
-    /* When the object carries a local light/world matrix, save the GTE's
-     * current rotation matrix into the context, install the object's own,
-     * run each of the three columns of the object's 3x3 through it, and put
-     * the saved matrix back. */
-    if (*(s32 *)(*(u8 **)(obj + 0x4) + 0x48) != 0) {
-        gte_ReadRotMatrix(ctx + 0x38);
-        gte_SetRotMatrix(*(u8 **)(*(u8 **)(obj + 0x4) + 0x48) + 0x24);
+    if (obj->coord2->super != NULL) {
+        gte_ReadRotMatrix(&ctx->savedRotMatrix);
+        gte_SetRotMatrix(&obj->coord2->super->workm);
 
-        gte_ldclmv(*(u8 **)(obj + 0x4) + 0x24);
+        gte_ldclmv(&obj->coord2->workm.m[0][0]);
         gte_llir();
-        gte_stclmv(*(u8 **)(obj + 0x4) + 0x24);
+        gte_stclmv(&obj->coord2->workm.m[0][0]);
 
-        gte_ldclmv(*(u8 **)(obj + 0x4) + 0x26);
+        gte_ldclmv(&obj->coord2->workm.m[0][1]);
         gte_llir();
-        gte_stclmv(*(u8 **)(obj + 0x4) + 0x26);
+        gte_stclmv(&obj->coord2->workm.m[0][1]);
 
-        gte_ldclmv(*(u8 **)(obj + 0x4) + 0x28);
+        gte_ldclmv(&obj->coord2->workm.m[0][2]);
         gte_llir();
-        gte_stclmv(*(u8 **)(obj + 0x4) + 0x28);
+        gte_stclmv(&obj->coord2->workm.m[0][2]);
 
-        gte_SetRotMatrix(ctx + 0x38);
+        gte_SetRotMatrix(&ctx->savedRotMatrix);
     }
 
-    /* Four reads of the flags word, not one cached copy: CSE treats each
-     * global store as a possible alias and keeps all four `lw`s, while the
-     * scheduler (which does know a struct field from a fixed scalar) then
-     * hoists them together above the stores. See RenderObjHead. */
-    D_80090C18 = (((RenderObjHead *)obj)->flags >> 9) & 0x7;
-    D_8008E248 = (((RenderObjHead *)obj)->flags >> 6) & 0x1;
-    D_8008E250 = (((RenderObjHead *)obj)->flags >> 5) & 0x1;
-    D_8008E24C = (((RenderObjHead *)obj)->flags >> 3) & 0x3;
-    ((RenderCtxHead *)ctx)->unk8 = 0xA;
+    /* MATCHING: four struct reads of attribute, hoisted by the scheduler
+     * above the global stores; unk8 is stored after them as a field. */
+    D_80090C18 = (obj->attribute >> 9) & 0x7;
+    D_8008E248 = (obj->attribute >> 6) & 0x1;
+    gSortUseGlobalLightMode = (obj->attribute >> 5) & 0x1;
+    gSortLightMode = (obj->attribute >> 3) & 0x3;
+    ctx->unk8 = 10;
 
-    *(Rgb8 *)(ctx + 0x34) = *(Rgb8 *)D_8008A82C;
+    ctx->faceColor = gTexturedFaceColor;
 
-    if ((D_8008E250 != 0 && D_800902E0 != 0) || D_8008E24C != 0) {
-        dpShift = 9;
+    if ((gSortUseGlobalLightMode != 0 && GsLIGHT_MODE != 0) || gSortLightMode != 0) {
+        dpShift = DP_CLUT_SHIFT_CUED;
     } else {
-        dpShift = 0x10;
+        dpShift = DP_CLUT_SHIFT_NONE;
     }
-    *(s32 *)(ctx + 0x2C) = dpShift;
+    ctx->dpShift = dpShift;
 
-    if (remaining == 0) {
+    if (packetsLeft == 0) {
         return;
     }
 
     {
-        void (*cbG3)(void *) = StoreSxyPolyG3;
+        void (*storeSxyG3)(void *) = StoreSxyPolyG3;
 
         do {
             s32 count;
 
-            prim = (u8 *)GsOUT_PACKET_P;
-            *(s32 *)(ctx + 0x18) = *(u16 *)(list + 0x2) & 0xFD07;
-            count = *(u16 *)(list + 0x0);
-            *(s32 *)(ctx + 0x1C) = (*(u32 *)(list + 0x0) >> 25) & 0x1;
-            remaining -= count;
+            prim = GsOUT_PACKET_P;
+            ctx->packetType = ((TmdGroupHeader *)packet)->type & TMD_TYPE_MASK;
+            count = ((TmdGroupHeader *)packet)->count;
+            ctx->semiTrans = (*(u32 *)packet >> TMD_WORD_ABE_SHIFT) & 0x1;
+            packetsLeft -= count;
 
-            /* Thirteen Psy-Q primitive flavours, one case each, in ascending
-             * tag order. GCC 2.6.3 expands a switch over sparse values as a
-             * balanced binary search -- `== median`, then `< median + 1` and
-             * recurse -- which is where retail's sltiu/beq ladder comes from;
-             * the case bodies then follow in source order, which is why they
-             * sit at ascending addresses in ascending tag order. */
-            switch (*(u32 *)(ctx + 0x18)) {
-                case 0x2000: {
+            /* MATCHING: cases in ascending type order; cc1 tests a sparse
+             * switch as a binary search and lays the bodies out in source
+             * order, which is retail's layout. */
+            switch (ctx->packetType) {
+                case TMD_TYPE(GPU_COM_F3, 0): {
                     u8 *elem;
+#define PKT ((TMD_P_F3 *)(elem - offsetof(TMD_P_F3, r0)))
+#define POLY ((POLY_F3 *)prim)
 
-                    /* A: POLY_F3, opaque */
-                    prim[3] = 4;
-                    prim[7] = 0x20;
+                    /* TMD_P_F3 -> POLY_F3: one colour, lit from the face normal. */
+                    setPolyF3(prim);
                     SetupPrimCode(prim, ctx);
-                    elem = list + 0x4;
+                    elem = packet + offsetof(TMD_P_F3, r0);
                 loopA:
-                    if (ProjectTriFace(prim, ctx, *(u16 *)(elem + 0x6), *(u16 *)(elem + 0x8),
-                                       *(u16 *)(elem + 0xA), StoreSxyPolyF3) == 0) {
-                        gte_ldv0(*(u8 **)(ctx + 0x10) + (s32) * (u16 *)(elem + 0x4) * 8);
-                        gte_ldrgb(elem);
+                    if (ProjectTriFace(prim, ctx, PKT->v0, PKT->v1, PKT->v2, StoreSxyPolyF3) == 0) {
+                        gte_ldv0(&ctx->normals[PKT->n0]);
+                        gte_ldrgb(&PKT->r0);
                         gte_ncds();
-                        gte_strgb(prim + 0x4);
-                        prim[7] = ctx[0x15];
-                        prim = (u8 *)SubmitPolyF3(prim, ctx);
+                        gte_strgb(&POLY->r0);
+                        setcode(prim, ctx->primCode);
+                        prim = SubmitPolyF3(prim, ctx);
                     }
-                    elem += 0x10;
-                    list += 0x10;
+                    elem += sizeof(TMD_P_F3);
+                    packet += sizeof(TMD_P_F3);
                     if (--count != 0)
                         goto loopA;
                     break;
+#undef PKT
+#undef POLY
                 }
 
-                case 0x2004: {
+                case TMD_TYPE(GPU_COM_F3, GsTMDFlagGRD): {
                     u8 *elem;
+#define PKT ((TMD_P_F3G *)(elem - offsetof(TMD_P_F3G, r2)))
+#define POLY ((POLY_G3 *)prim)
 
-                    /* B: POLY_G3, opaque -- one ncds per vertex colour */
-                    prim[3] = 6;
-                    prim[7] = 0x30;
+                    /* TMD_P_F3G -> POLY_G3: flat-shaded with a colour per vertex (GRD),
+                     * each lit from the one face normal. MATCHING: r0 and r1
+                     * are read through `packet`, r2 through `elem`. */
+                    setPolyG3(prim);
                     SetupPrimCode(prim, ctx);
-                    elem = list + 0xC;
+                    elem = packet + offsetof(TMD_P_F3G, r2);
                 loopB:
-                    if (ProjectTriFace(prim, ctx, *(u16 *)(elem + 0x6), *(u16 *)(elem + 0x8),
-                                       *(u16 *)(elem + 0xA), cbG3) == 0) {
-                        gte_ldv0(*(u8 **)(ctx + 0x10) + (s32) * (u16 *)(elem + 0x4) * 8);
-                        gte_ldrgb(list + 0x4);
+                    if (ProjectTriFace(prim, ctx, PKT->v0, PKT->v1, PKT->v2, storeSxyG3) == 0) {
+                        gte_ldv0(&ctx->normals[PKT->n0]);
+                        gte_ldrgb(&((TMD_P_F3G *)packet)->r0);
                         gte_ncds();
-                        gte_strgb(prim + 0x4);
-                        prim[7] = ctx[0x15];
-                        gte_ldrgb(list + 0x8);
+                        gte_strgb(&POLY->r0);
+                        setcode(prim, ctx->primCode);
+                        gte_ldrgb(&((TMD_P_F3G *)packet)->r1);
                         gte_ncds();
-                        gte_strgb(prim + 0xC);
-                        gte_ldrgb(elem);
+                        gte_strgb(&POLY->r1);
+                        gte_ldrgb(&PKT->r2);
                         gte_ncds();
-                        gte_strgb(prim + 0x14);
-                        prim = (u8 *)SubmitPolyG3(prim, ctx);
+                        gte_strgb(&POLY->r2);
+                        prim = SubmitPolyG3(prim, ctx);
                     }
-                    elem += 0x18;
-                    list += 0x18;
+                    elem += sizeof(TMD_P_F3G);
+                    packet += sizeof(TMD_P_F3G);
                     if (--count != 0)
                         goto loopB;
                     break;
+#undef PKT
+#undef POLY
                 }
 
-                case 0x2101: {
+                case TMD_TYPE(GPU_COM_NF3, TMD_FLAG_LGT): {
                     u8 *elem;
+#define PKT ((TMD_P_NF3 *)(elem - offsetof(TMD_P_NF3, r0)))
+#define POLY ((POLY_F3 *)prim)
 
-                    /* C: POLY_F3, depth-cued */
-                    prim[3] = 4;
-                    prim[7] = 0x20;
+                    /* TMD_P_NF3 -> POLY_F3: unlit, its colour depth-cued. */
+                    setPolyF3(prim);
                     SetupPrimCode(prim, ctx);
-                    elem = list + 0x4;
+                    elem = packet + offsetof(TMD_P_NF3, r0);
                 loopC:
-                    if (ProjectTriFace(prim, ctx, *(u16 *)(elem + 0x4), *(u16 *)(elem + 0x6),
-                                       *(u16 *)(elem + 0x8), StoreSxyPolyF3) == 0) {
-                        gte_ldrgb(elem);
+                    if (ProjectTriFace(prim, ctx, PKT->v0, PKT->v1, PKT->v2, StoreSxyPolyF3) == 0) {
+                        gte_ldrgb(&PKT->r0);
                         gte_dpcs();
-                        gte_strgb(prim + 0x4);
-                        prim[7] = ctx[0x15];
-                        prim = (u8 *)SubmitPolyF3(prim, ctx);
+                        gte_strgb(&POLY->r0);
+                        setcode(prim, ctx->primCode);
+                        prim = SubmitPolyF3(prim, ctx);
                     }
-                    elem += 0x10;
-                    list += 0x10;
+                    elem += sizeof(TMD_P_NF3);
+                    packet += sizeof(TMD_P_NF3);
                     if (--count != 0)
                         goto loopC;
                     break;
+#undef PKT
+#undef POLY
                 }
 
-                case 0x2400: {
+                case TMD_TYPE(GPU_COM_TF3, 0): {
                     u8 *elem;
+#define PKT ((TMD_P_TF3 *)(elem - offsetof(TMD_P_TF3, n0)))
+#define POLY ((POLY_FT3 *)prim)
 
-                    /* D: POLY_FT3, opaque -- one constant colour for the whole
-                 * group, loaded once before the loop. */
-                    prim[3] = 7;
-                    prim[7] = 0x24;
+                    /* TMD_P_TF3 -> POLY_FT3: lit, from gTexturedFaceColor, which is
+                     * loaded into the GTE once per run. */
+                    setPolyFT3(prim);
                     SetupPrimCode(prim, ctx);
-                    gte_ldrgb(ctx + 0x34);
-                    elem = list + 0x10;
+                    gte_ldrgb(&ctx->faceColor);
+                    elem = packet + offsetof(TMD_P_TF3, n0);
                 loopD:
-                    if (ProjectTriFace(prim, ctx, *(u16 *)(elem + 0x2), *(u16 *)(elem + 0x4),
-                                       *(u16 *)(elem + 0x6), StoreSxyPolyFT3) == 0) {
-                        *(u32 *)(prim + 0xC) = *(u32 *)(elem - 0xC);
-                        *(u32 *)(prim + 0x14) = *(u32 *)(elem - 0x8);
-                        *(u32 *)(prim + 0x1C) = *(u32 *)(elem - 0x4);
-                        ADD_CLUT_ROWS(prim, *(s32 *)(ctx + 0x24) >> *(s32 *)(ctx + 0x2C));
-                        gte_ldv0(*(u8 **)(ctx + 0x10) + (s32) * (u16 *)(elem + 0x0) * 8);
+                    if (ProjectTriFace(prim, ctx, PKT->v0, PKT->v1, PKT->v2, StoreSxyPolyFT3) == 0) {
+                        *(u32 *)&POLY->u0 = *(u32 *)&PKT->tu0;
+                        *(u32 *)&POLY->u1 = *(u32 *)&PKT->tu1;
+                        *(u32 *)&POLY->u2 = *(u32 *)&PKT->tu2;
+                        ADD_CLUT_ROWS(prim, ctx->dp >> ctx->dpShift);
+                        gte_ldv0(&ctx->normals[PKT->n0]);
                         gte_ncds();
-                        gte_strgb(prim + 0x4);
-                        prim[7] = ctx[0x15];
-                        prim = (u8 *)SubmitPolyFT3(prim, ctx);
+                        gte_strgb(&POLY->r0);
+                        setcode(prim, ctx->primCode);
+                        prim = SubmitPolyFT3(prim, ctx);
                     }
-                    elem += 0x18;
-                    list += 0x18;
+                    elem += sizeof(TMD_P_TF3);
+                    packet += sizeof(TMD_P_TF3);
                     if (--count != 0)
                         goto loopD;
                     break;
+#undef PKT
+#undef POLY
                 }
 
-                case 0x2501: {
+                case TMD_TYPE(GPU_COM_NTF3, TMD_FLAG_LGT): {
                     u8 *elem;
+#define PKT ((TMD_P_TNF3 *)(elem - offsetof(TMD_P_TNF3, r0)))
+#define POLY ((POLY_FT3 *)prim)
 
-                    /* E: POLY_FT3, depth-cued */
-                    prim[3] = 7;
-                    prim[7] = 0x24;
+                    /* TMD_P_TNF3 -> POLY_FT3: unlit, its colour depth-cued. */
+                    setPolyFT3(prim);
                     SetupPrimCode(prim, ctx);
-                    elem = list + 0x10;
+                    elem = packet + offsetof(TMD_P_TNF3, r0);
                 loopE:
-                    if (ProjectTriFace(prim, ctx, *(u16 *)(elem + 0x4), *(u16 *)(elem + 0x6),
-                                       *(u16 *)(elem + 0x8), StoreSxyPolyFT3) == 0) {
-                        *(u32 *)(prim + 0xC) = *(u32 *)(elem - 0xC);
-                        *(u32 *)(prim + 0x14) = *(u32 *)(elem - 0x8);
-                        *(u32 *)(prim + 0x1C) = *(u32 *)(elem - 0x4);
-                        ADD_CLUT_ROWS(prim, *(s32 *)(ctx + 0x24) >> *(s32 *)(ctx + 0x2C));
-                        gte_ldrgb(elem);
+                    if (ProjectTriFace(prim, ctx, PKT->v0, PKT->v1, PKT->v2, StoreSxyPolyFT3) == 0) {
+                        *(u32 *)&POLY->u0 = *(u32 *)&PKT->tu0;
+                        *(u32 *)&POLY->u1 = *(u32 *)&PKT->tu1;
+                        *(u32 *)&POLY->u2 = *(u32 *)&PKT->tu2;
+                        ADD_CLUT_ROWS(prim, ctx->dp >> ctx->dpShift);
+                        gte_ldrgb(&PKT->r0);
                         gte_dpcs();
-                        gte_strgb(prim + 0x4);
-                        prim[7] = ctx[0x15];
-                        prim = (u8 *)SubmitPolyFT3(prim, ctx);
+                        gte_strgb(&POLY->r0);
+                        setcode(prim, ctx->primCode);
+                        prim = SubmitPolyFT3(prim, ctx);
                     }
-                    elem += 0x1C;
-                    list += 0x1C;
+                    elem += sizeof(TMD_P_TNF3);
+                    packet += sizeof(TMD_P_TNF3);
                     if (--count != 0)
                         goto loopE;
                     break;
+#undef PKT
+#undef POLY
                 }
 
-                case 0x2800: {
+                case TMD_TYPE(GPU_COM_F4, 0): {
                     u8 *elem;
+#define PKT ((TMD_P_F4 *)(elem - offsetof(TMD_P_F4, r0)))
+#define POLY ((POLY_F4 *)prim)
 
-                    /* F: POLY_F4, opaque */
-                    prim[3] = 5;
-                    prim[7] = 0x28;
+                    /* TMD_P_F4 -> POLY_F4: one colour, lit from the face normal. */
+                    setPolyF4(prim);
                     SetupPrimCode(prim, ctx);
-                    elem = list + 0x4;
+                    elem = packet + offsetof(TMD_P_F4, r0);
                 loopF:
-                    if (ProjectQuadFace(prim, ctx, *(u16 *)(elem + 0x6), *(u16 *)(elem + 0x8),
-                                        *(u16 *)(elem + 0xA), *(u16 *)(elem + 0xC), StoreSxyPolyF4) == 0) {
-                        gte_ldv0(*(u8 **)(ctx + 0x10) + (s32) * (u16 *)(elem + 0x4) * 8);
-                        gte_ldrgb(elem);
+                    if (ProjectQuadFace(prim, ctx, PKT->v0, PKT->v1, PKT->v2, PKT->v3,
+                                        StoreSxyPolyF4) == 0) {
+                        gte_ldv0(&ctx->normals[PKT->n0]);
+                        gte_ldrgb(&PKT->r0);
                         gte_ncds();
-                        gte_strgb(prim + 0x4);
-                        prim[7] = ctx[0x15];
-                        prim = (u8 *)SubmitPolyF4(prim, ctx);
+                        gte_strgb(&POLY->r0);
+                        setcode(prim, ctx->primCode);
+                        prim = SubmitPolyF4(prim, ctx);
                     }
-                    elem += 0x14;
-                    list += 0x14;
+                    elem += sizeof(TMD_P_F4);
+                    packet += sizeof(TMD_P_F4);
                     if (--count != 0)
                         goto loopF;
                     break;
+#undef PKT
+#undef POLY
                 }
 
-                case 0x2901: {
+                case TMD_TYPE(GPU_COM_NF4, TMD_FLAG_LGT): {
                     u8 *elem;
+#define PKT ((TMD_P_NF4 *)(elem - offsetof(TMD_P_NF4, r0)))
+#define POLY ((POLY_F4 *)prim)
 
-                    /* G: POLY_F4, depth-cued */
-                    prim[3] = 5;
-                    prim[7] = 0x28;
+                    /* TMD_P_NF4 -> POLY_F4: unlit, its colour depth-cued. */
+                    setPolyF4(prim);
                     SetupPrimCode(prim, ctx);
-                    elem = list + 0x4;
+                    elem = packet + offsetof(TMD_P_NF4, r0);
                 loopG:
-                    if (ProjectQuadFace(prim, ctx, *(u16 *)(elem + 0x4), *(u16 *)(elem + 0x6),
-                                        *(u16 *)(elem + 0x8), *(u16 *)(elem + 0xA), StoreSxyPolyF4) == 0) {
-                        gte_ldrgb(elem);
+                    if (ProjectQuadFace(prim, ctx, PKT->v0, PKT->v1, PKT->v2, PKT->v3,
+                                        StoreSxyPolyF4) == 0) {
+                        gte_ldrgb(&PKT->r0);
                         gte_dpcs();
-                        gte_strgb(prim + 0x4);
-                        prim[7] = ctx[0x15];
-                        prim = (u8 *)SubmitPolyF4(prim, ctx);
+                        gte_strgb(&POLY->r0);
+                        setcode(prim, ctx->primCode);
+                        prim = SubmitPolyF4(prim, ctx);
                     }
-                    elem += 0x10;
-                    list += 0x10;
+                    elem += sizeof(TMD_P_NF4);
+                    packet += sizeof(TMD_P_NF4);
                     if (--count != 0)
                         goto loopG;
                     break;
+#undef PKT
+#undef POLY
                 }
 
-                case 0x2C00: {
+                case TMD_TYPE(GPU_COM_TF4, 0): {
                     u8 *elem;
+#define PKT ((TMD_P_TF4 *)(elem - offsetof(TMD_P_TF4, n0)))
+#define POLY ((POLY_FT4 *)prim)
 
-                    /* H: POLY_FT4, opaque */
-                    prim[3] = 9;
-                    prim[7] = 0x2C;
+                    /* TMD_P_TF4 -> POLY_FT4: lit, from gTexturedFaceColor. */
+                    setPolyFT4(prim);
                     SetupPrimCode(prim, ctx);
-                    gte_ldrgb(ctx + 0x34);
-                    elem = list + 0x14;
+                    gte_ldrgb(&ctx->faceColor);
+                    elem = packet + offsetof(TMD_P_TF4, n0);
                 loopH:
-                    if (ProjectQuadFace(prim, ctx, *(u16 *)(elem + 0x2), *(u16 *)(elem + 0x4),
-                                        *(u16 *)(elem + 0x6), *(u16 *)(elem + 0x8),
+                    if (ProjectQuadFace(prim, ctx, PKT->v0, PKT->v1, PKT->v2, PKT->v3,
                                         StoreSxyPolyFT4) == 0) {
-                        *(u32 *)(prim + 0xC) = *(u32 *)(elem - 0x10);
-                        *(u32 *)(prim + 0x14) = *(u32 *)(elem - 0xC);
-                        *(u32 *)(prim + 0x1C) = *(u32 *)(elem - 0x8);
-                        *(u32 *)(prim + 0x24) = *(u32 *)(elem - 0x4);
-                        ADD_CLUT_ROWS(prim, *(s32 *)(ctx + 0x24) >> *(s32 *)(ctx + 0x2C));
-                        gte_ldv0(*(u8 **)(ctx + 0x10) + (s32) * (u16 *)(elem + 0x0) * 8);
+                        *(u32 *)&POLY->u0 = *(u32 *)&PKT->tu0;
+                        *(u32 *)&POLY->u1 = *(u32 *)&PKT->tu1;
+                        *(u32 *)&POLY->u2 = *(u32 *)&PKT->tu2;
+                        *(u32 *)&POLY->u3 = *(u32 *)&PKT->tu3;
+                        ADD_CLUT_ROWS(prim, ctx->dp >> ctx->dpShift);
+                        gte_ldv0(&ctx->normals[PKT->n0]);
                         gte_ncds();
-                        gte_strgb(prim + 0x4);
-                        prim[7] = ctx[0x15];
-                        prim = (u8 *)SubmitPolyFT4(prim, ctx);
+                        gte_strgb(&POLY->r0);
+                        setcode(prim, ctx->primCode);
+                        prim = SubmitPolyFT4(prim, ctx);
                     }
-                    elem += 0x20;
-                    list += 0x20;
+                    elem += sizeof(TMD_P_TF4);
+                    packet += sizeof(TMD_P_TF4);
                     if (--count != 0)
                         goto loopH;
                     break;
+#undef PKT
+#undef POLY
                 }
 
-                case 0x2D01: {
+                case TMD_TYPE(GPU_COM_NTF4, TMD_FLAG_LGT): {
                     u8 *elem;
+#define PKT ((TMD_P_TNF4 *)(elem - offsetof(TMD_P_TNF4, r0)))
+#define POLY ((POLY_FT4 *)prim)
 
-                    /* I: POLY_FT4, depth-cued */
-                    prim[3] = 9;
-                    prim[7] = 0x2C;
+                    /* TMD_P_TNF4 -> POLY_FT4: unlit, its colour depth-cued. */
+                    setPolyFT4(prim);
                     SetupPrimCode(prim, ctx);
-                    elem = list + 0x14;
+                    elem = packet + offsetof(TMD_P_TNF4, r0);
                 loopI:
-                    if (ProjectQuadFace(prim, ctx, *(u16 *)(elem + 0x4), *(u16 *)(elem + 0x6),
-                                        *(u16 *)(elem + 0x8), *(u16 *)(elem + 0xA),
+                    if (ProjectQuadFace(prim, ctx, PKT->v0, PKT->v1, PKT->v2, PKT->v3,
                                         StoreSxyPolyFT4) == 0) {
-                        *(u32 *)(prim + 0xC) = *(u32 *)(elem - 0x10);
-                        *(u32 *)(prim + 0x14) = *(u32 *)(elem - 0xC);
-                        *(u32 *)(prim + 0x1C) = *(u32 *)(elem - 0x8);
-                        *(u32 *)(prim + 0x24) = *(u32 *)(elem - 0x4);
-                        ADD_CLUT_ROWS(prim, *(s32 *)(ctx + 0x24) >> *(s32 *)(ctx + 0x2C));
-                        gte_ldrgb(elem);
+                        *(u32 *)&POLY->u0 = *(u32 *)&PKT->tu0;
+                        *(u32 *)&POLY->u1 = *(u32 *)&PKT->tu1;
+                        *(u32 *)&POLY->u2 = *(u32 *)&PKT->tu2;
+                        *(u32 *)&POLY->u3 = *(u32 *)&PKT->tu3;
+                        ADD_CLUT_ROWS(prim, ctx->dp >> ctx->dpShift);
+                        gte_ldrgb(&PKT->r0);
                         gte_dpcs();
-                        gte_strgb(prim + 0x4);
-                        prim[7] = ctx[0x15];
-                        prim = (u8 *)SubmitPolyFT4(prim, ctx);
+                        gte_strgb(&POLY->r0);
+                        setcode(prim, ctx->primCode);
+                        prim = SubmitPolyFT4(prim, ctx);
                     }
-                    elem += 0x20;
-                    list += 0x20;
+                    elem += sizeof(TMD_P_TNF4);
+                    packet += sizeof(TMD_P_TNF4);
                     if (--count != 0)
                         goto loopI;
                     break;
+#undef PKT
+#undef POLY
                 }
 
-                case 0x3101: {
+                case TMD_TYPE(GPU_COM_NG3, TMD_FLAG_LGT): {
                     u8 *elem;
+#define PKT ((TMD_P_NG3 *)(elem - offsetof(TMD_P_NG3, r0)))
 
-                    /* J: POLY_G3, depth-cued -- three colours, one dpct */
-                    prim[3] = 6;
-                    prim[7] = 0x30;
+                    /* TMD_P_NG3 -> POLY_G3: unlit, three colours depth-cued at once. */
+                    setPolyG3(prim);
                     SetupPrimCode(prim, ctx);
-                    elem = list + 0x4;
+                    elem = packet + offsetof(TMD_P_NG3, r0);
                 loopJ:
-                    if (ProjectTriFace(prim, ctx, *(u16 *)(elem + 0xC), *(u16 *)(elem + 0xE),
-                                       *(u16 *)(elem + 0x10), cbG3) == 0) {
-                        gte_ldrgb3c(elem);
+                    if (ProjectTriFace(prim, ctx, PKT->v0, PKT->v1, PKT->v2, storeSxyG3) == 0) {
+                        gte_ldrgb3c(&PKT->r0);
                         gte_dpct();
                         gte_strgb3_g3(prim);
-                        prim[7] = ctx[0x15];
-                        prim = (u8 *)SubmitPolyG3(prim, ctx);
+                        setcode(prim, ctx->primCode);
+                        prim = SubmitPolyG3(prim, ctx);
                     }
-                    elem += 0x18;
-                    list += 0x18;
+                    elem += sizeof(TMD_P_NG3);
+                    packet += sizeof(TMD_P_NG3);
                     if (--count != 0)
                         goto loopJ;
                     break;
+#undef PKT
                 }
 
-                case 0x3501: {
+                case TMD_TYPE(GPU_COM_NTG3, TMD_FLAG_LGT): {
                     u8 *elem;
+#define PKT ((TMD_P_TNG3 *)(elem - offsetof(TMD_P_TNG3, r2)))
+#define POLY ((POLY_GT3 *)prim)
 
-                    /* K: POLY_GT3, depth-cued */
-                    prim[3] = 9;
-                    prim[7] = 0x34;
+                    /* TMD_P_TNG3 -> POLY_GT3: unlit, three colours depth-cued at once. */
+                    setPolyGT3(prim);
                     SetupPrimCode(prim, ctx);
-                    elem = list + 0x18;
+                    elem = packet + offsetof(TMD_P_TNG3, r2);
                 loopK:
-                    if (ProjectTriFace(prim, ctx, *(u16 *)(elem + 0x4), *(u16 *)(elem + 0x6),
-                                       *(u16 *)(elem + 0x8), StoreSxyPolyGT3) == 0) {
-                        *(u32 *)(prim + 0xC) = *(u32 *)(elem - 0x14);
-                        *(u32 *)(prim + 0x18) = *(u32 *)(elem - 0x10);
-                        *(u32 *)(prim + 0x24) = *(u32 *)(elem - 0xC);
-                        ADD_CLUT_ROWS(prim, *(s32 *)(ctx + 0x24) >> *(s32 *)(ctx + 0x2C));
-                        gte_ldrgb3(list + 0x10, list + 0x14, elem);
+                    if (ProjectTriFace(prim, ctx, PKT->v0, PKT->v1, PKT->v2, StoreSxyPolyGT3) == 0) {
+                        *(u32 *)&POLY->u0 = *(u32 *)&PKT->tu0;
+                        *(u32 *)&POLY->u1 = *(u32 *)&PKT->tu1;
+                        *(u32 *)&POLY->u2 = *(u32 *)&PKT->tu2;
+                        ADD_CLUT_ROWS(prim, ctx->dp >> ctx->dpShift);
+                        gte_ldrgb3(&((TMD_P_TNG3 *)packet)->r0, &((TMD_P_TNG3 *)packet)->r1, &PKT->r2);
                         gte_dpct();
-                        gte_strgb3(prim + 0x4, prim + 0x10, prim + 0x1C);
-                        prim[7] = ctx[0x15];
-                        prim = (u8 *)SubmitPolyGT3(prim, ctx);
+                        gte_strgb3(&POLY->r0, &POLY->r1, &POLY->r2);
+                        setcode(prim, ctx->primCode);
+                        prim = SubmitPolyGT3(prim, ctx);
                     }
-                    elem += 0x24;
-                    list += 0x24;
+                    elem += sizeof(TMD_P_TNG3);
+                    packet += sizeof(TMD_P_TNG3);
                     if (--count != 0)
                         goto loopK;
                     break;
+#undef PKT
+#undef POLY
                 }
 
-                case 0x3901: {
+                case TMD_TYPE(GPU_COM_NG4, TMD_FLAG_LGT): {
                     u8 *elem;
+#define PKT ((TMD_P_NG4 *)(elem - offsetof(TMD_P_NG4, r3)))
+#define POLY ((POLY_G4 *)prim)
 
-                    /* L: POLY_G4, depth-cued -- three colours by dpct, the
-                 * fourth by a second dpcs. */
-                    prim[3] = 8;
-                    prim[7] = 0x38;
+                    /* TMD_P_NG4 -> POLY_G4: unlit, three colours depth-cued at once
+                     * and the fourth on its own. */
+                    setPolyG4(prim);
                     SetupPrimCode(prim, ctx);
-                    elem = list + 0x10;
+                    elem = packet + offsetof(TMD_P_NG4, r3);
                 loopL:
-                    if (ProjectQuadFace(prim, ctx, *(u16 *)(elem + 0x4), *(u16 *)(elem + 0x6),
-                                        *(u16 *)(elem + 0x8), *(u16 *)(elem + 0xA), StoreSxyPolyG4) == 0) {
-                        gte_ldrgb3c(list + 0x4);
+                    if (ProjectQuadFace(prim, ctx, PKT->v0, PKT->v1, PKT->v2, PKT->v3,
+                                        StoreSxyPolyG4) == 0) {
+                        gte_ldrgb3c(&((TMD_P_NG4 *)packet)->r0);
                         gte_dpct();
                         gte_strgb3_g3(prim);
-                        prim[7] = ctx[0x15];
-                        gte_ldrgb(elem);
+                        setcode(prim, ctx->primCode);
+                        gte_ldrgb(&PKT->r3);
                         gte_dpcs();
-                        gte_strgb(prim + 0x1C);
-                        prim = (u8 *)SubmitPolyG4(prim, ctx);
+                        gte_strgb(&POLY->r3);
+                        prim = SubmitPolyG4(prim, ctx);
                     }
-                    elem += 0x1C;
-                    list += 0x1C;
+                    elem += sizeof(TMD_P_NG4);
+                    packet += sizeof(TMD_P_NG4);
                     if (--count != 0)
                         goto loopL;
                     break;
+#undef PKT
+#undef POLY
                 }
 
-                case 0x3D01: {
+                case TMD_TYPE(GPU_COM_NTG4, TMD_FLAG_LGT): {
                     u8 *elem;
+#define PKT ((TMD_P_TNG4 *)(elem - offsetof(TMD_P_TNG4, r3)))
+#define POLY ((POLY_GT4 *)prim)
 
-                    /* M: POLY_GT4, depth-cued -- the widest element, 0x2C bytes,
-                 * all four UVs and all four colours. */
-                    prim[3] = 0xC;
-                    prim[7] = 0x3C;
+                    /* TMD_P_TNG4 -> POLY_GT4: unlit, as TMD_P_NG4 plus four UVs. */
+                    setPolyGT4(prim);
                     SetupPrimCode(prim, ctx);
-                    elem = list + 0x20;
+                    elem = packet + offsetof(TMD_P_TNG4, r3);
                 loopM:
-                    if (ProjectQuadFace(prim, ctx, *(u16 *)(elem + 0x4), *(u16 *)(elem + 0x6),
-                                        *(u16 *)(elem + 0x8), *(u16 *)(elem + 0xA),
+                    if (ProjectQuadFace(prim, ctx, PKT->v0, PKT->v1, PKT->v2, PKT->v3,
                                         StoreSxyPolyGT4) == 0) {
-                        *(u32 *)(prim + 0xC) = *(u32 *)(elem - 0x1C);
-                        *(u32 *)(prim + 0x18) = *(u32 *)(elem - 0x18);
-                        *(u32 *)(prim + 0x24) = *(u32 *)(elem - 0x14);
-                        *(u32 *)(prim + 0x30) = *(u32 *)(elem - 0x10);
-                        ADD_CLUT_ROWS(prim, *(s32 *)(ctx + 0x24) >> *(s32 *)(ctx + 0x2C));
-                        gte_ldrgb3(list + 0x14, list + 0x18, list + 0x1C);
+                        *(u32 *)&POLY->u0 = *(u32 *)&PKT->tu0;
+                        *(u32 *)&POLY->u1 = *(u32 *)&PKT->tu1;
+                        *(u32 *)&POLY->u2 = *(u32 *)&PKT->tu2;
+                        *(u32 *)&POLY->u3 = *(u32 *)&PKT->tu3;
+                        ADD_CLUT_ROWS(prim, ctx->dp >> ctx->dpShift);
+                        gte_ldrgb3(&((TMD_P_TNG4 *)packet)->r0, &((TMD_P_TNG4 *)packet)->r1,
+                                   &((TMD_P_TNG4 *)packet)->r2);
                         gte_dpct();
-                        gte_strgb3(prim + 0x4, prim + 0x10, prim + 0x1C);
-                        prim[7] = ctx[0x15];
-                        gte_ldrgb(elem);
+                        gte_strgb3(&POLY->r0, &POLY->r1, &POLY->r2);
+                        setcode(prim, ctx->primCode);
+                        gte_ldrgb(&PKT->r3);
                         gte_dpcs();
-                        gte_strgb(prim + 0x28);
-                        prim = (u8 *)SubmitPolyGT4(prim, ctx);
+                        gte_strgb(&POLY->r3);
+                        prim = SubmitPolyGT4(prim, ctx);
                     }
-                    elem += 0x2C;
-                    list += 0x2C;
+                    elem += sizeof(TMD_P_TNG4);
+                    packet += sizeof(TMD_P_TNG4);
                     if (--count != 0)
                         goto loopM;
                     break;
+#undef PKT
+#undef POLY
                 }
 
                 default:
@@ -661,81 +723,61 @@ void func_80018464(void *objIn, void *otSrc, s32 otShift, void *ctxIn) {
             }
 
             GsOUT_PACKET_P = prim;
-        } while (remaining != 0);
+        } while (packetsLeft != 0);
     }
 }
 
 /*
- * Finish the GPU command byte of the POLY_xx primitive `prim`, then cache it
- * in the draw context. `prim[3]` is the P_TAG length byte and `prim[7]` is
- * the GPU command byte; func_80018464 writes the (len, code) pair for the
- * primitive type immediately before every one of its 13 calls to this, and
- * all eight pairs it uses are Sony's exactly -- (4, 0x20) POLY_F3, (6, 0x30)
- * POLY_G3, (7, 0x24) POLY_FT3, (5, 0x28) POLY_F4, (9, 0x2C) POLY_FT4,
- * (9, 0x34) POLY_GT3, (8, 0x38) POLY_G4, (12, 0x3C) POLY_GT4.
- *
- * Bit 0x2 of the command byte is the GPU's ABE (semi-transparency) bit and
- * is taken from the context's own flag at +0x1C; bit 0x1 is the shade-texture
- * bit (Psy-Q SetShadeTex) and is taken from the global D_8008E248, which
- * func_80018464 sets from bit 6 of the object's flags word. The two updates
- * are deliberately independent statements -- see this function's match
- * report, factoring them through one local costs the match.
- *
- * The length byte and the finished command byte are then cached at ctx+0x14
- * and ctx+0x15; TransformAndCullPoly re-stamps the length byte onto every
- * primitive it processes from ctx+0x14.
+ * Finish the command byte of the primitive SortTmdObject has just given its
+ * length and code, and cache both bytes in the context: the ABE
+ * (semi-transparency) bit from the run's packet type, the TGE (texture
+ * shading off) bit from D_8008E248, the object's GsLOFF bit.
+ * TransformAndCullPoly re-stamps the cached length onto every primitive.
+ * MATCHING: two separate statements; one shared local costs the match.
  */
-void SetupPrimCode(void *prim, void *ctx) {
-    u8 *a = (u8 *)prim;
+void SetupPrimCode(void *prim, PolyDrawCtx *ctx) {
+    setSemiTrans(prim, ctx->semiTrans);
+    setShadeTex(prim, D_8008E248);
 
-    if (*(s32 *)((u8 *)ctx + 0x1C) != 0) {
-        a[7] = a[7] | 0x2;
-    } else {
-        a[7] = a[7] & 0xFD;
-    }
-
-    if (D_8008E248 != 0) {
-        a[7] = a[7] | 0x1;
-    } else {
-        a[7] = a[7] & 0xFE;
-    }
-
-    *((u8 *)ctx + 0x14) = a[3];
-    *((u8 *)ctx + 0x15) = a[7];
+    ctx->primLen = getlen(prim);
+    ctx->primCode = getcode(prim);
 }
 
 /*
  * Project one three-vertex face and say whether it survived.
  *
- * `idx0`..`idx2` index the 8-byte vertex array the draw context holds at
- * ctx+0xC; the three resulting pointers are parked in the context's vertex
- * slots at +0xA4/+0xA8/+0xAC and loaded into the GTE. TransformAndCullPoly
- * does the transform and the cull decision. On success each vertex's screen
- * Z goes into the sort slot at +0x14 of the three per-vertex records the
- * context lists at +0x88/+0x8C/+0x90, `storeSxy` writes the screen XY into
- * `prim` at that primitive type's own offsets (one of the StoreSxyPoly**
- * leaves at the bottom of this file), and FlagLargePolyForDivide computes the screen
+ * `idx0`..`idx2` index the vertex array the draw context holds; the three
+ * resulting pointers are parked in the context's face slots and loaded into
+ * the GTE. TransformAndCullPoly does the transform and the cull decision. On
+ * success each vertex's screen Z goes into the sz of the three subdivision
+ * vertices the context lists, `storeSxy` writes the screen XY into `prim` at
+ * that primitive type's own offsets (one of the StoreSxyPoly** leaves at the
+ * bottom of this file), and FlagLargePolyForDivide computes the screen
  * bounding box over the 3 vertices. Returns 0 drawn, 1 culled.
  *
  * `prim` is only ever handed straight through, so it stays void * here.
  */
-s32 ProjectTriFace(void *prim, u8 *ctx, u16 idx0, u16 idx1, u16 idx2, void (*storeSxy)(void *)) {
-    *(void **)(ctx + 0xa4) = (u8 *)(*(void **)(ctx + 0xc)) + (s32)idx0 * 8;
-    *(void **)(ctx + 0xa8) = (u8 *)(*(void **)(ctx + 0xc)) + (s32)idx1 * 8;
-    *(void **)(ctx + 0xac) = (u8 *)(*(void **)(ctx + 0xc)) + (s32)idx2 * 8;
+s32 ProjectTriFace(void *prim, PolyDrawCtx *ctx, u16 idx0, u16 idx1, u16 idx2, void (*storeSxy)(void *)) {
+    /* MATCHING: the slots go through a plain pointer; as ctx->faceVtx[i]
+     * struct stores the scheduler interleaves them with the loads. */
+    SVECTOR **vtx = ctx->faceVtx;
 
-    gte_ldv3(*(void **)(ctx + 0xa4), *(void **)(ctx + 0xa8), *(void **)(ctx + 0xac));
+    vtx[0] = &ctx->vertices[idx0];
+    vtx[1] = &ctx->vertices[idx1];
+    vtx[2] = &ctx->vertices[idx2];
+
+    gte_ldv3(vtx[0], vtx[1], vtx[2]);
 
     if (TransformAndCullPoly(prim, ctx) != 0) {
         goto fail;
     }
 
     {
-        u8 *p0 = *(u8 **)(ctx + 0x88) + 0x14;
-        u8 *p1 = *(u8 **)(ctx + 0x8c) + 0x14;
-        u8 *p2 = *(u8 **)(ctx + 0x90) + 0x14;
+        u_long *sz0 = &ctx->divVtx3[0]->sz;
+        u_long *sz1 = &ctx->divVtx3[1]->sz;
+        u_long *sz2 = &ctx->divVtx3[2]->sz;
 
-        gte_stsz3(p0, p1, p2);
+        gte_stsz3(sz0, sz1, sz2);
     }
     storeSxy(prim);
     FlagLargePolyForDivide(ctx, 3);
@@ -749,20 +791,21 @@ fail:
  * through the same shared transform-and-cull; the fourth is transformed on
  * its own with a single rtps afterwards, which is why `storeSxy` is called
  * twice -- once with 1 to store the first three screen XYs, once with 0 to
- * store the fourth. Sort Zs go to four per-vertex records (+0x94..+0xA0),
- * the fourth vertex's screen XY is also cached at ctx+0x6C, and the bounding
- * box is computed over 4 vertices. Returns 0 drawn, 1 culled.
+ * store the fourth. Sort Zs go to four subdivision vertices, the fourth
+ * vertex's screen XY is also cached in the context, and the bounding box is
+ * computed over 4 vertices. Returns 0 drawn, 1 culled.
  */
-s32 ProjectQuadFace(void *prim, u8 *ctx, u16 idx0, u16 idx1, u16 idx2, u16 idx3,
+s32 ProjectQuadFace(void *prim, PolyDrawCtx *ctx, u16 idx0, u16 idx1, u16 idx2, u16 idx3,
                     void (*storeSxy)(void *, s32)) {
-    u8 *vtxSlot = ctx + 0xa4;
+    /* MATCHING: a plain pointer, as in ProjectTriFace. */
+    SVECTOR **vtx = ctx->faceVtx;
 
-    *(void **)(ctx + 0xa4) = (u8 *)(*(void **)(ctx + 0xc)) + (s32)idx0 * 8;
-    *(void **)(ctx + 0xa8) = (u8 *)(*(void **)(ctx + 0xc)) + (s32)idx1 * 8;
-    *(void **)(ctx + 0xac) = (u8 *)(*(void **)(ctx + 0xc)) + (s32)idx2 * 8;
-    *(void **)(ctx + 0xb0) = (u8 *)(*(void **)(ctx + 0xc)) + (s32)idx3 * 8;
+    vtx[0] = &ctx->vertices[idx0];
+    vtx[1] = &ctx->vertices[idx1];
+    vtx[2] = &ctx->vertices[idx2];
+    vtx[3] = &ctx->vertices[idx3];
 
-    gte_ldv3(*(void **)(vtxSlot + 0x0), *(void **)(vtxSlot + 0x4), *(void **)(vtxSlot + 0x8));
+    gte_ldv3(vtx[0], vtx[1], vtx[2]);
 
     if (TransformAndCullPoly(prim, ctx) != 0) {
         goto fail;
@@ -770,21 +813,21 @@ s32 ProjectQuadFace(void *prim, u8 *ctx, u16 idx0, u16 idx1, u16 idx2, u16 idx3,
 
     storeSxy(prim, 1);
 
-    gte_ldv0(*(void **)(vtxSlot + 0xc));
+    gte_ldv0(vtx[3]);
     gte_rtps();
 
     {
-        u8 *p0 = *(u8 **)(ctx + 0x94) + 0x14;
-        u8 *p1 = *(u8 **)(ctx + 0x98) + 0x14;
-        u8 *p2 = *(u8 **)(ctx + 0x9c) + 0x14;
-        u8 *p3 = *(u8 **)(ctx + 0xa0) + 0x14;
+        u_long *sz0 = &ctx->divVtx4[0]->sz;
+        u_long *sz1 = &ctx->divVtx4[1]->sz;
+        u_long *sz2 = &ctx->divVtx4[2]->sz;
+        u_long *sz3 = &ctx->divVtx4[3]->sz;
 
-        gte_stsz4(p0, p1, p2, p3);
+        gte_stsz4(sz0, sz1, sz2, sz3);
     }
 
     storeSxy(prim, 0);
 
-    gte_stsxy2(ctx + 0x6c);
+    gte_stsxy2(&ctx->sxy3);
 
     FlagLargePolyForDivide(ctx, 4);
     return 0;
@@ -793,74 +836,25 @@ fail:
 }
 
 /*
- * This unit's local view of the draw context TransformAndCullPoly works on
- * (the `ctx` its callers hand it -- one per-object scratch block, which
- * func_80018464's own caller places in the PS1 scratchpad at 0x1F800000).
- * Only the fields this function touches are typed; the callers still address
- * the rest by offset, and the offsets outside this view that this unit does
- * use are +0x0C the vertex array, +0x1C the semi-transparency flag,
- * +0x14/+0x15 the cached tag length and GPU command byte, +0x88..+0xA0 the
- * per-vertex sort records and +0xA4..+0xB0 the four vertex slots.
- *
- * The three SXY words are deliberately separate fields rather than an array:
- * retail stores them through three independently computed addresses, which
- * is gte_stsxy3()'s three-pointer form.
- */
-typedef struct PolyDrawCtx {
-    /* +0x000 */ u32 *otBase; /* ordering table, 4-byte entries */
-    /* +0x004 */ s32 otShift; /* otz >> otShift indexes otBase */
-    u8 pad008[0x014 - 0x008];
-    /* +0x014 */ u8 tagLen; /* SetupPrimCode's cached P_TAG length byte */
-    u8 pad015[0x020 - 0x015];
-    /* +0x020 */ s32 otz; /* avsz3 result */
-    /* +0x024 */ s32 dp;  /* IR0, the depth-cue factor */
-    /* +0x028 */ s32 opz; /* nclip result (MAC0) */
-    u8 pad02C[0x030 - 0x02C];
-    /* +0x030 */ u32 *otSlot; /* &otBase[otz >> otShift] */
-    u8 pad034[0x05C - 0x034];
-    /* +0x05C */ s32 flag; /* GTE FLAG & 0x40000 */
-    /* +0x060 */ s32 sxy0;
-    /* +0x064 */ s32 sxy1;
-    /* +0x068 */ s32 sxy2;
-    u8 pad06C[0x078 - 0x06C];
-    /* +0x078 */ s32 saturated; /* set when the transform saturated */
-} PolyDrawCtx;
-
-/*
- * The Psy-Q GPU primitive being filled in. Only the P_TAG length byte is
- * written from here; the GPU command byte one word later (+0x7) is
- * SetupPrimCode's, and the screen XYs are the StoreSxyPoly** leaves'.
- */
-typedef struct GpuPrim {
-    u8 pad000[3];
-    /* +0x003 */ u8 tagLen; /* P_TAG's length field, little-endian */
-} GpuPrim;
-
-/*
  * Perspective-transform the three vertices the caller already loaded into
  * the GTE (gte_ldv3), then cull: bail if the FLAG register shows anything
- * other than clean or SZ3-saturated, if the polygon is back-facing
- * (nclip <= 0), or if the depth-cue factor says it is too close. Otherwise
- * average the Z, cache the screen coordinates and compute the OT bucket.
- * Returns 0 on success, 1 when culled.
- *
- * Splat tagged this "handwritten"; it is ordinary C over the Psy-Q gte_*
- * macros (include/gte.h), and every one of retail's raw words is one of
- * those macros. Earlier rounds carried it as a whole-function __asm__.
+ * but clean or SZ3/OTZ-saturated (which marks the face for subdivision), if
+ * the polygon is back-facing (nclip <= 0), or if the depth-cue factor has
+ * reached ONE. Otherwise average the Z, cache the screen coordinates and
+ * compute the OT slot. Returns 0 on success, 1 when culled.
  */
 s32 TransformAndCullPoly(void *primIn, void *ctxIn) {
-    GpuPrim *prim = primIn;
     PolyDrawCtx *ctx = ctxIn;
 
-    ctx->saturated = 0;
+    ctx->divide = 0;
     gte_rtpt();
-    prim->tagLen = ctx->tagLen;
+    setlen(primIn, ctx->primLen);
     gte_stflg(&ctx->flag);
     if (ctx->flag != 0) {
-        if (ctx->flag != 0x40000) {
+        if (ctx->flag != GTE_FLAG_SZ3_OTZ_SAT) {
             return 1;
         }
-        ctx->saturated = 1;
+        ctx->divide = 1;
     }
     gte_nclip();
     gte_stopz(&ctx->opz);
@@ -868,7 +862,7 @@ s32 TransformAndCullPoly(void *primIn, void *ctxIn) {
         return 1;
     }
     gte_stdp(&ctx->dp);
-    if (ctx->dp >= 0x1000) {
+    if (ctx->dp >= ONE) {
         return 1;
     }
     gte_avsz3();
@@ -878,10 +872,10 @@ s32 TransformAndCullPoly(void *primIn, void *ctxIn) {
     return 0;
 }
 
-/* The six screen-XY store callbacks ProjectTri/QuadFace invoke, one per
- * Psy-Q primitive type: each writes the GTE's SXY FIFO into that POLY_xx's
- * own vertex offsets. POLY_FT4 and POLY_GT4's equivalents are StoreSxyPolyFT4
- * and StoreSxyPolyGT4 in code_8220_c. POLY_F3: xy0/xy1/xy2 at +0x8/+0xC/+0x10. */
+/* The screen-XY store callbacks ProjectTri/QuadFace invoke, one per
+ * primitive type: each writes the GTE's SXY FIFO into that POLY_xx's own
+ * vertex fields (StoreSxyPolyFT4 and StoreSxyPolyGT4 are in code_8220_c).
+ * POLY_F3: xy0/xy1/xy2 at +0x8/+0xC/+0x10. */
 void StoreSxyPolyF3(void *dst) {
     gte_stsxy3_f3(dst);
 }
@@ -891,11 +885,9 @@ void StoreSxyPolyG3(void *dst) {
     gte_stsxy3_g3(dst);
 }
 
-/* POLY_FT3: +0x8/+0x10/+0x18 -- byte-identical to the POLY_G3 store, since
- * POLY_G3's per-vertex RGB and POLY_FT3's per-vertex UV are both 4 bytes.
- * Retail keeps them as two separate functions and so does this file; which
- * is which is settled by the (len, code) pair at each one's call site, not
- * by the offsets. */
+/* POLY_FT3: +0x8/+0x10/+0x18, the same offsets as POLY_G3 (a UV word where
+ * POLY_G3 has an RGB word), but a separate function in retail; the
+ * primitive at each call site says which is which. */
 void StoreSxyPolyFT3(void *dst) {
     gte_stsxy3_ft3(dst);
 }
@@ -909,27 +901,26 @@ void StoreSxyPolyGT3(void *dst) {
  * POLY_F4: xy0/xy1/xy2 at +0x8/+0xC/+0x10, xy3 at +0x14. ProjectQuadFace
  * calls this twice -- storeFirst3 = 1 for the three vertices the shared
  * transform produced, then 0 for the fourth vertex's own rtps result.
- * `p` must be a real unconditionally-computed pointer, not a 0x14(%0)
- * offset inside the asm: see this function's match report.
+ * MATCHING: `xy3` is computed unconditionally, not as an offset in the asm.
  */
 void StoreSxyPolyF4(void *dst, s32 storeFirst3) {
-    char *p = (char *)dst + 0x14;
+    short *xy3 = &((POLY_F4 *)dst)->x3;
 
     if (storeFirst3) {
         gte_stsxy3_f4(dst);
     } else {
-        gte_stsxy2(p);
+        gte_stsxy2(xy3);
     }
 }
 
 /* POLY_G4: xy0/xy1/xy2 at +0x8/+0x10/+0x18, xy3 at +0x20. Same two-call
  * protocol as StoreSxyPolyF4. */
 void StoreSxyPolyG4(void *dst, s32 storeFirst3) {
-    char *p = (char *)dst + 0x20;
+    short *xy3 = &((POLY_G4 *)dst)->x3;
 
     if (storeFirst3) {
         gte_stsxy3_g4(dst);
     } else {
-        gte_stsxy2(p);
+        gte_stsxy2(xy3);
     }
 }

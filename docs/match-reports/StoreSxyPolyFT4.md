@@ -43,7 +43,7 @@ offsets } else { one swc2 through dst+N }`) with this function's own offsets
 **Tier A.** Sixth and final member of the StoreSxyPoly** family split
 across code_8220_b (StoreSxyPolyF3/G3/FT3/GT3/F4/G4) and this unit.
 StoreSxyPolyG4.md already named this function's call-site discriminator
-when it named its own sibling: the POLY_FT4 cases in func_80018464
+when it named its own sibling: the POLY_FT4 cases in SortTmdObject
 (`len = 9`, `code = 0x2C`) pass this function; the POLY_GT4 cases
 (`len = 12`, `code = 0x3C`) pass `func_8001979C` (now StoreSxyPolyGT4,
 below). Offsets `0x8`/`0x10`/`0x18` (true branch) and `0x20` (false

@@ -167,7 +167,7 @@ Transform, then cull. Both callers use the return value for exactly that.
 
 **`GteCullOwner` -> `GpuPrim`, and why the old name had to go.** The old
 name asserted that `arg0` is "the owner object" of the cull, which is not
-what it is. It is the Psy-Q GPU primitive being filled in: `func_80018464`
+what it is. It is the Psy-Q GPU primitive being filled in: `SortTmdObject`
 writes a `(len, code)` pair into its bytes `+0x3` and `+0x7` before every
 face, and all eight pairs it uses are Sony's POLY_xx values exactly (the
 table is in `docs/match-reports/SetupPrimCode.md`). So the field this
@@ -182,8 +182,18 @@ is not cull scratch, it is the per-object draw context that both
 `ProjectTriFace` and `ProjectQuadFace` thread through everything -- vertex
 array at `+0x0C`, semi-transparency flag at `+0x1C`, cached tag/code at
 `+0x14`/`+0x15`, per-vertex sort records at `+0x88..0xA0`, vertex slots at
-`+0xA4..0xB0`. `func_80018464`'s own caller puts it in the PS1 scratchpad
+`+0xA4..0xB0`. `SortTmdObject`'s own caller puts it in the PS1 scratchpad
 (`lui $a3, 0x1F80` at 0x80012368 in `asm/psyq_2864.s`).
 
 No offsets moved and no types changed -- both structs keep the exact layout
 that byte-matched; `tagLen` is `unk3`/`unk14` renamed in place.
+
+## Round 91 polish (delta, track 7)
+
+`GpuPrim` gave way to libgpu: the tag store is `setlen(primIn, ctx->primLen)`
+(the 8-bit bitfield compiles to the same `sb`), the near-plane test is
+`ctx->dp >= ONE` (libgte), the FLAG test names `GTE_FLAG_SZ3_OTZ_SAT`
+(bit 18), and `saturated` is the context's `divide` field, the flag the
+code_8220_c submit wrappers route to RCpoly* subdivision. The comment's
+history (splat's "handwritten" tag, the whole-function `__asm__` of earlier
+rounds) is this report's own table above.

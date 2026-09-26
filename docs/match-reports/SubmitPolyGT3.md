@@ -31,7 +31,7 @@ it did for the five siblings. No search was run; no other variants were
 needed. The preserved `self`/`prim` locals and the `Vec2s16` whole-struct
 copies (`lwl`/`lwr` + `swl`/`swr`) are kept unchanged from the old body.
 
-**Callers checked:** `func_80018464` in `src/code_8220_b.c` (one call site,
+**Callers checked:** `SortTmdObject` in `src/code_8220_b.c` (one call site,
 `prim = (u8 *)SubmitPolyGT3(prim, ctx);`), declared there as
 `extern void *SubmitPolyGT3(void *prim, void *ctx);`. No other reference in `src/`,
 `asm/` or `config/`. The return type agrees. `RCpolyGT3` stays declared `void` in
@@ -353,7 +353,7 @@ family root: base = **260** (100 insertion + 100 deletion + 12x5 register
 diffs). Not independently full-searched this pass; time budget went to a
 deep single search on `SubmitPolyF3` (40000 iterations, floor held at
 260, two false leads found and falsified against the real oracle) plus
-reading `code_8220_b`'s `func_80018464` for `self`'s real type -- see that
+reading `code_8220_b`'s `SortTmdObject` for `self`'s real type -- see that
 report's new section for the trace, and `SubmitPolyGT4.md` for the one
 sibling where the caller's own field writes independently confirm the
 size formula. Permuter scaffold left provisioned at

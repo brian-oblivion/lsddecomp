@@ -31,7 +31,7 @@
 #define MAX_UNDIVIDED_SPAN 256
 
 /* The per-object draw context, as this unit sees it: code_8220_b's
- * func_80018464 fills it for each object (in the scratchpad) and hands it to
+ * SortTmdObject fills it for each object (in the scratchpad) and hands it to
  * every per-face call. Only the fields read or written here are named;
  * code_8220_b keeps its own view of the rest. */
 typedef struct PolyDrawCtx {
@@ -325,7 +325,7 @@ void FlagLargePolyForDivide(void *ctxIn, s32 count) {
 extern s32 sDivClipWidth;
 extern s32 sDivClipHeight;
 
-/* The object's default ndiv: code_8220_b's func_80018464 sets it from bits
+/* The object's default ndiv: code_8220_b's SortTmdObject sets it from bits
  * 9-11 of the drawn object's flags. It keeps its address-style name because
  * config/psyq-objects.ld's `dc_cb` pin covers the address; see the report. */
 extern s32 D_80090C18;

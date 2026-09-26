@@ -85,3 +85,8 @@ replace of the round: 13 units access `->slot38`
 (`class_3bb8c_d/f/i/j/k.c`, `class_39e08.c`, `class_3ac78.c`,
 `code_2cc8c_c/d.c`, `code_55dd4.c`, `code_d294.c`, `code_d294_b.c`, plus
 this unit). Worth doing alone rather than batched.
+
+## Round 91 polish (delta, track 7)
+
+The source comment no longer names the two overriding subclasses; they are
+listed in this report above.

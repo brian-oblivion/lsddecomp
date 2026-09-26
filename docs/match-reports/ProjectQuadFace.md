@@ -150,3 +150,9 @@ what is specific to the four-vertex form is below.
 - This function is what already established `storeSxy`'s real two-argument
   signature; the triangle form's single call site could not distinguish it
   from an unused second parameter.
+
+## Round 91 polish (delta, track 7)
+
+As ProjectTriFace: `PolyDrawCtx` fields, the four slot stores through the
+existing plain `vtx` pointer (struct stores cost 70 bytes), sort Zs to
+`&divVtx4[N]->sz`, the fourth SXY to `&ctx->sxy3`.

@@ -94,7 +94,7 @@ unchanged.
   functions return to `fresh` (0 -> 62). One report rewritten to cite only its
   remaining `gp_rel` hit. Five substantive reports KEPT — their structural
   analysis is still good — with a banner saying the verdict is stale and the
-  function is assignable: `func_80018464`, `TaskCore__OnPadEvent`, `TaskCore__SetState`,
+  function is assignable: `SortTmdObject`, `TaskCore__OnPadEvent`, `TaskCore__SetState`,
   `FormatFullWidthNumber`, `Class865C8__OnObjMNotify`.
 
   `TaskCore__SetState` is worth singling out: CLAUDE.md cites it as the case where

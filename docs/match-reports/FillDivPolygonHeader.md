@@ -188,7 +188,7 @@ Globals renamed with it:
 `D_80090C18`, the default `ndiv`, keeps its name: `rename.py` refuses it
 because `config/psyq-objects.ld` pins Sony's `dc_cb` (libpress/vlc2) at
 0x80090C14 with 8 bytes, which covers it. Its only writer is code_8220_b's
-func_80018464, from bits 9-11 of the drawn object's flags, so the word
+SortTmdObject, from bits 9-11 of the drawn object's flags, so the word
 looks like game data; whether `dc_cb` really is 8 bytes is proposed to the
 head. Round 77 had left `D_8008A824`/`D_8008A828` as `D_` names for lack of
 a second accessor; the DIVPOLYGON layout is the evidence that was missing.

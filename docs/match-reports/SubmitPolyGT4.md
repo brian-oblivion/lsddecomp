@@ -31,7 +31,7 @@ it did for the five siblings. No search was run; no other variants were
 needed. The preserved `self`/`prim` locals and the `Vec2s16` whole-struct
 copies (`lwl`/`lwr` + `swl`/`swr`) are kept unchanged from the old body.
 
-**Callers checked:** `func_80018464` in `src/code_8220_b.c` (one call site,
+**Callers checked:** `SortTmdObject` in `src/code_8220_b.c` (one call site,
 `prim = (u8 *)SubmitPolyGT4(prim, ctx);`), declared there as
 `extern void *SubmitPolyGT4(void *prim, void *ctx);`. No other reference in `src/`,
 `asm/` or `config/`. The return type agrees. `RCpolyGT4` stays declared `void` in
@@ -424,11 +424,11 @@ function's own offsets. Not independently full-searched this pass -- time
 budget went to a deep single search on the root case
 (`SubmitPolyF3`, 40000 iterations, floor held at 260, two false leads
 found and falsified against the real oracle -- see that report) plus reading
-`code_8220_b`'s `func_80018464` for `self`'s real type.
+`code_8220_b`'s `SortTmdObject` for `self`'s real type.
 
-**This function is the one `func_80018464` independently confirms the size
+**This function is the one `SortTmdObject` independently confirms the size
 formula on.** Immediately before the `jal SubmitPolyGT4` call site,
-`func_80018464` GTE-stores four vertex-color records into `self` at
+`SortTmdObject` GTE-stores four vertex-color records into `self` at
 `+0x4`, `+0x10`, `+0x1C`, `+0x28` (stride `0xC`, 4 records) -- one past the
 last record is `0x28+0xC=0x34`, exactly this function's filler
 (`addiu $v0,$s1,0x34`). This is a real, independent confirmation of the
@@ -436,7 +436,7 @@ last record is `0x28+0xC=0x34`, exactly this function's filler
 curve-fit from this function's own reads -- see `SubmitPolyF3.md`'s new
 section for the full trace and for why it does NOT yet explain the missing
 C-level mention (no `self+1`/`&self[1]`-shaped expression exists anywhere
-in `func_80018464` either; it loops over its own cursors, not over `self`).
+in `SortTmdObject` either; it loops over its own cursors, not over `self`).
 
 Permuter scaffold left provisioned at `permuter-work/SubmitPolyGT4/`
 (gitignored, session-local) for a future targeted (PERM-macro) run.

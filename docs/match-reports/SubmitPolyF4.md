@@ -324,7 +324,7 @@ family root: base = **260** (100 insertion + 100 deletion + 12x5 register
 diffs). Not independently full-searched this pass; time budget went to a
 deep single search on `SubmitPolyF3` (40000 iterations, floor held at
 260, two false leads found and falsified against the real oracle) plus
-reading `code_8220_b`'s `func_80018464` for `self`'s real type -- see that
+reading `code_8220_b`'s `SortTmdObject` for `self`'s real type -- see that
 report's new section for the trace, and `SubmitPolyGT4.md` for the one
 sibling where the caller's own field writes independently confirm the
 size formula. Permuter scaffold left provisioned at

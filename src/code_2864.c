@@ -120,7 +120,7 @@ extern void GsSortBg(void *bg, void *ot, u16 pri);
 extern void GsSortBoxFill(GsBOXF_2864 *bp, void *ot, u16 pri);
 extern void GsSortSprite(GsSPRITE_2864 *sp, void *ot, u16 pri);
 extern void ApplyMatrixToLVArray(void *dst, void *src, s32 count, void *m);
-extern void func_80018464(void *objIn, void *otSrc, s32 otShift, void *ctxIn);
+extern void SortTmdObject(void *objIn, void *otSrc, s32 otShift, void *ctxIn);
 
 /*
  * Draw `node` into self's current ordering table, after first drawing every
@@ -216,7 +216,7 @@ void Viewport__DrawNode(Viewport *self, DrawNode *node) {
         GsSetLightMatrix(lw);
         GsSetLsMatrix(ls);
         if (node->obj.tmd != NULL) {
-            func_80018464(&node->obj, self->ot[self->otIndex], 14 - self->otLength, (void *)0x1F800000);
+            SortTmdObject(&node->obj, self->ot[self->otIndex], 14 - self->otLength, (void *)0x1F800000);
         }
     } else if ((tag & 0xFFF) == 0x144) {
         DrawNode *n = node;
