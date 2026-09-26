@@ -48,7 +48,7 @@
  * +0x088: Class866E8__OnElementEvent takes (self, command, elem); the slot
  * keeps SceneNode's (self, event). Its four callers (Finalize,
  * ResetAllElements, ApplyRateEntries, OnNotifyTag1) pass (self, 6 or 7,
- * elem, index) through Class866E8OnElementEventFn below (no code).
+ * elem, index) through StageMapOnSlotEventFn below (no code).
  * +0x0D4 getCurrentCellKey and +0x0F8 buildRateEntries keep their CALLERS'
  * shapes: DreamSys__WallLink passes getCurrentCellKey a second word the
  * occupant never reads, and SetTargetAndBuildRates returns buildRateEntries'
@@ -277,7 +277,7 @@ struct Class866E8 {
 }; /* 0x1E8 bytes: New_Class866E8 */
 
 /* +0x088's occupant, which takes the element too (see the banner). */
-typedef void (*Class866E8OnElementEventFn)(Class866E8 *self, s32 command, ChunkSlot *elem, s32 index);
+typedef void (*StageMapOnSlotEventFn)(Class866E8 *self, s32 command, ChunkSlot *elem, s32 index);
 
 /* ForEachElem's callbacks. */
 typedef void (*Class866E8CellFn)(Class866E8 *self, struct GridCell *cell);

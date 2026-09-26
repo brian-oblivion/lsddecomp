@@ -167,7 +167,7 @@ void Class866E8__Finalize(Class866E8 *self) {
 
     for (i = 0; i < 7; i++) {
         entry = &self->elems[i];
-        ((Class866E8OnElementEventFn)self->methods->notifyWithHull)(self, 6, entry, i);
+        ((StageMapOnSlotEventFn)self->methods->notifyWithHull)(self, 6, entry, i);
 
         if (entry->loader != NULL) {
             entry->loader->methods->release(entry->loader);
@@ -276,7 +276,7 @@ void Class866E8__ResetAllElements(Class866E8 *self) {
         if (list->linkResource != NULL) {
             list->linkResource = list->linkResource->methods->release(list->linkResource);
         }
-        ((Class866E8OnElementEventFn)self->methods->notifyWithHull)(self, 6, entry, i);
+        ((StageMapOnSlotEventFn)self->methods->notifyWithHull)(self, 6, entry, i);
         entry->loader->methods->releaseDataBlock(entry->loader);
     }
 

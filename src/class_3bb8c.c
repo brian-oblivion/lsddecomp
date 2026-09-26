@@ -311,7 +311,7 @@ void Class866E8__ApplyRateEntries(Class866E8 *self, ChunkLoadEntry *arr1, s32 co
     for (i = 0; i < count; i++) {
         sp = (ChunkLoadEntryTail *)&arr1->chunkIndex;
         e = self->methods->findElemByUnk32(self, sp->neighbour);
-        ((Class866E8OnElementEventFn)self->methods->notifyWithHull)(self, 6, e, i);
+        ((StageMapOnSlotEventFn)self->methods->notifyWithHull)(self, 6, e, i);
         if (arr1->file != 0) {
             if (e->loader->headerReady != 0) {
                 self->methods->resetElementCells(self, e);
@@ -359,7 +359,7 @@ void Class866E8__OnNotifyTag1(Class866E8 *self, void *arg1, s32 mode) {
         e = &self->elems[i];
         if (e->loader->dataReady != 0) {
             e->loader->dataReady = 0;
-            ((Class866E8OnElementEventFn)self->methods->notifyWithHull)(self, 7, e, i);
+            ((StageMapOnSlotEventFn)self->methods->notifyWithHull)(self, 7, e, i);
         }
         curMode = self->loadsPending;
         if (curMode == 1 && e->loadPending != 0) {
