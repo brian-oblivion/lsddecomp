@@ -62,7 +62,7 @@ updated with what survived and what did not.
 **New_TaskCoreObj** -- tier A. Canonical `New_X` allocator shape for
 `TaskCoreObj` (0xA4 bytes), matching `New_StreamTask`'s own shape one
 class down; the "TaskCore" name is this unit's own local view, kept
-independent of `include/Class6D3C8.h`'s `LoaderTask` view of the identical
+independent of `include/GameApplication.h`'s `LoaderTask` view of the identical
 table (per this unit's header comment).
 
 ## Track 4 (2026-09-25, round 84, alpha)

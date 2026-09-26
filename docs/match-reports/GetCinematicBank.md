@@ -37,10 +37,10 @@ Rec1C *GetCinematicBank(s32 *countOut, s32 n) {
   (`s32 unused`): PickWeeklyGroup passes one in `$a1`, as code_1677c's own
   prototype already says. Byte-neutral for SeedAndRandom.
 - No shared header was edited. Other units' prototypes for these functions
-  (class_39e08.h, class_3bb8c.h, Class6D3C8.h) are independent and untouched.
+  (class_39e08.h, class_3bb8c.h, GameApplication.h) are independent and untouched.
 
 ## Naming
 
 - **Name:** `GetCinematicBank`
-- **Tier:** B (head review, round 82: was A. The mechanics are this body's; the purpose word comes from the callers' inherited names in code_1677c.c / Class6D3C8.h, which are themselves hypotheses, so the name is consistent but not established)
+- **Tier:** B (head review, round 82: was A. The mechanics are this body's; the purpose word comes from the callers' inherited names in code_1677c.c / GameApplication.h, which are themselves hypotheses, so the name is consistent but not established)
 - **Evidence:** used by both ResolveCinematicChannel (bank/entry resolve) and GetGraphRoomStreamChannel with a bank id `n`; base 0x23E, stride 6 records, matches both callers' own naming.

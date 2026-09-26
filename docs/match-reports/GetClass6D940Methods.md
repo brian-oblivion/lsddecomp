@@ -51,7 +51,7 @@ NULL-terminated array of "class-method-table getters of every
 FileResource-derived client", `asm/data/5DB70.data.s`). Matches the
 established `GetXXXMethods` convention for every other entry in that same
 array (`GetVabStreamObjMethods`) and elsewhere (`GetFileResourceMethods`,
-`GetClass6D3C8Methods`). The stale "NOT class-framework" language in this
+`GetGameApplicationMethods`). The stale "NOT class-framework" language in this
 report's `## Role` section predates the correction and is left as written
 history rather than edited (the unit header comment and this `## Naming`
 section are authoritative).

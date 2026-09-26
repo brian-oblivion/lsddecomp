@@ -63,7 +63,7 @@ extern const char D_800113EC[];
 extern const char D_800113F8[];
 
 /* Same request-block shape src/code_1677c.c established at
- * `Class6D3C8__Class6D3C8`'s call site (`LoadModelRequest`, learned there to be
+ * `GameApplication__GameApplication`'s call site (`LoadModelRequest`, learned there to be
  * 0x10 bytes even though only the first two fields are ever written --
  * "local struct SIZE matters, not shape"). New_LinkResource
  * (include/LinkResource.h) takes it cast to its descriptor, struct Src6F240. */

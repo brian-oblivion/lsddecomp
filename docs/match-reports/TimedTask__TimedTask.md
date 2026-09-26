@@ -147,7 +147,7 @@ path and Class865C8's own sound, so only Class865C8's copy releases it.
 PlaySound is TaskCore__PlaySound's shape with 0x7F, 0x7F. ObjM calls the
 same object's +0x088/+0x08C, VabStreamObj's Mute/Unmute.
 `tools/classtable.py` stops at the last non-NULL slot, which is why it shows
-the 0x80-byte table as ending at +0x070. Class6D3C8__PollStatusObj switches
+the 0x80-byte table as ending at +0x070. GameApplication__PollStatusObj switches
 on init's return through Class865C8; 2 and 3 are Class865C8's own codes.
 
 Proposed, not applied (accessors outside this job's units):

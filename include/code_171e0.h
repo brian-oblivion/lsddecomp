@@ -4,8 +4,8 @@
 #include "common.h"
 #include "FileResource.h"
 
-/* D_8006D3C8 and its getter GetClass6D3C8Methods (defined in this unit) are
- * include/Class6D3C8.h's. */
+/* D_8006D3C8 and its getter GetGameApplicationMethods (defined in this unit) are
+ * include/GameApplication.h's. */
 
 /* Some class instance (a slot of gFileResourceMethods's table, going by
  * classtable.py) with at least one flag word at offset 0x24, OR'd with 1 by
@@ -22,7 +22,7 @@ typedef struct Vec3_171e0 {
     s32 z;
 } Vec3_171e0;
 
-extern void *BMemPMgrAlloc(s32 size); /* one arg confirmed by New_Class6D3C8.md (code_1677c) */
+extern void *BMemPMgrAlloc(s32 size); /* one arg confirmed by New_GameApplication.md (code_1677c) */
 extern void BMemPMgrFree(void *arg);
 extern s32 strlen(char *s);
 

@@ -1,4 +1,6 @@
-# New_Class6D3C8
+# New_GameApplication
+
+> Renamed from `New_Class6D3C8` on 2026-09-26 (tools/rename.py). Address 0x80025f7c.
 
 > Renamed from `new_class_6d3c8` on 2026-09-24 (tools/rename.py). Address 0x80025f7c.
 
@@ -16,11 +18,11 @@ round 8 (2026-09-02) with the project's first permuter run.
 ## RESOLUTION — the matching form
 
 ```c
-Class6D3C8 *New_Class6D3C8(Class6D3C8CtorArgs *arg) {
-    Class6D3C8 *self = BMemPMgrAlloc(0x2C);
+GameApplication *New_GameApplication(GameApplicationCtorArgs *arg) {
+    GameApplication *self = BMemPMgrAlloc(0x2C);
 
     if (self != 0) {
-        ((Class6D3C8Methods *)GetClass6D3C8Methods())->ctor(self, arg);
+        ((GameApplicationMethods *)GetGameApplicationMethods())->ctor(self, arg);
         return self;
     }
 }
@@ -121,10 +123,10 @@ Five attempts spent, all at 23/24 or worse (never better):
    DIFFERENT value from the fallthrough, unlike the previously-tried
    `goto done; done: return self;` where both paths shared one return).
    Needed one incidental fix along the way: calling
-   `GetClass6D3C8Methods()->ctor(...)` directly (rather than through an
-   intermediate `self->methods = GetClass6D3C8Methods();` assignment as in
-   `Class6D3C8__Class6D3C8`) requires an explicit `(Class6D3C8Methods *)` cast,
-   since `GetClass6D3C8Methods` returns bare `void *` and dereferencing a `void *`
+   `GetGameApplicationMethods()->ctor(...)` directly (rather than through an
+   intermediate `self->methods = GetGameApplicationMethods();` assignment as in
+   `GameApplication__GameApplication`) requires an explicit `(GameApplicationMethods *)` cast,
+   since `GetGameApplicationMethods` returns bare `void *` and dereferencing a `void *`
    member is a hard error, not just a warning, in this compiler. **Result:
    23/24, identical residue** (delay slot: retail `nop`, ours
    `move v0,s0`).
@@ -132,7 +134,7 @@ Five attempts spent, all at 23/24 or worse (never better):
    construct: ...`) — 15/24, WORSE: this shape doesn't merge the two exits
    into one epilogue at all (grows by 2 words, matching the general
    "early return with a separate epilogue" trap documented for
-   `Class6D3C8__PollGraphRoomStatus`).
+   `GameApplication__PollGraphRoomStatus`).
 3. **Bare `__asm__("")` as the very first statement of the function**
    (before the `malloc` call) — the one position broadcast #2 said closed
    an unrelated function's residue, and the existing report here had only
@@ -158,13 +160,13 @@ now, not two). The permuter-target recommendation above stands unchanged.
 
 ## Naming
 
-**`New_Class6D3C8` -- already named (pre-round-77), tier A.** The `New_X`
-allocator for `Class6D3C8` (`BMemPMgrAlloc` + dispatch through the class's
+**`New_GameApplication` -- already named (pre-round-77), tier A.** The `New_X`
+allocator for `GameApplication` (`BMemPMgrAlloc` + dispatch through the class's
 own ctor slot). Left as-is this round -- it predates this naming pass and
 already follows the project's `New_X` convention, just lowercase/underscore
-because it was named before the class's own type name (`Class6D3C8`) was
-established from `classtable.py`. Not renamed to `New_Class6D3C8` here:
+because it was named before the class's own type name (`GameApplication`) was
+established from `classtable.py`. Not renamed to `New_GameApplication` here:
 that would be a cosmetic-only rename with no new evidence behind it, and
-picking it up is better left to whoever names `Class6D3C8` itself formally
+picking it up is better left to whoever names `GameApplication` itself formally
 (this runner did not establish a game-purpose name for the class, only its
 `ClassXXXXX`-by-table-address identity).

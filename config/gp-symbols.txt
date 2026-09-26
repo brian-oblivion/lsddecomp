@@ -140,7 +140,6 @@ gCdState
 gCdTickStep
 gCdTimeoutCounter
 gCdUseVSyncCallback
-gClass6D3C8
 gDefaultBMemPMgr
 gDefaultGridSpan
 gDefaultScreenDims
@@ -155,6 +154,7 @@ gFileTable
 gFileTableCount
 gForcedVariant
 gForcedWeeklyGroup
+gGameApplication
 gInstantTeleportersEnabled
 gItemListCursorColor
 gItemListRowColor

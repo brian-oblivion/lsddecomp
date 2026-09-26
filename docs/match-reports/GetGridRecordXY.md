@@ -33,7 +33,7 @@ Rec1C *GetGridRecordXY(s32 index, s32 x, s32 y) {
   (`s32 unused`): PickWeeklyGroup passes one in `$a1`, as code_1677c's own
   prototype already says. Byte-neutral for SeedAndRandom.
 - No shared header was edited. Other units' prototypes for these functions
-  (class_39e08.h, class_3bb8c.h, Class6D3C8.h) are independent and untouched.
+  (class_39e08.h, class_3bb8c.h, GameApplication.h) are independent and untouched.
 
 ## Naming
 

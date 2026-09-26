@@ -10,7 +10,7 @@
  * GetClass865C8Methods). No class derives from it. The object is 0x50 bytes
  * (New_Class865C8); its own fields run from TimedTask's 0x38.
  *
- * The game builds one, in Class6D3C8__PollStatusObj (src/code_1677c.c):
+ * The game builds one, in GameApplication__PollStatusObj (src/code_1677c.c):
  * New_Class865C8(the task's IntermediateBaseInitArgs, the DreamSys, a flag),
  * init, release, and a switch on init's result, TimedTask::result (2 and 3
  * are values OnObjMNotify sets). What its methods do, measured:

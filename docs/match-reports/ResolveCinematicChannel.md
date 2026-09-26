@@ -55,5 +55,5 @@ the value's register swapped (v0/v1) -> one assignment of a ternary.
 ## Naming
 
 - **Name:** `ResolveCinematicChannel`
-- **Tier:** B (head review, round 82: was A. The mechanics are this body's; the purpose word comes from the callers' inherited names in code_1677c.c / Class6D3C8.h, which are themselves hypotheses, so the name is consistent but not established)
-- **Evidence:** its one caller, Class6D3C8__StartCinematicStream, uses the return value as the cinematic's stream group id, resolved from the DreamSys's own bank/entry pick; matches exactly.
+- **Tier:** B (head review, round 82: was A. The mechanics are this body's; the purpose word comes from the callers' inherited names in code_1677c.c / GameApplication.h, which are themselves hypotheses, so the name is consistent but not established)
+- **Evidence:** its one caller, GameApplication__StartCinematicStream, uses the return value as the cinematic's stream group id, resolved from the DreamSys's own bank/entry pick; matches exactly.

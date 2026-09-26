@@ -14,7 +14,7 @@ instance through the game allocator `BMemPMgrAlloc`, fetches the class's own
 vtable via `Get_vtable_Class65650()` (a `Get_vtable`-style accessor, matched
 separately, see its own report), and calls the constructor slot (`+0x008`)
 with `(self, arg1, arg2)`. Unlike the simpler `New_X` shapes documented
-elsewhere in this project (`New_Pad`, `New_Class6D3C8`), **this one
+elsewhere in this project (`New_Pad`, `New_GameApplication`), **this one
 also checks the constructor's own return value**: on constructor failure it
 frees the object (`BMemPMgrFree`) and returns `NULL` instead of leaving it
 allocated.
@@ -46,7 +46,7 @@ a two-way early exit sharing one epilogue with *different* return values,
 plain `if (...) return OTHER;` costs an extra `j`+`nop`.
 
 This function is a **third sub-shape**, distinct from both `New_Pad`
-(ignores the constructor's return, one early exit) and `New_Class6D3C8`
+(ignores the constructor's return, one early exit) and `New_GameApplication`
 (returns the allocation unconditionally, no early exit at all): it has **two**
 early-exit-shaped branches (the allocation null check, and the constructor
 failure check) plus a genuine three-way return (`NULL` on alloc failure,
@@ -76,7 +76,7 @@ parameter (matching the correction the head made to `class_16334.h`'s
 Not every `New_X` allocator is the same sub-shape. At least three exist in
 this codebase: (1) ignore the constructor's return, single early exit
 (`New_Pad`, needs `goto`); (2) unconditional return, no early exit
-(`New_Class6D3C8`, open stall); (3) check *both* the allocation and the
+(`New_GameApplication`, open stall); (3) check *both* the allocation and the
 constructor's return, two early exits converging on one epilogue
 (`New_Class65650`, matched with plain `if`/`return` — no `goto` needed).
 Identify which shape a given `New_X` is (does the retail asm test the

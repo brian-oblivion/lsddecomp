@@ -114,7 +114,7 @@ Reshapes tried:
    constructor call, with an explicit trailing `return NULL;` as the
    function's own last statement -- see "The matching C" above. 31/31.
 
-This was NOT the `New_Class6D3C8` / "redundant move" residue class after
+This was NOT the `New_GameApplication` / "redundant move" residue class after
 all, despite looking identical to it through attempts 1-5 -- it was an
 ordinary reshape that just hadn't been tried yet. Retracting the earlier
 "second permuter candidate" suggestion below; no permuter target here.

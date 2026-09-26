@@ -1,4 +1,6 @@
-# Class6D3C8__Class6D3C8
+# GameApplication__GameApplication
+
+> Renamed from `Class6D3C8__Class6D3C8` on 2026-09-26 (tools/rename.py). Address 0x80025fdc.
 
 > Renamed from `func_80025FDC` on 2026-09-24 (tools/rename.py). Address 0x80025fdc.
 
@@ -7,12 +9,12 @@
 ## What it does
 
 The constructor for the class whose method table is `D_8006D3C8`
-(`Class6D3C8`, slot `+0x008`): runs the intermediate base class's own
+(`GameApplication`, slot `+0x008`): runs the intermediate base class's own
 constructor through its ctor slot, installs this class's own vtable, stores
 the ctor argument, loads a 3D model ("ETC\DREAME5.TMD"), builds this
 object's owned `DreamSys` from the loaded model, makes one call into a
 not-yet-understood `DreamSys` vtable slot (`+0x228`), then finally invokes
-its own `slot40` (`Class6D3C8__SetDayFromTickCount`, the day-cursor advance already matched in
+its own `slot40` (`GameApplication__SetDayFromTickCount`, the day-cursor advance already matched in
 this unit).
 
 ## Derivation
@@ -30,7 +32,7 @@ lw    $v0, 0x8($v0)              ; base table's ctor slot
 nop
 jalr  $v0                         ; base_ctor(self, arg->unk00), return discarded
  addu $a0, $s0, $zero
-jal   GetClass6D3C8Methods                ; -> &D_8006D3C8 (own vtable)
+jal   GetGameApplicationMethods                ; -> &D_8006D3C8 (own vtable)
  nop
 sw    $v0, 0x0($s0)                 ; self->methods = own vtable
 jal   func_80048CF0                  ; reads an unnamed small-data global
@@ -68,11 +70,11 @@ jalr  $v0                                                  ; self->methods->slot
 Written as:
 
 ```c
-void Class6D3C8__Class6D3C8(Class6D3C8 *self, Class6D3C8CtorArgs *arg) {
+void GameApplication__GameApplication(GameApplication *self, GameApplicationCtorArgs *arg) {
     LoadModelRequest req;
 
     GetApplicationMethods()->ctor(self, arg->unk00);
-    self->methods = GetClass6D3C8Methods();
+    self->methods = GetGameApplicationMethods();
     self->arg = arg;
     func_800270AC(func_80048CF0());
     req.type = 0;
@@ -112,15 +114,15 @@ another caller is found that writes them.
 
 ## New struct/header knowledge (recorded in `include/`)
 
-- `include/Class6D3C8.h`: added `Class6D3C8CtorArgs` (the ctor's `arg`
+- `include/GameApplication.h`: added `GameApplicationCtorArgs` (the ctor's `arg`
   parameter type — only `+0x00` and `+0x14` are read here, observed against
-  the one call site's data, `asm/main.s`'s `gClass6D3C8CtorArgs` global:
+  the one call site's data, `asm/main.s`'s `gGameApplicationCtorArgs` global:
   `{0x13, 0, 1, 1, 1, 1}`), added `LoadModelRequest`, retyped
-  `MiddleClassMethods.ctor` and `Class6D3C8Methods.ctor`/`.slot40` from
+  `MiddleClassMethods.ctor` and `GameApplicationMethods.ctor`/`.slot40` from
   opaque `void *` to real callable signatures now that this function
-  exercises them, retyped `Class6D3C8::arg` and `::dreamSys` from `void *`
+  exercises them, retyped `GameApplication::arg` and `::dreamSys` from `void *`
   to their real pointer types, and declared the small externs this function
-  needed (`GetClass6D3C8Methods`, `sModelPathDreamE5`, `func_80048CF0`, `func_800270AC`,
+  needed (`GetGameApplicationMethods`, `sModelPathDreamE5`, `func_80048CF0`, `func_800270AC`,
   `New_LinkResource`).
 - `include/DreamSys.h`: extended `struct vtable_DreamSys` past its
   previously-documented end (`0x21c`) with 3 padding words and a new named
@@ -142,10 +144,10 @@ second hidden local.
 
 ## Naming
 
-**`Class6D3C8__Class6D3C8` -- tier A.** Convention `Class__Class` for a
+**`GameApplication__GameApplication` -- tier A.** Convention `Class__Class` for a
 constructor (compare `Class865C8__Class865C8`, `BasicClass__BasicClass`,
 `Class65650__Class65650`, etc. -- `grep -rnP '(\w+)__\1\(' src/*.c`). Evident
-from the body itself: dispatched through `Class6D3C8Methods.ctor`
+from the body itself: dispatched through `GameApplicationMethods.ctor`
 (vtable slot +0x008), calls the base class's own ctor slot first, then
 installs this class's own vtable pointer -- the base-constructor-through-
 slot+8 shape documented in `docs/research/class-framework.md`.

@@ -1,4 +1,6 @@
-# Class6D3C8__StartGraphRoomStreamTask
+# GameApplication__StartGraphRoomStreamTask
+
+> Renamed from `Class6D3C8__StartGraphRoomStreamTask` on 2026-09-26 (tools/rename.py). Address 0x8002658c.
 
 > Renamed from `func_8002658C` on 2026-09-24 (tools/rename.py). Address 0x8002658c.
 
@@ -6,9 +8,9 @@
 
 ## What it does
 
-Called by `Class6D3C8__PollGraphRoomStatus` (matched earlier) when its first `PollTask`
+Called by `GameApplication__PollGraphRoomStatus` (matched earlier) when its first `PollTask`
 reports `2`. Gated by `self->arg->unk08 != 0` (the same gate
-`Class6D3C8__StartWeeklyStreamTask` uses). Builds a `StreamTask`, derives a count via
+`GameApplication__StartWeeklyStreamTask` uses). Builds a `StreamTask`, derives a count via
 `GetGraphRoomStreamChannel`, initializes the task with that count divided by 15 and a
 fixed sub-slot, then a 5-argument `slot44` call (`a3 = -1`, unlike this
 unit's other `slot44` call sites which pass a computed lookup), then starts
@@ -17,7 +19,7 @@ it.
 ## Final C
 
 ```c
-void Class6D3C8__StartGraphRoomStreamTask(Class6D3C8 *self) {
+void GameApplication__StartGraphRoomStreamTask(GameApplication *self) {
     StreamTask *task;
     struct {
         u32 unk00;
@@ -54,7 +56,7 @@ CLAUDE.md already documents for `%`/`/`, just applied in the direction of
 *discovering* the divisor rather than confirming a known one.
 
 **2. Stack-local struct size AND field order both mattered, not just size.**
-Same 8-byte-shortfall shape as `Class6D3C8__Class6D3C8`'s `LoadModelRequest`: the
+Same 8-byte-shortfall shape as `GameApplication__GameApplication`'s `LoadModelRequest`: the
 `out`-parameter local only needed 4 bytes for what this call site reads
 back, but retail reserves 12. Padding it to 3 words fixed the frame size
 (`-0x38` matched) but left the field's *address* 8 bytes short
@@ -68,11 +70,11 @@ field's own address.**
 
 ## New struct/header knowledge
 
-`include/Class6D3C8.h`: added `StreamTaskMethods.slot6C` and `.slot12C` (new
+`include/GameApplication.h`: added `StreamTaskMethods.slot6C` and `.slot12C` (new
 slots, both `(void *self, s32 a1)`), retyped `slot44`'s 3rd parameter from
 `const char *path` to plain `s32 arg2` -- confirmed generic by this call
-site passing a computed count where `Class6D3C8__LoadIntroLogoSequence` passed a string
-pointer and `Class6D3C8__StartWeeklyStreamTask` passed another plain count; the field is a
+site passing a computed count where `GameApplication__LoadIntroLogoSequence` passed a string
+pointer and `GameApplication__StartWeeklyStreamTask` passed another plain count; the field is a
 raw 32-bit value whose interpretation is call-site-specific, not
 uniformly a string. Declared `GetGraphRoomStreamChannel` (day/count helper,
 `psyq_memset.s`, same "write to *out, return a separate value" shape as
@@ -102,12 +104,12 @@ second local is involved.
 
 ## Naming
 
-**`Class6D3C8__StartGraphRoomStreamTask` -- tier B.** Mechanics: gated by
+**`GameApplication__StartGraphRoomStreamTask` -- tier B.** Mechanics: gated by
 `arg->unk08`, builds a `StreamTask`, derives a count via `GetGraphRoomStreamChannel`,
 initializes the task from `count/15` and a fixed sub-slot, dispatches a
 5-argument `configure` (`a3 = -1`, unlike every other StreamTask launcher in
 this unit), then starts it. Named for its one and only caller:
-`Class6D3C8__PollGraphRoomStatus` invokes it exactly when its first
+`GameApplication__PollGraphRoomStatus` invokes it exactly when its first
 `GraphRoom`-named PollTask (`New_GraphRoom`) reports status "2" -- the
 same "GraphRoom" vocabulary as that report's naming, not a guess (evidence:
 the call-site gate, not the function body alone, which by itself doesn't
@@ -115,4 +117,4 @@ mention GraphRoom).
 
 ## Track 4 (2026-09-25, round 84, alpha)
 
-Class6D3C8.h's StreamTask view names +0x004 `release` (BasicClass's, `void *`), was `start` (track 4 round 84; see Class6D3C8__StartCinematicStream for the bytes that settled the return type). Byte-identical.
+GameApplication.h's StreamTask view names +0x004 `release` (BasicClass's, `void *`), was `start` (track 4 round 84; see GameApplication__StartCinematicStream for the bytes that settled the return type). Byte-identical.

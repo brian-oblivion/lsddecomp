@@ -1,4 +1,6 @@
-# Class6D3C8__RunPollTask
+# GameApplication__RunPollTask
+
+> Renamed from `Class6D3C8__RunPollTask` on 2026-09-26 (tools/rename.py). Address 0x80026518.
 
 > Renamed from `func_80026518` on 2026-09-24 (tools/rename.py). Address 0x80026518.
 
@@ -6,7 +8,7 @@
 
 ## What it does
 
-A small helper used by `Class6D3C8__PollGraphRoomStatus` (matched just before this): constructs
+A small helper used by `GameApplication__PollGraphRoomStatus` (matched just before this): constructs
 a `PollTask` by calling the caller-supplied constructor function pointer
 directly (`ctor(dreamSys)` -- not through any vtable, the function pointer
 itself IS the constructor), dispatches `slot44(task, extra, 0)` and
@@ -42,7 +44,7 @@ addu $v0, $s0, $zero                              ; return that saved value
 ```
 
 ```c
-s32 Class6D3C8__RunPollTask(PollTaskCtor ctor, void *dreamSys, s32 extra) {
+s32 GameApplication__RunPollTask(PollTaskCtor ctor, void *dreamSys, s32 extra) {
     PollTask *task = ctor(dreamSys);
     s32 result = task->methods->slot44(task, extra, 0);
 
@@ -53,11 +55,11 @@ s32 Class6D3C8__RunPollTask(PollTaskCtor ctor, void *dreamSys, s32 extra) {
 
 Matched first attempt -- the "delay slot after a `jalr` captures the
 *preceding* call's return value, not the one about to run" idiom (first
-found the hard way in `Class6D3C8__LoadIntroLogoSequence`) was already the expected read here.
+found the hard way in `GameApplication__LoadIntroLogoSequence`) was already the expected read here.
 
 ## Proposed learning
 
-None beyond what `Class6D3C8__LoadIntroLogoSequence`'s report already recorded; this function is
+None beyond what `GameApplication__LoadIntroLogoSequence`'s report already recorded; this function is
 a clean instance of the same idiom with no new residue.
 
 ## HEAD BROADCAST cross-check (this round's two levers)
@@ -68,11 +70,11 @@ a clean instance of the same idiom with no new residue.
 
 ## Naming
 
-**`Class6D3C8__RunPollTask` -- tier A.** Pure leaf helper, mechanics ARE the
+**`GameApplication__RunPollTask` -- tier A.** Pure leaf helper, mechanics ARE the
 purpose: constructs a `PollTask` via the caller-supplied `ctor`, dispatches
 `slot44(task, extra, 0)` and `slot4(task)` on it (fire-and-forget teardown),
 returns `slot44`'s result. Generic across both call sites
 (`New_GraphRoom`/`New_Class86B60`, both used only by
-`Class6D3C8__PollGraphRoomStatus`), so it is named for what it mechanically
+`GameApplication__PollGraphRoomStatus`), so it is named for what it mechanically
 does (build, query, dispose a PollTask) rather than for either specific
 caller.

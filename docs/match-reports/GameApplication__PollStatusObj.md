@@ -1,4 +1,6 @@
-# Class6D3C8__PollStatusObj
+# GameApplication__PollStatusObj
+
+> Renamed from `Class6D3C8__PollStatusObj` on 2026-09-26 (tools/rename.py). Address 0x80026698.
 
 > Renamed from `func_80026698` on 2026-09-24 (tools/rename.py). Address 0x80026698.
 
@@ -79,13 +81,13 @@ without reaching it. The fix came from re-reading four instructions of retail.
 
 ## What it does
 
-`Class6D3C8Methods` slot `+0x060`. Builds a `StatusObj` (`New_Class865C8`,
+`GameApplicationMethods` slot `+0x060`. Builds a `StatusObj` (`New_Class865C8`,
 New_X shape, 0x50 bytes), dispatches `slot44(obj)` (return kept) then
 `slot4(obj)` (return discarded -- via the same "delay slot after `jalr`
-captures the *preceding* call's return" idiom `Class6D3C8__RunPollTask` uses), and
-switches on that status: `2` runs `Class6D3C8__StartCinematicStream`, `3` latches
+captures the *preceding* call's return" idiom `GameApplication__RunPollTask` uses), and
+switches on that status: `2` runs `GameApplication__StartCinematicStream`, `3` latches
 `self->unk24`. Then queries the `DreamSys` status slot again
-(`DreamSys__GetCurrentDayAndYear`, the same slot `Class6D3C8__PollGraphRoomStatus` uses) with an out-parameter
+(`DreamSys__GetCurrentDayAndYear`, the same slot `GameApplication__PollGraphRoomStatus` uses) with an out-parameter
 this time, and derives a 0/1 result from both the call's return and the
 out-param.
 
@@ -93,7 +95,7 @@ out-param.
 
 ```c
 #if 0
-s32 Class6D3C8__PollStatusObj(Class6D3C8 *self) {
+s32 GameApplication__PollStatusObj(GameApplication *self) {
     s32 status;
     StatusObj *obj;
     s32 outVal;
@@ -106,7 +108,7 @@ s32 Class6D3C8__PollStatusObj(Class6D3C8 *self) {
 
     switch (status) {
     case 2:
-        Class6D3C8__StartCinematicStream(self);
+        GameApplication__StartCinematicStream(self);
         break;
     case 3:
         self->unk24 = 3;
@@ -123,8 +125,8 @@ s32 Class6D3C8__PollStatusObj(Class6D3C8 *self) {
 #endif
 ```
 
-This needs `Class6D3C8.h`'s `StatusObj`/`StatusObjMethods` (already
-committed) and the `Class6D3C8__StartCinematicStream` forward declaration (already committed).
+This needs `GameApplication.h`'s `StatusObj`/`StatusObjMethods` (already
+committed) and the `GameApplication__StartCinematicStream` forward declaration (already committed).
 
 ## Derivation and the levers that got this from 1/57 to 53/57
 
@@ -157,7 +159,7 @@ allocation, in three layers:
    cross-case code hoisting for `switch`, since it tripled the emitted code
    instead). This is presumably an instruction-scheduling-level decision
    (which delay slot filler is "available") rather than something a source
-   rewrite reaches, matching the class of residue in `New_Class6D3C8` and
+   rewrite reaches, matching the class of residue in `New_GameApplication` and
    the two instances the head's round-3 broadcast #3 already confirmed.
 3. **Reusing the SAME variable name across two semantically-unrelated
    purposes forces GCC to keep it alive across everything in between.**
@@ -185,7 +187,7 @@ allocation, in three layers:
    lowering materializes an unused default-arm constant (`1`) in the
    `beq`'s delay slot even though nothing ever reads it (same "unused
    value in a delay slot" idiom documented elsewhere in this unit, e.g.
-   `Class6D3C8__PollGraphRoomStatus`'s `pollDone`). No `switch`/`if` reshaping reproduced it;
+   `GameApplication__PollGraphRoomStatus`'s `pollDone`). No `switch`/`if` reshaping reproduced it;
    adding an explicit `case 1: break;` regressed badly (27/57, GCC grew the
    whole switch, presumably crossing a density threshold into a different
    lowering strategy).
@@ -243,12 +245,12 @@ switched on," and only the former gets the free reuse.
 
 ## Naming
 
-**`Class6D3C8__PollStatusObj` -- tier B.** Mechanics: builds a `StatusObj`
+**`GameApplication__PollStatusObj` -- tier B.** Mechanics: builds a `StatusObj`
 (`New_Class865C8`), reads one status code off it (`slot44`), tears it down
-(`slot4`), reacts to two of the codes (2 -> `Class6D3C8__StartCinematicStream`,
+(`slot4`), reacts to two of the codes (2 -> `GameApplication__StartCinematicStream`,
 3 -> latch `self->unk24`), then separately queries the owned `DreamSys`'s
 day/year status and derives a 0/1 result. Named for the StatusObj query
-mechanic, matching this unit's `Class6D3C8__PollGraphRoomStatus` naming
+mechanic, matching this unit's `GameApplication__PollGraphRoomStatus` naming
 shape (both are "poll an object for a status code and react to it"), since
 what the two status-code values actually MEAN in the game is not
 established from this body alone.

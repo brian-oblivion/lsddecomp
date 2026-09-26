@@ -153,7 +153,7 @@ polarity and never scheduling.
 ## Track 4 (2026-09-26, round 88)
 
 Obj865C8::unk38 is the game's DreamSys (code_1677c passes
-Class6D3C8::dreamSys to New_Class865C8), so the SubObjD view is gone and its
+GameApplication::dreamSys to New_Class865C8), so the SubObjD view is gone and its
 slots are DreamSys's: +0x1B8 endDay, +0x1BC getCinematic. The by-value
 return this body tests is therefore a CinematicCall {bank, entry}; the
 local 8-byte SubObjDPos is replaced by it and `pos.unk2` is `pos.entry`.

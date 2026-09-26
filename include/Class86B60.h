@@ -11,8 +11,8 @@
  * other method and the getter. Named by its table's address: what the class
  * does is readable below, but no name for it is established.
  *
- * Who makes one: Class6D3C8__PollGraphRoomStatus (src/code_1677c.c), through
- * Class6D3C8__RunPollTask(New_Class86B60, self->dreamSys, ...), in a loop that
+ * Who makes one: GameApplication__PollGraphRoomStatus (src/code_1677c.c), through
+ * GameApplication__RunPollTask(New_Class86B60, self->dreamSys, ...), in a loop that
  * runs GraphRoom again and retries while init returns 2. The ctor's argument,
  * kept at +0x0A4, is therefore the game's DreamSys.
  *

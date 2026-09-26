@@ -1,5 +1,5 @@
 #include "common.h"
-#include "Class6D3C8.h"
+#include "GameApplication.h"
 #include "DreamSys.h"
 #include "LinkResource.h"
 #include "TaskCore.h"
@@ -12,8 +12,8 @@
  * rather than a typed pointer because every New_X in the game calls it. */
 extern void *BMemPMgrAlloc(s32 size);
 
-/* Model-file-load request block used by Class6D3C8__Class6D3C8: {type; path}. Only
- * one call site is known so far (Class6D3C8__Class6D3C8, loading "ETC\DREAME5.TMD"
+/* Model-file-load request block used by GameApplication__GameApplication: {type; path}. Only
+ * one call site is known so far (GameApplication__GameApplication, loading "ETC\DREAME5.TMD"
  * via sModelPathDreamE5), so field names are provisional. */
 typedef struct LoadModelRequest {
     s32 type;
@@ -29,8 +29,8 @@ extern void func_800270AC(s32 value); /* stores its arg to a small-data global *
 
 extern s32 SetActiveDataSourceDriverMode(s32 a0, s32 a1, s32 a2); /* code_171e0, still INCLUDE_ASM there; returns
                                                        the last value its internal dispatch loop got --
-                                                       Class6D3C8__LoadIntroLogoSequence/Class6D3C8__StartWeeklyStreamTask discard it, but
-                                                       Class6D3C8__StartCinematicStream keeps it */
+                                                       GameApplication__LoadIntroLogoSequence/GameApplication__StartWeeklyStreamTask discard it, but
+                                                       GameApplication__StartCinematicStream keeps it */
 extern const char *GetIntroStreamName(s32 *typeCodeOut); /* psyq_memset.s: writes 0x31 to *typeCodeOut if non-NULL, always returns &sAsmkStreamPath */
 extern s32 GetStreamGroupForType(s32 index); /* psyq_memset.s: signed-halfword lookup into gStreamTypeToGroupTable[index] */
 extern s32 PickWeeklyStreamChannel(s32 *out, s32 param2); /* psyq_memset.s: day/week-style calculation (divides SeedAndRandom's result by 7); writes a related index to *out if non-NULL, returns a separate derived value */
@@ -38,11 +38,11 @@ extern s32 PickWeeklyStreamChannel(s32 *out, s32 param2); /* psyq_memset.s: day/
 extern const char sLogoPathAsmk[]; /* "ETC\ASMKLOGO.TIM" */
 extern const char sLogoPathOsd[];  /* "ETC\OSDLOGO.TIM" */
 
-/* The PollTasks Class6D3C8__RunPollTask runs (New_GraphRoom, New_Class86B60)
+/* The PollTasks GameApplication__RunPollTask runs (New_GraphRoom, New_Class86B60)
  * are TaskCore-family classes; this is this unit's own minimal view of
  * them: +0x004 is BasicClass's release, +0x044 IntermediateBase's init.
  * Constructed directly by a caller-supplied function pointer
- * (Class6D3C8__RunPollTask's own a0) rather than a New_X-style allocator. */
+ * (GameApplication__RunPollTask's own a0) rather than a New_X-style allocator. */
 typedef struct PollTaskMethods {
     s32 header;                                                              /* +0x000 */
     void (*slot4)(void *self);                                               /* +0x004 */
@@ -57,13 +57,13 @@ typedef struct PollTask {
 typedef PollTask *(*PollTaskCtor)(void *arg);
 
 /* This unit's own function, defined later in ROM order (forward declared
- * for Class6D3C8__PollGraphRoomStatus, which comes first). Constructs a PollTask via the
+ * for GameApplication__PollGraphRoomStatus, which comes first). Constructs a PollTask via the
  * caller-supplied `ctor`, dispatches slot44(task, initArgs, 0) and slot4(task)
  * on it, and returns slot44's result. */
-s32 Class6D3C8__RunPollTask(PollTaskCtor ctor, void *dreamSys, IntermediateBaseInitArgs *initArgs);
+s32 GameApplication__RunPollTask(PollTaskCtor ctor, void *dreamSys, IntermediateBaseInitArgs *initArgs);
 
 /* PollTask constructors (not this unit's to write). Called directly (not
- * through any vtable) as Class6D3C8__RunPollTask's `ctor` argument.
+ * through any vtable) as GameApplication__RunPollTask's `ctor` argument.
  * New_GraphRoom is include/GraphRoom.h's and New_Class86B60
  * include/Class86B60.h's, each cast to PollTaskCtor. */
 
@@ -76,11 +76,11 @@ extern s32 ResolveCinematicChannel(s32 *out, s32 packedBankEntry); /* psyq_memse
     to *out (-1 if unresolved); the packing must zero-extend both halves before combining
     (retail loads them with lhu, not lh) since the result is bitwise-composed, not a value read
     back as a signed 32-bit number. Also returns its own (separate) s32 value, kept by
-    Class6D3C8__StartCinematicStream. */
+    GameApplication__StartCinematicStream. */
 
 /* The `New_X` allocator for the class whose method table is D_8006D3C8:
  * allocates a 0x2C-byte instance and, on success, runs the class's own
- * constructor through slot +0x008 of the table GetClass6D3C8Methods() returns.
+ * constructor through slot +0x008 of the table GetGameApplicationMethods() returns.
  *
  * The null path deliberately falls off the end rather than returning a
  * value. That is not an oversight in the transcription -- it is what
@@ -91,26 +91,26 @@ extern s32 ResolveCinematicChannel(s32 *out, s32 packedBankEntry); /* psyq_memse
  * costs an extra instruction that retail does not have. GCC 2.6.3 warns
  * "control reaches end of non-void function" here, and the warning is
  * correct about the C -- the bytes are what say the original had it too.
- * See docs/match-reports/New_Class6D3C8.md for the full derivation. */
-Class6D3C8 *New_Class6D3C8(Class6D3C8CtorArgs *arg) {
-    Class6D3C8 *self = BMemPMgrAlloc(0x2C);
+ * See docs/match-reports/New_GameApplication.md for the full derivation. */
+GameApplication *New_GameApplication(GameApplicationCtorArgs *arg) {
+    GameApplication *self = BMemPMgrAlloc(0x2C);
 
     if (self != 0) {
-        GetClass6D3C8Methods()->ctor(self, arg);
+        GetGameApplicationMethods()->ctor(self, arg);
         return self;
     }
 }
 
-/* Constructs a Class6D3C8 instance: runs the intermediate base class's own
+/* Constructs a GameApplication instance: runs the intermediate base class's own
  * constructor (through its ctor slot), installs this class's own vtable,
  * stores the ctor argument, loads the "ETC\DREAME5.TMD" model, builds this
  * object's owned DreamSys from it, dispatches one DreamSys init call, then
- * runs this class's own slot40 (Class6D3C8__SetDayFromTickCount) once. */
-void Class6D3C8__Class6D3C8(Class6D3C8 *self, Class6D3C8CtorArgs *arg) {
+ * runs this class's own slot40 (GameApplication__SetDayFromTickCount) once. */
+void GameApplication__GameApplication(GameApplication *self, GameApplicationCtorArgs *arg) {
     LoadModelRequest req;
 
     GetApplicationMethods()->ctor((Application *)self, arg->dataSource);
-    self->methods = GetClass6D3C8Methods();
+    self->methods = GetGameApplicationMethods();
     self->ctorArgs = arg;
     func_800270AC(func_80048CF0());
     req.type = 0;
@@ -118,30 +118,30 @@ void Class6D3C8__Class6D3C8(Class6D3C8 *self, Class6D3C8CtorArgs *arg) {
     self->dreamSys = New_DreamSys(New_LinkResource((struct Src6F240 *)&req), 0, 0);
     self->skipGraphRoomPoll = 0;
     self->dreamSys->methods->slot228(self->dreamSys, arg->unk14);
-    ((Class6D3C8SetDayFn)self->methods->setScreenDims)(self);
+    ((GameApplicationSetDayFn)self->methods->setScreenDims)(self);
 }
 
 extern void SeedAndRandom(s32 day, s32 unused);
 
 /* Advances the day cursor: reads the running tick count kept in scratchpad
  * (0x1F800000, the PS-X data-cache-as-RAM region) and reduces it mod 365. */
-void Class6D3C8__SetDayFromTickCount(Class6D3C8 *self) {
+void GameApplication__SetDayFromTickCount(GameApplication *self) {
     SeedAndRandom(*(s32 *)0x1F800000 % 365, 0);
 }
 
 /* initSystems (+0x044): runs Application's own initSystems unless the parent's
  * `initialized` latch is already set. */
-void Class6D3C8__InitSystems(Class6D3C8 *self, DrawSystem *drawSystem, struct Pad *pad) {
+void GameApplication__InitSystems(GameApplication *self, DrawSystem *drawSystem, struct Pad *pad) {
     if (self->initialized == 0) {
         GetApplicationMethods()->initSystems((Application *)self, drawSystem, pad, 0);
     }
 }
 
 /* Optional stream-load block, gated by self->ctorArgs->showIntroLogos: registers a
- * "loader" task for "ETC\ASMKLOGO.TIM" (Class6D3C8__StartLoaderTask), then a separate
+ * "loader" task for "ETC\ASMKLOGO.TIM" (GameApplication__StartLoaderTask), then a separate
  * "stream" task for whatever type code GetIntroStreamName hands back
  * ("ETC\ASMK.STR"), then a second loader task for "ETC\OSDLOGO.TIM". */
-void Class6D3C8__LoadIntroLogoSequence(Class6D3C8 *self) {
+void GameApplication__LoadIntroLogoSequence(GameApplication *self) {
     const char *streamName;
     s32 typeCode;
     s32 typeLookup;
@@ -149,28 +149,28 @@ void Class6D3C8__LoadIntroLogoSequence(Class6D3C8 *self) {
 
     if (self->ctorArgs->showIntroLogos != 0) {
         SetActiveDataSourceDriverMode(0, 0, 0);
-        Class6D3C8__StartLoaderTask(self, sLogoPathAsmk);
+        GameApplication__StartLoaderTask(self, sLogoPathAsmk);
         task = New_StreamTask(0, 0, 0, 0);
         streamName = GetIntroStreamName(&typeCode);
         typeLookup = GetStreamGroupForType(typeCode);
         ((StreamTaskInitFn)task->methods->init)(task, (IntermediateBaseInitArgs *)self->aux,
                                                 streamName, typeLookup, 1);
         task->methods->release(task);
-        Class6D3C8__StartLoaderTask(self, sLogoPathOsd);
+        GameApplication__StartLoaderTask(self, sLogoPathOsd);
     }
 }
 
 /* Registers a "loader" task for the given resource path: allocates the
- * task, gives it a completion callback (Class6D3C8__LoaderTaskDoneCallback) and context
+ * task, gives it a completion callback (GameApplication__LoaderTaskDoneCallback) and context
  * (self), then sets its remaining parameters (path, the parent's aux as its init args) and
  * starts it. */
-void Class6D3C8__StartLoaderTask(Class6D3C8 *self, const char *path) {
+void GameApplication__StartLoaderTask(GameApplication *self, const char *path) {
     TaskCore *task = New_TaskCore(0, 0, 0);
 
     /* setCallback's occupant stores a void (*)(void *ctx); this callback
      * takes nothing and returns func_8004A070's value, which
      * TaskCore__RefreshViewValue ignores. */
-    task->methods->setCallback(task, (void (*)(void *))Class6D3C8__LoaderTaskDoneCallback, self);
+    task->methods->setCallback(task, (void (*)(void *))GameApplication__LoaderTaskDoneCallback, self);
     task->methods->setFrameBound(task, 0);
     task->methods->setSubHandle(task, path, 0);
     task->methods->init(task, (IntermediateBaseInitArgs *)self->aux, 0);
@@ -179,15 +179,15 @@ void Class6D3C8__StartLoaderTask(Class6D3C8 *self, const char *path) {
 
 extern s32 func_8004A070(s32 a0);
 
-s32 Class6D3C8__LoaderTaskDoneCallback(void) {
+s32 GameApplication__LoaderTaskDoneCallback(void) {
     return func_8004A070(0);
 }
 
 /* Optional stream-task init block, gated by self->ctorArgs->playStreams (the same
- * shape as Class6D3C8__LoadIntroLogoSequence's self->ctorArgs->showIntroLogos gate, minus the two
- * Class6D3C8__StartLoaderTask loader-task calls, and using PickWeeklyStreamChannel instead of
+ * shape as GameApplication__LoadIntroLogoSequence's self->ctorArgs->showIntroLogos gate, minus the two
+ * GameApplication__StartLoaderTask loader-task calls, and using PickWeeklyStreamChannel instead of
  * GetIntroStreamName to derive the type code). */
-void Class6D3C8__StartWeeklyStreamTask(Class6D3C8 *self) {
+void GameApplication__StartWeeklyStreamTask(GameApplication *self) {
     s32 derivedValue;
     s32 typeCode;
     s32 typeLookup;
@@ -207,11 +207,11 @@ void Class6D3C8__StartWeeklyStreamTask(Class6D3C8 *self) {
 /* Gated by self->ctorArgs->pollGraphRoom. Checks the DreamSys's own status slot
  * (+0x1A0); if it isn't already "1" and self->skipGraphRoomPoll hasn't latched, kicks
  * off one PollTask (New_GraphRoom) and, if THAT reports "2", runs
- * Class6D3C8__StartGraphRoomStreamTask. Then polls a second PollTask (New_Class86B60) in a loop,
+ * GameApplication__StartGraphRoomStreamTask. Then polls a second PollTask (New_Class86B60) in a loop,
  * restarting the first PollTask each time it reports "2", until it
  * reports anything else; clears self->skipGraphRoomPoll and returns 0 or 2 depending
  * on whether that final status was below 1. */
-s32 Class6D3C8__PollGraphRoomStatus(Class6D3C8 *self) {
+s32 GameApplication__PollGraphRoomStatus(GameApplication *self) {
     s32 status;
     s32 pollDone;
 
@@ -221,20 +221,20 @@ s32 Class6D3C8__PollGraphRoomStatus(Class6D3C8 *self) {
         status = self->dreamSys->methods->getCurrentDayAndYear(self->dreamSys, 0);
         if (status != 1) {
             if (self->skipGraphRoomPoll == 0) {
-                status = Class6D3C8__RunPollTask((PollTaskCtor)New_GraphRoom, self->dreamSys,
+                status = GameApplication__RunPollTask((PollTaskCtor)New_GraphRoom, self->dreamSys,
                                                  (IntermediateBaseInitArgs *)self->aux);
                 if (status == 2) {
-                    Class6D3C8__StartGraphRoomStreamTask(self);
+                    GameApplication__StartGraphRoomStreamTask(self);
                 }
             }
         }
 
         pollDone = 2;
     retry:
-        status = Class6D3C8__RunPollTask((PollTaskCtor)New_Class86B60, self->dreamSys,
+        status = GameApplication__RunPollTask((PollTaskCtor)New_Class86B60, self->dreamSys,
                                          (IntermediateBaseInitArgs *)self->aux);
         if (status == pollDone) {
-            Class6D3C8__RunPollTask((PollTaskCtor)New_GraphRoom, self->dreamSys,
+            GameApplication__RunPollTask((PollTaskCtor)New_GraphRoom, self->dreamSys,
                                     (IntermediateBaseInitArgs *)self->aux);
             goto retry;
         }
@@ -248,7 +248,7 @@ s32 Class6D3C8__PollGraphRoomStatus(Class6D3C8 *self) {
 /* Constructs a PollTask via the caller-supplied `ctor`, dispatches
  * slot44(task, initArgs, 0) and slot4(task) on it (fire-and-forget), and
  * returns slot44's result. */
-s32 Class6D3C8__RunPollTask(PollTaskCtor ctor, void *dreamSys, IntermediateBaseInitArgs *initArgs) {
+s32 GameApplication__RunPollTask(PollTaskCtor ctor, void *dreamSys, IntermediateBaseInitArgs *initArgs) {
     PollTask *task = ctor(dreamSys);
     s32 result = task->methods->slot44(task, initArgs, 0);
 
@@ -256,12 +256,12 @@ s32 Class6D3C8__RunPollTask(PollTaskCtor ctor, void *dreamSys, IntermediateBaseI
     return result;
 }
 
-/* Called by Class6D3C8__PollGraphRoomStatus when its first PollTask reports "2". Gated by
- * self->ctorArgs->playStreams (same gate as Class6D3C8__StartWeeklyStreamTask). Builds a StreamTask,
+/* Called by GameApplication__PollGraphRoomStatus when its first PollTask reports "2". Gated by
+ * self->ctorArgs->playStreams (same gate as GameApplication__StartWeeklyStreamTask). Builds a StreamTask,
  * derives a count via GetGraphRoomStreamChannel, sets the task's frame bound
  * to that count / 15 and clears skipOnConfirm, then runs its init (stream
  * group -1, unlike the other call sites) and releases it. */
-void Class6D3C8__StartGraphRoomStreamTask(Class6D3C8 *self) {
+void GameApplication__StartGraphRoomStreamTask(GameApplication *self) {
     StreamTask *task;
 
     struct {
@@ -284,12 +284,12 @@ void Class6D3C8__StartGraphRoomStreamTask(Class6D3C8 *self) {
     }
 }
 
-void Class6D3C8__NoOpSlot5C(void) {}
+void GameApplication__NoOpSlot5C(void) {}
 
 /* Builds a Class865C8 (include/Class865C8.h), runs its init with self
  * alone (Class865C8__Init takes nothing else, hence Class865C8InitFn) and
- * releases it; init's return, TimedTask::result, is a status code: 2 runs Class6D3C8__StartCinematicStream, 3 latches self->skipGraphRoomPoll.
- * Then queries the DreamSys status slot again (as Class6D3C8__PollGraphRoomStatus does),
+ * releases it; init's return, TimedTask::result, is a status code: 2 runs GameApplication__StartCinematicStream, 3 latches self->skipGraphRoomPoll.
+ * Then queries the DreamSys status slot again (as GameApplication__PollGraphRoomStatus does),
  * this time passing an out-param, and derives a 0/1 result from both the
  * call's return and the out-param. */
 /* Builds a Class865C8 for this instance's current state, reads one status
@@ -297,7 +297,7 @@ void Class6D3C8__NoOpSlot5C(void) {}
  * owned DreamSys a question and reports whether its answer was 1.
  *
  * Two things here were long-standing misreadings, both worth keeping written
- * down (docs/match-reports/Class6D3C8__PollStatusObj.md):
+ * down (docs/match-reports/GameApplication__PollStatusObj.md):
  *
  *  - `case 3` stores 1, NOT 3. Retail's `li $v0, 0x1` sits in the delay slot
  *    of the case-3 branch, so it executes before the jump is taken and $v0
@@ -312,7 +312,7 @@ void Class6D3C8__NoOpSlot5C(void) {}
  *    back out of the disassembly as `(u32)(check ^ 1) < 1`. That transcription
  *    is arithmetically right and cost two instructions; the plain `== 1` is
  *    what the source said. */
-s32 Class6D3C8__PollStatusObj(Class6D3C8 *self) {
+s32 GameApplication__PollStatusObj(GameApplication *self) {
     s32 status;
     Class865C8 *obj;
     s32 outVal;
@@ -325,7 +325,7 @@ s32 Class6D3C8__PollStatusObj(Class6D3C8 *self) {
 
     switch (status) {
         case 2:
-            Class6D3C8__StartCinematicStream(self);
+            GameApplication__StartCinematicStream(self);
             break;
         case 3:
             self->skipGraphRoomPoll = 1;
@@ -345,7 +345,7 @@ s32 Class6D3C8__PollStatusObj(Class6D3C8 *self) {
  * "no cinematic" path; otherwise, if self->ctorArgs->playStreams gates it, starts a
  * StreamTask on the resolved channel. Either branch finishes by starting
  * whichever task it built; if neither branch runs, nothing happens. */
-void Class6D3C8__StartCinematicStream(Class6D3C8 *self) {
+void GameApplication__StartCinematicStream(GameApplication *self) {
     CinematicCall cc;
 
     struct {
@@ -381,13 +381,13 @@ void Class6D3C8__StartCinematicStream(Class6D3C8 *self) {
     }
 }
 
-/* Class6D3C8Methods slot +0x064. Gated by self->ctorArgs->playStreams (same gate as
- * Class6D3C8__StartWeeklyStreamTask/Class6D3C8__StartGraphRoomStreamTask). Builds a StreamTask, clears its skipOnConfirm,
+/* GameApplicationMethods slot +0x064. Gated by self->ctorArgs->playStreams (same gate as
+ * GameApplication__StartWeeklyStreamTask/GameApplication__StartGraphRoomStreamTask). Builds a StreamTask, clears its skipOnConfirm,
  * derives a type code via GetStreamChannelInit, looks it up via GetStreamGroupForType,
  * initializes the task with it, then starts it -- the same shape as
- * Class6D3C8__LoadIntroLogoSequence/Class6D3C8__StartWeeklyStreamTask, but with setSkipOnConfirm(0) added and GetStreamChannelInit
+ * GameApplication__LoadIntroLogoSequence/GameApplication__StartWeeklyStreamTask, but with setSkipOnConfirm(0) added and GetStreamChannelInit
  * in place of GetIntroStreamName/PickWeeklyStreamChannel. */
-void Class6D3C8__StartStreamTaskWithInit(Class6D3C8 *self) {
+void GameApplication__StartStreamTaskWithInit(GameApplication *self) {
     StreamTask *task;
     s32 typeCode;
     s32 outerValue;

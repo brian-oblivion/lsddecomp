@@ -236,7 +236,7 @@ global compiles to a folded one, route that SPECIFIC access through a
 local pointer too, even though the qualifier looks redundant.
 
 This function is now the THIRD confirmed instance of the delay-slot-
-sharing "redundant move" residue class (`New_Class6D3C8`, `strcat`,
+sharing "redundant move" residue class (`New_GameApplication`, `strcat`,
 and now this one) -- per `docs/MATCHING-GUIDE.md`'s own note, this is
 the project's best-posed PERMUTER target, not a source-level guess to
 keep re-trying by hand. Flagging for a permuter run rather than more

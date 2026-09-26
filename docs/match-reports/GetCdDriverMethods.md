@@ -30,7 +30,7 @@ subclass or close sibling of `gFileResourceMethods`'s, inheriting the same Basic
 slot block and several of the same concrete method implementations.
 
 `GetCdDriverMethods` itself is the same "return my own vtable's address"
-accessor the project already names elsewhere: `GetClass6D3C8Methods` for
+accessor the project already names elsewhere: `GetGameApplicationMethods` for
 `D_8006D3C8` and `GetFileResourceMethods` for `gFileResourceMethods` (both in
 `include/code_171e0.h`'s doc comment).
 
@@ -69,7 +69,7 @@ Round 51 (alpha), FINISHING-PLAN track 3.
 **Evidence.** A two-instruction address-of: it returns `&gCdDriverMethods`, this
 class's own 29-slot method table. A pure leaf whose mechanics are its
 purpose, so tier A by the plan's own rule. The same accessor shape
-`GetClass6D3C8Methods` has for `D_8006D3C8` and `GetFileResourceMethods` for `gFileResourceMethods`.
+`GetGameApplicationMethods` has for `D_8006D3C8` and `GetFileResourceMethods` for `gFileResourceMethods`.
 
 **The class token `Class6D4E8` is deliberate, and this is the report that
 says why.** What the class IS, is now well evidenced: every method reachable

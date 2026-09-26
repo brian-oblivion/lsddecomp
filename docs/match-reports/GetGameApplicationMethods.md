@@ -1,4 +1,6 @@
-# GetClass6D3C8Methods
+# GetGameApplicationMethods
+
+> Renamed from `GetClass6D3C8Methods` on 2026-09-26 (tools/rename.py). Address 0x800269e0.
 
 > Renamed from `func_800269E0` on 2026-09-18 (tools/rename.py). Address 0x800269e0.
 
@@ -19,17 +21,17 @@ jr    $ra
 ```
 
 Just an address computation, no load — this is `&D_8006D3C8`, not
-`*D_8006D3C8`. Confirmed by its one caller, `New_Class6D3C8` in
-`asm/nonmatchings/code_1677c/New_Class6D3C8.s`: it calls this function, then
+`*D_8006D3C8`. Confirmed by its one caller, `New_GameApplication` in
+`asm/nonmatchings/code_1677c/New_GameApplication.s`: it calls this function, then
 does `lw $v0, 0x8($v0)` on the result and `jalr`s that — fetching the
-constructor slot (`+0x008`, `Class6D3C8__Class6D3C8`) from the table this function
+constructor slot (`+0x008`, `GameApplication__GameApplication`) from the table this function
 returned, exactly the "allocate, get methods, call ctor slot" idiom from
 CLAUDE.md's "Writing a class method".
 
 ```c
 extern s32 D_8006D3C8[];
 
-void *GetClass6D3C8Methods(void) {
+void *GetGameApplicationMethods(void) {
     return D_8006D3C8;
 }
 ```
@@ -52,9 +54,9 @@ Round 52 (alpha), FINISHING-PLAN track 3.
 
 | was | now | tier |
 | --- | --- | --- |
-| `func_800269E0` | `GetClass6D3C8Methods` | A |
+| `func_800269E0` | `GetGameApplicationMethods` | A |
 
-**Evidence.** A two-instruction address-of returning `&D_8006D3C8`. `Class6D3C8`
+**Evidence.** A two-instruction address-of returning `&D_8006D3C8`. `GameApplication`
 is already an established type name in `src/code_1677c.c` (that unit's own
 functions are typed against it), and the "return my own vtable" shape is
 already named twice in this project (`GetCdDriverMethods`,
@@ -63,7 +65,7 @@ purpose.
 
 ## Track 4 (2026-09-26, round 88)
 
-Retyped to `Class6D3C8Methods *GetClass6D3C8Methods(void)`, returning
-`&D_8006D3C8`; both are declared once, in `include/Class6D3C8.h`
+Retyped to `GameApplicationMethods *GetGameApplicationMethods(void)`, returning
+`&D_8006D3C8`; both are declared once, in `include/GameApplication.h`
 (`include/code_171e0.h`'s `extern s32 D_8006D3C8[]` view is deleted, and
-New_Class6D3C8 no longer casts the result). Image byte-identical.
+New_GameApplication no longer casts the result). Image byte-identical.

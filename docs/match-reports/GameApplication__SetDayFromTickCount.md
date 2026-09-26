@@ -1,4 +1,6 @@
-# Class6D3C8__SetDayFromTickCount
+# GameApplication__SetDayFromTickCount
+
+> Renamed from `Class6D3C8__SetDayFromTickCount` on 2026-09-26 (tools/rename.py). Address 0x800260a4.
 
 > Renamed from `func_800260A4` on 2026-09-24 (tools/rename.py). Address 0x800260a4.
 
@@ -38,19 +40,19 @@ jal   SeedAndRandom
 `0x1F800000` is the PS-X scratchpad region (data cache used as fast RAM,
 not a hardware register) — some running counter lives there as a plain
 `s32`, read once per call. m2c (`tools/m2ctx.py code_1677c --sig 'void
-Class6D3C8__SetDayFromTickCount(void)' --run`) independently produced the same `% 365`
+GameApplication__SetDayFromTickCount(void)' --run`) independently produced the same `% 365`
 reading, confirming the divisor and that GCC reproduces its own magic
 constant without any hand-tuning needed:
 
 ```c
-void Class6D3C8__SetDayFromTickCount(void) {
+void GameApplication__SetDayFromTickCount(void) {
     SeedAndRandom(*(s32 *)0x1F800000 % 365, 0);
 }
 ```
 
 `SeedAndRandom` (in `psyq_memset.s`, still `asm`) is called with `(day, 0)`
 — second argument's purpose unknown, always a literal 0 at every call in
-this unit's family (see `Class6D3C8__LoadIntroLogoSequence`/`Class6D3C8__StartWeeklyStreamTask` etc., all of which
+this unit's family (see `GameApplication__LoadIntroLogoSequence`/`GameApplication__StartWeeklyStreamTask` etc., all of which
 pass 0/0/0 into the sibling helper `SetActiveDataSourceDriverMode`, a related pattern this
 runner did not decompile).
 
@@ -67,7 +69,7 @@ assuming it needs special handling.
 
 ## Naming
 
-**`Class6D3C8__SetDayFromTickCount` -- tier B.** Mechanics: reads the
+**`GameApplication__SetDayFromTickCount` -- tier B.** Mechanics: reads the
 running tick count kept at the PS-X scratchpad address `0x1F800000`, reduces
 it mod 365 (a `%` on the day-count range), and forwards the result to
 `SeedAndRandom(day, 0)`. "Set day" describes the mechanical destination
@@ -78,11 +80,11 @@ therefore this function's ultimate game role) is not confirmed here.
 
 ## Track 4 (2026-09-26, round 88)
 
-Now declared `void Class6D3C8__SetDayFromTickCount(Class6D3C8 *self)`: it
+Now declared `void GameApplication__SetDayFromTickCount(GameApplication *self)`: it
 occupies Application's `setScreenDims` slot (+0x040) and its only caller, the
 ctor, passes `self` (in `$a0`), which the body never reads, so the added
 parameter emits nothing (image byte-identical). The slot keeps the
 inherited `setScreenDims` type; the ctor calls it through
-`Class6D3C8SetDayFn` (`include/Class6D3C8.h`). The name is kept rather than
+`GameApplicationSetDayFn` (`include/GameApplication.h`). The name is kept rather than
 renamed for the slot: the body seeds the RNG from the day count and does
 nothing a screen-dimensions setter would.

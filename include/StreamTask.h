@@ -11,10 +11,10 @@
  * the setters and the getter. The object is 0xDC bytes (New_StreamTask).
  *
  * The name is the table's stem with its `Obj` dropped (track 4 step 2);
- * include/Class6D3C8.h's view already called it StreamTask. What it does,
+ * include/GameApplication.h's view already called it StreamTask. What it does,
  * measured: it owns a MoviePlayer (`player`, New_MoviePlayer, gMoviePlayerMethods)
  * and runs one "ETC\*.STR" stream through it inside TaskCore's fade/state
- * machine. Every caller is code_1677c's Class6D3C8 (intro logo, weekly,
+ * machine. Every caller is code_1677c's GameApplication (intro logo, weekly,
  * GraphRoom and cinematic streams): New_StreamTask(NULL, NULL, NULL, NULL),
  * optionally setFrameBound / setSkipOnConfirm(0), then init with the stream,
  * then release. The player's slots as this class calls them

@@ -21,7 +21,7 @@ this codebase. Established from first principles across this whole batch:
   matches `BasicClassMethods::slot38` exactly. `TaskObjF` is therefore a
   `BasicClass` subclass whose own new slots start at +0x044 (the same
   "inherited low slots, subclass slots from the first free offset after
-  BasicClass's own 15" shape already documented for `Class6D3C8Methods`).
+  BasicClass's own 15" shape already documented for `GameApplicationMethods`).
 - `BuildMemcardPath` (this unit's other matched function) is a **different,
   unrelated object** — see its own report.
 

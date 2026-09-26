@@ -43,7 +43,7 @@ s32 TaskCore__Init(StreamTaskObj *self, s32 a1, s32 a2) {
 
 Matched first attempt.
 
-**Return-type discrepancy with `include/Class6D3C8.h`, flagged for the
+**Return-type discrepancy with `include/GameApplication.h`, flagged for the
 head:** that header already types this exact slot (`gTaskCoreMethods::slot44`,
 its own `LoaderTaskMethods::slot44`) as `void`, established from a
 *different, discarding* caller's call sites in another unit. This function's
@@ -53,12 +53,12 @@ purpose except to be the return value (nothing else touches it). A truly
 `void` source would not need this load at all. The two typings are not in
 conflict at the ABI level (a caller that ignores the return through a
 `void`-typed function pointer simply never reads `$v0`, which is exactly
-what `Class6D3C8.h`'s own caller does), so `Class6D3C8.h`'s existing callers
+what `GameApplication.h`'s own caller does), so `GameApplication.h`'s existing callers
 are unaffected either way -- but the FUNCTION's true return type is `s32`,
-and `Class6D3C8.h`'s `LoaderTaskMethods::slot44` typing looks incomplete now
+and `GameApplication.h`'s `LoaderTaskMethods::slot44` typing looks incomplete now
 that the occupant is known. Not fixed here (out of this unit's scope to edit
 that header under the parallel-run rules); worth the head reconciling in
-`Class6D3C8.h` directly, in a later round.
+`GameApplication.h` directly, in a later round.
 
 ## New struct/header knowledge
 

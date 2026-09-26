@@ -10,7 +10,7 @@
 
 Returns the address of `gFileResourceMethods`, a 44-slot method table (header word
 `0x00000003`) — the vtable of the class most of this unit's own functions
-belong to. Same "get methods" shape as `GetClass6D3C8Methods` immediately above,
+belong to. Same "get methods" shape as `GetGameApplicationMethods` immediately above,
 just for a different class.
 
 ## Derivation
@@ -42,7 +42,7 @@ BasicClass base (`gBasicClassMethods`, resolved with `--vs`) for the inherited s
 
 ## Proposed learning
 
-None beyond what `GetClass6D3C8Methods`'s report already says about this shape.
+None beyond what `GetGameApplicationMethods`'s report already says about this shape.
 
 ## Naming
 
@@ -53,7 +53,7 @@ Round 52 (alpha), FINISHING-PLAN track 3.
 | `func_80026C9C` | `GetFileResourceMethods` | A |
 
 **Evidence.** `return gFileResourceMethods;` -- the same "get my own vtable" shape as
-`GetClass6D3C8Methods` (this round) and `GetCdDriverMethods` (round 51).
+`GetGameApplicationMethods` (this round) and `GetCdDriverMethods` (round 51).
 Pure leaf, mechanics are its purpose.
 
 ## Proposed type names
@@ -68,7 +68,7 @@ unit's own header already predicted ("Not yet named or typed field-by-field"):
 
 | type | proposed name | tier | evidence |
 | --- | --- | --- | --- |
-| `FileResource` | `FileResource` | C | Matches this round's `FileResource__*` function-name token (the vtable's own address, per the project's existing `SceneNode`/`Class6D3C8`/`Class6D4E8` convention for a class whose real name is not yet established). |
+| `FileResource` | `FileResource` | C | Matches this round's `FileResource__*` function-name token (the vtable's own address, per the project's existing `SceneNode`/`GameApplication`/`Class6D4E8` convention for a class whose real name is not yet established). |
 | `FileResourceMethods` | `FileResourceMethods` | C | Same convention, applied to the method-table type. |
 
 Posted to the broadcast.

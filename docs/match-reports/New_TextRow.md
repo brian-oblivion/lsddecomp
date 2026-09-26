@@ -60,7 +60,7 @@ retail's null-path materialises a literal `move $v0,$zero` in the
 `beqz`'s own delay slot, where GCC naturally produces `move $v0,$s0`
 instead (since `$s0` already holds `self`, which equals 0 on that exact
 path -- a value-correct but differently-SPELLED "surplus mention"
-residue, same family as the project's `New_Class6D3C8`/`strcat`
+residue, same family as the project's `New_GameApplication`/`strcat`
 one-word class). Tried and rejected:
 
 - Restructuring as a genuine early exit
@@ -81,7 +81,7 @@ one-word class). Tried and rejected:
   are now two independent expressions rather than one shared variable.
   Matches CLAUDE.md/MATCHING-GUIDE's "early exit returning a DIFFERENT
   value: try goto and return both" family, landing on the `return`
-  form here (this shape has no loop, so the `Class6D3C8__PollGraphRoomStatus`-style
+  form here (this shape has no loop, so the `GameApplication__PollGraphRoomStatus`-style
   disqualifier for that lever doesn't apply).
 
 ### Proposed learning

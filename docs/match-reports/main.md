@@ -11,11 +11,11 @@
 This is the game's own `main()`. It runs an empty startup stub
 (`__main`, already matched, a no-op), sets a Psy-Q memory mode via
 `SetMem(2)`, stands up the game's `BMemPMgr` heap (`BMemPMgrInit`), installs
-it as the default pool (`SetDefaultBMemPMgr`), constructs the `Class6D3C8`
-instance at `gClass6D3C8` (`New_Class6D3C8`, seeded from the constant block
-`gClass6D3C8CtorArgs = {0x13, 0, 1, 1, 1, 1}`), allocates a second object via the
+it as the default pool (`SetDefaultBMemPMgr`), constructs the `GameApplication`
+instance at `gGameApplication` (`New_GameApplication`, seeded from the constant block
+`gGameApplicationCtorArgs = {0x13, 0, 1, 1, 1, 1}`), allocates a second object via the
 still-uncarved `New_DrawSystem`, opens a `Pad` (`New_Pad(NULL, 0)`),
-and dispatches two methods through `gClass6D3C8`'s own vtable (`+0x044` and
+and dispatches two methods through `gGameApplication`'s own vtable (`+0x044` and
 `+0x04C`) before returning. It never loops -- the real game loop presumably
 lives inside whatever `slot4C` (`Application__RunMainLoop`) or a callee reached from it
 does; this function is just game-code setup, past which retail's own crt0
@@ -26,7 +26,7 @@ correctly left untouched per the runner brief).
 
 ```c
 #include "common.h"
-#include "Class6D3C8.h"
+#include "GameApplication.h"
 #include "class_16334.h"
 
 /* Local, opaque: code_8220.h can't be included alongside class_16334.h
@@ -65,12 +65,12 @@ extern void SetDefaultBMemPMgr(BMemPMgr *pool);
 extern void *New_DrawSystem(void);
 
 extern BMemPMgr *gStartupBMemPMgr;
-extern Class6D3C8 *gClass6D3C8;
-extern Class6D3C8CtorArgs gClass6D3C8CtorArgs;
+extern GameApplication *gGameApplication;
+extern GameApplicationCtorArgs gGameApplicationCtorArgs;
 
 /* Matched in code_1677c.c; not yet declared in any header (no other carved
  * caller existed until now). */
-extern Class6D3C8 *New_Class6D3C8(Class6D3C8CtorArgs *arg);
+extern GameApplication *New_GameApplication(GameApplicationCtorArgs *arg);
 
 void main(void)
 {
@@ -81,11 +81,11 @@ void main(void)
     SetMem(2);
     gStartupBMemPMgr = BMemPMgrInit(0x166C00, 0);
     SetDefaultBMemPMgr(gStartupBMemPMgr);
-    gClass6D3C8 = New_Class6D3C8(&gClass6D3C8CtorArgs);
+    gGameApplication = New_GameApplication(&gGameApplicationCtorArgs);
     obj = New_DrawSystem();
     pad = New_Pad(0, 0);
-    gClass6D3C8->methods->forwardToBaseSlot44UnlessFlagged(gClass6D3C8, obj, pad);
-    gClass6D3C8->methods->slot4C(gClass6D3C8);
+    gGameApplication->methods->forwardToBaseSlot44UnlessFlagged(gGameApplication, obj, pad);
+    gGameApplication->methods->slot4C(gGameApplication);
 }
 
 void __main(void) {
@@ -95,7 +95,7 @@ void __main(void) {
 (Code block above updated round 79 to match `src/main.c` as it stands: the
 `+0x044` slot is `forwardToBaseSlot44UnlessFlagged` in the live source, not
 the `slot44` name this report's code block still carried from round 47 --
-`Class6D3C8Methods.forwardToBaseSlot44UnlessFlagged` was renamed by a later
+`GameApplicationMethods.forwardToBaseSlot44UnlessFlagged` was renamed by a later
 round without this report's inline C being refreshed. No behavior changed;
 this is a documentation sync only.)
 
@@ -105,7 +105,7 @@ this is a documentation sync only.)
   `config/splat.slps01556.lsdde.yaml`'s `main` c-segment comment: "main: the
   game's own `main()` (func_800118DC) plus a two-word stub") calls this
   function directly as the game's entry point; its body stands up the heap,
-  constructs the root `Class6D3C8` object, and dispatches into its vtable --
+  constructs the root `GameApplication` object, and dispatches into its vtable --
   the shape of a C program's `main`. **Not named literally `main`**: doing
   so trips GCC 2.6.3's own special-case for a function spelled exactly
   `main` -- it silently inserts an extra `jal __main` as the function's
@@ -170,16 +170,16 @@ this is a documentation sync only.)
     pointer); whether any still-uncarved code elsewhere also reads this
     exact global (as opposed to `gDefaultBMemPMgr`, a different address,
     `code_8220.c`) is not established, hence tier B rather than A.
-  - `D_8008AC20` -> `gClass6D3C8`, tier B. The one instance of `Class6D3C8`
+  - `D_8008AC20` -> `gGameApplication`, tier B. The one instance of `GameApplication`
     the game constructs, matching this header's own stated convention of
     keeping the class's identity tied to its vtable address until a
     game-purpose name is established (track 4). Read and written only here
     and in the shared header's comments (updated by this rename).
-  - `D_80066828` -> `gClass6D3C8CtorArgs`, tier A: purely mechanical, it
-    IS the one `Class6D3C8CtorArgs` block in the image, passed to
-    `New_Class6D3C8` at its only call site. `{0x13, 0, 1, 1, 1, 1}`, per
-    `include/Class6D3C8.h`'s existing documentation of which two fields
-    (`+0x00`, `+0x14`) `Class6D3C8__Class6D3C8` actually reads.
+  - `D_80066828` -> `gGameApplicationCtorArgs`, tier A: purely mechanical, it
+    IS the one `GameApplicationCtorArgs` block in the image, passed to
+    `New_GameApplication` at its only call site. `{0x13, 0, 1, 1, 1, 1}`, per
+    `include/GameApplication.h`'s existing documentation of which two fields
+    (`+0x00`, `+0x14`) `GameApplication__GameApplication` actually reads.
 
   All three: `./build-and-verify.sh` byte-identical, `tools/check-nonmatching.sh`
   green, after each individual `rename.py` run.
@@ -202,9 +202,9 @@ fingerprint) evidence that the callee IS that toolchain-standard symbol.
 Use a non-colliding name (`main`, `EntryMain`, etc.) for the game's
 real entry point instead.
 
-Also in `include/Class6D3C8.h`: `Class6D3C8Methods.unk4C` (never dispatched
+Also in `include/GameApplication.h`: `GameApplicationMethods.unk4C` (never dispatched
 by any carved C before this) is retyped from `void *` to `void
-(*slot4C)(Class6D3C8 *self);` -- this function is its first caller.
+(*slot4C)(GameApplication *self);` -- this function is its first caller.
 
 ## Two levers, one of them a straight misreading corrected by re-deriving from the encoding
 

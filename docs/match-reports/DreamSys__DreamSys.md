@@ -38,7 +38,7 @@ Matched first attempt.
 
 ## The head's broadcast lever applied directly
 
-This round's head broadcast (`New_Class6D3C8`, closed 24/24) was: a
+This round's head broadcast (`New_GameApplication`, closed 24/24) was: a
 constructor-family function often should NOT restate a return value with an
 explicit `return X;` when the value is already sitting in `$v0` from the
 immediately preceding call. This function's disassembly ends with a `jalr` to
@@ -85,7 +85,7 @@ anywhere) made it obvious before writing any C.
 ### Proposed learning
 
 None beyond what the head's own broadcast already captured for
-`New_Class6D3C8` — this is a second, independent, zero-attempt confirmation
+`New_GameApplication` — this is a second, independent, zero-attempt confirmation
 of the same lever ("a constructor's tail call already leaves the return value
 in the right place; do not restate it"), which is worth noting only as
 reinforcement, not as a new finding.
@@ -93,7 +93,7 @@ reinforcement, not as a new finding.
 ## Track 4 (LinkResource)
 
 2026-09-26, round 89 (delta): `arg1` is a LinkResource (include/LinkResource.h:
-Class6D3C8__Class6D3C8 passes New_LinkResource("ETC\DREAME5.TMD")), so the
+GameApplication__GameApplication passes New_LinkResource("ETC\DREAME5.TMD")), so the
 DreamSysCtorArgObj/DreamSysCtorArgMethods view is gone and the call is
 `arg1->methods->getModel(arg1, 0)` (+0x080, LinkResource__GetModel: the
 first TmdModel, added as a child). `unk_0x60`, the ctor slot's and
@@ -157,7 +157,7 @@ Replaced in the source by a comment that says what the code does; kept here as w
 - Parameters `modelSource`, `soundObj`, `viewport` (were `arg1..arg3`): the
   ctor stores the second and third in `soundObj` / `viewport` (both also
   reachable through `setSoundObj` / `setViewport`), and takes model 0 of the
-  first -- the LinkResource Class6D3C8__Class6D3C8 builds from
+  first -- the LinkResource GameApplication__GameApplication builds from
   "ETC\DREAME5.TMD" -- as its child.
 - Field `DreamSys::unk_0x60` -> `modelSource` (tier A: its one writer is this
   ctor, storing that LinkResource; nothing reads it back). Every accessor is in

@@ -28,4 +28,4 @@ in this codebase for the identical shape (`DreamSys.h`'s
 
 ## Track 4 (2026-09-26, round 87)
 
-Renamed with the class unification (gStreamTaskObjMethods -> class StreamTask, include/StreamTask.h): the `Obj` suffix is dropped (track 4 step 2; include/Class6D3C8.h already viewed the class as `StreamTask`). Occupies +0x088 (NULL in TaskCore's table).
+Renamed with the class unification (gStreamTaskObjMethods -> class StreamTask, include/StreamTask.h): the `Obj` suffix is dropped (track 4 step 2; include/GameApplication.h already viewed the class as `StreamTask`). Occupies +0x088 (NULL in TaskCore's table).

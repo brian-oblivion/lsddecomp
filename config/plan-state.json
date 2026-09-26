@@ -844,9 +844,9 @@
     "4": {
       "classes": {
         "D_8006D3C8": {
-          "class": "Class6D3C8",
+          "class": "GameApplication",
           "date": "2026-09-26",
-          "header": "include/Class6D3C8.h"
+          "header": "include/GameApplication.h"
         },
         "D_8006D940": {
           "class": "Class6D940",

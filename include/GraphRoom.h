@@ -15,8 +15,8 @@
  * the DreamSys's 365-day mood ring. What it is in the game (the graph
  * screen) is that reading; the mechanics below are measured.
  *
- * Who makes one: Class6D3C8__PollGraphRoomStatus (src/code_1677c.c), through
- * Class6D3C8__RunPollTask(New_GraphRoom, self->dreamSys, ...), so the ctor's
+ * Who makes one: GameApplication__PollGraphRoomStatus (src/code_1677c.c), through
+ * GameApplication__RunPollTask(New_GraphRoom, self->dreamSys, ...), so the ctor's
  * one argument, kept at +0x0A4, is the game's DreamSys. Its +0x1B0 is
  * DreamSys__GetSaveBlock, which returns &saveMagic; this unit reads that
  * block through its own record (DreamSaveBlock in class_3bb8c_t.c: +0x004

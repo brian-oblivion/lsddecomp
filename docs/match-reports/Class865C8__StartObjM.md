@@ -77,7 +77,7 @@ committed source.)
   unaffected.
 - `Class865C8Methods::slot10` typed `void (*)(Obj865C8 *self, Obj4C *arg1)`
   — a BasicClass-inherited slot (`BasicClass__AddChild`, same address
-  `Class6D3C8.h` already lists at its own local `+0x010` as an untyped
+  `GameApplication.h` already lists at its own local `+0x010` as an untyped
   `unk10`; not reconciled there per this project's per-unit local-view
   convention).
 - New opaque type `Obj4C`/`Obj4CMethods`: the object `New_ObjM`

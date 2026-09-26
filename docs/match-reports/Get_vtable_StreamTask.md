@@ -38,7 +38,7 @@ StreamTaskObjMethods *Get_vtable_StreamTask(void) {
 ```
 
 Matches the `lui`/`addiu` idiom already confirmed elsewhere in this project:
-"returns `&symbol`, not a value read from it" (`GetClass6D3C8Methods`,
+"returns `&symbol`, not a value read from it" (`GetGameApplicationMethods`,
 `docs/DECOMPILATION_LEARNINGS.md`).
 
 ## New struct/header knowledge
@@ -50,7 +50,7 @@ this unit's queue) and `extern StreamTaskObjMethods gStreamTaskMethods;`.
 ## Proposed learning
 
 `gStreamTaskMethods` sits right next to a second class's table, `gTaskCoreMethods`
-(`Class6D3C8.h`'s `LoaderTaskMethods`, established from a completely
+(`GameApplication.h`'s `LoaderTaskMethods`, established from a completely
 different allocator/unit, `New_TaskCore`). `StreamTaskObj`'s own slots
 `+0x00C`/`+0x080`/`+0x084` (`StreamTask__Finalize`/`StreamTask__OnPadPrev`/`StreamTask__OnPadNext`)
 forward straight through to `gTaskCoreMethods`'s implementations of the *same*
@@ -71,4 +71,4 @@ the established `Get_vtable_<Class>` convention exactly
 
 ## Track 4 (2026-09-26, round 87)
 
-Renamed with the class unification (gStreamTaskObjMethods -> class StreamTask, include/StreamTask.h): the `Obj` suffix is dropped (track 4 step 2; include/Class6D3C8.h already viewed the class as `StreamTask`). Returns &gStreamTaskMethods.
+Renamed with the class unification (gStreamTaskObjMethods -> class StreamTask, include/StreamTask.h): the `Obj` suffix is dropped (track 4 step 2; include/GameApplication.h already viewed the class as `StreamTask`). Returns &gStreamTaskMethods.

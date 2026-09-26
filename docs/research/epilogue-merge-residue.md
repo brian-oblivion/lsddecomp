@@ -95,7 +95,7 @@ you are in the wrong family. Spot it and stop.
 For the mechanism underneath (`fill_eager_delay_slots` in `reorg.c`, its
 `mostly_true_jump` static prediction of `EQ`-against-zero, and why an
 `__asm__("")` barrier cannot reach it), see the root-cause hypothesis in
-`docs/match-reports/New_Class6D3C8.md`. That analysis is informed inference
+`docs/match-reports/New_GameApplication.md`. That analysis is informed inference
 against a same-vintage GCC tree, not a read of the exact `gcc-2.6.3-psx`
 source, which is not vendored here.
 
@@ -103,7 +103,7 @@ source, which is not vendored here.
 
 Roughly 25 build-and-diff attempts across five functions and four units:
 
-- `New_Class6D3C8` (code_1677c, 23/24) — 14+ attempts. `if`/`goto` reshaping
+- `New_GameApplication` (code_1677c, 23/24) — 14+ attempts. `if`/`goto` reshaping
   both directions, `__asm__("")` in every position, `volatile`.
 - `Pad__DispatchEvents` (two broadcast instances).
 - `New_TimedTask` (class_39e08, 26/27) — runner: `__asm__("")` after the malloc;
@@ -169,7 +169,7 @@ Five instances, all byte-exact, all with `return NULL;` last:
 
 ### Still open: the `nop` sub-shape
 
-`New_Class6D3C8` (code_1677c, 23/24) is **not** closed, and it is a different
+`New_GameApplication` (code_1677c, 23/24) is **not** closed, and it is a different
 animal. Retail leaves the `beqz` delay slot as a bare `nop` and materializes
 nothing at all, relying on `$v0` still holding the allocator's own zero return.
 There is no second return expression to reorder. Both the rule above and a

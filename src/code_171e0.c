@@ -17,7 +17,7 @@
  * to the CD driver's own functions when it is active, and to an SPU/VAB-
  * side fallback otherwise.
  *
- * GetClass6D3C8Methods, SetVec3 and BuildFileName are unrelated utilities
+ * GetGameApplicationMethods, SetVec3 and BuildFileName are unrelated utilities
  * that happen to live in this segment; func_800270AC/func_800270B8 (a
  * getter/setter pair for D_8008A854) are left unnamed -- see their reports.
  */
@@ -25,7 +25,7 @@
 #include "code_171e0.h"
 #include "VabDriver.h"
 #include "CdDriver.h"
-#include "Class6D3C8.h"
+#include "GameApplication.h"
 
 /* gActiveDataSource's two observed values are the header words of the two
  * sibling classes it selects between: gCdDriverMethods (the CD-ROM read driver,
@@ -33,7 +33,7 @@
 #define DATASOURCE_CD 0x13
 #define DATASOURCE_SPU 0x23
 
-Class6D3C8Methods *GetClass6D3C8Methods(void) {
+GameApplicationMethods *GetGameApplicationMethods(void) {
     return &D_8006D3C8;
 }
 

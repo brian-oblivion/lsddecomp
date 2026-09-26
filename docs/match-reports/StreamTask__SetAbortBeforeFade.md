@@ -42,4 +42,4 @@ of five described in `StreamTask__SetUnkC4`'s report; same convention.
 
 ## Track 4 (2026-09-26, round 87)
 
-Renamed with the class unification (gStreamTaskObjMethods -> class StreamTask, include/StreamTask.h): the `Obj` suffix is dropped (track 4 step 2; include/Class6D3C8.h already viewed the class as `StreamTask`). Was StreamTaskObj__SetUnkD4. Own slot +0x134. unkD4 is read by StreamTask__RefreshViewValue (nonzero: MoviePlayer__Abort at once; zero: fade out first) and StreamTask__SetState case 8 (zero: abort after the fade). Reset: 1. Field `abortBeforeFade`, slot `setAbortBeforeFade`.
+Renamed with the class unification (gStreamTaskObjMethods -> class StreamTask, include/StreamTask.h): the `Obj` suffix is dropped (track 4 step 2; include/GameApplication.h already viewed the class as `StreamTask`). Was StreamTaskObj__SetUnkD4. Own slot +0x134. unkD4 is read by StreamTask__RefreshViewValue (nonzero: MoviePlayer__Abort at once; zero: fade out first) and StreamTask__SetState case 8 (zero: abort after the fade). Reset: 1. Field `abortBeforeFade`, slot `setAbortBeforeFade`.

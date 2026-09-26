@@ -22,7 +22,7 @@ BasicClassMethods *Get_vtable_BasicClass(void)
 
 `gBasicClassMethods` had no extern declaration anywhere in the tree yet (only prose
 references to it in `class_16334.h`, `code_171e0.h`, `code_55dd4.h`,
-`code_d294.h`, `Class6D3C8.h`). Added one to `include/code_8220.h`:
+`code_d294.h`, `GameApplication.h`). Added one to `include/code_8220.h`:
 
 ```c
 extern BasicClassMethods gBasicClassMethods;
