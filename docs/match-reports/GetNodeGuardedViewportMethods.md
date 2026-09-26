@@ -54,3 +54,7 @@ table" -- ARE the purpose, so tier A applies by the leaf-getter rule. The
 underlying vtable global was renamed alongside it, `D_800869D8` ->
 `gNodeGuardedViewportMethods` (same `g` + getter-name-minus-"Get" pairing already
 established by `gClass86668Methods`/`GetClass86668Methods`).
+
+## Track 6 (2026-09-26, round 92, echo)
+
+The class was renamed `Class869D8` -> `NodeGuardedViewport` (`tools/renametype.py`, tier B): its one behavioural override, update, runs Viewport__Update only while a view node is attached, which is what lets ObjM leave it detached after ExitSceneStyle. The name says the mechanism, not the viewport's role in the game. (renametype also rewrote the historical token `Class869D8__ForwardIfUnk10AndUnk70` above.)

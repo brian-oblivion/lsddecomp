@@ -49,3 +49,16 @@ a NodeGuardedViewport: none of Viewport's defaults are written by the class itse
 It is typed `void (*)(NodeGuardedViewport *)` in the table (the slot's type); the
 definition keeps its `(void)` parameter list because an empty body reads no
 argument and the bytes do not show one.
+
+## Track 6 (2026-09-26, round 92, echo)
+
+The class was renamed `Class869D8` -> `NodeGuardedViewport` (`tools/renametype.py`, tier B): its one behavioural override, update, runs Viewport__Update only while a view node is attached, which is what lets ObjM leave it detached after ExitSceneStyle. The name says the mechanism, not the viewport's role in the game. (renametype also rewrote the historical token `Class869D8__ForwardIfUnk10AndUnk70` above.)
+
+**Correction to the round-87 note above.** The Viewport ctor
+(`Viewport__Viewport`) installs `GetViewportMethods()` before its closing
+`self->methods->initDefaults(self)`, so that call dispatches
+`Viewport__InitDefaults` and every Viewport default IS written. This class's
+ctor then installs its own table and calls initDefaults a second time; the
+empty override makes that second call a no-op. It does not suppress the
+defaults. Name kept (tier A for the slot: it is the class's initDefaults,
+and the body is empty).

@@ -35,3 +35,9 @@ form was considered and rejected -- it would assert a tie to this specific
 class's own semantics that the body does not support (the function reads
 nothing, including no `self`, so nothing here is actually class-specific
 behavior).
+
+## Track 6 (2026-09-26, round 92, echo)
+
+The class was renamed `Class869D8` -> `NodeGuardedViewport` (`tools/renametype.py`, tier B): its one behavioural override, update, runs Viewport__Update only while a view node is attached, which is what lets ObjM leave it detached after ExitSceneStyle. The name says the mechanism, not the viewport's role in the game. (renametype also rewrote the historical token `Class869D8__ForwardIfUnk10AndUnk70` above.)
+
+Renamed from its `func_` placeholder to `NodeGuardedViewport__NoOpSlotC4` (`tools/rename.py`, tier A: an empty leaf, its mechanics are its purpose). The "keep the bare func_ name" precedent cited above is superseded: `SceneNode__NoOpSlot5C`, `ObjM__NoOpSlotBC`, `Actor__NoOpSlotD8` and two dozen others now use the `Class__NoOpSlotXX` form for an empty occupant of a known class's own slot. Nothing calls the slot (+0x0C4).

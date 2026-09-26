@@ -56,3 +56,9 @@ evident from the body and from the vtable dump (`tools/classtable.py
 ## Track 4 (2026-09-25, round 85, bravo)
 
 NodeGuardedViewport's parent is Viewport (id 0x7, include/Viewport.h, round 85): the base ctor call is `GetViewportMethods()->ctor((Viewport *)self)`, replacing class_3bb8c.h's BaseCtorTable_3bb8c_c view. This is the ctor chain that makes 0x17 Viewport's subclass. NodeGuardedViewport's own views are unchanged. Byte-identical.
+
+## Track 6 (2026-09-26, round 92, echo)
+
+The class was renamed `Class869D8` -> `NodeGuardedViewport` (`tools/renametype.py`, tier B): its one behavioural override, update, runs Viewport__Update only while a view node is attached, which is what lets ObjM leave it detached after ExitSceneStyle. The name says the mechanism, not the viewport's role in the game. (renametype also rewrote the historical token `Class869D8__ForwardIfUnk10AndUnk70` above.)
+
+The banner history that moved out of include/NodeGuardedViewport.h: IntermediateBaseInitArgs +0x010, where Class865C8__Class865C8 stores this object, was once viewed by class_39e08.h as `Obj0C::unk10`; the id tree 0x7 -> 0x17 was confirmed as the ctor chain in round 87 (track 4).

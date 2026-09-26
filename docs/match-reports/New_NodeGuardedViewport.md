@@ -46,3 +46,7 @@ by the tier-A leaf rule. Matches the project's established `New_Class866E8`/
 `New_X` naming convention (class_3ac78.c, class_39e08.c) exactly, and this
 name was already in use in this function's own report prose before the
 round-68 rename made it real.
+
+## Track 6 (2026-09-26, round 92, echo)
+
+The class was renamed `Class869D8` -> `NodeGuardedViewport` (`tools/renametype.py`, tier B): its one behavioural override, update, runs Viewport__Update only while a view node is attached, which is what lets ObjM leave it detached after ExitSceneStyle. The name says the mechanism, not the viewport's role in the game. (renametype also rewrote the historical token `Class869D8__ForwardIfUnk10AndUnk70` above.)

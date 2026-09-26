@@ -77,3 +77,9 @@ gNodeGuardedViewportMethods +0x09C, Viewport's `update` (gViewportMethods +0x09C
 the override adds is a NULL `viewNode` guard: the class updates only once a
 view node is attached. That is the slot's job with a precondition, not more
 than the slot name says.
+
+## Track 6 (2026-09-26, round 92, echo)
+
+The class was renamed `Class869D8` -> `NodeGuardedViewport` (`tools/renametype.py`, tier B): its one behavioural override, update, runs Viewport__Update only while a view node is attached, which is what lets ObjM leave it detached after ExitSceneStyle. The name says the mechanism, not the viewport's role in the game. (renametype also rewrote the historical token `Class869D8__ForwardIfUnk10AndUnk70` above.)
+
+The update guard is the evidence for the class name. Viewport__Update also dereferences `refView.super`, which RemoveChild clears together with `viewNode`, so both unguarded dereferences are covered by the one `viewNode != NULL` test.
