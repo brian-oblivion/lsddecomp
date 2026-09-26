@@ -1,5 +1,6 @@
 #include "common.h"
 #include "Class6D3C8.h"
+#include "GraphRoom.h"
 
 /* The `New_X` allocator for the class whose method table is D_8006D3C8:
  * allocates a 0x2C-byte instance and, on success, runs the class's own
@@ -142,7 +143,7 @@ s32 Class6D3C8__PollGraphRoomStatus(Class6D3C8 *self) {
         status = self->dreamSys->vt->DreamSys__GetCurrentDayAndYear(self->dreamSys, 0);
         if (status != 1) {
             if (self->unk24 == 0) {
-                status = Class6D3C8__RunPollTask(New_GraphRoom, self->dreamSys, self->unk1C);
+                status = Class6D3C8__RunPollTask((PollTaskCtor)New_GraphRoom, self->dreamSys, self->unk1C);
                 if (status == 2) {
                     Class6D3C8__StartGraphRoomStreamTask(self);
                 }
@@ -153,7 +154,7 @@ s32 Class6D3C8__PollGraphRoomStatus(Class6D3C8 *self) {
     retry:
         status = Class6D3C8__RunPollTask(New_Class86B60, self->dreamSys, self->unk1C);
         if (status == pollDone) {
-            Class6D3C8__RunPollTask(New_GraphRoom, self->dreamSys, self->unk1C);
+            Class6D3C8__RunPollTask((PollTaskCtor)New_GraphRoom, self->dreamSys, self->unk1C);
             goto retry;
         }
 
