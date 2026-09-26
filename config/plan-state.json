@@ -1270,6 +1270,7 @@
         "sdk-headers": true
       },
       "flagged": {
+        "DrawNode": "code_2864's local view of the scene node Viewport.h's drawNode slot types as SceneNode * (echo, round 94) (2026-09-26)",
         "EntityMoodHandlerArg": "it is SoundCueSet (Entity.h's own comment; code_179d8_e.c and code_179d8_l.c each define SoundCueSet locally): unify into one header, fields become slots[n].note/pitchOffset (2026-09-26)",
         "ViewportOt": "local view of Sony's GsOT (length, org, 0x14 bytes); code_2864 casts it to GsOT * at five sort calls (echo, round 94) (2026-09-26)"
       },
