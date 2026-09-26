@@ -262,6 +262,7 @@ def unit_metrics(info):
                                   for k, m in enumerate(ms) if m.group(1) in defs)
         units[c.stem] = {
             "defs": len(defs),
+            "def_names": defs,
             "func_named": sum(1 for d in defs if FUNC_PH.match(d)),
             "include_asm": len(inc),
             "nm_bodies": len(nm & set(inc)),
@@ -725,7 +726,14 @@ def collect_phase2(st, info, t5_status, classes, units_meta):
         own = sorted(n for n, (_, fs) in types.items() if hdr in fs)
         covered |= set(own)
         par = byt.get(c["parent"])
+        # The runner also edits the units holding the class's own methods
+        # (their banners, the renamed fields' accessors), so they are in the
+        # job's edit set: round 93 held a class_3bb8c polish by hand while
+        # 19 of its 21 functions were Class866E8's, under its class job.
+        owned = set(c.get("owned", []))
+        own_units = sorted(u for u, m in units_meta.items() if owned & set(m.get("def_names", ())))
         class_jobs.append({"class": name, "table": c["table"], "header": hdr, "types": own,
+                           "units": own_units,
                            "parent": (par.get("name") or par["table"]) if par else None,
                            "methods": len(c.get("owned", [])), "ph_name": ph_name, "ph_table": ph_table})
     homes = {}
@@ -1170,7 +1178,7 @@ def jobs(d, n):
                 extra += sony_note(j["header"])
                 tab = f" and table {j['table']}" if j["ph_table"] else ""
                 q6.append(("6", f"name class {j['class']}{tab} (parent {j['parent'] or 'none'}, {j['methods']} own "
-                                f"methods, {j['header']}{extra}) (units: {j['header']})", MODELS["types_runner"]))
+                                f"methods, {j['header']}{extra}) (units: {','.join([j['header']] + j['units'])})", MODELS["types_runner"]))
             for f, names in sorted(p2["_homes"].items(), key=lambda kv: (-len(kv[1]), kv[0])):
                 if f in first:
                     continue

@@ -19,8 +19,8 @@ and wrong for every round after. Run the tool. The mechanics of a round
 the per-function matching loop is CLAUDE.md and `docs/MATCHING-GUIDE.md`.
 This file does not repeat them.
 
-Plan revision: 30 (2026-09-26, round 92's premium head: a flagged type
-ranks first in track 6; step 4's base rule stands without a name).
+Plan revision: 31 (2026-09-26, round 93's premium head: a reopened phase
+1 track runs beside phase 2; a class job's edit set holds its methods' units).
 Changing the plan is a premium head task (§2); record the change in
 `docs/PROGRESS.md` and bump this line.
 
@@ -94,7 +94,8 @@ Their rules, stop rules and runner prompts are archived verbatim:
 SDK names) and `docs/archive/FINISHING-PLAN-tracks-3-5-2026-09-26.md`
 (naming pass, class unification, close-out). `plan.py` reopens a track by
 itself when the tree regresses (fresh ground, a stray class view, a global
-declared with two types); follow the archived section then. Two of their
+declared with two types); follow the archived section then, beside phase
+2, which stays open once track 5's checklist is ticked. Two of their
 rules are standing for every track: a function `progress.py` counts as
 library is never renamed or retyped as game code, and a preserved near-miss
 body lives only in an `#ifdef NON_MATCHING` block (CLAUDE.md).
@@ -197,6 +198,9 @@ one per other file that defines placeholder types. The head adds a name the
 patterns cannot see (an opaque one such as `ObjM`, or a local view of a type
 another file defines) with `plan.py flag-type`; its file's job then ranks
 first, since other jobs' debt usually waits on it (round 92: SoundCueSet).
+A class job's edit set is its header plus the units holding the class's own
+methods (their banners and field accessors), so a polish pass on one of those
+units defers behind it (round 93: class_3bb8c behind Class866E8).
 
 **The pass, per class** (prompt §4.8):
 1. Read the header banner, every own method and its report, the subclasses
