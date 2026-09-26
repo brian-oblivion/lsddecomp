@@ -170,6 +170,16 @@ typedef struct TmdGroupHeader {
     u16 type;
 } TmdGroupHeader;
 
+/* A TMD packet's type as SortTmdObject switches on it: the mode byte
+ * (Sony's GPU_COM_* codes, <libgs.h>) above the flag byte. */
+#define TMD_TYPE(mode, flag) ((mode) << 8 | (flag))
+#define TMD_FLAG_LGT 0x01    /* flag: light source calculation off */
+#define TMD_TYPE_MASK 0xFD07 /* mode less its ABE bit 0x02; flag's LGT, FCE, GRD */
+
+/* GTE FLAG bit 18: SZ3 or OTZ saturated. The one FLAG state
+ * TransformAndCullPoly keeps a polygon for, routed to subdivision. */
+#define GTE_FLAG_SZ3_OTZ_SAT 0x40000
+
 /* GsDOBJ2 keeps its TMD object as a u_long *. */
 #define OBJ_TMD(obj) ((struct TMD_STRUCT *)(obj)->tmd)
 
@@ -245,7 +255,7 @@ void SortTmdObject(GsDOBJ2 *obj, GsOT *ot, s32 otShift, void *scratch) {
     s32 packetsLeft;
     s32 dpShift;
 
-    if ((s32)obj->attribute < 0) {
+    if (obj->attribute & GsDOFF) {
         return;
     }
 
@@ -293,14 +303,14 @@ void SortTmdObject(GsDOBJ2 *obj, GsOT *ot, s32 otShift, void *scratch) {
     D_8008E248 = (obj->attribute >> 6) & 0x1;
     gSortUseGlobalLightMode = (obj->attribute >> 5) & 0x1;
     gSortLightMode = (obj->attribute >> 3) & 0x3;
-    ctx->unk8 = 0xA;
+    ctx->unk8 = 10;
 
     ctx->faceColor = gTexturedFaceColor;
 
     if ((gSortUseGlobalLightMode != 0 && GsLIGHT_MODE != 0) || gSortLightMode != 0) {
         dpShift = 9;
     } else {
-        dpShift = 0x10;
+        dpShift = 16;
     }
     ctx->dpShift = dpShift;
 
@@ -315,7 +325,7 @@ void SortTmdObject(GsDOBJ2 *obj, GsOT *ot, s32 otShift, void *scratch) {
             s32 count;
 
             prim = GsOUT_PACKET_P;
-            ctx->packetType = ((TmdGroupHeader *)packet)->type & 0xFD07;
+            ctx->packetType = ((TmdGroupHeader *)packet)->type & TMD_TYPE_MASK;
             count = ((TmdGroupHeader *)packet)->count;
             ctx->semiTrans = (*(u32 *)packet >> 25) & 0x1;
             packetsLeft -= count;
@@ -327,14 +337,13 @@ void SortTmdObject(GsDOBJ2 *obj, GsOT *ot, s32 otShift, void *scratch) {
              * the case bodies then follow in source order, which is why they
              * sit at ascending addresses in ascending tag order. */
             switch (ctx->packetType) {
-                case 0x2000: {
+                case TMD_TYPE(GPU_COM_F3, 0): {
                     u8 *elem;
 #define PKT ((TMD_P_F3 *)(elem - offsetof(TMD_P_F3, r0)))
 #define POLY ((POLY_F3 *)prim)
 
                     /* A: POLY_F3, opaque */
-                    prim[3] = 4;
-                    prim[7] = 0x20;
+                    setPolyF3(prim);
                     SetupPrimCode(prim, ctx);
                     elem = packet + offsetof(TMD_P_F3, r0);
                 loopA:
@@ -343,7 +352,7 @@ void SortTmdObject(GsDOBJ2 *obj, GsOT *ot, s32 otShift, void *scratch) {
                         gte_ldrgb(&PKT->r0);
                         gte_ncds();
                         gte_strgb(&POLY->r0);
-                        prim[7] = ctx->primCode;
+                        setcode(prim, ctx->primCode);
                         prim = SubmitPolyF3(prim, ctx);
                     }
                     elem += sizeof(TMD_P_F3);
@@ -355,14 +364,13 @@ void SortTmdObject(GsDOBJ2 *obj, GsOT *ot, s32 otShift, void *scratch) {
 #undef POLY
                 }
 
-                case 0x2004: {
+                case TMD_TYPE(GPU_COM_F3, GsTMDFlagGRD): {
                     u8 *elem;
 #define PKT ((TMD_P_F3G *)(elem - offsetof(TMD_P_F3G, r2)))
 #define POLY ((POLY_G3 *)prim)
 
                     /* B: POLY_G3, opaque -- one ncds per vertex colour */
-                    prim[3] = 6;
-                    prim[7] = 0x30;
+                    setPolyG3(prim);
                     SetupPrimCode(prim, ctx);
                     elem = packet + offsetof(TMD_P_F3G, r2);
                 loopB:
@@ -371,7 +379,7 @@ void SortTmdObject(GsDOBJ2 *obj, GsOT *ot, s32 otShift, void *scratch) {
                         gte_ldrgb(&((TMD_P_F3G *)packet)->r0);
                         gte_ncds();
                         gte_strgb(&POLY->r0);
-                        prim[7] = ctx->primCode;
+                        setcode(prim, ctx->primCode);
                         gte_ldrgb(&((TMD_P_F3G *)packet)->r1);
                         gte_ncds();
                         gte_strgb(&POLY->r1);
@@ -389,14 +397,13 @@ void SortTmdObject(GsDOBJ2 *obj, GsOT *ot, s32 otShift, void *scratch) {
 #undef POLY
                 }
 
-                case 0x2101: {
+                case TMD_TYPE(GPU_COM_NF3, TMD_FLAG_LGT): {
                     u8 *elem;
 #define PKT ((TMD_P_NF3 *)(elem - offsetof(TMD_P_NF3, r0)))
 #define POLY ((POLY_F3 *)prim)
 
                     /* C: POLY_F3, depth-cued */
-                    prim[3] = 4;
-                    prim[7] = 0x20;
+                    setPolyF3(prim);
                     SetupPrimCode(prim, ctx);
                     elem = packet + offsetof(TMD_P_NF3, r0);
                 loopC:
@@ -404,7 +411,7 @@ void SortTmdObject(GsDOBJ2 *obj, GsOT *ot, s32 otShift, void *scratch) {
                         gte_ldrgb(&PKT->r0);
                         gte_dpcs();
                         gte_strgb(&POLY->r0);
-                        prim[7] = ctx->primCode;
+                        setcode(prim, ctx->primCode);
                         prim = SubmitPolyF3(prim, ctx);
                     }
                     elem += sizeof(TMD_P_NF3);
@@ -416,15 +423,14 @@ void SortTmdObject(GsDOBJ2 *obj, GsOT *ot, s32 otShift, void *scratch) {
 #undef POLY
                 }
 
-                case 0x2400: {
+                case TMD_TYPE(GPU_COM_TF3, 0): {
                     u8 *elem;
 #define PKT ((TMD_P_TF3 *)(elem - offsetof(TMD_P_TF3, n0)))
 #define POLY ((POLY_FT3 *)prim)
 
                     /* D: POLY_FT3, opaque -- one constant colour for the whole
                      * group, loaded once before the loop. */
-                    prim[3] = 7;
-                    prim[7] = 0x24;
+                    setPolyFT3(prim);
                     SetupPrimCode(prim, ctx);
                     gte_ldrgb(&ctx->faceColor);
                     elem = packet + offsetof(TMD_P_TF3, n0);
@@ -437,7 +443,7 @@ void SortTmdObject(GsDOBJ2 *obj, GsOT *ot, s32 otShift, void *scratch) {
                         gte_ldv0(&ctx->normals[PKT->n0]);
                         gte_ncds();
                         gte_strgb(&POLY->r0);
-                        prim[7] = ctx->primCode;
+                        setcode(prim, ctx->primCode);
                         prim = SubmitPolyFT3(prim, ctx);
                     }
                     elem += sizeof(TMD_P_TF3);
@@ -449,14 +455,13 @@ void SortTmdObject(GsDOBJ2 *obj, GsOT *ot, s32 otShift, void *scratch) {
 #undef POLY
                 }
 
-                case 0x2501: {
+                case TMD_TYPE(GPU_COM_NTF3, TMD_FLAG_LGT): {
                     u8 *elem;
 #define PKT ((TMD_P_TNF3 *)(elem - offsetof(TMD_P_TNF3, r0)))
 #define POLY ((POLY_FT3 *)prim)
 
                     /* E: POLY_FT3, depth-cued */
-                    prim[3] = 7;
-                    prim[7] = 0x24;
+                    setPolyFT3(prim);
                     SetupPrimCode(prim, ctx);
                     elem = packet + offsetof(TMD_P_TNF3, r0);
                 loopE:
@@ -468,7 +473,7 @@ void SortTmdObject(GsDOBJ2 *obj, GsOT *ot, s32 otShift, void *scratch) {
                         gte_ldrgb(&PKT->r0);
                         gte_dpcs();
                         gte_strgb(&POLY->r0);
-                        prim[7] = ctx->primCode;
+                        setcode(prim, ctx->primCode);
                         prim = SubmitPolyFT3(prim, ctx);
                     }
                     elem += sizeof(TMD_P_TNF3);
@@ -480,14 +485,13 @@ void SortTmdObject(GsDOBJ2 *obj, GsOT *ot, s32 otShift, void *scratch) {
 #undef POLY
                 }
 
-                case 0x2800: {
+                case TMD_TYPE(GPU_COM_F4, 0): {
                     u8 *elem;
 #define PKT ((TMD_P_F4 *)(elem - offsetof(TMD_P_F4, r0)))
 #define POLY ((POLY_F4 *)prim)
 
                     /* F: POLY_F4, opaque */
-                    prim[3] = 5;
-                    prim[7] = 0x28;
+                    setPolyF4(prim);
                     SetupPrimCode(prim, ctx);
                     elem = packet + offsetof(TMD_P_F4, r0);
                 loopF:
@@ -497,7 +501,7 @@ void SortTmdObject(GsDOBJ2 *obj, GsOT *ot, s32 otShift, void *scratch) {
                         gte_ldrgb(&PKT->r0);
                         gte_ncds();
                         gte_strgb(&POLY->r0);
-                        prim[7] = ctx->primCode;
+                        setcode(prim, ctx->primCode);
                         prim = SubmitPolyF4(prim, ctx);
                     }
                     elem += sizeof(TMD_P_F4);
@@ -509,14 +513,13 @@ void SortTmdObject(GsDOBJ2 *obj, GsOT *ot, s32 otShift, void *scratch) {
 #undef POLY
                 }
 
-                case 0x2901: {
+                case TMD_TYPE(GPU_COM_NF4, TMD_FLAG_LGT): {
                     u8 *elem;
 #define PKT ((TMD_P_NF4 *)(elem - offsetof(TMD_P_NF4, r0)))
 #define POLY ((POLY_F4 *)prim)
 
                     /* G: POLY_F4, depth-cued */
-                    prim[3] = 5;
-                    prim[7] = 0x28;
+                    setPolyF4(prim);
                     SetupPrimCode(prim, ctx);
                     elem = packet + offsetof(TMD_P_NF4, r0);
                 loopG:
@@ -525,7 +528,7 @@ void SortTmdObject(GsDOBJ2 *obj, GsOT *ot, s32 otShift, void *scratch) {
                         gte_ldrgb(&PKT->r0);
                         gte_dpcs();
                         gte_strgb(&POLY->r0);
-                        prim[7] = ctx->primCode;
+                        setcode(prim, ctx->primCode);
                         prim = SubmitPolyF4(prim, ctx);
                     }
                     elem += sizeof(TMD_P_NF4);
@@ -537,14 +540,13 @@ void SortTmdObject(GsDOBJ2 *obj, GsOT *ot, s32 otShift, void *scratch) {
 #undef POLY
                 }
 
-                case 0x2C00: {
+                case TMD_TYPE(GPU_COM_TF4, 0): {
                     u8 *elem;
 #define PKT ((TMD_P_TF4 *)(elem - offsetof(TMD_P_TF4, n0)))
 #define POLY ((POLY_FT4 *)prim)
 
                     /* H: POLY_FT4, opaque */
-                    prim[3] = 9;
-                    prim[7] = 0x2C;
+                    setPolyFT4(prim);
                     SetupPrimCode(prim, ctx);
                     gte_ldrgb(&ctx->faceColor);
                     elem = packet + offsetof(TMD_P_TF4, n0);
@@ -559,7 +561,7 @@ void SortTmdObject(GsDOBJ2 *obj, GsOT *ot, s32 otShift, void *scratch) {
                         gte_ldv0(&ctx->normals[PKT->n0]);
                         gte_ncds();
                         gte_strgb(&POLY->r0);
-                        prim[7] = ctx->primCode;
+                        setcode(prim, ctx->primCode);
                         prim = SubmitPolyFT4(prim, ctx);
                     }
                     elem += sizeof(TMD_P_TF4);
@@ -571,14 +573,13 @@ void SortTmdObject(GsDOBJ2 *obj, GsOT *ot, s32 otShift, void *scratch) {
 #undef POLY
                 }
 
-                case 0x2D01: {
+                case TMD_TYPE(GPU_COM_NTF4, TMD_FLAG_LGT): {
                     u8 *elem;
 #define PKT ((TMD_P_TNF4 *)(elem - offsetof(TMD_P_TNF4, r0)))
 #define POLY ((POLY_FT4 *)prim)
 
                     /* I: POLY_FT4, depth-cued */
-                    prim[3] = 9;
-                    prim[7] = 0x2C;
+                    setPolyFT4(prim);
                     SetupPrimCode(prim, ctx);
                     elem = packet + offsetof(TMD_P_TNF4, r0);
                 loopI:
@@ -592,7 +593,7 @@ void SortTmdObject(GsDOBJ2 *obj, GsOT *ot, s32 otShift, void *scratch) {
                         gte_ldrgb(&PKT->r0);
                         gte_dpcs();
                         gte_strgb(&POLY->r0);
-                        prim[7] = ctx->primCode;
+                        setcode(prim, ctx->primCode);
                         prim = SubmitPolyFT4(prim, ctx);
                     }
                     elem += sizeof(TMD_P_TNF4);
@@ -604,13 +605,12 @@ void SortTmdObject(GsDOBJ2 *obj, GsOT *ot, s32 otShift, void *scratch) {
 #undef POLY
                 }
 
-                case 0x3101: {
+                case TMD_TYPE(GPU_COM_NG3, TMD_FLAG_LGT): {
                     u8 *elem;
 #define PKT ((TMD_P_NG3 *)(elem - offsetof(TMD_P_NG3, r0)))
 
                     /* J: POLY_G3, depth-cued -- three colours, one dpct */
-                    prim[3] = 6;
-                    prim[7] = 0x30;
+                    setPolyG3(prim);
                     SetupPrimCode(prim, ctx);
                     elem = packet + offsetof(TMD_P_NG3, r0);
                 loopJ:
@@ -618,7 +618,7 @@ void SortTmdObject(GsDOBJ2 *obj, GsOT *ot, s32 otShift, void *scratch) {
                         gte_ldrgb3c(&PKT->r0);
                         gte_dpct();
                         gte_strgb3_g3(prim);
-                        prim[7] = ctx->primCode;
+                        setcode(prim, ctx->primCode);
                         prim = SubmitPolyG3(prim, ctx);
                     }
                     elem += sizeof(TMD_P_NG3);
@@ -629,14 +629,13 @@ void SortTmdObject(GsDOBJ2 *obj, GsOT *ot, s32 otShift, void *scratch) {
 #undef PKT
                 }
 
-                case 0x3501: {
+                case TMD_TYPE(GPU_COM_NTG3, TMD_FLAG_LGT): {
                     u8 *elem;
 #define PKT ((TMD_P_TNG3 *)(elem - offsetof(TMD_P_TNG3, r2)))
 #define POLY ((POLY_GT3 *)prim)
 
                     /* K: POLY_GT3, depth-cued */
-                    prim[3] = 9;
-                    prim[7] = 0x34;
+                    setPolyGT3(prim);
                     SetupPrimCode(prim, ctx);
                     elem = packet + offsetof(TMD_P_TNG3, r2);
                 loopK:
@@ -648,7 +647,7 @@ void SortTmdObject(GsDOBJ2 *obj, GsOT *ot, s32 otShift, void *scratch) {
                         gte_ldrgb3(&((TMD_P_TNG3 *)packet)->r0, &((TMD_P_TNG3 *)packet)->r1, &PKT->r2);
                         gte_dpct();
                         gte_strgb3(&POLY->r0, &POLY->r1, &POLY->r2);
-                        prim[7] = ctx->primCode;
+                        setcode(prim, ctx->primCode);
                         prim = SubmitPolyGT3(prim, ctx);
                     }
                     elem += sizeof(TMD_P_TNG3);
@@ -660,15 +659,14 @@ void SortTmdObject(GsDOBJ2 *obj, GsOT *ot, s32 otShift, void *scratch) {
 #undef POLY
                 }
 
-                case 0x3901: {
+                case TMD_TYPE(GPU_COM_NG4, TMD_FLAG_LGT): {
                     u8 *elem;
 #define PKT ((TMD_P_NG4 *)(elem - offsetof(TMD_P_NG4, r3)))
 #define POLY ((POLY_G4 *)prim)
 
                     /* L: POLY_G4, depth-cued -- three colours by dpct, the
                      * fourth by a second dpcs. */
-                    prim[3] = 8;
-                    prim[7] = 0x38;
+                    setPolyG4(prim);
                     SetupPrimCode(prim, ctx);
                     elem = packet + offsetof(TMD_P_NG4, r3);
                 loopL:
@@ -677,7 +675,7 @@ void SortTmdObject(GsDOBJ2 *obj, GsOT *ot, s32 otShift, void *scratch) {
                         gte_ldrgb3c(&((TMD_P_NG4 *)packet)->r0);
                         gte_dpct();
                         gte_strgb3_g3(prim);
-                        prim[7] = ctx->primCode;
+                        setcode(prim, ctx->primCode);
                         gte_ldrgb(&PKT->r3);
                         gte_dpcs();
                         gte_strgb(&POLY->r3);
@@ -692,15 +690,14 @@ void SortTmdObject(GsDOBJ2 *obj, GsOT *ot, s32 otShift, void *scratch) {
 #undef POLY
                 }
 
-                case 0x3D01: {
+                case TMD_TYPE(GPU_COM_NTG4, TMD_FLAG_LGT): {
                     u8 *elem;
 #define PKT ((TMD_P_TNG4 *)(elem - offsetof(TMD_P_TNG4, r3)))
 #define POLY ((POLY_GT4 *)prim)
 
                     /* M: POLY_GT4, depth-cued -- the widest element, 0x2C bytes,
                      * all four UVs and all four colours. */
-                    prim[3] = 0xC;
-                    prim[7] = 0x3C;
+                    setPolyGT4(prim);
                     SetupPrimCode(prim, ctx);
                     elem = packet + offsetof(TMD_P_TNG4, r3);
                 loopM:
@@ -715,7 +712,7 @@ void SortTmdObject(GsDOBJ2 *obj, GsOT *ot, s32 otShift, void *scratch) {
                                    &((TMD_P_TNG4 *)packet)->r2);
                         gte_dpct();
                         gte_strgb3(&POLY->r0, &POLY->r1, &POLY->r2);
-                        prim[7] = ctx->primCode;
+                        setcode(prim, ctx->primCode);
                         gte_ldrgb(&PKT->r3);
                         gte_dpcs();
                         gte_strgb(&POLY->r3);
@@ -760,22 +757,11 @@ void SortTmdObject(GsDOBJ2 *obj, GsOT *ot, s32 otShift, void *scratch) {
  * primitive it processes.
  */
 void SetupPrimCode(void *prim, PolyDrawCtx *ctx) {
-    u8 *a = (u8 *)prim;
+    setSemiTrans(prim, ctx->semiTrans);
+    setShadeTex(prim, D_8008E248);
 
-    if (ctx->semiTrans != 0) {
-        a[7] = a[7] | 0x2;
-    } else {
-        a[7] = a[7] & 0xFD;
-    }
-
-    if (D_8008E248 != 0) {
-        a[7] = a[7] | 0x1;
-    } else {
-        a[7] = a[7] & 0xFE;
-    }
-
-    ctx->primLen = a[3];
-    ctx->primCode = a[7];
+    ctx->primLen = getlen(prim);
+    ctx->primCode = getcode(prim);
 }
 
 /*
@@ -883,15 +869,14 @@ fail:
  * those macros. Earlier rounds carried it as a whole-function __asm__.
  */
 s32 TransformAndCullPoly(void *primIn, void *ctxIn) {
-    P_TAG *prim = primIn;
     PolyDrawCtx *ctx = ctxIn;
 
     ctx->divide = 0;
     gte_rtpt();
-    prim->len = ctx->primLen;
+    setlen(primIn, ctx->primLen);
     gte_stflg(&ctx->flag);
     if (ctx->flag != 0) {
-        if (ctx->flag != 0x40000) {
+        if (ctx->flag != GTE_FLAG_SZ3_OTZ_SAT) {
             return 1;
         }
         ctx->divide = 1;
@@ -902,7 +887,7 @@ s32 TransformAndCullPoly(void *primIn, void *ctxIn) {
         return 1;
     }
     gte_stdp(&ctx->dp);
-    if (ctx->dp >= 0x1000) {
+    if (ctx->dp >= ONE) {
         return 1;
     }
     gte_avsz3();
