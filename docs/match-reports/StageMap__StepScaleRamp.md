@@ -6,7 +6,7 @@
 
 > Renamed from `func_8004D028` on 2026-09-24 (tools/rename.py). Address 0x8004d028.
 
-Sibling of `StageMap__FlushRateLatch` (own report) — same shape, one instruction
+Sibling of `StageMap__EndScaleRamp` (own report) — same shape, one instruction
 longer because the gate here is a genuine countdown rather than a
 one-shot latch.
 
@@ -56,11 +56,11 @@ void StageMap__StepScaleRamp(Obj866E8 *self) {
 
 `StageMap__ApplyRateToChild` is defined later in this file (ROM order), so it needs a
 forward declaration here — same pattern already used for
-`StageMap__ResetChildRate` in `StageMap__FlushRateLatch`.
+`StageMap__ResetChildRate` in `StageMap__EndScaleRamp`.
 
 ## New struct knowledge
 
-None new (reuses `Obj866E8::unk1E0`, established by `StageMap__FlushRateLatch`).
+None new (reuses `Obj866E8::unk1E0`, established by `StageMap__EndScaleRamp`).
 
 ## Attempts
 
@@ -78,6 +78,6 @@ None new — confirms the existing idiom, does not extend it.
 the configured rate entry to every child via
 `ForEachElem(self, ApplyRateToChild, 0)`, then decrements the countdown,
 clamping to -1 once it reaches 0 (a "done" sentinel, distinct from the
-0 the sibling `StageMap__FlushRateLatch` uses for "off"). Named for the
+0 the sibling `StageMap__EndScaleRamp` uses for "off"). Named for the
 mechanics: it is the per-tick advance of the rate/countdown pair
 established by `StageMap__StartScaleRamp`.

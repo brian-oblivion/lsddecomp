@@ -411,7 +411,7 @@ void StageMap__StepScaleRamp(StageMap *self) {
     }
 }
 
-void StageMap__FlushRateLatch(StageMap *self) {
+void StageMap__EndScaleRamp(StageMap *self) {
     if (self->rateCountdown != 0) {
         StageMap__ForEachElem(self, StageMap__ResetChildRate, 0);
         self->rateCountdown = 0;

@@ -1,4 +1,6 @@
-# StageMap__FlushRateLatch — MATCHED (18/18 words)
+# StageMap__EndScaleRamp — MATCHED (18/18 words)
+
+> Renamed from `StageMap__FlushRateLatch` on 2026-09-26 (tools/rename.py). Address 0x8004d088.
 
 > Renamed from `Class866E8__FlushRateLatch` on 2026-09-26 (tools/rename.py). Address 0x8004d088.
 
@@ -31,7 +33,7 @@ sw    $zero, 0x1E0($s0)    ; self->unk1E0 = 0 (unconditional on this path)
 ## Final C
 
 ```c
-void StageMap__FlushRateLatch(Obj866E8 *self) {
+void StageMap__EndScaleRamp(Obj866E8 *self) {
     if (self->unk1E0 != 0) {
         StageMap__ForEachElem(self, StageMap__ResetChildRate, 0);
         self->unk1E0 = 0;

@@ -29,7 +29,7 @@ the top-of-function register shuffle overwrites `a0` with `item` — this
 function genuinely ignores its own `self` argument, unlike its sibling
 `StageMap__ApplyRateToChild` which uses it (`self->unk1E4`). Confirmed real, not a
 missing-parameter bug, by cross-checking the only caller
-(`StageMap__FlushRateLatch`, which passes this function's address to
+(`StageMap__EndScaleRamp`, which passes this function's address to
 `StageMap__ForEachElem` exactly like `StageMap__StepScaleRamp` passes `StageMap__ApplyRateToChild`'s —
 same call shape, same two-parameter signature required by the eventual
 `StageMap__ForEachEntryChild` dispatcher).
@@ -57,7 +57,7 @@ None new beyond `StageMap__ApplyRateToChild`'s (same call-chain-tracing lesson).
 
 ## Naming
 
-**Tier B.** Not a vtable slot -- the `StageMap__FlushRateLatch` callback
+**Tier B.** Not a vtable slot -- the `StageMap__EndScaleRamp` callback
 sibling of `StageMap__ApplyRateToChild`. Body: `item->methods->slot48(
 item, 1, &D_800869CC)`, the constant "off" entry rather than the parent's
 own `rateEntry`. Named to read as the inverse of `ApplyRateToChild`.

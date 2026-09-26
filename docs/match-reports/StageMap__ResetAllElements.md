@@ -72,7 +72,7 @@ straight from the disassembly): `StageMapMethods::slot88` (declared with
 a 4th `s32 arg3` parameter that the occupant, `StageMap__OnElementEvent`, doesn't
 read — same "field type need not match every occupant's real signature"
 precedent as `StageMap__OnNotify`/`StageMap__OnElementEvent`'s `GetSceneNodeMethods`), `slot108`
-(`StageMap__ResetElementCells`, not decompiled), `slot140` (`StageMap__FlushRateLatch`, not
+(`StageMap__ResetElementCells`, not decompiled), `slot140` (`StageMap__EndScaleRamp`, not
 decompiled — this promotes what was previously just end-of-struct
 padding into a real slot), `StageMap::unkEC[7]` (`UnkSlotEntry_3ac78`,
 0x1C bytes each), `unk1B4`/`unk1B8`, and three new opaque types
