@@ -16,6 +16,7 @@
 #include "class_3bb8c.h"
 #include "TextEntry.h"
 #include "CharSprite.h"
+#include "TextRow.h"
 
 /* This project's own strcpy (matched elsewhere) -- TextEntry__SetText's own
  * caller, same local-declaration convention as class_3bb8c_e.c/others. */

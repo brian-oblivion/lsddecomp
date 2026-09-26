@@ -26,6 +26,7 @@
 #include "class_3bb8c.h"
 #include "class_39e08.h"
 #include "Class86668.h"
+#include "TextRow.h"
 
 /*
  * class_3bb8c_k's own view of ObjM (method table D_80087034, returned by

@@ -2036,10 +2036,8 @@ struct FieldM7C {
     FieldM7CMethods *methods;   /* +0x000 */
 };
 
-/* This unit's own view of the uncarved New_TextRow (see FieldM7C's
- * comment above for why the return type differs from the other unit's
- * already-matched view of the same external symbol). */
-extern FieldM7C *New_TextRow(void *ctx, s32 len, char *name);
+/* New_TextRow: include/TextRow.h (track 4, round 88), included by the units
+ * that call it; its callers cast the TextRow to their own view. */
 
 /* ObjM__AdvancePauseSetup's own literal arguments -- a "Pause" name string plus two
  * small opaque blocks, all reached only by address (never dereferenced in

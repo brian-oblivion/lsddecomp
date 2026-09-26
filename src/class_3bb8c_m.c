@@ -62,6 +62,7 @@
 #include "class_3bb8c.h"
 #include "Class81940.h"
 #include "BoxFill.h"
+#include "TextRow.h"
 
 /* Forward declaration: defined later in this same unit, but called by
  * ObjM__EnterState7/ObjM__EnterState8/ObjM__EnterStateA above its own definition. */
@@ -175,7 +176,7 @@ void ObjM__CloseAndNotifyC(ObjM *self) {
 void ObjM__AdvancePauseSetup(ObjM *self) {
     s32 state = self->pauseSetupStep;
     if (state == 0) {
-        self->unk7C = New_TextRow(self->unk74, 5, &D_8008AB44[0]);
+        self->unk7C = (FieldM7C *)New_TextRow(self->unk74, 5, &D_8008AB44[0]);
         self->unk7C->methods->slot4C(self->unk7C, self->unk14, &D_8008AB38);
         self->unk7C->methods->slotB8(self->unk7C, &D_8008AB40);
         self->pauseSetupStep = state + 1;

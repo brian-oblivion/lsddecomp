@@ -24,6 +24,7 @@
  */
 #include "common.h"
 #include "class_3bb8c.h"
+#include "TextRow.h"
 
 void Class86B60__Dtor(Class86B60 *self)
 {
