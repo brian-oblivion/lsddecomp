@@ -6,7 +6,7 @@
 /*
  * VabDriver -- the SPU/VAB data-source driver (class id 0x23, method table
  * gVabDriverMethods), a Class6D430 subclass and the CD-ROM driver's
- * (D_8006D4E8, 0x13) sibling. The id is DATASOURCE_SPU: SetActiveDataSource
+ * (gCdDriverMethods, 0x13) sibling. The id is DATASOURCE_SPU: SetActiveDataSource
  * (src/code_171e0.c) binds this table's driver-interface slots into
  * Class6D430's table and every client table whenever the active source is
  * not DATASOURCE_CD, and GetActiveDataSourceMethods returns it then.

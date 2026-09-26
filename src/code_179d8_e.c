@@ -21,7 +21,7 @@
  * `gVabDriverMethods`'s header word (0x23) is not a coincidence: it is
  * exactly the value `code_171e0.c`'s `gActiveDataSource` compares against to
  * select this backend (the other value, 0x13, selects the CD-ROM read
- * driver, `gVabDriverMethods`'s sibling `D_8006D4E8` in `code_179d8_q.c`).
+ * driver, `gVabDriverMethods`'s sibling `gCdDriverMethods` in `code_179d8_q.c`).
  * `code_171e0.c`'s own `GetActiveDataSourceMethods` returns `GetVabDriverMethods()` (this
  * unit) exactly when `gActiveDataSource == 0x23`, and `VabStreamObj`'s own
  * constructor/close (below) chain their base-class calls through that

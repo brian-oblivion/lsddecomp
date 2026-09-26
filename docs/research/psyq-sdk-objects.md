@@ -248,7 +248,7 @@ which is a four-instruction function that stores 1 to a `$gp`-relative flag.
 So the placement is a false positive by shape, and the RUNS doc's "a Sony
 name the game overrides (`ResetCallback`)" was this artefact, not an
 override. `runs` now prints `SUSPECT` under any run whose object's call
-resolves away from another placed object's definition. `Class6D4E8__StopCdService` and
+resolves away from another placed object's definition. `CdDriver__StopService` and
 its neighbours (`StopCdServiceIfIdle` calls the same flag setter first) are the
 game's libsnd build, which no disc has.
 

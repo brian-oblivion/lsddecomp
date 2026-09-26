@@ -1,6 +1,6 @@
 /*
  * code_179d8_s -- the CD-ROM read driver's per-object methods: slots +0x44..
- * +0x58 and +0x68 of D_8006D4E8 (`tools/classtable.py D_8006D4E8`), the
+ * +0x58 and +0x68 of gCdDriverMethods (`tools/classtable.py gCdDriverMethods`), the
  * class whose constructor is code_179d8_o and whose module-level half
  * (request queue, service pump, file table) is code_179d8_q/_r.
  *
@@ -22,24 +22,24 @@
 
 typedef struct Class6D4E8 Class6D4E8;
 
-/* D_8006D4E8, this class's own method table, down to the last slot this
+/* gCdDriverMethods, this class's own method table, down to the last slot this
  * unit dispatches. Each slot is named for the method `tools/classtable.py
- * D_8006D4E8` resolves it to. */
+ * gCdDriverMethods` resolves it to. */
 typedef struct Class6D4E8Methods {
     u8 pad0[0x44];
-    /* +0x44 */ s32 (*open)(Class6D4E8 *self, void *name, s32 arg2, s32 arg3); /* Class6D4E8__Open */
-    /* +0x48 */ s32 (*close)(Class6D4E8 *self);                    /* Class6D4E8__Close */
-    /* +0x4C */ s32 (*seek)(Class6D4E8 *self, s32 offset, s32 mode); /* Class6D4E8__Seek */
-    u8 pad50[0x54 - 0x50];                                         /* Class6D4E8__NoOpSlot50 */
-    /* +0x54 */ s32 (*read)(Class6D4E8 *self, s32 buf, s32 size);  /* Class6D4E8__Read */
-    /* +0x58 */ s32 (*loadFile)(Class6D4E8 *self, void *name);     /* Class6D4E8__LoadFile */
+    /* +0x44 */ s32 (*open)(Class6D4E8 *self, void *name, s32 arg2, s32 arg3); /* CdDriver__Open */
+    /* +0x48 */ s32 (*close)(Class6D4E8 *self);                    /* CdDriver__Close */
+    /* +0x4C */ s32 (*seek)(Class6D4E8 *self, s32 offset, s32 mode); /* CdDriver__Seek */
+    u8 pad50[0x54 - 0x50];                                         /* CdDriver__NoOpSlot50 */
+    /* +0x54 */ s32 (*read)(Class6D4E8 *self, s32 buf, s32 size);  /* CdDriver__Read */
+    /* +0x58 */ s32 (*loadFile)(Class6D4E8 *self, void *name);     /* CdDriver__LoadFile */
     u8 pad5C[0x64 - 0x5C];
     /* +0x64 */ s32 (*setFlag)(Class6D4E8 *self);                  /* Class6D430__SetFlag */
     u8 pad68[0x70 - 0x68];
-    /* +0x70 */ s32 (*stopCdService)(Class6D4E8 *self);            /* Class6D4E8__StopCdService */
+    /* +0x70 */ s32 (*stopCdService)(Class6D4E8 *self);            /* CdDriver__StopService */
 } Class6D4E8Methods;
 
-/* An instance of the D_8006D4E8 class, this unit's own local view. The same
+/* An instance of the gCdDriverMethods class, this unit's own local view. The same
  * object is ObjA34_179D8H to code_179d8_h.c's synchronous OpenCdFile/
  * CloseCdFile/GetCdFileSize/ReadCdFile, Obj6D4E8 to its constructor
  * (code_179d8_o.c), three Obj6D4E8_* views in code_179d8_q.c, and -- the
@@ -60,7 +60,7 @@ struct Class6D4E8 {
     /* +0x28 */ u16 inQueueDispatch; /* 1 only while RunRequestQueue calls a slot */
 };
 
-/* Bits Class6D4E8__RunRequestQueue ORs into `flags` when a request completes.
+/* Bits CdDriver__RunRequestQueue ORs into `flags` when a request completes.
  * Bit 0 (1) is left a literal: it is also Class6D430__SetFlag's bit, and the
  * queue node field that sets it here (`unk4`) has no established meaning. */
 #define CD_FLAG_DONE           0x002 /* some request completed */
@@ -114,7 +114,7 @@ typedef struct CdFileInfo {
     u8 pad8[0x18 - 8];
 } CdFileInfo;
 
-void Class6D4E8__Open(Class6D4E8 *self, char *name, s32 arg2, s32 arg3) {
+void CdDriver__Open(Class6D4E8 *self, char *name, s32 arg2, s32 arg3) {
     char path[0x40];
     CdFileInfo statBuf;
     CdFileEntry *rec;
@@ -162,7 +162,7 @@ void Class6D4E8__Open(Class6D4E8 *self, char *name, s32 arg2, s32 arg3) {
     UnlockCd();
 }
 
-void Class6D4E8__Close(Class6D4E8 *self) {
+void CdDriver__Close(Class6D4E8 *self) {
     if (gCdAsyncEnabled == 0 && D_8008A860 == 0) {
         CloseCdFile(self);
         return;
@@ -188,7 +188,7 @@ extern void CdIntToPos(s32 i, void *pos);
 extern void CdControl(s32 arg0, void *buf, s32 arg2);
 extern s32 CdSync(s32 mode, void *result);
 
-s32 Class6D4E8__Seek(Class6D4E8 *self, u32 offset, s32 mode) {
+s32 CdDriver__Seek(Class6D4E8 *self, u32 offset, s32 mode) {
     s32 v0;
     u32 sectors;
 
@@ -236,7 +236,7 @@ s32 Class6D4E8__Seek(Class6D4E8 *self, u32 offset, s32 mode) {
     return 0;
 }
 
-void Class6D4E8__NoOpSlot50(void) {
+void CdDriver__NoOpSlot50(void) {
 }
 
 
@@ -245,7 +245,7 @@ extern s32 CdRead(s32 sectors, void *buf, s32 mode);
 extern s32 CdReadSync(s32 mode, s32 result);
 extern void ResetCdStateMachine(void);
 
-s32 Class6D4E8__Read(Class6D4E8 *self, void *buf, u32 size) {
+s32 CdDriver__Read(Class6D4E8 *self, void *buf, u32 size) {
     s32 v1;
 
     if (gCdAsyncEnabled == 0 && D_8008A860 == 0) {
@@ -279,11 +279,11 @@ s32 Class6D4E8__Read(Class6D4E8 *self, void *buf, u32 size) {
     return 0;
 }
 
-extern void Class6D430__LoadFile(void); /* arity-ok: the definition takes (Class6D430 *this, s32 arg1) and reads both, but Class6D4E8__LoadFile passes NEITHER -- retail's jal at 0x80027834 has a bare nop delay slot and leaves its own incoming $a0/$a1 in place */
+extern void Class6D430__LoadFile(void); /* arity-ok: the definition takes (Class6D430 *this, s32 arg1) and reads both, but CdDriver__LoadFile passes NEITHER -- retail's jal at 0x80027834 has a bare nop delay slot and leaves its own incoming $a0/$a1 in place */
 
 extern void *BMemPMgrAlloc(s32 size);
 
-void Class6D4E8__LoadFile(Class6D4E8 *self, char *name) {
+void CdDriver__LoadFile(Class6D4E8 *self, char *name) {
     CdFileEntry *rec;
     s32 sectorCount;
     s32 readSize;
@@ -357,7 +357,7 @@ void Class6D4E8__LoadFile(Class6D4E8 *self, char *name) {
 extern void FreeCdRequestNode(CdRequestNode *node);
 extern void *GetCdFileEntry(s32 index);
 
-void Class6D4E8__RunRequestQueue(void) {
+void CdDriver__RunRequestQueue(void) {
     CdRequestNode *node;
     Class6D4E8 *self;
     s32 op;

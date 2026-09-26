@@ -1,15 +1,17 @@
-# Class6D4E8__Destroy -- MATCHED (21/21 words)
+# CdDriver__Finalize -- MATCHED (21/21 words)
+
+> Renamed from `Class6D4E8__Destroy` on 2026-09-26 (tools/rename.py). Address 0x80027274.
 
 > Renamed from `func_80027274` on 2026-09-25 (tools/rename.py). Address 0x80027274.
 
 Unit `code_179d8_o`, round 26 (2026-09-09). A two-call vtable dispatcher on
 `self`, both calls through `self->methods` (the class table set up by
-`Class6D4E8__Class6D4E8`'s constructor).
+`CdDriver__CdDriver`'s constructor).
 
 ## What it is
 
 ```c
-void Class6D4E8__Destroy(Obj6D4E8 *self)   /* round-26 text; see "Naming" for the current source */
+void CdDriver__Finalize(Obj6D4E8 *self)   /* round-26 text; see "Naming" for the current source */
 {
     self->methods->slot74();
     self->methods->slot5C(self);
@@ -39,10 +41,10 @@ Matched on the first attempt.
 
 Round 79 (delta).
 
-- **`Class6D4E8__Destroy`** (was `func_80027274`) -- **tier A**. Table slot
-  +0x00C of D_8006D4E8, overriding `Class6D430__Finalize` in the parent
+- **`CdDriver__Finalize`** (was `func_80027274`) -- **tier A**. Table slot
+  +0x00C of gCdDriverMethods, overriding `Class6D430__Finalize` in the parent
   table (and `BasicClass__Finalize` in the root). The body cancels this
-  object's queued CD requests (+0x074, `Class6D4E8__CancelRequests`) and
+  object's queued CD requests (+0x074, `CdDriver__CancelRequests`) and
   then frees its buffer (+0x05C, inherited `Class6D430__FreeBuffer`) -- the
   same two-dispatch shape as `Class6D430__Finalize` (`onBufferChanged` then
   `freeBuffer`). Named after the slot it overrides, following the parent.
@@ -57,7 +59,7 @@ Round 79 (delta).
 The section above types `slot74` as `void (*)(void)` because its `jalr` has
 a nop delay slot. That reading is wrong about the callee: at that `jalr`,
 `$a0` still holds this function's own `self` (the prologue's `move s0,a0`
-copies it and leaves `$a0` intact), and `Class6D4E8__CancelRequests`
+copies it and leaves `$a0` intact), and `CdDriver__CancelRequests`
 (code_179d8_q.c) reads `self` from `$a0`. So the call does pass `self`.
 Retyped to `void (*cancelRequests)(void *self)` and called as
 `self->methods->cancelRequests(self)`: **byte-identical** (build exit 0,

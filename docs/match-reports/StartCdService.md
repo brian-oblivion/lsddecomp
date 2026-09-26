@@ -40,7 +40,7 @@ stream as "track v0 across branches" is a trap here (see
 translation to nested `if`s with literal assignments is what matches.
 
 `ServiceCdDriver`'s own report already covers the `VSyncCallback` cast and
-the `D_8006D4E8` own-slot dispatch it performs; this function is simply one
+the `gCdDriverMethods` own-slot dispatch it performs; this function is simply one
 of its two registration call sites (`StopCdServiceIfIdle` is the other, guarding
 the same fields in a near-identical shape but written as its own
 independent nested-if — not factored, since the two bodies are close but not

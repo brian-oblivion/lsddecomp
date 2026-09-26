@@ -19,7 +19,7 @@
  * name, passes a 32-byte stack copy of it to requestLoadFile (+0x06C); the
  * setFlag override (+0x064, Class6EED8__SetFlag) sets `loaded` to 1 -- the
  * CD driver calls setFlag when a queued operation completes
- * (Class6D4E8__LoadFile, the request-queue dispatch in code_179d8_s) --
+ * (CdDriver__LoadFile, the request-queue dispatch in code_179d8_s) --
  * and finalize clears it again. Nothing overrides loadFile (+0x058 is NULL
  * in the static table), so the file lands in Class6D430's `buffer`.
  *

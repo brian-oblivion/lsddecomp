@@ -1,10 +1,12 @@
-# Class6D4E8__StopCdService — MATCHED (12/12 words)
+# CdDriver__StopService — MATCHED (12/12 words)
+
+> Renamed from `Class6D4E8__StopCdService` on 2026-09-26 (tools/rename.py). Address 0x80027d40.
 
 > Renamed from `func_80027D40` on 2026-09-17 (tools/rename.py). Address 0x80027d40.
 
 Round 45, runner echo (second sitting), `src/code_179d8_q.c`. This class's
 own method-table slot **+0x070** (see the class-map comment above
-`GetClass6D4E8Methods` in the `.c`).
+`GetCdDriverMethods` in the `.c`).
 
 ## Result
 
@@ -15,7 +17,7 @@ extern void LockCd(void);
 extern void UnlockCd(void);
 extern void StopCdServiceIfIdle(void);
 
-void Class6D4E8__StopCdService(void)
+void CdDriver__StopService(void)
 {
     LockCd();
     StopCdServiceIfIdle();
@@ -35,7 +37,7 @@ ahead of this definition to satisfy strict ROM-address file ordering.
 ### Proposed learning
 
 None new — same "set latch / do work / clear latch" bracket pattern already
-seen around `gCdLock` in this unit (`Class6D4E8__RequestLoadFile`, `DisableCdQueue`, now
+seen around `gCdLock` in this unit (`CdDriver__RequestLoadFile`, `DisableCdQueue`, now
 this one), just with a different body in the middle.
 
 ## Naming
@@ -44,14 +46,14 @@ Round 51 (alpha), FINISHING-PLAN track 3.
 
 | was | now | tier |
 | --- | --- | --- |
-| `func_80027D40` | `Class6D4E8__StopCdService` | B |
+| `func_80027D40` | `CdDriver__StopService` | B |
 
-**Evidence.** Slot `+0x070` of `D_8006D4E8`. The whole body is
+**Evidence.** Slot `+0x070` of `gCdDriverMethods`. The whole body is
 `LockCd(); StopCdServiceIfIdle(); UnlockCd();` -- the locked wrapper around
 this unit's `StopCdServiceIfIdle`, which unhooks the `VSyncCallback` and
 clears `gCdCallbackInstalled`/`gCdQueueEnabled` when the state machine has
 nothing pending. The name says exactly that: the class's "stop the CD
 service" slot.
 
-Tier B for the class token only (see `Class6D4E8__RequestLoadFile.md`); the
+Tier B for the class token only (see `CdDriver__RequestLoadFile.md`); the
 method's own behaviour is not in doubt.

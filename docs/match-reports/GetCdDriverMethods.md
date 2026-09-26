@@ -1,4 +1,6 @@
-# GetClass6D4E8Methods
+# GetCdDriverMethods
+
+> Renamed from `GetClass6D4E8Methods` on 2026-09-26 (tools/rename.py). Address 0x80027e68.
 
 > Renamed from `func_80027E68` on 2026-09-17 (tools/rename.py). Address 0x80027e68.
 
@@ -7,27 +9,27 @@
 ## Class identity
 
 This function is the "get my own method table" accessor for the class whose
-vtable is `D_8006D4E8` (29 slots, header word `0x13`, resolved with
-`tools/classtable.py D_8006D4E8`). Slot map:
+vtable is `gCdDriverMethods` (29 slots, header word `0x13`, resolved with
+`tools/classtable.py gCdDriverMethods`). Slot map:
 
 - `+0x004` `Class6D430__Release` (own-class slot, shared with `D_8006D430` at the
   identical offset)
-- `+0x008` `Class6D4E8__Class6D4E8` (ctor, by the project's `+0x008` convention)
-- `+0x00C` `Class6D4E8__Destroy` (dtor)
+- `+0x008` `CdDriver__CdDriver` (ctor, by the project's `+0x008` convention)
+- `+0x00C` `CdDriver__Finalize` (dtor)
 - `+0x010`..`+0x038` the 13 inherited `BasicClass__func_*` slots, verbatim
-- `+0x040`..`+0x074` own slots, including `Class6D4E8__RequestLoadFile`/`Class6D4E8__StopCdService`/
-  `Class6D4E8__CancelRequests` (this unit's next three queued functions, at `+0x06C`/
+- `+0x040`..`+0x074` own slots, including `CdDriver__RequestLoadFile`/`CdDriver__StopService`/
+  `CdDriver__CancelRequests` (this unit's next three queued functions, at `+0x06C`/
   `+0x070`/`+0x074`)
 
 Compared against `D_8006D430` (`include/code_171e0.h`'s
-`Class6D430Methods`) with `classtable.py D_8006D4E8 --vs D_8006D430`:
+`Class6D430Methods`) with `classtable.py gCdDriverMethods --vs D_8006D430`:
 `Class6D430__Release` at `+0x004` and `Class6D430__FreeBuffer`/`NoOp`/
 `Class6D430__SetFlag` at identical offsets (`+0x05C`/`+0x060`/`+0x064`) are shared
-between the two tables, strongly suggesting `D_8006D4E8`'s class is a
+between the two tables, strongly suggesting `gCdDriverMethods`'s class is a
 subclass or close sibling of `D_8006D430`'s, inheriting the same BasicClass
 slot block and several of the same concrete method implementations.
 
-`GetClass6D4E8Methods` itself is the same "return my own vtable's address"
+`GetCdDriverMethods` itself is the same "return my own vtable's address"
 accessor the project already names elsewhere: `GetClass6D3C8Methods` for
 `D_8006D3C8` and `GetClass6D430Methods` for `D_8006D430` (both in
 `include/code_171e0.h`'s doc comment).
@@ -35,21 +37,21 @@ accessor the project already names elsewhere: `GetClass6D3C8Methods` for
 ## The C
 
 ```c
-/* D_8006D4E8's own method table -- see class-identity note above. */
-extern s32 D_8006D4E8[];
+/* gCdDriverMethods's own method table -- see class-identity note above. */
+extern s32 gCdDriverMethods[];
 
-s32 *GetClass6D4E8Methods(void)
+s32 *GetCdDriverMethods(void)
 {
-    return D_8006D4E8;
+    return gCdDriverMethods;
 }
 ```
 
 ## Why `lui`/`addiu`, not `%gp_rel`
 
-`D_8006D4E8` lives in `.data` (confirmed in `asm/data/5DB70.data.s`), not
+`gCdDriverMethods` lives in `.data` (confirmed in `asm/data/5DB70.data.s`), not
 `.sdata`, so retail takes its address with an absolute `lui $v0,
-%hi(D_8006D4E8)` / `addiu $v0, $v0, %lo(D_8006D4E8)` pair rather than a
-`$gp`-relative load. Declaring it `extern s32 D_8006D4E8[];` and returning
+%hi(gCdDriverMethods)` / `addiu $v0, $v0, %lo(gCdDriverMethods)` pair rather than a
+`$gp`-relative load. Declaring it `extern s32 gCdDriverMethods[];` and returning
 the array (which decays to its address) reproduces that exactly.
 
 ## Provenance
@@ -62,9 +64,9 @@ Round 51 (alpha), FINISHING-PLAN track 3.
 
 | was | now | tier |
 | --- | --- | --- |
-| `func_80027E68` | `GetClass6D4E8Methods` | A |
+| `func_80027E68` | `GetCdDriverMethods` | A |
 
-**Evidence.** A two-instruction address-of: it returns `&D_8006D4E8`, this
+**Evidence.** A two-instruction address-of: it returns `&gCdDriverMethods`, this
 class's own 29-slot method table. A pure leaf whose mechanics are its
 purpose, so tier A by the plan's own rule. The same accessor shape
 `GetClass6D3C8Methods` has for `D_8006D3C8` and `GetClass6D430Methods` for `D_8006D430`.

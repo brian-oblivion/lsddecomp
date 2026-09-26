@@ -65,7 +65,7 @@
  * vtable (header word 0x00000E03), confirmed by `tools/classtable.py
  * 0x8006D940` -- slots +0x004/+0x05C/+0x060 are the SAME
  * `Class6D430__Release`/`Class6D430__FreeBuffer`/`NoOp` symbols the base class and
- * its CD-driver sibling (`D_8006D4E8`, code_179d8_q.c) share verbatim, +0x008
+ * its CD-driver sibling (`gCdDriverMethods`, code_179d8_q.c) share verbatim, +0x008
  * is a genuine ctor (`Class6D940__Class6D940`), +0x00C a genuine dtor
  * (`Class6D940__Finalize`), and `D_8006D940`'s own getter (`GetClass6D940Methods`,
  * ex-`func_8002C3A8`) is registered in `gDataSourceClientGetters` (code_171e0.c) -- the

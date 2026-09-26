@@ -57,7 +57,7 @@ Round 52 (alpha), FINISHING-PLAN track 3.
 **Evidence.** A two-instruction address-of returning `&D_8006D3C8`. `Class6D3C8`
 is already an established type name in `src/code_1677c.c` (that unit's own
 functions are typed against it), and the "return my own vtable" shape is
-already named twice in this project (`GetClass6D4E8Methods`,
+already named twice in this project (`GetCdDriverMethods`,
 `GetClass6D430Methods`, this same round). Pure leaf whose mechanics are its
 purpose.
 

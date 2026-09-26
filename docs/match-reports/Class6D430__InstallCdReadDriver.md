@@ -9,7 +9,7 @@ Unit: `code_179d8_h`. Runner: echo, round 17 (second assignment).
 ```c
 void Class6D430__InstallCdReadDriver(Class6D430 *self) {
     ((Class6D430Methods *)GetClass6D430Methods())->ctor(self);
-    self->methods = GetClass6D4E8Methods();
+    self->methods = GetCdDriverMethods();
     self->pendingGeneration = 0;
 }
 ```
@@ -20,7 +20,7 @@ code sample was stale and is corrected here, round 64.)
 
 with `#include "code_171e0.h"` (already-established header, reused
 UNCHANGED -- not copied or redefined) and a new local
-`extern Class6D430Methods *GetClass6D4E8Methods(void);`.
+`extern Class6D430Methods *GetCdDriverMethods(void);`.
 
 Byte-exact, 18/18 words.
 
@@ -30,9 +30,9 @@ The standard "chain to base ctor, then install the derived vtable" idiom:
 calls `D_8006D430`'s own ctor slot (`GetClass6D430Methods()->ctor`, i.e.
 `Class6D430__Class6D430`, matched in `code_171e0.c`) directly rather than through
 `self->methods` (since `self->methods` isn't set up yet), then overwrites
-`self->methods` with `GetClass6D4E8Methods()` -- a DIFFERENT class table
-(`D_8006D4E8`, confirmed via `tools/classtable.py --scan`: 29 slots, header
-`0x13`, vs. `D_8006D430`'s 0x03). `GetClass6D4E8Methods` itself is still uncarved
+`self->methods` with `GetCdDriverMethods()` -- a DIFFERENT class table
+(`gCdDriverMethods`, confirmed via `tools/classtable.py --scan`: 29 slots, header
+`0x13`, vs. `D_8006D430`'s 0x03). `GetCdDriverMethods` itself is still uncarved
 (`asm/code_179d8.s`); typed against `Class6D430Methods` for the
 assignment only -- the two classes are different but share the base's
 leading slot layout, which is all the type is asked to express here.
@@ -63,12 +63,12 @@ against that typing) -- so `Class6D430__` follows track 3's convention
 letter-for-letter ("methods `Class__Method`, where `Class` is the struct's
 type name"). The rest of the name describes only confirmed MECHANICS: chain
 to `Class6D430`'s own ctor, then overwrite `self->methods` with
-`GetClass6D4E8Methods()`'s table -- `D_8006D4E8`, independently named
+`GetCdDriverMethods()`'s table -- `gCdDriverMethods`, independently named
 elsewhere in the tree (`src/code_179d8_q.c`'s own header comment) as "the
 CD-ROM read driver", not a guess coined here. WHICH broader class or game
 subsystem this function itself belongs to (why a `Class6D430` instance gets
 reclassified this way here, distinct from `src/code_179d8_o.c`'s own
-confirmed ctor `Class6D4E8__Class6D4E8` for the same `D_8006D4E8` class) is NOT
+confirmed ctor `CdDriver__CdDriver` for the same `gCdDriverMethods` class) is NOT
 established -- no caller is visible yet (only referenced from the
 still-uncarved `code_179d8` remainder) and this is flagged as such rather
 than guessed at. See `Class6D430__DestroyCdReadDriver.md` for the paired

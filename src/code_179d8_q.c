@@ -2,7 +2,7 @@
  * code_179d8_q -- the CD-ROM read driver.
  *
  * This unit is the module-level half of the class whose method table is
- * D_8006D4E8 (header word 0x13; the object itself and its read/seek/close
+ * gCdDriverMethods (header word 0x13; the object itself and its read/seek/close
  * methods are code_179d8_s, its constructor code_179d8_o). It owns four
  * things, all of them singleton state in .sdata:
  *
@@ -30,7 +30,7 @@
 #include "CdDriver.h"
 #include "DrawSystem.h"
 
-/* --- local views of the D_8006D4E8 class ---------------------------------
+/* --- local views of the gCdDriverMethods class ---------------------------------
  * This unit defines three of that class's own method slots (+0x06C, +0x070,
  * +0x074) and sees its objects through three per-call-site views that differ
  * only in which fields they type. They are the same struct; merging them is
@@ -40,8 +40,8 @@
  * ------------------------------------------------------------------------ */
 
 /* The class's method table down to +0x058: the one slot
- * Class6D4E8__RequestLoadFile dispatches. `tools/classtable.py D_8006D4E8`
- * resolves that slot to Class6D4E8__LoadFile (code_179d8_s), which loads a named
+ * CdDriver__RequestLoadFile dispatches. `tools/classtable.py gCdDriverMethods`
+ * resolves that slot to CdDriver__LoadFile (code_179d8_s), which loads a named
  * file off the disc, so the slot is named for the method it dispatches to.
  * The sibling class D_8006D430 (include/code_171e0.h's
  * Class6D430Methods) leaves the identical offset unnamed -- this
@@ -62,7 +62,7 @@ struct Obj6D4E8_C80 {
 };
 
 /* +0x04 of whatever object a still-uninitialized local $s2 points at on this
- * path -- see the Class6D4E8__RequestLoadFile report for why that local is
+ * path -- see the CdDriver__RequestLoadFile report for why that local is
  * never assigned. Only the one field this store touches is typed, and the
  * object's identity is unknowable from here, so the name stays a
  * placeholder. */
@@ -77,7 +77,7 @@ extern void EnqueueCdRequest(struct Obj6D4E8_282AC *owner, s32 fileIndex,
                              s32 op, s32 param0, s32 param1);
 extern s32 FindCdFileIndex(char *name); /* code_179d8_r: name -> table index */
 
-void Class6D4E8__RequestLoadFile(Obj6D4E8_C80 *self, char *name)
+void CdDriver__RequestLoadFile(Obj6D4E8_C80 *self, char *name)
 {
     UnkC80 *s2;
     s32 idx;
@@ -106,7 +106,7 @@ extern void LockCd(void);
 extern void UnlockCd(void);
 extern void StopCdServiceIfIdle(void);
 
-void Class6D4E8__StopCdService(void)
+void CdDriver__StopService(void)
 {
     LockCd();
     StopCdServiceIfIdle();
@@ -124,7 +124,7 @@ extern void CdFlush(void);
 extern void ResetCdStateMachine(void); /* code_179d8_r: reset the state machine */
 extern void FreeCdRequestNode(CdRequestNode *req); /* code_179d8_r: unlink+free */
 
-void Class6D4E8__CancelRequests(Obj6D4E8_D70 *self)
+void CdDriver__CancelRequests(Obj6D4E8_D70 *self)
 {
     CdRequestNode *entry;
     CdRequestNode *node;
@@ -158,21 +158,21 @@ void Class6D4E8__CancelRequests(Obj6D4E8_D70 *self)
     UnlockCd();
 }
 
-/* D_8006D4E8's own method table, 29 slots per tools/classtable.py (header
- * word 0x13 at +0x000, Class6D430__Release at +0x004/own-slot, Class6D4E8__Class6D4E8 at
- * +0x008/ctor, Class6D4E8__Destroy at +0x00C/dtor, the 13 inherited BasicClass
+/* gCdDriverMethods's own method table, 29 slots per tools/classtable.py (header
+ * word 0x13 at +0x000, Class6D430__Release at +0x004/own-slot, CdDriver__CdDriver at
+ * +0x008/ctor, CdDriver__Finalize at +0x00C/dtor, the 13 inherited BasicClass
  * slots at +0x010..+0x038, then own slots at +0x040..+0x074 -- this unit
- * defines Class6D4E8__RequestLoadFile (+0x06C), Class6D4E8__StopCdService
- * (+0x070) and Class6D4E8__CancelRequests (+0x074)). This function is this
+ * defines CdDriver__RequestLoadFile (+0x06C), CdDriver__StopService
+ * (+0x070) and CdDriver__CancelRequests (+0x074)). This function is this
  * class's "get my own method table" accessor, the same convention
  * GetClass6D3C8Methods uses for D_8006D3C8 and GetClass6D430Methods uses for D_8006D430
  * (see include/code_171e0.h) -- just an address-of, not gp_rel, since
- * D_8006D4E8 lives in .data, not .sdata. */
-extern s32 D_8006D4E8[];
+ * gCdDriverMethods lives in .data, not .sdata. */
+extern s32 gCdDriverMethods[];
 
-s32 *GetClass6D4E8Methods(void)
+s32 *GetCdDriverMethods(void)
 {
-    return D_8006D4E8;
+    return gCdDriverMethods;
 }
 
 /* libcd/sys entry points (lib/libcd/sys.o, linked since round 34) --
@@ -367,11 +367,11 @@ extern void TickCdLoadFileStateMachine(void); /* code_179d8_r: state-machine ste
 extern s32 gCdQueueEnabled;
 extern void VSyncCallback(void (*cb)(void));
 
-/* The class's method table down to +0x068 (see GetClass6D4E8Methods's
+/* The class's method table down to +0x068 (see GetCdDriverMethods's
  * class-map comment above); only the one slot this call site dispatches is
  * typed, following the pad-to-offset convention include/code_171e0.h uses
  * for D_8006D430's own table. tools/classtable.py resolves +0x068 to
- * Class6D4E8__RunRequestQueue (code_179d8_s), which walks the gCdRequestQueue request list,
+ * CdDriver__RunRequestQueue (code_179d8_s), which walks the gCdRequestQueue request list,
  * dispatches each request through its owner's own slots and frees it with
  * FreeCdRequestNode -- so the slot is named for what that method does. */
 typedef struct Methods6D4E8_80EC Methods6D4E8_80EC;
@@ -401,7 +401,7 @@ s32 ServiceCdDriver(void)
     }
 
     if (gCdQueueEnabled != 0) {
-        ((Methods6D4E8_80EC *)GetClass6D4E8Methods())->runRequestQueue();
+        ((Methods6D4E8_80EC *)GetCdDriverMethods())->runRequestQueue();
     }
 
     if (gCdUseVSyncCallback != 0) {

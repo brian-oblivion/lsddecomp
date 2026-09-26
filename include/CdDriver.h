@@ -42,7 +42,7 @@ typedef struct CdFileEntry {
 
 /* One queued request: AllocCdRequestNode allocates and links it at the tail
  * of gCdRequestQueue, EnqueueCdRequest fills it, StartCdOperation sets
- * `active` on the head node, Class6D4E8__RunRequestQueue dispatches `op` back
+ * `active` on the head node, CdDriver__RunRequestQueue dispatches `op` back
  * to `owner`'s slot of the same name, FreeCdRequestNode unlinks and frees. */
 typedef struct CdRequestNode {
     /* +0x00 */ s32 active;               /* set by StartCdOperation when the op starts */
@@ -57,7 +57,7 @@ typedef struct CdRequestNode {
 } CdRequestNode; /* size 0x24 */
 
 /* A queue node's `op`: EnqueueCdRequest's third argument, dispatched back by
- * Class6D4E8__RunRequestQueue to the owner's slot of the same name. */
+ * CdDriver__RunRequestQueue to the owner's slot of the same name. */
 #define CD_OP_OPEN      2
 #define CD_OP_CLOSE     3
 #define CD_OP_SEEK      4

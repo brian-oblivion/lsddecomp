@@ -25,11 +25,11 @@ extern void TickCdLoadFileStateMachine(void); /* code_179d8_r: state-machine ste
 extern s32 gCdQueueEnabled;
 extern void VSyncCallback(void (*cb)(void));
 
-/* The class's method table down to +0x068 (see GetClass6D4E8Methods's
+/* The class's method table down to +0x068 (see GetCdDriverMethods's
  * class-map comment above); only the one slot this call site dispatches is
  * typed, following the pad-to-offset convention include/code_171e0.h uses
  * for D_8006D430's own table. tools/classtable.py resolves +0x068 to
- * Class6D4E8__RunRequestQueue (code_179d8_s), which walks the gCdRequestQueue request list,
+ * CdDriver__RunRequestQueue (code_179d8_s), which walks the gCdRequestQueue request list,
  * dispatches each request through its owner's own slots and frees it with
  * FreeCdRequestNode -- so the slot is named for what that method does. */
 typedef struct Methods6D4E8_80EC Methods6D4E8_80EC;
@@ -59,7 +59,7 @@ s32 ServiceCdDriver(void)
     }
 
     if (gCdQueueEnabled != 0) {
-        ((Methods6D4E8_80EC *)GetClass6D4E8Methods())->runRequestQueue();
+        ((Methods6D4E8_80EC *)GetCdDriverMethods())->runRequestQueue();
     }
 
     if (gCdUseVSyncCallback != 0) {
@@ -94,7 +94,7 @@ Body: an optional `VSyncCallback(0)` (`gCdUseVSyncCallback`), a two-way dispatch
 sibling `code_179d8_r` unit — declared extern here per the
 per-call-site-typed convention `code_179d8_h.c` already established for
 cross-unit libcd calls, now confirmed to apply to cross-unit game-code calls
-too), an optional virtual dispatch through `D_8006D4E8`'s own table slot
+too), an optional virtual dispatch through `gCdDriverMethods`'s own table slot
 +0x68 (guarded by `gCdQueueEnabled`), and finally an optional
 self-re-registration as a `VSyncCallback` (its own address, cast — the
 callback type is `void (*)(void)` and this function is typed `s32 (void)`
@@ -134,7 +134,7 @@ is the one word that covers a tick that both advances a state machine and
 drains a queue.
 
 **`gCdQueueEnabled`.** Its only reader is the guard on the `+0x068` dispatch
-here, and `tools/classtable.py` resolves that slot to `Class6D4E8__RunRequestQueue`
+here, and `tools/classtable.py` resolves that slot to `CdDriver__RunRequestQueue`
 (code_179d8_s), which walks `gCdRequestQueue`, dispatches each request and frees
 it with `FreeCdRequestNode`. So the flag gates queue processing specifically --
 not the tick, which still runs the state machine while the flag is clear.

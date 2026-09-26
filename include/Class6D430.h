@@ -8,7 +8,7 @@
  * table D_8006D430): a BasicClass subclass that owns one file buffer and
  * declares the file-I/O interface its subclasses reach through their tables.
  * Methods in src/code_171e0.c; sixteen classes derive from it
- * (`typeviews.py --tree`), among them the CD-ROM driver (D_8006D4E8, 0x13,
+ * (`typeviews.py --tree`), among them the CD-ROM driver (gCdDriverMethods, 0x13,
  * code_179d8_o/q/s) and the SPU/VAB driver (gVabDriverMethods, 0x23).
  *
  * The interface is bound AT RUN TIME. Slots +0x040..+0x058 and +0x068..+0x074
@@ -24,20 +24,20 @@ typedef struct Class6D430Methods Class6D430Methods;
 
 #define CLASS6D430_SLOTS(Self, CtorParams)                                                         \
     BASICCLASS_SLOTS(Self, CtorParams);                                                            \
-    /* +0x040 */ void (*slot40)(void);                          /* CD: Class6D4E8__NoOpSlot40 */   \
-    /* +0x044 */ void (*open)(Self *self, char *name, s32 arg2, s32 arg3); /* CD: Class6D4E8__Open */ \
-    /* +0x048 */ void (*close)(Self *self);                     /* CD: Class6D4E8__Close */        \
-    /* +0x04C */ s32 (*seek)(Self *self, u32 offset, s32 mode); /* CD: Class6D4E8__Seek; LoadFile's seek(0, 2) returns the size */ \
-    /* +0x050 */ void (*slot50)(void);                          /* CD: Class6D4E8__NoOpSlot50 */   \
-    /* +0x054 */ s32 (*read)(Self *self, void *buf, u32 size);  /* CD: Class6D4E8__Read */         \
-    /* +0x058 */ void (*loadFile)(Self *self, char *name);      /* Class6D430__LoadFile; CD: Class6D4E8__LoadFile */ \
+    /* +0x040 */ void (*slot40)(void);                          /* CD: CdDriver__NoOpSlot40 */   \
+    /* +0x044 */ void (*open)(Self *self, char *name, s32 arg2, s32 arg3); /* CD: CdDriver__Open */ \
+    /* +0x048 */ void (*close)(Self *self);                     /* CD: CdDriver__Close */        \
+    /* +0x04C */ s32 (*seek)(Self *self, u32 offset, s32 mode); /* CD: CdDriver__Seek; LoadFile's seek(0, 2) returns the size */ \
+    /* +0x050 */ void (*slot50)(void);                          /* CD: CdDriver__NoOpSlot50 */   \
+    /* +0x054 */ s32 (*read)(Self *self, void *buf, u32 size);  /* CD: CdDriver__Read */         \
+    /* +0x058 */ void (*loadFile)(Self *self, char *name);      /* Class6D430__LoadFile; CD: CdDriver__LoadFile */ \
     /* +0x05C */ void (*freeBuffer)(Self *self);                /* Class6D430__FreeBuffer */       \
     /* +0x060 */ void (*slot60)(void);                          /* NoOp, in every Class6D430 table */ \
     /* +0x064 */ void (*setFlag)(Self *self);                   /* Class6D430__SetFlag */          \
-    /* +0x068 */ void (*runRequestQueue)(void);                 /* CD: Class6D4E8__RunRequestQueue */ \
-    /* +0x06C */ void (*requestLoadFile)(Self *self, char *name); /* CD: Class6D4E8__RequestLoadFile */ \
-    /* +0x070 */ void (*stopService)(void);                     /* CD: Class6D4E8__StopCdService */ \
-    /* +0x074 */ void (*cancelRequests)(Self *self);            /* CD: Class6D4E8__CancelRequests */ \
+    /* +0x068 */ void (*runRequestQueue)(void);                 /* CD: CdDriver__RunRequestQueue */ \
+    /* +0x06C */ void (*requestLoadFile)(Self *self, char *name); /* CD: CdDriver__RequestLoadFile */ \
+    /* +0x070 */ void (*stopService)(void);                     /* CD: CdDriver__StopService */ \
+    /* +0x074 */ void (*cancelRequests)(Self *self);            /* CD: CdDriver__CancelRequests */ \
     /* +0x078 */ void *slot78                                   /* NULL */
 
 #define CLASS6D430_FIELDS(Methods)                                                                 \

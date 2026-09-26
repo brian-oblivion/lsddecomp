@@ -8,7 +8,7 @@
 
 Sets the scalar `s32` global `gCdLock` to `0`. No arguments, no return
 value. The clear half of the 1/0 latch pair completed by `LockCd`
-(see that report) -- `Class6D4E8__RequestLoadFile` calls `LockCd` on entry and
+(see that report) -- `CdDriver__RequestLoadFile` calls `LockCd` on entry and
 `UnlockCd` on every exit path; `DisableCdQueue` (queued, later in this
 unit) also calls both, `LockCd` first then `UnlockCd`.
 

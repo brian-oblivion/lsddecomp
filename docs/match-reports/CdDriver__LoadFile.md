@@ -1,14 +1,16 @@
-# Class6D4E8__LoadFile -- MATCHED (round 47, alpha)
+# CdDriver__LoadFile -- MATCHED (round 47, alpha)
+
+> Renamed from `Class6D4E8__LoadFile` on 2026-09-26 (tools/rename.py). Address 0x80027800.
 
 > Renamed from `func_80027800` on 2026-09-25 (tools/rename.py). Address 0x80027800.
 
 137/137 words, byte-exact, file 0x18000-0x18224. Cold ground, the largest of
-the six assigned before `Class6D4E8__RunRequestQueue`.
+the six assigned before `CdDriver__RunRequestQueue`.
 
 ## Source
 
 ```c
-/* This class's own methods table -- only the two slots Class6D4E8__LoadFile reads
+/* This class's own methods table -- only the two slots CdDriver__LoadFile reads
  * through are named (offsets 0x48/0x64). Added to the unit's shared
  * Obj80027480/Methods80027480 view; re-verified the four sibling functions
  * that already matched against the earlier, narrower Obj80027480 still
@@ -26,7 +28,7 @@ typedef struct Node8008A894 {
 extern Node8008A894 *gCdRequestQueue;
 extern void *BMemPMgrAlloc(s32 size);
 
-void Class6D4E8__LoadFile(Obj80027480 *self, char *arg1) {
+void CdDriver__LoadFile(Obj80027480 *self, char *arg1) {
     Rec80028448 *rec;
     s32 sectorCount;
     s32 pos;
@@ -104,7 +106,7 @@ two slots named: `slot48`, `slot64`), plus `unk10` (`void *`, a CdRead
 target buffer), `unk14` (`u32`), `unk20` (`u16`), and `unk24` (`s32`, a flags
 word, `|=`'d with `0x200`). All purely additive naming of previously-plain
 padding; re-verified the four already-matched sibling functions
-(`Class6D4E8__Close`, `Class6D4E8__Read`, `Class6D4E8__Seek`, `Class6D4E8__Open`) still
+(`CdDriver__Close`, `CdDriver__Read`, `CdDriver__Seek`, `CdDriver__Open`) still
 match after the extension (whole-image SHA1 passed with all five in the
 unit).
 
@@ -143,12 +145,12 @@ not necessarily the order that matters most:
 
 4. **A fourth, new-to-this-unit finding: an outer retry loop that WRAPS a
    whole nested retry-loop-plus-a-different-retry-loop needs the
-   goto-instead-of-do-while rewrite from `Class6D4E8__Read`, even in a unit
+   goto-instead-of-do-while rewrite from `CdDriver__Read`, even in a unit
    where the SAME lever was already shown NOT to transfer to a
-   structurally-simpler sibling loop (`Class6D4E8__Seek`'s report).** This
+   structurally-simpler sibling loop (`CdDriver__Seek`'s report).** This
    function's outermost retry (`while (v1 == -1)`, wrapping a CdControl/
    CdSync retry loop AND a CdRead/CdReadSync retry loop back to back) is
-   MORE complex than `Class6D4E8__Seek`'s CdControl/CdSync-only retry, which
+   MORE complex than `CdDriver__Seek`'s CdControl/CdSync-only retry, which
    matched as a plain `do`/`while`. Written as a plain `do`/`while` here,
    GCC's scheduler filled the back-edge branch's delay slot with a
    RECOMPUTED `a0=2` (the next iteration's `CdControl` argument setup) that
@@ -178,8 +180,8 @@ slots: `slot48` and `slot64`, both `s32 (*)(Obj80027480 *self)` by inference
 (neither call's return value is used by this function, so the byte match
 does not itself certify the return type -- see the standing wrapper
 caution). `rec` (`FindCdFileEntry`'s return) reuses `Rec80028448` from
-`Class6D4E8__Open`'s report; its `unk18` field (`u32`) is read here in the same
-shape as there. No caller of `Class6D4E8__LoadFile` exists yet in carved C, so its
+`CdDriver__Open`'s report; its `unk18` field (`u32`) is read here in the same
+shape as there. No caller of `CdDriver__LoadFile` exists yet in carved C, so its
 own return type is likewise UNCERTIFIED by any call site; `void` was chosen
 because every path either explicitly returns via a callee's forwarded value
 (itself never captured anywhere) or falls off the end with `v0` left
@@ -191,8 +193,8 @@ epilogue.
 **A goto-vs-do-while choice for a retry loop is not fully explained by
 "check this loop's own bytes" (round 47's earlier correction) -- loop BODY
 SIZE/complexity is a second axis worth testing directly.** Two nearly
-same-shaped CdControl/CdSync retry loops in this unit (`Class6D4E8__Seek`'s
-simple one, `Class6D4E8__LoadFile`'s one nested inside a larger combined retry)
+same-shaped CdControl/CdSync retry loops in this unit (`CdDriver__Seek`'s
+simple one, `CdDriver__LoadFile`'s one nested inside a larger combined retry)
 took OPPOSITE answers for the SAME inner shape, and the difference tracked
 with how much additional code (a second nested retry, more surrounding
 statements) the outer loop's body carried. When a retry loop's plain
@@ -207,7 +209,7 @@ Round 79 (charlie), FINISHING-PLAN track 3.
 
 | was | now | tier |
 | --- | --- | --- |
-| `func_80027800` | `Class6D4E8__LoadFile` | A |
+| `func_80027800` | `CdDriver__LoadFile` | A |
 
 **Evidence.** Overrides the base class's `+0x058` (`Class6D430__LoadFile`,
 which does open/size/alloc/rewind/read/close through the slots above). Sync
@@ -217,12 +219,12 @@ code_179d8_q already gives it), or inside a queue dispatch: looks the file
 up by name, rounds its size up to whole sectors, allocates `self->buffer`
 with `BMemPMgrAlloc` if it has none (calling `close` if that fails), and
 seeks + reads the whole file into it, recording the rounded size in
-`self->bufferSize`. `Class6D4E8__RequestLoadFile` (code_179d8_q) dispatches
+`self->bufferSize`. `CdDriver__RequestLoadFile` (code_179d8_q) dispatches
 this slot as `loadFile`, so the slot name and the function name agree.
 
 **Class prefix.** `Class6D4E8` is the placeholder token for the method
-table `D_8006D4E8` (the convention `Class6D4E8__RequestLoadFile` and its two
-siblings already use); `tools/classtable.py D_8006D4E8` lists this function
+table `gCdDriverMethods` (the convention `CdDriver__RequestLoadFile` and its two
+siblings already use); `tools/classtable.py gCdDriverMethods` lists this function
 at slot `+0x058`. The prefix names the table, not the developers' class.
 
 ## Proposed field names
@@ -230,14 +232,14 @@ at slot `+0x058`. The prefix names the table, not the developers' class.
 For the head to apply by type scope (out of unit). `Class6D430__LoadFile`
 (code_171e0), the base method this function overrides and calls in sync
 mode, drives these slots in the order open, size query, alloc, rewind, read,
-close; the one class that fills them (`D_8006D4E8`) fills them with the
+close; the one class that fills them (`gCdDriverMethods`) fills them with the
 methods named here.
 
 | unit | type | field | proposed | tier | evidence |
 | --- | --- | --- | --- | --- | --- |
-| include/code_171e0.h | `Class6D430Methods` | `configureBuffer` (+0x44) | `open` | A | called with the file name first; override is `Class6D4E8__Open` |
-| include/code_171e0.h | `Class6D430Methods` | `bufferControl` (+0x4C) | `seek` | B | called `(0, 2)` for the size and `(0, 0)` to rewind; override is `Class6D4E8__Seek` |
-| include/code_171e0.h | `Class6D430Methods` | `installBuffer` (+0x54) | `read` | A | called with the new buffer and its size; override is `Class6D4E8__Read` |
+| include/code_171e0.h | `Class6D430Methods` | `configureBuffer` (+0x44) | `open` | A | called with the file name first; override is `CdDriver__Open` |
+| include/code_171e0.h | `Class6D430Methods` | `bufferControl` (+0x4C) | `seek` | B | called `(0, 2)` for the size and `(0, 0)` to rewind; override is `CdDriver__Seek` |
+| include/code_171e0.h | `Class6D430Methods` | `installBuffer` (+0x54) | `read` | A | called with the new buffer and its size; override is `CdDriver__Read` |
 | include/code_171e0.h | `Class6D430` | `pendingGeneration` (+0x0C) | `isOpen` | B | same offset as `Class6D4E8::isOpen`; AllocBuffer zeroes it before calling `open` (which opens only when it is 0) and restores it after `close` |
 
 Also noted for whoever names code_171e0 again: `Class6D430__LoadFile`

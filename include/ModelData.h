@@ -25,8 +25,8 @@
  * GetActiveDataSourceMethods()->ctor, as TimBlockSrc__TimBlockSrc's is: it is
  * TimBlockSrc's sibling under Class6D430, and carries none of TimBlockSrc's
  * layout. That parent ctor is chosen at RUN TIME: the CD driver's
- * (Class6D4E8__Class6D4E8, which chains to Class6D430__Class6D430; its
- * object is 0x2C bytes, New_Class6D4E8) or, while gActiveDataSource is
+ * (CdDriver__CdDriver, which chains to Class6D430__Class6D430; its
+ * object is 0x2C bytes, New_CdDriver) or, while gActiveDataSource is
  * DATASOURCE_SPU, the VAB driver's (VabDriver__VabDriver, an empty body).
  * The fields below assume Class6D430's own 0x2C-byte layout, which is the
  * CD driver's whole object: ModelData's own fields start at +0x02C.
