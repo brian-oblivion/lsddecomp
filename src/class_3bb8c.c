@@ -47,7 +47,7 @@ s32 StageMap__SetTargetAndLoadChunks(StageMap *self, void *arg1, SceneNode *arg2
     self->target = arg2;
     self->targetCell.base = *arg3;
     ret = ComputeCellWorldOffsets(arg1, stackBuf, self->config, &self->origin, arg3);
-    return self->methods->buildRateEntries(self, ret, (LongVec3 *)stackBuf, sDefaultTargetSpecs);
+    return self->methods->loadChunksAround(self, ret, (LongVec3 *)stackBuf, sDefaultTargetSpecs);
 }
 
 s32 StageMap__ComputeCellOffsets(StageMap *self, void *arg1, void *arg2) {
@@ -105,7 +105,7 @@ void StageMap__Enable(StageMap *self) {
 }
 
 void StageMap__Disable(StageMap *self) {
-    self->methods->resetAllElements(self);
+    self->methods->unloadAllSlots(self);
     self->enabled = 0;
 }
 
@@ -126,7 +126,7 @@ s32 StageMap__UpdateFootprintTracking(StageMap *self) {
     result = sFootprintResultRemap[key];
 
     if (self->config->isVertical == 0) {
-        self->methods->buildRateEntries(self, buf.chunkIndex, &buf.chunkCentre,
+        self->methods->loadChunksAround(self, buf.chunkIndex, &buf.chunkCentre,
                                         sFootprintResultPtrTable[result]);
     }
 
@@ -189,17 +189,17 @@ void StageMap__LoadChunksAround(StageMap *self, s32 val, LongVec3 *arg2, ChunkSl
                 }
                 e->cellParent->coord2->flg = 0;
                 StageMap__ComputeChunkLoadEntry(self, &stackBuf[count], divisor, flag, val,
-                                             savedResult, arg3[i].neighbour);
+                                                savedResult, arg3[i].neighbour);
                 count++;
             }
         }
 
         for (i = 0; i < 7; i++) {
-            e = &self->elems[i];
+            e = &self->slots[i];
             e->loader->elemKey = e->neighbour;
         }
 
-        self->methods->applyRateEntries(self, stackBuf, count);
+        self->methods->applyChunkLoads(self, stackBuf, count);
     }
 }
 
@@ -251,7 +251,7 @@ s32 StageMap__ComputeNeighbourMask(StageMap *self, s32 val, s32 flag) {
  * The `do {} while (0);` below is LOAD-BEARING: removing it drifts the
  * image. It was inherited with the near-miss body and is verified here. */
 s32 StageMap__ComputeChunkLoadEntry(StageMap *self, ChunkLoadEntry *arg1, s32 divisor, s32 flag,
-                                 s32 val, s32 savedResult, s32 key) {
+                                    s32 val, s32 savedResult, s32 key) {
     s32 mask = sRateKeyMask[key];
     s32 result;
 
@@ -314,7 +314,7 @@ void StageMap__ApplyChunkLoads(StageMap *self, ChunkLoadEntry *arr1, s32 count) 
         ((StageMapOnSlotEventFn)self->methods->notifyWithHull)(self, 6, e, i);
         if (arr1->file != 0) {
             if (e->loader->headerReady != 0) {
-                self->methods->resetElementCells(self, e);
+                self->methods->clearSlotCells(self, e);
             }
             e->loader->chunkIndex = sp->chunkIndex;
             ((LbdFileLoadHeaderFn)e->loader->methods->processBuffer)(e->loader, arr1->file);
@@ -322,7 +322,7 @@ void StageMap__ApplyChunkLoads(StageMap *self, ChunkLoadEntry *arr1, s32 count) 
             self->loadsPending = 1;
         } else {
             if (e->loader->headerReady != 0) {
-                self->methods->resetElementCells(self, e);
+                self->methods->clearSlotCells(self, e);
             }
             if (e->loader->loadState != 0) {
                 e->loader->methods->cancelRequests(e->loader);
@@ -340,7 +340,7 @@ s32 StageMap__CountPendingLoads(StageMap *self) {
 
     count = 0;
     for (i = 0; i < 7; i++) {
-        if (self->elems[i].loadPending != 0) {
+        if (self->slots[i].loadPending != 0) {
             count++;
         }
     }
@@ -356,7 +356,7 @@ void StageMap__OnNotifyTag1(StageMap *self, void *arg1, s32 mode) {
         return;
     }
     for (i = 0; i < 7; i++) {
-        e = &self->elems[i];
+        e = &self->slots[i];
         if (e->loader->dataReady != 0) {
             e->loader->dataReady = 0;
             ((StageMapOnSlotEventFn)self->methods->notifyWithHull)(self, 7, e, i);
@@ -364,7 +364,7 @@ void StageMap__OnNotifyTag1(StageMap *self, void *arg1, s32 mode) {
         curMode = self->loadsPending;
         if (curMode == 1 && e->loadPending != 0) {
             if (e->loader->headerReady != 0) {
-                self->methods->loadElementResources(self, e);
+                self->methods->populateSlotCells(self, e);
                 e->loader->headerReady = 2;
                 e->loadPending = 0;
                 if (--self->unk1B4 == 0) {
@@ -384,7 +384,7 @@ void StageMap__OnNotifyTag1(StageMap *self, void *arg1, s32 mode) {
  * assigned on both sides of the slot4 call. Two locals (`info`, `info2`)
  * make each block-local, so local-alloc ties each to its addu result.
  * See docs/match-reports/StageMap__PopulateSlotCells.md. */
-/* StageMap__PopulateSlotCells (loadElementResources, +0x104) -- own local view of the
+/* StageMap__PopulateSlotCells (populateSlotCells, +0x104) -- own local view of the
  * records reached only from here. Kept in this .c, not class_3bb8c.h: none
  * of the 11 sibling units sharing that header touch these. */
 
@@ -599,8 +599,8 @@ void StageMap__SplitChunkIndex(StageMap *self, u8 *out, s32 val) {
 }
 
 ChunkSlot *StageMap__GetLastEventSlotChunk(StageMap *self, u8 *out) {
-    StageMap__SplitChunkIndex(self, out, self->lastEventElem->loader->chunkIndex);
-    return self->lastEventElem;
+    StageMap__SplitChunkIndex(self, out, self->lastEventSlot->loader->chunkIndex);
+    return self->lastEventSlot;
 }
 
 ChunkSlot *StageMap__FindSlotByNeighbour(StageMap *self, s32 key) {
@@ -608,7 +608,7 @@ ChunkSlot *StageMap__FindSlotByNeighbour(StageMap *self, s32 key) {
     ChunkSlot *e;
 
     for (i = 0; i < 7; i++) {
-        e = &self->elems[i];
+        e = &self->slots[i];
         if (e->loader->elemKey == key) {
             return e;
         }

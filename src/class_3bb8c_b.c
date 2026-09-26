@@ -5,13 +5,13 @@
  * as Entity.c/Entity_b.c).
  *
  * Functionally this slice is the class's SPATIAL GRID / FOOTPRINT
- * subsystem: the seven elements (self->elems), each mapped onto up to four
+ * subsystem: the seven elements (self->slots), each mapped onto up to four
  * CellRect rectangles (self->rects), and a per-cell bit (bit 31 of a
  * GridCell cell's `attribute`) that RefreshFootprint clears, recomputes
  * (via either ComputeFootprintFromRotation or SetFootprintFromQuery, gated
  * on self->config->isVertical) and sets again through SetFootprintCellFlag. A
  * second, unrelated mechanism lives at the tail of the unit: a rate/
- * countdown pair (self->rateCountdown/self->scaleStep) that
+ * countdown pair (self->scaleRampTicks/self->scaleStep) that
  * AdvanceRateCountdown/FlushRateLatch apply to every cell of every element
  * (their updateScale) via the generic ForEachElem/ForEachEntryChild
  * iterators.
@@ -32,7 +32,7 @@ s32 StageMap__FindSlotIndexByNeighbour(StageMap *self, s32 key) {
 
     result = 0;
     for (i = 0; i < 7; i++) {
-        e = &self->elems[i];
+        e = &self->slots[i];
         if (e->loader->elemKey == key) {
             result = i;
             break;
@@ -46,7 +46,7 @@ s32 StageMap__FindSlotIndexByChunk(StageMap *self, s32 key) {
     ChunkSlot *e;
 
     for (i = 0; i < 7; i++) {
-        e = &self->elems[i];
+        e = &self->slots[i];
         if (e->loader->chunkIndex == key && e->loader->headerReady != 0) {
             return i;
         }
@@ -180,7 +180,7 @@ void StageMap__BuildFootprintSlots(StageMap *self) {
         }
     }
     slot = &self->rects.e[0];
-    slot->slotIndex = self->methods->findElemIndexByUnk32(self, quadrant);
+    slot->slotIndex = self->methods->findSlotIndexByNeighbour(self, quadrant);
     slot->col = (col >= 0) ? col : 0;
     slot->row = row;
     span = col + width;
@@ -190,7 +190,7 @@ void StageMap__BuildFootprintSlots(StageMap *self) {
         count = StageMap__SplitFootprintSlot(self, slot, 0, quadrant, col, row, width, height);
         count += 1;
         slot = &self->rects.e[count];
-        slot->slotIndex = self->methods->findElemIndexByUnk32(self, quadrant + 1);
+        slot->slotIndex = self->methods->findSlotIndexByNeighbour(self, quadrant + 1);
         slot->col = 0;
         slot->row = self->rects.e[0].row;
         slot->width = over;
@@ -203,8 +203,8 @@ void StageMap__BuildFootprintSlots(StageMap *self) {
     self->rectCount = count;
 }
 
-s32 StageMap__SplitFootprintSlot(StageMap *self, CellRect *slot, s32 count, s32 baseIdx,
-                                   s32 col, s32 row, s32 width, s32 height) {
+s32 StageMap__SplitFootprintSlot(StageMap *self, CellRect *slot, s32 count, s32 baseIdx, s32 col,
+                                 s32 row, s32 width, s32 height) {
     s32 overflow;
     s32 span;
     s32 elemArg;
@@ -221,14 +221,14 @@ s32 StageMap__SplitFootprintSlot(StageMap *self, CellRect *slot, s32 count, s32 
 
         if (col < 10) {
             elemArg = baseIdx + 2;
-            slot->slotIndex = self->methods->findElemIndexByUnk32(self, elemArg);
+            slot->slotIndex = self->methods->findSlotIndexByNeighbour(self, elemArg);
             slot->col = col + 10;
             /* Stored in BOTH arms: cross-jumping merges the copies, and
              * the join label keeps the col reload below after it. */
             slot->height = span;
         } else {
             elemArg = baseIdx + 3;
-            slot->slotIndex = self->methods->findElemIndexByUnk32(self, elemArg);
+            slot->slotIndex = self->methods->findSlotIndexByNeighbour(self, elemArg);
             slot->col = col - 10;
             slot->height = span;
         }
@@ -245,7 +245,7 @@ s32 StageMap__SplitFootprintSlot(StageMap *self, CellRect *slot, s32 count, s32 
             widthLeft = widthLeft - span;
             slot->width = widthLeft;
             slot = &self->rects.e[count];
-            slot->slotIndex = self->methods->findElemIndexByUnk32(self, elemArg + 1);
+            slot->slotIndex = self->methods->findSlotIndexByNeighbour(self, elemArg + 1);
             slot->col = 0;
             slot->row = 0;
             slot->width = span - 20;
@@ -273,8 +273,7 @@ void StageMap__SetFootprintFromQuery(StageMap *self) {
         }
     }
     if (buf.chunkIndex - 1 >= 0) {
-        self->rectCount =
-            StageMap__InitFootprintSlot(self, junk, self->rectCount, buf.chunkIndex - 1);
+        self->rectCount = StageMap__InitFootprintSlot(self, junk, self->rectCount, buf.chunkIndex - 1);
     }
 }
 
@@ -297,7 +296,7 @@ s32 StageMap__InitFootprintSlot(StageMap *self, s32 unused, s32 key, s32 arg3) {
 
     slot = &self->rects.e[key];
     *slot = gDefaultElemRateOffset;
-    slot->slotIndex = self->methods->findElemIndexByUnk30(self, arg3);
+    slot->slotIndex = self->methods->findSlotIndexByChunk(self, arg3);
     return key + 1;
 }
 
@@ -312,7 +311,7 @@ void StageMap__SetFootprintCellFlag(StageMap *self, s32 setBit) {
 
     slot = self->rects.e;
     for (i = 0; i < self->rectCount; slot++, i++) {
-        e = &self->elems[slot->slotIndex];
+        e = &self->slots[slot->slotIndex];
         if (e->loader->headerReady == 0) {
             continue;
         }
@@ -349,7 +348,7 @@ void StageMap__SetBounds(StageMap *self, CellBounds *arg1) {
 }
 
 /* Picks one of the four static Ratio16[3] scale steps by the sign of
- * `rate` and by `flag`, then sets rateCountdown to |rate| scaled by the chosen
+ * `rate` and by `flag`, then sets scaleRampTicks to |rate| scaled by the chosen
  * step's y denominator (scaleStep[1].den).
  *
  * Two source shapes here are load-bearing and neither is cosmetic:
@@ -364,7 +363,7 @@ void StageMap__SetBounds(StageMap *self, CellBounds *arg1) {
  *    `mult` in each arm. Caching the load in `scale` and letting an explicit
  *    if/else assign a local `val` is what defers that `mflo`; the
  *    default-then-overwrite spelling makes cc1 extract it eagerly, and
- *    storing to self->rateCountdown directly instead of through `val` perturbs the
+ *    storing to self->scaleRampTicks directly instead of through `val` perturbs the
  *    table-selection half as well. Both were measured -- round 58 and
  *    docs/match-reports/StageMap__StartScaleRamp.md.
  *
@@ -398,23 +397,23 @@ merge:
     } else {
         val = scale * (~rate + 1);
     }
-    self->rateCountdown = val;
+    self->scaleRampTicks = val;
 }
 
 void StageMap__StepScaleRamp(StageMap *self) {
-    if (self->rateCountdown > 0) {
+    if (self->scaleRampTicks > 0) {
         StageMap__ForEachSlot(self, StageMap__AddScaleStepToCell, 0);
-        self->rateCountdown -= 1;
-        if (self->rateCountdown == 0) {
-            self->rateCountdown = -1;
+        self->scaleRampTicks -= 1;
+        if (self->scaleRampTicks == 0) {
+            self->scaleRampTicks = -1;
         }
     }
 }
 
 void StageMap__EndScaleRamp(StageMap *self) {
-    if (self->rateCountdown != 0) {
+    if (self->scaleRampTicks != 0) {
         StageMap__ForEachSlot(self, StageMap__ResetCellScale, 0);
-        self->rateCountdown = 0;
+        self->scaleRampTicks = 0;
     }
 }
 
@@ -431,7 +430,7 @@ void StageMap__ForEachSlot(StageMap *self, StageMapCellFn arg1, ChunkSlotFn arg2
     ChunkSlot *e;
 
     for (i = 0; i < 7; i++) {
-        e = &self->elems[i];
+        e = &self->slots[i];
         if (arg2 != 0) {
             arg2(self, e);
         }

@@ -101,10 +101,10 @@ void StageMap__StageMap(StageMap *self, LongVec3 *origin, s32 autoLoad) {
     self->enabled = 0;
     self->target = NULL;
     self->acceptedTags = 0;
-    self->rateCountdown = 0;
+    self->scaleRampTicks = 0;
 
     for (i = 0; i < 7; i++) {
-        entry = &self->elems[i];
+        entry = &self->slots[i];
 
         entry->loader = New_LbdFile();
         entry->loader->freeGuard = (entry->loader->buffer != NULL);
@@ -166,7 +166,7 @@ void StageMap__Finalize(StageMap *self) {
     self->methods->removeChild(self, (BasicClass *)GetDrawSystem());
 
     for (i = 0; i < 7; i++) {
-        entry = &self->elems[i];
+        entry = &self->slots[i];
         ((StageMapOnSlotEventFn)self->methods->notifyWithHull)(self, 6, entry, i);
 
         if (entry->loader != NULL) {
@@ -241,14 +241,14 @@ handle6:
     }
 
 merge:
-    self->lastEventElem = elem;
+    self->lastEventSlot = elem;
     self->methods->notifyParents(self, command);
 }
 
 void StageMap__UpdateIfEnabled(StageMap *self) {
     if (self->enabled) {
         self->methods->updateFootprintTracking(self);
-        self->methods->advanceRateCountdown(self);
+        self->methods->stepScaleRamp(self);
     }
 }
 
@@ -259,7 +259,7 @@ void StageMap__DispatchLinkCommand(StageMap *self, BasicClass *sender, s32 comma
 }
 
 /* Reset every one of the seven grid elements, then the two counters.
- * Matched round 71: `&self->elems[i]` is what produces retail's
+ * Matched round 71: `&self->slots[i]` is what produces retail's
  * base + running-offset walk (GCC's strength reduction), not a hand-rolled
  * byte offset. */
 void StageMap__UnloadAllSlots(StageMap *self) {
@@ -268,10 +268,10 @@ void StageMap__UnloadAllSlots(StageMap *self) {
     Class6D940 *list;
 
     for (i = 0; i < 7; i++) {
-        entry = &self->elems[i];
+        entry = &self->slots[i];
         entry->loader->methods->cancelRequests(entry->loader);
         entry->loadPending = 0;
-        self->methods->resetElementCells(self, entry);
+        self->methods->clearSlotCells(self, entry);
         list = entry->placements;
         if (list->linkResource != NULL) {
             list->linkResource = list->linkResource->methods->release(list->linkResource);
@@ -282,7 +282,7 @@ void StageMap__UnloadAllSlots(StageMap *self) {
 
     self->chunksLoaded = 0;
     self->unk1B4 = 0;
-    self->methods->flushRateLatch(self);
+    self->methods->endScaleRamp(self);
 }
 
 void StageMap__SetChildParams(StageMap *self, s32 count, s32 dirs, s32 colors) {
@@ -415,7 +415,7 @@ void StageMap__SetFootprintRect(StageMap *self, Descriptor10Ext *desc, s32 span)
     }
 
     self->rectCount = 1;
-    self->rects.e[0].slotIndex = self->methods->findElemIndexByUnk30(self, desc->chunkIndex);
+    self->rects.e[0].slotIndex = self->methods->findSlotIndexByChunk(self, desc->chunkIndex);
     self->rects.e[0].col = col;
     self->rects.e[0].row = row;
     self->rects.e[0].width = width;
@@ -437,7 +437,7 @@ void StageMap__DispatchToRectCells(StageMap *self, SceneNode *sender, s32 comman
 
     entry = self->rects.e;
     for (i = 0; i < self->rectCount; entry++, i++) {
-        slot = &self->elems[entry->slotIndex];
+        slot = &self->slots[entry->slotIndex];
         if (slot->loader->headerReady != 0) {
             cell = (slot->cells + entry->col) + entry->row * 20;
             for (row = 0; row < entry->height; row++) {
