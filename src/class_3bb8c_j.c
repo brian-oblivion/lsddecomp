@@ -23,6 +23,7 @@
 #include "class_3bb8c.h"
 #include "TextEntry.h"
 #include "ScreenSprite.h"
+#include "TimImage.h"
 
 void TextEntry__PrevChar(TextEntry *self)
 {
@@ -132,21 +133,23 @@ typedef struct Class86F88Methods_3bb8c_j Class86F88Methods_3bb8c_j;
 typedef struct Class86F88_3bb8c_j Class86F88_3bb8c_j;
 
 /*
- * Class86F88_3bb8c_j's own opaque "handle" object (self->unk50's pointee, built by
- * Class86F88__LoadResources via BuildFileName/New_TimImage/New_ScreenSprite: a
- * "CARD\\<name>.TIM" path is built and loaded, as in class_3bb8c_i's
- * TextEntry__LoadCardResources). Only the three slots this unit's own
- * functions dispatch through are named.
+ * Class86F88_3bb8c_j's own opaque "handle" object (self->unk50's pointee, a
+ * ScreenSprite built by Class86F88__LoadResources from a TimImage loaded
+ * with New_TimImage from a "CARD\\<name>.TIM" path, as in class_3bb8c_i's
+ * TextEntry__LoadCardResources). Only the slots this unit's own functions
+ * dispatch through are named. The TimImage handles themselves used this
+ * view until round 88 and are `TimImage *` now (include/TimImage.h), so
+ * slot78 has no accessor; slot8C's third argument is still typed with it.
  */
 typedef struct Class86F88Handle_3bb8c_j Class86F88Handle_3bb8c_j;
 typedef struct Class86F88HandleMethods_3bb8c_j Class86F88HandleMethods_3bb8c_j;
 struct Class86F88HandleMethods_3bb8c_j {
     u8 pad000[0x004];
-    void *(*slot4)(Class86F88Handle_3bb8c_j *self);                          /* +0x004, Class86F88__ReleaseResources/Class86F88__LoadResources */
+    void *(*slot4)(Class86F88Handle_3bb8c_j *self);                          /* +0x004, Class86F88__ReleaseResources */
     u8 pad008[0x04C - 0x008];
     void *(*slot4C)(Class86F88Handle_3bb8c_j *self, void *arg1, void *arg2); /* +0x04C, Class86F88__LoadResources */
     u8 pad050[0x078 - 0x050];
-    void (*slot78)(Class86F88Handle_3bb8c_j *self);                          /* +0x078, Class86F88__LoadResources */
+    void (*slot78)(Class86F88Handle_3bb8c_j *self);                          /* +0x078; no accessor since round 88 */
 };
 struct Class86F88Handle_3bb8c_j {
     Class86F88HandleMethods_3bb8c_j *methods; /* +0x000 */
@@ -377,7 +380,6 @@ void Class86F88__ResetCounters(Class86F88_3bb8c_j *self)
 }
 
 extern char *BuildFileName(char *dest, const char *arg1, const char *arg2, const char *arg3);
-extern Class86F88Handle_3bb8c_j *New_TimImage(char *path);
 extern const char D_8008AB14[]; /* "SELECT" */
 extern const char D_8008AB1C[]; /* "CARD\\" */
 extern const char D_8008AB24[]; /* ".TIM" */
@@ -396,8 +398,8 @@ void Class86F88__LoadResources(Class86F88_3bb8c_j *self, void *arg1)
     char path[0x20];
     const char *dir;
     const char *ext;
-    Class86F88Handle_3bb8c_j *handle1;
-    Class86F88Handle_3bb8c_j *handle2;
+    TimImage *handle1;
+    TimImage *handle2;
 
     if (arg1 == NULL) {
         return;
@@ -410,15 +412,15 @@ void Class86F88__LoadResources(Class86F88_3bb8c_j *self, void *arg1)
     ext = D_8008AB24;
 
     handle1 = New_TimImage(BuildFileName(path, D_8008AB14, dir, ext));
-    handle1->methods->slot78(handle1);
+    ((TimImageUploadFn)handle1->methods->slot78)(handle1);
     self->unk50 = (Class86F88Handle_3bb8c_j *)New_ScreenSprite(handle1, (SpriteRect *)&D_80087028, 0);
-    handle1->methods->slot4(handle1);
+    handle1->methods->release(handle1);
     self->unk50->methods->slot4C(self->unk50, arg1, &D_8008AAF8);
 
     handle2 = New_TimImage(BuildFileName(path, D_800116E4, dir, ext));
-    handle2->methods->slot78(handle2);
-    self->methods->slot8C(self, arg1, handle2, self->unk20, self->unk24, self->unk28);
-    handle2->methods->slot4(handle2);
+    ((TimImageUploadFn)handle2->methods->slot78)(handle2);
+    self->methods->slot8C(self, arg1, (Class86F88Handle_3bb8c_j *)handle2, self->unk20, self->unk24, self->unk28);
+    handle2->methods->release(handle2);
 }
 
 void Class86F88__ReleaseResources(Class86F88_3bb8c_j *self)

@@ -97,3 +97,12 @@ blocker itself was the only thing stopping them.
 ## Naming (round 77, naming runner delta)
 
 Renamed `func_8004DF64` -> `Class86B60__BeginMemcardSave`. **Tier B**: Lazy-inits `self->iconHandle` (`New_TimImage(D_800114F8)`, a real dlabel "CARD\\FILEICN1.TIM") and `self->unkAC` (`New_TaskObjF`), then dispatches `unkAC`'s `slot6C` with `D_8008A9D0` (VALUE-of, holds "BISLPS-01556" -- Sony's memcard save-header game-ID convention) plus filename-related fields. Named from the game-ID string as the strongest evidence this is the start of a memory-card save operation; the exact protocol is not established.
+
+## Track 4 (2026-09-26, round 88)
+
+TimImage is unified (`include/TimImage.h`); this unit's local `extern
+GenericReleaseObj_3bb8c_d *New_TimImage(const char *)` is deleted. The call
+casts its argument to `char *` and its result to
+`GenericReleaseObj_3bb8c_d *`, the type Class86B60's own view gives
+`iconHandle` (a TimImage; retyping Class86B60's field is that class's job).
+Image byte-identical.

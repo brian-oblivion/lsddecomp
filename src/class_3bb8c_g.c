@@ -27,6 +27,7 @@
 #include "class_3bb8c.h"
 #include "ScreenSprite.h"
 #include "TextEntry.h"
+#include "TimImage.h"
 
 void TaskObjF__SetState(Class86E00_3bb8c_g *self, s32 arg1)
 {
@@ -86,13 +87,6 @@ void TaskObjF__SetState(Class86E00_3bb8c_g *self, s32 arg1)
     }
 }
 
-/* Not this round's function (lives outside this unit's slice) -- a
- * resource loader taking a path, returning a handle. Already typed at
- * several other call sites in the project (`class_3bb8c_i.c`,
- * `class_3bb8c_j.c`, `class_39e08.h`, `code_2cc8c.h`), each with its own
- * local view per this project's established convention. */
-extern ChildObj86ED0 *New_TimImage(char *path);
-
 /* 0x11 (17) entries, indexed by `arg1` (range-checked `< 0x11` below);
  * mostly `char *` string pointers into rodata, a few raw literal words at
  * indices never reached from this call site. `asm/data/76DC8.data.s`. */
@@ -109,7 +103,7 @@ void TaskObjF__LoadCardIcon(Class86E00_3bb8c_g *self, s32 arg1)
     char path[0x20];
     char *buf;
     char *name;
-    ChildObj86ED0 *handle;
+    TimImage *handle;
     Class86E00Unk70Obj_3bb8c_g *newVal;
 
     if (arg1 >= 0x11) {
@@ -130,7 +124,7 @@ void TaskObjF__LoadCardIcon(Class86E00_3bb8c_g *self, s32 arg1)
     strcat(buf, gCardPathSuffix);
 
     handle = New_TimImage(buf);
-    handle->methods->slot78(handle);
+    ((TimImageUploadFn)handle->methods->slot78)(handle);
     newVal = (Class86E00Unk70Obj_3bb8c_g *)New_ScreenSprite(handle, (SpriteRect *)&D_80086EC4, 0);
     self->cardIcon = newVal;
     handle->methods->release(handle);

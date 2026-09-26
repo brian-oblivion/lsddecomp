@@ -303,3 +303,12 @@ cross-unit sibling with the same call skeleton first.
 ## Track 4
 
 2026-09-25, round 84 (charlie): The class `New_D8006ED4C` constructs is unified as ScreenSprite in `include/ScreenSprite.h`; the unit includes it and its local extern is gone. The call reads `self->unk50 = (Class86F88Handle_3bb8c_j *)New_ScreenSprite(handle1, (SpriteRect *)&D_80087028, 0)`: D_80087028 is the rect (words 0, 256, 160), and unk50's +0x04C call passes the screen position D_8008AAF8 = (-100, -60). Image byte-identical.
+
+## Track 4 (2026-09-26, round 88)
+
+TimImage is unified (`include/TimImage.h`); this unit's local `extern
+Class86F88Handle_3bb8c_j *New_TimImage(char *)` is deleted. `handle1`/
+`handle2` are `TimImage *`: +0x078 through `TimImageUploadFn` (occupant
+TimImage__Upload), `slot4` -> the inherited `release`; `handle2` is cast to
+`Class86F88Handle_3bb8c_j *` for slot8C, whose parameter is this class's
+own view (not TimImage's to retype). Image byte-identical.
