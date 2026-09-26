@@ -14,20 +14,18 @@
  *    view `StyleCueParam`/`StyleCueParamMethods`; tier B throughout --
  *    the callback mechanism is established, which specific numeric fields
  *    mean in the running game is not.
- *  - `Class876FCMethods` (`gClass876FCMethods`), an `Actor`-derived
- *    (include/Actor.h; id 0xEF34, parent 0x34 -- not DreamSys, 0x1F34)
- *    concrete class whose PRIVATE methods live in class_3bb8c_s.c (round
- *    70/round 17, `Class876FC` there is the same struct under the owner's
- *    name). This unit supplies its ctor/dtor/setParams/update
- *    (Class876FC__Class876FC/__Finalize/__SetParams/__Update) plus the
- *    `New_Class876FC` allocator; local view kept independent of
- *    class_3bb8c_s.c's per the multiple-independent-local-views convention.
+ *  - Class876FC (include/Class876FC.h, unified round 88), an Actor
+ *    subclass (id 0xEF34, parent 0x34): this unit supplies its slot
+ *    occupants (Class876FC__Class876FC/__Finalize/__SetParams/__Update)
+ *    and the `New_Class876FC` allocator; its private helpers are in
+ *    class_3bb8c_s.c and class_3bb8c_o.c.
  *
  * Named round 73 (charlie); tiers and evidence in each function's match
  * report.
  */
 #include "common.h"
 #include "Actor.h"
+#include "Class876FC.h"
 
 /* ------------------------------------------------------------------ *
  * gStyleCueCallbacks's 14 slots (StyleCue00..StyleCue13) plus the shared
@@ -316,55 +314,18 @@ s32 IsStyleVariantEven(void) {
 }
 
 /* ------------------------------------------------------------------ *
- * gClass876FCMethods's own slots (ctor/dtor/setParams), plus its `New_X` allocator.
- * See the file banner: this is the SAME sibling table `class_3bb8c_o.c`
- * (round 17, previous pass) already partly resolved; this unit's own
- * local view is kept independent, per the multiple-independent-views
- * convention -- `class_3bb8c_o.c` is not this unit's to edit.
+ * Class876FC's slot occupants (ctor, finalize, reset = SetParams, +0x0EC =
+ * Update), plus its `New_` allocator. The class: include/Class876FC.h.
  * ------------------------------------------------------------------ */
-
-typedef struct Class876FC Class876FC;
-typedef struct Class876FCMethods {
-    u8 pad0[0x8];
-    void *(*ctor)(Class876FC *self, void *arg1, void *arg2, void *arg3, void *arg4); /* +0x008 Class876FC__Class876FC (this unit) */
-    void *(*dtor)(Class876FC *self);                                                   /* +0x00C Class876FC__Finalize (this unit) */
-    u8 pad10[0x40 - 0x10];                                                              /* +0x010 .. +0x03F, shared-base slots, not this unit's to name */
-    void (*setParams)(Class876FC *self, void *arg1);                                           /* +0x040 Class876FC__SetParams (this unit) */
-} Class876FCMethods;
-
-/* Declared as a WORD array, not a byte array, so a whole-struct assignment
- * reproduces retail's aligned 4-word-per-iteration block-move codegen
- * (the already-confirmed idiom, e.g. DreamSys.h's DreamSysUnk14Tail) --
- * a byte array has alignment 1 and compiles the copy as a generic
- * runtime-alignment-checked memcpy loop instead. */
-typedef struct Block24 {
-    s32 raw[0x24 / 4];
-} Block24;
-
-struct Class876FC {
-    Class876FCMethods *methods; /* +0x000 */
-    u8 pad4[0x24 - 0x4];        /* +0x004 .. +0x023, unknown */
-    s32 tick;                     /* +0x024, cleared by Class876FC__SetParams */
-    u8 pad28[0x44 - 0x28];          /* +0x028 .. +0x043, unknown */
-    s32 unk44;                        /* +0x044 */
-    u8 pad48[0x54 - 0x48];               /* +0x048 .. +0x053, unknown */
-    void *kind;                            /* +0x054, the ctor's own arg1, stashed verbatim */
-    Block24 params;                          /* +0x058, Class876FC__SetParams's own 0x24-byte block-copy target */
-};
-
-/* The base class's table: include/Actor.h (GetActorMethods). */
 
 extern void *BMemPMgrAlloc(s32 size);
 extern void *BMemPMgrFree(void *ptr);
-extern Class876FCMethods *GetClass876FCMethods(void); /* class_3bb8c_o.c, round 17, ALREADY MATCHED -- returns &gClass876FCMethods */
-extern void Class876FC__ReleaseByKind(Class876FC *self);
-extern void *Class876FC__InitByKind(Class876FC *self, void *arg1, void *arg2);
 
-void *New_Class876FC(void *arg0, void *arg1, void *arg2, void *arg3) {
+Class876FC *New_Class876FC(s32 kind, Class876FCParams *params, Class6B5CC *parent, Vec3_d294 *pos) {
     Class876FC *self = BMemPMgrAlloc(0x98);
 
     if (self != NULL) {
-        if (GetClass876FCMethods()->ctor(self, arg0, arg1, arg2, arg3) != NULL) {
+        if (GetClass876FCMethods()->ctor(self, kind, params, parent, pos) != NULL) {
             return self;
         }
         BMemPMgrFree(self);
@@ -373,15 +334,16 @@ void *New_Class876FC(void *arg0, void *arg1, void *arg2, void *arg3) {
     return NULL;
 }
 
-void *Class876FC__Class876FC(Class876FC *self, void *arg1, void *arg2, void *arg3, void *arg4) {
+/* `kind` goes into Actor's pendingExtra (+0x054): see include/Class876FC.h. */
+Class876FC *Class876FC__Class876FC(Class876FC *self, s32 kind, Class876FCParams *params, Class6B5CC *parent, Vec3_d294 *pos) {
     if (GetActorMethods()->ctor((Actor *)self) == NULL) {
         goto fail;
     }
     self->methods = GetClass876FCMethods();
-    self->unk44 = 0;
-    self->kind = arg1;
-    self->methods->setParams(self, arg2);
-    Class876FC__InitByKind(self, arg3, arg4);
+    self->state = 0;
+    self->pendingExtra = kind;
+    ((Class876FCSetParamsFn)self->methods->reset)(self, params);
+    Class876FC__InitByKind(self, parent, pos);
     return self;
 fail:
     return NULL;
@@ -394,14 +356,14 @@ void Class876FC__Finalize(Class876FC *self) {
     GetActorMethods()->finalize((Actor *)self);
 }
 
-void Class876FC__SetParams(Class876FC *self, Block24 *src) {
-    self->params = *src;
+void Class876FC__SetParams(Class876FC *self, Class876FCParams *params) {
+    self->params = *params;
     self->tick = 0;
 }
 
-extern void Class876FC__UpdateByKind(Class876FC *self); /* arity-ok: the definition is 2-parameter and the callee DOES read $a1 (`move s1,a1` at 0x80056650), but Class876FC__Update passes nothing for it -- retail's jal at 0x80056508 has `sw v0,36(a0)` in the delay slot and leaves its own incoming $a1 in place */
-
-void Class876FC__Update(Class876FC *self) {
+/* `pos` arrives from StyleUpdateEffectSlots and is forwarded untouched in
+ * $a1 (retail's jal at 0x80056508 sets no $a1). */
+void Class876FC__Update(Class876FC *self, Vec3_d294 *pos) {
     self->tick = self->tick + 1;
-    Class876FC__UpdateByKind(self);
+    Class876FC__UpdateByKind(self, pos);
 }

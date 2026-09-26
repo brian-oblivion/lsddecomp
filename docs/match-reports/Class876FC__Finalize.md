@@ -43,3 +43,7 @@ report explicitly contrasts against.
 ## Track 4 (2026-09-25, round 82, delta)
 
 The base class is unified as `Actor` (`include/Actor.h`). Its +0x00C is the inherited Class6B5CC `finalize`, whose occupant Class6B5CC__Finalize returns nothing, so this function no longer returns the base call's value: it is `void`, and the base call a plain statement (`GetActorMethods()->finalize((Actor *)self)`). Same bytes: nothing touches $v0 after the jalr either way. Class876FC's own table view (`Class876FCMethods` in class_3bb8c_r.c) still types +0x00C as returning `void *`; that is the subclass's to settle.
+
+## Track 4 (2026-09-26, round 88, charlie)
+
+The class's view is now include/Class876FC.h (round 88); body unchanged, image byte-identical.
