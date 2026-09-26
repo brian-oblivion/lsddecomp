@@ -1,4 +1,6 @@
-# TodActor__SetUnk64
+# TodActor__SetMainPartNotifies
+
+> Renamed from `TodActor__SetUnk64` on 2026-09-26 (tools/rename.py). Address 0x80065bf4.
 
 > Renamed from `Class65650__SetUnk64` on 2026-09-26 (tools/rename.py). Address 0x80065bf4.
 
@@ -14,7 +16,7 @@ the `TodActor` object). Retail never sets `$v0` in this function, so its
 return value is treated as unused (`void`).
 
 ```c
-void TodActor__SetUnk64(TodActor *self, s32 value)
+void TodActor__SetMainPartNotifies(TodActor *self, s32 value)
 {
     self->unk64 = value;
 }
@@ -28,7 +30,7 @@ None; this is the plain single-instruction setter shape.
 
 Round 75 (charlie), track 3.
 
-- `TodActor__SetUnk64` (was `func_80065BF4`), tier B. Occupies +0x0F0 (first slot of this class's own range); a one-line setter of +0x64. InitDefaults sets it to 1 and TickCallbackA acts only while it is 1; what the value means is not known, so the field keeps its offset name.
+- `TodActor__SetMainPartNotifies` (was `func_80065BF4`), tier B. Occupies +0x0F0 (first slot of this class's own range); a one-line setter of +0x64. InitDefaults sets it to 1 and TickCallbackA acts only while it is 1; what the value means is not known, so the field keeps its offset name.
 
 ## Track 4 (2026-09-25, round 85, alpha)
 

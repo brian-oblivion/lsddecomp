@@ -142,7 +142,7 @@ void TodActor__Update(TodActor *self, void *arg1, s32 val) {
     }
 }
 
-void TodActor__SetUnk64(TodActor *self, s32 value) {
+void TodActor__SetMainPartNotifies(TodActor *self, s32 value) {
     self->unk64 = value;
 }
 

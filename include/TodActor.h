@@ -63,7 +63,7 @@ struct TagCheckArg; /* onNotify's sender, read only for its table's low id halfw
 /* clang-format off */
 #define TODACTOR_SLOTS(Self, CtorParams)                                                         \
     ACTOR_SLOTS(Self, CtorParams);                                                                 \
-    /* +0x0F0 */ void (*setUnk64)(Self *self, s32 value);       /* TodActor__SetUnk64 */         \
+    /* +0x0F0 */ void (*setUnk64)(Self *self, s32 value);       /* TodActor__SetMainPartNotifies */         \
     /* +0x0F4 */ s32 (*setupModelData)(Self *self, void *desc); /* TodActor__SetupModelData: 0 on success */ \
     /* +0x0F8 */ void (*teardownModelData)(Self *self);         /* TodActor__TeardownModelData */ \
     /* +0x0FC */ s32 (*findPartIndex)(Self *self, s32 id);      /* TodActor__FindPartIndex: -1 when no part has the id; called directly */ \
@@ -141,7 +141,7 @@ void TodActor__DetachFromParent(TodActor *self);
 void TodActor__SetDisplay(TodActor *self, void *arg);
 void TodActor__SetLightMode(TodActor *self, void *arg);
 void TodActor__Update(TodActor *self, void *sender, s32 event);
-void TodActor__SetUnk64(TodActor *self, s32 value);
+void TodActor__SetMainPartNotifies(TodActor *self, s32 value);
 s32 TodActor__SetupModelData(TodActor *self, void *desc);
 void TodActor__TeardownModelData(TodActor *self);
 s32 TodActor__AcquireModelData(TodActor *self, struct UnkArg1Obj *desc);
