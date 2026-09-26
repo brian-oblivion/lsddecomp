@@ -127,3 +127,13 @@ Renamed `func_` -> `Obj86B60__BroadcastToSlots`. **Tier B**: Forwards `a1` throu
 ## Track 4 (2026-09-25, round 84, alpha)
 
 Renamed from Obj86B60__BroadcastToSlots (tools/rename.py): the class prefix. Occupant of its gTaskCoreMethods slot, named for it in TASKCORE_SLOTS (`classtable.py gTaskCoreMethods`). The class (id 0x130, table gTaskCoreMethods) is unified as `TaskCore` in `include/TaskCore.h`; `self` is `TaskCore *` (it was the `Obj86B60` or `StreamTaskObj` view). Any source block above is the pre-unification spelling; the live body takes the unified types and slot names, byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).
+
+## asm sites
+
+Round 89 (runner delta, track 5 `asm-sites`): the bare `__asm__("")` after
+`i++` at the bottom of the loop is **justified** and now commented at the site.
+Measured by deleting it alone: the image went red (233504 bytes: the function
+came out one word shorter and everything after drifted), `funcdiff` 39/56, and
+asm-differ shows `addiu s1,s1,1` (`i++`) moved from before
+`lw v0,0x50(s0)` (the `self->slotCount` reload for the loop test) into that
+load's delay slot, replacing the `nop` retail keeps there. Instruction order.
