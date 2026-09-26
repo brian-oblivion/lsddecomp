@@ -8,8 +8,6 @@ typedef struct Class866E8Methods Class866E8Methods;
 typedef struct UnkListObj_3ac78 UnkListObj_3ac78;
 typedef struct UnkChildMethods_3ac78 UnkChildMethods_3ac78;
 typedef struct UnkChildObj_3ac78 UnkChildObj_3ac78;
-typedef struct UnkSlotChildMethods_3ac78 UnkSlotChildMethods_3ac78;
-typedef struct UnkSlotChildObj_3ac78 UnkSlotChildObj_3ac78;
 typedef struct UnkSlotEntry_3ac78 UnkSlotEntry_3ac78;
 typedef struct GridRect_3ac78 GridRect_3ac78;
 typedef struct GridRectList_3ac78 GridRectList_3ac78;
@@ -20,17 +18,16 @@ typedef struct GenericObject GenericObject;
 
 /*
  * One entry of Class866E8::elems[7] (Class866E8__ResetAllElements). 0x1C bytes; only the
- * three fields that function touches are typed. Its own two pointer
- * members' full types (UnkSlotChildObj_3ac78, Class6D940) are
- * defined further down -- fine, since a pointer only needs the forward
- * `typedef struct X X;` above, not the full body. This struct itself has
+ * three fields that function touches are typed. Its `target` and `list`
+ * members name their classes by tag (include/Class81940.h,
+ * include/Class6D940.h): a pointer needs no full body. This struct itself has
  * to come before Class866E8 below because Class866E8::elems is an ARRAY
  * member, which (unlike a pointer) needs a COMPLETE type.
  */
 struct UnkSlotEntry_3ac78 {
     u16 flag;                        /* zeroed at the top of each loop pass (Class866E8__ResetAllElements) */
-    u16 key;                         /* Class866E8__Class866E8 (ctor): set to the loop index (0..6), and copied on into target->key. class_3bb8c's independent view (Elem::unk2) has Class866E8__BuildRateEntries copy a caller-supplied key byte into the same field. */
-    UnkSlotChildObj_3ac78 *target;
+    u16 key;                         /* Class866E8__Class866E8 (ctor): set to the loop index (0..6), and copied on into target->ownerKey. class_3bb8c's independent view (Elem::unk2) has Class866E8__BuildRateEntries copy a caller-supplied key byte into the same field. */
+    struct Class81940 *target;       /* New_Class81940(); include/Class81940.h */
     struct Class6D940 *list;         /* New_Class6D940(0); include/Class6D940.h */
     GenericObject *cellParent;             /* Class866E8__Finalize: refreshed (discarded) through ->methods->release when non-NULL */
     /* RETYPED from `GenericObject **` (Class866E8__Finalize's earlier,
@@ -364,34 +361,6 @@ struct UnkChildMethods_3ac78 {
 
 struct UnkChildObj_3ac78 {
     UnkChildMethods_3ac78 *methods;
-};
-
-/*
- * Opaque "child" object referenced by each Class866E8::elems[] slot entry
- * (Class866E8__ResetAllElements). Class unknown; only the two dispatched slots are typed.
- * A DIFFERENT class from UnkChildObj_3ac78 above (different offsets), kept
- * as its own type rather than reusing that one.
- */
-struct UnkSlotChildMethods_3ac78 {
-    u8 pad0[0x4];
-    void *(*release)(UnkSlotChildObj_3ac78 *self);  /* Class866E8__Finalize: same shared BasicClass base slot as GenericMethodsHeader::release */
-    u8 pad8[0x74 - 0x8];
-    void (*slot74)(UnkSlotChildObj_3ac78 *self);
-    u8 pad78[0x84 - 0x78];
-    void (*slot84)(UnkSlotChildObj_3ac78 *self);
-    void (*slot88)(UnkSlotChildObj_3ac78 *self, s32 arg1); /* +0x088, Class866E8__Class866E8 (ctor): called with self->elems[i].target dispatched right after the object is freshly returned by New_Class81940, arg1 = Class866E8__Class866E8's own arg2 forwarded */
-};
-
-struct UnkSlotChildObj_3ac78 {
-    UnkSlotChildMethods_3ac78 *methods;
-    u8 pad4[0x10 - 0x4];
-    s32 unk10;    /* Class866E8__Class866E8 (ctor): tested nonzero (sltu), the boolean result stored into unk20 */
-    u8 pad14[0x20 - 0x14];
-    u16 unk20;    /* Class866E8__Class866E8 (ctor): set to (unk10 != 0) */
-    u8 pad22[0x2C - 0x22];
-    s16 unk2C;    /* Class866E8__DispatchToRectCells: gates the whole per-history-entry grid walk (nonzero test) */
-    u8 pad2E[0x32 - 0x2E];
-    u16 key;      /* Class866E8__Class866E8 (ctor): set to the outer loop index (0..6) */
 };
 
 #endif

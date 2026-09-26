@@ -36,6 +36,7 @@
 #include "Class86668.h"
 #include "DrawSystem.h"
 #include "Class6D940.h"
+#include "Class81940.h"
 
 /* Class86668::sound is BasicClass * (it may be the ctor's own argument); when
  * it is a New_VabStreamObj object, +0x080 is VabStreamObj__PlayTone. */
@@ -70,7 +71,6 @@ Class866E8 *New_Class866E8(s32 arg1, s32 arg2)
  * Class866E8__Class866E8's own helpers -- all still-uncarved elsewhere, typed
  * purely from this call site's own register usage.
  */
-extern UnkSlotChildObj_3ac78 *New_Class81940(void);
 extern GenericObject *New_Class86AA0(void);
 extern void BMemPMgrFree(void *arg1);
 extern Vec3_3ac78 gDefaultOrigin;
@@ -106,9 +106,9 @@ void Class866E8__Class866E8(Class866E8 *self, Vec3_3ac78 *arg1, s32 arg2)
         entry = &self->elems[i];
 
         entry->target = New_Class81940();
-        entry->target->unk20 = (entry->target->unk10 != 0);
-        entry->target->key = i;
-        entry->target->methods->slot88(entry->target, arg2);
+        entry->target->freeGuard = (entry->target->buffer != NULL);
+        entry->target->ownerKey = i;
+        entry->target->methods->setAutoLoadData(entry->target, arg2);
 
         entry->heldObj = NULL;
         entry->unk18 = 0;
@@ -275,7 +275,7 @@ void Class866E8__ResetAllElements(Class866E8 *self)
 
     for (i = 0; i < 7; i++) {
         entry = &self->elems[i];
-        entry->target->methods->slot74(entry->target);
+        entry->target->methods->cancelRequests(entry->target);
         entry->flag = 0;
         self->methods->slot108(self, entry);
         list = entry->list;
@@ -283,7 +283,7 @@ void Class866E8__ResetAllElements(Class866E8 *self)
             list->linkResource = list->linkResource->methods->release(list->linkResource);
         }
         self->methods->onElementEvent(self, 6, entry, i);
-        entry->target->methods->slot84(entry->target);
+        entry->target->methods->releaseDataBlock(entry->target);
     }
 
     self->unk1B8 = 0;
@@ -460,7 +460,7 @@ void Class866E8__DispatchToRectCells(Class866E8 *self, UnkListObj_3ac78 *sender,
     entry = self->rects.e;
     for (i = 0; i < self->rectCount; entry++, i++) {
         slot = &self->elems[entry->elemIdx];
-        if (slot->target->unk2C != 0) {
+        if (slot->target->headerReady != 0) {
             cell = (slot->cells + entry->col) + entry->row * 20;
             for (row = 0; row < entry->height; row++) {
                 for (col = 0; col < entry->width; cell++, col++) {
