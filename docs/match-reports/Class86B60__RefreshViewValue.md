@@ -47,3 +47,7 @@ Renamed `func_8004DABC` -> `Class86B60__RefreshViewValue`. **Tier B**: Calls the
 ## Track 4 (2026-09-25, round 84, alpha)
 
 Its up-calls to TaskCore (include/TaskCore.h, track 4 round 84) now go through `Get_vtable_TaskCore()` with `self` upcast to `TaskCore *` and TaskCore's slot names; byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).
+
+## Track 4 (2026-09-26, round 88, bravo)
+
+Class86B60 is unified in include/Class86B60.h (TASKCORE_SLOTS/TASKCORE_FIELDS plus its own). `unk60->unk14` is TaskCore's `slotCounts[5]` (s32 *, +0x060); the Class86B60Unk60Obj_3bb8c_d view is gone. Byte-identical (whole image green, 0 new warnings, nonmatching green).

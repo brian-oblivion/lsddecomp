@@ -86,3 +86,7 @@ with no `dlabel` of its own) may not even be nameable.
 ## Naming (round 77, naming runner delta)
 
 Renamed `func_8004E1C4` -> `Class86B60__UpdateMemcardSaveStatus`. **Tier B, lower confidence**: Calls `slot128` then forwards `self->unkBC`/`unkC0` (no icon handle, no literal flags) through `unkAC`'s `slot74` -- the simpler sibling of `Class86B60__UpdateMemcardSaveWithIcon` and the dispatch target for `Class86B60__Tick`'s case-3. Purpose beyond "the icon-less variant of the two unkAC dispatch calls" is not established.
+
+## Track 4 (2026-09-26, round 88, bravo)
+
+Class86B60 is unified in include/Class86B60.h (TASKCORE_SLOTS/TASKCORE_FIELDS plus its own). slot128 is this class's beginMemcardSave; unkBC/unkC0 are saveBlock/saveBlockSize, saveBlock cast to s32 for the TaskObjF view's s32 parameter (no code). Byte-identical (whole image green, 0 new warnings, nonmatching green).

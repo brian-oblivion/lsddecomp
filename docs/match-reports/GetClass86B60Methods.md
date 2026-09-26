@@ -28,3 +28,7 @@ First attempt, byte-exact.
 ## Naming (round 77, naming runner delta)
 
 Renamed `func_8004E2D0` -> `GetClass86B60Methods`. **Tier A**: Pure getter, returns `&gClass86B60Methods` only. Matches the established `Get<Class>Methods` convention already used in this same unit (`GetTaskObjFMethods`) and elsewhere (`GetClass6B5CCMethods`) for the identical no-argument vtable-getter shape.
+
+## Track 4 (2026-09-26, round 88, bravo)
+
+Class86B60 is unified in include/Class86B60.h (TASKCORE_SLOTS/TASKCORE_FIELDS plus its own). Its extern is in include/Class86B60.h; the class_3bb8c.h one is gone. Byte-identical (whole image green, 0 new warnings, nonmatching green).

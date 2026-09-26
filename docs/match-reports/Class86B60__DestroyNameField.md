@@ -39,3 +39,7 @@ Renamed `func_8004DC08` -> `Class86B60__DestroyNameField`. **Tier B**: Unconditi
 ## Track 4 (2026-09-25, round 84, alpha)
 
 Its up-calls to TaskCore (include/TaskCore.h, track 4 round 84) now go through `Get_vtable_TaskCore()` with `self` upcast to `TaskCore *` and TaskCore's slot names; byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).
+
+## Track 4 (2026-09-26, round 88, bravo)
+
+Class86B60 is unified in include/Class86B60.h (TASKCORE_SLOTS/TASKCORE_FIELDS plus its own). The releaseTarget override (+0x0DC). `nameField` is a TextRow; its release is BasicClass's. Byte-identical (whole image green, 0 new warnings, nonmatching green).

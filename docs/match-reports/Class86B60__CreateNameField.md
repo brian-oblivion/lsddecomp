@@ -129,3 +129,7 @@ matters at runtime -- some other, likely-uncarved code reassigns it first.
 ## Naming (round 77, naming runner delta)
 
 Renamed `func_8004DB18` -> `Class86B60__CreateNameField`. **Tier B**: SJIS-decodes `D_8008AA18` (a writable name-text buffer, per its own header comment) into a pool buffer and constructs `self->nameField` through `New_TextRow`, tagging it with three literal flag bytes. Named for what it builds (a text-field sub-object); the field's role in the larger UI is not established.
+
+## Track 4 (2026-09-26, round 88, bravo)
+
+Class86B60 is unified in include/Class86B60.h (TASKCORE_SLOTS/TASKCORE_FIELDS plus its own). The setTarget override (+0x0D8). Its argument is the TaskCoreTarget the ctor passes (&D_80086D44); the one field read, +0x004, is `handle`, New_TextRow's texture. Arg1DB18_3bb8c_d is gone. `nameField` is a `struct TextRow *` now: unkAB/unkAC/unkAA are visibleCount/firstVisible/gapIndex; the New_TextRow cast is gone. Byte-identical (whole image green, 0 new warnings, nonmatching green).

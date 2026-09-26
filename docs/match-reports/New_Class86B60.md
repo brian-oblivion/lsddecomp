@@ -60,3 +60,7 @@ None beyond what's already documented for this unit's `New_X` idiom.
 own return/param naming and is untouched by this rename (function names
 are unique symbols, tree-wide by construction, so that call site now reads
 `New_Class86B60` too).
+
+## Track 4 (2026-09-26, round 88, bravo)
+
+Class86B60 is unified in include/Class86B60.h (TASKCORE_SLOTS/TASKCORE_FIELDS plus its own). Its parameter is now `struct DreamSys *dreamSys` (the ctor's; Class6D3C8__PollGraphRoomStatus passes self->dreamSys). code_1677c's local `PollTask *` extern is gone; it casts to PollTaskCtor as for New_GraphRoom. Byte-identical (whole image green, 0 new warnings, nonmatching green).
