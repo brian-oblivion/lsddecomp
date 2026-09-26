@@ -9,7 +9,7 @@ drift. Fresh ground (carved revision 18, no prior report).
 
 ## What it does
 
-When the buffer is present (or flags bit 0x200 is set): the buffer is a count followed by that many offsets. Store the count at +0x2C, allocate a count-word array at +0x30, and for each offset create a TimImage with func_8003B39C(NULL) (New_TimImage: no file), point its buffer at buffer+offset (size 0), ask it for its GsIMAGE (its +0x09C, TimImage__GetTimInfo) and set its +0x4C to ((cy - 0x1E0) >> gTimClutRowShift) * 16 + self->+0x34 (a CLUT slot address from the image's CLUT row). Then +0x38 = 1 and the active driver's setFlag.
+When the buffer is present (or flags bit 0x200 is set): the buffer is a count followed by that many offsets. Store the count at +0x2C, allocate a count-word array at +0x30, and for each offset create a TimImage with New_TimImage(NULL) (no file), point its buffer at buffer+offset (size 0), ask it for its GsIMAGE (its +0x09C, TimImage__GetTimInfo) and set its +0x4C to ((cy - 0x1E0) >> gTimClutRowShift) * 16 + self->+0x34 (a CLUT slot address from the image's CLUT row). Then +0x38 = 1 and the active driver's setFlag.
 
 Table slot (`tools/classtable.py`): D_8006F1C4 +0x064 (setFlag override).
 
@@ -22,7 +22,7 @@ top of / earlier in `src/code_33808.c`.
 
 ```c
 /* D_8006F1C4 +0x064: when the buffer is there (or flag 0x200 is set),
- * build one TimImage (func_8003B39C(NULL)) per image of the buffer -- a
+ * build one TimImage (New_TimImage(NULL)) per image of the buffer -- a
  * count, then that many offsets -- into an array at +0x30 (+0x2C entries),
  * each adopting its image in place (size 0), and set each one's +0x4C from
  * the CLUT row its GsGetTimInfo reports (from y 0x1E0, >> gTimClutRowShift, 16
@@ -64,7 +64,7 @@ typedef struct Obj43CB8 {
     /* +0x038 */ s32 ready;
 } Obj43CB8;
 
-extern Tim43CB8 *func_8003B39C(char *name);
+extern Tim43CB8 *New_TimImage(char *name);
 extern s16 gTimClutRowShift;
 
 void TimArraySrc__BuildImages(Obj43CB8 *self) {
@@ -80,7 +80,7 @@ void TimArraySrc__BuildImages(Obj43CB8 *self) {
             objs = self->images;
             offs = (s32 *)self->buffer + 1;
             for (i = 0; i < self->count; i++) {
-                *objs = func_8003B39C(NULL);
+                *objs = New_TimImage(NULL);
                 (*objs)->buffer = (u8 *)self->buffer + *offs;
                 (*objs)->bufferSize = 0;
                 (*objs)->methods->getTimInfo(*objs, &info);
@@ -97,8 +97,8 @@ void TimArraySrc__BuildImages(Obj43CB8 *self) {
 
 ## Notes
 
-First build. The GsIMAGE local (0x1C bytes) is what gives retail's 0x50 frame. Local views: `Image43CB8` (LIBGS.H GsIMAGE, same layout as code_2bb9c.c's local GsIMAGE), `Tim43CB8`/`TimMethods43CB8` (TimImage as this function sees it: Class6D430 plus +0x09C getTimInfo and +0x04C), `Obj43CB8` (D_8006F1C4's +0x2C..+0x38). func_8003B39C is prototyped locally returning the local view, as class_3bb8c_d.c does.
+First build. The GsIMAGE local (0x1C bytes) is what gives retail's 0x50 frame. Local views: `Image43CB8` (LIBGS.H GsIMAGE, same layout as code_2bb9c.c's local GsIMAGE), `Tim43CB8`/`TimMethods43CB8` (TimImage as this function sees it: Class6D430 plus +0x09C getTimInfo and +0x04C), `Obj43CB8` (D_8006F1C4's +0x2C..+0x38). New_TimImage is prototyped locally returning the local view, as class_3bb8c_d.c does.
 
 ## Naming
 
-- **TimArraySrc__BuildImages**, tier A. Slot +0x064: builds one TimImage (func_8003B39C(NULL)) per image record in the buffer, each adopting its sub-buffer and computing its CLUT base from GsGetTimInfo-style fields.
+- **TimArraySrc__BuildImages**, tier A. Slot +0x064: builds one TimImage (New_TimImage(NULL)) per image record in the buffer, each adopting its sub-buffer and computing its CLUT base from GsGetTimInfo-style fields.

@@ -17,7 +17,7 @@
  *     (New_TmdModel); named from external call sites (class_3bb8c.c,
  *     code_55dd4.h) that already declare it `LinkResource *`.
  *   - TimArraySrc  (D_8006F1C4): an array of TimImage objects
- *     (code_2bb9c.c's func_8003B39C).
+ *     (code_2bb9c.c's New_TimImage).
  *   - Tod / TodSet (D_8006F240 / D_8006F590, TodSet a Tod subclass): one
  *     TOD's packet stream (ScanTodPackets/DecodeTodPacketWord) and an array
  *     of them; named from include/code_55dd4.h's own "TOD set" (Unk30Obj).
@@ -538,7 +538,7 @@ void TimArraySrc__Finalize(DataSrc33808 *self) {
     GetActiveDataSourceMethods()->finalize((Class6D430 *)self);
 }
 /* D_8006F1C4 +0x064: when the buffer is there (or flag 0x200 is set),
- * build one TimImage (func_8003B39C(NULL)) per image of the buffer -- a
+ * build one TimImage (New_TimImage(NULL)) per image of the buffer -- a
  * count, then that many offsets -- into an array at +0x30 (+0x2C entries),
  * each adopting its image in place (size 0), and set each one's +0x4C from
  * the CLUT row its GsGetTimInfo reports (from y 0x1E0, >> gTimClutRowShift, 16
@@ -580,7 +580,7 @@ typedef struct Obj43CB8 {
     /* +0x038 */ s32 ready;
 } Obj43CB8;
 
-extern Tim43CB8 *func_8003B39C(char *name);
+extern Tim43CB8 *New_TimImage(char *name);
 extern s16 gTimClutRowShift;
 
 void TimArraySrc__BuildImages(Obj43CB8 *self) {
@@ -596,7 +596,7 @@ void TimArraySrc__BuildImages(Obj43CB8 *self) {
             objs = self->images;
             offs = (s32 *)self->buffer + 1;
             for (i = 0; i < self->count; i++) {
-                *objs = func_8003B39C(NULL);
+                *objs = New_TimImage(NULL);
                 (*objs)->buffer = (u8 *)self->buffer + *offs;
                 (*objs)->bufferSize = 0;
                 (*objs)->methods->getTimInfo(*objs, &info);

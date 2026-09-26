@@ -133,7 +133,7 @@ typedef struct Class86F88_3bb8c_j Class86F88_3bb8c_j;
 
 /*
  * Class86F88_3bb8c_j's own opaque "handle" object (self->unk50's pointee, built by
- * Class86F88__LoadResources via BuildFileName/func_8003B39C/New_ScreenSprite: a
+ * Class86F88__LoadResources via BuildFileName/New_TimImage/New_ScreenSprite: a
  * "CARD\\<name>.TIM" path is built and loaded, as in class_3bb8c_i's
  * TextEntry__LoadCardResources). Only the three slots this unit's own
  * functions dispatch through are named.
@@ -377,7 +377,7 @@ void Class86F88__ResetCounters(Class86F88_3bb8c_j *self)
 }
 
 extern char *BuildFileName(char *dest, const char *arg1, const char *arg2, const char *arg3);
-extern Class86F88Handle_3bb8c_j *func_8003B39C(char *path);
+extern Class86F88Handle_3bb8c_j *New_TimImage(char *path);
 extern const char D_8008AB14[]; /* "SELECT" */
 extern const char D_8008AB1C[]; /* "CARD\\" */
 extern const char D_8008AB24[]; /* ".TIM" */
@@ -409,13 +409,13 @@ void Class86F88__LoadResources(Class86F88_3bb8c_j *self, void *arg1)
     dir = D_8008AB1C;
     ext = D_8008AB24;
 
-    handle1 = func_8003B39C(BuildFileName(path, D_8008AB14, dir, ext));
+    handle1 = New_TimImage(BuildFileName(path, D_8008AB14, dir, ext));
     handle1->methods->slot78(handle1);
     self->unk50 = (Class86F88Handle_3bb8c_j *)New_ScreenSprite(handle1, (SpriteRect *)&D_80087028, 0);
     handle1->methods->slot4(handle1);
     self->unk50->methods->slot4C(self->unk50, arg1, &D_8008AAF8);
 
-    handle2 = func_8003B39C(BuildFileName(path, D_800116E4, dir, ext));
+    handle2 = New_TimImage(BuildFileName(path, D_800116E4, dir, ext));
     handle2->methods->slot78(handle2);
     self->methods->slot8C(self, arg1, handle2, self->unk20, self->unk24, self->unk28);
     handle2->methods->slot4(handle2);

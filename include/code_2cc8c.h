@@ -127,7 +127,7 @@ struct Unk78Obj {
 };
 
 /* TaskCore::subHandle's pointee ("sub-resource handle"). Only TaskCore__SetSubHandle touches
- * it, loaded via `func_8003B39C(path)` (already matched, `class_39e08.c`,
+ * it, loaded via `New_TimImage(path)` (already matched, `class_39e08.c`,
  * where it returns the unit's own local view `SubObjG *` -- this unit keeps
  * its own local view of the same table per the project's established
  * multiple-independent-local-views convention). slot4's return value is
@@ -148,7 +148,7 @@ struct Unk74Obj {
     Unk74ObjMethods *methods;        /* +0x000 */
 };
 
-extern Unk74Obj *func_8003B39C(const char *path); /* already matched in
+extern Unk74Obj *New_TimImage(const char *path); /* already matched in
                                                        class_39e08.c; local
                                                        view retyped to this
                                                        unit's own Unk74Obj */

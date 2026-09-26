@@ -11,7 +11,7 @@ loads it through the `ChildObj86ED0` short-lived-handle idiom, and stashes
 the derived object into `self->unk70`.
 
 ```c
-extern ChildObj86ED0 *func_8003B39C(char *path);
+extern ChildObj86ED0 *New_TimImage(char *path);
 extern ChildObj86ED0 *New_ScreenSprite(ChildObj86ED0 *arg0, void *arg1, s32 arg2);
 
 extern char *gCardIconNames[];
@@ -45,7 +45,7 @@ void TaskObjF__LoadCardIcon(Class86E00_3bb8c_g *self, s32 arg1)
     strcat(buf, name);
     strcat(buf, gCardPathSuffix);
 
-    handle = func_8003B39C(buf);
+    handle = New_TimImage(buf);
     handle->methods->slot78(handle);
     newVal = New_ScreenSprite(handle, (void *)&D_80086EC4, 0);
     self->unk70 = newVal;
@@ -81,7 +81,7 @@ reaches for the `arg1` values this function is actually invoked with --
 declared as a plain `extern char *gCardIconNames[];`, which is enough to index
 without needing the full contents.
 
-The `func_8003B39C` / `slot78` / `New_ScreenSprite` / `release` sequence on
+The `New_TimImage` / `slot78` / `New_ScreenSprite` / `release` sequence on
 the temp `handle` is the exact idiom already established by
 `TextEntry__LoadCardResources` (`docs/match-reports/TextEntry__LoadCardResources.md`, a DIFFERENT unit,
 `class_3bb8c_i`) using the SAME shared `ChildObj86ED0`/`ChildMethods86ED0`
@@ -107,10 +107,10 @@ dereferenced in this unit") and `arg2` as an address-only opaque block
 First working version (semantically identical, `path` used directly with
 no `buf`/`name` locals, and `self->unk70 = New_ScreenSprite(...)` assigned
 straight into the struct field with no intermediate local) scored 62/71:
-retail keeps the temp-buffer address AND the `func_8003B39C` handle in the
+retail keeps the temp-buffer address AND the `New_TimImage` handle in the
 SAME callee-saved register across all four calls that need it (computed
 `addiu $s0,$sp,0x10` once, reused via `move a0,s0` for every `strcat` and
-the `func_8003B39C` call, then reassigned `s0=v0` to hold the handle for
+the `New_TimImage` call, then reassigned `s0=v0` to hold the handle for
 the rest of the function) -- passing `path` as a bare array argument at
 each call site instead let the compiler recompute `addiu $a0,$sp,0x10`
 fresh every time rather than keeping one persistent register. Introducing

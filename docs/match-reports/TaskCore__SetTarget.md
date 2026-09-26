@@ -43,7 +43,7 @@ void TaskCore__SetTarget(Obj86B60 *self, Unk4CObj *a1)
     self->unk50 = count;
 
     if (a1->unk0 != NULL) {
-        handle = func_8003B39C(a1->unk0);
+        handle = New_TimImage(a1->unk0);
         handle->methods->slot78(handle);
         handle->methods->slot5C(handle);
     } else {
@@ -82,13 +82,13 @@ offset 0. That statement is now WRONG in general and has been corrected in
 `include/code_2cc8c.h`'s `Unk4CObj` comment; it was true only of the
 evidence available at the time.
 
-- `+0x000 const char *unk0` — a path, passed to `func_8003B39C(unk0)` when
+- `+0x000 const char *unk0` — a path, passed to `New_TimImage(unk0)` when
   non-NULL to build `unk4`. Truthy-only gate also independently confirmed
   by `TaskCore__ReleaseTarget` (round 12, same unit).
 - `+0x004 Unk74Obj *unk4` — either the freshly-constructed handle (when
   `unk0` is set) or a pre-existing handle passed straight through
   (`a1->unk4`), written back at the end either way. Matches the EXACT
-  `func_8003B39C(path)` + `slot78` + `slot5C` idiom `TaskCore__SetSubHandle`
+  `New_TimImage(path)` + `slot78` + `slot5C` idiom `TaskCore__SetSubHandle`
   already uses for `self->unk74` — same `Unk74Obj` type, different field.
 - `+0x01C char **unk1C` — a null-terminated string array, DISTINCT from
   the already-known `+0x018 void **unk18` (adjacent field, same shape).

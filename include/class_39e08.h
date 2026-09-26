@@ -397,7 +397,7 @@ extern void InitDreamAux(void);
  * Stored into `Obj865C8::unk44` here, which this function's own body then
  * immediately dispatches through `SubObjGMethods::slot78`/`slot5C` --
  * consistent with the existing `SubObjG` family. */
-extern SubObjG *func_8003B39C(const char *path);
+extern SubObjG *New_TimImage(const char *path);
 
 /* Filenames right next to each other in the same rodata blob
  * (asm/data/1A90.rodata.s): "ETC\\ETC.TIM" and "ETC\\DREAMER.TMD". */

@@ -1137,7 +1137,7 @@ struct Class86B60 {
      * vtable, so it is retyped a pointer here (same size, no layout
      * change). */
     GenericReleaseObj_3bb8c_d *iconHandle; /* +0x0A8, Class86B60__Dtor: released iff unkAC != NULL.
-                                        RENAMED from unkA8 -- the `func_8003B39C(D_800114F8)`
+                                        RENAMED from unkA8 -- the `New_TimImage(D_800114F8)`
                                         return value (D_800114F8 = "CARD\FILEICN1.TIM"), see
                                         Class86B60__BeginMemcardSave. */
     /* +0x0AC, Class86B60__Class86B60: zeroed; Class86B60__Dtor: guards both releases.
@@ -1245,7 +1245,7 @@ extern s32 D_800114DC;
  * address is taken here. */
 extern s32 D_800114E8;
 
-/* Class86B60__BeginMemcardSave's own path string, passed to func_8003B39C -- a real
+/* Class86B60__BeginMemcardSave's own path string, passed to New_TimImage -- a real
  * dlabel (`asm/data/1C34.rodata.s`: "CARD\FILEICN1.TIM"), so this is the
  * ONLY correct spelling (CLAUDE.md: never re-write a string splat has
  * already emitted as a symbol). */
@@ -2308,7 +2308,7 @@ extern void StyleTeardown(void);
  */
 /* TextEntry's `textRow` (a TextRow, include/TextRow.h) and the two TIM handles
  * TextEntry__LoadCardResources and TaskObjF__LoadCardIcon load through
- * func_8003B39C: a view of the slots those calls use, not one class. */
+ * New_TimImage: a view of the slots those calls use, not one class. */
 typedef struct ChildObj86ED0 ChildObj86ED0;
 typedef struct ChildMethods86ED0 ChildMethods86ED0;
 struct ChildMethods86ED0 {

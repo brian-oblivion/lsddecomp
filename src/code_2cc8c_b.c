@@ -60,7 +60,7 @@ void TaskCore__SetSubHandle(TaskCore *self, const char *path, BasicClass *handle
         if (self->subHandlePath != NULL) {
             self->subHandle->methods->release(self->subHandle);
         }
-        self->subHandle = (BasicClass *)func_8003B39C(path);
+        self->subHandle = (BasicClass *)New_TimImage(path);
         ((Unk74Obj *)self->subHandle)->methods->slot78((Unk74Obj *)self->subHandle);
         ((Unk74Obj *)self->subHandle)->methods->slot5C((Unk74Obj *)self->subHandle);
     } else {
@@ -97,7 +97,7 @@ void TaskCore__SetTarget(TaskCore *self, TaskCoreTarget *a1)
     self->slotCount = count;
 
     if (a1->path != NULL) {
-        handle = func_8003B39C(a1->path);
+        handle = New_TimImage(a1->path);
         handle->methods->slot78(handle);
         handle->methods->slot5C(handle);
     } else {

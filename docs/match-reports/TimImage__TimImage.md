@@ -34,13 +34,13 @@ the local-view convention `code_179d8_d.c` / `_e.c` already use.
 ## Naming
 
 - **Class `TimImage`** (was `D_8006E558Obj`/`D_8006E558`), tier A. Every
-  project-wide caller of `func_8003B39C` (this class's `New_` helper) builds
+  project-wide caller of `New_TimImage` (this class's `New_` helper) builds
   a `"...\ .TIM"` path and passes it in; `TimImage__GetTimInfo` calls Sony's
   `GsGetTimInfo` on the loaded buffer; `TimImage__Upload` reads the result
   and uploads the pixel/CLUT blocks. The class is a TIM-image loader/upload
   handle, not merely "a Class6D430 subclass".
 - **`TimImage__TimImage`**, tier A (constructor: `Class__Class` convention).
-  Slot +0x008, dispatched by `func_8003B39C`/the table getter as `ctor`.
+  Slot +0x008, dispatched by `New_TimImage`/the table getter as `ctor`.
 - **`gTimImageMethods`** (was `D_8006E558`), tier A: `g<Class>Methods`
   convention for the class's static method table, matching
   `gVabDriverMethods`/`gClass86B60Methods`/etc. project-wide.

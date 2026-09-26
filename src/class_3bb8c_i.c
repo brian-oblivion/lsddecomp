@@ -163,12 +163,12 @@ void TextEntry__SetText(TextEntry *self, char *arg1, s32 mode)
 
 /*
  * TextEntry__LoadCardResources's own helpers/data -- builds two "CARD\\<name>.TIM"
- * paths (BuildFileName, code_171e0.c), loads each through func_8003B39C, and
+ * paths (BuildFileName, code_171e0.c), loads each through New_TimImage, and
  * makes panelSprite (New_ScreenSprite), textRow (New_TextRow) and
  * cursorSprite (New_CharSprite) from the loaded handles.
  */
 extern char *BuildFileName(char *dest, char *arg1, char *arg2, char *arg3);
-extern ChildObj86ED0 *func_8003B39C(char *path);
+extern ChildObj86ED0 *New_TimImage(char *path);
 
 extern const char sStrComInput[]; /* "COMINPUT" */
 extern const char sStrFontIcon[]; /* "FONTICON" */
@@ -198,13 +198,13 @@ void TextEntry__LoadCardResources(TextEntry *self, void *arg1)
     dir = sCardPathPrefix;
     ext = sTimExt;
 
-    handle1 = func_8003B39C(BuildFileName(path, sStrComInput, dir, ext));
+    handle1 = New_TimImage(BuildFileName(path, sStrComInput, dir, ext));
     handle1->methods->slot78(handle1);
     self->panelSprite = New_ScreenSprite(handle1, (SpriteRect *)&D_80086F7C, 0);
     handle1->methods->release(handle1);
     self->panelSprite->methods->attachToParent(self->panelSprite, (Class6B5CC *)arg1, (Vec3_d294 *)&D_8008AACC);
 
-    handle2 = func_8003B39C(BuildFileName(path, sStrFontIcon, dir, ext));
+    handle2 = New_TimImage(BuildFileName(path, sStrFontIcon, dir, ext));
     handle2->methods->slot78(handle2);
     self->textRow = (ChildObj86ED0 *)New_TextRow(handle2, self->textLen, self->editBuf);
     self->cursorSprite = New_CharSprite(handle2, 0x5F);

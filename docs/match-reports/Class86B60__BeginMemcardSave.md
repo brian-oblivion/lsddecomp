@@ -9,12 +9,12 @@ and no derivation; this round wrote and matched the function from scratch.
 ## Body
 
 ```c
-extern GenericReleaseObj_3bb8c_d *func_8003B39C(const char *path);
+extern GenericReleaseObj_3bb8c_d *New_TimImage(const char *path);
 
 void Class86B60__BeginMemcardSave(Class86B60 *self)
 {
     if (self->unkAC == NULL) {
-        self->iconHandle = func_8003B39C(D_800114F8);
+        self->iconHandle = New_TimImage(D_800114F8);
         self->unkAC = New_TaskObjF((void *)1, NULL);
     }
     self->unkAC->methods->slot6C(self->unkAC, D_8008A9D0, &D_80086D6C,
@@ -35,7 +35,7 @@ SLPS_015.56`.
 - Lazy-init guard: `if (self->unkAC == NULL) { ... }`, the mirror image of
   `Class86B60__Dtor`'s destructor guard on the same two fields
   (`iconHandle`/`unkAC`).
-- `func_8003B39C(D_800114F8)` -- `func_8003B39C` is already matched
+- `New_TimImage(D_800114F8)` -- `New_TimImage` is already matched
   project-wide under many independent local arities/return types (see
   e.g. `src/class_3bb8c_g.c`, `src/class_3bb8c_i.c`); this unit's own view
   returns exactly what it is stored into, `GenericReleaseObj_3bb8c_d *`.
@@ -78,7 +78,7 @@ SLPS_015.56`.
 - New externs: `D_800114F8` (`const char[]`, a real string dlabel),
   `D_8008A9D0` (`void *`, VALUE-of `%gp_rel`), `D_80086D6C` (`s32`,
   address-of placeholder for a real 16-entry pointer table).
-- `src/class_3bb8c_d.c`: local extern for `func_8003B39C` (own arity/
+- `src/class_3bb8c_d.c`: local extern for `New_TimImage` (own arity/
   return type, per the project's established independent-views
   convention for this widely-shared external symbol).
 
@@ -96,4 +96,4 @@ blocker itself was the only thing stopping them.
 
 ## Naming (round 77, naming runner delta)
 
-Renamed `func_8004DF64` -> `Class86B60__BeginMemcardSave`. **Tier B**: Lazy-inits `self->iconHandle` (`func_8003B39C(D_800114F8)`, a real dlabel "CARD\\FILEICN1.TIM") and `self->unkAC` (`New_TaskObjF`), then dispatches `unkAC`'s `slot6C` with `D_8008A9D0` (VALUE-of, holds "BISLPS-01556" -- Sony's memcard save-header game-ID convention) plus filename-related fields. Named from the game-ID string as the strongest evidence this is the start of a memory-card save operation; the exact protocol is not established.
+Renamed `func_8004DF64` -> `Class86B60__BeginMemcardSave`. **Tier B**: Lazy-inits `self->iconHandle` (`New_TimImage(D_800114F8)`, a real dlabel "CARD\\FILEICN1.TIM") and `self->unkAC` (`New_TaskObjF`), then dispatches `unkAC`'s `slot6C` with `D_8008A9D0` (VALUE-of, holds "BISLPS-01556" -- Sony's memcard save-header game-ID convention) plus filename-related fields. Named from the game-ID string as the strongest evidence this is the start of a memory-card save operation; the exact protocol is not established.

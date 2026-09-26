@@ -23,7 +23,7 @@ void Obj865C8__Obj865C8(Obj865C8 *self, Obj0C *arg1, SubObjD *arg2, s32 arg3) {
     GetClass86668Methods()->ctor((Class86668 *)self, (char *)GetSoundEffectDir(0), 0);
     self->methods = GetObj865C8Methods();
     InitDreamAux();
-    self->unk44 = func_8003B39C(D_800113EC);
+    self->unk44 = New_TimImage(D_800113EC);
     self->unk44->methods->slot78(self->unk44);
     self->unk44->methods->slot5C(self->unk44);
     req.type = 0;

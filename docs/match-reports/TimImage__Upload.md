@@ -76,7 +76,7 @@ instead.
 ## Naming
 
 - **`TimImage__Upload`** (was `func_8003B4A8`), tier A. Slot +0x078; every
-  project-wide caller of `New_TimImage`/`func_8003B39C` invokes this slot
+  project-wide caller of `New_TimImage` invokes this slot
   (`handle->methods->slot78(handle)`) immediately after construction, and
   its body describes the loaded TIM (`GsGetTimInfo`) then hands the pixel
   block, and CLUT when present, to the draw singleton's `loadImage` slot --
