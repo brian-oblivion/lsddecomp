@@ -136,3 +136,12 @@ per-frame counter in its one caller, so B.
 ## Track 4 (2026-09-26, round 88, charlie)
 
 class_3bb8c_s.c's `LinkNode` view (owner and children under one type) is gone: the owner is `StyleEffect` (include/StyleEffect.h), `modelChildren` are `Actor *`, `sprites` are `VariantSprite *`, and the local `Vec3S` is `LongVec3`. Accessor renames: `kind` is Actor's `pendingExtra` (+0x054, where the ctor stores it); `offset`/`rotation`/`scale`/`modelChildLayout`/`tableIndex`/`color`/`altColor` are `params.*`; slot `slotB8` is Actor's `setTranslation` on the owner and model children and Sprite's `setColor` on sprites; `*coord2 = 0` is `coord2->flg = 0`. Image byte-identical.
+
+## Track 6 (round 93, bravo)
+
+The `(u8 *)D_8008ACAC + 0x18` word is now `gStyleEffectViewport`'s, and it is
+Viewport's refView.vp.y (include/Viewport.h, +0x014 refView + 4): the effect
+follows the viewpoint's vertical movement since gStyleEffectBaseViewY (was
+gTrackedYSnapshot) was taken. PROPOSED for track 7: type the global
+`Viewport *` and read `->refView.vp.y`; spell the switch with
+StyleEffectKind.

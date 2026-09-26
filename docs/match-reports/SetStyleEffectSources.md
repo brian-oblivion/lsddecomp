@@ -88,3 +88,20 @@ Renamed from `BaseObjO__func_56f5c`. Prefix only: the second parameter is an Act
 `D_8008ACA4Obj *`/`void *`/`void *` in class_3bb8c_s.c. Both units now
 declare `Actor *`/`void *`/`void *`: this function stores its own `Actor *self` into the first, the two scalars go in through a `(void *)` cast. Byte-identical; no new `-Wall`
 warning.
+
+## Track 6 (round 93, bravo)
+
+`Actor__func_56f5c` -> `SetStyleEffectSources` (`python3 tools/rename.py
+Actor__func_56f5c SetStyleEffectSources`). **Tier B.** It is not an Actor
+method: its one caller, StyleBuildEffectSlots, passes the variant (unused),
+ObjM's DREAMER.TMD resource (a LinkResource, cast to Actor), ETC.TIM and the
+viewport, and it only stores them for StyleEffect's methods and prepares
+the two models the TMD's +0x080 slot (LinkResource's getModel) returns for
+gStyleEffectModelIds[0..1] (SetTargetOffset with D_8008AB94). The stored
+globals were renamed with it (one rename.py run each): D_8008ACA4 ->
+gStyleEffectTmd, D_8008ACA8 -> gStyleEffectTim, D_8008ACAC ->
+gStyleEffectViewport, D_8008AB98 -> gStyleEffectModelIds. PROPOSED (not
+applied, a prototype and body outside the header): its `Actor *self`
+parameter and the `Actor *` view of gStyleEffectTmd in class_3bb8c_o.c/_s.c
+are really `LinkResource *`, and the `setBackClip` calls through it are
+`getModel`; its prototype belongs in include/StyleEffect.h, not Actor.h.

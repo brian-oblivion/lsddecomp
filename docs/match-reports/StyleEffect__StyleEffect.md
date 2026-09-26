@@ -80,3 +80,28 @@ fail:
 ## Track 4 (2026-09-26, round 88, charlie)
 
 Retyped with the class's unification (include/StyleEffect.h): same parameters as New_StyleEffect. The two stores the old view called `unk44` and `kind` are Actor's `state` (+0x044) and `pendingExtra` (+0x054): the ctor keeps `kind` in pendingExtra, and the class overrides pendingExtra's setter slot (+0x0EC) with its update, so nothing else writes it. The old own slot `setParams` at +0x040 is SceneNode's `reset`; the call casts to StyleEffectSetParamsFn (no code). Image byte-identical.
+
+## Track 6 (round 93, bravo)
+
+The class `Class876FC` -> `StyleEffect` (`python3 tools/renametype.py
+Class876FC StyleEffect`, with its table, getter, allocator, 16 methods, the
+params block `StyleEffectParams` and the two cast types
+`StyleEffectSetParamsFn`/`StyleEffectUpdateFn`). **Tier B.** Evidence from its
+methods: every kind attaches under the parent at pos + params.offset
+(InitByKind) and every frame moves back to pos + offset plus the viewpoint's
+y change since it was built (UpdateByKind); what it carries is chosen by
+`kind` (a model, the model with two copies in a row, or five sprites). Its
+only creator is the style layer's effect-slot code (StyleFillEffectKind0..3
+into gStyleEffectSlots), whose vocabulary the name reuses. What an effect is
+in the game is not shown. The kinds became `enum StyleEffectKind` in
+include/StyleEffect.h (MODEL_ROW, MODEL, SPRITES, JITTER_SPRITES), from what
+each switch arm in class_3bb8c_s.c does; the switches still spell numbers.
+
+The header banner was rewritten as documentation (what it is, who builds
+it, lifecycle by slot); `params.rotation`/`params.scale` went from `void *`
+to `Ratio16 *` (updateRotation/updateScale take Ratio16[3]), no accessor
+changed. class_3bb8c_s.c's banner lost its history lines (unified round 88,
+named round 70, last match round 75), all already in the per-function
+reports.
+
+renametype.py rewrote the old class name inside this report's earlier prose too (known, pending an operator decision); those lines are history and were not hand-restored, so read `StyleEffect` in them as `Class876FC`.

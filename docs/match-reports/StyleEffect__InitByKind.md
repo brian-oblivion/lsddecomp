@@ -212,3 +212,15 @@ warning.
 ## Track 4 (2026-09-26, round 88, charlie)
 
 class_3bb8c_s.c's `LinkNode` view (owner and children under one type) is gone: the owner is `StyleEffect` (include/StyleEffect.h), `modelChildren` are `Actor *`, `sprites` are `VariantSprite *`, and the local `Vec3S` is `LongVec3`. Accessor renames: `kind` is Actor's `pendingExtra` (+0x054, where the ctor stores it); `offset`/`rotation`/`scale`/`modelChildLayout`/`tableIndex`/`color`/`altColor` are `params.*`; slot `slotB8` is Actor's `setTranslation` on the owner and model children and Sprite's `setColor` on sprites; `*coord2 = 0` is `coord2->flg = 0`. Image byte-identical.
+
+## Track 6 (round 93, bravo)
+
+Globals renamed with rename.py: D_8008ACA4 -> gStyleEffectTmd (the
+DREAMER.TMD LinkResource SetStyleEffectSources stores; kinds 0 and 1 take
+their model from it), D_8008AB98 -> gStyleEffectModelIds (the model index per
+kind), D_8008ACAC -> gStyleEffectViewport (ObjM's cached Viewport; the +0x018
+word read here is refView.vp.y, the viewpoint y), gTrackedYSnapshot ->
+gStyleEffectBaseViewY (that y, snapshotted at build). PROPOSED for track 7:
+read the viewpoint y as `gStyleEffectViewport->refView.vp.y` once the global
+is typed `Viewport *`, and `gStyleEffectTmd` as `LinkResource *` with
+`getModel`. renametype.py rewrote the old class name inside this report's earlier prose too (known, pending an operator decision); those lines are history and were not hand-restored, so read `StyleEffect` in them as `Class876FC`.
