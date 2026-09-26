@@ -135,12 +135,12 @@ typedef struct ChunkLoadEntry {
 
 /* The same 0xC stride based at +0x4: ApplyRateEntries' second walker
  * (strength-reduced from the parameter; its report). */
-typedef struct SetupSub866E8 {
+typedef struct ChunkLoadEntryTail {
     s16 chunkIndex; /* +0x4 in ChunkLoadEntry terms */
     u8 pad2[0x4 - 0x2];
     s32 neighbour; /* +0x8 */
     u8 pad8[0xC - 0x8];
-} SetupSub866E8;
+} ChunkLoadEntryTail;
 
 /* buildRateEntries' per-slot pair (sDefaultTargetSpecs and the
  * sFootprintResultPtrTable tables hold seven each): the neighbour key the

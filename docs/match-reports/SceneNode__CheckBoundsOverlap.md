@@ -50,7 +50,7 @@ the SAME element (giving `z` at offset 0 relative to itself, and `y` via
 same 6-byte stride each iteration. This is the exact "N walkers, differently
 based views of the same stride" shape the lever describes, confirmed a
 second time in this codebase (the lever's own worked example was
-`Class866E8__ApplyRateEntries`/`SetupSub866E8`, a different unit).
+`Class866E8__ApplyRateEntries`/`ChunkLoadEntryTail`, a different unit).
 
 **Per-iteration order is MIN.x, MIN.y, MIN.z, MAX.x, MAX.y, MAX.z —
 sequential, not interleaved per-axis.** Each of the six checks re-reads its

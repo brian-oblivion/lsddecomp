@@ -306,10 +306,10 @@ storeKey:
 void Class866E8__ApplyRateEntries(Class866E8 *self, ChunkLoadEntry *arr1, s32 count) {
     s32 i;
     ChunkSlot *e;
-    SetupSub866E8 *sp;
+    ChunkLoadEntryTail *sp;
 
     for (i = 0; i < count; i++) {
-        sp = (SetupSub866E8 *)&arr1->chunkIndex;
+        sp = (ChunkLoadEntryTail *)&arr1->chunkIndex;
         e = self->methods->findElemByUnk32(self, sp->neighbour);
         ((Class866E8OnElementEventFn)self->methods->notifyWithHull)(self, 6, e, i);
         if (arr1->file != 0) {

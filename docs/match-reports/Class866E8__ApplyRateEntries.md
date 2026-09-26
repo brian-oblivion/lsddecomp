@@ -2,7 +2,7 @@
 
 > Renamed from `func_8004BB3C` on 2026-09-24 (tools/rename.py). Address 0x8004bb3c.
 
-REVISITED, round 73: MATCHED 105/105 (walker is a strength-reduced giv of the walked parameter); names/types not relevant (existing ChunkLoadEntry/SetupSub866E8 views reused unchanged)
+REVISITED, round 73: MATCHED 105/105 (walker is a strength-reduced giv of the walked parameter); names/types not relevant (existing ChunkLoadEntry/ChunkLoadEntryTail views reused unchanged)
 
 ## Round 73 (bravo) -- revisit, MATCHED
 
@@ -104,8 +104,8 @@ allocation wrong.
 > **Split-combined-declaration lever, tried directly:** `ep`/`sp` (the two
 > differently-based walking pointers whose introduction in round 13 is
 > what got this function to 90/105 in the first place) are declared with
-> combined initializers (`ChunkLoadEntry *ep = arr1;` / `SetupSub866E8
-> *sp = (SetupSub866E8 *)((u8 *)arr1 + 4);`) -- exactly the shape the
+> combined initializers (`ChunkLoadEntry *ep = arr1;` / `ChunkLoadEntryTail
+> *sp = (ChunkLoadEntryTail *)((u8 *)arr1 + 4);`) -- exactly the shape the
 > lever targets. Split into separate declaration and assignment
 > statements, rebuilt: **90/105, IDENTICAL diff, no drift -- fully
 > inert.** Reverted (`git checkout -- src/class_3bb8c.c`; clean
@@ -200,7 +200,7 @@ allocation wrong.
 > identity, correct frame, correct length). This is round 17's exact
 > mismatch, independently reproduced with a fresh scaffold four rounds
 > later -- not a fluke of that one attempt, but a STRUCTURAL property of
-> isolating this function: the `sp = (SetupSub866E8*)((u8*)arr1+4)`
+> isolating this function: the `sp = (ChunkLoadEntryTail*)((u8*)arr1+4)`
 > computation's scheduling (and evidently now the frame size too) depends
 > on surrounding-file register pressure that a single-function compile unit
 > cannot reproduce.
@@ -326,7 +326,7 @@ allocation wrong.
 > (105/105 words present, only 15 differ, all register-identity/scheduling).
 > Comparing the scaffold's own rendered diff against the real build's
 > `asm-differ` output showed WHY: in the isolated single-function
-> compilation, the `sp = (SetupSub866E8 *)((u8 *)arr1 + 4)` computation
+> compilation, the `sp = (ChunkLoadEntryTail *)((u8 *)arr1 + 4)` computation
 > gets scheduled EARLY (an `addiu $s4,$s3,4` right in the parameter-save
 > preamble), where the REAL in-context build defers it PAST the
 > `blez`-guarded early-exit (`addiu $s3,a1,4`, computed from the raw
@@ -371,7 +371,7 @@ allocation wrong.
 > one type.** Retail seeds `$s4` at `arr1` and `$s3` at `arr1 + 4`, so the
 > two induction variables have different BASES, which is what stops GCC
 > 2.6.3's strength reduction proving them one family. The blocker the
-> original attempt hit -- "padding `SetupSub866E8` to 0xC would corrupt
+> original attempt hit -- "padding `ChunkLoadEntryTail` to 0xC would corrupt
 > `sizeof(ChunkLoadEntry)`" -- dissolves once the sub type is never
 > embedded in `ChunkLoadEntry` at all; it exists only as a local walking
 > pointer's target type, and `ChunkLoadEntry` is already 0xC so its own
@@ -379,7 +379,7 @@ allocation wrong.
 >
 > ```c
 > ChunkLoadEntry *ep = arr1;                                    /* ptr0  */
-> SetupSub866E8   *sp = (SetupSub866E8 *)((u8 *)arr1 + 4);       /* rate/id */
+> ChunkLoadEntryTail   *sp = (ChunkLoadEntryTail *)((u8 *)arr1 + 4);       /* rate/id */
 > ```
 >
 > The single `(u8 *)` cast is OUTSIDE the loop, so it costs the one
@@ -525,22 +525,22 @@ shape that worked -- see the head update at the top of this file:
    14/105, no change at all.
 3. A nested sub-struct (`ChunkLoadEntry { void *ptr0; struct { s16 rate;
    s32 id; } sub; }`), accessed as `arr1[i].sub.field` -- IDENTICAL 14/105.
-4. The same nested sub-struct, but with an explicit `SetupSub866E8 *sub =
+4. The same nested sub-struct, but with an explicit `ChunkLoadEntryTail *sub =
    &arr1[i].sub;` computed once per iteration (mixing indexed `ptr0` access
    with a sub-struct pointer for the rest) -- IDENTICAL 14/105.
 5. Fully manual pointer walking with NO array indexing at all: two
-   independent locals (`void **ptrWalk`, `SetupSub866E8 *subWalk`) seeded
+   independent locals (`void **ptrWalk`, `ChunkLoadEntryTail *subWalk`) seeded
    once before the loop and advanced via explicit `(u8 *)p + 0xC` casts at
    the bottom of the loop body -- REGRESSED to 4/105 (extra pointer-
    arithmetic instructions the cast-based increment needs, that retail
    doesn't have).
 6. The same two-pointer idea using NATURAL (non-cast) pointer arithmetic
    (`sub++`/`entry++` on properly-typed, correctly-strided pointers) --
-   not fully evaluated; discovered mid-attempt that giving `SetupSub866E8`
+   not fully evaluated; discovered mid-attempt that giving `ChunkLoadEntryTail`
    a padded size of `0xC` (so `sub++` advances by the right amount) would
    corrupt `sizeof(ChunkLoadEntry)` if the padded type were embedded in
    it, and unpicking that cleanly was not finished this round. This is the
-   most promising untried direction -- a `SetupSub866E8` sized 0xC used
+   most promising untried direction -- a `ChunkLoadEntryTail` sized 0xC used
    ONLY as a local walking-pointer's target type, kept entirely separate
    from the real (unpadded, 0xC via 3 flat fields) `ChunkLoadEntry`.
 
