@@ -631,14 +631,14 @@ struct Class6E99CMethods {
        dispatches it as `(self, s32 a1)` with a1 a small literal (5 or 6). */
     void (*slot30)(Class6E99CObj *self, s32 a1);
     u8 pad034[0x040 - 0x034];
-    void (*finishConstruct)(Class6E99CObj *self, s32 a1); /* +0x040, Class6E99C__FinishConstruct
+    void (*finishConstruct)(Class6E99CObj *self, s32 a1); /* +0x040, Class6E99C__Reset
                                 (this unit). Two args, not four: its own
                                 call site (Class6E99C__Class6E99C) only sets `a1`;
                                 `a2`/`a3` are leftover from the preceding
                                 ctor call and the occupant's own body never
                                 reads them. RENAMED round 61 (was slot40). */
     u8 pad044[0x060 - 0x044];
-    /* +0x060/+0x064, OBSERVED: Class6E99C__FinishConstruct/Class6E99C__Stop, both dispatched
+    /* +0x060/+0x064, OBSERVED: Class6E99C__Reset/Class6E99C__Stop, both dispatched
        as `(self, s32 a1)`. Occupants (code_2cc8c_f, bravo's own functions):
        BoxFill__SetDisplay (+0x060), BoxFill__SetSemiTrans (+0x064). */
     void (*slot60)(Class6E99CObj *self, s32 a1);
@@ -657,15 +657,15 @@ struct Class6E99CMethods {
        (BoxFill__SetColor/BoxFill__SetMask, both code_2cc8c_f) -- identical
        addresses in both tables (this class does not override them), same
        fingerprint as the other shared slots above. OBSERVED:
-       Class6E99C__StartFadeToIndex/Class6E99C__StartFadeDefault (both this unit). */
+       Class6E99C__StartFadeDown/Class6E99C__StartFadeUp (both this unit). */
     void (*slotB8)(Class6E99CObj *self, s32 a1, void *tableEntry);
     u8 pad0BC[0x0CC - 0x0BC];
     void (*slotCC)(Class6E99CObj *self, s32 a1);
     void (*setStep)(Class6E99CObj *self, s32 a1);     /* +0x0D0, Class6E99C__SetStep.
                                 RENAMED round 61 (was slotD0). */
-    void (*startFadeToIndex)(Class6E99CObj *self);             /* +0x0D4, Class6E99C__StartFadeToIndex.
+    void (*startFadeToIndex)(Class6E99CObj *self);             /* +0x0D4, Class6E99C__StartFadeDown.
                                 RENAMED round 61 (was slotD4). */
-    void (*startFadeDefault)(Class6E99CObj *self, s32 a1, s32 a2); /* +0x0D8, Class6E99C__StartFadeDefault.
+    void (*startFadeDefault)(Class6E99CObj *self, s32 a1, s32 a2); /* +0x0D8, Class6E99C__StartFadeUp.
                                 RENAMED round 61 (was slotD8). */
     /* +0x0DC, this class's own (BoxFill's table ends at +0x0CC). RENAMED
        round 61 (was slotDC). */
@@ -727,16 +727,16 @@ struct Class6E99CObj {
     u8 unk66;
     u8 pad067[0x068 - 0x067];
     s32 unk68;                 /* +0x068, OBSERVED: Class6E99C__Configure, a divisor */
-    /* +0x06C, OBSERVED: Class6E99C__Stop/Class6E99C__StartFadeToIndex/Class6E99C__StartFadeDefault/
-       Class6E99C__FinishConstruct (zeroed by the ctor override) -- a small dispatch-state
+    /* +0x06C, OBSERVED: Class6E99C__Stop/Class6E99C__StartFadeDown/Class6E99C__StartFadeUp/
+       Class6E99C__Reset (zeroed by the ctor override) -- a small dispatch-state
        tag: 0 == idle, 1 == fading to an indexed color (StartFadeToIndex),
        2 == fading to the default color (StartFadeDefault). RENAMED round
        61 (was unk6C); not a BoxFill field (BoxFill ends at +0x06C). */
     s32 state;
-    s32 unk70;                 /* +0x070, OBSERVED: Class6E99C__FinishConstruct, set from
+    s32 unk70;                 /* +0x070, OBSERVED: Class6E99C__Reset, set from
                                    its own `a1` parameter */
-    /* +0x074, OBSERVED: Class6E99C__FinishConstruct (ctor override sets it to 0xA),
-       Class6E99C__StartFadeToIndex (negated on the "already had one" path), Class6E99C__SetStep
+    /* +0x074, OBSERVED: Class6E99C__Reset (ctor override sets it to 0xA),
+       Class6E99C__StartFadeDown (negated on the "already had one" path), Class6E99C__SetStep
        (a plain setter, `self->step = a1`); also read a BYTE at a time by
        Class6E99C__Update via its low byte -- the per-tick amount added into
        unk64/unk65/unk66 while a fade is running. RENAMED round 61 (was
@@ -746,7 +746,7 @@ struct Class6E99CObj {
                                    Class6E99C__GetColor, a flags/mode word tested
                                    against 0xF and against bit masks
                                    0x1/0x2/0x4 */
-    /* +0x07C, OBSERVED: Class6E99C__FinishConstruct (ctor override zeroes it),
+    /* +0x07C, OBSERVED: Class6E99C__Reset (ctor override zeroes it),
        Class6E99C__Update (tested `== 9`), Class6E99C__Configure (set from its own a3
        parameter). */
     s32 unk7C;
@@ -777,12 +777,12 @@ struct Class6E99CObj {
  * address -- real element shape not derived (nothing this unit's chosen
  * functions dereference beyond taking the address), so left as opaque
  * byte blobs sized only by their known stride. `Class6E99C__Class6E99C`/
- * `Class6E99C__StartFadeToIndex`/`Class6E99C__StartFadeDefault`/`Class6E99C__GetColor` all compute the index as
+ * `Class6E99C__StartFadeDown`/`Class6E99C__StartFadeUp`/`Class6E99C__GetColor` all compute the index as
  * a raw BYTE offset (`sll v0,i,1; addu v0,v0,i` = `i*3`, added directly to
  * the base address with no further `*4`) -- i.e. `D_8006EA90` holds 3-BYTE
  * entries (plausibly a signed-byte triple, same shape as this file's own
  * `SByte3_d294`), not 0xC-byte ones. `D_8006EAA8` is indexed the SAME way
- * by `Class6E99C__StartFadeDefault` (not a single fixed entry as an earlier reading of
+ * by `Class6E99C__StartFadeUp` (not a single fixed entry as an earlier reading of
  * `Class6E99C__Class6E99C` alone suggested -- that one just always passes index 0),
  * so left unsized rather than fixed at 3 bytes. `D_8008A924` has only the
  * one (unindexed) use, so kept at a single entry's size. */

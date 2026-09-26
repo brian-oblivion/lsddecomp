@@ -43,8 +43,8 @@
  * code_2cc8c_f).
  *
  * `Class6E99C`'s own functions add a start/stop pair over an indexed and a
- * fixed color table (`Class6E99C__StartFadeToIndex`/
- * `Class6E99C__StartFadeDefault`/`Class6E99C__Stop`), a per-tick
+ * fixed color table (`Class6E99C__StartFadeDown`/
+ * `Class6E99C__StartFadeUp`/`Class6E99C__Stop`), a per-tick
  * `step`-driven accumulator into BoxFill's r/g/b bytes gated by a countdown
  * (`Class6E99C__Update`), and a save/restore of BoxFill's position and size
  * (`Class6E99C__PushPosition`/`Class6E99C__PopPosition`): a colour fade over
@@ -77,7 +77,7 @@ void Class6E99C__Class6E99C(Class6E99CObj *self, void *a1, s32 a2, s32 a3) {
     self->methods->finishConstruct(self, a2);
 }
 
-void Class6E99C__FinishConstruct(Class6E99CObj *self, s32 a1) {
+void Class6E99C__Reset(Class6E99CObj *self, s32 a1) {
     self->unk70 = a1;
     self->state = 0;
     self->step = 0xA;
@@ -127,7 +127,7 @@ void Class6E99C__SetStep(Class6E99CObj *self, s32 a1) {
  * instructions in a different order (29/35; round 73). */
 typedef s32 (*Configure6E99CFn)(Class6E99CObj *self, s32 a1, s32 a2, s32 a3);
 
-void Class6E99C__StartFadeToIndex(Class6E99CObj *self, s32 a1, s32 a2, s32 a3) {
+void Class6E99C__StartFadeDown(Class6E99CObj *self, s32 a1, s32 a2, s32 a3) {
     s32 idx;
 
     if (self->state != 0) {
@@ -139,7 +139,7 @@ void Class6E99C__StartFadeToIndex(Class6E99CObj *self, s32 a1, s32 a2, s32 a3) {
     self->step = -self->step;
 }
 
-void Class6E99C__StartFadeDefault(Class6E99CObj *self, s32 a1, s32 a2, s32 a3) {
+void Class6E99C__StartFadeUp(Class6E99CObj *self, s32 a1, s32 a2, s32 a3) {
     if (self->state != 0) {
         return;
     }

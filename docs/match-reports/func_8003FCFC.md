@@ -77,7 +77,7 @@ targeting the base-register-switch specifically:**
     Reasoning: `volatile` might prevent GCC from recognizing `out` and
     `dst` hold the same value and collapsing them. Regressed HARD
     (blew past 20 words, real frame-size change): `volatile` forces
-    `out` to a real stack slot the way it did for `Class6E99C__StartFadeDefault`'s
+    `out` to a real stack slot the way it did for `Class6E99C__StartFadeUp`'s
     dead-store attempt -- same mechanism, wrong direction entirely (a
     stack-resident copy is not what retail's register-only two-name
     residue needs). Reverted immediately.

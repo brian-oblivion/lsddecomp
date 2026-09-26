@@ -151,7 +151,7 @@ Early-returns if `state == 0` (not active); otherwise picks a mode
 appropriate, forces `step` positive (`abs`), clears `state = 0`
 (deactivating), and dispatches `slot14`/`slot30(mode)` (bravo/base
 occupants) as a finish notification. "Stop" reflects the `state = 0`
-reset mirroring `Class6E99C__StartFadeToIndex`/`StartFadeDefault`'s own
+reset mirroring `Class6E99C__StartFadeDown`/`StartFadeUp`'s own
 `state = 1`/`state = 2` -- the three functions form a clear
 start/start/stop triad over the same field. Which mode 5 vs 6 MEANS in
 game terms is not established.

@@ -61,9 +61,9 @@ type" caution, just for a parameter rather than a return.
 **`BoxFill__Reset`** -- tier A. `ClassEAC0Methods::finishConstruct`
 (`+0x040`), dispatched by `BoxFill__BoxFill` immediately after
 installing `self->methods` -- the identical architectural role, at the
-identical offset, as `Class6E99C__FinishConstruct` one level up and
+identical offset, as `Class6E99C__Reset` one level up and
 `Obj6EAC0__FinishConstruct` (round 54, this same table family) one level
-further down. See `Class6E99C__FinishConstruct.md`'s naming note for the
+further down. See `Class6E99C__Reset.md`'s naming note for the
 full three-occupant cross-check.
 
 ## Track 4 (2026-09-25, round 85, charlie)
