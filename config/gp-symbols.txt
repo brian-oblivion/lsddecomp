@@ -5,7 +5,6 @@ D_8008A824
 D_8008A828
 D_8008A82C
 D_8008A838
-D_8008A83C
 D_8008A850
 D_8008A854
 D_8008A860
@@ -152,6 +151,7 @@ gClass86F88RowOriginY
 gDefaultBMemPMgr
 gDefaultGridSpan
 gDefaultScreenDims
+gDrawSystem
 gDreamAuxStage
 gDreamAuxWorld
 gEntityDefaultOffset

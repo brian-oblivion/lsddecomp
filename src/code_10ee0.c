@@ -27,84 +27,19 @@
  * every function and both gp-variable accessors renamed via
  * tools/rename.py, method-table slots named for the methods they hold. See
  * each function's report `## Naming` for tier and evidence.
+ *
+ * Round 87 (bravo, track 4): the class is unified. Its one definition is
+ * include/DrawSystem.h (object, table, both value types); this unit keeps
+ * only libgpu's RECT and the SDK prototypes it calls.
  */
 #include "common.h"
-#include "BasicClass.h"
-
-/*
- * Local view of the D_8006C070 object (a BasicClass subclass): the game's
- * screen/graphics singleton (see the header comment above for the
- * cross-unit evidence). Only the fields this unit's matched methods touch
- * are named; the singleton other units reach through GetDrawSystem() is an
- * object of this class.
- */
-typedef struct DrawSystem DrawSystem;
-typedef struct DrawSystemMethods DrawSystemMethods;
+#include "DrawSystem.h"
 
 /* LIBGPU.H's RECT, declared locally (never #include a psyq header). */
 typedef struct {
     short x, y;
     short w, h;
 } RECT;
-
-/* A 4-short RECT source: x/y/w at +0/+2/+4, h at +8 (ConvertRect). */
-typedef struct {
-    /* +0x0 */ s16 x;
-    /* +0x2 */ s16 y;
-    /* +0x4 */ s16 w;
-    /* +0x6 */ s16 unk6;
-    /* +0x8 */ s16 h;
-} DrawSystemRect;
-
-/* What DrawSystem__GetDims fills in: two zero shorts then the +0x14 pair. */
-typedef struct {
-    /* +0x0 */ s16 x;
-    /* +0x2 */ s16 y;
-    /* +0x4 */ s32 w;
-    /* +0x8 */ s32 h;
-} DrawSystemDims;
-
-typedef struct {
-    /* +0x0 */ s32 w;
-    /* +0x4 */ s32 h;
-} DrawSystemSize;
-
-struct DrawSystemMethods {
-    BASICCLASS_SLOTS(DrawSystem, (DrawSystem *self));
-    /* +0x040 */ void (*init)(DrawSystem *self);                  /* DrawSystem__Init */
-    /* +0x044 */ void *initGraph;                                 /* DrawSystem__InitGraph */
-    /* +0x048 */ void *start;                                     /* DrawSystem__Start */
-    /* +0x04C */ void *stop;                                      /* DrawSystem__Stop */
-    /* +0x050 */ void *swapBuffers;                               /* DrawSystem__SwapBuffers */
-    /* +0x054 */ void *getActiveBuffer;                           /* DrawSystem__GetActiveBuffer */
-    /* +0x058 */ void *loadImage;                                 /* DrawSystem__LoadImage */
-    /* +0x05C */ void *storeImage;                                /* DrawSystem__StoreImage */
-    /* +0x060 */ void *slot60;                                    /* DrawSystem__func_80020A1C, always returns 0 */
-    /* +0x064 */ void *moveImage;                                 /* DrawSystem__MoveImage */
-    /* +0x068 */ void (*runLoop)(DrawSystem *self);               /* DrawSystem__RunLoop */
-    /* +0x06C */ void *countFrames;                               /* DrawSystem__CountFrames */
-    /* +0x070 */ void (*setVSyncCount)(DrawSystem *self, s32 value); /* DrawSystem__SetVSyncCount */
-    /* +0x074 */ void *getVSyncCount;                             /* DrawSystem__GetVSyncCount */
-    /* +0x078 */ void (*clearImage)(DrawSystem *self, u8 *color, DrawSystemRect *src); /* DrawSystem__ClearImage */
-    /* +0x07C */ DrawSystemSize *(*getDims)(DrawSystem *self, DrawSystemDims *out); /* DrawSystem__GetDims */
-    /* +0x080 */ void (*setSyncMode)(DrawSystem *self, s32 value); /* DrawSystem__SetSyncMode */
-};
-
-struct DrawSystem {
-    BASICCLASS_FIELDS(DrawSystemMethods);
-    /* +0x00C */ s32 unkC;            /* DrawSystem__CountFrames sets to 1 once unk24 reaches unk20 */
-    /* +0x010 */ s32 running;         /* cleared by Stop; SetVSyncCount stores unk20 only while 0; RunLoop's while condition */
-    /* +0x014 */ DrawSystemSize size; /* GetDims returns its address */
-    /* +0x01C */ s32 vramMode;        /* InitGraph: GsInitGraph vram mode */
-    /* +0x020 */ s32 unk20;           /* SetVSyncCount sets, GetVSyncCount gets; also RunLoop's VSync() argument and CountFrames's threshold -- one field, two uses, neither fully pinned down */
-    /* +0x024 */ s32 unk24;           /* CountFrames counts up to unk20 */
-    /* +0x028 */ u8 pad28[0x2C - 0x28];
-    /* +0x02C */ s32 syncMode;        /* SetSyncMode sets; gates the post-transfer DrawSync(0) in LoadImage/StoreImage and the running-bypass there and in ClearImage's dispatch */
-    /* +0x030 */ void (*callback)(void); /* SetCallback sets, RunLoop calls each VSync */
-};
-
-extern DrawSystemMethods D_8006C070;  /* the class's method table */
-extern DrawSystem *D_8008A83C;        /* sdata: the singleton GetDrawSystem returns */
 
 extern void GsSwapDispBuff(void);     /* LIBGS.H */
 extern void GsInitGraph(unsigned short x_res, unsigned short y_res,
@@ -121,9 +56,9 @@ extern int VSync(int mode);                         /* LIBETC.H */
 extern int StoreImage(RECT *rect, u_long *p);       /* LIBGPU.H */
 extern void *BMemPMgrAlloc(s32 size);
 
-DrawSystemMethods *Get_vtable_DrawSystem(void);
-DrawSystem *GetDrawSystem(void);
-void ConvertRect(RECT *dst, DrawSystemRect *src);
+extern DrawSystem *gDrawSystem;        /* sdata: the singleton GetDrawSystem returns */
+
+void ConvertRect(RECT *dst, DrawRect *src);
 
 DrawSystem *New_DrawSystem(void) {
     DrawSystem *p = BMemPMgrAlloc(0x34);
@@ -145,7 +80,7 @@ void DrawSystem__Init(DrawSystem *self) {
     self->methods->setSyncMode(self, 1);
     self->callback = NULL;
 }
-void DrawSystem__InitGraph(DrawSystem *self, DrawSystemSize *size, s32 vramMode) {
+void DrawSystem__InitGraph(DrawSystem *self, ScreenDims *size, s32 vramMode) {
     GsInitGraph(size->w, size->h, 0, 1, vramMode);
     GsDefDispBuff(0, 0, 0, size->h);
     self->size = *size;
@@ -168,7 +103,7 @@ void DrawSystem__SwapBuffers(DrawSystem *self) {
 s32 DrawSystem__GetActiveBuffer(DrawSystem *self) {
     return GsGetActiveBuff();
 }
-void DrawSystem__LoadImage(DrawSystem *self, DrawSystemRect *src, u_long *pixels) {
+void DrawSystem__LoadImage(DrawSystem *self, DrawRect *src, u32 *pixels) {
     RECT rect;
 
     if (self->running == 0 || self->syncMode != 0) {
@@ -179,13 +114,13 @@ void DrawSystem__LoadImage(DrawSystem *self, DrawSystemRect *src, u_long *pixels
         }
     }
 }
-void ConvertRect(RECT *dst, DrawSystemRect *src) {
+void ConvertRect(RECT *dst, DrawRect *src) {
     dst->x = src->x;
     dst->y = src->y;
     dst->w = src->w;
     dst->h = src->h;
 }
-void DrawSystem__StoreImage(DrawSystem *self, u_long *pixels, DrawSystemRect *src) {
+void DrawSystem__StoreImage(DrawSystem *self, u32 *pixels, DrawRect *src) {
     RECT rect;
 
     if (self->running == 0 || self->syncMode != 0) {
@@ -199,7 +134,7 @@ void DrawSystem__StoreImage(DrawSystem *self, u_long *pixels, DrawSystemRect *sr
 s32 DrawSystem__func_80020A1C(DrawSystem *self) {
     return 0;
 }
-void DrawSystem__MoveImage(DrawSystem *self, DrawSystemRect *src, s16 x, s16 y) {
+void DrawSystem__MoveImage(DrawSystem *self, DrawRect *src, s16 x, s16 y) {
     RECT rect;
 
     ConvertRect(&rect, src);
@@ -207,7 +142,7 @@ void DrawSystem__MoveImage(DrawSystem *self, DrawSystemRect *src, s16 x, s16 y) 
 }
 void DrawSystem__RunLoop(DrawSystem *self) {
     while (self->running != 0) {
-        VSync(self->unk20);
+        VSync(self->vsyncCount);
         if (self->callback != NULL) {
             self->callback();
         }
@@ -217,33 +152,33 @@ void DrawSystem__RunLoop(DrawSystem *self) {
 void DrawSystem__CountFrames(DrawSystem *self) {
     DrawSystem *obj = GetDrawSystem();
 
-    obj->unk24++;
-    if (obj->unk24 >= obj->unk20 && obj->unkC == 0) {
+    obj->frameCount++;
+    if (obj->frameCount >= obj->vsyncCount && obj->unkC == 0) {
         obj->unkC = 1;
-        obj->unk24 = 0;
+        obj->frameCount = 0;
     }
 }
 void DrawSystem__SetVSyncCount(DrawSystem *self, s32 value) {
     if (self->running == 0) {
-        self->unk20 = value;
+        self->vsyncCount = value;
     }
 }
 s32 DrawSystem__GetVSyncCount(DrawSystem *self) {
-    return self->unk20;
+    return self->vsyncCount;
 }
-void DrawSystem__ClearImage(DrawSystem *self, u8 *color, DrawSystemRect *src) {
-    DrawSystemDims dims;
+void DrawSystem__ClearImage(DrawSystem *self, u8 *color, DrawRect *src) {
+    DrawRect dims;
     RECT rect;
 
     if (src == NULL) {
         self->methods->getDims(self, &dims);
-        self->methods->clearImage(self, color, (DrawSystemRect *)&dims);
+        self->methods->clearImage(self, color, &dims);
     } else {
         ConvertRect(&rect, src);
         ClearImage(&rect, color[0], color[1], color[2]);
     }
 }
-DrawSystemSize *DrawSystem__GetDims(DrawSystem *self, DrawSystemDims *out) {
+ScreenDims *DrawSystem__GetDims(DrawSystem *self, DrawRect *out) {
     if (out != NULL) {
         out->x = 0;
         out->y = 0;
@@ -262,8 +197,8 @@ DrawSystemMethods *Get_vtable_DrawSystem(void) {
     return &D_8006C070;
 }
 DrawSystem *GetDrawSystem(void) {
-    return D_8008A83C;
+    return gDrawSystem;
 }
 void SetDrawSystem(DrawSystem *obj) {
-    D_8008A83C = obj;
+    gDrawSystem = obj;
 }

@@ -240,3 +240,7 @@ unknown. Do not "correct" the stride to 21 on this function's evidence alone.
 ## Track 4
 
 2026-09-26, round 86 (delta): class 0x14 (was D_8006EFAC) unified as LightRig in `include/LightRig.h`; the first call is `GetLightRigMethods()->ctor((LightRig *)self)` through include/LightRig.h (was a unit-local `BaseCtorTable_3ac78 *` view of the same getter). A pointer cast emits no code; image byte-identical. Class866E8's own view is unchanged.
+
+## Track 4 (2026-09-26, round 87, bravo)
+
+The local GetDrawSystem/New_DrawSystem extern this unit carried is gone; it comes from `include/DrawSystem.h` (D_8006C070 unified), with a pointer cast where this unit's own slot type asks for one. Byte-identical.

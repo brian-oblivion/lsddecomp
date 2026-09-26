@@ -79,3 +79,7 @@ struct Class6C070Methods {
 `New_<Class>` allocator shape (alloc + call the ctor slot) is a pure
 mechanic, so once the class has a name the allocator's name follows by the
 project's own convention (`BasicClass.h`; matches `New_WBgm`, round 81).
+
+## Track 4 (2026-09-26, round 87, bravo)
+
+The class is unified: its one definition is `include/DrawSystem.h` (object, method table, `ScreenDims`, `DrawRect`); the unit-local view the declarations above quote is gone. Field renames, settled by this unit's accessors (the only ones): `unk20` -> `vsyncCount` (SetVSyncCount stores, GetVSyncCount returns, RunLoop passes it to VSync, CountFrames compares against it), `unk24` -> `frameCount` (CountFrames counts it). `DrawSystemRect`/`DrawSystemDims` are one type, `DrawRect` {s16 x, y; s32 w, h} (ConvertRect's halfword loads at +0/+2/+4/+8 compile identically from it), and `DrawSystemSize` is `ScreenDims`. The singleton `D_8008A83C` is `gDrawSystem` (rename.py). Byte-identical.

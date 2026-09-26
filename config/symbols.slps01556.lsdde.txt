@@ -2854,3 +2854,4 @@ VabDriver__RequestLoadFile = 0x8002C420; // type:func
 VabDriver__StopService = 0x8002C428; // type:func
 VabDriver__CancelRequests = 0x8002C430; // type:func
 gTmdModelMethods = 0x8006BEA0;
+gDrawSystem = 0x8008A83C;

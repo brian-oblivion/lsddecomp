@@ -46,3 +46,7 @@ Needs the unit-local `Class6C070` view at the top of `src/code_10ee0.c`, with
 `WBgm__WBgm`, `class_3ac78.c`'s `Class866E8__Class866E8`, both do). +0x10 is
 named `running`: `DrawSystem__Start` sets it and enters this loop,
 `DrawSystem__Stop` clears it.
+
+## Track 4 (2026-09-26, round 87, bravo)
+
+The class is unified: its one definition is `include/DrawSystem.h` (object, method table, `ScreenDims`, `DrawRect`); the unit-local view the declarations above quote is gone. Field renames, settled by this unit's accessors (the only ones): `unk20` -> `vsyncCount` (SetVSyncCount stores, GetVSyncCount returns, RunLoop passes it to VSync, CountFrames compares against it), `unk24` -> `frameCount` (CountFrames counts it). `DrawSystemRect`/`DrawSystemDims` are one type, `DrawRect` {s16 x, y; s32 w, h} (ConvertRect's halfword loads at +0/+2/+4/+8 compile identically from it), and `DrawSystemSize` is `ScreenDims`. The singleton `D_8008A83C` is `gDrawSystem` (rename.py). Byte-identical.

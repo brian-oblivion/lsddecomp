@@ -68,3 +68,7 @@ does not declare: Class6D3C8__ForwardToBaseSlot44UnlessFlagged calls the slot
 with `(self, a1, a2, 0)`, and the `move a3,zero` in its jalr delay slot is
 retail's. The slot's return is `void`, the occupant's; the old subclass view
 typed it `s32`, and its one caller ignores $v0. Bytes unchanged.
+
+## Track 4 (2026-09-26, round 87, bravo)
+
+The local view of the DrawSystem singleton quoted above is gone; the unit takes DrawSystem, its method table and GetDrawSystem from `include/DrawSystem.h` (D_8006C070 unified). Byte-identical.

@@ -49,6 +49,7 @@
 #include "ModelData.h"
 #include "Tod.h"
 #include "TmdModel.h"
+#include "DrawSystem.h"
 
 typedef struct DataSrc33808 DataSrc33808;
 
@@ -1552,8 +1553,9 @@ void MoviePlayer__FreeFrameBuffers(Obj4575C *self) {
  * (gActiveMoviePlayer): optionally MoviePlayer__MarkPlaying first (+0x68), keep `arg2` at
  * +0x5C, open `name` on the stream object at +0x60 (its +0x044, 100); 1 when
  * that fails. Otherwise become the active movie, reset the state words, keep
- * `arg3`/`arg4` at +0x54/+0x58 and register gMovieFrameRect with the frame
- * rectangle (+0x20) through DrawSystem +0x078. 0. */
+ * `arg3`/`arg4` at +0x54/+0x58 and clear the frame rectangle (+0x20) through
+ * DrawSystem's clearImage (+0x078), whose color argument is gMovieFrameRect
+ * (a zero word: black; the name predates reading the slot). 0. */
 typedef struct StreamMethods457C0 {
     /* +0x000 */ u8 pad0[0x44];
     /* +0x044 */ s32 (*open)();
@@ -1581,22 +1583,12 @@ typedef struct Obj457C0 {
     /* +0x068 */ s32 unk68;
 } Obj457C0;
 
-typedef struct DrawSysMethods457C0 {
-    /* +0x000 */ u8 pad0[0x78];
-    /* +0x078 */ void (*slot78)();
-} DrawSysMethods457C0;
-
-typedef struct DrawSys457C0 {
-    /* +0x000 */ DrawSysMethods457C0 *methods;
-} DrawSys457C0;
-
 extern DataSrc33808 *gActiveMoviePlayer;
 extern s32 gMovieFrameRect;
-extern void *GetDrawSystem(void);
 void MoviePlayer__MarkPlaying();
 
 s32 MoviePlayer__Play(Obj457C0 *self, char *name, s32 arg2, s32 arg3, s32 arg4) {
-    DrawSys457C0 *ds;
+    DrawSystem *ds;
 
     if (gActiveMoviePlayer == NULL) {
         if (self->unk68 != 0) {
@@ -1613,7 +1605,7 @@ s32 MoviePlayer__Play(Obj457C0 *self, char *name, s32 arg2, s32 arg3, s32 arg4) 
             self->unk54 = arg3;
             self->unk58 = arg4;
             ds = GetDrawSystem();
-            ds->methods->slot78(ds, &gMovieFrameRect, self->rect);
+            ds->methods->clearImage(ds, (u8 *)&gMovieFrameRect, (DrawRect *)self->rect);
             return 0;
         }
         return 1;
@@ -1818,15 +1810,6 @@ void MoviePlayer__NoOpFreeBuffer(void) {
  * while it is still inside the frame (+0x20 + +0x24) decode the next strip
  * (DecDCTout, after a DrawSync when +0x34 is under 0x80); at the end,
  * rewind the rectangle to +0x20/+0x22 and flag the frame done. */
-typedef struct DrawSysMethods45BC8 {
-    /* +0x000 */ u8 pad0[0x58];
-    /* +0x058 */ void (*loadImage)();
-} DrawSysMethods45BC8;
-
-typedef struct DrawSys45BC8 {
-    /* +0x000 */ DrawSysMethods45BC8 *methods;
-} DrawSys45BC8;
-
 typedef struct Rect45BC8 {
     s16 x;
     s16 y;
@@ -1855,9 +1838,9 @@ extern int DrawSync(int mode);
 extern void DecDCTout(u32 *buf, int size);
 
 void MoviePlayer__DrawStrip(Obj45BC8 *self) {
-    DrawSys45BC8 *ds = (DrawSys45BC8 *)GetDrawSystem();
+    DrawSystem *ds = GetDrawSystem();
 
-    ds->methods->loadImage(ds, &self->rect, self->strip);
+    ds->methods->loadImage(ds, (DrawRect *)&self->rect, self->strip);
     self->rect.x += self->rect.w;
     if (self->rect.x < self->x0 + self->width) {
         if (self->unk34 < 0x80) {

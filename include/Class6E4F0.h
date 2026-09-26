@@ -2,6 +2,7 @@
 #define CLASS6E4F0_H
 
 #include "BasicClass.h"
+#include "DrawSystem.h"
 
 /*
  * Class6E4F0 -- class id 0x60, method table D_8006E4F0, a direct BasicClass
@@ -31,28 +32,13 @@
 typedef struct Class6E4F0 Class6E4F0;
 typedef struct Class6E4F0Methods Class6E4F0Methods;
 
-/* A {width, height} pair: the ctor's default is gDefaultScreenDims = {320, 240}. */
-typedef struct ScreenDims {
-    s32 w;
-    s32 h;
-} ScreenDims;
-
-/* initSystems's first argument: the DrawSystem main() builds (New_DrawSystem,
- * code_10ee0), seen only as far as this class dispatches it. +0x044 is
- * DrawSystem__InitGraph(self, size, vramMode). A view of DrawSystem
- * (D_8006C070), which is not unified yet; its unification replaces this. */
-typedef struct Class6E4F0SourceMethods {
-    u8 pad00[0x44];
-    void (*initGraph)(void *self, ScreenDims *dims, s32 vramMode); /* +0x044 DrawSystem__InitGraph */
-} Class6E4F0SourceMethods;
-
-typedef struct Class6E4F0Source {
-    Class6E4F0SourceMethods *methods;
-} Class6E4F0Source;
+/* ScreenDims ({w, h}; the ctor's default is gDefaultScreenDims = {320, 240})
+ * and initSystems's drawSystem argument are DrawSystem's: include/DrawSystem.h
+ * (round 87). */
 
 /* The 0x14-byte block initSystems allocates. */
 typedef struct Class6E4F0Aux {
-    /* +0x000 */ Class6E4F0Source *drawSystem; /* initSystems's drawSystem */
+    /* +0x000 */ DrawSystem *drawSystem;        /* initSystems's drawSystem */
     /* +0x004 */ struct Pad *pad;              /* initSystems's pad: main()'s New_Pad(0, 0) */
     /* +0x008 */ s32 unk08;                    /* cleared by initSystems */
     /* +0x00C */ s32 unk0C;                    /* cleared by initSystems */
@@ -64,7 +50,7 @@ typedef struct Class6E4F0Aux {
     /* +0x040 */ void (*setScreenDims)(Self *self, ScreenDims *dims, s32 vramMode); /* Class6E4F0__SetScreenDims */ \
     /* +0x044: the fourth argument is the caller's: Class6D3C8__ForwardToBaseSlot44UnlessFlagged  \
      * passes 0 (`move a3,zero` in the jalr's delay slot); the occupant never reads $a3. */      \
-    /* +0x044 */ void (*initSystems)(Self *self, Class6E4F0Source *drawSystem, struct Pad *pad, s32 arg3); /* Class6E4F0__InitSystems */ \
+    /* +0x044 */ void (*initSystems)(Self *self, DrawSystem *drawSystem, struct Pad *pad, s32 arg3); /* Class6E4F0__InitSystems */ \
     /* +0x048 */ void (*slot48)(Self *self);                    /* Class6E4F0__NoOpSlot48, empty */ \
     /* +0x04C */ void (*runMainLoop)(Self *self);               /* Class6E4F0__RunMainLoop */      \
     /* +0x050..+0x064: NULL here, called by runMainLoop; named for Class6D3C8's occupants */      \
@@ -96,7 +82,7 @@ extern Class6E4F0Methods *GetClass6E4F0Methods(void); /* returns &D_8006E4F0 */
 void Class6E4F0__Class6E4F0(Class6E4F0 *self, s32 dataSource);
 void Class6E4F0__Finalize(Class6E4F0 *self);
 void Class6E4F0__SetScreenDims(Class6E4F0 *self, ScreenDims *dims, s32 vramMode);
-void Class6E4F0__InitSystems(Class6E4F0 *self, Class6E4F0Source *drawSystem, struct Pad *pad);
+void Class6E4F0__InitSystems(Class6E4F0 *self, DrawSystem *drawSystem, struct Pad *pad);
 void Class6E4F0__NoOpSlot48(Class6E4F0 *self);
 void Class6E4F0__RunMainLoop(Class6E4F0 *self);
 

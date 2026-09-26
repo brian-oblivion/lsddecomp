@@ -275,3 +275,7 @@ Sony's empty `_obj/none` stub: an EXACT (TINY) fingerprint, placed directly
 before the `_obj/malloc` object, and the call only cc1 emits. Both oracles
 green. `GameMain` is withdrawn: the name was a workaround for the link
 failure, not a claim about the code.
+
+## Track 4 (2026-09-26, round 87, bravo)
+
+The local GetDrawSystem/New_DrawSystem extern this unit carried is gone; it comes from `include/DrawSystem.h` (D_8006C070 unified), with a pointer cast where this unit's own slot type asks for one. Byte-identical.

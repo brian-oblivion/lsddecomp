@@ -16,7 +16,7 @@
  *     gCdRequestQueue list (code_179d8_r owns the list itself) and starts the
  *     service;
  *   - the service pump: ServiceCdDriver, installed as a VSyncCallback (or as
- *     a callback on the singleton GetDrawSystem returns), which ticks
+ *     the DrawSystem singleton's callback, its setCallback slot +0x084), which ticks
  *     code_179d8_r's CD state machine and drains the request queue, plus
  *     LockCd/UnlockCd, the latch that keeps that tick out of a half-updated
  *     queue.
@@ -28,6 +28,7 @@
  */
 #include "common.h"
 #include "CdDriver.h"
+#include "DrawSystem.h"
 
 /* --- local views of the D_8006D4E8 class ---------------------------------
  * This unit defines three of that class's own method slots (+0x06C, +0x070,
@@ -241,36 +242,19 @@ s32 GetCdDriverMode(s32 *outMode2)
     return gCdAsyncEnabled;
 }
 
-extern s32 GetDrawSystem(void); /* returns D_8008A83C, a singleton object */
 extern s32 ServiceCdDriver(void);
-
-/* The singleton GetDrawSystem returns; only the slot this call site
- * dispatches (+0x84 of its method table) is typed here. That slot is handed
- * either ServiceCdDriver or 0, so it installs and clears a callback -- named
- * for what this one call site does with it, which is all the evidence
- * there is. */
-typedef struct ObjF18Methods ObjF18Methods;
-struct ObjF18Methods {
-    u8 pad00[0x84];
-    void (*setCallback)(void *self, void *cb);
-};
-
-typedef struct ObjF18 ObjF18;
-struct ObjF18 {
-    ObjF18Methods *methods;
-};
 
 s32 SetCdDriverMode(s32 async, s32 mode2, s32 useVSyncCallback)
 {
-    ObjF18 *obj;
+    DrawSystem *obj;
 
     if (gCdBusy == 0) {
         if (useVSyncCallback == 0) {
-            obj = (ObjF18 *)GetDrawSystem();
+            obj = GetDrawSystem();
 
             if (gCdAsyncEnabled == 0) {
                 if (async != 0) {
-                    obj->methods->setCallback(obj, (void *)ServiceCdDriver);
+                    obj->methods->setCallback(obj, (void (*)(void))ServiceCdDriver);
                 }
             } else {
                 if (async == 0) {

@@ -42,7 +42,7 @@ struct Class6C070 {
     /* +0x030 */ s32 unk30;
 };
 extern Class6C070Methods D_8006C070;
-extern Class6C070 *D_8008A83C;
+extern Class6C070 *gDrawSystem;
 extern void GsSwapDispBuff(void);
 ```
 
@@ -55,3 +55,9 @@ Round 82 (alpha) retyped +0x030 from `s32 unk30` to `void (*callback)(void)`: Dr
 `DrawSystem__SetCallback`, tier A. A pure setter of the `callback` field
 `DrawSystem__RunLoop` invokes once per VSync; mechanics ARE the purpose for
 a plain setter.
+
+## Track 4 (2026-09-26, round 87, bravo)
+
+The class is unified: its one definition is `include/DrawSystem.h` (object, method table, `ScreenDims`, `DrawRect`); the unit-local view the declarations above quote is gone. Field renames, settled by this unit's accessors (the only ones): `unk20` -> `vsyncCount` (SetVSyncCount stores, GetVSyncCount returns, RunLoop passes it to VSync, CountFrames compares against it), `unk24` -> `frameCount` (CountFrames counts it). `DrawSystemRect`/`DrawSystemDims` are one type, `DrawRect` {s16 x, y; s32 w, h} (ConvertRect's halfword loads at +0/+2/+4/+8 compile identically from it), and `DrawSystemSize` is `ScreenDims`. The singleton `D_8008A83C` is `gDrawSystem` (rename.py). Byte-identical.
+
+Slot +0x084 `setCallback` was missing from the old local table view; the header has it. Its one C caller is SetCdDriverMode (code_179d8_q), which installs ServiceCdDriver or clears it with 0.

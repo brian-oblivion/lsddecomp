@@ -359,3 +359,7 @@ on that basis.
 ## Track 4
 
 2026-09-26, round 86 (delta): class 0x14 (was D_8006EFAC) unified as LightRig in `include/LightRig.h`; the last call is `GetLightRigMethods()->finalize((LightRig *)self)` through include/LightRig.h (was `->dtor(self)` on the unit-local `BaseCtorTable_3ac78`: `dtor` was BasicClass's +0x00C `finalize` slot under another name). A pointer cast emits no code; image byte-identical.
+
+## Track 4 (2026-09-26, round 87, bravo)
+
+The local GetDrawSystem/New_DrawSystem extern this unit carried is gone; it comes from `include/DrawSystem.h` (D_8006C070 unified), with a pointer cast where this unit's own slot type asks for one. Byte-identical.

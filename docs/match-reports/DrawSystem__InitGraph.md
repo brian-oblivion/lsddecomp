@@ -45,3 +45,9 @@ as the object's own +0x044 slot from OUTSIDE the unit too --
 `code_2b78c.c`'s `Class6E4F0__InitSystems` receives this same object as its
 `source` argument and dispatches `source->methods->slot44(source, &self->dims,
 self->dimsArg)`, the identical offset.
+
+## Track 4 (2026-09-26, round 87, bravo)
+
+The class is unified: its one definition is `include/DrawSystem.h` (object, method table, `ScreenDims`, `DrawRect`); the unit-local view the declarations above quote is gone. Field renames, settled by this unit's accessors (the only ones): `unk20` -> `vsyncCount` (SetVSyncCount stores, GetVSyncCount returns, RunLoop passes it to VSync, CountFrames compares against it), `unk24` -> `frameCount` (CountFrames counts it). `DrawSystemRect`/`DrawSystemDims` are one type, `DrawRect` {s16 x, y; s32 w, h} (ConvertRect's halfword loads at +0/+2/+4/+8 compile identically from it), and `DrawSystemSize` is `ScreenDims`. The singleton `D_8008A83C` is `gDrawSystem` (rename.py). Byte-identical.
+
+Its dispatching caller, Class6E4F0__InitSystems (code_2b78c), now takes a `DrawSystem *` (include/Class6E4F0.h's Class6E4F0Source view deleted) and passes its own `ScreenDims`.

@@ -15,7 +15,7 @@ byte-identical, and the `## Naming` section at the end of this report
 carries the evidence for each one.
 
 ```c
-extern s32 GetDrawSystem(void); /* returns D_8008A83C, a singleton object */
+extern s32 GetDrawSystem(void); /* returns gDrawSystem, a singleton object */
 extern s32 ServiceCdDriver(void);
 extern s32 gCdBusy;
 extern s32 gCdAsyncEnabled;
@@ -143,3 +143,7 @@ of two callbacks drives the service; tier A.
 that slot either `ServiceCdDriver` or `0`, which is install/clear and nothing
 else. Tier B -- one call site is thin evidence for another class's slot, and
 the type stays a per-call-site local view.
+
+## Track 4 (2026-09-26, round 87, bravo)
+
+The local view of the DrawSystem singleton quoted above is gone; the unit takes DrawSystem, its method table and GetDrawSystem from `include/DrawSystem.h` (D_8006C070 unified). Byte-identical.

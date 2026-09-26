@@ -41,7 +41,6 @@ extern void SsInit(void);
 extern void GsInit3D(void);
 
 extern void SetActiveDataSource(s32 arg0); /* code_171e0 */
-extern void SetDrawSystem(void *arg);      /* code_10ee0, stores its arg to a gp global */
 extern void *BMemPMgrAlloc(s32 size);
 
 void Class6E4F0__Class6E4F0(Class6E4F0 *self, s32 dataSource) {
@@ -64,7 +63,7 @@ void Class6E4F0__SetScreenDims(Class6E4F0 *self, ScreenDims *dims, s32 vramMode)
     self->vramMode = vramMode;
 }
 
-void Class6E4F0__InitSystems(Class6E4F0 *self, Class6E4F0Source *drawSystem, struct Pad *pad) {
+void Class6E4F0__InitSystems(Class6E4F0 *self, DrawSystem *drawSystem, struct Pad *pad) {
     if (self->initialized == 0) {
         SetDrawSystem(drawSystem);
         drawSystem->methods->initGraph(drawSystem, &self->dims, self->vramMode);
