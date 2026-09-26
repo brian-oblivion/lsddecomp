@@ -6,6 +6,51 @@ stale, prose elsewhere is not.
 
 ---
 
+## 2026-09-26 — round 90: track 8, six regions filed (Opus head)
+
+Opus head, not started as premium; cap 5, two slots filled because
+`plan.py` listed two ready jobs, both track 8. The two premium setup items
+(`sdk-headers`, `format`) were reported, not attempted. Revision 27 was
+still uncommitted in `main` at Gate 0; the operator confirmed its session
+had finished and the head committed it unchanged (acb7543f) so the
+worktrees would carry `unitfile.py` and `tuboundary.py`.
+
+- **alpha** (Opus, four regions): `code_179d8_b`, `_n`, `_g` merged into
+  `libcd_bios` on rodata proof (both inner edges "start edge IMPOSSIBLE");
+  the one duplicate local view was `D_8006D620`, as the revision-27 trial
+  predicted. `code_179d8_c_b` became `libsnd_ssinit_libapi_counter`: its
+  content is two Sony modules, but splitting it needs a new carve that
+  `unitfile.py` cannot make and the binary does not force, so the split is
+  parked with the reason in the banner. `code_179d8_f_b` became
+  `libspu_s_ih`, and `code_2cc8c_e0` became `libgs_gs_101`.
+- **bravo** (Opus, two regions): `code_2cc8c_e1` became `libgs_gs_124`,
+  and `class_3bb8c_v` became `libcard_card_clear`. The head renamed that one
+  `libcard_card` after merging: bravo's banner repeated round 39's "object
+  on no disc", but round 74 had identified `libcard/card` on the 3.3 disc
+  by shape (exact length). Retail's copy was assembled differently, so it
+  never places.
+- **Every file this round is Sony code carried as C**, named
+  `<lib>_<module>` for its object. The ready regions were exactly the ones
+  whose units no track 6 or 7 job waits on, and those are Sony's.
+- **Head.** `func_8002B3E4` became `CD_set_test_parmnum` (alpha's
+  proposal). Round 79 had parked a 4-word tie because the position "does not
+  cluster". It now sits in one rodata-proven file whose functions follow
+  `libcd/bios@3.3`'s order, and in that object `callback` starts the word
+  after it. Track 2 is at 286 named. Merging alpha conflicted in four places,
+  all comment or ledger lines that two tool runs had rewritten. The old units
+  no longer existed, so none of the renames could be re-run; each hunk was
+  resolved by union, which is what a replay would have produced.
+- **All three oracles were green at every merge** (byte-exact, typeviews 0
+  new, nonmatching green, 84 units). Track 8 is at 7/34 regions with 0
+  ready: every remaining region waits on track 6 or 7, and both of those
+  wait on their premium setup items.
+- **Escalated** (see the round report): split support for track 8, and
+  `unitfile.py` rewriting unit names inside history comments. That makes
+  some old sentences name the wrong slice (alpha:
+  `code_179d8_h`'s comment now says `code_179d8_b` where it meant `_g`).
+
+---
+
 ## 2026-09-26 — premium session: plan revision 27, phase 2 (the code reads like a game's source)
 
 Operator: every track is done but the project is not. Files are named for

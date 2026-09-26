@@ -1253,6 +1253,41 @@
         }
       ],
       "status": "auto"
+    },
+    "6": {
+      "checklist": {},
+      "flagged": {},
+      "parked": {},
+      "reason": "",
+      "status": "auto"
+    },
+    "7": {
+      "checklist": {},
+      "reason": "",
+      "status": "auto",
+      "units_done": {}
+    },
+    "8": {
+      "parked": {},
+      "reason": "",
+      "rounds": [
+        {
+          "attempts": 6,
+          "calibration": false,
+          "date": "2026-09-26",
+          "matches": 6,
+          "model": "opus",
+          "note": "Opus head (not premium), cap 5, 2 Opus files runners on the only two ready jobs. alpha: code_179d8_b+n+g merged on rodata proof -> libcd_bios; code_179d8_c_b -> libsnd_ssinit_libapi_counter (content splits it between _SsSeqCalledTbyT_1per2 and SetRCnt, a new carve unitfile.py cannot make and the binary does not force: PARKED, reason in banner); code_179d8_f_b -> libspu_s_ih; code_2cc8c_e0 -> libgs_gs_101. bravo: code_2cc8c_e1 -> libgs_gs_124; class_3bb8c_v -> libcard_card_clear, which the head renamed libcard_card (round 74 identified the object, libcard/card@3.3, by shape; the banner said unknown). Head: func_8002B3E4 -> CD_set_test_parmnum (alpha's proposal; round 79's tie settled by position in the merged file); stale banner/yaml comments fixed. All steps byte-identical, typeviews 0 new, nonmatching green. Track 8 now 0 ready: every remaining region waits on track 6/7, which wait on the premium setup items.",
+          "round": 90,
+          "runners": 2
+        }
+      ],
+      "status": "auto"
+    },
+    "9": {
+      "checklist": {},
+      "reason": "",
+      "status": "auto"
     }
   }
 }
