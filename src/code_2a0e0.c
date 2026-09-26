@@ -17,6 +17,7 @@
 #include "common.h"
 #include "BasicClass.h"
 #include "DrawSystem.h"
+#include "VabStreamObj.h"
 
 /* Local view of D_8006E48C's objects: a background-music SEQ player. Fields
  * named from the libsnd calls they feed. */
@@ -36,15 +37,6 @@ struct WBgmMethods {
     /* +0x060 */ void (*setVab)(WBgm *self, s32 arg);            /* WBgm__SetVab */
 };
 
-/* What +0x0C holds: a New_VabStreamObj object. Only the fields read here. */
-typedef struct SeqVab {
-    BASICCLASS_FIELDS(BasicClassMethods);
-    /* +0x00C */ u8 padC[0x54 - 0xC];
-    /* +0x054 */ s16 vabId;
-    /* +0x056 */ u8 pad56[2];
-    /* +0x058 */ u16 ready;
-} SeqVab;
-
 /* What +0x10 holds: a New_D8006EED8 object. Only the fields read here. */
 typedef struct SeqData {
     BASICCLASS_FIELDS(BasicClassMethods);
@@ -56,7 +48,7 @@ typedef struct SeqData {
 
 struct WBgm {
     BASICCLASS_FIELDS(WBgmMethods);
-    /* +0x00C */ SeqVab *vab;
+    /* +0x00C */ VabStreamObj *vab;   /* New_VabStreamObj(setVab's path) */
     /* +0x010 */ SeqData *seqData;
     /* +0x014 */ s16 seqId;
     /* +0x016 */ u8 pad16[0x1A - 0x16];
@@ -78,7 +70,6 @@ extern short SsSeqOpen(unsigned long *addr, short vab_id);
 
 extern void *BMemPMgrAlloc(s32 size);
 extern SeqData *New_D8006EED8(s32 arg);
-extern SeqVab *New_VabStreamObj(s32 arg0);
 extern void printf(const char *fmt);
 extern const char D_80010FEC[]; /* "Seq Open error in WBgmHandleMonitorEvent" */
 WBgmMethods *Get_vtable_WBgm(void);
@@ -120,7 +111,7 @@ void WBgm__Finalize(WBgm *self) {
     self->methods->stop(self);
     SsSeqClose(self->seqId);
     if (self->vab != NULL) {
-        self->vab->methods->release((BasicClass *)self->vab);
+        self->vab->methods->release(self->vab);
     }
     if (self->seqData != NULL) {
         self->seqData->methods->release((BasicClass *)self->seqData);
@@ -140,7 +131,7 @@ void WBgm__Update(WBgm *self, s32 arg1, s32 arg2) {
     }
 }
 s32 WBgm__HandleMonitorEvent(WBgm *self) {
-    SeqVab *vab;
+    VabStreamObj *vab;
     SeqData *seq;
 
     vab = self->vab;
@@ -151,7 +142,7 @@ s32 WBgm__HandleMonitorEvent(WBgm *self) {
     if (seq == NULL) {
         return 0;
     }
-    if (vab->ready == 0) {
+    if (vab->attrsReady == 0) {
         return 0;
     }
     if (seq->loaded == 0) {
@@ -222,11 +213,11 @@ void WBgm__SetVab(WBgm *self, s32 arg) {
         self->methods->stop(self);
     }
     if (self->vab != NULL) {
-        self->vab->methods->release((BasicClass *)self->vab);
+        self->vab->methods->release(self->vab);
         self->vab = NULL;
     }
     if (arg != 0) {
-        self->vab = New_VabStreamObj(arg);
+        self->vab = New_VabStreamObj((char *)arg);
         if (WBgm__HandleMonitorEvent(self)) {
             if (self->autoPlay != 0) {
                 self->methods->play(self);
