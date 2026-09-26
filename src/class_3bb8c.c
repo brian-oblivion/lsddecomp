@@ -1,37 +1,22 @@
-/* First slice of the 365-function class_3bb8c block -- 20 functions,
- * 0x3BB8C..0x3CD88, all matched C, occupants of `gStageMapMethods` +0x0E4..+0x11C
- * (`tools/classtable.py 0x800866E8`). The remainder is `class_3bb8c_b` and
- * is still a monolithic asm segment.
+/*
+ * class_3bb8c -- the middle third of StageMap (include/StageMap.h): chunk
+ * loading and the position-to-cell math. class_3bb8c_b.c holds the rest;
+ * both units share include/class_3bb8c.h, which holds the class's data
+ * tables.
  *
- * This slice is StageMap's FOOTPRINT/RATE engine: the position-to-grid-cell
- * math and the per-element resource/GPU work that `class_3ac78`'s own unit
- * header (src/class_3ac78.c) describes as living in "class_3bb8c*" --
- * StageMap__ComputeFootprintDescriptor converts a world position
- * (SplitLongVec3) into a grid-cell descriptor (Descriptor10, byte row/column
- * plus sub-cell halfword offsets); StageMap__UpdateFootprintTracking runs
- * every enabled tick (paired with class_3ac78's StageMap__StepScaleRamp)
- * to refresh that descriptor and notify on change; StageMap__LoadChunksAround
- * / StageMap__ComputeNeighbourMask / StageMap__ComputeChunkLoadEntry /
- * StageMap__ApplyChunkLoads build and apply a per-element rate table from
- * a ChunkSlotSpec key/flag array (sDefaultTargetSpecs); and
- * StageMap__PopulateSlotCells / StageMap__ClearSlotCells own an
- * element's resource-load and GPU-link cell array (the same 0x668-byte grid
- * class_3ac78 calls out) and its teardown. StageMap__Enable/Disable set
- * the `enabled` flag class_3ac78 gates all of this on (cross-confirmed
- * there independently, see docs/match-reports/StageMap__Enable.md).
- *
- * The class is declared once, in include/StageMap.h (track 4, round 89);
- * the element's origin is read through Unk14Obj (include/class_3bb8c.h), a
- * GsCOORDINATE2 view with halfword reads.
- *
- * Carve notes for whoever takes the NEXT slice: this block holds all 13 of
- * the game's PSX BIOS trampolines (`jr $t2` with the vector in $t2 and the
- * call number in $t1) and 38 switch jump tables. None of either landed in
- * THIS slice -- verified, not assumed -- which is why it needs no attached
- * rodata slot and no `hasm` segment. The next slice will hit both, and both
- * have to be dispositioned at carve time rather than discovered by a runner
- * that has already spent its attempt budget. See Gate 2 in
- * docs/PARALLEL-RUNS.md.
+ *  - SetTargetAndLoadChunks, ComputeCellOffsets, ComputeCellWorldOffsets:
+ *    a cell descriptor to a world position and the chunk it lies in.
+ *  - Enable/Disable, UpdateFootprintTracking: the per-tick tracking of the
+ *    target (see the class banner).
+ *  - LoadChunksAround, ComputeNeighbourMask, ComputeChunkLoadEntry,
+ *    ApplyChunkLoads, CountPendingLoads, OnNotifyTag1: loading the chunks
+ *    around a centre chunk into the slots, and finishing each load.
+ *  - PopulateSlotCells / ClearSlotCells: linking a loaded chunk's
+ *    placements and models into its slot's cells, and clearing them.
+ *  - GetTargetDescriptor, ComputeFootprintDescriptor, SplitChunkIndex,
+ *    GetLastEventSlotChunk, FindSlotByNeighbour, FindSlotForPosition:
+ *    queries. A slot's position is read through Unk14Obj
+ *    (include/class_3bb8c.h), a GsCOORDINATE2 view with halfword reads.
  */
 #include "common.h"
 #include "class_3bb8c.h"

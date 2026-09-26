@@ -1,25 +1,22 @@
-/* Second slice of the 365-function class_3bb8c block, 0x3CD88..0x3DA54 --
- * the same class as class_3bb8c.c's first slice (StageMap,
- * gStageMapMethods, declared in include/StageMap.h), split only for
- * parallel runners, so this unit reuses that unit's header (same convention
- * as Entity.c/Entity_b.c).
+/*
+ * class_3bb8c_b -- the last third of StageMap (include/StageMap.h),
+ * sharing include/class_3bb8c.h with class_3bb8c.c.
  *
- * Functionally this slice is the class's SPATIAL GRID / FOOTPRINT
- * subsystem: the seven elements (self->slots), each mapped onto up to four
- * CellRect rectangles (self->rects), and a per-cell bit (bit 31 of a
- * GridCell cell's `attribute`) that RefreshFootprint clears, recomputes
- * (via either ComputeFootprintFromRotation or SetFootprintFromQuery, gated
- * on self->config->isVertical) and sets again through SetFootprintCellFlag. A
- * second, unrelated mechanism lives at the tail of the unit: a rate/
- * countdown pair (self->scaleRampTicks/self->scaleStep) that
- * StepScaleRamp/EndScaleRamp apply to every cell of every element
- * (their updateScale) via the generic ForEachSlot/ForEachSlotCell
- * iterators.
- *
- * "Footprint" is not this unit's own coinage: class_3ac78 already named the
- * analogous mechanism there (StageMap__ApplyToSenderFootprint,
- * SetFootprintRect, SetFootprintFromCell) before this unit's naming pass,
- * and this unit's names were chosen to agree with that vocabulary. */
+ *  - FindSlotIndexByNeighbour, FindSlotIndexByChunk: slot lookups.
+ *  - The footprint: once every chunk is loaded, RefreshFootprint sets bit
+ *    31 of `attribute` (libgs GsDOFF, display off) on the cells of the
+ *    current `rects` and every cell chained behind them, rebuilds `rects`,
+ *    the up to four cell rectangles around the target
+ *    (ComputeFootprintFromRotation and BuildFootprintSlots/
+ *    SplitFootprintSlot in a flat grid, SetFootprintFromQuery and
+ *    InitFootprintSlot in a vertical one), and clears the bit on the new
+ *    ones (SetFootprintCellFlag). IsPointOutOfBounds tests a cell against
+ *    `bounds` (SetBounds).
+ *  - The scale ramp: StartScaleRamp, StepScaleRamp, EndScaleRamp and their
+ *    per-cell callbacks AddScaleStepToCell and ResetCellScale, run over
+ *    every cell by ForEachSlot/ForEachSlotCell.
+ *  - GetUnk1CC, and GetStageMapMethods.
+ */
 #include "common.h"
 #include "class_3bb8c.h"
 #include "LbdFile.h"

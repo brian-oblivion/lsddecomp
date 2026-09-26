@@ -1,34 +1,24 @@
 /*
  * class_3ac78 -- TimedTask's last two functions (TimedTask__PlaySound and
  * GetTimedTaskMethods, include/TimedTask.h; the rest are in class_39e08),
- * then the front half of StageMap, the class whose method table is
- * gStageMapMethods (80 slots, header 0x114; tools/classtable.py gStageMapMethods). It
- * derives from SceneNode (code_d294) through LightRig (include/LightRig.h,
- * gLightRigMethods: the three flat lights and the ambient colour), whose ctor
- * and finalize its own chain to, and the game builds exactly one, at boot, in class_39e08's Class865C8__Class865C8 via New_StageMap(0, 1).
+ * then the front third of StageMap (include/StageMap.h): the loaded part of
+ * a stage's map, seven chunk slots each laid out as a lattice of GridCells.
  *
- * What it manages is a GRID. The object owns seven elements (elems[7]), each
- * pairing a loader, a placement list, a parent node, and a 0x668-byte heap
- * block holding that element's grid of GridCell cells; the constructor seeds every
- * cell with a world position on a 0x800 lattice. Indexing the grid uses a row
- * stride of 20 cells -- the same 20 that gDefaultGridSpan >> 11 produces
- * (0xA000 / 0x800, see StageMap__SetGridSpan) and the same stride
- * class_3bb8c_b's byte-matched StageMap__SetFootprintCellFlag walks.
+ * This third holds the object's life and its command path: the allocator
+ * and ctor (seven slots, each an LbdFile, a placement list, a cellParent
+ * GridCell attached at `origin` and 410 cells on a 0x800 lattice, row stride
+ * 20), Finalize, OnNotify, Reset, OnSlotEvent, the per-tick update
+ * (UpdateIfEnabled: footprint tracking, then the scale ramp), UnloadAllSlots,
+ * the setters ObjM configures it through (SetChildParams, SetCallback,
+ * SetAcceptedTags, SetGridSpan, SetConfig), and the path a command takes to
+ * the cells: DispatchLinkCommand and ForwardAcceptedCommand filter the
+ * sender against acceptedTags, ApplyToSenderFootprint turns the sender's
+ * position into one cell rectangle (SetFootprintFromCell or
+ * SetFootprintRect), and DispatchToRectCells hands the command to every cell
+ * in it and every cell chained behind each (NotifyGridCell).
  *
- * Work reaches the cells through a rectangle list (rects[4]/rectCount): a
- * notification arrives at StageMap__OnNotify or StageMap__DispatchLinkCommand,
- * StageMap__ForwardAcceptedCommand filters the sender against acceptedTags,
- * StageMap__ApplyToSenderFootprint turns the sender's position into one
- * rectangle, and StageMap__DispatchToRectCells re-notifies every cell in it
- * and every cell chained behind it. The queries that build those rectangles,
- * and an element's resource and GPU sides, live in class_3bb8c*. The class is
- * declared once, in include/StageMap.h (track 4, round 89).
- *
- * Every function in the unit is matched C; the last three stalls
- * (StageMap__UnloadAllSlots, StageMap__SetFootprintRect and
- * StageMap__DispatchToRectCells) were matched in round 71. func_8004B324 keeps its placeholder name
- * deliberately -- it is an empty vtable stub with no established purpose, the
- * same case as SceneNode__NoOpSlot5C in code_d294_b.
+ * func_8004B324 is the empty +0x0D8 stub; nothing calls it, so it keeps its
+ * placeholder name, like SceneNode__NoOpSlot5C in code_d294_b.
  */
 #include "common.h"
 #include "StageMap.h"
