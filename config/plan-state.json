@@ -872,11 +872,6 @@
           "date": "2026-09-26",
           "header": "include/Class6E99C.h"
         },
-        "D_8006F240": {
-          "class": "Tod",
-          "date": "2026-09-26",
-          "header": "include/Tod.h"
-        },
         "D_8006F384": {
           "class": "ModelData",
           "date": "2026-09-25",
@@ -1111,6 +1106,11 @@
           "class": "TmdModel",
           "date": "2026-09-26",
           "header": "include/TmdModel.h"
+        },
+        "gTodMethods": {
+          "class": "Tod",
+          "date": "2026-09-26",
+          "header": "include/Tod.h"
         },
         "gVabDriverMethods": {
           "class": "VabDriver",

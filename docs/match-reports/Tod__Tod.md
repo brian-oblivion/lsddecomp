@@ -9,9 +9,9 @@ drift. Fresh ground (carved revision 18, no prior report).
 
 ## What it does
 
-Constructor: active driver's ctor, install D_8006F240 (GetTodMethods); the argument is a two-word source descriptor { buffer, name }: with a buffer, adopt it (+0x10 = buffer, +0x14 size = 0) and call its own +0x064 (setFlag override); without one, call its own requestLoadFile (+0x06C) with the name.
+Constructor: active driver's ctor, install gTodMethods (GetTodMethods); the argument is a two-word source descriptor { buffer, name }: with a buffer, adopt it (+0x10 = buffer, +0x14 size = 0) and call its own +0x064 (setFlag override); without one, call its own requestLoadFile (+0x06C) with the name.
 
-Table slot (`tools/classtable.py`): D_8006F240 +0x008.
+Table slot (`tools/classtable.py`): gTodMethods +0x008.
 
 ## Source
 

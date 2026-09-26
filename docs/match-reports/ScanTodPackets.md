@@ -11,7 +11,7 @@ drift. Fresh ground (carved revision 18, no prior report).
 
 Walk a packet stream: the u16 at data +2 is the packet count, packets start at data +8. Each packet is decoded by DecodeTodPacketWord (the tables' +0x080) into value / type / sub-type / length-in-words. Type 8 sub-type 0: count it and append the value to `out` when given. Type 2: with `out` and `sel`, when the packet's halfword at +4 equals `*sel`, search the values appended so far (rewinding `out` by the count) for this packet's value and keep its index; without `out`, count it. The index / count is stored through `sel` when given; returns the number appended (u8).
 
-Table slot (`tools/classtable.py`): D_8006F240 +0x07C and D_8006F590 +0x07C (both tables share it; Tod__ScanPackets / TodSet__ScanPackets call it through slot +0x07C with the data past the buffer header).
+Table slot (`tools/classtable.py`): gTodMethods +0x07C and D_8006F590 +0x07C (both tables share it; Tod__ScanPackets / TodSet__ScanPackets call it through slot +0x07C with the data past the buffer header).
 
 ## Source
 
@@ -21,7 +21,7 @@ fields +0x2C..+0x38), `Ctor33808`, `CountedBuf33808` and `Req44858` sit at the
 top of / earlier in `src/code_33808.c`.
 
 ```c
-/* D_8006F240/D_8006F590 +0x07C: walk the packet words after the u16 count
+/* gTodMethods/D_8006F590 +0x07C: walk the packet words after the u16 count
  * at data +2 (from data +8), each decoded by +0x080 into a value, a type, a
  * sub-type and a length in words. Type 8 sub-type 0 appends the value to
  * `out` (when given) and counts it; type 2 either, with `out`, looks the

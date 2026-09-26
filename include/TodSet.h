@@ -21,7 +21,7 @@
  * include/ModelData.h).
  *
  * NO OWN SLOTS: the table is Tod's 0x84 bytes, with +0x008, +0x00C, +0x064
- * and +0x078 overridden (`classtable.py D_8006F590 --vs D_8006F240`).
+ * and +0x078 overridden (`classtable.py D_8006F590 --vs gTodMethods`).
  * +0x064 keeps the inherited name `setFlag` and its void type; the occupant
  * TodSet__BuildTods returns s32 (0 when every Tod was built), and the ctor
  * casts the call, as ModelData__ModelData casts its own. +0x078 is

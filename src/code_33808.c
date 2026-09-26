@@ -19,7 +19,7 @@
  *   - TimArraySrc  (gTimArraySrcMethods): an array of TimImage objects
  *     (code_2bb9c.c's New_TimImage), one per TimBlockSrc block
  *     (include/TimArraySrc.h, track 4, round 88).
- *   - Tod / TodSet (D_8006F240 / D_8006F590, TodSet a Tod subclass): one
+ *   - Tod / TodSet (gTodMethods / D_8006F590, TodSet a Tod subclass): one
  *     TOD's packet stream (ScanTodPackets/DecodeTodPacketWord) and an array
  *     of them; named from include/code_55dd4.h's own "TOD set" (Unk30Obj).
  *   - ModelData / TriggerWorld (D_8006F384 / D_8006F40C, TriggerWorld a
@@ -563,7 +563,7 @@ TimArraySrcMethods *GetTimArraySrcMethods(void) {
     return &gTimArraySrcMethods;
 }
 
-/* Allocate and construct a D_8006F240 object. */
+/* Allocate and construct a gTodMethods object. */
 Tod *New_Tod(Src6F240 *src) {
     void *obj = BMemPMgrAlloc(0x2C);
 
@@ -574,7 +574,7 @@ Tod *New_Tod(Src6F240 *src) {
     return NULL;
 }
 
-/* D_8006F240 +0x008: constructor -- the active driver's, then this table;
+/* gTodMethods +0x008: constructor -- the active driver's, then this table;
  * adopt a buffer handed in (size 0) and run its own +0x064, or else request
  * the named file. */
 void Tod__Tod(Tod *self, Src6F240 *src) {
@@ -589,17 +589,17 @@ void Tod__Tod(Tod *self, Src6F240 *src) {
     }
 }
 
-/* D_8006F240 +0x00C: finalize, straight to the active driver's. */
+/* gTodMethods +0x00C: finalize, straight to the active driver's. */
 void Tod__Finalize(Tod *self) {
     GetActiveDataSourceMethods()->finalize((Class6D430 *)self);
 }
 
-/* D_8006F240 +0x078: slot +0x07C over the buffer past its first two words. */
+/* gTodMethods +0x078: slot +0x07C over the buffer past its first two words. */
 u8 Tod__ScanPackets(Tod *self, u8 *out, u32 *sel) {
     return self->methods->scanTodPackets(self, out, sel, (u32 *)((u8 *)self->buffer + 8));
 }
 
-/* D_8006F240/D_8006F590 +0x07C: walk the packet words after the u16 count
+/* gTodMethods/D_8006F590 +0x07C: walk the packet words after the u16 count
  * at data +2 (from data +8), each decoded by +0x080 into a value, a type, a
  * sub-type and a length in words. Type 8 sub-type 0 appends the value to
  * `out` (when given) and counts it; type 2 either, with `out`, looks the
@@ -651,7 +651,7 @@ u8 ScanTodPackets(Tod *self, u8 *out, u32 *sel, u32 *data) {
     return cnt;
 }
 
-/* D_8006F240/D_8006F590 +0x080: decode one packet word -- the low byte, then
+/* gTodMethods/D_8006F590 +0x080: decode one packet word -- the low byte, then
  * the two nibbles at bits 16 and 20, then the top byte -- and return the
  * pointer past it. */
 u32 *DecodeTodPacketWord(Tod *self, u32 *acc, u8 *out0, u8 *out1, u8 *out2, u8 *out3) {
@@ -665,7 +665,7 @@ u32 *DecodeTodPacketWord(Tod *self, u32 *acc, u8 *out0, u8 *out1, u8 *out2, u8 *
 }
 
 TodMethods *GetTodMethods(void) {
-    return &D_8006F240;
+    return &gTodMethods;
 }
 
 /* Allocate and construct a gBgLayerMethods object. */

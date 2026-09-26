@@ -9,17 +9,17 @@ deletions, no out-of-range drift. Fresh ground (carved revision 18, no prior rep
 
 ## What it does
 
-Table getter: returns the method table `D_8006F240` (`lui/addiu; jr; nop`), declared locally as `extern s32 D_8006F240[];`.
+Table getter: returns the method table `gTodMethods` (`lui/addiu; jr; nop`), declared locally as `extern s32 gTodMethods[];`.
 
 Table slot (`tools/classtable.py`): `D_8006D430` +0x0A4.
 
 ## Source
 
 ```c
-extern s32 D_8006F240[];
+extern s32 gTodMethods[];
 
 void *GetTodMethods(void) {
-    return D_8006F240;
+    return gTodMethods;
 }
 ```
 
@@ -34,4 +34,4 @@ void *GetTodMethods(void) {
 
 ## Track 4 (2026-09-26, round 86, charlie)
 
-The local `extern s32 D_8006F240[];` is gone: the table is `extern TodMethods D_8006F240;` in include/Tod.h and the getter returns `TodMethods *` (`return &D_8006F240;`). Bytes unchanged.
+The local `extern s32 gTodMethods[];` is gone: the table is `extern TodMethods gTodMethods;` in include/Tod.h and the getter returns `TodMethods *` (`return &gTodMethods;`). Bytes unchanged.
