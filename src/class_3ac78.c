@@ -1,37 +1,27 @@
 /*
  * class_3ac78 -- TimedTask's last two functions (TimedTask__PlaySound and
  * GetTimedTaskMethods, include/TimedTask.h; the rest are in class_39e08),
- * then the front half of Class866E8, the class whose method table is
- * gClass866E8Methods (80 slots, header 0x114; tools/classtable.py gClass866E8Methods). It
- * derives from SceneNode (code_d294) through LightRig (include/LightRig.h,
- * gLightRigMethods: the three flat lights and the ambient colour), whose ctor
- * and finalize its own chain to, and the game builds exactly one, at boot, in class_39e08's Class865C8__Class865C8 via New_Class866E8(0, 1).
+ * then the front third of StageMap (include/StageMap.h): the loaded part of
+ * a stage's map, seven chunk slots each laid out as a lattice of GridCells.
  *
- * What it manages is a GRID. The object owns seven elements (elems[7]), each
- * pairing a loader, a placement list, a parent node, and a 0x668-byte heap
- * block holding that element's grid of GridCell cells; the constructor seeds every
- * cell with a world position on a 0x800 lattice. Indexing the grid uses a row
- * stride of 20 cells -- the same 20 that gDefaultGridSpan >> 11 produces
- * (0xA000 / 0x800, see Class866E8__SetGridSpan) and the same stride
- * class_3bb8c_b's byte-matched Class866E8__SetFootprintCellFlag walks.
+ * This third holds the object's life and its command path: the allocator
+ * and ctor (seven slots, each an LbdFile, a placement list, a cellParent
+ * GridCell attached at `origin` and 410 cells on a 0x800 lattice, row stride
+ * 20), Finalize, OnNotify, Reset, OnSlotEvent, the per-tick update
+ * (UpdateIfEnabled: footprint tracking, then the scale ramp), UnloadAllSlots,
+ * the setters ObjM configures it through (SetChildParams, SetCallback,
+ * SetAcceptedTags, SetGridSpan, SetConfig), and the path a command takes to
+ * the cells: DispatchLinkCommand and ForwardAcceptedCommand filter the
+ * sender against acceptedTags, ApplyToSenderFootprint turns the sender's
+ * position into one cell rectangle (SetFootprintFromCell or
+ * SetFootprintRect), and DispatchToRectCells hands the command to every cell
+ * in it and every cell chained behind each (NotifyGridCell).
  *
- * Work reaches the cells through a rectangle list (rects[4]/rectCount): a
- * notification arrives at Class866E8__OnNotify or Class866E8__DispatchLinkCommand,
- * Class866E8__ForwardAcceptedCommand filters the sender against acceptedTags,
- * Class866E8__ApplyToSenderFootprint turns the sender's position into one
- * rectangle, and Class866E8__DispatchToRectCells re-notifies every cell in it
- * and every cell chained behind it. The queries that build those rectangles,
- * and an element's resource and GPU sides, live in class_3bb8c*. The class is
- * declared once, in include/Class866E8.h (track 4, round 89).
- *
- * Every function in the unit is matched C; the last three stalls
- * (Class866E8__ResetAllElements, Class866E8__SetFootprintRect and
- * Class866E8__DispatchToRectCells) were matched in round 71. func_8004B324 keeps its placeholder name
- * deliberately -- it is an empty vtable stub with no established purpose, the
- * same case as SceneNode__NoOpSlot5C in code_d294_b.
+ * func_8004B324 is the empty +0x0D8 stub; nothing calls it, so it keeps its
+ * placeholder name, like SceneNode__NoOpSlot5C in code_d294_b.
  */
 #include "common.h"
-#include "Class866E8.h"
+#include "StageMap.h"
 #include "VabStreamObj.h"
 #include "LightRig.h"
 #include "TimedTask.h"
@@ -59,27 +49,27 @@ TimedTaskMethods *GetTimedTaskMethods(void) {
     return &gTimedTaskMethods;
 }
 
-Class866E8 *New_Class866E8(Unk54Struct *origin, s32 autoLoad) {
-    Class866E8 *self;
+StageMap *New_StageMap(LongVec3 *origin, s32 autoLoad) {
+    StageMap *self;
 
     self = BMemPMgrAlloc(0x1E8);
     if (self != NULL) {
-        GetClass866E8Methods()->ctor(self, origin, autoLoad);
+        GetStageMapMethods()->ctor(self, origin, autoLoad);
         return self;
     }
     return NULL;
 }
 
 /*
- * Class866E8__Class866E8's own helpers -- all still-uncarved elsewhere, typed
+ * StageMap__StageMap's own helpers -- all still-uncarved elsewhere, typed
  * purely from this call site's own register usage.
  */
 extern void BMemPMgrFree(void *arg1);
-extern Unk54Struct gDefaultOrigin;
+extern LongVec3 gDefaultOrigin;
 
-void Class866E8__Class866E8(Class866E8 *self, Unk54Struct *origin, s32 autoLoad) {
+void StageMap__StageMap(StageMap *self, LongVec3 *origin, s32 autoLoad) {
     s32 i;
-    Class866E8Elem *entry;
+    ChunkSlot *entry;
     GridCell *obj;
     GridCell **cellp;
     u8 *p;
@@ -87,7 +77,7 @@ void Class866E8__Class866E8(Class866E8 *self, Unk54Struct *origin, s32 autoLoad)
     s32 buf[3];
 
     GetLightRigMethods()->ctor((LightRig *)self);
-    self->methods = GetClass866E8Methods();
+    self->methods = GetStageMapMethods();
 
     if (origin != NULL) {
         self->origin = *origin;
@@ -95,16 +85,16 @@ void Class866E8__Class866E8(Class866E8 *self, Unk54Struct *origin, s32 autoLoad)
         self->origin = gDefaultOrigin;
     }
 
-    self->unk1B0 = 0;
+    self->loadsPending = 0;
     self->unk1B4 = 0;
-    self->unk1B8 = 0;
+    self->chunksLoaded = 0;
     self->enabled = 0;
     self->target = NULL;
     self->acceptedTags = 0;
-    self->rateCountdown = 0;
+    self->scaleRampTicks = 0;
 
     for (i = 0; i < 7; i++) {
-        entry = &self->elems[i];
+        entry = &self->slots[i];
 
         entry->loader = New_LbdFile();
         entry->loader->freeGuard = (entry->loader->buffer != NULL);
@@ -113,13 +103,12 @@ void Class866E8__Class866E8(Class866E8 *self, Unk54Struct *origin, s32 autoLoad)
 
         entry->heldObj = NULL;
         entry->unk18 = 0;
-        entry->key = i;
-        entry->flag = 0;
+        entry->neighbour = i;
+        entry->loadPending = 0;
 
         entry->placements = New_PlacementGrid(0);
         entry->cellParent = New_GridCell();
-        entry->cellParent->methods->attachToParent(entry->cellParent, (SceneNode *)self,
-                                                   (LongVec3 *)&self->origin);
+        entry->cellParent->methods->attachToParent(entry->cellParent, (SceneNode *)self, &self->origin);
 
         entry->cells = (GridCell **)BMemPMgrAlloc(0x668);
         if (entry->cells == NULL) {
@@ -156,9 +145,9 @@ void Class866E8__Class866E8(Class866E8 *self, Unk54Struct *origin, s32 autoLoad)
     self->methods->reset(self);
 }
 
-void Class866E8__Finalize(Class866E8 *self) {
+void StageMap__Finalize(StageMap *self) {
     s32 i;
-    Class866E8Elem *entry;
+    ChunkSlot *entry;
     GridCell *obj;
     GridCell **cellp;
     u8 *p;
@@ -167,8 +156,8 @@ void Class866E8__Finalize(Class866E8 *self) {
     self->methods->removeChild(self, (BasicClass *)GetDrawSystem());
 
     for (i = 0; i < 7; i++) {
-        entry = &self->elems[i];
-        ((Class866E8OnElementEventFn)self->methods->notifyWithHull)(self, 6, entry, i);
+        entry = &self->slots[i];
+        ((StageMapOnSlotEventFn)self->methods->notifyWithHull)(self, 6, entry, i);
 
         if (entry->loader != NULL) {
             entry->loader->methods->release(entry->loader);
@@ -206,7 +195,7 @@ void Class866E8__Finalize(Class866E8 *self) {
  * arguments these calls used to pass the no-argument getter as zero-cost (the
  * jal's delay slot holds a callee-save spill); track 4 dropped them. */
 
-void Class866E8__OnNotify(Class866E8 *self, BasicClass *sender, s32 command) {
+void StageMap__OnNotify(StageMap *self, BasicClass *sender, s32 command) {
     GetSceneNodeMethods()->onNotify((SceneNode *)self, sender, command);
 
     if ((sender->methods->header & 0xF) == 1) {
@@ -216,7 +205,7 @@ void Class866E8__OnNotify(Class866E8 *self, BasicClass *sender, s32 command) {
 
 extern s32 gDefaultGridSpan;
 
-void Class866E8__Reset(Class866E8 *self) {
+void StageMap__Reset(StageMap *self) {
     self->config = NULL;
     self->acceptedTags = 0;
     self->rectCount = 0;
@@ -227,7 +216,7 @@ void Class866E8__Reset(Class866E8 *self) {
     self->unk1D8 = -1;
 }
 
-void Class866E8__OnElementEvent(Class866E8 *self, s32 command, Class866E8Elem *elem) {
+void StageMap__OnSlotEvent(StageMap *self, s32 command, ChunkSlot *elem) {
     GetSceneNodeMethods()->notifyWithHull((SceneNode *)self, command);
 
     if (command == 6)
@@ -242,51 +231,51 @@ handle6:
     }
 
 merge:
-    self->lastEventElem = elem;
+    self->lastEventSlot = elem;
     self->methods->notifyParents(self, command);
 }
 
-void Class866E8__UpdateIfEnabled(Class866E8 *self) {
+void StageMap__UpdateIfEnabled(StageMap *self) {
     if (self->enabled) {
         self->methods->updateFootprintTracking(self);
-        self->methods->advanceRateCountdown(self);
+        self->methods->stepScaleRamp(self);
     }
 }
 
-void Class866E8__DispatchLinkCommand(Class866E8 *self, BasicClass *sender, s32 command) {
+void StageMap__DispatchLinkCommand(StageMap *self, BasicClass *sender, s32 command) {
     if ((u8)sender->methods->header == 0x34) {
         self->methods->forwardAcceptedCommand(self, sender, command);
     }
 }
 
 /* Reset every one of the seven grid elements, then the two counters.
- * Matched round 71: `&self->elems[i]` is what produces retail's
+ * Matched round 71: `&self->slots[i]` is what produces retail's
  * base + running-offset walk (GCC's strength reduction), not a hand-rolled
  * byte offset. */
-void Class866E8__ResetAllElements(Class866E8 *self) {
+void StageMap__UnloadAllSlots(StageMap *self) {
     s32 i;
-    Class866E8Elem *entry;
+    ChunkSlot *entry;
     PlacementGrid *list;
 
     for (i = 0; i < 7; i++) {
-        entry = &self->elems[i];
+        entry = &self->slots[i];
         entry->loader->methods->cancelRequests(entry->loader);
-        entry->flag = 0;
-        self->methods->resetElementCells(self, entry);
+        entry->loadPending = 0;
+        self->methods->clearSlotCells(self, entry);
         list = entry->placements;
         if (list->linkResource != NULL) {
             list->linkResource = list->linkResource->methods->release(list->linkResource);
         }
-        ((Class866E8OnElementEventFn)self->methods->notifyWithHull)(self, 6, entry, i);
+        ((StageMapOnSlotEventFn)self->methods->notifyWithHull)(self, 6, entry, i);
         entry->loader->methods->releaseDataBlock(entry->loader);
     }
 
-    self->unk1B8 = 0;
+    self->chunksLoaded = 0;
     self->unk1B4 = 0;
-    self->methods->flushRateLatch(self);
+    self->methods->endScaleRamp(self);
 }
 
-void Class866E8__SetChildParams(Class866E8 *self, s32 count, s32 dirs, s32 colors) {
+void StageMap__SetChildParams(StageMap *self, s32 count, s32 dirs, s32 colors) {
     s32 i;
     FlatLightObj *light;
 
@@ -299,16 +288,16 @@ void Class866E8__SetChildParams(Class866E8 *self, s32 count, s32 dirs, s32 color
     }
 }
 
-void Class866E8__SetCallback(Class866E8 *self, Class866E8ValueFn fn, void *ctx) {
-    self->valueFn = fn;
-    self->valueFnCtx = ctx;
+void StageMap__SetCallback(StageMap *self, ChunkFileFn fn, void *ctx) {
+    self->chunkFileFn = fn;
+    self->chunkFileCtx = ctx;
 }
 
-void Class866E8__SetAcceptedTags(Class866E8 *self, s32 *tags) {
+void StageMap__SetAcceptedTags(StageMap *self, s32 *tags) {
     self->acceptedTags = tags;
 }
 
-void Class866E8__ForwardAcceptedCommand(Class866E8 *self, void *sender, s32 command) {
+void StageMap__ForwardAcceptedCommand(StageMap *self, void *sender, s32 command) {
     s32 *p;
     u8 unused[24];
 
@@ -338,14 +327,14 @@ void Class866E8__ForwardAcceptedCommand(Class866E8 *self, void *sender, s32 comm
     } while (*p != 0);
 }
 
-void Class866E8__ApplyToSenderFootprint(Class866E8 *self, SceneNode *sender, s32 command) {
-    QueryPos866E8 *pos;
-    GridSlotList866E8 saved;
+void StageMap__ApplyToSenderFootprint(StageMap *self, SceneNode *sender, s32 command) {
+    SplitLongVec3 *pos;
+    CellRectSet saved;
     Descriptor10Ext buf;
     s32 savedRectCount;
 
     if (sender->parent != NULL) {
-        pos = (QueryPos866E8 *)sender->coord2->unk38;
+        pos = (SplitLongVec3 *)sender->coord2->unk38;
     } else {
         pos = NULL;
     }
@@ -357,19 +346,19 @@ void Class866E8__ApplyToSenderFootprint(Class866E8 *self, SceneNode *sender, s32
     savedRectCount = self->rectCount;
     saved = self->rects;
 
-    if (self->config->unk4 == 0) {
-        Class866E8__SetFootprintFromCell(self, &buf, 3);
+    if (self->config->isVertical == 0) {
+        StageMap__SetFootprintFromCell(self, &buf, 3);
     } else {
-        Class866E8__SetFootprintRect(self, &buf, 3);
+        StageMap__SetFootprintRect(self, &buf, 3);
     }
 
-    Class866E8__DispatchToRectCells(self, sender, command);
+    StageMap__DispatchToRectCells(self, sender, command);
 
     self->rectCount = savedRectCount;
     self->rects = saved;
 }
 
-void Class866E8__SetFootprintFromCell(Class866E8 *self, Descriptor10Ext *desc, s32 span) {
+void StageMap__SetFootprintFromCell(StageMap *self, Descriptor10Ext *desc, s32 span) {
     s16 t;
 
     self->footprintCol = desc->base.b2 - 1;
@@ -377,14 +366,14 @@ void Class866E8__SetFootprintFromCell(Class866E8 *self, Descriptor10Ext *desc, s
     self->footprintWidth = span;
     self->footprintHeight = span;
     self->footprintRow = t;
-    Class866E8__BuildFootprintSlots(self);
+    StageMap__BuildFootprintSlots(self);
 }
 
 /* Clamp a span x span footprint centred on desc's cell to the 20 x 20 grid:
  * a cell on the low edge (0) loses one row/column, one on the high edge
  * (0x13) loses one too. The edge tests read a COPY of each byte taken before
  * the decrement, and the height companion is `span` itself. Matched round 71. */
-void Class866E8__SetFootprintRect(Class866E8 *self, Descriptor10Ext *desc, s32 span) {
+void StageMap__SetFootprintRect(StageMap *self, Descriptor10Ext *desc, s32 span) {
     s32 col;
     s32 row;
     s32 width;
@@ -416,7 +405,7 @@ void Class866E8__SetFootprintRect(Class866E8 *self, Descriptor10Ext *desc, s32 s
     }
 
     self->rectCount = 1;
-    self->rects.e[0].elemIdx = self->methods->findElemIndexByUnk30(self, desc->unk28);
+    self->rects.e[0].slotIndex = self->methods->findSlotIndexByChunk(self, desc->chunkIndex);
     self->rects.e[0].col = col;
     self->rects.e[0].row = row;
     self->rects.e[0].width = width;
@@ -427,18 +416,18 @@ void Class866E8__SetFootprintRect(Class866E8 *self, Descriptor10Ext *desc, s32 s
  * each cell. Matched round 71: the ORDER of the comma-separated increments
  * is load-bearing in both loops (`entry++, i++` and `cell++, col++`); the
  * reverse order was the whole 95/117 residue. */
-void Class866E8__DispatchToRectCells(Class866E8 *self, SceneNode *sender, s32 command) {
+void StageMap__DispatchToRectCells(StageMap *self, SceneNode *sender, s32 command) {
     s32 i;
     s32 row;
     s32 col;
-    GridSlot866E8 *entry;
-    Class866E8Elem *slot;
+    CellRect *entry;
+    ChunkSlot *slot;
     GridCell **cell;
     GridCell *obj;
 
     entry = self->rects.e;
     for (i = 0; i < self->rectCount; entry++, i++) {
-        slot = &self->elems[entry->elemIdx];
+        slot = &self->slots[entry->slotIndex];
         if (slot->loader->headerReady != 0) {
             cell = (slot->cells + entry->col) + entry->row * 20;
             for (row = 0; row < entry->height; row++) {
@@ -457,8 +446,8 @@ void Class866E8__DispatchToRectCells(Class866E8 *self, SceneNode *sender, s32 co
     }
 }
 
-/* Widened this round (Class866E8__DispatchToRectCells) from a single-param signature to
- * accept two more, unused, forwarded params: Class866E8__DispatchToRectCells's own call
+/* Widened this round (StageMap__DispatchToRectCells) from a single-param signature to
+ * accept two more, unused, forwarded params: StageMap__DispatchToRectCells's own call
  * sites explicitly set up $a1/$a2 before every call here (unlike
  * GetSceneNodeMethods's "leftover, already-there" args -- these are real,
  * explicit `move` instructions), so the call itself needs a matching
@@ -473,19 +462,19 @@ void NotifyGridCell(GridCell *cell, SceneNode *sender, s32 command) {
     }
 }
 
-Descriptor10 *Class866E8__GetCurrentCellKey(Class866E8 *self) {
+Descriptor10 *StageMap__GetCurrentCellKey(StageMap *self) {
     return &self->curCell;
 }
 
 void func_8004B324(void) {}
 
-void Class866E8__SetGridSpan(Class866E8 *self, s32 span) {
+void StageMap__SetGridSpan(StageMap *self, s32 span) {
     self->gridSpan = span;
     self->gridCells = (s16)(span >> 11);
     self->gridHalfCells = (s16)(span >> 12);
 }
 
-void Class866E8__SetConfig(Class866E8 *self, Unk68Struct *config) {
+void StageMap__SetConfig(StageMap *self, StageGridDimensions *config) {
     self->methods->reset(self);
     self->config = config;
 }

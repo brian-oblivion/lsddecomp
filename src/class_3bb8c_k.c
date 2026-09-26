@@ -384,7 +384,7 @@ void ObjM__OnNotify(ObjM *self, BasicClass *sender, s32 event) {
     GetTimedTaskMethods()->onNotify((TimedTask *)self, sender, event);
     tag = sender->methods->header;
     if ((tag & 0xFFF) == 0x114) {
-        self->methods->onClass866E8Notify(self, sender, event);
+        self->methods->onStageMapNotify(self, sender, event);
     } else if ((tag & 0xFFF) == 0x164) {
         self->methods->onFadeNotify(self, (struct FadeBox *)sender, event);
     } else if ((tag & 0xFFFF) == 0x1F34) {

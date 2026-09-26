@@ -4,26 +4,26 @@
 #include "SceneNode.h"
 
 /*
- * GridCell -- one cell of Class866E8's grid: a SceneNode that carries the
+ * GridCell -- one cell of StageMap's grid: a SceneNode that carries the
  * model placed in that cell. Class id 0x24, method table gGridCellMethods;
  * SceneNode's subclass (the ctor chains to SceneNode's first), no class
  * below it. Methods in src/class_3bb8c_c.c.
  *
- * Lifecycle: only Class866E8__Class866E8 (src/class_3ac78.c) creates them.
+ * Lifecycle: only StageMap__StageMap (src/class_3ac78.c) creates them.
  * For each of its seven elements it makes one GridCell as the element's
- * `cellParent`, attached to the Class866E8 at `origin`, and 410 more as
+ * `cellParent`, attached to the StageMap at `origin`, and 410 more as
  * the element's `cells` (a 20 x 20 lattice, row stride 20, then 10
  * overflow cells), each attached to the cellParent 0x800 units apart in x
- * and z, lighting mode 1, `attribute` bit 31 set. Class866E8__Finalize
+ * and z, lighting mode 1, `attribute` bit 31 set. StageMap__Finalize
  * releases them all.
  *
- * Use: Class866E8__LoadElementResources fills a cell from the element's
+ * Use: StageMap__PopulateSlotCells fills a cell from the element's
  * placement records, linking the placement's TMD onto it (`model`, `tmd`,
  * GsLinkObject4 on `attribute`), setting its coord2 translation and y
  * rotation and its `flags36`; a record flagged as chained goes into one of
  * the overflow cells and is hung off the lattice cell through `nextInCell`.
- * Class866E8__ResetElementCells clears them again. Two walks read a cell
- * and its chain: Class866E8__DispatchToRectCells hands a command to every
+ * StageMap__ClearSlotCells clears them again. Two walks read a cell
+ * and its chain: StageMap__DispatchToRectCells hands a command to every
  * cell under a footprint rectangle (NotifyGridCell: only a cell with
  * flags36 bit 0x80), and Actor__ScanGridWindow raycasts vertically against
  * each (SceneNode__RaycastVertical).

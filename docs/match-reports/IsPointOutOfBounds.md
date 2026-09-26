@@ -16,7 +16,7 @@ positional skeleton diffs 25** — the same as round 71.
 the `NON_MATCHING` block removed):
 
 ```c
-s32 IsPointOutOfBounds(Bounds866E8_3bb8c_b *bounds, s8 *point) {
+s32 IsPointOutOfBounds(CellBounds *bounds, s8 *point) {
     if (bounds != NULL && point[0] >= bounds->minX && bounds->maxX >= point[0]
         && point[1] >= bounds->minY && bounds->maxY >= point[1]) {
         return 0;
@@ -27,7 +27,7 @@ s32 IsPointOutOfBounds(Bounds866E8_3bb8c_b *bounds, s8 *point) {
 
 `./build-and-verify.sh`: exit 0, `OK: build matches retail`; funcdiff 27/27,
 `insertions 0 / deletions 0`; `tools/check-nonmatching.sh` green. The caller
-`Class866E8__SetFootprintFromQuery` is untouched (same signature).
+`StageMap__SetFootprintFromQuery` is untouched (same signature).
 
 **Why it works (the mechanism round 71 named, and the construct that
 reaches it).** Round 71 established that the one root is that retail's
@@ -121,7 +121,7 @@ from the temps; it lands in `$a3` (shape below).
 | `?:` return, either polarity; single `if (\|\|) return 1;` | 2/27 or 0/27 | 6/6 or 1/1 |
 | `result = point[1]; result = b8 < result;` | 0/27 | 3/3 |
 | comparisons flipped (`p0 <= b4`, `p1 > b8`) | 0/27 | 3/3 |
-| return type `u8`/`s8`/`s16`/`u16` | 5/27, 0/0 in range, but **97 bytes differ in the caller** (`Class866E8__SetFootprintFromQuery`): rejected |
+| return type `u8`/`s8`/`s16`/`u16` | 5/27, 0/0 in range, but **97 bytes differ in the caller** (`StageMap__SetFootprintFromQuery`): rejected |
 
 **Bounded search (one).** Gate 3, all three checks, on the 1/1 result-variable
 shape: (1) scaffold compiles, base 360; (2) `--debug --stack-diffs`: 1
@@ -143,8 +143,8 @@ that local-alloc's temps have already shut out of `$v0`.
 
 ```c
 #if 0
-/* needs: common.h, class_3bb8c.h (Bounds866E8_3bb8c_b) */
-s32 IsPointOutOfBounds(Bounds866E8_3bb8c_b *bounds, s8 *point) {
+/* needs: common.h, class_3bb8c.h (CellBounds) */
+s32 IsPointOutOfBounds(CellBounds *bounds, s8 *point) {
     s32 result;
 
     result = 1;
@@ -212,7 +212,7 @@ block live after any checkout.
 > function needs a scaffold with more real surrounding-file context before
 > it can be trusted, which is head-scale work, not a bounded runner
 > attempt -- consistent with three other functions in this unit
-> (`Class866E8__SplitFootprintSlot`, `Class866E8__ComputeFootprintDescriptor`, `Class866E8__ApplyRateEntries`, `Class866E8__BuildFootprintSlots`)
+> (`StageMap__SplitFootprintSlot`, `StageMap__ComputeFootprintDescriptor`, `StageMap__ApplyChunkLoads`, `StageMap__BuildFootprintSlots`)
 > reaching the identical verdict this round and last.
 >
 > ### Proposed learning
@@ -230,10 +230,10 @@ block live after any checkout.
 > this file's other functions included changes the picture, rather than
 > retrying with fresh RNG on the same isolated seed.
 
-Not a vtable slot (confirmed absent from `gClass866E8Methods` via
+Not a vtable slot (confirmed absent from `gStageMapMethods` via
 `tools/classtable.py`) — a plain, non-virtual bounding-box test. Only
-caller: `Class866E8__SetFootprintFromQuery` (`IsPointOutOfBounds(self->unk1DC, &stackBuf[0x12])`),
-which established `Obj866E8::unk1DC`'s type (see `Class866E8__SetBounds`'s
+caller: `StageMap__SetFootprintFromQuery` (`IsPointOutOfBounds(self->unk1DC, &stackBuf[0x12])`),
+which established `Obj866E8::unk1DC`'s type (see `StageMap__SetBounds`'s
 report).
 
 ## What the function does (not in doubt)
@@ -273,7 +273,7 @@ jr ra
 This maps directly onto:
 
 ```c
-s32 IsPointOutOfBounds(Bounds866E8_3bb8c_b *bounds, s8 *point) {
+s32 IsPointOutOfBounds(CellBounds *bounds, s8 *point) {
     if (bounds == NULL) return 1;
     if (point[0] < bounds->unk0) return 1;
     if (bounds->unk4 < point[0]) return 1;
@@ -326,7 +326,7 @@ outputs (never mid-way), regardless of surface syntax:
    lowered identically to repeated `return 1;` statements by this
    compiler for this shape, at least here.
 4. **`goto fail;` with `bounds` copied into an explicit local first**
-   (`Bounds866E8_3bb8c_b *bounds = arg0;`), attempting to force retail's
+   (`CellBounds *bounds = arg0;`), attempting to force retail's
    `move a2,a0`. Byte-identical to attempt 3 — the redundant local was
    optimized away with no effect on codegen.
 5. **`goto fail;` with the byte values cached into explicit `s8 x, y;`
@@ -391,7 +391,7 @@ existence.
 #if 0
 /* Shape B (attempt 2) -- matches retail's branch TARGETS for 3 of 4 early
  * exits, closest structural match found, still not byte-exact. */
-s32 IsPointOutOfBounds(Bounds866E8_3bb8c_b *bounds, s8 *point) {
+s32 IsPointOutOfBounds(CellBounds *bounds, s8 *point) {
     if (bounds == NULL || point[0] < bounds->unk0 || bounds->unk4 < point[0] ||
         point[1] < bounds->unk2) {
         return 1;
@@ -403,10 +403,10 @@ s32 IsPointOutOfBounds(Bounds866E8_3bb8c_b *bounds, s8 *point) {
 
 ## New struct knowledge (established despite the stall)
 
-- New type `Bounds866E8_3bb8c_b` (`unk0`/`unk2` s16, `unk4`/`unk8` s32) —
+- New type `CellBounds` (`unk0`/`unk2` s16, `unk4`/`unk8` s32) —
   derived from reading THIS function's own body, independent of whether a
   byte-exact source form for it has been found. Used by `Obj866E8::unk1DC`
-  (see `Class866E8__SetBounds`'s report).
+  (see `StageMap__SetBounds`'s report).
 
 ## Attempts
 
@@ -477,14 +477,14 @@ real residue cascades widely.
 Bounded search (`timeout 600`, `-j 6 --stop-on-zero`): **71363
 iterations**, best score **770** (down from 1040, never reached zero).
 `timeout`'s own exit code line was not captured (same outer-Bash/inner-
-`timeout` race as `Class866E8__ConfigureRateEntry`/`strcpy` this round -- the trailing
+`timeout` race as `StageMap__StartScaleRamp`/`strcpy` this round -- the trailing
 `echo "permuter exit=$?"` never lands in the log); treated as an ordinary
 self-stop given the clean iteration count and no crash signature.
 
 **Two intermediate leads inspected, both hand-tested against the real
 oracle, both negative:**
 
-1. `output-910-1`: introduces a `Bounds866E8_3bb8c_b *new_var = bounds;`
+1. `output-910-1`: introduces a `CellBounds *new_var = bounds;`
    used for ONLY the first (`->unk0`) and last (`->unk8`) struct accesses,
    leaving the null check and the two middle accesses (`->unk4`, `->unk2`)
    on the original `bounds`. Hand-translated to a CONSISTENT form (a
@@ -527,8 +527,8 @@ all four field accesses, matching retail's literal register usage where
 even the null-check reads through the copied register) —
 
 ```c
-s32 IsPointOutOfBounds(Bounds866E8_3bb8c_b *arg0, s8 *point) {
-    Bounds866E8_3bb8c_b *bounds;
+s32 IsPointOutOfBounds(CellBounds *arg0, s8 *point) {
+    CellBounds *bounds;
     bounds = arg0;
     if (bounds == NULL) goto fail;
     if (point[0] < bounds->unk0) goto fail;
@@ -587,7 +587,7 @@ if/`||`/`goto` restatement of the same four-early-exit CFG — might make
 cc1's RTL expansion allocate differently:
 
 ```c
-s32 IsPointOutOfBounds(Bounds866E8_3bb8c_b *bounds, s8 *point) {
+s32 IsPointOutOfBounds(CellBounds *bounds, s8 *point) {
     return (bounds == NULL) ? 1
         : (point[0] < bounds->unk0) ? 1
         : (bounds->unk4 < point[0]) ? 1
@@ -628,7 +628,7 @@ least for this specific nested-ternary spelling.
 
 ---
 
-## Round 58 (bravo) — round 46's Gate 3 verdict is VOID (same unit error as `Class866E8__SplitFootprintSlot`), which RE-VALIDATES round 18's 71,363-iteration search as a genuine negative; four fresh source shapes, all inert at 2/27
+## Round 58 (bravo) — round 46's Gate 3 verdict is VOID (same unit error as `StageMap__SplitFootprintSlot`), which RE-VALIDATES round 18's 71,363-iteration search as a genuine negative; four fresh source shapes, all inert at 2/27
 
 Rebuilt Shape A (the round-19 `goto` body) from a clean `INCLUDE_ASM`
 baseline first, per Gate 1b: **2/27, exact length, zero outside-range drift**
@@ -645,7 +645,7 @@ Round 46's entry above says, of a freshly built scaffold:
 > launched.**
 
 **That comparison is invalid, and in the same specific way round 58 found on
-`Class866E8__SplitFootprintSlot`: `funcdiff.py` does not report insertion or deletion counts
+`StageMap__SplitFootprintSlot`: `funcdiff.py` does not report insertion or deletion counts
 at all.** The "real build shows 0/0" half was never measured — it was
 inferred from "2/27, exact length, no outside-range drift". Equal length does
 not mean zero insertions and zero deletions; it means they **cancel**. This
@@ -728,7 +728,7 @@ that the source itself carries a value live across the entire body. Attempts
 | 11 | shape 10 plus both the `result` variable and the `bounds` alias | **2/27, inert** |
 
 Shapes 10 and 11 are round 58's own new lever, the one that moved
-`Class866E8__SplitFootprintSlot` from 55/97 to 62/97 (a `do { } while (0)` is a real loop to
+`StageMap__SplitFootprintSlot` from 55/97 to 62/97 (a `do { } while (0)` is a real loop to
 GCC 2.6.3's loop pass where a plain brace block is nothing). **It does not
 apply here**, which is the useful half of the negative: that lever addresses
 scheduling and delay-slot placement, and this function's residue is a
@@ -746,7 +746,7 @@ file context" item round 46 raised can be closed.
 
 **Gate 3 check 3 is a check on BYTES, and comparing two tools' summary
 numbers is not it.** Three separate rounds across two functions (19 and 33 on
-`Class866E8__SplitFootprintSlot`, 46 here) read a permuter `--debug` structural summary against
+`StageMap__SplitFootprintSlot`, 46 here) read a permuter `--debug` structural summary against
 a figure they believed `funcdiff.py` had reported, concluded the scaffold was
 unfaithful, and stopped. `funcdiff.py` reports exactly three things: words
 equal at the same offset, bytes differing outside the function's range, and
@@ -784,10 +784,38 @@ re-attempted by hand this round).
 
 ## Naming
 
-**Tier A.** Confirmed NOT a vtable slot (`tools/classtable.py gClass866E8Methods`
+**Tier A.** Confirmed NOT a vtable slot (`tools/classtable.py gStageMapMethods`
 has no entry at this address) -- a plain, non-virtual helper, so it takes
-no `self` and gets no `Class866E8__` prefix. Still `INCLUDE_ASM` (a
+no `self` and gets no `StageMap__` prefix. Still `INCLUDE_ASM` (a
 documented STALL), named per this round's brief since the evidence for
 its mechanics is solid: four comparisons of an `[x,y]` point against a
-`Bounds866E8_3bb8c_b`'s four edges, returning nonzero when the point is
+`CellBounds`'s four edges, returning nonzero when the point is
 outside any of them. Mechanics-is-purpose leaf.
+
+## Track 6 (2026-09-26, round 93, alpha)
+
+The class `Class866E8` (table `gClass866E8Methods`, id 0x114, LightRig's
+subclass) is now `StageMap` (`python3 tools/renametype.py Class866E8
+StageMap`, tier B): it keeps seven slots loaded with map chunks of the
+current stage (LbdFile, `STGnn\Mnnn.LBD`) around a tracked target, the
+centre chunk and its six staggered neighbours (`sChunkNeighbourDeltas`), laid
+out by the stage's `StageGridDimensions` (`setConfig`, from ObjM's
+`GetStageGridDimensions(stage)`), each slot's placements linked into a 20 x
+20 lattice of GridCells whose drawn window follows the target. Tier B: the
+mechanics are established; "the stage's map" rests on the files it loads and
+the per-stage config. Header now `include/StageMap.h`; evidence in its banner.
+
+Member types, same pass: `Unk68Struct` is `StageGridDimensions`
+(include/StageGrid.h), `Unk54Struct` is `LongVec3` (include/SceneNode.h),
+`EntryDesc866E8` is `Ratio16[3]` (include/SceneNode.h), all by layout and
+use; `Class866E8Elem` -> `ChunkSlot`, `QueryPos866E8` -> `SplitLongVec3`,
+`SetupEntry866E8` -> `ChunkLoadEntry`, `SetupSub866E8` ->
+`ChunkLoadEntryTail`, `TargetSpec866E8` -> `ChunkSlotSpec`, `GridSlot866E8`
+-> `CellRect`, `GridSlotList866E8` -> `CellRectSet`, `Bounds866E8_3bb8c_b`
+-> `CellBounds`, `Class866E8ValueFn` -> `ChunkFileFn`,
+`Class866E8OnElementEventFn` -> `StageMapOnSlotEventFn`,
+`Class866E8ElemFn` -> `ChunkSlotFn`, `Class866E8CellFn` -> `StageMapCellFn`;
+new `ChunkNeighbourDelta` for `sChunkNeighbourDeltas` (was typed as the
+3-word placeholder). renametype.py also rewrote the old names inside
+earlier sections' history prose in this and sibling reports (known, pending
+an operator decision; not hand-reverted).

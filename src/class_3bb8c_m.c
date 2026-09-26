@@ -11,8 +11,8 @@
  * there), and its getter: EnterState7/8/A and NotifyParentsCodeB (the
  * DreamSys codes 0xE..0x11, which set IntermediateBase::state and start a
  * fade), StartFadeUp (the viewport's FadeBox fade box), the fade box's
- * and the Class866E8's notification handlers (OnFadeNotify: 5 fade down
- * done, 6 fade up done; OnClass866E8Notify: 7 runs CheckAuxTrigger), and
+ * and the StageMap's notification handlers (OnFadeNotify: 5 fade down
+ * done, 6 fade up done; OnStageMapNotify: 7 runs CheckAuxTrigger), and
  * the "Pause" overlay: AdvancePauseSetup builds the TextRow and, four
  * calls later, pauses the FrameClock, the WBgm and the VabStreamObj and
  * hides the viewport; TeardownPauseOverlay undoes it; the close-ready flag
@@ -37,7 +37,7 @@
 #include "BoxFill.h"
 #include "TextRow.h"
 #include "ObjM.h"
-#include "Class866E8.h"
+#include "StageMap.h"
 #include "NodeGuardedViewport.h"
 #include "FadeBox.h"
 #include "FrameClock.h"
@@ -117,7 +117,7 @@ void ObjM__OnFadeNotify(ObjM *self, FadeBox *sender, s32 event) {
     }
 }
 
-void ObjM__OnClass866E8Notify(ObjM *self, BasicClass *sender, s32 event) {
+void ObjM__OnStageMapNotify(ObjM *self, BasicClass *sender, s32 event) {
     if (event == 7) {
         self->methods->checkAuxTrigger(self);
     }
@@ -126,8 +126,8 @@ void ObjM__OnClass866E8Notify(ObjM *self, BasicClass *sender, s32 event) {
 s32 ObjM__CheckAuxTrigger(ObjM *self) {
     s32 out;
     s32 result;
-    Class866E8Elem *elem =
-        ((Class866E8 *)self->unk14)->methods->getLastTargetRateSplit((Class866E8 *)self->unk14, (u8 *)&out);
+    ChunkSlot *elem =
+        ((StageMap *)self->unk14)->methods->getLastTargetRateSplit((StageMap *)self->unk14, (u8 *)&out);
     void *thing = (void *)self->dreamSys->methods->getCurrentDayAndYear(self->dreamSys, 0);
     result = TryDreamAuxTrigger((s32)elem->loader->dataBuffer, &out, thing);
     elem->heldObj = (BasicClass *)result;
@@ -164,7 +164,7 @@ void ObjM__CloseAndNotifyC(ObjM *self) {
     }
 }
 
-/* The pause: step 0 builds the "Pause" TextRow under the Class866E8; the
+/* The pause: step 0 builds the "Pause" TextRow under the StageMap; the
  * fourth call after it hides the viewport and pauses the FrameClock, the
  * WBgm and the VabStreamObj (IntermediateBase::unk10, bgm, TimedTask::sound). */
 void ObjM__AdvancePauseSetup(ObjM *self) {

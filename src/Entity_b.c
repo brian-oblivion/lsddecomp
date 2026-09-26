@@ -17,7 +17,7 @@
 #include "common.h"
 #include "Entity.h"
 #include "DreamSys.h"
-#include "Class866E8.h"
+#include "StageMap.h"
 
 s32 Entity__UpdateTargetProximity(Entity *this) {
     EntityMoodRow *row;

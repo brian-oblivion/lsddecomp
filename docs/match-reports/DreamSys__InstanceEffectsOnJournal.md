@@ -230,7 +230,7 @@ Both in `include/DreamSys.h`:
 
 **funcdiff's own in-range count (73504-ish of a much larger apparent range)
 looks catastrophic and is not informative here** -- this is exactly the
-`Class866E8__ApplyRateEntries`-shaped trap `DECOMPILATION_LEARNINGS.md` already documents
+`StageMap__ApplyChunkLoads`-shaped trap `DECOMPILATION_LEARNINGS.md` already documents
 ("funcdiff's byte range is not a stalled function's true length"), for the
 same underlying reason: my compiled function is ONE WORD SHORT of retail's
 110, so the whole-image comparison range balloons to cover everything after
@@ -379,7 +379,7 @@ reproduced the same residue. **Note for the next reader**: at this
 function's actual length (one word short of retail's 110), `funcdiff.py`'s
 own raw in-range count reads as low as 15/110 with a "differs OUTSIDE this
 range too" drift warning -- this is NOT a regression, it is the exact
-`Class866E8__ApplyRateEntries`-shaped trap this report already documents. Reading
+`StageMap__ApplyChunkLoads`-shaped trap this report already documents. Reading
 `tools/asm-differ/diff.py`'s realigned output instead confirms **106/110
 words correct, same two residues, unchanged.**
 
@@ -451,7 +451,7 @@ build, exactly as expected), and `tools/asm-differ/diff.py` confirms:
   missing word, not a separate issue.
 - **Raw word-match**: `funcdiff.py`'s own in-range count reads 15/110 with an
   explicit "differs OUTSIDE this range too (134342 bytes)" warning --
-  confirmed this is the `Class866E8__ApplyRateEntries`-shaped trap the report already
+  confirmed this is the `StageMap__ApplyChunkLoads`-shaped trap the report already
   documents, not a regression. Reading `asm-differ`'s realigned output
   instead: **106/110 words truly correct**, same two residues as every
   earlier round (switch-index register choice, case-4 vtable-dereference

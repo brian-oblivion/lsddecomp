@@ -589,7 +589,7 @@ request to apply it everywhere): NOT this class.** Neither residue here
 is a commutative `addu`'s operand/destination-register choice -- one is a
 tail-merge/jump-elimination optimization (now fixed) and the other is a
 delay-slot-fill placement choice for an independent bitwise computation
-(same FAMILY as `Class866E8__ResetAllElements`'s delay-slot hoist in `class_3ac78`, not
+(same FAMILY as `StageMap__UnloadAllSlots`'s delay-slot hoist in `class_3ac78`, not
 the `addu rd,rs,rt` vs `addu rd,rt,rs` shape at all).
 
 ### Proposed learning

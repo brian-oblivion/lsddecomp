@@ -1,0 +1,606 @@
+# StageMap__ComputeChunkLoadEntry -- MATCH (63/63 words, ins 0 / del 0, exact length)
+
+> Renamed from `StageMap__ComputeRateEntry` on 2026-09-26 (tools/rename.py). Address 0x8004ba40.
+
+> Renamed from `Class866E8__ComputeRateEntry` on 2026-09-26 (tools/rename.py). Address 0x8004ba40.
+
+> Renamed from `func_8004BA40` on 2026-09-24 (tools/rename.py). Address 0x8004ba40.
+
+REVISITED, round 63: MATCHED 63/63, whole-image SHA1 green; names/types not
+relevant (no header, symbol or type change was needed -- `sNeighbourBits`,
+`sChunkNeighbourDeltas`, `Obj866E8::unk60`/`unk64`, `Unk54Struct` and `ChunkLoadEntry`
+were all already correct; the stall was one variable too many).
+
+> **ROUND 63 (delta): MATCHED, 58/63 -> 63/63 in two builds.** Stalled at
+> 58/63 since round 27, re-verified in rounds 32, 40, 46 and 47, and searched
+> by the permuter twice (~144,370 + ~184,000 iterations) without ever beating
+> its base score.
+>
+> ### Step (a): the inherited body reproduces its figure AND its cause
+>
+> `stalesyms.py` first: no stale callee names in this report, so the
+> preserved body links as written.
+>
+> Rebuilt the committed `#if 0` body verbatim:
+>
+> ```
+> StageMap__ComputeChunkLoadEntry: 58/63 words match (file 0x3C240-0x3C33C)
+> StageMap__ComputeChunkLoadEntry: insertions 0 / deletions 0
+> ```
+>
+> 58/63 reproduces exactly, length exact, no drift. **Unlike `StageMap__ComputeFootprintDescriptor`
+> this round, the recorded cause is CONFIRMED, not falsified**: ins/del is a
+> true 0/0 and `asm-differ` shows zero `<`/`>` markers, only five `r`
+> (register-substitution) rows. A "register identity" title with 0/0 is
+> exactly the self-consistent case the round-63 rule predicts. Recording both
+> outcomes matters -- the falsification rule is a pointer to read the diff,
+> not a presumption that inherited verdicts are wrong.
+>
+> ### The fix: ONE accumulator, not three temporaries
+>
+> The five residue words are all the same choice. Retail:
+>
+> ```
+> 3c2c0  lw   v1,4(v0)        |  3c2e0  addu v1,v1,v0
+> 3c2c8  addu v0,a1,v1        |  3c2ec  addu v1,v1,v0
+>                             |  3c2f0  addu v0,a1,v1
+> ```
+>
+> Retail runs **every** addend path through `$v1` and produces the final
+> value in `$v0` with a single `addu v0,a1,v1`. The build had `$v0` doing
+> both. Read as source: retail has ONE local carrying the multiply result,
+> the running sum and both branch addends, and ONE `value = val + sum;`
+> **after** the if/else -- which is also why path A can `j` to the common
+> tail with `addu v0,a1,v1` lifted into its delay slot (3c2c4/3c2c8),
+> ordinary tail-merging plus delay-slot fill.
+>
+> Four merged forms were built, one each:
+>
+> | form | score | ins/del |
+> | --- | --- | --- |
+> | `sum` merged, separate `lo`, `value = val + sum` after the if/else | 58/63 | 0/0 |
+> | `sum` merged, separate `lo`, store `val + sum` directly | 58/63 | 0/0 |
+> | `sum` seeded before the `if`, `+= lo` at the end | 6/63 | 14/14 (drift) |
+> | **`sum` reused for the multiply too, `sum += ...` in each branch** | **63/63** | **0/0** |
+>
+> So `lo` had to go as well: `sum = divisor * entry->unk0;` then
+> `sum += entry->unk4;` / `sum += entry->unk8;`. One local for all of it.
+>
+> ### Why two permuter campaigns missed it
+>
+> Round 32's entry records trying "separating `fieldVal`/`sum` temps from
+> `value` (to mirror retail's v1-running-sum/v0-final-result split)" and
+> measuring it inert. That reading of the residue was right about WHICH
+> registers retail used and exactly backwards about what produces them: the
+> split was already there and the merge was the fix. Both permuter searches
+> then ran from a scaffold seeded with the split body, so ~330,000 iterations
+> explored around a shape one variable away from the answer. **The permuter
+> mutates a body; it does not delete a local that the body's author put
+> there.**
+>
+> ### `do {} while (0);` is LOAD-BEARING
+>
+> The near-miss body carried a `do {} while (0);` between the `self->unk60`
+> call and `result = 1;`. Removing it (as ordinary tidy-up, after the match
+> was green) **breaks the image** -- `build exit=2` with drift. Restored and
+> re-verified. It is a syntactically-empty statement that nonetheless changes
+> GCC 2.6.3's scheduling here, and it is neither register pinning nor an
+> operand constraint, so it is within the rules -- but it must be flagged in
+> the source, which it now is. Anyone tidying a matched body in this unit
+> should re-run the oracle after deleting even a provably-empty statement.
+>
+> Oracle: `build exit=0`, `OK: build matches retail SLPS_015.56`, funcdiff
+> 63/63 ins 0/del 0, no drift. Unit `class_3bb8c` INCLUDE_ASM count 5 -> 4.
+>
+> ### Proposed learning
+>
+> **When a residue is pure register identity and retail uses FEWER distinct
+> registers than the build across a branch tree, the fix is to merge C locals,
+> not to split them.** The instinct on seeing "retail keeps a running sum in
+> $v1 and the result in $v0" is to create a variable per role; that is what
+> round 32 did and it is inert, because GCC was already coalescing. The
+> measurement that distinguishes the two directions is cheap: count the
+> DISTINCT registers retail uses across the whole branch tree and compare with
+> the number of live locals in your body. Here retail used 2 and the body
+> declared 4 (`fieldVal`, `lo`, `sum`, `value`); collapsing to 2 matched.
+> This is the same shape as round 63's `_SsInit` lever from bravo
+> ("the fix was fewer variables, re-paired, not more") reached from a
+> different direction, which makes it a pattern rather than a coincidence.
+>
+> **And a scoping note on permuter negatives:** this function's negative was
+> correctly recorded (both searches ran `--debug` first and the scaffold
+> agreed with the real build, so round 47 was right that it "stands as
+> evidence"). It is still not evidence that the function is unmatchable -- it
+> is evidence about the neighbourhood of the seed body. A negative is a
+> verdict about the body it was measured on.
+
+
+> **ROUND 47 (charlie): Gate 1b re-verified 58/63, no drift -- rebuilt via a
+> clean `make clean && make extract` (not just an `INCLUDE_ASM` flip this
+> time, after a batch-script regex bug corrupted an intermediate `#if 0`
+> block; recovered before anything was committed) plus the standard
+> `#if 0`->`#if 1` swap. Identical `$v0`/`$v1` accumulator residue,
+> unchanged from round 46.**
+>
+> **Checked this round's headline instruction (run permuter check 3 before
+> believing any inherited negative in the `class_3bb8c`/`Obj866E8`
+> family) against this function's own history.** This function's two
+> permuter searches (round 27, round 32) both explicitly ran `--debug`
+> BEFORE searching and recorded the scaffold's base score (25) with the
+> expected 5 pure register-difference penalties and ZERO
+> insertions/deletions/reorderings/branch/stack differences, matching the
+> real build's own residue shape exactly -- i.e. check 3 was already run
+> and PASSED, independently, both times. This function's negative is NOT
+> one of the five family members round 46 found voided (`StageMap__ApplyChunkLoads`,
+> `StageMap__ComputeFootprintDescriptor`, `StageMap__SplitFootprintSlot`, `StageMap__BuildFootprintSlots`, `IsPointOutOfBounds` --
+> all confirmed scaffold-MISMATCHED); `StageMap__ComputeChunkLoadEntry`'s scaffold has twice
+> been confirmed to AGREE with the real build. The ~184,000-iteration
+> negative stands as evidence, not as a voided measurement.
+>
+> Checked the 12th lever (round 46 late addendum: hoist a field pair used
+> on every path into locals PER `if`, not shared across `if`s) against
+> this residue directly: it does not apply here either, for the same
+> reason the beq/bne and split-declare levers did not last round -- the
+> residue is a whole-function accumulator register-COLOR choice
+> (`entry->unk4` in `$v1` vs `$v0`) in straight-line arithmetic, not a
+> field read shared between an `if`'s condition and its own body.
+>
+> **Disposition unchanged: 58/63.** No new attempt made; time went to
+> confirming this and the other five `class_3bb8c` residues' permuter
+> check-3 status is what it was recorded as, since that is this round's
+> stated priority for this family. `INCLUDE_ASM` untouched throughout
+> (verification only, `git status` clean before and after).
+
+> **ROUND 46 (charlie): Gate 1b re-verified 58/63, no drift; split-declare
+> lever tried on every combined-init local in the residue's own block
+> (`entry`, `fieldVal`, `lo`), INERT; beq/bne lever checked and does not
+> apply -- SKIPPING.** Rebuilt the committed 58/63 body from a clean
+> `INCLUDE_ASM` baseline: confirmed 58/63, exact length, identical
+> `$v0`/`$v1` accumulator residue at both sites.
+>
+> **Beq/bne delay-slot-polarity lever: does not apply.** The residue is a
+> register-identity choice in straight-line arithmetic (`entry->unk4` kept
+> in `$v1` throughout in retail, `$v0` here), not a branch or delay-slot
+> placement issue.
+>
+> **Split-combined-declaration lever, tried on all three untried
+> candidates in the `self->unk68->unk4 == 0` block:** `const Unk54Struct
+> *entry = &sChunkNeighbourDeltas[key];`, `s32 fieldVal = entry->unk4;` and `s32 lo =
+> divisor * entry->unk0;` are all combined declare-plus-initializer forms
+> that this report's history had not previously split (round 40's
+> "separating `fieldVal`/`sum` from `value`" tried a different axis --
+> which variables hold which sub-computation -- not declare-vs-assign
+> form). Split all three into separate declaration and assignment
+> statements in one build, rebuilt: **58/63, IDENTICAL diff, no drift --
+> fully inert.** Reverted (`git checkout -- src/class_3bb8c.c`; clean
+> build confirmed after).
+>
+> This is a FOURTH confirmed instance (joining `StageMap__ApplyChunkLoads`,
+> `Snd_setVabAttr`, `NoteOn`) of the same scope limitation: none of
+> `entry`/`fieldVal`/`lo` cross a CALL boundary before their value is
+> consumed (the one call in this function, `self->unk60(...)`, happens
+> after `value` is already stored to memory) -- the split-declare lever's
+> precondition (a value crossing a call boundary with independently-
+> confirmed-correct timing) is simply absent here, same as the other three
+> negatives.
+>
+> **Disposition unchanged: 58/63.** This remains, per round 40/41's own
+> assessment, the most exhaustively-tested residue in this unit (~184,000
+> permuter iterations across two independent RNG runs against a
+> `--debug`-validated matching scaffold, plus ~14 hand variants across
+> five rounds). Neither of this round's two new levers moved it.
+> **SKIPPING further attempts this round.**
+> Rebuilt the exact preserved body from a clean `INCLUDE_ASM` baseline:
+> confirmed 58/63, exact length, identical `$v0`/`$v1` register-identity
+> residue at both accumulator sites, unchanged from round 40. This
+> function already carries two independent permuter searches totaling
+> ~184,000 iterations (both against a validated scaffold) plus ~14 manual
+> structural variants across five rounds -- the most exhaustively-tested
+> residue in this unit, per round 40's own assessment, which this round's
+> reconfirmation agrees with. Given this round's staffing priority was the
+> functions with either an untried lever (dead-reload screen on
+> `StageMap__ApplyChunkLoads`/`StageMap__ComputeFootprintDescriptor`) or a real prior permuter signal
+> (`StageMap__FindSlotForPosition`, score 10 from base 20, never 0), and this function has
+> neither (both accumulator swaps have four independent negative manual
+> results each, plus two flat permuter searches that never beat the base
+> score), no new attempt was made here. Restored unchanged.
+
+> **ROUND 40 (bravo): Gate 1b re-verified 58/63, no drift; no new attempt,
+> judged the most exhaustively-tested residue in the unit.** Rebuilt the
+> exact preserved body from a clean `INCLUDE_ASM` baseline: confirmed
+> 58/63, no drift, identical `$v0`/`$v1` register-identity residue at both
+> accumulator sites. This function already carries two independent
+> permuter searches totaling ~184,000 iterations (both against a scaffold
+> validated to score the same residue as the real build) plus ~14 manual
+> structural variants across five rounds, including the round-40-relevant
+> hoist+operand-order COMBINATION tried on both accumulators last round
+> (round 39, both inert). Given this round's priority was the three
+> never-searched functions in the unit, and this one is the opposite case
+> (most-searched, not least), no new attempt was made here. Restored
+> unchanged.
+
+> **ROUND 39 (charlie): re-verified 58/63, the missing hoist+operand-order
+> COMBINATION tried on both accumulators, both inert.** Rebuilt the exact
+> preserved body per Gate 1b: confirmed 58/63, no drift, identical residue
+> to round 32's figure. This report's own history already tried "hoist the
+> field into a local" (round 32, natural order) and "reverse the operand
+> order" (round 27, unhoisted) as SEPARATE attempts on the
+> `entry->unk0 == 0` arm -- but per this round's `StageMap__FindSlotForPosition` finding,
+> neither alone being sufficient does not prove their COMBINATION is
+> inert, and that specific combination (hoisted local, reversed order) had
+> not actually been tried here. Tested it directly:
+> 1. `s32 fieldVal = entry->unk4; value = fieldVal + val;` (hoisted,
+>    reversed order) on the `entry->unk0 == 0` arm -- **IDENTICAL 58/63**,
+>    same residue, same diff addresses.
+> 2. `sum = entry->unk4 + lo;` / `sum = entry->unk8 + lo;` (reversed order,
+>    `lo` already hoisted per the existing body) on the `entry->unk0 != 0`
+>    arm's accumulator -- **IDENTICAL 58/63**, same residue.
+>
+> **Unlike `StageMap__FindSlotForPosition` and `StageMap__PopulateSlotCells`, the combination does NOT
+> move this residue.** Both `v0`/`v1` swaps here now have FOUR independent
+> negative results each (this report's rounds 24/25 baseline, round 27's
+> unhoisted reversal, round 32's hoisted-natural-order, and this round's
+> hoisted-reversed-order) plus ~184,000 permuter iterations across two
+> independently-scaffold-verified searches that never beat the base score.
+> This is now the most exhaustively negative-tested residue in the unit;
+> read as a confirmed register-identity wall, not an unexplored
+> combination. Not attempted further this round.
+
+> **ROUND 32 (bravo2): re-verified, one new manual attempt (negative), plus
+> a FRESH permuter run with new RNG (also negative, not just a repeat).**
+> Rebuilt the exact preserved body from a clean `INCLUDE_ASM` baseline:
+> confirmed 58/63, no drift, identical residue.
+>
+> Manual attempt: separated the loaded field into its own `s32 fieldVal`
+> local in the `entry->unk0 == 0` arm (`s32 fieldVal = entry->unk4; value =
+> val + fieldVal;`) -- IDENTICAL 58/63, no change. This is functionally the
+> same lever as round 27's attempt 1 (a named local for the loaded field),
+> confirming again that naming this specific value does not move its
+> register allocation.
+>
+> Per this round's finding 2 (a permuter plateau is not an exhaustion
+> proof -- a second independent run with fresh RNG closed a different
+> function this same round after a first run stalled), set up a fresh
+> scaffold and ran it independently of round 27's 39,940-iteration search:
+> `--debug` first confirmed the scaffold's base score (25) matches the
+> real build exactly, with the expected 5 pure register-difference
+> penalties and zero insertions/deletions/reorderings/branch/stack
+> differences -- a clean, trustworthy scaffold (unlike `StageMap__ComputeFootprintDescriptor`'s,
+> checked the same way this round and found unusable). Ran
+> `timeout 900 ... permuter.py -j 6 --stack-diffs --stop-on-zero
+> --best-only`, captured `rc=124` on the very next command (self-fired
+> bound, not an external kill). **144,370 iterations, best score never
+> dropped below the base score of 25 at any point** -- unlike
+> `SpuVmInit` this same round (closed at iteration 66,199 after a
+> flat first search), this second independent search found nothing
+> better than the seed. Combined with round 27's own 39,940-iteration run
+> (also flat), this residue has now survived **two independent searches
+> totaling ~184,000 iterations** without finding a zero or even a partial
+> improvement on the `entry->unk0==0` arm's `$v0`/`$v1` swap. Read as a
+> genuine negative, not an inconclusive one -- both searches used a
+> scaffold independently confirmed to score the SAME residue as the real
+> build. Not attempted further this round; time went to `StageMap__FindSlotForPosition`
+> (matched, 63/70 -> 68/70) instead.
+
+> **ROUND 27 (delta): re-verified, three more attempts, all negative.**
+> Rebuilt the exact preserved body from a clean `INCLUDE_ASM` baseline:
+> confirmed 58/63, no drift, identical residue to what this report already
+> documents. Three new structural variants on the `entry->unk0 == 0`
+> fallback (the second, previously-unclosed register-identity spot):
+>
+> 1. `s32 e4 = entry->unk4; value = val + e4;` (an extra named local for the
+>    loaded field, not tried before) -- **no change**, still 58/63,
+>    identical residue.
+> 2. `value = entry->unk4 + val;` (operand order swapped) -- **no change**,
+>    still 58/63, identical residue.
+> 3. Removing the shared `value` local entirely and storing straight into
+>    `*(s32 *)((u8 *)arg1 + 4)` in each branch (changes register pressure
+>    across the whole `if/else`, not just the one fallback) -- **much
+>    worse**: 31/63 with 135468 bytes of address drift outside the
+>    function's own range. Reverted immediately.
+>
+> This is now 10 manual structural variants (7 from round 24/25 plus these
+> 3) plus one 39,940-iteration permuter run, all converging on the same
+> conclusion: the `$v0`/`$v1` choice for this specific accumulator is
+> genuine register identity, unresponsive to any reshaping of the
+> surrounding C that does not regress the rest of the function. Not
+> re-attempted further this round; time went to `StageMap__UpdateFootprintTracking` (matched)
+> and `StageMap__ComputeFootprintDescriptor` instead, per this round's staffing guidance. Restored
+> to `INCLUDE_ASM` unchanged.
+
+Unit `class_3bb8c`. FRESH this round (no prior report). Restored to
+`INCLUDE_ASM`; no C left in `src/`.
+
+Only a caller-side prototype existed before this round (in
+`include/class_3bb8c.h`, established by `StageMap__LoadChunksAround`'s own call site --
+see that header's comment). This round implements the body and finds the
+prototype's return type was wrong.
+
+## What it does
+
+Called once per element from `StageMap__LoadChunksAround`'s outer loop, filling one
+`ChunkLoadEntry` slot (`arg1`, `&stackBuf[count]` at the call site) and
+returning whether it produced a "real" entry (`1`) or a blank one (`0`):
+
+1. `mask = sNeighbourBits[key]` (a 7-entry `1 << key` bitmask table, proven-sized
+   -- see below). If `(savedResult & mask) == 0`, the entry is blanked
+   (`arg1->ptr0 = NULL`) and the function returns `0` early -- but the
+   shared `arg1->id = key` write at the very end still happens (retail
+   reaches it via fallthrough from this path, not a duplicate store).
+2. Otherwise (mainline): compute a 32-bit "value" for the slot's `+0x4`
+   word (see "rodata ownership" note below on why this is written as a raw
+   `s32`, not `ChunkLoadEntry::rate`):
+   - If `self->unk68->unk4 == 0`: `value = val + key`.
+   - Else, index a second table `sChunkNeighbourDeltas[key]` (7-entry `Unk54Struct`
+     array, same proof as `sNeighbourBits`'s bound):
+     - If `entry->unk0 == 0`: `value = val + entry->unk4`.
+     - Else: `value = val + divisor * entry->unk0 + (flag ? entry->unk4 : entry->unk8)`
+       (the `divisor * entry->unk0` multiply is scheduled in the branch's
+       own delay slot in retail -- see "the mult/mflo pair" below, this is
+       the hazard-slot direction, NOT the `nop_mflo_mfhi` blocker).
+3. Store `value` into the slot, call `self->unk60(self->unk64, value, 0, 0)`
+   (a function pointer at `Obj866E8+0x060`, newly named this round -- was
+   undifferentiated padding), store its result into `arg1->ptr0`, return `1`.
+4. Shared tail (both paths): `arg1->id = key`, return the 0/1 result.
+
+## The mult/mflo pair -- confirmed NOT the blocker
+
+`CLAUDE.md`'s screen is for an `mflo`/`mfhi` FOLLOWED WITHIN TWO
+INSTRUCTIONS BY a `mult`/`div` (backward reading is not a blocker). Here the
+order is the other way: `mult $a2,$v1` sits in the delay slot of
+`bnez $v1,.L8004BACC` (so it always executes, branch outcome or not), and
+`mflo $v1` is only reached via the TAKEN branch, with the NOT-taken
+(fallthrough) path computing something unrelated and jumping AROUND the
+`mflo` entirely. This is ordinary delay-slot filling, not the blocked
+construct; `tools/nearmiss.py`/the two screens in `CLAUDE.md` both clear
+this function.
+
+## Header changes made this round
+
+- **`Obj866E8Methods`... no, `Obj866E8` struct itself**: split
+  `pad60[0x68 - 0x60]` into two named fields, `unk60` (the callback) and
+  `unk64` (its opaque context arg) -- additive (same total size, same
+  offsets), not a removal. Comment explains the split.
+- **`StageMap__ComputeChunkLoadEntry`'s own prototype**: return type corrected `void` ->
+  `s32`. Retail explicitly sets `$v0` to 0 or 1 on every path before
+  returning (see the tail sequence below) -- a `void` function would never
+  do this. `StageMap__LoadChunksAround`, the only caller, discards the result, which is
+  presumably why nobody caught this from the caller side alone.
+
+  **This retype is safe today only because `StageMap__LoadChunksAround` is still
+  `INCLUDE_ASM`, and it is a LOAD-BEARING fact for whoever attempts
+  `StageMap__LoadChunksAround` next.** `StageMap__LoadChunksAround` is a live 125/140 stall in this
+  same unit that calls `StageMap__ComputeChunkLoadEntry` and discards the result -- exactly
+  the condition under which a declared return type controls whether GCC
+  tail-merges identical DISCARDED call sites into one shared block or
+  keeps them separate (this round's own near-miss queue independently
+  measured the same mechanism from the other direction: N calls merging
+  into groups partitions by declared return type). If `StageMap__LoadChunksAround`'s
+  own word count doesn't match expectations, or shows an unexplained
+  2-or-4-word residue around calls to `StageMap__ComputeChunkLoadEntry`, check this
+  prototype before assuming a new residue class -- the `s32` return here
+  is evidence-backed (retail's own `$v0` sets, not a guess), so the fix is
+  almost certainly on `StageMap__LoadChunksAround`'s side, not this declaration's.
+- **Two new `extern` declarations**: `sNeighbourBits[7]` and
+  `sChunkNeighbourDeltas[7]`. Both sizes are PROVEN, not guessed -- the data file
+  (`asm/data/76DC8.data.s`) places exactly 7 words at `sNeighbourBits` before
+  `sChunkNeighbourDeltas` starts, and exactly 7 `Unk54Struct`-shaped (3-word) entries
+  at `sChunkNeighbourDeltas` before the next symbol (`sFootprintResultRemap`) starts. Comments in
+  the header point at this.
+
+## SUPERSEDED by round 63 -- the matching body
+
+The round-63 match is live in `src/class_3bb8c.c`. It differs from the 58/63
+body below only inside the `self->unk68->unk4 == 0` block: `fieldVal`, `lo`
+and `sum` collapse into a single `sum`, and `value = val + sum;` is hoisted
+out of both branches. The `do {} while (0);` is load-bearing -- see the
+round-63 entry at the top.
+
+```c
+    if (self->unk68->unk4 == 0) {
+        const Unk54Struct *entry = &sChunkNeighbourDeltas[key];
+        s32 value;
+        s32 sum;
+
+        if (entry->unk0 == 0) {
+            sum = entry->unk4;
+        } else {
+            sum = divisor * entry->unk0;
+            if (flag != 0) {
+                sum += entry->unk4;
+            } else {
+                sum += entry->unk8;
+            }
+        }
+        value = val + sum;
+        *(s32 *)((u8 *)arg1 + 4) = value;
+    } else {
+        *(s32 *)((u8 *)arg1 + 4) = val + key;
+    }
+```
+
+## HISTORICAL -- near-miss body before round 63 (58/63)
+
+```c
+s32 StageMap__ComputeChunkLoadEntry(Obj866E8 *self, ChunkLoadEntry *arg1, s32 divisor, s32 flag, s32 val, s32 savedResult, s32 key)
+{
+    s32 mask = sNeighbourBits[key];
+    s32 result;
+
+    if ((savedResult & mask) == 0) {
+        result = 0;
+        goto nullCase;
+    }
+
+    if (self->unk68->unk4 == 0) {
+        const Unk54Struct *entry = &sChunkNeighbourDeltas[key];
+        s32 value;
+
+        if (entry->unk0 == 0) {
+            value = val + entry->unk4;
+        } else {
+            s32 lo = divisor * entry->unk0;
+
+            if (flag != 0) {
+                value = val + (lo + entry->unk4);
+            } else {
+                value = val + (lo + entry->unk8);
+            }
+        }
+        *(s32 *)((u8 *)arg1 + 4) = value;
+    } else {
+        *(s32 *)((u8 *)arg1 + 4) = val + key;
+    }
+
+    arg1->ptr0 = self->unk60(self->unk64, *(s32 *)((u8 *)arg1 + 4), 0, 0);
+    do {} while (0);
+    result = 1;
+    goto storeKey;
+
+nullCase:
+    arg1->ptr0 = NULL;
+
+storeKey:
+    arg1->id = key;
+    return result;
+}
+```
+
+Needs (all added to `include/class_3bb8c.h` this round): `sNeighbourBits`,
+`sChunkNeighbourDeltas`, `Obj866E8::unk60`/`unk64`. `Unk54Struct` and `ChunkLoadEntry`
+already existed.
+
+## What was tried, in order
+
+1. **Baseline** (mainline wrapped in one `if/else`, both `id=key` writes
+   folded into a shared tail via one `else` block) -- compiled to **108/63
+   -- wildly too long** (frame `0x20` correct, but overall function 5 words
+   over). Root cause: the top-level guard (`if ((savedResult&mask)==0) {A}
+   else {B}`) put the wrong block on the branch-taken side. Retail's
+   `beqz $v1,.L8004BB1C` branches FORWARD to the null-case (placed near the
+   very end, right before the shared tail), with the mainline as immediate
+   fallthrough -- the OPPOSITE of what a naive `if (cond) {nullcase} else
+   {mainline}` compiles to. Same for the inner `entry->unk0` test: retail's
+   `bnez $v1,.L8004BACC` branches FORWARD to the mult/mflo path, with the
+   `entry->unk0==0` fallback as fallthrough -- again opposite of the
+   naive-first ordering. This is the SAME lever the head named for the
+   near-miss queue this round: shared-block placement follows the FIRST
+   branch's target/fallthrough choice in source order, not just "which
+   value the `if` tests."
+2. **Restructured with `goto`s** matching retail's actual fallthrough/branch
+   layout (guard test jumps FORWARD to `nullCase` near the end; inner
+   `entry->unk0==0` fallback written as the fallthrough, `entry->unk0!=0`
+   mult path in the `else`) -- fixed BOTH branch-polarity mismatches
+   (confirmed via every branch TARGET now landing correctly, per
+   `asm-differ`) and dropped the function to its CORRECT length, 63/63,
+   with the residue down to a `v0`-vs-`v1` register swap for the `result`
+   variable (worth 5 words at the time: 1 `move` insertion plus a handful
+   of the SAME register showing up differently at every use).
+3. **Permuter**, `-j 6 --stack-diffs --stop-on-zero --best-only`, seeded
+   with (2)'s body. `tools/setup-permuter.sh`'s two known bugs (missing
+   `--addiu-at`, and the rodata-stripping `sed 1,4d`) were checked --
+   `sNeighbourBits`'s `%lo(...)` addressing DOES touch `addiu_at`, so
+   `compile.sh`'s `MASPSX_FLAGS` was patched locally in
+   `permuter-work/StageMap__ComputeChunkLoadEntry/` (never in the shared script, this round's
+   parallel-mode constraint) before trusting any score; no embedded rodata
+   here so the second bug did not apply. **39,940 iterations, exit 124**
+   (this round's own `timeout 280`, self-fired -- captured directly this
+   time, `$?` written to a file by the backgrounding wrapper). Best
+   candidate found: permuter score 25 (vs base 410), a single
+   `do { } while (0);` statement inserted right before `result = 1;`.
+   Translated directly (it already IS idiomatic C -- an ordinary no-op
+   statement, not `PERM_*`/UB machinery) and re-verified: **fixed the
+   `result` register residue completely** (confirmed via `asm-differ`: the
+   whole tail from `sw $v0,0($s0)` through the epilogue now matches byte-
+   for-byte, no drift into the next function either). This is the
+   permitted kind of barrier per `CLAUDE.md` rule 6 -- it does not pin any
+   register, it only changes instruction ORDER (verified: no OTHER
+   register's identity changed anywhere else in the function).
+4. Function now at 58/63, all residue concentrated in the `entry->unk0==0`
+   fallback: retail keeps `entry->unk4` in `$v1` throughout
+   (`lw $v1,4($v0)` / `addu $v0,$a1,$v1`), mine keeps it in `$v0`
+   (`lw $v0,4($v0)` / `addu $v0,$a1,$v0`) -- and the SAME `$v0`/`$v1` swap
+   recurs in the OTHER (`entry->unk0!=0`) branch's accumulator
+   (`addu $v1,$v1,$v0` there vs mine `addu $v0,$v1,$v0`). Tried the SAME
+   `do {} while (0);` barrier at three placements -- immediately before
+   `value = val + entry->unk4;`, immediately before the `if (flag != 0)` in
+   the other arm, and at the very top of the `self->unk68->unk4 == 0`
+   block -- **no placement moved this second residue at all** (identical
+   58/63 every time). The permuter's own search (same 39,940-iteration run)
+   never found anything better than 25 for the WHOLE function, meaning it
+   also did not find a fix for this second spot.
+5. Declaring `value` before `mask`/`result` at the top of the function
+   (hoping to shift allocation order) -- no change, still 58/63.
+6. A local `s32 *slot = (s32 *)((u8 *)arg1 + 4);` pointer, replacing the
+   three separate `*(s32 *)((u8*)arg1+4)` casts with `*slot` -- **worse**
+   (69/63, +6 words: `lw`/`sw` through the pointer variable costs a
+   reload the raw casts avoid).
+7. Computing the `self->unk60(...)` call's result into a named `void *r`
+   local before assigning `result = 1;` and `arg1->ptr0 = r;` (reordering
+   which statement sets `result` relative to the `ptr0` store) -- no change
+   to the residue, same 58/63, same register on both sides of the
+   reordering.
+
+## Proposed learnings
+
+- **A scheduling barrier that is ORDINARY C, not `__asm__`, is still
+  covered by CLAUDE.md rule 6's test and can close a genuine
+  register-identity residue.** `do {} while (0);` closed one of this
+  function's two `v0`/`v1` swaps outright (permuter-found, confirmed by
+  hand afterward) while three by-hand placements of the exact same
+  statement failed to touch the SECOND, structurally similar-looking swap.
+  Two register swaps in the same function are not interchangeable just
+  because they look alike in a diff -- each needs its own search, and a fix
+  for one is not evidence about the other.
+- **`StageMap__LoadChunksAround`'s own call-site-derived prototype for a not-yet-matched
+  sibling can still have the wrong RETURN TYPE**, even when every argument
+  type is right. The caller discarding the value is exactly the condition
+  under which this kind of mistake survives undetected until the callee
+  itself is attempted -- worth flagging as a general reason not to trust an
+  inherited prototype's return type as settled just because its arguments
+  were carefully derived.
+- **The "shared block follows first branch target" lever generalizes past
+  `return` statements** (as documented for the near-miss queue this round)
+  to plain `if/else` guard clauses with a shared tail reached by `goto`:
+  whichever code retail reaches by FALLING THROUGH (no jump) belongs
+  textually first in the source; whichever it reaches via an explicit
+  forward branch belongs in the `else`/`goto`-target position, regardless
+  of which condition "reads more naturally" as the `if`.
+
+## Naming
+
+Round 78 (track 3, naming pass, bravo).
+
+| symbol | name | tier | evidence |
+| --- | --- | --- | --- |
+| `func_8004BA40` | `StageMap__ComputeChunkLoadEntry` | B | Fills one `ChunkLoadEntry` slot (`arg1->ptr0`/`arg1->id`) from `sChunkNeighbourDeltas[key]`/`sNeighbourBits[key]` and `self->unk60(self->unk64, ...)` (a stored resolver callback), called once per enabled `ChunkSlotSpec` by `StageMap__LoadChunksAround`. "Compute...Entry" matches that caller's own "Build...Entries" name (one call computes one entry of the array the caller builds). Return type corrected `void`->`s32` in an earlier round (see the header's own note); not revisited here. |
+
+## Track 6 (2026-09-26, round 93, alpha)
+
+The class `Class866E8` (table `gClass866E8Methods`, id 0x114, LightRig's
+subclass) is now `StageMap` (`python3 tools/renametype.py Class866E8
+StageMap`, tier B): it keeps seven slots loaded with map chunks of the
+current stage (LbdFile, `STGnn\Mnnn.LBD`) around a tracked target, the
+centre chunk and its six staggered neighbours (`sChunkNeighbourDeltas`), laid
+out by the stage's `StageGridDimensions` (`setConfig`, from ObjM's
+`GetStageGridDimensions(stage)`), each slot's placements linked into a 20 x
+20 lattice of GridCells whose drawn window follows the target. Tier B: the
+mechanics are established; "the stage's map" rests on the files it loads and
+the per-stage config. Header now `include/StageMap.h`; evidence in its banner.
+
+Member types, same pass: `Unk68Struct` is `StageGridDimensions`
+(include/StageGrid.h), `Unk54Struct` is `LongVec3` (include/SceneNode.h),
+`EntryDesc866E8` is `Ratio16[3]` (include/SceneNode.h), all by layout and
+use; `Class866E8Elem` -> `ChunkSlot`, `QueryPos866E8` -> `SplitLongVec3`,
+`SetupEntry866E8` -> `ChunkLoadEntry`, `SetupSub866E8` ->
+`ChunkLoadEntryTail`, `TargetSpec866E8` -> `ChunkSlotSpec`, `GridSlot866E8`
+-> `CellRect`, `GridSlotList866E8` -> `CellRectSet`, `Bounds866E8_3bb8c_b`
+-> `CellBounds`, `Class866E8ValueFn` -> `ChunkFileFn`,
+`Class866E8OnElementEventFn` -> `StageMapOnSlotEventFn`,
+`Class866E8ElemFn` -> `ChunkSlotFn`, `Class866E8CellFn` -> `StageMapCellFn`;
+new `ChunkNeighbourDelta` for `sChunkNeighbourDeltas` (was typed as the
+3-word placeholder). renametype.py also rewrote the old names inside
+earlier sections' history prose in this and sibling reports (known, pending
+an operator decision; not hand-reverted).
+
+This function: `StageMap__ComputeRateEntry` -> `StageMap__ComputeChunkLoadEntry` (`python3 tools/rename.py StageMap__ComputeRateEntry StageMap__ComputeChunkLoadEntry`, tier B): fills one ChunkLoadEntry: the neighbour's chunk index (centre + `rowDelta * columns` + the column step for the row parity; centre + key in a vertical grid) and its file record from `chunkFileFn`, or a NULL file when the mask excludes it.

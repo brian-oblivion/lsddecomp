@@ -10,7 +10,7 @@
 
 `New_NodeGuardedViewport`: the allocator for `NodeGuardedViewport`. Standard
 allocate-null-check-ctor shape, identical to class_3ac78.c's
-`New_Class866E8`/class_39e08.c's several `New_X` functions -- allocate a
+`New_StageMap`/class_39e08.c's several `New_X` functions -- allocate a
 fixed-size block (`0xDC` bytes here), and on success run the class's ctor
 (`NodeGuardedViewport__NodeGuardedViewport`, fetched through `GetNodeGuardedViewportMethods()->ctor`) and return the
 new instance; return `NULL` on allocation failure.
@@ -42,7 +42,7 @@ look like..."). No residue.
 
 **New_NodeGuardedViewport** -- tier A. Pure `New_X` allocator idiom (allocate fixed
 size, null-check, ctor, return); the allocator's mechanics ARE its purpose
-by the tier-A leaf rule. Matches the project's established `New_Class866E8`/
+by the tier-A leaf rule. Matches the project's established `New_StageMap`/
 `New_X` naming convention (class_3ac78.c, class_39e08.c) exactly, and this
 name was already in use in this function's own report prose before the
 round-68 rename made it real.

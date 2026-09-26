@@ -10,7 +10,7 @@
  * Methods in src/code_33808.c; no subclasses.
  *
  * The name is round 20's, from class_3bb8c.c's local view of the object
- * Class866E8__LoadElementResources stores in a PlacementGrid's `linkResource`;
+ * StageMap__PopulateSlotCells stores in a PlacementGrid's `linkResource`;
  * it is kept on this evidence: the class's own methods map the file's TMD
  * (LinkResource__MapModel: GsMapModelingData(&file->flags)) and build and
  * return the TmdModel objects the callers LINK -- code_55dd4.c's TOD
@@ -19,7 +19,7 @@
  *
  * Holders: ModelData's `linkResource` (ModelData__BuildResources, over the
  * TMD sub-block of a MOM file), PlacementGrid's `linkResource`
- * (Class866E8__LoadElementResources, the element's models), Class865C8's
+ * (StageMap__PopulateSlotCells, the element's models), Class865C8's
  * `dreamerTmd` ("ETC\DREAMER.TMD") and DreamSys's ctor argument
  * (GameApplication__GameApplication, "ETC\DREAME5.TMD": DreamSys__DreamSys adds
  * getModel(0) as its child).

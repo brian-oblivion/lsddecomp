@@ -40,7 +40,7 @@ report explicitly contrasts against.
 
 ## Naming
 
-**Tier A.** `+0x00C` is the "finalize" slot convention this project already uses (`SceneNode__Finalize`, `Class866E8__Finalize`, `Viewport__Finalize`), and the body matches: teardown helper then forward the shared base dtor's return.
+**Tier A.** `+0x00C` is the "finalize" slot convention this project already uses (`SceneNode__Finalize`, `StageMap__Finalize`, `Viewport__Finalize`), and the body matches: teardown helper then forward the shared base dtor's return.
 
 ## Track 4 (2026-09-25, round 82, delta)
 

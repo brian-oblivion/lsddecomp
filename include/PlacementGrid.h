@@ -15,14 +15,14 @@
  * first entry of gDataSourceClientGetters, so SetActiveDataSource rebinds
  * its file-I/O slots like every client's.
  *
- * Lifecycle: the grid manager (Class866E8) is its one user.
- * Class866E8__Class866E8 makes one per grid element, New_PlacementGrid(0),
- * so it never loads a file itself. Class866E8__LoadElementResources points
+ * Lifecycle: the grid manager (StageMap) is its one user.
+ * StageMap__StageMap makes one per grid element, New_PlacementGrid(0),
+ * so it never loads a file itself. StageMap__PopulateSlotCells points
  * `buffer` at the element's LbdFile header block + placementsOffset, puts a
  * LinkResource over the models that follow the placements in
  * `linkResource`, and calls +0x078 (FileResource's processBuffer) until it
  * returns 0, filling one GridCell from each CellPlacement.
- * Class866E8__ResetAllElements releases the LinkResource.
+ * StageMap__UnloadAllSlots releases the LinkResource.
  *
  * +0x078's occupant is PlacementGrid__ResolveEntry(self, placement, cell).
  * With placement->next zero it reads cell `cell`'s own record (12 bytes
@@ -51,7 +51,7 @@ typedef struct PlacementGridRecord {
 } PlacementGridRecord;
 
 /* What PlacementGrid__ResolveEntry fills in: the caller's stack record, 0x40
- * bytes (Class866E8__LoadElementResources). x and z are the cell's centre,
+ * bytes (StageMap__PopulateSlotCells). x and z are the cell's centre,
  * 0x800 units a cell. */
 typedef struct CellPlacement {
     /* +0x000 */ u8 pad0[0xC];

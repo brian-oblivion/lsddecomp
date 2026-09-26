@@ -253,7 +253,7 @@ process:
 **The struct definitions above ARE kept live in `src/code_179d8_d.c`**
 (not only in this report) -- they compile cleanly as unused types with
 the function itself restored to `INCLUDE_ASM`, per this project's
-established precedent (see e.g. `SetupEntry866E8`/`SetupSub866E8` in
+established precedent (see e.g. `ChunkLoadEntry`/`ChunkLoadEntryTail` in
 `include/class_3bb8c.h`, kept for a function that "is not a byte-exact
 match, so its body stays raw asm, but the prototype... reflects what the
 attempt established"). The offsets are directly measured from the
@@ -813,7 +813,7 @@ grid-cell-shaped index (cached byte offset, or fresh `index*12+8` lookup),
 and when present computes position-like fields on a 0x800/0x400 lattice
 with row stride 20 before forwarding to `ctx->unk2C->methods->slot80`.
 That lattice/stride matches `class_3ac78.c`'s own header comment for
-`Class866E8`'s 20-column grid verbatim ("seeds every cell with a world
+`StageMap`'s 20-column grid verbatim ("seeds every cell with a world
 position on a 0x800 lattice") -- a real lead for a future round, not
 claimed as proof here, since nothing in this unit confirms `ctx`/`self`
 are actually reached from that class. The pre-round-77-correction "no
@@ -825,7 +825,7 @@ built and scored).
 
 ## Track 4 (2026-09-26, round 87, echo)
 
-Retyped, byte-identical, with the class unified in `include/PlacementGrid.h`. `Ctx278` was the PlacementGrid object itself: this is slot +0x078 of gPlacementGridMethods (`classtable.py gPlacementGridMethods --vs gFileResourceMethods`), called only by Class866E8__LoadElementResources as `target->methods->slot78(target, &outBuf, i)` on the object New_PlacementGrid built. So `unk10` is FileResource's `buffer` (the caller points it into a loaded resource), `unk2C` is `linkResource` (the caller stores New_LinkResource there), and `Ctx278Sub`'s +0x080 is LinkResource__GetModel (gLinkResourceMethods). `Obj278` is the caller's 0x40-byte stack record, now `CellPlacement` (x/y/z at +0x0C..+0x14 go to the GPU coordinate, rotY +0x1A, `chained` +0x30, `next` +0x34 the offset of the cell's next record, which the caller loops on without advancing the cell); `Entry278` is `PlacementGridRecord`. The cell index splits as row = cell / 20, column = cell % 20, a 20x20 grid of 0x800-unit cells. The four-argument LinkResource call stays: `placement` must be in $a3.
+Retyped, byte-identical, with the class unified in `include/PlacementGrid.h`. `Ctx278` was the PlacementGrid object itself: this is slot +0x078 of gPlacementGridMethods (`classtable.py gPlacementGridMethods --vs gFileResourceMethods`), called only by StageMap__PopulateSlotCells as `target->methods->slot78(target, &outBuf, i)` on the object New_PlacementGrid built. So `unk10` is FileResource's `buffer` (the caller points it into a loaded resource), `unk2C` is `linkResource` (the caller stores New_LinkResource there), and `Ctx278Sub`'s +0x080 is LinkResource__GetModel (gLinkResourceMethods). `Obj278` is the caller's 0x40-byte stack record, now `CellPlacement` (x/y/z at +0x0C..+0x14 go to the GPU coordinate, rotY +0x1A, `chained` +0x30, `next` +0x34 the offset of the cell's next record, which the caller loops on without advancing the cell); `Entry278` is `PlacementGridRecord`. The cell index splits as row = cell / 20, column = cell % 20, a 20x20 grid of 0x800-unit cells. The four-argument LinkResource call stays: `placement` must be in $a3.
 
 ## Track 4 (LinkResource)
 
@@ -862,7 +862,7 @@ column = cell % 20, record at buffer + 8 + cell * 12), each holding a model
 index, a height, a y rotation and a byte of flags, with `next` chaining
 further records in the same cell; ResolveEntry places the record at the
 cell's centre (column/row * 0x800 + 0x400) and returns the model
-linkResource's getModel gives for its index. Class866E8__LoadElementResources
+linkResource's getModel gives for its index. StageMap__PopulateSlotCells
 points `buffer` at the grid element's LbdFile header block +
 `placementsOffset` (LbdFileHeader's own field name) and puts each result
 into that element's GridCell lattice (20 x 20, 0x800 apart: GridCell.h),
@@ -872,7 +872,7 @@ model's placement in one cell. The name says what the records are, not
 what the game draws with them (terrain tiles is plausible, not shown).
 
 **Field `PlacementGridRecord.cellFlags` (ex-`unk4`), tier B.** This
-function copies it to CellPlacement +0x02E, and Class866E8__LoadElementResources
+function copies it to CellPlacement +0x02E, and StageMap__PopulateSlotCells
 stores that in the GridCell's `flags36`, whose bit 0x80 NotifyGridCell tests
 and whose low seven bits DreamSys__NotifyLinkAttempt reads as a voice
 select. Named for where it goes; what the bits mean in the map is not

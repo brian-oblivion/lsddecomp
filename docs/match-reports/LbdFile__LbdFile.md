@@ -73,9 +73,9 @@ says the class "was named `LbdFile` for its table address"; what it named
 then was `Class81940`.
 
 **Class name `LbdFile`, tier A.** The files the class is handed are the
-stage's map chunks, STGnn\Mnnn.LBD: Class866E8__ApplyRateEntries calls
+stage's map chunks, STGnn\Mnnn.LBD: StageMap__ApplyChunkLoads calls
 loadHeader (+0x078) with each rate entry's `ptr0`, which
-Class866E8__ComputeRateEntry takes from the grid's callback, and that
+StageMap__ComputeChunkLoadEntry takes from the grid's callback, and that
 callback is ObjM__OnRegistrantEvent (ObjM__AttachTarget installs it), whose
 tail call GetGridRecordAt(stage, chunk) / GetGridRecordXY leaves
 `&group[9 + chunk]` of gRecordTable in $v0. gRecordTable's 0x1C-byte records
@@ -83,7 +83,7 @@ begin with a path, and record 9 of every stage group is its M000.LBD
 (stage 0: gRecordIndexTable[0] = 16, record 25 at 0x80081CC0 =
 "STG00\M000.LBD"; stage 1: record 39 at 0x80081E48 = "STG01\M000.LBD").
 The same index goes into `ownerRate` and is split into column and row
-(Class866E8__ComputeDivisorSplit). LBD is the game's own extension, and the
+(StageMap__SplitChunkIndex). LBD is the game's own extension, and the
 name follows the siblings named for the format they load (TimImage, Tod,
 VabStreamObj). What the header block's two regions and the data block hold
 beyond what their consumers do with them is not established here.
@@ -122,27 +122,27 @@ renamed):
 
 ## Proposed field names
 
-Not applied: every accessor outside `src/code_39094.c` is in Class866E8's
+Not applied: every accessor outside `src/code_39094.c` is in StageMap's
 units (class_3bb8c.c, class_3bb8c_b.c), outside this job. For the head to
 apply by type scope.
 
-- `LbdFile.ownerRate` (+0x030) -> `chunkIndex`. Class866E8__ApplyRateEntries
+- `LbdFile.ownerRate` (+0x030) -> `chunkIndex`. StageMap__ApplyChunkLoads
   stores in it the same entry value it passed to the grid callback to get
   the file's record (GetGridRecordAt(stage, value)); it is -1 exactly when
   no chunk is held (this ctor, LbdFile__ReleaseHeader; ResetElementCells
-  tests `>= 0`); Class866E8__ComputeDivisorSplit splits it into column
-  (`% divisor`) and row (`/ divisor`); Class866E8__FindElemIndexByUnk30
+  tests `>= 0`); StageMap__SplitChunkIndex splits it into column
+  (`% divisor`) and row (`/ divisor`); StageMap__FindSlotIndexByChunk
   finds the element holding a given chunk by it. Accessors: code_39094.c
   (LbdFile__LbdFile, LbdFile__ReleaseHeader), class_3bb8c.c
   (ApplyRateEntries, ResetElementCells, ComputeFootprintDescriptor,
   GetLastTargetRateSplit), class_3bb8c_b.c (FindElemIndexByUnk30).
-- `LbdFile.ownerKey` (+0x032) -> `elemKey`. Class866E8's ctor writes the
+- `LbdFile.ownerKey` (+0x032) -> `elemKey`. StageMap's ctor writes the
   element's index, BuildRateEntries copies each element's `key` in, and
   FindElemByUnk32 / UpdateFootprintTracking / class_3bb8c_p read it back to
   find an element. Accessors: class_3ac78.c, class_3bb8c.c, class_3bb8c_b.c,
   class_3bb8c_p.c (none in code_39094.c; the ctor zeroes it).
 - `LbdFileHeader.gridOffset` / `gridSize` (+0x04 / +0x08) ->
-  `placementsOffset` / `placementsSize`. Class866E8__LoadElementResources
+  `placementsOffset` / `placementsSize`. StageMap__PopulateSlotCells
   points the element's PlacementGrid (a 20x20 grid of placement records) at
   header + gridOffset and builds its LinkResource from header + gridOffset +
   gridSize, i.e. right after the placements. Accessor: class_3bb8c.c only.

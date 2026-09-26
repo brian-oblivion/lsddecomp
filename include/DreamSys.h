@@ -297,7 +297,7 @@ struct LinkResource;
    DreamSysCtorArgMethods (deleted round 89, track 4). */
 
 
-/* Actor::grid is the grid manager, Class866E8 (include/Class866E8.h, track 4
+/* Actor::grid is the grid manager, StageMap (include/StageMap.h, track 4
    round 89); DreamSys.c includes that header and calls it directly. */
 
 /* DreamSys's base class is Actor (include/Actor.h): DreamSys's own methods
@@ -1085,7 +1085,7 @@ MoodGraphPoint *IsDaySpecial(CinematicCall *cinematic, int day);
 /* The occupants of gDreamSysMethods not declared above, in slot order. */
 DreamSys *DreamSys__DreamSys(DreamSys *this, struct LinkResource *arg1, s32 arg2, s32 arg3);
 void DreamSys__ResetSessionState(DreamSys *this);
-void DreamSys__SpawnAtLink(DreamSys *this, struct Class866E8 *arg1);
+void DreamSys__SpawnAtLink(DreamSys *this, struct StageMap *arg1);
 void DreamSys__DetachFromParent(DreamSys *this);
 void DreamSys__NotifyLinkAttempt(DreamSys *this, s32 arg1);
 void DreamSys__OnPadEvent(DreamSys *this, s32 arg1, s32 mode);

@@ -65,7 +65,7 @@ history.
 
 ## Track 4 (2026-09-26, round 87, echo)
 
-Now `PlacementGrid *New_PlacementGrid(char *name)`, the ctor's parameter; the one caller (Class866E8__Class866E8) passes 0, so nothing is loaded. Byte-identical.
+Now `PlacementGrid *New_PlacementGrid(char *name)`, the ctor's parameter; the one caller (StageMap__StageMap) passes 0, so nothing is loaded. Byte-identical.
 
 
 ## Track 6 (2026-09-26, round 93, charlie)
@@ -92,7 +92,7 @@ column = cell % 20, record at buffer + 8 + cell * 12), each holding a model
 index, a height, a y rotation and a byte of flags, with `next` chaining
 further records in the same cell; ResolveEntry places the record at the
 cell's centre (column/row * 0x800 + 0x400) and returns the model
-linkResource's getModel gives for its index. Class866E8__LoadElementResources
+linkResource's getModel gives for its index. StageMap__PopulateSlotCells
 points `buffer` at the grid element's LbdFile header block +
 `placementsOffset` (LbdFileHeader's own field name) and puts each result
 into that element's GridCell lattice (20 x 20, 0x800 apart: GridCell.h),

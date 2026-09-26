@@ -451,7 +451,7 @@ operand-order-reversal negative:
    (`return *(upper + entry);` instead of `entry[upper]`, on top of the
    hoisted locals) -- **also byte-identical.** The combination corollary
    (two individually-inert levers reaching a residue together, as with
-   `Class866E8__FindElementForPosition`) does NOT hold here: both together produce the exact
+   `StageMap__FindSlotForPosition`) does NOT hold here: both together produce the exact
    same wrong register assignment as either alone or as the baseline.
 
 **This is a genuine, doubly-confirmed clean negative for both this round's
@@ -463,7 +463,7 @@ verified green; both experiments reverted immediately after measuring.
 
 ### Proposed learning (round 39)
 
-The combination corollary (`Class866E8__FindElementForPosition`: two inert levers together
+The combination corollary (`StageMap__FindSlotForPosition`: two inert levers together
 reaching 0) is real but not universal -- it depends on the two levers
 actually touching independent DEGREES OF FREEDOM in the scheduler/allocator
 decision. Here, hoisting the two byte reads and reversing the addition

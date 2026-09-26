@@ -30,7 +30,7 @@
 #include "common.h"
 #include "Actor.h"
 #include "DreamSys.h"
-#include "Class866E8.h"
+#include "StageMap.h"
 #include "LbdFile.h"
 #include "GridCell.h"
 #include "VariantSprite.h"
@@ -111,15 +111,15 @@ typedef struct GridQuery {
     s32 numRows;
 } GridQuery;
 
-/* The grid (self->grid) is a Class866E8 (include/Class866E8.h). Its
- * elements (Class866E8Elem) are what Actor__BuildLinkQueries collects: the
+/* The grid (self->grid) is a StageMap (include/StageMap.h). Its
+ * elements (ChunkSlot) are what Actor__BuildLinkQueries collects: the
  * loader's headerReady gates Actor__ScanLinkCandidates, its ownerKey is the
  * element key BuildLinkQueries steps by one, and `cells` is the 20-wide grid
  * of GridCell cells (each with its `nextInCell` chain) Actor__ScanGridWindow
  * walks. */
 
 /* Output buffer filled in by the grid's computeFootprintDescriptor (a
- * Descriptor10Ext, include/Class866E8.h: queryCol/queryRow are base.b2/b3,
+ * Descriptor10Ext, include/StageMap.h: queryCol/queryRow are base.b2/b3,
  * source is unk24; this view is 0x30 bytes, and the frame needs it) and read back by this unit's own Actor__BuildLinkQueries.
  * Only the three fields actually touched are named. `queryCol`/`queryRow`
  * feed straight into GridQuery::startCol/startRow (Actor__BuildLinkQueries,
@@ -129,15 +129,15 @@ typedef struct LinkQueryBuf {
     s8 queryCol;
     s8 queryRow;
     u8 pad04[0x24 - 0x4];
-    Class866E8Elem *source;
+    ChunkSlot *source;
     u8 pad28[0x30 - 0x28];
 } LinkQueryBuf;
 
 void *AcceptGridElem(void *arg0, void *arg1, void *arg2);
-s32 Actor__BuildLinkQueries(Actor *self, GridQuery *arr1, Class866E8Elem **arr2, LinkQueryBuf *arg3,
+s32 Actor__BuildLinkQueries(Actor *self, GridQuery *arr1, ChunkSlot **arr2, LinkQueryBuf *arg3,
                             s32 arg4);
 void *Actor__ScanLinkCandidates(Actor *self, void *arg1, void *arg2, s32 count, GridQuery *arr1,
-                                Class866E8Elem **arr2);
+                                ChunkSlot **arr2);
 
 s32 Actor__FindNearbyLink(Actor *self) {
     LinkQueryBuf sp18;
@@ -146,7 +146,7 @@ s32 Actor__FindNearbyLink(Actor *self) {
      * retail's exact stack layout for sp78/sp88 below (round 2026-09-04,
      * see this function's match report). */
     u8 pad48Tail[8];
-    Class866E8Elem *sp78[3];
+    ChunkSlot *sp78[3];
     LongVec3 sp88;
 
     if (self->grid != NULL) {
@@ -170,7 +170,7 @@ s32 Actor__FindNearbyLink(Actor *self) {
     return 0;
 }
 
-s32 Actor__BuildLinkQueries(Actor *self, GridQuery *arr1, Class866E8Elem **arr2, LinkQueryBuf *arg3,
+s32 Actor__BuildLinkQueries(Actor *self, GridQuery *arr1, ChunkSlot **arr2, LinkQueryBuf *arg3,
                             s32 arg4) {
     s32 f2 = arg3->queryCol;
     s32 f3 = arg3->queryRow;
@@ -186,9 +186,9 @@ s32 Actor__BuildLinkQueries(Actor *self, GridQuery *arr1, Class866E8Elem **arr2,
     row = f3;
     idx = 1;
     if (arg4 == 1) {
-        Class866E8 *unk4C;
-        Unk68Struct *unk68;
-        Class866E8Elem *src;
+        StageMap *unk4C;
+        StageGridDimensions *unk68;
+        ChunkSlot *src;
         s16 s3;
         s32 pos;
 
@@ -200,12 +200,12 @@ s32 Actor__BuildLinkQueries(Actor *self, GridQuery *arr1, Class866E8Elem **arr2,
         arr2[0] = src;
         unk4C = self->grid;
         unk68 = unk4C->config;
-        if (unk68->unk4 != idx) {
+        if (unk68->isVertical != idx) {
             return 1;
         }
         s3 = src->loader->elemKey;
         pos = s3 + 1;
-        if (pos < unk68->count) {
+        if (pos < unk68->rows) {
             arr2[1] = unk4C->methods->findElemByUnk32(unk4C, pos);
             idx = 2;
             arr1[1] = arr1[0];
@@ -243,20 +243,20 @@ s32 Actor__BuildLinkQueries(Actor *self, GridQuery *arr1, Class866E8Elem **arr2,
     return 1;
 }
 
-void *Actor__ScanGridWindow(Actor *self, void *arg1, void *arg2, GridQuery *query, Class866E8Elem *source);
+void *Actor__ScanGridWindow(Actor *self, void *arg1, void *arg2, GridQuery *query, ChunkSlot *source);
 
 /* Walks `count` entries of `arr1` (a `GridQuery[]`, stride 0xC) paired
- * element-for-element with `arr2` (a `Class866E8Elem *[]`, stride 4),
+ * element-for-element with `arr2` (a `ChunkSlot *[]`, stride 4),
  * skipping any entry whose element's loader does not have `headerReady`
  * set, and calling `Actor__ScanGridWindow` on the rest; returns the first
  * non-NULL result, or NULL if every entry was skipped or came back empty
  * (round 2026-09-04). */
 void *Actor__ScanLinkCandidates(Actor *self, void *arg1, void *arg2, s32 count, GridQuery *arr1,
-                                Class866E8Elem **arr2) {
+                                ChunkSlot **arr2) {
     s32 i;
 
     for (i = 0; i < count;) {
-        Class866E8Elem *elem = *arr2;
+        ChunkSlot *elem = *arr2;
         i++;
         if (elem->loader->headerReady != 0) {
             void *result = Actor__ScanGridWindow(self, arg1, arg2, arr1, elem);
@@ -281,7 +281,7 @@ void *Actor__ScanLinkCandidates(Actor *self, void *arg1, void *arg2, s32 count, 
  * from `a0` in the disassembly but never touched by the body -- present
  * only to match its caller's calling convention (round 2026-09-04). */
 void *Actor__ScanGridWindow(Actor *self, void *arg1, void *arg2, GridQuery *query,
-                            Class866E8Elem *source) {
+                            ChunkSlot *source) {
     s32 row, col;
     GridCell **bucket;
 

@@ -91,7 +91,7 @@ pattern per arm.
 
 round 15 (2026-09-04), runner echo, fresh carve `class_3bb8c_m`. This
 residue's fix unblocked accurate scoring for the rest of the unit's
-functions in ROM order after it (`ObjM__OnClass866E8Notify` onward), which had all
+functions in ROM order after it (`ObjM__OnStageMapNotify` onward), which had all
 been reading as near-total mismatches purely from this function's address
 drift.
 

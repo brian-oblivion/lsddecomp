@@ -329,7 +329,7 @@ persuade GCC to materialize its callee-saved copy at the same point.
 Result: **33/40, IDENTICAL residue, no change whatsoever** (same 7-word
 diff, same values, no drift either way) -- this axis, which helped
 close/narrow register-identity residues on `SceneNode__NotifyTaggedParents` and
-`Class866E8__Finalize` earlier this round, does nothing for a parameter-copy-
+`StageMap__Finalize` earlier this round, does nothing for a parameter-copy-
 TIMING residue. Reverted immediately.
 
 This is now 8 real attempts (6 from round 14 originally, plus this

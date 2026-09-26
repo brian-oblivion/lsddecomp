@@ -263,7 +263,7 @@ swap).
 
 ### Naming
 
-Round 93: parameters `(Descriptor10 *cell, void *unused, s32 lastCue)` -- ObjM__TickStyle passes the grid's getTargetDescriptor result, 0, 0; `cell` goes through Class866E8's computeCellOffsets into `targetPos` (a LongVec3; was `u8 buf[0x10]`, same bytes). The pool is `StyleCueSlot gStyleCueSlotPool[]` (0x68-byte slots, now that `cueSet` is a SoundCueSet).
+Round 93: parameters `(Descriptor10 *cell, void *unused, s32 lastCue)` -- ObjM__TickStyle passes the grid's getTargetDescriptor result, 0, 0; `cell` goes through StageMap's computeCellOffsets into `targetPos` (a LongVec3; was `u8 buf[0x10]`, same bytes). The pool is `StyleCueSlot gStyleCueSlotPool[]` (0x68-byte slots, now that `cueSet` is a SoundCueSet).
 
 ### Comments moved here from src/class_3bb8c_n.c
 

@@ -145,11 +145,11 @@ without stronger cause.
 ## Track 4 (2026-09-26, round 89)
 
 Renamed `CheckObj866E8CountFlag` -> `CheckSaveScoreFlag` with tools/rename.py
-while unifying Class866E8 (include/Class866E8.h). The old name claimed the
-object it reads is a Class866E8; it is not. Its one caller,
+while unifying StageMap (include/StageMap.h). The old name claimed the
+object it reads is a StageMap; it is not. Its one caller,
 `TitleMenu__RefreshMenu`, passes its own `self` as `ctx`, so
 `ctx->+0x0BC` is `TitleMenu::saveBlock` (include/TitleMenu.h: the DreamSys's
-`getSaveBlock` result, `&saveMagic`), and a Class866E8 is only 0x1E8 bytes
+`getSaveBlock` result, `&saveMagic`), and a StageMap is only 0x1E8 bytes
 while this reads +0x2F4. From `saveMagic`, +0x00C is DreamSys's
 `totalFlasbackUnlockScore` (include/DreamSys.h: saveMagic, currentYear,
 currentDay, totalFlasbackUnlockScore), which is the word compared against

@@ -134,7 +134,7 @@ extern EntityMethods gEntityMethods;
 extern EntityMethods *Get_vtable_Entity(void); /* returns &gEntityMethods */
 
 /* The object Entity__AttachToParent keeps in Actor's `grid` field (+0x04C)
- * is the grid manager, Class866E8 (include/Class866E8.h; code_4cd08 passes
+ * is the grid manager, StageMap (include/StageMap.h; code_4cd08 passes
  * D_8008ABFC). Entity_b/_e/_g call its configureRateEntry (+0x138). */
 
 /* Default arguments Entity__GetOrCreateFadeBox substitutes when its own
@@ -186,7 +186,7 @@ FadeBox *Entity__GetOrCreateFadeBox(Entity *self, void *name, void *arg2, void *
 void Entity__Finalize(Entity *self);
 void Entity__Reset(Entity *self);
 void Entity__AttachToParent(Entity *self, TodActor *peer, void *companion,
-                            struct Class866E8 *parent, void *offset);
+                            struct StageMap *parent, void *offset);
 void Entity__DetachFromParent(Entity *self);
 void Entity__Update(Entity *self, void *sender, s32 event);
 void Entity__NotifyLinkStage(Entity *self, void *sender, s32 event);

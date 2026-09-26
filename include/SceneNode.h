@@ -157,8 +157,8 @@ struct SceneNodeSub14 {
     /* +0x02C */ s32 hitMask; /* ClassifyAgainstPlanes: one bit per plane (own) or corner group (the other's) */ \
     /* +0x030 */ TmdHull *notifyVerts; /* TransformAndNotifyParents's hull, set only while the parents are notified */ \
     /* +0x034 */ u16 unk34; /* zeroed by GridCell's ctor */ \
-    /* +0x036 */ u16 flags36; /* bit 0x80 tested by Class866E8's NotifyGridCell; zeroed by GridCell's ctor */ \
-    /* +0x038 */ void *nextInCell; /* Class866E8's grid-cell chain; zeroed by GridCell's ctor */ \
+    /* +0x036 */ u16 flags36; /* bit 0x80 tested by StageMap's NotifyGridCell; zeroed by GridCell's ctor */ \
+    /* +0x038 */ void *nextInCell; /* StageMap's grid-cell chain; zeroed by GridCell's ctor */ \
     /* +0x03C */ u8 pad3C[8] /* the object is 0x44 bytes (New_SceneNode) */
 /* clang-format on */
 

@@ -5,7 +5,7 @@
  *
  * RegisterStyleConfig (class_3bb8c_m.c), called by ObjM__InitStyleAndWorld
  * and a no-op until StyleTeardown clears gStyleGrid, sets the state read here: gStyleGrid (the
- * scene's Class866E8), gStyleStage (ObjM's stage), gStyleSceneRefs (ObjM's
+ * scene's StageMap), gStyleStage (ObjM's stage), gStyleSceneRefs (ObjM's
  * sound, resources and viewport; StyleSceneRefs below) and gStyleDay (the
  * DreamSys day). ApplyStyleConfig then takes the stage's fixed config or,
  * with none, PickStyleFallbackConfig's: a variant (gStyleVariant, 0..3) and
@@ -44,7 +44,7 @@
 #include "StyleEffect.h"
 #include "BoxFill.h"
 #include "Viewport.h"
-#include "Class866E8.h"
+#include "StageMap.h"
 #include "SoundCueSet.h"
 
 /* The decoration set: this many BoxFill bands, stacked 3 pixels apart. */
@@ -355,7 +355,7 @@ struct StyleCueSlot {
 
 extern StyleCueSlot *FlushStyleCue(StyleCueSlot *slot);
 
-extern s32 gStyleGrid; /* a Class866E8; class_3bb8c_m.c declares it s32 too */
+extern s32 gStyleGrid; /* a StageMap; class_3bb8c_m.c declares it s32 too */
 extern StyleCueSlot *gStyleCueSlots[2];
 
 /* Releases everything TickStyle built and unregisters the scene. */
@@ -609,7 +609,7 @@ extern u8 gStyleCueRecordCounts[];
 extern s32 gStyleCueDistanceTable[];
 
 /* The cell-key halves: a record's four cell bytes and gStyleCueOffsets' s16
- * x/y/z, copied whole into a 10-byte cell key (Class866E8's Descriptor10
+ * x/y/z, copied whole into a 10-byte cell key (StageMap's Descriptor10
  * shape) for computeCellOffsets. */
 typedef struct Pos4 Pos4;
 
@@ -655,7 +655,7 @@ void *FindNextStyleCueInRange(LongVec3 *pos, s32 *outDist, LongVec3 *target) {
     EntrySlot *entry;
     LocalBuf buf;
     s32 dx, dz, dist;
-    Class866E8 *grid;
+    StageMap *grid;
 
     if (target == 0) {
         goto fail;
@@ -668,7 +668,7 @@ void *FindNextStyleCueInRange(LongVec3 *pos, s32 *outDist, LongVec3 *target) {
         if (entry->cue > 0) {
             buf.pos = entry->pos;
             buf.tab = gStyleCueOffsets[entry->offsetIndex];
-            grid = (Class866E8 *)gStyleGrid;
+            grid = (StageMap *)gStyleGrid;
             grid->methods->computeCellOffsets(grid, pos, &buf);
             dx = pos->x - target->x;
             if (dx < 0) {
@@ -762,7 +762,7 @@ s32 TickStyle(Descriptor10 *cell, void *unused, s32 lastCue) {
     target = 0;
     if (cell != 0) {
         target = &targetPos;
-        ((Class866E8 *)gStyleGrid)->methods->computeCellOffsets((Class866E8 *)gStyleGrid, target, cell);
+        ((StageMap *)gStyleGrid)->methods->computeCellOffsets((StageMap *)gStyleGrid, target, cell);
     }
     if (gStyleTickCount++ == 0) {
         ApplyStyleDecorationIfSet();

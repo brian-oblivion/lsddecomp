@@ -65,7 +65,7 @@ void Actor__AddChild(BaseObjO *self, TagWordObjO *arg) {
 
 - **A companion-pointer link/unlink pair's tag classification is a
   reusable fingerprint across sibling classes.** `(header & 0xFFF) ==
-  0x114` picks out one companion KIND (`0x114` is `gClass866E8Methods`'s own
+  0x114` picks out one companion KIND (`0x114` is `gStageMapMethods`'s own
   header word, confirmed via `tools/classtable.py --scan`) and
   `(header & 0xF) == 5` picks out a second, broader kind (any table whose
   header's low nibble is 5). Worth remembering the exact masks if another
@@ -85,4 +85,4 @@ half, right after it in ROM order.
 
 ## Track 4 (2026-09-25, round 82, delta)
 
-Renamed from `BaseObjO__LinkCompanion`. Override of +0x010 (addChild), named for its slot: chains SceneNode's addChild, then records the child as `grid` when its class id & 0xFFF is 0x114 (Class866E8, the grid manager) or as `ticker` when id & 0xF is 5 (FrameClock). The class (id 0x34, table `gActorMethods`, formerly `D_800878D4`) is unified as `Actor` in `include/Actor.h`: a SceneNode subclass and the base of TodActor/Entity, DreamSys and StyleEffect. Any source block above is the pre-unification spelling; the live body in `src/class_3bb8c_o.c` takes the unified types and field/slot names, byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).
+Renamed from `BaseObjO__LinkCompanion`. Override of +0x010 (addChild), named for its slot: chains SceneNode's addChild, then records the child as `grid` when its class id & 0xFFF is 0x114 (StageMap, the grid manager) or as `ticker` when id & 0xF is 5 (FrameClock). The class (id 0x34, table `gActorMethods`, formerly `D_800878D4`) is unified as `Actor` in `include/Actor.h`: a SceneNode subclass and the base of TodActor/Entity, DreamSys and StyleEffect. Any source block above is the pre-unification spelling; the live body in `src/class_3bb8c_o.c` takes the unified types and field/slot names, byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).

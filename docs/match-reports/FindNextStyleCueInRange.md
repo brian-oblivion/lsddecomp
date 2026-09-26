@@ -333,9 +333,9 @@ MATCHED, 111/111.
 | --- | --- | --- | --- |
 | `D_800876B4` | `gStyleCueRecordLists` | A | per-stage pointer to the stage's 8-byte cue records. |
 | `D_800876EC` | `gStyleCueRecordCounts` | A | per-stage record count, the loop bound. |
-| `D_800874EC` | `gStyleCueOffsets` | A | 6-byte s16 x/y/z entries, indexed by the record's byte 4; copied after the record's 4 cell bytes to make the 10-byte cell key (Class866E8's Descriptor10 shape) computeCellOffsets turns into a world position. |
+| `D_800874EC` | `gStyleCueOffsets` | A | 6-byte s16 x/y/z entries, indexed by the record's byte 4; copied after the record's 4 cell bytes to make the 10-byte cell key (StageMap's Descriptor10 shape) computeCellOffsets turns into a world position. |
 
-The `+0x0E8` local view on `gStyleGrid` is Class866E8's computeCellOffsets. Locals: `pos`, `outDist`, `target`, `remaining`, `records`, `dx`, `dz`, `grid`.
+The `+0x0E8` local view on `gStyleGrid` is StageMap's computeCellOffsets. Locals: `pos`, `outDist`, `target`, `remaining`, `records`, `dx`, `dz`, `grid`.
 
 ### Comments moved here from src/class_3bb8c_n.c
 

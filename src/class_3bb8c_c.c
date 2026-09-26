@@ -4,12 +4,12 @@
  * vtable): NodeGuardedViewport, GridCell and TitleMenu. All three follow
  * the same class-framework shape documented in
  * docs/research/class-framework.md and already used elsewhere in this
- * codebase (e.g. class_3ac78.c's Class866E8).
+ * codebase (e.g. class_3ac78.c's StageMap).
  *
  * NodeGuardedViewport (include/NodeGuardedViewport.h) is a Viewport whose
  * update skips the frame while no view node is attached; its seven table
  * methods, New_ and the getter are all here. GridCell (include/GridCell.h,
- * a SceneNode) is one cell of Class866E8's grid, carrying the model placed
+ * a SceneNode) is one cell of StageMap's grid, carrying the model placed
  * there; its five table methods, New_ and the getter are all here too.
  * TitleMenu (include/TitleMenu.h, a TaskCore) is the menu between days;
  * only its allocator and ctor are here, its other methods in

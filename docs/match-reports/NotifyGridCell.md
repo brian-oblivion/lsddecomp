@@ -6,7 +6,7 @@
 
 ## What it does
 
-`Class866E8`'s slot +0x0E0-adjacent helper: if `self` is non-NULL and a flag
+`StageMap`'s slot +0x0E0-adjacent helper: if `self` is non-NULL and a flag
 bit is set on it, calls its own slot +0x038.
 
 ## Derivation
@@ -21,18 +21,18 @@ lw   $v0, 0x38($v0)           ; ->slot38
 jalr $v0                      ; self->methods->slot38(self), no extra args
 ```
 
-Slot +0x038 is `Class866E8__OnNotify` (also this unit, still `INCLUDE_ASM`, not
+Slot +0x038 is `StageMap__OnNotify` (also this unit, still `INCLUDE_ASM`, not
 implemented this round). No literal/forwarded args are set up before the
-`jalr` beyond `self` itself (unlike `Class866E8__DispatchLinkCommand`/`TimedTask__PlaySound`, this
+`jalr` beyond `self` itself (unlike `StageMap__DispatchLinkCommand`/`TimedTask__PlaySound`, this
 function has no second parameter to forward — nothing else reads `$a1` in
 its body), so the call is `slot38(self)` only.
 
-`flags36` (`u16` at `Class866E8`+0x36) is a new field established this
+`flags36` (`u16` at `StageMap`+0x36) is a new field established this
 round; bit `0x80` gates the dispatch.
 
 ## Proposed learning
 
-None beyond what's already documented for `Class866E8` in `TimedTask__PlaySound.md`.
+None beyond what's already documented for `StageMap` in `TimedTask__PlaySound.md`.
 
 ## Naming
 
@@ -40,10 +40,38 @@ Round 67 (track 3, naming pass).
 
 | symbol | name | tier | evidence |
 | --- | --- | --- | --- |
-| `func_8004B2D4` | `NotifyGridCell` | B | A free function, not a vtable slot and not a method of `Class866E8` -- its `self` is a GRID CELL, which is why it is named `VerbNoun` rather than `Class__Method`. Its only caller is `Class866E8__DispatchToRectCells`, which passes a cell out of an element's grid and then every cell chained behind it. The body dispatches the cell's own `+0x038` slot when the cell is non-NULL and its `flags36 & 0x80` is set; `include/code_8220.h` establishes `+0x038` as `BasicClassMethods::onNotify`. The two extra parameters are forwarded implicitly -- the call sets up no registers, so `$a1`/`$a2` still hold this function's own incoming arguments, which is exactly why the signature was widened in an earlier round. |
+| `func_8004B2D4` | `NotifyGridCell` | B | A free function, not a vtable slot and not a method of `StageMap` -- its `self` is a GRID CELL, which is why it is named `VerbNoun` rather than `Class__Method`. Its only caller is `StageMap__DispatchToRectCells`, which passes a cell out of an element's grid and then every cell chained behind it. The body dispatches the cell's own `+0x038` slot when the cell is non-NULL and its `flags36 & 0x80` is set; `include/code_8220.h` establishes `+0x038` as `BasicClassMethods::onNotify`. The two extra parameters are forwarded implicitly -- the call sets up no registers, so `$a1`/`$a2` still hold this function's own incoming arguments, which is exactly why the signature was widened in an earlier round. |
 
 Parameters renamed: `self` -> `cell`, `arg1` -> `sender`, `arg2` -> `command`.
 A parameter rename does not move a byte; whole-image SHA1 re-verified.
 
 Tier B rather than A because "grid cell" comes from the caller, not from this
 body, and because `flags36`'s bit `0x80` has no established meaning.
+
+## Track 6 (2026-09-26, round 93, alpha)
+
+The class `Class866E8` (table `gClass866E8Methods`, id 0x114, LightRig's
+subclass) is now `StageMap` (`python3 tools/renametype.py Class866E8
+StageMap`, tier B): it keeps seven slots loaded with map chunks of the
+current stage (LbdFile, `STGnn\Mnnn.LBD`) around a tracked target, the
+centre chunk and its six staggered neighbours (`sChunkNeighbourDeltas`), laid
+out by the stage's `StageGridDimensions` (`setConfig`, from ObjM's
+`GetStageGridDimensions(stage)`), each slot's placements linked into a 20 x
+20 lattice of GridCells whose drawn window follows the target. Tier B: the
+mechanics are established; "the stage's map" rests on the files it loads and
+the per-stage config. Header now `include/StageMap.h`; evidence in its banner.
+
+Member types, same pass: `Unk68Struct` is `StageGridDimensions`
+(include/StageGrid.h), `Unk54Struct` is `LongVec3` (include/SceneNode.h),
+`EntryDesc866E8` is `Ratio16[3]` (include/SceneNode.h), all by layout and
+use; `Class866E8Elem` -> `ChunkSlot`, `QueryPos866E8` -> `SplitLongVec3`,
+`SetupEntry866E8` -> `ChunkLoadEntry`, `SetupSub866E8` ->
+`ChunkLoadEntryTail`, `TargetSpec866E8` -> `ChunkSlotSpec`, `GridSlot866E8`
+-> `CellRect`, `GridSlotList866E8` -> `CellRectSet`, `Bounds866E8_3bb8c_b`
+-> `CellBounds`, `Class866E8ValueFn` -> `ChunkFileFn`,
+`Class866E8OnElementEventFn` -> `StageMapOnSlotEventFn`,
+`Class866E8ElemFn` -> `ChunkSlotFn`, `Class866E8CellFn` -> `StageMapCellFn`;
+new `ChunkNeighbourDelta` for `sChunkNeighbourDeltas` (was typed as the
+3-word placeholder). renametype.py also rewrote the old names inside
+earlier sections' history prose in this and sibling reports (known, pending
+an operator decision; not hand-reverted).

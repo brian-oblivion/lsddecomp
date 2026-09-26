@@ -149,7 +149,7 @@ differences + 1 reordering + 1 insertion/deletion, matching the report's
 reached zero, but DID find a real improvement partway through, saved by
 `--best-only` at `permuter-work/strcpy/output-100-1` (score **100**, down
 from 315). `timeout`'s own exit code line was not captured in the log
-(same outer-Bash/inner-`timeout` race documented in `Class866E8__ConfigureRateEntry`'s
+(same outer-Bash/inner-`timeout` race documented in `StageMap__StartScaleRamp`'s
 report this round) — treated as an ordinary self-stop given the clean
 `iteration 52148` count and non-crash `multiprocessing` shutdown warning,
 not independently verified.

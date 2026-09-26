@@ -33,7 +33,7 @@ See `src/code_2c054.c` for the exact text.
 This is one of five instances of the `New_X` epilogue-merge residue class
 closed in a single pass. **The full account, the measurement table for the
 four source shapes that do NOT work, and the sub-shape that this rule does
-NOT close, are all in `docs/match-reports/New_Class866E8.md`** -- read that
+NOT close, are all in `docs/match-reports/New_StageMap.md`** -- read that
 one rather than re-deriving from here.
 
 The one-line version: retail materializes the return value twice, from two

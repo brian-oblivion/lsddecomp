@@ -94,9 +94,9 @@ says the class "was named `LbdFile` for its table address"; what it named
 then was `Class81940`.
 
 **Class name `LbdFile`, tier A.** The files the class is handed are the
-stage's map chunks, STGnn\Mnnn.LBD: Class866E8__ApplyRateEntries calls
+stage's map chunks, STGnn\Mnnn.LBD: StageMap__ApplyChunkLoads calls
 loadHeader (+0x078) with each rate entry's `ptr0`, which
-Class866E8__ComputeRateEntry takes from the grid's callback, and that
+StageMap__ComputeChunkLoadEntry takes from the grid's callback, and that
 callback is ObjM__OnRegistrantEvent (ObjM__AttachTarget installs it), whose
 tail call GetGridRecordAt(stage, chunk) / GetGridRecordXY leaves
 `&group[9 + chunk]` of gRecordTable in $v0. gRecordTable's 0x1C-byte records
@@ -104,7 +104,7 @@ begin with a path, and record 9 of every stage group is its M000.LBD
 (stage 0: gRecordIndexTable[0] = 16, record 25 at 0x80081CC0 =
 "STG00\M000.LBD"; stage 1: record 39 at 0x80081E48 = "STG01\M000.LBD").
 The same index goes into `ownerRate` and is split into column and row
-(Class866E8__ComputeDivisorSplit). LBD is the game's own extension, and the
+(StageMap__SplitChunkIndex). LBD is the game's own extension, and the
 name follows the siblings named for the format they load (TimImage, Tod,
 VabStreamObj). What the header block's two regions and the data block hold
 beyond what their consumers do with them is not established here.

@@ -10,8 +10,8 @@ Unit: `src/class_3bb8c_j.c` (class_3bb8c_j, newly carved round 15).
 
 **ROUND 75 CORRECTION.** This section originally claimed `self` is
 `Obj866E8` (the class established across class_3bb8c_b/c/etc, vtable
-`gClass866E8Methods`) and that the header additions below went onto that type.
-That was wrong, caught by `tools/classtable.py gClass866E8Methods` (which does
+`gStageMapMethods`) and that the header additions below went onto that type.
+That was wrong, caught by `tools/classtable.py gStageMapMethods` (which does
 NOT contain this function's address at any of its 80 slots) versus
 `tools/classtable.py gTextEntryMethods` (which places this function, and all
 five siblings named below, at its +0x094..+0x0A8) -- `gTextEntryMethods` is
