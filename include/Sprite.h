@@ -124,7 +124,7 @@ Sprite *New_Sprite(void *texture, s32 abr, SpriteRect *rect, void *arg3, s32 arg
 void *Sprite__Sprite(Sprite *self, void *texture, s32 abr, SpriteRect *rect, void *arg4, s32 arg5);
 void Sprite__Reset(Sprite *self, void *texture, s32 abr, SpriteRect *rect);
 void InitGsSprite(SpriteGs *sprite, s32 abr, SpriteRect *rect, struct GsIMAGE *image);
-void Sprite__UpdateRotation(Sprite *self, s32 set, WholeFrac_d294 *table);
+void Sprite__UpdateRotation(Sprite *self, s32 set, Ratio16 *table);
 s32 Sprite__SetDisplay(Sprite *self, s32 on);
 s32 Sprite__SetSemiTrans(Sprite *self, s32 on);
 s32 Sprite__SetSemiTransRate(Sprite *self, s32 rate);

@@ -721,7 +721,7 @@ void BgLayer__Reset(BgLayer *self, TileMap *src, s32 mode) {
 /* D_8006F2C4 +0x044 (updateRotation): entry [2] (the z angle) of the
  * {num, den} ratio table SceneNode's updateRotation reads, in 20.12 fixed
  * point, stored in the GsBG's rotate when `set`, else added. */
-void BgLayer__UpdateRotation(BgLayer *self, s32 set, WholeFrac_d294 *table) {
+void BgLayer__UpdateRotation(BgLayer *self, s32 set, Ratio16 *table) {
     s32 num = table[2].whole;
     s32 den = table[2].frac;
     s32 v = ((num / den) << 12) + (((num % den) << 12) / den);
@@ -737,7 +737,7 @@ void BgLayer__UpdateRotation(BgLayer *self, s32 set, WholeFrac_d294 *table) {
  * 20.12 fixed point become the GsBG's scale -- stored when `set` (0x1000
  * for a zero divisor, at most 30000), else added, a sum over 30000 giving
  * 30000, or 1 when either term of that ratio was negative. */
-void BgLayer__UpdateScale(BgLayer *self, s32 set, WholeFrac_d294 *src) {
+void BgLayer__UpdateScale(BgLayer *self, s32 set, Ratio16 *src) {
     s32 negX;
     s32 negY;
     s32 den;

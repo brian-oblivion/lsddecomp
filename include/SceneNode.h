@@ -53,9 +53,9 @@ typedef struct LongVec3 {
 /* One `{whole, frac}` entry of the three-entry angle/scale tables
  * updateRotation and updateScale take (ROTATION_ZERO, SCALE_ONE) and
  * SceneNode__GetRotationDegrees fills; RatioToFixed12 reads one. */
-typedef struct WholeFrac_d294 WholeFrac_d294;
+typedef struct Ratio16 Ratio16;
 
-struct WholeFrac_d294 {
+struct Ratio16 {
     s16 whole;
     s16 frac;
 };
@@ -90,7 +90,7 @@ struct SceneNodeSub14 {
 #define SCENENODE_SLOTS(Self, CtorParams)                                                         \
     BASICCLASS_SLOTS_R(Self, void *, CtorParams);                                                  \
     /* +0x040 */ void (*reset)(Self *self);                                /* SceneNode__Reset */  \
-    /* +0x044 */ void (*updateRotation)(Self *self, s32 set, void *table); /* SceneNode__UpdateRotation: WholeFrac_d294[3] degrees; set or add */ \
+    /* +0x044 */ void (*updateRotation)(Self *self, s32 set, void *table); /* SceneNode__UpdateRotation: Ratio16[3] degrees; set or add */ \
     /* +0x048 */ void (*updateScale)(Self *self, s32 set, void *table);    /* SceneNode__UpdateScale */ \
     /* +0x04C */ SceneNode *(*attachToParent)(Self *self, SceneNode *parent, LongVec3 *offset); /* SceneNode__AttachToParent */ \
     /* +0x050 */ SceneNode *(*detachFromParent)(Self *self);              /* SceneNode__DetachFromParent */ \
@@ -195,7 +195,7 @@ void SceneNode__NotifyTaggedParents(SceneNode *self, void *node);
 void SceneNode__RotateLocalVector(SceneNode *self, LongVec3 *dst, s16 *src);
 void SceneNode__LocalOffsetToWorldPos(SceneNode *self, s32 *dst, s32 *src,
                                       s32 unused); /* both callers set $a3 = 0 (0x80059460, 0x8005CF7C); the body never reads it */
-void SceneNode__GetRotationDegrees(SceneNode *self, WholeFrac_d294 *out);
+void SceneNode__GetRotationDegrees(SceneNode *self, Ratio16 *out);
 void SceneNode__LinkModel(SceneNode *self, void *model);
 void SceneNode__UnlinkModel(SceneNode *self);
 void SceneNode__FaceTarget(SceneNode *self, SceneNode *target, s32 yawOnly, s32 swapped, void *extra);

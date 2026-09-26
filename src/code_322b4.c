@@ -251,7 +251,7 @@ void InitGsSprite(SpriteGs *sprite, s32 abr, SpriteRect *rect, struct GsIMAGE *i
 
 /* gSpriteMethods slot +0x044 (updateRotation): table[2] as a fraction of
  * degrees, in 4096ths; set or add to the GsSPRITE's rotate. */
-void Sprite__UpdateRotation(Sprite *self, s32 set, WholeFrac_d294 *table) {
+void Sprite__UpdateRotation(Sprite *self, s32 set, Ratio16 *table) {
     s32 angle;
 
     angle = ((table[2].whole / table[2].frac) << 12) +

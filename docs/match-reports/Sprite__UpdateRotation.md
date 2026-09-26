@@ -3,16 +3,16 @@
 Round 82, runner alpha (fifth slot on code_322b4). Unit `src/code_322b4.c`. Fresh ground, no prior body attempt.
 
 - **Where:** gSpriteMethods slot +0x044 (updateRotation) (`tools/classtable.py`).
-- **What:** Takes table[2] (the WholeFrac_d294 z entry) as a quotient, angle = ((whole / frac) << 12) + ((whole % frac) << 12) / frac -- degrees in 4096ths -- and sets or adds it to sprite.rotate (+0x084). First build.
+- **What:** Takes table[2] (the Ratio16 z entry) as a quotient, angle = ((whole / frac) << 12) + ((whole % frac) << 12) / frac -- degrees in 4096ths -- and sets or adds it to sprite.rotate (+0x084). First build.
 - **Result:** byte-exact; 39/39 words, 0 insertions / 0 deletions, whole-image SHA1 green (`./build-and-verify.sh` OK). First build.
-- **Types:** typed through the UNIFIED `Sprite` and SceneNode.h's `WholeFrac_d294`, unchanged; matches the Sprite.h prototype.
+- **Types:** typed through the UNIFIED `Sprite` and SceneNode.h's `Ratio16`, unchanged; matches the Sprite.h prototype.
 
 ## Source
 
 ```c
 /* gSpriteMethods slot +0x044 (updateRotation): table[2] as a fraction of
  * degrees, in 4096ths; set or add to the GsSPRITE's rotate. */
-void Sprite__UpdateRotation(Sprite *self, s32 set, WholeFrac_d294 *table) {
+void Sprite__UpdateRotation(Sprite *self, s32 set, Ratio16 *table) {
     s32 angle;
 
     angle = ((table[2].whole / table[2].frac) << 12) + ((table[2].whole % table[2].frac) << 12) / table[2].frac;

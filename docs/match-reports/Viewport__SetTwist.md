@@ -31,7 +31,7 @@ void Viewport__SetTwist(Unk18Obj *self, s16 *pair) {
 ```
 
 Read the input pair as raw `s16 *` rather than reusing `code_d294.h`'s
-`WholeFrac_d294` -- this unit has its own local view of the shape and does
+`Ratio16` -- this unit has its own local view of the shape and does
 not include that header; a shared struct across units is a shared-header
 hazard per CLAUDE.md's "one exception" note, and there is no reuse benefit
 here since nothing in this unit dereferences the pair as anything but two
@@ -65,4 +65,4 @@ often, not a coincidence.
 
 ## Track 4 (2026-09-25, round 85, bravo)
 
-Renamed from `Unk18Obj__SetRatio12`. Renamed for the GsRVIEW2 member it writes: `refView.rz`, the twist, as a 20.12 value from a `WholeFrac_d294` (the same split division as RatioToFixed12, which reads the same type). Slot +0x080 `setTwist`. The class (id 0x7, table `gViewportMethods`, formerly `D_8006E8E4`) is unified as `Viewport` in `include/Viewport.h`, whose banner gives the evidence for the name: its methods hold a GsRVIEW2 (GsSetRefView2), the projection and near clip, a double-buffered GsOT pair, draw the scene tree into it and flip it; IntermediateBase and TaskCore already called the field holding it `viewport`. Any source block above is the pre-unification spelling; the live body takes the unified types and field and slot names, byte-identical.
+Renamed from `Unk18Obj__SetRatio12`. Renamed for the GsRVIEW2 member it writes: `refView.rz`, the twist, as a 20.12 value from a `Ratio16` (the same split division as RatioToFixed12, which reads the same type). Slot +0x080 `setTwist`. The class (id 0x7, table `gViewportMethods`, formerly `D_8006E8E4`) is unified as `Viewport` in `include/Viewport.h`, whose banner gives the evidence for the name: its methods hold a GsRVIEW2 (GsSetRefView2), the projection and near clip, a double-buffered GsOT pair, draw the scene tree into it and flip it; IntermediateBase and TaskCore already called the field holding it `viewport`. Any source block above is the pre-unification spelling; the live body takes the unified types and field and slot names, byte-identical.

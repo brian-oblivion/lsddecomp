@@ -349,7 +349,7 @@ void DreamSys__ResetLinkState(DreamSys *this, s32 arg1, s32 arg2) {
     this->staircaseMoveGate = 0;
     this->staircaseTickFn = 0;
     this->unk_0x78 = 0;
-    SceneNode__GetRotationDegrees((SceneNode *)this, (WholeFrac_d294 *)&local);
+    SceneNode__GetRotationDegrees((SceneNode *)this, (Ratio16 *)&local);
 
     local.field_0x8 = 0;
     local.field_0xA = 1;
@@ -1010,7 +1010,7 @@ bool DreamSys__TryTunnelLink(DreamSys *this, PlayerSpawnPoint *currentPos) {
     result = Test4TunnelLinks(&this->linkCoordinates, currentPos, this->currentStage);
     if (result < 0)
         return false;
-    SceneNode__GetRotationDegrees((SceneNode *)this, (WholeFrac_d294 *)local);
+    SceneNode__GetRotationDegrees((SceneNode *)this, (Ratio16 *)local);
     if (!DreamSys__CheckTunnelHeading(&this->exitRotation, &this->enterRotation, local))
         return false;
     if (this->moveCommandLatch == 0)
@@ -1102,7 +1102,7 @@ bool DreamSys__TryStaircaseLink(DreamSys *this, PlayerSpawnPoint *currentPos) {
                 }
             }
         } else if (Test4StaircaseNodes(&this->linkCoordinates, currentPos, this->currentStage) >= 0) {
-            SceneNode__GetRotationDegrees((SceneNode *)this, (WholeFrac_d294 *)local);
+            SceneNode__GetRotationDegrees((SceneNode *)this, (Ratio16 *)local);
             if (DreamSys__CheckStaircaseHeading(&this->exitRotation, &this->enterRotation, local) &&
                 this->moveCommandLatch != 0) {
                 *(PlayerSpawnPoint *)&this->staircaseGridPos = *currentPos;
@@ -1483,7 +1483,7 @@ void DreamSys__FlashbackSaving(DreamSys *this, s32 arg1, s32 arg2) {
 
     if (this->grid != NULL && rand() % 3 == 0) {
         pos = (PlayerSpawnPoint *)this->grid->methods->getTargetDescriptor(this->grid, 0, 0);
-        SceneNode__GetRotationDegrees((SceneNode *)this, (WholeFrac_d294 *)local);
+        SceneNode__GetRotationDegrees((SceneNode *)this, (Ratio16 *)local);
         this->methods->addFlashback(this, this->currentStage, pos, local, arg1, arg2, this->currentDay);
     }
 }
@@ -1596,10 +1596,10 @@ s32 Test4TunnelLinks(PlayerSpawnPoint *target, PlayerSpawnPoint *currentPos, s32
 
 /* Unit-local reading of the second parameter: the caller (DreamSys__CheckTunnelHeading)
    passes down a `s32 local[4]` buffer that SceneNode__GetRotationDegrees (code_d294_c) fills
-   with a 3-entry WholeFrac_d294 table; the byte offset +4 read here lands on
+   with a 3-entry Ratio16 table; the byte offset +4 read here lands on
    that table's `out[1].whole` (a degrees value, per SceneNode__GetRotationDegrees's own
    report). This function reads it unsigned (`lhu`), independent of
-   WholeFrac_d294's own `s16 whole` -- a second, disjoint view of the same
+   Ratio16's own `s16 whole` -- a second, disjoint view of the same
    bytes, so it is kept local rather than folded into that shared struct.
    Moved above DreamSys__CheckTunnelHeading (round 43) because that function's own arg2 is
    cast to this type before being forwarded to IsHeadingAligned below. */

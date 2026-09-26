@@ -30,7 +30,7 @@
  *    (self only), so the slot keeps SceneNode's type and the ctor, its one
  *    caller, casts to BgLayerResetFn (FINISHING-PLAN track 4 step 6);
  *  - +0x044 updateRotation (BgLayer__UpdateRotation) and +0x048 updateScale
- *    (BgLayer__UpdateScale): set or add, from the same WholeFrac_d294
+ *    (BgLayer__UpdateScale): set or add, from the same Ratio16
  *    {num, den} ratio table SceneNode's reads; the GsBG's rotate from entry
  *    [2] (the z angle, the only one a 2D layer has), its scalex/scaley from
  *    entries [0] and [1];
@@ -97,8 +97,8 @@ extern BgLayerMethods *GetBgLayerMethods(void); /* returns &D_8006F2C4 */
 BgLayer *New_BgLayer(struct TileMap *src, s32 mode); /* BMemPMgrAlloc(0x68), then ctor */
 void BgLayer__BgLayer(BgLayer *self, struct TileMap *src, s32 mode);
 void BgLayer__Reset(BgLayer *self, struct TileMap *src, s32 mode);
-void BgLayer__UpdateRotation(BgLayer *self, s32 set, WholeFrac_d294 *table);
-void BgLayer__UpdateScale(BgLayer *self, s32 set, WholeFrac_d294 *table);
+void BgLayer__UpdateRotation(BgLayer *self, s32 set, Ratio16 *table);
+void BgLayer__UpdateScale(BgLayer *self, s32 set, Ratio16 *table);
 void BgLayer__SetColor(BgLayer *self, s32 enable, BgLayerRgb *rgb);
 void BgLayer__NoOp(void);
 

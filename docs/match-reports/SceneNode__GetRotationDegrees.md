@@ -18,7 +18,7 @@
 ## The match
 
 ```c
-void SceneNode__GetRotationDegrees(SceneNodeObj *self, WholeFrac_d294 *out) {
+void SceneNode__GetRotationDegrees(SceneNodeObj *self, Ratio16 *out) {
     SceneNodeSub44 *src;
 
     src = self->unk14->unk44;
@@ -71,9 +71,9 @@ Only the verdict is superseded.
 
 Unit: `code_d294_c` (round 14). Converts `self->unk14->unk44`'s three
 4096-per-circle angle fields (`SceneNodeSub44::unk10/unk12/unk14`) into a
-3-entry `WholeFrac_d294` table: `whole = field * 45 >> 9` (== `field *
+3-entry `Ratio16` table: `whole = field * 45 >> 9` (== `field *
 360/4096`, i.e. angle units to degrees) and a constant `frac = 1` for
-every entry. `void SceneNode__GetRotationDegrees(SceneNodeObj *self, WholeFrac_d294
+every entry. `void SceneNode__GetRotationDegrees(SceneNodeObj *self, Ratio16
 *out)`.
 
 Blocker screen clean: no `gp_rel`, no `addiu $at,$at,%lo`, no
@@ -84,7 +84,7 @@ Blocker screen clean: no `gp_rel`, no `addiu $at,$at,%lo`, no
 ## `INCLUDE_ASM` per project rule)
 
 ```c
-void SceneNode__GetRotationDegrees(SceneNodeObj *self, WholeFrac_d294 *out) {
+void SceneNode__GetRotationDegrees(SceneNodeObj *self, Ratio16 *out) {
     SceneNodeSub44 *src;
 
     src = self->unk14->unk44;
@@ -102,7 +102,7 @@ Preserved inline (`#if 0`, positioned where it would compile back into
 
 ```c
 #if 0
-void SceneNode__GetRotationDegrees(SceneNodeObj *self, WholeFrac_d294 *out) {
+void SceneNode__GetRotationDegrees(SceneNodeObj *self, Ratio16 *out) {
     SceneNodeSub44 *src;
 
     src = self->unk14->unk44;
@@ -120,7 +120,7 @@ void SceneNode__GetRotationDegrees(SceneNodeObj *self, WholeFrac_d294 *out) {
 
 `include/code_d294.h` gains a proper named type for the `{s16 whole; s16
 frac;}` pair `RatioToFixed12` reads and this function produces --
-`WholeFrac_d294`, replacing the previous prose-only description. This is
+`Ratio16`, replacing the previous prose-only description. This is
 purely additive (a new typedef/struct; `RatioToFixed12`'s own `void *pair`
 parameter type is unchanged, since its callers only ever forward the
 pointer). See the header's own comment for the derivation.
@@ -207,7 +207,7 @@ kill). 34,825 iterations. Best score reached: **10** (down from the base
 170 -> 30 -> 15 -> 10 -- but **no zero**. The score-10 candidate:
 
 ```c
-void SceneNode__GetRotationDegrees(SceneNodeObj *self, WholeFrac_d294 *out)
+void SceneNode__GetRotationDegrees(SceneNodeObj *self, Ratio16 *out)
 {
   int new_var2;
   int new_var;
@@ -329,7 +329,7 @@ identity vs. pair-swap) before reaching for an axis that closed a
   `GsCOORDINATE2.param->rotate`, Sony's own SVECTOR of Euler angles; the
   conversion `* 45 >> 9` is exactly `* 360 / 4096`, i.e. PSX 4096-per-turn
   units to degrees; and the three outputs are written as a
-  `WholeFrac_d294[3]`, the same {value, 1} ratio shape
+  `Ratio16[3]`, the same {value, 1} ratio shape
   `SceneNode__FaceTarget` builds and `slot44` consumes.
 - The 4096-per-turn reading was already independently established in this
   header by `SceneNode__UpdateRotation`'s full-turn wrap (modulo 4096) on the same

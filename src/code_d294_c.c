@@ -79,7 +79,7 @@ void SceneNode__LocalOffsetToWorldPos(SceneNode *self, s32 *dst, s32 *src, s32 u
  * written BEFORE `.frac` even though retail EMITS the `frac` store first
  * (the compiler sinks the constant store into the delay slot itself).
  * See docs/match-reports/SceneNode__GetRotationDegrees.md. */
-void SceneNode__GetRotationDegrees(SceneNode *self, WholeFrac_d294 *out) {
+void SceneNode__GetRotationDegrees(SceneNode *self, Ratio16 *out) {
     SceneNodeSub44 *src;
 
     src = self->coord2->param;
@@ -252,7 +252,7 @@ void SceneNode__FaceTarget(SceneNode *self, SceneNode *target, s32 arg2, s32 arg
     s32 *table;
     s32 dx;
     s32 dz;
-    WholeFrac_d294 out[3];
+    Ratio16 out[3];
 
     pos = &self->coord2->tx;
     table = target->parent != 0 ? target->coord2->unk38 : 0;
@@ -305,10 +305,10 @@ void SceneNode__FaceTarget(SceneNode *self, SceneNode *target, s32 arg2, s32 arg
  * and are the weaker reading. Every producer in this unit sets the second
  * field to 1. */
 s32 RatioToFixed12(void *pair) {
-    WholeFrac_d294 *p;
+    Ratio16 *p;
     s32 q1, r1, q2;
 
-    p = (WholeFrac_d294 *)pair;
+    p = (Ratio16 *)pair;
     q1 = p->whole / p->frac;
     r1 = p->whole % p->frac;
     q2 = (r1 << 12) / p->frac;

@@ -110,7 +110,7 @@ extern void BMemPMgrFree(void *arg);
  * nop_mflo_mfhi toolchain flag it was once blocked on is RESOLVED per
  * CLAUDE.md's "Open toolchain blockers" table; see
  * docs/match-reports/RatioToFixed12.md for the current history): reads
- * a `WholeFrac_d294` at the
+ * a `Ratio16` at the
  * given pointer and returns a 20.12 fixed-point value (`whole << 12 |
  * frac`'s own division-derived low bits) -- read off its own
  * disassembly (a `div` by the pair's own two fields, not decompiled
@@ -254,7 +254,7 @@ s32 ClipSegmentToBox(TmdVec3 *out, BoundsBox_d294 *box, TmdVec3 *p1, TmdVec3 *p2
  * config/symbols.slps01556.lsdde.txt, 0x8001F0C8): arctangent of
  * (dy, dx) in PSX-native 4096-per-circle BAM units, matching every other
  * angle representation this unit's own functions already use (see
- * `WholeFrac_d294` above and `SceneNode__GetRotationDegrees`'s degree conversion). Real
+ * `Ratio16` above and `SceneNode__GetRotationDegrees`'s degree conversion). Real
  * argument order confirmed from SceneNode__FaceTarget's own two call sites,
  * below. */
 extern s32 ratan2(s32 dy, s32 dx);
@@ -270,7 +270,7 @@ extern s32 ratan2(s32 dy, s32 dx);
  * `target` via two `ratan2` calls, converts both to degrees (see
  * `SceneNode__GetRotationDegrees`'s same `x*360>>12` idiom -- pitch gets an EXTRA `+
  * 0x400` [90 degrees] added before conversion, yaw does not), builds a
- * `WholeFrac_d294[3]` {pitch, yaw, 0} table (each `.frac = 1`), and
+ * `Ratio16[3]` {pitch, yaw, 0} table (each `.frac = 1`), and
  * dispatches it to `updateRotation`. `arg2 != 0` forces the pitch entry to 0
  * (a "yaw only" mode); `arg3 == 0` adds 180 degrees to yaw (see below);
  * a non-NULL `arg4` fires a SECOND `updateRotation(self, 0, arg4)` call with the

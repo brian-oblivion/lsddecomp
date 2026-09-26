@@ -179,7 +179,7 @@ extern u8 D_8008A90C[];           /* address-taken only by this unit: (320, 240)
 extern u8 D_8008A904[];           /* address-taken only by this unit: (-100, -100), the
                             screen position Viewport's ctor and SetSubHandle
                             attach the sub handle at (include/Viewport.h) */
-extern WholeFrac_d294 D_8008A8F4; /* {0, 1}: Viewport__AttachViewChild's twist
+extern Ratio16 D_8008A8F4; /* {0, 1}: Viewport__AttachViewChild's twist
                             when its own is NULL (asm/data/7B048.sdata.s) */
 
 /* GsSetRefView2 is NO LONGER DECLARED HERE, round 33. It is Sony's

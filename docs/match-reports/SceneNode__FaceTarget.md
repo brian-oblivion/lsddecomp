@@ -9,7 +9,7 @@ flagged for its argument-swap oddity** (see `docs/match-reports/
 Entity__MoodCue115.md` and `Entity__MoodCue81.md` from earlier rounds, and
 `docs/DECOMPILATION_LEARNINGS.md`). A "face target" orientation setter:
 computes yaw/pitch from `self` toward `target` via two `ratan2` calls,
-converts both to degrees, builds a 3-entry `WholeFrac_d294` table, and
+converts both to degrees, builds a 3-entry `Ratio16` table, and
 dispatches it to `slot44` -- with an optional second `slot44` call
 forwarding a caller-supplied table verbatim.
 `void SceneNode__FaceTarget(SceneNodeObj *self, SceneNodeObj *target, s32 arg2,
@@ -23,7 +23,7 @@ void SceneNode__FaceTarget(SceneNodeObj *self, SceneNodeObj *target, s32 arg2, s
     s32 *table;
     s32 dx;
     s32 dz;
-    WholeFrac_d294 out[3];
+    Ratio16 out[3];
 
     pos = &self->unk14->unk18;
     table = target->unkC != 0 ? target->unk14->unk38 : 0;
@@ -214,7 +214,7 @@ here exactly as already declared.
   world position minus `self`'s own coord translation gives two angles;
   both are converted to degrees by the same `* 360 / 4096` this unit's
   `SceneNode__GetRotationDegrees` uses; they are packed as a
-  `WholeFrac_d294[3]` and dispatched to `slot44`, whose occupant is
+  `Ratio16[3]` and dispatched to `slot44`, whose occupant is
   `SceneNode__UpdateRotation` (code_d294.c, matched) -- the setter that writes
   `GsCOORD2PARAM.rotate`, i.e. the object's own rotation. Compute an
   orientation from self toward a target and install it as the object's

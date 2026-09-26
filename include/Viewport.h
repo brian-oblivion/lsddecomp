@@ -110,11 +110,11 @@ struct ViewportOt {
     /* +0x064 */ void (*setClearColor)(Self *self, ViewportRgb *color); /* Viewport__SetClearColor */ \
     /* +0x068 */ void (*setFarColor)(Self *self, ViewportRgb *color);   /* Viewport__SetFarColor */ \
     /* +0x06C */ void (*setFogNear)(Self *self, s32 fogNear);      /* Viewport__SetFogNear */        \
-    /* +0x070 */ void (*attachViewChild)(Self *self, BasicClass *node, LongVec3 *vp, LongVec3 *vr, WholeFrac_d294 *twist); /* Viewport__AttachViewChild; NULL twist: D_8008A8F4 */ \
+    /* +0x070 */ void (*attachViewChild)(Self *self, BasicClass *node, LongVec3 *vp, LongVec3 *vr, Ratio16 *twist); /* Viewport__AttachViewChild; NULL twist: D_8008A8F4 */ \
     /* +0x074 */ void (*detachViewChild)(Self *self);              /* Viewport__DetachViewChild */   \
     /* +0x078 */ void (*setViewPoint)(Self *self, LongVec3 *vp);  /* Viewport__SetViewPoint */      \
     /* +0x07C */ void (*setViewRef)(Self *self, LongVec3 *vr);    /* Viewport__SetViewRef */        \
-    /* +0x080 */ void (*setTwist)(Self *self, WholeFrac_d294 *twist); /* Viewport__SetTwist */       \
+    /* +0x080 */ void (*setTwist)(Self *self, Ratio16 *twist); /* Viewport__SetTwist */       \
     /* +0x084 */ void (*slot84)(void);                             /* func_8003ECC0, empty */        \
     /* +0x088 */ void (*slot88)(void);                             /* func_8003ECC8, empty */        \
     /* +0x08C */ void (*initOt)(Self *self);                       /* Viewport__InitOt */            \
@@ -196,11 +196,11 @@ void Viewport__SetClearColor(Viewport *self, ViewportRgb *color);
 void Viewport__SetFarColor(Viewport *self, ViewportRgb *color);
 void Viewport__SetFogNear(Viewport *self, s32 fogNear);
 void Viewport__AttachViewChild(Viewport *self, BasicClass *node, LongVec3 *vp, LongVec3 *vr,
-                               WholeFrac_d294 *twist);
+                               Ratio16 *twist);
 void Viewport__DetachViewChild(Viewport *self);
 void Viewport__SetViewPoint(Viewport *self, LongVec3 *vp);
 void Viewport__SetViewRef(Viewport *self, LongVec3 *vr);
-void Viewport__SetTwist(Viewport *self, WholeFrac_d294 *twist);
+void Viewport__SetTwist(Viewport *self, Ratio16 *twist);
 void func_8003ECC0(void);
 void func_8003ECC8(void);
 void Viewport__InitOt(Viewport *self);

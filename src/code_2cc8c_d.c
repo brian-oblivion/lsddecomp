@@ -130,7 +130,7 @@ extern void GsSetRefView2(void *arg0);
  * twist (D_8008A8F4 when `twist` is NULL), then hands refView to
  * GsSetRefView2. */
 void Viewport__AttachViewChild(Viewport *self, BasicClass *node, LongVec3 *vp, LongVec3 *vr,
-                               WholeFrac_d294 *twist) {
+                               Ratio16 *twist) {
     ViewportMethods *m = self->methods;
 
     if (self->viewNode != NULL) {
@@ -166,7 +166,7 @@ void Viewport__SetViewRef(Viewport *self, LongVec3 *vr) {
     }
 }
 
-void Viewport__SetTwist(Viewport *self, WholeFrac_d294 *twist) {
+void Viewport__SetTwist(Viewport *self, Ratio16 *twist) {
     s32 q1, r1, q2;
 
     if (self->viewNode != NULL) {

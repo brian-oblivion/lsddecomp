@@ -29,7 +29,7 @@ consumed by the caller regardless). `pair` ($a2) is a caller-supplied
 1 at `+0x4`/`+0x6`), read as a raw `s16 *` rather than a named struct --
 same shape and same precedent as `code_2cc8c_d.c`'s `Viewport__SetTwist` and
 `code_d294_c.c`'s `RatioToFixed12` (`code_2cc8c.h`'s own note on
-`WholeFrac_d294`: "a different unit's own local view of the same shape,
+`Ratio16`: "a different unit's own local view of the same shape,
 not a shared type").
 
 ## Body
