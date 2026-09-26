@@ -26,7 +26,6 @@ class_3bb8c_i: warning: passing arg 3 of `BuildFileName' discards `const' from p
 class_3bb8c_i: warning: passing arg 4 of `BuildFileName' discards `const' from pointer target type
 class_3bb8c_i: warning: passing arg 4 of `BuildFileName' discards `const' from pointer target type
 class_3bb8c_k: warning: unused variable `unused'
-class_3bb8c_l: warning: passing arg 2 of `RegisterStyleConfig' makes integer from pointer without a cast
 class_3bb8c_m: warning: return makes integer from pointer without a cast
 class_3bb8c_n: src/class_3bb8c_n.c: At top level:
 class_3bb8c_n: warning: `AdjustRgbByDelta' was previously implicitly declared to return `int'

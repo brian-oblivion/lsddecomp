@@ -762,193 +762,20 @@ extern s32 CopyMemcardIconTemplate(s32 arg0, s32 arg1);                /* TaskOb
  * are gone: those objects are the unified Class866E8, Class869D8,
  * Class6E99C, VabStreamObj, FrameClock, WBgm and TextRow. */
 
-/*
- * class_3bb8c_l -- the class whose method table is gObjMMethods (53 slots,
- * resolved with tools/classtable.py 0x80087034). This unit is the FIRST to
- * write any of this class's own methods, but sibling units class_3bb8c_k
- * and class_3bb8c_m are being carved/worked in the SAME round and may
- * independently reach the SAME table -- per round 14's learning ("suffix
- * new type names with your unit" when other runners are live on the same
- * header), every type below carries the `_3bb8c_l` suffix so a later merge
- * cannot collide on a name. Only the slots/fields this unit's own chosen
- * functions actually dispatch through are given concrete types; everything
- * else stays opaque padding.
- */
-typedef struct Obj87034_3bb8c_l Obj87034_3bb8c_l;
-
-/* self->styleConfig's pointee: a plain (non-vtable) record, read directly by
- * ObjM__PollTimBlockLoad via ordinary field offsets, never through a methods
- * pointer -- so it is NOT another Obj87034_3bb8c_l, just an opaque
- * 3-field descriptor. */
+/* ObjM::styleConfig's pointee (include/ObjM.h): not a class, a plain
+ * record, the same memory class_3bb8c_m's local StyleM describes
+ * (D_80087424, which ApplyStyleConfig fills and RegisterStyleConfig
+ * returns). What ObjM's methods do with each word: */
 typedef struct Unk50Struct_3bb8c_l {
-    s32 unk0;      /* +0x000, round 45's ObjM__SetupSceneStyle: forwarded opaquely to Obj14Methods_3bb8c_l::slotC4's arg2 */
-    s32 unk4;      /* +0x004, round 45's ObjM__SetupSceneStyle: forwarded opaquely to Obj14Methods_3bb8c_l::slotC4's arg3 */
-    s32 unk8;      /* +0x008, round 45's ObjM__SetupSceneStyle: forwarded opaquely to Obj14Methods_3bb8c_l::slotBC's arg1 */
-    void *unkC;   /* +0x00C, ObjM__PollTimBlockLoad (address taken, forwarded opaquely) */
+    s32 unk0;      /* +0x000, SetupSceneStyle: the Class866E8's setChildParams `dirs` */
+    s32 unk4;      /* +0x004, SetupSceneStyle: setChildParams `colors` */
+    s32 unk8;      /* +0x008, SetupSceneStyle: the Class866E8's setAmbientColor rgb (a pointer) */
+    void *unkC;    /* +0x00C, a colour: the viewport's setClearColor (EnterStyleSession); the TimBlockSrc's fadeAllEntries when unk14 is 2 (PollTimBlockLoad); StyleM's D_800872C4 entry */
     u8 pad10[0x014 - 0x010];
-    s32 unk14;    /* +0x014, ObjM__PollTimBlockLoad: discriminant compared against 2; also ObjM__EnterStyleSession: discriminant compared against 1 */
-    void *unk18;  /* +0x018, ObjM__PollTimBlockLoad (address taken, forwarded opaquely) */
-    void *unk1C;  /* +0x01C, ObjM__EnterStyleSession (address taken, forwarded opaquely) */
+    s32 unk14;     /* +0x014, selects unkC or unk18: PollTimBlockLoad against 2, EnterStyleSession against 1 */
+    void *unk18;   /* +0x018, a colour: setFarColor, or fadeAllEntries, when unk14 does not select unkC */
+    s32 unk1C;     /* +0x01C, EnterStyleSession: the viewport's setFogNear (StyleM: a D_8008730C value) */
 } Unk50Struct_3bb8c_l;
-
-/* Whatever self->unk14 points to: an object of some OTHER, unidentified
- * class -- it has its own methods pointer at +0x000 (ObjM__TickStyle
- * dispatches +0x10C on it) AND a plain u16 field at +0x1B4 (ObjM__PollTimBlockLoad
- * reads it directly). Offset +0x10C happens to coincide with a DreamSys
- * vtable offset, but DreamSys's own occupant there (DreamSys__SetSoundObj) takes
- * one s32 argument while this call site passes two -- different arities,
- * so this is a different class, not DreamSys; left unnamed. */
-typedef struct Obj14Methods_3bb8c_l {
-    u8 pad000[0x0BC];
-    /* +0x0BC, round 45's ObjM__SetupSceneStyle: `(self, self->styleConfig->unk8, 0)`. */
-    void (*slotBC)(void *self, s32 arg1, s32 arg2); /* +0x0BC */
-    u8 pad0C0[0x0C4 - 0x0C0];
-    /* +0x0C4, round 45's ObjM__SetupSceneStyle: `(self, 3, self->styleConfig->unk0,
-     * self->styleConfig->unk4)`. */
-    void (*slotC4)(void *self, s32 arg1, s32 arg2, s32 arg3); /* +0x0C4 */
-    u8 pad0C8[0x0CC - 0x0C8];
-    /* +0x0CC, round 45's ObjM__SetupSceneStyle: `(self, &D_8008710C)`. */
-    void (*slotCC)(void *self, void *arg1); /* +0x0CC */
-    u8 pad0D0[0x0DC - 0x0D0];
-    /* +0x0DC, round 45's ObjM__SetupSceneStyle: `(self, self->unk48)` on the
-     * OWNING Obj87034_3bb8c_l. */
-    void (*slotDC)(void *self, s32 arg1); /* +0x0DC */
-    /* +0x0E0, round 45's ObjM__SetupSceneStyle: `(self, GetStageGridDimensions(
-     * self->unk38))`. */
-    void (*slotE0)(void *self, void *arg1); /* +0x0E0 */
-    u8 pad0E4[0x0EC - 0x0E4];
-    void (*slotEC)(void *self);                        /* +0x0EC, ObjM__EnterStyleSession */
-    u8 padF0[0x10C - 0x0F0];
-    void *(*slot10C)(void *self, s32 arg1, s32 arg2); /* +0x10C, ObjM__TickStyle */
-    u8 pad110[0x134 - 0x110];
-    void (*slot134)(void *self, void *arg1);           /* +0x134, ObjM__InitStyleAndWorld */
-} Obj14Methods_3bb8c_l;
-typedef struct Obj14_3bb8c_l {
-    Obj14Methods_3bb8c_l *methods; /* +0x000 */
-    u8 pad04[0x1B4 - 0x004];
-    u16 unk1B4;                     /* +0x1B4, ObjM__PollTimBlockLoad */
-} Obj14_3bb8c_l;
-
-/* What self->world points to (and what its +0x0AC returns): an
- * unidentified class dispatched through style/world-setup slots. Until
- * round 88 this type was also self->target's, as DreamSysObj_3bb8c_l; the
- * target is the game's DreamSys (track 4: its +0x04C/+0x050/+0x0EC/+0x0F0/
- * +0x0F8/+0x0FC/+0x104/+0x108/+0x1A0/+0x200 calls are DreamSys occupants,
- * and +0x044/+0x164 are Actor's state and DreamSys's currentStage), and
- * those slots left with it. Nothing ties the world to DreamSys. */
-typedef struct StyleWorldMethods_3bb8c_l {
-    u8 pad00[0x054];
-    /* +0x054, round 45's ObjM__SetupSceneStyle: `(self, val)`, `val` a small
-     * derived integer (`(*obj->methods->slot7C(obj, 0)) / 2 * 5 / 3 +
-     * D_8008AB34`, `obj` being `*(void **)self->unkC`). */
-    void (*slot54)(void *self, s32 arg1); /* +0x054 */
-    u8 pad58[0x060 - 0x058];
-    void (*slot60)(void *self, s32 arg1);          /* +0x060, ObjM__EnterStyleSession */
-    void (*slot64)(void *self, void *arg1);        /* +0x064, ObjM__EnterStyleSession */
-    void (*slot68)(void *self, void *arg1);        /* +0x068, ObjM__EnterStyleSession */
-    void (*slot6C)(void *self, void *arg1);        /* +0x06C, ObjM__EnterStyleSession */
-    void (*slot70)(void *self, void *arg1, void *arg2, void *arg3, s32 arg4); /* +0x070, ObjM__InitStyleAndWorld: (target, &D_8008715C, &D_80087168, 0) */
-    void (*slot74)(void *self);          /* +0x074, ObjM__ExitSceneStyle */
-    u8 pad78[0x0AC - 0x078];
-    /* Returns another object of this view, dispatched through slotF0/slotD4
-     * (elaborated tag: the typedef is not in scope yet). */
-    struct StyleWorldObj_3bb8c_l *(*slotAC)(void *self);    /* +0x0AC, ObjM__EnterStyleSession */
-    void (*slotB0)(void *self, s32 arg1);          /* +0x0B0, ObjM__EnterStyleSession */
-    void (*slotB4)(void *self, s32 arg1);          /* +0x0B4, ObjM__EnterStyleSession */
-    u8 padB8[0x0D4 - 0x0B8];
-    void (*slotD4)(void *self, s32 arg1, s32 arg2, s32 arg3); /* +0x0D4, ObjM__EnterStyleSession (on slotAC's result) */
-    u8 padD8[0x0F0 - 0x0D8];
-    s32 (*slotF0)(void *self, s32 *outBuf, s32 arg2); /* +0x0F0, ObjM__EnterStyleSession (on slotAC's result, as (s32 *)ret, 0 or 3) */
-} StyleWorldMethods_3bb8c_l;
-typedef struct StyleWorldObj_3bb8c_l {
-    StyleWorldMethods_3bb8c_l *methods;
-} StyleWorldObj_3bb8c_l;
-
-/* Whatever arg1->unkC points to in ObjM__AttachTarget -- a registration sink
- * of some kind (arg1->unkC->methods->slotC8(arg1->unkC, callback,
- * userdata) reads like "subscribe `callback` for `userdata`"). Only the
- * one slot this unit calls through is named. */
-typedef struct RegistrantMethods_3bb8c_l {
-    u8 pad00[0x0C8];
-    void (*slotC8)(void *self, void (*callback)(Obj87034_3bb8c_l *self, s32 code, s32 arg2, s32 arg3), Obj87034_3bb8c_l *userdata); /* +0x0C8, ObjM__AttachTarget */
-} RegistrantMethods_3bb8c_l;
-typedef struct RegistrantObj_3bb8c_l {
-    RegistrantMethods_3bb8c_l *methods;
-} RegistrantObj_3bb8c_l;
-
-typedef struct Obj87034Methods_3bb8c_l {
-    s32 header;                                                    /* +0x000 */
-    void (*slot04)(Obj87034_3bb8c_l *self);                        /* +0x004, BasicClass generic (func_80017EB0); dispatched directly by ObjM__PollTimBlockLoad on its `other` argument */
-    u8 pad08[0x010 - 0x008];
-    void (*slot10)(Obj87034_3bb8c_l *self, s32 arg1);              /* +0x010, ObjM__AttachTarget */
-    void (*slot14)(Obj87034_3bb8c_l *self, void *arg1);            /* +0x014, ObjM__DetachTarget/ObjM__ExitSceneStyle */
-    u8 pad18[0x030 - 0x018];
-    void (*slot30)(Obj87034_3bb8c_l *self, s32 arg1);              /* +0x030, ObjM__EnterState4 (STALLED 28/71 -- offset/signature observed directly from the disassembly, reliable independent of the stall; see docs/match-reports/ObjM__EnterState4.md) */
-    u8 pad34[0x048 - 0x034];
-    void (*slot48)(Obj87034_3bb8c_l *self);                        /* +0x048, ObjM__DetachTarget/ObjM__TeardownStyle (via self->unk54) */
-    u8 pad4C[0x05C - 0x04C];
-    void (*slot5C)(Obj87034_3bb8c_l *self, s32 arg1);              /* +0x05C, ObjM__InitStyleAndWorld (arg1 is PickVariant's return value, forwarded opaquely) */
-    u8 pad60[0x074 - 0x060];
-    void (*slot74)(Obj87034_3bb8c_l *self);                        /* +0x074, ObjM__DispatchPadEvent (event 0x21) */
-    u8 pad78[0x07C - 0x078];
-    void (*slot7C)(Obj87034_3bb8c_l *self, void *arg1);            /* +0x07C, ObjM__PollTimBlockLoad */
-    void (*slot80)(Obj87034_3bb8c_l *self);                        /* +0x080, ObjM__PollTimBlockLoad */
-    void (*slot84)(Obj87034_3bb8c_l *self);                        /* +0x084, ObjM__TeardownStyle */
-    void (*slot88)(Obj87034_3bb8c_l *self);                        /* +0x088, ObjM__PollTimBlockLoad */
-    void (*slot8C)(Obj87034_3bb8c_l *self);                        /* +0x08C, ObjM__Update */
-    u8 pad90[0x094 - 0x090];
-    void (*slot94)(Obj87034_3bb8c_l *self);                        /* +0x094, ObjM__OnDreamSysNotify (event/code 0xA, dense switch) */
-    void (*slot98)(Obj87034_3bb8c_l *self);                        /* +0x098, ObjM__OnDreamSysNotify (event/code 0xC) */
-    void (*slot9C)(Obj87034_3bb8c_l *self);                        /* +0x09C, ObjM__EnterState5; ALSO ObjM__OnDreamSysNotify (event/code 0xD) */
-    void (*slotA0)(Obj87034_3bb8c_l *self);                        /* +0x0A0, ObjM__OnDreamSysNotify (event/code 0xE) */
-    void (*slotA4)(Obj87034_3bb8c_l *self);                        /* +0x0A4, ObjM__OnDreamSysNotify (event/code 0xF) */
-    void (*slotA8)(Obj87034_3bb8c_l *self);                        /* +0x0A8, ObjM__OnDreamSysNotify (event/code 0x10) */
-    void (*slotAC)(Obj87034_3bb8c_l *self);                        /* +0x0AC, ObjM__OnDreamSysNotify (event/code 0x11) */
-    u8 padB0[0x0C0 - 0x0B0];
-    void (*slotC0)(Obj87034_3bb8c_l *self);                        /* +0x0C0, ObjM__DispatchPadEvent (event 0xC) */
-    void (*slotC4)(Obj87034_3bb8c_l *self);                        /* +0x0C4, ObjM__DispatchPadEvent (event 0x2C)/ObjM__TogglePause */
-    void (*slotC8)(Obj87034_3bb8c_l *self);                        /* +0x0C8, ObjM__DispatchPadEvent (event 0x16) */
-    u8 padCC[0x0D0 - 0x0CC];
-    void (*slotD0)(Obj87034_3bb8c_l *self);                        /* +0x0D0, ObjM__Update/ObjM__TogglePause */
-    void (*slotD4)(Obj87034_3bb8c_l *self);                        /* +0x0D4, ObjM__ExitSceneStyle/ObjM__TogglePause */
-} Obj87034Methods_3bb8c_l;
-
-struct Obj87034_3bb8c_l {
-    Obj87034Methods_3bb8c_l *methods; /* +0x000 */
-    u8 pad04[0x00C - 0x004];
-    RegistrantObj_3bb8c_l *unkC;      /* +0x00C, ObjM__AttachTarget's `arg1->unkC` */
-    s32 unk10;                        /* +0x010, ObjM__EnterStyleSession */
-    Obj14_3bb8c_l *unk14;              /* +0x014, ObjM__PollTimBlockLoad/ObjM__TickStyle/ObjM__ExitSceneStyle */
-    StyleWorldObj_3bb8c_l *world;         /* +0x018, ObjM__ExitSceneStyle; cached into `cachedWorld` by ObjM__InitStyleAndWorld -- an object distinct from `target`, dispatched through style/world-setup slots (slot74/slotAC/slot60/slot64/slot6C/slot68/slotB0/slotB4) */
-    s32 unk1C;                           /* +0x01C, ObjM__Update: incremented once per call */
-    s32 phase;                            /* +0x020, ObjM__EnterState6: written 6 (a state/phase tag; also written 4 by ObjM__EnterState4 and 5 by ObjM__EnterState5; read by ObjM__OnDreamSysNotify, which is 0-gated) */
-    u8 pad24[0x034 - 0x024];
-    s32 unk34;                            /* +0x034, round 45's ObjM__SetupSceneStyle: forwarded opaquely to SetDreamAuxWorld's own arg3 */
-    void *unk38;                          /* +0x038, ObjM__OnRegistrantEvent: forwarded opaquely to GetGridRecordAt/GetGridRecordXY */
-    struct DreamSys *target;            /* +0x03C, many functions in this unit: the game's DreamSys (include/DreamSys.h), which SetDreamAuxWorld installs as gDreamAuxWorld */
-    s32 unk40;                             /* +0x040, ObjM__EnterStyleSession */
-    s32 unk44;                              /* +0x044, ObjM__EnterStyleSession */
-    s32 unk48;                               /* +0x048, ObjM__InitStyleAndWorld: set from arg1, or 0xA000 if arg1==0 */
-    s32 unk4C;                                /* +0x04C, ObjM__InitStyleAndWorld: set from arg3 (only when self->unk38 != 0) */
-    Unk50Struct_3bb8c_l *styleConfig;             /* +0x050, ObjM__PollTimBlockLoad; set from RegisterStyleConfig's return in ObjM__InitStyleAndWorld (or an explicit `arg2` override) */
-    Obj87034_3bb8c_l *unk54;                 /* +0x054, ObjM__TeardownStyle */
-    Obj87034_3bb8c_l *pendingOther;                  /* +0x058, ObjM__OnTag1Notify: forwarded as ObjM__PollTimBlockLoad's `other` */
-    u8 pad5C[0x060 - 0x05C];
-    s32 hasTarget;                                 /* +0x060, ObjM__PollTimBlockLoad: has-a-target gate, cleared after detaching */
-    s32 unk64;                                  /* +0x064, ObjM__PollTimBlockLoad: set to 1 */
-    s32 attached;                                   /* +0x068, ObjM__PollTimBlockLoad/ObjM__DispatchPadEvent/ObjM__Update: zero-checked gate */
-    s32 unk6C;                                    /* +0x06C, ObjM__InitStyleAndWorld: out-parameter address passed to RegisterStyleConfig, own type unknown */
-    u8 pad70[0x078 - 0x070];
-    StyleWorldObj_3bb8c_l *cachedWorld;                    /* +0x078, ObjM__InitStyleAndWorld: cached copy of self->world */
-    u8 pad7C[0x080 - 0x07C];
-    s32 unk80;                                    /* +0x080, ObjM__PollTimBlockLoad (on `other`)/ObjM__Update/ObjM__TogglePause: zero-checked gate */
-};
-
-/* ObjM_3bb8c_m's parent class, Class86668 (gClass86668Methods), is declared in
- * include/Class86668.h (track 4, round 84); class_3bb8c_k and class_3bb8c_l
- * include it for their base-table calls. The unit-local
- * `BaseMethods87034_3bb8c_l` view the round-15 head note here described is
- * gone. */
 
 /* ObjM__OnRegistrantEvent's own two helpers -- MATCHED, src/code_39094.c.
  * GetGridRecordAt(index, sub) reads both $a0 and $a1. ObjM__OnRegistrantEvent's
@@ -957,8 +784,8 @@ struct Obj87034_3bb8c_l {
  * code is a linear cell index, a negative one sends x/y to GetGridRecordXY.
  * (Was declared K&R/unprototyped and called with one argument until round
  * 82's externcheck pass; the forwarded form is byte-identical.) */
-extern s32 GetGridRecordAt(void *arg0, s32 sub);
-extern void GetGridRecordXY(void *arg0, s32 arg1, s32 arg2);
+extern s32 GetGridRecordAt(s32 index, s32 sub);
+extern void GetGridRecordXY(s32 index, s32 x, s32 y);
 
 /* ObjM__TickStyle's own helper -- MATCHED, src/class_3bb8c_n.c. Typed purely
  * from this call site's own register usage. */
