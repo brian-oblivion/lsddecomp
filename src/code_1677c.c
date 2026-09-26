@@ -4,6 +4,7 @@
 #include "TaskCore.h"
 #include "StreamTask.h"
 #include "GraphRoom.h"
+#include "Class86B60.h"
 
 /* The game's allocator, in the uncarved code_8220 block. Returns void *
  * rather than a typed pointer because every New_X in the game calls it. */
@@ -62,8 +63,8 @@ s32 Class6D3C8__RunPollTask(PollTaskCtor ctor, void *dreamSys, IntermediateBaseI
 
 /* PollTask constructors (not this unit's to write). Called directly (not
  * through any vtable) as Class6D3C8__RunPollTask's `ctor` argument.
- * New_GraphRoom is include/GraphRoom.h's (cast to PollTaskCtor). */
-extern PollTask *New_Class86B60(void *dreamSys);
+ * New_GraphRoom is include/GraphRoom.h's and New_Class86B60
+ * include/Class86B60.h's, each cast to PollTaskCtor. */
 
 extern s32 GetGraphRoomStreamChannel(s32 *out, s32 a1, s32 a2); /* psyq_memset.s: writes a derived count to *out, returns a separate derived value */
 /* code_39094.c: same "write to *out, return a separate value" shape as
@@ -248,7 +249,7 @@ s32 Class6D3C8__PollGraphRoomStatus(Class6D3C8 *self) {
 
         pollDone = 2;
     retry:
-        status = Class6D3C8__RunPollTask(New_Class86B60, self->dreamSys, (IntermediateBaseInitArgs *)self->aux);
+        status = Class6D3C8__RunPollTask((PollTaskCtor)New_Class86B60, self->dreamSys, (IntermediateBaseInitArgs *)self->aux);
         if (status == pollDone) {
             Class6D3C8__RunPollTask((PollTaskCtor)New_GraphRoom, self->dreamSys, (IntermediateBaseInitArgs *)self->aux);
             goto retry;
