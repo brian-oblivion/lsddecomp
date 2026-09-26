@@ -35,3 +35,13 @@ Round 75 (charlie), track 3.
 ## Track 4 (2026-09-25, round 85, alpha)
 
 The class (id 0x234, table `gTodActorMethods`) is unified as `TodActor` in `include/TodActor.h`: an Actor subclass (its ctor chains to Actor's first) and Entity's base. Any source block above is the pre-unification spelling (the local `TodActorMethods` of `include/code_55dd4.h`, `linkCompanion`/`unlinkCompanion`, `companion2`, `Unk5CObj`/`Unk70ElemObj`); the live body in `src/code_55dd4.c` takes the unified types and the inherited slot and field names (`addChild`/`removeChild`, Actor's `ticker`, `Actor *` parts, `ModelData *` modelData), byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).
+
+## Track 6 (round 93, echo)
+
+Renamed `TodActor__SetUnk64` -> `TodActor__SetMainPartNotifies`
+(`tools/rename.py`), slot `setUnk64` -> `setMainPartNotifies`, field `unk64`
+-> `mainPartNotifies` (header edit; the compiler listed 3 accessors, all in
+code_55dd4.c). **Tier B**: the field's one reader, TodActor__TickCallbackA,
+has mainPart send event 6 (`notifyWithHull`) after the actor's own move only
+while it is 1; Reset sets it to 1. What the notification is for is not
+established.

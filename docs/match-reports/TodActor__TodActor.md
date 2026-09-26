@@ -134,3 +134,34 @@ gModelDataMethods model-data class.
 ## Track 4 (2026-09-25, round 85, alpha)
 
 The class (id 0x234, table `gTodActorMethods`) is unified as `TodActor` in `include/TodActor.h`: an Actor subclass (its ctor chains to Actor's first) and Entity's base. Any source block above is the pre-unification spelling (the local `TodActorMethods` of `include/code_55dd4.h`, `linkCompanion`/`unlinkCompanion`, `companion2`, `Unk5CObj`/`Unk70ElemObj`); the live body in `src/code_55dd4.c` takes the unified types and the inherited slot and field names (`addChild`/`removeChild`, Actor's `ticker`, `Actor *` parts, `ModelData *` modelData), byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).
+
+## Track 6 (round 93, echo)
+
+Class `Class65650` renamed `TodActor` (`tools/renametype.py Class65650
+TodActor`: the family, `gTodActorMethods`, `New_TodActor`, every
+`TodActor__*` method, the macros, and the header, now `include/TodActor.h`
+with guard `TODACTOR_H`). **Tier A for what it claims**: an Actor whose own
+methods make one Actor part per TOD object (`CreateParts`, from ModelData's
+`scanPackets`), select a TOD of the ModelData's TodSet (`SetTod`), advance it
+per tick (`Tick`, `PlayTod`/`StopTod`) and write each frame's packets into the
+parts (`ApplyTodFrame`/`ApplyTodPacket`). The name claims "an Actor animated by
+a TOD" and nothing about what it is for in the game; the other methods (peer
+link, tick callbacks, playTone) are described in the banner, not named in the
+class name.
+
+Types with it: `Class65650AttachToParentFn` -> `TodActorAttachToParentFn`
+(same run); the getter `Get_vtable_TodActor` -> `GetTodActorMethods`
+(`tools/rename.py`, the getter was spelled that way in code, not only in
+prose); the ctor's descriptor `UnkArg1Obj` -> `TodActorDesc`
+(`tools/renametype.py UnkArg1Obj TodActorDesc --any-stem`, tier B: only its
++0x00C is read here). Sony and member-type substitutions, one header commit:
+`TimeTargetObj` -> Sony's `GsCOORD2PARAM`; `UnkArg2Obj`/`UnkArg2Methods` ->
+`VabStreamObj` (field `arg2`'s type); `GroupObj` -> `Tod` via
+`TODSET_TOD(set, i)`; `EntryObj2` -> `TodHeader`. See PlayTone, SetTod,
+ApplyTodPacket, SetMainPartNotifies.
+
+The header banner was rewritten as documentation (lifecycle, playback, peer
+and companion, sound). The field `arg2` keeps its name: its other accessors
+are in src/Entity.c, outside this job; `sound` is PROPOSED.
+
+History note: `tools/renametype.py` rewrote the old class name inside this report's earlier sections too (e.g. round 85's "unified as `TodActor`" was written as `Class65650`); those lines are left as the tool wrote them, pending the operator's decision on history prose.

@@ -109,3 +109,11 @@ Round 75 (charlie), track 3.
 ## Track 4 (2026-09-25, round 85, alpha)
 
 The class (id 0x234, table `gTodActorMethods`) is unified as `TodActor` in `include/TodActor.h`: an Actor subclass (its ctor chains to Actor's first) and Entity's base. Any source block above is the pre-unification spelling (the local `TodActorMethods` of `include/code_55dd4.h`, `linkCompanion`/`unlinkCompanion`, `companion2`, `Unk5CObj`/`Unk70ElemObj`); the live body in `src/code_55dd4.c` takes the unified types and the inherited slot and field names (`addChild`/`removeChild`, Actor's `ticker`, `Actor *` parts, `ModelData *` modelData), byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).
+
+## Track 6 (round 93, echo)
+
+The descriptor type `UnkArg1Obj` -> `TodActorDesc` (`tools/renametype.py
+UnkArg1Obj TodActorDesc --any-stem`). Tier B: only its +0x00C (a ModelData to
+borrow) is read here; when that is NULL the whole descriptor goes to
+New_ModelData as code_33808.c's Src6F240 ({buffer, name}). Its +0x000..+0x00B
+stay padding in this view.

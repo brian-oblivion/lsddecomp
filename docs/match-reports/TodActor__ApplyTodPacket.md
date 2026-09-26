@@ -1114,3 +1114,13 @@ now commented at the site. Measured by deleting it alone: the image went red
 drifted), `funcdiff` 187/257, and asm-differ shows `sw a1,0x20(v0)` (the `tz`
 store) moved from before the `j` that implements the `break` into that jump's
 delay slot, replacing the `nop` retail keeps there. Instruction order.
+
+## Track 6 (round 93, echo)
+
+The part's coordinate parameters, read through `coord2->param`, were
+code_55dd4.h's `TimeTargetObj` ({s32 scale[3]; pad; s16 rotate[3]; pad;
+s32 trans[3]}): that is Sony's `GsCOORD2PARAM` ({VECTOR scale; SVECTOR rotate;
+VECTOR trans}), same offsets and same use. The local type is deleted and the
+body reads `&param->rotate.vx`, `&param->scale.vx`, `&param->trans.vx` and
+`trans.vx/vy/vz` (the scale/trans cursors are `long *`, VECTOR's member type);
+code_55dd4.c now includes <libgte.h>, <libgpu.h>, <libgs.h>. Byte-identical.

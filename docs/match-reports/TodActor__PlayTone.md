@@ -60,3 +60,15 @@ Round 75 (charlie), track 3.
 ## Track 4 (2026-09-25, round 85, alpha)
 
 The class (id 0x234, table `gTodActorMethods`) is unified as `TodActor` in `include/TodActor.h`: an Actor subclass (its ctor chains to Actor's first) and Entity's base. Any source block above is the pre-unification spelling (the local `TodActorMethods` of `include/code_55dd4.h`, `linkCompanion`/`unlinkCompanion`, `companion2`, `Unk5CObj`/`Unk70ElemObj`); the live body in `src/code_55dd4.c` takes the unified types and the inherited slot and field names (`addChild`/`removeChild`, Actor's `ticker`, `Actor *` parts, `ModelData *` modelData), byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).
+
+## Track 6 (round 93, echo)
+
+Renamed `TodActor__func_800661D4` -> `TodActor__PlayTone` (`tools/rename.py`),
+slot `+0x124` `slot124` -> `playTone`, and `UnkArg2Obj`/`UnkArg2Methods`
+deleted for `VabStreamObj` (include/VabStreamObj.h). **Tier A** (a pure
+forward): the object at `arg2` is a VabStreamObj -- its `+0x080` is
+`VabStreamObj__PlayTone(self, index, vol, endVol)`, and Entity passes the same
+field to InitSoundCueSet/ServiceSoundCueSet/FlushSoundCueSet as their sound
+object, a VabStreamObj by SoundCueSet.h -- so this plays tone `index` on the
+actor's sound bank with vol = endVol = 0x6E. The forwarded parameter is typed
+`s32 index` accordingly; byte-identical. Nothing in C dispatches the slot.
