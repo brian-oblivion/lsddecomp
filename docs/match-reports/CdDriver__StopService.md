@@ -57,3 +57,6 @@ service" slot.
 
 Tier B for the class token only (see `CdDriver__RequestLoadFile.md`); the
 method's own behaviour is not in doubt.
+
+
+Track 4, 2026-09-26 (round 88). The class of gCdDriverMethods (was D_8006D4E8, id 0x13 = DATASOURCE_CD) is CdDriver, in include/CdDriver.h: its ctor calls InitCdDrive, its slots enqueue CD_OP_* requests and drive the CD read state machine, and it is VabDriver's sibling. The object views this function was typed against are replaced by CdDriver, whose fields are all Class6D430's (the driver runs on its clients' objects; Class6D430's +0x018/+0x01C were named pos/size for it). Byte-identical. `Class6D4E8__StopCdService` -> `CdDriver__StopService` by rename.py. Renamed from StopCdService for its slot, +0x070 stopService (VabDriver__StopService fills the same slot). Its one caller, CdDriver__RunRequestQueue, passes `self` (retail loads $a0 before the jalr) while Class6D430's slot is `void (*)(void)`; that call site casts through StopServiceSelfFn (no code).

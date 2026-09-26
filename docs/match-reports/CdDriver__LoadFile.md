@@ -245,3 +245,6 @@ methods named here.
 Also noted for whoever names code_171e0 again: `Class6D430__LoadFile`
 opens, sizes, allocates for, reads and closes a named file, i.e. it is the
 base-class LoadFile. Not renamed here (out of unit).
+
+
+Track 4, 2026-09-26 (round 88). The class of gCdDriverMethods (was D_8006D4E8, id 0x13 = DATASOURCE_CD) is CdDriver, in include/CdDriver.h: its ctor calls InitCdDrive, its slots enqueue CD_OP_* requests and drive the CD read state machine, and it is VabDriver's sibling. The object views this function was typed against are replaced by CdDriver, whose fields are all Class6D430's (the driver runs on its clients' objects; Class6D430's +0x018/+0x01C were named pos/size for it). Byte-identical. `Class6D4E8__LoadFile` -> `CdDriver__LoadFile` by rename.py. The arg-less Class6D430__LoadFile call goes through the LoadFileNoArgsFn cast (no code) now that Class6D430.h's prototype is in scope.

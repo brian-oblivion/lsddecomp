@@ -231,3 +231,6 @@ For the head to apply by type scope (out of unit):
 | code_179d8_o | `Obj6D4E8` | `unk28` | `inQueueDispatch` | A | the constructor's clear of the same field this function raises around each dispatch (note that view types it `s16`, this unit `u16`) |
 | include/code_171e0.h | `Class6D430` | `unk28` | `inQueueDispatch` | B | the base ctor zeroes it; only this derived class reads it |
 | include/code_171e0.h | `Class6D430` | `unk22` | `pendingRequests` | B | the base ctor zeroes it; EnqueueCdRequest/this function count it |
+
+
+Track 4, 2026-09-26 (round 88). The class of gCdDriverMethods (was D_8006D4E8, id 0x13 = DATASOURCE_CD) is CdDriver, in include/CdDriver.h: its ctor calls InitCdDrive, its slots enqueue CD_OP_* requests and drive the CD read state machine, and it is VabDriver's sibling. The object views this function was typed against are replaced by CdDriver, whose fields are all Class6D430's (the driver runs on its clients' objects; Class6D430's +0x018/+0x01C were named pos/size for it). Byte-identical. `Class6D4E8__RunRequestQueue` -> `CdDriver__RunRequestQueue` by rename.py. The +0x070 call passes `self` through the StopServiceSelfFn cast (Class6D430's stopService slot takes no arguments; retail loads $a0): without it 150/151 words.

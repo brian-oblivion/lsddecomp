@@ -99,3 +99,6 @@ with the class's method count, while the cost of a placeholder token is one
 worse than a placeholder" bites hardest is exactly here, and the existing
 `Class6B5CC__` spelling shows the project already settled on the hedge:
 placeholder CLASS, evidence-based METHOD.
+
+
+Track 4, 2026-09-26 (round 88). The class of gCdDriverMethods (was D_8006D4E8, id 0x13 = DATASOURCE_CD) is CdDriver, in include/CdDriver.h: its ctor calls InitCdDrive, its slots enqueue CD_OP_* requests and drive the CD read state machine, and it is VabDriver's sibling. The object views this function was typed against are replaced by CdDriver, whose fields are all Class6D430's (the driver runs on its clients' objects; Class6D430's +0x018/+0x01C were named pos/size for it). Byte-identical. `GetClass6D4E8Methods` -> `GetCdDriverMethods` by rename.py. Now returns `CdDriverMethods *` (`&gCdDriverMethods`), not `s32 *`.

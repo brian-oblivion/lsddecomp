@@ -223,3 +223,6 @@ views; proposing rather than renaming, since those units are not mine:
 | --- | --- | --- | --- | --- | --- |
 | code_179d8_s | `Obj80027480` | `unk22` | `pendingRequests` | A | `EnqueueCdRequest` increments it per queued request; `CdDriver__CancelRequests` decrements it once per node it unlinks |
 | code_179d8_s | `Obj80027480` | `unk24` | `flags` | A | only ever `|=` a bit (4 here, 0x200 in `CdDriver__LoadFile`) or cleared |
+
+
+Track 4, 2026-09-26 (round 88). The class of gCdDriverMethods (was D_8006D4E8, id 0x13 = DATASOURCE_CD) is CdDriver, in include/CdDriver.h: its ctor calls InitCdDrive, its slots enqueue CD_OP_* requests and drive the CD read state machine, and it is VabDriver's sibling. The object views this function was typed against are replaced by CdDriver, whose fields are all Class6D430's (the driver runs on its clients' objects; Class6D430's +0x018/+0x01C were named pos/size for it). Byte-identical. `Class6D4E8__RequestLoadFile` -> `CdDriver__RequestLoadFile` by rename.py.

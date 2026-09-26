@@ -74,3 +74,6 @@ needed LOADING, not that none was read.
   into an s-register with `move sN,a0` and has not called anything since,
   is still passing its own first argument. Check the callee before typing
   the slot zero-argument.
+
+
+Track 4, 2026-09-26 (round 88). The class of gCdDriverMethods (was D_8006D4E8, id 0x13 = DATASOURCE_CD) is CdDriver, in include/CdDriver.h: its ctor calls InitCdDrive, its slots enqueue CD_OP_* requests and drive the CD read state machine, and it is VabDriver's sibling. The object views this function was typed against are replaced by CdDriver, whose fields are all Class6D430's (the driver runs on its clients' objects; Class6D430's +0x018/+0x01C were named pos/size for it). Byte-identical. `Class6D4E8__Destroy` -> `CdDriver__Finalize` by rename.py. Renamed from Destroy for its slot, +0x00C finalize (track 4 step 6): the body cancels the object's requests and frees its buffer, which is what the slot does.

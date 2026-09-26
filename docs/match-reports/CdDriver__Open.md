@@ -251,3 +251,6 @@ Globals: `D_8006D574` -> `gCdSeekLoc` (A: 8 bytes of .data written only by
 `D_8008A860` keeps its placeholder for code_179d8_q's stated reason: every
 read here is the `gCdAsyncEnabled == 0 && D_8008A860 == 0` sync-mode test and
 nothing names the second mode.
+
+
+Track 4, 2026-09-26 (round 88). The class of gCdDriverMethods (was D_8006D4E8, id 0x13 = DATASOURCE_CD) is CdDriver, in include/CdDriver.h: its ctor calls InitCdDrive, its slots enqueue CD_OP_* requests and drive the CD read state machine, and it is VabDriver's sibling. The object views this function was typed against are replaced by CdDriver, whose fields are all Class6D430's (the driver runs on its clients' objects; Class6D430's +0x018/+0x01C were named pos/size for it). Byte-identical. `Class6D4E8__Open` -> `CdDriver__Open` by rename.py.
