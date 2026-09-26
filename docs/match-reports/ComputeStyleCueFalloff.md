@@ -81,3 +81,30 @@ s32 ComputeStyleCueFalloff(StyleCueParam *ctx) {
 ## Naming
 
 **Tier B.** Free function (called with `ctx`, not a `self` of its own type in the class-method sense), so no `Class__` prefix. The name reflects the mechanism, not the game meaning: `gStyleCueDistanceTable` (the same table `IsStyleCueNear`/`FindNearestStyleCueEntry`, code_8220_b.c/class_3bb8c_n.c, index with `dist < table[...]` -- confirming it holds distance thresholds) is read at a NEGATIVE tag index, divided down, and used as the divisor for `ctx->falloff`'s own value; `falloff` is used by every `StyleCueNN` occupant that calls this helper first. What the resulting scaled quantity represents in the running game (a cue repeat count? a duration?) is not established.
+
+## Track 6 (2026-09-26, round 92, alpha): `set` is a SoundCueSet
+
+class_3bb8c_r.c's `StyleCueParam` used to type both parameters of every
+StyleCueNN callback and of ComputeStyleCueFalloff; its old comment called it
+"very likely a SoundCueSet-shaped object" but kept one local type because
+nothing confirmed `self` and `ctx` were the same object. They are not, and
+the two now have different types:
+
+- The second parameter (was `self`, now `set`) is the SoundCueSet
+  (include/SoundCueSet.h). ServiceSoundCueSet calls `callback(owner, set)`,
+  and every offset the callbacks write agrees: +0x04 (was `kind`, the value
+  every callback dispatches on) is `tick`, +0x10 (was `falloff`) is
+  `attenuation`, and +0x1C..+0x50 (was `unk1C`..`unk50`) are
+  `slots[0..2].program/octave/vol/endVol`. The callbacks' `-1` store to
+  +0x04 is the same restart the Entity__MoodCueNN handlers do.
+- The first parameter (`ctx`) is the owner, class_3bb8c_n.c's
+  `StyleCueSlot`: TryStartStyleCue passes the slot as InitSoundCueSet's
+  owner and `&slot->cueSet` (+0x14) as the set. So `StyleCueParam` is now a
+  local view of StyleCueSlot: `methods` (+0x00) is the claimed record,
+  renamed `entry`, whose +0x06 `tag` is class_3bb8c_n's `countSign`;
+  `falloff` (+0x10) is `lastDist`; and `unk28` (+0x28) is
+  `cueSet.attenuationSteps` (+0x14 + 0x14). ComputeStyleCueFalloff therefore
+  scales the slot's last distance into 0..attenuationSteps against the cue's
+  distance limit, as Entity__GetProximityRatio does for Entity.
+
+Locals `kind` became `tick`. Zero bytes.

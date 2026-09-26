@@ -26,85 +26,53 @@
 #include "common.h"
 #include "SvmData.h"
 #include "VabStreamObj.h"
+#include "SoundCueSet.h"
 
-/* Matched round 73 -- docs/match-reports/ServiceSoundCueSet.md.
- * Round 75 (naming): `self`/`set` confirmed the same objects
- * `code_179d8_e.c` already names `VabStreamObj`/`SoundCueSet` -- the +0x80/
- * +0x84/+0x9C slots this function dispatches line up exactly with
- * `tools/classtable.py gVabStreamObjMethods`' `VabStreamObj__PlayTone`/
- * `VabStreamObj__StopVoice`/`VabStreamObj__SetPitchOffset`, and
- * `SoundCueSlot.index`/`SoundCueSet.tag`/`.owner`/`.slots` match this
- * function's own field usage (the `>= 0`-gated stop-voice call, the `> 0`
- * tag guard, `callback`'s first argument). VabStreamObj comes from
- * include/VabStreamObj.h since round 87 (track 4). SoundCueSet below is
- * still a second LOCAL view of the struct `code_179d8_e.c` defines: it is
- * not a class, and track 4 did not unify it (see FlushSoundCueSet.md /
- * DreamSys__SetSoundObj.md for the cross-unit identification trail). */
-typedef struct {
-    s32 index; /* matches code_179d8_e.c's SoundCueSlot.index: -1 sentinel, else a VabStreamObj__StopVoice-forwardable voice index */
-    s32 note; /* packed as note*16 into VabStreamObj__PlayTone's `index` argument (hi=note, lo=0) */
-    s32 pitchOffset; /* forwarded to VabStreamObj__SetPitchOffset unchanged */
-    s32 word2; /* default 0x7F (127); feeds PlayTone's arg2 via a `/unk14*unk10` remainder -- proposed vol/pan, unconfirmed */
-    s32 word3; /* default 0x40 (64); feeds PlayTone's arg3 the same way -- proposed vol/pan, unconfirmed */
-} SoundCueSlot;
-
-typedef struct SoundCueSet SoundCueSet;
-
-struct SoundCueSet {
-    s32 tag;  /* matches code_179d8_e.c's SoundCueSet.tag: guard, >0 required to service */
-    s32 unk4; /* incremented once per service call here; code_179d8_e.c's own view never reads it */
-    s32 owner; /* matches code_179d8_e.c's SoundCueSet.owner: passed as callback's first argument, unchanged */
-    void (*callback)(s32 arg0, SoundCueSet *self);
-    s32 unk10; /* set 0 before the callback runs; callback may set it negative to skip servicing this tick -- purpose beyond that not established */
-    s32 unk14; /* matches code_179d8_e.c's SoundCueSet.unk14 (set to 10 by InitSoundCueSet); used here as a divisor */
-    SoundCueSlot slots[3];
-};
-
-void ServiceSoundCueSet(VabStreamObj *a0, SoundCueSet *a1) {
+void ServiceSoundCueSet(VabStreamObj *sound, SoundCueSet *set) {
     s32 i;
     SoundCueSlot *e;
-    s32 rem1;
-    s32 rem2;
-    s32 note;
+    s32 vol;
+    s32 endVol;
+    s32 toneIndex;
 
-    if (a1->tag > 0) {
+    if (set->tag > 0) {
         i = 0;
-        e = &a1->slots[0];
+        e = &set->slots[0];
         do {
             i++;
-            e->note = -1;
-            e->pitchOffset = 0;
-            e->word2 = 0x7F;
-            e->word3 = 0x40;
+            e->program = -1;
+            e->octave = 0;
+            e->vol = 0x7F;
+            e->endVol = 0x40;
             e++;
         } while (i < 3);
 
-        a1->unk10 = 0;
-        if (a1->callback != NULL) {
-            a1->callback(a1->owner, a1);
+        set->attenuation = 0;
+        if (set->callback != NULL) {
+            set->callback(set->owner, set);
         }
 
-        if (a1->unk10 >= 0) {
-            e = &a1->slots[0];
+        if (set->attenuation >= 0) {
+            e = &set->slots[0];
             i = 0;
             do {
-                if (e->note >= 0) {
-                    if (e->index >= 0) {
-                        a0->methods->stopVoice(a0, e->index);
+                if (e->program >= 0) {
+                    if (e->voice >= 0) {
+                        sound->methods->stopVoice(sound, e->voice);
                     }
-                    a0->methods->setPitchOffset(a0, e->pitchOffset);
-                    note = e->note * 16;
-                    rem1 = e->word2 - (e->word2 / a1->unk14) * a1->unk10;
-                    rem2 = e->word3 - (e->word3 / a1->unk14) * a1->unk10;
-                    e->index = a0->methods->playTone(a0, note, rem1, rem2);
-                } else if (e->note == -2 && e->index >= 0) {
-                    a0->methods->stopVoice(a0, e->index);
+                    sound->methods->setPitchOffset(sound, e->octave);
+                    toneIndex = e->program * 16;
+                    vol = e->vol - (e->vol / set->attenuationSteps) * set->attenuation;
+                    endVol = e->endVol - (e->endVol / set->attenuationSteps) * set->attenuation;
+                    e->voice = sound->methods->playTone(sound, toneIndex, vol, endVol);
+                } else if (e->program == -2 && e->voice >= 0) {
+                    sound->methods->stopVoice(sound, e->voice);
                 }
                 i++;
                 e++;
             } while (i < 3);
         }
-        a1->unk4++;
+        set->tick++;
     }
 }
 

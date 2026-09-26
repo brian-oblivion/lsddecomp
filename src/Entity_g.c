@@ -65,7 +65,7 @@ extern u8 ROTATION_YAW_MINUS9[];
 extern u8 ROTATION_YAW_PLUS9[];
 extern u8 SCALE_THIRTY_SECOND[];
 
-void Entity__MoodCue98(Entity *this, EntityMoodHandlerArg *out) {
+void Entity__MoodCue98(Entity *this, SoundCueSet *out) {
     if (this->targetReached != 0) {
         if (Entity__GetOrCreateUnk100(this, NULL, 0, 0xA, 0) != 0) {
             this->unk100->methods->startFadeDown(this->unk100, (BasicClass *)this->ticker, 7, 0);
@@ -76,18 +76,18 @@ void Entity__MoodCue98(Entity *this, EntityMoodHandlerArg *out) {
     this->methods->moveLocalZ(this, -0x1E, (void *)1);
 }
 
-void Entity__MoodCue102(Entity *this, EntityMoodHandlerArg *out) {
+void Entity__MoodCue102(Entity *this, SoundCueSet *out) {
     void *a2;
 
     if (this->moodTimer == 0) {
         this->methods->moveLocalY(this, -0x200, 0);
     }
-    out->unk10 = this->methods->getProximityRatio(this);
+    out->attenuation = this->methods->getProximityRatio(this);
     if (this->todFrame == this->todFrameCount / 2) {
-        out->unk1C = 7;
-        out->unk20 = -2;
-        out->unk30 = 3;
-        out->unk34 = -2;
+        out->slots[0].program = 7;
+        out->slots[0].octave = -2;
+        out->slots[1].program = 3;
+        out->slots[1].octave = -2;
     }
     if (this->moodTimer >= 0x33) {
         this->methods->updateRotation(this, 0, D_80089CAC);
@@ -124,7 +124,7 @@ void Entity__MoodCue102(Entity *this, EntityMoodHandlerArg *out) {
     }
 }
 
-void Entity__MoodCue103(Entity *this, EntityMoodHandlerArg *out) {
+void Entity__MoodCue103(Entity *this, SoundCueSet *out) {
     if (this->moodTimer == 0x2BC) {
         if (rand() % 3 == 0) {
             this->state = 0xB;
@@ -146,18 +146,18 @@ void Entity__MoodCue103(Entity *this, EntityMoodHandlerArg *out) {
     this->methods->moveLocalZ(this, -0x1E, 0);
 }
 
-void Entity__MoodCue104(Entity *this, EntityMoodHandlerArg *out) {
+void Entity__MoodCue104(Entity *this, SoundCueSet *out) {
     this->methods->updateScale(this, 1, SCALE_QUARTER);
     if ((u32)(this->moodTimer - 0xC9) < 0x63) {
         this->methods->moveLocalY(this, -0x20, 0);
     }
 }
 
-void Entity__MoodCue105(Entity *this, EntityMoodHandlerArg *out) {
+void Entity__MoodCue105(Entity *this, SoundCueSet *out) {
     this->methods->setDisplay(this, rand() % 20 == 0);
 }
 
-void Entity__MoodCue106(Entity *this, EntityMoodHandlerArg *out) {
+void Entity__MoodCue106(Entity *this, SoundCueSet *out) {
     if (this->moodTimer == 0) {
         if ((rand() & 1) == 0) {
             this->state = 0xB;
@@ -179,17 +179,17 @@ void Entity__MoodCue106(Entity *this, EntityMoodHandlerArg *out) {
     this->methods->moveLocalX(this, (this->moodTimer % 20 < 10) ? 0x20 : -0x20, 0);
 }
 
-void Entity__MoodCue108(Entity *this, EntityMoodHandlerArg *out) {
+void Entity__MoodCue108(Entity *this, SoundCueSet *out) {
     Entity__MoodCue71(this, out);
     this->methods->updateScale(this, 1, SCALE_SIX);
 }
 
-void Entity__MoodCue109(Entity *this, EntityMoodHandlerArg *out) {
+void Entity__MoodCue109(Entity *this, SoundCueSet *out) {
     this->methods->updateScale(this, 1, SCALE_HALF);
     this->methods->moveLocalZ(this, -0xA, 0);
 }
 
-void Entity__MoodCue110(Entity *this, EntityMoodHandlerArg *out) {
+void Entity__MoodCue110(Entity *this, SoundCueSet *out) {
     this->methods->updateScale(this, 1, D_80089E44);
     this->methods->stopTod(this);
     if (this->state == 0) {
@@ -208,7 +208,7 @@ void Entity__MoodCue110(Entity *this, EntityMoodHandlerArg *out) {
     }
 }
 
-void Entity__MoodCue111(Entity *this, EntityMoodHandlerArg *out) {
+void Entity__MoodCue111(Entity *this, SoundCueSet *out) {
     if (this->moodTimer == 0) {
         if (((DreamSys *)this->peer)->methods->getDreamColor((DreamSys *)this->peer) == 5) {
             this->state = 0xB;
@@ -218,19 +218,19 @@ void Entity__MoodCue111(Entity *this, EntityMoodHandlerArg *out) {
         if ((u32)(this->moodTimer - 0x870) < 0x191) {
             if (this->moodTimer == 0x870) {
                 this->methods->stopTod(this);
-                out->unk1C = -2;
-                out->unk30 = -2;
-                out->unk44 = -2;
+                out->slots[0].program = -2;
+                out->slots[1].program = -2;
+                out->slots[2].program = -2;
                 return;
             }
             if ((u32)(this->moodTimer - 0x9F6) < 0xA) {
-                out->unk1C = 5;
-                out->unk20 = -2;
+                out->slots[0].program = 5;
+                out->slots[0].octave = -2;
                 return;
             }
             if (this->moodTimer == 0xA00) {
                 ((EntityPlayTodFn)this->methods->playTod)(this);
-                out->unk4 = 1;
+                out->tick = 1;
                 return;
             }
             return;
@@ -247,15 +247,14 @@ void Entity__MoodCue111(Entity *this, EntityMoodHandlerArg *out) {
     }
 }
 
-void Entity__StepYawInWindowsThenDeactivate(Entity *this, EntityMoodHandlerArg *out, s32 arg2,
-                                            s32 arg3, s32 arg4) {
+void Entity__StepYawInWindowsThenDeactivate(Entity *this, SoundCueSet *out, s32 arg2, s32 arg3, s32 arg4) {
     s32 timer;
 
-    out->unk10 = 0;
-    if (out->unk4 == 6) {
-        out->unk1C = 4;
-        out->unk30 = 4;
-        out->unk44 = 4;
+    out->attenuation = 0;
+    if (out->tick == 6) {
+        out->slots[0].program = 4;
+        out->slots[1].program = 4;
+        out->slots[2].program = 4;
     }
     timer = this->moodTimer;
     if (timer < arg2) {
@@ -288,11 +287,11 @@ L74:
     }
 }
 
-void Entity__MoodCue113(Entity *this, EntityMoodHandlerArg *out) {
+void Entity__MoodCue113(Entity *this, SoundCueSet *out) {
     Entity__MoodCue51(this, out);
 }
 
-void Entity__MoodCue114(Entity *this, EntityMoodHandlerArg *out) {
+void Entity__MoodCue114(Entity *this, SoundCueSet *out) {
     void *a2;
 
     if (rand() % 3 == 0) {
@@ -306,19 +305,19 @@ void Entity__MoodCue114(Entity *this, EntityMoodHandlerArg *out) {
     this->methods->updateRotation(this, 0, a2);
 }
 
-void Entity__MoodCue117(Entity *this, EntityMoodHandlerArg *out) {
+void Entity__MoodCue117(Entity *this, SoundCueSet *out) {
     this->methods->updateScale(this, 1, SCALE_SIX);
 }
 
-void Entity__MoodCue118(Entity *this, EntityMoodHandlerArg *out) {
+void Entity__MoodCue118(Entity *this, SoundCueSet *out) {
     this->methods->updateScale(this, 1, SCALE_SIX);
 }
 
-void Entity__MoodCue121(Entity *this, EntityMoodHandlerArg *out) {
+void Entity__MoodCue121(Entity *this, SoundCueSet *out) {
     this->methods->updateScale(this, 1, SCALE_QUARTER);
 }
 
-void Entity__MoodCue123(Entity *this, EntityMoodHandlerArg *out) {
+void Entity__MoodCue123(Entity *this, SoundCueSet *out) {
     if (this->moodTimer == 0) {
         if (rand() % 5 == 0) {
             this->state = 0xB;
@@ -338,7 +337,7 @@ void Entity__MoodCue123(Entity *this, EntityMoodHandlerArg *out) {
     }
 }
 
-void Entity__MoodCue125(Entity *this, EntityMoodHandlerArg *out) {
+void Entity__MoodCue125(Entity *this, SoundCueSet *out) {
     if (this->moodTimer == 0) {
         if ((rand() & 3) == 0) {
             goto trigger;
@@ -352,21 +351,21 @@ trigger:
     this->state = 1;
 merge:
     this->methods->updateScale(this, 1, D_80089E44);
-    out->unk10 = this->methods->getProximityRatio(this);
-    if (out->unk4 % (this->todFrameCount / 2) == 0) {
-        out->unk1C = 0xA;
-        out->unk20 = 1;
+    out->attenuation = this->methods->getProximityRatio(this);
+    if (out->tick % (this->todFrameCount / 2) == 0) {
+        out->slots[0].program = 0xA;
+        out->slots[0].octave = 1;
     }
     this->methods->moveLocalZ(this, -0xA, 0);
 }
 
-void Entity__MoodCue128(Entity *this, EntityMoodHandlerArg *out) {
+void Entity__MoodCue128(Entity *this, SoundCueSet *out) {
     SceneNode__FaceTarget((SceneNode *)this, (SceneNode *)this->peer, 1, 0, 0);
     this->methods->updateScale(this, 1, SCALE_THIRTY_SECOND);
     this->methods->moveLocalZ(this, -0x1E, (void *)1);
 }
 
-void Entity__MoodCue129(Entity *this, EntityMoodHandlerArg *out) {
+void Entity__MoodCue129(Entity *this, SoundCueSet *out) {
     if (this->moodTimer == 0) {
         this->state = rand() % 2 + 0xA;
     }

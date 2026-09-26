@@ -126,3 +126,51 @@ Better still, and track 4's call: replace `EntityMoodHandlerArg` with one shared
 ## Track 4 (2026-09-26, round 88, echo)
 
 The class (id 0x1F234, table `gEntityMethods`) is unified as `Entity` in `include/Entity.h`: a Class65650 subclass whose table and object expand `CLASS65650_SLOTS`/`CLASS65650_FIELDS`. Any source block above is the pre-unification spelling; the live body takes the inherited names (fields `parent`, `coord2`->`tx/ty/tz`, `tick`, `linkTarget`, `state` (was `moodState`), `lastOffsetValue`, `grid` (was `unk4C`), `ticker` (was `companion2`), `arg2` (was `soundCueChannel`), `parts`, `todPlaying`, `peer` (was `target`, cast to the `Unk94Obj` DreamSys view where its own slots are called); slots `reset`, `setDisplay`, `setLightMode`, `setTranslation`/`addTranslation`, `moveLocalZ/X/Y`, `moveLocalZOrFindLink`, `selectTickCallback`, `enableTickCallback`/`disableTickCallback`, `distanceToPeer`, `setTargetReached`, `updateActivationState`/`updateDeactivationState`), byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).
+
+## Track 6 (2026-09-26, round 92, alpha): one SoundCueSet
+
+`include/SoundCueSet.h` now holds the one definition of `SoundCueSet` and
+`SoundCueSlot`. It replaced three views: code_179d8_e.c's (named
+`tag`/`owner`/`callback`/`slots[].index` only), code_179d8_l.c's (named
+`note`/`pitchOffset`/`word2`/`word3`, `unk4`/`unk10`/`unk14`) and
+include/Entity.h's `EntityMoodHandlerArg` (all `unkNN`). Zero bytes; the
+whole-image SHA1 is unchanged.
+
+Layout verified against every reader: InitSoundCueSet (+0x00 tag, +0x04,
++0x08 owner, +0x0C callback, +0x14 = 10, three 0x14-byte slots from +0x18
+whose +0x0 gets -1), ServiceSoundCueSet (per-slot +0x4/+0x8/+0xC/+0x10
+reset to -1/0/0x7F/0x40, +0x10 zeroed, callback(owner, set), +0x04
+incremented), FlushSoundCueSet (slot +0x0 through stopVoice, +0x00
+cleared), Entity__GetProximityRatio (+0x14 divisor), the Entity__MoodCueNN
+handlers (+0x04, +0x10, slot 0 +0x4..+0x10, slot 1/2 +0x4/+0x8),
+class_3bb8c_r's StyleCueNN `self` (the same offsets) and DreamSys.h's
+`SoundCueCallbackArg` (+0x00 == tag 1, +0x04 % 20, slot 0/1 +0x4/+0x8).
+
+Names, tier A, each from what its readers do:
+
+| old (e / l / Entity.h) | new | evidence |
+| --- | --- | --- |
+| slot `index` / `index` / - | `voice` | ServiceSoundCueSet stores playTone's result there (the voice, or -1) and passes it to stopVoice(voice); Flush stops it |
+| - / `note` / `unk1C` `unk30` `unk44` | `program` | ServiceSoundCueSet passes `program * 16` as playTone's `index`, which PlayTone splits into program `index >> 4` and tone `index & 0xF` (so tone 0); -1 none, -2 stops the voice |
+| - / `pitchOffset` / `unk20` `unk34` `unk48` | `octave` | forwarded unchanged to setPitchOffset, whose parameter is `octave` (pitchOffset = octave * 12 - 24) |
+| - / `word2` / `unk24` | `vol` | playTone's `vol` argument after attenuation; default 0x7F |
+| - / `word3` / `unk28` | `endVol` | playTone's `endVol` argument after attenuation; default 0x40 |
+| `unk4` / `unk4` / `unk4` | `tick` | zeroed by Init, incremented once per service pass; handlers time requests on `tick % N` and `tick == 0`, and reset it with -1 |
+| - / `unk10` / `unk10` | `attenuation` | zeroed per tick, then each volume loses (vol / attenuationSteps) per unit; < 0 skips keying; handlers store a proximity ratio in 0..10 |
+| `unk14` / `unk14` / `unk14` | `attenuationSteps` | set to 10 by Init; the divisor above, and the scale both proximity helpers map a distance onto |
+
+Why not `note`/`pitchOffset` (code_179d8_l.c) or the earlier proposal's
+`voiceNTone`/`voiceNPitch` (Entity__MoodCue07.md): the value is neither a
+note nor a tone. VabStreamObj__PlayTone's `index` is program << 4 | tone,
+and ServiceSoundCueSet always sends tone 0, so what the callback writes is a
+VAB program number. The pitch word is the octave setPitchOffset takes, not
+a pitch offset (that is what setPitchOffset computes from it). `tick` and
+`attenuation` are the earlier proposal's names, kept.
+
+`callback` is typed `SoundCueCallbackFn`, `void (*)(void *owner,
+SoundCueSet *set)`; InitSoundCueSet's parameter takes that type and its
+first parameter is `sound` (it is unused). The three functions have no
+shared prototype: Entity.h, DreamSys.c and class_3bb8c_n.c declare them
+with their own type for the sound object (Class65650's `arg2` is a
+`struct UnkArg2Obj *`), and a header prototype taking `VabStreamObj *`
+would warn in each.
