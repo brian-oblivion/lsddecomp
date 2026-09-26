@@ -1,12 +1,12 @@
 # callback -- STALL: length 1 word SHORT (220/224 bytes); 30/56 raw word-match; first real diff at vram 0x8002B484
 
-**Unit:** code_179d8_g · **Size:** 56 words · **Status:** STALL (1 word short: 220/224 bytes, 30/56 words match, first real diff at vram 0x8002B484)
+**Unit:** libcd_bios · **Size:** 56 words · **Status:** STALL (1 word short: 220/224 bytes, 30/56 words match, first real diff at vram 0x8002B484)
 
 ## What it does
 
 Thread entry point registered by `CD_initintr`/`CD_init` via
 `func_80024D40(2, callback)`. Loops on `getintr()` (still
-`INCLUDE_ASM`/BLOCKED in `code_179d8_b`) dispatching two optional callbacks
+`INCLUDE_ASM`/BLOCKED in `libcd_bios`) dispatching two optional callbacks
 (`D_8006D600` and `D_8006D5FC`, both function pointers) based on flag bits,
 until `getintr()` returns 0, then restores the driver's saved status
 byte into `*D_8006D8C0`.
@@ -116,7 +116,7 @@ divergence (extra saved register) rather than the intended one.
 
 ## Round: hand analysis (runner delta), permuter queued but not yet run
 
-Re-read `asm/nonmatchings/code_179d8_g/callback.s` directly to
+Re-read `asm/nonmatchings/libcd_bios/callback.s` directly to
 confirm the report's residue reading byte-for-byte (not just trust the
 prose). Confirmed exactly as described:
 
@@ -423,7 +423,7 @@ function you're editing" attribution hazard -- checked `build/lsdde.map` and
 confirmed the apparent first diff at file offset 0x1BBF8 was a 4-byte
 immediate shift caused by upstream drift, not this function's own residue).
 Read the true site directly off retail's own `.s` instead, which this
-report's prose already pinpoints precisely: `asm/nonmatchings/code_179d8_g/
+report's prose already pinpoints precisely: `asm/nonmatchings/libcd_bios/
 callback.s` line 46, **file offset `0x1BC84`, vram `0x8002B484`** --
 the `lui $v0,%hi(D_8006D8D8) / addiu $v0,$v0,%lo(D_8006D8D8) / lbu $a0,0x0
 ($v0)` unfolded 3-instruction sequence this build's plain `D_8006D8D8[0]`
@@ -737,7 +737,7 @@ real oracle (round 19: the winning candidate retypes the global `D_8006D8D8`
 corrupts the already-matched `CD_flush`; reverted, re-confirmed round
 20) or UNSOUND (round 49's 75-score candidate reuses `pd9` across a
 loop-carried stale read, a real logic bug the scorer cannot see). No
-permuter output was ever adopted. Placed in `src/code_179d8_g.c` under
+permuter output was ever adopted. Placed in `src/libcd_bios.c` under
 `#ifdef NON_MATCHING`, using this report's own corrected `D_8006D8D8[0]`
 spelling (runner delta's correction, identical `--debug` score to the
 bare-array form) rather than the original body's implicit-truncation

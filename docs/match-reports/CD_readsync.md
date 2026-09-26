@@ -84,7 +84,7 @@ needed to establish it:
 | operand | what the data says | where |
 | --- | --- | --- |
 | `D_8006D6A0` | a fixed **8-element table of rodata string addresses** (`0x8001097C`, `0x80010970`, ...) -- an array, so the decay is tautologically non-null | `asm/data/5DDFC.data.s:121-130` |
-| `D_8006D8F8` | **one zero word** that the sibling `cb_read` stores `VSync(-1)`'s return into (`lui`/`addiu`/`sw $v0`) -- an `s32` timestamp | `asm/nonmatchings/code_179d8_g/cb_read.s:49-51` |
+| `D_8006D8F8` | **one zero word** that the sibling `cb_read` stores `VSync(-1)`'s return into (`lui`/`addiu`/`sw $v0`) -- an `s32` timestamp | `asm/nonmatchings/libcd_bios/cb_read.s:49-51` |
 
 A pointer global would be a word holding an address; this one holds a frame
 count written by `VSync`. That half of the lead is closed and should not be
@@ -157,7 +157,7 @@ corrected model.
 **Kept, not reverted, and the choice is deliberate.** Reverting would discard a
 byte-verified match on the strength of a style rule; keeping it silently would
 plant a construct that reads as a bug and invites copying. So it stays, with
-the defect named on the construct itself in `src/code_179d8_g.c`, the eleven
+the defect named on the construct itself in `src/libcd_bios.c`, the eleven
 dead ends recorded here so they are not re-run, and the mis-modelling lead
 written down. **Whether a duplicate-arm form may stand in `src/` at all is a
 project-policy question for the operator, not the head's to settle** -- this
@@ -178,7 +178,7 @@ at the data model rather than at the code shape.
 
 ## (original report follows) CD_readsync — MATCHED (174/174, 174/174 words -- round 39, up from 165/174 in round 36)
 
-`code_179d8_g`, vram `0x8002AEE0`, file offset `0x1B6E0`, 174 instructions
+`libcd_bios`, vram `0x8002AEE0`, file offset `0x1B6E0`, 174 instructions
 (0x2B8 bytes). No `nop_mflo_mfhi` or `gp_rel` hits — clean per the carve
 census; residue is codegen-shape, not a toolchain blocker. This is one of
 the three functions the unit's header comment used to mark BLOCKED on
@@ -442,7 +442,7 @@ mislead whoever picks that stall back up: the report's preserved body has
 func_80012C20(D_80010994, p8D8[0], p6A0[p8D8[1]], p620[D_8006D61D], p6A0[p8D8[0]]);
 ```
 
-but `asm/nonmatchings/code_179d8_g/CD_datasync.s` (lines ~50-70) shows the
+but `asm/nonmatchings/libcd_bios/CD_datasync.s` (lines ~50-70) shows the
 EXACT same instruction shape as this function's own diagnostic block: `a1 =
 D_8008B3EC` (not `p8D8[0]`), `a2 = D_6006D620[D_8006D61D]`, `a3 =
 D_8006D6A0[D_8006D8D8[0]]`, stack-arg = `D_8006D6A0[D_8006D8D8[1]]` —
@@ -461,7 +461,7 @@ See the shared writeup in `docs/match-reports/cd_read_retry.md` (filed
 there since that function is the round's primary target for this
 question); this function's own residue 2 above is cited there as a fourth,
 independently-found data point (partial-improvement, not full-transfer)
-alongside the three code_179d8_l reductions and the three code_179d8_g
+alongside the three code_179d8_l reductions and the three libcd_bios
 stalls read for the question.
 
 ### Proposed learnings
@@ -778,7 +778,7 @@ offsets 0x1B718/0x1B71C/0x1B728 (the `p6A0`/`p8D9` `$s4`/`$s5` swap),
 
 Retail's own instruction stream stores `D_8008B3E8 = 0` BEFORE
 `D_8008B3EC = (s32)D_80010AD8` (confirmed directly off
-`asm/nonmatchings/code_179d8_g/CD_readsync.s`, offsets 0x1B748-0x1B754);
+`asm/nonmatchings/libcd_bios/CD_readsync.s`, offsets 0x1B748-0x1B754);
 the round-36 body assigned them in the opposite order
 (`D_8008B3EC` then `D_8008B3E8`). Swapping the two assignment statements to
 match retail's order closed exactly the 0x1B74C/0x1B754 pair with no other
@@ -989,7 +989,7 @@ Round 89 (runner delta, track 5 `asm-sites`): the bare `__asm__("")` after
 `idx1 = p8D8[1];` in the timeout path is **justified** and now commented at the
 site. Measured by deleting it alone (60 bytes of the image differ; `funcdiff`
 cannot score this function because its symbol is absolute, so the evidence is
-`objdump -d -r` of `build/src/code_179d8_g.c.o` with and without it): retail
+`objdump -d -r` of `build/src/libcd_bios.c.o` with and without it): retail
 issues `lbu a0,0(s3)` and `lbu v0,1(s3)` (the two `p8D8` bytes) directly after
 the `puts` call; without the barrier the `p8D8[0]` load sinks below the
 `D_8008B3EC` and `D_8006D61D` loads for the `printf` arguments, and the index

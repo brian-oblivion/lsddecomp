@@ -2,7 +2,7 @@
 
 > Renamed from `func_8002B198` on 2026-09-23 (tools/rename.py). Address 0x8002b198.
 
-**Unit:** code_179d8_g · **Size:** 91 words · **Status:** STALL (length EXACT 364/364 bytes; best 49/91 words match, up from 45/91 in round 36; first real diff at vram 0x8002B1C8 -- see below)
+**Unit:** libcd_bios · **Size:** 91 words · **Status:** STALL (length EXACT 364/364 bytes; best 49/91 words match, up from 45/91 in round 36; first real diff at vram 0x8002B1C8 -- see below)
 
 ## What it does
 
@@ -118,7 +118,7 @@ function indexes both `[0]` and `[1]`. The retype is transparent to
 `CD_flush`'s own byte-exact match (`D_8006D8D8[0] = 2;` compiles
 identically to the old `D_8006D8D8 = 2;`), confirmed by rebuilding and
 re-diffing that function after the change. This is now the live
-declaration in `code_179d8_g.c`.
+declaration in `libcd_bios.c`.
 
 ### Proposed learning
 
@@ -453,7 +453,7 @@ exact at 364/364 bytes** -- matches round 36's recorded figure exactly.
 seed** (round 36's permuter fix changed the diagnostic call's last argument,
 which shifted the register-numbering residue from `cd_read_retry`-style
 `p6A0`/`p8D8` at `$s1`/`$s0` to a NEW pairing, `p620`/`p6A0` swapped at
-`$s3`/`$s1`/`$s0` -- confirmed via `objdump -dr build/src/code_179d8_g.c.o`:
+`$s3`/`$s1`/`$s0` -- confirmed via `objdump -dr build/src/libcd_bios.c.o`:
 this build assigns `s3=p620` correctly but `s1=p6A0`/`s0=p8D8` where retail
 wants `s1=p8D8`/`s0=p6A0`). Swapped the `p6A0`/`p8D8` assignment-statement
 order to `p620; p8D8; p6A0;` (retail's own instruction order, confirmed off

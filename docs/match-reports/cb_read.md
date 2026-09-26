@@ -2,7 +2,7 @@
 
 > Renamed from `func_8002B4D4` on 2026-09-23 (tools/rename.py). Address 0x8002b4d4.
 
-**Unit:** code_179d8_g · **Size:** 91 words · **Status:** MATCHED (byte-exact, round 49) -- history below is from when it was a STALL (length EXACT 91/91, 84/91 words match, first real diff at vram 0x8002B508)
+**Unit:** libcd_bios · **Size:** 91 words · **Status:** MATCHED (byte-exact, round 49) -- history below is from when it was a STALL (length EXACT 91/91, 84/91 words match, first real diff at vram 0x8002B508)
 
 ## What it does
 
@@ -517,7 +517,7 @@ trusting it -- and it FAILS.** The candidate introduces one change: a fresh
 function's last two `D_8006D8F4` reads (the `<= 0` guard and the dispatch-
 code `== 0` check) rewritten as `*new_var`. Built into `src/` in isolation:
 `funcdiff.py` reports **32/91 words** (WORSE than 60/91) and, checked via
-`objdump -d build/src/code_179d8_g.c.o`, the function compiles to **90 real
+`objdump -d build/src/libcd_bios.c.o`, the function compiles to **90 real
 instructions, one (4 bytes) SHORT of retail's 91** -- confirmed independently
 of `funcdiff`'s own byte-range read, since the SDK object immediately
 following this function in the same `.o` (`CdSearchFile`) is placed at an

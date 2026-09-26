@@ -46,7 +46,7 @@
  * func_800368E8/A54/A7C, all three previously MATCHED as C and all three now
  * deleted from here.  It sat in the MIDDLE of what the prefix trim had left,
  * so the slice became [c][o][c] and the tail half became the one-function
- * unit `src/code_179d8_f_b.c` (SpuInitHot).  Nothing moved with it: this
+ * unit `src/libspu_s_ih.c` (SpuInitHot).  Nothing moved with it: this
  * unit never owned a rodata attach.
  *
  * WHAT IS LEFT OF THIS UNIT IS ONE FUNCTION, Snd_crescendo.

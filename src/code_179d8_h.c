@@ -18,7 +18,7 @@
  * and strstr (0x80028BBC) are `libc2/strcpy.o` / `libc2/strstr.o`, and
  * CdStatus, CdLastCom (func_80028C44), CdReset (func_80028C54) and CdFlush
  * (func_80028CC0) are the first four functions of `libcd/sys.o` (Psy-Q 3.3),
- * which runs on through the whole front of code_179d8_b.  All six had been
+ * which runs on through the whole front of libcd_bios.  All six had been
  * matched as C; they were Sony's the whole time, and reclassifying them out of
  * the game count is the correction CLAUDE.md asks for, not a regression.  The
  * unit is now 0x19098..0x19378 (11 functions).  The "three carry real names
@@ -107,8 +107,8 @@ typedef struct StatBuf179D8H {
 /* CdSearchFile (was func_8002B640): Sony's, lib/libcd/iso9660.o since round 34 -- declared
  * LOCAL here, per-call-site typed.
  *
- * This comment used to read "still uncarved in its own unit (code_179d8_g,
- * BLOCKED addiu_at there)", and both halves had gone stale: code_179d8_g has
+ * This comment used to read "still uncarved in its own unit (libcd_bios,
+ * BLOCKED addiu_at there)", and both halves had gone stale: libcd_bios has
  * been a carved C unit since round 17, and `addiu_at` was RESOLVED in round
  * 21 (maspsx `--addiu-at`; docs/research/addiu-at-blocker.md), which leaves
  * func_8002B640 blocker-clean and assignable (re-screened with

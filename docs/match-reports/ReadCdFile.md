@@ -245,11 +245,11 @@ CD-ROM read/retry loop: if `self->unk0C == 0`, dispatch through
 `ObjA34_179D8H` class this unit already established) and return 0.
 Otherwise, loop: reset something via `func_80028DF0(2, &self->unk18, 0)`
 (this unit's own `unk18` field, matched in `OpenCdFile`'s stall report),
-poll `func_80028D68` (already matched elsewhere, in `code_179d8_b.c`) until
+poll `func_80028D68` (already matched elsewhere, in `libcd_bios.c`) until
 it returns nonzero; on `5` specifically, restart the whole loop; on any
 other nonzero, and only if the caller-supplied `arg2 >> 11` ("sector
 count"?) is nonzero, kick off `func_80029274` (a retry-writer, already
-matched in `code_179d8_b.c`) and poll `func_80029254` (also matched there)
+matched in `libcd_bios.c`) and poll `func_80029254` (also matched there)
 until it settles, returning 0 unless the settle value is exactly -1 (in
 which case retry the whole outer loop again).
 

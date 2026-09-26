@@ -255,7 +255,7 @@ offsets/types this report uses.
 
 Builds a CD path via `BuildCdFilePath` (this unit, matched) into a local 64-byte
 buffer, then retries `func_8002B640` (CD stat lookup, still uncarved,
-BLOCKED addiu_at in its own unit `code_179d8_g`) up to 100 times; on success,
+BLOCKED addiu_at in its own unit `libcd_bios`) up to 100 times; on success,
 copies the stat buffer's first two fields into `self->unk18`/`self->unk1C`
 and marks `self->unk0C = 1`; on exhausting the retries, logs via
 `func_80012C20` (Psy-Q print wrapper) and gives up. `self` is the SAME

@@ -31,7 +31,7 @@
  * NO RODATA ATTACH CAME WITH THIS HALF, and that is measured, not assumed: the
  * old code_179d8_mid_c monolith contains zero `jtbl_` and zero `.word .L`
  * across its whole extent, and the splat yaml's rodata slot list names none of
- * `code_179d8_j`, `_j_b` or `_j_c`.  Unlike round 33's code_179d8_c_b there
+ * `code_179d8_j`, `_j_b` or `_j_c`.  Unlike round 33's libsnd_ssinit_libapi_counter there
  * was nothing to move, and a link failure of the form
  * `undefined reference to '.L8003....'` would mean something else.
  *

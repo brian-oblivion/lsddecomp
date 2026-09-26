@@ -352,16 +352,16 @@ Head work while two runners converted the text-only game-unit runs
 the `libgs`/`libgte` objects in `code_2cc8c_e`).
 
 **`libc2/strcpy` + `libc2/strstr` + `libcd/sys`** (0x19378..0x19C78, crossing
-`code_179d8_h` / `code_179d8_b`): 27 functions, 22 of them matched C and three
+`code_179d8_h` / `libcd_bios`): 27 functions, 22 of them matched C and three
 INCLUDE_ASM stalls (`CdControl`, `CdControlF`, `CdControlB`, ~1200 report
 lines). `sys` has a 5-byte `.rdata` ("none", 0x1040) and a 0x80-byte `.data`
 (0x5DD7C, a table of 0/1 words); both slots split at the derived offsets, the
-`.rdata` with a 3-byte `pad`. `code_179d8_b` is left with ONE function.
+`.rdata` with a 3-byte `pad`. `libcd_bios` is left with ONE function.
 
 **`libcd/iso9660` + `libc2/strcmp` + `libc2/strncmp`** (0x1BE40..0x1C92C,
-crossing `code_179d8_g` / `code_179d8_d`): nine functions, three stalls
+crossing `libcd_bios` / `code_179d8_d`): nine functions, three stalls
 (`CdSearchFile`, `CD_newmedia`, `CD_cachefile`, ~1300 lines). `.rdata` 0x1EA
-at 0x12EC with a 2-byte pad before `code_179d8_c_b`'s jump table; `.data`
+at 0x12EC with a 2-byte pad before `libsnd_ssinit_libapi_counter`'s jump table; `.data`
 8 bytes at 0x5E138 (a byte search finds the same two DMA register addresses
 four times -- the relocation derivation picks the right one); `.bss` 0x2400 at
 0x8008B3F0 is the CD directory cache the game's own asm names as `D_8008B3F0`

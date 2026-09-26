@@ -1,82 +1,521 @@
 /*
- * ROUND 42 CORRECTION (2026-09-15) -- READ BEFORE ANY "BLOCKED" LINE BELOW:
- * every claim in this comment that a function is BLOCKED by `gp_rel`,
- * `nop_mflo_mfhi` or `addiu_at` is STALE.  All three constructs are RESOLVED
- * by pinned maspsx flags (CLAUDE.md, "Open toolchain blockers");
- * `tools/nearmiss.py` reports them tagged (RESOLVED-not-a-blocker) and counts
- * none of them.  Any "do NOT spend attempts on these" directive below is
- * therefore RETRACTED: those functions are ordinary matching work, and most
- * carry a mechanism-correct partial derivation already.  The rest of this
- * comment still stands -- only the blocker verdicts are withdrawn.
- * Screen: `python3 tools/nearmiss.py`, round 43 (2026-09-15).
+ * libcd_bios -- Sony's libcd `bios.c`, the low-level CD-ROM controller
+ * driver, carried as C. The game links a libcd build (RCS ids of December
+ * 1995) that no SDK disc carries, so this object cannot be linked from lib/
+ * the way its neighbours are (docs/research/psyq-sdk-objects.md); every
+ * function here is matched, or queued, as C instead. Sony's names
+ * throughout.
  *
- * code_179d8_g -- functions 83..99 of the original 274-function code_179d8
- * monolith, 0x1AB78..0x1C440 (vram 0x8002A378..0x8002BC40).  Carved round 17
- * (2026-09-04) off the back of what was then `code_179d8_mid`, the three
- * functions in front of this slice. Those three were left as "all addiu-$at
- * blocked, so there is nothing left to staff there"; re-censused round 24
- * (2026-09-08) that is FALSE -- CD_sync (161w), CD_ready (180w)
- * and CD_cw (282w) are ALL THREE blocker-clean now that `addiu_at`
- * is resolved. Round 26 (2026-09-09) acted on that and CARVED them as the
- * C unit `code_179d8_n`; no `code_179d8_mid` segment exists any more.
+ * What it holds, in bios.c's own order:
+ *   - getintr: reads the controller's interrupt cause and response bytes,
+ *     records them per cause, and reports the event to its caller;
+ *   - CD_sync / CD_ready: wait (with a timeout and a diagnostic print) for
+ *     a command to complete or for data to become ready;
+ *   - CD_cw: issue one controller command with its parameter bytes;
+ *   - CD_vol, CD_shell, CD_flush, CD_initvol, CD_initintr, CD_init: volume
+ *     set-up, shell-open recovery, draining the controller, and the reset
+ *     sequence that installs `callback` as the CD interrupt handler;
+ *   - cd_read_retry, CD_readm, CD_readsync, CD_datasync, CD_getsector: the
+ *     sector-read state machine and its DMA transfer;
+ *   - func_8002B3E4, callback, cb_read: a one-word setter, the interrupt
+ *     handler, and the per-sector read callback.
  *
- * Blocker census, three-grep screen run per function at carve time:
- * 14 of the 17 clean, zero trivial leaves.  These are BIG bodies -- 196,
- * 223, 186 and 189 instructions among them -- so this unit is smaller in
- * count and considerably larger in work than 17 suggests.  Budget fewer
- * functions per pass here than in a leaf-heavy unit.
+ * What decided its edges (python3 tools/tuboundary.py):
+ *   - start: the object in front, libcd/sys, ends here ("start edge
+ *     possible"), and getintr is bios.c's first function;
+ *   - CD_sync and CD_vol, once the first functions of their own carve units,
+ *     are proven to be the SAME file as what precedes them by the rodata
+ *     ("start edge IMPOSSIBLE", strings 0x800109F8 > 0x80010984 and
+ *     0x80010A38 > 0x80010984), so the three carve slices are merged here;
+ *   - end: the placed object libcd/iso9660 follows cb_read.
  *
- * NO LONGER BLOCKED -- all three of this unit's blocked functions were
- * blocked on `addiu_at` ALONE, and `addiu_at` was RESOLVED in round 21
- * (maspsx `--addiu-at`; docs/research/addiu-at-blocker.md). Re-screened with
- * `python3 tools/nearmiss.py` on 2026-09-08 (round 24):
- *   CD_readsync (174w)  func_8002B640 (186w)  func_8002B94C (189w)
- * The previous version of this comment read "BLOCKED, stub reports already
- * filed, do NOT spend attempts on these" -- a stale DIRECTIVE over free
- * ground.
- *
- * ROUND 32 (2026-09-12) CORRECTION -- that reopening WORKED, and the
- * "FRESH and assignable / their stub reports are already gone" wording it
- * left behind is now stale in the OPPOSITE direction. All three have since
- * been attempted and all three carry full worked stall reports (174/174
- * length-exact at 153 words; 3 words short; 2 words long respectively).
- * They are near-misses, NOT cold ground: read
- * docs/match-reports/<func>.md before spending an attempt, or you will
- * re-derive several hundred lines of someone else's derivation. Verified
- * by `tools/nearmiss.py` and by the presence of the report files, not by
- * reading this comment.
- *
- * AND A SECOND ROUND-32 CORRECTION, made the same day as the one above:
- * func_8002B640 and func_8002B94C are NOT GAME CODE AT ALL. Both lie fully
- * inside `libcd/iso9660.o` (Psy-Q 3.3), an object already placed in
- * config/psyq-objects.txt and verified against retail. No C matches them;
- * the correct disposition is conversion per docs/SDK-OBJECTS-GUIDE.md.
- * Only CD_readsync of the three is real game ground.
- *
- * ROUND 34 (head): CONVERTED. The unit's last three functions -- CdSearchFile
- * (func_8002B640), _cmp (func_8002B928, which had been matched as C) and
- * CD_newmedia (func_8002B94C) -- are linked from `lib/libcd/iso9660.o`, which
- * runs on into code_179d8_d (CD_searchdir, CD_cachefile, cd_read and a WEAK
- * memcpy). The unit is now 0x1AB78..0x1BE40 (vram 0x8002A378..0x8002B640),
- * 14 functions. The iso9660-only declarations that used to sit below (the
- * CD_* diagnostic strings, the directory-cache views, UWord) went with them.
- *
- * Note what happened here, because it is the reason this comment now
- * carries three verdicts: round 24 reopened all three as free ground and
- * round 32's first pass "corrected" that to near-misses -- both times
- * without asking whether Sony owned them. `python3 tools/sdkstalls.py`
- * answers that in one command and did not exist until round 32.
- *
- * Owns NO switch jump table -- zero `jtbl_` references in the slice -- so no
- * rodata sub-slot is attached to this unit.
+ * The history of the three carve slices this file was merged from is in
+ * docs/match-reports/getintr.md, "File history".
  */
 #include "common.h"
 
-/* code_179d8_g -- this window's globals continue code_179d8_b's reading:
- * plain scalar/pointer driver state, not object fields (no classtable.py
- * hit near D_8006D5FC..D_8006D934). This unit's own extern declarations,
- * kept local per the project's multiple-independent-local-views convention
- * -- see code_179d8_b.c's header comment for why no shared header. */
+/* getintr -- CD-ROM interrupt-cause dispatcher.  This is libcd's
+ * bios.c `getintr` (build 1.71, 1995-12, on no SDK disc, so it cannot be
+ * linked as an object -- docs/research/psyq-sdk-objects.md) and is matched
+ * as C instead.  Declarations are this unit's own view. */
+extern s32 D_8006D610;
+extern s32 D_8006D614;
+extern u8 D_8006D61D;
+extern s32 D_8006D6C0[]; /* 0/1 flag table, selector 0..0x1B, same index family as D_8006D620 */
+extern s32 D_8006D7C0[]; /* 0/1 flag table, selector 0..0x1B */
+
+extern s32 D_8006D60C; /* last status byte (resp[0]) */
+extern s32 D_8006D608;
+extern char *D_8006D620[];
+
+/* CD-ROM controller port pointers. */
+extern volatile u8 *D_8006D8C0;
+extern volatile u8 *D_8006D8C4;
+extern volatile u8 *D_8006D8C8;
+extern volatile u8 *D_8006D8CC;
+extern u8 D_8006D8D8[2];
+extern volatile u8 D_8006D8D9;
+extern volatile u8 D_8006D8DA;
+
+/* Per-cause last-response mailboxes, 8 bytes each, contiguous. */
+extern u8 D_8008B3CC[];
+extern u8 D_8008B3D4[];
+extern u8 D_8008B3DC[];
+
+extern void puts(const char *arg0);
+extern void printf(const char *fmt, ...);
+
+/* Debug/log strings, all in FD8.rodata, referenced as symbols. */
+extern const char D_800109B0[]; /* "DiskError: " */
+extern const char D_800109BC[]; /* "com=%s,code=(%02x:%02x)\n" */
+extern const char D_800109D8[]; /* "CDROM: unknown intr" */
+extern const char D_800109EC[]; /* "(%d)\n" */
+
+/* 8-byte response copy with a null guard on dst (2.6.3 does not fold
+ * `&array != NULL`).  It must be an INLINE FUNCTION, not a macro: as a
+ * do{}while(0) macro every site swapped the dst and counter registers
+ * (round 70); the inline's parameter pseudos give retail's allocation. */
+static __inline__ void copy8(u8 *d, const u8 *s)
+{
+    s32 i;
+    if (d != NULL) {
+        for (i = 7; i != -1; i--) {
+            *d++ = *s++;
+        }
+    }
+}
+
+s32 getintr(void)
+{
+    volatile u8 cause;
+    u8 resp[8];
+    s32 i;
+    s32 flags;
+
+    *D_8006D8C0 = 1;
+    cause = *D_8006D8CC & 7;
+    if (cause == 0) {
+        return 0;
+    }
+    flags = 0;
+    while (cause != (*D_8006D8CC & 7)) {
+        cause = *D_8006D8CC & 7;
+    }
+
+    for (i = 0; i < 8 && (*D_8006D8C0 & 0x20); i++) {
+        resp[i] = *D_8006D8C4;
+    }
+    for (; i < 8; i++) {
+        resp[i] = 0;
+    }
+
+    *D_8006D8C0 = 1;
+    *D_8006D8CC = 7;
+    *D_8006D8C8 = 7;
+
+    if (cause != 3 || D_8006D7C0[D_8006D61D] != 0) {
+        if (!(D_8006D60C & 0x10) && (resp[0] & 0x10)) {
+            D_8006D614++;
+        }
+        /* The volatile read keeps resp[0] a QImode value, so its
+         * zero-extension survives as retail's `andi v0,v0,0xff`; flags is
+         * then CSE'd from the value just stored.  resp[1] is a plain read. */
+        D_8006D60C = *(volatile u8 *)&resp[0];
+        D_8006D610 = resp[1];
+        flags = D_8006D60C & 0x1D;
+    }
+
+    if (cause == 5) {
+        puts(D_800109B0);
+        if (D_8006D608 > 0) {
+            printf(D_800109BC, D_8006D620[D_8006D61D], D_8006D60C, D_8006D610);
+        }
+    }
+
+    switch (cause) {
+    case 3:
+        if (flags != 0) {
+            *(volatile u8 *)D_8006D8D8 = 5;
+            copy8(D_8008B3CC, resp);
+            return 2;
+        }
+        if (D_8006D6C0[D_8006D61D] != 0) {
+            *(volatile u8 *)D_8006D8D8 = 3;
+            copy8(D_8008B3CC, resp);
+            return 1;
+        }
+        *(volatile u8 *)D_8006D8D8 = 2;
+        copy8(D_8008B3CC, resp);
+        return 2;
+
+    case 2: {
+        u8 v;
+        if (flags != 0) {
+            v = 5;
+        } else {
+            v = 2;
+        }
+        D_8006D8D8[0] = v;
+        copy8(D_8008B3CC, resp);
+        return 2;
+    }
+
+    case 1:
+        D_8006D8D9 = (flags != 0) ? 5 : 1;
+        copy8(D_8008B3D4, resp);
+        return 4;
+
+    case 4:
+        D_8006D8DA = 4;
+        *(volatile u8 *)&D_8006D8D9 = D_8006D8DA;
+        copy8(D_8008B3DC, resp);
+        copy8(D_8008B3D4, resp);
+        return 4;
+
+    case 5:
+        D_8006D8D9 = 5;
+        *(volatile u8 *)D_8006D8D8 = D_8006D8D9;
+        copy8(D_8008B3CC, resp);
+        copy8(D_8008B3D4, resp);
+        return 6;
+
+    default:
+        puts(D_800109D8);
+        printf(D_800109EC, cause);
+        return -1;
+    }
+}
+
+INCLUDE_ASM("asm/nonmatchings/libcd_bios", CD_sync);
+
+/* Round 37 (echo): re-splice of the round-35 rebuild, verbatim, to confirm
+ * the recorded 178/180 score before a permuter search -- per CLAUDE.md's
+ * "build the inherited body before you trust its score" discipline. See
+ * docs/match-reports/CD_ready.md for the full derivation; this is a
+ * STALL (2 words short, both instances of a redundant `andi` mask after an
+ * already-zero-extending `lbu` that GCC's instruction selection elides by
+ * choosing the load's destination register directly). Restored to
+ * INCLUDE_ASM per project rule -- no score short of byte-exact stays in
+ * src/. */
+#if 0
+extern s32 D_8006D608;
+extern u8 D_8006D61D;
+extern const char *D_8006D620[];
+extern const char *D_8006D6A0[];
+
+extern volatile u8 *D_8006D8C0;
+extern u8 D_8006D8D8[3];
+
+extern s32 D_8008B3E4;
+extern s32 D_8008B3E8;
+extern const char *D_8008B3EC;
+extern u8 D_8008B3CC[];
+extern u8 D_8008B3D4[];
+extern u8 D_8008B3DC[];                /* 8-byte record, this function's second flag's snapshot buffer */
+
+extern void (*D_8006D600)(s32 arg0, void *arg1);
+extern void (*D_8006D5FC)(s32 arg0, void *arg1);
+
+extern void CD_flush(void);
+extern s32 getintr(void);
+
+extern const char D_80010984[];
+extern const char D_80010994[];
+extern const char D_80010A14[];        /* "CD_ready" */
+
+s32 CD_ready(s32 arg0, s32 arg1)
+{
+    const char **table;
+    u8 *state;
+    u8 *state1;
+    u8 *state2;
+    s32 counter;
+    s32 result;
+    s32 flags;
+    u8 savedState;
+    u8 flag1;
+    u8 flag2;
+    u8 *dst;
+    const u8 *src;
+    s32 i;
+
+    D_8008B3E4 = VSync(-1) + 0x1E0;
+    table = D_8006D6A0;
+    state = D_8006D8D8;
+    state1 = state + 1;
+    state2 = state + 2;
+    D_8008B3E8 = 0;
+    D_8008B3EC = D_80010A14;
+
+    do {
+        if (D_8008B3E4 < VSync(-1)) {
+            goto timeout;
+        }
+        counter = D_8008B3E8;
+        D_8008B3E8 = counter + 1;
+        if (counter <= 0x1E0000) {
+            goto success;
+        }
+timeout:
+        puts(D_80010984);
+        printf(D_80010994, D_8008B3EC, D_8006D620[D_8006D61D],
+                      table[state[0]], table[state[1]]);
+        CD_flush();
+        result = -1;
+        goto skip_timeout;
+success:
+        result = 0;
+skip_timeout:
+        if (result != 0) {
+            return result;
+        }
+
+        if (CheckCallback() != 0) {
+            savedState = *D_8006D8C0 & 3;
+            for (;;) {
+                flags = getintr();
+                if (flags == 0) {
+                    break;
+                }
+                if (flags & 4) {
+                    if (D_8006D600 != NULL) {
+                        D_8006D600(*state1, D_8008B3D4);
+                    }
+                }
+                if (flags & 2) {
+                    if (D_8006D5FC != NULL) {
+                        D_8006D5FC(*state, D_8008B3CC);
+                    }
+                }
+            }
+            *D_8006D8C0 = savedState;
+        }
+
+        flag2 = *state2;
+        if (flag2 == 0) {
+            goto checkFlag1;
+        }
+        *state2 = 0;
+        __asm__("");
+        src = D_8008B3DC;
+        if (arg1 == 0) {
+            goto ret2;
+        }
+        dst = (u8 *)arg1;
+        for (i = 7; i != -1; i--) {
+            *dst = *src;
+            dst++;
+            src++;
+        }
+ret2:
+        return flag2;
+
+checkFlag1:
+        flag1 = state2[-1];
+        if (flag1 == 0) {
+            continue;
+        }
+        state2[-1] = 0;
+        __asm__("");
+        dst = (u8 *)arg1;
+        src = D_8008B3D4;
+        if (dst == 0) {
+            goto ret1;
+        }
+        for (i = 7; i != -1; i--) {
+            *dst = *src;
+            dst++;
+            src++;
+        }
+ret1:
+        return flag1;
+    } while (arg0 == 0);
+
+    return 0;
+}
+#endif
+INCLUDE_ASM("asm/nonmatchings/libcd_bios", CD_ready);
+
+/* Round 37 (echo): STALL, now 282/282 (LENGTH exact, no drift into
+ * anything downstream) -- up from 278/282, via two stacked permuter-found
+ * levers: (1) declaring D_8006D8D8 (and the two local pointers into it,
+ * `state`/`state1`) `volatile` closed 3 of the original 4 missing words
+ * (278->281/282); (2) a second search from that improved body found that
+ * materializing `table[state[1]]` into `src` as its own statement just
+ * before the timeout printf call (a dead store -- `src` is unconditionally
+ * overwritten before its value is ever read) closes the last word
+ * (281->282/282). Raw word-match went DOWN in the process (132/282 ->
+ * 98/282) even as length became exact -- see the match report's honest
+ * discussion of why LENGTH is still the right thing to have adopted here.
+ * Restored to INCLUDE_ASM per project rule. */
+#if 0
+extern s32 D_8006D608;
+extern u8 D_8006D61C;
+extern u8 D_8006D61D;
+extern const char *D_8006D620[];
+extern const char *D_8006D6A0[];
+extern u8 D_8006D618[4];               /* 4-byte record, written here for cmd == 2 */
+extern s32 D_8006D740[];               /* flag table, indexed by cmd; cmd+0x40 reaches the "needs param" table's
+                                         * memory (see the addressing note in the match report) -- do NOT re-split
+                                         * this into a second D_8006D840[cmd] access for the cmd+0x40 case */
+extern s32 D_8006D840[];               /* "does this command need a param" flag table, indexed by cmd; ONLY
+                                         * correct as a direct access at its own (non-+0x40) call site */
+
+extern volatile u8 *D_8006D8C0;
+extern volatile u8 *D_8006D8C4;
+extern volatile u8 *D_8006D8C8;
+extern volatile u8 D_8006D8D8[3];      /* round 37: permuter-found lever, see match report -- volatile here
+                                         * (and on state/state1 below) closes 3 of the 4 missing words */
+extern u8 D_8006D8D9;
+
+extern s32 D_8008B3E4;
+extern s32 D_8008B3E8;
+extern const char *D_8008B3EC;
+extern u8 D_8008B3CC[];
+extern u8 D_8008B3D4[];
+
+extern void (*D_8006D600)(s32 arg0, void *arg1);
+extern void (*D_8006D5FC)(s32 arg0, void *arg1);
+
+extern void CD_flush(void);
+extern s32 getintr(void);
+extern s32 CD_sync(s32 arg0, s32 arg1);          /* defined earlier in this unit, ROM order */
+
+extern const char D_80010984[];
+extern const char D_80010994[];
+extern const char D_80010A20[];        /* "%s...\n" */
+extern const char D_80010A28[];        /* "%s: no param\n" */
+extern const char D_80010A38[];        /* "CD_cw" */
+
+s32 CD_cw(s32 arg0, s32 arg1, s32 arg2, s32 arg3)
+{
+    const char **table;
+    volatile u8 *state;
+    volatile u8 *state1;
+    s32 counter;
+    s32 result;
+    s32 flags;
+    u8 savedState;
+    u8 *dst;
+    const u8 *src;
+    s32 i;
+
+    if (D_8006D608 >= 2) {
+        printf(D_80010A20, D_8006D620[arg0 & 0xFF]);
+    }
+
+    if (D_8006D840[arg0 & 0xFF] != 0 && arg1 == 0) {
+        if (D_8006D608 > 0) {
+            printf(D_80010A28, D_8006D620[arg0 & 0xFF]);
+        }
+        return -2;
+    }
+
+    CD_sync(0, 0);
+
+    if ((arg0 & 0xFF) == 2) {
+        src = (const u8 *)arg1;
+        for (i = 0; i < 4; i++) {
+            D_8006D618[i] = *src;
+            src++;
+        }
+    }
+
+    D_8006D8D8[0] = 0;
+
+    if (D_8006D740[arg0 & 0xFF] != 0) {
+        D_8006D8D9 = 0;
+    }
+
+    *D_8006D8C0 = 0;
+
+    if (D_8006D740[(arg0 & 0xFF) + 0x40] > 0) {
+        for (i = 0; i < D_8006D740[(arg0 & 0xFF) + 0x40]; i++) {
+            *D_8006D8C8 = ((u8 *)arg1)[i];
+        }
+    }
+
+    D_8006D61D = (u8)arg0;
+    *D_8006D8C4 = (u8)arg0;
+
+    if (arg3 != 0) {
+        return 0;
+    }
+
+    D_8008B3E4 = VSync(-1) + 0x1E0;
+    state = D_8006D8D8;
+    D_8008B3E8 = 0;
+    D_8008B3EC = D_80010A38;
+
+    if (*state == 0) {
+        table = D_8006D6A0;
+        state1 = state + 1;
+        do {
+            if (D_8008B3E4 < VSync(-1)) {
+                goto timeout3;
+            }
+            counter = D_8008B3E8;
+            D_8008B3E8 = counter + 1;
+            if (counter <= 0x1E0000) {
+                goto success3;
+            }
+timeout3:
+            puts(D_80010984);
+            src = table[state[1]];
+            printf(D_80010994, D_8008B3EC, D_8006D620[D_8006D61D],
+                          table[state[0]], src);
+            CD_flush();
+            result = -1;
+            goto skip_timeout3;
+success3:
+            result = 0;
+skip_timeout3:
+            if (result != 0) {
+                return result;
+            }
+            if (CheckCallback() != 0) {
+                savedState = *D_8006D8C0 & 3;
+                for (;;) {
+                    flags = getintr();
+                    if (flags == 0) {
+                        break;
+                    }
+                    if (flags & 4) {
+                        if (D_8006D600 != NULL) {
+                            D_8006D600(*state1, D_8008B3D4);
+                        }
+                    }
+                    if (flags & 2) {
+                        if (D_8006D5FC != NULL) {
+                            D_8006D5FC(*state, D_8008B3CC);
+                        }
+                    }
+                }
+                *D_8006D8C0 = savedState;
+            }
+        } while (*state == 0);
+    }
+
+    if (D_8006D8D8[0] == 2 && (arg0 & 0xFF) == 0xE) {
+        D_8006D61C = *(u8 *)arg1;
+    }
+
+    dst = (u8 *)arg2;
+    src = D_8008B3CC;
+    if (dst != NULL) {
+        for (i = 7; i != -1; i--) {
+            *dst = *src;
+            dst++;
+            src++;
+        }
+    }
+
+    return (D_8006D8D8[0] == 5) ? -1 : 0;
+}
+#endif
+INCLUDE_ASM("asm/nonmatchings/libcd_bios", CD_cw);
+
+/* Driver state: plain scalar and pointer globals, not object fields. */
 
 extern s32 D_8006D8A4;
 extern s32 D_8006D5FC;
@@ -90,8 +529,6 @@ extern u8 D_8006D619;
 extern u8 D_8006D61A;
 extern u8 D_8006D61C;
 extern u8 D_8006D61D;
-extern s32 D_8006D620[4];      /* read-only here; formerly noted BLOCKED (addiu_at) in
-                                 * CD_readsync -- addiu_at was RESOLVED round 21, dead cause */
 extern s32 D_8006D6A0[];       /* lookup table, indexed by a byte field << 2 */
 
 extern volatile u8 *D_8006D8C0;
@@ -145,9 +582,9 @@ extern void (*InterruptCallback(s32 arg0, void (*callback)(void)))(void); /* lib
 extern s32 VSync(s32 arg0);                            /* asm/psyq_15d04.s */
 extern void puts(const char *arg0);                   /* asm/psyq_15d04.s */
 extern void printf(const char *fmt, ...);                /* Psy-Q printf wrapper */
-extern s32 CD_cw(s32 arg0, s32 arg1, s32 arg2, s32 arg3); /* defined in code_179d8_n */
-extern s32 CD_sync(s32 arg0, s32 arg1);                   /* defined in code_179d8_n, per code_179d8_b.c */
-extern s32 getintr(void);                                /* code_179d8_b.c, MATCHED round 70
+extern s32 CD_cw(s32 arg0, s32 arg1, s32 arg2, s32 arg3); /* defined in libcd_bios */
+extern s32 CD_sync(s32 arg0, s32 arg1);                   /* defined in libcd_bios, per libcd_bios.c */
+extern s32 getintr(void);                                /* libcd_bios.c, MATCHED round 70
                                                                    (libcd getintr by its strings) */
 extern s32 CheckCallback(void);                                /* lib/libetc/intr.o -- trivial
                                                                    (u16)D_8006C272 getter */
@@ -355,7 +792,7 @@ s32 CD_init(void)
     return -(CD_sync(0, 0) != 2);
 }
 #else
-INCLUDE_ASM("asm/nonmatchings/code_179d8_g", CD_init);
+INCLUDE_ASM("asm/nonmatchings/libcd_bios", CD_init);
 #endif
 
 #ifdef NON_MATCHING
@@ -476,7 +913,7 @@ s32 cd_read_retry(void)
     }
 }
 #else
-INCLUDE_ASM("asm/nonmatchings/code_179d8_g", cd_read_retry);
+INCLUDE_ASM("asm/nonmatchings/libcd_bios", cd_read_retry);
 #endif
 
 s32 CD_readm(s32 arg0, s32 arg1, s32 arg2)
@@ -706,7 +1143,7 @@ s32 CD_datasync(s32 arg0)
 {
     s32 now;
     s32 ok;
-    s32 *p620;
+    char **p620;
     u8 *p8D8;
     s32 *p6A0;
 
@@ -749,7 +1186,7 @@ s32 CD_datasync(s32 arg0)
     }
 }
 #else
-INCLUDE_ASM("asm/nonmatchings/code_179d8_g", CD_datasync);
+INCLUDE_ASM("asm/nonmatchings/libcd_bios", CD_datasync);
 #endif
 
 s32 CD_getsector(s32 arg0, s32 arg1)
@@ -809,7 +1246,7 @@ void callback(void)
     *D_8006D8C0 = status;
 }
 #else
-INCLUDE_ASM("asm/nonmatchings/code_179d8_g", callback);
+INCLUDE_ASM("asm/nonmatchings/libcd_bios", callback);
 #endif
 
 void cb_read(s32 arg0, s32 arg1)

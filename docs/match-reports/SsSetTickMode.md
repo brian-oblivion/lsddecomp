@@ -4,7 +4,7 @@
 
 > Renamed from `func_80032588` on 2026-09-23 (tools/rename.py). Address 0x80032588.
 
-Unit: `code_179d8_c_b`. Round 41, runner delta. Owns `jtbl_80010CD8`
+Unit: `libsnd_ssinit_libapi_counter`. Round 41, runner delta. Owns `jtbl_80010CD8`
 (attached rodata, not touched by this round).
 
 Superseded round-23 stall report: this round re-derived from that report's
@@ -218,7 +218,7 @@ libsnd/ssinit `SsSetTickMode` (disc 3.3), confirming the hypothesis round 69
 already recorded below. This is Sony's SDK code, not decompiled game logic;
 track 2 names those functions and moves them out of tracks 1/1b/3.
 
-Round 69 (delta), track 3 pass on `code_179d8_c_b`.
+Round 69 (delta), track 3 pass on `libsnd_ssinit_libapi_counter`.
 
 | name | tier | evidence |
 | --- | --- | --- |
@@ -232,3 +232,56 @@ Round 69 (delta), track 3 pass on `code_179d8_c_b`.
 See `_SsStart.md` for the globals `_snd_use_interrupt_id`/`_snd_1per2`/
 `_snd_use_vsync_cb`/`_snd_vsync_cb`, which this function does
 not touch.
+
+## File history
+
+Round 90 (track 8) renamed the carve unit code_179d8_c_b to
+`src/libsnd_ssinit_libapi_counter.c`, for the two Sony modules it holds. Its
+banner is moved here verbatim, as it stood before the rename.
+
+```c
+/*
+ * code_179d8_c_b -- the sound-driver "sequencer timer" cluster: a software
+ * playback clock built on the PSX root counters (RCnt) and interrupt
+ * controller (IRQ), used to pace the game's music sequencer independently
+ * of vsync. `SsSetTickMode`/`_SsStart` (the latter still a stall)
+ * pick a tick rate and arm a root counter at it; `SsStart`/
+ * `SsStart2` are its two callers' one-line wrappers; `_SsTrapIntrVSync`/
+ * `_SsSeqCalledTbyT_1per2` are the two interrupt-time handlers it can
+ * register (one chains a previously-saved handler, the other halves the
+ * firing rate by toggling); `SsEnd` tears the whole thing down.
+ * `SetRCnt`/`GetRCnt`/`StartRCnt`/`StopRCnt`/`ResetRCnt` are Sony's
+ * libapi/counter module compiled into game text from a library build the
+ * SDK discs do not carry (identified by module order and KERNEL.H; see the
+ * symbols file), and everything above is built on them. `SsQuit` is
+ * unrelated -- a one-line forwarder to Sony's `SpuQuit` (libspu/s_q) -- kept
+ * here only because it falls in this address range.
+ *
+ * the tail half of the old code_179d8_c slice, split off in round 33
+ * (2026-09-12) when Sony's `libsnd/sstable.o` was linked into the middle of
+ * it. File 0x22D88..0x23500, vram 0x80032588..0x80032D00.
+ *
+ * WHY THE SPLIT EXISTS. `func_800323A8` (120w) sat between SsInitHot and
+ * SsSetTickMode and is Sony's `SsSetTableSize`; the object covers exactly
+ * those 120 words. A placed object cannot live inside a `c` segment, so the
+ * slice had to become [c][o][c] and the second `c` needed its own name. The
+ * first half kept `code_179d8_c`.
+ *
+ * THE RODATA ATTACH CAME WITH THIS HALF, AND THAT IS THE WHOLE REASON THIS
+ * COMMENT EXISTS. `SsSetTickMode` owns `jtbl_80010CD8`, whose sub-slot of the
+ * 0xFD8 rodata region is attached in the splat yaml. That attach pointed at
+ * `code_179d8_c`; SsSetTickMode is now HERE, so the attach was moved to
+ * `code_179d8_c_b`. Left behind it would have produced
+ * `undefined reference to '.L800325xx'` -- the routine carve failure Gate 2
+ * in docs/PARALLEL-RUNS.md documents. Leave it alone.
+ *
+ * This slice was cut at ROM-address boundaries, so it has no reason to align
+ * with class boundaries -- expect it to span more than one class, and
+ * identify each with tools/classtable.py rather than assuming one.
+ *
+ * Declarations: keep anything that encodes THIS unit's reading of a class
+ * next to the code, in this file. Do not create a shared code_179d8*.h -- the
+ * sibling slices are staffed independently and a shared header is what makes
+ * their merges collide.
+ */
+```

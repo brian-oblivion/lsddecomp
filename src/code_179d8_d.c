@@ -16,7 +16,7 @@
  * ROUND 34 (head): the unit's FIRST SIX functions left it. CD_searchdir
  * (func_8002BC40), CD_cachefile (func_8002BCEC, the 175w stall), cd_read
  * (func_8002BFA8) and iso9660's own WEAK memcpy (func_8002C014) are the tail
- * of `libcd/iso9660.o` (Psy-Q 3.3), which starts in code_179d8_g; strcmp
+ * of `libcd/iso9660.o` (Psy-Q 3.3), which starts in libcd_bios; strcmp
  * (func_8002C048) and strncmp (func_8002C0AC) are `libc2/strcmp.o` and
  * `libc2/strncmp.o`. Five had been matched as C -- they were Sony's the whole
  * time, and reclassifying them out of the game count is the correction
@@ -54,12 +54,12 @@
  * It is fresh ground; the mult/mfhi pair in its body is retail's signed-
  * divide-by-constant idiom, not the blocked mflo/mfhi-then-mult direction.
  *
- * Unlike its siblings code_179d8_b and code_179d8_c, this slice owns NO
+ * Unlike its siblings libcd_bios and code_179d8_c, this slice owns NO
  * jump table -- all seven jtbl blocks in the 0xFD8 rodata slot fall outside
  * 0x8002BC40..0x8002C408 -- so no rodata sub-slot is attached to it.
  *
  * ROUND 77 CORRECTION (naming pass, charlie): the paragraph below (round 16,
- * code_179d8_b's sibling-slice finding) is WRONG for this unit and must not
+ * libcd_bios's sibling-slice finding) is WRONG for this unit and must not
  * be trusted for it again. `python3 tools/classtable.py --scan` DOES hit
  * this unit's own globals: `D_8006D940` is a real 30-slot Class6D430-derived
  * vtable (header word 0x00000E03), confirmed by `tools/classtable.py

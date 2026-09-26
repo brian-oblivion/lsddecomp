@@ -18,17 +18,17 @@
  *     (`libsnd/vm_vsu.o`, Psy-Q 3.3), linked from the object.
  *   - func_800323A8 (120w) is `SsSetTableSize` (`libsnd/sstable.o`, Psy-Q
  *     3.5), linked from the object. It sat in the MIDDLE, so the slice became
- *     [c code_179d8_c][o sstable][c code_179d8_c_b] and everything from
- *     SsSetTickMode on now lives in `src/code_179d8_c_b.c`.
+ *     [c code_179d8_c][o sstable][c libsnd_ssinit_libapi_counter] and everything from
+ *     SsSetTickMode on now lives in `src/libsnd_ssinit_libapi_counter.c`.
  * Neither was ever matchable as C; both stall reports are kept, re-titled
  * CONVERTED. This unit is now three functions: _SsInit and its two
  * one-line callers.
  *
  * THE 0x14D8 RODATA ATTACH IS NO LONGER OURS. It belongs to SsSetTickMode
- * (jtbl_80010CD8), which went to code_179d8_c_b, and the yaml attach moved
+ * (jtbl_80010CD8), which went to libsnd_ssinit_libapi_counter, and the yaml attach moved
  * with it. Do not move it back.
  *
- * Carved round 16 by blocker DENSITY (see code_179d8_b's header for the
+ * Carved round 16 by blocker DENSITY (see libcd_bios's header for the
  * full window census). This window screened 16/20 clean.
  *
  * STALE CLAIM REMOVED, round 23 (2026-09-07): this comment listed
@@ -68,7 +68,7 @@
  * `SsInit`/`SsInitHot` (its arg=0/arg=1 wrappers) are Sony's too: the
  * head identified them under track 2 (EXACT fingerprint, the ssinit slot
  * position, and the `_SsInit(0)`/`_SsInit(1)` bodies), and `_SsInit`'s
- * mode!=0 arm calls Sony's `SpuInitHot` (code_179d8_f_b), identified the
+ * mode!=0 arm calls Sony's `SpuInitHot` (libspu_s_ih), identified the
  * same way. All three count as library.
  *
  * `_SsInit`'s data: `_snd_openflag`/`_snd_ev_flag` are Sony-pinned in

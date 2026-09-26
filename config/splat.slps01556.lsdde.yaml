@@ -117,7 +117,7 @@ segments:
       # standalone. Survey before moving a boundary here: of the 483 words in
       # the original 0xFD8..0x1764 slot, 179 are vram addresses inside
       # code_179d8's own text and the rest are ASCII.
-      - [0x11F8, .rodata, code_179d8_b]
+      - [0x11F8, .rodata, libcd_bios]
       - [0x120C, rodata]  # was 'code_179d8_mid remainder'; that text
                           # segment is now the code_179d8_n C unit, which
                           # owns no jump table, so this slot stays
@@ -131,7 +131,7 @@ segments:
       - [0x14D6, pad]
       # jtbl_80010CD8 belongs to func_80032588, in the code_179d8_c slice --
       # same situation as 0x11F8 above.
-      - [0x14D8, .rodata, code_179d8_c_b]
+      - [0x14D8, .rodata, libsnd_ssinit_libapi_counter]
       # 0x14F0 holds EXACTLY three jump tables and nothing else --
       # jtbl_80010CF0 (func_80034690) and jtbl_80010ED8 + jtbl_80010F38
       # (func_800357B0, a double switch), all three in the code_179d8_k
@@ -731,7 +731,7 @@ segments:
       # code_179d8_b: what is left of window [60..79] after libcd/sys took its
       # first 19 functions -- 0x19C78..0x1A1BC, ONE function (func_80029478),
       # which still owns jtbl_800109F8 and therefore the 0x11F8 rodata attach.
-      - [0x19C78, c, code_179d8_b]
+      - [0x19C78, c, libcd_bios]
       # code_179d8_n: functions 80..82 of the original monolith, 0x1A1BC..
       # 0x1AB78 (3 functions).  Carved round 26 (2026-09-09) out of what was
       # the `code_179d8_mid` UNCARVED remainder -- renamed on carve because
@@ -758,7 +758,6 @@ segments:
       # reference plain rodata SYMBOLS (D_80010984/994, D_80010A0C/A14/A20/
       # A28/A38); those resolve as externs and must be referenced by symbol,
       # never re-typed as C string literals.
-      - [0x1A1BC, c, code_179d8_n]
       # code_179d8_g: functions 83..99 of the original, 0x1AB78..0x1C440
       # (17 functions).  Census 2026-09-04 with the three-grep screen run
       # over each function's own text: 14/17 clean; the three blocked were
@@ -769,7 +768,6 @@ segments:
       # 186, 189 instructions), so this unit is smaller in count and larger
       # in work than its 17 suggests.  Owns NO switch jump table (zero
       # `jtbl_` references in the slice), so no rodata attach.
-      - [0x1AB78, c, code_179d8_g]     # now 0x1AB78..0x1BE40, 14 functions
       # ROUND 34 (head): libcd/iso9660 (Psy-Q 3.3, 0xA08) + libc2/strcmp +
       # libc2/strncmp tile 0x1BE40..0x1C92C exactly and cross the
       # code_179d8_g / code_179d8_d boundary at 0x1C440, so both units trim
@@ -966,7 +964,7 @@ segments:
       # func_80032588, which is in the tail; left on code_179d8_c the link
       # fails with `undefined reference to '.L800325xx'`.
       - [0x22BA8, o, libsnd/sstable]
-      - [0x22D88, c, code_179d8_c_b]
+      - [0x22D88, c, libsnd_ssinit_libapi_counter]
       # code_179d8_tail: functions 220..255 of the original.  UNCARVED
       # remainder in front of the code_179d8_f carve below, and left that
       # way deliberately: 0x23500..0x2673C is addiu-$at dense (26 of its 36
@@ -1124,7 +1122,7 @@ segments:
       # Text-only; the unit owns no jump table, so NO rodata attach moved --
       # the 0xFD8 rodata slot list names no `code_179d8_f` line at all.
       - [0x270E8, o, libsnd/stop]       # Snd_stop, SsSeqStop, SsSepStop
-      - [0x272A8, c, code_179d8_f_b]
+      - [0x272A8, c, libspu_s_ih]
       # psyq_SpuSetMute (0x272C8..0x2C054) is converted to linked Sony objects
       # one run at a time. 35 objects tile nine runs exactly, all from the 3.3
       # disc; the eight gaps between the runs are the game's own libspu/libsnd
@@ -1323,7 +1321,7 @@ segments:
       # 0xA0 `.bss` that "no relocation names" -- informational only, bss is
       # never placed in this yaml. gs_108's `.rdata` is the 0x1994 string
       # slot, split out above with its `pad`.
-      - [0x3030C, c, code_2cc8c_e0]     # func_8003FB0C
+      - [0x3030C, c, libgs_gs_101]     # func_8003FB0C
       - [0x3031C, o, libgs/gs_123]      # Gssub_make_matrix (was func_8003FB1C)
       - [0x303E4, c, libgs_gs_124]     # func_8003FBE4
       - [0x303F4, o, libgs/gs_111]      # GsDrawOt        (was func_8003FBF4)

@@ -2,7 +2,7 @@
 
 > Renamed from `func_8002B304` on 2026-09-23 (tools/rename.py). Address 0x8002b304.
 
-**Unit:** code_179d8_g · **Size:** 56 words · **Status:** MATCHED (56/56 words)
+**Unit:** libcd_bios · **Size:** 56 words · **Status:** MATCHED (56/56 words)
 
 ## What it does
 
@@ -43,6 +43,6 @@ while (cond); }` duplication was needed in source. `D_8006D934`'s pointee is
 declared `volatile s32` specifically so the loop keeps re-reading memory each
 iteration instead of being folded to an infinite loop with a single load.
 
-Sibling `code_179d8_b.c` already declares `CD_getsector(s32 arg0, s32
+Sibling `libcd_bios.c` already declares `CD_getsector(s32 arg0, s32
 arg1)` as extern (called from `func_800291EC`); this unit is the one that
 carves and defines it.
