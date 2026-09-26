@@ -157,11 +157,11 @@ void TitleMenu__AttachSaveTitle(TitleMenu *self, void *parent) {
 }
 
 /* MATCHED round 75 (was STALL round 43) -- see
- * docs/match-reports/TitleMenu__TickNameFieldCursor.md. `base` is taken BEFORE the first call
+ * docs/match-reports/TitleMenu__CycleSaveTitleColor.md. `base` is taken BEFORE the first call
  * (so it crosses a call and gets $s1), `buf = *color` is one struct copy
  * (SpriteRgb is three `s8`: three `lb`, then three `sb`), and each arm
  * indexes `base[D_8008AA28]` directly. */
-void TitleMenu__TickNameFieldCursor(TitleMenu *self, SpriteRgb *color) {
+void TitleMenu__CycleSaveTitleColor(TitleMenu *self, SpriteRgb *color) {
     SpriteRgb buf;
     u8 *base;
 

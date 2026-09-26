@@ -244,14 +244,14 @@ extern void *D_8008A9D0;
  * taken. */
 extern s32 D_80086D6C;
 
-/* TitleMenu__TickNameFieldCursor's own rolling byte index (0/1/2, wraps to 0 at 3) into
+/* TitleMenu__CycleSaveTitleColor's own rolling byte index (0/1/2, wraps to 0 at 3) into
  * that function's own 3-byte stack buffer -- declared in the ROM image
  * as a full `.word` (`asm/data/7B12C.sdata.s`), but accessed only via
  * `lbu`/`sb` here, so `u8` is the correct C type for this unit's own
  * reference regardless of the underlying storage's full width. */
 extern u8 D_8008AA28;
 
-/* TitleMenu__TickNameFieldCursor's own rolling word counter (wraps to 0 at 0x101). */
+/* TitleMenu__CycleSaveTitleColor's own rolling word counter (wraps to 0 at 0x101). */
 extern s32 D_8008AA2C;
 
 /* TaskObjF__TaskObjF's own one-shot init guard: read, then unconditionally

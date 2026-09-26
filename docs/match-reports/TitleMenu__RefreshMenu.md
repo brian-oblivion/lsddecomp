@@ -42,10 +42,10 @@ void TitleMenu__RefreshMenu(TitleMenu *self)
 
 Byte-exact on the first build: `funcdiff.py TitleMenu__RefreshMenu` -> `87/87 words
 match (file 0x3E608-0x3E764)`; whole-image `OK: build matches retail
-SLPS_015.56`. (Measured with the unit's other stall, `TitleMenu__TickNameFieldCursor`,
+SLPS_015.56`. (Measured with the unit's other stall, `TitleMenu__CycleSaveTitleColor`,
 temporarily restored to `INCLUDE_ASM` so its own known length residue could
 not contaminate this function's out-of-range read -- see that function's
-own report. `TitleMenu__TickNameFieldCursor` is back in C in the committed tree; re-verify
+own report. `TitleMenu__CycleSaveTitleColor` is back in C in the committed tree; re-verify
 the whole image after any further edit there.)
 
 ## Derivation
@@ -132,10 +132,10 @@ than changed.
 **A stalled sibling function's own drift can hide a clean match on the
 function next to it in the SAME unit.** `TitleMenu__RefreshMenu` scored 6/87 with a
 128324-byte out-of-range warning on the first build -- not because of
-anything wrong in `TitleMenu__RefreshMenu` itself, but because `TitleMenu__TickNameFieldCursor`
+anything wrong in `TitleMenu__RefreshMenu` itself, but because `TitleMenu__CycleSaveTitleColor`
 (this unit's OTHER round-43 target, still an unresolved 2-word-short
 residue at the time) sits immediately before it in ROM order and was
-shifting every address after it. Restoring `TitleMenu__TickNameFieldCursor` to
+shifting every address after it. Restoring `TitleMenu__CycleSaveTitleColor` to
 `INCLUDE_ASM` in isolation revealed `TitleMenu__RefreshMenu` was byte-exact all
 along. When a function's own diff looks structurally wrong immediately
 after editing an UNRELATED, EARLIER function in the same unit, check

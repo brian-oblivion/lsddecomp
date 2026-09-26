@@ -119,7 +119,7 @@ void TitleMenu__RefreshViewValue(TitleMenu *self);
 void TitleMenu__CreateSaveTitle(TitleMenu *self, TaskCoreTarget *target);
 void TitleMenu__DestroySaveTitle(TitleMenu *self);
 void TitleMenu__AttachSaveTitle(TitleMenu *self, void *parent);
-void TitleMenu__TickNameFieldCursor(TitleMenu *self, struct SpriteRgb *color);
+void TitleMenu__CycleSaveTitleColor(TitleMenu *self, struct SpriteRgb *color);
 void TitleMenu__RefreshMenu(TitleMenu *self);
 void TitleMenu__BeginCardAccess(TitleMenu *self);
 void TitleMenu__EndCardAccess(TitleMenu *self);

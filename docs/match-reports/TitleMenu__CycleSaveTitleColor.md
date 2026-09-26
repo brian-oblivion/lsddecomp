@@ -1,4 +1,6 @@
-# TitleMenu__TickNameFieldCursor -- MATCHED, round 75 (78/78, whole image OK)
+# TitleMenu__CycleSaveTitleColor -- MATCHED, round 75 (78/78, whole image OK)
+
+> Renamed from `TitleMenu__TickNameFieldCursor` on 2026-09-26 (tools/rename.py). Address 0x8004dcd0.
 
 > Renamed from `Class86B60__TickNameFieldCursor` on 2026-09-26 (tools/rename.py). Address 0x8004dcd0.
 
@@ -42,7 +44,7 @@ struct Arg1DCD0_3bb8c_d {
     s8 b2;
 };
 
-void TitleMenu__TickNameFieldCursor(TitleMenu *self, Arg1DCD0_3bb8c_d *arg1)
+void TitleMenu__CycleSaveTitleColor(TitleMenu *self, Arg1DCD0_3bb8c_d *arg1)
 {
     Arg1DCD0_3bb8c_d buf;
     u8 *base;
@@ -109,7 +111,7 @@ source.
 > blocked functions now match (see `docs/research/gp-relative-blocker.md`,
 > "RESOLVED"). Everything below is round 43's attempt AFTER the fix.
 
-# TitleMenu__TickNameFieldCursor -- STALL, round 43
+# TitleMenu__CycleSaveTitleColor -- STALL, round 43
 
 **Length: 2 words short (76/78, retail 0x138 bytes).**
 **Raw word-match (unaligned, from the length-shifted window): 3/78.**
@@ -140,7 +142,7 @@ struct Arg1DCD0_3bb8c_d {
     s8 b2;
 };
 
-void TitleMenu__TickNameFieldCursor(TitleMenu *self, Arg1DCD0_3bb8c_d *arg1)
+void TitleMenu__CycleSaveTitleColor(TitleMenu *self, Arg1DCD0_3bb8c_d *arg1)
 {
     u8 buf[3];
     u8 *base;
@@ -214,7 +216,7 @@ This is preserved verbatim, `#if 0`-wrapped, immediately above the
   `D_8008AA28` back (the ordinary compiled shape of an unsigned-char
   increment-and-wrap).
 - `self->nameField->methods->slotB8(self->nameField, buf)` -- reuses this round's
-  `TitleMenu__TickNameFieldCursor`... (no -- reuses the slot round 43 ALSO establishes
+  `TitleMenu__CycleSaveTitleColor`... (no -- reuses the slot round 43 ALSO establishes
   in this same function; see header changes). **Confirmed correct.**
 
 ## The one open residue
@@ -267,7 +269,7 @@ Ran `tools/decomp-permuter` on variant (4) above (300s, `-j 4`,
 whoever resumes this**: `tools/setup-permuter.sh`'s generated
 `compile.sh` did NOT include `--gp-symbols`/`--no-nop-mflo-mfhi` in its
 `MASPSX_FLAGS` (it predates round 42's fix landing in the Makefile) --
-patched by hand in the (gitignored) `permuter-work/TitleMenu__TickNameFieldCursor/compile.sh`
+patched by hand in the (gitignored) `permuter-work/TitleMenu__CycleSaveTitleColor/compile.sh`
 for this run; `tools/setup-permuter.sh` itself was NOT touched (out of
 this unit's scope). Without that patch the base score is nonsense (>3000,
 comparing against a `%hi`/`%lo`-relocated build of the candidate against a
@@ -295,7 +297,7 @@ project-wide from a runner worktree.
 
 ## Naming (round 77, naming runner delta)
 
-Renamed `func_8004DCD0` -> `TitleMenu__TickNameFieldCursor`. **Tier B**: Guarded by `self->unk3C`, cycles a 3-byte colour-like buffer through a rolling index (`D_8008AA28`, 0-2) and a counter (`D_8008AA2C`, wraps at 0x101), then forwards the buffer to `self->nameField`'s `slotB8`. Read as a counter-driven colour/blink update on the name field's cursor; the exact visual effect is not established.
+Renamed `func_8004DCD0` -> `TitleMenu__CycleSaveTitleColor`. **Tier B**: Guarded by `self->unk3C`, cycles a 3-byte colour-like buffer through a rolling index (`D_8008AA28`, 0-2) and a counter (`D_8008AA2C`, wraps at 0x101), then forwards the buffer to `self->nameField`'s `slotB8`. Read as a counter-driven colour/blink update on the name field's cursor; the exact visual effect is not established.
 
 ## Track 4 (2026-09-25, round 84, alpha)
 
