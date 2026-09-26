@@ -595,3 +595,15 @@ lead byte of each pair is skipped, not inspected, so this reads only every
 other input byte -- the "decode" half of a genuine halfwidth<->fullwidth
 Shift-JIS ASCII/digit conversion pair, not a guess about purpose from a
 single call site.
+
+## Round 94 (track 6, charlie): history moved from include/class_3bb8c.h
+
+Round 15's head note, which stood in the shared header until round 94:
+alpha's `extern char *DecodeFullWidthSjis(char *dest, char *src);` moved
+into src/class_3bb8c_i.c, the FOURTH instance of the shared-header prototype
+rule that round. DecodeFullWidthSjis was then INCLUDE_ASM in code_2cc8c_f, so
+every declaration was a call-site typing; class_3bb8c_i read it as
+`char *(char *, char *)` and class_3bb8c_j as `void (void *, void *)`, both
+byte-exact, because the return type of an INCLUDE_ASM callee only affects the
+caller's codegen. Two call-site typings of one undefined function are the
+case that must stay unit-local.

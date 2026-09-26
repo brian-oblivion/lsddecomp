@@ -79,3 +79,16 @@ the same call, `initArgs->unk0`'s +0x078 with `unk93` (and 0); this one makes
 it twice with the two 0xC-byte entries of D_80086DAC as the third argument.
 `handlerTable` was TaskCore's `initArgs` (IntermediateBaseInitArgs, +0x00C)
 all along; `&self->unk93` is TaskCore's `u8 unk93[3]`.
+
+## Round 94 (track 6, charlie): the view was the DrawSystem
+
+Round 93's lead holds. `initArgs->drawSystem` (IntermediateBaseInitArgs +0x000)
+is the DrawSystem Application__InitSystems passes, and DrawSystem's +0x078 is
+`clearImage(self, u8 *color, DrawRect *rect)` (include/DrawSystem.h). The
+call's arguments agree: `unk93` is a TaskCore colour triple, and `D_80086DAC`
+is two 0xC-byte DrawRects, `{0, 0, 320, 240}` and `{0, 240, 320, 240}`
+(asm/data/76DC8.data.s), the two display buffers, walked at stride 0xC.
+`TitleMenuUnkC0Obj_3bb8c_d`/`TitleMenuUnkC0ObjMethods_3bb8c_d` are deleted:
+the body casts to `DrawSystem *` and calls `clearImage`, the cursor is a
+`DrawRect *` stepped with `rect++`, and `D_80086DAC` is
+`extern DrawRect D_80086DAC[2]` (was `s32`). Zero bytes changed.

@@ -29,7 +29,7 @@ extern s32 D_8008710C;
 
 void ObjM__SetupSceneStyle(Obj87034_3bb8c_l *self) {
     DreamSysObj_3bb8c_l *unk18 = self->unk18;
-    Unk50Struct_3bb8c_l *unk50 = self->unk50;
+    StyleConfig *unk50 = self->unk50;
     UnkCObj_3bb8c_l *obj;
     s32 val;
     Obj14_3bb8c_l *unk14;
@@ -142,3 +142,15 @@ Round 78 (charlie), FINISHING-PLAN track 3.
 ## Track 4 (2026-09-26, round 89, echo)
 
 The class is unified as ObjM in include/ObjM.h (table gObjMMethods, was D_80087034); the class_3bb8c_k/_l/_m views (ObjM_3bb8c_k, Obj87034_3bb8c_l, ObjM) and class_39e08.h's Obj4C/SubObjB/EventArg are gone. Byte-identical. `self->unkC` was IntermediateBase::initArgs (its unk0 is read), `world` the viewport (setProjection +0x054, attachViewChild), `unk14` the StageMap (setAmbientColor +0x0BC, setChildParams, setConfig, setGridSpan, setAcceptedTags), `unk34` TimedTask::sound, `unk10` the FrameClock.
+
+## Round 94 (track 6, charlie)
+
+`Unk50Struct_3bb8c_l` is `StyleConfig` (ObjM::styleConfig's pointee,
+include/class_3bb8c.h), its fields named from their readers: `unk0`/`unk4`
+-> `lightDirs`/`lightColors` (the StageMap's setChildParams), `unk8` ->
+`ambientColor` (setAmbientColor), `unkC` -> `clearColor` (the viewport's
+setClearColor), `unk14` -> `colorMode` (1: the far colour is clearColor; 2:
+the TimBlockSrc fades to clearColor), `unk18` -> `farColor` (setFarColor
+otherwise), `unk1C` -> `fogNear` (setFogNear). Tier B for `colorMode`, whose
+two tested values are read by different methods for different choices.
+Zero bytes changed.

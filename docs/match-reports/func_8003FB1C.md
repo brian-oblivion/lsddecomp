@@ -133,3 +133,8 @@ with three-register batching), tailing off to whatever remains — here 3, 3, th
 2. It is one `*dst = src;` and needs no field-by-field spelling. The tell that
 it is a struct copy rather than hand-written field copies is that the loads are
 BATCHED ahead of the stores rather than interleaved one-for-one.
+
+## Round 94 (track 6)
+
+The second view is gone: class_3bb8c_b.c declares `extern MATRIX D_8008E98C;`
+from `<libgte.h>`, so both readers now use Sony's type.

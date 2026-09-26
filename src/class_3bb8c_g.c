@@ -242,7 +242,7 @@ void TaskObjF__AttachTextEntry(TaskObjF *self) {
         self->methods->addChild(self, (BasicClass *)self->textEntry);
         self->textEntry->methods->loadCardResources(self->textEntry, self->spriteParent);
         self->textEntry->methods->attachTarget(self->textEntry, self->inputSource, self->tickSource,
-                                               (struct TargetObj86ED0 *)self->sound);
+                                               self->sound);
     }
 }
 
@@ -280,7 +280,7 @@ void TaskObjF__AttachItemList(TaskObjF *self) {
         self->methods->addChild(self, (BasicClass *)self->itemList);
         self->itemList->methods->loadResources(self->itemList, self->spriteParent);
         self->itemList->methods->attachTarget(self->itemList, self->inputSource, self->tickSource,
-                                              (struct TargetObj86ED0 *)self->sound);
+                                              self->sound);
     }
 }
 

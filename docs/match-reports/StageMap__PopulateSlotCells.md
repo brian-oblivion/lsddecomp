@@ -551,7 +551,7 @@ fixes, worth recording since each is a small, generalizable lever:
    `idxVal` live. Routing both the `unk18` fill and `GsLinkObject4`'s `tmd`
    argument through `((LinkResEntry *)(*slot)->unk20)->unk10` instead of
    `((LinkResEntry *)idxVal)->unk10` recovered this. Same idiom as
-   `Unk14Obj::unk0` in `StageMap__LoadChunksAround`'s report and `u14b` in
+   `SplitCoord2::unk0` in `StageMap__LoadChunksAround`'s report and `u14b` in
    `StageMap__ComputeFootprintDescriptor`'s -- a THIRD independent confirmation this round.
 4. **A cached pointer needs to be RE-cached (not reused) at each natural
    "batch" boundary, and the boundary is where retail's own delay-slot

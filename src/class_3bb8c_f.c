@@ -42,7 +42,7 @@
  * return value lives in `$v0` either way, so the implicit-int reading
  * never produced different code, only a diagnostic. */
 s32 WaitForReadyEvent(s32 *arr, s32 count);
-char *BuildMemcardPath(DeviceName866E8 *dest, s32 selector, char *suffix);
+char *BuildMemcardPath(McDevicePath *dest, s32 selector, char *suffix);
 
 /* PSX BIOS file trampolines, linked from Sony's own objects since round 34
  * (libapi/a50,a52,a51,a54,a69 -- one 0x10-byte object per stub). These used
@@ -80,7 +80,7 @@ s32 TaskObjF__TryReadMemcardFile(TaskObjF *self, char *suffix, void *outBuf, s32
     s32 seekPos;
     u8 raw;
 
-    path = BuildMemcardPath((DeviceName866E8 *)pathBuf, self->cardSlot, suffix);
+    path = BuildMemcardPath((McDevicePath *)pathBuf, self->cardSlot, suffix);
     handle = open(path, 1);
     if (handle == -1) {
         return 0;
@@ -200,7 +200,7 @@ s32 TaskObjF__TryWriteMemcardSaveFile(TaskObjF *self, char *fileName, char *titl
     McIconSource *src;
     McSaveHeader *req;
 
-    path = BuildMemcardPath((DeviceName866E8 *)pathBuf, self->cardSlot, fileName);
+    path = BuildMemcardPath((McDevicePath *)pathBuf, self->cardSlot, fileName);
     delete (path);
     openMode = ((((u32)size + 0x21FF) >> 13) << 16) | 0x200;
     fileHandle = open(path, openMode);
@@ -232,8 +232,8 @@ s32 TaskObjF__TryWriteMemcardSaveFile(TaskObjF *self, char *fileName, char *titl
     return 1;
 }
 
-char *BuildMemcardPath(DeviceName866E8 *dest, s32 selector, char *suffix) {
-    DeviceName866E8 *src;
+char *BuildMemcardPath(McDevicePath *dest, s32 selector, char *suffix) {
+    McDevicePath *src;
 
     if (selector) {
         src = &gMcDevicePath1;

@@ -168,3 +168,14 @@ ChildObj86ED0 *New_TimImage(char *)` is deleted. `handle1`/`handle2` are
 `TimImage *`: +0x078 (FileResource's `void *slot78`, occupant
 TimImage__Upload) through `TimImageUploadFn`, +0x004 the inherited
 `release`. `ChildObj86ED0` stays for `textRow`. Image byte-identical.
+
+## Round 94 (track 6, charlie): textRow is a TextRow
+
+`ChildObj86ED0`/`ChildMethods86ED0` (include/class_3bb8c.h) are deleted: the
+object behind them is the `New_TextRow` result, so TextEntry::textRow
+(+0x044, include/TextEntry.h) is `struct TextRow *`. The slots map onto
+TextRow's table offset for offset: +0x004 `release`, +0x04C `attachToParent`
+(position cast to `LongVec3 *`, as ScreenSprite's banner describes), +0x0B8
+`setColor` (`D_8008AAC8`, the 0x80/0x80/0x00 word, passed as `SpriteRgb *`),
++0x0C4 `setCell`, called through `TextRowSetCellAtFn` because
+TextRow__SetCellAt takes the index too. Zero bytes changed.

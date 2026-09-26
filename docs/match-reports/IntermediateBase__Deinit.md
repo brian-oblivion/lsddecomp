@@ -35,7 +35,7 @@ void IntermediateBase__Deinit(Obj86B60 *self)
     methods->slot50(self);
     obj18 = self->unk18;
     if (self->unk24 == 0) {
-        ((Unk14Obj *)self->unk14)->methods->slot14((Unk14Obj *)self->unk14, (void *)self->unk10);
+        ((SplitCoord2 *)self->unk14)->methods->slot14((SplitCoord2 *)self->unk14, (void *)self->unk10);
         obj18->methods->slot14(obj18, (void *)self->unk10);
         obj18->methods->slot14(obj18, ((Obj86B60InitArgs *)self->unkC)->unk0);
     }
@@ -46,7 +46,7 @@ void IntermediateBase__Deinit(Obj86B60 *self)
         self->unk18 = obj18->methods->slot4(obj18);
     }
     if ((void *)((Obj86B60InitArgs *)self->unkC)->unkC != (void *)self->unk14) {
-        self->unk14 = (s32)((Unk14Obj *)self->unk14)->methods->slot4((Unk14Obj *)self->unk14);
+        self->unk14 = (s32)((SplitCoord2 *)self->unk14)->methods->slot4((SplitCoord2 *)self->unk14);
     }
     if (((Obj86B60InitArgs *)self->unkC)->unk8 != (void *)self->unk10) {
         self->unk10 = (s32)((Unk10Obj *)self->unk10)->methods->slot4((Unk10Obj *)self->unk10);
@@ -64,7 +64,7 @@ without a register-pressure iteration this time.
 
 - `Obj86B60Methods`: added `slot14` (inherited BasicClass removeChild) and
   `slot50` (external `TitleMenu__OnDeinit`, unobserved elsewhere).
-- `Unk14Obj`/`Unk18Obj`: both confirmed to ALSO expose the inherited
+- `SplitCoord2`/`Unk18Obj`: both confirmed to ALSO expose the inherited
   BasicClass `slot4` (release) and `slot14` (removeChild) -- same universal
   low-offset BasicClass layout every class in this game shares. Both types
   are now fully explained by "generic BasicClass descendant, only ever
@@ -73,7 +73,7 @@ without a register-pressure iteration this time.
 - New type `Unk10Obj`/`Unk10ObjMethods`: a THIRD alternate pointer reading
   of `self->unk10` (which stays `s32` in `Obj86B60`, per this header's
   established "keep the general field, cast locally" convention -- see
-  `Unk14Obj`'s own comment). Only `slot4` (release) is modelled; this
+  `SplitCoord2`'s own comment). Only `slot4` (release) is modelled; this
   function is the only place it is dereferenced as a pointer at all in this
   unit outside `IntermediateBase__Init`'s own (non-dereferencing) forwards.
 - This confirms `self->unkC`'s runtime identity across BOTH functions that
@@ -112,7 +112,7 @@ first build.
 
 **IntermediateBase__Deinit** (renamed from `func_8003E280`, round 55, runner
 alpha). Tier A: exact mirror of `IntermediateBase__Init` -- removes the children
-`Init` added (`removeChild`), then releases (`Unk14ObjMethods::release`/
+`Init` added (`removeChild`), then releases (`SplitCoord2Methods::release`/
 `Unk10ObjMethods::release`, both renamed this round, and
 `Unk18ObjMethods::release` (also renamed this round, exclusive --
 code_2cc8c_d.c never dispatches this exact slot on a Unk18Obj*)) each of the three helper
@@ -126,4 +126,4 @@ confirmed by `tools/classtable.py`/direct table read (see the header's own
 
 ## Track 4 (2026-09-25, round 82, charlie)
 
-The class is IntermediateBase (class id 0x30, gIntermediateBaseMethods; `tools/classtable.py gIntermediateBaseMethods` lists this function as one of its own occupants), declared once in include/IntermediateBase.h. `self` is now `IntermediateBase *`, not TaskCore's `Obj86B60` view; byte-identical. Renamed from Obj86B60__Deinit (class prefix). Occupies +0x048, slot `deinit`. Its first call, +0x050, is `onDeinit` (NULL here; DayTask__OnDeinit, ObjM__TeardownStyle, TaskCore__OnDeinit override it). The three releases go through BasicClass's release on `BasicClass *` fields (the Unk10Obj/Unk14Obj local views are gone).
+The class is IntermediateBase (class id 0x30, gIntermediateBaseMethods; `tools/classtable.py gIntermediateBaseMethods` lists this function as one of its own occupants), declared once in include/IntermediateBase.h. `self` is now `IntermediateBase *`, not TaskCore's `Obj86B60` view; byte-identical. Renamed from Obj86B60__Deinit (class prefix). Occupies +0x048, slot `deinit`. Its first call, +0x050, is `onDeinit` (NULL here; DayTask__OnDeinit, ObjM__TeardownStyle, TaskCore__OnDeinit override it). The three releases go through BasicClass's release on `BasicClass *` fields (the Unk10Obj/SplitCoord2 local views are gone).

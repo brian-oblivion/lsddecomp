@@ -6,7 +6,7 @@
 
 ## What it does
 
-`char *BuildMemcardPath(DeviceName866E8 *dest, s32 selector, char *suffix)`.
+`char *BuildMemcardPath(McDevicePath *dest, s32 selector, char *suffix)`.
 Copies a fixed 6-byte PS-X BIOS memory-card device-name template
 ("bu10:" when `selector` is nonzero, "bu00:" otherwise —
 `asm/data/7B008.sdata.s`, `gMcDevicePath1`/`gMcDevicePath0`) into `dest`, appends
@@ -25,18 +25,18 @@ Treated as an unrelated small helper.
 struct copy inside each branch of the `if`. The natural first attempt
 (`if (selector) *dest = gMcDevicePath1; else *dest = gMcDevicePath0;`) duplicates
 the whole 8-instruction unaligned-copy sequence into both arms (10 words
-too long, 0x90 vs retail's 0x68). Choosing a `DeviceName866E8 *src` in the
+too long, 0x90 vs retail's 0x68). Choosing a `McDevicePath *src` in the
 `if`/`else` and doing the assignment once afterward matches exactly.
 
 ## Struct
 
-`DeviceName866E8` is a 6-byte all-`s8` struct (natural alignment 1) — this
+`McDevicePath` is a 6-byte all-`s8` struct (natural alignment 1) — this
 reproduces retail's unaligned `lwl`/`lwr` + two `sb` copy, the same idiom
 already documented for `Descriptor10` in `include/class_3bb8c.h`.
 
 ## Header additions (`include/class_3bb8c.h`, additive only)
 
-- `DeviceName866E8` (new type) and its two extern instances `gMcDevicePath1`
+- `McDevicePath` (new type) and its two extern instances `gMcDevicePath1`
   ("bu10:") / `gMcDevicePath0` ("bu00:").
 - `extern char *strcat(char *dest, char *src);` — **an extern for a
   function outside this unit** (matched in `src/code_171e0.c`, declared in
@@ -50,7 +50,7 @@ already documented for `Descriptor10` in `include/class_3bb8c.h`.
 two call sites in ONE unit, with different argument counts, both byte-load-bearing.
 
 **Callee evidence** (the matched definition in `src/class_3bb8c_f.c`):
-`char *BuildMemcardPath(DeviceName866E8 *dest, s32 selector, char *suffix)` — three
+`char *BuildMemcardPath(McDevicePath *dest, s32 selector, char *suffix)` — three
 real arguments, `$a2` being the suffix string it appends.
 
 **SUPERSEDED, round 75 (see the correction at the end): `class_3bb8c_e` now declares a real three-argument prototype.** Original reasoning, kept as history -- **why `src/class_3bb8c_e.c` must declare it unprototyped.** Its two call sites
@@ -96,3 +96,20 @@ parameter, already in `$a2`, so no set-up is emitted and it read as a
 two-argument call. `src/class_3bb8c_e.c` now declares
 `extern void *BuildMemcardPath(void *dest, s32 selector, void *suffix);`
 and every call site in both units passes three. See `TaskObjF__OpenAndReadMemcardFile.md`.
+
+## Round 94 (track 6, charlie): history moved from include/class_3bb8c.h
+
+Round 34's note: five of the six prototypes that sat in the header were the
+PSX BIOS file trampolines, Sony's `open`/`read`/`lseek`/`close`/`delete`,
+linked from libapi/a50, a52, a51, a54, a69. They left the SHARED header
+deliberately: a prototype for a function another unit (here a Sony object)
+defines belongs in the `.c` that calls it, and `open`/`read`/`close` are
+generic enough that a future include/psyq prototype (measured 2026-09-12:
+none of the shipped headers declares them, only comments and O_* macros)
+would collide in whichever including unit pulled both in; the two callers
+also disagree about the first argument's type. Each caller (class_3bb8c_e.c,
+class_3bb8c_f.c) carries its own `extern`. CopyMemcardIconTemplate stayed:
+game code, src/class_3bb8c_g.c, matched round 45 (60/60 words; was
+gp_rel-blocked, resolved round 42). `DeviceName866E8` is `McDevicePath`
+(round 94); its comment's pointer to "the same idiom documented for
+Descriptor10 above" was stale and is gone.

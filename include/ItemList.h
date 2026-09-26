@@ -46,14 +46,14 @@
  * The object is 0x54 bytes (New_ItemList).
  */
 
-/* The objects it holds, by tag (TargetObj86ED0 is a helper view in
- * include/class_3bb8c.h: TaskObjF's `sound`, a VabStreamObj, TextEntry's target too). */
+/* The objects it holds, by tag (`target` is TaskObjF's `sound`, a
+ * VabStreamObj, as TextEntry's is). */
 struct SceneNode;
 struct ScreenSprite;
 struct TextRow;
 struct TimImage;
 struct SpriteRgb;
-struct TargetObj86ED0;
+struct VabStreamObj;
 
 typedef struct ItemList ItemList;
 typedef struct ItemListMethods ItemListMethods;
@@ -68,8 +68,8 @@ struct ItemListMethods {
     /* +0x044 */ void (*loadResources)(ItemList *self, struct SceneNode *parent); /* ItemList__LoadResources */
     /* +0x048 */ void (*releaseResources)(ItemList *self); /* ItemList__ReleaseResources */
     /* +0x04C */ void (*attachTarget)(ItemList *self, void *child1, void *child2,
-                                      struct TargetObj86ED0 *target); /* ItemList__AttachTarget */
-    /* +0x050 */ void (*detachTarget)(ItemList *self);                /* ItemList__DetachTarget */
+                                      struct VabStreamObj *target); /* ItemList__AttachTarget */
+    /* +0x050 */ void (*detachTarget)(ItemList *self);              /* ItemList__DetachTarget */
     /* +0x054 */ void (*setState)(ItemList *self, s32 state); /* ItemList__SetState: 2/3 close, 4 notifies parents */
     /* +0x058 */ void (*tickClosing)(ItemList *self, void *sender,
                                      s32 event); /* ItemList__TickClosing (reads only self; see the banner) */
@@ -104,7 +104,7 @@ struct ItemList {
     /* +0x030 */ s32 closeTicks;    /* tickClosing's call counter; setState zeroes */
     /* +0x034 */ void *inputSource; /* addChild/removeChild: the child whose class id's low nibble is 2; onNotify sends its events to handleInputCode */
     /* +0x038 */ void *tickSource; /* ... whose low nibble is 5; onNotify sends its events to tickClosing */
-    /* +0x03C */ struct TargetObj86ED0 *target; /* attachTarget; forwardToTarget calls its +0x080 with (code, 0x60, 0x60) */
+    /* +0x03C */ struct VabStreamObj *target; /* attachTarget; forwardToTarget plays tone `code` on it (playTone, volume 0x60, 0x60) */
     /* +0x040 */ struct TextRow *rows[4]; /* createRows: New_TextRow(font, 26, ...); index = item - topIndex */
     /* +0x050 */ struct ScreenSprite *panelSprite; /* loadResources: New_ScreenSprite(SELECT); non-NULL gates every list method */
 };
@@ -121,7 +121,7 @@ extern struct SpriteRgb gItemListCursorColor;
  * banner), as a caller that passes the extra arguments casts them: attachTarget
  * reaches its own addChild override with all four of its words once. */
 typedef void (*ItemListAddChildWideFn)(ItemList *self, void *child1, void *child2,
-                                       struct TargetObj86ED0 *target);
+                                       struct VabStreamObj *target);
 
 /* The class's own methods, in address order. */
 ItemList *New_ItemList(char **items, s32 mode);
@@ -135,7 +135,7 @@ void ItemList__OnNotify(ItemList *self, void *sender, s32 event);
 void ItemList__ResetView(ItemList *self);
 void ItemList__LoadResources(ItemList *self, struct SceneNode *parent);
 void ItemList__ReleaseResources(ItemList *self);
-void ItemList__AttachTarget(ItemList *self, void *child1, void *child2, struct TargetObj86ED0 *target);
+void ItemList__AttachTarget(ItemList *self, void *child1, void *child2, struct VabStreamObj *target);
 void ItemList__DetachTarget(ItemList *self);
 void ItemList__SetState(ItemList *self, s32 state);
 void ItemList__TickClosing(ItemList *self);

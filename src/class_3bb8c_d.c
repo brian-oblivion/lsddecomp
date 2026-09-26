@@ -44,14 +44,14 @@ void TitleMenu__Reset(TitleMenu *self) {
 
 void TitleMenu__OnDeinit(TitleMenu *self) {
     u32 i;
-    u8 *entry;
+    DrawRect *rect;
 
     i = 0;
-    entry = (u8 *)&D_80086DAC;
+    rect = D_80086DAC;
     for (; i < 2; i++) {
-        ((TitleMenuUnkC0Obj_3bb8c_d *)self->initArgs->drawSystem)
-            ->methods->slot78((TitleMenuUnkC0Obj_3bb8c_d *)self->initArgs->drawSystem, self->unk93, entry);
-        entry += 0xC;
+        ((DrawSystem *)self->initArgs->drawSystem)
+            ->methods->clearImage((DrawSystem *)self->initArgs->drawSystem, self->unk93, rect);
+        rect++;
     }
 }
 

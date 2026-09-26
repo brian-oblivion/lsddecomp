@@ -59,9 +59,9 @@
  * saveCtrl and saveIcon if they were made.
  *
  * Accessors that read an inherited field at another type than TaskCore's:
- * the ctor casts `sound` to VabStreamObj; onDeinit calls initArgs->drawSystem
- * at +0x078 through class_3bb8c.h's TitleMenuUnkC0Obj_3bb8c_d (TaskCore__OnDeinit
- * makes the same call through code_2c054.h's TaskTextObj); beginCardAccess
+ * the ctor casts `sound` to VabStreamObj; onDeinit casts initArgs->drawSystem
+ * to DrawSystem to call its clearImage (TaskCore__OnDeinit makes the same call
+ * through code_2c054.h's TaskTextObj); beginCardAccess
  * adds `saveCtrl` as a child, upcast to BasicClass.
  *
  * The object is 0xC4 bytes (New_TitleMenu's allocation).

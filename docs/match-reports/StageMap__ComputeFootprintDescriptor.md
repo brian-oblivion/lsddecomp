@@ -5,7 +5,7 @@
 > Renamed from `func_8004C1C0` on 2026-09-24 (tools/rename.py). Address 0x8004c1c0.
 
 REVISITED, round 63: MATCHED 106/106, whole-image SHA1 green; names/types used
-(the existing `Descriptor10Ext` / `SplitLongVec3` / `Unk14Obj` declarations
+(the existing `Descriptor10Ext` / `SplitLongVec3` / `SplitCoord2` declarations
 were correct and unchanged -- the stall was purely source SHAPE).
 
 > **ROUND 63 (delta): MATCHED, 72/106 -> 106/106 in five builds.** This
@@ -329,7 +329,7 @@ Resolves a query (`in`, a `SplitLongVec3*`) via `self->methods->slot11C`
 - `out->base.b0`/`b1` via `StageMap__SplitChunkIndex(self, out, e->unk4->unk30)` (mod/div
   by `self->unk68->divisor`), and `out->unk28` = the same raw rate.
 - `out->unkC/unk10/unk14` from `self->methods->slot118(self, e->unk4->unk32)
-  ->unkC->unk14` (a *different* `Elem`'s `Unk14Obj`, called `u14a` below):
+  ->unkC->unk14` (a *different* `Elem`'s `SplitCoord2`, called `u14a` below):
   `unk18+0x5000`, `unk1C` (new field, raw), `unk20+0x5000`.
 - `out->unk18/unk1C/unk20` from `in`'s three fields minus the just-computed
   `out->unkC`/`out->unk14` (a genuine RELOAD of the just-stored value, not a
@@ -337,7 +337,7 @@ Resolves a query (`in`, a `SplitLongVec3*`) via `self->methods->slot11C`
   `lw $v1,0x14($s0)` reloads).
 - `out->base.b2/b3`: `(in->x - u14b->unk18) >> 11` and `(in->z - u14b->unk20)
   >> 11`, each rounded toward zero (`+0x7FF` before the shift when negative),
-  where `u14b = e->unkC->unk14` (the FIRST elem's `Unk14Obj`, distinct from
+  where `u14b = e->unkC->unk14` (the FIRST elem's `SplitCoord2`, distinct from
   `u14a` above).
 - `out->base.h4/h6/h8`: halfword-precision versions of the same math, reusing
   `b2`/`b3`. `h6` is a raw truncating copy of `in->unk4`'s low halfword.
@@ -345,7 +345,7 @@ Resolves a query (`in`, a `SplitLongVec3*`) via `self->methods->slot11C`
 
 Full derivation, including the exact retail instruction trace this was built
 from, is in this report's body below and in the header comments for
-`Descriptor10Ext`/`SplitLongVec3`/`Unk14Obj` in `include/class_3bb8c.h`.
+`Descriptor10Ext`/`SplitLongVec3`/`SplitCoord2` in `include/class_3bb8c.h`.
 
 ## SUPERSEDED by round 63 -- the matching body
 
@@ -358,8 +358,8 @@ computed value), the `0x400` sits inside the subtracted group, and
 ```c
 s32 StageMap__ComputeFootprintDescriptor(Obj866E8 *self, Descriptor10Ext *out, SplitLongVec3 *in) {
     Elem *e;
-    Unk14Obj *u14a;
-    Unk14Obj *u14b;
+    SplitCoord2 *u14a;
+    SplitCoord2 *u14b;
     s32 rate;
     s32 t;
     s32 b2;
@@ -411,8 +411,8 @@ s32 StageMap__ComputeFootprintDescriptor(Obj866E8 *self, Descriptor10Ext *out, S
 ```c
 s32 StageMap__ComputeFootprintDescriptor(Obj866E8 *self, Descriptor10Ext *out, SplitLongVec3 *in) {
     Elem *e;
-    Unk14Obj *u14a;
-    Unk14Obj *u14b;
+    SplitCoord2 *u14a;
+    SplitCoord2 *u14b;
     s32 rate;
     s32 t;
     s8 b2;
@@ -459,7 +459,7 @@ s32 StageMap__ComputeFootprintDescriptor(Obj866E8 *self, Descriptor10Ext *out, S
 }
 ```
 
-This needs `Descriptor10Ext`, `SplitLongVec3` and the retyped `Unk14Obj`
+This needs `Descriptor10Ext`, `SplitLongVec3` and the retyped `SplitCoord2`
 (`unk18`/`unk20` as `union { s32 w; u16 h; }`, plus new `unk1C`) from
 `include/class_3bb8c.h`, and the retyped `slot110`/new `slot11C` in
 `Obj866E8Methods` (same file). All already committed to the header; this
@@ -578,7 +578,7 @@ Round 78 (track 3, naming pass, bravo).
 
 | symbol | name | tier | evidence |
 | --- | --- | --- | --- |
-| `func_8004C1C0` | `StageMap__ComputeFootprintDescriptor` | B | Occupant of `gStageMapMethods` +0x110 (`slot110`). `class_3ac78`'s own `StageMap__ApplyToSenderFootprint` (already matched) calls this exact slot to fill a `buf` that is then fed DIRECTLY to `StageMap__SetFootprintFromCell`/`StageMap__SetFootprintRect` as their own `desc` parameter -- i.e. this function's output IS the footprint descriptor those two already-named functions consume. Computes cell row/column (`base.b2`/`base.b3`) and sub-cell offsets (`base.h4`/`h6`/`h8`) from a `SplitLongVec3` world position via `StageMap__FindSlotForPosition` and an `Unk14Obj` position pair -- a position-to-grid-cell conversion, matching the caller-side evidence exactly. |
+| `func_8004C1C0` | `StageMap__ComputeFootprintDescriptor` | B | Occupant of `gStageMapMethods` +0x110 (`slot110`). `class_3ac78`'s own `StageMap__ApplyToSenderFootprint` (already matched) calls this exact slot to fill a `buf` that is then fed DIRECTLY to `StageMap__SetFootprintFromCell`/`StageMap__SetFootprintRect` as their own `desc` parameter -- i.e. this function's output IS the footprint descriptor those two already-named functions consume. Computes cell row/column (`base.b2`/`base.b3`) and sub-cell offsets (`base.h4`/`h6`/`h8`) from a `SplitLongVec3` world position via `StageMap__FindSlotForPosition` and an `SplitCoord2` position pair -- a position-to-grid-cell conversion, matching the caller-side evidence exactly. |
 
 ## Track 6 (2026-09-26, round 93, alpha)
 
@@ -607,3 +607,11 @@ new `ChunkNeighbourDelta` for `sChunkNeighbourDeltas` (was typed as the
 3-word placeholder). renametype.py also rewrote the old names inside
 earlier sections' history prose in this and sibling reports (known, pending
 an operator decision; not hand-reverted).
+
+## Round 94 (track 6, charlie)
+
+`Unk14Obj` is `SplitCoord2` (include/class_3bb8c.h): the slot's
+cellParent->coord2, a GsCOORDINATE2 with tx/tz as word-or-halfword unions.
+Its fields are named for the GsCOORDINATE2 words they overlay: `unk18` ->
+`tx` (coord.t[0]), `unk1C` -> `ty`, `unk20` -> `tz`; `unk0` (flg) had no
+accessor through this view and is padding. Zero bytes changed.

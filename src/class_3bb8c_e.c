@@ -237,7 +237,7 @@ extern s32 format(char *fs);
 s32 TaskObjF__FormatCard(TaskObjF *self) {
     s32 retries;
     s32 result;
-    DeviceName866E8 *path;
+    McDevicePath *path;
 
     retries = 10;
     do {

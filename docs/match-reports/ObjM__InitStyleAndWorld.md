@@ -27,7 +27,7 @@ extern s32 D_80087168;
 extern s32 D_80087118[];
 extern s32 D_80087150;
 
-void ObjM__InitStyleAndWorld(Obj87034_3bb8c_l *self, s32 arg1, Unk50Struct_3bb8c_l *arg2, s32 arg3) {
+void ObjM__InitStyleAndWorld(Obj87034_3bb8c_l *self, s32 arg1, StyleConfig *arg2, s32 arg3) {
     DreamSysObj_3bb8c_l *unk18 = self->unk18;
     s32 ret1;
     s32 flag;
@@ -45,7 +45,7 @@ void ObjM__InitStyleAndWorld(Obj87034_3bb8c_l *self, s32 arg1, Unk50Struct_3bb8c
 
     self->unk78 = unk18;
     ret1 = self->unk3C->methods->slot1A0(self->unk3C, 0);
-    self->unk50 = (Unk50Struct_3bb8c_l *) RegisterStyleConfig(self->unk14, self->unk38, &self->unk6C, ret1, 0);
+    self->unk50 = (StyleConfig *) RegisterStyleConfig(self->unk14, self->unk38, &self->unk6C, ret1, 0);
     if (arg2 != 0) {
         self->unk50 = arg2;
     }
@@ -212,3 +212,15 @@ drifted), `funcdiff` 74/136, and asm-differ shows `li a0,0x3` moved from above
 `sw v0,0x40(s1)` (the `self->unk40 = 0x10` store) to below the `stage` compare,
 where it displaces `move a1,zero` and pulls `sw a0,0x44(s1)` along with it.
 No source change.
+
+## Round 94 (track 6, charlie)
+
+`Unk50Struct_3bb8c_l` is `StyleConfig` (ObjM::styleConfig's pointee,
+include/class_3bb8c.h), its fields named from their readers: `unk0`/`unk4`
+-> `lightDirs`/`lightColors` (the StageMap's setChildParams), `unk8` ->
+`ambientColor` (setAmbientColor), `unkC` -> `clearColor` (the viewport's
+setClearColor), `unk14` -> `colorMode` (1: the far colour is clearColor; 2:
+the TimBlockSrc fades to clearColor), `unk18` -> `farColor` (setFarColor
+otherwise), `unk1C` -> `fogNear` (setFogNear). Tier B for `colorMode`, whose
+two tested values are read by different methods for different choices.
+Zero bytes changed.

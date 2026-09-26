@@ -96,3 +96,13 @@ forward into: optionally brackets a critical section, then calls
 `callback` on each of `self->events[4]` in turn, stopping at the first
 zero return. Mechanics and role (a for-each over this object's own event
 array) both directly evident from the body and its three callers.
+
+## Round 94 (track 6, charlie): history moved from include/class_3bb8c.h
+
+The three callbacks TaskObjF__EnableEvents/DisableEvents/TestEvents forward
+into ForEachEvent are EnableEvent/DisableEvent/TestEvent, linked from the
+Psy-Q objects libapi/a12, a13, a11 (round 34), declared in
+src/class_3bb8c_f.c only. An older comment called them "SPU routines"; they
+are kernel event-queue calls, only their neighbours in the block are libspu.
+WaitForReadyEvent's callback was `func_800390F4` until round 34 linked it as
+Sony's TestEvent, and TaskObjF's `field14` became `events` in round 60.

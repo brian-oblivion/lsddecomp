@@ -18,6 +18,7 @@
  *  - GetUnk1CC, and GetStageMapMethods.
  */
 #include "common.h"
+#include <libgte.h>
 #include "class_3bb8c.h"
 #include "LbdFile.h"
 #include "GridCell.h"
@@ -67,6 +68,10 @@ void StageMap__RefreshFootprint(StageMap *self) {
     StageMap__SetFootprintCellFlag(self, 1);
 }
 
+/* The template ComputeFootprintFromRotation copies before RotMatrix fills
+ * its rotation part (bss). */
+extern MATRIX D_8008E98C;
+
 void StageMap__ComputeFootprintFromRotation(StageMap *self, s32 arg1, s32 arg2) {
     SceneNodeSub44 *sub;
     Descriptor10Ext buf;
@@ -74,7 +79,7 @@ void StageMap__ComputeFootprintFromRotation(StageMap *self, s32 arg1, s32 arg2) 
     s32 point1;
     u16 angle; /* u16, not s32: the s32 form is byte-identical except
                      * for an 8-byte-smaller frame (round 71) */
-    QueryTemplate866E8 mat;
+    MATRIX mat;
     s32 offset;
     s32 flag;
     s32 half;
@@ -91,27 +96,28 @@ void StageMap__ComputeFootprintFromRotation(StageMap *self, s32 arg1, s32 arg2) 
     }
 
     mat = D_8008E98C;
-    mat.unk14 = 0;
-    mat.unk18 = 0;
-    mat.unk1C = self->gridSpan;
+    mat.t[0] = 0;
+    mat.t[1] = 0;
+    mat.t[2] = self->gridSpan;
     RotMatrix(rot, &mat);
-    ApplyMatrixLV(&mat, &mat.unk14, &mat.unk14);
+    /* (0, 0, gridSpan) rotated in place: t is both the input and the output. */
+    ApplyMatrixLV(&mat, (VECTOR *)mat.t, (VECTOR *)mat.t);
 
     if ((u16)(angle - 0x200) < 0x400 || (u16)(angle - 0xA00) < 0x400) {
-        offset = mat.unk1C;
+        offset = mat.t[2];
         self->footprintWidth = arg2;
         self->footprintHeight = arg1;
-        self->footprintCol = (mat.unk14 > 0) ? point0 : point0 - arg1 + 1;
-        self->footprintRow = (mat.unk1C > 0) ? point1 - (u16)self->gridHalfCells - 1
-                                             : point1 - (u16)self->gridHalfCells + 1;
+        self->footprintCol = (mat.t[0] > 0) ? point0 : point0 - arg1 + 1;
+        self->footprintRow = (mat.t[2] > 0) ? point1 - (u16)self->gridHalfCells - 1
+                                            : point1 - (u16)self->gridHalfCells + 1;
         flag = 0;
     } else if ((u16)(angle - 0x600) < 0x400 || (u16)(angle - 0x200) >= 0xC00) {
-        offset = mat.unk14;
+        offset = mat.t[0];
         self->footprintWidth = arg1;
         self->footprintHeight = arg2;
-        self->footprintCol = (mat.unk14 > 0) ? point0 - (u16)self->gridHalfCells - 1
-                                             : point0 - (u16)self->gridHalfCells + 1;
-        self->footprintRow = (mat.unk1C > 0) ? point1 : point1 - arg2 + 1;
+        self->footprintCol = (mat.t[0] > 0) ? point0 - (u16)self->gridHalfCells - 1
+                                            : point0 - (u16)self->gridHalfCells + 1;
+        self->footprintRow = (mat.t[2] > 0) ? point1 : point1 - arg2 + 1;
         flag = 1;
     }
 

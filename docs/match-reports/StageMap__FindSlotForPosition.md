@@ -6,7 +6,7 @@
 
 > Renamed from `func_8004C470` on 2026-09-24 (tools/rename.py). Address 0x8004c470.
 
-REVISITED, round 73: MATCHED 70/70 (field named at the add, assigned inside the bound test); names/types not relevant (existing Unk14Obj/Unk54Struct views reused unchanged)
+REVISITED, round 73: MATCHED 70/70 (field named at the add, assigned inside the bound test); names/types not relevant (existing SplitCoord2/Unk54Struct views reused unchanged)
 
 ## Round 73 (bravo) -- revisit, MATCHED
 
@@ -284,7 +284,7 @@ NON_MATCHING body promoted, round 73
 
 > **ROUND 20 (charlie): re-verified, one correction to this report's own
 > prose.** Rebuilt the exact preserved body below from a clean
-> `INCLUDE_ASM` baseline (one fix needed first: `Unk14Obj::unk18`/`unk20`
+> `INCLUDE_ASM` baseline (one fix needed first: `SplitCoord2::unk18`/`unk20`
 > were retyped to `union { s32 w; u16 h; }` by a LATER round's
 > `StageMap__ComputeFootprintDescriptor`/`StageMap__LoadChunksAround` work after this report was written, so
 > the preserved body's plain `r->unk18`/`r->unk20` no longer compiled --
@@ -326,7 +326,7 @@ Elem *StageMap__FindSlotForPosition(Obj866E8 *self, Unk54Struct *arg1) {
     s32 tol;
     s32 threshold;
     Elem *candidate;
-    Unk14Obj *r;
+    SplitCoord2 *r;
 
     i = 0;
     tol = 0xA000;
@@ -353,7 +353,7 @@ Elem *StageMap__FindSlotForPosition(Obj866E8 *self, Unk54Struct *arg1) {
 #endif
 ```
 
-(`r->unk18`/`r->unk20` are written `.w` here because `Unk14Obj::unk18`/
+(`r->unk18`/`r->unk20` are written `.w` here because `SplitCoord2::unk18`/
 `unk20` were retyped to `union { s32 w; u16 h; }` by a later round's work
 on `StageMap__ComputeFootprintDescriptor`/`StageMap__LoadChunksAround`, after this report's original body was
 written -- mechanical header-drift fix, not a residue change, same as
@@ -369,7 +369,7 @@ Elem *StageMap__FindSlotForPosition(Obj866E8 *self, Unk54Struct *arg1) {
     s32 tol;
     s32 threshold;
     Elem *candidate;
-    Unk14Obj *r;
+    SplitCoord2 *r;
 
     i = 0;
     tol = 0xA000;
@@ -643,3 +643,11 @@ earlier sections' history prose in this and sibling reports (known, pending
 an operator decision; not hand-reverted).
 
 This function: `StageMap__FindElementForPosition` -> `StageMap__FindSlotForPosition` (`python3 tools/rename.py StageMap__FindElementForPosition StageMap__FindSlotForPosition`, tier A): a lookup: the slot whose cellParent square (0xA000 in x and z from its position) holds the point; in a vertical grid also a y band of 0x800 per neighbour key. (The rename commit's message says "loaded slot" and "gridSpan": both wrong, the body tests neither.)
+
+## Round 94 (track 6, charlie)
+
+`Unk14Obj` is `SplitCoord2` (include/class_3bb8c.h): the slot's
+cellParent->coord2, a GsCOORDINATE2 with tx/tz as word-or-halfword unions.
+Its fields are named for the GsCOORDINATE2 words they overlay: `unk18` ->
+`tx` (coord.t[0]), `unk1C` -> `ty`, `unk20` -> `tz`; `unk0` (flg) had no
+accessor through this view and is padding. Zero bytes changed.

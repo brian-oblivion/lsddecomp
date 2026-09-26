@@ -39,3 +39,9 @@ markers added to
 
 Oracle green (`build exit=0`, `OK: build matches retail`) after the edit; a
 comment moves zero bytes.
+
+## Round 94 (track 6)
+
+`include/class_3bb8c.h`'s prototype is gone: its one caller,
+`StageMap__ComputeFootprintFromRotation` (src/class_3bb8c_b.c), takes Sony's
+`VECTOR *ApplyMatrixLV(MATRIX *m, VECTOR *v0, VECTOR *v1)` from `<libgte.h>`.

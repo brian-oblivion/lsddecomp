@@ -21,7 +21,7 @@ void ObjM__EnterStyleSession(Obj87034_3bb8c_l *self) {
     DreamSysMethods_3bb8c_l *m2;
     DreamSysObj_3bb8c_l *unk18;
     DreamSysObj_3bb8c_l *newObj;
-    Unk50Struct_3bb8c_l *unk50;
+    StyleConfig *unk50;
     s32 local10;
     s32 ret;
     s32 a2;
@@ -68,7 +68,7 @@ void ObjM__EnterStyleSession(Obj87034_3bb8c_l *self) {
   padding-to-field conversion, not a slide.
 - `Obj87034_3bb8c_l::unk40`, `::unk44` (`s32` each, +0x040/+0x044) --
   carved out of the existing `pad40[0x050-0x040]` gap.
-- `Unk50Struct_3bb8c_l::unk1C` (`void *`, +0x01C) -- appended after the
+- `StyleConfig::unk1C` (`void *`, +0x01C) -- appended after the
   existing `unk18` (which was the struct's last field), so this only grows
   the struct, no slide of any existing member.
 - `Obj14Methods_3bb8c_l::slotEC` (`void(void*)`, +0x0EC) -- carved out of
@@ -173,3 +173,15 @@ Round 78 (charlie), FINISHING-PLAN track 3.
 ## Track 4 (2026-09-26, round 89, echo)
 
 The class is unified as ObjM in include/ObjM.h (table gObjMMethods, was D_80087034); the class_3bb8c_k/_l/_m views (ObjM_3bb8c_k, Obj87034_3bb8c_l, ObjM) and class_39e08.h's Obj4C/SubObjB/EventArg are gone. Byte-identical. `world` is the viewport (NodeGuardedViewport: setLightMode, setClearColor, setFogNear, setFarColor, setUnkB4, setDrawEnabled), its getSubHandle the FadeBox fade box (setDivisorMode +0x0F0, startFadeDown +0x0D4); `attached` is `inSession`.
+
+## Round 94 (track 6, charlie)
+
+`Unk50Struct_3bb8c_l` is `StyleConfig` (ObjM::styleConfig's pointee,
+include/class_3bb8c.h), its fields named from their readers: `unk0`/`unk4`
+-> `lightDirs`/`lightColors` (the StageMap's setChildParams), `unk8` ->
+`ambientColor` (setAmbientColor), `unkC` -> `clearColor` (the viewport's
+setClearColor), `unk14` -> `colorMode` (1: the far colour is clearColor; 2:
+the TimBlockSrc fades to clearColor), `unk18` -> `farColor` (setFarColor
+otherwise), `unk1C` -> `fogNear` (setFogNear). Tier B for `colorMode`, whose
+two tested values are read by different methods for different choices.
+Zero bytes changed.

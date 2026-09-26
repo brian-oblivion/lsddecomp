@@ -357,7 +357,7 @@ If `arg3 == 0`, does nothing at all (whole body skipped). Otherwise:
    data table, reused type), fill `e->unkC->unk14`'s `unk18`/`unk1C`/
    `unk20` from `arg2` combined with either `tbl` (when
    `self->unk68->unk4 == 0`) or a flat `-0x5000` adjustment (otherwise),
-   zero the SAME `Unk14Obj`'s new `unk0` field (a genuine reload, not dead
+   zero the SAME `SplitCoord2`'s new `unk0` field (a genuine reload, not dead
    code), call the still-raw sibling `StageMap__ComputeChunkLoadEntry` (7 args, 2 on the
    stack) to fill one slot of a 7-entry `ChunkLoadEntry` stack buffer,
    increment `count`.
@@ -368,7 +368,7 @@ If `arg3 == 0`, does nothing at all (whole body skipped). Otherwise:
    `StageMap__ApplyChunkLoads` (this unit, also stalled this round).
 
 New header additions (all committed, additive; unchanged from the previous
-draft of this report): `Elem::unk2` (u16 @+0x002), `Unk14Obj::unk0` (s32
+draft of this report): `Elem::unk2` (u16 @+0x002), `SplitCoord2::unk0` (s32
 @+0x000), `ChunkSlotSpec` (new: `u8 key`@0, `u8 flag`@1, size 2),
 `extern Unk54Struct sNeighbourOffsets[]` (reuses the existing 3-`s32`-word shape),
 `extern void StageMap__ComputeChunkLoadEntry(...)` (7-arg prototype, established from this
@@ -464,7 +464,7 @@ void StageMap__LoadChunksAround(Obj866E8 *self, s32 val, Unk54Struct *arg2, Chun
     s32 i;
     Elem *e;
     Elem *e2;
-    Unk14Obj *u14;
+    SplitCoord2 *u14;
     Unk54Struct *tbl;
     ChunkLoadEntry stackBuf[7];
 
@@ -681,7 +681,7 @@ void StageMap__LoadChunksAround(Obj866E8 *self, s32 val, Unk54Struct *arg2, Chun
     s32 i;
     Elem *e;
     Elem *e2;
-    Unk14Obj *u14;
+    SplitCoord2 *u14;
     Unk54Struct *tbl;
     ChunkLoadEntry stackBuf[7];
 
@@ -761,3 +761,11 @@ earlier sections' history prose in this and sibling reports (known, pending
 an operator decision; not hand-reverted).
 
 This function: `StageMap__BuildRateEntries` -> `StageMap__LoadChunksAround` (`python3 tools/rename.py StageMap__BuildRateEntries StageMap__LoadChunksAround`, tier B): assigns every slot its neighbour key; each slot marked `load` moves its cellParent to centre + `sNeighbourOffsets[key]` and gets a ChunkLoadEntry; then applyChunkLoads.
+
+## Round 94 (track 6, charlie)
+
+`Unk14Obj` is `SplitCoord2` (include/class_3bb8c.h): the slot's
+cellParent->coord2, a GsCOORDINATE2 with tx/tz as word-or-halfword unions.
+Its fields are named for the GsCOORDINATE2 words they overlay: `unk18` ->
+`tx` (coord.t[0]), `unk1C` -> `ty`, `unk20` -> `tz`; `unk0` (flg) had no
+accessor through this view and is padding. Zero bytes changed.
