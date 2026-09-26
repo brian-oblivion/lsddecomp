@@ -177,7 +177,6 @@ gStartupBMemPMgr
 gStyleClearColor
 gStyleConfigIndex
 gStyleCueRecordIndex
-gStyleCueSelf
 gStyleCueSlots
 gStyleDay
 gStyleDecorColor
@@ -189,6 +188,7 @@ gStyleDecorPosBX
 gStyleDecorPosBY
 gStyleDecorVariant
 gStyleEffectSlotCount
+gStyleGrid
 gStyleStage
 gStyleTargetObj
 gStyleTickCount

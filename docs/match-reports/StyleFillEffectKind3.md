@@ -12,7 +12,7 @@ exit=2`, no compile-error grep hits, **79/81, `insertions 0 / deletions 0`
 **The shared `t` was a workaround for the real residue, and the real residue
 was aliasing, not registers.** Round 61 established (correctly) that the
 78/81 body's problem was one instruction: the `*q = gStyleSpawnRotations` store has to
-come AFTER the `lw a2, gStyleCueSelf` so it lands in the `jal` delay slot, and
+come AFTER the `lw a2, gStyleGrid` so it lands in the `jal` delay slot, and
 that a plain `u8 **q` store is an opaque `(mem (reg))` the scheduler will not
 move a global load across. Round 61 then forced the order by hoisting the
 load into a variable by hand, which cost a register colour somewhere else.
@@ -28,7 +28,7 @@ PtrBoxK3 *q;
 ...
 q = (PtrBoxK3 *) &gStyleSpawnRotation;
 q->p = gStyleSpawnRotations;
-*arg0 = New_Class876FC((void *) 3, (u8 *) q - 0xC, (void *) gStyleCueSelf, arg1);
+*arg0 = New_Class876FC((void *) 3, (u8 *) q - 0xC, (void *) gStyleGrid, arg1);
 ```
 
 No `t` at all, and the else value goes back to being an anonymous
@@ -109,7 +109,7 @@ build (`./build-and-verify.sh`, then `tools/funcdiff.py`).
 | 3 | **+ inline the `rand() % 3` instead of an `idx` local** | **66/81** |
 | 4 | + `u8 **q = &gStyleSpawnRotation;` for the tail store/arg pair | **71/81** |
 | 5 | + signature `void **StyleFillEffectKind3(void **arg0, void *arg1)` with `*arg0 = ...; arg0++; return arg0;` | **78/81** |
-| 6 | + ONE shared local `t` holding the else branch's computed value AND the hoisted `gStyleCueSelf` read (found by the permuter) | **79/81, ins 0 / del 0** |
+| 6 | + ONE shared local `t` holding the else branch's computed value AND the hoisted `gStyleGrid` read (found by the permuter) | **79/81, ins 0 / del 0** |
 
 Note step 2 on its own is the change round 47 recorded as a FAILURE ("16/81
 with 106238 bytes of drift -- reverted"). It is not a failure; it is
@@ -156,7 +156,7 @@ the answer was forty lines up in the same file.
 ```
 
 Nothing else differs. `t`'s pseudo has two disjoint live ranges (the else
-branch's value, then `gStyleCueSelf`), gcc 2.6.3 does no live-range splitting, so
+branch's value, then `gStyleGrid`), gcc 2.6.3 does no live-range splitting, so
 one hard register serves both -- and it picks `$a2`, the third-argument
 register the second use needs, where retail uses `$v1` and loads `$a2`
 directly at the second use. Both spellings are the same instruction COUNT;
@@ -166,7 +166,7 @@ by project rule.**
 Five further spellings were tried against it, all 79/81 and all
 byte-identical, so the colour is invariant rather than merely unimproved:
 `t` typed `s32` vs `void *`; the else value written as
-`(s32) &gStyleKind3Colors[n*3]` vs `(s32) (gStyleKind3Colors + n*3)`; `t = gStyleCueSelf`
+`(s32) &gStyleKind3Colors[n*3]` vs `(s32) (gStyleKind3Colors + n*3)`; `t = gStyleGrid`
 before vs after `q = &gStyleSpawnRotation`; `t` declared first vs last. Reusing the
 `s32 *p` pointer for all three roles instead of adding `t` regresses to
 73/81.
@@ -178,8 +178,8 @@ Three words differ, and they are one instruction moved:
 ```
 retail                              built
 458e8  addiu v0,v0,%lo(gStyleSpawnRotations)  458e8  addiu v0,v0,%lo(gStyleSpawnRotations)
-458ec  lw    a2,%gp_rel(gStyleCueSelf) 458ec  sw    v0,0(v1)          <-- here
-458f0  move  a3,s1                  458f0  lw    a2,%gp_rel(gStyleCueSelf)
+458ec  lw    a2,%gp_rel(gStyleGrid) 458ec  sw    v0,0(v1)          <-- here
+458f0  move  a3,s1                  458f0  lw    a2,%gp_rel(gStyleGrid)
 458f4  jal   New_Class876FC          458f4  jal   New_Class876FC
 458f8   sw   v0,0(v1)   (delay)     458f8   move a3,s1   (delay)
 ```
@@ -191,7 +191,7 @@ delay slot.
 **The mechanism is a scheduler memory dependence, and it is MEASURED, not
 reasoned.** A store through a pointer variable is `(mem (reg))` -- an opaque
 address gcc 2.6.3's `sched_analyze` will not disambiguate -- so the
-gp-relative load of `gStyleCueSelf` cannot hoist across it and the store cannot
+gp-relative load of `gStyleGrid` cannot hoist across it and the store cannot
 sink below it. Two independent experiments prove it is this and nothing else:
 
 - Write the store as a plain global (`gStyleSpawnRotation = gStyleSpawnRotations;`, a
@@ -199,7 +199,7 @@ sink below it. Two independent experiments prove it is this and nothing else:
   immediately** -- but the `q` pointer then folds away and the address
   argument regresses to `lui a1; addiu a1,%lo(gStyleSpawnOffsetX)` (73/81).
 - Keep the pointer store and hoist the load by hand instead
-  (`t = gStyleCueSelf;` as a local placed BEFORE the store): the ordering becomes
+  (`t = gStyleGrid;` as a local placed BEFORE the store): the ordering becomes
   **byte-for-byte retail's**, delay slot included, with *zero* structural
   difference -- see the variant below.
 
@@ -214,7 +214,7 @@ as a limit.
 
 ```c
     q = &gStyleSpawnRotation;
-    t = gStyleCueSelf;                                    /* s32 t; */
+    t = gStyleGrid;                                    /* s32 t; */
     *q = gStyleSpawnRotations;
     *arg0 = New_Class876FC((void *) 3, (u8 *) q - 0xC, (void *) t, arg1);
 ```
@@ -241,7 +241,7 @@ it forward as the residue.
 Axes varied against it, all 75/81, all identical output (so the colour is
 invariant to every one of them, not merely unimproved):
 
-- statement order over `{q = &gStyleSpawnRotation, t = gStyleCueSelf, val = gStyleSpawnRotations}` --
+- statement order over `{q = &gStyleSpawnRotation, t = gStyleGrid, val = gStyleSpawnRotations}` --
   every order that keeps the load before the store;
 - declaration order of `q`, `t`, `val`;
 - naming the stored value in a local vs leaving it anonymous;
@@ -309,7 +309,7 @@ reorderings and left only register-field differences.
 
 **Translated in-tree and it is a real improvement: 78/81 -> 79/81, and
 `insertions 2 / deletions 2` -> `insertions 0 / deletions 0`.** The candidate
-was my own `t`-hoist (a local holding `gStyleCueSelf`, placed before the store,
+was my own `t`-hoist (a local holding `gStyleGrid`, placed before the store,
 which is what lets the load hoist past the opaque pointer store) plus **one
 twist I had not tried: the SAME local also holds the else branch's computed
 value.** That single shared pseudo is worth 4 words -- splitting it into two
@@ -332,7 +332,7 @@ extern s32 gStyleDecorVariant;
 extern s32 gStyleDecorColors;
 extern u8 gStyleDecorColorsB[];
 extern u8 gStyleSpawnOffsetX[];
-extern s32 gStyleCueSelf;
+extern s32 gStyleGrid;
 extern s32 D_80087330;
 extern void SetupStyleSpawnParamsA(void *arg0, void *arg1);
 extern s32 gStyleSpawnColors[];
@@ -366,7 +366,7 @@ void **StyleFillEffectKind3(void **arg0, void *arg1) {
         t = (s32) (gStyleKind3Colors + ((u32) rand() % 3) * 3);
         gStyleSpawnColors[0] = t;
     }
-    t = gStyleCueSelf;
+    t = gStyleGrid;
     q = &gStyleSpawnRotation;
     *q = gStyleSpawnRotations;
     *arg0 = New_Class876FC((void *) 3, (u8 *) q - 0xC, (void *) t, arg1);
@@ -407,7 +407,7 @@ not a refutation** -- read the diff before reverting.
 
 **3. Reusing ONE local across two disjoint live ranges can be the source
 shape.** Here a single `s32 t` holds the else branch's computed value and then
-the `gStyleCueSelf` read; two separate variables cost 4 words. gcc 2.6.3 does no
+the `gStyleGrid` read; two separate variables cost 4 words. gcc 2.6.3 does no
 live-range splitting, so a shared variable is a shared hard register, and that
 is an allocation decision the source controls directly. This is the axis my
 own hand sweep did not have -- I varied statement order, declaration order,
@@ -438,4 +438,4 @@ as `StyleFillEffectKind0`/`1`/`2`.
 
 ## Track 4 (2026-09-26, round 88, charlie)
 
-`gStyleEffectSlots` holds Class876FC objects (New_Class876FC), so the walking pointer is `Class876FC **` and the position `LongVec3 *`; `kind` is passed as a plain `s32` (was `(void *) N`), the params block as `(Class876FCParams *)` over the separately-declared gStyleSpawnOffsetX.. symbols (one 0x24-byte Class876FCParams in the bytes; left as they are, a track 4b job), and gStyleCueSelf as the `SceneNode *` parent. Image byte-identical.
+`gStyleEffectSlots` holds Class876FC objects (New_Class876FC), so the walking pointer is `Class876FC **` and the position `LongVec3 *`; `kind` is passed as a plain `s32` (was `(void *) N`), the params block as `(Class876FCParams *)` over the separately-declared gStyleSpawnOffsetX.. symbols (one 0x24-byte Class876FCParams in the bytes; left as they are, a track 4b job), and gStyleGrid as the `SceneNode *` parent. Image byte-identical.

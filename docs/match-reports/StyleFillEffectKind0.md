@@ -26,7 +26,7 @@ void **StyleFillEffectKind0(void **arg0, s32 arg1, void *arg2) {
     ...
     for (i = 0; i < arg1; i++) {
         fp(arg2, (void *) t3);
-        *arg0 = New_Class876FC((void *) 0, &gStyleSpawnOffsetX, (void *) gStyleCueSelf, arg2);
+        *arg0 = New_Class876FC((void *) 0, &gStyleSpawnOffsetX, (void *) gStyleGrid, arg2);
         arg0++;
     }
     return arg0;
@@ -153,7 +153,7 @@ void *StyleFillEffectKind0(void *arg0, s32 arg1, void *arg2) {
     }
     for (i = 0; i < arg1; i++) {
         fp(arg2, (void *) t3);
-        *arr = New_Class876FC((void *) 0, gStyleSpawnOffsetX, (void *) gStyleCueSelf, arg2);
+        *arr = New_Class876FC((void *) 0, gStyleSpawnOffsetX, (void *) gStyleGrid, arg2);
         arr++;
     }
     return (void *) arr;
@@ -244,4 +244,4 @@ iteration via a `gStyleDay % 7` test. STALL, 93/99, whole-function
 
 ## Track 4 (2026-09-26, round 88, charlie)
 
-`gStyleEffectSlots` holds Class876FC objects (New_Class876FC), so the walking pointer is `Class876FC **` and the position `LongVec3 *`; `kind` is passed as a plain `s32` (was `(void *) N`), the params block as `(Class876FCParams *)` over the separately-declared gStyleSpawnOffsetX.. symbols (one 0x24-byte Class876FCParams in the bytes; left as they are, a track 4b job), and gStyleCueSelf as the `SceneNode *` parent. Image byte-identical.
+`gStyleEffectSlots` holds Class876FC objects (New_Class876FC), so the walking pointer is `Class876FC **` and the position `LongVec3 *`; `kind` is passed as a plain `s32` (was `(void *) N`), the params block as `(Class876FCParams *)` over the separately-declared gStyleSpawnOffsetX.. symbols (one 0x24-byte Class876FCParams in the bytes; left as they are, a track 4b job), and gStyleGrid as the `SceneNode *` parent. Image byte-identical.

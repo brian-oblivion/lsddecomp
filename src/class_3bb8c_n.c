@@ -7,7 +7,7 @@
  * globals its functions set up or gate on, renamed via `tools/rename.py`,
  * tree-wide.  The evidence for the `Style` prefix: this unit's global-state
  * cluster (`gStyleStage`/`gStyleDay`/`gStyleTargetObj`/`gStyleVariant`/
- * `gStyleDecorObj`/`gStyleCueSelf`/`gStyleTickCount`, formerly
+ * `gStyleDecorObj`/`gStyleGrid`/`gStyleTickCount`, formerly
  * `D_8008AC6C`/`74`/`7C`/`80`/`94`, `D_8008AB4C`/`70`) is the SAME cluster
  * `class_3bb8c_m.c`'s already-confirmed "Style" subsystem sets
  * (`RegisterStyleConfig`/`ApplyStyleConfig`/`FillStyleFromConfig`/
@@ -384,7 +384,7 @@ struct StyleCueSlot {
 
 extern s32 FlushStyleCue(StyleCueSlot *arg0);
 
-extern s32 gStyleCueSelf;
+extern s32 gStyleGrid;
 extern StyleCueSlot *gStyleCueSlots[2];
 
 void StyleTeardown(void) {
@@ -396,8 +396,8 @@ void StyleTeardown(void) {
     for (i = 0; i < 2; i++) {
         gStyleCueSlots[i] = (StyleCueSlot *)FlushStyleCue(gStyleCueSlots[i]);
     }
-    if (gStyleCueSelf != 0) {
-        gStyleCueSelf = 0;
+    if (gStyleGrid != 0) {
+        gStyleGrid = 0;
     }
 }
 
@@ -431,8 +431,7 @@ Class876FC **StyleFillEffectKind0(Class876FC **arg0, s32 arg1, LongVec3 *arg2) {
     }
     for (i = 0; i < arg1; i++) {
         fp(arg2, (void *)t3);
-        *arg0 = New_Class876FC(0, (Class876FCParams *)&gStyleSpawnOffsetX,
-                               (SceneNode *)gStyleCueSelf, arg2);
+        *arg0 = New_Class876FC(0, (Class876FCParams *)&gStyleSpawnOffsetX, (SceneNode *)gStyleGrid, arg2);
         arg0++;
     }
     return arg0;
@@ -449,8 +448,7 @@ Class876FC **StyleFillEffectKind1(Class876FC **arg0, s32 arg1, LongVec3 *arg2) {
     gStyleSpawnScale = gStyleKind1Scale;
     for (i = 0; i < arg1; i++) {
         SetupStyleSpawnParamsA(arg2, (void *)val);
-        *arg0 = New_Class876FC(1, (Class876FCParams *)&gStyleSpawnOffsetX,
-                               (SceneNode *)gStyleCueSelf, arg2);
+        *arg0 = New_Class876FC(1, (Class876FCParams *)&gStyleSpawnOffsetX, (SceneNode *)gStyleGrid, arg2);
         arg0++;
     }
     return arg0;
@@ -469,7 +467,7 @@ extern u8 gStyleKind3Colors[];
  * a plain `u8 **`.  Load-bearing: a store through a plain pointer is an
  * opaque (mem (reg)) that gcc 2.6.3's scheduler will not move a later
  * global load above; an in-struct store through a varying address does not
- * conflict with a scalar at a fixed address, so the gStyleCueSelf load
+ * conflict with a scalar at a fixed address, so the gStyleGrid load
  * schedules above it and the store lands in the jal delay slot, as retail.
  * Round 76; see docs/match-reports/StyleFillEffectKind3.md. */
 typedef struct PtrBoxK3 {
@@ -502,7 +500,7 @@ Class876FC **StyleFillEffectKind3(Class876FC **arg0, LongVec3 *arg1) {
     }
     q = (PtrBoxK3 *)&gStyleSpawnRotation;
     q->p = gStyleSpawnRotations;
-    *arg0 = New_Class876FC(3, (Class876FCParams *)((u8 *)q - 0xC), (SceneNode *)gStyleCueSelf, arg1);
+    *arg0 = New_Class876FC(3, (Class876FCParams *)((u8 *)q - 0xC), (SceneNode *)gStyleGrid, arg1);
     arg0++;
     return arg0;
 }
@@ -549,7 +547,7 @@ Class876FC **StyleFillEffectKind2(Class876FC **arg0, LongVec3 *arg1) {
     q = &gStyleSpawnRotation;
     *q = gStyleSpawnRotations;
     gStyleSpawnTableIndex = rand() % 6;
-    *arg0 = New_Class876FC(2, (Class876FCParams *)((u8 *)q - 0xC), (SceneNode *)gStyleCueSelf, arg1);
+    *arg0 = New_Class876FC(2, (Class876FCParams *)((u8 *)q - 0xC), (SceneNode *)gStyleGrid, arg1);
     arg0++;
     return arg0;
 }
@@ -656,7 +654,7 @@ extern u8 gStyleCueRecordCounts[];
 extern u8 gStyleCueOffsets[];
 extern s32 gStyleCueDistanceTable[];
 
-/* Local view only: `gStyleCueSelf`'s value is another "pointer stored as a
+/* Local view only: `gStyleGrid`'s value is another "pointer stored as a
  * plain s32" (same idiom as `gStyleTargetObj`), here treated as a "self" object
  * with a method table at offset 0, dispatched through slot +0x0E8. Moved
  * ahead of its original spot (just before TickStyle) because
@@ -731,7 +729,7 @@ void *FindNearestStyleCueEntry(void *arg0, s32 *arg1, void *arg2) {
         if (entry->count > 0) {
             buf.pos = entry->pos;
             buf.tab = *(TabEntry *)(gStyleCueOffsets + entry->idx * 6);
-            self = (void *)gStyleCueSelf;
+            self = (void *)gStyleGrid;
             ((ObjAB4C *)self)->methods->slotE8((ObjAB4C *)self, arg0, &buf);
             d1 = *(s32 *)arg0 - *(s32 *)arg2;
             if (d1 < 0) {
@@ -818,7 +816,7 @@ s32 TickStyle(void *arg0, void *arg1, s32 arg2) {
     ctx = 0;
     if (arg0 != 0) {
         ctx = buf;
-        ((ObjAB4C *)gStyleCueSelf)->methods->slotE8((ObjAB4C *)gStyleCueSelf, ctx, arg0);
+        ((ObjAB4C *)gStyleGrid)->methods->slotE8((ObjAB4C *)gStyleGrid, ctx, arg0);
     }
     if (gStyleTickCount++ == 0) {
         ApplyStyleDecorationIfSet();

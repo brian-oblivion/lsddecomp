@@ -204,7 +204,7 @@ ObjMMethods *GetObjMMethods(void) {
 
 struct StyleM;
 
-extern s32 gStyleCueSelf;
+extern s32 gStyleGrid;
 extern s32 gStyleStage;
 extern s32 gStyleTickCount;
 extern s32 gStyleDay;
@@ -219,10 +219,10 @@ s32 RegisterStyleConfig(s32 a0, s32 a1, s32 a2, s32 a3, s32 arg4) {
     s32 *p;
     s32 i;
 
-    if (gStyleCueSelf == 0) {
+    if (gStyleGrid == 0) {
         i = 1;
         p = &D_8008ACA0;
-        gStyleCueSelf = a0;
+        gStyleGrid = a0;
         gStyleStage = a1;
         gStyleTargetObj = a2;
         gStyleVariant = -1;

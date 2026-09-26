@@ -79,7 +79,7 @@ void *FindNearestStyleCueEntry(void *arg0, s32 *arg1, void *arg2) {
         if (entry->count > 0) {
             buf.pos = entry->pos;
             buf.tab = *(TabEntry *) (gStyleCueOffsets + entry->idx * 6);
-            self = (void *) gStyleCueSelf;
+            self = (void *) gStyleGrid;
             ((ObjAB4C *) self)->methods->slotE8((ObjAB4C *) self, arg0, &buf);
             d1 = *(s32 *) arg0 - *(s32 *) arg2;
             if (d1 < 0) {
@@ -104,7 +104,7 @@ fail:
 
 Needs (already present earlier in the unit, in strict ROM order): the
 `ObjAB4C`/`ObjAB4CMethods`/`Pos4`/`TabEntry`/`EntrySlot`/`LocalBuf` types and
-`extern s32 gStyleStage, gStyleCueRecordIndex, gStyleCueSelf, gStyleCueDistanceTable[];`,
+`extern s32 gStyleStage, gStyleCueRecordIndex, gStyleGrid, gStyleCueDistanceTable[];`,
 `extern u8 *gStyleCueRecordLists[], gStyleCueRecordCounts[], gStyleCueOffsets[];` (all already
 declared in `src/class_3bb8c_n.c` ahead of this function).
 
@@ -211,7 +211,7 @@ void *FindNearestStyleCueEntry(void *arg0, s32 *arg1, void *arg2) {
         if (entry->count > 0) {
             buf.pos = entry->pos;
             buf.tab = *(TabEntry *) (gStyleCueOffsets + entry->idx * 6);
-            self = (void *) gStyleCueSelf;
+            self = (void *) gStyleGrid;
             ((ObjAB4C *) self)->methods->slotE8((ObjAB4C *) self, arg0, &buf);
             d1 = *(s32 *) arg0 - *(s32 *) arg2;
             if (d1 < 0) {
@@ -244,7 +244,7 @@ Notes on the recovery:
   `lwl 3(s1)/lwr 0(s1)` + `swl 0x13(sp)/swr 0x10(sp)` sequences.
 - **The `ObjAB4C`/`ObjAB4CMethods` local view (self-dispatch through method
   slot `+0xE8`) is the SAME idiom `TickStyle` establishes** for
-  `gStyleCueSelf` -- moved that typedef earlier in the unit (it originally sat
+  `gStyleGrid` -- moved that typedef earlier in the unit (it originally sat
   just before `TickStyle`, which is ROM-later) since this function,
   ROM-earlier, also needs it. No behavioural change, pure reordering of a
   type declaration.
