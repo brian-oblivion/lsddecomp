@@ -10,7 +10,7 @@
 Walks `item->unk10[]` (an array of `EntryChildObj *`, `0x668` bytes /
 `0x19A` elements from the base pointer read at `item->unk10`), calling
 `callback(self, element)` for each. Prototype came from a previous round
-(traced through `StageMap__ApplyRateToChild`/`StageMap__ResetChildRate` two hops via
+(traced through `StageMap__AddScaleStepToCell`/`StageMap__ResetChildRate` two hops via
 `StageMap__ForEachElem`); this round supplied the body.
 
 ## RESOLUTION — mention the field twice, bound first

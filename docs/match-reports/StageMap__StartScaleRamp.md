@@ -177,7 +177,7 @@ byte-exact first half, and useful for whoever picks this back up.
   same table by the same stride, but is left independently declared —
   nothing in this unit reaches it through the `EntryDesc866E8` type.
 - **`Obj866E8::unk1E4` retyped** from `void *` to `EntryDesc866E8 *`.
-  Only reference elsewhere in this unit is `StageMap__ApplyRateToChild`, which
+  Only reference elsewhere in this unit is `StageMap__AddScaleStepToCell`, which
   forwards it opaquely to a `void *` parameter (`EntryChildObjMethods::
   slot48`'s `arg2`) — implicit pointer-to-`void *` conversion, so this
   does not disturb that already-matched function's bytes. Flagging per

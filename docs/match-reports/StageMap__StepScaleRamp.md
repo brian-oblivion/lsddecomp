@@ -20,8 +20,8 @@ sw    $ra, 0x14($sp)
 lw    $v0, 0x1E0($s0)        ; v0 = self->unk1E0
 blez  $v0, .skip
  nop
-lui   $a1, %hi(StageMap__ApplyRateToChild)
-addiu $a1, $a1, %lo(StageMap__ApplyRateToChild)
+lui   $a1, %hi(StageMap__AddScaleStepToCell)
+addiu $a1, $a1, %lo(StageMap__AddScaleStepToCell)
 jal   StageMap__ForEachElem
  move $a2, $zero
 lw    $v0, 0x1E0($s0)         ; reload
@@ -45,7 +45,7 @@ new value unconditionally, and the branch-not-taken path (decrement hit
 ```c
 void StageMap__StepScaleRamp(Obj866E8 *self) {
     if (self->unk1E0 > 0) {
-        StageMap__ForEachElem(self, StageMap__ApplyRateToChild, 0);
+        StageMap__ForEachElem(self, StageMap__AddScaleStepToCell, 0);
         self->unk1E0 -= 1;
         if (self->unk1E0 == 0) {
             self->unk1E0 = -1;
@@ -54,7 +54,7 @@ void StageMap__StepScaleRamp(Obj866E8 *self) {
 }
 ```
 
-`StageMap__ApplyRateToChild` is defined later in this file (ROM order), so it needs a
+`StageMap__AddScaleStepToCell` is defined later in this file (ROM order), so it needs a
 forward declaration here — same pattern already used for
 `StageMap__ResetChildRate` in `StageMap__EndScaleRamp`.
 

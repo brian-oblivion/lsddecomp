@@ -4,7 +4,7 @@
 
 > Renamed from `func_8004D108` on 2026-09-24 (tools/rename.py). Address 0x8004d108.
 
-Sibling of `StageMap__ApplyRateToChild` (see that report for how the true call chain —
+Sibling of `StageMap__AddScaleStepToCell` (see that report for how the true call chain —
 `StageMap__ForEachElem` forwards to `StageMap__ForEachEntryChild`, which does the actual
 `jalr` — was resolved). Same `Unk10ChildMethods_3bb8c_b::slot48` slot,
 different literal arguments.
@@ -27,10 +27,10 @@ jalr  $v0
 Notable: the original first parameter (`self`) is never referenced after
 the top-of-function register shuffle overwrites `a0` with `item` — this
 function genuinely ignores its own `self` argument, unlike its sibling
-`StageMap__ApplyRateToChild` which uses it (`self->unk1E4`). Confirmed real, not a
+`StageMap__AddScaleStepToCell` which uses it (`self->unk1E4`). Confirmed real, not a
 missing-parameter bug, by cross-checking the only caller
 (`StageMap__EndScaleRamp`, which passes this function's address to
-`StageMap__ForEachElem` exactly like `StageMap__StepScaleRamp` passes `StageMap__ApplyRateToChild`'s —
+`StageMap__ForEachElem` exactly like `StageMap__StepScaleRamp` passes `StageMap__AddScaleStepToCell`'s —
 same call shape, same two-parameter signature required by the eventual
 `StageMap__ForEachEntryChild` dispatcher).
 
@@ -53,11 +53,11 @@ void StageMap__ResetChildRate(Obj866E8 *self, Unk10ChildObj_3bb8c_b *item) {
 
 ### Proposed learning
 
-None new beyond `StageMap__ApplyRateToChild`'s (same call-chain-tracing lesson).
+None new beyond `StageMap__AddScaleStepToCell`'s (same call-chain-tracing lesson).
 
 ## Naming
 
 **Tier B.** Not a vtable slot -- the `StageMap__EndScaleRamp` callback
-sibling of `StageMap__ApplyRateToChild`. Body: `item->methods->slot48(
+sibling of `StageMap__AddScaleStepToCell`. Body: `item->methods->slot48(
 item, 1, &D_800869CC)`, the constant "off" entry rather than the parent's
 own `rateEntry`. Named to read as the inverse of `ApplyRateToChild`.

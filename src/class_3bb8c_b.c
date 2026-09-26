@@ -403,7 +403,7 @@ merge:
 
 void StageMap__StepScaleRamp(StageMap *self) {
     if (self->rateCountdown > 0) {
-        StageMap__ForEachElem(self, StageMap__ApplyRateToChild, 0);
+        StageMap__ForEachElem(self, StageMap__AddScaleStepToCell, 0);
         self->rateCountdown -= 1;
         if (self->rateCountdown == 0) {
             self->rateCountdown = -1;
@@ -418,7 +418,7 @@ void StageMap__EndScaleRamp(StageMap *self) {
     }
 }
 
-void StageMap__ApplyRateToChild(StageMap *self, GridCell *item) {
+void StageMap__AddScaleStepToCell(StageMap *self, GridCell *item) {
     item->methods->updateScale(item, 0, self->scaleStep);
 }
 
