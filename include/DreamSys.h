@@ -298,7 +298,7 @@ typedef struct DreamSysUnk11CResult {
 	DreamSysUnk11CInner *unk_0x4;
 } DreamSysUnk11CResult;
 
-/* Object pointed to by DreamSys::unk_0x4C, used by DreamSys__UnlinkLinkMgr (slot
+/* Object pointed to by DreamSys::unk_0x4C, used by DreamSys__DetachFromParent (slot
    +0xF0) and DreamSys__TryInstantTeleportLink (slot +0xE8, this round): same "vtable pointer
    at offset 0" shape as the other opaque views here. Unidentified class. */
 typedef struct DreamSysUnk4CMethods {
@@ -581,7 +581,7 @@ typedef struct DreamSys {
 	s8 unknown_values_0x4A[2];
 	/* Pointer to an unidentified object (own vtable at offset 0, slot
 	   +0xF0 called with itself as the sole argument). Used by
-	   DreamSys__UnlinkLinkMgr (round 2026-08-30-b); see DreamSysUnk4CObj above. */
+	   DreamSys__DetachFromParent (round 2026-08-30-b); see DreamSysUnk4CObj above. */
 	DreamSysUnk4CObj *linkMgr;
 	s8 unknown_values_0x50[4];
 	/* Written by this unit's own Actor__SetPendingExtra (its own +0x0EC slot), a
@@ -838,7 +838,7 @@ struct vtable_DreamSys{
 	void (*slot10)(DreamSys *this, void *arg);
 	/* Resolved via tools/classtable.py DREAMSYS_METHODS (+0x014); shared
 	   with Class65650's inherited slot14 (code_55dd4.h: "'unlink' companion
-	   of slot10"). Called by DreamSys__UnlinkLinkMgr as (this, this->unk_0x4C)
+	   of slot10"). Called by DreamSys__DetachFromParent as (this, this->unk_0x4C)
 	   (round 2026-08-30-b). Still INCLUDE_ASM; address 0x80057130 is
 	   outside this unit/runner's range. */
 	void (*Actor__RemoveChild)(DreamSys *this, DreamSysUnk4CObj *arg1);

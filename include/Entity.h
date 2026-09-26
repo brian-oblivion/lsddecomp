@@ -151,7 +151,7 @@ struct Unk94Methods {
     u8 pad000[0x44];
     void (*slot44)(Unk94Obj *self, s32 arg1, void *arg2);  /* updateRotation: Entity__MoodCue49 (Entity_d) */
     u8 pad048[0x94 - 0x48];
-    void (*slot94)(Unk94Obj *self, s32 arg1, s32 arg2);    /* DreamSys__ApplyLinkCommand: Entity__MoodCue123 (Entity_g), as (0, 2) and (0, 7) */
+    void (*slot94)(Unk94Obj *self, s32 arg1, s32 arg2);    /* DreamSys__OnPadEvent: Entity__MoodCue123 (Entity_g), as (0, 2) and (0, 7) */
     u8 pad098[0xB8 - 0x98];
     void (*slotB8)(Unk94Obj *self, void *arg1);            /* setTranslation: Entity__MoodCue49 (Entity_d) */
     u8 pad0BC[0xC4 - 0xBC];

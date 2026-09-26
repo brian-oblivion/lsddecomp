@@ -128,7 +128,7 @@ void DreamSys__SpawnAtLink(DreamSys *this, DreamSysSpawnArgObj *arg1)
 	}
 }
 
-void DreamSys__UnlinkLinkMgr(DreamSys *this)
+void DreamSys__DetachFromParent(DreamSys *this)
 {
 	this->linkMgr->methods->slot0xF0(this->linkMgr);
 	this->vt->Actor__RemoveChild(this, this->linkMgr);
@@ -169,7 +169,7 @@ neg2_mismatch:
 	this->vt->DreamSys__RestoreLinkSnapshot(this);
 }
 
-void DreamSys__ApplyLinkCommand(DreamSys *this, s32 arg1, s32 mode)
+void DreamSys__OnPadEvent(DreamSys *this, s32 arg1, s32 mode)
 {
 	if (this->moveOverride != 0)
 		return;
