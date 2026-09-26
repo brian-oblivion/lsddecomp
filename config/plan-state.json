@@ -2,7 +2,7 @@
   "models": {
     "match_runner": null,
     "naming_runner": "sonnet",
-    "polish_runner": "sonnet"
+    "polish_runner": "opus"
   },
   "stop_rule": {
     "attempts_per_model": 6,
