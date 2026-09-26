@@ -318,8 +318,9 @@ view again, and `plan.py classes` lists any that appears as a STRAY VIEW.
 unit that sees the class, so `plan.py` gives each ready class a measured
 FOOTPRINT (units naming its table, getter, own methods or view types, plus
 every unit including a header that does) and lists every ready class, most
-classes below it first; one whose footprint shares a unit or call-graph
-contention with a class above it is DEFERRED (revision 23: revision 20's
+classes below it first; one whose footprint shares a unit with a class
+above it is DEFERRED (a class renames only what its footprint holds, so the
+call-graph test applies to other jobs only; revision 23: revision 20's
 strict sequence, one runner at a time, was that test unmeasured). Tell each
 runner the others' classes and to post before editing outside its footprint.
 Prompt §4.6. Head
