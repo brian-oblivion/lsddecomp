@@ -84,3 +84,33 @@ Round 78 (track 3, naming pass, bravo).
 | symbol | name | tier | evidence |
 | --- | --- | --- | --- |
 | `func_8004C0AC` | `StageMap__ClearSlotCells` | B | Occupant of `gStageMapMethods` +0x108 (`slot108`), called by `class_3ac78`'s own `StageMap__UnloadAllSlots` (already matched) once per element. Walks `entry->unk10` over exactly `0x668` bytes -- the SAME 0x668-byte figure `class_3ac78`'s own unit header names as "a 0x668-byte heap block holding that element's grid of CELL objects" -- clearing a flag bit and two fields on every cell. "Reset...Cells" names this directly against that established vocabulary. |
+
+## Track 6 (2026-09-26, round 93, alpha)
+
+The class `Class866E8` (table `gClass866E8Methods`, id 0x114, LightRig's
+subclass) is now `StageMap` (`python3 tools/renametype.py Class866E8
+StageMap`, tier B): it keeps seven slots loaded with map chunks of the
+current stage (LbdFile, `STGnn\Mnnn.LBD`) around a tracked target, the
+centre chunk and its six staggered neighbours (`sChunkNeighbourDeltas`), laid
+out by the stage's `StageGridDimensions` (`setConfig`, from ObjM's
+`GetStageGridDimensions(stage)`), each slot's placements linked into a 20 x
+20 lattice of GridCells whose drawn window follows the target. Tier B: the
+mechanics are established; "the stage's map" rests on the files it loads and
+the per-stage config. Header now `include/StageMap.h`; evidence in its banner.
+
+Member types, same pass: `Unk68Struct` is `StageGridDimensions`
+(include/StageGrid.h), `Unk54Struct` is `LongVec3` (include/SceneNode.h),
+`EntryDesc866E8` is `Ratio16[3]` (include/SceneNode.h), all by layout and
+use; `Class866E8Elem` -> `ChunkSlot`, `QueryPos866E8` -> `SplitLongVec3`,
+`SetupEntry866E8` -> `ChunkLoadEntry`, `SetupSub866E8` ->
+`ChunkLoadEntryTail`, `TargetSpec866E8` -> `ChunkSlotSpec`, `GridSlot866E8`
+-> `CellRect`, `GridSlotList866E8` -> `CellRectSet`, `Bounds866E8_3bb8c_b`
+-> `CellBounds`, `Class866E8ValueFn` -> `ChunkFileFn`,
+`Class866E8OnElementEventFn` -> `StageMapOnSlotEventFn`,
+`Class866E8ElemFn` -> `ChunkSlotFn`, `Class866E8CellFn` -> `StageMapCellFn`;
+new `ChunkNeighbourDelta` for `sChunkNeighbourDeltas` (was typed as the
+3-word placeholder). renametype.py also rewrote the old names inside
+earlier sections' history prose in this and sibling reports (known, pending
+an operator decision; not hand-reverted).
+
+This function: `StageMap__ResetElementCells` -> `StageMap__ClearSlotCells` (`python3 tools/rename.py StageMap__ResetElementCells StageMap__ClearSlotCells`, tier B): when the slot holds a chunk: releases the LbdFile header and clears every cell's model/tmd with GsDOFF set.

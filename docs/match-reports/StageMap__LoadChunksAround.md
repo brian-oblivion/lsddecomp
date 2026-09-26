@@ -731,3 +731,33 @@ Round 78 (track 3, naming pass, bravo).
 | symbol | name | tier | evidence |
 | --- | --- | --- | --- |
 | `func_8004B700` | `StageMap__LoadChunksAround` | B | Occupant of `gStageMapMethods` +0x0F8 (`slotF8`, verified its own identity via classtable -- see the corrected slot comment in `include/class_3bb8c.h`). Iterates a `ChunkSlotSpec[7]` (`sDefaultTargetSpecs` at its one known call site), calling `StageMap__ComputeNeighbourMask` once and `StageMap__ComputeChunkLoadEntry` per enabled entry to fill a 7-slot `ChunkLoadEntry` stack buffer, then dispatches the filled count through `slotFC` (`StageMap__ApplyChunkLoads`). "Build...RateEntries" names the mechanic (assembling the entry array that the next slot applies), consistent with the sibling already-matched functions in this same vtable region (`StageMap__StartScaleRamp`, `StageMap__StepScaleRamp`, `StageMap__EndScaleRamp`). |
+
+## Track 6 (2026-09-26, round 93, alpha)
+
+The class `Class866E8` (table `gClass866E8Methods`, id 0x114, LightRig's
+subclass) is now `StageMap` (`python3 tools/renametype.py Class866E8
+StageMap`, tier B): it keeps seven slots loaded with map chunks of the
+current stage (LbdFile, `STGnn\Mnnn.LBD`) around a tracked target, the
+centre chunk and its six staggered neighbours (`sChunkNeighbourDeltas`), laid
+out by the stage's `StageGridDimensions` (`setConfig`, from ObjM's
+`GetStageGridDimensions(stage)`), each slot's placements linked into a 20 x
+20 lattice of GridCells whose drawn window follows the target. Tier B: the
+mechanics are established; "the stage's map" rests on the files it loads and
+the per-stage config. Header now `include/StageMap.h`; evidence in its banner.
+
+Member types, same pass: `Unk68Struct` is `StageGridDimensions`
+(include/StageGrid.h), `Unk54Struct` is `LongVec3` (include/SceneNode.h),
+`EntryDesc866E8` is `Ratio16[3]` (include/SceneNode.h), all by layout and
+use; `Class866E8Elem` -> `ChunkSlot`, `QueryPos866E8` -> `SplitLongVec3`,
+`SetupEntry866E8` -> `ChunkLoadEntry`, `SetupSub866E8` ->
+`ChunkLoadEntryTail`, `TargetSpec866E8` -> `ChunkSlotSpec`, `GridSlot866E8`
+-> `CellRect`, `GridSlotList866E8` -> `CellRectSet`, `Bounds866E8_3bb8c_b`
+-> `CellBounds`, `Class866E8ValueFn` -> `ChunkFileFn`,
+`Class866E8OnElementEventFn` -> `StageMapOnSlotEventFn`,
+`Class866E8ElemFn` -> `ChunkSlotFn`, `Class866E8CellFn` -> `StageMapCellFn`;
+new `ChunkNeighbourDelta` for `sChunkNeighbourDeltas` (was typed as the
+3-word placeholder). renametype.py also rewrote the old names inside
+earlier sections' history prose in this and sibling reports (known, pending
+an operator decision; not hand-reverted).
+
+This function: `StageMap__BuildRateEntries` -> `StageMap__LoadChunksAround` (`python3 tools/rename.py StageMap__BuildRateEntries StageMap__LoadChunksAround`, tier B): assigns every slot its neighbour key; each slot marked `load` moves its cellParent to centre + `sNeighbourOffsets[key]` and gets a ChunkLoadEntry; then applyChunkLoads.

@@ -261,3 +261,139 @@ cellParent at `buf`), `slot70` is `setLightMode(obj, 1)`, and `unk10` is
 declared `StageMap **` although it holds these same GridCell objects:
 that field, NotifyGridCell's parameter and StageMap__DispatchToRectCells
 are StageMap's own track 4 job (gStageMapMethods) and were left alone.
+
+## Track 6 (2026-09-26, round 93, alpha)
+
+The class `Class866E8` (table `gClass866E8Methods`, id 0x114, LightRig's
+subclass) is now `StageMap` (`python3 tools/renametype.py Class866E8
+StageMap`, tier B): it keeps seven slots loaded with map chunks of the
+current stage (LbdFile, `STGnn\Mnnn.LBD`) around a tracked target, the
+centre chunk and its six staggered neighbours (`sChunkNeighbourDeltas`), laid
+out by the stage's `StageGridDimensions` (`setConfig`, from ObjM's
+`GetStageGridDimensions(stage)`), each slot's placements linked into a 20 x
+20 lattice of GridCells whose drawn window follows the target. Tier B: the
+mechanics are established; "the stage's map" rests on the files it loads and
+the per-stage config. Header now `include/StageMap.h`; evidence in its banner.
+
+Member types, same pass: `Unk68Struct` is `StageGridDimensions`
+(include/StageGrid.h), `Unk54Struct` is `LongVec3` (include/SceneNode.h),
+`EntryDesc866E8` is `Ratio16[3]` (include/SceneNode.h), all by layout and
+use; `Class866E8Elem` -> `ChunkSlot`, `QueryPos866E8` -> `SplitLongVec3`,
+`SetupEntry866E8` -> `ChunkLoadEntry`, `SetupSub866E8` ->
+`ChunkLoadEntryTail`, `TargetSpec866E8` -> `ChunkSlotSpec`, `GridSlot866E8`
+-> `CellRect`, `GridSlotList866E8` -> `CellRectSet`, `Bounds866E8_3bb8c_b`
+-> `CellBounds`, `Class866E8ValueFn` -> `ChunkFileFn`,
+`Class866E8OnElementEventFn` -> `StageMapOnSlotEventFn`,
+`Class866E8ElemFn` -> `ChunkSlotFn`, `Class866E8CellFn` -> `StageMapCellFn`;
+new `ChunkNeighbourDelta` for `sChunkNeighbourDeltas` (was typed as the
+3-word placeholder). renametype.py also rewrote the old names inside
+earlier sections' history prose in this and sibling reports (known, pending
+an operator decision; not hand-reverted).
+
+### History moved from the unit banners
+
+The three units' banners were rewritten as documentation (track 6). What they carried that was history, verbatim:
+
+`src/class_3ac78.c`:
+
+```
+/*
+ * class_3ac78 -- TimedTask's last two functions (TimedTask__PlaySound and
+ * GetTimedTaskMethods, include/TimedTask.h; the rest are in class_39e08),
+ * then the front half of StageMap, the class whose method table is
+ * gStageMapMethods (80 slots, header 0x114; tools/classtable.py gStageMapMethods). It
+ * derives from SceneNode (code_d294) through LightRig (include/LightRig.h,
+ * gLightRigMethods: the three flat lights and the ambient colour), whose ctor
+ * and finalize its own chain to, and the game builds exactly one, at boot, in class_39e08's Class865C8__Class865C8 via New_StageMap(0, 1).
+ *
+ * What it manages is a GRID. The object owns seven elements (elems[7]), each
+ * pairing a loader, a placement list, a parent node, and a 0x668-byte heap
+ * block holding that element's grid of GridCell cells; the constructor seeds every
+ * cell with a world position on a 0x800 lattice. Indexing the grid uses a row
+ * stride of 20 cells -- the same 20 that gDefaultGridSpan >> 11 produces
+ * (0xA000 / 0x800, see StageMap__SetGridSpan) and the same stride
+ * class_3bb8c_b's byte-matched StageMap__SetFootprintCellFlag walks.
+ *
+ * Work reaches the cells through a rectangle list (rects[4]/rectCount): a
+ * notification arrives at StageMap__OnNotify or StageMap__DispatchLinkCommand,
+ * StageMap__ForwardAcceptedCommand filters the sender against acceptedTags,
+ * StageMap__ApplyToSenderFootprint turns the sender's position into one
+ * rectangle, and StageMap__DispatchToRectCells re-notifies every cell in it
+ * and every cell chained behind it. The queries that build those rectangles,
+ * and an element's resource and GPU sides, live in class_3bb8c*. The class is
+ * declared once, in include/StageMap.h (track 4, round 89).
+ *
+ * Every function in the unit is matched C; the last three stalls
+ * (StageMap__UnloadAllSlots, StageMap__SetFootprintRect and
+ * StageMap__DispatchToRectCells) were matched in round 71. func_8004B324 keeps its placeholder name
+ * deliberately -- it is an empty vtable stub with no established purpose, the
+ * same case as SceneNode__NoOpSlot5C in code_d294_b.
+ */
+```
+
+`src/class_3bb8c.c`:
+
+```
+/* First slice of the 365-function class_3bb8c block -- 20 functions,
+ * 0x3BB8C..0x3CD88, all matched C, occupants of `gStageMapMethods` +0x0E4..+0x11C
+ * (`tools/classtable.py 0x800866E8`). The remainder is `class_3bb8c_b` and
+ * is still a monolithic asm segment.
+ *
+ * This slice is StageMap's FOOTPRINT/RATE engine: the position-to-grid-cell
+ * math and the per-element resource/GPU work that `class_3ac78`'s own unit
+ * header (src/class_3ac78.c) describes as living in "class_3bb8c*" --
+ * StageMap__ComputeFootprintDescriptor converts a world position
+ * (SplitLongVec3) into a grid-cell descriptor (Descriptor10, byte row/column
+ * plus sub-cell halfword offsets); StageMap__UpdateFootprintTracking runs
+ * every enabled tick (paired with class_3ac78's StageMap__StepScaleRamp)
+ * to refresh that descriptor and notify on change; StageMap__LoadChunksAround
+ * / StageMap__ComputeNeighbourMask / StageMap__ComputeChunkLoadEntry /
+ * StageMap__ApplyChunkLoads build and apply a per-element rate table from
+ * a ChunkSlotSpec key/flag array (sDefaultTargetSpecs); and
+ * StageMap__PopulateSlotCells / StageMap__ClearSlotCells own an
+ * element's resource-load and GPU-link cell array (the same 0x668-byte grid
+ * class_3ac78 calls out) and its teardown. StageMap__Enable/Disable set
+ * the `enabled` flag class_3ac78 gates all of this on (cross-confirmed
+ * there independently, see docs/match-reports/StageMap__Enable.md).
+ *
+ * The class is declared once, in include/StageMap.h (track 4, round 89);
+ * the element's origin is read through Unk14Obj (include/class_3bb8c.h), a
+ * GsCOORDINATE2 view with halfword reads.
+ *
+ * Carve notes for whoever takes the NEXT slice: this block holds all 13 of
+ * the game's PSX BIOS trampolines (`jr $t2` with the vector in $t2 and the
+ * call number in $t1) and 38 switch jump tables. None of either landed in
+ * THIS slice -- verified, not assumed -- which is why it needs no attached
+ * rodata slot and no `hasm` segment. The next slice will hit both, and both
+ * have to be dispositioned at carve time rather than discovered by a runner
+ * that has already spent its attempt budget. See Gate 2 in
+ * docs/PARALLEL-RUNS.md.
+ */
+```
+
+`src/class_3bb8c_b.c`:
+
+```
+/* Second slice of the 365-function class_3bb8c block, 0x3CD88..0x3DA54 --
+ * the same class as class_3bb8c.c's first slice (StageMap,
+ * gStageMapMethods, declared in include/StageMap.h), split only for
+ * parallel runners, so this unit reuses that unit's header (same convention
+ * as Entity.c/Entity_b.c).
+ *
+ * Functionally this slice is the class's SPATIAL GRID / FOOTPRINT
+ * subsystem: the seven elements (self->slots), each mapped onto up to four
+ * CellRect rectangles (self->rects), and a per-cell bit (bit 31 of a
+ * GridCell cell's `attribute`) that RefreshFootprint clears, recomputes
+ * (via either ComputeFootprintFromRotation or SetFootprintFromQuery, gated
+ * on self->config->isVertical) and sets again through SetFootprintCellFlag. A
+ * second, unrelated mechanism lives at the tail of the unit: a rate/
+ * countdown pair (self->scaleRampTicks/self->scaleStep) that
+ * StepScaleRamp/EndScaleRamp apply to every cell of every element
+ * (their updateScale) via the generic ForEachSlot/ForEachSlotCell
+ * iterators.
+ *
+ * "Footprint" is not this unit's own coinage: class_3ac78 already named the
+ * analogous mechanism there (StageMap__ApplyToSenderFootprint,
+ * SetFootprintRect, SetFootprintFromCell) before this unit's naming pass,
+ * and this unit's names were chosen to agree with that vocabulary. */
+```

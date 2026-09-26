@@ -384,3 +384,33 @@ the current `include/class_3ac78.h`. The mapping, for whoever rebuilds one:
 The `#if 0` copy that lives in `src/class_3ac78.c` WAS updated to the current
 names in the same round, so that one still compiles; only identifiers changed
 and the recorded score is unaffected.
+
+## Track 6 (2026-09-26, round 93, alpha)
+
+The class `Class866E8` (table `gClass866E8Methods`, id 0x114, LightRig's
+subclass) is now `StageMap` (`python3 tools/renametype.py Class866E8
+StageMap`, tier B): it keeps seven slots loaded with map chunks of the
+current stage (LbdFile, `STGnn\Mnnn.LBD`) around a tracked target, the
+centre chunk and its six staggered neighbours (`sChunkNeighbourDeltas`), laid
+out by the stage's `StageGridDimensions` (`setConfig`, from ObjM's
+`GetStageGridDimensions(stage)`), each slot's placements linked into a 20 x
+20 lattice of GridCells whose drawn window follows the target. Tier B: the
+mechanics are established; "the stage's map" rests on the files it loads and
+the per-stage config. Header now `include/StageMap.h`; evidence in its banner.
+
+Member types, same pass: `Unk68Struct` is `StageGridDimensions`
+(include/StageGrid.h), `Unk54Struct` is `LongVec3` (include/SceneNode.h),
+`EntryDesc866E8` is `Ratio16[3]` (include/SceneNode.h), all by layout and
+use; `Class866E8Elem` -> `ChunkSlot`, `QueryPos866E8` -> `SplitLongVec3`,
+`SetupEntry866E8` -> `ChunkLoadEntry`, `SetupSub866E8` ->
+`ChunkLoadEntryTail`, `TargetSpec866E8` -> `ChunkSlotSpec`, `GridSlot866E8`
+-> `CellRect`, `GridSlotList866E8` -> `CellRectSet`, `Bounds866E8_3bb8c_b`
+-> `CellBounds`, `Class866E8ValueFn` -> `ChunkFileFn`,
+`Class866E8OnElementEventFn` -> `StageMapOnSlotEventFn`,
+`Class866E8ElemFn` -> `ChunkSlotFn`, `Class866E8CellFn` -> `StageMapCellFn`;
+new `ChunkNeighbourDelta` for `sChunkNeighbourDeltas` (was typed as the
+3-word placeholder). renametype.py also rewrote the old names inside
+earlier sections' history prose in this and sibling reports (known, pending
+an operator decision; not hand-reverted).
+
+This function: `StageMap__ResetAllElements` -> `StageMap__UnloadAllSlots` (`python3 tools/rename.py StageMap__ResetAllElements StageMap__UnloadAllSlots`, tier B): every slot: cancel loads, clear cells, release the placements' LinkResource, event 6, release the data block; then `chunksLoaded` 0 and EndScaleRamp.

@@ -579,3 +579,31 @@ Round 78 (track 3, naming pass, bravo).
 | symbol | name | tier | evidence |
 | --- | --- | --- | --- |
 | `func_8004C1C0` | `StageMap__ComputeFootprintDescriptor` | B | Occupant of `gStageMapMethods` +0x110 (`slot110`). `class_3ac78`'s own `StageMap__ApplyToSenderFootprint` (already matched) calls this exact slot to fill a `buf` that is then fed DIRECTLY to `StageMap__SetFootprintFromCell`/`StageMap__SetFootprintRect` as their own `desc` parameter -- i.e. this function's output IS the footprint descriptor those two already-named functions consume. Computes cell row/column (`base.b2`/`base.b3`) and sub-cell offsets (`base.h4`/`h6`/`h8`) from a `SplitLongVec3` world position via `StageMap__FindSlotForPosition` and an `Unk14Obj` position pair -- a position-to-grid-cell conversion, matching the caller-side evidence exactly. |
+
+## Track 6 (2026-09-26, round 93, alpha)
+
+The class `Class866E8` (table `gClass866E8Methods`, id 0x114, LightRig's
+subclass) is now `StageMap` (`python3 tools/renametype.py Class866E8
+StageMap`, tier B): it keeps seven slots loaded with map chunks of the
+current stage (LbdFile, `STGnn\Mnnn.LBD`) around a tracked target, the
+centre chunk and its six staggered neighbours (`sChunkNeighbourDeltas`), laid
+out by the stage's `StageGridDimensions` (`setConfig`, from ObjM's
+`GetStageGridDimensions(stage)`), each slot's placements linked into a 20 x
+20 lattice of GridCells whose drawn window follows the target. Tier B: the
+mechanics are established; "the stage's map" rests on the files it loads and
+the per-stage config. Header now `include/StageMap.h`; evidence in its banner.
+
+Member types, same pass: `Unk68Struct` is `StageGridDimensions`
+(include/StageGrid.h), `Unk54Struct` is `LongVec3` (include/SceneNode.h),
+`EntryDesc866E8` is `Ratio16[3]` (include/SceneNode.h), all by layout and
+use; `Class866E8Elem` -> `ChunkSlot`, `QueryPos866E8` -> `SplitLongVec3`,
+`SetupEntry866E8` -> `ChunkLoadEntry`, `SetupSub866E8` ->
+`ChunkLoadEntryTail`, `TargetSpec866E8` -> `ChunkSlotSpec`, `GridSlot866E8`
+-> `CellRect`, `GridSlotList866E8` -> `CellRectSet`, `Bounds866E8_3bb8c_b`
+-> `CellBounds`, `Class866E8ValueFn` -> `ChunkFileFn`,
+`Class866E8OnElementEventFn` -> `StageMapOnSlotEventFn`,
+`Class866E8ElemFn` -> `ChunkSlotFn`, `Class866E8CellFn` -> `StageMapCellFn`;
+new `ChunkNeighbourDelta` for `sChunkNeighbourDeltas` (was typed as the
+3-word placeholder). renametype.py also rewrote the old names inside
+earlier sections' history prose in this and sibling reports (known, pending
+an operator decision; not hand-reverted).
