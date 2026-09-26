@@ -23,7 +23,7 @@ void Entity__MoodCue76(Entity *this, EntityMoodHandlerArg *out) {
         if (this->unk84 == this->unk80 - 1) {
             this->methods->slot130(this);
             fn = (void (*)(Entity *, s32, void *))this->methods->slot48;
-            table = D_80089DFC;
+            table = SCALE_MINUS_SIXTY_FOURTH;
             fn(this, 0, table);
         }
     } else {
@@ -42,7 +42,7 @@ disassembly directly; the difficulty was entirely in getting GCC to
 regenerate retail's tail-merge.
 
 **First attempt** wrote the natural, idiomatic version -- two separate
-statement calls, `this->methods->slot48(this, 0, D_80089DFC);` in one
+statement calls, `this->methods->slot48(this, 0, SCALE_MINUS_SIXTY_FOURTH);` in one
 branch and `this->methods->slot44(this, 0, ROTATION_YAW_PLUS9);` in the other,
 both with discarded return values. This compiled to the *correct control
 flow* but **did not tail-merge**: each branch got its own `jalr $2 / nop`
@@ -107,7 +107,7 @@ principles alone.
 
 Why `MoodCueNN`: the function's address sits in `gEntityMoodHandlerTable` row 76 (`asm/data/79528.data.s`, base 0x80089EB0, stride 0x10; row = (slot address - 0x80089EB0) / 0x10), confirmed by reading `disk/SLPS_015.56` directly rather than trusting address proximity (Entity_d/round 76 measured that row order does not track code address). Tier B: the row-to-function mapping is a compiler fact, not a guess, but which dream object or mood state each row represents is not established -- the row number is kept decimal and zero-padded so the names sort in table order, same convention as Entity_d.
 
-**`D_80089DFC` left unnamed this round.** s16-pair-decoded it reads (-1,64,-1,64,-1,64,8,7) -- X=Y=Z=-1/64, none of the round-number ratios (1/2, 1/1, 6/1, ...) every named `SCALE_*` table uses so far. Passed to `updateScale` through a `void (*)(Entity*,s32,void*)` function pointer rather than a direct call, so it is genuinely a scale table by construction, just not one with an evident round value to name it after.
+**`SCALE_MINUS_SIXTY_FOURTH` left unnamed this round.** s16-pair-decoded it reads (-1,64,-1,64,-1,64,8,7) -- X=Y=Z=-1/64, none of the round-number ratios (1/2, 1/1, 6/1, ...) every named `SCALE_*` table uses so far. Passed to `updateScale` through a `void (*)(Entity*,s32,void*)` function pointer rather than a direct call, so it is genuinely a scale table by construction, just not one with an evident round value to name it after.
 
 ## Track 4 (2026-09-26, round 88, echo)
 

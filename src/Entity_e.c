@@ -290,7 +290,7 @@ void Entity__MoodCue75(Entity *this, SoundCueSet *out) {
     }
 }
 
-extern u8 D_80089DFC[];
+extern u8 SCALE_MINUS_SIXTY_FOURTH[];
 
 void Entity__MoodCue76(Entity *this, SoundCueSet *out) {
     void (*fn)(Entity *self, s32 set, void *table);
@@ -301,7 +301,7 @@ void Entity__MoodCue76(Entity *this, SoundCueSet *out) {
         if (this->todFrame == this->todFrameCount - 1) {
             this->methods->stopTod(this);
             fn = (void (*)(Entity *, s32, void *))this->methods->updateScale;
-            table = D_80089DFC;
+            table = SCALE_MINUS_SIXTY_FOURTH;
             fn(this, 0, table);
         }
     } else {
