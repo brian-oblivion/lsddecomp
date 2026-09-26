@@ -55,3 +55,7 @@ triple; Class6B5CC__UpdateScale assigns .scale). Both callers
 each BaseObjO child) pass objects whose tables resolve those three slots to
 exactly those functions (tools/classtable.py on gClass876FCMethods and gActorMethods).
 Free function because `node` is not always the owner.
+
+## Track 4 (2026-09-26, round 88, charlie)
+
+Retyped with Class876FC's unification: `Vec3S` is `Vec3_d294`; `node` is `Actor *` (the owner, upcast, and each model child) and `rotation` is `void *`, the type of Class6B5CC's updateRotation table. Image byte-identical.

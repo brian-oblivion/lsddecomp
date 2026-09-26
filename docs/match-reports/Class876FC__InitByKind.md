@@ -206,3 +206,7 @@ For the HEAD, by type scope; none applied here (other units' views).
 `D_8008ACA4Obj *`/`void *`/`void *` in class_3bb8c_s.c. Both units now
 declare `Actor *`/`void *`/`void *`: the local `D_8008ACA4Methods` view is gone and the +0x080 call reads `getSetUnk10Flag8`, the name `Actor__func_56f5c` calls the same slot by. Byte-identical; no new `-Wall`
 warning.
+
+## Track 4 (2026-09-26, round 88, charlie)
+
+class_3bb8c_s.c's `LinkNode` view (owner and children under one type) is gone: the owner is `Class876FC` (include/Class876FC.h), `modelChildren` are `Actor *`, `sprites` are `Class879C4 *`, and the local `Vec3S` is `Vec3_d294`. Accessor renames: `kind` is Actor's `pendingExtra` (+0x054, where the ctor stores it); `offset`/`rotation`/`scale`/`modelChildLayout`/`tableIndex`/`color`/`altColor` are `params.*`; slot `slotB8` is Actor's `setTranslation` on the owner and model children and Sprite's `setColor` on sprites; `*coord2 = 0` is `coord2->flg = 0`. Image byte-identical.

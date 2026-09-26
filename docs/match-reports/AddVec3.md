@@ -40,3 +40,7 @@ Round 70 (alpha). `func_80056794` -> `AddVec3`, **tier A**.
 Pure leaf, `dst = a + b` over three s32 components; the mechanics are its
 purpose. Free function (no `self`), VerbNoun. Checked no `AddVec3` or
 similar existed in the symbols file (only Actor__AddTranslation, a method).
+
+## Track 4 (2026-09-26, round 88, charlie)
+
+Retyped with Class876FC's unification: `Vec3S` is `Vec3_d294`. Image byte-identical.
