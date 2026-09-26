@@ -129,3 +129,13 @@ returns whether construction succeeded. "Fire" reflects the discard-the-
 result, side-effect-only dispatch loop; why exactly 3 candidate bytes (out
 of the record's 4-entry `entries` array) are walked here specifically is not
 established from this unit alone, hence B.
+
+## Track 4 (2026-09-26, round 88, bravo)
+
+`world` is now the unified `TriggerWorld *` (include/TriggerWorld.h, class
+D_8006F40C), which code_4cd08.c includes; the unit's local
+`extern TriggerWorld *New_TriggerWorld(s32 *ctx)` is gone. New_TriggerWorld
+takes the ctor's descriptor (`struct Src6F240 *`: {buffer, name}), so the
+call casts the stack array whose first word is the buffer:
+`New_TriggerWorld((struct Src6F240 *)ctxArg)`. A pointer cast, no code; bytes
+unchanged.

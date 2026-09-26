@@ -31,3 +31,7 @@ void *GetTriggerWorldMethods(void) {
 ## Naming
 
 - **GetTriggerWorldMethods**, tier A. Table getter.
+
+## Track 4 (2026-09-26, round 88, bravo)
+
+Now `TriggerWorldMethods *GetTriggerWorldMethods(void)` returning `&D_8006F40C` (include/TriggerWorld.h), replacing the unit-local `extern s32 D_8006F40C[]` and `void *` prototype. Bytes unchanged.

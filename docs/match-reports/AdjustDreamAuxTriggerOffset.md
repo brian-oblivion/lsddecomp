@@ -69,3 +69,13 @@ re-check of the world's vtable-0x80 predicate still reports state 4;
 otherwise returns `a0` unchanged. The mechanics (conditional fixed offset)
 are exactly what the name says; WHY 30, and why this particular re-check
 gates it, are not established from this unit alone, hence B not A.
+
+## Track 4 (2026-09-26, round 88, bravo)
+
+The view `*gDreamAuxWorld` is cast to is renamed `DreamAuxWorld` /
+`DreamAuxWorldFn80` in include/code_4cd08.h (was `TriggerWorld` /
+`TriggerWorldFn80`, same `{ void **vtable; }` shape, so the call is
+unchanged). The name `TriggerWorld` now belongs to the class D_8006F40C
+(include/TriggerWorld.h), whose table is 0x8C bytes: this call loads byte
++0x200 of its object's table (`lw v0,512(v0)`), so gDreamAuxWorld is not a
+TriggerWorld. Its real class is unresolved. Bytes unchanged.
