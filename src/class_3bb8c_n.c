@@ -402,7 +402,7 @@ void StyleTeardown(void) {
 }
 
 extern u8 gStyleSpawnScales[];
-extern s32 D_80087328[];
+extern s32 gStyleSpawnYChoices[];
 extern u8 *D_8008E0B4;
 extern s32 D_8008E0BC;
 extern s32 D_8008E0A4;
@@ -423,7 +423,7 @@ Class876FC **StyleFillEffectKind0(Class876FC **arg0, s32 arg1, LongVec3 *arg2) {
     D_8008E0B4 = (u8 *)gStyleSpawnScales + ((u32)rand() % 5) * 12;
     t3 = (u32)rand() % 5;
     if (t3 != 0) {
-        t3 = D_80087328[t3];
+        t3 = gStyleSpawnYChoices[t3];
     }
     fp = SetupStyleSpawnParamsB;
     if (gStyleCounter % 7 != 0) {
@@ -573,7 +573,7 @@ extern s32 D_8008E0B8;
  * See docs/match-reports/SetupStyleSpawnParamsA.md. */
 void SetupStyleSpawnParamsA(void *arg0, void *arg1) {
     if (arg1 == 0) {
-        arg1 = (void *)D_80087328[rand() & 3];
+        arg1 = (void *)gStyleSpawnYChoices[rand() & 3];
     }
     D_8008E0A8 = (s32)arg1;
     D_8008E0A4 = (rand() % 23) << 11;

@@ -158,7 +158,7 @@ the retype, so the retype cost it nothing.
 ### The matched body
 
 ```c
-extern s32 D_80087328[];
+extern s32 gStyleSpawnYChoices[];
 extern s32 D_8008E0A4;
 extern s32 D_8008E0A8;
 extern s32 D_8008E0AC;
@@ -168,7 +168,7 @@ extern s32 D_8008E0B8;
 
 void SetupStyleSpawnParamsA(void *arg0, void *arg1) {
     if (arg1 == 0) {
-        arg1 = (void *) D_80087328[rand() & 3];
+        arg1 = (void *) gStyleSpawnYChoices[rand() & 3];
     }
     D_8008E0A8 = (s32) arg1;
     D_8008E0A4 = (rand() % 23) << 11;

@@ -125,7 +125,7 @@ the output array walked and returned one slot advanced (the same
 
 ```c
 extern u8 gStyleSpawnScales[];
-extern s32 D_80087328[];
+extern s32 gStyleSpawnYChoices[];
 extern u8 *D_8008E0B4;
 extern s32 D_8008E0BC;
 extern u8 D_8008E0A4[];
@@ -145,7 +145,7 @@ void *StyleFillEffectKind0(void *arg0, s32 arg1, void *arg2) {
     D_8008E0B4 = (u8 *) gStyleSpawnScales + ((u32) rand() % 5) * 12;
     t3 = (u32) rand() % 5;
     if (t3 != 0) {
-        t3 = D_80087328[t3];
+        t3 = gStyleSpawnYChoices[t3];
     }
     fp = SetupStyleSpawnParamsB;
     if (gStyleCounter % 7 != 0) {
@@ -165,7 +165,7 @@ Every value confirmed directly off the raw bytes:
 - `rand() % 7` uses the signed reciprocal `0x92492493`/`sra 2` (the standard
   GCC signed-divide-by-7 idiom); `rand() % 5` (twice) uses the unsigned
   reciprocal `0xCCCCCCCD`/`srl 2`.
-- The `D_80087328` table lookup is a **word**-stride array (`sll v0,s1,2`
+- The `gStyleSpawnYChoices` table lookup is a **word**-stride array (`sll v0,s1,2`
   before the `lw`), and the guard `beqz s1,...` skips the lookup only when
   the `rand()%5` remainder is exactly 0 -- matching the `if (t3 != 0)`
   reassignment shape.
