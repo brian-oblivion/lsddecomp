@@ -197,7 +197,7 @@ load through a runtime-indexed global", §"BLOCKED: the `nop_mflo_mfhi` screen r
   choice, and the C's rejoin point decides it.** Retail's target is where its source's control
   flow goes next. `if (s == 1) { A(); continue; }` inside `for (;;)` with a
   trailing `if (s == 0) break;` jumps to the loop head's call; `do { ... } while (s != 0)` jumps to
-  the tail before the test (`Class6E4F0__RunMainLoop`, 62/63 -> 63/63, round 81).
+  the tail before the test (`Application__RunMainLoop`, 62/63 -> 63/63, round 81).
 
 ### 3b. Switch and jump tables
 

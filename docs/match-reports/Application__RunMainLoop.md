@@ -1,4 +1,6 @@
-# Class6E4F0__RunMainLoop
+# Application__RunMainLoop
+
+> Renamed from `Class6E4F0__RunMainLoop` on 2026-09-26 (tools/rename.py). Address 0x8003b110.
 
 > Renamed from `func_8003B110` on 2026-09-25 (tools/rename.py). Address 0x8003b110.
 
@@ -6,7 +8,7 @@
 
 ## What it does
 
-Slot `+0x04C` of D_8006E4F0 (inherited by Class6D3C8; `main` dispatches
+Slot `+0x04C` of gApplicationMethods (inherited by Class6D3C8; `main` dispatches
 it). If `initialized`, calls `+0x050` once, then runs forever: `+0x054`,
 then polls `+0x058` for a status and dispatches: 1 -> `+0x05C` and poll
 again, 2 -> `+0x064` if `+0x060` says so, 0 -> back to `+0x054`. Slots
@@ -16,7 +18,7 @@ NoOpSlot5C, PollStatusObj, StartStreamTaskWithInit). It never returns
 while initialized: the game's main loop.
 
 ```c
-void Class6E4F0__RunMainLoop(Class6E4F0 *self) {
+void Application__RunMainLoop(Application *self) {
     s32 status;
 
     if (self->initialized) {
@@ -68,7 +70,7 @@ usual switch.
 
 ## Naming
 
-**Round 81 (delta), track 3.** Renamed `func_8003B110` -> `Class6E4F0__RunMainLoop`.
+**Round 81 (delta), track 3.** Renamed `func_8003B110` -> `Application__RunMainLoop`.
 **Tier B**: "runs forever while initialized, dispatching the subclass's own
 state-machine slots" is evident from the body alone; "main loop" is
 corroborated by `include/Class6D3C8.h`'s own note that this is the slot
@@ -78,8 +80,8 @@ agreeing ones, so it stays B rather than A.
 ## Track 4
 
 **2026-09-25, round 84 (echo).** The class is declared once, in
-`include/Class6E4F0.h`. The six slots this function calls, +0x050..+0x064,
-are NULL words in D_8006E4F0's own data (the table is 0x68 bytes, past the 19
+`include/Application.h`. The six slots this function calls, +0x050..+0x064,
+are NULL words in gApplicationMethods's own data (the table is 0x68 bytes, past the 19
 slots classtable.py prints); they are named for the subclass's occupants
 (`loadIntroLogoSequence`, `startWeeklyStreamTask`, `pollGraphRoomStatus`,
 `slot5C` for the no-op, `pollStatusObj`, `startStreamTaskWithInit`). +0x060

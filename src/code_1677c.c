@@ -109,7 +109,7 @@ Class6D3C8 *New_Class6D3C8(Class6D3C8CtorArgs *arg) {
 void Class6D3C8__Class6D3C8(Class6D3C8 *self, Class6D3C8CtorArgs *arg) {
     LoadModelRequest req;
 
-    GetClass6E4F0Methods()->ctor((Class6E4F0 *)self, arg->dataSource);
+    GetApplicationMethods()->ctor((Application *)self, arg->dataSource);
     self->methods = GetClass6D3C8Methods();
     self->ctorArgs = arg;
     func_800270AC(func_80048CF0());
@@ -129,11 +129,11 @@ void Class6D3C8__SetDayFromTickCount(Class6D3C8 *self) {
     SeedAndRandom(*(s32 *)0x1F800000 % 365, 0);
 }
 
-/* initSystems (+0x044): runs Class6E4F0's own initSystems unless the parent's
+/* initSystems (+0x044): runs Application's own initSystems unless the parent's
  * `initialized` latch is already set. */
 void Class6D3C8__InitSystems(Class6D3C8 *self, DrawSystem *drawSystem, struct Pad *pad) {
     if (self->initialized == 0) {
-        GetClass6E4F0Methods()->initSystems((Class6E4F0 *)self, drawSystem, pad, 0);
+        GetApplicationMethods()->initSystems((Application *)self, drawSystem, pad, 0);
     }
 }
 

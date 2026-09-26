@@ -10,7 +10,7 @@
  * slots). Methods in src/code_10ee0.c; no class derives from it.
  *
  * main() builds the one instance (New_DrawSystem) and hands it to
- * Class6E4F0__InitSystems (code_2b78c), which stores it as the singleton
+ * Application__InitSystems (code_2b78c), which stores it as the singleton
  * (SetDrawSystem -> gDrawSystem) and calls its initGraph (GsInitGraph and
  * GsDefDispBuff for the screen size). Every other unit reaches it through
  * GetDrawSystem(): TimImage and the movie player upload through loadImage,
@@ -30,7 +30,7 @@ typedef struct DrawSystem DrawSystem;
 typedef struct DrawSystemMethods DrawSystemMethods;
 
 /* A {width, height} pair: the screen size initGraph hands to GsInitGraph
- * and getDims returns. Class6E4F0 keeps one (its default is
+ * and getDims returns. Application keeps one (its default is
  * gDefaultScreenDims = {320, 240}) and passes it to initGraph. */
 typedef struct ScreenDims {
     /* +0x0 */ s32 w;

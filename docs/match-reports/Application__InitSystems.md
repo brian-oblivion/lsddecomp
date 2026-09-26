@@ -1,4 +1,6 @@
-# Class6E4F0__InitSystems
+# Application__InitSystems
+
+> Renamed from `Class6E4F0__InitSystems` on 2026-09-26 (tools/rename.py). Address 0x8003b044.
 
 > Renamed from `func_8003B044` on 2026-09-25 (tools/rename.py). Address 0x8003b044.
 
@@ -6,7 +8,7 @@
 
 ## What it does
 
-Slot `+0x044` of D_8006E4F0; Class6D3C8's own +0x044
+Slot `+0x044` of gApplicationMethods; Class6D3C8's own +0x044
 (ForwardToBaseSlot44UnlessFlagged) forwards here. One-time system init,
 guarded by `self->initialized` (+0x18):
 
@@ -18,7 +20,7 @@ guarded by `self->initialized` (+0x18):
 - sets `initialized = 1`.
 
 ```c
-void Class6E4F0__InitSystems(Class6E4F0 *self, Class6E4F0Source *source, s32 arg) {
+void Application__InitSystems(Application *self, ApplicationSource *source, s32 arg) {
     if (self->initialized == 0) {
         SetDrawSystem(source);
         source->methods->slot44(source, &self->dims, self->dimsArg);
@@ -40,13 +42,13 @@ times), which is exactly what writing through `self->aux->` each time
 gives; a local `aux` would have kept it in a register.
 
 The `source` object's class is unknown (its +0x044 takes a
-`ScreenDims *` and an s32); typed as the local `Class6E4F0Source`.
+`ScreenDims *` and an s32); typed as the local `ApplicationSource`.
 code_1677c calls this slot with a 4th argument `0` that this body never
 reads.
 
 ## Naming
 
-**Round 81 (delta), track 3.** Renamed `func_8003B044` -> `Class6E4F0__InitSystems`.
+**Round 81 (delta), track 3.** Renamed `func_8003B044` -> `Application__InitSystems`.
 **Tier B**: the body does one-time init of multiple genuine Psy-Q subsystems
 (`SsInit` sound, `GsInit3D` graphics, plus forwarding to the source object's
 own display-setup slot and allocating the aux block) guarded by
@@ -58,12 +60,12 @@ established, only which SDK calls it makes.
 ## Track 4
 
 **2026-09-25, round 84 (echo).** The class is declared once, in
-`include/Class6E4F0.h`. The parameters are now `drawSystem` and `pad`, and
+`include/Application.h`. The parameters are now `drawSystem` and `pad`, and
 the aux block's first two fields likewise: the one caller chain is main()
 -> Class6D3C8's +0x044 override -> this slot, and main passes
 `New_DrawSystem()` and `New_Pad(0, 0)` (src/main.c). The draw system's
 +0x044 slot is `initGraph` (DrawSystem__InitGraph), `dimsArg` is `vramMode`.
-The slot type (`CLASS6E4F0_SLOTS`) carries a fourth `s32` argument this body
+The slot type (`APPLICATION_SLOTS`) carries a fourth `s32` argument this body
 does not declare: Class6D3C8__InitSystems calls the slot
 with `(self, a1, a2, 0)`, and the `move a3,zero` in its jalr delay slot is
 retail's. The slot's return is `void`, the occupant's; the old subclass view

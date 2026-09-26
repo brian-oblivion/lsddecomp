@@ -17,7 +17,7 @@ instance at `gClass6D3C8` (`New_Class6D3C8`, seeded from the constant block
 still-uncarved `New_DrawSystem`, opens a `Pad` (`New_Pad(NULL, 0)`),
 and dispatches two methods through `gClass6D3C8`'s own vtable (`+0x044` and
 `+0x04C`) before returning. It never loops -- the real game loop presumably
-lives inside whatever `slot4C` (`Class6E4F0__RunMainLoop`) or a callee reached from it
+lives inside whatever `slot4C` (`Application__RunMainLoop`) or a callee reached from it
 does; this function is just game-code setup, past which retail's own crt0
 takes over `$ra`'s return (the function immediately after, un-carved and
 correctly left untouched per the runner brief).

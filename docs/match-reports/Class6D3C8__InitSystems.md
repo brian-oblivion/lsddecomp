@@ -28,7 +28,7 @@ lw    $v0, 0x18($s0)        ; v0 = self->unk18
 nop
 bnez  $v0, .L80026154        ; skip if unk18 != 0
  addu $s2, $a2, $zero          ; s2 = a2
-jal   GetClass6E4F0Methods            ; -> &D_8006E4F0 (base class table)
+jal   GetApplicationMethods            ; -> &gApplicationMethods (base class table)
  nop
 lw    $v0, 0x44($v0)             ; base table slot +0x044
 addu  $a0, $s0, $zero
@@ -41,7 +41,7 @@ jalr  $v0
 ```
 
 **This is the class-hierarchy evidence for this whole unit.** Resolving
-`GetClass6E4F0Methods` (`tools/classtable.py 0x8006E4F0`) shows a 19-slot table
+`GetApplicationMethods` (`tools/classtable.py 0x8006E4F0`) shows a 19-slot table
 that is itself derived from BasicClass, and `classtable.py 0x8006D3C8 --vs
 0x8006E4F0` shows this unit's class shares +0x00C/+0x048/+0x04C *exactly*
 with that intermediate table — evidence this class's real parent is that
@@ -56,7 +56,7 @@ treated as `void` here since nothing in this unit consumes it.
 ```c
 void Class6D3C8__InitSystems(Class6D3C8 *self, void *a1, void *a2) {
     if (self->unk18 == 0) {
-        GetClass6E4F0Methods()->slot44(self, a1, a2, 0);
+        GetApplicationMethods()->slot44(self, a1, a2, 0);
     }
 }
 ```
@@ -68,14 +68,14 @@ match doesn't rule out inheritance — it may mean the diff is against the
 wrong ancestor. When a derived table's *high* slots (added by the subclass)
 line up byte-for-byte with a *different* candidate table's high slots too,
 re-run `--vs` against that candidate; a longer identical run there is the
-real parent. This class's real parent (D_8006E4F0, an intermediate between
+real parent. This class's real parent (gApplicationMethods, an intermediate between
 BasicClass and this class) was only found this way.
 
 ## Naming
 
 **`Class6D3C8__InitSystems` -- tier B.** Mechanics are
 clear from the body: when `self->unk18 == 0` it forwards straight to the
-intermediate base class's own `slot44` occupant (`GetClass6E4F0Methods()->slot44`,
+intermediate base class's own `slot44` occupant (`GetApplicationMethods()->slot44`,
 same slot number as the one this function itself occupies, `+0x044`), and
 does nothing otherwise. What `unk18 != 0` actually MEANS in game terms (an
 override flag set by some other, uncarved code path) is not established, so
@@ -99,32 +99,32 @@ runner's ownership. See `## Proposed field names` below.
   so the rename needs that call site updated in the same commit as the
   struct definition.
 - **`Class6D3C8Methods.slot4C`** -- NOT proposing a name. Its occupant
-  (`Class6E4F0__RunMainLoop`) is not in this unit and was not derived this round; all
+  (`Application__RunMainLoop`) is not in this unit and was not derived this round; all
   that's observable locally is the call shape at `src/main.c:61`
   (`gClass6D3C8->methods->slot4C(gClass6D3C8)`, no extra arguments, dispatched
   once right after `slot44` during startup). That's a call-site pattern, not
   a mechanics derivation of what the function itself does -- naming it from
   that alone would be the "guess at purpose" the naming rules warn against.
-  Left as `slot4C` for whoever carves `Class6E4F0__RunMainLoop`'s own unit.
+  Left as `slot4C` for whoever carves `Application__RunMainLoop`'s own unit.
 
 Posted to `tools/broadcast.sh post --from echo`.
 
 ## Track 4
 
 **2026-09-25, round 84 (echo).** The parent class is declared once, in
-`include/Class6E4F0.h`, and `MiddleClassMethods` is gone. The base call is
-now `GetClass6E4F0Methods()->initSystems((Class6E4F0 *)self, a1, a2, 0)`: the
-slot is named for its occupant, Class6E4F0__InitSystems, typed `void` (the
+`include/Application.h`, and `MiddleClassMethods` is gone. The base call is
+now `GetApplicationMethods()->initSystems((Application *)self, a1, a2, 0)`: the
+slot is named for its occupant, Application__InitSystems, typed `void` (the
 occupant's; nothing here reads $v0), and keeps the fourth argument this
 body's `move a3,zero` shows. The upcast emits no code. Bytes unchanged.
 
 ## Track 4 (2026-09-26, round 88)
 
-Renamed for its slot. `+0x044` is Class6E4F0's `initSystems`
-(`include/Class6E4F0.h`), and this override does nothing but chain to it:
-`GetClass6E4F0Methods()->initSystems(self, drawSystem, pad, 0)`. The guard
+Renamed for its slot. `+0x044` is Application's `initSystems`
+(`include/Application.h`), and this override does nothing but chain to it:
+`GetApplicationMethods()->initSystems(self, drawSystem, pad, 0)`. The guard
 field `+0x018` is not a Class6D3C8 field at all: it lies inside the parent's
-0x20-byte object, where Class6E4F0's view already names it `initialized`
+0x20-byte object, where Application's view already names it `initialized`
 ("cleared by the ctor, set by initSystems; runMainLoop runs only once
 set"). So the body reads "initialise the systems once": the "override flag"
 this report's Naming section could not explain is the parent's own

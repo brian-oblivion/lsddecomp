@@ -1,0 +1,87 @@
+#ifndef APPLICATION_H
+#define APPLICATION_H
+
+#include "BasicClass.h"
+#include "DrawSystem.h"
+#include "IntermediateBase.h"
+
+/*
+ * Application -- the program's application shell: it brings up the console's
+ * subsystems and runs the game's outer loop, and leaves what the loop does to
+ * its subclass. Class id 0x60, method table gApplicationMethods, a direct
+ * BasicClass subclass. Methods in src/code_2b78c.c.
+ *
+ * Lifecycle. It is abstract and never built on its own: its one subclass,
+ * Class6D3C8 (include/Class6D3C8.h), is the object main() (src/main.c)
+ * builds, and that subclass's ctor runs this one first.
+ *   ctor(dataSource)  runs CdInit once per boot, selects the data source
+ *                     (SetActiveDataSource) and sets the default screen,
+ *                     {320, 240} in vram mode 0, through setScreenDims.
+ *   initSystems       main() passes the DrawSystem and Pad it built. Once:
+ *                     registers the DrawSystem (SetDrawSystem), opens the
+ *                     display at the stored size and mode (its initGraph),
+ *                     then SsInit and GsInit3D, and allocates `aux`.
+ *   runMainLoop       once initialized, never returns: the six hooks at
+ *                     +0x050..+0x064 below, in the order their comments give.
+ *
+ * `aux` is the IntermediateBaseInitArgs (include/IntermediateBase.h) every
+ * task the subclass starts is given: {drawSystem, pad, NULL, NULL, NULL}; the
+ * NULLs make each task's IntermediateBase__Init create its own FrameClock,
+ * LightRig and Viewport.
+ *
+ * The table is 0x68 bytes: the six hooks are NULL words in this class's own
+ * table, filled by the subclass, and named for its occupants. Object size
+ * 0x20 (no allocator; the subclass's own fields start at +0x020).
+ */
+
+typedef struct Application Application;
+typedef struct ApplicationMethods ApplicationMethods;
+struct Pad; /* initSystems's pad: main()'s New_Pad(0, 0) */
+
+/* ScreenDims and DrawSystem are include/DrawSystem.h's. */
+
+/* clang-format off */
+#define APPLICATION_SLOTS(Self, CtorParams)                                                         \
+    BASICCLASS_SLOTS(Self, CtorParams);                                                            \
+    /* +0x040 */ void (*setScreenDims)(Self *self, ScreenDims *dims, s32 vramMode); /* Application__SetScreenDims */ \
+    /* +0x044: the occupant never reads arg3; Class6D3C8__InitSystems passes 0 */             \
+    /* +0x044 */ void (*initSystems)(Self *self, DrawSystem *drawSystem, struct Pad *pad, s32 arg3); /* Application__InitSystems */ \
+    /* +0x048 */ void (*slot48)(Self *self);                    /* Application__NoOpSlot48, empty; no caller */ \
+    /* +0x04C */ void (*runMainLoop)(Self *self);               /* Application__RunMainLoop */      \
+    /* +0x050..+0x064: NULL here, called by runMainLoop; named for Class6D3C8's occupants */      \
+    /* +0x050 */ void (*loadIntroLogoSequence)(Self *self);     /* once, before the loop */        \
+    /* +0x054 */ void (*startWeeklyStreamTask)(Self *self);     /* each outer iteration */         \
+    /* +0x058 */ s32 (*pollGraphRoomStatus)(Self *self);        /* 0 ends the inner loop, 1 and 2 dispatch */ \
+    /* +0x05C */ void (*slot5C)(Self *self);                    /* on status 1; Class6D3C8__NoOpSlot5C */ \
+    /* +0x060 */ s32 (*pollStatusObj)(Self *self);              /* on status 2; nonzero runs +0x064 */ \
+    /* +0x064 */ void (*startStreamTaskWithInit)(Self *self)    /* Class6D3C8__StartStreamTaskWithInit */
+/* clang-format on */
+
+/* clang-format off */
+#define APPLICATION_FIELDS(Methods)                                                                 \
+    BASICCLASS_FIELDS(Methods);                                                                    \
+    /* +0x00C */ ScreenDims dims;      /* setScreenDims; initGraph's size */                       \
+    /* +0x014 */ s32 vramMode;         /* setScreenDims; initGraph's GsInitGraph vram mode */      \
+    /* +0x018 */ s32 initialized;      /* cleared by the ctor, set by initSystems; runMainLoop runs only once set */ \
+    /* +0x01C */ IntermediateBaseInitArgs *aux /* initSystems's allocation: every task's init argument */
+/* clang-format on */
+
+struct ApplicationMethods {
+    APPLICATION_SLOTS(Application, (Application * self, s32 dataSource));
+};
+
+struct Application {
+    APPLICATION_FIELDS(ApplicationMethods);
+};
+
+extern ApplicationMethods gApplicationMethods;
+extern ApplicationMethods *GetApplicationMethods(void); /* returns &gApplicationMethods */
+
+void Application__Application(Application *self, s32 dataSource);
+void Application__Finalize(Application *self);
+void Application__SetScreenDims(Application *self, ScreenDims *dims, s32 vramMode);
+void Application__InitSystems(Application *self, DrawSystem *drawSystem, struct Pad *pad);
+void Application__NoOpSlot48(Application *self);
+void Application__RunMainLoop(Application *self);
+
+#endif
