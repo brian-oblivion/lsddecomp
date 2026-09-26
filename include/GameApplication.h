@@ -27,7 +27,7 @@
  *   +0x058 pollGraphRoomStatus    runs GraphRoom and TitleMenu against the
  *                                 DreamSys; returns 0, 1 or 2 to the loop
  *   +0x05C slot5C                 empty (GameApplication__NoOpSlot5C)
- *   +0x060 pollStatusObj          runs one Class865C8 (include/Class865C8.h)
+ *   +0x060 pollStatusObj          runs one DayTask (include/DayTask.h)
  *                                 and may start the current cinematic's stream;
  *                                 nonzero runs +0x064
  *   +0x064 startStreamTaskWithInit  the stream GetStreamChannelInit names
@@ -54,7 +54,7 @@ typedef struct GameApplicationMethods GameApplicationMethods;
  * gate below is read `!= 0` by the methods it names. */
 typedef struct GameApplicationConfig {
     /* +0x00 */ s32 dataSource; /* Application's ctor argument (0x13 = the CD driver's class id) */
-    /* +0x04 */ s32 unk04;      /* New_Class865C8's 3rd argument, in PollStatusObj: that ctor
+    /* +0x04 */ s32 unk04;      /* New_DayTask's 3rd argument, in PollStatusObj: that ctor
                             * passes (unk04 == 0) to SetActiveDataSourceDriverMode */
     /* +0x08 */ s32 playStreams; /* gates every StreamTask: StartWeeklyStreamTask, StartGraphRoomStreamTask,
                                      * StartCinematicStream's stream branch, StartStreamTaskWithInit */

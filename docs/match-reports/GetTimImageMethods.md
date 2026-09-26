@@ -41,5 +41,5 @@ extern FileResourceMethods gTimImageMethods;
 
 - **`GetTimImageMethods`** (was `func_8003B614`), tier A: matches the
   project's established `Get<Class>Methods` table-getter convention
-  (`GetFileResourceMethods`, `GetClass865C8Methods`, ...); the body is exactly
+  (`GetFileResourceMethods`, `GetDayTaskMethods`, ...); the body is exactly
   `return &gTimImageMethods;`.

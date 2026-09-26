@@ -29,7 +29,7 @@ jr    $ra
 
 Same "incoming argument stored at `sp+0x10` is the o32 outgoing 5th-argument
 slot for a call made later in the same function" shape already documented
-this project (`Class865C8__StartObjM`, `class_39e08`) — `arg2` here is silently
+this project (`DayTask__StartObjM`, `class_39e08`) — `arg2` here is silently
 forwarded as `ComputeCellWorldOffsets`'s 5th parameter, confirmed by reading
 `ComputeCellWorldOffsets`'s OWN prologue (`lw $t2, 0x10($sp)`).
 
@@ -69,7 +69,7 @@ unread tail call.
 ### Proposed learning
 
 None new — direct reuse of the "stack-homed incoming arg is really an
-outgoing 5th argument for a later call" lesson from `Class865C8__StartObjM`
+outgoing 5th argument for a later call" lesson from `DayTask__StartObjM`
 (`class_39e08`), now confirmed a second time in a different unit.
 
 ## Naming

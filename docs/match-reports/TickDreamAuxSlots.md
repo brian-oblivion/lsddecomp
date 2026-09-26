@@ -103,5 +103,5 @@ this function alone), so the type is deliberately generic
 `DreamAuxTickFn` typedef, already named "tick" before this round) and store
 the result back. The mechanics ARE the name (a tick pass), so this qualifies
 as tier A by FINISHING-PLAN's "pure leaf whose mechanics are its purpose"
-rule regardless of why the caller (`Class865C8__Finalize`, apparently a destructor)
+rule regardless of why the caller (`DayTask__Finalize`, apparently a destructor)
 invokes it once at that point.

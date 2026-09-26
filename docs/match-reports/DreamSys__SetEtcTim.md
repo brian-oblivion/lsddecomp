@@ -43,7 +43,7 @@ Renamed from `DreamSys__func_5938c` (tier C since round 66).
 
 A pure setter (`this->etcTim = value`, vtable slot +0x114), so its mechanics are
 its purpose; what was missing in round 66 was a name for the field. The one
-caller, `Class865C8__Class865C8` (src/class_39e08.c), passes `self->etcTim` --
+caller, `DayTask__DayTask` (src/class_39e08.c), passes `self->etcTim` --
 the `TimImage` it has just loaded, uploaded and freed the buffer of -- right after
 handing the DreamSys its sound object through `setSoundObj`. The field
 (`unk_0x64` until this round, renamed `etcTim` in include/DreamSys.h; its only

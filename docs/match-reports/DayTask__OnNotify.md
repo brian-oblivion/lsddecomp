@@ -1,10 +1,12 @@
-# Class865C8__OnNotify — MATCHED (47/47 words)
+# DayTask__OnNotify — MATCHED (47/47 words)
+
+> Renamed from `Class865C8__OnNotify` on 2026-09-26 (tools/rename.py). Address 0x80049958.
 
 > Renamed from `Obj865C8__OnNotify` on 2026-09-26 (tools/rename.py). Address 0x80049958.
 
 > Renamed from `func_80049958` on 2026-09-23 (tools/rename.py). Address 0x80049958.
 
-`Class865C8Methods` slot +0x038.
+`DayTaskMethods` slot +0x038.
 
 ## Disassembly shape
 
@@ -58,7 +60,7 @@ jr $ra
 ## Final C
 
 ```c
-void Class865C8__OnNotify(Obj865C8 *self, EventArg *arg1, s32 arg2) {
+void DayTask__OnNotify(Obj865C8 *self, EventArg *arg1, s32 arg2) {
     s32 tag;
 
     GetTimedTaskMethods()->slot38(self, arg1, arg2);
@@ -79,22 +81,22 @@ void Class865C8__OnNotify(Obj865C8 *self, EventArg *arg1, s32 arg2) {
   the double `lw ..., 0x0(reg)` chain in the disassembly is what pins this
   down as two separate objects, not a single struct with a field at a
   larger offset.
-- `Class865C8Methods::slot38` typed (was an untyped `void *`, this
+- `DayTaskMethods::slot38` typed (was an untyped `void *`, this
   function's own slot). `TimedTaskMethods::slot38` added (the sibling's
   inherited occupant, `IntermediateBase__OnNotify`, out of this unit's scope) — same
   signature, needed because this function calls through THAT table via
   `GetTimedTaskMethods()`, not its own.
-- **`Class865C8Methods::slot80` and `::slot84` retyped** from `void
+- **`DayTaskMethods::slot80` and `::slot84` retyped** from `void
   (*noop80)(void)` / opaque `void *slot84` to `void (*)(Obj865C8 *self,
   EventArg *arg1, s32 arg2)`. This is the significant correction: `slot80`
   was typed as a no-arg no-op purely because its one known occupant,
-  `Class865C8__OnDreamSysNotify` (`void Class865C8__OnDreamSysNotify(void) {}`, already matched), ignores
+  `DayTask__OnDreamSysNotify` (`void DayTask__OnDreamSysNotify(void) {}`, already matched), ignores
   everything. This function proves the SLOT itself takes 3 arguments —
-  `Class865C8__OnDreamSysNotify` just happens to not read them, and an empty body compiles
+  `DayTask__OnDreamSysNotify` just happens to not read them, and an empty body compiles
   identically (`jr $ra; nop`) whether its C prototype declares 0 or 3
   parameters, so the previous typing was invisible until a second caller
   that DOES pass real arguments showed up. `slot84`'s occupant
-  (`Class865C8__OnObjMNotify`) is still addiu_at-blocked and unverified beyond this
+  (`DayTask__OnObjMNotify`) is still addiu_at-blocked and unverified beyond this
   call site, but the signature here is well-established from the two
   register loads (`a1`/`a2`) immediately preceding the shared `jalr`.
 
@@ -113,8 +115,8 @@ specific lever this round.
 **However, a closely related but DISTINCT lever showed up and IS worth
 recording as its own entry:** a no-op-bodied occupant is not evidence a
 vtable SLOT takes no arguments, only that THAT occupant ignores whatever
-it's given. `Class865C8Methods::slot80` was typed `void (*)(void)` from
-`Class865C8__OnDreamSysNotify`'s empty body alone; this function's own disassembly loads
+it's given. `DayTaskMethods::slot80` was typed `void (*)(void)` from
+`DayTask__OnDreamSysNotify`'s empty body alone; this function's own disassembly loads
 real `a1`/`a2` before the `jalr`, proving the slot's true signature carries
 2 more parameters that this particular occupant simply discards. Same shape
 as CLAUDE.md's existing "a discarded return is never evidence of void" rule,
@@ -123,8 +125,8 @@ the full signature before trusting an empty-body occupant's parameter count.
 
 ## Naming
 
-`Class865C8__OnNotify` -- tier B. Overrides the base's +0x038 `IntermediateBase__OnNotify` slot (confirmed by `tools/classtable.py` diff) and, after forwarding to the base, dispatches by `arg1->target->header` tag (0x1F34 / 0x2F230) to the class's own `Noop80`/`OnTag2Notify`. The dispatch mechanism is evident from the body; what the two tag values MEAN in-game is not.
+`DayTask__OnNotify` -- tier B. Overrides the base's +0x038 `IntermediateBase__OnNotify` slot (confirmed by `tools/classtable.py` diff) and, after forwarding to the base, dispatches by `arg1->target->header` tag (0x1F34 / 0x2F230) to the class's own `Noop80`/`OnTag2Notify`. The dispatch mechanism is evident from the body; what the two tag values MEAN in-game is not.
 
-## Track 4 (2026-09-26, round 88, Class865C8)
+## Track 4 (2026-09-26, round 88, DayTask)
 
-The class (table D_800865C8, id 0x1F230, TimedTask's subclass) is unified as Class865C8 in include/Class865C8.h; the Obj865C8/Class865C8Methods views in class_39e08.h are gone. Prefix only. Its sender argument is typed BasicClass * (EventArg/HeaderObj were BasicClass/BasicClassMethods::header views): the two tags it tests are 0x1F34 (DreamSys) and 0x2F230 (gObjMMethods, the ObjM this class builds), so the slots it dispatches to are named onDreamSysNotify (+0x080) and onObjMNotify (+0x084).
+The class (table D_800865C8, id 0x1F230, TimedTask's subclass) is unified as DayTask in include/DayTask.h; the Obj865C8/DayTaskMethods views in class_39e08.h are gone. Prefix only. Its sender argument is typed BasicClass * (EventArg/HeaderObj were BasicClass/BasicClassMethods::header views): the two tags it tests are 0x1F34 (DreamSys) and 0x2F230 (gObjMMethods, the ObjM this class builds), so the slots it dispatches to are named onDreamSysNotify (+0x080) and onObjMNotify (+0x084).

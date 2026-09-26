@@ -43,4 +43,4 @@ register) and the extern cannot drop the argument: the caller's
 
 - **Name:** `GetSoundEffectDir`
 - **Tier:** A
-- **Evidence:** dereferences GetSoundEffectDirRef(); its one cross-unit caller (Class865C8__Class865C8 in class_39e08.c) passes the result straight into a data-source ctor's base-path argument.
+- **Evidence:** dereferences GetSoundEffectDirRef(); its one cross-unit caller (DayTask__DayTask in class_39e08.c) passes the result straight into a data-source ctor's base-path argument.

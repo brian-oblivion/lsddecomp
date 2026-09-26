@@ -277,7 +277,7 @@ typedef struct {
    GsRVIEW2 refView: +0x014 vp and +0x020 vr (the two "points"
    ProjectPointAtDistance interpolates between), +0x018 vp.y and +0x024
    vr.y (AdvanceMoveCycle's view bob moves both; StepLookOffset, StopDrift
-   and TickDrift move vr.y, i.e. look up and down). Class865C8__Init installs
+   and TickDrift move vr.y, i.e. look up and down). DayTask__Init installs
    a New_NodeGuardedViewport through setViewport, and Entity__MoodCue74 calls its
    setClearColor (+0x064). */
 struct Viewport;
@@ -428,7 +428,7 @@ struct DreamSys {
 	   (round 2026-09-02): the LinkResource its model 0 came from. No other
 	   observed use in this unit's queued functions. */
     struct LinkResource *modelSource;
-    /* The TimImage Class865C8__Class865C8 hands over through
+    /* The TimImage DayTask__DayTask hands over through
        DreamSys__SetEtcTim (vtable +0x114); cleared by the ctor, never
        dereferenced by the DreamSys. */
     s32 etcTim;

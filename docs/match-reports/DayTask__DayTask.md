@@ -1,10 +1,12 @@
-# Class865C8__Class865C8 — MATCHED (107/107 words)
+# DayTask__DayTask — MATCHED (107/107 words)
+
+> Renamed from `Class865C8__Class865C8` on 2026-09-26 (tools/rename.py). Address 0x80049684.
 
 > Renamed from `Obj865C8__Obj865C8` on 2026-09-26 (tools/rename.py). Address 0x80049684.
 
 > Renamed from `func_80049684` on 2026-09-23 (tools/rename.py). Address 0x80049684.
 
-`Class865C8Methods` slot +0x008 (the ctor). The largest function in this
+`DayTaskMethods` slot +0x008 (the ctor). The largest function in this
 unit's round, and the one the head's queue flagged as most likely to leave a
 residue. It didn't — full match on the second attempt (one instruction: a
 signed/unsigned comparison mismatch).
@@ -23,10 +25,10 @@ addu  $a1, $s0, $zero
 lw    $v0, 0x8($v0)            ; gTimedTaskMethods's own ctor slot
 jalr  $v0
  addu $a2, $zero, $zero        ; GetTimedTaskMethods()->ctor(self, s0, NULL)
-jal   GetClass865C8Methods
+jal   GetDayTaskMethods
  nop
 jal   InitDreamAux
- sw   $v0, 0x0($s1)            ; self->methods = GetClass865C8Methods() (== &gClass865C8Methods)
+ sw   $v0, 0x0($s1)            ; self->methods = GetDayTaskMethods() (== &gDayTaskMethods)
 lui   $a0, %hi(D_800113EC)
 addiu $a0, $a0, %lo(D_800113EC)
 jal   New_TimImage
@@ -101,12 +103,12 @@ jr $ra
 ## Final C
 
 ```c
-void Class865C8__Class865C8(Obj865C8 *self, Obj0C *arg1, SubObjD *arg2, s32 arg3) {
+void DayTask__DayTask(Obj865C8 *self, Obj0C *arg1, SubObjD *arg2, s32 arg3) {
     LoadRequest req;
     s32 tmp;
 
     GetTimedTaskMethods()->ctor(self, GetSoundEffectDir(0), 0);
-    self->methods = GetClass865C8Methods();
+    self->methods = GetDayTaskMethods();
     InitDreamAux();
     self->unk44 = New_TimImage(D_800113EC);
     self->unk44->methods->slot78(self->unk44);
@@ -143,9 +145,9 @@ needed anywhere in this 107-word function.
 - This ctor delegates to the SIBLING class's own ctor (`GetTimedTaskMethods()->
   ctor`, i.e. `TimedTask__TimedTask`) for shared base construction FIRST — same
   "override calls base impl via the other table" pattern already documented
-  for the dtor (`Class865C8__Finalize`) and several slot forwarders this round —
-  then immediately re-asserts `self->methods = GetClass865C8Methods()` (`&
-  gClass865C8Methods`, this class's REAL vtable), overwriting what the delegated
+  for the dtor (`DayTask__Finalize`) and several slot forwarders this round —
+  then immediately re-asserts `self->methods = GetDayTaskMethods()` (`&
+  gDayTaskMethods`, this class's REAL vtable), overwriting what the delegated
   ctor had just set to `&gTimedTaskMethods`. Two `self->methods` writes in one
   function, back to back, both legitimate.
 - `arg1` (this function's own 2nd parameter, `Obj0C *`) is both stored
@@ -154,9 +156,9 @@ needed anywhere in this 107-word function.
   simultaneously wiring up `self` and finishing construction of an object
   `self` doesn't own outright (passed in already allocated by the caller).
 - `arg2` (`SubObjD *`) is stored into `self->unk38` (its established type
-  from `Class865C8__Deinit`/`Class865C8__Init` this round) AND separately passed to
+  from `DayTask__Deinit`/`DayTask__Init` this round) AND separately passed to
   `self->methods->slot10`, whose established signature (from
-  `Class865C8__StartObjM`, an EARLIER round) expects `Obj4C *` — a different type
+  `DayTask__StartObjM`, an EARLIER round) expects `Obj4C *` — a different type
   entirely. Both usages are of the SAME raw pointer value (just a
   register-forwarded call argument on the `slot10` side, never
   dereferenced there), so a `(Obj4C *)` cast at that one call site
@@ -164,7 +166,7 @@ needed anywhere in this 107-word function.
 - Six independent "New_X"-shaped allocator calls (`New_TimImage`,
   `New_LinkResource`, `New_WBgm`, `New_NodeGuardedViewport`, `New_FrameClock`,
   `New_StageMap`) populate six different fields (`self->unk40/44/48`,
-  `arg1->unk8/unkC/unk10`) that this unit's OWN dtor (`Class865C8__Finalize`,
+  `arg1->unk8/unkC/unk10`) that this unit's OWN dtor (`DayTask__Finalize`,
   earlier this round) already established as a uniform `SubObjG` family via
   `->methods->slot4`. These are almost certainly six DIFFERENT real
   classes under the hood (`New_StageMap` is independently and fully typed
@@ -185,7 +187,7 @@ needed anywhere in this 107-word function.
   independently established elsewhere as `void InitDreamAux(void)`,
   itself a documented STALL in `code_4cd08` unrelated to this unit).
   Reading the CALLEE's prologue was the right move here, same lesson
-  `Class865C8__StartObjM` used earlier this round for the opposite question (an
+  `DayTask__StartObjM` used earlier this round for the opposite question (an
   argument that looked unused turning out to be real).
 
 ## New struct/extern knowledge (`include/class_39e08.h`)
@@ -228,8 +230,8 @@ question asks about (a LATER call through `self->methods` resolving to a
 DIFFERENT function BECAUSE of an earlier reassignment within the same
 function) — the two `self->methods` writes here don't interact with each
 other that way; nothing calls through `self->methods` AGAIN until well
-after both writes have settled to the FINAL value (`&gClass865C8Methods`,
-`GetClass865C8Methods()`'s return), so every actual dispatch through
+after both writes have settled to the FINAL value (`&gDayTaskMethods`,
+`GetDayTaskMethods()`'s return), so every actual dispatch through
 `self->methods` in this function sees the same, final table. Six functions
 into this round, reporting negative consistently. The one confirmed
 instance remains `TimedTask__TimedTask`'s ctor from the earlier round (where a
@@ -245,15 +247,15 @@ data point ruling out the naive "any double-write is suspect" reading.
 ### Session summary note
 
 This closes out the round: all 5 of this session's assigned functions
-(`Class865C8__OnNotify`, `Class865C8__OnInit`, `Class865C8__Finalize`, `Class865C8__AdvancePhase`,
-`Class865C8__Class865C8`) matched, none stalled — including the two the head
-expected residues to survive on. `Class865C8__AdvancePhase`'s residue (a GCC
+(`DayTask__OnNotify`, `DayTask__OnInit`, `DayTask__Finalize`, `DayTask__AdvancePhase`,
+`DayTask__DayTask`) matched, none stalled — including the two the head
+expected residues to survive on. `DayTask__AdvancePhase`'s residue (a GCC
 switch-case-balancing quirk) took 9 attempts; every other function in this
 session matched within 1-2.
 
 ## Naming
 
-`Class865C8__Class865C8` -- tier A. Named by the project's `Class__Class` ctor convention. Its body constructs the base, installs `gClass865C8Methods`, and loads two named resources verbatim ("ETC\ETC.TIM", "ETC\DREAMER.TMD") -- evidence from the body alone that this is the class's constructor.
+`DayTask__DayTask` -- tier A. Named by the project's `Class__Class` ctor convention. Its body constructs the base, installs `gDayTaskMethods`, and loads two named resources verbatim ("ETC\ETC.TIM", "ETC\DREAMER.TMD") -- evidence from the body alone that this is the class's constructor.
 
 ## Track 4 (2026-09-26, round 88)
 
@@ -269,6 +271,34 @@ occupant TimImage__Upload) through `TimImageUploadFn`, +0x05C is
 
 `New_D8006EF50` is now `New_FrameClock` (include/FrameClock.h), returning `FrameClock *`; the store into `Obj0C::unk8` (`SubObjG *`, field unchanged) upcasts it, and class_39e08.h's own `SubObjG *` extern of it is gone. Byte-identical.
 
-## Track 4 (2026-09-26, round 88, Class865C8)
+## Track 4 (2026-09-26, round 88, DayTask)
 
-The class (table D_800865C8, id 0x1F230, TimedTask's subclass) is unified as Class865C8 in include/Class865C8.h; the Obj865C8/Class865C8Methods views in class_39e08.h are gone. Renamed from Obj865C8__Obj865C8. Accessors now use the parent's names: unk0C -> initArgs, Obj0C::unk8/unkC/unk10 -> IntermediateBaseInitArgs unk8/unkC/viewport, subB -> sound, slot10 -> addChild, resetState -> resetCounters. Own fields named from this body: dreamSys (+0x038, arg2), etcTim (+0x044, New_TimImage("ETC\ETC.TIM"), TimImage *), dreamerTmd (+0x048, New_LinkResource("ETC\DREAMER.TMD")), bgm (+0x040, New_WBgm, WBgm *; the WBgm runner's proposal in New_WBgm.md). Byte-identical.
+The class (table D_800865C8, id 0x1F230, TimedTask's subclass) is unified as DayTask in include/DayTask.h; the Obj865C8/DayTaskMethods views in class_39e08.h are gone. Renamed from Obj865C8__Obj865C8. Accessors now use the parent's names: unk0C -> initArgs, Obj0C::unk8/unkC/unk10 -> IntermediateBaseInitArgs unk8/unkC/viewport, subB -> sound, slot10 -> addChild, resetState -> resetCounters. Own fields named from this body: dreamSys (+0x038, arg2), etcTim (+0x044, New_TimImage("ETC\ETC.TIM"), TimImage *), dreamerTmd (+0x048, New_LinkResource("ETC\DREAMER.TMD")), bgm (+0x040, New_WBgm, WBgm *; the WBgm runner's proposal in New_WBgm.md). Byte-identical.
+
+## Track 6 (2026-09-26, round 94, alpha): the class name
+
+`Class865C8` (the table's address, D_800865C8, kept through tracks 4 and 5:
+the header was unified in round 88 and said "a day's loop but not enough to
+name it") is now `DayTask`, with `python3 tools/renametype.py Class865C8
+DayTask` (the family: DayTaskMethods, DayTaskInitFn, DAYTASK_FIELDS/SLOTS,
+gDayTaskMethods, New_DayTask, GetDayTaskMethods and the twelve methods).
+Tier B. Evidence, all from this class's own bodies and its one caller:
+
+- every exit brackets one DreamSys `startDay`/`endDay` pair: AdvancePhase's
+  phase 1 calls startDay and starts an ObjM on the stage it returns (or, on
+  a refusal, endDay(0) and ends); every path of OnObjMNotify that ends the
+  task calls endDay first;
+- between the two it runs ObjM children, replacing one with a fresh ObjM on
+  `getCurrentStage` (phase 3) on ObjM's events 5..8 and 0xA;
+- `result` (init's return) encodes how the day ended, and its one caller
+  (GameApplication__PollStatusObj, reached from Application__RunMainLoop on
+  GraphRoom status 2) acts on it: 2 plays the cinematic, 3 sets
+  skipGraphRoomPoll.
+
+It is tier B, not A, because the "day" reading rests on DreamSys's
+startDay/endDay, which are FirecatFG's names (tier-B hypotheses by rule).
+The `Task` suffix follows the project's other IntermediateBase jobs run to
+a result (StreamTask) and its parent, TimedTask.
+
+The unit banner (include/class_39e08.h) no longer carries "track 4, round
+88/89"; that history is this section and the Track 4 sections above.

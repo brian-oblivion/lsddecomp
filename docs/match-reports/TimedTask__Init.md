@@ -5,7 +5,7 @@
 > Renamed from `func_8004A2C4` on 2026-09-23 (tools/rename.py). Address 0x8004a2c4.
 
 `Obj865C8`'s vtable slot +0x044 (`TimedTaskMethods`, i.e. the sibling class
-`gTimedTaskMethods` overriding `gClass865C8Methods`'s +0x044 — see `class_39e08.h`'s existing
+`gTimedTaskMethods` overriding `gDayTaskMethods`'s +0x044 — see `class_39e08.h`'s existing
 note that this function is one of gTimedTaskMethods's known overrides at
 +0x008/+0x00C/+0x040/+0x044/+0x048).
 
@@ -84,8 +84,8 @@ pair turns up.
 
 ## Naming
 
-`TimedTask__Init` -- tier B. Occupies +0x044 (the same Init-slot convention as `Class865C8__Init`, see above): zeroes `eventCode`, forwards to the base's own +0x044, returns `eventCode`. Named by slot-offset convention, not by an established in-game meaning.
+`TimedTask__Init` -- tier B. Occupies +0x044 (the same Init-slot convention as `DayTask__Init`, see above): zeroes `eventCode`, forwards to the base's own +0x044, returns `eventCode`. Named by slot-offset convention, not by an established in-game meaning.
 
 ## Track 4
 
-2026-09-25, round 84 (bravo): class unified in `include/TimedTask.h`. Not renamed. Signature `s32 (TimedTask *self, IntermediateBaseInitArgs *args, s32 mode)`, IntermediateBase's `init` slot; `eventCode` is `result`, which GameApplication__PollStatusObj switches on through Obj865C8 (1 is a timeout, TimedTask__SetState's state 4). Class865C8__Init and ObjM__AttachTarget call it as `GetTimedTaskMethods()->init((TimedTask *)self, (IntermediateBaseInitArgs *)..., mode)`. Image byte-identical.
+2026-09-25, round 84 (bravo): class unified in `include/TimedTask.h`. Not renamed. Signature `s32 (TimedTask *self, IntermediateBaseInitArgs *args, s32 mode)`, IntermediateBase's `init` slot; `eventCode` is `result`, which GameApplication__PollStatusObj switches on through Obj865C8 (1 is a timeout, TimedTask__SetState's state 4). DayTask__Init and ObjM__AttachTarget call it as `GetTimedTaskMethods()->init((TimedTask *)self, (IntermediateBaseInitArgs *)..., mode)`. Image byte-identical.

@@ -36,7 +36,7 @@ because the callee (`+0x06C`, `TimedTask__SetTimeout`, this unit's own function,
 matched the same round) is confirmed void from its own disassembly: it ends
 `jr $ra` / `nop` with no `$v0` ever set. Positive evidence, not silence.
 
-`self->methods` is typed `Class865C8Methods *` even though the runtime
+`self->methods` is typed `DayTaskMethods *` even though the runtime
 object is (per its ctor, `gTimedTaskMethods`) a sibling-class instance: both
 tables agree on the field type at +0x06C (confirmed identical function
 address in `tools/classtable.py 0x800865C8 --vs 0x8006E878` /

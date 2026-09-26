@@ -83,7 +83,7 @@ in the CFG before assuming linear `.s` order matches nesting order.
 
 Round 75 (bravo, track 3). `func_80052D10` -> `ObjM__OnNotify`, **tier B**.
 
-Slot +0x038 of gObjMMethods (`tools/classtable.py 0x80087034`), the slot called OnNotify elsewhere in this family (Class865C8__OnNotify, IntermediateBase__OnNotify). Calls the base's slot38, then dispatches on arg1->target->header: (tag & 0xFFF) == 0x114 -> ObjM__OnStageMapNotify (+0x0B4), 0x164 -> ObjM__OnFadeNotify (+0x0B0), (tag & 0xFFFF) == 0x1F34 -> ObjM__OnDreamSysNotify (+0x090). Tier B: which objects carry those header tags is not established.
+Slot +0x038 of gObjMMethods (`tools/classtable.py 0x80087034`), the slot called OnNotify elsewhere in this family (DayTask__OnNotify, IntermediateBase__OnNotify). Calls the base's slot38, then dispatches on arg1->target->header: (tag & 0xFFF) == 0x114 -> ObjM__OnStageMapNotify (+0x0B4), 0x164 -> ObjM__OnFadeNotify (+0x0B0), (tag & 0xFFFF) == 0x1F34 -> ObjM__OnDreamSysNotify (+0x090). Tier B: which objects carry those header tags is not established.
 
 
 ## Track 4 (2026-09-26, round 89, echo)

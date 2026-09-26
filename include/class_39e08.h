@@ -2,29 +2,29 @@
 #define CLASS_39E08_H
 
 #include "common.h"
-#include "Class865C8.h"
+#include "DayTask.h"
 
 /*
  * Unit class_39e08: the methods of two classes, in ROM order.
- *  - Class865C8 (gClass865C8Methods, 0x1F230), New_Class865C8 through
- *    GetClass865C8Methods: include/Class865C8.h (track 4, round 88).
+ *  - DayTask (gDayTaskMethods, 0x1F230), New_DayTask through
+ *    GetDayTaskMethods: the task that runs one dream day
+ *    (include/DayTask.h).
  *  - TimedTask (gTimedTaskMethods, 0x230), its parent, New_TimedTask
  *    through TimedTask__SetTimeout: include/TimedTask.h. Its last two
  *    functions, TimedTask__PlaySound and GetTimedTaskMethods, open
  *    class_3ac78. NoOpSlot58, CheckTimeout, SetState and SetTimeout are
- *    TimedTask's own methods that Class865C8 inherits unchanged.
- * plus func_8004A070, called once from Class865C8's ctor and once from
+ *    TimedTask's own methods that DayTask inherits unchanged.
+ * plus func_8004A070, called once from DayTask's ctor and once from
  * code_1677c: it manages a pair of file-scope globals (D_8008A978/
  * D_8008A97C) and loops on RegisterFileTableEntries; nothing pins down
  * what it registers.
  *
  * What stays here are the call-site views of objects this unit reaches
  * without a unified class to type them, each with only the slot or word its
- * one caller touches. ObjM (Class865C8::objM) is include/ObjM.h (track 4,
- * round 89).
+ * one caller touches. ObjM (DayTask::objM) is include/ObjM.h.
  */
 
-/* Opaque view of whatever object Class865C8__OnInit reaches through
+/* Opaque view of whatever object DayTask__OnInit reaches through
  * IntermediateBaseInitArgs::unk0: its +0x07C returns the size it hands the
  * viewport's setScreenSize. */
 typedef struct SubObjE SubObjE;
@@ -38,7 +38,7 @@ struct SubObjE {
     SubObjEMethods *methods;
 };
 
-/* New_ObjM and ObjM, the class of Class865C8::objM: include/ObjM.h. */
+/* New_ObjM and ObjM, the class of DayTask::objM: include/ObjM.h. */
 
 /* BasicClass-family allocator; see code_171e0.h / code_55dd4.h / Entity.h /
  * class_16334.h for the other units that also declare it locally. */
@@ -48,7 +48,7 @@ extern void *BMemPMgrAlloc(s32 size);
 extern void TickDreamAuxSlots(void);
 
 /* MATCHED, src/code_39094.c (`char *GetSoundEffectDir(void)`): returns the
- * "SND\\SE" directory string pointer; Class865C8's ctor passes it as
+ * "SND\\SE" directory string pointer; DayTask's ctor passes it as
  * TimedTask's soundBankPath. */
 extern s32 GetSoundEffectDir(s32 arg1); /* arity-ok: the definition takes no parameter and reads no argument register, but this dead argument IS byte-load-bearing -- retail emits `move a0,zero` at 0x800496A8 ahead of the jal at 0x800496B0 */
 

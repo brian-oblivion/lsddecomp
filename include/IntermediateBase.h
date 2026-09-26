@@ -8,7 +8,7 @@
  * BasicClass subclass that runs one attached job to a result. Methods in
  * src/code_2cc8c_c.c. Two classes derive from it (`typeviews.py --tree`):
  * TaskCore (0x130, gTaskCoreMethods: StreamTask, TitleMenu, GraphRoom
- * below it) and TimedTask (0x230: gClass865C8Methods's Class865C8 and gObjMMethods's ObjM
+ * below it) and TimedTask (0x230: gDayTaskMethods's DayTask and gObjMMethods's ObjM
  * below it). It is abstract: +0x04C, +0x050 and +0x058 are NULL in its own
  * table, and init/deinit call the first two. It has no allocator; the object
  * is 0x28 bytes because both subclasses' own fields start at +0x028
@@ -35,13 +35,13 @@ typedef struct IntermediateBaseMethods IntermediateBaseMethods;
 typedef struct IntermediateBaseInitArgs IntermediateBaseInitArgs;
 
 /* init's argument. The caller owns it; the object keeps the pointer at
- * +0x00C. Class865C8__Class865C8 fills +0x008..+0x010 itself (New_FrameClock(),
+ * +0x00C. DayTask__DayTask fills +0x008..+0x010 itself (New_FrameClock(),
  * New_StageMap(0, 1), New_NodeGuardedViewport()). */
 struct IntermediateBaseInitArgs {
     /* +0x000 */ BasicClass *drawSystem; /* Application__InitSystems: the DrawSystem; added as a child; onState2 calls its +0x048, onState3 its +0x04C */
     /* +0x004 */ BasicClass *pad; /* Application__InitSystems: the Pad; added as a child; onTag1Notify's event 2 calls its +0x044, +0x048 */
     /* +0x008 */ BasicClass *frameClock; /* becomes unk10; NULL: init makes one with New_FrameClock() */
-    /* +0x00C */ BasicClass *lightRig; /* becomes unk14; Class865C8 passes a StageMap (a LightRig); NULL: init makes one with New_LightRig() */
+    /* +0x00C */ BasicClass *lightRig; /* becomes unk14; DayTask passes a StageMap (a LightRig); NULL: init makes one with New_LightRig() */
     /* +0x010 */ BasicClass *viewport; /* becomes viewport; NULL: init makes one with New_Viewport() */
 };
 

@@ -22,9 +22,9 @@
  *    initDefaults again; the override makes that second call a no-op;
  *  - four own slots, +0x0B8..+0x0C4, hold empty functions nothing calls.
  *
- * Lifecycle: Class865C8__Class865C8 (src/class_39e08.c), the one
+ * Lifecycle: DayTask__DayTask (src/class_39e08.c), the one
  * construction site, builds it as its IntermediateBaseInitArgs' viewport.
- * Class865C8__Init hands it to the DreamSys (setViewport), and ObjM, built
+ * DayTask__Init hands it to the DreamSys (setViewport), and ObjM, built
  * from the same init args, drives it through Viewport's slots: InitStyleAndWorld
  * and SetupSceneStyle detach and re-attach the DreamSys as the view node,
  * EnterStyleSession sets its light mode, clear colour, fog and far colour and

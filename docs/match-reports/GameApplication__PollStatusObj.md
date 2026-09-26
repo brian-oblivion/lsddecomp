@@ -81,7 +81,7 @@ without reaching it. The fix came from re-reading four instructions of retail.
 
 ## What it does
 
-`GameApplicationMethods` slot `+0x060`. Builds a `StatusObj` (`New_Class865C8`,
+`GameApplicationMethods` slot `+0x060`. Builds a `StatusObj` (`New_DayTask`,
 New_X shape, 0x50 bytes), dispatches `slot44(obj)` (return kept) then
 `slot4(obj)` (return discarded -- via the same "delay slot after `jalr`
 captures the *preceding* call's return" idiom `GameApplication__RunPollTask` uses), and
@@ -102,7 +102,7 @@ s32 GameApplication__PollStatusObj(GameApplication *self) {
     s32 check;
     s32 result;
 
-    obj = New_Class865C8(self->unk1C, self->dreamSys, self->arg->unk04);
+    obj = New_DayTask(self->unk1C, self->dreamSys, self->arg->unk04);
     status = obj->methods->slot44(obj);
     obj->methods->slot4(obj);
 
@@ -246,7 +246,7 @@ switched on," and only the former gets the free reuse.
 ## Naming
 
 **`GameApplication__PollStatusObj` -- tier B.** Mechanics: builds a `StatusObj`
-(`New_Class865C8`), reads one status code off it (`slot44`), tears it down
+(`New_DayTask`), reads one status code off it (`slot44`), tears it down
 (`slot4`), reacts to two of the codes (2 -> `GameApplication__StartCinematicStream`,
 3 -> latch `self->unk24`), then separately queries the owned `DreamSys`'s
 day/year status and derives a 0/1 result. Named for the StatusObj query
@@ -255,16 +255,16 @@ shape (both are "poll an object for a status code and react to it"), since
 what the two status-code values actually MEAN in the game is not
 established from this body alone.
 
-## Track 4 (2026-09-26, round 88, Class865C8)
+## Track 4 (2026-09-26, round 88, DayTask)
 
-The "StatusObj" is Class865C8 (gClass865C8Methods, include/Class865C8.h):
-`New_Obj865C8` became `New_Class865C8`, and this unit's local
+The "StatusObj" is DayTask (gDayTaskMethods, include/DayTask.h):
+`New_Obj865C8` became `New_DayTask`, and this unit's local
 `StatusObj`/`StatusObjMethods` view was deleted. The body now reads
-`((Class865C8InitFn)obj->methods->init)(obj)` then
+`((DayTaskInitFn)obj->methods->init)(obj)` then
 `obj->methods->release(obj)`: slot +0x044 is IntermediateBase's
-`init(self, args, mode)`, and Class865C8's occupant, `Class865C8__Init`,
+`init(self, args, mode)`, and DayTask's occupant, `DayTask__Init`,
 takes self alone, so the call keeps passing only `$a0` through a typedef of
 the override (a pointer cast, no code). The status code is TimedTask's
-`result`: 2 and 3 are values `Class865C8__OnObjMNotify` sets when the ObjM
+`result`: 2 and 3 are values `DayTask__OnObjMNotify` sets when the ObjM
 it built ends the day (`endDay` returned 0 with a cinematic entry: 2;
 `endDay` failed, or events 0xC/0xD: 3). Byte-identical.

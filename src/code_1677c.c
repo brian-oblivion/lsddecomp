@@ -2,7 +2,7 @@
  * code_1677c -- GameApplication (include/GameApplication.h), the game's
  * Application subclass: its allocator and ctor, the RNG seed and initSystems
  * overrides, and the six hooks Application's main loop calls -- the intro
- * logos, the weekly stream, the GraphRoom poll, the Class865C8 run and the
+ * logos, the weekly stream, the GraphRoom poll, the DayTask run and the
  * streams that follow it -- with the loader- and poll-task helpers they share.
  * The table getter is in src/code_171e0.c.
  */
@@ -14,7 +14,7 @@
 #include "StreamTask.h"
 #include "GraphRoom.h"
 #include "TitleMenu.h"
-#include "Class865C8.h"
+#include "DayTask.h"
 
 /* The game's allocator, in the uncarved code_8220 block. Returns void *
  * rather than a typed pointer because every New_X in the game calls it. */
@@ -295,13 +295,13 @@ void GameApplication__StartGraphRoomStreamTask(GameApplication *self) {
 
 void GameApplication__NoOpSlot5C(void) {}
 
-/* Builds a Class865C8 (include/Class865C8.h), runs its init with self
- * alone (Class865C8__Init takes nothing else, hence Class865C8InitFn) and
+/* Builds a DayTask (include/DayTask.h), runs its init with self
+ * alone (DayTask__Init takes nothing else, hence DayTaskInitFn) and
  * releases it; init's return, TimedTask::result, is a status code: 2 runs GameApplication__StartCinematicStream, 3 latches self->skipGraphRoomPoll.
  * Then queries the DreamSys status slot again (as GameApplication__PollGraphRoomStatus does),
  * this time passing an out-param, and derives a 0/1 result from both the
  * call's return and the out-param. */
-/* Builds a Class865C8 for this instance's current state, reads one status
+/* Builds a DayTask for this instance's current state, reads one status
  * code off it, tears it down, and reacts to two of the codes. Then asks the
  * owned DreamSys a question and reports whether its answer was 1.
  *
@@ -323,13 +323,13 @@ void GameApplication__NoOpSlot5C(void) {}
  *    what the source said. */
 s32 GameApplication__PollStatusObj(GameApplication *self) {
     s32 status;
-    Class865C8 *obj;
+    DayTask *obj;
     s32 outVal;
     s32 check;
     s32 result;
 
-    obj = New_Class865C8((IntermediateBaseInitArgs *)self->aux, self->dreamSys, self->config->unk04);
-    status = ((Class865C8InitFn)obj->methods->init)(obj);
+    obj = New_DayTask((IntermediateBaseInitArgs *)self->aux, self->dreamSys, self->config->unk04);
+    status = ((DayTaskInitFn)obj->methods->init)(obj);
     obj->methods->release(obj);
 
     switch (status) {

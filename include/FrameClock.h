@@ -17,7 +17,7 @@
  * (include/DrawSystem.h): IntermediateBase__Init (src/code_2cc8c_c.c) keeps
  * one at +0x010 (initArgs->unk8, or New_FrameClock()), adds it as a child of
  * itself, of the viewport and of the LightRig, and IntermediateBase__OnTag1Notify
- * calls its tick on the DrawSystem's event 2. Class865C8__Class865C8
+ * calls its tick on the DrawSystem's event 2. DayTask__DayTask
  * (src/class_39e08.c) makes the one handed in as initArgs->unk8.
  *
  * Its listeners, all dispatching on the sender's class nibble 5:

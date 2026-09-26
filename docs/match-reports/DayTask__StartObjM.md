@@ -1,6 +1,8 @@
-# Class865C8__StartObjM — MATCHED (33/33 words)
+# DayTask__StartObjM — MATCHED (33/33 words)
 
-> Renamed from `Class865C8__EnterState2` on 2026-09-26 (tools/rename.py). Address 0x80049e20.
+> Renamed from `Class865C8__StartObjM` on 2026-09-26 (tools/rename.py). Address 0x80049e20.
+
+> Renamed from `DayTask__EnterState2` on 2026-09-26 (tools/rename.py). Address 0x80049e20.
 
 > Renamed from `Obj865C8__EnterState2` on 2026-09-26 (tools/rename.py). Address 0x80049e20.
 
@@ -39,7 +41,7 @@ sw    $v0, 0x3C($s0)         ; self->unk3C = 2
 jr    $ra
 ```
 
-The key to the residue-free read: `Class865C8__StartObjM`'s own incoming `arg1`
+The key to the residue-free read: `DayTask__StartObjM`'s own incoming `arg1`
 ($a1) is stored at `0x10($sp)` in the prologue — not as a dead argument
 spill, but because that slot IS the o32 outgoing-argument home for a call's
 5th parameter, and `New_ObjM` takes 5 args (4 in `$a0-$a3`, the 5th on
@@ -51,7 +53,7 @@ inside this function's body.
 ## Final C
 
 ```c
-void Class865C8__StartObjM(Obj865C8 *self, s32 arg1) {
+void DayTask__StartObjM(Obj865C8 *self, s32 arg1) {
     self->unk4C = New_ObjM(self->subB, (s32)self->unk40, (s32)self->unk44, (s32)self->unk48, arg1);
     self->methods->slot10(self, self->unk4C);
     self->unk4C->methods->slot44(self->unk4C, (s32)self->unk0C, (s32)self->unk38);
@@ -60,8 +62,8 @@ void Class865C8__StartObjM(Obj865C8 *self, s32 arg1) {
 ```
 
 (The `(s32)` casts were added across two later passes in round 2026-09-02
-— `unk0C`/`unk38` when `Class865C8__Deinit` proved those two fields are really
-pointers, and `unk40`/`unk44`/`unk48` when `Class865C8__Finalize` proved those
+— `unk0C`/`unk38` when `DayTask__Deinit` proved those two fields are really
+pointers, and `unk40`/`unk44`/`unk48` when `DayTask__Finalize` proved those
 three are too. See "Correction" below. This snippet reflects the CURRENT
 committed source.)
 
@@ -75,7 +77,7 @@ committed source.)
   `SubObjD *`, and `unk40`/`unk44`/`unk48` are all `SubObjG *`. `unk4C` was
   typed `Obj4C *` (the object `New_ObjM` returns) from the start,
   unaffected.
-- `Class865C8Methods::slot10` typed `void (*)(Obj865C8 *self, Obj4C *arg1)`
+- `DayTaskMethods::slot10` typed `void (*)(Obj865C8 *self, Obj4C *arg1)`
   — a BasicClass-inherited slot (`BasicClass__AddChild`, same address
   `GameApplication.h` already lists at its own local `+0x010` as an untyped
   `unk10`; not reconciled there per this project's per-unit local-view
@@ -103,7 +105,7 @@ An incoming register argument stored to `sp+0x10` in the prologue with no
 later load from that slot is not necessarily a dead/unused-parameter spill —
 check whether the same offset is the o32 outgoing-argument home (args 5+ go
 at `$sp+0x10` in the CALLER's own frame) for a call made later in the same
-function. Here it was `Class865C8__StartObjM` silently forwarding its own 2nd
+function. Here it was `DayTask__StartObjM` silently forwarding its own 2nd
 parameter as the 5th argument to `New_ObjM`. Worth checking cross-call
 argument counts (via the callee's own prologue, e.g. how far up its stack it
 loads incoming args from) before writing off such a store as inert.
@@ -112,8 +114,8 @@ loads incoming args from) before writing off such a store as inert.
 
 All five of this function's opaquely-forwarded fields (`unk0C`, `unk38`,
 `unk40`, `unk44`, `unk48`) were later proven to be real pointer types by
-functions that DO dereference them: `Class865C8__Deinit`/`Class865C8__Init` settled
-`unk0C` (`Obj0C *`) and `unk38` (`SubObjD *`); `Class865C8__Finalize` settled
+functions that DO dereference them: `DayTask__Deinit`/`DayTask__Init` settled
+`unk0C` (`Obj0C *`) and `unk38` (`SubObjD *`); `DayTask__Finalize` settled
 `unk40`/`unk44`/`unk48` (all `SubObjG *`). This function's own derivation
 above is left as originally written — it was, and remains, an accurate
 account of what THIS function's disassembly alone shows, which cannot
@@ -125,13 +127,13 @@ was reconfirmed at 33/33 after each retyping pass.
 
 ## Naming
 
-`Class865C8__StartObjM` -- tier B. Unconditionally sets `state = 2` at the end and constructs a new object via `New_ObjM`, stored at `unk4C`; called from both `Class865C8__AdvancePhase` and `Class865C8__OnObjMNotify`. Named for the one state transition its body always performs.
+`DayTask__StartObjM` -- tier B. Unconditionally sets `state = 2` at the end and constructs a new object via `New_ObjM`, stored at `unk4C`; called from both `DayTask__AdvancePhase` and `DayTask__OnObjMNotify`. Named for the one state transition its body always performs.
 
-## Track 4 (2026-09-26, round 88, Class865C8)
+## Track 4 (2026-09-26, round 88, DayTask)
 
-The class (table D_800865C8, id 0x1F230, TimedTask's subclass) is unified as Class865C8 in include/Class865C8.h; the Obj865C8/Class865C8Methods views in class_39e08.h are gone. Renamed from Obj865C8__EnterState2: builds New_ObjM(sound, bgm, etcTim, dreamerTmd, stage), keeps it at +0x04C (objM), adds it as a child, calls its init (+0x044) with (initArgs, dreamSys), phase = 2. Not a slot.
+The class (table D_800865C8, id 0x1F230, TimedTask's subclass) is unified as DayTask in include/DayTask.h; the Obj865C8/DayTaskMethods views in class_39e08.h are gone. Renamed from Obj865C8__EnterState2: builds New_ObjM(sound, bgm, etcTim, dreamerTmd, stage), keeps it at +0x04C (objM), adds it as a child, calls its init (+0x044) with (initArgs, dreamSys), phase = 2. Not a slot.
 
 
 ## Track 4 (2026-09-26, round 89, echo)
 
-The class is unified as ObjM in include/ObjM.h (table gObjMMethods, was D_80087034); the class_3bb8c_k/_l/_m views (ObjM_3bb8c_k, Obj87034_3bb8c_l, ObjM) and class_39e08.h's Obj4C/SubObjB/EventArg are gone. Byte-identical. Class865C8::objM is `struct ObjM *`; New_ObjM's arguments go uncast and init/deinit/release are called by name.
+The class is unified as ObjM in include/ObjM.h (table gObjMMethods, was D_80087034); the class_3bb8c_k/_l/_m views (ObjM_3bb8c_k, Obj87034_3bb8c_l, ObjM) and class_39e08.h's Obj4C/SubObjB/EventArg are gone. Byte-identical. DayTask::objM is `struct ObjM *`; New_ObjM's arguments go uncast and init/deinit/release are called by name.

@@ -19,7 +19,7 @@
  *
  * Holders: ModelData's `linkResource` (ModelData__BuildResources, over the
  * TMD sub-block of a MOM file), PlacementGrid's `linkResource`
- * (StageMap__PopulateSlotCells, the element's models), Class865C8's
+ * (StageMap__PopulateSlotCells, the element's models), DayTask's
  * `dreamerTmd` ("ETC\DREAMER.TMD") and DreamSys's ctor argument
  * (GameApplication__GameApplication, "ETC\DREAME5.TMD": DreamSys__DreamSys adds
  * getModel(0) as its child).

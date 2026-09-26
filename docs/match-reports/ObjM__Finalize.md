@@ -40,9 +40,9 @@ unit). Matched first attempt.
 
 Round 75 (bravo, track 3). `func_80052CD8` -> `ObjM__Finalize`, **tier A**.
 
-Slot +0x00C of gObjMMethods (`tools/classtable.py 0x80087034`). Forwards to the base's dtor (GetTimedTaskMethods()->dtor). Named after the base family's own +0x00C names (TimedTask__Dtor, Class865C8__Finalize; the first renamed `TimedTask__Finalize` in round 84).
+Slot +0x00C of gObjMMethods (`tools/classtable.py 0x80087034`). Forwards to the base's dtor (GetTimedTaskMethods()->dtor). Named after the base family's own +0x00C names (TimedTask__Dtor, DayTask__Finalize; the first renamed `TimedTask__Finalize` in round 84).
 
-## Track 4 (2026-09-26, round 88, Class865C8)
+## Track 4 (2026-09-26, round 88, DayTask)
 
 ObjM__Finalize's parameter was `Obj865C8 *` (the sibling class's view); it is now `ObjM_3bb8c_k *`, class_3bb8c_k's own view of this method's class (gObjMMethods). Byte-identical.
 
