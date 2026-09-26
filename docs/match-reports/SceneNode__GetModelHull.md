@@ -1,4 +1,6 @@
-# SceneNode__ReadUnk20Data -- MATCHED (9/9 words)
+# SceneNode__GetModelHull -- MATCHED (9/9 words)
+
+> Renamed from `SceneNode__ReadUnk20Data` on 2026-09-26 (tools/rename.py). Address 0x8001d600.
 
 > Renamed from `Class6B5CC__ReadUnk20Data` on 2026-09-26 (tools/rename.py). Address 0x8001d600.
 
@@ -13,14 +15,14 @@ argument straight through (untouched, still in `$a1` from the caller) to
 `TmdModel__GetHull` (Psy-Q, `psyq_GsLinkObject4.s`).
 
 ```c
-void SceneNode__ReadUnk20Data(SceneNodeObj *self, void *dest) {
+void SceneNode__GetModelHull(SceneNodeObj *self, void *dest) {
     TmdModel__GetHull(self->unk20, dest);
 }
 ```
 
 ## Return type: `void`, not `return TmdModel__GetHull(...)`
 
-`SceneNode__ReadUnk20Data` never touches `$v0` after the `jal`, so the byte match alone
+`SceneNode__GetModelHull` never touches `$v0` after the `jal`, so the byte match alone
 doesn't distinguish `void` from a pass-through `return`. Checked
 `TmdModel__GetHull`'s own disassembly instead: its last write to `$v0` before
 `jr $ra` is leftover from an unrelated `lhu $v0, 0x1E($sp)` a few
@@ -41,7 +43,7 @@ image SHA1 still green).
 
 ## Evidence
 
-Disassembly (`asm/nonmatchings/code_d294_b/SceneNode__ReadUnk20Data.s`):
+Disassembly (`asm/nonmatchings/code_d294_b/SceneNode__GetModelHull.s`):
 ```
 lw  $a0, 0x20($a0)      # a0 = self->unk20
 jal TmdModel__GetHull

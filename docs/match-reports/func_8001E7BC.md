@@ -44,7 +44,7 @@ return 1;
 
 - **`SceneNodeObj` gains (at least) THREE new fields**, all read directly
   off `self` (not through `unk14`):
-  - `+0x20`: ALREADY typed `void *unk20` (round 12, `SceneNode__ReadUnk20Data`) --
+  - `+0x20`: ALREADY typed `void *unk20` (round 12, `SceneNode__GetModelHull`) --
     this function is a SECOND confirming use, null-checked at entry (a
     `return 0` guard) and later passed as `TmdModel__RaycastFaces`'s own first
     argument. No retype needed, just a second confirmed non-NULL-checked

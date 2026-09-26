@@ -677,7 +677,7 @@ renames/proposals:
 | slot | current | proposed | occupant (this unit) |
 | --- | --- | --- | --- |
 | `+0x084` | `slot84` | `getRotMatrix` | `SceneNode__GetRotMatrix` (proposed `SceneNode__GetRotMatrix`) |
-| `+0x08C` | `slot8C` | `readUnk20Data` | `SceneNode__ReadUnk20Data` |
+| `+0x08C` | `slot8C` | `readUnk20Data` | `SceneNode__GetModelHull` |
 | `+0x090` | `slot90` | `transformAndNotifyParents` | `SceneNode__TransformAndNotifyParents` |
 | `+0x0A0` | `slotA0` | `tryAttachNearby` | `SceneNode__TryAttachNearby` (proposed `SceneNode__TryAttachNearby`, this function) |
 | `+0x0A4` | `slotA4` | `composeAndApplyRotation` | `SceneNode__ComposeAndApplyRotation` |

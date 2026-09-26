@@ -16,7 +16,7 @@ void SceneNode__NotifyIfUnk20Active(SceneNodeObj *self, s32 a1);
 
 Gated on `2 <= a1 < 4`, `self->unk20 != NULL`, and `TmdModel__GetBoundsCount(self->unk20)`
 being true: fills a local stack buffer via this class's own `+0x8C` vtable
-slot (`SceneNode__ReadUnk20Data`, already matched in this unit — forwards to
+slot (`SceneNode__GetModelHull`, already matched in this unit — forwards to
 `TmdModel__GetHull(self->unk20, dest)`), then forwards that same buffer into
 `+0x90` (`SceneNode__TransformAndNotifyParents`, also already matched), with the original `a1`
 passed through as `SceneNode__TransformAndNotifyParents`'s own `a2`.
@@ -57,7 +57,7 @@ void SceneNode__NotifyIfUnk20Active(SceneNodeObj *self, s32 a1) {
    (`SceneNode__TransformAndNotifyParents`) only reads its own `a1` argument's `+0x0`/`+0x4`, so
    `GenericCountList_d294`'s minimal 8-byte shape is sufficient for THAT
    call to compile and match. But the SAME buffer is also the `dest` argument
-   to `SceneNode__ReadUnk20Data` → `TmdModel__GetHull` (PsyQ, `asm/psyq_GsLinkObject4.s`,
+   to `SceneNode__GetModelHull` → `TmdModel__GetHull` (PsyQ, `asm/psyq_GsLinkObject4.s`,
    not decompiled), whose own disassembly stores through offsets out past
    `+0x32` of `dest`. An 8-byte local buffer compiles fine (nothing checks
    bounds) but reserves too little stack, giving a frame 0x30 bytes
@@ -76,7 +76,7 @@ void SceneNode__NotifyIfUnk20Active(SceneNodeObj *self, s32 a1) {
 `include/code_d294.h`:
 
 - `SceneNodeMethods`: typed `+0x08C` (`slot8C`, `void (*)(SceneNodeObj*,
-  void*)`, occupant `SceneNode__ReadUnk20Data`) and `+0x090` (`slot90`, `void (*)
+  void*)`, occupant `SceneNode__GetModelHull`) and `+0x090` (`slot90`, `void (*)
   (SceneNodeObj*, GenericCountList_d294*, s32)`, occupant `SceneNode__TransformAndNotifyParents`).
   Both already-matched functions in this unit; confirmed occupants via
   `tools/classtable.py gSceneNodeMethods`. Split out of the `pad060[0x0A0-0x060]`
@@ -84,7 +84,7 @@ void SceneNode__NotifyIfUnk20Active(SceneNodeObj *self, s32 a1) {
   dispatched through it — no longer true once this call site was written).
 - New extern `TmdModel__GetBoundsCount(void *arg0)` returning `s32`, PsyQ library
   (`asm/psyq_GsLinkObject4.s`), same opaque `self->unk20` shape as
-  `TmdModel__GetHull`/`SceneNode__ReadUnk20Data`'s own declarations.
+  `TmdModel__GetHull`/`SceneNode__GetModelHull`'s own declarations.
 
 ## Proposed learning
 
@@ -115,7 +115,7 @@ complete.
 
 Renamed from `func_8001D568` via `tools/rename.py`. **Tier B** -- gates
 on `2 <= a1 < 4` and `self->unk20 != NULL && TmdModel__GetBoundsCount(self->unk20)`,
-then chains `SceneNode__ReadUnk20Data` (slot `+0x08C`) into
+then chains `SceneNode__GetModelHull` (slot `+0x08C`) into
 `SceneNode__TransformAndNotifyParents` (slot `+0x090`). Name describes
 the gate-then-forward mechanics; purpose of the `a1` range or the
 underlying notification is not established. Purely local to this unit

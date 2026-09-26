@@ -11,7 +11,7 @@
  * symbol is comment-referenced from other units' own vtable census notes);
  * a rotation-matrix builder (`SceneNode__GetRotMatrix`, proposed
  * `SceneNode__GetRotMatrix`); a gated read-transform-notify chain
- * (`SceneNode__ReadUnk20Data` -> `SceneNode__NotifyIfUnk20Active` ->
+ * (`SceneNode__GetModelHull` -> `SceneNode__NotifyIfUnk20Active` ->
  * `SceneNode__TransformAndNotifyParents`); two vtable no-op stubs
  * (`func_8001D6A4`/`D6AC`, kept `func_` per this class's own
  * `SceneNode__func_1d33c` no-op precedent); a command dispatcher over the same
@@ -89,13 +89,13 @@ void SceneNode__GetRotMatrix(SceneNode *self, s32 a1, s32 a2) {
 
 /* a1 gates a small range (2 <= a1 < 4). When self->model is set and
  * TmdModel__GetBoundsCount(self->model) reports true, fills a stack buffer through
- * this class's own +0x8C slot (SceneNode__ReadUnk20Data, already matched in this
+ * this class's own +0x8C slot (SceneNode__GetModelHull, already matched in this
  * unit -- fills it via TmdModel__GetHull(self->model, dest)) then forwards
  * that same buffer, retyped as a TmdHull, into +0x90
  * (SceneNode__TransformAndNotifyParents, also already matched in this unit), with the original
  * a1 passed through as SceneNode__TransformAndNotifyParents's own a2. */
 void SceneNode__NotifyIfUnk20Active(SceneNode *self, s32 a1) {
-    /* Sized to reproduce retail's own frame (0x58): SceneNode__ReadUnk20Data's own
+    /* Sized to reproduce retail's own frame (0x58): SceneNode__GetModelHull's own
      * target (TmdModel__GetHull, code_fa50) writes a TmdHull
      * (include/TmdModel.h: a count word and eight 6-byte corners, 0x34
      * bytes) into its `dest`, so the true destination struct is bigger than
@@ -121,7 +121,7 @@ void SceneNode__NotifyIfUnk20Active(SceneNode *self, s32 a1) {
 /* Forwards self->model (the TmdModel, held as `void *` in SceneNode.h) and
  * its own 2nd argument straight through to TmdModel__GetHull, untouched.
  * TmdModel__GetHull (code_fa50) is void, so this wrapper is void too. */
-void SceneNode__ReadUnk20Data(SceneNode *self, void *dest) {
+void SceneNode__GetModelHull(SceneNode *self, void *dest) {
     TmdModel__GetHull(self->model, dest);
 }
 
