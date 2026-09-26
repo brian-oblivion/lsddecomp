@@ -608,7 +608,9 @@ STAGE_PERMALINK_TRIGGERS = 0x80088710;
 LEN_STAGE_PERMALINK_TRIGGERS = 0x80088748;
 SPECIAL_DAYS = 0x80088CCC;
 SPECIAL_COLORS = 0x80088D20;
-D_8008AC68 = 0x8008AC68; // identified: libc2/rand.o .sbss (weak `n`, the rand seed), pinned by psyq-objects.ld; was FirecatFG's Small__rand
+// identified: libc2/rand.o .sbss (its weak `n`, the rand seed), pinned by
+// psyq-objects.ld. Was FirecatFG's Small__rand (round 89).
+D_8008AC68 = 0x8008AC68;
 gpNavChallengesComplete = 0x8008ACB4;
 gpDinamicLinkPenalty = 0x8008ACB8;
 Class6B5CC__RotateLocalVector = 0x8001E58C; // type:func
