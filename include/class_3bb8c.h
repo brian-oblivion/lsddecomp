@@ -798,30 +798,14 @@ extern void *BMemPMgrAlloc(s32 size);
  * to the no-argument getter as zero-cost (docs/match-reports/Class86AA0__Class86AA0.md). */
 
 
-/*
- * A third small sibling class (New_X/ctor pair, same shape as Class869D8
- * and Class86AA0 above), named by its vtable's address `gClass86B60Methods`
- * (returned by `GetClass86B60Methods`, still raw asm in the uncarved
- * `asm/class_3bb8c_d.s` -- called directly, not through any vtable).
- * `New_Class86B60` is the New_X allocator (alloc size 0xC4); `Class86B60__Class86B60`
- * is the ctor itself, which SETS `self->methods` directly to this table's
- * own pointer (the base-class constructor chaining pattern already seen
- * in `TaskCoreMethods::slotD8`, include/code_2c054.h) rather than fetching
- * it through another getter first.
- */
-typedef struct Class86B60 Class86B60;
-typedef struct Class86B60Methods Class86B60Methods;
-/* The DreamSys Class86B60::dreamSys holds (include/DreamSys.h; the units
- * that call through it include that header). */
-struct DreamSys;
+/* Class86B60 (gClass86B60Methods, a TaskCore) is defined in
+ * include/Class86B60.h (round 88, track 4). Two views of OTHER classes
+ * its methods call stay here, named for the Class86B60 field that holds
+ * them: */
 
-/*
- * self->unkC's pointee. `unk0` is itself a pointer to a small vtable
- * object (`slot78`, reached by Class86B60__OnDeinit in a fixed 2-iteration loop
- * alongside a table walk); `unk4` is an opaque value forwarded verbatim
- * by Class86B60__EndMemcardSave as an argument to `Class86B60Methods::slot10`.
- */
-typedef struct Class86B60UnkCObj_3bb8c_d Class86B60UnkCObj_3bb8c_d;
+/* The class of IntermediateBaseInitArgs::unk0 (a BasicClass * there), as
+ * Class86B60__OnDeinit calls its +0x078; TaskCore__OnDeinit makes the same
+ * call through code_2c054.h's TaskTextObj. */
 typedef struct Class86B60UnkC0ObjMethods_3bb8c_d Class86B60UnkC0ObjMethods_3bb8c_d;
 typedef struct Class86B60UnkC0Obj_3bb8c_d Class86B60UnkC0Obj_3bb8c_d;
 
@@ -838,108 +822,9 @@ struct Class86B60UnkC0Obj_3bb8c_d {
     Class86B60UnkC0ObjMethods_3bb8c_d *methods; /* +0x000 */
 };
 
-struct Class86B60UnkCObj_3bb8c_d {
-    Class86B60UnkC0Obj_3bb8c_d *unk0; /* +0x000, Class86B60__OnDeinit */
-    void *unk4;                        /* +0x004, Class86B60__EndMemcardSave: opaque, forwarded verbatim */
-};
-
-/*
- * self->unk4C's pointee. Only `unk8` is reached, by Class86B60__SetState, as an
- * opaque value forwarded verbatim to `Class86B60Methods::slotF0`'s 2nd
- * argument.
- */
-typedef struct Class86B60Unk4CObj_3bb8c_d Class86B60Unk4CObj_3bb8c_d;
-struct Class86B60Unk4CObj_3bb8c_d {
-    u8 pad0[0x008];
-    void *unk8; /* +0x008, Class86B60__SetState */
-};
-
-/*
- * self->unk60's pointee. Only `unk14` is reached, by Class86B60__RefreshViewValue, as a
- * plain `s32` copied into a one-word stack buffer before being forwarded
- * by address to DreamSys's getSetScreenShake (+0x19C).
- */
-typedef struct Class86B60Unk60Obj_3bb8c_d Class86B60Unk60Obj_3bb8c_d;
-struct Class86B60Unk60Obj_3bb8c_d {
-    u8 pad0[0x014];
-    s32 unk14; /* +0x014, Class86B60__RefreshViewValue */
-};
-
-/*
- * Generic class-instance shape used only to reach the shared BasicClass-
- * family "release" slot (`+0x004`, same offset as `BasicClassMethods::
- * release` in include/code_8220.h -- "virtual finalize, then free self")
- * on an object whose concrete class this unit does not otherwise need to
- * know. Local, independent view per this project's established
- * multiple-independent-views convention. Class86B60__Finalize calls this on both `Class86B60::unkA8` and
- * `Class86B60::unkAC`.
- */
-typedef struct GenericReleaseMethods_3bb8c_d GenericReleaseMethods_3bb8c_d;
-typedef struct GenericReleaseObj_3bb8c_d GenericReleaseObj_3bb8c_d;
-
-struct GenericReleaseMethods_3bb8c_d {
-    u8 pad000[0x004];
-    void (*release)(GenericReleaseObj_3bb8c_d *self); /* +0x004 */
-};
-
-struct GenericReleaseObj_3bb8c_d {
-    GenericReleaseMethods_3bb8c_d *methods; /* +0x000 */
-};
-
-/*
- * Class86B60::unkB0's pointee. Shares the same `release` slot at `+0x004`
- * as `GenericReleaseObj_3bb8c_d`, but also exposes `+0x04C` (reached by
- * Class86B60__ForwardToNameField), so it gets its own local view rather than reusing that
- * minimal type.
- */
-typedef struct Class86B60UnkB0ObjMethods_3bb8c_d Class86B60UnkB0ObjMethods_3bb8c_d;
-typedef struct Class86B60UnkB0Obj_3bb8c_d Class86B60UnkB0Obj_3bb8c_d;
-
-struct Class86B60UnkB0ObjMethods_3bb8c_d {
-    u8 pad000[0x004];
-    void (*release)(Class86B60UnkB0Obj_3bb8c_d *self); /* +0x004, Class86B60__DestroyNameField */
-    u8 pad008[0x04C - 0x008];
-    /* +0x04C, Class86B60__ForwardToNameField's own 2nd call: `(self, arg1, &D_8008A9B4)`. */
-    void (*slot4C)(Class86B60UnkB0Obj_3bb8c_d *self, s32 arg1, void *arg2);
-    u8 pad050[0x0B8 - 0x050];
-    /* +0x0B8, Class86B60__TickNameFieldCursor's own last call: `(self, buf)` where `buf` is
-     * that function's own 3-byte stack buffer. Lands at the SAME offset
-     * as `include/class_3bb8c.h`'s own `FieldM7CMethods::slotB8` (a
-     * different unit's independent view) and TextRow's table
-     * (include/TextRow.h) -- further confirmation (on top of `release`
-     * +0x004 and `slot4C` +0x04C already matching both) that `unkB0` is
-     * that same real class. */
-    void (*slotB8)(Class86B60UnkB0Obj_3bb8c_d *self, void *arg1);
-    u8 pad0BC[0x0CC - 0x0BC];
-    /* +0x0CC, Class86B60__CommitNameEntry's own call: `(self, buf)` where `buf` is a
-     * pool-allocated string this function fills with `DecodeFullWidthSjis`
-     * before the call and frees right after. */
-    void (*slotCC)(Class86B60UnkB0Obj_3bb8c_d *self, void *arg1);
-};
-
-struct Class86B60UnkB0Obj_3bb8c_d {
-    Class86B60UnkB0ObjMethods_3bb8c_d *methods; /* +0x000 */
-    u8 pad004[0x0A9 - 0x004];
-    /* +0x0A9, Class86B60__CommitNameEntry: read as an unsigned byte and used directly as
-     * an allocation SIZE (`BMemPMgrAlloc`'s own argument). */
-    u8 unkA9;
-    /* +0x0AA/+0x0AB/+0x0AC, Class86B60__CreateNameField: three literal byte fields
-     * (9/8/4) set right after allocation via `New_TextRow` -- this is
-     * a TextRow (include/TextRow.h): +0x0A9 cellCount, +0x0AA gapIndex,
-     * +0x0AB visibleCount, +0x0AC firstVisible. */
-    u8 unkAA;
-    u8 unkAB;
-    u8 unkAC;
-};
-
-/*
- * Class86B60::unkAC's fuller shape -- shares the same `release` slot at
- * `+0x004` as the generic view (established by Class86B60__Finalize), but
- * Class86B60__EndMemcardSave also reaches `+0x070`. Same reasoning as
- * `Class86B60UnkB0Obj_3bb8c_d` above: kept a dedicated type rather than
- * assuming `unkA8` shares this fuller interface too, since nothing in
- * this unit ever dispatches a second slot on `unkA8`.
- */
+/* Class86B60::saveCtrl's class: New_TaskObjF's object (gTaskObjFMethods,
+ * class id 0xB), as Class86B60's methods call it. A view of TaskObjF, not
+ * of Class86B60; include/Class86B60.h refers to it by tag. */
 typedef struct Class86B60UnkACObjMethods_3bb8c_d Class86B60UnkACObjMethods_3bb8c_d;
 typedef struct Class86B60UnkACObj_3bb8c_d Class86B60UnkACObj_3bb8c_d;
 
@@ -948,7 +833,7 @@ struct Class86B60UnkACObjMethods_3bb8c_d {
     void (*release)(Class86B60UnkACObj_3bb8c_d *self); /* +0x004, Class86B60__Finalize */
     u8 pad008[0x06C - 0x008];
     /* +0x06C, Class86B60__BeginMemcardSave's own call: `(self, D_8008A9D0, &D_80086D6C,
-     * self->unkC->unk4, self->unk10, self->unk14, self->unk48)` -- 7
+     * self->initArgs->unk4, self->unk10, self->unk14, self->sound)` -- 7
      * arguments, the last three on the stack. Every pointer beyond `self`
      * is forwarded opaquely (never dereferenced by this slot's own
      * caller), so all stay `void *`/`s32 *` placeholders. */
@@ -956,7 +841,7 @@ struct Class86B60UnkACObjMethods_3bb8c_d {
                    void *arg3, void *arg4, void *arg5, void *arg6); /* +0x06C */
     void (*slot70)(Class86B60UnkACObj_3bb8c_d *self); /* +0x070, Class86B60__EndMemcardSave */
     /* +0x074, Class86B60__UpdateMemcardSaveStatus's own 2nd call: `(self, D_8008AA10, D_8008AA18,
-     * self->unkBC, self->unkC0)` -- the two middle arguments are the
+     * self->saveBlock, self->saveBlockSize)` -- the two middle arguments are the
      * VALUES of two `.sdata` globals loaded via `%gp_rel` (not their
      * addresses), each holding a pointer into the still-uncarved rodata
      * block at `D_80011434` (verified in `asm/data/1C34.rodata.s`: no
@@ -964,10 +849,10 @@ struct Class86B60UnkACObjMethods_3bb8c_d {
      * name and are forwarded as opaque `void *`). */
     void (*slot74)(Class86B60UnkACObj_3bb8c_d *self, void *arg1, void *arg2, s32 arg3, s32 arg4); /* +0x074 */
     /* +0x078, Class86B60__UpdateMemcardSaveWithIcon's own call: `(self, D_8008AA10, D_8008AA18,
-     * 0xD, 3, self->unkA8, self->unkBC, self->unkC0)` -- eight arguments,
-     * the last four on the stack. `arg5` is `Class86B60::unkA8`, forwarded
-     * opaquely (never dereferenced by this slot's own caller), so kept
-     * `void *` rather than its fuller `GenericReleaseObj_3bb8c_d *` type. */
+     * 0xD, 3, self->iconHandle, self->saveBlock, self->saveBlockSize)` --
+     * eight arguments, the last four on the stack. `arg5` is
+     * `Class86B60::iconHandle` (a TimImage), forwarded opaquely (never
+     * dereferenced by this slot's own caller), so kept `void *`. */
     void (*slot78)(Class86B60UnkACObj_3bb8c_d *self, void *arg1, void *arg2,
                    s32 arg3, s32 arg4, void *arg5, s32 arg6, s32 arg7); /* +0x078 */
 };
@@ -976,224 +861,24 @@ struct Class86B60UnkACObj_3bb8c_d {
     Class86B60UnkACObjMethods_3bb8c_d *methods; /* +0x000 */
 };
 
-/*
- * Generic class-instance shape used only to read another object's own
- * vtable header WORD (the full `s32` at the vtable's own `+0x000`), the
- * same "arg->methods->header" runtime-type-id shape already documented
- * project-wide. Distinct from a read of
- * only the LOW BYTE of the same word (a `lbu`, Class86AA0__DispatchLinkCommand) -- Class86B60__OnNotify loads and
- * masks the FULL WORD (`lw` then `andi ..,0xF`), so a byte-typed
- * struct here would emit the wrong load width.
- */
-typedef struct GenericHeaderMethods_3bb8c_d GenericHeaderMethods_3bb8c_d;
-typedef struct GenericHeaderObj_3bb8c_d GenericHeaderObj_3bb8c_d;
 
-struct GenericHeaderMethods_3bb8c_d {
-    s32 header; /* +0x000 */
-};
+/* Class86B60's menu description (include/TaskCore.h): Class86B60__Class86B60
+ * passes &D_80086D44 as TaskCore's ctor's `target` and again to setTarget.
+ * 0x28 bytes in asm/data/76DC8.data.s, a path word, three zero words, the two
+ * colour triples and four pointers: the TaskCoreTarget layout. RETYPED from a
+ * placeholder `s32` in round 88 (address-of only; no byte change). */
+extern TaskCoreTarget D_80086D44;
 
-struct GenericHeaderObj_3bb8c_d {
-    GenericHeaderMethods_3bb8c_d *methods; /* +0x000 */
-};
+/* "ETC\ETCSE" (asm/data/1C34.rodata.s), Class86B60__Class86B60's
+ * soundBankPath for TaskCore's ctor. RETYPED from a placeholder `s32` in
+ * round 88 (address-of only); the ctor casts away the const for the
+ * ctor's `char *`. */
+extern const char D_800114DC[];
 
-struct Class86B60Methods {
-    u8 pad000[0x008];
-    void (*ctor)(Class86B60 *self, void *dreamSys);  /* +0x008, Class86B60__Class86B60 occupies this slot */
-    u8 pad00C[0x010 - 0x00C];
-    /* +0x010, Class86B60__EndMemcardSave's own first two calls -- called TWICE with
-     * different arguments (`self->unkC->unk4`, then `self->unk10`), both
-     * opaque values forwarded verbatim. */
-    void (*slot10)(Class86B60 *self, void *arg1);
-    /* +0x014, Class86B60__EndMemcardSave's own 3rd call: `(self, self->unkAC)`, the
-     * pointer forwarded opaquely rather than dereferenced by this slot's
-     * caller. */
-    void (*slot14)(Class86B60 *self, void *arg1);
-    u8 pad018[0x040 - 0x018];
-    /* +0x040, Class86B60__Class86B60's own last call -- same "runs right after
-     * self->methods is installed" shape as Class869D8Methods::initDefaults
-     * (include/Class869D8.h). This struct (Class86B60Methods) is otherwise SHARED with
-     * src/class_3bb8c_d.c (many other slots below are dispatched from
-     * functions there), so this rename followed the compiler-ownership
-     * recipe rather than being assumed safe: renamed the definition alone,
-     * rebuilt, and the ONLY accessor the compiler found anywhere in the
-     * tree was this unit's own Class86B60__Class86B60 (src/class_3bb8c_c.c)
-     * -- round 68. */
-    void (*onConstruct)(Class86B60 *self, void *dreamSys);
-    u8 pad044[0x060 - 0x044];
-    /* +0x060, Class86B60__CommitNameEntry's own two calls, both `(self, literal)` --
-     * once with `0xB` right after `self->unk58 = 5`, once with `0xF`
-     * later in the same function. */
-    void (*slot60)(Class86B60 *self, s32 arg1);
-    u8 pad064[0x06C - 0x064];
-    void (*slot6C)(Class86B60 *self, s32 arg1); /* +0x06C, Class86B60__Reset's own 2nd call, arg1 = 0xA */
-    u8 pad070[0x078 - 0x070];
-    void (*slot78)(Class86B60 *self); /* +0x078, Class86B60__SetState's own last call, `self` only */
-    void (*slot7C)(Class86B60 *self); /* +0x07C, Class86B60__SetState's own 2nd call, `self` only */
-    u8 pad080[0x094 - 0x080];
-    /* +0x094, Class86B60__Tick's shared tail call target for its `unk58==1`
-     * and `unk58==4` cases -- a crossjump-merge-safe local function
-     * pointer (see round 12's "local function pointer variable" lever)
-     * rather than a retyped slot, since `slot130`/`slot134` reach the
-     * SAME call site with the same signature. */
-    void (*slot94)(Class86B60 *self);
-    u8 pad098[0x0D4 - 0x098];
-    /* +0x0D4, Class86B60__Reset's own first call, arg1 = &D_800114E8, arg2 = 0. */
-    void (*slotD4)(Class86B60 *self, void *arg1, s32 arg2);
-    void (*slotD8)(Class86B60 *self, void *arg1);      /* +0x0D8, Class86B60__Class86B60's own call, arg1 = &D_80086D44 */
-    u8 pad0DC[0x0E0 - 0x0DC];
-    /* +0x0E0, Class86B60__CommitNameEntry's own call: `(self, self->unk14)`, arg1
-     * forwarded opaquely. */
-    void (*slotE0)(Class86B60 *self, void *arg1);
-    u8 pad0E4[0x0F0 - 0x0E4];
-    /* +0x0F0, Class86B60__SetState's own 3rd call: `(self, self->unk4C->unk8,
-     * 1)`. Distinct from DreamSys's +0x0F0 (getSetFlashbackSession, see
-     * Class86B60__Reset's report) -- same offset number, unrelated table.
-     * Class86B60__CommitNameEntry (this round) also reaches this slot, forwarding an
-     * `s32` (its own saved pre-overwrite copy of `self->unk58`) through
-     * the SAME `void *arg1` parameter, cast at that call site rather than
-     * retyping the slot -- the bit pattern is unchanged either way, and
-     * `Class86B60__SetState`'s own call already established the pointer type. */
-    void (*slotF0)(Class86B60 *self, void *arg1, s32 arg2);
-    u8 pad0F4[0x11C - 0x0F4];
-    /* +0x11C, Class86B60__CommitNameEntry's own call: `(self, buf, 1)` where `buf` is
-     * the value DreamSys's getSetScreenShake (+0x19C, via `self->dreamSys`)
-     * just filled through a stack out-parameter. */
-    void (*slot11C)(Class86B60 *self, s32 arg1, s32 arg2);
-    u8 pad120[0x124 - 0x120];
-    void (*slot124)(Class86B60 *self, s32 arg1); /* +0x124, Class86B60__SetState (arg1=0)/Class86B60__OnTagBValue (arg1=0x16) */
-    /* +0x128, Class86B60__UpdateMemcardSaveStatus's own first call, `self` only. Return unused. */
-    void (*slot128)(Class86B60 *self);
-    void (*slot12C)(Class86B60 *self); /* +0x12C, Class86B60__OnTagBValue's own first call, `self` only */
-    void (*slot130)(Class86B60 *self); /* +0x130, Class86B60__Tick's `unk58==2` tail target */
-    void (*slot134)(Class86B60 *self); /* +0x134, Class86B60__Tick's `unk58==3` tail target */
-    /* +0x138, Class86B60__OnNotify's forward target, only reached when its own
-     * arg1's header-word low nibble == 0xB (a runtime-type-id gate) --
-     * called with all three of Class86B60__OnNotify's own parameters verbatim. */
-    void (*slot138)(Class86B60 *self, void *arg1, s32 arg2);
-};
-
-struct Class86B60 {
-    Class86B60Methods *methods;    /* +0x000 */
-    u8 pad004[0x00C - 0x004];
-    Class86B60UnkCObj_3bb8c_d *handlerTable; /* +0x00C, Class86B60__OnDeinit/Class86B60__EndMemcardSave.
-                                        RENAMED from unkC -- the fixed-entry table object
-                                        Class86B60__OnDeinit walks. */
-    void *unk10;                     /* +0x010, Class86B60__EndMemcardSave: opaque, forwarded verbatim */
-    void *unk14;                     /* +0x014, Class86B60__BeginMemcardSave: opaque, forwarded verbatim to unkAC->methods->slot6C */
-    u8 pad018[0x02C - 0x018];
-    s32 unk2C;                      /* +0x02C, Class86B60__Reset: set to 0x190 */
-    u8 pad030[0x034 - 0x030];
-    s32 unk34;                      /* +0x034, Class86B60__Reset: zeroed */
-    /* +0x038, Class86B60__Tick: set to 0 on the `unk58==1` path and to the
-     * literal 2 on the `unk58==4` path -- read by nothing else in this
-     * unit. The literal 2 is the SAME constant `Class86B60__Tick` compares
-     * `self->unk58` against for its `case 2`, and retail keeps it
-     * resident in one register across the whole function rather than
-     * re-materializing it, which is what proves this is a literal `2`
-     * and not (as a first reading of the raw asm suggested) `self`
-     * re-stored through a leftover register. */
-    s32 unk38;
-    /* +0x03C, Class86B60__TickNameFieldCursor: a flag tested `!= 0`, gating whether that
-     * function fills its own local 3-byte buffer from `arg1`'s bytes or
-     * zeroes it instead. No setter in this unit. */
-    s32 unk3C;
-    u8 pad040[0x048 - 0x040];
-    /* Set up by the base ctor chain (Get_vtable_TaskCore()->ctor), read
-     * (never written) by Class86B60__Class86B60 right after. Same offset/shape as
-     * `StreamTask::unk48` in include/StreamTask.h (also a base-ctor-
-     * chain output), but kept as its own local type since nothing ties
-     * the two classes together and the one slot this unit dispatches
-     * through (+0x09C) isn't among that type's own known slots. */
-    struct Class86B60Unk48Obj *unk48;  /* +0x048, Class86B60__Class86B60 */
-    Class86B60Unk4CObj_3bb8c_d *unk4C; /* +0x04C, Class86B60__SetState */
-    u8 pad050[0x058 - 0x050];
-    s32 state;                       /* +0x058, Class86B60__Tick: 5-valued dispatch (0-4). RENAMED from unk58 (compiler-ownership check: accessor set entirely inside src/class_3bb8c_d.c). */
-    u8 pad05C[0x060 - 0x05C];
-    Class86B60Unk60Obj_3bb8c_d *unk60; /* +0x060, Class86B60__RefreshViewValue */
-    u8 pad064[0x093 - 0x064];
-    /* +0x093, Class86B60__OnDeinit: address-of only, forwarded as
-     * `Class86B60UnkC0ObjMethods_3bb8c_d::slot78`'s 2nd argument each
-     * loop iteration; real extent beyond one byte unknown. */
-    u8 unk93;
-    u8 pad094[0x0A4 - 0x094];
-    /* +0x0A4, Class86B60__Class86B60: its dreamSys argument, the game's
-     * DreamSys (track 4, round 88: the six slots this class calls on it,
-     * +0x0F0/+0x19C/+0x1A0/+0x1A8/+0x1AC/+0x1B0, are DreamSys's
-     * getSetFlashbackSession, getSetScreenShake, getCurrentDayAndYear,
-     * clearNewGameFlag, getNewGameFlag and getSaveBlock). */
-    struct DreamSys *dreamSys;
-    /* +0x0A8/+0x0AC, Class86B60__Finalize (this unit's destructor): two owned
-     * sub-objects, each released through their own shared `release` slot.
-     * BOTH releases sit inside the SAME `unkAC != NULL` guard -- retail's
-     * single branch skips over both calls together, not just the first;
-     * there is no separate null check on `unkA8`. `unkAC` was previously
-     * typed a bare `s32` from Class86B60__Class86B60's `zeroed` write alone, which
-     * is consistent with either a scalar 0 or a null pointer -- this
-     * round's Class86B60__Finalize is what proves it is dereferenced through a
-     * vtable, so it is retyped a pointer here (same size, no layout
-     * change). */
-    GenericReleaseObj_3bb8c_d *iconHandle; /* +0x0A8, Class86B60__Finalize: released iff unkAC != NULL.
-                                        RENAMED from unkA8 -- the `New_TimImage(D_800114F8)`
-                                        return value (D_800114F8 = "CARD\FILEICN1.TIM"), see
-                                        Class86B60__BeginMemcardSave. */
-    /* +0x0AC, Class86B60__Class86B60: zeroed; Class86B60__Finalize: guards both releases.
-     * RETYPED from the minimal `GenericReleaseObj_3bb8c_d *` to the
-     * dedicated `Class86B60UnkACObj_3bb8c_d *` -- Class86B60__EndMemcardSave reaches a
-     * second slot (`+0x070`) on it. Same size, no layout change. */
-    Class86B60UnkACObj_3bb8c_d *saveCtrl;
-    /* +0x0B0, Class86B60__DestroyNameField: a third owned sub-object, released
-     * unconditionally (no null check) through the same shared `release`
-     * slot as `unkA8`/`unkAC`. Typed its own `Class86B60UnkB0Obj_3bb8c_d`
-     * rather than reusing `GenericReleaseObj_3bb8c_d` -- Class86B60__ForwardToNameField
-     * reaches a SECOND slot (`+0x04C`) on the same pointer that
-     * `unkA8`/`unkAC` never do, so it is kept a distinct local view
-     * rather than assuming the other two share its fuller shape. */
-    Class86B60UnkB0Obj_3bb8c_d *nameField; /* RENAMED from unkB0 -- the New_TextRow result
-                                        Class86B60__CreateNameField constructs. */
-    u8 pad0B4[0x0BC - 0x0B4];
-    s32 unkBC;                      /* +0x0BC, Class86B60__Class86B60: dreamSys->methods->getSaveBlock's return (&saveMagic) */
-    s32 unkC0;                      /* +0x0C0, Class86B60__Class86B60: output buffer address passed BY REFERENCE
-                                        to dreamSys->methods->getSaveBlock (the save block size, 0x700) -- last word of the 0xC4-byte
-                                        allocation (0xC0+4 == 0xC4), which is why this field is exactly
-                                        one word wide rather than a guess */
-};
-
-extern Class86B60Methods gClass86B60Methods;
-extern Class86B60Methods *GetClass86B60Methods(void);   /* still raw asm, asm/class_3bb8c_d.s -- called
-                                                       directly (jal), not through any vtable */
-
-/*
- * self->unk48's own pointee (Class86B60Unk48Obj). Only slot9C is reached,
- * by Class86B60__Class86B60, with a single s32 argument (-1); return value unused.
- */
-typedef struct Class86B60Unk48ObjMethods {
-    u8 pad000[0x09C];
-    void (*slot9C)(struct Class86B60Unk48Obj *self, s32 arg1); /* +0x09C */
-} Class86B60Unk48ObjMethods;
-
-typedef struct Class86B60Unk48Obj {
-    Class86B60Unk48ObjMethods *methods;   /* +0x000 */
-} Class86B60Unk48Obj;
-
-/* Class86B60's parent is TaskCore (include/TaskCore.h, track 4 round 84):
- * its methods reach the base implementations through Get_vtable_TaskCore()
- * and upcast `self`. The local view that stood here
- * (BaseTaskCtorTable_3bb8c_c) is gone. */
-
-/* Address-of only in this unit (Class86B60__Class86B60 passes &D_80086D44 both as
- * the base ctor's arg1 and, again, as slotD8's own arg1). Placeholder s32
- * type since only the address is taken here. */
-extern s32 D_80086D44;
-
-/* Address-of only in this unit (Class86B60__Class86B60 passes &D_800114DC as the
- * base ctor's arg2). Placeholder s32 type since only the address is taken
- * here. */
-extern s32 D_800114DC;
-
-/* Address-of only in this unit (Class86B60__Reset passes &D_800114E8 to
- * `Class86B60Methods::slotD4`). Placeholder s32 type since only the
- * address is taken here. */
-extern s32 D_800114E8;
+/* "ETC\TITLE.TIM" (asm/data/1C34.rodata.s), Class86B60__Reset's path for
+ * setSubHandle. RETYPED from a placeholder `s32` in round 88 (address-of
+ * only). */
+extern const char D_800114E8[];
 
 /* Class86B60__BeginMemcardSave's own path string, passed to New_TimImage -- a real
  * dlabel (`asm/data/1C34.rodata.s`: "CARD\FILEICN1.TIM"), so this is the
@@ -1208,8 +893,8 @@ extern const char D_800114F8[];
 extern s32 D_80086DAC;
 
 /* Address-of only in this unit (Class86B60__ForwardToNameField passes &D_8008A9B4 to
- * `Class86B60UnkB0ObjMethods_3bb8c_d::slot4C`). Placeholder s32 type
- * since only the address is taken here. */
+ * the name field's attachToParent, TextRow +0x04C, as its Vec3_d294 offset;
+ * the words are -4, -23, ...). Placeholder s32 type, cast at the call. */
 extern s32 D_8008A9B4;
 
 /* VALUE-of, not address-of, in this unit -- Class86B60__UpdateMemcardSaveStatus reaches these
