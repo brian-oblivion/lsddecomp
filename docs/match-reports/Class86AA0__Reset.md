@@ -25,7 +25,7 @@ report per function, matched ones included.
 
 **Class86AA0__Reset** -- tier C, kept deliberately. Same shape and same
 precedent as `NodeGuardedViewport__InitDefaults`/`NodeGuardedViewport__NoOpSlotB8`/`NodeGuardedViewport__NoOpSlotBC`/
-`NodeGuardedViewport__NoOpSlotC0`/`func_8004D374` above (this unit's own `NodeGuardedViewport`
+`NodeGuardedViewport__NoOpSlotC0`/`NodeGuardedViewport__NoOpSlotC4` above (this unit's own `NodeGuardedViewport`
 siblings) and as `func_8004B324`/`SceneNode__NoOpSlot5C` elsewhere in the project:
 a genuinely empty, no-argument, no-established-purpose vtable stub keeps
 its bare `func_` name rather than a `Class86AA0__func_...` form that would

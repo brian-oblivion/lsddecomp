@@ -2902,3 +2902,4 @@ gTexturedFaceColor = 0x8008A82C;
 NodeGuardedViewport__NoOpSlotB8 = 0x8004D35C; // type:func
 NodeGuardedViewport__NoOpSlotBC = 0x8004D364; // type:func
 NodeGuardedViewport__NoOpSlotC0 = 0x8004D36C; // type:func
+NodeGuardedViewport__NoOpSlotC4 = 0x8004D374; // type:func

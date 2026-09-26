@@ -60,7 +60,7 @@ void NodeGuardedViewport__NoOpSlotBC(void) {}
 
 void NodeGuardedViewport__NoOpSlotC0(void) {}
 
-void func_8004D374(void) {}
+void NodeGuardedViewport__NoOpSlotC4(void) {}
 
 NodeGuardedViewportMethods *GetNodeGuardedViewportMethods(void) {
     return &gNodeGuardedViewportMethods;
