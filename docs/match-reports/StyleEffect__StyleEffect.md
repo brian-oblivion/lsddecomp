@@ -1,27 +1,29 @@
-# Class876FC__Class876FC -- MATCHED (41/41 words)
+# StyleEffect__StyleEffect -- MATCHED (41/41 words)
+
+> Renamed from `Class876FC__Class876FC` on 2026-09-26 (tools/rename.py). Address 0x800563c0.
 
 > Renamed from `func_800563C0` on 2026-09-23 (tools/rename.py). Address 0x800563c0.
 
-Unit: `class_3bb8c_r` (round 17 continuation). `Class876FCMethods::ctor`
-(vtable offset `+0x008` of `gClass876FCMethods`) -- chains to the shared base
+Unit: `class_3bb8c_r` (round 17 continuation). `StyleEffectMethods::ctor`
+(vtable offset `+0x008` of `gStyleEffectMethods`) -- chains to the shared base
 class's own ctor (`GetActorMethods()->ctor`, the SAME shared-base getter
 `class_3bb8c_o.c` already used for its own `Actor__Actor`/
 `New_Actor` last pass), installs this class's own vtable, sets two
-fields, dispatches its own `slot40`, and tail-calls `Class876FC__InitByKind` for
+fields, dispatches its own `slot40`, and tail-calls `StyleEffect__InitByKind` for
 its return value's side effect only.
 
 ## Final source
 
 ```c
-void *Class876FC__Class876FC(Class876FC *self, void *arg1, void *arg2, void *arg3, void *arg4) {
+void *StyleEffect__StyleEffect(StyleEffect *self, void *arg1, void *arg2, void *arg3, void *arg4) {
     if (GetActorMethods()->ctor(self) == NULL) {
         goto fail;
     }
-    self->methods = GetClass876FCMethods();
+    self->methods = GetStyleEffectMethods();
     self->unk44 = 0;
     self->unk54 = arg1;
     self->methods->slot40(self, arg2);
-    Class876FC__InitByKind(self, arg3, arg4);
+    StyleEffect__InitByKind(self, arg3, arg4);
     return self;
 fail:
     return NULL;
@@ -43,18 +45,18 @@ fail:
   there): with a plain `if`/`return NULL`, the return-`self` path needs
   its own explicit `j` to reach the shared epilogue, costing one word.
   `goto` collapses both exits onto ONE epilogue.
-- **The tail call to `Class876FC__InitByKind`'s return value is DISCARDED, not
-  forwarded.** The first attempt wrote `return Class876FC__InitByKind(self, arg3,
+- **The tail call to `StyleEffect__InitByKind`'s return value is DISCARDED, not
+  forwarded.** The first attempt wrote `return StyleEffect__InitByKind(self, arg3,
   arg4);`, which is the "byte match tells you nothing about return type"
   trap's INVERSE mistake -- it assumed the tail call's own return
   propagates, but retail actually issues the call, then explicitly does
   `move v0,s0` (an extra instruction) to force the return value back to
-  `self` regardless of what `Class876FC__InitByKind` returned. Caught immediately
-  by a real word-count mismatch (28/41 with `return Class876FC__InitByKind(...)`,
+  `self` regardless of what `StyleEffect__InitByKind` returned. Caught immediately
+  by a real word-count mismatch (28/41 with `return StyleEffect__InitByKind(...)`,
   worse yet with the wrong exit-value idiom on top) -- the fix was two
-  statements, `Class876FC__InitByKind(self, arg3, arg4); return self;`, not one.
-- `GetClass876FCMethods` (installing this class's own vtable) and
-  `Class876FC__InitByKind` (this class's own post-init hook, still `INCLUDE_ASM`
+  statements, `StyleEffect__InitByKind(self, arg3, arg4); return self;`, not one.
+- `GetStyleEffectMethods` (installing this class's own vtable) and
+  `StyleEffect__InitByKind` (this class's own post-init hook, still `INCLUDE_ASM`
   outside this unit's range) are both declared as local externs, per the
   established "calling into a function in another/uncarved unit is fine"
   convention.
@@ -73,8 +75,8 @@ fail:
 
 ## Naming
 
-**Tier A.** `Class876FC` is the class name class_3bb8c_s.c already uses for `gClass876FCMethods` (its own comment: "`Class876FC` here; class_3bb8c_r.c's `Obj876FC`" -- confirmed via `tools/classtable.py 0x800876FC`, whose slot list mixes `SceneNode__`/`BaseObjO__`/`DreamSys__`-prefixed inherited slots with this unit's own `+0x008`/`+0x00C`/`+0x040`/`+0x0EC`). Ctor naming follows the `Class__Class` convention already used for `Actor__Actor`/`SceneNode__SceneNode`. The body is a constructor by construction (chains the shared base ctor, installs the vtable, dispatches init) -- purpose evident from the body.
+**Tier A.** `StyleEffect` is the class name class_3bb8c_s.c already uses for `gStyleEffectMethods` (its own comment: "`StyleEffect` here; class_3bb8c_r.c's `Obj876FC`" -- confirmed via `tools/classtable.py 0x800876FC`, whose slot list mixes `SceneNode__`/`BaseObjO__`/`DreamSys__`-prefixed inherited slots with this unit's own `+0x008`/`+0x00C`/`+0x040`/`+0x0EC`). Ctor naming follows the `Class__Class` convention already used for `Actor__Actor`/`SceneNode__SceneNode`. The body is a constructor by construction (chains the shared base ctor, installs the vtable, dispatches init) -- purpose evident from the body.
 
 ## Track 4 (2026-09-26, round 88, charlie)
 
-Retyped with the class's unification (include/Class876FC.h): same parameters as New_Class876FC. The two stores the old view called `unk44` and `kind` are Actor's `state` (+0x044) and `pendingExtra` (+0x054): the ctor keeps `kind` in pendingExtra, and the class overrides pendingExtra's setter slot (+0x0EC) with its update, so nothing else writes it. The old own slot `setParams` at +0x040 is SceneNode's `reset`; the call casts to Class876FCSetParamsFn (no code). Image byte-identical.
+Retyped with the class's unification (include/StyleEffect.h): same parameters as New_StyleEffect. The two stores the old view called `unk44` and `kind` are Actor's `state` (+0x044) and `pendingExtra` (+0x054): the ctor keeps `kind` in pendingExtra, and the class overrides pendingExtra's setter slot (+0x0EC) with its update, so nothing else writes it. The old own slot `setParams` at +0x040 is SceneNode's `reset`; the call casts to StyleEffectSetParamsFn (no code). Image byte-identical.

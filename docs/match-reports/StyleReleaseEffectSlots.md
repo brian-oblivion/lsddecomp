@@ -59,4 +59,4 @@ gStyleEffectSlotCount)` -- the release half of the triad, called from
 
 ## Track 4 (2026-09-26, round 88, charlie)
 
-`gStyleEffectSlots` retyped `void *[]` -> `Class876FC *[]` (every element is a New_Class876FC object); ReleaseBasicClassArray takes it as `(void **)`. Image byte-identical.
+`gStyleEffectSlots` retyped `void *[]` -> `StyleEffect *[]` (every element is a New_StyleEffect object); ReleaseBasicClassArray takes it as `(void **)`. Image byte-identical.

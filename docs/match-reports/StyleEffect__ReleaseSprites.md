@@ -1,4 +1,6 @@
-# Class876FC__ReleaseSprites -- MATCHED (9/9 words)
+# StyleEffect__ReleaseSprites -- MATCHED (9/9 words)
+
+> Renamed from `Class876FC__ReleaseSprites` on 2026-09-26 (tools/rename.py). Address 0x80056df8.
 
 > Renamed from `LinkOwnerObj__ReleaseLinks` on 2026-09-26 (tools/rename.py). Address 0x80056df8.
 
@@ -28,7 +30,7 @@ typedef struct LinkOwnerObj {
 
 extern void ReleaseBasicClassArray(void **array, s32 count);
 
-void Class876FC__ReleaseSprites(LinkOwnerObj *this) {
+void StyleEffect__ReleaseSprites(LinkOwnerObj *this) {
     ReleaseBasicClassArray((void **)this->arr84, 5);
 }
 ```
@@ -48,8 +50,8 @@ the same symbol (`code_2cc8c.h`'s `void ReleaseBasicClassArray(void *a0, void *a
 class the rest of this unit implements, see the file banner) -- `+0x84`
 would overflow that class's 0x58-byte allocation (`New_Actor`). It is
 kept as its own independent local type, `LinkOwnerObj`, established
-together with `Class876FC__RandomizeSprites` (which walks indices 1..4 of the SAME
-5-element array) and `Class876FC__ReleaseSpritesB` (byte-identical body to this
+together with `StyleEffect__RandomizeSprites` (which walks indices 1..4 of the SAME
+5-element array) and `StyleEffect__ReleaseSpritesB` (byte-identical body to this
 function).
 
 ### Proposed learning
@@ -58,7 +60,7 @@ None beyond what's already documented -- straightforward wrapper.
 
 ## Naming
 
-**`Class876FC__ReleaseSprites` -- tier A.** Mechanics ARE the purpose: the
+**`StyleEffect__ReleaseSprites` -- tier A.** Mechanics ARE the purpose: the
 whole body is `ReleaseBasicClassArray(this->links, 5)`, i.e. "release [all
 of] this object's links". `LinkOwnerObj` is this unit's own established
 local view of the class `class_3bb8c_s.c` independently calls `LinkNode`
@@ -68,16 +70,16 @@ convention rather than importing that name here.
 
 ## Track 4 (2026-09-26, round 88, charlie)
 
-Renamed from the `LinkOwnerObj__` family to `Class876FC__` with the class's
-unification (`include/Class876FC.h`). Evidence: the only caller is
-Class876FC's own per-kind dispatch in `class_3bb8c_s.c`
-(`Class876FC__InitByKind` kind 3, `Class876FC__UpdateByKind` kind 3,
-`Class876FC__ReleaseByKind` kinds 2/3), each passing its own `self`; the
-five-element array at +0x084 ("links") is `Class876FC::sprites`, filled by
-`Class876FC__SpawnSprites` with `New_VariantSprite` objects. The old
-`LinkOwnerObj`/`LinkElemObj` views were Class876FC and VariantSprite under
+Renamed from the `LinkOwnerObj__` family to `StyleEffect__` with the class's
+unification (`include/StyleEffect.h`). Evidence: the only caller is
+StyleEffect's own per-kind dispatch in `class_3bb8c_s.c`
+(`StyleEffect__InitByKind` kind 3, `StyleEffect__UpdateByKind` kind 3,
+`StyleEffect__ReleaseByKind` kinds 2/3), each passing its own `self`; the
+five-element array at +0x084 ("links") is `StyleEffect::sprites`, filled by
+`StyleEffect__SpawnSprites` with `New_VariantSprite` objects. The old
+`LinkOwnerObj`/`LinkElemObj` views were StyleEffect and VariantSprite under
 another name; RandomizeSprites' `slot48` is VariantSprite's inherited
 `updateScale` and its `angle` (+0x084) is `sprite.rotate` (Sprite, +0x064 +
 0x020, 4096 per degree -- the `(rand() % 360) << 12` it stores).
 
-View replaced the same day: the `LinkOwnerObj`/`LinkElemObj` views in class_3bb8c_o.c are deleted and the unit includes include/Class876FC.h (`this` is `Class876FC *self`; `links` is `sprites`, `slot48` is `updateScale`, `angle` is `sprite.rotate`). Image byte-identical.
+View replaced the same day: the `LinkOwnerObj`/`LinkElemObj` views in class_3bb8c_o.c are deleted and the unit includes include/StyleEffect.h (`this` is `StyleEffect *self`; `links` is `sprites`, `slot48` is `updateScale`, `angle` is `sprite.rotate`). Image byte-identical.

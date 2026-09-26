@@ -91,12 +91,12 @@ Dispatches on `gStyleVariant` (`PickStyleFallbackConfig`'s "kind") to
 `StyleFillEffectKind3` (variant 0) or `StyleFillEffectKind2` (variant 2).
 The build/update/release triad naming mirrors `StyleBuildDecorSet` above,
 for the SEPARATE `gStyleEffectSlots` array (a different object class --
-`Obj876FC`, allocated through `class_3bb8c_r.c`'s `New_Class876FC`, not
+`Obj876FC`, allocated through `class_3bb8c_r.c`'s `New_StyleEffect`, not
 `New_BoxFill`). MATCHED, 60/60, first build.
 
 ## Track 4 (2026-09-26, round 88, charlie)
 
-`gStyleEffectSlots` retyped `void *[]` -> `Class876FC *[]` (every element is a New_Class876FC object); ReleaseBasicClassArray takes it as `(void **)`. Image byte-identical.
+`gStyleEffectSlots` retyped `void *[]` -> `StyleEffect *[]` (every element is a New_StyleEffect object); ReleaseBasicClassArray takes it as `(void **)`. Image byte-identical.
 
 ## Round 93 polish (delta, track 7)
 

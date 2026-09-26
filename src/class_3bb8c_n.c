@@ -19,7 +19,7 @@
  *    box; every tick StyleUpdateDecorSet shifts their colours, their
  *    position and the viewport's clear colour by the view point's y offset
  *    from its reference point;
- *  - the effect slots: Class876FC objects of kinds 0..3 (gStyleEffectSlots)
+ *  - the effect slots: StyleEffect objects of kinds 0..3 (gStyleEffectSlots)
  *    built from one parameter block, gStyleSpawnOffsetX..gStyleSpawnColors,
  *    that StyleFillEffectKindN and SetupStyleSpawnParamsA/B fill in; each
  *    tick updates them with the target position;
@@ -41,7 +41,7 @@
 
 #include "common.h"
 #include "Actor.h"
-#include "Class876FC.h"
+#include "StyleEffect.h"
 #include "BoxFill.h"
 #include "Viewport.h"
 #include "Class866E8.h"
@@ -267,11 +267,11 @@ extern s32 gStyleSceneRefs;
 extern s32 rand(void);
 extern s8 gStyleKind0Counts[];
 extern s32 gStyleEffectSlotCount;
-extern Class876FC *gStyleEffectSlots[];
-extern Class876FC **StyleFillEffectKind0(Class876FC **slots, s32 count, LongVec3 *pos);
-extern Class876FC **StyleFillEffectKind1(Class876FC **slots, s32 count, LongVec3 *pos);
-extern Class876FC **StyleFillEffectKind3(Class876FC **slots, LongVec3 *pos);
-extern Class876FC **StyleFillEffectKind2(Class876FC **slots, LongVec3 *pos);
+extern StyleEffect *gStyleEffectSlots[];
+extern StyleEffect **StyleFillEffectKind0(StyleEffect **slots, s32 count, LongVec3 *pos);
+extern StyleEffect **StyleFillEffectKind1(StyleEffect **slots, s32 count, LongVec3 *pos);
+extern StyleEffect **StyleFillEffectKind3(StyleEffect **slots, LongVec3 *pos);
+extern StyleEffect **StyleFillEffectKind2(StyleEffect **slots, LongVec3 *pos);
 
 /* Hands the variant and ObjM's resources to Actor__func_56f5c, then builds
  * the effect slots for the variant: gStyleKind0Counts' pick of
@@ -281,7 +281,7 @@ void StyleBuildEffectSlots(LongVec3 *pos) {
     StyleSceneRefs *refs;
     s32 kind0Count;
     s32 kind1Count;
-    Class876FC **next;
+    StyleEffect **next;
 
     if (gStyleVariant < 0) {
         return;
@@ -306,18 +306,18 @@ void StyleBuildEffectSlots(LongVec3 *pos) {
 extern s32 gStyleVariant;
 extern s32 gStyleEffectSlotCount;
 
-/* Each slot's +0x0EC is Class876FC__Update, called with the position
- * (include/Class876FC.h: the slot keeps Actor's setPendingExtra type). */
+/* Each slot's +0x0EC is StyleEffect__Update, called with the position
+ * (include/StyleEffect.h: the slot keeps Actor's setPendingExtra type). */
 void StyleUpdateEffectSlots(LongVec3 *pos) {
     s32 i;
-    Class876FC *slot;
+    StyleEffect *slot;
 
     if (gStyleVariant < 0) {
         return;
     }
     for (i = 0; i < gStyleEffectSlotCount; i++) {
         slot = gStyleEffectSlots[i];
-        ((Class876FCUpdateFn)slot->methods->setPendingExtra)(slot, pos);
+        ((StyleEffectUpdateFn)slot->methods->setPendingExtra)(slot, pos);
     }
 }
 
@@ -376,7 +376,7 @@ extern Ratio16 gStyleSpawnScales[][3];
 extern s32 gStyleSpawnYChoices[];
 extern Ratio16 *gStyleSpawnScale;
 extern s32 gStyleSpawnTableIndex;
-/* The first word of the Class876FCParams block every effect is built from
+/* The first word of the StyleEffectParams block every effect is built from
  * (gStyleSpawnOffsetX .. gStyleSpawnColors, separate symbols in the image). */
 extern s32 gStyleSpawnOffsetX;
 extern void SetupStyleSpawnParamsA(LongVec3 *pos, s32 offsetY);
@@ -386,7 +386,7 @@ extern void SetupStyleSpawnParamsB(LongVec3 *pos, s32 offsetY);
  * of them, an offset y (0: each setup picks one; a pick of 4 reads the word
  * after gStyleSpawnYChoices, as retail does), and per slot
  * SetupStyleSpawnParamsA, or B on every seventh day. Returns the next slot. */
-Class876FC **StyleFillEffectKind0(Class876FC **slots, s32 count, LongVec3 *pos) {
+StyleEffect **StyleFillEffectKind0(StyleEffect **slots, s32 count, LongVec3 *pos) {
     s32 i;
     s32 offsetY;
     void (*setup)(LongVec3 *, s32);
@@ -404,7 +404,7 @@ Class876FC **StyleFillEffectKind0(Class876FC **slots, s32 count, LongVec3 *pos) 
     for (i = 0; i < count; i++) {
         setup(pos, offsetY);
         *slots =
-            New_Class876FC(0, (Class876FCParams *)&gStyleSpawnOffsetX, (SceneNode *)gStyleGrid, pos);
+            New_StyleEffect(0, (StyleEffectParams *)&gStyleSpawnOffsetX, (SceneNode *)gStyleGrid, pos);
         slots++;
     }
     return slots;
@@ -415,7 +415,7 @@ extern Ratio16 gStyleKind1Scale[];
 
 /* Fills `count` slots with kind-1 effects: gStyleKind1Scale, offset y
  * gStyleSpawnYChoice2. */
-Class876FC **StyleFillEffectKind1(Class876FC **slots, s32 count, LongVec3 *pos) {
+StyleEffect **StyleFillEffectKind1(StyleEffect **slots, s32 count, LongVec3 *pos) {
     s32 i;
     s32 offsetY;
 
@@ -424,7 +424,7 @@ Class876FC **StyleFillEffectKind1(Class876FC **slots, s32 count, LongVec3 *pos) 
     for (i = 0; i < count; i++) {
         SetupStyleSpawnParamsA(pos, offsetY);
         *slots =
-            New_Class876FC(1, (Class876FCParams *)&gStyleSpawnOffsetX, (SceneNode *)gStyleGrid, pos);
+            New_StyleEffect(1, (StyleEffectParams *)&gStyleSpawnOffsetX, (SceneNode *)gStyleGrid, pos);
         slots++;
     }
     return slots;
@@ -448,7 +448,7 @@ typedef struct PtrBoxK3 {
 /* Appends one kind-3 effect. With decor variant active and band colours B
  * its offset and colour are fixed; otherwise its z offset is folded to
  * -30720..0 and its colour is random. */
-Class876FC **StyleFillEffectKind3(Class876FC **slots, LongVec3 *pos) {
+StyleEffect **StyleFillEffectKind3(StyleEffect **slots, LongVec3 *pos) {
     s32 *offsetZ;
     PtrBoxK3 *rotation;
 
@@ -471,9 +471,9 @@ Class876FC **StyleFillEffectKind3(Class876FC **slots, LongVec3 *pos) {
     rotation = (PtrBoxK3 *)&gStyleSpawnRotation;
     rotation->p = gStyleSpawnRotations[0];
     /* MATCHING: the block's address is taken back from its rotation member */
-    *slots =
-        New_Class876FC(3, (Class876FCParams *)((u8 *)rotation - offsetof(Class876FCParams, rotation)),
-                       (SceneNode *)gStyleGrid, pos);
+    *slots = New_StyleEffect(
+        3, (StyleEffectParams *)((u8 *)rotation - offsetof(StyleEffectParams, rotation)),
+        (SceneNode *)gStyleGrid, pos);
     slots++;
     return slots;
 }
@@ -493,7 +493,7 @@ typedef struct S32BoxK2 {
 
 /* Appends one kind-2 effect with a random colour and, except on every
  * twentieth day, gStyleKind2AltColor as its alternate colour. */
-Class876FC **StyleFillEffectKind2(Class876FC **slots, LongVec3 *pos) {
+StyleEffect **StyleFillEffectKind2(StyleEffect **slots, LongVec3 *pos) {
     s32 r;
     s32 altColor;
     S32BoxK2 *color;
@@ -515,9 +515,9 @@ Class876FC **StyleFillEffectKind2(Class876FC **slots, LongVec3 *pos) {
     *rotation = gStyleSpawnRotations[0];
     gStyleSpawnTableIndex = rand() % 6;
     /* MATCHING: the block's address is taken back from its rotation member */
-    *slots =
-        New_Class876FC(2, (Class876FCParams *)((u8 *)rotation - offsetof(Class876FCParams, rotation)),
-                       (SceneNode *)gStyleGrid, pos);
+    *slots = New_StyleEffect(
+        2, (StyleEffectParams *)((u8 *)rotation - offsetof(StyleEffectParams, rotation)),
+        (SceneNode *)gStyleGrid, pos);
     slots++;
     return slots;
 }

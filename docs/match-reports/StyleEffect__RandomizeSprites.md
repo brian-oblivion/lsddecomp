@@ -1,4 +1,6 @@
-# Class876FC__RandomizeSprites -- MATCHED (57/57 words)
+# StyleEffect__RandomizeSprites -- MATCHED (57/57 words)
+
+> Renamed from `Class876FC__RandomizeSprites` on 2026-09-26 (tools/rename.py). Address 0x80056e44.
 
 > Renamed from `LinkOwnerObj__RandomizeLinks` on 2026-09-26 (tools/rename.py). Address 0x80056e44.
 
@@ -15,7 +17,7 @@ random "angle" field.
 extern s32 rand(void);
 extern Vec3O gLinkElemVec3Table[];
 
-void Class876FC__RandomizeSprites(LinkOwnerObj *this) {
+void StyleEffect__RandomizeSprites(LinkOwnerObj *this) {
     LinkElemObj **p = &this->arr84[1];
     s32 i;
 
@@ -78,7 +80,7 @@ void Class876FC__RandomizeSprites(LinkOwnerObj *this) {
 
 ## Naming
 
-**`Class876FC__RandomizeSprites` -- tier A.** Mechanics ARE the purpose:
+**`StyleEffect__RandomizeSprites` -- tier A.** Mechanics ARE the purpose:
 for each of 4 link elements, calls the element's own `slot48` with a
 random entry from a 6-entry `Vec3O` table and sets the element's own
 `angle` field to a random degrees value -- "randomize" describes exactly
@@ -100,19 +102,19 @@ stays.
 
 **Callee evidence** (`0x80056E44`, and the definition in
 `src/class_3bb8c_o.c`): entry is `addiu s0,a0,136` and `$a1` is never read —
-one real argument, exactly as `void Class876FC__RandomizeSprites(LinkOwnerObj *this)`
+one real argument, exactly as `void StyleEffect__RandomizeSprites(LinkOwnerObj *this)`
 says.
 
-**Why the extern must stay unprototyped.** `Class876FC__UpdateByKind`'s dispatch passes a
+**Why the extern must stay unprototyped.** `StyleEffect__UpdateByKind`'s dispatch passes a
 second argument, and retail emits it:
 
 ```
-800566f8:  jal   80056e44 <Class876FC__RandomizeSprites>
+800566f8:  jal   80056e44 <StyleEffect__RandomizeSprites>
 800566fc:  move  a1,s1            <- the dead 2nd argument, in retail
 ```
 
-`s1` is `Class876FC__UpdateByKind`'s own `arg1`. Its two sibling arms in the same switch
-do the same thing (`jal Class876FC__DriftModelChildren` / `move a1,s1` at `0x800566D8`,
+`s1` is `StyleEffect__UpdateByKind`'s own `arg1`. Its two sibling arms in the same switch
+do the same thing (`jal StyleEffect__DriftModelChildren` / `move a1,s1` at `0x800566D8`,
 `jal NoOpIgnoreArgs` / `move a1,s1` at `0x800566EC`), so the whole dispatch
 forwards `(self, arg1)` uniformly regardless of what each target reads. A
 one-parameter prototype here would make every arm a `too many arguments`
@@ -123,16 +125,16 @@ added to `src/class_3bb8c_s.c:145`. Oracle green.
 
 ## Track 4 (2026-09-26, round 88, charlie)
 
-Renamed from the `LinkOwnerObj__` family to `Class876FC__` with the class's
-unification (`include/Class876FC.h`). Evidence: the only caller is
-Class876FC's own per-kind dispatch in `class_3bb8c_s.c`
-(`Class876FC__InitByKind` kind 3, `Class876FC__UpdateByKind` kind 3,
-`Class876FC__ReleaseByKind` kinds 2/3), each passing its own `self`; the
-five-element array at +0x084 ("links") is `Class876FC::sprites`, filled by
-`Class876FC__SpawnSprites` with `New_VariantSprite` objects. The old
-`LinkOwnerObj`/`LinkElemObj` views were Class876FC and VariantSprite under
+Renamed from the `LinkOwnerObj__` family to `StyleEffect__` with the class's
+unification (`include/StyleEffect.h`). Evidence: the only caller is
+StyleEffect's own per-kind dispatch in `class_3bb8c_s.c`
+(`StyleEffect__InitByKind` kind 3, `StyleEffect__UpdateByKind` kind 3,
+`StyleEffect__ReleaseByKind` kinds 2/3), each passing its own `self`; the
+five-element array at +0x084 ("links") is `StyleEffect::sprites`, filled by
+`StyleEffect__SpawnSprites` with `New_VariantSprite` objects. The old
+`LinkOwnerObj`/`LinkElemObj` views were StyleEffect and VariantSprite under
 another name; RandomizeSprites' `slot48` is VariantSprite's inherited
 `updateScale` and its `angle` (+0x084) is `sprite.rotate` (Sprite, +0x064 +
 0x020, 4096 per degree -- the `(rand() % 360) << 12` it stores).
 
-View replaced the same day: the `LinkOwnerObj`/`LinkElemObj` views in class_3bb8c_o.c are deleted and the unit includes include/Class876FC.h (`this` is `Class876FC *self`; `links` is `sprites`, `slot48` is `updateScale`, `angle` is `sprite.rotate`). Image byte-identical.
+View replaced the same day: the `LinkOwnerObj`/`LinkElemObj` views in class_3bb8c_o.c are deleted and the unit includes include/StyleEffect.h (`this` is `StyleEffect *self`; `links` is `sprites`, `slot48` is `updateScale`, `angle` is `sprite.rotate`). Image byte-identical.

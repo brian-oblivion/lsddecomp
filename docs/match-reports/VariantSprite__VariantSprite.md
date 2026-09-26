@@ -82,7 +82,7 @@ The base class is unified as `Sprite` (`include/Sprite.h`, table `gSpriteMethods
 
 Renamed from `D800879C4__D800879C4` (tools/rename.py). The class is unified
 as `VariantSprite` (`include/VariantSprite.h`, table `gVariantSpriteMethods`,
-formerly `D_800879C4`), the `ClassXXXXX` convention of Class876FC and
+formerly `D_800879C4`), the `ClassXXXXX` convention of StyleEffect and
 FadeBox: the sprites' role in the game is not established, so no
 descriptive name. The unit-local `D800879C4Obj` / `D800879C4Methods` views
 are gone. Current body:
@@ -120,7 +120,7 @@ mechanics are certain and are the whole of what the class adds to Sprite --
 `variant` (0 or 1) picks the texture cell the Sprite ctor binds
 (`gVariantSpriteCells`) and the CLUT row the reset slot sets
 (`gVariantSpriteClutX/Y`). What the sprites are in the game is not
-established (their only builder is Class876FC, kinds 2 and 3, and every
+established (their only builder is StyleEffect, kinds 2 and 3, and every
 path passes variant 0), which is why it is not tier A. The table, getter,
 allocator, methods and the three data tables followed the class name.
 The same tool run rewrote `Class879C4` tokens inside this report's older

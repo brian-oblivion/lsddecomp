@@ -43,4 +43,4 @@ similar existed in the symbols file (only Actor__AddTranslation, a method).
 
 ## Track 4 (2026-09-26, round 88, charlie)
 
-Retyped with Class876FC's unification: `Vec3S` is `LongVec3`. Image byte-identical.
+Retyped with StyleEffect's unification: `Vec3S` is `LongVec3`. Image byte-identical.

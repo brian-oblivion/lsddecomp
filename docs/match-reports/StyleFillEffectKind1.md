@@ -11,7 +11,7 @@ void **StyleFillEffectKind1(void **arg0, s32 arg1, void *arg2);
 ```
 
 Fills `arg1` slots of the array at `arg0` (advancing it by one pointer each
-time) with `New_Class876FC(...)` results, and returns the pointer one past
+time) with `New_StyleEffect(...)` results, and returns the pointer one past
 the last slot written -- the classic "array fill, return next free slot"
 idiom (matches this unit's already-established preference for that shape;
 see `StyleTeardown`'s per-index rewrite of `gStyleCueSlots`).
@@ -24,14 +24,14 @@ extern u8 gStyleKind1Scale[];            /* address only taken, never indexed */
 extern u8 gStyleSpawnOffsetX[];            /* address only taken, passed to New_X */
 extern u8 *gStyleSpawnScale;             /* set to &gStyleKind1Scale unconditionally */
 extern void *SetupStyleSpawnParamsA(void *arg0, void *arg1);   /* forward decl, own unit, cold */
-extern void *New_Class876FC(void *arg0, void *arg1, void *arg2, void *arg3); /* class_3bb8c_r.c, ALREADY MATCHED */
+extern void *New_StyleEffect(void *arg0, void *arg1, void *arg2, void *arg3); /* class_3bb8c_r.c, ALREADY MATCHED */
 ```
 
 `gStyleSpawnYChoice2` is a 2-word dlabel in `asm/data/76DC8.data.s`; only the first
 word is read here (`lw`, not indexed), so it is declared scalar rather than
 an array -- if a sibling function later indexes `[1]`, retype there, not
 here (no other unit references any of these four symbols currently).
-`New_Class876FC` is `class_3bb8c_r.c`'s already-matched `New_X`-style
+`New_StyleEffect` is `class_3bb8c_r.c`'s already-matched `New_X`-style
 allocator (`void *(void*,void*,void*,void*)`), called cross-unit by
 prototype only. `SetupStyleSpawnParamsA` is one of this unit's own still-cold
 functions (110w, queued later); its return value is discarded here (`jal`
@@ -50,7 +50,7 @@ void **StyleFillEffectKind1(void **arg0, s32 arg1, void *arg2) {
     gStyleSpawnScale = gStyleKind1Scale;
     for (i = 0; i < arg1; i++) {
         SetupStyleSpawnParamsA(arg2, (void *) val);
-        *arg0 = New_Class876FC((void *) 1, gStyleSpawnOffsetX, (void *) gStyleGrid, arg2);
+        *arg0 = New_StyleEffect((void *) 1, gStyleSpawnOffsetX, (void *) gStyleGrid, arg2);
         arg0++;
     }
     return arg0;
@@ -91,7 +91,7 @@ change; second attempt: hoisted to a local before the loop, byte-exact).
 **`StyleFillEffectKind1`, tier B.**
 
 Sibling of `StyleFillEffectKind0`: fills `arg1` slots of `gStyleEffectSlots`
-via the same `New_Class876FC` allocator, this time with a literal kind
+via the same `New_StyleEffect` allocator, this time with a literal kind
 argument of `1`. Called unconditionally (every `gStyleVariant`) from
 `StyleBuildEffectSlots`, right after `StyleFillEffectKind0`. MATCHED,
 42/42, second build (one lever: hoist the read of `gStyleSpawnYChoice2` out of the
@@ -99,7 +99,7 @@ loop).
 
 ## Track 4 (2026-09-26, round 88, charlie)
 
-`gStyleEffectSlots` holds Class876FC objects (New_Class876FC), so the walking pointer is `Class876FC **` and the position `LongVec3 *`; `kind` is passed as a plain `s32` (was `(void *) N`), the params block as `(Class876FCParams *)` over the separately-declared gStyleSpawnOffsetX.. symbols (one 0x24-byte Class876FCParams in the bytes; left as they are, a track 4b job), and gStyleGrid as the `SceneNode *` parent. Image byte-identical.
+`gStyleEffectSlots` holds StyleEffect objects (New_StyleEffect), so the walking pointer is `StyleEffect **` and the position `LongVec3 *`; `kind` is passed as a plain `s32` (was `(void *) N`), the params block as `(StyleEffectParams *)` over the separately-declared gStyleSpawnOffsetX.. symbols (one 0x24-byte StyleEffectParams in the bytes; left as they are, a track 4b job), and gStyleGrid as the `SceneNode *` parent. Image byte-identical.
 
 ## Round 93 polish (delta, track 7)
 

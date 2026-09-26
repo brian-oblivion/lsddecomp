@@ -4,7 +4,7 @@
 
 Unit `class_3bb8c_s`. `self` here is a `LinkNode` in the CALLEE role (a
 child, e.g. `self->arr7C[i]`), not the owning node -- see
-`Class876FC__InitByKind`/`Class876FC__PlaceModelChildren`'s call sites, which both pass one of the
+`StyleEffect__InitByKind`/`StyleEffect__PlaceModelChildren`'s call sites, which both pass one of the
 owner's own child pointers as `self` here.
 
 ## Classification
@@ -38,7 +38,7 @@ no evidence either way for a 4th parameter from this call site alone.
 ### Proposed learning
 
 Confirms (again) that "a register is preserved across a call" is NOT evidence
-that the callee reads it -- see the `Class876FC__SpawnSprites` read-only cross-check
+that the callee reads it -- see the `StyleEffect__SpawnSprites` read-only cross-check
 (still `INCLUDE_ASM`/`gp_rel`-blocked in this same unit), which calls the same
 kind of `slot4C` with a completely different, and clearly unrelated, `$a3`
 value sitting stale in the register from far earlier in that function.
@@ -51,11 +51,11 @@ Pure forwarder: slot +0x04C (SceneNode__AttachToParent: sets the parent link and
 coord2 `super`, writes `trans` into coord.t), then slots +0x044 and +0x048
 with set = 1 (SceneNode__UpdateRotation assigns GsCOORD2PARAM.rotate from a degree ratio
 triple; SceneNode__UpdateScale assigns .scale). Both callers
-(Class876FC__InitByKind on the owner, Class876FC__PlaceModelChildren on
+(StyleEffect__InitByKind on the owner, StyleEffect__PlaceModelChildren on
 each BaseObjO child) pass objects whose tables resolve those three slots to
-exactly those functions (tools/classtable.py on gClass876FCMethods and gActorMethods).
+exactly those functions (tools/classtable.py on gStyleEffectMethods and gActorMethods).
 Free function because `node` is not always the owner.
 
 ## Track 4 (2026-09-26, round 88, charlie)
 
-Retyped with Class876FC's unification: `Vec3S` is `LongVec3`; `node` is `Actor *` (the owner, upcast, and each model child) and `rotation` is `void *`, the type of SceneNode's updateRotation table. Image byte-identical.
+Retyped with StyleEffect's unification: `Vec3S` is `LongVec3`; `node` is `Actor *` (the owner, upcast, and each model child) and `rotation` is `void *`, the type of SceneNode's updateRotation table. Image byte-identical.

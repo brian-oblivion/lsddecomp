@@ -1,4 +1,6 @@
-# Class876FC__InitByKind -- MATCHED (72/72 words)
+# StyleEffect__InitByKind -- MATCHED (72/72 words)
+
+> Renamed from `Class876FC__InitByKind` on 2026-09-26 (tools/rename.py). Address 0x80056520.
 
 > Renamed from `func_80056520` on 2026-09-23 (tools/rename.py). Address 0x80056520.
 
@@ -14,7 +16,7 @@ already present in `config/gp-symbols.txt`. Matched byte-exact this round.
 ## What it is
 
 One of this unit's three `self->unk54`-dispatch handlers (see
-`Class876FC__ReleaseByKind`'s comment). Folds `*arg2 + self->unk58` into a stack-local
+`StyleEffect__ReleaseByKind`'s comment). Folds `*arg2 + self->unk58` into a stack-local
 Vec3, forwards it through `AttachWithRotScale`, snapshots a lookup table's current
 value into `gTrackedYSnapshot`, and — only when `unk54` is 0 or 1 — calls through a
 NEW cross-class vtable slot (`+0x080` on the object pointed to by the global
@@ -23,7 +25,7 @@ NEW cross-class vtable slot (`+0x080` on the object pointed to by the global
 ## C
 
 ```c
-void Class876FC__InitByKind(LinkNode *self, void *arg1, Vec3S *arg2) {
+void StyleEffect__InitByKind(LinkNode *self, void *arg1, Vec3S *arg2) {
     Vec3S local;
     s32 state;
 
@@ -40,13 +42,13 @@ void Class876FC__InitByKind(LinkNode *self, void *arg1, Vec3S *arg2) {
 
     switch (state) {
     case 0:
-        Class876FC__PlaceModelChildren(self, 0);
+        StyleEffect__PlaceModelChildren(self, 0);
         break;
     case 2:
-        Class876FC__BuildRandomSprites(self, 0);
+        StyleEffect__BuildRandomSprites(self, 0);
         break;
     case 3:
-        Class876FC__SpawnPlainSprites(self, 0);
+        StyleEffect__SpawnPlainSprites(self, 0);
         break;
     default:
         break;
@@ -90,9 +92,9 @@ green).
   object's true type belongs to a different, uncarved unit and there is no
   shared header to extend, so this stays a local, minimal view (project's
   multiple-independent-local-views convention).
-- **Two functions called here (`Class876FC__BuildRandomSprites`, `Class876FC__SpawnPlainSprites`) are defined
-  with a NARROWER real prototype than this call site uses** (`Class876FC__BuildRandomSprites`
-  takes only `self`; `Class876FC__SpawnPlainSprites` — defined in `class_3bb8c_o.c` — takes
+- **Two functions called here (`StyleEffect__BuildRandomSprites`, `StyleEffect__SpawnPlainSprites`) are defined
+  with a NARROWER real prototype than this call site uses** (`StyleEffect__BuildRandomSprites`
+  takes only `self`; `StyleEffect__SpawnPlainSprites` — defined in `class_3bb8c_o.c` — takes
   only `this`). Retail's own call sites still set up a dead second argument
   register for both. Reproduced with old-style (unprototyped) `extern void
   func_X();` declarations local to this file, which suppress the
@@ -102,22 +104,22 @@ green).
 
 ### Struct edit surfaced a broader hazard: SIZE DRIFT via an unnecessary local variable
 
-Building this function alongside `Class876FC__SpawnSprites` (same session) surfaced a
+Building this function alongside `StyleEffect__SpawnSprites` (same session) surfaced a
 whole-image SHA1 failure that was NOT a compile error and NOT a diff in
 either function's own instruction stream — a first from-scratch instance of
 CLAUDE.md's "shared-struct hazard is broader than retyping" class, but the
 trigger here was a LOCAL VARIABLE choice, not a struct edit: an
-unnecessary `LinkNode *sn = self;` alias in `Class876FC__SpawnSprites` (written to
+unnecessary `LinkNode *sn = self;` alias in `StyleEffect__SpawnSprites` (written to
 avoid repeating a cast) added ONE extra callee-saved register to that
 function's own prologue, growing it by 12 bytes (3 words) and shifting
 EVERY function and rodata blob after it in the whole link — including,
 misleadingly, this function's own funcdiff window, which then reported 5
 scattered "residue" words that were pure ripple and vanished the moment the
-alias was removed. See `Class876FC__SpawnSprites`'s own report for the mechanism.
+alias was removed. See `StyleEffect__SpawnSprites`'s own report for the mechanism.
 
 ### Proposed learning
 
-Confirms MATCHING-GUIDE.md's own recorded lesson (`Class876FC__DriftModelChildren`'s report,
+Confirms MATCHING-GUIDE.md's own recorded lesson (`StyleEffect__DriftModelChildren`'s report,
 same unit) a THIRD time in a different function: a spurious local variable
 can change a function's own register allocation footprint enough to grow
 its instruction count, and because `.rodata` is linked before `.text`, that
@@ -130,41 +132,41 @@ the wrong function.
 
 ## Naming
 
-Round 70 (alpha). `func_80056520` -> `Class876FC__InitByKind`, **tier B**.
+Round 70 (alpha). `func_80056520` -> `StyleEffect__InitByKind`, **tier B**.
 
-Only caller is the class's ctor `Class876FC__Class876FC` (class_3bb8c_r.c), with the
+Only caller is the class's ctor `StyleEffect__StyleEffect` (class_3bb8c_r.c), with the
 ctor's own arg3/arg4 as (parent, pos). Body: snapshot `*(D_8008ACAC + 0x18)`
 into gTrackedYSnapshot; `AttachWithRotScale(self, parent, pos + offset,
 rotation, scale)`; for kind < 2, `SceneNode__LinkModel(self,
 D_8008ACA4->slot80(D_8008AB98[kind]))`; then kind 0 ->
-Class876FC__PlaceModelChildren(self, 0), 2 -> Class876FC__BuildRandomSprites,
-3 -> Class876FC__SpawnPlainSprites (= Class876FC__SpawnSprites(self, 0, 0, NULL)).
+StyleEffect__PlaceModelChildren(self, 0), 2 -> StyleEffect__BuildRandomSprites,
+3 -> StyleEffect__SpawnPlainSprites (= StyleEffect__SpawnSprites(self, 0, 0, NULL)).
 "Init" rests on the one ctor caller, so B.
 
-The class: every function here runs on a gClass876FCMethods instance.
-`New_Class876FC` allocates 0x98 bytes (where `sprites[5]` ends) and passes a
+The class: every function here runs on a gStyleEffectMethods instance.
+`New_StyleEffect` allocates 0x98 bytes (where `sprites[5]` ends) and passes a
 kind 0..3 as its first argument (class_3bb8c_n.c passes 0, 1, 2, 3 at its
-four call sites); `Class876FC__Class876FC` (table +0x008, the ctor) stores it at
-+0x054. `Class876FC` is the table-address class name, the
+four call sites); `StyleEffect__StyleEffect` (table +0x008, the ctor) stores it at
++0x054. `StyleEffect` is the table-address class name, the
 `SceneNode`/`TodActor` convention.
 
 Globals named in this pass: `gTrackedYSnapshot` (was D_8008ACB0, tier B:
 written here from D_8008ACAC's +0x018 word, subtracted from it again by
-Class876FC__UpdateByKind; only this unit references it).
+StyleEffect__UpdateByKind; only this unit references it).
 
 ### Field and slot names in this unit's local view (applied, round 70)
 
 `LinkNode` and `LinkNodeMethods` are defined only in `src/class_3bb8c_s.c`,
 so the compiler's accessor list after renaming the definition was entirely in
 this unit (every `has no member` error was in src/class_3bb8c_s.c, all fixed; build and `tools/check-nonmatching.sh`
-green). `typedef struct LinkNode Class876FC;` was added for the owner's
+green). `typedef struct LinkNode StyleEffect;` was added for the owner's
 method signatures; zero bytes changed.
 
 | offset | old | new | tier | evidence |
 | --- | --- | --- | --- | --- |
 | +0x014 | unk14 | coord2 | B | code_d294.h maps SceneNodeObj +0x14 to GsDOBJ2.coord2; `*coord2 = 0` is its flg |
 | +0x020 | unk20 | model | A | SceneNode__LinkModel stores its 2nd argument here; PlaceModelChildren hands it to each child |
-| +0x024 | unk24 | tick | B | Class876FC__SetParams zeroes it, Class876FC__Update (slot +0x0EC) increments it before every update |
+| +0x024 | unk24 | tick | B | StyleEffect__SetParams zeroes it, StyleEffect__Update (slot +0x0EC) increments it before every update |
 | +0x054 | unk54 | kind | B | ctor stores New's first argument, 0..3 at the four class_3bb8c_n.c call sites; three switches on it |
 | +0x058 | unk58 | offset | B | added to the caller's position in Init and Update |
 | +0x064 | unk64 | rotation | B | passed as updateRotation's data |
@@ -174,7 +176,7 @@ method signatures; zero bytes changed.
 | +0x074 | unk74 | color | B | every sprite's slotB8 (Sprite__SetColor copies 3 bytes to GsSPRITE r,g,b) |
 | +0x078 | unk78 | altColor | B | sprites[1]'s slotB8 argument instead of color when non-NULL |
 | +0x07C | arr7C | modelChildren | B | New_Actor objects, linked to the owner's model |
-| +0x084 | arr84 | sprites | B | New_VariantSprite objects (GsSPRITE at +0x64, see Class876FC__SpawnSprites) |
+| +0x084 | arr84 | sprites | B | New_VariantSprite objects (GsSPRITE at +0x64, see StyleEffect__SpawnSprites) |
 | slot +0x044 | slot44 | updateRotation | B | SceneNode__UpdateRotation (set/add GsCOORD2PARAM.rotate, degrees) |
 | slot +0x048 | slot48 | updateScale | B | SceneNode__UpdateScale (set/add .scale); sprite override VariantSprite__UpdateScale also a scale |
 | slot +0x04C | slot4C | attachToParent | B | SceneNode__AttachToParent (parent link, coord2 super, coord.t) |
@@ -192,7 +194,7 @@ different object (captured by Actor__func_56f5c) whose class is unknown.
 For the HEAD, by type scope; none applied here (other units' views).
 
 - `class_3bb8c_r.c` `Obj876FC` (same object): `unk24` -> `tick` (B, same
-  evidence as above: zeroed by Class876FC__SetParams, incremented by Class876FC__Update);
+  evidence as above: zeroed by StyleEffect__SetParams, incremented by StyleEffect__Update);
   `unk54` -> `kind` (B); `block58` -> `params` (B: the 0x24-byte block this
   unit reads as offset/rotation/scale/modelChildLayout/tableIndex/color/
   altColor).
@@ -209,4 +211,4 @@ warning.
 
 ## Track 4 (2026-09-26, round 88, charlie)
 
-class_3bb8c_s.c's `LinkNode` view (owner and children under one type) is gone: the owner is `Class876FC` (include/Class876FC.h), `modelChildren` are `Actor *`, `sprites` are `VariantSprite *`, and the local `Vec3S` is `LongVec3`. Accessor renames: `kind` is Actor's `pendingExtra` (+0x054, where the ctor stores it); `offset`/`rotation`/`scale`/`modelChildLayout`/`tableIndex`/`color`/`altColor` are `params.*`; slot `slotB8` is Actor's `setTranslation` on the owner and model children and Sprite's `setColor` on sprites; `*coord2 = 0` is `coord2->flg = 0`. Image byte-identical.
+class_3bb8c_s.c's `LinkNode` view (owner and children under one type) is gone: the owner is `StyleEffect` (include/StyleEffect.h), `modelChildren` are `Actor *`, `sprites` are `VariantSprite *`, and the local `Vec3S` is `LongVec3`. Accessor renames: `kind` is Actor's `pendingExtra` (+0x054, where the ctor stores it); `offset`/`rotation`/`scale`/`modelChildLayout`/`tableIndex`/`color`/`altColor` are `params.*`; slot `slotB8` is Actor's `setTranslation` on the owner and model children and Sprite's `setColor` on sprites; `*coord2 = 0` is `coord2->flg = 0`. Image byte-identical.

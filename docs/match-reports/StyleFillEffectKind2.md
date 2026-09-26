@@ -79,7 +79,7 @@ void **StyleFillEffectKind2(void **arg0, void *arg1) {
     q = &gStyleSpawnRotation;
     *q = gStyleSpawnRotations;
     gStyleSpawnTableIndex = rand() % 6;
-    *arg0 = New_Class876FC((void *) 2, (u8 *) q - 0xC, (void *) gStyleGrid, arg1);
+    *arg0 = New_StyleEffect((void *) 2, (u8 *) q - 0xC, (void *) gStyleGrid, arg1);
     arg0++;
     return arg0;
 }
@@ -167,7 +167,7 @@ u8 **q;
 q = &gStyleSpawnRotation;
 *q = gStyleSpawnRotations;
 ...
-New_Class876FC((void *) 2, (u8 *) q - 0xC, (void *) gStyleGrid, arg1);
+New_StyleEffect((void *) 2, (u8 *) q - 0xC, (void *) gStyleGrid, arg1);
 ```
 
 **16/79 and 1 short -> 42/79 and LENGTH EXACT**, skeleton diffs 59 -> 35.
@@ -192,7 +192,7 @@ Retyping to the sibling's shape:
 ```c
 void **StyleFillEffectKind2(void **arg0, void *arg1) {
     ...
-    *arg0 = New_Class876FC((void *) 2, (u8 *) q - 0xC, (void *) gStyleGrid, arg1);
+    *arg0 = New_StyleEffect((void *) 2, (u8 *) q - 0xC, (void *) gStyleGrid, arg1);
     arg0++;
     return arg0;
 }
@@ -336,7 +336,7 @@ local COUNT (this session's other two matches) or a declaration.
 - **(a)** an explicit alias for the first store:
   `new_var = slot; *new_var = (s32) (gStyleKind2Colors + idx * 3);`
 - **(b)** a named local for the `gStyleGrid` load, passed as
-  `New_Class876FC`'s third argument.
+  `New_StyleEffect`'s third argument.
 
 Screened for UB first (no use-before-init, no staleness across a back-edge,
 each assignment consumed immediately -- it passes the forward-trace screen),
@@ -389,7 +389,7 @@ extern u8 *gStyleSpawnRotation;
 extern u8 gStyleSpawnRotations[];
 extern s32 gStyleSpawnTableIndex;
 extern void SetupStyleSpawnParamsA(void *arg0, void *arg1);
-extern void *New_Class876FC(void *arg0, void *arg1, void *arg2, void *arg3);
+extern void *New_StyleEffect(void *arg0, void *arg1, void *arg2, void *arg3);
 
 void **StyleFillEffectKind2(void **arg0, void *arg1) {
     s32 idx;
@@ -413,7 +413,7 @@ void **StyleFillEffectKind2(void **arg0, void *arg1) {
     *q = gStyleSpawnRotations;
     randval = rand();
     gStyleSpawnTableIndex = randval - (randval / 3) * 6;
-    *arg0 = New_Class876FC((void *) 2, (u8 *) q - 0xC, (void *) gStyleGrid, arg1);
+    *arg0 = New_StyleEffect((void *) 2, (u8 *) q - 0xC, (void *) gStyleGrid, arg1);
     arg0++;
     return arg0;
 }
@@ -494,12 +494,12 @@ record of what someone did, not a proof of what does not work.
 Called only when `gStyleVariant == 2`, from `StyleBuildEffectSlots`, as
 the kind-2-exclusive finishing fill (the sibling of `StyleFillEffectKind3`,
 mirrored for the other variant). Passes a literal kind argument of `2` to
-`New_Class876FC`. STALL, 49/79 words (length exact), residue at ins 3/del 3
+`New_StyleEffect`. STALL, 49/79 words (length exact), residue at ins 3/del 3
 per the round-64 revisit.
 
 ## Track 4 (2026-09-26, round 88, charlie)
 
-`gStyleEffectSlots` holds Class876FC objects (New_Class876FC), so the walking pointer is `Class876FC **` and the position `LongVec3 *`; `kind` is passed as a plain `s32` (was `(void *) N`), the params block as `(Class876FCParams *)` over the separately-declared gStyleSpawnOffsetX.. symbols (one 0x24-byte Class876FCParams in the bytes; left as they are, a track 4b job), and gStyleGrid as the `SceneNode *` parent. Image byte-identical.
+`gStyleEffectSlots` holds StyleEffect objects (New_StyleEffect), so the walking pointer is `StyleEffect **` and the position `LongVec3 *`; `kind` is passed as a plain `s32` (was `(void *) N`), the params block as `(StyleEffectParams *)` over the separately-declared gStyleSpawnOffsetX.. symbols (one 0x24-byte StyleEffectParams in the bytes; left as they are, a track 4b job), and gStyleGrid as the `SceneNode *` parent. Image byte-identical.
 
 ## Round 93 polish (delta, track 7)
 
@@ -524,7 +524,7 @@ Verbatim as they stood before the round-93 comment pass (identifiers already car
 ```
 
 ```c
-/* Appends one kind-2 New_Class876FC object after picking a random colour
+/* Appends one kind-2 New_StyleEffect object after picking a random colour
  * triple and a per-20-ticks gStyleKind2AltColor value.  MATCHED round 76 (charlie).
  * `val = (gStyleDay / 20) * 20; if (gStyleDay != val)` is the
  * load-bearing spelling of `% 20 != 0`: because the tested variable is also

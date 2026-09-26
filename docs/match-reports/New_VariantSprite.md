@@ -121,7 +121,7 @@ Renamed from `New_D800879C4` (tools/rename.py); the class is `VariantSprite`
 three arguments are forwarded unchanged to the ctor, whose parameters they
 name (see `VariantSprite__VariantSprite`'s report), and the result is the object.
 The body is unchanged but for the parameter names; the one caller outside
-this unit, `Class876FC__SpawnSprites` (class_3bb8c_s.c), passes its `a2`
+this unit, `StyleEffect__SpawnSprites` (class_3bb8c_s.c), passes its `a2`
 as the variant without a cast and casts the result to its `LinkNode *`
 view, and its local `extern` of this function is gone. The "UNCARVED
 ground" section above is history: the getter and table are
@@ -136,11 +136,11 @@ mechanics are certain and are the whole of what the class adds to Sprite --
 `variant` (0 or 1) picks the texture cell the Sprite ctor binds
 (`gVariantSpriteCells`) and the CLUT row the reset slot sets
 (`gVariantSpriteClutX/Y`). What the sprites are in the game is not
-established (their only builder is Class876FC, kinds 2 and 3, and every
+established (their only builder is StyleEffect, kinds 2 and 3, and every
 path passes variant 0), which is why it is not tier A. The table, getter,
 allocator, methods and the three data tables followed the class name.
 The same tool run rewrote `Class879C4` tokens inside this report's older
 history prose (the known renametype behaviour pending an operator
 decision); those lines were left as the tool wrote them.
 
-Its only caller is `Class876FC__SpawnSprites`, with variant 0.
+Its only caller is `StyleEffect__SpawnSprites`, with variant 0.

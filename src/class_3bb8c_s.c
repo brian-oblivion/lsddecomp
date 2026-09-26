@@ -1,24 +1,24 @@
 /*
  * class_3bb8c_s -- 0x46D20..0x475F0, the private methods of the class whose
- * table is gClass876FCMethods: Class876FC, include/Class876FC.h (round 88).
- * A 0x98-byte scene object built by New_Class876FC with a `kind` 0..3: it
+ * table is gStyleEffectMethods: StyleEffect, include/StyleEffect.h (round 88).
+ * A 0x98-byte scene object built by New_StyleEffect with a `kind` 0..3: it
  * attaches itself under a parent at pos + offset, links a model for kinds
  * 0-1, and owns up to two child arrays -- two Actor model children laid
  * out in a row that spin and drift along z after frame 500 (kind 0), or
  * five VariantSprite sprites (a GsSPRITE at +0x64) that are randomised at build
  * time (kind 2) or every frame (kind 3, class_3bb8c_o.c). Entry points are
  * the class's ctor, update slot (+0x0EC) and dtor in class_3bb8c_r.c, via
- * Class876FC__InitByKind / __UpdateByKind / __ReleaseByKind.
+ * StyleEffect__InitByKind / __UpdateByKind / __ReleaseByKind.
  *
- * All 10 matched (Class876FC__DriftModelChildren, the last, in round 75).
+ * All 10 matched (StyleEffect__DriftModelChildren, the last, in round 75).
  * Named round 70; tiers in the reports. Game-level role unknown.
  */
 #include "common.h"
 #include "Actor.h"
 #include "VariantSprite.h"
-#include "Class876FC.h"
+#include "StyleEffect.h"
 
-/* The class and its children: include/Class876FC.h (the owner),
+/* The class and its children: include/StyleEffect.h (the owner),
  * include/Actor.h (modelChildren) and include/VariantSprite.h (sprites). */
 
 extern void ReleaseBasicClassArray(void **array, s32 count);
@@ -32,18 +32,18 @@ void AddVec3(LongVec3 *dst, LongVec3 *a, LongVec3 *b);
 void AttachWithRotScale(Actor *node, void *parent, void *trans, void *rotation, void *scale);
 
 /* Four of the class's one-parameter helpers are called here with a dead
- * second argument that is byte-load-bearing, so include/Class876FC.h
+ * second argument that is byte-load-bearing, so include/StyleEffect.h
  * declares them WITHOUT a prototype (old-style), which is what lets these
  * calls pass it:
- *  - Class876FC__SpawnPlainSprites (class_3bb8c_o.c): its body WRITES
+ *  - StyleEffect__SpawnPlainSprites (class_3bb8c_o.c): its body WRITES
  *    $a1/$a2/$a3 to zero before any read, but InitByKind's retail emits
  *    `move a1,zero` at 0x80056624;
- *  - Class876FC__RandomizeSprites (class_3bb8c_o.c): its body reads only
+ *  - StyleEffect__RandomizeSprites (class_3bb8c_o.c): its body reads only
  *    $a0 (`addiu s0,a0,136`), but UpdateByKind's retail emits `move a1,s1`
  *    at 0x800566FC;
- *  - Class876FC__BuildRandomSprites (below): its body reads only $a0
+ *  - StyleEffect__BuildRandomSprites (below): its body reads only $a0
  *    (`move s1,a0`); InitByKind's retail emits `move a1,zero` at 0x80056614;
- *  - Class876FC__DriftModelChildren (below): its body writes $a1 (`move
+ *  - StyleEffect__DriftModelChildren (below): its body writes $a1 (`move
  *    a1,zero`) before any read; UpdateByKind's retail emits `move a1,s1` in
  *    the jal delay slot at 0x800566D8 (round 75).
  * NoOpIgnoreArgs (class_3bb8c_o.c, empty) is the same idiom. */
@@ -56,21 +56,21 @@ extern void NoOpIgnoreArgs();
  * D_8008ACA4 is the Actor it ran on, called here through SceneNode's
  * +0x080 getSetUnk10Flag8 as that function calls it; D_8008ACA8 is
  * forwarded opaquely to New_VariantSprite as its third argument; D_8008ACAC's
- * pointee has a field at +0x018 that Class876FC__InitByKind and
- * Class876FC__UpdateByKind snapshot/diff via gTrackedYSnapshot. */
+ * pointee has a field at +0x018 that StyleEffect__InitByKind and
+ * StyleEffect__UpdateByKind snapshot/diff via gTrackedYSnapshot. */
 extern Actor *D_8008ACA4; /* the Actor Actor__func_56f5c ran on */
 extern void *D_8008ACA8;
 extern void *D_8008ACAC;
 extern s32 gTrackedYSnapshot;
 extern s32 D_8008AB98[];
 
-/* Called once, from the class's ctor (Class876FC__Class876FC): place self under
+/* Called once, from the class's ctor (StyleEffect__StyleEffect): place self under
  * `parent` at pos + offset, then build the per-kind parts. Kinds 0 and 1
  * link a model fetched from D_8008ACA4 by D_8008AB98[kind]; kind 0 also
  * gets two model children, kind 2 five randomised sprites, kind 3 five
- * plain sprites (Class876FC__SpawnPlainSprites is Class876FC__SpawnSprites(self,
+ * plain sprites (StyleEffect__SpawnPlainSprites is StyleEffect__SpawnSprites(self,
  * 0, 0, NULL)). */
-void Class876FC__InitByKind(Class876FC *self, SceneNode *parent, LongVec3 *pos) {
+void StyleEffect__InitByKind(StyleEffect *self, SceneNode *parent, LongVec3 *pos) {
     LongVec3 local;
     s32 state;
 
@@ -87,25 +87,25 @@ void Class876FC__InitByKind(Class876FC *self, SceneNode *parent, LongVec3 *pos) 
 
     switch (state) {
         case 0:
-            Class876FC__PlaceModelChildren(self, 0);
+            StyleEffect__PlaceModelChildren(self, 0);
             break;
         case 2:
-            Class876FC__BuildRandomSprites(self, 0);
+            StyleEffect__BuildRandomSprites(self, 0);
             break;
         case 3:
-            Class876FC__SpawnPlainSprites(self, 0);
+            StyleEffect__SpawnPlainSprites(self, 0);
             break;
         default:
             break;
     }
 }
 
-/* Called every frame from the class's slot +0x0EC (Class876FC__Update, right
+/* Called every frame from the class's slot +0x0EC (StyleEffect__Update, right
  * after it increments `tick`): set self's translation (Actor's
  * setTranslation) to pos + offset, plus however far D_8008ACAC's +0x018
- * word has moved since Class876FC__InitByKind snapshotted it, then run the
+ * word has moved since StyleEffect__InitByKind snapshotted it, then run the
  * per-kind update. */
-void Class876FC__UpdateByKind(Class876FC *self, LongVec3 *pos) {
+void StyleEffect__UpdateByKind(StyleEffect *self, LongVec3 *pos) {
     LongVec3 local;
 
     AddVec3(&local, pos, &self->params.offset);
@@ -114,32 +114,32 @@ void Class876FC__UpdateByKind(Class876FC *self, LongVec3 *pos) {
 
     switch (self->pendingExtra) {
         case 0:
-            Class876FC__DriftModelChildren(self, pos);
+            StyleEffect__DriftModelChildren(self, pos);
             break;
         case 2:
             NoOpIgnoreArgs(self, pos);
             break;
         case 3:
-            Class876FC__RandomizeSprites(self, pos);
+            StyleEffect__RandomizeSprites(self, pos);
             break;
         default:
             break;
     }
 }
 
-/* Called from the class's dtor (Class876FC__Finalize): release whichever child
+/* Called from the class's dtor (StyleEffect__Finalize): release whichever child
  * array this kind built (kinds 2 and 3 both release `sprites`, through two
  * identical class_3bb8c_o.c functions). */
-void Class876FC__ReleaseByKind(Class876FC *self) {
+void StyleEffect__ReleaseByKind(StyleEffect *self) {
     switch (self->pendingExtra) {
         case 0:
-            Class876FC__ReleaseModelChildren(self);
+            StyleEffect__ReleaseModelChildren(self);
             break;
         case 2:
-            Class876FC__ReleaseSprites(self);
+            StyleEffect__ReleaseSprites(self);
             break;
         case 3:
-            Class876FC__ReleaseSpritesB(self);
+            StyleEffect__ReleaseSpritesB(self);
             break;
         default:
             break;
@@ -169,7 +169,7 @@ void AttachWithRotScale(Actor *node, void *parent, void *trans, void *rotation, 
 extern LongVec3 gModelChildOffsetInit;
 extern s32 gModelChildSpacing[];
 
-void Class876FC__PlaceModelChildren(Class876FC *self, s32 reuse) {
+void StyleEffect__PlaceModelChildren(StyleEffect *self, s32 reuse) {
     LongVec3 accum;
     Actor **p;
     s32 i;
@@ -216,7 +216,7 @@ extern s32 gSpinRotStep[];
  * Matched round 75: the step is read straight from the table in the guard,
  * and the loop's pointer is taken again after the call -- CSE turns that
  * second &gModelChildDriftZ[idx] into retail's `move s4,s1`. */
-void Class876FC__DriftModelChildren(Class876FC *self) {
+void StyleEffect__DriftModelChildren(StyleEffect *self) {
     s32 idx;
     s32 accumOffset;
     s32 divq;
@@ -245,12 +245,12 @@ void Class876FC__DriftModelChildren(Class876FC *self) {
         modend = self->tick;
         if (divq >= 0) {
             if ((u32)modend % (u32)divq == 0) {
-                Class876FC__PlaceModelChildren(self, 1);
+                StyleEffect__PlaceModelChildren(self, 1);
             }
         } else {
             u32 adivq = ~divq + 1;
             if ((u32)modend % adivq == 0) {
-                Class876FC__PlaceModelChildren(self, 1);
+                StyleEffect__PlaceModelChildren(self, 1);
             }
         }
     }
@@ -258,7 +258,7 @@ void Class876FC__DriftModelChildren(Class876FC *self) {
 }
 
 /* Release the two model children, if this layout made any. */
-void Class876FC__ReleaseModelChildren(Class876FC *self) {
+void StyleEffect__ReleaseModelChildren(StyleEffect *self) {
     if (self->params.modelChildLayout != 0) {
         ReleaseBasicClassArray((void **)self->modelChildren, 2);
     }
@@ -268,13 +268,13 @@ void Class876FC__ReleaseModelChildren(Class876FC *self) {
  * rand(); then sprites[1] is either shifted along x by
  * gSpriteShiftX[tableIndex] and recoloured (tableIndex >= 2) or made
  * semi-transparent (rate 0) and rescaled, and sprites[2] is hidden. */
-void Class876FC__BuildRandomSprites(Class876FC *self) {
+void StyleEffect__BuildRandomSprites(StyleEffect *self) {
     s32 parity = rand() % 2;
     void *tblOrNull = parity ? NULL : gSpriteScaleHalf;
     VariantSprite *child;
     SpriteRgb *arg;
 
-    Class876FC__SpawnSprites(self, 0, 0, tblOrNull);
+    StyleEffect__SpawnSprites(self, 0, 0, tblOrNull);
 
     if (self->params.tableIndex >= 2) {
         VariantSpriteMethods *m;
@@ -303,8 +303,8 @@ void Class876FC__BuildRandomSprites(Class876FC *self) {
  * assign `scale` as their scale when non-NULL. `self` stays `void *`: it is
  * the prototype class_3bb8c_o.c calls through, and a typed local alias of
  * it costs a callee-saved register (see this function's report). */
-void Class876FC__SpawnSprites(void *self, s32 unused, s32 variant, void *scale) {
-    VariantSprite **p = ((Class876FC *)self)->sprites;
+void StyleEffect__SpawnSprites(void *self, s32 unused, s32 variant, void *scale) {
+    VariantSprite **p = ((StyleEffect *)self)->sprites;
     VariantSprite *node;
     s32 i;
 
@@ -312,7 +312,7 @@ void Class876FC__SpawnSprites(void *self, s32 unused, s32 variant, void *scale) 
         node = New_VariantSprite(variant, 0, D_8008ACA8);
         *p = node;
         node->methods->attachToParent(node, self, 0);
-        (*p)->methods->setColor(*p, ((Class876FC *)self)->params.color);
+        (*p)->methods->setColor(*p, ((StyleEffect *)self)->params.color);
         if (scale != 0) {
             (*p)->methods->updateScale(*p, 1, scale);
         }

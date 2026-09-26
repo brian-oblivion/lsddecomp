@@ -38,7 +38,7 @@ void VariantSprite__SetVariantClut(VariantSprite *self, s32 variant) {
  * gVariantSpriteMethods --vs gSceneNodeMethods). `ratios` is two s16 num/den pairs
  * (x at +0x0/+0x2, y at +0x4/+0x6) -- every caller passes one of
  * gSpriteScaleLarge/gSpriteScaleSmall ({6,5}, {4,6}) or a table forwarded
- * from Class876FC__SpawnSprites -- each turned into a 20.12 fixed-point
+ * from StyleEffect__SpawnSprites -- each turned into a 20.12 fixed-point
  * ratio by the split-division idiom RatioToFixed12 uses (code_d294_c.c).
  * Unlike the base method, `set` is never read: every path assigns. Read as
  * a raw `s16 *` per the RatioToFixed12 precedent for this shape.
