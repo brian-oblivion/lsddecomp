@@ -24,6 +24,7 @@
  */
 #include "common.h"
 #include "Entity.h"
+#include "DreamSys.h"
 
 /* Data tables reached with a raw pointer by this unit's mood-dispatch
  * handlers -- same convention as Entity_d.c/Entity_c.c's own SCALE_Y2/
@@ -59,7 +60,7 @@ void Entity__MoodCue82(Entity *this, EntityMoodHandlerArg *out) {
             out->unk1C = 0x12;
             out->unk10 = 0;
             out->unk30 = 3;
-            ((Unk94Obj *)this->peer)->methods->slot130((Unk94Obj *)this->peer, 1);
+            ((DreamSys *)this->peer)->methods->clearTickCallbacks((DreamSys *)this->peer, 1);
         }
         if (this->moodTimer >= 0x15) {
             this->methods->moveLocalZ(this, -0x28, 0);
@@ -134,13 +135,13 @@ void Entity__MoodCue85(Entity *this, EntityMoodHandlerArg *out) {
     } else if (this->state == 0xA) {
         if (this->moodTimer < 0xA) {
             this->methods->updateRotation(this, 0, ROTATION_YAW_PLUS9);
-            if (((Unk94Obj *)this->peer)->methods->slot100((Unk94Obj *)this->peer) != 0) {
+            if (((DreamSys *)this->peer)->methods->getLinkCommandFlag((DreamSys *)this->peer) != 0) {
                 SetCueTones7_7_7(out);
                 this->state = 0xC;
                 this->moodTimer = -1;
             }
         } else {
-            ((Unk94Obj *)this->peer)->methods->slot130((Unk94Obj *)this->peer, 1);
+            ((DreamSys *)this->peer)->methods->clearTickCallbacks((DreamSys *)this->peer, 1);
             this->state = 0xB;
             this->moodTimer = -1;
         }
@@ -163,10 +164,10 @@ void Entity__MoodCue85(Entity *this, EntityMoodHandlerArg *out) {
                     this->unk100->methods->startFadeUp(this->unk100, (BasicClass *)this->ticker, 0, 0);
                 }
             }
-            ((Unk94Obj *)this->peer)->methods->slot44((Unk94Obj *)this->peer, 0, ROTATION_ZPLUS1);
+            ((DreamSys *)this->peer)->methods->updateRotation((DreamSys *)this->peer, 0, ROTATION_ZPLUS1);
         } else {
             SetCueTones18_3_3(out);
-            ((Unk94Obj *)this->peer)->methods->slot44((Unk94Obj *)this->peer, 1, ROTATION_YAW_PLUS180);
+            ((DreamSys *)this->peer)->methods->updateRotation((DreamSys *)this->peer, 1, ROTATION_YAW_PLUS180);
             this->methods->notifyParents(this, (rand() % 5 != 0) ? 0xA : 0xC);
             this->state = 0xE;
         }
@@ -275,7 +276,7 @@ void Entity__MoodCue91(Entity *this, EntityMoodHandlerArg *out) {
     }
     if (this->todFrame >= 0x19) {
         this->methods->moveLocalZ(this, -0x14, 0);
-        ((Unk94Obj *)this->peer)->methods->slot130((Unk94Obj *)this->peer, 1);
+        ((DreamSys *)this->peer)->methods->clearTickCallbacks((DreamSys *)this->peer, 1);
     }
     if (this->moodTimer == 0x32) {
         this->methods->notifyParents(this, 0xA);
@@ -291,7 +292,7 @@ void Entity__MoodCue92(Entity *this, EntityMoodHandlerArg *out) {
         if (this->targetReached != 0) {
             Class6B5CC__FaceTarget((Class6B5CC *)this, (Class6B5CC *)this->peer, 1, 0, 0);
             this->methods->setTod(this, 1);
-            ((Unk94Obj *)this->peer)->methods->slot130((Unk94Obj *)this->peer, 1);
+            ((DreamSys *)this->peer)->methods->clearTickCallbacks((DreamSys *)this->peer, 1);
         } else if (this->todFrame == 0) {
             do {
                 this->todFramePtr = this->methods->applyTodFrame(this, this->todFramePtr, 0);
@@ -326,7 +327,7 @@ void Entity__MoodCue93(Entity *this, EntityMoodHandlerArg *out) {
 
 void Entity__MoodCue94(Entity *this, EntityMoodHandlerArg *out) {
     if (this->moodTimer == 0) {
-        if (((Unk94Obj *)this->peer)->methods->slot200((Unk94Obj *)this->peer) != 7) {
+        if (((DreamSys *)this->peer)->methods->getDreamColor((DreamSys *)this->peer) != 7) {
             this->state = 0xB;
         }
     }

@@ -48,6 +48,14 @@
 #include "DreamSys.h"
 #include "VabStreamObj.h"
 
+/* code_179d8_l's SoundCueSet service pair, as this unit calls them
+   (DreamSys__TickDrift / DreamSys__StopDrift: (soundObj, soundCueSet)).
+   Moved here from DreamSys.h in track 4 (round 88): Entity.h declares the
+   same functions with `void *` parameters, and a unit including both
+   headers would see conflicting types. */
+extern void FlushSoundCueSet(s32 arg0, void *arg1);
+extern void ServiceSoundCueSet(s32 arg0, void *arg1);
+
 /* Forward declarations for two of this unit's OWN functions, both called
    around line 450 but not defined until ~200 lines later, in ROM order.
    Without these, C89 implicitly declares them as `int ()` at the call site

@@ -207,7 +207,9 @@ typedef struct {
    this unit; not independently re-confirmed this round). +0x24 (the second point's y) is
    confirmed: DreamSys__StepLookOffset (round 2026-08-30) nudges it. +0x18 (the first
    point's y) is also now confirmed: DreamSys__AdvanceMoveCycle (round 2026-09-02) nudges
-   it by the SAME delta as +0x24, in the same statement pair. */
+   it by the SAME delta as +0x24, in the same statement pair. It is an object:
+   Entity__MoodCue74 (Entity_e) calls +0x064 of the table at its +0x000
+   through Entity.h's Unk5CObj view (track 4, round 88). */
 typedef struct DreamSysUnk5C {
 	s8 unknown_values_0x0[0x18];
 	s32 startValue;
@@ -486,15 +488,6 @@ extern const s8 VOICE_PITCH_BY_SELECT[0x18];
    class_16334.h for the other units that also declare it locally. */
 extern void *BMemPMgrAlloc(s32 size);
 
-/* Also declared in Entity.h for a different (Entity) struct's fields; here
-   called by DreamSys__StopDrift as (this->soundObj, this->soundCueSet)
-   (round 2026-08-30-b). */
-extern void FlushSoundCueSet(s32 arg0, void *arg1);
-
-/* Also declared in Entity.h. Called by DreamSys__TickDrift as
-   (this->soundObj, this->soundCueSet) -- same argument shape as
-   FlushSoundCueSet above (round 2026-08-30-d). */
-extern void ServiceSoundCueSet(s32 arg0, void *arg1);
 
 /* The object. Actor's fields (include/Actor.h) run to +0x058; DreamSys's
  * own start there. New_DreamSys allocates 0x928 bytes. */

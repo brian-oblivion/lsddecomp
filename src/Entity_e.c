@@ -28,6 +28,7 @@
  */
 #include "common.h"
 #include "Entity.h"
+#include "DreamSys.h"
 
 void Entity__MoodCue59(Entity *this, EntityMoodHandlerArg *out) {
     if (this->moodTimer == 0 && rand() % 10 == 0) {
@@ -68,9 +69,9 @@ void Entity__MoodCue62(Entity *this, EntityMoodHandlerArg *out) {
     }
     this->methods->moveLocalZ(this, -5, 0);
     if (this->moodTimer == 0x12C && this->methods->distanceToPeer(this, this->peer) < 0x1000) {
-        ((Unk94Obj *)this->peer)->methods->slot130((Unk94Obj *)this->peer, 0);
+        ((DreamSys *)this->peer)->methods->clearTickCallbacks((DreamSys *)this->peer, 0);
     } else if (this->moodTimer == 0x1F4) {
-        ((Unk94Obj *)this->peer)->methods->slot134((Unk94Obj *)this->peer, 1, 1);
+        ((DreamSys *)this->peer)->methods->setTickCallbacks((DreamSys *)this->peer, 1, 1);
     }
     if (this->state == 0) {
         if (this->methods->distanceToPeer(this, this->peer) < 0x400) {
@@ -173,7 +174,7 @@ void Entity__MoodCue68(Entity *this, EntityMoodHandlerArg *out) {
             out->unk44 = -2;
         }
         if ((this->moodTimer & 1) == 0) {
-            if (((Unk94Obj *)this->peer)->methods->slot100((Unk94Obj *)this->peer) != 0) {
+            if (((DreamSys *)this->peer)->methods->getLinkCommandFlag((DreamSys *)this->peer) != 0) {
                 this->moodTimer = -1;
                 this->state = 0xA;
                 out->unk1C = 0x12;
@@ -252,8 +253,8 @@ extern u8 ROTATION_YAW_PLUS90[];
 void Entity__MoodCue73(Entity *this, EntityMoodHandlerArg *out) {
     out->unk10 = 0;
     if (out->unk4 == 0) {
-        ((Unk94Obj *)this->peer)->methods->slot44((Unk94Obj *)this->peer, 1, ROTATION_YAW_PLUS90);
-        ((Unk94Obj *)this->peer)->methods->slot130((Unk94Obj *)this->peer, 1);
+        ((DreamSys *)this->peer)->methods->updateRotation((DreamSys *)this->peer, 1, ROTATION_YAW_PLUS90);
+        ((DreamSys *)this->peer)->methods->clearTickCallbacks((DreamSys *)this->peer, 1);
         out->unk1C = 0x19;
         out->unk30 = 0x19;
         out->unk44 = 0x19;
@@ -269,24 +270,24 @@ extern u8 D_8008AC1C[];
 
 void Entity__MoodCue74(Entity *this, EntityMoodHandlerArg *out) {
     if (this->moodTimer == 0) {
-        ((Unk94Obj *)this->peer)->unk5C->methods->slot64(((Unk94Obj *)this->peer)->unk5C, D_8008AC1C);
+        ((Unk5CObj *)((DreamSys *)this->peer)->heightCurve)->methods->slot64((Unk5CObj *)((DreamSys *)this->peer)->heightCurve, D_8008AC1C);
         this->state = rand() % 3;
-        if (((Unk94Obj *)this->peer)->coord2->tz < 0x262) {
+        if (((DreamSys *)this->peer)->coord2->tz < 0x262) {
             this->state = 0;
         }
     }
     if (this->state != 0) {
         if (this->todFrameCount / 2 < this->moodTimer) {
-            ((Unk94Obj *)this->peer)->methods->slotC4((Unk94Obj *)this->peer, 0x80, 0);
+            ((DreamSys *)this->peer)->methods->moveLocalZ((DreamSys *)this->peer, 0x80, 0);
         }
         if (this->moodTimer == this->todFrameCount - 0x1E) {
             this->methods->notifyParents(this, 0xA);
         }
     } else {
         if ((u32)(this->moodTimer - 0x14) < 0x64) {
-            ((Unk94Obj *)this->peer)->methods->slotC4((Unk94Obj *)this->peer, -((this->moodTimer - 0x13) * 0x20), 1);
+            ((DreamSys *)this->peer)->methods->moveLocalZ((DreamSys *)this->peer, -((this->moodTimer - 0x13) * 0x20), (void *)1);
             if (this->moodTimer == 0x55) {
-                ((Unk94Obj *)this->peer)->methods->slot134((Unk94Obj *)this->peer, 1, 1);
+                ((DreamSys *)this->peer)->methods->setTickCallbacks((DreamSys *)this->peer, 1, 1);
             }
         }
     }
@@ -507,7 +508,7 @@ void Entity__MoodCue81(Entity *this, EntityMoodHandlerArg *out) {
                 this->state = mood;
             }
         } else {
-            ((Unk94Obj *)this->peer)->methods->slot130((Unk94Obj *)this->peer, 1);
+            ((DreamSys *)this->peer)->methods->clearTickCallbacks((DreamSys *)this->peer, 1);
             Class6B5CC__FaceTarget((Class6B5CC *)this->peer, (Class6B5CC *)this, 1, 1, 0);
             if (this->state == 2) {
                 if (this->methods->distanceToPeer(this, this->peer) < 0x960) {
@@ -528,7 +529,7 @@ void Entity__MoodCue81(Entity *this, EntityMoodHandlerArg *out) {
             Class6B5CC__FaceTarget((Class6B5CC *)this, (Class6B5CC *)this->peer, 1, 0, 0);
         }
         if (this->methods->distanceToPeer(this, this->peer) < 0x800) {
-            ((Unk94Obj *)this->peer)->methods->slotC4((Unk94Obj *)this->peer, -0x800, 0);
+            ((DreamSys *)this->peer)->methods->moveLocalZ((DreamSys *)this->peer, -0x800, 0);
         }
         mod = -0x14;
     }

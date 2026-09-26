@@ -41,6 +41,7 @@
  */
 #include "common.h"
 #include "Entity.h"
+#include "DreamSys.h"
 
 /* Data rows this unit's mood-dispatch handlers pass through to a vtable
  * call as an opaque argument -- never dereferenced here, so an opaque byte
@@ -68,7 +69,7 @@ void Entity__MoodCue98(Entity *this, EntityMoodHandlerArg *out) {
         if (Entity__GetOrCreateUnk100(this, NULL, 0, 0xA, 0) != 0) {
             this->unk100->methods->startFadeDown(this->unk100, (BasicClass *)this->ticker, 7, 0);
             this->methods->deactivate(this);
-            ((Unk94Obj *)this->peer)->methods->slot21C((Unk94Obj *)this->peer);
+            ((DreamSys *)this->peer)->methods->resetFlashbackList((DreamSys *)this->peer);
         }
     }
     this->methods->moveLocalZ(this, -0x1E, (void *)1);
@@ -114,11 +115,11 @@ void Entity__MoodCue102(Entity *this, EntityMoodHandlerArg *out) {
     }
     if (this->targetReached != 0 && this->state == 0) {
         this->state = 0xC;
-        ((Unk94Obj *)this->peer)->methods->slot130((Unk94Obj *)this->peer, 1);
+        ((DreamSys *)this->peer)->methods->clearTickCallbacks((DreamSys *)this->peer, 1);
         this->methods->notifyParents(this, 0xA);
     }
     if (this->state == 0xC) {
-        ((Unk94Obj *)this->peer)->methods->slotC4((Unk94Obj *)this->peer, 0x100, 0);
+        ((DreamSys *)this->peer)->methods->moveLocalZ((DreamSys *)this->peer, 0x100, 0);
     }
 }
 
@@ -208,7 +209,7 @@ void Entity__MoodCue110(Entity *this, EntityMoodHandlerArg *out) {
 
 void Entity__MoodCue111(Entity *this, EntityMoodHandlerArg *out) {
     if (this->moodTimer == 0) {
-        if (((Unk94Obj *)this->peer)->methods->slot200((Unk94Obj *)this->peer) == 5) {
+        if (((DreamSys *)this->peer)->methods->getDreamColor((DreamSys *)this->peer) == 5) {
             this->state = 0xB;
         }
     }
@@ -329,8 +330,8 @@ void Entity__MoodCue123(Entity *this, EntityMoodHandlerArg *out) {
     }
     if (this->state == 0xB) {
         if (this->moodTimer >= 0x12D) {
-            ((Unk94Obj *)this->peer)->methods->slot94((Unk94Obj *)this->peer, 0, 2);
-            ((Unk94Obj *)this->peer)->methods->slot94((Unk94Obj *)this->peer, 0, 7);
+            ((DreamSys *)this->peer)->methods->onPadEvent((DreamSys *)this->peer, 0, 2);
+            ((DreamSys *)this->peer)->methods->onPadEvent((DreamSys *)this->peer, 0, 7);
         }
     }
 }

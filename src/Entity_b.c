@@ -16,6 +16,7 @@
  */
 #include "common.h"
 #include "Entity.h"
+#include "DreamSys.h"
 
 /* Constant transform triples passed to updateRotation (slot +0x44,
  * func_8001CEB4: three {s16 num, s16 den} ratios in degrees), updateScale
@@ -138,7 +139,7 @@ EntityMethods *Get_vtable_Entity(void) {
 
 void Entity__MoodCue00(Entity *this, EntityMoodHandlerArg *out) {
     if (out->unk4 == 0) {
-        if (((Unk94Obj *)this->peer)->methods->slot200((Unk94Obj *)this->peer) == 5) {
+        if (((DreamSys *)this->peer)->methods->getDreamColor((DreamSys *)this->peer) == 5) {
             this->state = 0x64;
         }
     }
@@ -182,7 +183,7 @@ void Entity__MoodCue01(Entity *this, EntityMoodHandlerArg *out) {
         out->unk1C = 0x14;
         out->unk30 = 0x14;
         out->unk44 = 0x14;
-        ((Unk94Obj *)this->peer)->methods->slot130((Unk94Obj *)this->peer, 1);
+        ((DreamSys *)this->peer)->methods->clearTickCallbacks((DreamSys *)this->peer, 1);
     }
     Class6B5CC__FaceTarget((Class6B5CC *)this, (Class6B5CC *)this->peer, 1, 0, 0);
     this->methods->moveLocalZ(this, -0x5A, 0);
@@ -268,7 +269,7 @@ void Entity__MoodCue11(Entity *this, EntityMoodHandlerArg *out) {
             row = ROTATION_YAW_MINUS90;
         }
         if ((u32)(this->moodTimer - 0xD5D) < 0x78) {
-            if (((Unk94Obj *)this->peer)->methods->slot100((Unk94Obj *)this->peer) != 0) {
+            if (((DreamSys *)this->peer)->methods->getLinkCommandFlag((DreamSys *)this->peer) != 0) {
                 this->moodTimer = 0;
                 this->state = 0xD;
             }

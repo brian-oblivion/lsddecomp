@@ -29,9 +29,10 @@
  * lie past the end of Class65650's table: their occupants in
  * DREAMSYS_METHODS are DreamSys__GetLinkCommandFlag,
  * DreamSys__ProjectPointAtDistance, DreamSys__GetCurrentDayAndYear,
- * DreamSys__GetDreamColor and DreamSys__ResetFlashbackList. `Unk94Obj` below
- * is this header's view of that object (DreamSys is not unified); accessors
- * cast `peer` to it. Entity's attachToParent keeps its `parent` argument in
+ * DreamSys__GetDreamColor and DreamSys__ResetFlashbackList. The units that
+ * call it include include/DreamSys.h and cast `peer` (Class65650's field,
+ * typed Class65650 *) to DreamSys *; the Unk94Obj view that stood here was
+ * deleted in track 4 (round 88). Entity's attachToParent keeps its `parent` argument in
  * Actor's `grid` field (+0x04C).
  *
  * Sound cues. startSoundCue calls InitSoundCueSet on `soundCueSet` with
@@ -59,8 +60,6 @@
 
 typedef struct Entity Entity;
 typedef struct EntityMethods EntityMethods;
-typedef struct Unk94Obj Unk94Obj;
-typedef struct Unk94Methods Unk94Methods;
 typedef struct Unk5CObj Unk5CObj;
 typedef struct Unk5CMethods Unk5CMethods;
 typedef struct Unk4CObj Unk4CObj;
@@ -144,47 +143,12 @@ typedef void (*EntityPlayTodFn)(Entity *self);
 extern EntityMethods ENTITY_METHODS;
 extern EntityMethods *Get_vtable_Entity(void); /* returns &ENTITY_METHODS */
 
-/* The peer's view (see the banner: the player, a DreamSys). Slots are named
- * by offset, with the DREAMSYS_METHODS occupant (or the inherited slot's
- * name) and the Entity callers beside each. */
-struct Unk94Methods {
-    u8 pad000[0x44];
-    void (*slot44)(Unk94Obj *self, s32 arg1, void *arg2);  /* updateRotation: Entity__MoodCue49 (Entity_d) */
-    u8 pad048[0x94 - 0x48];
-    void (*slot94)(Unk94Obj *self, s32 arg1, s32 arg2);    /* DreamSys__OnPadEvent: Entity__MoodCue123 (Entity_g), as (0, 2) and (0, 7) */
-    u8 pad098[0xB8 - 0x98];
-    void (*slotB8)(Unk94Obj *self, void *arg1);            /* setTranslation: Entity__MoodCue49 (Entity_d) */
-    u8 pad0BC[0xC4 - 0xBC];
-    void (*slotC4)(Unk94Obj *self, s32 arg1, s32 arg2);    /* moveLocalZ: Entity__MoodCue74 (Entity_e) */
-    void (*slotC8)(Unk94Obj *self, s32 arg1, s32 arg2);    /* moveLocalX: Entity__MoodCue58 (Entity_d) */
-    void (*slotCC)(Unk94Obj *self, s32 arg1, s32 arg2);    /* moveLocalY: Entity__MoodCue47/58 (Entity_d) */
-    u8 pad0D0[0x100 - 0xD0];
-    s32 (*slot100)(Unk94Obj *self);                        /* DreamSys__GetLinkCommandFlag: compared against 0 */
-    u8 pad104[0x120 - 0x104];
-    s32 (*slot120)(Unk94Obj *self, s32 arg1, s32 arg2, void *arg3, s32 arg4); /* DreamSys__ProjectPointAtDistance: Entity__IsNearTarget's tail call */
-    u8 pad124[0x130 - 0x124];
-    void (*slot130)(Unk94Obj *self, s32 arg1);             /* DreamSys__ClearTickCallbacks: (peer, 0) and (peer, 1) */
-    void (*slot134)(Unk94Obj *self, s32 arg1, s32 arg2);   /* DreamSys__SetTickCallbacks: Entity__MoodCue115 (Entity_d), Entity__MoodCue74 (Entity_e) */
-    u8 pad138[0x1A0 - 0x138];
-    s32 (*slot1A0)(Unk94Obj *self, s32 arg1);              /* DreamSys__GetCurrentDayAndYear: Entity__MoodCue46 (Entity_d), taken mod 3 */
-    u8 pad1A4[0x200 - 0x1A4];
-    s32 (*slot200)(Unk94Obj *self);                        /* DreamSys__GetDreamColor: compared against 1, 5, 6, 7 */
-    u8 pad204[0x21C - 0x204];
-    void (*slot21C)(Unk94Obj *self);                       /* DreamSys__ResetFlashbackList: Entity__MoodCue98 (Entity_g) */
-};
-
-struct Unk94Obj {
-    Unk94Methods *methods;      /* +0x00 */
-    u8 pad04[0x14 - 0x04];
-    Class6B5CCSub14 *coord2;    /* +0x14, Class6B5CC's coord2 */
-    u8 pad18[0x5C - 0x18];
-    Unk5CObj *unk5C;            /* +0x5C (Class65650's modelData offset), dereferenced through its own table by Entity__MoodCue74 (Entity_e) */
-};
-
-/* The object at the peer's +0x5C; one slot reached. */
+/* The object at the peer's +0x5C: DreamSys's heightCurve (DreamSys.h's
+ * DreamSysUnk5C reads its data fields; nothing there names its table). One
+ * slot reached; accessors cast heightCurve to it. */
 struct Unk5CMethods {
     u8 pad000[0x64];
-    void (*slot64)(Unk5CObj *self, void *arg1); /* Entity__MoodCue74 (Entity_e) as slot64(peer->unk5C, D_8008AC1C) */
+    void (*slot64)(Unk5CObj *self, void *arg1); /* Entity__MoodCue74 (Entity_e) as slot64(peer->heightCurve, D_8008AC1C) */
 };
 
 struct Unk5CObj {
