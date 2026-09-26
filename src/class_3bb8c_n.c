@@ -50,17 +50,30 @@
 #include "Actor.h"
 #include "Class876FC.h"
 #include "BoxFill.h"
+#include "Viewport.h"
+#include "Class866E8.h"
+#include "SoundCueSet.h"
+
+/* What gStyleTargetObj points at: ObjM's +0x06C..+0x07B block (its one
+ * caller, ObjM__InitStyleAndWorld, passes &ctorSound to RegisterStyleConfig,
+ * which keeps it here; include/ObjM.h). */
+typedef struct StyleSceneRefs {
+    void *sound;        /* +0x000, ObjM::ctorSound: the sound object the cue functions take first */
+    void *dreamerTmd;   /* +0x004, ObjM::dreamerTmd */
+    void *etcTim;       /* +0x008, ObjM::etcTim */
+    Viewport *viewport; /* +0x00C, ObjM::cachedViewport */
+} StyleSceneRefs;
 
 /* gStyleDecorObj and gStyleDecorSlots[] hold BoxFill objects
  * (include/BoxFill.h, New_BoxFill), in globals typed `s32`/`void *[]`
  * (track 4b's to retype). */
 
 extern const u8 *gStyleDecorColor;
-extern s32 gStyleDecorObj;
+extern BoxFill *gStyleDecorObj;
 
 void StyleFlushDecoration(void) {
     if (gStyleDecorColor != 0) {
-        ((BoxFill *)gStyleDecorObj)->methods->release((BoxFill *)gStyleDecorObj);
+        gStyleDecorObj->methods->release(gStyleDecorObj);
         gStyleDecorColor = 0;
     }
 }
@@ -71,11 +84,11 @@ extern s8 gStyleVariantPicks[];
 extern s32 gStyleVariant;
 extern s8 gStyleVariantConfigCounts[];
 extern s32 gStyleConfigIndex;
-extern s32 gStyleVariantConfigs[];
-extern s32 gStyleClearColor;
+extern s8 *gStyleVariantConfigs[];
+extern const u8 *gStyleClearColor;
 extern u8 gStyleDecorColorsB[];
-extern u8 gStylePalette[];
-extern s32 gStyleDecorColors;
+extern u8 gStylePalette[][3];
+extern const u8 *gStyleDecorColors;
 extern u8 gStyleDecorColorsA[];
 extern s32 gStyleDecorVariant;
 
@@ -95,16 +108,16 @@ void *PickStyleFallbackConfig(void) {
     divisor = gStyleVariantConfigCounts[kind];
     remainder = sum % divisor;
     gStyleConfigIndex = remainder;
-    result = (s8 *)gStyleVariantConfigs[kind] + remainder * 4;
+    result = gStyleVariantConfigs[kind] + remainder * 4;
     if (kind == 0) {
         b3 = result[3];
-        gStyleClearColor = (s32)(gStylePalette + b3 * 3);
+        gStyleClearColor = gStylePalette[b3];
         b2 = result[2];
         tab = gStyleDecorColorsB;
         if (b2 != 0x12) {
             tab = gStyleDecorColorsA;
         }
-        gStyleDecorColors = (s32)tab;
+        gStyleDecorColors = tab;
         if (remainder < 4) {
             gStyleDecorVariant = 1;
         } else if (remainder < 6) {
@@ -118,20 +131,8 @@ extern s32 gStyleDecorPosX;
 extern s32 gStyleDecorPosY;
 extern s32 gStyleDecorSizeW;
 extern s32 gStyleDecorSizeH;
-extern void *gStyleDecorSlots[];
-extern s32 gStyleTargetObj;
-
-typedef struct ObjSlotAC ObjSlotAC;
-typedef struct ObjSlotACMethods ObjSlotACMethods;
-
-struct ObjSlotACMethods {
-    u8 padAC[0xAC];
-    void *(*slotAC)(ObjSlotAC *self); /* +0x0AC */
-};
-
-struct ObjSlotAC {
-    ObjSlotACMethods *methods; /* +0x000 */
-};
+extern BoxFill *gStyleDecorSlots[];
+extern StyleSceneRefs *gStyleTargetObj;
 
 /* Local view: gStyleDecorPosX/gStyleDecorPosY and gStyleDecorSizeW/gStyleDecorSizeH are two
  * adjacent 8-byte pairs, and this unit copies each into a local pair as a
@@ -160,9 +161,9 @@ void StyleBuildDecorSet(void) {
     PairXY paramA;
     PairXY paramB;
     s32 i;
-    void *obj;
-    ObjSlotAC *self2;
-    void *result;
+    BoxFill *obj;
+    Viewport *viewport;
+    SceneNode *parent;
 
     if (gStyleDecorVariant == 0) {
         return;
@@ -176,69 +177,41 @@ void StyleBuildDecorSet(void) {
     for (i = 1; i < 0x12; i++) {
         obj = New_BoxFill(&paramB, (void *)(gStyleDecorColors + i * 3), 0x1FFF);
         gStyleDecorSlots[i] = obj;
-        ((BoxFillAttachToParentFn)((BoxFill *)obj)->methods->attachToParent)(obj, gStyleDecorSlots[0],
-                                                                             (Pair32E99C *)&paramA);
+        ((BoxFillAttachToParentFn)obj->methods->attachToParent)(obj, (SceneNode *)gStyleDecorSlots[0],
+                                                                (Pair32E99C *)&paramA);
         paramA.y += 3;
         paramB.y -= 7;
     }
 
-    self2 = *(ObjSlotAC **)(gStyleTargetObj + 0xC);
-    result = self2->methods->slotAC(self2);
-    ((BoxFillAttachToParentFn)((BoxFill *)gStyleDecorSlots[0])->methods->attachToParent)(
-        gStyleDecorSlots[0], result, (Pair32E99C *)&paramA);
+    viewport = gStyleTargetObj->viewport;
+    parent = viewport->methods->getSubHandle(viewport);
+    ((BoxFillAttachToParentFn)gStyleDecorSlots[0]->methods->attachToParent)(
+        gStyleDecorSlots[0], parent, (Pair32E99C *)&paramA);
 }
-
-
-typedef struct ObjAC7CSub ObjAC7CSub;
-typedef struct ObjAC7CSubMethods ObjAC7CSubMethods;
-
-struct ObjAC7CSubMethods {
-    u8 pad64[0x64];
-    void (*slot64)(ObjAC7CSub *self, void *arg1); /* +0x064 */
-};
-
-struct ObjAC7CSub {
-    ObjAC7CSubMethods *methods; /* +0x000 */
-    u8 pad4[0x18 - 0x4];
-    s32 field18; /* +0x018 */
-    u8 pad1C[0x24 - 0x1C];
-    s32 field24; /* +0x024 */
-};
-
-typedef struct ObjSlotB8B8 ObjSlotB8B8;
-typedef struct ObjSlotB8B8Methods ObjSlotB8B8Methods;
-
-struct ObjSlotB8B8Methods {
-    u8 padB8[0xB8];
-    void (*slotB8)(ObjSlotB8B8 *self, s32 arg1, void *arg2); /* +0x0B8 */
-    void (*slotBC)(ObjSlotB8B8 *self, void *arg1);           /* +0x0BC */
-};
-
-struct ObjSlotB8B8 {
-    ObjSlotB8B8Methods *methods; /* +0x000 */
-};
 
 /* MATCHED round 61 (bravo), first attempt, after the BLKmode-struct-copy
  * lever found on StyleBuildDecorSet -- see docs/match-reports/StyleUpdateDecorSet.md.
  * `rgb` is written only at [0..2] (by AdjustRgbByDelta); its declared size of 8
  * is inferred from the STACK LAYOUT (it occupies sp+0x10..0x17, with `pos`
  * at sp+0x18), not from any access. */
+void AdjustRgbByDelta(u8 *dst, u8 *src, s32 delta);
+
 void StyleUpdateDecorSet(void) {
-    ObjAC7CSub *self;
+    Viewport *viewport;
     s32 delta;
     s32 shift;
     u8 rgb[8];
     PairXY pos;
     s32 srcOfs;
     s32 i;
-    void **wp;
-    ObjSlotB8B8 *obj;
+    BoxFill **wp;
+    BoxFill *obj;
 
     if (gStyleDecorVariant == 0) {
         return;
     }
-    self = *(ObjAC7CSub **)(gStyleTargetObj + 0xC);
-    delta = self->field18 - self->field24;
+    viewport = gStyleTargetObj->viewport;
+    delta = viewport->refView.vp.y - viewport->refView.vr.y;
     shift = (delta / 600) * 3;
     if (shift <= 0) {
         return;
@@ -253,17 +226,17 @@ void StyleUpdateDecorSet(void) {
     pos.y += shift * 3;
     do {
         AdjustRgbByDelta(rgb, (u8 *)(srcOfs + gStyleDecorColors), shift);
-        obj = (ObjSlotB8B8 *)*wp;
-        obj->methods->slotB8(obj, 1, rgb);
-        obj = (ObjSlotB8B8 *)*wp;
+        obj = *wp;
+        obj->methods->setColor(obj, 1, rgb);
+        obj = *wp;
         i++;
         srcOfs += 3;
-        obj->methods->slotBC(obj, &pos);
+        obj->methods->setPosition(obj, (Pair32E99C *)&pos);
         pos.y += 3;
         wp++;
     } while (i < 0x12);
     AdjustRgbByDelta(rgb, (u8 *)gStyleClearColor, shift);
-    self->methods->slot64(self, rgb);
+    viewport->methods->setClearColor(viewport, (ViewportRgb *)rgb);
 }
 
 void AdjustRgbByDelta(u8 *dst, u8 *src, s32 delta) {
@@ -274,17 +247,17 @@ void AdjustRgbByDelta(u8 *dst, u8 *src, s32 delta) {
 
 extern void ReleaseBasicClassArray(void **array, s32 count);
 extern s32 gStyleDecorVariant;
-extern void *gStyleDecorSlots[];
+extern BoxFill *gStyleDecorSlots[];
 
 void StyleReleaseDecorSet(void) {
     if (gStyleDecorVariant != 0) {
-        ReleaseBasicClassArray(gStyleDecorSlots, 0x12);
+        ReleaseBasicClassArray((void **)gStyleDecorSlots, 0x12);
         gStyleDecorVariant = 0;
     }
 }
 
 extern s32 gStyleVariant;
-extern s32 gStyleTargetObj;
+extern StyleSceneRefs *gStyleTargetObj;
 extern s32 rand(void);
 extern s8 gStyleKind0Counts[];
 extern s32 gStyleEffectSlotCount;
@@ -295,7 +268,7 @@ extern Class876FC **StyleFillEffectKind3(Class876FC **arg0, LongVec3 *arg1);
 extern Class876FC **StyleFillEffectKind2(Class876FC **arg0, LongVec3 *arg1);
 
 void StyleBuildEffectSlots(LongVec3 *arg0) {
-    s32 base;
+    StyleSceneRefs *refs;
     s32 val;
     s32 count;
     Class876FC **filled;
@@ -303,9 +276,8 @@ void StyleBuildEffectSlots(LongVec3 *arg0) {
     if (gStyleVariant < 0) {
         return;
     }
-    base = gStyleTargetObj;
-    Actor__func_56f5c(gStyleVariant, (void *)*(s32 *)(base + 4), *(s32 *)(base + 8),
-                      *(s32 *)(base + 0xC));
+    refs = gStyleTargetObj;
+    Actor__func_56f5c(gStyleVariant, (Actor *)refs->dreamerTmd, (s32)refs->etcTim, (s32)refs->viewport);
     val = gStyleKind0Counts[rand() & 3];
     count = (gStyleVariant == 2) ? 0x10 - val : 0;
     gStyleEffectSlotCount = val + count;
@@ -353,7 +325,7 @@ void StyleReleaseEffectSlots(void) {
  * is the SAME record `FindNearestStyleCueEntry` returns as `EntrySlot *`
  * below -- a second independent local view of one struct, per the
  * multiple-independent-local-views convention, not merged with it: this
- * view only ever touches `countSign` (+0x6, an `EntrySlot::count`-typed
+ * view only ever touches `cue` (+0x6, an `EntrySlot::count`-typed
  * byte, address-taken then chased and toggled), where `EntrySlot` names the
  * rest. `StyleCueSlot::entry` is that claimed record, released by
  * `FlushStyleCue`/`StopStyleCueIfNear`. `posX`/`posZ` are the slot's own 2D
@@ -368,23 +340,21 @@ typedef struct StyleCueEntryView StyleCueEntryView;
 
 struct StyleCueEntryView {
     u8 pad0[0x6];
-    s8 countSign; /* +0x006 */
+    s8 cue; /* +0x006 */
 };
 
 typedef struct StyleCueSlot StyleCueSlot;
 
 struct StyleCueSlot {
     StyleCueEntryView *entry; /* +0x000 */
-    s32 posX;                 /* +0x004 */
-    u8 pad8[0x4];
-    s32 posZ;     /* +0x00C */
-    s32 lastDist; /* +0x010 */
-    s32 cueSet;   /* +0x014 */
-};
+    LongVec3 pos;             /* +0x004 */
+    s32 lastDist;             /* +0x010 */
+    SoundCueSet cueSet;       /* +0x014 */
+}; /* 0x68 bytes */
 
-extern s32 FlushStyleCue(StyleCueSlot *arg0);
+extern StyleCueSlot *FlushStyleCue(StyleCueSlot *arg0);
 
-extern s32 gStyleGrid;
+extern Class866E8 *gStyleGrid;
 extern StyleCueSlot *gStyleCueSlots[2];
 
 void StyleTeardown(void) {
@@ -394,16 +364,16 @@ void StyleTeardown(void) {
     StyleReleaseDecorSet();
     StyleReleaseEffectSlots();
     for (i = 0; i < 2; i++) {
-        gStyleCueSlots[i] = (StyleCueSlot *)FlushStyleCue(gStyleCueSlots[i]);
+        gStyleCueSlots[i] = FlushStyleCue(gStyleCueSlots[i]);
     }
     if (gStyleGrid != 0) {
         gStyleGrid = 0;
     }
 }
 
-extern u8 gStyleSpawnScales[];
+extern Ratio16 gStyleSpawnScales[][3];
 extern s32 gStyleSpawnYChoices[];
-extern u8 *gStyleSpawnScale;
+extern Ratio16 *gStyleSpawnScale;
 extern s32 gStyleSpawnTableIndex;
 extern s32 gStyleSpawnOffsetX;
 extern void SetupStyleSpawnParamsA(void *arg0, void *arg1);
@@ -420,7 +390,7 @@ Class876FC **StyleFillEffectKind0(Class876FC **arg0, s32 arg1, LongVec3 *arg2) {
     void (*fp)(void *, void *);
 
     gStyleSpawnTableIndex = rand() % 7;
-    gStyleSpawnScale = (u8 *)gStyleSpawnScales + ((u32)rand() % 5) * 12;
+    gStyleSpawnScale = gStyleSpawnScales[(u32)rand() % 5];
     t3 = (u32)rand() % 5;
     if (t3 != 0) {
         t3 = gStyleSpawnYChoices[t3];
@@ -438,7 +408,7 @@ Class876FC **StyleFillEffectKind0(Class876FC **arg0, s32 arg1, LongVec3 *arg2) {
 }
 
 extern s32 gStyleSpawnYChoice2;
-extern u8 gStyleKind1Scale[];
+extern Ratio16 gStyleKind1Scale[];
 
 Class876FC **StyleFillEffectKind1(Class876FC **arg0, s32 arg1, LongVec3 *arg2) {
     s32 i;
@@ -457,11 +427,11 @@ Class876FC **StyleFillEffectKind1(Class876FC **arg0, s32 arg1, LongVec3 *arg2) {
 extern s32 gStyleSpawnYChoice2;
 extern void SetupStyleSpawnParamsA(void *arg0, void *arg1);
 extern s32 gStyleSpawnColors[];
-extern u8 *gStyleSpawnRotation;
-extern u8 gStyleSpawnRotations[];
+extern Ratio16 *gStyleSpawnRotation;
+extern Ratio16 gStyleSpawnRotations[][3];
 extern s32 gStyleSpawnOffsetY;
 extern s32 gStyleSpawnOffsetZ;
-extern u8 gStyleKind3Colors[];
+extern u8 gStyleKind3Colors[][3];
 
 /* Local view: gStyleSpawnRotation stored through a pointer to a ONE-FIELD STRUCT, not
  * a plain `u8 **`.  Load-bearing: a store through a plain pointer is an
@@ -471,7 +441,7 @@ extern u8 gStyleKind3Colors[];
  * schedules above it and the store lands in the jal delay slot, as retail.
  * Round 76; see docs/match-reports/StyleFillEffectKind3.md. */
 typedef struct PtrBoxK3 {
-    u8 *p; /* +0x000 */
+    Ratio16 *p; /* +0x000 */
 } PtrBoxK3;
 
 /* Appends one kind-3 New_Class876FC object; with the decor variant active
@@ -483,11 +453,11 @@ Class876FC **StyleFillEffectKind3(Class876FC **arg0, LongVec3 *arg1) {
     PtrBoxK3 *q;
 
     SetupStyleSpawnParamsA(arg1, (void *)gStyleSpawnYChoice2);
-    if (gStyleDecorVariant != 0 && gStyleDecorColors == (s32)gStyleDecorColorsB) {
+    if (gStyleDecorVariant != 0 && gStyleDecorColors == gStyleDecorColorsB) {
         gStyleSpawnOffsetX = 0xFFFF5000;
         gStyleSpawnOffsetY = -0x2000;
         gStyleSpawnOffsetZ = 0;
-        gStyleSpawnColors[0] = (s32)(gStyleKind3Colors + 3);
+        gStyleSpawnColors[0] = (s32)gStyleKind3Colors[1];
     } else {
         p = &gStyleSpawnOffsetZ;
         if (*p > 0) {
@@ -496,20 +466,20 @@ Class876FC **StyleFillEffectKind3(Class876FC **arg0, LongVec3 *arg1) {
         if (*p < -0x7800) {
             *p = -0x7800;
         }
-        gStyleSpawnColors[0] = (s32)(gStyleKind3Colors + ((u32)rand() % 3) * 3);
+        gStyleSpawnColors[0] = (s32)gStyleKind3Colors[(u32)rand() % 3];
     }
     q = (PtrBoxK3 *)&gStyleSpawnRotation;
-    q->p = gStyleSpawnRotations;
+    q->p = gStyleSpawnRotations[0];
     *arg0 = New_Class876FC(3, (Class876FCParams *)((u8 *)q - 0xC), (SceneNode *)gStyleGrid, arg1);
     arg0++;
     return arg0;
 }
 
 extern s32 gStyleKind2AltColor;
-extern u8 gStyleKind2Colors[];
+extern u8 gStyleKind2Colors[][3];
 extern s32 gStyleSpawnColors[];
-extern u8 *gStyleSpawnRotation;
-extern u8 gStyleSpawnRotations[];
+extern Ratio16 *gStyleSpawnRotation;
+extern Ratio16 gStyleSpawnRotations[][3];
 extern s32 gStyleSpawnTableIndex;
 
 /* Local view, same reason as PtrBoxK3 above: the first gStyleSpawnColors store goes
@@ -530,11 +500,11 @@ Class876FC **StyleFillEffectKind2(Class876FC **arg0, LongVec3 *arg1) {
     s32 r;
     s32 val;
     S32BoxK2 *slot;
-    u8 **q;
+    Ratio16 **q;
 
     r = rand();
     slot = (S32BoxK2 *)gStyleSpawnColors;
-    slot->v = (s32)(gStyleKind2Colors + ((u32)r % 3) * 3);
+    slot->v = (s32)gStyleKind2Colors[(u32)r % 3];
     slot++;
     val = (gStyleDay / 20) * 20;
     if (gStyleDay != val) {
@@ -545,7 +515,7 @@ Class876FC **StyleFillEffectKind2(Class876FC **arg0, LongVec3 *arg1) {
     slot->v = val;
     SetupStyleSpawnParamsA(arg1, (void *)gStyleSpawnYChoice2);
     q = &gStyleSpawnRotation;
-    *q = gStyleSpawnRotations;
+    *q = gStyleSpawnRotations[0];
     gStyleSpawnTableIndex = rand() % 6;
     *arg0 = New_Class876FC(2, (Class876FCParams *)((u8 *)q - 0xC), (SceneNode *)gStyleGrid, arg1);
     arg0++;
@@ -554,8 +524,8 @@ Class876FC **StyleFillEffectKind2(Class876FC **arg0, LongVec3 *arg1) {
 
 extern s32 gStyleSpawnOffsetY;
 extern s32 gStyleSpawnOffsetZ;
-extern u8 *gStyleSpawnRotation;
-extern u8 gStyleSpawnRotations[];
+extern Ratio16 *gStyleSpawnRotation;
+extern Ratio16 gStyleSpawnRotations[][3];
 extern s32 gStyleSpawnModelLayout;
 
 /* MATCHED round 64 (charlie), 110/110, ins 0 / del 0, one build.  The
@@ -584,7 +554,7 @@ void SetupStyleSpawnParamsA(void *arg0, void *arg1) {
     if (rand() & 1) {
         gStyleSpawnOffsetZ = -gStyleSpawnOffsetZ;
     }
-    gStyleSpawnRotation = gStyleSpawnRotations + ((u32)rand() % 7) * 12;
+    gStyleSpawnRotation = gStyleSpawnRotations[(u32)rand() % 7];
     gStyleSpawnModelLayout = rand() % 5;
 }
 
@@ -621,27 +591,28 @@ void SetupStyleSpawnParamsB(void *arg0, void *arg1) {
     } else if (mod3 == 2) {
         gStyleSpawnOffsetZ = 0x800;
     }
-    gStyleSpawnRotation = gStyleSpawnRotations + ((u32)rand() % 7) * 12;
+    gStyleSpawnRotation = gStyleSpawnRotations[(u32)rand() % 7];
     gStyleSpawnModelLayout = rand() % 5;
 }
 
-extern s32 gStyleTargetObj;
-extern void *FindNearestStyleCueEntry(void *arg0, s32 *arg1, void *arg2);
-extern s32 gStyleCueCallbacks[];
-extern s32 InitSoundCueSet(s32 arg0, void *arg1, s32 arg2, void *arg3, s32 arg4);
+extern StyleSceneRefs *gStyleTargetObj;
+extern void *FindNearestStyleCueEntry(LongVec3 *arg0, s32 *arg1, LongVec3 *arg2);
+extern SoundCueCallbackFn gStyleCueCallbacks[];
+extern s32 InitSoundCueSet(void *sound, SoundCueSet *set, s32 tag, void *owner,
+                           SoundCueCallbackFn callback);
 
-StyleCueSlot *TryStartStyleCue(StyleCueSlot *arg0, s32 *arg1, void *arg2, void *arg3) {
+StyleCueSlot *TryStartStyleCue(StyleCueSlot *arg0, s32 *arg1, LongVec3 *arg2, void *arg3) {
     StyleCueEntryView *sub;
 
-    sub = (StyleCueEntryView *)FindNearestStyleCueEntry(&arg0->posX, &arg0->lastDist, arg2);
+    sub = (StyleCueEntryView *)FindNearestStyleCueEntry(&arg0->pos, &arg0->lastDist, arg2);
     if (sub != 0) {
         arg0->entry = sub;
-        InitSoundCueSet(*(s32 *)gStyleTargetObj, &arg0->cueSet, sub->countSign, arg0,
-                        gStyleCueCallbacks[sub->countSign]);
-        if (sub->countSign == *arg1) {
-            *arg1 = -sub->countSign;
+        InitSoundCueSet(gStyleTargetObj->sound, &arg0->cueSet, sub->cue, arg0,
+                        gStyleCueCallbacks[sub->cue]);
+        if (sub->cue == *arg1) {
+            *arg1 = -sub->cue;
         }
-        sub->countSign = -sub->countSign;
+        sub->cue = -sub->cue;
         return arg0;
     }
     return 0;
@@ -651,25 +622,7 @@ extern s32 gStyleStage;
 extern s32 gStyleCueRecordIndex;
 extern u8 *gStyleCueRecordLists[];
 extern u8 gStyleCueRecordCounts[];
-extern u8 gStyleCueOffsets[];
 extern s32 gStyleCueDistanceTable[];
-
-/* Local view only: `gStyleGrid`'s value is another "pointer stored as a
- * plain s32" (same idiom as `gStyleTargetObj`), here treated as a "self" object
- * with a method table at offset 0, dispatched through slot +0x0E8. Moved
- * ahead of its original spot (just before TickStyle) because
- * FindNearestStyleCueEntry, ROM-earlier, also dispatches through it. */
-typedef struct ObjAB4C ObjAB4C;
-typedef struct ObjAB4CMethods ObjAB4CMethods;
-
-struct ObjAB4CMethods {
-    u8 padE8[0xE8];
-    void (*slotE8)(ObjAB4C *self, void *arg1, void *arg2); /* +0x0E8 */
-};
-
-struct ObjAB4C {
-    ObjAB4CMethods *methods; /* +0x000 */
-};
 
 typedef struct Pos4 Pos4;
 
@@ -685,14 +638,16 @@ struct TabEntry {
     s16 tail;
 };
 
+extern TabEntry gStyleCueOffsets[];
+
 typedef struct EntrySlot EntrySlot;
 
 struct EntrySlot {
-    Pos4 pos; /* +0x0 */
-    u8 idx;   /* +0x4 */
-    u8 pad5;  /* +0x5 */
-    s8 count; /* +0x6 */
-    u8 pad7;  /* +0x7 */
+    Pos4 pos;       /* +0x0 */
+    u8 offsetIndex; /* +0x4 */
+    u8 pad5;        /* +0x5 */
+    s8 cue;         /* +0x6 */
+    u8 pad7;        /* +0x7 */
 };
 
 typedef struct LocalBuf LocalBuf;
@@ -710,13 +665,13 @@ struct LocalBuf {
  * `entry` pointer's address computation as `offset + (s32) base` instead
  * of `base + offset`, closed the last word (a pure commutative-operand
  * encoding-order residue in the `addu`). */
-void *FindNearestStyleCueEntry(void *arg0, s32 *arg1, void *arg2) {
+void *FindNearestStyleCueEntry(LongVec3 *arg0, s32 *arg1, LongVec3 *arg2) {
     s32 j, n;
     u8 *base;
     EntrySlot *entry;
     LocalBuf buf;
     s32 d1, d2, dist;
-    void *self;
+    Class866E8 *grid;
 
     if (arg2 == 0) {
         goto fail;
@@ -726,23 +681,23 @@ void *FindNearestStyleCueEntry(void *arg0, s32 *arg1, void *arg2) {
     entry = (EntrySlot *)(gStyleCueRecordIndex * 8 + (s32)base);
     for (j = 0; j < n; j++, entry++) {
         gStyleCueRecordIndex++;
-        if (entry->count > 0) {
+        if (entry->cue > 0) {
             buf.pos = entry->pos;
-            buf.tab = *(TabEntry *)(gStyleCueOffsets + entry->idx * 6);
-            self = (void *)gStyleGrid;
-            ((ObjAB4C *)self)->methods->slotE8((ObjAB4C *)self, arg0, &buf);
-            d1 = *(s32 *)arg0 - *(s32 *)arg2;
+            buf.tab = gStyleCueOffsets[entry->offsetIndex];
+            grid = gStyleGrid;
+            grid->methods->computeCellOffsets(grid, arg0, &buf);
+            d1 = arg0->x - arg2->x;
             if (d1 < 0) {
                 d1 = ~d1 + 1;
             }
-            d2 = *(s32 *)((u8 *)arg0 + 8) - *(s32 *)((u8 *)arg2 + 8);
+            d2 = arg0->z - arg2->z;
             if (d2 >= 0) {
                 dist = d1 + d2;
             } else {
                 dist = d1 - d2;
             }
             *arg1 = dist;
-            if (dist < gStyleCueDistanceTable[entry->count]) {
+            if (dist < gStyleCueDistanceTable[entry->cue]) {
                 return entry;
             }
         }
@@ -751,21 +706,21 @@ fail:
     return 0;
 }
 
-extern s32 gStyleTargetObj;
-extern void FlushSoundCueSet(s32 arg0, void *arg1);
+extern StyleSceneRefs *gStyleTargetObj;
+extern void FlushSoundCueSet(void *sound, SoundCueSet *set);
 
-s32 FlushStyleCue(StyleCueSlot *arg0) {
-    FlushSoundCueSet(*(s32 *)gStyleTargetObj, &arg0->cueSet);
-    arg0->entry->countSign = -arg0->entry->countSign;
+StyleCueSlot *FlushStyleCue(StyleCueSlot *arg0) {
+    FlushSoundCueSet(gStyleTargetObj->sound, &arg0->cueSet);
+    arg0->entry->cue = -arg0->entry->cue;
     return 0;
 }
 
-extern s32 IsStyleCueNear(StyleCueSlot *arg0, void *arg1);
-extern void ServiceSoundCueSet(s32 arg0, void *arg1);
+extern s32 IsStyleCueNear(StyleCueSlot *arg0, LongVec3 *arg1);
+extern void ServiceSoundCueSet(void *sound, SoundCueSet *set);
 
-s32 StopStyleCueIfNear(StyleCueSlot *arg0, void *arg1, void *arg2) {
+s32 StopStyleCueIfNear(StyleCueSlot *arg0, LongVec3 *arg1, void *arg2) {
     if (IsStyleCueNear(arg0, arg1) != 0) {
-        ServiceSoundCueSet(*(s32 *)gStyleTargetObj, &arg0->cueSet);
+        ServiceSoundCueSet(gStyleTargetObj->sound, &arg0->cueSet);
         return 1;
     }
     return 0;
@@ -773,25 +728,25 @@ s32 StopStyleCueIfNear(StyleCueSlot *arg0, void *arg1, void *arg2) {
 
 extern s32 gStyleCueDistanceTable[];
 
-s32 IsStyleCueNear(StyleCueSlot *arg0, void *arg1) {
+s32 IsStyleCueNear(StyleCueSlot *arg0, LongVec3 *arg1) {
     s32 dx, dy, dist;
     s8 idx;
 
     if (arg1 == 0) {
         return 0;
     }
-    dx = arg0->posX - *(s32 *)arg1;
+    dx = arg0->pos.x - arg1->x;
     if (dx < 0) {
         dx = ~dx + 1;
     }
-    dy = arg0->posZ - *(s32 *)((u8 *)arg1 + 0x8);
+    dy = arg0->pos.z - arg1->z;
     if (dy >= 0) {
         dist = dx + dy;
     } else {
         dist = dx - dy;
     }
     arg0->lastDist = dist;
-    idx = arg0->entry->countSign;
+    idx = arg0->entry->cue;
     if (dist < gStyleCueDistanceTable[-idx]) {
         dist = 1;
         return dist;
@@ -799,24 +754,25 @@ s32 IsStyleCueNear(StyleCueSlot *arg0, void *arg1) {
     return 0;
 }
 
+extern void ApplyStyleDecorationIfSet(void); /* class_3bb8c_m.c */
 extern void StyleBuildDecorSet(void);
 extern void StyleUpdateDecorSet(void);
 extern void StyleScrollVramStrips(void);
 extern s32 gStyleTickCount;
 extern s32 gStyleCueRecordIndex;
-extern u8 gStyleCueSlotPool[];
-extern StyleCueSlot *TryStartStyleCue(StyleCueSlot *arg0, s32 *arg1, void *arg2, void *arg3);
-extern s32 StopStyleCueIfNear(StyleCueSlot *arg0, void *arg1, void *arg2);
+extern StyleCueSlot gStyleCueSlotPool[];
+extern StyleCueSlot *TryStartStyleCue(StyleCueSlot *arg0, s32 *arg1, LongVec3 *arg2, void *arg3);
+extern s32 StopStyleCueIfNear(StyleCueSlot *arg0, LongVec3 *arg1, void *arg2);
 
-s32 TickStyle(void *arg0, void *arg1, s32 arg2) {
-    void *ctx;
-    u8 buf[0x10];
+s32 TickStyle(Descriptor10 *arg0, void *arg1, s32 arg2) {
+    LongVec3 *ctx;
+    LongVec3 buf;
     s32 i;
 
     ctx = 0;
     if (arg0 != 0) {
-        ctx = buf;
-        ((ObjAB4C *)gStyleGrid)->methods->slotE8((ObjAB4C *)gStyleGrid, ctx, arg0);
+        ctx = &buf;
+        gStyleGrid->methods->computeCellOffsets(gStyleGrid, ctx, arg0);
     }
     if (gStyleTickCount++ == 0) {
         ApplyStyleDecorationIfSet();
@@ -830,7 +786,7 @@ s32 TickStyle(void *arg0, void *arg1, s32 arg2) {
     for (i = 0; i < 2; i++) {
         if (gStyleCueSlots[i] != 0) {
             if (StopStyleCueIfNear(gStyleCueSlots[i], ctx, arg1) == 0) {
-                gStyleCueSlots[i] = (StyleCueSlot *)FlushStyleCue(gStyleCueSlots[i]);
+                gStyleCueSlots[i] = FlushStyleCue(gStyleCueSlots[i]);
             }
             /* INERT ON PURPOSE -- DO NOT DELETE. This pair is a semantic
              * no-op (`i` is the initialized loop counter, so nothing here is
@@ -844,32 +800,31 @@ s32 TickStyle(void *arg0, void *arg1, s32 arg2) {
             i++;
             i--;
         } else {
-            gStyleCueSlots[i] =
-                TryStartStyleCue((StyleCueSlot *)(gStyleCueSlotPool + i * 0x68), &arg2, ctx, arg1);
+            gStyleCueSlots[i] = TryStartStyleCue(&gStyleCueSlotPool[i], &arg2, ctx, arg1);
         }
     }
     return arg2;
 }
 
 extern s32 gStyleStage;
-extern void func_8003B624(void *arg0, s32 arg1, void *arg2);
-extern s32 gStyleStripRectA[];
-extern s32 gStyleStripScratchA[];
-extern s32 gStyleStripRectB[];
-extern s32 gStyleStripScratchB[];
+extern void func_8003B624(DrawRect *rect, s32 count, DrawRect *scratch);
+extern DrawRect gStyleStripRectA;
+extern DrawRect gStyleStripScratchA;
+extern DrawRect gStyleStripRectB;
+extern DrawRect gStyleStripScratchB;
 
 void StyleScrollVramStrips(void) {
-    void *a0, *a2;
+    DrawRect *a0, *a2;
     s32 a1;
 
     if (gStyleStage == 2) {
-        a0 = gStyleStripRectA;
-        a2 = gStyleStripScratchA;
+        a0 = &gStyleStripRectA;
+        a2 = &gStyleStripScratchA;
         a1 = 1;
     } else if ((u32)(gStyleStage - 3) < 3) {
         a1 = 1;
-        a0 = gStyleStripRectB;
-        a2 = gStyleStripScratchB;
+        a0 = &gStyleStripRectB;
+        a2 = &gStyleStripScratchB;
     } else {
         return;
     }
