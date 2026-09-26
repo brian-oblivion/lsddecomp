@@ -838,6 +838,11 @@
           "date": "2026-09-25",
           "header": "include/BasicClass.h"
         },
+        "D_8006C070": {
+          "class": "DrawSystem",
+          "date": "2026-09-26",
+          "header": "include/DrawSystem.h"
+        },
         "D_8006D430": {
           "class": "Class6D430",
           "date": "2026-09-25",
@@ -847,6 +852,11 @@
           "class": "Class6E4F0",
           "date": "2026-09-25",
           "header": "include/Class6E4F0.h"
+        },
+        "D_8006E99C": {
+          "class": "Class6E99C",
+          "date": "2026-09-26",
+          "header": "include/Class6E99C.h"
         },
         "D_8006F0B8": {
           "class": "TimBlockSrc",
