@@ -8,7 +8,7 @@
  * (track 3 naming pass).
  *
  * Eleven method tables, nine of them FileResource (data-source) subclasses
- * reached through nine of D_8006D430's own `Get...Methods` getter slots
+ * reached through nine of gFileResourceMethods's own `Get...Methods` getter slots
  * (from +0x07C):
  *
  *   - TimBlockSrc  (D_8006F0B8): a sector-header + block loader with four

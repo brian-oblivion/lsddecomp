@@ -19,7 +19,7 @@
  * src/code_179d8_e.c), a separate FileResource subclass. Methods in
  * src/code_179d8_d.c (ctor through NoOpSlot50) and src/code_179d8_e.c
  * (Read onward, and the getter). Each is named for its slot
- * (`classtable.py gVabDriverMethods --vs D_8006D430`); the slot names are
+ * (`classtable.py gVabDriverMethods --vs gFileResourceMethods`); the slot names are
  * FileResource's.
  *
  * NO FIELDS/SLOTS MACROS: no class lies below 0x23 (`typeviews.py --tree`).

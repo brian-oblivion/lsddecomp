@@ -42,7 +42,7 @@ to fill". Not renamed.
 ## Track 4 (2026-09-26, round 87, alpha): renamed `func_8002C3D0` -> `VabDriver__NoOpSlot40`
 
 Named for its slot, FINISHING-PLAN track 4 step 6. `classtable.py
-gVabDriverMethods --vs D_8006D430` puts this function at `+0x040`, one of
+gVabDriverMethods --vs gFileResourceMethods` puts this function at `+0x040`, one of
 FileResource's run-time-bound driver-interface slots (`include/FileResource.h`
 names it `slot40`; the CD driver's occupant is `CdDriver__NoOpSlot40`).
 `SetActiveDataSource` (code_171e0.c) copies the active driver's interface

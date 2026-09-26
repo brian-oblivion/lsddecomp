@@ -173,7 +173,7 @@ independent checks agree:
 `python3 tools/typeviews.py --tree` prints the tree; it finds 58 classes.
 `classtable.py --scan`'s 60 tables include `gStyleCueCallbacks` (a callback
 array sharing no slot with any class) and `D_8006C0F8` (its first word is a
-code pointer). `D_8006D430`'s scan also reads on into the next symbol,
+code pointer). `gFileResourceMethods`'s scan also reads on into the next symbol,
 `gDataSourceClientGetters`, a NULL-terminated list of table getters.
 
 **Class methods in `psyq_*` segments.** 26 classes keep some or all of their

@@ -10,7 +10,7 @@
 
 ## What it does
 
-Slot `+0x004` of the `D_8006D430` method table (see `include/code_171e0.h`'s
+Slot `+0x004` of the `gFileResourceMethods` method table (see `include/code_171e0.h`'s
 `FileResourceMethods`). It clears one flag, then explicitly chains
 **both** destructors available to it: the class's own (`this->methods->dtor`,
 itself `FileResource__Finalize`, resolved through the vtable rather than by name) and
@@ -71,7 +71,7 @@ void *FileResource__Release(FileResource *this) {
 
 ## Proposed learning
 
-`D_8006D430`'s own vtable follows the exact same convention as
+`gFileResourceMethods`'s own vtable follows the exact same convention as
 `BasicClassMethods` (header @0, an own-class slot @+0x004, ctor @+0x008,
 dtor @+0x00C) — confirmed by dumping the table's raw words directly from
 `disk/SLPS_015.56` rather than trusting a null-slot scan in isolation (see
@@ -91,7 +91,7 @@ Round 52 (alpha), FINISHING-PLAN track 3.
 
 **Track 4 (2026-09-25, FileResource unification): renamed from `DestroyChained`, tier A.** Occupies BasicClass's `release` slot (+0x004), inherited by all sixteen FileResource subclasses; like `BasicClass__Release` it finalizes (its own `finalize` slot, then BasicClass's) and frees the object, returning NULL. An override is named for the slot it occupies (FINISHING-PLAN track 4).
 
-**Evidence.** `D_8006D430`'s `+0x004` own-class slot -- but verbatim-shared
+**Evidence.** `gFileResourceMethods`'s `+0x004` own-class slot -- but verbatim-shared
 with `gCdDriverMethods` at the identical offset (`docs/match-reports/GetCdDriverMethods.md`),
 so it is not really "FileResource's own" and a `FileResource__` prefix would
 misattribute it. Clears the busy flag, then explicitly chains its own dtor

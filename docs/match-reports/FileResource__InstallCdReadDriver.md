@@ -29,12 +29,12 @@ Byte-exact, 18/18 words.
 ## Notes
 
 The standard "chain to base ctor, then install the derived vtable" idiom:
-calls `D_8006D430`'s own ctor slot (`GetFileResourceMethods()->ctor`, i.e.
+calls `gFileResourceMethods`'s own ctor slot (`GetFileResourceMethods()->ctor`, i.e.
 `FileResource__FileResource`, matched in `code_171e0.c`) directly rather than through
 `self->methods` (since `self->methods` isn't set up yet), then overwrites
 `self->methods` with `GetCdDriverMethods()` -- a DIFFERENT class table
 (`gCdDriverMethods`, confirmed via `tools/classtable.py --scan`: 29 slots, header
-`0x13`, vs. `D_8006D430`'s 0x03). `GetCdDriverMethods` itself is still uncarved
+`0x13`, vs. `gFileResourceMethods`'s 0x03). `GetCdDriverMethods` itself is still uncarved
 (`asm/code_179d8.s`); typed against `FileResourceMethods` for the
 assignment only -- the two classes are different but share the base's
 leading slot layout, which is all the type is asked to express here.

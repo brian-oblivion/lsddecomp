@@ -3,7 +3,7 @@
  * of CdDriver, the CD-ROM data source (include/CdDriver.h; method table
  * gCdDriverMethods, header word 0x13 = code_171e0.c's DATASOURCE_CD).
  * vram 0x800271D8..0x800272D0. `tools/classtable.py gCdDriverMethods --vs
- * D_8006D430` shows this unit's four functions as:
+ * gFileResourceMethods` shows this unit's four functions as:
  *   New_CdDriver          allocates 0x2C bytes, dispatches table +0x008
  *   CdDriver__CdDriver    +0x008: FileResource ctor, own table, InitCdDrive
  *   CdDriver__Finalize    +0x00C: cancelRequests (+0x074), freeBuffer (+0x05C)

@@ -8,11 +8,11 @@
 
 ## What it does
 
-The constructor for the `D_8006D430` class (its own vtable slot `+0x008`,
+The constructor for the `gFileResourceMethods` class (its own vtable slot `+0x008`,
 per `include/code_171e0.h`'s `FileResourceMethods`). Chains the base
 class's constructor first (`Get_vtable_BasicClass()->ctor(this)`), then installs
 this class's own vtable pointer (fetched via the already-matched
-`GetFileResourceMethods`, which just returns `&D_8006D430`), then zeroes every field
+`GetFileResourceMethods`, which just returns `&gFileResourceMethods`), then zeroes every field
 this unit currently knows about.
 
 ## Derivation
@@ -22,7 +22,7 @@ jal   Get_vtable_BasicClass
  addu $s0, $a0, $zero        ; s0 = this
 lw    $v0, 0x8($v0)          ; v0 = (base table)->ctor
 jalr  $v0                    ; Get_vtable_BasicClass()->ctor(this)
-jal   GetFileResourceMethods          ; v0 = &D_8006D430
+jal   GetFileResourceMethods          ; v0 = &gFileResourceMethods
 sw    $v0, 0x0($s0)          ; this->methods = v0
 sw    $zero, 0xC($s0)        ; this->unk0C = 0
 sw    $zero, 0x10($s0)       ; this->unk10 = 0

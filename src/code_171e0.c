@@ -110,7 +110,7 @@ void FileResource__SetFlag(FileResource *this) {
 }
 
 FileResourceMethods *GetFileResourceMethods(void) {
-    return &D_8006D430;
+    return &gFileResourceMethods;
 }
 
 extern s32 gActiveDataSource;

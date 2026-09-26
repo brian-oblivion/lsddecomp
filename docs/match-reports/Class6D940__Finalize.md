@@ -39,7 +39,7 @@ position in the base class.
 
 Renamed `Class6D940__Destroy -> Class6D940__Finalize`: it occupies slot
 +0x00C of D_8006D940, which is `finalize` in every class
-(`include/BasicClass.h`; `tools/classtable.py D_8006D940 --vs D_8006D430`
+(`include/BasicClass.h`; `tools/classtable.py D_8006D940 --vs gFileResourceMethods`
 shows it overriding `FileResource__Finalize`), and its body is only the
 parent's finalize, reached through the active data source's table
 (`GetActiveDataSourceMethods()->finalize`). The slot is `void`, so the

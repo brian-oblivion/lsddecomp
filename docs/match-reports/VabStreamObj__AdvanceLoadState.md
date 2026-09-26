@@ -121,4 +121,4 @@ The report above says +0x058 and +0x06C are "null in retail". That is only
 true of the static table. `SetActiveDataSource` copies the active driver's
 interface slots into every table `gDataSourceClientGetters` lists
 (`include/FileResource.h`), and `GetVabStreamObjMethods` is on that list
-(D_8006D430 +0x098). At run time these calls reach the driver.
+(gFileResourceMethods +0x098). At run time these calls reach the driver.

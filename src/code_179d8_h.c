@@ -69,7 +69,7 @@
  * Class-framework status, CORRECTED round 64: measured, not assumed, and the
  * prior claim here ("zero functions in this slice reference any of the 60
  * method tables") was wrong by the time it was written -- `python3
- * tools/classtable.py --scan` lists BOTH `D_8006D430` (44 slots, header 3)
+ * tools/classtable.py --scan` lists BOTH `gFileResourceMethods` (44 slots, header 3)
  * and `gCdDriverMethods` (29 slots, header 0x13) among the 60, and
  * `FileResource__InstallCdReadDriver`/`FileResource__DestroyCdReadDriver`
  * dispatch through both via `GetFileResourceMethods()`/`GetCdDriverMethods()`.

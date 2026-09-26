@@ -27,7 +27,7 @@
  * The atlas is a TileAtlas (D_8006F514, include/TileAtlas.h, by tag here):
  * its `cells` is the 300-GsCELL array BuildMap copies into map.base.
  *
- * SLOTS (`classtable.py D_8006F498 --vs D_8006D430`, 30 against 30):
+ * SLOTS (`classtable.py D_8006F498 --vs gFileResourceMethods`, 30 against 30):
  *  - +0x008 ctor, TileMap__TileMap(self, arg1, atlas): the active driver's
  *    ctor, this table, atlas at +0x03C, loaded = 0; with arg1 == 0,
  *    defaultGrid = 1, unk2A = 0 and setFlag (+0x064). What a nonzero arg1

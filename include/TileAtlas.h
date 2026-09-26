@@ -24,7 +24,7 @@
  * src/code_2c054.c): New_TileAtlas(0), then New_TileMap(0, atlas), then
  * New_BgLayer(tileMap, 1); TaskCore__Finalize releases the three (+0x004).
  *
- * SLOTS (`classtable.py D_8006F514 --vs D_8006D430`, 30 against 30; the
+ * SLOTS (`classtable.py D_8006F514 --vs gFileResourceMethods`, 30 against 30; the
  * words from +0x07C on are gDataSourceClientGetters, not this table):
  *  - +0x008 ctor, TileAtlas__TileAtlas(self, arg1): the active driver's
  *    ctor, this table, unk34 = 0, loaded = 0; with arg1 == 0,

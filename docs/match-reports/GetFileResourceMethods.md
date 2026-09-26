@@ -8,7 +8,7 @@
 
 ## What it does
 
-Returns the address of `D_8006D430`, a 44-slot method table (header word
+Returns the address of `gFileResourceMethods`, a 44-slot method table (header word
 `0x00000003`) — the vtable of the class most of this unit's own functions
 belong to. Same "get methods" shape as `GetClass6D3C8Methods` immediately above,
 just for a different class.
@@ -16,16 +16,16 @@ just for a different class.
 ## Derivation
 
 ```
-lui   $v0, %hi(D_8006D430)
+lui   $v0, %hi(gFileResourceMethods)
 jr    $ra
- addiu $v0, $v0, %lo(D_8006D430)
+ addiu $v0, $v0, %lo(gFileResourceMethods)
 ```
 
 ```c
-extern s32 D_8006D430[];
+extern s32 gFileResourceMethods[];
 
 void *GetFileResourceMethods(void) {
-    return D_8006D430;
+    return gFileResourceMethods;
 }
 ```
 
@@ -52,7 +52,7 @@ Round 52 (alpha), FINISHING-PLAN track 3.
 | --- | --- | --- |
 | `func_80026C9C` | `GetFileResourceMethods` | A |
 
-**Evidence.** `return D_8006D430;` -- the same "get my own vtable" shape as
+**Evidence.** `return gFileResourceMethods;` -- the same "get my own vtable" shape as
 `GetClass6D3C8Methods` (this round) and `GetCdDriverMethods` (round 51).
 Pure leaf, mechanics are its purpose.
 
@@ -82,7 +82,7 @@ declarations; same shape and same discriminator as `GetClass6B5CCMethods`.
 
 ```
 80026c9c:  lui   v0,0x8007
-80026ca0:  addiu v0,v0,-11216     ; &D_8006D430
+80026ca0:  addiu v0,v0,-11216     ; &gFileResourceMethods
 80026ca4:  jr    ra
 80026ca8:  nop
 ```

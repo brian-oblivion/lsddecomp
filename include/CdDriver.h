@@ -38,7 +38,7 @@
  * size.
  *
  * Every own method is named for its slot (`classtable.py gCdDriverMethods
- * --vs D_8006D430`); the slot names are FileResource's, which were named for
+ * --vs gFileResourceMethods`); the slot names are FileResource's, which were named for
  * these occupants. Slot types are FileResource's too. Where the old local
  * views disagreed (open/close/loadFile/setFlag/stopService returning s32,
  * read's buf as s32), the occupants return void / take void * and the

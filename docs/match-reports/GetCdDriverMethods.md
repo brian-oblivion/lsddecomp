@@ -12,7 +12,7 @@ This function is the "get my own method table" accessor for the class whose
 vtable is `gCdDriverMethods` (29 slots, header word `0x13`, resolved with
 `tools/classtable.py gCdDriverMethods`). Slot map:
 
-- `+0x004` `FileResource__Release` (own-class slot, shared with `D_8006D430` at the
+- `+0x004` `FileResource__Release` (own-class slot, shared with `gFileResourceMethods` at the
   identical offset)
 - `+0x008` `CdDriver__CdDriver` (ctor, by the project's `+0x008` convention)
 - `+0x00C` `CdDriver__Finalize` (dtor)
@@ -21,17 +21,17 @@ vtable is `gCdDriverMethods` (29 slots, header word `0x13`, resolved with
   `CdDriver__CancelRequests` (this unit's next three queued functions, at `+0x06C`/
   `+0x070`/`+0x074`)
 
-Compared against `D_8006D430` (`include/code_171e0.h`'s
-`FileResourceMethods`) with `classtable.py gCdDriverMethods --vs D_8006D430`:
+Compared against `gFileResourceMethods` (`include/code_171e0.h`'s
+`FileResourceMethods`) with `classtable.py gCdDriverMethods --vs gFileResourceMethods`:
 `FileResource__Release` at `+0x004` and `FileResource__FreeBuffer`/`NoOp`/
 `FileResource__SetFlag` at identical offsets (`+0x05C`/`+0x060`/`+0x064`) are shared
 between the two tables, strongly suggesting `gCdDriverMethods`'s class is a
-subclass or close sibling of `D_8006D430`'s, inheriting the same BasicClass
+subclass or close sibling of `gFileResourceMethods`'s, inheriting the same BasicClass
 slot block and several of the same concrete method implementations.
 
 `GetCdDriverMethods` itself is the same "return my own vtable's address"
 accessor the project already names elsewhere: `GetClass6D3C8Methods` for
-`D_8006D3C8` and `GetFileResourceMethods` for `D_8006D430` (both in
+`D_8006D3C8` and `GetFileResourceMethods` for `gFileResourceMethods` (both in
 `include/code_171e0.h`'s doc comment).
 
 ## The C
@@ -69,7 +69,7 @@ Round 51 (alpha), FINISHING-PLAN track 3.
 **Evidence.** A two-instruction address-of: it returns `&gCdDriverMethods`, this
 class's own 29-slot method table. A pure leaf whose mechanics are its
 purpose, so tier A by the plan's own rule. The same accessor shape
-`GetClass6D3C8Methods` has for `D_8006D3C8` and `GetFileResourceMethods` for `D_8006D430`.
+`GetClass6D3C8Methods` has for `D_8006D3C8` and `GetFileResourceMethods` for `gFileResourceMethods`.
 
 **The class token `Class6D4E8` is deliberate, and this is the report that
 says why.** What the class IS, is now well evidenced: every method reachable

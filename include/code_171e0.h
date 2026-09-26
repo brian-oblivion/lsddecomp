@@ -7,7 +7,7 @@
 /* D_8006D3C8 and its getter GetClass6D3C8Methods (defined in this unit) are
  * include/Class6D3C8.h's. */
 
-/* Some class instance (a slot of D_8006D430's table, going by
+/* Some class instance (a slot of gFileResourceMethods's table, going by
  * classtable.py) with at least one flag word at offset 0x24, OR'd with 1 by
  * FileResource__SetFlag. The full layout is derived further down this file, once
  * the method table type it needs (FileResourceMethods) is declared. */

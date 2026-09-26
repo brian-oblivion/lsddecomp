@@ -81,7 +81,7 @@ doesn't own the container.
 ## Track 4 (2026-09-26, round 87)
 
 Renamed `VabStreamObj__Close` -> `VabStreamObj__Finalize` with `rename.py`.
-`classtable.py gVabStreamObjMethods --vs D_8006D430` shows this is the
+`classtable.py gVabStreamObjMethods --vs gFileResourceMethods` shows this is the
 +0x00C override, FileResource's `finalize` slot (BasicClass's), and the body is
 a finalize: it releases what the ctor acquired and chains to the active
 driver's finalize, as `FileResource__Finalize` does. "Close" also named a

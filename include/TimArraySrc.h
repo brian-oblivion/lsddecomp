@@ -25,7 +25,7 @@
  * four CLUT fade ramps, then setFlag (+0x064, BuildImages) and +0x078
  * (UploadImages); the TimBlockSrc keeps it in `blocks` and releases it.
  *
- * SLOTS (`classtable.py D_8006F1C4 --vs D_8006D430`, 30 against 30; the
+ * SLOTS (`classtable.py D_8006F1C4 --vs gFileResourceMethods`, 30 against 30; the
  * words from +0x07C on are gDataSourceClientGetters, not this table):
  *  - +0x008 ctor, TimArraySrc__TimArraySrc(self, name): the active
  *    driver's ctor, this table, count/images/ready cleared, and

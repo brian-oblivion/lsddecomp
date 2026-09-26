@@ -10,10 +10,10 @@
 
 ## What it does
 
-`D_8006D430`'s vtable slot `+0x058`. A lazy (re)allocation routine: if
+`gFileResourceMethods`'s vtable slot `+0x058`. A lazy (re)allocation routine: if
 `this->unk10` is already set, it's a no-op; otherwise it calls four more of
 this class's own slots (`+0x044`, `+0x04C` twice, `+0x054`) — all four are
-null at `D_8006D430`'s own level (verified by reading the table's raw words
+null at `gFileResourceMethods`'s own level (verified by reading the table's raw words
 directly out of `disk/SLPS_015.56`; see `include/code_171e0.h`), so they only
 resolve to real code for whichever subclass overrides them — sizes a new
 allocation via `BMemPMgrAlloc`, and on success installs the new pointer/size
@@ -184,7 +184,7 @@ per FINISHING-PLAN track 3's merge procedure).
 ## Proposed vtable slot names
 
 `FileResourceMethods`'s slots this function dispatches through are
-null at `D_8006D430`'s own level (subclass-provided), and the same
+null at `gFileResourceMethods`'s own level (subclass-provided), and the same
 cross-unit exposure applies (`code_179d8_h.c` types objects against this
 table too). Proposed, not renamed:
 
@@ -196,7 +196,7 @@ table too). Proposed, not renamed:
 | `+0x048` (`slot48`) | `onBufferChanged` | C | Called on both the success and failure paths of this function, and also from `FileResource__Finalize` -- a notification/finalize hook rather than part of the alloc logic itself. |
 
 All four are tier C: the CALL SITES are fully derived, but every one of
-these slots is null at `D_8006D430`'s own level, so nothing here confirms
+these slots is null at `gFileResourceMethods`'s own level, so nothing here confirms
 what an overriding subclass's implementation actually does. Posted to the
 broadcast.
 

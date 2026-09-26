@@ -5,7 +5,7 @@
 
 /*
  * FileResource -- the base of the game's data sources (class id 0x3, method
- * table D_8006D430): a BasicClass subclass that owns one file buffer and
+ * table gFileResourceMethods): a BasicClass subclass that owns one file buffer and
  * declares the file-I/O interface its subclasses reach through their tables.
  * Methods in src/code_171e0.c; sixteen classes derive from it
  * (`typeviews.py --tree`), among them the CD-ROM driver (gCdDriverMethods, 0x13,
@@ -77,11 +77,11 @@ struct FileResource {
     FILERESOURCE_FIELDS(FileResourceMethods);
 };
 
-extern FileResourceMethods D_8006D430;
+extern FileResourceMethods gFileResourceMethods;
 extern FileResourceMethods *GetFileResourceMethods(void);
 
 /* The table getters of every class SetActiveDataSource rebinds, NULL-
- * terminated; it sits right after D_8006D430's last slot. */
+ * terminated; it sits right after gFileResourceMethods's last slot. */
 extern void *(*gDataSourceClientGetters[])(void);
 
 void *FileResource__Release(FileResource *self);

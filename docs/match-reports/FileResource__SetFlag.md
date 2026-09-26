@@ -9,7 +9,7 @@
 ## What it does
 
 Sets bit 0 of a flags word at offset `0x24` of its argument. It is itself
-slot `+0x064` of the `D_8006D430` method table (see `GetFileResourceMethods`'s
+slot `+0x064` of the `gFileResourceMethods` method table (see `GetFileResourceMethods`'s
 report), so its real signature is fixed by whatever that slot is called with
 elsewhere — here, just `this`.
 

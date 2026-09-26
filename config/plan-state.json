@@ -862,11 +862,6 @@
           "date": "2026-09-26",
           "header": "include/Class6D3C8.h"
         },
-        "D_8006D430": {
-          "class": "FileResource",
-          "date": "2026-09-25",
-          "header": "include/FileResource.h"
-        },
         "D_8006D940": {
           "class": "Class6D940",
           "date": "2026-09-26",
@@ -1021,6 +1016,11 @@
           "class": "Class879C4",
           "date": "2026-09-26",
           "header": "include/Class879C4.h"
+        },
+        "gFileResourceMethods": {
+          "class": "FileResource",
+          "date": "2026-09-25",
+          "header": "include/FileResource.h"
         },
         "gFlatLightObjMethods": {
           "class": "FlatLightObj",

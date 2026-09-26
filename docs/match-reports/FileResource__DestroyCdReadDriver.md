@@ -18,7 +18,7 @@ Byte-exact, 14/14 words.
 
 ## Notes
 
-Chains directly to `D_8006D430`'s own dtor slot (`GetFileResourceMethods()->dtor`,
+Chains directly to `gFileResourceMethods`'s own dtor slot (`GetFileResourceMethods()->dtor`,
 i.e. `FileResource__Finalize`, matched in `code_171e0.c`) rather than through
 `self->methods` -- same "call the base class's own copy of a slot, not the
 possibly-overridden one on `self`" idiom `FileResource__Release` in that same file

@@ -15,7 +15,7 @@
  * PARENT BY CTOR CHAIN: Class81940__Class81940's first call is
  * GetActiveDataSourceMethods()->ctor, and finalize, setFlag and
  * cancelRequests forward to the active driver's, as Class6D940, TimBlockSrc
- * and VabStreamObj do. GetClass81940Methods is D_8006D430's
+ * and VabStreamObj do. GetClass81940Methods is gFileResourceMethods's
  * gDataSourceClientGetters entry at +0x0A0, so SetActiveDataSource rebinds
  * this table's interface slots (+0x040..+0x058, +0x068..+0x074; +0x058 is
  * NULL in the static table).

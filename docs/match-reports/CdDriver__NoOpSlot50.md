@@ -22,10 +22,10 @@ Round 79 (charlie), FINISHING-PLAN track 3.
 
 **Evidence.** `tools/classtable.py gCdDriverMethods` lists it at `+0x050`, between
 `CdDriver__Seek` (+0x04C) and `CdDriver__Read` (+0x054); the base class
-`D_8006D430` leaves that slot null. The body is empty, so the mechanics are
+`gFileResourceMethods` leaves that slot null. The body is empty, so the mechanics are
 the whole of it: the `Class__NoOpSlotNN` form the symbols file already uses
 (`Class6D3C8__NoOpSlot5C`, `ObjM__NoOpSlot40`). No dispatch of THIS class's
-+0x50 was identified (the local views of `gCdDriverMethods` and `D_8006D430` all
++0x50 was identified (the local views of `gCdDriverMethods` and `gFileResourceMethods` all
 pad over it), so what the slot is FOR is unknown.
 
 

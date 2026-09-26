@@ -10,7 +10,7 @@
 
 ## What it does
 
-This class's own destructor — `D_8006D430`'s vtable slot `+0x00C`, called
+This class's own destructor — `gFileResourceMethods`'s vtable slot `+0x00C`, called
 `FileResource__Release` and `Pad__Finalize` (in `class_16334`, a different class'
 `dtor`, same convention) alike. It calls two more of its own slots in turn:
 `+0x048` (unimplemented/null at this level — a subclass-provided hook,
@@ -103,7 +103,7 @@ not established.
 
 | slot | proposed name | tier | evidence |
 | --- | --- | --- | --- |
-| `+0x05C` (`slot5C`) | `freeBuffer` | B | Resolves to `FileResource__FreeBuffer` at this class's own level (confirmed by dumping `D_8006D430`'s raw words), dispatched indirectly. Per the project's "vtable slots named like the method they dispatch to" convention. Proposed rather than renamed only because the slot's declaration lives in the shared, cross-unit-exposed `FileResourceMethods`. |
+| `+0x05C` (`slot5C`) | `freeBuffer` | B | Resolves to `FileResource__FreeBuffer` at this class's own level (confirmed by dumping `gFileResourceMethods`'s raw words), dispatched indirectly. Per the project's "vtable slots named like the method they dispatch to" convention. Proposed rather than renamed only because the slot's declaration lives in the shared, cross-unit-exposed `FileResourceMethods`. |
 
 See `FileResource__LoadFile.md` for `+0x048`'s proposal (`onBufferChanged`),
 also dispatched from this function. Posted to the broadcast.

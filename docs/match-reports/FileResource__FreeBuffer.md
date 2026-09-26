@@ -8,7 +8,7 @@
 
 ## What it does
 
-`D_8006D430`'s vtable slot `+0x05C` (also reachable indirectly through
+`gFileResourceMethods`'s vtable slot `+0x05C` (also reachable indirectly through
 `FileResource__Finalize`, the class's own dtor). Frees `this->unk10` via
 `BMemPMgrFree` and clears it, but only when three conditions all hold:
 the pointer is non-NULL, `this->unk14` (its recorded size) is non-zero, and

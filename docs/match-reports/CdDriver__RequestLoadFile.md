@@ -22,7 +22,7 @@ carries the evidence for each one.
  * CdDriver__RequestLoadFile dispatches. `tools/classtable.py gCdDriverMethods`
  * resolves that slot to CdDriver__LoadFile (code_179d8_s), which loads a named
  * file off the disc, so the slot is named for the method it dispatches to.
- * The sibling class D_8006D430 (include/code_171e0.h's
+ * The sibling class gFileResourceMethods (include/code_171e0.h's
  * FileResourceMethods) leaves the identical offset unnamed -- this
  * stays an independent local view, per the project's multiple-local-views
  * convention, rather than an edit to that shared header. */
@@ -151,7 +151,7 @@ allows.
   completes with `typedef struct Obj6D4E8_282AC Obj6D4E8_282AC;`, so the
   prototypes are identical types and nothing conflicts.
 - `self`'s own `+0x58` method-table slot is the identical offset the sibling
-  class `D_8006D430` leaves as an unnamed pad in
+  class `gFileResourceMethods` leaves as an unnamed pad in
   `include/code_171e0.h`'s `FileResourceMethods` ("FileResource__LoadFile's own
   slot, unused here"). Rather than editing that shared header — which
   `code_179d8_h.c` and `code_171e0.c` also include —
