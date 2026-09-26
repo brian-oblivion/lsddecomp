@@ -5,34 +5,65 @@
 #include "StageGrid.h"
 
 /*
- * StageMap -- the grid manager (class id 0x114, method table
- * gStageMapMethods at 0x800866E8): LightRig's subclass, no class below it.
- * Its ctor and finalize chain to LightRig's first, and it inherits getLight
- * and setAmbientColor unchanged. Methods in src/class_3ac78.c
- * (New_StageMap .. SetConfig), src/class_3bb8c.c (SetTargetAndBuildRates
- * .. FindElementForPosition) and src/class_3bb8c_b.c (FindElemIndexByUnk32
- * .. GetStageMapMethods). The game makes one, at boot
- * (Class865C8__Class865C8 via New_StageMap(NULL, 1)); Actor keeps it as
- * `grid` (include/Actor.h) when addChild sees a class-0x114 child.
+ * StageMap -- the part of a stage's map that is loaded: seven map chunks
+ * around a tracked target, each laid out as a lattice of GridCells. Class
+ * id 0x114, method table gStageMapMethods; LightRig's subclass (its ctor
+ * and finalize chain to LightRig's first; getLight and setAmbientColor are
+ * inherited unchanged), no class below it. Methods in src/class_3ac78.c
+ * (New_StageMap .. SetConfig), src/class_3bb8c.c (SetTargetAndLoadChunks
+ * .. FindSlotForPosition) and src/class_3bb8c_b.c
+ * (FindSlotIndexByNeighbour .. GetStageMapMethods).
  *
- * What its own methods do:
- *  - the ctor makes seven elements (`elems`), each a LbdFile `loader`, a
- *    Class6D940 `placements`, a GridCell `cellParent` attached to this
- *    object at `origin`, and a 0x668-byte block of GridCell `cells`
- *    attached to the cellParent on a 0x800-unit lattice. Every grid index
- *    uses a row stride of 20 cells: gDefaultGridSpan (0xA000) >> 11, stored
- *    by setGridSpan in `gridCells`.
- *  - applyChunkLoads loads an element's file through its loader
- *    (LbdFile loadHeader); onNotifyTag1 consumes the header when it is
- *    read and populateSlotCells links each cell to its placement's model.
- *  - updateFootprintTracking (every tick while `enabled`) turns `target`'s
- *    world position into a Descriptor10Ext (computeFootprintDescriptor) and
- *    keeps it in `targetCell`, notifying parents with 5 when its leading
- *    halfword (the element row/column pair) changes; refreshFootprint then
- *    rebuilds `rects`, the up to four element-local rectangles the target
- *    covers, and flags their cells (StageMap__SetFootprintCellFlag).
- *  - forwardAcceptedCommand/applyToSenderFootprint re-notify every cell of
- *    a sender's rectangle (DispatchToRectCells, NotifyGridCell).
+ * Lifecycle. The game makes one, at boot (Class865C8__Class865C8, via
+ * New_StageMap(NULL, 1)). ObjM configures it for its stage: setConfig
+ * with the stage's StageGridDimensions (GetStageGridDimensions),
+ * setCallback with ObjM__OnRegistrantEvent (a chunk index -> that chunk's
+ * file record, GetGridRecordAt), setGridSpan, setAcceptedTags,
+ * setChildParams, setBounds, and enables it.
+ * DreamSys__SpawnAtLink hands it the target (setTargetAndLoadChunks);
+ * Actor keeps it as `grid` (include/Actor.h) when addChild sees a
+ * class-0x114 child. Disable unloads every slot; Finalize releases them.
+ *
+ * The chunk grid. A stage is `columns` x `rows` chunks (StageGridDimensions),
+ * a chunk 0xA000 units square, numbered row * columns + column; odd rows
+ * sit half a chunk to -x (ComputeCellWorldOffsets), so a chunk has six
+ * neighbours. A vertical grid (isVertical) stacks its chunks in y instead.
+ *
+ * The seven slots (`slots`, ChunkSlot). The ctor gives each an LbdFile
+ * `loader`, a Class6D940 `placements`, a GridCell `cellParent` attached to
+ * this object at `origin`, and 410 GridCell `cells` attached to the
+ * cellParent 0x800 units apart (20 x 20, row stride 20, then 10 cells for
+ * chained placements). Each slot holds a neighbour key, 0..6 (3 is the
+ * centre), that says where around the centre chunk it sits:
+ *  - loadChunksAround takes a centre chunk index and position and a
+ *    ChunkSlotSpec per slot; each slot marked `load` moves its cellParent to
+ *    centre + sNeighbourOffsets[key] and gets a ChunkLoadEntry
+ *    (ComputeChunkLoadEntry: the neighbour's chunk index from
+ *    sChunkNeighbourDeltas, NULL when ComputeNeighbourMask puts it off the
+ *    grid, else the chunk's file record from the callback);
+ *  - applyChunkLoads starts each entry's LbdFile load (or cancels it);
+ *    onNotifyTag1, as the reads finish, links each chunk's placements and
+ *    models into its slot's cells (populateSlotCells), and sets
+ *    `chunksLoaded` once none is pending.
+ *
+ * Tracking. Every tick while `enabled`, updateFootprintTracking turns the
+ * target's position into a Descriptor10Ext (computeFootprintDescriptor:
+ * chunk column/row, cell column/row, offset in the cell), keeps it in
+ * `targetCell`, and notifies parents with 5 when the chunk changes. In a
+ * flat grid it also re-centres: the slot holding the target picks a spec
+ * through sFootprintResultRemap and sFootprintResultPtrTable (NULL, no
+ * change, for the centre slot) and loadChunksAround reloads the slots that
+ * spec marks around the target's chunk. Then refreshFootprint
+ * rebuilds `rects`, the up to four cell rectangles the target covers, and
+ * flags their cells (SetFootprintCellFlag). forwardAcceptedCommand and
+ * applyToSenderFootprint hand a sender's command to every cell under its
+ * rectangle (DispatchToRectCells, NotifyGridCell).
+ *
+ * Scale ramp. startScaleRamp (called by Entity_b/e/g) picks a Ratio16[3]
+ * step, y +-1/64 or +-1/4, and a tick count; stepScaleRamp (every tick
+ * after tracking) adds it to every cell's scale until the count runs out,
+ * and endScaleRamp sets every cell back to 1/1.
+ *
  * Descriptor10 has the shape of DreamSys.h's PlayerSpawnPoint (chunk
  * col/row, tile col/row, s16 x/y/z): DreamSys__WallLink copies
  * getCurrentCellKey's result into its linkCoordinates whole. The two are
@@ -41,18 +72,18 @@
  *
  * Inherited slots it overrides (`tools/classtable.py gStageMapMethods --vs
  * gLightRigMethods`): +0x008 the ctor, +0x00C Finalize, +0x038 OnNotify,
- * +0x040 Reset, +0x088 notifyIfUnk20Active (StageMap__OnSlotEvent,
- * see below), +0x098 update (StageMap__UpdateIfEnabled) and +0x09C
+ * +0x040 Reset, +0x088 notifyWithHull (StageMap__OnSlotEvent, see
+ * below), +0x098 update (StageMap__UpdateIfEnabled) and +0x09C
  * DispatchLinkCommand.
  *
- * +0x088: StageMap__OnSlotEvent takes (self, command, elem); the slot
+ * +0x088: StageMap__OnSlotEvent takes (self, command, slot); the slot
  * keeps SceneNode's (self, event). Its four callers (Finalize,
- * ResetAllElements, ApplyRateEntries, OnNotifyTag1) pass (self, 6 or 7,
- * elem, index) through StageMapOnSlotEventFn below (no code).
+ * UnloadAllSlots, ApplyChunkLoads, OnNotifyTag1) pass (self, 6 or 7,
+ * slot, index) through StageMapOnSlotEventFn below (no code).
  * +0x0D4 getCurrentCellKey and +0x0F8 loadChunksAround keep their CALLERS'
  * shapes: DreamSys__WallLink passes getCurrentCellKey a second word the
- * occupant never reads, and SetTargetAndBuildRates returns loadChunksAround'
- * value although the occupant returns nothing.
+ * occupant never reads, and SetTargetAndLoadChunks returns
+ * loadChunksAround's value although the occupant returns nothing.
  *
  * The object is 0x1E8 bytes (New_StageMap).
  */
@@ -66,9 +97,9 @@ typedef struct StageMapMethods StageMapMethods;
 typedef struct ChunkSlot ChunkSlot;
 
 /* A grid-cell descriptor, 10 bytes, alignment 2 (every member s8/s16, so a
- * whole copy is lwl/lwr + swl/swr + sh: SetTargetAndBuildRates). b0/b1 the
- * element column/row (ComputeDivisorSplit: rate % divisor, rate / divisor),
- * b2/b3 the cell column/row inside the element, h4/h6/h8 the offset inside
+ * whole copy is lwl/lwr + swl/swr + sh: SetTargetAndLoadChunks). b0/b1 the
+ * chunk column/row (SplitChunkIndex: index % columns, index / columns),
+ * b2/b3 the cell column/row inside the chunk, h4/h6/h8 the offset inside
  * the cell (ComputeFootprintDescriptor). UpdateFootprintTracking and
  * DispatchToRectCells read b0/b1 as one u16. */
 typedef struct Descriptor10 {
@@ -86,7 +117,7 @@ typedef struct Descriptor10Ext {
     Descriptor10 base; /* +0x000 */
     LongVec3 chunkCentre; /* +0x00C, the slot's cellParent position + 0x5000 in x and z (half a chunk) */
     LongVec3 relPos; /* +0x018, the queried position less chunkCentre in x and z; y as queried */
-    ChunkSlot *slot; /* +0x024, the slot findElementForPosition resolved */
+    ChunkSlot *slot; /* +0x024, the slot FindSlotForPosition resolved */
     s32 chunkIndex;  /* +0x028, that slot's LbdFile::chunkIndex, sign-extended */
 } Descriptor10Ext;
 
@@ -111,8 +142,8 @@ typedef struct SplitLongVec3 {
 } SplitLongVec3;
 
 /* The step from a centre chunk's index (row * columns + column) to one of
- * the seven chunks around it, indexed by ChunkSlotSpec::key
- * (sChunkNeighbourDeltas, ComputeRateEntry): rowDelta rows, then colDeltaOddRow
+ * the seven chunks around it, indexed by ChunkSlotSpec::neighbour
+ * (sChunkNeighbourDeltas, ComputeChunkLoadEntry): rowDelta rows, then colDeltaOddRow
  * or colDeltaEvenRow columns by the centre row's parity (odd rows sit half a
  * chunk to -x, ComputeCellWorldOffsets). The table holds the centre (key 3,
  * all 0) and its six staggered neighbours. */
@@ -125,7 +156,7 @@ typedef struct ChunkNeighbourDelta {
 /* applyChunkLoads' 0xC-byte entries, one per slot to (re)load: the file
  * record valueFn returned for the chunk (NULL: cancel the slot's load), the
  * chunk's index in the stage grid and the neighbour key of the slot that
- * takes it. ComputeRateEntry writes chunkIndex as a whole word. */
+ * takes it. ComputeChunkLoadEntry writes chunkIndex as a whole word. */
 typedef struct ChunkLoadEntry {
     void *file;     /* +0x0 */
     s16 chunkIndex; /* +0x4 */
@@ -133,7 +164,7 @@ typedef struct ChunkLoadEntry {
     s32 neighbour; /* +0x8 */
 } ChunkLoadEntry;
 
-/* The same 0xC stride based at +0x4: ApplyRateEntries' second walker
+/* The same 0xC stride based at +0x4: ApplyChunkLoads' second walker
  * (strength-reduced from the parameter; its report). */
 typedef struct ChunkLoadEntryTail {
     s16 chunkIndex; /* +0x4 in ChunkLoadEntry terms */
@@ -142,7 +173,7 @@ typedef struct ChunkLoadEntryTail {
     u8 pad8[0xC - 0x8];
 } ChunkLoadEntryTail;
 
-/* loadChunksAround' per-slot pair (sDefaultTargetSpecs and the
+/* loadChunksAround's per-slot pair (sDefaultTargetSpecs and the
  * sFootprintResultPtrTable tables hold seven each): the neighbour key the
  * slot takes (0..6, the index into sNeighbourOffsets and sChunkNeighbourDeltas;
  * 3 is the centre) and whether it is (re)loaded and repositioned. */
@@ -151,7 +182,7 @@ typedef struct ChunkSlotSpec {
     u8 load;      /* +0x1 */
 } ChunkSlotSpec;
 
-/* One element-local rectangle of cells, 0xC bytes, no padding. */
+/* One rectangle of cells inside one slot's lattice, 0xC bytes, no padding. */
 typedef struct CellRect {
     s32 slotIndex; /* +0x0, index into slots[] */
     s16 col;       /* +0x4, starting column */
@@ -175,20 +206,20 @@ typedef struct CellBounds {
     s32 maxRow; /* +0x008 */
 } CellBounds;
 
-/* One of the seven elements, 0x1C bytes (the ctor, Finalize). */
+/* One of the seven chunk slots, 0x1C bytes (the ctor, Finalize). */
 struct ChunkSlot {
-    /* +0x000 */ u16 loadPending; /* 1 while its load is pending (ApplyRateEntries; OnNotifyTag1 clears it) */
-    /* +0x002 */ u16 neighbour; /* the ctor: its index; BuildRateEntries: the spec's neighbour, copied on into loader->elemKey */
-    /* +0x004 */ struct LbdFile *loader; /* New_LbdFile(): the element's file (include/LbdFile.h) */
+    /* +0x000 */ u16 loadPending; /* 1 while its load is pending (ApplyChunkLoads; OnNotifyTag1 clears it) */
+    /* +0x002 */ u16 neighbour; /* the ctor: its index; LoadChunksAround: the spec's neighbour, copied on into loader->elemKey */
+    /* +0x004 */ struct LbdFile *loader; /* New_LbdFile(): the slot's chunk file (include/LbdFile.h) */
     /* +0x008 */ struct Class6D940 *placements; /* New_Class6D940(0): its placement records (include/Class6D940.h) */
     /* +0x00C */ struct GridCell *cellParent; /* New_GridCell(), attached to the StageMap at `origin`; every cell's parent */
     /* +0x010 */ struct GridCell **cells; /* BMemPMgrAlloc(0x668): 410 New_GridCell() cells, row stride 20 */
-    /* +0x014 */ BasicClass *heldObj; /* zeroed by the ctor; OnElementEvent releases it on event 6 */
+    /* +0x014 */ BasicClass *heldObj; /* zeroed by the ctor; OnSlotEvent releases it on event 6 */
     /* +0x018 */ s32 unk18;           /* zeroed by the ctor */
 };
 
-/* The ctor's callback pair (setCallback): ComputeRateEntry calls
- * valueFn(valueFnCtx, value, 0, 0) and keeps the result as an entry's name. */
+/* The ctor's callback pair (setCallback): ComputeChunkLoadEntry calls
+ * valueFn(valueFnCtx, value, 0, 0) and keeps the result as the entry's file record. */
 typedef void *(*ChunkFileFn)(void *ctx, s32 value, s32 arg2, s32 arg3);
 
 /* LightRig's slots, then this class's own. */
@@ -218,12 +249,12 @@ struct StageMapMethods {
                                          s32 count); /* StageMap__ApplyChunkLoads */
     /* +0x100 */ void (*onNotifyTag1)(StageMap *self, void *sender,
                                       s32 mode); /* StageMap__OnNotifyTag1; OnNotify's class-1 sender case */
-    /* +0x104 */ void (*populateSlotCells)(StageMap *self, ChunkSlot *elem); /* StageMap__PopulateSlotCells */
-    /* +0x108 */ void (*clearSlotCells)(StageMap *self, ChunkSlot *elem); /* StageMap__ClearSlotCells */
+    /* +0x104 */ void (*populateSlotCells)(StageMap *self, ChunkSlot *slot); /* StageMap__PopulateSlotCells */
+    /* +0x108 */ void (*clearSlotCells)(StageMap *self, ChunkSlot *slot); /* StageMap__ClearSlotCells */
     /* +0x10C */ Descriptor10 *(*getTargetDescriptor)(StageMap *self, Descriptor10Ext *out,
                                                       void **outPos); /* StageMap__GetTargetDescriptor */
     /* +0x110 */ s32 (*computeFootprintDescriptor)(StageMap *self, Descriptor10Ext *out,
-                                                   SplitLongVec3 *pos); /* StageMap__ComputeFootprintDescriptor: 0, or 1 when no element holds pos */
+                                                   SplitLongVec3 *pos); /* StageMap__ComputeFootprintDescriptor: 0, or 1 when no slot holds pos */
     /* +0x114 */ ChunkSlot *(*getLastTargetRateSplit)(StageMap *self, u8 *out); /* StageMap__GetLastEventSlotChunk */
     /* +0x118 */ ChunkSlot *(*findElemByUnk32)(StageMap *self, s32 key); /* StageMap__FindSlotByNeighbour */
     /* +0x11C */ ChunkSlot *(*findElementForPosition)(StageMap *self, LongVec3 *pos); /* StageMap__FindSlotForPosition */
@@ -256,14 +287,14 @@ struct StageMap {
     /* +0x084 */ s32 footprintHeight;
     /* +0x088 */ s32 rectCount;     /* how many of rects[] are live */
     /* +0x08C */ CellRectSet rects; /* BuildFootprintSlots, SetFootprintRect, InitFootprintSlot write; DispatchToRectCells, SetFootprintCellFlag walk */
-    /* +0x0BC */ Descriptor10Ext targetCell; /* UpdateFootprintTracking: the target's last descriptor; SetTargetAndBuildRates sets .base; getTargetDescriptor returns &.base */
+    /* +0x0BC */ Descriptor10Ext targetCell; /* UpdateFootprintTracking: the target's last descriptor; SetTargetAndLoadChunks sets .base; getTargetDescriptor returns &.base */
     /* +0x0E8 */ s32 *acceptedTags; /* setAcceptedTags: a 0-terminated list of class ids ForwardAcceptedCommand accepts */
     /* +0x0EC */ ChunkSlot slots[7];
-    /* +0x1B0 */ s32 loadsPending; /* 1 while element loads are pending (ApplyRateEntries; OnNotifyTag1 clears it) */
-    /* +0x1B4 */ u16 unk1B4; /* CountFlaggedElements after ApplyRateEntries; OnNotifyTag1 counts it down */
+    /* +0x1B0 */ s32 loadsPending; /* 1 while chunk loads are pending (ApplyChunkLoads; OnNotifyTag1 clears it) */
+    /* +0x1B4 */ u16 unk1B4; /* CountPendingLoads after ApplyChunkLoads; OnNotifyTag1 counts it down */
     /* +0x1B6 */ u8 pad1B6[0x1B8 - 0x1B6];
     /* +0x1B8 */ s32 chunksLoaded; /* set when that count reaches 0; RefreshFootprint does nothing while it is 0 */
-    /* +0x1BC */ ChunkSlot *lastEventSlot; /* OnElementEvent's elem; GetLastTargetRateSplit reads it */
+    /* +0x1BC */ ChunkSlot *lastEventSlot; /* OnSlotEvent's slot; GetLastEventSlotChunk reads it */
     /* +0x1C0 */ Descriptor10 curCell; /* DispatchToRectCells: the cell being notified (b0/b1 copied from targetCell as a u16); getCurrentCellKey returns it */
     /* +0x1CA */ u8 pad1CA[0x1CC - 0x1CA];
     /* +0x1CC */ s32 unk1CC;         /* Reset: -1; GetUnk1CC returns its address */
@@ -271,16 +302,16 @@ struct StageMap {
     /* +0x1D4 */ s32 unk1D4;         /* Reset: -1 */
     /* +0x1D8 */ s32 unk1D8;         /* Reset: -1 */
     /* +0x1DC */ CellBounds *bounds; /* setBounds; IsPointOutOfBounds */
-    /* +0x1E0 */ s32 scaleRampTicks; /* configureRateEntry; stepScaleRamp/endScaleRamp */
-    /* +0x1E4 */ Ratio16 *scaleStep; /* configureRateEntry: one of four Ratio16[3] steps (x, y, z) that stepScaleRamp adds to every cell's scale; only y is nonzero, +-1/64 or +-1/4 */
+    /* +0x1E0 */ s32 scaleRampTicks; /* startScaleRamp: |amount| * the step's y den; stepScaleRamp counts it down (-1 when done), endScaleRamp zeroes it */
+    /* +0x1E4 */ Ratio16 *scaleStep; /* startScaleRamp: one of four Ratio16[3] steps (x, y, z) that stepScaleRamp adds to every cell's scale; only y is nonzero, +-1/64 or +-1/4 */
 }; /* 0x1E8 bytes: New_StageMap */
 
-/* +0x088's occupant, which takes the element too (see the banner). */
-typedef void (*StageMapOnSlotEventFn)(StageMap *self, s32 command, ChunkSlot *elem, s32 index);
+/* +0x088's occupant, which takes the slot too (see the banner). */
+typedef void (*StageMapOnSlotEventFn)(StageMap *self, s32 command, ChunkSlot *slot, s32 index);
 
-/* ForEachElem's callbacks. */
+/* ForEachSlot's callbacks. */
 typedef void (*StageMapCellFn)(StageMap *self, struct GridCell *cell);
-typedef void (*ChunkSlotFn)(StageMap *self, ChunkSlot *elem);
+typedef void (*ChunkSlotFn)(StageMap *self, ChunkSlot *slot);
 
 extern StageMapMethods gStageMapMethods;
 extern StageMapMethods *GetStageMapMethods(void); /* returns &gStageMapMethods */
@@ -292,7 +323,7 @@ void StageMap__StageMap(StageMap *self, LongVec3 *origin, s32 autoLoad);
 void StageMap__Finalize(StageMap *self);
 void StageMap__OnNotify(StageMap *self, BasicClass *sender, s32 command);
 void StageMap__Reset(StageMap *self);
-void StageMap__OnSlotEvent(StageMap *self, s32 command, ChunkSlot *elem);
+void StageMap__OnSlotEvent(StageMap *self, s32 command, ChunkSlot *slot);
 void StageMap__UpdateIfEnabled(StageMap *self);
 void StageMap__DispatchLinkCommand(StageMap *self, BasicClass *sender, s32 command);
 void StageMap__UnloadAllSlots(StageMap *self);
@@ -320,12 +351,12 @@ void StageMap__LoadChunksAround(StageMap *self, s32 val, LongVec3 *pos, ChunkSlo
 s32 StageMap__ComputeNeighbourMask(StageMap *self, s32 val, s32 flag);
 s32 StageMap__ComputeChunkLoadEntry(StageMap *self, ChunkLoadEntry *entry, s32 divisor, s32 flag,
                                     s32 val, s32 savedResult,
-                                    s32 key); /* 0 or 1; BuildRateEntries discards it */
+                                    s32 key); /* 0 or 1; LoadChunksAround discards it */
 void StageMap__ApplyChunkLoads(StageMap *self, ChunkLoadEntry *entries, s32 count);
 s32 StageMap__CountPendingLoads(StageMap *self);
 void StageMap__OnNotifyTag1(StageMap *self, void *sender, s32 mode);
-void StageMap__PopulateSlotCells(StageMap *self, ChunkSlot *elem);
-void StageMap__ClearSlotCells(StageMap *self, ChunkSlot *elem);
+void StageMap__PopulateSlotCells(StageMap *self, ChunkSlot *slot);
+void StageMap__ClearSlotCells(StageMap *self, ChunkSlot *slot);
 Descriptor10 *StageMap__GetTargetDescriptor(StageMap *self, Descriptor10Ext *out, void **outPos);
 s32 StageMap__ComputeFootprintDescriptor(StageMap *self, Descriptor10Ext *out, SplitLongVec3 *pos);
 void StageMap__SplitChunkIndex(StageMap *self, u8 *out, s32 val);
@@ -351,6 +382,6 @@ void StageMap__EndScaleRamp(StageMap *self);
 void StageMap__AddScaleStepToCell(StageMap *self, struct GridCell *cell);
 void StageMap__ResetCellScale(StageMap *self, struct GridCell *cell);
 void StageMap__ForEachSlot(StageMap *self, StageMapCellFn cellFn, ChunkSlotFn elemFn);
-void StageMap__ForEachSlotCell(StageMap *self, StageMapCellFn cellFn, ChunkSlot *elem);
+void StageMap__ForEachSlotCell(StageMap *self, StageMapCellFn cellFn, ChunkSlot *slot);
 
 #endif

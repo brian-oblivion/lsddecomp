@@ -12,8 +12,8 @@
  * on self->config->isVertical) and sets again through SetFootprintCellFlag. A
  * second, unrelated mechanism lives at the tail of the unit: a rate/
  * countdown pair (self->scaleRampTicks/self->scaleStep) that
- * AdvanceRateCountdown/FlushRateLatch apply to every cell of every element
- * (their updateScale) via the generic ForEachElem/ForEachEntryChild
+ * StepScaleRamp/EndScaleRamp apply to every cell of every element
+ * (their updateScale) via the generic ForEachSlot/ForEachSlotCell
  * iterators.
  *
  * "Footprint" is not this unit's own coinage: class_3ac78 already named the

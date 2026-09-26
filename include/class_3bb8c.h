@@ -20,7 +20,7 @@ typedef struct QueryTemplate866E8 QueryTemplate866E8;
  * setting its element: no element (-1), the whole 20 x 20 cells from (0, 0). */
 extern CellRect gFullSlotRect;
 
-/* The default "enable every element" spec table SetTargetAndBuildRates
+/* The default "enable every element" spec table SetTargetAndLoadChunks
  * passes to buildRateEntries: seven entries, every `flag` nonzero
  * (asm/data/76DC8.data.s). */
 extern ChunkSlotSpec sDefaultTargetSpecs[7];
@@ -31,7 +31,7 @@ extern ChunkSlotSpec sDefaultTargetSpecs[7];
 extern LongVec3 sNeighbourOffsets[];
 
 /* `key`-indexed bitmask table (`1 << key`) StageMap__ComputeChunkLoadEntry tests
- * against ComputeRateFlags' result. 7 words in the data before
+ * against ComputeNeighbourMask' result. 7 words in the data before
  * sChunkNeighbourDeltas starts. */
 extern const s32 sNeighbourBits[7];
 
@@ -50,7 +50,7 @@ extern const s8 sFootprintResultRemap[8];
 /* 7 pointers, the first NULL, the rest to the 4-word (seven 2-byte
  * ChunkSlotSpecs, padded) tables D_80086914..D_80086964:
  * UpdateFootprintTracking passes the selected one to buildRateEntries as its
- * spec table, as SetTargetAndBuildRates passes sDefaultTargetSpecs. */
+ * spec table, as SetTargetAndLoadChunks passes sDefaultTargetSpecs. */
 extern ChunkSlotSpec *sFootprintResultPtrTable[7];
 
 /*
