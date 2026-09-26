@@ -51,12 +51,75 @@
 typedef struct DreamSys DreamSys;
 typedef struct DreamSysMethods DreamSysMethods;
 
+/* The codes a DreamSys sends its parents through notifyParents (ObjM__OnDreamSysNotify
+ * switches on them). Each link code is also what ExecuteLink leaves in
+ * Actor::state while that link is pending; DREAMSYS_NO_LINK is the idle
+ * state every link test requires. */
+enum DreamSysLinkCode {
+    DREAMSYS_NO_LINK = 0,
+    DREAMSYS_TIME_UP = 10,          /* TimerTick: tick reached dreamTimeLimit */
+    DREAMSYS_LINK_DAY_START = 11,   /* InitSpawnLoc: the day's first spawn */
+    DREAMSYS_LINK_DYNAMIC = 12,     /* DynamicLink: a random spawn */
+    DREAMSYS_LINK_WALL = 13,        /* StaticWallLink */
+    DREAMSYS_LINK_FLASHBACK = 14,   /* LoadNextFlashback */
+    DREAMSYS_LINK_TUNNEL = 15,      /* TryTunnelLink */
+    DREAMSYS_LINK_STAGE_TIMER = 16, /* TryStageTimerLink */
+    DREAMSYS_LINK_TELEPORT = 17     /* TryInstantTeleportLink */
+};
+
+/* DreamSys::moveCommand, set by the pad handler and consumed by
+ * AdvanceMoveCycle / ApplyMoveCommand. MOVE_COMMAND_SIGNS and
+ * MOVE_COMMAND_DISPATCH make 1/2 a +/- step along the local z axis
+ * (MoveLocalZOrFindLink) and 3/4 a -/+ step along local x
+ * (MoveLocalXOrFindLink); FlipMoveCommand swaps each pair. Forced and
+ * staircase movement always use MOVE_COMMAND_FORWARD. */
+enum DreamSysMoveCommand {
+    MOVE_COMMAND_NONE = 0,
+    MOVE_COMMAND_FORWARD = 1,
+    MOVE_COMMAND_BACK = 2,
+    MOVE_COMMAND_LEFT = 3,
+    MOVE_COMMAND_RIGHT = 4
+};
+
+/* DreamSys::moveMode indexes MOVE_MODE_SPEEDS {0, 24, 64, 128, 384}. The
+ * pad handler switches to MOVE_MODE_RUN only while moving forward, and a
+ * staircase walk takes about a seventh of the frames in it. */
+#define MOVE_MODE_RUN 4
+
+/* DreamSys::lookCallbackMode: what SelectCallback80 installs in lookCallback. */
+enum DreamSysLookCallback {
+    LOOK_CALLBACK_NONE = 0,
+    LOOK_CALLBACK_STEP_LOOK = 1, /* stepLook */
+    LOOK_CALLBACK_SLOT14C = 2,   /* an empty slot */
+    LOOK_CALLBACK_SLOT150 = 3    /* an empty slot */
+};
+
+/* DreamSys::moveCallbackMode: what SelectCallback98 installs in moveCallback. */
+enum DreamSysMoveCallback {
+    MOVE_CALLBACK_NONE = 0,
+    MOVE_CALLBACK_TICK_MOVE = 1, /* tickMove */
+    MOVE_CALLBACK_TICK_DRIFT = 2 /* tickDrift, with the sound cue set running */
+};
+
+/* The dream clock counts DreamSys::tick 15 times per unit of
+ * dreamTimeLimit's public value (GetSetDreamTimeLimit scales both ways). The
+ * unit is seconds: every STAGE_TIME_LIMITS entry is a whole number of
+ * minutes (240, 180, 480, 420, ...). */
+#define DREAM_TICKS_PER_SECOND 15
+
+/* DreamSys::moodPreviousDays holds one mood per day; AdvanceDay wraps the
+ * day into the next year here. */
+#define DAYS_PER_YEAR 365
+
+/* The navigation challenges DreamSys::navChallengesArray records. */
+#define NAV_CHALLENGE_COUNT 30
+
 /* .sbss values. The 7B4B4 sbss segment that actually holds these is still
    plain `data` (un-flipped to dot-form), so it already provides these
    symbols; declaring them `extern` here lets this header be #included
    without a multiple-definition link error. Whoever flips that segment to
    `.data, DreamSys` should drop `extern` here in the same commit. */
-extern s8 (*gpNavChallengesComplete)[30];
+extern s8 (*gpNavChallengesComplete)[NAV_CHALLENGE_COUNT];
 extern s32 *gpDinamicLinkPenalty;
 extern s32 gLinkSrcStage;
 extern s32 gLinkTriggerIndex;
@@ -504,14 +567,14 @@ struct DreamSys {
     s32 totalFlasbackUnlockScore;
     s32 navigationFlasbackUnlockScore;
     s32 instanceFlasbackUnlockScore;
-    MoodGraphPoint moodPreviousDays[365];
+    MoodGraphPoint moodPreviousDays[DAYS_PER_YEAR];
     /* 2 bytes unused */
     s32 amountFlashbacksAvailable;
     FlashbackEntry storedFlasbacks[10];
 
     s8 unknown_values_0x5d8[8];
 
-    s8 navChallengesArray[30];
+    s8 navChallengesArray[NAV_CHALLENGE_COUNT];
     /* 2 bytes unused */
     s32 amountDynamicLinksDone;
     s8 unknown_values_0x604[116];
@@ -575,6 +638,10 @@ struct DreamSys {
     s8 unknown_values_0x922[2];
     s32 unk_0x924;
 };
+
+/* The bytes DreamSys__GetSaveBlock hands out, from saveMagic up to
+   newGamePending: 1792. */
+#define DREAMSYS_SAVE_SIZE (offsetof(DreamSys, newGamePending) - offsetof(DreamSys, saveMagic))
 
 /* Dispatch table indexed by DreamSys__ApplyMoveCommand's `arg1`; see that table's own
    comment near MOVE_MODE_SPEEDS/MOVE_COMMAND_SIGNS above. Same element signature as

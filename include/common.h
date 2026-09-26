@@ -10,6 +10,11 @@
 #define offsetof(type, member) ((unsigned int)&((type *)0)->member)
 #endif
 
+/* The number of elements in the array `arr` (an array, never a pointer).
+ * Signed, so `i < ARRAY_COUNT(a)` on an s32 compares signed, as a literal
+ * would. */
+#define ARRAY_COUNT(arr) ((s32)(sizeof(arr) / sizeof((arr)[0])))
+
 typedef union MoodGraphPoint {
     s16 value;
 
