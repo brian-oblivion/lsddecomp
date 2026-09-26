@@ -902,6 +902,11 @@
           "date": "2026-09-26",
           "header": "include/TriggerWorld.h"
         },
+        "D_8006F498": {
+          "class": "TileMap",
+          "date": "2026-09-26",
+          "header": "include/TileMap.h"
+        },
         "D_8006F590": {
           "class": "TodSet",
           "date": "2026-09-26",
