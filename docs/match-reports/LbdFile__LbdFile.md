@@ -1,4 +1,6 @@
-# Class81940__Class81940 -- MATCHED (31/31 words)
+# LbdFile__LbdFile -- MATCHED (31/31 words)
+
+> Renamed from `Class81940__Class81940` on 2026-09-26 (tools/rename.py). Address 0x800488e4.
 
 > Renamed from `DataSrc39094__DataSrc39094` on 2026-09-26 (tools/rename.py). Address 0x800488e4.
 
@@ -11,7 +13,7 @@ out-of-range drift.
 
 ## What it does
 
-Slot +0x008 (ctor) of gClass81940Methods: runs the active data source's ctor on self, installs its own table (GetClass81940Methods), initialises +0x30=-1, +0x2C/+0x2E/+0x32=0, +0x34=NULL, +0x38=1, then allocates a 0xB358-byte file buffer into FileResource's `buffer`, setting `bufferSize` only on success. Written in natural order; the scheduler produced retail's store order.
+Slot +0x008 (ctor) of gLbdFileMethods: runs the active data source's ctor on self, installs its own table (GetLbdFileMethods), initialises +0x30=-1, +0x2C/+0x2E/+0x32=0, +0x34=NULL, +0x38=1, then allocates a 0xB358-byte file buffer into FileResource's `buffer`, setting `bufferSize` only on success. Written in natural order; the scheduler produced retail's store order.
 
 ## Source
 
@@ -19,10 +21,10 @@ Declarations it needs are the local views at the top of `src/code_39094.c`
 (`DataSrc39094`, `DataSrc39094Methods`, `Rec1C`) and `include/FileResource.h`.
 
 ```c
-/* slot +0x008 of gClass81940Methods (ctor) */
-void Class81940__Class81940(DataSrc39094 *self) {
+/* slot +0x008 of gLbdFileMethods (ctor) */
+void LbdFile__LbdFile(DataSrc39094 *self) {
     GetActiveDataSourceMethods()->ctor((FileResource *)self);
-    self->methods = GetClass81940Methods();
+    self->methods = GetLbdFileMethods();
     self->unk30 = -1;
     self->headerReady = 0;
     self->dataReady = 0;
@@ -40,7 +42,7 @@ void Class81940__Class81940(DataSrc39094 *self) {
 ## Notes
 
 - The unit now has a local `DataSrc39094Methods` view (FILERESOURCE_SLOTS plus
-  slots +0x07C..+0x084, +0x084 = Class81940__ReleaseDataBlock) and the object's
+  slots +0x07C..+0x084, +0x084 = LbdFile__ReleaseDataBlock) and the object's
   `pad30[4]` is split into `s16 unk30` (init -1) and `u16 unk32`. Byte-neutral
   for the ten functions matched earlier this round (whole image green).
 - `SeedAndRandom`'s local definition gained an unused second parameter
@@ -51,10 +53,10 @@ void Class81940__Class81940(DataSrc39094 *self) {
 
 ## Naming
 
-- **Name:** `Class81940__Class81940`
+- **Name:** `LbdFile__LbdFile`
 - **Tier:** A
 - **Evidence:** slot +0x008 (ctor); chains the active data source's base ctor, installs this class's own table, and allocates the 0xB358 header buffer -- textbook FileResource subclass constructor.
 
 ## Track 4 (2026-09-26, round 87)
 
-Renamed `DataSrc39094__DataSrc39094` -> `Class81940__Class81940` with `rename.py`: the +0x008 ctor occupant, named for the class. The class (method table gClass81940Methods, id 0x903, a FileResource subclass) was named `Class81940` for its table address, 0x80081940 (renamed from `D_80081940` to `gClass81940Methods`), as Class6D940 is (FINISHING-PLAN track 4 step 2); the old `DataSrc39094` was the unit's local view name, and dropping its unit suffix leaves `DataSrc`, which every FileResource subclass is. The unified definition is `include/Class81940.h`.
+Renamed `DataSrc39094__DataSrc39094` -> `LbdFile__LbdFile` with `rename.py`: the +0x008 ctor occupant, named for the class. The class (method table gLbdFileMethods, id 0x903, a FileResource subclass) was named `LbdFile` for its table address, 0x80081940 (renamed from `D_80081940` to `gLbdFileMethods`), as Class6D940 is (FINISHING-PLAN track 4 step 2); the old `DataSrc39094` was the unit's local view name, and dropping its unit suffix leaves `DataSrc`, which every FileResource subclass is. The unified definition is `include/LbdFile.h`.

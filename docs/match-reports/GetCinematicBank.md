@@ -30,7 +30,7 @@ Rec1C *GetCinematicBank(s32 *countOut, s32 n) {
 ## Notes
 
 - The unit now has a local `D_80081940Methods` view (FILERESOURCE_SLOTS plus
-  slots +0x07C..+0x084, +0x084 = Class81940__ReleaseDataBlock) and the object's
+  slots +0x07C..+0x084, +0x084 = LbdFile__ReleaseDataBlock) and the object's
   `pad30[4]` is split into `s16 unk30` (init -1) and `u16 unk32`. Byte-neutral
   for the ten functions matched earlier this round (whole image green).
 - `SeedAndRandom`'s local definition gained an unused second parameter

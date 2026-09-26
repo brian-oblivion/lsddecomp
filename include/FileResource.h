@@ -80,7 +80,7 @@ typedef struct FileResourceMethods FileResourceMethods;
     /* +0x022 */ u16 pendingRequests;                                                              \
     /* +0x024 */ s32 flags;           /* bit 0 set by SetFlag */                                   \
     /* +0x028 */ u16 inQueueDispatch;                                                              \
-    /* +0x02A */ u16 loadState            /* a subclass's load step, 0 when idle (Class81940, VabStreamObj); the object is 0x2C bytes */
+    /* +0x02A */ u16 loadState            /* a subclass's load step, 0 when idle (LbdFile, VabStreamObj); the object is 0x2C bytes */
 /* clang-format on */
 
 struct FileResourceMethods {

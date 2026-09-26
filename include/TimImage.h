@@ -11,7 +11,7 @@
  *
  * The ctor chain agrees with the id: TimImage__TimImage's first call is
  * GetActiveDataSourceMethods()->ctor, and finalize forwards to the active
- * driver's, as TimBlockSrc and Class81940 do.
+ * driver's, as TimBlockSrc and LbdFile do.
  *
  * What its own methods do: getTimInfo (+0x09C, TimImage__GetTimInfo)
  * describes the TIM in `buffer` (past its id word) into a GsIMAGE with

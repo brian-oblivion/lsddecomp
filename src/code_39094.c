@@ -6,12 +6,12 @@
  * those, and no Sony fingerprint). All 38 functions matched round 82 (three
  * echo sessions); named round 82 (bravo). Two independent groups of code:
  *
- * 1. Class81940 (method table gClass81940Methods; include/Class81940.h): a
+ * 1. LbdFile (method table gLbdFileMethods; include/LbdFile.h): a
  *    FileResource data source that streams a header block into its own 0xB358
- *    buffer (state 9, Class81940__LoadHeader), then, once the read completes
- *    (Class81940__AdvanceLoadState), an optional data block the header
- *    describes into a second allocation (state 10, Class81940__LoadDataBlock/
- *    dataBuffer), started automatically unless Class81940__SetAutoLoadData
+ *    buffer (state 9, LbdFile__LoadHeader), then, once the read completes
+ *    (LbdFile__AdvanceLoadState), an optional data block the header
+ *    describes into a second allocation (state 10, LbdFile__LoadDataBlock/
+ *    dataBuffer), started automatically unless LbdFile__SetAutoLoadData
  *    turned that off.
  * 2. Free functions over gRecordTable, a table of 0x230+ fixed 0x1C-byte
  *    records (Rec1C): random-or-forced pickers (SeedAndRandom,
@@ -24,7 +24,7 @@
  *    fields and the channels' in-game meaning are not established.
  */
 #include "common.h"
-#include "Class81940.h"
+#include "LbdFile.h"
 #include "StageGrid.h"
 
 /* One 0x1C-byte record of the table GetRecordTable returns (gRecordTable,
@@ -39,20 +39,20 @@ extern void *BMemPMgrFree(void *ptr);
 extern FileResourceMethods *GetActiveDataSourceMethods(void);
 extern void *BMemPMgrAlloc(s32 size);
 
-/* allocator: new Class81940 object */
-Class81940 *New_Class81940(void) {
-    Class81940 *obj = BMemPMgrAlloc(0x3C);
+/* allocator: new LbdFile object */
+LbdFile *New_LbdFile(void) {
+    LbdFile *obj = BMemPMgrAlloc(0x3C);
     if (obj != NULL) {
-        GetClass81940Methods()->ctor(obj);
+        GetLbdFileMethods()->ctor(obj);
         return obj;
     }
     return NULL;
 }
 
-/* slot +0x008 of gClass81940Methods (ctor) */
-void Class81940__Class81940(Class81940 *self) {
+/* slot +0x008 of gLbdFileMethods (ctor) */
+void LbdFile__LbdFile(LbdFile *self) {
     GetActiveDataSourceMethods()->ctor((FileResource *)self);
-    self->methods = GetClass81940Methods();
+    self->methods = GetLbdFileMethods();
     self->ownerRate = -1;
     self->headerReady = 0;
     self->dataReady = 0;
@@ -65,20 +65,20 @@ void Class81940__Class81940(Class81940 *self) {
     }
 }
 
-/* slot +0x00C of gClass81940Methods (finalize) */
-void Class81940__Finalize(Class81940 *self) {
+/* slot +0x00C of gLbdFileMethods (finalize) */
+void LbdFile__Finalize(LbdFile *self) {
     self->methods->releaseDataBlock(self);
     GetActiveDataSourceMethods()->finalize((FileResource *)self);
 }
 
-/* slot +0x064 of gClass81940Methods (setFlag) */
-void Class81940__AdvanceLoadState(Class81940 *self) {
+/* slot +0x064 of gLbdFileMethods (setFlag) */
+void LbdFile__AdvanceLoadState(LbdFile *self) {
     if (self->loadState == 9) {
         if (self->flags & 0x80) {
             self->loadState = 0;
             self->headerReady = 1;
             if (self->autoLoadData != 0) {
-                ((Class81940LoadDataBlockNoArgFn)self->methods->loadDataBlock)(); /* retail passes no argument */
+                ((LbdFileLoadDataBlockNoArgFn)self->methods->loadDataBlock)(); /* retail passes no argument */
             }
         }
     } else if (self->loadState == 10) {
@@ -90,16 +90,16 @@ void Class81940__AdvanceLoadState(Class81940 *self) {
     GetActiveDataSourceMethods()->setFlag((FileResource *)self);
 }
 
-/* slot +0x074 of gClass81940Methods (cancelRequests) */
-void Class81940__CancelRequests(Class81940 *self) {
+/* slot +0x074 of gLbdFileMethods (cancelRequests) */
+void LbdFile__CancelRequests(LbdFile *self) {
     GetActiveDataSourceMethods()->cancelRequests((FileResource *)self);
     self->headerReady = 0;
     self->dataReady = 0;
     self->loadState = 0;
 }
 
-/* slot +0x078 of gClass81940Methods: start streaming a file into the buffer */
-void Class81940__LoadHeader(Class81940 *self, char *name) {
+/* slot +0x078 of gLbdFileMethods: start streaming a file into the buffer */
+void LbdFile__LoadHeader(LbdFile *self, char *name) {
     if (self->buffer != NULL && name != NULL) {
         if (self->loadState == 0) {
             self->headerReady = 0;
@@ -113,35 +113,35 @@ void Class81940__LoadHeader(Class81940 *self, char *name) {
     }
 }
 
-void Class81940__ReleaseHeader(Class81940 *self) {
+void LbdFile__ReleaseHeader(LbdFile *self) {
     self->methods->freeBuffer(self);
     self->headerReady = 0;
     self->ownerRate = -1;
 }
 
-/* slot +0x080 of gClass81940Methods: load the data block the header describes */
-s32 Class81940__LoadDataBlock(Class81940 *self) {
+/* slot +0x080 of gLbdFileMethods: load the data block the header describes */
+s32 LbdFile__LoadDataBlock(LbdFile *self) {
     s32 size;
-    if (((Class81940Header *)self->buffer)->hasData == 0) {
+    if (((LbdFileHeader *)self->buffer)->hasData == 0) {
         return 0;
     }
     if (self->loadState != 0) {
         return 0;
     }
-    ((Class81940ReleaseDataBlockNoArgFn)self->methods->releaseDataBlock)(); /* retail passes no argument */
-    size = ((Class81940Header *)self->buffer)->dataSize;
+    ((LbdFileReleaseDataBlockNoArgFn)self->methods->releaseDataBlock)(); /* retail passes no argument */
+    size = ((LbdFileHeader *)self->buffer)->dataSize;
     self->dataBuffer = BMemPMgrAlloc(size);
     if (self->dataBuffer == NULL) {
         return 0;
     }
     self->loadState = 10;
-    self->methods->seek(self, ((Class81940Header *)self->buffer)->dataOffset, 0);
+    self->methods->seek(self, ((LbdFileHeader *)self->buffer)->dataOffset, 0);
     self->methods->read(self, self->dataBuffer, size);
     return 1;
 }
 
-/* slot +0x084 of gClass81940Methods */
-void Class81940__ReleaseDataBlock(Class81940 *self) {
+/* slot +0x084 of gLbdFileMethods */
+void LbdFile__ReleaseDataBlock(LbdFile *self) {
     self->dataReady = 0;
     if (self->dataBuffer != NULL) {
         self->dataBuffer = BMemPMgrFree(self->dataBuffer);
@@ -158,13 +158,13 @@ extern const char sAsmkStreamPath[];
 extern s16 gStreamTypeToGroupTable[];
 extern s16 gRecordIndexTable[];
 
-/* slot +0x088 of gClass81940Methods */
-void Class81940__SetAutoLoadData(Class81940 *self, s32 value) {
+/* slot +0x088 of gLbdFileMethods */
+void LbdFile__SetAutoLoadData(LbdFile *self, s32 value) {
     self->autoLoadData = value;
 }
 
-Class81940Methods *GetClass81940Methods(void) {
-    return &gClass81940Methods;
+LbdFileMethods *GetLbdFileMethods(void) {
+    return &gLbdFileMethods;
 }
 
 s32 func_80048CF0(void) {

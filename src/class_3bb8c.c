@@ -37,7 +37,7 @@
 #include "class_3bb8c.h"
 #include "Class6D940.h"
 #include "LinkResource.h"
-#include "Class81940.h"
+#include "LbdFile.h"
 #include "Class86AA0.h"
 
 s32 Class866E8__SetTargetAndBuildRates(Class866E8 *self, void *arg1, SceneNode *arg2, Descriptor10 *arg3) {
@@ -317,7 +317,7 @@ void Class866E8__ApplyRateEntries(Class866E8 *self, SetupEntry866E8 *arr1, s32 c
                 self->methods->resetElementCells(self, e);
             }
             e->loader->ownerRate = sp->rate;
-            ((Class81940LoadHeaderFn)e->loader->methods->processBuffer)(e->loader, arr1->ptr0);
+            ((LbdFileLoadHeaderFn)e->loader->methods->processBuffer)(e->loader, arr1->ptr0);
             e->flag = 1;
             self->unk1B0 = 1;
         } else {
@@ -405,9 +405,9 @@ typedef struct BE54LoadReq {
 extern void GsLinkObject4(s32 tmd, void *objp, s32 n);
 
 void Class866E8__LoadElementResources(Class866E8 *self, Class866E8Elem *entry) {
-    Class81940Header *info;
-    Class81940Header *info2;
-    Class81940 *hdr;
+    LbdFileHeader *info;
+    LbdFileHeader *info2;
+    LbdFile *hdr;
     Class6D940 *target;
     LinkResource *res;
     Class86AA0 **slot;
@@ -505,7 +505,7 @@ void Class866E8__ResetElementCells(Class866E8 *self, Class866E8Elem *entry) {
     Class86AA0 **end;
 
     if (entry->loader->ownerRate >= 0) {
-        ((Class81940ReleaseHeaderElemFn)entry->loader->methods->releaseHeader)(entry->loader, entry);
+        ((LbdFileReleaseHeaderElemFn)entry->loader->methods->releaseHeader)(entry->loader, entry);
         end = entry->cells + 0x19A;
         for (p = entry->cells; p < end; p++) {
             (*p)->attribute |= 0x80000000;

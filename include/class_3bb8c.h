@@ -40,7 +40,7 @@ extern const s32 sRateKeyMask[7];
  * 7 entries (0x800868A8-0x800868FC). */
 extern const Unk54Struct sRateEntryTable[7];
 
-/* Class81940::ownerKey-indexed remap, read signed by
+/* LbdFile::ownerKey-indexed remap, read signed by
  * Class866E8__UpdateFootprintTracking: exactly 8 bytes in the data
  * (01 02 03 00 04 05 06 00) before sDefaultTargetSpecs. The byte (0..6) is
  * UpdateFootprintTracking's return value and the index into

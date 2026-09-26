@@ -908,11 +908,6 @@
           "date": "2026-09-26",
           "header": "include/Class6EED8.h"
         },
-        "gClass81940Methods": {
-          "class": "Class81940",
-          "date": "2026-09-26",
-          "header": "include/Class81940.h"
-        },
         "gClass865C8Methods": {
           "class": "Class865C8",
           "date": "2026-09-26",
@@ -992,6 +987,11 @@
           "class": "ItemList",
           "date": "2026-09-26",
           "header": "include/ItemList.h"
+        },
+        "gLbdFileMethods": {
+          "class": "LbdFile",
+          "date": "2026-09-26",
+          "header": "include/LbdFile.h"
         },
         "gLightRigMethods": {
           "class": "LightRig",

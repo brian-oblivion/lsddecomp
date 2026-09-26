@@ -1,4 +1,6 @@
-# Class81940__Finalize -- MATCHED (21/21 words)
+# LbdFile__Finalize -- MATCHED (21/21 words)
+
+> Renamed from `Class81940__Finalize` on 2026-09-26 (tools/rename.py). Address 0x80048960.
 
 > Renamed from `DataSrc39094__Finalize` on 2026-09-26 (tools/rename.py). Address 0x80048960.
 
@@ -11,7 +13,7 @@ out-of-range drift.
 
 ## What it does
 
-Slot +0x00C (finalize) of gClass81940Methods: calls its own slot +0x084 (Class81940__ReleaseDataBlock, frees the +0x34 allocation), then the active data source's `finalize(self)` via GetActiveDataSourceMethods().
+Slot +0x00C (finalize) of gLbdFileMethods: calls its own slot +0x084 (LbdFile__ReleaseDataBlock, frees the +0x34 allocation), then the active data source's `finalize(self)` via GetActiveDataSourceMethods().
 
 ## Source
 
@@ -19,8 +21,8 @@ Declarations it needs are the local views at the top of `src/code_39094.c`
 (`DataSrc39094`, `DataSrc39094Methods`, `Rec1C`) and `include/FileResource.h`.
 
 ```c
-/* slot +0x00C of gClass81940Methods (finalize) */
-void Class81940__Finalize(DataSrc39094 *self) {
+/* slot +0x00C of gLbdFileMethods (finalize) */
+void LbdFile__Finalize(DataSrc39094 *self) {
     self->methods->releaseAlloc(self);
     GetActiveDataSourceMethods()->finalize((FileResource *)self);
 }
@@ -30,7 +32,7 @@ void Class81940__Finalize(DataSrc39094 *self) {
 ## Notes
 
 - The unit now has a local `DataSrc39094Methods` view (FILERESOURCE_SLOTS plus
-  slots +0x07C..+0x084, +0x084 = Class81940__ReleaseDataBlock) and the object's
+  slots +0x07C..+0x084, +0x084 = LbdFile__ReleaseDataBlock) and the object's
   `pad30[4]` is split into `s16 unk30` (init -1) and `u16 unk32`. Byte-neutral
   for the ten functions matched earlier this round (whole image green).
 - `SeedAndRandom`'s local definition gained an unused second parameter
@@ -41,10 +43,10 @@ void Class81940__Finalize(DataSrc39094 *self) {
 
 ## Naming
 
-- **Name:** `Class81940__Finalize`
+- **Name:** `LbdFile__Finalize`
 - **Tier:** A
 - **Evidence:** slot +0x00C (finalize); releases the data-block allocation then chains the active data source's base finalize.
 
 ## Track 4 (2026-09-26, round 87)
 
-Renamed `DataSrc39094__Finalize` -> `Class81940__Finalize` with `rename.py` (class rename only; +0x00C finalize occupant). The class (method table gClass81940Methods, id 0x903, a FileResource subclass) was named `Class81940` for its table address, 0x80081940 (renamed from `D_80081940` to `gClass81940Methods`), as Class6D940 is (FINISHING-PLAN track 4 step 2); the old `DataSrc39094` was the unit's local view name, and dropping its unit suffix leaves `DataSrc`, which every FileResource subclass is. The unified definition is `include/Class81940.h`.
+Renamed `DataSrc39094__Finalize` -> `LbdFile__Finalize` with `rename.py` (class rename only; +0x00C finalize occupant). The class (method table gLbdFileMethods, id 0x903, a FileResource subclass) was named `LbdFile` for its table address, 0x80081940 (renamed from `D_80081940` to `gLbdFileMethods`), as Class6D940 is (FINISHING-PLAN track 4 step 2); the old `DataSrc39094` was the unit's local view name, and dropping its unit suffix leaves `DataSrc`, which every FileResource subclass is. The unified definition is `include/LbdFile.h`.

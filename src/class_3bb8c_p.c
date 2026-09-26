@@ -30,7 +30,7 @@
 #include "Actor.h"
 #include "DreamSys.h"
 #include "Class866E8.h"
-#include "Class81940.h"
+#include "LbdFile.h"
 #include "Class86AA0.h"
 #include "Class879C4.h"
 
