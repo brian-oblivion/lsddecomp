@@ -15,6 +15,7 @@
  */
 #include "common.h"
 #include "Actor.h"
+#include "Class879C4.h"
 
 /* ------------------------------------------------------------------ *
  * LinkNode is this unit's ONE local view of every object it touches: the
@@ -114,9 +115,7 @@ extern void LinkOwnerObj__RandomizeLinks(); /* arity-ok: definition is 1-paramet
 extern void Class876FC__BuildRandomSprites(); /* arity-ok: the definition is 1-parameter and LIVES IN THIS FILE (below, ROM-later), the body reading only $a0 (`move s1,a0`); Class876FC__InitByKind's dead 2nd argument is byte-load-bearing -- retail emits `move a1,zero` at 0x80056614 */
 extern void Class876FC__DriftModelChildren(); /* arity-ok: the definition is 1-parameter and LIVES IN THIS FILE (below, ROM-later), the body writing $a1 (`move a1,zero`) before any read; Class876FC__UpdateByKind's dead 2nd argument is byte-load-bearing -- retail emits `move a1,s1` in the jal delay slot at 0x800566D8 (round 75) */
 
-/* class_3bb8c_p.c; fully prototyped since every call site here uses all
- * three arguments for real. */
-extern void *New_Class879C4(void *arg1, void *arg2, void *arg3);
+/* New_Class879C4: include/Class879C4.h. */
 
 /* Three globals class_3bb8c_o.c's Actor__func_56f5c captures once from its
  * parameters (declared there with the same types; track 4b, round 85):
@@ -381,7 +380,7 @@ void Class876FC__SpawnSprites(void *self, s32 a1, s32 a2, void *tbl) {
     s32 i;
 
     for (i = 0; i < 5; i++, p++) {
-        node = New_Class879C4((void *)a2, 0, D_8008ACA8);
+        node = (LinkNode *)New_Class879C4(a2, 0, D_8008ACA8);
         *p = node;
         node->methods->attachToParent(node, self, 0);
         (*p)->methods->slotB8(*p, ((LinkNode *)self)->color);
