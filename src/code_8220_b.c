@@ -221,7 +221,7 @@ void func_80018464(void *objIn, void *otSrc, s32 otShift, void *ctxIn) {
 
     *(void **)(ctx + 0x0) = *(void **)((u8 *)otSrc + 0x4);
     *(s32 *)(ctx + 0x4) = otShift;
-    InitVtxRecordPtrs(ctx + 0x88, gPolySubmitTableTri, 3);
+    InitVtxRecordPtrs(ctx + 0x88, gDivPolygon3, 3);
     InitVtxRecordPtrs(ctx + 0x94, gPolySubmitTableQuad, 4);
 
     remaining = *(s32 *)(*(u8 **)(obj + 0x8) + 0x14);

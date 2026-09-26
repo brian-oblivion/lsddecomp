@@ -187,7 +187,7 @@ included by the unit.)
 
 Unit: `src/code_8220_c.c`. Quad-flavored sibling of `SubmitPolyF3` (this
 unit, also stalled at the identical residue) — same OT-splice-or-calls
-structure, `gPolySubmitTableQuad` instead of `gPolySubmitTableTri`, `CopyPolyVtx4` (also
+structure, `gPolySubmitTableQuad` instead of `gDivPolygon3`, `CopyPolyVtx4` (also
 stalled this unit, 6-arg quad-flavored copy) instead of `CopyPolyVtx3`,
 and `func_8001A8D4` (Psy-Q SDK, `asm/psyq_rcpolyf4.s`, quad-flavored
 sibling of `func_8001A564`) instead of `func_8001A564`.

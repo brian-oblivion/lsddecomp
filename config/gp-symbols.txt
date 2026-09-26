@@ -151,6 +151,7 @@ gClass86F88RowOriginY
 gDefaultBMemPMgr
 gDefaultGridSpan
 gDefaultScreenDims
+gDivPolygon3
 gDrawSystem
 gDreamAuxStage
 gDreamAuxWorld
@@ -175,7 +176,6 @@ gNameCharTable
 gOpenVabCount
 gPendingVabBuffer
 gPolySubmitTableQuad
-gPolySubmitTableTri
 gSoundEffectDirPtr
 gStartupBMemPMgr
 gStyleColorTable

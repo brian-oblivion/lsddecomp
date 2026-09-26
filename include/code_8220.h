@@ -189,7 +189,7 @@ typedef struct PolyVtx {
  * 3-element arrays of PolyVtx pointers plus three UV sources. */
 extern void CopyPolyVtx3(PolyVtx **dst, PolyVtx **src, PolyUV4 *uv0, PolyUV4 *uv1, PolyUV4 *uv2);
 
-/* Populates a submit table's (`table`, gPolySubmitTableTri/gPolySubmitTableQuad):
+/* Populates a submit table's (`table`, gDivPolygon3/gPolySubmitTableQuad):
  * +0x00 an OT/code word (sPolyOtCodeOverride when sPolyOtCodeOverrideSet is set, else
  * D_80090C18), +0x04 D_8008A824, +0x08 D_8008A828 -- these three are
  * UNCONDITIONAL (the third rides in the branch's own delay slot in
@@ -225,9 +225,9 @@ extern void RCpolyF3(void *self, void *table);
 /* Opaque table, referenced only by ADDRESS (never dereferenced in this
  * unit) and handed to FillRCPolyHeader/RCpolyF3. asm/data, not yet
  * carved -- real element type unknown. */
-extern u8 gPolySubmitTableTri[];
+extern u8 gDivPolygon3[];
 
-/* Quad-flavored sibling of gPolySubmitTableTri/FillRCPolyHeader/RCpolyF3,
+/* Quad-flavored sibling of gDivPolygon3/FillRCPolyHeader/RCpolyF3,
  * referenced the same way by SubmitPolyF4 (code_8220_c, round 13). */
 extern u8 gPolySubmitTableQuad[];
 

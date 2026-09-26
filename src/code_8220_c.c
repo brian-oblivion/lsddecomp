@@ -59,11 +59,11 @@ void StoreSxyPolyGT4(void *dst, s32 storeFirst3) {
  * settle), hence the cast. */
 void *SubmitPolyF3(void *prim, void *ctx) {
     if (*(s32 *)((u8 *)ctx + 0x78) != 0) {
-        FillRCPolyHeader(gPolySubmitTableTri, ctx, (u8 *)prim + 0x4, 0, 0, 0);
+        FillRCPolyHeader(gDivPolygon3, ctx, (u8 *)prim + 0x4, 0, 0, 0);
         CopyPolyVtx3((PolyVtx **)((u8 *)ctx + 0x88), (PolyVtx **)((u8 *)ctx + 0xA4),
                      (PolyUV4 *)((u8 *)prim + 0x8), (PolyUV4 *)((u8 *)prim + 0xC),
                      (PolyUV4 *)((u8 *)prim + 0x10));
-        return ((void *(*)(void *, void *))RCpolyF3)(prim, gPolySubmitTableTri);
+        return ((void *(*)(void *, void *))RCpolyF3)(prim, gDivPolygon3);
     }
     ((OtTag *)prim)->addr = (*(OtTag **)((u8 *)ctx + 0x30))->addr;
     (*(OtTag **)((u8 *)ctx + 0x30))->addr = (u32)prim;
@@ -79,7 +79,7 @@ void *SubmitPolyG3(void *prim, void *ctx) {
     u8 *c = (u8 *)ctx;
 
     if (*(s32 *)(c + 0x78) != 0) {
-        FillRCPolyHeader(gPolySubmitTableTri, c, self + 0x4, 0, 0, 0);
+        FillRCPolyHeader(gDivPolygon3, c, self + 0x4, 0, 0, 0);
         CopyPolyVtx3((PolyVtx **)(c + 0x88), (PolyVtx **)(c + 0xA4), (PolyUV4 *)(self + 0x8),
                      (PolyUV4 *)(self + 0x10), (PolyUV4 *)(self + 0x18));
 
@@ -91,7 +91,7 @@ void *SubmitPolyG3(void *prim, void *ctx) {
         *(Vec2s16 *)(*(u8 **)(c + 0x8C) + 0xC) = *(Vec2s16 *)(self + 0xC);
         *(Vec2s16 *)(*(u8 **)(c + 0x90) + 0xC) = *(Vec2s16 *)(self + 0x14);
 
-        return ((void *(*)(void *, void *))RCpolyG3)(self, gPolySubmitTableTri);
+        return ((void *(*)(void *, void *))RCpolyG3)(self, gDivPolygon3);
     }
     ((OtTag *)self)->addr = (*(OtTag **)(c + 0x30))->addr;
     (*(OtTag **)(c + 0x30))->addr = (u32)self;
@@ -104,7 +104,7 @@ void *SubmitPolyG3(void *prim, void *ctx) {
  * SubmitPolyF3. */
 void *SubmitPolyFT3(void *prim, void *ctx) {
     if (*(s32 *)((u8 *)ctx + 0x78) != 0) {
-        FillRCPolyHeader(gPolySubmitTableTri, ctx, (u8 *)prim + 0x4, 1, *(u16 *)((u8 *)prim + 0xE),
+        FillRCPolyHeader(gDivPolygon3, ctx, (u8 *)prim + 0x4, 1, *(u16 *)((u8 *)prim + 0xE),
                          *(u16 *)((u8 *)prim + 0x16));
         CopyPolyVtx3((PolyVtx **)((u8 *)ctx + 0x88), (PolyVtx **)((u8 *)ctx + 0xA4),
                      (PolyUV4 *)((u8 *)prim + 0x8), (PolyUV4 *)((u8 *)prim + 0x10),
@@ -117,7 +117,7 @@ void *SubmitPolyFT3(void *prim, void *ctx) {
         *(u16 *)(*(u8 **)((u8 *)ctx + 0x8C) + 0x8) = *(u16 *)((u8 *)prim + 0x14);
         *(u16 *)(*(u8 **)((u8 *)ctx + 0x90) + 0x8) = *(u16 *)((u8 *)prim + 0x1C);
 
-        return ((void *(*)(void *, void *))RCpolyFT3)(prim, gPolySubmitTableTri);
+        return ((void *(*)(void *, void *))RCpolyFT3)(prim, gDivPolygon3);
     }
     ((OtTag *)prim)->addr = (*(OtTag **)((u8 *)ctx + 0x30))->addr;
     (*(OtTag **)((u8 *)ctx + 0x30))->addr = (u32)prim;
@@ -205,8 +205,7 @@ void *SubmitPolyGT3(void *prim, void *ctx) {
     u8 *c = (u8 *)ctx;
 
     if (*(s32 *)(c + 0x78) != 0) {
-        FillRCPolyHeader(gPolySubmitTableTri, c, self + 0x4, 1, *(u16 *)(self + 0xE),
-                         *(u16 *)(self + 0x1A));
+        FillRCPolyHeader(gDivPolygon3, c, self + 0x4, 1, *(u16 *)(self + 0xE), *(u16 *)(self + 0x1A));
         CopyPolyVtx3((PolyVtx **)(c + 0x88), (PolyVtx **)(c + 0xA4), (PolyUV4 *)(self + 0x8),
                      (PolyUV4 *)(self + 0x14), (PolyUV4 *)(self + 0x20));
 
@@ -222,7 +221,7 @@ void *SubmitPolyGT3(void *prim, void *ctx) {
         *(u16 *)(*(u8 **)(c + 0x8C) + 0x8) = *(u16 *)(self + 0x18);
         *(u16 *)(*(u8 **)(c + 0x90) + 0x8) = *(u16 *)(self + 0x24);
 
-        return ((void *(*)(void *, void *))RCpolyGT3)(prim, gPolySubmitTableTri);
+        return ((void *(*)(void *, void *))RCpolyGT3)(prim, gDivPolygon3);
     }
     ((OtTag *)self)->addr = (*(OtTag **)(c + 0x30))->addr;
     (*(OtTag **)(c + 0x30))->addr = (u32)self;
@@ -265,7 +264,7 @@ void *SubmitPolyGT4(void *prim, void *ctx) {
 }
 
 /* Called twice, once per arity, from the render-context setup in
- * code_8220_b (`InitVtxRecordPtrs(ctx + 0x88, gPolySubmitTableTri, 3)`,
+ * code_8220_b (`InitVtxRecordPtrs(ctx + 0x88, gDivPolygon3, 3)`,
  * `InitVtxRecordPtrs(ctx + 0x94, gPolySubmitTableQuad, 4)`): writes a
  * running pointer through `table`'s own per-vertex records (stride 0x18,
  * starting at `table + 0x18`) into two parallel arrays -- `dst[i]` (the
@@ -357,7 +356,7 @@ extern s32 D_80090C18;
 extern s32 sPolyOtCodeOverrideSet;
 extern s32 sPolyOtCodeOverride;
 
-/* Populates a submit table's (`table`, one of gPolySubmitTableTri/
+/* Populates a submit table's (`table`, one of gDivPolygon3/
  * gPolySubmitTableQuad) common header fields ahead of a Submit* wrapper's
  * RCpoly* call: +0x0 an OT/code word (sPolyOtCodeOverride when
  * sPolyOtCodeOverrideSet, else the D_80090C18 default), +0x4 D_8008A824,

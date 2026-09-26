@@ -54,7 +54,7 @@ void FillRCPolyHeader(void *arg0, void *arg1, PolyUV4 *arg2, s32 arg3, u16 arg4,
 }
 ```
 
-Populates a GPU primitive header at `arg0` (`gPolySubmitTableTri`/`gPolySubmitTableQuad`
+Populates a GPU primitive header at `arg0` (`gDivPolygon3`/`gPolySubmitTableQuad`
 depending on caller): a selected OT/code word at +0x00, `D_8008A824` at
 +0x04, `D_8008A828` at +0x08, an unaligned `PolyUV4` at +0x10 copied from
 `*arg2`, and the plain word at `arg1 + 0x30` at +0x14. Only the two `u16`
@@ -154,5 +154,5 @@ which pass `1` plus the calling primitive's own `+0xE`/`+0x16` (FT3/FT4)
 or `+0xE`/`+0x1A` (GT3/GT4) fields -- POLY_FTn/GTn's CLUT and TPAGE words
 in the Psy-Q layout -- while F3/G3/F4/G4 pass `0, 0, 0` and leave the
 table's `+0xC`/`+0xE` untouched. `table`/`ctx` match code_8220_b's/this
-unit's own established terms for these two objects (gPolySubmitTableTri/
+unit's own established terms for these two objects (gDivPolygon3/
 Quad, and the per-face draw context).

@@ -338,11 +338,11 @@ void SubmitPolyF3(void *arg0, void *arg1) {
         ((OtTag *)arg0)->addr = (*(OtTag **)((u8 *)arg1 + 0x30))->addr;
         (*(OtTag **)((u8 *)arg1 + 0x30))->addr = (u32)arg0;
     } else {
-        FillRCPolyHeader(gPolySubmitTableTri, arg1, (u8 *)arg0 + 0x4, 0, 0, 0);
+        FillRCPolyHeader(gDivPolygon3, arg1, (u8 *)arg0 + 0x4, 0, 0, 0);
         CopyPolyVtx3((PolyVtx **)((u8 *)arg1 + 0x88), (PolyVtx **)((u8 *)arg1 + 0xA4),
                       (PolyUV4 *)((u8 *)arg0 + 0x8), (PolyUV4 *)((u8 *)arg0 + 0xC),
                       (PolyUV4 *)((u8 *)arg0 + 0x10));
-        RCpolyF3(arg0, gPolySubmitTableTri);
+        RCpolyF3(arg0, gDivPolygon3);
     }
 }
 #endif
@@ -370,7 +370,7 @@ either splices `arg0` into an OT-style singly-linked list threaded through
 splice, low 24 bits are the address), or — when `arg1->0x78` is set —
 routes through `FillRCPolyHeader` (gp_rel-blocked, this unit),
 `CopyPolyVtx3` (matched this round, this unit) and `func_8001A564`
-(Psy-Q SDK) instead, passing a shared table `gPolySubmitTableTri`.
+(Psy-Q SDK) instead, passing a shared table `gDivPolygon3`.
 
 ## Best body reached (46/54 words)
 
@@ -399,9 +399,9 @@ void SubmitPolyF3(void *arg0, void *arg1)
             *head1 = (*head1 & 0xFF000000) | ((u32)arg0 & 0xFFFFFF);
         }
     } else {
-        FillRCPolyHeader(gPolySubmitTableTri, arg1, (u8 *)arg0 + 0x4, 0, 0, 0);
+        FillRCPolyHeader(gDivPolygon3, arg1, (u8 *)arg0 + 0x4, 0, 0, 0);
         CopyPolyVtx3((u8 *)arg1 + 0x88, (u8 *)arg1 + 0xA4, (u8 *)arg0 + 0x8, (u8 *)arg0 + 0xC, (u8 *)arg0 + 0x10);
-        func_8001A564(arg0, gPolySubmitTableTri);
+        func_8001A564(arg0, gDivPolygon3);
     }
 }
 #endif
