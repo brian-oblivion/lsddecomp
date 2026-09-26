@@ -18,7 +18,7 @@ round 8 (2026-09-02) with the project's first permuter run.
 ## RESOLUTION — the matching form
 
 ```c
-GameApplication *New_GameApplication(GameApplicationCtorArgs *arg) {
+GameApplication *New_GameApplication(GameApplicationConfig *arg) {
     GameApplication *self = BMemPMgrAlloc(0x2C);
 
     if (self != 0) {

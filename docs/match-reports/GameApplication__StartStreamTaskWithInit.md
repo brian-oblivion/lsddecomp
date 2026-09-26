@@ -58,7 +58,7 @@ across --
 None beyond what this unit's earlier reports already established; this
 function is a clean fourth instance of the "StreamTask init" shape
 (`GameApplication__LoadIntroLogoSequence`, `GameApplication__StartWeeklyStreamTask`, `GameApplication__StartGraphRoomStreamTask`, now this one), each
-gated by a different `GameApplicationCtorArgs` field and differing only in
+gated by a different `GameApplicationConfig` field and differing only in
 which library helper derives the type code and whether extra slots
 (`slot12C`) are involved.
 

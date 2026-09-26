@@ -70,7 +70,7 @@ jalr  $v0                                                  ; self->methods->slot
 Written as:
 
 ```c
-void GameApplication__GameApplication(GameApplication *self, GameApplicationCtorArgs *arg) {
+void GameApplication__GameApplication(GameApplication *self, GameApplicationConfig *arg) {
     LoadModelRequest req;
 
     GetApplicationMethods()->ctor(self, arg->unk00);
@@ -114,9 +114,9 @@ another caller is found that writes them.
 
 ## New struct/header knowledge (recorded in `include/`)
 
-- `include/GameApplication.h`: added `GameApplicationCtorArgs` (the ctor's `arg`
+- `include/GameApplication.h`: added `GameApplicationConfig` (the ctor's `arg`
   parameter type — only `+0x00` and `+0x14` are read here, observed against
-  the one call site's data, `asm/main.s`'s `gGameApplicationCtorArgs` global:
+  the one call site's data, `asm/main.s`'s `gGameApplicationConfig` global:
   `{0x13, 0, 1, 1, 1, 1}`), added `LoadModelRequest`, retyped
   `MiddleClassMethods.ctor` and `GameApplicationMethods.ctor`/`.slot40` from
   opaque `void *` to real callable signatures now that this function

@@ -92,7 +92,7 @@ extern s32 ResolveCinematicChannel(s32 *out, s32 packedBankEntry); /* psyq_memse
  * "control reaches end of non-void function" here, and the warning is
  * correct about the C -- the bytes are what say the original had it too.
  * See docs/match-reports/New_GameApplication.md for the full derivation. */
-GameApplication *New_GameApplication(GameApplicationCtorArgs *arg) {
+GameApplication *New_GameApplication(GameApplicationConfig *arg) {
     GameApplication *self = BMemPMgrAlloc(0x2C);
 
     if (self != 0) {
@@ -106,7 +106,7 @@ GameApplication *New_GameApplication(GameApplicationCtorArgs *arg) {
  * stores the ctor argument, loads the "ETC\DREAME5.TMD" model, builds this
  * object's owned DreamSys from it, dispatches one DreamSys init call, then
  * runs this class's own slot40 (GameApplication__SeedRandom) once. */
-void GameApplication__GameApplication(GameApplication *self, GameApplicationCtorArgs *arg) {
+void GameApplication__GameApplication(GameApplication *self, GameApplicationConfig *arg) {
     LoadModelRequest req;
 
     GetApplicationMethods()->ctor((Application *)self, arg->dataSource);

@@ -13,7 +13,7 @@ This is the game's own `main()`. It runs an empty startup stub
 `SetMem(2)`, stands up the game's `BMemPMgr` heap (`BMemPMgrInit`), installs
 it as the default pool (`SetDefaultBMemPMgr`), constructs the `GameApplication`
 instance at `gGameApplication` (`New_GameApplication`, seeded from the constant block
-`gGameApplicationCtorArgs = {0x13, 0, 1, 1, 1, 1}`), allocates a second object via the
+`gGameApplicationConfig = {0x13, 0, 1, 1, 1, 1}`), allocates a second object via the
 still-uncarved `New_DrawSystem`, opens a `Pad` (`New_Pad(NULL, 0)`),
 and dispatches two methods through `gGameApplication`'s own vtable (`+0x044` and
 `+0x04C`) before returning. It never loops -- the real game loop presumably
@@ -66,11 +66,11 @@ extern void *New_DrawSystem(void);
 
 extern BMemPMgr *gStartupBMemPMgr;
 extern GameApplication *gGameApplication;
-extern GameApplicationCtorArgs gGameApplicationCtorArgs;
+extern GameApplicationConfig gGameApplicationConfig;
 
 /* Matched in code_1677c.c; not yet declared in any header (no other carved
  * caller existed until now). */
-extern GameApplication *New_GameApplication(GameApplicationCtorArgs *arg);
+extern GameApplication *New_GameApplication(GameApplicationConfig *arg);
 
 void main(void)
 {
@@ -81,7 +81,7 @@ void main(void)
     SetMem(2);
     gStartupBMemPMgr = BMemPMgrInit(0x166C00, 0);
     SetDefaultBMemPMgr(gStartupBMemPMgr);
-    gGameApplication = New_GameApplication(&gGameApplicationCtorArgs);
+    gGameApplication = New_GameApplication(&gGameApplicationConfig);
     obj = New_DrawSystem();
     pad = New_Pad(0, 0);
     gGameApplication->methods->forwardToBaseSlot44UnlessFlagged(gGameApplication, obj, pad);
@@ -175,8 +175,8 @@ this is a documentation sync only.)
     keeping the class's identity tied to its vtable address until a
     game-purpose name is established (track 4). Read and written only here
     and in the shared header's comments (updated by this rename).
-  - `D_80066828` -> `gGameApplicationCtorArgs`, tier A: purely mechanical, it
-    IS the one `GameApplicationCtorArgs` block in the image, passed to
+  - `D_80066828` -> `gGameApplicationConfig`, tier A: purely mechanical, it
+    IS the one `GameApplicationConfig` block in the image, passed to
     `New_GameApplication` at its only call site. `{0x13, 0, 1, 1, 1, 1}`, per
     `include/GameApplication.h`'s existing documentation of which two fields
     (`+0x00`, `+0x14`) `GameApplication__GameApplication` actually reads.

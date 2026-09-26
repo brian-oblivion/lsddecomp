@@ -49,7 +49,7 @@ argument from the start).
 
 ## New struct/header knowledge
 
-`include/GameApplication.h`: split `GameApplicationCtorArgs`'s `+0x04..+0x0B` padding
+`include/GameApplication.h`: split `GameApplicationConfig`'s `+0x04..+0x0B` padding
 to expose `+0x08` (`unk08`, this function's gate) as its own field,
 matching the existing `+0x0C` (`unk0C`, `GameApplication__LoadIntroLogoSequence`'s gate). Declared
 `PickWeeklyStreamChannel` (day/week-style helper, `psyq_memset.s`, same "write an
@@ -58,7 +58,7 @@ index to *out, return a related but different value" shape as
 
 ## Proposed learning
 
-Two sibling `GameApplicationCtorArgs` gate fields (`+0x08`, `+0x0C`) each guard a
+Two sibling `GameApplicationConfig` gate fields (`+0x08`, `+0x0C`) each guard a
 near-identical "build a StreamTask, derive+lookup a type code, init and
 start it" block, differing only in which helper derives the type code and
 whether extra `LoaderTask` registrations bookend it. Once one sibling is

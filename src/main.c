@@ -44,7 +44,7 @@ extern void SetDefaultBMemPMgr(BMemPMgr *pool);
 
 extern BMemPMgr *gStartupBMemPMgr;
 extern GameApplication *gGameApplication;
-extern GameApplicationCtorArgs gGameApplicationCtorArgs;
+extern GameApplicationConfig gGameApplicationConfig;
 
 void main(void) {
     DrawSystem *obj;
@@ -53,7 +53,7 @@ void main(void) {
     SetMem(2);
     gStartupBMemPMgr = BMemPMgrInit(0x166C00, 0);
     SetDefaultBMemPMgr(gStartupBMemPMgr);
-    gGameApplication = New_GameApplication(&gGameApplicationCtorArgs);
+    gGameApplication = New_GameApplication(&gGameApplicationConfig);
     obj = New_DrawSystem();
     pad = New_Pad(0, 0);
     /* GameApplication__InitSystems takes no 4th argument: include/GameApplication.h. */
