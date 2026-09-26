@@ -11,13 +11,13 @@
  * guessing from a slot number:
  *
  *   - This unit's `self` (`ObjM`) is a subclass whose OWN vtable is
- *     `D_80087034` (`tools/classtable.py 0x80087034`, 53 slots) -- the same
+ *     `gObjMMethods` (`tools/classtable.py 0x80087034`, 53 slots) -- the same
  *     class as class_3bb8c_l's `Obj87034_3bb8c_l` (see that HEAD NOTE in
  *     include/class_3bb8c.h; NOT unified with it here, a struct-merge is its
  *     own change per that note). This unit's own 14 functions occupy that
  *     table's tail, offsets +0xA0..+0xD4, i.e. this class's own new virtual
  *     methods (the base Class86668/Obj865C8 table --
- *     docs/match-reports/ObjM__Dtor.md -- only goes up to about +0x88).
+ *     docs/match-reports/ObjM__Finalize.md -- only goes up to about +0x88).
  *     `ObjMMethods::notifyParents`/`checkAuxTrigger`/`teardownPauseOverlay`
  *     (+0x030/+0x0B8/+0x0D4) are confirmed the same way: +0x030 is
  *     `BasicClass__NotifyParents`, and +0x0B8/+0x0D4 are this unit's own
@@ -40,7 +40,7 @@
  * forward to `ObjMMethods::notifyParents` -- consistent with a pause/dialog
  * overlay controller driving a small state machine and notifying its
  * parent object of transitions, but nothing here pins down the exact
- * gameplay meaning of any one mode code. `func_800541CC` (vtable slot
+ * gameplay meaning of any one mode code. `ObjM__NoOpSlotBC` (vtable slot
  * +0x0BC) is an empty `{}` body with no further evidence and is left
  * unnamed.
  *
@@ -143,7 +143,7 @@ s32 ObjM__CheckAuxTrigger(ObjM *self) {
     return 1;
 }
 
-void func_800541CC(void) {
+void ObjM__NoOpSlotBC(void) {
 }
 
 void ObjM__UpdateCloseReadyFlag(ObjM *self) {
@@ -201,7 +201,7 @@ void ObjM__TeardownPauseOverlay(ObjM *self) {
 }
 
 void *GetObjMMethods(void) {
-    return &D_80087034;
+    return &gObjMMethods;
 }
 
 struct StyleM;

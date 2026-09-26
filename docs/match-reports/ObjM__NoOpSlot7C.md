@@ -10,7 +10,7 @@ void ObjM__NoOpSlot7C(void) {
 ```
 
 An empty body -- splat generated this stub itself (`jr $ra; nop`), not
-work done in this round. It fills vtable slot `+0x07C` of `D_80087034`
+work done in this round. It fills vtable slot `+0x07C` of `gObjMMethods`
 (`tools/classtable.py 0x80087034`), `ObjM`'s own table (confirmed via the
 constructor/destructor slots, see `ObjM__NoOpSlot40.md`).
 

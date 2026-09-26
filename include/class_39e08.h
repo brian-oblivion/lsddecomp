@@ -57,7 +57,7 @@ typedef struct SubObjB {
     SubObjBMethods *methods;
 } SubObjB;
 
-/* D_80087034's object (ObjM) as New_ObjM returns it and Class865C8 keeps it
+/* gObjMMethods's object (ObjM) as New_ObjM returns it and Class865C8 keeps it
  * (Class865C8::objM): the three slots Class865C8's methods call. */
 typedef struct Obj4C Obj4C;
 typedef struct Obj4CMethods {

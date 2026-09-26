@@ -6,7 +6,7 @@ Unit `src/class_3bb8c_l.c`. Round 26, runner delta.
 
 ## What it is
 
-An event/code dispatcher for `Obj87034_3bb8c_l` (method table `D_80087034`,
+An event/code dispatcher for `Obj87034_3bb8c_l` (method table `gObjMMethods`,
 53 slots). Owns `jtbl_8001174C`, a dense 8-entry jump table for codes
 `0xA..0x11`, dispatched through eight of the class's OWN method-table slots
 (`self->methods->slotXX`):

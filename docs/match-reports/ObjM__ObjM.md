@@ -10,7 +10,7 @@ attempt at its final source shape).
 
 ## Role
 
-The ctor for the class whose method table is `D_80087034` (`GetObjMMethods`'s
+The ctor for the class whose method table is `gObjMMethods` (`GetObjMMethods`'s
 return value) -- this IS the function `New_ObjM`'s `New_X` allocator
 dispatches to through that vtable's `+0x008` slot. First chains to the base
 class's ctor (`GetClass86668Methods()->ctor(self, 0, arg1)`, the shared
@@ -87,7 +87,7 @@ register reuse.
 
 Round 75 (bravo, track 3). `func_80052C10` -> `ObjM__ObjM`, **tier A**.
 
-Slot +0x008 of D_80087034 (`tools/classtable.py 0x80087034`), the ctor New_ObjM calls. Runs the base Class86668 ctor, sets methods = GetObjMMethods(), stores its arguments and clears fields, then calls +0x040.
+Slot +0x008 of gObjMMethods (`tools/classtable.py 0x80087034`), the ctor New_ObjM calls. Runs the base Class86668 ctor, sets methods = GetObjMMethods(), stores its arguments and clears fields, then calls +0x040.
 
 Local view fields named round 75 (class_3bb8c_k's `ObjM_3bb8c_k` only):
 `pauseSetupStep` (+0x080) and `closeReady` (+0x084), tier B, from the

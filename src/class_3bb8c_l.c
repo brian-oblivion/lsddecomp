@@ -5,7 +5,7 @@
  *
  * This slice is entirely `ObjM`'s own methods -- confirmed, not guessed:
  * `tools/classtable.py 0x80087034` resolves the class's vtable directly to
- * `ObjM__ObjM` (ctor) and `ObjM__Dtor` (dtor), the SAME class sibling unit
+ * `ObjM__ObjM` (ctor) and `ObjM__Finalize` (dtor), the SAME class sibling unit
  * class_3bb8c_m independently reached and named. The two units are NOT
  * unified (round-13 struct-edit hazard; see the HEAD NOTE above
  * `Obj87034_3bb8c_l`'s definition in include/class_3bb8c.h) -- this unit
@@ -145,13 +145,13 @@ void ObjM__TeardownStyle(Obj87034_3bb8c_l *self) {
     self->unk54->methods->slot48(self->unk54);
 }
 
-void ObjM__OnSelectTransfer(Obj87034_3bb8c_l *self, void *arg1, s32 sel) {
+void ObjM__OnTag1Notify(Obj87034_3bb8c_l *self, void *arg1, s32 sel) {
     if (sel == 2) {
-        ObjM__TransferToOther(self, self->pendingOther);
+        ObjM__PollTimBlockLoad(self, self->pendingOther);
     }
 }
 
-void ObjM__TransferToOther(Obj87034_3bb8c_l *self, Obj87034_3bb8c_l *other) {
+void ObjM__PollTimBlockLoad(Obj87034_3bb8c_l *self, Obj87034_3bb8c_l *other) {
     s32 ret;
     s32 sel;
     void *a1;
@@ -186,7 +186,7 @@ void ObjM__TransferToOther(Obj87034_3bb8c_l *self, Obj87034_3bb8c_l *other) {
     }
 }
 
-void ObjM__DispatchEvent(Obj87034_3bb8c_l *self, void *arg1, s32 eventId) {
+void ObjM__DispatchPadEvent(Obj87034_3bb8c_l *self, void *arg1, s32 eventId) {
     Obj87034Methods_3bb8c_l *m = self->methods;
     void (*fn)(Obj87034_3bb8c_l *);
 
@@ -224,7 +224,7 @@ call:
     fn(self);
 }
 
-void ObjM__TickTarget(Obj87034_3bb8c_l *self) {
+void ObjM__Update(Obj87034_3bb8c_l *self) {
     void (*fn)(Obj87034_3bb8c_l *);
 
     if (self->attached != 0) {
@@ -238,7 +238,7 @@ void ObjM__TickTarget(Obj87034_3bb8c_l *self) {
     }
 }
 
-void ObjM__DispatchActiveState(Obj87034_3bb8c_l *self) {
+void ObjM__TogglePause(Obj87034_3bb8c_l *self) {
     Obj87034Methods_3bb8c_l *m = self->methods;
 
     if (self->unk80 != 0) {

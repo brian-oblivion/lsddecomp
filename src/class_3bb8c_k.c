@@ -15,7 +15,7 @@
  *    result to the parents, which read the chosen item back through
  *    GetCursorIndex. Its ctor, child and resource methods are in
  *    class_3bb8c_j. Declared in include/Class86F88.h (track 4, round 89).
- *  - ObjM (table D_80087034, slots +0x008/+0x00C/+0x038, plus New_ObjM):
+ *  - ObjM (table gObjMMethods, slots +0x008/+0x00C/+0x038, plus New_ObjM):
  *    its allocator, ctor, dtor and OnNotify. The rest of ObjM is in
  *    class_3bb8c_l and class_3bb8c_m.
  *
@@ -31,7 +31,7 @@
 #include "Class86F88.h"
 
 /*
- * class_3bb8c_k's own view of ObjM (method table D_80087034, returned by
+ * class_3bb8c_k's own view of ObjM (method table gObjMMethods, returned by
  * GetObjMMethods; the shared `ObjM`/`Obj87034_3bb8c_l` views are in
  * include/class_3bb8c.h). Only what New_ObjM, ObjM__ObjM and
  * ObjM__OnNotify reach is typed. Kept local to this unit per the
@@ -45,7 +45,7 @@
 typedef struct ObjMMethods_3bb8c_k ObjMMethods_3bb8c_k;
 typedef struct ObjM_3bb8c_k ObjM_3bb8c_k;
 
-/* Slot names are the method each slot holds in D_80087034. */
+/* Slot names are the method each slot holds in gObjMMethods. */
 struct ObjMMethods_3bb8c_k {
     u8 pad000[0x008];
     /* +0x008 ObjM__ObjM, New_ObjM's ctor call. */
@@ -447,7 +447,7 @@ void ObjM__ObjM(ObjM_3bb8c_k *self, SubObjB *arg1, s32 arg2, s32 arg3, s32 arg4,
     self->methods->slot40(self);
 }
 
-void ObjM__Dtor(ObjM_3bb8c_k *self)
+void ObjM__Finalize(ObjM_3bb8c_k *self)
 {
     GetClass86668Methods()->finalize((Class86668 *)self);
 }

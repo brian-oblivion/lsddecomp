@@ -7,7 +7,7 @@
 
 ## What it does
 
-`self`'s class is `Obj87034_3bb8c_l` (vtable `D_80087034`, resolved with
+`self`'s class is `Obj87034_3bb8c_l` (vtable `gObjMMethods`, resolved with
 `tools/classtable.py 0x80087034` — see the header note in
 `include/class_3bb8c.h` for the full derivation). This function registers a
 callback with some other object (`arg1->unkC`, an unidentified
@@ -56,4 +56,4 @@ Round 78 (charlie), FINISHING-PLAN track 3.
 | --- | --- | --- | --- |
 | `func_80052DE8` | `ObjM__AttachTarget` | B | see below |
 
-**Evidence.** vtable slot +0x044 of `D_80087034` (`ObjM`, confirmed via classtable.py's ctor/dtor slots). Registers `ObjM__OnRegistrantEvent` as a callback with `arg1->unkC` (a "registrant" object), stores `arg2` into `self->target`, forwards to the shared base accessor's own slot `+0x44`, then dispatches self's own `AddChild` (slot10). Mechanics -- subscribe + link a target + add a child -- are clear; the in-game reason is not.
+**Evidence.** vtable slot +0x044 of `gObjMMethods` (`ObjM`, confirmed via classtable.py's ctor/dtor slots). Registers `ObjM__OnRegistrantEvent` as a callback with `arg1->unkC` (a "registrant" object), stores `arg2` into `self->target`, forwards to the shared base accessor's own slot `+0x44`, then dispatches self's own `AddChild` (slot10). Mechanics -- subscribe + link a target + add a child -- are clear; the in-game reason is not.

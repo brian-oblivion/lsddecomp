@@ -26,7 +26,7 @@ call site's own register usage.
   passes `(self->unk14, 0, 0)`, three total arguments against DreamSys's
   own two. Different arity, different class; `self->unk14`'s pointee is
   left as an unnamed local view (`Obj14_3bb8c_l`) with only this one slot
-  and (from `ObjM__TransferToOther`) one plain `u16` field named.
+  and (from `ObjM__PollTimBlockLoad`) one plain `u16` field named.
 
 ## Naming
 

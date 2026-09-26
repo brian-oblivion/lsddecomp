@@ -913,11 +913,11 @@ struct ObjMMethods {
     u8 pad018[0x030 - 0x018];
     /* +0x030 == BasicClass__NotifyParents's own slot (confirmed with
      * `tools/classtable.py 0x80087034`, same table as the rest of ObjMMethods
-     * -- self->methods IS D_80087034), so this is a plain notify-parents
+     * -- self->methods IS gObjMMethods), so this is a plain notify-parents
      * dispatch with a class-specific event code, not an unknown slot. */
     void (*notifyParents)(ObjM *self, s32 code);   /* +0x030, ObjM__NotifyParentsCodeB/ObjM__HandleEvent5Or6/ObjM__CloseAndNotifyD/ObjM__CloseAndNotifyC */
     u8 pad034[0x0B8 - 0x034];
-    void (*checkAuxTrigger)(ObjM *self);            /* +0x0B8, ObjM__HandleEvent7: this class's OWN ObjM__CheckAuxTrigger, confirmed via classtable.py against D_80087034 */
+    void (*checkAuxTrigger)(ObjM *self);            /* +0x0B8, ObjM__HandleEvent7: this class's OWN ObjM__CheckAuxTrigger, confirmed via classtable.py against gObjMMethods */
     u8 pad0BC[0x0D4 - 0x0BC];
     void (*teardownPauseOverlay)(ObjM *self);       /* +0x0D4, ObjM__CloseAndNotifyD/ObjM__CloseAndNotifyC: this class's OWN ObjM__TeardownPauseOverlay, confirmed via classtable.py */
 };
@@ -956,7 +956,7 @@ struct ObjM {
 /* -------------------------------------------------------------------
  * HEAD NOTE, round 15 merge: `ObjM` (above, from class_3bb8c_m) and
  * `Obj87034_3bb8c_l` (below, from class_3bb8c_l) are the SAME CLASS.
- * Both units independently reached method table D_80087034, which is
+ * Both units independently reached method table gObjMMethods, which is
  * exactly the collision runner delta anticipated when it suffixed its
  * type names. The proof is a cross-unit call, not a guess:
  * ObjM__ForwardToSubChild is DEFINED in class_3bb8c_m.c taking `ObjM *self` and
@@ -974,7 +974,7 @@ struct ObjM {
  * ------------------------------------------------------------------- */
 
 /*
- * class_3bb8c_l -- the class whose method table is D_80087034 (53 slots,
+ * class_3bb8c_l -- the class whose method table is gObjMMethods (53 slots,
  * resolved with tools/classtable.py 0x80087034). This unit is the FIRST to
  * write any of this class's own methods, but sibling units class_3bb8c_k
  * and class_3bb8c_m are being carved/worked in the SAME round and may
@@ -988,23 +988,23 @@ struct ObjM {
 typedef struct Obj87034_3bb8c_l Obj87034_3bb8c_l;
 
 /* self->styleConfig's pointee: a plain (non-vtable) record, read directly by
- * ObjM__TransferToOther via ordinary field offsets, never through a methods
+ * ObjM__PollTimBlockLoad via ordinary field offsets, never through a methods
  * pointer -- so it is NOT another Obj87034_3bb8c_l, just an opaque
  * 3-field descriptor. */
 typedef struct Unk50Struct_3bb8c_l {
     s32 unk0;      /* +0x000, round 45's ObjM__SetupSceneStyle: forwarded opaquely to Obj14Methods_3bb8c_l::slotC4's arg2 */
     s32 unk4;      /* +0x004, round 45's ObjM__SetupSceneStyle: forwarded opaquely to Obj14Methods_3bb8c_l::slotC4's arg3 */
     s32 unk8;      /* +0x008, round 45's ObjM__SetupSceneStyle: forwarded opaquely to Obj14Methods_3bb8c_l::slotBC's arg1 */
-    void *unkC;   /* +0x00C, ObjM__TransferToOther (address taken, forwarded opaquely) */
+    void *unkC;   /* +0x00C, ObjM__PollTimBlockLoad (address taken, forwarded opaquely) */
     u8 pad10[0x014 - 0x010];
-    s32 unk14;    /* +0x014, ObjM__TransferToOther: discriminant compared against 2; also ObjM__EnterStyleSession: discriminant compared against 1 */
-    void *unk18;  /* +0x018, ObjM__TransferToOther (address taken, forwarded opaquely) */
+    s32 unk14;    /* +0x014, ObjM__PollTimBlockLoad: discriminant compared against 2; also ObjM__EnterStyleSession: discriminant compared against 1 */
+    void *unk18;  /* +0x018, ObjM__PollTimBlockLoad (address taken, forwarded opaquely) */
     void *unk1C;  /* +0x01C, ObjM__EnterStyleSession (address taken, forwarded opaquely) */
 } Unk50Struct_3bb8c_l;
 
 /* Whatever self->unk14 points to: an object of some OTHER, unidentified
  * class -- it has its own methods pointer at +0x000 (ObjM__TickStyle
- * dispatches +0x10C on it) AND a plain u16 field at +0x1B4 (ObjM__TransferToOther
+ * dispatches +0x10C on it) AND a plain u16 field at +0x1B4 (ObjM__PollTimBlockLoad
  * reads it directly). Offset +0x10C happens to coincide with a DreamSys
  * vtable offset, but DreamSys's own occupant there (DreamSys__SetSoundObj) takes
  * one s32 argument while this call site passes two -- different arities,
@@ -1037,7 +1037,7 @@ typedef struct Obj14Methods_3bb8c_l {
 typedef struct Obj14_3bb8c_l {
     Obj14Methods_3bb8c_l *methods; /* +0x000 */
     u8 pad04[0x1B4 - 0x004];
-    u16 unk1B4;                     /* +0x1B4, ObjM__TransferToOther */
+    u16 unk1B4;                     /* +0x1B4, ObjM__PollTimBlockLoad */
 } Obj14_3bb8c_l;
 
 /* What self->world points to (and what its +0x0AC returns): an
@@ -1089,7 +1089,7 @@ typedef struct RegistrantObj_3bb8c_l {
 
 typedef struct Obj87034Methods_3bb8c_l {
     s32 header;                                                    /* +0x000 */
-    void (*slot04)(Obj87034_3bb8c_l *self);                        /* +0x004, BasicClass generic (func_80017EB0); dispatched directly by ObjM__TransferToOther on its `other` argument */
+    void (*slot04)(Obj87034_3bb8c_l *self);                        /* +0x004, BasicClass generic (func_80017EB0); dispatched directly by ObjM__PollTimBlockLoad on its `other` argument */
     u8 pad08[0x010 - 0x008];
     void (*slot10)(Obj87034_3bb8c_l *self, s32 arg1);              /* +0x010, ObjM__AttachTarget */
     void (*slot14)(Obj87034_3bb8c_l *self, void *arg1);            /* +0x014, ObjM__DetachTarget/ObjM__ExitSceneStyle */
@@ -1100,13 +1100,13 @@ typedef struct Obj87034Methods_3bb8c_l {
     u8 pad4C[0x05C - 0x04C];
     void (*slot5C)(Obj87034_3bb8c_l *self, s32 arg1);              /* +0x05C, ObjM__InitStyleAndWorld (arg1 is PickVariant's return value, forwarded opaquely) */
     u8 pad60[0x074 - 0x060];
-    void (*slot74)(Obj87034_3bb8c_l *self);                        /* +0x074, ObjM__DispatchEvent (event 0x21) */
+    void (*slot74)(Obj87034_3bb8c_l *self);                        /* +0x074, ObjM__DispatchPadEvent (event 0x21) */
     u8 pad78[0x07C - 0x078];
-    void (*slot7C)(Obj87034_3bb8c_l *self, void *arg1);            /* +0x07C, ObjM__TransferToOther */
-    void (*slot80)(Obj87034_3bb8c_l *self);                        /* +0x080, ObjM__TransferToOther */
+    void (*slot7C)(Obj87034_3bb8c_l *self, void *arg1);            /* +0x07C, ObjM__PollTimBlockLoad */
+    void (*slot80)(Obj87034_3bb8c_l *self);                        /* +0x080, ObjM__PollTimBlockLoad */
     void (*slot84)(Obj87034_3bb8c_l *self);                        /* +0x084, ObjM__TeardownStyle */
-    void (*slot88)(Obj87034_3bb8c_l *self);                        /* +0x088, ObjM__TransferToOther */
-    void (*slot8C)(Obj87034_3bb8c_l *self);                        /* +0x08C, ObjM__TickTarget */
+    void (*slot88)(Obj87034_3bb8c_l *self);                        /* +0x088, ObjM__PollTimBlockLoad */
+    void (*slot8C)(Obj87034_3bb8c_l *self);                        /* +0x08C, ObjM__Update */
     u8 pad90[0x094 - 0x090];
     void (*slot94)(Obj87034_3bb8c_l *self);                        /* +0x094, ObjM__HandleStateCode (event/code 0xA, dense switch) */
     void (*slot98)(Obj87034_3bb8c_l *self);                        /* +0x098, ObjM__HandleStateCode (event/code 0xC) */
@@ -1116,12 +1116,12 @@ typedef struct Obj87034Methods_3bb8c_l {
     void (*slotA8)(Obj87034_3bb8c_l *self);                        /* +0x0A8, ObjM__HandleStateCode (event/code 0x10) */
     void (*slotAC)(Obj87034_3bb8c_l *self);                        /* +0x0AC, ObjM__HandleStateCode (event/code 0x11) */
     u8 padB0[0x0C0 - 0x0B0];
-    void (*slotC0)(Obj87034_3bb8c_l *self);                        /* +0x0C0, ObjM__DispatchEvent (event 0xC) */
-    void (*slotC4)(Obj87034_3bb8c_l *self);                        /* +0x0C4, ObjM__DispatchEvent (event 0x2C)/ObjM__DispatchActiveState */
-    void (*slotC8)(Obj87034_3bb8c_l *self);                        /* +0x0C8, ObjM__DispatchEvent (event 0x16) */
+    void (*slotC0)(Obj87034_3bb8c_l *self);                        /* +0x0C0, ObjM__DispatchPadEvent (event 0xC) */
+    void (*slotC4)(Obj87034_3bb8c_l *self);                        /* +0x0C4, ObjM__DispatchPadEvent (event 0x2C)/ObjM__TogglePause */
+    void (*slotC8)(Obj87034_3bb8c_l *self);                        /* +0x0C8, ObjM__DispatchPadEvent (event 0x16) */
     u8 padCC[0x0D0 - 0x0CC];
-    void (*slotD0)(Obj87034_3bb8c_l *self);                        /* +0x0D0, ObjM__TickTarget/ObjM__DispatchActiveState */
-    void (*slotD4)(Obj87034_3bb8c_l *self);                        /* +0x0D4, ObjM__ExitSceneStyle/ObjM__DispatchActiveState */
+    void (*slotD0)(Obj87034_3bb8c_l *self);                        /* +0x0D0, ObjM__Update/ObjM__TogglePause */
+    void (*slotD4)(Obj87034_3bb8c_l *self);                        /* +0x0D4, ObjM__ExitSceneStyle/ObjM__TogglePause */
 } Obj87034Methods_3bb8c_l;
 
 struct Obj87034_3bb8c_l {
@@ -1129,9 +1129,9 @@ struct Obj87034_3bb8c_l {
     u8 pad04[0x00C - 0x004];
     RegistrantObj_3bb8c_l *unkC;      /* +0x00C, ObjM__AttachTarget's `arg1->unkC` */
     s32 unk10;                        /* +0x010, ObjM__EnterStyleSession */
-    Obj14_3bb8c_l *unk14;              /* +0x014, ObjM__TransferToOther/ObjM__TickStyle/ObjM__ExitSceneStyle */
+    Obj14_3bb8c_l *unk14;              /* +0x014, ObjM__PollTimBlockLoad/ObjM__TickStyle/ObjM__ExitSceneStyle */
     StyleWorldObj_3bb8c_l *world;         /* +0x018, ObjM__ExitSceneStyle; cached into `cachedWorld` by ObjM__InitStyleAndWorld -- an object distinct from `target`, dispatched through style/world-setup slots (slot74/slotAC/slot60/slot64/slot6C/slot68/slotB0/slotB4) */
-    s32 unk1C;                           /* +0x01C, ObjM__TickTarget: incremented once per call */
+    s32 unk1C;                           /* +0x01C, ObjM__Update: incremented once per call */
     s32 phase;                            /* +0x020, ObjM__EnterState6: written 6 (a state/phase tag; also written 4 by ObjM__EnterState4 and 5 by ObjM__EnterState5; read by ObjM__HandleStateCode, which is 0-gated) */
     u8 pad24[0x034 - 0x024];
     s32 unk34;                            /* +0x034, round 45's ObjM__SetupSceneStyle: forwarded opaquely to SetDreamAuxWorld's own arg3 */
@@ -1141,18 +1141,18 @@ struct Obj87034_3bb8c_l {
     s32 unk44;                              /* +0x044, ObjM__EnterStyleSession */
     s32 unk48;                               /* +0x048, ObjM__InitStyleAndWorld: set from arg1, or 0xA000 if arg1==0 */
     s32 unk4C;                                /* +0x04C, ObjM__InitStyleAndWorld: set from arg3 (only when self->unk38 != 0) */
-    Unk50Struct_3bb8c_l *styleConfig;             /* +0x050, ObjM__TransferToOther; set from RegisterStyleConfig's return in ObjM__InitStyleAndWorld (or an explicit `arg2` override) */
+    Unk50Struct_3bb8c_l *styleConfig;             /* +0x050, ObjM__PollTimBlockLoad; set from RegisterStyleConfig's return in ObjM__InitStyleAndWorld (or an explicit `arg2` override) */
     Obj87034_3bb8c_l *unk54;                 /* +0x054, ObjM__TeardownStyle */
-    Obj87034_3bb8c_l *pendingOther;                  /* +0x058, ObjM__OnSelectTransfer: forwarded as ObjM__TransferToOther's `other` */
+    Obj87034_3bb8c_l *pendingOther;                  /* +0x058, ObjM__OnTag1Notify: forwarded as ObjM__PollTimBlockLoad's `other` */
     u8 pad5C[0x060 - 0x05C];
-    s32 hasTarget;                                 /* +0x060, ObjM__TransferToOther: has-a-target gate, cleared after detaching */
-    s32 unk64;                                  /* +0x064, ObjM__TransferToOther: set to 1 */
-    s32 attached;                                   /* +0x068, ObjM__TransferToOther/ObjM__DispatchEvent/ObjM__TickTarget: zero-checked gate */
+    s32 hasTarget;                                 /* +0x060, ObjM__PollTimBlockLoad: has-a-target gate, cleared after detaching */
+    s32 unk64;                                  /* +0x064, ObjM__PollTimBlockLoad: set to 1 */
+    s32 attached;                                   /* +0x068, ObjM__PollTimBlockLoad/ObjM__DispatchPadEvent/ObjM__Update: zero-checked gate */
     s32 unk6C;                                    /* +0x06C, ObjM__InitStyleAndWorld: out-parameter address passed to RegisterStyleConfig, own type unknown */
     u8 pad70[0x078 - 0x070];
     StyleWorldObj_3bb8c_l *cachedWorld;                    /* +0x078, ObjM__InitStyleAndWorld: cached copy of self->world */
     u8 pad7C[0x080 - 0x07C];
-    s32 unk80;                                    /* +0x080, ObjM__TransferToOther (on `other`)/ObjM__TickTarget/ObjM__DispatchActiveState: zero-checked gate */
+    s32 unk80;                                    /* +0x080, ObjM__PollTimBlockLoad (on `other`)/ObjM__Update/ObjM__TogglePause: zero-checked gate */
 };
 
 /* ObjM's parent class, Class86668 (gClass86668Methods), is declared in
@@ -1166,9 +1166,9 @@ struct Obj87034_3bb8c_l {
  * definition (ROM order later) is reached. */
 extern void ObjM__OnRegistrantEvent(Obj87034_3bb8c_l *self, s32 code, s32 arg2, s32 arg3);
 
-/* ObjM__OnSelectTransfer's tail call -- forward-declared for the same ROM-order
- * reason as ObjM__OnRegistrantEvent above (ObjM__TransferToOther is defined later). */
-extern void ObjM__TransferToOther(Obj87034_3bb8c_l *self, Obj87034_3bb8c_l *other);
+/* ObjM__OnTag1Notify's tail call -- forward-declared for the same ROM-order
+ * reason as ObjM__OnRegistrantEvent above (ObjM__PollTimBlockLoad is defined later). */
+extern void ObjM__PollTimBlockLoad(Obj87034_3bb8c_l *self, Obj87034_3bb8c_l *other);
 
 /* ObjM__OnRegistrantEvent's own two helpers -- MATCHED, src/code_39094.c.
  * GetGridRecordAt(index, sub) reads both $a0 and $a1. ObjM__OnRegistrantEvent's
@@ -1259,12 +1259,12 @@ struct TargetObj86ED0 {
  * round 89). */
 
 /* GetObjMMethods: a plain class-vtable getter (`lui`/`addiu`, no
- * `lw`/`sw`), returns `&D_80087034` verbatim. Confirmed a BasicClass-
+ * `lw`/`sw`), returns `&gObjMMethods` verbatim. Confirmed a BasicClass-
  * derived vtable with `tools/classtable.py 0x80087034` (header word then
  * `BasicClass__Release` at +4, the class-framework fingerprint) --
  * nothing in this unit dereferences it, so it stays untyped beyond the
  * address itself, same convention as `sDefaultTargetSpecs` above. */
-extern s32 D_80087034;
+extern s32 gObjMMethods;
 extern void *GetObjMMethods(void);
 
 #endif

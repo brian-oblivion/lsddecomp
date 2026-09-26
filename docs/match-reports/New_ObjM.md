@@ -7,7 +7,7 @@
 
 ## Role
 
-`New_X`-style allocator for the class whose method table is `D_80087034`
+`New_X`-style allocator for the class whose method table is `gObjMMethods`
 (the same table `GetObjMMethods` returns). Allocates a 0x88-byte instance
 via `BMemPMgrAlloc`; if allocation succeeds, dispatches through the
 returned vtable's `+0x008` (ctor) slot with the 5 forwarded arguments and
@@ -135,4 +135,4 @@ project-wide `New_X` allocator shape before assuming it generalizes.
 
 Round 75 (bravo, track 3). `func_80052B70` -> `New_ObjM`, **tier A**.
 
-New_X allocator: BMemPMgrAlloc(0x88), then GetObjMMethods()->ctor (+0x008 of D_80087034, `tools/classtable.py 0x80087034`) with the 5 forwarded arguments; returns the object or NULL. Caller: Class865C8__StartObjM (class_39e08). The class's type name is `ObjM` (include/class_3bb8c.h).
+New_X allocator: BMemPMgrAlloc(0x88), then GetObjMMethods()->ctor (+0x008 of gObjMMethods, `tools/classtable.py 0x80087034`) with the 5 forwarded arguments; returns the object or NULL. Caller: Class865C8__StartObjM (class_39e08). The class's type name is `ObjM` (include/class_3bb8c.h).

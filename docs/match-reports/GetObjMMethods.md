@@ -6,7 +6,7 @@
 
 ## What this function does
 
-Plain vtable getter: whole body is `lui`/`addiu` computing `&D_80087034`,
+Plain vtable getter: whole body is `lui`/`addiu` computing `&gObjMMethods`,
 no `lw`/`sw` at all. `tools/classtable.py 0x80087034` confirms it is a
 real class vtable (header word then `BasicClass__Release` at +4, the
 class-framework fingerprint) -- a subclass of `BasicClass`. Nothing in
@@ -15,7 +15,7 @@ pointer itself.
 
 ```c
 void *GetObjMMethods(void) {
-    return &D_80087034;
+    return &gObjMMethods;
 }
 ```
 
@@ -30,4 +30,4 @@ round 15b (2026-09-04), runner echo, second pass on `class_3bb8c_m`
 
 ## Naming
 
-**GetObjMMethods** -- tier A. Plain vtable getter: whole body is `lui`/`addiu` computing `&D_80087034`, matching the `Get<Class>Methods` pattern already established elsewhere in this codebase (`GetClass869D8Methods` etc.). `tools/classtable.py 0x80087034` confirms it is a real class vtable (BasicClass framework fingerprint). A pure getter is tier A by definition; the class's own game-facing name stays unconfirmed, hence `GetObjMMethods` rather than a semantic name.
+**GetObjMMethods** -- tier A. Plain vtable getter: whole body is `lui`/`addiu` computing `&gObjMMethods`, matching the `Get<Class>Methods` pattern already established elsewhere in this codebase (`GetClass869D8Methods` etc.). `tools/classtable.py 0x80087034` confirms it is a real class vtable (BasicClass framework fingerprint). A pure getter is tier A by definition; the class's own game-facing name stays unconfirmed, hence `GetObjMMethods` rather than a semantic name.

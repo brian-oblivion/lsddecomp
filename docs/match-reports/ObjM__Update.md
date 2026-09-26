@@ -1,4 +1,6 @@
-# ObjM__TickTarget
+# ObjM__Update
+
+> Renamed from `ObjM__TickTarget` on 2026-09-26 (tools/rename.py). Address 0x800533f0.
 
 > Renamed from `func_800533F0` on 2026-09-24 (tools/rename.py). Address 0x800533f0.
 
@@ -8,7 +10,7 @@
 ## What it does
 
 ```c
-void ObjM__TickTarget(Obj87034_3bb8c_l *self) {
+void ObjM__Update(Obj87034_3bb8c_l *self) {
     void (*fn)(Obj87034_3bb8c_l *);
 
     if (self->unk68 != 0) {
@@ -37,6 +39,6 @@ Round 78 (charlie), FINISHING-PLAN track 3.
 
 | was | now | tier | evidence |
 | --- | --- | --- | --- |
-| `func_800533F0` | `ObjM__TickTarget` | B | see below |
+| `func_800533F0` | `ObjM__Update` | B | see below |
 
 **Evidence.** vtable slot +0x05C. Gated on `self->unk68`: increments the `unk1C` counter, then dispatches one of two slots (`slotD0`/`slot8C`) depending on `self->unk80`.

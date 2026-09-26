@@ -1,4 +1,6 @@
-# ObjM__TransferToOther
+# ObjM__PollTimBlockLoad
+
+> Renamed from `ObjM__TransferToOther` on 2026-09-26 (tools/rename.py). Address 0x800531cc.
 
 > Renamed from `func_800531CC` on 2026-09-24 (tools/rename.py). Address 0x800531cc.
 
@@ -14,7 +16,7 @@ by the identical field offsets `self` and `other` are both read through:
 `0x0`, `0x3C`, `0x50`, `0x60`, `0x68`, `0x80`).
 
 ```c
-void ObjM__TransferToOther(Obj87034_3bb8c_l *self, Obj87034_3bb8c_l *other) {
+void ObjM__PollTimBlockLoad(Obj87034_3bb8c_l *self, Obj87034_3bb8c_l *other) {
     s32 ret;
     s32 sel;
     void *a1;
@@ -98,6 +100,6 @@ Round 78 (charlie), FINISHING-PLAN track 3.
 
 | was | now | tier | evidence |
 | --- | --- | --- | --- |
-| `func_800531CC` | `ObjM__TransferToOther` | B | see below |
+| `func_800531CC` | `ObjM__PollTimBlockLoad` | B | see below |
 
-**Evidence.** Private helper (not itself a vtable slot), called only from `ObjM__OnSelectTransfer`. The detach-from-current-target / link-to-new-target logic: `other` is confirmed to be the SAME class (`Obj87034_3bb8c_l`) by the identical field offsets both `self` and `other` are read through (`+0x0`, `+0x3C`, `+0x50`, `+0x60`, `+0x68`, `+0x80`).
+**Evidence.** Private helper (not itself a vtable slot), called only from `ObjM__OnTag1Notify`. The detach-from-current-target / link-to-new-target logic: `other` is confirmed to be the SAME class (`Obj87034_3bb8c_l`) by the identical field offsets both `self` and `other` are read through (`+0x0`, `+0x3C`, `+0x50`, `+0x60`, `+0x68`, `+0x80`).

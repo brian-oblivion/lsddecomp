@@ -11,7 +11,7 @@
  * (Class86668__PlaySound, GetClass86668Methods). The object is 0x38 bytes
  * (New_Class86668). Two classes derive from it, each ctor calling
  * Class86668__Class86668 first (`typeviews.py --tree`): gClass865C8Methods
- * (0x1F230, Class865C8, class_39e08) and D_80087034 (0x2F230, ObjM,
+ * (0x1F230, Class865C8, class_39e08) and gObjMMethods (0x2F230, ObjM,
  * class_3bb8c_k/_l/_m).
  *
  * Construction, ctor(soundBankPath, sound): the base ctor, then `sound` =
@@ -49,7 +49,7 @@ typedef struct Class86668Methods Class86668Methods;
     INTERMEDIATEBASE_SLOTS(Self, CtorParams);                                                      \
     /* +0x06C */ void (*setTimeout)(Self *self, s32 timeout); /* Class86668__SetTimeout: timeoutFrames = timeout * 20 (negative: kept, never fires) */ \
     /* +0x070 */ void (*playSound)(Self *self, s32 tone);     /* Class86668__PlaySound: sound's PlayTone(tone, 0x7F, 0x7F) */ \
-    /* +0x074 */ void (*slot74)(Self *self);                  /* NULL; ObjM__DispatchActiveState */ \
+    /* +0x074 */ void (*slot74)(Self *self);                  /* NULL; ObjM__TogglePause */ \
     /* +0x078 */ void *slot78;                                /* NULL in all three tables */     \
     /* +0x07C */ void (*onState4)(Self *self)                 /* NULL; setState(4) calls it; empty in both subclasses */
 
