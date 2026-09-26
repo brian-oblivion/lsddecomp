@@ -110,3 +110,18 @@ not a redundant return of an already-computed pointer). Read both: which
 one applies depends on whether the tail after the guard is itself a bare
 `return` of a value already computed before the branch (this case) or
 further work (that one).
+
+## Track 4 (2026-09-26, round 87, alpha)
+
+Renamed from `New_D800879C4` (tools/rename.py); the class is `Class879C4`
+(`include/Class879C4.h`). The prototype is now
+`Class879C4 *New_Class879C4(s32 variant, void *arg2, void *texture)`: the
+three arguments are forwarded unchanged to the ctor, whose parameters they
+name (see `Class879C4__Class879C4`'s report), and the result is the object.
+The body is unchanged but for the parameter names; the one caller outside
+this unit, `Class876FC__SpawnSprites` (class_3bb8c_s.c), passes its `a2`
+as the variant without a cast and casts the result to its `LinkNode *`
+view, and its local `extern` of this function is gone. The "UNCARVED
+ground" section above is history: the getter and table are
+`GetClass879C4Methods` / `gClass879C4Methods` in class_3bb8c_t.c.
+Byte-identical.

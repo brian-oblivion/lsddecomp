@@ -132,3 +132,13 @@ set, s16 *ratios)` with `spriteScaleX`/`spriteScaleY`, byte-identical.
 | fields `unk58`, `unk5C`, `unk60` | C (kept) | Known: the base init `Sprite__Reset` zeroes `+0x58`; when `+0x58` is non-zero this method multiplies the s32s at `+0x5C`/`+0x60` by the x/y ratios (`>> 12`) instead of setting the sprite scale. The draw path `Viewport__DrawNode` does not read them. Nothing found that sets `+0x58` non-zero, so no name. |
 
 Could not name: `unk58`/`unk5C`/`unk60`, above.
+
+## Track 4 (2026-09-26, round 87, alpha)
+
+Renamed from `D800879C4__UpdateScale` (tools/rename.py); the class is
+`Class879C4` (`include/Class879C4.h`). The override is named for its slot
+(+0x048 `updateScale`), which it already was. The slot keeps Class6B5CC's
+`void *table`; the occupant reads it as `s16 *ratios` (two num/den pairs).
+The local view's `spriteScaleX/Y` are now `sprite.scalex` /
+`sprite.scaley` (SpriteGs, s16 at +0x080 / +0x082); `unk58/5C/60` are
+Sprite's fields (SPRITE_FIELDS). Byte-identical.

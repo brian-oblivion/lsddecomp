@@ -31,3 +31,12 @@ include `class_3bb8c_p`'s header).
 ./build-and-verify.sh   # build exit=0, OK: build matches retail
 tools/funcdiff.py GetClass879C4Methods   # 4/4
 ```
+
+## Track 4 (2026-09-26, round 87, alpha)
+
+Renamed from `func_80057F58` (tools/rename.py), tier A: a plain getter for
+`&gClass879C4Methods` (formerly `D_800879C4`), named like
+`GetSpriteMethods` / `GetActorMethods`. It now returns `Class879C4Methods *`
+(`include/Class879C4.h`); class_3bb8c_t.c's opaque `D_800879C4Table`
+typedef and extern are gone. Its callers are the class's own allocator and
+ctor (class_3bb8c_p.c). Byte-identical.

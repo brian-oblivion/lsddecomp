@@ -110,3 +110,17 @@ below, byte-identical.
 ## Proposed field names
 
 - `class_3bb8c_p.c`, `D800879C4Methods::postConstruct` (`+0x040`) -> `setVariantClut`, tier A: the slot resolves to this function (`tools/classtable.py gClass879C4Methods`), and slots are named like the method they dispatch to. Only that one local view; do NOT touch `GraphRoomMethods::postConstruct` in class_3bb8c_t.c, which is a different class's slot. Not applied here (another unit's file).
+
+## Track 4 (2026-09-26, round 87, alpha)
+
+Renamed from `D800879C4__SetVariantClut` (tools/rename.py); the class is
+`Class879C4` (`include/Class879C4.h`). It occupies the inherited `reset`
+slot (+0x040) and keeps its own name: the body does something narrower and
+different from Sprite__Reset (it never binds a texture; it records the
+variant and repoints the CLUT), so the slot-name rule's exception applies.
+The slot keeps Class6B5CC's type; the ctor calls this through
+`Class879C4ResetFn` because it passes the variant. Return type `void` (the
+merge's +0x040 CONFLICT: the old `void *` was the ctor's local reading; see
+`Class879C4__Class879C4`'s report). The local view's `spriteClutX/Y` are
+now `sprite.cx` / `sprite.cy` (Sprite.h's SpriteGs, the same s16 at
++0x074 / +0x076). Byte-identical.

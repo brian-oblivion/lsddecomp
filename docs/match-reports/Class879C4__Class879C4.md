@@ -75,3 +75,37 @@ tools/funcdiff.py Class879C4__Class879C4   # 43/43
 ## Track 4 (2026-09-25, round 82, alpha)
 
 The base class is unified as `Sprite` (`include/Sprite.h`, table `gSpriteMethods`, formerly `D_8006EE1C`). The unit-local `D8006EE1CMethods` view is gone: the call goes through `SpriteMethods`' ctor, whose parameters are `(Sprite *self, void *texture, s32 abr, SpriteRect *rect, void *arg4, s32 arg5)` (Sprite__Sprite forwards all five to its +0x040 reset, which reads texture/abr/rect), so `self` is upcast (a pointer cast, no code) and `gClass879C4Cells` is now `SpriteRect[2]` instead of an opaque 12-byte entry. Byte-identical: whole image green, 0 new warnings.
+
+## Track 4 (2026-09-26, round 87, alpha)
+
+Renamed from `D800879C4__D800879C4` (tools/rename.py). The class is unified
+as `Class879C4` (`include/Class879C4.h`, table `gClass879C4Methods`,
+formerly `D_800879C4`), the `ClassXXXXX` convention of Class876FC and
+Class6E99C: the sprites' role in the game is not established, so no
+descriptive name. The unit-local `D800879C4Obj` / `D800879C4Methods` views
+are gone. Current body:
+
+```c
+void Class879C4__Class879C4(Class879C4 *self, s32 variant, void *arg2, void *texture) {
+    GetSpriteMethods()->ctor((Sprite *)self, texture, 0, &gClass879C4Cells[variant], arg2, 0);
+    self->methods = GetClass879C4Methods();
+    self->unkA4 = 0;
+    ((Class879C4ResetFn)self->methods->reset)(self, variant);
+}
+```
+
+- **Return type `void`, settled by the bytes.** `typeviews.py --merge`
+  reported a CONFLICT at +0x040: Sprite's `reset` returns void, the old
+  local `setVariantClut` returned `void *` so this ctor could `return` it.
+  The occupant, `Class879C4__SetVariantClut`, returns nothing (its body
+  never writes `$v0`), and this ctor ends in the `jalr` with no `move v0,
+  s1` after it. A void ctor ending in a void call compiles to the same 43
+  words (whole image green), so the slot keeps the occupant's `void` and the
+  ctor returns nothing, as ScreenSprite's does. The ctor slot, from
+  Class6B5CC, still says `void *`; New_Class879C4 ignores the result.
+- **The reset call's cast.** The slot (Class6B5CC's `reset(Self *self)`)
+  takes no argument; the occupant takes the variant, so the call casts to
+  `Class879C4ResetFn` (round 85's Class65650 precedent; no code).
+- Parameter names: `variant` picks the texture cell here and the CLUT row in
+  SetVariantClut; `texture` is forwarded as Sprite's `texture`; `arg2` as
+  Sprite's opaque `arg4`. `unk_0xA4` -> `unkA4` (only this ctor writes it).
