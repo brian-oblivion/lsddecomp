@@ -628,6 +628,11 @@ def track4_classes(st):
 
     def below(t):
         return sum(1 + below(k) for k in kids.get(t, []))
+    # an ancestor's unified type seen as a "view" (a getter or method declared
+    # with the parent's type) is not this class's: every includer of its
+    # header would count (round 88: BgLayer's Class6B5CCMethods, 45 units)
+    unified_types = {n + sfx for led in ledger.values() if not led.get("parked") and led.get("class")
+                     for n in [led["class"]] for sfx in ("", "Methods")}
     out = []
     for c in cen:
         led = ledger.get(c["table"])
@@ -664,7 +669,7 @@ def track4_classes(st):
         units_ = sorted({u for d in c["objects"].values() for u in d["units"]} |
                         {Path(f).stem for f in files if f.startswith("src/")})
         if state == "ready":
-            units_ = sorted(set(units_) | class_footprint(c))
+            units_ = sorted(set(units_) | class_footprint(c, unified_types))
         out.append(dict(c, state=state, stray=stray, below=below(c["table"]),
                         nviews=len(c["objects"]) + len(c["tables"]), files=files, units=units_,
                         name=(led or {}).get("class")))
@@ -680,7 +685,7 @@ def track4_classes(st):
 _fp_texts = None
 
 
-def class_footprint(c):
+def class_footprint(c, unified_types=frozenset()):
     """Every unit a class job may edit (revision 23): the units whose code
     (comments stripped) names the class's table, a getter of it, an own
     method or a view type, plus every unit that includes, directly or through
@@ -697,9 +702,10 @@ def class_footprint(c):
             t = f.read_text(errors="replace")
             _fp_texts[f] = (re.sub(r"/\*.*?\*/", " ", t, flags=re.S),
                             set(re.findall(r'#include\s+"([^"]+)"', t)))
-    syms = {c["table"], *c["owned"], *c["objects"], *c["tables"]}
+    views = [v for v in (*c["objects"], *c["tables"]) if v not in unified_types]
+    syms = {c["table"], *c["owned"], *views}
     tre = re.escape(c["table"])
-    ore = "|".join(map(re.escape, c["objects"])) or r"(?!)"
+    ore = "|".join(map(re.escape, [o for o in c["objects"] if o not in unified_types])) or r"(?!)"
     for t, _ in _fp_texts.values():
         syms |= set(re.findall(rf"\b(\w+)\s*\(\s*(?:void)?\s*\)\s*\{{\s*return\s+&?\s*{tre}\s*;", t))
         # a function DEFINED returning the object (a singleton getter, an
