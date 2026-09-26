@@ -11,7 +11,7 @@ drift. Fresh ground (carved revision 18, no prior report).
 
 As TileMap__Load but marks the u16 at +0x32. Retail has a 0x38-byte frame although nothing but $ra/$s0 touches the stack.
 
-Table slot (`tools/classtable.py`): D_8006F514 +0x064 (setFlag).
+Table slot (`tools/classtable.py`): gTileAtlasMethods +0x064 (setFlag).
 
 ## Source
 
@@ -20,7 +20,7 @@ The unit-local view `DataSrc33808` (a Class6D430 subclass built with the unified
 fields +0x2C..+0x38) and `CountedBuf33808` sit at the top of `src/code_33808.c`.
 
 ```c
-/* D_8006F514 +0x064: unless +0x2A is set, slot +0x078 and mark +0x32. */
+/* gTileAtlasMethods +0x064: unless +0x2A is set, slot +0x078 and mark +0x32. */
 typedef struct Obj6F514 {
     CLASS6D430_FIELDS(DataSrc33808Methods);
     /* +0x02C */ u8 pad2C[6];
@@ -51,4 +51,4 @@ void TileAtlas__Load(Obj6F514 *self) {
 
 ## Track 4 (2026-09-26, round 88, alpha)
 
-Class unified in `include/TileAtlas.h` (D_8006F514, 0x303, a Class6D430 subclass, 0x38 bytes). `self` is `TileAtlas *` (was `Obj6F514`); +0x032 is `loaded`. The no-argument call through +0x078 (retail never sets $a0 before the `jalr`, confirmed in the built object) goes through the header's `TileAtlasBuildCellsFn` typedef instead of an inline `void (*)()` cast. No rename. Byte-identical.
+Class unified in `include/TileAtlas.h` (gTileAtlasMethods, 0x303, a Class6D430 subclass, 0x38 bytes). `self` is `TileAtlas *` (was `Obj6F514`); +0x032 is `loaded`. The no-argument call through +0x078 (retail never sets $a0 before the `jalr`, confirmed in the built object) goes through the header's `TileAtlasBuildCellsFn` typedef instead of an inline `void (*)()` cast. No rename. Byte-identical.

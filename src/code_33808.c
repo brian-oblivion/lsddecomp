@@ -27,7 +27,7 @@
  *     those pairs; ModelData named from code_55dd4.h/.c's own "tmd"/"tods"/
  *     "modelData" fields, TriggerWorld from code_4cd08.c's own declared
  *     return type.
- *   - TileMap / TileAtlas (gTileMapMethods / D_8006F514): a 20x15 grid of
+ *   - TileMap / TileAtlas (gTileMapMethods / gTileAtlasMethods): a 20x15 grid of
  *     16x16-cell map data (a GsMAP, consumed by BgLayer as its map source)
  *     and the 300-GsCELL texture atlas it indexes; built together and used
  *     together in src/code_2c054.c's TaskCore__TaskCore (include/TileMap.h,
@@ -1098,7 +1098,7 @@ TileMapMethods *GetTileMapMethods(void) {
     return &gTileMapMethods;
 }
 
-/* Allocate and construct a D_8006F514 object. */
+/* Allocate and construct a gTileAtlasMethods object. */
 TileAtlas *New_TileAtlas(s32 arg0) {
     TileAtlas *obj = BMemPMgrAlloc(0x38);
 
@@ -1109,7 +1109,7 @@ TileAtlas *New_TileAtlas(s32 arg0) {
     return NULL;
 }
 
-/* D_8006F514 +0x008: constructor -- the active driver's, then this table;
+/* gTileAtlasMethods +0x008: constructor -- the active driver's, then this table;
  * clear unk34/loaded, and with no `arg1` set defaultCells, clear +0x2A and
  * run its own +0x064. */
 void TileAtlas__TileAtlas(TileAtlas *self, s32 arg1) {
@@ -1126,7 +1126,7 @@ void TileAtlas__TileAtlas(TileAtlas *self, s32 arg1) {
     }
 }
 
-/* D_8006F514 +0x00C: finalize -- free unk34 and the cells, then the active
+/* gTileAtlasMethods +0x00C: finalize -- free unk34 and the cells, then the active
  * driver's. */
 void TileAtlas__Finalize(TileAtlas *self) {
     BMemPMgrFree(self->unk34);
@@ -1134,7 +1134,7 @@ void TileAtlas__Finalize(TileAtlas *self) {
     GetActiveDataSourceMethods()->finalize((Class6D430 *)self);
 }
 
-/* D_8006F514 +0x064: unless +0x2A is set, slot +0x078 (BuildCells) and
+/* gTileAtlasMethods +0x064: unless +0x2A is set, slot +0x078 (BuildCells) and
  * mark `loaded`. */
 
 void TileAtlas__Load(TileAtlas *self) {
@@ -1146,7 +1146,7 @@ void TileAtlas__Load(TileAtlas *self) {
     }
 }
 
-/* D_8006F514 +0x078: with defaultCells, build 300 GsCELLs (16 x 16 texels
+/* gTileAtlasMethods +0x078: with defaultCells, build 300 GsCELLs (16 x 16 texels
  * each) at `cells` over the texture pages from x 0x280: u,v step by 16, a
  * new row at x 0x3C0, a new texture page every 64 x (the lower half from v
  * 0x100). */
@@ -1198,7 +1198,7 @@ void TileAtlas__BuildCells(TileAtlas *self) {
 }
 
 TileAtlasMethods *GetTileAtlasMethods(void) {
-    return &D_8006F514;
+    return &gTileAtlasMethods;
 }
 
 /* Allocate and construct a TodSet; freed and NULL when the constructor fails. */

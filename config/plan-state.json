@@ -897,11 +897,6 @@
           "date": "2026-09-26",
           "header": "include/TriggerWorld.h"
         },
-        "D_8006F514": {
-          "class": "TileAtlas",
-          "date": "2026-09-26",
-          "header": "include/TileAtlas.h"
-        },
         "D_8006F590": {
           "class": "TodSet",
           "date": "2026-09-26",
@@ -1096,6 +1091,11 @@
           "class": "TextRow",
           "date": "2026-09-26",
           "header": "include/TextRow.h"
+        },
+        "gTileAtlasMethods": {
+          "class": "TileAtlas",
+          "date": "2026-09-26",
+          "header": "include/TileAtlas.h"
         },
         "gTileMapMethods": {
           "class": "TileMap",

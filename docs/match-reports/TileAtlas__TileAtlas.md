@@ -9,9 +9,9 @@ drift. Fresh ground (carved revision 18, no prior report).
 
 ## What it does
 
-Constructor: active driver's ctor, install D_8006F514 (GetTileAtlasMethods), clear +0x34 (word) and +0x32 (halfword); when `arg` is 0, set +0x30 = 1, clear +0x2A, and call its own +0x064 slot (TileAtlas__Load) with self.
+Constructor: active driver's ctor, install gTileAtlasMethods (GetTileAtlasMethods), clear +0x34 (word) and +0x32 (halfword); when `arg` is 0, set +0x30 = 1, clear +0x2A, and call its own +0x064 slot (TileAtlas__Load) with self.
 
-Table slot (`tools/classtable.py`): D_8006F514 +0x008.
+Table slot (`tools/classtable.py`): gTileAtlasMethods +0x008.
 
 ## Source
 
@@ -29,7 +29,7 @@ typedef struct Obj6F514 {
     /* +0x034 */ s32 unk34;
 } Obj6F514;
 
-/* D_8006F514 +0x008: constructor -- the active driver's, then this table;
+/* gTileAtlasMethods +0x008: constructor -- the active driver's, then this table;
  * clear +0x34/+0x32, and with no `arg` set +0x30, clear +0x2A and run its
  * own +0x064. */
 void TileAtlas__TileAtlas(Obj6F514 *self, s32 arg) {
@@ -57,4 +57,4 @@ First build. The 0x40 frame with nothing on the stack past ra/s0/s1 is the unuse
 
 ## Track 4 (2026-09-26, round 88, alpha)
 
-Class unified in `include/TileAtlas.h` (D_8006F514, 0x303, a Class6D430 subclass, 0x38 bytes). `self` is `TileAtlas *` (was the unit-local `Obj6F514`). +0x030 unk30 -> `defaultCells` (set to 1 here when arg1 == 0; TileAtlas__BuildCells builds only when it is set, the counterpart of TileMap's `defaultGrid`), +0x032 unk32 -> `loaded` (0 here, 1 from TileAtlas__Load), +0x034 `unk34` retyped `s32` -> `void *` (zeroed here, freed by Finalize, set by no TileAtlas method). The setFlag call needs no cast. No rename. Byte-identical.
+Class unified in `include/TileAtlas.h` (gTileAtlasMethods, 0x303, a Class6D430 subclass, 0x38 bytes). `self` is `TileAtlas *` (was the unit-local `Obj6F514`). +0x030 unk30 -> `defaultCells` (set to 1 here when arg1 == 0; TileAtlas__BuildCells builds only when it is set, the counterpart of TileMap's `defaultGrid`), +0x032 unk32 -> `loaded` (0 here, 1 from TileAtlas__Load), +0x034 `unk34` retyped `s32` -> `void *` (zeroed here, freed by Finalize, set by no TileAtlas method). The setFlag call needs no cast. No rename. Byte-identical.
