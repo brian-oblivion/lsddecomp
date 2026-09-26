@@ -35,7 +35,6 @@ typedef struct Unk6CObj Unk6CObj;
 typedef struct Unk6C14Obj Unk6C14Obj;
 typedef struct Unk6C14SubObj Unk6C14SubObj;
 typedef struct QueryTemplate866E8 QueryTemplate866E8;
-typedef struct LinkTarget866E8 LinkTarget866E8;
 typedef struct ResInfo866E8 ResInfo866E8;
 typedef struct EntryGpu EntryGpu;
 
@@ -504,11 +503,11 @@ struct Elem {
      * `unk4->unk32` (already established). */
     u16 unk2;                      /* +0x002 */
     ElemTarget *unk4;               /* +0x004 */
-    /* Class866E8__LoadElementResources: a per-frame GPU link/load coordinator -- its own
-     * vtable slot78 drives that function's whole loop. Full body
-     * (`LinkTarget866E8`) kept in class_3bb8c.c, this unit's own reading
-     * of a class none of Elem's other established fields touch. */
-    LinkTarget866E8 *unk8;           /* +0x008, Class866E8__LoadElementResources */
+    /* New_Class6D940(0) (Class866E8__Class866E8): the element's placement
+     * grid; Class866E8__LoadElementResources points its buffer into the
+     * element's resource and walks its +0x078 (Class6D940__ResolveEntry)
+     * over every cell. include/Class6D940.h. */
+    struct Class6D940 *unk8;         /* +0x008, Class866E8__LoadElementResources */
     UnkCObj *unkC;                  /* +0x00C, Class866E8__FindElementForPosition (via slot118's return) */
     /* Class866E8__ResetElementCells: array of pointers, walked over 0x668 raw bytes --
      * the true element count is not a round number of elements, so this
