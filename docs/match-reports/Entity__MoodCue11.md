@@ -203,3 +203,7 @@ The class (id 0x1F234, table `gEntityMethods`) is unified as `Entity` in `includ
 ## Track 4b (round 93, charlie) — 2026-09-26
 
 The motion templates are declared once, in `include/Entity.h` (`ROTATION_*`/`SCALE_*` as `Ratio16[]`, `TRANSLATE_*` as `LongVec3[]`); the unit-local `u8[]` externs are gone. The local `row`, which only ever holds `ROTATION_YAW_MINUS90`/`ROTATION_YAW_PLUS90` or 0 and is passed to `updateRotation`, is now `Ratio16 *` (was `u8 *`). A pointer local's pointee type changes no instruction and the slot takes `void *`, so the bytes held: whole image green, 0 new `-Wall` warnings, nonmatching green.
+
+## Track 7 (round 94, delta)
+
+Local `row` renamed `turn` (tier A: it holds the rotation template handed to updateRotation, never a mood row) and initialised/tested against `NULL`. `notifyParents(this, 0xB)` is `ENTITY_EFFECT_EVENT_VIDEO`. `state` 11/12/13 are this handler's phases. The window test `(u32)(moodTimer - 0xD5D) < 0x78` is now written `moodTimer >= 3421 && moodTimer < 3541`; GCC folds it to the same unsigned compare, byte-identical (measured). Every literal in the live body is in its base: decimal for moodTimer ticks, distances, TOD frames, VAB programs and `state` phases (hex remains only for masks). Byte-identical (whole image green).

@@ -174,3 +174,7 @@ shared prototype: Entity.h, DreamSys.c and class_3bb8c_n.c declare them
 with their own type for the sound object (TodActor's `arg2` is a
 `struct UnkArg2Obj *`), and a header prototype taking `VabStreamObj *`
 would warn in each.
+
+## Track 7 (round 94, delta)
+
+Every literal in the live body is in its base: decimal for moodTimer ticks, distances, TOD frames, VAB programs and `state` phases (hex remains only for masks). Byte-identical (whole image green).
