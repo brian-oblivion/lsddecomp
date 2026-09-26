@@ -4,42 +4,38 @@
 #include "IntermediateBase.h"
 
 /*
- * TimedTask -- class id 0x230, method table gTimedTaskMethods: the
- * IntermediateBase subclass that adds a frame timeout and a sound object to
- * IntermediateBase's run-one-job-to-a-result. Methods in src/class_39e08.c
- * (New_TimedTask through TimedTask__SetTimeout) and src/class_3ac78.c
- * (TimedTask__PlaySound, GetTimedTaskMethods). The object is 0x38 bytes
- * (New_TimedTask). Two classes derive from it, each ctor calling
- * TimedTask__TimedTask first (`typeviews.py --tree`): gClass865C8Methods
- * (0x1F230, Class865C8, class_39e08) and gObjMMethods (0x2F230, ObjM,
- * class_3bb8c_k/_l/_m).
+ * TimedTask -- class id 0x230, method table gTimedTaskMethods. An
+ * IntermediateBase (a job run to a result) that adds three things: a frame
+ * timeout that ends the job with result 1, a sound object it can play tones
+ * on, and `result` itself, which init returns. The object is 0x38 bytes.
  *
- * Construction, ctor(soundBankPath, sound): the base ctor, then `sound` =
- * New_VabStreamObj(soundBankPath) when a path is given (Class865C8 passes
- * GetSoundEffectDir()) or the caller's object (ObjM passes Class865C8's), and
- * resetCounters, which here is TimedTask__CancelTimeout: setTimeout(-1).
- * Finalize releases `sound` only when the ctor made it, then runs the base
- * finalize. playSound(tone) is the sound's +0x080, VabStreamObj__PlayTone,
- * with 0x7F, 0x7F (TaskCore__PlaySound's shape; ObjM calls the same object's
- * +0x088/+0x08C, VabStreamObj's Mute/Unmute).
+ * Nothing builds a bare TimedTask (New_TimedTask has no caller); the game
+ * uses its two subclasses, whose ctors call TimedTask__TimedTask first:
+ * Class865C8 (0x1F230, include/Class865C8.h), built by
+ * Class6D3C8__PollStatusObj, which switches on init's return; and ObjM
+ * (0x2F230, include/ObjM.h), which Class865C8 builds and hands its sound.
  *
- * The timeout. setTimeout(n) stores n * 20 frames, or n itself when
- * negative. update (TimedTask__CheckTimeout) runs the base update, which
+ * Lifecycle. ctor(soundBankPath, sound): with a path, `sound` is
+ * New_VabStreamObj(soundBankPath) and finalize releases it; without one it
+ * is the caller's object and finalize leaves it alone. The ctor ends with
+ * resetCounters (TimedTask__CancelTimeout: setTimeout(-1)). init zeroes
+ * `result`, runs IntermediateBase's init and returns `result`.
+ *
+ * The timeout. setTimeout(n) arms it at n * 20 frames; a negative n
+ * disarms it. update (TimedTask__CheckTimeout) runs the base update, which
  * counts frames, then calls setState(4) once frameCounter passes
- * timeoutFrames as UNSIGNED, so -1 never fires. setState
- * (TimedTask__SetState) runs the base setState and, for 4, sets result = 1
- * and calls onState4. init (TimedTask__Init) zeroes `result`, runs the base
- * init and returns `result`: Class6D3C8__PollStatusObj, through Class865C8,
- * switches on it (2 and 3 are Class865C8's own codes).
+ * timeoutFrames compared unsigned, so -1 never fires. setState(4)
+ * (TimedTask__SetState) sets result = 1 and calls onState4. The only
+ * setTimeout call in the game is CancelTimeout's -1: the mechanism is
+ * complete but never armed.
  *
- * Slots +0x074..+0x07C are NULL in this class's own table (the table is 0x80
- * bytes, its last three words zero; classtable.py stops at the last
- * non-NULL slot). +0x07C is the one this class calls.
+ * playSound(tone) is the sound's VabStreamObj__PlayTone(tone, 0x7F, 0x7F);
+ * `sound` is typed `BasicClass *`, and its callers cast it to VabStreamObj.
  *
- * IntermediateBase's onInit (+0x04C) is (self, s32, s32, s32). Of this
- * class's two subclasses, ObjM__InitStyleAndWorld takes three arguments
- * after self and Class865C8__OnInit takes self alone; neither is retyped
- * here.
+ * Slots +0x074..+0x07C are NULL in this class's own table (0x80 bytes, the
+ * last three words zero); setState(4) calls +0x07C. Overrides in the
+ * subclasses whose parameters differ from the slot (onInit, +0x04C) keep the
+ * slot's type; each subclass header lists its own.
  */
 
 typedef struct TimedTask TimedTask;
