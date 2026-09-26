@@ -81,3 +81,7 @@ First build. DrawSystem is reached through a per-function methods view (the type
 ## Naming
 
 - **MoviePlayer__DrawStrip**, tier A. Slot +0x060: uploads the decoded strip, steps the draw rectangle, and decodes the next strip while still inside the frame; marks the frame done at the end.
+
+## Track 4 (2026-09-26, round 87, bravo)
+
+The local view of the DrawSystem singleton quoted above is gone; the unit takes DrawSystem, its method table and GetDrawSystem from `include/DrawSystem.h` (D_8006C070 unified). Byte-identical.

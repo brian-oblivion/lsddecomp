@@ -102,3 +102,7 @@ Ninth build. Every shape with the failing open as an early `if (open(...) != 0) 
 ## Naming
 
 - **MoviePlayer__Play**, tier A. Slot +0x040: starts playing a named movie file when none is already active, registers the frame rectangle with the draw system.
+
+## Track 4 (2026-09-26, round 87, bravo)
+
+The `DrawSys457C0` view is gone; the call goes through `include/DrawSystem.h`. DrawSystem +0x078 is `clearImage(self, u8 *color, DrawRect *rect)` (occupant DrawSystem__ClearImage), so this call clears the frame rectangle at +0x20 with `gMovieFrameRect` as the COLOR (a zero word: black), not "registers gMovieFrameRect with the rectangle". The source now reads `ds->methods->clearImage(ds, (u8 *)&gMovieFrameRect, (DrawRect *)self->rect)`; pointer casts only, byte-identical. Proposed (not done, not this class): rename `gMovieFrameRect` -> `gMovieClearColor`.

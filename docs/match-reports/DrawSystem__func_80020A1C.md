@@ -52,3 +52,7 @@ Kept the tier-C `DrawSystem__func_80020A1C` form (class known, function
 purpose not): the body is `return 0;` with no caller in this unit and no
 other evidence of what the constant answers. A guessed name (e.g. "CanX")
 would be worse than the placeholder.
+
+## Track 4 (2026-09-26, round 87, bravo)
+
+The class is unified: its one definition is `include/DrawSystem.h` (object, method table, `ScreenDims`, `DrawRect`); the unit-local view the declarations above quote is gone. Field renames, settled by this unit's accessors (the only ones): `unk20` -> `vsyncCount` (SetVSyncCount stores, GetVSyncCount returns, RunLoop passes it to VSync, CountFrames compares against it), `unk24` -> `frameCount` (CountFrames counts it). `DrawSystemRect`/`DrawSystemDims` are one type, `DrawRect` {s16 x, y; s32 w, h} (ConvertRect's halfword loads at +0/+2/+4/+8 compile identically from it), and `DrawSystemSize` is `ScreenDims`. The singleton `D_8008A83C` is `gDrawSystem` (rename.py). Byte-identical.

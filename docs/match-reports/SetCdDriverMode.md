@@ -143,3 +143,7 @@ of two callbacks drives the service; tier A.
 that slot either `ServiceCdDriver` or `0`, which is install/clear and nothing
 else. Tier B -- one call site is thin evidence for another class's slot, and
 the type stays a per-call-site local view.
+
+## Track 4 (2026-09-26, round 87, bravo)
+
+The local view of the DrawSystem singleton quoted above is gone; the unit takes DrawSystem, its method table and GetDrawSystem from `include/DrawSystem.h` (D_8006C070 unified). Byte-identical.

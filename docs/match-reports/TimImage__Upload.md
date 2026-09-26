@@ -94,3 +94,7 @@ instead.
   `code_10ee0.c` itself is still mostly `INCLUDE_ASM`, so this unit's struct
   stays a partial two-slot local view (pad + `loadImage` + `moveImage`), not
   a full definition.
+
+## Track 4 (2026-09-26, round 87, bravo)
+
+The local view of the DrawSystem singleton quoted above is gone; the unit takes DrawSystem, its method table and GetDrawSystem from `include/DrawSystem.h` (D_8006C070 unified). Byte-identical.
