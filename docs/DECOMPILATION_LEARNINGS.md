@@ -183,7 +183,7 @@ load through a runtime-indexed global", §"BLOCKED: the `nop_mflo_mfhi` screen r
   argument, are TWO calls GCC cross-jumped**, not one call with an argument chosen in a variable
   (`Entity__MoodCue111`, seven words short: its four `li v0,-0x3C` were each block's first instruction
   copied into branch delay slots). A per-branch `return` blocks the merge; a `void` function lets
-  three calls merge (`TaskObjF__func_8004F8A4`). Retail's `j` into a shared STORE is likewise two
+  three calls merge (`TaskObjF__BeginSave`). Retail's `j` into a shared STORE is likewise two
   identical stores (`Class86B60__TickNameFieldCursor`). (round 75)
 - **When retail keeps BOTH arms of an if/else and the build presets the constant before the branch,
   test the RESULT variable.** jump.c turns `if (x % 20) v = a; else v = 0;` into "set 0, then maybe

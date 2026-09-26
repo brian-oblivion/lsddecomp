@@ -1,27 +1,23 @@
 /*
- * class_3bb8c_g -- TaskObjF methods, slots +0x07C..+0x0B0 of gTaskObjFMethods
- * (0x80086DC4; class_3bb8c_f holds +0x064..+0x078), plus one standalone
- * helper (CopyMemcardIconTemplate) reused by class_3bb8c_m's memcard save
- * writer. The local view type is still called Class86E00_3bb8c_g, after a
- * mid-table address an earlier round took for a separate class table (see
- * include/class_3bb8c.h).
+ * class_3bb8c_g -- TaskObjF methods (include/TaskObjF.h), slots +0x07C..
+ * +0x0B0 of gTaskObjFMethods (class_3bb8c_f holds +0x064..+0x078), the
+ * table getter, plus one standalone helper (CopyMemcardIconTemplate) reused
+ * by class_3bb8c_m's memcard save writer.
  *
- * TaskObjF runs a `state` machine: SetState/AdvanceState fire a fixed
- * set of transition-entry callbacks and either commit a new `state` or
- * tear the object down; ForceIdleFromState and TickStateDelay drive two
- * more paths into the same shared slot7C/slot8C tail; OnCommand and
- * OnItemSelected forward an externally supplied 2/3 dispatch code the
- * same way. Two lazily-attached child sub-objects, childA (a TextEntry,
- * New_TextEntry, include/TextEntry.h) and childB (a Class86F88,
- * New_Class86F88), are attached/detached in mirrored pairs through the
- * slots +0x044..+0x050 both classes put at the same offsets. A third,
- * independent child (cardIcon) is a memcard-icon TIM image, loaded once
- * by LoadCardIcon and stepped by TickCardIcon.
+ * TaskObjF runs a `state` machine: SetState notifies the parent, swaps the
+ * card icon and runs the entry action of the new state (format, write, read,
+ * or open a widget); AdvanceState and ForceIdleFromState answer the input
+ * source's events, TickStateDelay the tick source's. The two widgets are
+ * lazily attached in mirrored pairs: `textEntry` (a TextEntry, to edit the
+ * title) and `itemList` (a Class86F88, to choose among the existing files),
+ * driven through the slots +0x044..+0x050 both classes put at the same
+ * offsets; their results come back through OnTextEntryResult and
+ * OnItemListResult. `cardIcon` is a ScreenSprite of a CARD\*.TIM message,
+ * made by LoadCardIcon and released by ReleaseCardIcon.
  *
- * Every function in the unit is matched C. What each numeric `state`
- * code and each OnCommand/OnItemSelected dispatch code means in game
- * terms is not established -- names below describe mechanics, not
- * purpose (tier B throughout except the pure getter GetTaskObjFMethods). See each function's own match report for its evidence.
+ * Every function in the unit is matched C. What each numeric `state` code
+ * means in game terms is not established. See each function's own match
+ * report for its evidence.
  */
 #include "common.h"
 #include "class_3bb8c.h"
@@ -29,10 +25,12 @@
 #include "TextEntry.h"
 #include "Class86F88.h"
 #include "TimImage.h"
+#include "VabStreamObj.h"
+#include "TaskObjF.h"
 
-void TaskObjF__SetState(Class86E00_3bb8c_g *self, s32 arg1)
+void TaskObjF__SetState(TaskObjF *self, s32 arg1)
 {
-    Class86E00Methods_3bb8c_g *methods = self->methods;
+    TaskObjFMethods *methods = self->methods;
     s32 ret;
     s32 i;
 
@@ -40,49 +38,49 @@ void TaskObjF__SetState(Class86E00_3bb8c_g *self, s32 arg1)
         arg1 = 0x17;
     }
 
-    methods->slot30(self, arg1);
-    methods->slot84(self);
-    methods->slot80(self, arg1);
+    methods->notifyParents(self, arg1);
+    methods->releaseCardIcon(self);
+    methods->loadCardIcon(self, arg1);
 
     self->waitCounter = 0;
     switch (arg1) {
     case 0x13:
-        arg1 = methods->slot50(self) ? 0x11 : 8;
-        methods->slot7C(self, arg1);
+        arg1 = methods->formatCard(self) ? 0x11 : 8;
+        methods->setState(self, arg1);
         break;
     case 0x14:
-        if (*(u8 *)self->unk40 == 0) {
-            methods->slot58(self, self->unk40, self->unk30, self->unk34);
+        if (*(u8 *)self->fileName == 0) {
+            methods->findUnusedMemcardName(self, self->fileName, self->namePrefix, self->nameSuffixes);
         }
-        ret = methods->slot68(self, self->unk40, self->unk44, self->unk4C,
-                              self->unk50, self->unk54, self->unk58);
+        ret = methods->writeMemcardSaveFile(self, self->fileName, self->title, self->iconFrames,
+                                            self->iconImage, self->data, self->dataSize);
         arg1 = ret ? 0x16 : 0xC;
-        methods->slot7C(self, arg1);
+        methods->setState(self, arg1);
         break;
     case 0x15:
-        ret = methods->slot64(self, self->unk40, self->unk54, self->unk58);
+        ret = methods->readMemcardFile(self, self->fileName, self->data, self->dataSize);
         arg1 = ret ? 0x16 : 0x10;
-        methods->slot7C(self, arg1);
+        methods->setState(self, arg1);
         break;
     case 0x11:
-        methods->slot9C(self);
+        methods->attachTextEntry(self);
         break;
     case 0x12:
-        methods->slotA8(self);
+        methods->attachItemList(self);
         break;
     }
 
     if ((u32)(arg1 - 0x16) < 2) {
-        if (self->secondaryMode == 1 && self->unk38 != NULL) {
-            BMemPMgrFree(self->unk3C);
-            for (i = 0; i < self->unk2C; i++) {
-                BMemPMgrFree(((void **)self->unk38)[i]);
+        if (self->opMode == 1 && self->titles != NULL) {
+            BMemPMgrFree(self->foundSuffixes);
+            for (i = 0; i < self->bufCount; i++) {
+                BMemPMgrFree(self->titles[i]);
             }
-            BMemPMgrFree(self->unk38);
-            self->unk38 = NULL;
+            BMemPMgrFree(self->titles);
+            self->titles = NULL;
         }
         self->state = 0;
-        self->secondaryMode = 0;
+        self->opMode = 0;
     } else {
         self->state = arg1;
     }
@@ -99,18 +97,18 @@ extern s32 D_80086EC4;
 /* opaque block, the fresh `cardIcon`'s own `slot4C` arg2, address-only here. */
 extern s32 D_8008AA94;
 
-void TaskObjF__LoadCardIcon(Class86E00_3bb8c_g *self, s32 arg1)
+void TaskObjF__LoadCardIcon(TaskObjF *self, s32 arg1)
 {
     char path[0x20];
     char *buf;
     char *name;
     TimImage *handle;
-    Class86E00Unk70Obj_3bb8c_g *newVal;
+    ScreenSprite *newVal;
 
     if (arg1 >= 0x11) {
         return;
     }
-    if (self->childReady == 0) {
+    if (self->spriteParent == 0) {
         return;
     }
     if (self->cardIcon != NULL) {
@@ -126,62 +124,62 @@ void TaskObjF__LoadCardIcon(Class86E00_3bb8c_g *self, s32 arg1)
 
     handle = New_TimImage(buf);
     ((TimImageUploadFn)handle->methods->slot78)(handle);
-    newVal = (Class86E00Unk70Obj_3bb8c_g *)New_ScreenSprite(handle, (SpriteRect *)&D_80086EC4, 0);
+    newVal = New_ScreenSprite(handle, (SpriteRect *)&D_80086EC4, 0);
     self->cardIcon = newVal;
     handle->methods->release(handle);
-    newVal->methods->slot4C(newVal, self->childReady, (void *)&D_8008AA94);
+    newVal->methods->attachToParent(newVal, self->spriteParent, (Vec3_d294 *)&D_8008AA94);
 }
 
-void TaskObjF__TickCardIcon(Class86E00_3bb8c_g *self)
+void TaskObjF__ReleaseCardIcon(TaskObjF *self)
 {
     if (self->cardIcon != NULL) {
-        self->cardIcon = self->cardIcon->methods->slot4(self->cardIcon);
+        self->cardIcon = self->cardIcon->methods->release(self->cardIcon);
     }
 }
 
-void TaskObjF__OnNotify(Class86E00_3bb8c_g *self, s32 arg1, s32 arg2)
+void TaskObjF__OnInputEvent(TaskObjF *self, void *sender, s32 arg2)
 {
     if (self->state != 0) {
         if (arg2 == 0x19) {
-            self->methods->slot90(self);
+            self->methods->advanceState(self);
         } else if (arg2 == 0x17) {
-            self->methods->slot94(self);
+            self->methods->forceIdleFromState(self);
         }
     }
 }
 
-void TaskObjF__SetChildFlag8(Class86E00_3bb8c_g *self, s32 arg1)
+void TaskObjF__PlaySound(TaskObjF *self, s32 arg1)
 {
-    if (self->childC != NULL) {
-        self->childC->methods->slot80(self->childC, arg1, 0x7F, 0x7F);
+    if (self->sound != NULL) {
+        self->sound->methods->playTone(self->sound, arg1, 0x7F, 0x7F);
     }
 }
 
-void TaskObjF__AdvanceState(Class86E00_3bb8c_g *self)
+void TaskObjF__AdvanceState(TaskObjF *self)
 {
-    Class86E00Methods_3bb8c_g *methods = self->methods;
+    TaskObjFMethods *methods = self->methods;
 
     switch (self->state) {
     case 2:
     case 4:
     case 0xA:
     case 0xE:
-        methods->slot8C(self, 0);
+        methods->playSound(self, 0);
         if (self->state == 0xE) {
-            strcpy((char *)self->unk40, self->unk30);
-            strcat((char *)self->unk40, ((char **)self->unk3C)[(s32)self->selectedItem]);
-            strcpy((char *)self->unk44, ((char **)self->unk38)[(s32)self->selectedItem]);
+            strcpy(self->fileName, self->namePrefix);
+            strcat(self->fileName, self->foundSuffixes[self->selectedIndex]);
+            strcpy(self->title, self->titles[self->selectedIndex]);
         }
-        if (self->secondaryMode == 2) {
-            methods->slot78(self, self->unk40, self->unk44, self->unk48,
-                             self->unk4C, self->unk50, self->unk54, self->unk58);
-        } else if (self->secondaryMode == 1) {
-            methods->slot74(self, self->unk40, self->unk44, self->unk54, self->unk58);
+        if (self->opMode == 2) {
+            methods->beginSave(self, self->fileName, self->title, self->titleEditPos,
+                               self->iconFrames, self->iconImage, self->data, self->dataSize);
+        } else if (self->opMode == 1) {
+            methods->beginLoad(self, self->fileName, self->title, self->data, self->dataSize);
         }
         break;
     case 6:
-        methods->slot8C(self, 0);
-        methods->slot7C(self, 7);
+        methods->playSound(self, 0);
+        methods->setState(self, 7);
         break;
     case 3:
     case 5:
@@ -190,28 +188,28 @@ void TaskObjF__AdvanceState(Class86E00_3bb8c_g *self)
     case 0xC:
     case 0xD:
     case 0x10:
-        methods->slot8C(self, 0x10);
-        methods->slot7C(self, 0x17);
+        methods->playSound(self, 0x10);
+        methods->setState(self, 0x17);
         break;
     }
 }
 
-void TaskObjF__ForceIdleFromState(Class86E00_3bb8c_g *self)
+void TaskObjF__ForceIdleFromState(TaskObjF *self)
 {
     switch (self->state) {
     case 4:
     case 6:
     case 0xA:
     case 0xE:
-        self->methods->slot8C(self, 0x10);
-        self->methods->slot7C(self, 0x17);
+        self->methods->playSound(self, 0x10);
+        self->methods->setState(self, 0x17);
         break;
     default:
         break;
     }
 }
 
-void TaskObjF__TickStateDelay(Class86E00_3bb8c_g *self)
+void TaskObjF__TickStateDelay(TaskObjF *self)
 {
     s32 old;
     s32 newVal;
@@ -223,7 +221,7 @@ void TaskObjF__TickStateDelay(Class86E00_3bb8c_g *self)
         if (old < 6) {
             return;
         }
-        self->methods->slot7C(self, 0x13);
+        self->methods->setState(self, 0x13);
     } else if (self->state == 0xB) {
         old = self->waitCounter;
         newVal = old + 1;
@@ -231,7 +229,7 @@ void TaskObjF__TickStateDelay(Class86E00_3bb8c_g *self)
         if (old < 6) {
             return;
         }
-        self->methods->slot7C(self, 0x14);
+        self->methods->setState(self, 0x14);
     } else if (self->state == 0xF) {
         old = self->waitCounter;
         newVal = old + 1;
@@ -239,92 +237,93 @@ void TaskObjF__TickStateDelay(Class86E00_3bb8c_g *self)
         if (old < 6) {
             return;
         }
-        self->methods->slot7C(self, 0x15);
+        self->methods->setState(self, 0x15);
     }
 }
 
-void TaskObjF__AttachChildA(Class86E00_3bb8c_g *self)
+void TaskObjF__AttachTextEntry(TaskObjF *self)
 {
-    if (self->childReady != 0 && self->unk60 != 0) {
-        if (self->childA == NULL) {
-            self->childA = New_TextEntry((char *)((self->unk48 << 1) + self->unk44), 1);
-            self->childAttached = 1;
+    if (self->spriteParent != 0 && self->inputSource != 0) {
+        if (self->textEntry == NULL) {
+            self->textEntry = New_TextEntry((self->titleEditPos << 1) + self->title, 1);
+            self->ownsWidget = 1;
         }
-        self->methods->slot10(self, (Class86E00SubObj_3bb8c_g *)self->childA);
-        self->childA->methods->loadCardResources(self->childA, (void *)self->childReady);
-        self->childA->methods->attachTarget(self->childA, (void *)self->unk60, (void *)self->unk64,
-                                           (struct TargetObj86ED0 *)self->childC);
+        self->methods->addChild(self, (BasicClass *)self->textEntry);
+        self->textEntry->methods->loadCardResources(self->textEntry, self->spriteParent);
+        self->textEntry->methods->attachTarget(self->textEntry, self->inputSource, self->tickSource,
+                                              (struct TargetObj86ED0 *)self->sound);
     }
 }
 
-void TaskObjF__DetachChildA(Class86E00_3bb8c_g *self)
+void TaskObjF__DetachTextEntry(TaskObjF *self)
 {
-    if (self->childReady != 0 && self->unk60 != 0 && self->childA != NULL) {
-        self->childA->methods->detachTarget(self->childA);
-        self->childA->methods->releaseCardResources(self->childA);
-        if (self->childAttached != 0) {
-            self->childA->methods->release(self->childA);
-            self->childA = NULL;
+    if (self->spriteParent != 0 && self->inputSource != 0 && self->textEntry != NULL) {
+        self->textEntry->methods->detachTarget(self->textEntry);
+        self->textEntry->methods->releaseCardResources(self->textEntry);
+        if (self->ownsWidget != 0) {
+            self->textEntry->methods->release(self->textEntry);
+            self->textEntry = NULL;
         }
     }
 }
 
-void TaskObjF__OnCommand(Class86E00_3bb8c_g *self, void *arg1, s32 arg2)
+void TaskObjF__OnTextEntryResult(TaskObjF *self, void *arg1, s32 arg2)
 {
     switch (arg2) {
     case 2:
-        self->methods->slotA0(self);
-        self->methods->slot78(self, self->unk40, self->unk44, self->unk48,
-                               self->unk4C, self->unk50, self->unk54, self->unk58);
+        self->methods->detachTextEntry(self);
+        self->methods->beginSave(self, self->fileName, self->title, self->titleEditPos,
+                                 self->iconFrames, self->iconImage, self->data, self->dataSize);
         break;
     case 3:
-        self->methods->slotA0(self);
-        self->methods->slot7C(self, 0x17);
+        self->methods->detachTextEntry(self);
+        self->methods->setState(self, 0x17);
         break;
     }
 }
 
-void TaskObjF__AttachChildB(Class86E00_3bb8c_g *self)
+void TaskObjF__AttachItemList(TaskObjF *self)
 {
-    if (self->childReady != 0 && self->unk60 != 0) {
-        if (self->childB == NULL) {
-            self->childB = (Class86E00SubObj_3bb8c_g *)New_Class86F88(self->unk38, 1);
-            self->childAttached = 1;
+    if (self->spriteParent != 0 && self->inputSource != 0) {
+        if (self->itemList == NULL) {
+            self->itemList = New_Class86F88(self->titles, 1);
+            self->ownsWidget = 1;
         }
-        self->methods->slot10(self, self->childB);
-        self->childB->methods->slot44(self->childB, self->childReady);
-        self->childB->methods->slot4C(self->childB, self->unk60, self->unk64, self->childC);
+        self->methods->addChild(self, (BasicClass *)self->itemList);
+        self->itemList->methods->loadResources(self->itemList, self->spriteParent);
+        self->itemList->methods->attachTarget(self->itemList, self->inputSource, self->tickSource,
+                                             (struct TargetObj86ED0 *)self->sound);
     }
 }
 
-void TaskObjF__DetachChildB(Class86E00_3bb8c_g *self)
+void TaskObjF__DetachItemList(TaskObjF *self)
 {
-    if (self->childReady != 0 && self->unk60 != 0 && self->childB != NULL) {
-        self->childB->methods->slot50(self->childB);
-        self->childB->methods->slot48(self->childB);
-        if (self->childAttached != 0) {
-            self->childB->methods->release(self->childB);
-            self->childB = NULL;
+    if (self->spriteParent != 0 && self->inputSource != 0 && self->itemList != NULL) {
+        self->itemList->methods->detachTarget(self->itemList);
+        self->itemList->methods->releaseResources(self->itemList);
+        if (self->ownsWidget != 0) {
+            self->itemList->methods->release(self->itemList);
+            self->itemList = NULL;
         }
     }
 }
 
-void TaskObjF__OnItemSelected(Class86E00_3bb8c_g *self, GenericSlot9CObj_3bb8c_g *arg1, s32 arg2)
+void TaskObjF__OnItemListResult(TaskObjF *self, Class86F88 *arg1, s32 arg2)
 {
     switch (arg2) {
     case 2:
-        self->selectedItem = arg1->methods->slot9C(arg1);
-        self->methods->slotAC(self);
-        self->methods->slot7C(self, 0xE);
+        self->selectedIndex = arg1->methods->getCursorIndex(arg1);
+        self->methods->detachItemList(self);
+        self->methods->setState(self, 0xE);
         break;
     case 3:
-        self->methods->slotAC(self);
-        self->methods->slot7C(self, 0x17);
+        self->methods->detachItemList(self);
+        self->methods->setState(self, 0x17);
         break;
     }
 }
 
-GenericCtorTable_3bb8c_d *GetTaskObjFMethods(void)
+TaskObjFMethods *GetTaskObjFMethods(void)
 {
     return &gTaskObjFMethods;
 }

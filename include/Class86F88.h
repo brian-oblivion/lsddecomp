@@ -22,9 +22,9 @@
  *  - handleInputCode (the tag-2 child's notifications): 25 closes with
  *    result 2, 23 with result 3; setState(4) then passes `result` to
  *    notifyParents, and the parent reads the chosen item with getCursorIndex.
- * Its one maker is TaskObjF__AttachChildB (class_3bb8c_g, mode 1), which
+ * Its one maker is TaskObjF__AttachItemList (class_3bb8c_g, mode 1), which
  * drives loadResources/attachTarget/detachTarget/releaseResources exactly as
- * TaskObjF__AttachChildA drives TextEntry's same slots (include/TextEntry.h:
+ * TaskObjF__AttachTextEntry drives TextEntry's same slots (include/TextEntry.h:
  * slots +0x044..+0x060 and fields +0x02C..+0x03C line up one for one). What
  * the list holds in the game is not established.
  *
@@ -39,7 +39,7 @@
  */
 
 /* The objects it holds, by tag (TargetObj86ED0 is a helper view in
- * include/class_3bb8c.h: TaskObjF's childC, TextEntry's target too). */
+ * include/class_3bb8c.h: TaskObjF's `sound`, a VabStreamObj, TextEntry's target too). */
 struct Class6B5CC;
 struct ScreenSprite;
 struct TextRow;

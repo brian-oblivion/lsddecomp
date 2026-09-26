@@ -33,5 +33,5 @@ cache, then clears `self->unk3C` (also established this round, from
 Renamed from `Class86F88__RemoveCachedChildren`: the body is
 TextEntry__DetachTarget's at the same slot (+0x050), removeChild on the two
 cached children then `target = NULL`, and it undoes Class86F88__AttachTarget.
-Its caller TaskObjF__DetachChildB drives it where TaskObjF__DetachChildA drives
+Its caller TaskObjF__DetachItemList drives it where TaskObjF__DetachTextEntry drives
 TextEntry's detachTarget.

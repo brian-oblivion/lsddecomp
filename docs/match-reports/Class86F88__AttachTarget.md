@@ -88,7 +88,7 @@ Renamed from `Class86F88__AddChildAndSetState`. The body is
 TextEntry__AttachTarget's, at the same slot (+0x04C) of a sibling class with
 the same one caller: addChild(child1), addChild(child2), `target = arg3`,
 `result = 0` (TextEntry also clears altCommands). Its only caller,
-TaskObjF__AttachChildB (class_3bb8c_g), passes `(unk60, unk64, childC)`
-exactly as TaskObjF__AttachChildA passes them to TextEntry's attachTarget, and
+TaskObjF__AttachItemList (class_3bb8c_g), passes `(unk60, unk64, childC)`
+exactly as TaskObjF__AttachTextEntry passes them to TextEntry's attachTarget, and
 `target` is what ForwardToTarget calls. Nothing in it sets a state; the
 cleared word is `result`.

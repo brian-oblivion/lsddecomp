@@ -526,3 +526,7 @@ a syntax error here).
   the disassembly shows this exact shape (a runtime `(src|dst)&3` check
   with two code paths vs. an unconditional `lwl`/`lwr` sequence with
   none) rather than re-deriving it from first principles each time.
+
+## Track 4 (2026-09-26, round 89)
+
+Parameters retyped with TaskObjF's unification (include/TaskObjF.h), byte-identical: `a1` is `char *fileName` (TaskObjF::fileName; BuildMemcardPath's suffix), `handle` is `char *title` (TaskObjF::title; strcpy'd into the header), `arg5` is `struct TimImage *icon` (TaskObjF::iconImage, from Class86B60's iconHandle; the icon source is its Class6D430 `buffer`, +0x010, so the local McIconSourceRef view is gone), `arg6` is `void *data` and `arg7` is `s32 size`. Only CopyMemcardIconTemplate's own `(s32, s32)` view still takes casts.

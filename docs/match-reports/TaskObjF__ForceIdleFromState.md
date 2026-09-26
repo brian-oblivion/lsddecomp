@@ -38,7 +38,7 @@ cases.
 ## Struct changes (additive, `include/class_3bb8c.h`)
 
 None new -- `slot8C`/`slot7C` were both already declared while surveying
-the unit (`TaskObjF__TickCardIcon`'s report).
+the unit (`TaskObjF__ReleaseCardIcon`'s report).
 
 ### Proposed learning
 

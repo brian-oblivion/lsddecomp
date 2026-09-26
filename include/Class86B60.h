@@ -42,12 +42,12 @@
  *    class; saveCtrl is one): events 0x16 and 0x17 run endMemcardSave, 0x16
  *    also clears the new-game flag and calls commitNameEntry.
  *  - beginMemcardSave makes `iconHandle` (New_TimImage("CARD\FILEICN1.TIM"))
- *    and `saveCtrl` (New_TaskObjF(1, NULL)) once, calls saveCtrl's +0x06C with
+ *    and `saveCtrl` (New_TaskObjF(1, 0)) once, calls saveCtrl's init (+0x06C) with
  *    "BISLPS-01556" (D_8008A9D0's value, the memory-card product code), adds
  *    saveCtrl as a child and removes initArgs->unk4 and unk10; endMemcardSave
- *    undoes both and calls saveCtrl's +0x070. The two update methods pass
+ *    undoes both and calls saveCtrl's deinit (+0x070). The two update methods pass
  *    D_8008AA10/D_8008AA18 and saveBlock/saveBlockSize to saveCtrl's
- *    +0x074 or +0x078 (the latter also iconHandle).
+ *    beginLoad (+0x074) or beginSave (+0x078, also iconHandle).
  *
  * Accessors that read an inherited field at another type than TaskCore's:
  * the ctor calls `sound` (TaskCore's BasicClass *) past BasicClass's slots
@@ -56,9 +56,11 @@
  * makes the same call through code_2c054.h's TaskTextObj); beginMemcardSave
  * adds `saveCtrl` as a child, upcast to BasicClass.
  *
- * `saveCtrl` is a TaskObjF (gTaskObjFMethods), a class not unified yet; it is
- * referred to by the tag of the view class_3bb8c.h keeps for it,
- * Class86B60UnkACObj_3bb8c_d, which is TaskObjF's job to merge.
+ * `saveCtrl` is a TaskObjF (include/TaskObjF.h, unified round 89): init
+ * (+0x06C) gets the product code, the name suffix table (D_80086D6C),
+ * initArgs->unk4 and unk10 as its input and tick sources, unk14 as its
+ * sprite parent and `sound`; beginSave (+0x078) and beginLoad (+0x074) get
+ * saveBlock/saveBlockSize as the data read or written.
  *
  * The object is 0xC4 bytes (New_Class86B60's allocation).
  */
@@ -70,7 +72,7 @@ struct DreamSys;
 struct TimImage;
 struct TextRow;
 struct SpriteRgb;
-struct Class86B60UnkACObj_3bb8c_d;
+struct TaskObjF;
 
 struct Class86B60Methods {
     TASKCORE_SLOTS(Class86B60, (Class86B60 *self, struct DreamSys *dreamSys));
@@ -88,11 +90,11 @@ struct Class86B60 {
     TASKCORE_FIELDS(Class86B60Methods);
     /* +0x0A4 */ struct DreamSys *dreamSys;     /* the ctor's; its +0x0F0/+0x19C/+0x1A0/+0x1A8/+0x1AC/+0x1B0 are called */
     /* +0x0A8 */ struct TimImage *iconHandle;   /* beginMemcardSave: New_TimImage("CARD\FILEICN1.TIM"); finalize releases it */
-    /* +0x0AC */ struct Class86B60UnkACObj_3bb8c_d *saveCtrl; /* beginMemcardSave: New_TaskObjF(1, NULL); the ctor clears it;
+    /* +0x0AC */ struct TaskObjF *saveCtrl;               /* beginMemcardSave: New_TaskObjF(1, 0); the ctor clears it;
                                                                  finalize releases it and iconHandle when it is set */
     /* +0x0B0 */ struct TextRow *nameField;     /* setTarget (CreateNameField): New_TextRow; releaseTarget releases it */
     /* +0x0B4 */ u8 pad0B4[0x0BC - 0x0B4];
-    /* +0x0BC */ s32 *saveBlock;                /* the ctor: DreamSys getSaveBlock's result (&saveMagic); saveCtrl's +0x074/+0x078 take it as s32 */
+    /* +0x0BC */ s32 *saveBlock;                /* the ctor: DreamSys getSaveBlock's result (&saveMagic); saveCtrl's beginLoad/beginSave data */
     /* +0x0C0 */ s32 saveBlockSize;             /* the ctor: getSaveBlock's *outSize (0x700); the object is 0xC4 bytes */
 };
 
