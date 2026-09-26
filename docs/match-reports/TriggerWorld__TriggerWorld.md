@@ -44,3 +44,7 @@ First build; the same shape as TodSet__TodSet (D_8006F590's ctor). The allocator
 
 - **TriggerWorld__TriggerWorld**, tier B (head review, round 83: was A). Constructor: the parent ModelData's ctor (owns=0), then this table; runs its own Load when the argument's first word is set.
   Head review, round 83: the class name rests on one caller's local view type, named by an earlier runner (class_3bb8c.c round 20 for LinkResource; code_4cd08.c round 43 for TriggerWorld), not on this body. The body shows mechanics only, so tier B; track 4 may sharpen it.
+
+## Track 4 (2026-09-26, round 88, bravo)
+
+Now `void *TriggerWorld__TriggerWorld(TriggerWorld *self, struct Src6F240 *src)`: the `s32 *arg` was ModelData's descriptor, so `*arg != 0` reads `src->buffer != NULL`. The parent ctor is still called through Ctor33808 (it takes a third argument, 0, that the void-typed slot has no room for) and +0x064 through an `s32 (*)()` cast (setFlag is void; TriggerWorld__Load returns nothing, but the ctor tests $v0, as retail does). Bytes unchanged.

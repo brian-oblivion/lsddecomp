@@ -50,3 +50,5 @@ body does exactly what the slot says for this class (release the ModelData
 array TriggerWorld__BuildResources built, zero the count at +0x038). An
 override is named for its slot (FINISHING-PLAN track 4 step 6). Class
 unified in `include/TriggerWorld.h`.
+
+Retyped in the same round: `self` is `TriggerWorld *`, +0x038 is `modelDataCount` (was DataSrc33808.unk38). Bytes unchanged.

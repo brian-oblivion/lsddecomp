@@ -78,3 +78,5 @@ failure path calls +0x07C, ModelData's `releaseResources` slot, whose
 TriggerWorld occupant is now TriggerWorld__ReleaseResources. Named after the
 parent's occupant so the pair reads as one. Class unified in
 `include/TriggerWorld.h`.
+
+Retyped in the same round: `self` is `TriggerWorld *`, +0x038 is `modelDataCount` (was DataSrc33808.unk38), and the failure path calls `releaseResources(self)` (was the unit-local `slot7C`). Bytes unchanged.

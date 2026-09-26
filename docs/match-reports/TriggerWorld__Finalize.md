@@ -38,3 +38,7 @@ void TriggerWorld__Finalize(DataSrc33808 *self) {
 ## Naming
 
 - **TriggerWorld__Finalize**, tier A. Slot +0x00C: releases parts (slot7C) then the parent ModelData's finalize.
+
+## Track 4 (2026-09-26, round 88, bravo)
+
+Now `void TriggerWorld__Finalize(TriggerWorld *self)`: `self->methods->slot7C()` (argumentless, through the unit-local DataSrc33808 view) is `self->methods->releaseResources(self)`, ModelData's +0x07C, and the parent call is `GetModelDataMethods()->finalize((ModelData *)self)` with no table cast. Passing self emits no code: it is in $a0 on entry, and the argumentless call left it there. Bytes unchanged.

@@ -37,3 +37,7 @@ void TriggerWorld__Load(DataSrc33808 *self) {
 ## Naming
 
 - **TriggerWorld__Load**, tier A. Slot +0x064: slot78 (BuildParts).
+
+## Track 4 (2026-09-26, round 88, bravo)
+
+Now `void TriggerWorld__Load(TriggerWorld *self)` (include/TriggerWorld.h); the +0x078 call keeps its `s32 (*)()` cast (Class6D430's slot78 is `void *`; the occupant is TriggerWorld__BuildResources). Bytes unchanged.
