@@ -4,32 +4,35 @@
 #include "FileResource.h"
 
 /*
- * PlacementGrid -- a FileResource data source (class id 0xE03, method table
- * gPlacementGridMethods) over a 20x20 grid of placement records. Methods in
- * src/code_179d8_d.c. No classes derive from it. Its getter is the first
- * entry of gDataSourceClientGetters, so SetActiveDataSource rebinds its
- * interface slots like every other client's.
+ * PlacementGrid -- the model placements of one grid element's 20 x 20
+ * cells: a view over the placements section of the element's LbdFile
+ * header block, a list of PlacementGridRecords that ResolveEntry turns,
+ * one per call, into a CellPlacement and the model it places. Class id
+ * 0xE03, method table gPlacementGridMethods, parent FileResource (the ctor
+ * chains to GetActiveDataSourceMethods()->ctor, and Finalize and SetFlag
+ * forward to the active driver's, as TimBlockSrc, Tod and ModelData do); no
+ * subclasses. Methods in src/code_179d8_d.c. GetPlacementGridMethods is the
+ * first entry of gDataSourceClientGetters, so SetActiveDataSource rebinds
+ * its file-I/O slots like every client's.
  *
- * PARENT BY CTOR CHAIN: PlacementGrid__PlacementGrid's first call is
- * GetActiveDataSourceMethods()->ctor, and PlacementGrid__Finalize and
- * PlacementGrid__SetFlag forward to the active driver's finalize and setFlag,
- * as TimBlockSrc, Tod and ModelData do.
+ * Lifecycle: the grid manager (Class866E8) is its one user.
+ * Class866E8__Class866E8 makes one per grid element, New_PlacementGrid(0),
+ * so it never loads a file itself. Class866E8__LoadElementResources points
+ * `buffer` at the element's LbdFile header block + placementsOffset, puts a
+ * LinkResource over the models that follow the placements in
+ * `linkResource`, and calls +0x078 (FileResource's processBuffer) until it
+ * returns 0, filling one GridCell from each CellPlacement.
+ * Class866E8__ResetAllElements releases the LinkResource.
  *
- * Its one user is the grid manager (Class866E8): Class866E8__Class866E8
- * makes one per grid element with New_PlacementGrid(0), so nothing is
- * loaded; Class866E8__LoadElementResources points `buffer` into an already
- * loaded resource, puts a LinkResource (gLinkResourceMethods) of the element's models
- * in `linkResource`, then calls +0x078 once per cell until it returns 0.
- *
- * +0x078 is FileResource's slot78 (NULL there): this table's occupant is
- * PlacementGrid__ResolveEntry(self, placement, cell), s32. It reads cell
- * `cell`'s PlacementGridRecord (12 bytes each, from buffer +8; cell / 20 is
- * the row, cell % 20 the column), follows `next` for a second record in
- * the same cell, fills a CellPlacement and returns the model
- * linkResource's +0x080 (LinkResource__GetModel) gives for the record's
- * model index: 0 past the last cell (400), -1 for an empty record.
- * Class866E8__LoadElementResources calls it through
- * PlacementGridResolveEntryFn, a cast of the inherited slot (no code).
+ * +0x078's occupant is PlacementGrid__ResolveEntry(self, placement, cell).
+ * With placement->next zero it reads cell `cell`'s own record (12 bytes
+ * each from buffer + 8, row-major: cell / 20 is the row, cell % 20 the
+ * column); otherwise the record at buffer + next, the cell's next one. It
+ * fills the placement at the cell's centre and returns what linkResource's
+ * getModel (+0x080, LinkResource__GetModel) gives for the record's model
+ * index: -1 for an empty record, 0 once cell reaches 400. Its caller
+ * reaches it through PlacementGridResolveEntryFn, a cast of the untyped
+ * inherited slot (no code).
  */
 
 typedef struct PlacementGrid PlacementGrid;
@@ -38,13 +41,13 @@ typedef struct PlacementGridMethods PlacementGridMethods;
 /* One record in the buffer, 12 bytes: PlacementGrid__ResolveEntry steps
  * cell * 12 + 8. */
 typedef struct PlacementGridRecord {
-    /* +0x0 */ u8 present; /* zero: the cell is empty, ResolveEntry returns -1 */
-    /* +0x1 */ u8 unk1;    /* -> CellPlacement.unk2C */
-    /* +0x2 */ u16 model;  /* the index passed to linkResource's +0x080 */
-    /* +0x4 */ u8 unk4;    /* -> CellPlacement.unk2E */
-    /* +0x5 */ u8 rotY;    /* in 0x400 steps: -> CellPlacement.rotY */
-    /* +0x6 */ s16 y;      /* in 0x800 units: -> CellPlacement.y */
-    /* +0x8 */ s32 next;   /* buffer offset of the cell's next record, 0 for none */
+    /* +0x0 */ u8 present;   /* zero: the cell is empty, ResolveEntry returns -1 */
+    /* +0x1 */ u8 unk1;      /* -> CellPlacement.unk2C */
+    /* +0x2 */ u16 model;    /* the index passed to linkResource's +0x080 */
+    /* +0x4 */ u8 cellFlags; /* -> CellPlacement.unk2E, which becomes the GridCell's flags36 */
+    /* +0x5 */ u8 rotY;      /* in 0x400 steps: -> CellPlacement.rotY */
+    /* +0x6 */ s16 y;        /* in 0x800 units: -> CellPlacement.y */
+    /* +0x8 */ s32 next;     /* buffer offset of the cell's next record, 0 for none */
 } PlacementGridRecord;
 
 /* What PlacementGrid__ResolveEntry fills in: the caller's stack record, 0x40
@@ -59,7 +62,7 @@ typedef struct CellPlacement {
     /* +0x01A */ u16 rotY; /* record rotY * 0x400 */
     /* +0x01C */ u8 pad1C[0x2C - 0x1C];
     /* +0x02C */ u16 unk2C;   /* record unk1 */
-    /* +0x02E */ u16 unk2E;   /* record unk4 */
+    /* +0x02E */ u16 unk2E;   /* record cellFlags; the caller copies it to the GridCell's flags36 */
     /* +0x030 */ s32 chained; /* 1: this record came from the previous one's `next` */
     /* +0x034 */ s32 next; /* in: the offset to follow (0 starts at the cell); out: the record's `next` */
     /* +0x038 */ s32 model; /* record model */
@@ -70,14 +73,14 @@ typedef s32 (*PlacementGridResolveEntryFn)(PlacementGrid *self, CellPlacement *p
 
 struct PlacementGridMethods {
     FILERESOURCE_SLOTS(PlacementGrid, (PlacementGrid * self, char *name));
-    /* +0x078 is FileResource's slot78; this table's occupant is
+    /* +0x078 is FileResource's processBuffer; this table's occupant is
      * PlacementGrid__ResolveEntry (PlacementGridResolveEntryFn). */
 };
 
 struct PlacementGrid {
     FILERESOURCE_FIELDS(PlacementGridMethods);
     /* +0x02C */ struct LinkResource *linkResource; /* the models' LinkResource (include/LinkResource.h); zeroed by the ctor */
-    /* +0x030 */ s32 loaded; /* set by PlacementGrid__SetFlag; zeroed by the ctor */
+    /* +0x030 */ s32 loaded; /* set by PlacementGrid__SetFlag (the driver's read-done callback); zeroed by the ctor; nothing reads it */
 }; /* 0x34 bytes: New_PlacementGrid */
 
 extern PlacementGridMethods gPlacementGridMethods;

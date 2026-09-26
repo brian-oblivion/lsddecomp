@@ -103,8 +103,7 @@ extern void *BMemPMgrAlloc(s32 size);
  * `linkResource`'s getModel (+0x080): with four arguments, because retail
  * keeps `placement` in $a3 across the call (the round-76 match). The
  * occupant reads only (self, index); a function-pointer cast, no code. */
-typedef s32 (*PlacementGridGetModelFn)(LinkResource *self, s32 model, s32 cell,
-                                    CellPlacement *placement);
+typedef s32 (*PlacementGridGetModelFn)(LinkResource *self, s32 model, s32 cell, CellPlacement *placement);
 
 PlacementGrid *New_PlacementGrid(char *name) {
     PlacementGrid *self;
@@ -162,7 +161,7 @@ s32 PlacementGrid__ResolveEntry(PlacementGrid *self, CellPlacement *placement, s
             placement->z = (row << 11) + 0x400;
             placement->rotY = rec->rotY << 10;
             placement->unk2C = rec->unk1;
-            placement->unk2E = rec->unk4;
+            placement->unk2E = rec->cellFlags;
             model = rec->model;
             placement->model = model;
             link = self->linkResource;
