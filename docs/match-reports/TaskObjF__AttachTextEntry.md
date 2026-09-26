@@ -31,7 +31,7 @@ void TaskObjF__AttachTextEntry(Class86E00_3bb8c_g *self)
 Straightforward transcription: two readiness gates (`unk68`, `unk60`), a
 lazy-init of `unk78` guarded by a null check, then three calls (one on
 `self`'s own vtable, two on `unk78`'s). The combined `&&` guard, unlike
-`TitleMenu__OnTagBValue` last round, compiled to the exact same shape as retail's
+`TitleMenu__OnCardEvent` last round, compiled to the exact same shape as retail's
 two separate `beqz`s here -- both share the identical target label, so
 there was no range-check fold at stake and the `&&` form worked first try
 for that part.

@@ -84,7 +84,7 @@ struct TitleMenuMethods {
     /* +0x130 */ void (*updateMemcardSaveWithIcon)(TitleMenu *self); /* TitleMenu__SaveToCard; tick's activeSlot 2 */
     /* +0x134 */ void (*updateMemcardSaveStatus)(TitleMenu *self); /* TitleMenu__LoadFromCard; tick's activeSlot 3 */
     /* +0x138 */ void (*onTagBValue)(TitleMenu *self, BasicClass *sender,
-                                     s32 event); /* TitleMenu__OnTagBValue; onNotify's class-0xB case */
+                                     s32 event); /* TitleMenu__OnCardEvent; onNotify's class-0xB case */
 };
 
 struct TitleMenu {
@@ -125,6 +125,6 @@ void TitleMenu__BeginCardAccess(TitleMenu *self);
 void TitleMenu__EndCardAccess(TitleMenu *self);
 void TitleMenu__SaveToCard(TitleMenu *self);
 void TitleMenu__LoadFromCard(TitleMenu *self);
-void TitleMenu__OnTagBValue(TitleMenu *self, BasicClass *sender, s32 event);
+void TitleMenu__OnCardEvent(TitleMenu *self, BasicClass *sender, s32 event);
 
 #endif

@@ -1,16 +1,18 @@
-# TitleMenu__OnTagBValue -- MATCH
+# TitleMenu__OnCardEvent -- MATCH
+
+> Renamed from `TitleMenu__OnTagBValue` on 2026-09-26 (tools/rename.py). Address 0x8004e230.
 
 > Renamed from `Class86B60__OnTagBValue` on 2026-09-26 (tools/rename.py). Address 0x8004e230.
 
 > Renamed from `func_8004E230` on 2026-09-24 (tools/rename.py). Address 0x8004e230.
 
 Unit `class_3bb8c_d`, round 14. `./build-and-verify.sh` exit 0; whole-image
-SHA1 matches retail. `funcdiff.py TitleMenu__OnTagBValue`: 40/40 words match.
+SHA1 matches retail. `funcdiff.py TitleMenu__OnCardEvent`: 40/40 words match.
 
 ## Source
 
 ```c
-void TitleMenu__OnTagBValue(TitleMenu *self, s32 arg1, s32 value)
+void TitleMenu__OnCardEvent(TitleMenu *self, s32 arg1, s32 value)
 {
     if (value < 0x18) {
         if (value >= 0x16) {
@@ -70,7 +72,7 @@ nested-`if` spelling before anything else.
 
 ## Naming (round 77, naming runner delta)
 
-Renamed `func_8004E230` -> `TitleMenu__OnTagBValue`. **Tier B**: The exclusive dispatch target of `TitleMenu__OnNotify`'s `slot138` forward (called only when `arg1`'s header nibble == 0xB), gating further work on ranges of its own `value` parameter (>= 0x16, < 0x18, == 0x16). Named for its role as the tag-0xB handler; the value ranges' meaning is not established.
+Renamed `func_8004E230` -> `TitleMenu__OnCardEvent`. **Tier B**: The exclusive dispatch target of `TitleMenu__OnNotify`'s `slot138` forward (called only when `arg1`'s header nibble == 0xB), gating further work on ranges of its own `value` parameter (>= 0x16, < 0x18, == 0x16). Named for its role as the tag-0xB handler; the value ranges' meaning is not established.
 
 ## Track 4 (2026-09-26, round 88, bravo)
 

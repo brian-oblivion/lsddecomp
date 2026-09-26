@@ -261,7 +261,7 @@ void TitleMenu__LoadFromCard(TitleMenu *self) {
                                        self->saveBlockSize);
 }
 
-void TitleMenu__OnTagBValue(TitleMenu *self, BasicClass *sender, s32 event) {
+void TitleMenu__OnCardEvent(TitleMenu *self, BasicClass *sender, s32 event) {
     if (event < 0x18) {
         if (event >= 0x16) {
             self->methods->endMemcardSave(self);

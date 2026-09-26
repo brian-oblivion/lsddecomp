@@ -69,7 +69,7 @@ Renamed `TitleMenu__ForwardIfTagB` -> `TitleMenu__OnNotify` (tools/rename.py):
 it is the occupant of gTitleMenuMethods +0x038, BasicClass's `onNotify` slot,
 and its body is an onNotify override -- the base onNotify
 (IntermediateBase__OnNotify, through Get_vtable_TaskCore()), then this class's
-own +0x138 (`onTagBValue`, TitleMenu__OnTagBValue) with the same
+own +0x138 (`onTagBValue`, TitleMenu__OnCardEvent) with the same
 (sender, event) when the SENDER's class-id low nibble is 0xB. Its parameters
 are now onNotify's: `BasicClass *sender` (the `GenericHeaderObj_3bb8c_d`
 view is gone; BasicClassMethods::header is the same full `s32` word, `lw`
