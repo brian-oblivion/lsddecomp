@@ -63,14 +63,14 @@ reached indirectly by `New_Class86F88`
 ## Class identity (ROUND 75 correction -- read this before the rest of the file)
 
 This unit's local type for `self` was originally named `Class86ED0` and
-described as having vtable `gObj86ED0Methods`. Both were wrong, and the error
+described as having vtable `gTextEntryMethods`. Both were wrong, and the error
 predates this round: `include/class_3bb8c.h`'s own round-15 HEAD NOTEs
-(search "gObj86ED0Methods and gClass86F88Methods") already documented it and deferred
+(search "gTextEntryMethods and gClass86F88Methods") already documented it and deferred
 the fix. Settled by address, not by guess:
 
-- `func_80051A4C` (this unit, now named `Get_vtable_Obj86ED0`) returns
-  `&gObj86ED0Methods` directly -- but `gObj86ED0Methods` is `Obj86ED0`'s OWN table
-  (42 slots, `tools/classtable.py gObj86ED0Methods`), a DIFFERENT class
+- `func_80051A4C` (this unit, now named `GetTextEntryMethods`) returns
+  `&gTextEntryMethods` directly -- but `gTextEntryMethods` is `Obj86ED0`'s OWN table
+  (42 slots, `tools/classtable.py gTextEntryMethods`), a DIFFERENT class
   established independently by class_3bb8c_i. It has NOTHING to do with
   this constructor's class.
 - This class's REAL table is `gClass86F88Methods`, reached through
@@ -95,7 +95,7 @@ Nothing about the matched BYTES was ever affected by any of this (a type
 name is not codegen) -- `build-and-verify.sh` and `tools/check-nonmatching.sh`
 stayed green throughout. Only the class attribution and `self`'s type
 name were wrong. See `src/class_3bb8c_j.c`'s file header comment for the
-short version, and `Get_vtable_Obj86ED0.md` for the getter-side half of
+short version, and `GetTextEntryMethods.md` for the getter-side half of
 this same correction.
 
 ## Semantics (established with reasonable confidence from the disassembly)
@@ -239,7 +239,7 @@ nowhere close. This function's search space (7 local values needing a
 specific register rotation across ~30 live instructions) appears to be
 beyond what an unguided permuter search closes quickly, unlike the
 smaller single-residue functions in this same unit
-(`Obj86ED0__ResetAllAndFinish`, `Class86F88__AddChildAndSetState`) where 14-5000 iterations sufficed.
+(`TextEntry__ResetAllChars`, `Class86F88__AddChildAndSetState`) where 14-5000 iterations sufficed.
 
 **Not re-staffed without a plan beyond "try more permuter time" or "try
 every p/q aliasing permutation by hand."** A structured next step: derive
@@ -258,7 +258,7 @@ A function whose funcdiff residue is "correct total length, wrong
 registers throughout, cascading from partway through the body" is
 categorically different from an entangled multi-defect residue
 (Entity__MoodCue26's class) or a genuine one-instruction residue
-(Obj86ED0__ResetAllAndFinish's class) -- it is the project's established "register
+(TextEntry__ResetAllChars's class) -- it is the project's established "register
 saturation" pattern (`TaskCore__RefreshSlotView`) but WITHOUT retail saturating all
 9 callee-saved registers (retail here uses only 7 of 9: s0-s6), so the
 `grep -oE 'sw +\$s[0-9]'` == 8/9 predictor does not catch it. Consider

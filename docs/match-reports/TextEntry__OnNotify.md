@@ -1,4 +1,6 @@
-# Obj86ED0__Notify -- MATCHED (44/44 words)
+# TextEntry__OnNotify -- MATCHED (44/44 words)
+
+> Renamed from `Obj86ED0__Notify` on 2026-09-26 (tools/rename.py). Address 0x80050e78.
 
 > Renamed from `func_80050E78` on 2026-09-24 (tools/rename.py). Address 0x80050e78.
 
@@ -6,15 +8,15 @@ Unit `class_3bb8c_i`, carved round 14.
 
 `Obj86ED0`'s slot38 override (vtable slot 0x038, the last slot BasicClass
 itself defines). Dispatches the BASE class's own `slot38` first, then reads
-the tag word off `arg1` exactly like `Obj86ED0__AddChild`/`Obj86ED0__RemoveChild`, and
+the tag word off `arg1` exactly like `TextEntry__AddChild`/`TextEntry__RemoveChild`, and
 routes to one of this class's OWN two extra slots (`slot58`/`slot5C`,
 0x058/0x05C) via `self->methods` this time (not the base table) --
-`slot5C` is itself `Obj86ED0__HandleCommand`, STALLED in this same unit (addiu-$at /
+`slot5C` is itself `TextEntry__HandleCommand`, STALLED in this same unit (addiu-$at /
 jump-table blocker, see its own report), so its type only needed naming,
 not a body.
 
 ```c
-void Obj86ED0__Notify(Obj86ED0 *self, void *arg1, s32 arg2)
+void TextEntry__OnNotify(Obj86ED0 *self, void *arg1, s32 arg2)
 {
     s32 tag;
     s32 mask;
@@ -59,4 +61,10 @@ its own disassembly, not by analogy); this one was not.
 
 ## Naming
 
-- `Obj86ED0__Notify` -- tier A. gObj86ED0Methods +0x038 (classtable.py), overrides BasicClass's slot38 (the last BasicClass-defined slot): dispatches the base slot38, then tag-routes to handleCommand/tickState. Named to match the already-matched sibling TaskObjF__Notify (src/class_3bb8c_f.c), which reads the identical tag the identical way.
+- `TextEntry__OnNotify` -- tier A. gTextEntryMethods +0x038 (classtable.py), overrides BasicClass's slot38 (the last BasicClass-defined slot): dispatches the base slot38, then tag-routes to handleCommand/tickState. Named to match the already-matched sibling TaskObjF__Notify (src/class_3bb8c_f.c), which reads the identical tag the identical way.
+
+## Track 4 (2026-09-26, round 87)
+
+Class unified as `TextEntry` (include/TextEntry.h; table gObj86ED0Methods -> gTextEntryMethods, type Obj86ED0 -> TextEntry). The class name is for what its methods do: setText keeps a caller's string buffer and a working copy, the cursor and char methods edit the copy, command 25 writes it back, 23 closes without writing (banner of include/TextEntry.h). Fields renamed from their accessors: unk14 charCount, unk1C charIndex, unk20 altCommands, nameLen textLen, nameBuf textBuf, unk28 editBuf, unk40 cursorSprite (CharSprite *), unk44 textRow, unk48 panelSprite (ScreenSprite *). Zero bytes changed.
+
+Renamed from Obj86ED0__Notify for its slot, BasicClass's onNotify (+0x038). It calls the base onNotify, then handleCommand (sender low nibble 2) or tickState (5) with (sender, event); the bytes pass $a1/$a2 to both, which is why the tickState slot keeps those parameters though its occupant reads only self.

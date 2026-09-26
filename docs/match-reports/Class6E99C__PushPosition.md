@@ -374,7 +374,7 @@ neither side of which changes it) to coerce a register copy, not a
 change any idiomatic C would produce. Manually tried the SAME trick by
 hand, directly on `a1` (`if (self) { src = a1; } else { src = a1; }`,
 `src` used in place of `a1` for both dereferences): **no change, still
-210** -- unlike `Obj86ED0__ResetAllAndFinish`'s own use of this exact idiom elsewhere
+210** -- unlike `TextEntry__ResetAllChars`'s own use of this exact idiom elsewhere
 in the project, it does not reproduce the missing move here. Given (a)
 an explicit named local copy-propagates away, (b) the branch-based
 forcing trick that worked on a DIFFERENT function does not work here,

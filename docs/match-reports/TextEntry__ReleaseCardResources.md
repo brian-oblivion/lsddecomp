@@ -1,4 +1,6 @@
-# Obj86ED0__ReleaseCardResources -- MATCHED (35/35 words)
+# TextEntry__ReleaseCardResources -- MATCHED (35/35 words)
+
+> Renamed from `Obj86ED0__ReleaseCardResources` on 2026-09-26 (tools/rename.py). Address 0x80051174.
 
 > Renamed from `func_80051174` on 2026-09-24 (tools/rename.py). Address 0x80051174.
 
@@ -12,7 +14,7 @@ matching retail's asymmetric store pattern exactly (`sw v0,0x48(s0)` after
 the first `release` call, no corresponding store after the other two).
 
 ```c
-void Obj86ED0__ReleaseCardResources(Obj86ED0 *self)
+void TextEntry__ReleaseCardResources(Obj86ED0 *self)
 {
     if (self->unk48 != NULL) {
         self->unk48 = self->unk48->methods->release(self->unk48);
@@ -36,4 +38,8 @@ dispatched on an opaque child pointer.
 
 ## Naming
 
-- `Obj86ED0__ReleaseCardResources` -- tier A. gObj86ED0Methods +0x048 (releaseCardResources slot, classtable.py). Symmetric teardown of Obj86ED0__LoadCardResources -- releases unk48/unk44/unk40.
+- `TextEntry__ReleaseCardResources` -- tier A. gTextEntryMethods +0x048 (releaseCardResources slot, classtable.py). Symmetric teardown of TextEntry__LoadCardResources -- releases unk48/unk44/unk40.
+
+## Track 4 (2026-09-26, round 87)
+
+Class unified as `TextEntry` (include/TextEntry.h; table gObj86ED0Methods -> gTextEntryMethods, type Obj86ED0 -> TextEntry). The class name is for what its methods do: setText keeps a caller's string buffer and a working copy, the cursor and char methods edit the copy, command 25 writes it back, 23 closes without writing (banner of include/TextEntry.h). Fields renamed from their accessors: unk14 charCount, unk1C charIndex, unk20 altCommands, nameLen textLen, nameBuf textBuf, unk28 editBuf, unk40 cursorSprite (CharSprite *), unk44 textRow, unk48 panelSprite (ScreenSprite *). Zero bytes changed.

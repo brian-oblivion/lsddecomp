@@ -254,7 +254,7 @@ which is exactly the three-way rotation on file. Split into two, each
 handle has a short, dense live range, outranks the addresses, and takes `$s0`
 in turn, as retail does.
 
-The template was the MATCHED sibling `Obj86ED0__LoadCardResources` in
+The template was the MATCHED sibling `TextEntry__LoadCardResources` in
 `src/class_3bb8c_i.c`: the same "CARD\\<name>.TIM" resource loader, with
 `char path[0x20]`, `dir`/`ext` locals and `handle1`/`handle2`. Screen for the
 next case: a cross-unit sibling with the same call skeleton (here

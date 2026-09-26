@@ -308,7 +308,7 @@ typedef struct Obj866E8Methods {
      * leading raw halfword differs from what was there before. */
     void (*slot30)(Obj866E8 *self, s32 arg1);  /* +0x030 */
     u8 pad034[0x60 - 0x34];
-    /* Called by round 45's Obj86ED0__DispatchIndexValue/Obj86ED0__DispatchLookupValue as
+    /* Called by round 45's TextEntry__SetCursorPos/TextEntry__SetCharAt as
      * `self->methods->slot60(self, 0)`, tail of the countdown/flush
      * "record + notify" path, when their own trailing flag argument is
      * set. Return unused. */
@@ -319,16 +319,16 @@ typedef struct Obj866E8Methods {
     void (*slot88)(Obj866E8 *self, s32 arg1, Elem *entry, s32 arg3); /* +0x088 */
     u8 pad08C[0xA4 - 0x8C];
     /* = the "flush all" finalizer, class_3bb8c_j round 15: called once by
-     * Obj86ED0__ResetAllAndFinish right after its countdown-flush loop, with (self,
+     * TextEntry__ResetAllChars right after its countdown-flush loop, with (self,
      * self->unk18, literal 1). Return unused. */
-    void (*slotA4)(Obj866E8 *self, s32 arg1, s32 arg2);   /* +0x0A4, Obj86ED0__ResetAllAndFinish */
+    void (*slotA4)(Obj866E8 *self, s32 arg1, s32 arg2);   /* +0x0A4, TextEntry__ResetAllChars */
     /* = the countdown/flush callback, class_3bb8c_j round 15: called by
-     * Obj86ED0__AdvanceCountdown (self, self->unk18, decremented countdown, literal 1),
-     * Obj86ED0__ResetCountdown (self, self->unk18, literal 0, literal 1) and
-     * Obj86ED0__ResetAllAndFinish's own loop (self, loop index, self->unk1C, literal 0).
+     * TextEntry__PrevChar (self, self->unk18, decremented countdown, literal 1),
+     * TextEntry__ResetChar (self, self->unk18, literal 0, literal 1) and
+     * TextEntry__ResetAllChars's own loop (self, loop index, self->unk1C, literal 0).
      * Argument MEANING differs per call site (index vs. self->unk18) but
      * all three pass exactly 3 args beyond self; return unused. */
-    void (*slotA8)(Obj866E8 *self, s32 arg1, s32 arg2, s32 arg3); /* +0x0A8, Obj86ED0__AdvanceCountdown/Obj86ED0__ResetCountdown/Obj86ED0__ResetAllAndFinish */
+    void (*slotA8)(Obj866E8 *self, s32 arg1, s32 arg2, s32 arg3); /* +0x0A8, TextEntry__PrevChar/TextEntry__ResetChar/TextEntry__ResetAllChars */
     u8 pad0AC[0xC0 - 0xAC];
     /* Called by Class866E8__Disable right before it clears self->enabled. */
     void (*slotC0)(Obj866E8 *self);            /* +0x0C0 */
@@ -718,34 +718,34 @@ struct Obj866E8 {
     s32 unkC;                      /* +0x00C, CheckObj866E8CountFlag (compared against 9999999) */
     /*
      * +0x010..+0x048: a "countdown/flush" subsystem, established by
-     * class_3bb8c_j (round 15) from four functions (Obj86ED0__AdvanceCountdown,
-     * Obj86ED0__ToggleFlag20, Obj86ED0__ResetCountdown, Obj86ED0__ResetAllAndFinish) plus two gp_rel-blocked
-     * siblings in the same unit (Obj86ED0__DispatchIndexValue, Obj86ED0__DispatchLookupValue, both confirmed
+     * class_3bb8c_j (round 15) from four functions (TextEntry__PrevChar,
+     * TextEntry__ToggleAltCommands, TextEntry__ResetChar, TextEntry__ResetAllChars) plus two gp_rel-blocked
+     * siblings in the same unit (TextEntry__SetCursorPos, TextEntry__SetCharAt, both confirmed
      * to touch the SAME unk48/unk18/unk1C fields -- see those functions'
      * stub reports). unk10 is a trip count read once per "flush all" call
-     * (Obj86ED0__ResetAllAndFinish); unk14 is the countdown's own reset value; unk18 is
+     * (TextEntry__ResetAllChars); unk14 is the countdown's own reset value; unk18 is
      * forwarded as methods->slotA8/slotA4's own arg1; unk1C is the live
      * countdown, decremented per call and reset from unk14 on expiry; unk20
-     * is an unrelated boolean toggled independently by Obj86ED0__ToggleFlag20; unk48
+     * is an unrelated boolean toggled independently by TextEntry__ToggleAltCommands; unk48
      * is a readiness/enable gate every function in the group tests non-zero
      * before doing anything, never itself dereferenced in this unit.
      */
-    s32 unk10;                     /* +0x010, Obj86ED0__ResetAllAndFinish */
-    s32 unk14;                     /* +0x014, Obj86ED0__AdvanceCountdown */
-    s32 unk18;                     /* +0x018, Obj86ED0__AdvanceCountdown/Obj86ED0__ResetCountdown/Obj86ED0__ResetAllAndFinish */
-    s32 unk1C;                     /* +0x01C, Obj86ED0__AdvanceCountdown/Obj86ED0__ResetCountdown/Obj86ED0__ResetAllAndFinish */
-    s32 unk20;                     /* +0x020, Obj86ED0__ToggleFlag20 (xor-toggled) */
+    s32 unk10;                     /* +0x010, TextEntry__ResetAllChars */
+    s32 unk14;                     /* +0x014, TextEntry__PrevChar */
+    s32 unk18;                     /* +0x018, TextEntry__PrevChar/TextEntry__ResetChar/TextEntry__ResetAllChars */
+    s32 unk1C;                     /* +0x01C, TextEntry__PrevChar/TextEntry__ResetChar/TextEntry__ResetAllChars */
+    s32 unk20;                     /* +0x020, TextEntry__ToggleAltCommands (xor-toggled) */
     u8 pad24[0x28 - 0x24];
-    u8 *unk28;                     /* +0x028, round 45's Obj86ED0__DispatchLookupValue: a per-index byte buffer, `unk28[arg1] = table[idx]` */
+    u8 *unk28;                     /* +0x028, round 45's TextEntry__SetCharAt: a per-index byte buffer, `unk28[arg1] = table[idx]` */
     u8 pad2C[0x40 - 0x2C];
-    /* +0x040/+0x044, round 45's Obj86ED0__DispatchIndexValue/Obj86ED0__DispatchLookupValue: opaque
+    /* +0x040/+0x044, round 45's TextEntry__SetCursorPos/TextEntry__SetCharAt: opaque
      * resource-handle objects, dispatched only through this unit's own
      * local method-table views (Unk40Obj866E8Methods/Unk44Obj866E8Methods
      * in class_3bb8c_j.c) -- kept `void *` here since nothing outside that
      * unit touches them yet. */
     void *unk40;                   /* +0x040 */
     void *unk44;                   /* +0x044 */
-    s32 unk48;                     /* +0x048, Obj86ED0__AdvanceCountdown/Obj86ED0__ToggleFlag20/Obj86ED0__ResetCountdown/Obj86ED0__ResetAllAndFinish */
+    s32 unk48;                     /* +0x048, TextEntry__PrevChar/TextEntry__ToggleAltCommands/TextEntry__ResetChar/TextEntry__ResetAllChars */
     u8 pad4C[0x54 - 0x4C];
     Unk54Struct unk54;             /* +0x054, Class866E8__ComputeCellOffsets (address taken, forwarded opaquely) */
     /* +0x060/+0x064, Class866E8__ComputeRateEntry (this round): a callback invoked as
@@ -1769,7 +1769,7 @@ struct Class86E00_3bb8c_g {
      * right after attaching `childA`/`childB`, and consumed (guarding a
      * teardown callback) by TaskObjF__DetachChildA/TaskObjF__DetachChildB. */
     s32 childAttached;
-    Class86E00SubObj_3bb8c_g *childA; /* +0x078, TaskObjF__AttachChildA/TaskObjF__DetachChildA */
+    struct TextEntry *childA;         /* +0x078, TaskObjF__AttachChildA/TaskObjF__DetachChildA: New_TextEntry (include/TextEntry.h) */
     Class86E00SubObj_3bb8c_g *childB; /* +0x07C, TaskObjF__AttachChildB/TaskObjF__DetachChildB */
     void *selectedItem; /* +0x080, TaskObjF__OnItemSelected: set from `arg1->methods->slot9C(arg1)`'s return */
 };
@@ -1779,22 +1779,15 @@ struct Class86E00_3bb8c_g {
  * value stored into `self->childB`. Not this round's function here -- it
  * is class_3bb8c_j's New_Class86F88 (matched round 15,
  * src/class_3bb8c_j.c; ROUND 75: its class is gClass86F88Methods/Class86F88_3bb8c_j,
- * not gObj86ED0Methods -- see that unit's file header comment):
+ * not gTextEntryMethods -- see that unit's file header comment):
  * `BMemPMgrAlloc(0x54)` then, on success, its own ctor-table getter's
  * `+0x008` slot called `(self, arg0, arg1)`. This call site's own
  * evidence (arg1 a literal `1`) is what fixed the 2nd parameter as `s32`
  * rather than a pointer. */
 extern void *New_Class86F88(void *arg0, s32 arg1);
 
-/* Not this round's function (lives outside this unit's slice) --
- * TaskObjF__AttachChildA's own external helper, called with `((self->unk48 << 1)
- * + self->unk44, 1)`; return value stored into `self->childA`. The 2nd
- * argument (a literal `1`) is materialized EARLY, in the delay slot of
- * the guard testing `self->childA == NULL` several instructions before
- * this call -- nothing overwrites `$a1` in between, which is what
- * reveals it as a real 2nd argument rather than a scheduling artifact
- * (see TaskObjF__AttachChildA's report). */
-extern void *New_Obj86ED0(s32 arg0, s32 arg1);
+/* New_TextEntry (TaskObjF__AttachChildA's childA) is declared in
+ * include/TextEntry.h. */
 
 /*
  * class_3bb8c_f: a SEPARATE class from Obj866E8 above -- no evidence unifies
@@ -2460,99 +2453,49 @@ extern void TickDreamAuxSlots2(void);
 extern void StyleTeardown(void);
 
 
-/* -------------------------------------------------------------------
- * HEAD NOTE, round 15 merge: `Obj86ED0` below and `Class86ED0` in
- * src/class_3bb8c_j.c are TWO NAMES for the table at gObj86ED0Methods, given
- * independently by runners alpha and bravo in the same round. Unify
- * deliberately, not inside a merge.
- *
- * Read alongside that, one of the two summaries was wrong and the binary
- * settles it. bravo reported this class as "alloc size 0x54, vtable
- * gObj86ED0Methods"; alpha reported 0x4C. Measured:
- *
- *   New_Obj86ED0  li a0,0x4c -> BMemPMgrAlloc, then ctors through
- *                  Get_vtable_Obj86ED0(), which returns &gObj86ED0Methods.
- *   New_Class86F88  allocates 0x54 and ctors through GetClass86F88Methods(),
- *                  a DIFFERENT table getter living in class_3bb8c_k.
- *
- * So gObj86ED0Methods's class is 0x4C bytes (alpha is right), and bravo's
- * 0x54-byte New_X belongs to a different class whose table it had not yet
- * identified -- it typed that object `Class86ED0` after the getter it did
- * recognise. Neither unit's BYTES are affected; both are byte-exact, and
- * a type name is not codegen. What was at risk was the next reader
- * inheriting "gObj86ED0Methods == 0x54 bytes" as fact.
- * ------------------------------------------------------------------- */
 /*
- * Obj86ED0 -- BasicClass-derived class, vtable gObj86ED0Methods (resolved with
- * `tools/classtable.py gObj86ED0Methods`, 42 slots; the ONLY class this unit
- * (class_3bb8c_i) itself defines methods for). Get_vtable_Obj86ED0 (this class's
- * own table getter, `class_3bb8c_j`, still INCLUDE_ASM) returns
- * `&gObj86ED0Methods`; New_Obj86ED0 is the `New_X`-shaped factory that
- * allocates the 0x4C-byte instance and dispatches its ctor (slot 0x008).
- * Slots 0x004-0x038 line up one-for-one with BasicClass's own 14-slot
- * layout (include/code_8220.h's BasicClassMethods) -- `classtable.py --vs
- * D_8006B58C` confirms release/getNextChild/addParentRef/removeParentRef/
- * clearParentRefs/getNextParentRef/notifyParents/slot34 are UNMODIFIED
- * BasicClass pointers, while ctor/finalize/addChild/removeChild/
- * removeAllChildren/slot38 are all overridden by this unit's own
- * functions. Only the slots this unit's own functions dispatch through
- * SELF (`self->methods->slotN`, as opposed to the explicit
- * `Get_vtable_BasicClass()->slotN` base-table calls, which go through
- * include/BasicClass.h's BasicClassMethods) are named below; the rest stays opaque
- * padding, same policy as `Obj866E8Methods` elsewhere in this header.
+ * TextEntry (gTextEntryMethods, class_3bb8c_i/j) is declared in
+ * include/TextEntry.h (FINISHING-PLAN track 4, round 87). What stays here are
+ * two helper views of objects it HOLDS, which are not its class: the
+ * resources `cursorSprite`/`textRow`/`panelSprite` and the TIM handles
+ * (ChildObj86ED0), and `target` (TargetObj86ED0). The names are kept.
  */
-typedef struct Obj86ED0 Obj86ED0;
-typedef struct Obj86ED0Methods Obj86ED0Methods;
-
-/* Generic BasicClass-family child object -- only `release` (+0x004,
- * matching BasicClassMethods's own layout) is dispatched on one of
- * these from this unit (Obj86ED0__ReleaseCardResources, on self->unk40/unk44/unk48).
- * Kept minimal/opaque beyond that, same policy as
- * `Class86E00SubObj_3bb8c_g` elsewhere in this header. */
+/* TextEntry's `textRow` (an Obj6EAC0, New_Obj6EAC0) and the two TIM handles
+ * TextEntry__LoadCardResources and TaskObjF__LoadCardIcon load through
+ * func_8003B39C: a view of the slots those calls use, not one class. */
 typedef struct ChildObj86ED0 ChildObj86ED0;
 typedef struct ChildMethods86ED0 ChildMethods86ED0;
 struct ChildMethods86ED0 {
     u8 pad000[0x004];
-    void *(*release)(ChildObj86ED0 *self); /* +0x004, Obj86ED0__ReleaseCardResources */
+    void *(*release)(ChildObj86ED0 *self); /* +0x004, TextEntry__ReleaseCardResources, TextEntry__LoadCardResources (handles) */
     u8 pad008[0x04C - 0x008];
-    /* +0x04C, Obj86ED0__LoadCardResources (three call sites, always through self->unk40/
-     * unk44/unk48). Same offset/arity as the unrelated FieldM7CMethods::
-     * slot4C above -- not unified with it, per this project's established
-     * multiple-independent-local-views convention (this unit's own reading
-     * from its own call sites). arg1 is Obj86ED0__LoadCardResources's own forwarded
-     * parameter; arg2 is a small opaque data blob passed only by address. */
+    /* +0x04C, textRow: (parent, &D_8008AAD4), the attachToParent shape
+     * ScreenSprite's slot has (include/ScreenSprite.h). */
     void (*slot4C)(ChildObj86ED0 *self, void *arg1, void *arg2);
     u8 pad050[0x078 - 0x050];
-    void (*slot78)(ChildObj86ED0 *self); /* +0x078, Obj86ED0__LoadCardResources, on the short-lived handle before New_ScreenSprite/New_Obj6EAC0 consume it */
+    void (*slot78)(ChildObj86ED0 *self); /* +0x078, TextEntry__LoadCardResources, on each handle before the sprites consume it */
     u8 pad07C[0x0B8 - 0x07C];
-    void (*slotB8)(ChildObj86ED0 *self, void *arg1); /* +0x0B8, Obj86ED0__LoadCardResources, self->unk44 only */
-    /* +0x0BC/+0x0C4, added round 75 (class_3bb8c_j, track 3 naming):
-     * Obj86ED0__DispatchIndexValue/Obj86ED0__DispatchLookupValue dispatch through self->unk40/unk44 (both
-     * already typed ChildObj86ED0* above, established by this same unit's
-     * own field comments). A round-45 comment in class_3bb8c_j had read
-     * these as a locally-typed, unrelated object instead -- additive fix,
-     * no existing offset moved. */
-    void (*slotBC)(ChildObj86ED0 *self, void *arg1); /* +0x0BC, Obj86ED0__DispatchIndexValue, self->unk40 */
-    u8 pad0C0[0x0C4 - 0x0C0];
-    void (*slotC4)(ChildObj86ED0 *self, s32 arg1, s32 arg2); /* +0x0C4, Obj86ED0__DispatchLookupValue, self->unk44 */
+    void (*slotB8)(ChildObj86ED0 *self, void *arg1); /* +0x0B8, TextEntry__LoadCardResources, textRow */
+    u8 pad0BC[0x0C4 - 0x0BC];
+    void (*slotC4)(ChildObj86ED0 *self, s32 arg1, s32 arg2); /* +0x0C4, TextEntry__SetCharAt, textRow: (char, pos); Obj6EAC0__SetChildChar */
 };
 struct ChildObj86ED0 {
     ChildMethods86ED0 *methods; /* +0x000 */
 };
 
-/* self->unk3C's pointee -- an unrelated class (own vtable, unconnected to
- * gObj86ED0Methods), reached only through its own +0x080 slot by Obj86ED0__NotifyTarget.
+/* TextEntry's `target` (+0x03C) -- an unrelated class (own vtable, unconnected to
+ * gTextEntryMethods; TaskObjF passes its childC), reached only through its own +0x080 slot by TextEntry__NotifyTarget.
  * Field meaning beyond that slot is unestablished. */
 typedef struct TargetObj86ED0 TargetObj86ED0;
 typedef struct TargetMethods86ED0 TargetMethods86ED0;
 struct TargetMethods86ED0 {
     u8 pad000[0x080];
-    /* +0x080, Obj86ED0__NotifyTarget: `self->methods->slot80(self, arg1, 0x60, 0x60)`.
+    /* +0x080, TextEntry__NotifyTarget: `self->methods->slot80(self, arg1, 0x60, 0x60)`.
      * 3 args, not 2 -- confirmed against this project's established
      * self->methods->slot80(self, arg1, 0x60, 0x60) idiom seen at several
      * other call sites (src/class_3bb8c_k.c, src/code_2cc8c.c,
      * src/class_3bb8c_g.c, src/code_55dd4.c), all forwarding a caller-
-     * supplied arg1 alongside a repeated literal. Obj86ED0__NotifyTarget itself
+     * supplied arg1 alongside a repeated literal. TextEntry__NotifyTarget itself
      * takes that arg1 as its own second parameter and forwards it
      * unchanged (same register, no move instruction). */
     void (*slot80)(TargetObj86ED0 *self, s32 arg1, s32 arg2, s32 arg3);
@@ -2560,142 +2503,6 @@ struct TargetMethods86ED0 {
 struct TargetObj86ED0 {
     TargetMethods86ED0 *methods; /* +0x000 */
 };
-
-struct Obj86ED0Methods {
-    u8 pad000[0x008];
-    /* +0x008, New_Obj86ED0's own dispatch target -- this class's own
-     * ctor, OVERRIDING BasicClass's no-arg ctor with a 2-arg one.
-     * Obj86ED0__Obj86ED0 itself, MATCHED round 45; the signature below is
-     * the vtable slot's own type (self, arg1, arg2), matching how
-     * New_Obj86ED0 calls it -- Obj86ED0__Obj86ED0's own DEFINITION is typed
-     * more precisely (`char *arg1`, since it calls `strlen` on it), which
-     * is fine: a data-table vtable slot's declared field type need not
-     * match the defining function's own prototype exactly. */
-    void (*ctor)(Obj86ED0 *self, s32 arg1, s32 arg2);
-    u8 pad00C[0x010 - 0x00C];
-    /* +0x010, CORRECTED round 77 (track 3 naming) -- `tools/classtable.py
-     * gObj86ED0Methods` proves the slot's own IMPLEMENTATION is
-     * `Obj86ED0__AddChild` (OVERRIDES BasicClass's addChild). The previous
-     * comment named the CALLER (`Obj86ED0__AttachTarget`, which reaches this
-     * slot through `self->methods->addChild`) as if it were the
-     * implementation -- backwards. Comment-only fix, zero bytes changed. */
-    void (*addChild)(Obj86ED0 *self, void *child);    /* +0x010, Obj86ED0__AddChild; called via self->methods by Obj86ED0__AttachTarget */
-    /* +0x014, same correction: implementation is `Obj86ED0__RemoveChild`,
-     * called via `self->methods->removeChild` by `Obj86ED0__DetachTarget`
-     * and `Obj86ED0__SetState`. */
-    void (*removeChild)(Obj86ED0 *self, void *child);  /* +0x014, Obj86ED0__RemoveChild; called via self->methods by Obj86ED0__DetachTarget/Obj86ED0__SetState */
-    u8 pad018[0x030 - 0x018];
-    /* +0x030, Obj86ED0__SetState's own dispatch -- UNMODIFIED BasicClass
-     * notifyParents (BasicClass__NotifyParents, code_8220_b), reached through
-     * self's own table this one time instead of `Get_vtable_BasicClass()`. */
-    void (*notifyParents)(Obj86ED0 *self, s32 arg1);
-    u8 pad034[0x040 - 0x034];
-    /* +0x040, RENAMED round 77 (was slot40) -- implementation is
-     * `Obj86ED0__SetName` (classtable-confirmed), Obj86ED0__Obj86ED0's own
-     * tail dispatch `self->methods->setName(self, arg1, arg2)`, forwarding
-     * the ctor's own two arguments unchanged. Referenced only from this
-     * unit's own functions -- safe to name in the shared struct. */
-    void (*setName)(Obj86ED0 *self, s32 arg1, s32 arg2); /* +0x040, Obj86ED0__SetName; dispatched by Obj86ED0__Obj86ED0 */
-    u8 pad044[0x048 - 0x044];
-    /* +0x048, RENAMED round 77 (was slot48) -- implementation is
-     * `Obj86ED0__ReleaseCardResources`, dispatched by Obj86ED0__SetState's
-     * case 2/3. Unit-exclusive reference. */
-    void (*releaseCardResources)(Obj86ED0 *self);         /* +0x048, Obj86ED0__ReleaseCardResources; dispatched by Obj86ED0__SetState */
-    u8 pad04C[0x054 - 0x04C];
-    /* +0x054, RENAMED round 77 (was slot54) -- implementation is
-     * `Obj86ED0__SetState`, dispatched by Obj86ED0__TickState (arg1==4) and
-     * Obj86ED0__HandleCommand (arg1==2/3). Unit-exclusive reference. */
-    void (*setState)(Obj86ED0 *self, s32 arg1);             /* +0x054, Obj86ED0__SetState; dispatched by Obj86ED0__TickState/Obj86ED0__HandleCommand */
-    /* +0x058, RENAMED round 77 (was slot58) -- implementation is
-     * `Obj86ED0__TickState`, dispatched by Obj86ED0__Notify's tag==5 case.
-     * Unit-exclusive reference. */
-    void (*tickState)(Obj86ED0 *self, void *arg1, s32 arg2);  /* +0x058, Obj86ED0__TickState; dispatched by Obj86ED0__Notify (tag==5) */
-    /* +0x05C, RENAMED round 77 (was slot5C) -- implementation is
-     * `Obj86ED0__HandleCommand`, dispatched by Obj86ED0__Notify's tag==2
-     * case. Unit-exclusive reference. */
-    void (*handleCommand)(Obj86ED0 *self, void *arg1, s32 arg2);   /* +0x05C, Obj86ED0__HandleCommand; dispatched by Obj86ED0__Notify (tag==2) */
-    /* +0x060, Obj86ED0__HandleCommand's own `arg2 == 25`/`23` cases AND
-     * class_3bb8c_j's Obj86ED0__DispatchIndexValue/Obj86ED0__DispatchLookupValue
-     * (`arg2`/`arg3` nonzero) -- referenced by TWO units, left as `slot60`
-     * (PROPOSED name in the match report/broadcast, not applied here). */
-    void (*slot60)(Obj86ED0 *self, s32 arg1);            /* +0x060 */
-    u8 pad064[0x088 - 0x064];
-    /* +0x088..+0x0A0, RENAMED round 77 (track 3 naming) -- `classtable.py
-     * gObj86ED0Methods` resolves these seven slots to their REAL
-     * implementations for the first time (the previous comment described
-     * only the dispatch shape, not the callees): `arg2 == 21`/`5` ->
-     * Obj86ED0__MoveCursorRight, `20`/`4` -> Obj86ED0__MoveCursorLeft,
-     * `18`/`2` -> Obj86ED0__AdvanceCharSelect (all three this unit's own,
-     * already named above), `19`/`3` -> Obj86ED0__AdvanceCountdown, `28` ->
-     * Obj86ED0__ToggleFlag20, `31` -> Obj86ED0__ResetCountdown, `32` ->
-     * Obj86ED0__ResetAllAndFinish (these four class_3bb8c_j's own, named
-     * round 15/75). All are referenced ONLY from Obj86ED0__HandleCommand's
-     * switch in this unit -- unit-exclusive, safe to name here even though
-     * four of the seven implementations live in class_3bb8c_j. The two
-     * cases per slot gate on `self->unk20` with OPPOSITE polarity, same
-     * idiom as Class866E8__ComputeRateEntry's mask test. All seven share the identical
-     * `(Obj86ED0 *self)` shape, confirmed directly off the call site
-     * (`jalr $v0; addu $a0,$s0,$zero`, no other register set). */
-    void (*moveCursorRight)(Obj86ED0 *self);              /* +0x088, Obj86ED0__MoveCursorRight (this unit) */
-    void (*moveCursorLeft)(Obj86ED0 *self);                /* +0x08C, Obj86ED0__MoveCursorLeft (this unit) */
-    void (*advanceCharSelect)(Obj86ED0 *self);              /* +0x090, Obj86ED0__AdvanceCharSelect (this unit) */
-    void (*advanceCountdown)(Obj86ED0 *self);                /* +0x094, Obj86ED0__AdvanceCountdown (class_3bb8c_j) */
-    void (*toggleFlag20)(Obj86ED0 *self);                      /* +0x098, Obj86ED0__ToggleFlag20 (class_3bb8c_j) */
-    void (*resetCountdown)(Obj86ED0 *self);                      /* +0x09C, Obj86ED0__ResetCountdown (class_3bb8c_j) */
-    void (*resetAllAndFinish)(Obj86ED0 *self);                    /* +0x0A0, Obj86ED0__ResetAllAndFinish (class_3bb8c_j) */
-    /* +0x0A4/+0x0A8, referenced by BOTH this unit (Obj86ED0__MoveCursorRight/
-     * Left call slotA4; Obj86ED0__AdvanceCharSelect calls slotA8) AND
-     * class_3bb8c_j (Obj86ED0__ResetAllAndFinish calls both;
-     * Obj86ED0__ResetCountdown calls slotA8) -- cross-unit, left unnamed
-     * (PROPOSED, not applied here). Implementations are class_3bb8c_j's own
-     * Obj86ED0__DispatchIndexValue/Obj86ED0__DispatchLookupValue. */
-    void (*slotA4)(Obj86ED0 *self, s32 arg1, s32 arg2);       /* +0x0A4, Obj86ED0__DispatchIndexValue */
-    /* +0x0A8. 3 args, not 2 -- retail's call sets $a1/$a3
-     * (`self->unk18`, `1`) and leaves $a2 holding the just-computed
-     * incremented `unk1C` value untouched from a few instructions earlier
-     * (no fresh load/li for it), which only makes sense if that register
-     * IS the call's own middle argument, forwarded because it was already
-     * live there. Same shape as TargetMethods86ED0::slot80 above. */
-    void (*slotA8)(Obj86ED0 *self, s32 arg1, s32 arg2, s32 arg3);        /* +0x0A8, Obj86ED0__DispatchLookupValue */
-};
-
-struct Obj86ED0 {
-    Obj86ED0Methods *methods;  /* +0x000 */
-    u8 pad004[0x00C - 0x004];   /* inherited BasicClass children/parentRefs, untouched by this unit */
-    s32 mode;                    /* +0x00C, RENAMED round 77 (was unkC) -- Obj86ED0__SetName: its own `mode` argument, unit-exclusive (only class_3bb8c_i's own functions touch it) */
-    s32 nameLen;                   /* +0x010, Obj86ED0__SetName (halved when mode==1)/Obj86ED0__MoveCursorRight (upper bound tested against cursorIndex+1) */
-    s32 unk14;                   /* +0x014, Obj86ED0__AdvanceCharSelect (upper bound tested against unk1C+1) */
-    s32 cursorIndex;                   /* +0x018, Obj86ED0__SetName (zeroed)/Obj86ED0__MoveCursorRight/Obj86ED0__MoveCursorLeft (inc/dec counter, capped by nameLen) */
-    s32 unk1C;                   /* +0x01C, Obj86ED0__SetName (zeroed)/Obj86ED0__AdvanceCharSelect (inc counter or reset to 0, capped by unk14) */
-    s32 unk20;                   /* +0x020, Obj86ED0__AttachTarget (zeroed)/Obj86ED0__ToggleFlag20 (xor-toggled, class_3bb8c_j) */
-    char *nameBuf;                /* +0x024, RENAMED round 77 (was unk24) -- Obj86ED0__SetName: its own `arg1` (caller-owned name-string buffer, unit-exclusive); Obj86ED0__HandleCommand's `case 25` re-encodes `unk28` back INTO this buffer on commit */
-    char *unk28;                 /* +0x028, Obj86ED0__Finalize (freed in finalize)/Obj86ED0__SetName (DecodeFullWidthSjis/strcpy destination) */
-    s32 closeState;               /* +0x02C, RENAMED round 77 (was unk2C) -- Obj86ED0__AttachTarget (zeroed)/Obj86ED0__SetState (set to its own arg1 for arg1 in [2,4); read as notifyParents's arg1 for arg1==4)/Obj86ED0__TickState (range-checked against [2,4)); unit-exclusive */
-    s32 closeTickCount;           /* +0x030, RENAMED round 77 (was unk30) -- Obj86ED0__SetState (zeroed)/Obj86ED0__TickState (incremented; gates the slot54 call on the OLD value being nonzero); unit-exclusive */
-    void *childType2;              /* +0x034, RENAMED round 77 (was unk34) -- Obj86ED0__AddChild/Obj86ED0__RemoveChild (addChild/removeChild target when child's tag==2)/Obj86ED0__SetState/Obj86ED0__DetachTarget (removeChild target); unit-exclusive */
-    void *childType5;              /* +0x038, RENAMED round 77 (was unk38) -- Obj86ED0__AddChild/Obj86ED0__RemoveChild (tag==5)/Obj86ED0__DetachTarget (removeChild target); unit-exclusive */
-    TargetObj86ED0 *target;         /* +0x03C, RENAMED round 77 (was unk3C) -- Obj86ED0__AttachTarget (its own arg3)/Obj86ED0__NotifyTarget (dispatch target)/Obj86ED0__DetachTarget (zeroed); unit-exclusive */
-    ChildObj86ED0 *unk40;          /* +0x040, Obj86ED0__ReleaseCardResources (released, no null-back store) */
-    ChildObj86ED0 *unk44;           /* +0x044, Obj86ED0__ReleaseCardResources (released, no null-back store) */
-    ChildObj86ED0 *unk48;            /* +0x048, Obj86ED0__ReleaseCardResources (release+null-back)/Obj86ED0__ClearChildRefs/Obj86ED0__RemoveAllChildren (zeroed)/Obj86ED0__MoveCursorRight/Obj86ED0__MoveCursorLeft/Obj86ED0__AdvanceCharSelect (nonzero readiness gate)/Obj86ED0__LoadCardResources (set from a resolved resource handle) */
-};
-
-/* HEAD NOTE round 15: alpha's `extern Obj86ED0Methods *Get_vtable_Obj86ED0(void);`
- * also moved into src/class_3bb8c_i.c, for the same reason as the symbol
- * above and with a sharper edge -- runner bravo DEFINES Get_vtable_Obj86ED0 in
- * src/class_3bb8c_j.c returning its own `Class86ED0Methods *`, so a
- * shared-header prototype in another unit's type is `conflicting types for
- * 'Get_vtable_Obj86ED0'`, a hard compile error rather than a warning. A
- * cross-unit prototype for a function ANOTHER unit defines belongs in the
- * caller, not in the shared header, whenever the two units hold different
- * local views of the same class. */
-/* HEAD NOTE round 15: the `extern Obj86ED0Methods gObj86ED0Methods;` that stood
- * here was moved into src/class_3bb8c_i.c. src/class_3bb8c_j.c carries its
- * own `extern Class86ED0Methods gObj86ED0Methods;` for the same object, and two
- * incompatible declarations of one symbol in a SHARED header reach both
- * translation units. Unit-local views belong in the unit -- which is what
- * runner bravo did with `Class86ED0` deliberately. The TYPES below stay
- * here because they are the richer, measured view; only the symbol moved. */
 
 /* HEAD NOTE round 15: alpha's `extern char *DecodeFullWidthSjis(char *dest, char
  * *src);` moved into src/class_3bb8c_i.c -- FOURTH instance of the
@@ -2718,13 +2525,13 @@ struct Obj86ED0 {
  * living in class_3bb8c_k" that bravo had not identified. charlie has now
  * MATCHED GetClass86F88Methods, and it returns &gClass86F88Methods. So the 0x54-byte
  * class's method table is gClass86F88Methods -- charlie's Class86F88 -- and NOT
- * gObj86ED0Methods.
+ * gTextEntryMethods.
  *
  * Consequence for the next reader: the type named `Class86ED0` in
  * src/class_3bb8c_j.c is MISNAMED. It is the object of the 0x54-byte
- * class (table gClass86F88Methods); the name came from Get_vtable_Obj86ED0, the only
+ * class (table gClass86F88Methods); the name came from GetTextEntryMethods, the only
  * getter bravo had resolved at the time, which actually returns
- * gObj86ED0Methods -- alpha's separate 0x4C-byte class in class_3bb8c_i.
+ * gTextEntryMethods -- alpha's separate 0x4C-byte class in class_3bb8c_i.
  *
  * Nothing is wrong with the BYTES: class_3bb8c_j is byte-exact and a type
  * name is not codegen. Only the name misleads. Left in place rather than
@@ -2736,9 +2543,9 @@ struct Obj86ED0 {
  * now `Class86F88_3bb8c_j`/`Class86F88Methods_3bb8c_j` (kept LOCAL to that
  * unit rather than reusing the bare `Class86F88` name above, to avoid a
  * name collision in that translation unit, which includes this header and
- * so sees both). `Get_vtable_Obj86ED0` (that unit's own definition of the
+ * so sees both). `GetTextEntryMethods` (that unit's own definition of the
  * function still called `func_80051A4C` above) is now correctly typed
- * `Obj86ED0Methods *`. See src/class_3bb8c_j.c's file header comment for
+ * `TextEntryMethods *`. See src/class_3bb8c_j.c's file header comment for
  * the classtable.py evidence.
  * ------------------------------------------------------------------- */
 

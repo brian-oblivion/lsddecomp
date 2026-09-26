@@ -11,9 +11,10 @@
  * tear the object down; ForceIdleFromState and TickStateDelay drive two
  * more paths into the same shared slot7C/slot8C tail; OnCommand and
  * OnItemSelected forward an externally supplied 2/3 dispatch code the
- * same way. Two lazily-attached child sub-objects (childA/childB, the
- * same real class the sibling units call Obj86ED0/Class86ED0 via
- * gObj86ED0Methods) are attached/detached in mirrored pairs. A third,
+ * same way. Two lazily-attached child sub-objects, childA (a TextEntry,
+ * New_TextEntry, include/TextEntry.h) and childB (a Class86F88,
+ * New_Class86F88), are attached/detached in mirrored pairs through the
+ * slots +0x044..+0x050 both classes put at the same offsets. A third,
  * independent child (cardIcon) is a memcard-icon TIM image, loaded once
  * by LoadCardIcon and stepped by TickCardIcon.
  *
@@ -25,6 +26,7 @@
 #include "common.h"
 #include "class_3bb8c.h"
 #include "ScreenSprite.h"
+#include "TextEntry.h"
 
 void TaskObjF__SetState(Class86E00_3bb8c_g *self, s32 arg1)
 {
@@ -250,20 +252,21 @@ void TaskObjF__AttachChildA(Class86E00_3bb8c_g *self)
 {
     if (self->childReady != 0 && self->unk60 != 0) {
         if (self->childA == NULL) {
-            self->childA = New_Obj86ED0((self->unk48 << 1) + self->unk44, 1);
+            self->childA = New_TextEntry((char *)((self->unk48 << 1) + self->unk44), 1);
             self->childAttached = 1;
         }
-        self->methods->slot10(self, self->childA);
-        self->childA->methods->slot44(self->childA, self->childReady);
-        self->childA->methods->slot4C(self->childA, self->unk60, self->unk64, self->childC);
+        self->methods->slot10(self, (Class86E00SubObj_3bb8c_g *)self->childA);
+        self->childA->methods->loadCardResources(self->childA, (void *)self->childReady);
+        self->childA->methods->attachTarget(self->childA, (void *)self->unk60, (void *)self->unk64,
+                                           (struct TargetObj86ED0 *)self->childC);
     }
 }
 
 void TaskObjF__DetachChildA(Class86E00_3bb8c_g *self)
 {
     if (self->childReady != 0 && self->unk60 != 0 && self->childA != NULL) {
-        self->childA->methods->slot50(self->childA);
-        self->childA->methods->slot48(self->childA);
+        self->childA->methods->detachTarget(self->childA);
+        self->childA->methods->releaseCardResources(self->childA);
         if (self->childAttached != 0) {
             self->childA->methods->release(self->childA);
             self->childA = NULL;

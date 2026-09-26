@@ -1,25 +1,27 @@
-# New_Obj86ED0 -- MATCHED (27/27 words)
+# New_TextEntry -- MATCHED (27/27 words)
+
+> Renamed from `New_Obj86ED0` on 2026-09-26 (tools/rename.py). Address 0x80050ba8.
 
 > Renamed from `func_80050BA8` on 2026-09-24 (tools/rename.py). Address 0x80050ba8.
 
 Unit `class_3bb8c_i`, carved round 14.
 
 `New_X`-shaped factory for `Obj86ED0` (see `include/class_3bb8c.h`, vtable
-`gObj86ED0Methods`, resolved with `tools/classtable.py gObj86ED0Methods`): allocates the
-0x4C-byte instance and dispatches its own ctor (slot 0x008, `Obj86ED0__Obj86ED0`,
+`gTextEntryMethods`, resolved with `tools/classtable.py gTextEntryMethods`): allocates the
+0x4C-byte instance and dispatches its own ctor (slot 0x008, `TextEntry__TextEntry`,
 itself a STALLED gp_rel-blocked function in this same unit -- see its own
-report). `Get_vtable_Obj86ED0` (`class_3bb8c_j`, still `INCLUDE_ASM`) is this
+report). `GetTextEntryMethods` (`class_3bb8c_j`, still `INCLUDE_ASM`) is this
 class's own table getter, mirroring `Get_vtable_BasicClass`'s no-argument shape;
 its return type only needed naming here (`Obj86ED0Methods *`), not a body.
 
 ```c
-void *New_Obj86ED0(s32 arg0, s32 arg1)
+void *New_TextEntry(s32 arg0, s32 arg1)
 {
     Obj86ED0 *self;
 
     self = BMemPMgrAlloc(0x4C);
     if (self != NULL) {
-        Get_vtable_Obj86ED0()->ctor(self, arg0, arg1);
+        GetTextEntryMethods()->ctor(self, arg0, arg1);
         return self;
     }
     return NULL;
@@ -57,4 +59,8 @@ exits at all.
 
 ## Naming
 
-- `New_Obj86ED0` -- tier A. New_X factory shape already established project-wide (BMemPMgrAlloc(0x4C), then dispatch ctor through the class's own table getter, return self or NULL). Matches gObj86ED0Methods's own alloc size (classtable.py) exactly.
+- `New_TextEntry` -- tier A. New_X factory shape already established project-wide (BMemPMgrAlloc(0x4C), then dispatch ctor through the class's own table getter, return self or NULL). Matches gTextEntryMethods's own alloc size (classtable.py) exactly.
+
+## Track 4 (2026-09-26, round 87)
+
+Class unified as `TextEntry` (include/TextEntry.h; table gObj86ED0Methods -> gTextEntryMethods, type Obj86ED0 -> TextEntry). The class name is for what its methods do: setText keeps a caller's string buffer and a working copy, the cursor and char methods edit the copy, command 25 writes it back, 23 closes without writing (banner of include/TextEntry.h). Fields renamed from their accessors: unk14 charCount, unk1C charIndex, unk20 altCommands, nameLen textLen, nameBuf textBuf, unk28 editBuf, unk40 cursorSprite (CharSprite *), unk44 textRow, unk48 panelSprite (ScreenSprite *). Zero bytes changed.
