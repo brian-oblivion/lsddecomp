@@ -1,4 +1,6 @@
-# Class6D3C8__ForwardToBaseSlot44UnlessFlagged
+# Class6D3C8__InitSystems
+
+> Renamed from `Class6D3C8__ForwardToBaseSlot44UnlessFlagged` on 2026-09-26 (tools/rename.py). Address 0x80026108.
 
 > Renamed from `Class6D3C8__ForwardToBaseUnlessOverridden` on 2026-09-24 (tools/rename.py). Address 0x80026108.
 
@@ -52,7 +54,7 @@ return value (if used at all) is whatever the base method leaves behind —
 treated as `void` here since nothing in this unit consumes it.
 
 ```c
-void Class6D3C8__ForwardToBaseSlot44UnlessFlagged(Class6D3C8 *self, void *a1, void *a2) {
+void Class6D3C8__InitSystems(Class6D3C8 *self, void *a1, void *a2) {
     if (self->unk18 == 0) {
         GetClass6E4F0Methods()->slot44(self, a1, a2, 0);
     }
@@ -71,7 +73,7 @@ BasicClass and this class) was only found this way.
 
 ## Naming
 
-**`Class6D3C8__ForwardToBaseSlot44UnlessFlagged` -- tier B.** Mechanics are
+**`Class6D3C8__InitSystems` -- tier B.** Mechanics are
 clear from the body: when `self->unk18 == 0` it forwards straight to the
 intermediate base class's own `slot44` occupant (`GetClass6E4F0Methods()->slot44`,
 same slot number as the one this function itself occupies, `+0x044`), and
@@ -115,3 +117,18 @@ now `GetClass6E4F0Methods()->initSystems((Class6E4F0 *)self, a1, a2, 0)`: the
 slot is named for its occupant, Class6E4F0__InitSystems, typed `void` (the
 occupant's; nothing here reads $v0), and keeps the fourth argument this
 body's `move a3,zero` shows. The upcast emits no code. Bytes unchanged.
+
+## Track 4 (2026-09-26, round 88)
+
+Renamed for its slot. `+0x044` is Class6E4F0's `initSystems`
+(`include/Class6E4F0.h`), and this override does nothing but chain to it:
+`GetClass6E4F0Methods()->initSystems(self, drawSystem, pad, 0)`. The guard
+field `+0x018` is not a Class6D3C8 field at all: it lies inside the parent's
+0x20-byte object, where Class6E4F0's view already names it `initialized`
+("cleared by the ctor, set by initSystems; runMainLoop runs only once
+set"). So the body reads "initialise the systems once": the "override flag"
+this report's Naming section could not explain is the parent's own
+initialized latch, and the tier-B mechanism name gives way to the slot name
+under FINISHING-PLAN track 4 step 6. The override takes three parameters
+where the slot takes four (the caller in `main` passes three), so the slot
+keeps the inherited type and `main` casts to `Class6D3C8InitSystemsFn`.

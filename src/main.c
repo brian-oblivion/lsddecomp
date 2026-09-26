@@ -46,10 +46,6 @@ extern BMemPMgr *gStartupBMemPMgr;
 extern Class6D3C8 *gClass6D3C8;
 extern Class6D3C8CtorArgs gClass6D3C8CtorArgs;
 
-/* Matched in code_1677c.c; not yet declared in any header (no other carved
- * caller existed until now). */
-extern Class6D3C8 *New_Class6D3C8(Class6D3C8CtorArgs *arg);
-
 void main(void)
 {
     DrawSystem *obj;
@@ -61,8 +57,9 @@ void main(void)
     gClass6D3C8 = New_Class6D3C8(&gClass6D3C8CtorArgs);
     obj = New_DrawSystem();
     pad = New_Pad(0, 0);
-    gClass6D3C8->methods->forwardToBaseSlot44UnlessFlagged(gClass6D3C8, obj, pad);
-    gClass6D3C8->methods->slot4C(gClass6D3C8);
+    /* Class6D3C8__InitSystems takes no 4th argument: include/Class6D3C8.h. */
+    ((Class6D3C8InitSystemsFn)gClass6D3C8->methods->initSystems)(gClass6D3C8, obj, pad);
+    gClass6D3C8->methods->runMainLoop(gClass6D3C8);
 }
 
 /* Sony's _obj/none (round 79); the call to it is cc1's, inside main. */

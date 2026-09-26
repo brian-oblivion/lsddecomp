@@ -4,14 +4,8 @@
 #include "common.h"
 #include "Class6D430.h"
 
-/* Method table (25 slots per tools/classtable.py) for the class whose
- * constructor caller is New_Class6D3C8 (src unit code_1677c). Not yet named
- * or typed field-by-field -- only its address is needed here, by
- * GetClass6D3C8Methods, which hands it to New_Class6D3C8 so the constructor slot
- * (+0x008, Class6D3C8__Class6D3C8) can be fetched and called indirectly. See
- * CLAUDE.md's "Writing a class method" for the +0x008 constructor-slot
- * convention. */
-extern s32 D_8006D3C8[];
+/* D_8006D3C8 and its getter GetClass6D3C8Methods (defined in this unit) are
+ * include/Class6D3C8.h's. */
 
 /* Some class instance (a slot of D_8006D430's table, going by
  * classtable.py) with at least one flag word at offset 0x24, OR'd with 1 by

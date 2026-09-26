@@ -70,12 +70,9 @@ class_3bb8c_p: warning: its scope is only this definition or declaration,
 class_3bb8c_p: warning: unused variable `pad48Tail'
 class_3bb8c_p: warning: which is probably not what you want.
 class_3bb8c_s: warning: implicit declaration of function `rand'
-code_1677c: warning: `struct DreamSys' declared inside parameter list
 code_1677c: warning: control reaches end of non-void function
-code_1677c: warning: its scope is only this definition or declaration,
 code_1677c: warning: passing arg 2 makes pointer from integer without a cast
 code_1677c: warning: passing arg 3 makes integer from pointer without a cast
-code_1677c: warning: which is probably not what you want.
 code_171e0: warning: assignment from incompatible pointer type
 code_179d8_d: warning: unused variable `buf'
 code_179d8_d: warning: unused variable `buf'
@@ -156,6 +153,3 @@ code_d294_b: warning: unused variable `unused'
 code_fa50: warning: `p' might be used uninitialized in this function
 code_fa50: warning: `size' might be used uninitialized in this function
 code_fa50: warning: unused variable `v60'
-main: warning: `struct DreamSys' declared inside parameter list
-main: warning: its scope is only this definition or declaration,
-main: warning: which is probably not what you want.

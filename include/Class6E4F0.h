@@ -48,7 +48,7 @@ typedef struct Class6E4F0Aux {
 #define CLASS6E4F0_SLOTS(Self, CtorParams)                                                         \
     BASICCLASS_SLOTS(Self, CtorParams);                                                            \
     /* +0x040 */ void (*setScreenDims)(Self *self, ScreenDims *dims, s32 vramMode); /* Class6E4F0__SetScreenDims */ \
-    /* +0x044: the fourth argument is the caller's: Class6D3C8__ForwardToBaseSlot44UnlessFlagged  \
+    /* +0x044: the fourth argument is the caller's: Class6D3C8__InitSystems  \
      * passes 0 (`move a3,zero` in the jalr's delay slot); the occupant never reads $a3. */      \
     /* +0x044 */ void (*initSystems)(Self *self, DrawSystem *drawSystem, struct Pad *pad, s32 arg3); /* Class6E4F0__InitSystems */ \
     /* +0x048 */ void (*slot48)(Self *self);                    /* Class6E4F0__NoOpSlot48, empty */ \

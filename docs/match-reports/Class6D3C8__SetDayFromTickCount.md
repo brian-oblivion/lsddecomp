@@ -75,3 +75,14 @@ it mod 365 (a `%` on the day-count range), and forwards the result to
 why the game does this at this vtable slot (`+0x040`, dispatched once from
 the ctor); `SeedAndRandom` itself is uncarved, so its own purpose (and
 therefore this function's ultimate game role) is not confirmed here.
+
+## Track 4 (2026-09-26, round 88)
+
+Now declared `void Class6D3C8__SetDayFromTickCount(Class6D3C8 *self)`: it
+occupies Class6E4F0's `setScreenDims` slot (+0x040) and its only caller, the
+ctor, passes `self` (in `$a0`), which the body never reads, so the added
+parameter emits nothing (image byte-identical). The slot keeps the
+inherited `setScreenDims` type; the ctor calls it through
+`Class6D3C8SetDayFn` (`include/Class6D3C8.h`). The name is kept rather than
+renamed for the slot: the body seeds the RNG from the day count and does
+nothing a screen-dimensions setter would.
