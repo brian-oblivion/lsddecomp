@@ -350,7 +350,7 @@ load through a runtime-indexed global", §"BLOCKED: the `nop_mflo_mfhi` screen r
   (round 73): the inline copy (`movstrsi_internal`) CLOBBERS `$v0`/`$v1`/`$a0`/`$a1`, so a parameter
   live across a whole-struct assignment loses its incoming register; an unexplained entry `move
   $a3,$a0` next to batched `lw/lw/sw/sw` is the tell (`Class6E99C__PushPosition`). (a
-  docs/match-reports/func_8001E7BC.md, round 57)
+  docs/match-reports/SceneNode__RaycastVertical.md, round 57)
 - **When a residue is a missing register-to-register COPY, try DELETING the named local and
   inlining the expression** — the inverse of the "name the subexpression" lever. 2.6.3's
   signed `x / 2**k` (k > 1) opens with `t = x`, and whether that copy survives is coalescing
@@ -664,10 +664,10 @@ load through a runtime-indexed global", §"BLOCKED: the `nop_mflo_mfhi` screen r
   closed in single-digit builds after 14 and 46 rounds. A revisit's first act is to re-derive the
   CLASS from the disassembly. (a round 59)
 - **A register-identity verdict is a claim about the RESIDUE, not about the function, and it DECAYS
-  as the rest of the function changes.** All three of round 44's residues on `func_8001E7BC` were
+  as the rest of the function changes.** All three of round 44's residues on `SceneNode__RaycastVertical` were
   filed as one class; two were ordinary source-shape differences elsewhere in the body. When a stall
   carries SEVERAL same-class residues, fix the STRUCTURE first and re-measure. (a
-  docs/match-reports/func_8001E7BC.md, round 57)
+  docs/match-reports/SceneNode__RaycastVertical.md, round 57)
 - **A lever's NEGATIVE is scoped to the (function, lever, STATE) triple, and so is a POSITIVE.** A
   guard polarity inert in round 19 closed three words in round 33; a fix rejected in rounds 19 and
   20 closed the function in round 49. **If you have changed anything else since a lever was

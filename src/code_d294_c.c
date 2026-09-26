@@ -15,8 +15,8 @@
  * and eight standalone leaves -- vector, matrix, fixed-point, bounding-box
  * and bitfield primitives -- that the rest of the game calls by symbol.
  *
- * Every function in this unit is now decompiled; func_8001E7BC, the last
- * INCLUDE_ASM, matched in round 57 (docs/match-reports/func_8001E7BC.md).
+ * Every function in this unit is now decompiled; SceneNode__RaycastVertical, the last
+ * INCLUDE_ASM, matched in round 57 (docs/match-reports/SceneNode__RaycastVertical.md).
  */
 
 #include "common.h"
@@ -44,7 +44,7 @@ void SceneNode__RotateLocalVector(SceneNode *self, LongVec3 *dst, s16 *src) {
  * angles, same as SceneNode__RotateLocalVector above) and add the object's
  * accumulated world translation. That translation is `unk14->unk38`, which
  * is GsCOORDINATE2.workm.t -- the composed world matrix's own translation
- * (+0x24 workm, +0x14 into MATRIX = +0x38). func_8001E7BC is the function
+ * (+0x24 workm, +0x14 into MATRIX = +0x38). SceneNode__RaycastVertical is the function
  * that maintains it, by summing coord.t down the owner chain.
  *
  * The `self->unkC != 0 ? ... : 0` ternary is recomputed before EACH of the
@@ -118,9 +118,9 @@ void SceneNode__UnlinkModel(SceneNode *self) {
 
 extern void SubVec3S16(s32 *dest, s16 *from, s16 *to);
 
-/* MATCHED round 57 (revisit) -- see docs/match-reports/func_8001E7BC.md.
+/* MATCHED round 57 (revisit) -- see docs/match-reports/SceneNode__RaycastVertical.md.
  *
- * Kept as `func_8001E7BC` on purpose (track 3, tier C): the whole second
+ * Kept as `SceneNode__RaycastVertical` on purpose (track 3, tier C): the whole second
  * half hangs off `TmdModel__RaycastFaces` (code_fa50, a segment cast against
  * every face of the model; round 82 found it game code, not Psy-Q), and no
  * verb for the function as a whole has been established.
@@ -163,7 +163,7 @@ extern void SubVec3S16(s32 *dest, s16 *from, s16 *to);
  *
  * `(u8 *)node + 0x38 != NULL` is retail's own check, not a typo for
  * `node != NULL`: the disassembly forms the sum first and tests THAT. */
-s32 func_8001E7BC(SceneNode *self, s32 *arg1, s32 *arg2) {
+s32 SceneNode__RaycastVertical(SceneNode *self, s32 *arg1, s32 *arg2) {
     s32 *table;
     s16 buf18[4];
     s16 delta[4];
@@ -225,7 +225,7 @@ s32 func_8001E7BC(SceneNode *self, s32 *arg1, s32 *arg2) {
 /* dest = to - from, over three components, widening s16 inputs to s32.
  * Parameter ORDER is the subtrahend first: the value subtracted is the 2nd
  * argument, the value subtracted FROM is the 3rd. What the two vectors
- * represent is not established -- func_8001E7BC is the only known caller,
+ * represent is not established -- SceneNode__RaycastVertical is the only known caller,
  * and it passes `buf18` (slotA4's rotated delta) as `from` and `buf28`
  * (TmdModel__RaycastFaces's own output) as `to`. */
 void SubVec3S16(s32 *dest, s16 *from, s16 *to) {

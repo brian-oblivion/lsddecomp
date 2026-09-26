@@ -73,7 +73,7 @@ accesses are plain uses of existing fields, not new ones.
   (2) it adds `self->unk14->unk38`, which is `GsCOORDINATE2.workm.t` -- the
   COMPOSED world matrix's translation (`workm` at +0x24, `t` at +0x14 into
   MATRIX, = +0x38; see the PSY-Q IDENTIFICATION note in
-  include/code_d294.h). `func_8001E7BC` is the function that maintains that
+  include/code_d294.h). `SceneNode__RaycastVertical` is the function that maintains that
   field, by summing `coord.t` down the owner chain.
 - **Why B, not A:** "WorldPos" rests on the `workm.t` identification, which
   is solid; "Local" rests on the rotation being the object's own only, which

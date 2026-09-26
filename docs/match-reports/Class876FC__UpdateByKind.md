@@ -112,7 +112,7 @@ them, and forwards `$a1` straight on:
 
 `$a1` at the `jal` is whatever `Class876FC__Update`'s own caller left there, and
 `Class876FC__UpdateByKind` consumes it as `arg1`. This is the same register-forwarding
-trap that `externcheck.py` was written for (round 57, `func_8001E7BC`) —
+trap that `externcheck.py` was written for (round 57, `SceneNode__RaycastVertical`) —
 with the difference that here it reproduces retail, so the narrow declaration
 is correct for this unit and must not be widened.
 

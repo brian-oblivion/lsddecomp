@@ -1,4 +1,6 @@
-# func_8001E7BC -- MATCHED (round 57, revisit): 180/180 words, byte-exact, whole-image SHA1 green. SEE ROUND 57 AT THE BOTTOM -- everything between here and it is superseded history, kept for its derivation value; the round-46 section it points to is no longer the current best.
+# SceneNode__RaycastVertical -- MATCHED (round 57, revisit): 180/180 words, byte-exact, whole-image SHA1 green. SEE ROUND 57 AT THE BOTTOM -- everything between here and it is superseded history, kept for its derivation value; the round-46 section it points to is no longer the current best.
+
+> Renamed from `func_8001E7BC` on 2026-09-26 (tools/rename.py). Address 0x8001e7bc.
 
 Unit: `code_d294_c` (round 14). By far the largest function in this
 round's queue (200 asm lines, 0x2D0 bytes / 180 words -- more than 60%
@@ -17,7 +19,7 @@ writing C directly instead of re-deriving the shape from scratch.
 
 ## Signature and top-level shape
 
-`s32 func_8001E7BC(SceneNodeObj *self, void *arg1, void *arg2)`
+`s32 SceneNode__RaycastVertical(SceneNodeObj *self, void *arg1, void *arg2)`
 (return value is 0 or 1; `arg1`/`arg2` types not yet pinned down --
 `arg2` is read as a 3-entry `u16`-ish table, `arg1` is forwarded whole
 into `SubVec3S16`'s own `dest` parameter, already `s32*` per that
@@ -460,7 +462,7 @@ NULL, never index the ternary as a whole.
 
 ## Round 46 (echo): first-ever permuter search, one real lever found (136 -> 142/180)
 
-Per this round's assignment, `func_8001E7BC` was flagged NEVER SEARCHED
+Per this round's assignment, `SceneNode__RaycastVertical` was flagged NEVER SEARCHED
 despite three prior hand-lever rounds (19, 44). Re-verified 136/180 live
 first (rebuilt the round-44 preserved body, `funcdiff.py` confirmed
 136/180 exactly, no drift -- check 3, base score agrees with the real
@@ -533,7 +535,7 @@ the eventual lever will take.
 extern s32 TmdModel__RaycastFaces(void *arg0, void *arg1, void *arg2, s32 arg3, void *arg4, s16 *arg5);
 extern void SubVec3S16(s32 *dest, s16 *b, s16 *a);
 
-s32 func_8001E7BC(SceneNodeObj *self, s32 *arg1, s32 *arg2) {
+s32 SceneNode__RaycastVertical(SceneNodeObj *self, s32 *arg1, s32 *arg2) {
     s32 *table;
     s16 buf18[4];
     s16 delta[4];
@@ -592,7 +594,7 @@ s32 func_8001E7BC(SceneNodeObj *self, s32 *arg1, s32 *arg2) {
 
 ## Naming (round 50, charlie -- FINISHING-PLAN track 3)
 
-- **KEPT as `func_8001E7BC`. Tier C.** What IS known, written down so the
+- **KEPT as `SceneNode__RaycastVertical`. Tier C.** What IS known, written down so the
   next reader does not re-derive it:
   - It is a **method of SceneNode** (first parameter `SceneNodeObj *`,
     dispatches `slotA4`), and it is the function that MAINTAINS the world

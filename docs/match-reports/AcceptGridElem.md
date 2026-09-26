@@ -23,7 +23,7 @@ caller's 3-argument calling convention.
 ```c
 void *AcceptGridElem(void *arg0, void *arg1, void *arg2) {
     if (arg0 != NULL) {
-        if (func_8001E7BC() != 0) {
+        if (SceneNode__RaycastVertical() != 0) {
             return arg0;
         }
     }
@@ -31,13 +31,13 @@ void *AcceptGridElem(void *arg0, void *arg1, void *arg2) {
 }
 ```
 
-`func_8001E7BC` is declared locally (`extern s32 func_8001E7BC(void);`) --
+`SceneNode__RaycastVertical` is declared locally (`extern s32 SceneNode__RaycastVertical(void);`) --
 it is matched/queued in a different unit (`src/code_d294_c.c`), so its
 prototype belongs here, not in a shared header.
 
 ## Shape note
 
-Written as NESTED `if`s rather than `if (arg0 != NULL && func_8001E7BC())`.
+Written as NESTED `if`s rather than `if (arg0 != NULL && SceneNode__RaycastVertical())`.
 The combined-condition form compiles to an extra `move v1,v0` before the
 `bnez` and shifts the whole function 4 bytes long (a spurious second
 `return NULL;` merge point reached via a different control path than
@@ -48,7 +48,7 @@ words with the size drift warning; nested form gives 15/15 exactly.
 ## Naming
 
 **`AcceptGridElem` -- tier A.** A pure predicate/leaf: returns
-`arg0` unchanged if it is non-NULL AND the global gate `func_8001E7BC()`
+`arg0` unchanged if it is non-NULL AND the global gate `SceneNode__RaycastVertical()`
 is non-zero, else `NULL`. Mechanics ARE the purpose here (an accept/reject
 test), matching CLAUDE.md's tier-A carve-out for "a pure leaf whose
 mechanics ARE its purpose (a getter, a clamp, a list push)". `arg1`/`arg2`
@@ -77,17 +77,17 @@ nested `if`s before suspecting anything else.
 
 ## Round 57 (head, at merge) -- the prototype was wrong and the oracle could not see it
 
-This unit declared `extern s32 func_8001E7BC(void);` and called it with no
-arguments. In the SAME round, `code_d294_c` matched `func_8001E7BC` and
-established its real signature: `s32 func_8001E7BC(SceneNodeObj *self,
+This unit declared `extern s32 SceneNode__RaycastVertical(void);` and called it with no
+arguments. In the SAME round, `code_d294_c` matched `SceneNode__RaycastVertical` and
+established its real signature: `s32 SceneNode__RaycastVertical(SceneNodeObj *self,
 s32 *arg1, s32 *arg2)`, a SceneNode method. The two readings met at merge.
 
 `arg1`/`arg2` were therefore never "unused parameters that exist to match
 the calling convention" -- they are FORWARDED. `AcceptGridElem(arg0, arg1,
-arg2)` receives them in `$a0`-`$a2` and `func_8001E7BC` reads them from the
+arg2)` receives them in `$a0`-`$a2` and `SceneNode__RaycastVertical` reads them from the
 same registers, so the zero-argument call compiled byte-identically while
 saying something false about the code. Rewritten as
-`func_8001E7BC(arg0, arg1, arg2)` against the real prototype: **byte-exact,
+`SceneNode__RaycastVertical(arg0, arg1, arg2)` against the real prototype: **byte-exact,
 whole-image SHA1 green**, so this is a readability fix with no codegen
 component.
 
@@ -111,7 +111,7 @@ Discriminator: a local `extern ... (void)` (or any arity) for a symbol some
 other unit now DEFINES. Sweep with
 `grep -rn 'extern .*func_' src/` against the matched set after any round
 that closes functions. (a docs/match-reports/AcceptGridElem.md
-and docs/match-reports/func_8001E7BC.md, round 57)
+and docs/match-reports/SceneNode__RaycastVertical.md, round 57)
 
 ## Track 4 (2026-09-25, round 82, delta)
 

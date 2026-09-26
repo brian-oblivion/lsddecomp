@@ -167,7 +167,7 @@ with `flag2` a plain `s32` local initialized to `0` and never written again.
 provably dead from a pure dataflow standpoint -- that in itself is a data
 point about what this exact GCC 2.6.3/-O2 configuration does and does not
 constant-fold across a loop containing calls (it did NOT eliminate it here,
-unlike the signed/unsigned `unk10` case in `func_8001E7BC`'s round-19
+unlike the signed/unsigned `unk10` case in `SceneNode__RaycastVertical`'s round-19
 history, which is textually a much more local fold). My build reproduced
 this branch as written (did not get eliminated on my side either) -- the
 residue here is register identity, not branch presence/absence.
@@ -223,7 +223,7 @@ the function's saved-register block and beyond (170 of 199 words differ in
 total). This looks like the classic "too few/too many other values compete
 for saved registers ahead of `self` in program order" register-identity
 class this project has repeatedly found NOT responsive to `__asm__` barriers
-or simple declaration reordering (see `func_8001E7BC`'s own round-44
+or simple declaration reordering (see `SceneNode__RaycastVertical`'s own round-44
 residue #1, same symptom, same unit). Not attempted further this round --
 budget went to establishing the first honest score and closing the
 structural unknowns instead of iterating blind on a 10-candidate saved-

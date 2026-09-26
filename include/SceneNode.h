@@ -15,7 +15,7 @@
  *
  * Objects form a transform hierarchy: attachToParent sets `parent` and points
  * the coordinate's `super` at the parent's coordinate, and the parent chain is
- * walked through `parent` (ComposeAndApplyRotation, func_8001E7BC). The
+ * walked through `parent` (ComposeAndApplyRotation, SceneNode__RaycastVertical). The
  * inherited onNotify is split by the SENDER's class nibble: a Pad (2) goes to
  * onPadEvent, a FrameClock (5) to update, another SceneNode (4) to
  * dispatchLinkCommand, which on event 2/3 runs tryAttachNearby and on event 4

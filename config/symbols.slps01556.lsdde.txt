@@ -2879,3 +2879,4 @@ ObjM__NoOpSlotBC = 0x800541CC; // type:func
 SceneNode__OnPadEvent = 0x8001D6A4; // type:func
 SceneNode__Update = 0x8001D6AC; // type:func
 SceneNode__NoOpSlotB0 = 0x8001E49C; // type:func
+SceneNode__RaycastVertical = 0x8001E7BC; // type:func

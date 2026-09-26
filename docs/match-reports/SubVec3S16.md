@@ -42,7 +42,7 @@ No new struct or vtable-slot knowledge.
   so `VerbNoun`. The operation is complete and visible -- three-component
   subtraction of `s16` inputs widened into an `s32` output -- but WHAT the
   two vectors are is not established, which is what keeps it at B: its only
-  known caller is `func_8001E7BC`, still `INCLUDE_ASM`, where they are the
+  known caller is `SceneNode__RaycastVertical`, still `INCLUDE_ASM`, where they are the
   two outputs of a `TmdModel__RaycastFaces` call that is itself unidentified Psy-Q.
 - **Parameters renamed `(dest, b, a)` -> `(dest, from, to)`** and the body
   rewritten to `dest[i] = to[i] - from[i]`, same expression, so that the

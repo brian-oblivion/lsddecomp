@@ -310,11 +310,11 @@ void *Actor__ScanGridWindow(Actor *self, void *arg1, void *arg2, GridQuery *quer
  * byte-identical here only because arg0-arg2 are already in $a0-$a2 -- the
  * byte oracle cannot see a wrong prototype. Spelled out so the forwarding is
  * visible; verified byte-exact. */
-extern s32 func_8001E7BC(void *self, void *out, void *target);
+extern s32 SceneNode__RaycastVertical(void *self, void *out, void *target);
 
 void *AcceptGridElem(void *arg0, void *arg1, void *arg2) {
     if (arg0 != NULL) {
-        if (func_8001E7BC(arg0, arg1, arg2) != 0) {
+        if (SceneNode__RaycastVertical(arg0, arg1, arg2) != 0) {
             return arg0;
         }
     }
