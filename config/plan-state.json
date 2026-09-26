@@ -1042,6 +1042,11 @@
           "date": "2026-09-26",
           "header": "include/LightRig.h"
         },
+        "gMoviePlayerMethods": {
+          "class": "MoviePlayer",
+          "date": "2026-09-26",
+          "header": "include/MoviePlayer.h"
+        },
         "gPadMethods": {
           "class": "Pad",
           "date": "2026-09-25",
