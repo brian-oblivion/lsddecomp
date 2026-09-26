@@ -1,4 +1,6 @@
-# TriggerWorld__GetOffset -- MATCHED (13/13 words)
+# TriggerWorld__GetModelData -- MATCHED (13/13 words)
+
+> Renamed from `TriggerWorld__GetOffset` on 2026-09-26 (tools/rename.py). Address 0x80044c90.
 
 > Renamed from `func_80044C90` on 2026-09-25 (tools/rename.py). Address 0x80044c90.
 
@@ -23,7 +25,7 @@ Slot +0x078 is `void *slot78` in the unified macro, so calls cast it.
 ```c
 /* D_8006F40C +0x088: entry `index` of the buffer's counted word array, 0 when
  * out of range. */
-s32 TriggerWorld__GetOffset(DataSrc33808 *self, u32 index) {
+s32 TriggerWorld__GetModelData(DataSrc33808 *self, u32 index) {
     CountedBuf33808 *buf = self->buffer;
 
     if (index < buf->count) {
@@ -42,4 +44,22 @@ s32 TriggerWorld__GetOffset(DataSrc33808 *self, u32 index) {
 
 ## Naming
 
-- **TriggerWorld__GetOffset**, tier A. Slot +0x088: entry `index` of the buffer's counted word array, 0 out of range.
+- **TriggerWorld__GetModelData**, tier A. Slot +0x088: entry `index` of the buffer's counted word array, 0 out of range.
+
+## Track 4 (2026-09-26, round 88, bravo)
+
+Renamed from `TriggerWorld__GetOffset`, and its return type is now
+`ModelData *` (was `s32`; the word is returned unchanged in $v0, image
+byte-identical). The words it reads are not offsets once the object is
+built: TriggerWorld__BuildResources overwrites each `entries[i]` with the
+`New_ModelData` it made over buffer + entries[i], and the ctor runs that
+build (via +0x064 -> +0x078) whenever the descriptor has a buffer.
+
+The caller confirms it. `ProcessDreamAuxTriggerRecord` (code_4cd08) gets its
+object from `New_TriggerWorld` (FireDreamAuxTriggerEntries), calls this slot
+(+0x088) with the record's parity, and stores the result at `scratch[3]`
+(+0x00C), which `SpawnDreamAuxTriggerEntity` passes as `New_Entity`'s
+descriptor; Entity__Entity hands it to Class65650__Class65650, whose
+Class65650__AcquireModelData borrows the ModelData at the descriptor's
++0x00C (UnkArg1Obj.modelData). Class unified in `include/TriggerWorld.h`
+(slot +0x088 `getModelData`).

@@ -1,4 +1,6 @@
-# TriggerWorld__ReleaseParts -- MATCHED (14/14 words)
+# TriggerWorld__ReleaseResources -- MATCHED (14/14 words)
+
+> Renamed from `TriggerWorld__ReleaseParts` on 2026-09-26 (tools/rename.py). Address 0x80044c58.
 
 > Renamed from `func_80044C58` on 2026-09-25 (tools/rename.py). Address 0x80044c58.
 
@@ -23,7 +25,7 @@ Slot +0x078 is `void *slot78` in the unified macro, so calls cast it.
 ```c
 /* D_8006F40C +0x07C: release the object array in the buffer (past its first
  * two words), +0x38 entries long, and zero the count. */
-void TriggerWorld__ReleaseParts(DataSrc33808 *self) {
+void TriggerWorld__ReleaseResources(DataSrc33808 *self) {
     ReleaseBasicClassArray((BasicClass **)((u8 *)self->buffer + 8), self->unk38);
     self->unk38 = 0;
 }
@@ -38,4 +40,13 @@ void TriggerWorld__ReleaseParts(DataSrc33808 *self) {
 
 ## Naming
 
-- **TriggerWorld__ReleaseParts**, tier A. Slot +0x07C: releases the ModelData array, +0x38 entries, and zeroes the count.
+- **TriggerWorld__ReleaseResources**, tier A. Slot +0x07C: releases the ModelData array, +0x38 entries, and zeroes the count.
+
+## Track 4 (2026-09-26, round 88, bravo)
+
+Renamed from `TriggerWorld__ReleaseParts`: it occupies +0x07C, ModelData's
+`releaseResources` slot (MODELDATA_SLOTS in `include/ModelData.h`), and the
+body does exactly what the slot says for this class (release the ModelData
+array TriggerWorld__BuildResources built, zero the count at +0x038). An
+override is named for its slot (FINISHING-PLAN track 4 step 6). Class
+unified in `include/TriggerWorld.h`.

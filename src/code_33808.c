@@ -1045,7 +1045,7 @@ void TriggerWorld__Load(DataSrc33808 *self) {
  * sub-block of the buffer's counted offset table, into the table's own
  * words, counting them at +0x38; 0 when all exist, otherwise slot +0x07C
  * (release) and 1. */
-s32 TriggerWorld__BuildParts(DataSrc33808 *self) {
+s32 TriggerWorld__BuildResources(DataSrc33808 *self) {
     Req44858 req;
     CountedBuf33808 *buf;
     s32 *p;
@@ -1074,13 +1074,13 @@ fail:
 }
 /* D_8006F40C +0x07C: release the object array in the buffer (past its first
  * two words), +0x38 entries long, and zero the count. */
-void TriggerWorld__ReleaseParts(DataSrc33808 *self) {
+void TriggerWorld__ReleaseResources(DataSrc33808 *self) {
     ReleaseBasicClassArray((BasicClass **)((u8 *)self->buffer + 8), self->unk38);
     self->unk38 = 0;
 }
 /* D_8006F40C +0x088: entry `index` of the buffer's counted word array, 0 when
  * out of range. */
-s32 TriggerWorld__GetOffset(DataSrc33808 *self, u32 index) {
+s32 TriggerWorld__GetModelData(DataSrc33808 *self, u32 index) {
     CountedBuf33808 *buf = self->buffer;
 
     if (index < buf->count) {

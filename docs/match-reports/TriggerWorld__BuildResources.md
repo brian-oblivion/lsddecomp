@@ -1,4 +1,6 @@
-# TriggerWorld__BuildParts -- MATCHED (52/52 words)
+# TriggerWorld__BuildResources -- MATCHED (52/52 words)
+
+> Renamed from `TriggerWorld__BuildParts` on 2026-09-26 (tools/rename.py). Address 0x80044b88.
 
 > Renamed from `func_80044B88` on 2026-09-25 (tools/rename.py). Address 0x80044b88.
 
@@ -9,7 +11,7 @@ drift. Fresh ground (carved revision 18, no prior report).
 
 ## What it does
 
-Build step: SetVec3 fills a three-word request {buffer, 0, 1}; for each of the buffer's `count` offsets, point the request at buffer+offset, allocate a D_8006F384 source through New_ModelData and store it over the offset word itself (entries[i]), counting successes at +0x38. On an allocation failure call its own +0x07C (TriggerWorld__ReleaseParts, which releases the ones built and zeroes the count) and return 1; otherwise 0. The sibling of D_8006F384's ModelData__BuildResources.
+Build step: SetVec3 fills a three-word request {buffer, 0, 1}; for each of the buffer's `count` offsets, point the request at buffer+offset, allocate a D_8006F384 source through New_ModelData and store it over the offset word itself (entries[i]), counting successes at +0x38. On an allocation failure call its own +0x07C (TriggerWorld__ReleaseResources, which releases the ones built and zeroes the count) and return 1; otherwise 0. The sibling of D_8006F384's ModelData__BuildResources.
 
 Table slot (`tools/classtable.py`): D_8006F40C +0x078.
 
@@ -25,7 +27,7 @@ top of / earlier in `src/code_33808.c`.
  * sub-block of the buffer's counted offset table, into the table's own
  * words, counting them at +0x38; 0 when all exist, otherwise slot +0x07C
  * (release) and 1. */
-s32 TriggerWorld__BuildParts(DataSrc33808 *self) {
+s32 TriggerWorld__BuildResources(DataSrc33808 *self) {
     Req44858 req;
     CountedBuf33808 *buf;
     s32 *p;
@@ -60,8 +62,19 @@ First build. The loop pointer walks `buf->entries` while the offset is re-read t
 
 ## Naming
 
-- **TriggerWorld__BuildParts**, tier A. Slot +0x078: builds a ModelData (not owning) over each sub-block of the buffer's counted offset table, counting them at +0x38.
+- **TriggerWorld__BuildResources**, tier A. Slot +0x078: builds a ModelData (not owning) over each sub-block of the buffer's counted offset table, counting them at +0x38.
 
 ## Track 4
 
 2026-09-25, round 84 (delta): Its parent ModelData (D_8006F384) is unified in `include/ModelData.h` (this class is still its own job). The part allocation reads `*p = (s32)New_ModelData((Src6F240 *)&req)` (was `(s32)&req`), a pointer cast with no code. Image byte-identical.
+
+## Track 4 (2026-09-26, round 88, bravo)
+
+Renamed from `TriggerWorld__BuildParts`. It occupies +0x078, Class6D430's
+unnamed `slot78` that ModelData's own table fills with
+ModelData__BuildResources; this is TriggerWorld's override of that same step
+(build its resources, 0 on success, release and 1 on failure), and its
+failure path calls +0x07C, ModelData's `releaseResources` slot, whose
+TriggerWorld occupant is now TriggerWorld__ReleaseResources. Named after the
+parent's occupant so the pair reads as one. Class unified in
+`include/TriggerWorld.h`.
