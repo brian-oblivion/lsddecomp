@@ -108,7 +108,7 @@ s32 GetBMemPMgrBusy(void) {
  * cross-unit-declaration rule. */
 extern s32 D_80090C18;
 extern s32 D_8008E250;
-extern s32 D_8008E24C;
+extern s32 gSortLightMode;
 extern s32 GsLIGHT_MODE;
 
 /* Local views, and each one's STRUCT-ness is load-bearing, not decoration.
@@ -259,12 +259,12 @@ void SortTmdObject(void *objIn, void *otSrc, s32 otShift, void *ctxIn) {
     D_80090C18 = (((RenderObjHead *)obj)->flags >> 9) & 0x7;
     D_8008E248 = (((RenderObjHead *)obj)->flags >> 6) & 0x1;
     D_8008E250 = (((RenderObjHead *)obj)->flags >> 5) & 0x1;
-    D_8008E24C = (((RenderObjHead *)obj)->flags >> 3) & 0x3;
+    gSortLightMode = (((RenderObjHead *)obj)->flags >> 3) & 0x3;
     ((RenderCtxHead *)ctx)->unk8 = 0xA;
 
     *(Rgb8 *)(ctx + 0x34) = *(Rgb8 *)D_8008A82C;
 
-    if ((D_8008E250 != 0 && GsLIGHT_MODE != 0) || D_8008E24C != 0) {
+    if ((D_8008E250 != 0 && GsLIGHT_MODE != 0) || gSortLightMode != 0) {
         dpShift = 9;
     } else {
         dpShift = 0x10;

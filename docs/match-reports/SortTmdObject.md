@@ -505,7 +505,7 @@ position.
  * cross-unit-declaration rule. */
 extern s32 D_80090C18;
 extern s32 D_8008E250;
-extern s32 D_8008E24C;
+extern s32 gSortLightMode;
 extern s32 GsLIGHT_MODE;
 extern s8 D_8008A82C[3];
 extern void *GsOUT_PACKET_P;
@@ -616,7 +616,7 @@ void SortTmdObject(void *objIn, void *otSrc, s32 otShift, void *ctxIn)
     D_80090C18 = (*(u32 *)obj >> 9) & 0x7;
     D_8008E248 = (*(u32 *)obj >> 6) & 0x1;
     D_8008E250 = (*(u32 *)obj >> 5) & 0x1;
-    D_8008E24C = (*(u32 *)obj >> 3) & 0x3;
+    gSortLightMode = (*(u32 *)obj >> 3) & 0x3;
 
     {
         s8 *tint = D_8008A82C;
@@ -628,7 +628,7 @@ void SortTmdObject(void *objIn, void *otSrc, s32 otShift, void *ctxIn)
 
     if (D_8008E250 != 0 && GsLIGHT_MODE != 0) {
         dpShift = 9;
-    } else if (D_8008E24C != 0) {
+    } else if (gSortLightMode != 0) {
         dpShift = 9;
     } else {
         dpShift = 0x10;
@@ -1299,7 +1299,7 @@ register" above.
 extern void *GsOUT_PACKET_P;
 extern s32 D_80090C18;
 extern s32 D_8008E250;
-extern s32 D_8008E24C;
+extern s32 gSortLightMode;
 extern s32 GsLIGHT_MODE;
 extern s8 D_8008A82C[3];
 
@@ -1467,7 +1467,7 @@ void SortTmdObject(void *arg0, void *arg1, s32 arg2, void *arg3)
         D_80090C18 = (raw >> 9) & 0x7;
         D_8008E248 = (raw >> 6) & 0x1;
         D_8008E250 = (raw >> 5) & 0x1;
-        D_8008E24C = (raw >> 3) & 0x3;
+        gSortLightMode = (raw >> 3) & 0x3;
     }
     prim[0x34] = D_8008A82C[0];
     prim[0x35] = D_8008A82C[1];
@@ -1475,7 +1475,7 @@ void SortTmdObject(void *arg0, void *arg1, s32 arg2, void *arg3)
 
     if (D_8008E250 != 0 && GsLIGHT_MODE != 0) {
         v0 = 9;
-    } else if (D_8008E24C != 0) {
+    } else if (gSortLightMode != 0) {
         v0 = 9;
     } else {
         v0 = 0x10;
