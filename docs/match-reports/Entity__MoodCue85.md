@@ -119,3 +119,10 @@ existing names' reading, not re-derived here.
 | `Entity::unk50` (+0x50) | `companion2` | B | Entity is a Class65650 subclass (`Entity__Entity` calls `Get_vtable_Class65650()->ctor`; ENTITY_METHODS keeps Class65650's slots), and `code_55dd4.h` names Class65650's +0x50 `companion2` (the tag-5 BaseObjO companion). Here and in `Entity__MoodCue57` it is only passed opaquely as `unk100->slotD4/slotD8`'s arg1, so nothing in this unit contradicts or confirms it beyond the offset. | Entity_g (first compiler failure, `Entity_g.c:78`; make stops there, so a witness, not the full list) |
 
 **Applied by the head at merge, round 79**, by type scope, each field separately with both oracles green. `moodDuration` (round 78) is now `todFrameCount`.
+
+## Track 4 (2026-09-26, round 87, echo)
+
+`this->unk100` is a `Class6E99C *` (include/Class6E99C.h); the slot
+call through its +0x0D4 and +0x0D8 is now `startFadeDown`/`startFadeUp` (Class6E99C__StartFadeDown/StartFadeUp), with `companion2`, an
+`s32` in Entity.h, cast `(BasicClass *)` as the fade's source (Class6E99C's
+configure adds it as a child; no code). Image byte-identical.

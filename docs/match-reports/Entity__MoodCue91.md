@@ -86,3 +86,10 @@ same symbol: no precedent for naming a non-uniform, non-unit-fraction scale.
 
 Types were left as they were (`s32`), not corrected to Class65650's `u8 *`;
 no offset or size moved. Both oracles green after each.
+
+## Track 4 (2026-09-26, round 87, echo)
+
+`this->unk100` is a `Class6E99C *` (include/Class6E99C.h); the slot
+call through its +0x0D4 is now `startFadeDown` (Class6E99C__StartFadeDown), with `companion2`, an
+`s32` in Entity.h, cast `(BasicClass *)` as the fade's source (Class6E99C's
+configure adds it as a child; no code). Image byte-identical.

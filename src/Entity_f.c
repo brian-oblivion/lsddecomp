@@ -151,7 +151,7 @@ void Entity__MoodCue85(Entity *this, EntityMoodHandlerArg *out) {
         } else {
             SetCueTones7_7_7(out);
             if (Entity__GetOrCreateUnk100(this, NULL, NULL, (void *)0x1E, 0) != NULL) {
-                this->unk100->methods->slotD4(this->unk100, this->companion2, 7, 0);
+                this->unk100->methods->startFadeDown(this->unk100, (BasicClass *)this->companion2, 7, 0);
             }
             this->moodState = 0xD;
             this->moodTimer = -1;
@@ -160,7 +160,7 @@ void Entity__MoodCue85(Entity *this, EntityMoodHandlerArg *out) {
         if (this->moodTimer < 0x5A) {
             if (this->moodTimer == 0x1E) {
                 if (Entity__GetOrCreateUnk100(this, NULL, NULL, (void *)0xA, 0) != NULL) {
-                    this->unk100->methods->slotD8(this->unk100, this->companion2, 0, 0);
+                    this->unk100->methods->startFadeUp(this->unk100, (BasicClass *)this->companion2, 0, 0);
                 }
             }
             this->target->methods->slot44(this->target, 0, ROTATION_ZPLUS1);
@@ -263,7 +263,7 @@ void Entity__MoodCue91(Entity *this, EntityMoodHandlerArg *out) {
             if (rand() & 1) {
                 this->methods->addVec14(this, TRANSLATE_Y_MINUS256);
             }
-            this->unk100->methods->slotD4(this->unk100, this->companion2, 0, 0);
+            this->unk100->methods->startFadeDown(this->unk100, (BasicClass *)this->companion2, 0, 0);
         }
     } else {
         if (this->todFrame == 0) {

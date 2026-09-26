@@ -135,3 +135,21 @@ not established -- every known call site passes `name`/`arg2` as NULL, so
 those defaults are never actually exercised in the corpus read so far. Named
 after the mechanic (get-or-create) and the field it operates on (`unk100`),
 not after a guess about what the object represents.
+
+## Track 4 (2026-09-26, round 87, echo)
+
+`Entity::unk100` is now typed `Class6E99C *` (include/Class6E99C.h); the
+local `Unk100Obj`/`Unk100Methods` view and Entity.h's own
+`extern Unk100Obj *New_Class6E99C` are deleted. This function's four slot
+calls resolve through D_8006E99C (`tools/classtable.py D_8006E99C`) and now
+use the unified names: slot50 -> `detachFromParent`
+(Class6B5CC__DetachFromParent), slot4C -> `attachToParent`
+(BoxFill__AttachToParent, `this` upcast to `Class6B5CC *`), slotD0 ->
+`setStep` (Class6E99C__SetStep; `arg3` passed `(s32)`, no code). What the
+arguments are, from the occupants: `name` is New_Class6E99C's SIZE (read as
+two low halfwords into boxW/boxH; the default gEntityDefaultPos is
+{320, 240}), `arg2` is the attach position (BoxFill__AttachToParent's
+Pair32E99C; default {-100, -100}, the relative top-left, the same pair
+Viewport passes, D_8008A904) and `arg3` the fade step. The parameter names
+and the function's own name are Entity's (not renamed here; proposed in
+echo's round-87 summary). Image byte-identical.
