@@ -9,9 +9,9 @@ drift. Fresh ground (carved revision 18, no prior report).
 
 ## What it does
 
-Constructor: the active driver's ctor, install D_8006F0B8, clear +0x2C/+0x30/+0x3C/+0x34/+0x38, and lay out four 16-byte channel entries at +0x40: shift = gTimBlockClutShift, mask = 1 << shift, +4 = 0, +6 = 0x1E0 + the running sum of masks, +8 = 0x100, +0xA = 1 (TimBlockSrc__SetEntryShift later rewrites one entry's shift/mask, TimBlockSrc__FadeEntry its vector at +0xC). Then allocate a 0x24-byte header buffer and a 0x800-byte sector buffer (+0x34); with both, adopt the header as the data-source buffer (size 0x24), set state 9 at +0x2A, clear +0x80, open `name` (own +0x044 with 1, 0) and read one sector into +0x34 (own +0x054).
+Constructor: the active driver's ctor, install gTimBlockSrcMethods, clear +0x2C/+0x30/+0x3C/+0x34/+0x38, and lay out four 16-byte channel entries at +0x40: shift = gTimBlockClutShift, mask = 1 << shift, +4 = 0, +6 = 0x1E0 + the running sum of masks, +8 = 0x100, +0xA = 1 (TimBlockSrc__SetEntryShift later rewrites one entry's shift/mask, TimBlockSrc__FadeEntry its vector at +0xC). Then allocate a 0x24-byte header buffer and a 0x800-byte sector buffer (+0x34); with both, adopt the header as the data-source buffer (size 0x24), set state 9 at +0x2A, clear +0x80, open `name` (own +0x044 with 1, 0) and read one sector into +0x34 (own +0x054).
 
-Table slot (`tools/classtable.py`): D_8006F0B8 +0x008 (its allocator New_TimBlockSrc passes one argument).
+Table slot (`tools/classtable.py`): gTimBlockSrcMethods +0x008 (its allocator New_TimBlockSrc passes one argument).
 
 ## Source
 
@@ -21,7 +21,7 @@ fields +0x2C..+0x38), `Ctor33808`, `CountedBuf33808` and `Req44858` sit at the
 top of / earlier in `src/code_33808.c`.
 
 ```c
-/* D_8006F0B8 +0x008: constructor -- the active driver's, then this table;
+/* gTimBlockSrcMethods +0x008: constructor -- the active driver's, then this table;
  * clear +0x2C..+0x3C and lay out the four channel entries at +0x40 (shift
  * gTimBlockClutShift, its mask, consecutive slots from 0x1E0); then adopt a 0x24-byte
  * header buffer (state 9 at +0x2A), allocate the 0x800-byte sector buffer
@@ -102,4 +102,4 @@ Twenty-ninth build (four families of levers, all needed together): (1) an `s16 s
 
 ## Track 4 (2026-09-25, round 83, bravo)
 
-Occupant of +0x008. Fields now named: +0x2C `blockCount`, +0x30 `blocks`, +0x38 `sectorSize`, +0x3C `loaded`, +0x80 `failed`; each entry's +0x04..+0x0A the RECT `clutX`/`clutY`/`clutW`/`clutH` this ctor lays out (0, 0x1E0 + i * mask, 0x100, 1). The class (id 0xF03, table `D_8006F0B8`) is unified as `TimBlockSrc` in `include/TimBlockSrc.h`. Any source block above is the pre-unification spelling; the live body in `src/code_33808.c` takes the unified types, byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).
+Occupant of +0x008. Fields now named: +0x2C `blockCount`, +0x30 `blocks`, +0x38 `sectorSize`, +0x3C `loaded`, +0x80 `failed`; each entry's +0x04..+0x0A the RECT `clutX`/`clutY`/`clutW`/`clutH` this ctor lays out (0, 0x1E0 + i * mask, 0x100, 1). The class (id 0xF03, table `gTimBlockSrcMethods`) is unified as `TimBlockSrc` in `include/TimBlockSrc.h`. Any source block above is the pre-unification spelling; the live body in `src/code_33808.c` takes the unified types, byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).

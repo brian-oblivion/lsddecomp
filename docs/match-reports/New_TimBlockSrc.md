@@ -11,7 +11,7 @@ drift. Fresh ground (carved revision 18, no prior report).
 
 Allocator shape: `BMemPMgrAlloc(size)`, then the constructor (+0x008) through the class's table getter, called through the unit-local `Ctor33808` view (an unprototyped `s32 (*ctor)()` at +0x008, declared at the top of the unit with the getter prototypes), since each class's constructor takes different arguments. Shape: `if (obj != NULL) { ctor; return obj; } return NULL;`.
 
-Table slot (`tools/classtable.py`): none (allocator for D_8006F0B8, object size 0x84).
+Table slot (`tools/classtable.py`): none (allocator for gTimBlockSrcMethods, object size 0x84).
 
 ## Source
 
@@ -20,7 +20,7 @@ The unit-local view `DataSrc33808` (a Class6D430 subclass built with the unified
 fields +0x2C..+0x38) and `CountedBuf33808` sit at the top of `src/code_33808.c`.
 
 ```c
-/* Allocate and construct a D_8006F0B8 object. */
+/* Allocate and construct a gTimBlockSrcMethods object. */
 void *New_TimBlockSrc(s32 arg0) {
     void *obj = BMemPMgrAlloc(0x84);
 
@@ -42,8 +42,8 @@ void *New_TimBlockSrc(s32 arg0) {
 
 ## Naming
 
-- **New_TimBlockSrc**, tier B. Allocator for D_8006F0B8; class named for its own mechanics (see TimBlockSrc__TimBlockSrc).
+- **New_TimBlockSrc**, tier B. Allocator for gTimBlockSrcMethods; class named for its own mechanics (see TimBlockSrc__TimBlockSrc).
 
 ## Track 4 (2026-09-25, round 83, bravo)
 
-The allocator; 0x84 is the class size the header records. It now reaches the ctor through the typed getter (`GetTimBlockSrcMethods()->ctor(obj, (char *)arg0)`) instead of the unit's `Ctor33808` cast; its own signature is unchanged because `src/class_3bb8c_l.c` declares it `s32 New_TimBlockSrc(s32)` locally. The class (id 0xF03, table `D_8006F0B8`) is unified as `TimBlockSrc` in `include/TimBlockSrc.h`. Any source block above is the pre-unification spelling; the live body in `src/code_33808.c` takes the unified types, byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).
+The allocator; 0x84 is the class size the header records. It now reaches the ctor through the typed getter (`GetTimBlockSrcMethods()->ctor(obj, (char *)arg0)`) instead of the unit's `Ctor33808` cast; its own signature is unchanged because `src/class_3bb8c_l.c` declares it `s32 New_TimBlockSrc(s32)` locally. The class (id 0xF03, table `gTimBlockSrcMethods`) is unified as `TimBlockSrc` in `include/TimBlockSrc.h`. Any source block above is the pre-unification spelling; the live body in `src/code_33808.c` takes the unified types, byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).

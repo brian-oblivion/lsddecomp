@@ -24,7 +24,7 @@
  * (Class86668__Init: +0x028 result; TaskCore__Init: +0x038 result).
  *
  * onNotify splits by the SENDER's root class nibble, as Class6B5CC's does:
- * a D_8006C070 (1) goes to onTag1Notify, a Pad (2) to onPadEvent, a
+ * a gDrawSystemMethods (1) goes to onTag1Notify, a Pad (2) to onPadEvent, a
  * FrameClock (5) to update, which here only counts frames. setState stores
  * the state, passes it to notifyParents and runs onState2 or onState3 for 2
  * or 3. Both reset the frame counter and call initArgs->unk0.
@@ -53,7 +53,7 @@ struct IntermediateBaseInitArgs {
     /* +0x048 */ void (*deinit)(Self *self);                 /* IntermediateBase__Deinit */      \
     /* +0x04C */ void (*onInit)(Self *self, s32 arg1, s32 arg2, s32 arg3); /* NULL; init calls it (0, 0, 0) after adding the children */ \
     /* +0x050 */ void (*onDeinit)(Self *self);               /* NULL; deinit's first call */     \
-    /* +0x054 */ void (*onTag1Notify)(Self *self, BasicClass *sender, s32 event); /* IntermediateBase__OnTag1Notify: onNotify's D_8006C070 (1) case */ \
+    /* +0x054 */ void (*onTag1Notify)(Self *self, BasicClass *sender, s32 event); /* IntermediateBase__OnTag1Notify: onNotify's gDrawSystemMethods (1) case */ \
     /* +0x058 */ void (*onPadEvent)(Self *self, BasicClass *sender, s32 event);   /* NULL; onNotify's Pad (2) case */ \
     /* +0x05C */ void (*update)(Self *self, BasicClass *sender, s32 event);       /* IntermediateBase__IncrementFrameCounter: onNotify's FrameClock (5) case */ \
     /* +0x060 */ void (*setState)(Self *self, s32 state);    /* IntermediateBase__SetState; TaskCore__SetState, Class86B60__SetState */ \

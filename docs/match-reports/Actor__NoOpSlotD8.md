@@ -3,7 +3,7 @@
 > Renamed from `DreamSys__NoOpSlotD8` on 2026-09-25 (tools/rename.py). Address 0x80057610.
 
 Unit: `src/class_3bb8c_p.c`. Class: `DreamSys`, own vtable slot `+0x0D8`
-(resolved via `tools/classtable.py DREAMSYS_METHODS`, which lists this
+(resolved via `tools/classtable.py gDreamSysMethods`, which lists this
 exact function -- `0x80057610` -- as the default table's `+0x0D8` value).
 No match report existed before this round: this is a splat-matched,
 length-exact two-word leaf (`jr $ra; nop`), one of the "four two-word

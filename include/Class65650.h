@@ -7,7 +7,7 @@
  * Class65650 -- an Actor that owns one Actor "part" per object of a TOD
  * animation and plays TODs over them (class id 0x234, method table
  * gClass65650Methods): an Actor subclass (include/Actor.h). Methods in
- * src/code_55dd4.c; one class derives from it, Entity (ENTITY_METHODS,
+ * src/code_55dd4.c; one class derives from it, Entity (gEntityMethods,
  * 0x1F234, include/Entity.h), whose ctor calls this class's first
  * (Entity__Entity: Get_vtable_Class65650()->ctor).
  *
@@ -54,7 +54,7 @@ struct UnkArg2Obj;  /* the ctor's second argument: unidentified, its +0x080 slot
 struct TagCheckArg; /* onNotify's sender, read only for its table's low id halfword */
 
 /* Occupants in gClass65650Methods named at each slot; `tools/classtable.py
- * ENTITY_METHODS --vs gClass65650Methods` lists Entity's overrides. The
+ * gEntityMethods --vs gClass65650Methods` lists Entity's overrides. The
  * inherited slots keep Actor's names; this class overrides +0x008, +0x00C
  * (Class65650__Finalize), +0x038 (Class65650__OnNotify), +0x040
  * (Class65650__Reset), +0x04C/+0x050 (Class65650__AttachToParent/

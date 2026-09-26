@@ -9,9 +9,9 @@ drift. Fresh ground (carved revision 18, no prior report).
 
 ## What it does
 
-When +0x30 is set, allocate 300 GsCELLs (0x960 bytes) at +0x2C and fill them as 16x16-texel cells over VRAM from x 0x280: u steps by 16, x by 16; at x 0x3C0 the row wraps (u 0, x 0x280, v += 16); whenever x crosses a 64-pixel texture page the cell's tpage becomes x >> 6 (plus 16 once v reaches 0x100) and u restarts at 0. The first page comes from GetTPage(2, 0, 0x280, 0). cba and flag are zero. The D_8006F498 object (20 x 15 grid of 16 x 16 cells, index table 0..299) is its GsMAP partner.
+When +0x30 is set, allocate 300 GsCELLs (0x960 bytes) at +0x2C and fill them as 16x16-texel cells over VRAM from x 0x280: u steps by 16, x by 16; at x 0x3C0 the row wraps (u 0, x 0x280, v += 16); whenever x crosses a 64-pixel texture page the cell's tpage becomes x >> 6 (plus 16 once v reaches 0x100) and u restarts at 0. The first page comes from GetTPage(2, 0, 0x280, 0). cba and flag are zero. The gTileMapMethods object (20 x 15 grid of 16 x 16 cells, index table 0..299) is its GsMAP partner.
 
-Table slot (`tools/classtable.py`): D_8006F514 +0x078.
+Table slot (`tools/classtable.py`): gTileAtlasMethods +0x078.
 
 ## Source
 
@@ -21,7 +21,7 @@ fields +0x2C..+0x38), `Ctor33808`, `CountedBuf33808` and `Req44858` sit at the
 top of / earlier in `src/code_33808.c`.
 
 ```c
-/* D_8006F514 +0x078: when +0x30 is set, build 300 GsCELLs (16 x 16 texels
+/* gTileAtlasMethods +0x078: when +0x30 is set, build 300 GsCELLs (16 x 16 texels
  * each) at +0x2C over the texture pages from x 0x280: u,v step by 16, a new
  * row at x 0x3C0, a new texture page every 64 x (the lower half from v
  * 0x100). */
@@ -90,4 +90,4 @@ Eleventh build. The cell is LIBGS.H's GsCELL (u, v, cba, flag, tpage), unit-loca
 
 ## Track 4 (2026-09-26, round 88, alpha)
 
-Class unified in `include/TileAtlas.h` (D_8006F514, 0x303, a Class6D430 subclass, 0x38 bytes). `self` is `TileAtlas *` (was `Obj6F514`); the cell type is LIBGS.H's `GsCELL`, now defined in the header (was the unit-local `Cell450B4`, same layout), and the flag at +0x030 is `defaultCells`. `cells` is the array TileMap__BuildMap takes as its GsMAP base. No rename. Byte-identical.
+Class unified in `include/TileAtlas.h` (gTileAtlasMethods, 0x303, a Class6D430 subclass, 0x38 bytes). `self` is `TileAtlas *` (was `Obj6F514`); the cell type is LIBGS.H's `GsCELL`, now defined in the header (was the unit-local `Cell450B4`, same layout), and the flag at +0x030 is `defaultCells`. `cells` is the array TileMap__BuildMap takes as its GsMAP base. No rename. Byte-identical.

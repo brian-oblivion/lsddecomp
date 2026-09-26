@@ -9,9 +9,9 @@ drift. Fresh ground (carved revision 18, no prior report).
 
 ## What it does
 
-Reset a GsBG embedded at +0x044 of the D_8006F2C4 object over a map source whose +0x2C is a GsMAP (the D_8006F498 object lays one out: cellw/cellh 16, ncellw 20, ncellh 15). Mode 0: attribute 0x1000000, w/h = cell size x cell count; mode 1: attribute 0x2000000, 320 x 240. Then x/y/scroll 0, r,g,b from gBgLayerDefaultColor, map = &src->cellw, scale 0x1000/0x1000, rotate 0, mx/my = w/2, h/2.
+Reset a GsBG embedded at +0x044 of the gBgLayerMethods object over a map source whose +0x2C is a GsMAP (the gTileMapMethods object lays one out: cellw/cellh 16, ncellw 20, ncellh 15). Mode 0: attribute 0x1000000, w/h = cell size x cell count; mode 1: attribute 0x2000000, 320 x 240. Then x/y/scroll 0, r,g,b from gBgLayerDefaultColor, map = &src->cellw, scale 0x1000/0x1000, rotate 0, mx/my = w/2, h/2.
 
-Table slot (`tools/classtable.py`): D_8006F2C4 +0x040 (the Class6B5CC `reset` slot, called by BgLayer__BgLayer with its two arguments).
+Table slot (`tools/classtable.py`): gBgLayerMethods +0x040 (the Class6B5CC `reset` slot, called by BgLayer__BgLayer with its two arguments).
 
 ## Source
 
@@ -21,7 +21,7 @@ fields +0x2C..+0x38), `Ctor33808`, `CountedBuf33808` and `Req44858` sit at the
 top of / earlier in `src/code_33808.c`.
 
 ```c
-/* D_8006F2C4 +0x040: reset -- lay out the GsBG at +0x044 over a map
+/* gBgLayerMethods +0x040: reset -- lay out the GsBG at +0x044 over a map
  * source: mode 0 sizes it to the map (cell size x cell count), mode 1 to a
  * 320 x 240 screen (with its own attribute); then zero position and
  * scroll, take the colour in gBgLayerDefaultColor, point it at the source's GsMAP

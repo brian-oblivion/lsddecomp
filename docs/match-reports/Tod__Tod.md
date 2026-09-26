@@ -9,9 +9,9 @@ drift. Fresh ground (carved revision 18, no prior report).
 
 ## What it does
 
-Constructor: active driver's ctor, install D_8006F240 (GetTodMethods); the argument is a two-word source descriptor { buffer, name }: with a buffer, adopt it (+0x10 = buffer, +0x14 size = 0) and call its own +0x064 (setFlag override); without one, call its own requestLoadFile (+0x06C) with the name.
+Constructor: active driver's ctor, install gTodMethods (GetTodMethods); the argument is a two-word source descriptor { buffer, name }: with a buffer, adopt it (+0x10 = buffer, +0x14 size = 0) and call its own +0x064 (setFlag override); without one, call its own requestLoadFile (+0x06C) with the name.
 
-Table slot (`tools/classtable.py`): D_8006F240 +0x008.
+Table slot (`tools/classtable.py`): gTodMethods +0x008.
 
 ## Source
 
@@ -41,7 +41,7 @@ void Tod__Tod(DataSrc33808 *self, Src6F240 *src) {
 
 ## Notes
 
-First build. The else branch reuses the just-stored table pointer (GCC CSE of `self->methods = getter()`), which the ordinary `self->methods->requestLoadFile` spelling reproduces. The same descriptor is what D_8006F590's ctor (TodSet__TodSet, the subclass) tests with `*arg`.
+First build. The else branch reuses the just-stored table pointer (GCC CSE of `self->methods = getter()`), which the ordinary `self->methods->requestLoadFile` spelling reproduces. The same descriptor is what gTodSetMethods's ctor (TodSet__TodSet, the subclass) tests with `*arg`.
 
 ## Naming
 

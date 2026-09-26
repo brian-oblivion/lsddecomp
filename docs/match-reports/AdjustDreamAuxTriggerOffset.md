@@ -75,7 +75,7 @@ gates it, are not established from this unit alone, hence B not A.
 The view `*gDreamAuxWorld` is cast to is renamed `DreamAuxWorld` /
 `DreamAuxWorldFn80` in include/code_4cd08.h (was `TriggerWorld` /
 `TriggerWorldFn80`, same `{ void **vtable; }` shape, so the call is
-unchanged). The name `TriggerWorld` now belongs to the class D_8006F40C
+unchanged). The name `TriggerWorld` now belongs to the class gTriggerWorldMethods
 (include/TriggerWorld.h), whose table is 0x8C bytes: this call loads byte
 +0x200 of its object's table (`lw v0,512(v0)`), so gDreamAuxWorld is not a
 TriggerWorld. Its real class is unresolved. Bytes unchanged.

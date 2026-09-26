@@ -9,17 +9,17 @@ deletions, no out-of-range drift. Fresh ground (carved revision 18, no prior rep
 
 ## What it does
 
-Table getter: returns the method table `D_8006F590` (`lui/addiu; jr; nop`), declared locally as `extern s32 D_8006F590[];`.
+Table getter: returns the method table `gTodSetMethods` (`lui/addiu; jr; nop`), declared locally as `extern s32 gTodSetMethods[];`.
 
 Table slot (`tools/classtable.py`): `D_8006D430` +0x0A8.
 
 ## Source
 
 ```c
-extern s32 D_8006F590[];
+extern s32 gTodSetMethods[];
 
 void *GetTodSetMethods(void) {
-    return D_8006F590;
+    return gTodSetMethods;
 }
 ```
 
@@ -34,4 +34,4 @@ void *GetTodSetMethods(void) {
 
 ## Track 4 (2026-09-26, round 88, delta)
 
-Now `TodSetMethods *GetTodSetMethods(void)` returning `&D_8006F590` (include/TodSet.h), replacing the unit-local `extern s32 D_8006F590[]` and `void *` prototype. Bytes unchanged.
+Now `TodSetMethods *GetTodSetMethods(void)` returning `&gTodSetMethods` (include/TodSet.h), replacing the unit-local `extern s32 gTodSetMethods[]` and `void *` prototype. Bytes unchanged.

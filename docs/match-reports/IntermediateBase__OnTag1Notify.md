@@ -85,7 +85,7 @@ object; what event code 2 represents in the game is not established
 
 ## Track 4 (2026-09-25, round 82, charlie)
 
-The class is IntermediateBase (class id 0x30, gIntermediateBaseMethods; `tools/classtable.py gIntermediateBaseMethods` lists this function as one of its own occupants), declared once in include/IntermediateBase.h. `self` is now `IntermediateBase *`, not TaskCore's `Obj86B60` view; byte-identical. Renamed from Obj86B60__OnTag1Notify (class prefix). Occupies +0x054, slot `onTag1Notify`: OnNotify's case for a sender of root class 1 (D_8006C070). Parameters are (sender, event). The calls on unk10 and initArgs->unk4 use one local view in code_2cc8c_c.c (IntermediateBaseLinked); their classes are not established.
+The class is IntermediateBase (class id 0x30, gIntermediateBaseMethods; `tools/classtable.py gIntermediateBaseMethods` lists this function as one of its own occupants), declared once in include/IntermediateBase.h. `self` is now `IntermediateBase *`, not TaskCore's `Obj86B60` view; byte-identical. Renamed from Obj86B60__OnTag1Notify (class prefix). Occupies +0x054, slot `onTag1Notify`: OnNotify's case for a sender of root class 1 (gDrawSystemMethods). Parameters are (sender, event). The calls on unk10 and initArgs->unk4 use one local view in code_2cc8c_c.c (IntermediateBaseLinked); their classes are not established.
 
 ## Track 4 (2026-09-26, round 88, delta: FrameClock)
 

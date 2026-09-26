@@ -11,17 +11,17 @@ deletions, no out-of-range drift. Fresh ground (carved revision 18, no prior rep
 
 ## What it does
 
-Table getter: returns the method table `D_8006F498` (`lui/addiu; jr; nop`), declared locally as `extern s32 D_8006F498[];`.
+Table getter: returns the method table `gTileMapMethods` (`lui/addiu; jr; nop`), declared locally as `extern s32 gTileMapMethods[];`.
 
 Table slot (`tools/classtable.py`): `D_8006D430` +0x088.
 
 ## Source
 
 ```c
-extern s32 D_8006F498[];
+extern s32 gTileMapMethods[];
 
 void *GetTileMapMethods(void) {
-    return D_8006F498;
+    return gTileMapMethods;
 }
 ```
 
@@ -36,4 +36,4 @@ void *GetTileMapMethods(void) {
 
 ## Track 4 (2026-09-26, round 88, alpha)
 
-Class unified in `include/TileMap.h`. Returns `TileMapMethods *` and `&D_8006F498` (was `void *` over `extern s32 D_8006F498[]`). Byte-identical.
+Class unified in `include/TileMap.h`. Returns `TileMapMethods *` and `&gTileMapMethods` (was `void *` over `extern s32 gTileMapMethods[]`). Byte-identical.

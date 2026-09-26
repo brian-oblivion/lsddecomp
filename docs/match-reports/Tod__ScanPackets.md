@@ -11,7 +11,7 @@ drift. Fresh ground (carved revision 18, no prior report).
 
 Returns `(u8)self->methods->slot7C(self, arg1, arg2, (u8 *)self->buffer + 8)`: a0..a2 pass through, a3 is buffer+8, and the trailing `andi 0xFF` is the u8 return truncating an s32 slot result.
 
-Table slot (`tools/classtable.py`): D_8006F240 +0x078.
+Table slot (`tools/classtable.py`): gTodMethods +0x078.
 
 ## Source
 
@@ -21,7 +21,7 @@ fields +0x2C..+0x38) and `CountedBuf33808` sit at the top of `src/code_33808.c`.
 Slot +0x078 is `void *slot78` in the unified macro, so calls cast it.
 
 ```c
-/* D_8006F240 +0x078: slot +0x07C over the buffer past its first two words. */
+/* gTodMethods +0x078: slot +0x07C over the buffer past its first two words. */
 u8 Tod__ScanPackets(DataSrc33808 *self, s32 arg1, s32 arg2) {
     return self->methods->slot7C(self, arg1, arg2, (u8 *)self->buffer + 8);
 }

@@ -9,9 +9,9 @@ drift. Fresh ground (carved revision 18, no prior report).
 
 ## What it does
 
-Build step (D_8006F590's setFlag override): SetVec3 fills a three-word request {buffer, 0, 1}; for each of the buffer's `count` offsets, point the request at buffer+offset and allocate a D_8006F240 source (New_Tod) over it, storing the object over the offset word. On a NULL, walk back releasing (slot +0x004) every one already built and return 1; otherwise 0.
+Build step (gTodSetMethods's setFlag override): SetVec3 fills a three-word request {buffer, 0, 1}; for each of the buffer's `count` offsets, point the request at buffer+offset and allocate a gTodMethods source (New_Tod) over it, storing the object over the offset word. On a NULL, walk back releasing (slot +0x004) every one already built and return 1; otherwise 0.
 
-Table slot (`tools/classtable.py`): D_8006F590 +0x064.
+Table slot (`tools/classtable.py`): gTodSetMethods +0x064.
 
 ## Source
 
@@ -21,7 +21,7 @@ fields +0x2C..+0x38), `Ctor33808`, `CountedBuf33808` and `Req44858` sit at the
 top of / earlier in `src/code_33808.c`.
 
 ```c
-/* D_8006F590 +0x064: build a D_8006F240 source over each sub-block of the
+/* gTodSetMethods +0x064: build a gTodMethods source over each sub-block of the
  * buffer's counted offset table, into the table's own words; 0 when all
  * exist, otherwise release the ones already built and 1. */
 s32 TodSet__BuildTods(DataSrc33808 *self) {

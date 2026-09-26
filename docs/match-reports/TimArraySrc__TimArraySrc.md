@@ -9,9 +9,9 @@ drift. Fresh ground (carved revision 18, no prior report).
 
 ## What it does
 
-Constructor: runs the active data-source driver's ctor (GetActiveDataSourceMethods()->ctor), installs D_8006F1C4 (GetTimArraySrcMethods), zeroes +0x2C/+0x30/+0x38, and when `name` is non-NULL calls its own requestLoadFile (+0x06C) with it. Returns nothing (v0 is left as the last jalr's).
+Constructor: runs the active data-source driver's ctor (GetActiveDataSourceMethods()->ctor), installs gTimArraySrcMethods (GetTimArraySrcMethods), zeroes +0x2C/+0x30/+0x38, and when `name` is non-NULL calls its own requestLoadFile (+0x06C) with it. Returns nothing (v0 is left as the last jalr's).
 
-Table slot (`tools/classtable.py`): D_8006F1C4 +0x008.
+Table slot (`tools/classtable.py`): gTimArraySrcMethods +0x008.
 
 ## Source
 
@@ -21,7 +21,7 @@ fields +0x2C..+0x38), `Ctor33808` and `CountedBuf33808` sit at the top of
 `src/code_33808.c`.
 
 ```c
-/* D_8006F1C4 +0x008: constructor -- the active driver's, then this table,
+/* gTimArraySrcMethods +0x008: constructor -- the active driver's, then this table,
  * clear +0x2C/+0x30/+0x38, and request `name` when there is one. */
 void TimArraySrc__TimArraySrc(DataSrc33808 *self, char *name) {
     GetActiveDataSourceMethods()->ctor((Class6D430 *)self);

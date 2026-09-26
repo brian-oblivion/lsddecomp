@@ -52,7 +52,7 @@ typedef struct Class86F88Methods Class86F88Methods;
 
 /* BasicClass's slots (overrides: +0x008 Class86F88__Class86F88, +0x00C
  * Finalize, +0x010 AddChild, +0x014 RemoveChild, +0x018 RemoveAllChildren,
- * +0x038 OnNotify; `tools/classtable.py gClass86F88Methods --vs D_8006B58C`),
+ * +0x038 OnNotify; `tools/classtable.py gClass86F88Methods --vs gBasicClassMethods`),
  * then this class's own. +0x064..+0x078 are NULL in the table. */
 struct Class86F88Methods {
     BASICCLASS_SLOTS(Class86F88, (Class86F88 * self, char **items, s32 mode));

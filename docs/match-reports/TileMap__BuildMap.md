@@ -13,7 +13,7 @@ drift. Fresh ground (carved revision 18, no prior report).
 
 Copies +0x2C of the object at +0x3C into +0x34. When +0x40 is set: +0x2E = 20, +0x2C = +0x2D = 16 (bytes), +0x30 = 15, then allocates +0x2E * +0x30 halfwords into +0x38 and fills them 0..n-1, returning. With +0x40 clear, or when the allocation fails, calls its own freeBuffer (+0x05C).
 
-Table slot (`tools/classtable.py`): D_8006F498 +0x078 (called by its setFlag override TileMap__Load).
+Table slot (`tools/classtable.py`): gTileMapMethods +0x078 (called by its setFlag override TileMap__Load).
 
 ## Source
 
@@ -37,7 +37,7 @@ typedef struct Obj6F498 {
     /* +0x042 */ u16 unk42;
 } Obj6F498;
 
-/* D_8006F498 +0x078: copy +0x2C of the object at +0x3C to +0x34; when +0x40
+/* gTileMapMethods +0x078: copy +0x2C of the object at +0x3C to +0x34; when +0x40
  * is set, lay out a 20 x 15 grid (16 x 16 cells) and fill an allocated
  * index table 0..n-1 at +0x38; otherwise, or when the allocation fails,
  * free the buffer (own +0x05C). */
@@ -76,6 +76,6 @@ Matched on build 2. **Lever: `mult` by a register holding a constant the functio
 
 ## Track 4 (2026-09-26, round 88, alpha)
 
-Class unified in `include/TileMap.h`. `self` is `TileMap *` (was `Obj6F498`); +0x02C..+0x03B are the GsMAP `map` (cellw, cellh, ncellw, ncellh, base, index; were unk2C, unk2D, unk2E, unk30, unk34, unk38 -- LIBGS.H's own layout, the pad at +0x032 is its alignment gap), +0x03C `atlas`, +0x040 `defaultGrid`. The atlas's +0x02C is still read through the unit-local `DataSrc33808` cast (TileAtlas, D_8006F514, is not unified) and cast to `struct GsCELL *`. Byte-identical.
+Class unified in `include/TileMap.h`. `self` is `TileMap *` (was `Obj6F498`); +0x02C..+0x03B are the GsMAP `map` (cellw, cellh, ncellw, ncellh, base, index; were unk2C, unk2D, unk2E, unk30, unk34, unk38 -- LIBGS.H's own layout, the pad at +0x032 is its alignment gap), +0x03C `atlas`, +0x040 `defaultGrid`. The atlas's +0x02C is still read through the unit-local `DataSrc33808` cast (TileAtlas, gTileAtlasMethods, is not unified) and cast to `struct GsCELL *`. Byte-identical.
 
 Later the same round (alpha, third class): TileAtlas unified (`include/TileAtlas.h`). TileMap::atlas (+0x03C) is `struct TileAtlas *` (was `Class6D430 *`), so the base is read as `self->atlas->cells` -- no `DataSrc33808` cast and no `struct GsCELL *` cast. Byte-identical.

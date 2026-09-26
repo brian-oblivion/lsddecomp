@@ -56,7 +56,7 @@ typedef struct TaskObjFMethods TaskObjFMethods;
 
 /* BasicClass's slots (overrides: +0x008 TaskObjF__TaskObjF, +0x00C Finalize,
  * +0x010 AddChild, +0x014 RemoveChild, +0x018 RemoveAllChildren, +0x038
- * OnNotify; `tools/classtable.py gTaskObjFMethods --vs D_8006B58C`), then
+ * OnNotify; `tools/classtable.py gTaskObjFMethods --vs gBasicClassMethods`), then
  * this class's own, every one of them filled. */
 struct TaskObjFMethods {
     BASICCLASS_SLOTS(TaskObjF, (TaskObjF * self, s32 padEnable, s32 cardSlot));

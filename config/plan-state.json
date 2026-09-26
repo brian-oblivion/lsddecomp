@@ -842,21 +842,6 @@
     },
     "4": {
       "classes": {
-        "DREAMSYS_METHODS": {
-          "class": "DreamSys",
-          "date": "2026-09-26",
-          "header": "include/DreamSys.h"
-        },
-        "D_8006B58C": {
-          "class": "BasicClass",
-          "date": "2026-09-25",
-          "header": "include/BasicClass.h"
-        },
-        "D_8006C070": {
-          "class": "DrawSystem",
-          "date": "2026-09-26",
-          "header": "include/DrawSystem.h"
-        },
         "D_8006D3C8": {
           "class": "Class6D3C8",
           "date": "2026-09-26",
@@ -882,60 +867,20 @@
           "date": "2026-09-26",
           "header": "include/Class6E99C.h"
         },
-        "D_8006F0B8": {
-          "class": "TimBlockSrc",
-          "date": "2026-09-25",
-          "header": "include/TimBlockSrc.h"
-        },
-        "D_8006F1C4": {
-          "class": "TimArraySrc",
-          "date": "2026-09-26",
-          "header": "include/TimArraySrc.h"
-        },
-        "D_8006F240": {
-          "class": "Tod",
-          "date": "2026-09-26",
-          "header": "include/Tod.h"
-        },
-        "D_8006F2C4": {
-          "class": "BgLayer",
-          "date": "2026-09-26",
-          "header": "include/BgLayer.h"
-        },
-        "D_8006F384": {
-          "class": "ModelData",
-          "date": "2026-09-25",
-          "header": "include/ModelData.h"
-        },
-        "D_8006F40C": {
-          "class": "TriggerWorld",
-          "date": "2026-09-26",
-          "header": "include/TriggerWorld.h"
-        },
-        "D_8006F498": {
-          "class": "TileMap",
-          "date": "2026-09-26",
-          "header": "include/TileMap.h"
-        },
-        "D_8006F514": {
-          "class": "TileAtlas",
-          "date": "2026-09-26",
-          "header": "include/TileAtlas.h"
-        },
-        "D_8006F590": {
-          "class": "TodSet",
-          "date": "2026-09-26",
-          "header": "include/TodSet.h"
-        },
-        "ENTITY_METHODS": {
-          "class": "Entity",
-          "date": "2026-09-26",
-          "header": "include/Entity.h"
-        },
         "gActorMethods": {
           "class": "Actor",
           "date": "2026-09-25",
           "header": "include/Actor.h"
+        },
+        "gBasicClassMethods": {
+          "class": "BasicClass",
+          "date": "2026-09-25",
+          "header": "include/BasicClass.h"
+        },
+        "gBgLayerMethods": {
+          "class": "BgLayer",
+          "date": "2026-09-26",
+          "header": "include/BgLayer.h"
         },
         "gBoxFillMethods": {
           "class": "BoxFill",
@@ -1022,6 +967,21 @@
           "date": "2026-09-26",
           "header": "include/Class879C4.h"
         },
+        "gDrawSystemMethods": {
+          "class": "DrawSystem",
+          "date": "2026-09-26",
+          "header": "include/DrawSystem.h"
+        },
+        "gDreamSysMethods": {
+          "class": "DreamSys",
+          "date": "2026-09-26",
+          "header": "include/DreamSys.h"
+        },
+        "gEntityMethods": {
+          "class": "Entity",
+          "date": "2026-09-26",
+          "header": "include/Entity.h"
+        },
         "gFlatLightObjMethods": {
           "class": "FlatLightObj",
           "date": "2026-09-26",
@@ -1051,6 +1011,11 @@
           "class": "LinkResource",
           "date": "2026-09-26",
           "header": "include/LinkResource.h"
+        },
+        "gModelDataMethods": {
+          "class": "ModelData",
+          "date": "2026-09-25",
+          "header": "include/ModelData.h"
         },
         "gMoviePlayerMethods": {
           "class": "MoviePlayer",
@@ -1102,6 +1067,26 @@
           "date": "2026-09-26",
           "header": "include/TextRow.h"
         },
+        "gTileAtlasMethods": {
+          "class": "TileAtlas",
+          "date": "2026-09-26",
+          "header": "include/TileAtlas.h"
+        },
+        "gTileMapMethods": {
+          "class": "TileMap",
+          "date": "2026-09-26",
+          "header": "include/TileMap.h"
+        },
+        "gTimArraySrcMethods": {
+          "class": "TimArraySrc",
+          "date": "2026-09-26",
+          "header": "include/TimArraySrc.h"
+        },
+        "gTimBlockSrcMethods": {
+          "class": "TimBlockSrc",
+          "date": "2026-09-25",
+          "header": "include/TimBlockSrc.h"
+        },
         "gTimImageMethods": {
           "class": "TimImage",
           "date": "2026-09-26",
@@ -1111,6 +1096,21 @@
           "class": "TmdModel",
           "date": "2026-09-26",
           "header": "include/TmdModel.h"
+        },
+        "gTodMethods": {
+          "class": "Tod",
+          "date": "2026-09-26",
+          "header": "include/Tod.h"
+        },
+        "gTodSetMethods": {
+          "class": "TodSet",
+          "date": "2026-09-26",
+          "header": "include/TodSet.h"
+        },
+        "gTriggerWorldMethods": {
+          "class": "TriggerWorld",
+          "date": "2026-09-26",
+          "header": "include/TriggerWorld.h"
         },
         "gVabDriverMethods": {
           "class": "VabDriver",

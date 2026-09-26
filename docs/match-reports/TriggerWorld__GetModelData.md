@@ -13,7 +13,7 @@ drift. Fresh ground (carved revision 18, no prior report).
 
 `buf = self->buffer; if (index < buf->count) return buf->entries[index]; return 0;` with an unsigned index (`sltu`). The `j` + `addu v0,zero,zero` delay slot is GCC's layout for the out-of-range return; matched on the first build as written.
 
-Table slot (`tools/classtable.py`): D_8006F40C +0x088.
+Table slot (`tools/classtable.py`): gTriggerWorldMethods +0x088.
 
 ## Source
 
@@ -23,7 +23,7 @@ fields +0x2C..+0x38) and `CountedBuf33808` sit at the top of `src/code_33808.c`.
 Slot +0x078 is `void *slot78` in the unified macro, so calls cast it.
 
 ```c
-/* D_8006F40C +0x088: entry `index` of the buffer's counted word array, 0 when
+/* gTriggerWorldMethods +0x088: entry `index` of the buffer's counted word array, 0 when
  * out of range. */
 s32 TriggerWorld__GetModelData(DataSrc33808 *self, u32 index) {
     CountedBuf33808 *buf = self->buffer;

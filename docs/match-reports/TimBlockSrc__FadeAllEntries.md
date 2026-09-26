@@ -11,7 +11,7 @@ drift. Fresh ground (carved revision 18, no prior report).
 
 Under Lock/UnlockActiveDataSource, calls slot +0x080 as (self, i, arg) for i = 0..3.
 
-Table slot (`tools/classtable.py`): D_8006F0B8 +0x07C.
+Table slot (`tools/classtable.py`): gTimBlockSrcMethods +0x07C.
 
 ## Source
 
@@ -20,7 +20,7 @@ The unit-local view `DataSrc33808` (a Class6D430 subclass built with the unified
 fields +0x2C..+0x38) and `CountedBuf33808` sit at the top of `src/code_33808.c`.
 
 ```c
-/* D_8006F0B8 +0x07C: slot +0x080 for entries 0..3, under the data-source
+/* gTimBlockSrcMethods +0x07C: slot +0x080 for entries 0..3, under the data-source
  * lock. */
 extern void LockActiveDataSource(void);
 extern void UnlockActiveDataSource(void);
@@ -49,4 +49,4 @@ void TimBlockSrc__FadeAllEntries(DataSrc33808 *self, s32 arg) {
 
 ## Track 4 (2026-09-25, round 83, bravo)
 
-Occupant of +0x07C, now the `fadeAllEntries` slot. Its second argument is retyped `TimBlockSrcColor *` (was `s32`): it is passed straight on as `fadeEntry`'s colour; the slot call is now prototyped (`self->methods->fadeEntry(self, i, color)`, was the unprototyped `slot80`), byte-identical. The class (id 0xF03, table `D_8006F0B8`) is unified as `TimBlockSrc` in `include/TimBlockSrc.h`. Any source block above is the pre-unification spelling; the live body in `src/code_33808.c` takes the unified types, byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).
+Occupant of +0x07C, now the `fadeAllEntries` slot. Its second argument is retyped `TimBlockSrcColor *` (was `s32`): it is passed straight on as `fadeEntry`'s colour; the slot call is now prototyped (`self->methods->fadeEntry(self, i, color)`, was the unprototyped `slot80`), byte-identical. The class (id 0xF03, table `gTimBlockSrcMethods`) is unified as `TimBlockSrc` in `include/TimBlockSrc.h`. Any source block above is the pre-unification spelling; the live body in `src/code_33808.c` takes the unified types, byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).

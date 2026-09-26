@@ -1520,7 +1520,7 @@ s32 DreamSys__func_5ba20(DreamSys *this, s32 value) {
 }
 
 DreamSysMethods *Get_vtable_DreamSys(void) {
-    return &DREAMSYS_METHODS;
+    return &gDreamSysMethods;
 }
 
 void InitNavChallengesArray(s8 (*arrayMem)[30], s32 *linkCounter) {

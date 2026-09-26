@@ -41,7 +41,7 @@ Matched first try.
 
 Renamed from `Class86F88__NotifyChild`: it occupies gClass86F88Methods
 +0x038, BasicClass's `onNotify` slot (`classtable.py gClass86F88Methods --vs
-D_8006B58C`: OVERRIDDEN BasicClass__OnNotify), and it chains
+gBasicClassMethods`: OVERRIDDEN BasicClass__OnNotify), and it chains
 `Get_vtable_BasicClass()->onNotify` first, so the override takes the slot's
 name (FINISHING-PLAN track 4 step 6). The tag-2 child's notifications go to
 `handleInputCode` (+0x05C), the tag-5 child's to `tickClosing` (+0x058).

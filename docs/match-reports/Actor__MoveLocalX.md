@@ -5,7 +5,7 @@
 > Renamed from `func_800574C4` on 2026-09-19 (tools/rename.py). Address 0x800574c4.
 
 Unit: `src/class_3bb8c_p.c`. Class: `DreamSys`, own vtable slot `+0x0C8`
-(base-class-inherited; resolved via `tools/classtable.py DREAMSYS_METHODS`
+(base-class-inherited; resolved via `tools/classtable.py gDreamSysMethods`
 and confirmed unchanged in the DreamSys-level table too).
 
 ## Signature

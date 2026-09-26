@@ -49,7 +49,7 @@ flag; a preserved derivation (where one existed) was directly usable.
 ## Naming
 
 **Tier A.** Constructor: vtable slot `+0x08`, which `classtable.py`'s diff
-against `D_8006B58C` (`BasicClassMethods`) shows overrides
+against `gBasicClassMethods` (`BasicClassMethods`) shows overrides
 `BasicClass__BasicClass` -- the project's `Class__Class` constructor
 convention. Confirmed, not guessed: this body's own call to `PadInit` on the
 first live instance is what establishes the `Pad` class hypothesis in the

@@ -129,7 +129,7 @@ below).
 
 ## What it does
 
-Resolved via `tools/classtable.py DREAMSYS_METHODS` at +0x1E8 (this round's
+Resolved via `tools/classtable.py gDreamSysMethods` at +0x1E8 (this round's
 correction of the previous placeholder name, see the vtable's own comment).
 `effect` (4..12) selects one of five behaviours through a dense
 `switch`/jump-table dispatch; `entity` is an opaque object (almost certainly

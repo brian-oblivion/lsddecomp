@@ -11,7 +11,7 @@ drift. Fresh ground (carved revision 18, no prior report).
 
 `self->methods->slot78(self)` through the unified `void *slot78` cast to an unprototyped function pointer. No s0 is involved, so passing self explicitly costs nothing (a0 still holds it).
 
-Table slot (`tools/classtable.py`): D_8006F40C +0x064.
+Table slot (`tools/classtable.py`): gTriggerWorldMethods +0x064.
 
 ## Source
 
@@ -21,7 +21,7 @@ fields +0x2C..+0x38) and `CountedBuf33808` sit at the top of `src/code_33808.c`.
 Slot +0x078 is `void *slot78` in the unified macro, so calls cast it.
 
 ```c
-/* D_8006F40C +0x064: slot +0x078. */
+/* gTriggerWorldMethods +0x064: slot +0x078. */
 void TriggerWorld__Load(DataSrc33808 *self) {
     ((s32 (*)())self->methods->slot78)(self);
 }

@@ -6,7 +6,7 @@
 
 ## What it does
 
-Returns the address of `D_8006B58C`, BasicClass's own 14-slot method table
+Returns the address of `gBasicClassMethods`, BasicClass's own 14-slot method table
 (`BASICCLASS_METHODS` per `docs/research/class-framework.md`). Called from
 `BasicClass__BasicClass` (`code_8220.c`) to install the base vtable on a
 freshly-constructed `BasicClass`.
@@ -16,19 +16,19 @@ freshly-constructed `BasicClass`.
 ```c
 BasicClassMethods *Get_vtable_BasicClass(void)
 {
-    return &D_8006B58C;
+    return &gBasicClassMethods;
 }
 ```
 
-`D_8006B58C` had no extern declaration anywhere in the tree yet (only prose
+`gBasicClassMethods` had no extern declaration anywhere in the tree yet (only prose
 references to it in `class_16334.h`, `code_171e0.h`, `code_55dd4.h`,
 `code_d294.h`, `Class6D3C8.h`). Added one to `include/code_8220.h`:
 
 ```c
-extern BasicClassMethods D_8006B58C;
+extern BasicClassMethods gBasicClassMethods;
 ```
 
-The underlying data (`asm/data/57070.data.s`, `dlabel D_8006B58C`) is 0x40
+The underlying data (`asm/data/57070.data.s`, `dlabel gBasicClassMethods`) is 0x40
 bytes / 16 words — one header word, 14 method-pointer words matching every
 field of `BasicClassMethods`, and a trailing `.word 0x00000000` past the
 struct's own `0x03C` end. That extra word is not part of the C-visible
@@ -46,8 +46,8 @@ Matched first attempt — simple `lui`/`addiu` address-of, no ambiguity.
 `func_80018390` -> `Get_vtable_BasicClass`. **Tier A** -- pure leaf
 returning one known address.
 
-Evidence: the whole body is `return &D_8006B58C;`, and `D_8006B58C` is
-BasicClass's own 14-slot method table (`tools/classtable.py D_8006B58C`).
+Evidence: the whole body is `return &gBasicClassMethods;`, and `gBasicClassMethods` is
+BasicClass's own 14-slot method table (`tools/classtable.py gBasicClassMethods`).
 The spelling is the house convention rather than an invention:
 `Get_vtable_DreamSys` (`src/DreamSys.c`) and `Get_vtable_Entity`
 (`src/Entity_b.c`) are the two existing vtable accessors in the tree and
@@ -56,9 +56,9 @@ what makes matching the existing convention worth more than a tidier one.
 
 ### Proposed field/global name for the head
 
-`D_8006B58C` -> `BASICCLASS_METHODS`. **Tier A.** It is the name
+`gBasicClassMethods` -> `BASICCLASS_METHODS`. **Tier A.** It is the name
 `docs/research/class-framework.md` already uses for this exact table, and
-it matches `DREAMSYS_METHODS`, the one method table in the tree that is
+it matches `gDreamSysMethods`, the one method table in the tree that is
 already named. **`tools/rename.py` refuses it** and I did not work around
 it: its "NEW already appears" guard fires because six files
 (`docs/match-reports/BasicClass__BasicClass.md`, this report,
@@ -77,7 +77,7 @@ But the best candidate name for a placeholder symbol is very often the name
 the project's own PROSE has been using for that symbol all along -- that is
 what makes it the right name -- and prose hits fire the guard just as hard
 as a real symbol would. Measured twice this round on one symbol
-(`D_8006B58C`, six prose hits, zero symbol hits). A prose-only hit is
+(`gBasicClassMethods`, six prose hits, zero symbol hits). A prose-only hit is
 distinguishable from a real one: a real collision appears in a
 DECLARATION or the symbols file, and the tool already parses the symbols
 file. This is a tooling escalation, not something to route around by

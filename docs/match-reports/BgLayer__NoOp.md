@@ -11,7 +11,7 @@ deletions, no out-of-range drift. Fresh ground (carved revision 18, no prior rep
 
 Empty method (`jr ra; nop`).
 
-Table slot (`tools/classtable.py`): `D_8006F2C4` +0x0BC.
+Table slot (`tools/classtable.py`): `gBgLayerMethods` +0x0BC.
 
 ## Source
 

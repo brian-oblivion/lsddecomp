@@ -4,7 +4,7 @@
 
 Round 81, runner alpha. Unit `src/code_10ee0.c`. Fresh ground, no prior attempt.
 
-- **Where:** D_8006C070 slot +0x07C (slots resolved with `tools/classtable.py D_8006C070`).
+- **Where:** gDrawSystemMethods slot +0x07C (slots resolved with `tools/classtable.py gDrawSystemMethods`).
 - **What:** if out is non-NULL writes {0, 0, size.w, size.h * 2}; returns &self->size (+0x14).
 - **Result:** byte-exact on the FIRST build, no levers; `funcdiff.py` reports
   13/13 words, 0 insertions / 0 deletions, and the whole-image SHA1 is

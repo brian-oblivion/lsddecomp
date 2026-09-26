@@ -5,9 +5,9 @@
 ## The BasicClass design (established this round; full detail in `include/code_8220.h`'s doc comment)
 
 `BasicClass` is the game's hand-rolled base class, root of the class
-framework (`docs/research/class-framework.md`). Vtable is `D_8006B58C`
+framework (`docs/research/class-framework.md`). Vtable is `gBasicClassMethods`
 (`BASICCLASS_METHODS`), 14 slots, resolved with `tools/classtable.py
-D_8006B58C` — matches this unit's carve exactly: 13 of the 14 occupant
+gBasicClassMethods` — matches this unit's carve exactly: 13 of the 14 occupant
 functions are named `BasicClass__func_*`/`BasicClass__BasicClass` in this
 carve's own 20 functions (the 3 highest slots, `+0x030`/`+0x034`/`+0x038`,
 land in `code_8220_b`, next round's carve).
@@ -32,7 +32,7 @@ The base constructor, dispatched through the class framework's own slot
 `+0x008` convention (docs/research/class-framework.md: "constructors are
 called through the method table, base-class constructors included").
 Fetches the class's own vtable via `Get_vtable_BasicClass` (a tiny getter, still
-`asm/code_8220_b.s`, that just returns `&D_8006B58C`), stores it at
+`asm/code_8220_b.s`, that just returns `&gBasicClassMethods`), stores it at
 `self->methods`, and zeroes both lists.
 
 ## The C

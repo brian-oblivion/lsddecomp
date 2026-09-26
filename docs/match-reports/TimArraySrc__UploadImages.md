@@ -13,7 +13,7 @@ drift. Fresh ground (carved revision 18, no prior report).
 
 Walks the object-pointer array at +0x30 (+0x2C entries, count re-read every iteration) and calls each object's own slot +0x078 with that object.
 
-Table slot (`tools/classtable.py`): D_8006F1C4 +0x078.
+Table slot (`tools/classtable.py`): gTimArraySrcMethods +0x078.
 
 ## Source
 
@@ -23,7 +23,7 @@ fields +0x2C..+0x38), `Ctor33808` and `CountedBuf33808` sit at the top of
 `src/code_33808.c`.
 
 ```c
-/* D_8006F1C4 +0x078: slot +0x078 of every object in the array at +0x30
+/* gTimArraySrcMethods +0x078: slot +0x078 of every object in the array at +0x30
  * (+0x2C entries). */
 void TimArraySrc__UploadImages(DataSrc33808 *self) {
     DataSrc33808 **objs = (DataSrc33808 **)self->unk30;

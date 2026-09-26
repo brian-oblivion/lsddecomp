@@ -6,7 +6,7 @@ Unit `code_55dd4`, 0x800661CC. The body is `jr $ra; nop`, which splat emits as C
 
 Round 75 (charlie), track 3.
 
-- `Class65650__TickCallbackC` (was `func_800661CC`), tier A. Occupies +0x120, the 'C' tick callback; empty body. No override found in ENTITY_METHODS.
+- `Class65650__TickCallbackC` (was `func_800661CC`), tier A. Occupies +0x120, the 'C' tick callback; empty body. No override found in gEntityMethods.
 
 ## Track 4 (2026-09-25, round 85, alpha)
 

@@ -17,7 +17,7 @@
 
 ## What it does
 
-Vtable slot `+0x16C` (resolved via `tools/classtable.py DREAMSYS_METHODS`,
+Vtable slot `+0x16C` (resolved via `tools/classtable.py gDreamSysMethods`,
 named in the header even though the function itself stalled -- the slot
 identity is not in question, only the body's exact codegen). Gate flag
 `unk_0xBC`: while `>= 0`, calls through `this->unk_0x58`'s own vtable at

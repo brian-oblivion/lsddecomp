@@ -35,7 +35,7 @@ loose `void *`/`*a1` reads into real fields.
   naming), which is exactly what let m2c CSE it into one `temp_a0`.
 - **`Class6B5CCMethods::slot30`** (+0x030, new field): `BasicClass__NotifyParents`,
   inherited verbatim into this class's own table (already established by the
-  file banner's `--vs D_8006B58C` census) -- not decompiled here, since
+  file banner's `--vs gBasicClassMethods` census) -- not decompiled here, since
   BasicClass belongs to a different, still-uncarved unit. Dispatched here as
   `(self, s32 arg1)`.
 - **`Class6B5CCSub14::unk24`** (renamed from `pad24`): only its address is

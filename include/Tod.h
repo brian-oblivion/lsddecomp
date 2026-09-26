@@ -4,9 +4,9 @@
 #include "Class6D430.h"
 
 /*
- * Tod -- a Class6D430 data source (class id 0x4F03, method table D_8006F240)
+ * Tod -- a Class6D430 data source (class id 0x4F03, method table gTodMethods)
  * over one TOD animation's packet stream. Methods in src/code_33808.c; one
- * subclass, TodSet (D_8006F590, 0x14F03), whose ctor calls this class's
+ * subclass, TodSet (gTodSetMethods, 0x14F03), whose ctor calls this class's
  * first (TodSet__TodSet: GetTodMethods()->ctor(self, arg)) and whose
  * TodSet__BuildTods makes one Tod per sub-block of its buffer (New_Tod).
  *
@@ -67,7 +67,7 @@ struct Tod {
     TOD_FIELDS(TodMethods);
 };
 
-extern TodMethods D_8006F240;
+extern TodMethods gTodMethods;
 extern TodMethods *GetTodMethods(void);
 
 Tod *New_Tod(struct Src6F240 *src);

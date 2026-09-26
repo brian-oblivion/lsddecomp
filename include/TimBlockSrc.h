@@ -5,7 +5,7 @@
 
 /*
  * TimBlockSrc -- a Class6D430 data source (class id 0xF03, method table
- * D_8006F0B8) that loads a file of TIM blocks one sector-buffer at a time
+ * gTimBlockSrcMethods) that loads a file of TIM blocks one sector-buffer at a time
  * and fades up to four 256-colour CLUT rows. Methods in src/code_33808.c.
  *
  * Loading (setFlag, +0x064, is TimBlockSrc__AdvanceLoadState: the driver
@@ -13,7 +13,7 @@
  * its first 0x24 bytes are a header -- a block count, the blocks' file
  * offsets from +0x04, their sizes from +0x14 (MaxOfBufferWords) -- copied
  * into `buffer`. Each block is then read into `sector` and handed to a new
- * TimArraySrc (D_8006F1C4, include/TimArraySrc.h), whose clutBase is
+ * TimArraySrc (gTimArraySrcMethods, include/TimArraySrc.h), whose clutBase is
  * `entries`, into `blocks`.
  *
  * Fading. `entries[i]` is CLUT row i's fade ramp: `mask` (1 << shift) rows
@@ -75,7 +75,7 @@ struct TimBlockSrc {
     /* +0x080 */ s32 failed; /* an allocation failed */
 }; /* 0x84 bytes: New_TimBlockSrc */
 
-extern TimBlockSrcMethods D_8006F0B8;
+extern TimBlockSrcMethods gTimBlockSrcMethods;
 extern TimBlockSrcMethods *GetTimBlockSrcMethods(void);
 
 void *New_TimBlockSrc(s32 arg0);

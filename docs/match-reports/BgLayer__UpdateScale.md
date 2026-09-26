@@ -13,7 +13,7 @@ drift. Fresh ground (carved revision 18, no prior report).
 
 Scale of the GsBG at +0x044: with src = four halfwords {xnum, xden, ynum, yden}, sx/sy are xnum/xden and ynum/yden in 20.12 fixed point (integer part << 12 plus (remainder << 12) / den, the same formula BgLayer__UpdateRotation uses for the rotation). With `set`: scalex (+0x60) = 0x1000 for a zero divisor, else min((s16)sx, 30000); likewise scaley (+0x62). Otherwise each is added, except that a sum over 30000 yields 30000 -- or 1 when either term of that ratio was negative.
 
-Table slot (`tools/classtable.py`): D_8006F2C4 +0x048.
+Table slot (`tools/classtable.py`): gBgLayerMethods +0x048.
 
 ## Source
 
@@ -23,7 +23,7 @@ fields +0x2C..+0x38), `Ctor33808`, `CountedBuf33808` and `Req44858` sit at the
 top of / earlier in `src/code_33808.c`.
 
 ```c
-/* D_8006F2C4 +0x048: the two ratios of `src` (+0 over +2, +4 over +6) in
+/* gBgLayerMethods +0x048: the two ratios of `src` (+0 over +2, +4 over +6) in
  * 20.12 fixed point become the GsBG's scale -- stored when `set` (0x1000
  * for a zero divisor, at most 30000), else added, a sum over 30000 giving
  * 30000, or 1 when either term of that ratio was negative. */
@@ -109,4 +109,4 @@ Second build. The first build matched everything but the clamp in the `set` arm 
 
 ## Track 4 (2026-09-26, round 88, alpha)
 
-Renamed from `BgLayer__SetScale` for the slot it overrides: D_8006F2C4 +0x048 is Class6B5CC's `updateScale` (Class6B5CC__UpdateScale), set or add from the same `WholeFrac_d294` {num, den} ratio table; this override reads entries [0] and [1] (x, y), which were the `Scale4441C` view's xnum/xden/ynum/yden. That view is gone: the live body takes `WholeFrac_d294 *src` and reads `src[0].whole`, `src[0].frac`, `src[1].whole`, `src[1].frac`; `self` is `BgLayer *` (include/BgLayer.h). The clamp to 30000 is this override's own, the slot name still says what it does. Byte-identical.
+Renamed from `BgLayer__SetScale` for the slot it overrides: gBgLayerMethods +0x048 is Class6B5CC's `updateScale` (Class6B5CC__UpdateScale), set or add from the same `WholeFrac_d294` {num, den} ratio table; this override reads entries [0] and [1] (x, y), which were the `Scale4441C` view's xnum/xden/ynum/yden. That view is gone: the live body takes `WholeFrac_d294 *src` and reads `src[0].whole`, `src[0].frac`, `src[1].whole`, `src[1].frac`; `self` is `BgLayer *` (include/BgLayer.h). The clamp to 30000 is this override's own, the slot name still says what it does. Byte-identical.

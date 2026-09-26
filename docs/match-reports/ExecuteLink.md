@@ -63,7 +63,7 @@ call sites in this unit still use it as a plain integer).
 ## New vtable slots
 
 - `vtable_DreamSys` gained `slot30` (`+0x030`), resolved via
-  `tools/classtable.py DREAMSYS_METHODS` to `BasicClass__NotifyParents` — the
+  `tools/classtable.py gDreamSysMethods` to `BasicClass__NotifyParents` — the
   same shared base-class slot `class_3ac78.h`/`Class6D3C8.h` already name
   `slot30` with an identical `(self, s32 arg1)` signature. Return
   discarded here too.

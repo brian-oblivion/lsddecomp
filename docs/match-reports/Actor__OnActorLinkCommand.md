@@ -41,7 +41,7 @@ tables:
   `self`'s OWN vtable (`self->vt->slotA0`, `include/DreamSys.h`) at
   `+0x0A0` -- ordinary polymorphic dispatch, resolves to `Class6B5CC__TryAttachNearby`
   currently (not overridden at the `DreamSys` level, per
-  `tools/classtable.py DREAMSYS_METHODS`), but written as a real vtable
+  `tools/classtable.py gDreamSysMethods`), but written as a real vtable
   call rather than a fixed symbol.
 
 ## Shape note: the range check must be nested `if`s, not `&&`

@@ -1,7 +1,7 @@
 /* Entity_b -- second slice of the Entity class (include/Entity.h, table
- * ENTITY_METHODS; `tools/classtable.py ENTITY_METHODS`).
+ * gEntityMethods; `tools/classtable.py gEntityMethods`).
  *
- *  - ENTITY_METHODS' last three slots, run every tick by Entity__Update:
+ *  - gEntityMethods' last three slots, run every tick by Entity__Update:
  *    Entity__UpdateTargetProximity (+0x178, raises targetReached via setTargetReached once
  *    the target is within the mood row's proximityRange) and
  *    Entity__UpdateSoundCueStart/Stop (+0x17C/+0x180, start the sound cue
@@ -134,7 +134,7 @@ s32 Entity__UpdateSoundCueStop(Entity *this) {
 }
 
 EntityMethods *Get_vtable_Entity(void) {
-    return &ENTITY_METHODS;
+    return &gEntityMethods;
 }
 
 void Entity__MoodCue00(Entity *this, EntityMoodHandlerArg *out) {

@@ -4,7 +4,7 @@
 
 Round 82, runner alpha. Unit `src/code_10ee0.c`. Fresh ground, no prior attempt.
 
-- **Where:** D_8006C070 slot +0x044 (`tools/classtable.py D_8006C070`).
+- **Where:** gDrawSystemMethods slot +0x044 (`tools/classtable.py gDrawSystemMethods`).
 - **What:** graphics setup. `GsInitGraph(w, h, 0, 1, vramMode)`,
   `GsDefDispBuff(0, 0, 0, h)`, then copies the 8-byte `{w, h}` size into
   self+0x14 and stores the vram mode at self+0x1C (a new field `unk1C`

@@ -7,7 +7,7 @@
 
 /*
  * Entity -- a Class65650 (TOD-animated Actor) driven by a per-mood row of
- * tables (class id 0x1F234, method table ENTITY_METHODS, getter
+ * tables (class id 0x1F234, method table gEntityMethods, getter
  * Get_vtable_Entity): Class65650's one subclass (include/Class65650.h); no
  * class derives from it. The ctor calls Class65650's first
  * (Get_vtable_Class65650()->ctor), so the id parent is the ctor-chain
@@ -27,7 +27,7 @@
  * offset) is Class65650's; code_4cd08 passes gDreamAuxWorld as the peer, and
  * the slots Entity calls on `peer` (+0x100, +0x120, +0x1A0, +0x200, +0x21C)
  * lie past the end of Class65650's table: their occupants in
- * DREAMSYS_METHODS are DreamSys__GetLinkCommandFlag,
+ * gDreamSysMethods are DreamSys__GetLinkCommandFlag,
  * DreamSys__ProjectPointAtDistance, DreamSys__GetCurrentDayAndYear,
  * DreamSys__GetDreamColor and DreamSys__ResetFlashbackList. The units that
  * call it include include/DreamSys.h and cast `peer` (Class65650's field,
@@ -67,7 +67,7 @@ typedef struct EntityMoodHandlerArg EntityMoodHandlerArg;
  * Entity__Finalize, +0x040 Entity__Reset, +0x04C Entity__AttachToParent,
  * +0x050 Entity__DetachFromParent, +0x098 Entity__Update, +0x0DC
  * Entity__NotifyLinkStage, +0x0E0 Entity__OnClass86AA0LinkCommand, +0x11C
- * Entity__TickSoundCue; `tools/classtable.py ENTITY_METHODS --vs
+ * Entity__TickSoundCue; `tools/classtable.py gEntityMethods --vs
  * gClass65650Methods`), then this class's own. */
 struct EntityMethods {
     CLASS65650_SLOTS(Entity, (Entity * self, s32 moodIndex, void *desc, void *arg2));
@@ -136,8 +136,8 @@ struct Entity {
  * no code. */
 typedef void (*EntityPlayTodFn)(Entity *self);
 
-extern EntityMethods ENTITY_METHODS;
-extern EntityMethods *Get_vtable_Entity(void); /* returns &ENTITY_METHODS */
+extern EntityMethods gEntityMethods;
+extern EntityMethods *Get_vtable_Entity(void); /* returns &gEntityMethods */
 
 /* The object Entity__AttachToParent keeps in Actor's `grid` field (+0x04C)
  * is the grid manager, Class866E8 (include/Class866E8.h; code_4cd08 passes

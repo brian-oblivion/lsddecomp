@@ -145,7 +145,7 @@ DreamSys__TryInstantTeleportLink -- STALL: exact length (63/63 instructions, zer
 Restored to `INCLUDE_ASM`, no toolchain issue. **PERMUTER-EXHAUSTED** (round
 2026-09-02, runner BRAVO) -- see "Permuter run" below; do not re-run this
 search expecting a different outcome without new information.
-**Vtable slot:** `DREAMSYS_METHODS +0x1D8` (third of the four-slot run; see DreamSys__TryTunnelLink.md)
+**Vtable slot:** `gDreamSysMethods +0x1D8` (third of the four-slot run; see DreamSys__TryTunnelLink.md)
 
 ## What it does (fully derived, control flow confirmed)
 
@@ -199,7 +199,7 @@ encodes it, at exactly two sites.
 - `vtable_DreamSys` gained a name for `+0xB8` (previously folded into an
   anonymous `u32 unknown_functions_0xa0[7]`, right before the already-named
   `Actor__AddTranslation` at `+0xBC`): resolved via `tools/classtable.py
-  DREAMSYS_METHODS` to `Actor__SetTranslation`, address outside this
+  gDreamSysMethods` to `Actor__SetTranslation`, address outside this
   unit/runner's range, still `INCLUDE_ASM`. Called as `this->vt->
   Actor__SetTranslation(this, &local)` -- same buffer as the slot above.
 - The tail two calls, `vt->slot0x108(this)` and `vt->slot0x104(this, ...)`,

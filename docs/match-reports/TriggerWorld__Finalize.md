@@ -9,9 +9,9 @@ drift. Fresh ground (carved revision 18, no prior report).
 
 ## What it does
 
-`self->methods->slot7C();` (zero-argument, as ModelData__Finalize) then the parent D_8006F384's finalize through its getter `GetModelDataMethods`, cast to the local methods type. D_8006F40C derives from D_8006F384 (they share +0x080/+0x084).
+`self->methods->slot7C();` (zero-argument, as ModelData__Finalize) then the parent gModelDataMethods's finalize through its getter `GetModelDataMethods`, cast to the local methods type. gTriggerWorldMethods derives from gModelDataMethods (they share +0x080/+0x084).
 
-Table slot (`tools/classtable.py`): D_8006F40C +0x00C (finalize).
+Table slot (`tools/classtable.py`): gTriggerWorldMethods +0x00C (finalize).
 
 ## Source
 
@@ -21,7 +21,7 @@ fields +0x2C..+0x38) and `CountedBuf33808` sit at the top of `src/code_33808.c`.
 Slot +0x078 is `void *slot78` in the unified macro, so calls cast it.
 
 ```c
-/* D_8006F40C +0x00C: finalize -- slot +0x07C, then the parent D_8006F384's. */
+/* gTriggerWorldMethods +0x00C: finalize -- slot +0x07C, then the parent gModelDataMethods's. */
 void TriggerWorld__Finalize(DataSrc33808 *self) {
     self->methods->slot7C();
     ((DataSrc33808Methods *)GetModelDataMethods())->finalize(self);

@@ -16,7 +16,7 @@ void CdDriver__NoOpSlot40(void)
 ```
 
 `gCdDriverMethods + 0x040` (per `tools/classtable.py`), a new slot the base
-"BasicClass" table (`D_8006B58C`, 14 slots) does not have at all -- see
+"BasicClass" table (`gBasicClassMethods`, 14 slots) does not have at all -- see
 `New_CdDriver.md`. An empty `void(void)` function needs no stack frame
 at `-O2` (nothing to save, nothing to compute), so it compiles to exactly
 `jr $ra` / `nop` regardless of what argument list the slot's OTHER

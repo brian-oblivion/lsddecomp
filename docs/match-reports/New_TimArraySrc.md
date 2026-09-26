@@ -11,7 +11,7 @@ drift. Fresh ground (carved revision 18, no prior report).
 
 Allocator shape: `BMemPMgrAlloc(size)`, then the constructor (+0x008) through the class's table getter, called through the unit-local `Ctor33808` view (an unprototyped `s32 (*ctor)()` at +0x008, declared at the top of the unit with the getter prototypes), since each class's constructor takes different arguments. Shape: `if (obj != NULL) { ctor; return obj; } return NULL;`.
 
-Table slot (`tools/classtable.py`): none (allocator for D_8006F1C4, object size 0x3C).
+Table slot (`tools/classtable.py`): none (allocator for gTimArraySrcMethods, object size 0x3C).
 
 ## Source
 
@@ -20,7 +20,7 @@ The unit-local view `DataSrc33808` (a Class6D430 subclass built with the unified
 fields +0x2C..+0x38) and `CountedBuf33808` sit at the top of `src/code_33808.c`.
 
 ```c
-/* Allocate and construct a D_8006F1C4 object. */
+/* Allocate and construct a gTimArraySrcMethods object. */
 void *New_TimArraySrc(s32 arg0) {
     void *obj = BMemPMgrAlloc(0x3C);
 
@@ -42,7 +42,7 @@ void *New_TimArraySrc(s32 arg0) {
 
 ## Naming
 
-- **New_TimArraySrc**, tier A. Allocator for D_8006F1C4, which builds arrays of TimImage objects (New_TimImage, confirmed elsewhere as "new TimImage(name)", src/code_2bb9c.c).
+- **New_TimArraySrc**, tier A. Allocator for gTimArraySrcMethods, which builds arrays of TimImage objects (New_TimImage, confirmed elsewhere as "new TimImage(name)", src/code_2bb9c.c).
 
 
 ## Track 4 (2026-09-26, round 88, runner alpha)

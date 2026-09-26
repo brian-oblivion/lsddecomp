@@ -56,7 +56,7 @@ void ObjM__PollTimBlockLoad(Obj87034_3bb8c_l *self, Obj87034_3bb8c_l *other) {
 almost certainly `DreamSys *` — see the header comment on
 `DreamSysObj_3bb8c_l`/`DreamSysMethods_3bb8c_l` in `include/class_3bb8c.h`
 for the full cross-check against `tools/classtable.py 0x80087BDC`
-(`DREAMSYS_METHODS`, `include/DreamSys.h`). Declared as this unit's own
+(`gDreamSysMethods`, `include/DreamSys.h`). Declared as this unit's own
 independent minimal view rather than editing `DreamSys.h`, since none of
 that header's own named fields cover the offsets this unit reaches
 (`+0x050`, `+0x074`, `+0x0FC`, `+0x104`, `+0x108`, `+0x200` all fall inside

@@ -50,7 +50,7 @@ right but the specific callee name (`func_80025F2C` vs. the already-known
 ## Naming
 
 **Tier A.** Occupies vtable slot `+0x0C`, BasicClass's `finalize`
-(`classtable.py gPadMethods --vs D_8006B58C`), and forwards to
+(`classtable.py gPadMethods --vs gBasicClassMethods`), and forwards to
 `BasicClass__Finalize` after stopping the pad library on the last instance.
 Named `Pad__Destroy` in round 77 after `VabDriver__Destroy`; renamed
 2026-09-25 (track 4, BasicClass unification) to `Pad__Finalize`, because an

@@ -16,8 +16,8 @@ void DreamSys__SetTickCallbacks(DreamSys *this, s32 arg1, s32 arg2)
 
 ## Derivation
 
-Vtable slot `0x134` in `DREAMSYS_METHODS` (confirmed with
-`tools/classtable.py DREAMSYS_METHODS`). Two straight-line virtual calls: the
+Vtable slot `0x134` in `gDreamSysMethods` (confirmed with
+`tools/classtable.py gDreamSysMethods`). Two straight-line virtual calls: the
 first passes `a1` unchanged (the callee-preserved register from entry — the
 disassembly never touches `$a1` before the first `jalr`), the second passes
 `a2` (saved into `$s1` across the first call, since `$a1`/`$a2` are

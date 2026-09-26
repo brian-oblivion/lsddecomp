@@ -4,7 +4,7 @@
 #include "Class6B5CC.h"
 
 /*
- * BgLayer -- class id 0x54, method table D_8006F2C4: a Class6B5CC subclass
+ * BgLayer -- class id 0x54, method table gBgLayerMethods: a Class6B5CC subclass
  * (its ctor chains to GetClass6B5CCMethods()->ctor first, so the id tree
  * 0x4 -> 0x54 is the ctor chain) whose own fields, +0x044..+0x067, are
  * exactly libgs's GsBG (LIBGS.H: attribute, x, y, w, h, scrollx, scrolly,
@@ -20,7 +20,7 @@
  * Finalize releases it, and the colour fades (TaskCore__TickColorFade,
  * TaskCore__TickFadeColor) call setColor every frame.
  *
- * SLOTS (`classtable.py D_8006F2C4 --vs gClass6B5CCMethods`, 47 against 45):
+ * SLOTS (`classtable.py gBgLayerMethods --vs gClass6B5CCMethods`, 47 against 45):
  *  - +0x008 ctor, BgLayer__BgLayer(self, src, mode): Class6B5CC's, this
  *    table, then reset(self, src, mode). Returns nothing; the slot keeps
  *    Class6B5CC's `void *` ctor type, New_BgLayer ignoring the value (as
@@ -44,7 +44,7 @@
  * copies them lb/lb/lb, sb/sb/sb (BgLayer__SetColor, BgLayer__Reset), which
  * three u8 members would not give.
  *
- * The map source is a TileMap (D_8006F498, include/TileMap.h, round 88),
+ * The map source is a TileMap (gTileMapMethods, include/TileMap.h, round 88),
  * whose GsMAP starts at +0x02C. Only its tag is named here, as
  * include/TriggerWorld.h does for its descriptor.
  */
@@ -90,8 +90,8 @@ struct BgLayer {
     /* +0x064 */ s32 rotate; /* GsBG.rotate, 20.12; updateRotation */
 };
 
-extern BgLayerMethods D_8006F2C4;
-extern BgLayerMethods *GetBgLayerMethods(void); /* returns &D_8006F2C4 */
+extern BgLayerMethods gBgLayerMethods;
+extern BgLayerMethods *GetBgLayerMethods(void); /* returns &gBgLayerMethods */
 
 /* The class's own methods, in address order. */
 BgLayer *New_BgLayer(struct TileMap *src, s32 mode); /* BMemPMgrAlloc(0x68), then ctor */

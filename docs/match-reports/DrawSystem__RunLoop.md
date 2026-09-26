@@ -4,7 +4,7 @@
 
 Round 82, runner alpha. Unit `src/code_10ee0.c`. Fresh ground, no prior attempt.
 
-- **Where:** D_8006C070 slot +0x068 (`tools/classtable.py D_8006C070`);
+- **Where:** gDrawSystemMethods slot +0x068 (`tools/classtable.py gDrawSystemMethods`);
   DrawSystem__Start calls it through `methods->slot68` after setting +0x10.
 - **What:** the frame loop. While +0x10 is set: `VSync(self->unk20)`, call the
   optional callback at +0x30, then `notifyParents(self, 2)` (BasicClass slot

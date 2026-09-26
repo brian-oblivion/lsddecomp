@@ -9,9 +9,9 @@ drift. Fresh ground (carved revision 18, no prior report).
 
 ## What it does
 
-Constructor: active driver's ctor, install D_8006F384 (GetModelDataMethods), store the third argument at +0x34 (the flag that ModelData__BuildResources tests before building the two sub-sources and ModelData__ReleaseResources before releasing them; named `owns` as a reading, not evidence); then adopt the descriptor's buffer (size 0) and call its own +0x064 (ModelData__Load), returning NULL on a nonzero result, or request the descriptor's file.
+Constructor: active driver's ctor, install gModelDataMethods (GetModelDataMethods), store the third argument at +0x34 (the flag that ModelData__BuildResources tests before building the two sub-sources and ModelData__ReleaseResources before releasing them; named `owns` as a reading, not evidence); then adopt the descriptor's buffer (size 0) and call its own +0x064 (ModelData__Load), returning NULL on a nonzero result, or request the descriptor's file.
 
-Table slot (`tools/classtable.py`): D_8006F384 +0x008 (the allocator New_ModelData passes 1 as the third argument; the subclass D_8006F40C's ctor TriggerWorld__TriggerWorld passes 0).
+Table slot (`tools/classtable.py`): gModelDataMethods +0x008 (the allocator New_ModelData passes 1 as the third argument; the subclass gTriggerWorldMethods's ctor TriggerWorld__TriggerWorld passes 0).
 
 ## Source
 
@@ -23,7 +23,7 @@ fields +0x2C..+0x38), `Ctor33808` and `CountedBuf33808` sit at the top of
 ```c
 #include "ModelData.h"
 
-/* D_8006F384 +0x008: constructor -- the active driver's, then this table,
+/* gModelDataMethods +0x008: constructor -- the active driver's, then this table,
  * `owns` at +0x34; adopt the descriptor's buffer (size 0) and run its own
  * +0x064, whose nonzero result fails the construction (NULL), or else
  * request its file. */
@@ -56,4 +56,4 @@ First build, using the `goto fail` lever just found on LinkResource__LinkResourc
 
 ## Track 4
 
-2026-09-25, round 84 (delta): ModelData (D_8006F384) is unified in `include/ModelData.h`; the unit-shared `DataSrc33808` view no longer types it. +0x034 is `ownsResources` (was `unk34`). Callers settle what it means: New_ModelData passes 1 and TriggerWorld__TriggerWorld passes 0, and only while it is set do BuildResources build, and ReleaseResources release, the two sub-sources. The ctor's first call is `GetActiveDataSourceMethods()->ctor`, the same call TimBlockSrc__TimBlockSrc makes, which is the evidence that the class sits under Class6D430 and not under TimBlockSrc (whose id, 0xF03, 0x5F03 extends). Image byte-identical.
+2026-09-25, round 84 (delta): ModelData (gModelDataMethods) is unified in `include/ModelData.h`; the unit-shared `DataSrc33808` view no longer types it. +0x034 is `ownsResources` (was `unk34`). Callers settle what it means: New_ModelData passes 1 and TriggerWorld__TriggerWorld passes 0, and only while it is set do BuildResources build, and ReleaseResources release, the two sub-sources. The ctor's first call is `GetActiveDataSourceMethods()->ctor`, the same call TimBlockSrc__TimBlockSrc makes, which is the evidence that the class sits under Class6D430 and not under TimBlockSrc (whose id, 0xF03, 0x5F03 extends). Image byte-identical.

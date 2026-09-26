@@ -9,9 +9,9 @@ drift. Fresh ground (carved revision 18, no prior report).
 
 ## What it does
 
-When +0x34 is set: fills a 3-word stack request with SetVec3(&req, buffer + buffer[+8], 0, 1) and constructs a LinkResource (gLinkResourceMethods) object from it (New_LinkResource) into +0x2C; if that succeeded, points req.buffer at buffer + 0x0C and constructs a D_8006F590 object (New_TodSet) into +0x30; returns 0 when both exist. On either failure it calls its own +0x07C (ModelData__ReleaseResources, which releases what was built) and returns 1. With +0x34 clear, returns 0.
+When +0x34 is set: fills a 3-word stack request with SetVec3(&req, buffer + buffer[+8], 0, 1) and constructs a LinkResource (gLinkResourceMethods) object from it (New_LinkResource) into +0x2C; if that succeeded, points req.buffer at buffer + 0x0C and constructs a gTodSetMethods object (New_TodSet) into +0x30; returns 0 when both exist. On either failure it calls its own +0x07C (ModelData__ReleaseResources, which releases what was built) and returns 1. With +0x34 clear, returns 0.
 
-Table slot (`tools/classtable.py`): D_8006F384 +0x078 (called by ModelData__Load, its setFlag override).
+Table slot (`tools/classtable.py`): gModelDataMethods +0x078 (called by ModelData__Load, its setFlag override).
 
 ## Source
 
@@ -57,7 +57,7 @@ s32 ModelData__BuildResources(ModelData *self) {
 
 ## Notes
 
-First build. The redundant `sw zero, 0x30` on the second failure is an explicit `self->unk30 = NULL;` in the source. The request is the same { buffer, name/0, mode } descriptor that D_8006F240's ctor (Tod__Tod) reads; SetVec3 (code_171e0) is declared unprototyped here since each unit carries its own reading of it. The allocators take `s32` in this unit, so the request address is cast.
+First build. The redundant `sw zero, 0x30` on the second failure is an explicit `self->unk30 = NULL;` in the source. The request is the same { buffer, name/0, mode } descriptor that gTodMethods's ctor (Tod__Tod) reads; SetVec3 (code_171e0) is declared unprototyped here since each unit carries its own reading of it. The allocators take `s32` in this unit, so the request address is cast.
 
 ## Naming
 
@@ -65,7 +65,7 @@ First build. The redundant `sw zero, 0x30` on the second failure is an explicit 
 
 ## Track 4
 
-2026-09-25, round 84 (delta): ModelData (D_8006F384) is unified in `include/ModelData.h`; the unit-shared `DataSrc33808` view no longer types it. +0x02C is `linkResource` (`Class6D430 *`, New_LinkResource's result; the `(s32)` and `(void *)` casts are gone), +0x030 is `todSet` (`Class6D430 *`, New_TodSet's result) and +0x034 is `ownsResources`. The failure path calls `releaseResources(self)` (slot +0x07C). Image byte-identical.
+2026-09-25, round 84 (delta): ModelData (gModelDataMethods) is unified in `include/ModelData.h`; the unit-shared `DataSrc33808` view no longer types it. +0x02C is `linkResource` (`Class6D430 *`, New_LinkResource's result; the `(s32)` and `(void *)` casts are gone), +0x030 is `todSet` (`Class6D430 *`, New_TodSet's result) and +0x034 is `ownsResources`. The failure path calls `releaseResources(self)` (slot +0x07C). Image byte-identical.
 
 ## Track 4 (2026-09-26, round 88, delta)
 

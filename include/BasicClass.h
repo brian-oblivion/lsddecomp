@@ -5,7 +5,7 @@
 
 /*
  * BasicClass -- the root of the game's hand-rolled class framework
- * (docs/research/class-framework.md), class id 0x0, method table D_8006B58C.
+ * (docs/research/class-framework.md), class id 0x0, method table gBasicClassMethods.
  * Methods live in src/code_8220.c and src/code_8220_b.c.
  *
  * Every class derives from it: word +0x000 of each method table is a
@@ -63,7 +63,7 @@ struct BasicClassListNode {
 };
 
 /* The fifteen slots every method table starts with. Occupants in BasicClass's
- * own table named at each slot; `tools/classtable.py <table> --vs D_8006B58C`
+ * own table named at each slot; `tools/classtable.py <table> --vs gBasicClassMethods`
  * lists a subclass's overrides. */
 #define BASICCLASS_SLOTS(Self, CtorParams) BASICCLASS_SLOTS_R(Self, void, CtorParams)
 
@@ -108,8 +108,8 @@ struct BasicClass {
     BASICCLASS_FIELDS(BasicClassMethods);
 };
 
-extern BasicClassMethods D_8006B58C;                   /* BasicClass's own method table */
-extern BasicClassMethods *Get_vtable_BasicClass(void); /* returns &D_8006B58C */
+extern BasicClassMethods gBasicClassMethods;                   /* BasicClass's own method table */
+extern BasicClassMethods *Get_vtable_BasicClass(void); /* returns &gBasicClassMethods */
 
 /* BasicClass's methods: the occupants of its own table, code_8220 and
  * code_8220_b. A subclass reaches them through Get_vtable_BasicClass(). */

@@ -5,8 +5,8 @@
 
 ## What it does
 
-`DREAMSYS_METHODS` slot `+0x218` (confirmed via `tools/classtable.py
-DREAMSYS_METHODS`). Roughly 1-in-3 (`rand() % 3 == 0`) of the time, if
+`gDreamSysMethods` slot `+0x218` (confirmed via `tools/classtable.py
+gDreamSysMethods`). Roughly 1-in-3 (`rand() % 3 == 0`) of the time, if
 `this->unk_0x4C` exists, records the player's current position as a new
 flashback entry:
 
@@ -37,12 +37,12 @@ Matched first attempt — no reshaping needed.
   per this unit's established "multiple independent local views of the same
   method table" convention (`DECOMPILATION_LEARNINGS.md`) rather than unifying
   the two headers.
-- **`DREAMSYS_METHODS+0x214` retyped from an untyped `void *
+- **`gDreamSysMethods+0x214` retyped from an untyped `void *
   GameManager__AddFlashback` placeholder to `AddFlashback`**, with
   `DreamSys__AddFlashback`'s own signature. Grepped `src/` and `include/` for
   the old field name first — no other caller referenced it, so this is a
   plain correction, not an out-of-scope edit.
-- **`DREAMSYS_METHODS+0x218` retyped similarly to `FlashbackSaving`** (this
+- **`gDreamSysMethods+0x218` retyped similarly to `FlashbackSaving`** (this
   function's own slot, per `classtable.py`). Not called through the vtable by
   anything in this unit; retyped for documentation only.
 - **The call passes 7 arguments: 4 in `$a0`-`$a3`, 3 more on the caller's

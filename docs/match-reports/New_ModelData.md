@@ -11,7 +11,7 @@ drift. Fresh ground (carved revision 18, no prior report).
 
 Allocator shape: `BMemPMgrAlloc(size)`, then the constructor (+0x008) through the class's table getter, called through the unit-local `Ctor33808` view (an unprototyped `s32 (*ctor)()` at +0x008, declared at the top of the unit with the getter prototypes), since each class's constructor takes different arguments. If the constructor returns zero the object is freed and NULL returned: `if (obj != NULL) { if (ctor(obj, a)) return obj; BMemPMgrFree(obj); } return NULL;`. Here the constructor gets (obj, arg0, 1).
 
-Table slot (`tools/classtable.py`): none (allocator for D_8006F384, object size 0x38).
+Table slot (`tools/classtable.py`): none (allocator for gModelDataMethods, object size 0x38).
 
 ## Source
 
@@ -22,7 +22,7 @@ fields +0x2C..+0x38) and `CountedBuf33808` sit at the top of `src/code_33808.c`.
 ```c
 #include "ModelData.h"
 
-/* Allocate and construct a D_8006F384 object (second constructor argument 1); freed and NULL when the constructor fails. */
+/* Allocate and construct a gModelDataMethods object (second constructor argument 1); freed and NULL when the constructor fails. */
 ModelData *New_ModelData(Src6F240 *src) {
     void *obj = BMemPMgrAlloc(0x38);
 
@@ -50,4 +50,4 @@ ModelData *New_ModelData(Src6F240 *src) {
 
 ## Track 4
 
-2026-09-25, round 84 (delta): ModelData (D_8006F384) is unified in `include/ModelData.h`; the unit-shared `DataSrc33808` view no longer types it. The allocator now reads `ModelData *New_ModelData(Src6F240 *src)` (was `void *` from `s32 arg0`): its argument is the ctor's descriptor, passed through unchanged in $a1, so the bytes are the same. Its callers cast: TriggerWorld__BuildResources, InitDreamAux (code_4cd08) and Class65650__AcquireModelData (code_55dd4), whose local externs of it are deleted. The ctor is still reached through the unprototyped Ctor33808 view, because CLASS6D430_SLOTS declares +0x008 returning void. Image byte-identical.
+2026-09-25, round 84 (delta): ModelData (gModelDataMethods) is unified in `include/ModelData.h`; the unit-shared `DataSrc33808` view no longer types it. The allocator now reads `ModelData *New_ModelData(Src6F240 *src)` (was `void *` from `s32 arg0`): its argument is the ctor's descriptor, passed through unchanged in $a1, so the bytes are the same. Its callers cast: TriggerWorld__BuildResources, InitDreamAux (code_4cd08) and Class65650__AcquireModelData (code_55dd4), whose local externs of it are deleted. The ctor is still reached through the unprototyped Ctor33808 view, because CLASS6D430_SLOTS declares +0x008 returning void. Image byte-identical.

@@ -5,8 +5,8 @@
 
 /*
  * DrawSystem -- the game's screen/graphics singleton, class id 0x1, method
- * table D_8006C070, a direct BasicClass subclass (`tools/classtable.py
- * D_8006C070 --vs D_8006B58C`: overrides only the ctor, adds seventeen
+ * table gDrawSystemMethods, a direct BasicClass subclass (`tools/classtable.py
+ * gDrawSystemMethods --vs gBasicClassMethods`: overrides only the ctor, adds seventeen
  * slots). Methods in src/code_10ee0.c; no class derives from it.
  *
  * main() builds the one instance (New_DrawSystem) and hands it to
@@ -86,7 +86,7 @@ struct DrawSystem {
     /* +0x030 */ void (*callback)(void); /* setCallback; runLoop calls it every VSync. The object is 0x34 bytes (New_DrawSystem) */
 };
 
-extern DrawSystemMethods D_8006C070; /* DrawSystem's method table */
+extern DrawSystemMethods gDrawSystemMethods; /* DrawSystem's method table */
 extern DrawSystemMethods *Get_vtable_DrawSystem(void);
 
 DrawSystem *GetDrawSystem(void); /* returns gDrawSystem, the singleton */

@@ -13,13 +13,13 @@ table.
 The FirecatFG name is drawn from `gCdDriverMethods`, this class's own 29-slot method
 table. Per CLAUDE.md, that name is a hypothesis, not evidence -- resolved
 instead with `tools/classtable.py 0x8006D4E8 --vs 0x8006B58C` (comparing
-against `D_8006B58C`, the 14-slot table for the project's "BasicClass"
+against `gBasicClassMethods`, the 14-slot table for the project's "BasicClass"
 hierarchy, whose constructor `BasicClass__BasicClass` sits at `+0x008`).
-`gCdDriverMethods` overrides exactly three slots relative to `D_8006B58C`
+`gCdDriverMethods` overrides exactly three slots relative to `gBasicClassMethods`
 (`+0x004`, `+0x008`, `+0x00C` -- `Class6D430__Release`, `CdDriver__CdDriver`,
 `CdDriver__Finalize`), inherits `+0x010..+0x038` verbatim (identical
 `BasicClass__func_*` addresses in both tables), and adds new slots from
-`+0x040` up that `D_8006B58C` doesn't have at all (including this unit's own
+`+0x040` up that `gBasicClassMethods` doesn't have at all (including this unit's own
 `CdDriver__NoOpSlot40`). Since `+0x008` is confirmed as the constructor slot in the
 BASE table, `New_CdDriver` allocating and then calling through that same
 slot on ITS OWN table (which resolves to `CdDriver__CdDriver`, this unit's next

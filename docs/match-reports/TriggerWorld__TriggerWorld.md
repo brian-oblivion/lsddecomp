@@ -9,9 +9,9 @@ drift. Fresh ground (carved revision 18, no prior report).
 
 ## What it does
 
-Constructor: the parent D_8006F384's ctor (through GetModelDataMethods's table, with (self, arg, 0)), install D_8006F40C; if the argument's first word is nonzero, call its own +0x064 (TriggerWorld__Load) and return NULL on a nonzero result; otherwise return self.
+Constructor: the parent gModelDataMethods's ctor (through GetModelDataMethods's table, with (self, arg, 0)), install gTriggerWorldMethods; if the argument's first word is nonzero, call its own +0x064 (TriggerWorld__Load) and return NULL on a nonzero result; otherwise return self.
 
-Table slot (`tools/classtable.py`): D_8006F40C +0x008.
+Table slot (`tools/classtable.py`): gTriggerWorldMethods +0x008.
 
 ## Source
 
@@ -21,7 +21,7 @@ fields +0x2C..+0x38), `Ctor33808` and `CountedBuf33808` sit at the top of
 `src/code_33808.c`.
 
 ```c
-/* D_8006F40C +0x008: constructor -- the parent D_8006F384's (third argument
+/* gTriggerWorldMethods +0x008: constructor -- the parent gModelDataMethods's (third argument
  * 0), then this table; when the argument's first word is set, its own
  * +0x064 runs, and a nonzero result fails the construction (NULL). */
 void *TriggerWorld__TriggerWorld(DataSrc33808 *self, s32 *arg) {
@@ -38,7 +38,7 @@ void *TriggerWorld__TriggerWorld(DataSrc33808 *self, s32 *arg) {
 
 ## Notes
 
-First build; the same shape as TodSet__TodSet (D_8006F590's ctor). The allocator New_ModelData passes 1 as the parent's third argument; this subclass passes 0. setFlag is cast at the call site to return s32.
+First build; the same shape as TodSet__TodSet (gTodSetMethods's ctor). The allocator New_ModelData passes 1 as the parent's third argument; this subclass passes 0. setFlag is cast at the call site to return s32.
 
 ## Naming
 

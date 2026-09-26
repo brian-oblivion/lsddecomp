@@ -13,7 +13,7 @@ drift. Fresh ground (carved revision 18, no prior report).
 
 `ReleaseBasicClassArray((BasicClass **)((u8 *)self->buffer + 8), self->unk38); self->unk38 = 0;`
 
-Table slot (`tools/classtable.py`): D_8006F40C +0x07C.
+Table slot (`tools/classtable.py`): gTriggerWorldMethods +0x07C.
 
 ## Source
 
@@ -23,7 +23,7 @@ fields +0x2C..+0x38) and `CountedBuf33808` sit at the top of `src/code_33808.c`.
 Slot +0x078 is `void *slot78` in the unified macro, so calls cast it.
 
 ```c
-/* D_8006F40C +0x07C: release the object array in the buffer (past its first
+/* gTriggerWorldMethods +0x07C: release the object array in the buffer (past its first
  * two words), +0x38 entries long, and zero the count. */
 void TriggerWorld__ReleaseResources(DataSrc33808 *self) {
     ReleaseBasicClassArray((BasicClass **)((u8 *)self->buffer + 8), self->unk38);

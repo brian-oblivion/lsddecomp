@@ -3,7 +3,7 @@
 > Renamed from `func_80058F18` on 2026-09-22 (tools/rename.py). Address 0x80058f18.
 
 **Unit:** DreamSys · **Size:** 37 words · **Status:** MATCHED (37/37 words, full build verified byte-exact)
-**Vtable slot:** `DREAMSYS_METHODS +0xDC` (this function's own slot)
+**Vtable slot:** `gDreamSysMethods +0xDC` (this function's own slot)
 
 ## Context
 
@@ -16,7 +16,7 @@ offsets involved and the class-id constant being compared.
 
 `GetActorMethods()->slot0xDC` resolves (via `tools/classtable.py gActorMethods`)
 to `Actor__OnActorLinkCommand`, out of this unit's scope. `this->vt->slot0x1E8` resolves
-(via `tools/classtable.py DREAMSYS_METHODS`) to
+(via `tools/classtable.py gDreamSysMethods`) to
 `DreamSys__InstanceEffectsOnJournal` -- already forward-declared in
 `include/DreamSys.h` and already has a real body pending as
 `DreamSys__InstanceEffectsOnJournal` (`INCLUDE_ASM` elsewhere in this file).
@@ -59,10 +59,10 @@ typedef struct DreamSysBaseMethods {
 header word (`& 0xFFF == 0x114`). This function reads the SAME shape
 (`*(*(void**)arg1) & MASK == CONSTANT`) but with `MASK = 0xFFFFF` (20 bits,
 not 12) and `CONSTANT = 0x1F234`. `tools/classtable.py --scan` confirms
-`ENTITY_METHODS` (96 slots) has header word exactly `0x1F234` -- so this function
-is checking "is `arg1` an instance of `ENTITY_METHODS`'s class" before
+`gEntityMethods` (96 slots) has header word exactly `0x1F234` -- so this function
+is checking "is `arg1` an instance of `gEntityMethods`'s class" before
 dispatching `InstanceEffectsOnJournal`, consistent with the vtable slot's
-name (`ENTITY_METHODS` is plausibly the Journal entity's class).
+name (`gEntityMethods` is plausibly the Journal entity's class).
 
 This is worth promoting: the previous open question assumed "low 12 bits"
 from a single data point. A second data point using 20 bits, on a header
@@ -76,7 +76,7 @@ Promote to `DECOMPILATION_LEARNINGS.md`'s class-table header-word open
 question: a second in-game read (`DreamSys__DispatchInstanceEffect`, `DreamSys`, vtable
 `+0xDC`) masks `*(*(void**)obj)` with `0xFFFFF` (not `0xFFF`) and compares
 against `0x1F234` -- a literal that does not fit in 12 bits and matches
-`ENTITY_METHODS`'s header word exactly (`tools/classtable.py --scan`). The
+`gEntityMethods`'s header word exactly (`tools/classtable.py --scan`). The
 class-id field is confirmed to occupy more than 12 bits in at least this
 check; the previous "low 12 bits" framing from `DreamSys__DispatchChunkChange` should be
 read as "this function happened to use a 12-bit mask", not as the field's

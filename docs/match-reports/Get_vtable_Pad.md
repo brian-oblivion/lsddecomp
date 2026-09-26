@@ -42,7 +42,7 @@ First-try match, no iteration needed -- straight address-of a global.
 question (`0x57070`, `0x76DC8`, `0x79528`, sbss runs) is at least partly
 explained for `0x57070`: it holds (at least) this class's method table,
 `gPadMethods`, and very likely the neighbouring `BASICCLASS_METHODS` table
-(`D_8006B58C`) and others of the 60 tables `classtable.py --scan` finds --
+(`gBasicClassMethods`) and others of the 60 tables `classtable.py --scan` finds --
 worth cross-referencing all 60 table addresses against that data segment's
 range before calling it "unidentified."
 

@@ -4,7 +4,7 @@
  * 0x800206E0..0x80020C74). It was counted as Psy-Q SDK by segment name;
  * tools/gameinsdk.py measured it as game (a call into game code, a method-
  * table entry beside game methods, or contiguity with those, and no Sony
- * fingerprint). What it holds: the 19 methods of D_8006C070, the game's
+ * fingerprint). What it holds: the 19 methods of gDrawSystemMethods, the game's
  * screen/graphics singleton, matched as DrawSystem this round. `main.c`
  * builds the one instance (`New_DrawSystem`) and hands it into the game's
  * startup chain, which lands it in `code_2b78c.c`'s `Class6E4F0__InitSystems`
@@ -200,7 +200,7 @@ void DrawSystem__SetCallback(DrawSystem *self, void (*callback)(void)) {
 }
 
 DrawSystemMethods *Get_vtable_DrawSystem(void) {
-    return &D_8006C070;
+    return &gDrawSystemMethods;
 }
 
 DrawSystem *GetDrawSystem(void) {

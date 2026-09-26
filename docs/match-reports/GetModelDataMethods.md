@@ -9,7 +9,7 @@ deletions, no out-of-range drift. Fresh ground (carved revision 18, no prior rep
 
 ## What it does
 
-Table getter: returns the method table `D_8006F384` (`lui/addiu; jr; nop`), declared locally as `extern s32 D_8006F384[];`.
+Table getter: returns the method table `gModelDataMethods` (`lui/addiu; jr; nop`), declared locally as `extern s32 gModelDataMethods[];`.
 
 Table slot (`tools/classtable.py`): `D_8006D430` +0x0AC.
 
@@ -19,7 +19,7 @@ Table slot (`tools/classtable.py`): `D_8006D430` +0x0AC.
 #include "ModelData.h"
 
 ModelDataMethods *GetModelDataMethods(void) {
-    return &D_8006F384;
+    return &gModelDataMethods;
 }
 ```
 
@@ -34,4 +34,4 @@ ModelDataMethods *GetModelDataMethods(void) {
 
 ## Track 4
 
-2026-09-25, round 84 (delta): ModelData (D_8006F384) is unified in `include/ModelData.h`; the unit-shared `DataSrc33808` view no longer types it. The getter returns `ModelDataMethods *` from `&D_8006F384`, where it used to return `void *` from a local `extern s32 D_8006F384[]` that is now deleted. The code is the same lui/addiu. Image byte-identical.
+2026-09-25, round 84 (delta): ModelData (gModelDataMethods) is unified in `include/ModelData.h`; the unit-shared `DataSrc33808` view no longer types it. The getter returns `ModelDataMethods *` from `&gModelDataMethods`, where it used to return `void *` from a local `extern s32 gModelDataMethods[]` that is now deleted. The code is the same lui/addiu. Image byte-identical.

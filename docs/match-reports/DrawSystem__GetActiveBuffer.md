@@ -4,7 +4,7 @@
 
 Round 81, runner alpha. Unit `src/code_10ee0.c`. Fresh ground, no prior attempt.
 
-- **Where:** D_8006C070 slot +0x054 (slots resolved with `tools/classtable.py D_8006C070`).
+- **Where:** gDrawSystemMethods slot +0x054 (slots resolved with `tools/classtable.py gDrawSystemMethods`).
 - **What:** tail of GsGetActiveBuff (LIBGS.H `int GsGetActiveBuff(void)`); returning its value is a guess -- the bytes cannot tell void from int (tail-call wrapper rule).
 - **Result:** byte-exact on the FIRST build, no levers; `funcdiff.py` reports
   8/8 words, 0 insertions / 0 deletions, and the whole-image SHA1 is

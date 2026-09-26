@@ -30,7 +30,7 @@
  *    getActiveBuffer and swapBuffers slots.
  *
  * Children are cached by their class-id nibble (AddChild/RemoveChild): 1 is
- * the DrawSystem (D_8006C070, id 0x1), 4 a Class6B5CC, the node the view is
+ * the DrawSystem (gDrawSystemMethods, id 0x1), 4 a Class6B5CC, the node the view is
  * attached to. Each is typed by its class (include/DrawSystem.h,
  * include/Class6B5CC.h); round 87 retired code_2cc8c.h's GenericObj view of
  * the DrawSystem.
@@ -93,7 +93,7 @@ struct ViewportOt {
 };
 
 /* BasicClass's slots, then this class's own. `tools/classtable.py
- * gViewportMethods --vs D_8006B58C` lists the overrides of the inherited
+ * gViewportMethods --vs gBasicClassMethods` lists the overrides of the inherited
  * ones (ctor, finalize, addChild, removeChild, removeAllChildren, onNotify). */
 /* clang-format off */
 #define VIEWPORT_SLOTS(Self, CtorParams)                                                           \

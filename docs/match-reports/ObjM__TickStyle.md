@@ -22,7 +22,7 @@ call site's own register usage.
 
 - `self->unk14->methods->slot10C` is the call site that RULES OUT
   `self->unk14` being `DreamSys *` despite offset `+0x10C` existing in
-  `DREAMSYS_METHODS` (`DreamSys__SetSoundObj`, `void(DreamSys*, s32)`) — this call
+  `gDreamSysMethods` (`DreamSys__SetSoundObj`, `void(DreamSys*, s32)`) — this call
   passes `(self->unk14, 0, 0)`, three total arguments against DreamSys's
   own two. Different arity, different class; `self->unk14`'s pointee is
   left as an unnamed local view (`Obj14_3bb8c_l`) with only this one slot

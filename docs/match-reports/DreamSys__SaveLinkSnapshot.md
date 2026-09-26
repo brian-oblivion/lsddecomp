@@ -3,7 +3,7 @@
 > Renamed from `func_8005B904` on 2026-09-22 (tools/rename.py). Address 0x8005b904.
 
 **Unit:** DreamSys · **Sizes:** 35 words / 36 words · **Status:** BOTH MATCHED (byte-exact, full build verified)
-**Vtable slots:** `DREAMSYS_METHODS +0x220` / `+0x224`
+**Vtable slots:** `gDreamSysMethods +0x220` / `+0x224`
 
 Documented together: they are a save/restore pair for the same struct, and
 neither makes sense read in isolation.

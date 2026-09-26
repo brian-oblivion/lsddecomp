@@ -133,7 +133,7 @@ established from this unit alone, hence B.
 ## Track 4 (2026-09-26, round 88, bravo)
 
 `world` is now the unified `TriggerWorld *` (include/TriggerWorld.h, class
-D_8006F40C), which code_4cd08.c includes; the unit's local
+gTriggerWorldMethods), which code_4cd08.c includes; the unit's local
 `extern TriggerWorld *New_TriggerWorld(s32 *ctx)` is gone. New_TriggerWorld
 takes the ctor's descriptor (`struct Src6F240 *`: {buffer, name}), so the
 call casts the stack array whose first word is the buffer:

@@ -9,17 +9,17 @@ deletions, no out-of-range drift. Fresh ground (carved revision 18, no prior rep
 
 ## What it does
 
-Table getter: returns the method table `D_8006F2C4` (`lui/addiu; jr; nop`), declared locally as `extern s32 D_8006F2C4[];`.
+Table getter: returns the method table `gBgLayerMethods` (`lui/addiu; jr; nop`), declared locally as `extern s32 gBgLayerMethods[];`.
 
 Table slot (`tools/classtable.py`): none: no data word references it (reached some other way).
 
 ## Source
 
 ```c
-extern s32 D_8006F2C4[];
+extern s32 gBgLayerMethods[];
 
 void *GetBgLayerMethods(void) {
-    return D_8006F2C4;
+    return gBgLayerMethods;
 }
 ```
 
@@ -34,4 +34,4 @@ void *GetBgLayerMethods(void) {
 
 ## Track 4 (2026-09-26, round 88, alpha)
 
-Class unified in `include/BgLayer.h`: returns `BgLayerMethods *` (`&D_8006F2C4`, declared `extern BgLayerMethods D_8006F2C4;` there). The local `extern s32 D_8006F2C4[];` and `void *` prototype in code_33808.c are gone. Byte-identical.
+Class unified in `include/BgLayer.h`: returns `BgLayerMethods *` (`&gBgLayerMethods`, declared `extern BgLayerMethods gBgLayerMethods;` there). The local `extern s32 gBgLayerMethods[];` and `void *` prototype in code_33808.c are gone. Byte-identical.
