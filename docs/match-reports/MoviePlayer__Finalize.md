@@ -46,3 +46,7 @@ First build. DecDCT* declared locally with LIBPRESS.H's prototypes; MoviePlayer_
 ## Track 4 (2026-09-26, round 87)
 
 The +0x060 object is a CdStream (include/CdStream.h, unified this round). `Obj455D4::unk60` was `BasicClass *`; it is the CdStream, now `CdStream *` (release is the inherited slot). MoviePlayer's own view and field names are unchanged. Zero bytes changed.
+
+## Track 4 (2026-09-26, round 89)
+
+Class unified in `include/MoviePlayer.h` (id 0x70, table `gMoviePlayerMethods`, was `D_8006F614`; a direct BasicClass subclass, 0x6C bytes). The unit-local views in `src/code_33808.c` are gone; Obj455D4 is gone; `unk60` -> `stream`. Byte-identical; `typeviews.py --warnings` 0 new.

@@ -75,3 +75,7 @@ First build. Written through a local copy of the global (`cur`) -- retail keeps 
 ## Track 4 (2026-09-26, round 87)
 
 The +0x060 object is a CdStream (include/CdStream.h, unified this round). `Sub458B8`/`Methods458B8` are deleted; `unk60` is `CdStream *`; slot58 is `restart`, slot7C stays `slot7C` (empty occupant, typed from this call's arguments). MoviePlayer's own view and field names are unchanged. Zero bytes changed.
+
+## Track 4 (2026-09-26, round 89)
+
+Class unified in `include/MoviePlayer.h` (id 0x70, table `gMoviePlayerMethods`, was `D_8006F614`; a direct BasicClass subclass, 0x6C bytes). The unit-local views in `src/code_33808.c` are gone; Obj458B8 is gone; `cur` is a `MoviePlayer *` straight from `gActiveMoviePlayer` (now declared `MoviePlayer *`, was the unit's DataSrc33808 view). `unk64` -> `started`. Byte-identical; `typeviews.py --warnings` 0 new.

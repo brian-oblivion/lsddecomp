@@ -41,3 +41,7 @@ First build. The failing-ctor allocator lever with the test inverted: this class
 ## Naming
 
 - **New_MoviePlayer**, tier A. Called from src/code_2c054.c's TaskCore__TaskCore; externally typed `StreamTaskUnkB4Obj *` there. Opens a CD stream object and drives an MDEC decode/upload state machine (mechanics match the class name; the constructor/finalize/state-machine functions ARE playing a movie).
+
+## Track 4 (2026-09-26, round 89)
+
+Class unified in `include/MoviePlayer.h` (id 0x70, table `gMoviePlayerMethods`, was `D_8006F614`; a direct BasicClass subclass, 0x6C bytes). The unit-local views in `src/code_33808.c` are gone; it returns `MoviePlayer *` and takes `(DrawRect *frame, s32 speed, s32 external)`, calling the typed ctor slot instead of the `Ctor33808` cast. Its one caller, StreamTask__StreamTask, passes `(DrawRect *)GetDefaultStreamTaskInitData()`: the ctor hands it to InitFrame, which copies it whole into `frame`/`stripRect` and reads its w/h words, so the three-word StreamTaskInitData is the frame rectangle. Byte-identical; `typeviews.py --warnings` 0 new.

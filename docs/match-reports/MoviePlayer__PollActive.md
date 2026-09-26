@@ -71,3 +71,7 @@ with `f(self)`, so when one form misses, flip it before anything else.
 ## Naming
 
 - **MoviePlayer__PollActive**, tier A. Slot +0x064: while the stream is still running, throttles a periodic callback (slot44) every 100 ticks; otherwise clears the active-movie global and reports done.
+
+## Track 4 (2026-09-26, round 89)
+
+Class unified in `include/MoviePlayer.h` (id 0x70, table `gMoviePlayerMethods`, was `D_8006F614`; a direct BasicClass subclass, 0x6C bytes). The unit-local views in `src/code_33808.c` are gone; Obj45C94/Methods45C94 are gone; the +0x044 call is `stop`. Byte-identical; `typeviews.py --warnings` 0 new.

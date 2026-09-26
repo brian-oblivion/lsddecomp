@@ -37,4 +37,8 @@ void MoviePlayer__SetAutoPlay(Obj6F614 *self, s32 value) {
 
 ## Naming
 
-- **MoviePlayer__SetAutoPlay**, tier A. Slot +0x06C: stores its argument into the result field DecodeFrame reads.
+- **MoviePlayer__SetAutoPlay**, tier A. Slot +0x06C: stores its argument into MoviePlayer::autoPlay (+0x068), which only MoviePlayer__Play reads (MarkPlaying at once when set); StreamTask__OnInit passes its own `autoPlay`. (Was `MoviePlayer__SetResult`, whose "result field DecodeFrame reads" was wrong: DecodeFrame never reads +0x068. Round 89.)
+
+## Track 4 (2026-09-26, round 89)
+
+Class unified in `include/MoviePlayer.h` (id 0x70, table `gMoviePlayerMethods`, was `D_8006F614`; a direct BasicClass subclass, 0x6C bytes). The unit-local views in `src/code_33808.c` are gone; renamed from `MoviePlayer__SetResult` (see Naming); Obj6F614 is gone, `unk68` -> `autoPlay`. Byte-identical; `typeviews.py --warnings` 0 new.

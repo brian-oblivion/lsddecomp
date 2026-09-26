@@ -67,3 +67,7 @@ Its up-calls to TaskCore (include/TaskCore.h, track 4 round 84) now go through `
 ## Track 4 (2026-09-26, round 87)
 
 Renamed with the class unification (gStreamTaskObjMethods -> class StreamTask, include/StreamTask.h): the `Obj` suffix is dropped (track 4 step 2; include/Class6D3C8.h already viewed the class as `StreamTask`). Was StreamTaskObj__func_8003BB5C. Occupies +0x05C update and up-calls TaskCore's first, then polls MoviePlayer__Advance into `playDone` and, once it reports done while not already fading out, setState(7).
+
+## Track 4 (2026-09-26, round 89)
+
+The player is a MoviePlayer (`include/MoviePlayer.h`); code_2c054.h's StreamTaskUnkB4Obj view is gone and code_2c054.c's `PLAYER()` casts `player` (still `BasicClass *` in StreamTask.h) to `MoviePlayer *`. The +0x048 call is `advance`. Byte-identical.

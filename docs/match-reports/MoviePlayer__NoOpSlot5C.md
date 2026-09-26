@@ -30,4 +30,8 @@ void MoviePlayer__NoOpSlot5C(void) {
 
 ## Naming
 
-- **MoviePlayer__NoOpSlot5C**, tier B. Empty freeBuffer-shaped override (matches the Class6D430 slot MoviePlayer otherwise repurposes); MoviePlayer needs no buffer freed at this slot.
+- **MoviePlayer__NoOpSlot5C**, tier B. Empty occupant of MoviePlayer's own slot +0x05C, named like its siblings NoOpSlot50/54. (Was `MoviePlayer__NoOpFreeBuffer`, after Class6D430's +0x05C freeBuffer; MoviePlayer is a direct BasicClass subclass, so that slot name never applied. Round 89.)
+
+## Track 4 (2026-09-26, round 89)
+
+Class unified in `include/MoviePlayer.h` (id 0x70, table `gMoviePlayerMethods`, was `D_8006F614`; a direct BasicClass subclass, 0x6C bytes). The unit-local views in `src/code_33808.c` are gone; renamed from `MoviePlayer__NoOpFreeBuffer` (see Naming). Byte-identical; `typeviews.py --warnings` 0 new.

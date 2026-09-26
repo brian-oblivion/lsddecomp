@@ -90,3 +90,7 @@ First build, written straight away in the nested success-path shape (`if (stream
 ## Track 4 (2026-09-26, round 87)
 
 The +0x060 object is a CdStream (include/CdStream.h, unified this round). `Stream454C4`/`StreamMethods454C4` and the local New_CdStream extern are deleted; +0x060 `stream` is `CdStream *` and slot40 is `setRing`. MoviePlayer's own view and field names are unchanged. Zero bytes changed.
+
+## Track 4 (2026-09-26, round 89)
+
+Class unified in `include/MoviePlayer.h` (id 0x70, table `gMoviePlayerMethods`, was `D_8006F614`; a direct BasicClass subclass, 0x6C bytes). The unit-local views in `src/code_33808.c` are gone; it takes `(MoviePlayer *self, DrawRect *frame, s32 speed, s32 external)` (BASICCLASS_SLOTS_R with an `s32` return: 0 success, 1 failure). `unk60` -> `stream`, `ring`, `unk50`; the +0x06C call is `setAutoPlay(self, 1)`. Byte-identical; `typeviews.py --warnings` 0 new.

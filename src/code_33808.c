@@ -40,7 +40,8 @@
  *     include/BgLayer.h, track 4, round 88).
  *   - MoviePlayer (gMoviePlayerMethods): a BasicClass subclass driving CD-streamed,
  *     MDEC-decoded FMV playback (open a CD stream, decode/upload strips,
- *     play/stop/tick controls); called from code_2c054.c.
+ *     play/stop/tick controls); called from code_2c054.c
+ *     (include/MoviePlayer.h, track 4, round 89).
  *
  * libpress starts right after, at DecDCTReset (now psyq_36654).
  */

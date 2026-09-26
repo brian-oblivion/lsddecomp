@@ -110,3 +110,7 @@ The `DrawSys457C0` view is gone; the call goes through `include/DrawSystem.h`. D
 ## Track 4 (2026-09-26, round 87)
 
 The +0x060 object is a CdStream (include/CdStream.h, unified this round). `Stream457C0`/`StreamMethods457C0` are deleted; `unk60` is `CdStream *`, the call is `open`. MoviePlayer's own view and field names are unchanged. Zero bytes changed.
+
+## Track 4 (2026-09-26, round 89)
+
+Class unified in `include/MoviePlayer.h` (id 0x70, table `gMoviePlayerMethods`, was `D_8006F614`; a direct BasicClass subclass, 0x6C bytes). The unit-local views in `src/code_33808.c` are gone; Obj457C0 is gone. `rect` -> `frame` (a DrawRect, so the clearImage call needs no cast); `unk5C` -> `frameCount` (startRead's frameCount in Advance), `unk58` -> `loops`, `unk68` -> `autoPlay`, `unk3C`/`unk40`/`unk44`/`unk48`/`unk4C` -> `frameIndex`/`haveFrame`/`finished`/`streamEnded`/`frameDone`, `unk54` kept. `gMovieFrameRect` was renamed `gMovieClearColor` (rename.py) and typed `u8[4]`, so the color argument needs no cast either. Byte-identical; `typeviews.py --warnings` 0 new.

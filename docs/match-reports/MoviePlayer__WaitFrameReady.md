@@ -47,3 +47,7 @@ caller. Byte-identical.
 ## Naming
 
 - **MoviePlayer__WaitFrameReady**, tier A. Busy-waits until the frame-ready flag is set; called only from DecodeFrame with the active movie.
+
+## Track 4 (2026-09-26, round 89)
+
+Class unified in `include/MoviePlayer.h` (id 0x70, table `gMoviePlayerMethods`, was `D_8006F614`; a direct BasicClass subclass, 0x6C bytes). The unit-local views in `src/code_33808.c` are gone; the Obj45CFC parameter is `MoviePlayer *`; `unk4C` -> `frameDone`. Byte-identical; `typeviews.py --warnings` 0 new.

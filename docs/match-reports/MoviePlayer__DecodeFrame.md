@@ -81,3 +81,7 @@ Second build. The first shape, `if (cur->unk44 != 0) return slot64(cur);` ahead 
 ## Naming
 
 - **MoviePlayer__DecodeFrame**, tier A. Slot +0x068: when a frame finished pending, runs PollActive's own result; otherwise waits for the last strip, decodes the next frame's bitstream and its first strip.
+
+## Track 4 (2026-09-26, round 89)
+
+Class unified in `include/MoviePlayer.h` (id 0x70, table `gMoviePlayerMethods`, was `D_8006F614`; a direct BasicClass subclass, 0x6C bytes). The unit-local views in `src/code_33808.c` are gone; Obj45CFC/Methods45CFC are gone; +0x058 is `pullFrame`, +0x064 `pollActive`, `unk40`/`unk44`/`unk4C` are `haveFrame`/`finished`/`frameDone`, `unk34` is `stripRect.h`. Byte-identical; `typeviews.py --warnings` 0 new.

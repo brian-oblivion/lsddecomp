@@ -79,3 +79,7 @@ First build. The same through-the-global shape as MoviePlayer__Stop (a local `cu
 ## Track 4 (2026-09-26, round 87)
 
 The +0x060 object is a CdStream (include/CdStream.h, unified this round). `Sub458B8`/`Methods458B8` are deleted; `unk60` is `CdStream *`; slot48 is `close`, slot7C stays `slot7C`. MoviePlayer's own view and field names are unchanged. Zero bytes changed.
+
+## Track 4 (2026-09-26, round 89)
+
+Class unified in `include/MoviePlayer.h` (id 0x70, table `gMoviePlayerMethods`, was `D_8006F614`; a direct BasicClass subclass, 0x6C bytes). The unit-local views in `src/code_33808.c` are gone; Obj458B8 is gone; `unk48` -> `streamEnded`, `unk44` -> `finished`, `unk64` -> `started`. Byte-identical; `typeviews.py --warnings` 0 new.

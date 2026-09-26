@@ -85,3 +85,7 @@ First build. DrawSystem is reached through a per-function methods view (the type
 ## Track 4 (2026-09-26, round 87, bravo)
 
 The local view of the DrawSystem singleton quoted above is gone; the unit takes DrawSystem, its method table and GetDrawSystem from `include/DrawSystem.h` (D_8006C070 unified). Byte-identical.
+
+## Track 4 (2026-09-26, round 89)
+
+Class unified in `include/MoviePlayer.h` (id 0x70, table `gMoviePlayerMethods`, was `D_8006F614`; a direct BasicClass subclass, 0x6C bytes). The unit-local views in `src/code_33808.c` are gone; Obj45BC8 and Rect45BC8 are gone. `rect` is `stripRect`, a DrawRect with an s32 w: retail's `lhu +0x030` is cc1 narrowing the load of that word, measured by building this view with `s32 w` byte-identical before the merge. `x0`/`y0`/`width` are `frame.x`/`frame.y`/`frame.w`, `unk34` is `stripRect.h` (the frame height), `unk4C`/`unk48`/`unk44` are `frameDone`/`streamEnded`/`finished`. Byte-identical; `typeviews.py --warnings` 0 new.
