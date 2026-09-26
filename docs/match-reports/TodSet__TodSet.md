@@ -9,9 +9,9 @@ drift. Fresh ground (carved revision 18, no prior report).
 
 ## What it does
 
-Constructor: the parent gTodMethods's ctor (through GetTodMethods's table, same argument), install D_8006F590; if the argument's first word is nonzero, call its own +0x064 (TodSet__BuildTods) and return NULL on a nonzero result; otherwise return self.
+Constructor: the parent gTodMethods's ctor (through GetTodMethods's table, same argument), install gTodSetMethods; if the argument's first word is nonzero, call its own +0x064 (TodSet__BuildTods) and return NULL on a nonzero result; otherwise return self.
 
-Table slot (`tools/classtable.py`): D_8006F590 +0x008.
+Table slot (`tools/classtable.py`): gTodSetMethods +0x008.
 
 ## Source
 
@@ -21,7 +21,7 @@ fields +0x2C..+0x38), `Ctor33808` and `CountedBuf33808` sit at the top of
 `src/code_33808.c`.
 
 ```c
-/* D_8006F590 +0x008: constructor -- the parent gTodMethods's, then this
+/* gTodSetMethods +0x008: constructor -- the parent gTodMethods's, then this
  * table; when the argument's first word is set, its own +0x064 runs, and a
  * nonzero result fails the construction (NULL). */
 void *TodSet__TodSet(DataSrc33808 *self, s32 *arg) {

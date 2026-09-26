@@ -9,9 +9,9 @@ drift. Fresh ground (carved revision 18, no prior report).
 
 ## What it does
 
-`ReleaseBasicClassArray(buf->entries, buf->count)` over the buffer's counted array, then the PARENT's finalize through its getter: `((DataSrc33808Methods *)GetTodMethods())->finalize(self)` -- GetTodMethods returns gTodMethods, so D_8006F590 derives from gTodMethods (consistent with the shared +0x07C/+0x080 slots).
+`ReleaseBasicClassArray(buf->entries, buf->count)` over the buffer's counted array, then the PARENT's finalize through its getter: `((DataSrc33808Methods *)GetTodMethods())->finalize(self)` -- GetTodMethods returns gTodMethods, so gTodSetMethods derives from gTodMethods (consistent with the shared +0x07C/+0x080 slots).
 
-Table slot (`tools/classtable.py`): D_8006F590 +0x00C (finalize).
+Table slot (`tools/classtable.py`): gTodSetMethods +0x00C (finalize).
 
 ## Source
 
@@ -21,7 +21,7 @@ fields +0x2C..+0x38) and `CountedBuf33808` sit at the top of `src/code_33808.c`.
 Slot +0x078 is `void *slot78` in the unified macro, so calls cast it.
 
 ```c
-/* D_8006F590 +0x00C: finalize -- release the buffer's counted object array,
+/* gTodSetMethods +0x00C: finalize -- release the buffer's counted object array,
  * then the parent gTodMethods's. */
 void TodSet__Finalize(DataSrc33808 *self) {
     CountedBuf33808 *buf = self->buffer;

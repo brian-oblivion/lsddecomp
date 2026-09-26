@@ -42,4 +42,4 @@ u8 ModelData__ForwardScanPackets(ModelData *self, s32 arg1, s32 arg2) {
 
 ## Track 4
 
-2026-09-25, round 84 (delta): ModelData (gModelDataMethods) is unified in `include/ModelData.h`; the unit-shared `DataSrc33808` view no longer types it. Slot +0x080 is `scanPackets`, `u8 (*)(ModelData *self, s32 arg1, s32 arg2)`. The forwarded call reads `todSet->methods->slot78` through Class6D430's table, still cast, because the TodSet class (D_8006F590) is not unified. Image byte-identical.
+2026-09-25, round 84 (delta): ModelData (gModelDataMethods) is unified in `include/ModelData.h`; the unit-shared `DataSrc33808` view no longer types it. Slot +0x080 is `scanPackets`, `u8 (*)(ModelData *self, s32 arg1, s32 arg2)`. The forwarded call reads `todSet->methods->slot78` through Class6D430's table, still cast, because the TodSet class (gTodSetMethods) is not unified. Image byte-identical.

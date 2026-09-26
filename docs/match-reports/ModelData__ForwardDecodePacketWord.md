@@ -42,7 +42,7 @@ void *ModelData__ForwardDecodePacketWord(ModelData *self, s32 arg1, s32 arg2, s3
 
 ## Track 4
 
-2026-09-25, round 84 (delta): ModelData (gModelDataMethods) is unified in `include/ModelData.h`; the unit-shared `DataSrc33808` view no longer types it. Slot +0x084 is `decodePacketWord`. The TodSet's slot +0x080 lies past Class6D430's table, and the TodSet class (D_8006F590) is not unified, so the call reaches it through `((DataSrc33808 *)self->todSet)->methods->slot80`: a pointer cast, no code. Image byte-identical.
+2026-09-25, round 84 (delta): ModelData (gModelDataMethods) is unified in `include/ModelData.h`; the unit-shared `DataSrc33808` view no longer types it. Slot +0x084 is `decodePacketWord`. The TodSet's slot +0x080 lies past Class6D430's table, and the TodSet class (gTodSetMethods) is not unified, so the call reaches it through `((DataSrc33808 *)self->todSet)->methods->slot80`: a pointer cast, no code. Image byte-identical.
 
 ## Track 4 (2026-09-26, round 88, delta)
 

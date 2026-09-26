@@ -9,7 +9,7 @@ drift. Fresh ground (carved revision 18, no prior report).
 
 ## What it does
 
-When +0x34 is set: fills a 3-word stack request with SetVec3(&req, buffer + buffer[+8], 0, 1) and constructs a LinkResource (gLinkResourceMethods) object from it (New_LinkResource) into +0x2C; if that succeeded, points req.buffer at buffer + 0x0C and constructs a D_8006F590 object (New_TodSet) into +0x30; returns 0 when both exist. On either failure it calls its own +0x07C (ModelData__ReleaseResources, which releases what was built) and returns 1. With +0x34 clear, returns 0.
+When +0x34 is set: fills a 3-word stack request with SetVec3(&req, buffer + buffer[+8], 0, 1) and constructs a LinkResource (gLinkResourceMethods) object from it (New_LinkResource) into +0x2C; if that succeeded, points req.buffer at buffer + 0x0C and constructs a gTodSetMethods object (New_TodSet) into +0x30; returns 0 when both exist. On either failure it calls its own +0x07C (ModelData__ReleaseResources, which releases what was built) and returns 1. With +0x34 clear, returns 0.
 
 Table slot (`tools/classtable.py`): gModelDataMethods +0x078 (called by ModelData__Load, its setFlag override).
 

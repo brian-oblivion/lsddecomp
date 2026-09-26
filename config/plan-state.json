@@ -872,11 +872,6 @@
           "date": "2026-09-26",
           "header": "include/TriggerWorld.h"
         },
-        "D_8006F590": {
-          "class": "TodSet",
-          "date": "2026-09-26",
-          "header": "include/TodSet.h"
-        },
         "ENTITY_METHODS": {
           "class": "Entity",
           "date": "2026-09-26",
@@ -1111,6 +1106,11 @@
           "class": "Tod",
           "date": "2026-09-26",
           "header": "include/Tod.h"
+        },
+        "gTodSetMethods": {
+          "class": "TodSet",
+          "date": "2026-09-26",
+          "header": "include/TodSet.h"
         },
         "gVabDriverMethods": {
           "class": "VabDriver",

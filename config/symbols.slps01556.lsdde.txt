@@ -2885,3 +2885,4 @@ gTimArraySrcMethods = 0x8006F1C4;
 gTimBlockSrcMethods = 0x8006F0B8;
 gTodMethods = 0x8006F240;
 gModelDataMethods = 0x8006F384;
+gTodSetMethods = 0x8006F590;

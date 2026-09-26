@@ -19,7 +19,7 @@
  *   - TimArraySrc  (gTimArraySrcMethods): an array of TimImage objects
  *     (code_2bb9c.c's New_TimImage), one per TimBlockSrc block
  *     (include/TimArraySrc.h, track 4, round 88).
- *   - Tod / TodSet (gTodMethods / D_8006F590, TodSet a Tod subclass): one
+ *   - Tod / TodSet (gTodMethods / gTodSetMethods, TodSet a Tod subclass): one
  *     TOD's packet stream (ScanTodPackets/DecodeTodPacketWord) and an array
  *     of them; named from include/code_55dd4.h's own "TOD set" (Unk30Obj).
  *   - ModelData / TriggerWorld (gModelDataMethods / D_8006F40C, TriggerWorld a
@@ -599,7 +599,7 @@ u8 Tod__ScanPackets(Tod *self, u8 *out, u32 *sel) {
     return self->methods->scanTodPackets(self, out, sel, (u32 *)((u8 *)self->buffer + 8));
 }
 
-/* gTodMethods/D_8006F590 +0x07C: walk the packet words after the u16 count
+/* gTodMethods/gTodSetMethods +0x07C: walk the packet words after the u16 count
  * at data +2 (from data +8), each decoded by +0x080 into a value, a type, a
  * sub-type and a length in words. Type 8 sub-type 0 appends the value to
  * `out` (when given) and counts it; type 2 either, with `out`, looks the
@@ -651,7 +651,7 @@ u8 ScanTodPackets(Tod *self, u8 *out, u32 *sel, u32 *data) {
     return cnt;
 }
 
-/* gTodMethods/D_8006F590 +0x080: decode one packet word -- the low byte, then
+/* gTodMethods/gTodSetMethods +0x080: decode one packet word -- the low byte, then
  * the two nibbles at bits 16 and 20, then the top byte -- and return the
  * pointer past it. */
 u32 *DecodeTodPacketWord(Tod *self, u32 *acc, u8 *out0, u8 *out1, u8 *out2, u8 *out3) {
@@ -863,7 +863,7 @@ void ModelData__Load(ModelData *self) {
 }
 
 /* gModelDataMethods +0x078: when +0x34 is set, build a LinkResource source over the
- * buffer's sub-block (at the offset in its third word) and a D_8006F590 one
+ * buffer's sub-block (at the offset in its third word) and a gTodSetMethods one
  * over the buffer past +0x0C, into +0x2C and +0x30; 0 when both exist,
  * otherwise slot +0x07C (release) and 1. */
 typedef struct Req44858 {
@@ -1214,7 +1214,7 @@ TodSet *New_TodSet(Src6F240 *src) {
     return NULL;
 }
 
-/* D_8006F590 +0x008: constructor -- the parent Tod's, then this table; when
+/* gTodSetMethods +0x008: constructor -- the parent Tod's, then this table; when
  * the descriptor holds a buffer, its own +0x064 (TodSet__BuildTods) runs,
  * and a nonzero result fails the construction (NULL). */
 void *TodSet__TodSet(TodSet *self, Src6F240 *src) {
@@ -1228,7 +1228,7 @@ void *TodSet__TodSet(TodSet *self, Src6F240 *src) {
     return self;
 }
 
-/* D_8006F590 +0x00C: finalize -- release the buffer's counted Tod array,
+/* gTodSetMethods +0x00C: finalize -- release the buffer's counted Tod array,
  * then the parent Tod's. */
 void TodSet__Finalize(TodSet *self) {
     CountedBuf33808 *buf = self->buffer;
@@ -1237,7 +1237,7 @@ void TodSet__Finalize(TodSet *self) {
     GetTodMethods()->finalize((Tod *)self);
 }
 
-/* D_8006F590 +0x064: build a Tod over each sub-block of the buffer's
+/* gTodSetMethods +0x064: build a Tod over each sub-block of the buffer's
  * counted offset table, into the table's own words; 0 when all exist,
  * otherwise release the ones already built and 1. */
 s32 TodSet__BuildTods(TodSet *self) {
@@ -1268,7 +1268,7 @@ s32 TodSet__BuildTods(TodSet *self) {
     return 0;
 }
 
-/* D_8006F590 +0x078: Tod's +0x07C scanner over the data past the buffer's
+/* gTodSetMethods +0x078: Tod's +0x07C scanner over the data past the buffer's
  * counted array. */
 u8 TodSet__ScanPackets(TodSet *self, u8 *out, u32 *sel) {
     CountedBuf33808 *buf = self->buffer;
@@ -1277,7 +1277,7 @@ u8 TodSet__ScanPackets(TodSet *self, u8 *out, u32 *sel) {
 }
 
 TodSetMethods *GetTodSetMethods(void) {
-    return &D_8006F590;
+    return &gTodSetMethods;
 }
 
 /* Allocate and construct a MoviePlayer; freed and NULL when the constructor

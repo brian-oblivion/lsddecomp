@@ -4,7 +4,7 @@
 #include "Tod.h"
 
 /*
- * TodSet -- a Tod subclass (class id 0x14F03, method table D_8006F590) over
+ * TodSet -- a Tod subclass (class id 0x14F03, method table gTodSetMethods) over
  * a buffer holding several TOD animations: a counted offset table, one Tod
  * per entry, then the packet data. Methods in src/code_33808.c; no
  * subclasses. Its parent is its id parent: TodSet__TodSet's first call is
@@ -21,7 +21,7 @@
  * include/ModelData.h).
  *
  * NO OWN SLOTS: the table is Tod's 0x84 bytes, with +0x008, +0x00C, +0x064
- * and +0x078 overridden (`classtable.py D_8006F590 --vs gTodMethods`).
+ * and +0x078 overridden (`classtable.py gTodSetMethods --vs gTodMethods`).
  * +0x064 keeps the inherited name `setFlag` and its void type; the occupant
  * TodSet__BuildTods returns s32 (0 when every Tod was built), and the ctor
  * casts the call, as ModelData__ModelData casts its own. +0x078 is
@@ -50,7 +50,7 @@ struct TodSet {
     TOD_FIELDS(TodSetMethods);
 };
 
-extern TodSetMethods D_8006F590;
+extern TodSetMethods gTodSetMethods;
 extern TodSetMethods *GetTodSetMethods(void);
 
 TodSet *New_TodSet(struct Src6F240 *src);
