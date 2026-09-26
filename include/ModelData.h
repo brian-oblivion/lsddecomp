@@ -57,7 +57,7 @@ typedef struct ModelDataMethods ModelDataMethods;
 
 #define MODELDATA_FIELDS(Methods)                                                                  \
     CLASS6D430_FIELDS(Methods);                                                                    \
-    /* +0x02C */ Class6D430 *linkResource; /* New_LinkResource (gLinkResourceMethods); released by ReleaseResources */ \
+    /* +0x02C */ struct LinkResource *linkResource; /* New_LinkResource (include/LinkResource.h); released by ReleaseResources */ \
     /* +0x030 */ Class6D430 *todSet;       /* New_TodSet (D_8006F590); +0x080/+0x084 forward to it */ \
     /* +0x034 */ s32 ownsResources         /* the ctor's third argument: New_ModelData 1, TriggerWorld 0; BuildResources and ReleaseResources act only while it is set. The object is 0x38 bytes (New_ModelData): TriggerWorld's own fields start at +0x038 */
 
