@@ -1047,6 +1047,11 @@
           "date": "2026-09-26",
           "header": "include/LightRig.h"
         },
+        "gLinkResourceMethods": {
+          "class": "LinkResource",
+          "date": "2026-09-26",
+          "header": "include/LinkResource.h"
+        },
         "gMoviePlayerMethods": {
           "class": "MoviePlayer",
           "date": "2026-09-26",
