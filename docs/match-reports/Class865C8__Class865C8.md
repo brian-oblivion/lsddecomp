@@ -1,4 +1,6 @@
-# Obj865C8__Obj865C8 — MATCHED (107/107 words)
+# Class865C8__Class865C8 — MATCHED (107/107 words)
+
+> Renamed from `Obj865C8__Obj865C8` on 2026-09-26 (tools/rename.py). Address 0x80049684.
 
 > Renamed from `func_80049684` on 2026-09-23 (tools/rename.py). Address 0x80049684.
 
@@ -21,10 +23,10 @@ addu  $a1, $s0, $zero
 lw    $v0, 0x8($v0)            ; gClass86668Methods's own ctor slot
 jalr  $v0
  addu $a2, $zero, $zero        ; GetClass86668Methods()->ctor(self, s0, NULL)
-jal   GetObj865C8Methods
+jal   GetClass865C8Methods
  nop
 jal   InitDreamAux
- sw   $v0, 0x0($s1)            ; self->methods = GetObj865C8Methods() (== &D_800865C8)
+ sw   $v0, 0x0($s1)            ; self->methods = GetClass865C8Methods() (== &gClass865C8Methods)
 lui   $a0, %hi(D_800113EC)
 addiu $a0, $a0, %lo(D_800113EC)
 jal   New_TimImage
@@ -99,12 +101,12 @@ jr $ra
 ## Final C
 
 ```c
-void Obj865C8__Obj865C8(Obj865C8 *self, Obj0C *arg1, SubObjD *arg2, s32 arg3) {
+void Class865C8__Class865C8(Obj865C8 *self, Obj0C *arg1, SubObjD *arg2, s32 arg3) {
     LoadRequest req;
     s32 tmp;
 
     GetClass86668Methods()->ctor(self, GetSoundEffectDir(0), 0);
-    self->methods = GetObj865C8Methods();
+    self->methods = GetClass865C8Methods();
     InitDreamAux();
     self->unk44 = New_TimImage(D_800113EC);
     self->unk44->methods->slot78(self->unk44);
@@ -141,9 +143,9 @@ needed anywhere in this 107-word function.
 - This ctor delegates to the SIBLING class's own ctor (`GetClass86668Methods()->
   ctor`, i.e. `Class86668__Class86668`) for shared base construction FIRST — same
   "override calls base impl via the other table" pattern already documented
-  for the dtor (`Obj865C8__Dtor`) and several slot forwarders this round —
-  then immediately re-asserts `self->methods = GetObj865C8Methods()` (`&
-  D_800865C8`, this class's REAL vtable), overwriting what the delegated
+  for the dtor (`Class865C8__Finalize`) and several slot forwarders this round —
+  then immediately re-asserts `self->methods = GetClass865C8Methods()` (`&
+  gClass865C8Methods`, this class's REAL vtable), overwriting what the delegated
   ctor had just set to `&gClass86668Methods`. Two `self->methods` writes in one
   function, back to back, both legitimate.
 - `arg1` (this function's own 2nd parameter, `Obj0C *`) is both stored
@@ -152,9 +154,9 @@ needed anywhere in this 107-word function.
   simultaneously wiring up `self` and finishing construction of an object
   `self` doesn't own outright (passed in already allocated by the caller).
 - `arg2` (`SubObjD *`) is stored into `self->unk38` (its established type
-  from `Obj865C8__Deinit`/`Obj865C8__Init` this round) AND separately passed to
+  from `Class865C8__Deinit`/`Class865C8__Init` this round) AND separately passed to
   `self->methods->slot10`, whose established signature (from
-  `Obj865C8__EnterState2`, an EARLIER round) expects `Obj4C *` — a different type
+  `Class865C8__EnterState2`, an EARLIER round) expects `Obj4C *` — a different type
   entirely. Both usages are of the SAME raw pointer value (just a
   register-forwarded call argument on the `slot10` side, never
   dereferenced there), so a `(Obj4C *)` cast at that one call site
@@ -162,7 +164,7 @@ needed anywhere in this 107-word function.
 - Six independent "New_X"-shaped allocator calls (`New_TimImage`,
   `New_LinkResource`, `New_WBgm`, `New_Class869D8`, `New_FrameClock`,
   `New_Class866E8`) populate six different fields (`self->unk40/44/48`,
-  `arg1->unk8/unkC/unk10`) that this unit's OWN dtor (`Obj865C8__Dtor`,
+  `arg1->unk8/unkC/unk10`) that this unit's OWN dtor (`Class865C8__Finalize`,
   earlier this round) already established as a uniform `SubObjG` family via
   `->methods->slot4`. These are almost certainly six DIFFERENT real
   classes under the hood (`New_Class866E8` is independently and fully typed
@@ -183,7 +185,7 @@ needed anywhere in this 107-word function.
   independently established elsewhere as `void InitDreamAux(void)`,
   itself a documented STALL in `code_4cd08` unrelated to this unit).
   Reading the CALLEE's prologue was the right move here, same lesson
-  `Obj865C8__EnterState2` used earlier this round for the opposite question (an
+  `Class865C8__EnterState2` used earlier this round for the opposite question (an
   argument that looked unused turning out to be real).
 
 ## New struct/extern knowledge (`include/class_39e08.h`)
@@ -226,8 +228,8 @@ question asks about (a LATER call through `self->methods` resolving to a
 DIFFERENT function BECAUSE of an earlier reassignment within the same
 function) — the two `self->methods` writes here don't interact with each
 other that way; nothing calls through `self->methods` AGAIN until well
-after both writes have settled to the FINAL value (`&D_800865C8`,
-`GetObj865C8Methods()`'s return), so every actual dispatch through
+after both writes have settled to the FINAL value (`&gClass865C8Methods`,
+`GetClass865C8Methods()`'s return), so every actual dispatch through
 `self->methods` in this function sees the same, final table. Six functions
 into this round, reporting negative consistently. The one confirmed
 instance remains `Class86668__Class86668`'s ctor from the earlier round (where a
@@ -243,15 +245,15 @@ data point ruling out the naive "any double-write is suspect" reading.
 ### Session summary note
 
 This closes out the round: all 5 of this session's assigned functions
-(`Obj865C8__OnNotify`, `Obj865C8__StartSubA`, `Obj865C8__Dtor`, `Obj865C8__AdvanceState`,
-`Obj865C8__Obj865C8`) matched, none stalled — including the two the head
-expected residues to survive on. `Obj865C8__AdvanceState`'s residue (a GCC
+(`Class865C8__OnNotify`, `Class865C8__OnInit`, `Class865C8__Finalize`, `Class865C8__AdvanceState`,
+`Class865C8__Class865C8`) matched, none stalled — including the two the head
+expected residues to survive on. `Class865C8__AdvanceState`'s residue (a GCC
 switch-case-balancing quirk) took 9 attempts; every other function in this
 session matched within 1-2.
 
 ## Naming
 
-`Obj865C8__Obj865C8` -- tier A. Named by the project's `Class__Class` ctor convention. Its body constructs the base, installs `D_800865C8`, and loads two named resources verbatim ("ETC\ETC.TIM", "ETC\DREAMER.TMD") -- evidence from the body alone that this is the class's constructor.
+`Class865C8__Class865C8` -- tier A. Named by the project's `Class__Class` ctor convention. Its body constructs the base, installs `gClass865C8Methods`, and loads two named resources verbatim ("ETC\ETC.TIM", "ETC\DREAMER.TMD") -- evidence from the body alone that this is the class's constructor.
 
 ## Track 4 (2026-09-26, round 88)
 

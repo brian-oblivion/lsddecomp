@@ -1,4 +1,6 @@
-# Obj865C8__Deinit — MATCHED (37/37 words)
+# Class865C8__Deinit — MATCHED (37/37 words)
+
+> Renamed from `Obj865C8__Deinit` on 2026-09-26 (tools/rename.py). Address 0x80049ac0.
 
 > Renamed from `func_80049AC0` on 2026-09-23 (tools/rename.py). Address 0x80049ac0.
 
@@ -42,14 +44,14 @@ jr $ra
 `Class86668__Deinit` (this unit, already matched:
 `void Class86668__Deinit(Obj865C8 *self) { Get_vtable_IntermediateBase()->slot48(self); }`) —
 i.e. this function forwards to the SIBLING class's slot48 override
-explicitly, not to its own (`Obj865C8__Deinit` itself occupies `D_800865C8`'s
+explicitly, not to its own (`Class865C8__Deinit` itself occupies `gClass865C8Methods`'s
 +0x048 slot — this is a self-referential-looking but actually cross-class
 call, resolved by `tools/classtable.py`, not by inspection).
 
 ## Final C
 
 ```c
-void Obj865C8__Deinit(Obj865C8 *self) {
+void Class865C8__Deinit(Obj865C8 *self) {
     SubObjD *sub = self->unk38;
 
     GetClass86668Methods()->slot48(self);
@@ -62,16 +64,16 @@ void Obj865C8__Deinit(Obj865C8 *self) {
 ## New struct knowledge (`include/class_39e08.h`)
 
 - `Obj865C8::unk0C` retyped from `s32` (its only other use so far,
-  `Obj865C8__EnterState2`'s forwarded arg to `Get_vtable_IntermediateBase()->slot44`, a plain
+  `Class865C8__EnterState2`'s forwarded arg to `Get_vtable_IntermediateBase()->slot44`, a plain
   register-passthrough that never dereferences it) to `Obj0C *` — this
-  function dereferences it (`->unk4`) directly. Updated `Obj865C8__EnterState2`'s
+  function dereferences it (`->unk4`) directly. Updated `Class865C8__EnterState2`'s
   call site with an explicit `(s32)` cast; same register value either way,
   confirmed by rebuilding both functions together (33/33 and 37/37 both
   hold).
 - `Obj865C8::unk10` (s32, new) — passed as a plain register value to a
   `slot14` call, never dereferenced.
 - `Obj865C8::unk38` retyped from `s32` to `SubObjD *` for the same reason as
-  `unk0C` — `Obj865C8__EnterState2` never dereferences it either, cast added there
+  `unk0C` — `Class865C8__EnterState2` never dereferences it either, cast added there
   too.
 - New opaque type `Obj0C` (only field known: `unk4`, plain scalar,
   no vtable dispatch through it in this unit).
@@ -94,10 +96,10 @@ pointer, retype the FIELD and add an explicit `(s32)` cast at the older,
 opaque call site rather than leaving the field typed `s32` project-wide —
 the cast reproduces the identical register move, and the field's real type
 carries forward to every future reader. Confirmed here with two functions
-(`Obj865C8__Deinit`, `Obj865C8__EnterState2`) sharing `Obj865C8::unk0C`/`unk38` with
+(`Class865C8__Deinit`, `Class865C8__EnterState2`) sharing `Obj865C8::unk0C`/`unk38` with
 opposite usage shapes; rebuilding both together after the retype held both
 matches.
 
 ## Naming
 
-`Obj865C8__Deinit` -- tier B. Occupies +0x048, the mirror of Init's slot (`gIntermediateBaseMethods`'s +0x048 forwards to `IntermediateBase__Deinit`). Undoes what Init configured on the sub-object and forwards to `Class86668__Deinit`; the same caveat as Init applies to its specific purpose here.
+`Class865C8__Deinit` -- tier B. Occupies +0x048, the mirror of Init's slot (`gIntermediateBaseMethods`'s +0x048 forwards to `IntermediateBase__Deinit`). Undoes what Init configured on the sub-object and forwards to `Class86668__Deinit`; the same caveat as Init applies to its specific purpose here.

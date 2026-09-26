@@ -1,4 +1,6 @@
-# Obj865C8__OnTag2Notify — MATCHED (byte-exact, whole-image `build exit=0`)
+# Class865C8__OnObjMNotify — MATCHED (byte-exact, whole-image `build exit=0`)
+
+> Renamed from `Obj865C8__OnTag2Notify` on 2026-09-26 (tools/rename.py). Address 0x80049eb4.
 
 > Renamed from `func_80049EB4` on 2026-09-23 (tools/rename.py). Address 0x80049eb4.
 
@@ -15,7 +17,7 @@ untouched and nothing here is toolchain-blocked.
 ## The match
 
 ```c
-void Obj865C8__OnTag2Notify(Obj865C8 *self, s32 arg1, s32 arg2) {
+void Class865C8__OnObjMNotify(Obj865C8 *self, s32 arg1, s32 arg2) {
     struct SubObjDPos pos;
     s32 result;
 
@@ -52,7 +54,7 @@ void Obj865C8__OnTag2Notify(Obj865C8 *self, s32 arg1, s32 arg2) {
 ```
 
 `arg1` is genuinely unused — same shape as the already-matched sibling
-`Obj865C8__AdvanceState`, which this function closely parallels. Codes 9 and 0xB map to
+`Class865C8__AdvanceState`, which this function closely parallels. Codes 9 and 0xB map to
 the epilogue (no-ops). The two `onEventArg(self, 3)` calls cross-jump into one
 site, which falls out of the shape and needed no encouragement.
 
@@ -95,16 +97,16 @@ Two corroborating details, both needed before writing it that way:
 
 - **`SubObjDMethods::slot1BC`** carved out of `pad1BC[0x1E0 - 0x1BC]`. Split is
   additive and preserves the 0x24 total (4 + `pad1C0` of 0x20).
-- **`SubObjDMethods::slot1B8` RETYPED `void` -> `s32`.** `Obj865C8__OnTag2Notify`
+- **`SubObjDMethods::slot1B8` RETYPED `void` -> `s32`.** `Class865C8__OnObjMNotify`
   branches on the return value directly off the `jalr` (`bnez $v0`), which is
   positive evidence the slot is non-void.
 
   **This is the round-7 shared-vtable-slot hazard and it was checked as such,
-  not assumed.** The unit's other caller, `Obj865C8__AdvanceState`, is already matched
+  not assumed.** The unit's other caller, `Class865C8__AdvanceState`, is already matched
   and DISCARDS the return — exactly the configuration where retyping
   `void` -> `s32` stopped GCC tail-merging two identical discarded calls and
   cost 4 words. Here it came back clean: whole-image SHA1 green, and
-  `Obj865C8__AdvanceState` (94/94) and `Obj865C8__EnterState2` (33/33) re-verified individually
+  `Class865C8__AdvanceState` (94/94) and `Class865C8__EnterState2` (33/33) re-verified individually
   after the retype. The check is per-slot and cannot be reasoned by analogy —
   round 7 had two symmetric slots that needed opposite answers.
 
@@ -146,12 +148,12 @@ polarity and never scheduling.
 
 ## Naming
 
-`Obj865C8__OnTag2Notify` -- tier B. Occupies +0x084, dispatched by `Obj865C8__OnNotify`'s other tag branch (0x2F230). A `switch` over small integer codes (4, 5-8/0xA, 0xC/0xD) that queries/reconfigures `subD` and sets `eventCode`/`state`; the dispatch shape is clear, the meaning of the tag and its sub-codes is not.
+`Class865C8__OnObjMNotify` -- tier B. Occupies +0x084, dispatched by `Class865C8__OnNotify`'s other tag branch (0x2F230). A `switch` over small integer codes (4, 5-8/0xA, 0xC/0xD) that queries/reconfigures `subD` and sets `eventCode`/`state`; the dispatch shape is clear, the meaning of the tag and its sub-codes is not.
 
 ## Track 4 (2026-09-26, round 88)
 
 Obj865C8::unk38 is the game's DreamSys (code_1677c passes
-Class6D3C8::dreamSys to New_Obj865C8), so the SubObjD view is gone and its
+Class6D3C8::dreamSys to New_Class865C8), so the SubObjD view is gone and its
 slots are DreamSys's: +0x1B8 endDay, +0x1BC getCinematic. The by-value
 return this body tests is therefore a CinematicCall {bank, entry}; the
 local 8-byte SubObjDPos is replaced by it and `pos.unk2` is `pos.entry`.

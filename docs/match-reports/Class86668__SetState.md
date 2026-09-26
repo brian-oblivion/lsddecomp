@@ -11,7 +11,7 @@
 ## What it does
 
 Method-table slot +0x060, shared VERBATIM (same function address) between
-`D_800865C8` and its sibling `gClass86668Methods` -- confirmed by
+`gClass865C8Methods` and its sibling `gClass86668Methods` -- confirmed by
 `tools/classtable.py`, both tables list `Class86668__SetState` at +0x060. Always
 forwards to the BASE class's own +0x060 implementation first (return value
 discarded), then -- based on the ORIGINAL argument, not the base call's
@@ -71,4 +71,4 @@ not a real retail fact.
 
 ## Track 4
 
-2026-09-25, round 84 (bravo): class unified in `include/Class86668.h`. Renamed from `Class86668__OnEventArg`, tier A: it occupies +0x060, IntermediateBase's `setState` slot (IntermediateBase__SetState in the parent table), and its first call is the base setState with the same argument. For state 4 it also sets `result` (was `eventCode`) = 1 and calls +0x07C, now named `onState4` (NULL in this class's own 0x80-byte table; empty Obj865C8__Noop7C and ObjM__NoOpSlot7C in the subclasses). State 4 is what Class86668__CheckTimeout raises. Signature `(Class86668 *self, s32 state)`. Image byte-identical.
+2026-09-25, round 84 (bravo): class unified in `include/Class86668.h`. Renamed from `Class86668__OnEventArg`, tier A: it occupies +0x060, IntermediateBase's `setState` slot (IntermediateBase__SetState in the parent table), and its first call is the base setState with the same argument. For state 4 it also sets `result` (was `eventCode`) = 1 and calls +0x07C, now named `onState4` (NULL in this class's own 0x80-byte table; empty Class865C8__OnState4 and ObjM__NoOpSlot7C in the subclasses). State 4 is what Class86668__CheckTimeout raises. Signature `(Class86668 *self, s32 state)`. Image byte-identical.

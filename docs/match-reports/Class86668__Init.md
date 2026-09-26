@@ -3,7 +3,7 @@
 > Renamed from `func_8004A2C4` on 2026-09-23 (tools/rename.py). Address 0x8004a2c4.
 
 `Obj865C8`'s vtable slot +0x044 (`Class86668Methods`, i.e. the sibling class
-`gClass86668Methods` overriding `D_800865C8`'s +0x044 — see `class_39e08.h`'s existing
+`gClass86668Methods` overriding `gClass865C8Methods`'s +0x044 — see `class_39e08.h`'s existing
 note that this function is one of gClass86668Methods's known overrides at
 +0x008/+0x00C/+0x040/+0x044/+0x048).
 
@@ -82,8 +82,8 @@ pair turns up.
 
 ## Naming
 
-`Class86668__Init` -- tier B. Occupies +0x044 (the same Init-slot convention as `Obj865C8__Init`, see above): zeroes `eventCode`, forwards to the base's own +0x044, returns `eventCode`. Named by slot-offset convention, not by an established in-game meaning.
+`Class86668__Init` -- tier B. Occupies +0x044 (the same Init-slot convention as `Class865C8__Init`, see above): zeroes `eventCode`, forwards to the base's own +0x044, returns `eventCode`. Named by slot-offset convention, not by an established in-game meaning.
 
 ## Track 4
 
-2026-09-25, round 84 (bravo): class unified in `include/Class86668.h`. Not renamed. Signature `s32 (Class86668 *self, IntermediateBaseInitArgs *args, s32 mode)`, IntermediateBase's `init` slot; `eventCode` is `result`, which Class6D3C8__PollStatusObj switches on through Obj865C8 (1 is a timeout, Class86668__SetState's state 4). Obj865C8__Init and ObjM__AttachTarget call it as `GetClass86668Methods()->init((Class86668 *)self, (IntermediateBaseInitArgs *)..., mode)`. Image byte-identical.
+2026-09-25, round 84 (bravo): class unified in `include/Class86668.h`. Not renamed. Signature `s32 (Class86668 *self, IntermediateBaseInitArgs *args, s32 mode)`, IntermediateBase's `init` slot; `eventCode` is `result`, which Class6D3C8__PollStatusObj switches on through Obj865C8 (1 is a timeout, Class86668__SetState's state 4). Class865C8__Init and ObjM__AttachTarget call it as `GetClass86668Methods()->init((Class86668 *)self, (IntermediateBaseInitArgs *)..., mode)`. Image byte-identical.

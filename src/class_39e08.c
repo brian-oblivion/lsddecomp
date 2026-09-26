@@ -7,24 +7,24 @@
 #include "FrameClock.h"
 #include "DreamSys.h"
 
-Obj865C8 *New_Obj865C8(Obj0C *arg1, DreamSys *arg2, s32 arg3)
+Obj865C8 *New_Class865C8(Obj0C *arg1, DreamSys *arg2, s32 arg3)
 {
     Obj865C8 *self;
 
     self = BMemPMgrAlloc(0x50);
     if (self != NULL) {
-        GetObj865C8Methods()->ctor(self, arg1, arg2, arg3);
+        GetClass865C8Methods()->ctor(self, arg1, arg2, arg3);
         return self;
     }
     return NULL;
 }
 
-void Obj865C8__Obj865C8(Obj865C8 *self, Obj0C *arg1, DreamSys *arg2, s32 arg3) {
+void Class865C8__Class865C8(Obj865C8 *self, Obj0C *arg1, DreamSys *arg2, s32 arg3) {
     LoadRequest req;
     s32 tmp;
 
     GetClass86668Methods()->ctor((Class86668 *)self, (char *)GetSoundEffectDir(0), 0);
-    self->methods = GetObj865C8Methods();
+    self->methods = GetClass865C8Methods();
     InitDreamAux();
     self->unk44 = (SubObjG *)New_TimImage((char *)D_800113EC);
     ((TimImageUploadFn)((TimImage *)self->unk44)->methods->slot78)((TimImage *)self->unk44);
@@ -47,7 +47,7 @@ void Obj865C8__Obj865C8(Obj865C8 *self, Obj0C *arg1, DreamSys *arg2, s32 arg3) {
     self->methods->resetState(self);
 }
 
-void Obj865C8__Dtor(Obj865C8 *self) {
+void Class865C8__Finalize(Obj865C8 *self) {
     Obj0C *o = self->unk0C;
     SubObjG *g;
 
@@ -65,7 +65,7 @@ void Obj865C8__Dtor(Obj865C8 *self) {
     GetClass86668Methods()->finalize((Class86668 *)self);
 }
 
-void Obj865C8__OnNotify(Obj865C8 *self, EventArg *arg1, s32 arg2) {
+void Class865C8__OnNotify(Obj865C8 *self, EventArg *arg1, s32 arg2) {
     s32 tag;
 
     GetClass86668Methods()->onNotify((Class86668 *)self, arg1, arg2);
@@ -77,11 +77,11 @@ void Obj865C8__OnNotify(Obj865C8 *self, EventArg *arg1, s32 arg2) {
     }
 }
 
-void Obj865C8__ResetState(Obj865C8 *self) {
+void Class865C8__ResetState(Obj865C8 *self) {
     self->state = 0;
 }
 
-void Obj865C8__Init(Obj865C8 *self) {
+void Class865C8__Init(Obj865C8 *self) {
     DreamSys *sub = self->unk38;
 
     sub->methods->addChild(sub, (BasicClass *)self->unk0C->unk4);
@@ -90,7 +90,7 @@ void Obj865C8__Init(Obj865C8 *self) {
     GetClass86668Methods()->init((Class86668 *)self, (IntermediateBaseInitArgs *)self->unk0C, 0);
 }
 
-void Obj865C8__Deinit(Obj865C8 *self) {
+void Class865C8__Deinit(Obj865C8 *self) {
     DreamSys *sub = self->unk38;
 
     GetClass86668Methods()->deinit((Class86668 *)self);
@@ -99,7 +99,7 @@ void Obj865C8__Deinit(Obj865C8 *self) {
     sub->methods->removeChild(sub, (BasicClass *)self->unk10);
 }
 
-void Obj865C8__StartSubA(Obj865C8 *self) {
+void Class865C8__OnInit(Obj865C8 *self) {
     SubObjE *obj;
     SubObjA *subA;
     SubObjF *ret;
@@ -117,7 +117,7 @@ void Obj865C8__StartSubA(Obj865C8 *self) {
     self->state = 1;
 }
 
-void Obj865C8__RunSubUpdates(Obj865C8 *self) {
+void Class865C8__OnDeinit(Obj865C8 *self) {
     SubObjA *sub = self->subA;
 
     sub->methods->slot90(sub);
@@ -125,10 +125,10 @@ void Obj865C8__RunSubUpdates(Obj865C8 *self) {
 }
 
 /* Defined later in this file (ROM order); forward-declared here since
- * Obj865C8__AdvanceState calls it. */
-extern void Obj865C8__EnterState2(Obj865C8 *self, s32 arg1);
+ * Class865C8__AdvanceState calls it. */
+extern void Class865C8__EnterState2(Obj865C8 *self, s32 arg1);
 
-void Obj865C8__AdvanceState(Obj865C8 *self, s32 arg1, s32 arg2) {
+void Class865C8__AdvanceState(Obj865C8 *self, s32 arg1, s32 arg2) {
     s32 result;
 
     GetClass86668Methods()->onTag1Notify((Class86668 *)self, (BasicClass *)arg1, arg2);
@@ -142,7 +142,7 @@ void Obj865C8__AdvanceState(Obj865C8 *self, s32 arg1, s32 arg2) {
                 self->methods->onEventArg(self, 3);
                 return;
             }
-            Obj865C8__EnterState2(self, result);
+            Class865C8__EnterState2(self, result);
             break;
         case 2:
             break;
@@ -150,26 +150,26 @@ void Obj865C8__AdvanceState(Obj865C8 *self, s32 arg1, s32 arg2) {
             self->unk4C->methods->slot48(self->unk4C);
             self->unk4C->methods->slot4(self->unk4C);
             result = self->unk38->methods->getCurrentStage(self->unk38);
-            Obj865C8__EnterState2(self, result);
+            Class865C8__EnterState2(self, result);
             break;
         }
     }
 }
 
-void Obj865C8__EnterState2(Obj865C8 *self, s32 arg1) {
+void Class865C8__EnterState2(Obj865C8 *self, s32 arg1) {
     self->unk4C = New_ObjM(self->subB, (s32)self->unk40, (s32)self->unk44, (s32)self->unk48, arg1);
     self->methods->slot10(self, self->unk4C);
     self->unk4C->methods->slot44(self->unk4C, (s32)self->unk0C, (s32)self->unk38);
     self->state = 2;
 }
 
-void Obj865C8__Noop7C(void) {
+void Class865C8__OnState4(void) {
 }
 
-void Obj865C8__Noop80(void) {
+void Class865C8__OnDreamSysNotify(void) {
 }
 
-void Obj865C8__OnTag2Notify(Obj865C8 *self, s32 arg1, s32 arg2) {
+void Class865C8__OnObjMNotify(Obj865C8 *self, s32 arg1, s32 arg2) {
     CinematicCall pos;
     s32 result;
 
@@ -204,8 +204,8 @@ void Obj865C8__OnTag2Notify(Obj865C8 *self, s32 arg1, s32 arg2) {
     }
 }
 
-Class865C8Methods *GetObj865C8Methods(void) {
-    return &D_800865C8;
+Class865C8Methods *GetClass865C8Methods(void) {
+    return &gClass865C8Methods;
 }
 
 /* Sony's, from the still-uncarved psyq_39094 SDK segment

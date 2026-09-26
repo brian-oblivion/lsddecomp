@@ -41,5 +41,5 @@ extern Class6D430Methods gTimImageMethods;
 
 - **`GetTimImageMethods`** (was `func_8003B614`), tier A: matches the
   project's established `Get<Class>Methods` table-getter convention
-  (`GetClass6D430Methods`, `GetObj865C8Methods`, ...); the body is exactly
+  (`GetClass6D430Methods`, `GetClass865C8Methods`, ...); the body is exactly
   `return &gTimImageMethods;`.

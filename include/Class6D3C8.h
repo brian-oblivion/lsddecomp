@@ -46,7 +46,7 @@ typedef struct Class6D3C8Methods Class6D3C8Methods;
  * self->ctorArgs; each gate below is read `!= 0` by the methods it names. */
 typedef struct Class6D3C8CtorArgs {
     /* +0x00 */ s32 dataSource;     /* Class6E4F0's ctor argument (0x13 = the CD driver's class id) */
-    /* +0x04 */ s32 unk04;          /* New_Obj865C8's 3rd argument, in PollStatusObj */
+    /* +0x04 */ s32 unk04;          /* New_Class865C8's 3rd argument, in PollStatusObj */
     /* +0x08 */ s32 playStreams;    /* gates every StreamTask: StartWeeklyStreamTask, StartGraphRoomStreamTask,
                                      * StartCinematicStream's stream branch, StartStreamTaskWithInit */
     /* +0x0C */ s32 showIntroLogos; /* gates LoadIntroLogoSequence */

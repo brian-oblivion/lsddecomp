@@ -8,7 +8,7 @@
  * BasicClass subclass that runs one attached job to a result. Methods in
  * src/code_2cc8c_c.c. Two classes derive from it (`typeviews.py --tree`):
  * TaskCore (0x130, gTaskCoreMethods: StreamTask, Class86B60, GraphRoom
- * below it) and Class86668 (0x230: D_800865C8's Obj865C8 and D_80087034's ObjM
+ * below it) and Class86668 (0x230: gClass865C8Methods's Obj865C8 and D_80087034's ObjM
  * below it). It is abstract: +0x04C, +0x050 and +0x058 are NULL in its own
  * table, and init/deinit call the first two. It has no allocator; the object
  * is 0x28 bytes because both subclasses' own fields start at +0x028
@@ -35,7 +35,7 @@ typedef struct IntermediateBaseMethods IntermediateBaseMethods;
 typedef struct IntermediateBaseInitArgs IntermediateBaseInitArgs;
 
 /* init's argument. The caller owns it; the object keeps the pointer at
- * +0x00C. Obj865C8__Obj865C8 fills +0x008..+0x010 itself (New_FrameClock(),
+ * +0x00C. Class865C8__Class865C8 fills +0x008..+0x010 itself (New_FrameClock(),
  * New_Class866E8(0, 1), New_Class869D8()). */
 struct IntermediateBaseInitArgs {
     /* +0x000 */ BasicClass *unk0;     /* added as a child; onState2 calls its +0x048, onState3 its +0x04C */

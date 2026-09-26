@@ -95,9 +95,9 @@ typedef struct StatusObj {
     StatusObjMethods *methods;
 } StatusObj;
 
-/* class_39e08.c's New_Obj865C8(Obj0C *, DreamSys *, s32); this unit passes
+/* class_39e08.c's New_Class865C8(Obj0C *, DreamSys *, s32); this unit passes
  * the parent's aux (the tasks' IntermediateBaseInitArgs) and its DreamSys. */
-extern StatusObj *New_Obj865C8(IntermediateBaseInitArgs *initArgs, DreamSys *dreamSys, s32 a2);
+extern StatusObj *New_Class865C8(IntermediateBaseInitArgs *initArgs, DreamSys *dreamSys, s32 a2);
 
 /* The `New_X` allocator for the class whose method table is D_8006D3C8:
  * allocates a 0x2C-byte instance and, on success, runs the class's own
@@ -332,7 +332,7 @@ s32 Class6D3C8__PollStatusObj(Class6D3C8 *self) {
     s32 check;
     s32 result;
 
-    obj = New_Obj865C8((IntermediateBaseInitArgs *)self->aux, self->dreamSys, self->ctorArgs->unk04);
+    obj = New_Class865C8((IntermediateBaseInitArgs *)self->aux, self->dreamSys, self->ctorArgs->unk04);
     status = obj->methods->slot44(obj);
     obj->methods->slot4(obj);
 

@@ -10,7 +10,7 @@
  * (New_Class86668 through Class86668__SetTimeout) and src/class_3ac78.c
  * (Class86668__PlaySound, GetClass86668Methods). The object is 0x38 bytes
  * (New_Class86668). Two classes derive from it, each ctor calling
- * Class86668__Class86668 first (`typeviews.py --tree`): D_800865C8
+ * Class86668__Class86668 first (`typeviews.py --tree`): gClass865C8Methods
  * (0x1F230, Obj865C8, class_39e08) and D_80087034 (0x2F230, ObjM,
  * class_3bb8c_k/_l/_m).
  *
@@ -38,7 +38,7 @@
  *
  * IntermediateBase's onInit (+0x04C) is (self, s32, s32, s32). Of this
  * class's two subclasses, ObjM__InitStyleAndWorld takes three arguments
- * after self and Obj865C8__StartSubA takes self alone; neither is retyped
+ * after self and Class865C8__OnInit takes self alone; neither is retyped
  * here.
  */
 

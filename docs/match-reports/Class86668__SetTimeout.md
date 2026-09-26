@@ -8,7 +8,7 @@
 
 ## What it does
 
-Method-table slot +0x06C, shared verbatim between `D_800865C8` and
+Method-table slot +0x06C, shared verbatim between `gClass865C8Methods` and
 `gClass86668Methods` (same address in both tables). Sets `self->unk2C` to `arg1`
 unconditionally, then overwrites it with `arg1 * 20` if `arg1` is
 non-negative.

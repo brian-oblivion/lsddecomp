@@ -143,7 +143,7 @@ second hidden local.
 ## Naming
 
 **`Class6D3C8__Class6D3C8` -- tier A.** Convention `Class__Class` for a
-constructor (compare `Obj865C8__Obj865C8`, `BasicClass__BasicClass`,
+constructor (compare `Class865C8__Class865C8`, `BasicClass__BasicClass`,
 `Class65650__Class65650`, etc. -- `grep -rnP '(\w+)__\1\(' src/*.c`). Evident
 from the body itself: dispatched through `Class6D3C8Methods.ctor`
 (vtable slot +0x008), calls the base class's own ctor slot first, then

@@ -24,7 +24,7 @@
  * reaches onNotify, which forwards a DrawSystem sender (class id nibble 1)
  * to +0x040 update, which retries on event 2.
  *
- * Its one construction: Obj865C8__Obj865C8 (src/class_39e08.c),
+ * Its one construction: Class865C8__Class865C8 (src/class_39e08.c),
  * New_WBgm(PickWeeklyGroup(0), NULL, 1): the VAB path is one of the seven
  * gWeeklyGroupTable strings ("SND\\AMBIENT" ... "SND\\STANDERD",
  * asm/data/1B84.rodata.s), no SEQ yet, autoPlay on. That caller keeps the

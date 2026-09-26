@@ -1,4 +1,6 @@
-# Obj865C8__StartSubA — MATCHED (63/63 words)
+# Class865C8__OnInit — MATCHED (63/63 words)
+
+> Renamed from `Obj865C8__StartSubA` on 2026-09-26 (tools/rename.py). Address 0x80049b54.
 
 > Renamed from `func_80049B54` on 2026-09-23 (tools/rename.py). Address 0x80049b54.
 
@@ -66,7 +68,7 @@ jr $ra
 ## Final C
 
 ```c
-void Obj865C8__StartSubA(Obj865C8 *self) {
+void Class865C8__OnInit(Obj865C8 *self) {
     SubObjE *obj;
     SubObjA *subA;
     SubObjF *ret;
@@ -144,4 +146,4 @@ forward-declared struct bodies as a bare `struct X { ... };`, never repeat
 
 ## Naming
 
-`Obj865C8__StartSubA` -- tier B. Sets up `subA` with a fixed constant (0x4B0) and two rodata addresses, then unconditionally sets `state = 1`: a clear 'begin' step for the state machine, but what `subA` itself represents in the game is not established (opaque vtable-only view).
+`Class865C8__OnInit` -- tier B. Sets up `subA` with a fixed constant (0x4B0) and two rodata addresses, then unconditionally sets `state = 1`: a clear 'begin' step for the state machine, but what `subA` itself represents in the game is not established (opaque vtable-only view).

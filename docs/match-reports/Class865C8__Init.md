@@ -1,4 +1,6 @@
-# Obj865C8__Init — MATCHED (41/41 words)
+# Class865C8__Init — MATCHED (41/41 words)
+
+> Renamed from `Obj865C8__Init` on 2026-09-26 (tools/rename.py). Address 0x80049a1c.
 
 > Renamed from `func_80049A1C` on 2026-09-23 (tools/rename.py). Address 0x80049a1c.
 
@@ -45,7 +47,7 @@ jr $ra
 ## Final C
 
 ```c
-void Obj865C8__Init(Obj865C8 *self) {
+void Class865C8__Init(Obj865C8 *self) {
     SubObjD *sub = self->unk38;
 
     sub->methods->slot10(sub, self->unk0C->unk4);
@@ -56,7 +58,7 @@ void Obj865C8__Init(Obj865C8 *self) {
 ```
 
 (The `(s32)` casts on `unk8`/`unk10` were added in round 2026-09-02's
-`Obj865C8__Dtor` pass, after that function proved both fields are really
+`Class865C8__Finalize` pass, after that function proved both fields are really
 `SubObjG *` — see "Correction" note below. This snippet reflects the
 CURRENT committed source, not what compiled at the time this report was
 first written.)
@@ -70,7 +72,7 @@ here.
 
 Continues carving `Obj0C` (fields `unk8`, `unk10` added alongside the
 already-known `unk4`) and `SubObjDMethods` (`slot10` added alongside the
-already-known `slot14`/`slot110`), both established by `Obj865C8__Deinit` in
+already-known `slot14`/`slot110`), both established by `Class865C8__Deinit` in
 this same round. `Class86668Methods::slot44` added, typed `s32 (*)(Obj865C8
 *self, s32 arg1, s32 arg2)` from `Class86668__Init`'s own established
 signature.
@@ -78,21 +80,21 @@ signature.
 ## Attempts
 
 1 (matched on first attempt — straightforward once `unk0C`/`unk38`/
-`SubObjD` were already carved by `Obj865C8__Deinit` earlier this round).
+`SubObjD` were already carved by `Class865C8__Deinit` earlier this round).
 
 ### Proposed learning
 
-None new beyond `Obj865C8__Deinit`'s (same session, same fields) — this
+None new beyond `Class865C8__Deinit`'s (same session, same fields) — this
 function is corroborating evidence for that one's opaque-struct carve, not a
 new lever.
 
-## Correction (added by Obj865C8__Dtor, same round, not a rewrite of the above)
+## Correction (added by Class865C8__Finalize, same round, not a rewrite of the above)
 
 At the time this report was written, `Obj0C::unk8`/`unk10` were typed `s32`
 because THIS function's own call sites only ever forward them as opaque
 register values through a vtable call that never dereferences them —
-consistent with either a scalar or a pointer. `Obj865C8__Dtor`
-(`docs/match-reports/Obj865C8__Dtor.md`) later dereferences both fields
+consistent with either a scalar or a pointer. `Class865C8__Finalize`
+(`docs/match-reports/Class865C8__Finalize.md`) later dereferences both fields
 directly (`->methods->slot4`) and settles it: they are `SubObjG *`. This
 function's own derivation above is left as originally written (it was, and
 remains, an accurate account of what THIS function's disassembly shows);
@@ -102,4 +104,4 @@ this function was reconfirmed at 41/41 after the change.
 
 ## Naming
 
-`Obj865C8__Init` -- tier B. Occupies +0x044 -- compared against `gIntermediateBaseMethods`'s own +0x044 slot, which forwards to `IntermediateBase__Init` (code_2cc8c.h), the established base-class Init slot at this exact offset. This override configures the `subD` sub-object and forwards to the sibling class's own +0x044 (`Class86668__Init`); what 'init' accomplishes for THIS class beyond that is not established.
+`Class865C8__Init` -- tier B. Occupies +0x044 -- compared against `gIntermediateBaseMethods`'s own +0x044 slot, which forwards to `IntermediateBase__Init` (code_2cc8c.h), the established base-class Init slot at this exact offset. This override configures the `subD` sub-object and forwards to the sibling class's own +0x044 (`Class86668__Init`); what 'init' accomplishes for THIS class beyond that is not established.

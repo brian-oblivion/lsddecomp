@@ -1,4 +1,6 @@
-# Obj865C8__ResetState
+# Class865C8__ResetState
+
+> Renamed from `Obj865C8__ResetState` on 2026-09-26 (tools/rename.py). Address 0x80049a14.
 
 > Renamed from `func_80049A14` on 2026-09-23 (tools/rename.py). Address 0x80049a14.
 
@@ -6,7 +8,7 @@
 
 ## What it does
 
-Method-table slot +0x040 of the class whose vtable is `D_800865C8` (resolved
+Method-table slot +0x040 of the class whose vtable is `gClass865C8Methods` (resolved
 with `tools/classtable.py 0x800865C8`). Zeroes one field of the instance.
 
 ## Derivation
@@ -19,7 +21,7 @@ jr    $ra
 A one-instruction leaf, the store living in the branch delay slot. Written as:
 
 ```c
-void Obj865C8__ResetState(Obj865C8 *self) {
+void Class865C8__ResetState(Obj865C8 *self) {
     self->unk3C = 0;
 }
 ```
@@ -33,4 +35,4 @@ None beyond what's already documented for this residue-free shape.
 
 ## Naming
 
-`Obj865C8__ResetState` -- tier A. Pure one-line setter (`state = 0`); mechanics are its purpose. Occupies the class's own +0x040 override; the field it resets is used as a 0-3 state code by `Obj865C8__AdvanceState`/`Obj865C8__OnTag2Notify`.
+`Class865C8__ResetState` -- tier A. Pure one-line setter (`state = 0`); mechanics are its purpose. Occupies the class's own +0x040 override; the field it resets is used as a 0-3 state code by `Class865C8__AdvanceState`/`Class865C8__OnObjMNotify`.

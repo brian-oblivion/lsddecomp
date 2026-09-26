@@ -79,7 +79,7 @@ without reaching it. The fix came from re-reading four instructions of retail.
 
 ## What it does
 
-`Class6D3C8Methods` slot `+0x060`. Builds a `StatusObj` (`New_Obj865C8`,
+`Class6D3C8Methods` slot `+0x060`. Builds a `StatusObj` (`New_Class865C8`,
 New_X shape, 0x50 bytes), dispatches `slot44(obj)` (return kept) then
 `slot4(obj)` (return discarded -- via the same "delay slot after `jalr`
 captures the *preceding* call's return" idiom `Class6D3C8__RunPollTask` uses), and
@@ -100,7 +100,7 @@ s32 Class6D3C8__PollStatusObj(Class6D3C8 *self) {
     s32 check;
     s32 result;
 
-    obj = New_Obj865C8(self->unk1C, self->dreamSys, self->arg->unk04);
+    obj = New_Class865C8(self->unk1C, self->dreamSys, self->arg->unk04);
     status = obj->methods->slot44(obj);
     obj->methods->slot4(obj);
 
@@ -244,7 +244,7 @@ switched on," and only the former gets the free reuse.
 ## Naming
 
 **`Class6D3C8__PollStatusObj` -- tier B.** Mechanics: builds a `StatusObj`
-(`New_Obj865C8`), reads one status code off it (`slot44`), tears it down
+(`New_Class865C8`), reads one status code off it (`slot44`), tears it down
 (`slot4`), reacts to two of the codes (2 -> `Class6D3C8__StartCinematicStream`,
 3 -> latch `self->unk24`), then separately queries the owned `DreamSys`'s
 day/year status and derives a 0/1 result. Named for the StatusObj query
