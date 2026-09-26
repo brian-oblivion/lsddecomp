@@ -11,18 +11,15 @@
  * methods, New_ and the getter are all here. GridCell (include/GridCell.h,
  * a SceneNode) is one cell of Class866E8's grid, carrying the model placed
  * there; its five table methods, New_ and the getter are all here too.
- * TitleMenu
- * (include/TitleMenu.h, a TaskCore) is the largest of the three -- its own
- * vtable (gTitleMenuMethods, 78 slots) is occupied mostly by the sibling
- * unit class_3bb8c_d.c; this unit contributes only the allocator and ctor.
+ * TitleMenu (include/TitleMenu.h, a TaskCore) is the menu between days;
+ * only its allocator and ctor are here, its other methods in
+ * class_3bb8c_d.c.
  *
- * Two free functions round out the unit: CheckSaveScoreFlag, called
- * directly (not through any vtable) from
- * TitleMenu__RefreshMenu, computes a 0/1 flag from its save block (TitleMenu::saveBlock); and
- * FormatNumberIntoBuffer, called from TitleMenu's own ctor, formats a
- * number into a shared buffer whose broader role (nearby rodata strings
- * hint at a memory-card save label) is not established from this unit
- * alone.
+ * Two free functions serve TitleMenu: CheckSaveScoreFlag (called from
+ * TitleMenu__RefreshMenu) writes the menu's FLASHBACK lock,
+ * registrationSlots[1], from two words of the save block; and
+ * FormatNumberIntoBuffer (called from the ctor with the current day) writes
+ * the day as three full-width digits into the save title, "LSD   Day001".
  *
  * All 20 definitions here are matched, 0 INCLUDE_ASM.
  */

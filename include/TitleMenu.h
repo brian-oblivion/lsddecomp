@@ -4,63 +4,65 @@
 #include "TaskCore.h"
 
 /*
- * TitleMenu -- class id 0x1F130, method table gTitleMenuMethods, a TaskCore
- * subclass (`tools/classtable.py gTitleMenuMethods --vs gTaskCoreMethods`:
- * fourteen overrides and six slots of its own). No class derives from it.
+ * TitleMenu -- the menu over ETC\TITLE.TIM that the game returns to between
+ * days: START, FLASHBACK, SAVE, LOAD, GRAPH and SHAKE (the six `names` of its
+ * TaskCoreTarget, D_80086D44), with the memory-card save title ("LSD   Day001")
+ * shown as a TextRow. A TaskCore (class id 0x1F130, table gTitleMenuMethods;
+ * fourteen overrides and six slots of its own); no class derives from it.
  * src/class_3bb8c_c.c holds the allocator and ctor, src/class_3bb8c_d.c every
- * other method and the getter. Named by its table's address: what the class
- * does is readable below, but no name for it is established.
+ * other method and the getter.
  *
- * Who makes one: GameApplication__PollGraphRoomStatus (src/code_1677c.c), through
- * GameApplication__RunPollTask(New_TitleMenu, self->dreamSys, ...), in a loop that
- * runs GraphRoom again and retries while init returns 2. The ctor's argument,
- * kept at +0x0A4, is therefore the game's DreamSys.
+ * Who makes one: GameApplication__PollGraphRoomStatus (src/code_1677c.c) runs
+ * it with GameApplication__RunPollTask(New_TitleMenu, dreamSys, ...) after the
+ * day's GraphRoom; while it returns 2 (GRAPH) it runs GraphRoom again and then
+ * the menu again.
  *
- * Construction, ctor(dreamSys): TaskCore's ctor with (&D_80086D44, "ETC\ETCSE",
- * NULL), this class's table, the sound's +0x09C (VabStreamObj__SetPitchOffset)
- * with -1, dreamSys kept, saveCtrl cleared, the DreamSys's getSaveBlock into
- * saveBlock/saveBlockSize, FormatNumberIntoBuffer(getCurrentDayAndYear(0)),
- * setTarget(&D_80086D44) -- which this class overrides with CreateNameField --
- * and a call of resetCounters (TitleMenu__Reset) that also passes dreamSys,
- * which the slot does not have and Reset does not read ($a1 is loaded in the
- * retail bytes), so the ctor casts the slot to TitleMenuResetCallFn below,
- * as GraphRoom's does.
+ * Construction, ctor(dreamSys): TaskCore's ctor with the menu, "ETC\ETCSE" and
+ * no sound object; `sound`'s pitch offset set to -1; `saveCtrl` cleared;
+ * `saveBlock`/`saveBlockSize` from DreamSys's getSaveBlock;
+ * FormatNumberIntoBuffer writes the current day into the save title;
+ * setTarget, then resetCounters (TitleMenu__Reset: the TITLE.TIM backdrop via
+ * setSubHandle, frame bound 10, the flashback session cleared).
  *
- * What the overrides do, measured:
- *  - setTarget builds no slot widgets: it makes `nameField`, a TextRow of the
- *    SJIS text in D_8008AA18's buffer (D_8008AA14's string copied in at
- *    +0x18 first when the DreamSys's new-game flag is set), 8 of its cells
- *    visible from cell 4, a gap before cell 9. releaseTarget releases it; updateSlotElements
- *    attaches it; broadcastToSlots blinks one of its three colour channels.
- *  - activeSlot (TaskCore's +0x058) is what tick switches on: 1 and 4 set
- *    `result` to 0 or 2 and refreshViewValue (1 also getSetFlashbackSession
- *    (0, 1)); 2 runs updateMemcardSaveWithIcon, 3 updateMemcardSaveStatus.
- *  - setState(5) calls commitNameEntry; setState(0xA) runs onPadCancel,
- *    setActiveSlot(target->unk8, 1) and onPadConfirm.
- *  - onNotify is the base one, then onTagBValue(sender, event) when the
- *    sender's class id has low nibble 0xB (gTaskObjFMethods, 0xB, is such a
- *    class; saveCtrl is one): events 0x16 and 0x17 run endMemcardSave, 0x16
- *    also clears the new-game flag and calls commitNameEntry.
- *  - beginMemcardSave makes `iconHandle` (New_TimImage("CARD\FILEICN1.TIM"))
- *    and `saveCtrl` (New_TaskObjF(1, 0)) once, calls saveCtrl's init (+0x06C) with
- *    "BISLPS-01556" (D_8008A9D0's value, the memory-card product code), adds
- *    saveCtrl as a child and removes initArgs->unk4 and unk10; endMemcardSave
- *    undoes both and calls saveCtrl's deinit (+0x070). The two update methods pass
- *    D_8008AA10/D_8008AA18 and saveBlock/saveBlockSize to saveCtrl's
- *    beginLoad (+0x074) or beginSave (+0x078, also iconHandle).
+ * The menu. The six entries are TaskCore's slots, `activeSlot` their index:
+ *  - 0 START is the target's confirm slot (unkC): TaskCore ends the menu with
+ *    refreshViewValue, which this class extends to store SHAKE's setting
+ *    (slotCounts[5]) through DreamSys's getSetScreenShake.
+ *  - 1 FLASHBACK: result 0 and a flashback session opened; 4 GRAPH: result 2.
+ *    Both then end the menu through refreshViewValue.
+ *  - 2 SAVE runs saveToCard, 3 LOAD loadFromCard.
+ *  - 5 SHAKE is the one entry with an item list (the target's unk24[5]).
+ *  - FLASHBACK starts locked (registrationSlots[1] = 1); refreshMenu clears
+ *    the lock through CheckSaveScoreFlag when the save block allows it.
+ * setState(5), the menu becoming active, runs refreshMenu: the save title's
+ * text reloaded, FLASHBACK's lock recomputed, the widgets re-attached and
+ * SHAKE's cursor set from DreamSys. setState(0xA) cancels, reselects the
+ * target's first slot and confirms.
+ *
+ * The save title replaces TaskCore's slot widgets as what setTarget,
+ * releaseTarget, updateSlotElements and broadcastToSlots manage:
+ * createSaveTitle makes `saveTitle` from the SJIS title in D_8008AA18's buffer
+ * (blanked from +0x18 on a new game), 8 cells visible from cell 4 with a gap
+ * before cell 9; cycleSaveTitleColor lights one colour channel a frame.
+ *
+ * The memory card. beginCardAccess makes `saveIcon` (CARD\FILEICN1.TIM) and
+ * `saveCtrl` (a TaskObjF, include/TaskObjF.h) on first use, inits saveCtrl
+ * with the product code "BISLPS-01556", the file suffix table, the pad and
+ * clock sources (initArgs->pad, unk10), unk14 as sprite parent and `sound`,
+ * and hands input to it: saveCtrl is added as a child and the pad and
+ * clock are removed. saveToCard stores SHAKE's setting and calls saveCtrl's beginSave
+ * with the save title, `saveIcon` and the save block; loadFromCard calls
+ * beginLoad with the same block. saveCtrl's terminal events reach onNotify
+ * (the sender's class id ends in 0xB, as TaskObjF's does) and onCardEvent:
+ * 0x16 (the operation completed) and 0x17 both run endCardAccess, which gives input back; 0x16
+ * also clears the new-game flag and runs refreshMenu. Finalize releases
+ * saveCtrl and saveIcon if they were made.
  *
  * Accessors that read an inherited field at another type than TaskCore's:
- * the ctor calls `sound` (TaskCore's BasicClass *) past BasicClass's slots
- * and casts it to VabStreamObj; onDeinit calls initArgs->unk0 at +0x078 and
- * casts it to class_3bb8c.h's TitleMenuUnkC0Obj_3bb8c_d (TaskCore__OnDeinit
- * makes the same call through code_2c054.h's TaskTextObj); beginMemcardSave
+ * the ctor casts `sound` to VabStreamObj; onDeinit calls initArgs->drawSystem
+ * at +0x078 through class_3bb8c.h's TitleMenuUnkC0Obj_3bb8c_d (TaskCore__OnDeinit
+ * makes the same call through code_2c054.h's TaskTextObj); beginCardAccess
  * adds `saveCtrl` as a child, upcast to BasicClass.
- *
- * `saveCtrl` is a TaskObjF (include/TaskObjF.h, unified round 89): init
- * (+0x06C) gets the product code, the name suffix table (D_80086D6C),
- * initArgs->unk4 and unk10 as its input and tick sources, unk14 as its
- * sprite parent and `sound`; beginSave (+0x078) and beginLoad (+0x074) get
- * saveBlock/saveBlockSize as the data read or written.
  *
  * The object is 0xC4 bytes (New_TitleMenu's allocation).
  */
@@ -76,24 +78,24 @@ struct TaskObjF;
 
 struct TitleMenuMethods {
     TASKCORE_SLOTS(TitleMenu, (TitleMenu * self, struct DreamSys *dreamSys));
-    /* +0x124 */ void (*commitNameEntry)(TitleMenu *self, s32 arg1); /* TitleMenu__RefreshMenu; both callers pass
-                                                                         arg1 (setState: 0, onTagBValue: 0x16) and the
-                                                                         occupant reads self alone */
-    /* +0x128 */ void (*beginMemcardSave)(TitleMenu *self); /* TitleMenu__BeginCardAccess; updateMemcardSave* call it first */
-    /* +0x12C */ void (*endMemcardSave)(TitleMenu *self); /* TitleMenu__EndCardAccess; onTagBValue's 0x16/0x17 */
-    /* +0x130 */ void (*updateMemcardSaveWithIcon)(TitleMenu *self); /* TitleMenu__SaveToCard; tick's activeSlot 2 */
-    /* +0x134 */ void (*updateMemcardSaveStatus)(TitleMenu *self); /* TitleMenu__LoadFromCard; tick's activeSlot 3 */
-    /* +0x138 */ void (*onTagBValue)(TitleMenu *self, BasicClass *sender,
+    /* +0x124 */ void (*refreshMenu)(TitleMenu *self, s32 arg1); /* TitleMenu__RefreshMenu; both callers pass
+                                                                     arg1 (setState: 0, onCardEvent: 0x16) and the
+                                                                     occupant reads self alone */
+    /* +0x128 */ void (*beginCardAccess)(TitleMenu *self); /* TitleMenu__BeginCardAccess; saveToCard/loadFromCard call it first */
+    /* +0x12C */ void (*endCardAccess)(TitleMenu *self); /* TitleMenu__EndCardAccess; onCardEvent's 0x16/0x17 */
+    /* +0x130 */ void (*saveToCard)(TitleMenu *self); /* TitleMenu__SaveToCard; tick's activeSlot 2, SAVE */
+    /* +0x134 */ void (*loadFromCard)(TitleMenu *self); /* TitleMenu__LoadFromCard; tick's activeSlot 3, LOAD */
+    /* +0x138 */ void (*onCardEvent)(TitleMenu *self, BasicClass *sender,
                                      s32 event); /* TitleMenu__OnCardEvent; onNotify's class-0xB case */
 };
 
 struct TitleMenu {
     TASKCORE_FIELDS(TitleMenuMethods);
     /* +0x0A4 */ struct DreamSys *dreamSys; /* the ctor's; its +0x0F0/+0x19C/+0x1A0/+0x1A8/+0x1AC/+0x1B0 are called */
-    /* +0x0A8 */ struct TimImage *iconHandle; /* beginMemcardSave: New_TimImage("CARD\FILEICN1.TIM"); finalize releases it */
-    /* +0x0AC */ struct TaskObjF *saveCtrl; /* beginMemcardSave: New_TaskObjF(1, 0); the ctor clears it;
-                                                                 finalize releases it and iconHandle when it is set */
-    /* +0x0B0 */ struct TextRow *nameField; /* setTarget (CreateNameField): New_TextRow; releaseTarget releases it */
+    /* +0x0A8 */ struct TimImage *saveIcon; /* beginCardAccess: New_TimImage("CARD\FILEICN1.TIM"); beginSave's icon */
+    /* +0x0AC */ struct TaskObjF *saveCtrl; /* beginCardAccess: New_TaskObjF(1, 0); the ctor clears it;
+                                             finalize releases it and saveIcon when it is set */
+    /* +0x0B0 */ struct TextRow *saveTitle; /* setTarget (createSaveTitle): the save title; releaseTarget releases it */
     /* +0x0B4 */ u8 pad0B4[0x0BC - 0x0B4];
     /* +0x0BC */ s32 *saveBlock; /* the ctor: DreamSys getSaveBlock's result (&saveMagic); saveCtrl's beginLoad/beginSave data */
     /* +0x0C0 */ s32 saveBlockSize; /* the ctor: getSaveBlock's *outSize (0x700); the object is 0xC4 bytes */
