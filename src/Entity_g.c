@@ -79,7 +79,7 @@ void Entity__MoodCue102(Entity *this, SoundCueSet *out) {
         if (this->moodTimer < 2000) {
             this->methods->moveLocalZ(this, -64, 0);
         } else {
-            this->state = 1;
+            this->state = ENTITY_STATE_DONE;
         }
     } else {
         this->methods->moveLocalZ(this, -256, 0);
@@ -118,7 +118,7 @@ void Entity__MoodCue103(Entity *this, SoundCueSet *out) {
 
 void Entity__MoodCue104(Entity *this, SoundCueSet *out) {
     this->methods->updateScale(this, 1, SCALE_QUARTER);
-    if ((u32)(this->moodTimer - 201) < 99) {
+    if (this->moodTimer >= 201 && this->moodTimer < 300) {
         this->methods->moveLocalY(this, -32, 0);
     }
 }
@@ -177,20 +177,21 @@ void Entity__MoodCue110(Entity *this, SoundCueSet *out) {
 
 void Entity__MoodCue111(Entity *this, SoundCueSet *out) {
     if (this->moodTimer == 0) {
-        if (((DreamSys *)this->peer)->methods->getDreamColor((DreamSys *)this->peer) == 5) {
+        if (((DreamSys *)this->peer)->methods->getDreamColor((DreamSys *)this->peer) == DREAM_COLOR_PINK) {
             this->state = 11;
         }
     }
     if (this->state != 0 && this->moodTimer >= 2160) {
-        if ((u32)(this->moodTimer - 2160) < 401) {
+        /* MATCHING: the repeated `>= 2160` is retail's second range test. */
+        if (this->moodTimer >= 2160 && this->moodTimer <= 2560) {
             if (this->moodTimer == 2160) {
                 this->methods->stopTod(this);
-                out->slots[0].program = -2;
-                out->slots[1].program = -2;
-                out->slots[2].program = -2;
+                out->slots[0].program = SOUND_CUE_STOP;
+                out->slots[1].program = SOUND_CUE_STOP;
+                out->slots[2].program = SOUND_CUE_STOP;
                 return;
             }
-            if ((u32)(this->moodTimer - 2550) < 10) {
+            if (this->moodTimer >= 2550 && this->moodTimer < 2560) {
                 out->slots[0].program = 5;
                 out->slots[0].octave = -2;
                 return;
@@ -281,6 +282,7 @@ void Entity__MoodCue123(Entity *this, SoundCueSet *out) {
     }
     if (this->state == 11) {
         if (this->moodTimer >= 301) {
+            /* DreamSys__OnPadEvent's events 2 and 7: walk forward, then run. */
             ((DreamSys *)this->peer)->methods->onPadEvent((DreamSys *)this->peer, 0, 2);
             ((DreamSys *)this->peer)->methods->onPadEvent((DreamSys *)this->peer, 0, 7);
         }
