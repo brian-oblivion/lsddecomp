@@ -35,7 +35,7 @@ Allocator/wrapper whose prologue has the constant arg set (`li a0,K`) BEFORE a c
 
 ## Naming
 
-- `New_D8006EC74` -- tier A. Allocator: BMemPMgrAlloc(0xAC) then calls the ctor slot -- the "New_<Class>" allocator convention already used throughout the project (New_Sprite, New_Class866E8); mechanics are the whole purpose.
+- `New_D8006EC74` -- tier A. Allocator: BMemPMgrAlloc(0xAC) then calls the ctor slot -- the "New_<Class>" allocator convention already used throughout the project (New_Sprite, New_StageMap); mechanics are the whole purpose.
 
 ## Track 4
 

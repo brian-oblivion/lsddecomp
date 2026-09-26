@@ -1,0 +1,92 @@
+# StageMap__ApplyRateToChild — MATCHED (14/14 words)
+
+> Renamed from `Class866E8__ApplyRateToChild` on 2026-09-26 (tools/rename.py). Address 0x8004d0d0.
+
+> Renamed from `func_8004D0D0` on 2026-09-24 (tools/rename.py). Address 0x8004d0d0.
+
+## How the arguments were resolved (worth recording — this one was not
+obvious from the function's own body alone)
+
+`StageMap__ApplyRateToChild`'s only two references anywhere in the executable are as a
+function-pointer VALUE (`lui`/`addiu` of its address, never a direct
+`jal`) inside `StageMap__AdvanceRateCountdown` (this unit), passed as the second argument
+to `StageMap__ForEachElem`. Reading `StageMap__ForEachElem` in isolation makes it look
+like `StageMap__ApplyRateToChild` is invoked there directly as `callback(self, &arr[i])`
+— but `StageMap__ForEachElem` (own body: `s5 = a1`, forwarded unchanged to
+`StageMap__ForEachEntryChild`'s own second argument) actually treats its OWN second
+argument as a pass-through value, not a callback it calls itself. The
+real call site is one level further down, inside `StageMap__ForEachEntryChild`, which
+walks `item->unk10[]` (an array of `Unk10ChildObj_3bb8c_b*`, up to
+`+0x668` bytes from the base) and calls `callback(self, element)` for
+each entry. So `StageMap__ApplyRateToChild`'s true "item" parameter is one of THOSE
+array elements, not `&self->arr[i]` directly — reading only the
+one-hop-removed caller would have produced the wrong type for `arg1`.
+
+## Disassembly
+
+```
+addiu $sp, $sp, -0x18
+move  $v1, $a0            ; v1 = self
+move  $a0, $a1            ; a0 = item
+sw    $ra, 0x10($sp)
+lw    $v0, 0x0($a0)       ; v0 = item->methods
+lw    $a2, 0x1E4($v1)     ; a2 = self->unk1E4  (set up before the call)
+lw    $v0, 0x48($v0)      ; v0 = item->methods->slot48
+jalr  $v0
+ move $a1, $zero            ; a1 = 0
+...epilogue
+```
+
+`m2c` (seeded with `void StageMap__ApplyRateToChild(void *arg0, void *arg1)`) already
+called this shape correctly: `(*arg1)->unk48(arg1, 0, arg0->unk1E4);` —
+confirming the vtable-slot read before any header work was done.
+
+## Final C
+
+```c
+void StageMap__ApplyRateToChild(Obj866E8 *self, Unk10ChildObj_3bb8c_b *item) {
+    item->methods->slot48(item, 0, self->unk1E4);
+}
+```
+
+## New struct knowledge (`include/class_3bb8c.h`)
+
+- New type `Unk10ChildObj_3bb8c_b` / `Unk10ChildMethods_3bb8c_b` — the
+  object type held in `Elem::unk10[]`. Only `slot48` is typed
+  (`void (*slot48)(Unk10ChildObj_3bb8c_b *self, s32 arg1, void *arg2)`),
+  resolved from this function and its sibling `StageMap__ResetChildRate`.
+- `Elem::unk10` (`Unk10ChildObj_3bb8c_b **`, +0x010) — same real field
+  `class_3ac78.h`'s independent view already names `unk10`
+  (`GenericObject **`) on its own `UnkSlotEntry_3ac78` type; both
+  descriptions agree on offset and "array of pointers, walked to +0x668".
+- `Obj866E8::unk1E4` (`void *`, +0x1E4) — forwarded opaquely as `slot48`'s
+  third argument; never dereferenced in this unit.
+- `extern void StageMap__ForEachElem(...)` / `extern void StageMap__ForEachEntryChild(...)` —
+  both still `INCLUDE_ASM` in this same unit; forward-declared per the
+  established "calling into a still-`INCLUDE_ASM` function is fine"
+  convention, typed from their own call sites (see those functions' future
+  reports for the full derivation).
+
+## Attempts
+
+1 (matched on first attempt, once the true call chain — two hops through
+`StageMap__ForEachElem`/`StageMap__ForEachEntryChild`, not one — was traced).
+
+### Proposed learning
+
+**A function passed by address is not necessarily called by its immediate
+receiver.** `StageMap__ForEachElem` receives `StageMap__ApplyRateToChild`'s address only to
+forward it, unclobbered, to a second function (`StageMap__ForEachEntryChild`) that does
+the actual `jalr`. Reading the receiver's own body (which never does
+`jalr` on that register) is itself the signal to keep tracing one hop
+further before typing the passed function's parameters from the wrong
+call site.
+
+## Naming
+
+**Tier B.** Not a vtable slot -- a callback, passed as a function pointer
+to `StageMap__ForEachElem`/`StageMap__ForEachEntryChild` by
+`StageMap__AdvanceRateCountdown`. Body: `item->methods->slot48(item, 0,
+self->rateEntry)`. Named for what it does to each child entry (forwards
+the parent's current rate entry to it), mirrored by
+`StageMap__ResetChildRate`'s sibling shape.

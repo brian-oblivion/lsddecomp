@@ -29,7 +29,7 @@
 #include "common.h"
 #include "Actor.h"
 #include "DreamSys.h"
-#include "Class866E8.h"
+#include "StageMap.h"
 #include "LbdFile.h"
 #include "GridCell.h"
 #include "Class879C4.h"
@@ -110,7 +110,7 @@ typedef struct GridQuery {
     s32 numRows;
 } GridQuery;
 
-/* The grid (self->grid) is a Class866E8 (include/Class866E8.h). Its
+/* The grid (self->grid) is a StageMap (include/StageMap.h). Its
  * elements (ChunkSlot) are what Actor__BuildLinkQueries collects: the
  * loader's headerReady gates Actor__ScanLinkCandidates, its ownerKey is the
  * element key BuildLinkQueries steps by one, and `cells` is the 20-wide grid
@@ -118,7 +118,7 @@ typedef struct GridQuery {
  * walks. */
 
 /* Output buffer filled in by the grid's computeFootprintDescriptor (a
- * Descriptor10Ext, include/Class866E8.h: queryCol/queryRow are base.b2/b3,
+ * Descriptor10Ext, include/StageMap.h: queryCol/queryRow are base.b2/b3,
  * source is unk24; this view is 0x30 bytes, and the frame needs it) and read back by this unit's own Actor__BuildLinkQueries.
  * Only the three fields actually touched are named. `queryCol`/`queryRow`
  * feed straight into GridQuery::startCol/startRow (Actor__BuildLinkQueries,
@@ -185,7 +185,7 @@ s32 Actor__BuildLinkQueries(Actor *self, GridQuery *arr1, ChunkSlot **arr2, Link
     row = f3;
     idx = 1;
     if (arg4 == 1) {
-        Class866E8 *unk4C;
+        StageMap *unk4C;
         StageGridDimensions *unk68;
         ChunkSlot *src;
         s16 s3;

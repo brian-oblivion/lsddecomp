@@ -277,7 +277,7 @@ naming it is what breaks.
 
 **And a note on how NOT to read that last row.** Charlie measured this round
 that two individually-inert levers can combine productively
-(`Class866E8__LoadElementResources`, 130/150 -> 132/150), so the attempt-6 x attempt-7
+(`StageMap__LoadElementResources`, 130/150 -> 132/150), so the attempt-6 x attempt-7
 conjunction looked like the prescribed next move here. It scored 16/73, and
 the tempting conclusion -- "conjunctions can also combine destructively" --
 **is not supported by this data.** Once attempt 6's reuse half is measured

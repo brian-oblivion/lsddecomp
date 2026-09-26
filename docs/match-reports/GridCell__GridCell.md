@@ -32,7 +32,7 @@ void GridCell__GridCell(GridCell *self)
 
 `GetSceneNodeMethods` is already declared elsewhere in the codebase
 (`include/class_3ac78.h`) with a two-argument signature,
-`void *GetSceneNodeMethods(Class866E8 *self, s32 arg1)`. This unit's own call
+`void *GetSceneNodeMethods(StageMap *self, s32 arg1)`. This unit's own call
 site never sets up a second argument register (`$a1`) before the `jal` --
 the instruction immediately after is a plain `lw` on the return value, not
 an `addu $a1, ...` -- so it is declared here, file-locally, as single-
@@ -112,7 +112,7 @@ evidence class as `NodeGuardedViewport__NodeGuardedViewport`.
 GridCell is unified in `include/GridCell.h` and expands
 SCENENODE_FIELDS: the three fields this ctor zeroes are SceneNode's, so
 `unk36` -> `flags36` and `unk38` (s32) -> `nextInCell` (void *, written as
-`NULL`; Class866E8__DispatchToRectCells walks it as a pointer). The store is
+`NULL`; StageMap__DispatchToRectCells walks it as a pointer). The store is
 `sw $zero` either way; image byte-identical. GridCell has no own fields:
 New_GridCell allocates 0x3C bytes, shorter than SceneNode's 0x44.
 
@@ -125,15 +125,15 @@ which are the handlers for a link command from this class). **Tier B.**
 
 Evidence, all from the code:
 
-- the only `New_GridCell` call sites are Class866E8__Class866E8's: one
+- the only `New_GridCell` call sites are StageMap__StageMap's: one
   per element as `cellParent`, and 0x668 / 4 = 410 per element as `cells`,
   attached to the cellParent on a 0x800-unit lattice (row stride 20, the
-  grid's `gridCells`); Class866E8__Finalize releases them;
-- Class866E8__LoadElementResources fills each cell from the element's
+  grid's `gridCells`); StageMap__Finalize releases them;
+- StageMap__LoadElementResources fills each cell from the element's
   placement records (TMD linked with GsLinkObject4, coord2 translation and
   y rotation, `flags36`), and chains the overflow cells (index 400 on) off
   a lattice cell through `nextInCell`;
-- the two cell walks, Class866E8__DispatchToRectCells (NotifyGridCell) and
+- the two cell walks, StageMap__DispatchToRectCells (NotifyGridCell) and
   Actor__ScanGridWindow, visit a cell and its `nextInCell` chain.
 
 Tier B, not A: the element's `cellParent` is also a GridCell (the root of

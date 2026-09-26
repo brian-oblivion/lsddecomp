@@ -16,26 +16,26 @@
  * sound, bgm, etcTim, dreamerTmd, stage), added as a child and init'ed with
  * Class865C8's init args and its DreamSys. So the inherited
  * IntermediateBase fields hold that Class865C8's init-arg objects:
- * unk10 its FrameClock, unk14 its Class866E8, viewport its NodeGuardedViewport, and
+ * unk10 its FrameClock, unk14 its StageMap, viewport its NodeGuardedViewport, and
  * TimedTask's sound its VabStreamObj. Those fields keep their parents'
  * `BasicClass *` types and ObjM's methods cast them (no code).
  *
  * What its methods do, measured:
  *  - init (ObjM__AttachTarget) registers ObjM__OnRegistrantEvent as the
- *    Class866E8's callback, keeps the DreamSys and adds it as a child;
+ *    StageMap's callback, keeps the DreamSys and adds it as a child;
  *    onInit (ObjM__InitStyleAndWorld) builds `timBlockSrc`
  *    (New_TimBlockSrc of the day's variant) and `styleConfig`
  *    (RegisterStyleConfig);
  *  - onTag1Notify's event 2 (ObjM__PollTimBlockLoad) waits for the
  *    TimBlockSrc: loaded, it fades its CLUT rows to a styleConfig colour;
  *    either way releases it and runs setupSceneStyle, then, once the
- *    Class866E8 has nothing pending, enterStyleSession (`inSession`);
+ *    StageMap has nothing pending, enterStyleSession (`inSession`);
  *  - update (ObjM__Update) counts frames and runs tickStyle, or
  *    advancePauseSetup while the "Pause" overlay is up; onPadEvent maps
  *    pad codes onto togglePause and the close-ready slots;
  *  - onNotify splits by the sender's class id: the DreamSys's codes
  *    0xA..0x11 go to enterState4..A, the viewport's fade object
- *    (Class6E99C) reports fade down/up done (5/6), and the Class866E8's
+ *    (Class6E99C) reports fade down/up done (5/6), and the StageMap's
  *    event 7 runs checkAuxTrigger. The enterState/close methods set
  *    IntermediateBase::state and notifyParents it; Class865C8's
  *    onObjMNotify acts on those codes.
@@ -93,9 +93,9 @@ struct ObjMMethods {
     /* +0x0AC */ void (*notifyParentsCodeB)(ObjM *self); /* ObjM__NotifyParentsCodeB: code 0x11 */
     /* +0x0B0 */ void (*onFadeNotify)(ObjM *self, struct Class6E99C *sender,
                                       s32 event); /* ObjM__OnFadeNotify: onNotify's 0x164 sender; 5 fade down done, 6 up */
-    /* +0x0B4 */ void (*onClass866E8Notify)(ObjM *self, BasicClass *sender,
-                                            s32 event); /* ObjM__OnClass866E8Notify: onNotify's 0x114 sender */
-    /* +0x0B8 */ s32 (*checkAuxTrigger)(ObjM *self); /* ObjM__CheckAuxTrigger: OnClass866E8Notify's event 7 */
+    /* +0x0B4 */ void (*onStageMapNotify)(ObjM *self, BasicClass *sender,
+                                            s32 event); /* ObjM__OnStageMapNotify: onNotify's 0x114 sender */
+    /* +0x0B8 */ s32 (*checkAuxTrigger)(ObjM *self); /* ObjM__CheckAuxTrigger: OnStageMapNotify's event 7 */
     /* +0x0BC */ void (*slotBC)(void);               /* ObjM__NoOpSlotBC, empty; never called */
     /* +0x0C0 */ void (*updateCloseReadyFlag)(ObjM *self); /* ObjM__UpdateCloseReadyFlag: DispatchPadEvent's 0xC */
     /* +0x0C4 */ void (*clearCloseReadyFlag)(ObjM *self); /* ObjM__ClearCloseReadyFlag: DispatchPadEvent's 0x2C, TogglePause */
@@ -111,7 +111,7 @@ struct ObjM {
     /* +0x03C */ struct DreamSys *dreamSys; /* init's third argument (AttachTarget); a child. Every DreamSys slot ObjM calls */
     /* +0x040 */ s32 unk40; /* InitStyleAndWorld: 0x10; the DreamSys's resetLinkState's arg2 */
     /* +0x044 */ s32 unk44; /* InitStyleAndWorld: 2 or 3; resetLinkState's arg1 */
-    /* +0x048 */ s32 gridSpan; /* onInit's arg1, 0 meaning 0xA000; the Class866E8's setGridSpan (SetupSceneStyle) */
+    /* +0x048 */ s32 gridSpan; /* onInit's arg1, 0 meaning 0xA000; the StageMap's setGridSpan (SetupSceneStyle) */
     /* +0x04C */ s32 unk4C;                               /* onInit's arg3; no reader */
     /* +0x050 */ struct Unk50Struct_3bb8c_l *styleConfig; /* RegisterStyleConfig's result, or onInit's arg2 */
     /* +0x054 */ struct WBgm *bgm; /* the ctor's (Class865C8's bgm): setSeq, stop, pause, resume */
@@ -165,7 +165,7 @@ void ObjM__EnterStateA(ObjM *self);
 void ObjM__NotifyParentsCodeB(ObjM *self);
 void ObjM__StartFadeUp(ObjM *self, s32 channels, s32 arg2, s32 step, s32 addChild);
 void ObjM__OnFadeNotify(ObjM *self, struct Class6E99C *sender, s32 event);
-void ObjM__OnClass866E8Notify(ObjM *self, BasicClass *sender, s32 event);
+void ObjM__OnStageMapNotify(ObjM *self, BasicClass *sender, s32 event);
 s32 ObjM__CheckAuxTrigger(ObjM *self);
 void ObjM__NoOpSlotBC(void);
 void ObjM__UpdateCloseReadyFlag(ObjM *self);

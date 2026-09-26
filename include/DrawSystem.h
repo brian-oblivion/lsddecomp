@@ -15,7 +15,7 @@
  * GsDefDispBuff for the screen size). Every other unit reaches it through
  * GetDrawSystem(): TimImage and the movie player upload through loadImage,
  * the movie player clears its frame through clearImage, the CD driver
- * installs its service routine with setCallback, and WBgm and Class866E8
+ * installs its service routine with setCallback, and WBgm and StageMap
  * add it as a child. Viewport keeps it as its `drawSystem` child and flips
  * through swapBuffers/getActiveBuffer.
  *

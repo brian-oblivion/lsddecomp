@@ -17,7 +17,7 @@
 #include "common.h"
 #include "Entity.h"
 #include "DreamSys.h"
-#include "Class866E8.h"
+#include "StageMap.h"
 
 /* Constant transform triples passed to updateRotation (slot +0x44,
  * func_8001CEB4: three {s16 num, s16 den} ratios in degrees), updateScale

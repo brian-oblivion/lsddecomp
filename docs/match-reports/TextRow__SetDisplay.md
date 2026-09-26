@@ -207,7 +207,7 @@ residue around without shrinking it.
 
 The "defer a value's STORE into a later delay slot while the value
 itself is computed earlier" shape (already documented for a
-tail-call's delay slot, `Class866E8__SetFootprintFromCell`) also applies to a loop's OWN
+tail-call's delay slot, `StageMap__SetFootprintFromCell`) also applies to a loop's OWN
 back-edge branch, not just a tail call -- worth generalising that
 entry once a lever is found here. Separately: **a lever that closes
 one residue in a near-identical sibling function does not reliably

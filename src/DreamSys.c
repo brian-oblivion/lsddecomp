@@ -34,7 +34,7 @@
 #include <rand.h>
 #include "DreamSys.h"
 #include "LinkResource.h"
-#include "Class866E8.h"
+#include "StageMap.h"
 #include "LbdFile.h"
 #include "VabStreamObj.h"
 #include "Viewport.h"
@@ -116,7 +116,7 @@ void DreamSys__ResetSessionState(DreamSys *this) {
     this->unk_0x924 = 0;
 }
 
-void DreamSys__SpawnAtLink(DreamSys *this, Class866E8 *grid) {
+void DreamSys__SpawnAtLink(DreamSys *this, StageMap *grid) {
     s32 attachPos[4];
 
     grid->methods->setTargetAndBuildRates(grid, attachPos, (SceneNode *)this,
@@ -1200,8 +1200,8 @@ void DreamSys__ProcessChunkChange(DreamSys *this, void *entity, s32 effect) {
     PlayerSpawnPoint *pos;
 
     if (effect == 5) {
-        pos = (PlayerSpawnPoint *)((Class866E8 *)entity)
-                  ->methods->getTargetDescriptor((Class866E8 *)entity, 0, 0);
+        pos = (PlayerSpawnPoint *)((StageMap *)entity)
+                  ->methods->getTargetDescriptor((StageMap *)entity, 0, 0);
         this->methods->logChunkMood(this, pos);
     }
 }

@@ -101,11 +101,11 @@ extern Matrix2cc8c D_8008E98C;
 ## `D_8008E98C` already had a DIFFERENT local view, and that is fine
 
 `include/class_3bb8c.h` declares the same symbol as `QueryTemplate866E8` for
-`Class866E8__ComputeFootprintFromRotation` (round 13) — "8 words, offsets 0x00-0x1C, the first five
+`StageMap__ComputeFootprintFromRotation` (round 13) — "8 words, offsets 0x00-0x1C, the first five
 opaque". **The two views agree on the bytes and are in fact consistent**: that
 reading's opaque `unk0[5]` is this one's `m[3][3]` plus its tail pad, and its
 `unk14`/`unk18`/`unk1C` are `t[0]`/`t[1]`/`t[2]` — which also explains why
-`Class866E8__ComputeFootprintFromRotation` zeroes two of them and sets the third, i.e. it is setting a
+`StageMap__ComputeFootprintFromRotation` zeroes two of them and sets the third, i.e. it is setting a
 translation vector on a copied identity matrix.
 
 Neither declaration was moved. `code_2cc8c_e` does not include

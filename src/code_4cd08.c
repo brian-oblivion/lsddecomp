@@ -5,7 +5,7 @@
 #include "ModelData.h"
 #include "TriggerWorld.h"
 #include "DreamSys.h"
-#include "Class866E8.h"
+#include "StageMap.h"
 
 const char gMomPathSymSpy[] = "ETC\\SYMSPY.MOM";
 const char gMomPathSymDog[] = "ETC\\SYMDOG.MOM";
@@ -45,7 +45,7 @@ void TickDreamAuxSlots(void) {
 }
 
 extern s32 gDreamAuxStage;
-extern Class866E8 *D_8008ABFC; /* the grid manager: SetDreamAuxWorld's a1; Entity__AttachToParent keeps it as the entity's grid */
+extern StageMap *D_8008ABFC; /* the grid manager: SetDreamAuxWorld's a1; Entity__AttachToParent keeps it as the entity's grid */
 extern DreamSys *gDreamAuxWorld; /* the player DreamSys: class_3bb8c_l passes its `target` */
 extern s32 D_8008AC04;
 extern s32 D_8008AC08;
@@ -57,7 +57,7 @@ void SetDreamAuxWorld(s32 a0, s32 a1, DreamSys *world, s32 a3, s32 a4) {
     u32 i;
 
     gDreamAuxStage = a0;
-    D_8008ABFC = (Class866E8 *)a1;
+    D_8008ABFC = (StageMap *)a1;
     gDreamAuxWorld = world;
     D_8008AC04 = a3;
     D_8008AC08 = a4;

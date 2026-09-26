@@ -10,7 +10,7 @@
 
 ## What it does
 
-`TimedTask`'s own slot +0x070 method. Reads the `Class866E8` instance held at
+`TimedTask`'s own slot +0x070 method. Reads the `StageMap` instance held at
 `self->unk34`; if non-NULL, forwards its own second parameter plus two literal
 `0x7F` values into that sub-object's vtable slot +0x080.
 
@@ -27,9 +27,9 @@ jalr  $v0
 ```
 
 Resolved via `tools/classtable.py gTimedTaskMethods` and `tools/classtable.py
-gClass866E8Methods`: `gTimedTaskMethods` (28 slots, header 0x230) is this function's own
+gStageMapMethods`: `gTimedTaskMethods` (28 slots, header 0x230) is this function's own
 containing class's vtable, and this IS its last slot (+0x070) — the only
-reason this class is visible from this unit at all. `gClass866E8Methods` (80 slots,
+reason this class is visible from this unit at all. `gStageMapMethods` (80 slots,
 header 0x114) is the vtable of the sub-object at `self->unk34`; slot +0x080
 there is `SceneNode__SetBackClip` (outside this unit, in `code_d294.s`), which reads
 its own incoming `$a0`/`$a1`/`$a2` (three real params) and ignores a fourth —
@@ -45,7 +45,7 @@ which can only be `TimedTask__PlaySound`'s own second parameter, forwarded uncha
 (no `move` needed since it's already resident in the right register).
 
 Named the two classes by vtable address per project convention (see
-`Class6D3C8.h`): `TimedTask` (gTimedTaskMethods) and `Class866E8` (gClass866E8Methods).
+`Class6D3C8.h`): `TimedTask` (gTimedTaskMethods) and `StageMap` (gStageMapMethods).
 Both declared in the new `include/class_3ac78.h`.
 
 ## Proposed learning
@@ -64,11 +64,11 @@ Round 67 (track 3, naming pass).
 
 | symbol | name | tier | evidence |
 | --- | --- | --- | --- |
-| `func_8004A478` | `TimedTask__SetChildFlag8` | B | `gTimedTaskMethods`'s own last slot (`+0x070`). Reads the child object at `self->unk34`, and if non-NULL dispatches its `+0x080` slot. In `Class866E8` that slot is the inherited `SceneNode__SetBackClip` (matched, `code_d294_b`), a get-or-set of bit 8 of the object's `unk10` bitfield, taking `(self, value)` -- so the two literal `0x7F`s this call sets up are not read by that occupant. Tier B, and prefixed with the containing class rather than the callee's: the name says what this method does (push a flag down to the held child), not what the child's class is. |
+| `func_8004A478` | `TimedTask__SetChildFlag8` | B | `gTimedTaskMethods`'s own last slot (`+0x070`). Reads the child object at `self->unk34`, and if non-NULL dispatches its `+0x080` slot. In `StageMap` that slot is the inherited `SceneNode__SetBackClip` (matched, `code_d294_b`), a get-or-set of bit 8 of the object's `unk10` bitfield, taking `(self, value)` -- so the two literal `0x7F`s this call sets up are not read by that occupant. Tier B, and prefixed with the containing class rather than the callee's: the name says what this method does (push a flag down to the held child), not what the child's class is. |
 
-Deliberately NOT asserted: that `TimedTask::unk34` is a `Class866E8`. The
+Deliberately NOT asserted: that `TimedTask::unk34` is a `StageMap`. The
 header claims it, but the only evidence is that slot `+0x080` exists in
-`gClass866E8Methods` -- true of every `SceneNode` descendant. The name avoids
+`gStageMapMethods` -- true of every `SceneNode` descendant. The name avoids
 depending on it.
 
 The two `0x7F` arguments are left in the call: they cost nothing, they are
@@ -77,7 +77,7 @@ table family may read them.
 
 ## Track 4
 
-2026-09-25, round 84 (bravo): class unified in `include/TimedTask.h`. Renamed from `TimedTask__SetChildFlag8`, tier A. The ctor settles what +0x034 is: `New_VabStreamObj(soundBankPath)` when the first ctor argument is non-NULL (Obj865C8 passes GetSoundEffectDir()), the caller's object otherwise (ObjM passes Obj865C8's, itself a VabStreamObj); ObjM calls the same field's +0x088/+0x08C, VabStreamObj's Mute/Unmute. gVabStreamObjMethods' +0x080 is VabStreamObj__PlayTone, so this is `sound->PlayTone(tone, 0x7F, 0x7F)`, the shape of TaskCore__PlaySound (which passes 0x60, 0x60). The Class866E8 reading above is withdrawn: the field is `TimedTask::sound` (`BasicClass *`), cast in class_3ac78.c to a local SoundObj_3ac78 view with +0x080 `playTone`. Slot +0x070 is named `playSound`. Image byte-identical.
+2026-09-25, round 84 (bravo): class unified in `include/TimedTask.h`. Renamed from `TimedTask__SetChildFlag8`, tier A. The ctor settles what +0x034 is: `New_VabStreamObj(soundBankPath)` when the first ctor argument is non-NULL (Obj865C8 passes GetSoundEffectDir()), the caller's object otherwise (ObjM passes Obj865C8's, itself a VabStreamObj); ObjM calls the same field's +0x088/+0x08C, VabStreamObj's Mute/Unmute. gVabStreamObjMethods' +0x080 is VabStreamObj__PlayTone, so this is `sound->PlayTone(tone, 0x7F, 0x7F)`, the shape of TaskCore__PlaySound (which passes 0x60, 0x60). The StageMap reading above is withdrawn: the field is `TimedTask::sound` (`BasicClass *`), cast in class_3ac78.c to a local SoundObj_3ac78 view with +0x080 `playTone`. Slot +0x070 is named `playSound`. Image byte-identical.
 
 ## Track 4 (2026-09-26, round 87, VabStreamObj)
 

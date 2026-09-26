@@ -46,7 +46,7 @@ whole unit; `./build-and-verify.sh` reports a clean whole-image SHA1 match.
 ## Naming
 
 **NodeGuardedViewport__NodeGuardedViewport** -- tier A. Canonical ctor (`Class__Class`
-convention, e.g. `Class866E8__Class866E8`): chains the base ctor, installs
+convention, e.g. `StageMap__StageMap`): chains the base ctor, installs
 this class's own vtable via `GetNodeGuardedViewportMethods()`, then dispatches the
 freshly-installed table's own post-construct hook. The identity of the
 class and the fact that this occupies its own `ctor` slot (+0x008) are both

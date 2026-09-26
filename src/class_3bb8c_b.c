@@ -1,6 +1,6 @@
 /* Second slice of the 365-function class_3bb8c block, 0x3CD88..0x3DA54 --
- * the same class as class_3bb8c.c's first slice (Class866E8,
- * gClass866E8Methods, declared in include/Class866E8.h), split only for
+ * the same class as class_3bb8c.c's first slice (StageMap,
+ * gStageMapMethods, declared in include/StageMap.h), split only for
  * parallel runners, so this unit reuses that unit's header (same convention
  * as Entity.c/Entity_b.c).
  *
@@ -17,7 +17,7 @@
  * iterators.
  *
  * "Footprint" is not this unit's own coinage: class_3ac78 already named the
- * analogous mechanism there (Class866E8__ApplyToSenderFootprint,
+ * analogous mechanism there (StageMap__ApplyToSenderFootprint,
  * SetFootprintRect, SetFootprintFromCell) before this unit's naming pass,
  * and this unit's names were chosen to agree with that vocabulary. */
 #include "common.h"
@@ -25,7 +25,7 @@
 #include "LbdFile.h"
 #include "GridCell.h"
 
-s32 Class866E8__FindElemIndexByUnk32(Class866E8 *self, s32 key) {
+s32 StageMap__FindElemIndexByUnk32(StageMap *self, s32 key) {
     s32 result;
     s32 i;
     ChunkSlot *e;
@@ -41,7 +41,7 @@ s32 Class866E8__FindElemIndexByUnk32(Class866E8 *self, s32 key) {
     return result;
 }
 
-s32 Class866E8__FindElemIndexByUnk30(Class866E8 *self, s32 key) {
+s32 StageMap__FindElemIndexByUnk30(StageMap *self, s32 key) {
     s32 i;
     ChunkSlot *e;
 
@@ -54,23 +54,23 @@ s32 Class866E8__FindElemIndexByUnk30(Class866E8 *self, s32 key) {
     return -1;
 }
 
-void Class866E8__RefreshFootprint(Class866E8 *self) {
+void StageMap__RefreshFootprint(StageMap *self) {
     s32 idx;
 
     if (self->chunksLoaded == 0) {
         return;
     }
     idx = self->gridHalfCells * 2;
-    Class866E8__SetFootprintCellFlag(self, 0);
+    StageMap__SetFootprintCellFlag(self, 0);
     if (self->config->isVertical == 0) {
-        Class866E8__ComputeFootprintFromRotation(self, idx, self->gridCells);
+        StageMap__ComputeFootprintFromRotation(self, idx, self->gridCells);
     } else {
-        Class866E8__SetFootprintFromQuery(self);
+        StageMap__SetFootprintFromQuery(self);
     }
-    Class866E8__SetFootprintCellFlag(self, 1);
+    StageMap__SetFootprintCellFlag(self, 1);
 }
 
-void Class866E8__ComputeFootprintFromRotation(Class866E8 *self, s32 arg1, s32 arg2) {
+void StageMap__ComputeFootprintFromRotation(StageMap *self, s32 arg1, s32 arg2) {
     SceneNodeSub44 *sub;
     Descriptor10Ext buf;
     s32 point0;
@@ -132,18 +132,18 @@ void Class866E8__ComputeFootprintFromRotation(Class866E8 *self, s32 arg1, s32 ar
     } else {
         self->footprintRow = (u16)self->footprintRow + offset;
     }
-    Class866E8__BuildFootprintSlots(self);
+    StageMap__BuildFootprintSlots(self);
 }
 
 /* Matched round 75. Three source-shape levers closed what was filed since
  * round 19 as a whole-function register rotation
- * (docs/match-reports/Class866E8__BuildFootprintSlots.md): ONE slot pointer reused for the
+ * (docs/match-reports/StageMap__BuildFootprintSlots.md): ONE slot pointer reused for the
  * second slot (no separate slot1), assigned once at the join after the
  * row<0 test (reorg fills the bgez delay slot from it and deletes the
  * redundant copy on the other path -- no barrier, no duplicate); the
  * clipped remainder in its own local `over` rather than `span -= 0x14`;
  * and `count += 1` as a statement in each arm plus at the join. */
-void Class866E8__BuildFootprintSlots(Class866E8 *self) {
+void StageMap__BuildFootprintSlots(StageMap *self) {
     s32 flag;
     s32 col;
     s32 width;
@@ -187,7 +187,7 @@ void Class866E8__BuildFootprintSlots(Class866E8 *self) {
     if (span >= 0x15) {
         over = span - 0x14;
         slot->width = width - over;
-        count = Class866E8__SplitFootprintSlot(self, slot, 0, quadrant, col, row, width, height);
+        count = StageMap__SplitFootprintSlot(self, slot, 0, quadrant, col, row, width, height);
         count += 1;
         slot = &self->rects.e[count];
         slot->slotIndex = self->methods->findElemIndexByUnk32(self, quadrant + 1);
@@ -197,13 +197,13 @@ void Class866E8__BuildFootprintSlots(Class866E8 *self) {
         slot->height = self->rects.e[0].height;
     } else {
         slot->width = width;
-        count = Class866E8__SplitFootprintSlot(self, slot, 0, quadrant, col, row, width, height);
+        count = StageMap__SplitFootprintSlot(self, slot, 0, quadrant, col, row, width, height);
     }
     count += 1;
     self->rectCount = count;
 }
 
-s32 Class866E8__SplitFootprintSlot(Class866E8 *self, CellRect *slot, s32 count, s32 baseIdx,
+s32 StageMap__SplitFootprintSlot(StageMap *self, CellRect *slot, s32 count, s32 baseIdx,
                                    s32 col, s32 row, s32 width, s32 height) {
     s32 overflow;
     s32 span;
@@ -259,22 +259,22 @@ s32 Class866E8__SplitFootprintSlot(Class866E8 *self, CellRect *slot, s32 count, 
     return count;
 }
 
-void Class866E8__SetFootprintFromQuery(Class866E8 *self) {
+void StageMap__SetFootprintFromQuery(StageMap *self) {
     s32 junk;
     Descriptor10Ext buf;
 
     self->methods->getTargetDescriptor(self, &buf, 0);
     self->rectCount = 0;
-    self->rectCount = Class866E8__InitFootprintSlot(self, junk, 0, buf.chunkIndex);
+    self->rectCount = StageMap__InitFootprintSlot(self, junk, 0, buf.chunkIndex);
     if (IsPointOutOfBounds(self->bounds, &buf.base.b2) != 0) {
         if (buf.chunkIndex + 1 < self->config->rows) {
             self->rectCount =
-                Class866E8__InitFootprintSlot(self, junk, self->rectCount, buf.chunkIndex + 1);
+                StageMap__InitFootprintSlot(self, junk, self->rectCount, buf.chunkIndex + 1);
         }
     }
     if (buf.chunkIndex - 1 >= 0) {
         self->rectCount =
-            Class866E8__InitFootprintSlot(self, junk, self->rectCount, buf.chunkIndex - 1);
+            StageMap__InitFootprintSlot(self, junk, self->rectCount, buf.chunkIndex - 1);
     }
 }
 
@@ -292,7 +292,7 @@ s32 IsPointOutOfBounds(CellBounds *bounds, s8 *point) {
     return 1;
 }
 
-s32 Class866E8__InitFootprintSlot(Class866E8 *self, s32 unused, s32 key, s32 arg3) {
+s32 StageMap__InitFootprintSlot(StageMap *self, s32 unused, s32 key, s32 arg3) {
     CellRect *slot;
 
     slot = &self->rects.e[key];
@@ -301,7 +301,7 @@ s32 Class866E8__InitFootprintSlot(Class866E8 *self, s32 unused, s32 key, s32 arg
     return key + 1;
 }
 
-void Class866E8__SetFootprintCellFlag(Class866E8 *self, s32 setBit) {
+void StageMap__SetFootprintCellFlag(StageMap *self, s32 setBit) {
     s32 i;
     s32 j;
     s32 k;
@@ -340,11 +340,11 @@ void Class866E8__SetFootprintCellFlag(Class866E8 *self, s32 setBit) {
     }
 }
 
-void *Class866E8__GetUnk1CC(Class866E8 *self) {
+void *StageMap__GetUnk1CC(StageMap *self) {
     return &self->unk1CC;
 }
 
-void Class866E8__SetBounds(Class866E8 *self, CellBounds *arg1) {
+void StageMap__SetBounds(StageMap *self, CellBounds *arg1) {
     self->bounds = arg1;
 }
 
@@ -366,10 +366,10 @@ void Class866E8__SetBounds(Class866E8 *self, CellBounds *arg1) {
  *    default-then-overwrite spelling makes cc1 extract it eagerly, and
  *    storing to self->rateCountdown directly instead of through `val` perturbs the
  *    table-selection half as well. Both were measured -- round 58 and
- *    docs/match-reports/Class866E8__ConfigureRateEntry.md.
+ *    docs/match-reports/StageMap__ConfigureRateEntry.md.
  *
  * `~rate + 1` is retail's own negation (`nor`/`addiu`), not `-rate`. */
-void Class866E8__ConfigureRateEntry(Class866E8 *self, s32 rate, s32 flag) {
+void StageMap__ConfigureRateEntry(StageMap *self, s32 rate, s32 flag) {
     Ratio16 *table;
     s32 val;
     s32 scale;
@@ -401,9 +401,9 @@ merge:
     self->rateCountdown = val;
 }
 
-void Class866E8__AdvanceRateCountdown(Class866E8 *self) {
+void StageMap__AdvanceRateCountdown(StageMap *self) {
     if (self->rateCountdown > 0) {
-        Class866E8__ForEachElem(self, Class866E8__ApplyRateToChild, 0);
+        StageMap__ForEachElem(self, StageMap__ApplyRateToChild, 0);
         self->rateCountdown -= 1;
         if (self->rateCountdown == 0) {
             self->rateCountdown = -1;
@@ -411,22 +411,22 @@ void Class866E8__AdvanceRateCountdown(Class866E8 *self) {
     }
 }
 
-void Class866E8__FlushRateLatch(Class866E8 *self) {
+void StageMap__FlushRateLatch(StageMap *self) {
     if (self->rateCountdown != 0) {
-        Class866E8__ForEachElem(self, Class866E8__ResetChildRate, 0);
+        StageMap__ForEachElem(self, StageMap__ResetChildRate, 0);
         self->rateCountdown = 0;
     }
 }
 
-void Class866E8__ApplyRateToChild(Class866E8 *self, GridCell *item) {
+void StageMap__ApplyRateToChild(StageMap *self, GridCell *item) {
     item->methods->updateScale(item, 0, self->scaleStep);
 }
 
-void Class866E8__ResetChildRate(Class866E8 *self, GridCell *item) {
+void StageMap__ResetChildRate(StageMap *self, GridCell *item) {
     item->methods->updateScale(item, 1, D_800869CC);
 }
 
-void Class866E8__ForEachElem(Class866E8 *self, Class866E8CellFn arg1, ChunkSlotFn arg2) {
+void StageMap__ForEachElem(StageMap *self, StageMapCellFn arg1, ChunkSlotFn arg2) {
     s32 i;
     ChunkSlot *e;
 
@@ -435,11 +435,11 @@ void Class866E8__ForEachElem(Class866E8 *self, Class866E8CellFn arg1, ChunkSlotF
         if (arg2 != 0) {
             arg2(self, e);
         }
-        Class866E8__ForEachEntryChild(self, arg1, e);
+        StageMap__ForEachEntryChild(self, arg1, e);
     }
 }
 
-void Class866E8__ForEachEntryChild(Class866E8 *self, Class866E8CellFn callback, ChunkSlot *item) {
+void StageMap__ForEachEntryChild(StageMap *self, StageMapCellFn callback, ChunkSlot *item) {
     GridCell **p;
     GridCell **end;
 
@@ -450,6 +450,6 @@ void Class866E8__ForEachEntryChild(Class866E8 *self, Class866E8CellFn callback, 
     }
 }
 
-Class866E8Methods *GetClass866E8Methods(void) {
-    return &gClass866E8Methods;
+StageMapMethods *GetStageMapMethods(void) {
+    return &gStageMapMethods;
 }

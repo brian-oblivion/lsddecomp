@@ -8,7 +8,7 @@
  * one element of the grid manager (class id 0x903, method table
  * gLbdFileMethods, parent FileResource; methods in src/code_39094.c; no
  * subclasses). The files it is handed are the gRecordTable records
- * GetGridRecordAt(stage, chunk) returns: Class866E8__ComputeRateEntry takes
+ * GetGridRecordAt(stage, chunk) returns: StageMap__ComputeRateEntry takes
  * each entry's name from the grid's callback, ObjM__OnRegistrantEvent, whose
  * tail call leaves that record in $v0, and the record's first bytes are the
  * path ("STG00\M000.LBD" is record 9 of stage 0's group).
@@ -28,11 +28,11 @@
  * first, and GetLbdFileMethods is in gDataSourceClientGetters, so
  * SetActiveDataSource rebinds this table's file-I/O slots.
  *
- * Its one user is the grid manager (Class866E8), which makes one per grid
- * element (New_LbdFile in Class866E8__Class866E8, with freeGuard set so
+ * Its one user is the grid manager (StageMap), which makes one per grid
+ * element (New_LbdFile in StageMap__StageMap, with freeGuard set so
  * freeBuffer keeps the fixed buffer), loads each element's chunk through it
- * (Class866E8__ApplyRateEntries), links the header block's placements and
- * models into the element's cells (Class866E8__LoadElementResources), then
+ * (StageMap__ApplyRateEntries), links the header block's placements and
+ * models into the element's cells (StageMap__LoadElementResources), then
  * marks the header consumed (headerReady 2). ObjM__CheckAuxTrigger hands
  * the data block to TryDreamAuxTrigger and releases it when that returns 0.
  *
@@ -43,7 +43,7 @@
  *  - AdvanceLoadState calls +0x080 and LoadDataBlock calls +0x084 with no
  *    argument (retail sets no $a0; it still holds self):
  *    LbdFileLoadDataBlockNoArgFn and LbdFileReleaseDataBlockNoArgFn.
- *  - Class866E8__ResetElementCells passes +0x07C a second argument, the
+ *  - StageMap__ResetElementCells passes +0x07C a second argument, the
  *    element, that LbdFile__ReleaseHeader never reads:
  *    LbdFileReleaseHeaderElemFn.
  */
@@ -55,7 +55,7 @@ typedef struct LbdFileMethods LbdFileMethods;
 typedef struct LbdFileHeader {
     /* +0x00 */ u8 pad0[0x2];
     /* +0x02 */ u16 hasData; /* zero: loadDataBlock returns 0 */
-    /* +0x04 */ s32 placementsOffset; /* Class866E8__LoadElementResources: the element's Class6D940 buffer is header + placementsOffset */
+    /* +0x04 */ s32 placementsOffset; /* StageMap__LoadElementResources: the element's Class6D940 buffer is header + placementsOffset */
     /* +0x08 */ s32 placementsSize; /* ... and its LinkResource's data header + placementsOffset + placementsSize */
     /* +0x0C */ u8 padC[0x10 - 0xC];
     /* +0x10 */ u32 dataOffset; /* file offset of the data block (seek mode 0) */
@@ -74,10 +74,10 @@ struct LbdFileMethods {
 
 struct LbdFile {
     FILERESOURCE_FIELDS(LbdFileMethods); /* buffer: the 0xB358 header block (LbdFileHeader); loadState: 0 idle, 9 header, 10 data block */
-    /* +0x02C */ s16 headerReady; /* 1 when the header is read; Class866E8__OnNotifyTag1 sets 2 once consumed */
-    /* +0x02E */ s16 dataReady; /* 1 when the data block is read; cleared by Class866E8__OnNotifyTag1 */
+    /* +0x02C */ s16 headerReady; /* 1 when the header is read; StageMap__OnNotifyTag1 sets 2 once consumed */
+    /* +0x02E */ s16 dataReady; /* 1 when the data block is read; cleared by StageMap__OnNotifyTag1 */
     /* +0x030 */ s16 chunkIndex; /* the loaded chunk's record index in its stage (ApplyRateEntries); -1 when none (ctor, ReleaseHeader) */
-    /* +0x032 */ s16 elemKey; /* the owner's element key: Class866E8's ctor (the index) and BuildRateEntries; zeroed by the ctor */
+    /* +0x032 */ s16 elemKey; /* the owner's element key: StageMap's ctor (the index) and BuildRateEntries; zeroed by the ctor */
     /* +0x034 */ void *dataBuffer; /* the data block, BMemPMgrAlloc(dataSize); freed by ReleaseDataBlock */
     /* +0x038 */ s32 autoLoadData; /* nonzero (the ctor's 1): the header's completion starts loadDataBlock */
 }; /* 0x3C bytes: New_LbdFile */

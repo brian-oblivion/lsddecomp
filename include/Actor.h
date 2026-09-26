@@ -12,8 +12,8 @@
  *
  * Children and companions. addChild/removeChild/removeAllChildren chain
  * SceneNode's and also record two companions by the child's class id:
- * `(id & 0xFFF) == 0x114` is the grid manager (Class866E8, include/
- * Class866E8.h), kept in `grid`; `(id & 0xF) == 5` is a FrameClock object,
+ * `(id & 0xFFF) == 0x114` is the grid manager (StageMap, include/
+ * StageMap.h), kept in `grid`; `(id & 0xF) == 5` is a FrameClock object,
  * kept in `ticker` (SceneNode's onNotify routes that class's events to
  * `update`, +0x098, which the subclasses override as Class65650's
  * Update (formerly OnClass6EF50Notify), Entity__Update and DreamSys__TimerTick).
@@ -43,8 +43,8 @@
 typedef struct Actor Actor;
 typedef struct ActorMethods ActorMethods;
 
-/* The grid manager (include/Class866E8.h); only its address is kept here. */
-struct Class866E8;
+/* The grid manager (include/StageMap.h); only its address is kept here. */
+struct StageMap;
 
 /* Occupants in gActorMethods named at each slot; `tools/classtable.py
  * <subclass table> --vs gActorMethods` lists a subclass's overrides. The
@@ -77,7 +77,7 @@ struct Class866E8;
     /* +0x044 */ s32 state;               /* zeroed by the ctor; a subclass's state code (DreamSys and Entity: include/DreamSys.h, include/Entity.h) */ \
     /* +0x048 */ s16 lastOffsetValue;     /* MoveAlongLocalAxis's val, setLastOffsetValue; Reset: 300; NotifyMove's magnitude */ \
     /* +0x04A */ u8 pad4A[2];                                                                      \
-    /* +0x04C */ struct Class866E8 *grid; /* the class-0x114 child addChild recorded; FindNearbyLink queries it */ \
+    /* +0x04C */ struct StageMap *grid; /* the class-0x114 child addChild recorded; FindNearbyLink queries it */ \
     /* +0x050 */ BasicClass *ticker;      /* the class-5 (FrameClock) child addChild recorded */   \
     /* +0x054 */ s32 pendingExtra         /* setPendingExtra; Reset: 0; NotifyMove adds it to |lastOffsetValue|. The object is 0x58 bytes (New_Actor) */
 /* clang-format on */

@@ -106,7 +106,7 @@ void Entity__Reset(Entity *this) {
 }
 
 void Entity__AttachToParent(Entity *this, Class65650 *peer, void *companion,
-                            struct Class866E8 *parent, void *offset) {
+                            struct StageMap *parent, void *offset) {
     if (this->parent != 0) {
         return;
     }

@@ -15,9 +15,9 @@
  * Class6D940__SetFlag forward to the active driver's finalize and setFlag,
  * as TimBlockSrc, Tod and ModelData do.
  *
- * Its one user is the grid manager (Class866E8): Class866E8__Class866E8
+ * Its one user is the grid manager (StageMap): StageMap__StageMap
  * makes one per grid element with New_Class6D940(0), so nothing is
- * loaded; Class866E8__LoadElementResources points `buffer` into an already
+ * loaded; StageMap__LoadElementResources points `buffer` into an already
  * loaded resource, puts a LinkResource (gLinkResourceMethods) of the element's models
  * in `linkResource`, then calls +0x078 once per cell until it returns 0.
  *
@@ -28,7 +28,7 @@
  * the same cell, fills a Class6D940Placement and returns the model
  * linkResource's +0x080 (LinkResource__GetModel) gives for the record's
  * model index: 0 past the last cell (400), -1 for an empty record.
- * Class866E8__LoadElementResources calls it through
+ * StageMap__LoadElementResources calls it through
  * Class6D940ResolveEntryFn, a cast of the inherited slot (no code).
  */
 
@@ -48,7 +48,7 @@ typedef struct Class6D940Record {
 } Class6D940Record;
 
 /* What Class6D940__ResolveEntry fills in: the caller's stack record, 0x40
- * bytes (Class866E8__LoadElementResources). x and z are the cell's centre,
+ * bytes (StageMap__LoadElementResources). x and z are the cell's centre,
  * 0x800 units a cell. */
 typedef struct Class6D940Placement {
     /* +0x000 */ u8 pad0[0xC];

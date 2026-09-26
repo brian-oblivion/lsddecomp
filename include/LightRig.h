@@ -15,7 +15,7 @@
  *    each before SceneNode's finalize.
  *  - setAmbientColor (+0x0BC) stores an r,g,b in `ambient` and hands it,
  *    scaled << 4, to GsSetAmbient.
- *  - The one caller of getLight outside the class, Class866E8__SetChildParams,
+ *  - The one caller of getLight outside the class, StageMap__SetChildParams,
  *    calls each returned light's +0x044 and +0x048 -- FlatLightObj's setColor
  *    and setDirection -- from sources that step by 3 bytes (an r,g,b) and by
  *    6 bytes (an s16 vx,vy,vz) per light.
@@ -23,18 +23,18 @@
  * Who holds one: IntermediateBase__Init makes one with New_LightRig() when
  * its init args bring none (IntermediateBase's +0x014) and, in mode 0, adds
  * its FrameClock object (+0x010) to it as a child. One class derives from
- * it: Class866E8 (gClass866E8Methods, 0x114, the grid manager), whose ctor and
+ * it: StageMap (gStageMapMethods, 0x114, the grid manager), whose ctor and
  * finalize chain to this class's first and whose table inherits getLight
- * unchanged; it expands these macros (include/Class866E8.h).
+ * unchanged; it expands these macros (include/StageMap.h).
  *
  * The ctor chains to SceneNode's (GetSceneNodeMethods()->ctor), so the id
  * tree (0x4 -> 0x14) is the ctor chain. The ctor returns nothing, but the
  * slot keeps SceneNode's `void *` ctor type: no caller of this class's ctor
- * reads $v0 (New_LightRig returns the allocation, Class866E8__Class866E8
+ * reads $v0 (New_LightRig returns the allocation, StageMap__StageMap
  * discards it), so the two spellings compile alike.
  *
  * The object is 0x54 bytes (New_LightRig): `lights` at +0x044 and `ambient`
- * at +0x050, then one byte of word padding. Class866E8 names nothing of its
+ * at +0x050, then one byte of word padding. StageMap names nothing of its
  * own in +0x044..+0x054 (its first own field, `origin`, is at +0x054).
  */
 
@@ -57,7 +57,7 @@ struct LightRigRgb {
 /* clang-format off */
 #define LIGHTRIG_SLOTS(Self, CtorParams)                                                           \
     SCENENODE_SLOTS(Self, CtorParams);                                                            \
-    /* +0x0B8 */ BasicClass *(*getLight)(Self *self, s32 index); /* LightRig__GetLight: lights[index]; Class866E8 inherits it */ \
+    /* +0x0B8 */ BasicClass *(*getLight)(Self *self, s32 index); /* LightRig__GetLight: lights[index]; StageMap inherits it */ \
     /* +0x0BC */ void (*setAmbientColor)(Self *self, LightRigRgb *rgb, s32 swap) /* LightRig__SetAmbientColor; swap: the old colour comes back in *rgb */
 /* clang-format on */
 

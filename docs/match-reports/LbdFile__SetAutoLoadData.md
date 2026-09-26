@@ -50,7 +50,7 @@ void LbdFile__SetAutoLoadData(DataSrc39094 *self, s32 value) {
 
 ## Track 4 (2026-09-26, round 87)
 
-Renamed `DataSrc39094__SetAutoLoadData` -> `LbdFile__SetAutoLoadData` with `rename.py` (class rename only; +0x088, the last slot). Its one caller is Class866E8__Class866E8, forwarding its own arg2. The class (method table gLbdFileMethods, id 0x903, a FileResource subclass) was named `LbdFile` for its table address, 0x80081940 (renamed from `D_80081940` to `gLbdFileMethods`), as Class6D940 is (FINISHING-PLAN track 4 step 2); the old `DataSrc39094` was the unit's local view name, and dropping its unit suffix leaves `DataSrc`, which every FileResource subclass is. The unified definition is `include/LbdFile.h`.
+Renamed `DataSrc39094__SetAutoLoadData` -> `LbdFile__SetAutoLoadData` with `rename.py` (class rename only; +0x088, the last slot). Its one caller is StageMap__StageMap, forwarding its own arg2. The class (method table gLbdFileMethods, id 0x903, a FileResource subclass) was named `LbdFile` for its table address, 0x80081940 (renamed from `D_80081940` to `gLbdFileMethods`), as Class6D940 is (FINISHING-PLAN track 4 step 2); the old `DataSrc39094` was the unit's local view name, and dropping its unit suffix leaves `DataSrc`, which every FileResource subclass is. The unified definition is `include/LbdFile.h`.
 
 
 ## Track 6 (2026-09-26, round 92, echo)
@@ -64,9 +64,9 @@ says the class "was named `LbdFile` for its table address"; what it named
 then was `Class81940`.
 
 **Class name `LbdFile`, tier A.** The files the class is handed are the
-stage's map chunks, STGnn\Mnnn.LBD: Class866E8__ApplyRateEntries calls
+stage's map chunks, STGnn\Mnnn.LBD: StageMap__ApplyRateEntries calls
 loadHeader (+0x078) with each rate entry's `ptr0`, which
-Class866E8__ComputeRateEntry takes from the grid's callback, and that
+StageMap__ComputeRateEntry takes from the grid's callback, and that
 callback is ObjM__OnRegistrantEvent (ObjM__AttachTarget installs it), whose
 tail call GetGridRecordAt(stage, chunk) / GetGridRecordXY leaves
 `&group[9 + chunk]` of gRecordTable in $v0. gRecordTable's 0x1C-byte records
@@ -74,7 +74,7 @@ begin with a path, and record 9 of every stage group is its M000.LBD
 (stage 0: gRecordIndexTable[0] = 16, record 25 at 0x80081CC0 =
 "STG00\M000.LBD"; stage 1: record 39 at 0x80081E48 = "STG01\M000.LBD").
 The same index goes into `ownerRate` and is split into column and row
-(Class866E8__ComputeDivisorSplit). LBD is the game's own extension, and the
+(StageMap__ComputeDivisorSplit). LBD is the game's own extension, and the
 name follows the siblings named for the format they load (TimImage, Tod,
 VabStreamObj). What the header block's two regions and the data block hold
 beyond what their consumers do with them is not established here.

@@ -63,4 +63,4 @@ history.
 
 ## Track 4 (2026-09-26, round 87, echo)
 
-Now `Class6D940 *New_Class6D940(char *name)`, the ctor's parameter; the one caller (Class866E8__Class866E8) passes 0, so nothing is loaded. Byte-identical.
+Now `Class6D940 *New_Class6D940(char *name)`, the ctor's parameter; the one caller (StageMap__StageMap) passes 0, so nothing is loaded. Byte-identical.

@@ -42,7 +42,7 @@
 #include "common.h"
 #include "Entity.h"
 #include "DreamSys.h"
-#include "Class866E8.h"
+#include "StageMap.h"
 
 /* Data rows this unit's mood-dispatch handlers pass through to a vtable
  * call as an opaque argument -- never dereferenced here, so an opaque byte

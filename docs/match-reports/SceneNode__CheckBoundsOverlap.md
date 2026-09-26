@@ -50,7 +50,7 @@ the SAME element (giving `z` at offset 0 relative to itself, and `y` via
 same 6-byte stride each iteration. This is the exact "N walkers, differently
 based views of the same stride" shape the lever describes, confirmed a
 second time in this codebase (the lever's own worked example was
-`Class866E8__ApplyRateEntries`/`ChunkLoadEntryTail`, a different unit).
+`StageMap__ApplyRateEntries`/`ChunkLoadEntryTail`, a different unit).
 
 **Per-iteration order is MIN.x, MIN.y, MIN.z, MAX.x, MAX.y, MAX.z —
 sequential, not interleaved per-axis.** Each of the six checks re-reads its
@@ -267,7 +267,7 @@ concrete, measured leads for the next attempt:
 
 **Confirms Lever 2 (two walkers, differently-based views of one stride)
 generalizes beyond its original worked example.** This is the SECOND
-independent function in this codebase (after `Class866E8__ApplyRateEntries` in a
+independent function in this codebase (after `StageMap__ApplyRateEntries` in a
 different unit) where retail's own register allocation shows a dense
 per-element loop split across two pointers into the same array, one offset
 from the other by a few bytes, rather than one pointer with field-offset

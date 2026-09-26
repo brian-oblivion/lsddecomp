@@ -96,10 +96,10 @@ so the declaration has to keep its arity or the call site's bytes change. Here
 it emits nothing — all three call sites already have the value in the register:
 
 ```
-8004a9a0:  jal   8001e57c <GetSceneNodeMethods>   ; Class866E8__OnNotify (class_3ac78.c, 2-arg call)
+8004a9a0:  jal   8001e57c <GetSceneNodeMethods>   ; StageMap__OnNotify (class_3ac78.c, 2-arg call)
 8004a9a4:  move  s2,a2                             ; callee-save SPILL, not argument setup
 
-8004aa88:  jal   8001e57c <GetSceneNodeMethods>   ; Class866E8__OnElementEvent (class_3ac78.c, 2-arg call)
+8004aa88:  jal   8001e57c <GetSceneNodeMethods>   ; StageMap__OnElementEvent (class_3ac78.c, 2-arg call)
 8004aa8c:  move  s2,a2                             ; ditto
 
 8004d3e8:  jal   8001e57c <GetSceneNodeMethods>   ; GridCell__GridCell (via include/class_3bb8c.h, 1-arg call)
@@ -121,7 +121,7 @@ reduce either declaration to `(void)` — which is correct and unchanged, since
 `(void)` would make both call sites a `too many arguments` compile error. `()`
 is a different spelling and was never considered.
 
-- `src/class_3ac78.c:182` — `extern void *GetSceneNodeMethods(Class866E8 *self, s32 arg1);` -> `extern void *GetSceneNodeMethods();`
+- `src/class_3ac78.c:182` — `extern void *GetSceneNodeMethods(StageMap *self, s32 arg1);` -> `extern void *GetSceneNodeMethods();`
 - `include/class_3bb8c.h:952` — `extern BaseCtorTableB_3bb8c_c *GetSceneNodeMethods(void *self);` -> `extern BaseCtorTableB_3bb8c_c *GetSceneNodeMethods();`
 
 Return types are untouched (they are this project's multiple-independent-local-views

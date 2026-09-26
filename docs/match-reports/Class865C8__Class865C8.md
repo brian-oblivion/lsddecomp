@@ -70,9 +70,9 @@ jal   New_FrameClock
  sw   $v0, 0x10($s3)                       ; arg1->unk10 = New_NodeGuardedViewport()
 addu  $a0, $zero, $zero
 ori   $a1, $zero, 0x1
-jal   New_Class866E8
+jal   New_StageMap
  sw   $v0, 0x8($s3)                          ; arg1->unk8 = New_FrameClock()
-sw    $v0, 0xC($s3)                           ; arg1->unkC = New_Class866E8(0, 1)
+sw    $v0, 0xC($s3)                           ; arg1->unkC = New_StageMap(0, 1)
 lw    $v0, 0x0($s1)
 addu  $a0, $s1, $zero
 sw    $s2, 0x38($s1)                            ; self->unk38 = arg2
@@ -121,7 +121,7 @@ void Class865C8__Class865C8(Obj865C8 *self, Obj0C *arg1, SubObjD *arg2, s32 arg3
     self->unk0C = arg1;
     arg1->unk10 = New_NodeGuardedViewport();
     arg1->unk8 = New_FrameClock();
-    arg1->unkC = (SubObjG *)New_Class866E8(0, 1);
+    arg1->unkC = (SubObjG *)New_StageMap(0, 1);
     self->unk38 = arg2;
     self->methods->slot10(self, (Obj4C *)arg2);
     arg2->methods->slot10C(arg2, self->subB);
@@ -163,17 +163,17 @@ needed anywhere in this 107-word function.
   reconciles the two established types without disturbing either.
 - Six independent "New_X"-shaped allocator calls (`New_TimImage`,
   `New_LinkResource`, `New_WBgm`, `New_NodeGuardedViewport`, `New_FrameClock`,
-  `New_Class866E8`) populate six different fields (`self->unk40/44/48`,
+  `New_StageMap`) populate six different fields (`self->unk40/44/48`,
   `arg1->unk8/unkC/unk10`) that this unit's OWN dtor (`Class865C8__Finalize`,
   earlier this round) already established as a uniform `SubObjG` family via
   `->methods->slot4`. These are almost certainly six DIFFERENT real
-  classes under the hood (`New_Class866E8` is independently and fully typed
-  in `class_3ac78.h` as returning `Class866E8 *`, a much richer type with
+  classes under the hood (`New_StageMap` is independently and fully typed
+  in `class_3ac78.h` as returning `StageMap *`, a much richer type with
   its own documented `ctor`/`slot38`/`slot40`/`slot80`/`slotD0`) — `SubObjG`
   is this unit's own minimal, deliberately-unified LOCAL view (only the
   slots this unit's own functions actually reach: `slot4`, and now
   `slot5C`/`slot78` added here), not a claim that all six are the same
-  class. Casts at the `New_Class866E8` call site reconcile the two
+  class. Casts at the `New_StageMap` call site reconcile the two
   independent local views, per this project's established
   multiple-local-views convention.
 - Two calls (`New_NodeGuardedViewport`, `New_FrameClock`) and one more
@@ -208,7 +208,7 @@ needed anywhere in this 107-word function.
 - Nine new function externs, several deliberately re-declared locally with
   a DIFFERENT (but ABI-compatible) type than an existing declaration
   elsewhere in the project (`New_LinkResource`, `func_8004A070`,
-  `SetActiveDataSourceDriverMode`, `New_Class866E8`) — all four already have an extern
+  `SetActiveDataSourceDriverMode`, `New_StageMap`) — all four already have an extern
   somewhere else (`Class6D3C8.h` or `code_1677c.c`); this unit keeps its
   own local view rather than cross-including, per established policy. The
   other five (`GetSoundEffectDir`, `InitDreamAux`, `New_TimImage`,

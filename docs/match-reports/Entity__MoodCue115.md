@@ -333,7 +333,7 @@ docs/match-reports/`, then filter to the ones whose first lines say STALL):
 `SceneNode__TryAttachNearby`, `DreamSys__StepLookYaw`,
 `DreamSys__TryInstantTeleportLink`, `cd_read_retry`, `func_80032148`,
 `func_80033AB0`, `Snd_decrescendo`, `_SsSetControlChange`, `ContDataEntry`,
-`TaskCore__CommitElementScroll`, `Class866E8__SplitFootprintSlot`, `TaskObjF__CheckCardStatus`, `StyleFillEffectKind3`,
+`TaskCore__CommitElementScroll`, `StageMap__SplitFootprintSlot`, `TaskObjF__CheckCardStatus`, `StyleFillEffectKind3`,
 `Entity__MoodCue111`, `TaskObjF__BeginSave`. I did not screen these — that is
 other units' work and outside this brief — but the ordering heuristic is
 cheap: **rank by LENGTH-OFF first**, because an un-merged arm costs words

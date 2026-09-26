@@ -1,26 +1,26 @@
 /* First slice of the 365-function class_3bb8c block -- 20 functions,
- * 0x3BB8C..0x3CD88, all matched C, occupants of `gClass866E8Methods` +0x0E4..+0x11C
+ * 0x3BB8C..0x3CD88, all matched C, occupants of `gStageMapMethods` +0x0E4..+0x11C
  * (`tools/classtable.py 0x800866E8`). The remainder is `class_3bb8c_b` and
  * is still a monolithic asm segment.
  *
- * This slice is Class866E8's FOOTPRINT/RATE engine: the position-to-grid-cell
+ * This slice is StageMap's FOOTPRINT/RATE engine: the position-to-grid-cell
  * math and the per-element resource/GPU work that `class_3ac78`'s own unit
  * header (src/class_3ac78.c) describes as living in "class_3bb8c*" --
- * Class866E8__ComputeFootprintDescriptor converts a world position
+ * StageMap__ComputeFootprintDescriptor converts a world position
  * (SplitLongVec3) into a grid-cell descriptor (Descriptor10, byte row/column
- * plus sub-cell halfword offsets); Class866E8__UpdateFootprintTracking runs
- * every enabled tick (paired with class_3ac78's Class866E8__AdvanceRateCountdown)
- * to refresh that descriptor and notify on change; Class866E8__BuildRateEntries
- * / Class866E8__ComputeRateFlags / Class866E8__ComputeRateEntry /
- * Class866E8__ApplyRateEntries build and apply a per-element rate table from
+ * plus sub-cell halfword offsets); StageMap__UpdateFootprintTracking runs
+ * every enabled tick (paired with class_3ac78's StageMap__AdvanceRateCountdown)
+ * to refresh that descriptor and notify on change; StageMap__BuildRateEntries
+ * / StageMap__ComputeRateFlags / StageMap__ComputeRateEntry /
+ * StageMap__ApplyRateEntries build and apply a per-element rate table from
  * a ChunkSlotSpec key/flag array (sDefaultTargetSpecs); and
- * Class866E8__LoadElementResources / Class866E8__ResetElementCells own an
+ * StageMap__LoadElementResources / StageMap__ResetElementCells own an
  * element's resource-load and GPU-link cell array (the same 0x668-byte grid
- * class_3ac78 calls out) and its teardown. Class866E8__Enable/Disable set
+ * class_3ac78 calls out) and its teardown. StageMap__Enable/Disable set
  * the `enabled` flag class_3ac78 gates all of this on (cross-confirmed
- * there independently, see docs/match-reports/Class866E8__Enable.md).
+ * there independently, see docs/match-reports/StageMap__Enable.md).
  *
- * The class is declared once, in include/Class866E8.h (track 4, round 89);
+ * The class is declared once, in include/StageMap.h (track 4, round 89);
  * the element's origin is read through Unk14Obj (include/class_3bb8c.h), a
  * GsCOORDINATE2 view with halfword reads.
  *
@@ -40,7 +40,7 @@
 #include "LbdFile.h"
 #include "GridCell.h"
 
-s32 Class866E8__SetTargetAndBuildRates(Class866E8 *self, void *arg1, SceneNode *arg2, Descriptor10 *arg3) {
+s32 StageMap__SetTargetAndBuildRates(StageMap *self, void *arg1, SceneNode *arg2, Descriptor10 *arg3) {
     s32 stackBuf[3];
     s32 ret;
 
@@ -50,7 +50,7 @@ s32 Class866E8__SetTargetAndBuildRates(Class866E8 *self, void *arg1, SceneNode *
     return self->methods->buildRateEntries(self, ret, (LongVec3 *)stackBuf, sDefaultTargetSpecs);
 }
 
-s32 Class866E8__ComputeCellOffsets(Class866E8 *self, void *arg1, void *arg2) {
+s32 StageMap__ComputeCellOffsets(StageMap *self, void *arg1, void *arg2) {
     s32 outBuf[3];
 
     return ComputeCellWorldOffsets(arg1, outBuf, self->config, &self->origin, arg2);
@@ -100,17 +100,17 @@ s32 ComputeCellWorldOffsets(s32 *arg0, s32 *outBuf, StageGridDimensions *arg2, L
     return sum;
 }
 
-void Class866E8__Enable(Class866E8 *self) {
+void StageMap__Enable(StageMap *self) {
     self->enabled = 1;
 }
 
-void Class866E8__Disable(Class866E8 *self) {
+void StageMap__Disable(StageMap *self) {
     self->methods->resetAllElements(self);
     self->enabled = 0;
 }
 
-/* Class866E8__UpdateFootprintTracking -- see docs/match-reports/Class866E8__UpdateFootprintTracking.md. */
-s32 Class866E8__UpdateFootprintTracking(Class866E8 *self) {
+/* StageMap__UpdateFootprintTracking -- see docs/match-reports/StageMap__UpdateFootprintTracking.md. */
+s32 StageMap__UpdateFootprintTracking(StageMap *self) {
     Descriptor10Ext buf;
     ChunkSlot *e;
     s32 key;
@@ -144,18 +144,18 @@ s32 Class866E8__UpdateFootprintTracking(Class866E8 *self) {
 
 /* MATCH, round 63 (delta): closed a 137/140 stall that had stood since round
  * 40 across four re-verifications, ten inert structural variants and a
- * 37,155-iteration permuter search -- see docs/match-reports/Class866E8__BuildRateEntries.md.
+ * 37,155-iteration permuter search -- see docs/match-reports/StageMap__BuildRateEntries.md.
  * The 3-word residue was a genuine pure register-identity difference (funcdiff
  * ins 0 / del 0, no asm-differ markers): retail held the second loop's element
  * pointer in $a2, the build in $v0. The fix was to DELETE a local -- the
  * second loop reuses `e`, the same variable the first loop walks, instead of a
  * separate `e2`. Nothing else in the body changed.
  * That axis is exactly the one a permuter cannot reach: it mutates a body, it
- * does not merge two of its locals into one. Same lever as Class866E8__ComputeRateEntry this
+ * does not merge two of its locals into one. Same lever as StageMap__ComputeRateEntry this
  * round.
  * The `__asm__("")` barrier this body used to carry before `u14 = ...` is gone:
  * with `e` merged it is no longer needed, verified by whole-image rebuild. */
-void Class866E8__BuildRateEntries(Class866E8 *self, s32 val, LongVec3 *arg2, ChunkSlotSpec *arg3) {
+void StageMap__BuildRateEntries(StageMap *self, s32 val, LongVec3 *arg2, ChunkSlotSpec *arg3) {
     s32 divisor;
     s32 flag;
     s32 savedResult;
@@ -169,7 +169,7 @@ void Class866E8__BuildRateEntries(Class866E8 *self, s32 val, LongVec3 *arg2, Chu
     if (arg3 != 0) {
         divisor = self->config->columns;
         flag = (val / divisor) & 1;
-        savedResult = Class866E8__ComputeRateFlags(self, val, flag);
+        savedResult = StageMap__ComputeRateFlags(self, val, flag);
 
         count = 0;
         for (i = 0; i < 7; i++) {
@@ -188,7 +188,7 @@ void Class866E8__BuildRateEntries(Class866E8 *self, s32 val, LongVec3 *arg2, Chu
                     u14->unk20.w = arg2->z - 0x5000;
                 }
                 e->cellParent->coord2->flg = 0;
-                Class866E8__ComputeRateEntry(self, &stackBuf[count], divisor, flag, val,
+                StageMap__ComputeRateEntry(self, &stackBuf[count], divisor, flag, val,
                                              savedResult, arg3[i].neighbour);
                 count++;
             }
@@ -203,7 +203,7 @@ void Class866E8__BuildRateEntries(Class866E8 *self, s32 val, LongVec3 *arg2, Chu
     }
 }
 
-s32 Class866E8__ComputeRateFlags(Class866E8 *self, s32 val, s32 flag) {
+s32 StageMap__ComputeRateFlags(StageMap *self, s32 val, s32 flag) {
     StageGridDimensions *u;
     s32 divisor;
     s32 unk4;
@@ -239,7 +239,7 @@ s32 Class866E8__ComputeRateFlags(Class866E8 *self, s32 val, s32 flag) {
 
 /* MATCH, round 63 (delta): closed a 58/63 stall that had stood since round
  * 27 across five re-verifications and ~330,000 permuter iterations -- see
- * docs/match-reports/Class866E8__ComputeRateEntry.md. The 5-word residue really was pure
+ * docs/match-reports/StageMap__ComputeRateEntry.md. The 5-word residue really was pure
  * register identity (funcdiff ins 0 / del 0, no asm-differ markers), and the
  * fix was FEWER variables, not more: retail carries the multiply result AND
  * the running sum AND both branch addends in ONE local (`sum`, retail's
@@ -250,7 +250,7 @@ s32 Class866E8__ComputeRateFlags(Class866E8 *self, s32 val, s32 flag) {
  * iterations without ever reaching the merged shape.
  * The `do {} while (0);` below is LOAD-BEARING: removing it drifts the
  * image. It was inherited with the near-miss body and is verified here. */
-s32 Class866E8__ComputeRateEntry(Class866E8 *self, ChunkLoadEntry *arg1, s32 divisor, s32 flag,
+s32 StageMap__ComputeRateEntry(StageMap *self, ChunkLoadEntry *arg1, s32 divisor, s32 flag,
                                  s32 val, s32 savedResult, s32 key) {
     s32 mask = sRateKeyMask[key];
     s32 result;
@@ -302,8 +302,8 @@ storeKey:
  * is `arr1` itself (initial value = the incoming argument register).
  * `sp` is therefore assigned from `arr1` inside the body and `arr1` is
  * advanced directly; the old `ep = arr1` copy is what swapped s3/s4.
- * See docs/match-reports/Class866E8__ApplyRateEntries.md. */
-void Class866E8__ApplyRateEntries(Class866E8 *self, ChunkLoadEntry *arr1, s32 count) {
+ * See docs/match-reports/StageMap__ApplyRateEntries.md. */
+void StageMap__ApplyRateEntries(StageMap *self, ChunkLoadEntry *arr1, s32 count) {
     s32 i;
     ChunkSlot *e;
     ChunkLoadEntryTail *sp;
@@ -331,10 +331,10 @@ void Class866E8__ApplyRateEntries(Class866E8 *self, ChunkLoadEntry *arr1, s32 co
         }
         arr1++;
     }
-    self->unk1B4 = Class866E8__CountFlaggedElements(self);
+    self->unk1B4 = StageMap__CountFlaggedElements(self);
 }
 
-s32 Class866E8__CountFlaggedElements(Class866E8 *self) {
+s32 StageMap__CountFlaggedElements(StageMap *self) {
     s32 count;
     s32 i;
 
@@ -347,7 +347,7 @@ s32 Class866E8__CountFlaggedElements(Class866E8 *self) {
     return count;
 }
 
-void Class866E8__OnNotifyTag1(Class866E8 *self, void *arg1, s32 mode) {
+void StageMap__OnNotifyTag1(StageMap *self, void *arg1, s32 mode) {
     s32 i;
     ChunkSlot *e;
     s32 curMode;
@@ -383,8 +383,8 @@ void Class866E8__OnNotifyTag1(Class866E8 *self, void *arg1, s32 mode) {
  * round 40 (`info` in $a1 where retail has $v0) was ONE `info` local
  * assigned on both sides of the slot4 call. Two locals (`info`, `info2`)
  * make each block-local, so local-alloc ties each to its addu result.
- * See docs/match-reports/Class866E8__LoadElementResources.md. */
-/* Class866E8__LoadElementResources (loadElementResources, +0x104) -- own local view of the
+ * See docs/match-reports/StageMap__LoadElementResources.md. */
+/* StageMap__LoadElementResources (loadElementResources, +0x104) -- own local view of the
  * records reached only from here. Kept in this .c, not class_3bb8c.h: none
  * of the 11 sibling units sharing that header touch these. */
 
@@ -404,7 +404,7 @@ typedef struct BE54LoadReq {
 
 extern void GsLinkObject4(s32 tmd, void *objp, s32 n);
 
-void Class866E8__LoadElementResources(Class866E8 *self, ChunkSlot *entry) {
+void StageMap__LoadElementResources(StageMap *self, ChunkSlot *entry) {
     LbdFileHeader *info;
     LbdFileHeader *info2;
     LbdFile *hdr;
@@ -500,7 +500,7 @@ void Class866E8__LoadElementResources(Class866E8 *self, ChunkSlot *entry) {
     }
 }
 
-void Class866E8__ResetElementCells(Class866E8 *self, ChunkSlot *entry) {
+void StageMap__ResetElementCells(StageMap *self, ChunkSlot *entry) {
     GridCell **p;
     GridCell **end;
 
@@ -515,7 +515,7 @@ void Class866E8__ResetElementCells(Class866E8 *self, ChunkSlot *entry) {
     }
 }
 
-Descriptor10 *Class866E8__GetTargetDescriptor(Class866E8 *self, Descriptor10Ext *arg1, void **out) {
+Descriptor10 *StageMap__GetTargetDescriptor(StageMap *self, Descriptor10Ext *arg1, void **out) {
     void *v1;
 
     v1 = &self->target->coord2->tx;
@@ -532,7 +532,7 @@ Descriptor10 *Class866E8__GetTargetDescriptor(Class866E8 *self, Descriptor10Ext 
 
 /* MATCH, round 63 (delta): closed a six-round stall (72/106 since round 19)
  * with three source-shape corrections, none of them register pinning -- see
- * docs/match-reports/Class866E8__ComputeFootprintDescriptor.md.
+ * docs/match-reports/StageMap__ComputeFootprintDescriptor.md.
  *   1. `b2`/`b3` are s32 locals RE-READ from `out->base.b2`/`b3` after the
  *      byte stores. An s8 field shifted directly in the expression compiles
  *      to `lbu` + `sll 0x18` + `sra 0xd`; assigning it to an s32 local first
@@ -544,7 +544,7 @@ Descriptor10 *Class866E8__GetTargetDescriptor(Class866E8 *self, Descriptor10Ext 
  *   3. `out->unk24 = e;` is the LAST statement of the block. Every earlier
  *      placement schedules its `sw` too early; only trailing it after the
  *      h8 store reproduces retail's order. */
-s32 Class866E8__ComputeFootprintDescriptor(Class866E8 *self, Descriptor10Ext *out, SplitLongVec3 *in) {
+s32 StageMap__ComputeFootprintDescriptor(StageMap *self, Descriptor10Ext *out, SplitLongVec3 *in) {
     ChunkSlot *e;
     Unk14Obj *u14a;
     Unk14Obj *u14b;
@@ -557,7 +557,7 @@ s32 Class866E8__ComputeFootprintDescriptor(Class866E8 *self, Descriptor10Ext *ou
     if (e != 0) {
         rate = e->loader->chunkIndex;
         out->chunkIndex = rate;
-        Class866E8__ComputeDivisorSplit(self, (u8 *)out, rate);
+        StageMap__ComputeDivisorSplit(self, (u8 *)out, rate);
 
         u14a = (Unk14Obj *)self->methods->findElemByUnk32(self, e->loader->elemKey)->cellParent->coord2;
         out->chunkCentre.x = u14a->unk18.w + 0x5000;
@@ -593,17 +593,17 @@ s32 Class866E8__ComputeFootprintDescriptor(Class866E8 *self, Descriptor10Ext *ou
     return 1;
 }
 
-void Class866E8__ComputeDivisorSplit(Class866E8 *self, u8 *out, s32 val) {
+void StageMap__ComputeDivisorSplit(StageMap *self, u8 *out, s32 val) {
     out[0] = val % self->config->columns;
     out[1] = val / self->config->columns;
 }
 
-ChunkSlot *Class866E8__GetLastTargetRateSplit(Class866E8 *self, u8 *out) {
-    Class866E8__ComputeDivisorSplit(self, out, self->lastEventElem->loader->chunkIndex);
+ChunkSlot *StageMap__GetLastTargetRateSplit(StageMap *self, u8 *out) {
+    StageMap__ComputeDivisorSplit(self, out, self->lastEventElem->loader->chunkIndex);
     return self->lastEventElem;
 }
 
-ChunkSlot *Class866E8__FindElemByUnk32(Class866E8 *self, s32 key) {
+ChunkSlot *StageMap__FindElemByUnk32(StageMap *self, s32 key) {
     s32 i;
     ChunkSlot *e;
 
@@ -623,8 +623,8 @@ ChunkSlot *Class866E8__FindElemByUnk32(Class866E8 *self, s32 key) {
  * INSIDE the upper-bound test keeps the `arg1` load ahead of the field
  * load, as retail schedules it (a `w = ...;` statement before the `if`
  * fixes the add but swaps those two loads). See
- * docs/match-reports/Class866E8__FindElementForPosition.md. */
-ChunkSlot *Class866E8__FindElementForPosition(Class866E8 *self, LongVec3 *arg1) {
+ * docs/match-reports/StageMap__FindElementForPosition.md. */
+ChunkSlot *StageMap__FindElementForPosition(StageMap *self, LongVec3 *arg1) {
     s32 i;
     s32 tol;
     s32 threshold;

@@ -105,7 +105,7 @@ all sources before storing any of them.
 **StreamTask__StreamTask** -- tier A. Occupies `gStreamTaskMethods`'s
 own ctor slot `+0x008` (`classtable.py`), matching the established
 `Class__Class` constructor convention already used elsewhere in this
-codebase (`IntermediateBase__IntermediateBase`, `Class866E8__Class866E8`).
+codebase (`IntermediateBase__IntermediateBase`, `StageMap__StageMap`).
 
 ## Track 4 (2026-09-25, round 84, alpha)
 

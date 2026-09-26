@@ -31,8 +31,8 @@ this function only takes its address).
 
 ## Proposed learning
 
-None beyond what's already documented for `TimedTask`/`Class866E8` in
-`TimedTask__PlaySound.md` and `New_Class866E8.md`.
+None beyond what's already documented for `TimedTask`/`StageMap` in
+`TimedTask__PlaySound.md` and `New_StageMap.md`.
 
 ## Naming
 

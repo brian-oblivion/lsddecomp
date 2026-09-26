@@ -20,7 +20,7 @@
 #include "common.h"
 #include "Entity.h"
 #include "DreamSys.h"
-#include "Class866E8.h"
+#include "StageMap.h"
 #include "Viewport.h"
 
 void Entity__MoodCue59(Entity *this, SoundCueSet *out) {

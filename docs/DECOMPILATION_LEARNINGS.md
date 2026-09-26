@@ -138,7 +138,7 @@ load through a runtime-indexed global", §"BLOCKED: the `nop_mflo_mfhi` screen r
   same result")
 - **`do { ... } while (0)` is a REAL RTL construct to 2.6.3, not a no-op brace block.** The loop
   pass runs over it, so it can change code a plain `{ }` in the identical place does not, and that
-  bare-brace control IS the discriminator. Its effect is not fixed: scheduling on `Class866E8__SplitFootprintSlot`,
+  bare-brace control IS the discriminator. Its effect is not fixed: scheduling on `StageMap__SplitFootprintSlot`,
   global register allocation on `Snd_decrescendo`. (a round 58, bravo + charlie)
 - **A one-instruction `else` arm leaves NO BLOCK**: reorg steals it into the branch's own delay slot
   and the branch targets the outer join, so "retail assigns this in a delay slot, mine assigns it
@@ -153,7 +153,7 @@ load through a runtime-indexed global", §"BLOCKED: the `nop_mflo_mfhi` screen r
   is this, not a block-order result. (a round 65)
 - **The ORDER of comma expressions in a `for` increment clause is a scheduling lever**: swapping
   `i++, p++` to `p++, i++` fixed a loop tail's `addu`/`addiu` pairing, and the inner loop's swap
-  closed `Class866E8__DispatchToRectCells` 117/117 after a round-19 permuter bound fired. Try it by
+  closed `StageMap__DispatchToRectCells` 117/117 after a round-19 permuter bound fired. Try it by
   hand at any loop-tail residue before a search. (round 71)
 - **A loop whose ONLY call sits at the bottom, reached by an entry `j`, and is also the loop's first
   action is `for (f(); cond; f())` with the call written TWICE**: cross-jump merges the copies into
@@ -162,7 +162,7 @@ load through a runtime-indexed global", §"BLOCKED: the `nop_mflo_mfhi` screen r
   increment's, deciding which setup lands around an intervening `jalr`. (round 82, code_322b4)
 - **One store retail shows at a join may be the SAME store written in both arms**: GCC merges the
   identical stores into the join block, and the label that merge creates stops a following reload
-  from hoisting above it. `Class866E8__SplitFootprintSlot` 97/97; the barriers and `do{}while(0)` it had carried were
+  from hoisting above it. `StageMap__SplitFootprintSlot` 97/97; the barriers and `do{}while(0)` it had carried were
   compensating for that missing label. (round 71)
 - **A stall whose compiled LENGTH differs from retail is a control-flow defect until shown
   otherwise, whatever its title calls it.** `ItemList__ItemList`, filed "register rotation, 6/107" since
@@ -367,7 +367,7 @@ load through a runtime-indexed global", §"BLOCKED: the `nop_mflo_mfhi` screen r
   asm-differ points where a fresh one was worth 500; ADDING a hoisted base pointer moved
   `SpuVmAlloc`. The delete direction needs a CALL-crossing live range, so it does not apply to
   leaves. A permuter never merges or deletes locals, so local count is a PARAMETER of its search
-  space: `Class866E8__ComputeRateEntry` (four locals into two) and `Class866E8__BuildRateEntries` (one deleted) closed after ~330k
+  space: `StageMap__ComputeRateEntry` (four locals into two) and `StageMap__BuildRateEntries` (one deleted) closed after ~330k
   iterations missed both. (a round 65; round 63)
 
 - **A register swap that REPEATS at every expansion of a `do { } while (0)` macro closes as a
@@ -378,13 +378,13 @@ load through a runtime-indexed global", §"BLOCKED: the `nop_mflo_mfhi` screen r
 
 - **A base-plus-running-offset walk in retail is strength reduction of `&self->arr[i]`**: write
   the index and let GCC produce the walk and its delay-slot increment. Hand-rolling `(u8 *)self +
-  off; off += 0x1C` reproduces the arithmetic but not the schedule (`Class866E8__ResetAllElements`,
+  off; off += 0x1C` reproduces the arithmetic but not the schedule (`StageMap__ResetAllElements`,
   9/74 -> 74/74 on the first build). (round 71)
   Likewise a register stepping by a constant beside the counter is GCC's own `i * K`: write
   `table + i * 3`, not a hand-stepped counter (`StyleBuildDecorSet`, 17/86 -> 86/86, round 76).
 - **A value in a callee-saved register with no call visibly crossing it was ASSIGNED before a
   call**: GCC sank the computation into a delay slot after the call, which reads as a pointless
-  promotion. Move the assignment to right after its input is loaded (`Class866E8__ComputeFootprintFromRotation`, filed as a
+  promotion. Move the assignment to right after its input is loaded (`StageMap__ComputeFootprintFromRotation`, filed as a
   HARD RULE 6 stall in round 34, 85/165 -> 131/165 length-exact). (round 71)
 
 - **A full parameter register swap at 0/0 can be global-alloc PRIORITY, and `cc1 -dl` measures
@@ -395,7 +395,7 @@ load through a runtime-indexed global", §"BLOCKED: the `nop_mflo_mfhi` screen r
 - **Split a variable REUSED for two unrelated values** — the inverse of the delete-a-local lever.
   Discriminator: an equal-length rotation among saved registers, one local assigned in two
   independent halves. Closed `ItemList__LoadResources` (three-way rotation, 75/95) on the
-  first build and `Class866E8__LoadElementResources` 142/150. (PROGRESS round 73)
+  first build and `StageMap__LoadElementResources` 142/150. (PROGRESS round 73)
 - **An address whose BASE is `$a0` while the object lives in `$s0` means a second C variable
   aliasing `this`.** Scheduling and delay-slot filling move instructions but never change which
   register an address uses. Closed `DreamSys__StepLookYaw` (1 short). (PROGRESS round 73)
@@ -410,10 +410,10 @@ load through a runtime-indexed global", §"BLOCKED: the `nop_mflo_mfhi` screen r
   whatever the source order; a NAMED local keeps its source position** (`cc1 -dr`). So flipping
   textual order is inert, and a field load FIRST in retail means the source had it in a local;
   assign it inside the expression (`a < (w = r->f) + tol`) to keep load order. Closed
-  `Class866E8__FindElementForPosition` 69/70 after ~183k permuter iterations. (PROGRESS round 73)
+  `StageMap__FindElementForPosition` 69/70 after ~183k permuter iterations. (PROGRESS round 73)
 - **A `+4` walker set up from an ARGUMENT register after a loop's count check is GCC's loop
   optimiser, not a C pointer**: advance the parameter itself and take `&p->field` inside the body; a
-  C-initialised second pointer always lands before the check. Closed `Class866E8__ApplyRateEntries`. (round 73)
+  C-initialised second pointer always lands before the check. Closed `StageMap__ApplyRateEntries`. (round 73)
 
 ### 3e. Frames and stack
 
@@ -598,7 +598,7 @@ load through a runtime-indexed global", §"BLOCKED: the `nop_mflo_mfhi` screen r
   (`s + (p + 0x14)` -> `(s + p) + 0x14`), so no spelling containing the literal reaches retail's
   grouping. A local `hdr = 0x14` survives it and cse turns it back into an immediate (`Viewport__InitOt`,
   73/73 after 14 groupings and ~89k permuter iterations); splitting `(w + 20) - span` into two
-  statements closed `Class866E8__SplitFootprintSlot`. (round 71) The same goes for a multiply and a byte constant: retail's `li; mult` right after storing that constant is the multiply BY THE STORED FIELD (a literal `* 15` strength-reduces to `sll`/`subu`, one word short; round 82, code_33808), and `li 0x80` feeding `s8` stores is `s32 grey = 0x80;` (the literal folds to `li -0x80`; `InitGsSprite`, round 82).
+  statements closed `StageMap__SplitFootprintSlot`. (round 71) The same goes for a multiply and a byte constant: retail's `li; mult` right after storing that constant is the multiply BY THE STORED FIELD (a literal `* 15` strength-reduces to `sll`/`subu`, one word short; round 82, code_33808), and `li 0x80` feeding `s8` stores is `s32 grey = 0x80;` (the literal folds to `li -0x80`; `InitGsSprite`, round 82).
 - **A flat table indexed `&T[r*C]` then `[c]` wants a named row-pointer local, `T (*tbl)[C] = ...;
   tbl[r][c]`**: the local puts the table-address load before the index arithmetic; the inline
   cast does not. Closed `CalcDreamColor` 28/35. (round 73)

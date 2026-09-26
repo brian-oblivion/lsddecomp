@@ -4,19 +4,19 @@
 #include "common.h"
 #include "BasicClass.h"
 #include "TaskCore.h"
-#include "Class866E8.h"
+#include "StageMap.h"
 
 /*
- * class_3bb8c.c and class_3bb8c_b.c hold the back half of Class866E8 (the
- * grid manager, gClass866E8Methods), which is declared once, in
- * include/Class866E8.h (track 4, round 89). What stays here is that class's
+ * class_3bb8c.c and class_3bb8c_b.c hold the back half of StageMap (the
+ * grid manager, gStageMapMethods), which is declared once, in
+ * include/StageMap.h (track 4, round 89). What stays here is that class's
  * data (the rate and footprint tables) and the helper views its two units
  * read through casts.
  */
 typedef struct Unk14Obj Unk14Obj;
 typedef struct QueryTemplate866E8 QueryTemplate866E8;
 
-/* The rectangle Class866E8__InitFootprintSlot copies into rects[key] before
+/* The rectangle StageMap__InitFootprintSlot copies into rects[key] before
  * setting its element: no element (-1), the whole 20 x 20 cells from (0, 0). */
 extern CellRect gDefaultElemRateOffset;
 
@@ -25,23 +25,23 @@ extern CellRect gDefaultElemRateOffset;
  * (asm/data/76DC8.data.s). */
 extern ChunkSlotSpec sDefaultTargetSpecs[7];
 
-/* Indexed by ChunkSlotSpec::key in Class866E8__BuildRateEntries: the
+/* Indexed by ChunkSlotSpec::key in StageMap__BuildRateEntries: the
  * world offset of that neighbour's cellParent from the centre position. Bound unknown (`key` is the caller's
  * byte), so unsized. */
 extern LongVec3 sRateOffsetTable[];
 
-/* `key`-indexed bitmask table (`1 << key`) Class866E8__ComputeRateEntry tests
+/* `key`-indexed bitmask table (`1 << key`) StageMap__ComputeRateEntry tests
  * against ComputeRateFlags' result. 7 words in the data before
  * sRateEntryTable starts. */
 extern const s32 sRateKeyMask[7];
 
 /* `key`-indexed chunk-index steps to the seven chunks around a centre chunk
- * (ChunkNeighbourDelta, include/Class866E8.h), 7 entries
+ * (ChunkNeighbourDelta, include/StageMap.h), 7 entries
  * (0x800868A8-0x800868FC). */
 extern const ChunkNeighbourDelta sRateEntryTable[7];
 
 /* LbdFile::ownerKey-indexed remap, read signed by
- * Class866E8__UpdateFootprintTracking: exactly 8 bytes in the data
+ * StageMap__UpdateFootprintTracking: exactly 8 bytes in the data
  * (01 02 03 00 04 05 06 00) before sDefaultTargetSpecs. The byte (0..6) is
  * UpdateFootprintTracking's return value and the index into
  * sFootprintResultPtrTable. */
@@ -56,9 +56,9 @@ extern ChunkSlotSpec *sFootprintResultPtrTable[7];
 /*
  * A GsCOORDINATE2 (SceneNodeSub14) read as the element's origin: an
  * element's cellParent->coord2, reached through a cast. tx (+0x018) and tz
- * (+0x020) are unions because Class866E8__ComputeFootprintDescriptor reads
+ * (+0x020) are unions because StageMap__ComputeFootprintDescriptor reads
  * each whole (the cell) and, later, as its low halfword (the offset):
- * retail reloads at the narrower width. Class866E8__BuildRateEntries writes
+ * retail reloads at the narrower width. StageMap__BuildRateEntries writes
  * all three and clears `flg` (+0x000).
  */
 struct Unk14Obj {
@@ -79,7 +79,7 @@ struct Unk14Obj {
 };
 
 /*
- * Template struct copied wholesale by Class866E8__ComputeFootprintFromRotation from the constant
+ * Template struct copied wholesale by StageMap__ComputeFootprintFromRotation from the constant
  * global `D_8008E98C` into a stack-local descriptor, then partially
  * overwritten (`unk14`/`unk18` zeroed, `unk1C` set from `self->gridSpan`)
  * before being handed to two uncarved library helpers
@@ -88,15 +88,15 @@ struct Unk14Obj {
  * five words are read/written only as the opaque whole-struct copy.
  */
 struct QueryTemplate866E8 {
-    s32 unk0[5]; /* +0x000..+0x010, opaque (untouched by Class866E8__ComputeFootprintFromRotation) */
-    s32 unk14; /* +0x014, Class866E8__ComputeFootprintFromRotation: zeroed before the call, then an in/out arg to ApplyMatrixLV */
-    s32 unk18; /* +0x018, Class866E8__ComputeFootprintFromRotation: zeroed before the call */
-    s32 unk1C; /* +0x01C, Class866E8__ComputeFootprintFromRotation: set to self->gridSpan before the call */
+    s32 unk0[5]; /* +0x000..+0x010, opaque (untouched by StageMap__ComputeFootprintFromRotation) */
+    s32 unk14; /* +0x014, StageMap__ComputeFootprintFromRotation: zeroed before the call, then an in/out arg to ApplyMatrixLV */
+    s32 unk18; /* +0x018, StageMap__ComputeFootprintFromRotation: zeroed before the call */
+    s32 unk1C; /* +0x01C, StageMap__ComputeFootprintFromRotation: set to self->gridSpan before the call */
 };
 
 extern QueryTemplate866E8 D_8008E98C;
 
-/* Library helpers (Class866E8__ComputeFootprintFromRotation's only call
+/* Library helpers (StageMap__ComputeFootprintFromRotation's only call
  * site). `RotMatrix`'s first argument is the target's coord2->param->rotate.
  * `ApplyMatrixLV` is called with its 2nd and 3rd arguments pointing at the
  * SAME address (`&desc.unk14` passed twice) -- confirmed against the raw
@@ -113,14 +113,14 @@ extern Ratio16 D_800869A8[3];
 extern Ratio16 D_800869B4[3];
 extern Ratio16 D_800869C0[3];
 
-/* 1/1, 1/1, 1/1: the scale Class866E8__ResetChildRate sets on every cell. */
+/* 1/1, 1/1, 1/1: the scale StageMap__ResetChildRate sets on every cell. */
 extern Ratio16 D_800869CC[3];
 
 /* -------------------------------------------------------------------
  * class_3bb8c_c additions below. Small sibling classes, each built by
  * its own New_X/ctor pair (allocator + base-chain + own-vtable-set, the
  * same shape as TimedTask__TimedTask in class_39e08.c). Named by their
- * vtable's address, same convention as Class866E8/TimedTask. The first
+ * vtable's address, same convention as StageMap/TimedTask. The first
  * of them, NodeGuardedViewport (gNodeGuardedViewportMethods, a Viewport), is defined in
  * include/NodeGuardedViewport.h (round 87, track 4).
  * ------------------------------------------------------------------- */
@@ -368,7 +368,7 @@ extern s32 CopyMemcardIconTemplate(s32 arg0, s32 arg1); /* TaskObjF__WriteMemcar
  * round 89). The views `ObjM` (class_3bb8c_m) and `Obj87034_3bb8c_l`, and
  * their helper views of the objects ObjM holds (FieldM14/18/34/50/7C,
  * ChildM_AC, ChildM114, ParamM, Obj14/StyleWorldObj/RegistrantObj_3bb8c_l)
- * are gone: those objects are the unified Class866E8, NodeGuardedViewport,
+ * are gone: those objects are the unified StageMap, NodeGuardedViewport,
  * Class6E99C, TimBlockSrc, VabStreamObj, FrameClock, WBgm and TextRow. */
 
 /* ObjM::styleConfig's pointee (include/ObjM.h): not a class, a plain
@@ -376,9 +376,9 @@ extern s32 CopyMemcardIconTemplate(s32 arg0, s32 arg1); /* TaskObjF__WriteMemcar
  * (D_80087424, which ApplyStyleConfig fills and RegisterStyleConfig
  * returns). What ObjM's methods do with each word: */
 typedef struct Unk50Struct_3bb8c_l {
-    s32 unk0;   /* +0x000, SetupSceneStyle: the Class866E8's setChildParams `dirs` */
+    s32 unk0;   /* +0x000, SetupSceneStyle: the StageMap's setChildParams `dirs` */
     s32 unk4;   /* +0x004, SetupSceneStyle: setChildParams `colors` */
-    s32 unk8;   /* +0x008, SetupSceneStyle: the Class866E8's setAmbientColor rgb (a pointer) */
+    s32 unk8;   /* +0x008, SetupSceneStyle: the StageMap's setAmbientColor rgb (a pointer) */
     void *unkC; /* +0x00C, a colour: the viewport's setClearColor (EnterStyleSession); the TimBlockSrc's fadeAllEntries when unk14 is 2 (PollTimBlockLoad); StyleM's D_800872C4 entry */
     u8 pad10[0x014 - 0x010];
     s32 unk14; /* +0x014, selects unkC or unk18: PollTimBlockLoad against 2, EnterStyleSession against 1 */

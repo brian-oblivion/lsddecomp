@@ -27,7 +27,7 @@ counted as the same register). Blocker screen clean (no `gp_rel`, no
 LENGTH are settled** — the best attempt compiles to exactly 51 words with
 **zero address drift** (no "differs outside this range" warning), the
 same "confirmed zero-drift register PERMUTATION" signature CLAUDE.md
-documents for `Class866E8__BuildFootprintSlots` in the `class_3bb8c_b`/`_c` header family.
+documents for `StageMap__BuildFootprintSlots` in the `class_3bb8c_b`/`_c` header family.
 Retail's own register assignment: `self`→`$fp`, `a1`→`$s3`, `handle`→
 `$s2`, `a3`→`$s7`, `arg5`→`$s6`, `arg6`→`$s5`, `arg7`→`$s4`, plus `$s1`
 (retry counter) and `$s0` (result). The best attempt reached (preserved
@@ -50,7 +50,7 @@ not a missing or extra value.
 3. **Local-declaration order** (`count`/`result` swapped) — reverted
    immediately, made things worse (back to 31/51).
 
-Given `Class866E8__BuildFootprintSlots`'s own report (this same header-family class,
+Given `StageMap__BuildFootprintSlots`'s own report (this same header-family class,
 documented in CLAUDE.md) already tried declaration-order and
 branch-structure reshaping across 7 variants with an isolated
 sub-second reproducer and never moved a SINGLE value off its
@@ -113,7 +113,7 @@ two units.
 
 Given this function's own STALL classification cited CLAUDE.md's
 "register-identity permutation, not fixable by reshaping" class (confirmed
-independently by `Class866E8__BuildFootprintSlots`, 7 variants, zero movement), a permuter
+independently by `StageMap__BuildFootprintSlots`, 7 variants, zero movement), a permuter
 run was set up with TARGETED `PERM_GENERAL` macros over the two axes
 round-17's manual attempts had already identified as levers (declaration
 order of `count`/`result`; statement order of `count = 10;` vs. the
@@ -198,7 +198,7 @@ drift" stall class on the strength of "every value is already the right
 TYPE, only the register differs" should still have its ARGUMENT/LOCAL
 TYPES individually re-examined, not assumed correct, before accepting the
 classification.** This function's own residue was filed as a 3-instance
-confirmation of that class alongside `Class866E8__BuildFootprintSlots`/`ItemList__LoadResources` (see
+confirmation of that class alongside `StageMap__BuildFootprintSlots`/`ItemList__LoadResources` (see
 those reports, also round 18) -- but unlike those two (where nine
 combined declaration-order attempts across three functions moved nothing),
 this one's actual cause was a narrower, single-parameter type mismatch
@@ -210,7 +210,7 @@ declared wider than a byte is exactly the shape worth re-typing before
 accepting a register-identity stall, the same way CLAUDE.md's `s8`/`s16`
 struct-field guidance already treats a narrow access as a signal about the
 DECLARED width. Suggest cross-referencing this note from
-`Class866E8__BuildFootprintSlots`'s and `ItemList__LoadResources`'s entries in
+`StageMap__BuildFootprintSlots`'s and `ItemList__LoadResources`'s entries in
 `docs/DECOMPILATION_LEARNINGS.md`'s existing class writeup, since this
 round closed one of three instances that class currently claims and the
 mechanism that closed it does not generalize to the other two (both

@@ -6,7 +6,7 @@
  * This slice is entirely ObjM's own methods (gObjMMethods, include/ObjM.h;
  * track 4, round 89 unified the class_3bb8c_k/_l/_m views there), slots
  * +0x040..+0x09C in table order: the init/deinit pair (AttachTarget keeps
- * the DreamSys and hooks the Class866E8's callback, DetachTarget), onInit
+ * the DreamSys and hooks the StageMap's callback, DetachTarget), onInit
  * and onDeinit (InitStyleAndWorld, TeardownStyle), onTag1Notify with the
  * TimBlockSrc poll it runs (PollTimBlockLoad), onPadEvent
  * (DispatchPadEvent), update, togglePause (ObjM__TogglePause), the style scene
@@ -23,7 +23,7 @@
 #include "TimedTask.h"
 #include "DreamSys.h"
 #include "ObjM.h"
-#include "Class866E8.h"
+#include "StageMap.h"
 #include "NodeGuardedViewport.h"
 #include "Class6E99C.h"
 #include "TimBlockSrc.h"
@@ -32,11 +32,11 @@
 void ObjM__NoOpSlot40(void) {}
 
 /* init. `args` is the building Class865C8's init args: args->unkC is its
- * Class866E8 (IntermediateBase__Init keeps it as unk14), whose callback
+ * StageMap (IntermediateBase__Init keeps it as unk14), whose callback
  * becomes ObjM__OnRegistrantEvent. */
 void ObjM__AttachTarget(ObjM *self, IntermediateBaseInitArgs *args, DreamSys *dreamSys) {
-    ((Class866E8 *)args->lightRig)
-        ->methods->setCallback((Class866E8 *)args->lightRig,
+    ((StageMap *)args->lightRig)
+        ->methods->setCallback((StageMap *)args->lightRig,
                                (ChunkFileFn)ObjM__OnRegistrantEvent, self);
     self->dreamSys = dreamSys;
     GetTimedTaskMethods()->init((TimedTask *)self, args, 1);
@@ -66,7 +66,7 @@ extern void func_8001EF60(s32 arg0);
 extern s32 RegisterStyleConfig(void *arg0, s32 arg1, s32 *arg2, s32 arg3, s32 arg4);
 
 /* Data reached by address: the viewport's view point and view reference
- * (attachViewChild), the Class866E8's bounds; and D_80087118, one
+ * (attachViewChild), the StageMap's bounds; and D_80087118, one
  * setPendingExtra value per stage. */
 extern s32 D_8008715C;
 extern s32 D_80087168;
@@ -126,13 +126,13 @@ void ObjM__InitStyleAndWorld(ObjM *self, s32 gridSpan, Unk50Struct_3bb8c_l *styl
         if (stage == three) {
             flag = 1;
         }
-        ((Class866E8 *)self->unk14)->methods->setBounds((Class866E8 *)self->unk14, 0);
+        ((StageMap *)self->unk14)->methods->setBounds((StageMap *)self->unk14, 0);
     } else {
         self->unk40 = 0x10;
         self->unk44 = 2;
         flag = 1;
-        ((Class866E8 *)self->unk14)
-            ->methods->setBounds((Class866E8 *)self->unk14, (CellBounds *)&D_80087150);
+        ((StageMap *)self->unk14)
+            ->methods->setBounds((StageMap *)self->unk14, (CellBounds *)&D_80087150);
     }
 
     self->gridSpan = gridSpan;
@@ -162,7 +162,7 @@ void ObjM__OnTag1Notify(ObjM *self, void *sender, s32 event) {
 /* `src` is always self->timBlockSrc. Loaded, its CLUT rows fade to a
  * styleConfig colour; failed or loaded, it is released and the scene set
  * up (a failure also adds 0x1E to the DreamSys's time limit). With nothing
- * pending and the Class866E8 idle, the style session starts. */
+ * pending and the StageMap idle, the style session starts. */
 void ObjM__PollTimBlockLoad(ObjM *self, TimBlockSrc *src) {
     s32 ret;
     s32 sel;
@@ -191,7 +191,7 @@ void ObjM__PollTimBlockLoad(ObjM *self, TimBlockSrc *src) {
         }
     }
     if (self->timBlockPending == 0) {
-        if (((Class866E8 *)self->unk14)->unk1B4 == 0 && self->inSession == 0) {
+        if (((StageMap *)self->unk14)->unk1B4 == 0 && self->inSession == 0) {
             self->unk64 = 1;
             self->methods->enterStyleSession(self);
         }
@@ -292,7 +292,7 @@ extern void SetDreamAuxWorld(s32 a0, s32 a1, DreamSys *world, s32 a3, s32 a4);
 /* A plain `s32` bias added to the projection distance (%gp_rel value). */
 extern s32 D_8008AB34;
 
-/* The Class866E8's accepted tags (setAcceptedTags), an opaque .data block
+/* The StageMap's accepted tags (setAcceptedTags), an opaque .data block
  * (asm/data/76DC8.data.s) reached by address. */
 extern s32 D_8008710C;
 
@@ -301,7 +301,7 @@ void ObjM__SetupSceneStyle(ObjM *self) {
     Unk50Struct_3bb8c_l *style = self->styleConfig;
     UnkCObj_3bb8c_l *obj;
     s32 val;
-    Class866E8 *rig;
+    StageMap *rig;
 
     vp->methods->detachViewChild(vp);
 
@@ -314,7 +314,7 @@ void ObjM__SetupSceneStyle(ObjM *self) {
 
     SetDreamAuxWorld(self->stage, (s32)self->unk14, self->dreamSys, (s32)self->sound, (s32)self->unk10);
 
-    rig = (Class866E8 *)self->unk14;
+    rig = (StageMap *)self->unk14;
     self->methods->addChild(self, (BasicClass *)rig);
 
     rig->methods->setAmbientColor(rig, (LightRigRgb *)style->unk8, 0);
@@ -346,7 +346,7 @@ void ObjM__EnterStyleSession(ObjM *self) {
 
     self->inSession = 1;
     self->dreamSys->methods->resetLinkState(self->dreamSys, self->unk44, self->unk40);
-    ((Class866E8 *)self->unk14)->methods->enable((Class866E8 *)self->unk14);
+    ((StageMap *)self->unk14)->methods->enable((StageMap *)self->unk14);
 
     vp = (NodeGuardedViewport *)self->viewport;
     style = self->styleConfig;
@@ -378,7 +378,7 @@ void ObjM__EnterStyleSession(ObjM *self) {
 }
 
 void ObjM__TickStyle(ObjM *self) {
-    TickStyle(((Class866E8 *)self->unk14)->methods->getTargetDescriptor((Class866E8 *)self->unk14, 0, 0),
+    TickStyle(((StageMap *)self->unk14)->methods->getTargetDescriptor((StageMap *)self->unk14, 0, 0),
               0, 0);
 }
 

@@ -364,7 +364,7 @@ field. (ItemList__ItemList, one word, 66 -> 98/107.)
   0x800521D4..0x80052DE0, 20 functions, all matched) were carved in round 15
   and named in round 75 (track 3).
 - Both attributions in `class_3bb8c_j` were wrong before round 75: the
-  TextEntry group was typed as Class866E8's `Obj866E8`, and this class's
+  TextEntry group was typed as StageMap's `Obj866E8`, and this class's
   group was named after gTextEntryMethods (the section above has the
   `tools/classtable.py` evidence). The class was declared in its own header
   in track 4 (round 89) as `Class86F88`, and named `ItemList` in track 6

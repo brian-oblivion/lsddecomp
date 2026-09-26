@@ -87,6 +87,6 @@ extern s32 func_8004A070(s32 arg1);
  * value discarded at this call site. */
 extern s32 SetActiveDataSourceDriverMode(s32 arg1, s32 arg2, s32 arg3);
 
-/* New_Class866E8 is declared in include/Class866E8.h. */
+/* New_StageMap is declared in include/StageMap.h. */
 
 #endif

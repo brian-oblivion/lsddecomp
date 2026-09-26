@@ -4,12 +4,12 @@
  * vtable): NodeGuardedViewport, GridCell and Class86B60. All three follow
  * the same class-framework shape documented in
  * docs/research/class-framework.md and already used elsewhere in this
- * codebase (e.g. class_3ac78.c's Class866E8).
+ * codebase (e.g. class_3ac78.c's StageMap).
  *
  * NodeGuardedViewport (include/NodeGuardedViewport.h) is a Viewport whose
  * update skips the frame while no view node is attached; its seven table
  * methods, New_ and the getter are all here. GridCell (include/GridCell.h,
- * a SceneNode) is one cell of Class866E8's grid, carrying the model placed
+ * a SceneNode) is one cell of StageMap's grid, carrying the model placed
  * there; its five table methods, New_ and the getter are all here too.
  * Class86B60
  * (include/Class86B60.h, a TaskCore) is the largest of the three -- its own

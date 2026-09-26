@@ -151,7 +151,7 @@ void Actor__AddChild(Actor *self, BasicClass *child) {
     GetSceneNodeMethods()->addChild((SceneNode *)self, child);
     tag = child->methods->header;
     if ((tag & 0xFFF) == 0x114) {
-        self->grid = (struct Class866E8 *)child;
+        self->grid = (struct StageMap *)child;
     } else if ((tag & 0xF) == 5) {
         self->ticker = child;
     }

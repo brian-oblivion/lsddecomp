@@ -11,7 +11,7 @@
 Get-vtable helper for a small sibling class: returns `&gNodeGuardedViewportMethods`, the
 vtable this unit calls `NodeGuardedViewportMethods`. Same shape as the game's other
 `func_80xxxxxx()->ctor(...)` vtable getters (e.g. class_3ac78.c's
-`GetTimedTaskMethods`/`GetClass866E8Methods`).
+`GetTimedTaskMethods`/`GetStageMapMethods`).
 
 ## The C
 
@@ -28,7 +28,7 @@ NodeGuardedViewportMethods *GetNodeGuardedViewportMethods(void)
 as every other one in this codebase: header word (0x17), then a
 `BasicClass__Release` slot at +0x004, then a ctor at +0x008. Resolved by
 reading the table directly (it isn't registered with `tools/classtable.py`,
-since it isn't `gClass866E8Methods`'s own table -- this is a distinct, smaller
+since it isn't `gStageMapMethods`'s own table -- this is a distinct, smaller
 class). Only the slots this unit's own functions reach are typed:
 +0x008 (`ctor`, NodeGuardedViewport__NodeGuardedViewport) and +0x040 (a post-construct hook,
 NodeGuardedViewport__InitDefaults, already matched as an empty body). See

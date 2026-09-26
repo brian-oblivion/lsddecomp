@@ -48,7 +48,7 @@ this time reached through a vtable dispatch rather than a bare `jal`.
 
 ## Naming
 
-**Tier A.** `New_X` allocator convention (`New_Actor`, `New_SceneNode`, `New_Class866E8`, `New_BoxFill`, `New_VabStreamObj`), matching this unit's own established allocator shape and `Class876FC` (see below).
+**Tier A.** `New_X` allocator convention (`New_Actor`, `New_SceneNode`, `New_StageMap`, `New_BoxFill`, `New_VabStreamObj`), matching this unit's own established allocator shape and `Class876FC` (see below).
 
 ## Track 4 (2026-09-26, round 88, charlie)
 
