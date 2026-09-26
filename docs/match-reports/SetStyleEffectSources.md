@@ -1,4 +1,6 @@
-# Actor__func_56f5c -- MATCHED, round 44 (2026-09-15)
+# SetStyleEffectSources -- MATCHED, round 44 (2026-09-15)
+
+> Renamed from `Actor__func_56f5c` on 2026-09-26 (tools/rename.py). Address 0x80056f5c.
 
 > Renamed from `BaseObjO__func_56f5c` on 2026-09-25 (tools/rename.py). Address 0x80056f5c.
 
@@ -28,7 +30,7 @@ extern s32 D_8008AB94;
 
 extern void SetTargetOffset(void *arg0, void *arg1);
 
-void Actor__func_56f5c(s32 arg0, BaseObjO *self, s32 arg2, s32 arg3) {
+void SetStyleEffectSources(s32 arg0, BaseObjO *self, s32 arg2, s32 arg3) {
     s32 i;
     void *ret;
 
@@ -67,7 +69,7 @@ slot (return/argument shape) without derivation risk.
 
 ## Naming
 
-**`Actor__func_56f5c` -- tier C.** Class is known (`self` is `BaseObjO`,
+**`SetStyleEffectSources` -- tier C.** Class is known (`self` is `BaseObjO`,
 confirmed by the `self->methods->slot80` dispatch), and the mechanics are
 fully described in this report (stash `self`/two scalars into three
 globals, then loop twice through the still-unresolved `slot80` occupant

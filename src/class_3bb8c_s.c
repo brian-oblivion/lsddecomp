@@ -51,14 +51,14 @@ extern void NoOpIgnoreArgs();
 
 /* New_VariantSprite: include/VariantSprite.h. */
 
-/* Three globals class_3bb8c_o.c's Actor__func_56f5c captures once from its
+/* Three globals class_3bb8c_o.c's SetStyleEffectSources captures once from its
  * parameters (declared there with the same types; track 4b, round 85):
  * gStyleEffectTmd is the Actor it ran on, called here through SceneNode's
  * +0x080 getSetUnk10Flag8 as that function calls it; gStyleEffectTim is
  * forwarded opaquely to New_VariantSprite as its third argument; gStyleEffectViewport's
  * pointee has a field at +0x018 that StyleEffect__InitByKind and
  * StyleEffect__UpdateByKind snapshot/diff via gStyleEffectBaseViewY. */
-extern Actor *gStyleEffectTmd; /* the Actor Actor__func_56f5c ran on */
+extern Actor *gStyleEffectTmd; /* the Actor SetStyleEffectSources ran on */
 extern void *gStyleEffectTim;
 extern void *gStyleEffectViewport;
 extern s32 gStyleEffectBaseViewY;

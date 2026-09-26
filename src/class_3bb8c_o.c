@@ -100,7 +100,7 @@ extern s32 D_8008AB94;
 
 extern void SetTargetOffset(void *arg0, void *arg1);
 
-void Actor__func_56f5c(s32 unused, Actor *self, s32 arg2, s32 arg3) {
+void SetStyleEffectSources(s32 unused, Actor *self, s32 arg2, s32 arg3) {
     s32 i;
     void *ret;
 

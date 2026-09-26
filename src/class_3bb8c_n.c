@@ -273,7 +273,7 @@ extern StyleEffect **StyleFillEffectKind1(StyleEffect **slots, s32 count, LongVe
 extern StyleEffect **StyleFillEffectKind3(StyleEffect **slots, LongVec3 *pos);
 extern StyleEffect **StyleFillEffectKind2(StyleEffect **slots, LongVec3 *pos);
 
-/* Hands the variant and ObjM's resources to Actor__func_56f5c, then builds
+/* Hands the variant and ObjM's resources to SetStyleEffectSources, then builds
  * the effect slots for the variant: gStyleKind0Counts' pick of
  * kind 0, kind 1 up to STYLE_VARIANT2_EFFECTS for variant 2, then one kind-3
  * (variant 0) or kind-2 (variant 2). */
@@ -287,7 +287,8 @@ void StyleBuildEffectSlots(LongVec3 *pos) {
         return;
     }
     refs = (StyleSceneRefs *)gStyleSceneRefs;
-    Actor__func_56f5c(gStyleVariant, (Actor *)refs->dreamerTmd, (s32)refs->etcTim, (s32)refs->viewport);
+    SetStyleEffectSources(gStyleVariant, (Actor *)refs->dreamerTmd, (s32)refs->etcTim,
+                          (s32)refs->viewport);
     kind0Count = gStyleKind0Counts[rand() & 3];
     kind1Count = (gStyleVariant == 2) ? STYLE_VARIANT2_EFFECTS - kind0Count : 0;
     gStyleEffectSlotCount = kind0Count + kind1Count;

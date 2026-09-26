@@ -187,7 +187,7 @@ method signatures; zero bytes changed.
 | slot +0x0BC | slotBC | addTranslation | B | Actor__AddTranslation; only called on model children (sprite override is a no-op) |
 
 The unused `D_8008ACA4Methods::slot80` is left alone: gStyleEffectTmd is a
-different object (captured by Actor__func_56f5c) whose class is unknown.
+different object (captured by SetStyleEffectSources) whose class is unknown.
 
 ## Proposed field names
 
@@ -206,7 +206,7 @@ For the HEAD, by type scope; none applied here (other units' views).
 
 `gStyleEffectTmd`/`gStyleEffectTim`/`gStyleEffectViewport` were `s32` in class_3bb8c_o.c and
 `D_8008ACA4Obj *`/`void *`/`void *` in class_3bb8c_s.c. Both units now
-declare `Actor *`/`void *`/`void *`: the local `D_8008ACA4Methods` view is gone and the +0x080 call reads `getSetUnk10Flag8`, the name `Actor__func_56f5c` calls the same slot by. Byte-identical; no new `-Wall`
+declare `Actor *`/`void *`/`void *`: the local `D_8008ACA4Methods` view is gone and the +0x080 call reads `getSetUnk10Flag8`, the name `SetStyleEffectSources` calls the same slot by. Byte-identical; no new `-Wall`
 warning.
 
 ## Track 4 (2026-09-26, round 88, charlie)
