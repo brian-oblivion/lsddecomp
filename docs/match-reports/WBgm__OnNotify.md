@@ -115,3 +115,9 @@ extern WBgmMethods gWBgmMethods;
 extern s32 gWBgmActive;
 extern u8 gSsSizeTableBuf[];
 ```
+
+## Track 4 (2026-09-26, round 88, alpha)
+
+The class is now declared once, in `include/WBgm.h` (table `gWBgmMethods`, renamed from `D_8006E48C` with tools/rename.py this round); `src/code_2a0e0.c` keeps no view of it, so the view quoted in this report's source section is historical. Image byte-identical after every step.
+
+The forward to +0x040 update now casts the sender `(DrawSystem *)` instead of `(s32)`: the call is guarded by the DrawSystem kind-of test (`(header & 0xF) == 1`).

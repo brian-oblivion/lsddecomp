@@ -139,3 +139,9 @@ Class6D430's `buffer` (+0x010), `loaded` the same field under the same
 name; the release calls lose their `(BasicClass *)` casts and WBgm__SetSeq
 casts its s32 argument to the ctor's `char *name`. The whole image stays
 byte-identical; the Source block above is the earlier text.
+
+## Track 4 (2026-09-26, round 88, alpha)
+
+The class is now declared once, in `include/WBgm.h` (table `gWBgmMethods`, renamed from `D_8006E48C` with tools/rename.py this round); `src/code_2a0e0.c` keeps no view of it, so the view quoted in this report's source section is historical. Image byte-identical after every step.
+
+Parameter retyped `s32 arg` -> `char *seqPath` (slot +0x05C with it); the `(char *)` cast before New_Class6EED8 is gone and the test reads `seqPath != NULL`. Callers: WBgm__WBgm (its seqPath argument; the one construction passes NULL). No C outside this unit names the slot (grep; INCLUDE_ASM callers through +0x05C were not searched).

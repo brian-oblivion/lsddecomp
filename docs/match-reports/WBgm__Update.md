@@ -71,3 +71,9 @@ extern WBgmMethods gWBgmMethods;
 extern s32 gWBgmActive;
 extern u8 gSsSizeTableBuf[];
 ```
+
+## Track 4 (2026-09-26, round 88, alpha)
+
+The class is now declared once, in `include/WBgm.h` (table `gWBgmMethods`, renamed from `D_8006E48C` with tools/rename.py this round); `src/code_2a0e0.c` keeps no view of it, so the view quoted in this report's source section is historical. Image byte-identical after every step.
+
+Parameters renamed and retyped `(s32 arg1, s32 arg2)` -> `(DrawSystem *sender, s32 event)`, slot +0x040 with them. Caller: WBgm__OnNotify only, which forwards when the sender's class id nibble is 1 (DrawSystem, id 0x1, include/DrawSystem.h). The ctor adds the DrawSystem as a child, so its runLoop's per-VSync notifyParents(self, 2) is what arrives here; event 2 is that per-frame tick, which supports the name `Update` (still tier B: nothing in this unit names what event 2 is beyond that one sender).

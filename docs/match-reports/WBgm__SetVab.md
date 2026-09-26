@@ -139,3 +139,9 @@ transferred. `vabId` (+0x054) is the same field under the same name. The
 release calls no longer cast, and `WBgm__SetVab` casts its s32 `arg` to
 the `char *` path New_VabStreamObj takes. WBgm's own slot types are
 unchanged.
+
+## Track 4 (2026-09-26, round 88, alpha)
+
+The class is now declared once, in `include/WBgm.h` (table `gWBgmMethods`, renamed from `D_8006E48C` with tools/rename.py this round); `src/code_2a0e0.c` keeps no view of it, so the view quoted in this report's source section is historical. Image byte-identical after every step.
+
+Parameter retyped `s32 arg` -> `char *vabPath` (slot +0x060 with it); the `(char *)` cast before New_VabStreamObj is gone and the test reads `vabPath != NULL`. Callers: WBgm__WBgm, whose vabPath is one of the gWeeklyGroupTable VAB paths (see New_WBgm's Track 4 paragraph).
