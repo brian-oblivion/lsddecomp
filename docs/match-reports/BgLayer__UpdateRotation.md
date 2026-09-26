@@ -57,3 +57,7 @@ First build. `/` and `%` of the same operands share one div (mflo then mfhi). Th
 ## Naming
 
 - **BgLayer__UpdateRotation**, tier B. Slot +0x044: a ratio converted to 20.12 fixed point, stored or added into the rotate field.
+
+## Track 4 (2026-09-26, round 88, alpha)
+
+Renamed from `BgLayer__SetRotation` for the slot it overrides: D_8006F2C4 +0x044 is Class6B5CC's `updateRotation` (Class6B5CC__UpdateRotation), and the body does what that slot does, set (flag nonzero) or add, from the same three-entry `WholeFrac_d294` {num, den} ratio table Class6B5CC's version reads through RatioToFixed12 (entries at +0/+4/+8). A GsBG has one rotation, so this override reads only entry [2], the z angle: the `Ratio44380` view's +0x08/+0x0A. That view is gone; the live body takes `WholeFrac_d294 *table` and reads `table[2].whole` / `table[2].frac`, `self` is `BgLayer *` (include/BgLayer.h) and +0x064 is `rotate` (GsBG.rotate; was unk64). Byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).

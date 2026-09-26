@@ -154,3 +154,7 @@ Renamed from TaskCoreObj__TaskCoreObj (tools/rename.py). Occupant of +0x008 (`ct
 *New_VabStreamObj(char *)` is deleted. `src/code_2c054.c` includes
 `include/VabStreamObj.h` instead. The existing `(BasicClass *)` cast into
 `TaskCore::sound` is unchanged, and the whole image stays byte-identical.
+
+## Track 4 (2026-09-26, round 88, alpha)
+
+TaskCore::bgLayer (+0x078) is `struct BgLayer *` (include/BgLayer.h, was `BasicClass *`), so the New_BgLayer result is stored uncast; the TileMap argument is cast to BgLayer.h's `struct Map44294 *` (no code). include/code_2c054.h's local extern of New_BgLayer is gone. Byte-identical.

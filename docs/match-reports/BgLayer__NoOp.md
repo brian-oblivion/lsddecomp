@@ -29,3 +29,7 @@ void BgLayer__NoOp(void) {
 ## Naming
 
 - **BgLayer__NoOp**, tier C. Empty body filling BgLayer's own extra slot +0x0BC; no call site found for it in this unit, mechanics-only name.
+
+## Track 4 (2026-09-26, round 88, alpha)
+
+Class unified in `include/BgLayer.h`: its own slot +0x0BC, named `slotBC` there (empty, no known caller), so the function keeps its name. Byte-identical.

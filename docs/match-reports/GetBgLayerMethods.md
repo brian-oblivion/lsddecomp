@@ -31,3 +31,7 @@ void *GetBgLayerMethods(void) {
 ## Naming
 
 - **GetBgLayerMethods**, tier A. Table getter.
+
+## Track 4 (2026-09-26, round 88, alpha)
+
+Class unified in `include/BgLayer.h`: returns `BgLayerMethods *` (`&D_8006F2C4`, declared `extern BgLayerMethods D_8006F2C4;` there). The local `extern s32 D_8006F2C4[];` and `void *` prototype in code_33808.c are gone. Byte-identical.
