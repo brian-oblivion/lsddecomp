@@ -854,7 +854,7 @@ s32 TickStyle(void *arg0, void *arg1, s32 arg2) {
 extern s32 gStyleKind;
 extern void func_8003B624(void *arg0, s32 arg1, void *arg2);
 extern s32 gStyleStripRectA[];
-extern s32 D_80087450[];
+extern s32 gStyleStripScratchA[];
 extern s32 D_8008745C[];
 extern s32 D_80087468[];
 
@@ -864,7 +864,7 @@ void DrawStyleTables(void) {
 
     if (gStyleKind == 2) {
         a0 = gStyleStripRectA;
-        a2 = D_80087450;
+        a2 = gStyleStripScratchA;
         a1 = 1;
     } else if ((u32)(gStyleKind - 3) < 3) {
         a1 = 1;
