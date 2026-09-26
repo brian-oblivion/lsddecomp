@@ -15,7 +15,7 @@ slots, `slotC4` and `slot134`, discovered here).
 ```c
 void Entity__MoodCue74(Entity *this, EntityMoodHandlerArg *out) {
     if (this->unkFC == 0) {
-        this->unk94->unk5C->methods->slot64(this->unk94->unk5C, D_8008AC1C);
+        this->unk94->unk5C->methods->slot64(this->unk94->unk5C, sMoodCue74ClearColor);
         this->unk44 = rand() % 3;
         if (this->unk94->unk14->z < 0x262) {
             this->unk44 = 0;
@@ -50,7 +50,7 @@ void Entity__MoodCue74(Entity *this, EntityMoodHandlerArg *out) {
   its immediate parent (`Unk94Obj`), the same convention `Unk94Obj` itself,
   `Unk4CObj` and `Unk100Obj` already use for the offset THEY sit at in
   `Entity`. Only `slot64(self, arg1)` is known (called here as
-  `slot64(unk94->unk5C, D_8008AC1C)`, no third argument set up before the
+  `slot64(unk94->unk5C, sMoodCue74ClearColor)`, no third argument set up before the
   `jalr` -- `a2` is never written on this call path).
 - **`Unk94Methods` gained two slots**, both split out of previously-opaque
   padding ranges (no existing field moved or retyped):
@@ -62,9 +62,9 @@ void Entity__MoodCue74(Entity *this, EntityMoodHandlerArg *out) {
   - `slot134` (`void (*)(Unk94Obj*, s32, s32)`), was inside `pad134[0x1A0-0x134]`
     (immediately after `slot130`) -- called as `slot134(unk94, 1, 1)`,
     return discarded, same caveat.
-- `D_8008AC1C` (a single-word data table at `asm/data/7B3F8.sdata.s`,
+- `sMoodCue74ClearColor` (a single-word data table at `asm/data/7B3F8.sdata.s`,
   immediately after the already-known `gEntityDefaultPos`/`gEntityDefaultOffset`) gets its
-  own per-unit `extern u8 D_8008AC1C[];` in `Entity_e.c`, same convention
+  own per-unit `extern u8 sMoodCue74ClearColor[];` in `Entity_e.c`, same convention
   as this file's other opaque data-table externs.
 
 **No existing declaration was retyped, renamed, or resized** -- every change
@@ -115,7 +115,7 @@ opcode's low bits differ, so this is easy to misdiagnose as "close enough."
 
 Why `MoodCueNN`: the function's address sits in `gEntityMoodHandlerTable` row 74 (`asm/data/79528.data.s`, base 0x80089EB0, stride 0x10; row = (slot address - 0x80089EB0) / 0x10), confirmed by reading `disk/SLPS_015.56` directly rather than trusting address proximity (Entity_d/round 76 measured that row order does not track code address). Tier B: the row-to-function mapping is a compiler fact, not a guess, but which dream object or mood state each row represents is not established -- the row number is kept decimal and zero-padded so the names sort in table order, same convention as Entity_d.
 
-**`D_8008AC1C` left unnamed this round.** Already documented (this report's own body, pre-rename) as a single-word data table adjacent to `gEntityDefaultPos`/`gEntityDefaultOffset`, not a rotation/scale/translate-style {num,den} or s32-triple table, and passed to `Unk5CObj::slot64` whose own purpose is unestablished -- no evident value to name it from.
+**`sMoodCue74ClearColor` left unnamed this round.** Already documented (this report's own body, pre-rename) as a single-word data table adjacent to `gEntityDefaultPos`/`gEntityDefaultOffset`, not a rotation/scale/translate-style {num,den} or s32-triple table, and passed to `Unk5CObj::slot64` whose own purpose is unestablished -- no evident value to name it from.
 
 ## Track 4 (2026-09-26, round 88, echo)
 

@@ -245,13 +245,13 @@ void Entity__MoodCue73(Entity *this, SoundCueSet *out) {
     }
 }
 
-extern u8 D_8008AC1C[];
+extern u8 sMoodCue74ClearColor[];
 
 void Entity__MoodCue74(Entity *this, SoundCueSet *out) {
     if (this->moodTimer == 0) {
         ((DreamSys *)this->peer)
             ->viewport->methods->setClearColor(((DreamSys *)this->peer)->viewport,
-                                               (ViewportRgb *)D_8008AC1C);
+                                               (ViewportRgb *)sMoodCue74ClearColor);
         this->state = rand() % 3;
         if (((DreamSys *)this->peer)->coord2->tz < 0x262) {
             this->state = 0;
