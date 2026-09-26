@@ -150,14 +150,15 @@ void TitleMenu__TitleMenu(TitleMenu *self, struct DreamSys *dreamSys) {
     ((TitleMenuResetCallFn)self->methods->resetCounters)(self, dreamSys);
 }
 
-void CheckSaveScoreFlag(Ctx678_3bb8c_c *ctx, Result678_3bb8c_c *out) {
-    SaveBlock678_3bb8c_c *target = ctx->target;
-    s32 flag = 1;
+void CheckSaveScoreFlag(TitleMenu *self, TaskCoreTarget *target) {
+    DreamSaveBlock *save = (DreamSaveBlock *)self->saveBlock;
+    s32 locked = 1;
 
-    if (target->unkC > 9999999) {
-        flag = (target->unk2F4 == 0);
+    if (save->totalFlasbackUnlockScore > 9999999) {
+        locked = (save->amountFlashbacksAvailable == 0);
     }
-    out->block[1] = flag;
+    /* A NULL entry is a slot the cursor can stop on; slot 1 is FLASHBACK. */
+    target->registrationSlots[1] = (void *)locked;
 }
 
 /* FormatFullWidthNumber is GAME code (matched round 38, src/code_2cc8c_f.c -- its

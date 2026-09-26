@@ -154,3 +154,28 @@ while this reads +0x2F4. From `saveMagic`, +0x00C is DreamSys's
 `totalFlasbackUnlockScore` (include/DreamSys.h: saveMagic, currentYear,
 currentDay, totalFlasbackUnlockScore), which is the word compared against
 9999999. Image byte-identical.
+
+## Round 94 (track 6, charlie): its three views were TitleMenu, TaskCoreTarget and the save block
+
+- `Ctx678_3bb8c_c` (a pointer at +0x0BC) is `TitleMenu`: the one caller,
+  TitleMenu__RefreshMenu, passes its own self, and +0x0BC is
+  TitleMenu::saveBlock. Deleted; the parameter is `TitleMenu *self`.
+- `Result678_3bb8c_c` (a pointer at +0x018) is `TaskCoreTarget`: the caller
+  passes `self->target`, and +0x018 is `registrationSlots`, whose NULL
+  entries are the slots the cursor stops on. Deleted; the parameter is
+  `TaskCoreTarget *target` and the store is
+  `target->registrationSlots[1] = (void *)locked` (slot 1 is FLASHBACK).
+- `SaveBlock678_3bb8c_c` is renamed `DreamSaveBlock` (include/class_3bb8c.h):
+  getSaveBlock returns `&saveMagic`, DreamSys +0x178, so +0x00C is DreamSys
+  +0x184 `totalFlasbackUnlockScore` and +0x2F4 is DreamSys +0x46C
+  `amountFlashbacksAvailable` (offsets measured with cc1 on
+  `offsetof(DreamSys, ...)`). The fields take DreamSys's (inherited,
+  tier B) names, typo included, so one grep finds both.
+
+The body reads: FLASHBACK stays locked unless the total unlock score is past
+9999999 and at least one flashback is stored. The TitleMenu banner already
+said so. Zero bytes changed.
+
+Proposed (not applied, a symbol rename outside this types job):
+`CheckSaveScoreFlag` -> `UpdateFlashbackLock` (tier B: the mechanics are
+certain, the two DreamSys field names are inherited).

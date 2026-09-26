@@ -217,36 +217,17 @@ extern s32 D_8008AA30;
 extern void FormatNumberIntoBuffer(s32 arg0);
 
 /*
- * The block CheckSaveScoreFlag reads: its caller's TitleMenu::saveBlock
- * (the DreamSys's getSaveBlock, &saveMagic). +0x00C from saveMagic is
- * DreamSys's totalFlasbackUnlockScore (include/DreamSys.h); +0x2F4 is
- * unnamed there.
+ * The save block DreamSys's getSaveBlock returns (TitleMenu::saveBlock):
+ * DreamSys from `saveMagic` (+0x178) on, so each field here is the DreamSys
+ * field (include/DreamSys.h) 0x178 bytes further in. CheckSaveScoreFlag
+ * reads the two below.
  */
-typedef struct SaveBlock678_3bb8c_c {
+typedef struct DreamSaveBlock {
     u8 pad00[0x00C];
-    s32 unkC; /* +0x00C, compared against 9999999 */
+    s32 totalFlasbackUnlockScore; /* +0x00C, DreamSys +0x184: FLASHBACK unlocks past 9999999 */
     u8 pad10[0x2F4 - 0x010];
-    s32 unk2F4; /* +0x2F4, zero-checked when unkC > 9999999 */
-} SaveBlock678_3bb8c_c;
-
-/*
- * First argument of CheckSaveScoreFlag: its one caller,
- * TitleMenu__RefreshMenu (class_3bb8c_d), passes its own self, so
- * +0x0BC is TitleMenu::saveBlock (include/TitleMenu.h).
- */
-typedef struct Ctx678_3bb8c_c {
-    u8 pad00[0x0BC];
-    SaveBlock678_3bb8c_c *target; /* +0x0BC */
-} Ctx678_3bb8c_c;
-
-/*
- * Second argument of CheckSaveScoreFlag: holds a pointer at +0x018 to a small
- * result block whose word at +0x004 is the flag CheckSaveScoreFlag computes.
- */
-typedef struct Result678_3bb8c_c {
-    u8 pad00[0x018];
-    s32 *block; /* +0x018, CheckSaveScoreFlag writes block[1] */
-} Result678_3bb8c_c;
+    s32 amountFlashbacksAvailable; /* +0x2F4, DreamSys +0x46C: ... and only with one stored */
+} DreamSaveBlock;
 
 /* TaskObjF (gTaskObjFMethods, class_3bb8c_d/e/f/g) is include/TaskObjF.h
  * (track 4, round 89). */
