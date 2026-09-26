@@ -171,16 +171,16 @@ struct Class86F88Methods_3bb8c_j {
     u8 pad000[0x008];
     void (*ctor)(Class86F88_3bb8c_j *self, void *arg0, s32 arg1); /* +0x008, Class86F88__Class86F88 (occupant); New_Class86F88's call site */
     u8 pad00C[0x010 - 0x00C];
-    /* Called by Class86F88__AddChildAndSetState at two arities: (self,arg1,arg2,arg3) at its
+    /* Called by Class86F88__AttachTarget at two arities: (self,arg1,arg2,arg3) at its
      * first call site (a straight passthrough of that function's own
      * params) and (self,arg2) at its second -- see that function's report. */
-    void (*slot10)(Class86F88_3bb8c_j *self, void *arg1, s32 arg2, s32 arg3); /* +0x010, Class86F88__AddChildAndSetState */
-    void (*slot14)(Class86F88_3bb8c_j *self, void *arg1);          /* +0x014, Class86F88__RemoveCachedChildren */
+    void (*slot10)(Class86F88_3bb8c_j *self, void *arg1, s32 arg2, s32 arg3); /* +0x010, Class86F88__AttachTarget */
+    void (*slot14)(Class86F88_3bb8c_j *self, void *arg1);          /* +0x014, Class86F88__DetachTarget */
     u8 pad018[0x040 - 0x018];
     void (*slot40)(Class86F88_3bb8c_j *self);                        /* +0x040, Class86F88__Class86F88 tail */
     u8 pad044[0x058 - 0x044];
-    void (*slot58)(Class86F88_3bb8c_j *self, void *arg1, s32 arg2);    /* +0x058, Class86F88__NotifyChild (tag==5) */
-    void (*slot5C)(Class86F88_3bb8c_j *self, void *arg1, s32 arg2);     /* +0x05C, Class86F88__NotifyChild (tag==2) */
+    void (*slot58)(Class86F88_3bb8c_j *self, void *arg1, s32 arg2);    /* +0x058, Class86F88__OnNotify (tag==5) */
+    void (*slot5C)(Class86F88_3bb8c_j *self, void *arg1, s32 arg2);     /* +0x05C, Class86F88__OnNotify (tag==2) */
     u8 pad060[0x08C - 0x060];
     void (*slot8C)(Class86F88_3bb8c_j *self, void *arg1, Class86F88Handle_3bb8c_j *arg2, s32 arg3, s32 arg4, s32 arg5); /* +0x08C, Class86F88__LoadResources */
     void (*slot90)(Class86F88_3bb8c_j *self);                          /* +0x090, Class86F88__ReleaseResources */
@@ -194,14 +194,14 @@ struct Class86F88_3bb8c_j {
     s32 unk14;                        /* +0x014, Class86F88__Class86F88: a running MAX over the per-entry lengths computed in its fill loop */
     void **unk18;                      /* +0x018, Class86F88__Finalize/Class86F88__Class86F88: array of unk10 individually-allocated buffers */
     s32 *unk1C;                         /* +0x01C, Class86F88__Finalize (freed as one block)/Class86F88__Class86F88 (array of unk10 per-entry lengths) */
-    s32 unk20;                           /* +0x020, Class86F88__ResetCounters */
-    s32 unk24;                            /* +0x024, Class86F88__ResetCounters */
-    s32 unk28;                             /* +0x028, Class86F88__ResetCounters */
-    s32 unk2C;                               /* +0x02C, Class86F88__AddChildAndSetState: cleared to 0 */
+    s32 unk20;                           /* +0x020, Class86F88__ResetView */
+    s32 unk24;                            /* +0x024, Class86F88__ResetView */
+    s32 unk28;                             /* +0x028, Class86F88__ResetView */
+    s32 unk2C;                               /* +0x02C, Class86F88__AttachTarget: cleared to 0 */
     u8 pad30[0x34 - 0x30];
     void *unk34;                            /* +0x034, "tag==2" registered-child cache */
     void *unk38;                             /* +0x038, "tag==5" registered-child cache */
-    s32 unk3C;                                /* +0x03C, Class86F88__RemoveCachedChildren (cleared)/Class86F88__AddChildAndSetState (set from its own arg3) */
+    s32 unk3C;                                /* +0x03C, Class86F88__DetachTarget (cleared)/Class86F88__AttachTarget (set from its own arg3) */
     u8 pad40[0x50 - 0x40];
     Class86F88Handle_3bb8c_j *unk50;                  /* +0x050 */
 };
@@ -359,7 +359,7 @@ void Class86F88__RemoveAllChildren(Class86F88_3bb8c_j *self)
     Get_vtable_BasicClass()->removeAllChildren((BasicClass *)self);
 }
 
-void Class86F88__NotifyChild(Class86F88_3bb8c_j *self, void *arg1, s32 arg2)
+void Class86F88__OnNotify(Class86F88_3bb8c_j *self, void *arg1, s32 arg2)
 {
     s32 tag;
 
@@ -372,7 +372,7 @@ void Class86F88__NotifyChild(Class86F88_3bb8c_j *self, void *arg1, s32 arg2)
     }
 }
 
-void Class86F88__ResetCounters(Class86F88_3bb8c_j *self)
+void Class86F88__ResetView(Class86F88_3bb8c_j *self)
 {
     self->unk20 = 0;
     self->unk24 = 0;
@@ -431,7 +431,7 @@ void Class86F88__ReleaseResources(Class86F88_3bb8c_j *self)
     }
 }
 
-void Class86F88__AddChildAndSetState(Class86F88_3bb8c_j *self, void *arg1, s32 arg2, s32 arg3)
+void Class86F88__AttachTarget(Class86F88_3bb8c_j *self, void *arg1, s32 arg2, s32 arg3)
 {
     typedef void (*Slot10NarrowFn)(Class86F88_3bb8c_j *self, s32 arg1);
     void (*fn)(Class86F88_3bb8c_j *self, void *arg1, s32 arg2, s32 arg3);
@@ -447,7 +447,7 @@ void Class86F88__AddChildAndSetState(Class86F88_3bb8c_j *self, void *arg1, s32 a
     } while (0);
 }
 
-void Class86F88__RemoveCachedChildren(Class86F88_3bb8c_j *self)
+void Class86F88__DetachTarget(Class86F88_3bb8c_j *self)
 {
     self->methods->slot14(self, self->unk34);
     self->methods->slot14(self, self->unk38);

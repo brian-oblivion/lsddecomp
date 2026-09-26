@@ -2051,7 +2051,7 @@ struct Class86F88Elem {
 
 /*
  * Class86F88::target's pointee, added round 75. Set by
- * Class86F88__AddChildAndSetState (class_3bb8c_j) from its arg3, which
+ * Class86F88__AttachTarget (class_3bb8c_j) from its arg3, which
  * TaskObjF__AttachChildA/B (class_3bb8c_g) pass as that object's `childC`.
  * Its +0x080 is called as (target, code, 0x60, 0x60) here and as
  * (childC, code, 0x7F, 0x7F) by TaskObjF__SetChildFlag8. Before round 75
