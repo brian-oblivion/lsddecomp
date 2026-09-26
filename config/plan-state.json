@@ -1166,12 +1166,21 @@
           "runners": 13
         },
         {
+          "amended": [
+            {
+              "date": "2026-09-26",
+              "was": {
+                "note": "Premium head, cap 5, 18 Opus runner sessions in six waves, 18 classes unified: TodSet, Class6D3C8, Class86AA0, TextRow (ex Obj6EAC0), WBgm, TriggerWorld, Entity, TimImage, BgLayer, FrameClock (ex D_8006EF50), Class876FC, TileMap, TileAtlas, DreamSys, TimArraySrc, Class86B60, CdDriver (ex Class6D4E8), Class865C8 (ex Obj865C8). Plan revision 25: class_footprint counts allocator callers and ignores unified ancestors' types (a one-job list became four). Runner tool fixes: typeviews.py parses every parameter stab and local-variable stabs. Head: Class6D430 +0x070 stopService takes self. All merges byte-identical (clean rebuilds after header-heavy merges), 0 new warnings (baseline 155 -> 141), nonmatching green."
+              },
+              "why": "warnings baseline started the round at 161, not 155"
+            }
+          ],
           "attempts": 18,
           "calibration": false,
           "date": "2026-09-26",
           "matches": 18,
           "model": "opus",
-          "note": "Premium head, cap 5, 18 Opus runner sessions in six waves, 18 classes unified: TodSet, Class6D3C8, Class86AA0, TextRow (ex Obj6EAC0), WBgm, TriggerWorld, Entity, TimImage, BgLayer, FrameClock (ex D_8006EF50), Class876FC, TileMap, TileAtlas, DreamSys, TimArraySrc, Class86B60, CdDriver (ex Class6D4E8), Class865C8 (ex Obj865C8). Plan revision 25: class_footprint counts allocator callers and ignores unified ancestors' types (a one-job list became four). Runner tool fixes: typeviews.py parses every parameter stab and local-variable stabs. Head: Class6D430 +0x070 stopService takes self. All merges byte-identical (clean rebuilds after header-heavy merges), 0 new warnings (baseline 155 -> 141), nonmatching green.",
+          "note": "Premium head, cap 5, 18 Opus runner sessions in six waves, 18 classes unified: TodSet, Class6D3C8, Class86AA0, TextRow (ex Obj6EAC0), WBgm, TriggerWorld, Entity, TimImage, BgLayer, FrameClock (ex D_8006EF50), Class876FC, TileMap, TileAtlas, DreamSys, TimArraySrc, Class86B60, CdDriver (ex Class6D4E8), Class865C8 (ex Obj865C8). Plan revision 25: class_footprint counts allocator callers and ignores unified ancestors' types (a one-job list became four). Runner tool fixes: typeviews.py parses every parameter stab and local-variable stabs. Head: Class6D430 +0x070 stopService takes self. All merges byte-identical (clean rebuilds after header-heavy merges), 0 new warnings (baseline 161 -> 141), nonmatching green.",
           "round": 88,
           "runners": 18
         }
