@@ -2919,3 +2919,4 @@ gStyleVariantConfigs = 0x800873C8;
 gStyleVariantConfigCounts = 0x800873D8;
 gStyleVariantPicks = 0x800873DC;
 gStyleKind2AltColor = 0x80087430;
+gStyleStripRectA = 0x80087444;
