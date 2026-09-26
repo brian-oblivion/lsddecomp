@@ -96,7 +96,7 @@ void WBgm__Update(WBgm *self, DrawSystem *sender, s32 event) {
 
 s32 WBgm__HandleMonitorEvent(WBgm *self) {
     VabStreamObj *vab;
-    Class6EED8 *seq;
+    RequestedFile *seq;
 
     vab = self->vab;
     if (vab == NULL) {
@@ -169,7 +169,7 @@ void WBgm__SetSeq(WBgm *self, char *seqPath) {
         self->seqData = NULL;
     }
     if (seqPath != NULL) {
-        self->seqData = New_Class6EED8(seqPath);
+        self->seqData = New_RequestedFile(seqPath);
         if (WBgm__HandleMonitorEvent(self)) {
             if (self->autoPlay != 0) {
                 self->methods->play(self);

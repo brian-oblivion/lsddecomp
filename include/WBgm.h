@@ -4,7 +4,7 @@
 #include "BasicClass.h"
 #include "DrawSystem.h"
 #include "VabStreamObj.h"
-#include "Class6EED8.h"
+#include "RequestedFile.h"
 
 /*
  * WBgm -- class id 0x50, method table gWBgmMethods (24 slots), a direct
@@ -15,7 +15,7 @@
  * WBgmHandleMonitorEvent", printed by WBgm__HandleMonitorEvent's own body.
  *
  * A background-music player: one libsnd SEQ played on one VAB bank. The
- * bank is a VabStreamObj (`vab`), the SEQ file a Class6EED8 (`seqData`);
+ * bank is a VabStreamObj (`vab`), the SEQ file a RequestedFile (`seqData`);
  * both load asynchronously, so the SEQ is SsSeqOpen'd (HandleMonitorEvent)
  * only once `vab->attrsReady` and `seqData->loaded` are both set, and
  * played at once if `autoPlay`. Until then `openState` is 1 and the
@@ -59,7 +59,7 @@ struct WBgmMethods {
 struct WBgm {
     BASICCLASS_FIELDS(WBgmMethods);
     /* +0x00C */ VabStreamObj *vab; /* New_VabStreamObj(setVab's path) */
-    /* +0x010 */ Class6EED8 *seqData; /* New_Class6EED8(setSeq's path): the SEQ file, SsSeqOpen'd from its buffer once loaded */
+    /* +0x010 */ RequestedFile *seqData; /* New_RequestedFile(setSeq's path): the SEQ file, SsSeqOpen'd from its buffer once loaded */
     /* +0x014 */ s16 seqId;             /* SsSeqOpen's result; every SsSeq* call's access number */
     /* +0x016 */ u8 pad16[0x1A - 0x16]; /* no accessor in the class's methods */
     /* +0x01A */ u16 openState; /* 0 idle, 1 waiting for both loads, 2 opened (HandleMonitorEvent); stop resets it to 0 */

@@ -6,7 +6,7 @@ Round 81, runner delta. Unit `src/code_2a0e0.c` (carved from `psyq_2a0e0` in
 FINISHING-PLAN revision 18). Fresh ground, no prior attempt.
 
 - **Where:** gWBgmMethods slot +0x05C (setSeq) (slots resolved with `tools/classtable.py gWBgmMethods`).
-- **What:** set the SEQ data: stop if playing, release and clear +0x10, and if the argument is non-zero load `New_Class6EED8(arg)` into +0x10 and try-open; on success play if auto-play (+0x20), on failure mark `openState = 1` if it was 0.
+- **What:** set the SEQ data: stop if playing, release and clear +0x10, and if the argument is non-zero load `New_RequestedFile(arg)` into +0x10 and try-open; on success play if auto-play (+0x20), on failure mark `openState = 1` if it was 0.
 - **Result:** byte-exact on the first build. `funcdiff.py` reports 58/58
   words, 0 insertions / 0 deletions, and the whole-image SHA1 is green
   (`OK: build matches retail`).
@@ -38,7 +38,7 @@ void WBgm__SetSeq(WBgm *self, s32 arg) {
         self->seqData = NULL;
     }
     if (arg != 0) {
-        self->seqData = New_Class6EED8(arg);
+        self->seqData = New_RequestedFile(arg);
         if (WBgm__HandleMonitorEvent(self)) {
             if (self->autoPlay != 0) {
                 self->methods->play(self);
@@ -82,7 +82,7 @@ typedef struct SeqVab {
     /* +0x058 */ u16 ready;
 } SeqVab;
 
-/* What +0x10 holds: a New_Class6EED8 object. Only the fields read here. */
+/* What +0x10 holds: a New_RequestedFile object. Only the fields read here. */
 typedef struct SeqData {
     BASICCLASS_FIELDS(BasicClassMethods);
     /* +0x00C */ u8 padC[0x10 - 0xC];
@@ -115,7 +115,7 @@ extern short SsSeqOpen(unsigned long *addr, short vab_id);
 
 extern void *BMemPMgrAlloc(s32 size);
 extern BasicClass *GetDrawSystem(void);
-extern SeqData *New_Class6EED8(s32 arg);
+extern SeqData *New_RequestedFile(s32 arg);
 extern SeqVab *New_VabStreamObj(s32 arg0);
 extern void printf(const char *fmt);
 extern const char D_80010FEC[]; /* "Seq Open error in WBgmHandleMonitorEvent" */
@@ -129,12 +129,12 @@ extern s32 gWBgmActive;
 extern u8 gSsSizeTableBuf[];
 ```
 
-## Track 4 (2026-09-26, round 87, Class6EED8)
+## Track 4 (2026-09-26, round 87, RequestedFile)
 
 The unit-local view `SeqData` (BASICCLASS_FIELDS, +0x010 `addr`, +0x02C
-`loaded`) and its `extern SeqData *New_Class6EED8(s32)` are gone: the
-census missed them, as New_Class6EED8's return type. `WBgm::seqData` is
-`Class6EED8 *` (`include/Class6EED8.h`, round 87, delta). `addr` is
+`loaded`) and its `extern SeqData *New_RequestedFile(s32)` are gone: the
+census missed them, as New_RequestedFile's return type. `WBgm::seqData` is
+`RequestedFile *` (`include/RequestedFile.h`, round 87, delta). `addr` is
 FileResource's `buffer` (+0x010), `loaded` the same field under the same
 name; the release calls lose their `(BasicClass *)` casts and WBgm__SetSeq
 casts its s32 argument to the ctor's `char *name`. The whole image stays
@@ -144,4 +144,4 @@ byte-identical; the Source block above is the earlier text.
 
 The class is now declared once, in `include/WBgm.h` (table `gWBgmMethods`, renamed from `D_8006E48C` with tools/rename.py this round); `src/code_2a0e0.c` keeps no view of it, so the view quoted in this report's source section is historical. Image byte-identical after every step.
 
-Parameter retyped `s32 arg` -> `char *seqPath` (slot +0x05C with it); the `(char *)` cast before New_Class6EED8 is gone and the test reads `seqPath != NULL`. Callers: WBgm__WBgm (its seqPath argument; the one construction passes NULL). No C outside this unit names the slot (grep; INCLUDE_ASM callers through +0x05C were not searched).
+Parameter retyped `s32 arg` -> `char *seqPath` (slot +0x05C with it); the `(char *)` cast before New_RequestedFile is gone and the test reads `seqPath != NULL`. Callers: WBgm__WBgm (its seqPath argument; the one construction passes NULL). No C outside this unit names the slot (grep; INCLUDE_ASM callers through +0x05C were not searched).
