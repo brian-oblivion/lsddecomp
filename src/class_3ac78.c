@@ -357,7 +357,7 @@ void Class866E8__ApplyToSenderFootprint(Class866E8 *self, SceneNode *sender, s32
     savedRectCount = self->rectCount;
     saved = self->rects;
 
-    if (self->config->unk4 == 0) {
+    if (self->config->isVertical == 0) {
         Class866E8__SetFootprintFromCell(self, &buf, 3);
     } else {
         Class866E8__SetFootprintRect(self, &buf, 3);
@@ -485,7 +485,7 @@ void Class866E8__SetGridSpan(Class866E8 *self, s32 span) {
     self->gridHalfCells = (s16)(span >> 12);
 }
 
-void Class866E8__SetConfig(Class866E8 *self, Unk68Struct *config) {
+void Class866E8__SetConfig(Class866E8 *self, StageGridDimensions *config) {
     self->methods->reset(self);
     self->config = config;
 }

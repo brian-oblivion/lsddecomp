@@ -319,7 +319,7 @@ void ObjM__SetupSceneStyle(ObjM *self) {
 
     rig->methods->setAmbientColor(rig, (LightRigRgb *)style->unk8, 0);
     rig->methods->setChildParams(rig, 3, style->unk0, style->unk4);
-    rig->methods->setConfig(rig, (Unk68Struct *)GetStageGridDimensions(self->stage));
+    rig->methods->setConfig(rig, GetStageGridDimensions(self->stage));
     ((DreamSysAttachToParentFn)self->dreamSys->methods->attachToParent)(self->dreamSys, rig);
     rig->methods->setGridSpan(rig, self->gridSpan);
     rig->methods->setAcceptedTags(rig, &D_8008710C);

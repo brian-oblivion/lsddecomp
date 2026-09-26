@@ -2,6 +2,7 @@
 #define CLASS866E8_H
 
 #include "LightRig.h"
+#include "StageGrid.h"
 
 /*
  * Class866E8 -- the grid manager (class id 0x114, method table
@@ -71,16 +72,6 @@ typedef struct Unk54Struct {
     s32 unk4;
     s32 unk8;
 } Unk54Struct;
-
-/* `config`'s pointee, set by setConfig. The elements are laid out `divisor`
- * to a row and `count` deep; `unk4` nonzero switches every footprint query
- * to the other layout (RefreshFootprint, ComputeRateFlags,
- * FindElementForPosition, ApplyToSenderFootprint). */
-typedef struct Unk68Struct {
-    s16 divisor; /* +0x000 */
-    s16 count;   /* +0x002 */
-    s32 unk4;    /* +0x004 */
-} Unk68Struct;
 
 /* A grid-cell descriptor, 10 bytes, alignment 2 (every member s8/s16, so a
  * whole copy is lwl/lwr + swl/swr + sh: SetTargetAndBuildRates). b0/b1 the
@@ -220,7 +211,7 @@ struct Class866E8Methods {
     /* +0x0D4 */ Descriptor10 *(*getCurrentCellKey)(Class866E8 *self, void *arg1); /* Class866E8__GetCurrentCellKey (reads only self; see the banner) */
     /* +0x0D8 */ void (*slotD8)(void); /* func_8004B324, empty; never called */
     /* +0x0DC */ void (*setGridSpan)(Class866E8 *self, s32 span); /* Class866E8__SetGridSpan */
-    /* +0x0E0 */ void (*setConfig)(Class866E8 *self, Unk68Struct *config); /* Class866E8__SetConfig */
+    /* +0x0E0 */ void (*setConfig)(Class866E8 *self, StageGridDimensions *config); /* Class866E8__SetConfig */
     /* +0x0E4 */ s32 (*setTargetAndBuildRates)(Class866E8 *self, void *outPos, SceneNode *target,
                                                Descriptor10 *cell); /* Class866E8__SetTargetAndBuildRates */
     /* +0x0E8 */ s32 (*computeCellOffsets)(Class866E8 *self, void *outPos,
@@ -261,7 +252,7 @@ struct Class866E8 {
     /* +0x054 */ Unk54Struct origin; /* the ctor: its argument, or gDefaultOrigin; the cellParents attach here */
     /* +0x060 */ Class866E8ValueFn valueFn; /* setCallback */
     /* +0x064 */ void *valueFnCtx;          /* setCallback */
-    /* +0x068 */ Unk68Struct *config;       /* setConfig; NULL after Reset */
+    /* +0x068 */ StageGridDimensions *config; /* setConfig (ObjM: GetStageGridDimensions(stage)); NULL after Reset */
     /* +0x06C */ SceneNode *target; /* setTargetAndBuildRates (DreamSys__SpawnAtLink passes the DreamSys); its coord2 is the tracked position */
     /* +0x070 */ s32 enabled;       /* enable/disable; gates UpdateIfEnabled */
     /* +0x074 */ s32 gridSpan;      /* setGridSpan: gDefaultGridSpan = 0xA000 */
@@ -325,12 +316,12 @@ void NotifyGridCell(struct GridCell *cell, SceneNode *sender, s32 command);
 Descriptor10 *Class866E8__GetCurrentCellKey(Class866E8 *self);
 void func_8004B324(void);
 void Class866E8__SetGridSpan(Class866E8 *self, s32 span);
-void Class866E8__SetConfig(Class866E8 *self, Unk68Struct *config);
+void Class866E8__SetConfig(Class866E8 *self, StageGridDimensions *config);
 s32 Class866E8__SetTargetAndBuildRates(Class866E8 *self, void *outPos, SceneNode *target,
                                        Descriptor10 *cell);
 s32 Class866E8__ComputeCellOffsets(Class866E8 *self, void *outPos, void *cell);
-s32 ComputeCellWorldOffsets(s32 *outPos, s32 *outBuf, Unk68Struct *config, Unk54Struct *origin,
-                            Descriptor10 *cell);
+s32 ComputeCellWorldOffsets(s32 *outPos, s32 *outBuf, StageGridDimensions *config,
+                            Unk54Struct *origin, Descriptor10 *cell);
 void Class866E8__Enable(Class866E8 *self);
 void Class866E8__Disable(Class866E8 *self);
 s32 Class866E8__UpdateFootprintTracking(Class866E8 *self);

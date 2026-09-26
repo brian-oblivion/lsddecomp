@@ -186,7 +186,7 @@ s32 Actor__BuildLinkQueries(Actor *self, GridQuery *arr1, Class866E8Elem **arr2,
     idx = 1;
     if (arg4 == 1) {
         Class866E8 *unk4C;
-        Unk68Struct *unk68;
+        StageGridDimensions *unk68;
         Class866E8Elem *src;
         s16 s3;
         s32 pos;
@@ -199,12 +199,12 @@ s32 Actor__BuildLinkQueries(Actor *self, GridQuery *arr1, Class866E8Elem **arr2,
         arr2[0] = src;
         unk4C = self->grid;
         unk68 = unk4C->config;
-        if (unk68->unk4 != idx) {
+        if (unk68->isVertical != idx) {
             return 1;
         }
         s3 = src->loader->elemKey;
         pos = s3 + 1;
-        if (pos < unk68->count) {
+        if (pos < unk68->rows) {
             arr2[1] = unk4C->methods->findElemByUnk32(unk4C, pos);
             idx = 2;
             arr1[1] = arr1[0];

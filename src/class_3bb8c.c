@@ -65,7 +65,7 @@ s32 Class866E8__ComputeCellOffsets(Class866E8 *self, void *arg1, void *arg2) {
  * attempts targeted the outBuf[0]/outBuf[2] STORE-vs-LOAD scheduling
  * directly and never touched this constant; the permuter found a
  * completely different axis. See docs/match-reports/ComputeCellWorldOffsets.md. */
-s32 ComputeCellWorldOffsets(s32 *arg0, s32 *outBuf, Unk68Struct *arg2, Unk54Struct *arg3,
+s32 ComputeCellWorldOffsets(s32 *arg0, s32 *outBuf, StageGridDimensions *arg2, Unk54Struct *arg3,
                             Descriptor10 *arg4) {
     s32 idx;
     s32 factor;
@@ -74,16 +74,16 @@ s32 ComputeCellWorldOffsets(s32 *arg0, s32 *outBuf, Unk68Struct *arg2, Unk54Stru
     s32 a0v;
     s32 off;
 
-    if (arg2->unk4 == 0) {
+    if (arg2->isVertical == 0) {
         idx = arg4->b1;
-        factor = arg2->count;
-        sum = arg4->b0 + arg2->divisor * idx;
+        factor = arg2->rows;
+        sum = arg4->b0 + arg2->columns * idx;
     } else {
         factor = 1;
         idx = 0;
         sum = 0;
     }
-    v1 = (arg3->unk0 - arg2->divisor * 0x5000) + arg4->b0 * 0xA000;
+    v1 = (arg3->unk0 - arg2->columns * 0x5000) + arg4->b0 * 0xA000;
     a0v = arg3->unk8 - factor * 0x5000;
     outBuf[0] = v1;
     if (idx & 1) {
@@ -125,7 +125,7 @@ s32 Class866E8__UpdateFootprintTracking(Class866E8 *self) {
     key = e->loader->elemKey;
     result = sFootprintResultRemap[key];
 
-    if (self->config->unk4 == 0) {
+    if (self->config->isVertical == 0) {
         self->methods->buildRateEntries(self, buf.unk28, (Unk54Struct *)&buf.unkC,
                                         sFootprintResultPtrTable[result]);
     }
@@ -167,7 +167,7 @@ void Class866E8__BuildRateEntries(Class866E8 *self, s32 val, Unk54Struct *arg2, 
     SetupEntry866E8 stackBuf[7];
 
     if (arg3 != 0) {
-        divisor = self->config->divisor;
+        divisor = self->config->columns;
         flag = (val / divisor) & 1;
         savedResult = Class866E8__ComputeRateFlags(self, val, flag);
 
@@ -178,7 +178,7 @@ void Class866E8__BuildRateEntries(Class866E8 *self, s32 val, Unk54Struct *arg2, 
             if (arg3[i].flag != 0) {
                 tbl = &sRateOffsetTable[arg3[i].key];
                 u14 = (Unk14Obj *)e->cellParent->coord2;
-                if (self->config->unk4 == 0) {
+                if (self->config->isVertical == 0) {
                     u14->unk18.w = arg2->unk0 + tbl->unk0;
                     u14->unk1C = arg2->unk4;
                     u14->unk20.w = arg2->unk8 + tbl->unk8;
@@ -204,7 +204,7 @@ void Class866E8__BuildRateEntries(Class866E8 *self, s32 val, Unk54Struct *arg2, 
 }
 
 s32 Class866E8__ComputeRateFlags(Class866E8 *self, s32 val, s32 flag) {
-    Unk68Struct *u;
+    StageGridDimensions *u;
     s32 divisor;
     s32 unk4;
     s32 count;
@@ -212,9 +212,9 @@ s32 Class866E8__ComputeRateFlags(Class866E8 *self, s32 val, s32 flag) {
     s32 i;
 
     u = self->config;
-    divisor = u->divisor;
-    unk4 = u->unk4;
-    count = u->count;
+    divisor = u->columns;
+    unk4 = u->isVertical;
+    count = u->rows;
     if (unk4 == 0) {
         flags = (val < divisor) ? 3 : 0;
         if (val >= divisor * (count - 1)) {
@@ -260,7 +260,7 @@ s32 Class866E8__ComputeRateEntry(Class866E8 *self, SetupEntry866E8 *arg1, s32 di
         goto nullCase;
     }
 
-    if (self->config->unk4 == 0) {
+    if (self->config->isVertical == 0) {
         const Unk54Struct *entry = &sRateEntryTable[key];
         s32 value;
         s32 sum;
@@ -594,8 +594,8 @@ s32 Class866E8__ComputeFootprintDescriptor(Class866E8 *self, Descriptor10Ext *ou
 }
 
 void Class866E8__ComputeDivisorSplit(Class866E8 *self, u8 *out, s32 val) {
-    out[0] = val % self->config->divisor;
-    out[1] = val / self->config->divisor;
+    out[0] = val % self->config->columns;
+    out[1] = val / self->config->columns;
 }
 
 Class866E8Elem *Class866E8__GetLastTargetRateSplit(Class866E8 *self, u8 *out) {
@@ -640,7 +640,7 @@ Class866E8Elem *Class866E8__FindElementForPosition(Class866E8 *self, Unk54Struct
         r = (Unk14Obj *)candidate->cellParent->coord2;
         if (arg1->unk0 >= r->unk18.w && arg1->unk0 < (w = r->unk18.w) + tol) {
             if (arg1->unk8 >= r->unk20.w && arg1->unk8 < (w = r->unk20.w) + tol) {
-                if (self->config->unk4 == 0) {
+                if (self->config->isVertical == 0) {
                     return candidate;
                 }
                 if (threshold >= arg1->unk4) {

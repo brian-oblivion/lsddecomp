@@ -9,7 +9,7 @@
  * GridSlot866E8 rectangles (self->rects), and a per-cell bit (bit 31 of a
  * GridCell cell's `attribute`) that RefreshFootprint clears, recomputes
  * (via either ComputeFootprintFromRotation or SetFootprintFromQuery, gated
- * on self->config->unk4) and sets again through SetFootprintCellFlag. A
+ * on self->config->isVertical) and sets again through SetFootprintCellFlag. A
  * second, unrelated mechanism lives at the tail of the unit: a rate/
  * countdown pair (self->rateCountdown/self->rateEntry) that
  * AdvanceRateCountdown/FlushRateLatch apply to every cell of every element
@@ -62,7 +62,7 @@ void Class866E8__RefreshFootprint(Class866E8 *self) {
     }
     idx = self->gridHalfCells * 2;
     Class866E8__SetFootprintCellFlag(self, 0);
-    if (self->config->unk4 == 0) {
+    if (self->config->isVertical == 0) {
         Class866E8__ComputeFootprintFromRotation(self, idx, self->gridCells);
     } else {
         Class866E8__SetFootprintFromQuery(self);
@@ -267,7 +267,7 @@ void Class866E8__SetFootprintFromQuery(Class866E8 *self) {
     self->rectCount = 0;
     self->rectCount = Class866E8__InitFootprintSlot(self, junk, 0, buf.unk28);
     if (IsPointOutOfBounds(self->bounds, &buf.base.b2) != 0) {
-        if (buf.unk28 + 1 < self->config->count) {
+        if (buf.unk28 + 1 < self->config->rows) {
             self->rectCount = Class866E8__InitFootprintSlot(self, junk, self->rectCount, buf.unk28 + 1);
         }
     }
