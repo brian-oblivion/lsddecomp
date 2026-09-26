@@ -403,10 +403,10 @@ struct DreamSys {
     /* Set by DreamSys__SelectCallback80(this, arg1): NULL when arg1==0, otherwise one of
 	   three vtable-slot function pointers selected by arg1 (1/2/3). Called
 	   with (this) by DreamSys__RunTickCallbacks, if non-NULL. */
-    void (*callback_0x80)(struct DreamSys *this);
+    void (*lookCallback)(struct DreamSys *this);
     /* Set unconditionally to arg1 by DreamSys__SelectCallback80(this, arg1); no other
 	   observed use (round 2026-08-30). */
-    s32 callback80Mode;
+    s32 lookCallbackMode;
     /* Index into the (LOOK_OFFSET_STEPS, LOOK_OFFSET_LIMITS) delta/threshold table pair,
 	   consumed and reset to 0 by DreamSys__StepLookOffset (round 2026-08-30). */
     s32 lookOffsetCommand;
@@ -420,14 +420,14 @@ struct DreamSys {
     /* Running delta accumulator paired with lookYawCommand; see DreamSys__StepLookYaw
 	   (round 2026-08-30). */
     s32 lookYaw;
-    /* Set by DreamSys__SelectCallback80(this, arg1) exactly like callback_0x80, but from
+    /* Set by DreamSys__SelectCallback80(this, arg1) exactly like lookCallback, but from
 	   a *different* trio of vtable slots. Called with (this) by
 	   DreamSys__RunTickCallbacks, if non-NULL. */
-    void (*callback_0x98)(struct DreamSys *this);
+    void (*moveCallback)(struct DreamSys *this);
     /* "Mode" field read/written by DreamSys__SelectCallback98(this, arg1): when ==2 on
 	   entry, this->methods->stopDrift(this, 0) fires first; then it is set
 	   unconditionally to arg1 (round 2026-08-30). */
-    s32 callback98Mode;
+    s32 moveCallbackMode;
     /* (this->moveCommand ^ 1) < 1u, i.e. (moveCommand == 1), written by
 	   DreamSys__StepLookYaw; also toggled/incremented by DreamSys__FlipMoveCommand and forced
 	   to 1 by DreamSys__TickMoveForced (round 2026-08-30). */
@@ -467,7 +467,7 @@ struct DreamSys {
     s32 voiceIndex;
     s8 unknown_values_0xC0[4];
     /* Set to 1 by DreamSys__SelectCallback98's arg1==2 case, alongside cueServiceActive and
-	   callback_0x98 (round 2026-08-30). */
+	   moveCallback (round 2026-08-30). */
     s32 driftActive;
     /* Set to 1 by DreamSys__SelectCallback98's arg1==2 case, alongside driftActive
 	   (round 2026-08-30). */
@@ -658,8 +658,8 @@ struct DreamSysMethods {
     /* +0x140 */ void (*stepLook)(DreamSys *self);                   /* DreamSys__StepLook */
     /* +0x144 */ void (*stepLookOffset)(DreamSys *self);             /* DreamSys__StepLookOffset */
     /* +0x148 */ void (*stepLookYaw)(DreamSys *self);                /* DreamSys__StepLookYaw */
-    /* +0x14C */ void (*slot14C)(DreamSys *self); /* DreamSys__NoOpSlot14C, empty; a callback_0x80 choice */
-    /* +0x150 */ void (*slot150)(DreamSys *self); /* DreamSys__NoOpSlot150, empty; a callback_0x80 choice */
+    /* +0x14C */ void (*slot14C)(DreamSys *self); /* DreamSys__NoOpSlot14C, empty; a lookCallback choice */
+    /* +0x150 */ void (*slot150)(DreamSys *self); /* DreamSys__NoOpSlot150, empty; a lookCallback choice */
     /* +0x154 */ s32 (*tickMove)(DreamSys *self);                   /* DreamSys__TickMove */
     /* +0x158 */ s32 (*tickMoveFree)(DreamSys *self);               /* DreamSys__TickMoveFree */
     /* +0x15C */ s32 (*tickMoveForced)(DreamSys *self);             /* DreamSys__TickMoveForced */

@@ -111,8 +111,8 @@ DreamSys *DreamSys__DreamSys(DreamSys *this, LinkResource *modelSource, s32 soun
 void DreamSys__ResetSessionState(DreamSys *this) {
     this->methods->setDisplay(this, 0);
     this->methods->updateRotation(this, 1, &ROTATION_YAW_180);
-    this->callback_0x80 = NULL;
-    this->callback_0x98 = NULL;
+    this->lookCallback = NULL;
+    this->moveCallback = NULL;
     *(s32 *)this->soundCueSet = 0;
     this->staircaseActive = 0;
     this->staircaseMoveGate = 0;
@@ -398,10 +398,10 @@ void DreamSys__UpdateTickState(DreamSys *this) {
 }
 
 void DreamSys__RunTickCallbacks(DreamSys *this) {
-    if (this->callback_0x80 != NULL)
-        this->callback_0x80(this);
-    if (this->callback_0x98 != NULL)
-        this->callback_0x98(this);
+    if (this->lookCallback != NULL)
+        this->lookCallback(this);
+    if (this->moveCallback != NULL)
+        this->moveCallback(this);
 }
 
 /* Local prototypes, own local view (SceneNode__LocalOffsetToWorldPos is a different unit's
@@ -485,19 +485,19 @@ void DreamSys__SetTickCallbacks(DreamSys *this, s32 mode98, s32 mode80) {
 void DreamSys__SelectCallback80(DreamSys *this, s32 mode) {
     DreamSysMethods *vt = this->methods;
 
-    this->callback80Mode = mode;
+    this->lookCallbackMode = mode;
     switch (mode) {
         case 0:
-            this->callback_0x80 = NULL;
+            this->lookCallback = NULL;
             break;
         case 1:
-            this->callback_0x80 = vt->stepLook;
+            this->lookCallback = vt->stepLook;
             break;
         case 2:
-            this->callback_0x80 = vt->slot14C;
+            this->lookCallback = vt->slot14C;
             break;
         case 3:
-            this->callback_0x80 = vt->slot150;
+            this->lookCallback = vt->slot150;
             break;
     }
 }
@@ -507,18 +507,18 @@ extern void InitSoundCueSet(s32 arg0, void *arg1, s32 arg2, DreamSys *arg3, void
 void DreamSys__SelectCallback98(DreamSys *this, s32 mode) {
     DreamSysMethods *vt = this->methods;
 
-    if (this->callback98Mode == 2)
+    if (this->moveCallbackMode == 2)
         vt->stopDrift(this, 0);
-    this->callback98Mode = mode;
+    this->moveCallbackMode = mode;
     switch (mode) {
         case 0:
-            this->callback_0x98 = NULL;
+            this->moveCallback = NULL;
             break;
         case 1:
-            this->callback_0x98 = (void (*)(DreamSys *))vt->tickMove;
+            this->moveCallback = (void (*)(DreamSys *))vt->tickMove;
             break;
         case 2:
-            this->callback_0x98 = vt->tickDrift;
+            this->moveCallback = vt->tickDrift;
             this->driftActive = 1;
             this->cueServiceActive = 1;
             InitSoundCueSet(this->soundObj, this->soundCueSet, 1, this, this->methods->soundCueCallback);
