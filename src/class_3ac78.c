@@ -31,10 +31,10 @@
  */
 #include "common.h"
 #include "class_3ac78.h"
+#include "VabStreamObj.h"
 #include "LightRig.h"
 #include "Class86668.h"
 #include "DrawSystem.h"
-#include "VabStreamObj.h"
 
 /* Class86668::sound is BasicClass * (it may be the ctor's own argument); when
  * it is a New_VabStreamObj object, +0x080 is VabStreamObj__PlayTone. */
