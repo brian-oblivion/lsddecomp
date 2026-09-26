@@ -107,8 +107,8 @@ typedef struct StatBuf179D8H {
 /* CdSearchFile (was func_8002B640): Sony's, lib/libcd/iso9660.o since round 34 -- declared
  * LOCAL here, per-call-site typed.
  *
- * This comment used to read "still uncarved in its own unit (code_179d8_g,
- * BLOCKED addiu_at there)", and both halves had gone stale: code_179d8_g has
+ * This comment used to read "still uncarved in its own unit (code_179d8_b,
+ * BLOCKED addiu_at there)", and both halves had gone stale: code_179d8_b has
  * been a carved C unit since round 17, and `addiu_at` was RESOLVED in round
  * 21 (maspsx `--addiu-at`; docs/research/addiu-at-blocker.md), which leaves
  * func_8002B640 blocker-clean and assignable (re-screened with

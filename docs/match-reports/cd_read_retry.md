@@ -2,7 +2,7 @@
 
 > Renamed from `func_8002AA6C` on 2026-09-24 (tools/rename.py). Address 0x8002aa6c.
 
-Unit `code_179d8_g`. Runner delta, round 17. 223 instructions.
+Unit `code_179d8_b`. Runner delta, round 17. 223 instructions.
 
 ## Read this label first
 
@@ -41,7 +41,7 @@ the length was nearly right, which is what made its score readable.
 ## Body, as salvaged
 
 Uncompiled and unmeasured beyond the above. Everything it references was
-declared in `src/code_179d8_g.c` at the time, including the `extern volatile`
+declared in `src/code_179d8_b.c` at the time, including the `extern volatile`
 hardware-register block (`D_8006D8C0` and neighbours) that delta established
 for this unit.
 
@@ -208,7 +208,7 @@ nothing to re-derive there.
 
 Restored to `INCLUDE_ASM` (no score short of byte-exact stays in
 `src/`); the two extern declarations for `D_80010AAC`/`D_80010ABC` are
-kept live in `src/code_179d8_g.c` since they're needed by any future
+kept live in `src/code_179d8_b.c` since they're needed by any future
 attempt and cost nothing to carry forward.
 
 ### Proposed learning
@@ -233,8 +233,8 @@ functions touching the same global.
 
 Per the head's brief, worked from round 19's 119/223 baseline (ignore the
 superseded "Score: NONE" section above this one -- see round 19's own
-entry for why). Read `asm/nonmatchings/code_179d8_g/cd_read_retry.s`
-directly alongside `objdump -dr build/src/code_179d8_g.c.o` and
+entry for why). Read `asm/nonmatchings/code_179d8_b/cd_read_retry.s`
+directly alongside `objdump -dr build/src/code_179d8_b.c.o` and
 `tools/asm-differ/diff.py cd_read_retry` to localize the actual
 instruction-count gap, rather than trusting the round-19 report's prose
 description of it (which turned out to describe the opposite register
@@ -524,7 +524,7 @@ instead, changing which arm falls through).
 
 Re-reading `cb_read`'s STILL-OPEN residue (the `elseBranch` pointer
 landing in `$s0` instead of `$v1`) against the raw `.s`
-(`asm/nonmatchings/code_179d8_g/cb_read.s`, lines 34-45) confirms the
+(`asm/nonmatchings/code_179d8_b/cb_read.s`, lines 34-45) confirms the
 block-order PART of the mechanism is already satisfied here: the
 if-branch's own tail ends with an explicit `j .L8002B56C` (line 39, jumping
 OVER the elseBranch to the shared label), and `elseBranch` itself (line
@@ -1016,7 +1016,7 @@ instead of `puts(D_80010AAC)` directly. Verified against the real oracle:
 on the resulting object shows GCC materializes `D_80010AAC`'s address into
 `$a0` ONCE, before the loop label, and the loop body's `jal puts` relies on
 `$a0` STILL holding it -- while retail's own disassembly
-(`asm/nonmatchings/code_179d8_g/cd_read_retry.s`, `.L8002AAC8:`) recomputes
+(`asm/nonmatchings/code_179d8_b/cd_read_retry.s`, `.L8002AAC8:`) recomputes
 the same `lui`/`addiu` pair FRESH INSIDE the loop, every iteration. Because
 `$a0` is caller-saved and every iteration of this loop makes several calls
 (`printf`, `CD_cw` more than once) that clobber it, **the hoisted

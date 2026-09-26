@@ -359,7 +359,7 @@ lines). `sys` has a 5-byte `.rdata` ("none", 0x1040) and a 0x80-byte `.data`
 `.rdata` with a 3-byte `pad`. `code_179d8_b` is left with ONE function.
 
 **`libcd/iso9660` + `libc2/strcmp` + `libc2/strncmp`** (0x1BE40..0x1C92C,
-crossing `code_179d8_g` / `code_179d8_d`): nine functions, three stalls
+crossing `code_179d8_b` / `code_179d8_d`): nine functions, three stalls
 (`CdSearchFile`, `CD_newmedia`, `CD_cachefile`, ~1300 lines). `.rdata` 0x1EA
 at 0x12EC with a 2-byte pad before `code_179d8_c_b`'s jump table; `.data`
 8 bytes at 0x5E138 (a byte search finds the same two DMA register addresses

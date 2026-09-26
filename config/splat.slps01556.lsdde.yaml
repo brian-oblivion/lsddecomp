@@ -768,7 +768,6 @@ segments:
       # 186, 189 instructions), so this unit is smaller in count and larger
       # in work than its 17 suggests.  Owns NO switch jump table (zero
       # `jtbl_` references in the slice), so no rodata attach.
-      - [0x1AB78, c, code_179d8_g]     # now 0x1AB78..0x1BE40, 14 functions
       # ROUND 34 (head): libcd/iso9660 (Psy-Q 3.3, 0xA08) + libc2/strcmp +
       # libc2/strncmp tile 0x1BE40..0x1C92C exactly and cross the
       # code_179d8_g / code_179d8_d boundary at 0x1C440, so both units trim

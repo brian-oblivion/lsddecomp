@@ -29,7 +29,7 @@ retail 0x1A640 (vram 0x80029E40):  andi $a2, $v0, 0xFF     -- missing (flag2 == 
 retail 0x1A690 (vram 0x80029E90):  andi $a2, $v0, 0xFF     -- missing (flag1 == D_8006D8D8[1] check)
 ```
 
-In both spots, retail loads the flag byte with `lbu $v0, N($s3)` and then REDUNDANTLY re-masks it with `andi $a2, $v0, 0xFF` before the `beqz`/comparison -- redundant because `lbu` already zero-extends, so the mask can never change the value. GCC in this build correctly proves the mask is a no-op and elides it (`lbu $a2, N($s3)` directly, no `andi`). This is dead-code elimination working AS INTENDED on a genuinely redundant instruction retail happens to keep; it is not something a scheduling barrier can rescue. `docs/DECOMPILATION_LEARNINGS.md`'s decomposition of the `code_179d8_g` "redundant-raw-copy-elision" puzzle names this exact mechanism as its THIRD cause, distinct from block-order: *"Dead-code elimination. `func_8002B94C`'s redundant-looking check is removed by the optimizer BEFORE scheduling runs, which no barrier placement can rescue."* Confirmed empirically here too: neither a `__asm__("")` barrier immediately after the load, nor one after the following store, restores the mask (both left in the body below as inert, since they DID fix a genuine, separate ordering defect one line later -- see below -- and removing them regresses that fix).
+In both spots, retail loads the flag byte with `lbu $v0, N($s3)` and then REDUNDANTLY re-masks it with `andi $a2, $v0, 0xFF` before the `beqz`/comparison -- redundant because `lbu` already zero-extends, so the mask can never change the value. GCC in this build correctly proves the mask is a no-op and elides it (`lbu $a2, N($s3)` directly, no `andi`). This is dead-code elimination working AS INTENDED on a genuinely redundant instruction retail happens to keep; it is not something a scheduling barrier can rescue. `docs/DECOMPILATION_LEARNINGS.md`'s decomposition of the `code_179d8_b` "redundant-raw-copy-elision" puzzle names this exact mechanism as its THIRD cause, distinct from block-order: *"Dead-code elimination. `func_8002B94C`'s redundant-looking check is removed by the optimizer BEFORE scheduling runs, which no barrier placement can rescue."* Confirmed empirically here too: neither a `__asm__("")` barrier immediately after the load, nor one after the following store, restores the mask (both left in the body below as inert, since they DID fix a genuine, separate ordering defect one line later -- see below -- and removing them regresses that fix).
 
 Two real fixes ARE folded into the body below and are worth keeping on record:
 
@@ -184,7 +184,7 @@ ret1:
 ## What is known independently of this body
 
 - Screened blocker-clean at carve time (round 26).
-- `D_8008B3DC` is a NEW symbol this unit introduces (not referenced by `code_179d8_g.c` or `code_179d8_b.c`'s own local views) -- an 8-byte scratch buffer parallel to `D_8008B3CC`/`D_8008B3D4`, no dlabel in `asm/data/*.s` (uninitialized/BSS-style, same as those two).
+- `D_8008B3DC` is a NEW symbol this unit introduces (not referenced by `code_179d8_b.c` or `code_179d8_b.c`'s own local views) -- an 8-byte scratch buffer parallel to `D_8008B3CC`/`D_8008B3D4`, no dlabel in `asm/data/*.s` (uninitialized/BSS-style, same as those two).
 - The two flag bytes (`D_8006D8D8[1]`, `D_8006D8D8[2]`) are read/written ONLY by this function within the unit; `CD_sync` and `CD_cw` only ever touch `D_8006D8D8[0]`/`[1]`.
 
 ### Proposed learning
@@ -197,7 +197,7 @@ ret1:
 > `func_8002B94C` cause "suspect" without resolving why. It resolves cleanly:
 > `func_8002B94C` is **`CD_newmedia`**, Sony's code, linked from
 > `lib/libcd/iso9660.o` and reclassified in round 34 --
-> `src/code_179d8_g.c`'s header comment records the conversion. It was never
+> `src/code_179d8_b.c`'s header comment records the conversion. It was never
 > a game stall, so **no source shape ever reached those bytes** and there is
 > no "documented `func_8002B94C` cause" to match against. The dead-code
 > elimination of an `andi` after an already-zero-extending `lbu` is a real
@@ -208,7 +208,7 @@ ret1:
 >
 > Note the `CD_readsync` half of that same bullet is the OTHER exit and is
 > fine: that one was matched as game C (174/174, round 39), so its precedent
-> is real and complete -- go read the C in `src/code_179d8_g.c` rather than
+> is real and complete -- go read the C in `src/code_179d8_b.c` rather than
 > the report's summary of it.
 
 Same stale-symbol-name hazard as `CD_sync` (see that report's round-35

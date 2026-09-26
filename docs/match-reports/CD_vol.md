@@ -2,7 +2,7 @@
 
 > Renamed from `func_8002A378` on 2026-09-23 (tools/rename.py). Address 0x8002a378.
 
-**Unit:** code_179d8_g · **Size:** 34 words · **Status:** MATCHED (34/34 words)
+**Unit:** code_179d8_b · **Size:** 34 words · **Status:** MATCHED (34/34 words)
 
 ## What it does
 

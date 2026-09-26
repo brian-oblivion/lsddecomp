@@ -5,7 +5,7 @@
 > matched C counted as game code; the object owns its bytes, so the C is gone from
 > `src/` and the game-code count shrank by it -- the correction CLAUDE.md asks
 > for, not a regression. The run `libcd/iso9660` + `libc2/strcmp` +
-> `libc2/strncmp` tiles 0x1BE40..0x1C92C and crosses the code_179d8_g /
+> `libc2/strncmp` tiles 0x1BE40..0x1C92C and crosses the code_179d8_b /
 > code_179d8_d boundary; both units trimmed. Whole-image SHA1 green. Nothing
 > here is assignable and there is no stall left to work. The text below is the
 > pre-conversion record.

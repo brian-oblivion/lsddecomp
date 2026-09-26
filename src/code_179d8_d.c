@@ -16,7 +16,7 @@
  * ROUND 34 (head): the unit's FIRST SIX functions left it. CD_searchdir
  * (func_8002BC40), CD_cachefile (func_8002BCEC, the 175w stall), cd_read
  * (func_8002BFA8) and iso9660's own WEAK memcpy (func_8002C014) are the tail
- * of `libcd/iso9660.o` (Psy-Q 3.3), which starts in code_179d8_g; strcmp
+ * of `libcd/iso9660.o` (Psy-Q 3.3), which starts in code_179d8_b; strcmp
  * (func_8002C048) and strncmp (func_8002C0AC) are `libc2/strcmp.o` and
  * `libc2/strncmp.o`. Five had been matched as C -- they were Sony's the whole
  * time, and reclassifying them out of the game count is the correction

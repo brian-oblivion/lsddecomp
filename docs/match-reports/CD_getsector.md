@@ -2,7 +2,7 @@
 
 > Renamed from `func_8002B304` on 2026-09-23 (tools/rename.py). Address 0x8002b304.
 
-**Unit:** code_179d8_g · **Size:** 56 words · **Status:** MATCHED (56/56 words)
+**Unit:** code_179d8_b · **Size:** 56 words · **Status:** MATCHED (56/56 words)
 
 ## What it does
 

@@ -22,7 +22,7 @@
 > than round 20's — just not the one the title claims.
 
 
-**Unit:** code_179d8_g · **Size:** 196 words · **Status:** STALL (length EXACT 196/196, 171/196 words match, first real diff at vram 0x8002A888)
+**Unit:** code_179d8_b · **Size:** 196 words · **Status:** STALL (length EXACT 196/196, 171/196 words match, first real diff at vram 0x8002A888)
 
 ## What it does
 
