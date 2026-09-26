@@ -116,6 +116,14 @@ requires a relocation-masked *exact* match instead of scoring by edit distance,
 and does not commit the objects — `sdk/` and `lib/` are bring-your-own like
 `disk/` — but the shape of the solution is theirs.
 
+The objects come from Sony's "Programmer Tool — Runtime Library" discs, in
+redump format, from the [ps1_sdks collection on the Internet
+Archive](https://archive.org/download/ps1_sdks) (`sdk/README.md`). Which disc
+supplies which object is measured, not assumed, and recorded in
+`config/psyq-objects.txt`; as of 2026-09-26 it takes 165 objects from the 3.3
+disc, 11 from 3.5 and 2 from 3.6
+(`grep -vE '^\s*(#|$)' config/psyq-objects.txt | awk '{print $1}' | sort | uniq -c`).
+
 The conversion from Sony's LNK object format to ELF is
 [**psyq-obj-parser**](https://github.com/grumpycoders/pcsx-redux/tree/main/tools/psyq-obj-parser)
 from the grumpycoders' **PCSX-Redux** project; we use the static Linux build
@@ -142,22 +150,31 @@ purpose.
 
 ## Tools
 
-Built entirely on the console decompilation community's work:
+Built entirely on the console decompilation community's work. Everything
+below is fetched or built by `tools/setup.sh`; "shallow clone" means it takes
+upstream HEAD, unpinned.
 
-| tool | what it does here |
-| --- | --- |
-| [splat](https://github.com/ethteck/splat) (ethteck) | splits the executable into asm and C units |
-| [maspsx](https://github.com/mkst/maspsx) (mkst) | reproduces ASPSX macro expansion between cc1 and gas — in the build pipeline, not optional |
-| [m2c](https://github.com/matt-kempster/m2c) (matt-kempster) | seeds a C body from a function's disassembly |
-| [psyq-obj-parser](https://github.com/grumpycoders/pcsx-redux/tree/main/tools/psyq-obj-parser) (grumpycoders, PCSX-Redux) | converts Sony's Psy-Q `.OBJ` files to ELF objects the linker accepts |
-| [pyelftools](https://github.com/eliben/pyelftools) (eliben) | reads the converted objects' text and relocations in `tools/match_obj.py` |
-| [asm-differ](https://github.com/simonlindholm/asm-differ) (simonlindholm) | side-by-side diffs with register and branch tracking |
-| [decomp-permuter](https://github.com/simonlindholm/decomp-permuter) (simonlindholm) | searches source variants for a match |
-| [old-gcc](https://github.com/decompals/old-gcc) (decompals) | the Psy-Q-patched GCC 2.6.3 builds |
-| [spimdisasm](https://github.com/Decompollaborate/spimdisasm) / [rabbitizer](https://github.com/Decompollaborate/rabbitizer) | the MIPS disassembly underneath splat |
+| tool | pin | what it does here |
+| --- | --- | --- |
+| [old-gcc](https://github.com/decompals/old-gcc) (decompals) | release 0.17, `gcc-2.6.3-psx.tar.gz`, sha1-checked | the Psy-Q-patched GCC 2.6.3 (`cpp`, `cc1`) that compiles every C unit |
+| [maspsx](https://github.com/mkst/maspsx) (mkst) | shallow clone, plus `tools/patches/maspsx-addiu-at.patch` and `maspsx-lsd-flags.patch` | reproduces Sony ASPSX 2.34's macro expansion between cc1 and gas; in the build pipeline, not optional. The two patches are this project's: each adds a flag that switches on one behaviour maspsx already had (`--addiu-at`, `--gp-symbols`, `--no-nop-mflo-mfhi`, `--nop-at-expansion`) |
+| [GNU binutils](https://ftp.gnu.org/gnu/binutils/) | 2.43.1, built locally for `mipsel-linux-gnu` | `as`, `ld`, `objcopy`, `objdump`, `nm` |
+| [splat](https://github.com/ethteck/splat) (ethteck) | `splat64==0.41.1` | splits the executable into asm, data and C units (`make extract`) |
+| [spimdisasm](https://github.com/Decompollaborate/spimdisasm) / [rabbitizer](https://github.com/Decompollaborate/rabbitizer) (Decompollaborate) | 1.42.4 / 1.16.2 | the MIPS disassembly underneath splat |
+| [psyq-obj-parser](https://github.com/grumpycoders/pcsx-redux/tree/main/tools/psyq-obj-parser) (grumpycoders, PCSX-Redux) | decompme/compilers static build | converts Sony's Psy-Q `.OBJ` files to ELF objects the linker accepts |
+| [pyelftools](https://github.com/eliben/pyelftools) (eliben) | 0.33 | reads the converted objects' text and relocations in `tools/match_obj.py` |
+| [m2c](https://github.com/matt-kempster/m2c) (matt-kempster) | shallow clone | seeds a C body from a function's disassembly (`tools/m2ctx.py --run`) |
+| [asm-differ](https://github.com/simonlindholm/asm-differ) (simonlindholm) | shallow clone | side-by-side diffs with register and branch tracking |
+| [decomp-permuter](https://github.com/simonlindholm/decomp-permuter) (simonlindholm) | shallow clone | searches source variants for a match (`tools/setup-permuter.sh`) |
 
-The `include/psyq/` headers are Sony's Psy-Q SDK headers, as redistributed
-across the PSX decompilation scene.
+The remaining Python packages in `tools/requirements.txt` are, pinned, what
+those tools import: `n64img`, `pygfxd` and `crunch64` for splat; `colorama`,
+`watchdog`, `Levenshtein` and `cxxfilt` for asm-differ; `pycparser` for m2c;
+`toml` for the permuter; and their transitive dependencies.
+
+The `include/psyq/` headers are Sony's Psy-Q SDK headers; ours are
+byte-identical to the copies in FirecatFG's lsddecomp, which is where they came
+from.
 
 ## Legal
 
