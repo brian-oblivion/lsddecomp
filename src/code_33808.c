@@ -172,7 +172,7 @@ typedef struct Hdr43200 {
 
 extern void LockActiveDataSource(void);
 extern void UnlockActiveDataSource(void);
-u32 MaxOfBufferWords(FileResource *self);
+u32 FindMaxTimBlockSize(FileResource *self);
 
 void TimBlockSrc__AdvanceLoadState(TimBlockSrc *self) {
     TimArraySrc **p;
@@ -185,7 +185,7 @@ void TimBlockSrc__AdvanceLoadState(TimBlockSrc *self) {
             if (self->flags & 0x80) {
                 *(Hdr43200 *)self->buffer = *(Hdr43200 *)self->sector;
                 BMemPMgrFree(self->sector);
-                max = MaxOfBufferWords((FileResource *)self);
+                max = FindMaxTimBlockSize((FileResource *)self);
                 self->blocks = BMemPMgrAlloc(*(u32 *)self->buffer * 4);
                 if (self->blocks == NULL) {
                     goto fail;
@@ -241,7 +241,7 @@ typedef struct Buf434DC {
     /* +0x14 */ u32 vals[1];
 } Buf434DC;
 
-u32 MaxOfBufferWords(FileResource *self) {
+u32 FindMaxTimBlockSize(FileResource *self) {
     Buf434DC *buf = self->buffer;
     u32 i;
     u32 max = 0;
