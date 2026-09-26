@@ -105,6 +105,7 @@ for the SEPARATE `gStyleEffectSlots` array (a different object class --
 | old | new | tier | evidence |
 | --- | --- | --- | --- |
 | `D_80087324` | `gStyleKind0Counts` | A | 4 bytes {0, 3, 8, 16} picked by `rand() & 3`, passed as StyleFillEffectKind0's count. |
+| `gStyleTargetObj` | `gStyleSceneRefs` | A | RegisterStyleConfig stores its arg2 there, and its one caller passes `&ObjM::ctorSound`, the start of the sound/dreamerTmd/etcTim/cachedViewport block (`StyleSceneRefs`); kept `s32` because class_3bb8c_m.c declares it so. |
 | `0x10` | `STYLE_VARIANT2_EFFECTS` (16) | B | variant 2 fills kind 1 up to this many kind-0 plus kind-1 effects. |
 
 `gStyleSceneRefs + 4/8/0xC` are fields of the `StyleSceneRefs` view (ObjM's dreamerTmd, etcTim, cachedViewport). Locals: `pos`, `refs`, `kind0Count`, `kind1Count`, `next`.
