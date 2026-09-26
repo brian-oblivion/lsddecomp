@@ -758,7 +758,6 @@ segments:
       # reference plain rodata SYMBOLS (D_80010984/994, D_80010A0C/A14/A20/
       # A28/A38); those resolve as externs and must be referenced by symbol,
       # never re-typed as C string literals.
-      - [0x1A1BC, c, code_179d8_n]
       # code_179d8_g: functions 83..99 of the original, 0x1AB78..0x1C440
       # (17 functions).  Census 2026-09-04 with the three-grep screen run
       # over each function's own text: 14/17 clean; the three blocked were

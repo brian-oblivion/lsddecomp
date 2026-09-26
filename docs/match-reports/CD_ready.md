@@ -2,7 +2,7 @@
 
 > Renamed from `func_80029C40` on 2026-09-23 (tools/rename.py). Address 0x80029c40.
 
-Unit `code_179d8_n`. Runner echo, round 26. Carved this round; no prior report exists.
+Unit `code_179d8_b`. Runner echo, round 26. Carved this round; no prior report exists.
 
 ## Signature
 
@@ -312,5 +312,5 @@ above), not a redundant-instruction-elision on address computation or
 staleness the way `CD_cw`'s was -- the two residues only LOOKED
 similar ("something about `D_8006D8D8` accesses"), and the lever that
 helped one function did nothing for the other. Reverted immediately;
-`src/code_179d8_n.c` confirmed back to its committed state
+`src/code_179d8_b.c` confirmed back to its committed state
 (`build-and-verify.sh` clean, `git status` empty) before moving on.

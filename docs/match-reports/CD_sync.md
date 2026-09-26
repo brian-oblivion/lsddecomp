@@ -2,7 +2,7 @@
 
 > Renamed from `func_800299BC` on 2026-09-23 (tools/rename.py). Address 0x800299bc.
 
-Unit `code_179d8_n`. Runner echo, round 26. Carved this round; no prior report exists.
+Unit `code_179d8_b`. Runner echo, round 26. Carved this round; no prior report exists.
 
 ## Signature
 
@@ -10,7 +10,7 @@ Unit `code_179d8_n`. Runner echo, round 26. Carved this round; no prior report e
 s32 CD_sync(s32 arg0, s32 arg1);
 ```
 
-Confirmed by two already-matched call sites: `src/code_179d8_b.c:110` (`return CD_sync(arg0, arg1);`) and `src/code_179d8_n.c`'s own sibling `CD_cw` (`CD_sync(0, 0);`).
+Confirmed by two already-matched call sites: `src/code_179d8_b.c:110` (`return CD_sync(arg0, arg1);`) and `src/code_179d8_b.c`'s own sibling `CD_cw` (`CD_sync(0, 0);`).
 
 ## What this function does
 
@@ -270,7 +270,7 @@ this same round (where a length-exact state was adopted despite a raw-
 match tradeoff, because the structural gap count did not worsen), here
 the length gap did not close at all -- it merely changed sign, and the
 mechanism achieving the raw-match improvement is pushing AGAINST the
-documented root cause rather than around it. Reverted; `src/code_179d8_n.c`
+documented root cause rather than around it. Reverted; `src/code_179d8_b.c`
 confirmed back to its committed state (`build-and-verify.sh` clean,
 `git status` empty) before moving on. Filing as STALL, figures unchanged
 from the round-35 addendum (162/161 words LONG, same residue).

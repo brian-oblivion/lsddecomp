@@ -18,7 +18,7 @@
  * (2026-09-08) that is FALSE -- CD_sync (161w), CD_ready (180w)
  * and CD_cw (282w) are ALL THREE blocker-clean now that `addiu_at`
  * is resolved. Round 26 (2026-09-09) acted on that and CARVED them as the
- * C unit `code_179d8_n`; no `code_179d8_mid` segment exists any more.
+ * C unit `code_179d8_b`; no `code_179d8_mid` segment exists any more.
  *
  * Blocker census, three-grep screen run per function at carve time:
  * 14 of the 17 clean, zero trivial leaves.  These are BIG bodies -- 196,
@@ -145,8 +145,8 @@ extern void (*InterruptCallback(s32 arg0, void (*callback)(void)))(void); /* lib
 extern s32 VSync(s32 arg0);                            /* asm/psyq_15d04.s */
 extern void puts(const char *arg0);                   /* asm/psyq_15d04.s */
 extern void printf(const char *fmt, ...);                /* Psy-Q printf wrapper */
-extern s32 CD_cw(s32 arg0, s32 arg1, s32 arg2, s32 arg3); /* defined in code_179d8_n */
-extern s32 CD_sync(s32 arg0, s32 arg1);                   /* defined in code_179d8_n, per code_179d8_b.c */
+extern s32 CD_cw(s32 arg0, s32 arg1, s32 arg2, s32 arg3); /* defined in code_179d8_b */
+extern s32 CD_sync(s32 arg0, s32 arg1);                   /* defined in code_179d8_b, per code_179d8_b.c */
 extern s32 getintr(void);                                /* code_179d8_b.c, MATCHED round 70
                                                                    (libcd getintr by its strings) */
 extern s32 CheckCallback(void);                                /* lib/libetc/intr.o -- trivial
