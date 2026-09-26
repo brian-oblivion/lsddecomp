@@ -50,13 +50,13 @@ struct EntityMethods {
     /* +0x0C */ u8 pad0C[0x30 - 0x0C];
     /* +0x30 */ void (*notifyParents)(Entity *self, s32 arg1);   /* called by Entity__SetTargetReached, Entity__NotifyIfTargetInRange */
     /* +0x34 */ u8 pad34[0x40 - 0x34];
-    /* +0x40 */ void (*initState)(Entity *self);              /* self-only slot: occupant is Entity__InitState (tools/classtable.py), called by Entity__Entity right after this->methods is (re)assigned */
+    /* +0x40 */ void (*initState)(Entity *self);              /* self-only slot: occupant is Entity__Reset (tools/classtable.py), called by Entity__Entity right after this->methods is (re)assigned */
     /* +0x44 */ void (*updateRotation)(Entity *self, s32 arg1, void *arg2); /* called by Entity__MoodCue07 as slot44(this, 0, ROTATION_YAW_PLUS2) */
     /* +0x48 */ s32 (*updateScale)(Entity *self, s32 arg1, void *arg2); /* called by Entity__MoodCue08 (result discarded) and Entity__MoodCue17 (a tail call that returns it), both with arg1==1 -- see CLAUDE.md's "one-line wrapper" rule, Entity__MoodCue17 has no positive evidence of void */
     /* +0x4C */ u8 pad4C[0x60 - 0x4C];
     /* +0x60 */ void (*slot60)(Entity *self, s32 arg1);   /* called by Entity__Activate, Entity__Deactivate */
     /* +0x64 */ u8 pad64[0x70 - 0x64];
-    /* +0x70 */ void (*slot70)(Entity *self, s32 arg1);   /* called by Entity__InitState as slot70(this, 1), gated on `gEntityUnlockKindTable[this->moodIndex*0x10]-1` being unsigned-less-than 9 */
+    /* +0x70 */ void (*slot70)(Entity *self, s32 arg1);   /* called by Entity__Reset as slot70(this, 1), gated on `gEntityUnlockKindTable[this->moodIndex*0x10]-1` being unsigned-less-than 9 */
     /* +0x74 */ u8 pad74[0xB8 - 0x74];
     /* +0xB8 */ void (*setVec14)(Entity *self, void *arg1);  /* called by Entity__MoodCue30 as setVec14(this, &this->target->unk14->x) -- a vector-pointer argument, same shape as Entity__IsNearTarget's still-INCLUDE_ASM arg1 */
     /* +0xBC */ void (*addVec14)(Entity *self, void *arg1);  /* called by Entity__MoodCue08 */
@@ -66,7 +66,7 @@ struct EntityMethods {
     /* +0xCC */ void (*slotCC)(Entity *self, s32 arg1, s32 arg2); /* RETYPED BACK s32 -> void, round 68, and this one is settled by retail's own bytes rather than by a convention. It had been s32 on the strength of Entity__MoodCue37 (Entity_c) being a lone `return this->methods->slotCC(this, -0x5A, 0);` wrapper -- CLAUDE.md's "one-line wrapper" rule. But Entity__MoodCue37 compiles BYTE-IDENTICALLY as `void Entity__MoodCue37(Entity *this) { this->methods->slotCC(this, -0x5A, 0); }`, so its bytes were never evidence either way, while Entity__MoodCue115 (Entity_d) has POSITIVE evidence for void: retail tail-merges its slotCC call with sibling slot134/slotC4 calls that are void, and GCC 2.6.3 cannot cross-jump a `(set v0 (call ...))` against a bare `(call ...)`. s32 cost that function 6 words and was the whole of its two-round stall; void matches it 198/198. Same mechanism as slotC4 above, measured in the opposite direction -- see docs/match-reports/Entity__MoodCue115.md. */
     /* +0xD0 */ void (*slotD0)(Entity *self, s32 arg1, s32 arg2); /* called by Entity__MoodCue16 as slotD0(this, -0x176, rand() % 2), and by Entity__MoodCue11 as slotD0(this, this->unk48, 0) */
     /* +0xD4 */ u8 padD4[0x10C - 0xD4];
-    /* +0x10C */ void (*slot10C)(Entity *self, s32 arg1);  /* called by Entity__InitState as slot10C(this, 0x42), unconditionally */
+    /* +0x10C */ void (*slot10C)(Entity *self, s32 arg1);  /* called by Entity__Reset as slot10C(this, 0x42), unconditionally */
     /* +0x110 */ void (*slot110)(Entity *self);            /* called by Entity__StartSoundCue */
     /* +0x114 */ void (*slot114)(Entity *self);           /* called by Entity__StopSoundCue */
     /* +0x118 */ u8 pad118[0x128 - 0x118];
@@ -78,8 +78,8 @@ struct EntityMethods {
     /* +0x144 */ s32 (*distanceToRegion)(Entity *self, Unk94Obj *arg1); /* called by Entity__IsTargetInRange, as slot144(this, this->target) -- arg1 stays live in $a1 from its own first use all the way to this call, which is WHY retail keeps this->target in $a1 rather than a scratch register (see the match report's now-superseded "register identity" stall write-up); compared with slt -- value-returning, not void */
     /* +0x148 */ s32 (*getProximityRatio)(Entity *self);            /* called by Entity__MoodCue05; holds Entity__GetProximityRatio (this unit, MATCHED round 44) */
     /* +0x14C */ u8 pad14C[0x15C - 0x14C];
-    /* +0x15C */ void (*activate)(Entity *self);            /* self-only slot: occupant is Entity__Activate (tools/classtable.py -- a self-referential vtable dispatch, same idiom initState/slot60/etc. use throughout this table). Called by Entity__AttachUnk4C (unconditionally once its two per-mood skip-flag gates pass) and by Entity__UpdateActivationState (when its detachKind-derived condition fires) */
-    /* +0x160 */ void (*deactivate)(Entity *self);             /* CROSS-UNIT (Entity_c/d/e/f/g also dispatch through this slot -- see docs/match-reports/Entity__Deactivate.md's Proposed field names) -- occupant is Entity__Deactivate, same self-referential idiom as slot15C above. Called by Entity__DetachUnk4C, Entity__NotifyReset, Entity__UpdateDeactivationState */
+    /* +0x15C */ void (*activate)(Entity *self);            /* self-only slot: occupant is Entity__Activate (tools/classtable.py -- a self-referential vtable dispatch, same idiom initState/slot60/etc. use throughout this table). Called by Entity__AttachToParent (unconditionally once its two per-mood skip-flag gates pass) and by Entity__UpdateActivationState (when its detachKind-derived condition fires) */
+    /* +0x160 */ void (*deactivate)(Entity *self);             /* CROSS-UNIT (Entity_c/d/e/f/g also dispatch through this slot -- see docs/match-reports/Entity__Deactivate.md's Proposed field names) -- occupant is Entity__Deactivate, same self-referential idiom as slot15C above. Called by Entity__DetachFromParent, Entity__OnClass86AA0LinkCommand, Entity__UpdateDeactivationState */
     /* +0x164 */ void (*setUnkF4)(Entity *self, s32 arg1);    /* called by Entity__Deactivate and Entity__UpdateTargetProximity (as slot164(self, 1)) */
     /* +0x168 */ void (*startSoundCue)(Entity *self);               /* called by Entity__UpdateSoundCueStart */
     /* +0x16C */ void (*stopSoundCue)(Entity *self);                /* called by Entity__Deactivate, Entity__UpdateSoundCueStop, Entity__MoodCue77 (Entity_e) */
@@ -162,7 +162,7 @@ struct Unk5CObj {
 };
 
 /* Object pointed to by `Entity::unk4C` (previously modeled as a plain `s32`
- * on the strength of Entity__DetachUnk4C's `this->unk4C = 0;`, which type-checks
+ * on the strength of Entity__DetachFromParent's `this->unk4C = 0;`, which type-checks
  * against a pointer just as well). Entity__MoodCue12 dereferences it at +0x00 as
  * a method-table pointer (the same class-framework idiom as `Unk94Obj`) and
  * calls its own +0x138 slot with two extra literal-1 arguments. Shape beyond
@@ -246,7 +246,7 @@ struct EntityRegionRef {
 struct Entity {
     /* +0x00 */ EntityMethods *methods;
     /* +0x04 */ u8 pad04[0x0C - 0x04];
-    /* +0x0C */ s32 unk0C;              /* gate flag checked by Entity__DetachUnk4C -- parallels Class65650/DreamSys's own shared-base +0xC gate, see code_55dd4.h */
+    /* +0x0C */ s32 unk0C;              /* gate flag checked by Entity__DetachFromParent -- parallels Class65650/DreamSys's own shared-base +0xC gate, see code_55dd4.h */
     /* +0x10 */ u8 pad10[0x14 - 0x10];
     /* +0x14 */ EntityPos *unk14;        /* the 3-word position Entity__IsNearTarget/Entity__DistanceToRegion read via +0x18 */
     /* +0x18 */ u8 pad18[0x24 - 0x18];
@@ -256,7 +256,7 @@ struct Entity {
     /* +0x44 */ s32 moodState;             /* gates Entity__UpdateActivationState's whole body when == 1; also a small state code compared against several other literals (0xB, 0xC, 0x24, ...) by this unit's mood-dispatch handlers, and incremented directly by Entity__MoodCue13 */
     /* +0x48 */ s16 unk48;               /* a HALFWORD field (sh/lh, not the full-word sw/lw every other field here uses) -- Entity__MoodCue11 both writes it (-0x14, -0x78) and reads it back (as slotD0's arg1) */
     /* +0x4A */ u8 pad4A[0x4C - 0x4A];
-    /* +0x4C */ Unk4CObj *unk4C;          /* cleared (NULL) by Entity__DetachUnk4C; dereferenced through its own vtable by Entity__MoodCue12 -- see Unk4CObj's own comment */
+    /* +0x4C */ Unk4CObj *unk4C;          /* cleared (NULL) by Entity__DetachFromParent; dereferenced through its own vtable by Entity__MoodCue12 -- see Unk4CObj's own comment */
     /* +0x50 */ s32 companion2;              /* Class65650's companion2 (code_55dd4.h, the tag-5 BaseObjO companion); was unk50 -- round 79 head, alpha's proposal (Entity__MoodCue93.md): Entity is a Class65650 subclass (Entity__Entity runs its ctor; ENTITY_METHODS keeps its slots, `classtable.py ENTITY_METHODS --vs gClass65650Methods`). In Entity code only passed as unk100's startFadeDown/startFadeUp source (Entity__MoodCue57, Entity__MoodCue85; Class6E99C adds it as a child). Tier B. */
     /* +0x54 */ u8 pad54[0x58 - 0x54];
     /* +0x58 */ s32 soundCueChannel;             /* passed to ServiceSoundCueSet/FlushSoundCueSet */
@@ -279,8 +279,8 @@ struct Entity {
     /* +0xF4 */ s32 targetReached;           /* set from Entity__SetTargetReached's arg1; latched 1 by Entity__UpdateTargetProximity once the target is within proximityRange, cleared by Entity__Deactivate; round 78 head: renamed from unkF4 by type scope */
     /* +0xF8 */ s32 soundCueActive;             /* cleared by Entity__StopSoundCue */
     /* +0xFC */ s32 moodTimer;             /* incremented by Entity__TickSoundCue */
-    /* +0x100 */ Class6E99C *unk100;     /* lazily created/cached by Entity__GetOrCreateUnk100 (New_Class6E99C); released by Entity__Destructor */
-    /* +0x104 */ BasicClass *unk104;     /* released by Entity__Destructor (its +0x004, release), never set in Entity code: nothing shows its class */
+    /* +0x100 */ Class6E99C *unk100;     /* lazily created/cached by Entity__GetOrCreateUnk100 (New_Class6E99C); released by Entity__Finalize */
+    /* +0x104 */ BasicClass *unk104;     /* released by Entity__Finalize (its +0x004, release), never set in Entity code: nothing shows its class */
 };
 
 extern EntityMethods *Get_vtable_Entity(void);
@@ -337,11 +337,11 @@ struct EntityMoodRow {
 
 extern EntityMoodRow gEntityMoodTable[];
 extern s8 gEntityUnlockKindTable[];  /* GetUnlockEffect */
-extern s8 D_80089EA7[];  /* read by Entity__AttachUnk4C, own base symbol immediately after gEntityUnlockKindTable, moodIndex*0x10-indexed like the rest of this family */
+extern s8 D_80089EA7[];  /* read by Entity__AttachToParent, own base symbol immediately after gEntityUnlockKindTable, moodIndex*0x10-indexed like the rest of this family */
 extern s8 gEntityLinkStageTable[];  /* GetLinkStage */
 extern s8 gEntityEventVideoTable[];  /* GetEventVideo */
 extern s8 gEntityProximityThresholdTable[];  /* read by Entity__GetProximityRatio (getProximityRatio), own base symbol immediately before D_80089EAF, moodIndex*0x10-indexed like the rest of this family */
-extern s8 D_80089EAF[];  /* read by Entity__AttachUnk4C, own base symbol immediately after gEntityEventVideoTable, moodIndex*0x10-indexed like the rest of this family */
+extern s8 D_80089EAF[];  /* read by Entity__AttachToParent, own base symbol immediately after gEntityEventVideoTable, moodIndex*0x10-indexed like the rest of this family */
 
 void *Entity__GetMoodEffect(Entity *this);
 s32 Entity__GetEventVideo(Entity *this);

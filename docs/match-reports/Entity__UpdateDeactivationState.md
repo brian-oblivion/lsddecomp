@@ -23,7 +23,7 @@ based on `row->linkKind`:
   non-zero, or `linkKind == 2` when it returned zero.
 
 Detaching calls `this->methods->slot160(this)` — the same slot
-`Entity__DetachUnk4C`/`Entity__NotifyReset` dispatch through.
+`Entity__DetachFromParent`/`Entity__OnClass86AA0LinkCommand` dispatch through.
 
 ## Final C
 

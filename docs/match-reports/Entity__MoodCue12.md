@@ -25,7 +25,7 @@ see `Entity__MoodCue13.md`):
 ## New field: `Entity::unk4C` retyped, and `Unk4CObj`/`Unk4CMethods` added
 
 `Entity::unk4C` was modeled as a plain `s32` (only known write:
-`this->unk4C = 0;` in `Entity__DetachUnk4C`, `src/Entity.c`) — which type-checks
+`this->unk4C = 0;` in `Entity__DetachFromParent`, `src/Entity.c`) — which type-checks
 identically against a NULL pointer, so retyping it doesn't touch that
 already-matched function. This function dereferences it at `+0x00` as a
 method-table pointer (the same class-framework idiom used everywhere else in

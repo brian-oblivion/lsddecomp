@@ -6,7 +6,7 @@ Unit `code_55dd4`, 0x800661C4. The body is `jr $ra; nop`, which splat emits as C
 
 Round 75 (charlie), track 3.
 
-- `Class65650__TickCallbackB` (was `func_800661C4`), tier A. Occupies +0x11C, the 'B' tick callback; empty body (`jr $ra`). Entity overrides this slot with Entity__TickSoundCue and selects 'B' in Entity__InitState.
+- `Class65650__TickCallbackB` (was `func_800661C4`), tier A. Occupies +0x11C, the 'B' tick callback; empty body (`jr $ra`). Entity overrides this slot with Entity__TickSoundCue and selects 'B' in Entity__Reset.
 
 ## Track 4 (2026-09-25, round 85, alpha)
 

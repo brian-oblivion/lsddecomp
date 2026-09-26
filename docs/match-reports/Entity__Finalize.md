@@ -1,4 +1,6 @@
-# Entity__Destructor
+# Entity__Finalize
+
+> Renamed from `Entity__Destructor` on 2026-09-26 (tools/rename.py). Address 0x8005d1ec.
 
 > Renamed from `func_8005D1EC` on 2026-09-19 (tools/rename.py). Address 0x8005d1ec.
 
@@ -16,7 +18,7 @@ big comment in `Entity.h`).
 ## Final C
 
 ```c
-void Entity__Destructor(Entity *this) {
+void Entity__Finalize(Entity *this) {
     if (this->unk100 != NULL) {
         this->unk100->methods->slot04(this->unk100);
     }

@@ -1,4 +1,6 @@
-# Entity__NotifyReset
+# Entity__OnClass86AA0LinkCommand
+
+> Renamed from `Entity__NotifyReset` on 2026-09-26 (tools/rename.py). Address 0x8005d658.
 
 > Renamed from `func_8005D658` on 2026-09-19 (tools/rename.py). Address 0x8005d658.
 
@@ -8,13 +10,13 @@
 
 Calls the shared "BasicClass" ancestor's `slotE0(this, a1, a2)`, then, if
 `a2 == 4`, also calls this entity's own current `methods->slot160(this)` —
-the same `slot160` that `Entity__DetachUnk4C` and `Entity__UpdateDeactivationState` also dispatch
+the same `slot160` that `Entity__DetachFromParent` and `Entity__UpdateDeactivationState` also dispatch
 through.
 
 ## Final C
 
 ```c
-void Entity__NotifyReset(Entity *this, s32 a1, s32 a2) {
+void Entity__OnClass86AA0LinkCommand(Entity *this, s32 a1, s32 a2) {
     Get_vtable_Class65650()->slotE0(this, a1, a2);
     if (a2 == 4) {
         this->methods->slot160(this);

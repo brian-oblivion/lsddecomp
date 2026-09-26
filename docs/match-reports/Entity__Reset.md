@@ -1,4 +1,6 @@
-# Entity__InitState -- MATCHED (39/39 words)
+# Entity__Reset -- MATCHED (39/39 words)
+
+> Renamed from `Entity__InitState` on 2026-09-26 (tools/rename.py). Address 0x8005d278.
 
 > Renamed from `func_8005D278` on 2026-09-19 (tools/rename.py). Address 0x8005d278.
 
@@ -15,7 +17,7 @@ unconditionally calls two more vtable slots.
 ## Final C
 
 ```c
-void Entity__InitState(Entity *this) {
+void Entity__Reset(Entity *this) {
     s32 kind;
 
     kind = ((u8 *)gEntityUnlockKindTable)[this->moodIndex * 0x10];

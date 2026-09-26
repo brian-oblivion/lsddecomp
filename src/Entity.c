@@ -5,7 +5,7 @@
  * tables and the per-frame behaviour those handlers run.
  *
  * This unit itself covers Entity's own construction/destruction
- * (New_Entity/Entity__Entity/Entity__Destructor), its per-tick dispatcher
+ * (New_Entity/Entity__Entity/Entity__Finalize), its per-tick dispatcher
  * (Entity__Update, chaining through most of EntityMethods), the sound-cue
  * lifecycle (Entity__StartSoundCue/TickSoundCue/StopSoundCue on the
  * soundCueChannel/soundCueSet pair), the active-flag toggle
@@ -82,7 +82,7 @@ Class6E99C *Entity__GetOrCreateUnk100(Entity *this, void *name, void *arg2, void
     return sub;
 }
 
-void Entity__Destructor(Entity *this) {
+void Entity__Finalize(Entity *this) {
     if (this->unk100 != NULL) {
         this->unk100->methods->release(this->unk100);
     }
@@ -92,7 +92,7 @@ void Entity__Destructor(Entity *this) {
     Get_vtable_Class65650()->finalize((Class65650 *)this);
 }
 
-void Entity__InitState(Entity *this) {
+void Entity__Reset(Entity *this) {
     s32 kind;
 
     kind = ((u8 *)gEntityUnlockKindTable)[this->moodIndex * 0x10];
@@ -103,7 +103,7 @@ void Entity__InitState(Entity *this) {
     this->methods->deactivate(this);
 }
 
-void Entity__AttachUnk4C(Entity *this, s32 arg1, s32 arg2, Unk4CObj *arg3, s32 arg4) {
+void Entity__AttachToParent(Entity *this, s32 arg1, s32 arg2, Unk4CObj *arg3, s32 arg4) {
     if (this->unk0C != 0) {
         return;
     }
@@ -120,7 +120,7 @@ void Entity__AttachUnk4C(Entity *this, s32 arg1, s32 arg2, Unk4CObj *arg3, s32 a
     this->methods->startSoundCue(this);
 }
 
-void Entity__DetachUnk4C(Entity *this) {
+void Entity__DetachFromParent(Entity *this) {
     if (this->unk0C != 0) {
         this->methods->deactivate(this);
         Get_vtable_Class65650()->detachFromParent((Class65650 *)this);
@@ -165,7 +165,7 @@ void Entity__NotifyLinkStage(Entity *this, s32 arg1, s32 arg2) {
     this->methods->notifyParents(this, arg2);
 }
 
-void Entity__NotifyReset(Entity *this, s32 a1, s32 a2) {
+void Entity__OnClass86AA0LinkCommand(Entity *this, s32 a1, s32 a2) {
     Get_vtable_Class65650()->onClass86AA0LinkCommand((Class65650 *)this, (void *)a1, a2);
     if (a2 == 4) {
         this->methods->deactivate(this);

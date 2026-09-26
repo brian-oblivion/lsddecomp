@@ -45,6 +45,6 @@ unrelated "Link" vocabulary already established for `Entity__GetLinkStage`.
   (self-referential dispatch). CROSS-UNIT: called from Entity_c/d/e/f/g
   (grep -rn -- '->slot160(' src/Entity_*.c), so proposed rather than
   applied even though this unit's OWN three callers
-  (`Entity__DetachUnk4C`, `Entity__NotifyReset`, `Entity__
+  (`Entity__DetachFromParent`, `Entity__OnClass86AA0LinkCommand`, `Entity__
   UpdateDeactivationState`) were updated to reflect the finding in the
   header comment directly.

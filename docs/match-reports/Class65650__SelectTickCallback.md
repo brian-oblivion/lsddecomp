@@ -55,7 +55,7 @@ it then.
 
 Round 75 (charlie), track 3.
 
-- `Class65650__SelectTickCallback` (was `func_800660BC`), tier A. Occupies +0x10C. Stores the VALUE of slot +0x118/+0x11C/+0x120 (TickCallbackA/B/C) in tickCallback for selector 0x41/0x42/0x43 ('A'/'B'/'C'); anything else leaves it. Callers: InitDefaults ('A'), Entity__InitState ('B', which Entity overrides with Entity__TickSoundCue).
+- `Class65650__SelectTickCallback` (was `func_800660BC`), tier A. Occupies +0x10C. Stores the VALUE of slot +0x118/+0x11C/+0x120 (TickCallbackA/B/C) in tickCallback for selector 0x41/0x42/0x43 ('A'/'B'/'C'); anything else leaves it. Callers: InitDefaults ('A'), Entity__Reset ('B', which Entity overrides with Entity__TickSoundCue).
 
 ## Track 4 (2026-09-25, round 85, alpha)
 

@@ -1,4 +1,6 @@
-# Entity__DetachUnk4C
+# Entity__DetachFromParent
+
+> Renamed from `Entity__DetachUnk4C` on 2026-09-26 (tools/rename.py). Address 0x8005d418.
 
 > Renamed from `func_8005D418` on 2026-09-19 (tools/rename.py). Address 0x8005d418.
 
@@ -16,7 +18,7 @@ table), then clears `this->unk4C`.
 ## Final C
 
 ```c
-void Entity__DetachUnk4C(Entity *this) {
+void Entity__DetachFromParent(Entity *this) {
     if (this->unk0C != 0) {
         this->methods->slot160(this);
         Get_vtable_Class65650()->slot50(this);
@@ -31,7 +33,7 @@ Matched on the first attempt.
 
 ## Proposed learning
 
-This function (along with `Entity__NotifyReset`, `Entity__Update`, `Entity__GetOrCreateUnk100`)
+This function (along with `Entity__OnClass86AA0LinkCommand`, `Entity__Update`, `Entity__GetOrCreateUnk100`)
 is what established `Get_vtable_Class65650()`'s SHARED-vtable role for this unit —
 see the class-framework comment block now at the top of `Entity.h`. Worth
 flagging for anyone touching `Entity_b` next: `Get_vtable_Class65650()` (matched,
@@ -45,7 +47,7 @@ unit's own call sites need.
 ## Naming
 
 **Tier B.** Renamed from `func_8005D418` this round (tools/rename.py). The
-exact mirror of `Entity__AttachUnk4C` (clears `this->unk4C` under the same
+exact mirror of `Entity__AttachToParent` (clears `this->unk4C` under the same
 `this->unk0C` gate, plus a base-ancestor `slot50` call and `methods->slot160`
 -- now known to resolve to `Entity__Deactivate`, see the proposed field
 names in `Entity__Deactivate.md`). Same caveat as AttachUnk4C: mechanics

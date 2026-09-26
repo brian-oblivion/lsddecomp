@@ -1,4 +1,6 @@
-# Entity__AttachUnk4C -- MATCHED (65/65 words)
+# Entity__AttachToParent -- MATCHED (65/65 words)
+
+> Renamed from `Entity__AttachUnk4C` on 2026-09-26 (tools/rename.py). Address 0x8005d314.
 
 > Renamed from `func_8005D314` on 2026-09-19 (tools/rename.py). Address 0x8005d314.
 
@@ -6,7 +8,7 @@
 
 ## What it does
 
-Gated by `this->unk0C` (the same shared-ancestor "gate flag" `Entity__DetachUnk4C`
+Gated by `this->unk0C` (the same shared-ancestor "gate flag" `Entity__DetachFromParent`
 reads), forwards all four of its own arguments straight through to a new
 `BasicClassMethods` slot (`slot4C`), stashes `arg3` into `this->unk4C` (the
 `Unk4CObj *` field), then runs two independent early-out checks against two
@@ -17,7 +19,7 @@ self-only vtable calls.
 ## Final C
 
 ```c
-void Entity__AttachUnk4C(Entity *this, s32 arg1, s32 arg2, Unk4CObj *arg3, s32 arg4) {
+void Entity__AttachToParent(Entity *this, s32 arg1, s32 arg2, Unk4CObj *arg3, s32 arg4) {
     if (this->unk0C != 0) {
         return;
     }
@@ -80,5 +82,5 @@ mechanic is a leaf-simple field set (`this->unk4C = arg3`) past a gate, so
 the name says exactly that -- "Attach" for the store, "Unk4C" because the
 field's own real-world purpose is still open (its only other known reader,
 `Entity__MoodCue12`, dereferences it as a vtable-holding object but that alone
-doesn't say what it IS). Pairs with `Entity__DetachUnk4C` below under the
+doesn't say what it IS). Pairs with `Entity__DetachFromParent` below under the
 same `this->unk0C` gate.
