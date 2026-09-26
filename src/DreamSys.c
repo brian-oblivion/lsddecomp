@@ -41,7 +41,7 @@
  * Naming pass: round 66 (Opus). Everything above is measured, not guessed --
  * the evidence for each name is in that function's match report under
  * `## Naming`. Four functions are deliberately still `func_`-shaped
- * (DreamSys__func_5938c/59590/59598/5ba20 and the free GetTeleportTimeBonus): each
+ * (DreamSys__SetEtcTim/59590/59598/5ba20 and the free GetTeleportTimeBonus): each
  * touches exactly one field or global that nothing in any carved unit ever
  * reads back, so there is nothing to name them after. */
 #include "common.h"
@@ -388,7 +388,7 @@ void DreamSys__SetViewport(DreamSys *this, Viewport *value) {
     this->viewport = value;
 }
 
-void DreamSys__func_5938c(DreamSys *this, s32 value) {
+void DreamSys__SetEtcTim(DreamSys *this, s32 value) {
     this->unk_0x64 = value;
 }
 

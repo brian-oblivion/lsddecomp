@@ -1,4 +1,6 @@
-# DreamSys__func_5938c
+# DreamSys__SetEtcTim
+
+> Renamed from `DreamSys__func_5938c` on 2026-09-26 (tools/rename.py). Address 0x8005938c.
 
 > Renamed from `func_8005938C` on 2026-09-22 (tools/rename.py). Address 0x8005938c.
 
@@ -11,7 +13,7 @@ Setter for `unk_0x64`.
 ## The C
 
 ```c
-void DreamSys__func_5938c(DreamSys *this, s32 value)
+void DreamSys__SetEtcTim(DreamSys *this, s32 value)
 {
 	this->unk_0x64 = value;
 }
@@ -36,7 +38,7 @@ see docs/DECOMPILATION_LEARNINGS.md on salvage splicing.
 
 ## Naming
 
-`DreamSys__func_5938c` -- tier C (round 66, runner alpha, FINISHING-PLAN track 3).
+`DreamSys__SetEtcTim` -- tier C (round 66, runner alpha, FINISHING-PLAN track 3).
 
 Renamed from `func_8005938C`.
 

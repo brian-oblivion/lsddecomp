@@ -396,7 +396,7 @@ struct DreamSys {
 	   (round 2026-09-02): the LinkResource its model 0 came from. No other
 	   observed use in this unit's queued functions. */
     struct LinkResource *unk_0x60;
-    /* Set by DreamSys__func_5938c(this, value); no other observed use. */
+    /* Set by DreamSys__SetEtcTim(this, value); no other observed use. */
     s32 unk_0x64;
 
     bool isFlashbackSession;
@@ -656,7 +656,7 @@ struct DreamSysMethods {
     /* +0x108 */ s32 (*getDreamTimerScaled)(DreamSys *self); /* DreamSys__GetDreamTimerScaled: tick / 15 */
     /* +0x10C */ void (*setSoundObj)(DreamSys *self, s32 value); /* DreamSys__SetSoundObj */
     /* +0x110 */ void (*setViewport)(DreamSys *self, struct Viewport *value); /* DreamSys__SetViewport */
-    /* +0x114 */ void (*slot114)(DreamSys *self, s32 value); /* DreamSys__func_5938c: unk_0x64 = value */
+    /* +0x114 */ void (*slot114)(DreamSys *self, s32 value); /* DreamSys__SetEtcTim: unk_0x64 = value */
     /* +0x118 */ void (*updateTickState)(DreamSys *self);  /* DreamSys__UpdateTickState */
     /* +0x11C */ void (*runTickCallbacks)(DreamSys *self); /* DreamSys__RunTickCallbacks */
     /* +0x120 */ s32 (*projectPointAtDistance)(DreamSys *self, s32 *out, s32 dist, s32 *reference,
