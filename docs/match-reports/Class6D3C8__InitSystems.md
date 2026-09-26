@@ -28,7 +28,7 @@ lw    $v0, 0x18($s0)        ; v0 = self->unk18
 nop
 bnez  $v0, .L80026154        ; skip if unk18 != 0
  addu $s2, $a2, $zero          ; s2 = a2
-jal   GetApplicationMethods            ; -> &D_8006E4F0 (base class table)
+jal   GetApplicationMethods            ; -> &gApplicationMethods (base class table)
  nop
 lw    $v0, 0x44($v0)             ; base table slot +0x044
 addu  $a0, $s0, $zero
@@ -68,7 +68,7 @@ match doesn't rule out inheritance — it may mean the diff is against the
 wrong ancestor. When a derived table's *high* slots (added by the subclass)
 line up byte-for-byte with a *different* candidate table's high slots too,
 re-run `--vs` against that candidate; a longer identical run there is the
-real parent. This class's real parent (D_8006E4F0, an intermediate between
+real parent. This class's real parent (gApplicationMethods, an intermediate between
 BasicClass and this class) was only found this way.
 
 ## Naming

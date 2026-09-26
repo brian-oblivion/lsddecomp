@@ -8,11 +8,11 @@
 
 ## What it does
 
-The class-table getter: returns `&D_8006E4F0`.
+The class-table getter: returns `&gApplicationMethods`.
 
 ```c
 ApplicationMethods *GetApplicationMethods(void) {
-    return &D_8006E4F0;
+    return &gApplicationMethods;
 }
 ```
 
@@ -22,7 +22,7 @@ ApplicationMethods *GetApplicationMethods(void) {
 *func_8003B20C(void);` with its own view of the table. This unit does NOT
 include that header and declares its own local `ApplicationMethods` view,
 so the two never meet in one translation unit (the multiple-local-views
-convention). A track-4 unification of D_8006E4F0 would merge the two views:
+convention). A track-4 unification of gApplicationMethods would merge the two views:
 MiddleClassMethods types +0x044 as `s32 (*)(void *, void *, void *, s32)`
 (4 args, from code_1677c's call `slot44(self, a1, a2, 0)`), while the
 occupant Application__InitSystems reads only three (self, source, arg). A void
@@ -53,7 +53,7 @@ collision rules: never edit `config/symbols.slps01556.lsdde.txt` except
 through `tools/rename.py`). Posted to the broadcast for the head.
 
 Note in passing: this round's byte-exact match of `func_8003B20C` as
-ordinary game C (`return &D_8006E4F0;`, called directly by
+ordinary game C (`return &gApplicationMethods;`, called directly by
 `Class6D3C8__Class6D3C8`, confirmed game code) also resolves that stale
 track-2 ambiguity note -- it is not Sony's `DrawPrim`/`SpuRead`/`SpuWrite`,
 it is this class's table getter. The note should be dropped when the head
@@ -65,7 +65,7 @@ applies the rename.
 `GetApplicationMethods` with `tools/rename.py`, which now replaces the
 address's existing symbols-file line (the blocker above no longer
 reproduces; the symbols line carried no stale `unidentified` note by this
-round). Evidence unchanged: the body is `return &D_8006E4F0;`, Application's
+round). Evidence unchanged: the body is `return &gApplicationMethods;`, Application's
 own table, and both callers use it as the table getter
 (`Application__Application` installs it; `Class6D3C8__Class6D3C8` and
 `Class6D3C8__InitSystems` call the base class's ctor and

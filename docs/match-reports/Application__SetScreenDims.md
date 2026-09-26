@@ -8,7 +8,7 @@
 
 ## What it does
 
-Slot `+0x040` of D_8006E4F0. Copies an 8-byte pair into `self+0x0C` and
+Slot `+0x040` of gApplicationMethods. Copies an 8-byte pair into `self+0x0C` and
 stores the third argument at `self+0x14`. The ctor (Application__Application) calls it
 as `setDims(self, &gDefaultScreenDims, 0)`, and gDefaultScreenDims in sdata is
 `{0x140, 0xF0}` = {320, 240}: a screen size. Application__InitSystems later hands

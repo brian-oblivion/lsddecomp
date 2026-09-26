@@ -8,7 +8,7 @@
 
 ## What it does
 
-Slot `+0x04C` of D_8006E4F0 (inherited by Class6D3C8; `main` dispatches
+Slot `+0x04C` of gApplicationMethods (inherited by Class6D3C8; `main` dispatches
 it). If `initialized`, calls `+0x050` once, then runs forever: `+0x054`,
 then polls `+0x058` for a status and dispatches: 1 -> `+0x05C` and poll
 again, 2 -> `+0x064` if `+0x060` says so, 0 -> back to `+0x054`. Slots
@@ -81,7 +81,7 @@ agreeing ones, so it stays B rather than A.
 
 **2026-09-25, round 84 (echo).** The class is declared once, in
 `include/Application.h`. The six slots this function calls, +0x050..+0x064,
-are NULL words in D_8006E4F0's own data (the table is 0x68 bytes, past the 19
+are NULL words in gApplicationMethods's own data (the table is 0x68 bytes, past the 19
 slots classtable.py prints); they are named for the subclass's occupants
 (`loadIntroLogoSequence`, `startWeeklyStreamTask`, `pollGraphRoomStatus`,
 `slot5C` for the no-op, `pollStatusObj`, `startStreamTaskWithInit`). +0x060

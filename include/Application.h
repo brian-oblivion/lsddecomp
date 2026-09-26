@@ -6,7 +6,7 @@
 #include "IntermediateBase.h"
 
 /*
- * Application -- class id 0x60, method table D_8006E4F0, a direct BasicClass
+ * Application -- class id 0x60, method table gApplicationMethods, a direct BasicClass
  * subclass (its ctor calls BasicClass's ctor first). Methods in
  * src/code_2b78c.c. Its one subclass is Class6D3C8 (D_8006D3C8, 0x1F60,
  * include/Class6D3C8.h), the game's root object, whose ctor calls this
@@ -79,8 +79,8 @@ struct Application {
     APPLICATION_FIELDS(ApplicationMethods);
 };
 
-extern ApplicationMethods D_8006E4F0;
-extern ApplicationMethods *GetApplicationMethods(void); /* returns &D_8006E4F0 */
+extern ApplicationMethods gApplicationMethods;
+extern ApplicationMethods *GetApplicationMethods(void); /* returns &gApplicationMethods */
 
 void Application__Application(Application *self, s32 dataSource);
 void Application__Finalize(Application *self);

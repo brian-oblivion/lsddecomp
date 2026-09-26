@@ -853,11 +853,6 @@
           "date": "2026-09-26",
           "header": "include/Class6D940.h"
         },
-        "D_8006E4F0": {
-          "class": "Application",
-          "date": "2026-09-25",
-          "header": "include/Application.h"
-        },
         "D_8006E99C": {
           "class": "Class6E99C",
           "date": "2026-09-26",
@@ -867,6 +862,11 @@
           "class": "Actor",
           "date": "2026-09-25",
           "header": "include/Actor.h"
+        },
+        "gApplicationMethods": {
+          "class": "Application",
+          "date": "2026-09-25",
+          "header": "include/Application.h"
         },
         "gBasicClassMethods": {
           "class": "BasicClass",

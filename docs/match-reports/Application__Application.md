@@ -8,7 +8,7 @@
 
 ## What it does
 
-The D_8006E4F0 constructor (slot `+0x008`). Class6D3C8__Class6D3C8
+The gApplicationMethods constructor (slot `+0x008`). Class6D3C8__Class6D3C8
 (code_1677c) calls it through `GetApplicationMethods()->ctor(self, arg->unk00)`.
 
 1. base ctor through BasicClass's table;

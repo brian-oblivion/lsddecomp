@@ -8,7 +8,7 @@
 
 ## What it does
 
-Empty. It is the `+0x00C` (finalize) override in D_8006E4F0's method table
+Empty. It is the `+0x00C` (finalize) override in gApplicationMethods's method table
 (`classtable.py 0x8006E4F0 --vs 0x8006B58C`), inherited verbatim by
 Class6D3C8 (D_8006D3C8). So this class's finalize does NOT chain to
 BasicClass__Finalize.

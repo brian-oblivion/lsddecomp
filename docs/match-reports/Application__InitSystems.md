@@ -8,7 +8,7 @@
 
 ## What it does
 
-Slot `+0x044` of D_8006E4F0; Class6D3C8's own +0x044
+Slot `+0x044` of gApplicationMethods; Class6D3C8's own +0x044
 (ForwardToBaseSlot44UnlessFlagged) forwards here. One-time system init,
 guarded by `self->initialized` (+0x18):
 

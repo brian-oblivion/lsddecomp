@@ -23,7 +23,7 @@ sw    $s0, 0x20($sp)
 addu  $s0, $a0, $zero        ; s0 = self
 sw    $s1, 0x24($sp)
 sw    $ra, 0x28($sp)
-jal   GetApplicationMethods           ; -> &D_8006E4F0 (intermediate base table)
+jal   GetApplicationMethods           ; -> &gApplicationMethods (intermediate base table)
  addu $s1, $a1, $zero          ; s1 = arg
 lw    $a1, 0x0($s1)             ; a1 = arg->unk00
 lw    $v0, 0x8($v0)              ; base table's ctor slot

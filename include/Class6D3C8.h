@@ -7,7 +7,7 @@
  * Class6D3C8 -- class id 0x1F60, method table D_8006D3C8 (25 slots), a
  * subclass of Application (include/Application.h): its ctor calls
  * GetApplicationMethods()->ctor first, and `classtable.py D_8006D3C8 --vs
- * D_8006E4F0` shares every slot but +0x008/+0x040/+0x044 and the six
+ * gApplicationMethods` shares every slot but +0x008/+0x040/+0x044 and the six
  * +0x050..+0x064 slots Application leaves NULL. No class derives from it.
  * Methods in src/code_1677c.c; the table getter is in src/code_171e0.c.
  *
