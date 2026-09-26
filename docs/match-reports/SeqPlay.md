@@ -507,3 +507,67 @@ to inert-looking dead-branch duplications just as strictly as to
 suspicious retype/widen candidates.
 
 **NON_MATCHING body promoted, round 66** (runner charlie).
+
+## Former unit banner of src/code_179d8_k.c (moved verbatim, round 94)
+
+The carve record (round 24) and the blocker re-census (rounds 42 and 43), moved here when the banner was rewritten as documentation.
+
+```c
+/*
+ * ROUND 42 CORRECTION (2026-09-15) -- READ BEFORE ANY "BLOCKED" LINE BELOW:
+ * every claim in this comment that a function is BLOCKED by `gp_rel`,
+ * `nop_mflo_mfhi` or `addiu_at` is STALE.  All three constructs are RESOLVED
+ * by pinned maspsx flags (CLAUDE.md, "Open toolchain blockers");
+ * `tools/nearmiss.py` reports them tagged (RESOLVED-not-a-blocker) and counts
+ * none of them.  Any "do NOT spend attempts on these" directive below is
+ * therefore RETRACTED: those functions are ordinary matching work, and most
+ * carry a mechanism-correct partial derivation already.  The rest of this
+ * comment still stands -- only the blocker verdicts are withdrawn.
+ * Screen: `python3 tools/nearmiss.py`, round 43 (2026-09-15).
+ *
+ * code_179d8_k -- functions 238..255 of the original 274-function code_179d8
+ * monolith, 0x24938..0x2673C (vram 0x80034138..0x80035F3C).  Carved round 24
+ * (2026-09-08) out of what had been the `code_179d8_tail` asm remainder,
+ * which this unit consumes WHOLE -- there is no remainder left on either
+ * side (code_179d8_i in front, code_179d8_f behind).
+ *
+ * WHY IT WAS UNCARVED FOR SIX ROUNDS, AND WHY THAT VERDICT IS DEAD.
+ * The splat comment on the old remainder read "17 of its 18 functions are
+ * addiu-$at blocked".  `addiu_at` was RESOLVED in round 21 (maspsx
+ * `--addiu-at`; docs/research/addiu-at-blocker.md), so that census measured
+ * an obstruction that no longer exists.  Re-censused 2026-09-08 with
+ * `python3 tools/nearmiss.py`'s four screens, canonical shell forms
+ * (`grep -A2` FORWARD for nop_mflo_mfhi -- the direction is load-bearing):
+ *
+ *   18 of 18 CLEAN.  Zero gp_rel, zero nop_mflo_mfhi, zero `jr $t2`
+ *   trampolines.  This is the single best carve left in the executable.
+ *
+ * Sizes, cheapest first -- six functions at 31..51 words, which is the
+ * cheap seam the `fresh` queue had run out of:
+ *   SetProgramChange  31w   ContRpn1  31w   ContRpn2  31w
+ *   SetPitchBend  44w   ReadDeltaValue  47w   ContResetAll  51w
+ *   SeqPlay  69w   NoteOn  70w   ContNrpn1  77w
+ *   ContModulation  79w   ContPortaTime  79w   ContNrpn2  82w
+ *   ContPortamento  90w   GetSeqData 172w   Snd_setVabAttr 179w
+ *   _SsSetControlChange 200w   GetMetaEvent 213w   ContDataEntry 376w
+ *
+ * THIS UNIT OWNS THREE SWITCH JUMP TABLES, not the two the old remainder
+ * comment claimed: _SsSetControlChange -> jtbl_80010CF0, and Snd_setVabAttr ->
+ * jtbl_80010ED8 AND jtbl_80010F38 (a double switch).  The 0x14F0 rodata
+ * slot holds exactly those three tables and nothing else, is referenced
+ * from nowhere outside this unit, and is attached whole in the splat yaml.
+ * You do not need to do anything about it -- but if you match either
+ * function, remember a `%lo(jtbl_*)` load is ordinary matchable code now.
+ *
+ * Boundary checks at carve time, both sides: no function has more than one
+ * `addiu $sp, $sp, -N`, every one ends in its own `jr $ra`, zero `alabel`,
+ * and the one frameless function (ReadDeltaValue) opens on
+ * `sll $a0, $a0, 16` -- leaf argument narrowing, not a caller-frame read.
+ *
+ * Expect this slice to span more than one class; a ~20-function slice cut
+ * at ROM-address boundaries has no reason to align with class boundaries.
+ * Identify each with tools/classtable.py rather than assuming the unit has
+ * one.  Expect low-level driver-shaped code rather than class-framework
+ * code, as elsewhere in code_179d8; confirm, do not assume.
+ */
+```
