@@ -125,9 +125,10 @@ enum EntityEffect {
 };
 
 /* Actor::state 1: Entity__UpdateActivationState does not activate an
- * inactive Entity whose state is 1. The MoodCue handlers store it after
- * deactivate, when their cue has run its course; the other values they
- * store are each handler's own phases. */
+ * inactive Entity whose state is 1, and Entity__UpdateSoundCueStart does
+ * not restart its cue. The MoodCue handlers store it when their cue has run
+ * its course (usually after deactivate or stopSoundCue); the other values
+ * they store are each handler's own phases. */
 #define ENTITY_STATE_DONE 1
 
 extern EntityMethods gEntityMethods;
@@ -215,8 +216,8 @@ s32 Entity__UpdateSoundCueStop(Entity *self);
 /* MoodCue handlers called from another Entity unit. */
 void Entity__MoodCue51(Entity *self, SoundCueSet *out); /* Entity_d; called by Entity__MoodCue113 (Entity_g) */
 void Entity__MoodCue71(Entity *self, SoundCueSet *out); /* Entity_e; called by Entity__MoodCue108 (Entity_g) */
-void Entity__StepYawInWindowsThenDeactivate(Entity *self, SoundCueSet *out, s32 arg2, s32 arg3,
-                                            s32 arg4); /* Entity_g; called by Entity_d */
+void Entity__StepYawInWindowsThenDeactivate(Entity *self, SoundCueSet *out, s32 windowStart,
+                                            s32 deactivateTimer, s32 zStep); /* Entity_g; called by Entity_d */
 
 /* The motion templates (.data, 0x80089C58..0x80089E97, in address order):
  * the constant triples the MoodCue handlers in Entity_b..Entity_g pass to
