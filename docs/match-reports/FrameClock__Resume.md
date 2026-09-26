@@ -28,3 +28,7 @@ void FrameClock__Resume(D_8006EF50Obj *self) {
 ## Naming
 
 - `FrameClock__Resume` -- tier A. Slot +0x050: sets flag10 = 0. Pure setter.
+
+## Track 4 (2026-09-26, round 88, delta)
+
+Renamed from `D8006EF50__ClearFlag10`, tier A: clears `paused`. Evidence: ObjM__TeardownPauseOverlay calls +0x050 on its FrameClock beside +0x050 on its WBgm (WBgm__Resume). The class (id 0x5, table `gFrameClockMethods`, formerly `D_8006EF50`) is unified as `FrameClock` in `include/FrameClock.h`, whose banner holds the evidence for the class name: its tick (+0x044) is called by IntermediateBase__OnTag1Notify on the DrawSystem's per-VSync event 2, counts one frame and tells its parents event 2, or 3 while paused, or 4 while flag14 is set. Fields renamed: `count` -> `frameCount`, `flag10` -> `paused`. Any source block above is the pre-unification spelling (`D_8006EF50Obj`); the live body in `src/code_322b4.c` takes `FrameClock *`, byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).
