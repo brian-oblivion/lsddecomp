@@ -121,3 +121,11 @@ constitute entering a "world") is inferred from usage, not proven, hence B.
 `DreamAuxSlot::entity` holds New_Entity's result and is now `struct Entity *`; the call passes the mood index without a `(void *)` cast.
 
 Byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).
+
+## Track 4 (2026-09-26, round 88)
+
+The third parameter is retyped `s32 a2` -> `DreamSys *world`, and the global
+it is stored in, gDreamAuxWorld, `s32` -> `DreamSys *` (code_4cd08.c). Its
+only caller, ObjM__SetupSceneStyle (class_3bb8c_l), passes its DreamSys
+`target`; code_4cd08 calls +0x200 of its table (getDreamColor) and passes
+it as Entity's peer. Byte-identical.

@@ -271,10 +271,9 @@ struct UnkCObj_3bb8c_l {
     UnkCObjMethods_3bb8c_l *methods; /* +0x000 */
 };
 
-/* Uncarved cross-unit helper (code_4cd08.c, MATCHED round 43) -- no header
- * declares it, so this unit's own call-site typing is local, all-`s32`
- * per that function's own definition. */
-extern void SetDreamAuxWorld(s32 a0, s32 a1, s32 a2, s32 a3, s32 a4);
+/* code_4cd08.c's (MATCHED round 43); no header declares it. `world` is the
+ * DreamSys it installs as gDreamAuxWorld (track 4, round 88). */
+extern void SetDreamAuxWorld(s32 a0, s32 a1, DreamSys *world, s32 a3, s32 a4);
 
 /* GetStageGridDimensions comes from include/StageGrid.h, through
  * DreamSys.h (the local `void *` reading that stood here went with it). */
@@ -304,7 +303,7 @@ void ObjM__SetupSceneStyle(Obj87034_3bb8c_l *self) {
 
     unk18->methods->slot70(unk18, self->target, &D_8008715C, &D_80087168, 0);
 
-    SetDreamAuxWorld((s32)self->unk38, (s32)self->unk14, (s32)self->target, self->unk34, self->unk10);
+    SetDreamAuxWorld((s32)self->unk38, (s32)self->unk14, self->target, self->unk34, self->unk10);
 
     unk14 = self->unk14;
     self->methods->slot10(self, (s32)unk14);

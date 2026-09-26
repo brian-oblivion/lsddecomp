@@ -4,6 +4,7 @@
 #include "Class6B5CC.h"
 #include "ModelData.h"
 #include "TriggerWorld.h"
+#include "DreamSys.h"
 
 const char gMomPathSymSpy[] = "ETC\\SYMSPY.MOM";
 const char gMomPathSymDog[] = "ETC\\SYMDOG.MOM";
@@ -46,20 +47,20 @@ void TickDreamAuxSlots(void)
 
 extern s32 gDreamAuxStage;
 extern s32 D_8008ABFC;
-extern s32 gDreamAuxWorld;
+extern DreamSys *gDreamAuxWorld; /* the player DreamSys: class_3bb8c_l passes its `target` */
 extern s32 D_8008AC04;
 extern s32 D_8008AC08;
 
 void SetTeleportsEnabled(s32 triggerType);
 
-void SetDreamAuxWorld(s32 a0, s32 a1, s32 a2, s32 a3, s32 a4)
+void SetDreamAuxWorld(s32 a0, s32 a1, DreamSys *world, s32 a3, s32 a4)
 {
     DreamAuxSlot *slot = gDreamAuxSlots;
     u32 i;
 
     gDreamAuxStage = a0;
     D_8008ABFC = a1;
-    gDreamAuxWorld = a2;
+    gDreamAuxWorld = world;
     D_8008AC04 = a3;
     D_8008AC08 = a4;
 
@@ -164,8 +165,8 @@ s32 AdjustDreamAuxTriggerOffset(s32 a0, s32 a1)
     s32 val = gDreamAuxStage;
 
     if (val == 4 && a1 == 0x10) {
-        DreamAuxWorld *w = (DreamAuxWorld *)gDreamAuxWorld;
-        s32 result = ((DreamAuxWorldFn80)w->vtable[0x80])(w);
+        DreamSys *w = gDreamAuxWorld;
+        s32 result = w->methods->getDreamColor(w);
 
         if (result == val) {
             a0 += 0x1E;
@@ -349,13 +350,12 @@ success:
     return true;
 }
 
-/* Compares the vtable-slot-0x80 result of `*gDreamAuxWorld` (DreamAuxWorldFn80,
- * include/code_4cd08.h) against a per-idx signed byte from D_80088D16. */
+/* Compares gDreamAuxWorld's getDreamColor (DreamSys +0x200) against a per-idx signed byte from D_80088D16. */
 bool CheckDreamAuxWorldState(s32 idx)
 {
-    DreamAuxWorld *w = (DreamAuxWorld *)gDreamAuxWorld;
+    DreamSys *w = gDreamAuxWorld;
     s32 val = D_80088D16[idx];
-    s32 result = ((DreamAuxWorldFn80)w->vtable[0x80])(w);
+    s32 result = w->methods->getDreamColor(w);
 
     return val == result;
 }
