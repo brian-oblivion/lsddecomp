@@ -11,8 +11,8 @@
 `SceneNode`'s own destructor — vtable slot `+0x00C` of `gSceneNodeMethods`
 (confirmed via `tools/classtable.py gSceneNodeMethods`). Calls three of its own
 virtual teardown hooks in order (`slot50` = `SceneNode__DetachFromParent`, `slot54` =
-`SceneNode__DetachAttachedChildren`, `slot5C` = `SceneNode__func_1d33c` — all three still queued or,
-for `SceneNode__func_1d33c`, already a matched no-op stub elsewhere), frees the two
+`SceneNode__DetachAttachedChildren`, `slot5C` = `SceneNode__NoOpSlot5C` — all three still queued or,
+for `SceneNode__NoOpSlot5C`, already a matched no-op stub elsewhere), frees the two
 sub-blocks the constructor allocated (`self->unk14->unk44`, then
 `self->unk14` itself), then tail-calls the BasicClass base destructor
 (`Get_vtable_BasicClass()->dtor(self)`).
@@ -33,12 +33,12 @@ void SceneNode__Finalize(SceneNodeObj *self) {
 ## Note: `slot5C`'s local declared arity does not match its current occupant
 
 This call site passes 2 arguments (`self`, `0`) to `self->methods->slot5C`.
-That slot's CURRENT occupant, `SceneNode__func_1d33c`, is already matched
+That slot's CURRENT occupant, `SceneNode__NoOpSlot5C`, is already matched
 elsewhere in this unit as a no-argument `void(void)` body (`{}`, a bare
 `jr $ra`). Both are right about their own codegen — the callee ignores
 every argument it's given, so the caller's arity is unconstrained. Typed
 `slot5C` as `void (*)(SceneNodeObj *, s32)` in `include/code_d294.h`
-to match THIS call site; did not touch `SceneNode__func_1d33c`'s own declaration.
+to match THIS call site; did not touch `SceneNode__NoOpSlot5C`'s own declaration.
 Same precedent as `GetSceneNodeMethods`, documented in `include/class_3bb8c.h`.
 
 ## Provenance

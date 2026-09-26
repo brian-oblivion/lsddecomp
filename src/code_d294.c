@@ -240,7 +240,7 @@ void SceneNode__GetNextAttachedChild(SceneNode *self, SceneNode **entry, BasicCl
     *entry = NULL;
 }
 
-void SceneNode__func_1d33c(void) {}
+void SceneNode__NoOpSlot5C(void) {}
 
 s32 SceneNode__SetDisplay(SceneNode *self, s32 a1) {
     return GetSetBitField(&self->attribute, ATTR_DOFF_SHIFT, 1, a1 == 0) == 0;

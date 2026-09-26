@@ -263,7 +263,7 @@ extern s32 ratan2(s32 dy, s32 dx);
  * Entity_b/c/d/e.c call via their own separate `Entity.h` declaration,
  * `SceneNode__FaceTarget(Entity *this, void *arg1, s32 arg2, s32 arg3, s32
  * arg4)`; same "per-call-site signature, not a callee property"
- * precedent as `GetSceneNodeMethods`/`SceneNode__func_1d33c` above -- this unit's own
+ * precedent as `GetSceneNodeMethods`/`SceneNode__NoOpSlot5C` above -- this unit's own
  * view differs in the first two parameters' types only, see below).
  *
  * A "face target" orientation setter: computes yaw/pitch from `self` to

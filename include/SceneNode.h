@@ -96,7 +96,7 @@ struct SceneNodeSub14 {
     /* +0x050 */ SceneNode *(*detachFromParent)(Self *self);              /* SceneNode__DetachFromParent */ \
     /* +0x054 */ void (*detachAttachedChildren)(Self *self);               /* SceneNode__DetachAttachedChildren */ \
     /* +0x058 */ void (*getNextAttachedChild)(Self *self, SceneNode **entry, BasicClassListNode **cursor); /* SceneNode__GetNextAttachedChild */ \
-    /* +0x05C */ void (*slot5C)(Self *self, s32 arg1);                     /* SceneNode__func_1d33c, empty; Finalize passes (self, 0) */ \
+    /* +0x05C */ void (*slot5C)(Self *self, s32 arg1);                     /* SceneNode__NoOpSlot5C, empty; Finalize passes (self, 0) */ \
     /* +0x060 */ s32 (*setDisplay)(Self *self, s32 on);                    /* SceneNode__SetDisplay */ \
     /* +0x064 */ u32 (*setSemiTrans)(Self *self, s32 on);                  /* SceneNode__SetSemiTrans */ \
     /* +0x068 */ u32 (*setSemiTransRate)(Self *self, u32 rate);            /* SceneNode__SetSemiTransRate */ \
@@ -168,7 +168,7 @@ SceneNode *SceneNode__AttachToParent(SceneNode *self, SceneNode *parent, LongVec
 SceneNode *SceneNode__DetachFromParent(SceneNode *self);
 void SceneNode__DetachAttachedChildren(SceneNode *self);
 void SceneNode__GetNextAttachedChild(SceneNode *self, SceneNode **entry, BasicClassListNode **cursor);
-void SceneNode__func_1d33c(void);
+void SceneNode__NoOpSlot5C(void);
 s32 SceneNode__SetDisplay(SceneNode *self, s32 on);
 u32 SceneNode__SetSemiTrans(SceneNode *self, s32 on);
 u32 SceneNode__SetSemiTransRate(SceneNode *self, u32 rate);

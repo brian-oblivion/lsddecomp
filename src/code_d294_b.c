@@ -14,7 +14,7 @@
  * (`SceneNode__GetModelHull` -> `SceneNode__NotifyWithHull` ->
  * `SceneNode__TransformAndNotifyParents`); two vtable no-op stubs
  * (`SceneNode__OnPadEvent`/`D6AC`, kept `func_` per this class's own
- * `SceneNode__func_1d33c` no-op precedent); a command dispatcher over the same
+ * `SceneNode__NoOpSlot5C` no-op precedent); a command dispatcher over the same
  * "attach" state (`SceneNode__DispatchLinkCommand`, proposed `SceneNode__DispatchLinkCommand`);
  * a proximity-attach attempt (`SceneNode__TryAttachNearby`, MATCHED round
  * 76) that hands off to a rotation compose-and-

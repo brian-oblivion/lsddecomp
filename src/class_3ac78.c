@@ -26,7 +26,7 @@
  * (Class866E8__ResetAllElements, Class866E8__SetFootprintRect and
  * Class866E8__DispatchToRectCells) were matched in round 71. func_8004B324 keeps its placeholder name
  * deliberately -- it is an empty vtable stub with no established purpose, the
- * same case as SceneNode__func_1d33c in code_d294_b.
+ * same case as SceneNode__NoOpSlot5C in code_d294_b.
  */
 #include "common.h"
 #include "Class866E8.h"

@@ -20,7 +20,7 @@ now so track 3's naming pass has somewhere to record the tier decision.
 
 **Kept as `SceneNode__OnPadEvent` -- Tier C.** Same shape and same disposition as the
 already-established no-op-stub precedent in this exact class,
-`SceneNode__func_1d33c` (`code_d294.c`, matched, never renamed): a vtable
+`SceneNode__NoOpSlot5C` (`code_d294.c`, matched, never renamed): a vtable
 override whose entire behavior is "do nothing." Renaming a no-op to
 anything more specific than its offset would assert a purpose ("this
 class disables feature X here") that the empty body cannot support --
