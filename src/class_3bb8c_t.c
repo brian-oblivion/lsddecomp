@@ -8,12 +8,10 @@
  * addresses, not class boundaries.  Identify each with tools/classtable.py.
  * It holds two classes:
  *
- * - Four leaf overrides plus a getter (Class879C4__Update/40/48/50, GetClass879C4Methods)
- *   of the STILL-UNCARVED, unrelated sibling class whose table is
- *   `gClass879C4Methods` (49 slots; its ctor and remaining slots live in the
- *   neighbouring `class_3bb8c_p` unit, which carries its own independent
- *   local view). None of these five functions has enough of a body to name
- *   past its own address; see the naming pass note above each.
+ * - Four empty leaves plus the table getter (Class879C4__Update,
+ *   Class879C4__func_57f40/48/50, GetClass879C4Methods) of the unrelated
+ *   Class879C4 (table `gClass879C4Methods`, 49 slots; include/Class879C4.h;
+ *   its ctor is in `class_3bb8c_p`, two more methods in `class_3bb8c_q`).
  * - The WHOLE of `GraphRoom` (round 75 name; table `gGraphRoomMethods`,
  *   73 slots), a TaskCore subclass, unified in include/GraphRoom.h (track 4,
  *   round 87; the header's banner has the slots, fields and evidence).
@@ -44,31 +42,17 @@
 #include "GraphRoom.h"
 #include "BoxFill.h"
 #include "DreamSys.h"
-
-/* The class allocated by this unit's own New_GraphRoom, table gClass879C4Methods
- * (49 slots, resolved via tools/classtable.py). Its ctor (Class879C4__Class879C4)
- * and its own funcs 80057F38/40/48/50 live in the neighbouring
- * `class_3bb8c_p` unit (round 2026-09-04 earlier this round), which
- * already carries its own local view of this table
- * (`D_800879C4Methods`/`D_800879C4Obj` in that file). This unit's own
- * view is kept separate per the multiple-independent-local-views
- * convention -- GetClass879C4Methods itself needs no fields, only the address.
- * Round 75 naming pass: this class is still uncarved and unrelated to
- * GraphRoom below, so it has no name past its address; the four leaf
- * overrides below are empty bodies (`jr $ra; nop`, no arguments visible)
- * and give no evidence of purpose beyond "does nothing" -- kept `func_`. */
-typedef struct D_800879C4Table D_800879C4Table;
-extern D_800879C4Table gClass879C4Methods;
+#include "Class879C4.h"
 
 extern void *BMemPMgrAlloc(s32 size);
 
 
-/* Round 75 naming pass: no body to read past `jr $ra; nop` -- splat matched
- * these itself. They are gClass879C4Methods's own leaf overrides
- * (tools/classtable.py: +0x098/+0x0BC/+0x0C0/+0x0C4), an unrelated,
- * still-uncarved class, so even the tier-C `Class__func_xxxxx` form does
- * not apply (no confirmed class name to prefix with). Kept bare `func_`. */
-void Class879C4__Update(void) {
+/* Class879C4's (include/Class879C4.h) four empty leaves, `jr $ra; nop`
+ * (splat matched them itself), and its table getter. Class879C4__Update is
+ * the +0x098 update override of Sprite__Update, typed as that slot; the
+ * other three occupy the class's own slots +0x0BC/+0x0C0/+0x0C4, which
+ * nothing calls, so they keep the tier-C `Class__func_xxxxx` form. */
+void Class879C4__Update(Class879C4 *self, void *sender, s32 event) {
 }
 
 void Class879C4__func_57f40(void) {
@@ -80,10 +64,7 @@ void Class879C4__func_57f48(void) {
 void Class879C4__func_57f50(void) {
 }
 
-/* Round 75 naming pass: plain no-argument getter for gClass879C4Methods, same
- * "no class name yet" reasoning as the four leaves above. Kept bare `func_`
- * rather than a guessed class prefix. */
-D_800879C4Table *GetClass879C4Methods(void) {
+Class879C4Methods *GetClass879C4Methods(void) {
     return &gClass879C4Methods;
 }
 
