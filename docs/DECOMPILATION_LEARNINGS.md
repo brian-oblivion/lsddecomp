@@ -519,7 +519,7 @@ load through a runtime-indexed global", §"BLOCKED: the `nop_mflo_mfhi` screen r
   FORWARDED-PARAMETER arity defect.** Check the previous call: if its callee reads `$aN` and the
   caller never writes it, declare and pass the caller's own parameter (a file-local fn-pointer view
   if the shared slot is under-declared); a `move $tN,$aK` whose `$tN` later takes a call result is
-  the parameter reused as the result (`aK = f(..., aK)`). Closed `Class6E99C__StartFadeToIndex`/
+  the parameter reused as the result (`aK = f(..., aK)`). Closed `Class6E99C__StartFadeDown`/
   `StartFadeDefault` after 94k permuter iterations. (PROGRESS round 73)
 - **Read every call's argument registers in retail before any other lever; round 75's commonest
   defect was the wrong NUMBER of arguments or a missing return, 17 functions.** A "filler"

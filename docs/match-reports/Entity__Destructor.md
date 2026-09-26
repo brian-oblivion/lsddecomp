@@ -43,3 +43,10 @@ Occupies `EntityMethods` dtor slot +0x00C (`tools/classtable.py`), the
 direct counterpart to `Entity__Entity`'s ctor slot +0x008. A destructor's
 mechanics (tear down the two cached sub-objects, then the shared ancestor's
 own `dtor`) are its purpose.
+
+## Track 4 (2026-09-26, round 87, echo)
+
+`unk100` is a `Class6E99C *` and `unk104` a `BasicClass *` (Entity.h);
+both calls through their +0x004 are now `release` (BasicClass__Release in
+every table). `unk104` is only ever released in Entity code, so it is typed
+no further than the slot it reaches. Image byte-identical.

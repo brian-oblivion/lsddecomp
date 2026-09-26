@@ -155,3 +155,10 @@ handler word of `gEntityMoodHandlerTable` (`asm/data/79528.data.s`, base
 0x80089EB0, 0x10-byte stride) at row 57, read directly from
 `disk/SLPS_015.56`. Mechanics established (mood-tick sound-cue-set
 callback); which dream object owns the row is not.
+
+## Track 4 (2026-09-26, round 87, echo)
+
+`this->unk100` is a `Class6E99C *` (include/Class6E99C.h); the slot
+call through its +0x0D4 is now `startFadeDown` (Class6E99C__StartFadeDown), with `companion2`, an
+`s32` in Entity.h, cast `(BasicClass *)` as the fade's source (Class6E99C's
+configure adds it as a child; no code). Image byte-identical.

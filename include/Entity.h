@@ -3,6 +3,7 @@
 
 #include "common.h"
 #include "Class65650.h"
+#include "Class6E99C.h"
 
 /* The Entity class. `src/Entity.c` is the first 25 of a 142-function block
  * split at Entity__UpdateTargetProximity; the remainder is Entity_b, still a monolithic asm
@@ -28,8 +29,6 @@
  */
 typedef struct Entity Entity;
 typedef struct EntityMethods EntityMethods;
-typedef struct Unk100Obj Unk100Obj;
-typedef struct Unk100Methods Unk100Methods;
 typedef struct Unk94Obj Unk94Obj;
 typedef struct Unk94Methods Unk94Methods;
 typedef struct Unk5CObj Unk5CObj;
@@ -96,31 +95,14 @@ struct EntityMethods {
  * functions reach the base implementations through Get_vtable_Class65650()
  * and upcast. */
 
-/* An object cached in `Entity::unk100`/`unk104`, unrelated to `EntityMethods`
- * -- its own method table, dispatched through in Entity__Destructor/Entity__GetOrCreateUnk100.
- * Real shape unknown beyond the slots reached here. */
-struct Unk100Methods {
-    /* +0x00 */ u8 pad00[0x04];
-    /* +0x04 */ void (*slot04)(Unk100Obj *self);                          /* called by Entity__Destructor */
-    /* +0x08 */ u8 pad08[0x4C - 0x08];
-    /* +0x4C */ void (*slot4C)(Unk100Obj *self, Entity *arg1, void *arg2); /* called by Entity__GetOrCreateUnk100 */
-    /* +0x50 */ void (*slot50)(Unk100Obj *self);                           /* called by Entity__GetOrCreateUnk100 */
-    /* +0x54 */ u8 pad54[0xD0 - 0x54];
-    /* +0xD0 */ void (*slotD0)(Unk100Obj *self, void *arg1);                /* called by Entity__GetOrCreateUnk100 */
-    /* +0xD4 */ void (*slotD4)(Unk100Obj *self, s32 arg1, s32 arg2, s32 arg3); /* called by Entity__MoodCue57 (Entity_d) as slotD4(this->unk100, this->unk50, 4, 0), and by Entity__MoodCue85 (Entity_f) as slotD4(this->unk100, this->unk50, 7, 0) */
-    /* +0xD8 */ void (*slotD8)(Unk100Obj *self, s32 arg1, s32 arg2, s32 arg3); /* called by Entity__MoodCue85 (Entity_f) as slotD8(this->unk100, this->unk50, 0, 0); return value unused at this, its only known call site */
-};
-
-struct Unk100Obj {
-    Unk100Methods *methods; /* +0x00 */
-};
-
-extern Unk100Obj *New_Class6E99C(void *name, s32 arg1, s32 arg2);
+/* `Entity::unk100` is a Class6E99C (include/Class6E99C.h, track 4 round 87;
+ * it was a local Unk100Obj view here): Entity__GetOrCreateUnk100 makes it with
+ * New_Class6E99C, and the MoodCue handlers start its fades. */
 
 /* Already matched in Entity.c (not INCLUDE_ASM), but not previously called
  * from outside that unit -- Entity__MoodCue57 (Entity_d) is its first cross-unit
  * caller, hence the extern here rather than only a file-local definition. */
-extern Unk100Obj *Entity__GetOrCreateUnk100(Entity *this, void *name, void *arg2, void *arg3, s32 arg4);
+extern Class6E99C *Entity__GetOrCreateUnk100(Entity *this, void *name, void *arg2, void *arg3, s32 arg4);
 
 /* Object pointed to by `Entity::target`. NOT another `Entity`, despite +0x14
  * also holding an `EntityPos *` (same convention as `Entity::unk14`):
@@ -163,11 +145,11 @@ struct Unk94Obj {
     u8 pad04[0x14 - 0x04];
     EntityPos *unk14;        /* +0x14, read by Entity__IsTargetInRange (its own +0x1C, i.e. y) */
     u8 pad18[0x5C - 0x18];
-    Unk5CObj *unk5C;          /* +0x5C, dereferenced through its OWN vtable (see Unk5CObj's own comment) by Entity__MoodCue74 (Entity_e) -- yet another instance of the class-framework object-pointer-at-a-field convention, same shape as Entity::unk4C/Entity::unk100 */
+    Unk5CObj *unk5C;          /* +0x5C, dereferenced through its OWN vtable (see Unk5CObj's own comment) by Entity__MoodCue74 (Entity_e) -- yet another instance of the class-framework object-pointer-at-a-field convention, same shape as Entity::unk4C */
 };
 
 /* Object pointed to by `Unk94Obj::unk5C` -- named for the offset it sits at
- * in ITS parent, same convention as `Unk94Obj`/`Unk4CObj`/`Unk100Obj` being
+ * in ITS parent, same convention as `Unk94Obj`/`Unk4CObj` being
  * named for the offset they sit at in THEIRS (`Entity`). Shape beyond the
  * one slot reached so far is unknown. */
 struct Unk5CMethods {
@@ -197,7 +179,7 @@ struct Unk4CObj {
 /* Object pointed to by `Entity::unk70`. Entity__MoodCue58 (Entity_d) dereferences
  * its own +0x04 to get a second, further object (`Unk70Sub`) and calls that
  * one's own vtable slot +0x60 -- the same two-level class-framework idiom as
- * `Unk94Obj`/`Unk100Obj`, just one hop deeper. Shape beyond the one slot
+ * `Unk94Obj`, just one hop deeper. Shape beyond the one slot
  * reached here is unknown. */
 struct Unk70SubMethods {
     u8 pad00[0x60];
@@ -275,7 +257,7 @@ struct Entity {
     /* +0x48 */ s16 unk48;               /* a HALFWORD field (sh/lh, not the full-word sw/lw every other field here uses) -- Entity__MoodCue11 both writes it (-0x14, -0x78) and reads it back (as slotD0's arg1) */
     /* +0x4A */ u8 pad4A[0x4C - 0x4A];
     /* +0x4C */ Unk4CObj *unk4C;          /* cleared (NULL) by Entity__DetachUnk4C; dereferenced through its own vtable by Entity__MoodCue12 -- see Unk4CObj's own comment */
-    /* +0x50 */ s32 companion2;              /* Class65650's companion2 (code_55dd4.h, the tag-5 BaseObjO companion); was unk50 -- round 79 head, alpha's proposal (Entity__MoodCue93.md): Entity is a Class65650 subclass (Entity__Entity runs its ctor; ENTITY_METHODS keeps its slots, `classtable.py ENTITY_METHODS --vs gClass65650Methods`). In Entity code only passed opaquely as unk100->slotD4/slotD8's arg1 (Entity__MoodCue57, Entity__MoodCue85). Tier B. */
+    /* +0x50 */ s32 companion2;              /* Class65650's companion2 (code_55dd4.h, the tag-5 BaseObjO companion); was unk50 -- round 79 head, alpha's proposal (Entity__MoodCue93.md): Entity is a Class65650 subclass (Entity__Entity runs its ctor; ENTITY_METHODS keeps its slots, `classtable.py ENTITY_METHODS --vs gClass65650Methods`). In Entity code only passed as unk100's startFadeDown/startFadeUp source (Entity__MoodCue57, Entity__MoodCue85; Class6E99C adds it as a child). Tier B. */
     /* +0x54 */ u8 pad54[0x58 - 0x54];
     /* +0x58 */ s32 soundCueChannel;             /* passed to ServiceSoundCueSet/FlushSoundCueSet */
     /* +0x5C */ u8 pad5C[0x70 - 0x5C];
@@ -297,8 +279,8 @@ struct Entity {
     /* +0xF4 */ s32 targetReached;           /* set from Entity__SetTargetReached's arg1; latched 1 by Entity__UpdateTargetProximity once the target is within proximityRange, cleared by Entity__Deactivate; round 78 head: renamed from unkF4 by type scope */
     /* +0xF8 */ s32 soundCueActive;             /* cleared by Entity__StopSoundCue */
     /* +0xFC */ s32 moodTimer;             /* incremented by Entity__TickSoundCue */
-    /* +0x100 */ Unk100Obj *unk100;      /* lazily created/cached by Entity__GetOrCreateUnk100; torn down by Entity__Destructor */
-    /* +0x104 */ Unk100Obj *unk104;       /* torn down by Entity__Destructor, never set within this unit */
+    /* +0x100 */ Class6E99C *unk100;     /* lazily created/cached by Entity__GetOrCreateUnk100 (New_Class6E99C); released by Entity__Destructor */
+    /* +0x104 */ BasicClass *unk104;     /* released by Entity__Destructor (its +0x004, release), never set in Entity code: nothing shows its class */
 };
 
 extern EntityMethods *Get_vtable_Entity(void);

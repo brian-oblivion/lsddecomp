@@ -75,7 +75,7 @@ extern void Entity__StepYawInWindowsThenDeactivate(Entity *this, EntityMoodHandl
 void Entity__MoodCue98(Entity *this, EntityMoodHandlerArg *out) {
     if (this->targetReached != 0) {
         if (Entity__GetOrCreateUnk100(this, NULL, 0, 0xA, 0) != 0) {
-            this->unk100->methods->slotD4(this->unk100, this->companion2, 7, 0);
+            this->unk100->methods->startFadeDown(this->unk100, (BasicClass *)this->companion2, 7, 0);
             this->methods->deactivate(this);
             this->target->methods->slot21C(this->target);
         }

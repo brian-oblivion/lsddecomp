@@ -52,10 +52,10 @@ Entity *Entity__Entity(Entity *this, s32 arg1, s32 arg2, s32 arg3) {
     return NULL;
 }
 
-Unk100Obj *Entity__GetOrCreateUnk100(Entity *this, void *name, void *arg2, void *arg3, s32 arg4) {
-    Unk100Obj *cached;
-    Unk100Obj *sub;
-    Unk100Methods *m;
+Class6E99C *Entity__GetOrCreateUnk100(Entity *this, void *name, void *arg2, void *arg3, s32 arg4) {
+    Class6E99C *cached;
+    Class6E99C *sub;
+    Class6E99CMethods *m;
     void *dispatchArg2;
 
     cached = this->unk100;
@@ -71,23 +71,23 @@ Unk100Obj *Entity__GetOrCreateUnk100(Entity *this, void *name, void *arg2, void 
     } else {
         sub = cached;
     }
-    sub->methods->slot50(sub);
+    sub->methods->detachFromParent(sub);
     m = sub->methods;
     dispatchArg2 = arg2;
     if (dispatchArg2 == NULL) {
         dispatchArg2 = gEntityDefaultOffset;
     }
-    m->slot4C(sub, this, dispatchArg2);
-    sub->methods->slotD0(sub, arg3);
+    m->attachToParent(sub, (Class6B5CC *)this, dispatchArg2);
+    sub->methods->setStep(sub, (s32)arg3);
     return sub;
 }
 
 void Entity__Destructor(Entity *this) {
     if (this->unk100 != NULL) {
-        this->unk100->methods->slot04(this->unk100);
+        this->unk100->methods->release(this->unk100);
     }
     if (this->unk104 != NULL) {
-        this->unk104->methods->slot04(this->unk104);
+        this->unk104->methods->release(this->unk104);
     }
     Get_vtable_Class65650()->finalize((Class65650 *)this);
 }

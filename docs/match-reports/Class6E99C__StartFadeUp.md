@@ -1,4 +1,6 @@
-# Class6E99C__StartFadeDefault -- MATCHED (41/41, round 73; was STALL, 1 word short, 40/41 compiled)
+# Class6E99C__StartFadeUp -- MATCHED (41/41, round 73; was STALL, 1 word short, 40/41 compiled)
+
+> Renamed from `Class6E99C__StartFadeDefault` on 2026-09-26 (tools/rename.py). Address 0x800400b0.
 
 REVISITED, round 73: MATCHED 41/41 (whole-image SHA1 green); names/types used
 
@@ -19,7 +21,7 @@ it is forwarded to `configure` (no argument register is written before that
 then stored back into that same pseudo and used as the table index. So the
 source reuses the dead parameter (LEARNINGS 3d, "Reuse a provably dead
 PARAMETER instead of a fresh local") and forwards all three parameters (the
-arity fix that closed `Class6E99C__StartFadeToIndex` the same round). The
+arity fix that closed `Class6E99C__StartFadeDown` the same round). The
 round-21 reading -- "a register-only dead store GCC eliminates before
 scheduling" -- was a correct observation that the `move` could not come from
 a dead C statement, and the wrong conclusion that it therefore could not come
@@ -32,7 +34,7 @@ Builds this round: 1 (preserved body) + 1 (lever) = 2.
 ```c
 typedef s32 (*Configure6E99CFn)(Class6E99CObj *self, s32 a1, s32 a2, s32 a3);
 
-void Class6E99C__StartFadeDefault(Class6E99CObj *self, s32 a1, s32 a2, s32 a3) {
+void Class6E99C__StartFadeUp(Class6E99CObj *self, s32 a1, s32 a2, s32 a3) {
     if (self->state != 0) {
         return;
     }
@@ -47,7 +49,7 @@ void Class6E99C__StartFadeDefault(Class6E99CObj *self, s32 a1, s32 a2, s32 a3) {
 ```
 
 `Configure6E99CFn` is defined once in `src/code_2cc8c_e.c`, above
-`Class6E99C__StartFadeToIndex`; the shared `Class6E99CMethods::configure`
+`Class6E99C__StartFadeDown`; the shared `Class6E99CMethods::configure`
 slot is not retyped.
 
 ### Proposed learning
@@ -58,7 +60,7 @@ PARAMETER reused as the result's variable** -- not a dead store and not
 reorg inventing a filler. Write `aK = callee(self, ..., aK, ...);` and use
 `aK`. Discriminator: `$aK` is not written before the call (so it is being
 forwarded) and the result lands in the same `$tN`. Pairs with the
-forwarded-arity entry proposed in `Class6E99C__StartFadeToIndex.md`.
+forwarded-arity entry proposed in `Class6E99C__StartFadeDown.md`.
 
 
 > Renamed from `func_800400B0` on 2026-09-20 (tools/rename.py). Address 0x800400b0.
@@ -71,7 +73,7 @@ rebuilt: **20/41 words match, `WARNING: differs OUTSIDE this range too
 (40/41 compiled words, one real missing instruction), confirming the
 correction still holds and nothing has drifted since. Deliberate skip:
 residue 1 (the shared `slotB8(self,1,tableEntry)` scheduling class) is
-the same confirmed-negative mechanism as `Class6E99C__StartFadeToIndex`'s own
+the same confirmed-negative mechanism as `Class6E99C__StartFadeDown`'s own
 ~94,000-iteration search; residue 2 (the register-only dead `move
 $t0,$a2`) already has four negative attempts plus a 280-second bounded
 permuter search (base score 440, no improvement) and a reasoned
@@ -85,7 +87,7 @@ residue. Restored to `INCLUDE_ASM`; full oracle re-confirmed green.
 **This is the "roughly one inherited body in six carries a false
 clean/drift-free claim" case this round's assignment warned about.**
 Restored the exact preserved body from round 20 verbatim (unchanged, see
-below) and rebuilt in ISOLATION (`Class6E99C__StartFadeToIndex` reverted to
+below) and rebuilt in ISOLATION (`Class6E99C__StartFadeDown` reverted to
 `INCLUDE_ASM` first, to rule out any cross-contamination from that
 sibling): `tools/funcdiff.py` reports `20/41 words match` with a
 **`WARNING: the build differs OUTSIDE this range too (224685 bytes)`**
@@ -100,13 +102,13 @@ differently-registered.
 
 Re-ran with the coordinator's corrected oracle grep this round
 (`error:|parse error|undefined reference|\*\*\* \[[^]]*\.o\]`): zero
-hits both times (isolated and combined with `Class6E99C__StartFadeToIndex`), so this
+hits both times (isolated and combined with `Class6E99C__StartFadeDown`), so this
 is not a masked compile error either -- the build genuinely, cleanly
 compiles to a shorter function than retail.
 
 ### The real mechanism (found via `mipsel-linux-gnu-objdump` on the built object, cross-checked against retail's own `.s`)
 
-Retail's `Class6E99C__StartFadeDefault.s` contains **two** separate
+Retail's `Class6E99C__StartFadeUp.s` contains **two** separate
 `addu $t0, $reg, $zero` copies, each sitting in a branch's delay slot
 (both execute unconditionally, MIPS delay-slot semantics):
 
@@ -173,7 +175,7 @@ beating 440.
 verdict is WRONG for this function's real state and is corrected here.**
 The true state is: **40/41 compiled words (one real missing
 instruction), residue 1 (the shared `li a1,1` scheduling class with
-`Class6E99C__StartFadeToIndex`) unconfirmed on its own since the length mismatch makes
+`Class6E99C__StartFadeDown`) unconfirmed on its own since the length mismatch makes
 `funcdiff`'s per-word window untrustworthy past the divergence point**
 -- residue 1's own bytes may well still hold once residue 2's length is
 fixed, but that cannot be verified against a drifted window, only
@@ -199,11 +201,11 @@ wrong function.
 ## Round 20 (runner delta): not re-attempted, downgraded shared axis
 
 Did not spend a fresh attempt on this function directly this round.
-`Class6E99C__StartFadeToIndex`'s own residue 1 is the SAME `slotB8(self, 1,
+`Class6E99C__StartFadeDown`'s own residue 1 is the SAME `slotB8(self, 1,
 tableEntry)`-after-a-fresh-dispatch shape as this function's residue 1
 (both reports already cross-reference each other on this), and that
 shared axis was permuter-searched to ~94,000 unguided iterations this
-round with zero improvement (see `Class6E99C__StartFadeToIndex.md`). Since residue 1
+round with zero improvement (see `Class6E99C__StartFadeDown.md`). Since residue 1
 here is the identical mechanism, treating it as re-confirmed negative by
 transfer rather than re-spending a second ~94,000-iteration budget on a
 byte-identical scheduling shape.
@@ -254,7 +256,7 @@ distinct residues.
 
 ```c
 #if 0
-void Class6E99C__StartFadeDefault(Class6E99CObj *self, s32 a1, s32 a2) {
+void Class6E99C__StartFadeUp(Class6E99CObj *self, s32 a1, s32 a2) {
     s32 idx;
 
     if (self->state != 0) {
@@ -271,7 +273,7 @@ void Class6E99C__StartFadeDefault(Class6E99CObj *self, s32 a1, s32 a2) {
 #endif
 ```
 
-## Residue 1 -- same `li a1,1` scheduling class as `Class6E99C__StartFadeToIndex`
+## Residue 1 -- same `li a1,1` scheduling class as `Class6E99C__StartFadeDown`
 
 Identical to that function's own residue: retail materialises the `1`
 literal right after the `configure` dispatch, before computing `idx*3`; this
@@ -318,7 +320,7 @@ as dead code (confirmed: adding it produced no instruction at all).
   never spilled). Flagging the rejection explicitly per this round's
   "record the lever you didn't pull and why" convention, in case the
   reasoning is wrong -- it would cost one attempt to check directly.
-- **The permuter**, for the same reasons given in `Class6E99C__StartFadeToIndex`'s report
+- **The permuter**, for the same reasons given in `Class6E99C__StartFadeDown`'s report
   -- time budget, and this looks like the same underlying scheduling
   mechanism as that function's residue 1, so a `PERM_VAR`-guided search
   seeded from either function's near-miss body might close both at once.
@@ -344,11 +346,25 @@ verified build still taking the `#else INCLUDE_ASM` branch.
 
 ## Naming (round 61, track 3)
 
-**`Class6E99C__StartFadeDefault`** -- tier B (STALL, preserved body
+**`Class6E99C__StartFadeUp`** -- tier B (STALL, preserved body
 unchanged by this rename). `Class6E99CMethods::startFadeDefault` (`+0x0D8`). Mirror
-of `Class6E99C__StartFadeToIndex` (see that report's naming note for the
+of `Class6E99C__StartFadeDown` (see that report's naming note for the
 pairing evidence): guards on `state == 0`, and either just decrements the
 countdown (`altMode != 0`, i.e. "resume") or dispatches the FIXED
 `D_8006EAA8[idx * 3]` color entry and sets `state = 2`. "Default" reflects
 `D_8006EAA8` being the same table `Class6E99C__Stop` falls back to when
 `unk78 == 0xF` (its own documented "use the fixed table" sentinel).
+
+## Track 4 (2026-09-26, round 87, echo)
+
+Renamed from `Class6E99C__StartFadeDefault` to `Class6E99C__StartFadeUp`.
+"Default" named the colour source (`D_8006EAA8`, whose entries are all
+black in the retail bytes); the mechanics are the fade direction. Unless
+`altMode` is set it sets the box colour to black, and `step` stays positive
+(`Class6E99C__Stop` restores a negated one, `Class6E99C__Reset` sets 10), so
+`Class6E99C__Update` counts the selected channels UP from 0 over
+`0x100 / step` ticks; with `altMode` set it keeps the current colour and
+takes one tick off `ticksLeft`. It is the counterpart of
+`Class6E99C__StartFadeDown` (state 2 against that one's 1; `Stop`
+notifies its parents with event 6 against 5). Caller: Entity__MoodCue85
+(Entity_f) passes (companion2, 0, 0). Tier B.

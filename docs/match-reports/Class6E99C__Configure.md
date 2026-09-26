@@ -217,7 +217,7 @@ s32 Class6E99C__Configure(Class6E99CObj *self, s32 a1, s32 a2, s32 a3) {
 ```
 
 Real 3-parameter occupant, NOT the 1-argument shape its two known callers
-(`Class6E99C__StartFadeToIndex`, `Class6E99C__StartFadeDefault`, both this unit) actually invoke it
+(`Class6E99C__StartFadeDown`, `Class6E99C__StartFadeUp`, both this unit) actually invoke it
 with -- those callers set up only `self` before the `jalr`, so `a1`/`a2`/
 `a3` are leftover register values from whatever preceded the call at each
 site, unused by design at those two call sites. The vtable slot's own
@@ -356,9 +356,24 @@ a fresh name is neutral.
 dispatches `slot10`/`slot64`/`slot68`/`slot60` (bravo's own occupants).
 Named "Configure" rather than "Start"/"Init" because it is ALSO reachable
 through `configure` with only `self` (no real arguments) from
-`Class6E99C__StartFadeToIndex`/`Class6E99C__StartFadeDefault`, where its
+`Class6E99C__StartFadeDown`/`Class6E99C__StartFadeUp`, where its
 return value is read back as a color-table index -- i.e. it is a
 general-purpose "(re)configure and report" entry point, not a one-shot
 initializer. The a2-garbage-on-1-arg-call nuance is inherited unchanged
 from the matched body and already documented in this function's own
 `## Notes`/report history; not re-derived here.
+
+## Track 4 (2026-09-26, round 87, echo)
+
+Slots under their unified names. The call at +0x010 was `slot10(self)`
+and is now `addChild(self, source)`: the occupant is Class6B5CC__AddChild,
+and this function never writes `$a1` before that jalr, so its own second
+argument (now `BasicClass *source`) is the child; the build stayed
+byte-identical with the argument spelled. The two StartFade functions
+forward their `source` to it, and Class6E99C__Stop removes the same object
+with `removeChild` (its own second argument, which Class6E99C__Update
+passes as the notifying `sender`). The `configure` slot is now typed with
+its occupant's four parameters, so the StartFade callers' file-local
+`Configure6E99CFn` cast is gone. Fields: unk70 -> defaultChannels, unk78 ->
+channels, unk80 -> ticksLeft, unk68 -> BoxFill's `mask`; slot64/68/60 ->
+setSemiTrans/setSemiTransRate/setDisplay.

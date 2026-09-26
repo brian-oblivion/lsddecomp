@@ -74,3 +74,10 @@ generic per-object dispatch idiom (`Entity__Update(this, a1, a2)`,
 `include/Entity.h`'s slot98 note), which is the evidence for "Update"
 specifically rather than a bespoke name. Purpose in the actual game (what
 the color accumulation drives) is not established -- tier B, not A.
+
+## Track 4 (2026-09-26, round 87, echo)
+
+The +0x098 override of Class6B5CC's `update(self, sender, event)`
+slot, parameters named for it. Fields: unk80 -> ticksLeft, unk78 ->
+channels, unk64/65/66 -> BoxFill's color[0..2]; the sender goes to `stop`,
+which removes it as a child. Image byte-identical.

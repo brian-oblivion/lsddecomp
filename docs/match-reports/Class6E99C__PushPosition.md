@@ -532,3 +532,9 @@ installs a NEW position from its own `a1`(x,y)/`a2` arguments into
 into the live fields -- a save/restore-of-one pair, hence
 "Push"/"Pop". What game event drives the push (an on-screen position
 override, e.g. a highlight or animation) is not established -- tier B.
+
+## Track 4 (2026-09-26, round 87, echo)
+
+Fields under their unified names: unkC -> parent, unk50/54 -> posX/posY,
+unk60/62 -> boxW/boxH (BoxFill's), unk88/8C -> savedW/savedH, unk90/94 ->
+savedPosX/savedPosY (Class6E99C's). Image byte-identical.
