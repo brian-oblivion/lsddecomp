@@ -35,13 +35,6 @@ class_3bb8c_i: warning: passing arg 3 of `BuildFileName' discards `const' from p
 class_3bb8c_i: warning: passing arg 3 of `BuildFileName' discards `const' from pointer target type
 class_3bb8c_i: warning: passing arg 4 of `BuildFileName' discards `const' from pointer target type
 class_3bb8c_i: warning: passing arg 4 of `BuildFileName' discards `const' from pointer target type
-class_3bb8c_j: src/class_3bb8c_j.c: At top level:
-class_3bb8c_j: warning: `Class86F88__ClearCachedRefs' was previously implicitly declared to return `int'
-class_3bb8c_j: warning: implicit declaration of function `Class86F88__ClearCachedRefs'
-class_3bb8c_j: warning: previous external decl of `Class86F88__ClearCachedRefs'
-class_3bb8c_j: warning: previous implicit declaration of `Class86F88__ClearCachedRefs'
-class_3bb8c_j: warning: type mismatch with previous external decl
-class_3bb8c_j: warning: type mismatch with previous implicit declaration
 class_3bb8c_k: warning: unused variable `unused'
 class_3bb8c_l: warning: passing arg 2 of `RegisterStyleConfig' makes integer from pointer without a cast
 class_3bb8c_m: warning: passing arg 2 makes integer from pointer without a cast
