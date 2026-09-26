@@ -46,7 +46,7 @@ Entity *Entity__Entity(Entity *this, s32 moodIndex, void *desc, void *arg2) {
         this->methods = Get_vtable_Entity();
         this->moodIndex = moodIndex;
         this->soundCueSet.tag = 0;
-        this->unk100 = NULL;
+        this->fadeBox = NULL;
         this->unk104 = NULL;
         this->methods->reset(this);
         return this;
@@ -60,7 +60,7 @@ FadeBox *Entity__GetOrCreateFadeBox(Entity *this, void *name, void *arg2, void *
     FadeBoxMethods *m;
     void *dispatchArg2;
 
-    cached = this->unk100;
+    cached = this->fadeBox;
     if (cached == NULL) {
         if (name == NULL) {
             name = gEntityDefaultPos;
@@ -69,7 +69,7 @@ FadeBox *Entity__GetOrCreateFadeBox(Entity *this, void *name, void *arg2, void *
         if (sub == NULL) {
             return NULL;
         }
-        this->unk100 = sub;
+        this->fadeBox = sub;
     } else {
         sub = cached;
     }
@@ -85,8 +85,8 @@ FadeBox *Entity__GetOrCreateFadeBox(Entity *this, void *name, void *arg2, void *
 }
 
 void Entity__Finalize(Entity *this) {
-    if (this->unk100 != NULL) {
-        this->unk100->methods->release(this->unk100);
+    if (this->fadeBox != NULL) {
+        this->fadeBox->methods->release(this->fadeBox);
     }
     if (this->unk104 != NULL) {
         this->unk104->methods->release(this->unk104);

@@ -152,7 +152,7 @@ void Entity__MoodCue85(Entity *this, SoundCueSet *out) {
         } else {
             SetCueTones7_7_7(out);
             if (Entity__GetOrCreateFadeBox(this, NULL, NULL, (void *)0x1E, 0) != NULL) {
-                this->unk100->methods->startFadeDown(this->unk100, (BasicClass *)this->ticker, 7, 0);
+                this->fadeBox->methods->startFadeDown(this->fadeBox, (BasicClass *)this->ticker, 7, 0);
             }
             this->state = 0xD;
             this->moodTimer = -1;
@@ -161,7 +161,7 @@ void Entity__MoodCue85(Entity *this, SoundCueSet *out) {
         if (this->moodTimer < 0x5A) {
             if (this->moodTimer == 0x1E) {
                 if (Entity__GetOrCreateFadeBox(this, NULL, NULL, (void *)0xA, 0) != NULL) {
-                    this->unk100->methods->startFadeUp(this->unk100, (BasicClass *)this->ticker, 0, 0);
+                    this->fadeBox->methods->startFadeUp(this->fadeBox, (BasicClass *)this->ticker, 0, 0);
                 }
             }
             ((DreamSys *)this->peer)->methods->updateRotation((DreamSys *)this->peer, 0, ROTATION_ZPLUS1);
@@ -264,7 +264,7 @@ void Entity__MoodCue91(Entity *this, SoundCueSet *out) {
             if (rand() & 1) {
                 this->methods->addTranslation(this, TRANSLATE_Y_MINUS256);
             }
-            this->unk100->methods->startFadeDown(this->unk100, (BasicClass *)this->ticker, 0, 0);
+            this->fadeBox->methods->startFadeDown(this->fadeBox, (BasicClass *)this->ticker, 0, 0);
         }
     } else {
         if (this->todFrame == 0) {

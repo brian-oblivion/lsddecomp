@@ -401,7 +401,7 @@ tail_check:
     self->otIndex = (self->otIndex == 0);
 }
 
-/* Only while no view node is set: releases the current subHandle, installs
+/* Only while no view node is set: releases the current fadeBox, installs
  * `handle`, and attaches it under sceneRoot at D_8008A904 (-100, -100). The
  * occupant of handle's +0x04C (BoxFill__AttachToParent, a FadeBox's) takes a
  * screen position where SceneNode's attachToParent slot types a LongVec3
@@ -411,18 +411,18 @@ void Viewport__SetSubHandle(Viewport *self, SceneNode *handle) {
         return;
     }
 
-    if (self->subHandle != NULL) {
-        self->subHandle->methods->release(self->subHandle);
+    if (self->fadeBox != NULL) {
+        self->fadeBox->methods->release(self->fadeBox);
     }
 
-    self->subHandle = handle;
+    self->fadeBox = handle;
     if (handle != NULL) {
         handle->methods->attachToParent(handle, self->sceneRoot, (LongVec3 *)D_8008A904);
     }
 }
 
 SceneNode *Viewport__GetFadeBox(Viewport *self) {
-    return self->subHandle;
+    return self->fadeBox;
 }
 
 void Viewport__SetUnkB4(Viewport *self, s32 value) {

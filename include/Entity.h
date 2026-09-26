@@ -97,7 +97,7 @@ struct Entity {
     /* +0x0F4 */ s32 targetReached;  /* setTargetReached; latched by updateTargetProximity */
     /* +0x0F8 */ s32 soundCueActive; /* startSoundCue / stopSoundCue */
     /* +0x0FC */ s32 moodTimer;      /* zeroed by startSoundCue, counted by Entity__TickSoundCue */
-    /* +0x100 */ FadeBox *unk100; /* made by Entity__GetOrCreateFadeBox (New_FadeBox); released by Entity__Finalize */
+    /* +0x100 */ FadeBox *fadeBox; /* made by Entity__GetOrCreateFadeBox (New_FadeBox); released by Entity__Finalize */
     /* +0x104 */ BasicClass *unk104; /* released by Entity__Finalize, never set in Entity code: nothing shows its class. The object is 0x108 bytes (New_Entity) */
 };
 

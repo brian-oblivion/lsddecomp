@@ -55,7 +55,7 @@
  * ObjM__InitStyleAndWorld passes &ctorSound to RegisterStyleConfig, which
  * keeps it in gStyleTargetObj, and ApplyStyleDecorationIfSet
  * (class_3bb8c_m) calls +0x0AC on that block's +0x00C, cachedViewport
- * (Viewport's getSubHandle). The fields are kept flat.
+ * (Viewport's getFadeBox). The fields are kept flat.
  */
 
 typedef struct ObjM ObjM;

@@ -40,7 +40,7 @@
  * so the id tree (0x0 -> 0x7 -> 0x17) is the ctor chain. NodeGuardedViewport expands
  * these macros (round 87).
  *
- * Not settled here: subHandle is a FadeBox (0x164, below gBoxFillMethods,
+ * Not settled here: fadeBox holds a FadeBox (0x164, below gBoxFillMethods,
  * 0x64), whose +0x04C override (BoxFill__AttachToParent) takes a two-word screen
  * position where SceneNode's attachToParent slot takes a LongVec3 offset;
  * the ctor and SetSubHandle pass D_8008A904 (-100, -100) through the
@@ -124,8 +124,8 @@ struct ViewportOt {
     /* +0x09C */ void (*update)(Self *self);                       /* Viewport__Update; NodeGuardedViewport__Update */ \
     /* +0x0A0 */ void (*drawNode)(Self *self, SceneNode *node);   /* Viewport__DrawNode (code_2864) */ \
     /* +0x0A4 */ void (*flip)(Self *self);                         /* Viewport__Flip */              \
-    /* +0x0A8 */ void (*setSubHandle)(Self *self, SceneNode *handle); /* Viewport__SetSubHandle */  \
-    /* +0x0AC */ SceneNode *(*getSubHandle)(Self *self);          /* Viewport__GetFadeBox */      \
+    /* +0x0A8 */ void (*setFadeBox)(Self *self, SceneNode *handle); /* Viewport__SetSubHandle */  \
+    /* +0x0AC */ SceneNode *(*getFadeBox)(Self *self);          /* Viewport__GetFadeBox */      \
     /* +0x0B0 */ void (*setUnkB4)(Self *self, s32 value);          /* Viewport__SetUnkB4 */          \
     /* +0x0B4 */ void (*setDrawEnabled)(Self *self, s32 on)        /* Viewport__SetDrawEnabled */
 /* clang-format on */
@@ -159,7 +159,7 @@ struct ViewportOt {
     /* +0x098 */ s32 zDiv;                /* Update: the depth per OT tag; drawNode's sprite z */  \
     /* +0x09C */ u8 pad09C[0x0AC - 0x09C];                                                         \
     /* +0x0AC */ SceneNode *sceneRoot;   /* the ctor's New_SceneNode; Update draws it; finalize releases it */ \
-    /* +0x0B0 */ SceneNode *subHandle;   /* the ctor's New_FadeBox, attached under sceneRoot */ \
+    /* +0x0B0 */ SceneNode *fadeBox;   /* the ctor's New_FadeBox, attached under sceneRoot */ \
     /* +0x0B4 */ s32 unkB4;               /* Flip: nonzero swaps once more on buffer 0 */          \
     /* +0x0B8 */ s32 drawEnabled          /* Flip: 0 skips the clear and draw; default 1 */
 /* clang-format on */

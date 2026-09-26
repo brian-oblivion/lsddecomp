@@ -68,7 +68,7 @@ extern u8 SCALE_THIRTY_SECOND[];
 void Entity__MoodCue98(Entity *this, SoundCueSet *out) {
     if (this->targetReached != 0) {
         if (Entity__GetOrCreateFadeBox(this, NULL, 0, 0xA, 0) != 0) {
-            this->unk100->methods->startFadeDown(this->unk100, (BasicClass *)this->ticker, 7, 0);
+            this->fadeBox->methods->startFadeDown(this->fadeBox, (BasicClass *)this->ticker, 7, 0);
             this->methods->deactivate(this);
             ((DreamSys *)this->peer)->methods->resetFlashbackList((DreamSys *)this->peer);
         }

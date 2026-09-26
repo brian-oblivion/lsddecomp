@@ -436,7 +436,8 @@ void Entity__MoodCue57(Entity *this, SoundCueSet *out) {
         } else if (frame == 48) {
             if (Entity__IsNearTarget(this, &this->coord2->tx, 15, 10)) {
                 if (Entity__GetOrCreateFadeBox(this, NULL, NULL, (void *)10, 0) != NULL) {
-                    this->unk100->methods->startFadeDown(this->unk100, (BasicClass *)this->ticker, 4, 0);
+                    this->fadeBox->methods->startFadeDown(this->fadeBox, (BasicClass *)this->ticker,
+                                                          4, 0);
                 }
                 if (rand() & 1) {
                     this->methods->notifyParents(this, ENTITY_EFFECT_EVENT_VIDEO);

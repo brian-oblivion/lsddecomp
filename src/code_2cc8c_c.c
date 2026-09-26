@@ -232,7 +232,7 @@ void Viewport__Viewport(Viewport *self) {
     self->viewNode = 0;
     self->sceneRoot = New_SceneNode();
     obj = (SceneNode *)New_FadeBox(D_8008A90C, 0, 0);
-    self->subHandle = obj;
+    self->fadeBox = obj;
     obj->methods->attachToParent(obj, self->sceneRoot, (LongVec3 *)D_8008A904);
     self->methods->initDefaults(self);
 }
@@ -241,7 +241,7 @@ void Viewport__Finalize(Viewport *self) {
     self->methods->deinitOt(self);
     self->methods->detachViewChild(self);
     self->sceneRoot->methods->release(self->sceneRoot);
-    self->methods->setSubHandle(self, 0);
+    self->methods->setFadeBox(self, 0);
     Get_vtable_BasicClass()->finalize((BasicClass *)self);
 }
 

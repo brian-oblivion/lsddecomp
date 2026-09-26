@@ -363,7 +363,7 @@ void ObjM__EnterStyleSession(ObjM *self) {
     vp->methods->setUnkB4(vp, 0);
     vp->methods->setDrawEnabled(vp, 1);
 
-    fade = (FadeBox *)vp->methods->getSubHandle(vp);
+    fade = (FadeBox *)vp->methods->getFadeBox(vp);
     self->methods->addChild(self, (BasicClass *)fade);
 
     ret = self->dreamSys->methods->getSetFlashbackSession(self->dreamSys, (DreamColors *)&local10, -1);

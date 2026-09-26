@@ -36,11 +36,11 @@
  * keeps the current colour, and stop leaves the box shown after a fade down.
  * pushPosition/popPosition save and restore BoxFill's size and position.
  *
- * Its users: Viewport makes one as its subHandle (320x240 at the relative
+ * Its users: Viewport makes one as its fadeBox (320x240 at the relative
  * (-100, -100)), which ObjM fades and whose 5/6 it handles
  * (ObjM__OnFadeNotify; ObjM__EnterStyleSession sets altMode from the
  * DreamSys's flashback session). Entity makes one on demand as its
- * `unk100` (Entity__GetOrCreateFadeBox); the MoodCue handlers fade it with
+ * `fadeBox` (Entity__GetOrCreateFadeBox); the MoodCue handlers fade it with
  * the entity's ticker as the source.
  *
  * Overrides whose parameter list differs from the inherited slot keep the

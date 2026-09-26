@@ -118,7 +118,7 @@ void Class865C8__OnInit(Class865C8 *self) {
     vp = (Viewport *)self->viewport;
     size = obj->methods->slot7C(obj, 0);
     vp->methods->setScreenSize(vp, size);
-    ret = vp->methods->getSubHandle(vp);
+    ret = vp->methods->getFadeBox(vp);
     ret->methods->setDisplay(ret, 1);
     vp->methods->setUnk44(vp, 0x4B0);
     vp->methods->attachViewChild(vp, (BasicClass *)self->dreamSys, &D_80086650, &D_8008665C, 0);

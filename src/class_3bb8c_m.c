@@ -81,10 +81,10 @@ void ObjM__NotifyParentsCodeB(ObjM *self) {
 }
 
 /* The viewport (IntermediateBase::viewport, a NodeGuardedViewport) hands out its fade
- * box (getSubHandle, Viewport's New_FadeBox). */
+ * box (getFadeBox, Viewport's New_FadeBox). */
 void ObjM__StartFadeUp(ObjM *self, s32 channels, s32 arg2, s32 step, s32 addChild) {
-    FadeBox *fade =
-        (FadeBox *)((NodeGuardedViewport *)self->viewport)->methods->getSubHandle((NodeGuardedViewport *)self->viewport);
+    FadeBox *fade = (FadeBox *)((NodeGuardedViewport *)self->viewport)
+                        ->methods->getFadeBox((NodeGuardedViewport *)self->viewport);
     if (step != 0) {
         fade->methods->setStep(fade, step);
     }
