@@ -602,8 +602,8 @@ typedef struct TodFile {
 } TodFile;
 
 /* gTodMethods +0x078: slot +0x07C over the buffer past its first two words. */
-u8 Tod__ScanPackets(Tod *self, u8 *out, u32 *sel) {
-    return self->methods->scanTodPackets(self, out, sel, ((TodFile *)self->buffer)->frames);
+u8 Tod__ScanPackets(Tod *self, u8 *out, u32 *tmdId) {
+    return self->methods->scanTodPackets(self, out, tmdId, ((TodFile *)self->buffer)->frames);
 }
 
 /* gTodMethods/gTodSetMethods +0x07C: walk the packet words after the u16 count
@@ -627,62 +627,62 @@ typedef struct TodPacket {
     /* +0x04 */ u16 tmdId;
 } TodPacket;
 
-u8 ScanTodPackets(Tod *self, u8 *out, u32 *sel, u32 *data) {
-    u8 value;
+u8 ScanTodPackets(Tod *self, u8 *out, u32 *tmdId, u32 *data) {
+    u8 objId;
     u8 type;
-    u8 sub;
+    u8 flag;
     u8 len;
-    u32 n;
+    u32 packetCount;
     u32 i;
     s32 j;
-    u8 cnt;
-    s32 found;
+    u8 created;
+    s32 index;
 
-    n = ((TodFrame *)data)->packetCount;
+    packetCount = ((TodFrame *)data)->packetCount;
     data += 2;
     i = 0;
-    cnt = 0;
-    found = 0;
-    for (; i < n; i++) {
-        DecodeTodPacketWord(self, data, &value, &type, &sub, &len);
-        if (type == 8 && sub == 0) {
-            cnt++;
+    created = 0;
+    index = 0;
+    for (; i < packetCount; i++) {
+        DecodeTodPacketWord(self, data, &objId, &type, &flag, &len);
+        if (type == 8 && flag == 0) {
+            created++;
             if (out != NULL) {
-                *out++ = value;
+                *out++ = objId;
             }
         } else if (type == 2) {
             if (out != NULL) {
-                if (sel != NULL && ((TodPacket *)data)->tmdId == *sel) {
-                    for (j = 0, out -= cnt; j < cnt; j++) {
-                        if (*out++ == value) {
-                            found = j;
+                if (tmdId != NULL && ((TodPacket *)data)->tmdId == *tmdId) {
+                    for (j = 0, out -= created; j < created; j++) {
+                        if (*out++ == objId) {
+                            index = j;
                             break;
                         }
                     }
                 }
-            } else if (sel != NULL) {
-                found++;
+            } else if (tmdId != NULL) {
+                index++;
             }
         }
         data += len;
     }
-    if (sel != NULL) {
-        *sel = found;
+    if (tmdId != NULL) {
+        *tmdId = index;
     }
-    return cnt;
+    return created;
 }
 
 /* gTodMethods/gTodSetMethods +0x080: decode one packet word -- the low byte, then
  * the two nibbles at bits 16 and 20, then the top byte -- and return the
  * pointer past it. */
-u32 *DecodeTodPacketWord(Tod *self, u32 *acc, u8 *out0, u8 *out1, u8 *out2, u8 *out3) {
-    u32 v = *acc;
+u32 *DecodeTodPacketWord(Tod *self, u32 *packet, u8 *objId, u8 *type, u8 *flag, u8 *len) {
+    u32 word = *packet;
 
-    *out0 = v;
-    *out1 = (v >> 16) & 0xF;
-    *out2 = (v >> 20) & 0xF;
-    *out3 = v >> 24;
-    return acc + 1;
+    *objId = word;
+    *type = (word >> 16) & 0xF;
+    *flag = (word >> 20) & 0xF;
+    *len = word >> 24;
+    return packet + 1;
 }
 
 TodMethods *GetTodMethods(void) {
@@ -939,16 +939,16 @@ void ModelData__ReleaseResources(ModelData *self) {
 }
 
 /* gModelDataMethods/gTriggerWorldMethods +0x080: forwarded to slot +0x078 of the object at +0x30. */
-u8 ModelData__ForwardScanPackets(ModelData *self, s32 arg1, s32 arg2) {
-    return ((s32 (*)())self->todSet->methods->processBuffer)(self->todSet, arg1, arg2);
+u8 ModelData__ForwardScanPackets(ModelData *self, s32 out, s32 tmdId) {
+    return ((s32 (*)())self->todSet->methods->processBuffer)(self->todSet, out, tmdId);
 }
 
 /* gModelDataMethods/gTriggerWorldMethods +0x084: forwarded to slot +0x080 of the object at +0x30. */
-void *ModelData__ForwardDecodePacketWord(ModelData *self, s32 arg1, s32 arg2, s32 arg3, s32 arg4,
-                                         s32 arg5) {
+void *ModelData__ForwardDecodePacketWord(ModelData *self, s32 packet, s32 objId, s32 type, s32 flag,
+                                         s32 len) {
     return ((TodSet *)self->todSet)
-        ->methods->decodePacketWord((TodSet *)self->todSet, (u32 *)arg1, (u8 *)arg2, (u8 *)arg3,
-                                    (u8 *)arg4, (u8 *)arg5);
+        ->methods->decodePacketWord((TodSet *)self->todSet, (u32 *)packet, (u8 *)objId, (u8 *)type,
+                                    (u8 *)flag, (u8 *)len);
 }
 
 ModelDataMethods *GetModelDataMethods(void) {
@@ -1048,11 +1048,11 @@ TriggerWorldMethods *GetTriggerWorldMethods(void) {
 }
 
 /* Allocate and construct a gTileMapMethods object. */
-TileMap *New_TileMap(s32 arg0, TileAtlas *atlas) {
+TileMap *New_TileMap(s32 source, TileAtlas *atlas) {
     TileMap *obj = BMemPMgrAlloc(0x44);
 
     if (obj != NULL) {
-        GetTileMapMethods()->ctor(obj, arg0, atlas);
+        GetTileMapMethods()->ctor(obj, source, atlas);
         return obj;
     }
     return NULL;
@@ -1061,14 +1061,14 @@ TileMap *New_TileMap(s32 arg0, TileAtlas *atlas) {
 /* gTileMapMethods +0x008: constructor -- the active driver's, then this table;
  * store the atlas, clear `loaded`, and with no `arg1` set defaultGrid,
  * clear +0x2A and run its own +0x064. */
-void TileMap__TileMap(TileMap *self, s32 arg1, TileAtlas *atlas) {
+void TileMap__TileMap(TileMap *self, s32 source, TileAtlas *atlas) {
     s32 unused[8];
 
     GetActiveDataSourceMethods()->ctor((FileResource *)self);
     self->methods = GetTileMapMethods();
     self->atlas = atlas;
     self->loaded = 0;
-    if (arg1 == 0) {
+    if (source == 0) {
         self->defaultGrid = 1;
         self->loadState = 0;
         self->methods->setFlag(self);
@@ -1125,11 +1125,11 @@ TileMapMethods *GetTileMapMethods(void) {
 }
 
 /* Allocate and construct a gTileAtlasMethods object. */
-TileAtlas *New_TileAtlas(s32 arg0) {
+TileAtlas *New_TileAtlas(s32 source) {
     TileAtlas *obj = BMemPMgrAlloc(0x38);
 
     if (obj != NULL) {
-        GetTileAtlasMethods()->ctor(obj, arg0);
+        GetTileAtlasMethods()->ctor(obj, source);
         return obj;
     }
     return NULL;
@@ -1138,14 +1138,14 @@ TileAtlas *New_TileAtlas(s32 arg0) {
 /* gTileAtlasMethods +0x008: constructor -- the active driver's, then this table;
  * clear unk34/loaded, and with no `arg1` set defaultCells, clear +0x2A and
  * run its own +0x064. */
-void TileAtlas__TileAtlas(TileAtlas *self, s32 arg1) {
+void TileAtlas__TileAtlas(TileAtlas *self, s32 source) {
     s32 unused[8];
 
     GetActiveDataSourceMethods()->ctor((FileResource *)self);
     self->methods = GetTileAtlasMethods();
     self->unk34 = 0;
     self->loaded = 0;
-    if (arg1 == 0) {
+    if (source == 0) {
         self->defaultCells = 1;
         self->loadState = 0;
         self->methods->setFlag(self);
@@ -1293,10 +1293,10 @@ s32 TodSet__BuildTods(TodSet *self) {
 
 /* gTodSetMethods +0x078: Tod's +0x07C scanner over the data past the buffer's
  * counted array. */
-u8 TodSet__ScanPackets(TodSet *self, u8 *out, u32 *sel) {
+u8 TodSet__ScanPackets(TodSet *self, u8 *out, u32 *tmdId) {
     CountedBuf33808 *buf = self->buffer;
 
-    return self->methods->scanTodPackets(self, out, sel, ((TodFile *)&buf->entries[buf->count])->frames);
+    return self->methods->scanTodPackets(self, out, tmdId, ((TodFile *)&buf->entries[buf->count])->frames);
 }
 
 TodSetMethods *GetTodSetMethods(void) {
@@ -1305,11 +1305,11 @@ TodSetMethods *GetTodSetMethods(void) {
 
 /* Allocate and construct a MoviePlayer; freed and NULL when the constructor
  * returns nonzero (this ctor reports failure, not self). */
-MoviePlayer *New_MoviePlayer(DrawRect *frame, s32 speed, s32 external) {
+MoviePlayer *New_MoviePlayer(DrawRect *frame, s32 cdSpeed, s32 external) {
     MoviePlayer *obj = BMemPMgrAlloc(0x6C);
 
     if (obj != NULL) {
-        if (GetMoviePlayerMethods()->ctor(obj, frame, speed, external) == 0) {
+        if (GetMoviePlayerMethods()->ctor(obj, frame, cdSpeed, external) == 0) {
             return obj;
         }
         BMemPMgrFree(obj);
@@ -1322,10 +1322,10 @@ MoviePlayer *New_MoviePlayer(DrawRect *frame, s32 speed, s32 external) {
  * 1 when either fails. Then reset the MDEC the first time any player is built
  * (gMdecInitialized), route its output callback to OnMdecFrameReady, hand the
  * stream the ring (0x12000), clear unk50 and setAutoPlay(1). 0. */
-s32 MoviePlayer__MoviePlayer(MoviePlayer *self, DrawRect *frame, s32 speed, s32 external) {
+s32 MoviePlayer__MoviePlayer(MoviePlayer *self, DrawRect *frame, s32 cdSpeed, s32 external) {
     Get_vtable_BasicClass()->ctor((BasicClass *)self);
     self->methods = GetMoviePlayerMethods();
-    self->stream = New_CdStream(speed, 15, 0);
+    self->stream = New_CdStream(cdSpeed, 15, 0);
     if (self->stream != NULL) {
         if (MoviePlayer__InitFrame(self, frame, external) == 0) {
             if (gMdecInitialized == 0) {
@@ -1409,7 +1409,7 @@ void MoviePlayer__FreeFrameBuffers(MoviePlayer *self) {
  * on the stream (100 tries); 1 when that fails. Otherwise become the active
  * movie, reset the state words, keep `arg3`/`loops` and clear `frame`
  * through DrawSystem's clearImage, color gMovieClearColor. 0. */
-s32 MoviePlayer__Play(MoviePlayer *self, char *name, s32 frameCount, s32 arg3, s32 loops) {
+s32 MoviePlayer__Play(MoviePlayer *self, char *name, s32 frameCount, s32 repeat, s32 loops) {
     DrawSystem *ds;
 
     if (gActiveMoviePlayer == NULL) {
@@ -1424,7 +1424,7 @@ s32 MoviePlayer__Play(MoviePlayer *self, char *name, s32 frameCount, s32 arg3, s
             self->frameDone = 1;
             self->streamEnded = 0;
             self->finished = 0;
-            self->unk54 = arg3;
+            self->unk54 = repeat;
             self->loops = loops;
             ds = GetDrawSystem();
             ds->methods->clearImage(ds, gMovieClearColor, &self->frame);
