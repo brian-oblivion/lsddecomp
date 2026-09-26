@@ -403,7 +403,7 @@ void StyleTeardown(void) {
 
 extern u8 gStyleSpawnScales[];
 extern s32 gStyleSpawnYChoices[];
-extern u8 *D_8008E0B4;
+extern u8 *gStyleSpawnScale;
 extern s32 D_8008E0BC;
 extern s32 gStyleSpawnOffsetX;
 extern void SetupStyleSpawnParamsA(void *arg0, void *arg1);
@@ -420,7 +420,7 @@ Class876FC **StyleFillEffectKind0(Class876FC **arg0, s32 arg1, LongVec3 *arg2) {
     void (*fp)(void *, void *);
 
     D_8008E0BC = rand() % 7;
-    D_8008E0B4 = (u8 *)gStyleSpawnScales + ((u32)rand() % 5) * 12;
+    gStyleSpawnScale = (u8 *)gStyleSpawnScales + ((u32)rand() % 5) * 12;
     t3 = (u32)rand() % 5;
     if (t3 != 0) {
         t3 = gStyleSpawnYChoices[t3];
@@ -446,7 +446,7 @@ Class876FC **StyleFillEffectKind1(Class876FC **arg0, s32 arg1, LongVec3 *arg2) {
     s32 val;
 
     val = D_80087330;
-    D_8008E0B4 = gStyleKind1Scale;
+    gStyleSpawnScale = gStyleKind1Scale;
     for (i = 0; i < arg1; i++) {
         SetupStyleSpawnParamsA(arg2, (void *)val);
         *arg0 = New_Class876FC(1, (Class876FCParams *)&gStyleSpawnOffsetX,
