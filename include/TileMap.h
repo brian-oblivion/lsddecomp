@@ -5,7 +5,7 @@
 
 /*
  * TileMap -- a Class6D430 data source (class id 0x203, method table
- * D_8006F498) whose own fields, +0x02C..+0x03B, are exactly libgs's GsMAP
+ * gTileMapMethods) whose own fields, +0x02C..+0x03B, are exactly libgs's GsMAP
  * (LIBGS.H: cellw, cellh, ncellw, ncellh, base, index). Methods in
  * src/code_33808.c. No classes derive from it (`typeviews.py --tree`), so
  * there are no FIELDS/SLOTS macros.
@@ -27,7 +27,7 @@
  * The atlas is a TileAtlas (D_8006F514, include/TileAtlas.h, by tag here):
  * its `cells` is the 300-GsCELL array BuildMap copies into map.base.
  *
- * SLOTS (`classtable.py D_8006F498 --vs D_8006D430`, 30 against 30):
+ * SLOTS (`classtable.py gTileMapMethods --vs D_8006D430`, 30 against 30):
  *  - +0x008 ctor, TileMap__TileMap(self, arg1, atlas): the active driver's
  *    ctor, this table, atlas at +0x03C, loaded = 0; with arg1 == 0,
  *    defaultGrid = 1, unk2A = 0 and setFlag (+0x064). What a nonzero arg1
@@ -79,8 +79,8 @@ struct TileMap {
  * banner). */
 typedef void (*TileMapBuildMapFn)();
 
-extern TileMapMethods D_8006F498;
-extern TileMapMethods *GetTileMapMethods(void); /* returns &D_8006F498 */
+extern TileMapMethods gTileMapMethods;
+extern TileMapMethods *GetTileMapMethods(void); /* returns &gTileMapMethods */
 
 TileMap *New_TileMap(s32 arg0, struct TileAtlas *atlas); /* BMemPMgrAlloc(0x44), then ctor */
 void TileMap__TileMap(TileMap *self, s32 arg1, struct TileAtlas *atlas);

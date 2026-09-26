@@ -27,7 +27,7 @@
  *     those pairs; ModelData named from code_55dd4.h/.c's own "tmd"/"tods"/
  *     "modelData" fields, TriggerWorld from code_4cd08.c's own declared
  *     return type.
- *   - TileMap / TileAtlas (D_8006F498 / D_8006F514): a 20x15 grid of
+ *   - TileMap / TileAtlas (gTileMapMethods / D_8006F514): a 20x15 grid of
  *     16x16-cell map data (a GsMAP, consumed by BgLayer as its map source)
  *     and the 300-GsCELL texture atlas it indexes; built together and used
  *     together in src/code_2c054.c's TaskCore__TaskCore (include/TileMap.h,
@@ -1021,7 +1021,7 @@ TriggerWorldMethods *GetTriggerWorldMethods(void) {
     return &D_8006F40C;
 }
 
-/* Allocate and construct a D_8006F498 object. */
+/* Allocate and construct a gTileMapMethods object. */
 TileMap *New_TileMap(s32 arg0, TileAtlas *atlas) {
     TileMap *obj = BMemPMgrAlloc(0x44);
 
@@ -1032,7 +1032,7 @@ TileMap *New_TileMap(s32 arg0, TileAtlas *atlas) {
     return NULL;
 }
 
-/* D_8006F498 +0x008: constructor -- the active driver's, then this table;
+/* gTileMapMethods +0x008: constructor -- the active driver's, then this table;
  * store the atlas, clear `loaded`, and with no `arg1` set defaultGrid,
  * clear +0x2A and run its own +0x064. */
 void TileMap__TileMap(TileMap *self, s32 arg1, TileAtlas *atlas) {
@@ -1049,14 +1049,14 @@ void TileMap__TileMap(TileMap *self, s32 arg1, TileAtlas *atlas) {
     }
 }
 
-/* D_8006F498 +0x00C: finalize -- free the map's index table, then the
+/* gTileMapMethods +0x00C: finalize -- free the map's index table, then the
  * active driver's. */
 void TileMap__Finalize(TileMap *self) {
     BMemPMgrFree(self->map.index);
     GetActiveDataSourceMethods()->finalize((Class6D430 *)self);
 }
 
-/* D_8006F498 +0x064: unless +0x2A is set, slot +0x078 (BuildMap) and mark
+/* gTileMapMethods +0x064: unless +0x2A is set, slot +0x078 (BuildMap) and mark
  * `loaded`. */
 
 void TileMap__Load(TileMap *self) {
@@ -1066,7 +1066,7 @@ void TileMap__Load(TileMap *self) {
     }
 }
 
-/* D_8006F498 +0x078: take the atlas's cells as the map's base;
+/* gTileMapMethods +0x078: take the atlas's cells as the map's base;
  * with defaultGrid, lay out a 20 x 15 grid of 16 x 16 cells and fill an
  * allocated index table 0..n-1; otherwise, or when the allocation fails,
  * free the buffer (own +0x05C). */
@@ -1095,7 +1095,7 @@ void TileMap__BuildMap(TileMap *self) {
 }
 
 TileMapMethods *GetTileMapMethods(void) {
-    return &D_8006F498;
+    return &gTileMapMethods;
 }
 
 /* Allocate and construct a D_8006F514 object. */

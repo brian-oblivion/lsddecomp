@@ -9,7 +9,7 @@ drift. Fresh ground (carved revision 18, no prior report).
 
 ## What it does
 
-Reset a GsBG embedded at +0x044 of the gBgLayerMethods object over a map source whose +0x2C is a GsMAP (the D_8006F498 object lays one out: cellw/cellh 16, ncellw 20, ncellh 15). Mode 0: attribute 0x1000000, w/h = cell size x cell count; mode 1: attribute 0x2000000, 320 x 240. Then x/y/scroll 0, r,g,b from gBgLayerDefaultColor, map = &src->cellw, scale 0x1000/0x1000, rotate 0, mx/my = w/2, h/2.
+Reset a GsBG embedded at +0x044 of the gBgLayerMethods object over a map source whose +0x2C is a GsMAP (the gTileMapMethods object lays one out: cellw/cellh 16, ncellw 20, ncellh 15). Mode 0: attribute 0x1000000, w/h = cell size x cell count; mode 1: attribute 0x2000000, 320 x 240. Then x/y/scroll 0, r,g,b from gBgLayerDefaultColor, map = &src->cellw, scale 0x1000/0x1000, rotate 0, mx/my = w/2, h/2.
 
 Table slot (`tools/classtable.py`): gBgLayerMethods +0x040 (the Class6B5CC `reset` slot, called by BgLayer__BgLayer with its two arguments).
 

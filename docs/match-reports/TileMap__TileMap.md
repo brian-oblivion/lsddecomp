@@ -11,9 +11,9 @@ drift. Fresh ground (carved revision 18, no prior report).
 
 ## What it does
 
-Constructor: active driver's ctor, install D_8006F498 (GetTileMapMethods), store the third argument at +0x3C, clear +0x42; when the second argument is 0, set +0x40 = 1, clear +0x2A and call its own +0x064 (TileMap__Load).
+Constructor: active driver's ctor, install gTileMapMethods (GetTileMapMethods), store the third argument at +0x3C, clear +0x42; when the second argument is 0, set +0x40 = 1, clear +0x2A and call its own +0x064 (TileMap__Load).
 
-Table slot (`tools/classtable.py`): D_8006F498 +0x008.
+Table slot (`tools/classtable.py`): gTileMapMethods +0x008.
 
 ## Source
 
@@ -31,7 +31,7 @@ typedef struct Obj6F498 {
     /* +0x042 */ u16 unk42;
 } Obj6F498;
 
-/* D_8006F498 +0x008: constructor -- the active driver's, then this table;
+/* gTileMapMethods +0x008: constructor -- the active driver's, then this table;
  * store `arg2` at +0x3C, clear +0x42, and with no `arg1` set +0x40, clear
  * +0x2A and run its own +0x064. */
 void TileMap__TileMap(Obj6F498 *self, s32 arg1, s32 arg2) {

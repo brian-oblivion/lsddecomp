@@ -44,7 +44,7 @@
  * copies them lb/lb/lb, sb/sb/sb (BgLayer__SetColor, BgLayer__Reset), which
  * three u8 members would not give.
  *
- * The map source is a TileMap (D_8006F498, include/TileMap.h, round 88),
+ * The map source is a TileMap (gTileMapMethods, include/TileMap.h, round 88),
  * whose GsMAP starts at +0x02C. Only its tag is named here, as
  * include/TriggerWorld.h does for its descriptor.
  */

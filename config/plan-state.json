@@ -897,11 +897,6 @@
           "date": "2026-09-26",
           "header": "include/TriggerWorld.h"
         },
-        "D_8006F498": {
-          "class": "TileMap",
-          "date": "2026-09-26",
-          "header": "include/TileMap.h"
-        },
         "D_8006F514": {
           "class": "TileAtlas",
           "date": "2026-09-26",
@@ -1101,6 +1096,11 @@
           "class": "TextRow",
           "date": "2026-09-26",
           "header": "include/TextRow.h"
+        },
+        "gTileMapMethods": {
+          "class": "TileMap",
+          "date": "2026-09-26",
+          "header": "include/TileMap.h"
         },
         "gTimImageMethods": {
           "class": "TimImage",

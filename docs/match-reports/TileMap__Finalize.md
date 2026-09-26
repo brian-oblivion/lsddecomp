@@ -13,7 +13,7 @@ drift. Fresh ground (carved revision 18, no prior report).
 
 `BMemPMgrFree((void *)self->unk38); GetActiveDataSourceMethods()->finalize(self);`
 
-Table slot (`tools/classtable.py`): D_8006F498 +0x00C (finalize).
+Table slot (`tools/classtable.py`): gTileMapMethods +0x00C (finalize).
 
 ## Source
 
@@ -23,7 +23,7 @@ fields +0x2C..+0x38) and `CountedBuf33808` sit at the top of `src/code_33808.c`.
 Slot +0x078 is `void *slot78` in the unified macro, so calls cast it.
 
 ```c
-/* D_8006F498 +0x00C: finalize -- free +0x38, then the active driver's. */
+/* gTileMapMethods +0x00C: finalize -- free +0x38, then the active driver's. */
 void TileMap__Finalize(DataSrc33808 *self) {
     BMemPMgrFree((void *)self->unk38);
     GetActiveDataSourceMethods()->finalize((Class6D430 *)self);

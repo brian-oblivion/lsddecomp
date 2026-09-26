@@ -13,7 +13,7 @@ drift. Fresh ground (carved revision 18, no prior report).
 
 Allocator shape: `BMemPMgrAlloc(size)`, then the constructor (+0x008) through the class's table getter, called through the unit-local `Ctor33808` view (an unprototyped `s32 (*ctor)()` at +0x008, declared at the top of the unit with the getter prototypes), since each class's constructor takes different arguments. Shape: `if (obj != NULL) { ctor; return obj; } return NULL;`.
 
-Table slot (`tools/classtable.py`): none (allocator for D_8006F498, object size 0x44, two constructor arguments).
+Table slot (`tools/classtable.py`): none (allocator for gTileMapMethods, object size 0x44, two constructor arguments).
 
 ## Source
 
@@ -22,7 +22,7 @@ The unit-local view `DataSrc33808` (a Class6D430 subclass built with the unified
 fields +0x2C..+0x38) and `CountedBuf33808` sit at the top of `src/code_33808.c`.
 
 ```c
-/* Allocate and construct a D_8006F498 object. */
+/* Allocate and construct a gTileMapMethods object. */
 void *New_TileMap(s32 arg0, s32 arg1) {
     void *obj = BMemPMgrAlloc(0x44);
 

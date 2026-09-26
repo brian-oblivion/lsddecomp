@@ -9,7 +9,7 @@ drift. Fresh ground (carved revision 18, no prior report).
 
 ## What it does
 
-When +0x30 is set, allocate 300 GsCELLs (0x960 bytes) at +0x2C and fill them as 16x16-texel cells over VRAM from x 0x280: u steps by 16, x by 16; at x 0x3C0 the row wraps (u 0, x 0x280, v += 16); whenever x crosses a 64-pixel texture page the cell's tpage becomes x >> 6 (plus 16 once v reaches 0x100) and u restarts at 0. The first page comes from GetTPage(2, 0, 0x280, 0). cba and flag are zero. The D_8006F498 object (20 x 15 grid of 16 x 16 cells, index table 0..299) is its GsMAP partner.
+When +0x30 is set, allocate 300 GsCELLs (0x960 bytes) at +0x2C and fill them as 16x16-texel cells over VRAM from x 0x280: u steps by 16, x by 16; at x 0x3C0 the row wraps (u 0, x 0x280, v += 16); whenever x crosses a 64-pixel texture page the cell's tpage becomes x >> 6 (plus 16 once v reaches 0x100) and u restarts at 0. The first page comes from GetTPage(2, 0, 0x280, 0). cba and flag are zero. The gTileMapMethods object (20 x 15 grid of 16 x 16 cells, index table 0..299) is its GsMAP partner.
 
 Table slot (`tools/classtable.py`): D_8006F514 +0x078.
 
