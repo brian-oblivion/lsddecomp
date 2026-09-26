@@ -37,7 +37,7 @@ jr   $ra
 `sNdivOverrideSet` and `sNdivOverride` (`asm/data/7B018.sdata.s`) are plain `.sdata`
 words, initialized to `1` and `2` respectively, and referenced from nowhere
 else in the executable except this function and its `code_8220_c` sibling
-`FillRCPolyHeader` (also assigned this round -- see `FillRCPolyHeader.md`). No
+`FillDivPolygonHeader` (also assigned this round -- see `FillDivPolygonHeader.md`). No
 existing type information anywhere else in the codebase constrains them
 further, so they are declared `s32`.
 
@@ -72,8 +72,8 @@ them.
 
 `func_8001A54C` -> `SetNdivOverride`, parameters (`arg0`, `arg1`) ->
 (`enable`, `code`). **Tier A**: a two-field setter whose read side
-(FillRCPolyHeader, this unit) is fully derived -- `enable` gates whether
-FillRCPolyHeader's header word 0 comes from `code` (stored only when
+(FillDivPolygonHeader, this unit) is fully derived -- `enable` gates whether
+FillDivPolygonHeader's header word 0 comes from `code` (stored only when
 `enable` is set) or the per-object D_80090C18 default. Matches the
 globals it writes, `sNdivOverrideSet`/`sNdivOverride` (named
 alongside this function).

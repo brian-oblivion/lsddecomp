@@ -59,7 +59,7 @@ void StoreSxyPolyGT4(void *dst, s32 storeFirst3) {
  * settle), hence the cast. */
 void *SubmitPolyF3(void *prim, void *ctx) {
     if (*(s32 *)((u8 *)ctx + 0x78) != 0) {
-        FillRCPolyHeader(gDivPolygon3, ctx, (u8 *)prim + 0x4, 0, 0, 0);
+        FillDivPolygonHeader(gDivPolygon3, ctx, (u8 *)prim + 0x4, 0, 0, 0);
         CopyPolyVtx3((PolyVtx **)((u8 *)ctx + 0x88), (PolyVtx **)((u8 *)ctx + 0xA4),
                      (PolyUV4 *)((u8 *)prim + 0x8), (PolyUV4 *)((u8 *)prim + 0xC),
                      (PolyUV4 *)((u8 *)prim + 0x10));
@@ -79,7 +79,7 @@ void *SubmitPolyG3(void *prim, void *ctx) {
     u8 *c = (u8 *)ctx;
 
     if (*(s32 *)(c + 0x78) != 0) {
-        FillRCPolyHeader(gDivPolygon3, c, self + 0x4, 0, 0, 0);
+        FillDivPolygonHeader(gDivPolygon3, c, self + 0x4, 0, 0, 0);
         CopyPolyVtx3((PolyVtx **)(c + 0x88), (PolyVtx **)(c + 0xA4), (PolyUV4 *)(self + 0x8),
                      (PolyUV4 *)(self + 0x10), (PolyUV4 *)(self + 0x18));
 
@@ -104,8 +104,8 @@ void *SubmitPolyG3(void *prim, void *ctx) {
  * SubmitPolyF3. */
 void *SubmitPolyFT3(void *prim, void *ctx) {
     if (*(s32 *)((u8 *)ctx + 0x78) != 0) {
-        FillRCPolyHeader(gDivPolygon3, ctx, (u8 *)prim + 0x4, 1, *(u16 *)((u8 *)prim + 0xE),
-                         *(u16 *)((u8 *)prim + 0x16));
+        FillDivPolygonHeader(gDivPolygon3, ctx, (u8 *)prim + 0x4, 1, *(u16 *)((u8 *)prim + 0xE),
+                             *(u16 *)((u8 *)prim + 0x16));
         CopyPolyVtx3((PolyVtx **)((u8 *)ctx + 0x88), (PolyVtx **)((u8 *)ctx + 0xA4),
                      (PolyUV4 *)((u8 *)prim + 0x8), (PolyUV4 *)((u8 *)prim + 0x10),
                      (PolyUV4 *)((u8 *)prim + 0x18));
@@ -130,7 +130,7 @@ void *SubmitPolyFT3(void *prim, void *ctx) {
  * SubmitPolyF3. */
 void *SubmitPolyF4(void *prim, void *ctx) {
     if (*(s32 *)((u8 *)ctx + 0x78) != 0) {
-        FillRCPolyHeader(gDivPolygon4, ctx, (u8 *)prim + 0x4, 0, 0, 0);
+        FillDivPolygonHeader(gDivPolygon4, ctx, (u8 *)prim + 0x4, 0, 0, 0);
         CopyPolyVtx4((u8 *)ctx + 0x94, (u8 *)ctx + 0xA4, (u8 *)prim + 0x8, (u8 *)prim + 0xC,
                      (u8 *)prim + 0x10, (u8 *)prim + 0x14);
         return ((void *(*)(void *, void *))RCpolyF4)(prim, gDivPolygon4);
@@ -149,7 +149,7 @@ void *SubmitPolyG4(void *prim, void *ctx) {
     u8 *c = (u8 *)ctx;
 
     if (*(s32 *)(c + 0x78) != 0) {
-        FillRCPolyHeader(gDivPolygon4, c, self + 0x4, 0, 0, 0);
+        FillDivPolygonHeader(gDivPolygon4, c, self + 0x4, 0, 0, 0);
         CopyPolyVtx4(c + 0x94, c + 0xA4, self + 0x8, self + 0x10, self + 0x18, self + 0x20);
 
         *(u16 *)(*(u8 **)(c + 0x94) + 0xA) = *(u8 *)(self + 0xF);
@@ -175,8 +175,8 @@ void *SubmitPolyG4(void *prim, void *ctx) {
  * SubmitPolyF3. */
 void *SubmitPolyFT4(void *prim, void *ctx) {
     if (*(s32 *)((u8 *)ctx + 0x78) != 0) {
-        FillRCPolyHeader(gDivPolygon4, ctx, (u8 *)prim + 0x4, 1, *(u16 *)((u8 *)prim + 0xE),
-                         *(u16 *)((u8 *)prim + 0x16));
+        FillDivPolygonHeader(gDivPolygon4, ctx, (u8 *)prim + 0x4, 1, *(u16 *)((u8 *)prim + 0xE),
+                             *(u16 *)((u8 *)prim + 0x16));
         CopyPolyVtx4((u8 *)ctx + 0x94, (u8 *)ctx + 0xA4, (u8 *)prim + 0x8, (u8 *)prim + 0x10,
                      (u8 *)prim + 0x18, (u8 *)prim + 0x20);
 
@@ -205,7 +205,7 @@ void *SubmitPolyGT3(void *prim, void *ctx) {
     u8 *c = (u8 *)ctx;
 
     if (*(s32 *)(c + 0x78) != 0) {
-        FillRCPolyHeader(gDivPolygon3, c, self + 0x4, 1, *(u16 *)(self + 0xE), *(u16 *)(self + 0x1A));
+        FillDivPolygonHeader(gDivPolygon3, c, self + 0x4, 1, *(u16 *)(self + 0xE), *(u16 *)(self + 0x1A));
         CopyPolyVtx3((PolyVtx **)(c + 0x88), (PolyVtx **)(c + 0xA4), (PolyUV4 *)(self + 0x8),
                      (PolyUV4 *)(self + 0x14), (PolyUV4 *)(self + 0x20));
 
@@ -237,7 +237,7 @@ void *SubmitPolyGT4(void *prim, void *ctx) {
     u8 *c = (u8 *)ctx;
 
     if (*(s32 *)(c + 0x78) != 0) {
-        FillRCPolyHeader(gDivPolygon4, c, self + 0x4, 1, *(u16 *)(self + 0xE), *(u16 *)(self + 0x1A));
+        FillDivPolygonHeader(gDivPolygon4, c, self + 0x4, 1, *(u16 *)(self + 0xE), *(u16 *)(self + 0x1A));
         CopyPolyVtx4(c + 0x94, c + 0xA4, self + 0x8, self + 0x14, self + 0x20, self + 0x2C);
 
         *(u16 *)(*(u8 **)(c + 0x94) + 0xA) = *(u16 *)(self + 0x26);
@@ -337,7 +337,7 @@ void UpdatePolyBBoxAndCull(void *ctx, s32 count) {
     }
 }
 
-/* sDivClipWidth/sDivClipHeight -- read only by FillRCPolyHeader, unconditionally
+/* sDivClipWidth/sDivClipHeight -- read only by FillDivPolygonHeader, unconditionally
  * copied into every submit table's +0x4/+0x8 words. No second accessor
  * establishes what either holds beyond "a GPU header word"; left as `D_`
  * names (round 77, insufficient evidence for gPoly*-style names). */
@@ -365,7 +365,8 @@ extern s32 sNdivOverride;
  * plain word at `ctx + 0x30` (the caller's computed OT bucket pointer,
  * code_8220.h). Pure header-populate leaf, same shape at all 8 call
  * sites: tier A. */
-void FillRCPolyHeader(void *table, void *ctx, PolyUV4 *uv, s32 hasUv1Codes, u16 uv1Clut, u16 uv1TPage) {
+void FillDivPolygonHeader(void *table, void *ctx, PolyUV4 *uv, s32 hasUv1Codes, u16 uv1Clut,
+                          u16 uv1TPage) {
     u8 *dst = (u8 *)table;
     u8 *c = (u8 *)ctx;
     s32 val;
@@ -424,8 +425,8 @@ void CopyPolyVtx4(PolyVtx **dst, PolyVtx **src, PolyUV4 *uv0, PolyUV4 *uv1, Poly
 extern s32 sNdivOverrideSet;
 extern s32 sNdivOverride;
 
-/* Setter matching FillRCPolyHeader's read side: `enable` gates whether
- * FillRCPolyHeader's header word 0 comes from `code` (this call's second
+/* Setter matching FillDivPolygonHeader's read side: `enable` gates whether
+ * FillDivPolygonHeader's header word 0 comes from `code` (this call's second
  * argument, stored only when `enable` is set) or from the per-object
  * D_80090C18 default. Tier A. */
 void SetNdivOverride(s32 enable, s32 code) {

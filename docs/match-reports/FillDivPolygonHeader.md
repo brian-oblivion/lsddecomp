@@ -1,4 +1,6 @@
-# FillRCPolyHeader -- MATCHED (round 44, 27/27 words)
+# FillDivPolygonHeader -- MATCHED (round 44, 27/27 words)
+
+> Renamed from `FillRCPolyHeader` on 2026-09-26 (tools/rename.py). Address 0x8001a380.
 
 > Renamed from `func_8001A380` on 2026-09-24 (tools/rename.py). Address 0x8001a380.
 
@@ -10,7 +12,7 @@ stub, which recorded no attempt and no score.
 ## Result
 
 ```
-FillRCPolyHeader: 27/27 words match (file 0xAB80-0xABEC)
+FillDivPolygonHeader: 27/27 words match (file 0xAB80-0xABEC)
 ```
 
 Whole-image `./build-and-verify.sh` passes (`build exit=0`).
@@ -24,7 +26,7 @@ extern s32 D_80090C18;
 extern s32 sNdivOverrideSet;
 extern s32 sNdivOverride;
 
-void FillRCPolyHeader(void *arg0, void *arg1, PolyUV4 *arg2, s32 arg3, u16 arg4, u16 arg5)
+void FillDivPolygonHeader(void *arg0, void *arg1, PolyUV4 *arg2, s32 arg3, u16 arg4, u16 arg5)
 {
     u8 *dst = (u8 *)arg0;
     u8 *prim = (u8 *)arg1;
@@ -145,7 +147,7 @@ ordinary register/scheduling residue, not a semantic error.
 
 ## Naming (round 77, alpha)
 
-`func_8001A380` -> `FillRCPolyHeader`, parameters (`arg0..arg5`) ->
+`func_8001A380` -> `FillDivPolygonHeader`, parameters (`arg0..arg5`) ->
 (`table`, `ctx`, `uv`, `hasUv1Codes`, `uv1Clut`, `uv1TPage`). **Tier A**:
 pure header-populate leaf, same shape at all 8 call sites (code_8220.h's
 own extern comment already derived every field it writes). `hasUv1Codes`/

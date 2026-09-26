@@ -202,7 +202,7 @@ void SubmitPolyGT3(void *arg0, void *arg1) {
         ((OtTag *)self)->addr = (*(OtTag **)(prim + 0x30))->addr;
         (*(OtTag **)(prim + 0x30))->addr = (u32)self;
     } else {
-        FillRCPolyHeader(gDivPolygon3, prim, self + 0x4, 1, *(u16 *)(self + 0xE), *(u16 *)(self + 0x1A));
+        FillDivPolygonHeader(gDivPolygon3, prim, self + 0x4, 1, *(u16 *)(self + 0xE), *(u16 *)(self + 0x1A));
         CopyPolyVtx3((PolyVtx **)(prim + 0x88), (PolyVtx **)(prim + 0xA4),
                       (PolyUV4 *)(self + 0x8), (PolyUV4 *)(self + 0x14),
                       (PolyUV4 *)(self + 0x20));
@@ -232,7 +232,7 @@ INCLUDE_ASM("asm/nonmatchings/code_8220_c", SubmitPolyGT3);
 
 Unit: `src/code_8220_c.c`. Seventh sibling of the `SubmitPolyF3` OT-splice-
 or-calls family — Gouraud-triangle flavor combining `SubmitPolyFT3`'s
-`FillRCPolyHeader` argument shape (`a3=1`, two `u16` stack args) with
+`FillDivPolygonHeader` argument shape (`a3=1`, two `u16` stack args) with
 `CopyPolyVtx3` (triangle, 3-record output). Calls `func_8001BFD4` (Psy-Q
 SDK, `asm/psyq_rcpolygt3.s`).
 
@@ -272,7 +272,7 @@ void SubmitPolyGT3(void *arg0, void *arg1)
             *head1 = (*head1 & 0xFF000000) | ((u32)self & 0xFFFFFF);
         }
     } else {
-        FillRCPolyHeader(gDivPolygon3, prim, self + 0x4, 1, *(u16 *)(self + 0xE), *(u16 *)(self + 0x1A));
+        FillDivPolygonHeader(gDivPolygon3, prim, self + 0x4, 1, *(u16 *)(self + 0xE), *(u16 *)(self + 0x1A));
         CopyPolyVtx3(prim + 0x88, prim + 0xA4, self + 0x8, self + 0x14, self + 0x20);
 
         *(u16 *)(*(u8 **)(prim + 0x88) + 0xA) = *(u16 *)(self + 0x26);

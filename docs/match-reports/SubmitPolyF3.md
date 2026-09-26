@@ -95,7 +95,7 @@ full oracle in isolation, reverted: `build exit=2`, zero compile-error hits,
 revert.
 
 Not re-attempted beyond the mandatory reproduction. This round's two sibling
-`gp_rel`-reopened functions in this unit (`SetNdivOverride`, `FillRCPolyHeader`)
+`gp_rel`-reopened functions in this unit (`SetNdivOverride`, `FillDivPolygonHeader`)
 both matched clean once the `gp_rel` toolchain fix (round 42) was accounted
 for — but this function's own residue was never a `gp_rel` hit (it carries
 none), so that fix is irrelevant to it and nothing here changes. Per the
@@ -338,7 +338,7 @@ void SubmitPolyF3(void *arg0, void *arg1) {
         ((OtTag *)arg0)->addr = (*(OtTag **)((u8 *)arg1 + 0x30))->addr;
         (*(OtTag **)((u8 *)arg1 + 0x30))->addr = (u32)arg0;
     } else {
-        FillRCPolyHeader(gDivPolygon3, arg1, (u8 *)arg0 + 0x4, 0, 0, 0);
+        FillDivPolygonHeader(gDivPolygon3, arg1, (u8 *)arg0 + 0x4, 0, 0, 0);
         CopyPolyVtx3((PolyVtx **)((u8 *)arg1 + 0x88), (PolyVtx **)((u8 *)arg1 + 0xA4),
                       (PolyUV4 *)((u8 *)arg0 + 0x8), (PolyUV4 *)((u8 *)arg0 + 0xC),
                       (PolyUV4 *)((u8 *)arg0 + 0x10));
@@ -368,7 +368,7 @@ Unit: `src/code_8220_c.c`. `void SubmitPolyF3(void *arg0, void *arg1)` —
 either splices `arg0` into an OT-style singly-linked list threaded through
 `arg1->0x30` (packed pointer: top byte is a tag preserved across the
 splice, low 24 bits are the address), or — when `arg1->0x78` is set —
-routes through `FillRCPolyHeader` (gp_rel-blocked, this unit),
+routes through `FillDivPolygonHeader` (gp_rel-blocked, this unit),
 `CopyPolyVtx3` (matched this round, this unit) and `func_8001A564`
 (Psy-Q SDK) instead, passing a shared table `gDivPolygon3`.
 
@@ -399,7 +399,7 @@ void SubmitPolyF3(void *arg0, void *arg1)
             *head1 = (*head1 & 0xFF000000) | ((u32)arg0 & 0xFFFFFF);
         }
     } else {
-        FillRCPolyHeader(gDivPolygon3, arg1, (u8 *)arg0 + 0x4, 0, 0, 0);
+        FillDivPolygonHeader(gDivPolygon3, arg1, (u8 *)arg0 + 0x4, 0, 0, 0);
         CopyPolyVtx3((u8 *)arg1 + 0x88, (u8 *)arg1 + 0xA4, (u8 *)arg0 + 0x8, (u8 *)arg0 + 0xC, (u8 *)arg0 + 0x10);
         func_8001A564(arg0, gDivPolygon3);
     }
@@ -409,7 +409,7 @@ void SubmitPolyF3(void *arg0, void *arg1)
 
 Build compiles clean, no address drift (in-range comparison, retail's
 declared `0xD8` bytes = 54 words, matched exactly by this body's length).
-The whole `else` branch (the `FillRCPolyHeader`/`CopyPolyVtx3`/`func_8001A564`
+The whole `else` branch (the `FillDivPolygonHeader`/`CopyPolyVtx3`/`func_8001A564`
 calls) is BYTE-EXACT — every remaining diff is inside the `if` branch (the
 linked-list splice).
 
@@ -570,7 +570,7 @@ happens to evaluate its argument twice.
   it is NOT dead: GCC 2.6.3 hoists an existing independent instruction into a
   load-delay slot, it does not invent one. Something in the real source reads
   or forms `arg0 + 0x14`. Whoever holds this unit knows what lives at `+0x14`
-  in this object from the seven siblings and the `FillRCPolyHeader`/
+  in this object from the seven siblings and the `FillDivPolygonHeader`/
   `CopyPolyVtx3` call sites, and is far better placed to name it than a
   cold re-derivation.
 
@@ -1072,7 +1072,7 @@ C form all along, misdiagnosed as a scheduling residue) does NOT recur
 anywhere in this nine-function family.** Every one of these nine functions'
 preserved best-body sources (see each one's own report, and the bodies
 still inlined in `src/code_8220_c.c` under `#if 0`) is already ordinary C —
-the `OtTag` bitfield splice plus the `FillRCPolyHeader`/`CopyPolyVtx3`/
+the `OtTag` bitfield splice plus the `FillDivPolygonHeader`/`CopyPolyVtx3`/
 `CopyPolyVtx4` call sequence — with no asm block anywhere in any of them.
 So the two residue classes on this unit's work list are genuinely distinct:
 `CopyPolyVtx4`'s was a wrong SOURCE SHAPE (asm standing in for a callable

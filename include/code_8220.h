@@ -199,14 +199,14 @@ extern void CopyPolyVtx3(PolyVtx **dst, PolyVtx **src, PolyUV4 *uv0, PolyUV4 *uv
  * alignment-2 all-s16 layout); +0x14 is the plain word at
  * `ctx + 0x30`. MATCHED round 44 after the gp_rel blocker that
  * stalled it at carve time (round 13) was resolved -- see
- * docs/match-reports/FillRCPolyHeader.md. Declared here so its caller in
+ * docs/match-reports/FillDivPolygonHeader.md. Declared here so its caller in
  * this unit, SubmitPolyF3, can compile (still INCLUDE_ASM). Parameters
  * named round 77 (alpha): `hasUv1Codes`/`uv1Clut`/`uv1TPage` from the
  * FT3/GT3/FT4/GT4 call sites, which pass 1 plus the primitive's own
  * `+0xE`/`+0x16` or `+0xE`/`+0x1A` fields (POLY_FTn/GTn's CLUT and TPAGE
  * words); F3/G3/F4/G4 pass 0/0/0 and leave +0xC/+0xE untouched. */
-extern void FillRCPolyHeader(void *table, void *ctx, PolyUV4 *uv, s32 hasUv1Codes, u16 uv1Clut,
-                             u16 uv1TPage);
+extern void FillDivPolygonHeader(void *table, void *ctx, PolyUV4 *uv, s32 hasUv1Codes, u16 uv1Clut,
+                                 u16 uv1TPage);
 
 /* Psy-Q SDK (asm/psyq_rcpolyf3.s, not a carved C unit). Called by
  * SubmitPolyF3 (code_8220_c) with (self, table).
@@ -223,11 +223,11 @@ extern void FillRCPolyHeader(void *table, void *ctx, PolyUV4 *uv, s32 hasUv1Code
 extern void RCpolyF3(void *self, void *table);
 
 /* Opaque table, referenced only by ADDRESS (never dereferenced in this
- * unit) and handed to FillRCPolyHeader/RCpolyF3. asm/data, not yet
+ * unit) and handed to FillDivPolygonHeader/RCpolyF3. asm/data, not yet
  * carved -- real element type unknown. */
 extern u8 gDivPolygon3[];
 
-/* Quad-flavored sibling of gDivPolygon3/FillRCPolyHeader/RCpolyF3,
+/* Quad-flavored sibling of gDivPolygon3/FillDivPolygonHeader/RCpolyF3,
  * referenced the same way by SubmitPolyF4 (code_8220_c, round 13). */
 extern u8 gDivPolygon4[];
 

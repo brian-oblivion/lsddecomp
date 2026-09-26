@@ -216,7 +216,7 @@ void SubmitPolyG4(void *arg0, void *arg1) {
         ((OtTag *)self)->addr = (*(OtTag **)(prim + 0x30))->addr;
         (*(OtTag **)(prim + 0x30))->addr = (u32)self;
     } else {
-        FillRCPolyHeader(gDivPolygon4, prim, self + 0x4, 0, 0, 0);
+        FillDivPolygonHeader(gDivPolygon4, prim, self + 0x4, 0, 0, 0);
         CopyPolyVtx4(prim + 0x94, prim + 0xA4, self + 0x8, self + 0x10,
                       self + 0x18, self + 0x20);
 
@@ -285,7 +285,7 @@ void SubmitPolyG4(void *arg0, void *arg1)
             *head1 = (*head1 & 0xFF000000) | ((u32)self & 0xFFFFFF);
         }
     } else {
-        FillRCPolyHeader(gDivPolygon4, prim, self + 0x4, 0, 0, 0);
+        FillDivPolygonHeader(gDivPolygon4, prim, self + 0x4, 0, 0, 0);
         CopyPolyVtx4(prim + 0x94, prim + 0xA4, self + 0x8, self + 0x10, self + 0x18, self + 0x20);
 
         *(u16 *)(*(u8 **)(prim + 0x94) + 0xA) = *(u8 *)(self + 0xF);

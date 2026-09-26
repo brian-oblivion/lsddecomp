@@ -68,7 +68,7 @@ in `src/code_8220_c.c` (noted in rounds 39/44 — it was only ever flipped in
 live temporarily for reproduction). Took the "Best body reached (53/70
 words)" snapshot below verbatim and placed it, wrapped in
 `#ifdef NON_MATCHING ... #else INCLUDE_ASM ... #endif`, in the unit at its
-existing ROM position (immediately before `FillRCPolyHeader`). The local
+existing ROM position (immediately before `FillDivPolygonHeader`). The local
 `Vec2s16` typedef was renamed `Vec2s16_268` to follow this unit's existing
 per-function disambiguation convention (`Vec2s16_98`/`_C04`/`_EE4`/`_A64`
 already exist for the sibling family) and avoid any future name collision

@@ -172,7 +172,7 @@ void SubmitPolyFT3(void *arg0, void *arg1) {
         ((OtTag *)arg0)->addr = (*(OtTag **)((u8 *)arg1 + 0x30))->addr;
         (*(OtTag **)((u8 *)arg1 + 0x30))->addr = (u32)arg0;
     } else {
-        FillRCPolyHeader(gDivPolygon3, arg1, (u8 *)arg0 + 0x4, 1, *(u16 *)((u8 *)arg0 + 0xE), *(u16 *)((u8 *)arg0 + 0x16));
+        FillDivPolygonHeader(gDivPolygon3, arg1, (u8 *)arg0 + 0x4, 1, *(u16 *)((u8 *)arg0 + 0xE), *(u16 *)((u8 *)arg0 + 0x16));
         CopyPolyVtx3((PolyVtx **)((u8 *)arg1 + 0x88), (PolyVtx **)((u8 *)arg1 + 0xA4),
                       (PolyUV4 *)((u8 *)arg0 + 0x8), (PolyUV4 *)((u8 *)arg0 + 0x10),
                       (PolyUV4 *)((u8 *)arg0 + 0x18));
@@ -198,7 +198,7 @@ INCLUDE_ASM("asm/nonmatchings/code_8220_c", SubmitPolyFT3);
 Unit: `src/code_8220_c.c`. Gouraud-triangle-flavored sibling of
 `SubmitPolyF3`/`SubmitPolyF4`/`SubmitPolyG3` (this unit, all stalled at
 the same underlying residue) — same `prim->0x78`-gated OT-splice-or-calls
-shape. Calls-branch differs from `SubmitPolyG3`'s: `FillRCPolyHeader` gets a
+shape. Calls-branch differs from `SubmitPolyG3`'s: `FillDivPolygonHeader` gets a
 non-zero `a3` (`1`) and two `u16` stack args read from `self` (`+0xE`,
 `+0x16`) instead of the `0,0,0` triangle/quad-submission-path shape; the
 tail copies are three `u16` widen-and-store operations into `+0xA` from a
@@ -237,7 +237,7 @@ void SubmitPolyFT3(void *arg0, void *arg1)
             *head1 = (*head1 & 0xFF000000) | ((u32)self & 0xFFFFFF);
         }
     } else {
-        FillRCPolyHeader(gDivPolygon3, prim, self + 0x4, 1, *(u16 *)(self + 0xE), *(u16 *)(self + 0x16));
+        FillDivPolygonHeader(gDivPolygon3, prim, self + 0x4, 1, *(u16 *)(self + 0xE), *(u16 *)(self + 0x16));
         CopyPolyVtx3(prim + 0x88, prim + 0xA4, self + 0x8, self + 0x10, self + 0x18);
 
         *(u16 *)(*(u8 **)(prim + 0x88) + 0xA) = *(u16 *)(self + 0x1E);
@@ -311,7 +311,7 @@ changes above before spending anything on register-level reshaping.
 ## RUNNER PASS, round 13 continued: applied, instruction-exact, same residue class
 
 Applied both changes with this function's own offsets and its non-zero
-`FillRCPolyHeader` third stack arg. One attempt, 70/78 words, confirmed via
+`FillDivPolygonHeader` third stack arg. One attempt, 70/78 words, confirmed via
 `asm-differ` zero-inserted/zero-deleted. Calls branch byte-exact. Remaining
 residue: `$a2`/`$a1` register identity plus one missing `addiu
 $v0,$s1,0x20` — matches the verified cross-sibling formula in

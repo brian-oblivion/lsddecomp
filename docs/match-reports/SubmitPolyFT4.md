@@ -194,7 +194,7 @@ void SubmitPolyFT4(void *arg0, void *arg1) {
         ((OtTag *)arg0)->addr = (*(OtTag **)((u8 *)arg1 + 0x30))->addr;
         (*(OtTag **)((u8 *)arg1 + 0x30))->addr = (u32)arg0;
     } else {
-        FillRCPolyHeader(gDivPolygon4, arg1, (u8 *)arg0 + 0x4, 1, *(u16 *)((u8 *)arg0 + 0xE), *(u16 *)((u8 *)arg0 + 0x16));
+        FillDivPolygonHeader(gDivPolygon4, arg1, (u8 *)arg0 + 0x4, 1, *(u16 *)((u8 *)arg0 + 0xE), *(u16 *)((u8 *)arg0 + 0x16));
         CopyPolyVtx4((u8 *)arg1 + 0x94, (u8 *)arg1 + 0xA4, (u8 *)arg0 + 0x8,
                       (u8 *)arg0 + 0x10, (u8 *)arg0 + 0x18, (u8 *)arg0 + 0x20);
 
@@ -220,7 +220,7 @@ already included by the unit.)
 
 Unit: `src/code_8220_c.c`. Sixth sibling of the `SubmitPolyF3` OT-splice-
 or-calls family. Calls-branch shape combines `SubmitPolyFT3`'s
-`FillRCPolyHeader(...,1,self->0xE,self->0x16)` argument pattern with
+`FillDivPolygonHeader(...,1,self->0xE,self->0x16)` argument pattern with
 `SubmitPolyG4`'s quad (4-record) output and `CopyPolyVtx4` call; tail
 copies are two full passes of four `u16` widen-stores (into `+0xA` from a
 shared `self+0x1E`, then into `+0x8` from four different `self` offsets).
@@ -258,7 +258,7 @@ void SubmitPolyFT4(void *arg0, void *arg1)
             *head1 = (*head1 & 0xFF000000) | ((u32)self & 0xFFFFFF);
         }
     } else {
-        FillRCPolyHeader(gDivPolygon4, prim, self + 0x4, 1, *(u16 *)(self + 0xE), *(u16 *)(self + 0x16));
+        FillDivPolygonHeader(gDivPolygon4, prim, self + 0x4, 1, *(u16 *)(self + 0xE), *(u16 *)(self + 0x16));
         CopyPolyVtx4(prim + 0x94, prim + 0xA4, self + 0x8, self + 0x10, self + 0x18, self + 0x20);
 
         *(u16 *)(*(u8 **)(prim + 0x94) + 0xA) = *(u16 *)(self + 0x1E);
@@ -323,7 +323,7 @@ changes above before spending anything on register-level reshaping.
 ## RUNNER PASS, round 13 continued: applied, instruction-exact, refined the offset formula
 
 Applied both changes with this function's own offsets (gouraud-quad flavor:
-`FillRCPolyHeader` a3=1, `CopyPolyVtx4`, `func_8001BAB4`). One attempt, 80/88
+`FillDivPolygonHeader` a3=1, `CopyPolyVtx4`, `func_8001BAB4`). One attempt, 80/88
 words, confirmed via `asm-differ` zero-inserted/zero-deleted. Calls branch
 byte-exact. Remaining residue: `$a2`/`$a1` register identity plus one
 missing `addiu $v0,$s1,0x28`.

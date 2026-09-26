@@ -204,7 +204,7 @@ void SubmitPolyG3(void *arg0, void *arg1) {
             (*(OtTag **)(prim + 0x30))->addr = (u32)self;
         } while (0);
     } else {
-        FillRCPolyHeader(gDivPolygon3, prim, self + 0x4, 0, 0, 0);
+        FillDivPolygonHeader(gDivPolygon3, prim, self + 0x4, 0, 0, 0);
         CopyPolyVtx3((PolyVtx **)(prim + 0x88), (PolyVtx **)(prim + 0xA4),
                       (PolyUV4 *)(self + 0x8), (PolyUV4 *)(self + 0x10),
                       (PolyUV4 *)(self + 0x18));
@@ -340,7 +340,7 @@ void SubmitPolyG3(void *arg0, void *arg1) {
         ((OtTag *)self)->addr = (*(OtTag **)(prim + 0x30))->addr;
         (*(OtTag **)(prim + 0x30))->addr = (u32)self;
     } else {
-        FillRCPolyHeader(gDivPolygon3, prim, self + 0x4, 0, 0, 0);
+        FillDivPolygonHeader(gDivPolygon3, prim, self + 0x4, 0, 0, 0);
         CopyPolyVtx3((PolyVtx **)(prim + 0x88), (PolyVtx **)(prim + 0xA4),
                       (PolyUV4 *)(self + 0x8), (PolyUV4 *)(self + 0x10),
                       (PolyUV4 *)(self + 0x18));
@@ -367,7 +367,7 @@ INCLUDE_ASM("asm/nonmatchings/code_8220_c", SubmitPolyG3);
 Unit: `src/code_8220_c.c`. Third sibling of `SubmitPolyF3`/`SubmitPolyF4`
 (this unit, both stalled) — same `prim->0x78`-gated OT-splice-or-calls
 shape, this time with MORE post-call work: after
-`FillRCPolyHeader`(gp_rel-blocked)/`CopyPolyVtx3` (matched), it copies a byte
+`FillDivPolygonHeader`(gp_rel-blocked)/`CopyPolyVtx3` (matched), it copies a byte
 from `self` (widened to `s16`) into three output records' `+0xA` field,
 then an unaligned 4-byte value from three different `self` offsets into
 the same three records' `+0xC` field, then calls `func_8001AD54` (Psy-Q
@@ -410,7 +410,7 @@ void SubmitPolyG3(void *arg0, void *arg1)
             *head1 = (*head1 & 0xFF000000) | ((u32)self & 0xFFFFFF);
         }
     } else {
-        FillRCPolyHeader(gDivPolygon3, prim, self + 0x4, 0, 0, 0);
+        FillDivPolygonHeader(gDivPolygon3, prim, self + 0x4, 0, 0, 0);
         CopyPolyVtx3(prim + 0x88, prim + 0xA4, self + 0x8, self + 0x10, self + 0x18);
 
         *(u16 *)(*(u8 **)(prim + 0x88) + 0xA) = *(u8 *)(self + 0xF);

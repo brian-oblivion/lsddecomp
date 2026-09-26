@@ -250,7 +250,7 @@ void SubmitPolyGT4(void *arg0, void *arg1) {
         ((OtTag *)self)->addr = (*(OtTag **)(prim + 0x30))->addr;
         (*(OtTag **)(prim + 0x30))->addr = (u32)self;
     } else {
-        FillRCPolyHeader(gDivPolygon4, prim, self + 0x4, 1, *(u16 *)(self + 0xE), *(u16 *)(self + 0x1A));
+        FillDivPolygonHeader(gDivPolygon4, prim, self + 0x4, 1, *(u16 *)(self + 0xE), *(u16 *)(self + 0x1A));
         CopyPolyVtx4(prim + 0x94, prim + 0xA4, self + 0x8, self + 0x14,
                       self + 0x20, self + 0x2C);
 
@@ -282,7 +282,7 @@ already included by the unit.)
 
 Unit: `src/code_8220_c.c`. Eighth and final sibling of the
 `SubmitPolyF3` OT-splice-or-calls family, and the largest (Gouraud-quad
-flavor: `FillRCPolyHeader` with `a3=1`, `CopyPolyVtx4` quad copy, 4 output
+flavor: `FillDivPolygonHeader` with `a3=1`, `CopyPolyVtx4` quad copy, 4 output
 records, two full passes of `u16` widen-stores). Calls `func_8001C474`
 (Psy-Q SDK, same `asm/psyq_rcpolygt3.s` file as `func_8001BFD4`).
 
@@ -322,7 +322,7 @@ void SubmitPolyGT4(void *arg0, void *arg1)
             *head1 = (*head1 & 0xFF000000) | ((u32)self & 0xFFFFFF);
         }
     } else {
-        FillRCPolyHeader(gDivPolygon4, prim, self + 0x4, 1, *(u16 *)(self + 0xE), *(u16 *)(self + 0x1A));
+        FillDivPolygonHeader(gDivPolygon4, prim, self + 0x4, 1, *(u16 *)(self + 0xE), *(u16 *)(self + 0x1A));
         CopyPolyVtx4(prim + 0x94, prim + 0xA4, self + 0x8, self + 0x14, self + 0x20, self + 0x2C);
 
         *(u16 *)(*(u8 **)(prim + 0x94) + 0xA) = *(u16 *)(self + 0x26);

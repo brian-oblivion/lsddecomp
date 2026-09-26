@@ -72,7 +72,7 @@ diff to the recorded figure** (first diff word 12, `retail=00ff063c
 built=00ff053c`). `git status --porcelain` empty after revert. Same residue
 class as `SubmitPolyF3` (see that report for the shared root analysis and
 the two already-falsified fix attempts); not re-attempted this round.
-`FillRCPolyHeader` (this unit's OTHER `gp_rel`-reopened sibling, MATCHED 27/27
+`FillDivPolygonHeader` (this unit's OTHER `gp_rel`-reopened sibling, MATCHED 27/27
 this round) shares no code path with this residue, so its fix does not
 transfer here.
 
@@ -171,7 +171,7 @@ void SubmitPolyF4(void *arg0, void *arg1) {
         ((OtTag *)arg0)->addr = (*(OtTag **)((u8 *)arg1 + 0x30))->addr;
         (*(OtTag **)((u8 *)arg1 + 0x30))->addr = (u32)arg0;
     } else {
-        FillRCPolyHeader(gDivPolygon4, arg1, (u8 *)arg0 + 0x4, 0, 0, 0);
+        FillDivPolygonHeader(gDivPolygon4, arg1, (u8 *)arg0 + 0x4, 0, 0, 0);
         CopyPolyVtx4((u8 *)arg1 + 0x94, (u8 *)arg1 + 0xA4, (u8 *)arg0 + 0x8,
                       (u8 *)arg0 + 0xC, (u8 *)arg0 + 0x10, (u8 *)arg0 + 0x14);
         RCpolyF4(arg0, gDivPolygon4);
@@ -219,7 +219,7 @@ void SubmitPolyF4(void *arg0, void *arg1)
             *head1 = (*head1 & 0xFF000000) | ((u32)arg0 & 0xFFFFFF);
         }
     } else {
-        FillRCPolyHeader(gDivPolygon4, arg1, (u8 *)arg0 + 0x4, 0, 0, 0);
+        FillDivPolygonHeader(gDivPolygon4, arg1, (u8 *)arg0 + 0x4, 0, 0, 0);
         CopyPolyVtx4((u8 *)arg1 + 0x94, (u8 *)arg1 + 0xA4, (u8 *)arg0 + 0x8, (u8 *)arg0 + 0xC, (u8 *)arg0 + 0x10, (u8 *)arg0 + 0x14);
         func_8001A8D4(arg0, gDivPolygon4);
     }
@@ -292,7 +292,7 @@ changes above before spending anything on register-level reshaping.
 ## RUNNER PASS, round 13 continued: applied, instruction-exact, same residue class
 
 Applied both changes with this function's own offsets (quad flavor:
-`FillRCPolyHeader`/`CopyPolyVtx4`/`func_8001A8D4`, table `gDivPolygon4`). One
+`FillDivPolygonHeader`/`CopyPolyVtx4`/`func_8001A8D4`, table `gDivPolygon4`). One
 attempt, 48/56 words, confirmed via `asm-differ` zero-inserted/zero-deleted.
 The `else` (calls) branch is byte-exact. Remaining residue, identical class
 to `SubmitPolyF3`:
