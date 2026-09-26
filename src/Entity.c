@@ -44,7 +44,7 @@ Entity *Entity__Entity(Entity *this, s32 moodIndex, void *desc, void *arg2) {
     if (Get_vtable_Class65650()->ctor((Class65650 *)this, desc, arg2) != NULL) {
         this->methods = Get_vtable_Entity();
         this->moodIndex = moodIndex;
-        this->soundCueSet = 0;
+        this->soundCueSet.tag = 0;
         this->unk100 = NULL;
         this->unk104 = NULL;
         this->methods->reset(this);
@@ -237,7 +237,7 @@ s32 Entity__GetProximityRatio(Entity *this) {
     if (threshold < result) {
         return -1;
     }
-    return result / (threshold / self->proximityDivisor);
+    return result / (threshold / self->soundCueSet.unk14);
 }
 
 EntityMoodRow *Entity__GetMoodEffect(Entity *this) {

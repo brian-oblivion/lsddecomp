@@ -94,13 +94,36 @@ struct EntityMethods {
     /* +0x180 */ void (*updateSoundCueStop)(Entity *self);               /* Entity__UpdateSoundCueStop */
 };                                   /* 97 slots, 0x184 bytes */
 
+/* The MoodCue handlers' second argument: the SoundCueSet they are the
+ * callback of (see the banner). In src/code_179d8_l.c's names: +0x04 the
+ * service count (unk4), +0x10 the skip word, and from +0x18 three 0x14-byte
+ * slots {index, note, pitchOffset, word2, word3}, so unk1C/unk20/unk24/unk28
+ * are slot 0's note/pitchOffset/word2/word3, unk30/unk34 slot 1's
+ * note/pitchOffset and unk44/unk48 slot 2's. Entity embeds one at +0x09C. */
+struct EntityMoodHandlerArg {
+    s32 tag;     /* +0x00, InitSoundCueSet's tag (moodIndex + 1); serviced only while > 0; zeroed by Entity__Entity */
+    s32 unk4;    /* +0x04, the service count ServiceSoundCueSet increments; the handlers time their tone requests on it (Entity__MoodCue05/07/09/10/13: `out->unk4 % N`) */
+    u8 pad08[0x08];
+    s32 unk10;    /* +0x10, written by Entity__MoodCue15/Entity__MoodCue05/Entity__MoodCue10/... */
+    s32 unk14;    /* +0x14, the divisor InitSoundCueSet sets (10); Entity__GetProximityRatio divides by it */
+    u8 pad18[0x04];
+    s32 unk1C;     /* +0x1C, written by Entity__MoodCue15/Entity__MoodCue05/Entity__MoodCue10/... */
+    s32 unk20;      /* +0x20, written by Entity__MoodCue07 only (paired with unk1C the same round) */
+    s32 unk24;       /* +0x24, written by Entity__MoodCue40 (Entity_d) */
+    s32 unk28;        /* +0x28, written by Entity__MoodCue40 (Entity_d) */
+    u8 pad2C[0x04];
+    s32 unk30;      /* +0x30, written by Entity__MoodCue10/Entity__MoodCue07 */
+    s32 unk34;       /* +0x34, written by Entity__MoodCue07 only (paired with unk30) */
+    u8 pad38[0x0C];
+    s32 unk44;       /* +0x44, written by Entity__MoodCue10/Entity__MoodCue07 */
+    s32 unk48;        /* +0x48, written by Entity__MoodCue07 only (paired with unk44) */
+    u8 pad4C[0x54 - 0x4C];  /* slot 2's word2/word3; the set is 0x54 bytes */
+};
+
 struct Entity {
     CLASS65650_FIELDS(EntityMethods);
     /* +0x098 */ s32 moodIndex;         /* New_Entity's first argument: the row of gEntityMoodTable and the byte tables */
-    /* +0x09C */ s32 soundCueSet;       /* the first word (tag) of a 0x54-byte SoundCueSet running to +0x0F0 (EntityMoodHandlerArg); zeroed by the ctor, address-taken by the SoundCueSet calls */
-    /* +0x0A0 */ u8 padA0[0x0B0 - 0x0A0];
-    /* +0x0B0 */ s32 proximityDivisor;  /* soundCueSet's +0x14, the divisor InitSoundCueSet sets (10); Entity__GetProximityRatio divides by it */
-    /* +0x0B4 */ u8 padB4[0x0F0 - 0x0B4];
+    /* +0x09C */ EntityMoodHandlerArg soundCueSet; /* the SoundCueSet startSoundCue initialises and the MoodCue handlers fill */
     /* +0x0F0 */ s32 active;            /* activate / deactivate */
     /* +0x0F4 */ s32 targetReached;     /* setTargetReached; latched by updateTargetProximity */
     /* +0x0F8 */ s32 soundCueActive;    /* startSoundCue / stopSoundCue */
@@ -221,31 +244,6 @@ extern s8 gEntityLinkStageTable[];  /* GetLinkStage */
 extern s8 gEntityEventVideoTable[];  /* GetEventVideo */
 extern s8 gEntityProximityThresholdTable[];  /* read by Entity__GetProximityRatio, own base symbol immediately before D_80089EAF, moodIndex*0x10-indexed like the rest of this family */
 extern s8 D_80089EAF[];  /* read by Entity__AttachToParent, own base symbol immediately after gEntityEventVideoTable, moodIndex*0x10-indexed like the rest of this family */
-
-/* The MoodCue handlers' second argument: the SoundCueSet they are the
- * callback of (see the banner). In src/code_179d8_l.c's names: +0x04 the
- * service count (unk4), +0x10 the skip word, and from +0x18 three 0x14-byte
- * slots {index, note, pitchOffset, word2, word3}, so unk1C/unk20/unk24/unk28
- * are slot 0's note/pitchOffset/word2/word3, unk30/unk34 slot 1's
- * note/pitchOffset and unk44/unk48 slot 2's. Only the offsets touched so far
- * are given. */
-struct EntityMoodHandlerArg {
-    u8 pad00[0x04];
-    s32 unk4;    /* +0x04, gate flag read by Entity__MoodCue05/Entity__MoodCue10/Entity__MoodCue09/Entity__MoodCue13, and by Entity__MoodCue07 (as `out->unk4 % 90`) */
-    u8 pad08[0x08];
-    s32 unk10;    /* +0x10, written by Entity__MoodCue15/Entity__MoodCue05/Entity__MoodCue10/... */
-    u8 pad14[0x08];
-    s32 unk1C;     /* +0x1C, written by Entity__MoodCue15/Entity__MoodCue05/Entity__MoodCue10/... */
-    s32 unk20;      /* +0x20, written by Entity__MoodCue07 only (paired with unk1C the same round) */
-    s32 unk24;       /* +0x24, written by Entity__MoodCue40 (Entity_d) */
-    s32 unk28;        /* +0x28, written by Entity__MoodCue40 (Entity_d) */
-    u8 pad2C[0x04];
-    s32 unk30;      /* +0x30, written by Entity__MoodCue10/Entity__MoodCue07 */
-    s32 unk34;       /* +0x34, written by Entity__MoodCue07 only (paired with unk30) */
-    u8 pad38[0x0C];
-    s32 unk44;       /* +0x44, written by Entity__MoodCue10/Entity__MoodCue07 */
-    s32 unk48;        /* +0x48, written by Entity__MoodCue07 only (paired with unk44) */
-};
 
 /* The class's own methods, in ROM order (Entity, then Entity_b). A caller
  * reaching the base ones goes through Get_vtable_Class65650() and upcasts. */
