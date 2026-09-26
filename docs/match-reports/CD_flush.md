@@ -82,3 +82,16 @@ signature tell**, not just for tail-call wrappers (already documented) but
 for functions with real bodies too: if the function's last live use of `$v0`
 was for something other than the literal return value, and retail's delay
 slot is a bare `nop`, the function almost certainly returns `void`.
+
+## asm sites
+
+Round 89 (runner delta, track 5 `asm-sites`): the bare `__asm__("")` after
+`*q = D_8006D8DA;` is **justified** and now commented at the site. Measured by
+deleting it alone (35 bytes of the image differ; `funcdiff` cannot score this
+function because its symbol is absolute, so the evidence is `objdump -d -r` of
+`build/src/code_179d8_g.c.o` with and without it): without the barrier the
+`lw` of the `D_8006D8C0` pointer and the `li 2` / `sb` to `D_8006D8D8` are
+hoisted above the `sb zero` to `D_8006D61C` and the `sb` through `q` to
+`D_8006D8D9`; retail performs those two stores first. As knock-on effects the
+pointer lands in `a0` instead of `v1` and the loop's `li v1,0x7` / `li a0,0x1`
+pair swaps order. The primary change is instruction order.

@@ -217,6 +217,8 @@ void CD_flush(void)
     q = &D_8006D8D9;
     D_8006D61C = 0;
     *q = D_8006D8DA;
+    /* Keeps the D_8006D8C0 pointer load and the D_8006D8D8[0] = 2 store
+     * below the D_8006D61C / D_8006D8D9 stores; without it GCC hoists them above. */
     __asm__("");
     D_8006D8D8[0] = 2;
     *D_8006D8C0 = 0;
@@ -490,12 +492,11 @@ s32 CD_readm(s32 arg0, s32 arg1, s32 arg2)
      * (three distinct address computations -- two folded through $at, one
      * unfolded through a real GPR) instead of the single shared store GCC's
      * cross-jump/tail-merge pass produces from the equivalent if/else-if/else
-     * or switch. The barrier on case1 and the local `volatile s32 *` pointers
-     * on case3/case2's-neighbour below are what keeps each store distinct
-     * enough that the merge heuristic can't unify them -- removing any one
-     * of the three re-merges a pair and drops 4-24 bytes. This is a
-     * scheduling/block-identity lever (order/selection), not a register-
-     * identity fix: no operand constraint pins a register here. */
+     * or switch. The match report records how the `goto` layout and the
+     * local `volatile s32 *` pointers below were found to keep the stores
+     * apart. A bare `__asm__("")` after case1's store, once part of that
+     * recipe, was retired in round 89: removing it left the object
+     * byte-identical. */
     if (t == 0) {
         goto case1;
     }
@@ -505,7 +506,6 @@ s32 CD_readm(s32 arg0, s32 arg1, s32 arg2)
     goto case3;
 case1:
     D_8006D8F0 = 0x200;
-    __asm__("");
     goto join;
 case2:
     D_8006D8F0 = 0x249;
@@ -576,6 +576,8 @@ s32 CD_readsync(s32 arg0, s32 arg1)
         puts(D_80010984);
         idx0 = p8D8[0];
         idx1 = p8D8[1];
+        /* Keeps both p8D8 byte loads directly after the puts call, ahead of
+         * the printf argument loads; without it the p8D8[0] load sinks below them. */
         __asm__("");
         /* &D_8008B3EC routed through a local pointer -- forces the same
          * unfolded lui/addiu addressing retail uses for this argument;

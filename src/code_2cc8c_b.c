@@ -208,6 +208,8 @@ void TaskCore__BroadcastToSlots(TaskCore *self, void *a1)
             self->methods->broadcastToSlotElements(self, a1);
         }
         i++;
+        /* Keeps i++ ahead of the self->slotCount reload, leaving retail's nop
+         * in that load's delay slot; without it GCC moves i++ into the slot. */
         __asm__("");
     }
     self->activeSlot = origIdx;

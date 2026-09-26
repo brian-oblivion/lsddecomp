@@ -1102,3 +1102,13 @@ were a view of LinkResource (gLinkResourceMethods), now unified in
 `struct LinkResource *`. The model-id packet calls its `getModel` (+0x080,
 LinkResource__GetModel) directly, the `TmdModel *` result cast to the
 existing `s32 v`. Byte-identical.
+
+## asm sites
+
+Round 89 (runner delta, track 5 `asm-sites`): the bare `__asm__("")` after
+`coordB->tz = v3;` (end of that `case`, before `break`) is **justified** and
+now commented at the site. Measured by deleting it alone: the image went red
+(96826 bytes: the function came out one word shorter and everything after
+drifted), `funcdiff` 187/257, and asm-differ shows `sw a1,0x20(v0)` (the `tz`
+store) moved from before the `j` that implements the `break` into that jump's
+delay slot, replacing the `nop` retail keeps there. Instruction order.

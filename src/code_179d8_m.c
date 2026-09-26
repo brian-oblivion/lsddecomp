@@ -330,12 +330,20 @@ extern u16 D_80090C64;
 extern u16 D_8008E228;
 extern u16 D_8008E22C;
 
+/* Pointer to a "current object" whose only fields SpuVmNoiseOff touches
+ * sit at a fixed byte offset from the base, not scaled by any index -- a
+ * different reading of the same D_8006DAD4 symbol from code_179d8_j.c's
+ * array-of-0x10-byte-records view, per this project's
+ * multiple-independent-local-views convention. SpuVmInit (and
+ * SpuVmFlush's NON_MATCHING body) reach the same base through casts.
+ * Until round 89 SpuVmInit used a second name for it, aliased with
+ * `__asm__("D_8006DAD4")`; one declaration here is byte-identical. */
 typedef struct {
     u8 pad[0x194];
     u16 unk194; /* +0x194 */
     u16 unk196; /* +0x196 */
-} ObjDAD4Edd4;
-extern ObjDAD4Edd4 *D_8006DAD4Edd4 __asm__("D_8006DAD4");
+} ObjDAD4;
+extern ObjDAD4 *D_8006DAD4;
 
 /* MATCHED round 32 (bravo), 270/270 -- closes the register-identity stall
  * every prior round's hand-reshaping (10 axes) and one earlier permuter
@@ -411,14 +419,16 @@ void SpuVmInit(s32 a0) {
         _svm_voice[(u16) i].unk30 = 0;
         _svm_voice[(u16) i].unk24 = 0;
 
-        ((s16 *) D_8006DAD4Edd4)[woff + 3] = 0x200;   /* +0x6 */
+        ((s16 *) D_8006DAD4)[woff + 3] = 0x200;   /* +0x6 */
         scratch = woff;
-        ((s16 *) D_8006DAD4Edd4)[woff + 2] = 0x1000;  /* +0x4 */
-        ((u16 *) D_8006DAD4Edd4)[woff + 4] = 0x80FF;  /* +0x8 */
-        ((s16 *) D_8006DAD4Edd4)[scratch] = 0;         /* +0x0 */
-        ((s16 *) D_8006DAD4Edd4)[woff + 1] = 0;       /* +0x2 */
-        ((s16 *) D_8006DAD4Edd4)[woff + 5] = 0x4000;  /* +0xA */
+        ((s16 *) D_8006DAD4)[woff + 2] = 0x1000;  /* +0x4 */
+        ((u16 *) D_8006DAD4)[woff + 4] = 0x80FF;  /* +0x8 */
+        ((s16 *) D_8006DAD4)[scratch] = 0;         /* +0x0 */
+        ((s16 *) D_8006DAD4)[woff + 1] = 0;       /* +0x2 */
+        ((s16 *) D_8006DAD4)[woff + 5] = 0x4000;  /* +0xA */
 
+        /* Keeps the D_8008EA26 store and its reload below the six
+         * D_8006DAD4 halfword stores; without it GCC hoists them above. */
         __asm__("");
         D_8008EA26 = i;
         chan = D_8008EA26;
@@ -490,18 +500,6 @@ void SpuVmNoiseOnWithAdsr(s32 a0, s32 a1, s32 a2, s32 a3) {
     }
 }
 
-
-/* Pointer to a "current object" whose only fields this function
- * touches sit at a fixed byte offset from the base, not scaled by any
- * index -- a different reading of the same D_8006DAD4 symbol from
- * code_179d8_j.c's array-of-0x10-byte-records view, per this project's
- * multiple-independent-local-views convention. */
-typedef struct {
-    u8 pad[0x194];
-    u16 unk194; /* +0x194 */
-    u16 unk196; /* +0x196 */
-} ObjDAD4;
-extern ObjDAD4 *D_8006DAD4;
 
 void SpuVmNoiseOff(void) {
     s16 i;

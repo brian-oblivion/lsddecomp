@@ -163,6 +163,8 @@ void Entity__MoodCue26(Entity *this, EntityMoodHandlerArg *out) {
         if (out->unk4 % this->todFrameCount == 0) {
             out->unk10 = this->methods->getProximityRatio(this);
             out->unk1C = 0x1A;
+            /* Keeps the `li` of v1 = 0x6E below the out->unk1C store; without it
+             * GCC schedules it above the out->unk10 store, right after the call. */
             __asm__("");
             v1 = 0x6E;
             goto compare;

@@ -52,3 +52,15 @@ caller is expected to know a push is outstanding). Named as the matching
 Fields under their unified names: unkC -> parent, unk50/54 -> posX/posY,
 unk60/62 -> boxW/boxH (BoxFill's), unk88/8C -> savedW/savedH, unk90/94 ->
 savedPosX/savedPosY (Class6E99C's). Image byte-identical.
+
+## asm sites
+
+Round 89 (runner delta, track 5 `asm-sites`): the barrier after
+`self->posY = t1;` is **justified**, now commented at the site, and
+simplified. Measured by deleting it alone: the image went red (12 bytes, same
+length), `funcdiff` 3/9, and asm-differ shows `lhu a1,0x88(a0)` /
+`lhu a2,0x8c(a0)` (`savedW`, `savedH`) hoisted above `sw v0,0x50(a0)` /
+`sw v1,0x54(a0)` (`posX`, `posY`). Retail stores first, then loads.
+Instruction order. It was spelled `__asm__("" ::: "memory")`; the bare
+`__asm__("")` builds byte-identical (whole image green), so the clobber was
+not what forced the order and the site now uses the bare form.

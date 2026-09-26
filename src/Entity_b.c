@@ -98,7 +98,6 @@ s32 Entity__IsTargetInRange(Entity *this, s32 range) {
     Class65650 *other;
     s32 oy, ty;
 
-    __asm__("");
     other = this->peer;
     oy = other->coord2->ty;
     ty = this->coord2->ty;

@@ -128,3 +128,13 @@ report's own "What it does" section establishes the full mechanics
 (priority-ordered per-bit scan, reverse-order delivery to the per-instance
 `onButtonEvent` handler at slot `+0x30`) directly from the body; nothing
 about the name asserts more than that.
+
+## asm sites
+
+Round 89 (runner delta, track 5 `asm-sites`): the bare `__asm__("")` at the
+top of the body is **justified**; its existing site comment already says what
+it forces, and a re-measurement confirms it. Deleting it alone turned the image
+red (8 bytes), `funcdiff` 61/65, and asm-differ shows only the four prologue
+stores reordered: retail `sw ra,0x60 / s2,0x58 / s1,0x54 / s0,0x50`, without
+the barrier `s0,0x50 / ra,0x60 / s2,0x58 / s1,0x54` -- same registers, same
+offsets. No source change.

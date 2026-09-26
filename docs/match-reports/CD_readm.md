@@ -134,3 +134,14 @@ computation that further distinguishes the block. Expect to try several
 combinations across however many branches converge on the shared store --
 which one needs which lever is not predictable in advance and was only found
 by testing and reading which pair re-merged after each change.
+
+## asm sites
+
+Round 89 (runner delta, track 5 `asm-sites`): the bare `__asm__("")` after
+case1's `D_8006D8F0 = 0x200;` store is **retired**. Measured by deleting it
+alone and rebuilding: `build/src/code_179d8_g.c.o` came out byte-identical to
+the object built with it (`cmp`), and `./build-and-verify.sh` stayed green. So
+in the current source no pair of the three stores re-merges without it; the
+"barrier only on case1" part of the combination above is no longer load-bearing.
+The in-source comment was updated to say so. `CD_readm` now carries no
+`__asm__`.

@@ -184,3 +184,15 @@ not just at the function entry. The original "worth flagging as a permuter
 candidate" note below is retracted for this function; `Entity__UpdateActivationState`
 (72/74, different function, not yet re-attempted this round) may still
 be worth a similar targeted retry before reaching for the permuter.
+
+## asm sites
+
+Round 89 (runner delta, track 5 `asm-sites`): the one bare `__asm__("")`,
+inside `if (this->state != 0 || ...loadNextFlashback(this, 0))` before
+`this->tick = 0;`, is **justified** and now commented at the site. Measured by
+deleting it alone: the image went red by 1 byte, `funcdiff` 61/62, and the one
+differing word is the `bnez v0` at 0x495DC (the `state != 0` test): retail
+branches to 0x49604, this block's own `j`/`sw zero,0x24(s0)` tail, while the
+barrier-less build branches to 0x49640, the identical tail after the
+`notifyParents(this, 0xA)` call. So what it forces is block identity (no
+cross-jump between two identical tails), not register identity.

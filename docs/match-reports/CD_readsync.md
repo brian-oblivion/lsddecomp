@@ -982,3 +982,15 @@ s32 CD_readsync(s32 arg0, s32 arg1)
     return pF8[-1];
 }
 ```
+
+## asm sites
+
+Round 89 (runner delta, track 5 `asm-sites`): the bare `__asm__("")` after
+`idx1 = p8D8[1];` in the timeout path is **justified** and now commented at the
+site. Measured by deleting it alone (60 bytes of the image differ; `funcdiff`
+cannot score this function because its symbol is absolute, so the evidence is
+`objdump -d -r` of `build/src/code_179d8_g.c.o` with and without it): retail
+issues `lbu a0,0(s3)` and `lbu v0,1(s3)` (the two `p8D8` bytes) directly after
+the `puts` call; without the barrier the `p8D8[0]` load sinks below the
+`D_8008B3EC` and `D_8006D61D` loads for the `printf` arguments, and the index
+arithmetic reshuffles around it. Instruction order.

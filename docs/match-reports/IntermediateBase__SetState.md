@@ -471,3 +471,13 @@ linked symbols`). The report's recorded 23/32 figure and residue class
 ## Track 4 (2026-09-25, round 82, charlie)
 
 The class is IntermediateBase (class id 0x30, gIntermediateBaseMethods; `tools/classtable.py gIntermediateBaseMethods` lists this function as one of its own occupants), declared once in include/IntermediateBase.h. `self` is now `IntermediateBase *`, not TaskCore's `Obj86B60` view; byte-identical. Renamed from Obj86B60__NotifyParents. The round-55 name rested on the header's claim that this function is `slot30`'s occupant; it occupies +0x060 (`classtable.py gIntermediateBaseMethods`), and +0x030 is BasicClass__NotifyParents, which it CALLS. It stores its argument in +0x020 (now `state`), passes it to notifyParents, and runs +0x064 (`onState2`) on 2 and +0x068 (`onState3`) on 3. The overrides of +0x060 are named SetState (TaskCore__SetState, Class86B60__SetState) and forward to this base, so the slot is `setState` and so is this occupant. Tier B. The base call is now the inherited `methods->notifyParents(self, state)` rather than a one-argument `slot30(self)`: byte-identical, the state is already in $a1.
+
+## asm sites
+
+Round 89 (runner delta, track 5 `asm-sites`): the `__asm__("" ::: "memory")`
+after `methods = self->methods;` is **retired**. Measured by deleting it alone
+and rebuilding: `build/src/code_2cc8c_c.c.o` came out byte-identical to the
+object built with it (`cmp`), and `./build-and-verify.sh` stayed green. The
+"without the barrier, `lw s2,0(s1)` lands late" observation above no longer
+holds for the current source (what changed since was not measured). The
+function now carries no `__asm__`.

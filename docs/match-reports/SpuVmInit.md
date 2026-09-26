@@ -751,3 +751,24 @@ comments hold the evidence): `gDisableVoiceStarveScan` is libsnd/vm_g.o's
 writes the fields through a local mirror of the SDK struct. `gSpuMallocArea`
 is `_ss_spu_vm_rec + 8` (vmanager.o bss, 3.5 layout), spelled `D_8008DEB0`
 because splat names only addresses some asm references. Byte-identical.
+
+## asm sites
+
+Round 89 (runner delta, track 5 `asm-sites`), two sites:
+
+- **Retired: the asm-label alias** `extern ObjDAD4Edd4 *D_8006DAD4Edd4
+  __asm__("D_8006DAD4");`. SpuVmInit was its only user (six `(s16 *)`/`(u16 *)`
+  cast stores). The unit's `ObjDAD4` typedef and `extern ObjDAD4 *D_8006DAD4;`
+  moved up to where the alias stood (SpuVmNoiseOff, later in the unit, still
+  uses them), the identical `ObjDAD4Edd4` typedef was dropped, and SpuVmInit
+  now names `D_8006DAD4` directly. `build/src/code_179d8_m.c.o` came out
+  byte-identical (`cmp`), `./build-and-verify.sh` green, and
+  `tools/check-nonmatching.sh code_179d8_m` still passes.
+- **Justified: the bare `__asm__("")`** before `D_8008EA26 = i;`. Measured by
+  deleting it alone: the image went red (281676 bytes differ: the function
+  came out one word shorter -- retail's `nop` after the `lhu` reload is gone --
+  and everything after it drifted), `funcdiff` 163/269, and
+  asm-differ shows the `sh a1,-0x15da(at)` store to `D_8008EA26` and its
+  `lhu` reload hoisted above the six `D_8006DAD4` halfword stores
+  (`sh ... 6/4/8/0/2/0xa(a0)`) that retail performs first. Instruction order
+  only; the barrier now carries a one-line comment saying so.

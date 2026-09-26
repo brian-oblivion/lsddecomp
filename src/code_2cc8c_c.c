@@ -180,15 +180,15 @@ void IntermediateBase__IncrementFrameCounter(IntermediateBase *self)
 
 /* Matched round 72: the two state-dependent calls are ONE call through a
  * slot picked per arm (self then has 5 refs, not 6, so global-alloc ranks
- * state above it: state -> $s0, self -> $s1).  The barrier only moves state's
- * copy into the prologue (instruction order, not register identity). */
+ * state above it: state -> $s0, self -> $s1).  The `__asm__("" ::: "memory")`
+ * it carried after the methods load was retired in round 89: removing it
+ * left the object byte-identical. */
 void IntermediateBase__SetState(IntermediateBase *self, s32 state)
 {
     IntermediateBaseMethods *methods;
     void (*fn)(IntermediateBase *);
 
     methods = self->methods;
-    __asm__("" ::: "memory");
     self->state = state;
     methods->notifyParents(self, state);
     if (state == 2) {

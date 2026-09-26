@@ -466,6 +466,8 @@ void Class866E8__LoadElementResources(Class866E8 *self, Class866E8Elem *entry) {
             (*slot)->tmd = ((LinkResEntry *)(*slot)->model)->unk10;
             GsLinkObject4(((LinkResEntry *)(*slot)->model)->unk10, &(*slot)->attribute, 0);
             gpu = (*slot)->coord2;
+            /* Keeps the outBuf.x/.y/.z stack loads below the load of
+             * (*slot)->coord2; without it GCC hoists all three above it. */
             __asm__("");
             b = outBuf.x;
             c = outBuf.y;

@@ -144,6 +144,8 @@ s32 SpuVmGetSeqLVol(s32 p0)
     Entry90902E8 *tbl = D_800902E8[channel];
     s32 recIdx = (p0 & 0xFF00) >> 8;
 
+    /* Keeps the D_8008EA22 store after the D_800902E8[channel] load and
+     * the record-index arithmetic; without it GCC hoists the store to the top. */
     __asm__("");
     D_8008EA22 = channel;
     return tbl[recIdx].unk74;
@@ -153,6 +155,8 @@ s32 SpuVmGetSeqRVol(s32 p0)
 {
     Entry90902E8 *tbl = D_800902E8[(u8) p0];
 
+    /* Keeps the D_800902E8[(u8) p0] load above the D_8008EA22 store;
+     * without it the load sinks below the store and the index arithmetic. */
     __asm__("");
     D_8008EA22 = p0;
     return tbl[(p0 & 0xFF00) >> 8].unk76;

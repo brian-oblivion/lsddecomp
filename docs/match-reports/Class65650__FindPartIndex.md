@@ -131,3 +131,12 @@ Round 75 (charlie), track 3.
 ## Track 4 (2026-09-25, round 85, alpha)
 
 The class (id 0x234, table `gClass65650Methods`) is unified as `Class65650` in `include/Class65650.h`: an Actor subclass (its ctor chains to Actor's first) and Entity's base. Any source block above is the pre-unification spelling (the local `Class65650Methods` of `include/code_55dd4.h`, `linkCompanion`/`unlinkCompanion`, `companion2`, `Unk5CObj`/`Unk70ElemObj`); the live body in `src/code_55dd4.c` takes the unified types and the inherited slot and field names (`addChild`/`removeChild`, Actor's `ticker`, `Actor *` parts, `ModelData *` modelData), byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).
+
+## asm sites
+
+Round 89 (runner delta, track 5 `asm-sites`): the bare `__asm__("")` after
+`arr = self->partIds;` is **justified** and now commented at the site.
+Measured by deleting it alone: the image went red (14 bytes, same length),
+`funcdiff` 18/22, and asm-differ shows `move a2,v0` (the copy of `arr`) moved
+from before `lw a0,0x6c(a0)` (the `self->partCount` load) into the delay slot
+of `blez a0` (the `count <= 0` test). Instruction order.

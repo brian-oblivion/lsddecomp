@@ -831,3 +831,14 @@ Round 78 (track 3, naming pass, bravo).
 ## Track 4 (2026-09-26, round 87, echo)
 
 `LinkTarget866E8` and `BE54OutBuf` were views of Class6D940 and its placement record; both are gone for `include/Class6D940.h` (`buffer`, `bufferSize`, `linkResource`; `Class6D940Placement` x/y/z/rotY/unk2E/chained/next). The slot78 call casts the inherited `void *slot78` to `Class6D940ResolveEntryFn` (no code). The local LinkResource view went with it: `linkResource` is `Class6D430 *` and its +0x004 is `release`. Byte-identical.
+
+## asm sites
+
+Round 89 (runner delta, track 5 `asm-sites`): the bare `__asm__("")` after
+`gpu = (*slot)->coord2;` is **justified** and now commented at the site.
+Measured by deleting it alone: the image went red (14 bytes), `funcdiff`
+145/150, and asm-differ shows the three `outBuf` stack loads
+(`lw v1,0x1c(sp)`, `lw a0,0x20(sp)`, `lw a1,0x24(sp)`) hoisted above
+`lw v0,0x14(v0)` (the `->coord2` load), filling the load-delay `nop` that
+retail keeps after `lw v0,0(s0)` and leaving a `nop` after the coord2 load
+instead. Instruction order only.
