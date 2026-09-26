@@ -88,6 +88,7 @@
 #include "common.h"
 #include "VabDriver.h"
 #include "Class6D940.h"
+#include "LinkResource.h"
 
 /* Class6D430's, code_171e0.c: the active driver's table, through which
  * Class6D940's ctor, finalize and setFlag reach their parent's. */
@@ -98,19 +99,11 @@ extern Class6D430Methods *GetActiveDataSourceMethods(void);
  * this unit does not include either header. */
 extern void *BMemPMgrAlloc(s32 size);
 
-/* LinkResource's (D_8006F13C) table as Class6D940__ResolveEntry reaches it
- * through `linkResource`: only +0x080 (LinkResource__GetEntry), called with
- * four arguments because retail keeps `placement` in $a3 across the call
- * (the round-76 match). A view of LinkResource, for that class's job to
- * retire, not of this one. */
-typedef struct LinkResourceView_179d8_d LinkResourceView_179d8_d;
-typedef struct LinkResourceViewMethods_179d8_d {
-    u8 pad000[0x080];
-    s32 (*getEntry)(LinkResourceView_179d8_d *self, s32 model, s32 cell, Class6D940Placement *placement);
-} LinkResourceViewMethods_179d8_d;
-struct LinkResourceView_179d8_d {
-    LinkResourceViewMethods_179d8_d *methods;
-};
+/* LinkResource__GetModel as Class6D940__ResolveEntry calls it through
+ * `linkResource`'s getModel (+0x080): with four arguments, because retail
+ * keeps `placement` in $a3 across the call (the round-76 match). The
+ * occupant reads only (self, index); a function-pointer cast, no code. */
+typedef s32 (*Class6D940GetModelFn)(LinkResource *self, s32 model, s32 cell, Class6D940Placement *placement);
 
 Class6D940 *New_Class6D940(char *name)
 {
@@ -151,7 +144,7 @@ void Class6D940__SetFlag(Class6D940 *self)
 s32 Class6D940__ResolveEntry(Class6D940 *self, Class6D940Placement *placement, s32 cell)
 {
     Class6D940Record *rec;
-    LinkResourceView_179d8_d *link;
+    LinkResource *link;
     s32 row;
     s32 col;
     s32 model;
@@ -176,8 +169,8 @@ s32 Class6D940__ResolveEntry(Class6D940 *self, Class6D940Placement *placement, s
             placement->unk2E = rec->unk4;
             model = rec->model;
             placement->model = model;
-            link = (LinkResourceView_179d8_d *)self->linkResource;
-            return link->methods->getEntry(link, model, cell, placement);
+            link = self->linkResource;
+            return ((Class6D940GetModelFn)link->methods->getModel)(link, model, cell, placement);
         }
         return -1;
     }

@@ -11,7 +11,7 @@ drift. Fresh ground (carved revision 18, no prior report).
 
 Finalize: walks the NULL-terminated object-pointer array at +0x2C releasing each (own slot +0x004), frees the array (BMemPMgrFree), then the active driver's finalize.
 
-Table slot (`tools/classtable.py`): D_8006F13C +0x00C.
+Table slot (`tools/classtable.py`): gLinkResourceMethods +0x00C.
 
 ## Source
 
@@ -21,7 +21,7 @@ fields +0x2C..+0x38), `Ctor33808` and `CountedBuf33808` sit at the top of
 `src/code_33808.c`.
 
 ```c
-/* D_8006F13C +0x00C: finalize -- release every object in the NULL-ended
+/* gLinkResourceMethods +0x00C: finalize -- release every object in the NULL-ended
  * array at +0x2C, free the array, then the active driver's. */
 void LinkResource__Finalize(DataSrc33808 *self) {
     DataSrc33808 **objs = (DataSrc33808 **)self->unk2C;
@@ -42,3 +42,14 @@ First build. A plain `while (*objs != NULL)` is rotated by GCC into the top-test
 ## Naming
 
 - **LinkResource__Finalize**, tier A. Class6D430 finalize override: releases every object in the NULL-ended array at +0x2C.
+
+## Track 4
+
+2026-09-26, round 89 (delta): LinkResource (table `gLinkResourceMethods`,
+renamed from D_8006F13C) is unified in `include/LinkResource.h`. The
+unit-local views this body used (`DataSrc33808`, `Obj6F13C`, `Buf439EC`,
+`Rec6F13C`/`Buf6F13C`, the `extern s32 D_8006F13C[]` array) are gone:
+`self` is `LinkResource *`, its +0x02C is `TmdModel **models`, the buffer is
+read as `TmdFile *` (include/TmdModel.h), the allocator's descriptor is
+`Src6F240 *`, and the getter returns `&gLinkResourceMethods`.
+Byte-identical.

@@ -219,21 +219,13 @@ struct Viewport;
    StartVoice calls setPitchOffset (+0x09C). This header used to carry that
    view as DreamSysUnk58 / DreamSysUnk58Vtable (deleted round 87, track 4). */
 
-/* Object pointed to by DreamSys__DreamSys's `arg1` constructor parameter --
-   same "vtable pointer at offset 0" shape as the other opaque classes in
-   this unit. Stored verbatim into DreamSys::unk_0x60 and also used
-   immediately: `arg1->methods->slot0x80(arg1, 0)`'s return value (a
-   companion pointer, forwarded as `void *`) is passed to DreamSys's own
-   `methods->addChild` right after -- the same "buddy-link" shape code_55dd4.h
-   documents for Class65650's `slot10`/`slot14` pair (round 2026-09-02).
-   Nothing else identifies this class. */
-typedef struct DreamSysCtorArgMethods {
-	u8 pad00[0x80];
-	void *(*slot0x80)(void *self, s32 arg1);
-} DreamSysCtorArgMethods;
-typedef struct DreamSysCtorArgObj {
-	DreamSysCtorArgMethods *methods;
-} DreamSysCtorArgObj;
+struct LinkResource;
+
+/* DreamSys__DreamSys's `arg1` is a LinkResource (include/LinkResource.h;
+   Class6D3C8__Class6D3C8 passes New_LinkResource("ETC\DREAME5.TMD")): the
+   ctor keeps it in unk_0x60 and adds its getModel(0), a TmdModel, as a
+   child. This header used to carry that view as DreamSysCtorArgObj /
+   DreamSysCtorArgMethods (deleted round 89, track 4). */
 
 
 /* Actor::grid is the grid manager, Class866E8 (include/Class866E8.h, track 4
@@ -397,9 +389,9 @@ struct DreamSys {
 	   `struct Viewport` above for the refView fields this class moves. */
 	struct Viewport *viewport;
 	/* Set unconditionally to the constructor's `arg1` by DreamSys__DreamSys
-	   (round 2026-09-02) -- see DreamSysCtorArgObj. No other observed use in
-	   this unit's queued functions. */
-	void *unk_0x60;
+	   (round 2026-09-02): the LinkResource its model 0 came from. No other
+	   observed use in this unit's queued functions. */
+	struct LinkResource *unk_0x60;
 	/* Set by DreamSys__func_5938c(this, value); no other observed use. */
 	s32 unk_0x64;
 
@@ -645,7 +637,7 @@ typedef enum DreamColors{
  *    no offset; ObjM__SetupSceneStyle calls it through
  *    DreamSysAttachToParentFn. */
 struct DreamSysMethods {
-	ACTOR_SLOTS(DreamSys, (DreamSys *self, void *arg1, s32 arg2, s32 arg3));
+	ACTOR_SLOTS(DreamSys, (DreamSys *self, struct LinkResource *arg1, s32 arg2, s32 arg3));
 	/* +0x0F0 */ s32 (*getSetFlashbackSession)(DreamSys *self, DreamColors *out, s32 value); /* DreamSys__GetSetFlashbackSession: value < 0 writes the day's colour to *out */
 	/* +0x0F4 */ void (*setMoveOverride)(DreamSys *self, s32 value);     /* DreamSys__SetMoveOverride */
 	/* +0x0F8 */ void (*resetLinkState)(DreamSys *self, s32 arg1, s32 arg2); /* DreamSys__ResetLinkState */
@@ -996,7 +988,7 @@ DreamSysMethods *Get_vtable_DreamSys(void);
  * matched C (e.g. Class6D3C8__Class6D3C8 in src/code_1677c.c) can call it -- see
  * "Calling into a function that is still INCLUDE_ASM in another unit is
  * fine" in docs/DECOMPILATION_LEARNINGS.md. */
-DreamSys *New_DreamSys(void *arg0, s32 arg1, s32 arg2);
+DreamSys *New_DreamSys(struct LinkResource *arg0, s32 arg1, s32 arg2);
 
 
 
@@ -1035,7 +1027,7 @@ MoodGraphPoint *IsDaySpecial(CinematicCall *cinematic, int day);
 
 
 /* The occupants of DREAMSYS_METHODS not declared above, in slot order. */
-DreamSys *DreamSys__DreamSys(DreamSys *this, void *arg1, s32 arg2, s32 arg3);
+DreamSys *DreamSys__DreamSys(DreamSys *this, struct LinkResource *arg1, s32 arg2, s32 arg3);
 void DreamSys__ResetSessionState(DreamSys *this);
 void DreamSys__SpawnAtLink(DreamSys *this, struct Class866E8 *arg1);
 void DreamSys__DetachFromParent(DreamSys *this);

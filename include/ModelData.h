@@ -5,7 +5,7 @@
 
 /*
  * ModelData -- a Class6D430 data source (class id 0x5F03, method table
- * D_8006F384) that splits one loaded file into a LinkResource (D_8006F13C,
+ * D_8006F384) that splits one loaded file into a LinkResource (gLinkResourceMethods,
  * an array of TMD models) and a TodSet (D_8006F590, an array of TOD
  * animations), and forwards TOD packet scanning to the TodSet. Methods in
  * src/code_33808.c; one subclass, TriggerWorld (D_8006F40C, 0x15F03), whose
@@ -57,7 +57,7 @@ typedef struct ModelDataMethods ModelDataMethods;
 
 #define MODELDATA_FIELDS(Methods)                                                                  \
     CLASS6D430_FIELDS(Methods);                                                                    \
-    /* +0x02C */ Class6D430 *linkResource; /* New_LinkResource (D_8006F13C); released by ReleaseResources */ \
+    /* +0x02C */ struct LinkResource *linkResource; /* New_LinkResource (include/LinkResource.h); released by ReleaseResources */ \
     /* +0x030 */ Class6D430 *todSet;       /* New_TodSet (D_8006F590); +0x080/+0x084 forward to it */ \
     /* +0x034 */ s32 ownsResources         /* the ctor's third argument: New_ModelData 1, TriggerWorld 0; BuildResources and ReleaseResources act only while it is set. The object is 0x38 bytes (New_ModelData): TriggerWorld's own fields start at +0x038 */
 

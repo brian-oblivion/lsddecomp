@@ -1093,3 +1093,12 @@ Round 75 (charlie), track 3.
 ## Track 4 (2026-09-25, round 85, alpha)
 
 The class (id 0x234, table `gClass65650Methods`) is unified as `Class65650` in `include/Class65650.h`: an Actor subclass (its ctor chains to Actor's first) and Entity's base. Any source block above is the pre-unification spelling (the local `Class65650Methods` of `include/code_55dd4.h`, `linkCompanion`/`unlinkCompanion`, `companion2`, `Unk5CObj`/`Unk70ElemObj`); the live body in `src/code_55dd4.c` takes the unified types and the inherited slot and field names (`addChild`/`removeChild`, Actor's `ticker`, `Actor *` parts, `ModelData *` modelData), byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).
+
+## Track 4 (LinkResource)
+
+2026-09-26, round 89 (delta): `Unk2CObj`/`Unk2CMethods` (include/code_55dd4.h)
+were a view of LinkResource (gLinkResourceMethods), now unified in
+`include/LinkResource.h`; ModelData's `linkResource` is typed
+`struct LinkResource *`. The model-id packet calls its `getModel` (+0x080,
+LinkResource__GetModel) directly, the `TmdModel *` result cast to the
+existing `s32 v`. Byte-identical.

@@ -509,7 +509,7 @@ void *Class65650__ApplyTodPacket(Class65650 *self, void *acc, void *extra)
         if (count != 0 && elem->model == NULL) {
             s32 v;
 
-            v = ((Unk2CObj *)self->modelData->linkResource)->methods->getModel(self->modelData->linkResource, count - 1);
+            v = (s32)self->modelData->linkResource->methods->getModel(self->modelData->linkResource, count - 1);
             Class6B5CC__LinkModel((Class6B5CC *)elem, (void *)v);
         }
         break;

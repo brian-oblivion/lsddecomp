@@ -36,6 +36,7 @@
 #include "common.h"
 #include "class_3bb8c.h"
 #include "Class6D940.h"
+#include "LinkResource.h"
 #include "Class81940.h"
 #include "Class86AA0.h"
 
@@ -386,8 +387,9 @@ void Class866E8__OnNotifyTag1(Class866E8 *self, void *arg1, s32 mode) {
  * of the 11 sibling units sharing that header touch these. */
 
 /* Class6D940__ResolveEntry's non-0/non-(-1) return value (what
- * LinkResource__GetEntry returns) -- a resolved link-target record, read
- * only for its `unk10` (tmd base address). */
+ * LinkResource__GetModel returns): a TmdModel (include/TmdModel.h), read
+ * only for its +0x010, TmdModel's `object`. A view of TmdModel, left for
+ * that class (round 89, LinkResource's unification did not retype it). */
 typedef struct LinkResEntry {
     u8 pad0[0x10];
     s32 unk10;   /* +0x010 */
@@ -398,7 +400,6 @@ typedef struct BE54LoadReq {
     u8 pad4[0xC];
 } BE54LoadReq;
 
-extern void *New_LinkResource(BE54LoadReq *req);
 extern void GsLinkObject4(s32 tmd, void *objp, s32 n);
 
 void Class866E8__LoadElementResources(Class866E8 *self, Class866E8Elem *entry) {
@@ -406,7 +407,7 @@ void Class866E8__LoadElementResources(Class866E8 *self, Class866E8Elem *entry) {
     Class81940Header *info2;
     Class81940 *hdr;
     Class6D940 *target;
-    Class6D430 *res;
+    LinkResource *res;
     Class86AA0 **slot;
     u8 *base;
     Class6B5CCSub14 *gpu;
@@ -434,7 +435,7 @@ void Class866E8__LoadElementResources(Class866E8 *self, Class866E8Elem *entry) {
     }
     info2 = hdr->buffer;
     req.field0 = (s32)info2 + info2->gridOffset + info2->gridSize;
-    target->linkResource = New_LinkResource(&req);
+    target->linkResource = New_LinkResource((struct Src6F240 *)&req);
     outBuf.next = 0;
 
     i = 0;

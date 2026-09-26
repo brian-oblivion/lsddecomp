@@ -9,17 +9,17 @@ deletions, no out-of-range drift. Fresh ground (carved revision 18, no prior rep
 
 ## What it does
 
-Table getter: returns the method table `D_8006F13C`, declared locally as `extern s32 D_8006F13C[];`.
+Table getter: returns the method table `gLinkResourceMethods`, declared locally as `extern s32 gLinkResourceMethods[];`.
 
 Table slot (`tools/classtable.py`): `D_8006D430` +0x094 (the Class6D430 `Get...Methods` getter list).
 
 ## Source
 
 ```c
-extern s32 D_8006F13C[];
+extern s32 gLinkResourceMethods[];
 
 void *GetLinkResourceMethods(void) {
-    return D_8006F13C;
+    return gLinkResourceMethods;
 }
 ```
 
@@ -32,3 +32,14 @@ void *GetLinkResourceMethods(void) {
 ## Naming
 
 - **GetLinkResourceMethods**, tier A. Table getter.
+
+## Track 4
+
+2026-09-26, round 89 (delta): LinkResource (table `gLinkResourceMethods`,
+renamed from D_8006F13C) is unified in `include/LinkResource.h`. The
+unit-local views this body used (`DataSrc33808`, `Obj6F13C`, `Buf439EC`,
+`Rec6F13C`/`Buf6F13C`, the `extern s32 D_8006F13C[]` array) are gone:
+`self` is `LinkResource *`, its +0x02C is `TmdModel **models`, the buffer is
+read as `TmdFile *` (include/TmdModel.h), the allocator's descriptor is
+`Src6F240 *`, and the getter returns `&gLinkResourceMethods`.
+Byte-identical.

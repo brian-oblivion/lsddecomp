@@ -11,7 +11,7 @@ drift. Fresh ground (carved revision 18, no prior report).
 
 Tail of `GsMapModelingData((u32 *)self->buffer + 1)`: the buffer holds a TMD, and +4 skips its id word (the TMD `flags` word is what GsMapModelingData expects to start from). Prototype declared locally (LIBGS.H spelling in a comment).
 
-Table slot (`tools/classtable.py`): D_8006F13C +0x078.
+Table slot (`tools/classtable.py`): gLinkResourceMethods +0x078.
 
 ## Source
 
@@ -24,7 +24,7 @@ Slot +0x078 is `void *slot78` in the unified macro, so calls cast it.
 /* LIBGS.H: void GsMapModelingData(unsigned long *p); */
 void GsMapModelingData(u32 *p);
 
-/* D_8006F13C +0x078: map the TMD in the buffer (past its id word). */
+/* gLinkResourceMethods +0x078: map the TMD in the buffer (past its id word). */
 void LinkResource__MapModel(Class6D430 *self) {
     GsMapModelingData((u32 *)self->buffer + 1);
 }
@@ -40,3 +40,14 @@ void LinkResource__MapModel(Class6D430 *self) {
 ## Naming
 
 - **LinkResource__MapModel**, tier A. Slot +0x078: GsMapModelingData wrapper over the buffer's TMD.
+
+## Track 4
+
+2026-09-26, round 89 (delta): LinkResource (table `gLinkResourceMethods`,
+renamed from D_8006F13C) is unified in `include/LinkResource.h`. The
+unit-local views this body used (`DataSrc33808`, `Obj6F13C`, `Buf439EC`,
+`Rec6F13C`/`Buf6F13C`, the `extern s32 D_8006F13C[]` array) are gone:
+`self` is `LinkResource *`, its +0x02C is `TmdModel **models`, the buffer is
+read as `TmdFile *` (include/TmdModel.h), the allocator's descriptor is
+`Src6F240 *`, and the getter returns `&gLinkResourceMethods`.
+Byte-identical.

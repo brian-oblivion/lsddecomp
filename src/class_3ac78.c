@@ -35,6 +35,7 @@
 #include "Class86668.h"
 #include "DrawSystem.h"
 #include "Class6D940.h"
+#include "LinkResource.h"
 #include "Class81940.h"
 #include "Class86AA0.h"
 #include "FlatLightObj.h"

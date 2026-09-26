@@ -18,7 +18,7 @@
  * Its one user is the grid manager (Class866E8): Class866E8__Class866E8
  * makes one per grid element with New_Class6D940(0), so nothing is
  * loaded; Class866E8__LoadElementResources points `buffer` into an already
- * loaded resource, puts a LinkResource (D_8006F13C) of the element's models
+ * loaded resource, puts a LinkResource (gLinkResourceMethods) of the element's models
  * in `linkResource`, then calls +0x078 once per cell until it returns 0.
  *
  * +0x078 is Class6D430's slot78 (NULL there): this table's occupant is
@@ -26,7 +26,7 @@
  * `cell`'s Class6D940Record (12 bytes each, from buffer +8; cell / 20 is
  * the row, cell % 20 the column), follows `next` for a second record in
  * the same cell, fills a Class6D940Placement and returns the model
- * linkResource's +0x080 (LinkResource__GetEntry) gives for the record's
+ * linkResource's +0x080 (LinkResource__GetModel) gives for the record's
  * model index: 0 past the last cell (400), -1 for an empty record.
  * Class866E8__LoadElementResources calls it through
  * Class6D940ResolveEntryFn, a cast of the inherited slot (no code).
@@ -76,7 +76,7 @@ struct Class6D940Methods {
 
 struct Class6D940 {
     CLASS6D430_FIELDS(Class6D940Methods);
-    /* +0x02C */ Class6D430 *linkResource; /* the models' LinkResource (D_8006F13C); zeroed by the ctor */
+    /* +0x02C */ struct LinkResource *linkResource; /* the models' LinkResource (include/LinkResource.h); zeroed by the ctor */
     /* +0x030 */ s32 loaded;               /* set by Class6D940__SetFlag; zeroed by the ctor */
 };                                         /* 0x34 bytes: New_Class6D940 */
 
