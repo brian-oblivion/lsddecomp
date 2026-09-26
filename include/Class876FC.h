@@ -17,7 +17,7 @@
  * pos), with `kind` 0..3, `params` the 0x24-byte block at gStyleSpawnOffsetX (seven
  * separately-declared symbols gStyleSpawnOffsetX..D_8008E0C0 in class_3bb8c_n.c;
  * one Class876FCParams in the bytes: the callers pass `&gStyleSpawnOffsetX` or
- * `&D_8008E0B0 - 0xC`), `parent` gStyleCueSelf and `pos` the caller's
+ * `&gStyleSpawnRotation - 0xC`), `parent` gStyleCueSelf and `pos` the caller's
  * position. The ctor stores `kind`, copies `params` through the reset slot
  * and attaches self under `parent` at pos + params.offset
  * (Class876FC__InitByKind). Per kind: 0 and 1 link a model fetched through

@@ -76,7 +76,7 @@ void **StyleFillEffectKind2(void **arg0, void *arg1) {
     }
     slot->v = val;
     SetupStyleSpawnParamsA(arg1, (void *) D_80087330);
-    q = &D_8008E0B0;
+    q = &gStyleSpawnRotation;
     *q = gStyleSpawnRotations;
     D_8008E0BC = rand() % 6;
     *arg0 = New_Class876FC((void *) 2, (u8 *) q - 0xC, (void *) gStyleCueSelf, arg1);
@@ -125,14 +125,14 @@ confirming the recorded "1 word short" precisely.
 recorded the scaffold at ins 12 / del 13 and called it AGREE, which was right.
 What nobody had done was read the diff for *what* those ten insertions were.
 
-### Lever 1 (+26 words and the whole length gap): retail caches `&D_8008E0B0`
+### Lever 1 (+26 words and the whole length gap): retail caches `&gStyleSpawnRotation`
 
 Round 47 filed the residue as "`arg1` capture timing" plus "instruction
 scheduling interleave". The length arithmetic says otherwise, and it closes
 exactly. From the disassembly, retail:
 
 ```
-lui   s0,%hi(D_8008E0B0) ; addiu s0,s0,%lo(D_8008E0B0)   /* $s0 = &D_8008E0B0 */
+lui   s0,%hi(gStyleSpawnRotation) ; addiu s0,s0,%lo(gStyleSpawnRotation)   /* $s0 = &gStyleSpawnRotation */
 lui   v0,%hi(gStyleSpawnRotations) ; addiu v0,v0,%lo(gStyleSpawnRotations)
 jal   rand
  sw   v0,0x0($s0)                      /* the store rides rand's delay slot */
@@ -145,7 +145,7 @@ address absolutely, which costs a word and wastes the delay slot:
 
 ```
 lui v0,%hi(gStyleSpawnRotations) ; addiu v0,v0,%lo(gStyleSpawnRotations)
-lui at,%hi(D_8008E0B0) ; sw v0,%lo(D_8008E0B0)(at)      /* 2 words */
+lui at,%hi(gStyleSpawnRotation) ; sw v0,%lo(gStyleSpawnRotation)(at)      /* 2 words */
 jal rand
  nop                                                     /* delay slot wasted */
 ...
@@ -164,7 +164,7 @@ carries in its own preserved body:
 ```c
 u8 **q;
 ...
-q = &D_8008E0B0;
+q = &gStyleSpawnRotation;
 *q = gStyleSpawnRotations;
 ...
 New_Class876FC((void *) 2, (u8 *) q - 0xC, (void *) gStyleCueSelf, arg1);
@@ -172,7 +172,7 @@ New_Class876FC((void *) 2, (u8 *) q - 0xC, (void *) gStyleCueSelf, arg1);
 
 **16/79 and 1 short -> 42/79 and LENGTH EXACT**, skeleton diffs 59 -> 35.
 
-Round 48's attempt 6 tried this exact lever (`u8 **ptr = &D_8008E0B0;`) and
+Round 48's attempt 6 tried this exact lever (`u8 **ptr = &gStyleSpawnRotation;`) and
 recorded "regressed badly (8/79, +47000 more bytes of drift)". I cannot
 reproduce that; on this body it is worth +26 words and the entire length gap.
 Whatever differed, **the recorded negative on this lever is wrong and should
@@ -385,7 +385,7 @@ extern s32 gStyleKind2AltColor;
 extern s32 D_80087330;
 extern u8 gStyleKind2Colors[];
 extern s32 D_8008E0C0[];
-extern u8 *D_8008E0B0;
+extern u8 *gStyleSpawnRotation;
 extern u8 gStyleSpawnRotations[];
 extern s32 D_8008E0BC;
 extern void SetupStyleSpawnParamsA(void *arg0, void *arg1);
@@ -409,7 +409,7 @@ void **StyleFillEffectKind2(void **arg0, void *arg1) {
     }
     *slot = v0;
     SetupStyleSpawnParamsA(arg1, (void *) D_80087330);
-    q = &D_8008E0B0;
+    q = &gStyleSpawnRotation;
     *q = gStyleSpawnRotations;
     randval = rand();
     D_8008E0BC = randval - (randval / 3) * 6;
@@ -456,7 +456,7 @@ slot instead and collapses the whole `if`. **An empty delay slot on retail's
 check before spending a build.
 
 **3. A stall report's per-lever negatives decay too, not just its score and
-its class.** Round 48's attempt 6 recorded the `&D_8008E0B0` pointer local as
+its class.** Round 48's attempt 6 recorded the `&gStyleSpawnRotation` pointer local as
 "regressed badly (8/79)". It is worth +26 words and the entire length gap.
 Section 4 already says the CLASS goes stale unnoticed while the measurement
 stays good; this adds that an individual lever recorded as FAILED is the most

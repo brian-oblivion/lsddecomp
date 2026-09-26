@@ -1,4 +1,4 @@
-# StyleFillEffectKind3 -- MATCHED 81/81 (round 76), lever: store the D_8008E0B0 slot through a pointer to a one-field STRUCT (scheduler alias rule), no shared `t`
+# StyleFillEffectKind3 -- MATCHED 81/81 (round 76), lever: store the gStyleSpawnRotation slot through a pointer to a one-field STRUCT (scheduler alias rule), no shared `t`
 
 REVISITED, round 76: MATCHED 81/81 in 12 builds, no permuter, no barrier; names/types used (local struct view `PtrBoxK3` for the store; D_8008E0xx names kept).
 
@@ -26,7 +26,7 @@ pointer as a STRUCT FIELD and the load is free to schedule above it:
 typedef struct PtrBoxK3 { u8 *p; } PtrBoxK3;
 PtrBoxK3 *q;
 ...
-q = (PtrBoxK3 *) &D_8008E0B0;
+q = (PtrBoxK3 *) &gStyleSpawnRotation;
 q->p = gStyleSpawnRotations;
 *arg0 = New_Class876FC((void *) 3, (u8 *) q - 0xC, (void *) gStyleCueSelf, arg1);
 ```
@@ -107,7 +107,7 @@ build (`./build-and-verify.sh`, then `tools/funcdiff.py`).
 | 1 | baseline: round 46's preserved body, rebuilt | 38/81 |
 | 2 | `s32 *p = &gStyleSpawnOffsetZ;` for the clamp block | 38, length 79 (2 short), drift |
 | 3 | **+ inline the `rand() % 3` instead of an `idx` local** | **66/81** |
-| 4 | + `u8 **q = &D_8008E0B0;` for the tail store/arg pair | **71/81** |
+| 4 | + `u8 **q = &gStyleSpawnRotation;` for the tail store/arg pair | **71/81** |
 | 5 | + signature `void **StyleFillEffectKind3(void **arg0, void *arg1)` with `*arg0 = ...; arg0++; return arg0;` | **78/81** |
 | 6 | + ONE shared local `t` holding the else branch's computed value AND the hoisted `gStyleCueSelf` read (found by the permuter) | **79/81, ins 0 / del 0** |
 
@@ -167,7 +167,7 @@ Five further spellings were tried against it, all 79/81 and all
 byte-identical, so the colour is invariant rather than merely unimproved:
 `t` typed `s32` vs `void *`; the else value written as
 `(s32) &gStyleKind3Colors[n*3]` vs `(s32) (gStyleKind3Colors + n*3)`; `t = gStyleCueSelf`
-before vs after `q = &D_8008E0B0`; `t` declared first vs last. Reusing the
+before vs after `q = &gStyleSpawnRotation`; `t` declared first vs last. Reusing the
 `s32 *p` pointer for all three roles instead of adding `t` regresses to
 73/81.
 
@@ -194,7 +194,7 @@ address gcc 2.6.3's `sched_analyze` will not disambiguate -- so the
 gp-relative load of `gStyleCueSelf` cannot hoist across it and the store cannot
 sink below it. Two independent experiments prove it is this and nothing else:
 
-- Write the store as a plain global (`D_8008E0B0 = gStyleSpawnRotations;`, a
+- Write the store as a plain global (`gStyleSpawnRotation = gStyleSpawnRotations;`, a
   `(mem (symbol_ref))` the scheduler CAN disambiguate) and **the load hoists
   immediately** -- but the `q` pointer then folds away and the address
   argument regresses to `lui a1; addiu a1,%lo(gStyleSpawnOffsetX)` (73/81).
@@ -213,7 +213,7 @@ as a limit.
 ### Waypoint: the `t`-hoist with a dedicated `t` -- 75/81, PURE register colour, zero structural diff
 
 ```c
-    q = &D_8008E0B0;
+    q = &gStyleSpawnRotation;
     t = gStyleCueSelf;                                    /* s32 t; */
     *q = gStyleSpawnRotations;
     *arg0 = New_Class876FC((void *) 3, (u8 *) q - 0xC, (void *) t, arg1);
@@ -224,8 +224,8 @@ Every instruction and every placement matches retail. The only diff is a
 `$v1` and the stored VALUE in `$v0`, this build does the reverse:
 
 ```
-458d8  lui   v1,%hi(D_8008E0B0)     |  lui   v0,%hi(D_8008E0B0)
-458dc  addiu v1,v1,%lo(D_8008E0B0)  |  addiu v0,v0,%lo(D_8008E0B0)
+458d8  lui   v1,%hi(gStyleSpawnRotation)     |  lui   v0,%hi(gStyleSpawnRotation)
+458dc  addiu v1,v1,%lo(gStyleSpawnRotation)  |  addiu v0,v0,%lo(gStyleSpawnRotation)
 458e0  addiu a1,v1,-0xc             |  addiu a1,v0,-0xc
 458e4  lui   v0,%hi(gStyleSpawnRotations)     |  lui   v1,%hi(gStyleSpawnRotations)
 458e8  addiu v0,v0,%lo(gStyleSpawnRotations)  |  addiu v1,v1,%lo(gStyleSpawnRotations)
@@ -241,7 +241,7 @@ it forward as the residue.
 Axes varied against it, all 75/81, all identical output (so the colour is
 invariant to every one of them, not merely unimproved):
 
-- statement order over `{q = &D_8008E0B0, t = gStyleCueSelf, val = gStyleSpawnRotations}` --
+- statement order over `{q = &gStyleSpawnRotation, t = gStyleCueSelf, val = gStyleSpawnRotations}` --
   every order that keeps the load before the store;
 - declaration order of `q`, `t`, `val`;
 - naming the stored value in a local vs leaving it anonymous;
@@ -250,12 +250,12 @@ invariant to every one of them, not merely unimproved):
   `(void *) (q - 3)`;
 - `p` declared at function scope vs inside the `else` block; `q` declared at
   function scope vs inside a trailing block;
-- reusing ONE pointer variable for both `&gStyleSpawnOffsetZ` and `&D_8008E0B0`
+- reusing ONE pointer variable for both `&gStyleSpawnOffsetZ` and `&gStyleSpawnRotation`
   (73/81 -- worse, and the only one of these that moved the score).
 
 Two further axes were tried on the 78/81 body and made it worse, recorded so
 nobody re-spends them: a bare `__asm__("")` before the call (70/81), and an
-initialiser-form declaration `u8 **q = &D_8008E0B0;` (11/81 -- the address
+initialiser-form declaration `u8 **q = &gStyleSpawnRotation;` (11/81 -- the address
 computation moves above the branch).
 
 ## Signature (corrected this round)
@@ -336,7 +336,7 @@ extern s32 gStyleCueSelf;
 extern s32 D_80087330;
 extern void SetupStyleSpawnParamsA(void *arg0, void *arg1);
 extern s32 D_8008E0C0[];
-extern u8 *D_8008E0B0;
+extern u8 *gStyleSpawnRotation;
 extern u8 gStyleSpawnRotations[];
 extern s32 gStyleSpawnOffsetY;
 extern s32 gStyleSpawnOffsetZ;
@@ -367,7 +367,7 @@ void **StyleFillEffectKind3(void **arg0, void *arg1) {
         D_8008E0C0[0] = t;
     }
     t = gStyleCueSelf;
-    q = &D_8008E0B0;
+    q = &gStyleSpawnRotation;
     *q = gStyleSpawnRotations;
     *arg0 = New_Class876FC((void *) 3, (u8 *) q - 0xC, (void *) t, arg1);
     arg0++;

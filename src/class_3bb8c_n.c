@@ -459,13 +459,13 @@ Class876FC **StyleFillEffectKind1(Class876FC **arg0, s32 arg1, LongVec3 *arg2) {
 extern s32 D_80087330;
 extern void SetupStyleSpawnParamsA(void *arg0, void *arg1);
 extern s32 D_8008E0C0[];
-extern u8 *D_8008E0B0;
+extern u8 *gStyleSpawnRotation;
 extern u8 gStyleSpawnRotations[];
 extern s32 gStyleSpawnOffsetY;
 extern s32 gStyleSpawnOffsetZ;
 extern u8 gStyleKind3Colors[];
 
-/* Local view: D_8008E0B0 stored through a pointer to a ONE-FIELD STRUCT, not
+/* Local view: gStyleSpawnRotation stored through a pointer to a ONE-FIELD STRUCT, not
  * a plain `u8 **`.  Load-bearing: a store through a plain pointer is an
  * opaque (mem (reg)) that gcc 2.6.3's scheduler will not move a later
  * global load above; an in-struct store through a varying address does not
@@ -500,7 +500,7 @@ Class876FC **StyleFillEffectKind3(Class876FC **arg0, LongVec3 *arg1) {
         }
         D_8008E0C0[0] = (s32)(gStyleKind3Colors + ((u32)rand() % 3) * 3);
     }
-    q = (PtrBoxK3 *)&D_8008E0B0;
+    q = (PtrBoxK3 *)&gStyleSpawnRotation;
     q->p = gStyleSpawnRotations;
     *arg0 = New_Class876FC(3, (Class876FCParams *)((u8 *)q - 0xC), (SceneNode *)gStyleCueSelf, arg1);
     arg0++;
@@ -510,7 +510,7 @@ Class876FC **StyleFillEffectKind3(Class876FC **arg0, LongVec3 *arg1) {
 extern s32 gStyleKind2AltColor;
 extern u8 gStyleKind2Colors[];
 extern s32 D_8008E0C0[];
-extern u8 *D_8008E0B0;
+extern u8 *gStyleSpawnRotation;
 extern u8 gStyleSpawnRotations[];
 extern s32 D_8008E0BC;
 
@@ -546,7 +546,7 @@ Class876FC **StyleFillEffectKind2(Class876FC **arg0, LongVec3 *arg1) {
     }
     slot->v = val;
     SetupStyleSpawnParamsA(arg1, (void *)D_80087330);
-    q = &D_8008E0B0;
+    q = &gStyleSpawnRotation;
     *q = gStyleSpawnRotations;
     D_8008E0BC = rand() % 6;
     *arg0 = New_Class876FC(2, (Class876FCParams *)((u8 *)q - 0xC), (SceneNode *)gStyleCueSelf, arg1);
@@ -556,7 +556,7 @@ Class876FC **StyleFillEffectKind2(Class876FC **arg0, LongVec3 *arg1) {
 
 extern s32 gStyleSpawnOffsetY;
 extern s32 gStyleSpawnOffsetZ;
-extern u8 *D_8008E0B0;
+extern u8 *gStyleSpawnRotation;
 extern u8 gStyleSpawnRotations[];
 extern s32 D_8008E0B8;
 
@@ -586,7 +586,7 @@ void SetupStyleSpawnParamsA(void *arg0, void *arg1) {
     if (rand() & 1) {
         gStyleSpawnOffsetZ = -gStyleSpawnOffsetZ;
     }
-    D_8008E0B0 = gStyleSpawnRotations + ((u32)rand() % 7) * 12;
+    gStyleSpawnRotation = gStyleSpawnRotations + ((u32)rand() % 7) * 12;
     D_8008E0B8 = rand() % 5;
 }
 
@@ -623,7 +623,7 @@ void SetupStyleSpawnParamsB(void *arg0, void *arg1) {
     } else if (mod3 == 2) {
         gStyleSpawnOffsetZ = 0x800;
     }
-    D_8008E0B0 = gStyleSpawnRotations + ((u32)rand() % 7) * 12;
+    gStyleSpawnRotation = gStyleSpawnRotations + ((u32)rand() % 7) * 12;
     D_8008E0B8 = rand() % 5;
 }
 
