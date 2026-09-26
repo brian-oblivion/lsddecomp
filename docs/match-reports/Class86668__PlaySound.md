@@ -25,9 +25,9 @@ jalr  $v0
 ```
 
 Resolved via `tools/classtable.py gClass86668Methods` and `tools/classtable.py
-D_800866E8`: `gClass86668Methods` (28 slots, header 0x230) is this function's own
+gClass866E8Methods`: `gClass86668Methods` (28 slots, header 0x230) is this function's own
 containing class's vtable, and this IS its last slot (+0x070) — the only
-reason this class is visible from this unit at all. `D_800866E8` (80 slots,
+reason this class is visible from this unit at all. `gClass866E8Methods` (80 slots,
 header 0x114) is the vtable of the sub-object at `self->unk34`; slot +0x080
 there is `Class6B5CC__GetSetUnk10Flag8` (outside this unit, in `code_d294.s`), which reads
 its own incoming `$a0`/`$a1`/`$a2` (three real params) and ignores a fourth —
@@ -43,7 +43,7 @@ which can only be `Class86668__PlaySound`'s own second parameter, forwarded unch
 (no `move` needed since it's already resident in the right register).
 
 Named the two classes by vtable address per project convention (see
-`Class6D3C8.h`): `Class86668` (gClass86668Methods) and `Class866E8` (D_800866E8).
+`Class6D3C8.h`): `Class86668` (gClass86668Methods) and `Class866E8` (gClass866E8Methods).
 Both declared in the new `include/class_3ac78.h`.
 
 ## Proposed learning
@@ -66,7 +66,7 @@ Round 67 (track 3, naming pass).
 
 Deliberately NOT asserted: that `Class86668::unk34` is a `Class866E8`. The
 header claims it, but the only evidence is that slot `+0x080` exists in
-`D_800866E8` -- true of every `Class6B5CC` descendant. The name avoids
+`gClass866E8Methods` -- true of every `Class6B5CC` descendant. The name avoids
 depending on it.
 
 The two `0x7F` arguments are left in the call: they cost nothing, they are

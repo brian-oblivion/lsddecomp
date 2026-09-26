@@ -17,6 +17,7 @@
 #include "common.h"
 #include "Entity.h"
 #include "DreamSys.h"
+#include "Class866E8.h"
 
 /* Constant transform triples passed to updateRotation (slot +0x44,
  * func_8001CEB4: three {s16 num, s16 den} ratios in degrees), updateScale
@@ -323,7 +324,7 @@ void Entity__MoodCue12(Entity *this) {
     if (this->state == 0xB) {
         result = this->methods->distanceToPeer(this, this->peer);
         if (result < 0xA00) {
-            ((Unk4CObj *)this->grid)->methods->slot138((Unk4CObj *)this->grid, 1, 1);
+            this->grid->methods->configureRateEntry(this->grid, 1, 1);
             this->moodTimer = 1;
             this->state = 0xC;
         }

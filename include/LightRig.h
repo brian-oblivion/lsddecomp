@@ -23,10 +23,9 @@
  * Who holds one: IntermediateBase__Init makes one with New_LightRig() when
  * its init args bring none (IntermediateBase's +0x014) and, in mode 0, adds
  * its FrameClock object (+0x010) to it as a child. One class derives from
- * it: Class866E8 (D_800866E8, 0x114, the grid manager), whose ctor and
+ * it: Class866E8 (gClass866E8Methods, 0x114, the grid manager), whose ctor and
  * finalize chain to this class's first and whose table inherits getLight
- * unchanged; its views are its own (include/class_3ac78.h,
- * include/class_3bb8c.h) and do not expand these macros yet.
+ * unchanged; it expands these macros (include/Class866E8.h).
  *
  * The ctor chains to Class6B5CC's (GetClass6B5CCMethods()->ctor), so the id
  * tree (0x4 -> 0x14) is the ctor chain. The ctor returns nothing, but the
@@ -35,8 +34,8 @@
  * discards it), so the two spellings compile alike.
  *
  * The object is 0x54 bytes (New_LightRig): `lights` at +0x044 and `ambient`
- * at +0x050, then one byte of word padding. Class866E8's view names nothing
- * in +0x044..+0x054 (its first own field, `origin`, is at +0x054).
+ * at +0x050, then one byte of word padding. Class866E8 names nothing of its
+ * own in +0x044..+0x054 (its first own field, `origin`, is at +0x054).
  */
 
 typedef struct LightRig LightRig;

@@ -65,7 +65,7 @@ void Actor__AddChild(BaseObjO *self, TagWordObjO *arg) {
 
 - **A companion-pointer link/unlink pair's tag classification is a
   reusable fingerprint across sibling classes.** `(header & 0xFFF) ==
-  0x114` picks out one companion KIND (`0x114` is `D_800866E8`'s own
+  0x114` picks out one companion KIND (`0x114` is `gClass866E8Methods`'s own
   header word, confirmed via `tools/classtable.py --scan`) and
   `(header & 0xF) == 5` picks out a second, broader kind (any table whose
   header's low nibble is 5). Worth remembering the exact masks if another

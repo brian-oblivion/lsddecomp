@@ -1,27 +1,26 @@
 /*
  * class_3ac78 -- the front half of Class866E8, the class whose method table is
- * D_800866E8 (80 slots, header 0x114; tools/classtable.py D_800866E8). It
+ * gClass866E8Methods (80 slots, header 0x114; tools/classtable.py gClass866E8Methods). It
  * derives from Class6B5CC (code_d294) through LightRig (include/LightRig.h,
  * gLightRigMethods: the three flat lights and the ambient colour), whose ctor
  * and finalize its own chain to, and the game builds exactly one, at boot, in class_39e08's Class865C8__Class865C8 via New_Class866E8(0, 1).
  *
  * What it manages is a GRID. The object owns seven elements (elems[7]), each
- * pairing a target object, a list, a parent node, and a 0x668-byte heap block
- * holding that element's grid of cell objects; the constructor seeds every
+ * pairing a loader, a placement list, a parent node, and a 0x668-byte heap
+ * block holding that element's grid of Class86AA0 cells; the constructor seeds every
  * cell with a world position on a 0x800 lattice. Indexing the grid uses a row
  * stride of 20 cells -- the same 20 that gDefaultGridSpan >> 11 produces
  * (0xA000 / 0x800, see Class866E8__SetGridSpan) and the same stride
  * class_3bb8c_b's byte-matched Class866E8__SetFootprintCellFlag walks.
  *
  * Work reaches the cells through a rectangle list (rects[4]/rectCount): a
- * notification arrives at Class866E8__OnNotify or Class866E8__OnCommand,
+ * notification arrives at Class866E8__OnNotify or Class866E8__DispatchLinkCommand,
  * Class866E8__ForwardAcceptedCommand filters the sender against acceptedTags,
  * Class866E8__ApplyToSenderFootprint turns the sender's position into one
  * rectangle, and Class866E8__DispatchToRectCells re-notifies every cell in it
  * and every cell chained behind it. The queries that build those rectangles,
- * and an element's resource and GPU sides, live in class_3bb8c*, which keeps
- * its own independent view of the same object (Obj866E8 / Elem /
- * GridSlot866E8 in include/class_3bb8c.h).
+ * and an element's resource and GPU sides, live in class_3bb8c*. The class is
+ * declared once, in include/Class866E8.h (track 4, round 89).
  *
  * Every function in the unit is matched C; the last three stalls
  * (Class866E8__ResetAllElements, Class866E8__SetFootprintRect and
@@ -30,7 +29,7 @@
  * same case as Class6B5CC__func_1d33c in code_d294_b.
  */
 #include "common.h"
-#include "class_3ac78.h"
+#include "Class866E8.h"
 #include "VabStreamObj.h"
 #include "LightRig.h"
 #include "Class86668.h"
@@ -38,6 +37,9 @@
 #include "Class6D940.h"
 #include "Class81940.h"
 #include "Class86AA0.h"
+#include "FlatLightObj.h"
+
+extern void *BMemPMgrAlloc(s32 size);
 
 /* Class86668::sound is BasicClass * (it may be the ctor's own argument); when
  * it is a New_VabStreamObj object, +0x080 is VabStreamObj__PlayTone. */
@@ -56,13 +58,13 @@ Class86668Methods *GetClass86668Methods(void)
     return &gClass86668Methods;
 }
 
-Class866E8 *New_Class866E8(s32 arg1, s32 arg2)
+Class866E8 *New_Class866E8(Unk54Struct *origin, s32 autoLoad)
 {
     Class866E8 *self;
 
     self = BMemPMgrAlloc(0x1E8);
     if (self != NULL) {
-        GetClass866E8Methods()->ctor(self, arg1, arg2);
+        GetClass866E8Methods()->ctor(self, origin, autoLoad);
         return self;
     }
     return NULL;
@@ -73,14 +75,14 @@ Class866E8 *New_Class866E8(s32 arg1, s32 arg2)
  * purely from this call site's own register usage.
  */
 extern void BMemPMgrFree(void *arg1);
-extern Vec3_3ac78 gDefaultOrigin;
+extern Unk54Struct gDefaultOrigin;
 
-void Class866E8__Class866E8(Class866E8 *self, Vec3_3ac78 *arg1, s32 arg2)
+void Class866E8__Class866E8(Class866E8 *self, Unk54Struct *origin, s32 autoLoad)
 {
     s32 i;
-    UnkSlotEntry_3ac78 *entry;
+    Class866E8Elem *entry;
     Class86AA0 *obj;
-    Class866E8 **cellp;
+    Class86AA0 **cellp;
     u8 *p;
     u8 *end;
     s32 buf[3];
@@ -88,8 +90,8 @@ void Class866E8__Class866E8(Class866E8 *self, Vec3_3ac78 *arg1, s32 arg2)
     GetLightRigMethods()->ctor((LightRig *)self);
     self->methods = GetClass866E8Methods();
 
-    if (arg1 != NULL) {
-        self->origin = *arg1;
+    if (origin != NULL) {
+        self->origin = *origin;
     } else {
         self->origin = gDefaultOrigin;
     }
@@ -98,28 +100,28 @@ void Class866E8__Class866E8(Class866E8 *self, Vec3_3ac78 *arg1, s32 arg2)
     self->unk1B4 = 0;
     self->unk1B8 = 0;
     self->enabled = 0;
-    self->unk6C = 0;
+    self->target = NULL;
     self->acceptedTags = 0;
-    self->unk1E0 = 0;
+    self->rateCountdown = 0;
 
     for (i = 0; i < 7; i++) {
         entry = &self->elems[i];
 
-        entry->target = New_Class81940();
-        entry->target->freeGuard = (entry->target->buffer != NULL);
-        entry->target->ownerKey = i;
-        entry->target->methods->setAutoLoadData(entry->target, arg2);
+        entry->loader = New_Class81940();
+        entry->loader->freeGuard = (entry->loader->buffer != NULL);
+        entry->loader->ownerKey = i;
+        entry->loader->methods->setAutoLoadData(entry->loader, autoLoad);
 
         entry->heldObj = NULL;
         entry->unk18 = 0;
         entry->key = i;
         entry->flag = 0;
 
-        entry->list = New_Class6D940(0);
+        entry->placements = New_Class6D940(0);
         entry->cellParent = New_Class86AA0();
         entry->cellParent->methods->attachToParent(entry->cellParent, (Class6B5CC *)self, (Vec3_d294 *)&self->origin);
 
-        entry->cells = (Class866E8 **)BMemPMgrAlloc(0x668);
+        entry->cells = (Class86AA0 **)BMemPMgrAlloc(0x668);
         if (entry->cells == NULL) {
             return;
         }
@@ -150,34 +152,34 @@ void Class866E8__Class866E8(Class866E8 *self, Vec3_3ac78 *arg1, s32 arg2)
         }
     }
 
-    self->methods->addChild(self, (s32)GetDrawSystem());
+    self->methods->addChild(self, (BasicClass *)GetDrawSystem());
     self->methods->reset(self);
 }
 
 void Class866E8__Finalize(Class866E8 *self)
 {
     s32 i;
-    UnkSlotEntry_3ac78 *entry;
-    GenericObject *obj;
-    Class866E8 **cellp;
+    Class866E8Elem *entry;
+    Class86AA0 *obj;
+    Class86AA0 **cellp;
     u8 *p;
     u8 *end;
 
-    self->methods->removeChild(self, (void *)GetDrawSystem());
+    self->methods->removeChild(self, (BasicClass *)GetDrawSystem());
 
     for (i = 0; i < 7; i++) {
         entry = &self->elems[i];
-        self->methods->onElementEvent(self, 6, entry, i);
+        ((Class866E8OnElementEventFn)self->methods->notifyIfUnk20Active)(self, 6, entry, i);
 
-        if (entry->target != NULL) {
-            entry->target->methods->release(entry->target);
+        if (entry->loader != NULL) {
+            entry->loader->methods->release(entry->loader);
         }
 
-        if (entry->list != NULL) {
-            if (entry->list->linkResource != NULL) {
-                entry->list->linkResource->methods->release(entry->list->linkResource);
+        if (entry->placements != NULL) {
+            if (entry->placements->linkResource != NULL) {
+                entry->placements->linkResource->methods->release(entry->placements->linkResource);
             }
-            entry->list = entry->list->methods->release(entry->list);
+            entry->placements = entry->placements->methods->release(entry->placements);
         }
 
         if (entry->cellParent != NULL) {
@@ -188,7 +190,7 @@ void Class866E8__Finalize(Class866E8 *self)
         end = (u8 *)cellp + 0x668;
         p = (u8 *)cellp;
         while (p < end) {
-            obj = *(GenericObject **)p;
+            obj = *(Class86AA0 **)p;
             if (obj != NULL) {
                 obj->methods->release(obj);
             }
@@ -205,12 +207,12 @@ void Class866E8__Finalize(Class866E8 *self)
  * arguments these calls used to pass the no-argument getter as zero-cost (the
  * jal's delay slot holds a callee-save spill); track 4 dropped them. */
 
-void Class866E8__OnNotify(Class866E8 *self, GenericObject *sender, s32 command)
+void Class866E8__OnNotify(Class866E8 *self, BasicClass *sender, s32 command)
 {
     GetClass6B5CCMethods()->onNotify((Class6B5CC *)self, sender, command);
 
     if ((sender->methods->header & 0xF) == 1) {
-        self->methods->slot100(self, sender, command);
+        self->methods->onNotifyTag1(self, sender, command);
     }
 }
 
@@ -228,7 +230,7 @@ void Class866E8__Reset(Class866E8 *self)
     self->unk1D8 = -1;
 }
 
-void Class866E8__OnElementEvent(Class866E8 *self, s32 command, UnkSlotEntry_3ac78 *elem)
+void Class866E8__OnElementEvent(Class866E8 *self, s32 command, Class866E8Elem *elem)
 {
     GetClass6B5CCMethods()->notifyIfUnk20Active((Class6B5CC *)self, command);
 
@@ -251,12 +253,12 @@ merge:
 void Class866E8__UpdateIfEnabled(Class866E8 *self)
 {
     if (self->enabled) {
-        self->methods->slotF4(self);
-        self->methods->slot13C(self);
+        self->methods->updateFootprintTracking(self);
+        self->methods->advanceRateCountdown(self);
     }
 }
 
-void Class866E8__OnCommand(Class866E8 *self, GenericObject *sender, s32 command)
+void Class866E8__DispatchLinkCommand(Class866E8 *self, BasicClass *sender, s32 command)
 {
     if ((u8)sender->methods->header == 0x34) {
         self->methods->forwardAcceptedCommand(self, sender, command);
@@ -270,48 +272,48 @@ void Class866E8__OnCommand(Class866E8 *self, GenericObject *sender, s32 command)
 void Class866E8__ResetAllElements(Class866E8 *self)
 {
     s32 i;
-    UnkSlotEntry_3ac78 *entry;
+    Class866E8Elem *entry;
     Class6D940 *list;
 
     for (i = 0; i < 7; i++) {
         entry = &self->elems[i];
-        entry->target->methods->cancelRequests(entry->target);
+        entry->loader->methods->cancelRequests(entry->loader);
         entry->flag = 0;
-        self->methods->slot108(self, entry);
-        list = entry->list;
+        self->methods->resetElementCells(self, entry);
+        list = entry->placements;
         if (list->linkResource != NULL) {
             list->linkResource = list->linkResource->methods->release(list->linkResource);
         }
-        self->methods->onElementEvent(self, 6, entry, i);
-        entry->target->methods->releaseDataBlock(entry->target);
+        ((Class866E8OnElementEventFn)self->methods->notifyIfUnk20Active)(self, 6, entry, i);
+        entry->loader->methods->releaseDataBlock(entry->loader);
     }
 
     self->unk1B8 = 0;
     self->unk1B4 = 0;
-    self->methods->slot140(self);
+    self->methods->flushRateLatch(self);
 }
 
-void Class866E8__SetChildParams(Class866E8 *self, s32 count, s32 arg2, s32 arg3)
+void Class866E8__SetChildParams(Class866E8 *self, s32 count, s32 dirs, s32 colors)
 {
     s32 i;
-    UnkChildObj_3ac78 *child;
+    FlatLightObj *light;
 
     for (i = 0; i < count; i++) {
-        child = self->methods->getChild(self, i);
-        child->methods->slot44(child, 1, arg3);
-        arg3 += 3;
-        child->methods->slot48(child, 1, arg2);
-        arg2 += 6;
+        light = (FlatLightObj *)self->methods->getLight(self, i);
+        light->methods->setColor(light, 1, (FlatLightColor *)colors);
+        colors += 3;
+        light->methods->setDirection(light, 1, (s16 *)dirs);
+        dirs += 6;
     }
 }
 
-void Class866E8__SetCallback(Class866E8 *self, s32 fn, s32 ctx)
+void Class866E8__SetCallback(Class866E8 *self, Class866E8ValueFn fn, void *ctx)
 {
     self->valueFn = fn;
     self->valueFnCtx = ctx;
 }
 
-void Class866E8__SetAcceptedTags(Class866E8 *self, s32 tags)
+void Class866E8__SetAcceptedTags(Class866E8 *self, s32 *tags)
 {
     self->acceptedTags = tags;
 }
@@ -333,38 +335,35 @@ void Class866E8__ForwardAcceptedCommand(Class866E8 *self, void *sender, s32 comm
         return;
     }
 
-    p = (s32 *)self->acceptedTags;
+    p = self->acceptedTags;
     if (p == NULL)
         return;
     if (*p == 0)
         return;
 
     do {
-        if (*p == ((GenericObject *)sender)->methods->header) {
+        if (*p == ((BasicClass *)sender)->methods->header) {
             self->methods->applyToSenderFootprint(self, sender, command);
         }
         p++;
     } while (*p != 0);
 }
 
-extern void Class866E8__SetFootprintFromCell(Class866E8 *self, UnkArgObj_3ac78 *desc, s32 span);
-extern void Class866E8__SetFootprintRect(Class866E8 *self, UnkArgObj_3ac78 *desc, s32 span);
-extern void Class866E8__DispatchToRectCells(Class866E8 *self, UnkListObj_3ac78 *sender, s32 command);
 
-void Class866E8__ApplyToSenderFootprint(Class866E8 *self, UnkListObj_3ac78 *sender, s32 command)
+void Class866E8__ApplyToSenderFootprint(Class866E8 *self, Class6B5CC *sender, s32 command)
 {
-    s32 gateArg;
-    GridRectList_3ac78 saved;
-    UnkArgObj_3ac78 buf;
+    QueryPos866E8 *pos;
+    GridSlotList866E8 saved;
+    Descriptor10Ext buf;
     s32 savedRectCount;
 
-    if (sender->unk0C != 0) {
-        gateArg = (s32)((u8 *)sender->unk14 + 0x38);
+    if (sender->parent != NULL) {
+        pos = (QueryPos866E8 *)sender->coord2->unk38;
     } else {
-        gateArg = 0;
+        pos = NULL;
     }
 
-    if (self->methods->slot110(self, &buf, gateArg) != 0) {
+    if (self->methods->computeFootprintDescriptor(self, &buf, pos) != 0) {
         return;
     }
 
@@ -383,16 +382,14 @@ void Class866E8__ApplyToSenderFootprint(Class866E8 *self, UnkListObj_3ac78 *send
     self->rects = saved;
 }
 
-extern void Class866E8__BuildFootprintSlots(Class866E8 *self);
-
-void Class866E8__SetFootprintFromCell(Class866E8 *self, UnkArgObj_3ac78 *desc, s32 span)
+void Class866E8__SetFootprintFromCell(Class866E8 *self, Descriptor10Ext *desc, s32 span)
 {
     s16 t;
 
-    self->footprintCol = desc->unk2 - 1;
-    t = desc->unk3 - 1;
-    self->footprintW = span;
-    self->footprintH = span;
+    self->footprintCol = desc->base.b2 - 1;
+    t = desc->base.b3 - 1;
+    self->footprintWidth = span;
+    self->footprintHeight = span;
     self->footprintRow = t;
     Class866E8__BuildFootprintSlots(self);
 }
@@ -401,7 +398,7 @@ void Class866E8__SetFootprintFromCell(Class866E8 *self, UnkArgObj_3ac78 *desc, s
  * a cell on the low edge (0) loses one row/column, one on the high edge
  * (0x13) loses one too. The edge tests read a COPY of each byte taken before
  * the decrement, and the height companion is `span` itself. Matched round 71. */
-void Class866E8__SetFootprintRect(Class866E8 *self, UnkArgObj_3ac78 *desc, s32 span)
+void Class866E8__SetFootprintRect(Class866E8 *self, Descriptor10Ext *desc, s32 span)
 {
     s32 col;
     s32 row;
@@ -410,8 +407,8 @@ void Class866E8__SetFootprintRect(Class866E8 *self, UnkArgObj_3ac78 *desc, s32 s
     s32 origRow;
 
     width = span;
-    col = desc->unk2;
-    row = desc->unk3;
+    col = desc->base.b2;
+    row = desc->base.b3;
     origCol = col;
     origRow = row;
 
@@ -434,39 +431,37 @@ void Class866E8__SetFootprintRect(Class866E8 *self, UnkArgObj_3ac78 *desc, s32 s
     }
 
     self->rectCount = 1;
-    self->rects.e[0].elemIdx = self->methods->slot124(self, desc->unk28);
+    self->rects.e[0].elemIdx = self->methods->findElemIndexByUnk30(self, desc->unk28);
     self->rects.e[0].col = col;
     self->rects.e[0].row = row;
     self->rects.e[0].width = width;
     self->rects.e[0].height = span;
 }
 
-extern void NotifyGridCell(Class866E8 *cell, UnkListObj_3ac78 *sender, s32 command);
-
 /* Notify every cell of every rectangle, and every object chained behind
  * each cell. Matched round 71: the ORDER of the comma-separated increments
  * is load-bearing in both loops (`entry++, i++` and `cell++, col++`); the
  * reverse order was the whole 95/117 residue. */
-void Class866E8__DispatchToRectCells(Class866E8 *self, UnkListObj_3ac78 *sender, s32 command)
+void Class866E8__DispatchToRectCells(Class866E8 *self, Class6B5CC *sender, s32 command)
 {
     s32 i;
     s32 row;
     s32 col;
-    GridRect_3ac78 *entry;
-    UnkSlotEntry_3ac78 *slot;
-    Class866E8 **cell;
-    Class866E8 *obj;
+    GridSlot866E8 *entry;
+    Class866E8Elem *slot;
+    Class86AA0 **cell;
+    Class86AA0 *obj;
 
     entry = self->rects.e;
     for (i = 0; i < self->rectCount; entry++, i++) {
         slot = &self->elems[entry->elemIdx];
-        if (slot->target->headerReady != 0) {
+        if (slot->loader->headerReady != 0) {
             cell = (slot->cells + entry->col) + entry->row * 20;
             for (row = 0; row < entry->height; row++) {
                 for (col = 0; col < entry->width; cell++, col++) {
-                    self->curCellTag = self->cellTag;
-                    self->curCellCol = entry->col + col;
-                    self->curCellRow = entry->row + row;
+                    *(u16 *)&self->curCell = *(u16 *)&self->targetCell;
+                    self->curCell.b2 = entry->col + col;
+                    self->curCell.b3 = entry->row + row;
                     NotifyGridCell(*cell, sender, command);
                     for (obj = (*cell)->nextInCell; obj != NULL; obj = obj->nextInCell) {
                         NotifyGridCell(obj, sender, command);
@@ -488,16 +483,16 @@ void Class866E8__DispatchToRectCells(Class866E8 *self, UnkListObj_3ac78 *sender,
  * reserve stack space for unused trailing integer/pointer args on this
  * target, so the definition's own bytes are unaffected (reverified
  * 18/18 after the widening). */
-void NotifyGridCell(Class866E8 *cell, UnkListObj_3ac78 *sender, s32 command)
+void NotifyGridCell(Class86AA0 *cell, Class6B5CC *sender, s32 command)
 {
     if (cell != NULL && (cell->flags36 & 0x80)) {
-        cell->methods->onNotify(cell);
+        cell->methods->onNotify(cell, sender, command);
     }
 }
 
-void *Class866E8__GetCurrentCellKey(Class866E8 *self)
+Descriptor10 *Class866E8__GetCurrentCellKey(Class866E8 *self)
 {
-    return &self->curCellTag;
+    return &self->curCell;
 }
 
 void func_8004B324(void) {
@@ -510,7 +505,7 @@ void Class866E8__SetGridSpan(Class866E8 *self, s32 span)
     self->gridHalfCells = (s16)(span >> 12);
 }
 
-void Class866E8__SetConfig(Class866E8 *self, UnkPtr68Obj_3ac78 *config)
+void Class866E8__SetConfig(Class866E8 *self, Unk68Struct *config)
 {
     self->methods->reset(self);
     self->config = config;

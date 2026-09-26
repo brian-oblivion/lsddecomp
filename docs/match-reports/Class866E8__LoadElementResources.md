@@ -826,7 +826,7 @@ Round 78 (track 3, naming pass, bravo).
 
 | symbol | name | tier | evidence |
 | --- | --- | --- | --- |
-| `func_8004BE54` | `Class866E8__LoadElementResources` | B | Occupant of `D_800866E8` +0x104 (`slot104`), and its own identity slot -- `Class866E8__OnNotifyTag1` dispatches `self->methods->slot104(self, e)` which resolves to this same function. Body: releases the element's old link resource, issues a new `New_LinkResource` resource-load request, then loops `target->methods->slot78` building `GsLinkObject4`-linked GPU records into the element's cell array (`entry->unk10`). Matches `src/class_3ac78.c`'s own unit-header narrative almost verbatim: "The queries that build those rectangles, and an element's resource AND GPU sides, live in class_3bb8c*" -- this function IS that resource-and-GPU side. |
+| `func_8004BE54` | `Class866E8__LoadElementResources` | B | Occupant of `gClass866E8Methods` +0x104 (`slot104`), and its own identity slot -- `Class866E8__OnNotifyTag1` dispatches `self->methods->slot104(self, e)` which resolves to this same function. Body: releases the element's old link resource, issues a new `New_LinkResource` resource-load request, then loops `target->methods->slot78` building `GsLinkObject4`-linked GPU records into the element's cell array (`entry->unk10`). Matches `src/class_3ac78.c`'s own unit-header narrative almost verbatim: "The queries that build those rectangles, and an element's resource AND GPU sides, live in class_3bb8c*" -- this function IS that resource-and-GPU side. |
 
 ## Track 4 (2026-09-26, round 87, echo)
 

@@ -29,6 +29,9 @@
 #include "common.h"
 #include "Actor.h"
 #include "DreamSys.h"
+#include "Class866E8.h"
+#include "Class81940.h"
+#include "Class86AA0.h"
 #include "Class879C4.h"
 
 /* Two-element s16 array -- Actor__MoveLocalX and Actor__MoveLocalY each write one
@@ -108,47 +111,17 @@ typedef struct GridQuery {
     s32 numRows;
 } GridQuery;
 
-/* A grid-bucket linked-list node: singly-linked chain at +0x38, the same
- * "self-typed next pointer" idiom already established for `EntryChildObj`
- * in include/class_3bb8c.h (an UNRELATED class, per this round's own
- * research -- convergent shape, not a shared type). Walked by
- * Actor__ScanGridWindow; matched against with AcceptGridElem (already matched,
- * this unit, below). */
-typedef struct GridElem {
-    u8 pad00[0x38];
-    struct GridElem *next;
-} GridElem;
 
-/* self->grid's pointee (DreamSys.h's DreamSysUnk4CObj view of the grid
- * manager) dereferences to one of these via its own
- * `+0x4` field (a s16 flag at +0x2C, read by Actor__ScanLinkCandidates, and a second
- * s16 at +0x32, read by Actor__BuildLinkQueries) and, when treated as
- * Actor__ScanGridWindow's 5th argument, a grid-array base pointer at `+0x10`.
- * Multiple independent call sites agree on this shape; kept opaque
- * beyond the fields actually read. */
-typedef struct GridArrElemInner {
-    u8 pad00[0x2C];
-    /* Gates whether Actor__ScanLinkCandidates processes this array
-     * entry at all (`if (elem->info->enabled != 0)`) -- confirmed
-     * directly from that function's own body. */
-    s16 enabled;
-    u8 pad2E[0x32 - 0x2E];
-    s16 unk32;
-} GridArrElemInner;
-typedef struct GridArrElem {
-    u8 pad00[0x4];
-    /* Per-entry descriptor -- only its `enabled` flag is read by this
-     * unit's matched code. */
-    GridArrElemInner *info;
-    u8 pad08[0x10 - 0x8];
-    /* The grid-array base pointer Actor__ScanGridWindow indexes as
-     * `(GridElem **)` (confirmed directly from that function's own
-     * body). */
-    GridElem **buckets;
-} GridArrElem;
+/* The grid (self->grid) is a Class866E8 (include/Class866E8.h). Its
+ * elements (Class866E8Elem) are what Actor__BuildLinkQueries collects: the
+ * loader's headerReady gates Actor__ScanLinkCandidates, its ownerKey is the
+ * element key BuildLinkQueries steps by one, and `cells` is the 20-wide grid
+ * of Class86AA0 cells (each with its `nextInCell` chain) Actor__ScanGridWindow
+ * walks. */
 
-/* Output buffer filled in by DreamSysUnk4CMethods::queryLinkAtPos (see
- * include/DreamSys.h) and read back by this unit's own Actor__BuildLinkQueries.
+/* Output buffer filled in by the grid's computeFootprintDescriptor (a
+ * Descriptor10Ext, include/Class866E8.h: queryCol/queryRow are base.b2/b3,
+ * source is unk24; this view is 0x30 bytes, and the frame needs it) and read back by this unit's own Actor__BuildLinkQueries.
  * Only the three fields actually touched are named. `queryCol`/`queryRow`
  * feed straight into GridQuery::startCol/startRow (Actor__BuildLinkQueries,
  * matched round 75; round 57 naming pass). */
@@ -157,13 +130,13 @@ typedef struct LinkQueryBuf {
     s8 queryCol;
     s8 queryRow;
     u8 pad04[0x24 - 0x4];
-    GridArrElem *source;
+    Class866E8Elem *source;
     u8 pad28[0x30 - 0x28];
 } LinkQueryBuf;
 
 void *AcceptGridElem(void *arg0, void *arg1, void *arg2);
-s32 Actor__BuildLinkQueries(Actor *self, GridQuery *arr1, GridArrElem **arr2, LinkQueryBuf *arg3, s32 arg4);
-void *Actor__ScanLinkCandidates(Actor *self, void *arg1, void *arg2, s32 count, GridQuery *arr1, GridArrElem **arr2);
+s32 Actor__BuildLinkQueries(Actor *self, GridQuery *arr1, Class866E8Elem **arr2, LinkQueryBuf *arg3, s32 arg4);
+void *Actor__ScanLinkCandidates(Actor *self, void *arg1, void *arg2, s32 count, GridQuery *arr1, Class866E8Elem **arr2);
 
 s32 Actor__FindNearbyLink(Actor *self) {
     LinkQueryBuf sp18;
@@ -172,13 +145,13 @@ s32 Actor__FindNearbyLink(Actor *self) {
      * retail's exact stack layout for sp78/sp88 below (round 2026-09-04,
      * see this function's match report). */
     u8 pad48Tail[8];
-    GridArrElem *sp78[3];
+    Class866E8Elem *sp78[3];
     Vec3_d294 sp88;
 
     if (self->grid != NULL) {
         void *pos = &self->coord2->tx;
 
-        if (((DreamSysUnk4CObj *)self->grid)->methods->queryLinkAtPos((DreamSysUnk4CObj *)self->grid, &sp18, pos) == 0) {
+        if (self->grid->methods->computeFootprintDescriptor(self->grid, (Descriptor10Ext *)&sp18, pos) == 0) {
             s32 count = Actor__BuildLinkQueries(self, sp48, sp78, &sp18, 1);
             void *result = Actor__ScanLinkCandidates(self, &sp88, pos, count, sp48, sp78);
 
@@ -195,7 +168,7 @@ s32 Actor__FindNearbyLink(Actor *self) {
     return 0;
 }
 
-s32 Actor__BuildLinkQueries(Actor *self, GridQuery *arr1, GridArrElem **arr2, LinkQueryBuf *arg3, s32 arg4) {
+s32 Actor__BuildLinkQueries(Actor *self, GridQuery *arr1, Class866E8Elem **arr2, LinkQueryBuf *arg3, s32 arg4) {
     s32 f2 = arg3->queryCol;
     s32 f3 = arg3->queryRow;
     s32 numCols;
@@ -210,9 +183,9 @@ s32 Actor__BuildLinkQueries(Actor *self, GridQuery *arr1, GridArrElem **arr2, Li
     row = f3;
     idx = 1;
     if (arg4 == 1) {
-        DreamSysUnk4CObj *unk4C;
-        DreamSysUnk4C68Obj *unk68;
-        GridArrElem *src;
+        Class866E8 *unk4C;
+        Unk68Struct *unk68;
+        Class866E8Elem *src;
         s16 s3;
         s32 pos;
 
@@ -222,21 +195,21 @@ s32 Actor__BuildLinkQueries(Actor *self, GridQuery *arr1, GridArrElem **arr2, Li
         arr1[0].numRows = numRows;
         src = arg3->source;
         arr2[0] = src;
-        unk4C = (DreamSysUnk4CObj *)self->grid;
-        unk68 = unk4C->unk_0x68;
-        if (unk68->unk_0x4 != idx) {
+        unk4C = self->grid;
+        unk68 = unk4C->config;
+        if (unk68->unk4 != idx) {
             return 1;
         }
-        s3 = src->info->unk32;
+        s3 = src->loader->ownerKey;
         pos = s3 + 1;
-        if (pos < unk68->unk_0x2) {
-            arr2[1] = unk4C->methods->getGridArrElemAt(unk4C, pos);
+        if (pos < unk68->count) {
+            arr2[1] = unk4C->methods->findElemByUnk32(unk4C, pos);
             idx = 2;
             arr1[1] = arr1[0];
         }
         pos = s3 - 1;
         if (pos >= 0) {
-            arr2[idx] = unk4C->methods->getGridArrElemAt(unk4C, pos);
+            arr2[idx] = unk4C->methods->findElemByUnk32(unk4C, pos);
             arr1[idx] = arr1[0];
             idx++;
         }
@@ -267,21 +240,21 @@ s32 Actor__BuildLinkQueries(Actor *self, GridQuery *arr1, GridArrElem **arr2, Li
     return 1;
 }
 
-void *Actor__ScanGridWindow(Actor *self, void *arg1, void *arg2, GridQuery *query, GridArrElem *source);
+void *Actor__ScanGridWindow(Actor *self, void *arg1, void *arg2, GridQuery *query, Class866E8Elem *source);
 
 /* Walks `count` entries of `arr1` (a `GridQuery[]`, stride 0xC) paired
- * element-for-element with `arr2` (a `GridArrElem *[]`, stride 4),
- * skipping any entry whose `GridArrElem` doesn't have its `enabled` flag
+ * element-for-element with `arr2` (a `Class866E8Elem *[]`, stride 4),
+ * skipping any entry whose element's loader does not have `headerReady`
  * set, and calling `Actor__ScanGridWindow` on the rest; returns the first
  * non-NULL result, or NULL if every entry was skipped or came back empty
  * (round 2026-09-04). */
-void *Actor__ScanLinkCandidates(Actor *self, void *arg1, void *arg2, s32 count, GridQuery *arr1, GridArrElem **arr2) {
+void *Actor__ScanLinkCandidates(Actor *self, void *arg1, void *arg2, s32 count, GridQuery *arr1, Class866E8Elem **arr2) {
     s32 i;
 
     for (i = 0; i < count;) {
-        GridArrElem *elem = *arr2;
+        Class866E8Elem *elem = *arr2;
         i++;
-        if (elem->info->enabled != 0) {
+        if (elem->loader->headerReady != 0) {
             void *result = Actor__ScanGridWindow(self, arg1, arg2, arr1, elem);
             if (result != NULL) {
                 return result;
@@ -293,36 +266,36 @@ void *Actor__ScanLinkCandidates(Actor *self, void *arg1, void *arg2, s32 count, 
     return NULL;
 }
 
-/* Scans a rectangular window of a grid of `GridElem` bucket lists, rooted
- * at `source->buckets`, `query->numRows` rows by `query->numCols` columns,
+/* Scans a rectangular window of a grid of Class86AA0 cell chains, rooted
+ * at `source->cells`, `query->numRows` rows by `query->numCols` columns,
  * starting at row `query->startRow`, column `query->startCol` (each row is
  * 0x50 bytes = 20 bucket-head pointers; each column step is one bucket-head
  * pointer, 4 bytes). For each bucket, tries `AcceptGridElem` against the
- * head first, then each linked element in turn (`->next`), returning the
+ * head first, then each linked element in turn (`->nextInCell`), returning the
  * first one `AcceptGridElem` accepts (non-NULL); NULL if the whole window
  * comes up empty. `self` (this function's own first argument) is read
  * from `a0` in the disassembly but never touched by the body -- present
  * only to match its caller's calling convention (round 2026-09-04). */
-void *Actor__ScanGridWindow(Actor *self, void *arg1, void *arg2, GridQuery *query, GridArrElem *source) {
+void *Actor__ScanGridWindow(Actor *self, void *arg1, void *arg2, GridQuery *query, Class866E8Elem *source) {
     s32 row, col;
-    GridElem **bucket;
+    Class86AA0 **bucket;
 
-    bucket = (GridElem **) ((u8 *) source->buckets + query->startRow * 0x50 + query->startCol * 4);
+    bucket = (Class86AA0 **) ((u8 *) source->cells + query->startRow * 0x50 + query->startCol * 4);
     for (row = 0; row < query->numRows; row++) {
         for (col = 0; col < query->numCols; col++) {
-            GridElem *node;
+            Class86AA0 *node;
 
             if (AcceptGridElem(*bucket, arg1, arg2) != NULL) {
                 return *bucket;
             }
-            for (node = (*bucket)->next; node != NULL; node = node->next) {
+            for (node = (*bucket)->nextInCell; node != NULL; node = node->nextInCell) {
                 if (AcceptGridElem(node, arg1, arg2) != NULL) {
                     return node;
                 }
             }
             bucket++;
         }
-        bucket = (GridElem **) ((u8 *) bucket - (query->numCols * 4 + 0x50));
+        bucket = (Class86AA0 **) ((u8 *) bucket - (query->numCols * 4 + 0x50));
     }
     return NULL;
 }

@@ -46,6 +46,8 @@
  * reads back, so there is nothing to name them after. */
 #include "common.h"
 #include "DreamSys.h"
+#include "Class866E8.h"
+#include "Class81940.h"
 #include "VabStreamObj.h"
 #include "Viewport.h"
 
@@ -119,11 +121,11 @@ void DreamSys__ResetSessionState(DreamSys *this)
 	this->unk_0x924 = 0;
 }
 
-void DreamSys__SpawnAtLink(DreamSys *this, DreamSysSpawnArgObj *arg1)
+void DreamSys__SpawnAtLink(DreamSys *this, Class866E8 *arg1)
 {
 	s32 local[4];
 
-	arg1->methods->slot0xE4(arg1, local, this, &this->linkCoordinates);
+	arg1->methods->setTargetAndBuildRates(arg1, local, (Class6B5CC *)this, (Descriptor10 *)&this->linkCoordinates);
 	GetActorMethods()->attachToParent((Actor *)this, (Class6B5CC *)arg1, (Vec3_d294 *)local);
 	this->methods->addChild(this, (BasicClass *)arg1);
 	if (this->state == 0xE) {
@@ -139,7 +141,7 @@ void DreamSys__SpawnAtLink(DreamSys *this, DreamSysSpawnArgObj *arg1)
 
 void DreamSys__DetachFromParent(DreamSys *this)
 {
-	((DreamSysUnk4CObj *)this->grid)->methods->slot0xF0((DreamSysUnk4CObj *)this->grid);
+	this->grid->methods->disable(this->grid);
 	this->methods->removeChild(this, (BasicClass *)this->grid);
 	GetActorMethods()->detachFromParent((Actor *)this);
 }
@@ -167,11 +169,11 @@ void DreamSys__NotifyLinkAttempt(DreamSys *this, s32 arg1)
 	goto shared_tail;
 
 handle_neg2:
-	if (((DreamSysUnk4CObj *)this->grid)->methods->slot0x11C((DreamSysUnk4CObj *)this->grid, &this->coord2->tx)->unk_0x4->unk_0x2C != 2)
+	if (this->grid->methods->findElementForPosition(this->grid, (Unk54Struct *)&this->coord2->tx)->loader->headerReady != 2)
 		goto neg2_mismatch;
 
 shared_tail:
-	this->methods->tryStageTimerLink(this, ((DreamSysUnk4CObj *)this->grid)->methods->slot0x10C((DreamSysUnk4CObj *)this->grid, 0, 0));
+	this->methods->tryStageTimerLink(this, (PlayerSpawnPoint *)this->grid->methods->getTargetDescriptor(this->grid, 0, 0));
 	return;
 
 neg2_mismatch:
@@ -286,7 +288,7 @@ void DreamSys__WallLink(DreamSys *this, void* unk_class_86aa0, int arg2)
 		return;
 	if (this->state != 0)
 		return;
-	this->linkCoordinates = *((DreamSysUnk4CObj *)this->grid)->methods->slot0xD4((DreamSysUnk4CObj *)this->grid, unk_class_86aa0);
+	this->linkCoordinates = *(PlayerSpawnPoint *)this->grid->methods->getCurrentCellKey(this->grid, unk_class_86aa0);
 	if (!this->methods->staticWallLink(this, &this->linkCoordinates) && this->tickBoundary != 0) {
 		this->methods->dynamicLink(this);
 	}
@@ -775,7 +777,7 @@ s32 DreamSys__ApplyMoveCommand(DreamSys *this, s32 arg1)
 	if (arg1 != 0) {
 		delta = MOVE_COMMAND_SIGNS[arg1] * MOVE_MODE_SPEEDS[this->moveMode];
 		this->methods->slot12C(this);
-		pos = ((DreamSysUnk4CObj *)this->grid)->methods->slot0x10C((DreamSysUnk4CObj *)this->grid, 0, 0);
+		pos = (PlayerSpawnPoint *)this->grid->methods->getTargetDescriptor(this->grid, 0, 0);
 		if (!this->methods->tryStaircaseLink(this, pos)
 		 && !this->methods->tryInstantTeleportLink(this, pos)
 		 && !this->methods->tryTunnelLink(this, pos)) {
@@ -1100,7 +1102,7 @@ bool DreamSys__TryInstantTeleportLink(DreamSys *this, PlayerSpawnPoint *currentP
 		saved = func_8005BFC4();
 		if (ExecuteLink(this, result, 0x11, 0)) {
 			this->state = 0;
-			((DreamSysUnk4CObj *)this->grid)->methods->slot0xE8((DreamSysUnk4CObj *)this->grid, local, &this->linkCoordinates);
+			this->grid->methods->computeCellOffsets(this->grid, local, &this->linkCoordinates);
 			this->methods->setTranslation(this, (Vec3_d294 *)local);
 			if (saved != 0 && !this->isFlashbackSession)
 				this->methods->getSetDreamTimeLimit(this, this->methods->getDreamTimerScaled(this) + saved);
@@ -1550,7 +1552,7 @@ void DreamSys__FlashbackSaving(DreamSys *this, s32 arg1, s32 arg2)
 	s32 local[4];
 
 	if (this->grid != NULL && rand() % 3 == 0) {
-		pos = ((DreamSysUnk4CObj *)this->grid)->methods->slot0x10C((DreamSysUnk4CObj *)this->grid, 0, 0);
+		pos = (PlayerSpawnPoint *)this->grid->methods->getTargetDescriptor(this->grid, 0, 0);
 		Class6B5CC__GetRotationDegrees((Class6B5CC *)this, (WholeFrac_d294 *)local);
 		this->methods->addFlashback(this, this->currentStage, pos, local, arg1, arg2, this->currentDay);
 	}

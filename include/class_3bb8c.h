@@ -4,572 +4,75 @@
 #include "common.h"
 #include "BasicClass.h"
 #include "TaskCore.h"
+#include "Class866E8.h"
 
 /*
- * The class whose method table is D_800866E8 (80 slots, resolved with
- * tools/classtable.py 0x800866E8). No FirecatFG name survives, so fields
- * are named by offset until real names are known. This unit (class_3bb8c)
- * is the FIRST to write any of this class's own methods -- a different
- * unit, class_3ac78, already has its own independent local view of the
- * SAME table (`Class866E8`/`Class866E8Methods` in include/class_3ac78.h,
- * established from ITS OWN call sites: ctor +0x008, slot38, slot40
- * (gp_rel-blocked), slot80, slotD0). Per this project's established
- * multiple-independent-local-views convention (see e.g. StreamTaskObj vs.
- * LoaderTaskMethods in code_2c054.h/Class6D3C8.h), this header does NOT
- * edit or extend that one -- it is this unit's own view, named distinctly
- * (`Obj866E8`) to avoid implying a shared type across translation units
- * that never include each other's headers.
- *
- * Only the slots/fields this unit's functions actually touch are given
- * concrete types; the rest stay opaque padding.
+ * class_3bb8c.c and class_3bb8c_b.c hold the back half of Class866E8 (the
+ * grid manager, gClass866E8Methods), which is declared once, in
+ * include/Class866E8.h (track 4, round 89). What stays here is that class's
+ * data (the rate and footprint tables) and the helper views its two units
+ * read through casts.
  */
-typedef struct Obj866E8 Obj866E8;
-typedef struct EntryChildObj EntryChildObj;
-typedef struct Elem Elem;
-typedef struct UnkCObj UnkCObj;
 typedef struct Unk14Obj Unk14Obj;
-typedef struct Unk1BCObj Unk1BCObj;
-typedef struct Unk6CObj Unk6CObj;
-typedef struct Unk6C14Obj Unk6C14Obj;
-typedef struct Unk6C14SubObj Unk6C14SubObj;
 typedef struct QueryTemplate866E8 QueryTemplate866E8;
-typedef struct EntryGpu EntryGpu;
-
-/* self+0x54: an inline (not pointer) 3-word sub-struct, dereferenced by
- * ComputeCellWorldOffsets (arg3) and also matches Class866E8__FindElementForPosition's `arg1` descriptor
- * (unk0/unk4/unk8, all s32) -- reused for both since the shapes agree and
- * nothing distinguishes them. Field meaning unknown beyond "3 words,
- * read/written as a group". */
-typedef struct Unk54Struct {
-    s32 unk0;
-    s32 unk4;
-    s32 unk8;
-} Unk54Struct;
-
-/*
- * self->unk68's pointee. Established from THREE independent functions in
- * this unit, all agreeing on the same 8-byte, 4-byte-aligned layout:
- *  - Class866E8__ComputeDivisorSplit reads +0x000 (s16 divisor) as a `div`/`%` operand.
- *  - Class866E8__ComputeRateFlags reads +0x000 (same divisor) and +0x002 (s16 count,
- *    used as a loop trip count) and +0x004 (s32, gates the whole
- *    function between two totally different code paths).
- *  - ComputeCellWorldOffsets's own `arg2` parameter is fed this exact pointer at
- *    its one call site (Class866E8__ComputeCellOffsets) and reads all three fields
- *    (+0x000 s16, +0x002 s16, +0x004 s32) the same way.
- *  - Class866E8__FindElementForPosition reads +0x004 alone (a boolean-ish gate).
- */
-typedef struct Unk68Struct {
-    s16 divisor;   /* +0x000 */
-    s16 count;     /* +0x002 */
-    s32 unk4;      /* +0x004 */
-} Unk68Struct;
-
-/*
- * A 10-byte "descriptor" struct, passed by pointer. Established from TWO
- * independent functions:
- *  - ComputeCellWorldOffsets's `arg4` (5th/stack argument) reads it as four signed
- *    bytes (+0x0..+0x3) followed by three signed halfwords (+0x4, +0x6,
- *    +0x8).
- *  - Class866E8__SetTargetAndBuildRates block-copies a whole one of these (its own `arg3`)
- *    into `self->unkBC` in ONE retail load-all-then-store-all sequence:
- *    two unaligned lwl/lwr loads (8 bytes) followed by a plain unaligned
- *    swl/swr pair, then a final aligned `sh` for the trailing halfword.
- *    Reproducing the unaligned word copies (rather than per-field copies)
- *    needs this struct's natural alignment to be LESS than 4 -- true here
- *    only because every member is s8/s16 and none is s32, the same
- *    "no s32 member forces alignment 2" idiom already documented for
- *    `FlashbackRotation` in include/DreamSys.h. A struct with a stray s32
- *    member would compile to plain aligned `lw`/`sw` instead and would
- *    not match.
- */
-typedef struct Descriptor10 {
-    s8 b0;
-    s8 b1;
-    s8 b2;
-    s8 b3;
-    s16 h4;
-    s16 h6;
-    s16 h8;
-} Descriptor10;
-
-/*
- * EVIDENCE STATUS, round 10: every declaration in this region was derived
- * from functions that STALLED -- Class866E8__ComputeFootprintDescriptor (72/106), Class866E8__BuildRateEntries
- * (125/140), Class866E8__ApplyRateEntries (structurally 104/105). None of it is backed by a
- * byte-exact match. The offsets and access widths are OBSERVED from the
- * disassembly and are reliable; the TYPES and the names are inferred, and the
- * grouping into structs is a hypothesis.
- *
- * (These comments originally said "MATCHED" for Class866E8__ComputeFootprintDescriptor and
- * Class866E8__BuildRateEntries. That was wrong -- the runner matched nothing in this unit
- * this round -- and it mattered, because it presented inferred structure as
- * byte-verified and would have discouraged the next reader from questioning
- * it. Relabelled by the head at merge.)
- *
- * Output struct of Class866E8__ComputeFootprintDescriptor (Obj866E8Methods::slot110). A `Descriptor10`
- * embedded at +0x000 (natural alignment 2, so the next member falls at the
- * next 4-byte boundary, +0x00C -- matches exactly) followed by 8 more s32-
- * sized fields the function fills from a resolved Elem/Unk14Obj pair.
- * `base.b0`/`base.b1` are filled by the callee `Class866E8__ComputeDivisorSplit` (mod/div of
- * the raw rate); `base.b2`/`base.b3`/`h4`/`h6`/`h8` are computed in
- * Class866E8__ComputeFootprintDescriptor itself. Field meaning beyond that is unestablished -- named
- * by offset like the rest of this unit's opaque types.
- */
-typedef struct Descriptor10Ext {
-    Descriptor10 base;   /* +0x000 */
-    s32 unkC;            /* +0x00C */
-    s32 unk10;           /* +0x010 */
-    s32 unk14;           /* +0x014 */
-    s32 unk18;           /* +0x018 */
-    s32 unk1C;           /* +0x01C */
-    s32 unk20;           /* +0x020 */
-    Elem *unk24;         /* +0x024, Class866E8__ComputeFootprintDescriptor: the Elem it resolved via slot11C */
-    s32 unk28;           /* +0x028, Class866E8__ComputeFootprintDescriptor: the raw Class81940::ownerRate, sign-extended */
-} Descriptor10Ext;
-
-/*
- * "in" struct of Class866E8__ComputeFootprintDescriptor (Obj866E8Methods::slot110's 3rd param).
- * Three fields, each read BOTH as a full s32 (for a coarse cell-index
- * computation) and, separately and later, as just the low `u16` half (for a
- * fine sub-cell offset computation) -- the same memory, two widths, at
- * non-adjacent points in the function, which is why each is a union here
- * rather than a plain s32: writing it as a plain field and casting at the
- * use site would not force retail's observed re-load-at-the-narrower-width
- * behaviour. Provenance: Class866E8__GetTargetDescriptor (this unit) passes
- * `(u8 *)self->unk6C->unk14 + 0x18` as this pointer.
- */
-typedef struct QueryPos866E8 {
-    union { s32 w; u16 h; } unk0;   /* +0x000 */
-    union { s32 w; u16 h; } unk4;   /* +0x004 */
-    union { s32 w; u16 h; } unk8;   /* +0x008 */
-} QueryPos866E8;
-
-/*
- * Class866E8__ApplyRateEntries's 2nd parameter: a 0xC-byte-strided array, one entry per
- * loop iteration. Established from that function alone: `ptr0` is tested
- * for NULL to pick a branch and then, on the non-NULL branch, forwarded
- * VERBATIM (untouched) to the element's Class81940 +0x078 (loadHeader's name) -- consistent with a
- * pointer, though its pointee is never dereferenced in this unit; `rate`
- * is read as a plain halfword and copied into the resolved Elem's
- * `unk4->ownerRate` (an `s16` there); `id` is read as a full word and
- * passed as `Obj866E8Methods::slot118`'s index argument.
- *
- * NOTE for whoever revisits Class866E8__ApplyRateEntries: retail walks `ptr0` and the
- * `rate`/`id` pair via TWO INDEPENDENTLY-INCREMENTING pointers (registers
- * `$s4`/`$s3`, both `+= 0xC` per iteration), not one indexed base. This
- * WAS reproduced, in round 13: the lever is two walkers of DIFFERENTLY
- * BASED types -- a `SetupEntry866E8 *` at `arr1` for `ptr0` and a
- * `SetupSub866E8 *` at `arr1 + 4` for `rate`/`id` (see that typedef
- * below) -- each advanced by a natural `++`. Both `addiu` increments then
- * appear and the function reaches 90/105 words at the CORRECT length.
- * Regroupings that keep ONE base (plain `arr1[i].field`, an `&arr1[i]`
- * element pointer, a nested `arr1[i].sub.field`) all collapse to one
- * induction variable; byte-cast walking regresses further. The remaining
- * residue is a `$s3`/`$s4` identity swap. See the match report.
- *
- * MATCHED round 73: the second walker is `sp = (SetupSub866E8 *)&arr1->rate`
- * assigned INSIDE the loop, with `arr1` itself advanced (no `ep` copy);
- * loop.c's strength reduction then produces the `+4` register. The note
- * above is kept as history.
- */
-typedef struct SetupEntry866E8 {
-    void *ptr0;     /* +0x0 */
-    s16 rate;       /* +0x4 */
-    u8 pad6[0x8 - 0x6];
-    s32 id;         /* +0x8 */
-} SetupEntry866E8;
-
-/* A SECOND view of the SAME 0xC-byte stride, based at `+0x4` instead of
- * `+0x0`. Exists only as the target type of Class866E8__ApplyRateEntries's `rate`/`id`
- * walking pointer, so that a natural `++` strides the real array pitch
- * without a byte cast inside the loop; it is deliberately NOT embedded in
- * SetupEntry866E8 (doing so would corrupt that struct's size). Retail
- * seeds this walker at `arr1 + 4` and the `ptr0` walker at `arr1`, which
- * is why two differently-BASED types are needed rather than two pointers
- * of one type. */
-typedef struct SetupSub866E8 {
-    s16 rate;       /* +0x4 in SetupEntry866E8 terms */
-    u8 pad2[0x4 - 0x2];
-    s32 id;         /* +0x8 */
-    u8 pad8[0xC - 0x8];
-} SetupSub866E8;
-
-/* Uncarved helper in this same unit (asm/class_3bb8c.s past this slice),
- * called by Class866E8__ComputeCellOffsets and Class866E8__SetTargetAndBuildRates (both already matched) and
- * itself attempted-but-stalled this round (58/73, see
- * docs/match-reports/ComputeCellWorldOffsets.md) -- not a byte-exact match, so its
- * body stays raw asm, but the prototype below reflects what the attempt
- * established.
- *
- * Parameter types were tightened this round (all pointer-TYPE-only
- * changes -- same pointer size/ABI, so this does not disturb either
- * existing caller's already-matched bytes): `arg0` is written through as
- * two `s32` words at both known call sites (`s32 *`, was `void *`);
- * `arg2` is `self->unk68` at both call sites (Unk68Struct *, see above);
- * `arg4` is the 5th/stack argument (Descriptor10 *, see above); `outBuf`
- * is fed a 3-word local array by both call sites, so it is typed `s32 *`
- * rather than opaque `void *`. */
-extern s32 ComputeCellWorldOffsets(s32 *arg0, s32 *outBuf, Unk68Struct *arg2, Unk54Struct *arg3, Descriptor10 *arg4);
 
 /* Constant `Unk54Struct` (unk0=-1, unk4=0, unk8=0x140014) whole-struct-copied
- * by Class866E8__InitFootprintSlot into self+0x8C+key*0xC. */
+ * by Class866E8__InitFootprintSlot into rects[key]. */
 extern Unk54Struct gDefaultElemRateOffset;
 
-/*
- * Class866E8__BuildRateEntries's per-outer-loop-iteration key/enable pair, read from its
- * own `arg3` parameter (a 2-byte-strided array, one entry per element of
- * `self->arr`). `key` is copied into the resolved Elem's own `unk2` and
- * doubles as an index into `sRateOffsetTable` (`key * 0xC`, i.e. `sRateOffsetTable
- * + key`, since that table's own stride is 0xC == sizeof(Unk54Struct));
- * `flag` gates the whole per-element body (skip if 0).
- */
-typedef struct TargetSpec866E8 {
-    u8 key;   /* +0x0 */
-    u8 flag;  /* +0x1 */
-} TargetSpec866E8;
-
-/* Retyped this round from `extern s32` (address-only placeholder) to a real
- * 7-entry `TargetSpec866E8` array: Class866E8__SetTargetAndBuildRates's only use
- * of `&sDefaultTargetSpecs` is as the `arg3` it forwards to its own slotF8
- * (Class866E8__BuildRateEntries), whose real, already-matched signature reads
- * exactly `arg3[i].key`/`arg3[i].flag` for `i < 7`. Every entry's `flag` byte
- * is nonzero in the data (`asm/data/76DC8.data.s`), i.e. this is the default
- * "enable every element" spec table. */
+/* The default "enable every element" spec table SetTargetAndBuildRates
+ * passes to buildRateEntries: seven entries, every `flag` nonzero
+ * (asm/data/76DC8.data.s). */
 extern TargetSpec866E8 sDefaultTargetSpecs[7];
 
-/* Data table, 0xC-byte stride, indexed by `TargetSpec866E8::key` in
- * Class866E8__BuildRateEntries -- reuses `Unk54Struct`'s shape (three consecutive `s32`
- * words) since that is exactly how Class866E8__BuildRateEntries reads it (offsets
- * 0x0/0x4/0x8, all as plain `s32`, no evidence of any other width). Bound
- * unknown from this unit alone (`key` is an arbitrary byte from the
- * caller), so left unsized. */
+/* Indexed by TargetSpec866E8::key in Class866E8__BuildRateEntries, 0xC
+ * stride, read as three plain words. Bound unknown (`key` is the caller's
+ * byte), so unsized. */
 extern Unk54Struct sRateOffsetTable[];
 
-/* Called once per element from Class866E8__BuildRateEntries's outer loop with seven
- * arguments: `self`, the stack-buffer slot being filled (`&stackBuf[count]`,
- * a `SetupEntry866E8*`), `self->unk68->divisor`, the `val / divisor`
- * quotient's low bit, `val` itself, the earlier
- * `Class866E8__ComputeRateFlags(self, val, flag)` result, and `arg3[i].key`. Matched this
- * round -- see docs/match-reports/Class866E8__ComputeRateEntry.md. */
-extern s32 Class866E8__ComputeRateEntry(Obj866E8 *self, SetupEntry866E8 *arg1, s32 divisor, s32 flag, s32 val, s32 savedResult, s32 key);
-/* NOTE: return type corrected this round from `void` to `s32` (0 or 1,
- * whether the mask test at the top passed) -- retail explicitly sets
- * $v0 to 0 or 1 on every path before returning, which a `void` function
- * would never do. Class866E8__BuildRateEntries, the only caller, discards it. */
-
-/* `key`-indexed bitmask table, one bit per key (`1 << key`), tested against
- * `savedResult` (Class866E8__ComputeRateFlags's return, forwarded through Class866E8__BuildRateEntries) by
- * Class866E8__ComputeRateEntry. Bound is PROVEN, not guessed: the data file places exactly
- * 7 words here (0x8008688C-0800868A8) before sRateEntryTable starts, and
- * sRateEntryTable below is independently proven to hold exactly 7 `Unk54Struct`
- * entries (0x800868A8-0x800868FC) -- same key domain, consistent. */
+/* `key`-indexed bitmask table (`1 << key`) Class866E8__ComputeRateEntry tests
+ * against ComputeRateFlags' result. 7 words in the data before
+ * sRateEntryTable starts. */
 extern const s32 sRateKeyMask[7];
 
-/* `key`-indexed, reuses `Unk54Struct`'s 3-`s32` shape (same evidence as
- * `sRateOffsetTable` above: offsets 0x0/0x4/0x8, plain words). Read by
- * Class866E8__ComputeRateEntry as: `unk0` gates a `divisor * unk0` multiply (its low 32
- * bits used, `unk4` or `unk8` added depending on a caller-supplied `flag`);
- * when `unk0 == 0` the multiply is skipped entirely and `unk4` alone is
- * used. Sized at 7 (see sRateKeyMask's comment for why this one is provable
- * where `sRateOffsetTable` above is not). */
+/* `key`-indexed, three words each: ComputeRateEntry uses `unk0 * divisor`
+ * plus `unk4` or `unk8` (by its `flag`), or `unk4` alone when `unk0` is 0.
+ * 7 entries (0x800868A8-0x800868FC). */
 extern const Unk54Struct sRateEntryTable[7];
 
-/* `Class81940::ownerKey`-indexed remap table, read by Class866E8__UpdateFootprintTracking as a
- * signed byte (`lb`). 8-entry bound is PROVEN, not guessed: the data file
- * (`asm/data/76DC8.data.s`) places exactly 8 bytes here (values
- * `01 02 03 00 04 05 06 00`) before `sDefaultTargetSpecs` starts. The fetched byte
- * (range 0..6) doubles as Class866E8__UpdateFootprintTracking's own return value and, scaled by
- * 4, as the index into `sFootprintResultPtrTable` below. */
+/* Class81940::ownerKey-indexed remap, read signed by
+ * Class866E8__UpdateFootprintTracking: exactly 8 bytes in the data
+ * (01 02 03 00 04 05 06 00) before sDefaultTargetSpecs. The byte (0..6) is
+ * UpdateFootprintTracking's return value and the index into
+ * sFootprintResultPtrTable. */
 extern const s8 sFootprintResultRemap[8];
 
-/* 7-entry pointer table, first entry NULL, indexed by `sFootprintResultRemap`'s
- * fetched byte in Class866E8__UpdateFootprintTracking. Bound PROVEN by the data file: exactly 7
- * words at `sFootprintResultPtrTable` (one NULL, six pointers into the 4-word tables
- * `D_80086914`..`D_80086964`) before the next symbol starts. Element type
- * `s32 *` matches `Obj866E8Methods::slotF8`'s own `arg3` (already `s32 *`
- * from `Class866E8__SetTargetAndBuildRates`'s call site) -- Class866E8__UpdateFootprintTracking forwards a
- * `sFootprintResultPtrTable` entry there unchanged. */
-extern s32 *sFootprintResultPtrTable[7];
-
-/* Only the slots this unit's functions dispatch through (via
- * self->methods->slotNN) are typed; everything else stays opaque so the
- * struct keeps the right size/offsets without requiring every method to be
- * typed up front (same policy as include/class_39e08.h). */
-typedef struct Obj866E8Methods {
-    u8 pad000[0x30];
-    /* = BasicClass::notifyParents (`BasicClass__NotifyParents`, classtable-
-     * verified against `D_800866E8`'s own +0x030 entry) -- this class
-     * inherits the base BasicClassMethods layout for its low slots (see
-     * `include/code_8220.h`). Called by Class866E8__UpdateFootprintTracking as
-     * `self->methods->slot30(self, 5)` when the just-copied descriptor's
-     * leading raw halfword differs from what was there before. */
-    void (*slot30)(Obj866E8 *self, s32 arg1);  /* +0x030 */
-    u8 pad034[0x60 - 0x34];
-    /* Called by round 45's TextEntry__SetCursorPos/TextEntry__SetCharAt as
-     * `self->methods->slot60(self, 0)`, tail of the countdown/flush
-     * "record + notify" path, when their own trailing flag argument is
-     * set. Return unused. */
-    void (*slot60)(Obj866E8 *self, s32 arg1);  /* +0x060 */
-    u8 pad064[0x88 - 0x64];
-    /* Called by Class866E8__OnNotifyTag1 with a literal 7, one of the object's own
-     * Elem array slots, and the loop index. */
-    void (*slot88)(Obj866E8 *self, s32 arg1, Elem *entry, s32 arg3); /* +0x088 */
-    u8 pad08C[0xA4 - 0x8C];
-    /* = the "flush all" finalizer, class_3bb8c_j round 15: called once by
-     * TextEntry__ResetAllChars right after its countdown-flush loop, with (self,
-     * self->unk18, literal 1). Return unused. */
-    void (*slotA4)(Obj866E8 *self, s32 arg1, s32 arg2);   /* +0x0A4, TextEntry__ResetAllChars */
-    /* = the countdown/flush callback, class_3bb8c_j round 15: called by
-     * TextEntry__PrevChar (self, self->unk18, decremented countdown, literal 1),
-     * TextEntry__ResetChar (self, self->unk18, literal 0, literal 1) and
-     * TextEntry__ResetAllChars's own loop (self, loop index, self->unk1C, literal 0).
-     * Argument MEANING differs per call site (index vs. self->unk18) but
-     * all three pass exactly 3 args beyond self; return unused. */
-    void (*slotA8)(Obj866E8 *self, s32 arg1, s32 arg2, s32 arg3); /* +0x0A8, TextEntry__PrevChar/TextEntry__ResetChar/TextEntry__ResetAllChars */
-    u8 pad0AC[0xC0 - 0xAC];
-    /* Called by Class866E8__Disable right before it clears self->enabled. */
-    void (*slotC0)(Obj866E8 *self);            /* +0x0C0 */
-    u8 pad0C4[0xF8 - 0xC4];
-    /* = Class866E8__BuildRateEntries. This IS Class866E8__BuildRateEntries's own identity slot
-     * (verified via classtable, `D_800866E8`'s own +0x0F8 entry) -- its real
-     * signature (self, s32 val, Unk54Struct *arg2, TargetSpec866E8 *arg3, void
-     * return) is established by that function's own body, not by this call
-     * site's placeholder types. Called by Class866E8__SetTargetAndBuildRates with
-     * ComputeCellWorldOffsets's own return value, the SAME stack buffer that was
-     * ComputeCellWorldOffsets's `outBuf` argument (as `Unk54Struct *`), and
-     * `sDefaultTargetSpecs` (as `TargetSpec866E8 *`). Left `s32`/`s32 *`/`s32 *`
-     * here rather than retyped to match: `Class866E8__UpdateFootprintTracking`'s OWN
-     * call through this same slot passes `&buf.unkC` (`s32 *`) and a
-     * `sFootprintResultPtrTable` entry (`s32 *`) instead, and retyping the field would need
-     * that already-matched call site re-cast rather than left alone -- the
-     * two call sites' real argument types genuinely differ, which is exactly
-     * what a `void *`-shaped vtable slot type papers over on this project. */
-    s32 (*slotF8)(Obj866E8 *self, s32 arg1, s32 *arg2, s32 *arg3);   /* +0x0F8 */
-    /* = Class866E8__ApplyRateEntries. This IS Class866E8__ApplyRateEntries's own identity slot (verified
-     * via classtable), not something Class866E8__ApplyRateEntries calls -- its actual
-     * signature is `(self, arr1, count)`, matching a `SetupEntry866E8`
-     * array and a count, per Class866E8__ApplyRateEntries's own stalled-but-structurally-
-     * derived body (see docs/match-reports/Class866E8__ApplyRateEntries.md). Called by
-     * Class866E8__BuildRateEntries (this round: STALLED at 125/140, register identity only)
-     * at the end of its own loop with
-     * a 7-slot stack buffer it filled and the number of slots actually
-     * used. */
-    void (*slotFC)(Obj866E8 *self, SetupEntry866E8 *arr1, s32 count); /* +0x0FC */
-    u8 pad100[0x104 - 0x100];
-    /* Called by Class866E8__OnNotifyTag1 with one of the object's own Elem array
-     * slots. */
-    void (*slot104)(Obj866E8 *self, Elem *entry);  /* +0x104 */
-    /* = called by Class866E8__ApplyRateEntries (this round) with one of the object's own
-     * Elem array slots, in BOTH branches of an `arr1[i].ptr0 != 0` test --
-     * guarded by the SAME `entry->unk4->unk2C != 0` condition each time.
-     * Return value unused. Distinct from slot104 above, which
-     * Class866E8__OnNotifyTag1 dispatches under a different (mode==1) condition. */
-    void (*slot108)(Obj866E8 *self, Elem *entry); /* +0x108 */
-    /* Called by Class866E8__SetFootprintFromQuery with its own stack-local query buffer
-     * (see `CC74QueryBuf`) and a literal 0; return value unused there.
-     * Also called by Class866E8__ComputeFootprintFromRotation with the identical (own stack-local
-     * CC74QueryBuf, 0) shape; return value unused there either. */
-    s32 (*slot10C)(Obj866E8 *self, void *outBuf, s32 arg2); /* +0x10C */
-    /* = Class866E8__ComputeFootprintDescriptor (this round: STALLED at 72/106). Resolves `in` (may be NULL at
-     * other call sites; Class866E8__ComputeFootprintDescriptor itself never null-checks it) via
-     * slot11C, then fills `out`. Returns 0 on success, 1 if the slot11C
-     * lookup misses. Matches class_3ac78's independent view of the same
-     * slot -- `self->methods->slot110(self, &buf, gateArg)` in that unit's
-     * Class866E8__ApplyToSenderFootprint uses the identical (out-pointer, in-pointer) argument
-     * order, which is what fixed these two params as pointers rather than
-     * the previous round's placeholder (s32, void*). Class866E8__GetTargetDescriptor (this
-     * unit) passes its own `arg1` param through as `out` and a computed
-     * pointer as `in` -- see Class866E8__GetTargetDescriptor's retyped signature below. */
-    s32 (*slot110)(Obj866E8 *self, Descriptor10Ext *out, QueryPos866E8 *in);   /* +0x110 */
-    u8 pad114[0x118 - 0x114];
-    /* Called by Class866E8__FindElementForPosition with a plain array index (0..6); the
-     * returned pointer is subsequently read like an Elem slot accessor,
-     * so this is almost certainly `return &self->arr[index];` -- not
-     * this round's function to match. */
-    Elem *(*slot118)(Obj866E8 *self, s32 index);   /* +0x118 */
-    /* Called by Class866E8__ComputeFootprintDescriptor with its own `in` (QueryPos866E8*) param,
-     * forwarded opaquely; return value dereferenced exactly like an Elem
-     * (->unk4, ->unkC), so this is almost certainly an Elem-lookup sibling
-     * to slot118 (Class866E8__FindElemByUnk32) -- not this round's function to match
-     * (Class866E8__FindElementForPosition, still INCLUDE_ASM in this unit). */
-    Elem *(*slot11C)(Obj866E8 *self, QueryPos866E8 *arg1);   /* +0x11C */
-    /* Called twice by Class866E8__SplitFootprintSlot, each time with a small offset off
-     * its own arg3; the return value is stored as a freshly-created
-     * GridSlot866E8's `elemIdx`. */
-    s32 (*slot120)(Obj866E8 *self, s32 arg1);      /* +0x120 */
-    /* Called by Class866E8__InitFootprintSlot with its own arg3 (unmodified); the return
-     * value is stored into the first word of a freshly-copied 3-word
-     * slot at self+0x8C+key*0xC (see Class866E8__InitFootprintSlot). */
-    s32 (*slot124)(Obj866E8 *self, s32 arg1);      /* +0x124 */
-    /* = Class866E8__RefreshFootprint (class_3bb8c_b, already matched: `void
-     * Class866E8__RefreshFootprint(Obj866E8 *self)`). Called by Class866E8__UpdateFootprintTracking as
-     * `self->methods->slot128(self)`, return unused. Classtable-verified
-     * (`D_800866E8`'s own +0x128 entry). */
-    void (*slot128)(Obj866E8 *self);               /* +0x128 */
-} Obj866E8Methods;
+/* 7 pointers, the first NULL, the rest to the 4-word (seven 2-byte
+ * TargetSpec866E8s, padded) tables D_80086914..D_80086964:
+ * UpdateFootprintTracking passes the selected one to buildRateEntries as its
+ * spec table, as SetTargetAndBuildRates passes sDefaultTargetSpecs. */
+extern TargetSpec866E8 *sFootprintResultPtrTable[7];
 
 /*
- * Opaque object pointed to by UnkCObj::unk14. `unk1C` established by this
- * round's Class866E8__ComputeFootprintDescriptor (plain s32, single-width read). `unk18`/`unk20`
- * were originally typed plain s32 from Class866E8__FindElementForPosition (still INCLUDE_ASM,
- * so provisional); Class866E8__ComputeFootprintDescriptor (STALLED, 72/106) reads them BOTH as a full s32
- * (coarse) and, separately and later in the function, as just the low
- * `u16` half (fine) -- retail re-loads from memory at the narrower width
- * rather than deriving it from the already-loaded s32, so each is a union
- * here rather than a plain field (same reasoning as `QueryPos866E8`
- * above). Class866E8__FindElementForPosition's own s32-only reads remain valid against the
- * `.w` member, so this is additive, not a contradiction of what it
- * established.
+ * A GsCOORDINATE2 (Class6B5CCSub14) read as the element's origin: an
+ * element's cellParent->coord2, reached through a cast. tx (+0x018) and tz
+ * (+0x020) are unions because Class866E8__ComputeFootprintDescriptor reads
+ * each whole (the cell) and, later, as its low halfword (the offset):
+ * retail reloads at the narrower width. Class866E8__BuildRateEntries writes
+ * all three and clears `flg` (+0x000).
  */
 struct Unk14Obj {
-    /* Class866E8__BuildRateEntries (round: charlie/4): cleared to 0 right after unk18/
-     * unk1C/unk20 are filled -- a genuine RELOAD of the same Unk14Obj*
-     * (not the same register kept live), so it is a real memory write, not
-     * dead code. */
-    s32 unk0;                         /* +0x000 */
+    s32 unk0;                         /* +0x000, GsCOORDINATE2.flg */
     u8 pad4[0x18 - 0x4];
-    union { s32 w; u16 h; } unk18;   /* +0x018 */
-    s32 unk1C;                        /* +0x01C, Class866E8__ComputeFootprintDescriptor */
-    union { s32 w; u16 h; } unk20;    /* +0x020 */
-};
-
-/*
- * Opaque object returned by Obj866E8Methods::slot118 -- read as +0x00C is
- * a pointer to a Unk14Obj. Deliberately a DIFFERENT top-level type from
- * `Elem` even though slot118's return value is later read exactly like an
- * Elem-array-slot accessor would suggest, because this round's evidence
- * (Class866E8__FindElementForPosition) only reaches the +0x00C field, never Elem's own +0x000
- * or +0x004 -- unifying them would be guessing past the evidence.
- */
-struct UnkCObj {
-    u8 pad00[0x14];
-    Unk14Obj *unk14;    /* +0x014, Class866E8__FindElementForPosition */
-};
-
-/*
- * self+0xEC's array element, one of Obj866E8::arr[7]. Established from
- * Class866E8__CountFlaggedElements (+0x000), Class866E8__FindElemByUnk32 (+0x004), and this round's
- * Class866E8__ResetElementCells (+0x00C indirectly via unk4, +0x010) and Class866E8__OnNotifyTag1
- * (+0x000, +0x004). class_3bb8c_b's Class866E8__ForEachEntryChild independently reached
- * the same +0x010 pointer array, walked over the same 0x668 raw bytes,
- * and Class866E8__FindElemIndexByUnk30/Class866E8__FindElemIndexByUnk32 the same +0x004 target.
- */
-struct Elem {
-    u16 flag;                      /* +0x000 */
-    /* Class866E8__BuildRateEntries (round: charlie/4): copied from `arg3[i].key` (a raw
-     * byte, zero-extended then stored as a halfword) and, in a second
-     * separate loop over all 7 elements, copied onward into
-     * `unk4->unk32` (already established). */
-    u16 unk2;                      /* +0x002 */
-    struct Class81940 *unk4;        /* +0x004, New_Class81940 (Class866E8__Class866E8); include/Class81940.h */
-    /* New_Class6D940(0) (Class866E8__Class866E8): the element's placement
-     * grid; Class866E8__LoadElementResources points its buffer into the
-     * element's resource and walks its +0x078 (Class6D940__ResolveEntry)
-     * over every cell. include/Class6D940.h. */
-    struct Class6D940 *unk8;         /* +0x008, Class866E8__LoadElementResources */
-    UnkCObj *unkC;                  /* +0x00C, Class866E8__FindElementForPosition (via slot118's return) */
-    /* Class866E8__ResetElementCells: array of pointers, walked over 0x668 raw bytes --
-     * the true element count is not a round number of elements, so this
-     * stays byte-offset arithmetic rather than a sized array. */
-    EntryChildObj **unk10;           /* +0x010 */
-    u8 pad14[0x1C - 0x14];
-};
-
-/*
- * Target of Elem::unk10[i]. TWO runners derived this object independently
- * in round 8 from opposite ends and the head merged them here; the split
- * views are why the offsets below have unrelated provenance:
- *  - class_3bb8c (Class866E8__ResetElementCells) reached the DATA: it ORs a flag bit into
- *    +0x010 and zeroes +0x018 and +0x020.
- *  - class_3bb8c_b (Class866E8__ApplyRateToChild/Class866E8__ResetChildRate, via Class866E8__ForEachEntryChild)
- *    reached the METHOD TABLE at +0x000 and the one slot those two
- *    dispatch through.
- * They agree on the object's identity (both reach it as Elem::unk10[i]),
- * so this is one type, not two independent views -- the
- * independent-views convention applies ACROSS unit headers, and these two
- * units share this one.
- */
-
-typedef struct EntryChildObjMethods {
-    u8 pad00[0x48];
-    /* Called by Class866E8__ApplyRateToChild (arg2 = the parent's own rateEntry) and
-     * Class866E8__ResetChildRate (arg2 = &D_800869CC). Return value unused by both. */
-    void (*slot48)(EntryChildObj *self, s32 arg1, void *arg2); /* +0x048 */
-} EntryChildObjMethods;
-
-struct EntryChildObj {
-    EntryChildObjMethods *methods;  /* +0x000, Class866E8__ApplyRateToChild/Class866E8__ResetChildRate */
-    u8 pad04[0x10 - 0x04];
-    u32 unk10;                      /* +0x010, Class866E8__ResetElementCells: OR'd with 0x80000000; Class866E8__SetFootprintCellFlag: bit31 set/cleared per its own arg1 */
-    /* Class866E8__LoadElementResources: a GsCOORDINATE2-shaped per-entry GPU link record --
-     * full body (`EntryGpu`) kept in class_3bb8c.c. Note this sits right
-     * where a `GsDOBJ2` embedded at THIS object's own +0x010 would put its
-     * `coord2` field (`GsDOBJ2::attribute` at +0x000 lines up with this
-     * object's own +0x010 `unk10`, used as GsLinkObject4's `objp`) --
-     * consistent, not asserted as the real PSYQ type here. */
-    EntryGpu *unk14;                 /* +0x014, Class866E8__LoadElementResources */
-    s32 unk18;                      /* +0x018, Class866E8__ResetElementCells: zeroed */
-    u8 pad1C[0x20 - 0x1C];
-    s32 unk20;                      /* +0x020, Class866E8__ResetElementCells: zeroed */
-    u8 pad24[0x36 - 0x24];
-    s16 unk36;                       /* +0x036, Class866E8__LoadElementResources */
-    EntryChildObj *unk38;           /* +0x038, Class866E8__SetFootprintCellFlag: singly-linked chain, walked while non-NULL */
-};
-
-/*
- * Opaque target of self->unk1BC. Only field established: Class866E8__GetLastTargetRateSplit
- * reads +0x004, an element's Class81940 (its +0x030 ownerRate is read
- * straight afterward).
- */
-struct Unk1BCObj {
-    u8 pad0[0x4];
-    struct Class81940 *unk4;        /* +0x004, Class866E8__GetLastTargetRateSplit */
-};
-
-/*
- * self+0x6C->unk14's pointee (round 13, Class866E8__ComputeFootprintFromRotation). Only field
- * established: +0x044, a further pointer (Unk6C14SubObj*).
- */
-struct Unk6C14Obj {
-    u8 pad00[0x44];
-    Unk6C14SubObj *unk44;           /* +0x044, Class866E8__ComputeFootprintFromRotation */
-};
-
-/*
- * Unk6C14Obj::unk44's pointee. `+0x010` is only ever address-taken
- * (forwarded raw to RotMatrix, never dereferenced in this unit);
- * `+0x012` is read BOTH as a signed halfword (to test its sign, adding
- * 0x1000 to the unsigned reading when negative -- a 12-bit two's
- * complement unpack) and, separately, as the resulting unsigned value
- * used for the range dispatch that follows. Class866E8__GetTargetDescriptor's own
- * `(u8 *)self->unk6C->unk14 + 0x18` -- one level UP the chain, on
- * Unk6C14Obj's OWN address, not this sub-object -- stays a raw cast in
- * that unit, untouched here.
- */
-struct Unk6C14SubObj {
-    u8 pad00[0x12];
-    u16 unk12;                      /* +0x012, Class866E8__ComputeFootprintFromRotation */
-};
-
-/*
- * self+0x6C's pointee. Class866E8__SetTargetAndBuildRates only ever STORES its own arg2 here
- * raw (never dereferences it); Class866E8__GetTargetDescriptor dereferences it and reads
- * +0x014, itself a pointer used only for address-of-plus-offset
- * arithmetic (`+0x018`), never further dereferenced. Retyped this round
- * (round 13, Class866E8__ComputeFootprintFromRotation) from `void *` to `Unk6C14Obj *` -- the ONLY
- * other reader, Class866E8__GetTargetDescriptor, already casts it straight to `(u8 *)`
- * before doing arithmetic, so the retype does not change that already-
- * matched function's bytes (verified: full rebuild stays green).
- */
-struct Unk6CObj {
-    u8 pad00[0x14];
-    Unk6C14Obj *unk14;              /* +0x014, Class866E8__GetTargetDescriptor/Class866E8__ComputeFootprintFromRotation */
+    union { s32 w; u16 h; } unk18;   /* +0x018, tx */
+    s32 unk1C;                        /* +0x01C, ty */
+    union { s32 w; u16 h; } unk20;    /* +0x020, tz */
 };
 
 /*
  * Template struct copied wholesale by Class866E8__ComputeFootprintFromRotation from the constant
  * global `D_8008E98C` into a stack-local descriptor, then partially
- * overwritten (`unk14`/`unk18` zeroed, `unk1C` set from `self->unk74`)
+ * overwritten (`unk14`/`unk18` zeroed, `unk1C` set from `self->gridSpan`)
  * before being handed to two uncarved library helpers
  * (`RotMatrix`/`ApplyMatrixLV`) as an in/out parameter block. Field
  * meaning beyond "8 words, offsets 0x00-0x1C" is unestablished; the first
@@ -579,203 +82,28 @@ struct QueryTemplate866E8 {
     s32 unk0[5];                    /* +0x000..+0x010, opaque (untouched by Class866E8__ComputeFootprintFromRotation) */
     s32 unk14;                      /* +0x014, Class866E8__ComputeFootprintFromRotation: zeroed before the call, then an in/out arg to ApplyMatrixLV */
     s32 unk18;                      /* +0x018, Class866E8__ComputeFootprintFromRotation: zeroed before the call */
-    s32 unk1C;                      /* +0x01C, Class866E8__ComputeFootprintFromRotation: set to self->unk74 before the call */
+    s32 unk1C;                      /* +0x01C, Class866E8__ComputeFootprintFromRotation: set to self->gridSpan before the call */
 };
 
 extern QueryTemplate866E8 D_8008E98C;
 
-/* Uncarved library helpers (round 13, Class866E8__ComputeFootprintFromRotation's only known call
- * site). `RotMatrix`'s first argument is `(u8 *)sub + 0x10` where
- * `sub` is a `Unk6C14SubObj *` -- never dereferenced in this unit, so
- * typed as a raw pointer rather than claiming a struct shape for it.
- * `ApplyMatrixLV` is called with its 2nd and 3rd arguments pointing at
- * the SAME address (`&desc.unk14` passed twice) -- confirmed against the
- * raw disassembly (`$a1`/`$a2` both `sp+0x54`), not a transcription
- * shortcut. */
+/* Library helpers (Class866E8__ComputeFootprintFromRotation's only call
+ * site). `RotMatrix`'s first argument is the target's coord2->param->rotate.
+ * `ApplyMatrixLV` is called with its 2nd and 3rd arguments pointing at the
+ * SAME address (`&desc.unk14` passed twice) -- confirmed against the raw
+ * disassembly (`$a1`/`$a2` both `sp+0x54`). */
 extern void RotMatrix(void *arg0, QueryTemplate866E8 *arg1);
 extern void ApplyMatrixLV(QueryTemplate866E8 *arg0, s32 *arg1, s32 *arg2); /* arity-ok: this IS the callee's real signature (Sony libgte, 0x80015618 reads $a0 matrix / $a1 in / $a2 out); include/code_d294.h's unprototyped copy is round 19's deliberate frame-sizing shape, not a claim about arity */
 
-/*
- * Opaque target of Obj866E8::bounds (Class866E8__SetBounds stores it raw;
- * IsPointOutOfBounds -- a plain, non-virtual helper, NOT a vtable slot, see
- * tools/classtable.py D_800866E8 -- dereferences it as a min/max bounding
- * box against an [x,y] byte pair). Field meaning inferred from the four
- * comparisons in IsPointOutOfBounds: `unk0`/`unk2` gate the LOW side, `unk4`/
- * `unk8` the HIGH side, of the point's two axes respectively.
- */
-typedef struct Bounds866E8_3bb8c_b {
-    s16 minX;                      /* +0x000, IsPointOutOfBounds: point[0] < this -> out of range */
-    s16 minY;                      /* +0x002, IsPointOutOfBounds: point[1] < this -> out of range */
-    s32 maxX;                      /* +0x004, IsPointOutOfBounds: this < point[0] -> out of range */
-    s32 maxY;                      /* +0x008, IsPointOutOfBounds: this < point[1] -> out of range (also the function's own return value) */
-} Bounds866E8_3bb8c_b;
-
-/*
- * self->rateEntry's pointee: one of four static 0xC-byte table entries at
- * D_8008699C/D_800869A8/D_800869B4/D_800869C0 (addresses confirmed 0xC
- * apart), selected by Class866E8__ConfigureRateEntry from (rate > 0, flag != 0) and never
- * dereferenced past +0x006. The same 0xC stride lines up with
- * D_800869CC (declared `extern s32 D_800869CC[3]` below, by
- * Class866E8__ResetChildRate) as a plausible fifth entry of the same table, but
- * nothing in this unit reaches that entry through THIS pointer type, so
- * the two stay independently declared rather than unified into one
- * array of unproven length.
- */
-typedef struct EntryDesc866E8 {
-    u8 pad0[0x6];
-    s16 scale;          /* +0x006, Class866E8__ConfigureRateEntry: multiplied against abs(rate) */
-    u8 pad8[0xC - 0x8];
-} EntryDesc866E8;
-
+/* The four static EntryDesc866E8 entries (0xC apart) configureRateEntry
+ * picks for `rateEntry` by (rate > 0, flag != 0). */
 extern EntryDesc866E8 D_8008699C;
 extern EntryDesc866E8 D_800869A8;
 extern EntryDesc866E8 D_800869B4;
 extern EntryDesc866E8 D_800869C0;
 
-/*
- * self+0x8C's array element (`Obj866E8::gridSlots`, see below). Established
- * from Class866E8__SetFootprintCellFlag, which reads all five fields: `elemIdx` selects
- * `self->arr[elemIdx]`; `col`/`row` locate a starting cell in that element's
- * `unk10` pointer grid (row stride 20 cells, confirmed by the `* 20`
- * offset math); `width`/`height` are the sub-rectangle's width/height walked
- * from that starting cell. Class866E8__InitFootprintSlot (already matched, a different
- * unit's round) writes a whole one of these via a 3-word block copy using
- * the coarser, already-committed `Unk54Struct` view of the SAME memory --
- * per this project's independent-views convention, that write-side view
- * is left alone; this is a separate, more granular READ-side view of the
- * same 0xC bytes, justified because a whole-struct copy does not care
- * about the internal layout it is copying.
- */
-typedef struct GridSlot866E8 {
-    s32 elemIdx;   /* +0x0, Class866E8__SetFootprintCellFlag: selects self->arr[elemIdx] */
-    s16 col;        /* +0x4, Class866E8__SetFootprintCellFlag: starting column */
-    s16 row;        /* +0x6, Class866E8__SetFootprintCellFlag: starting row (row stride 20) */
-    s16 width;        /* +0x8, Class866E8__SetFootprintCellFlag: sub-rectangle width */
-    s16 height;        /* +0xA, Class866E8__SetFootprintCellFlag: sub-rectangle height */
-} GridSlot866E8;
-
-/*
- * Class866E8__SetFootprintFromQuery's own stack-local query buffer, filled by a call through
- * `Obj866E8Methods::slot10C` and read back at two offsets: `+0x2` (a
- * signed [x,y] byte pair, forwarded to IsPointOutOfBounds as its `point`
- * argument) and `+0x28` (a plain `s32`, read directly by Class866E8__SetFootprintFromQuery
- * itself). Everything else is unproven -- this is a local, not part of
- * `Obj866E8`, so it stays a minimal opaque type sized only to cover the
- * two known offsets.
- */
-typedef struct CC74QueryBuf {
-    u8 pad0[0x2];
-    s8 point[2];        /* +0x2, Class866E8__SetFootprintFromQuery: forwarded to IsPointOutOfBounds */
-    u8 pad4[0x28 - 0x4];
-    s32 count;          /* +0x28, Class866E8__SetFootprintFromQuery */
-} CC74QueryBuf;
-
-struct Obj866E8 {
-    Obj866E8Methods *methods;      /* +0x000 */
-    u8 pad04[0x0C - 0x04];
-    s32 unkC;                      /* +0x00C, CheckObj866E8CountFlag (compared against 9999999) */
-    /*
-     * +0x010..+0x048: a "countdown/flush" subsystem, established by
-     * class_3bb8c_j (round 15) from four functions (TextEntry__PrevChar,
-     * TextEntry__ToggleAltCommands, TextEntry__ResetChar, TextEntry__ResetAllChars) plus two gp_rel-blocked
-     * siblings in the same unit (TextEntry__SetCursorPos, TextEntry__SetCharAt, both confirmed
-     * to touch the SAME unk48/unk18/unk1C fields -- see those functions'
-     * stub reports). unk10 is a trip count read once per "flush all" call
-     * (TextEntry__ResetAllChars); unk14 is the countdown's own reset value; unk18 is
-     * forwarded as methods->slotA8/slotA4's own arg1; unk1C is the live
-     * countdown, decremented per call and reset from unk14 on expiry; unk20
-     * is an unrelated boolean toggled independently by TextEntry__ToggleAltCommands; unk48
-     * is a readiness/enable gate every function in the group tests non-zero
-     * before doing anything, never itself dereferenced in this unit.
-     */
-    s32 unk10;                     /* +0x010, TextEntry__ResetAllChars */
-    s32 unk14;                     /* +0x014, TextEntry__PrevChar */
-    s32 unk18;                     /* +0x018, TextEntry__PrevChar/TextEntry__ResetChar/TextEntry__ResetAllChars */
-    s32 unk1C;                     /* +0x01C, TextEntry__PrevChar/TextEntry__ResetChar/TextEntry__ResetAllChars */
-    s32 unk20;                     /* +0x020, TextEntry__ToggleAltCommands (xor-toggled) */
-    u8 pad24[0x28 - 0x24];
-    u8 *unk28;                     /* +0x028, round 45's TextEntry__SetCharAt: a per-index byte buffer, `unk28[arg1] = table[idx]` */
-    u8 pad2C[0x40 - 0x2C];
-    /* +0x040/+0x044, round 45's TextEntry__SetCursorPos/TextEntry__SetCharAt: opaque
-     * resource-handle objects, dispatched only through this unit's own
-     * local method-table views (Unk40Obj866E8Methods/Unk44Obj866E8Methods
-     * in class_3bb8c_j.c) -- kept `void *` here since nothing outside that
-     * unit touches them yet. */
-    void *unk40;                   /* +0x040 */
-    void *unk44;                   /* +0x044 */
-    s32 unk48;                     /* +0x048, TextEntry__PrevChar/TextEntry__ToggleAltCommands/TextEntry__ResetChar/TextEntry__ResetAllChars */
-    u8 pad4C[0x54 - 0x4C];
-    Unk54Struct unk54;             /* +0x054, Class866E8__ComputeCellOffsets (address taken, forwarded opaquely) */
-    /* +0x060/+0x064, Class866E8__ComputeRateEntry (this round): a callback invoked as
-     * `unk60(unk64, value, 0, 0)`, whose result is stored into the
-     * SetupEntry866E8 slot being filled. `unk64` is never dereferenced in
-     * this unit, only forwarded -- opaque context pointer. Was undifferentiated
-     * padding (`pad60[0x68 - 0x60]`) before this round; the split is
-     * additive (same total size, same offsets), not a removal. */
-    void *(*unk60)(void *arg0, s32 arg1, s32 arg2, s32 arg3); /* +0x060 */
-    void *unk64;                                              /* +0x064 */
-    Unk68Struct *unk68;            /* +0x068, Class866E8__ComputeCellOffsets/Class866E8__SetTargetAndBuildRates/Class866E8__ComputeRateFlags/Class866E8__FindElementForPosition */
-    Unk6CObj *target;              /* +0x06C, Class866E8__SetTargetAndBuildRates stores it raw; Class866E8__GetTargetDescriptor dereferences it; round 78 head: renamed from unk6C by type scope (bravo proposed posSource; `target` matches the two functions that set and read it) */
-    s32 enabled;                   /* +0x070, Class866E8__Enable/Class866E8__Disable. TIER A: class_3ac78's
-                                     * independent local view of this SAME field already reached "enabled"
-                                     * from the identical evidence (its own Class866E8__UpdateIfEnabled report,
-                                     * round 67) -- set 1 by Class866E8__Enable, cleared 0 by Class866E8__Disable
-                                     * after a teardown dispatch, matching a plain enable/disable pair. */
-    s32 gridSpan;                  /* +0x074, world span of the grid; gDefaultGridSpan = 0xA000. Class866E8__ComputeFootprintFromRotation copies it into its stack-local QueryTemplate866E8's unk1C before calling RotMatrix */
-    s16 gridHalfCells;             /* +0x078, gridSpan >> 12 = 10; Class866E8__RefreshFootprint doubles it into an index (giving gridCells) */
-    s16 gridCells;                 /* +0x07A, gridSpan >> 11 = 20, the row stride byte-matched Class866E8__SetFootprintCellFlag uses; Class866E8__RefreshFootprint passes it on as an arg */
-    s16 footprintCol;                     /* +0x07C, Class866E8__BuildFootprintSlots: a signed sub-cell horizontal offset, clamped into [0,0x14) and combined with footprintWidth to decide whether the grid footprint spans one or two 20-unit cells; also written directly by Class866E8__ComputeFootprintFromRotation */
-    s16 footprintRow;                     /* +0x07E, Class866E8__BuildFootprintSlots: same convention as footprintCol, vertical; also written directly by Class866E8__ComputeFootprintFromRotation */
-    s32 footprintWidth;                     /* +0x080, Class866E8__ComputeFootprintFromRotation (writes arg1 or arg2 depending on its own dispatch), then read/forwarded by Class866E8__BuildFootprintSlots to Class866E8__SplitFootprintSlot's p7 */
-    s32 footprintHeight;                     /* +0x084, Class866E8__ComputeFootprintFromRotation (writes the other of arg1/arg2), then read/forwarded by Class866E8__BuildFootprintSlots to Class866E8__SplitFootprintSlot's p8 */
-    s32 gridSlotCount;                     /* +0x088, Class866E8__SetFootprintCellFlag: loop count over gridSlots[] (bounded by gridSlots's own 4-element capacity) */
-    GridSlot866E8 gridSlots[4];      /* +0x08C, Class866E8__SetFootprintCellFlag (reads); Class866E8__InitFootprintSlot (writes, via the coarser Unk54Struct view) -- exactly fills the gap up to the existing unkBC field, so this is a hard capacity, not a guess */
-    Descriptor10 unkBC;            /* +0x0BC, Class866E8__SetTargetAndBuildRates: whole-struct copy from its arg3 */
-    u8 padC6[0xEC - 0xC6];
-    Elem arr[7];                   /* +0x0EC, Class866E8__CountFlaggedElements/Class866E8__FindElemByUnk32/Class866E8__FindElemIndexByUnk32/Class866E8__FindElemIndexByUnk30/Class866E8__OnNotifyTag1/Class866E8__ForEachEntryChild */
-    s32 unk1B0;                    /* +0x1B0, Class866E8__OnNotifyTag1 */
-    u16 unk1B4;                    /* +0x1B4, Class866E8__OnNotifyTag1 */
-    u8 pad1B6[0x1B8 - 0x1B6];
-    s32 unk1B8;                    /* +0x1B8, Class866E8__OnNotifyTag1 */
-    Unk1BCObj *unk1BC;             /* +0x1BC, Class866E8__GetLastTargetRateSplit */
-    u8 pad1C0[0x1CC - 0x1C0];
-    s32 unk1CC;                    /* +0x1CC, Class866E8__GetUnk1CC (address-of only, real type unknown) */
-    u8 pad1D0[0x1DC - 0x1D0];
-    Bounds866E8_3bb8c_b *bounds;   /* +0x1DC, Class866E8__SetBounds (stores raw)/IsPointOutOfBounds (dereferences) */
-    s32 rateCountdown;                    /* +0x1E0, Class866E8__AdvanceRateCountdown/Class866E8__FlushRateLatch: a countdown gate */
-    EntryDesc866E8 *rateEntry;        /* +0x1E4, Class866E8__ApplyRateToChild (forwarded opaquely)/Class866E8__ConfigureRateEntry (selects one of four statics and reads +0x6) */
-    u8 pad1E8[0x2F4 - 0x1E8];
-    s32 unk2F4;                    /* +0x2F4, CheckObj866E8CountFlag: zero-checked when unkC > 9999999 */
-};
-
-/* Get-vtable helper, same shape and same real function as
- * class_3ac78.h's `GetClass866E8Methods` (independent view: this unit names the
- * return type Obj866E8Methods, not Class866E8Methods). It now has a real
- * body in this unit (class_3bb8c_b); class_3ac78 still calls it via `jal`
- * as a raw external. */
-extern Obj866E8Methods D_800866E8;
-
-/* Still raw asm in this unit (not this round's target): walks
- * item->unk10[] (an array of EntryChildObj*, up to +0x668 bytes
- * from the base read at item->unk10), calling callback(self, element) for
- * each. Derived to resolve Class866E8__ApplyRateToChild/Class866E8__ResetChildRate's true call site --
- * see those functions' reports. Not called by name anywhere in this
- * unit's own C (only from within Class866E8__ForEachElem's still-raw body), so this
- * prototype is documentation, not load-bearing. */
-extern void Class866E8__ForEachEntryChild(Obj866E8 *self, void (*callback)(Obj866E8 *self, EntryChildObj *item), Elem *item);
-
-/* Still raw asm in this unit (not this round's target): iterates
- * self->arr, invoking an optional per-element callback (arg2, called
- * (self, &arr[i]) when non-NULL) and then always forwarding (self, arg1,
- * &arr[i]) to Class866E8__ForEachEntryChild. Class866E8__AdvanceRateCountdown/Class866E8__FlushRateLatch both call it
- * with arg2 = NULL (no per-element callback), passing a function POINTER
- * as arg1 instead -- that pointer is consumed further down in
- * Class866E8__ForEachEntryChild, not by this function itself. */
-extern void Class866E8__ForEachElem(Obj866E8 *self, void (*arg1)(Obj866E8 *self, EntryChildObj *item), void (*arg2)(Obj866E8 *self, Elem *item));
-
-/* 3-word (12-byte) data block, address-of only -- passed to
- * EntryChildObjMethods::slot48 as an opaque arg2 by Class866E8__ResetChildRate.
- * Never dereferenced in this unit, so left untyped in size only. */
+/* 3-word block Class866E8__ResetChildRate passes to every cell's updateScale
+ * (the same 0xC stride as the four above, plausibly a fifth entry). */
 extern s32 D_800869CC[3];
 
 /* -------------------------------------------------------------------
@@ -966,26 +294,35 @@ extern s32 D_8008AA30;
 extern void FormatNumberIntoBuffer(s32 arg0);
 
 /*
- * First argument of CheckObj866E8CountFlag: an unrelated, larger caller-side
- * struct (only seen from its one caller, Class86B60__CommitNameEntry in the still-
- * uncarved asm/class_3bb8c_d.s) whose own +0x0BC field is a pointer to
- * the Obj866E8 instance this function actually operates on -- NOT
- * Obj866E8's own +0x0BC (that offset on Obj866E8 itself is the
- * already-documented embedded Descriptor10 `unkBC`). Named distinctly to
- * avoid implying any relation to Obj866E8's own layout.
+ * The block CheckSaveScoreFlag reads: its caller's Class86B60::saveBlock
+ * (the DreamSys's getSaveBlock, &saveMagic). +0x00C from saveMagic is
+ * DreamSys's totalFlasbackUnlockScore (include/DreamSys.h); +0x2F4 is
+ * unnamed there.
+ */
+typedef struct SaveBlock678_3bb8c_c {
+    u8 pad00[0x00C];
+    s32 unkC;                                   /* +0x00C, compared against 9999999 */
+    u8 pad10[0x2F4 - 0x010];
+    s32 unk2F4;                                 /* +0x2F4, zero-checked when unkC > 9999999 */
+} SaveBlock678_3bb8c_c;
+
+/*
+ * First argument of CheckSaveScoreFlag: its one caller,
+ * Class86B60__CommitNameEntry (class_3bb8c_d), passes its own self, so
+ * +0x0BC is Class86B60::saveBlock (include/Class86B60.h).
  */
 typedef struct Ctx678_3bb8c_c {
     u8 pad00[0x0BC];
-    Obj866E8 *target;                           /* +0x0BC */
+    SaveBlock678_3bb8c_c *target;               /* +0x0BC */
 } Ctx678_3bb8c_c;
 
 /*
- * Second argument of CheckObj866E8CountFlag: holds a pointer at +0x018 to a small
- * result block whose word at +0x004 is the flag CheckObj866E8CountFlag computes.
+ * Second argument of CheckSaveScoreFlag: holds a pointer at +0x018 to a small
+ * result block whose word at +0x004 is the flag CheckSaveScoreFlag computes.
  */
 typedef struct Result678_3bb8c_c {
     u8 pad00[0x018];
-    s32 *block;                                 /* +0x018, CheckObj866E8CountFlag writes block[1] */
+    s32 *block;                                 /* +0x018, CheckSaveScoreFlag writes block[1] */
 } Result678_3bb8c_c;
 
 /*
@@ -1280,9 +617,9 @@ struct Class86E00_3bb8c_g {
  * include/TextEntry.h. */
 
 /*
- * class_3bb8c_f: a SEPARATE class from Obj866E8 above -- no evidence unifies
+ * class_3bb8c_f: a SEPARATE class from Class866E8 (include/Class866E8.h) -- no evidence unifies
  * them (distinct field layouts), and BuildMemcardPath below writes raw bytes
- * over its own object's first 6 bytes, which would corrupt Obj866E8's own
+ * over its own object's first 6 bytes, which would corrupt Class866E8's own
  * vtable pointer if the two were the same type. This is this unit's own
  * BasicClass-derived (docs/research/class-framework.md, include/code_8220.h)
  * task-ish object: it dispatches through the INHERITED BasicClass
@@ -1422,13 +759,13 @@ extern s32 CopyMemcardIconTemplate(s32 arg0, s32 arg1);                /* TaskOb
 /* -------------------------------------------------------------------
  * class_3bb8c_m additions below (fourth 20-function slice of the tail,
  * 0x44518..0x44F14 -- see src/class_3bb8c_m.c's header comment for the
- * carve provenance). This is a DIFFERENT object graph from Obj866E8
- * above: the field offsets established here (0x10, 0x14, 0x18, 0x20,
+ * carve provenance). This is a DIFFERENT object graph from Class866E8
+ * (include/Class866E8.h): the field offsets established here (0x10, 0x14, 0x18, 0x20,
  * 0x34, 0x3C, 0x54, 0x80, 0x84) don't correspond to anything already
- * documented on Obj866E8's layout, and this unit's own self-vtable slots
+ * documented on Class866E8's layout, and this unit's own self-vtable slots
  * (0x10, 0x14, 0x30, 0xB8, 0xD4) collide with nothing already recorded in
- * Obj866E8Methods either. Kept as an entirely independent type rather
- * than folded into Obj866E8, per this project's established
+ * Class866E8Methods either. Kept as an entirely independent type rather
+ * than folded into Class866E8, per this project's established
  * multiple-independent-local-views convention -- nothing in this unit's
  * own evidence ties its `self` to that type. Named with an "M" suffix to
  * avoid implying any relationship.

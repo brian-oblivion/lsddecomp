@@ -68,7 +68,7 @@ Round 78 (track 3, naming pass, bravo).
 
 | symbol | name | tier | evidence |
 | --- | --- | --- | --- |
-| `func_8004B38C` | `Class866E8__SetTargetAndBuildRates` | B | Occupant of `D_800866E8` +0x0E4 (`tools/classtable.py 0x800866E8`), class prefix confirmed. Stores its own `arg2`/`arg3` into `self->unk6C`/`self->unkBC` (the tracked position source and current footprint descriptor), then computes offsets via `ComputeCellWorldOffsets` and forwards the result through its own vtable slot `slotF8`, which is `Class866E8__BuildRateEntries`'s identity slot. Mechanics only -- "sets the target/descriptor, then builds rates from it" describes what the body does, not why. |
+| `func_8004B38C` | `Class866E8__SetTargetAndBuildRates` | B | Occupant of `gClass866E8Methods` +0x0E4 (`tools/classtable.py 0x800866E8`), class prefix confirmed. Stores its own `arg2`/`arg3` into `self->unk6C`/`self->unkBC` (the tracked position source and current footprint descriptor), then computes offsets via `ComputeCellWorldOffsets` and forwards the result through its own vtable slot `slotF8`, which is `Class866E8__BuildRateEntries`'s identity slot. Mechanics only -- "sets the target/descriptor, then builds rates from it" describes what the body does, not why. |
 
 ## Proposed field names
 

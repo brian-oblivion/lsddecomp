@@ -23,9 +23,9 @@
  * them. The one caller of setColor (+0x044) and setDirection (+0x048) is
  * Class866E8__SetChildParams (src/class_3ac78.c), through LightRig's
  * getLight, with update = 1 and sources stepping 3 bytes (an r,g,b) and 6
- * bytes (an s16 vx,vy,vz) per light. That call site still types the light
- * through its own view (UnkChildObj_3ac78, include/class_3ac78.h), with s32
- * arguments: a Class866E8 matter, not this class's.
+ * bytes (an s16 vx,vy,vz) per light. That call site casts getLight's
+ * BasicClass * to FlatLightObj * and its s32 sources to the slots' types
+ * (track 4, round 89).
  *
  * The object is 0x20 bytes (New_FlatLightObj's allocation).
  */

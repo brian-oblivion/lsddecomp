@@ -2,7 +2,7 @@
 
 > Renamed from `func_8004D244` on 2026-09-24 (tools/rename.py). Address 0x8004d244.
 
-Get-vtable helper for the class whose method table is `D_800866E8`
+Get-vtable helper for the class whose method table is `gClass866E8Methods`
 (`Obj866E8` in this unit's header, `Class866E8` in `class_3ac78.h`'s
 independent view of the SAME table). This is the SAME real function
 `class_3ac78.h` already documents an `extern` prototype for (`"Get-vtable
@@ -12,13 +12,13 @@ has a real body, contributed by this unit.
 ## Disassembly
 
 ```
-lui   $v0, %hi(D_800866E8)
-addiu $v0, $v0, %lo(D_800866E8)
+lui   $v0, %hi(gClass866E8Methods)
+addiu $v0, $v0, %lo(gClass866E8Methods)
 jr    $ra
  nop
 ```
 
-No dereference — this just materializes `&D_800866E8`. Confirmed as a
+No dereference — this just materializes `&gClass866E8Methods`. Confirmed as a
 zero-argument call from its only external caller, `class_3ac78.c`'s
 `Class866E8__Class866E8` (the `New_Class866E8` constructor): the `jal` there has a
 `nop` in its own delay slot (no argument setup) and the very next
@@ -29,13 +29,13 @@ instruction stores `$v0` straight into `self->methods` (offset 0), i.e.
 
 ```c
 Obj866E8Methods *GetClass866E8Methods(void) {
-    return &D_800866E8;
+    return &gClass866E8Methods;
 }
 ```
 
 ## New struct/global knowledge
 
-- `extern Obj866E8Methods D_800866E8;` added to `include/class_3bb8c.h`
+- `extern Obj866E8Methods gClass866E8Methods;` added to `include/class_3bb8c.h`
   (this unit's own independent view of the table; `class_3ac78.h` keeps
   its own separate `Class866E8Methods` view of the identical memory, per
   the project's established multiple-independent-views convention).
@@ -53,7 +53,7 @@ None new — confirms the already-established "extern Methods D_xxx; return
 
 ## Naming
 
-**Tier A.** `lui`/`addiu` of `&D_800866E8`, no dereference -- the class's
+**Tier A.** `lui`/`addiu` of `&gClass866E8Methods`, no dereference -- the class's
 get-vtable helper. Matches this project's established
 `GetClass<addr>Methods` convention for these helpers exactly (e.g.
 `GetClass86668Methods`, `GetClass86F88Methods`, `GetClass869D8Methods`),

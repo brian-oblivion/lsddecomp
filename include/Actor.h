@@ -13,7 +13,7 @@
  * Children and companions. addChild/removeChild/removeAllChildren chain
  * Class6B5CC's and also record two companions by the child's class id:
  * `(id & 0xFFF) == 0x114` is the grid manager (Class866E8, include/
- * class_3ac78.h), kept in `grid`; `(id & 0xF) == 5` is a FrameClock object,
+ * Class866E8.h), kept in `grid`; `(id & 0xF) == 5` is a FrameClock object,
  * kept in `ticker` (Class6B5CC's onNotify routes that class's events to
  * `update`, +0x098, which the subclasses override as Class65650's
  * Update (formerly OnClass6EF50Notify), Entity__Update and DreamSys__TimerTick).
@@ -43,7 +43,7 @@
 typedef struct Actor Actor;
 typedef struct ActorMethods ActorMethods;
 
-/* The grid manager (include/class_3ac78.h); only its address is kept here. */
+/* The grid manager (include/Class866E8.h); only its address is kept here. */
 struct Class866E8;
 
 /* Occupants in gActorMethods named at each slot; `tools/classtable.py

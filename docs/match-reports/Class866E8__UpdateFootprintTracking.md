@@ -3,7 +3,7 @@
 > Renamed from `func_8004B5BC` on 2026-09-24 (tools/rename.py). Address 0x8004b5bc.
 
 Unit `class_3bb8c`. Slot `Obj866E8Methods::slotF4` (verified against
-`tools/classtable.py 0x800866E8`, which resolves `D_800866E8`'s own
+`tools/classtable.py 0x800866E8`, which resolves `gClass866E8Methods`'s own
 `+0x0F4` entry directly to `Class866E8__UpdateFootprintTracking`).
 
 Round 26 (runner delta) picked this up as the only FRESH function on the
@@ -179,4 +179,4 @@ Round 78 (track 3, naming pass, bravo).
 
 | symbol | name | tier | evidence |
 | --- | --- | --- | --- |
-| `func_8004B5BC` | `Class866E8__UpdateFootprintTracking` | B | Occupant of `D_800866E8` +0x0F4 (`slotF4`). `class_3ac78`'s own `Class866E8__UpdateIfEnabled` (round 67 report) dispatches this slot then `slot13C` (`Class866E8__AdvanceRateCountdown`) back-to-back, guarded by `enabled` -- i.e. this runs every "enabled" tick alongside the rate countdown. Body reads the current footprint query (`slot10C`), resolves an element and its remap byte, conditionally forwards through `slotF8` (`Class866E8__BuildRateEntries`), calls `slot128` (`Class866E8__RefreshFootprint`), then updates `self->unkBC` (the current descriptor) and notifies (`slot30`) only if the descriptor's leading value changed. "Update...Tracking" names the mechanic (per-tick refresh-and-notify-on-change of the tracked footprint state), not an unproven in-game purpose. |
+| `func_8004B5BC` | `Class866E8__UpdateFootprintTracking` | B | Occupant of `gClass866E8Methods` +0x0F4 (`slotF4`). `class_3ac78`'s own `Class866E8__UpdateIfEnabled` (round 67 report) dispatches this slot then `slot13C` (`Class866E8__AdvanceRateCountdown`) back-to-back, guarded by `enabled` -- i.e. this runs every "enabled" tick alongside the rate countdown. Body reads the current footprint query (`slot10C`), resolves an element and its remap byte, conditionally forwards through `slotF8` (`Class866E8__BuildRateEntries`), calls `slot128` (`Class866E8__RefreshFootprint`), then updates `self->unkBC` (the current descriptor) and notifies (`slot30`) only if the descriptor's leading value changed. "Update...Tracking" names the mechanic (per-tick refresh-and-notify-on-change of the tracked footprint state), not an unproven in-game purpose. |

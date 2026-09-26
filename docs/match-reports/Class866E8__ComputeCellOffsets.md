@@ -76,4 +76,4 @@ Round 78 (track 3, naming pass, bravo).
 
 | symbol | name | tier | evidence |
 | --- | --- | --- | --- |
-| `func_8004B418` | `Class866E8__ComputeCellOffsets` | B | Occupant of `D_800866E8` +0x0E8. A thin wrapper: forwards `self->unk68`/`&self->unk54` and its own two arguments straight into `ComputeCellWorldOffsets`, discarding that call's own `outBuf` (a fresh unread local). Named for the mechanic it performs (call the world-offset computation with this object's own divisor/count/gate and cell-base state), not a guessed purpose. |
+| `func_8004B418` | `Class866E8__ComputeCellOffsets` | B | Occupant of `gClass866E8Methods` +0x0E8. A thin wrapper: forwards `self->unk68`/`&self->unk54` and its own two arguments straight into `ComputeCellWorldOffsets`, discarding that call's own `outBuf` (a fresh unread local). Named for the mechanic it performs (call the world-offset computation with this object's own divisor/count/gate and cell-base state), not a guessed purpose. |

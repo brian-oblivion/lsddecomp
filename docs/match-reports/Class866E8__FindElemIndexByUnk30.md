@@ -2,7 +2,7 @@
 
 > Renamed from `func_8004C5D0` on 2026-09-24 (tools/rename.py). Address 0x8004c5d0.
 
-A vtable slot in `D_800866E8` (`+0x124`, per `tools/classtable.py`), and
+A vtable slot in `gClass866E8Methods` (`+0x124`, per `tools/classtable.py`), and
 already independently visible from `class_3ac78.h`'s own view of the same
 table — its own comment types the occupant as `void
 *(*slot124)(Class866E8 *self, void *arg1)`. Reading THIS unit's actual
@@ -80,7 +80,7 @@ s32 Class866E8__FindElemIndexByUnk30(Obj866E8 *self, s32 key) {
 
 ### Proposed learning
 
-**`class_3ac78.h`'s independent typing of `D_800866E8` slot `+0x124`
+**`class_3ac78.h`'s independent typing of `gClass866E8Methods` slot `+0x124`
 (`void *(*slot124)(Class866E8 *self, void *arg1)`) does not match this
 occupant's own body** — the occupant returns `s32` (an index or `-1`) and
 never dereferences `arg1`, only compares it against a signed 16-bit field.

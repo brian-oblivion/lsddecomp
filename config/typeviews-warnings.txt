@@ -1,17 +1,7 @@
 DreamSys: warning: control reaches end of non-void function
 Entity_g: warning: passing arg 4 of `Entity__GetOrCreateUnk100' makes pointer from integer without a cast
 class_3ac78: warning: unused variable `unused'
-class_3bb8c: src/class_3bb8c.c: At top level:
-class_3bb8c: warning: `Class866E8__ComputeDivisorSplit' was previously implicitly declared to return `int'
 class_3bb8c: warning: control reaches end of non-void function
-class_3bb8c: warning: implicit declaration of function `Class866E8__ComputeDivisorSplit'
-class_3bb8c: warning: implicit declaration of function `Class866E8__ComputeRateFlags'
-class_3bb8c: warning: implicit declaration of function `Class866E8__CountFlaggedElements'
-class_3bb8c: warning: passing arg 4 from incompatible pointer type
-class_3bb8c: warning: previous external decl of `Class866E8__ComputeDivisorSplit'
-class_3bb8c: warning: previous implicit declaration of `Class866E8__ComputeDivisorSplit'
-class_3bb8c: warning: type mismatch with previous external decl
-class_3bb8c: warning: type mismatch with previous implicit declaration
 class_3bb8c_b: warning: `flag' might be used uninitialized in this function
 class_3bb8c_b: warning: `junk' might be used uninitialized in this function
 class_3bb8c_b: warning: `offset' might be used uninitialized in this function

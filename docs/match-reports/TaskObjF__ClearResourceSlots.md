@@ -4,7 +4,7 @@
 
 **Unit:** class_3bb8c_e (round 14, first slice of the new `Node3bb8cE` class --
 see `include`-local declarations at the top of `src/class_3bb8c_e.c`; this
-class is unrelated to `Obj866E8`/`D_800866E8` in `include/class_3bb8c.h`).
+class is unrelated to `Obj866E8`/`gClass866E8Methods` in `include/class_3bb8c.h`).
 
 ## What it does
 
