@@ -43,7 +43,7 @@
  *    LongVec3 offset; it attaches with a NULL offset, then setPosition.
  *    Callers cast to BoxFillAttachToParentFn (class_3bb8c_m/_n,
  *    code_2cc8c_b) or, through a SceneNode pointer, cast the argument
- *    (Viewport__SetSubHandle). BoxFill__AttachAbsolute calls it with FOUR
+ *    (Viewport__SetFadeBox). BoxFill__AttachAbsolute calls it with FOUR
  *    arguments through an unprototyped pointer (see its match report).
  * The ctor itself returns nothing where SceneNode's slot returns `void *`;
  * every caller ignores the value.

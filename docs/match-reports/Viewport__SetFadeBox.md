@@ -1,4 +1,6 @@
-# Viewport__SetSubHandle — MATCHED
+# Viewport__SetFadeBox — MATCHED
+
+> Renamed from `Viewport__SetSubHandle` on 2026-09-26 (tools/rename.py). Address 0x8003f1a8.
 
 > Renamed from `Unk18Obj__SetSubHandle` on 2026-09-25 (tools/rename.py). Address 0x8003f1a8.
 
@@ -10,7 +12,7 @@ real attempts).
 ## Signature
 
 ```c
-void Viewport__SetSubHandle(Unk18Obj *self, SubHandleObj *arg1);
+void Viewport__SetFadeBox(Unk18Obj *self, SubHandleObj *arg1);
 ```
 
 `Unk18ObjMethods`'s own `+0x0A8` slot occupant (`slotA8`) — a DIFFERENT
@@ -29,7 +31,7 @@ shared `D_8008A904` constant (already known from round 13's
 `Viewport__Viewport`, the same 3rd argument).
 
 ```c
-void Viewport__SetSubHandle(Unk18Obj *self, SubHandleObj *arg1) {
+void Viewport__SetFadeBox(Unk18Obj *self, SubHandleObj *arg1) {
     if (self->unk10 != NULL) {
         return;
     }

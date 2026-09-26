@@ -406,7 +406,7 @@ tail_check:
  * occupant of handle's +0x04C (BoxFill__AttachToParent, a FadeBox's) takes a
  * screen position where SceneNode's attachToParent slot types a LongVec3
  * offset, hence the cast (include/Viewport.h, "Not settled here"). */
-void Viewport__SetSubHandle(Viewport *self, SceneNode *handle) {
+void Viewport__SetFadeBox(Viewport *self, SceneNode *handle) {
     if (self->viewNode != NULL) {
         return;
     }
