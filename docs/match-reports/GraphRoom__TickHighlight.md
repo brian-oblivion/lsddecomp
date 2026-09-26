@@ -77,3 +77,7 @@ ScoreDayLog match" (in-game trigger cadence not independently confirmed).
 ## Track 4 (2026-09-25, round 85, charlie)
 
 points[] are BoxFills (include/BoxFill.h); the deleted `GraphRoomPoint` view's `highlight` (+0x0B8) is setColor(1, &D_8008ABBC): the highlight is a colour overwrite. Zero bytes.
+
+## Track 4 (2026-09-26, round 87, alpha): renamed `GraphRoomObj__TickHighlight` -> `GraphRoom__TickHighlight`
+
+The class is unified in `include/GraphRoom.h` (class id 0x2F130, table `gGraphRoomMethods`, parent TaskCore; `tools/classtable.py gGraphRoomMethods --vs gTaskCoreMethods`). The class name drops round 75's `Obj` suffix (FINISHING-PLAN track 4 step 2); every function prefix moved with it. The unit's GraphRoomObj/GraphRoomMethods views are deleted and `self` is `GraphRoom *`; inherited fields and slots carry TaskCore's and IntermediateBase's names. Zero bytes changed (build-and-verify OK, typeviews --warnings 0 new). Prefix only. The class's own slot +0x124, `tickHighlight`. The field the round-19 view called elapsedHours is IntermediateBase's s32 frameCounter; the body's `sltiu`/`divu` need it unsigned, so it is read as `(u32)self->frameCounter`.

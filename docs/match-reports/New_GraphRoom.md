@@ -54,3 +54,7 @@ tools/funcdiff.py New_GraphRoom   # 24/24
 `GraphRoomObj` this round -- see `src/class_3bb8c_t.c`'s own header
 comment for the class-identity evidence (loads "ETC\HGRAPH.TIM", builds
 100 coloured points from a day-type ring).
+
+## Track 4 (2026-09-26, round 87, alpha): renamed `New_GraphRoomObj` -> `New_GraphRoom`
+
+The class is unified in `include/GraphRoom.h` (class id 0x2F130, table `gGraphRoomMethods`, parent TaskCore; `tools/classtable.py gGraphRoomMethods --vs gTaskCoreMethods`). The class name drops round 75's `Obj` suffix (FINISHING-PLAN track 4 step 2); every function prefix moved with it. The unit's GraphRoomObj/GraphRoomMethods views are deleted and `self` is `GraphRoom *`; inherited fields and slots carry TaskCore's and IntermediateBase's names. Zero bytes changed (build-and-verify OK, typeviews --warnings 0 new). Prefix only. Now returns `GraphRoom *` and takes `struct DreamSys *`: its one caller, Class6D3C8__PollGraphRoomStatus (src/code_1677c.c), passes `self->dreamSys` through Class6D3C8__RunPollTask, and casts New_GraphRoom to PollTaskCtor there; include/Class6D3C8.h's own `extern PollTask *New_GraphRoom(void *)` is deleted.

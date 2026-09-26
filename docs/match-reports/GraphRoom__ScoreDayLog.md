@@ -233,3 +233,7 @@ its round-41 provenance, `func_800585B4` -> `GraphRoom__ScoreDayLog` via
 fixed day-type targets (`D_80087BD4`) and records, per target, the most
 recent matching day index into `matchedDayIndices` -- exactly "scoring"
 the log against those four targets, feeding `GraphRoom__TickHighlight`.
+
+## Track 4 (2026-09-26, round 87, alpha): renamed `GraphRoomObj__ScoreDayLog` -> `GraphRoom__ScoreDayLog`
+
+The class is unified in `include/GraphRoom.h` (class id 0x2F130, table `gGraphRoomMethods`, parent TaskCore; `tools/classtable.py gGraphRoomMethods --vs gTaskCoreMethods`). The class name drops round 75's `Obj` suffix (FINISHING-PLAN track 4 step 2); every function prefix moved with it. The unit's GraphRoomObj/GraphRoomMethods views are deleted and `self` is `GraphRoom *`; inherited fields and slots carry TaskCore's and IntermediateBase's names. Zero bytes changed (build-and-verify OK, typeviews --warnings 0 new). Prefix only; not a slot (called by PopulateGraphPoints alone). The log is the DreamSys save block: `days` is moodPreviousDays, `scored` (+0x467 of the block, DreamSys +0x5DF, the last byte of DreamSys's unknown_values_0x5d8) is renamed graphScored in the unit's record. The round-24 "not DreamSys" note compared the offsets against DreamSys's start rather than saveMagic (+0x178).

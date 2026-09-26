@@ -214,3 +214,7 @@ Its up-calls to TaskCore (include/TaskCore.h, track 4 round 84) now go through `
 ## Track 4 (2026-09-25, round 85, charlie)
 
 points[] are BoxFills (include/BoxFill.h); the deleted `GraphRoomPoint` view's `setPosition` (+0x0C4) is attachAbsolute(parent, &point, 0): attach at a pixel position. Zero bytes.
+
+## Track 4 (2026-09-26, round 87, alpha): renamed `GraphRoomObj__PopulateGraphPoints` -> `GraphRoom__PopulateGraphPoints`
+
+The class is unified in `include/GraphRoom.h` (class id 0x2F130, table `gGraphRoomMethods`, parent TaskCore; `tools/classtable.py gGraphRoomMethods --vs gTaskCoreMethods`). The class name drops round 75's `Obj` suffix (FINISHING-PLAN track 4 step 2); every function prefix moved with it. The unit's GraphRoomObj/GraphRoomMethods views are deleted and `self` is `GraphRoom *`; inherited fields and slots carry TaskCore's and IntermediateBase's names. Zero bytes changed (build-and-verify OK, typeviews --warnings 0 new). Prefix only. Occupies +0x0E0, TaskCore's `updateSlotElements`, and keeps its own name (step 6: after the base call it scores the log and places one dot a day). The +0x1B0 call is DreamSys__GetSaveBlock through DreamSys.h; the record is DreamSaveBlock (fields currentYear/currentDay/moodPreviousDays, DreamSys's names at the same offsets from saveMagic).

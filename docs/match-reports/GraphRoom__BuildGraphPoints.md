@@ -201,3 +201,7 @@ comment); also allocates the 4-byte `matchedDayIndices` scratch buffer
 ## Track 4 (2026-09-25, round 85, charlie)
 
 The points are New_BoxFill boxes (include/BoxFill.h): size &D_8008ABAC, colour &D_8008ABB4 then the fading `rgb`, priority 0. Zero bytes.
+
+## Track 4 (2026-09-26, round 87, alpha): renamed `GraphRoomObj__BuildGraphPoints` -> `GraphRoom__BuildGraphPoints`
+
+The class is unified in `include/GraphRoom.h` (class id 0x2F130, table `gGraphRoomMethods`, parent TaskCore; `tools/classtable.py gGraphRoomMethods --vs gTaskCoreMethods`). The class name drops round 75's `Obj` suffix (FINISHING-PLAN track 4 step 2); every function prefix moved with it. The unit's GraphRoomObj/GraphRoomMethods views are deleted and `self` is `GraphRoom *`; inherited fields and slots carry TaskCore's and IntermediateBase's names. Zero bytes changed (build-and-verify OK, typeviews --warnings 0 new). Prefix only. Occupies +0x0D8, TaskCore's `setTarget`, and keeps its own name (step 6: the body sets no target, it builds the 100 BoxFill dots and matchedDayIndices). The ctor reaches it as setTarget(self, NULL).
