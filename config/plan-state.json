@@ -867,11 +867,6 @@
           "date": "2026-09-26",
           "header": "include/Class6E99C.h"
         },
-        "ENTITY_METHODS": {
-          "class": "Entity",
-          "date": "2026-09-26",
-          "header": "include/Entity.h"
-        },
         "gActorMethods": {
           "class": "Actor",
           "date": "2026-09-25",
@@ -981,6 +976,11 @@
           "class": "DreamSys",
           "date": "2026-09-26",
           "header": "include/DreamSys.h"
+        },
+        "gEntityMethods": {
+          "class": "Entity",
+          "date": "2026-09-26",
+          "header": "include/Entity.h"
         },
         "gFlatLightObjMethods": {
           "class": "FlatLightObj",

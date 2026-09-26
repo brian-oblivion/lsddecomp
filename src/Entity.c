@@ -14,8 +14,8 @@
  * small getters over the moodIndex-selected per-mood tables
  * (Entity__GetMoodEffect/GetUnlockEffect/GetLinkStage/GetEventVideo).
  *
- * Entity's own vtable is ENTITY_METHODS (asm/data/79528.data.s), reached via
- * Get_vtable_Entity (Entity_b.c); `tools/classtable.py ENTITY_METHODS` is
+ * Entity's own vtable is gEntityMethods (asm/data/79528.data.s), reached via
+ * Get_vtable_Entity (Entity_b.c); `tools/classtable.py gEntityMethods` is
  * the ground truth for which function occupies which slot, including the
  * several self-referential slots this unit's own functions dispatch back
  * into (activate/deactivate/getProximityRatio/startSoundCue/stopSoundCue).
