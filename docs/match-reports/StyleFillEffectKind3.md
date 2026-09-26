@@ -435,3 +435,7 @@ to `New_Class876FC` and appends exactly one slot (`*arg0 = ...; arg0++;
 return arg0;`). STALL, 79/81 words (length exact), register-identity
 residue only; naming from the literal `3` argument, confirmed the same way
 as `StyleFillEffectKind0`/`1`/`2`.
+
+## Track 4 (2026-09-26, round 88, charlie)
+
+`gStyleEffectSlots` holds Class876FC objects (New_Class876FC), so the walking pointer is `Class876FC **` and the position `Vec3_d294 *`; `kind` is passed as a plain `s32` (was `(void *) N`), the params block as `(Class876FCParams *)` over the separately-declared D_8008E0A4.. symbols (one 0x24-byte Class876FCParams in the bytes; left as they are, a track 4b job), and gStyleCueSelf as the `Class6B5CC *` parent. Image byte-identical.

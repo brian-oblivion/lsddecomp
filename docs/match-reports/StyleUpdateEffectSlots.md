@@ -78,3 +78,7 @@ Iterates `gStyleEffectSlots[0 .. gStyleEffectSlotCount)` dispatching
 `slotEC(obj, arg0)` on each -- the per-frame update half of the
 `StyleBuildEffectSlots`/`StyleUpdateEffectSlots`/`StyleReleaseEffectSlots`
 triad. MATCHED, 34/34, first build.
+
+## Track 4 (2026-09-26, round 88, charlie)
+
+The `ObjE0C8` view is gone: each slot is a `Class876FC` (include/Class876FC.h) and the +0x0EC call is Class876FC__Update through `Class876FCUpdateFn` (the slot keeps Actor's `setPendingExtra` type; a cast, no code). `arg0` is the position (`Vec3_d294 *`), which Update forwards to UpdateByKind. Image byte-identical.

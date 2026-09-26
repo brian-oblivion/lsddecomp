@@ -48,6 +48,7 @@
 
 #include "common.h"
 #include "Actor.h"
+#include "Class876FC.h"
 #include "BoxFill.h"
 
 /* gStyleDecorObj and gStyleDecorSlots[] hold BoxFill objects
@@ -280,17 +281,17 @@ extern s32 gStyleTargetObj;
 extern s32 rand(void);
 extern s8 D_80087324[];
 extern s32 gStyleEffectSlotCount;
-extern void *gStyleEffectSlots[];
-extern void **StyleFillEffectKind0(void **arg0, s32 arg1, void *arg2);
-extern void **StyleFillEffectKind1(void **arg0, s32 arg1, void *arg2);
-extern void **StyleFillEffectKind3(void **arg0, void *arg1);
-extern void **StyleFillEffectKind2(void **arg0, void *arg1);
+extern Class876FC *gStyleEffectSlots[];
+extern Class876FC **StyleFillEffectKind0(Class876FC **arg0, s32 arg1, Vec3_d294 *arg2);
+extern Class876FC **StyleFillEffectKind1(Class876FC **arg0, s32 arg1, Vec3_d294 *arg2);
+extern Class876FC **StyleFillEffectKind3(Class876FC **arg0, Vec3_d294 *arg1);
+extern Class876FC **StyleFillEffectKind2(Class876FC **arg0, Vec3_d294 *arg1);
 
-void StyleBuildEffectSlots(void *arg0) {
+void StyleBuildEffectSlots(Vec3_d294 *arg0) {
     s32 base;
     s32 val;
     s32 count;
-    void **filled;
+    Class876FC **filled;
 
     if (gStyleVariant < 0) {
         return;
@@ -312,43 +313,30 @@ void StyleBuildEffectSlots(void *arg0) {
     gStyleEffectSlotCount = gStyleEffectSlotCount + 1;
 }
 
-/* Local view: array elements at gStyleEffectSlots are objects with a method table
- * pointer at offset 0, dispatched here through slot +0xEC as
- * slotEC(self, arg1). */
-typedef struct ObjE0C8 ObjE0C8;
-typedef struct ObjE0C8Methods ObjE0C8Methods;
-struct ObjE0C8Methods {
-    u8 padEC[0xEC];
-    void (*slotEC)(ObjE0C8 *self, void *arg1); /* +0x0EC */
-};
-struct ObjE0C8 {
-    ObjE0C8Methods *methods; /* +0x000 */
-};
-
 extern s32 gStyleVariant;
 extern s32 gStyleEffectSlotCount;
-extern void *gStyleEffectSlots[];
 
-void StyleUpdateEffectSlots(void *arg0) {
+/* Each slot's +0x0EC is Class876FC__Update, called with the position
+ * (include/Class876FC.h: the slot keeps Actor's setPendingExtra type). */
+void StyleUpdateEffectSlots(Vec3_d294 *arg0) {
     s32 i;
-    ObjE0C8 *obj;
+    Class876FC *obj;
 
     if (gStyleVariant < 0) {
         return;
     }
     for (i = 0; i < gStyleEffectSlotCount; i++) {
-        obj = (ObjE0C8 *) gStyleEffectSlots[i];
-        obj->methods->slotEC(obj, arg0);
+        obj = gStyleEffectSlots[i];
+        ((Class876FCUpdateFn)obj->methods->setPendingExtra)(obj, arg0);
     }
 }
 
 extern s32 gStyleVariant;
 extern s32 gStyleEffectSlotCount;
-extern void *gStyleEffectSlots[];
 
 void StyleReleaseEffectSlots(void) {
     if (gStyleVariant >= 0) {
-        ReleaseBasicClassArray(gStyleEffectSlots, gStyleEffectSlotCount);
+        ReleaseBasicClassArray((void **)gStyleEffectSlots, gStyleEffectSlotCount);
     }
 }
 
@@ -410,14 +398,13 @@ extern s32 D_8008E0BC;
 extern s32 D_8008E0A4;
 extern void SetupStyleSpawnParamsA(void *arg0, void *arg1);
 extern void SetupStyleSpawnParamsB(void *arg0, void *arg1);
-extern void *New_Class876FC(void *arg0, void *arg1, void *arg2, void *arg3);
 
 /* Fills arg1 slots with New_Class876FC(kind 0, ...) objects, first setting
  * up the random style parameters and choosing the per-slot setup function by
  * gStyleCounter % 7; returns the next free slot. Matched round 75: arg0 is
  * the walking pointer itself (a separate `arr = arg0` copy reordered the
  * prologue's argument moves). */
-void **StyleFillEffectKind0(void **arg0, s32 arg1, void *arg2) {
+Class876FC **StyleFillEffectKind0(Class876FC **arg0, s32 arg1, Vec3_d294 *arg2) {
     s32 i;
     s32 t3;
     void (*fp)(void *, void *);
@@ -434,7 +421,7 @@ void **StyleFillEffectKind0(void **arg0, s32 arg1, void *arg2) {
     }
     for (i = 0; i < arg1; i++) {
         fp(arg2, (void *) t3);
-        *arg0 = New_Class876FC((void *) 0, &D_8008E0A4, (void *) gStyleCueSelf, arg2);
+        *arg0 = New_Class876FC(0, (Class876FCParams *)&D_8008E0A4, (Class6B5CC *) gStyleCueSelf, arg2);
         arg0++;
     }
     return arg0;
@@ -443,7 +430,7 @@ void **StyleFillEffectKind0(void **arg0, s32 arg1, void *arg2) {
 extern s32 D_80087330;
 extern u8 D_80087204[];
 
-void **StyleFillEffectKind1(void **arg0, s32 arg1, void *arg2) {
+Class876FC **StyleFillEffectKind1(Class876FC **arg0, s32 arg1, Vec3_d294 *arg2) {
     s32 i;
     s32 val;
 
@@ -451,7 +438,7 @@ void **StyleFillEffectKind1(void **arg0, s32 arg1, void *arg2) {
     D_8008E0B4 = D_80087204;
     for (i = 0; i < arg1; i++) {
         SetupStyleSpawnParamsA(arg2, (void *) val);
-        *arg0 = New_Class876FC((void *) 1, &D_8008E0A4, (void *) gStyleCueSelf, arg2);
+        *arg0 = New_Class876FC(1, (Class876FCParams *)&D_8008E0A4, (Class6B5CC *) gStyleCueSelf, arg2);
         arg0++;
     }
     return arg0;
@@ -481,7 +468,7 @@ typedef struct PtrBoxK3 {
  * and the default colour table it pins the spawn parameters, otherwise it
  * clamps D_8008E0AC and picks a random colour triple.  MATCHED round 76
  * (charlie). */
-void **StyleFillEffectKind3(void **arg0, void *arg1) {
+Class876FC **StyleFillEffectKind3(Class876FC **arg0, Vec3_d294 *arg1) {
     s32 *p;
     PtrBoxK3 *q;
 
@@ -503,7 +490,7 @@ void **StyleFillEffectKind3(void **arg0, void *arg1) {
     }
     q = (PtrBoxK3 *) &D_8008E0B0;
     q->p = D_80087174;
-    *arg0 = New_Class876FC((void *) 3, (u8 *) q - 0xC, (void *) gStyleCueSelf, arg1);
+    *arg0 = New_Class876FC(3, (Class876FCParams *)((u8 *) q - 0xC), (Class6B5CC *) gStyleCueSelf, arg1);
     arg0++;
     return arg0;
 }
@@ -529,7 +516,7 @@ typedef struct S32BoxK2 {
  * load-bearing spelling of `% 20 != 0`: because the tested variable is also
  * the assigned one, jump.c cannot rewrite the if/else into `val = 0; if (..)
  * val = D_80087430;`, which is what every `% 20` spelling compiles to. */
-void **StyleFillEffectKind2(void **arg0, void *arg1) {
+Class876FC **StyleFillEffectKind2(Class876FC **arg0, Vec3_d294 *arg1) {
     s32 r;
     s32 val;
     S32BoxK2 *slot;
@@ -550,7 +537,7 @@ void **StyleFillEffectKind2(void **arg0, void *arg1) {
     q = &D_8008E0B0;
     *q = D_80087174;
     D_8008E0BC = rand() % 6;
-    *arg0 = New_Class876FC((void *) 2, (u8 *) q - 0xC, (void *) gStyleCueSelf, arg1);
+    *arg0 = New_Class876FC(2, (Class876FCParams *)((u8 *) q - 0xC), (Class6B5CC *) gStyleCueSelf, arg1);
     arg0++;
     return arg0;
 }

@@ -496,3 +496,7 @@ the kind-2-exclusive finishing fill (the sibling of `StyleFillEffectKind3`,
 mirrored for the other variant). Passes a literal kind argument of `2` to
 `New_Class876FC`. STALL, 49/79 words (length exact), residue at ins 3/del 3
 per the round-64 revisit.
+
+## Track 4 (2026-09-26, round 88, charlie)
+
+`gStyleEffectSlots` holds Class876FC objects (New_Class876FC), so the walking pointer is `Class876FC **` and the position `Vec3_d294 *`; `kind` is passed as a plain `s32` (was `(void *) N`), the params block as `(Class876FCParams *)` over the separately-declared D_8008E0A4.. symbols (one 0x24-byte Class876FCParams in the bytes; left as they are, a track 4b job), and gStyleCueSelf as the `Class6B5CC *` parent. Image byte-identical.
