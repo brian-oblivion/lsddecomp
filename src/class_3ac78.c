@@ -1,5 +1,7 @@
 /*
- * class_3ac78 -- the front half of Class866E8, the class whose method table is
+ * class_3ac78 -- TimedTask's last two functions (TimedTask__PlaySound and
+ * GetTimedTaskMethods, include/TimedTask.h; the rest are in class_39e08),
+ * then the front half of Class866E8, the class whose method table is
  * gClass866E8Methods (80 slots, header 0x114; tools/classtable.py gClass866E8Methods). It
  * derives from SceneNode (code_d294) through LightRig (include/LightRig.h,
  * gLightRigMethods: the three flat lights and the ambient colour), whose ctor

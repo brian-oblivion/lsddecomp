@@ -8,12 +8,11 @@
  * Unit class_39e08: the methods of two classes, in ROM order.
  *  - Class865C8 (gClass865C8Methods, 0x1F230), New_Class865C8 through
  *    GetClass865C8Methods: include/Class865C8.h (track 4, round 88).
- *  - TimedTask (gTimedTaskMethods, 0x230), its parent, from
- *    New_TimedTask on: include/TimedTask.h (track 4, round 84). Slots
- *    +0x058..+0x06C (NoOpSlot58, CheckTimeout, SetState, SetTimeout) sit at
- *    the same offsets in both tables and lie in ROM between TimedTask's
- *    finalize and TimedTask__PlaySound: they are TimedTask methods that
- *    Class865C8 inherits (round 73 head correction).
+ *  - TimedTask (gTimedTaskMethods, 0x230), its parent, New_TimedTask
+ *    through TimedTask__SetTimeout: include/TimedTask.h. Its last two
+ *    functions, TimedTask__PlaySound and GetTimedTaskMethods, open
+ *    class_3ac78. NoOpSlot58, CheckTimeout, SetState and SetTimeout are
+ *    TimedTask's own methods that Class865C8 inherits unchanged.
  * plus func_8004A070, called once from Class865C8's ctor and once from
  * code_1677c: it manages a pair of file-scope globals (D_8008A978/
  * D_8008A97C) and loops on RegisterFileTableEntries; nothing pins down
