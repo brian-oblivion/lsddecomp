@@ -1,4 +1,6 @@
-# TitleMenu__CreateNameField -- MATCHED 60/60, round 43
+# TitleMenu__CreateSaveTitle -- MATCHED 60/60, round 43
+
+> Renamed from `TitleMenu__CreateNameField` on 2026-09-26 (tools/rename.py). Address 0x8004db18.
 
 > Renamed from `Class86B60__CreateNameField` on 2026-09-26 (tools/rename.py). Address 0x8004db18.
 
@@ -21,7 +23,7 @@ extern char *strcpy(char *dest, char *src);
 extern s32 strlen(char *s);
 extern void DecodeFullWidthSjis(void *dst, void *src);
 
-void TitleMenu__CreateNameField(TitleMenu *self, Arg1DB18_3bb8c_d *arg1)
+void TitleMenu__CreateSaveTitle(TitleMenu *self, Arg1DB18_3bb8c_d *arg1)
 {
     u32 size;
     char *buf;
@@ -45,7 +47,7 @@ void TitleMenu__CreateNameField(TitleMenu *self, Arg1DB18_3bb8c_d *arg1)
 }
 ```
 
-Byte-exact on the first build: `funcdiff.py TitleMenu__CreateNameField` -> `60/60 words
+Byte-exact on the first build: `funcdiff.py TitleMenu__CreateSaveTitle` -> `60/60 words
 match (file 0x3E318-0x3E408)`; whole-image `OK: build matches retail
 SLPS_015.56`.
 
@@ -121,7 +123,7 @@ No EXISTING declaration was retyped or resized.
 ### Proposed learning
 
 A `%gp_rel`-loaded global whose static ROM-image value points into
-`.rodata` is not necessarily read-only in practice: `TitleMenu__CreateNameField` writes
+`.rodata` is not necessarily read-only in practice: `TitleMenu__CreateSaveTitle` writes
 through `D_8008AA18` (a `strcpy` destination) despite its ROM-image value
 sitting inside an unowned rodata string table. When a function treats a
 gp-relative global's value as a destination/buffer rather than a source,
@@ -130,7 +132,7 @@ matters at runtime -- some other, likely-uncarved code reassigns it first.
 
 ## Naming (round 77, naming runner delta)
 
-Renamed `func_8004DB18` -> `TitleMenu__CreateNameField`. **Tier B**: SJIS-decodes `D_8008AA18` (a writable name-text buffer, per its own header comment) into a pool buffer and constructs `self->nameField` through `New_TextRow`, tagging it with three literal flag bytes. Named for what it builds (a text-field sub-object); the field's role in the larger UI is not established.
+Renamed `func_8004DB18` -> `TitleMenu__CreateSaveTitle`. **Tier B**: SJIS-decodes `D_8008AA18` (a writable name-text buffer, per its own header comment) into a pool buffer and constructs `self->nameField` through `New_TextRow`, tagging it with three literal flag bytes. Named for what it builds (a text-field sub-object); the field's role in the larger UI is not established.
 
 ## Track 4 (2026-09-26, round 88, bravo)
 

@@ -51,7 +51,7 @@ the whole image after any further edit there.)
 ## Derivation
 
 - `size = self->nameField->unkA9;` -- a NEW `u8` field at `TitleMenuUnkB0Obj_
-  3bb8c_d`'s +0x0A9 (immediately before this round's `TitleMenu__CreateNameField`-
+  3bb8c_d`'s +0x0A9 (immediately before this round's `TitleMenu__CreateSaveTitle`-
   established `unkAA`/`unkAB`/`unkAC`), read unsigned and used directly as
   an allocation size.
 - `origState = self->state;` -- a snapshot of the CURRENT `state` value,
@@ -62,7 +62,7 @@ the whole image after any further edit there.)
 - `buf1 = BMemPMgrAlloc(size); DecodeFullWidthSjis(buf1, D_8008AA18); self->
   nameField->methods->slotCC(self->nameField, buf1); BMemPMgrFree(buf1);` -- the
   identical allocate/fill/consume/free idiom already matched in this unit's
-  own `TitleMenu__CreateNameField` (this round), just simpler (no `strcpy`/`strlen`
+  own `TitleMenu__CreateSaveTitle` (this round), just simpler (no `strcpy`/`strlen`
   sizing step here -- the size comes straight from `unkA9`).
   `slotCC` is a NEW slot on `TitleMenuUnkB0ObjMethods_3bb8c_d`, landing at
   +0x0CC, 0x10 bytes after this round's `slotB8` (+0x0B8) with an

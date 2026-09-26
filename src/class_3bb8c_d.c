@@ -5,7 +5,7 @@
  *
  * TitleMenu is a TaskCore. Its overrides replace TaskCore's slot widgets
  * with one owned TextRow, `nameField` (setTarget/releaseTarget/
- * updateSlotElements/broadcastToSlots: TitleMenu__CreateNameField/
+ * updateSlotElements/broadcastToSlots: TitleMenu__CreateSaveTitle/
  * DestroyNameField/ForwardToNameField/TickNameFieldCursor), and its own
  * slots drive `saveCtrl`, a TaskObjF whose calls carry "BISLPS-01556",
  * Sony's memory-card product code (TitleMenu__Begin/EndMemcardSave and the
@@ -123,7 +123,7 @@ extern void DecodeFullWidthSjis(void *dst, void *src);
 
 /* The setTarget override: `target` is the TaskCoreTarget the ctor passes
  * (&D_80086D44); only its `handle` is read, as the TextRow's texture. */
-void TitleMenu__CreateNameField(TitleMenu *self, TaskCoreTarget *target) {
+void TitleMenu__CreateSaveTitle(TitleMenu *self, TaskCoreTarget *target) {
     u32 size;
     char *buf;
 

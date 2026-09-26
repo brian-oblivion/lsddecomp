@@ -206,7 +206,7 @@ extern s32 D_8008A9B4;
  * be spelled by the address they point to and are typed opaque `void *`
  * instead.
  *
- * `D_8008AA18` is also read by round 43's `TitleMenu__CreateNameField`, which
+ * `D_8008AA18` is also read by round 43's `TitleMenu__CreateSaveTitle`, which
  * `strcpy`s INTO `(char *)D_8008AA18 + 0x18` and reads it with `strlen` --
  * both require the RUNTIME value to be a writable buffer, not the .rodata
  * address the ROM image happens to initialise it to. Nothing in this unit
@@ -222,7 +222,7 @@ extern void *D_8008AA18;
  * writable-buffer placeholder rather than the real runtime value. */
 extern void *D_8008AA24;
 
-/* Same VALUE-of `%gp_rel` pattern, read only by round 43's `TitleMenu__CreateNameField`
+/* Same VALUE-of `%gp_rel` pattern, read only by round 43's `TitleMenu__CreateSaveTitle`
  * as `strcpy`'s SOURCE argument. Holds `0x80011474` in the ROM image
  * (immediately past `D_8008AA10`'s own "BISLPS-01556xxx" string, i.e. the
  * start of the font-glyph word table in `D_80011434`) -- likely also a

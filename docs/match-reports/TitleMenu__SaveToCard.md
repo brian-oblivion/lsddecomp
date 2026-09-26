@@ -84,7 +84,7 @@ its own new slot immediately after it.
 
 ## Naming (round 77, naming runner delta)
 
-Renamed `func_8004E0E4` -> `TitleMenu__SaveToCard`. **Tier B, lower confidence**: Refreshes the view (same idiom as `TitleMenu__RefreshViewValue`), calls `slot128`, conditionally clears `D_8008AA10` behind the same `self->unkA4->methods->slot1AC()` gate `TitleMenu__CreateNameField` also tests, then forwards `self->iconHandle` plus literal flags (0xD, 3) through `unkAC`'s `slot78`. It is `TitleMenu__Tick`'s case-2 dispatch target. Purpose beyond "the icon-carrying variant of the two unkAC dispatch calls" is not established.
+Renamed `func_8004E0E4` -> `TitleMenu__SaveToCard`. **Tier B, lower confidence**: Refreshes the view (same idiom as `TitleMenu__RefreshViewValue`), calls `slot128`, conditionally clears `D_8008AA10` behind the same `self->unkA4->methods->slot1AC()` gate `TitleMenu__CreateSaveTitle` also tests, then forwards `self->iconHandle` plus literal flags (0xD, 3) through `unkAC`'s `slot78`. It is `TitleMenu__Tick`'s case-2 dispatch target. Purpose beyond "the icon-carrying variant of the two unkAC dispatch calls" is not established.
 
 ## Proposed field names
 

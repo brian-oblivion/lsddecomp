@@ -36,7 +36,7 @@ None new.
 
 ## Naming (round 77, naming runner delta)
 
-Renamed `func_8004DC08` -> `TitleMenu__DestroyNameField`. **Tier B**: Unconditionally releases `self->nameField` (the sub-object `TitleMenu__CreateNameField` constructs) then forwards to the base class's own `slotDC`. Mirror-image counterpart to `CreateNameField`; not the class's own destructor (that is `TitleMenu__Finalize`, a different base slot).
+Renamed `func_8004DC08` -> `TitleMenu__DestroyNameField`. **Tier B**: Unconditionally releases `self->nameField` (the sub-object `TitleMenu__CreateSaveTitle` constructs) then forwards to the base class's own `slotDC`. Mirror-image counterpart to `CreateNameField`; not the class's own destructor (that is `TitleMenu__Finalize`, a different base slot).
 
 ## Track 4 (2026-09-25, round 84, alpha)
 
