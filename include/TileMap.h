@@ -17,16 +17,15 @@
  * The name is round 83's, and the evidence is the GsMAP: TileMap__BuildMap
  * fills cellw/cellh = 16, ncellw = 20, ncellh = 15 (a 320 x 240 screen of
  * 16 x 16 cells), allocates the ncellw * ncellh u16 index table and fills
- * it 0..n-1, and takes `base` from its atlas's +0x02C; BgLayer__Reset
+ * it 0..n-1, and takes `base` from its atlas's cells; BgLayer__Reset
  * (include/BgLayer.h) points a GsBG's map at &map and sizes the layer from
  * cellw * ncellw by cellh * ncellh.
  *
  * How it is used, at the one New_TileMap call site (TaskCore__TaskCore,
  * src/code_2c054.c): New_TileAtlas(0), then New_TileMap(0, atlas), then
  * New_BgLayer(tileMap, 1); TaskCore__Finalize releases the three (+0x004).
- * The atlas is a TileAtlas (D_8006F514, src/code_33808.c, not unified):
- * its +0x02C is the 300-GsCELL array BuildMap copies into map.base. It is
- * typed here by the nearest unified ancestor, Class6D430.
+ * The atlas is a TileAtlas (D_8006F514, include/TileAtlas.h, by tag here):
+ * its `cells` is the 300-GsCELL array BuildMap copies into map.base.
  *
  * SLOTS (`classtable.py D_8006F498 --vs D_8006D430`, 30 against 30):
  *  - +0x008 ctor, TileMap__TileMap(self, arg1, atlas): the active driver's
@@ -45,12 +44,14 @@
  * object is 0x44 bytes (New_TileMap).
  */
 
+struct TileAtlas;
+
 typedef struct TileMap TileMap;
 typedef struct TileMapMethods TileMapMethods;
 
 /* LIBGS.H GsMAP, laid out as the SDK declares it (as include/TimImage.h
  * does for GsIMAGE); BgLayer's GsBG points at it. GsCELL is by tag only:
- * TileAtlas's own view of it is Cell450B4 in src/code_33808.c. */
+ * include/TileAtlas.h defines it. */
 typedef struct GsMAP {
     /* +0x00 */ u8 cellw;
     /* +0x01 */ u8 cellh;
@@ -61,7 +62,7 @@ typedef struct GsMAP {
 } GsMAP;
 
 struct TileMapMethods {
-    CLASS6D430_SLOTS(TileMap, (TileMap *self, s32 arg1, Class6D430 *atlas));
+    CLASS6D430_SLOTS(TileMap, (TileMap *self, s32 arg1, struct TileAtlas *atlas));
     /* +0x078 is Class6D430's slot78; this table's occupant is
      * TileMap__BuildMap, called through TileMapBuildMapFn. */
 };                                   /* 30 slots, 0x7C bytes */
@@ -69,7 +70,7 @@ struct TileMapMethods {
 struct TileMap {
     CLASS6D430_FIELDS(TileMapMethods);
     /* +0x02C */ GsMAP map;          /* TileMap__BuildMap fills it; BgLayer__Reset points its GsBG here */
-    /* +0x03C */ Class6D430 *atlas;  /* a TileAtlas (D_8006F514): the ctor's third argument; BuildMap reads its +0x02C */
+    /* +0x03C */ struct TileAtlas *atlas; /* include/TileAtlas.h: the ctor's third argument; BuildMap reads its cells */
     /* +0x040 */ u16 defaultGrid;    /* 1 from the ctor when arg1 == 0; BuildMap lays out the 20 x 15 grid only when set */
     /* +0x042 */ u16 loaded;         /* 0 from the ctor, 1 from TileMap__Load after BuildMap */
 };                                   /* 0x44 bytes: New_TileMap */
@@ -81,8 +82,8 @@ typedef void (*TileMapBuildMapFn)();
 extern TileMapMethods D_8006F498;
 extern TileMapMethods *GetTileMapMethods(void); /* returns &D_8006F498 */
 
-TileMap *New_TileMap(s32 arg0, Class6D430 *atlas); /* BMemPMgrAlloc(0x44), then ctor */
-void TileMap__TileMap(TileMap *self, s32 arg1, Class6D430 *atlas);
+TileMap *New_TileMap(s32 arg0, struct TileAtlas *atlas); /* BMemPMgrAlloc(0x44), then ctor */
+void TileMap__TileMap(TileMap *self, s32 arg1, struct TileAtlas *atlas);
 void TileMap__Finalize(TileMap *self);
 void TileMap__Load(TileMap *self);
 void TileMap__BuildMap(TileMap *self);
