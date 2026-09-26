@@ -120,3 +120,42 @@ is deleted. `src/class_39e08.c` now includes `include/VabStreamObj.h`, where
 the allocator returns `VabStreamObj *`, and casts the result to
 `BasicClass *` for `TimedTask::sound`. The whole image stays
 byte-identical.
+
+## Track 6 (2026-09-26, round 92, charlie): the class is TimedTask
+
+`python3 tools/renametype.py Class86668 TimedTask` renamed the class, its
+table (`gClass86668Methods` -> `gTimedTaskMethods`), its getter, allocator,
+ctor and every `Class86668__` method; image byte-identical. Tier B.
+
+Evidence. What this class adds to IntermediateBase is, from its own
+methods: `timeoutFrames` (SetTimeout stores n * 20, a negative n as is),
+CheckTimeout (the update override: base update, then setState(4) once
+frameCounter passes timeoutFrames unsigned), SetState (for 4: result = 1,
+onState4), Init (zero `result`, base init, return `result`), and a `sound`
+object that PlaySound plays tones on. The timeout ending the job with a
+result is the one behaviour no sibling (TaskCore) or parent defines in this
+form, so it names the class. Tier B, not A: the only setTimeout call in the
+game is CancelTimeout's `setTimeout(-1)`, so the timeout is never armed and
+its purpose in play is not observed; the sound half is shared with TaskCore
+and does not distinguish it. Rejected: a "dream"/"day" name (both
+subclasses run the dream day, but that is what the subclasses do, not this
+class).
+
+Moved here from the header banner (derivation, not documentation):
+Class865C8 passes `GetSoundEffectDir()` as soundBankPath; ObjM passes a null
+path and Class865C8's own sound, so only Class865C8's copy releases it.
+PlaySound is TaskCore__PlaySound's shape with 0x7F, 0x7F. ObjM calls the
+same object's +0x088/+0x08C, VabStreamObj's Mute/Unmute.
+`tools/classtable.py` stops at the last non-NULL slot, which is why it shows
+the 0x80-byte table as ending at +0x070. Class6D3C8__PollStatusObj switches
+on init's return through Class865C8; 2 and 3 are Class865C8's own codes.
+
+Proposed, not applied (accessors outside this job's units):
+- slot +0x074 `slot74` -> `togglePause`: NULL here, its one occupant is
+  ObjM__TogglePause and its one caller ObjM__DispatchPadEvent's 0x21 case
+  (`src/class_3bb8c_l.c`).
+- field +0x034 `sound` `BasicClass *` -> `struct VabStreamObj *`, with the
+  ctor's and New_TimedTask's `sound` parameter: every object that reaches it
+  is a New_VabStreamObj, and four units cast it back. Needs ObjM.h's ctor
+  and New_ObjM parameters retyped with it (ObjM passes its own `BasicClass *`
+  sound), or the build gains pointer-type warnings where it has none now.
