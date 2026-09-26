@@ -23,7 +23,7 @@ extern s8 D_800873DC[];        /* 16-entry table, indexed by (gStyleCounter+gSty
 extern s32 gStyleVariant;
 extern s8 D_800873D8[];        /* divisor table, indexed by "kind" -- raw index, no scale */
 extern s32 D_8008AC84;
-extern s32 D_800873C8[];       /* array of raw base addresses, indexed by "kind" (scaled x4) */
+extern s32 gStyleVariantConfigs[];       /* array of raw base addresses, indexed by "kind" (scaled x4) */
 extern s32 gStyleFlushColor;
 extern u8 gStyleDecorColorsB[];        /* address only taken */
 extern u8 gStylePalette[];        /* 3-byte-stride table, indexed by a byte field */
@@ -51,7 +51,7 @@ void *PickStyleFallbackConfig(void) {
     divisor = D_800873D8[kind];
     remainder = sum % divisor;
     D_8008AC84 = remainder;
-    result = (s8 *) D_800873C8[kind] + remainder * 4;
+    result = (s8 *) gStyleVariantConfigs[kind] + remainder * 4;
     if (kind == 0) {
         b3 = result[3];
         gStyleFlushColor = (s32) (gStylePalette + b3 * 3);
@@ -73,7 +73,7 @@ void *PickStyleFallbackConfig(void) {
 
 Notes:
 
-- `D_800873C8[kind]` is loaded as a raw `s32` *value* (not an address-of),
+- `gStyleVariantConfigs[kind]` is loaded as a raw `s32` *value* (not an address-of),
   then used as a base address for further byte-granular pointer arithmetic
   (`+ remainder * 4`) -- exactly the `gStyleTargetObj` "pointer stored as a plain
   scalar" idiom already established elsewhere in this unit, just for a

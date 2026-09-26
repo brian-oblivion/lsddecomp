@@ -71,7 +71,7 @@ extern s8 D_800873DC[];
 extern s32 gStyleVariant;
 extern s8 D_800873D8[];
 extern s32 D_8008AC84;
-extern s32 D_800873C8[];
+extern s32 gStyleVariantConfigs[];
 extern s32 gStyleFlushColor;
 extern u8 gStyleDecorColorsB[];
 extern u8 gStylePalette[];
@@ -95,7 +95,7 @@ void *PickStyleFallbackConfig(void) {
     divisor = D_800873D8[kind];
     remainder = sum % divisor;
     D_8008AC84 = remainder;
-    result = (s8 *)D_800873C8[kind] + remainder * 4;
+    result = (s8 *)gStyleVariantConfigs[kind] + remainder * 4;
     if (kind == 0) {
         b3 = result[3];
         gStyleFlushColor = (s32)(gStylePalette + b3 * 3);

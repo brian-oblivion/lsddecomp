@@ -2915,3 +2915,4 @@ gStyleDecorColorsA = 0x80087234;
 gStyleDecorColorsB = 0x8008726C;
 gStyleKind0Counts = 0x80087324;
 gStyleSpawnYChoices = 0x80087328;
+gStyleVariantConfigs = 0x800873C8;
