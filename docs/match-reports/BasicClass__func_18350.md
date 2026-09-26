@@ -59,3 +59,8 @@ confirmed. `grep -rn -- '->slot34\b\|\.slot34\b' src/` returns nothing, so
 the field is also the one field in `BasicClassMethods` with no accessor
 anywhere and could in principle be renamed by a single runner — there is
 just nothing to rename it to.
+
+## Round 91 polish (delta, track 7)
+
+Name kept, tier C. The source comment was cut to the conclusion; the table
+census it quoted is this report's table above.

@@ -76,3 +76,7 @@ EMITTER, not an `on*` handler, and it is not finalize-specific --
 C, which is a fact about how much is carved, not about the slot.
 Cross-unit: accessed from `src/class_3bb8c_i.c` and `src/code_8220.c`, so
 not mine to rename.
+
+## Round 91 polish (delta, track 7)
+
+Comment trimmed: the slot is named by its field (`onNotify`), not its offset.

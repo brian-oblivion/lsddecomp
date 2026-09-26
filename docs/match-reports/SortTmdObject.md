@@ -2040,3 +2040,74 @@ per-group element lists are. Tier B rather than A because what `arg0` and
   here so the block stays greppable under either name. `tools/stalesyms.py`
   reports nothing against this file, i.e. every symbol the preserved body
   calls is still live.
+
+## Round 91 polish (delta, track 7)
+
+Byte-identical after every step; the three oracles green at each commit.
+
+### Naming
+
+- `func_80018464` -> **`SortTmdObject`, tier A.** Round 51 held the name back
+  pending a Sony-ownership ruling. That question is now measured: Sony's
+  `GsSortObject4` exists (`libgs/objt2.o` on the 3.3, 3.5 and 3.6 discs,
+  `objt.o` on 3.0) and is a different body -- it also stores GsTON from
+  attribute bit 30, writes `ndiv`/`HWD0`/`VWD0` into the scratch block and
+  tests GsLIOFF/GsLIGNR/GsLMODE against GsLIGHT_MODE with a different ladder;
+  it has none of this function's InitVtxRecordPtrs calls, TMD-type switch or
+  calls into code_8220_c. `psyq_sdk.py match` never placed it here, and the
+  caller (`Viewport__DrawNode`, formerly in `psyq_2864`) is carved game code
+  now. What the body does is evident from it alone: same four arguments as
+  `GsSortObject4` (`GsDOBJ2 *`, `GsOT *`, shift, scratch), it reads the
+  GsDOBJ2's GsCOORDINATE2 and TMD object at Sony's offsets, walks the TMD's
+  primitive list and writes one POLY_xx per surviving face into the
+  GsOUT_PACKET_P buffer and the OT. "Sort" is libgs's verb for that.
+- `D_800902E0` -> `GsLIGHT_MODE`: Sony's, pinned in `psyq-objects.ld` by eight
+  libgs objects; `rename.py` names it as the only allowed rename.
+- `D_8008E24C` -> `gSortLightMode`, tier B: attribute bits 3-4 (GsFOG|GsMATE).
+- `D_8008E250` -> `gSortUseGlobalLightMode`, tier B: attribute bit 5
+  (GsLLMOD); the object is depth-cued when it is set and GsLIGHT_MODE is
+  non-zero.
+- `D_8008A82C` -> `gTexturedFaceColor`, tier A: `.byte 0x80,0x80,0x80`,
+  copied into the context once per object and loaded as the GTE colour of
+  every lit textured face (the POLY_FT3 and POLY_FT4 cases). Only reader.
+- Sony's `GsSortObject4` (disassembled from `objt2.o`) stores the same four
+  attribute fields as this function -- `(a >> 3) & 3` GsLMODE, `(a >> 5) & 1`
+  GsLIGNR, `(a >> 6) & 1` GsLIOFF, `(a >> 9) & 7` GsNDIV. No linked Sony
+  object references those four names, so the game-style names above are
+  used; whether the addresses ARE Sony's commons (3.3+ `libgs/global.o`
+  defines all four) is left to the head (see the proposals in the round-91
+  summary). `D_8008E248` (GsLOFF) and `D_80090C18` (GsDIV) cannot be renamed
+  by `rename.py`: it reports them inside Sony's `PSDOFSY` and `dc_cb`, whose
+  pinned sizes (8) are distance-to-next-pin estimates -- `PSDOFSY` is 4 bytes
+  in `libgs/gs_010.o`.
+
+### Types and constants
+
+- Arguments are Sony's `GsDOBJ2 *` and `GsOT *`; the TMD object is
+  `struct TMD_STRUCT` (libgs.h) through `OBJ_TMD()`; the rotation block reads
+  `obj->coord2->super->workm` and the three columns of `obj->coord2->workm`.
+- Every scratchpad offset is a field of the unit-local `PolyDrawCtx`
+  (`+0x88`/`+0x94` are `RVECTOR *` into the DIVPOLYGON3/4 tables, `+0xA4`
+  `SVECTOR *[4]`, `+0x78` the subdivide flag, agreeing with code_8220_c).
+- Each case names its packet (`TMD_P_F3` ... `TMD_P_TNG4`) through a per-case
+  `PKT` macro, `(type *)(elem - offsetof(type, member))`, because `elem` has
+  to stay parked on the member retail parks it on; list-relative colour reads
+  cast `packet`. The primitive is `POLY` (`POLY_F3` ... `POLY_GT4`). None of
+  this moved a byte, including the struct-ness of every new field access.
+- libgpu's `setPolyF3` ... `setPolyGT4` replace the `prim[3]`/`prim[7]` pairs
+  and `setcode` the cached-code store; all compile to the same `sb`s.
+- Case labels are `TMD_TYPE(GPU_COM_*, flag)` with libgs's `GPU_COM_*` and
+  `GsTMDFlagGRD`, plus unit-local `TMD_FLAG_LGT`, `TMD_TYPE_MASK` (0xFD07),
+  `TMD_WORD_ABE_SHIFT` (25), `DP_CLUT_SHIFT_CUED`/`_NONE` (9/16) and
+  `GsDOFF` for the early-out (`bltz` unchanged).
+- The old case comments called the lit cases "opaque"; they are the lit
+  (ncds from the face normal) packets, the others unlit and depth-cued.
+  Semi-transparency is the separate ABE bit.
+
+### Moved out of the source
+
+The function comment's derivation of the goto loops, the alias-rule
+explanation of the four attribute reads, the do/while(0) loop-depth note,
+the binary-search switch layout and the "submit wrappers declared void"
+history (round 50) are all in the sections above; the source keeps one
+MATCHING line for each.

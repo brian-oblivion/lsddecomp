@@ -1,26 +1,21 @@
 /*
- * code_8220_b -- the tail of the BasicClass block, then the game's own
- * per-face polygon renderer. Two unrelated halves, split at SortTmdObject.
+ * code_8220_b -- the end of BasicClass, then the game's TMD renderer.
  *
- * 0x80018288..0x80018458 finishes BasicClass, the hand-rolled base class
- * whose framework and 14-slot method table live in code_8220.c and
- * include/code_8220.h: the two list primitives BasicClass's own methods
- * call (FreeBasicClassList, GetNextBasicClass), the array release helper,
- * the vtable accessor, the two notification slots (BasicClass__NotifyParents
- * at +0x030 and BasicClass__OnNotify at +0x038) and the empty +0x034 hook,
- * plus the accessor pair for the pool allocator's re-entrancy flag.
+ * BasicClass (include/BasicClass.h; the rest of it is code_8220.c): the list
+ * helpers its methods use (FreeBasicClassList, GetNextBasicClass,
+ * ReleaseBasicClassArray), its table getter, the notification pair
+ * NotifyParents / OnNotify with the empty slot between them, and the pool
+ * allocator's busy-flag accessors.
  *
- * 0x80018464..0x8001974C is the renderer. SortTmdObject (the unit's one
- * stall, still INCLUDE_ASM) walks a model's face groups, dispatches on each
- * group's tag to one of 13 cases, and per face calls SetupPrimCode, then
- * ProjectTriFace or ProjectQuadFace, then one of Sony's RCpoly* packers via
- * the wrappers in code_8220_c. ProjectTri/QuadFace index the shared vertex
- * array, hand the vertices to the GTE, call TransformAndCullPoly for the
- * transform-and-cull decision, write each vertex's Z into its sort slot, and
- * call back into one of the six StoreSxyPoly** leaves to write the screen XY
- * into the Psy-Q POLY_xx primitive at that primitive type's own offsets.
- * Every GTE access goes through the gte_* macros in include/gte.h; those are
- * Sony's names and are never renamed.
+ * The renderer: SortTmdObject, the game's replacement for Sony's
+ * GsSortObject4, turns a GsDOBJ2's TMD object into GPU primitives. Per face,
+ * SetupPrimCode finishes the primitive's command byte, ProjectTriFace or
+ * ProjectQuadFace transforms and culls it through TransformAndCullPoly and
+ * writes its screen coordinates with one of the StoreSxyPoly* leaves, and a
+ * submit wrapper in code_8220_c links it into the OT, through Sony's RCpoly*
+ * subdivision when TransformAndCullPoly or UpdatePolyBBoxAndCull flags the
+ * face. All GTE work goes through include/gte.h's gte_* macros (Sony's
+ * names; never <inline.h>).
  */
 
 #include "common.h"
@@ -41,9 +36,8 @@ void FreeBasicClassList(BasicClassListNode **head) {
 }
 
 /* BasicClassMethods slot +0x030. Tell every object holding a reference to
- * `self` that `event` happened, by calling each one's own +0x038 slot with
- * `self` as the sender. BasicClass__Finalize (finalize, code_8220.c) is
- * the only caller in carved C and passes 1. */
+ * `self` that `event` happened, by calling each one's onNotify slot with
+ * `self` as the sender. BasicClass__Finalize passes 1, "going away". */
 void BasicClass__NotifyParents(BasicClass *self, s32 event) {
     BasicClassListNode *cursor = self->parentRefs;
     BasicClass *parent;
@@ -53,22 +47,16 @@ void BasicClass__NotifyParents(BasicClass *self, s32 event) {
     }
 }
 
-/* BasicClassMethods slot +0x034, and deliberately still a placeholder name.
- * The body is empty, and of the 60 method tables tools/classtable.py finds,
- * 58 have this exact address in slot +0x034; the two that differ
- * (D_8006C0F8, whose header word is a pointer and which is probably a
- * mis-detected table start, and gStyleCueCallbacks, a wholly independent 14-slot
- * class that overrides every slot) are not BasicClass-derived. Nothing in
- * the game overrides it, so nothing establishes what it is for. */
+/* BasicClassMethods slot +0x034. Empty, and no BasicClass-derived table
+ * overrides it, so nothing says what it is for: the name stays a tier-C
+ * placeholder (the table census is in the report). */
 void BasicClass__func_18350(void) {}
 
 /* BasicClassMethods slot +0x038, the receiving half of NotifyParents:
  * `sender` is telling `self` that `event` happened. The base class treats
  * event 1 as "sender is going away" and drops it from its own children.
- * Subclasses override this and forward to the base first -- Class6B5CC__OnNotify
- * (code_d294) then dispatches on the sender's class tag, Class65650__OnNotify
- * (code_55dd4) then checks the sender's tag and the same event == 1 -- so
- * `event` is a general notification code, not a boolean. */
+ * Subclasses override it, call this first, then look at the sender's class
+ * tag as well, so `event` is a notification code, not a boolean. */
 void BasicClass__OnNotify(BasicClass *self, void *sender, s32 event) {
     if (event == 1) {
         self->methods->removeChild(self, (BasicClass *)sender);
@@ -105,28 +93,29 @@ s32 GetBMemPMgrBusy(void) {
     return gBMemPMgrBusy;
 }
 
-/* Globals this renderer publishes for SetupPrimCode and the code_8220_c
- * submit wrappers to read back. D_8008E248 is already in code_8220.h; the
- * other four are this unit's own view and stay local per CLAUDE.md's
- * cross-unit-declaration rule. */
-extern s32 D_80090C18;
-extern s32 gSortUseGlobalLightMode;
-extern s32 gSortLightMode;
+/* The drawn object's attribute bits, as SortTmdObject publishes them for
+ * SetupPrimCode and the code_8220_c submit wrappers (D_8008E248, GsLOFF, is
+ * declared in code_8220.h). Sony's GsSortObject4 keeps the same four fields
+ * in GsNDIV, GsLIOFF, GsLIGNR and GsLMODE. */
+extern s32 D_80090C18;              /* GsDIV1..5: subdivision level */
+extern s32 gSortUseGlobalLightMode; /* GsLLMOD */
+extern s32 gSortLightMode;          /* GsFOG | GsMATE */
 
-/* Rgb8 makes the tint a 3-byte block move: `la`, three `lb`, three `sb`. */
+/* MATCHING: three s8s, so SortTmdObject's copy of gTexturedFaceColor is a
+ * 3-byte block move (`la`, three `lb`, three `sb`). */
 typedef struct {
     s8 r, g, b;
 } Rgb8;
 
 /*
  * The per-object draw context SortTmdObject builds in the PS1 scratchpad
- * (its caller passes 0x1F800000) and hands to every function below. Only
- * the fields this unit touches are named; +0x070..+0x077 are the screen
- * bounding box UpdatePolyBBoxAndCull (code_8220_c) keeps.
+ * (its caller passes 0x1F800000) and hands to every function below and to
+ * the code_8220_c submit wrappers. Only the fields this unit touches are
+ * named; +0x070..+0x077 are the screen bounding box UpdatePolyBBoxAndCull
+ * keeps.
  *
- * The three SXY words are deliberately separate fields rather than an array:
- * retail stores them through three independently computed addresses, which
- * is gte_stsxy3()'s three-pointer form.
+ * MATCHING: the three SXY words are separate fields, not an array, for
+ * gte_stsxy3()'s three independently computed addresses.
  */
 typedef struct PolyDrawCtx {
     /* +0x000 */ GsOT_TAG *otBase;  /* the GsOT's org */
@@ -194,12 +183,10 @@ typedef struct TmdGroupHeader {
 /* GsDOBJ2 keeps its TMD object as a u_long *. */
 #define OBJ_TMD(obj) ((struct TMD_STRUCT *)(obj)->tmd)
 
-/* Advance a primitive's CLUT by `rows` palette rows. A statement macro, and
- * its do/while(0) is part of the bytes: the per-element loops below are goto
- * loops (see the function comment), which drops one loop-depth level from
- * flow's reference weighting, and this construct puts it back for the update
- * alone -- without it local-alloc hands the loaded CLUT, not the shifted
- * depth, $v0 at all six sites. */
+/* Move a textured primitive's CLUT `rows` palette rows down (one row is
+ * 1 << 6 in libgpu's getClut encoding). MATCHING: the do/while(0) gives back
+ * the loop depth SortTmdObject's goto loops drop; without it local-alloc
+ * swaps $v0/$v1 at all six sites. */
 /* clang-format off */
 #define ADD_CLUT_ROWS(p, rows) \
     do { \
@@ -212,15 +199,9 @@ extern void InitVtxRecordPtrs(void *dst, void *table, s32 count);
 extern void StoreSxyPolyFT4(void *dst, s32 storeFirst3);
 extern void StoreSxyPolyGT4(void *dst, s32 storeFirst3);
 
-/*
- * The eight submit wrappers in code_8220_c, which are still INCLUDE_ASM there
- * and declared `void`. That is provably a placeholder: every one of them is a
- * tail call whose last instruction before its epilogue is `jal RCpolyXX` with
- * no intervening store to $v0, so Sony's return value falls straight out --
- * the standard `p = RCpolyF3(p);` work-buffer-advance idiom. This function
- * consumes exactly that value, so this file declares its own view rather than
- * importing the stale one (round 50's finding; see the report).
- */
+/* The eight submit wrappers in code_8220_c. Each links the finished
+ * primitive into the OT (directly, or through its RCpoly* subdivider) and
+ * returns the packet cursor past what it wrote. */
 extern void *SubmitPolyF3(void *prim, void *ctx);
 extern void *SubmitPolyG3(void *prim, void *ctx);
 extern void *SubmitPolyFT3(void *prim, void *ctx);
@@ -230,8 +211,7 @@ extern void *SubmitPolyFT4(void *prim, void *ctx);
 extern void *SubmitPolyGT3(void *prim, void *ctx);
 extern void *SubmitPolyGT4(void *prim, void *ctx);
 
-/* Defined below, in ROM order. Forward-declared because this function comes
- * first in the segment and calls all of them. */
+/* Defined below SortTmdObject, which calls them. */
 void SetupPrimCode(void *prim, PolyDrawCtx *ctx);
 s32 ProjectTriFace(void *prim, PolyDrawCtx *ctx, u16 idx0, u16 idx1, u16 idx2, void (*storeSxy)(void *));
 s32 ProjectQuadFace(void *prim, PolyDrawCtx *ctx, u16 idx0, u16 idx1, u16 idx2, u16 idx3,
@@ -244,20 +224,29 @@ void StoreSxyPolyF4(void *dst, s32 storeFirst3);
 void StoreSxyPolyG4(void *dst, s32 storeFirst3);
 
 /*
- * Walk one model's face groups and emit a GPU primitive per surviving face.
+ * The game's own GsSortObject4 (same arguments): emit every surviving face of
+ * `obj`'s TMD object into `ot` as a GPU primitive in the GsOUT_PACKET_P
+ * buffer. `otShift` turns a face's Z into its OT slot; `scratch` is where the
+ * PolyDrawCtx goes.
  *
- * Every GTE access goes through include/gte.h. The RGB store macros are the
- * one-pointer-at-offset-0 Psy-Q forms, which is why `gte_strgb(&POLY->r0)`
- * and not `swc2 $22, 0x4(prim)`: the addiu that materialises the sum is part
- * of retail.
+ * First the object's attribute bits go to the globals above, and when its
+ * GsCOORDINATE2 has a parent, the object's workm is rotated by the parent's
+ * workm column by column, the GTE rotation matrix saved around it. The TMD's
+ * primitives come in runs of one packet type, the first packet's header
+ * holding the run's length; each type has one case, which sets the
+ * primitive's length and code once, then per packet projects the face and,
+ * if it survives, lights it from its normal (ncds) or depth-cues its own
+ * colours (dpcs, dpct), copies the UVs and hands the primitive to its submit
+ * wrapper. The packet cursor is reloaded from GsOUT_PACKET_P per run and
+ * written back after it; an unknown type ends the object.
  *
- * The thirteen per-element loops are goto loops, not do/while: GCC 2.6.3's
- * loop optimiser only runs on syntactic loops, and there it strength-reduces
- * `elem`'s constant-offset uses into a second induction variable (the
- * gte_ldrgb "r" operand keeps the original alive), costing a setup `addiu`,
- * an increment per iteration and an eighth saved register -- +28 words in
- * all. `ctx` is assigned after the early return for the same reason retail
- * copies a3 through a1 into s2 there.
+ * `packet` is the current TMD packet and `elem` walks beside it, parked on
+ * one member; PKT names the packet as seen from `elem`, POLY the primitive.
+ * MATCHING: retail keeps both pointers and addresses fields from each. The
+ * loops are gotos because a do/while strength-reduces `elem` into a third
+ * pointer (+28 words), `ctx` is assigned after the early return for
+ * retail's a3 -> a1 -> s2 copy, and the RGB stores take `&POLY->r0` because
+ * the addiu that forms it is retail's.
  */
 void SortTmdObject(GsDOBJ2 *obj, GsOT *ot, s32 otShift, void *scratch) {
     PolyDrawCtx *ctx;
@@ -282,10 +271,6 @@ void SortTmdObject(GsDOBJ2 *obj, GsOT *ot, s32 otShift, void *scratch) {
     ctx->vertices = (SVECTOR *)OBJ_TMD(obj)->vertop;
     ctx->normals = (SVECTOR *)OBJ_TMD(obj)->nortop;
 
-    /* When the object's coordinate system has a parent, save the GTE's
-     * current rotation matrix into the context, install the parent's world
-     * matrix, run each of the three columns of the object's own through it,
-     * and put the saved matrix back. */
     if (obj->coord2->super != NULL) {
         gte_ReadRotMatrix(&ctx->savedRotMatrix);
         gte_SetRotMatrix(&obj->coord2->super->workm);
@@ -305,11 +290,8 @@ void SortTmdObject(GsDOBJ2 *obj, GsOT *ot, s32 otShift, void *scratch) {
         gte_SetRotMatrix(&ctx->savedRotMatrix);
     }
 
-    /* Four reads of the attribute word, not one cached copy: CSE treats each
-     * global store as a possible alias and keeps all four `lw`s, while the
-     * scheduler (which does know a struct field from a fixed scalar) then
-     * hoists them together above the stores. The unk8 store must be a struct
-     * field written after them, so that it waits behind the loads. */
+    /* MATCHING: four struct reads of attribute, hoisted by the scheduler
+     * above the global stores; unk8 is stored after them as a field. */
     D_80090C18 = (obj->attribute >> 9) & 0x7;
     D_8008E248 = (obj->attribute >> 6) & 0x1;
     gSortUseGlobalLightMode = (obj->attribute >> 5) & 0x1;
@@ -341,19 +323,16 @@ void SortTmdObject(GsDOBJ2 *obj, GsOT *ot, s32 otShift, void *scratch) {
             ctx->semiTrans = (*(u32 *)packet >> TMD_WORD_ABE_SHIFT) & 0x1;
             packetsLeft -= count;
 
-            /* Thirteen Psy-Q primitive flavours, one case each, in ascending
-             * tag order. GCC 2.6.3 expands a switch over sparse values as a
-             * balanced binary search -- `== median`, then `< median + 1` and
-             * recurse -- which is where retail's sltiu/beq ladder comes from;
-             * the case bodies then follow in source order, which is why they
-             * sit at ascending addresses in ascending tag order. */
+            /* MATCHING: cases in ascending type order; cc1 tests a sparse
+             * switch as a binary search and lays the bodies out in source
+             * order, which is retail's layout. */
             switch (ctx->packetType) {
                 case TMD_TYPE(GPU_COM_F3, 0): {
                     u8 *elem;
 #define PKT ((TMD_P_F3 *)(elem - offsetof(TMD_P_F3, r0)))
 #define POLY ((POLY_F3 *)prim)
 
-                    /* A: POLY_F3, opaque */
+                    /* TMD_P_F3 -> POLY_F3: one colour, lit from the face normal. */
                     setPolyF3(prim);
                     SetupPrimCode(prim, ctx);
                     elem = packet + offsetof(TMD_P_F3, r0);
@@ -380,7 +359,9 @@ void SortTmdObject(GsDOBJ2 *obj, GsOT *ot, s32 otShift, void *scratch) {
 #define PKT ((TMD_P_F3G *)(elem - offsetof(TMD_P_F3G, r2)))
 #define POLY ((POLY_G3 *)prim)
 
-                    /* B: POLY_G3, opaque -- one ncds per vertex colour */
+                    /* TMD_P_F3G -> POLY_G3: flat-shaded with a colour per vertex (GRD),
+                     * each lit from the one face normal. MATCHING: r0 and r1
+                     * are read through `packet`, r2 through `elem`. */
                     setPolyG3(prim);
                     SetupPrimCode(prim, ctx);
                     elem = packet + offsetof(TMD_P_F3G, r2);
@@ -413,7 +394,7 @@ void SortTmdObject(GsDOBJ2 *obj, GsOT *ot, s32 otShift, void *scratch) {
 #define PKT ((TMD_P_NF3 *)(elem - offsetof(TMD_P_NF3, r0)))
 #define POLY ((POLY_F3 *)prim)
 
-                    /* C: POLY_F3, depth-cued */
+                    /* TMD_P_NF3 -> POLY_F3: unlit, its colour depth-cued. */
                     setPolyF3(prim);
                     SetupPrimCode(prim, ctx);
                     elem = packet + offsetof(TMD_P_NF3, r0);
@@ -439,8 +420,8 @@ void SortTmdObject(GsDOBJ2 *obj, GsOT *ot, s32 otShift, void *scratch) {
 #define PKT ((TMD_P_TF3 *)(elem - offsetof(TMD_P_TF3, n0)))
 #define POLY ((POLY_FT3 *)prim)
 
-                    /* D: POLY_FT3, opaque -- one constant colour for the whole
-                     * group, loaded once before the loop. */
+                    /* TMD_P_TF3 -> POLY_FT3: lit, from gTexturedFaceColor, which is
+                     * loaded into the GTE once per run. */
                     setPolyFT3(prim);
                     SetupPrimCode(prim, ctx);
                     gte_ldrgb(&ctx->faceColor);
@@ -471,7 +452,7 @@ void SortTmdObject(GsDOBJ2 *obj, GsOT *ot, s32 otShift, void *scratch) {
 #define PKT ((TMD_P_TNF3 *)(elem - offsetof(TMD_P_TNF3, r0)))
 #define POLY ((POLY_FT3 *)prim)
 
-                    /* E: POLY_FT3, depth-cued */
+                    /* TMD_P_TNF3 -> POLY_FT3: unlit, its colour depth-cued. */
                     setPolyFT3(prim);
                     SetupPrimCode(prim, ctx);
                     elem = packet + offsetof(TMD_P_TNF3, r0);
@@ -501,7 +482,7 @@ void SortTmdObject(GsDOBJ2 *obj, GsOT *ot, s32 otShift, void *scratch) {
 #define PKT ((TMD_P_F4 *)(elem - offsetof(TMD_P_F4, r0)))
 #define POLY ((POLY_F4 *)prim)
 
-                    /* F: POLY_F4, opaque */
+                    /* TMD_P_F4 -> POLY_F4: one colour, lit from the face normal. */
                     setPolyF4(prim);
                     SetupPrimCode(prim, ctx);
                     elem = packet + offsetof(TMD_P_F4, r0);
@@ -529,7 +510,7 @@ void SortTmdObject(GsDOBJ2 *obj, GsOT *ot, s32 otShift, void *scratch) {
 #define PKT ((TMD_P_NF4 *)(elem - offsetof(TMD_P_NF4, r0)))
 #define POLY ((POLY_F4 *)prim)
 
-                    /* G: POLY_F4, depth-cued */
+                    /* TMD_P_NF4 -> POLY_F4: unlit, its colour depth-cued. */
                     setPolyF4(prim);
                     SetupPrimCode(prim, ctx);
                     elem = packet + offsetof(TMD_P_NF4, r0);
@@ -556,7 +537,7 @@ void SortTmdObject(GsDOBJ2 *obj, GsOT *ot, s32 otShift, void *scratch) {
 #define PKT ((TMD_P_TF4 *)(elem - offsetof(TMD_P_TF4, n0)))
 #define POLY ((POLY_FT4 *)prim)
 
-                    /* H: POLY_FT4, opaque */
+                    /* TMD_P_TF4 -> POLY_FT4: lit, from gTexturedFaceColor. */
                     setPolyFT4(prim);
                     SetupPrimCode(prim, ctx);
                     gte_ldrgb(&ctx->faceColor);
@@ -589,7 +570,7 @@ void SortTmdObject(GsDOBJ2 *obj, GsOT *ot, s32 otShift, void *scratch) {
 #define PKT ((TMD_P_TNF4 *)(elem - offsetof(TMD_P_TNF4, r0)))
 #define POLY ((POLY_FT4 *)prim)
 
-                    /* I: POLY_FT4, depth-cued */
+                    /* TMD_P_TNF4 -> POLY_FT4: unlit, its colour depth-cued. */
                     setPolyFT4(prim);
                     SetupPrimCode(prim, ctx);
                     elem = packet + offsetof(TMD_P_TNF4, r0);
@@ -620,7 +601,7 @@ void SortTmdObject(GsDOBJ2 *obj, GsOT *ot, s32 otShift, void *scratch) {
                     u8 *elem;
 #define PKT ((TMD_P_NG3 *)(elem - offsetof(TMD_P_NG3, r0)))
 
-                    /* J: POLY_G3, depth-cued -- three colours, one dpct */
+                    /* TMD_P_NG3 -> POLY_G3: unlit, three colours depth-cued at once. */
                     setPolyG3(prim);
                     SetupPrimCode(prim, ctx);
                     elem = packet + offsetof(TMD_P_NG3, r0);
@@ -645,7 +626,7 @@ void SortTmdObject(GsDOBJ2 *obj, GsOT *ot, s32 otShift, void *scratch) {
 #define PKT ((TMD_P_TNG3 *)(elem - offsetof(TMD_P_TNG3, r2)))
 #define POLY ((POLY_GT3 *)prim)
 
-                    /* K: POLY_GT3, depth-cued */
+                    /* TMD_P_TNG3 -> POLY_GT3: unlit, three colours depth-cued at once. */
                     setPolyGT3(prim);
                     SetupPrimCode(prim, ctx);
                     elem = packet + offsetof(TMD_P_TNG3, r2);
@@ -675,8 +656,8 @@ void SortTmdObject(GsDOBJ2 *obj, GsOT *ot, s32 otShift, void *scratch) {
 #define PKT ((TMD_P_NG4 *)(elem - offsetof(TMD_P_NG4, r3)))
 #define POLY ((POLY_G4 *)prim)
 
-                    /* L: POLY_G4, depth-cued -- three colours by dpct, the
-                     * fourth by a second dpcs. */
+                    /* TMD_P_NG4 -> POLY_G4: unlit, three colours depth-cued at once
+                     * and the fourth on its own. */
                     setPolyG4(prim);
                     SetupPrimCode(prim, ctx);
                     elem = packet + offsetof(TMD_P_NG4, r3);
@@ -706,8 +687,7 @@ void SortTmdObject(GsDOBJ2 *obj, GsOT *ot, s32 otShift, void *scratch) {
 #define PKT ((TMD_P_TNG4 *)(elem - offsetof(TMD_P_TNG4, r3)))
 #define POLY ((POLY_GT4 *)prim)
 
-                    /* M: POLY_GT4, depth-cued -- the widest element, 0x2C bytes,
-                     * all four UVs and all four colours. */
+                    /* TMD_P_TNG4 -> POLY_GT4: unlit, as TMD_P_NG4 plus four UVs. */
                     setPolyGT4(prim);
                     SetupPrimCode(prim, ctx);
                     elem = packet + offsetof(TMD_P_TNG4, r3);
@@ -748,24 +728,12 @@ void SortTmdObject(GsDOBJ2 *obj, GsOT *ot, s32 otShift, void *scratch) {
 }
 
 /*
- * Finish the GPU command byte of the POLY_xx primitive `prim`, then cache it
- * in the draw context. `prim[3]` is the P_TAG length byte and `prim[7]` is
- * the GPU command byte; SortTmdObject writes the (len, code) pair for the
- * primitive type immediately before every one of its 13 calls to this, and
- * all eight pairs it uses are Sony's exactly -- (4, 0x20) POLY_F3, (6, 0x30)
- * POLY_G3, (7, 0x24) POLY_FT3, (5, 0x28) POLY_F4, (9, 0x2C) POLY_FT4,
- * (9, 0x34) POLY_GT3, (8, 0x38) POLY_G4, (12, 0x3C) POLY_GT4.
- *
- * Bit 0x2 of the command byte is the GPU's ABE (semi-transparency) bit and
- * is taken from the context's own flag; bit 0x1 is the shade-texture
- * bit (Psy-Q SetShadeTex) and is taken from the global D_8008E248, which
- * SortTmdObject sets from bit 6 of the object's flags word. The two updates
- * are deliberately independent statements -- see this function's match
- * report, factoring them through one local costs the match.
- *
- * The length byte and the finished command byte are then cached in the
- * context; TransformAndCullPoly re-stamps the length byte onto every
- * primitive it processes.
+ * Finish the command byte of the primitive SortTmdObject has just given its
+ * length and code, and cache both bytes in the context: the ABE
+ * (semi-transparency) bit from the run's packet type, the TGE (texture
+ * shading off) bit from D_8008E248, the object's GsLOFF bit.
+ * TransformAndCullPoly re-stamps the cached length onto every primitive.
+ * MATCHING: two separate statements; one shared local costs the match.
  */
 void SetupPrimCode(void *prim, PolyDrawCtx *ctx) {
     setSemiTrans(prim, ctx->semiTrans);
@@ -870,14 +838,10 @@ fail:
 /*
  * Perspective-transform the three vertices the caller already loaded into
  * the GTE (gte_ldv3), then cull: bail if the FLAG register shows anything
- * other than clean or SZ3-saturated, if the polygon is back-facing
- * (nclip <= 0), or if the depth-cue factor says it is too close. Otherwise
- * average the Z, cache the screen coordinates and compute the OT bucket.
- * Returns 0 on success, 1 when culled.
- *
- * Splat tagged this "handwritten"; it is ordinary C over the Psy-Q gte_*
- * macros (include/gte.h), and every one of retail's raw words is one of
- * those macros. Earlier rounds carried it as a whole-function __asm__.
+ * but clean or SZ3/OTZ-saturated (which marks the face for subdivision), if
+ * the polygon is back-facing (nclip <= 0), or if the depth-cue factor has
+ * reached ONE. Otherwise average the Z, cache the screen coordinates and
+ * compute the OT slot. Returns 0 on success, 1 when culled.
  */
 s32 TransformAndCullPoly(void *primIn, void *ctxIn) {
     PolyDrawCtx *ctx = ctxIn;
@@ -908,10 +872,10 @@ s32 TransformAndCullPoly(void *primIn, void *ctxIn) {
     return 0;
 }
 
-/* The six screen-XY store callbacks ProjectTri/QuadFace invoke, one per
- * Psy-Q primitive type: each writes the GTE's SXY FIFO into that POLY_xx's
- * own vertex offsets. POLY_FT4 and POLY_GT4's equivalents are StoreSxyPolyFT4
- * and StoreSxyPolyGT4 in code_8220_c. POLY_F3: xy0/xy1/xy2 at +0x8/+0xC/+0x10. */
+/* The screen-XY store callbacks ProjectTri/QuadFace invoke, one per
+ * primitive type: each writes the GTE's SXY FIFO into that POLY_xx's own
+ * vertex fields (StoreSxyPolyFT4 and StoreSxyPolyGT4 are in code_8220_c).
+ * POLY_F3: xy0/xy1/xy2 at +0x8/+0xC/+0x10. */
 void StoreSxyPolyF3(void *dst) {
     gte_stsxy3_f3(dst);
 }
@@ -921,11 +885,9 @@ void StoreSxyPolyG3(void *dst) {
     gte_stsxy3_g3(dst);
 }
 
-/* POLY_FT3: +0x8/+0x10/+0x18 -- byte-identical to the POLY_G3 store, since
- * POLY_G3's per-vertex RGB and POLY_FT3's per-vertex UV are both 4 bytes.
- * Retail keeps them as two separate functions and so does this file; which
- * is which is settled by the (len, code) pair at each one's call site, not
- * by the offsets. */
+/* POLY_FT3: +0x8/+0x10/+0x18, the same offsets as POLY_G3 (a UV word where
+ * POLY_G3 has an RGB word), but a separate function in retail; the
+ * primitive at each call site says which is which. */
 void StoreSxyPolyFT3(void *dst) {
     gte_stsxy3_ft3(dst);
 }
@@ -939,8 +901,7 @@ void StoreSxyPolyGT3(void *dst) {
  * POLY_F4: xy0/xy1/xy2 at +0x8/+0xC/+0x10, xy3 at +0x14. ProjectQuadFace
  * calls this twice -- storeFirst3 = 1 for the three vertices the shared
  * transform produced, then 0 for the fourth vertex's own rtps result.
- * `xy3` must be a real unconditionally-computed pointer, not a 0x14(%0)
- * offset inside the asm: see this function's match report.
+ * MATCHING: `xy3` is computed unconditionally, not as an offset in the asm.
  */
 void StoreSxyPolyF4(void *dst, s32 storeFirst3) {
     short *xy3 = &((POLY_F4 *)dst)->x3;

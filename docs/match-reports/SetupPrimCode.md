@@ -127,3 +127,13 @@ symbols file when the address route fails, or accept that this class of
 global stays `D_`-named. Worth settling before track 3 gets much further,
 because the workaround (renaming by hand) is exactly what `rename.py`
 exists to prevent.
+
+## Round 91 polish (delta, track 7)
+
+The body is now libgpu's own macros -- `setSemiTrans(prim, ctx->semiTrans)`,
+`setShadeTex(prim, D_8008E248)`, `ctx->primLen = getlen(prim)`,
+`ctx->primCode = getcode(prim)` -- byte-identical (29/29). The two ternary
+macro statements stay separate, which is the shape this report's
+"independent statements" finding requires. `ctx` is the unit's
+`PolyDrawCtx`. The function comment lost the POLY_xx (len, code) table (it
+is in SortTmdObject's report) and the history.

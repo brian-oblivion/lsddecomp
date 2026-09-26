@@ -89,3 +89,8 @@ asm-differ catches it.
 `1` before the fourth vertex's own `gte_rtps()` and `0` after: the flag
 selects "the three vertices the shared transform produced" versus "the
 fourth vertex's result", not an on/off.
+
+## Round 91 polish (delta, track 7)
+
+`p` is now `short *xy3 = &((POLY_F4 *)dst)->x3`, still computed
+unconditionally at the top (byte-identical).
