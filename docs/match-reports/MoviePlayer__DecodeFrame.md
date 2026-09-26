@@ -85,3 +85,14 @@ Second build. The first shape, `if (cur->unk44 != 0) return slot64(cur);` ahead 
 ## Track 4 (2026-09-26, round 89)
 
 Class unified in `include/MoviePlayer.h` (id 0x70, table `gMoviePlayerMethods`, was `D_8006F614`; a direct BasicClass subclass, 0x6C bytes). The unit-local views in `src/code_33808.c` are gone; Obj45CFC/Methods45CFC are gone; +0x058 is `pullFrame`, +0x064 `pollActive`, `unk40`/`unk44`/`unk4C` are `haveFrame`/`finished`/`frameDone`, `unk34` is `stripRect.h`. Byte-identical; `typeviews.py --warnings` 0 new.
+
+## Round 93 polish (charlie, track 7)
+
+### Naming
+
+| old | new | tier | evidence |
+| --- | --- | --- | --- |
+| `0x80` | `MOVIE_SYNC_HEIGHT` | A | as in DrawStrip |
+| DecDCTin prototype | <libpress.h> | A | local copy deleted |
+
+MATCHING line at the closing brace: no return when another player is active, as retail.

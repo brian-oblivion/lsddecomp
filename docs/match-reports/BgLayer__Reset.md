@@ -77,3 +77,13 @@ A SceneNode subclass whose fields past +0x044 read (u32, s16 x6, three bytes, a 
 Class unified in `include/BgLayer.h`. `self` is `BgLayer *` (was `Obj6F2C4`); +0x054 is `color`, a `BgLayerRgb` (was `Vec3S8 unk54`; still signed, which the lb/sb copy needs), +0x064 `rotate` (was unk64); `gBgLayerDefaultColor` is `BgLayerRgb`. The slot +0x040 keeps SceneNode's `reset(self)` type; the ctor casts to `BgLayerResetFn`. Byte-identical.
 
 Later the same round (alpha, second class): TileMap unified too (`include/TileMap.h`, same round): `src` is `TileMap *` (was the unit-local `Map44294` view, deleted), and the fields read are `src->map.cellw`/`ncellw`/`cellh`/`ncellh`; `map` points at `&src->map` (was `&src->cellw`). Byte-identical.
+
+## Round 93 polish (charlie, track 7)
+
+### Naming
+
+| old | new | tier | evidence |
+| --- | --- | --- | --- |
+| `0x1000000`, `0x2000000` | `BG_ATTR_8BIT`, `BG_ATTR_15BIT` | B | GsBG attribute bits 24..25 are the colour mode in Sony's libgs (0 4-bit CLUT, 1 8-bit, 2 15-bit); mode 1, the one New_BgLayer's caller uses, is 15-bit over TileAtlas's GetTPage(2) pages, which agrees |
+| `320`, `240` | `BG_SCREEN_W`, `BG_SCREEN_H` | B | mode 1 sizes the layer to them; the display is 320 x 240 |
+| `0x1000` | `ONE` | A | unit scale in 20.12 |

@@ -45,3 +45,12 @@ First build. The failing-ctor allocator lever with the test inverted: this class
 ## Track 4 (2026-09-26, round 89)
 
 Class unified in `include/MoviePlayer.h` (id 0x70, table `gMoviePlayerMethods`, was `D_8006F614`; a direct BasicClass subclass, 0x6C bytes). The unit-local views in `src/code_33808.c` are gone; it returns `MoviePlayer *` and takes `(DrawRect *frame, s32 speed, s32 external)`, calling the typed ctor slot instead of the `Ctor33808` cast. Its one caller, StreamTask__StreamTask, passes `(DrawRect *)GetDefaultStreamTaskInitData()`: the ctor hands it to InitFrame, which copies it whole into `frame`/`stripRect` and reads its w/h words, so the three-word StreamTaskInitData is the frame rectangle. Byte-identical; `typeviews.py --warnings` 0 new.
+
+## Round 93 polish (charlie, track 7)
+
+### Naming
+
+| old | new | tier | evidence |
+| --- | --- | --- | --- |
+| the size literal | `sizeof(MoviePlayer)` | A | each equals the object size the class header records (and the allocation retail makes); the image is byte-identical |
+| `speed` | `cdSpeed` | A | New_CdStream's speed argument (CdStream.h: < 4 means double speed) |

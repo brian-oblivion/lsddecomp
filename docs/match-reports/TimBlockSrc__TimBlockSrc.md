@@ -103,3 +103,16 @@ Twenty-ninth build (four families of levers, all needed together): (1) an `s16 s
 ## Track 4 (2026-09-25, round 83, bravo)
 
 Occupant of +0x008. Fields now named: +0x2C `blockCount`, +0x30 `blocks`, +0x38 `sectorSize`, +0x3C `loaded`, +0x80 `failed`; each entry's +0x04..+0x0A the RECT `clutX`/`clutY`/`clutW`/`clutH` this ctor lays out (0, 0x1E0 + i * mask, 0x100, 1). The class (id 0xF03, table `gTimBlockSrcMethods`) is unified as `TimBlockSrc` in `include/TimBlockSrc.h`. Any source block above is the pre-unification spelling; the live body in `src/code_33808.c` takes the unified types, byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).
+
+## Round 93 polish (charlie, track 7)
+
+### Naming
+
+| old | new | tier | evidence |
+| --- | --- | --- | --- |
+| `0x1E0` | `CLUT_FADE_Y` (480) | A | the ramps' clutY base here, FadeClutRow's src.y base, and TimArraySrc__BuildImages' CLUT-row origin: the VRAM row the fade CLUTs start at |
+| `0x100` | `CLUT_COLORS` (256) | A | the width of each ramp's CLUT RECT; FadeClutRow reads and writes rows of that many 16-bit colours |
+| `0x24` | `sizeof(Hdr43200)` | A | the header buffer's allocation and bufferSize, the size AdvanceLoadState copies |
+| `0x800` | `CD_SECTOR_SIZE` (2048) | A | the first read of the file, whose first 36 bytes are the header |
+| `9` | `TIMBLOCK_LOAD_HEADER` | A | set before the header-sector read; AdvanceLoadState's branch for it parses the header |
+| `4` | `ARRAY_COUNT(self->entries)` | A | the loop fills `entries[4]` |

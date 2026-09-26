@@ -51,3 +51,7 @@ caller. Byte-identical.
 ## Track 4 (2026-09-26, round 89)
 
 Class unified in `include/MoviePlayer.h` (id 0x70, table `gMoviePlayerMethods`, was `D_8006F614`; a direct BasicClass subclass, 0x6C bytes). The unit-local views in `src/code_33808.c` are gone; the Obj45CFC parameter is `MoviePlayer *`; `unk4C` -> `frameDone`. Byte-identical; `typeviews.py --warnings` 0 new.
+
+## Round 93 polish (charlie, track 7)
+
+MATCHING line on the loop: `frameDone` is not volatile, so the body reads it once and then spins forever if it was 0 (`move v0, zero; beqz v0, .`), which is retail's code.

@@ -41,6 +41,20 @@
 
 struct Src6F240;
 
+/* A TOD packet's header word, as DecodeTodPacketWord splits it (Sony's TOD
+ * format): object id in bits 0..15 (the low byte is kept), packet type in
+ * 16..19, flag in 20..23, length in words in 24..31. */
+#define TOD_PACKET_TYPE_SHIFT 16
+#define TOD_PACKET_FLAG_SHIFT 20
+#define TOD_PACKET_LEN_SHIFT 24
+#define TOD_PACKET_NIBBLE 0xF /* the type and flag fields' mask */
+
+/* The packet types ScanTodPackets tests. TOD_PACKET_MODEL_ID is spelled
+ * exactly as include/code_55dd4.h's, which defines the other types. */
+#define TOD_PACKET_MODEL_ID 2       /* data: the TMD id the object is drawn with */
+#define TOD_PACKET_OBJECT_CONTROL 8 /* the flag says create or kill */
+#define TOD_OBJECT_CREATE 0         /* an object-control packet's flag: create */
+
 typedef struct Tod Tod;
 typedef struct TodMethods TodMethods;
 

@@ -52,3 +52,11 @@ override is named for its slot (FINISHING-PLAN track 4 step 6). Class
 unified in `include/TriggerWorld.h`.
 
 Retyped in the same round: `self` is `TriggerWorld *`, +0x038 is `modelDataCount` (was DataSrc33808.unk38). Bytes unchanged.
+
+## Round 93 polish (charlie, track 7)
+
+### Naming
+
+| old | new | tier | evidence |
+| --- | --- | --- | --- |
+| `(u8 *)buffer + 8` | `CountedBuf33808.entries` | A | the ModelData BuildResources wrote over the counted offsets |

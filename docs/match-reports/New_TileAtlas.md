@@ -47,3 +47,12 @@ void *New_TileAtlas(s32 arg0) {
 ## Track 4 (2026-09-26, round 88, alpha)
 
 Class unified in `include/TileAtlas.h` (gTileAtlasMethods, 0x303, a FileResource subclass, 0x38 bytes). Returns `TileAtlas *` (was `void *`; include/code_2c054.h's local view returned `StreamTaskUnkB4Obj *` and is deleted); the ctor is reached through the typed `TileAtlasMethods` ctor slot `(TileAtlas *self, s32 arg1)` instead of the unit's `Ctor33808` cast. One caller, TaskCore__TaskCore (src/code_2c054.c), which stores the result in TaskCore::tileAtlas and passes it to New_TileMap. No rename. Byte-identical.
+
+## Round 93 polish (charlie, track 7)
+
+### Naming
+
+| old | new | tier | evidence |
+| --- | --- | --- | --- |
+| the size literal | `sizeof(TileAtlas)` | A | each equals the object size the class header records (and the allocation retail makes); the image is byte-identical |
+| `arg0` | `source` | C | as New_TileMap's |

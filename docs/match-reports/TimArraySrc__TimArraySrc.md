@@ -46,3 +46,7 @@ First build. No lever needed.
 
 ## Track 4 (2026-09-26, round 88, runner alpha)
 Class unified as TimArraySrc (include/TimArraySrc.h); self retyped from the unit-local DataSrc33808. Fields: unk2C -> count, unk30 -> images (TimImage **), unk38 -> ready, named from BuildImages, which is the only writer after this ctor. Byte-identical.
+
+## Round 93 polish (charlie, track 7)
+
+Comment rewritten only; no names or constants changed.

@@ -47,3 +47,11 @@ void *New_Tod(s32 arg0) {
 ## Track 4 (2026-09-26, round 86, charlie)
 
 Now `Tod *New_Tod(Src6F240 *src)` (include/Tod.h): its one caller, TodSet__BuildTods, passes the address of a descriptor whose first word is the buffer Tod__Tod adopts, and stores the result as an object; the caller casts both (`(Src6F240 *)&req`, `(DataSrc33808 *)`), no code. Bytes unchanged.
+
+## Round 93 polish (charlie, track 7)
+
+### Naming
+
+| old | new | tier | evidence |
+| --- | --- | --- | --- |
+| the size literal | `sizeof(Tod)` | A | each equals the object size the class header records (and the allocation retail makes); the image is byte-identical |

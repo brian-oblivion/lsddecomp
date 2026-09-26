@@ -89,3 +89,14 @@ A loop pre-test that retail does as a SIGNED compare (`blez`) on a value cc1 can
 ## Track 4 (2026-09-26, round 86, charlie)
 
 `self` is now `Tod *` (include/Tod.h), and the function is Tod's +0x07C `scanTodPackets` slot (TodSet inherits it). The forward prototype of DecodeTodPacketWord above it moved into the header. Bytes unchanged.
+
+## Round 93 polish (charlie, track 7)
+
+### Naming
+
+| old | new | tier | evidence |
+| --- | --- | --- | --- |
+| `value`, `sub`, `n`, `cnt`, `found`, `sel` | `objId`, `flag`, `packetCount`, `created`, `index`, `tmdId` | A/B | DecodeTodPacketWord splits Sony's TOD packet header (object id, type, flag, length); `tmdId` is B: in, the TMD id matched against model-id packets; out, the index or count |
+| `8`, `0` | `TOD_PACKET_OBJECT_CONTROL`, `TOD_OBJECT_CREATE` (include/Tod.h) | A | Sony's TOD packet type 8 is object control, flag 0 create; the function collects those packets' object ids |
+| `2` | `TOD_PACKET_MODEL_ID` (include/Tod.h, the same spelling as include/code_55dd4.h's) | A | type 2 carries the TMD id, read at packet +4 |
+| `((u16 *)data)[1]`, `[2]` | `TodFrame.packetCount`, `TodPacket.tmdId` | A | a TOD frame header is {size, packet count, frame number}; a model-id packet's data starts with the id |

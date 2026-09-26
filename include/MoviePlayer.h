@@ -44,7 +44,7 @@ struct MoviePlayerMethods {
      * rectangle, `speed` goes to New_CdStream, `external` nonzero means the
      * caller owns the buffers (InitFrame allocates none). */
     BASICCLASS_SLOTS_R(MoviePlayer, s32, (MoviePlayer * self, DrawRect *frame, s32 speed, s32 external));
-    /* +0x040 */ s32 (*play)(MoviePlayer *self, char *name, s32 frameCount, s32 arg3,
+    /* +0x040 */ s32 (*play)(MoviePlayer *self, char *name, s32 frameCount, s32 keepActive,
                              s32 loops); /* MoviePlayer__Play: 0 started (or another movie is active), 1 open failed */
     /* +0x044 */ void (*stop)(MoviePlayer *self); /* MoviePlayer__Stop: reset, hand the stream MarkStopped, restart it */
     /* +0x048 */ s32 (*advance)(MoviePlayer *self); /* MoviePlayer__Advance: StreamTask's per-tick call; nonzero when done */
@@ -75,14 +75,14 @@ struct MoviePlayer {
     /* +0x044 */ s32 finished; /* drawStrip at a frame's end once streamEnded, and abort; decodeFrame then returns pollActive */
     /* +0x048 */ s32 streamEnded; /* pullFrame when getNextFrame returns < 0, and abort; pullFrame then pulls nothing */
     /* +0x04C */ s32 frameDone; /* drawStrip after a frame's last strip; WaitFrameReady spins on it; play and stop set it */
-    /* +0x050 */ s32 unk50; /* MarkPlaying 1, MarkStopped -1; advance starts the stream reading (startRead) while nonzero,
+    /* +0x050 */ s32 pendingStart; /* MarkPlaying 1, MarkStopped -1; advance starts the stream reading (startRead) while nonzero,
                                       * counting `loops` down when negative, then clears it. The ctor clears it */
-    /* +0x054 */ s32 unk54; /* play's arg3 (StreamTask's unkC4); while set, pollActive does not finish but calls stop
+    /* +0x054 */ s32 keepActive; /* play's keepActive (StreamTask's unkC4); while set, pollActive does not finish but calls stop
                                       * every 100 polls; abort clears it */
     /* +0x058 */ s32 loops;        /* play's; advance mutes the stream when it runs out */
     /* +0x05C */ s32 frameCount;   /* play's arg2; advance's startRead(1, frameCount) */
     /* +0x060 */ CdStream *stream; /* the ctor's New_CdStream; finalize releases it */
-    /* +0x064 */ s32 started; /* advance, after startRead; abort; stop clears it. With unk50 clear, advance decodes only once set */
+    /* +0x064 */ s32 started; /* advance, after startRead; abort; stop clears it. With pendingStart clear, advance decodes only once set */
     /* +0x068 */ s32 autoPlay; /* setAutoPlay; play calls MarkPlaying at once when set */
 }; /* 0x6C bytes: New_MoviePlayer */
 
@@ -99,10 +99,10 @@ s32 MoviePlayer__MoviePlayer(MoviePlayer *self, DrawRect *frame, s32 speed, s32 
 void MoviePlayer__Finalize(MoviePlayer *self);
 s32 MoviePlayer__InitFrame(MoviePlayer *self, DrawRect *frame, s32 external);
 void MoviePlayer__FreeFrameBuffers(MoviePlayer *self);
-s32 MoviePlayer__Play(MoviePlayer *self, char *name, s32 frameCount, s32 arg3, s32 loops);
-void MoviePlayer__MarkPlaying(MoviePlayer *self); /* unk50 = 1; play's call */
+s32 MoviePlayer__Play(MoviePlayer *self, char *name, s32 frameCount, s32 keepActive, s32 loops);
+void MoviePlayer__MarkPlaying(MoviePlayer *self); /* pendingStart = 1; play's call */
 void MoviePlayer__Stop(MoviePlayer *self);
-void MoviePlayer__MarkStopped(MoviePlayer *self); /* unk50 = -1; stop hands it to the stream's slot7C, whose occupant is empty */
+void MoviePlayer__MarkStopped(MoviePlayer *self); /* pendingStart = -1; stop hands it to the stream's slot7C, whose occupant is empty */
 s32 MoviePlayer__Advance(MoviePlayer *self);
 void MoviePlayer__Abort(MoviePlayer *self);
 void MoviePlayer__NoOpSlot50(void);

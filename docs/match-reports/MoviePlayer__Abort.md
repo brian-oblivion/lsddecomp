@@ -83,3 +83,11 @@ The +0x060 object is a CdStream (include/CdStream.h, unified this round). `Sub45
 ## Track 4 (2026-09-26, round 89)
 
 Class unified in `include/MoviePlayer.h` (id 0x70, table `gMoviePlayerMethods`, was `D_8006F614`; a direct BasicClass subclass, 0x6C bytes). The unit-local views in `src/code_33808.c` are gone; Obj458B8 is gone; `unk48` -> `streamEnded`, `unk44` -> `finished`, `unk64` -> `started`. Byte-identical; `typeviews.py --warnings` 0 new.
+
+## Round 93 polish (charlie, track 7)
+
+### Naming
+
+| old | new | tier | evidence |
+| --- | --- | --- | --- |
+| `unk54` | `keepActive` | B | cleared here; see MoviePlayer__Play |

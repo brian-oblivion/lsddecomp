@@ -47,3 +47,11 @@ void *ModelData__ForwardDecodePacketWord(ModelData *self, s32 arg1, s32 arg2, s3
 ## Track 4 (2026-09-26, round 88, delta)
 
 The forwarded call now reaches the TodSet at +0x030 through its own table, `((TodSet *)self->todSet)->methods->decodePacketWord(...)`, instead of casting it to the unit-local DataSrc33808 for `slot80`; the s32 arguments (ModelData.h's slot type, unchanged) are cast to the slot's pointer types, which emits no code. Holding the pointer in a local first did NOT match (the whole-image SHA1 went red); the double cast inline does. Bytes unchanged.
+
+## Round 93 polish (charlie, track 7)
+
+### Naming
+
+| old | new | tier | evidence |
+| --- | --- | --- | --- |
+| `arg1`..`arg5` | `packet`, `objId`, `type`, `flag`, `len` | A | forwarded to DecodeTodPacketWord; still `s32` because include/ModelData.h declares them so |

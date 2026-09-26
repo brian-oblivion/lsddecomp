@@ -50,3 +50,11 @@ void *New_TriggerWorld(s32 arg0) {
 ## Track 4 (2026-09-26, round 88, bravo)
 
 Now `TriggerWorld *New_TriggerWorld(struct Src6F240 *src)` (include/TriggerWorld.h): the argument is the construction descriptor the ctor hands to ModelData__ModelData, and the object is a TriggerWorld (0x3C bytes, one own field at +0x038). The ctor is still reached through the unprototyped Ctor33808 view, because MODELDATA_SLOTS types +0x008 returning void while this ctor returns self or NULL. code_4cd08's FireDreamAuxTriggerEntries, the one caller, casts its stack array in. Bytes unchanged.
+
+## Round 93 polish (charlie, track 7)
+
+### Naming
+
+| old | new | tier | evidence |
+| --- | --- | --- | --- |
+| the size literal | `sizeof(TriggerWorld)` | A | each equals the object size the class header records (and the allocation retail makes); the image is byte-identical |

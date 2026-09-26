@@ -1,4 +1,6 @@
-# MaxOfBufferWords -- MATCHED (23/23 words)
+# FindMaxTimBlockSize -- MATCHED (23/23 words)
+
+> Renamed from `MaxOfBufferWords` on 2026-09-26 (tools/rename.py). Address 0x800434dc.
 
 > Renamed from `func_800434DC` on 2026-09-25 (tools/rename.py). Address 0x800434dc.
 
@@ -27,7 +29,7 @@ typedef struct Buf434DC {
     /* +0x14 */ u32 vals[1];
 } Buf434DC;
 
-u32 MaxOfBufferWords(FileResource *self) {
+u32 FindMaxTimBlockSize(FileResource *self) {
     Buf434DC *buf = self->buffer;
     u32 i;
     u32 max = 0;
@@ -51,4 +53,13 @@ u32 MaxOfBufferWords(FileResource *self) {
 
 ## Naming
 
-- **MaxOfBufferWords**, tier B. Free helper: the largest of the buffer's counted words from +0x14; used only by TimBlockSrc__AdvanceLoadState to size the block sector buffer.
+- **FindMaxTimBlockSize**, tier B. Free helper: the largest of the buffer's counted words from +0x14; used only by TimBlockSrc__AdvanceLoadState to size the block sector buffer.
+
+## Round 93 polish (charlie, track 7)
+
+### Naming
+
+| old | new | tier | evidence |
+| --- | --- | --- | --- |
+| `MaxOfBufferWords` | `FindMaxTimBlockSize` (rename.py) | A | a pure leaf: the largest of the header's `count` words from +0x14, which are the block sizes (see TimBlockSrc__AdvanceLoadState's row); its one caller sizes the block buffer with it |
+| `Buf434DC` `pad4[0x10]`, `vals[1]` | `offsets[4]`, `sizes[4]` | A | as above |

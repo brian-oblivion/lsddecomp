@@ -47,3 +47,11 @@ void *New_TimArraySrc(s32 arg0) {
 
 ## Track 4 (2026-09-26, round 88, runner alpha)
 Class unified as TimArraySrc (include/TimArraySrc.h). Now declared `TimArraySrc *New_TimArraySrc(char *name)` and calls the prototyped `GetTimArraySrcMethods()->ctor(obj, name)` instead of casting the table to the unit-local Ctor33808: the ctor's second parameter is `name` (TimArraySrc__TimArraySrc passes it to requestLoadFile) and the one caller, TimBlockSrc__AdvanceLoadState, passes 0 (now NULL). Byte-identical.
+
+## Round 93 polish (charlie, track 7)
+
+### Naming
+
+| old | new | tier | evidence |
+| --- | --- | --- | --- |
+| the size literal | `sizeof(TimArraySrc)` | A | each equals the object size the class header records (and the allocation retail makes); the image is byte-identical |

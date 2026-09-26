@@ -11,7 +11,7 @@
  * Loading (setFlag, +0x064, is TimBlockSrc__AdvanceLoadState: the driver
  * runs it when a read completes). The ctor reads the file's first sector;
  * its first 0x24 bytes are a header -- a block count, the blocks' file
- * offsets from +0x04, their sizes from +0x14 (MaxOfBufferWords) -- copied
+ * offsets from +0x04, their sizes from +0x14 (FindMaxTimBlockSize) -- copied
  * into `buffer`. Each block is then read into `sector` and handed to a new
  * TimArraySrc (gTimArraySrcMethods, include/TimArraySrc.h), whose clutBase is
  * `entries`, into `blocks`.
@@ -31,6 +31,13 @@
  * carries a byte of this class's layout, so they expand FILERESOURCE's macros
  * directly (round 83).
  */
+
+/* TimBlockSrc__AdvanceLoadState's steps, in FileResource's loadState. */
+enum TimBlockLoadState {
+    TIMBLOCK_LOAD_IDLE = 0,   /* done, or not started */
+    TIMBLOCK_LOAD_HEADER = 9, /* the ctor's header-sector read is pending */
+    TIMBLOCK_LOAD_BLOCK = 10  /* a block read into `sector` is pending */
+};
 
 typedef struct TimBlockSrc TimBlockSrc;
 typedef struct TimBlockSrcMethods TimBlockSrcMethods;
