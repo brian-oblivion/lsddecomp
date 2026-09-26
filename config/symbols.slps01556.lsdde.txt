@@ -2936,3 +2936,4 @@ gStyleSpawnModelLayout = 0x8008E0B8;
 gStyleSpawnTableIndex = 0x8008E0BC;
 gStyleSpawnColors = 0x8008E0C0;
 gStyleSpawnYChoice1 = 0x8008732C;
+gStyleSpawnYChoice2 = 0x80087330;

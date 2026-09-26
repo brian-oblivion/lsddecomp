@@ -437,14 +437,14 @@ Class876FC **StyleFillEffectKind0(Class876FC **arg0, s32 arg1, LongVec3 *arg2) {
     return arg0;
 }
 
-extern s32 D_80087330;
+extern s32 gStyleSpawnYChoice2;
 extern u8 gStyleKind1Scale[];
 
 Class876FC **StyleFillEffectKind1(Class876FC **arg0, s32 arg1, LongVec3 *arg2) {
     s32 i;
     s32 val;
 
-    val = D_80087330;
+    val = gStyleSpawnYChoice2;
     gStyleSpawnScale = gStyleKind1Scale;
     for (i = 0; i < arg1; i++) {
         SetupStyleSpawnParamsA(arg2, (void *)val);
@@ -454,7 +454,7 @@ Class876FC **StyleFillEffectKind1(Class876FC **arg0, s32 arg1, LongVec3 *arg2) {
     return arg0;
 }
 
-extern s32 D_80087330;
+extern s32 gStyleSpawnYChoice2;
 extern void SetupStyleSpawnParamsA(void *arg0, void *arg1);
 extern s32 gStyleSpawnColors[];
 extern u8 *gStyleSpawnRotation;
@@ -482,7 +482,7 @@ Class876FC **StyleFillEffectKind3(Class876FC **arg0, LongVec3 *arg1) {
     s32 *p;
     PtrBoxK3 *q;
 
-    SetupStyleSpawnParamsA(arg1, (void *)D_80087330);
+    SetupStyleSpawnParamsA(arg1, (void *)gStyleSpawnYChoice2);
     if (gStyleDecorVariant != 0 && gStyleDecorColors == (s32)gStyleDecorColorsB) {
         gStyleSpawnOffsetX = 0xFFFF5000;
         gStyleSpawnOffsetY = -0x2000;
@@ -543,7 +543,7 @@ Class876FC **StyleFillEffectKind2(Class876FC **arg0, LongVec3 *arg1) {
         val = 0;
     }
     slot->v = val;
-    SetupStyleSpawnParamsA(arg1, (void *)D_80087330);
+    SetupStyleSpawnParamsA(arg1, (void *)gStyleSpawnYChoice2);
     q = &gStyleSpawnRotation;
     *q = gStyleSpawnRotations;
     gStyleSpawnTableIndex = rand() % 6;

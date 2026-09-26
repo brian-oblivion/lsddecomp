@@ -19,7 +19,7 @@ see `StyleTeardown`'s per-index rewrite of `gStyleCueSlots`).
 ## New externs
 
 ```c
-extern s32 D_80087330;             /* only element [0] read here */
+extern s32 gStyleSpawnYChoice2;             /* only element [0] read here */
 extern u8 gStyleKind1Scale[];            /* address only taken, never indexed */
 extern u8 gStyleSpawnOffsetX[];            /* address only taken, passed to New_X */
 extern u8 *gStyleSpawnScale;             /* set to &gStyleKind1Scale unconditionally */
@@ -27,7 +27,7 @@ extern void *SetupStyleSpawnParamsA(void *arg0, void *arg1);   /* forward decl, 
 extern void *New_Class876FC(void *arg0, void *arg1, void *arg2, void *arg3); /* class_3bb8c_r.c, ALREADY MATCHED */
 ```
 
-`D_80087330` is a 2-word dlabel in `asm/data/76DC8.data.s`; only the first
+`gStyleSpawnYChoice2` is a 2-word dlabel in `asm/data/76DC8.data.s`; only the first
 word is read here (`lw`, not indexed), so it is declared scalar rather than
 an array -- if a sibling function later indexes `[1]`, retype there, not
 here (no other unit references any of these four symbols currently).
@@ -46,7 +46,7 @@ void **StyleFillEffectKind1(void **arg0, s32 arg1, void *arg2) {
     s32 i;
     s32 val;
 
-    val = D_80087330;
+    val = gStyleSpawnYChoice2;
     gStyleSpawnScale = gStyleKind1Scale;
     for (i = 0; i < arg1; i++) {
         SetupStyleSpawnParamsA(arg2, (void *) val);
@@ -60,13 +60,13 @@ void **StyleFillEffectKind1(void **arg0, s32 arg1, void *arg2) {
 ## Lever: capture a global into a local BEFORE a loop that calls through it,
 even when the call's return value is discarded
 
-First attempt read `D_80087330` directly inside the loop body
-(`SetupStyleSpawnParamsA(arg2, (void *) D_80087330)`), which is semantically identical
+First attempt read `gStyleSpawnYChoice2` directly inside the loop body
+(`SetupStyleSpawnParamsA(arg2, (void *) gStyleSpawnYChoice2)`), which is semantically identical
 -- but GCC 2.6.3 can't prove `SetupStyleSpawnParamsA` doesn't write back to
-`D_80087330`, so it reloads the global from memory on every iteration
+`gStyleSpawnYChoice2`, so it reloads the global from memory on every iteration
 (`lui`/`lw` inside the loop, one fewer callee-saved register overall: 39
 words instead of retail's 42). Retail hoists the read to a local
-(`s32 val = D_80087330;`) *before* the loop, which is picked up into a
+(`s32 val = gStyleSpawnYChoice2;`) *before* the loop, which is picked up into a
 saved register ($s4) that survives across the loop's two calls -- 3 extra
 words (the load-once-and-keep pattern) and matches exactly.
 
@@ -94,7 +94,7 @@ Sibling of `StyleFillEffectKind0`: fills `arg1` slots of `gStyleEffectSlots`
 via the same `New_Class876FC` allocator, this time with a literal kind
 argument of `1`. Called unconditionally (every `gStyleVariant`) from
 `StyleBuildEffectSlots`, right after `StyleFillEffectKind0`. MATCHED,
-42/42, second build (one lever: hoist the read of `D_80087330` out of the
+42/42, second build (one lever: hoist the read of `gStyleSpawnYChoice2` out of the
 loop).
 
 ## Track 4 (2026-09-26, round 88, charlie)

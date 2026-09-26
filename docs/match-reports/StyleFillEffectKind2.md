@@ -75,7 +75,7 @@ void **StyleFillEffectKind2(void **arg0, void *arg1) {
         val = 0;
     }
     slot->v = val;
-    SetupStyleSpawnParamsA(arg1, (void *) D_80087330);
+    SetupStyleSpawnParamsA(arg1, (void *) gStyleSpawnYChoice2);
     q = &gStyleSpawnRotation;
     *q = gStyleSpawnRotations;
     gStyleSpawnTableIndex = rand() % 6;
@@ -382,7 +382,7 @@ window.
 extern s32 gStyleDay;
 extern s32 gStyleGrid;
 extern s32 gStyleKind2AltColor;
-extern s32 D_80087330;
+extern s32 gStyleSpawnYChoice2;
 extern u8 gStyleKind2Colors[];
 extern s32 gStyleSpawnColors[];
 extern u8 *gStyleSpawnRotation;
@@ -408,7 +408,7 @@ void **StyleFillEffectKind2(void **arg0, void *arg1) {
         v0 = gStyleKind2AltColor;
     }
     *slot = v0;
-    SetupStyleSpawnParamsA(arg1, (void *) D_80087330);
+    SetupStyleSpawnParamsA(arg1, (void *) gStyleSpawnYChoice2);
     q = &gStyleSpawnRotation;
     *q = gStyleSpawnRotations;
     randval = rand();
