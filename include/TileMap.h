@@ -62,18 +62,18 @@ typedef struct GsMAP {
 } GsMAP;
 
 struct TileMapMethods {
-    CLASS6D430_SLOTS(TileMap, (TileMap *self, s32 arg1, struct TileAtlas *atlas));
+    CLASS6D430_SLOTS(TileMap, (TileMap * self, s32 arg1, struct TileAtlas *atlas));
     /* +0x078 is Class6D430's slot78; this table's occupant is
      * TileMap__BuildMap, called through TileMapBuildMapFn. */
-};                                   /* 30 slots, 0x7C bytes */
+}; /* 30 slots, 0x7C bytes */
 
 struct TileMap {
     CLASS6D430_FIELDS(TileMapMethods);
-    /* +0x02C */ GsMAP map;          /* TileMap__BuildMap fills it; BgLayer__Reset points its GsBG here */
+    /* +0x02C */ GsMAP map; /* TileMap__BuildMap fills it; BgLayer__Reset points its GsBG here */
     /* +0x03C */ struct TileAtlas *atlas; /* include/TileAtlas.h: the ctor's third argument; BuildMap reads its cells */
-    /* +0x040 */ u16 defaultGrid;    /* 1 from the ctor when arg1 == 0; BuildMap lays out the 20 x 15 grid only when set */
-    /* +0x042 */ u16 loaded;         /* 0 from the ctor, 1 from TileMap__Load after BuildMap */
-};                                   /* 0x44 bytes: New_TileMap */
+    /* +0x040 */ u16 defaultGrid; /* 1 from the ctor when arg1 == 0; BuildMap lays out the 20 x 15 grid only when set */
+    /* +0x042 */ u16 loaded; /* 0 from the ctor, 1 from TileMap__Load after BuildMap */
+}; /* 0x44 bytes: New_TileMap */
 
 /* TileMap__BuildMap as TileMap__Load calls it: no argument (see the
  * banner). */

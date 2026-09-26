@@ -71,6 +71,7 @@ struct BasicClassListNode {
  * class whose constructor returns self or NULL (Class6B5CC and everything
  * below it: New_Class6B5CC tests `ctor(obj) != NULL`) passes `void *`.
  * BasicClass's own ctor returns nothing, so BASICCLASS_SLOTS passes `void`. */
+/* clang-format off */
 #define BASICCLASS_SLOTS_R(Self, CtorRet, CtorParams)                                              \
     /* +0x000 */ s32 header; /* class id; `(header & mask) == id` is is-kind-of */                 \
     /* +0x004 */ void *(*release)(Self *self);                 /* BasicClass__Release: finalize, free self, NULL */ \
@@ -88,23 +89,26 @@ struct BasicClassListNode {
     /* +0x034 */ void (*slot34)(void);                         /* BasicClass__func_18350, empty; never overridden, never called */ \
     /* +0x038 */ void (*onNotify)(Self *self, void *sender, s32 event); /* BasicClass__OnNotify */  \
     /* +0x03C */ void *slot3C                                  /* NULL in all 59 method tables */
+/* clang-format on */
 
 /* The object fields every class starts with. `Methods` is the class's own
  * method-table type, so `this->methods->slot` is typed for the subclass. */
+/* clang-format off */
 #define BASICCLASS_FIELDS(Methods)                                                                 \
     /* +0x000 */ Methods *methods;                                                                 \
     /* +0x004 */ BasicClassListNode *children;                                                     \
     /* +0x008 */ BasicClassListNode *parentRefs
+/* clang-format on */
 
 struct BasicClassMethods {
-    BASICCLASS_SLOTS(BasicClass, (BasicClass *self));
+    BASICCLASS_SLOTS(BasicClass, (BasicClass * self));
 };
 
 struct BasicClass {
     BASICCLASS_FIELDS(BasicClassMethods);
 };
 
-extern BasicClassMethods D_8006B58C;                  /* BasicClass's own method table */
+extern BasicClassMethods D_8006B58C;                   /* BasicClass's own method table */
 extern BasicClassMethods *Get_vtable_BasicClass(void); /* returns &D_8006B58C */
 
 /* BasicClass's methods: the occupants of its own table, code_8220 and
@@ -125,9 +129,12 @@ void BasicClass__func_18350(void);
 void BasicClass__OnNotify(BasicClass *self, void *sender, s32 event);
 
 /* The list primitives, code_8220 and code_8220_b. */
-extern s32 PushBasicClassListNode(BasicClassListNode **head, BasicClass *value);   /* allocate a node, prepend it to *head */
-extern void RemoveBasicClassListNode(BasicClassListNode **head, BasicClass *value); /* unlink and free the node holding value */
-extern void GetNextBasicClass(BasicClass **outValue, BasicClassListNode **cursor);  /* *outValue = node value (or NULL); advance *cursor */
-extern void FreeBasicClassList(BasicClassListNode **head);                          /* free every node; *head is not cleared */
+extern s32 PushBasicClassListNode(BasicClassListNode **head,
+                                  BasicClass *value); /* allocate a node, prepend it to *head */
+extern void RemoveBasicClassListNode(BasicClassListNode **head,
+                                     BasicClass *value); /* unlink and free the node holding value */
+extern void GetNextBasicClass(BasicClass **outValue,
+                              BasicClassListNode **cursor); /* *outValue = node value (or NULL); advance *cursor */
+extern void FreeBasicClassList(BasicClassListNode **head); /* free every node; *head is not cleared */
 
 #endif

@@ -223,11 +223,15 @@ listed by `plan.py`.
 
 ### Track 7: every body reads without the disassembly
 
-**Setup (premium head, once): `format`.** Write `.clang-format` to the house
-style (4-space indent, K&R braces, pointer star on the name, a blank line
-between functions), record the clang-format major version in it, format every
-`src/` and `include/` file (not `include/psyq/`) in one commit between rounds,
-byte-identical, then `plan.py check --item format`.
+**Style (setup `format`, done round 91).** `.clang-format` is the house style
+(clang-format 22): 4-space indent, attached braces, `*` on the name, a blank
+line between definitions, includes never sorted (their order is load-bearing),
+comments never reflowed, strings never split. `make format` formats `src/` and
+`include/` (never `include/psyq/`). A multi-line `#define` and a K&R
+definition sit between `/* clang-format off */` and `/* clang-format on */`
+(block form: cpp is C89); write a new one the same way. A tool that reads
+`src/` must not depend on layout: the format commit left every tool's output
+unchanged, measured, after fixing two that did.
 
 **One pass per unit**, in `plan.py`'s order (most debt first), prompt §4.9:
 1. Placeholder globals and functions: `rename.py`, the naming rules.

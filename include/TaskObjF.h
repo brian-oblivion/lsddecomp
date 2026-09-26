@@ -59,68 +59,86 @@ typedef struct TaskObjFMethods TaskObjFMethods;
  * OnNotify; `tools/classtable.py gTaskObjFMethods --vs D_8006B58C`), then
  * this class's own, every one of them filled. */
 struct TaskObjFMethods {
-    BASICCLASS_SLOTS(TaskObjF, (TaskObjF *self, s32 padEnable, s32 cardSlot));
-    /* +0x040 */ void (*setCardSlot)(TaskObjF *self, s32 cardSlot);          /* TaskObjF__SetCardSlot; the ctor's last call */
-    /* +0x044 */ s32 (*openEvents)(TaskObjF *self);                          /* TaskObjF__OpenEvents */
-    /* +0x048 */ s32 (*closeEvents)(TaskObjF *self);                         /* TaskObjF__CloseEvents */
-    /* +0x04C */ s32 (*checkCardStatus)(TaskObjF *self, s32 *outA, s32 *outB, s32 *outC); /* TaskObjF__CheckCardStatus; Validate reads the three */
-    /* +0x050 */ s32 (*formatCard)(TaskObjF *self);                          /* TaskObjF__FormatCard; setState(0x13) */
-    /* +0x054 */ s32 (*probeMemcardFile)(TaskObjF *self, char *destTitle, char *suffix); /* TaskObjF__ProbeMemcardFile: nonzero when the file opens */
-    /* +0x058 */ char *(*findUnusedMemcardName)(TaskObjF *self, char *buf, char *prefix, char **suffixes); /* TaskObjF__FindUnusedMemcardName; setState(0x14) */
-    /* +0x05C */ s32 (*collectExistingMemcardFiles)(TaskObjF *self, char **destTitles, char **outSuffixes, char *prefix, char **suffixes); /* TaskObjF__CollectExistingMemcardFiles; beginLoad */
-    /* +0x060 */ s32 (*checkCardSpace)(TaskObjF *self, u8 iconFrames, s32 size); /* TaskObjF__CheckCardSpace; beginSave */
-    /* +0x064 */ s32 (*readMemcardFile)(TaskObjF *self, char *suffix, void *outBuf, s32 outSize); /* TaskObjF__ReadMemcardFile; setState(0x15) */
-    /* +0x068 */ s32 (*writeMemcardSaveFile)(TaskObjF *self, char *fileName, char *title, char iconFrames, struct TimImage *icon, void *data, s32 size); /* TaskObjF__WriteMemcardSaveFile; setState(0x14) */
-    /* +0x06C */ void (*init)(TaskObjF *self, char *namePrefix, char **nameSuffixes, BasicClass *inputSource, BasicClass *tickSource, struct Class6B5CC *spriteParent, struct VabStreamObj *sound); /* TaskObjF__Init */
-    /* +0x070 */ void (*deinit)(TaskObjF *self);                             /* TaskObjF__Deinit */
-    /* +0x074 */ void (*beginLoad)(TaskObjF *self, char *fileName, char *title, void *data, s32 size); /* TaskObjF__BeginLoad */
-    /* +0x078 */ void (*beginSave)(TaskObjF *self, char *fileName, char *title, s32 titleEditPos, u8 iconFrames, struct TimImage *icon, void *data, s32 size); /* TaskObjF__BeginSave */
-    /* +0x07C */ void (*setState)(TaskObjF *self, s32 state);                /* TaskObjF__SetState */
-    /* +0x080 */ void (*loadCardIcon)(TaskObjF *self, s32 index);            /* TaskObjF__LoadCardIcon: CARD\<gCardIconNames[index]>.TIM */
-    /* +0x084 */ void (*releaseCardIcon)(TaskObjF *self);                    /* TaskObjF__ReleaseCardIcon */
-    /* +0x088 */ void (*onInputEvent)(TaskObjF *self, void *sender, s32 event); /* TaskObjF__OnInputEvent (reads self and event) */
-    /* +0x08C */ void (*playSound)(TaskObjF *self, s32 index);               /* TaskObjF__PlaySound */
-    /* +0x090 */ void (*advanceState)(TaskObjF *self);                       /* TaskObjF__AdvanceState; onInputEvent's 0x19 */
-    /* +0x094 */ void (*forceIdleFromState)(TaskObjF *self);                 /* TaskObjF__ForceIdleFromState; onInputEvent's 0x17 */
-    /* +0x098 */ void (*tickStateDelay)(TaskObjF *self, void *sender, s32 event); /* TaskObjF__TickStateDelay (reads only self; see the banner) */
-    /* +0x09C */ void (*attachTextEntry)(TaskObjF *self);                    /* TaskObjF__AttachTextEntry; setState(0x11) */
-    /* +0x0A0 */ void (*detachTextEntry)(TaskObjF *self);                    /* TaskObjF__DetachTextEntry */
-    /* +0x0A4 */ void (*onTextEntryResult)(TaskObjF *self, void *sender, s32 result); /* TaskObjF__OnTextEntryResult */
-    /* +0x0A8 */ void (*attachItemList)(TaskObjF *self);                     /* TaskObjF__AttachItemList; setState(0x12) */
-    /* +0x0AC */ void (*detachItemList)(TaskObjF *self);                     /* TaskObjF__DetachItemList */
-    /* +0x0B0 */ void (*onItemListResult)(TaskObjF *self, struct Class86F88 *sender, s32 result); /* TaskObjF__OnItemListResult */
+    BASICCLASS_SLOTS(TaskObjF, (TaskObjF * self, s32 padEnable, s32 cardSlot));
+    /* +0x040 */ void (*setCardSlot)(TaskObjF *self, s32 cardSlot); /* TaskObjF__SetCardSlot; the ctor's last call */
+    /* +0x044 */ s32 (*openEvents)(TaskObjF *self);  /* TaskObjF__OpenEvents */
+    /* +0x048 */ s32 (*closeEvents)(TaskObjF *self); /* TaskObjF__CloseEvents */
+    /* +0x04C */ s32 (*checkCardStatus)(TaskObjF *self, s32 *outA, s32 *outB,
+                                        s32 *outC); /* TaskObjF__CheckCardStatus; Validate reads the three */
+    /* +0x050 */ s32 (*formatCard)(TaskObjF *self); /* TaskObjF__FormatCard; setState(0x13) */
+    /* +0x054 */ s32 (*probeMemcardFile)(TaskObjF *self, char *destTitle,
+                                         char *suffix); /* TaskObjF__ProbeMemcardFile: nonzero when the file opens */
+    /* +0x058 */ char *(*findUnusedMemcardName)(TaskObjF *self, char *buf, char *prefix,
+                                                char **suffixes); /* TaskObjF__FindUnusedMemcardName; setState(0x14) */
+    /* +0x05C */ s32 (*collectExistingMemcardFiles)(TaskObjF *self, char **destTitles,
+                                                    char **outSuffixes, char *prefix,
+                                                    char **suffixes); /* TaskObjF__CollectExistingMemcardFiles; beginLoad */
+    /* +0x060 */ s32 (*checkCardSpace)(TaskObjF *self, u8 iconFrames,
+                                       s32 size); /* TaskObjF__CheckCardSpace; beginSave */
+    /* +0x064 */ s32 (*readMemcardFile)(TaskObjF *self, char *suffix, void *outBuf,
+                                        s32 outSize); /* TaskObjF__ReadMemcardFile; setState(0x15) */
+    /* +0x068 */ s32 (*writeMemcardSaveFile)(TaskObjF *self, char *fileName, char *title,
+                                             char iconFrames, struct TimImage *icon, void *data,
+                                             s32 size); /* TaskObjF__WriteMemcardSaveFile; setState(0x14) */
+    /* +0x06C */ void (*init)(TaskObjF *self, char *namePrefix, char **nameSuffixes,
+                              BasicClass *inputSource, BasicClass *tickSource,
+                              struct Class6B5CC *spriteParent, struct VabStreamObj *sound); /* TaskObjF__Init */
+    /* +0x070 */ void (*deinit)(TaskObjF *self); /* TaskObjF__Deinit */
+    /* +0x074 */ void (*beginLoad)(TaskObjF *self, char *fileName, char *title, void *data,
+                                   s32 size); /* TaskObjF__BeginLoad */
+    /* +0x078 */ void (*beginSave)(TaskObjF *self, char *fileName, char *title, s32 titleEditPos,
+                                   u8 iconFrames, struct TimImage *icon, void *data,
+                                   s32 size);                 /* TaskObjF__BeginSave */
+    /* +0x07C */ void (*setState)(TaskObjF *self, s32 state); /* TaskObjF__SetState */
+    /* +0x080 */ void (*loadCardIcon)(TaskObjF *self, s32 index); /* TaskObjF__LoadCardIcon: CARD\<gCardIconNames[index]>.TIM */
+    /* +0x084 */ void (*releaseCardIcon)(TaskObjF *self); /* TaskObjF__ReleaseCardIcon */
+    /* +0x088 */ void (*onInputEvent)(TaskObjF *self, void *sender,
+                                      s32 event); /* TaskObjF__OnInputEvent (reads self and event) */
+    /* +0x08C */ void (*playSound)(TaskObjF *self, s32 index); /* TaskObjF__PlaySound */
+    /* +0x090 */ void (*advanceState)(TaskObjF *self); /* TaskObjF__AdvanceState; onInputEvent's 0x19 */
+    /* +0x094 */ void (*forceIdleFromState)(TaskObjF *self); /* TaskObjF__ForceIdleFromState; onInputEvent's 0x17 */
+    /* +0x098 */ void (*tickStateDelay)(TaskObjF *self, void *sender,
+                                        s32 event); /* TaskObjF__TickStateDelay (reads only self; see the banner) */
+    /* +0x09C */ void (*attachTextEntry)(TaskObjF *self); /* TaskObjF__AttachTextEntry; setState(0x11) */
+    /* +0x0A0 */ void (*detachTextEntry)(TaskObjF *self); /* TaskObjF__DetachTextEntry */
+    /* +0x0A4 */ void (*onTextEntryResult)(TaskObjF *self, void *sender,
+                                           s32 result); /* TaskObjF__OnTextEntryResult */
+    /* +0x0A8 */ void (*attachItemList)(TaskObjF *self); /* TaskObjF__AttachItemList; setState(0x12) */
+    /* +0x0AC */ void (*detachItemList)(TaskObjF *self); /* TaskObjF__DetachItemList */
+    /* +0x0B0 */ void (*onItemListResult)(TaskObjF *self, struct Class86F88 *sender,
+                                          s32 result); /* TaskObjF__OnItemListResult */
 };
 
 struct TaskObjF {
     BASICCLASS_FIELDS(TaskObjFMethods);
-    /* +0x00C */ s32 cardSlot;          /* setCardSlot; 0 or 1: BuildMemcardPath's "bu00:"/"bu10:" */
-    /* +0x010 */ s32 cardHandle;        /* setCardSlot: cardSlot << 4, the _card_info/_card_load/_card_clear channel */
-    /* +0x014 */ s32 events[4];         /* openEvents: OpenEvent per D_80086E78 entry; ForEachEvent/WaitForReadyEvent walk them */
-    /* +0x024 */ s32 opMode;            /* 1 beginLoad, 2 beginSave; the terminal states clear it. advanceState retries the one that is set */
-    /* +0x028 */ s32 state;             /* setState; init clears it */
-    /* +0x02C */ s32 bufCount;          /* collectExistingMemcardFiles's count; how many `titles` buffers are kept */
-    /* +0x030 */ char *namePrefix;      /* init: the product code ("BISLPS-01556", D_8008A9D0); file names are prefix + suffix */
-    /* +0x034 */ char **nameSuffixes;   /* init: a NULL-terminated table of candidate suffixes (D_80086D6C) */
-    /* +0x038 */ char **titles;         /* AllocBuffers: 16 pointers, 15 buffers of 0x41; the existing files' titles; the item list's strings */
-    /* +0x03C */ char **foundSuffixes;  /* AllocBuffers: 0x40 bytes; the suffix of each file in `titles` */
-    /* +0x040 */ char *fileName;        /* beginLoad/beginSave; advanceState builds it from the chosen entry */
-    /* +0x044 */ char *title;           /* beginLoad/beginSave; the text entry edits it from titleEditPos */
-    /* +0x048 */ s32 titleEditPos;      /* beginSave: first full-width character of `title` the text entry edits */
-    /* +0x04C */ u8 iconFrames;         /* beginSave: icon frame count, the save header's 0x10 + n and n * 0x80 bytes */
+    /* +0x00C */ s32 cardSlot; /* setCardSlot; 0 or 1: BuildMemcardPath's "bu00:"/"bu10:" */
+    /* +0x010 */ s32 cardHandle; /* setCardSlot: cardSlot << 4, the _card_info/_card_load/_card_clear channel */
+    /* +0x014 */ s32 events[4]; /* openEvents: OpenEvent per D_80086E78 entry; ForEachEvent/WaitForReadyEvent walk them */
+    /* +0x024 */ s32 opMode; /* 1 beginLoad, 2 beginSave; the terminal states clear it. advanceState retries the one that is set */
+    /* +0x028 */ s32 state;  /* setState; init clears it */
+    /* +0x02C */ s32 bufCount; /* collectExistingMemcardFiles's count; how many `titles` buffers are kept */
+    /* +0x030 */ char *namePrefix; /* init: the product code ("BISLPS-01556", D_8008A9D0); file names are prefix + suffix */
+    /* +0x034 */ char **nameSuffixes; /* init: a NULL-terminated table of candidate suffixes (D_80086D6C) */
+    /* +0x038 */ char **titles; /* AllocBuffers: 16 pointers, 15 buffers of 0x41; the existing files' titles; the item list's strings */
+    /* +0x03C */ char **foundSuffixes; /* AllocBuffers: 0x40 bytes; the suffix of each file in `titles` */
+    /* +0x040 */ char *fileName; /* beginLoad/beginSave; advanceState builds it from the chosen entry */
+    /* +0x044 */ char *title; /* beginLoad/beginSave; the text entry edits it from titleEditPos */
+    /* +0x048 */ s32 titleEditPos; /* beginSave: first full-width character of `title` the text entry edits */
+    /* +0x04C */ u8 iconFrames; /* beginSave: icon frame count, the save header's 0x10 + n and n * 0x80 bytes */
     /* +0x04D */ u8 pad04D[0x050 - 0x04D];
     /* +0x050 */ struct TimImage *iconImage; /* beginSave: the icon TIM; writeMemcardSaveFile copies its CLUT and frames */
-    /* +0x054 */ void *data;            /* beginLoad/beginSave: the save block read into or written from */
-    /* +0x058 */ s32 dataSize;          /* its size in bytes */
-    /* +0x05C */ s32 waitCounter;       /* setState zeroes; tickStateDelay counts to 6 */
+    /* +0x054 */ void *data;   /* beginLoad/beginSave: the save block read into or written from */
+    /* +0x058 */ s32 dataSize; /* its size in bytes */
+    /* +0x05C */ s32 waitCounter; /* setState zeroes; tickStateDelay counts to 6 */
     /* +0x060 */ BasicClass *inputSource; /* AddChild: the child whose class id's low nibble is 2; its events go to onInputEvent */
-    /* +0x064 */ BasicClass *tickSource;  /* ... low nibble 5; its events go to tickStateDelay */
+    /* +0x064 */ BasicClass *tickSource; /* ... low nibble 5; its events go to tickStateDelay */
     /* +0x068 */ struct Class6B5CC *spriteParent; /* init; the widgets' and the card icon's sprite parent; with inputSource, gates attach/detach */
-    /* +0x06C */ struct VabStreamObj *sound;      /* init; playSound's playTone target, the widgets' target too */
-    /* +0x070 */ struct ScreenSprite *cardIcon;   /* loadCardIcon: New_ScreenSprite of a CARD\*.TIM; releaseCardIcon */
-    /* +0x074 */ s32 ownsWidget;        /* attachTextEntry/attachItemList set it when they made the widget; detach then releases it */
+    /* +0x06C */ struct VabStreamObj *sound; /* init; playSound's playTone target, the widgets' target too */
+    /* +0x070 */ struct ScreenSprite *cardIcon; /* loadCardIcon: New_ScreenSprite of a CARD\*.TIM; releaseCardIcon */
+    /* +0x074 */ s32 ownsWidget; /* attachTextEntry/attachItemList set it when they made the widget; detach then releases it */
     /* +0x078 */ struct TextEntry *textEntry; /* attachTextEntry: New_TextEntry(title + 2 * titleEditPos, 1); AddChild's class 0x10 */
     /* +0x07C */ struct Class86F88 *itemList; /* attachItemList: New_Class86F88(titles, 1); AddChild's class 0x20 */
-    /* +0x080 */ s32 selectedIndex;     /* onItemListResult: the list's getCursorIndex */
+    /* +0x080 */ s32 selectedIndex; /* onItemListResult: the list's getCursorIndex */
 };
 
 extern TaskObjFMethods gTaskObjFMethods;
@@ -145,25 +163,30 @@ s32 TaskObjF__FormatCard(TaskObjF *self);
 s32 TaskObjF__ProbeMemcardFile(TaskObjF *self, char *destBuf, char *suffix);
 s32 TaskObjF__OpenAndReadMemcardFile(TaskObjF *self, char *destBuf, char *suffix);
 char *TaskObjF__FindUnusedMemcardName(TaskObjF *self, char *buf, char *middle, char **entries);
-s32 TaskObjF__CollectExistingMemcardFiles(TaskObjF *self, char **destBufs, char **outArr, char *middle, char **entries);
+s32 TaskObjF__CollectExistingMemcardFiles(TaskObjF *self, char **destBufs, char **outArr,
+                                          char *middle, char **entries);
 s32 TaskObjF__CheckCardSpace(TaskObjF *self, u8 id, s32 sizeArg);
 s32 TaskObjF__ProbeCardFreeSpace(TaskObjF *self, u8 id, s32 sizeArg);
 s32 TaskObjF__ReadMemcardFile(TaskObjF *self, char *suffix, void *outBuf, s32 outSize);
 s32 TaskObjF__TryReadMemcardFile(TaskObjF *self, char *suffix, void *outBuf, s32 outSize);
-s32 TaskObjF__WriteMemcardSaveFile(TaskObjF *self, char *fileName, char *title, char a3, struct TimImage *icon, void *data, s32 size);
-s32 TaskObjF__TryWriteMemcardSaveFile(TaskObjF *self, char *fileName, char *title, u8 a3, struct TimImage *icon, void *data, s32 size);
+s32 TaskObjF__WriteMemcardSaveFile(TaskObjF *self, char *fileName, char *title, char a3,
+                                   struct TimImage *icon, void *data, s32 size);
+s32 TaskObjF__TryWriteMemcardSaveFile(TaskObjF *self, char *fileName, char *title, u8 a3,
+                                      struct TimImage *icon, void *data, s32 size);
 s32 TaskObjF__EnableEvents(TaskObjF *self);
 s32 TaskObjF__DisableEvents(TaskObjF *self);
 s32 TaskObjF__TestEvents(TaskObjF *self);
 s32 TaskObjF__ForEachEvent(TaskObjF *self, s32 (*callback)(s32), s32 flag);
 s32 TaskObjF__WaitForReadyEvent(TaskObjF *self);
-void TaskObjF__Init(TaskObjF *self, char *namePrefix, char **nameSuffixes, BasicClass *inputSource, BasicClass *tickSource, struct Class6B5CC *spriteParent, struct VabStreamObj *sound);
+void TaskObjF__Init(TaskObjF *self, char *namePrefix, char **nameSuffixes, BasicClass *inputSource,
+                    BasicClass *tickSource, struct Class6B5CC *spriteParent, struct VabStreamObj *sound);
 void TaskObjF__Deinit(TaskObjF *self);
 void TaskObjF__BeginLoad(TaskObjF *self, char *fileName, char *title, void *data, s32 size);
 void TaskObjF__AllocBuffers(TaskObjF *self);
 void TaskObjF__FreeUnusedBuffers(TaskObjF *self);
 void TaskObjF__FreeBuffers(TaskObjF *self);
-void TaskObjF__BeginSave(TaskObjF *self, char *fileName, char *title, s32 titleEditPos, u8 iconFrames, struct TimImage *icon, void *data, s32 size);
+void TaskObjF__BeginSave(TaskObjF *self, char *fileName, char *title, s32 titleEditPos,
+                         u8 iconFrames, struct TimImage *icon, void *data, s32 size);
 s32 TaskObjF__Validate(TaskObjF *self);
 void TaskObjF__OnNotify(TaskObjF *self, void *sender, s32 event);
 void TaskObjF__SetState(TaskObjF *self, s32 state);

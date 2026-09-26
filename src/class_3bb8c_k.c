@@ -32,8 +32,7 @@
 #include "Class86F88.h"
 #include "ObjM.h"
 
-void Class86F88__SetState(Class86F88 *self, s32 state)
-{
+void Class86F88__SetState(Class86F88 *self, s32 state) {
     self->closeTicks = 0;
     if (state < 2) {
         goto end;
@@ -56,8 +55,7 @@ end:
     return;
 }
 
-void Class86F88__TickClosing(Class86F88 *self)
-{
+void Class86F88__TickClosing(Class86F88 *self) {
     s32 old;
 
     if (self->result >= 4) {
@@ -76,31 +74,30 @@ void Class86F88__TickClosing(Class86F88 *self)
 
 void Class86F88__HandleInputCode(Class86F88 *self, void *source, s32 code) {
     switch (code) {
-    case 25:
-        self->methods->forwardToTarget(self, 0x10);
-        self->methods->setState(self, 2);
-        break;
-    case 23:
-        self->methods->forwardToTarget(self, 0x10);
-        self->methods->setState(self, 3);
-        break;
-    case 5:
-        self->methods->scrollRight(self);
-        break;
-    case 4:
-        self->methods->scrollLeft(self);
-        break;
-    case 18:
-        self->methods->cursorUp(self);
-        break;
-    case 19:
-        self->methods->cursorDown(self);
-        break;
+        case 25:
+            self->methods->forwardToTarget(self, 0x10);
+            self->methods->setState(self, 2);
+            break;
+        case 23:
+            self->methods->forwardToTarget(self, 0x10);
+            self->methods->setState(self, 3);
+            break;
+        case 5:
+            self->methods->scrollRight(self);
+            break;
+        case 4:
+            self->methods->scrollLeft(self);
+            break;
+        case 18:
+            self->methods->cursorUp(self);
+            break;
+        case 19:
+            self->methods->cursorDown(self);
+            break;
     }
 }
 
-void Class86F88__ForwardToTarget(Class86F88 *self, s32 code)
-{
+void Class86F88__ForwardToTarget(Class86F88 *self, s32 code) {
     struct TargetObj86ED0 *target = self->target;
 
     if (target != NULL) {
@@ -108,8 +105,7 @@ void Class86F88__ForwardToTarget(Class86F88 *self, s32 code)
     }
 }
 
-void Class86F88__ScrollRight(Class86F88 *self)
-{
+void Class86F88__ScrollRight(Class86F88 *self) {
     Class86F88Methods *methods;
     s32 tmp;
     s32 column;
@@ -128,8 +124,7 @@ void Class86F88__ScrollRight(Class86F88 *self)
     methods->refreshRows(self, self->topIndex, column, self->cursorIndex, 1);
 }
 
-void Class86F88__ScrollLeft(Class86F88 *self)
-{
+void Class86F88__ScrollLeft(Class86F88 *self) {
     s32 column;
 
     if (!self->panelSprite) {
@@ -143,8 +138,7 @@ void Class86F88__ScrollLeft(Class86F88 *self)
     self->methods->refreshRows(self, self->topIndex, column, self->cursorIndex, 1);
 }
 
-void Class86F88__CursorUp(Class86F88 *self, s32 arg1, s32 arg2, s32 arg3)
-{
+void Class86F88__CursorUp(Class86F88 *self, s32 arg1, s32 arg2, s32 arg3) {
     s32 cursor;
     s32 newTop;
     s32 newCursor;
@@ -167,8 +161,7 @@ void Class86F88__CursorUp(Class86F88 *self, s32 arg1, s32 arg2, s32 arg3)
     }
 }
 
-void Class86F88__CursorDown(Class86F88 *self, s32 arg1, s32 arg2, s32 arg3)
-{
+void Class86F88__CursorDown(Class86F88 *self, s32 arg1, s32 arg2, s32 arg3) {
     s32 newTop;
     s32 newCursor;
     s32 prevTop;
@@ -196,8 +189,8 @@ void Class86F88__CursorDown(Class86F88 *self, s32 arg1, s32 arg2, s32 arg3)
 extern s32 gClass86F88RowOriginX;
 extern s32 gClass86F88RowOriginY;
 
-void Class86F88__CreateRows(Class86F88 *self, Class6B5CC *parent, TimImage *font, s32 top, s32 column, s32 cursor)
-{
+void Class86F88__CreateRows(Class86F88 *self, Class6B5CC *parent, TimImage *font, s32 top,
+                            s32 column, s32 cursor) {
     char buf[0x20];
     ScreenSpritePos pos;
     TextRow **p;
@@ -228,8 +221,7 @@ void Class86F88__CreateRows(Class86F88 *self, Class6B5CC *parent, TimImage *font
     Class86F88__SetView(self, top, column, cursor, 1);
 }
 
-void Class86F88__ReleaseRows(Class86F88 *self)
-{
+void Class86F88__ReleaseRows(Class86F88 *self) {
     s32 count;
     s32 i;
     u8 unused[8];
@@ -270,8 +262,7 @@ void Class86F88__ReleaseRows(Class86F88 *self)
 extern s32 strlen(char *s);
 extern void *memcpy(char *dest, char *src, s32 n);
 
-void Class86F88__RefreshRows(Class86F88 *self, s32 top, s32 column, s32 cursor, s32 notify)
-{
+void Class86F88__RefreshRows(Class86F88 *self, s32 top, s32 column, s32 cursor, s32 notify) {
     s32 count;
     s32 i;
     char buf[0x20];
@@ -296,8 +287,7 @@ void Class86F88__RefreshRows(Class86F88 *self, s32 top, s32 column, s32 cursor, 
     }
 }
 
-char *Class86F88__FormatRowText(Class86F88 *self, char *dest, s32 row, s32 top, s32 column)
-{
+char *Class86F88__FormatRowText(Class86F88 *self, char *dest, s32 row, s32 top, s32 column) {
     s32 idx = top + row;
     s32 len;
     s32 i;
@@ -317,8 +307,7 @@ char *Class86F88__FormatRowText(Class86F88 *self, char *dest, s32 row, s32 top, 
     return dest;
 }
 
-void Class86F88__SetView(Class86F88 *self, s32 top, s32 column, s32 cursor, s32 highlight)
-{
+void Class86F88__SetView(Class86F88 *self, s32 top, s32 column, s32 cursor, s32 highlight) {
     TextRow *elem;
     s32 flag = highlight;
 
@@ -333,8 +322,7 @@ void Class86F88__SetView(Class86F88 *self, s32 top, s32 column, s32 cursor, s32 
     elem->methods->setColor(elem, &gClass86F88CursorColor);
 }
 
-void Class86F88__StepCursorInView(Class86F88 *self, s32 dir, s32 notify)
-{
+void Class86F88__StepCursorInView(Class86F88 *self, s32 dir, s32 notify) {
     TextRow **p;
     s32 idx;
 
@@ -357,18 +345,16 @@ void Class86F88__StepCursorInView(Class86F88 *self, s32 dir, s32 notify)
     }
 }
 
-s32 Class86F88__GetCursorIndex(Class86F88 *self)
-{
+s32 Class86F88__GetCursorIndex(Class86F88 *self) {
     return self->cursorIndex;
 }
 
-Class86F88Methods *GetClass86F88Methods(void)
-{
+Class86F88Methods *GetClass86F88Methods(void) {
     return &gClass86F88Methods;
 }
 
-ObjM *New_ObjM(BasicClass *sound, struct WBgm *bgm, TimImage *etcTim, struct LinkResource *dreamerTmd, s32 stage)
-{
+ObjM *New_ObjM(BasicClass *sound, struct WBgm *bgm, TimImage *etcTim,
+               struct LinkResource *dreamerTmd, s32 stage) {
     ObjM *self;
     ObjMMethods *methods;
 
@@ -381,8 +367,8 @@ ObjM *New_ObjM(BasicClass *sound, struct WBgm *bgm, TimImage *etcTim, struct Lin
     return NULL;
 }
 
-void ObjM__ObjM(ObjM *self, BasicClass *sound, struct WBgm *bgm, TimImage *etcTim, struct LinkResource *dreamerTmd, s32 stage)
-{
+void ObjM__ObjM(ObjM *self, BasicClass *sound, struct WBgm *bgm, TimImage *etcTim,
+                struct LinkResource *dreamerTmd, s32 stage) {
     GetClass86668Methods()->ctor((Class86668 *)self, 0, sound);
     self->methods = GetObjMMethods();
     self->unk64 = 0;
@@ -398,13 +384,11 @@ void ObjM__ObjM(ObjM *self, BasicClass *sound, struct WBgm *bgm, TimImage *etcTi
     self->methods->resetCounters(self);
 }
 
-void ObjM__Finalize(ObjM *self)
-{
+void ObjM__Finalize(ObjM *self) {
     GetClass86668Methods()->finalize((Class86668 *)self);
 }
 
-void ObjM__OnNotify(ObjM *self, BasicClass *sender, s32 event)
-{
+void ObjM__OnNotify(ObjM *self, BasicClass *sender, s32 event) {
     s32 tag;
 
     GetClass86668Methods()->onNotify((Class86668 *)self, sender, event);

@@ -44,7 +44,9 @@ void BoxFill__SetColor(BoxFill *self, s32 overwrite, u8 *rgb) {
     BoxFill__ApplyColor(self, self->color, rgb, overwrite);
 }
 
-typedef struct { s8 r, g, b; } RGB80040790;
+typedef struct {
+    s8 r, g, b;
+} RGB80040790;
 
 void BoxFill__ApplyColor(BoxFill *self, u8 *dst, u8 *src, s32 overwrite) {
     u8 *d;
@@ -74,8 +76,7 @@ void BoxFill__SetSize(BoxFill *self, s32 *size) {
 /* +0x04C is called with FOUR arguments through an unprototyped pointer: its
  * occupant reads three, and the fourth is this function's own a3, already in
  * $a3 (BoxFill.h's banner). */
-void BoxFill__AttachAbsolute(BoxFill *self, Class6B5CC *parent, Pair32E99C *pos, s32 arg3)
-{
+void BoxFill__AttachAbsolute(BoxFill *self, Class6B5CC *parent, Pair32E99C *pos, s32 arg3) {
     void (*fn)();
     BoxFill *q;
 
@@ -261,8 +262,7 @@ void TextRow__SetCellAt(TextRow *self, s32 cell, s32 index) {
     elem->methods->setCell(elem, cell & 0xFF);
 }
 
-void TextRow__NoOpGetCell(void) {
-}
+void TextRow__NoOpGetCell(void) {}
 
 void TextRow__SetText(TextRow *self, char *text) {
     CharSprite **elemp = self->cells;
@@ -277,8 +277,7 @@ void TextRow__SetText(TextRow *self, char *text) {
     }
 }
 
-void TextRow__NoOpSlotD0(void) {
-}
+void TextRow__NoOpSlotD0(void) {}
 
 void TextRow__SetCellPitch(TextRow *self, s32 pitch) {
     self->cellPitch = pitch;

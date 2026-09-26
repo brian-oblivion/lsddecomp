@@ -45,25 +45,25 @@ typedef struct Class6D3C8Methods Class6D3C8Methods;
  * {0x13, 0, 1, 1, 1, 1} (asm/data/57028.data.s), kept by the ctor at
  * self->ctorArgs; each gate below is read `!= 0` by the methods it names. */
 typedef struct Class6D3C8CtorArgs {
-    /* +0x00 */ s32 dataSource;     /* Class6E4F0's ctor argument (0x13 = the CD driver's class id) */
-    /* +0x04 */ s32 unk04;          /* New_Class865C8's 3rd argument, in PollStatusObj */
-    /* +0x08 */ s32 playStreams;    /* gates every StreamTask: StartWeeklyStreamTask, StartGraphRoomStreamTask,
+    /* +0x00 */ s32 dataSource; /* Class6E4F0's ctor argument (0x13 = the CD driver's class id) */
+    /* +0x04 */ s32 unk04;      /* New_Class865C8's 3rd argument, in PollStatusObj */
+    /* +0x08 */ s32 playStreams; /* gates every StreamTask: StartWeeklyStreamTask, StartGraphRoomStreamTask,
                                      * StartCinematicStream's stream branch, StartStreamTaskWithInit */
     /* +0x0C */ s32 showIntroLogos; /* gates LoadIntroLogoSequence */
     /* +0x10 */ s32 pollGraphRoom;  /* gates PollGraphRoomStatus (0: it returns 2 at once) */
-    /* +0x14 */ s32 unk14;          /* the ctor passes it to the DreamSys's slot228 (DreamSys__func_5ba20) */
+    /* +0x14 */ s32 unk14; /* the ctor passes it to the DreamSys's slot228 (DreamSys__func_5ba20) */
 } Class6D3C8CtorArgs;
 
 struct Class6D3C8Methods {
-    CLASS6E4F0_SLOTS(Class6D3C8, (Class6D3C8 *self, Class6D3C8CtorArgs *args));
+    CLASS6E4F0_SLOTS(Class6D3C8, (Class6D3C8 * self, Class6D3C8CtorArgs *args));
 };
 
 struct Class6D3C8 {
     CLASS6E4F0_FIELDS(Class6D3C8Methods);
     /* +0x020 */ Class6D3C8CtorArgs *ctorArgs; /* the ctor's argument */
-    /* +0x024 */ s32 skipGraphRoomPoll;        /* ctor clears; PollStatusObj sets it on status 3; PollGraphRoomStatus
+    /* +0x024 */ s32 skipGraphRoomPoll; /* ctor clears; PollStatusObj sets it on status 3; PollGraphRoomStatus
                                                 * skips its New_GraphRoom poll while set, then clears it */
-    /* +0x028 */ struct DreamSys *dreamSys;    /* the ctor's New_DreamSys() */
+    /* +0x028 */ struct DreamSys *dreamSys; /* the ctor's New_DreamSys() */
 };
 
 /* The two overrides whose parameter lists differ from their slots'. */

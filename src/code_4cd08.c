@@ -10,8 +10,7 @@
 const char gMomPathSymSpy[] = "ETC\\SYMSPY.MOM";
 const char gMomPathSymDog[] = "ETC\\SYMDOG.MOM";
 
-void InitDreamAux(void)
-{
+void InitDreamAux(void) {
     DreamAuxLoadReq req;
     u32 i;
     s32 j;
@@ -30,8 +29,7 @@ void InitDreamAux(void)
     }
 }
 
-void TickDreamAuxSlots(void)
-{
+void TickDreamAuxSlots(void) {
     DreamAuxSlot *slot = gDreamAuxSlots;
     u32 done;
 
@@ -54,8 +52,7 @@ extern s32 D_8008AC08;
 
 void SetTeleportsEnabled(s32 triggerType);
 
-void SetDreamAuxWorld(s32 a0, s32 a1, DreamSys *world, s32 a3, s32 a4)
-{
+void SetDreamAuxWorld(s32 a0, s32 a1, DreamSys *world, s32 a3, s32 a4) {
     DreamAuxSlot *slot = gDreamAuxSlots;
     u32 i;
 
@@ -76,13 +73,11 @@ void SetDreamAuxWorld(s32 a0, s32 a1, DreamSys *world, s32 a3, s32 a4)
 
 extern void SetInstantTeleportersEnabled(bool value);
 
-void SetTeleportsEnabled(s32 triggerType)
-{
+void SetTeleportsEnabled(s32 triggerType) {
     SetInstantTeleportersEnabled(triggerType == 0xB || triggerType == 3);
 }
 
-void EnableTeleportsForKind(s32 kind)
-{
+void EnableTeleportsForKind(s32 kind) {
     if (kind == 0x4E) {
         goto call;
     }
@@ -102,8 +97,7 @@ call:
     SetInstantTeleportersEnabled(1);
 }
 
-void TickDreamAuxSlots2(void)
-{
+void TickDreamAuxSlots2(void) {
     u32 done;
     DreamAuxSlot *slot;
 
@@ -128,8 +122,7 @@ bool CheckTriggerParity(s32 coordParity, s8 *entry);
 s32 FireDreamAuxTriggerEntries(s32 a0, s8 *a1, s32 a2);
 void DespawnDreamAuxEntity(DreamAuxSlot *a0);
 
-s32 TryDreamAuxTrigger(s32 a0, s16 *a1, s32 a2)
-{
+s32 TryDreamAuxTrigger(s32 a0, s16 *a1, s32 a2) {
     s32 record = LookupDreamAuxTrigger(a1);
 
     if (record != 0) {
@@ -145,8 +138,7 @@ s32 TryDreamAuxTrigger(s32 a0, s16 *a1, s32 a2)
 
 s32 AdjustDreamAuxTriggerOffset(s32 a0, s32 a1);
 
-s32 LookupDreamAuxTrigger(s16 *a0)
-{
+s32 LookupDreamAuxTrigger(s16 *a0) {
     s32 idx = gDreamAuxStage;
     s32 count = gDreamAuxTriggerCounts[idx];
     DreamAuxTriggerEntry *entry = gDreamAuxTriggerEntries[idx];
@@ -161,8 +153,7 @@ s32 LookupDreamAuxTrigger(s16 *a0)
     return 0;
 }
 
-s32 AdjustDreamAuxTriggerOffset(s32 a0, s32 a1)
-{
+s32 AdjustDreamAuxTriggerOffset(s32 a0, s32 a1) {
     s32 val = gDreamAuxStage;
 
     if (val == 4 && a1 == 0x10) {
@@ -182,8 +173,7 @@ s32 AdjustDreamAuxTriggerOffset(s32 a0, s32 a1)
  * one byte is not yet known here, so it is addressed by byte offset rather
  * than through a named struct. A parity byte of 0 means "no side constraint",
  * hence the early `true`. */
-bool CheckTriggerParity(s32 coordParity, s8 *entry)
-{
+bool CheckTriggerParity(s32 coordParity, s8 *entry) {
     bool result = true;
 
     if (entry[2] != 0) {
@@ -195,8 +185,7 @@ bool CheckTriggerParity(s32 coordParity, s8 *entry)
 
 bool ProcessDreamAuxTriggerRecord(s32 value, void *ctx, TriggerRecord *record, TriggerWorld *world);
 
-s32 FireDreamAuxTriggerEntries(s32 a0, s8 *a1, s32 a2)
-{
+s32 FireDreamAuxTriggerEntries(s32 a0, s8 *a1, s32 a2) {
     s32 ctxArg[4];
     TriggerWorld *world;
 
@@ -222,8 +211,7 @@ s32 FireDreamAuxTriggerEntries(s32 a0, s8 *a1, s32 a2)
     return 0;
 }
 
-bool ProcessDreamAuxTriggerRecord(s32 value, void *ctx, TriggerRecord *record, TriggerWorld *world)
-{
+bool ProcessDreamAuxTriggerRecord(s32 value, void *ctx, TriggerRecord *record, TriggerWorld *world) {
     s8 *p;
     s8 *end;
     void *callResult;
@@ -275,8 +263,7 @@ fail:
  * exactly.  See docs/match-reports/CheckDreamAuxTriggerCondition.md.
  */
 
-bool CheckDreamAuxTriggerCondition(s32 value, TriggerRecord *record)
-{
+bool CheckDreamAuxTriggerCondition(s32 value, TriggerRecord *record) {
     s8 sel = record->sel;
     s32 idx;
 
@@ -299,51 +286,51 @@ negate:
 have_idx:
 
     switch (idx - 2) {
-    case 0:
-    case 1:
-    case 2:
-        if (!MatchesDreamAuxProgression(value, idx - 1)) {
-            return false;
-        }
-        break;
-    case 3:
-        if (value % 3 != 0) {
-            return false;
-        }
-        break;
-    case 4:
-        if (value % 3 == 0) {
-            return false;
-        }
-        break;
-    case 5:
-        if (!IsStyleVariantEven()) {
-            return false;
-        }
-        break;
-    case 6:
-    case 7:
-        if (value % 3 != idx - 7) {
-            return false;
-        }
-        break;
-    case 18:
-        if ((value & 1) != 0) {
-            return false;
-        }
-        break;
-    case 19:
-        if ((value & 1) == 0) {
-            return false;
-        }
-        break;
-    default:
-        if (idx >= 10) {
-            if (!CheckDreamAuxWorldState(idx)) {
+        case 0:
+        case 1:
+        case 2:
+            if (!MatchesDreamAuxProgression(value, idx - 1)) {
                 return false;
             }
-        }
-        break;
+            break;
+        case 3:
+            if (value % 3 != 0) {
+                return false;
+            }
+            break;
+        case 4:
+            if (value % 3 == 0) {
+                return false;
+            }
+            break;
+        case 5:
+            if (!IsStyleVariantEven()) {
+                return false;
+            }
+            break;
+        case 6:
+        case 7:
+            if (value % 3 != idx - 7) {
+                return false;
+            }
+            break;
+        case 18:
+            if ((value & 1) != 0) {
+                return false;
+            }
+            break;
+        case 19:
+            if ((value & 1) == 0) {
+                return false;
+            }
+            break;
+        default:
+            if (idx >= 10) {
+                if (!CheckDreamAuxWorldState(idx)) {
+                    return false;
+                }
+            }
+            break;
     }
 
 success:
@@ -352,8 +339,7 @@ success:
 }
 
 /* Compares gDreamAuxWorld's getDreamColor (DreamSys +0x200) against a per-idx signed byte from D_80088D16. */
-bool CheckDreamAuxWorldState(s32 idx)
-{
+bool CheckDreamAuxWorldState(s32 idx) {
     DreamSys *w = gDreamAuxWorld;
     s32 val = D_80088D16[idx];
     s32 result = w->methods->getDreamColor(w);
@@ -361,8 +347,7 @@ bool CheckDreamAuxWorldState(s32 idx)
     return val == result;
 }
 
-bool MatchesDreamAuxProgression(s32 a0, s32 a1)
-{
+bool MatchesDreamAuxProgression(s32 a0, s32 a1) {
     s32 target = (a0 - 1) / 30 + 1;
     s32 i;
 
@@ -405,17 +390,18 @@ typedef struct {
 extern DreamAuxPos6 gDreamAuxPosTable[];
 extern u8 D_80088F18[];
 
-bool SpawnDreamAuxTriggerEntity(s32 kind, void *out, void *ctx, s32 entry)
-{
+bool SpawnDreamAuxTriggerEntity(s32 kind, void *out, void *ctx, s32 entry) {
     Entity *entity = New_Entity(kind, out, (void *)D_8008AC04);
 
     if (entity != NULL) {
         DreamAuxSpawnInfo *rec;
+
         struct {
             u16 ctxVal;
             u16 recordVal0;
             DreamAuxPos6 pos;
         } coords;
+
         s32 outBuf[4];
 
         coords.ctxVal = *(u16 *)ctx;
@@ -425,23 +411,23 @@ bool SpawnDreamAuxTriggerEntity(s32 kind, void *out, void *ctx, s32 entry)
 
         D_8008ABFC->methods->computeCellOffsets(D_8008ABFC, outBuf, &coords);
         entity->methods->updateRotation(entity, 1, D_80088F18 + rec->val2 * 12);
-        ((Class65650AttachToParentFn)entity->methods->attachToParent)((Class65650 *)entity, (Class65650 *)gDreamAuxWorld,
-                                                                      (void *)D_8008AC08, (void *)D_8008ABFC, outBuf);
+        ((Class65650AttachToParentFn)entity->methods->attachToParent)(
+            (Class65650 *)entity, (Class65650 *)gDreamAuxWorld, (void *)D_8008AC08,
+            (void *)D_8008ABFC, outBuf);
         return false;
     }
     return true;
 }
 
-
-void DespawnDreamAuxEntity(DreamAuxSlot *a0)
-{
+void DespawnDreamAuxEntity(DreamAuxSlot *a0) {
     if (a0->entity != NULL) {
         s32 localPos[3];
 
         a0->entity->methods->detachFromParent(a0->entity);
         Class6B5CC__LocalOffsetToWorldPos((Class6B5CC *)gDreamAuxWorld, localPos, a0->pos, 0);
-        ((Class65650AttachToParentFn)a0->entity->methods->attachToParent)((Class65650 *)a0->entity, (Class65650 *)gDreamAuxWorld,
-                                                                          (void *)D_8008AC08, (void *)D_8008ABFC, localPos);
+        ((Class65650AttachToParentFn)a0->entity->methods->attachToParent)(
+            (Class65650 *)a0->entity, (Class65650 *)gDreamAuxWorld, (void *)D_8008AC08,
+            (void *)D_8008ABFC, localPos);
         Class6B5CC__FaceTarget((Class6B5CC *)a0->entity, (Class6B5CC *)gDreamAuxWorld, 1, 0, 0);
     }
 }

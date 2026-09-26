@@ -34,6 +34,7 @@ typedef struct CdLoc16 {
 typedef struct Class6D430 Class6D430;
 typedef struct Class6D430Methods Class6D430Methods;
 
+/* clang-format off */
 #define CLASS6D430_SLOTS(Self, CtorParams)                                                         \
     BASICCLASS_SLOTS(Self, CtorParams);                                                            \
     /* +0x040 */ void (*slot40)(void);                          /* CD: CdDriver__NoOpSlot40 */   \
@@ -51,7 +52,9 @@ typedef struct Class6D430Methods Class6D430Methods;
     /* +0x070 */ void (*stopService)(Self *self);               /* CD: CdDriver__StopService; neither occupant reads self, but CdDriver__RunRequestQueue loads $a0 = self before the jalr (round 88) */ \
     /* +0x074 */ void (*cancelRequests)(Self *self);            /* CD: CdDriver__CancelRequests */ \
     /* +0x078 */ void *slot78                                   /* NULL */
+/* clang-format on */
 
+/* clang-format off */
 #define CLASS6D430_FIELDS(Methods)                                                                 \
     BASICCLASS_FIELDS(Methods);                                                                    \
     /* +0x00C */ s32 isOpen;          /* cleared while LoadFile runs, then restored */             \
@@ -64,9 +67,10 @@ typedef struct Class6D430Methods Class6D430Methods;
     /* +0x024 */ s32 flags;           /* bit 0 set by SetFlag */                                   \
     /* +0x028 */ u16 inQueueDispatch;                                                              \
     /* +0x02A */ u16 unk2A            /* the object is 0x2C bytes: Class6D940's own fields start at +0x02C */
+/* clang-format on */
 
 struct Class6D430Methods {
-    CLASS6D430_SLOTS(Class6D430, (Class6D430 *self));
+    CLASS6D430_SLOTS(Class6D430, (Class6D430 * self));
 };
 
 struct Class6D430 {

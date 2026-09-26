@@ -49,20 +49,24 @@ typedef struct ModelDataMethods ModelDataMethods;
 /* +0x078 is Class6D430's slot78 (NULL there): this table's occupant is
  * ModelData__BuildResources(self), s32, 0 when both sources exist; the
  * callers cast it (an inherited slot keeps the parent's name). */
+/* clang-format off */
 #define MODELDATA_SLOTS(Self, CtorParams)                                                          \
     CLASS6D430_SLOTS(Self, CtorParams);                                                            \
     /* +0x07C */ void (*releaseResources)(Self *self);          /* ModelData__ReleaseResources */  \
     /* +0x080 */ u8 (*scanPackets)(Self *self, s32 arg1, s32 arg2); /* ModelData__ForwardScanPackets: todSet's +0x078 */ \
     /* +0x084 */ void *(*decodePacketWord)(Self *self, s32 arg1, s32 arg2, s32 arg3, s32 arg4, s32 arg5) /* ModelData__ForwardDecodePacketWord: todSet's +0x080 */
+/* clang-format on */
 
+/* clang-format off */
 #define MODELDATA_FIELDS(Methods)                                                                  \
     CLASS6D430_FIELDS(Methods);                                                                    \
     /* +0x02C */ struct LinkResource *linkResource; /* New_LinkResource (include/LinkResource.h); released by ReleaseResources */ \
     /* +0x030 */ Class6D430 *todSet;       /* New_TodSet (D_8006F590); +0x080/+0x084 forward to it */ \
     /* +0x034 */ s32 ownsResources         /* the ctor's third argument: New_ModelData 1, TriggerWorld 0; BuildResources and ReleaseResources act only while it is set. The object is 0x38 bytes (New_ModelData): TriggerWorld's own fields start at +0x038 */
+/* clang-format on */
 
 struct ModelDataMethods {
-    MODELDATA_SLOTS(ModelData, (ModelData *self, struct Src6F240 *src, s32 owns));
+    MODELDATA_SLOTS(ModelData, (ModelData * self, struct Src6F240 *src, s32 owns));
 };
 
 struct ModelData {
@@ -79,6 +83,7 @@ void ModelData__Load(ModelData *self);
 s32 ModelData__BuildResources(ModelData *self);
 void ModelData__ReleaseResources(ModelData *self);
 u8 ModelData__ForwardScanPackets(ModelData *self, s32 arg1, s32 arg2);
-void *ModelData__ForwardDecodePacketWord(ModelData *self, s32 arg1, s32 arg2, s32 arg3, s32 arg4, s32 arg5);
+void *ModelData__ForwardDecodePacketWord(ModelData *self, s32 arg1, s32 arg2, s32 arg3, s32 arg4,
+                                         s32 arg5);
 
 #endif

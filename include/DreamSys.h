@@ -83,6 +83,7 @@ extern s32 LOOK_YAW_LIMITS[3];
    own "Current" value, see that field), not by arg1. */
 extern s32 MOVE_MODE_SPEEDS[5];
 extern s8 MOVE_COMMAND_SIGNS[8];
+
 /* Declared further down (after the real `DreamSys` typedef exists) as
    `extern void (*MOVE_COMMAND_DISPATCH[5])(DreamSys *this, s32 val, void *extra);` --
    same element type as Actor__MoveLocalZOrFindLink/Actor__MoveLocalXOrFindLink (Actor +0x0D0/+0x0D4), which this table
@@ -98,15 +99,15 @@ extern s8 MOVE_COMMAND_SIGNS[8];
    and every one of them decodes to a plausible angle: see
    ROTATION_YAW_180 / _PLUS45 / _MINUS45 and CARDINAL_ROTATIONS below. */
 typedef struct RotationRatio {
-	s16 numerator;
-	s16 denominator;
+    s16 numerator;
+    s16 denominator;
 } RotationRatio;
 
 /* The x/y/z triple Class6B5CC__UpdateRotation actually consumes. */
 typedef struct RotationRatios {
-	RotationRatio x;
-	RotationRatio y;
-	RotationRatio z;
+    RotationRatio x;
+    RotationRatio y;
+    RotationRatio z;
 } RotationRatios;
 
 /* One 12-byte-stride RotationRatios array that splat had to split across two
@@ -125,35 +126,39 @@ extern RotationRatios TURN_ROTATIONS[];
    arg2 with flag 1 (absolute) by DreamSys__ResetSessionState. */
 extern RotationRatios ROTATION_YAW_180;
 
-typedef struct CinematicCall{
-	s16 bank;
-	s16 entry;
+typedef struct CinematicCall {
+    s16 bank;
+    s16 entry;
 } CinematicCall;
 
 typedef struct {
-	MoodGraphPoint lastMood;
-	/* 2 bytes unused */
-	struct sumAxis{
-		s32 dynamic;
-		s32 upper;
-	} sumMoods;
-	s32 amountMoods;
+    MoodGraphPoint lastMood;
+
+    /* 2 bytes unused */
+    struct sumAxis {
+        s32 dynamic;
+        s32 upper;
+    } sumMoods;
+
+    s32 amountMoods;
 } MoodGraphContributor;
 
 typedef struct PlayerSpawnPoint {
-	struct MapChunk {
-		u8 col;
-		u8 row;
-	} chunk;
-	struct MapTile {
-		u8 col;
-		u8 row;
-	} tile;
-	struct RelativePos {
-		s16 x;
-		s16 y;
-		s16 z;
-	} position;
+    struct MapChunk {
+        u8 col;
+        u8 row;
+    } chunk;
+
+    struct MapTile {
+        u8 col;
+        u8 row;
+    } tile;
+
+    struct RelativePos {
+        s16 x;
+        s16 y;
+        s16 z;
+    } position;
 } PlayerSpawnPoint;
 
 /* The `chunk`+`tile` half of a PlayerSpawnPoint (4 bytes), reinterpreted as
@@ -165,8 +170,8 @@ typedef struct PlayerSpawnPoint {
    copy, matching retail's own two separate unaligned-copy instruction
    groups. */
 typedef struct PlayerSpawnGridPos {
-	struct MapChunk chunk;
-	struct MapTile tile;
+    struct MapChunk chunk;
+    struct MapTile tile;
 } PlayerSpawnGridPos;
 
 /* pitch/heading/roll grouped into one 12-byte nested struct (round
@@ -178,27 +183,27 @@ typedef struct PlayerSpawnGridPos {
    project. A per-field or looped copy would not reproduce that
    instruction ordering. */
 typedef struct FlashbackRotation {
-	struct Angle{
-		s16 angle;
-		s16 one;
-	} pitch; /* Does not do what you think it does */
-	struct Angle heading;
-	struct Angle roll; /* Ditto */
+    struct Angle {
+        s16 angle;
+        s16 one;
+    } pitch; /* Does not do what you think it does */
+    struct Angle heading;
+    struct Angle roll; /* Ditto */
 } FlashbackRotation;
 
 typedef struct {
-	s32 stageID;
-	PlayerSpawnPoint position;
-	FlashbackRotation rotation;
-	s16 timeLimit;
-	/* Was `s32`; retyped (round 2026-09-02): DreamSys__AddFlashback writes
+    s32 stageID;
+    PlayerSpawnPoint position;
+    FlashbackRotation rotation;
+    s16 timeLimit;
+    /* Was `s32`; retyped (round 2026-09-02): DreamSys__AddFlashback writes
 	   it with a bare `sh` (halfword store) from an `s32` argument, which
 	   only makes sense if the field itself is 2 bytes -- an `s32` field
 	   fed by an `s32` argument would store all 4 bytes (`sw`), not 2. The
 	   remaining 2 bytes before `day` are ordinary C struct alignment
 	   padding, not a separate field. */
-	s16 unknown_value_0x1c;
-	s32 day;
+    s16 unknown_value_0x1c;
+    s32 day;
 } FlashbackEntry;
 
 
@@ -248,21 +253,22 @@ struct LinkResource;
    a bare `sh`, consistent with either `s16` or `s32` at this call shape,
    kept `s32` for uniformity with its self-only siblings. */
 typedef struct DreamSysEntityMethods {
-	u8 pad00[0x38];
-	/* Three arguments, not two (round 75, DreamSys__InstanceEffectsOnJournal):
+    u8 pad00[0x38];
+    /* Three arguments, not two (round 75, DreamSys__InstanceEffectsOnJournal):
 	   the caller forwards its own `effect` in $a2 untouched, which is why its
 	   switch index lives in $v1. Only caller: that function. */
-	void (*slot0x38)(void *self, struct DreamSys *arg1, s32 effect);
-	u8 pad3C[0x10C - 0x3C];
-	PlayerSpawnPoint *(*slot0x10C)(void *self, s32 arg1, s32 arg2);
-	u8 pad110[0x14C - 0x110];
-	MoodGraphPoint *(*slot0x14C)(void *self);
-	s32 (*slot0x150)(void *self);
-	s32 (*slot0x154)(void *self);
-	s32 (*slot0x158)(void *self);
+    void (*slot0x38)(void *self, struct DreamSys *arg1, s32 effect);
+    u8 pad3C[0x10C - 0x3C];
+    PlayerSpawnPoint *(*slot0x10C)(void *self, s32 arg1, s32 arg2);
+    u8 pad110[0x14C - 0x110];
+    MoodGraphPoint *(*slot0x14C)(void *self);
+    s32 (*slot0x150)(void *self);
+    s32 (*slot0x154)(void *self);
+    s32 (*slot0x158)(void *self);
 } DreamSysEntityMethods;
+
 typedef struct DreamSysEntityObj {
-	DreamSysEntityMethods *methods;
+    DreamSysEntityMethods *methods;
 } DreamSysEntityObj;
 
 /* Struct pointed to by DreamSys__SoundCueCallback's arg1 -- forwarded (never called) as
@@ -271,14 +277,14 @@ typedef struct DreamSysEntityObj {
    DreamSys__SoundCueCallback itself touches are named; +0x8..+0x1C and +0x24..+0x30
    are unconfirmed gaps (round 2026-08-30-d). */
 typedef struct SoundCueCallbackArg {
-	s32 mode;             /* +0x0, compared against literal 1 */
-	s32 value;              /* +0x4, divided by 20 */
-	s8 unknown_values_0x8[0x14];
-	s32 field_0x1C;
-	s32 field_0x20;
-	s8 unknown_values_0x24[0xC];
-	s32 field_0x30;
-	s32 field_0x34;
+    s32 mode;  /* +0x0, compared against literal 1 */
+    s32 value; /* +0x4, divided by 20 */
+    s8 unknown_values_0x8[0x14];
+    s32 field_0x1C;
+    s32 field_0x20;
+    s8 unknown_values_0x24[0xC];
+    s32 field_0x30;
+    s32 field_0x34;
 } SoundCueCallbackArg;
 
 /* DreamSys__TickDrift's per-tick addTranslation (+0x0BC) step. */
@@ -351,11 +357,10 @@ extern RotationRatios ROTATION_YAW_MINUS45;
    the viewpoint and the reference point, read as {x, y = value, z =
    position} (round 2026-08-30-d; the Viewport identification is round 88). */
 typedef struct DreamSysInterpPoint {
-	s8 unknown_values_0x0[4];
-	s32 value;
-	s32 position;
+    s8 unknown_values_0x0[4];
+    s32 value;
+    s32 position;
 } DreamSysInterpPoint;
-
 
 /* 3x3 lookup table indexed by [dynamicClass][upperClass], each axis
    classified into {0,1,2} by CalcDreamColor first (round 2026-08-30-d). */
@@ -376,93 +381,92 @@ extern const s8 VOICE_PITCH_BY_SELECT[0x18];
    class_16334.h for the other units that also declare it locally. */
 extern void *BMemPMgrAlloc(s32 size);
 
-
 /* The object. Actor's fields (include/Actor.h) run to +0x058; DreamSys's
  * own start there. New_DreamSys allocates 0x928 bytes. */
 struct DreamSys {
-	ACTOR_FIELDS(DreamSysMethods);
-	/* +0x058 onward: DreamSys's own */
-	/* Set by DreamSys__SetSoundObj(this, value): a VabStreamObj, cast to
+    ACTOR_FIELDS(DreamSysMethods);
+    /* +0x058 onward: DreamSys's own */
+    /* Set by DreamSys__SetSoundObj(this, value): a VabStreamObj, cast to
 	   one where it is called through (include/VabStreamObj.h). */
-	s32 soundObj;
-	/* The camera: set by DreamSys__SetViewport (and the ctor's arg3); see
+    s32 soundObj;
+    /* The camera: set by DreamSys__SetViewport (and the ctor's arg3); see
 	   `struct Viewport` above for the refView fields this class moves. */
-	struct Viewport *viewport;
-	/* Set unconditionally to the constructor's `arg1` by DreamSys__DreamSys
+    struct Viewport *viewport;
+    /* Set unconditionally to the constructor's `arg1` by DreamSys__DreamSys
 	   (round 2026-09-02): the LinkResource its model 0 came from. No other
 	   observed use in this unit's queued functions. */
-	struct LinkResource *unk_0x60;
-	/* Set by DreamSys__func_5938c(this, value); no other observed use. */
-	s32 unk_0x64;
+    struct LinkResource *unk_0x60;
+    /* Set by DreamSys__func_5938c(this, value); no other observed use. */
+    s32 unk_0x64;
 
-	bool isFlashbackSession;
-	/* Read by DreamSys__TickMove; compared against 0 / 1, else-branch otherwise.
+    bool isFlashbackSession;
+    /* Read by DreamSys__TickMove; compared against 0 / 1, else-branch otherwise.
 	   Meaning unidentified beyond that (round 2026-08-30). */
-	s32 moveOverride;
+    s32 moveOverride;
 
-	/* Gate flag: DreamSys__BlockMovement sets it to 1; DreamSys__GetLinkCommandFlag reads it back;
+    /* Gate flag: DreamSys__BlockMovement sets it to 1; DreamSys__GetLinkCommandFlag reads it back;
 	   DreamSys__UpdateTickState skips its whole body while this is nonzero. */
-	s32 movementBlocked;
-	/* Cleared to 0, then set to (tick % tickPeriod == 0) by
+    s32 movementBlocked;
+    /* Cleared to 0, then set to (tick % tickPeriod == 0) by
 	   DreamSys__UpdateTickState. */
-	s32 linkCommandFlag;
-	/* Cleared to 0 by DreamSys__func_59598; no other observed use. */
-	s32 unk_0x78;
-	/* Cleared to 0 by DreamSys__func_59590; no other observed use. */
-	s32 unk_0x7C;
-	/* Set by DreamSys__SelectCallback80(this, arg1): NULL when arg1==0, otherwise one of
+    s32 linkCommandFlag;
+    /* Cleared to 0 by DreamSys__func_59598; no other observed use. */
+    s32 unk_0x78;
+    /* Cleared to 0 by DreamSys__func_59590; no other observed use. */
+    s32 unk_0x7C;
+    /* Set by DreamSys__SelectCallback80(this, arg1): NULL when arg1==0, otherwise one of
 	   three vtable-slot function pointers selected by arg1 (1/2/3). Called
 	   with (this) by DreamSys__RunTickCallbacks, if non-NULL. */
-	void (*callback_0x80)(struct DreamSys *this);
-	/* Set unconditionally to arg1 by DreamSys__SelectCallback80(this, arg1); no other
+    void (*callback_0x80)(struct DreamSys *this);
+    /* Set unconditionally to arg1 by DreamSys__SelectCallback80(this, arg1); no other
 	   observed use (round 2026-08-30). */
-	s32 callback80Mode;
-	/* Index into the (LOOK_OFFSET_STEPS, LOOK_OFFSET_LIMITS) delta/threshold table pair,
+    s32 callback80Mode;
+    /* Index into the (LOOK_OFFSET_STEPS, LOOK_OFFSET_LIMITS) delta/threshold table pair,
 	   consumed and reset to 0 by DreamSys__StepLookOffset (round 2026-08-30). */
-	s32 lookOffsetCommand;
-	/* Running accumulator nudged by lookOffsetCommand's table entry, or decayed by
+    s32 lookOffsetCommand;
+    /* Running accumulator nudged by lookOffsetCommand's table entry, or decayed by
 	   600/call towards 0 when lookOffsetCommand is 0; also propagated into
 	   viewport->refView.vr.y. Set by DreamSys__StepLookOffset (round 2026-08-30). */
-	s32 lookOffset;
-	/* Index into the (LOOK_YAW_STEPS, LOOK_YAW_LIMITS) delta/threshold table pair,
+    s32 lookOffset;
+    /* Index into the (LOOK_YAW_STEPS, LOOK_YAW_LIMITS) delta/threshold table pair,
 	   consumed and reset to 0 by DreamSys__StepLookYaw (round 2026-08-30). */
-	s32 lookYawCommand;
-	/* Running delta accumulator paired with lookYawCommand; see DreamSys__StepLookYaw
+    s32 lookYawCommand;
+    /* Running delta accumulator paired with lookYawCommand; see DreamSys__StepLookYaw
 	   (round 2026-08-30). */
-	s32 lookYaw;
-	/* Set by DreamSys__SelectCallback80(this, arg1) exactly like callback_0x80, but from
+    s32 lookYaw;
+    /* Set by DreamSys__SelectCallback80(this, arg1) exactly like callback_0x80, but from
 	   a *different* trio of vtable slots. Called with (this) by
 	   DreamSys__RunTickCallbacks, if non-NULL. */
-	void (*callback_0x98)(struct DreamSys *this);
-	/* "Mode" field read/written by DreamSys__SelectCallback98(this, arg1): when ==2 on
+    void (*callback_0x98)(struct DreamSys *this);
+    /* "Mode" field read/written by DreamSys__SelectCallback98(this, arg1): when ==2 on
 	   entry, this->methods->stopDrift(this, 0) fires first; then it is set
 	   unconditionally to arg1 (round 2026-08-30). */
-	s32 callback98Mode;
-	/* (this->moveCommand ^ 1) < 1u, i.e. (moveCommand == 1), written by
+    s32 callback98Mode;
+    /* (this->moveCommand ^ 1) < 1u, i.e. (moveCommand == 1), written by
 	   DreamSys__StepLookYaw; also toggled/incremented by DreamSys__FlipMoveCommand and forced
 	   to 1 by DreamSys__TickMoveForced (round 2026-08-30). */
-	s32 moveCommand;
-	/* Index into the 12-byte-stride TURN_ROTATIONS table; consumed and reset
+    s32 moveCommand;
+    /* Index into the 12-byte-stride TURN_ROTATIONS table; consumed and reset
 	   to 0 by DreamSys__ApplyPendingTurn (round 2026-08-30-b). */
-	s32 turnCommand;
-	/* (moveCommand == 1) as computed by DreamSys__StepLookYaw; unconditionally cleared
+    s32 turnCommand;
+    /* (moveCommand == 1) as computed by DreamSys__StepLookYaw; unconditionally cleared
 	   to 0 by DreamSys__FlipMoveCommand on every call (round 2026-08-30). */
-	s32 moveCommandLatch;
-	/* "Current" value; DreamSys__RestorePreviousMoveMode overwrites this with previousMoveMode.
+    s32 moveCommandLatch;
+    /* "Current" value; DreamSys__RestorePreviousMoveMode overwrites this with previousMoveMode.
 	   DreamSys__GetSetMoveMode's bounds-checked setter (vtable +0x180) writes both
 	   this and previousMoveMode together; DreamSys__ChangeMoveMode copies the OLD value of
 	   this into previousMoveMode before overwriting it, when the new value
 	   differs (round 2026-08-30-b). */
-	s32 moveMode;
-	/* "Previous"/paired value; see moveMode (round 2026-08-30-b). */
-	s32 previousMoveMode;
-	/* Attempt/beat counter incremented (and bounded to [0,4)) by
+    s32 moveMode;
+    /* "Previous"/paired value; see moveMode (round 2026-08-30-b). */
+    s32 previousMoveMode;
+    /* Attempt/beat counter incremented (and bounded to [0,4)) by
 	   DreamSys__AdvanceMoveCycle on every call while moveCommand is nonzero; reset to 0 once
 	   moveCommand goes back to 0. Compared against 3 there to pick a +-50
 	   nudge applied to viewport->refView's vp.y and vr.y, and against 4 (together with
 	   moveMode) to force moveCommand back to 0 (round 2026-09-02). */
-	s32 moveCycleTick;
-	/* Derived from `linkTarget->flags36` masked to 0x7F, or forced to
+    s32 moveCycleTick;
+    /* Derived from `linkTarget->flags36` masked to 0x7F, or forced to
 	   0 (if >= 0x18) or 2 (if `state == 15` and this is still 0)
 	   by DreamSys__NotifyLinkAttempt's `arg1 == -1` path (round 2026-09-02). Also an index:
 	   DreamSys__StartVoice (round 2026-09-06) does nothing when this is 0, else
@@ -470,83 +474,83 @@ struct DreamSys {
 	   it against 0x16 (22) to decide whether to keep or discard
 	   voiceIndex's new value, and against 0xB (11) to gate two extra vtable
 	   calls. */
-	s32 voiceSelect;
-	/* Gate flag: DreamSys__StopVoice runs its body (a call through
+    s32 voiceSelect;
+    /* Gate flag: DreamSys__StopVoice runs its body (a call through
 	   soundObj's stopVoice (+0x084), then resets this to -1) only while this is
 	   >= 0 (round 2026-08-30-b). */
-	s32 voiceIndex;
-	s8 unknown_values_0xC0[4];
-	/* Set to 1 by DreamSys__SelectCallback98's arg1==2 case, alongside cueServiceActive and
+    s32 voiceIndex;
+    s8 unknown_values_0xC0[4];
+    /* Set to 1 by DreamSys__SelectCallback98's arg1==2 case, alongside cueServiceActive and
 	   callback_0x98 (round 2026-08-30). */
-	s32 driftActive;
-	/* Set to 1 by DreamSys__SelectCallback98's arg1==2 case, alongside driftActive
+    s32 driftActive;
+    /* Set to 1 by DreamSys__SelectCallback98's arg1==2 case, alongside driftActive
 	   (round 2026-08-30). */
-	s32 cueServiceActive;
-	/* Struct initialized in-place by InitSoundCueSet (still INCLUDE_ASM, in
+    s32 cueServiceActive;
+    /* Struct initialized in-place by InitSoundCueSet (still INCLUDE_ASM, in
 	   the uncarved code_179d8) via DreamSys__SelectCallback98's arg1==2 case; internal
 	   layout unknown beyond that entry point (round 2026-08-30). */
-	s8 soundCueSet[0x54];
+    s8 soundCueSet[0x54];
 
-	/* Divisor for DreamSys__UpdateTickState's (tick % tickPeriod) check. */
-	s32 tickPeriod;
-	/* Result of DreamSys__UpdateTickState's (tick % tickPeriod == 0) check. */
-	s32 tickBoundary;
-	/* tickBoundary/0x128/0x12C/0x130 are also bounds-checked-set as a group of
+    /* Divisor for DreamSys__UpdateTickState's (tick % tickPeriod) check. */
+    s32 tickPeriod;
+    /* Result of DreamSys__UpdateTickState's (tick % tickPeriod == 0) check. */
+    s32 tickBoundary;
+    /* tickBoundary/0x128/0x12C/0x130 are also bounds-checked-set as a group of
 	   four by DreamSys__SetGateFlags (vtable +0x18C): each is overwritten with the
 	   corresponding argument only when that argument is >= 0
 	   (round 2026-08-30-b). */
-	s32 unk_0x128;
-	s32 unk_0x12C;
-	s32 unk_0x130;
+    s32 unk_0x128;
+    s32 unk_0x12C;
+    s32 unk_0x130;
 
-	s32 dreamTimeLimit;
-	s8 unknown_values_0x138[12];
+    s32 dreamTimeLimit;
+    s8 unknown_values_0x138[12];
 
-	MoodGraphContributor areaMoods;
-	MoodGraphContributor entityMoods;
-	s32 currentStage;
-	CinematicCall nextCinematic;
-	PlayerSpawnPoint linkCoordinates;
-	/* 2 bytes unused */
-	s32 saveMagic;
-	s32 currentYear;
-	s32 currentDay;
-	s32 totalFlasbackUnlockScore;
-	s32 navigationFlasbackUnlockScore;
-	s32 instanceFlasbackUnlockScore;
-	MoodGraphPoint moodPreviousDays[365];
-	/* 2 bytes unused */
-	s32 amountFlashbacksAvailable;
-	FlashbackEntry storedFlasbacks[10];
+    MoodGraphContributor areaMoods;
+    MoodGraphContributor entityMoods;
+    s32 currentStage;
+    CinematicCall nextCinematic;
+    PlayerSpawnPoint linkCoordinates;
+    /* 2 bytes unused */
+    s32 saveMagic;
+    s32 currentYear;
+    s32 currentDay;
+    s32 totalFlasbackUnlockScore;
+    s32 navigationFlasbackUnlockScore;
+    s32 instanceFlasbackUnlockScore;
+    MoodGraphPoint moodPreviousDays[365];
+    /* 2 bytes unused */
+    s32 amountFlashbacksAvailable;
+    FlashbackEntry storedFlasbacks[10];
 
-	s8 unknown_values_0x5d8[8];
+    s8 unknown_values_0x5d8[8];
 
-	s8 navChallengesArray[30];
-	/* 2 bytes unused */
-	s32 amountDynamicLinksDone;
-	s8 unknown_values_0x604[116];
+    s8 navChallengesArray[30];
+    /* 2 bytes unused */
+    s32 amountDynamicLinksDone;
+    s8 unknown_values_0x604[116];
 
-	bool screenShakeOn;
-	s32 unknown_word_0x67c;
-	s32 unknown_word_0x680;
-	s8 unknown_values_0x684[500];
+    bool screenShakeOn;
+    s32 unknown_word_0x67c;
+    s32 unknown_word_0x680;
+    s8 unknown_values_0x684[500];
 
-	s32 newGamePending;
-	s32 currentFlashbackIndex;
-	/* Set (whole word) by DreamSys__TryStageTimerLink to GetStageLinkAngle()'s return value,
+    s32 newGamePending;
+    s32 currentFlashbackIndex;
+    /* Set (whole word) by DreamSys__TryStageTimerLink to GetStageLinkAngle()'s return value,
 	   right before an ExecuteLink (round 2026-09-02). */
-	s32 stageLinkAngle;
-	/* Gate flag read by DreamSys__SetMoveOverride (round 2026-08-30-b): when nonzero
+    s32 stageLinkAngle;
+    /* Gate flag read by DreamSys__SetMoveOverride (round 2026-08-30-b): when nonzero
 	   (reusing the SAME loaded value, not a fresh 0/1 test), forwarded as
 	   Class6B5CC__UpdateRotation's arg2 -- cast from s32 to void*, not dereferenced. */
-	s32 enterRotation;
-	/* Zeroed (whole word) by DreamSys__TryStageTimerLink alongside enterRotation
+    s32 enterRotation;
+    /* Zeroed (whole word) by DreamSys__TryStageTimerLink alongside enterRotation
 	   (round 2026-09-02). */
-	s32 exitRotation;
+    s32 exitRotation;
 
-	s32 storedDay;
+    s32 storedDay;
 
-	/* The struct previously ended here (0x890), but New_DreamSys allocates
+    /* The struct previously ended here (0x890), but New_DreamSys allocates
 	   sizeof(DreamSys) via a literal `ori $a0, $zero, 0x928` -- 0x98 bytes
 	   more than any field so far discovered accounts for. Extended to the
 	   allocator's real size (round 2026-08-30-b); the four words
@@ -557,33 +561,33 @@ struct DreamSys {
 	   0x28-byte GsCOORD2PARAM) into these two fields;
 	   DreamSys__RestoreLinkSnapshot copies them back and then clears
 	   coord2->flg (round 2026-09-02; Class6B5CC's own types, track 4). */
-	Class6B5CCSub14 coord2Snapshot;
-	Class6B5CCSub44 coord2ParamSnapshot;
-	s32 staircaseActive;
-	/* Compared with an UNSIGNED `< 1` (sltiu) by DreamSys__ApplyMoveCommand (round
+    Class6B5CCSub14 coord2Snapshot;
+    Class6B5CCSub44 coord2ParamSnapshot;
+    s32 staircaseActive;
+    /* Compared with an UNSIGNED `< 1` (sltiu) by DreamSys__ApplyMoveCommand (round
 	   2026-09-06) -- typed `u32` rather than `s32` to reproduce that,
 	   confirmed safe since its only two writers (round 2026-08-30) both
 	   set it to the literal 0. */
-	u32 staircaseMoveGate;
-	/* Function pointer, called as `staircaseTickFn(this)` and its `s32` result
+    u32 staircaseMoveGate;
+    /* Function pointer, called as `staircaseTickFn(this)` and its `s32` result
 	   used as a truth value (DreamSys__TryStaircaseLink, round 2026-09-06); set from
 	   `STAIRCASE_TICK_FNS[GetLastSpawnExtra()]` (both MATCHED) or NULLed --
 	   0 is a valid state, tested with a plain `!= 0`/`== 0` before ever
 	   being called through. */
-	s32 (*staircaseTickFn)(struct DreamSys *this);
-	/* A retry/attempt counter (round 2026-09-02, DreamSys__TickStaircaseCase2): read as a
+    s32 (*staircaseTickFn)(struct DreamSys *this);
+    /* A retry/attempt counter (round 2026-09-02, DreamSys__TickStaircaseCase2): read as a
 	   whole word, compared against several literal bands, and incremented
 	   by 1 at that function's normal exit. */
-	s32 staircaseFrame;
-	/* See PlayerSpawnGridPos's own comment -- the `chunk`+`tile` half of a
+    s32 staircaseFrame;
+    /* See PlayerSpawnGridPos's own comment -- the `chunk`+`tile` half of a
 	   PlayerSpawnPoint whole-struct-copied here by DreamSys__TryStaircaseLink. */
-	PlayerSpawnGridPos staircaseGridPos;
-	/* A `struct RelativePos`, address-taken and passed to DreamSys__ApplyRelativeOffset as
+    PlayerSpawnGridPos staircaseGridPos;
+    /* A `struct RelativePos`, address-taken and passed to DreamSys__ApplyRelativeOffset as
 	   its `b` argument (round 2026-09-02, DreamSys__TickStaircaseCase2) -- carved out of
 	   what was raw padding in the same 0x10-byte block as staircaseFrame above. */
-	struct RelativePos staircaseOrigin;
-	s8 unknown_values_0x922[2];
-	s32 unk_0x924;
+    struct RelativePos staircaseOrigin;
+    s8 unknown_values_0x922[2];
+    s32 unk_0x924;
 };
 
 /* Dispatch table indexed by DreamSys__ApplyMoveCommand's `arg1`; see that table's own
@@ -609,12 +613,16 @@ extern s32 (*STAIRCASE_TICK_FNS[4])(DreamSys *this);
    DreamSys__TryStaircaseLink's call site, which remains INCLUDE_ASM in this unit. */
 extern s32 GetLastSpawnExtra(void);
 
-typedef enum DreamColors{
-	DREAM_COLOR_BLACK, DREAM_COLOR_BLUE,
-	DREAM_COLOR_GREEN, DREAM_COLOR_CYAN,
-	DREAM_COLOR_RED, DREAM_COLOR_PINK,
-	DREAM_COLOR_YELLOW, DREAM_COLOR_WHITE,
-}DreamColors;
+typedef enum DreamColors {
+    DREAM_COLOR_BLACK,
+    DREAM_COLOR_BLUE,
+    DREAM_COLOR_GREEN,
+    DREAM_COLOR_CYAN,
+    DREAM_COLOR_RED,
+    DREAM_COLOR_PINK,
+    DREAM_COLOR_YELLOW,
+    DREAM_COLOR_WHITE,
+} DreamColors;
 
 /* Occupants in DREAMSYS_METHODS named at each slot (`tools/classtable.py
  * DREAMSYS_METHODS --vs gActorMethods`). The inherited slots keep Actor's
@@ -637,87 +645,96 @@ typedef enum DreamColors{
  *    no offset; ObjM__SetupSceneStyle calls it through
  *    DreamSysAttachToParentFn. */
 struct DreamSysMethods {
-	ACTOR_SLOTS(DreamSys, (DreamSys *self, struct LinkResource *arg1, s32 arg2, s32 arg3));
-	/* +0x0F0 */ s32 (*getSetFlashbackSession)(DreamSys *self, DreamColors *out, s32 value); /* DreamSys__GetSetFlashbackSession: value < 0 writes the day's colour to *out */
-	/* +0x0F4 */ void (*setMoveOverride)(DreamSys *self, s32 value);     /* DreamSys__SetMoveOverride */
-	/* +0x0F8 */ void (*resetLinkState)(DreamSys *self, s32 arg1, s32 arg2); /* DreamSys__ResetLinkState */
-	/* +0x0FC */ void (*blockMovement)(DreamSys *self);                  /* DreamSys__BlockMovement: movementBlocked = 1 */
-	/* +0x100 */ s32 (*getLinkCommandFlag)(DreamSys *self);              /* DreamSys__GetLinkCommandFlag */
-	/* +0x104 */ s32 (*getSetDreamTimeLimit)(DreamSys *self, s32 time);  /* DreamSys__GetSetDreamTimeLimit */
-	/* +0x108 */ s32 (*getDreamTimerScaled)(DreamSys *self);             /* DreamSys__GetDreamTimerScaled: tick / 15 */
-	/* +0x10C */ void (*setSoundObj)(DreamSys *self, s32 value);         /* DreamSys__SetSoundObj */
-	/* +0x110 */ void (*setViewport)(DreamSys *self, struct Viewport *value); /* DreamSys__SetViewport */
-	/* +0x114 */ void (*slot114)(DreamSys *self, s32 value);             /* DreamSys__func_5938c: unk_0x64 = value */
-	/* +0x118 */ void (*updateTickState)(DreamSys *self);                /* DreamSys__UpdateTickState */
-	/* +0x11C */ void (*runTickCallbacks)(DreamSys *self);               /* DreamSys__RunTickCallbacks */
-	/* +0x120 */ s32 (*projectPointAtDistance)(DreamSys *self, s32 *out, s32 dist, s32 *reference, s32 tolerance); /* DreamSys__ProjectPointAtDistance */
-	/* +0x124 */ void (*slot124)(DreamSys *self);                        /* DreamSys__func_59590: unk_0x7C = 0 */
-	/* +0x128 */ void (*slot128)(DreamSys *self);                        /* DreamSys__func_59598: unk_0x78 = 0 */
-	/* +0x12C */ s32 (*slot12C)(DreamSys *self);                         /* DreamSys__NoOpSlot12C */
-	/* +0x130 */ void (*clearTickCallbacks)(DreamSys *self, bool arg1);  /* DreamSys__ClearTickCallbacks */
-	/* +0x134 */ void (*setTickCallbacks)(DreamSys *self, s32 arg1, s32 arg2); /* DreamSys__SetTickCallbacks: selectCallback98(arg1), selectCallback80(arg2) */
-	/* +0x138 */ void (*selectCallback80)(DreamSys *self, s32 arg1);     /* DreamSys__SelectCallback80 */
-	/* +0x13C */ void (*selectCallback98)(DreamSys *self, s32 arg1);     /* DreamSys__SelectCallback98 */
-	/* +0x140 */ void (*stepLook)(DreamSys *self);                       /* DreamSys__StepLook */
-	/* +0x144 */ void (*stepLookOffset)(DreamSys *self);                 /* DreamSys__StepLookOffset */
-	/* +0x148 */ void (*stepLookYaw)(DreamSys *self);                    /* DreamSys__StepLookYaw */
-	/* +0x14C */ void (*slot14C)(DreamSys *self);                        /* DreamSys__NoOpSlot14C, empty; a callback_0x80 choice */
-	/* +0x150 */ void (*slot150)(DreamSys *self);                        /* DreamSys__NoOpSlot150, empty; a callback_0x80 choice */
-	/* +0x154 */ s32 (*tickMove)(DreamSys *self);                        /* DreamSys__TickMove */
-	/* +0x158 */ s32 (*tickMoveFree)(DreamSys *self);                    /* DreamSys__TickMoveFree */
-	/* +0x15C */ s32 (*tickMoveForced)(DreamSys *self);                  /* DreamSys__TickMoveForced */
-	/* +0x160 */ s32 (*tickMoveHeld)(DreamSys *self);                    /* DreamSys__TickMoveHeld */
-	/* +0x164 */ s32 (*advanceMoveCycle)(DreamSys *self, s32 arg1);      /* DreamSys__AdvanceMoveCycle */
-	/* +0x168 */ void (*startVoice)(DreamSys *self);                     /* DreamSys__StartVoice */
-	/* +0x16C */ void (*stopVoice)(DreamSys *self);                      /* DreamSys__StopVoice */
-	/* +0x170 */ s32 (*applyMoveCommand)(DreamSys *self, s32 arg1);      /* DreamSys__ApplyMoveCommand */
-	/* +0x174 */ void (*applyPendingTurn)(DreamSys *self);               /* DreamSys__ApplyPendingTurn */
-	/* +0x178 */ void (*tickDrift)(DreamSys *self);                      /* DreamSys__TickDrift */
-	/* +0x17C */ void (*stopDrift)(DreamSys *self, s32 arg1);            /* DreamSys__StopDrift */
-	/* +0x180 */ s32 (*getSetMoveMode)(DreamSys *self, s32 value);       /* DreamSys__GetSetMoveMode */
-	/* +0x184 */ void (*changeMoveMode)(DreamSys *self, s32 value);      /* DreamSys__ChangeMoveMode */
-	/* +0x188 */ void (*restorePreviousMoveMode)(DreamSys *self);        /* DreamSys__RestorePreviousMoveMode */
-	/* +0x18C */ void (*setGateFlags)(DreamSys *self, s32 a, s32 b, s32 c, s32 d); /* DreamSys__SetGateFlags */
-	/* +0x190 */ void (*setTickPeriod)(DreamSys *self, s32 value);       /* DreamSys__SetTickPeriod */
-	/* +0x194 */ void (*soundCueCallback)(void *arg0, SoundCueCallbackArg *arg1); /* DreamSys__SoundCueCallback: only its VALUE is read (InitSoundCueSet's callback) */
-	/* +0x198 */ void (*initNewGame)(DreamSys *self);                    /* DreamSys__InitNewGame */
-	/* +0x19C */ void (*getSetScreenShake)(DreamSys *self, bool *value); /* DreamSys__GetSetScreenShake */
-	/* +0x1A0 */ s32 (*getCurrentDayAndYear)(DreamSys *self, s32 *outYear); /* DreamSys__GetCurrentDayAndYear */
-	/* +0x1A4 */ s32 (*advanceDay)(DreamSys *self);                      /* DreamSys__AdvanceDay */
-	/* +0x1A8 */ void (*clearNewGameFlag)(DreamSys *self);               /* DreamSys__ClearNewGameFlag */
-	/* +0x1AC */ s32 (*getNewGameFlag)(DreamSys *self);                  /* DreamSys__GetNewGameFlag */
-	/* +0x1B0 */ s32 *(*getSaveBlock)(DreamSys *self, s32 *outSize);     /* DreamSys__GetSaveBlock: &saveMagic; *outSize = 0x700 */
-	/* +0x1B4 */ s32 (*startDay)(DreamSys *self);                        /* DreamSys__StartDay */
-	/* +0x1B8 */ s32 (*endDay)(DreamSys *self, s32 arg1);                /* DreamSys__EndDay */
-	/* +0x1BC */ CinematicCall (*getCinematic)(DreamSys *self);          /* DreamSys__GetCinematic */
-	/* +0x1C0 */ void (*initSpawnLoc)(DreamSys *self);                   /* DreamSys__InitSpawnLoc */
-	/* +0x1C4 */ void (*dynamicLink)(DreamSys *self);                    /* DreamSys__DynamicLink */
-	/* +0x1C8 */ bool (*staticWallLink)(DreamSys *self, PlayerSpawnPoint *currentPos); /* DreamSys__StaticWallLink */
-	/* +0x1CC */ bool (*loadNextFlashback)(DreamSys *self, bool unknown); /* DreamSys__LoadNextFlashback */
-	/* +0x1D0 */ bool (*tryTunnelLink)(DreamSys *self, PlayerSpawnPoint *currentPos); /* DreamSys__TryTunnelLink */
-	/* +0x1D4 */ bool (*tryStageTimerLink)(DreamSys *self, PlayerSpawnPoint *currentPos); /* DreamSys__TryStageTimerLink */
-	/* +0x1D8 */ bool (*tryInstantTeleportLink)(DreamSys *self, PlayerSpawnPoint *currentPos); /* DreamSys__TryInstantTeleportLink */
-	/* +0x1DC */ bool (*tryStaircaseLink)(DreamSys *self, PlayerSpawnPoint *currentPos); /* DreamSys__TryStaircaseLink */
-	/* +0x1E0 */ s32 (*getCurrentStage)(DreamSys *self);                 /* DreamSys__GetCurrentStage */
-	/* +0x1E4 */ void (*processChunkChange)(DreamSys *self, void *entity, s32 effect); /* DreamSys__ProcessChunkChange: dispatchLinkCommand's grid (0x114) case */
-	/* +0x1E8 */ void (*instanceEffectsOnJournal)(DreamSys *self, void *entity, s32 effect); /* DreamSys__InstanceEffectsOnJournal: onActorLinkCommand's Entity (0x1F234) case */
-	/* +0x1EC */ void (*getPreviousDayMood)(DreamSys *self, MoodGraphPoint *target, bool unknown); /* DreamSys__GetPreviousDayMood */
-	/* +0x1F0 */ void (*initMoodContributors)(DreamSys *self, MoodGraphPoint *special); /* DreamSys__InitMoodContibutors */
-	/* +0x1F4 */ void (*logChunkMood)(DreamSys *self, PlayerSpawnPoint *currentPos); /* DreamSys__LogChunkMood */
-	/* +0x1F8 */ void (*logInstanceMood)(DreamSys *self, MoodGraphPoint *source); /* DreamSys__LogInstanceMood */
-	/* +0x1FC */ void (*updateDreamChart)(DreamSys *self, MoodGraphPoint *ret); /* DreamSys__UpdateDreamChart */
-	/* +0x200 */ DreamColors (*getDreamColor)(DreamSys *self);           /* DreamSys__GetDreamColor */
-	/* +0x204 */ void (*clearMoodGraph)(DreamSys *self, MoodGraphContributor *contributor); /* DreamSys__ClearMoodGraph */
-	/* +0x208 */ void (*logMood)(DreamSys *self, MoodGraphContributor *layer, MoodGraphPoint *mood); /* DreamSys__LogMood */
-	/* +0x20C */ void (*getMoodAverage)(DreamSys *self, MoodGraphContributor *layer, MoodGraphPoint *ret); /* DreamSys__GetMoodAverage */
-	/* +0x210 */ void (*calcUnlockScore)(DreamSys *self);                /* DreamSys__CalcUnlockScore */
-	/* +0x214 */ void (*addFlashback)(DreamSys *self, s32 stage, PlayerSpawnPoint *pos, s32 *angles, s32 unknown, s32 time, s32 day); /* DreamSys__AddFlashback */
-	/* +0x218 */ void (*flashbackSaving)(DreamSys *self, s32 arg1, s32 arg2); /* DreamSys__FlashbackSaving */
-	/* +0x21C */ void (*resetFlashbackList)(DreamSys *self);             /* DreamSys__ResetFlashbackList */
-	/* +0x220 */ void (*saveLinkSnapshot)(DreamSys *self);               /* DreamSys__SaveLinkSnapshot: coord2 and its param into the snapshot fields */
-	/* +0x224 */ void (*restoreLinkSnapshot)(DreamSys *self);            /* DreamSys__RestoreLinkSnapshot */
-	/* +0x228 */ s32 (*slot228)(DreamSys *self, s32 value);              /* DreamSys__func_5ba20: get/set; Class6D3C8__Class6D3C8 calls it */
-};                                   /* 139 slots, 0x22C bytes */
+    ACTOR_SLOTS(DreamSys, (DreamSys * self, struct LinkResource *arg1, s32 arg2, s32 arg3));
+    /* +0x0F0 */ s32 (*getSetFlashbackSession)(DreamSys *self, DreamColors *out,
+                                               s32 value); /* DreamSys__GetSetFlashbackSession: value < 0 writes the day's colour to *out */
+    /* +0x0F4 */ void (*setMoveOverride)(DreamSys *self, s32 value); /* DreamSys__SetMoveOverride */
+    /* +0x0F8 */ void (*resetLinkState)(DreamSys *self, s32 arg1, s32 arg2); /* DreamSys__ResetLinkState */
+    /* +0x0FC */ void (*blockMovement)(DreamSys *self); /* DreamSys__BlockMovement: movementBlocked = 1 */
+    /* +0x100 */ s32 (*getLinkCommandFlag)(DreamSys *self); /* DreamSys__GetLinkCommandFlag */
+    /* +0x104 */ s32 (*getSetDreamTimeLimit)(DreamSys *self, s32 time); /* DreamSys__GetSetDreamTimeLimit */
+    /* +0x108 */ s32 (*getDreamTimerScaled)(DreamSys *self); /* DreamSys__GetDreamTimerScaled: tick / 15 */
+    /* +0x10C */ void (*setSoundObj)(DreamSys *self, s32 value); /* DreamSys__SetSoundObj */
+    /* +0x110 */ void (*setViewport)(DreamSys *self, struct Viewport *value); /* DreamSys__SetViewport */
+    /* +0x114 */ void (*slot114)(DreamSys *self, s32 value); /* DreamSys__func_5938c: unk_0x64 = value */
+    /* +0x118 */ void (*updateTickState)(DreamSys *self);  /* DreamSys__UpdateTickState */
+    /* +0x11C */ void (*runTickCallbacks)(DreamSys *self); /* DreamSys__RunTickCallbacks */
+    /* +0x120 */ s32 (*projectPointAtDistance)(DreamSys *self, s32 *out, s32 dist, s32 *reference,
+                                               s32 tolerance); /* DreamSys__ProjectPointAtDistance */
+    /* +0x124 */ void (*slot124)(DreamSys *self); /* DreamSys__func_59590: unk_0x7C = 0 */
+    /* +0x128 */ void (*slot128)(DreamSys *self); /* DreamSys__func_59598: unk_0x78 = 0 */
+    /* +0x12C */ s32 (*slot12C)(DreamSys *self);  /* DreamSys__NoOpSlot12C */
+    /* +0x130 */ void (*clearTickCallbacks)(DreamSys *self, bool arg1); /* DreamSys__ClearTickCallbacks */
+    /* +0x134 */ void (*setTickCallbacks)(DreamSys *self, s32 arg1,
+                                          s32 arg2); /* DreamSys__SetTickCallbacks: selectCallback98(arg1), selectCallback80(arg2) */
+    /* +0x138 */ void (*selectCallback80)(DreamSys *self, s32 arg1); /* DreamSys__SelectCallback80 */
+    /* +0x13C */ void (*selectCallback98)(DreamSys *self, s32 arg1); /* DreamSys__SelectCallback98 */
+    /* +0x140 */ void (*stepLook)(DreamSys *self);                   /* DreamSys__StepLook */
+    /* +0x144 */ void (*stepLookOffset)(DreamSys *self);             /* DreamSys__StepLookOffset */
+    /* +0x148 */ void (*stepLookYaw)(DreamSys *self);                /* DreamSys__StepLookYaw */
+    /* +0x14C */ void (*slot14C)(DreamSys *self); /* DreamSys__NoOpSlot14C, empty; a callback_0x80 choice */
+    /* +0x150 */ void (*slot150)(DreamSys *self); /* DreamSys__NoOpSlot150, empty; a callback_0x80 choice */
+    /* +0x154 */ s32 (*tickMove)(DreamSys *self);                   /* DreamSys__TickMove */
+    /* +0x158 */ s32 (*tickMoveFree)(DreamSys *self);               /* DreamSys__TickMoveFree */
+    /* +0x15C */ s32 (*tickMoveForced)(DreamSys *self);             /* DreamSys__TickMoveForced */
+    /* +0x160 */ s32 (*tickMoveHeld)(DreamSys *self);               /* DreamSys__TickMoveHeld */
+    /* +0x164 */ s32 (*advanceMoveCycle)(DreamSys *self, s32 arg1); /* DreamSys__AdvanceMoveCycle */
+    /* +0x168 */ void (*startVoice)(DreamSys *self);                /* DreamSys__StartVoice */
+    /* +0x16C */ void (*stopVoice)(DreamSys *self);                 /* DreamSys__StopVoice */
+    /* +0x170 */ s32 (*applyMoveCommand)(DreamSys *self, s32 arg1); /* DreamSys__ApplyMoveCommand */
+    /* +0x174 */ void (*applyPendingTurn)(DreamSys *self);          /* DreamSys__ApplyPendingTurn */
+    /* +0x178 */ void (*tickDrift)(DreamSys *self);                 /* DreamSys__TickDrift */
+    /* +0x17C */ void (*stopDrift)(DreamSys *self, s32 arg1);       /* DreamSys__StopDrift */
+    /* +0x180 */ s32 (*getSetMoveMode)(DreamSys *self, s32 value);  /* DreamSys__GetSetMoveMode */
+    /* +0x184 */ void (*changeMoveMode)(DreamSys *self, s32 value); /* DreamSys__ChangeMoveMode */
+    /* +0x188 */ void (*restorePreviousMoveMode)(DreamSys *self); /* DreamSys__RestorePreviousMoveMode */
+    /* +0x18C */ void (*setGateFlags)(DreamSys *self, s32 a, s32 b, s32 c, s32 d); /* DreamSys__SetGateFlags */
+    /* +0x190 */ void (*setTickPeriod)(DreamSys *self, s32 value); /* DreamSys__SetTickPeriod */
+    /* +0x194 */ void (*soundCueCallback)(void *arg0, SoundCueCallbackArg *arg1); /* DreamSys__SoundCueCallback: only its VALUE is read (InitSoundCueSet's callback) */
+    /* +0x198 */ void (*initNewGame)(DreamSys *self);                    /* DreamSys__InitNewGame */
+    /* +0x19C */ void (*getSetScreenShake)(DreamSys *self, bool *value); /* DreamSys__GetSetScreenShake */
+    /* +0x1A0 */ s32 (*getCurrentDayAndYear)(DreamSys *self, s32 *outYear); /* DreamSys__GetCurrentDayAndYear */
+    /* +0x1A4 */ s32 (*advanceDay)(DreamSys *self);        /* DreamSys__AdvanceDay */
+    /* +0x1A8 */ void (*clearNewGameFlag)(DreamSys *self); /* DreamSys__ClearNewGameFlag */
+    /* +0x1AC */ s32 (*getNewGameFlag)(DreamSys *self);    /* DreamSys__GetNewGameFlag */
+    /* +0x1B0 */ s32 *(*getSaveBlock)(DreamSys *self, s32 *outSize); /* DreamSys__GetSaveBlock: &saveMagic; *outSize = 0x700 */
+    /* +0x1B4 */ s32 (*startDay)(DreamSys *self);               /* DreamSys__StartDay */
+    /* +0x1B8 */ s32 (*endDay)(DreamSys *self, s32 arg1);       /* DreamSys__EndDay */
+    /* +0x1BC */ CinematicCall (*getCinematic)(DreamSys *self); /* DreamSys__GetCinematic */
+    /* +0x1C0 */ void (*initSpawnLoc)(DreamSys *self);          /* DreamSys__InitSpawnLoc */
+    /* +0x1C4 */ void (*dynamicLink)(DreamSys *self);           /* DreamSys__DynamicLink */
+    /* +0x1C8 */ bool (*staticWallLink)(DreamSys *self, PlayerSpawnPoint *currentPos); /* DreamSys__StaticWallLink */
+    /* +0x1CC */ bool (*loadNextFlashback)(DreamSys *self, bool unknown); /* DreamSys__LoadNextFlashback */
+    /* +0x1D0 */ bool (*tryTunnelLink)(DreamSys *self, PlayerSpawnPoint *currentPos); /* DreamSys__TryTunnelLink */
+    /* +0x1D4 */ bool (*tryStageTimerLink)(DreamSys *self, PlayerSpawnPoint *currentPos); /* DreamSys__TryStageTimerLink */
+    /* +0x1D8 */ bool (*tryInstantTeleportLink)(DreamSys *self, PlayerSpawnPoint *currentPos); /* DreamSys__TryInstantTeleportLink */
+    /* +0x1DC */ bool (*tryStaircaseLink)(DreamSys *self, PlayerSpawnPoint *currentPos); /* DreamSys__TryStaircaseLink */
+    /* +0x1E0 */ s32 (*getCurrentStage)(DreamSys *self); /* DreamSys__GetCurrentStage */
+    /* +0x1E4 */ void (*processChunkChange)(DreamSys *self, void *entity,
+                                            s32 effect); /* DreamSys__ProcessChunkChange: dispatchLinkCommand's grid (0x114) case */
+    /* +0x1E8 */ void (*instanceEffectsOnJournal)(DreamSys *self, void *entity,
+                                                  s32 effect); /* DreamSys__InstanceEffectsOnJournal: onActorLinkCommand's Entity (0x1F234) case */
+    /* +0x1EC */ void (*getPreviousDayMood)(DreamSys *self, MoodGraphPoint *target,
+                                            bool unknown); /* DreamSys__GetPreviousDayMood */
+    /* +0x1F0 */ void (*initMoodContributors)(DreamSys *self, MoodGraphPoint *special); /* DreamSys__InitMoodContibutors */
+    /* +0x1F4 */ void (*logChunkMood)(DreamSys *self, PlayerSpawnPoint *currentPos); /* DreamSys__LogChunkMood */
+    /* +0x1F8 */ void (*logInstanceMood)(DreamSys *self, MoodGraphPoint *source); /* DreamSys__LogInstanceMood */
+    /* +0x1FC */ void (*updateDreamChart)(DreamSys *self, MoodGraphPoint *ret); /* DreamSys__UpdateDreamChart */
+    /* +0x200 */ DreamColors (*getDreamColor)(DreamSys *self); /* DreamSys__GetDreamColor */
+    /* +0x204 */ void (*clearMoodGraph)(DreamSys *self, MoodGraphContributor *contributor); /* DreamSys__ClearMoodGraph */
+    /* +0x208 */ void (*logMood)(DreamSys *self, MoodGraphContributor *layer,
+                                 MoodGraphPoint *mood); /* DreamSys__LogMood */
+    /* +0x20C */ void (*getMoodAverage)(DreamSys *self, MoodGraphContributor *layer,
+                                        MoodGraphPoint *ret); /* DreamSys__GetMoodAverage */
+    /* +0x210 */ void (*calcUnlockScore)(DreamSys *self);     /* DreamSys__CalcUnlockScore */
+    /* +0x214 */ void (*addFlashback)(DreamSys *self, s32 stage, PlayerSpawnPoint *pos, s32 *angles,
+                                      s32 unknown, s32 time, s32 day); /* DreamSys__AddFlashback */
+    /* +0x218 */ void (*flashbackSaving)(DreamSys *self, s32 arg1, s32 arg2); /* DreamSys__FlashbackSaving */
+    /* +0x21C */ void (*resetFlashbackList)(DreamSys *self); /* DreamSys__ResetFlashbackList */
+    /* +0x220 */ void (*saveLinkSnapshot)(DreamSys *self); /* DreamSys__SaveLinkSnapshot: coord2 and its param into the snapshot fields */
+    /* +0x224 */ void (*restoreLinkSnapshot)(DreamSys *self); /* DreamSys__RestoreLinkSnapshot */
+    /* +0x228 */ s32 (*slot228)(DreamSys *self, s32 value); /* DreamSys__func_5ba20: get/set; Class6D3C8__Class6D3C8 calls it */
+}; /* 139 slots, 0x22C bytes */
 
 /* reset (+0x040) as DreamSys__DreamSys calls it (see above). */
 typedef DreamSys *(*DreamSysResetRetFn)(DreamSys *self);
@@ -727,25 +744,26 @@ typedef DreamSys *(*DreamSysResetRetFn)(DreamSys *self);
  * through this cast. */
 typedef void (*DreamSysAttachToParentFn)(DreamSys *self, void *parent);
 
-
-typedef struct StageSpawn{
-	struct MapChunk chunk;
-	struct MapTile tile;
-	/* u8, not s8 (round 2026-09-08, GenerateInitialSpawn): retail reads it
+typedef struct StageSpawn {
+    struct MapChunk chunk;
+    struct MapTile tile;
+    /* u8, not s8 (round 2026-09-08, GenerateInitialSpawn): retail reads it
 	   with `lbu` -- it indexes SPAWN_POS_ADJUST, so must zero-extend. */
-	u8 adjustment;
-	s8 extra;
-}StageSpawn;
+    u8 adjustment;
+    s8 extra;
+} StageSpawn;
 
-typedef struct StaticLinkTrigger{
-	struct MapChunk chunk;
-	union TriggerTile{
-		struct MapTile axis;
-		s16 value;
-	} tile;
-	s8 stage;
-	s8 spawnpointIndex;
-}StaticLinkTrigger;
+typedef struct StaticLinkTrigger {
+    struct MapChunk chunk;
+
+    union TriggerTile {
+        struct MapTile axis;
+        s16 value;
+    } tile;
+
+    s8 stage;
+    s8 spawnpointIndex;
+} StaticLinkTrigger;
 
 /* Jumptable holding all of DreamSys "virtual" methods */
 extern DreamSysMethods DREAMSYS_METHODS;
@@ -754,15 +772,15 @@ extern s16 STAGE_TIME_LIMITS[];
 
 extern struct RelativePos SPAWN_POS_ADJUST[];
 
-extern StageSpawn* STAGE_SPAWNPOINTS[];
+extern StageSpawn *STAGE_SPAWNPOINTS[];
 /* Retyped u8 (round 2026-09-08, GenerateInitialSpawn): retail reads it with
    `lbu`, and the surrounding loop guard (`count != 0` implying `count > 0`,
    a single `beqz`) only holds if it can't be negative -- a signed `s8` here
    forces GCC to add a second `blez` check that retail does not have. */
 extern u8 LEN_STAGE_SPAWNPOINTS[];
 
-extern StageSpawn* STAGE_PERMALINK_SPAWNS[];
-extern StaticLinkTrigger* STAGE_PERMALINK_TRIGGERS[];
+extern StageSpawn *STAGE_PERMALINK_SPAWNS[];
+extern StaticLinkTrigger *STAGE_PERMALINK_TRIGGERS[];
 extern s8 LEN_STAGE_PERMALINK_TRIGGERS[];
 
 extern s16 SPECIAL_DAYS[];
@@ -789,7 +807,7 @@ extern s8 SPECIAL_COLORS[];
    function is its own real C body, only while it is still INCLUDE_ASM
    (round 2026-08-30-c note superseded). */
 extern s32 GetStaticSpawn(PlayerSpawnPoint *target, PlayerSpawnPoint *currentPos, s32 stage,
-                           s8 *triggerLens, StaticLinkTrigger **triggers, StageSpawn **spawns, s32 flag);
+                          s8 *triggerLens, StaticLinkTrigger **triggers, StageSpawn **spawns, s32 flag);
 
 /* Called by DreamSys__TryStageTimerLink as (&this->linkCoordinates, this->currentStage,
    currentPos, this->tick); result compared with `bltz` exactly like
@@ -797,7 +815,8 @@ extern s32 GetStaticSpawn(PlayerSpawnPoint *target, PlayerSpawnPoint *currentPos
    later in this unit's own ROM order -- this is a forward declaration, not a
    cross-unit prototype (the gp-relative blocker this was once filed under is
    resolved; see docs/match-reports/Test4StageTransition.md). */
-extern s32 Test4StageTransition(PlayerSpawnPoint *target, s32 stage, PlayerSpawnPoint *currentPos, s32 timer);
+extern s32 Test4StageTransition(PlayerSpawnPoint *target, s32 stage, PlayerSpawnPoint *currentPos,
+                                s32 timer);
 
 /* Called by DreamSys__TryStageTimerLink with NO arguments (the disassembly's call site has
    an empty delay slot and no a0-a3 setup); its return value is stored whole
@@ -850,17 +869,17 @@ extern s32 func_8005BFC4(void);
 /* Table triple for Test4TunnelLinks (round 2026-08-30-d), same roles as the
    STAGE_PERMALINK_* triple above but for tunnel links specifically. */
 extern s8 LEN_TUNNEL_TRIGGERS[];
-extern StaticLinkTrigger* TUNNEL_TRIGGERS[];
-extern StageSpawn* TUNNEL_SPAWNS[];
+extern StaticLinkTrigger *TUNNEL_TRIGGERS[];
+extern StageSpawn *TUNNEL_SPAWNS[];
 
 /* Table triple for Test4StaircaseNodes (round 2026-08-30-d). */
 extern s8 LEN_STAIRCASE_TRIGGERS[];
-extern StaticLinkTrigger* STAIRCASE_TRIGGERS[];
-extern StageSpawn* STAIRCASE_SPAWNS[];
+extern StaticLinkTrigger *STAIRCASE_TRIGGERS[];
+extern StageSpawn *STAIRCASE_SPAWNS[];
 
 /* This function might be called when the player hits a wall?
 It tries to do an static link first, then a dynamic one */
-void DreamSys__WallLink(DreamSys *this, void* unk_class_86aa0, int arg2);
+void DreamSys__WallLink(DreamSys *this, void *unk_class_86aa0, int arg2);
 
 /* @brief Sets the overall time limit for the dream and returns its previous value. */
 /* @param value The new time limit, in seconds. Negative values are stored as-is. */
@@ -927,7 +946,7 @@ void DreamSys__LogChunkMood(DreamSys *this, PlayerSpawnPoint *currentPos);
 
 /* @brief Logs the given mood point as an instance mood. */
 /* @param source Pointer to the mood to get logged. */
-void DreamSys__LogInstanceMood(DreamSys *this,MoodGraphPoint *source);
+void DreamSys__LogInstanceMood(DreamSys *this, MoodGraphPoint *source);
 
 /* @brief Calculates the current Overall Mood of the dream based on data from the contributors. */
 /* @param ret Pointer where the final graph point will be written to. */
@@ -949,13 +968,13 @@ void DreamSys__ClearMoodGraph(DreamSys *this, MoodGraphContributor *contributor)
 /* @brief "Logs" a given Mood Effect on the given Contributor. */
 /* @param layer The contributor that will recieve the mood. */
 /* @param mood The mood contribution to be logged. */
-void DreamSys__LogMood(DreamSys* this, MoodGraphContributor* layer, MoodGraphPoint* mood);
+void DreamSys__LogMood(DreamSys *this, MoodGraphContributor *layer, MoodGraphPoint *mood);
 
 /* @brief Calculates the average point of a given Contributor. */
 /* @param layer The MoodGraphContributor to be calculated. */
 /* @param ret Pointer where this contributor's average point will be written to. */
 /* @return To &ret, MoodPoint between (-9,-9) and (9,9). */
-void DreamSys__GetMoodAverage(DreamSys* this, MoodGraphContributor* layer, MoodGraphPoint* ret);
+void DreamSys__GetMoodAverage(DreamSys *this, MoodGraphContributor *layer, MoodGraphPoint *ret);
 
 /* @brief Turns the values of a given mood contributor axis into an useable average */
 /* @param lank The mood contribution that happened last, which recieves a boost in the code */
@@ -974,7 +993,8 @@ void DreamSys__CalcUnlockScore(DreamSys *this);
 /* @param unknown */
 /* @param time Time limit of the flashback */
 /* @param day Day number of the flashback */
-void DreamSys__AddFlashback(DreamSys *this, s32 stage, PlayerSpawnPoint* pos, s32 *angles, s32 unknown, s32 time, s32 day);
+void DreamSys__AddFlashback(DreamSys *this, s32 stage, PlayerSpawnPoint *pos, s32 *angles,
+                            s32 unknown, s32 time, s32 day);
 
 /* @brief Called by the Grey Man to "erase" your flashback log */
 void DreamSys__ResetFlashbackList(DreamSys *this);
@@ -989,7 +1009,6 @@ DreamSysMethods *Get_vtable_DreamSys(void);
  * "Calling into a function that is still INCLUDE_ASM in another unit is
  * fine" in docs/DECOMPILATION_LEARNINGS.md. */
 DreamSys *New_DreamSys(struct LinkResource *arg0, s32 arg1, s32 arg2);
-
 
 
 /* @brief Initializes the values that will be used by CalcNavigationScore. */

@@ -43,17 +43,21 @@ typedef struct CharSpriteMethods CharSpriteMethods;
 /* ScreenSprite's slots, then this class's own. `tools/classtable.py
  * gCharSpriteMethods --vs gScreenSpriteMethods` lists the overrides of the
  * inherited ones (CharSprite__CharSprite, CharSprite__Reset). */
+/* clang-format off */
 #define CHARSPRITE_SLOTS(Self, CtorParams)                                                         \
     SCREENSPRITE_SLOTS(Self, CtorParams);                                                          \
     /* +0x0C4 */ void (*setCell)(Self *self, u8 cell); /* CharSprite__SetCell; gTextRowMethods: TextRow__SetCellAt */ \
     /* +0x0C8 */ u8 (*getCell)(Self *self)             /* CharSprite__GetCell; gTextRowMethods: TextRow__NoOpGetCell (empty) */
+/* clang-format on */
 
+/* clang-format off */
 #define CHARSPRITE_FIELDS(Methods)                                                                 \
     SCREENSPRITE_FIELDS(Methods);                                                                  \
     /* +0x0A8 */ u8 cellIndex /* setCell stores it, getCell returns it. The object is 0xAC bytes (New_CharSprite) */
+/* clang-format on */
 
 struct CharSpriteMethods {
-    CHARSPRITE_SLOTS(CharSprite, (CharSprite *self, void *texture, u8 cell));
+    CHARSPRITE_SLOTS(CharSprite, (CharSprite * self, void *texture, u8 cell));
 };
 
 struct CharSprite {

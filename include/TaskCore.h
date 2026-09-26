@@ -79,19 +79,20 @@ typedef struct TaskCoreTarget TaskCoreTarget;
  * first argument; Class86B60 passes &D_80086D44). One slot per `names`
  * entry. */
 struct TaskCoreTarget {
-    /* +0x000 */ const char *path;      /* non-NULL: setTarget loads `handle` from it (New_TimImage) and releaseTarget releases that */
-    /* +0x004 */ BasicClass *handle;    /* New_TimImage(path), or the caller's own when path is NULL; the slot widgets' first argument */
-    /* +0x008 */ s32 unk8;              /* setState(5): setActiveSlot(unk8, 0) */
-    /* +0x00C */ s32 unkC;              /* tick: confirming this slot runs refreshViewValue */
+    /* +0x000 */ const char *path; /* non-NULL: setTarget loads `handle` from it (New_TimImage) and releaseTarget releases that */
+    /* +0x004 */ BasicClass *handle; /* New_TimImage(path), or the caller's own when path is NULL; the slot widgets' first argument */
+    /* +0x008 */ s32 unk8; /* setState(5): setActiveSlot(unk8, 0) */
+    /* +0x00C */ s32 unkC; /* tick: confirming this slot runs refreshViewValue */
     /* +0x010 */ u8 unselectedColor[3]; /* broadcastToSlots at state 5; the colour a slot or item loses focus to */
-    /* +0x013 */ u8 selectedColor[3];   /* setActiveSlot's colour for the new slot */
+    /* +0x013 */ u8 selectedColor[3]; /* setActiveSlot's colour for the new slot */
     /* +0x016 */ u8 pad16[2];
     /* +0x018 */ void **registrationSlots; /* NULL entries are the slots find{Next,Prev}FreeSlot stop at */
-    /* +0x01C */ char **names;          /* NULL-terminated; one New_TextRow widget per name */
-    /* +0x020 */ u8 *externalRecords;   /* 8 bytes a slot, updateSlotElements' position for each widget */
-    /* +0x024 */ void **unk24;          /* per slot: NULL, or the item-list record createSlotElements and the scroll methods read */
+    /* +0x01C */ char **names;             /* NULL-terminated; one New_TextRow widget per name */
+    /* +0x020 */ u8 *externalRecords; /* 8 bytes a slot, updateSlotElements' position for each widget */
+    /* +0x024 */ void **unk24; /* per slot: NULL, or the item-list record createSlotElements and the scroll methods read */
 };
 
+/* clang-format off */
 #define TASKCORE_SLOTS(Self, CtorParams)                                                           \
     INTERMEDIATEBASE_SLOTS(Self, CtorParams);                                                      \
     /* +0x06C */ void (*setFrameBound)(Self *self, s32 bound);   /* TaskCore__SetFrameBound: frameBound = bound * 20 (negative: kept) */ \
@@ -143,7 +144,9 @@ struct TaskCoreTarget {
     /* +0x118 */ void (*retreatSlotCursor)(Self *self);          /* TaskCore__RetreatSlotCursor */ \
     /* +0x11C */ void (*setSlotCursor)(Self *self, s32 cursor, s32 withSound); /* TaskCore__SetSlotCursor */ \
     /* +0x120 */ s32 (*getActiveSlotCount)(Self *self)           /* TaskCore__GetActiveSlotCount */
+/* clang-format on */
 
+/* clang-format off */
 #define TASKCORE_FIELDS(Methods)                                                                   \
     INTERMEDIATEBASE_FIELDS(Methods);                                                              \
     /* +0x028 */ s32 unk28;             /* reset: 3; onInit: the viewport's +0x048 (Viewport__SetOtLength) */ \
@@ -178,9 +181,11 @@ struct TaskCoreTarget {
     /* +0x099 */ u8 pad099[3];                                                                     \
     /* +0x09C */ void (*viewCallback)(void *ctx); /* setCallback; refreshViewValue calls it */     \
     /* +0x0A0 */ void *viewCallbackCtx  /* the object is 0xA4 bytes: StreamTask's own fields start at +0x0A4 */
+/* clang-format on */
 
 struct TaskCoreMethods {
-    TASKCORE_SLOTS(TaskCore, (TaskCore *self, TaskCoreTarget *target, char *soundBankPath, BasicClass *sound));
+    TASKCORE_SLOTS(TaskCore,
+                   (TaskCore * self, TaskCoreTarget *target, char *soundBankPath, BasicClass *sound));
 };
 
 struct TaskCore {

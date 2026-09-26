@@ -51,10 +51,10 @@ typedef struct LinkResource LinkResource;
 typedef struct LinkResourceMethods LinkResourceMethods;
 
 struct LinkResourceMethods {
-    CLASS6D430_SLOTS(LinkResource, (LinkResource *self, struct Src6F240 *src));
+    CLASS6D430_SLOTS(LinkResource, (LinkResource * self, struct Src6F240 *src));
     /* +0x07C */ struct TmdObject *(*getTmdObject)(LinkResource *self, s32 index); /* LinkResource__GetTmdObject */
-    /* +0x080 */ struct TmdModel *(*getModel)(LinkResource *self, s32 index);      /* LinkResource__GetModel */
-    /* +0x084 */ void (*slot84)(void);                                            /* LinkResource__NoOp */
+    /* +0x080 */ struct TmdModel *(*getModel)(LinkResource *self, s32 index); /* LinkResource__GetModel */
+    /* +0x084 */ void (*slot84)(void); /* LinkResource__NoOp */
 };
 
 struct LinkResource {

@@ -62,9 +62,9 @@ typedef struct BgLayerRgb {
 } BgLayerRgb;
 
 struct BgLayerMethods {
-    CLASS6B5CC_SLOTS(BgLayer, (BgLayer *self, struct TileMap *src, s32 mode));
+    CLASS6B5CC_SLOTS(BgLayer, (BgLayer * self, struct TileMap *src, s32 mode));
     /* +0x0B8 */ void (*setColor)(BgLayer *self, s32 enable, BgLayerRgb *rgb); /* BgLayer__SetColor */
-    /* +0x0BC */ void (*slotBC)(void);                                         /* BgLayer__NoOp, empty; no known caller */
+    /* +0x0BC */ void (*slotBC)(void); /* BgLayer__NoOp, empty; no known caller */
 };
 
 /* BgLayer__Reset's own parameter list, which the inherited +0x040 slot does
@@ -82,12 +82,12 @@ struct BgLayer {
     /* +0x052 */ s16 scrolly;
     /* +0x054 */ BgLayerRgb color; /* GsBG r, g, b: gBgLayerDefaultColor at reset; setColor */
     /* +0x057 */ u8 pad57;
-    /* +0x058 */ void *map;        /* GsBG.map: the source's GsMAP (&src->map, +0x02C) */
-    /* +0x05C */ s16 mx;           /* the pivot: w / 2, h / 2 */
+    /* +0x058 */ void *map; /* GsBG.map: the source's GsMAP (&src->map, +0x02C) */
+    /* +0x05C */ s16 mx;    /* the pivot: w / 2, h / 2 */
     /* +0x05E */ s16 my;
-    /* +0x060 */ s16 scalex;       /* 20.12; 0x1000 at reset, clamped to 30000 by updateScale */
+    /* +0x060 */ s16 scalex; /* 20.12; 0x1000 at reset, clamped to 30000 by updateScale */
     /* +0x062 */ s16 scaley;
-    /* +0x064 */ s32 rotate;       /* GsBG.rotate, 20.12; updateRotation */
+    /* +0x064 */ s32 rotate; /* GsBG.rotate, 20.12; updateRotation */
 };
 
 extern BgLayerMethods D_8006F2C4;

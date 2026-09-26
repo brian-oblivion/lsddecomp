@@ -39,19 +39,23 @@ typedef struct Class879C4Methods Class879C4Methods;
  * inherited ones (Class879C4__Class879C4, Class879C4__SetVariantClut at
  * reset, Class879C4__UpdateScale, Class879C4__Update). The three own slots
  * hold empty functions and nothing calls them. */
+/* clang-format off */
 #define CLASS879C4_SLOTS(Self, CtorParams)                                                         \
     SPRITE_SLOTS(Self, CtorParams);                                                                \
     /* +0x0BC */ void (*slotBC)(void); /* Class879C4__func_57f40, empty; never called */           \
     /* +0x0C0 */ void (*slotC0)(void); /* Class879C4__func_57f48, empty; never called */           \
     /* +0x0C4 */ void (*slotC4)(void)  /* Class879C4__func_57f50, empty; never called */
+/* clang-format on */
 
+/* clang-format off */
 #define CLASS879C4_FIELDS(Methods)                                                                 \
     SPRITE_FIELDS(Methods);                                                                        \
     /* +0x0A0 */ s32 variant; /* SetVariantClut: the ctor's first argument, 0 or 1 */             \
     /* +0x0A4 */ s32 unkA4    /* zeroed by the ctor; no other accessor. The object is 0xA8 bytes (New_Class879C4) */
+/* clang-format on */
 
 struct Class879C4Methods {
-    CLASS879C4_SLOTS(Class879C4, (Class879C4 *self, s32 variant, void *arg2, void *texture));
+    CLASS879C4_SLOTS(Class879C4, (Class879C4 * self, s32 variant, void *arg2, void *texture));
 };
 
 struct Class879C4 {

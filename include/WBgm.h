@@ -43,29 +43,30 @@ typedef struct WBgmMethods WBgmMethods;
 
 /* BasicClass's slots, then this class's own, named for their occupants. */
 struct WBgmMethods {
-    BASICCLASS_SLOTS(WBgm, (WBgm *self, char *vabPath, char *seqPath, s32 autoPlay)); /* WBgm__WBgm */
-    /* +0x040 */ void (*update)(WBgm *self, DrawSystem *sender, s32 event); /* WBgm__Update; onNotify's DrawSystem case */
-    /* +0x044 */ void (*play)(WBgm *self);                       /* WBgm__Play */
-    /* +0x048 */ void (*stop)(WBgm *self);                       /* WBgm__Stop: SsSeqStop + SsSeqClose */
-    /* +0x04C */ void (*pause)(WBgm *self);                      /* WBgm__Pause */
-    /* +0x050 */ void (*resume)(WBgm *self);                     /* WBgm__Resume */
-    /* +0x054 */ void (*setVol)(WBgm *self, s16 left, s16 right); /* WBgm__SetVol */
+    BASICCLASS_SLOTS(WBgm, (WBgm * self, char *vabPath, char *seqPath, s32 autoPlay)); /* WBgm__WBgm */
+    /* +0x040 */ void (*update)(WBgm *self, DrawSystem *sender,
+                                s32 event);  /* WBgm__Update; onNotify's DrawSystem case */
+    /* +0x044 */ void (*play)(WBgm *self);   /* WBgm__Play */
+    /* +0x048 */ void (*stop)(WBgm *self);   /* WBgm__Stop: SsSeqStop + SsSeqClose */
+    /* +0x04C */ void (*pause)(WBgm *self);  /* WBgm__Pause */
+    /* +0x050 */ void (*resume)(WBgm *self); /* WBgm__Resume */
+    /* +0x054 */ void (*setVol)(WBgm *self, s16 left, s16 right);   /* WBgm__SetVol */
     /* +0x058 */ void (*crescendo)(WBgm *self, s16 vol, s32 scale); /* WBgm__Crescendo */
-    /* +0x05C */ void (*setSeq)(WBgm *self, char *seqPath);      /* WBgm__SetSeq; NULL only drops the old one */
-    /* +0x060 */ void (*setVab)(WBgm *self, char *vabPath);      /* WBgm__SetVab; NULL only drops the old one */
+    /* +0x05C */ void (*setSeq)(WBgm *self, char *seqPath); /* WBgm__SetSeq; NULL only drops the old one */
+    /* +0x060 */ void (*setVab)(WBgm *self, char *vabPath); /* WBgm__SetVab; NULL only drops the old one */
 };
 
 struct WBgm {
     BASICCLASS_FIELDS(WBgmMethods);
-    /* +0x00C */ VabStreamObj *vab;   /* New_VabStreamObj(setVab's path) */
+    /* +0x00C */ VabStreamObj *vab; /* New_VabStreamObj(setVab's path) */
     /* +0x010 */ Class6EED8 *seqData; /* New_Class6EED8(setSeq's path): the SEQ file, SsSeqOpen'd from its buffer once loaded */
-    /* +0x014 */ s16 seqId;           /* SsSeqOpen's result; every SsSeq* call's access number */
+    /* +0x014 */ s16 seqId;             /* SsSeqOpen's result; every SsSeq* call's access number */
     /* +0x016 */ u8 pad16[0x1A - 0x16]; /* no accessor in the class's methods */
-    /* +0x01A */ u16 openState;       /* 0 idle, 1 waiting for both loads, 2 opened (HandleMonitorEvent); stop resets it to 0 */
+    /* +0x01A */ u16 openState; /* 0 idle, 1 waiting for both loads, 2 opened (HandleMonitorEvent); stop resets it to 0 */
     /* +0x01C */ u16 paused;
     /* +0x01E */ u16 playing;
-    /* +0x020 */ s32 autoPlay;        /* the ctor's argument: play as soon as the SEQ opens */
-};                                    /* 0x24 bytes: New_WBgm */
+    /* +0x020 */ s32 autoPlay; /* the ctor's argument: play as soon as the SEQ opens */
+}; /* 0x24 bytes: New_WBgm */
 
 extern WBgmMethods gWBgmMethods;
 extern WBgmMethods *Get_vtable_WBgm(void); /* returns &gWBgmMethods */

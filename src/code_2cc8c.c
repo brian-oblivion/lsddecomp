@@ -46,34 +46,32 @@
 #include "VabStreamObj.h"
 #include "BgLayer.h"
 
-void TaskCore__OnPadEvent(TaskCore *self, BasicClass *sender, s32 event)
-{
+void TaskCore__OnPadEvent(TaskCore *self, BasicClass *sender, s32 event) {
     TaskCoreMethods *methods;
 
     methods = self->methods;
     if (self->inputMode != 0) {
         switch (event) {
-        case 0x12:
-            methods->onPadPrev(self);
-            break;
-        case 0x13:
-            methods->onPadNext(self);
-            break;
-        case 0x21:
-            methods->onPad21(self);
-            break;
-        case 0x17:
-            methods->onPadCancel(self);
-            break;
-        case 0x19:
-            methods->onPadConfirm(self);
-            break;
+            case 0x12:
+                methods->onPadPrev(self);
+                break;
+            case 0x13:
+                methods->onPadNext(self);
+                break;
+            case 0x21:
+                methods->onPad21(self);
+                break;
+            case 0x17:
+                methods->onPadCancel(self);
+                break;
+            case 0x19:
+                methods->onPadConfirm(self);
+                break;
         }
     }
 }
 
-void TaskCore__Update(TaskCore *self, BasicClass *sender, s32 event)
-{
+void TaskCore__Update(TaskCore *self, BasicClass *sender, s32 event) {
     TaskCoreMethods *methods;
 
     methods = self->methods;
@@ -87,80 +85,77 @@ void TaskCore__Update(TaskCore *self, BasicClass *sender, s32 event)
         }
     }
     switch (self->state) {
-    case 2:
-        methods->setState(self, 4);
-        break;
-    case 4:
-        methods->tickFadeCallback(self);
-        break;
-    case 7:
-        methods->tickFadeOutCallback(self);
-        break;
-    case 8:
-        methods->setState(self, 3);
-        break;
+        case 2:
+            methods->setState(self, 4);
+            break;
+        case 4:
+            methods->tickFadeCallback(self);
+            break;
+        case 7:
+            methods->tickFadeOutCallback(self);
+            break;
+        case 8:
+            methods->setState(self, 3);
+            break;
     }
 }
 
-void TaskCore__SetState(TaskCore *self, s32 state)
-{
+void TaskCore__SetState(TaskCore *self, s32 state) {
     TaskCoreMethods *methods;
 
     methods = self->methods;
     Get_vtable_IntermediateBase()->setState((IntermediateBase *)self, state);
     switch (state) {
-    case 5:
-        methods->broadcastToSlots(self, self->target->unselectedColor);
-        methods->setActiveSlot(self, self->target->unk8, 0);
-        self->frameCounter = 0;
-        self->inputMode = 1;
-        break;
-    case 6:
-        self->result = 1;
-        methods->refreshViewValue(self);
-        break;
-    case 4:
-    case 7:
-        self->frameCounter = 0;
-        self->inputMode = 0;
-        break;
-    case 8:
-        self->frameCounter = 0;
-        break;
-    case 9:
-    case 0xA:
-    case 0xB:
-    case 0xE:
-    case 0xF:
-    case 0x10:
-    case 0x11:
-        self->state = 5;
-        self->frameCounter = 0;
-        switch (state) {
+        case 5:
+            methods->broadcastToSlots(self, self->target->unselectedColor);
+            methods->setActiveSlot(self, self->target->unk8, 0);
+            self->frameCounter = 0;
+            self->inputMode = 1;
+            break;
+        case 6:
+            self->result = 1;
+            methods->refreshViewValue(self);
+            break;
+        case 4:
+        case 7:
+            self->frameCounter = 0;
+            self->inputMode = 0;
+            break;
+        case 8:
+            self->frameCounter = 0;
+            break;
+        case 9:
+        case 0xA:
         case 0xB:
-            methods->tick(self);
-            break;
+        case 0xE:
         case 0xF:
-            methods->commitElementScroll(self);
-            break;
+        case 0x10:
         case 0x11:
-            methods->cancelElementScroll(self);
+            self->state = 5;
+            self->frameCounter = 0;
+            switch (state) {
+                case 0xB:
+                    methods->tick(self);
+                    break;
+                case 0xF:
+                    methods->commitElementScroll(self);
+                    break;
+                case 0x11:
+                    methods->cancelElementScroll(self);
+                    break;
+            }
             break;
-        }
-        break;
     }
 }
 
-void TaskCore__SetFrameBound(TaskCore *self, s32 bound)
-{
+void TaskCore__SetFrameBound(TaskCore *self, s32 bound) {
     self->frameBound = bound;
     if (bound >= 0) {
         self->frameBound = bound * 20;
     }
 }
 
-void TaskCore__PlaySound(TaskCore *self, s32 tone)
-{
+void TaskCore__PlaySound(TaskCore *self, s32 tone) {
     VabStreamObj *sound;
 
     sound = (VabStreamObj *)self->sound;
@@ -169,16 +164,14 @@ void TaskCore__PlaySound(TaskCore *self, s32 tone)
     }
 }
 
-void TaskCore__func_8003C7F4(TaskCore *self)
-{
+void TaskCore__func_8003C7F4(TaskCore *self) {
     if (self->target != NULL) {
         self->methods->playSound(self, 0x10);
         self->methods->setState(self, 0xA);
     }
 }
 
-void TaskCore__OnPadConfirm(TaskCore *self)
-{
+void TaskCore__OnPadConfirm(TaskCore *self) {
     s32 reason;
 
     if (self->target != NULL) {
@@ -191,16 +184,14 @@ void TaskCore__OnPadConfirm(TaskCore *self)
     }
 }
 
-void TaskCore__OnPadCancel(TaskCore *self)
-{
+void TaskCore__OnPadCancel(TaskCore *self) {
     if (self->target != NULL && self->inputMode != 1) {
         self->methods->playSound(self, 0x10);
         self->methods->setState(self, 0x11);
     }
 }
 
-void TaskCore__OnPadPrev(TaskCore *self)
-{
+void TaskCore__OnPadPrev(TaskCore *self) {
     void (*handler)(TaskCore *self);
 
     if (self->target == NULL) {
@@ -216,8 +207,7 @@ void TaskCore__OnPadPrev(TaskCore *self)
     handler(self);
 }
 
-void TaskCore__OnPadNext(TaskCore *self)
-{
+void TaskCore__OnPadNext(TaskCore *self) {
     void (*handler)(TaskCore *self);
 
     if (self->target == NULL) {
@@ -233,8 +223,7 @@ void TaskCore__OnPadNext(TaskCore *self)
     handler(self);
 }
 
-void TaskCore__Tick(TaskCore *self)
-{
+void TaskCore__Tick(TaskCore *self) {
     TaskCoreTarget *target;
     s32 idx;
 
@@ -247,66 +236,61 @@ void TaskCore__Tick(TaskCore *self)
     }
 }
 
-void TaskCore__RefreshViewValue(TaskCore *self)
-{
+void TaskCore__RefreshViewValue(TaskCore *self) {
     if (self->viewCallback != NULL) {
         self->viewCallback(self->viewCallbackCtx);
     }
     self->methods->setState(self, 7);
 }
 
-void TaskCore__SetCallback(TaskCore *self, void (*callback)(void *ctx), void *ctx)
-{
+void TaskCore__SetCallback(TaskCore *self, void (*callback)(void *ctx), void *ctx) {
     self->viewCallback = callback;
     self->viewCallbackCtx = ctx;
 }
 
-void TaskCore__SetFadeCallbackEnabled(TaskCore *self, s32 enable)
-{
+void TaskCore__SetFadeCallbackEnabled(TaskCore *self, s32 enable) {
     TaskCoreMethods *methods;
 
     methods = self->methods;
     switch (enable) {
-    case 0:
-        self->fadeInCallback = NULL;
-        break;
-    case 1:
-        self->fadeInCallback = methods->tickColorFade;
-        break;
+        case 0:
+            self->fadeInCallback = NULL;
+            break;
+        case 1:
+            self->fadeInCallback = methods->tickColorFade;
+            break;
     }
 }
 
-void TaskCore__SetFadeOutCallbackEnabled(TaskCore *self, s32 enable)
-{
+void TaskCore__SetFadeOutCallbackEnabled(TaskCore *self, s32 enable) {
     TaskCoreMethods *methods;
 
     methods = self->methods;
     switch (enable) {
-    case 0:
-        self->fadeOutCallback = NULL;
-        break;
-    case 1:
-        self->fadeOutCallback = methods->tickFadeColor;
-        break;
+        case 0:
+            self->fadeOutCallback = NULL;
+            break;
+        case 1:
+            self->fadeOutCallback = methods->tickFadeColor;
+            break;
     }
 }
 
-typedef struct { s8 r, g, b; } RGB8003CB68;
+typedef struct {
+    s8 r, g, b;
+} RGB8003CB68;
 
-void TaskCore__SetColors(TaskCore *self, u8 *a1, u8 *a2, u8 *a3)
-{
+void TaskCore__SetColors(TaskCore *self, u8 *a1, u8 *a2, u8 *a3) {
     *(RGB8003CB68 *)self->baseColor = *(RGB8003CB68 *)a1;
     *(RGB8003CB68 *)self->unk93 = *(RGB8003CB68 *)a2;
     *(RGB8003CB68 *)self->unk96 = *(RGB8003CB68 *)a3;
 }
 
-void TaskCore__SetFadeRate(TaskCore *self, s32 rate)
-{
+void TaskCore__SetFadeRate(TaskCore *self, s32 rate) {
     self->fadeRate = rate;
 }
 
-s32 TaskCore__TickFadeCallback(TaskCore *self)
-{
+s32 TaskCore__TickFadeCallback(TaskCore *self) {
     s32 result;
 
     result = 1;
@@ -319,8 +303,7 @@ s32 TaskCore__TickFadeCallback(TaskCore *self)
     return result;
 }
 
-s32 TaskCore__TickColorFade(TaskCore *self)
-{
+s32 TaskCore__TickColorFade(TaskCore *self) {
     s32 prod;
     u8 buffer[3];
 
@@ -333,8 +316,7 @@ s32 TaskCore__TickColorFade(TaskCore *self)
     return (u8)prod >= 0x81;
 }
 
-s32 TaskCore__TickFadeOutCallback(TaskCore *self)
-{
+s32 TaskCore__TickFadeOutCallback(TaskCore *self) {
     s32 result;
 
     result = 1;

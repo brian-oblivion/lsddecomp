@@ -32,8 +32,7 @@ extern char *strcpy(char *dest, char *src);
  * site, and two call-site typings of one function cannot share a header. */
 extern char *DecodeFullWidthSjis(char *dest, char *src);
 
-TextEntry *New_TextEntry(char *text, s32 mode)
-{
+TextEntry *New_TextEntry(char *text, s32 mode) {
     TextEntry *self;
 
     self = BMemPMgrAlloc(0x4C);
@@ -55,8 +54,7 @@ extern s32 strlen(char *s);
  * inline loop below has to be literal source, not a call). */
 extern u8 *gNameCharTable;
 
-void TextEntry__TextEntry(TextEntry *self, char *arg1, s32 arg2)
-{
+void TextEntry__TextEntry(TextEntry *self, char *arg1, s32 arg2) {
     u8 *p;
     s32 count;
 
@@ -77,21 +75,18 @@ void TextEntry__TextEntry(TextEntry *self, char *arg1, s32 arg2)
     self->methods->setText(self, arg1, arg2);
 }
 
-void TextEntry__ClearChildRefs(TextEntry *self)
-{
+void TextEntry__ClearChildRefs(TextEntry *self) {
     self->childType2 = NULL;
     self->childType5 = NULL;
     self->panelSprite = NULL;
 }
 
-void TextEntry__Finalize(TextEntry *self)
-{
+void TextEntry__Finalize(TextEntry *self) {
     BMemPMgrFree(self->editBuf);
     Get_vtable_BasicClass()->finalize((BasicClass *)self);
 }
 
-void TextEntry__AddChild(TextEntry *self, void *arg1)
-{
+void TextEntry__AddChild(TextEntry *self, void *arg1) {
     s32 tag;
     s32 mask;
 
@@ -107,8 +102,7 @@ void TextEntry__AddChild(TextEntry *self, void *arg1)
     }
 }
 
-void TextEntry__RemoveChild(TextEntry *self, void *arg1)
-{
+void TextEntry__RemoveChild(TextEntry *self, void *arg1) {
     s32 tag;
     s32 mask;
 
@@ -124,16 +118,14 @@ void TextEntry__RemoveChild(TextEntry *self, void *arg1)
     }
 }
 
-void TextEntry__RemoveAllChildren(TextEntry *self)
-{
+void TextEntry__RemoveAllChildren(TextEntry *self) {
     self->childType2 = NULL;
     self->childType5 = NULL;
     self->panelSprite = NULL;
     Get_vtable_BasicClass()->removeAllChildren((BasicClass *)self);
 }
 
-void TextEntry__OnNotify(TextEntry *self, void *arg1, s32 arg2)
-{
+void TextEntry__OnNotify(TextEntry *self, void *arg1, s32 arg2) {
     s32 tag;
     s32 mask;
 
@@ -148,8 +140,7 @@ void TextEntry__OnNotify(TextEntry *self, void *arg1, s32 arg2)
     }
 }
 
-void TextEntry__SetText(TextEntry *self, char *arg1, s32 mode)
-{
+void TextEntry__SetText(TextEntry *self, char *arg1, s32 mode) {
     self->mode = mode;
     self->textBuf = arg1;
     self->cursorIndex = 0;
@@ -170,18 +161,17 @@ void TextEntry__SetText(TextEntry *self, char *arg1, s32 mode)
  */
 extern char *BuildFileName(char *dest, char *arg1, char *arg2, char *arg3);
 
-extern const char sStrComInput[]; /* "COMINPUT" */
-extern const char sStrFontIcon[]; /* "FONTICON" */
+extern const char sStrComInput[];    /* "COMINPUT" */
+extern const char sStrFontIcon[];    /* "FONTICON" */
 extern const char sCardPathPrefix[]; /* "CARD\\" */
-extern const char sTimExt[]; /* ".TIM" */
+extern const char sTimExt[];         /* ".TIM" */
 extern s32 D_80086F7C; /* 3 words, New_ScreenSprite's rect: a SpriteRect {0, 0, 224, 120} */
 extern s32 D_8008AAC8; /* opaque block, slotB8's arg1, address-only here */
 extern s32 D_8008AACC; /* panelSprite's attachToParent position, address-only here */
 extern s32 D_8008AAD4; /* textRow's slot4C position, address-only here */
 extern s32 D_8008AADC; /* cursorSprite's attachToParent position; class_3bb8c_j reads its x */
 
-void TextEntry__LoadCardResources(TextEntry *self, void *arg1)
-{
+void TextEntry__LoadCardResources(TextEntry *self, void *arg1) {
     char path[0x20];
     const char *dir;
     const char *ext;
@@ -202,7 +192,8 @@ void TextEntry__LoadCardResources(TextEntry *self, void *arg1)
     ((TimImageUploadFn)handle1->methods->slot78)(handle1);
     self->panelSprite = New_ScreenSprite(handle1, (SpriteRect *)&D_80086F7C, 0);
     handle1->methods->release(handle1);
-    self->panelSprite->methods->attachToParent(self->panelSprite, (Class6B5CC *)arg1, (Vec3_d294 *)&D_8008AACC);
+    self->panelSprite->methods->attachToParent(self->panelSprite, (Class6B5CC *)arg1,
+                                               (Vec3_d294 *)&D_8008AACC);
 
     handle2 = New_TimImage(BuildFileName(path, sStrFontIcon, dir, ext));
     ((TimImageUploadFn)handle2->methods->slot78)(handle2);
@@ -211,11 +202,11 @@ void TextEntry__LoadCardResources(TextEntry *self, void *arg1)
     handle2->methods->release(handle2);
     self->textRow->methods->slot4C(self->textRow, arg1, (void *)&D_8008AAD4);
     self->textRow->methods->slotB8(self->textRow, (void *)&D_8008AAC8);
-    self->cursorSprite->methods->attachToParent(self->cursorSprite, (Class6B5CC *)arg1, (Vec3_d294 *)&D_8008AADC);
+    self->cursorSprite->methods->attachToParent(self->cursorSprite, (Class6B5CC *)arg1,
+                                                (Vec3_d294 *)&D_8008AADC);
 }
 
-void TextEntry__ReleaseCardResources(TextEntry *self)
-{
+void TextEntry__ReleaseCardResources(TextEntry *self) {
     if (self->panelSprite != NULL) {
         self->panelSprite = self->panelSprite->methods->release(self->panelSprite);
         self->textRow->methods->release(self->textRow);
@@ -223,8 +214,7 @@ void TextEntry__ReleaseCardResources(TextEntry *self)
     }
 }
 
-void TextEntry__AttachTarget(TextEntry *self, void *arg1, void *arg2, TargetObj86ED0 *arg3)
-{
+void TextEntry__AttachTarget(TextEntry *self, void *arg1, void *arg2, TargetObj86ED0 *arg3) {
     self->methods->addChild(self, arg1);
     self->methods->addChild(self, arg2);
     self->target = arg3;
@@ -232,34 +222,31 @@ void TextEntry__AttachTarget(TextEntry *self, void *arg1, void *arg2, TargetObj8
     self->altCommands = 0;
 }
 
-void TextEntry__DetachTarget(TextEntry *self)
-{
+void TextEntry__DetachTarget(TextEntry *self) {
     self->methods->removeChild(self, self->childType2);
     self->methods->removeChild(self, self->childType5);
     self->target = NULL;
 }
 
-void TextEntry__SetState(TextEntry *self, s32 arg1)
-{
+void TextEntry__SetState(TextEntry *self, s32 arg1) {
     self->closeTickCount = 0;
     if (arg1 < 2) {
         return;
     }
     switch (arg1) {
-    case 2:
-    case 3:
-        self->methods->removeChild(self, self->childType2);
-        self->methods->releaseCardResources(self);
-        self->closeState = arg1;
-        break;
-    case 4:
-        self->methods->notifyParents(self, self->closeState);
-        break;
+        case 2:
+        case 3:
+            self->methods->removeChild(self, self->childType2);
+            self->methods->releaseCardResources(self);
+            self->closeState = arg1;
+            break;
+        case 4:
+            self->methods->notifyParents(self, self->closeState);
+            break;
     }
 }
 
-void TextEntry__TickState(TextEntry *self)
-{
+void TextEntry__TickState(TextEntry *self) {
     s32 tag;
     s32 old;
 
@@ -286,86 +273,84 @@ void TextEntry__TickState(TextEntry *self)
  * call site). */
 extern void EncodeFullWidthSjis(char *dest, char *src);
 
-void TextEntry__HandleCommand(TextEntry *self, void *arg1, s32 arg2)
-{
+void TextEntry__HandleCommand(TextEntry *self, void *arg1, s32 arg2) {
     switch (arg2) {
-    default:
-        return;
-    case 25:
-        if (self->mode == 1) {
-            EncodeFullWidthSjis(self->textBuf, self->editBuf);
-        } else {
-            strcpy(self->textBuf, self->editBuf);
-        }
-        self->methods->notifyTarget(self, 0x10);
-        self->methods->setState(self, 2);
-        return;
-    case 23:
-        self->methods->notifyTarget(self, 0x10);
-        self->methods->setState(self, 3);
-        return;
-    case 32:
-        self->methods->resetAllChars(self);
-        return;
-    case 31:
-        self->methods->resetChar(self);
-        return;
-    case 28:
-        self->methods->toggleAltCommands(self);
-        return;
-    case 21:
-        if (self->altCommands != 0) {
+        default:
             return;
-        }
-        self->methods->moveCursorRight(self);
-        return;
-    case 5:
-        if (self->altCommands == 0) {
+        case 25:
+            if (self->mode == 1) {
+                EncodeFullWidthSjis(self->textBuf, self->editBuf);
+            } else {
+                strcpy(self->textBuf, self->editBuf);
+            }
+            self->methods->notifyTarget(self, 0x10);
+            self->methods->setState(self, 2);
             return;
-        }
-        self->methods->moveCursorRight(self);
-        return;
-    case 20:
-        if (self->altCommands != 0) {
+        case 23:
+            self->methods->notifyTarget(self, 0x10);
+            self->methods->setState(self, 3);
             return;
-        }
-        self->methods->moveCursorLeft(self);
-        return;
-    case 4:
-        if (self->altCommands == 0) {
+        case 32:
+            self->methods->resetAllChars(self);
             return;
-        }
-        self->methods->moveCursorLeft(self);
-        return;
-    case 18:
-        if (self->altCommands != 0) {
+        case 31:
+            self->methods->resetChar(self);
             return;
-        }
-        self->methods->nextChar(self);
-        return;
-    case 2:
-        if (self->altCommands == 0) {
+        case 28:
+            self->methods->toggleAltCommands(self);
             return;
-        }
-        self->methods->nextChar(self);
-        return;
-    case 19:
-        if (self->altCommands == 0) {
-            goto slot94Call;
-        }
-        return;
-    case 3:
-        if (self->altCommands == 0) {
+        case 21:
+            if (self->altCommands != 0) {
+                return;
+            }
+            self->methods->moveCursorRight(self);
             return;
-        }
-slot94Call:
-        self->methods->prevChar(self);
-        return;
+        case 5:
+            if (self->altCommands == 0) {
+                return;
+            }
+            self->methods->moveCursorRight(self);
+            return;
+        case 20:
+            if (self->altCommands != 0) {
+                return;
+            }
+            self->methods->moveCursorLeft(self);
+            return;
+        case 4:
+            if (self->altCommands == 0) {
+                return;
+            }
+            self->methods->moveCursorLeft(self);
+            return;
+        case 18:
+            if (self->altCommands != 0) {
+                return;
+            }
+            self->methods->nextChar(self);
+            return;
+        case 2:
+            if (self->altCommands == 0) {
+                return;
+            }
+            self->methods->nextChar(self);
+            return;
+        case 19:
+            if (self->altCommands == 0) {
+                goto slot94Call;
+            }
+            return;
+        case 3:
+            if (self->altCommands == 0) {
+                return;
+            }
+        slot94Call:
+            self->methods->prevChar(self);
+            return;
     }
 }
 
-void TextEntry__NotifyTarget(TextEntry *self, s32 arg1)
-{
+void TextEntry__NotifyTarget(TextEntry *self, s32 arg1) {
     TargetObj86ED0 *target;
 
     target = self->target;
@@ -374,8 +359,7 @@ void TextEntry__NotifyTarget(TextEntry *self, s32 arg1)
     }
 }
 
-void TextEntry__MoveCursorRight(TextEntry *self)
-{
+void TextEntry__MoveCursorRight(TextEntry *self) {
     s32 old;
     s32 v;
 
@@ -391,8 +375,7 @@ void TextEntry__MoveCursorRight(TextEntry *self)
     }
 }
 
-void TextEntry__MoveCursorLeft(TextEntry *self)
-{
+void TextEntry__MoveCursorLeft(TextEntry *self) {
     s32 old;
     s32 v;
 
@@ -408,8 +391,7 @@ void TextEntry__MoveCursorLeft(TextEntry *self)
     }
 }
 
-void TextEntry__NextChar(TextEntry *self)
-{
+void TextEntry__NextChar(TextEntry *self) {
     s32 v;
 
     if (self->panelSprite != NULL) {

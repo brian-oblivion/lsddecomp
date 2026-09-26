@@ -52,6 +52,7 @@ struct Class866E8;
  * +0x010, +0x014, +0x018 (Actor__AddChild/RemoveChild/RemoveAllChildren),
  * +0x040 (Actor__Reset), +0x088 (Actor__NotifyMove) and +0x09C
  * (Actor__DispatchLinkCommand). */
+/* clang-format off */
 #define ACTOR_SLOTS(Self, CtorParams)                                                              \
     CLASS6B5CC_SLOTS(Self, CtorParams);                                                            \
     /* +0x0B8 */ void (*setTranslation)(Self *self, Vec3_d294 *v);          /* Actor__SetTranslation */ \
@@ -68,7 +69,9 @@ struct Class866E8;
     /* +0x0E4 */ void (*setLastOffsetValue)(Self *self, s16 val);           /* Actor__SetLastOffsetValue */ \
     /* +0x0E8 */ void (*slotE8)(Self *self);                                /* Actor__NoOpSlotE8, empty; NotifyMove calls it on an Actor linkTarget */ \
     /* +0x0EC */ void (*setPendingExtra)(Self *self, s32 extra)             /* Actor__SetPendingExtra */
+/* clang-format on */
 
+/* clang-format off */
 #define ACTOR_FIELDS(Methods)                                                                      \
     CLASS6B5CC_FIELDS(Methods);                                                                    \
     /* +0x044 */ s32 state;               /* zeroed by the ctor; a subclass's state code (DreamSys and Entity: include/DreamSys.h, include/Entity.h) */ \
@@ -77,9 +80,10 @@ struct Class866E8;
     /* +0x04C */ struct Class866E8 *grid; /* the class-0x114 child addChild recorded; FindNearbyLink queries it */ \
     /* +0x050 */ BasicClass *ticker;      /* the class-5 (FrameClock) child addChild recorded */   \
     /* +0x054 */ s32 pendingExtra         /* setPendingExtra; Reset: 0; NotifyMove adds it to |lastOffsetValue|. The object is 0x58 bytes (New_Actor) */
+/* clang-format on */
 
 struct ActorMethods {
-    ACTOR_SLOTS(Actor, (Actor *self));
+    ACTOR_SLOTS(Actor, (Actor * self));
 };
 
 struct Actor {

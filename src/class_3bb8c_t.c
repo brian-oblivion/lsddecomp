@@ -47,23 +47,18 @@
 
 extern void *BMemPMgrAlloc(s32 size);
 
-
 /* Class879C4's (include/Class879C4.h) four empty leaves, `jr $ra; nop`
  * (splat matched them itself), and its table getter. Class879C4__Update is
  * the +0x098 update override of Sprite__Update, typed as that slot; the
  * other three occupy the class's own slots +0x0BC/+0x0C0/+0x0C4, which
  * nothing calls, so they keep the tier-C `Class__func_xxxxx` form. */
-void Class879C4__Update(Class879C4 *self, void *sender, s32 event) {
-}
+void Class879C4__Update(Class879C4 *self, void *sender, s32 event) {}
 
-void Class879C4__func_57f40(void) {
-}
+void Class879C4__func_57f40(void) {}
 
-void Class879C4__func_57f48(void) {
-}
+void Class879C4__func_57f48(void) {}
 
-void Class879C4__func_57f50(void) {
-}
+void Class879C4__func_57f50(void) {}
 
 Class879C4Methods *GetClass879C4Methods(void) {
     return &gClass879C4Methods;
@@ -91,7 +86,7 @@ typedef struct DreamSaveBlock {
     u8 pad0C[0x18 - 0xC];
     /* +0x018 */ s16 moodPreviousDays[365]; /* walked backwards from currentDay - 1 */
     u8 pad2F2[0x467 - 0x2F2];
-    /* +0x467 */ s8 graphScored;  /* set once ScoreDayLog's scan has succeeded */
+    /* +0x467 */ s8 graphScored; /* set once ScoreDayLog's scan has succeeded */
 } DreamSaveBlock;
 
 GraphRoom *New_GraphRoom(struct DreamSys *dreamSys) {
@@ -126,7 +121,8 @@ void GraphRoom__Reset(GraphRoom *self) {
 void GraphRoom__Update(GraphRoom *self, BasicClass *sender, s32 event) {
     Get_vtable_TaskCore()->update((TaskCore *)self, sender, event);
     if (self->inputMode == 1) {
-        DreamSaveBlock *save = (DreamSaveBlock *)self->dreamSys->methods->getSaveBlock(self->dreamSys, 0);
+        DreamSaveBlock *save =
+            (DreamSaveBlock *)self->dreamSys->methods->getSaveBlock(self->dreamSys, 0);
         if (save->currentYear != 0 || save->currentDay != 0) {
             self->points[0]->methods->setDisplay(self->points[0], self->frameCounter & 1);
         }
@@ -151,6 +147,7 @@ typedef struct D_8008ABB8Color {
     s8 g;
     s8 b;
 } D_8008ABB8Color;
+
 extern u8 D_8008ABAC;
 extern u8 D_8008ABB4;
 extern D_8008ABB8Color D_8008ABB8;
@@ -274,8 +271,7 @@ extern s16 D_80087BD4[4];
  * 41 confirmed both empirically, byte-exact with them, off by dozens of
  * words without). Do not "simplify" this without re-running
  * ./build-and-verify.sh. */
-s32 GraphRoom__ScoreDayLog(GraphRoom *self, DreamSaveBlock *log)
-{
+s32 GraphRoom__ScoreDayLog(GraphRoom *self, DreamSaveBlock *log) {
     u32 i;
     s16 *days;
     s32 j;

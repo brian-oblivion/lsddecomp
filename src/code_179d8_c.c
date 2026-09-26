@@ -120,8 +120,7 @@ extern VoiceState80090368 D_80090368[0x20];
  * `i = 0;` before each loop is a statement in its own right, not a `for`
  * init clause: retail zeroes the counter BEFORE loading the source base.
  */
-void _SsInit(s32 arg0)
-{
+void _SsInit(s32 arg0) {
     s32 i, j;
     u16 *base;
     u16 *src;
@@ -178,12 +177,10 @@ void _SsInit(s32 arg0)
     _snd_ev_flag = 0;
 }
 
-void SsInit(void)
-{
+void SsInit(void) {
     _SsInit(0);
 }
 
-void SsInitHot(void)
-{
+void SsInitHot(void) {
     _SsInit(1);
 }

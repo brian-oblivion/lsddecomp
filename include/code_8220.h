@@ -18,6 +18,7 @@
  * which walk this same list via BMemPMgr's freeListStart/freeListEnd.
  */
 typedef struct BMemBlockHdr BMemBlockHdr;
+
 struct BMemBlockHdr {
     /* +0x000 */ u32 sizeAndFlags;
     /* +0x004 */ BMemBlockHdr *prev;
@@ -33,12 +34,13 @@ struct BMemBlockHdr {
  * BMemBlockHdr nodes rather than through any field of this struct.
  */
 typedef struct BMemPMgr BMemPMgr;
+
 struct BMemPMgr {
-    /* +0x000 */ void *freeListHead;   /* set to `self + 0x1C` by BMemPMgrInit; the pool's first free-list node */
+    /* +0x000 */ void *freeListHead; /* set to `self + 0x1C` by BMemPMgrInit; the pool's first free-list node */
     /* +0x004 */ s32 poolSize;
     /* +0x008 */ BMemBlockHdr *freeListStart; /* free list head, SetupBMemPMgrFreeList/B34/CFC */
     /* +0x00C */ BMemBlockHdr *freeListEnd;   /* free list tail, same trio */
-    /* +0x010 */ s32 unk10;            /* set to 1 by SetupBMemPMgrFreeList; not yet read by any decoded function */
+    /* +0x010 */ s32 unk10; /* set to 1 by SetupBMemPMgrFreeList; not yet read by any decoded function */
 };
 
 /* The generic pool allocator/free pair, established already by
@@ -153,7 +155,7 @@ extern void UpdatePolyBBoxAndCull(void *ctx, s32 count);
  * register allocation and does NOT match. */
 typedef struct OtTag {
     u32 addr : 24;
-    u32 len  : 8;
+    u32 len : 8;
 } OtTag;
 
 /* CopyPolyVtx3's payload types (round 13). Both are ALL-s16 and that is
@@ -178,15 +180,14 @@ typedef struct PolyUV4 {
  * 4-byte payload at +0x010 are touched by that function; the span between
  * is opaque from it alone. */
 typedef struct PolyVtx {
-    PolyXY8 xy;                  /* +0x000 */
+    PolyXY8 xy; /* +0x000 */
     u8 pad008[0x010 - 0x008];
-    PolyUV4 uv;                  /* +0x010 */
+    PolyUV4 uv; /* +0x010 */
 } PolyVtx;
 
 /* Unaligned struct-field copy helper, code_8220_c (round 13). Takes two
  * 3-element arrays of PolyVtx pointers plus three UV sources. */
-extern void CopyPolyVtx3(PolyVtx **dst, PolyVtx **src, PolyUV4 *uv0,
-                          PolyUV4 *uv1, PolyUV4 *uv2);
+extern void CopyPolyVtx3(PolyVtx **dst, PolyVtx **src, PolyUV4 *uv0, PolyUV4 *uv1, PolyUV4 *uv2);
 
 /* Populates a submit table's (`table`, gPolySubmitTableTri/gPolySubmitTableQuad):
  * +0x00 an OT/code word (sPolyOtCodeOverride when sPolyOtCodeOverrideSet is set, else
@@ -204,7 +205,8 @@ extern void CopyPolyVtx3(PolyVtx **dst, PolyVtx **src, PolyUV4 *uv0,
  * FT3/GT3/FT4/GT4 call sites, which pass 1 plus the primitive's own
  * `+0xE`/`+0x16` or `+0xE`/`+0x1A` fields (POLY_FTn/GTn's CLUT and TPAGE
  * words); F3/G3/F4/G4 pass 0/0/0 and leave +0xC/+0xE untouched. */
-extern void FillRCPolyHeader(void *table, void *ctx, PolyUV4 *uv, s32 hasUv1Codes, u16 uv1Clut, u16 uv1TPage);
+extern void FillRCPolyHeader(void *table, void *ctx, PolyUV4 *uv, s32 hasUv1Codes, u16 uv1Clut,
+                             u16 uv1TPage);
 
 /* Psy-Q SDK (asm/psyq_rcpolyf3.s, not a carved C unit). Called by
  * SubmitPolyF3 (code_8220_c) with (self, table).
@@ -233,8 +235,8 @@ extern u8 gPolySubmitTableQuad[];
  * Extends CopyPolyVtx3 to a 4th vertex: forwards elements 0-2 to it
  * unchanged, then does its own dst[3]->xy = src[3]->xy / dst[3]->uv = *uv3
  * (round 20). */
-extern void CopyPolyVtx4(PolyVtx **dst, PolyVtx **src, PolyUV4 *uv0, PolyUV4 *uv1,
-                          PolyUV4 *uv2, PolyUV4 *uv3);
+extern void CopyPolyVtx4(PolyVtx **dst, PolyVtx **src, PolyUV4 *uv0, PolyUV4 *uv1, PolyUV4 *uv2,
+                         PolyUV4 *uv3);
 
 /* Psy-Q SDK (asm/psyq_rcpolyf4.s, not a carved C unit). Called by
  * SubmitPolyF4 (code_8220_c) with (self, table) -- quad-flavored sibling

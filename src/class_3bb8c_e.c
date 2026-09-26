@@ -58,8 +58,7 @@ extern void *BMemPMgrFree(void *ptr);
 extern char *strcpy(char *dest, char *src);
 extern char *strcat(char *dest, char *src);
 
-void TaskObjF__ClearResourceSlots(TaskObjF *self)
-{
+void TaskObjF__ClearResourceSlots(TaskObjF *self) {
     self->inputSource = NULL;
     self->tickSource = NULL;
     self->spriteParent = NULL;
@@ -67,13 +66,11 @@ void TaskObjF__ClearResourceSlots(TaskObjF *self)
     self->itemList = NULL;
 }
 
-void TaskObjF__Finalize(TaskObjF *self)
-{
+void TaskObjF__Finalize(TaskObjF *self) {
     Get_vtable_BasicClass()->finalize((BasicClass *)self);
 }
 
-void TaskObjF__AddChild(TaskObjF *self, BasicClass *child)
-{
+void TaskObjF__AddChild(TaskObjF *self, BasicClass *child) {
     s32 tag;
 
     if (child == NULL) {
@@ -98,8 +95,7 @@ void TaskObjF__AddChild(TaskObjF *self, BasicClass *child)
     }
 }
 
-void TaskObjF__RemoveChild(TaskObjF *self, BasicClass *child)
-{
+void TaskObjF__RemoveChild(TaskObjF *self, BasicClass *child) {
     s32 tag;
 
     if (child == NULL) {
@@ -118,8 +114,7 @@ void TaskObjF__RemoveChild(TaskObjF *self, BasicClass *child)
     Get_vtable_BasicClass()->removeChild((BasicClass *)self, child);
 }
 
-void TaskObjF__RemoveAllChildren(TaskObjF *self)
-{
+void TaskObjF__RemoveAllChildren(TaskObjF *self) {
     self->inputSource = NULL;
     self->tickSource = NULL;
     self->spriteParent = NULL;
@@ -128,8 +123,7 @@ void TaskObjF__RemoveAllChildren(TaskObjF *self)
     Get_vtable_BasicClass()->removeAllChildren((BasicClass *)self);
 }
 
-void TaskObjF__SetCardSlot(TaskObjF *self, s32 val)
-{
+void TaskObjF__SetCardSlot(TaskObjF *self, s32 val) {
     self->cardSlot = val;
     self->cardHandle = val << 4;
 }
@@ -137,8 +131,7 @@ void TaskObjF__SetCardSlot(TaskObjF *self, s32 val)
 extern void EnterCriticalSection(void);
 extern void ExitCriticalSection(void);
 
-s32 TaskObjF__OpenEvents(TaskObjF *self)
-{
+s32 TaskObjF__OpenEvents(TaskObjF *self) {
     s32 i;
     TaskObjF *cur;
 
@@ -158,15 +151,13 @@ s32 TaskObjF__OpenEvents(TaskObjF *self)
 /* Psy-Q's CloseEvent (libapi), passed as TaskObjF__ForEachEvent's callback. */
 extern s32 CloseEvent(s32 event);
 
-s32 TaskObjF__CloseEvents(TaskObjF *self)
-{
+s32 TaskObjF__CloseEvents(TaskObjF *self) {
     TaskObjF__DisableEvents(self);
     TaskObjF__ForEachEvent(self, CloseEvent, 1);
     return 1;
 }
 
-s32 TaskObjF__CheckCardStatus(TaskObjF *self, s32 *p1, s32 *p2, s32 *p3)
-{
+s32 TaskObjF__CheckCardStatus(TaskObjF *self, s32 *p1, s32 *p2, s32 *p3) {
     s32 retries;
     s32 localFlag;
     s32 result;
@@ -184,8 +175,7 @@ s32 TaskObjF__CheckCardStatus(TaskObjF *self, s32 *p1, s32 *p2, s32 *p3)
     return result;
 }
 
-s32 TaskObjF__CardInfoAndLoadStatus(TaskObjF *self, s32 *p1, s32 *p2, s32 *p3)
-{
+s32 TaskObjF__CardInfoAndLoadStatus(TaskObjF *self, s32 *p1, s32 *p2, s32 *p3) {
     if (TaskObjF__CardInfoStatus(self, p1, p2) != 0) {
         TaskObjF__CardLoadStatus(self, p1, p3);
     }
@@ -194,8 +184,7 @@ s32 TaskObjF__CardInfoAndLoadStatus(TaskObjF *self, s32 *p1, s32 *p2, s32 *p3)
 extern s32 _card_info(s32 arg0);
 extern s32 _card_clear(s32 arg0);
 
-s32 TaskObjF__CardInfoStatus(TaskObjF *self, s32 *p1, s32 *p2)
-{
+s32 TaskObjF__CardInfoStatus(TaskObjF *self, s32 *p1, s32 *p2) {
     s32 status;
     s32 code;
 
@@ -219,8 +208,7 @@ s32 TaskObjF__CardInfoStatus(TaskObjF *self, s32 *p1, s32 *p2)
 
 extern s32 _card_load(s32 arg0);
 
-s32 TaskObjF__CardLoadStatus(TaskObjF *self, s32 *p1, s32 *p2)
-{
+s32 TaskObjF__CardLoadStatus(TaskObjF *self, s32 *p1, s32 *p2) {
     s32 status;
     s32 code;
 
@@ -246,8 +234,7 @@ s32 TaskObjF__CardLoadStatus(TaskObjF *self, s32 *p1, s32 *p2)
  * round 85: this unit had its own `s32` view for this address-only use). */
 extern s32 format(char *fs);
 
-s32 TaskObjF__FormatCard(TaskObjF *self)
-{
+s32 TaskObjF__FormatCard(TaskObjF *self) {
     s32 retries;
     s32 result;
     DeviceName866E8 *path;
@@ -265,8 +252,7 @@ s32 TaskObjF__FormatCard(TaskObjF *self)
  * BuildMemcardPath's 3rd argument. Round 75 corrected the earlier reading
  * that TaskObjF__OpenAndReadMemcardFile never used it: it never TOUCHES $a2, because the value
  * is already where the call wants it. */
-s32 TaskObjF__ProbeMemcardFile(TaskObjF *self, char *destBuf, char *suffix)
-{
+s32 TaskObjF__ProbeMemcardFile(TaskObjF *self, char *destBuf, char *suffix) {
     s32 retries;
     s32 result;
 
@@ -284,8 +270,7 @@ extern s32 open(void *arg0, s32 arg1);
 extern s32 read(s32 arg0, void *arg1, s32 arg2);
 extern s32 close(s32 arg0);
 
-s32 TaskObjF__OpenAndReadMemcardFile(TaskObjF *self, char *destBuf, char *suffix)
-{
+s32 TaskObjF__OpenAndReadMemcardFile(TaskObjF *self, char *destBuf, char *suffix) {
     s32 pathBuf[8];
     void *path;
     s32 handle;
@@ -306,8 +291,7 @@ s32 TaskObjF__OpenAndReadMemcardFile(TaskObjF *self, char *destBuf, char *suffix
     return 1;
 }
 
-char *TaskObjF__FindUnusedMemcardName(TaskObjF *self, char *buf, char *middle, char **entries)
-{
+char *TaskObjF__FindUnusedMemcardName(TaskObjF *self, char *buf, char *middle, char **entries) {
     while (*entries != NULL) {
         strcpy(buf, middle);
         strcat(buf, *entries);
@@ -319,8 +303,8 @@ char *TaskObjF__FindUnusedMemcardName(TaskObjF *self, char *buf, char *middle, c
     return NULL;
 }
 
-s32 TaskObjF__CollectExistingMemcardFiles(TaskObjF *self, char **destBufs, char **outArr, char *middle, char **entries)
-{
+s32 TaskObjF__CollectExistingMemcardFiles(TaskObjF *self, char **destBufs, char **outArr,
+                                          char *middle, char **entries) {
     s32 count;
     char buf[0x20];
 
@@ -339,8 +323,7 @@ s32 TaskObjF__CollectExistingMemcardFiles(TaskObjF *self, char **destBufs, char 
     return count;
 }
 
-s32 TaskObjF__CheckCardSpace(TaskObjF *self, u8 id, s32 sizeArg)
-{
+s32 TaskObjF__CheckCardSpace(TaskObjF *self, u8 id, s32 sizeArg) {
     s32 retries;
     s32 result;
 
@@ -351,10 +334,9 @@ s32 TaskObjF__CheckCardSpace(TaskObjF *self, u8 id, s32 sizeArg)
     return result;
 }
 
-extern s32 delete(void *arg0);
+extern s32 delete (void *arg0);
 
-s32 TaskObjF__ProbeCardFreeSpace(TaskObjF *self, u8 id, s32 sizeArg)
-{
+s32 TaskObjF__ProbeCardFreeSpace(TaskObjF *self, u8 id, s32 sizeArg) {
     s32 pathBuf[8];
     void *path;
     s32 handle;
@@ -367,6 +349,6 @@ s32 TaskObjF__ProbeCardFreeSpace(TaskObjF *self, u8 id, s32 sizeArg)
         return 0;
     }
     close(handle);
-    delete(pathBuf);
+    delete (pathBuf);
     return 1;
 }

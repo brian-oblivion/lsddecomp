@@ -32,8 +32,8 @@
 #include "common.h"
 #include "Class6E4F0.h"
 
-extern s32 gCdInitDone;           /* CdInit has been called */
-extern ScreenDims gDefaultScreenDims;    /* {320, 240} */
+extern s32 gCdInitDone;               /* CdInit has been called */
+extern ScreenDims gDefaultScreenDims; /* {320, 240} */
 
 /* Psy-Q LIBCD.H / LIBSND.H / LIBGS.H prototypes. */
 extern int CdInit(void);
@@ -55,8 +55,7 @@ void Class6E4F0__Class6E4F0(Class6E4F0 *self, s32 dataSource) {
     self->methods->setScreenDims(self, &gDefaultScreenDims, 0);
 }
 
-void Class6E4F0__Finalize(Class6E4F0 *self) {
-}
+void Class6E4F0__Finalize(Class6E4F0 *self) {}
 
 void Class6E4F0__SetScreenDims(Class6E4F0 *self, ScreenDims *dims, s32 vramMode) {
     self->dims = *dims;
@@ -79,8 +78,7 @@ void Class6E4F0__InitSystems(Class6E4F0 *self, DrawSystem *drawSystem, struct Pa
     }
 }
 
-void Class6E4F0__NoOpSlot48(Class6E4F0 *self) {
-}
+void Class6E4F0__NoOpSlot48(Class6E4F0 *self) {}
 
 void Class6E4F0__RunMainLoop(Class6E4F0 *self) {
     s32 status;

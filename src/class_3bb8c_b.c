@@ -75,7 +75,7 @@ void Class866E8__ComputeFootprintFromRotation(Class866E8 *self, s32 arg1, s32 ar
     Descriptor10Ext buf;
     s32 point0;
     s32 point1;
-    u16 angle;      /* u16, not s32: the s32 form is byte-identical except
+    u16 angle; /* u16, not s32: the s32 form is byte-identical except
                      * for an 8-byte-smaller frame (round 71) */
     QueryTemplate866E8 mat;
     s32 offset;
@@ -106,14 +106,14 @@ void Class866E8__ComputeFootprintFromRotation(Class866E8 *self, s32 arg1, s32 ar
         self->footprintHeight = arg1;
         self->footprintCol = (mat.unk14 > 0) ? point0 : point0 - arg1 + 1;
         self->footprintRow = (mat.unk1C > 0) ? point1 - (u16)self->gridHalfCells - 1
-                                      : point1 - (u16)self->gridHalfCells + 1;
+                                             : point1 - (u16)self->gridHalfCells + 1;
         flag = 0;
     } else if ((u16)(angle - 0x600) < 0x400 || (u16)(angle - 0x200) >= 0xC00) {
         offset = mat.unk14;
         self->footprintWidth = arg1;
         self->footprintHeight = arg2;
         self->footprintCol = (mat.unk14 > 0) ? point0 - (u16)self->gridHalfCells - 1
-                                      : point0 - (u16)self->gridHalfCells + 1;
+                                             : point0 - (u16)self->gridHalfCells + 1;
         self->footprintRow = (mat.unk1C > 0) ? point1 : point1 - arg2 + 1;
         flag = 1;
     }
@@ -203,7 +203,8 @@ void Class866E8__BuildFootprintSlots(Class866E8 *self) {
     self->rectCount = count;
 }
 
-s32 Class866E8__SplitFootprintSlot(Class866E8 *self, GridSlot866E8 *slot, s32 count, s32 baseIdx, s32 col, s32 row, s32 width, s32 height) {
+s32 Class866E8__SplitFootprintSlot(Class866E8 *self, GridSlot866E8 *slot, s32 count, s32 baseIdx,
+                                   s32 col, s32 row, s32 width, s32 height) {
     s32 overflow;
     s32 span;
     s32 elemArg;
@@ -282,8 +283,8 @@ void Class866E8__SetFootprintFromQuery(Class866E8 *self) {
  * of $v0, and pushing `bounds` to $a2), and the final `>=` folds back into
  * the store-flag `slt`. See docs/match-reports/IsPointOutOfBounds.md. */
 s32 IsPointOutOfBounds(Bounds866E8_3bb8c_b *bounds, s8 *point) {
-    if (bounds != NULL && point[0] >= bounds->minX && bounds->maxX >= point[0]
-        && point[1] >= bounds->minY && bounds->maxY >= point[1]) {
+    if (bounds != NULL && point[0] >= bounds->minX && bounds->maxX >= point[0] &&
+        point[1] >= bounds->minY && bounds->maxY >= point[1]) {
         return 0;
     }
     return 1;
@@ -292,7 +293,7 @@ s32 IsPointOutOfBounds(Bounds866E8_3bb8c_b *bounds, s8 *point) {
 s32 Class866E8__InitFootprintSlot(Class866E8 *self, s32 unused, s32 key, s32 arg3) {
     Unk54Struct *slot;
 
-    slot = (Unk54Struct *) ((u8 *) self + 0x8C + key * sizeof(Unk54Struct));
+    slot = (Unk54Struct *)((u8 *)self + 0x8C + key * sizeof(Unk54Struct));
     *slot = gDefaultElemRateOffset;
     slot->unk0 = self->methods->findElemIndexByUnk30(self, arg3);
     return key + 1;

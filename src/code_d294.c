@@ -18,18 +18,19 @@
 #include "code_d294.h"
 
 /* The low nibble of a class table's header word is its class tag. */
-#define CLASS_TAG_MASK   0xF
-#define TAG_PAD          2   /* gPadMethods, PadMethods (include/Pad.h) */
-#define TAG_CLASS6B5CC   4   /* this class and every subclass of it */
-#define TAG_CLASS6EF50   5   /* gFrameClockMethods */
-#define TAG_TMDMODEL     9   /* gTmdModelMethods (include/TmdModel.h): the object Class6B5CC__LinkModel links */
+#define CLASS_TAG_MASK 0xF
+#define TAG_PAD 2        /* gPadMethods, PadMethods (include/Pad.h) */
+#define TAG_CLASS6B5CC 4 /* this class and every subclass of it */
+#define TAG_CLASS6EF50 5 /* gFrameClockMethods */
+#define TAG_TMDMODEL \
+    9 /* gTmdModelMethods (include/TmdModel.h): the object Class6B5CC__LinkModel links */
 
 /* Bit positions in GsDOBJ2.attribute (self->unk10), include/psyq/libgs.h. */
-#define ATTR_LIGHTMODE_SHIFT  3   /* GsFOG|GsMATE|GsLLMOD, 3 bits */
-#define ATTR_LOFF_SHIFT       6   /* GsLOFF */
-#define ATTR_ABR_SHIFT        28  /* GsAZERO..GsATHREE, 2 bits */
-#define ATTR_ALON_SHIFT       30  /* GsALON */
-#define ATTR_DOFF_SHIFT       31  /* GsDOFF */
+#define ATTR_LIGHTMODE_SHIFT 3 /* GsFOG|GsMATE|GsLLMOD, 3 bits */
+#define ATTR_LOFF_SHIFT 6      /* GsLOFF */
+#define ATTR_ABR_SHIFT 28      /* GsAZERO..GsATHREE, 2 bits */
+#define ATTR_ALON_SHIFT 30     /* GsALON */
+#define ATTR_DOFF_SHIFT 31     /* GsDOFF */
 
 Class6B5CC *New_Class6B5CC(void) {
     Class6B5CC *obj;
@@ -239,8 +240,7 @@ void Class6B5CC__GetNextAttachedChild(Class6B5CC *self, Class6B5CC **entry, Basi
     *entry = NULL;
 }
 
-void Class6B5CC__func_1d33c(void) {
-}
+void Class6B5CC__func_1d33c(void) {}
 
 s32 Class6B5CC__SetDisplay(Class6B5CC *self, s32 a1) {
     return GetSetBitField(&self->attribute, ATTR_DOFF_SHIFT, 1, a1 == 0) == 0;

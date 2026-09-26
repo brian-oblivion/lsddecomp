@@ -84,6 +84,7 @@ typedef struct EntryDAD4 {
     s16 unk6; /* +0x6 -- read by SsUtKeyOff, entry index 25 only */
     u8 pad8[0x10 - 0x8];
 } EntryDAD4;
+
 extern EntryDAD4 *D_8006DAD4;
 
 /* STALL -- see docs/match-reports/SsUtChangePitch.md.  HEAD SALVAGE, round 31,
@@ -126,9 +127,8 @@ s32 SsUtChangeADSR(s16 idx, s16 p1, s16 p2, s16 p3, u16 p4, u16 p5) {
     return -1;
 }
 
-s32 SsUtGetDetVVol(s16 idx, s16 *out1, s16 *out2)
-{
-    if ((u16) idx < 0x18) {
+s32 SsUtGetDetVVol(s16 idx, s16 *out1, s16 *out2) {
+    if ((u16)idx < 0x18) {
         *out1 = D_8006DAD4[idx].unk0;
         *out2 = D_8006DAD4[idx].unk2;
         return 0;
@@ -136,14 +136,13 @@ s32 SsUtGetDetVVol(s16 idx, s16 *out1, s16 *out2)
     return -1;
 }
 
-s32 SsUtSetDetVVol(s16 idx, s16 p1, s16 p2)
-{
+s32 SsUtSetDetVVol(s16 idx, s16 p1, s16 p2) {
     /* Retail reserves an 8-byte frame it never touches. Only an unused local
      * ARRAY of that size reproduces it -- a scalar is register-allocated and
      * eliminated, and a 4-byte array reserves the wrong amount. */
     s32 unused[2];
 
-    if ((u16) idx < 0x18) {
+    if ((u16)idx < 0x18) {
         _svm_sreg_buf[idx].unk2 = p2;
         _svm_sreg_dirty[idx] |= 3;
         _svm_sreg_buf[idx].unk0 = p1;
@@ -152,12 +151,11 @@ s32 SsUtSetDetVVol(s16 idx, s16 p1, s16 p2)
     return -1;
 }
 
-s32 SsUtGetVVol(s16 idx, s16 *out1, s16 *out2)
-{
+s32 SsUtGetVVol(s16 idx, s16 *out1, s16 *out2) {
     EntryDAD4 *e;
     s16 f0, f2;
 
-    if ((u16) idx < 0x18) {
+    if ((u16)idx < 0x18) {
         e = &D_8006DAD4[idx];
         f0 = e->unk0;
         f2 = e->unk2;
@@ -168,14 +166,13 @@ s32 SsUtGetVVol(s16 idx, s16 *out1, s16 *out2)
     return -1;
 }
 
-s32 SsUtSetVVol(s16 idx, s16 p1, s16 p2)
-{
+s32 SsUtSetVVol(s16 idx, s16 p1, s16 p2) {
     /* Retail reserves an 8-byte frame it never touches, same idiom as
      * SsUtSetDetVVol. */
     s32 unused[2];
     s16 t1, t2;
 
-    if ((u16) idx < 0x18) {
+    if ((u16)idx < 0x18) {
         t1 = p1 * 129;
         t2 = p2 * 129;
         _svm_sreg_buf[idx].unk2 = t2;
@@ -186,18 +183,16 @@ s32 SsUtSetVVol(s16 idx, s16 p1, s16 p2)
     return -1;
 }
 
-s32 SsUtAutoVol(s16 p0, s16 p1, s16 p2, s16 p3)
-{
-    if ((u16) p0 < 0x18) {
+s32 SsUtAutoVol(s16 p0, s16 p1, s16 p2, s16 p3) {
+    if ((u16)p0 < 0x18) {
         SeAutoVol(p0, p1, p2, p3);
         return 0;
     }
     return -1;
 }
 
-s32 SsUtAutoPan(s16 p0, s16 p1, s16 p2, s16 p3)
-{
-    if ((u16) p0 < 0x18) {
+s32 SsUtAutoPan(s16 p0, s16 p1, s16 p2, s16 p3) {
+    if ((u16)p0 < 0x18) {
         SeAutoPan(p0, p1, p2, p3);
         return 0;
     }

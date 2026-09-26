@@ -41,22 +41,22 @@
  * not a class, and track 4 did not unify it (see FlushSoundCueSet.md /
  * DreamSys__SetSoundObj.md for the cross-unit identification trail). */
 typedef struct {
-    s32 index;   /* matches code_179d8_e.c's SoundCueSlot.index: -1 sentinel, else a VabStreamObj__StopVoice-forwardable voice index */
-    s32 note;    /* packed as note*16 into VabStreamObj__PlayTone's `index` argument (hi=note, lo=0) */
-    s32 pitchOffset;  /* forwarded to VabStreamObj__SetPitchOffset unchanged */
-    s32 word2;   /* default 0x7F (127); feeds PlayTone's arg2 via a `/unk14*unk10` remainder -- proposed vol/pan, unconfirmed */
-    s32 word3;   /* default 0x40 (64); feeds PlayTone's arg3 the same way -- proposed vol/pan, unconfirmed */
+    s32 index; /* matches code_179d8_e.c's SoundCueSlot.index: -1 sentinel, else a VabStreamObj__StopVoice-forwardable voice index */
+    s32 note; /* packed as note*16 into VabStreamObj__PlayTone's `index` argument (hi=note, lo=0) */
+    s32 pitchOffset; /* forwarded to VabStreamObj__SetPitchOffset unchanged */
+    s32 word2; /* default 0x7F (127); feeds PlayTone's arg2 via a `/unk14*unk10` remainder -- proposed vol/pan, unconfirmed */
+    s32 word3; /* default 0x40 (64); feeds PlayTone's arg3 the same way -- proposed vol/pan, unconfirmed */
 } SoundCueSlot;
 
 typedef struct SoundCueSet SoundCueSet;
 
 struct SoundCueSet {
-    s32 tag;     /* matches code_179d8_e.c's SoundCueSet.tag: guard, >0 required to service */
-    s32 unk4;    /* incremented once per service call here; code_179d8_e.c's own view never reads it */
-    s32 owner;   /* matches code_179d8_e.c's SoundCueSet.owner: passed as callback's first argument, unchanged */
+    s32 tag;  /* matches code_179d8_e.c's SoundCueSet.tag: guard, >0 required to service */
+    s32 unk4; /* incremented once per service call here; code_179d8_e.c's own view never reads it */
+    s32 owner; /* matches code_179d8_e.c's SoundCueSet.owner: passed as callback's first argument, unchanged */
     void (*callback)(s32 arg0, SoundCueSet *self);
-    s32 unk10;   /* set 0 before the callback runs; callback may set it negative to skip servicing this tick -- purpose beyond that not established */
-    s32 unk14;   /* matches code_179d8_e.c's SoundCueSet.unk14 (set to 10 by InitSoundCueSet); used here as a divisor */
+    s32 unk10; /* set 0 before the callback runs; callback may set it negative to skip servicing this tick -- purpose beyond that not established */
+    s32 unk14; /* matches code_179d8_e.c's SoundCueSet.unk14 (set to 10 by InitSoundCueSet); used here as a divisor */
     SoundCueSlot slots[3];
 };
 
@@ -119,8 +119,7 @@ extern u8 D_8008E9D0;
 extern u8 D_8008EA1B;
 extern void SpuSetNoiseVoice(s32 a0, s32 a1);
 
-s32 SpuVmAlloc(void)
-{
+s32 SpuVmAlloc(void) {
     s32 chosen;
     u16 bestSec;
     s32 found;
@@ -139,26 +138,25 @@ s32 SpuVmAlloc(void)
     bestIdx = 0x63;
     threshold = D_8008EA1B;
 
-    for (idx = 0; (u8) idx < D_8008E9D0; idx++) {
-        if (_svm_voice[(u8) idx].unk1B != 0
-            || _svm_voice[(u8) idx].unk06 != 0) {
-            pri = _svm_voice[(u8) idx].unk18;
-            if (pri < (s32)(u16) threshold) {
+    for (idx = 0; (u8)idx < D_8008E9D0; idx++) {
+        if (_svm_voice[(u8)idx].unk1B != 0 || _svm_voice[(u8)idx].unk06 != 0) {
+            pri = _svm_voice[(u8)idx].unk18;
+            if (pri < (s32)(u16)threshold) {
                 threshold = pri;
                 bestIdx = idx;
-                bestSec = _svm_voice[(u8) idx].unk06;
-                bestTer = _svm_voice[(u8) idx].unk02;
+                bestSec = _svm_voice[(u8)idx].unk06;
+                bestTer = _svm_voice[(u8)idx].unk02;
                 found = 1;
-            } else if (pri == (s32)(u16) threshold) {
+            } else if (pri == (s32)(u16)threshold) {
                 found++;
-                newSec = _svm_voice[(u8) idx].unk06;
+                newSec = _svm_voice[(u8)idx].unk06;
                 if (newSec < bestSec) {
-                    bestTer = _svm_voice[(u8) idx].unk02;
+                    bestTer = _svm_voice[(u8)idx].unk02;
                     bestSec = newSec;
                     bestIdx = idx;
                 } else if (newSec == bestSec) {
-                    if (bestTer < (s16) _svm_voice[(u8) idx].unk02) {
-                        bestTer = (s16) _svm_voice[(u8) idx].unk02;
+                    if (bestTer < (s16)_svm_voice[(u8)idx].unk02) {
+                        bestTer = (s16)_svm_voice[(u8)idx].unk02;
                         bestIdx = idx;
                     }
                 }
@@ -168,8 +166,8 @@ s32 SpuVmAlloc(void)
         }
     }
 
-    if ((u8) chosen == 0x63) {
-        if ((u8) found != 0) {
+    if ((u8)chosen == 0x63) {
+        if ((u8)found != 0) {
             chosen = bestIdx;
         } else {
             chosen = D_8008E9D0;
@@ -177,19 +175,19 @@ s32 SpuVmAlloc(void)
     }
 
     count = D_8008E9D0;
-    if ((u8) chosen < count) {
+    if ((u8)chosen < count) {
         if (count != 0) {
-            for (idx = 0; (u8) idx < count; idx++) {
-                _svm_voice[(u8) idx].unk02 = _svm_voice[(u8) idx].unk02 + 1;
+            for (idx = 0; (u8)idx < count; idx++) {
+                _svm_voice[(u8)idx].unk02 = _svm_voice[(u8)idx].unk02 + 1;
             }
         }
-        _svm_voice[(u8) chosen].unk02 = 0;
-        _svm_voice[(u8) chosen].unk18 = D_8008EA1B;
-        if (_svm_voice[(u8) chosen].unk1B == 2) {
+        _svm_voice[(u8)chosen].unk02 = 0;
+        _svm_voice[(u8)chosen].unk18 = D_8008EA1B;
+        if (_svm_voice[(u8)chosen].unk1B == 2) {
             SpuSetNoiseVoice(0, 0xFFFFFF);
         }
     }
-    return (u8) chosen;
+    return (u8)chosen;
 }
 #else
 INCLUDE_ASM("asm/nonmatchings/code_179d8_l", SpuVmAlloc);
@@ -204,6 +202,7 @@ typedef struct {
     u16 unk76;
     u8 pad78[0xAC - 0x78];
 } D800902E8Entry;
+
 extern D800902E8Entry *D_800902E8[];
 
 extern u8 D_8008EA16;
@@ -237,6 +236,7 @@ typedef struct {
     u8 pad0[0x18];
     u8 unk18; /* +0x18 */
 } ObjE970;
+
 extern ObjE970 *D_8008E970;
 
 extern u8 D_8008EA10;
@@ -355,6 +355,7 @@ typedef struct {
     u16 unk18; /* +0x12 */
     u8 pad20[0x20 - 20];
 } D8008E978Entry;
+
 extern D8008E978Entry *D_8008E978;
 
 INCLUDE_ASM("asm/nonmatchings/code_179d8_l", SpuVmDoAllocate);
@@ -530,12 +531,9 @@ void SePitchBend(s32 chan, s32 bend) {
     }
 }
 
+void func_8002E2F8(void) {}
 
-void func_8002E2F8(void) {
-}
-
-void func_8002E300(void) {
-}
+void func_8002E300(void) {}
 
 /* Matched round 73 -- docs/match-reports/SeAutoVol.md. Same body as
  * SeAutoPan (code_179d8_m), over _svm_voice +0x1C..+0x26 instead of
@@ -561,4 +559,3 @@ void SeAutoVol(s16 voice, s16 from, s16 to, s16 duration) {
         _svm_voice[voice].unk1E = q;
     }
 }
-

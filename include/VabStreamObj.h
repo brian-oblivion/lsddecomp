@@ -44,16 +44,16 @@ typedef struct VabStreamObjMethods VabStreamObjMethods;
  * not bring in LIBSND.H's prototypes, which the units declare locally. */
 typedef struct VabStreamVagAtr {
     /* +0x00 */ u8 pad0[0x4];
-    /* +0x04 */ u8 center;           /* VagAtr::center, the tone's centre note */
-    /* +0x05 */ u8 shift;            /* VagAtr::shift, centre-note fine tune */
+    /* +0x04 */ u8 center; /* VagAtr::center, the tone's centre note */
+    /* +0x05 */ u8 shift;  /* VagAtr::shift, centre-note fine tune */
     /* +0x06 */ u8 pad6[0x20 - 0x6];
 } VabStreamVagAtr;
 
 /* The two fields of Sony's VabHdr (32 bytes) that LoadVagAttrs reads. */
 typedef struct VabStreamVabHdr {
     /* +0x00 */ u8 pad0[0x12];
-    /* +0x12 */ u16 ts;              /* program count */
-    /* +0x14 */ u16 vs;              /* VAG count */
+    /* +0x12 */ u16 ts; /* program count */
+    /* +0x14 */ u16 vs; /* VAG count */
     /* +0x16 */ u8 pad16[0x20 - 0x16];
 } VabStreamVabHdr;
 
@@ -64,30 +64,32 @@ typedef s32 (*VabStreamObjOnBodyReadyFn)(VabStreamObj *self, s32 done);
 
 struct VabStreamObjMethods {
     /* ctor: New_VabStreamObj passes the bank's base path (no extension). */
-    CLASS6D430_SLOTS(VabStreamObj, (VabStreamObj *self, char *path));
-    /* +0x07C */ void (*loadVagAttrs)(VabStreamObj *self);         /* VabStreamObj__LoadVagAttrs */
-    /* +0x080 */ s32 (*playTone)(VabStreamObj *self, s32 index, s32 vol, s32 endVol); /* VabStreamObj__PlayTone: the voice, or -1 */
-    /* +0x084 */ s32 (*stopVoice)(VabStreamObj *self, s32 voice);  /* VabStreamObj__StopVoice: always -1 */
-    /* +0x088 */ s32 (*mute)(VabStreamObj *self);                  /* VabStreamObj__Mute */
-    /* +0x08C */ s32 (*unmute)(VabStreamObj *self);                /* VabStreamObj__Unmute */
-    /* +0x090 */ void (*slot90)(void);                             /* VabStreamObj__NoOpSlot90; no caller */
-    /* +0x094 */ void (*slot94)(void);                             /* VabStreamObj__NoOpSlot94; no caller */
-    /* +0x098 */ void (*slot98)(void);                             /* VabStreamObj__NoOpSlot98; no caller */
-    /* +0x09C */ void (*setPitchOffset)(VabStreamObj *self, s32 octave); /* VabStreamObj__SetPitchOffset: pitchOffset = octave * 12 - 24 */
-};                                   /* 39 slots, 0xA0 bytes */
+    CLASS6D430_SLOTS(VabStreamObj, (VabStreamObj * self, char *path));
+    /* +0x07C */ void (*loadVagAttrs)(VabStreamObj *self); /* VabStreamObj__LoadVagAttrs */
+    /* +0x080 */ s32 (*playTone)(VabStreamObj *self, s32 index, s32 vol,
+                                 s32 endVol); /* VabStreamObj__PlayTone: the voice, or -1 */
+    /* +0x084 */ s32 (*stopVoice)(VabStreamObj *self, s32 voice); /* VabStreamObj__StopVoice: always -1 */
+    /* +0x088 */ s32 (*mute)(VabStreamObj *self);                 /* VabStreamObj__Mute */
+    /* +0x08C */ s32 (*unmute)(VabStreamObj *self);               /* VabStreamObj__Unmute */
+    /* +0x090 */ void (*slot90)(void); /* VabStreamObj__NoOpSlot90; no caller */
+    /* +0x094 */ void (*slot94)(void); /* VabStreamObj__NoOpSlot94; no caller */
+    /* +0x098 */ void (*slot98)(void); /* VabStreamObj__NoOpSlot98; no caller */
+    /* +0x09C */ void (*setPitchOffset)(VabStreamObj *self,
+                                        s32 octave); /* VabStreamObj__SetPitchOffset: pitchOffset = octave * 12 - 24 */
+}; /* 39 slots, 0xA0 bytes */
 
 struct VabStreamObj {
     CLASS6D430_FIELDS(VabStreamObjMethods); /* buffer: the loaded .VH, then the .VB; unk2A is the load state: 0 idle, 1 header, 6 body */
-    /* +0x02C */ VabStreamVabHdr vabHdr;          /* SsUtGetVabHdr */
-    /* +0x04C */ VabStreamVagAtr *vagAttrPool;    /* vabHdr.vs records */
-    /* +0x050 */ VabStreamVagAtr **progVagTable;  /* vabHdr.ts pointers into vagAttrPool, one per program */
-    /* +0x054 */ s16 vabId;                       /* SsVabOpenHead / SsVabTransBody; WBgm opens its SEQ on it */
-    /* +0x056 */ s16 muted;                       /* Mute / Unmute */
-    /* +0x058 */ u16 attrsReady;                  /* set by OnBodyReady; WBgm waits on it */
-    /* +0x05A */ u16 bodyTransferPending;         /* set when SsVabTransBody succeeds */
-    /* +0x05C */ void *baseFilename;              /* the ctor's copy of the path; freed once the .VB is requested */
-    /* +0x060 */ s32 pitchOffset;                 /* semitones added to a tone's centre note */
-};                                   /* 0x64 bytes: New_VabStreamObj */
+    /* +0x02C */ VabStreamVabHdr vabHdr;       /* SsUtGetVabHdr */
+    /* +0x04C */ VabStreamVagAtr *vagAttrPool; /* vabHdr.vs records */
+    /* +0x050 */ VabStreamVagAtr **progVagTable; /* vabHdr.ts pointers into vagAttrPool, one per program */
+    /* +0x054 */ s16 vabId;      /* SsVabOpenHead / SsVabTransBody; WBgm opens its SEQ on it */
+    /* +0x056 */ s16 muted;      /* Mute / Unmute */
+    /* +0x058 */ u16 attrsReady; /* set by OnBodyReady; WBgm waits on it */
+    /* +0x05A */ u16 bodyTransferPending; /* set when SsVabTransBody succeeds */
+    /* +0x05C */ void *baseFilename; /* the ctor's copy of the path; freed once the .VB is requested */
+    /* +0x060 */ s32 pitchOffset;    /* semitones added to a tone's centre note */
+}; /* 0x64 bytes: New_VabStreamObj */
 
 extern VabStreamObjMethods gVabStreamObjMethods;
 extern VabStreamObjMethods *GetVabStreamObjMethods(void);

@@ -53,20 +53,20 @@ typedef struct TextRowMethods TextRowMethods;
  * __DetachFromParent, __SetDisplay, __SetColor, __SetPosition, __SetCellAt
  * and __NoOpGetCell (empty, at getCell). */
 struct TextRowMethods {
-    CHARSPRITE_SLOTS(TextRow, (TextRow *self, void *texture, s32 count, char *text));
-    /* +0x0CC */ void (*setText)(TextRow *self, char *text);    /* TextRow__SetText */
-    /* +0x0D0 */ void (*slotD0)(void);                          /* TextRow__NoOpSlotD0, empty; never called */
+    CHARSPRITE_SLOTS(TextRow, (TextRow * self, void *texture, s32 count, char *text));
+    /* +0x0CC */ void (*setText)(TextRow *self, char *text); /* TextRow__SetText */
+    /* +0x0D0 */ void (*slotD0)(void); /* TextRow__NoOpSlotD0, empty; never called */
     /* +0x0D4 */ void (*setCellPitch)(TextRow *self, s32 pitch); /* TextRow__SetCellPitch; reset passes 7 */
 };
 
 struct TextRow {
     CHARSPRITE_FIELDS(TextRowMethods);
-    /* +0x0A9 */ u8 cellCount;      /* the ctor's count: cells allocated; finalize releases them, setPosition walks them */
-    /* +0x0AA */ u8 gapIndex;       /* 0: none; else attachToParent adds 0x10 before this cell (Class86B60's name field: 9) */
-    /* +0x0AB */ u8 visibleCount;   /* the window attach/detach/setDisplay/setColor walk; the ctor sets it to count (name field: 8) */
-    /* +0x0AC */ u8 firstVisible;   /* its first cell; the ctor sets 0 (name field: 4) */
+    /* +0x0A9 */ u8 cellCount; /* the ctor's count: cells allocated; finalize releases them, setPosition walks them */
+    /* +0x0AA */ u8 gapIndex; /* 0: none; else attachToParent adds 0x10 before this cell (Class86B60's name field: 9) */
+    /* +0x0AB */ u8 visibleCount; /* the window attach/detach/setDisplay/setColor walk; the ctor sets it to count (name field: 8) */
+    /* +0x0AC */ u8 firstVisible; /* its first cell; the ctor sets 0 (name field: 4) */
     /* +0x0AD */ u8 padAD[3];
-    /* +0x0B0 */ s32 cellPitch;     /* setCellPitch; added to x between cells */
+    /* +0x0B0 */ s32 cellPitch; /* setCellPitch; added to x between cells */
     /* +0x0B4 */ CharSprite **cells; /* cellCount New_CharSprite cells. The object is 0xB8 bytes (New_TextRow) */
 };
 

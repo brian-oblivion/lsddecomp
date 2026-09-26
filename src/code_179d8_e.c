@@ -95,12 +95,12 @@ typedef struct SoundCueSlot {
 } SoundCueSlot;
 
 typedef struct SoundCueSet {
-    s32 tag;    /* +0x00, guard (0 = uninitialized) AND, once initialized, the caller's own tag (round 52: Entity.c passes this->moodIndex + 1) */
-    s32 unk4;   /* +0x04, zeroed by InitSoundCueSet, never read by this unit's own functions */
+    s32 tag; /* +0x00, guard (0 = uninitialized) AND, once initialized, the caller's own tag (round 52: Entity.c passes this->moodIndex + 1) */
+    s32 unk4;    /* +0x04, zeroed by InitSoundCueSet, never read by this unit's own functions */
     void *owner; /* +0x08, the caller's own object pointer (Entity, DreamSys, etc -- opaque here) */
     s32 callback; /* +0x0C, a function-pointer-shaped value from the caller (round 52: DreamSys.c passes a vtable slot, class_3bb8c_n.c indexes a table of them) -- stored, never called by this unit's own functions */
     u8 pad10[0x14 - 0x10];
-    s32 unk14;  /* +0x14, set to the constant 10 by InitSoundCueSet; no further evidence of its role in this unit */
+    s32 unk14; /* +0x14, set to the constant 10 by InitSoundCueSet; no further evidence of its role in this unit */
     SoundCueSlot slots[3]; /* +0x18 */
 } SoundCueSet;
 
@@ -108,20 +108,15 @@ s32 VabDriver__Read(void) {
     return 0;
 }
 
-void VabDriver__LoadFile(void) {
-}
+void VabDriver__LoadFile(void) {}
 
-void VabDriver__RunRequestQueue(void) {
-}
+void VabDriver__RunRequestQueue(void) {}
 
-void VabDriver__RequestLoadFile(void) {
-}
+void VabDriver__RequestLoadFile(void) {}
 
-void VabDriver__StopService(void) {
-}
+void VabDriver__StopService(void) {}
 
-void VabDriver__CancelRequests(void) {
-}
+void VabDriver__CancelRequests(void) {}
 
 VabDriverMethods *GetVabDriverMethods(void) {
     return &gVabDriverMethods;
@@ -137,11 +132,10 @@ s32 GetVabDriverMode(s32 *arg0) {
     return gVabDriverMode;
 }
 
-s32 SetVabDriverMode(s32 a, s32 b)
-{
-	gVabDriverMode = a;
-	gVabDriverModeArg = b;
-	return 1;
+s32 SetVabDriverMode(s32 a, s32 b) {
+    gVabDriverMode = a;
+    gVabDriverModeArg = b;
+    return 1;
 }
 
 s32 func_8002C478(void) {
@@ -265,33 +259,33 @@ void VabStreamObj__AdvanceLoadState(VabStreamObj *self) {
     char path[0x20];
 
     switch (self->unk2A) {
-    case 0:
-        break;
-    case 1:
-        if (self->flags & 0x200) {
-            self->vabId = SsVabOpenHead(self->buffer, -1);
-            BuildFileName(path, self->baseFilename, NULL, gVabBodySuffix);
-            gPendingVabBuffer = self->buffer;
-            self->unk2A = 6;
-            self->buffer = NULL;
-            self->methods->loadFile(self, path);
-            if (self->baseFilename != NULL) {
-                BMemPMgrFree(self->baseFilename);
-                self->baseFilename = NULL;
+        case 0:
+            break;
+        case 1:
+            if (self->flags & 0x200) {
+                self->vabId = SsVabOpenHead(self->buffer, -1);
+                BuildFileName(path, self->baseFilename, NULL, gVabBodySuffix);
+                gPendingVabBuffer = self->buffer;
+                self->unk2A = 6;
+                self->buffer = NULL;
+                self->methods->loadFile(self, path);
+                if (self->baseFilename != NULL) {
+                    BMemPMgrFree(self->baseFilename);
+                    self->baseFilename = NULL;
+                }
             }
-        }
-        break;
-    case 6:
-        if (self->flags & 0x200) {
-            self->vabId = SsVabTransBody(self->buffer, self->vabId);
-            if (self->vabId != -1) {
-                self->bodyTransferPending = 1;
-                ((VabStreamObjOnBodyReadyFn)self->methods->slot78)(self, 1);
+            break;
+        case 6:
+            if (self->flags & 0x200) {
+                self->vabId = SsVabTransBody(self->buffer, self->vabId);
+                if (self->vabId != -1) {
+                    self->bodyTransferPending = 1;
+                    ((VabStreamObjOnBodyReadyFn)self->methods->slot78)(self, 1);
+                }
             }
-        }
-        break;
-    default:
-        break;
+            break;
+        default:
+            break;
     }
 }
 
@@ -320,8 +314,7 @@ typedef struct ProgAtrView {
     u8 pad1[0x10 - 0x1];
 } ProgAtrView;
 
-void VabStreamObj__LoadVagAttrs(VabStreamObj *self)
-{
+void VabStreamObj__LoadVagAttrs(VabStreamObj *self) {
     ProgAtrView prog;
     VabStreamVagAtr *pool;
     s32 i;
@@ -385,7 +378,7 @@ s32 VabStreamObj__PlayTone(VabStreamObj *self, s32 index, s32 vol, s32 endVol) {
         lo = index - hi * 16;
         entry = &prog[lo];
         result = SsUtKeyOn(self->vabId, (s16)hi, (s16)lo, (s16)(entry->center + self->pitchOffset),
-                                entry->shift, (s16)vol, (s16)vol);
+                           entry->shift, (s16)vol, (s16)vol);
         if (result >= 0) {
             SsUtAutoVol(result, (s16)vol, (s16)endVol, 2);
             return result;
@@ -430,14 +423,11 @@ s32 VabStreamObj__Unmute(VabStreamObj *self) {
     return flag;
 }
 
-void VabStreamObj__NoOpSlot90(void) {
-}
+void VabStreamObj__NoOpSlot90(void) {}
 
-void VabStreamObj__NoOpSlot94(void) {
-}
+void VabStreamObj__NoOpSlot94(void) {}
 
-void VabStreamObj__NoOpSlot98(void) {
-}
+void VabStreamObj__NoOpSlot98(void) {}
 
 void VabStreamObj__SetPitchOffset(VabStreamObj *self, s32 octave) {
     self->pitchOffset = octave * 12 - 0x18;

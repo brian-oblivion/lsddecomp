@@ -29,8 +29,7 @@
 #include "Class86B60.h"
 #include "VabStreamObj.h"
 
-Class869D8 *New_Class869D8(void)
-{
+Class869D8 *New_Class869D8(void) {
     Class869D8 *self;
 
     self = BMemPMgrAlloc(0xDC);
@@ -41,42 +40,33 @@ Class869D8 *New_Class869D8(void)
     return NULL;
 }
 
-void Class869D8__Class869D8(Class869D8 *self)
-{
+void Class869D8__Class869D8(Class869D8 *self) {
     GetViewportMethods()->ctor((Viewport *)self);
     self->methods = GetClass869D8Methods();
     self->methods->initDefaults(self);
 }
 
-void Class869D8__InitDefaults(void) {
-}
+void Class869D8__InitDefaults(void) {}
 
-void Class869D8__Update(Class869D8 *self)
-{
+void Class869D8__Update(Class869D8 *self) {
     if (self->viewNode != NULL && self->otReady != 0) {
         GetViewportMethods()->update((Viewport *)self);
     }
 }
 
-void func_8004D35C(void) {
-}
+void func_8004D35C(void) {}
 
-void func_8004D364(void) {
-}
+void func_8004D364(void) {}
 
-void func_8004D36C(void) {
-}
+void func_8004D36C(void) {}
 
-void func_8004D374(void) {
-}
+void func_8004D374(void) {}
 
-Class869D8Methods *GetClass869D8Methods(void)
-{
+Class869D8Methods *GetClass869D8Methods(void) {
     return &gClass869D8Methods;
 }
 
-Class86AA0 *New_Class86AA0(void)
-{
+Class86AA0 *New_Class86AA0(void) {
     Class86AA0 *self;
 
     self = BMemPMgrAlloc(0x3C);
@@ -87,8 +77,7 @@ Class86AA0 *New_Class86AA0(void)
     return NULL;
 }
 
-void Class86AA0__Class86AA0(Class86AA0 *self)
-{
+void Class86AA0__Class86AA0(Class86AA0 *self) {
     GetClass6B5CCMethods()->ctor((Class6B5CC *)self);
     self->methods = GetClass86AA0Methods();
     self->unk34 = 0;
@@ -96,13 +85,11 @@ void Class86AA0__Class86AA0(Class86AA0 *self)
     self->nextInCell = NULL;
 }
 
-void Class86AA0__Reset(void) {
-}
+void Class86AA0__Reset(void) {}
 
 /* Only the low byte of the sender's class id is read: 0x34 is an Actor
  * (Actor__DispatchLinkCommand makes the same test the other way round). */
-void Class86AA0__DispatchLinkCommand(Class86AA0 *self, BasicClass *sender, s32 event)
-{
+void Class86AA0__DispatchLinkCommand(Class86AA0 *self, BasicClass *sender, s32 event) {
     if (*(u8 *)sender->methods == 0x34) {
         self->methods->onActorLinkCommand(self, sender, event);
     }
@@ -110,8 +97,7 @@ void Class86AA0__DispatchLinkCommand(Class86AA0 *self, BasicClass *sender, s32 e
 
 /* tryAttachNearby keeps Class6B5CC's one-parameter slot type; this caller
  * passes the sender and event too, as Actor__OnActorLinkCommand does. */
-void Class86AA0__OnActorLinkCommand(Class86AA0 *self, void *sender, s32 event)
-{
+void Class86AA0__OnActorLinkCommand(Class86AA0 *self, void *sender, s32 event) {
     GetClass6B5CCMethods()->dispatchLinkCommand((Class6B5CC *)self, sender, event);
     if (event >= 9) {
         return;
@@ -124,18 +110,15 @@ void Class86AA0__OnActorLinkCommand(Class86AA0 *self, void *sender, s32 event)
     ((void (*)(Class86AA0 *, void *, s32))self->methods->tryAttachNearby)(self, sender, event);
 }
 
-void *Class86AA0__ReturnSelf(Class86AA0 *self)
-{
+void *Class86AA0__ReturnSelf(Class86AA0 *self) {
     return self;
 }
 
-Class86AA0Methods *GetClass86AA0Methods(void)
-{
+Class86AA0Methods *GetClass86AA0Methods(void) {
     return &gClass86AA0Methods;
 }
 
-Class86B60 *New_Class86B60(struct DreamSys *dreamSys)
-{
+Class86B60 *New_Class86B60(struct DreamSys *dreamSys) {
     Class86B60 *self;
 
     self = BMemPMgrAlloc(0xC4);
@@ -146,8 +129,7 @@ Class86B60 *New_Class86B60(struct DreamSys *dreamSys)
     return NULL;
 }
 
-void Class86B60__Class86B60(Class86B60 *self, struct DreamSys *dreamSys)
-{
+void Class86B60__Class86B60(Class86B60 *self, struct DreamSys *dreamSys) {
     DreamSys *dream;
     VabStreamObj *sound;
 
@@ -164,8 +146,7 @@ void Class86B60__Class86B60(Class86B60 *self, struct DreamSys *dreamSys)
     ((Class86B60ResetCallFn)self->methods->resetCounters)(self, dreamSys);
 }
 
-void CheckSaveScoreFlag(Ctx678_3bb8c_c *ctx, Result678_3bb8c_c *out)
-{
+void CheckSaveScoreFlag(Ctx678_3bb8c_c *ctx, Result678_3bb8c_c *out) {
     SaveBlock678_3bb8c_c *target = ctx->target;
     s32 flag = 1;
 
@@ -195,8 +176,7 @@ typedef struct {
     s8 a, b, c, d, e, f;
 } Buf6_3bb8c_c;
 
-void FormatNumberIntoBuffer(s32 arg0)
-{
+void FormatNumberIntoBuffer(s32 arg0) {
     FormatFullWidthNumber(D_8008AA24, arg0, 3, 0);
     *(Buf6_3bb8c_c *)((s8 *)D_8008AA18 + 0x12) = *(Buf6_3bb8c_c *)D_8008AA24;
 }

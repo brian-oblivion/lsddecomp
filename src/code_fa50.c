@@ -31,8 +31,8 @@
 
 /* A box with a leading word: TmdModel__GetHull's local. */
 typedef struct TypedBox_fa50 {
-    s32 type;               /* +0x000 */
-    TmdBox box;             /* +0x004 */
+    s32 type;   /* +0x000 */
+    TmdBox box; /* +0x004 */
 } TypedBox_fa50;
 
 /* The eight corners of a box: v[0..3] one face, v[4..7] the other. */
@@ -42,14 +42,14 @@ typedef struct Corners_fa50 {
 
 /* A counted list of boxes' corners (TmdHull is the one-box case). */
 typedef struct HullList_fa50 {
-    s32 n;                  /* +0x000 */
-    Corners_fa50 c[1];      /* +0x004 */
+    s32 n;             /* +0x000 */
+    Corners_fa50 c[1]; /* +0x004 */
 } HullList_fa50;
 
 /* A segment: start and direction (end - start). */
 typedef struct Ray_fa50 {
-    TmdVec3 org;            /* +0x000 */
-    TmdVec3 dir;            /* +0x006 */
+    TmdVec3 org; /* +0x000 */
+    TmdVec3 dir; /* +0x006 */
 } Ray_fa50;
 
 /* LIBGTE's VECTOR, declared locally. */
@@ -67,17 +67,17 @@ typedef union VecBox_fa50 {
 
 typedef struct Target_fa50 {
     u8 pad0[0x6];
-    s16 unk6;               /* +0x006 */
+    s16 unk6; /* +0x006 */
 } Target_fa50;
 
 typedef struct Inner_fa50 {
     u8 pad0[0x10];
-    Target_fa50 *unk10;     /* +0x010 */
+    Target_fa50 *unk10; /* +0x010 */
 } Inner_fa50;
 
 typedef struct Outer_fa50 {
     u8 pad0[0x10];
-    Inner_fa50 *unk10;      /* +0x010 */
+    Inner_fa50 *unk10; /* +0x010 */
 } Outer_fa50;
 
 extern void GsMapModelingData(unsigned long *p);
@@ -96,6 +96,7 @@ TmdModel *New_TmdModel(TmdObject *object) {
     }
     return NULL;
 }
+
 void TmdModel__TmdModel(TmdModel *self, TmdObject *object) {
     Get_vtable_BasicClass()->ctor((BasicClass *)self);
     self->methods = Get_vtable_TmdModel();
@@ -103,26 +104,33 @@ void TmdModel__TmdModel(TmdModel *self, TmdObject *object) {
     self->data = (TmdFile *)((u8 *)object - 0xC);
     TmdModel__InitBoundsCount(self);
 }
+
 void TmdModel__SetQuad(TmdModel *self, TmdModelQuad *src) {
     self->quad = *src;
 }
+
 void TmdModel__MapModelingData(TmdModel *self) {
     GsMapModelingData((unsigned long *)&self->data->flags);
 }
+
 TmdObject *TmdModel__GetObject(TmdModel *self, s32 i) {
     return &self->data->objects[i];
 }
-void TmdModel__func_8001F37C(void) {
-}
+
+void TmdModel__func_8001F37C(void) {}
+
 TmdModelMethods *Get_vtable_TmdModel(void) {
     return &gTmdModelMethods;
 }
+
 void TmdModel__InitBoundsCount(TmdModel *self) {
     gTmdModelBoundsCount = 1;
 }
+
 s32 TmdModel__GetBoundsCount(TmdModel *self) {
     return gTmdModelBoundsCount;
 }
+
 void TmdModel__ComputeBounds(TmdModel *self, TmdBox *box) {
     s32 i;
     s32 n;
@@ -141,20 +149,29 @@ void TmdModel__ComputeBounds(TmdModel *self, TmdBox *box) {
     box->max = box->min;
     for (i = 0; i < n; i++) {
         v++;
-        if (v->x < box->min.x) box->min.x = v->x;
-        if (v->y < *miny) *miny = v->y;
-        if (v->z < *minz) *minz = v->z;
-        if (*maxx < v->x) *maxx = v->x;
-        if (*maxy < v->y) *maxy = v->y;
-        if (*maxz < v->z) *maxz = v->z;
+        if (v->x < box->min.x)
+            box->min.x = v->x;
+        if (v->y < *miny)
+            *miny = v->y;
+        if (v->z < *minz)
+            *minz = v->z;
+        if (*maxx < v->x)
+            *maxx = v->x;
+        if (*maxy < v->y)
+            *maxy = v->y;
+        if (*maxz < v->z)
+            *maxz = v->z;
     }
 }
+
 void TmdModel__UpdateBoundsBuffer(TmdModel *self) {
     TmdModel__ComputeBounds(self, gTmdModelBoundsBuf);
 }
+
 TmdBox *TmdModel__GetBoundsBuffer(TmdModel *self, s32 i) {
     return gTmdModelBoundsBuf;
 }
+
 void TmdModel__GetHull(TmdModel *self, TmdHull *out) {
     TypedBox_fa50 b;
 
@@ -186,6 +203,7 @@ void TmdModel__GetHull(TmdModel *self, TmdHull *out) {
     out->v[7].z = b.box.max.z;
     out->count = 1;
 }
+
 void RotateAndOffsetHullList(HullList_fa50 *h, s32 turn, s32 back, s32 d) {
     Corners_fa50 tmp;
     Corners_fa50 *c;
@@ -229,13 +247,15 @@ void RotateAndOffsetHullList(HullList_fa50 *h, s32 turn, s32 back, s32 d) {
         }
     }
 }
+
 /* Casts the segment origin..end against every triangle/quad of the model and
  * keeps the nearest hit: *best = its distance, *hitOut = the point, *height =
  * the point's y above the face's box. Returns whether anything was hit. The
  * VECTOR locals are scratch named by their frame slot; v60 is never used but
  * holds retail's slot, and dist is an 8-byte array because retail keeps it in
  * memory at the slot after uF0. */
-s32 TmdModel__RaycastFaces(TmdModel *self, s32 *best, TmdVec3 *hitOut, s32 *height, TmdVec3 *origin, TmdVec3 *end) {
+s32 TmdModel__RaycastFaces(TmdModel *self, s32 *best, TmdVec3 *hitOut, s32 *height, TmdVec3 *origin,
+                           TmdVec3 *end) {
     TmdVec3 tri[4];
     Vec4_fa50 plane;
     Ray_fa50 ray;
@@ -370,12 +390,18 @@ s32 TmdModel__RaycastFaces(TmdModel *self, s32 *best, TmdVec3 *hitOut, s32 *heig
         uF0.b.max = uF0.b.min;
         for (i = 0; i < nverts - 1; i++) {
             v++;
-            if (v->x < *minx) *minx = v->x;
-            if (v->y < *miny) *miny = v->y;
-            if (v->z < *minz) *minz = v->z;
-            if (*maxx < v->x) *maxx = v->x;
-            if (*maxy < v->y) *maxy = v->y;
-            if (*maxz < v->z) *maxz = v->z;
+            if (v->x < *minx)
+                *minx = v->x;
+            if (v->y < *miny)
+                *miny = v->y;
+            if (v->z < *minz)
+                *minz = v->z;
+            if (*maxx < v->x)
+                *maxx = v->x;
+            if (*maxy < v->y)
+                *maxy = v->y;
+            if (*maxz < v->z)
+                *maxz = v->z;
         }
         if (hit.x < uF0.b.min.x - 24 || hit.y < uF0.b.min.y - 24 || hit.z < uF0.b.min.z - 24 ||
             uF0.b.max.x + 24 < hit.x || uF0.b.max.y + 24 < hit.y || uF0.b.max.z + 24 < hit.z) {
@@ -392,6 +418,7 @@ s32 TmdModel__RaycastFaces(TmdModel *self, s32 *best, TmdVec3 *hitOut, s32 *heig
     }
     return found;
 }
+
 TmdPrim *TmdModel__NextPrimitive(TmdModel *self, TmdPrim *p, s32 *n, TmdVec3 *out, u32 *count) {
     s32 idx[4];
     TmdObject *rec = self->object;
@@ -407,165 +434,165 @@ TmdPrim *TmdModel__NextPrimitive(TmdModel *self, TmdPrim *p, s32 *n, TmdVec3 *ou
     }
     *n = 4;
     switch (p->mode) {
-    case 0x20:
-    case 0x22:
-        if (p->flag & 4) {
+        case 0x20:
+        case 0x22:
+            if (p->flag & 4) {
+                idx[0] = p->h[7];
+                idx[1] = p->h[8];
+                idx[2] = p->h[9];
+                size = 0x18;
+                goto tri;
+            } else {
+                idx[0] = p->h[3];
+                idx[1] = p->h[4];
+                idx[2] = p->h[5];
+                size = 0x10;
+                goto tri;
+            }
+            break;
+        case 0x21:
+        case 0x23:
+            idx[0] = p->h[2];
+            idx[1] = p->h[3];
+            idx[2] = p->h[4];
+            size = 0x10;
+            goto tri;
+        case 0x24:
+        case 0x26:
             idx[0] = p->h[7];
             idx[1] = p->h[8];
             idx[2] = p->h[9];
             size = 0x18;
             goto tri;
-        } else {
-            idx[0] = p->h[3];
-            idx[1] = p->h[4];
-            idx[2] = p->h[5];
-            size = 0x10;
+        case 0x25:
+        case 0x27:
+            idx[0] = p->h[8];
+            idx[1] = p->h[9];
+            idx[2] = p->h[10];
+            size = 0x1C;
             goto tri;
-        }
-        break;
-    case 0x21:
-    case 0x23:
-        idx[0] = p->h[2];
-        idx[1] = p->h[3];
-        idx[2] = p->h[4];
-        size = 0x10;
-        goto tri;
-    case 0x24:
-    case 0x26:
-        idx[0] = p->h[7];
-        idx[1] = p->h[8];
-        idx[2] = p->h[9];
-        size = 0x18;
-        goto tri;
-    case 0x25:
-    case 0x27:
-        idx[0] = p->h[8];
-        idx[1] = p->h[9];
-        idx[2] = p->h[10];
-        size = 0x1C;
-        goto tri;
-    case 0x28:
-    case 0x2A:
-        if (p->flag & 4) {
+        case 0x28:
+        case 0x2A:
+            if (p->flag & 4) {
+                idx[0] = p->h[9];
+                idx[1] = p->h[10];
+                idx[2] = p->h[11];
+                idx[3] = p->h[12];
+                size = 0x20;
+            } else {
+                idx[0] = p->h[3];
+                idx[1] = p->h[4];
+                idx[2] = p->h[5];
+                idx[3] = p->h[6];
+                size = 0x14;
+            }
+            break;
+        case 0x29:
+        case 0x2B:
+            idx[0] = p->h[2];
+            idx[1] = p->h[3];
+            idx[2] = p->h[4];
+            idx[3] = p->h[5];
+            size = 0x10;
+            break;
+        case 0x2C:
+        case 0x2E:
             idx[0] = p->h[9];
             idx[1] = p->h[10];
             idx[2] = p->h[11];
             idx[3] = p->h[12];
             size = 0x20;
-        } else {
-            idx[0] = p->h[3];
-            idx[1] = p->h[4];
-            idx[2] = p->h[5];
-            idx[3] = p->h[6];
-            size = 0x14;
-        }
-        break;
-    case 0x29:
-    case 0x2B:
-        idx[0] = p->h[2];
-        idx[1] = p->h[3];
-        idx[2] = p->h[4];
-        idx[3] = p->h[5];
-        size = 0x10;
-        break;
-    case 0x2C:
-    case 0x2E:
-        idx[0] = p->h[9];
-        idx[1] = p->h[10];
-        idx[2] = p->h[11];
-        idx[3] = p->h[12];
-        size = 0x20;
-        break;
-    case 0x2D:
-    case 0x2F:
-        idx[0] = p->h[10];
-        idx[1] = p->h[11];
-        idx[2] = p->h[12];
-        idx[3] = p->h[13];
-        size = 0x20;
-        break;
-    case 0x30:
-    case 0x32:
-        if (p->flag & 4) {
+            break;
+        case 0x2D:
+        case 0x2F:
+            idx[0] = p->h[10];
+            idx[1] = p->h[11];
+            idx[2] = p->h[12];
+            idx[3] = p->h[13];
+            size = 0x20;
+            break;
+        case 0x30:
+        case 0x32:
+            if (p->flag & 4) {
+                idx[0] = p->h[7];
+                idx[1] = p->h[9];
+                idx[2] = p->h[11];
+                size = 0x1C;
+                goto tri;
+            } else {
+                idx[0] = p->h[3];
+                idx[1] = p->h[5];
+                idx[2] = p->h[7];
+                size = 0x14;
+                goto tri;
+            }
+            break;
+        case 0x31:
+        case 0x33:
+            idx[0] = p->h[6];
+            idx[1] = p->h[7];
+            idx[2] = p->h[8];
+            size = 0x18;
+            goto tri;
+        case 0x34:
+        case 0x36:
             idx[0] = p->h[7];
             idx[1] = p->h[9];
             idx[2] = p->h[11];
             size = 0x1C;
             goto tri;
-        } else {
-            idx[0] = p->h[3];
-            idx[1] = p->h[5];
-            idx[2] = p->h[7];
-            size = 0x14;
-            goto tri;
-        }
-        break;
-    case 0x31:
-    case 0x33:
-        idx[0] = p->h[6];
-        idx[1] = p->h[7];
-        idx[2] = p->h[8];
-        size = 0x18;
-        goto tri;
-    case 0x34:
-    case 0x36:
-        idx[0] = p->h[7];
-        idx[1] = p->h[9];
-        idx[2] = p->h[11];
-        size = 0x1C;
-        goto tri;
-    case 0x35:
-    case 0x37:
-        idx[0] = p->h[12];
-        idx[1] = p->h[13];
-        idx[2] = p->h[14];
-        size = 0x24;
-    tri:
-        *n = 3;
-        break;
-    case 0x38:
-    case 0x3A:
-        if (p->flag & 4) {
+        case 0x35:
+        case 0x37:
+            idx[0] = p->h[12];
+            idx[1] = p->h[13];
+            idx[2] = p->h[14];
+            size = 0x24;
+        tri:
+            *n = 3;
+            break;
+        case 0x38:
+        case 0x3A:
+            if (p->flag & 4) {
+                idx[0] = p->h[9];
+                idx[1] = p->h[11];
+                idx[2] = p->h[13];
+                idx[3] = p->h[15];
+                size = 0x24;
+            } else {
+                idx[0] = p->h[3];
+                idx[1] = p->h[5];
+                idx[2] = p->h[7];
+                idx[3] = p->h[9];
+                size = 0x18;
+            }
+            break;
+        case 0x39:
+        case 0x3B:
+            idx[0] = p->h[8];
+            idx[1] = p->h[9];
+            idx[2] = p->h[10];
+            idx[3] = p->h[11];
+            size = 0x1C;
+            break;
+        case 0x3C:
+        case 0x3E:
             idx[0] = p->h[9];
             idx[1] = p->h[11];
             idx[2] = p->h[13];
             idx[3] = p->h[15];
             size = 0x24;
-        } else {
-            idx[0] = p->h[3];
-            idx[1] = p->h[5];
-            idx[2] = p->h[7];
-            idx[3] = p->h[9];
-            size = 0x18;
-        }
-        break;
-    case 0x39:
-    case 0x3B:
-        idx[0] = p->h[8];
-        idx[1] = p->h[9];
-        idx[2] = p->h[10];
-        idx[3] = p->h[11];
-        size = 0x1C;
-        break;
-    case 0x3C:
-    case 0x3E:
-        idx[0] = p->h[9];
-        idx[1] = p->h[11];
-        idx[2] = p->h[13];
-        idx[3] = p->h[15];
-        size = 0x24;
-        break;
-    case 0x3D:
-    case 0x3F:
-        idx[0] = p->h[16];
-        idx[1] = p->h[17];
-        idx[2] = p->h[18];
-        idx[3] = p->h[19];
-        size = 0x2C;
-        break;
-    default:
-        *n = 0;
-        break;
+            break;
+        case 0x3D:
+        case 0x3F:
+            idx[0] = p->h[16];
+            idx[1] = p->h[17];
+            idx[2] = p->h[18];
+            idx[3] = p->h[19];
+            size = 0x2C;
+            break;
+        default:
+            *n = 0;
+            break;
     }
     verts = self->object->verts;
     for (i = 0; i < *n; i++) {
@@ -574,12 +601,14 @@ TmdPrim *TmdModel__NextPrimitive(TmdModel *self, TmdPrim *p, s32 *n, TmdVec3 *ou
     (*count)++;
     return (TmdPrim *)((u8 *)p + size);
 }
+
 void AccumulateTargetOffset(Outer_fa50 *self, s32 *xy) {
     Target_fa50 *t = self->unk10->unk10;
 
     t->unk6 += xy[0] / 16;
     t->unk6 += xy[1] * 64;
 }
+
 void SetTargetOffset(Outer_fa50 *self, s16 *xy) {
     Target_fa50 *t = self->unk10->unk10;
     s32 v;

@@ -72,10 +72,11 @@ def main():
     # caller leaves loaded; byte-exact both ways, see report */`
     ok = set()
     for path in list(srcpath.src_files()) + list(ROOT.glob("include/*.h")):
-        for line in path.read_text(errors="replace").splitlines():
-            m = re.search(r"\bextern\b[^;]*?\b(\w+)\s*\([^;]*;.*arity-ok:", line)
-            if m:
-                ok.add(m.group(1))
+        # The statement may span lines (clang-format wraps long ones): the
+        # marker is in the comment that follows its `;`, before the next line.
+        for m in re.finditer(r"\bextern\b[^;]*?\b(\w+)\s*\([^;]*;[ \t]*/\*[^\n]*?arity-ok:",
+                             path.read_text(errors="replace")):
+            ok.add(m.group(1))
     for h in ROOT.glob("include/*.h"):
         text = re.sub(r"/\*.*?\*/", "", h.read_text(errors="replace"), flags=re.S)
         for name, params in EXTERN_RE.findall(text):

@@ -19,24 +19,34 @@
 #include "Viewport.h"
 
 /* Psy-Q LIBGTE.H / LIBGS.H shapes, declared locally. */
-typedef struct { s16 m[3][3]; s32 t[3]; } MATRIX_2864;
-typedef struct { s32 vx, vy, vz, pad; } VECTOR_2864;
-typedef struct { s16 vx, vy, vz, pad; } SVECTOR_2864;
+typedef struct {
+    s16 m[3][3];
+    s32 t[3];
+} MATRIX_2864;
 
 typedef struct {
-    u32 scale[4];            /* +0x00 VECTOR scale, read as unsigned */
-    SVECTOR_2864 rotate;     /* +0x10 */
-    VECTOR_2864 trans;       /* +0x18 */
+    s32 vx, vy, vz, pad;
+} VECTOR_2864;
+
+typedef struct {
+    s16 vx, vy, vz, pad;
+} SVECTOR_2864;
+
+typedef struct {
+    u32 scale[4];        /* +0x00 VECTOR scale, read as unsigned */
+    SVECTOR_2864 rotate; /* +0x10 */
+    VECTOR_2864 trans;   /* +0x18 */
 } GsCOORD2PARAM_2864;
 
 typedef struct GsCOORDINATE2_2864 GsCOORDINATE2_2864;
+
 struct GsCOORDINATE2_2864 {
-    u32 flg;                          /* +0x00 */
-    MATRIX_2864 coord;                /* +0x04 */
-    MATRIX_2864 workm;                /* +0x24 */
-    GsCOORD2PARAM_2864 *param;        /* +0x44 */
-    GsCOORDINATE2_2864 *super;        /* +0x48 */
-    GsCOORDINATE2_2864 *sub;          /* +0x4C */
+    u32 flg;                   /* +0x00 */
+    MATRIX_2864 coord;         /* +0x04 */
+    MATRIX_2864 workm;         /* +0x24 */
+    GsCOORD2PARAM_2864 *param; /* +0x44 */
+    GsCOORDINATE2_2864 *super; /* +0x48 */
+    GsCOORDINATE2_2864 *sub;   /* +0x4C */
 };
 
 typedef struct {
@@ -71,32 +81,35 @@ typedef struct {
  * 0x64 box fill, 0x44 sprite -- 0x144 screen-space, otherwise world-space --
  * and anything else a GsDOBJ2 model). */
 typedef struct DrawNode DrawNode;
+
 struct DrawNode {
     BASICCLASS_FIELDS(BasicClassMethods);
-    DrawNode *parent;           /* +0x00C */
-    GsDOBJ2_2864 obj;           /* +0x010 */
+    DrawNode *parent; /* +0x00C */
+    GsDOBJ2_2864 obj; /* +0x010 */
     u8 pad20[0x44 - 0x20];
+
     union {
-        u8 bg[0x28];            /* tag 0x54: GsBG at +0x44 */
-        struct {                /* tag 0x64 */
-            u16 pri;            /* +0x044 */
+        u8 bg[0x28]; /* tag 0x54: GsBG at +0x44 */
+
+        struct {     /* tag 0x64 */
+            u16 pri; /* +0x044 */
             u8 pad46[2];
-            s32 relative;       /* +0x048 */
+            s32 relative; /* +0x048 */
             u8 pad4C[4];
-            s32 x;              /* +0x050 */
-            s32 y;              /* +0x054 */
-            GsBOXF_2864 box;    /* +0x058 */
+            s32 x;           /* +0x050 */
+            s32 y;           /* +0x054 */
+            GsBOXF_2864 box; /* +0x058 */
         } boxf;
-        struct {                /* tag 0x44 */
+
+        struct { /* tag 0x44 */
             u8 pad44[0x64 - 0x44];
             GsSPRITE_2864 sprite; /* +0x064 */
             u8 pad88[0xA0 - 0x88];
-            s32 ratioX;         /* +0x0A0 */
-            s32 ratioY;         /* +0x0A4 */
+            s32 ratioX; /* +0x0A0 */
+            s32 ratioY; /* +0x0A4 */
         } spr;
     } u;
 };
-
 
 extern void RotMatrix(SVECTOR_2864 *r, MATRIX_2864 *m);
 extern void GsGetLs(GsCOORDINATE2_2864 *m, MATRIX_2864 *out);
@@ -123,8 +136,7 @@ extern void func_80018464(void *objIn, void *otSrc, s32 otShift, void *ctxIn);
  *    the ratio ternaries are one store each (the second copy of the store
  *    is the delay-slot filler's); `~v + 1` is retail's nor/addiu negate.
  */
-void Viewport__DrawNode(Viewport *self, DrawNode *node)
-{
+void Viewport__DrawNode(Viewport *self, DrawNode *node) {
     MATRIX_2864 lsBuf;
     MATRIX_2864 lwBuf;
     MATRIX_2864 *ls;

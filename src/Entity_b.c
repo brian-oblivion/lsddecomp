@@ -214,8 +214,7 @@ void Entity__MoodCue07(Entity *this, EntityMoodHandlerArg *out) {
     if (this->moodTimer >= 0x79) {
         this->methods->updateRotation(this, 0, ROTATION_YAW_PLUS2);
         this->methods->moveLocalZ(this, -0x140, 0);
-    } else if (this->moodTimer >= 0x38 ||
-               Entity__IsNearTarget(this, &this->coord2->tx, 1, 1) != 0) {
+    } else if (this->moodTimer >= 0x38 || Entity__IsNearTarget(this, &this->coord2->tx, 1, 1) != 0) {
         this->methods->addTranslation(this, TRANSLATE_Y_MINUS64);
     } else if (this->moodTimer >= 0xA) {
         Class6B5CC__FaceTarget((Class6B5CC *)this, (Class6B5CC *)this->peer, 1, 0, 0);

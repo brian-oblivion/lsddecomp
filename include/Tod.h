@@ -47,16 +47,20 @@ typedef struct TodMethods TodMethods;
 /* Both own slots are typed as their occupants. +0x07C returns u8: cc1 still
  * emits Tod__ScanPackets' trailing `andi 0xFF` over a u8 slot, so the bytes
  * do not need the s32 the unit-local view had (round 86). */
+/* clang-format off */
 #define TOD_SLOTS(Self, CtorParams)                                                                \
     CLASS6D430_SLOTS(Self, CtorParams);                                                            \
     /* +0x07C */ u8 (*scanTodPackets)(Self *self, u8 *out, u32 *sel, u32 *data); /* ScanTodPackets, in both tables */ \
     /* +0x080 */ u32 *(*decodePacketWord)(Self *self, u32 *acc, u8 *out0, u8 *out1, u8 *out2, u8 *out3) /* DecodeTodPacketWord, in both tables */
+/* clang-format on */
 
+/* clang-format off */
 #define TOD_FIELDS(Methods)                                                                        \
     CLASS6D430_FIELDS(Methods) /* no own fields: the object is 0x2C bytes (New_Tod), and so is TodSet's (New_TodSet) */
+/* clang-format on */
 
 struct TodMethods {
-    TOD_SLOTS(Tod, (Tod *self, struct Src6F240 *src));
+    TOD_SLOTS(Tod, (Tod * self, struct Src6F240 *src));
 };
 
 struct Tod {

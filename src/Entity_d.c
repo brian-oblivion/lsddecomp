@@ -210,8 +210,7 @@ void Entity__func_80060710(Entity *this) {
     }
 }
 
-void Entity__MoodCue45(void) {
-}
+void Entity__MoodCue45(void) {}
 
 void Entity__MoodCue46(Entity *this, EntityMoodHandlerArg *out) {
     s32 r;
@@ -483,7 +482,8 @@ void Entity__MoodCue58(Entity *this, EntityMoodHandlerArg *out) {
         if (this->moodTimer < 0x32) {
             ((DreamSys *)this->peer)->methods->moveLocalY((DreamSys *)this->peer, -0x14, 0);
         } else if (this->moodTimer < 0x1F4) {
-            ((DreamSys *)this->peer)->methods->moveLocalX((DreamSys *)this->peer, (this->moodTimer % 40 < 0x14) ? -5 : 5, 0);
+            ((DreamSys *)this->peer)
+                ->methods->moveLocalX((DreamSys *)this->peer, (this->moodTimer % 40 < 0x14) ? -5 : 5, 0);
         } else if (this->moodTimer == 0x1F4) {
             this->methods->notifyParents(this, 0xC);
         }
@@ -560,4 +560,3 @@ tail:
         this->methods->notifyParents(this, 0xA);
     }
 }
-

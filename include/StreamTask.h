@@ -91,42 +91,47 @@ struct StreamTaskInitData {
  * $a0-$a3 plus a fifth stored to 0x10($sp), the o32 stack-argument slot
  * (docs/match-reports/New_StreamTask.md). */
 struct StreamTaskMethods {
-    TASKCORE_SLOTS(StreamTask, (StreamTask *self, TaskCoreTarget *target, char *soundBankPath, BasicClass *sound, StreamTaskInitData *initData));
-    /* +0x124 */ void (*setUnkC4)(StreamTask *self, s32 value);           /* StreamTask__SetUnkC4 */
-    /* +0x128 */ void (*setLoopCount)(StreamTask *self, s32 count);       /* StreamTask__SetLoopCount */
-    /* +0x12C */ void (*setSkipOnConfirm)(StreamTask *self, s32 enable);  /* StreamTask__SetSkipOnConfirm; code_1677c passes 0 */
-    /* +0x130 */ void (*setUnkD0)(StreamTask *self, s32 value);           /* StreamTask__SetUnkD0 */
+    TASKCORE_SLOTS(StreamTask, (StreamTask * self, TaskCoreTarget *target, char *soundBankPath,
+                                BasicClass *sound, StreamTaskInitData *initData));
+    /* +0x124 */ void (*setUnkC4)(StreamTask *self, s32 value);     /* StreamTask__SetUnkC4 */
+    /* +0x128 */ void (*setLoopCount)(StreamTask *self, s32 count); /* StreamTask__SetLoopCount */
+    /* +0x12C */ void (*setSkipOnConfirm)(StreamTask *self, s32 enable); /* StreamTask__SetSkipOnConfirm; code_1677c passes 0 */
+    /* +0x130 */ void (*setUnkD0)(StreamTask *self, s32 value); /* StreamTask__SetUnkD0 */
     /* +0x134 */ void (*setAbortBeforeFade)(StreamTask *self, s32 enable); /* StreamTask__SetAbortBeforeFade */
 };
 
 /* TaskCore's 0xA4 bytes, then this class's own to 0xDC (New_StreamTask). */
 struct StreamTask {
     TASKCORE_FIELDS(StreamTaskMethods);
-    /* +0x0A4 */ s32 playDone;          /* OnInit: 0; Update: the player's Advance until nonzero */
+    /* +0x0A4 */ s32 playDone; /* OnInit: 0; Update: the player's Advance until nonzero */
     /* +0x0A8 */ StreamTaskInitData initData; /* the ctor's fifth argument or the default */
     /* +0x0B4 */ struct MoviePlayer *player; /* New_MoviePlayer(GetDefaultStreamTaskInitData(), 0, 0); finalize releases it */
-    /* +0x0B8 */ s32 streamName;        /* Init's; the player's Play name. ctor: 0 */
-    /* +0x0BC */ s32 streamGroup;       /* Init's (GetStreamGroupForType, or -1); Play's second argument */
-    /* +0x0C0 */ s32 autoPlay;          /* Init's (every caller 1); the player's setAutoPlay (MoviePlayer::autoPlay, +0x068), which Play tests to MarkPlaying at once */
-    /* +0x0C4 */ s32 unkC4;             /* setUnkC4; reset 0; Play's third argument (the player's +0x054) */
-    /* +0x0C8 */ s32 loopCount;         /* setLoopCount; reset -1; Play's fourth argument, the player's `loops` (MoviePlayer__Advance) */
-    /* +0x0CC */ s32 skipOnConfirm;     /* setSkipOnConfirm; reset 1; OnPadConfirm: nonzero ends the task with result 2 */
-    /* +0x0D0 */ s32 unkD0;             /* setUnkD0; reset 0; no method of this class reads it */
-    /* +0x0D4 */ s32 abortBeforeFade;   /* setAbortBeforeFade; reset 1; RefreshViewValue aborts at once, else SetState(8) after the fade */
-    /* +0x0D8 */ s32 fadingOut;         /* SetState: 5 clears, 7 sets; Update skips its setState(7) when set */
+    /* +0x0B8 */ s32 streamName;  /* Init's; the player's Play name. ctor: 0 */
+    /* +0x0BC */ s32 streamGroup; /* Init's (GetStreamGroupForType, or -1); Play's second argument */
+    /* +0x0C0 */ s32 autoPlay; /* Init's (every caller 1); the player's setAutoPlay (MoviePlayer::autoPlay, +0x068), which Play tests to MarkPlaying at once */
+    /* +0x0C4 */ s32 unkC4;    /* setUnkC4; reset 0; Play's third argument (the player's +0x054) */
+    /* +0x0C8 */ s32 loopCount; /* setLoopCount; reset -1; Play's fourth argument, the player's `loops` (MoviePlayer__Advance) */
+    /* +0x0CC */ s32 skipOnConfirm; /* setSkipOnConfirm; reset 1; OnPadConfirm: nonzero ends the task with result 2 */
+    /* +0x0D0 */ s32 unkD0; /* setUnkD0; reset 0; no method of this class reads it */
+    /* +0x0D4 */ s32 abortBeforeFade; /* setAbortBeforeFade; reset 1; RefreshViewValue aborts at once, else SetState(8) after the fade */
+    /* +0x0D8 */ s32 fadingOut; /* SetState: 5 clears, 7 sets; Update skips its setState(7) when set */
 };
 
 /* +0x044's occupant as its callers need it (see the banner). */
-typedef void (*StreamTaskInitFn)(StreamTask *self, IntermediateBaseInitArgs *args, s32 streamName, s32 streamGroup, s32 autoPlay);
+typedef void (*StreamTaskInitFn)(StreamTask *self, IntermediateBaseInitArgs *args, s32 streamName,
+                                 s32 streamGroup, s32 autoPlay);
 
 extern StreamTaskMethods gStreamTaskMethods;
 extern StreamTaskMethods *Get_vtable_StreamTask(void); /* returns &gStreamTaskMethods */
 
-StreamTask *New_StreamTask(TaskCoreTarget *target, char *soundBankPath, BasicClass *sound, StreamTaskInitData *initData);
-void StreamTask__StreamTask(StreamTask *self, TaskCoreTarget *target, char *soundBankPath, BasicClass *sound, StreamTaskInitData *initData);
+StreamTask *New_StreamTask(TaskCoreTarget *target, char *soundBankPath, BasicClass *sound,
+                           StreamTaskInitData *initData);
+void StreamTask__StreamTask(StreamTask *self, TaskCoreTarget *target, char *soundBankPath,
+                            BasicClass *sound, StreamTaskInitData *initData);
 void StreamTask__Finalize(StreamTask *self);
 void StreamTask__Reset(StreamTask *self);
-void StreamTask__Init(StreamTask *self, IntermediateBaseInitArgs *args, s32 streamName, s32 streamGroup, s32 autoPlay);
+void StreamTask__Init(StreamTask *self, IntermediateBaseInitArgs *args, s32 streamName,
+                      s32 streamGroup, s32 autoPlay);
 void StreamTask__OnInit(StreamTask *self);
 void StreamTask__Update(StreamTask *self, BasicClass *sender, s32 event);
 void StreamTask__SetState(StreamTask *self, s32 state);

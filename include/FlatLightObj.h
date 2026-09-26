@@ -47,16 +47,18 @@ typedef struct {
 } FlatLightParams;
 
 struct FlatLightObjMethods {
-    BASICCLASS_SLOTS(FlatLightObj, (FlatLightObj *self, s32 lightId)); /* ctor: FlatLightObj__FlatLightObj */
-    /* +0x040 */ void (*setLightId)(FlatLightObj *self, s32 lightId);                      /* FlatLightObj__SetLightId */
-    /* +0x044 */ void (*setColor)(FlatLightObj *self, s32 update, FlatLightColor *rgb);     /* FlatLightObj__SetColor: copy *rgb if update, then GsSetFlatLight */
-    /* +0x048 */ void (*setDirection)(FlatLightObj *self, s32 update, s16 *dir);            /* FlatLightObj__SetDirection: widen dir[0..2] if update, then GsSetFlatLight */
+    BASICCLASS_SLOTS(FlatLightObj, (FlatLightObj * self, s32 lightId)); /* ctor: FlatLightObj__FlatLightObj */
+    /* +0x040 */ void (*setLightId)(FlatLightObj *self, s32 lightId); /* FlatLightObj__SetLightId */
+    /* +0x044 */ void (*setColor)(FlatLightObj *self, s32 update,
+                                  FlatLightColor *rgb); /* FlatLightObj__SetColor: copy *rgb if update, then GsSetFlatLight */
+    /* +0x048 */ void (*setDirection)(FlatLightObj *self, s32 update,
+                                      s16 *dir); /* FlatLightObj__SetDirection: widen dir[0..2] if update, then GsSetFlatLight */
 };
 
 struct FlatLightObj {
     BASICCLASS_FIELDS(FlatLightObjMethods);
-    /* +0x00C */ s32 lightId;             /* the GsSetFlatLight id: 0, 1 or 2 from LightRig */
-    /* +0x010 */ FlatLightParams light;   /* ends at +0x020, the object's size */
+    /* +0x00C */ s32 lightId;           /* the GsSetFlatLight id: 0, 1 or 2 from LightRig */
+    /* +0x010 */ FlatLightParams light; /* ends at +0x020, the object's size */
 };
 
 extern FlatLightObjMethods gFlatLightObjMethods;

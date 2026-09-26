@@ -45,33 +45,37 @@ typedef struct Class6E99CMethods Class6E99CMethods;
  * Class6E99C__Reset, +0x098 Class6E99C__Update; `tools/classtable.py
  * D_8006E99C --vs gBoxFillMethods`), then this class's own. */
 struct Class6E99CMethods {
-    BOXFILL_SLOTS(Class6E99C, (Class6E99C *self, void *size, s32 channels, s32 pri));
-    /* +0x0D0 */ void (*setStep)(Class6E99C *self, s32 step);                  /* Class6E99C__SetStep */
-    /* +0x0D4 */ void (*startFadeDown)(Class6E99C *self, BasicClass *source, s32 channels, s32 arg3); /* Class6E99C__StartFadeDown */
-    /* +0x0D8 */ void (*startFadeUp)(Class6E99C *self, BasicClass *source, s32 channels, s32 arg3);   /* Class6E99C__StartFadeUp */
-    /* +0x0DC */ s32 (*configure)(Class6E99C *self, BasicClass *source, s32 channels, s32 arg3);      /* Class6E99C__Configure: returns the mask it stored */
-    /* +0x0E0 */ void (*stop)(Class6E99C *self, BasicClass *source);          /* Class6E99C__Stop */
-    /* +0x0E4 */ void *(*getColor)(Class6E99C *self);                         /* Class6E99C__GetColor: the mask's table entry */
-    /* +0x0E8 */ void (*pushPosition)(Class6E99C *self, SkipShort2 *size, Pair32E99C *pos); /* Class6E99C__PushPosition: only while attached */
-    /* +0x0EC */ void (*popPosition)(Class6E99C *self);                       /* Class6E99C__PopPosition */
+    BOXFILL_SLOTS(Class6E99C, (Class6E99C * self, void *size, s32 channels, s32 pri));
+    /* +0x0D0 */ void (*setStep)(Class6E99C *self, s32 step); /* Class6E99C__SetStep */
+    /* +0x0D4 */ void (*startFadeDown)(Class6E99C *self, BasicClass *source, s32 channels,
+                                       s32 arg3); /* Class6E99C__StartFadeDown */
+    /* +0x0D8 */ void (*startFadeUp)(Class6E99C *self, BasicClass *source, s32 channels,
+                                     s32 arg3); /* Class6E99C__StartFadeUp */
+    /* +0x0DC */ s32 (*configure)(Class6E99C *self, BasicClass *source, s32 channels,
+                                  s32 arg3); /* Class6E99C__Configure: returns the mask it stored */
+    /* +0x0E0 */ void (*stop)(Class6E99C *self, BasicClass *source); /* Class6E99C__Stop */
+    /* +0x0E4 */ void *(*getColor)(Class6E99C *self); /* Class6E99C__GetColor: the mask's table entry */
+    /* +0x0E8 */ void (*pushPosition)(Class6E99C *self, SkipShort2 *size,
+                                      Pair32E99C *pos); /* Class6E99C__PushPosition: only while attached */
+    /* +0x0EC */ void (*popPosition)(Class6E99C *self); /* Class6E99C__PopPosition */
     /* +0x0F0 */ void (*setDivisorMode)(Class6E99C *self, s32 altMode, s32 divisor); /* Class6E99C__SetDivisorMode */
 };
 
 struct Class6E99C {
     BOXFILL_FIELDS(Class6E99CMethods);
-    /* +0x06C */ s32 state;           /* 0 idle, 1 fading down (startFadeDown), 2 up (startFadeUp); stop returns it to 0 */
+    /* +0x06C */ s32 state; /* 0 idle, 1 fading down (startFadeDown), 2 up (startFadeUp); stop returns it to 0 */
     /* +0x070 */ s32 defaultChannels; /* the ctor's mask (Reset); configure uses it when passed a negative mask */
-    /* +0x074 */ s32 step;            /* per-tick channel delta: 10 from Reset, setStep; negated by startFadeDown */
-    /* +0x078 */ s32 channels;        /* the mask configure stored (0 as 0xF): which bytes update steps, which colour getColor returns */
-    /* +0x07C */ s32 unk7C;           /* configure's third argument; update does not step while it is 9 */
-    /* +0x080 */ s32 ticksLeft;       /* configure: 0x100 / step; update counts it down and stops at 0 */
-    /* +0x084 */ s32 unk84;           /* configure: BoxFill's mask / ticksLeft; no reader */
-    /* +0x088 */ s32 savedW;          /* pushPosition's copy of boxW, restored by popPosition */
-    /* +0x08C */ s32 savedH;          /* ... of boxH */
-    /* +0x090 */ s32 savedPosX;       /* ... of posX (copied with posY as one Pair32E99C) */
-    /* +0x094 */ s32 savedPosY;       /* ... of posY */
-    /* +0x098 */ s32 altMode;         /* setDivisorMode: shortens ticksLeft by 1/divisor; startFadeUp keeps the colour */
-    /* +0x09C */ s32 divisor;         /* setDivisorMode */
+    /* +0x074 */ s32 step; /* per-tick channel delta: 10 from Reset, setStep; negated by startFadeDown */
+    /* +0x078 */ s32 channels; /* the mask configure stored (0 as 0xF): which bytes update steps, which colour getColor returns */
+    /* +0x07C */ s32 unk7C;     /* configure's third argument; update does not step while it is 9 */
+    /* +0x080 */ s32 ticksLeft; /* configure: 0x100 / step; update counts it down and stops at 0 */
+    /* +0x084 */ s32 unk84;     /* configure: BoxFill's mask / ticksLeft; no reader */
+    /* +0x088 */ s32 savedW;    /* pushPosition's copy of boxW, restored by popPosition */
+    /* +0x08C */ s32 savedH;    /* ... of boxH */
+    /* +0x090 */ s32 savedPosX; /* ... of posX (copied with posY as one Pair32E99C) */
+    /* +0x094 */ s32 savedPosY; /* ... of posY */
+    /* +0x098 */ s32 altMode; /* setDivisorMode: shortens ticksLeft by 1/divisor; startFadeUp keeps the colour */
+    /* +0x09C */ s32 divisor; /* setDivisorMode */
 };
 
 extern Class6E99CMethods D_8006E99C;

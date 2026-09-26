@@ -28,8 +28,7 @@
 #include "VabStreamObj.h"
 #include "TaskObjF.h"
 
-void TaskObjF__SetState(TaskObjF *self, s32 arg1)
-{
+void TaskObjF__SetState(TaskObjF *self, s32 arg1) {
     TaskObjFMethods *methods = self->methods;
     s32 ret;
     s32 i;
@@ -44,30 +43,30 @@ void TaskObjF__SetState(TaskObjF *self, s32 arg1)
 
     self->waitCounter = 0;
     switch (arg1) {
-    case 0x13:
-        arg1 = methods->formatCard(self) ? 0x11 : 8;
-        methods->setState(self, arg1);
-        break;
-    case 0x14:
-        if (*(u8 *)self->fileName == 0) {
-            methods->findUnusedMemcardName(self, self->fileName, self->namePrefix, self->nameSuffixes);
-        }
-        ret = methods->writeMemcardSaveFile(self, self->fileName, self->title, self->iconFrames,
-                                            self->iconImage, self->data, self->dataSize);
-        arg1 = ret ? 0x16 : 0xC;
-        methods->setState(self, arg1);
-        break;
-    case 0x15:
-        ret = methods->readMemcardFile(self, self->fileName, self->data, self->dataSize);
-        arg1 = ret ? 0x16 : 0x10;
-        methods->setState(self, arg1);
-        break;
-    case 0x11:
-        methods->attachTextEntry(self);
-        break;
-    case 0x12:
-        methods->attachItemList(self);
-        break;
+        case 0x13:
+            arg1 = methods->formatCard(self) ? 0x11 : 8;
+            methods->setState(self, arg1);
+            break;
+        case 0x14:
+            if (*(u8 *)self->fileName == 0) {
+                methods->findUnusedMemcardName(self, self->fileName, self->namePrefix, self->nameSuffixes);
+            }
+            ret = methods->writeMemcardSaveFile(self, self->fileName, self->title, self->iconFrames,
+                                                self->iconImage, self->data, self->dataSize);
+            arg1 = ret ? 0x16 : 0xC;
+            methods->setState(self, arg1);
+            break;
+        case 0x15:
+            ret = methods->readMemcardFile(self, self->fileName, self->data, self->dataSize);
+            arg1 = ret ? 0x16 : 0x10;
+            methods->setState(self, arg1);
+            break;
+        case 0x11:
+            methods->attachTextEntry(self);
+            break;
+        case 0x12:
+            methods->attachItemList(self);
+            break;
     }
 
     if ((u32)(arg1 - 0x16) < 2) {
@@ -97,8 +96,7 @@ extern s32 D_80086EC4;
 /* opaque block, the fresh `cardIcon`'s own `slot4C` arg2, address-only here. */
 extern s32 D_8008AA94;
 
-void TaskObjF__LoadCardIcon(TaskObjF *self, s32 arg1)
-{
+void TaskObjF__LoadCardIcon(TaskObjF *self, s32 arg1) {
     char path[0x20];
     char *buf;
     char *name;
@@ -130,15 +128,13 @@ void TaskObjF__LoadCardIcon(TaskObjF *self, s32 arg1)
     newVal->methods->attachToParent(newVal, self->spriteParent, (Vec3_d294 *)&D_8008AA94);
 }
 
-void TaskObjF__ReleaseCardIcon(TaskObjF *self)
-{
+void TaskObjF__ReleaseCardIcon(TaskObjF *self) {
     if (self->cardIcon != NULL) {
         self->cardIcon = self->cardIcon->methods->release(self->cardIcon);
     }
 }
 
-void TaskObjF__OnInputEvent(TaskObjF *self, void *sender, s32 arg2)
-{
+void TaskObjF__OnInputEvent(TaskObjF *self, void *sender, s32 arg2) {
     if (self->state != 0) {
         if (arg2 == 0x19) {
             self->methods->advanceState(self);
@@ -148,69 +144,65 @@ void TaskObjF__OnInputEvent(TaskObjF *self, void *sender, s32 arg2)
     }
 }
 
-void TaskObjF__PlaySound(TaskObjF *self, s32 arg1)
-{
+void TaskObjF__PlaySound(TaskObjF *self, s32 arg1) {
     if (self->sound != NULL) {
         self->sound->methods->playTone(self->sound, arg1, 0x7F, 0x7F);
     }
 }
 
-void TaskObjF__AdvanceState(TaskObjF *self)
-{
+void TaskObjF__AdvanceState(TaskObjF *self) {
     TaskObjFMethods *methods = self->methods;
 
     switch (self->state) {
-    case 2:
-    case 4:
-    case 0xA:
-    case 0xE:
-        methods->playSound(self, 0);
-        if (self->state == 0xE) {
-            strcpy(self->fileName, self->namePrefix);
-            strcat(self->fileName, self->foundSuffixes[self->selectedIndex]);
-            strcpy(self->title, self->titles[self->selectedIndex]);
-        }
-        if (self->opMode == 2) {
-            methods->beginSave(self, self->fileName, self->title, self->titleEditPos,
-                               self->iconFrames, self->iconImage, self->data, self->dataSize);
-        } else if (self->opMode == 1) {
-            methods->beginLoad(self, self->fileName, self->title, self->data, self->dataSize);
-        }
-        break;
-    case 6:
-        methods->playSound(self, 0);
-        methods->setState(self, 7);
-        break;
-    case 3:
-    case 5:
-    case 8:
-    case 9:
-    case 0xC:
-    case 0xD:
-    case 0x10:
-        methods->playSound(self, 0x10);
-        methods->setState(self, 0x17);
-        break;
+        case 2:
+        case 4:
+        case 0xA:
+        case 0xE:
+            methods->playSound(self, 0);
+            if (self->state == 0xE) {
+                strcpy(self->fileName, self->namePrefix);
+                strcat(self->fileName, self->foundSuffixes[self->selectedIndex]);
+                strcpy(self->title, self->titles[self->selectedIndex]);
+            }
+            if (self->opMode == 2) {
+                methods->beginSave(self, self->fileName, self->title, self->titleEditPos,
+                                   self->iconFrames, self->iconImage, self->data, self->dataSize);
+            } else if (self->opMode == 1) {
+                methods->beginLoad(self, self->fileName, self->title, self->data, self->dataSize);
+            }
+            break;
+        case 6:
+            methods->playSound(self, 0);
+            methods->setState(self, 7);
+            break;
+        case 3:
+        case 5:
+        case 8:
+        case 9:
+        case 0xC:
+        case 0xD:
+        case 0x10:
+            methods->playSound(self, 0x10);
+            methods->setState(self, 0x17);
+            break;
     }
 }
 
-void TaskObjF__ForceIdleFromState(TaskObjF *self)
-{
+void TaskObjF__ForceIdleFromState(TaskObjF *self) {
     switch (self->state) {
-    case 4:
-    case 6:
-    case 0xA:
-    case 0xE:
-        self->methods->playSound(self, 0x10);
-        self->methods->setState(self, 0x17);
-        break;
-    default:
-        break;
+        case 4:
+        case 6:
+        case 0xA:
+        case 0xE:
+            self->methods->playSound(self, 0x10);
+            self->methods->setState(self, 0x17);
+            break;
+        default:
+            break;
     }
 }
 
-void TaskObjF__TickStateDelay(TaskObjF *self)
-{
+void TaskObjF__TickStateDelay(TaskObjF *self) {
     s32 old;
     s32 newVal;
 
@@ -241,8 +233,7 @@ void TaskObjF__TickStateDelay(TaskObjF *self)
     }
 }
 
-void TaskObjF__AttachTextEntry(TaskObjF *self)
-{
+void TaskObjF__AttachTextEntry(TaskObjF *self) {
     if (self->spriteParent != 0 && self->inputSource != 0) {
         if (self->textEntry == NULL) {
             self->textEntry = New_TextEntry((self->titleEditPos << 1) + self->title, 1);
@@ -251,12 +242,11 @@ void TaskObjF__AttachTextEntry(TaskObjF *self)
         self->methods->addChild(self, (BasicClass *)self->textEntry);
         self->textEntry->methods->loadCardResources(self->textEntry, self->spriteParent);
         self->textEntry->methods->attachTarget(self->textEntry, self->inputSource, self->tickSource,
-                                              (struct TargetObj86ED0 *)self->sound);
+                                               (struct TargetObj86ED0 *)self->sound);
     }
 }
 
-void TaskObjF__DetachTextEntry(TaskObjF *self)
-{
+void TaskObjF__DetachTextEntry(TaskObjF *self) {
     if (self->spriteParent != 0 && self->inputSource != 0 && self->textEntry != NULL) {
         self->textEntry->methods->detachTarget(self->textEntry);
         self->textEntry->methods->releaseCardResources(self->textEntry);
@@ -267,23 +257,21 @@ void TaskObjF__DetachTextEntry(TaskObjF *self)
     }
 }
 
-void TaskObjF__OnTextEntryResult(TaskObjF *self, void *arg1, s32 arg2)
-{
+void TaskObjF__OnTextEntryResult(TaskObjF *self, void *arg1, s32 arg2) {
     switch (arg2) {
-    case 2:
-        self->methods->detachTextEntry(self);
-        self->methods->beginSave(self, self->fileName, self->title, self->titleEditPos,
-                                 self->iconFrames, self->iconImage, self->data, self->dataSize);
-        break;
-    case 3:
-        self->methods->detachTextEntry(self);
-        self->methods->setState(self, 0x17);
-        break;
+        case 2:
+            self->methods->detachTextEntry(self);
+            self->methods->beginSave(self, self->fileName, self->title, self->titleEditPos,
+                                     self->iconFrames, self->iconImage, self->data, self->dataSize);
+            break;
+        case 3:
+            self->methods->detachTextEntry(self);
+            self->methods->setState(self, 0x17);
+            break;
     }
 }
 
-void TaskObjF__AttachItemList(TaskObjF *self)
-{
+void TaskObjF__AttachItemList(TaskObjF *self) {
     if (self->spriteParent != 0 && self->inputSource != 0) {
         if (self->itemList == NULL) {
             self->itemList = New_Class86F88(self->titles, 1);
@@ -292,12 +280,11 @@ void TaskObjF__AttachItemList(TaskObjF *self)
         self->methods->addChild(self, (BasicClass *)self->itemList);
         self->itemList->methods->loadResources(self->itemList, self->spriteParent);
         self->itemList->methods->attachTarget(self->itemList, self->inputSource, self->tickSource,
-                                             (struct TargetObj86ED0 *)self->sound);
+                                              (struct TargetObj86ED0 *)self->sound);
     }
 }
 
-void TaskObjF__DetachItemList(TaskObjF *self)
-{
+void TaskObjF__DetachItemList(TaskObjF *self) {
     if (self->spriteParent != 0 && self->inputSource != 0 && self->itemList != NULL) {
         self->itemList->methods->detachTarget(self->itemList);
         self->itemList->methods->releaseResources(self->itemList);
@@ -308,23 +295,21 @@ void TaskObjF__DetachItemList(TaskObjF *self)
     }
 }
 
-void TaskObjF__OnItemListResult(TaskObjF *self, Class86F88 *arg1, s32 arg2)
-{
+void TaskObjF__OnItemListResult(TaskObjF *self, Class86F88 *arg1, s32 arg2) {
     switch (arg2) {
-    case 2:
-        self->selectedIndex = arg1->methods->getCursorIndex(arg1);
-        self->methods->detachItemList(self);
-        self->methods->setState(self, 0xE);
-        break;
-    case 3:
-        self->methods->detachItemList(self);
-        self->methods->setState(self, 0x17);
-        break;
+        case 2:
+            self->selectedIndex = arg1->methods->getCursorIndex(arg1);
+            self->methods->detachItemList(self);
+            self->methods->setState(self, 0xE);
+            break;
+        case 3:
+            self->methods->detachItemList(self);
+            self->methods->setState(self, 0x17);
+            break;
     }
 }
 
-TaskObjFMethods *GetTaskObjFMethods(void)
-{
+TaskObjFMethods *GetTaskObjFMethods(void) {
     return &gTaskObjFMethods;
 }
 
@@ -346,9 +331,11 @@ extern u8 *gMemcardIconTemplate;
 typedef struct {
     s8 raw[6];
 } Buf6_3bb8c_g;
+
 typedef struct {
     s8 raw[12];
 } Buf12_3bb8c_g;
+
 typedef struct {
     s8 a, b;
 } Pair2_3bb8c_g;
@@ -361,8 +348,7 @@ typedef struct {
  * content at exit (`$v0` left holding a pointer into the `gMemcardIconTemplate`
  * template in every path) confirms the real return type is a pointer,
  * loosely read as `s32` by the caller that never dereferences it. */
-s32 CopyMemcardIconTemplate(s32 arg0, s32 arg1)
-{
+s32 CopyMemcardIconTemplate(s32 arg0, s32 arg1) {
     u8 *self = (u8 *)arg0;
     u8 *src = (u8 *)arg1;
     s32 t0;

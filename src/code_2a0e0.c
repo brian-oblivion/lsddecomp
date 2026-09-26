@@ -50,6 +50,7 @@ WBgm *New_WBgm(char *vabPath, char *seqPath, s32 autoPlay) {
     }
     return NULL;
 }
+
 void WBgm__WBgm(WBgm *self, char *vabPath, char *seqPath, s32 autoPlay) {
     Get_vtable_BasicClass()->ctor((BasicClass *)self);
     self->methods = Get_vtable_WBgm();
@@ -65,6 +66,7 @@ void WBgm__WBgm(WBgm *self, char *vabPath, char *seqPath, s32 autoPlay) {
     self->methods->setVab(self, vabPath);
     self->methods->addChild(self, (BasicClass *)GetDrawSystem());
 }
+
 void WBgm__Finalize(WBgm *self) {
     gWBgmActive = 0;
     self->methods->stop(self);
@@ -78,17 +80,20 @@ void WBgm__Finalize(WBgm *self) {
     self->methods->removeChild(self, (BasicClass *)GetDrawSystem());
     Get_vtable_BasicClass()->finalize((BasicClass *)self);
 }
+
 void WBgm__OnNotify(WBgm *self, void *sender, s32 event) {
     Get_vtable_BasicClass()->onNotify((BasicClass *)self, sender, event);
     if ((((BasicClass *)sender)->methods->header & 0xF) == 1) {
         self->methods->update(self, (DrawSystem *)sender, event);
     }
 }
+
 void WBgm__Update(WBgm *self, DrawSystem *sender, s32 event) {
     if (event == 2 && self->openState == 1 && WBgm__HandleMonitorEvent(self) && self->autoPlay != 0) {
         self->methods->play(self);
     }
 }
+
 s32 WBgm__HandleMonitorEvent(WBgm *self) {
     VabStreamObj *vab;
     Class6EED8 *seq;
@@ -115,6 +120,7 @@ s32 WBgm__HandleMonitorEvent(WBgm *self) {
     self->openState = 2;
     return 1;
 }
+
 void WBgm__Play(WBgm *self) {
     if (self->playing == 0) {
         SsSeqSetVol(self->seqId, 0x34, 0x34);
@@ -122,6 +128,7 @@ void WBgm__Play(WBgm *self) {
         self->playing = 1;
     }
 }
+
 void WBgm__Stop(WBgm *self) {
     if (self->playing != 0) {
         SsSeqStop(self->seqId);
@@ -130,24 +137,29 @@ void WBgm__Stop(WBgm *self) {
         self->openState = 0;
     }
 }
+
 void WBgm__Pause(WBgm *self) {
     if (self->paused == 0) {
         SsSeqPause(self->seqId);
         self->paused = 1;
     }
 }
+
 void WBgm__Resume(WBgm *self) {
     if (self->paused != 0) {
         SsSeqReplay(self->seqId);
         self->paused = 0;
     }
 }
+
 void WBgm__SetVol(WBgm *self, s16 left, s16 right) {
     SsSeqSetVol(self->seqId, left, right);
 }
+
 void WBgm__Crescendo(WBgm *self, s16 vol, s32 scale) {
     SsSeqSetCrescendo(self->seqId, vol, func_8002CC28() * scale);
 }
+
 void WBgm__SetSeq(WBgm *self, char *seqPath) {
     if (self->playing != 0) {
         self->methods->stop(self);
@@ -167,6 +179,7 @@ void WBgm__SetSeq(WBgm *self, char *seqPath) {
         }
     }
 }
+
 void WBgm__SetVab(WBgm *self, char *vabPath) {
     if (self->playing != 0) {
         self->methods->stop(self);
@@ -186,12 +199,15 @@ void WBgm__SetVab(WBgm *self, char *vabPath) {
         }
     }
 }
+
 WBgmMethods *Get_vtable_WBgm(void) {
     return &gWBgmMethods;
 }
+
 s32 IsWBgmActive(void) {
     return gWBgmActive;
 }
+
 void *GetSsSizeTableBuf(void) {
     return &gSsSizeTableBuf;
 }

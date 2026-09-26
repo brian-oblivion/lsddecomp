@@ -24,8 +24,7 @@
 #include "TmdModel.h"
 #include "Class876FC.h"
 
-void NoOpIgnoreArgs(void) {
-}
+void NoOpIgnoreArgs(void) {}
 
 /* ------------------------------------------------------------------ *
  * Group 1: Class876FC's sprite-array helpers (include/Class876FC.h), called
@@ -106,11 +105,11 @@ void Actor__func_56f5c(s32 unused, Actor *self, s32 arg2, s32 arg3) {
     void *ret;
 
     D_8008ACA4 = self;
-    D_8008ACA8 = (void *) arg2;
-    D_8008ACAC = (void *) arg3;
+    D_8008ACA8 = (void *)arg2;
+    D_8008ACAC = (void *)arg3;
     i = 0;
     do {
-        ret = (void *) self->methods->getSetUnk10Flag8(self, D_8008AB98[i]);
+        ret = (void *)self->methods->getSetUnk10Flag8(self, D_8008AB98[i]);
         SetTargetOffset(ret, &D_8008AB94);
         i++;
     } while (i < 2);

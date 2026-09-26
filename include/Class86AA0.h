@@ -46,16 +46,20 @@ typedef struct Class86AA0Methods Class86AA0Methods;
  * slots are the ctor, reset and dispatchLinkCommand (see the banner). The
  * ctor returns nothing, but the slot keeps Class6B5CC's `void *` ctor type:
  * New_Class86AA0 ignores the value (as LightRig's ctor, include/LightRig.h). */
+/* clang-format off */
 #define CLASS86AA0_SLOTS(Self, CtorParams)                                                         \
     CLASS6B5CC_SLOTS(Self, CtorParams);                                                            \
     /* +0x0B8 */ void (*onActorLinkCommand)(Self *self, void *sender, s32 event); /* Class86AA0__OnActorLinkCommand; Class86AA0__DispatchLinkCommand's 0x34 case */ \
     /* +0x0BC */ void *(*returnSelf)(Self *self) /* Class86AA0__ReturnSelf; no known caller */
+/* clang-format on */
 
+/* clang-format off */
 #define CLASS86AA0_FIELDS(Methods)                                                                 \
     CLASS6B5CC_FIELDS(Methods) /* no own fields; the object is 0x3C bytes (New_Class86AA0), see the banner */
+/* clang-format on */
 
 struct Class86AA0Methods {
-    CLASS86AA0_SLOTS(Class86AA0, (Class86AA0 *self));
+    CLASS86AA0_SLOTS(Class86AA0, (Class86AA0 * self));
 };
 
 struct Class86AA0 {
@@ -66,9 +70,9 @@ extern Class86AA0Methods gClass86AA0Methods;
 extern Class86AA0Methods *GetClass86AA0Methods(void); /* returns &gClass86AA0Methods */
 
 /* The class's own methods, in address order. */
-Class86AA0 *New_Class86AA0(void);             /* BMemPMgrAlloc(0x3C), then ctor */
+Class86AA0 *New_Class86AA0(void); /* BMemPMgrAlloc(0x3C), then ctor */
 void Class86AA0__Class86AA0(Class86AA0 *self);
-void Class86AA0__Reset(void);                 /* +0x040; empty, reads no argument */
+void Class86AA0__Reset(void); /* +0x040; empty, reads no argument */
 void Class86AA0__DispatchLinkCommand(Class86AA0 *self, BasicClass *sender, s32 event);
 void Class86AA0__OnActorLinkCommand(Class86AA0 *self, void *sender, s32 event);
 void *Class86AA0__ReturnSelf(Class86AA0 *self);

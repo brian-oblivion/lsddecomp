@@ -36,10 +36,10 @@ typedef struct GenericCountList_d294 GenericCountList_d294;
  * which is what makes Class6B5CC__GetRotMatrix's whole-struct copy compile to
  * lwl/lwr (DECOMPILATION_LEARNINGS, the all-s8/s16 struct idiom). */
 struct S16Quad_d294 {
-    s16 x;  /* +0x000 */
-    s16 y;  /* +0x002 */
-    s16 z;  /* +0x004 */
-    s16 w;  /* +0x006, never written by Class6B5CC__GetRotMatrix's negate path */
+    s16 x; /* +0x000 */
+    s16 y; /* +0x002 */
+    s16 z; /* +0x004 */
+    s16 w; /* +0x006, never written by Class6B5CC__GetRotMatrix's negate path */
 };
 
 /* A plain 3-word vector: Class6B5CC__AttachToParent's optional offset, and the
@@ -61,6 +61,7 @@ typedef struct Vec3S16_d294 {
  * updateRotation and updateScale take (ROTATION_ZERO, SCALE_ONE) and
  * Class6B5CC__GetRotationDegrees fills; RatioToFixed12 reads one. */
 typedef struct WholeFrac_d294 WholeFrac_d294;
+
 struct WholeFrac_d294 {
     s16 whole;
     s16 frac;
@@ -68,34 +69,34 @@ struct WholeFrac_d294 {
 
 /* GsCOORD2PARAM, 0x28 bytes: the ctor's second allocation. */
 struct Class6B5CCSub44 {
-    s32 scaleX;  /* +0x000, GsCOORD2PARAM.scale.vx */
-    s32 scaleY;  /* +0x004, scale.vy */
-    s32 scaleZ;  /* +0x008, scale.vz */
+    s32 scaleX; /* +0x000, GsCOORD2PARAM.scale.vx */
+    s32 scaleY; /* +0x004, scale.vy */
+    s32 scaleZ; /* +0x008, scale.vz */
     u8 padC[0x010 - 0x00C];
-    S16Quad_d294 rotate;  /* +0x010, GsCOORD2PARAM.rotate (4096 per turn) */
-    u8 pad18[0x028 - 0x018];  /* +0x018, trans (VECTOR); no accessor */
+    S16Quad_d294 rotate;     /* +0x010, GsCOORD2PARAM.rotate (4096 per turn) */
+    u8 pad18[0x028 - 0x018]; /* +0x018, trans (VECTOR); no accessor */
 };
 
 /* GsCOORDINATE2, 0x50 bytes: the ctor's first allocation. */
 struct Class6B5CCSub14 {
-    s32 flg;                    /* +0x000, 0 = recompute (updateRotation/updateScale/attachToParent clear it) */
-    u8 pad04[0x018 - 0x004];    /* +0x004, coord.m */
-    s32 tx;                     /* +0x018, coord.t[0]: attachToParent's offset */
-    s32 ty;                     /* +0x01C, coord.t[1] */
-    s32 tz;                     /* +0x020, coord.t[2] */
-    u8 unk24[0x038 - 0x024];    /* +0x024, workm (address only: the matrix TransformAndNotifyParents applies) */
-    s32 unk38[3];               /* +0x038, workm.t: the world position, indexed per axis */
-    Class6B5CCSub44 *param;     /* +0x044, GsCOORDINATE2.param */
-    Class6B5CCSub14 *super;     /* +0x048, the parent's coordinate: set by attachToParent, cleared by detachFromParent */
-    Class6B5CCSub14 *sub;       /* +0x04C, GsCOORDINATE2.sub; no accessor */
+    s32 flg; /* +0x000, 0 = recompute (updateRotation/updateScale/attachToParent clear it) */
+    u8 pad04[0x018 - 0x004]; /* +0x004, coord.m */
+    s32 tx;                  /* +0x018, coord.t[0]: attachToParent's offset */
+    s32 ty;                  /* +0x01C, coord.t[1] */
+    s32 tz;                  /* +0x020, coord.t[2] */
+    u8 unk24[0x038 - 0x024]; /* +0x024, workm (address only: the matrix TransformAndNotifyParents applies) */
+    s32 unk38[3];            /* +0x038, workm.t: the world position, indexed per axis */
+    Class6B5CCSub44 *param; /* +0x044, GsCOORDINATE2.param */
+    Class6B5CCSub14 *super; /* +0x048, the parent's coordinate: set by attachToParent, cleared by detachFromParent */
+    Class6B5CCSub14 *sub; /* +0x04C, GsCOORDINATE2.sub; no accessor */
 };
 
 /* A count and a vertex array (count * 8 Vec3S16_d294 corners from &unk4):
  * TransformAndNotifyParents's argument, held in `notifyVerts` while the
  * parents are notified. */
 struct GenericCountList_d294 {
-    s32 unk0;  /* +0x000, multiplied by 8 to form ApplyMatrixToSVArray's count */
-    u8 unk4;   /* +0x004, address only: the first corner */
+    s32 unk0; /* +0x000, multiplied by 8 to form ApplyMatrixToSVArray's count */
+    u8 unk4;  /* +0x004, address only: the first corner */
 };
 
 /* TryAttachNearby's transformed copy of a count list: eight corners per count. */
@@ -106,6 +107,7 @@ typedef struct AttachCornerList_d294b {
 
 /* Occupants in gClass6B5CCMethods named at each slot; `tools/classtable.py
  * <subclass table> --vs gClass6B5CCMethods` lists a subclass's overrides. */
+/* clang-format off */
 #define CLASS6B5CC_SLOTS(Self, CtorParams)                                                         \
     BASICCLASS_SLOTS_R(Self, void *, CtorParams);                                                  \
     /* +0x040 */ void (*reset)(Self *self);                                /* Class6B5CC__Reset */  \
@@ -138,7 +140,9 @@ typedef struct AttachCornerList_d294b {
     /* +0x0AC */ s32 (*classifyAgainstPlanes)(Self *self, void *outFlag, Vec3S16_d294 *delta, void *corners); /* Class6B5CC__ClassifyAgainstPlanes */ \
     /* +0x0B0 */ void (*slotB0)(void);                                     /* func_8001E49C, empty; never called */ \
     /* +0x0B4 */ void (*notifyTaggedParents)(Self *self, void *node)       /* Class6B5CC__NotifyTaggedParents */
+/* clang-format on */
 
+/* clang-format off */
 #define CLASS6B5CC_FIELDS(Methods)                                                                 \
     BASICCLASS_FIELDS(Methods);                                                                    \
     /* +0x00C */ Class6B5CC *parent;      /* attachToParent/detachFromParent; the chain ComposeAndApplyRotation walks */ \
@@ -155,9 +159,10 @@ typedef struct AttachCornerList_d294b {
     /* +0x036 */ u16 flags36;             /* bit 0x80 tested by Class866E8's NotifyGridCell; zeroed by Class86AA0's ctor */ \
     /* +0x038 */ void *nextInCell;        /* Class866E8's grid-cell chain; zeroed by Class86AA0's ctor */ \
     /* +0x03C */ u8 pad3C[8]              /* the object is 0x44 bytes (New_Class6B5CC) */
+/* clang-format on */
 
 struct Class6B5CCMethods {
-    CLASS6B5CC_SLOTS(Class6B5CC, (Class6B5CC *self));
+    CLASS6B5CC_SLOTS(Class6B5CC, (Class6B5CC * self));
 };
 
 struct Class6B5CC {
@@ -204,12 +209,14 @@ void Class6B5CC__DispatchLinkCommand(Class6B5CC *self, void *sender, s32 event);
 void Class6B5CC__TryAttachNearby(Class6B5CC *self, Class6B5CC *other);
 void Class6B5CC__ComposeAndApplyRotation(Class6B5CC *self, void *vec, void *dst, void *src, s32 count);
 s32 Class6B5CC__CheckBoundsOverlap(Class6B5CC *self, void *corners, Vec3S16_d294 *delta);
-s32 Class6B5CC__ClassifyAgainstPlanes(Class6B5CC *self, s32 *outFlag, Vec3S16_d294 *delta, AttachCornerList_d294b *corners);
+s32 Class6B5CC__ClassifyAgainstPlanes(Class6B5CC *self, s32 *outFlag, Vec3S16_d294 *delta,
+                                      AttachCornerList_d294b *corners);
 void func_8001E49C(void);
 void Class6B5CC__NotifyTaggedParents(Class6B5CC *self, void *node);
 
 void Class6B5CC__RotateLocalVector(Class6B5CC *self, Vec3_d294 *dst, s16 *src);
-void Class6B5CC__LocalOffsetToWorldPos(Class6B5CC *self, s32 *dst, s32 *src, s32 unused); /* both callers set $a3 = 0 (0x80059460, 0x8005CF7C); the body never reads it */
+void Class6B5CC__LocalOffsetToWorldPos(Class6B5CC *self, s32 *dst, s32 *src,
+                                       s32 unused); /* both callers set $a3 = 0 (0x80059460, 0x8005CF7C); the body never reads it */
 void Class6B5CC__GetRotationDegrees(Class6B5CC *self, WholeFrac_d294 *out);
 void Class6B5CC__LinkModel(Class6B5CC *self, void *model);
 void Class6B5CC__UnlinkModel(Class6B5CC *self);

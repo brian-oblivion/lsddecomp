@@ -76,7 +76,7 @@ typedef struct TmdObject {
 /* A TMD file: three header words, then the object table. */
 typedef struct TmdFile {
     /* +0x000 */ u32 id;
-    /* +0x004 */ u32 flags;      /* GsMapModelingData's argument points here */
+    /* +0x004 */ u32 flags; /* GsMapModelingData's argument points here */
     /* +0x008 */ u32 nobj;
     /* +0x00C */ TmdObject objects[1];
 } TmdFile;
@@ -87,24 +87,24 @@ typedef struct TmdModelQuad {
 } TmdModelQuad;
 
 struct TmdModelMethods {
-    BASICCLASS_SLOTS(TmdModel, (TmdModel *self, TmdObject *object));
-    /* +0x040 */ void (*setQuad)(TmdModel *self, TmdModelQuad *src);   /* TmdModel__SetQuad */
-    /* +0x044 */ void (*mapModelingData)(TmdModel *self);             /* TmdModel__MapModelingData */
-    /* +0x048 */ TmdObject *(*getObject)(TmdModel *self, s32 i);      /* TmdModel__GetObject */
-    /* +0x04C */ void (*slot4C)(void);                                /* TmdModel__func_8001F37C, empty */
+    BASICCLASS_SLOTS(TmdModel, (TmdModel * self, TmdObject *object));
+    /* +0x040 */ void (*setQuad)(TmdModel *self, TmdModelQuad *src); /* TmdModel__SetQuad */
+    /* +0x044 */ void (*mapModelingData)(TmdModel *self);            /* TmdModel__MapModelingData */
+    /* +0x048 */ TmdObject *(*getObject)(TmdModel *self, s32 i);     /* TmdModel__GetObject */
+    /* +0x04C */ void (*slot4C)(void); /* TmdModel__func_8001F37C, empty */
 };
 
 struct TmdModel {
     BASICCLASS_FIELDS(TmdModelMethods);
-    /* +0x00C */ TmdFile *data;       /* object - 0xC: the file header when object is the first entry */
-    /* +0x010 */ TmdObject *object;   /* New_TmdModel's argument */
-    /* +0x014 */ TmdModelQuad quad;   /* setQuad's copy */
+    /* +0x00C */ TmdFile *data; /* object - 0xC: the file header when object is the first entry */
+    /* +0x010 */ TmdObject *object; /* New_TmdModel's argument */
+    /* +0x014 */ TmdModelQuad quad; /* setQuad's copy */
 };
 
 extern TmdModelMethods gTmdModelMethods;
 extern TmdModelMethods *Get_vtable_TmdModel(void); /* returns &gTmdModelMethods */
 
-extern s32 gTmdModelBoundsCount;   /* boxes in the bounds buffer: 1, set by the ctor */
+extern s32 gTmdModelBoundsCount; /* boxes in the bounds buffer: 1, set by the ctor */
 
 TmdModel *New_TmdModel(TmdObject *object);
 
@@ -122,7 +122,8 @@ void TmdModel__ComputeBounds(TmdModel *self, TmdBox *box);
 void TmdModel__UpdateBoundsBuffer(TmdModel *self);
 TmdBox *TmdModel__GetBoundsBuffer(TmdModel *self, s32 i);
 void TmdModel__GetHull(TmdModel *self, TmdHull *out);
-s32 TmdModel__RaycastFaces(TmdModel *self, s32 *best, TmdVec3 *hitOut, s32 *height, TmdVec3 *origin, TmdVec3 *end);
+s32 TmdModel__RaycastFaces(TmdModel *self, s32 *best, TmdVec3 *hitOut, s32 *height, TmdVec3 *origin,
+                           TmdVec3 *end);
 TmdPrim *TmdModel__NextPrimitive(TmdModel *self, TmdPrim *p, s32 *n, TmdVec3 *out, u32 *count);
 
 #endif

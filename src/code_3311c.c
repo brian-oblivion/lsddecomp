@@ -32,20 +32,24 @@ FlatLightObj *New_FlatLightObj(s32 lightId) {
     }
     return NULL;
 }
+
 void FlatLightObj__FlatLightObj(FlatLightObj *self, s32 lightId) {
     Get_vtable_BasicClass()->ctor((BasicClass *)self);
     self->methods = Get_vtable_FlatLightObj();
     self->methods->setLightId(self, lightId);
 }
+
 void FlatLightObj__SetLightId(FlatLightObj *self, s32 lightId) {
     self->lightId = lightId;
 }
+
 void FlatLightObj__SetColor(FlatLightObj *self, s32 update, FlatLightColor *rgb) {
     if (update) {
         self->light.rgb = *rgb;
     }
     GsSetFlatLight(self->lightId, &self->light);
 }
+
 void FlatLightObj__SetDirection(FlatLightObj *self, s32 update, s16 *dir) {
     if (update) {
         self->light.vx = dir[0];
@@ -54,6 +58,7 @@ void FlatLightObj__SetDirection(FlatLightObj *self, s32 update, s16 *dir) {
     }
     GsSetFlatLight(self->lightId, &self->light);
 }
+
 FlatLightObjMethods *Get_vtable_FlatLightObj(void) {
     return &gFlatLightObjMethods;
 }

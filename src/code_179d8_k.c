@@ -63,11 +63,12 @@
  * guesses, not authoritative.  Per this project's convention, a prototype
  * for a function ANOTHER unit defines stays in this .c, not in a shared
  * header. */
-extern void SpuVmPitchBend(s32 a0, s16 a1, u8 a2, u8 a3);   /* code_179d8_m, not yet matched: local guess */
+extern void SpuVmPitchBend(s32 a0, s16 a1, u8 a2, u8 a3); /* code_179d8_m, not yet matched: local guess */
 /* SpuVmKeyOn (round 76, was StartNote): Sony libsnd/vmanager INTERNAL,
  * no public LIBSND.H prototype (unlike SsUtKeyOn) -- kept byte-exact. */
-extern s32 SpuVmKeyOn(s32 a0, s16 a1, s16 a2, u16 a3, u16 a4, u16 a5);  /* code_179d8_m, not yet matched: local guess, matches code_179d8_j's independent reading of the same call shape */
-extern s32 SpuVmKeyOff(s32 a0, s16 a1, s16 a2, u16 a3);   /* code_179d8_m, not yet matched: local guess, ditto */
+extern s32 SpuVmKeyOn(s32 a0, s16 a1, s16 a2, u16 a3, u16 a4,
+                      u16 a5); /* code_179d8_m, not yet matched: local guess, matches code_179d8_j's independent reading of the same call shape */
+extern s32 SpuVmKeyOff(s32 a0, s16 a1, s16 a2, u16 a3); /* code_179d8_m, not yet matched: local guess, ditto */
 /* Psy-Q libsnd, linked from the SDK objects (round 34): `ut_rev` and
  * `vm_doff`. Both were carried as matched C in code_179d8_f.c until that
  * unit's prefix was given back to Sony; these are local views, as a Psy-Q
@@ -94,56 +95,57 @@ extern void SpuVmDamperOff(void);
  * their address is only known at runtime, exactly the case this project's
  * pointer-arithmetic convention is for. */
 typedef struct {
-    u8 unk0;    /* +0x0: a byte passed alongside unk3C to _SsSndNextSep on
+    u8 unk0; /* +0x0: a byte passed alongside unk3C to _SsSndNextSep on
                  * end-of-track cleanup */
     u8 pad1[0x4 - 0x1];
-    u8 *unk4;   /* +0x4: cursor into a byte-encoded (7-bit VLQ) event stream */
-    u8 *unk8;   /* +0x8: saved "track start" cursor, restored into unk4 (and
+    u8 *unk4; /* +0x4: cursor into a byte-encoded (7-bit VLQ) event stream */
+    u8 *unk8; /* +0x8: saved "track start" cursor, restored into unk4 (and
                  * sometimes unkC) on end-of-track / repeat */
-    u8 *unkC;   /* +0xC: a saved backup of unk4, restored into it on a "resume" path */
-    u8 unk10;   /* +0x10: one-shot latch, set once a "kind 1" retrigger fires */
-    u8 unk11;   /* +0x11: cached MIDI-style running-status byte (0xFF standing
+    u8 *unkC; /* +0xC: a saved backup of unk4, restored into it on a "resume" path */
+    u8 unk10; /* +0x10: one-shot latch, set once a "kind 1" retrigger fires */
+    u8 unk11; /* +0x11: cached MIDI-style running-status byte (0xFF standing
                  * in for a 0xF0 "meta" status) -- read back to interpret a
                  * later event byte that has its high bit clear */
-    u8 unk12;   /* +0x12: byte offset to the active embedded state block */
-    u8 unk13;   /* +0x13 */
-    u8 unk14;   /* +0x14 */
-    u8 unk15;   /* +0x15: a cached byte, written from the "default kind" path */
-    u8 unk16;   /* +0x16: event-kind selector (compared against 0x14/0x1E/0x28) */
+    u8 unk12; /* +0x12: byte offset to the active embedded state block */
+    u8 unk13; /* +0x13 */
+    u8 unk14; /* +0x14 */
+    u8 unk15; /* +0x15: a cached byte, written from the "default kind" path */
+    u8 unk16; /* +0x16: event-kind selector (compared against 0x14/0x1E/0x28) */
     u8 pad17[0x27 - 0x17];
-    u8 unk27;   /* +0x27: dispatch-mode selector (compared against 1) */
-    u8 unk28;   /* +0x28: a cached byte, written from the "mode 1" latch path */
-    u8 unk29;   /* +0x29: a retrigger/step counter */
-    u8 unk2A;   /* +0x2A: a second, independent retrigger/step counter */
-    u8 unk2B;   /* +0x2B: cleared on end-of-track stop (redundant double store
+    u8 unk27; /* +0x27: dispatch-mode selector (compared against 1) */
+    u8 unk28; /* +0x28: a cached byte, written from the "mode 1" latch path */
+    u8 unk29; /* +0x29: a retrigger/step counter */
+    u8 unk2A; /* +0x2A: a second, independent retrigger/step counter */
+    u8 unk2B; /* +0x2B: cleared on end-of-track stop (redundant double store
                  * in retail -- see GetMetaEvent) */
     u8 pad2C[0x3C - 0x2C];
-    u8 unk3C;   /* +0x3C: compared against 0xFF; a "track/channel select" byte
+    u8 unk3C; /* +0x3C: compared against 0xFF; a "track/channel select" byte
                  * passed to _SsSndNextSep on end-of-track stop */
     u8 pad3D[0x46 - 0x3D];
-    s16 unk46;  /* +0x46: repeat-count LIMIT (0 = loop forever) */
-    u16 unk48;  /* +0x48: repeat COUNTER, incremented per end-of-track;
+    s16 unk46; /* +0x46: repeat-count LIMIT (0 = loop forever) */
+    u16 unk48; /* +0x48: repeat COUNTER, incremented per end-of-track;
                  * sign-checked via explicit (s16) cast at its compare site,
                  * same idiom as code_179d8_i.c's unk40 */
-    s16 unk4A;  /* +0x4A: a per-tick scaling factor used in the tempo/rate
+    s16 unk4A; /* +0x4A: a per-tick scaling factor used in the tempo/rate
                  * recompute on a Set-Tempo meta event */
-    s16 unk4C;  /* +0x4C */
+    s16 unk4C; /* +0x4C */
     u8 pad4E[0x6E - 0x4E];
-    s16 unk6E;  /* +0x6E: a repeat/skip counter, decremented per catch-up tick */
-    s16 unk70;  /* +0x70: next scheduling threshold, compared against unk88 */
+    s16 unk6E; /* +0x6E: a repeat/skip counter, decremented per catch-up tick */
+    s16 unk70; /* +0x70: next scheduling threshold, compared against unk88 */
     u8 pad72[0x74 - 0x72];
-    u16 unk74;  /* +0x74: nonzero-gated dispatch enable flag */
+    u16 unk74; /* +0x74: nonzero-gated dispatch enable flag */
     u8 pad76[0x80 - 0x76];
-    s32 unk80;  /* +0x80: accumulated tick position */
+    s32 unk80; /* +0x80: accumulated tick position */
     u8 pad84[0x88 - 0x84];
-    s32 unk88;  /* +0x88: last-value scratch, overloaded per call site */
-    s32 unk8C;  /* +0x8C: recomputed BPM (60000000 / microseconds-per-quarter),
+    s32 unk88; /* +0x88: last-value scratch, overloaded per call site */
+    s32 unk8C; /* +0x8C: recomputed BPM (60000000 / microseconds-per-quarter),
                  * cached from the last Set-Tempo meta event */
-    u32 unk90;  /* +0x90: playback state flags */
+    u32 unk90; /* +0x90: playback state flags */
     u8 pad94[0xA8 - 0x94];
-    s16 unkA8;  /* +0xA8: a masked-byte parameter cached from a dispatch call */
+    s16 unkA8; /* +0xA8: a masked-byte parameter cached from a dispatch call */
     u8 padAA[0xAC - 0xAA];
 } Entry90902E8;
+
 extern Entry90902E8 *D_800902E8[];
 
 /* Shared VLQ-style delta-time decoder: reads a 7-bit-per-byte
@@ -166,8 +168,7 @@ extern void GetSeqData(s16 channel, s16 slot);
  * counter.  The third parameter is unused; retail reuses its dead register
  * ($a2) to hold rec->unk70 for that store (round 69,
  * docs/match-reports/SeqPlay.md). */
-void SeqPlay(s16 a0, s16 a1, s16 a2)
-{
+void SeqPlay(s16 a0, s16 a1, s16 a2) {
     Entry90902E8 *rec = &D_800902E8[a0][a1];
     s16 last = rec->unk70;
     s32 elapsed = rec->unk88;
@@ -242,8 +243,7 @@ extern void GetMetaEvent(s16 a0, s16 a1, u8 a2);
  * the other way around), CLAUDE.md's register-identity STALL rule --
  * reshaping tried and did not move it (docs/match-reports/GetSeqData.md).
  * Hand-derived. */
-void GetSeqData(s16 a0, s16 a1)
-{
+void GetSeqData(s16 a0, s16 a1) {
     Entry90902E8 *rec = &D_800902E8[a0][a1];
     u8 *p;
     u8 raw;
@@ -255,68 +255,68 @@ void GetSeqData(s16 a0, s16 a1)
     if (raw & 0x80) {
         rec->unk12 = raw & 0xF;
         switch (raw & 0xF0) {
-        case 0x90:
-            p = rec->unk4;
-            rec->unk11 = 0x90;
-            rec->unk4 = p + 1;
-            note = *p;
-            rec->unk4 = p + 2;
-            vel = *(p + 1);
-            rec->unk88 = ReadDeltaValue(a0, a1);
-            NoteOn(a0, a1, note, vel);
-            return;
-        case 0xB0:
-            p = rec->unk4;
-            rec->unk11 = 0xB0;
-            rec->unk4 = p + 1;
-            note = *p;
-            _SsSetControlChange(a0, a1, note);
-            return;
-        case 0xC0:
-            p = rec->unk4;
-            rec->unk11 = 0xC0;
-            rec->unk4 = p + 1;
-            note = *p;
-            SetProgramChange(a0, a1, note);
-            return;
-        case 0xE0:
-            rec->unk11 = 0xE0;
-            rec->unk4 = rec->unk4 + 1;
-            SetPitchBend(a0, a1);
-            return;
-        case 0xF0:
-            p = rec->unk4;
-            rec->unk11 = 0xFF;
-            rec->unk12 = raw & 0xF;
-            rec->unk4 = p + 1;
-            note = *p;
-            GetMetaEvent(a0, a1, note);
-            return;
-        default:
-            return;
+            case 0x90:
+                p = rec->unk4;
+                rec->unk11 = 0x90;
+                rec->unk4 = p + 1;
+                note = *p;
+                rec->unk4 = p + 2;
+                vel = *(p + 1);
+                rec->unk88 = ReadDeltaValue(a0, a1);
+                NoteOn(a0, a1, note, vel);
+                return;
+            case 0xB0:
+                p = rec->unk4;
+                rec->unk11 = 0xB0;
+                rec->unk4 = p + 1;
+                note = *p;
+                _SsSetControlChange(a0, a1, note);
+                return;
+            case 0xC0:
+                p = rec->unk4;
+                rec->unk11 = 0xC0;
+                rec->unk4 = p + 1;
+                note = *p;
+                SetProgramChange(a0, a1, note);
+                return;
+            case 0xE0:
+                rec->unk11 = 0xE0;
+                rec->unk4 = rec->unk4 + 1;
+                SetPitchBend(a0, a1);
+                return;
+            case 0xF0:
+                p = rec->unk4;
+                rec->unk11 = 0xFF;
+                rec->unk12 = raw & 0xF;
+                rec->unk4 = p + 1;
+                note = *p;
+                GetMetaEvent(a0, a1, note);
+                return;
+            default:
+                return;
         }
     } else {
         switch (rec->unk11) {
-        case 0x90:
-            vel = *rec->unk4;
-            rec->unk4 = rec->unk4 + 1;
-            rec->unk88 = ReadDeltaValue(a0, a1);
-            NoteOn(a0, a1, raw, vel);
-            return;
-        case 0xB0:
-            _SsSetControlChange(a0, a1, raw);
-            return;
-        case 0xC0:
-            SetProgramChange(a0, a1, raw);
-            return;
-        case 0xE0:
-            SetPitchBend(a0, a1);
-            return;
-        case 0xFF:
-            GetMetaEvent(a0, a1, raw);
-            return;
-        default:
-            return;
+            case 0x90:
+                vel = *rec->unk4;
+                rec->unk4 = rec->unk4 + 1;
+                rec->unk88 = ReadDeltaValue(a0, a1);
+                NoteOn(a0, a1, raw, vel);
+                return;
+            case 0xB0:
+                _SsSetControlChange(a0, a1, raw);
+                return;
+            case 0xC0:
+                SetProgramChange(a0, a1, raw);
+                return;
+            case 0xE0:
+                SetPitchBend(a0, a1);
+                return;
+            case 0xFF:
+                GetMetaEvent(a0, a1, raw);
+                return;
+            default:
+                return;
         }
     }
 }
@@ -332,8 +332,7 @@ INCLUDE_ASM("asm/nonmatchings/code_179d8_k", GetSeqData);
  * reviewed round 66; its winning mutation (`return;` as
  * `do { return; } while (0);`) is in the report, not here: this body is
  * for the reader and the verified build never compiles it. */
-void NoteOn(s16 a0, s16 a1, s32 a2, s32 a3)
-{
+void NoteOn(s16 a0, s16 a1, s32 a2, s32 a3) {
     Entry90902E8 *rec = &D_800902E8[a0][a1];
     u8 offset = rec->unk12;
     s16 speed = *(s16 *)((u8 *)rec + 0x4E + offset * 2);
@@ -363,8 +362,7 @@ void NoteOn(s16 a0, s16 a1, s32 a2, s32 a3)
 INCLUDE_ASM("asm/nonmatchings/code_179d8_k", NoteOn);
 #endif
 
-void SetProgramChange(s16 a0, s16 a1, u8 a2)
-{
+void SetProgramChange(s16 a0, s16 a1, u8 a2) {
     Entry90902E8 *rec = &D_800902E8[a0][a1];
     u8 *p = (u8 *)rec + rec->unk12;
 
@@ -419,8 +417,7 @@ extern void ContResetAll(s16 a0, s16 a1);
  * case-local `u16`, which keeps the switch-wide byte in a caller-saved
  * register and gives each case its own callee-saved copy.
  */
-void _SsSetControlChange(s16 a0, s16 a1, u8 a2)
-{
+void _SsSetControlChange(s16 a0, s16 a1, u8 a2) {
     Entry90902E8 *rec = &D_800902E8[a0][a1];
     u8 *p = rec->unk4;
     u8 offset = rec->unk12;
@@ -429,74 +426,74 @@ void _SsSetControlChange(s16 a0, s16 a1, u8 a2)
     rec->unk4 = p + 1;
     val = *p;
     switch (a2) {
-    case 0:
-        rec->unk4C = val;
-        rec->unk88 = ReadDeltaValue(a0, a1);
-        return;
-    case 6:
-        ContDataEntry(a0, a1, val);
-        return;
-    case 7: {
-        u16 o = offset;
-        u8 *blk = (u8 *)rec + o;
-        s32 packed = (a1 << 8) | a0;
+        case 0:
+            rec->unk4C = val;
+            rec->unk88 = ReadDeltaValue(a0, a1);
+            return;
+        case 6:
+            ContDataEntry(a0, a1, val);
+            return;
+        case 7: {
+            u16 o = offset;
+            u8 *blk = (u8 *)rec + o;
+            s32 packed = (a1 << 8) | a0;
 
-        SpuVmSetVol(packed, rec->unk4C, blk[0x2C], val, blk[0x17]);
-        *(s16 *)((u8 *)rec + o * 2 + 0x4E) = val;
-        rec->unk88 = ReadDeltaValue(a0, a1);
-        return;
-    }
-    case 10: {
-        s32 packed = (a1 << 8) | a0;
-        u16 o = offset;
-        u8 *blk = (u8 *)rec + o;
-        s16 wide = *(s16 *)((u8 *)rec + o * 2 + 0x4E);
-
-        SpuVmSetVol(packed, rec->unk4C, blk[0x2C], wide, val);
-        blk[0x17] = val;
-        rec->unk88 = ReadDeltaValue(a0, a1);
-        return;
-    }
-    case 11: {
-        u16 o = offset;
-        u8 *blk = (u8 *)rec + o;
-
-        SpuVmSetProgVol(rec->unk4C, blk[0x2C], val);
-        SpuVmSetVol((a1 << 8) | a0, rec->unk4C, blk[0x2C],
-                      *(s16 *)((u8 *)rec + o * 2 + 0x4E), blk[0x17]);
-        rec->unk88 = ReadDeltaValue(a0, a1);
-        return;
-    }
-    case 64:
-        if (val < 0x40) {
-            SpuVmDamperOff();
-        } else {
-            SpuVmDamperOn();
+            SpuVmSetVol(packed, rec->unk4C, blk[0x2C], val, blk[0x17]);
+            *(s16 *)((u8 *)rec + o * 2 + 0x4E) = val;
+            rec->unk88 = ReadDeltaValue(a0, a1);
+            return;
         }
-        break;
-    case 65:
-        ContPortamento(a0, a1, val);
-        return;
-    case 91:
-        SsUtSetReverbDepth(val, val);
-        break;
-    case 98:
-        ContNrpn1(a0, a1, val);
-        return;
-    case 99:
-        ContNrpn2(a0, a1, val);
-        return;
-    case 100:
-        ContRpn1(a0, a1, val);
-        return;
-    case 101:
-        ContRpn2(a0, a1, val);
-        return;
-    case 121:
-        ContResetAll(a0, a1);
-        return;
-    default:
-        break;
+        case 10: {
+            s32 packed = (a1 << 8) | a0;
+            u16 o = offset;
+            u8 *blk = (u8 *)rec + o;
+            s16 wide = *(s16 *)((u8 *)rec + o * 2 + 0x4E);
+
+            SpuVmSetVol(packed, rec->unk4C, blk[0x2C], wide, val);
+            blk[0x17] = val;
+            rec->unk88 = ReadDeltaValue(a0, a1);
+            return;
+        }
+        case 11: {
+            u16 o = offset;
+            u8 *blk = (u8 *)rec + o;
+
+            SpuVmSetProgVol(rec->unk4C, blk[0x2C], val);
+            SpuVmSetVol((a1 << 8) | a0, rec->unk4C, blk[0x2C], *(s16 *)((u8 *)rec + o * 2 + 0x4E),
+                        blk[0x17]);
+            rec->unk88 = ReadDeltaValue(a0, a1);
+            return;
+        }
+        case 64:
+            if (val < 0x40) {
+                SpuVmDamperOff();
+            } else {
+                SpuVmDamperOn();
+            }
+            break;
+        case 65:
+            ContPortamento(a0, a1, val);
+            return;
+        case 91:
+            SsUtSetReverbDepth(val, val);
+            break;
+        case 98:
+            ContNrpn1(a0, a1, val);
+            return;
+        case 99:
+            ContNrpn2(a0, a1, val);
+            return;
+        case 100:
+            ContRpn1(a0, a1, val);
+            return;
+        case 101:
+            ContRpn2(a0, a1, val);
+            return;
+        case 121:
+            ContResetAll(a0, a1);
+            return;
+        default:
+            break;
     }
     rec->unk88 = ReadDeltaValue(a0, a1);
 }
@@ -519,13 +516,13 @@ void _SsSetControlChange(s16 a0, s16 a1, u8 a2)
  * other two callees aliases the same object, so the compiler cannot prove
  * `unk0` is unchanged and must reload it. */
 typedef struct {
-    u8 unk0;    /* +0x00: item count, written by SsUtGetProgAtr */
+    u8 unk0; /* +0x00: item count, written by SsUtGetProgAtr */
     u8 pad1[0x10 - 0x1];
 } NoteList_800349B0;
 
 typedef struct {
     u8 pad0[0x8];
-    u8 unk8;    /* +0x08: byte stamped between the two per-item calls -- the
+    u8 unk8; /* +0x08: byte stamped between the two per-item calls -- the
                  * struct's TOTAL size is 0x20, not the 0x28 that offset
                  * alone would suggest; see ContModulation.md's round-31
                  * update for why the two are decoupled once the
@@ -537,8 +534,7 @@ extern s16 SsUtGetProgAtr(s16 a0, s16 a1, void *out);
 extern void SsUtGetVagAtr(s16 a0, s16 a1, s16 a2, void *out);
 extern void SsUtSetVagAtr(s16 a0, s16 a1, s16 a2, void *out);
 
-void ContModulation(s16 a0, s16 a1, u8 a2)
-{
+void ContModulation(s16 a0, s16 a1, u8 a2) {
     Entry90902E8 *rec = &D_800902E8[a0][a1];
     u8 offset;
     NoteList_800349B0 list;
@@ -558,12 +554,11 @@ void ContModulation(s16 a0, s16 a1, u8 a2)
  * Only the scratch byte's offset differs (0xB here vs 0x8 there). */
 typedef struct {
     u8 pad0[0xB];
-    u8 unkB;    /* +0x0B: byte stamped between the two per-item calls */
+    u8 unkB; /* +0x0B: byte stamped between the two per-item calls */
     u8 pad9[0x20 - 0xC];
 } Scratch_80034AEC;
 
-void ContPortaTime(s16 a0, s16 a1, u8 a2)
-{
+void ContPortaTime(s16 a0, s16 a1, u8 a2) {
     Entry90902E8 *rec = &D_800902E8[a0][a1];
     u8 offset;
     NoteList_800349B0 list;
@@ -584,12 +579,11 @@ void ContPortaTime(s16 a0, s16 a1, u8 a2)
  * one-byte flag written into the scratch buffer at relative offset 1. */
 typedef struct {
     u8 pad0[0x1];
-    u8 unk1;    /* +0x01: velocity-curve flag, 2 / 0 / left untouched */
+    u8 unk1; /* +0x01: velocity-curve flag, 2 / 0 / left untouched */
     u8 pad2[0x20 - 0x2];
 } Scratch_80034C28;
 
-void ContPortamento(s16 a0, s16 a1, s32 a2)
-{
+void ContPortamento(s16 a0, s16 a1, s32 a2) {
     Entry90902E8 *rec = &D_800902E8[a0][a1];
     u8 offset;
     NoteList_800349B0 list;
@@ -617,8 +611,7 @@ void ContPortamento(s16 a0, s16 a1, s32 a2)
  * 49/51 raw word-match, residue is the project's settled commutative-
  * operand-order canonicalization class (2 words). Near-miss body preserved
  * in the report; #if 0 body kept here too so it travels with this .c. */
-void ContResetAll(s16 a0, s16 a1)
-{
+void ContResetAll(s16 a0, s16 a1) {
     Entry90902E8 *rec = &D_800902E8[a0][a1];
 
     SsUtReverbOff();
@@ -690,53 +683,51 @@ INCLUDE_ASM("asm/nonmatchings/code_179d8_k", ContNrpn1);
  * delay slot one branch earlier than retail places it -- a pure
  * instruction-scheduling residue, not a logic or CFG difference. */
 #if 1
-void ContNrpn2(s16 a0, s16 a1, u8 a2)
-{
+void ContNrpn2(s16 a0, s16 a1, u8 a2) {
     Entry90902E8 *rec = &D_800902E8[a0][a1];
     u8 kind = a2;
     s32 result;
 
     switch (kind) {
-    case 0x14:
-        rec->unk16 = a2;
-        rec->unk27 = 1;
-        result = ReadDeltaValue(a0, a1);
-        rec->unk88 = result;
-        rec->unkC = rec->unk4;
-        return;
-    case 0x1E:
-        rec->unk16 = a2;
-        if (rec->unk28 == 0) {
-            rec->unk10 = 0;
-            rec->unk88 = ReadDeltaValue(a0, a1);
-            return;
-        }
-        if (rec->unk28 < 0x7F) {
-            rec->unk28--;
+        case 0x14:
+            rec->unk16 = a2;
+            rec->unk27 = 1;
             result = ReadDeltaValue(a0, a1);
             rec->unk88 = result;
-            if (rec->unk28 != 0) {
-                rec->unk4 = rec->unkC;
-            } else {
-                rec->unk10 = 0;
-            }
+            rec->unkC = rec->unk4;
             return;
-        }
-        ReadDeltaValue(a0, a1);
-        rec->unk4 = rec->unkC;
-        rec->unk88 = 0;
-        return;
-    default:
-        rec->unk16 = a2;
-        rec->unk2A = rec->unk2A + 1;
-        rec->unk88 = ReadDeltaValue(a0, a1);
-        return;
+        case 0x1E:
+            rec->unk16 = a2;
+            if (rec->unk28 == 0) {
+                rec->unk10 = 0;
+                rec->unk88 = ReadDeltaValue(a0, a1);
+                return;
+            }
+            if (rec->unk28 < 0x7F) {
+                rec->unk28--;
+                result = ReadDeltaValue(a0, a1);
+                rec->unk88 = result;
+                if (rec->unk28 != 0) {
+                    rec->unk4 = rec->unkC;
+                } else {
+                    rec->unk10 = 0;
+                }
+                return;
+            }
+            ReadDeltaValue(a0, a1);
+            rec->unk4 = rec->unkC;
+            rec->unk88 = 0;
+            return;
+        default:
+            rec->unk16 = a2;
+            rec->unk2A = rec->unk2A + 1;
+            rec->unk88 = ReadDeltaValue(a0, a1);
+            return;
     }
 }
 #endif
 
-void ContRpn1(s16 a0, s16 a1, u8 a2)
-{
+void ContRpn1(s16 a0, s16 a1, u8 a2) {
     Entry90902E8 *rec = &D_800902E8[a0][a1];
     u8 counter = rec->unk29;
 
@@ -746,8 +737,7 @@ void ContRpn1(s16 a0, s16 a1, u8 a2)
     rec->unk88 = ReadDeltaValue(a0, a1);
 }
 
-void ContRpn2(s16 a0, s16 a1, u8 a2)
-{
+void ContRpn2(s16 a0, s16 a1, u8 a2) {
     Entry90902E8 *rec = &D_800902E8[a0][a1];
     u8 counter = rec->unk29;
 
@@ -766,17 +756,17 @@ void ContRpn2(s16 a0, s16 a1, u8 a2)
  * byte is refilled by the unconditional SsUtGetVagAtr call at function
  * entry before any case reads it. */
 typedef struct {
-    u8 prior;    /* +0x0 */
-    u8 mode;     /* +0x1 */
+    u8 prior; /* +0x0 */
+    u8 mode;  /* +0x1 */
     u8 pad2[0x6 - 0x2];
-    u8 min;      /* +0x6 */
-    u8 max;      /* +0x7 */
+    u8 min; /* +0x6 */
+    u8 max; /* +0x7 */
     u8 pad8[0x9 - 0x8];
-    u8 vibT;     /* +0x9 */
-    u8 porW;     /* +0xA */
+    u8 vibT; /* +0x9 */
+    u8 porW; /* +0xA */
     u8 padB[0x10 - 0xB];
-    u16 adsr1;   /* +0x10 */
-    u16 adsr2;   /* +0x12 */
+    u16 adsr1; /* +0x10 */
+    u16 adsr2; /* +0x12 */
     u8 pad14[0x20 - 0x14];
 } Scratch_800357B0;
 
@@ -801,11 +791,11 @@ typedef struct {
  * its unk29==2 loops touch. */
 typedef struct {
     u8 pad0[0x4];
-    u8 unk4;      /* +0x4: read back and stored unchanged in the unk13==2 loop -- see report */
-    u8 unk5;      /* +0x5: read back and stored unchanged in the unk13==1 loop -- see report */
+    u8 unk4; /* +0x4: read back and stored unchanged in the unk13==2 loop -- see report */
+    u8 unk5; /* +0x5: read back and stored unchanged in the unk13==1 loop -- see report */
     u8 pad6[0xC - 0x6];
-    u8 unkC;      /* +0xC */
-    u8 unkD;      /* +0xD */
+    u8 unkC; /* +0xC */
+    u8 unkD; /* +0xD */
     u8 pad0E[0x20 - 0xE];
 } Scratch800351D0;
 
@@ -814,19 +804,21 @@ typedef struct {
  * (retail addresses it at sp+0x58 = list+0x10) and, with the 18 bytes
  * after it, the two by-value arguments of Snd_setVabAttr (round 69). */
 typedef struct {
-    u8 count;                  /* +0x00: item count, SsUtGetProgAtr's usual field */
+    u8 count; /* +0x00: item count, SsUtGetProgAtr's usual field */
     u8 pad1[0x10 - 0x1];
+
     union {
-        Scratch_800357B0 s;    /* +0x10: passed by value to Snd_setVabAttr */
-        Scratch800351D0 v;     /* +0x10: SsUtGet/SetVagAtr's buffer in the unk29==2 loops */
+        Scratch_800357B0 s; /* +0x10: passed by value to Snd_setVabAttr */
+        Scratch800351D0 v;  /* +0x10: SsUtGet/SetVagAtr's buffer in the unk29==2 loops */
     } scratch;
-    AdsrRaw_800357B0 adsr;     /* +0x30: passed by value to Snd_setVabAttr */
+
+    AdsrRaw_800357B0 adsr; /* +0x30: passed by value to Snd_setVabAttr */
 } List_800351D0;
 
 /* Snd_setVabAttr is defined later in this unit; its own definition fixes
  * this signature (round 49). */
 extern void Snd_setVabAttr(s16 channel, s16 slot, s16 kind, Scratch_800357B0 scratch,
-                          AdsrRaw_800357B0 resolved, s16 arg5, u8 arg6);
+                           AdsrRaw_800357B0 resolved, s16 arg5, u8 arg6);
 
 #ifdef NON_MATCHING
 /* NON_MATCHING: 380/376 words, 4 LONG; 95/376 raw, frame exact (-0x108).
@@ -837,8 +829,7 @@ extern void Snd_setVabAttr(s16 channel, s16 slot, s16 kind, Scratch_800357B0 scr
  * (docs/match-reports/ContDataEntry.md). Hand-derived. Written for the
  * reader: the byte-shaped body's `dead[16]` frame pad and `volatile` on the
  * two `unused` locals are omitted here and kept in the report. */
-void ContDataEntry(s16 a0, s16 a1, u8 a2)
-{
+void ContDataEntry(s16 a0, s16 a1, u8 a2) {
     s16 ch = a0;
     s16 slot = a1;
     Entry90902E8 *rec = &D_800902E8[ch][slot];
@@ -907,12 +898,12 @@ void ContDataEntry(s16 a0, s16 a1, u8 a2)
         kind = rec->unk16;
         if (kind == 0x10) {
             for (i = 0; i < list.count; i++) {
-                Snd_setVabAttr(rec->unk4C, ((u8 *)rec + off)[0x2C], i,
-                              list.scratch.s, list.adsr, rec->unk15, a2 & 0xFF);
+                Snd_setVabAttr(rec->unk4C, ((u8 *)rec + off)[0x2C], i, list.scratch.s, list.adsr,
+                               rec->unk15, a2 & 0xFF);
             }
         } else {
-            Snd_setVabAttr(rec->unk4C, ((u8 *)rec + off)[0x2C], (s16)kind,
-                          list.scratch.s, list.adsr, rec->unk15, a2 & 0xFF);
+            Snd_setVabAttr(rec->unk4C, ((u8 *)rec + off)[0x2C], (s16)kind, list.scratch.s,
+                           list.adsr, rec->unk15, a2 & 0xFF);
         }
         rec->unk88 = ReadDeltaValue(ch, slot);
         rec->unk2A = 0;
@@ -953,131 +944,129 @@ extern void SsUtSetReverbDelay(s16 a0);
  * (per program-tone) is fetched/stored; `arg5` is the outer parameter
  * selector (0..22), `arg6` the value byte nearly every arm uses. */
 void Snd_setVabAttr(s16 channel, s16 slot, s16 kind, Scratch_800357B0 scratch,
-                    AdsrRaw_800357B0 resolved, s16 arg5, u8 arg6)
-{
+                    AdsrRaw_800357B0 resolved, s16 arg5, u8 arg6) {
     SsUtGetVagAtr(channel, slot, kind, &scratch);
 
     switch (arg5) {
-    case 0:
-        scratch.prior = arg6;
-        goto tailA;
-    case 1:
-        scratch.mode = arg6;
-        SsUtSetVagAtr(channel, slot, kind, &scratch);
-        if (arg6 == 0) {
-            SsUtReverbOff();
-            return;
-        }
-        if (arg6 == 1) {
-            return;
-        }
-        if (arg6 == 2) {
-            return;
-        }
-        if (arg6 == 3) {
-            return;
-        }
-        if (arg6 != 4) {
-            return;
-        }
-        SsUtReverbOn();
-        return;
-    case 2:
-        scratch.min = arg6;
-        goto tailA;
-    case 3:
-        scratch.max = arg6;
-tailA:
-        SsUtSetVagAtr(channel, slot, kind, &scratch);
-        return;
-    case 4:
-    case 5:
-    case 6:
-    case 7:
-    case 8:
-    case 9:
-    case 10:
-    case 11:
-    case 12:
-    case 13:
-    case 14:
-    {
-        s16 new_var;
-
-        _SsUtResolveADSR(scratch.adsr1, scratch.adsr2, &resolved);
-        new_var = channel;
-        switch (arg5) {
-        case 4:
-            resolved.unkA = 0;
-            resolved.unk0 = arg6;
-            break;
-        case 5:
-            resolved.unkA = 1;
-            resolved.unk0 = arg6;
-            break;
-        case 6:
-            resolved.unk2 = arg6;
-            break;
-        case 7:
-            resolved.unk4 = arg6;
-            break;
-        case 8:
-            resolved.unkC = 0;
-            resolved.unk6 = arg6;
-            break;
-        case 9:
-            resolved.unkC = 1;
-            resolved.unk6 = arg6;
-            break;
-        case 10:
-            resolved.unkE = 0;
-            resolved.unk8 = arg6;
-            break;
-        case 11:
-            resolved.unkE = 1;
-            resolved.unk8 = arg6;
-            break;
-        case 12: {
+        case 0:
+            scratch.prior = arg6;
+            goto tailA;
+        case 1:
+            scratch.mode = arg6;
+            SsUtSetVagAtr(channel, slot, kind, &scratch);
             if (arg6 == 0) {
-                /* nothing -- falls to the shared check below */
-            } else if (arg6 < 0x40) {
-                resolved.unk10 = 0;
-                break;
+                SsUtReverbOff();
+                return;
             }
-            if ((u32)(arg6 - 0x40) < 0x40) {
-                resolved.unk10 = 1;
+            if (arg6 == 1) {
+                return;
             }
-            break;
-        }
+            if (arg6 == 2) {
+                return;
+            }
+            if (arg6 == 3) {
+                return;
+            }
+            if (arg6 != 4) {
+                return;
+            }
+            SsUtReverbOn();
+            return;
+        case 2:
+            scratch.min = arg6;
+            goto tailA;
+        case 3:
+            scratch.max = arg6;
+        tailA:
+            SsUtSetVagAtr(channel, slot, kind, &scratch);
+            return;
+        case 4:
+        case 5:
+        case 6:
+        case 7:
+        case 8:
+        case 9:
+        case 10:
+        case 11:
+        case 12:
         case 13:
-            scratch.vibT = arg6;
-            break;
-        case 14:
-            scratch.porW = arg6;
-            break;
+        case 14: {
+            s16 new_var;
+
+            _SsUtResolveADSR(scratch.adsr1, scratch.adsr2, &resolved);
+            new_var = channel;
+            switch (arg5) {
+                case 4:
+                    resolved.unkA = 0;
+                    resolved.unk0 = arg6;
+                    break;
+                case 5:
+                    resolved.unkA = 1;
+                    resolved.unk0 = arg6;
+                    break;
+                case 6:
+                    resolved.unk2 = arg6;
+                    break;
+                case 7:
+                    resolved.unk4 = arg6;
+                    break;
+                case 8:
+                    resolved.unkC = 0;
+                    resolved.unk6 = arg6;
+                    break;
+                case 9:
+                    resolved.unkC = 1;
+                    resolved.unk6 = arg6;
+                    break;
+                case 10:
+                    resolved.unkE = 0;
+                    resolved.unk8 = arg6;
+                    break;
+                case 11:
+                    resolved.unkE = 1;
+                    resolved.unk8 = arg6;
+                    break;
+                case 12: {
+                    if (arg6 == 0) {
+                        /* nothing -- falls to the shared check below */
+                    } else if (arg6 < 0x40) {
+                        resolved.unk10 = 0;
+                        break;
+                    }
+                    if ((u32)(arg6 - 0x40) < 0x40) {
+                        resolved.unk10 = 1;
+                    }
+                    break;
+                }
+                case 13:
+                    scratch.vibT = arg6;
+                    break;
+                case 14:
+                    scratch.porW = arg6;
+                    break;
+            }
+            _SsUtBuildADSR(&resolved, &scratch.adsr1, &scratch.adsr2);
+            SsUtSetVagAtr(new_var, slot, kind, &scratch);
+            return;
         }
-        _SsUtBuildADSR(&resolved, &scratch.adsr1, &scratch.adsr2);
-        SsUtSetVagAtr(new_var, slot, kind, &scratch);
-        return;
-    }
-    case 15:
-        SsUtSetReverbType(arg6);
-        return;
-    case 16:
-        SsUtSetReverbDepth(arg6, arg6);
-        return;
-    case 17:
-        SsUtSetReverbFeedback(arg6);
-        return;
-    case 18:
-    case 19:
-        SsUtSetReverbDelay(arg6);
-        return;
-    case 20:
-    case 21:
-    case 22:
-    default:
-        return;
+        case 15:
+            SsUtSetReverbType(arg6);
+            return;
+        case 16:
+            SsUtSetReverbDepth(arg6, arg6);
+            return;
+        case 17:
+            SsUtSetReverbFeedback(arg6);
+            return;
+        case 18:
+        case 19:
+            SsUtSetReverbDelay(arg6);
+            return;
+        case 20:
+        case 21:
+        case 22:
+        default:
+            return;
     }
 }
 
@@ -1087,8 +1076,7 @@ tailA:
  * logic or CFG difference -- no if/else arm ordering applies here (see
  * report for the round-25 head lever's explicit negative answer). */
 #if 1
-void SetPitchBend(s16 a0, s16 a1)
-{
+void SetPitchBend(s16 a0, s16 a1) {
     Entry90902E8 *rec = &D_800902E8[a0][a1];
     u8 *cursor = rec->unk4;
     s32 packed;
@@ -1167,8 +1155,7 @@ extern u32 VBLANK_MINUS;
  * not a banned register pin); round 35's permuter search (15862+
  * iterations) found no zero and never beat the base score, residue
  * marked permuter-exhausted. */
-void GetMetaEvent(s16 a0, s16 a1, u8 a2)
-{
+void GetMetaEvent(s16 a0, s16 a1, u8 a2) {
     Entry90902E8 *rec = &D_800902E8[a0][a1];
 
     if (a2 != 0x2F) {
@@ -1258,8 +1245,7 @@ INCLUDE_ASM("asm/nonmatchings/code_179d8_k", GetMetaEvent);
  * exact shape (jump-arm written explicitly, fallthrough-arm last in
  * source order) is what makes GCC 2.6.3 choose retail's own register for
  * both. See the round-25 head broadcast on if/else arm ordering. */
-s32 ReadDeltaValue(s16 a0, s16 a1)
-{
+s32 ReadDeltaValue(s16 a0, s16 a1) {
     Entry90902E8 *rec = &D_800902E8[a0][a1];
     u8 *cursor = rec->unk4;
     s32 acc;

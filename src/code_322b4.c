@@ -64,11 +64,6 @@ extern void *BMemPMgrAlloc(s32 size);
 
 extern Class6D430Methods *GetActiveDataSourceMethods(void);
 
-
-
-
-
-
 /* Allocate and construct a CharSprite (0xAC bytes): one character cell. */
 CharSprite *New_CharSprite(void *texture, u8 cell) {
     CharSprite *obj = BMemPMgrAlloc(0xAC);
@@ -79,6 +74,7 @@ CharSprite *New_CharSprite(void *texture, u8 cell) {
     }
     return NULL;
 }
+
 /* CharSprite slot +0x008 (ctor): the ScreenSprite ctor with cell 0x20's rect,
  * install the table, then reset to the caller's cell. */
 void CharSprite__CharSprite(CharSprite *self, void *texture, u8 cell) {
@@ -89,10 +85,12 @@ void CharSprite__CharSprite(CharSprite *self, void *texture, u8 cell) {
     self->methods = GetCharSpriteMethods();
     ((CharSpriteResetFn)self->methods->reset)(self, cell);
 }
+
 /* CharSprite slot +0x040 (reset): re-select the cell through slot +0x0C4. */
 void CharSprite__Reset(CharSprite *self, u8 cell) {
     self->methods->setCell(self, cell);
 }
+
 /* CharSprite slot +0x0C4: store the cell index and point u,v at its 8x8 cell. */
 void CharSprite__SetCell(CharSprite *self, u8 cell) {
     SpriteRect r;
@@ -102,16 +100,19 @@ void CharSprite__SetCell(CharSprite *self, u8 cell) {
     self->sprite.u = r.u;
     self->sprite.v = r.v;
 }
+
 /* CharSprite slot +0x0C8: read the byte at +0x0A8. */
 u8 CharSprite__GetCell(CharSprite *self) {
     u8 pad[16]; /* unused: it is what gives retail its 0x10-byte frame */
 
     return self->cellIndex;
 }
+
 /* Returns the CharSprite method table. */
 CharSpriteMethods *GetCharSpriteMethods(void) {
     return &gCharSpriteMethods;
 }
+
 /* Cell index -> 8x8 rect in a 32-wide grid, offset from D_8006ED40. */
 void GetCellRect(SpriteRect *dst, u32 cell) {
     *dst = D_8006ED40;
@@ -119,6 +120,7 @@ void GetCellRect(SpriteRect *dst, u32 cell) {
     dst->u += (cell & 0x1F) * 8;
     dst->v += (cell >> 5) * 8;
 }
+
 /* Allocate and construct a ScreenSprite (0xA8 bytes). */
 ScreenSprite *New_ScreenSprite(void *texture, SpriteRect *rect, s32 arg3) {
     ScreenSprite *obj = BMemPMgrAlloc(0xA8);
@@ -129,6 +131,7 @@ ScreenSprite *New_ScreenSprite(void *texture, SpriteRect *rect, s32 arg3) {
     }
     return NULL;
 }
+
 /* gScreenSpriteMethods slot +0x008 (ctor): the Sprite ctor with abr 0 and arg4 NULL,
  * install the table, then reset. */
 void ScreenSprite__ScreenSprite(ScreenSprite *self, void *texture, SpriteRect *rect, s32 arg3) {
@@ -136,9 +139,10 @@ void ScreenSprite__ScreenSprite(ScreenSprite *self, void *texture, SpriteRect *r
     self->methods = GetScreenSpriteMethods();
     self->methods->reset(self);
 }
+
 /* gScreenSpriteMethods slot +0x040 (reset): empty override. */
-void ScreenSprite__Reset(ScreenSprite *self) {
-}
+void ScreenSprite__Reset(ScreenSprite *self) {}
+
 /* gCharSpriteMethods and gScreenSpriteMethods slot +0x04C (attachToParent): when not yet
  * attached, attach through Sprite's with a zero offset, then hand the
  * caller's third argument to slot +0x0BC. */
@@ -148,40 +152,44 @@ void ScreenSprite__AttachToParent(ScreenSprite *self, Class6B5CC *parent, Screen
         self->methods->setPosition(self, pos);
     }
 }
+
 /* gCharSpriteMethods and gScreenSpriteMethods slot +0x0BC. */
 void ScreenSprite__SetPosition(ScreenSprite *self, ScreenSpritePos *pos) {
     if (self->parent != NULL) {
         self->screenPos = *pos;
     }
 }
+
 /* gCharSpriteMethods and gScreenSpriteMethods slot +0x0C0: when attached, move the sprite's
  * pivot: 0 centre, 1 left, 2 right, 3 top, 4 bottom. */
 void ScreenSprite__SetPivotAnchor(ScreenSprite *self, u32 anchor) {
     if (self->parent != NULL) {
         switch (anchor) {
-        case 0:
-            self->sprite.mx = self->sprite.w >> 1;
-            self->sprite.my = self->sprite.h >> 1;
-            break;
-        case 1:
-            self->sprite.mx = 0;
-            break;
-        case 2:
-            self->sprite.mx = self->sprite.w;
-            break;
-        case 3:
-            self->sprite.my = 0;
-            break;
-        case 4:
-            self->sprite.my = self->sprite.h;
-            break;
+            case 0:
+                self->sprite.mx = self->sprite.w >> 1;
+                self->sprite.my = self->sprite.h >> 1;
+                break;
+            case 1:
+                self->sprite.mx = 0;
+                break;
+            case 2:
+                self->sprite.mx = self->sprite.w;
+                break;
+            case 3:
+                self->sprite.my = 0;
+                break;
+            case 4:
+                self->sprite.my = self->sprite.h;
+                break;
         }
     }
 }
+
 /* Returns the gScreenSpriteMethods method table. */
 ScreenSpriteMethods *GetScreenSpriteMethods(void) {
     return &gScreenSpriteMethods;
 }
+
 /* Allocate and construct a Sprite (0xA0 bytes). */
 Sprite *New_Sprite(void *texture, s32 abr, SpriteRect *rect, void *arg3, s32 arg4) {
     Sprite *obj = BMemPMgrAlloc(0xA0);
@@ -192,9 +200,12 @@ Sprite *New_Sprite(void *texture, s32 abr, SpriteRect *rect, void *arg3, s32 arg
     }
     return NULL;
 }
+
 /* Sprite's reset as its ctor calls it: with all five ctor arguments (the
  * slot is Class6B5CC's, typed without them; Sprite.h, "Not settled"). */
-typedef void *(*SpriteCtorReset_322b4)(Sprite *self, void *texture, s32 abr, SpriteRect *rect, void *arg4, s32 arg5);
+typedef void *(*SpriteCtorReset_322b4)(Sprite *self, void *texture, s32 abr, SpriteRect *rect,
+                                       void *arg4, s32 arg5);
+
 /* gSpriteMethods slot +0x008 (ctor): the Class6B5CC ctor, install the table,
  * and hand every argument to reset. */
 void *Sprite__Sprite(Sprite *self, void *texture, s32 abr, SpriteRect *rect, void *arg4, s32 arg5) {
@@ -202,6 +213,7 @@ void *Sprite__Sprite(Sprite *self, void *texture, s32 abr, SpriteRect *rect, voi
     self->methods = GetSpriteMethods();
     return ((SpriteCtorReset_322b4)self->methods->reset)(self, texture, abr, rect, arg4, arg5);
 }
+
 /* gSpriteMethods slot +0x040 (reset): bind the texture and cell, rebuild the GsSPRITE. */
 void Sprite__Reset(Sprite *self, void *texture, s32 abr, SpriteRect *rect) {
     self->image = &((TimImage *)texture)->tim;
@@ -209,6 +221,7 @@ void Sprite__Reset(Sprite *self, void *texture, s32 abr, SpriteRect *rect) {
     InitGsSprite(&self->sprite, abr, rect, self->image);
     self->unk58 = 0;
 }
+
 /* Fill a GsSPRITE from a texture image and a cell: colour mode and tpage
  * from the image, size and u,v from the cell, the pivot at its centre,
  * neutral colour, scale 1.0 and no rotation. */
@@ -235,42 +248,50 @@ void InitGsSprite(SpriteGs *sprite, s32 abr, SpriteRect *rect, struct GsIMAGE *i
     sprite->scalex = 0x1000;
     sprite->scaley = 0x1000;
 }
+
 /* gSpriteMethods slot +0x044 (updateRotation): table[2] as a fraction of
  * degrees, in 4096ths; set or add to the GsSPRITE's rotate. */
 void Sprite__UpdateRotation(Sprite *self, s32 set, WholeFrac_d294 *table) {
     s32 angle;
 
-    angle = ((table[2].whole / table[2].frac) << 12) + ((table[2].whole % table[2].frac) << 12) / table[2].frac;
+    angle = ((table[2].whole / table[2].frac) << 12) +
+            ((table[2].whole % table[2].frac) << 12) / table[2].frac;
     if (set) {
         self->sprite.rotate = angle;
     } else {
         self->sprite.rotate += angle;
     }
 }
+
 /* Sprite classes slot +0x060: display on/off (attribute bit 31, inverted). */
 s32 Sprite__SetDisplay(Sprite *self, s32 a1) {
     return GetSetBitField(&self->sprite.attribute, 0x1F, 1, a1 == 0) == 0;
 }
+
 /* Sprite classes slot +0x064: attribute bit 30. */
 s32 Sprite__SetSemiTrans(Sprite *self, s32 a1) {
     return GetSetBitField(&self->sprite.attribute, 0x1E, 1, a1 != 0);
 }
+
 /* Sprite classes slot +0x068: attribute bits 28..29. */
 s32 Sprite__SetSemiTransRate(Sprite *self, s32 a1) {
     return GetSetBitField(&self->sprite.attribute, 0x1C, 2, a1);
 }
+
 /* gTextRowMethods and gCharSpriteMethods slot +0x098 (update): empty override. */
-void Sprite__Update(Sprite *self, void *sender, s32 event) {
-}
+void Sprite__Update(Sprite *self, void *sender, s32 event) {}
+
 /* Slot +0x0B8 of gCharSpriteMethods, gScreenSpriteMethods, gSpriteMethods and gClass879C4Methods (the
  * sprite classes): copy three bytes into the embedded GsSPRITE's r,g,b. */
 void Sprite__SetColor(Sprite *self, SpriteRgb *rgb) {
     self->sprite.rgb = *rgb;
 }
+
 /* Returns the gSpriteMethods method table. */
 SpriteMethods *GetSpriteMethods(void) {
     return &gSpriteMethods;
 }
+
 /* Allocate and construct a Class6EED8 (0x30 bytes). */
 Class6EED8 *New_Class6EED8(char *name) {
     Class6EED8 *obj = BMemPMgrAlloc(0x30);
@@ -281,6 +302,7 @@ Class6EED8 *New_Class6EED8(char *name) {
     }
     return NULL;
 }
+
 /* gClass6EED8Methods slot +0x008 (ctor): the active driver's ctor, install
  * the table, clear `loaded`, and pass a stack copy of the name to
  * requestLoadFile (+0x06C). */
@@ -295,21 +317,25 @@ void Class6EED8__Class6EED8(Class6EED8 *self, char *name) {
         self->methods->requestLoadFile(self, buf);
     }
 }
+
 /* gClass6EED8Methods slot +0x00C (finalize): clear `loaded`, then the active
  * driver's finalize. */
 void Class6EED8__Finalize(Class6EED8 *self) {
     self->loaded = 0;
     GetActiveDataSourceMethods()->finalize((Class6D430 *)self);
 }
+
 /* gClass6EED8Methods slot +0x064 (setFlag): the driver reports the requested
  * file loaded. */
 void Class6EED8__SetFlag(Class6EED8 *self) {
     self->loaded = 1;
 }
+
 /* Returns the gClass6EED8Methods method table. */
 Class6EED8Methods *GetClass6EED8Methods(void) {
     return &gClass6EED8Methods;
 }
+
 /* Allocate and construct a FrameClock (0x1C bytes). */
 FrameClock *New_FrameClock(void) {
     FrameClock *obj = BMemPMgrAlloc(0x1C);
@@ -320,16 +346,19 @@ FrameClock *New_FrameClock(void) {
     }
     return NULL;
 }
+
 /* gFrameClockMethods slot +0x008 (ctor): the BasicClass ctor, install the table, reset(0). */
 void FrameClock__FrameClock(FrameClock *self) {
     Get_vtable_BasicClass()->ctor((BasicClass *)self);
     self->methods = Get_vtable_FrameClock();
     self->methods->reset(self, 0);
 }
+
 /* gFrameClockMethods slot +0x00C (finalize): the BasicClass finalize. */
 void FrameClock__Finalize(FrameClock *self) {
     Get_vtable_BasicClass()->finalize((BasicClass *)self);
 }
+
 /* gFrameClockMethods slot +0x024 (removeParentRef): step the cursor past the parent
  * being removed, then the BasicClass removeParentRef. */
 void FrameClock__RemoveParentRef(FrameClock *self, BasicClass *parent) {
@@ -338,6 +367,7 @@ void FrameClock__RemoveParentRef(FrameClock *self, BasicClass *parent) {
     }
     Get_vtable_BasicClass()->removeParentRef((BasicClass *)self, parent);
 }
+
 /* gFrameClockMethods slot +0x030 (notifyParents): walk the parent refs with the
  * cursor at +0x018 (which removeParentRef keeps valid) and pass each the
  * event through its onNotify. */
@@ -345,11 +375,13 @@ void FrameClock__NotifyParents(FrameClock *self, s32 event) {
     BasicClass *parent;
 
     self->parentCursor = self->parentRefs;
-    for (GetNextBasicClass(&parent, &self->parentCursor); parent != NULL; GetNextBasicClass(&parent, &self->parentCursor)) {
+    for (GetNextBasicClass(&parent, &self->parentCursor); parent != NULL;
+         GetNextBasicClass(&parent, &self->parentCursor)) {
         parent->methods->onNotify(parent, self, event);
     }
     self->parentCursor = NULL;
 }
+
 /* gFrameClockMethods slot +0x040 (reset). */
 void FrameClock__Reset(FrameClock *self, s32 frameCount) {
     self->frameCount = frameCount;
@@ -357,6 +389,7 @@ void FrameClock__Reset(FrameClock *self, s32 frameCount) {
     self->paused = 0;
     self->parentCursor = 0;
 }
+
 /* gFrameClockMethods slot +0x044: notify event 4 if flag14, else 3 if paused, else
  * count up and notify 2. */
 void FrameClock__Tick(FrameClock *self) {
@@ -372,30 +405,37 @@ void FrameClock__Tick(FrameClock *self) {
     }
     self->methods->notifyParents(self, event);
 }
+
 /* gFrameClockMethods slot +0x048. */
 s32 FrameClock__GetFrameCount(FrameClock *self) {
     return self->frameCount;
 }
+
 /* gFrameClockMethods slot +0x04C. */
 void FrameClock__Pause(FrameClock *self) {
     self->paused = 1;
 }
+
 /* gFrameClockMethods slot +0x050. */
 void FrameClock__Resume(FrameClock *self) {
     self->paused = 0;
 }
+
 /* gFrameClockMethods slot +0x054. */
 s32 FrameClock__IsPaused(FrameClock *self) {
     return self->paused;
 }
+
 /* gFrameClockMethods slot +0x058. */
 void FrameClock__SetFlag14(FrameClock *self) {
     self->flag14 = 1;
 }
+
 /* Returns the gFrameClockMethods method table. */
 FrameClockMethods *Get_vtable_FrameClock(void) {
     return &gFrameClockMethods;
 }
+
 /* Allocate and construct a LightRig (0x54 bytes). */
 LightRig *New_LightRig(void) {
     LightRig *obj = BMemPMgrAlloc(0x54);
@@ -406,6 +446,7 @@ LightRig *New_LightRig(void) {
     }
     return NULL;
 }
+
 /* LightRig slot +0x008 (ctor): the Class6B5CC ctor, install the table,
  * create and add the three flat lights, then reset. */
 void LightRig__LightRig(LightRig *self) {
@@ -420,6 +461,7 @@ void LightRig__LightRig(LightRig *self) {
     }
     self->methods->reset(self);
 }
+
 /* LightRig slot +0x00C (finalize): release the three lights, then the
  * Class6B5CC finalize. */
 void LightRig__Finalize(LightRig *self) {
@@ -432,17 +474,20 @@ void LightRig__Finalize(LightRig *self) {
     }
     GetClass6B5CCMethods()->finalize((Class6B5CC *)self);
 }
+
 /* LightRig slot +0x040 (reset): mark the coordinate for recompute. */
 void LightRig__Reset(LightRig *self) {
     self->coord2->flg = 0;
 }
+
 /* LightRig slot +0x09C (dispatchLinkCommand): empty override. */
-void LightRig__DispatchLinkCommand(LightRig *self, void *sender, s32 event) {
-}
+void LightRig__DispatchLinkCommand(LightRig *self, void *sender, s32 event) {}
+
 /* LightRig slot +0x0B8 (getLight), inherited unchanged by gClass866E8Methods. */
 BasicClass *LightRig__GetLight(LightRig *self, s32 index) {
     return self->lights[index];
 }
+
 /* LightRig slot +0x0BC: set the ambient colour (swapping the old one out
  * into *rgb when asked) and hand it to GsSetAmbient. */
 void LightRig__SetAmbientColor(LightRig *self, LightRigRgb *rgb, s32 swap) {
@@ -457,6 +502,7 @@ void LightRig__SetAmbientColor(LightRig *self, LightRigRgb *rgb, s32 swap) {
     }
     GsSetAmbient((u8)self->ambient.r << 4, (u8)self->ambient.g << 4, (u8)self->ambient.b << 4);
 }
+
 /* Returns the LightRig method table. */
 LightRigMethods *GetLightRigMethods(void) {
     return &gLightRigMethods;

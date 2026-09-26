@@ -97,10 +97,10 @@ typedef struct {
     s16 unk76; /* +0x76 */
     u8 pad78[0xAC - 0x78];
 } Entry90902E8;
+
 extern Entry90902E8 *D_800902E8[];
 
-s32 SpuVmSeKeyOn(s32 p0, s32 p1, s32 p2, s32 p3, u16 p4, u16 p5)
-{
+s32 SpuVmSeKeyOn(s32 p0, s32 p1, s32 p2, s32 p3, u16 p4, u16 p5) {
     u16 outA;
     u16 outB;
 
@@ -114,32 +114,28 @@ s32 SpuVmSeKeyOn(s32 p0, s32 p1, s32 p2, s32 p3, u16 p4, u16 p5)
         outA = p5;
         outB = 0x7F - ((p4 << 6) / p5);
     }
-    return SpuVmKeyOn(0x21, (s16) p0, (s16) p1, (u16) p2, outA, outB);
+    return SpuVmKeyOn(0x21, (s16)p0, (s16)p1, (u16)p2, outA, outB);
 }
 
-s32 SpuVmSeKeyOff(s16 p0, s16 p1, u16 p2)
-{
+s32 SpuVmSeKeyOff(s16 p0, s16 p1, u16 p2) {
     return SpuVmKeyOff(0x21, p0, p1, p2);
 }
 
-void KeyOnCheck(void) {
-}
+void KeyOnCheck(void) {}
 
 INCLUDE_ASM("asm/nonmatchings/code_179d8_j", SpuVmSetSeqVol);
 
-s32 SpuVmGetSeqVol(s32 p0, s16 *out1, s16 *out2)
-{
-    Entry90902E8 *tbl = D_800902E8[(u8) p0];
-    s16 *cur = (s16 *) &D_8008EA22;
+s32 SpuVmGetSeqVol(s32 p0, s16 *out1, s16 *out2) {
+    Entry90902E8 *tbl = D_800902E8[(u8)p0];
+    s16 *cur = (s16 *)&D_8008EA22;
 
-    *cur = (s16) p0;
+    *cur = (s16)p0;
     *out1 = tbl[(p0 & 0xFF00) >> 8].unk74;
     *out2 = tbl[(p0 & 0xFF00) >> 8].unk76;
     return *cur;
 }
 
-s32 SpuVmGetSeqLVol(s32 p0)
-{
+s32 SpuVmGetSeqLVol(s32 p0) {
     s32 channel = p0 & 0xFF;
     Entry90902E8 *tbl = D_800902E8[channel];
     s32 recIdx = (p0 & 0xFF00) >> 8;
@@ -151,9 +147,8 @@ s32 SpuVmGetSeqLVol(s32 p0)
     return tbl[recIdx].unk74;
 }
 
-s32 SpuVmGetSeqRVol(s32 p0)
-{
-    Entry90902E8 *tbl = D_800902E8[(u8) p0];
+s32 SpuVmGetSeqRVol(s32 p0) {
+    Entry90902E8 *tbl = D_800902E8[(u8)p0];
 
     /* Keeps the D_800902E8[(u8) p0] load above the D_8008EA22 store;
      * without it the load sinks below the store and the index arithmetic. */

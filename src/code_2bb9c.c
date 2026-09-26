@@ -57,6 +57,7 @@ TimImage *New_TimImage(char *name) {
     }
     return NULL;
 }
+
 /* TimImage +0x008: the ctor. */
 void TimImage__TimImage(TimImage *self, char *name) {
     GetActiveDataSourceMethods()->ctor((Class6D430 *)self);
@@ -67,10 +68,12 @@ void TimImage__TimImage(TimImage *self, char *name) {
         self->methods->requestLoadFile(self, name);
     }
 }
+
 /* TimImage +0x00C: finalize, straight to the active driver's. */
 void TimImage__Finalize(TimImage *self) {
     GetActiveDataSourceMethods()->finalize((Class6D430 *)self);
 }
+
 /* TimImage +0x078: describe the TIM, then upload its pixel block and, when
  * pmode bit 3 says it has one, its CLUT. */
 void TimImage__Upload(TimImage *self) {
@@ -96,40 +99,44 @@ void TimImage__Upload(TimImage *self) {
         }
     }
 }
+
 /* TimImage slot (tools/classtable.py); empty body. */
-void TimImage__func_8003B5AC(void) {
-}
+void TimImage__func_8003B5AC(void) {}
+
 /* TimImage slot (tools/classtable.py); empty body. */
-void TimImage__func_8003B5B4(void) {
-}
+void TimImage__func_8003B5B4(void) {}
+
 /* TimImage slot (tools/classtable.py); empty body. */
-void TimImage__func_8003B5BC(void) {
-}
+void TimImage__func_8003B5BC(void) {}
+
 /* TimImage slot (tools/classtable.py); empty body. */
-void TimImage__func_8003B5C4(void) {
-}
+void TimImage__func_8003B5C4(void) {}
+
 /* TimImage slot (tools/classtable.py); empty body. */
-void TimImage__func_8003B5CC(void) {
-}
+void TimImage__func_8003B5CC(void) {}
+
 /* TimImage slot (tools/classtable.py); empty body. */
-void TimImage__func_8003B5D4(void) {
-}
+void TimImage__func_8003B5D4(void) {}
+
 /* TimImage slot (tools/classtable.py); empty body. */
-void TimImage__func_8003B5DC(void) {
-}
+void TimImage__func_8003B5DC(void) {}
+
 /* TimImage +0x098: sets unk48 to 1; unk48's purpose beyond that flag is
  * unestablished (no caller reads it outside the ctor/this setter). */
 void TimImage__func_8003B5E4(TimImage *self) {
     self->unk48 = 1;
 }
+
 /* TimImage +0x09C: describe the TIM held in the buffer. */
 void TimImage__GetTimInfo(TimImage *self, GsIMAGE *tim) {
     GsGetTimInfo((u32 *)self->buffer + 1, tim);
 }
+
 /* The class's table getter (called by New_TimImage and TimImage__TimImage). */
 TimImageMethods *GetTimImageMethods(void) {
     return &gTimImageMethods;
 }
+
 /* Not in gTimImageMethods's table. Three calls to the draw singleton's slot
  * +0x064 per iteration, built from r's edges and p; nothing but i changes
  * between iterations. */

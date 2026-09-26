@@ -48,18 +48,18 @@ typedef struct TimArraySrcMethods TimArraySrcMethods;
 struct TimImage;
 
 struct TimArraySrcMethods {
-    CLASS6D430_SLOTS(TimArraySrc, (TimArraySrc *self, char *name));
+    CLASS6D430_SLOTS(TimArraySrc, (TimArraySrc * self, char *name));
     /* +0x078 is Class6D430's slot78; this table's occupant is
      * TimArraySrc__UploadImages (TimArraySrcUploadFn). */
-};                                   /* 30 slots, 0x7C bytes */
+}; /* 30 slots, 0x7C bytes */
 
 struct TimArraySrc {
     CLASS6D430_FIELDS(TimArraySrcMethods); /* buffer: the block (count, then offsets) */
-    /* +0x02C */ s32 count;                 /* images built: the block's first word */
-    /* +0x030 */ struct TimImage **images;  /* BMemPMgrAlloc(count * 4), one New_TimImage(NULL) each */
-    /* +0x034 */ s32 clutBase;              /* address of TimBlockSrc's entries[]; BuildImages adds 16 per CLUT row to it for each TimImage's clutBase */
-    /* +0x038 */ s32 ready;                 /* 0 from the ctor, 1 once BuildImages built the array */
-};                                          /* 0x3C bytes: New_TimArraySrc */
+    /* +0x02C */ s32 count;                /* images built: the block's first word */
+    /* +0x030 */ struct TimImage **images; /* BMemPMgrAlloc(count * 4), one New_TimImage(NULL) each */
+    /* +0x034 */ s32 clutBase; /* address of TimBlockSrc's entries[]; BuildImages adds 16 per CLUT row to it for each TimImage's clutBase */
+    /* +0x038 */ s32 ready;    /* 0 from the ctor, 1 once BuildImages built the array */
+}; /* 0x3C bytes: New_TimArraySrc */
 
 /* TimArraySrc__UploadImages as TimBlockSrc__AdvanceLoadState calls it
  * through slot78. */

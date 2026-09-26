@@ -69,17 +69,17 @@ struct BoxFill;
 struct DreamSaveBlock;
 
 struct GraphRoomMethods {
-    TASKCORE_SLOTS(GraphRoom, (GraphRoom *self, struct DreamSys *dreamSys));
+    TASKCORE_SLOTS(GraphRoom, (GraphRoom * self, struct DreamSys *dreamSys));
     /* +0x124 */ void (*tickHighlight)(GraphRoom *self); /* GraphRoom__TickHighlight; update's last call */
 };
 
 struct GraphRoom {
     TASKCORE_FIELDS(GraphRoomMethods);
-    /* +0x0A4 */ struct DreamSys *dreamSys;  /* the ctor's; +0x1B0 (GetSaveBlock) is the day log */
+    /* +0x0A4 */ struct DreamSys *dreamSys; /* the ctor's; +0x1B0 (GetSaveBlock) is the day log */
     /* +0x0A8 */ struct BoxFill *points[100]; /* BuildGraphPoints' dots, one a logged day, newest first */
-    /* +0x238 */ s32 scored;                 /* ScoreDayLog's result, kept by PopulateGraphPoints */
-    /* +0x23C */ u32 highlightCount;         /* TickHighlight: targets highlighted so far, < 4 */
-    /* +0x240 */ s8 *matchedDayIndices;      /* BMemPMgrAlloc(4): per ScoreDayLog target, the dot it matched */
+    /* +0x238 */ s32 scored;         /* ScoreDayLog's result, kept by PopulateGraphPoints */
+    /* +0x23C */ u32 highlightCount; /* TickHighlight: targets highlighted so far, < 4 */
+    /* +0x240 */ s8 *matchedDayIndices; /* BMemPMgrAlloc(4): per ScoreDayLog target, the dot it matched */
 };
 
 /* The ctor's resetCounters call, as the retail bytes make it: the slot is

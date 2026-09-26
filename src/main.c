@@ -46,8 +46,7 @@ extern BMemPMgr *gStartupBMemPMgr;
 extern Class6D3C8 *gClass6D3C8;
 extern Class6D3C8CtorArgs gClass6D3C8CtorArgs;
 
-void main(void)
-{
+void main(void) {
     DrawSystem *obj;
     Pad *pad;
 
@@ -63,5 +62,4 @@ void main(void)
 }
 
 /* Sony's _obj/none (round 79); the call to it is cc1's, inside main. */
-void __main(void) {
-}
+void __main(void) {}

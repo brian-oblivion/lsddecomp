@@ -24,8 +24,7 @@
 #include "ScreenSprite.h"
 #include "TimImage.h"
 
-void TextEntry__PrevChar(TextEntry *self)
-{
+void TextEntry__PrevChar(TextEntry *self) {
     s32 count;
 
     if (self->panelSprite) {
@@ -39,23 +38,20 @@ void TextEntry__PrevChar(TextEntry *self)
     }
 }
 
-void TextEntry__ToggleAltCommands(TextEntry *self)
-{
+void TextEntry__ToggleAltCommands(TextEntry *self) {
     if (self->panelSprite) {
         self->altCommands ^= 1;
     }
 }
 
-void TextEntry__ResetChar(TextEntry *self)
-{
+void TextEntry__ResetChar(TextEntry *self) {
     if (self->panelSprite) {
         self->charIndex = 0;
         self->methods->setCharAt(self, self->cursorIndex, 0, 1);
     }
 }
 
-void TextEntry__ResetAllChars(TextEntry *self)
-{
+void TextEntry__ResetAllChars(TextEntry *self) {
     s32 i;
 
     if (self->panelSprite) {
@@ -75,8 +71,7 @@ void TextEntry__ResetAllChars(TextEntry *self)
 extern s32 D_8008AADC; /* VALUE-of here: the cursor's x at position 0 (class_3bb8c_i takes its address) */
 extern s32 D_8008AAE0; /* VALUE-of, TextEntry__SetCursorPos only: the cursor's y */
 
-void TextEntry__SetCursorPos(TextEntry *self, s32 pos, s32 notify)
-{
+void TextEntry__SetCursorPos(TextEntry *self, s32 pos, s32 notify) {
     ScreenSpritePos local;
     CharSprite *obj;
 
@@ -96,8 +91,7 @@ void TextEntry__SetCursorPos(TextEntry *self, s32 pos, s32 notify)
  * (ROM image initialises it to D_800115D0, still-uncarved rodata). */
 extern u8 *gNameCharTable;
 
-void TextEntry__SetCharAt(TextEntry *self, s32 pos, s32 charIndex, s32 notify)
-{
+void TextEntry__SetCharAt(TextEntry *self, s32 pos, s32 charIndex, s32 notify) {
     ChildObj86ED0 *obj;
 
     if (self->panelSprite) {
@@ -114,8 +108,7 @@ void TextEntry__SetCharAt(TextEntry *self, s32 pos, s32 charIndex, s32 notify)
 
 /* TextEntry's own table getter (include/TextEntry.h), defined here in ROM
  * order; not Class86F88's. */
-TextEntryMethods *GetTextEntryMethods(void)
-{
+TextEntryMethods *GetTextEntryMethods(void) {
     return &gTextEntryMethods;
 }
 
@@ -129,8 +122,7 @@ TextEntryMethods *GetTextEntryMethods(void)
 extern void *BMemPMgrAlloc(s32 size);
 extern void *BMemPMgrFree(void *ptr);
 
-Class86F88 *New_Class86F88(char **items, s32 mode)
-{
+Class86F88 *New_Class86F88(char **items, s32 mode) {
     Class86F88 *self = BMemPMgrAlloc(0x54);
 
     if (self == NULL) {
@@ -157,8 +149,7 @@ extern s32 strlen(void *arg0);
 extern void DecodeFullWidthSjis(void *dst, void *src);
 extern char *strcpy(char *dest, char *src);
 
-void Class86F88__Class86F88(Class86F88 *self, char **items, s32 mode)
-{
+void Class86F88__Class86F88(Class86F88 *self, char **items, s32 mode) {
     char **p;
     s32 i;
     s32 len;
@@ -199,15 +190,13 @@ void Class86F88__Class86F88(Class86F88 *self, char **items, s32 mode)
     self->methods->resetView(self);
 }
 
-void Class86F88__ClearCachedRefs(Class86F88 *self)
-{
+void Class86F88__ClearCachedRefs(Class86F88 *self) {
     self->inputSource = NULL;
     self->tickSource = NULL;
     self->panelSprite = NULL;
 }
 
-void Class86F88__Finalize(Class86F88 *self)
-{
+void Class86F88__Finalize(Class86F88 *self) {
     s32 i;
 
     for (i = 0; i < self->itemCount; i++) {
@@ -218,8 +207,7 @@ void Class86F88__Finalize(Class86F88 *self)
     Get_vtable_BasicClass()->finalize((BasicClass *)self);
 }
 
-void Class86F88__AddChild(Class86F88 *self, void *child)
-{
+void Class86F88__AddChild(Class86F88 *self, void *child) {
     s32 tag;
 
     if (child) {
@@ -233,8 +221,7 @@ void Class86F88__AddChild(Class86F88 *self, void *child)
     }
 }
 
-void Class86F88__RemoveChild(Class86F88 *self, void *child)
-{
+void Class86F88__RemoveChild(Class86F88 *self, void *child) {
     s32 tag;
 
     if (child) {
@@ -248,16 +235,14 @@ void Class86F88__RemoveChild(Class86F88 *self, void *child)
     }
 }
 
-void Class86F88__RemoveAllChildren(Class86F88 *self)
-{
+void Class86F88__RemoveAllChildren(Class86F88 *self) {
     self->inputSource = NULL;
     self->tickSource = NULL;
     self->panelSprite = NULL;
     Get_vtable_BasicClass()->removeAllChildren((BasicClass *)self);
 }
 
-void Class86F88__OnNotify(Class86F88 *self, void *sender, s32 event)
-{
+void Class86F88__OnNotify(Class86F88 *self, void *sender, s32 event) {
     s32 tag;
 
     Get_vtable_BasicClass()->onNotify((BasicClass *)self, sender, event);
@@ -269,8 +254,7 @@ void Class86F88__OnNotify(Class86F88 *self, void *sender, s32 event)
     }
 }
 
-void Class86F88__ResetView(Class86F88 *self)
-{
+void Class86F88__ResetView(Class86F88 *self) {
     self->topIndex = 0;
     self->column = 0;
     self->cursorIndex = 0;
@@ -290,8 +274,7 @@ extern const char D_800116E4[]; /* "FONTICON" */
  * round-18/19 stall (75/95, both addresses and the handle swapped among
  * $s0-$s2). Same shape as class_3bb8c_i's TextEntry__LoadCardResources.
  */
-void Class86F88__LoadResources(Class86F88 *self, Class6B5CC *parent)
-{
+void Class86F88__LoadResources(Class86F88 *self, Class6B5CC *parent) {
     char path[0x20];
     const char *dir;
     const char *ext;
@@ -320,8 +303,7 @@ void Class86F88__LoadResources(Class86F88 *self, Class6B5CC *parent)
     handle2->methods->release(handle2);
 }
 
-void Class86F88__ReleaseResources(Class86F88 *self)
-{
+void Class86F88__ReleaseResources(Class86F88 *self) {
     if (self->panelSprite) {
         self->methods->releaseRows(self);
         self->panelSprite = self->panelSprite->methods->release(self->panelSprite);
@@ -330,8 +312,8 @@ void Class86F88__ReleaseResources(Class86F88 *self)
 
 /* The first addChild passes all four words through (Class86F88AddChildWideFn,
  * no code): see this function's report for the do/while. */
-void Class86F88__AttachTarget(Class86F88 *self, void *child1, void *child2, struct TargetObj86ED0 *target)
-{
+void Class86F88__AttachTarget(Class86F88 *self, void *child1, void *child2,
+                              struct TargetObj86ED0 *target) {
     Class86F88AddChildWideFn fn;
     s32 zero;
 
@@ -345,8 +327,7 @@ void Class86F88__AttachTarget(Class86F88 *self, void *child1, void *child2, stru
     } while (0);
 }
 
-void Class86F88__DetachTarget(Class86F88 *self)
-{
+void Class86F88__DetachTarget(Class86F88 *self) {
     self->methods->removeChild(self, self->inputSource);
     self->methods->removeChild(self, self->tickSource);
     self->target = NULL;

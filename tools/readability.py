@@ -158,10 +158,11 @@ def game_bodies(live, info):
 
 
 def magic_literals(body):
-    hits = []
+    hits, cont = [], False
     for line in body.split("\n"):
         s = line.strip()
-        if s.startswith("#") or re.match(r"^(?:typedef\s+)?enum\b", s):
+        pp, cont = cont or s.startswith("#"), (cont or s.startswith("#")) and s.endswith("\\")
+        if pp or re.match(r"^(?:typedef\s+)?enum\b", s):
             continue
         for m in NUM_RE.finditer(line):
             v = m.group(1)

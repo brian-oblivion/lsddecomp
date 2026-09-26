@@ -60,6 +60,7 @@ struct TagCheckArg; /* onNotify's sender, read only for its table's low id halfw
  * (Class65650__Reset), +0x04C/+0x050 (Class65650__AttachToParent/
  * DetachFromParent), +0x060 (Class65650__SetDisplay), +0x070
  * (Class65650__SetLightMode) and +0x098 (Class65650__Update). */
+/* clang-format off */
 #define CLASS65650_SLOTS(Self, CtorParams)                                                         \
     ACTOR_SLOTS(Self, CtorParams);                                                                 \
     /* +0x0F0 */ void (*setUnk64)(Self *self, s32 value);       /* Class65650__SetUnk64 */         \
@@ -83,7 +84,9 @@ struct TagCheckArg; /* onNotify's sender, read only for its table's low id halfw
     /* +0x138 */ void *(*applyTodPacket)(Self *self, void *packet, void *extra); /* Class65650__ApplyTodPacket: returns the next packet */ \
     /* +0x13C */ void (*linkPeer)(Self *self, Class65650 *other); /* Class65650__LinkPeer: addChild both ways, peer = other */ \
     /* +0x140 */ void (*unlinkPeer)(Self *self)                 /* Class65650__UnlinkPeer */
+/* clang-format on */
 
+/* clang-format off */
 #define CLASS65650_FIELDS(Methods)                                                                 \
     ACTOR_FIELDS(Methods);                                                                         \
     /* +0x058 */ struct UnkArg2Obj *arg2;  /* the ctor's second argument, kept verbatim; slot124 calls its +0x080 */ \
@@ -102,9 +105,10 @@ struct TagCheckArg; /* onNotify's sender, read only for its table's low id halfw
     /* +0x08C */ s32 tickCallbackEnabled;  /* enableTickCallback / disableTickCallback */          \
     /* +0x090 */ s32 todPlaying;           /* playTod / stopTod; gates frame advance in tick */    \
     /* +0x094 */ Class65650 *peer          /* linkPeer's other, NULL after unlinkPeer. The object is 0x98 bytes (New_Class65650) */
+/* clang-format on */
 
 struct Class65650Methods {
-    CLASS65650_SLOTS(Class65650, (Class65650 *self, void *desc, void *arg2));
+    CLASS65650_SLOTS(Class65650, (Class65650 * self, void *desc, void *arg2));
 };
 
 struct Class65650 {
@@ -122,7 +126,7 @@ extern Class65650Methods *Get_vtable_Class65650(void); /* returns &gClass65650Me
 /* +0x04C's occupant in this class's table, as a caller reaching it through
  * the inherited slot casts it (see the banner). */
 typedef void (*Class65650AttachToParentFn)(Class65650 *self, Class65650 *peer, void *companion,
-                                          void *parent, void *offset);
+                                           void *parent, void *offset);
 
 /* The class's own methods, in ROM order (code_55dd4). A subclass reaches
  * the base ones through Get_vtable_Class65650() and upcasts. */
@@ -131,7 +135,8 @@ Class65650 *Class65650__Class65650(Class65650 *self, void *desc, void *arg2);
 void Class65650__Finalize(Class65650 *self);
 void Class65650__OnNotify(Class65650 *self, struct TagCheckArg *sender, s32 event);
 void Class65650__Reset(Class65650 *self);
-void Class65650__AttachToParent(Class65650 *self, Class65650 *peer, void *companion, void *parent, void *offset);
+void Class65650__AttachToParent(Class65650 *self, Class65650 *peer, void *companion, void *parent,
+                                void *offset);
 void Class65650__DetachFromParent(Class65650 *self);
 void Class65650__SetDisplay(Class65650 *self, void *arg);
 void Class65650__SetLightMode(Class65650 *self, void *arg);

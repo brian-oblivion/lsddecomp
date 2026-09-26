@@ -22,7 +22,6 @@
  * just an unobserved return. */
 extern void func_80038E44(s32 a0);
 
-void SpuInitHot(void)
-{
+void SpuInitHot(void) {
     func_80038E44(1);
 }

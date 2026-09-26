@@ -33,8 +33,7 @@ typedef struct {
     s16 x, y;
 } Vec2s16;
 
-void StoreSxyPolyFT4(void *dst, s32 storeFirst3)
-{
+void StoreSxyPolyFT4(void *dst, s32 storeFirst3) {
     if (storeFirst3) {
         gte_stsxy3_ft4(dst);
     } else {
@@ -44,8 +43,7 @@ void StoreSxyPolyFT4(void *dst, s32 storeFirst3)
     }
 }
 
-void StoreSxyPolyGT4(void *dst, s32 storeFirst3)
-{
+void StoreSxyPolyGT4(void *dst, s32 storeFirst3) {
     if (storeFirst3) {
         gte_stsxy3_gt4(dst);
     } else {
@@ -63,8 +61,8 @@ void *SubmitPolyF3(void *prim, void *ctx) {
     if (*(s32 *)((u8 *)ctx + 0x78) != 0) {
         FillRCPolyHeader(gPolySubmitTableTri, ctx, (u8 *)prim + 0x4, 0, 0, 0);
         CopyPolyVtx3((PolyVtx **)((u8 *)ctx + 0x88), (PolyVtx **)((u8 *)ctx + 0xA4),
-                      (PolyUV4 *)((u8 *)prim + 0x8), (PolyUV4 *)((u8 *)prim + 0xC),
-                      (PolyUV4 *)((u8 *)prim + 0x10));
+                     (PolyUV4 *)((u8 *)prim + 0x8), (PolyUV4 *)((u8 *)prim + 0xC),
+                     (PolyUV4 *)((u8 *)prim + 0x10));
         return ((void *(*)(void *, void *))RCpolyF3)(prim, gPolySubmitTableTri);
     }
     ((OtTag *)prim)->addr = (*(OtTag **)((u8 *)ctx + 0x30))->addr;
@@ -82,9 +80,8 @@ void *SubmitPolyG3(void *prim, void *ctx) {
 
     if (*(s32 *)(c + 0x78) != 0) {
         FillRCPolyHeader(gPolySubmitTableTri, c, self + 0x4, 0, 0, 0);
-        CopyPolyVtx3((PolyVtx **)(c + 0x88), (PolyVtx **)(c + 0xA4),
-                      (PolyUV4 *)(self + 0x8), (PolyUV4 *)(self + 0x10),
-                      (PolyUV4 *)(self + 0x18));
+        CopyPolyVtx3((PolyVtx **)(c + 0x88), (PolyVtx **)(c + 0xA4), (PolyUV4 *)(self + 0x8),
+                     (PolyUV4 *)(self + 0x10), (PolyUV4 *)(self + 0x18));
 
         *(u16 *)(*(u8 **)(c + 0x88) + 0xA) = *(u8 *)(self + 0xF);
         *(u16 *)(*(u8 **)(c + 0x8C) + 0xA) = *(u8 *)(self + 0xF);
@@ -107,10 +104,11 @@ void *SubmitPolyG3(void *prim, void *ctx) {
  * SubmitPolyF3. */
 void *SubmitPolyFT3(void *prim, void *ctx) {
     if (*(s32 *)((u8 *)ctx + 0x78) != 0) {
-        FillRCPolyHeader(gPolySubmitTableTri, ctx, (u8 *)prim + 0x4, 1, *(u16 *)((u8 *)prim + 0xE), *(u16 *)((u8 *)prim + 0x16));
+        FillRCPolyHeader(gPolySubmitTableTri, ctx, (u8 *)prim + 0x4, 1, *(u16 *)((u8 *)prim + 0xE),
+                         *(u16 *)((u8 *)prim + 0x16));
         CopyPolyVtx3((PolyVtx **)((u8 *)ctx + 0x88), (PolyVtx **)((u8 *)ctx + 0xA4),
-                      (PolyUV4 *)((u8 *)prim + 0x8), (PolyUV4 *)((u8 *)prim + 0x10),
-                      (PolyUV4 *)((u8 *)prim + 0x18));
+                     (PolyUV4 *)((u8 *)prim + 0x8), (PolyUV4 *)((u8 *)prim + 0x10),
+                     (PolyUV4 *)((u8 *)prim + 0x18));
 
         *(u16 *)(*(u8 **)((u8 *)ctx + 0x88) + 0xA) = *(u16 *)((u8 *)prim + 0x1E);
         *(u16 *)(*(u8 **)((u8 *)ctx + 0x8C) + 0xA) = *(u16 *)((u8 *)prim + 0x1E);
@@ -133,8 +131,8 @@ void *SubmitPolyFT3(void *prim, void *ctx) {
 void *SubmitPolyF4(void *prim, void *ctx) {
     if (*(s32 *)((u8 *)ctx + 0x78) != 0) {
         FillRCPolyHeader(gPolySubmitTableQuad, ctx, (u8 *)prim + 0x4, 0, 0, 0);
-        CopyPolyVtx4((u8 *)ctx + 0x94, (u8 *)ctx + 0xA4, (u8 *)prim + 0x8,
-                      (u8 *)prim + 0xC, (u8 *)prim + 0x10, (u8 *)prim + 0x14);
+        CopyPolyVtx4((u8 *)ctx + 0x94, (u8 *)ctx + 0xA4, (u8 *)prim + 0x8, (u8 *)prim + 0xC,
+                     (u8 *)prim + 0x10, (u8 *)prim + 0x14);
         return ((void *(*)(void *, void *))RCpolyF4)(prim, gPolySubmitTableQuad);
     }
     ((OtTag *)prim)->addr = (*(OtTag **)((u8 *)ctx + 0x30))->addr;
@@ -152,8 +150,7 @@ void *SubmitPolyG4(void *prim, void *ctx) {
 
     if (*(s32 *)(c + 0x78) != 0) {
         FillRCPolyHeader(gPolySubmitTableQuad, c, self + 0x4, 0, 0, 0);
-        CopyPolyVtx4(c + 0x94, c + 0xA4, self + 0x8, self + 0x10,
-                      self + 0x18, self + 0x20);
+        CopyPolyVtx4(c + 0x94, c + 0xA4, self + 0x8, self + 0x10, self + 0x18, self + 0x20);
 
         *(u16 *)(*(u8 **)(c + 0x94) + 0xA) = *(u8 *)(self + 0xF);
         *(u16 *)(*(u8 **)(c + 0x98) + 0xA) = *(u8 *)(self + 0xF);
@@ -178,9 +175,10 @@ void *SubmitPolyG4(void *prim, void *ctx) {
  * SubmitPolyF3. */
 void *SubmitPolyFT4(void *prim, void *ctx) {
     if (*(s32 *)((u8 *)ctx + 0x78) != 0) {
-        FillRCPolyHeader(gPolySubmitTableQuad, ctx, (u8 *)prim + 0x4, 1, *(u16 *)((u8 *)prim + 0xE), *(u16 *)((u8 *)prim + 0x16));
-        CopyPolyVtx4((u8 *)ctx + 0x94, (u8 *)ctx + 0xA4, (u8 *)prim + 0x8,
-                      (u8 *)prim + 0x10, (u8 *)prim + 0x18, (u8 *)prim + 0x20);
+        FillRCPolyHeader(gPolySubmitTableQuad, ctx, (u8 *)prim + 0x4, 1, *(u16 *)((u8 *)prim + 0xE),
+                         *(u16 *)((u8 *)prim + 0x16));
+        CopyPolyVtx4((u8 *)ctx + 0x94, (u8 *)ctx + 0xA4, (u8 *)prim + 0x8, (u8 *)prim + 0x10,
+                     (u8 *)prim + 0x18, (u8 *)prim + 0x20);
 
         *(u16 *)(*(u8 **)((u8 *)ctx + 0x94) + 0xA) = *(u16 *)((u8 *)prim + 0x1E);
         *(u16 *)(*(u8 **)((u8 *)ctx + 0x98) + 0xA) = *(u16 *)((u8 *)prim + 0x1E);
@@ -207,10 +205,10 @@ void *SubmitPolyGT3(void *prim, void *ctx) {
     u8 *c = (u8 *)ctx;
 
     if (*(s32 *)(c + 0x78) != 0) {
-        FillRCPolyHeader(gPolySubmitTableTri, c, self + 0x4, 1, *(u16 *)(self + 0xE), *(u16 *)(self + 0x1A));
-        CopyPolyVtx3((PolyVtx **)(c + 0x88), (PolyVtx **)(c + 0xA4),
-                      (PolyUV4 *)(self + 0x8), (PolyUV4 *)(self + 0x14),
-                      (PolyUV4 *)(self + 0x20));
+        FillRCPolyHeader(gPolySubmitTableTri, c, self + 0x4, 1, *(u16 *)(self + 0xE),
+                         *(u16 *)(self + 0x1A));
+        CopyPolyVtx3((PolyVtx **)(c + 0x88), (PolyVtx **)(c + 0xA4), (PolyUV4 *)(self + 0x8),
+                     (PolyUV4 *)(self + 0x14), (PolyUV4 *)(self + 0x20));
 
         *(u16 *)(*(u8 **)(c + 0x88) + 0xA) = *(u16 *)(self + 0x26);
         *(u16 *)(*(u8 **)(c + 0x8C) + 0xA) = *(u16 *)(self + 0x26);
@@ -240,9 +238,9 @@ void *SubmitPolyGT4(void *prim, void *ctx) {
     u8 *c = (u8 *)ctx;
 
     if (*(s32 *)(c + 0x78) != 0) {
-        FillRCPolyHeader(gPolySubmitTableQuad, c, self + 0x4, 1, *(u16 *)(self + 0xE), *(u16 *)(self + 0x1A));
-        CopyPolyVtx4(c + 0x94, c + 0xA4, self + 0x8, self + 0x14,
-                      self + 0x20, self + 0x2C);
+        FillRCPolyHeader(gPolySubmitTableQuad, c, self + 0x4, 1, *(u16 *)(self + 0xE),
+                         *(u16 *)(self + 0x1A));
+        CopyPolyVtx4(c + 0x94, c + 0xA4, self + 0x8, self + 0x14, self + 0x20, self + 0x2C);
 
         *(u16 *)(*(u8 **)(c + 0x94) + 0xA) = *(u16 *)(self + 0x26);
         *(u16 *)(*(u8 **)(c + 0x98) + 0xA) = *(u16 *)(self + 0x26);
@@ -277,8 +275,7 @@ void *SubmitPolyGT4(void *prim, void *ctx) {
  * matching ProjectTriFace/ProjectQuadFace's own arity code. Mechanics
  * established; WHY the table also keeps its own copy of the same pointers
  * is not (round 77, tier B). */
-void InitVtxRecordPtrs(void *dst, void *table, s32 kind)
-{
+void InitVtxRecordPtrs(void *dst, void *table, s32 kind) {
     u8 *src = (u8 *)table + 0x18;
     u8 *dst0 = (u8 *)dst;
     u8 *dst1 = (kind == 4) ? (u8 *)table + 0xF0 : (u8 *)table + 0xA8;
@@ -304,8 +301,7 @@ void InitVtxRecordPtrs(void *dst, void *table, s32 kind)
  * ctx+0x70/0x72/0x74/0x76 (min x/y, max x/y) and sets the cull flag when
  * either span reaches 0x101 -- i.e. when the primitive's screen extent in
  * either axis would exceed what a single draw primitive can represent. */
-void UpdatePolyBBoxAndCull(void *ctx, s32 count)
-{
+void UpdatePolyBBoxAndCull(void *ctx, s32 count) {
     u8 *self = (u8 *)ctx;
     s16 *xp, *yp, *end;
 
@@ -371,8 +367,7 @@ extern s32 sPolyOtCodeOverride;
  * plain word at `ctx + 0x30` (the caller's computed OT bucket pointer,
  * code_8220.h). Pure header-populate leaf, same shape at all 8 call
  * sites: tier A. */
-void FillRCPolyHeader(void *table, void *ctx, PolyUV4 *uv, s32 hasUv1Codes, u16 uv1Clut, u16 uv1TPage)
-{
+void FillRCPolyHeader(void *table, void *ctx, PolyUV4 *uv, s32 hasUv1Codes, u16 uv1Clut, u16 uv1TPage) {
     u8 *dst = (u8 *)table;
     u8 *c = (u8 *)ctx;
     s32 val;
@@ -413,8 +408,7 @@ void FillRCPolyHeader(void *table, void *ctx, PolyUV4 *uv, s32 hasUv1Codes, u16 
  * these six assignments, byte-exact, and CLAUDE.md HARD RULE 6 cites it as
  * the example of "hard to type" not being "no C form".
  */
-void CopyPolyVtx3(PolyVtx **dst, PolyVtx **src, PolyUV4 *uv0, PolyUV4 *uv1,
-                   PolyUV4 *uv2) {
+void CopyPolyVtx3(PolyVtx **dst, PolyVtx **src, PolyUV4 *uv0, PolyUV4 *uv1, PolyUV4 *uv2) {
     dst[0]->xy = src[0]->xy;
     dst[1]->xy = src[1]->xy;
     dst[2]->xy = src[2]->xy;
@@ -423,9 +417,7 @@ void CopyPolyVtx3(PolyVtx **dst, PolyVtx **src, PolyUV4 *uv0, PolyUV4 *uv1,
     dst[2]->uv = *uv2;
 }
 
-
-void CopyPolyVtx4(PolyVtx **dst, PolyVtx **src, PolyUV4 *uv0, PolyUV4 *uv1,
-                   PolyUV4 *uv2, PolyUV4 *uv3) {
+void CopyPolyVtx4(PolyVtx **dst, PolyVtx **src, PolyUV4 *uv0, PolyUV4 *uv1, PolyUV4 *uv2, PolyUV4 *uv3) {
     CopyPolyVtx3(dst, src, uv0, uv1, uv2);
     dst[3]->xy = src[3]->xy;
     dst[3]->uv = *uv3;
@@ -438,8 +430,7 @@ extern s32 sPolyOtCodeOverride;
  * FillRCPolyHeader's header word 0 comes from `code` (this call's second
  * argument, stored only when `enable` is set) or from the per-object
  * D_80090C18 default. Tier A. */
-void SetPolyOtCodeOverride(s32 enable, s32 code)
-{
+void SetPolyOtCodeOverride(s32 enable, s32 code) {
     sPolyOtCodeOverrideSet = enable;
     if (enable) {
         sPolyOtCodeOverride = code;

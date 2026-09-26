@@ -51,17 +51,21 @@ struct ScreenSpritePos {
  * gScreenSpriteMethods --vs gSpriteMethods` lists the overrides of the
  * inherited ones (ScreenSprite__ScreenSprite, ScreenSprite__Reset,
  * ScreenSprite__AttachToParent). */
+/* clang-format off */
 #define SCREENSPRITE_SLOTS(Self, CtorParams)                                                       \
     SPRITE_SLOTS(Self, CtorParams);                                                                \
     /* +0x0BC */ void (*setPosition)(Self *self, ScreenSpritePos *pos); /* ScreenSprite__SetPosition; gTextRowMethods: TextRow__SetPosition */ \
     /* +0x0C0 */ void (*setPivotAnchor)(Self *self, u32 anchor)         /* ScreenSprite__SetPivotAnchor: 0 centre, 1 left, 2 right, 3 top, 4 bottom */
+/* clang-format on */
 
+/* clang-format off */
 #define SCREENSPRITE_FIELDS(Methods)                                                               \
     SPRITE_FIELDS(Methods);                                                                        \
     /* +0x0A0 */ ScreenSpritePos screenPos /* setPosition; Viewport__DrawNode places the sprite from it. The object is 0xA8 bytes (New_ScreenSprite): CharSprite's own fields start at +0x0A8 */
+/* clang-format on */
 
 struct ScreenSpriteMethods {
-    SCREENSPRITE_SLOTS(ScreenSprite, (ScreenSprite *self, void *texture, SpriteRect *rect, s32 arg3));
+    SCREENSPRITE_SLOTS(ScreenSprite, (ScreenSprite * self, void *texture, SpriteRect *rect, s32 arg3));
 };
 
 struct ScreenSprite {

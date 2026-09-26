@@ -182,11 +182,14 @@ s32 func_8001E7BC(Class6B5CC *self, s32 *arg1, s32 *arg2) {
                 if (cur != NULL) {
                     do {
                         ((Vec3_d294 *)(self->parent != 0 ? self->coord2->unk38 : (s32 *)0))->x =
-                            ((Vec3_d294 *)(self->parent != 0 ? self->coord2->unk38 : (s32 *)0))->x + cur->coord2->tx;
+                            ((Vec3_d294 *)(self->parent != 0 ? self->coord2->unk38 : (s32 *)0))->x +
+                            cur->coord2->tx;
                         ((Vec3_d294 *)(self->parent != 0 ? self->coord2->unk38 : (s32 *)0))->y =
-                            ((Vec3_d294 *)(self->parent != 0 ? self->coord2->unk38 : (s32 *)0))->y + cur->coord2->ty;
+                            ((Vec3_d294 *)(self->parent != 0 ? self->coord2->unk38 : (s32 *)0))->y +
+                            cur->coord2->ty;
                         ((Vec3_d294 *)(self->parent != 0 ? self->coord2->unk38 : (s32 *)0))->z =
-                            ((Vec3_d294 *)(self->parent != 0 ? self->coord2->unk38 : (s32 *)0))->z + cur->coord2->tz;
+                            ((Vec3_d294 *)(self->parent != 0 ? self->coord2->unk38 : (s32 *)0))->z +
+                            cur->coord2->tz;
 
                         cur = cur->parent;
                     } while (cur != NULL);
@@ -204,12 +207,14 @@ s32 func_8001E7BC(Class6B5CC *self, s32 *arg1, s32 *arg2) {
         delta[0] = buf18[0];
         delta[1] = (u16)buf18[1] - 0x400;
         delta[2] = buf18[2];
-        if (TmdModel__RaycastFaces(self->model, (s32 *)buf30, (TmdVec3 *)buf28, NULL, (TmdVec3 *)buf18, (TmdVec3 *)delta)) {
+        if (TmdModel__RaycastFaces(self->model, (s32 *)buf30, (TmdVec3 *)buf28, NULL,
+                                   (TmdVec3 *)buf18, (TmdVec3 *)delta)) {
             SubVec3S16(arg1, buf18, buf28);
             return 1;
         }
         delta[1] = (u16)buf18[1] + 0x400;
-        if (TmdModel__RaycastFaces(self->model, (s32 *)buf30, (TmdVec3 *)buf28, NULL, (TmdVec3 *)buf18, (TmdVec3 *)delta)) {
+        if (TmdModel__RaycastFaces(self->model, (s32 *)buf30, (TmdVec3 *)buf28, NULL,
+                                   (TmdVec3 *)buf18, (TmdVec3 *)delta)) {
             SubVec3S16(arg1, buf18, buf28);
             return 1;
         }

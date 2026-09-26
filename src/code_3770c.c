@@ -37,9 +37,9 @@ extern void *CdSearchFile(void *fp, char *name);
 extern char *strcpy(char *dest, char *src);
 extern char *strcat(char *dest, char *src);
 
-void *func_800270B8(void);   /* code_171e0.c: the data directory string */
+void *func_800270B8(void); /* code_171e0.c: the data directory string */
 extern s32 D_8008A94C;
-extern char D_8008A954[];    /* ";1" */
+extern char D_8008A954[]; /* ";1" */
 extern void StSetStream(u32 mode, u32 start_frame, u32 end_frame, void (*func1)(), void (*func2)());
 
 extern void *BMemPMgrAlloc(s32 size);
@@ -76,6 +76,7 @@ CdStream *New_CdStream(s32 speed, s32 fps, s32 arg3) {
     }
     return NULL;
 }
+
 void CdStream__CdStream(CdStream *self, u32 speed, s32 fps, s32 arg3) {
     Get_vtable_BasicClass()->ctor((BasicClass *)self);
     self->methods = Get_vtable_CdStream();
@@ -89,16 +90,19 @@ void CdStream__CdStream(CdStream *self, u32 speed, s32 fps, s32 arg3) {
     self->onSeekDone = NULL;
     self->state = 0;
 }
+
 void CdStream__Finalize(CdStream *self) {
     self->methods->close(self);
     Get_vtable_BasicClass()->finalize((BasicClass *)self);
 }
+
 void CdStream__SetRing(CdStream *self, u32 *ring, u32 size) {
     if (self->state == 0) {
         StSetRing(ring, size >> 11);
         self->ring = ring;
     }
 }
+
 s32 CdStream__Open(CdStream *self, char *name, s32 tries) {
     char path[0x20];
     s32 n;
@@ -128,6 +132,7 @@ s32 CdStream__Open(CdStream *self, char *name, s32 tries) {
     }
     return 1;
 }
+
 s32 SetupCdStreamAudio(CdStream *self) {
     SpuCommonAttr attr;
 
@@ -140,6 +145,7 @@ s32 SetupCdStreamAudio(CdStream *self) {
     SpuSetCommonAttr(&attr);
     return 1;
 }
+
 void CdStream__Close(CdStream *self) {
     CdStream *cur;
 
@@ -152,6 +158,7 @@ void CdStream__Close(CdStream *self) {
         }
     }
 }
+
 void CdStream__Seek(CdStream *self, u8 *pos) {
     if (self->state != 2 && gActiveCdStream == self) {
         if (self->onSeekDone != NULL) {
@@ -164,6 +171,7 @@ void CdStream__Seek(CdStream *self, u8 *pos) {
         self->state = 1;
     }
 }
+
 void OnCdSeekComplete(u8 status, u8 *result) {
     if (gActiveCdStream != NULL && status == 2) {
         CdSyncCallback(NULL);
@@ -172,6 +180,7 @@ void OnCdSeekComplete(u8 status, u8 *result) {
         }
     }
 }
+
 void CdStream__StartRead(CdStream *self, u32 startFrame, s32 frameCount) {
     u32 mode;
 
@@ -192,6 +201,7 @@ void CdStream__StartRead(CdStream *self, u32 startFrame, s32 frameCount) {
         self->state = 2;
     }
 }
+
 void CdStream__Stop(CdStream *self) {
     if (self->state == 2 && gActiveCdStream == self) {
         self->methods->mute(self);
@@ -202,6 +212,7 @@ void CdStream__Stop(CdStream *self) {
         self->state = 4;
     }
 }
+
 void CdStream__Restart(CdStream *self) {
     CdStream *cur;
 
@@ -213,10 +224,11 @@ void CdStream__Restart(CdStream *self) {
         }
     }
 }
-void CdStream__NoOpSlot5C(CdStream *self) {
-}
-void CdStream__NoOpSlot60(CdStream *self) {
-}
+
+void CdStream__NoOpSlot5C(CdStream *self) {}
+
+void CdStream__NoOpSlot60(CdStream *self) {}
+
 void CdStream__Mute(CdStream *self) {
     if (self->muted == 0 && gActiveCdStream == self) {
         while (CdControl(0xB, 0, 0) == 0) {
@@ -224,6 +236,7 @@ void CdStream__Mute(CdStream *self) {
         self->muted = 1;
     }
 }
+
 void CdStream__Demute(CdStream *self) {
     if (self->muted != 0 && gActiveCdStream == self) {
         while (CdControl(0xC, 0, 0) == 0) {
@@ -231,6 +244,7 @@ void CdStream__Demute(CdStream *self) {
         self->muted = 0;
     }
 }
+
 s32 CdStream__GetNextFrame(CdStream *self, u32 **addr, u32 *frame, s32 tries) {
     u32 *header;
     u32 n;
@@ -260,32 +274,39 @@ s32 CdStream__GetNextFrame(CdStream *self, u32 **addr, u32 *frame, s32 tries) {
     CdStream__ReleaseFrame(self, *addr, *frame);
     return 1;
 }
+
 void CdStream__ReleaseFrame(CdStream *self, u32 *base, u32 frame) {
     if (self->onFrameReady != NULL) {
         self->onFrameReady(self->cbArg);
         self->methods->freeRing(self, base);
     }
 }
+
 void CdStream__OnStreamEnd(CdStream *self) {
     if (self->onStreamEnd != NULL) {
         self->onFrameReady(self->cbArg);
         self->methods->close(self);
     }
 }
+
 u32 CdStream__FreeRing(CdStream *self, u32 *base) {
     return StFreeRing(base);
 }
+
 void CdStream__UnsetRing(CdStream *self) {
     StUnSetRing();
 }
+
 void CdStream__ClearRing(CdStream *self) {
     StClearRing();
 }
+
 int CdStream__Sync(CdStream *self, int mode) {
     return CdSync(mode, self->cdResult);
 }
-void CdStream__NoOpSlot7C(CdStream *self) {
-}
+
+void CdStream__NoOpSlot7C(CdStream *self) {}
+
 CdStreamMethods *Get_vtable_CdStream(void) {
     return &gCdStreamMethods;
 }

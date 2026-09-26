@@ -46,18 +46,20 @@
  * project's multiple-independent-local-views convention rather than being
  * asserted identical to SoundCueSet. */
 typedef struct StyleCueParam StyleCueParam;
+
 typedef struct StyleCueParamMethods {
     u8 pad0[0x6];
     s8 tag; /* +0x006, a small type id -- read signed, used as a NEGATIVE
              * index into gStyleCueDistanceTable (see ComputeStyleCueFalloff). */
 } StyleCueParamMethods;
+
 struct StyleCueParam {
     StyleCueParamMethods *methods; /* +0x000 */
-    s32 kind;                /* +0x004, a "kind" selector the 14 slot
+    s32 kind;                      /* +0x004, a "kind" selector the 14 slot
                                * occupants below all dispatch on */
-    u8 pad8[0x10 - 0x8];        /* +0x008 .. +0x00F, unknown */
-    s32 falloff;                    /* +0x010, ComputeStyleCueFalloff's own result */
-    u8 pad14[0x1C - 0x14];          /* +0x014 .. +0x01B, unknown */
+    u8 pad8[0x10 - 0x8];           /* +0x008 .. +0x00F, unknown */
+    s32 falloff;                   /* +0x010, ComputeStyleCueFalloff's own result */
+    u8 pad14[0x1C - 0x14];         /* +0x014 .. +0x01B, unknown */
     s32 unk1C;
     s32 unk20;
     s32 unk24;
@@ -335,7 +337,8 @@ Class876FC *New_Class876FC(s32 kind, Class876FCParams *params, Class6B5CC *paren
 }
 
 /* `kind` goes into Actor's pendingExtra (+0x054): see include/Class876FC.h. */
-Class876FC *Class876FC__Class876FC(Class876FC *self, s32 kind, Class876FCParams *params, Class6B5CC *parent, Vec3_d294 *pos) {
+Class876FC *Class876FC__Class876FC(Class876FC *self, s32 kind, Class876FCParams *params,
+                                   Class6B5CC *parent, Vec3_d294 *pos) {
     if (GetActorMethods()->ctor((Actor *)self) == NULL) {
         goto fail;
     }

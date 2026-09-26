@@ -34,7 +34,7 @@ typedef struct VabDriverMethods VabDriverMethods;
 struct VabDriverMethods {
     /* The ctor's parameter list is Class6D430's: every chained call reaches
      * it as GetActiveDataSourceMethods()->ctor(self). */
-    CLASS6D430_SLOTS(VabDriver, (VabDriver *self));
+    CLASS6D430_SLOTS(VabDriver, (VabDriver * self));
     /* The table is 29 slots and ends after +0x074: the word at +0x078
      * (Class6D430's slot78) is gVabStreamObjMethods's header, 0xA03. */
 };
@@ -47,18 +47,18 @@ extern VabDriverMethods gVabDriverMethods;
 extern VabDriverMethods *GetVabDriverMethods(void);
 
 /* The bodies take no arguments: none of them reads a register. */
-void VabDriver__VabDriver(void);            /* +0x008 ctor */
-void VabDriver__Destroy(void);              /* +0x00C finalize */
-void VabDriver__NoOpSlot40(void);           /* +0x040 slot40 */
-void VabDriver__Open(void);                 /* +0x044 open */
-void VabDriver__Close(void);                /* +0x048 close */
-void VabDriver__Seek(void);                 /* +0x04C seek */
-void VabDriver__NoOpSlot50(void);           /* +0x050 slot50 */
-s32 VabDriver__Read(void);                  /* +0x054 read: returns 0 */
-void VabDriver__LoadFile(void);             /* +0x058 loadFile */
-void VabDriver__RunRequestQueue(void);      /* +0x068 runRequestQueue */
-void VabDriver__RequestLoadFile(void);      /* +0x06C requestLoadFile */
-void VabDriver__StopService(void);          /* +0x070 stopService */
-void VabDriver__CancelRequests(void);       /* +0x074 cancelRequests */
+void VabDriver__VabDriver(void);       /* +0x008 ctor */
+void VabDriver__Destroy(void);         /* +0x00C finalize */
+void VabDriver__NoOpSlot40(void);      /* +0x040 slot40 */
+void VabDriver__Open(void);            /* +0x044 open */
+void VabDriver__Close(void);           /* +0x048 close */
+void VabDriver__Seek(void);            /* +0x04C seek */
+void VabDriver__NoOpSlot50(void);      /* +0x050 slot50 */
+s32 VabDriver__Read(void);             /* +0x054 read: returns 0 */
+void VabDriver__LoadFile(void);        /* +0x058 loadFile */
+void VabDriver__RunRequestQueue(void); /* +0x068 runRequestQueue */
+void VabDriver__RequestLoadFile(void); /* +0x06C requestLoadFile */
+void VabDriver__StopService(void);     /* +0x070 stopService */
+void VabDriver__CancelRequests(void);  /* +0x074 cancelRequests */
 
 #endif

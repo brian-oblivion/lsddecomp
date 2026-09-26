@@ -99,8 +99,8 @@
  * string buffer starts, so it's at least 0x18 bytes -- the rest is
  * unestablished. */
 typedef struct StatBuf179D8H {
-    CdLoc16 pos;         /* was unk0 -- copied into CdDriver::pos */
-    u32 size;            /* was unk4 -- copied into CdDriver::size */
+    CdLoc16 pos; /* was unk0 -- copied into CdDriver::pos */
+    u32 size;    /* was unk4 -- copied into CdDriver::size */
     u8 pad8[0x18 - 0x8];
 } StatBuf179D8H;
 
@@ -114,7 +114,7 @@ typedef struct StatBuf179D8H {
  * func_8002B640 blocker-clean and assignable (re-screened with
  * `python3 tools/nearmiss.py`, 2026-09-08).  And THAT went stale in round
  * 34: it is Sony's CdSearchFile, linked from the object, never matchable. */
-extern s32 CdSearchFile(StatBuf179D8H *statBuf, char *path);   /* lib/libcd/iso9660.o (round 34) */
+extern s32 CdSearchFile(StatBuf179D8H *statBuf, char *path); /* lib/libcd/iso9660.o (round 34) */
 extern void printf(const char *fmt, void *arg1);
 extern char gCdFileNotFoundFmt[];
 
@@ -140,8 +140,7 @@ void Class6D430__DestroyCdReadDriver(Class6D430 *self) {
     GetClass6D430Methods()->finalize(self);
 }
 
-void NoOp2(void) {
-}
+void NoOp2(void) {}
 
 /* MATCHED round 74 (charlie). The retry loop is a label + backward goto,
  * not while/for: a real loop gets loop notes, loop.c hoists &path out of it
@@ -195,8 +194,7 @@ s32 GetCdFileSize(CdDriver *self) {
     return result;
 }
 
-void NoOp3(void) {
-}
+void NoOp3(void) {}
 
 /* libcd/sys entry points (lib/libcd/sys.o, linked since round 34) -- this
  * unit's own per-call-site typing for ReadCdFile's calls, kept local. */
@@ -246,9 +244,7 @@ s32 ReadCdFile(CdDriver *self, char *arg1, s32 arg2) {
     return 0;
 }
 
-void NoOp4(void) {
-}
-
+void NoOp4(void) {}
 
 s32 GetCdUseVSyncCallback(void) {
     return gCdUseVSyncCallback;

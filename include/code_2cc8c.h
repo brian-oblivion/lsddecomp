@@ -81,6 +81,7 @@ typedef struct EventArg EventArg;
 struct HeaderObj {
     s32 header; /* +0x000 */
 };
+
 struct EventArg {
     HeaderObj *target; /* +0x000 */
 };
@@ -100,6 +101,7 @@ struct EventArg {
  * code_2cc8c_b.c casts to this type; see this struct's own comment above
  * for the cross-unit `target->unk24[idx]` reads that stay untyped). */
 typedef struct SlotEntry SlotEntry;
+
 struct SlotEntry {
     u8 pad000[0x004];
     s32 savedCursor; /* +0x004, renamed from unk4, round 78 -- the
@@ -107,17 +109,17 @@ struct SlotEntry {
                     TaskCore__CommitElementScroll, READ back as `newVal` by the
                     already-matched TaskCore__CancelElementScroll */
     u8 pad008[0x010 - 0x008];
-    s32 unk10;   /* +0x010 */
-    s32 unk14;   /* +0x014, combined with unk10 and a per-slot counter into
+    s32 unk10; /* +0x010 */
+    s32 unk14; /* +0x014, combined with unk10 and a per-slot counter into
                     a 2-word stack buffer (`{unk10, unk14 - counter*10}`)
                     passed by address to a TextRow setPosition call, then
                     incremented by 10 per loop iteration -- see
                     TaskCore__CommitElementScroll/TaskCore__RefreshSlotView */
 };
 
-extern void *BMemPMgrAlloc(s32 size);   /* allocator, confirmed across many
+extern void *BMemPMgrAlloc(s32 size);                   /* allocator, confirmed across many
                                             units */
-extern void *BMemPMgrFree(void *ptr);  /* matching free/release. Its own
+extern void *BMemPMgrFree(void *ptr);                   /* matching free/release. Its own
                                             disassembly (still INCLUDE_ASM,
                                             asm/nonmatchings/code_8220/
                                             BMemPMgrFree.s) ends with an
@@ -151,7 +153,7 @@ extern void ReleaseBasicClassArray(void *a0, void *a1); /* not yet seen elsewher
  */
 struct SrcDesc {
     u8 pad000[0x004];
-    s32 unk4;    /* +0x004, becomes self->unk60[idx] */
+    s32 unk4; /* +0x004, becomes self->unk60[idx] */
     u8 pad008[0x018 - 0x008];
     char **unk18; /* +0x018, NULL-terminated array of C strings -- each
                       element is passed to strlen (already typed
@@ -167,14 +169,14 @@ extern s32 strlen(char *s); /* Psy-Q libc2/strlen, linked from Sony's
  * TaskCore's `BasicClass *` to it. */
 
 /* New_BoxFill: include/BoxFill.h. */
-extern s32 D_8008A8E8[2];   /* address-taken only by this unit */
-extern char D_8008A8F0[4];  /* address-taken only by this unit */
+extern s32 D_8008A8E8[2];  /* address-taken only by this unit */
+extern char D_8008A8F0[4]; /* address-taken only by this unit */
 
 /* New_Class6E99C: include/Class6E99C.h. */
 /* New_Class6B5CC: include/Class6B5CC.h (it was a local Unk18AcObj view). */
-extern u8 D_8008A90C[]; /* address-taken only by this unit: (320, 240), the
+extern u8 D_8008A90C[];           /* address-taken only by this unit: (320, 240), the
                             size Viewport's ctor passes New_Class6E99C */
-extern u8 D_8008A904[]; /* address-taken only by this unit: (-100, -100), the
+extern u8 D_8008A904[];           /* address-taken only by this unit: (-100, -100), the
                             screen position Viewport's ctor and SetSubHandle
                             attach the sub handle at (include/Viewport.h) */
 extern WholeFrac_d294 D_8008A8F4; /* {0, 1}: Viewport__AttachViewChild's twist
@@ -263,7 +265,6 @@ extern s32 ResetGraph(s32 mode);
 /* New_LightRig: include/LightRig.h. */
 
 
-
 /*
  * BoxFill (class id 0x64, gBoxFillMethods) is declared once, in
  * include/BoxFill.h (track 4, round 85). Its methods are code_2cc8c_e's
@@ -301,15 +302,12 @@ extern u32 GetSetBitField(u32 *word, s32 shift, s32 width, u32 value);
  * fields that function touches are named. (typedef forward-declared near
  * the top of this file, see there.) */
 struct TexPageDesc {
-    s32 shift;   /* +0x000 */
-    s32 stride;  /* +0x004 */
-    s32 width;   /* +0x008 */
-    s32 height;  /* +0x00C */
-    s32 size;    /* +0x010, computed = (4 << shift) + stride - 4 */
+    s32 shift;  /* +0x000 */
+    s32 stride; /* +0x004 */
+    s32 width;  /* +0x008 */
+    s32 height; /* +0x00C */
+    s32 size;   /* +0x010, computed = (4 << shift) + stride - 4 */
 };
-
-
-
 
 /* Class6E99C's colour tables (include/Class6E99C.h), indexed at a 3-byte
  * stride by a channel mask (`i*3`, no further scaling). Retail bytes:

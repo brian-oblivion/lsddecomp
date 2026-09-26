@@ -48,7 +48,6 @@ typedef struct DreamAuxSlot {
 extern DreamAuxSlot gDreamAuxSlots[14];
 extern DreamAuxSlot gDreamAuxSlots2[14];
 
-
 /* A tiny fixed-size record family read by InitDreamAux: 14 (0xE) parallel
  * groups, gDreamAuxGroupCounts[i] a signed count and gDreamAuxGroupRecords[i] a pointer to an
  * array of count 8-byte records whose first byte InitDreamAux clears. The

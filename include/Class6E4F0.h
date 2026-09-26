@@ -38,13 +38,14 @@ typedef struct Class6E4F0Methods Class6E4F0Methods;
 
 /* The 0x14-byte block initSystems allocates. */
 typedef struct Class6E4F0Aux {
-    /* +0x000 */ DrawSystem *drawSystem;        /* initSystems's drawSystem */
-    /* +0x004 */ struct Pad *pad;              /* initSystems's pad: main()'s New_Pad(0, 0) */
-    /* +0x008 */ s32 unk08;                    /* cleared by initSystems */
-    /* +0x00C */ s32 unk0C;                    /* cleared by initSystems */
-    /* +0x010 */ s32 unk10;                    /* cleared by initSystems */
+    /* +0x000 */ DrawSystem *drawSystem; /* initSystems's drawSystem */
+    /* +0x004 */ struct Pad *pad;        /* initSystems's pad: main()'s New_Pad(0, 0) */
+    /* +0x008 */ s32 unk08;              /* cleared by initSystems */
+    /* +0x00C */ s32 unk0C;              /* cleared by initSystems */
+    /* +0x010 */ s32 unk10;              /* cleared by initSystems */
 } Class6E4F0Aux;
 
+/* clang-format off */
 #define CLASS6E4F0_SLOTS(Self, CtorParams)                                                         \
     BASICCLASS_SLOTS(Self, CtorParams);                                                            \
     /* +0x040 */ void (*setScreenDims)(Self *self, ScreenDims *dims, s32 vramMode); /* Class6E4F0__SetScreenDims */ \
@@ -60,16 +61,19 @@ typedef struct Class6E4F0Aux {
     /* +0x05C */ void (*slot5C)(Self *self);                    /* on status 1; Class6D3C8__NoOpSlot5C */ \
     /* +0x060 */ s32 (*pollStatusObj)(Self *self);              /* on status 2; nonzero runs +0x064 */ \
     /* +0x064 */ void (*startStreamTaskWithInit)(Self *self)    /* Class6D3C8__StartStreamTaskWithInit */
+/* clang-format on */
 
+/* clang-format off */
 #define CLASS6E4F0_FIELDS(Methods)                                                                 \
     BASICCLASS_FIELDS(Methods);                                                                    \
     /* +0x00C */ ScreenDims dims;      /* setScreenDims; initGraph's size */                       \
     /* +0x014 */ s32 vramMode;         /* setScreenDims; initGraph's GsInitGraph vram mode */      \
     /* +0x018 */ s32 initialized;      /* cleared by the ctor, set by initSystems; runMainLoop runs only once set */ \
     /* +0x01C */ Class6E4F0Aux *aux    /* initSystems's allocation */
+/* clang-format on */
 
 struct Class6E4F0Methods {
-    CLASS6E4F0_SLOTS(Class6E4F0, (Class6E4F0 *self, s32 dataSource));
+    CLASS6E4F0_SLOTS(Class6E4F0, (Class6E4F0 * self, s32 dataSource));
 };
 
 struct Class6E4F0 {

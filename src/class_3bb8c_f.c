@@ -52,11 +52,11 @@ char *BuildMemcardPath(DeviceName866E8 *dest, s32 selector, char *suffix);
  * `open` takes a `void *` where this unit's takes a `char *`. Two local
  * views are legitimate; one shared declaration would not be.
  * These are C89 identifiers under -fno-builtin, nothing else claims them. */
-extern s32 open(char *path, s32 mode);            /* B(0x32) */
-extern s32 read(s32 handle, void *buf, s32 size); /* B(0x34) */
-extern s32 lseek(s32 handle, s32 pos, s32 whence);/* B(0x33) */
-extern s32 close(s32 handle);                     /* B(0x36) */
-extern s32 delete(void *path);                    /* B(0x45) */
+extern s32 open(char *path, s32 mode);             /* B(0x32) */
+extern s32 read(s32 handle, void *buf, s32 size);  /* B(0x34) */
+extern s32 lseek(s32 handle, s32 pos, s32 whence); /* B(0x33) */
+extern s32 close(s32 handle);                      /* B(0x36) */
+extern s32 delete (void *path);                    /* B(0x45) */
 
 s32 TaskObjF__ReadMemcardFile(TaskObjF *self, char *suffix, void *outBuf, s32 outSize) {
     s32 count;
@@ -96,7 +96,8 @@ s32 TaskObjF__TryReadMemcardFile(TaskObjF *self, char *suffix, void *outBuf, s32
     return 1;
 }
 
-s32 TaskObjF__WriteMemcardSaveFile(TaskObjF *self, char *fileName, char *title, char a3, struct TimImage *icon, void *data, s32 size) {
+s32 TaskObjF__WriteMemcardSaveFile(TaskObjF *self, char *fileName, char *title, char a3,
+                                   struct TimImage *icon, void *data, s32 size) {
     s32 count;
     s32 result;
 
@@ -160,11 +161,11 @@ typedef struct IconFrame {
  * 8-byte header and 12-byte CLUT block header would put the CLUT at +0x14). */
 typedef struct McIconSource {
     u8 pad0[0x14];
-    IconPaletteHalf palette[2];  /* +0x14 */
+    IconPaletteHalf palette[2]; /* +0x14 */
     u8 pad34[0x40 - 0x34];
-    IconFrame frame0;              /* +0x40 */
-    IconFrame frame1;                /* +0xC0 */
-    IconFrame frame2;                  /* +0x140 */
+    IconFrame frame0; /* +0x40 */
+    IconFrame frame1; /* +0xC0 */
+    IconFrame frame2; /* +0x140 */
 } McIconSource;
 
 /* The 0x200-byte memory-card save FILE HEADER this function builds and
@@ -185,11 +186,13 @@ typedef struct McSaveHeader {
     IconFrame frame2;
 } McSaveHeader;
 
-extern const char D_80011530[];  /* rodata string "File not create in WriteFile\n" */
-extern s32 write(s32 handle, void *buf, s32 size);  /* CD/streaming read-request submit; own local view, not yet declared elsewhere in this project */
-extern void printf(const char *fmt);  /* own local view: this call site passes only the format string, no variadic args (code_8220.h's 3-arg view is a DIFFERENT call site's shape) */
+extern const char D_80011530[]; /* rodata string "File not create in WriteFile\n" */
+extern s32 write(s32 handle, void *buf,
+                 s32 size); /* CD/streaming read-request submit; own local view, not yet declared elsewhere in this project */
+extern void printf(const char *fmt); /* own local view: this call site passes only the format string, no variadic args (code_8220.h's 3-arg view is a DIFFERENT call site's shape) */
 
-s32 TaskObjF__TryWriteMemcardSaveFile(TaskObjF *self, char *fileName, char *title, u8 a3, struct TimImage *icon, void *data, s32 size) {
+s32 TaskObjF__TryWriteMemcardSaveFile(TaskObjF *self, char *fileName, char *title, u8 a3,
+                                      struct TimImage *icon, void *data, s32 size) {
     char pathBuf[0x20];
     char *path;
     s32 fileHandle;
@@ -198,7 +201,7 @@ s32 TaskObjF__TryWriteMemcardSaveFile(TaskObjF *self, char *fileName, char *titl
     McSaveHeader *req;
 
     path = BuildMemcardPath((DeviceName866E8 *)pathBuf, self->cardSlot, fileName);
-    delete(path);
+    delete (path);
     openMode = ((((u32)size + 0x21FF) >> 13) << 16) | 0x200;
     fileHandle = open(path, openMode);
     if (fileHandle == -1) {
@@ -228,8 +231,6 @@ s32 TaskObjF__TryWriteMemcardSaveFile(TaskObjF *self, char *fileName, char *titl
     close(fileHandle);
     return 1;
 }
-
-
 
 char *BuildMemcardPath(DeviceName866E8 *dest, s32 selector, char *suffix) {
     DeviceName866E8 *src;
@@ -311,7 +312,8 @@ s32 WaitForReadyEvent(s32 *arr, s32 count) {
     }
 }
 
-void TaskObjF__Init(TaskObjF *self, char *namePrefix, char **nameSuffixes, BasicClass *inputSource, BasicClass *tickSource, struct Class6B5CC *spriteParent, struct VabStreamObj *sound) {
+void TaskObjF__Init(TaskObjF *self, char *namePrefix, char **nameSuffixes, BasicClass *inputSource,
+                    BasicClass *tickSource, struct Class6B5CC *spriteParent, struct VabStreamObj *sound) {
     self->namePrefix = namePrefix;
     self->nameSuffixes = nameSuffixes;
     self->titles = 0;
@@ -343,7 +345,8 @@ void TaskObjF__BeginLoad(TaskObjF *self, char *fileName, char *title, void *data
     if (TaskObjF__Validate(self)) {
         TaskObjF__FreeBuffers(self);
         TaskObjF__AllocBuffers(self);
-        result = self->methods->collectExistingMemcardFiles(self, self->titles, self->foundSuffixes, self->namePrefix, self->nameSuffixes);
+        result = self->methods->collectExistingMemcardFiles(self, self->titles, self->foundSuffixes,
+                                                            self->namePrefix, self->nameSuffixes);
         self->bufCount = result;
         if (result != 0) {
             TaskObjF__FreeUnusedBuffers(self);
@@ -398,7 +401,8 @@ void TaskObjF__FreeBuffers(TaskObjF *self) {
  * function returns nothing -- the early exit falls straight into the
  * epilogue with Validate's own $v0 -- and each of the three leaves makes its
  * own setState call, which GCC cross-jumps down to one shared `jalr`. */
-void TaskObjF__BeginSave(TaskObjF *self, char *fileName, char *title, s32 titleEditPos, u8 iconFrames, struct TimImage *icon, void *data, s32 size) {
+void TaskObjF__BeginSave(TaskObjF *self, char *fileName, char *title, s32 titleEditPos,
+                         u8 iconFrames, struct TimImage *icon, void *data, s32 size) {
     s32 code;
     TaskObjFMethods *m;
 
@@ -431,7 +435,6 @@ void TaskObjF__BeginSave(TaskObjF *self, char *fileName, char *title, s32 titleE
         }
     }
 }
-
 
 s32 TaskObjF__Validate(TaskObjF *self) {
     s32 buf10;

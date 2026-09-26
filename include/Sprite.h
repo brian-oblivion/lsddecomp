@@ -81,7 +81,7 @@ struct SpriteGs {
     /* +0x01A */ s16 my;
     /* +0x01C */ s16 scalex;
     /* +0x01E */ s16 scaley;
-    /* +0x020 */ s32 rotate;    /* updateRotation (Sprite__UpdateRotation): 4096 per degree */
+    /* +0x020 */ s32 rotate; /* updateRotation (Sprite__UpdateRotation): 4096 per degree */
 };
 
 /* Class6B5CC's slots, then this class's own. Occupants in gSpriteMethods
@@ -89,10 +89,13 @@ struct SpriteGs {
  * gClass6B5CCMethods` lists the overrides of the inherited ones (Sprite__Sprite,
  * Sprite__Reset, Sprite__UpdateRotation, Sprite__SetDisplay,
  * Sprite__SetSemiTrans, Sprite__SetSemiTransRate, Sprite__Update). */
+/* clang-format off */
 #define SPRITE_SLOTS(Self, CtorParams)                                                             \
     CLASS6B5CC_SLOTS(Self, CtorParams);                                                            \
     /* +0x0B8 */ void (*setColor)(Self *self, SpriteRgb *rgb) /* Sprite__SetColor; gTextRowMethods: TextRow__SetColor */
+/* clang-format on */
 
+/* clang-format off */
 #define SPRITE_FIELDS(Methods)                                                                     \
     CLASS6B5CC_FIELDS(Methods);                                                                    \
     /* +0x044 */ u8 pad44[4];                                                                      \
@@ -103,9 +106,10 @@ struct SpriteGs {
     /* +0x060 */ s32 unk60;             /* Class879C4__UpdateScale: times the y ratio when unk58 != 0 */ \
     /* +0x064 */ SpriteGs sprite;       /* InitGsSprite fills it; Viewport__DrawNode sorts it */    \
     /* +0x088 */ u8 pad88[0xA0 - 0x88]  /* the object is 0xA0 bytes (New_Sprite); ScreenSprite's own fields start at +0x0A0 */
+/* clang-format on */
 
 struct SpriteMethods {
-    SPRITE_SLOTS(Sprite, (Sprite *self, void *texture, s32 abr, SpriteRect *rect, void *arg4, s32 arg5));
+    SPRITE_SLOTS(Sprite, (Sprite * self, void *texture, s32 abr, SpriteRect *rect, void *arg4, s32 arg5));
 };
 
 struct Sprite {

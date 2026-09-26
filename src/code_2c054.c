@@ -5,8 +5,8 @@
 #include "TileMap.h"
 #include "TileAtlas.h"
 
-StreamTask *New_StreamTask(TaskCoreTarget *target, char *soundBankPath, BasicClass *sound, StreamTaskInitData *initData)
-{
+StreamTask *New_StreamTask(TaskCoreTarget *target, char *soundBankPath, BasicClass *sound,
+                           StreamTaskInitData *initData) {
     StreamTask *self;
 
     self = BMemPMgrAlloc(0xDC);
@@ -17,7 +17,8 @@ StreamTask *New_StreamTask(TaskCoreTarget *target, char *soundBankPath, BasicCla
     return NULL;
 }
 
-void StreamTask__StreamTask(StreamTask *self, TaskCoreTarget *target, char *soundBankPath, BasicClass *sound, StreamTaskInitData *initData) {
+void StreamTask__StreamTask(StreamTask *self, TaskCoreTarget *target, char *soundBankPath,
+                            BasicClass *sound, StreamTaskInitData *initData) {
     Get_vtable_TaskCore()->ctor((TaskCore *)self, target, soundBankPath, sound);
     self->methods = Get_vtable_StreamTask();
     if (initData != NULL) {
@@ -43,7 +44,8 @@ void StreamTask__Reset(StreamTask *self) {
     self->abortBeforeFade = 1;
 }
 
-void StreamTask__Init(StreamTask *self, IntermediateBaseInitArgs *args, s32 streamName, s32 streamGroup, s32 autoPlay) {
+void StreamTask__Init(StreamTask *self, IntermediateBaseInitArgs *args, s32 streamName,
+                      s32 streamGroup, s32 autoPlay) {
     self->streamName = streamName;
     self->streamGroup = streamGroup;
     self->autoPlay = autoPlay;
@@ -56,7 +58,8 @@ void StreamTask__OnInit(StreamTask *self) {
     ((void (*)(TaskCore *))Get_vtable_TaskCore()->onInit)((TaskCore *)self);
     self->playDone = 0;
     self->player->methods->setAutoPlay(self->player, self->autoPlay);
-    if (self->player->methods->play(self->player, (char *)self->streamName, self->streamGroup, self->unkC4, self->loopCount) != 0) {
+    if (self->player->methods->play(self->player, (char *)self->streamName, self->streamGroup,
+                                    self->unkC4, self->loopCount) != 0) {
         self->methods->setFrameBound(self, 0);
     }
 }
@@ -79,20 +82,20 @@ void StreamTask__Update(StreamTask *self, BasicClass *sender, s32 event) {
 void StreamTask__SetState(StreamTask *self, s32 state) {
     Get_vtable_TaskCore()->setState((TaskCore *)self, state);
     switch (state) {
-    case 5:
-        self->fadingOut = 0;
-        break;
-    case 7:
-        self->fadingOut = 1;
-        break;
-    case 8:
-        if (self->abortBeforeFade == 0) {
-            self->player->methods->abort(self->player);
-        }
-        break;
-    case 0x12:
-        self->methods->refreshViewValue(self);
-        break;
+        case 5:
+            self->fadingOut = 0;
+            break;
+        case 7:
+            self->fadingOut = 1;
+            break;
+        case 8:
+            if (self->abortBeforeFade == 0) {
+                self->player->methods->abort(self->player);
+            }
+            break;
+        case 0x12:
+            self->methods->refreshViewValue(self);
+            break;
     }
 }
 
@@ -119,11 +122,9 @@ void StreamTask__OnPadNext(StreamTask *self) {
     Get_vtable_TaskCore()->onPadNext((TaskCore *)self);
 }
 
-void StreamTask__NoOpSlot88(void) {
-}
+void StreamTask__NoOpSlot88(void) {}
 
-void StreamTask__NoOpSlot8C(void) {
-}
+void StreamTask__NoOpSlot8C(void) {}
 
 void StreamTask__RefreshViewValue(StreamTask *self) {
     if (self->abortBeforeFade != 0) {
@@ -158,8 +159,7 @@ StreamTaskMethods *Get_vtable_StreamTask(void) {
 }
 
 /* The TaskCore allocator: 0xA4 bytes, constructed through its own ctor. */
-TaskCore *New_TaskCore(TaskCoreTarget *target, char *soundBankPath, BasicClass *sound)
-{
+TaskCore *New_TaskCore(TaskCoreTarget *target, char *soundBankPath, BasicClass *sound) {
     TaskCore *self;
 
     self = BMemPMgrAlloc(0xA4);
@@ -244,9 +244,12 @@ void TaskCore__OnInit(TaskCore *self) {
         self->bgLayer->methods->setColor(self->bgLayer, 1, (BgLayerRgb *)self->baseColor);
     }
     if (self->subHandle == 0) {
-        ((TaskTextObj *)self->initArgs->unk0)->methods->slot78((TaskTextObj *)self->initArgs->unk0, self->baseColor, gDefaultStreamTaskInitData);
+        ((TaskTextObj *)self->initArgs->unk0)
+            ->methods->slot78((TaskTextObj *)self->initArgs->unk0, self->baseColor,
+                              gDefaultStreamTaskInitData);
     }
-    ((TaskTextObj *)self->initArgs->unk0)->methods->slot78((TaskTextObj *)self->initArgs->unk0, self->baseColor, 0);
+    ((TaskTextObj *)self->initArgs->unk0)
+        ->methods->slot78((TaskTextObj *)self->initArgs->unk0, self->baseColor, 0);
     core->setOtLength(viewport, self->unk28);
     core->setUnk44(viewport, self->unk2C);
     core->setUnk48(viewport, self->unk30);
@@ -261,6 +264,7 @@ void TaskCore__OnDeinit(TaskCore *self) {
     viewport->methods->detachViewChild(viewport);
     self->bgLayer->methods->detachFromParent(self->bgLayer);
     if (self->unk34 != 0) {
-        ((TaskTextObj *)self->initArgs->unk0)->methods->slot78((TaskTextObj *)self->initArgs->unk0, self->unk93, 0);
+        ((TaskTextObj *)self->initArgs->unk0)
+            ->methods->slot78((TaskTextObj *)self->initArgs->unk0, self->unk93, 0);
     }
 }

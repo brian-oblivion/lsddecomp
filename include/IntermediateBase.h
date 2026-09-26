@@ -38,13 +38,14 @@ typedef struct IntermediateBaseInitArgs IntermediateBaseInitArgs;
  * +0x00C. Class865C8__Class865C8 fills +0x008..+0x010 itself (New_FrameClock(),
  * New_Class866E8(0, 1), New_Class869D8()). */
 struct IntermediateBaseInitArgs {
-    /* +0x000 */ BasicClass *unk0;     /* added as a child; onState2 calls its +0x048, onState3 its +0x04C */
-    /* +0x004 */ BasicClass *unk4;     /* added as a child; onTag1Notify's event 2 calls its +0x044, +0x048 */
-    /* +0x008 */ BasicClass *unk8;     /* becomes unk10; NULL: init makes one with New_FrameClock() */
-    /* +0x00C */ BasicClass *unkC;     /* becomes unk14; NULL: init makes one with New_LightRig() */
+    /* +0x000 */ BasicClass *unk0; /* added as a child; onState2 calls its +0x048, onState3 its +0x04C */
+    /* +0x004 */ BasicClass *unk4; /* added as a child; onTag1Notify's event 2 calls its +0x044, +0x048 */
+    /* +0x008 */ BasicClass *unk8; /* becomes unk10; NULL: init makes one with New_FrameClock() */
+    /* +0x00C */ BasicClass *unkC; /* becomes unk14; NULL: init makes one with New_LightRig() */
     /* +0x010 */ BasicClass *viewport; /* becomes viewport; NULL: init makes one with New_Viewport() */
 };
 
+/* clang-format off */
 #define INTERMEDIATEBASE_SLOTS(Self, CtorParams)                                                   \
     BASICCLASS_SLOTS(Self, CtorParams);                                                            \
     /* +0x040 */ void (*resetCounters)(Self *self);          /* IntermediateBase__ResetCounters; the ctor's last call */ \
@@ -58,7 +59,9 @@ struct IntermediateBaseInitArgs {
     /* +0x060 */ void (*setState)(Self *self, s32 state);    /* IntermediateBase__SetState; TaskCore__SetState, Class86B60__SetState */ \
     /* +0x064 */ void (*onState2)(Self *self);               /* IntermediateBase__OnState2 */    \
     /* +0x068 */ void (*onState3)(Self *self)                /* IntermediateBase__OnState3 */
+/* clang-format on */
 
+/* clang-format off */
 #define INTERMEDIATEBASE_FIELDS(Methods)                                                           \
     BASICCLASS_FIELDS(Methods);                                                                    \
     /* +0x00C */ IntermediateBaseInitArgs *initArgs; /* init's argument, kept */                   \
@@ -68,9 +71,10 @@ struct IntermediateBaseInitArgs {
     /* +0x01C */ s32 frameCounter;      /* update adds 1; resetCounters, onState2, onState3 clear it */ \
     /* +0x020 */ s32 state;             /* setState's argument; resetCounters clears it */         \
     /* +0x024 */ s32 initMode           /* init's mode: 0 attaches to the viewport and runs to the end */
+/* clang-format on */
 
 struct IntermediateBaseMethods {
-    INTERMEDIATEBASE_SLOTS(IntermediateBase, (IntermediateBase *self));
+    INTERMEDIATEBASE_SLOTS(IntermediateBase, (IntermediateBase * self));
 };
 
 struct IntermediateBase {

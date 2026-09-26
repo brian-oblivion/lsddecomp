@@ -43,7 +43,7 @@ typedef struct TodSet TodSet;
 typedef struct TodSetMethods TodSetMethods;
 
 struct TodSetMethods {
-    TOD_SLOTS(TodSet, (TodSet *self, struct Src6F240 *src));
+    TOD_SLOTS(TodSet, (TodSet * self, struct Src6F240 *src));
 };
 
 struct TodSet {

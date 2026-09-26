@@ -98,8 +98,7 @@ void Pad__DispatchEvents(Pad *self) {
     }
 }
 
-void Pad__func_80025E14(void) {
-}
+void Pad__func_80025E14(void) {}
 
 void Pad__LoadButtonTable(void) {
     Block64 local;
@@ -116,8 +115,7 @@ void Pad__LoadButtonTable(void) {
     }
 }
 
-void Pad__func_80025E94(void) {
-}
+void Pad__func_80025E94(void) {}
 
 PadMethods *Get_vtable_Pad(void) {
     return &gPadMethods;

@@ -58,18 +58,18 @@ typedef struct GsCELL {
 } GsCELL;
 
 struct TileAtlasMethods {
-    CLASS6D430_SLOTS(TileAtlas, (TileAtlas *self, s32 arg1));
+    CLASS6D430_SLOTS(TileAtlas, (TileAtlas * self, s32 arg1));
     /* +0x078 is Class6D430's slot78; this table's occupant is
      * TileAtlas__BuildCells, called through TileAtlasBuildCellsFn. */
-};                                   /* 30 slots, 0x7C bytes */
+}; /* 30 slots, 0x7C bytes */
 
 struct TileAtlas {
     CLASS6D430_FIELDS(TileAtlasMethods);
-    /* +0x02C */ GsCELL *cells;      /* 300 of them, from TileAtlas__BuildCells; TileMap__BuildMap's map.base */
-    /* +0x030 */ u16 defaultCells;   /* 1 from the ctor when arg1 == 0; BuildCells builds only when set */
-    /* +0x032 */ u16 loaded;         /* 0 from the ctor, 1 from TileAtlas__Load after BuildCells */
-    /* +0x034 */ void *unk34;        /* 0 from the ctor, freed by Finalize; no TileAtlas method sets it */
-};                                   /* 0x38 bytes: New_TileAtlas */
+    /* +0x02C */ GsCELL *cells; /* 300 of them, from TileAtlas__BuildCells; TileMap__BuildMap's map.base */
+    /* +0x030 */ u16 defaultCells; /* 1 from the ctor when arg1 == 0; BuildCells builds only when set */
+    /* +0x032 */ u16 loaded;       /* 0 from the ctor, 1 from TileAtlas__Load after BuildCells */
+    /* +0x034 */ void *unk34; /* 0 from the ctor, freed by Finalize; no TileAtlas method sets it */
+}; /* 0x38 bytes: New_TileAtlas */
 
 /* TileAtlas__BuildCells as TileAtlas__Load calls it: no argument (see the
  * banner). */

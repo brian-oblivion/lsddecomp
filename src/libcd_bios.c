@@ -75,8 +75,7 @@ extern const char D_800109EC[]; /* "(%d)\n" */
  * `&array != NULL`).  It must be an INLINE FUNCTION, not a macro: as a
  * do{}while(0) macro every site swapped the dst and counter registers
  * (round 70); the inline's parameter pseudos give retail's allocation. */
-static __inline__ void copy8(u8 *d, const u8 *s)
-{
+static __inline__ void copy8(u8 *d, const u8 *s) {
     s32 i;
     if (d != NULL) {
         for (i = 7; i != -1; i--) {
@@ -85,8 +84,7 @@ static __inline__ void copy8(u8 *d, const u8 *s)
     }
 }
 
-s32 getintr(void)
-{
+s32 getintr(void) {
     volatile u8 cause;
     u8 resp[8];
     s32 i;
@@ -133,56 +131,56 @@ s32 getintr(void)
     }
 
     switch (cause) {
-    case 3:
-        if (flags != 0) {
-            *(volatile u8 *)D_8006D8D8 = 5;
+        case 3:
+            if (flags != 0) {
+                *(volatile u8 *)D_8006D8D8 = 5;
+                copy8(D_8008B3CC, resp);
+                return 2;
+            }
+            if (D_8006D6C0[D_8006D61D] != 0) {
+                *(volatile u8 *)D_8006D8D8 = 3;
+                copy8(D_8008B3CC, resp);
+                return 1;
+            }
+            *(volatile u8 *)D_8006D8D8 = 2;
+            copy8(D_8008B3CC, resp);
+            return 2;
+
+        case 2: {
+            u8 v;
+            if (flags != 0) {
+                v = 5;
+            } else {
+                v = 2;
+            }
+            D_8006D8D8[0] = v;
             copy8(D_8008B3CC, resp);
             return 2;
         }
-        if (D_8006D6C0[D_8006D61D] != 0) {
-            *(volatile u8 *)D_8006D8D8 = 3;
+
+        case 1:
+            D_8006D8D9 = (flags != 0) ? 5 : 1;
+            copy8(D_8008B3D4, resp);
+            return 4;
+
+        case 4:
+            D_8006D8DA = 4;
+            *(volatile u8 *)&D_8006D8D9 = D_8006D8DA;
+            copy8(D_8008B3DC, resp);
+            copy8(D_8008B3D4, resp);
+            return 4;
+
+        case 5:
+            D_8006D8D9 = 5;
+            *(volatile u8 *)D_8006D8D8 = D_8006D8D9;
             copy8(D_8008B3CC, resp);
-            return 1;
-        }
-        *(volatile u8 *)D_8006D8D8 = 2;
-        copy8(D_8008B3CC, resp);
-        return 2;
+            copy8(D_8008B3D4, resp);
+            return 6;
 
-    case 2: {
-        u8 v;
-        if (flags != 0) {
-            v = 5;
-        } else {
-            v = 2;
-        }
-        D_8006D8D8[0] = v;
-        copy8(D_8008B3CC, resp);
-        return 2;
-    }
-
-    case 1:
-        D_8006D8D9 = (flags != 0) ? 5 : 1;
-        copy8(D_8008B3D4, resp);
-        return 4;
-
-    case 4:
-        D_8006D8DA = 4;
-        *(volatile u8 *)&D_8006D8D9 = D_8006D8DA;
-        copy8(D_8008B3DC, resp);
-        copy8(D_8008B3D4, resp);
-        return 4;
-
-    case 5:
-        D_8006D8D9 = 5;
-        *(volatile u8 *)D_8006D8D8 = D_8006D8D9;
-        copy8(D_8008B3CC, resp);
-        copy8(D_8008B3D4, resp);
-        return 6;
-
-    default:
-        puts(D_800109D8);
-        printf(D_800109EC, cause);
-        return -1;
+        default:
+            puts(D_800109D8);
+            printf(D_800109EC, cause);
+            return -1;
     }
 }
 
@@ -529,18 +527,18 @@ extern u8 D_8006D619;
 extern u8 D_8006D61A;
 extern u8 D_8006D61C;
 extern u8 D_8006D61D;
-extern s32 D_8006D6A0[];       /* lookup table, indexed by a byte field << 2 */
+extern s32 D_8006D6A0[]; /* lookup table, indexed by a byte field << 2 */
 
 extern volatile u8 *D_8006D8C0;
 extern volatile u8 *D_8006D8C4;
 extern volatile u8 *D_8006D8C8;
 extern volatile u8 *D_8006D8CC;
 extern volatile s32 *D_8006D8D0;
-extern volatile u16 *D_8006D8D4;   /* HW register block; offsets are byte offsets */
+extern volatile u16 *D_8006D8D4; /* HW register block; offsets are byte offsets */
 extern u8 D_8006D8D8[2];
 extern u8 D_8006D8D9;
 extern volatile u8 D_8006D8DA;
-extern s32 D_8006D8DC[10];   /* first of 10 consecutive words zeroed by a pointer walk;
+extern s32 D_8006D8DC[10]; /* first of 10 consecutive words zeroed by a pointer walk;
                           * D_8006D8E0..D_8006D900 are the other nine, each
                           * already individually named -- not a real array. */
 extern s32 D_8006D8E0;
@@ -577,16 +575,16 @@ extern volatile s32 *D_8006D930;
 extern volatile s32 *D_8006D934;
 
 /* Still INCLUDE_ASM elsewhere -- not this unit's to carve. */
-extern void ResetCallback(void);                              /* lib/libetc/intr.o */
+extern void ResetCallback(void);                                          /* lib/libetc/intr.o */
 extern void (*InterruptCallback(s32 arg0, void (*callback)(void)))(void); /* lib/libetc/intr.o, per code_179d8_c.c */
-extern s32 VSync(s32 arg0);                            /* asm/psyq_15d04.s */
-extern void puts(const char *arg0);                   /* asm/psyq_15d04.s */
-extern void printf(const char *fmt, ...);                /* Psy-Q printf wrapper */
+extern s32 VSync(s32 arg0);                                               /* asm/psyq_15d04.s */
+extern void puts(const char *arg0);                                       /* asm/psyq_15d04.s */
+extern void printf(const char *fmt, ...);                                 /* Psy-Q printf wrapper */
 extern s32 CD_cw(s32 arg0, s32 arg1, s32 arg2, s32 arg3); /* defined in libcd_bios */
-extern s32 CD_sync(s32 arg0, s32 arg1);                   /* defined in libcd_bios, per libcd_bios.c */
-extern s32 getintr(void);                                /* libcd_bios.c, MATCHED round 70
+extern s32 CD_sync(s32 arg0, s32 arg1); /* defined in libcd_bios, per libcd_bios.c */
+extern s32 getintr(void);               /* libcd_bios.c, MATCHED round 70
                                                                    (libcd getintr by its strings) */
-extern s32 CheckCallback(void);                                /* lib/libetc/intr.o -- trivial
+extern s32 CheckCallback(void);         /* lib/libetc/intr.o -- trivial
                                                                    (u16)D_8006C272 getter */
 /* Still INCLUDE_ASM in THIS unit (not yet converted) -- INCLUDE_ASM leaves no
  * C-level prototype of its own, so callers within this file need one. */
@@ -600,8 +598,7 @@ extern s32 CD_datasync(s32 arg0);
 void callback(void);
 void cb_read(s32 arg0, s32 arg1);
 
-s32 CD_vol(u8 *arg0)
-{
+s32 CD_vol(u8 *arg0) {
     *D_8006D8C0 = 2;
     *D_8006D8C8 = arg0[0];
     *D_8006D8CC = arg0[1];
@@ -612,8 +609,7 @@ s32 CD_vol(u8 *arg0)
     return 0;
 }
 
-void CD_shell(void)
-{
+void CD_shell(void) {
     s32 saved;
     s32 counter = 0;
 
@@ -639,8 +635,7 @@ void CD_shell(void)
     }
 }
 
-void CD_flush(void)
-{
+void CD_flush(void) {
     volatile u8 *q;
 
     *D_8006D8C0 = 1;
@@ -663,8 +658,7 @@ void CD_flush(void)
     *D_8006D8D0 = 0x1325;
 }
 
-s32 CD_initvol(void)
-{
+s32 CD_initvol(void) {
     u8 buf[4];
 
     if (D_8006D8D4[0xDC] == 0 && D_8006D8D4[0xDD] == 0) {
@@ -689,8 +683,7 @@ s32 CD_initvol(void)
     return 0;
 }
 
-void CD_initintr(void)
-{
+void CD_initintr(void) {
     s32 *p;
     s32 i;
 
@@ -713,8 +706,7 @@ void CD_initintr(void)
  * retail splits CD_cw(1,0,0,0)'s argument materialization from its
  * own a3/jal by ~90 bytes; neither call position tried reproduces the split
  * (docs/match-reports/CD_init.md). Hand-derived. */
-s32 CD_init(void)
-{
+s32 CD_init(void) {
     s32 *p;
     s32 i;
     volatile u8 *q;
@@ -806,8 +798,7 @@ INCLUDE_ASM("asm/nonmatchings/libcd_bios", CD_init);
  * confirmed sound (both are freshly written on every path before their
  * next read) against a rejected sibling candidate that hoisted a value
  * across a loop boundary unsoundly. */
-s32 cd_read_retry(void)
-{
+s32 cd_read_retry(void) {
     s32 n;
     s32 *tmp;
     s32 *pRetry;
@@ -916,8 +907,7 @@ s32 cd_read_retry(void)
 INCLUDE_ASM("asm/nonmatchings/libcd_bios", cd_read_retry);
 #endif
 
-s32 CD_readm(s32 arg0, s32 arg1, s32 arg2)
-{
+s32 CD_readm(s32 arg0, s32 arg1, s32 arg2) {
     s32 t;
     volatile s32 *p;
 
@@ -947,17 +937,16 @@ case1:
 case2:
     D_8006D8F0 = 0x249;
     goto join;
-case3:
-    {
-        volatile s32 *q3 = &D_8006D8F0;
-        *q3 = 0x246;
-    }
+case3: {
+    volatile s32 *q3 = &D_8006D8F0;
+    *q3 = 0x246;
+}
 join:
 
-    {
-        volatile s32 *q4 = &D_8006D8E4;
-        *q4 = arg0;
-    }
+{
+    volatile s32 *q4 = &D_8006D8E4;
+    *q4 = arg0;
+}
     D_8006D8E0 = arg1;
     D_8006D8DC[0] = 8;
     D_8006D8FC = D_8006D5FC;
@@ -970,8 +959,7 @@ join:
     return -(cd_read_retry() < 1);
 }
 
-s32 CD_readsync(s32 arg0, s32 arg1)
-{
+s32 CD_readsync(s32 arg0, s32 arg1) {
     s32 now;
     s32 old;
     s32 flags;
@@ -1021,8 +1009,7 @@ s32 CD_readsync(s32 arg0, s32 arg1)
          * a plain `D_8008B3EC` reference here compiles FOLDED instead.
          * See docs/match-reports/CD_readsync.md's round-36 entry. */
         pEC = &D_8008B3EC;
-        printf(D_80010994, *pEC, D_8006D620[D_8006D61D],
-               p6A0[idx0], p6A0[idx1]);
+        printf(D_80010994, *pEC, D_8006D620[D_8006D61D], p6A0[idx0], p6A0[idx1]);
         CD_flush();
         result = -1;
         goto after_diag;
@@ -1139,8 +1126,7 @@ s32 CD_readsync(s32 arg0, s32 arg1)
  * CD_datasync.md). Structure is hand-derived; the diagnostic call's
  * `ok =` sink is a permuter find (round 36), reviewed as a semantically
  * inert dead-store reuse and oracle-confirmed. */
-s32 CD_datasync(s32 arg0)
-{
+s32 CD_datasync(s32 arg0) {
     s32 now;
     s32 ok;
     char **p620;
@@ -1171,8 +1157,7 @@ s32 CD_datasync(s32 arg0)
              * the register target for this last argument's value -- a fresh
              * local here compiles worse (45/91 vs 49/91); see this report's
              * round-36 entry. */
-            printf(D_80010994, p8D8[0], p6A0[p8D8[1]], p620[D_8006D61D],
-                   ok = p6A0[p8D8[0]]);
+            printf(D_80010994, p8D8[0], p6A0[p8D8[1]], p620[D_8006D61D], ok = p6A0[p8D8[0]]);
             CD_flush();
             return -1;
         }
@@ -1189,8 +1174,7 @@ s32 CD_datasync(s32 arg0)
 INCLUDE_ASM("asm/nonmatchings/libcd_bios", CD_datasync);
 #endif
 
-s32 CD_getsector(s32 arg0, s32 arg1)
-{
+s32 CD_getsector(s32 arg0, s32 arg1) {
     *D_8006D8C0 = 0;
     *D_8006D8CC = 0x80;
     *D_8006D924 = 0x20943;
@@ -1207,8 +1191,7 @@ s32 CD_getsector(s32 arg0, s32 arg1)
     return 0;
 }
 
-void CD_set_test_parmnum(s32 arg0)
-{
+void CD_set_test_parmnum(s32 arg0) {
     D_8006D8A4 = arg0;
 }
 
@@ -1216,8 +1199,7 @@ void CD_set_test_parmnum(s32 arg0)
 /* NON_MATCHING: 30/56 words, length 1 short. Residue: instruction-selection
  * (retail computes &D_8006D8D8 unfolded inside the loop; this folds it)
  * (docs/match-reports/callback.md). Hand-derived. */
-void callback(void)
-{
+void callback(void) {
     u8 status;
     s32 flags;
     s32 handler;
@@ -1249,8 +1231,7 @@ void callback(void)
 INCLUDE_ASM("asm/nonmatchings/libcd_bios", callback);
 #endif
 
-void cb_read(s32 arg0, s32 arg1)
-{
+void cb_read(s32 arg0, s32 arg1) {
     volatile s32 *p;
     s32 code;
     s32 dummy;
@@ -1269,16 +1250,14 @@ void cb_read(s32 arg0, s32 arg1)
     dummy = *p;
     (void)dummy;
     goto shared;
-elseBranch:
-    {
-        volatile s32 *p2 = &D_8006D8F4;
-        *p2 = -1;
-    }
-shared:
-    {
-        volatile s32 *pF8 = &D_8006D8F8;
-        *pF8 = VSync(-1);
-    }
+elseBranch: {
+    volatile s32 *p2 = &D_8006D8F4;
+    *p2 = -1;
+}
+shared: {
+    volatile s32 *pF8 = &D_8006D8F8;
+    *pF8 = VSync(-1);
+}
 
     if (D_8006D8F4 < 0 && D_8006D8DC[0] > 0) {
         cd_read_retry();

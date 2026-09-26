@@ -36,13 +36,12 @@ extern u32 VBLANK_MINUS;
  * _snd_video_mode (Psy-Q `GetVideoMode`) is 0/1, and cases 0/4/5 pick between
  * SEQ_TICKRATE_50/SEQ_TICKRATE_60 by it -- named by value only, not by an
  * NTSC/PAL claim this file has no direct evidence for. */
-#define SEQ_TICKRATE_50  0x32
-#define SEQ_TICKRATE_60  0x3c
+#define SEQ_TICKRATE_50 0x32
+#define SEQ_TICKRATE_60 0x3c
 #define SEQ_TICKRATE_120 0x78
 #define SEQ_TICKRATE_240 0xf0
 
-void SsSetTickMode(s32 a0)
-{
+void SsSetTickMode(s32 a0) {
     s32 cmd;
 
     if (a0 & 0x1000) {
@@ -58,46 +57,46 @@ void SsSetTickMode(s32 a0)
     if (cmd < 6) {
         if ((u32)cmd < 6) {
             switch (cmd) {
-            case 4:
-                VBLANK_MINUS = SEQ_TICKRATE_50;
-                if (_snd_video_mode == 1) {
-                    _snd_seq_tick_mode = 5;
-                } else {
-                    _snd_seq_tick_mode = SEQ_TICKRATE_50;
-                }
-                return;
-            case 1:
-                VBLANK_MINUS = SEQ_TICKRATE_60;
-                if (_snd_video_mode == 0) {
-                    _snd_seq_tick_mode = 5;
-                } else {
-                    _snd_seq_tick_mode = SEQ_TICKRATE_60;
-                }
-                return;
-            case 3:
-                VBLANK_MINUS = SEQ_TICKRATE_120;
-                return;
-            case 2:
-                VBLANK_MINUS = SEQ_TICKRATE_240;
-                return;
-            case 5:
-                if (_snd_video_mode == 0) {
-                    VBLANK_MINUS = SEQ_TICKRATE_60;
-                } else if (_snd_video_mode == 1) {
+                case 4:
                     VBLANK_MINUS = SEQ_TICKRATE_50;
-                } else {
+                    if (_snd_video_mode == 1) {
+                        _snd_seq_tick_mode = 5;
+                    } else {
+                        _snd_seq_tick_mode = SEQ_TICKRATE_50;
+                    }
+                    return;
+                case 1:
                     VBLANK_MINUS = SEQ_TICKRATE_60;
-                }
-                return;
-            case 0:
-                if (_snd_video_mode == 0) {
-                    VBLANK_MINUS = SEQ_TICKRATE_60;
-                } else if (_snd_video_mode == 1) {
-                    VBLANK_MINUS = SEQ_TICKRATE_50;
-                } else {
-                    VBLANK_MINUS = SEQ_TICKRATE_60;
-                }
-                return;
+                    if (_snd_video_mode == 0) {
+                        _snd_seq_tick_mode = 5;
+                    } else {
+                        _snd_seq_tick_mode = SEQ_TICKRATE_60;
+                    }
+                    return;
+                case 3:
+                    VBLANK_MINUS = SEQ_TICKRATE_120;
+                    return;
+                case 2:
+                    VBLANK_MINUS = SEQ_TICKRATE_240;
+                    return;
+                case 5:
+                    if (_snd_video_mode == 0) {
+                        VBLANK_MINUS = SEQ_TICKRATE_60;
+                    } else if (_snd_video_mode == 1) {
+                        VBLANK_MINUS = SEQ_TICKRATE_50;
+                    } else {
+                        VBLANK_MINUS = SEQ_TICKRATE_60;
+                    }
+                    return;
+                case 0:
+                    if (_snd_video_mode == 0) {
+                        VBLANK_MINUS = SEQ_TICKRATE_60;
+                    } else if (_snd_video_mode == 1) {
+                        VBLANK_MINUS = SEQ_TICKRATE_50;
+                    } else {
+                        VBLANK_MINUS = SEQ_TICKRATE_60;
+                    }
+                    return;
             }
         } else {
             VBLANK_MINUS = SEQ_TICKRATE_60;
@@ -111,13 +110,11 @@ INCLUDE_ASM("asm/nonmatchings/libsnd_ssinit_libapi_counter", _SsStart);
 
 extern void _SsStart(s32 arg0);
 
-void SsStart(void)
-{
+void SsStart(void) {
     _SsStart(1);
 }
 
-void SsStart2(void)
-{
+void SsStart2(void) {
     _SsStart(0);
 }
 
@@ -131,8 +128,7 @@ extern s32 _snd_use_vsync_cb;
 extern s32 _snd_use_interrupt_id;
 extern void (*_snd_vsync_cb)(void);
 
-void SsEnd(void)
-{
+void SsEnd(void) {
     s32 v;
 
     if (_snd_seq_no_tick != 0) {
@@ -162,8 +158,7 @@ void SsEnd(void)
 
 extern void SpuQuit(void);
 
-void SsQuit(void)
-{
+void SsQuit(void) {
     SpuQuit();
 }
 
@@ -172,8 +167,7 @@ void SsQuit(void)
 extern void SsSeqCalledTbyT(void);
 extern void (*_snd_vsync_cb)(void);
 
-void _SsTrapIntrVSync(void)
-{
+void _SsTrapIntrVSync(void) {
     if (_snd_vsync_cb != NULL) {
         _snd_vsync_cb();
     }
@@ -182,8 +176,7 @@ void _SsTrapIntrVSync(void)
 
 extern s32 D_8006DCA0;
 
-void _SsSeqCalledTbyT_1per2(void)
-{
+void _SsSeqCalledTbyT_1per2(void) {
     if (D_8006DCA0 == 0) {
         D_8006DCA0 = 1;
     } else {
@@ -207,18 +200,17 @@ void _SsSeqCalledTbyT_1per2(void)
  * carry (removed in the same round; SetRCnt still verifies 40/40).
  * See docs/match-reports/ResetRCnt.md for the mechanism. */
 typedef struct {
-    volatile u16 count;              /* 0x0 */
-    u8  pad2[0x4 - 0x2];
-    volatile u16 mode;                /* 0x4 */
-    u8  pad6[0x8 - 0x6];
-    volatile u16 target;               /* 0x8 */
-    u8  padA[0x10 - 0xA];
+    volatile u16 count; /* 0x0 */
+    u8 pad2[0x4 - 0x2];
+    volatile u16 mode; /* 0x4 */
+    u8 pad6[0x8 - 0x6];
+    volatile u16 target; /* 0x8 */
+    u8 padA[0x10 - 0xA];
 } RCntEntry;
 
 extern RCntEntry *D_8006DCB0;
 
-s32 SetRCnt(s32 n, s16 target, u32 mode)
-{
+s32 SetRCnt(s32 n, s16 target, u32 mode) {
     s32 idx = (u16)n;
     u16 md = 0x48;
     u32 isLow;
@@ -252,8 +244,7 @@ s32 SetRCnt(s32 n, s16 target, u32 mode)
     return 1;
 }
 
-s32 GetRCnt(s32 n)
-{
+s32 GetRCnt(s32 n) {
     s32 idx = (u16)n;
     RCntEntry *base;
 
@@ -278,8 +269,7 @@ typedef struct {
 extern IrqRegs *D_8006DCAC;
 extern u32 D_8006DCB4[4];
 
-s32 StartRCnt(u16 which)
-{
+s32 StartRCnt(u16 which) {
     s32 idx = which;
     IrqRegs *reg = D_8006DCAC;
 
@@ -287,8 +277,7 @@ s32 StartRCnt(u16 which)
     return idx < 3;
 }
 
-s32 StopRCnt(u16 which)
-{
+s32 StopRCnt(u16 which) {
     s32 idx = which;
     IrqRegs *reg = D_8006DCAC;
 
@@ -296,8 +285,7 @@ s32 StopRCnt(u16 which)
     return 1;
 }
 
-s32 ResetRCnt(s32 n)
-{
+s32 ResetRCnt(s32 n) {
     s32 idx = (u16)n;
     RCntEntry *base;
 

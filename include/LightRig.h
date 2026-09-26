@@ -54,18 +54,22 @@ struct LightRigRgb {
  * gLightRigMethods --vs gClass6B5CCMethods` lists the overrides of the
  * inherited ones (LightRig__LightRig, __Finalize, __Reset,
  * __DispatchLinkCommand). */
+/* clang-format off */
 #define LIGHTRIG_SLOTS(Self, CtorParams)                                                           \
     CLASS6B5CC_SLOTS(Self, CtorParams);                                                            \
     /* +0x0B8 */ BasicClass *(*getLight)(Self *self, s32 index); /* LightRig__GetLight: lights[index]; Class866E8 inherits it */ \
     /* +0x0BC */ void (*setAmbientColor)(Self *self, LightRigRgb *rgb, s32 swap) /* LightRig__SetAmbientColor; swap: the old colour comes back in *rgb */
+/* clang-format on */
 
+/* clang-format off */
 #define LIGHTRIG_FIELDS(Methods)                                                                   \
     CLASS6B5CC_FIELDS(Methods);                                                                    \
     /* +0x044 */ BasicClass *lights[3]; /* the ctor's New_FlatLightObj(0..2), also children */    \
     /* +0x050 */ LightRigRgb ambient    /* setAmbientColor; GsSetAmbient gets each << 4. The object is 0x54 bytes (New_LightRig) */
+/* clang-format on */
 
 struct LightRigMethods {
-    LIGHTRIG_SLOTS(LightRig, (LightRig *self));
+    LIGHTRIG_SLOTS(LightRig, (LightRig * self));
 };
 
 struct LightRig {

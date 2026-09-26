@@ -29,14 +29,14 @@
 #include "TimBlockSrc.h"
 #include "WBgm.h"
 
-void ObjM__NoOpSlot40(void) {
-}
+void ObjM__NoOpSlot40(void) {}
 
 /* init. `args` is the building Class865C8's init args: args->unkC is its
  * Class866E8 (IntermediateBase__Init keeps it as unk14), whose callback
  * becomes ObjM__OnRegistrantEvent. */
 void ObjM__AttachTarget(ObjM *self, IntermediateBaseInitArgs *args, DreamSys *dreamSys) {
-    ((Class866E8 *)args->unkC)->methods->setCallback((Class866E8 *)args->unkC, (Class866E8ValueFn)ObjM__OnRegistrantEvent, self);
+    ((Class866E8 *)args->unkC)
+        ->methods->setCallback((Class866E8 *)args->unkC, (Class866E8ValueFn)ObjM__OnRegistrantEvent, self);
     self->dreamSys = dreamSys;
     GetClass86668Methods()->init((Class86668 *)self, args, 1);
     self->methods->addChild(self, (BasicClass *)dreamSys);
@@ -87,11 +87,13 @@ void ObjM__InitStyleAndWorld(ObjM *self, s32 gridSpan, Unk50Struct_3bb8c_l *styl
     ret1 = PickDailyVariant(self->stage, 0, ret1);
     self->timBlockSrc = (TimBlockSrc *)New_TimBlockSrc(ret1);
 
-    vp->methods->attachViewChild(vp, (BasicClass *)self->dreamSys, (Vec3_d294 *)&D_8008715C, (Vec3_d294 *)&D_80087168, 0);
+    vp->methods->attachViewChild(vp, (BasicClass *)self->dreamSys, (Vec3_d294 *)&D_8008715C,
+                                 (Vec3_d294 *)&D_80087168, 0);
 
     self->cachedViewport = vp;
     ret1 = self->dreamSys->methods->getCurrentDayAndYear(self->dreamSys, 0);
-    self->styleConfig = (Unk50Struct_3bb8c_l *) RegisterStyleConfig(self->unk14, self->stage, (s32 *)&self->ctorSound, ret1, 0);
+    self->styleConfig = (Unk50Struct_3bb8c_l *)RegisterStyleConfig(self->unk14, self->stage,
+                                                                   (s32 *)&self->ctorSound, ret1, 0);
     if (style != 0) {
         self->styleConfig = style;
     }
@@ -108,7 +110,7 @@ void ObjM__InitStyleAndWorld(ObjM *self, s32 gridSpan, Unk50Struct_3bb8c_l *styl
          * declared type, the same idiom code_179d8_m.c documents for
          * D_8008EA26's `*(u8 *)&sym`, used here in the opposite
          * direction (forcing a reload instead of permitting a fold). */
-        stage = *(s32 volatile *) &self->stage;
+        stage = *(s32 volatile *)&self->stage;
         self->unk40 = 0x10;
         three = 3;
         /* Order-only: without this barrier the scheduler moves `three`'s
@@ -128,7 +130,8 @@ void ObjM__InitStyleAndWorld(ObjM *self, s32 gridSpan, Unk50Struct_3bb8c_l *styl
         self->unk40 = 0x10;
         self->unk44 = 2;
         flag = 1;
-        ((Class866E8 *)self->unk14)->methods->setBounds((Class866E8 *)self->unk14, (Bounds866E8_3bb8c_b *)&D_80087150);
+        ((Class866E8 *)self->unk14)
+            ->methods->setBounds((Class866E8 *)self->unk14, (Bounds866E8_3bb8c_b *)&D_80087150);
     }
 
     self->gridSpan = gridSpan;
@@ -261,18 +264,19 @@ void ObjM__TogglePause(ObjM *self) {
     }
 }
 
-void ObjM__NoOpSlot7C(void) {
-}
+void ObjM__NoOpSlot7C(void) {}
 
 /* initArgs->unk0 as SetupSceneStyle reads it: its +0x07C returns a
  * pointer to one word (class_39e08.h's SubObjE is the same call from
  * Class865C8__OnInit). */
 typedef struct UnkCObj_3bb8c_l UnkCObj_3bb8c_l;
 typedef struct UnkCObjMethods_3bb8c_l UnkCObjMethods_3bb8c_l;
+
 struct UnkCObjMethods_3bb8c_l {
     u8 pad000[0x07C];
     s32 *(*slot7C)(UnkCObj_3bb8c_l *self, s32 arg1); /* +0x07C */
 };
+
 struct UnkCObj_3bb8c_l {
     UnkCObjMethods_3bb8c_l *methods; /* +0x000 */
 };
@@ -304,7 +308,8 @@ void ObjM__SetupSceneStyle(ObjM *self) {
     val = *obj->methods->slot7C(obj, 0);
     vp->methods->setProjection(vp, val / 2 * 5 / 3 + D_8008AB34);
 
-    vp->methods->attachViewChild(vp, (BasicClass *)self->dreamSys, (Vec3_d294 *)&D_8008715C, (Vec3_d294 *)&D_80087168, 0);
+    vp->methods->attachViewChild(vp, (BasicClass *)self->dreamSys, (Vec3_d294 *)&D_8008715C,
+                                 (Vec3_d294 *)&D_80087168, 0);
 
     SetDreamAuxWorld(self->stage, (s32)self->unk14, self->dreamSys, (s32)self->sound, (s32)self->unk10);
 
@@ -372,7 +377,8 @@ void ObjM__EnterStyleSession(ObjM *self) {
 }
 
 void ObjM__TickStyle(ObjM *self) {
-    TickStyle(((Class866E8 *)self->unk14)->methods->getTargetDescriptor((Class866E8 *)self->unk14, 0, 0), 0, 0);
+    TickStyle(((Class866E8 *)self->unk14)->methods->getTargetDescriptor((Class866E8 *)self->unk14, 0, 0),
+              0, 0);
 }
 
 /* The DreamSys's codes 0xA..0x11 run enterState4..notifyParentsCodeB while
@@ -381,29 +387,29 @@ void ObjM__TickStyle(ObjM *self) {
 void ObjM__OnDreamSysNotify(ObjM *self, BasicClass *sender, s32 code) {
     if (self->state == 0) {
         switch (code - 0xA) {
-        case 0:
-            self->methods->enterState4(self);
-            break;
-        case 1:
-            break;
-        case 2:
-            self->methods->enterState5(self);
-            break;
-        case 3:
-            self->methods->enterState6(self);
-            break;
-        case 4:
-            self->methods->enterState7(self);
-            break;
-        case 5:
-            self->methods->enterState8(self);
-            break;
-        case 6:
-            self->methods->enterStateA(self);
-            break;
-        case 7:
-            self->methods->notifyParentsCodeB(self);
-            break;
+            case 0:
+                self->methods->enterState4(self);
+                break;
+            case 1:
+                break;
+            case 2:
+                self->methods->enterState5(self);
+                break;
+            case 3:
+                self->methods->enterState6(self);
+                break;
+            case 4:
+                self->methods->enterState7(self);
+                break;
+            case 5:
+                self->methods->enterState8(self);
+                break;
+            case 6:
+                self->methods->enterStateA(self);
+                break;
+            case 7:
+                self->methods->notifyParentsCodeB(self);
+                break;
         }
     } else if (code >= 9) {
         self->dreamSys->state = 0;
@@ -426,16 +432,16 @@ void ObjM__EnterState4(ObjM *self) {
         }
         arg3 = 0xA;
         switch (t) {
-        case 1:
-            local18 = 0;
-            break;
-        case 2:
-            local18 = 4;
-            break;
-        case 3:
-            local18 = 7;
-            arg3 = 5;
-            break;
+            case 1:
+                local18 = 0;
+                break;
+            case 2:
+                local18 = 4;
+                break;
+            case 3:
+                local18 = 7;
+                arg3 = 5;
+                break;
         }
         ObjM__StartFadeUp(self, local18, 0, arg3, 1);
         return;

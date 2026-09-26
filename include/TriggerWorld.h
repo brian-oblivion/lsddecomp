@@ -51,7 +51,7 @@ typedef struct TriggerWorld TriggerWorld;
 typedef struct TriggerWorldMethods TriggerWorldMethods;
 
 struct TriggerWorldMethods {
-    MODELDATA_SLOTS(TriggerWorld, (TriggerWorld *self, struct Src6F240 *src));
+    MODELDATA_SLOTS(TriggerWorld, (TriggerWorld * self, struct Src6F240 *src));
     /* +0x088 */ ModelData *(*getModelData)(TriggerWorld *self, u32 index); /* TriggerWorld__GetModelData */
 };
 

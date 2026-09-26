@@ -43,8 +43,7 @@ typedef struct {
 
 #define SLOT_POS(target) (*(SlotPos *)&(target)->unk10)
 
-s32 TaskCore__TickFadeColor(TaskCore *self)
-{
+s32 TaskCore__TickFadeColor(TaskCore *self) {
     s32 c = 0x80 - (self->frameCounter * self->fadeRate);
     u8 buf[3];
 
@@ -56,8 +55,7 @@ s32 TaskCore__TickFadeColor(TaskCore *self)
     return (u8)c >= 0x81;
 }
 
-void TaskCore__SetSubHandle(TaskCore *self, const char *path, BasicClass *handle)
-{
+void TaskCore__SetSubHandle(TaskCore *self, const char *path, BasicClass *handle) {
     if (path != NULL) {
         if (self->subHandlePath != NULL) {
             self->subHandle->methods->release(self->subHandle);
@@ -71,8 +69,7 @@ void TaskCore__SetSubHandle(TaskCore *self, const char *path, BasicClass *handle
     self->subHandlePath = path;
 }
 
-void TaskCore__SetTarget(TaskCore *self, TaskCoreTarget *a1)
-{
+void TaskCore__SetTarget(TaskCore *self, TaskCoreTarget *a1) {
     char **list;
     s32 count;
     s32 size;
@@ -128,8 +125,7 @@ void TaskCore__SetTarget(TaskCore *self, TaskCoreTarget *a1)
     a1->handle = (BasicClass *)handle;
 }
 
-void TaskCore__ReleaseTarget(TaskCore *self)
-{
+void TaskCore__ReleaseTarget(TaskCore *self) {
     TextRow **arr;
     s32 i;
 
@@ -159,8 +155,7 @@ void TaskCore__ReleaseTarget(TaskCore *self)
     BMemPMgrFree(self->slotElements);
 }
 
-void TaskCore__UpdateSlotElements(TaskCore *self, void *a1)
-{
+void TaskCore__UpdateSlotElements(TaskCore *self, void *a1) {
     TextRow **arr;
     u8 *ptr;
     s32 i;
@@ -187,8 +182,7 @@ void TaskCore__UpdateSlotElements(TaskCore *self, void *a1)
     }
 }
 
-void TaskCore__BroadcastToSlots(TaskCore *self, void *a1)
-{
+void TaskCore__BroadcastToSlots(TaskCore *self, void *a1) {
     s32 origIdx;
     TextRow **arr;
     s32 i;
@@ -215,8 +209,7 @@ void TaskCore__BroadcastToSlots(TaskCore *self, void *a1)
     self->activeSlot = origIdx;
 }
 
-void TaskCore__FindNextFreeSlot(TaskCore *self)
-{
+void TaskCore__FindNextFreeSlot(TaskCore *self) {
     s32 i;
 
     if (self->target == NULL) {
@@ -240,8 +233,7 @@ void TaskCore__FindNextFreeSlot(TaskCore *self)
     self->methods->setActiveSlot(self, i, 1);
 }
 
-void TaskCore__FindPrevFreeSlot(TaskCore *self)
-{
+void TaskCore__FindPrevFreeSlot(TaskCore *self) {
     s32 i;
 
     if (self->target == NULL) {
@@ -265,8 +257,7 @@ void TaskCore__FindPrevFreeSlot(TaskCore *self)
     self->methods->setActiveSlot(self, i, 1);
 }
 
-void TaskCore__SetActiveSlot(TaskCore *self, s32 a1, void *a2)
-{
+void TaskCore__SetActiveSlot(TaskCore *self, s32 a1, void *a2) {
     s32 idx;
     TextRow *elemB;
     TextRow *elemA;
@@ -288,13 +279,11 @@ void TaskCore__SetActiveSlot(TaskCore *self, s32 a1, void *a2)
     self->methods->setState(self, 9);
 }
 
-s32 TaskCore__GetActiveSlot(TaskCore *self)
-{
+s32 TaskCore__GetActiveSlot(TaskCore *self) {
     return self->activeSlot;
 }
 
-void TaskCore__CreateSlotElements(TaskCore *self, void *desc, void *a2)
-{
+void TaskCore__CreateSlotElements(TaskCore *self, void *desc, void *a2) {
     char **list;
     s32 idx;
     s32 count;
@@ -323,14 +312,12 @@ void TaskCore__CreateSlotElements(TaskCore *self, void *desc, void *a2)
     }
 }
 
-void TaskCore__ReleaseSlotElements(TaskCore *self)
-{
+void TaskCore__ReleaseSlotElements(TaskCore *self) {
     ReleaseBasicClassArray(self->itemLists[self->activeSlot], self->itemCounts[self->activeSlot]);
     BMemPMgrFree(self->itemLists[self->activeSlot]);
 }
 
-void TaskCore__RefreshSlotView(TaskCore *self, void *a1, s32 a2)
-{
+void TaskCore__RefreshSlotView(TaskCore *self, void *a1, s32 a2) {
     s32 idx;
     TextRow **arr;
     s32 count;
@@ -379,8 +366,7 @@ void TaskCore__RefreshSlotView(TaskCore *self, void *a1, s32 a2)
     arr[counter]->methods->setDisplay(arr[counter], 1);
 }
 
-void TaskCore__BroadcastToSlotElements(TaskCore *self, void *a1)
-{
+void TaskCore__BroadcastToSlotElements(TaskCore *self, void *a1) {
     s32 idx = self->activeSlot;
     TextRow **arr = (TextRow **)self->itemLists[idx];
     s32 count = self->itemCounts[idx];
@@ -393,8 +379,7 @@ void TaskCore__BroadcastToSlotElements(TaskCore *self, void *a1)
     }
 }
 
-void TaskCore__BeginElementScroll(TaskCore *self)
-{
+void TaskCore__BeginElementScroll(TaskCore *self) {
     s32 idx;
     TextRow *elem;
     u8 *buf;
@@ -411,8 +396,7 @@ void TaskCore__BeginElementScroll(TaskCore *self)
     self->methods->setState(self, 14);
 }
 
-void TaskCore__CommitElementScroll(TaskCore *self)
-{
+void TaskCore__CommitElementScroll(TaskCore *self) {
     s32 idx;
     s32 counter;
     SlotPos pos;
@@ -452,8 +436,7 @@ void TaskCore__CommitElementScroll(TaskCore *self)
     self->methods->setState(self, 0x10);
 }
 
-void TaskCore__CancelElementScroll(TaskCore *self)
-{
+void TaskCore__CancelElementScroll(TaskCore *self) {
     s32 idx;
     s32 counter;
     TextRow **arr;
@@ -478,8 +461,7 @@ void TaskCore__CancelElementScroll(TaskCore *self)
     self->methods->setState(self, 17);
 }
 
-void TaskCore__AdvanceSlotCursor(TaskCore *self)
-{
+void TaskCore__AdvanceSlotCursor(TaskCore *self) {
     s32 idx = self->activeSlot;
     s32 v = self->slotCounts[idx];
 
@@ -490,8 +472,7 @@ void TaskCore__AdvanceSlotCursor(TaskCore *self)
     self->methods->setSlotCursor(self, v, 1);
 }
 
-void TaskCore__RetreatSlotCursor(TaskCore *self)
-{
+void TaskCore__RetreatSlotCursor(TaskCore *self) {
     s32 idx = self->activeSlot;
     s32 v = self->slotCounts[idx];
 
@@ -502,8 +483,7 @@ void TaskCore__RetreatSlotCursor(TaskCore *self)
     self->methods->setSlotCursor(self, v, 1);
 }
 
-void TaskCore__SetSlotCursor(TaskCore *self, s32 a1, void *a2)
-{
+void TaskCore__SetSlotCursor(TaskCore *self, s32 a1, void *a2) {
     s32 idx;
     s32 counter;
     TextRow **arr;

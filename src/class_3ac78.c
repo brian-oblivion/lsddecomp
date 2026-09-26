@@ -45,8 +45,7 @@ extern void *BMemPMgrAlloc(s32 size);
 /* Class86668::sound is BasicClass * (it may be the ctor's own argument); when
  * it is a New_VabStreamObj object, +0x080 is VabStreamObj__PlayTone. */
 
-void Class86668__PlaySound(Class86668 *self, s32 tone)
-{
+void Class86668__PlaySound(Class86668 *self, s32 tone) {
     VabStreamObj *sound = (VabStreamObj *)self->sound;
 
     if (sound != NULL) {
@@ -54,13 +53,11 @@ void Class86668__PlaySound(Class86668 *self, s32 tone)
     }
 }
 
-Class86668Methods *GetClass86668Methods(void)
-{
+Class86668Methods *GetClass86668Methods(void) {
     return &gClass86668Methods;
 }
 
-Class866E8 *New_Class866E8(Unk54Struct *origin, s32 autoLoad)
-{
+Class866E8 *New_Class866E8(Unk54Struct *origin, s32 autoLoad) {
     Class866E8 *self;
 
     self = BMemPMgrAlloc(0x1E8);
@@ -78,8 +75,7 @@ Class866E8 *New_Class866E8(Unk54Struct *origin, s32 autoLoad)
 extern void BMemPMgrFree(void *arg1);
 extern Unk54Struct gDefaultOrigin;
 
-void Class866E8__Class866E8(Class866E8 *self, Unk54Struct *origin, s32 autoLoad)
-{
+void Class866E8__Class866E8(Class866E8 *self, Unk54Struct *origin, s32 autoLoad) {
     s32 i;
     Class866E8Elem *entry;
     Class86AA0 *obj;
@@ -120,7 +116,8 @@ void Class866E8__Class866E8(Class866E8 *self, Unk54Struct *origin, s32 autoLoad)
 
         entry->placements = New_Class6D940(0);
         entry->cellParent = New_Class86AA0();
-        entry->cellParent->methods->attachToParent(entry->cellParent, (Class6B5CC *)self, (Vec3_d294 *)&self->origin);
+        entry->cellParent->methods->attachToParent(entry->cellParent, (Class6B5CC *)self,
+                                                   (Vec3_d294 *)&self->origin);
 
         entry->cells = (Class86AA0 **)BMemPMgrAlloc(0x668);
         if (entry->cells == NULL) {
@@ -157,8 +154,7 @@ void Class866E8__Class866E8(Class866E8 *self, Unk54Struct *origin, s32 autoLoad)
     self->methods->reset(self);
 }
 
-void Class866E8__Finalize(Class866E8 *self)
-{
+void Class866E8__Finalize(Class866E8 *self) {
     s32 i;
     Class866E8Elem *entry;
     Class86AA0 *obj;
@@ -208,8 +204,7 @@ void Class866E8__Finalize(Class866E8 *self)
  * arguments these calls used to pass the no-argument getter as zero-cost (the
  * jal's delay slot holds a callee-save spill); track 4 dropped them. */
 
-void Class866E8__OnNotify(Class866E8 *self, BasicClass *sender, s32 command)
-{
+void Class866E8__OnNotify(Class866E8 *self, BasicClass *sender, s32 command) {
     GetClass6B5CCMethods()->onNotify((Class6B5CC *)self, sender, command);
 
     if ((sender->methods->header & 0xF) == 1) {
@@ -219,8 +214,7 @@ void Class866E8__OnNotify(Class866E8 *self, BasicClass *sender, s32 command)
 
 extern s32 gDefaultGridSpan;
 
-void Class866E8__Reset(Class866E8 *self)
-{
+void Class866E8__Reset(Class866E8 *self) {
     self->config = NULL;
     self->acceptedTags = 0;
     self->rectCount = 0;
@@ -231,8 +225,7 @@ void Class866E8__Reset(Class866E8 *self)
     self->unk1D8 = -1;
 }
 
-void Class866E8__OnElementEvent(Class866E8 *self, s32 command, Class866E8Elem *elem)
-{
+void Class866E8__OnElementEvent(Class866E8 *self, s32 command, Class866E8Elem *elem) {
     GetClass6B5CCMethods()->notifyIfUnk20Active((Class6B5CC *)self, command);
 
     if (command == 6)
@@ -251,16 +244,14 @@ merge:
     self->methods->notifyParents(self, command);
 }
 
-void Class866E8__UpdateIfEnabled(Class866E8 *self)
-{
+void Class866E8__UpdateIfEnabled(Class866E8 *self) {
     if (self->enabled) {
         self->methods->updateFootprintTracking(self);
         self->methods->advanceRateCountdown(self);
     }
 }
 
-void Class866E8__DispatchLinkCommand(Class866E8 *self, BasicClass *sender, s32 command)
-{
+void Class866E8__DispatchLinkCommand(Class866E8 *self, BasicClass *sender, s32 command) {
     if ((u8)sender->methods->header == 0x34) {
         self->methods->forwardAcceptedCommand(self, sender, command);
     }
@@ -270,8 +261,7 @@ void Class866E8__DispatchLinkCommand(Class866E8 *self, BasicClass *sender, s32 c
  * Matched round 71: `&self->elems[i]` is what produces retail's
  * base + running-offset walk (GCC's strength reduction), not a hand-rolled
  * byte offset. */
-void Class866E8__ResetAllElements(Class866E8 *self)
-{
+void Class866E8__ResetAllElements(Class866E8 *self) {
     s32 i;
     Class866E8Elem *entry;
     Class6D940 *list;
@@ -294,8 +284,7 @@ void Class866E8__ResetAllElements(Class866E8 *self)
     self->methods->flushRateLatch(self);
 }
 
-void Class866E8__SetChildParams(Class866E8 *self, s32 count, s32 dirs, s32 colors)
-{
+void Class866E8__SetChildParams(Class866E8 *self, s32 count, s32 dirs, s32 colors) {
     s32 i;
     FlatLightObj *light;
 
@@ -308,32 +297,29 @@ void Class866E8__SetChildParams(Class866E8 *self, s32 count, s32 dirs, s32 color
     }
 }
 
-void Class866E8__SetCallback(Class866E8 *self, Class866E8ValueFn fn, void *ctx)
-{
+void Class866E8__SetCallback(Class866E8 *self, Class866E8ValueFn fn, void *ctx) {
     self->valueFn = fn;
     self->valueFnCtx = ctx;
 }
 
-void Class866E8__SetAcceptedTags(Class866E8 *self, s32 *tags)
-{
+void Class866E8__SetAcceptedTags(Class866E8 *self, s32 *tags) {
     self->acceptedTags = tags;
 }
 
-void Class866E8__ForwardAcceptedCommand(Class866E8 *self, void *sender, s32 command)
-{
+void Class866E8__ForwardAcceptedCommand(Class866E8 *self, void *sender, s32 command) {
     s32 *p;
     u8 unused[24];
 
     switch (command) {
-    case 2:
-    case 3:
-    case 5:
-    case 6:
-    case 7:
-    case 8:
-        break;
-    default:
-        return;
+        case 2:
+        case 3:
+        case 5:
+        case 6:
+        case 7:
+        case 8:
+            break;
+        default:
+            return;
     }
 
     p = self->acceptedTags;
@@ -350,9 +336,7 @@ void Class866E8__ForwardAcceptedCommand(Class866E8 *self, void *sender, s32 comm
     } while (*p != 0);
 }
 
-
-void Class866E8__ApplyToSenderFootprint(Class866E8 *self, Class6B5CC *sender, s32 command)
-{
+void Class866E8__ApplyToSenderFootprint(Class866E8 *self, Class6B5CC *sender, s32 command) {
     QueryPos866E8 *pos;
     GridSlotList866E8 saved;
     Descriptor10Ext buf;
@@ -383,8 +367,7 @@ void Class866E8__ApplyToSenderFootprint(Class866E8 *self, Class6B5CC *sender, s3
     self->rects = saved;
 }
 
-void Class866E8__SetFootprintFromCell(Class866E8 *self, Descriptor10Ext *desc, s32 span)
-{
+void Class866E8__SetFootprintFromCell(Class866E8 *self, Descriptor10Ext *desc, s32 span) {
     s16 t;
 
     self->footprintCol = desc->base.b2 - 1;
@@ -399,8 +382,7 @@ void Class866E8__SetFootprintFromCell(Class866E8 *self, Descriptor10Ext *desc, s
  * a cell on the low edge (0) loses one row/column, one on the high edge
  * (0x13) loses one too. The edge tests read a COPY of each byte taken before
  * the decrement, and the height companion is `span` itself. Matched round 71. */
-void Class866E8__SetFootprintRect(Class866E8 *self, Descriptor10Ext *desc, s32 span)
-{
+void Class866E8__SetFootprintRect(Class866E8 *self, Descriptor10Ext *desc, s32 span) {
     s32 col;
     s32 row;
     s32 width;
@@ -443,8 +425,7 @@ void Class866E8__SetFootprintRect(Class866E8 *self, Descriptor10Ext *desc, s32 s
  * each cell. Matched round 71: the ORDER of the comma-separated increments
  * is load-bearing in both loops (`entry++, i++` and `cell++, col++`); the
  * reverse order was the whole 95/117 residue. */
-void Class866E8__DispatchToRectCells(Class866E8 *self, Class6B5CC *sender, s32 command)
-{
+void Class866E8__DispatchToRectCells(Class866E8 *self, Class6B5CC *sender, s32 command) {
     s32 i;
     s32 row;
     s32 col;
@@ -484,30 +465,25 @@ void Class866E8__DispatchToRectCells(Class866E8 *self, Class6B5CC *sender, s32 c
  * reserve stack space for unused trailing integer/pointer args on this
  * target, so the definition's own bytes are unaffected (reverified
  * 18/18 after the widening). */
-void NotifyGridCell(Class86AA0 *cell, Class6B5CC *sender, s32 command)
-{
+void NotifyGridCell(Class86AA0 *cell, Class6B5CC *sender, s32 command) {
     if (cell != NULL && (cell->flags36 & 0x80)) {
         cell->methods->onNotify(cell, sender, command);
     }
 }
 
-Descriptor10 *Class866E8__GetCurrentCellKey(Class866E8 *self)
-{
+Descriptor10 *Class866E8__GetCurrentCellKey(Class866E8 *self) {
     return &self->curCell;
 }
 
-void func_8004B324(void) {
-}
+void func_8004B324(void) {}
 
-void Class866E8__SetGridSpan(Class866E8 *self, s32 span)
-{
+void Class866E8__SetGridSpan(Class866E8 *self, s32 span) {
     self->gridSpan = span;
     self->gridCells = (s16)(span >> 11);
     self->gridHalfCells = (s16)(span >> 12);
 }
 
-void Class866E8__SetConfig(Class866E8 *self, Unk68Struct *config)
-{
+void Class866E8__SetConfig(Class866E8 *self, Unk68Struct *config) {
     self->methods->reset(self);
     self->config = config;
 }

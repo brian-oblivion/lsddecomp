@@ -63,9 +63,9 @@ typedef struct Pair32E99C Pair32E99C;
  * D_8008A8E8[2]), so New_BoxFill and the ctor slot take `void *` and the
  * occupants read it as this. */
 struct SkipShort2 {
-    s16 x;             /* +0x000, the width */
+    s16 x; /* +0x000, the width */
     u8 pad2[0x004 - 0x002];
-    s16 y;             /* +0x004, the height */
+    s16 y; /* +0x004, the height */
 };
 
 /* A two-word screen position (setPosition, attachToParent's third argument):
@@ -81,6 +81,7 @@ struct Pair32E99C {
  * inherited ones: +0x008 (BoxFill__BoxFill), +0x040 (BoxFill__Reset), +0x04C
  * (BoxFill__AttachToParent), +0x060 (BoxFill__SetDisplay), +0x064
  * (BoxFill__SetSemiTrans), +0x068 (BoxFill__SetSemiTransRate). */
+/* clang-format off */
 #define BOXFILL_SLOTS(Self, CtorParams)                                                            \
     CLASS6B5CC_SLOTS(Self, CtorParams);                                                            \
     /* +0x0B8 */ void (*setColor)(Self *self, s32 overwrite, void *rgb);  /* BoxFill__SetColor: copy the 3 bytes, or add them when overwrite is 0 */ \
@@ -89,7 +90,9 @@ struct Pair32E99C {
     /* +0x0C4 */ void (*attachAbsolute)(Self *self, Class6B5CC *parent, Pair32E99C *pos, s32 arg3); /* BoxFill__AttachAbsolute: attachToParent, relative = 0, unk4C = arg3 */ \
     /* +0x0C8 */ void (*setPri)(Self *self, s32 pri);                     /* BoxFill__SetPri */          \
     /* +0x0CC */ s32 (*setMask)(Self *self, s32 bits)                     /* BoxFill__SetMask: mask = (1 << bits) - 1; Reset passes 13 */
+/* clang-format on */
 
+/* clang-format off */
 #define BOXFILL_FIELDS(Methods)                                                                    \
     CLASS6B5CC_FIELDS(Methods);                                                                    \
     /* +0x044 */ s32 pri;          /* setPri, the ctor's third argument; DrawNode's GsSortBoxFill pri (its low halfword) */ \
@@ -105,9 +108,10 @@ struct Pair32E99C {
     /* +0x064 */ u8 color[3];      /* GsBOXF.r, g, b: setColor (Reset's default D_8008A924) */     \
     /* +0x067 */ u8 pad67;                                                                         \
     /* +0x068 */ s32 mask          /* setMask. The object is 0x6C bytes (New_BoxFill) */
+/* clang-format on */
 
 struct BoxFillMethods {
-    BOXFILL_SLOTS(BoxFill, (BoxFill *self, void *size, void *color, s32 pri));
+    BOXFILL_SLOTS(BoxFill, (BoxFill * self, void *size, void *color, s32 pri));
 };
 
 struct BoxFill {

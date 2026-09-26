@@ -69,7 +69,7 @@ void Actor__MoveLocalY(Actor *self, s32 val, void *notify) {
  * (confirmed with a standalone reproducer: inline truncation swaps which
  * of s0/s1 holds which, round 2026-09-04). */
 void Actor__MoveAlongLocalAxis(Actor *self, s16 *axis, s32 val, void *notify, volatile s32 event) {
-    s16 val16 = (s16) val;
+    s16 val16 = (s16)val;
     *axis = val16;
     self->lastOffsetValue = val16;
     self->methods->addLocalTranslation(self, &D_8008ABA4[0]);
@@ -87,8 +87,7 @@ void Actor__MoveLocalXOrFindLink(Actor *self, s32 val, void *notify) {
     Actor__MoveOrFindNearbyLink(self, self->methods->moveLocalX, val, notify);
 }
 
-void Actor__NoOpSlotD8(void) {
-}
+void Actor__NoOpSlotD8(void) {}
 
 void Actor__MoveOrFindNearbyLink(Actor *self, void (*move)(Actor *, s32, void *), s32 val, void *notify) {
     self->linkTarget = NULL;
@@ -110,7 +109,6 @@ typedef struct GridQuery {
     s32 numCols;
     s32 numRows;
 } GridQuery;
-
 
 /* The grid (self->grid) is a Class866E8 (include/Class866E8.h). Its
  * elements (Class866E8Elem) are what Actor__BuildLinkQueries collects: the
@@ -135,8 +133,10 @@ typedef struct LinkQueryBuf {
 } LinkQueryBuf;
 
 void *AcceptGridElem(void *arg0, void *arg1, void *arg2);
-s32 Actor__BuildLinkQueries(Actor *self, GridQuery *arr1, Class866E8Elem **arr2, LinkQueryBuf *arg3, s32 arg4);
-void *Actor__ScanLinkCandidates(Actor *self, void *arg1, void *arg2, s32 count, GridQuery *arr1, Class866E8Elem **arr2);
+s32 Actor__BuildLinkQueries(Actor *self, GridQuery *arr1, Class866E8Elem **arr2, LinkQueryBuf *arg3,
+                            s32 arg4);
+void *Actor__ScanLinkCandidates(Actor *self, void *arg1, void *arg2, s32 count, GridQuery *arr1,
+                                Class866E8Elem **arr2);
 
 s32 Actor__FindNearbyLink(Actor *self) {
     LinkQueryBuf sp18;
@@ -151,7 +151,8 @@ s32 Actor__FindNearbyLink(Actor *self) {
     if (self->grid != NULL) {
         void *pos = &self->coord2->tx;
 
-        if (self->grid->methods->computeFootprintDescriptor(self->grid, (Descriptor10Ext *)&sp18, pos) == 0) {
+        if (self->grid->methods->computeFootprintDescriptor(self->grid, (Descriptor10Ext *)&sp18,
+                                                            pos) == 0) {
             s32 count = Actor__BuildLinkQueries(self, sp48, sp78, &sp18, 1);
             void *result = Actor__ScanLinkCandidates(self, &sp88, pos, count, sp48, sp78);
 
@@ -168,7 +169,8 @@ s32 Actor__FindNearbyLink(Actor *self) {
     return 0;
 }
 
-s32 Actor__BuildLinkQueries(Actor *self, GridQuery *arr1, Class866E8Elem **arr2, LinkQueryBuf *arg3, s32 arg4) {
+s32 Actor__BuildLinkQueries(Actor *self, GridQuery *arr1, Class866E8Elem **arr2, LinkQueryBuf *arg3,
+                            s32 arg4) {
     s32 f2 = arg3->queryCol;
     s32 f3 = arg3->queryRow;
     s32 numCols;
@@ -248,7 +250,8 @@ void *Actor__ScanGridWindow(Actor *self, void *arg1, void *arg2, GridQuery *quer
  * set, and calling `Actor__ScanGridWindow` on the rest; returns the first
  * non-NULL result, or NULL if every entry was skipped or came back empty
  * (round 2026-09-04). */
-void *Actor__ScanLinkCandidates(Actor *self, void *arg1, void *arg2, s32 count, GridQuery *arr1, Class866E8Elem **arr2) {
+void *Actor__ScanLinkCandidates(Actor *self, void *arg1, void *arg2, s32 count, GridQuery *arr1,
+                                Class866E8Elem **arr2) {
     s32 i;
 
     for (i = 0; i < count;) {
@@ -260,7 +263,7 @@ void *Actor__ScanLinkCandidates(Actor *self, void *arg1, void *arg2, s32 count, 
                 return result;
             }
         }
-        arr1 = (GridQuery *) ((u8 *) arr1 + 0xC);
+        arr1 = (GridQuery *)((u8 *)arr1 + 0xC);
         arr2++;
     }
     return NULL;
@@ -276,11 +279,12 @@ void *Actor__ScanLinkCandidates(Actor *self, void *arg1, void *arg2, s32 count, 
  * comes up empty. `self` (this function's own first argument) is read
  * from `a0` in the disassembly but never touched by the body -- present
  * only to match its caller's calling convention (round 2026-09-04). */
-void *Actor__ScanGridWindow(Actor *self, void *arg1, void *arg2, GridQuery *query, Class866E8Elem *source) {
+void *Actor__ScanGridWindow(Actor *self, void *arg1, void *arg2, GridQuery *query,
+                            Class866E8Elem *source) {
     s32 row, col;
     Class86AA0 **bucket;
 
-    bucket = (Class86AA0 **) ((u8 *) source->cells + query->startRow * 0x50 + query->startCol * 4);
+    bucket = (Class86AA0 **)((u8 *)source->cells + query->startRow * 0x50 + query->startCol * 4);
     for (row = 0; row < query->numRows; row++) {
         for (col = 0; col < query->numCols; col++) {
             Class86AA0 *node;
@@ -295,7 +299,7 @@ void *Actor__ScanGridWindow(Actor *self, void *arg1, void *arg2, GridQuery *quer
             }
             bucket++;
         }
-        bucket = (Class86AA0 **) ((u8 *) bucket - (query->numCols * 4 + 0x50));
+        bucket = (Class86AA0 **)((u8 *)bucket - (query->numCols * 4 + 0x50));
     }
     return NULL;
 }
@@ -316,7 +320,6 @@ void *AcceptGridElem(void *arg0, void *arg1, void *arg2) {
     }
     return NULL;
 }
-
 
 /* tryAttachNearby is called with (self, sender, event): Class6B5CC's slot
  * declares self alone (its occupant's second parameter arrives in the
@@ -339,8 +342,7 @@ void Actor__SetLastOffsetValue(Actor *self, s16 val) {
     self->lastOffsetValue = val;
 }
 
-void Actor__NoOpSlotE8(void) {
-}
+void Actor__NoOpSlotE8(void) {}
 
 void Actor__SetPendingExtra(Actor *self, s32 extra) {
     self->pendingExtra = extra;

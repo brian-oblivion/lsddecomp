@@ -16,8 +16,7 @@
 extern Vec3_d294 D_80086650;
 extern Vec3_d294 D_8008665C;
 
-Class865C8 *New_Class865C8(IntermediateBaseInitArgs *initArgs, DreamSys *dreamSys, s32 arg3)
-{
+Class865C8 *New_Class865C8(IntermediateBaseInitArgs *initArgs, DreamSys *dreamSys, s32 arg3) {
     Class865C8 *self;
 
     self = BMemPMgrAlloc(0x50);
@@ -28,7 +27,8 @@ Class865C8 *New_Class865C8(IntermediateBaseInitArgs *initArgs, DreamSys *dreamSy
     return NULL;
 }
 
-void Class865C8__Class865C8(Class865C8 *self, IntermediateBaseInitArgs *initArgs, DreamSys *dreamSys, s32 arg3) {
+void Class865C8__Class865C8(Class865C8 *self, IntermediateBaseInitArgs *initArgs,
+                            DreamSys *dreamSys, s32 arg3) {
     LoadRequest req;
     s32 tmp;
 
@@ -139,24 +139,24 @@ void Class865C8__AdvancePhase(Class865C8 *self, BasicClass *sender, s32 event) {
     GetClass86668Methods()->onTag1Notify((Class86668 *)self, sender, event);
     if (event == 2 && self->phase != event) {
         switch (self->phase) {
-        case 1:
-            result = self->dreamSys->methods->startDay(self->dreamSys);
-            if (result < 0) {
-                self->dreamSys->methods->endDay(self->dreamSys, 0);
-                self->result = event;
-                self->methods->setState(self, 3);
-                return;
-            }
-            Class865C8__StartObjM(self, result);
-            break;
-        case 2:
-            break;
-        case 3:
-            self->objM->methods->deinit(self->objM);
-            self->objM->methods->release(self->objM);
-            result = self->dreamSys->methods->getCurrentStage(self->dreamSys);
-            Class865C8__StartObjM(self, result);
-            break;
+            case 1:
+                result = self->dreamSys->methods->startDay(self->dreamSys);
+                if (result < 0) {
+                    self->dreamSys->methods->endDay(self->dreamSys, 0);
+                    self->result = event;
+                    self->methods->setState(self, 3);
+                    return;
+                }
+                Class865C8__StartObjM(self, result);
+                break;
+            case 2:
+                break;
+            case 3:
+                self->objM->methods->deinit(self->objM);
+                self->objM->methods->release(self->objM);
+                result = self->dreamSys->methods->getCurrentStage(self->dreamSys);
+                Class865C8__StartObjM(self, result);
+                break;
         }
     }
 }
@@ -168,44 +168,42 @@ void Class865C8__StartObjM(Class865C8 *self, s32 stage) {
     self->phase = 2;
 }
 
-void Class865C8__OnState4(void) {
-}
+void Class865C8__OnState4(void) {}
 
-void Class865C8__OnDreamSysNotify(void) {
-}
+void Class865C8__OnDreamSysNotify(void) {}
 
 void Class865C8__OnObjMNotify(Class865C8 *self, BasicClass *sender, s32 event) {
     CinematicCall pos;
     s32 result;
 
     switch (event) {
-    case 4:
-        self->objM->methods->deinit(self->objM);
-        self->objM->methods->release(self->objM);
-        result = self->dreamSys->methods->endDay(self->dreamSys, 0);
-        if (result == 0) {
-            pos = self->dreamSys->methods->getCinematic(self->dreamSys);
-            self->result = pos.entry < 0 ? 1 : 2;
-        } else {
+        case 4:
+            self->objM->methods->deinit(self->objM);
+            self->objM->methods->release(self->objM);
+            result = self->dreamSys->methods->endDay(self->dreamSys, 0);
+            if (result == 0) {
+                pos = self->dreamSys->methods->getCinematic(self->dreamSys);
+                self->result = pos.entry < 0 ? 1 : 2;
+            } else {
+                self->result = 3;
+            }
+            self->methods->setState(self, 3);
+            break;
+        case 5:
+        case 6:
+        case 7:
+        case 8:
+        case 0xA:
+            self->phase = 3;
+            break;
+        case 0xC:
+        case 0xD:
+            self->objM->methods->deinit(self->objM);
+            self->objM->methods->release(self->objM);
+            self->dreamSys->methods->endDay(self->dreamSys, event != 0xC ? 2 : 1);
             self->result = 3;
-        }
-        self->methods->setState(self, 3);
-        break;
-    case 5:
-    case 6:
-    case 7:
-    case 8:
-    case 0xA:
-        self->phase = 3;
-        break;
-    case 0xC:
-    case 0xD:
-        self->objM->methods->deinit(self->objM);
-        self->objM->methods->release(self->objM);
-        self->dreamSys->methods->endDay(self->dreamSys, event != 0xC ? 2 : 1);
-        self->result = 3;
-        self->methods->setState(self, 3);
-        break;
+            self->methods->setState(self, 3);
+            break;
     }
 }
 
@@ -225,8 +223,7 @@ extern s32 RegisterFileTableEntries(void *arg0, s32 arg1);
 extern s32 D_8008A978;
 extern s32 D_8008A97C;
 
-s32 func_8004A070(s32 arg0)
-{
+s32 func_8004A070(s32 arg0) {
     s32 local;
     void *obj;
     s32 prev;
@@ -237,20 +234,20 @@ s32 func_8004A070(s32 arg0)
     D_8008A978 = prev + 1;
 
     switch (prev + 1) {
-    case 1:
-        if (arg0 != 0) {
-            D_8008A978 = prev + 2;
-        } else {
-            local = local / 2;
-            D_8008A97C = local;
-        }
-        break;
-    case 2:
-        local = local - D_8008A97C;
-        break;
-    default:
-        local = 0;
-        break;
+        case 1:
+            if (arg0 != 0) {
+                D_8008A978 = prev + 2;
+            } else {
+                local = local / 2;
+                D_8008A97C = local;
+            }
+            break;
+        case 2:
+            local = local - D_8008A97C;
+            break;
+        default:
+            local = 0;
+            break;
     }
 
     while ((result = RegisterFileTableEntries(obj, local)) == 0) {
@@ -258,8 +255,7 @@ s32 func_8004A070(s32 arg0)
     return result;
 }
 
-Class86668 *New_Class86668(char *soundBankPath, BasicClass *sound)
-{
+Class86668 *New_Class86668(char *soundBankPath, BasicClass *sound) {
     Class86668 *self;
 
     self = BMemPMgrAlloc(0x38);
@@ -303,8 +299,7 @@ void Class86668__Deinit(Class86668 *self) {
     Get_vtable_IntermediateBase()->deinit((IntermediateBase *)self);
 }
 
-void Class86668__NoOpSlot58(void) {
-}
+void Class86668__NoOpSlot58(void) {}
 
 void Class86668__CheckTimeout(Class86668 *self, BasicClass *sender, s32 event) {
     Get_vtable_IntermediateBase()->update((IntermediateBase *)self, sender, event);

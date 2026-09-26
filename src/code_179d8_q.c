@@ -41,17 +41,16 @@
  * object's identity is unknowable from here, so the name stays a
  * placeholder. */
 typedef struct UnkC80 UnkC80;
+
 struct UnkC80 {
     u8 pad00[0x04];
     /* +0x04 */ s32 unk04;
 };
 
-extern void EnqueueCdRequest(CdDriver *owner, s32 fileIndex,
-                             s32 op, s32 param0, s32 param1);
+extern void EnqueueCdRequest(CdDriver *owner, s32 fileIndex, s32 op, s32 param0, s32 param1);
 extern s32 FindCdFileIndex(char *name); /* code_179d8_r: name -> table index */
 
-void CdDriver__RequestLoadFile(CdDriver *self, char *name)
-{
+void CdDriver__RequestLoadFile(CdDriver *self, char *name) {
     UnkC80 *s2;
     s32 idx;
 
@@ -61,8 +60,7 @@ void CdDriver__RequestLoadFile(CdDriver *self, char *name)
         if (gCdAsyncEnabled != 0) {
             s2->unk04 = 1;
             idx = FindCdFileIndex(name);
-            EnqueueCdRequest(self, idx,
-                             CD_OP_LOAD_FILE, 0, 0);
+            EnqueueCdRequest(self, idx, CD_OP_LOAD_FILE, 0, 0);
         } else {
             self->methods->loadFile(self, name);
 
@@ -79,19 +77,17 @@ extern void LockCd(void);
 extern void UnlockCd(void);
 extern void StopCdServiceIfIdle(void);
 
-void CdDriver__StopService(void)
-{
+void CdDriver__StopService(void) {
     LockCd();
     StopCdServiceIfIdle();
     UnlockCd();
 }
 
 extern void CdFlush(void);
-extern void ResetCdStateMachine(void); /* code_179d8_r: reset the state machine */
+extern void ResetCdStateMachine(void);             /* code_179d8_r: reset the state machine */
 extern void FreeCdRequestNode(CdRequestNode *req); /* code_179d8_r: unlink+free */
 
-void CdDriver__CancelRequests(CdDriver *self)
-{
+void CdDriver__CancelRequests(CdDriver *self) {
     CdRequestNode *entry;
     CdRequestNode *node;
     CdRequestNode *next;
@@ -126,8 +122,7 @@ void CdDriver__CancelRequests(CdDriver *self)
 
 /* The class's own table getter (include/CdDriver.h) -- an address-of, not
  * gp_rel: gCdDriverMethods lives in .data, not .sdata. */
-CdDriverMethods *GetCdDriverMethods(void)
-{
+CdDriverMethods *GetCdDriverMethods(void) {
     return &gCdDriverMethods;
 }
 
@@ -145,8 +140,7 @@ extern s32 CdControlB(u_char com, void *param, void *result);
 
 extern s32 sCdDriveInited;
 
-void InitCdDrive(void)
-{
+void InitCdDrive(void) {
     u8 mode;
 
     if (sCdDriveInited != 0) {
@@ -160,27 +154,19 @@ void InitCdDrive(void)
     sCdDriveInited = 1;
 }
 
-
-s32 IsCdBusy(void)
-{
+s32 IsCdBusy(void) {
     return gCdBusy;
 }
 
-
-s32 IsCdIdle(void)
-{
+s32 IsCdIdle(void) {
     return gCdIdle;
 }
 
-
-s32 GetCdOperation(void)
-{
+s32 GetCdOperation(void) {
     return gCdOperation;
 }
 
-
-s32 GetCdState(void)
-{
+s32 GetCdState(void) {
     return gCdState;
 }
 
@@ -190,8 +176,7 @@ s32 GetCdState(void)
  * -- i.e. "neither mode is on, take the plain synchronous path". Nothing
  * establishes what the second mode IS, so nothing here names it. */
 
-s32 GetCdDriverMode(s32 *outMode2)
-{
+s32 GetCdDriverMode(s32 *outMode2) {
     if (outMode2 != NULL) {
         *outMode2 = D_8008A860;
     }
@@ -200,8 +185,7 @@ s32 GetCdDriverMode(s32 *outMode2)
 
 extern s32 ServiceCdDriver(void);
 
-s32 SetCdDriverMode(s32 async, s32 mode2, s32 useVSyncCallback)
-{
+s32 SetCdDriverMode(s32 async, s32 mode2, s32 useVSyncCallback) {
     DrawSystem *obj;
 
     if (gCdBusy == 0) {
@@ -229,21 +213,15 @@ s32 SetCdDriverMode(s32 async, s32 mode2, s32 useVSyncCallback)
     return 0;
 }
 
-
-void SetFileTable(CdFileEntry *table)
-{
+void SetFileTable(CdFileEntry *table) {
     gFileTable = table;
 }
 
-
-void SetFileTableCount(s32 count)
-{
+void SetFileTableCount(s32 count) {
     gFileTableCount = count;
 }
 
-
-s32 GetFileTableCount(void)
-{
+s32 GetFileTableCount(void) {
     return gFileTableCount;
 }
 
@@ -254,13 +232,14 @@ s32 GetFileTableCount(void)
  * code_179d8_h.c's OpenCdFile derived for the same Sony function. Only
  * the two fields this call site copies out are typed. */
 typedef struct CdFileInfo CdFileInfo;
+
 struct CdFileInfo {
     CdLoc16 pos;
     u32 size;
     u8 pad8[0x18 - 0x8];
 };
 
-extern const char sFileNotFoundMsg[]; /* "File not found. file = %s\n" */
+extern const char sFileNotFoundMsg[];                      /* "File not found. file = %s\n" */
 extern s32 CdSearchFile(CdFileInfo *fileInfo, char *path); /* libcd/iso9660.o */
 extern void printf(const char *fmt, void *arg1);
 extern char *BuildCdFilePath(char *dest, char *suffix); /* code_179d8_r */
@@ -268,8 +247,7 @@ extern void InitCdDrive(void);
 
 #define CD_SEARCH_RETRIES 0x65
 
-s32 ResolveFileEntries(CdFileEntry *entries, s32 count)
-{
+s32 ResolveFileEntries(CdFileEntry *entries, s32 count) {
     CdFileEntry *end;
     char path[0x40];
     CdFileInfo info;
@@ -305,26 +283,23 @@ s32 ResolveFileEntries(CdFileEntry *entries, s32 count)
  * half-updated queue. Not a mutex -- nothing spins or blocks on it. */
 extern s32 gCdLock;
 
-void LockCd(void)
-{
+void LockCd(void) {
     gCdLock = 1;
 }
 
 extern s32 gCdLock;
 
-void UnlockCd(void)
-{
+void UnlockCd(void) {
     gCdLock = 0;
 }
 
-extern s32 GetBMemPMgrBusy(void); /* code_8220_b */
-extern void TickCdStateMachine(void); /* code_179d8_r: state-machine step 1 */
+extern s32 GetBMemPMgrBusy(void);             /* code_8220_b */
+extern void TickCdStateMachine(void);         /* code_179d8_r: state-machine step 1 */
 extern void TickCdLoadFileStateMachine(void); /* code_179d8_r: state-machine step 2 */
 extern s32 gCdQueueEnabled;
 extern void VSyncCallback(void (*cb)(void));
 
-s32 ServiceCdDriver(void)
-{
+s32 ServiceCdDriver(void) {
     if (gCdLock != 0) {
         return 0;
     }
@@ -356,8 +331,7 @@ s32 ServiceCdDriver(void)
 
 extern s32 gCdCallbackInstalled;
 
-void StartCdService(void)
-{
+void StartCdService(void) {
     LockCd();
 
     if (gCdCallbackInstalled == 0) {
@@ -375,8 +349,7 @@ extern s32 gCdCallbackInstalled;
 extern s32 gCdQueueEnabled;
 extern void VSyncCallback(void (*cb)(void));
 
-void StopCdServiceIfIdle(void)
-{
+void StopCdServiceIfIdle(void) {
     LockCd();
 
     if (gCdTickStep == 0 && gCdCallbackInstalled != 0) {
@@ -392,8 +365,7 @@ void StopCdServiceIfIdle(void)
 
 extern s32 gCdQueueEnabled;
 
-void DisableCdQueue(void)
-{
+void DisableCdQueue(void) {
     LockCd();
     gCdQueueEnabled = 0;
     UnlockCd();
@@ -408,6 +380,7 @@ void DisableCdQueue(void)
  * arguments code_179d8_s passes through: a byte count and a flag for op 4, a
  * buffer and a size for op 5. */
 typedef struct CdRequest_282AC CdRequest_282AC;
+
 struct CdRequest_282AC {
     u8 pad00[0x08];
     /* +0x08 */ s32 op;
@@ -416,14 +389,13 @@ struct CdRequest_282AC {
     /* +0x14 */ s32 param0;
     /* +0x18 */ s32 param1;
 };
+
 extern CdRequest_282AC *AllocCdRequestNode(void); /* code_179d8_r: alloc + link */
 
 /* The store order below is retail's own (+0x08, +0x14, +0x0C, +0x10, +0x18),
  * not ascending offset -- see the match report: this compiler keeps
  * statement order for these, so the statements are in retail's order. */
-void EnqueueCdRequest(CdDriver *owner, s32 fileIndex, s32 op,
-                      s32 param0, s32 param1)
-{
+void EnqueueCdRequest(CdDriver *owner, s32 fileIndex, s32 op, s32 param0, s32 param1) {
     CdRequest_282AC *entry = AllocCdRequestNode();
 
     entry->op = op;

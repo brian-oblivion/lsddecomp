@@ -75,10 +75,9 @@ extern void *BMemPMgrFree(void *ptr);
 /* libc2/strstr.o, linked (see code_179d8_h.c's carve notes). */
 extern char *strstr(char *s1, char *s2);
 
-extern s32 gCdTimeoutCounter;   /* timeout counter */
+extern s32 gCdTimeoutCounter; /* timeout counter */
 
-CdRequestNode *AllocCdRequestNode(void)
-{
+CdRequestNode *AllocCdRequestNode(void) {
     CdRequestNode *node;
     CdRequestNode *head;
     CdRequestNode *cur;
@@ -108,8 +107,7 @@ CdRequestNode *AllocCdRequestNode(void)
     return node;
 }
 
-void FreeCdRequestNode(CdRequestNode *node)
-{
+void FreeCdRequestNode(CdRequestNode *node) {
     CdRequestNode *prev;
     CdRequestNode *next;
 
@@ -130,8 +128,7 @@ void FreeCdRequestNode(CdRequestNode *node)
     UnlockCd();
 }
 
-void *FindCdFileEntry(char *name)
-{
+void *FindCdFileEntry(char *name) {
     CdFileEntry *cur = gFileTable;
     s32 i = 0;
 
@@ -147,8 +144,7 @@ void *FindCdFileEntry(char *name)
     return NULL;
 }
 
-s32 FindCdFileIndex(char *name)
-{
+s32 FindCdFileIndex(char *name) {
     CdFileEntry *cur = gFileTable;
     s32 i = 0;
 
@@ -164,8 +160,7 @@ s32 FindCdFileIndex(char *name)
     return i;
 }
 
-void *GetCdFileEntry(s32 index)
-{
+void *GetCdFileEntry(s32 index) {
     void *result;
     CdFileEntry *base;
 
@@ -181,8 +176,7 @@ void *GetCdFileEntry(s32 index)
 extern void ResetCdStateMachine(void);
 extern void SetCdState(s32 state);
 
-void TickCdStateMachine(void)
-{
+void TickCdStateMachine(void) {
     s32 state;
     s32 v1;
     s32 newstate;
@@ -258,8 +252,7 @@ L_end:
     UnlockCd();
 }
 
-void TickCdLoadFileStateMachine(void)
-{
+void TickCdLoadFileStateMachine(void) {
     s32 state;
     s32 v1;
     s32 newstate;
@@ -339,8 +332,7 @@ L_end:
     UnlockCd();
 }
 
-void StartCdOperation(s32 op, s32 state)
-{
+void StartCdOperation(s32 op, s32 state) {
     gCdBusy = 1;
     gCdOperation = op;
     gCdState = state;
@@ -348,8 +340,7 @@ void StartCdOperation(s32 op, s32 state)
     gCdRequestQueue->active = 1;
 }
 
-void ResetCdStateMachine(void)
-{
+void ResetCdStateMachine(void) {
     gCdOperation = 0;
     gCdState = 0;
     gCdTickStep = 0;
@@ -358,8 +349,7 @@ void ResetCdStateMachine(void)
     gCdBusy = 0;
 }
 
-void SetCdState(s32 state)
-{
+void SetCdState(s32 state) {
     gCdState = state;
     gCdTimeoutCounter = 0;
 }

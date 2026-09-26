@@ -45,6 +45,7 @@
 typedef struct Class86668 Class86668;
 typedef struct Class86668Methods Class86668Methods;
 
+/* clang-format off */
 #define CLASS86668_SLOTS(Self, CtorParams)                                                         \
     INTERMEDIATEBASE_SLOTS(Self, CtorParams);                                                      \
     /* +0x06C */ void (*setTimeout)(Self *self, s32 timeout); /* Class86668__SetTimeout: timeoutFrames = timeout * 20 (negative: kept, never fires) */ \
@@ -52,16 +53,19 @@ typedef struct Class86668Methods Class86668Methods;
     /* +0x074 */ void (*slot74)(Self *self);                  /* NULL; ObjM__TogglePause */ \
     /* +0x078 */ void *slot78;                                /* NULL in all three tables */     \
     /* +0x07C */ void (*onState4)(Self *self)                 /* NULL; setState(4) calls it; empty in both subclasses */
+/* clang-format on */
 
+/* clang-format off */
 #define CLASS86668_FIELDS(Methods)                                                                 \
     INTERMEDIATEBASE_FIELDS(Methods);                                                              \
     /* +0x028 */ s32 result;          /* init zeroes it and returns it; setState(4) sets 1 */      \
     /* +0x02C */ s32 timeoutFrames;   /* setTimeout; update: frameCounter past it (unsigned) is setState(4) */ \
     /* +0x030 */ char *soundBankPath; /* the ctor's; nonzero: finalize releases `sound` */         \
     /* +0x034 */ BasicClass *sound    /* New_VabStreamObj(soundBankPath) or the ctor's own; the object is 0x38 bytes */
+/* clang-format on */
 
 struct Class86668Methods {
-    CLASS86668_SLOTS(Class86668, (Class86668 *self, char *soundBankPath, BasicClass *sound));
+    CLASS86668_SLOTS(Class86668, (Class86668 * self, char *soundBankPath, BasicClass *sound));
 };
 
 struct Class86668 {

@@ -36,19 +36,23 @@ typedef struct Class869D8Methods Class869D8Methods;
 
 /* Viewport's slots, then this class's own. The overrides of inherited
  * slots are the ctor, initDefaults and update (see the banner). */
+/* clang-format off */
 #define CLASS869D8_SLOTS(Self, CtorParams)                                                         \
     VIEWPORT_SLOTS(Self, CtorParams);                                                              \
     /* +0x0B8 */ void (*slotB8)(void); /* func_8004D35C, empty; no known caller */                 \
     /* +0x0BC */ void (*slotBC)(void); /* func_8004D364, empty; no known caller */                 \
     /* +0x0C0 */ void (*slotC0)(void); /* func_8004D36C, empty; no known caller */                 \
     /* +0x0C4 */ void (*slotC4)(void)  /* func_8004D374, empty; no known caller */
+/* clang-format on */
 
+/* clang-format off */
 #define CLASS869D8_FIELDS(Methods)                                                                 \
     VIEWPORT_FIELDS(Methods);                                                                      \
     /* +0x0BC */ u8 pad0BC[0x0DC - 0x0BC] /* no accessor; the object is 0xDC bytes (New_Class869D8) */
+/* clang-format on */
 
 struct Class869D8Methods {
-    CLASS869D8_SLOTS(Class869D8, (Class869D8 *self));
+    CLASS869D8_SLOTS(Class869D8, (Class869D8 * self));
 };
 
 struct Class869D8 {
@@ -59,9 +63,9 @@ extern Class869D8Methods gClass869D8Methods;
 extern Class869D8Methods *GetClass869D8Methods(void); /* returns &gClass869D8Methods */
 
 /* The class's own methods, in address order. */
-Class869D8 *New_Class869D8(void);             /* BMemPMgrAlloc(0xDC), then ctor */
+Class869D8 *New_Class869D8(void); /* BMemPMgrAlloc(0xDC), then ctor */
 void Class869D8__Class869D8(Class869D8 *self);
-void Class869D8__InitDefaults(void);          /* +0x040; empty, reads no argument */
+void Class869D8__InitDefaults(void); /* +0x040; empty, reads no argument */
 void Class869D8__Update(Class869D8 *self);
 void func_8004D35C(void);
 void func_8004D364(void);

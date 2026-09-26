@@ -48,6 +48,7 @@ Class81940 *New_Class81940(void) {
     }
     return NULL;
 }
+
 /* slot +0x008 of gClass81940Methods (ctor) */
 void Class81940__Class81940(Class81940 *self) {
     GetActiveDataSourceMethods()->ctor((Class6D430 *)self);
@@ -63,11 +64,13 @@ void Class81940__Class81940(Class81940 *self) {
         self->bufferSize = 0xB358;
     }
 }
+
 /* slot +0x00C of gClass81940Methods (finalize) */
 void Class81940__Finalize(Class81940 *self) {
     self->methods->releaseDataBlock(self);
     GetActiveDataSourceMethods()->finalize((Class6D430 *)self);
 }
+
 /* slot +0x064 of gClass81940Methods (setFlag) */
 void Class81940__AdvanceLoadState(Class81940 *self) {
     if (self->unk2A == 9) {
@@ -86,6 +89,7 @@ void Class81940__AdvanceLoadState(Class81940 *self) {
     }
     GetActiveDataSourceMethods()->setFlag((Class6D430 *)self);
 }
+
 /* slot +0x074 of gClass81940Methods (cancelRequests) */
 void Class81940__CancelRequests(Class81940 *self) {
     GetActiveDataSourceMethods()->cancelRequests((Class6D430 *)self);
@@ -93,6 +97,7 @@ void Class81940__CancelRequests(Class81940 *self) {
     self->dataReady = 0;
     self->unk2A = 0;
 }
+
 /* slot +0x078 of gClass81940Methods: start streaming a file into the buffer */
 void Class81940__LoadHeader(Class81940 *self, char *name) {
     if (self->buffer != NULL && name != NULL) {
@@ -107,11 +112,13 @@ void Class81940__LoadHeader(Class81940 *self, char *name) {
         self->methods->read(self, self->buffer, 0xB358);
     }
 }
+
 void Class81940__ReleaseHeader(Class81940 *self) {
     self->methods->freeBuffer(self);
     self->headerReady = 0;
     self->ownerRate = -1;
 }
+
 /* slot +0x080 of gClass81940Methods: load the data block the header describes */
 s32 Class81940__LoadDataBlock(Class81940 *self) {
     s32 size;
@@ -132,6 +139,7 @@ s32 Class81940__LoadDataBlock(Class81940 *self) {
     self->methods->read(self, self->dataBuffer, size);
     return 1;
 }
+
 /* slot +0x084 of gClass81940Methods */
 void Class81940__ReleaseDataBlock(Class81940 *self) {
     self->dataReady = 0;
@@ -139,12 +147,13 @@ void Class81940__ReleaseDataBlock(Class81940 *self) {
         self->dataBuffer = BMemPMgrFree(self->dataBuffer);
     }
 }
+
 extern s32 D_8008A960;
 extern s32 gForcedWeeklyGroup;
 extern s32 gForcedVariant;
 extern u8 gWeeklyGroupTable[];
 extern u8 gRecordTable[];
-extern char *gSoundEffectDirPtr;  /* -> "SND\\SE" */
+extern char *gSoundEffectDirPtr; /* -> "SND\\SE" */
 extern const char sAsmkStreamPath[];
 extern s16 gStreamTypeToGroupTable[];
 extern s16 gRecordIndexTable[];
@@ -153,18 +162,22 @@ extern s16 gRecordIndexTable[];
 void Class81940__SetAutoLoadData(Class81940 *self, s32 value) {
     self->autoLoadData = value;
 }
+
 Class81940Methods *GetClass81940Methods(void) {
     return &gClass81940Methods;
 }
+
 s32 func_80048CF0(void) {
     return D_8008A960;
 }
+
 s32 SeedAndRandom(s32 seed, s32 unused) {
     if (seed != 0) {
         srand(seed);
     }
     return rand();
 }
+
 void SetPickOverrides(s32 a, s32 b) {
     if (a >= 0) {
         gForcedWeeklyGroup = a;
@@ -173,15 +186,18 @@ void SetPickOverrides(s32 a, s32 b) {
         gForcedVariant = b;
     }
 }
+
 void *GetRecordTable(s32 *out) {
     if (out != NULL) {
         *out = 0x230;
     }
     return gRecordTable;
 }
+
 void *GetWeeklyGroupTable(void) {
     return gWeeklyGroupTable;
 }
+
 s32 PickWeeklyGroup(s32 arg) {
     u32 r = (u32)SeedAndRandom(0, arg) % 7;
     s32 *table = GetWeeklyGroupTable();
@@ -195,12 +211,15 @@ s32 PickWeeklyGroup(s32 arg) {
     }
     return *entry;
 }
+
 char **GetSoundEffectDirRef(void) {
     return &gSoundEffectDirPtr;
 }
+
 char *GetSoundEffectDir(void) {
     return *GetSoundEffectDirRef();
 }
+
 Rec1C *GetRecordGroup(s32 index) {
     return &((Rec1C *)GetRecordTable(NULL))[gRecordIndexTable[index]];
 }
@@ -208,16 +227,19 @@ Rec1C *GetRecordGroup(s32 index) {
 Rec1C *GetRecordGroupAlias(s32 index) {
     return GetRecordGroup(index);
 }
+
 Rec1C *PickDailyVariant(s32 index, s32 arg1, s32 day) {
     s32 n = ((day - 1) % 40) / 10 + 1;
     s32 r = SeedAndRandom(0, arg1) % n;
     return &GetRecordGroupAlias(index)[r];
 }
+
 Rec1C *GetVariantBlock(s32 index) {
     return &GetRecordGroup(index)[4];
 }
+
 Rec1C *PickVariant(s32 index, s32 arg1) {
-    u32 r = (u32)SeedAndRandom(0, arg1) % 5;  /* arg1 only forwarded, like PickDailyVariant's */
+    u32 r = (u32)SeedAndRandom(0, arg1) % 5; /* arg1 only forwarded, like PickDailyVariant's */
     Rec1C *rec;
     if (index == 9) {
         if (r == 2) {
@@ -230,29 +252,35 @@ Rec1C *PickVariant(s32 index, s32 arg1) {
     rec = GetVariantBlock(index);
     return &rec[gForcedVariant != 0 ? gForcedVariant - 1 : r];
 }
+
 Rec1C *GetGridRecordBase(s32 index) {
     return &GetRecordGroup(index)[9];
 }
+
 Rec1C *GetGridRecordAt(s32 index, s32 sub) {
     return &GetGridRecordBase(index)[sub];
 }
+
 Rec1C *GetGridRecordXY(s32 index, s32 x, s32 y) {
     return GetGridRecordAt(index, x + GetStageGridDimensions(index)->columns * y);
 }
+
 const char *GetIntroStreamName(s32 *typeCodeOut) {
     if (typeCodeOut != NULL) {
         *typeCodeOut = 0x31;
     }
     return sAsmkStreamPath;
 }
+
 Rec1C *GetWeeklyStreamPool(s32 *countOut) {
     if (countOut != NULL) {
         *countOut = 0;
     }
     return &((Rec1C *)GetRecordTable(NULL))[0x230];
 }
+
 Rec1C *PickWeeklyStreamChannel(s32 *countOut, s32 arg1) {
-    u32 r = (u32)SeedAndRandom(0, arg1) % 7;  /* arg1 only forwarded, like PickDailyVariant's */
+    u32 r = (u32)SeedAndRandom(0, arg1) % 7; /* arg1 only forwarded, like PickDailyVariant's */
     s32 count;
     Rec1C *rec = GetWeeklyStreamPool(&count);
     if (countOut != NULL) {
@@ -260,12 +288,14 @@ Rec1C *PickWeeklyStreamChannel(s32 *countOut, s32 arg1) {
     }
     return &rec[r];
 }
+
 Rec1C *GetStreamPool2(s32 *countOut) {
     if (countOut != NULL) {
         *countOut = 7;
     }
     return &((Rec1C *)GetRecordTable(NULL))[0x237];
 }
+
 Rec1C *GetStreamChannelInit(s32 *countOut) {
     s32 count;
     Rec1C *rec = GetStreamPool2(&count);
@@ -274,12 +304,14 @@ Rec1C *GetStreamChannelInit(s32 *countOut) {
     }
     return rec;
 }
+
 Rec1C *GetStreamPool3(s32 *countOut) {
     if (countOut != NULL) {
         *countOut = 8;
     }
     return &((Rec1C *)GetRecordTable(NULL))[0x238];
 }
+
 Rec1C *GetStreamPool3Channel(s32 *countOut, s32 sub) {
     s32 count;
     Rec1C *rec = GetStreamPool3(&count);
@@ -288,6 +320,7 @@ Rec1C *GetStreamPool3Channel(s32 *countOut, s32 sub) {
     }
     return &rec[sub];
 }
+
 Rec1C *GetCinematicBank(s32 *countOut, s32 n) {
     Rec1C *rec = &((Rec1C *)GetRecordTable(NULL))[0x23E];
     if (countOut != NULL) {
@@ -295,6 +328,7 @@ Rec1C *GetCinematicBank(s32 *countOut, s32 n) {
     }
     return &rec[n * 6];
 }
+
 /* two s16 halves passed by value in one register */
 typedef struct RecPick {
     s16 group;
@@ -313,9 +347,11 @@ Rec1C *ResolveCinematicChannel(s32 *countOut, RecPick pick) {
     }
     return GetStreamPool3Channel(countOut, pick.sub);
 }
+
 s32 GetStreamGroupForType(s32 index) {
     return gStreamTypeToGroupTable[index];
 }
+
 Rec1C *GetGraphRoomStreamChannel(s32 *total, s32 n, s32 len) {
     s32 count;
     s32 i;

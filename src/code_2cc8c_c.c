@@ -33,13 +33,11 @@
 #include "LightRig.h"
 #include "FrameClock.h"
 
-s32 TaskCore__GetActiveSlotCount(TaskCore *self)
-{
+s32 TaskCore__GetActiveSlotCount(TaskCore *self) {
     return self->slotCounts[self->activeSlot];
 }
 
-TaskCoreMethods *Get_vtable_TaskCore(void)
-{
+TaskCoreMethods *Get_vtable_TaskCore(void) {
     return &gTaskCoreMethods;
 }
 
@@ -48,8 +46,7 @@ TaskCoreMethods *Get_vtable_TaskCore(void)
  * address. */
 extern u8 gDefaultStreamTaskInitData[];
 
-void *GetDefaultStreamTaskInitData(void)
-{
+void *GetDefaultStreamTaskInitData(void) {
     return gDefaultStreamTaskInitData;
 }
 
@@ -59,25 +56,25 @@ void *GetDefaultStreamTaskInitData(void)
  * (+0x044 in onTag1Notify). Their classes are not established; every call
  * passes the object alone. */
 typedef struct IntermediateBaseLinked IntermediateBaseLinked;
+
 typedef struct IntermediateBaseLinkedMethods {
     u8 pad000[0x044];
     void (*slot44)(IntermediateBaseLinked *self); /* +0x044 */
     void (*slot48)(IntermediateBaseLinked *self); /* +0x048 */
     void (*slot4C)(IntermediateBaseLinked *self); /* +0x04C */
 } IntermediateBaseLinkedMethods;
+
 struct IntermediateBaseLinked {
     IntermediateBaseLinkedMethods *methods; /* +0x000 */
 };
 
-void IntermediateBase__IntermediateBase(IntermediateBase *self)
-{
+void IntermediateBase__IntermediateBase(IntermediateBase *self) {
     Get_vtable_BasicClass()->ctor((BasicClass *)self);
     self->methods = Get_vtable_IntermediateBase();
     self->methods->resetCounters(self);
 }
 
-void IntermediateBase__OnNotify(IntermediateBase *self, BasicClass *sender, s32 event)
-{
+void IntermediateBase__OnNotify(IntermediateBase *self, BasicClass *sender, s32 event) {
     s32 header;
 
     Get_vtable_BasicClass()->onNotify((BasicClass *)self, sender, event);
@@ -91,14 +88,12 @@ void IntermediateBase__OnNotify(IntermediateBase *self, BasicClass *sender, s32 
     }
 }
 
-void IntermediateBase__ResetCounters(IntermediateBase *self)
-{
+void IntermediateBase__ResetCounters(IntermediateBase *self) {
     self->frameCounter = 0;
     self->state = 0;
 }
 
-void IntermediateBase__Init(IntermediateBase *self, IntermediateBaseInitArgs *args, s32 mode)
-{
+void IntermediateBase__Init(IntermediateBase *self, IntermediateBaseInitArgs *args, s32 mode) {
     IntermediateBaseMethods *methods;
     BasicClass *viewport;
 
@@ -134,8 +129,7 @@ void IntermediateBase__Init(IntermediateBase *self, IntermediateBaseInitArgs *ar
     }
 }
 
-void IntermediateBase__Deinit(IntermediateBase *self)
-{
+void IntermediateBase__Deinit(IntermediateBase *self) {
     IntermediateBaseMethods *methods;
     BasicClass *viewport;
 
@@ -161,8 +155,7 @@ void IntermediateBase__Deinit(IntermediateBase *self)
     }
 }
 
-void IntermediateBase__OnTag1Notify(IntermediateBase *self, BasicClass *sender, s32 event)
-{
+void IntermediateBase__OnTag1Notify(IntermediateBase *self, BasicClass *sender, s32 event) {
     IntermediateBaseLinked *obj4;
 
     if (event == 2) {
@@ -173,8 +166,7 @@ void IntermediateBase__OnTag1Notify(IntermediateBase *self, BasicClass *sender, 
     }
 }
 
-void IntermediateBase__IncrementFrameCounter(IntermediateBase *self)
-{
+void IntermediateBase__IncrementFrameCounter(IntermediateBase *self) {
     self->frameCounter++;
 }
 
@@ -183,8 +175,7 @@ void IntermediateBase__IncrementFrameCounter(IntermediateBase *self)
  * state above it: state -> $s0, self -> $s1).  The `__asm__("" ::: "memory")`
  * it carried after the methods load was retired in round 89: removing it
  * left the object byte-identical. */
-void IntermediateBase__SetState(IntermediateBase *self, s32 state)
-{
+void IntermediateBase__SetState(IntermediateBase *self, s32 state) {
     IntermediateBaseMethods *methods;
     void (*fn)(IntermediateBase *);
 
@@ -201,8 +192,7 @@ void IntermediateBase__SetState(IntermediateBase *self, s32 state)
     fn(self);
 }
 
-void IntermediateBase__OnState2(IntermediateBase *self)
-{
+void IntermediateBase__OnState2(IntermediateBase *self) {
     IntermediateBaseLinked *obj0;
 
     self->frameCounter = 0;
@@ -210,8 +200,7 @@ void IntermediateBase__OnState2(IntermediateBase *self)
     obj0->methods->slot48(obj0);
 }
 
-void IntermediateBase__OnState3(IntermediateBase *self)
-{
+void IntermediateBase__OnState3(IntermediateBase *self) {
     IntermediateBaseLinked *obj0;
 
     obj0 = (IntermediateBaseLinked *)self->initArgs->unk0;
@@ -219,13 +208,11 @@ void IntermediateBase__OnState3(IntermediateBase *self)
     self->frameCounter = 0;
 }
 
-IntermediateBaseMethods *Get_vtable_IntermediateBase(void)
-{
+IntermediateBaseMethods *Get_vtable_IntermediateBase(void) {
     return &gIntermediateBaseMethods;
 }
 
-Viewport *New_Viewport(void)
-{
+Viewport *New_Viewport(void) {
     Viewport *self;
 
     self = BMemPMgrAlloc(0xBC);
@@ -236,8 +223,7 @@ Viewport *New_Viewport(void)
     return NULL;
 }
 
-void Viewport__Viewport(Viewport *self)
-{
+void Viewport__Viewport(Viewport *self) {
     Class6B5CC *obj;
 
     Get_vtable_BasicClass()->ctor((BasicClass *)self);
@@ -251,8 +237,7 @@ void Viewport__Viewport(Viewport *self)
     self->methods->initDefaults(self);
 }
 
-void Viewport__Finalize(Viewport *self)
-{
+void Viewport__Finalize(Viewport *self) {
     self->methods->deinitOt(self);
     self->methods->detachViewChild(self);
     self->sceneRoot->methods->release(self->sceneRoot);
@@ -260,8 +245,7 @@ void Viewport__Finalize(Viewport *self)
     Get_vtable_BasicClass()->finalize((BasicClass *)self);
 }
 
-void Viewport__AddChild(Viewport *self, BasicClass *child)
-{
+void Viewport__AddChild(Viewport *self, BasicClass *child) {
     s32 header;
 
     Get_vtable_BasicClass()->addChild((BasicClass *)self, child);
@@ -274,8 +258,7 @@ void Viewport__AddChild(Viewport *self, BasicClass *child)
     }
 }
 
-void Viewport__RemoveChild(Viewport *self, BasicClass *child)
-{
+void Viewport__RemoveChild(Viewport *self, BasicClass *child) {
     s32 header;
 
     header = child->methods->header & 0xF;
@@ -291,8 +274,7 @@ void Viewport__RemoveChild(Viewport *self, BasicClass *child)
 /* Viewport's removeAllChildren override (+0x018 of gViewportMethods and of
  * gClass869D8Methods): clears the three child caches AddChild fills, then
  * the base. */
-void Viewport__RemoveAllChildren(Viewport *self)
-{
+void Viewport__RemoveAllChildren(Viewport *self) {
     self->refView.super = 0;
     self->viewNode = 0;
     self->drawSystem = NULL;

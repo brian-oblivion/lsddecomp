@@ -86,17 +86,17 @@ void Class876FC__InitByKind(Class876FC *self, Class6B5CC *parent, Vec3_d294 *pos
     }
 
     switch (state) {
-    case 0:
-        Class876FC__PlaceModelChildren(self, 0);
-        break;
-    case 2:
-        Class876FC__BuildRandomSprites(self, 0);
-        break;
-    case 3:
-        Class876FC__SpawnPlainSprites(self, 0);
-        break;
-    default:
-        break;
+        case 0:
+            Class876FC__PlaceModelChildren(self, 0);
+            break;
+        case 2:
+            Class876FC__BuildRandomSprites(self, 0);
+            break;
+        case 3:
+            Class876FC__SpawnPlainSprites(self, 0);
+            break;
+        default:
+            break;
     }
 }
 
@@ -113,17 +113,17 @@ void Class876FC__UpdateByKind(Class876FC *self, Vec3_d294 *pos) {
     self->methods->setTranslation(self, &local);
 
     switch (self->pendingExtra) {
-    case 0:
-        Class876FC__DriftModelChildren(self, pos);
-        break;
-    case 2:
-        NoOpIgnoreArgs(self, pos);
-        break;
-    case 3:
-        Class876FC__RandomizeSprites(self, pos);
-        break;
-    default:
-        break;
+        case 0:
+            Class876FC__DriftModelChildren(self, pos);
+            break;
+        case 2:
+            NoOpIgnoreArgs(self, pos);
+            break;
+        case 3:
+            Class876FC__RandomizeSprites(self, pos);
+            break;
+        default:
+            break;
     }
 }
 
@@ -132,17 +132,17 @@ void Class876FC__UpdateByKind(Class876FC *self, Vec3_d294 *pos) {
  * identical class_3bb8c_o.c functions). */
 void Class876FC__ReleaseByKind(Class876FC *self) {
     switch (self->pendingExtra) {
-    case 0:
-        Class876FC__ReleaseModelChildren(self);
-        break;
-    case 2:
-        Class876FC__ReleaseSprites(self);
-        break;
-    case 3:
-        Class876FC__ReleaseSpritesB(self);
-        break;
-    default:
-        break;
+        case 0:
+            Class876FC__ReleaseModelChildren(self);
+            break;
+        case 2:
+            Class876FC__ReleaseSprites(self);
+            break;
+        case 3:
+            Class876FC__ReleaseSpritesB(self);
+            break;
+        default:
+            break;
     }
 }
 
@@ -216,8 +216,7 @@ extern s32 gSpinRotStep[];
  * Matched round 75: the step is read straight from the table in the guard,
  * and the loop's pointer is taken again after the call -- CSE turns that
  * second &gModelChildDriftZ[idx] into retail's `move s4,s1`. */
-void Class876FC__DriftModelChildren(Class876FC *self)
-{
+void Class876FC__DriftModelChildren(Class876FC *self) {
     s32 idx;
     s32 accumOffset;
     s32 divq;
@@ -227,8 +226,7 @@ void Class876FC__DriftModelChildren(Class876FC *self)
     s32 *stepZ;
 
     idx = self->params.tableIndex;
-    if (self->params.modelChildLayout != 0 && gModelChildDriftZ[idx] != 0
-        && (u32) self->tick >= 0x1F5) {
+    if (self->params.modelChildLayout != 0 && gModelChildDriftZ[idx] != 0 && (u32)self->tick >= 0x1F5) {
         p = self->modelChildren;
         self->methods->updateRotation(self, 0, gSpinRotStep);
         i = 0;
@@ -246,12 +244,12 @@ void Class876FC__DriftModelChildren(Class876FC *self)
         divq = 24500 / gModelChildDriftZ[idx];
         modend = self->tick;
         if (divq >= 0) {
-            if ((u32) modend % (u32) divq == 0) {
+            if ((u32)modend % (u32)divq == 0) {
                 Class876FC__PlaceModelChildren(self, 1);
             }
         } else {
             u32 adivq = ~divq + 1;
-            if ((u32) modend % adivq == 0) {
+            if ((u32)modend % adivq == 0) {
                 Class876FC__PlaceModelChildren(self, 1);
             }
         }

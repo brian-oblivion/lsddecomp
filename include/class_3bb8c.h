@@ -62,11 +62,20 @@ extern TargetSpec866E8 *sFootprintResultPtrTable[7];
  * all three and clears `flg` (+0x000).
  */
 struct Unk14Obj {
-    s32 unk0;                         /* +0x000, GsCOORDINATE2.flg */
+    s32 unk0; /* +0x000, GsCOORDINATE2.flg */
     u8 pad4[0x18 - 0x4];
-    union { s32 w; u16 h; } unk18;   /* +0x018, tx */
-    s32 unk1C;                        /* +0x01C, ty */
-    union { s32 w; u16 h; } unk20;    /* +0x020, tz */
+
+    union {
+        s32 w;
+        u16 h;
+    } unk18; /* +0x018, tx */
+
+    s32 unk1C; /* +0x01C, ty */
+
+    union {
+        s32 w;
+        u16 h;
+    } unk20; /* +0x020, tz */
 };
 
 /*
@@ -79,10 +88,10 @@ struct Unk14Obj {
  * five words are read/written only as the opaque whole-struct copy.
  */
 struct QueryTemplate866E8 {
-    s32 unk0[5];                    /* +0x000..+0x010, opaque (untouched by Class866E8__ComputeFootprintFromRotation) */
-    s32 unk14;                      /* +0x014, Class866E8__ComputeFootprintFromRotation: zeroed before the call, then an in/out arg to ApplyMatrixLV */
-    s32 unk18;                      /* +0x018, Class866E8__ComputeFootprintFromRotation: zeroed before the call */
-    s32 unk1C;                      /* +0x01C, Class866E8__ComputeFootprintFromRotation: set to self->gridSpan before the call */
+    s32 unk0[5]; /* +0x000..+0x010, opaque (untouched by Class866E8__ComputeFootprintFromRotation) */
+    s32 unk14; /* +0x014, Class866E8__ComputeFootprintFromRotation: zeroed before the call, then an in/out arg to ApplyMatrixLV */
+    s32 unk18; /* +0x018, Class866E8__ComputeFootprintFromRotation: zeroed before the call */
+    s32 unk1C; /* +0x01C, Class866E8__ComputeFootprintFromRotation: set to self->gridSpan before the call */
 };
 
 extern QueryTemplate866E8 D_8008E98C;
@@ -93,7 +102,8 @@ extern QueryTemplate866E8 D_8008E98C;
  * SAME address (`&desc.unk14` passed twice) -- confirmed against the raw
  * disassembly (`$a1`/`$a2` both `sp+0x54`). */
 extern void RotMatrix(void *arg0, QueryTemplate866E8 *arg1);
-extern void ApplyMatrixLV(QueryTemplate866E8 *arg0, s32 *arg1, s32 *arg2); /* arity-ok: this IS the callee's real signature (Sony libgte, 0x80015618 reads $a0 matrix / $a1 in / $a2 out); include/code_d294.h's unprototyped copy is round 19's deliberate frame-sizing shape, not a claim about arity */
+extern void ApplyMatrixLV(QueryTemplate866E8 *arg0, s32 *arg1,
+                          s32 *arg2); /* arity-ok: this IS the callee's real signature (Sony libgte, 0x80015618 reads $a0 matrix / $a1 in / $a2 out); include/code_d294.h's unprototyped copy is round 19's deliberate frame-sizing shape, not a claim about arity */
 
 /* The four static EntryDesc866E8 entries (0xC apart) configureRateEntry
  * picks for `rateEntry` by (rate > 0, flag != 0). */
@@ -264,9 +274,9 @@ extern void FormatNumberIntoBuffer(s32 arg0);
  */
 typedef struct SaveBlock678_3bb8c_c {
     u8 pad00[0x00C];
-    s32 unkC;                                   /* +0x00C, compared against 9999999 */
+    s32 unkC; /* +0x00C, compared against 9999999 */
     u8 pad10[0x2F4 - 0x010];
-    s32 unk2F4;                                 /* +0x2F4, zero-checked when unkC > 9999999 */
+    s32 unk2F4; /* +0x2F4, zero-checked when unkC > 9999999 */
 } SaveBlock678_3bb8c_c;
 
 /*
@@ -276,7 +286,7 @@ typedef struct SaveBlock678_3bb8c_c {
  */
 typedef struct Ctx678_3bb8c_c {
     u8 pad00[0x0BC];
-    SaveBlock678_3bb8c_c *target;               /* +0x0BC */
+    SaveBlock678_3bb8c_c *target; /* +0x0BC */
 } Ctx678_3bb8c_c;
 
 /*
@@ -285,10 +295,8 @@ typedef struct Ctx678_3bb8c_c {
  */
 typedef struct Result678_3bb8c_c {
     u8 pad00[0x018];
-    s32 *block;                                 /* +0x018, CheckSaveScoreFlag writes block[1] */
+    s32 *block; /* +0x018, CheckSaveScoreFlag writes block[1] */
 } Result678_3bb8c_c;
-
-
 
 /* TaskObjF (gTaskObjFMethods, class_3bb8c_d/e/f/g) is include/TaskObjF.h
  * (track 4, round 89). */
@@ -330,8 +338,8 @@ typedef struct DeviceName866E8 {
     s8 b0, b1, b2, b3, b4, b5;
 } DeviceName866E8;
 
-extern DeviceName866E8 gMcDevicePath1;   /* "bu10:" */
-extern DeviceName866E8 gMcDevicePath0;   /* "bu00:" */
+extern DeviceName866E8 gMcDevicePath1; /* "bu10:" */
+extern DeviceName866E8 gMcDevicePath0; /* "bu00:" */
 
 /* This project's own strcat (matched elsewhere, src/code_171e0.c) --
  * BuildMemcardPath is this unit's only caller. */
@@ -354,7 +362,7 @@ extern char *strcat(char *dest, char *src);
  *
  * CopyMemcardIconTemplate stays: it is game code, defined in src/class_3bb8c_g.c
  * (MATCHED round 45, 60/60 words -- was gp_rel-blocked, resolved round 42). */
-extern s32 CopyMemcardIconTemplate(s32 arg0, s32 arg1);                /* TaskObjF__WriteMemcardSaveFile's own retry-loop bracket; also called with (arg,0) after the retry loop gives up */
+extern s32 CopyMemcardIconTemplate(s32 arg0, s32 arg1); /* TaskObjF__WriteMemcardSaveFile's own retry-loop bracket; also called with (arg,0) after the retry loop gives up */
 
 /* ObjM (gObjMMethods, class_3bb8c_k/_l/_m) is include/ObjM.h (track 4,
  * round 89). The views `ObjM` (class_3bb8c_m) and `Obj87034_3bb8c_l`, and
@@ -368,14 +376,14 @@ extern s32 CopyMemcardIconTemplate(s32 arg0, s32 arg1);                /* TaskOb
  * (D_80087424, which ApplyStyleConfig fills and RegisterStyleConfig
  * returns). What ObjM's methods do with each word: */
 typedef struct Unk50Struct_3bb8c_l {
-    s32 unk0;      /* +0x000, SetupSceneStyle: the Class866E8's setChildParams `dirs` */
-    s32 unk4;      /* +0x004, SetupSceneStyle: setChildParams `colors` */
-    s32 unk8;      /* +0x008, SetupSceneStyle: the Class866E8's setAmbientColor rgb (a pointer) */
-    void *unkC;    /* +0x00C, a colour: the viewport's setClearColor (EnterStyleSession); the TimBlockSrc's fadeAllEntries when unk14 is 2 (PollTimBlockLoad); StyleM's D_800872C4 entry */
+    s32 unk0;   /* +0x000, SetupSceneStyle: the Class866E8's setChildParams `dirs` */
+    s32 unk4;   /* +0x004, SetupSceneStyle: setChildParams `colors` */
+    s32 unk8;   /* +0x008, SetupSceneStyle: the Class866E8's setAmbientColor rgb (a pointer) */
+    void *unkC; /* +0x00C, a colour: the viewport's setClearColor (EnterStyleSession); the TimBlockSrc's fadeAllEntries when unk14 is 2 (PollTimBlockLoad); StyleM's D_800872C4 entry */
     u8 pad10[0x014 - 0x010];
-    s32 unk14;     /* +0x014, selects unkC or unk18: PollTimBlockLoad against 2, EnterStyleSession against 1 */
-    void *unk18;   /* +0x018, a colour: setFarColor, or fadeAllEntries, when unk14 does not select unkC */
-    s32 unk1C;     /* +0x01C, EnterStyleSession: the viewport's setFogNear (StyleM: a D_8008730C value) */
+    s32 unk14; /* +0x014, selects unkC or unk18: PollTimBlockLoad against 2, EnterStyleSession against 1 */
+    void *unk18; /* +0x018, a colour: setFarColor, or fadeAllEntries, when unk14 does not select unkC */
+    s32 unk1C; /* +0x01C, EnterStyleSession: the viewport's setFogNear (StyleM: a D_8008730C value) */
 } Unk50Struct_3bb8c_l;
 
 /* ObjM__OnRegistrantEvent's own two helpers -- MATCHED, src/code_39094.c.
@@ -412,6 +420,7 @@ extern void StyleTeardown(void);
  * until round 88; they are `TimImage *` now (include/TimImage.h). */
 typedef struct ChildObj86ED0 ChildObj86ED0;
 typedef struct ChildMethods86ED0 ChildMethods86ED0;
+
 struct ChildMethods86ED0 {
     u8 pad000[0x004];
     void *(*release)(ChildObj86ED0 *self); /* +0x004, TextEntry__ReleaseCardResources */
@@ -424,8 +433,10 @@ struct ChildMethods86ED0 {
     u8 pad07C[0x0B8 - 0x07C];
     void (*slotB8)(ChildObj86ED0 *self, void *arg1); /* +0x0B8, TextEntry__LoadCardResources, textRow */
     u8 pad0BC[0x0C4 - 0x0BC];
-    void (*slotC4)(ChildObj86ED0 *self, s32 arg1, s32 arg2); /* +0x0C4, TextEntry__SetCharAt, textRow: (char, pos); TextRow__SetCellAt */
+    void (*slotC4)(ChildObj86ED0 *self, s32 arg1,
+                   s32 arg2); /* +0x0C4, TextEntry__SetCharAt, textRow: (char, pos); TextRow__SetCellAt */
 };
+
 struct ChildObj86ED0 {
     ChildMethods86ED0 *methods; /* +0x000 */
 };
@@ -435,6 +446,7 @@ struct ChildObj86ED0 {
  * Field meaning beyond that slot is unestablished. */
 typedef struct TargetObj86ED0 TargetObj86ED0;
 typedef struct TargetMethods86ED0 TargetMethods86ED0;
+
 struct TargetMethods86ED0 {
     u8 pad000[0x080];
     /* +0x080, TextEntry__NotifyTarget: `self->methods->slot80(self, arg1, 0x60, 0x60)`.
@@ -447,6 +459,7 @@ struct TargetMethods86ED0 {
      * unchanged (same register, no move instruction). */
     void (*slot80)(TargetObj86ED0 *self, s32 arg1, s32 arg2, s32 arg3);
 };
+
 struct TargetObj86ED0 {
     TargetMethods86ED0 *methods; /* +0x000 */
 };

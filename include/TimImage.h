@@ -53,7 +53,7 @@ typedef struct GsIMAGE {
 } GsIMAGE;
 
 struct TimImageMethods {
-    CLASS6D430_SLOTS(TimImage, (TimImage *self, char *name));
+    CLASS6D430_SLOTS(TimImage, (TimImage * self, char *name));
     /* +0x078 is Class6D430's slot78; this table's occupant is
      * TimImage__Upload (TimImageUploadFn). */
     /* +0x07C..+0x094: empty bodies (TimImage__func_8003B5AC..5DC); no C
@@ -65,16 +65,16 @@ struct TimImageMethods {
     /* +0x08C */ void (*slot8C)(void);
     /* +0x090 */ void (*slot90)(void);
     /* +0x094 */ void (*slot94)(void);
-    /* +0x098 */ void (*slot98)(TimImage *self);                   /* TimImage__func_8003B5E4: unk48 = 1 */
+    /* +0x098 */ void (*slot98)(TimImage *self); /* TimImage__func_8003B5E4: unk48 = 1 */
     /* +0x09C */ void (*getTimInfo)(TimImage *self, GsIMAGE *tim); /* TimImage__GetTimInfo */
-};                                   /* 39 slots, 0xA0 bytes */
+}; /* 39 slots, 0xA0 bytes */
 
 struct TimImage {
     CLASS6D430_FIELDS(TimImageMethods); /* buffer: the TIM file */
-    /* +0x02C */ GsIMAGE tim;       /* TimImage__Upload describes the TIM here; a Sprite's reset keeps its address */
-    /* +0x048 */ s32 unk48;         /* 0 from the ctor, 1 from slot98; no reader found */
-    /* +0x04C */ s32 clutBase;      /* 0 from the ctor; TimArraySrc__BuildImages: from the CLUT row GsGetTimInfo reports */
-};                                   /* 0x50 bytes: New_TimImage */
+    /* +0x02C */ GsIMAGE tim; /* TimImage__Upload describes the TIM here; a Sprite's reset keeps its address */
+    /* +0x048 */ s32 unk48; /* 0 from the ctor, 1 from slot98; no reader found */
+    /* +0x04C */ s32 clutBase; /* 0 from the ctor; TimArraySrc__BuildImages: from the CLUT row GsGetTimInfo reports */
+}; /* 0x50 bytes: New_TimImage */
 
 typedef void (*TimImageUploadFn)(TimImage *self);
 

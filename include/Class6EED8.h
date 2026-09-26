@@ -33,13 +33,13 @@ typedef struct Class6EED8 Class6EED8;
 typedef struct Class6EED8Methods Class6EED8Methods;
 
 struct Class6EED8Methods {
-    CLASS6D430_SLOTS(Class6EED8, (Class6EED8 *self, char *name));
+    CLASS6D430_SLOTS(Class6EED8, (Class6EED8 * self, char *name));
 };
 
 struct Class6EED8 {
     CLASS6D430_FIELDS(Class6EED8Methods);
     /* +0x02C */ s32 loaded; /* 1 once setFlag reports the requested file loaded; cleared by the ctor and Class6EED8__Finalize */
-};                           /* 0x30 bytes: New_Class6EED8 */
+}; /* 0x30 bytes: New_Class6EED8 */
 
 extern Class6EED8Methods gClass6EED8Methods;
 extern Class6EED8Methods *GetClass6EED8Methods(void);

@@ -15,11 +15,10 @@
 
 #define CDDRIVER_SIZE 0x2C /* New_CdDriver's BMemPMgrAlloc request: Class6D430's size */
 
-extern void *BMemPMgrAlloc(s32 size);              /* Psy-Q allocator, matched signature used project-wide */
-extern void InitCdDrive(void);                        /* code_179d8_q: one-shot CdSetDebug(0) + CdlSetmode double speed */
+extern void *BMemPMgrAlloc(s32 size); /* Psy-Q allocator, matched signature used project-wide */
+extern void InitCdDrive(void); /* code_179d8_q: one-shot CdSetDebug(0) + CdlSetmode double speed */
 
-CdDriver *New_CdDriver(void)
-{
+CdDriver *New_CdDriver(void) {
     CdDriver *self;
 
     self = BMemPMgrAlloc(CDDRIVER_SIZE);
@@ -30,20 +29,16 @@ CdDriver *New_CdDriver(void)
     return NULL;
 }
 
-void CdDriver__CdDriver(CdDriver *self)
-{
+void CdDriver__CdDriver(CdDriver *self) {
     GetClass6D430Methods()->ctor((Class6D430 *)self);
     self->methods = GetCdDriverMethods();
     self->inQueueDispatch = 0;
     InitCdDrive();
 }
 
-void CdDriver__Finalize(CdDriver *self)
-{
+void CdDriver__Finalize(CdDriver *self) {
     self->methods->cancelRequests(self);
     self->methods->freeBuffer(self);
 }
 
-void CdDriver__NoOpSlot40(void)
-{
-}
+void CdDriver__NoOpSlot40(void) {}

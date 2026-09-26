@@ -272,7 +272,9 @@ extern u8 D_8008AC1C[];
 
 void Entity__MoodCue74(Entity *this, EntityMoodHandlerArg *out) {
     if (this->moodTimer == 0) {
-        ((DreamSys *)this->peer)->viewport->methods->setClearColor(((DreamSys *)this->peer)->viewport, (ViewportRgb *)D_8008AC1C);
+        ((DreamSys *)this->peer)
+            ->viewport->methods->setClearColor(((DreamSys *)this->peer)->viewport,
+                                               (ViewportRgb *)D_8008AC1C);
         this->state = rand() % 3;
         if (((DreamSys *)this->peer)->coord2->tz < 0x262) {
             this->state = 0;
@@ -287,7 +289,9 @@ void Entity__MoodCue74(Entity *this, EntityMoodHandlerArg *out) {
         }
     } else {
         if ((u32)(this->moodTimer - 0x14) < 0x64) {
-            ((DreamSys *)this->peer)->methods->moveLocalZ((DreamSys *)this->peer, -((this->moodTimer - 0x13) * 0x20), (void *)1);
+            ((DreamSys *)this->peer)
+                ->methods->moveLocalZ((DreamSys *)this->peer, -((this->moodTimer - 0x13) * 0x20),
+                                      (void *)1);
             if (this->moodTimer == 0x55) {
                 ((DreamSys *)this->peer)->methods->setTickCallbacks((DreamSys *)this->peer, 1, 1);
             }
@@ -348,7 +352,8 @@ void Entity__MoodCue77(Entity *this, EntityMoodHandlerArg *out) {
         return;
     }
     if (this->state == 0) {
-        if (this->moodTimer == 0x3C || this->moodTimer == 0xD4 || this->moodTimer == 0x122 || this->moodTimer == 0x140) {
+        if (this->moodTimer == 0x3C || this->moodTimer == 0xD4 || this->moodTimer == 0x122 ||
+            this->moodTimer == 0x140) {
             this->methods->updateRotation(this, 0, ROTATION_YAW_PLUS90);
         }
         if (this->moodTimer == 0x18E) {
@@ -441,7 +446,6 @@ void Entity__MoodCue78(Entity *this, EntityMoodHandlerArg *out) {
         this->state = 1;
     }
 }
-
 
 extern u8 ROTATION_YAW_PLUS2[];
 
@@ -540,4 +544,3 @@ void Entity__MoodCue81(Entity *this, EntityMoodHandlerArg *out) {
         this->methods->moveLocalY(this, -0xC8, 0);
     }
 }
-

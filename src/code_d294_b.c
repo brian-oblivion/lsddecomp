@@ -140,24 +140,22 @@ void Class6B5CC__TransformAndNotifyParents(Class6B5CC *self, GenericCountList_d2
     self->notifyVerts = NULL;
 }
 
-void func_8001D6A4(void) {
-}
+void func_8001D6A4(void) {}
 
-void func_8001D6AC(void) {
-}
+void func_8001D6AC(void) {}
 
 /* a2 selects one of three behaviors: 2 or 3 dispatches through the vtable
  * (self->methods->slotA0), exactly 4 stores a1 into self->linkTarget, and
  * anything else (< 2 or > 4) is a no-op. */
 void Class6B5CC__DispatchLinkCommand(Class6B5CC *self, void *sender, s32 event) {
     switch (event) {
-    case 2:
-    case 3:
-        self->methods->tryAttachNearby(self);
-        break;
-    case 4:
-        self->linkTarget = sender;
-        break;
+        case 2:
+        case 3:
+            self->methods->tryAttachNearby(self);
+            break;
+        case 4:
+            self->linkTarget = sender;
+            break;
     }
 }
 
@@ -345,7 +343,6 @@ s32 Class6B5CC__CheckBoundsOverlap(Class6B5CC *self, void *arg1, Vec3S16_d294 *d
     return ret;
 }
 
-
 /* Tests the corner list against every model plane. Part 1 averages two
  * diagonal corner pairs into mid[0]/mid[1] and tests that segment against
  * each plane, setting bit i of self->hitMask on a hit; any hit returns at once.
@@ -358,7 +355,8 @@ s32 Class6B5CC__CheckBoundsOverlap(Class6B5CC *self, void *arg1, Vec3S16_d294 *d
  * `p`, `v` and `hi` as pointers. */
 extern s32 D_8008A838;
 
-s32 Class6B5CC__ClassifyAgainstPlanes(Class6B5CC *self, s32 *outFlag, Vec3S16_d294 *diff, AttachCornerList_d294b *list) {
+s32 Class6B5CC__ClassifyAgainstPlanes(Class6B5CC *self, s32 *outFlag, Vec3S16_d294 *diff,
+                                      AttachCornerList_d294b *list) {
     Vec3S16_d294 mid[2];
     Vec3S16_d294 *p;
     Vec3S16_d294 *hi;
@@ -392,7 +390,8 @@ s32 Class6B5CC__ClassifyAgainstPlanes(Class6B5CC *self, s32 *outFlag, Vec3S16_d2
     for (i = 0; i < count1; i++) {
         plane = (Sixteen6_d294 *)TmdModel__GetBoundsBuffer(self->model, i);
         if (ClipSegmentToBox(NULL, (BoundsBox_d294 *)plane, &mid[0], &mid[1])) {
-            if (TmdModel__RaycastFaces(self->model, &bigConst, (TmdVec3 *)diff, &outWord, (TmdVec3 *)&mid[0], (TmdVec3 *)&mid[1])) {
+            if (TmdModel__RaycastFaces(self->model, &bigConst, (TmdVec3 *)diff, &outWord,
+                                       (TmdVec3 *)&mid[0], (TmdVec3 *)&mid[1])) {
                 if (D_8008A838 == 0) {
                     self->hitMask |= 1 << i;
                 } else if (outWord >= 0x201) {
@@ -419,7 +418,8 @@ s32 Class6B5CC__ClassifyAgainstPlanes(Class6B5CC *self, s32 *outFlag, Vec3S16_d2
             for (m = 0; m < 4; m++) {
                 if (m == 1 || m == 2) {
                     if (ClipSegmentToBox(NULL, (BoundsBox_d294 *)plane, v, v + 4)) {
-                        if (TmdModel__RaycastFaces(self->model, &bigConst, (TmdVec3 *)diff, &outWord, (TmdVec3 *)v, (TmdVec3 *)(v + 4))) {
+                        if (TmdModel__RaycastFaces(self->model, &bigConst, (TmdVec3 *)diff,
+                                                   &outWord, (TmdVec3 *)v, (TmdVec3 *)(v + 4))) {
                             if (outWord >= 0x201) {
                                 self->hitMask |= 1 << i;
                                 *outFlag |= 1 << k;
@@ -572,8 +572,7 @@ void BisectSegmentToBox(Vec3S16_d294 *out, BoundsBox_d294 *box, Vec3S16_d294 *ne
     }
 }
 
-void func_8001E49C(void) {
-}
+void func_8001E49C(void) {}
 
 /* Walks node's parent refs. For each run it finds the next entry whose class
  * kind (low nibble of its method table's first word) is 4. If that entry's

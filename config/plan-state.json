@@ -1264,7 +1264,9 @@
       "status": "auto"
     },
     "7": {
-      "checklist": {},
+      "checklist": {
+        "format": true
+      },
       "reason": "",
       "status": "auto",
       "units_done": {}

@@ -98,11 +98,9 @@ void Viewport__SetProjection(Viewport *self, s32 h) {
     self->projH = h;
 }
 
-void func_8003EA6C(void) {
-}
+void func_8003EA6C(void) {}
 
-void func_8003EA74(void) {
-}
+void func_8003EA74(void) {}
 
 void Viewport__SetLightMode(Viewport *self, s32 mode) {
     self->lightMode = mode;
@@ -131,7 +129,8 @@ extern void GsSetRefView2(void *arg0);
  * (addChild caches it as viewNode), sets the viewpoint, reference point and
  * twist (D_8008A8F4 when `twist` is NULL), then hands refView to
  * GsSetRefView2. */
-void Viewport__AttachViewChild(Viewport *self, BasicClass *node, Vec3_d294 *vp, Vec3_d294 *vr, WholeFrac_d294 *twist) {
+void Viewport__AttachViewChild(Viewport *self, BasicClass *node, Vec3_d294 *vp, Vec3_d294 *vr,
+                               WholeFrac_d294 *twist) {
     ViewportMethods *m = self->methods;
 
     if (self->viewNode != NULL) {
@@ -178,11 +177,9 @@ void Viewport__SetTwist(Viewport *self, WholeFrac_d294 *twist) {
     }
 }
 
-void func_8003ECC0(void) {
-}
+void func_8003ECC0(void) {}
 
-void func_8003ECC8(void) {
-}
+void func_8003ECC8(void) {}
 
 /* One-time allocation of this object's two ordering tables (see
  * docs/match-reports/Viewport__InitOt.md). Each half of the buffer is a
@@ -391,8 +388,7 @@ void Viewport__Flip(Viewport *self) {
 
     idx = self->otIndex;
     rawBytes = (u8 *)&self->clearColor;
-    GsSortClear(rawBytes[0], rawBytes[1], rawBytes[2],
-                self->ot[idx]);
+    GsSortClear(rawBytes[0], rawBytes[1], rawBytes[2], self->ot[idx]);
 
     idx = self->otIndex;
     GsDrawOt(self->ot[idx]);

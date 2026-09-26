@@ -30,7 +30,7 @@
 /* gActiveDataSource's two observed values are the header words of the two
  * sibling classes it selects between: gCdDriverMethods (the CD-ROM read driver,
  * code_179d8_q.c) and gVabDriverMethods (VabDriver, the SPU/VAB driver, include/VabDriver.h). */
-#define DATASOURCE_CD  0x13
+#define DATASOURCE_CD 0x13
 #define DATASOURCE_SPU 0x23
 
 Class6D3C8Methods *GetClass6D3C8Methods(void) {
@@ -103,8 +103,7 @@ void Class6D430__FreeBuffer(Class6D430 *this) {
     this->buffer = NULL;
 }
 
-void NoOp(void) {
-}
+void NoOp(void) {}
 
 void Class6D430__SetFlag(Class6D430 *this) {
     this->flags |= 1;
@@ -292,21 +291,19 @@ s32 RegisterFileTableEntries(void *arg0, s32 arg1) {
         SetFileTable(arg0);
         idx = GetFileTableCount();
         SetFileTableCount(idx + arg1);
-        return ResolveFileEntries((u8 *) arg0 + idx * 0x1C, arg1);
+        return ResolveFileEntries((u8 *)arg0 + idx * 0x1C, arg1);
     }
     return 1;
 }
 
 extern void *D_8008A854;
 
-void func_800270AC(void *value)
-{
-	D_8008A854 = value;
+void func_800270AC(void *value) {
+    D_8008A854 = value;
 }
 
-void *func_800270B8(void)
-{
-	return D_8008A854;
+void *func_800270B8(void) {
+    return D_8008A854;
 }
 
 char *BuildFileName(char *dest, char *arg1, char *arg2, char *arg3) {

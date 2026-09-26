@@ -27,26 +27,26 @@
 /* Bits CdDriver__RunRequestQueue ORs into `flags` when a request completes.
  * Bit 0 (1) is left a literal: it is also Class6D430__SetFlag's bit, and the
  * queue node field that sets it here (`unk4`) has no established meaning. */
-#define CD_FLAG_DONE           0x002 /* some request completed */
-#define CD_FLAG_NONE_PENDING   0x004 /* ... and pendingRequests reached 0 */
-#define CD_FLAG_OPEN_DONE      0x010
-#define CD_FLAG_CLOSE_DONE     0x020
-#define CD_FLAG_SEEK_DONE      0x040
-#define CD_FLAG_READ_DONE      0x080
+#define CD_FLAG_DONE 0x002         /* some request completed */
+#define CD_FLAG_NONE_PENDING 0x004 /* ... and pendingRequests reached 0 */
+#define CD_FLAG_OPEN_DONE 0x010
+#define CD_FLAG_CLOSE_DONE 0x020
+#define CD_FLAG_SEEK_DONE 0x040
+#define CD_FLAG_READ_DONE 0x080
 #define CD_FLAG_LOAD_FILE_DONE 0x200
 
 /* gCdState values StartCdOperation's second argument sets
  * (code_179d8_r.c): 1 issues a CdlSetloc seek, 7 issues a CdRead. */
-#define CD_STATE_IDLE   0
+#define CD_STATE_IDLE 0
 #define CD_STATE_SETLOC 1
-#define CD_STATE_READ   7
+#define CD_STATE_READ 7
 
 /* Psy-Q libcd values, spelled locally as code_179d8_q.c/_r.c do: CdlSetloc
  * (command 2), CdlModeSpeed (0x80, double speed) and CdSync's CdlDiskError
  * (5). */
-#define CD_CMD_SETLOC        2
+#define CD_CMD_SETLOC 2
 #define CD_MODE_DOUBLE_SPEED 0x80
-#define CD_SYNC_DISK_ERROR   5
+#define CD_SYNC_DISK_ERROR 5
 
 
 extern void CloseCdFile(CdDriver *self);
@@ -56,8 +56,7 @@ extern void LockCd(void);
  * method below and left literal), state is the first CD_STATE_*. */
 extern void StartCdOperation(s32 op, s32 state);
 extern void ResetCdStateMachine(void);
-extern void EnqueueCdRequest(CdDriver *arg0, s32 arg1, s32 arg2, s32 arg3,
-                           s32 arg4);
+extern void EnqueueCdRequest(CdDriver *arg0, s32 arg1, s32 arg2, s32 arg3, s32 arg4);
 extern void UnlockCd(void);
 
 extern void *FindCdFileEntry(char *arg0);
@@ -200,9 +199,7 @@ s32 CdDriver__Seek(CdDriver *self, u32 offset, s32 mode) {
     return 0;
 }
 
-void CdDriver__NoOpSlot50(void) {
-}
-
+void CdDriver__NoOpSlot50(void) {}
 
 extern void ReadCdFile(CdDriver *self, void *arg1, s32 arg2);
 extern s32 CdRead(s32 sectors, void *buf, s32 mode);
@@ -327,7 +324,6 @@ void CdDriver__LoadFile(CdDriver *self, char *name) {
 extern void FreeCdRequestNode(CdRequestNode *node);
 extern void *GetCdFileEntry(s32 index);
 
-
 void CdDriver__RunRequestQueue(void) {
     CdRequestNode *node;
     CdDriver *self;
@@ -341,22 +337,21 @@ void CdDriver__RunRequestQueue(void) {
         if (node->active == 0) {
             self->inQueueDispatch = 1;
             switch (op) {
-            case CD_OP_OPEN:
-                self->methods->open(self, GetCdFileEntry(node->fileIndex),
-                                  node->param0, node->param1);
-                break;
-            case CD_OP_CLOSE:
-                self->methods->close(self);
-                break;
-            case CD_OP_SEEK:
-                self->methods->seek(self, node->param0, node->param1);
-                break;
-            case CD_OP_READ:
-                self->methods->read(self, (void *)node->param0, node->param1);
-                break;
-            case CD_OP_LOAD_FILE:
-                self->methods->loadFile(self, GetCdFileEntry(node->fileIndex));
-                break;
+                case CD_OP_OPEN:
+                    self->methods->open(self, GetCdFileEntry(node->fileIndex), node->param0, node->param1);
+                    break;
+                case CD_OP_CLOSE:
+                    self->methods->close(self);
+                    break;
+                case CD_OP_SEEK:
+                    self->methods->seek(self, node->param0, node->param1);
+                    break;
+                case CD_OP_READ:
+                    self->methods->read(self, (void *)node->param0, node->param1);
+                    break;
+                case CD_OP_LOAD_FILE:
+                    self->methods->loadFile(self, GetCdFileEntry(node->fileIndex));
+                    break;
             }
             self->inQueueDispatch = 0;
         } else if (gCdIdle != 0) {
@@ -369,21 +364,21 @@ void CdDriver__RunRequestQueue(void) {
                 self->flags = *(volatile s32 *)&self->flags | CD_FLAG_NONE_PENDING;
             }
             switch (op) {
-            case CD_OP_OPEN:
-                self->flags |= CD_FLAG_OPEN_DONE;
-                break;
-            case CD_OP_CLOSE:
-                self->flags |= CD_FLAG_CLOSE_DONE;
-                break;
-            case CD_OP_SEEK:
-                self->flags |= CD_FLAG_SEEK_DONE;
-                break;
-            case CD_OP_READ:
-                self->flags |= CD_FLAG_READ_DONE;
-                break;
-            case CD_OP_LOAD_FILE:
-                self->flags |= CD_FLAG_LOAD_FILE_DONE;
-                break;
+                case CD_OP_OPEN:
+                    self->flags |= CD_FLAG_OPEN_DONE;
+                    break;
+                case CD_OP_CLOSE:
+                    self->flags |= CD_FLAG_CLOSE_DONE;
+                    break;
+                case CD_OP_SEEK:
+                    self->flags |= CD_FLAG_SEEK_DONE;
+                    break;
+                case CD_OP_READ:
+                    self->flags |= CD_FLAG_READ_DONE;
+                    break;
+                case CD_OP_LOAD_FILE:
+                    self->flags |= CD_FLAG_LOAD_FILE_DONE;
+                    break;
             }
             self->methods->setFlag(self);
             FreeCdRequestNode(node);

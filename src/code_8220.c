@@ -39,8 +39,7 @@ extern void free(void *ptr);
  * each declare their own, which is why no single declaration is shared. */
 extern void printf(const char *fmt, void *arg1, s32 arg2);
 
-void *BMemPMgrInit(s32 poolSize)
-{
+void *BMemPMgrInit(s32 poolSize) {
     BMemPMgr *pool;
 
     if ((u32)poolSize < 0x400) {
@@ -57,18 +56,15 @@ void *BMemPMgrInit(s32 poolSize)
     return pool;
 }
 
-void SetDefaultBMemPMgr(BMemPMgr *pool)
-{
+void SetDefaultBMemPMgr(BMemPMgr *pool) {
     gDefaultBMemPMgr = pool;
 }
 
-void FreeMem(void *ptr)
-{
+void FreeMem(void *ptr) {
     free(ptr);
 }
 
-void SetupBMemPMgrFreeList(BMemPMgr *pool)
-{
+void SetupBMemPMgrFreeList(BMemPMgr *pool) {
     BMemPMgr *mgr;
     BMemBlockHdr *header;
     u8 *end;
@@ -89,10 +85,12 @@ void SetupBMemPMgrFreeList(BMemPMgr *pool)
     *(u32 *)end = 0x80000000;
 }
 
+/* clang-format off */
 void *BMemPMgrAlloc(size, pool)
     s32 size;
     void *pool;
 {
+    /* clang-format on */
     BMemPMgr *mgr;
     BMemBlockHdr *cursor;
     BMemBlockHdr *result;
@@ -170,7 +168,8 @@ void *BMemPMgrAlloc(size, pool)
                             mgr->freeListStart = remainder;
                         }
                     }
-                    *(BMemBlockHdr **)((u8 *)remainder + (remainder->sizeAndFlags & 0xFFFFFFF) - 4) = remainder;
+                    *(BMemBlockHdr **)((u8 *)remainder + (remainder->sizeAndFlags & 0xFFFFFFF) - 4) =
+                        remainder;
                 }
                 break;
             }
@@ -181,10 +180,12 @@ void *BMemPMgrAlloc(size, pool)
     return result;
 }
 
+/* clang-format off */
 void *BMemPMgrFree(ptr, pool)
     void *ptr;
     void *pool;
 {
+    /* clang-format on */
     BMemPMgr *mgr;
     BMemBlockHdr *header;
     BMemBlockHdr *next;
@@ -203,8 +204,8 @@ void *BMemPMgrFree(ptr, pool)
             u32 freedSize = header->sizeAndFlags & 0xFFFFFFF;
 
             header = *(BMemBlockHdr **)((u8 *)ptr - 8);
-            header->sizeAndFlags = (header->sizeAndFlags & 0xF0000000)
-                | (freedSize + (header->sizeAndFlags & 0xFFFFFFF));
+            header->sizeAndFlags = (header->sizeAndFlags & 0xF0000000) |
+                                   (freedSize + (header->sizeAndFlags & 0xFFFFFFF));
             {
                 BMemBlockHdr *n = header->next;
                 BMemBlockHdr *p = header->prev;
@@ -229,7 +230,8 @@ void *BMemPMgrFree(ptr, pool)
         if (nextFree) {
             u32 nextSize = next->sizeAndFlags & 0xFFFFFFF;
 
-            header->sizeAndFlags = (header->sizeAndFlags & 0xF0000000) | (nextSize + (header->sizeAndFlags & 0xFFFFFFF));
+            header->sizeAndFlags = (header->sizeAndFlags & 0xF0000000) |
+                                   (nextSize + (header->sizeAndFlags & 0xFFFFFFF));
             {
                 BMemBlockHdr *n = next->next;
                 BMemBlockHdr *p = next->prev;
@@ -274,45 +276,38 @@ void *BMemPMgrFree(ptr, pool)
     return NULL;
 }
 
-void func_80017EA8(void) {
-}
+void func_80017EA8(void) {}
 
-void *BasicClass__Release(BasicClass *self)
-{
+void *BasicClass__Release(BasicClass *self) {
     self->methods->finalize(self);
     BMemPMgrFree(self);
     return NULL;
 }
 
-void BasicClass__BasicClass(BasicClass *self)
-{
+void BasicClass__BasicClass(BasicClass *self) {
     self->methods = Get_vtable_BasicClass();
     self->parentRefs = NULL;
     self->children = NULL;
 }
 
-void BasicClass__Finalize(BasicClass *self)
-{
+void BasicClass__Finalize(BasicClass *self) {
     self->methods->notifyParents(self, 1);
     self->methods->removeAllChildren(self);
     self->methods->clearParentRefs(self);
 }
 
-void BasicClass__AddChild(BasicClass *self, BasicClass *child)
-{
+void BasicClass__AddChild(BasicClass *self, BasicClass *child) {
     if (PushBasicClassListNode(&self->children, child)) {
         child->methods->addParentRef(child, self);
     }
 }
 
-void BasicClass__RemoveChild(BasicClass *self, BasicClass *child)
-{
+void BasicClass__RemoveChild(BasicClass *self, BasicClass *child) {
     RemoveBasicClassListNode(&self->children, child);
     child->methods->removeParentRef(child, self);
 }
 
-void BasicClass__RemoveAllChildren(BasicClass *self)
-{
+void BasicClass__RemoveAllChildren(BasicClass *self) {
     BasicClass *child;
     BasicClass **childPtr;
     BasicClassListNode *cursor;
@@ -326,40 +321,34 @@ void BasicClass__RemoveAllChildren(BasicClass *self)
     }
 }
 
-void BasicClass__GetNextChild(BasicClass *self, BasicClass **outChild, BasicClassListNode **cursor)
-{
+void BasicClass__GetNextChild(BasicClass *self, BasicClass **outChild, BasicClassListNode **cursor) {
     if (*outChild == NULL) {
         *cursor = self->children;
     }
     GetNextBasicClass(outChild, cursor);
 }
 
-s32 BasicClass__AddParentRef(BasicClass *self, BasicClass *parent)
-{
+s32 BasicClass__AddParentRef(BasicClass *self, BasicClass *parent) {
     return PushBasicClassListNode(&self->parentRefs, parent);
 }
 
-void BasicClass__RemoveParentRef(BasicClass *self, BasicClass *parent)
-{
+void BasicClass__RemoveParentRef(BasicClass *self, BasicClass *parent) {
     RemoveBasicClassListNode(&self->parentRefs, parent);
 }
 
-void BasicClass__ClearParentRefs(BasicClass *self)
-{
+void BasicClass__ClearParentRefs(BasicClass *self) {
     FreeBasicClassList(&self->parentRefs);
     self->parentRefs = NULL;
 }
 
-void BasicClass__GetNextParentRef(BasicClass *self, BasicClass **outParent, BasicClassListNode **cursor)
-{
+void BasicClass__GetNextParentRef(BasicClass *self, BasicClass **outParent, BasicClassListNode **cursor) {
     if (*outParent == NULL) {
         *cursor = self->parentRefs;
     }
     GetNextBasicClass(outParent, cursor);
 }
 
-s32 PushBasicClassListNode(BasicClassListNode **head, BasicClass *value)
-{
+s32 PushBasicClassListNode(BasicClassListNode **head, BasicClass *value) {
     BasicClassListNode *node;
     BasicClassListNode *oldHead;
 
@@ -374,8 +363,7 @@ s32 PushBasicClassListNode(BasicClassListNode **head, BasicClass *value)
     return 0;
 }
 
-void RemoveBasicClassListNode(BasicClassListNode **head, BasicClass *value)
-{
+void RemoveBasicClassListNode(BasicClassListNode **head, BasicClass *value) {
     BasicClassListNode *prev;
     BasicClassListNode *node;
 

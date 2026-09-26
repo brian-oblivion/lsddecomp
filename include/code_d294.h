@@ -96,9 +96,10 @@ typedef struct Sixteen6_d294 {
  * C89 flexible array member isn't available). MEASURED: `count*48` is the
  * byte span from `&hdr` to the array's end, i.e. 8 corners per `count`. */
 typedef struct CornerList_d294 CornerList_d294;
+
 struct CornerList_d294 {
-    s32 count;         /* +0x000 */
-    Vec3S16_d294 hdr;  /* +0x004, corner[0]; corner[1..] follow at +0x00A */
+    s32 count;        /* +0x000 */
+    Vec3S16_d294 hdr; /* +0x004, corner[0]; corner[1..] follow at +0x00A */
 };
 
 extern void *BMemPMgrAlloc(s32 size);

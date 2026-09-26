@@ -105,12 +105,13 @@ void Entity__Reset(Entity *this) {
     this->methods->deactivate(this);
 }
 
-void Entity__AttachToParent(Entity *this, Class65650 *peer, void *companion, struct Class866E8 *parent, void *offset) {
+void Entity__AttachToParent(Entity *this, Class65650 *peer, void *companion,
+                            struct Class866E8 *parent, void *offset) {
     if (this->parent != 0) {
         return;
     }
-    ((Class65650AttachToParentFn)Get_vtable_Class65650()->attachToParent)((Class65650 *)this, peer, companion, parent,
-                                                                          offset);
+    ((Class65650AttachToParentFn)Get_vtable_Class65650()->attachToParent)((Class65650 *)this, peer,
+                                                                          companion, parent, offset);
     this->grid = parent;
     if (D_80089EA7[this->moodIndex * 0x10] != 0) {
         return;
@@ -180,6 +181,7 @@ void Entity__TickSoundCue(Entity *this) {
 }
 
 typedef struct EntityVec3 EntityVec3;
+
 struct EntityVec3 {
     s32 x;
     s32 y;
@@ -200,7 +202,8 @@ s32 Entity__IsNearTarget(Entity *this, void *pos, s32 arg2, s32 arg3) {
     } else {
         arg3 <<= 11;
     }
-    return ((DreamSys *)this->peer)->methods->projectPointAtDistance((DreamSys *)this->peer, 0, arg2 << 11, (s32 *)&local, arg3);
+    return ((DreamSys *)this->peer)
+        ->methods->projectPointAtDistance((DreamSys *)this->peer, 0, arg2 << 11, (s32 *)&local, arg3);
 }
 
 s32 Entity__DistanceToPeer(Entity *this, Class65650 *peer) {
@@ -283,16 +286,18 @@ void Entity__SetTargetReached(Entity *this, s32 arg1) {
 }
 
 typedef struct EntityMoodHandlerRow EntityMoodHandlerRow;
+
 struct EntityMoodHandlerRow {
     void *handler; /* +0x00 */
     u8 pad04[0x10 - 0x04];
 };
+
 extern EntityMoodHandlerRow gEntityMoodHandlerTable[];
 extern void InitSoundCueSet(void *sound, void *set, s32 tag, Entity *owner, void *callback);
 
 void Entity__StartSoundCue(Entity *this) {
     InitSoundCueSet(this->arg2, &this->soundCueSet, this->moodIndex + 1, this,
-                  gEntityMoodHandlerTable[this->moodIndex].handler);
+                    gEntityMoodHandlerTable[this->moodIndex].handler);
     ((EntityPlayTodFn)this->methods->playTod)(this);
     this->methods->enableTickCallback(this);
     this->moodTimer = 0;

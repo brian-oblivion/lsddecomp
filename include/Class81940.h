@@ -59,33 +59,33 @@ typedef struct Class81940Methods Class81940Methods;
 /* The start of the header block loadHeader reads into `buffer`. */
 typedef struct Class81940Header {
     /* +0x00 */ u16 unk0;
-    /* +0x02 */ u16 hasData;        /* zero: loadDataBlock returns 0 */
-    /* +0x04 */ s32 gridOffset;     /* Class866E8__LoadElementResources: the element's Class6D940 buffer is header + gridOffset */
-    /* +0x08 */ s32 gridSize;       /* ... and its LinkResource's data header + gridOffset + gridSize */
+    /* +0x02 */ u16 hasData; /* zero: loadDataBlock returns 0 */
+    /* +0x04 */ s32 gridOffset; /* Class866E8__LoadElementResources: the element's Class6D940 buffer is header + gridOffset */
+    /* +0x08 */ s32 gridSize; /* ... and its LinkResource's data header + gridOffset + gridSize */
     /* +0x0C */ u8 padC[0x10 - 0xC];
-    /* +0x10 */ u32 dataOffset;     /* file offset of the data block (seek mode 0) */
-    /* +0x14 */ s32 dataSize;       /* the data block's size: dataBuffer's allocation */
+    /* +0x10 */ u32 dataOffset; /* file offset of the data block (seek mode 0) */
+    /* +0x14 */ s32 dataSize;   /* the data block's size: dataBuffer's allocation */
 } Class81940Header;
 
 struct Class81940Methods {
-    CLASS6D430_SLOTS(Class81940, (Class81940 *self));
+    CLASS6D430_SLOTS(Class81940, (Class81940 * self));
     /* +0x078 is Class6D430's slot78; this table's occupant is
      * Class81940__LoadHeader (Class81940LoadHeaderFn). */
-    /* +0x07C */ void (*releaseHeader)(Class81940 *self);       /* Class81940__ReleaseHeader */
-    /* +0x080 */ s32 (*loadDataBlock)(Class81940 *self);        /* Class81940__LoadDataBlock: 1 when a read was started */
-    /* +0x084 */ void (*releaseDataBlock)(Class81940 *self);    /* Class81940__ReleaseDataBlock */
+    /* +0x07C */ void (*releaseHeader)(Class81940 *self); /* Class81940__ReleaseHeader */
+    /* +0x080 */ s32 (*loadDataBlock)(Class81940 *self); /* Class81940__LoadDataBlock: 1 when a read was started */
+    /* +0x084 */ void (*releaseDataBlock)(Class81940 *self); /* Class81940__ReleaseDataBlock */
     /* +0x088 */ void (*setAutoLoadData)(Class81940 *self, s32 value); /* Class81940__SetAutoLoadData */
-};                                   /* 34 slots, 0x8C bytes */
+}; /* 34 slots, 0x8C bytes */
 
 struct Class81940 {
     CLASS6D430_FIELDS(Class81940Methods); /* buffer: the 0xB358 header block (Class81940Header); unk2A is the load state: 0 idle, 9 header, 10 data block */
-    /* +0x02C */ s16 headerReady;   /* 1 when the header is read; Class866E8__OnNotifyTag1 sets 2 once consumed */
-    /* +0x02E */ s16 dataReady;     /* 1 when the data block is read; cleared by Class866E8__OnNotifyTag1 */
-    /* +0x030 */ s16 ownerRate;     /* the owner's: Class866E8__ApplyRateEntries' setup-entry rate; -1 from the ctor and ReleaseHeader */
-    /* +0x032 */ s16 ownerKey;      /* the owner's: Class866E8's element index; zeroed by the ctor */
-    /* +0x034 */ void *dataBuffer;  /* the data block, BMemPMgrAlloc(dataSize); freed by ReleaseDataBlock */
-    /* +0x038 */ s32 autoLoadData;  /* nonzero (the ctor's 1): the header's completion starts loadDataBlock */
-};                                   /* 0x3C bytes: New_Class81940 */
+    /* +0x02C */ s16 headerReady; /* 1 when the header is read; Class866E8__OnNotifyTag1 sets 2 once consumed */
+    /* +0x02E */ s16 dataReady; /* 1 when the data block is read; cleared by Class866E8__OnNotifyTag1 */
+    /* +0x030 */ s16 ownerRate; /* the owner's: Class866E8__ApplyRateEntries' setup-entry rate; -1 from the ctor and ReleaseHeader */
+    /* +0x032 */ s16 ownerKey;  /* the owner's: Class866E8's element index; zeroed by the ctor */
+    /* +0x034 */ void *dataBuffer; /* the data block, BMemPMgrAlloc(dataSize); freed by ReleaseDataBlock */
+    /* +0x038 */ s32 autoLoadData; /* nonzero (the ctor's 1): the header's completion starts loadDataBlock */
+}; /* 0x3C bytes: New_Class81940 */
 
 typedef void (*Class81940LoadHeaderFn)(Class81940 *self, char *name);
 typedef s32 (*Class81940LoadDataBlockNoArgFn)(void);

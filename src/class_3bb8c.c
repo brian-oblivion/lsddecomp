@@ -40,7 +40,8 @@
 #include "Class81940.h"
 #include "Class86AA0.h"
 
-s32 Class866E8__SetTargetAndBuildRates(Class866E8 *self, void *arg1, Class6B5CC *arg2, Descriptor10 *arg3) {
+s32 Class866E8__SetTargetAndBuildRates(Class866E8 *self, void *arg1, Class6B5CC *arg2,
+                                       Descriptor10 *arg3) {
     s32 stackBuf[3];
     s32 ret;
 
@@ -65,7 +66,8 @@ s32 Class866E8__ComputeCellOffsets(Class866E8 *self, void *arg1, void *arg2) {
  * attempts targeted the outBuf[0]/outBuf[2] STORE-vs-LOAD scheduling
  * directly and never touched this constant; the permuter found a
  * completely different axis. See docs/match-reports/ComputeCellWorldOffsets.md. */
-s32 ComputeCellWorldOffsets(s32 *arg0, s32 *outBuf, Unk68Struct *arg2, Unk54Struct *arg3, Descriptor10 *arg4) {
+s32 ComputeCellWorldOffsets(s32 *arg0, s32 *outBuf, Unk68Struct *arg2, Unk54Struct *arg3,
+                            Descriptor10 *arg4) {
     s32 idx;
     s32 factor;
     s32 sum;
@@ -125,7 +127,8 @@ s32 Class866E8__UpdateFootprintTracking(Class866E8 *self) {
     result = sFootprintResultRemap[key];
 
     if (self->config->unk4 == 0) {
-        self->methods->buildRateEntries(self, buf.unk28, (Unk54Struct *)&buf.unkC, sFootprintResultPtrTable[result]);
+        self->methods->buildRateEntries(self, buf.unk28, (Unk54Struct *)&buf.unkC,
+                                        sFootprintResultPtrTable[result]);
     }
 
     self->methods->refreshFootprint(self);
@@ -186,7 +189,8 @@ void Class866E8__BuildRateEntries(Class866E8 *self, s32 val, Unk54Struct *arg2, 
                     u14->unk20.w = arg2->unk8 - 0x5000;
                 }
                 e->cellParent->coord2->flg = 0;
-                Class866E8__ComputeRateEntry(self, &stackBuf[count], divisor, flag, val, savedResult, arg3[i].key);
+                Class866E8__ComputeRateEntry(self, &stackBuf[count], divisor, flag, val,
+                                             savedResult, arg3[i].key);
                 count++;
             }
         }
@@ -199,7 +203,6 @@ void Class866E8__BuildRateEntries(Class866E8 *self, s32 val, Unk54Struct *arg2, 
         self->methods->applyRateEntries(self, stackBuf, count);
     }
 }
-
 
 s32 Class866E8__ComputeRateFlags(Class866E8 *self, s32 val, s32 flag) {
     Unk68Struct *u;
@@ -248,8 +251,8 @@ s32 Class866E8__ComputeRateFlags(Class866E8 *self, s32 val, s32 flag) {
  * iterations without ever reaching the merged shape.
  * The `do {} while (0);` below is LOAD-BEARING: removing it drifts the
  * image. It was inherited with the near-miss body and is verified here. */
-s32 Class866E8__ComputeRateEntry(Class866E8 *self, SetupEntry866E8 *arg1, s32 divisor, s32 flag, s32 val, s32 savedResult, s32 key)
-{
+s32 Class866E8__ComputeRateEntry(Class866E8 *self, SetupEntry866E8 *arg1, s32 divisor, s32 flag,
+                                 s32 val, s32 savedResult, s32 key) {
     s32 mask = sRateKeyMask[key];
     s32 result;
 
@@ -280,7 +283,8 @@ s32 Class866E8__ComputeRateEntry(Class866E8 *self, SetupEntry866E8 *arg1, s32 di
     }
 
     arg1->ptr0 = self->valueFn(self->valueFnCtx, *(s32 *)((u8 *)arg1 + 4), 0, 0);
-    do {} while (0);
+    do {
+    } while (0);
     result = 1;
     goto storeKey;
 
@@ -291,7 +295,6 @@ storeKey:
     arg1->id = key;
     return result;
 }
-
 
 /* MATCH, round 73 (bravo): 105/105. Retail's `+4` walker is a
  * strength-reduced giv of the walked PARAMETER, not a second user
@@ -392,7 +395,7 @@ void Class866E8__OnNotifyTag1(Class866E8 *self, void *arg1, s32 mode) {
  * that class (round 89, LinkResource's unification did not retype it). */
 typedef struct LinkResEntry {
     u8 pad0[0x10];
-    s32 unk10;   /* +0x010 */
+    s32 unk10; /* +0x010 */
 } LinkResEntry;
 
 typedef struct BE54LoadReq {
@@ -590,7 +593,6 @@ s32 Class866E8__ComputeFootprintDescriptor(Class866E8 *self, Descriptor10Ext *ou
     }
     return 1;
 }
-
 
 void Class866E8__ComputeDivisorSplit(Class866E8 *self, u8 *out, s32 val) {
     out[0] = val % self->config->divisor;

@@ -1,0 +1,33 @@
+# House style (FINISHING-PLAN track 7). Written for clang-format 22; other
+# majors may format differently, so `make format` is judged on this one.
+# Never applied to include/psyq/ (Sony's headers stay as shipped).
+BasedOnStyle: LLVM
+Language: Cpp
+Standard: c++03
+IndentWidth: 4
+ContinuationIndentWidth: 4
+ColumnLimit: 100
+PenaltyExcessCharacter: 3
+UseTab: Never
+BreakBeforeBraces: Attach
+PointerAlignment: Right
+DerivePointerAlignment: false
+SeparateDefinitionBlocks: Always
+AllowShortFunctionsOnASingleLine: Empty
+AllowShortIfStatementsOnASingleLine: Never
+AllowShortLoopsOnASingleLine: false
+AllowShortBlocksOnASingleLine: Never
+AllowShortCaseLabelsOnASingleLine: false
+IndentCaseLabels: true
+AlignTrailingComments:
+  Kind: Always
+  OverEmptyLines: 0
+# Load-bearing: include order (common.h first, Sony's in SDK order).
+SortIncludes: Never
+IncludeBlocks: Preserve
+# Banners and report-style comments hold tables and derivations.
+ReflowComments: Never
+# __asm__ bodies and rodata strings stay exactly as written.
+BreakStringLiterals: false
+AlignEscapedNewlines: Left
+MaxEmptyLinesToKeep: 2

@@ -51,32 +51,32 @@ typedef struct CdDriver CdDriver;
 typedef struct CdDriverMethods CdDriverMethods;
 
 struct CdDriverMethods {
-    CLASS6D430_SLOTS(CdDriver, (CdDriver *self));
+    CLASS6D430_SLOTS(CdDriver, (CdDriver * self));
     /* The table is 29 slots and ends after +0x074 (Class6D430's slot78 is
      * the next table's header). */
 };
 
 struct CdDriver {
     CLASS6D430_FIELDS(CdDriverMethods);
-};                                   /* 0x2C bytes: New_CdDriver */
+}; /* 0x2C bytes: New_CdDriver */
 
 extern CdDriverMethods gCdDriverMethods;
 extern CdDriverMethods *GetCdDriverMethods(void);
 
 CdDriver *New_CdDriver(void);
-void CdDriver__CdDriver(CdDriver *self);                                /* +0x008 ctor */
-void CdDriver__Finalize(CdDriver *self);                                /* +0x00C finalize: cancelRequests, freeBuffer */
-void CdDriver__NoOpSlot40(void);                                        /* +0x040 slot40 */
-void CdDriver__Open(CdDriver *self, char *name, s32 arg2, s32 arg3);    /* +0x044 open */
-void CdDriver__Close(CdDriver *self);                                   /* +0x048 close */
-s32 CdDriver__Seek(CdDriver *self, u32 offset, s32 mode);               /* +0x04C seek */
-void CdDriver__NoOpSlot50(void);                                        /* +0x050 slot50 */
-s32 CdDriver__Read(CdDriver *self, void *buf, u32 size);                /* +0x054 read: returns 0 */
-void CdDriver__LoadFile(CdDriver *self, char *name);                    /* +0x058 loadFile */
-void CdDriver__RunRequestQueue(void);                                   /* +0x068 runRequestQueue */
-void CdDriver__RequestLoadFile(CdDriver *self, char *name);             /* +0x06C requestLoadFile */
-void CdDriver__StopService(void);                                       /* +0x070 stopService */
-void CdDriver__CancelRequests(CdDriver *self);                          /* +0x074 cancelRequests */
+void CdDriver__CdDriver(CdDriver *self); /* +0x008 ctor */
+void CdDriver__Finalize(CdDriver *self); /* +0x00C finalize: cancelRequests, freeBuffer */
+void CdDriver__NoOpSlot40(void);         /* +0x040 slot40 */
+void CdDriver__Open(CdDriver *self, char *name, s32 arg2, s32 arg3); /* +0x044 open */
+void CdDriver__Close(CdDriver *self);                                /* +0x048 close */
+s32 CdDriver__Seek(CdDriver *self, u32 offset, s32 mode);            /* +0x04C seek */
+void CdDriver__NoOpSlot50(void);                                     /* +0x050 slot50 */
+s32 CdDriver__Read(CdDriver *self, void *buf, u32 size);             /* +0x054 read: returns 0 */
+void CdDriver__LoadFile(CdDriver *self, char *name);                 /* +0x058 loadFile */
+void CdDriver__RunRequestQueue(void);                                /* +0x068 runRequestQueue */
+void CdDriver__RequestLoadFile(CdDriver *self, char *name);          /* +0x06C requestLoadFile */
+void CdDriver__StopService(void);                                    /* +0x070 stopService */
+void CdDriver__CancelRequests(CdDriver *self);                       /* +0x074 cancelRequests */
 
 /* One record of the file table: a name resolved once by ResolveFileEntries
  * (CdSearchFile on BuildCdFilePath(name)) and then reused as a seek target.
@@ -93,11 +93,11 @@ typedef struct CdFileEntry {
  * `active` on the head node, CdDriver__RunRequestQueue dispatches `op` back
  * to `owner`'s slot of the same name, FreeCdRequestNode unlinks and frees. */
 typedef struct CdRequestNode {
-    /* +0x00 */ s32 active;               /* set by StartCdOperation when the op starts */
-    /* +0x04 */ s32 unk4;                 /* zeroed at allocation; nonzero ORs flags bit 0 */
-    /* +0x08 */ s32 op;                   /* CD_OP_* */
-    /* +0x0C */ CdDriver *owner;          /* the requesting object (any Class6D430 client) */
-    /* +0x10 */ s32 fileIndex;            /* FindCdFileIndex's index, 0 if none */
+    /* +0x00 */ s32 active;      /* set by StartCdOperation when the op starts */
+    /* +0x04 */ s32 unk4;        /* zeroed at allocation; nonzero ORs flags bit 0 */
+    /* +0x08 */ s32 op;          /* CD_OP_* */
+    /* +0x0C */ CdDriver *owner; /* the requesting object (any Class6D430 client) */
+    /* +0x10 */ s32 fileIndex;   /* FindCdFileIndex's index, 0 if none */
     /* +0x14 */ s32 param0;
     /* +0x18 */ s32 param1;
     /* +0x1C */ struct CdRequestNode *prev;
@@ -106,16 +106,16 @@ typedef struct CdRequestNode {
 
 /* A queue node's `op`: EnqueueCdRequest's third argument, dispatched back by
  * CdDriver__RunRequestQueue to the owner's slot of the same name. */
-#define CD_OP_OPEN      2
-#define CD_OP_CLOSE     3
-#define CD_OP_SEEK      4
-#define CD_OP_READ      5
+#define CD_OP_OPEN 2
+#define CD_OP_CLOSE 3
+#define CD_OP_SEEK 4
+#define CD_OP_READ 5
 #define CD_OP_LOAD_FILE 7
 
 /* gCdTickStep: which of code_179d8_r.c's two state machines ServiceCdDriver
  * ticks. */
 #define CD_TICK_STATE_MACHINE 1 /* TickCdStateMachine */
-#define CD_TICK_LOAD_FILE     2 /* TickCdLoadFileStateMachine */
+#define CD_TICK_LOAD_FILE 2     /* TickCdLoadFileStateMachine */
 
 /* The module state. Every global here was declared in two or more of the
  * units above, with up to three different types; the types below are the
@@ -123,18 +123,18 @@ typedef struct CdRequestNode {
  * extern in that unit (track 4b, round 85). */
 extern s32 gCdAsyncEnabled;
 extern s32 D_8008A860;
-extern s32 gCdBusy;                     /* 0/1 */
-extern CdFileEntry *gFileTable;         /* SetFileTable */
-extern s32 gFileTableCount;             /* SetFileTableCount */
-extern s32 gCdIdle;                     /* 0/1 */
-extern s32 gCdOperation;                /* StartCdOperation's op, GetCdOperation's result */
-extern s32 gCdState;                    /* the state machine's phase */
-extern CdFileEntry *gCdSeekParam;       /* the state machines seek to &gCdSeekParam->pos */
-extern s32 gCdReadSectorCount;          /* CdRead sector count */
-extern void *gCdReadBuffer;             /* CdRead target buffer */
-extern CdFileEntry *gCdSavedSeekParam;  /* LoadFile's saved gCdSeekParam */
-extern CdRequestNode *gCdRequestQueue;  /* list head */
-extern s32 gCdTickStep;                 /* CD_TICK_* */
+extern s32 gCdBusy;                    /* 0/1 */
+extern CdFileEntry *gFileTable;        /* SetFileTable */
+extern s32 gFileTableCount;            /* SetFileTableCount */
+extern s32 gCdIdle;                    /* 0/1 */
+extern s32 gCdOperation;               /* StartCdOperation's op, GetCdOperation's result */
+extern s32 gCdState;                   /* the state machine's phase */
+extern CdFileEntry *gCdSeekParam;      /* the state machines seek to &gCdSeekParam->pos */
+extern s32 gCdReadSectorCount;         /* CdRead sector count */
+extern void *gCdReadBuffer;            /* CdRead target buffer */
+extern CdFileEntry *gCdSavedSeekParam; /* LoadFile's saved gCdSeekParam */
+extern CdRequestNode *gCdRequestQueue; /* list head */
+extern s32 gCdTickStep;                /* CD_TICK_* */
 extern s32 gCdUseVSyncCallback;
 
 #endif /* CDDRIVER_H */

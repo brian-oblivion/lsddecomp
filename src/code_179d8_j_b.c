@@ -72,18 +72,19 @@
  * this unit's own accessor touches is named; offsets are exact (read
  * from SsUtKeyOn's own lbu/lhu immediates), field names are not. */
 typedef struct {
-    u8 unk0;  /* +0x0 */
-    u8 unk1;  /* +0x1 */
-    u8 unk2;  /* +0x2 */
-    u8 unk3;  /* +0x3 */
-    u8 unk4;  /* +0x4 */
-    u8 unk5;  /* +0x5 */
-    u8 unk6;  /* +0x6 */
-    u8 unk7;  /* +0x7 */
+    u8 unk0; /* +0x0 */
+    u8 unk1; /* +0x1 */
+    u8 unk2; /* +0x2 */
+    u8 unk3; /* +0x3 */
+    u8 unk4; /* +0x4 */
+    u8 unk5; /* +0x5 */
+    u8 unk6; /* +0x6 */
+    u8 unk7; /* +0x7 */
     u8 pad8[0x16 - 0x8];
     u16 unk16; /* +0x16 */
     u8 pad18[0x20 - 0x18];
 } RecordE978;
+
 extern RecordE978 *D_8008E978;
 
 /* Base pointer for a table of 0x10-byte entries, indexed by a 0..0x17
@@ -96,6 +97,7 @@ typedef struct EntryDAD4 {
     s16 unk6; /* +0x6 -- read by SsUtKeyOff, entry index 25 only */
     u8 pad8[0x10 - 0x8];
 } EntryDAD4;
+
 extern EntryDAD4 *D_8006DAD4;
 
 /* Reentrancy lock, same identifier/type as the sibling reading in
@@ -127,6 +129,7 @@ typedef struct SlotE968 {
     u8 unk4; /* +0x4 */
     u8 pad5[0x10 - 0x5];
 } SlotE968;
+
 extern SlotE968 *D_8008E968;
 
 /* SsUtKeyOn's own scratch globals -- a "start channel" setup
@@ -184,12 +187,14 @@ typedef struct {
     u16 unk76;
     u8 pad78[0xAC - 0x78];
 } D800902E8Entry;
+
 extern D800902E8Entry *D_800902E8[];
 
 typedef struct {
     u8 pad0[0x18];
     u8 unk18; /* +0x18 */
 } ObjE970;
+
 extern ObjE970 *D_8008E970;
 
 extern s16 D_8008E8C0;
@@ -301,8 +306,7 @@ INCLUDE_ASM("asm/nonmatchings/code_179d8_j_b", SpuVmSetVol);
  * busy-lock guard's branch polarity, with the rest not re-characterised
  * since `--nop-at-expansion` closed the old length gap
  * (docs/match-reports/SsUtKeyOn.md). Hand-derived. */
-s32 SsUtKeyOn(s16 p0, s16 p1, s16 p2, s16 p3, u16 p4, s16 p5, s16 p6)
-{
+s32 SsUtKeyOn(s16 p0, s16 p1, s16 p2, s16 p3, u16 p4, s16 p5, s16 p6) {
     SlotE968 *slot;
     RecordE978 *rec;
     s32 result;
@@ -317,9 +321,9 @@ s32 SsUtKeyOn(s16 p0, s16 p1, s16 p2, s16 p3, u16 p4, s16 p5, s16 p6)
         goto fail;
     }
     D_8008EA22 = 0x21;
-    D_8008EA0E = (u8) p3;
-    D_8008EA0F = (u8) p4;
-    D_8008EA18 = (u8) p2;
+    D_8008EA0E = (u8)p3;
+    D_8008EA0F = (u8)p4;
+    D_8008EA18 = (u8)p2;
     if (p5 == p6) {
         D_8008EA11 = 0x40;
         D_8008EA10 = p5;
@@ -348,43 +352,43 @@ s32 SsUtKeyOn(s16 p0, s16 p1, s16 p2, s16 p3, u16 p4, s16 p5, s16 p6)
     D_8008EA1E = rec->unk6;
     D_8008EA1F = rec->unk7;
 
-    if ((s16) note == 0) {
+    if ((s16)note == 0) {
         goto fail;
     }
-    result = (s32)(u8) SpuVmAlloc();
-    if ((u8) result == D_8008E9D0) {
+    result = (s32)(u8)SpuVmAlloc();
+    if ((u8)result == D_8008E9D0) {
         goto fail;
     }
     __asm__("");
-    D_8008EA26 = (u8) result;
+    D_8008EA26 = (u8)result;
     __asm__("");
-    _svm_voice[(u8) result].unk0E = 0x21;
+    _svm_voice[(u8)result].unk0E = 0x21;
     __asm__("");
-    _svm_voice[(u8) result].unk16 = p0;
+    _svm_voice[(u8)result].unk16 = p0;
     __asm__("");
-    _svm_voice[(u8) result].unk12 = p1;
+    _svm_voice[(u8)result].unk12 = p1;
     __asm__("");
-    _svm_voice[(u8) result].unk10 = D_8008EA13;
+    _svm_voice[(u8)result].unk10 = D_8008EA13;
     __asm__("");
-    _svm_voice[(u8) result].unk00 = D_8008EA24;
+    _svm_voice[(u8)result].unk00 = D_8008EA24;
     __asm__("");
     pending18 = D_8008EA18;
-    _svm_voice[(u8) result].unk0C = p3;
-    _svm_voice[(u8) result].unk1B = 1;
+    _svm_voice[(u8)result].unk0C = p3;
+    _svm_voice[(u8)result].unk1B = 1;
     __asm__("");
-    _svm_voice[(u8) result].unk02 = 0;
+    _svm_voice[(u8)result].unk02 = 0;
     __asm__("");
-    _svm_voice[(u8) result].unk14 = pending18;
+    _svm_voice[(u8)result].unk14 = pending18;
 
     SpuVmDoAllocate();
-    if ((s16) D_8008EA24 == 0xFF) {
-        vmNoiseOn((u8) result);
+    if ((s16)D_8008EA24 == 0xFF) {
+        vmNoiseOn((u8)result);
     } else {
-        s32 ret = note2pitch2((u16) p3, p4);
-        SpuVmKeyOnNow(1, (u16) ret);
+        s32 ret = note2pitch2((u16)p3, p4);
+        SpuVmKeyOnNow(1, (u16)ret);
     }
     _snd_ev_flag = 0;
-    return (u8) result;
+    return (u8)result;
 
 fail:
     _snd_ev_flag = 0;
@@ -395,8 +399,7 @@ fail_nolock:
 INCLUDE_ASM("asm/nonmatchings/code_179d8_j_b", SsUtKeyOn);
 #endif
 
-s32 SsUtKeyOff(s16 idx, s16 p1, s16 p2, s16 p3, s16 p4)
-{
+s32 SsUtKeyOff(s16 idx, s16 p1, s16 p2, s16 p3, s16 p4) {
     u16 chan;
     u32 mask0;
     u16 mask1;
@@ -405,18 +408,16 @@ s32 SsUtKeyOff(s16 idx, s16 p1, s16 p2, s16 p3, s16 p4)
         goto fail_nolock;
     }
     _snd_ev_flag = 1;
-    if ((u16) idx >= 0x18) {
+    if ((u16)idx >= 0x18) {
         goto fail;
     }
-    if (_svm_voice[idx].unk16 != p1
-     || _svm_voice[idx].unk12 != p2
-     || _svm_voice[idx].unk14 != p3
-     || _svm_voice[idx].unk0C != p4) {
+    if (_svm_voice[idx].unk16 != p1 || _svm_voice[idx].unk12 != p2 || _svm_voice[idx].unk14 != p3 ||
+        _svm_voice[idx].unk0C != p4) {
         goto fail;
     }
     if (_svm_voice[idx].unk00 == 0xFF) {
-        _svm_voice[(u8) idx].unk1B = 0;
-        _svm_voice[(u8) idx].unk04 = 0;
+        _svm_voice[(u8)idx].unk1B = 0;
+        _svm_voice[(u8)idx].unk04 = 0;
         D_8006DAD4[25].unk4 = 0;
         D_8006DAD4[25].unk6 = 0;
     } else {
@@ -452,8 +453,7 @@ fail_nolock:
  * flip; the 5-word gap is not re-characterised since
  * `--nop-at-expansion` closed 11 of the old 16
  * (docs/match-reports/SsUtKeyOnV.md). Hand-derived. */
-s32 SsUtKeyOnV(s16 idx, s16 p0, s16 p1, s16 p2, u16 p3, u16 p4, s16 p5, s16 p6)
-{
+s32 SsUtKeyOnV(s16 idx, s16 p0, s16 p1, s16 p2, u16 p3, u16 p4, s16 p5, s16 p6) {
     RecordE978 *rec;
     u16 note;
     u8 pending18;
@@ -462,16 +462,16 @@ s32 SsUtKeyOnV(s16 idx, s16 p0, s16 p1, s16 p2, u16 p3, u16 p4, s16 p5, s16 p6)
         return -1;
     }
     _snd_ev_flag = 1;
-    if ((u16) idx >= 0x18) {
+    if ((u16)idx >= 0x18) {
         goto fail;
     }
     if (SpuVmVSetUp(p0, p1) != 0) {
         goto fail;
     }
     D_8008EA22 = 0x21;
-    D_8008EA0E = (u8) p3;
-    D_8008EA0F = (u8) p4;
-    D_8008EA18 = (u8) p2;
+    D_8008EA0E = (u8)p3;
+    D_8008EA0F = (u8)p4;
+    D_8008EA18 = (u8)p2;
     if (p5 == p6) {
         D_8008EA11 = 0x40;
         D_8008EA10 = p5;
@@ -499,7 +499,7 @@ s32 SsUtKeyOnV(s16 idx, s16 p0, s16 p1, s16 p2, u16 p3, u16 p4, s16 p5, s16 p6)
     D_8008EA1E = rec->unk6;
     D_8008EA1F = rec->unk7;
 
-    if ((s16) note == 0) {
+    if ((s16)note == 0) {
         goto fail;
     }
     __asm__("");
@@ -523,11 +523,11 @@ s32 SsUtKeyOnV(s16 idx, s16 p0, s16 p1, s16 p2, u16 p3, u16 p4, s16 p5, s16 p6)
     __asm__("");
     _svm_voice[idx].unk14 = pending18;
     SpuVmDoAllocate();
-    if ((s16) D_8008EA24 == 0xFF) {
-        vmNoiseOn((u8) idx);
+    if ((s16)D_8008EA24 == 0xFF) {
+        vmNoiseOn((u8)idx);
     } else {
         s32 ret = note2pitch2(p3, p4);
-        SpuVmKeyOnNow(1, (u16) ret);
+        SpuVmKeyOnNow(1, (u16)ret);
     }
     _snd_ev_flag = 0;
     return idx;
@@ -551,8 +551,7 @@ INCLUDE_ASM("asm/nonmatchings/code_179d8_j_b", SsUtKeyOnV);
  * released BEFORE the mask block rather than after it (retail's
  * `sw zero, _snd_ev_flag` sits at 0x80031950, between the D_8008E228 load and
  * the first `or`). See docs/match-reports/SsUtKeyOffV.md. */
-s32 SsUtKeyOffV(s16 idx)
-{
+s32 SsUtKeyOffV(s16 idx) {
     u16 chan;
     u32 mask0;
     u16 mask1;
@@ -561,7 +560,7 @@ s32 SsUtKeyOffV(s16 idx)
         goto fail_nolock;
     }
     _snd_ev_flag = 1;
-    if ((u16) idx >= 0x18) {
+    if ((u16)idx >= 0x18) {
         goto fail;
     }
     D_8008EA26 = idx;

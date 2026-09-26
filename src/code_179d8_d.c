@@ -103,10 +103,10 @@ extern void *BMemPMgrAlloc(s32 size);
  * `linkResource`'s getModel (+0x080): with four arguments, because retail
  * keeps `placement` in $a3 across the call (the round-76 match). The
  * occupant reads only (self, index); a function-pointer cast, no code. */
-typedef s32 (*Class6D940GetModelFn)(LinkResource *self, s32 model, s32 cell, Class6D940Placement *placement);
+typedef s32 (*Class6D940GetModelFn)(LinkResource *self, s32 model, s32 cell,
+                                    Class6D940Placement *placement);
 
-Class6D940 *New_Class6D940(char *name)
-{
+Class6D940 *New_Class6D940(char *name) {
     Class6D940 *self;
     Class6D940Methods *table;
 
@@ -119,8 +119,7 @@ Class6D940 *New_Class6D940(char *name)
     return NULL;
 }
 
-void Class6D940__Class6D940(Class6D940 *self, char *name)
-{
+void Class6D940__Class6D940(Class6D940 *self, char *name) {
     GetActiveDataSourceMethods()->ctor((Class6D430 *)self);
     self->methods = GetClass6D940Methods();
     self->linkResource = NULL;
@@ -130,19 +129,16 @@ void Class6D940__Class6D940(Class6D940 *self, char *name)
     }
 }
 
-void Class6D940__Finalize(Class6D940 *self)
-{
+void Class6D940__Finalize(Class6D940 *self) {
     GetActiveDataSourceMethods()->finalize((Class6D430 *)self);
 }
 
-void Class6D940__SetFlag(Class6D940 *self)
-{
+void Class6D940__SetFlag(Class6D940 *self) {
     self->loaded = 1;
     GetActiveDataSourceMethods()->setFlag((Class6D430 *)self);
 }
 
-s32 Class6D940__ResolveEntry(Class6D940 *self, Class6D940Placement *placement, s32 cell)
-{
+s32 Class6D940__ResolveEntry(Class6D940 *self, Class6D940Placement *placement, s32 cell) {
     Class6D940Record *rec;
     LinkResource *link;
     s32 row;
@@ -177,38 +173,28 @@ s32 Class6D940__ResolveEntry(Class6D940 *self, Class6D940Placement *placement, s
     return 0;
 }
 
-
-Class6D940Methods *GetClass6D940Methods(void)
-{
+Class6D940Methods *GetClass6D940Methods(void) {
     return &D_8006D940;
 }
 
-s32 func_8002C3B8(void)
-{
+s32 func_8002C3B8(void) {
     return 0;
 }
 
-void VabDriver__VabDriver(void) {
-}
+void VabDriver__VabDriver(void) {}
 
-void VabDriver__Destroy(void) {
-}
+void VabDriver__Destroy(void) {}
 
-void VabDriver__NoOpSlot40(void)
-{
+void VabDriver__NoOpSlot40(void) {
     char buf[0x40];
 }
 
-void VabDriver__Open(void)
-{
+void VabDriver__Open(void) {
     char buf[0x40];
 }
 
-void VabDriver__Close(void) {
-}
+void VabDriver__Close(void) {}
 
-void VabDriver__Seek(void) {
-}
+void VabDriver__Seek(void) {}
 
-void VabDriver__NoOpSlot50(void) {
-}
+void VabDriver__NoOpSlot50(void) {}

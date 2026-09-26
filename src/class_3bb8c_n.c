@@ -60,7 +60,7 @@ extern s32 gStyleDecorObj;
 
 void StyleFlushDecoration(void) {
     if (gStyleDecorColor != 0) {
-        ((BoxFill *) gStyleDecorObj)->methods->release((BoxFill *) gStyleDecorObj);
+        ((BoxFill *)gStyleDecorObj)->methods->release((BoxFill *)gStyleDecorObj);
         gStyleDecorColor = 0;
     }
 }
@@ -95,16 +95,16 @@ void *PickStyleFallbackConfig(void) {
     divisor = D_800873D8[kind];
     remainder = sum % divisor;
     D_8008AC84 = remainder;
-    result = (s8 *) D_800873C8[kind] + remainder * 4;
+    result = (s8 *)D_800873C8[kind] + remainder * 4;
     if (kind == 0) {
         b3 = result[3];
-        gStyleFlushColor = (s32) (D_800872C4 + b3 * 3);
+        gStyleFlushColor = (s32)(D_800872C4 + b3 * 3);
         b2 = result[2];
         tab = D_8008726C;
         if (b2 != 0x12) {
             tab = D_80087234;
         }
-        gStyleColorTable = (s32) tab;
+        gStyleColorTable = (s32)tab;
         if (remainder < 4) {
             gStyleDecorVariant = 1;
         } else if (remainder < 6) {
@@ -123,10 +123,12 @@ extern s32 gStyleTargetObj;
 
 typedef struct ObjSlotAC ObjSlotAC;
 typedef struct ObjSlotACMethods ObjSlotACMethods;
+
 struct ObjSlotACMethods {
     u8 padAC[0xAC];
     void *(*slotAC)(ObjSlotAC *self); /* +0x0AC */
 };
+
 struct ObjSlotAC {
     ObjSlotACMethods *methods; /* +0x000 */
 };
@@ -141,6 +143,7 @@ struct ObjSlotAC {
  * it.  Written as two scalar stores, neither reload appears and the body is
  * several words short.  Round 61; see docs/match-reports/StyleBuildDecorSet.md. */
 typedef struct PairXY PairXY;
+
 struct PairXY {
     s32 x; /* +0x000 */
     s32 y; /* +0x004 */
@@ -164,34 +167,36 @@ void StyleBuildDecorSet(void) {
     if (gStyleDecorVariant == 0) {
         return;
     }
-    paramA = *(PairXY *) &gStyleDecorPosAX;
+    paramA = *(PairXY *)&gStyleDecorPosAX;
     if (gStyleDecorVariant == 2) {
         paramA.y += 0x1E;
     }
-    paramB = *(PairXY *) &gStyleDecorPosBX;
-    gStyleDecorSlots[0] = New_BoxFill(&paramB, (void *) gStyleColorTable, 0x1FFF);
+    paramB = *(PairXY *)&gStyleDecorPosBX;
+    gStyleDecorSlots[0] = New_BoxFill(&paramB, (void *)gStyleColorTable, 0x1FFF);
     for (i = 1; i < 0x12; i++) {
-        obj = New_BoxFill(&paramB, (void *) (gStyleColorTable + i * 3), 0x1FFF);
+        obj = New_BoxFill(&paramB, (void *)(gStyleColorTable + i * 3), 0x1FFF);
         gStyleDecorSlots[i] = obj;
-        ((BoxFillAttachToParentFn)((BoxFill *) obj)->methods->attachToParent)(
-            obj, gStyleDecorSlots[0], (Pair32E99C *) &paramA);
+        ((BoxFillAttachToParentFn)((BoxFill *)obj)->methods->attachToParent)(obj, gStyleDecorSlots[0],
+                                                                             (Pair32E99C *)&paramA);
         paramA.y += 3;
         paramB.y -= 7;
     }
 
-    self2 = *(ObjSlotAC **) (gStyleTargetObj + 0xC);
+    self2 = *(ObjSlotAC **)(gStyleTargetObj + 0xC);
     result = self2->methods->slotAC(self2);
-    ((BoxFillAttachToParentFn)((BoxFill *) gStyleDecorSlots[0])->methods->attachToParent)(
-        gStyleDecorSlots[0], result, (Pair32E99C *) &paramA);
+    ((BoxFillAttachToParentFn)((BoxFill *)gStyleDecorSlots[0])->methods->attachToParent)(
+        gStyleDecorSlots[0], result, (Pair32E99C *)&paramA);
 }
 
 
 typedef struct ObjAC7CSub ObjAC7CSub;
 typedef struct ObjAC7CSubMethods ObjAC7CSubMethods;
+
 struct ObjAC7CSubMethods {
     u8 pad64[0x64];
     void (*slot64)(ObjAC7CSub *self, void *arg1); /* +0x064 */
 };
+
 struct ObjAC7CSub {
     ObjAC7CSubMethods *methods; /* +0x000 */
     u8 pad4[0x18 - 0x4];
@@ -202,11 +207,13 @@ struct ObjAC7CSub {
 
 typedef struct ObjSlotB8B8 ObjSlotB8B8;
 typedef struct ObjSlotB8B8Methods ObjSlotB8B8Methods;
+
 struct ObjSlotB8B8Methods {
     u8 padB8[0xB8];
     void (*slotB8)(ObjSlotB8B8 *self, s32 arg1, void *arg2); /* +0x0B8 */
-    void (*slotBC)(ObjSlotB8B8 *self, void *arg1); /* +0x0BC */
+    void (*slotBC)(ObjSlotB8B8 *self, void *arg1);           /* +0x0BC */
 };
+
 struct ObjSlotB8B8 {
     ObjSlotB8B8Methods *methods; /* +0x000 */
 };
@@ -230,13 +237,13 @@ void StyleUpdateDecorSet(void) {
     if (gStyleDecorVariant == 0) {
         return;
     }
-    self = *(ObjAC7CSub **) (gStyleTargetObj + 0xC);
+    self = *(ObjAC7CSub **)(gStyleTargetObj + 0xC);
     delta = self->field18 - self->field24;
     shift = (delta / 600) * 3;
     if (shift <= 0) {
         return;
     }
-    pos = *(PairXY *) &gStyleDecorPosAX;
+    pos = *(PairXY *)&gStyleDecorPosAX;
     i = 0;
     if (gStyleDecorVariant == 2) {
         pos.y += 0x1E;
@@ -245,17 +252,17 @@ void StyleUpdateDecorSet(void) {
     srcOfs = 0;
     pos.y += shift * 3;
     do {
-        AdjustRgbByDelta(rgb, (u8 *) (srcOfs + gStyleColorTable), shift);
-        obj = (ObjSlotB8B8 *) *wp;
+        AdjustRgbByDelta(rgb, (u8 *)(srcOfs + gStyleColorTable), shift);
+        obj = (ObjSlotB8B8 *)*wp;
         obj->methods->slotB8(obj, 1, rgb);
-        obj = (ObjSlotB8B8 *) *wp;
+        obj = (ObjSlotB8B8 *)*wp;
         i++;
         srcOfs += 3;
         obj->methods->slotBC(obj, &pos);
         pos.y += 3;
         wp++;
     } while (i < 0x12);
-    AdjustRgbByDelta(rgb, (u8 *) gStyleFlushColor, shift);
+    AdjustRgbByDelta(rgb, (u8 *)gStyleFlushColor, shift);
     self->methods->slot64(self, rgb);
 }
 
@@ -297,7 +304,8 @@ void StyleBuildEffectSlots(Vec3_d294 *arg0) {
         return;
     }
     base = gStyleTargetObj;
-    Actor__func_56f5c(gStyleVariant, (void *) *(s32 *) (base + 4), *(s32 *) (base + 8), *(s32 *) (base + 0xC));
+    Actor__func_56f5c(gStyleVariant, (void *)*(s32 *)(base + 4), *(s32 *)(base + 8),
+                      *(s32 *)(base + 0xC));
     val = D_80087324[rand() & 3];
     count = (gStyleVariant == 2) ? 0x10 - val : 0;
     gStyleEffectSlotCount = val + count;
@@ -357,19 +365,21 @@ void StyleReleaseEffectSlots(void) {
  * only ever address-taken carries no evidence about its own declared
  * type). */
 typedef struct StyleCueEntryView StyleCueEntryView;
+
 struct StyleCueEntryView {
     u8 pad0[0x6];
     s8 countSign; /* +0x006 */
 };
 
 typedef struct StyleCueSlot StyleCueSlot;
+
 struct StyleCueSlot {
     StyleCueEntryView *entry; /* +0x000 */
-    s32 posX; /* +0x004 */
+    s32 posX;                 /* +0x004 */
     u8 pad8[0x4];
-    s32 posZ; /* +0x00C */
+    s32 posZ;     /* +0x00C */
     s32 lastDist; /* +0x010 */
-    s32 cueSet; /* +0x014 */
+    s32 cueSet;   /* +0x014 */
 };
 
 extern s32 FlushStyleCue(StyleCueSlot *arg0);
@@ -384,7 +394,7 @@ void StyleTeardown(void) {
     StyleReleaseDecorSet();
     StyleReleaseEffectSlots();
     for (i = 0; i < 2; i++) {
-        gStyleCueSlots[i] = (StyleCueSlot *) FlushStyleCue(gStyleCueSlots[i]);
+        gStyleCueSlots[i] = (StyleCueSlot *)FlushStyleCue(gStyleCueSlots[i]);
     }
     if (gStyleCueSelf != 0) {
         gStyleCueSelf = 0;
@@ -410,8 +420,8 @@ Class876FC **StyleFillEffectKind0(Class876FC **arg0, s32 arg1, Vec3_d294 *arg2) 
     void (*fp)(void *, void *);
 
     D_8008E0BC = rand() % 7;
-    D_8008E0B4 = (u8 *) D_800871C8 + ((u32) rand() % 5) * 12;
-    t3 = (u32) rand() % 5;
+    D_8008E0B4 = (u8 *)D_800871C8 + ((u32)rand() % 5) * 12;
+    t3 = (u32)rand() % 5;
     if (t3 != 0) {
         t3 = D_80087328[t3];
     }
@@ -420,8 +430,8 @@ Class876FC **StyleFillEffectKind0(Class876FC **arg0, s32 arg1, Vec3_d294 *arg2) 
         fp = SetupStyleSpawnParamsA;
     }
     for (i = 0; i < arg1; i++) {
-        fp(arg2, (void *) t3);
-        *arg0 = New_Class876FC(0, (Class876FCParams *)&D_8008E0A4, (Class6B5CC *) gStyleCueSelf, arg2);
+        fp(arg2, (void *)t3);
+        *arg0 = New_Class876FC(0, (Class876FCParams *)&D_8008E0A4, (Class6B5CC *)gStyleCueSelf, arg2);
         arg0++;
     }
     return arg0;
@@ -437,8 +447,8 @@ Class876FC **StyleFillEffectKind1(Class876FC **arg0, s32 arg1, Vec3_d294 *arg2) 
     val = D_80087330;
     D_8008E0B4 = D_80087204;
     for (i = 0; i < arg1; i++) {
-        SetupStyleSpawnParamsA(arg2, (void *) val);
-        *arg0 = New_Class876FC(1, (Class876FCParams *)&D_8008E0A4, (Class6B5CC *) gStyleCueSelf, arg2);
+        SetupStyleSpawnParamsA(arg2, (void *)val);
+        *arg0 = New_Class876FC(1, (Class876FCParams *)&D_8008E0A4, (Class6B5CC *)gStyleCueSelf, arg2);
         arg0++;
     }
     return arg0;
@@ -472,12 +482,12 @@ Class876FC **StyleFillEffectKind3(Class876FC **arg0, Vec3_d294 *arg1) {
     s32 *p;
     PtrBoxK3 *q;
 
-    SetupStyleSpawnParamsA(arg1, (void *) D_80087330);
-    if (gStyleDecorVariant != 0 && gStyleColorTable == (s32) D_8008726C) {
+    SetupStyleSpawnParamsA(arg1, (void *)D_80087330);
+    if (gStyleDecorVariant != 0 && gStyleColorTable == (s32)D_8008726C) {
         D_8008E0A4 = 0xFFFF5000;
         D_8008E0A8 = -0x2000;
         D_8008E0AC = 0;
-        D_8008E0C0[0] = (s32) (D_8008721C + 3);
+        D_8008E0C0[0] = (s32)(D_8008721C + 3);
     } else {
         p = &D_8008E0AC;
         if (*p > 0) {
@@ -486,11 +496,11 @@ Class876FC **StyleFillEffectKind3(Class876FC **arg0, Vec3_d294 *arg1) {
         if (*p < -0x7800) {
             *p = -0x7800;
         }
-        D_8008E0C0[0] = (s32) (D_8008721C + ((u32) rand() % 3) * 3);
+        D_8008E0C0[0] = (s32)(D_8008721C + ((u32)rand() % 3) * 3);
     }
-    q = (PtrBoxK3 *) &D_8008E0B0;
+    q = (PtrBoxK3 *)&D_8008E0B0;
     q->p = D_80087174;
-    *arg0 = New_Class876FC(3, (Class876FCParams *)((u8 *) q - 0xC), (Class6B5CC *) gStyleCueSelf, arg1);
+    *arg0 = New_Class876FC(3, (Class876FCParams *)((u8 *)q - 0xC), (Class6B5CC *)gStyleCueSelf, arg1);
     arg0++;
     return arg0;
 }
@@ -523,8 +533,8 @@ Class876FC **StyleFillEffectKind2(Class876FC **arg0, Vec3_d294 *arg1) {
     u8 **q;
 
     r = rand();
-    slot = (S32BoxK2 *) D_8008E0C0;
-    slot->v = (s32) (D_80087228 + ((u32) r % 3) * 3);
+    slot = (S32BoxK2 *)D_8008E0C0;
+    slot->v = (s32)(D_80087228 + ((u32)r % 3) * 3);
     slot++;
     val = (gStyleCounter / 20) * 20;
     if (gStyleCounter != val) {
@@ -533,15 +543,14 @@ Class876FC **StyleFillEffectKind2(Class876FC **arg0, Vec3_d294 *arg1) {
         val = 0;
     }
     slot->v = val;
-    SetupStyleSpawnParamsA(arg1, (void *) D_80087330);
+    SetupStyleSpawnParamsA(arg1, (void *)D_80087330);
     q = &D_8008E0B0;
     *q = D_80087174;
     D_8008E0BC = rand() % 6;
-    *arg0 = New_Class876FC(2, (Class876FCParams *)((u8 *) q - 0xC), (Class6B5CC *) gStyleCueSelf, arg1);
+    *arg0 = New_Class876FC(2, (Class876FCParams *)((u8 *)q - 0xC), (Class6B5CC *)gStyleCueSelf, arg1);
     arg0++;
     return arg0;
 }
-
 
 extern s32 D_8008E0A8;
 extern s32 D_8008E0AC;
@@ -564,9 +573,9 @@ extern s32 D_8008E0B8;
  * See docs/match-reports/SetupStyleSpawnParamsA.md. */
 void SetupStyleSpawnParamsA(void *arg0, void *arg1) {
     if (arg1 == 0) {
-        arg1 = (void *) D_80087328[rand() & 3];
+        arg1 = (void *)D_80087328[rand() & 3];
     }
-    D_8008E0A8 = (s32) arg1;
+    D_8008E0A8 = (s32)arg1;
     D_8008E0A4 = (rand() % 23) << 11;
     if (rand() & 1) {
         D_8008E0A4 = -D_8008E0A4;
@@ -575,7 +584,7 @@ void SetupStyleSpawnParamsA(void *arg0, void *arg1) {
     if (rand() & 1) {
         D_8008E0AC = -D_8008E0AC;
     }
-    D_8008E0B0 = D_80087174 + ((u32) rand() % 7) * 12;
+    D_8008E0B0 = D_80087174 + ((u32)rand() % 7) * 12;
     D_8008E0B8 = rand() % 5;
 }
 
@@ -612,7 +621,7 @@ void SetupStyleSpawnParamsB(void *arg0, void *arg1) {
     } else if (mod3 == 2) {
         D_8008E0AC = 0x800;
     }
-    D_8008E0B0 = D_80087174 + ((u32) rand() % 7) * 12;
+    D_8008E0B0 = D_80087174 + ((u32)rand() % 7) * 12;
     D_8008E0B8 = rand() % 5;
 }
 
@@ -624,10 +633,11 @@ extern s32 InitSoundCueSet(s32 arg0, void *arg1, s32 arg2, void *arg3, s32 arg4)
 StyleCueSlot *TryStartStyleCue(StyleCueSlot *arg0, s32 *arg1, void *arg2, void *arg3) {
     StyleCueEntryView *sub;
 
-    sub = (StyleCueEntryView *) FindNearestStyleCueEntry(&arg0->posX, &arg0->lastDist, arg2);
+    sub = (StyleCueEntryView *)FindNearestStyleCueEntry(&arg0->posX, &arg0->lastDist, arg2);
     if (sub != 0) {
         arg0->entry = sub;
-        InitSoundCueSet(*(s32 *) gStyleTargetObj, &arg0->cueSet, sub->countSign, arg0, gStyleCueCallbacks[sub->countSign]);
+        InitSoundCueSet(*(s32 *)gStyleTargetObj, &arg0->cueSet, sub->countSign, arg0,
+                        gStyleCueCallbacks[sub->countSign]);
         if (sub->countSign == *arg1) {
             *arg1 = -sub->countSign;
         }
@@ -651,36 +661,42 @@ extern s32 gStyleCueDistanceTable[];
  * FindNearestStyleCueEntry, ROM-earlier, also dispatches through it. */
 typedef struct ObjAB4C ObjAB4C;
 typedef struct ObjAB4CMethods ObjAB4CMethods;
+
 struct ObjAB4CMethods {
     u8 padE8[0xE8];
     void (*slotE8)(ObjAB4C *self, void *arg1, void *arg2); /* +0x0E8 */
 };
+
 struct ObjAB4C {
     ObjAB4CMethods *methods; /* +0x000 */
 };
 
 typedef struct Pos4 Pos4;
+
 struct Pos4 {
     s16 hi;
     s16 lo;
 };
 
 typedef struct TabEntry TabEntry;
+
 struct TabEntry {
     Pos4 head;
     s16 tail;
 };
 
 typedef struct EntrySlot EntrySlot;
+
 struct EntrySlot {
-    Pos4 pos;  /* +0x0 */
-    u8 idx;    /* +0x4 */
-    u8 pad5;   /* +0x5 */
-    s8 count;  /* +0x6 */
-    u8 pad7;   /* +0x7 */
+    Pos4 pos; /* +0x0 */
+    u8 idx;   /* +0x4 */
+    u8 pad5;  /* +0x5 */
+    s8 count; /* +0x6 */
+    u8 pad7;  /* +0x7 */
 };
 
 typedef struct LocalBuf LocalBuf;
+
 struct LocalBuf {
     Pos4 pos;
     TabEntry tab;
@@ -707,19 +723,19 @@ void *FindNearestStyleCueEntry(void *arg0, s32 *arg1, void *arg2) {
     }
     base = D_800876B4[gStyleKind];
     n = D_800876EC[gStyleKind] - gStyleCueRecordIndex;
-    entry = (EntrySlot *) (gStyleCueRecordIndex * 8 + (s32) base);
+    entry = (EntrySlot *)(gStyleCueRecordIndex * 8 + (s32)base);
     for (j = 0; j < n; j++, entry++) {
         gStyleCueRecordIndex++;
         if (entry->count > 0) {
             buf.pos = entry->pos;
-            buf.tab = *(TabEntry *) (D_800874EC + entry->idx * 6);
-            self = (void *) gStyleCueSelf;
-            ((ObjAB4C *) self)->methods->slotE8((ObjAB4C *) self, arg0, &buf);
-            d1 = *(s32 *) arg0 - *(s32 *) arg2;
+            buf.tab = *(TabEntry *)(D_800874EC + entry->idx * 6);
+            self = (void *)gStyleCueSelf;
+            ((ObjAB4C *)self)->methods->slotE8((ObjAB4C *)self, arg0, &buf);
+            d1 = *(s32 *)arg0 - *(s32 *)arg2;
             if (d1 < 0) {
                 d1 = ~d1 + 1;
             }
-            d2 = *(s32 *) ((u8 *) arg0 + 8) - *(s32 *) ((u8 *) arg2 + 8);
+            d2 = *(s32 *)((u8 *)arg0 + 8) - *(s32 *)((u8 *)arg2 + 8);
             if (d2 >= 0) {
                 dist = d1 + d2;
             } else {
@@ -739,7 +755,7 @@ extern s32 gStyleTargetObj;
 extern void FlushSoundCueSet(s32 arg0, void *arg1);
 
 s32 FlushStyleCue(StyleCueSlot *arg0) {
-    FlushSoundCueSet(*(s32 *) gStyleTargetObj, &arg0->cueSet);
+    FlushSoundCueSet(*(s32 *)gStyleTargetObj, &arg0->cueSet);
     arg0->entry->countSign = -arg0->entry->countSign;
     return 0;
 }
@@ -749,7 +765,7 @@ extern void ServiceSoundCueSet(s32 arg0, void *arg1);
 
 s32 StopStyleCueIfNear(StyleCueSlot *arg0, void *arg1, void *arg2) {
     if (IsStyleCueNear(arg0, arg1) != 0) {
-        ServiceSoundCueSet(*(s32 *) gStyleTargetObj, &arg0->cueSet);
+        ServiceSoundCueSet(*(s32 *)gStyleTargetObj, &arg0->cueSet);
         return 1;
     }
     return 0;
@@ -764,11 +780,11 @@ s32 IsStyleCueNear(StyleCueSlot *arg0, void *arg1) {
     if (arg1 == 0) {
         return 0;
     }
-    dx = arg0->posX - *(s32 *) arg1;
+    dx = arg0->posX - *(s32 *)arg1;
     if (dx < 0) {
         dx = ~dx + 1;
     }
-    dy = arg0->posZ - *(s32 *) ((u8 *) arg1 + 0x8);
+    dy = arg0->posZ - *(s32 *)((u8 *)arg1 + 0x8);
     if (dy >= 0) {
         dist = dx + dy;
     } else {
@@ -800,7 +816,7 @@ s32 TickStyle(void *arg0, void *arg1, s32 arg2) {
     ctx = 0;
     if (arg0 != 0) {
         ctx = buf;
-        ((ObjAB4C *) gStyleCueSelf)->methods->slotE8((ObjAB4C *) gStyleCueSelf, ctx, arg0);
+        ((ObjAB4C *)gStyleCueSelf)->methods->slotE8((ObjAB4C *)gStyleCueSelf, ctx, arg0);
     }
     if (gStyleTickCount++ == 0) {
         ApplyStyleDecorationIfSet();
@@ -814,7 +830,7 @@ s32 TickStyle(void *arg0, void *arg1, s32 arg2) {
     for (i = 0; i < 2; i++) {
         if (gStyleCueSlots[i] != 0) {
             if (StopStyleCueIfNear(gStyleCueSlots[i], ctx, arg1) == 0) {
-                gStyleCueSlots[i] = (StyleCueSlot *) FlushStyleCue(gStyleCueSlots[i]);
+                gStyleCueSlots[i] = (StyleCueSlot *)FlushStyleCue(gStyleCueSlots[i]);
             }
             /* INERT ON PURPOSE -- DO NOT DELETE. This pair is a semantic
              * no-op (`i` is the initialized loop counter, so nothing here is
@@ -828,7 +844,8 @@ s32 TickStyle(void *arg0, void *arg1, s32 arg2) {
             i++;
             i--;
         } else {
-            gStyleCueSlots[i] = TryStartStyleCue((StyleCueSlot *) (gStyleCueSlotPool + i * 0x68), &arg2, ctx, arg1);
+            gStyleCueSlots[i] =
+                TryStartStyleCue((StyleCueSlot *)(gStyleCueSlotPool + i * 0x68), &arg2, ctx, arg1);
         }
     }
     return arg2;
@@ -849,7 +866,7 @@ void DrawStyleTables(void) {
         a0 = D_80087444;
         a2 = D_80087450;
         a1 = 1;
-    } else if ((u32) (gStyleKind - 3) < 3) {
+    } else if ((u32)(gStyleKind - 3) < 3) {
         a1 = 1;
         a0 = D_8008745C;
         a2 = D_80087468;

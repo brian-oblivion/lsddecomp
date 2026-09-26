@@ -51,7 +51,6 @@ struct TaskTextObj {
     TaskTextMethods *methods; /* +0x000 */
 };
 
-
 /* The viewport (TaskCore::viewport, `BasicClass *` in IntermediateBase.h) is a
  * Viewport: TaskCore__OnInit/OnDeinit cast it to include/Viewport.h's type.
  * Its local view here (StreamTaskUnk18Obj) was merged there in round 85.

@@ -75,27 +75,28 @@ struct SpriteRgb;
 struct TaskObjF;
 
 struct Class86B60Methods {
-    TASKCORE_SLOTS(Class86B60, (Class86B60 *self, struct DreamSys *dreamSys));
+    TASKCORE_SLOTS(Class86B60, (Class86B60 * self, struct DreamSys *dreamSys));
     /* +0x124 */ void (*commitNameEntry)(Class86B60 *self, s32 arg1); /* Class86B60__CommitNameEntry; both callers pass
                                                                          arg1 (setState: 0, onTagBValue: 0x16) and the
                                                                          occupant reads self alone */
-    /* +0x128 */ void (*beginMemcardSave)(Class86B60 *self);          /* Class86B60__BeginMemcardSave; updateMemcardSave* call it first */
-    /* +0x12C */ void (*endMemcardSave)(Class86B60 *self);            /* Class86B60__EndMemcardSave; onTagBValue's 0x16/0x17 */
+    /* +0x128 */ void (*beginMemcardSave)(Class86B60 *self); /* Class86B60__BeginMemcardSave; updateMemcardSave* call it first */
+    /* +0x12C */ void (*endMemcardSave)(Class86B60 *self); /* Class86B60__EndMemcardSave; onTagBValue's 0x16/0x17 */
     /* +0x130 */ void (*updateMemcardSaveWithIcon)(Class86B60 *self); /* Class86B60__UpdateMemcardSaveWithIcon; tick's activeSlot 2 */
-    /* +0x134 */ void (*updateMemcardSaveStatus)(Class86B60 *self);   /* Class86B60__UpdateMemcardSaveStatus; tick's activeSlot 3 */
-    /* +0x138 */ void (*onTagBValue)(Class86B60 *self, BasicClass *sender, s32 event); /* Class86B60__OnTagBValue; onNotify's class-0xB case */
+    /* +0x134 */ void (*updateMemcardSaveStatus)(Class86B60 *self); /* Class86B60__UpdateMemcardSaveStatus; tick's activeSlot 3 */
+    /* +0x138 */ void (*onTagBValue)(Class86B60 *self, BasicClass *sender,
+                                     s32 event); /* Class86B60__OnTagBValue; onNotify's class-0xB case */
 };
 
 struct Class86B60 {
     TASKCORE_FIELDS(Class86B60Methods);
-    /* +0x0A4 */ struct DreamSys *dreamSys;     /* the ctor's; its +0x0F0/+0x19C/+0x1A0/+0x1A8/+0x1AC/+0x1B0 are called */
-    /* +0x0A8 */ struct TimImage *iconHandle;   /* beginMemcardSave: New_TimImage("CARD\FILEICN1.TIM"); finalize releases it */
-    /* +0x0AC */ struct TaskObjF *saveCtrl;               /* beginMemcardSave: New_TaskObjF(1, 0); the ctor clears it;
+    /* +0x0A4 */ struct DreamSys *dreamSys; /* the ctor's; its +0x0F0/+0x19C/+0x1A0/+0x1A8/+0x1AC/+0x1B0 are called */
+    /* +0x0A8 */ struct TimImage *iconHandle; /* beginMemcardSave: New_TimImage("CARD\FILEICN1.TIM"); finalize releases it */
+    /* +0x0AC */ struct TaskObjF *saveCtrl; /* beginMemcardSave: New_TaskObjF(1, 0); the ctor clears it;
                                                                  finalize releases it and iconHandle when it is set */
-    /* +0x0B0 */ struct TextRow *nameField;     /* setTarget (CreateNameField): New_TextRow; releaseTarget releases it */
+    /* +0x0B0 */ struct TextRow *nameField; /* setTarget (CreateNameField): New_TextRow; releaseTarget releases it */
     /* +0x0B4 */ u8 pad0B4[0x0BC - 0x0B4];
-    /* +0x0BC */ s32 *saveBlock;                /* the ctor: DreamSys getSaveBlock's result (&saveMagic); saveCtrl's beginLoad/beginSave data */
-    /* +0x0C0 */ s32 saveBlockSize;             /* the ctor: getSaveBlock's *outSize (0x700); the object is 0xC4 bytes */
+    /* +0x0BC */ s32 *saveBlock; /* the ctor: DreamSys getSaveBlock's result (&saveMagic); saveCtrl's beginLoad/beginSave data */
+    /* +0x0C0 */ s32 saveBlockSize; /* the ctor: getSaveBlock's *outSize (0x700); the object is 0xC4 bytes */
 };
 
 /* The ctor's resetCounters call, as the retail bytes make it: the slot is

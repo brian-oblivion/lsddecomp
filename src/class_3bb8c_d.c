@@ -25,8 +25,7 @@
 #include "Class86B60.h"
 #include "TaskObjF.h"
 
-void Class86B60__Finalize(Class86B60 *self)
-{
+void Class86B60__Finalize(Class86B60 *self) {
     if (self->saveCtrl != NULL) {
         self->saveCtrl->methods->release(self->saveCtrl);
         self->iconHandle->methods->release(self->iconHandle);
@@ -34,16 +33,14 @@ void Class86B60__Finalize(Class86B60 *self)
     Get_vtable_TaskCore()->finalize((TaskCore *)self);
 }
 
-void Class86B60__OnNotify(Class86B60 *self, BasicClass *sender, s32 event)
-{
+void Class86B60__OnNotify(Class86B60 *self, BasicClass *sender, s32 event) {
     Get_vtable_TaskCore()->onNotify((TaskCore *)self, sender, event);
     if ((sender->methods->header & 0xF) == 0xB) {
         self->methods->onTagBValue(self, sender, event);
     }
 }
 
-void Class86B60__Reset(Class86B60 *self)
-{
+void Class86B60__Reset(Class86B60 *self) {
     self->unk34 = 0;
     self->unk2C = 0x190;
     self->methods->setSubHandle(self, D_800114E8, 0);
@@ -51,22 +48,20 @@ void Class86B60__Reset(Class86B60 *self)
     self->dreamSys->methods->getSetFlashbackSession(self->dreamSys, 0, 0);
 }
 
-void Class86B60__OnDeinit(Class86B60 *self)
-{
+void Class86B60__OnDeinit(Class86B60 *self) {
     u32 i;
     u8 *entry;
 
     i = 0;
     entry = (u8 *)&D_80086DAC;
     for (; i < 2; i++) {
-        ((Class86B60UnkC0Obj_3bb8c_d *)self->initArgs->unk0)->methods->slot78(
-            (Class86B60UnkC0Obj_3bb8c_d *)self->initArgs->unk0, self->unk93, entry);
+        ((Class86B60UnkC0Obj_3bb8c_d *)self->initArgs->unk0)
+            ->methods->slot78((Class86B60UnkC0Obj_3bb8c_d *)self->initArgs->unk0, self->unk93, entry);
         entry += 0xC;
     }
 }
 
-void Class86B60__SetState(Class86B60 *self, s32 state)
-{
+void Class86B60__SetState(Class86B60 *self, s32 state) {
     Get_vtable_TaskCore()->setState((TaskCore *)self, state);
     if (state == 5) {
         self->methods->commitNameEntry(self, 0);
@@ -78,35 +73,33 @@ void Class86B60__SetState(Class86B60 *self, s32 state)
     }
 }
 
-void Class86B60__Tick(Class86B60 *self)
-{
+void Class86B60__Tick(Class86B60 *self) {
     void (*fn)(Class86B60 *);
 
     Get_vtable_TaskCore()->tick((TaskCore *)self);
     switch (self->activeSlot) {
-    case 1:
-        self->result = 0;
-        self->dreamSys->methods->getSetFlashbackSession(self->dreamSys, 0, 1);
-        fn = self->methods->refreshViewValue;
-        break;
-    case 2:
-        fn = self->methods->updateMemcardSaveWithIcon;
-        break;
-    case 3:
-        fn = self->methods->updateMemcardSaveStatus;
-        break;
-    case 4:
-        self->result = 2;
-        fn = self->methods->refreshViewValue;
-        break;
-    default:
-        return;
+        case 1:
+            self->result = 0;
+            self->dreamSys->methods->getSetFlashbackSession(self->dreamSys, 0, 1);
+            fn = self->methods->refreshViewValue;
+            break;
+        case 2:
+            fn = self->methods->updateMemcardSaveWithIcon;
+            break;
+        case 3:
+            fn = self->methods->updateMemcardSaveStatus;
+            break;
+        case 4:
+            self->result = 2;
+            fn = self->methods->refreshViewValue;
+            break;
+        default:
+            return;
     }
     fn(self);
 }
 
-void Class86B60__RefreshViewValue(Class86B60 *self)
-{
+void Class86B60__RefreshViewValue(Class86B60 *self) {
     s32 buf;
 
     Get_vtable_TaskCore()->refreshViewValue((TaskCore *)self);
@@ -129,8 +122,7 @@ extern void DecodeFullWidthSjis(void *dst, void *src);
 
 /* The setTarget override: `target` is the TaskCoreTarget the ctor passes
  * (&D_80086D44); only its `handle` is read, as the TextRow's texture. */
-void Class86B60__CreateNameField(Class86B60 *self, TaskCoreTarget *target)
-{
+void Class86B60__CreateNameField(Class86B60 *self, TaskCoreTarget *target) {
     u32 size;
     char *buf;
 
@@ -152,16 +144,15 @@ void Class86B60__CreateNameField(Class86B60 *self, TaskCoreTarget *target)
     BMemPMgrFree(buf);
 }
 
-void Class86B60__DestroyNameField(Class86B60 *self)
-{
+void Class86B60__DestroyNameField(Class86B60 *self) {
     self->nameField->methods->release(self->nameField);
     Get_vtable_TaskCore()->releaseTarget((TaskCore *)self);
 }
 
-void Class86B60__ForwardToNameField(Class86B60 *self, void *parent)
-{
+void Class86B60__ForwardToNameField(Class86B60 *self, void *parent) {
     Get_vtable_TaskCore()->updateSlotElements((TaskCore *)self, parent);
-    self->nameField->methods->attachToParent(self->nameField, (Class6B5CC *)parent, (Vec3_d294 *)&D_8008A9B4);
+    self->nameField->methods->attachToParent(self->nameField, (Class6B5CC *)parent,
+                                             (Vec3_d294 *)&D_8008A9B4);
 }
 
 /* MATCHED round 75 (was STALL round 43) -- see
@@ -169,8 +160,7 @@ void Class86B60__ForwardToNameField(Class86B60 *self, void *parent)
  * (so it crosses a call and gets $s1), `buf = *color` is one struct copy
  * (SpriteRgb is three `s8`: three `lb`, then three `sb`), and each arm
  * indexes `base[D_8008AA28]` directly. */
-void Class86B60__TickNameFieldCursor(Class86B60 *self, SpriteRgb *color)
-{
+void Class86B60__TickNameFieldCursor(Class86B60 *self, SpriteRgb *color) {
     SpriteRgb buf;
     u8 *base;
 
@@ -205,10 +195,10 @@ void Class86B60__TickNameFieldCursor(Class86B60 *self, SpriteRgb *color)
  * receives. Same independent-arities situation already documented for
  * Get_vtable_TaskCore until round 84: this unit's own local view
  * matches what THIS call site needs. */
-extern void CheckSaveScoreFlag(void *arg0, void *arg1, void *arg2); /* arity-ok: the definition is 2-parameter and the callee WRITES $a2 (`li a2,0x1` at 0x8004D690) before reading it, but the 3rd argument is byte-load-bearing here -- retail emits `lw a2,164(s0)` at 0x8004DE74 */
+extern void CheckSaveScoreFlag(void *arg0, void *arg1,
+                               void *arg2); /* arity-ok: the definition is 2-parameter and the callee WRITES $a2 (`li a2,0x1` at 0x8004D690) before reading it, but the 3rd argument is byte-load-bearing here -- retail emits `lw a2,164(s0)` at 0x8004DE74 */
 
-void Class86B60__CommitNameEntry(Class86B60 *self)
-{
+void Class86B60__CommitNameEntry(Class86B60 *self) {
     s32 size;
     s32 origSlot;
     char *buf1;
@@ -231,31 +221,27 @@ void Class86B60__CommitNameEntry(Class86B60 *self)
     self->dreamSys->methods->getSetScreenShake(self->dreamSys, &buf2);
 }
 
-void Class86B60__BeginMemcardSave(Class86B60 *self)
-{
+void Class86B60__BeginMemcardSave(Class86B60 *self) {
     if (self->saveCtrl == NULL) {
         self->iconHandle = New_TimImage((char *)D_800114F8);
         self->saveCtrl = New_TaskObjF(1, 0);
     }
     self->saveCtrl->methods->init(self->saveCtrl, D_8008A9D0, (char **)&D_80086D6C,
-                                  self->initArgs->unk4, self->unk10,
-                                  (struct Class6B5CC *)self->unk14,
+                                  self->initArgs->unk4, self->unk10, (struct Class6B5CC *)self->unk14,
                                   (struct VabStreamObj *)self->sound);
     self->methods->addChild(self, (BasicClass *)self->saveCtrl);
     self->methods->removeChild(self, self->initArgs->unk4);
     self->methods->removeChild(self, self->unk10);
 }
 
-void Class86B60__EndMemcardSave(Class86B60 *self)
-{
+void Class86B60__EndMemcardSave(Class86B60 *self) {
     self->methods->addChild(self, self->initArgs->unk4);
     self->methods->addChild(self, self->unk10);
     self->methods->removeChild(self, (BasicClass *)self->saveCtrl);
     self->saveCtrl->methods->deinit(self->saveCtrl);
 }
 
-void Class86B60__UpdateMemcardSaveWithIcon(Class86B60 *self)
-{
+void Class86B60__UpdateMemcardSaveWithIcon(Class86B60 *self) {
     s32 buf;
 
     buf = self->slotCounts[5];
@@ -268,15 +254,13 @@ void Class86B60__UpdateMemcardSaveWithIcon(Class86B60 *self)
                                        self->iconHandle, self->saveBlock, self->saveBlockSize);
 }
 
-void Class86B60__UpdateMemcardSaveStatus(Class86B60 *self)
-{
+void Class86B60__UpdateMemcardSaveStatus(Class86B60 *self) {
     self->methods->beginMemcardSave(self);
-    self->saveCtrl->methods->beginLoad(self->saveCtrl, D_8008AA10, D_8008AA18,
-                                       self->saveBlock, self->saveBlockSize);
+    self->saveCtrl->methods->beginLoad(self->saveCtrl, D_8008AA10, D_8008AA18, self->saveBlock,
+                                       self->saveBlockSize);
 }
 
-void Class86B60__OnTagBValue(Class86B60 *self, BasicClass *sender, s32 event)
-{
+void Class86B60__OnTagBValue(Class86B60 *self, BasicClass *sender, s32 event) {
     if (event < 0x18) {
         if (event >= 0x16) {
             self->methods->endMemcardSave(self);
@@ -288,13 +272,11 @@ void Class86B60__OnTagBValue(Class86B60 *self, BasicClass *sender, s32 event)
     }
 }
 
-Class86B60Methods *GetClass86B60Methods(void)
-{
+Class86B60Methods *GetClass86B60Methods(void) {
     return &gClass86B60Methods;
 }
 
-TaskObjF *New_TaskObjF(s32 padEnable, s32 cardSlot)
-{
+TaskObjF *New_TaskObjF(s32 padEnable, s32 cardSlot) {
     TaskObjF *self;
 
     self = BMemPMgrAlloc(0x84);
@@ -315,8 +297,7 @@ extern void InitCARD(s32 padEnable);
 extern void StartCARD(void);
 extern void _bu_init(void);
 
-void TaskObjF__TaskObjF(TaskObjF *self, s32 padEnable, s32 cardSlot)
-{
+void TaskObjF__TaskObjF(TaskObjF *self, s32 padEnable, s32 cardSlot) {
     s32 count;
 
     Get_vtable_BasicClass()->ctor((BasicClass *)self);

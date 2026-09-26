@@ -57,7 +57,7 @@ typedef struct SvmVoice {
     s16 unk16; /* +0x16 -- compared against a key-off argument */
     s16 unk18; /* +0x18 -- SpuVmAlloc's priority, loaded from D_8008EA1B */
     u8 pad1A;
-    u8 unk1B;  /* +0x1B -- byte state: 1 keyed on, 2 noise, 0 off */
+    u8 unk1B; /* +0x1B -- byte state: 1 keyed on, 2 noise, 0 off */
     /* +0x1C..+0x26: the SeAutoVol/SetAutoVol ramp. */
     s16 unk1C; /* +0x1C -- nonzero while the ramp runs; SeAutoVol sets it, SetAutoVol clears it when +0x24 reaches +0x26 */
     s16 unk1E; /* +0x1E -- per-tick increment/decrement applied to +0x24 */
@@ -72,7 +72,7 @@ typedef struct SvmVoice {
     s16 unk2E; /* +0x2E -- countdown to the next step, reloaded from +0x2C */
     s16 unk30; /* +0x30 -- running ramp value, SeAutoPan's "from" */
     s16 unk32; /* +0x32 -- value the ramp clamps to, SeAutoPan's "to" */
-} SvmVoice; /* 0x34 */
+} SvmVoice;    /* 0x34 */
 
 extern SvmVoice _svm_voice[]; /* 24 voices */
 
@@ -94,7 +94,7 @@ typedef struct SvmSreg {
     u8 padC[0x10 - 0xC];
 } SvmSreg; /* 0x10 */
 
-extern SvmSreg _svm_sreg_buf[];   /* 24 voices */
-extern u8 _svm_sreg_dirty[];      /* 24 voices: which _svm_sreg_buf fields SpuVmFlush must copy out */
+extern SvmSreg _svm_sreg_buf[]; /* 24 voices */
+extern u8 _svm_sreg_dirty[];    /* 24 voices: which _svm_sreg_buf fields SpuVmFlush must copy out */
 
 #endif

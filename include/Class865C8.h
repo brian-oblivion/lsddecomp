@@ -46,16 +46,19 @@ struct DreamSys;
 struct WBgm;
 struct TimImage;
 struct LinkResource;
-struct ObjM;  /* include/ObjM.h */
+struct ObjM; /* include/ObjM.h */
 
 /* Class86668's slots, then this class's own. Overridden: ctor, finalize,
  * onNotify, resetCounters (Class865C8__ResetPhase), init, deinit, onInit,
  * onDeinit, onTag1Notify (Class865C8__AdvancePhase) and onState4. */
+/* clang-format off */
 #define CLASS865C8_SLOTS(Self, CtorParams)                                                         \
     CLASS86668_SLOTS(Self, CtorParams);                                                            \
     /* +0x080 */ void (*onDreamSysNotify)(Self *self, BasicClass *sender, s32 event); /* Class865C8__OnDreamSysNotify, empty; onNotify's 0x1F34 (DreamSys) sender */ \
     /* +0x084 */ void (*onObjMNotify)(Self *self, BasicClass *sender, s32 event)      /* Class865C8__OnObjMNotify; onNotify's 0x2F230 (gObjMMethods) sender */
+/* clang-format on */
 
+/* clang-format off */
 #define CLASS865C8_FIELDS(Methods)                                                                 \
     CLASS86668_FIELDS(Methods);                                                                    \
     /* +0x038 */ struct DreamSys *dreamSys; /* the ctor's; a child; init/deinit hand it the init args' objects */ \
@@ -64,14 +67,16 @@ struct ObjM;  /* include/ObjM.h */
     /* +0x044 */ struct TimImage *etcTim;   /* New_TimImage("ETC\ETC.TIM"), uploaded and its buffer freed; DreamSys +0x114; New_ObjM's 3rd */ \
     /* +0x048 */ struct LinkResource *dreamerTmd;    /* New_LinkResource("ETC\DREAMER.TMD"); New_ObjM's 4th; finalize releases it */ \
     /* +0x04C */ struct ObjM *objM          /* StartObjM's New_ObjM(...); a child; released by AdvancePhase/OnObjMNotify */
+/* clang-format on */
 
 struct Class865C8Methods {
-    CLASS865C8_SLOTS(Class865C8, (Class865C8 *self, IntermediateBaseInitArgs *initArgs, struct DreamSys *dreamSys, s32 arg3));
+    CLASS865C8_SLOTS(Class865C8, (Class865C8 * self, IntermediateBaseInitArgs *initArgs,
+                                  struct DreamSys *dreamSys, s32 arg3));
 };
 
 struct Class865C8 {
     CLASS865C8_FIELDS(Class865C8Methods);
-};                                    /* 0x50 bytes: New_Class865C8 */
+}; /* 0x50 bytes: New_Class865C8 */
 
 extern Class865C8Methods gClass865C8Methods;
 extern Class865C8Methods *GetClass865C8Methods(void); /* returns &gClass865C8Methods */
@@ -80,8 +85,10 @@ extern Class865C8Methods *GetClass865C8Methods(void); /* returns &gClass865C8Met
 typedef s32 (*Class865C8InitFn)(Class865C8 *self);
 
 /* The class's own methods, in address order. */
-Class865C8 *New_Class865C8(IntermediateBaseInitArgs *initArgs, struct DreamSys *dreamSys, s32 arg3); /* BMemPMgrAlloc(0x50), then ctor */
-void Class865C8__Class865C8(Class865C8 *self, IntermediateBaseInitArgs *initArgs, struct DreamSys *dreamSys, s32 arg3);
+Class865C8 *New_Class865C8(IntermediateBaseInitArgs *initArgs, struct DreamSys *dreamSys,
+                           s32 arg3); /* BMemPMgrAlloc(0x50), then ctor */
+void Class865C8__Class865C8(Class865C8 *self, IntermediateBaseInitArgs *initArgs,
+                            struct DreamSys *dreamSys, s32 arg3);
 void Class865C8__Finalize(Class865C8 *self);
 void Class865C8__OnNotify(Class865C8 *self, BasicClass *sender, s32 event);
 void Class865C8__ResetPhase(Class865C8 *self);
@@ -91,8 +98,8 @@ void Class865C8__OnInit(Class865C8 *self);
 void Class865C8__OnDeinit(Class865C8 *self);
 void Class865C8__AdvancePhase(Class865C8 *self, BasicClass *sender, s32 event);
 void Class865C8__StartObjM(Class865C8 *self, s32 stage);
-void Class865C8__OnState4(void);              /* +0x07C; empty, reads no argument */
-void Class865C8__OnDreamSysNotify(void);      /* +0x080; empty, reads no argument */
+void Class865C8__OnState4(void);         /* +0x07C; empty, reads no argument */
+void Class865C8__OnDreamSysNotify(void); /* +0x080; empty, reads no argument */
 void Class865C8__OnObjMNotify(Class865C8 *self, BasicClass *sender, s32 event);
 
 #endif

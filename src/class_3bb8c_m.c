@@ -51,9 +51,9 @@ extern s32 TryDreamAuxTrigger(s32 arg0, s32 *arg1, void *arg2);
 
 /* ObjM__AdvancePauseSetup's literals, all reached by address: the "Pause"
  * text, the TextRow's position (attachToParent) and its colour (setColor). */
-extern char D_8008AB44[];   /* "Pause" (asm/data/7B008.sdata.s) */
-extern s32 D_8008AB38;      /* two words: the position */
-extern s32 D_8008AB40;      /* one word: the colour */
+extern char D_8008AB44[]; /* "Pause" (asm/data/7B008.sdata.s) */
+extern s32 D_8008AB38;    /* two words: the position */
+extern s32 D_8008AB40;    /* one word: the colour */
 
 void ObjM__EnterState7(ObjM *self) {
     s32 val;
@@ -83,7 +83,8 @@ void ObjM__NotifyParentsCodeB(ObjM *self) {
 /* The viewport (IntermediateBase::viewport, a Class869D8) hands out its fade
  * box (getSubHandle, Viewport's New_Class6E99C). */
 void ObjM__StartFadeUp(ObjM *self, s32 channels, s32 arg2, s32 step, s32 addChild) {
-    Class6E99C *fade = (Class6E99C *)((Class869D8 *)self->viewport)->methods->getSubHandle((Class869D8 *)self->viewport);
+    Class6E99C *fade =
+        (Class6E99C *)((Class869D8 *)self->viewport)->methods->getSubHandle((Class869D8 *)self->viewport);
     if (step != 0) {
         fade->methods->setStep(fade, step);
     }
@@ -96,22 +97,23 @@ void ObjM__StartFadeUp(ObjM *self, s32 channels, s32 arg2, s32 step, s32 addChil
 void ObjM__OnFadeNotify(ObjM *self, Class6E99C *sender, s32 event) {
     void *color;
     switch (event) {
-    case 5:
-        self->methods->removeChild(self, (BasicClass *)sender);
-        self->dreamSys->methods->setMoveOverride(self->dreamSys, 0);
-        self->state = 0;
-        break;
-    case 6:
-        self->methods->removeChild(self, (BasicClass *)sender);
-        color = sender->methods->getColor(sender);
-        ((Class869D8 *)self->viewport)->methods->setClearColor((Class869D8 *)self->viewport, (ViewportRgb *)color);
-        if (self->state != 5 && self->state != 8 && self->state == 0xA) {
-            self->dreamSys->methods->stopDrift(self->dreamSys, 1);
+        case 5:
+            self->methods->removeChild(self, (BasicClass *)sender);
             self->dreamSys->methods->setMoveOverride(self->dreamSys, 0);
-            self->state = 4;
-        }
-        self->methods->notifyParents(self, self->state);
-        break;
+            self->state = 0;
+            break;
+        case 6:
+            self->methods->removeChild(self, (BasicClass *)sender);
+            color = sender->methods->getColor(sender);
+            ((Class869D8 *)self->viewport)
+                ->methods->setClearColor((Class869D8 *)self->viewport, (ViewportRgb *)color);
+            if (self->state != 5 && self->state != 8 && self->state == 0xA) {
+                self->dreamSys->methods->stopDrift(self->dreamSys, 1);
+                self->dreamSys->methods->setMoveOverride(self->dreamSys, 0);
+                self->state = 4;
+            }
+            self->methods->notifyParents(self, self->state);
+            break;
     }
 }
 
@@ -124,7 +126,8 @@ void ObjM__OnClass866E8Notify(ObjM *self, BasicClass *sender, s32 event) {
 s32 ObjM__CheckAuxTrigger(ObjM *self) {
     s32 out;
     s32 result;
-    Class866E8Elem *elem = ((Class866E8 *)self->unk14)->methods->getLastTargetRateSplit((Class866E8 *)self->unk14, (u8 *)&out);
+    Class866E8Elem *elem =
+        ((Class866E8 *)self->unk14)->methods->getLastTargetRateSplit((Class866E8 *)self->unk14, (u8 *)&out);
     void *thing = (void *)self->dreamSys->methods->getCurrentDayAndYear(self->dreamSys, 0);
     result = TryDreamAuxTrigger((s32)elem->loader->dataBuffer, &out, thing);
     elem->heldObj = (BasicClass *)result;
@@ -135,8 +138,7 @@ s32 ObjM__CheckAuxTrigger(ObjM *self) {
     return 1;
 }
 
-void ObjM__NoOpSlotBC(void) {
-}
+void ObjM__NoOpSlotBC(void) {}
 
 void ObjM__UpdateCloseReadyFlag(ObjM *self) {
     if (self->pauseSetupStep != 0 && self->state == 0) {
@@ -169,7 +171,8 @@ void ObjM__AdvancePauseSetup(ObjM *self) {
     s32 state = self->pauseSetupStep;
     if (state == 0) {
         self->pauseText = New_TextRow(self->etcTim, 5, &D_8008AB44[0]);
-        self->pauseText->methods->attachToParent(self->pauseText, (Class6B5CC *)self->unk14, (Vec3_d294 *)&D_8008AB38);
+        self->pauseText->methods->attachToParent(self->pauseText, (Class6B5CC *)self->unk14,
+                                                 (Vec3_d294 *)&D_8008AB38);
         self->pauseText->methods->setColor(self->pauseText, (SpriteRgb *)&D_8008AB40);
         self->pauseSetupStep = state + 1;
         return;
@@ -249,7 +252,7 @@ void *ApplyStyleConfig(void) {
     if (cfg == 0) {
         cfg = PickStyleFallbackConfig();
     }
-    FillStyleFromConfig((struct StyleM *) &D_80087424, cfg);
+    FillStyleFromConfig((struct StyleM *)&D_80087424, cfg);
     if (cfg[1] >= 4) {
         gStyleDecorColor = D_800872C4[cfg[2]];
     }
@@ -269,11 +272,11 @@ void *ApplyStyleConfig(void) {
  * stride-3 address arithmetic. D_8008730C is six words, 0x6800 down to 0x0800. */
 struct StyleM {
     u8 pad000[0x00C];
-    const u8 *unkC;                 /* +0x00C, a D_800872C4 entry */
+    const u8 *unkC; /* +0x00C, a D_800872C4 entry */
     u8 pad010[0x014 - 0x010];
-    s32 unk14;                      /* +0x014, cfg[0] sign-extended */
-    const u8 *unk18;                /* +0x018, a D_800872C4 entry */
-    s32 unk1C;                      /* +0x01C, a D_8008730C value */
+    s32 unk14;       /* +0x014, cfg[0] sign-extended */
+    const u8 *unk18; /* +0x018, a D_800872C4 entry */
+    s32 unk1C;       /* +0x01C, a D_8008730C value */
 };
 
 extern u8 D_800872C4[][3];
@@ -294,13 +297,16 @@ void FillStyleFromConfig(struct StyleM *style, s8 *cfg) {
  * touched by this function. */
 typedef struct LocalSubObj LocalSubObj;
 typedef struct LocalSubMethods LocalSubMethods;
+
 struct LocalSubMethods {
     u8 pad00[0xAC];
-    s32 (*slotAC)(LocalSubObj *self);                          /* +0x0AC */
+    s32 (*slotAC)(LocalSubObj *self); /* +0x0AC */
 };
+
 struct LocalSubObj {
     LocalSubMethods *methods;
 };
+
 typedef struct FieldAC7CHolder {
     u8 pad0[0xC];
     LocalSubObj *unkC;
@@ -314,14 +320,14 @@ void ApplyStyleDecorationIfSet(void) {
     s32 tmp;
 
     if (gStyleDecorColor != 0) {
-        gStyleDecorObj = (s32) New_BoxFill(&D_8008AB60, (void *) gStyleDecorColor, 0);
-        ((BoxFill *) gStyleDecorObj)->methods->setSemiTrans((BoxFill *) gStyleDecorObj, 1);
-        ((BoxFill *) gStyleDecorObj)->methods->setSemiTransRate((BoxFill *) gStyleDecorObj, 0);
+        gStyleDecorObj = (s32)New_BoxFill(&D_8008AB60, (void *)gStyleDecorColor, 0);
+        ((BoxFill *)gStyleDecorObj)->methods->setSemiTrans((BoxFill *)gStyleDecorObj, 1);
+        ((BoxFill *)gStyleDecorObj)->methods->setSemiTransRate((BoxFill *)gStyleDecorObj, 0);
 
-        tmp = ((FieldAC7CHolder *) gStyleTargetObj)->unkC->methods->slotAC(
-                ((FieldAC7CHolder *) gStyleTargetObj)->unkC);
+        tmp = ((FieldAC7CHolder *)gStyleTargetObj)
+                  ->unkC->methods->slotAC(((FieldAC7CHolder *)gStyleTargetObj)->unkC);
 
-        ((BoxFillAttachToParentFn)((BoxFill *) gStyleDecorObj)->methods->attachToParent)(
-            (BoxFill *) gStyleDecorObj, (Class6B5CC *) tmp, (Pair32E99C *) &D_8008AB58);
+        ((BoxFillAttachToParentFn)((BoxFill *)gStyleDecorObj)->methods->attachToParent)(
+            (BoxFill *)gStyleDecorObj, (Class6B5CC *)tmp, (Pair32E99C *)&D_8008AB58);
     }
 }

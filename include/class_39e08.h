@@ -29,10 +29,12 @@
  * IntermediateBaseInitArgs::unk0: its +0x07C returns the size it hands the
  * viewport's setScreenSize. */
 typedef struct SubObjE SubObjE;
+
 typedef struct SubObjEMethods {
     u8 pad00[0x7C];
     struct ViewportSize *(*slot7C)(SubObjE *self, s32 arg1);
 } SubObjEMethods;
+
 struct SubObjE {
     SubObjEMethods *methods;
 };
@@ -72,7 +74,6 @@ typedef struct LoadRequest {
     s32 unk08;
     s32 unk0C;
 } LoadRequest;
-
 
 /* src/code_39094.c: one of the seven gWeeklyGroupTable words, each a VAB
  * path string ("SND\\AMBIENT" ... "SND\\STANDERD"). Its return value is

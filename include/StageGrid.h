@@ -3,24 +3,25 @@
 
 #include "common.h"
 
-typedef struct StageGridDimensions{
+typedef struct StageGridDimensions {
     s16 columns;
     s16 rows;
     bool isVertical;
-}StageGridDimensions;
+} StageGridDimensions;
 
-typedef struct StageChunk{
+typedef struct StageChunk {
     s8 column;
     s8 row;
-}StageChunk;
+} StageChunk;
 
-struct simplePair{
-    s8 x; s8 y;
+struct simplePair {
+    s8 x;
+    s8 y;
 };
 
 extern StageGridDimensions STAGE_GRID_DIMENSIONS[];
 
-extern MoodGraphPoint* STAGE_CHUNK_MOODS[];
+extern MoodGraphPoint *STAGE_CHUNK_MOODS[];
 
 /* @brief Number of entries in STAGE_GRID_DIMENSIONS / STAGE_CHUNK_MOODS (14). */
 extern s32 GetStageGridDimensionsCount(void);

@@ -79,22 +79,23 @@ struct ViewportRgb {
 
 /* libgs GsRVIEW2, 0x20 bytes: the argument GsSetRefView2 takes. */
 struct ViewportRefView {
-    Vec3_d294 vp;              /* +0x000, viewpoint: setViewPoint */
-    Vec3_d294 vr;              /* +0x00C, reference point: setViewRef */
-    s32 rz;                    /* +0x018, twist, 20.12 (setTwist) */
-    Class6B5CCSub14 *super;    /* +0x01C, the view node's GsCOORDINATE2 (AddChild) */
+    Vec3_d294 vp;           /* +0x000, viewpoint: setViewPoint */
+    Vec3_d294 vr;           /* +0x00C, reference point: setViewRef */
+    s32 rz;                 /* +0x018, twist, 20.12 (setTwist) */
+    Class6B5CCSub14 *super; /* +0x01C, the view node's GsCOORDINATE2 (AddChild) */
 };
 
 /* libgs GsOT header, 0x14 bytes: InitOt fills the two words it sets. */
 struct ViewportOt {
-    s32 length;                /* +0x000, otLength */
-    s32 org;                   /* +0x004, this half's otTags */
+    s32 length; /* +0x000, otLength */
+    s32 org;    /* +0x004, this half's otTags */
     u8 pad08[0x14 - 0x08];
 };
 
 /* BasicClass's slots, then this class's own. `tools/classtable.py
  * gViewportMethods --vs D_8006B58C` lists the overrides of the inherited
  * ones (ctor, finalize, addChild, removeChild, removeAllChildren, onNotify). */
+/* clang-format off */
 #define VIEWPORT_SLOTS(Self, CtorParams)                                                           \
     BASICCLASS_SLOTS(Self, CtorParams);                                                            \
     /* +0x040 */ void (*initDefaults)(Self *self);                  /* Viewport__InitDefaults; Class869D8: Class869D8__InitDefaults, empty */ \
@@ -127,7 +128,9 @@ struct ViewportOt {
     /* +0x0AC */ Class6B5CC *(*getSubHandle)(Self *self);          /* Viewport__GetSubHandle */      \
     /* +0x0B0 */ void (*setUnkB4)(Self *self, s32 value);          /* Viewport__SetUnkB4 */          \
     /* +0x0B4 */ void (*setDrawEnabled)(Self *self, s32 on)        /* Viewport__SetDrawEnabled */
+/* clang-format on */
 
+/* clang-format off */
 #define VIEWPORT_FIELDS(Methods)                                                                   \
     BASICCLASS_FIELDS(Methods);                                                                    \
     /* +0x00C */ DrawSystem *drawSystem;  /* the class-1 child (AddChild); Flip's getActiveBuffer/swapBuffers */ \
@@ -159,9 +162,10 @@ struct ViewportOt {
     /* +0x0B0 */ Class6B5CC *subHandle;   /* the ctor's New_Class6E99C, attached under sceneRoot */ \
     /* +0x0B4 */ s32 unkB4;               /* Flip: nonzero swaps once more on buffer 0 */          \
     /* +0x0B8 */ s32 drawEnabled          /* Flip: 0 skips the clear and draw; default 1 */
+/* clang-format on */
 
 struct ViewportMethods {
-    VIEWPORT_SLOTS(Viewport, (Viewport *self));
+    VIEWPORT_SLOTS(Viewport, (Viewport * self));
 };
 
 struct Viewport {
@@ -191,7 +195,8 @@ void Viewport__SetLightMode(Viewport *self, s32 mode);
 void Viewport__SetClearColor(Viewport *self, ViewportRgb *color);
 void Viewport__SetFarColor(Viewport *self, ViewportRgb *color);
 void Viewport__SetFogNear(Viewport *self, s32 fogNear);
-void Viewport__AttachViewChild(Viewport *self, BasicClass *node, Vec3_d294 *vp, Vec3_d294 *vr, WholeFrac_d294 *twist);
+void Viewport__AttachViewChild(Viewport *self, BasicClass *node, Vec3_d294 *vp, Vec3_d294 *vr,
+                               WholeFrac_d294 *twist);
 void Viewport__DetachViewChild(Viewport *self);
 void Viewport__SetViewPoint(Viewport *self, Vec3_d294 *vp);
 void Viewport__SetViewRef(Viewport *self, Vec3_d294 *vr);
@@ -209,7 +214,7 @@ Class6B5CC *Viewport__GetSubHandle(Viewport *self);
 void Viewport__SetUnkB4(Viewport *self, s32 value);
 void Viewport__SetDrawEnabled(Viewport *self, s32 on);
 
-Viewport *New_Viewport(void);                 /* BMemPMgrAlloc(0xBC), then ctor */
-Class6B5CC *GetRootNode(Class6B5CC *node);    /* follow `parent` to the top */
+Viewport *New_Viewport(void);              /* BMemPMgrAlloc(0xBC), then ctor */
+Class6B5CC *GetRootNode(Class6B5CC *node); /* follow `parent` to the top */
 
 #endif

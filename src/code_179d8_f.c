@@ -122,8 +122,7 @@ extern Entry90902E8 *D_800902E8[];
 extern s32 SpuVmSetSeqVol(s16 a0, u16 a1, u16 a2, s32 a3);
 extern s32 SpuVmGetSeqVol(s32 a0, s16 *out1, s16 *out2);
 
-void Snd_crescendo(s16 a0, s16 a1)
-{
+void Snd_crescendo(s16 a0, s16 a1) {
     Entry90902E8 **arr;
     Entry90902E8 *entry;
     s16 thresh;

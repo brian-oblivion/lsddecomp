@@ -45,34 +45,35 @@ typedef struct TimBlockSrcColor {
 /* One CLUT row's fade ramp. 0x10 bytes: TimArraySrc__BuildImages steps a
  * TimImage's clutBase through them 16 bytes a CLUT row. */
 typedef struct TimBlockSrcEntry {
-    /* +0x00 */ u16 shift;            /* TimBlockSrc__SetEntryShift */
-    /* +0x02 */ u16 mask;             /* 1 << shift: the ramp's rows */
-    /* +0x04 */ u16 clutX;            /* +0x04..+0x0A a RECT: the ctor lays out 0, 0x1E0 + i * mask, 0x100, 1 */
+    /* +0x00 */ u16 shift; /* TimBlockSrc__SetEntryShift */
+    /* +0x02 */ u16 mask;  /* 1 << shift: the ramp's rows */
+    /* +0x04 */ u16 clutX; /* +0x04..+0x0A a RECT: the ctor lays out 0, 0x1E0 + i * mask, 0x100, 1 */
     /* +0x06 */ u16 clutY;
     /* +0x08 */ u16 clutW;
-    /* +0x0A */ u16 clutH;            /* set to mask by FadeClutRow */
+    /* +0x0A */ u16 clutH;              /* set to mask by FadeClutRow */
     /* +0x0C */ TimBlockSrcColor color; /* TimBlockSrc__FadeEntry */
     /* +0x0F */ u8 padF;
 } TimBlockSrcEntry;
 
 struct TimBlockSrcMethods {
-    CLASS6D430_SLOTS(TimBlockSrc, (TimBlockSrc *self, char *name));
+    CLASS6D430_SLOTS(TimBlockSrc, (TimBlockSrc * self, char *name));
     /* +0x078 is Class6D430's slot78; this table's occupant is
      * TimBlockSrc__SetEntryShift(self, index, shift). */
     /* +0x07C */ void (*fadeAllEntries)(TimBlockSrc *self, TimBlockSrcColor *color); /* TimBlockSrc__FadeAllEntries */
-    /* +0x080 */ void (*fadeEntry)(TimBlockSrc *self, s32 index, TimBlockSrcColor *color); /* TimBlockSrc__FadeEntry */
+    /* +0x080 */ void (*fadeEntry)(TimBlockSrc *self, s32 index,
+                                   TimBlockSrcColor *color); /* TimBlockSrc__FadeEntry */
 };
 
 struct TimBlockSrc {
     CLASS6D430_FIELDS(TimBlockSrcMethods); /* unk2A is the load state: 9 header, 10 blocks, 0 done */
-    /* +0x02C */ s32 blockCount;      /* TimArraySrcs built so far */
+    /* +0x02C */ s32 blockCount;           /* TimArraySrcs built so far */
     /* +0x030 */ struct TimArraySrc **blocks; /* one per block; ReleaseBasicClassArray'd by Finalize */
-    /* +0x034 */ void *sector;        /* the read buffer: 0x800 for the header, then the largest block size */
+    /* +0x034 */ void *sector; /* the read buffer: 0x800 for the header, then the largest block size */
     /* +0x038 */ s32 sectorSize;
-    /* +0x03C */ s32 loaded;          /* set after the last block */
+    /* +0x03C */ s32 loaded; /* set after the last block */
     /* +0x040 */ TimBlockSrcEntry entries[4];
-    /* +0x080 */ s32 failed;          /* an allocation failed */
-};                                    /* 0x84 bytes: New_TimBlockSrc */
+    /* +0x080 */ s32 failed; /* an allocation failed */
+}; /* 0x84 bytes: New_TimBlockSrc */
 
 extern TimBlockSrcMethods D_8006F0B8;
 extern TimBlockSrcMethods *GetTimBlockSrcMethods(void);

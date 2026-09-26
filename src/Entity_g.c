@@ -247,7 +247,8 @@ void Entity__MoodCue111(Entity *this, EntityMoodHandlerArg *out) {
     }
 }
 
-void Entity__StepYawInWindowsThenDeactivate(Entity *this, EntityMoodHandlerArg *out, s32 arg2, s32 arg3, s32 arg4) {
+void Entity__StepYawInWindowsThenDeactivate(Entity *this, EntityMoodHandlerArg *out, s32 arg2,
+                                            s32 arg3, s32 arg4) {
     s32 timer;
 
     out->unk10 = 0;
