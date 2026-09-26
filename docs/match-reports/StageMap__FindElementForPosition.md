@@ -184,7 +184,7 @@ NON_MATCHING body promoted, round 73
 > needing a CHANGED state, not a repeat, a **second independent RNG run**
 > (not a rerun of round 38's own search) qualifies, since round 38's run
 > was a single seed and CLAUDE.md documents elsewhere in this project
-> (`StageMap__ComputeRateEntry`'s own round-32 history) that "a permuter plateau is not
+> (`StageMap__ComputeChunkLoadEntry`'s own round-32 history) that "a permuter plateau is not
 > an exhaustion proof" until a SECOND independent search has also failed.
 >
 > **Scaffold, validated before searching:** `tools/setup-permuter.sh
@@ -211,7 +211,7 @@ NON_MATCHING body promoted, round 73
 > `--debug`-validated scaffolds confirmed to score the same residue as the
 > real build, on top of round 38's five manual variants and round 39's
 > four more. **This is now the most exhaustively permuter-tested residue
-> in the unit alongside `StageMap__ComputeRateEntry`'s two 144k/40k-iteration searches**
+> in the unit alongside `StageMap__ComputeChunkLoadEntry`'s two 144k/40k-iteration searches**
 > -- read as a hard floor of this specific commutative-operand-order class
 > under this compiler, not an unexplored lead. Not re-attempted further
 > this round; restored to `INCLUDE_ASM` unchanged, `git diff` against the
@@ -222,12 +222,12 @@ NON_MATCHING body promoted, round 73
 > **A second independent permuter run is worth the bounded cost even after
 > a first run plateaued at the same non-zero score, but two flat runs in a
 > row is a real stopping signal, not just an unlucky pair.** This report
-> and `StageMap__ComputeRateEntry`'s now each carry two independently-seeded searches
+> and `StageMap__ComputeChunkLoadEntry`'s now each carry two independently-seeded searches
 > (183k and 184k total iterations respectively) that never beat their own
 > base score -- both single-word/two-register commutative-operand-identity
 > residues. Given this project's confirmed, cross-function
 > commutative-canonicalization class (this function, `StageMap__LoadElementResources`'s
-> `or`/`addu` sites, `StageMap__ComputeRateEntry`'s `$v0`/`$v1` accumulators), a THIRD
+> `or`/`addu` sites, `StageMap__ComputeChunkLoadEntry`'s `$v0`/`$v1` accumulators), a THIRD
 > search on any of these is unlikely to be a good use of a bounded permuter
 > slot; a differently-shaped seed (not just fresh RNG on the same shape)
 > would be needed to find new ground, and no such reshaping has been

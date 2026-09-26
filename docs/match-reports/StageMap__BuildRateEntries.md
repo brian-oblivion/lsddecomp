@@ -24,7 +24,7 @@ relevant (no header, symbol or type change -- the fix removed a local).
 > ```
 >
 > Exact length, no drift, and `asm-differ` shows zero `<`/`>` markers with
-> three `r` rows -- so like `StageMap__ComputeRateEntry` and unlike `StageMap__ComputeFootprintDescriptor` this
+> three `r` rows -- so like `StageMap__ComputeChunkLoadEntry` and unlike `StageMap__ComputeFootprintDescriptor` this
 > round, **the inherited "pure register identity" verdict is CONFIRMED.**
 > Residue, all three words in the second loop:
 >
@@ -93,7 +93,7 @@ relevant (no header, symbol or type change -- the fix removed a local).
 > The body carried a bare `__asm__("")` before `u14 = e->unkC->unk14;` in the
 > first loop. With `e` merged it is no longer needed: removed, and the
 > whole-image rebuild stays green. It was a crutch for the two-variable shape.
-> (Contrast `StageMap__ComputeRateEntry`'s `do {} while (0);` this same round, which was
+> (Contrast `StageMap__ComputeChunkLoadEntry`'s `do {} while (0);` this same round, which was
 > tested the same way and IS still load-bearing -- test, do not assume,
 > in either direction.)
 >
@@ -108,7 +108,7 @@ relevant (no header, symbol or type change -- the fix removed a local).
 > is a register-colour difference on a loop's walking pointer and another loop
 > in the same function walks something similar, try reusing that loop's
 > variable before trying anything else. Measured twice this round on the same
-> axis (`StageMap__ComputeRateEntry`: four locals to two; `StageMap__BuildRateEntries`: `e2` deleted),
+> axis (`StageMap__ComputeChunkLoadEntry`: four locals to two; `StageMap__BuildRateEntries`: `e2` deleted),
 > and bravo's `_SsInit` is a third instance from the other direction.
 >
 > **And the operational form of it: "the permuter found nothing" bounds the
@@ -302,7 +302,7 @@ its use site instead of caching it.
 > swaps only, no instruction shape differences). Given three prior rounds'
 > confirmation including a callee-saved-register-order check, no new
 > variant was attempted this round; time went to `StageMap__FindElementForPosition` (matched)
-> and a permuter run on `StageMap__ComputeRateEntry` instead.
+> and a permuter run on `StageMap__ComputeChunkLoadEntry` instead.
 
 > **ROUND 27 (delta): callee-saved-register check per the head's broadcast
 > (a parameter that must survive a call sometimes gets promoted to a
@@ -356,7 +356,7 @@ If `arg3 == 0`, does nothing at all (whole body skipped). Otherwise:
    `unk20` from `arg2` combined with either `tbl` (when
    `self->unk68->unk4 == 0`) or a flat `-0x5000` adjustment (otherwise),
    zero the SAME `Unk14Obj`'s new `unk0` field (a genuine reload, not dead
-   code), call the still-raw sibling `StageMap__ComputeRateEntry` (7 args, 2 on the
+   code), call the still-raw sibling `StageMap__ComputeChunkLoadEntry` (7 args, 2 on the
    stack) to fill one slot of a 7-entry `ChunkLoadEntry` stack buffer,
    increment `count`.
 4. A SECOND loop, `i = 0..6` again unconditionally: copies
@@ -369,7 +369,7 @@ New header additions (all committed, additive; unchanged from the previous
 draft of this report): `Elem::unk2` (u16 @+0x002), `Unk14Obj::unk0` (s32
 @+0x000), `ChunkSlotSpec` (new: `u8 key`@0, `u8 flag`@1, size 2),
 `extern Unk54Struct sRateOffsetTable[]` (reuses the existing 3-`s32`-word shape),
-`extern void StageMap__ComputeRateEntry(...)` (7-arg prototype, established from this
+`extern void StageMap__ComputeChunkLoadEntry(...)` (7-arg prototype, established from this
 call site only), and `Obj866E8Methods::slotFC` fixed to its real signature
 (see `StageMap__ApplyRateEntries`'s report for the mixup that entry had).
 
@@ -490,7 +490,7 @@ void StageMap__BuildRateEntries(Obj866E8 *self, s32 val, Unk54Struct *arg2, Chun
                 }
                 u14 = e->unkC->unk14;
                 u14->unk0 = 0;
-                StageMap__ComputeRateEntry(self, &stackBuf[count], divisor, flag, val, savedResult, arg3[i].key);
+                StageMap__ComputeChunkLoadEntry(self, &stackBuf[count], divisor, flag, val, savedResult, arg3[i].key);
                 count++;
             }
         }
@@ -706,7 +706,7 @@ void StageMap__BuildRateEntries(Obj866E8 *self, s32 val, Unk54Struct *arg2, Chun
                     u14->unk20.w = arg2->unk8 - 0x5000;
                 }
                 e->unkC->unk14->unk0 = 0;
-                StageMap__ComputeRateEntry(self, &stackBuf[count], divisor, flag, val, savedResult, arg3[i].key);
+                StageMap__ComputeChunkLoadEntry(self, &stackBuf[count], divisor, flag, val, savedResult, arg3[i].key);
                 count++;
             }
         }
@@ -728,4 +728,4 @@ Round 78 (track 3, naming pass, bravo).
 
 | symbol | name | tier | evidence |
 | --- | --- | --- | --- |
-| `func_8004B700` | `StageMap__BuildRateEntries` | B | Occupant of `gStageMapMethods` +0x0F8 (`slotF8`, verified its own identity via classtable -- see the corrected slot comment in `include/class_3bb8c.h`). Iterates a `ChunkSlotSpec[7]` (`sDefaultTargetSpecs` at its one known call site), calling `StageMap__ComputeNeighbourMask` once and `StageMap__ComputeRateEntry` per enabled entry to fill a 7-slot `ChunkLoadEntry` stack buffer, then dispatches the filled count through `slotFC` (`StageMap__ApplyRateEntries`). "Build...RateEntries" names the mechanic (assembling the entry array that the next slot applies), consistent with the sibling already-matched functions in this same vtable region (`StageMap__ConfigureRateEntry`, `StageMap__AdvanceRateCountdown`, `StageMap__FlushRateLatch`). |
+| `func_8004B700` | `StageMap__BuildRateEntries` | B | Occupant of `gStageMapMethods` +0x0F8 (`slotF8`, verified its own identity via classtable -- see the corrected slot comment in `include/class_3bb8c.h`). Iterates a `ChunkSlotSpec[7]` (`sDefaultTargetSpecs` at its one known call site), calling `StageMap__ComputeNeighbourMask` once and `StageMap__ComputeChunkLoadEntry` per enabled entry to fill a 7-slot `ChunkLoadEntry` stack buffer, then dispatches the filled count through `slotFC` (`StageMap__ApplyRateEntries`). "Build...RateEntries" names the mechanic (assembling the entry array that the next slot applies), consistent with the sibling already-matched functions in this same vtable region (`StageMap__ConfigureRateEntry`, `StageMap__AdvanceRateCountdown`, `StageMap__FlushRateLatch`). |

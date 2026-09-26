@@ -1,4 +1,6 @@
-# StageMap__ComputeRateEntry -- MATCH (63/63 words, ins 0 / del 0, exact length)
+# StageMap__ComputeChunkLoadEntry -- MATCH (63/63 words, ins 0 / del 0, exact length)
+
+> Renamed from `StageMap__ComputeRateEntry` on 2026-09-26 (tools/rename.py). Address 0x8004ba40.
 
 > Renamed from `Class866E8__ComputeRateEntry` on 2026-09-26 (tools/rename.py). Address 0x8004ba40.
 
@@ -22,8 +24,8 @@ were all already correct; the stall was one variable too many).
 > Rebuilt the committed `#if 0` body verbatim:
 >
 > ```
-> StageMap__ComputeRateEntry: 58/63 words match (file 0x3C240-0x3C33C)
-> StageMap__ComputeRateEntry: insertions 0 / deletions 0
+> StageMap__ComputeChunkLoadEntry: 58/63 words match (file 0x3C240-0x3C33C)
+> StageMap__ComputeChunkLoadEntry: insertions 0 / deletions 0
 > ```
 >
 > 58/63 reproduces exactly, length exact, no drift. **Unlike `StageMap__ComputeFootprintDescriptor`
@@ -131,7 +133,7 @@ were all already correct; the stall was one variable too many).
 > and PASSED, independently, both times. This function's negative is NOT
 > one of the five family members round 46 found voided (`StageMap__ApplyRateEntries`,
 > `StageMap__ComputeFootprintDescriptor`, `StageMap__SplitFootprintSlot`, `StageMap__BuildFootprintSlots`, `IsPointOutOfBounds` --
-> all confirmed scaffold-MISMATCHED); `StageMap__ComputeRateEntry`'s scaffold has twice
+> all confirmed scaffold-MISMATCHED); `StageMap__ComputeChunkLoadEntry`'s scaffold has twice
 > been confirmed to AGREE with the real build. The ~184,000-iteration
 > negative stands as evidence, not as a voided measurement.
 >
@@ -359,7 +361,7 @@ this function.
   `pad60[0x68 - 0x60]` into two named fields, `unk60` (the callback) and
   `unk64` (its opaque context arg) -- additive (same total size, same
   offsets), not a removal. Comment explains the split.
-- **`StageMap__ComputeRateEntry`'s own prototype**: return type corrected `void` ->
+- **`StageMap__ComputeChunkLoadEntry`'s own prototype**: return type corrected `void` ->
   `s32`. Retail explicitly sets `$v0` to 0 or 1 on every path before
   returning (see the tail sequence below) -- a `void` function would never
   do this. `StageMap__BuildRateEntries`, the only caller, discards the result, which is
@@ -368,14 +370,14 @@ this function.
   **This retype is safe today only because `StageMap__BuildRateEntries` is still
   `INCLUDE_ASM`, and it is a LOAD-BEARING fact for whoever attempts
   `StageMap__BuildRateEntries` next.** `StageMap__BuildRateEntries` is a live 125/140 stall in this
-  same unit that calls `StageMap__ComputeRateEntry` and discards the result -- exactly
+  same unit that calls `StageMap__ComputeChunkLoadEntry` and discards the result -- exactly
   the condition under which a declared return type controls whether GCC
   tail-merges identical DISCARDED call sites into one shared block or
   keeps them separate (this round's own near-miss queue independently
   measured the same mechanism from the other direction: N calls merging
   into groups partitions by declared return type). If `StageMap__BuildRateEntries`'s
   own word count doesn't match expectations, or shows an unexplained
-  2-or-4-word residue around calls to `StageMap__ComputeRateEntry`, check this
+  2-or-4-word residue around calls to `StageMap__ComputeChunkLoadEntry`, check this
   prototype before assuming a new residue class -- the `s32` return here
   is evidence-backed (retail's own `$v0` sets, not a guess), so the fix is
   almost certainly on `StageMap__BuildRateEntries`'s side, not this declaration's.
@@ -420,7 +422,7 @@ round-63 entry at the top.
 ## HISTORICAL -- near-miss body before round 63 (58/63)
 
 ```c
-s32 StageMap__ComputeRateEntry(Obj866E8 *self, ChunkLoadEntry *arg1, s32 divisor, s32 flag, s32 val, s32 savedResult, s32 key)
+s32 StageMap__ComputeChunkLoadEntry(Obj866E8 *self, ChunkLoadEntry *arg1, s32 divisor, s32 flag, s32 val, s32 savedResult, s32 key)
 {
     s32 mask = sRateKeyMask[key];
     s32 result;
@@ -499,7 +501,7 @@ already existed.
    `--addiu-at`, and the rodata-stripping `sed 1,4d`) were checked --
    `sRateKeyMask`'s `%lo(...)` addressing DOES touch `addiu_at`, so
    `compile.sh`'s `MASPSX_FLAGS` was patched locally in
-   `permuter-work/StageMap__ComputeRateEntry/` (never in the shared script, this round's
+   `permuter-work/StageMap__ComputeChunkLoadEntry/` (never in the shared script, this round's
    parallel-mode constraint) before trusting any score; no embedded rodata
    here so the second bug did not apply. **39,940 iterations, exit 124**
    (this round's own `timeout 280`, self-fired -- captured directly this
@@ -571,4 +573,4 @@ Round 78 (track 3, naming pass, bravo).
 
 | symbol | name | tier | evidence |
 | --- | --- | --- | --- |
-| `func_8004BA40` | `StageMap__ComputeRateEntry` | B | Fills one `ChunkLoadEntry` slot (`arg1->ptr0`/`arg1->id`) from `sRateEntryTable[key]`/`sRateKeyMask[key]` and `self->unk60(self->unk64, ...)` (a stored resolver callback), called once per enabled `ChunkSlotSpec` by `StageMap__BuildRateEntries`. "Compute...Entry" matches that caller's own "Build...Entries" name (one call computes one entry of the array the caller builds). Return type corrected `void`->`s32` in an earlier round (see the header's own note); not revisited here. |
+| `func_8004BA40` | `StageMap__ComputeChunkLoadEntry` | B | Fills one `ChunkLoadEntry` slot (`arg1->ptr0`/`arg1->id`) from `sRateEntryTable[key]`/`sRateKeyMask[key]` and `self->unk60(self->unk64, ...)` (a stored resolver callback), called once per enabled `ChunkSlotSpec` by `StageMap__BuildRateEntries`. "Compute...Entry" matches that caller's own "Build...Entries" name (one call computes one entry of the array the caller builds). Return type corrected `void`->`s32` in an earlier round (see the header's own note); not revisited here. |

@@ -121,7 +121,7 @@ despite ~15 manual attempts) is exactly what caught it.
 > list-scheduler choice (batching independent loads ahead of a store),
 > not reachable through source-level reordering or reload-caching
 > placement. Not attempted further this round; time went to `StageMap__FindElementForPosition`
-> (matched) and a permuter run on `StageMap__ComputeRateEntry` instead.
+> (matched) and a permuter run on `StageMap__ComputeChunkLoadEntry` instead.
 
 > **ROUND 20 (charlie): re-verified, residue mechanism pinned down more
 > precisely via direct `.o` disassembly (not just `funcdiff`'s summary).**

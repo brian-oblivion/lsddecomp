@@ -47,7 +47,7 @@ then was `Class81940`.
 **Class name `LbdFile`, tier A.** The files the class is handed are the
 stage's map chunks, STGnn\Mnnn.LBD: StageMap__ApplyRateEntries calls
 loadHeader (+0x078) with each rate entry's `ptr0`, which
-StageMap__ComputeRateEntry takes from the grid's callback, and that
+StageMap__ComputeChunkLoadEntry takes from the grid's callback, and that
 callback is ObjM__OnRegistrantEvent (ObjM__AttachTarget installs it), whose
 tail call GetGridRecordAt(stage, chunk) / GetGridRecordXY leaves
 `&group[9 + chunk]` of gRecordTable in $v0. gRecordTable's 0x1C-byte records

@@ -11,7 +11,7 @@
  * plus sub-cell halfword offsets); StageMap__UpdateFootprintTracking runs
  * every enabled tick (paired with class_3ac78's StageMap__AdvanceRateCountdown)
  * to refresh that descriptor and notify on change; StageMap__BuildRateEntries
- * / StageMap__ComputeNeighbourMask / StageMap__ComputeRateEntry /
+ * / StageMap__ComputeNeighbourMask / StageMap__ComputeChunkLoadEntry /
  * StageMap__ApplyRateEntries build and apply a per-element rate table from
  * a ChunkSlotSpec key/flag array (sDefaultTargetSpecs); and
  * StageMap__LoadElementResources / StageMap__ResetElementCells own an
@@ -151,7 +151,7 @@ s32 StageMap__UpdateFootprintTracking(StageMap *self) {
  * second loop reuses `e`, the same variable the first loop walks, instead of a
  * separate `e2`. Nothing else in the body changed.
  * That axis is exactly the one a permuter cannot reach: it mutates a body, it
- * does not merge two of its locals into one. Same lever as StageMap__ComputeRateEntry this
+ * does not merge two of its locals into one. Same lever as StageMap__ComputeChunkLoadEntry this
  * round.
  * The `__asm__("")` barrier this body used to carry before `u14 = ...` is gone:
  * with `e` merged it is no longer needed, verified by whole-image rebuild. */
@@ -188,7 +188,7 @@ void StageMap__BuildRateEntries(StageMap *self, s32 val, LongVec3 *arg2, ChunkSl
                     u14->unk20.w = arg2->z - 0x5000;
                 }
                 e->cellParent->coord2->flg = 0;
-                StageMap__ComputeRateEntry(self, &stackBuf[count], divisor, flag, val,
+                StageMap__ComputeChunkLoadEntry(self, &stackBuf[count], divisor, flag, val,
                                              savedResult, arg3[i].neighbour);
                 count++;
             }
@@ -239,7 +239,7 @@ s32 StageMap__ComputeNeighbourMask(StageMap *self, s32 val, s32 flag) {
 
 /* MATCH, round 63 (delta): closed a 58/63 stall that had stood since round
  * 27 across five re-verifications and ~330,000 permuter iterations -- see
- * docs/match-reports/StageMap__ComputeRateEntry.md. The 5-word residue really was pure
+ * docs/match-reports/StageMap__ComputeChunkLoadEntry.md. The 5-word residue really was pure
  * register identity (funcdiff ins 0 / del 0, no asm-differ markers), and the
  * fix was FEWER variables, not more: retail carries the multiply result AND
  * the running sum AND both branch addends in ONE local (`sum`, retail's
@@ -250,7 +250,7 @@ s32 StageMap__ComputeNeighbourMask(StageMap *self, s32 val, s32 flag) {
  * iterations without ever reaching the merged shape.
  * The `do {} while (0);` below is LOAD-BEARING: removing it drifts the
  * image. It was inherited with the near-miss body and is verified here. */
-s32 StageMap__ComputeRateEntry(StageMap *self, ChunkLoadEntry *arg1, s32 divisor, s32 flag,
+s32 StageMap__ComputeChunkLoadEntry(StageMap *self, ChunkLoadEntry *arg1, s32 divisor, s32 flag,
                                  s32 val, s32 savedResult, s32 key) {
     s32 mask = sRateKeyMask[key];
     s32 result;

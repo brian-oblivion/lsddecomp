@@ -30,7 +30,7 @@ extern ChunkSlotSpec sDefaultTargetSpecs[7];
  * byte), so unsized. */
 extern LongVec3 sRateOffsetTable[];
 
-/* `key`-indexed bitmask table (`1 << key`) StageMap__ComputeRateEntry tests
+/* `key`-indexed bitmask table (`1 << key`) StageMap__ComputeChunkLoadEntry tests
  * against ComputeRateFlags' result. 7 words in the data before
  * sRateEntryTable starts. */
 extern const s32 sRateKeyMask[7];

@@ -320,7 +320,7 @@ void StageMap__Disable(StageMap *self);
 s32 StageMap__UpdateFootprintTracking(StageMap *self);
 void StageMap__BuildRateEntries(StageMap *self, s32 val, LongVec3 *pos, ChunkSlotSpec *specs);
 s32 StageMap__ComputeNeighbourMask(StageMap *self, s32 val, s32 flag);
-s32 StageMap__ComputeRateEntry(StageMap *self, ChunkLoadEntry *entry, s32 divisor, s32 flag,
+s32 StageMap__ComputeChunkLoadEntry(StageMap *self, ChunkLoadEntry *entry, s32 divisor, s32 flag,
                                  s32 val, s32 savedResult, s32 key); /* 0 or 1; BuildRateEntries discards it */
 void StageMap__ApplyRateEntries(StageMap *self, ChunkLoadEntry *entries, s32 count);
 s32 StageMap__CountFlaggedElements(StageMap *self);

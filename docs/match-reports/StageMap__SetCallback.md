@@ -34,7 +34,7 @@ Round 67 (track 3, naming pass).
 
 | symbol | name | tier | evidence |
 | --- | --- | --- | --- |
-| `func_8004ADC4` | `StageMap__SetCallback` | A | Occupant of vtable slot `+0x0C8`; a two-word setter whose stores land at `+0x060` and `+0x064`. `class_3bb8c`'s MATCHED `StageMap__ComputeRateEntry` invokes exactly that pair as `unk60(unk64, value, 0, 0)` and stores the result -- so the first word is a function pointer and the second its context. A pure setter whose mechanics are its purpose. |
+| `func_8004ADC4` | `StageMap__SetCallback` | A | Occupant of vtable slot `+0x0C8`; a two-word setter whose stores land at `+0x060` and `+0x064`. `class_3bb8c`'s MATCHED `StageMap__ComputeChunkLoadEntry` invokes exactly that pair as `unk60(unk64, value, 0, 0)` and stores the result -- so the first word is a function pointer and the second its context. A pure setter whose mechanics are its purpose. |
 
 | field | name | tier | evidence |
 | --- | --- | --- | --- |
