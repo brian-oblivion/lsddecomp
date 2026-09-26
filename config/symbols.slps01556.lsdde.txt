@@ -2876,3 +2876,4 @@ gClass866E8Methods = 0x800866E8;
 gLinkResourceMethods = 0x8006F13C;
 gObjMMethods = 0x80087034;
 ObjM__NoOpSlotBC = 0x800541CC; // type:func
+sDivClipWidth = 0x8008A824;

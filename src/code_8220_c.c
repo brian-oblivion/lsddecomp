@@ -337,11 +337,11 @@ void UpdatePolyBBoxAndCull(void *ctx, s32 count) {
     }
 }
 
-/* D_8008A824/D_8008A828 -- read only by FillRCPolyHeader, unconditionally
+/* sDivClipWidth/D_8008A828 -- read only by FillRCPolyHeader, unconditionally
  * copied into every submit table's +0x4/+0x8 words. No second accessor
  * establishes what either holds beyond "a GPU header word"; left as `D_`
  * names (round 77, insufficient evidence for gPoly*-style names). */
-extern s32 D_8008A824;
+extern s32 sDivClipWidth;
 extern s32 D_8008A828;
 
 /* dc_cb+0x4 (Sony; config/psyq-objects.ld pins `dc_cb` at 0x80090c14).
@@ -358,7 +358,7 @@ extern s32 sPolyOtCodeOverride;
 /* Populates a submit table's (`table`, one of gDivPolygon3/
  * gDivPolygon4) common header fields ahead of a Submit* wrapper's
  * RCpoly* call: +0x0 an OT/code word (sPolyOtCodeOverride when
- * sPolyOtCodeOverrideSet, else the D_80090C18 default), +0x4 D_8008A824,
+ * sPolyOtCodeOverrideSet, else the D_80090C18 default), +0x4 sDivClipWidth,
  * +0x8 D_8008A828 -- these three are UNCONDITIONAL; only the two u16 args
  * at +0xC/+0xE are gated on `hasUv1Codes`. +0x10 is an unaligned PolyUV4
  * copied from `*uv` (same lwl/lwr idiom as CopyPolyVtx3); +0x14 is the
@@ -377,7 +377,7 @@ void FillRCPolyHeader(void *table, void *ctx, PolyUV4 *uv, s32 hasUv1Codes, u16 
     } else {
         val = D_80090C18;
     }
-    code = D_8008A824;
+    code = sDivClipWidth;
     code2 = D_8008A828;
 
     *(s32 *)dst = val;

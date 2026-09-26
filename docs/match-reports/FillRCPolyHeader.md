@@ -18,7 +18,7 @@ Whole-image `./build-and-verify.sh` passes (`build exit=0`).
 ## Final C
 
 ```c
-extern s32 D_8008A824;
+extern s32 sDivClipWidth;
 extern s32 D_8008A828;
 extern s32 D_80090C18;
 extern s32 sPolyOtCodeOverrideSet;
@@ -37,7 +37,7 @@ void FillRCPolyHeader(void *arg0, void *arg1, PolyUV4 *arg2, s32 arg3, u16 arg4,
     } else {
         val = D_80090C18;
     }
-    code = D_8008A824;
+    code = sDivClipWidth;
     code2 = D_8008A828;
 
     *(s32 *)dst = val;
@@ -55,7 +55,7 @@ void FillRCPolyHeader(void *arg0, void *arg1, PolyUV4 *arg2, s32 arg3, u16 arg4,
 ```
 
 Populates a GPU primitive header at `arg0` (`gDivPolygon3`/`gDivPolygon4`
-depending on caller): a selected OT/code word at +0x00, `D_8008A824` at
+depending on caller): a selected OT/code word at +0x00, `sDivClipWidth` at
 +0x04, `D_8008A828` at +0x08, an unaligned `PolyUV4` at +0x10 copied from
 `*arg2`, and the plain word at `arg1 + 0x30` at +0x14. Only the two `u16`
 stack args (`arg4`/`arg5`, stored at +0x0C/+0x0E) are conditional on
@@ -106,7 +106,7 @@ it takes reading the raw `.s` (or the `~>` branch-target markers) and asking
   in ONE statement placed *after* the `if`/`else` avoided the duplication --
   but only once the merge block itself had enough real work in it (see next
   point).
-- **The two unconditional-global reads (`D_8008A824`, `D_8008A828`) must be
+- **The two unconditional-global reads (`sDivClipWidth`, `D_8008A828`) must be
   assigned to locals placed AFTER the `val` if/else, not before it and not as
   initializers at the top of the function.** Putting them before the branch
   hoists their loads ahead of the `sPolyOtCodeOverrideSet` test entirely, which is a
@@ -116,7 +116,7 @@ it takes reading the raw `.s` (or the `~>` branch-target markers) and asking
   above.
 - Declaration ORDER of the two temps (`code` before `code2`) does not affect
   codegen; only the ORDER OF THE ASSIGNMENT STATEMENTS does (they must read
-  `D_8008A824` before `D_8008A828`, matching retail's `gp_rel` load order at
+  `sDivClipWidth` before `D_8008A828`, matching retail's `gp_rel` load order at
   offsets `0x1C`/`0x20` from `$gp`).
 - A bare `__asm__("")` scheduling barrier between the unconditional stores
   and the `if (arg3)` block was tried and made things WORSE (dropped to
