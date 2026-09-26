@@ -756,3 +756,27 @@ s32 _card_clear(s32 chan) {
 }
 #endif
 ```
+
+## File history (moved from the unit banner, round 90)
+
+- Round 27 (head): carved `class_3bb8c_v` as a one-function unit, because
+  the function sat between two PSX BIOS trampoline clusters inside the old
+  `class_3bb8c_h` segment (2 before, now `class_3bb8c_h_b`; 5 after, now
+  `class_3bb8c_h_c`), and trampolines stay in `asm` segments. Not a
+  class-table slot (`classtable.py --scan`). The canonical declaration is
+  the caller's, `extern s32 _card_clear(s32 arg0);` in
+  `src/class_3bb8c_e.c`, passing `self->unk10`.
+- Round 34: the neighbours became linked libcard objects, so the unit now
+  sits between placed `libcard/c171` and `libcard/a78`.
+- Round 36 (runner charlie): retargeted the preserved body's callees to
+  `_new_card`/`_card_write`, re-measured 9/12, exact length, no drift;
+  restored `INCLUDE_ASM` (body preserved above).
+- Round 39 (head): identified as Sony libcard, unmatchable by construction
+  (this report's top sections). The old banner kept a stale "12 words --
+  this should close in one sitting" directive as an example of a confident
+  stale instruction; that example now lives here.
+- Round 90 (track 8): `tools/unitfile.py rename class_3bb8c_v
+  libcard_card_clear`. `tuboundary.py --unit class_3bb8c_v`: "(after
+  sony:libcard/c171): start edge possible"; both neighbours are placed
+  objects, so no merge was possible. Named for the function because the
+  object's module id is not measurable from the discs on hand.
