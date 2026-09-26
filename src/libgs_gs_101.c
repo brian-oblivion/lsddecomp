@@ -1,5 +1,5 @@
 /*
- * code_2cc8c_e0 -- ONE function, Sony's GsSetNearClip (libgs/gs_101), 4 words,
+ * libgs_gs_101 -- ONE function, Sony's GsSetNearClip (libgs/gs_101), 4 words,
  * 0x3030C..0x3031C (vram 0x8003FB0C..0x8003FB1C).
  *
  * SONY CODE, written as C. Round 78's head identified it under FINISHING-PLAN
@@ -13,7 +13,7 @@
  *
  * ROUND 34: this unit exists because the object behind it, libgs/gs_123
  * (Gssub_make_matrix), is linked, which split the old code_2cc8c_e segment
- * into [c code_2cc8c_e0][o libgs/gs_123][c ...]. gs_101 itself never placed
+ * into [c libgs_gs_101][o libgs/gs_123][c ...]. gs_101 itself never placed
  * as an object (no .o segment here), so the function stays as C.
  *
  * Deliberately includes only common.h. The one caller, Viewport__Update

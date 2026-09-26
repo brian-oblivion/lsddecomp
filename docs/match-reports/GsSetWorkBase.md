@@ -47,11 +47,11 @@ global, not unit-static -- moot here since it already carries its Sony name.
 
 ### Sibling note
 
-`func_8003FB0C` (`src/code_2cc8c_e0.c`, charlie's unit this round) is the
+`func_8003FB0C` (`src/libgs_gs_101.c`, charlie's unit this round) is the
 identical shape one function earlier in the same original segment
 (`D_800902E4 = a0`), called from the same caller (`Viewport__Update`) two
 lines above this one. `D_800902E4` is NOT referenced outside
-`code_2cc8c_e0.c` (checked: `grep -rn D_800902E4 src/ include/`), so unlike
+`libgs_gs_101.c` (checked: `grep -rn D_800902E4 src/ include/`), so unlike
 `GsOUT_PACKET_P` it does not carry a Sony pin as far as this unit can see --
 that's charlie's call to make with `rename.py`, which will say either way.
 Posted to the broadcast for parallel naming.
