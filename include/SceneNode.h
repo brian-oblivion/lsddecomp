@@ -117,7 +117,7 @@ struct SceneNodeSub14 {
     /* +0x0A4 */ void (*composeAndApplyRotation)(Self *self, void *vec, void *dst, void *src, s32 count); /* SceneNode__ComposeAndApplyRotation */ \
     /* +0x0A8 */ s32 (*checkBoundsOverlap)(Self *self, void *corners, TmdVec3 *delta); /* SceneNode__CheckBoundsOverlap */ \
     /* +0x0AC */ s32 (*classifyAgainstPlanes)(Self *self, void *outFlag, TmdVec3 *delta, void *corners); /* SceneNode__ClassifyAgainstPlanes */ \
-    /* +0x0B0 */ void (*slotB0)(void);                                     /* func_8001E49C, empty; never called */ \
+    /* +0x0B0 */ void (*slotB0)(void);                                     /* SceneNode__NoOpSlotB0, empty; never called */ \
     /* +0x0B4 */ void (*notifyTaggedParents)(Self *self, void *node)       /* SceneNode__NotifyTaggedParents */
 /* clang-format on */
 
@@ -189,7 +189,7 @@ void SceneNode__TryAttachNearby(SceneNode *self, SceneNode *other);
 void SceneNode__ComposeAndApplyRotation(SceneNode *self, void *vec, void *dst, void *src, s32 count);
 s32 SceneNode__CheckBoundsOverlap(SceneNode *self, void *corners, TmdVec3 *delta);
 s32 SceneNode__ClassifyAgainstPlanes(SceneNode *self, s32 *outFlag, TmdVec3 *delta, TmdHull *corners);
-void func_8001E49C(void);
+void SceneNode__NoOpSlotB0(void);
 void SceneNode__NotifyTaggedParents(SceneNode *self, void *node);
 
 void SceneNode__RotateLocalVector(SceneNode *self, LongVec3 *dst, s16 *src);

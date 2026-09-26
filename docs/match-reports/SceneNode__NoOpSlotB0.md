@@ -1,4 +1,6 @@
-# func_8001E49C -- MATCHED (trivial)
+# SceneNode__NoOpSlotB0 -- MATCHED (trivial)
+
+> Renamed from `func_8001E49C` on 2026-09-26 (tools/rename.py). Address 0x8001e49c.
 
 Round 54 (bravo, track 3). `code_d294_b`.
 
@@ -16,7 +18,7 @@ now so track 3's naming pass has somewhere to record the tier decision.
 
 ## Naming
 
-**Kept as `func_8001E49C` -- Tier C.** Same shape and same disposition as the
+**Kept as `SceneNode__NoOpSlotB0` -- Tier C.** Same shape and same disposition as the
 already-established no-op-stub precedent in this exact class,
 `SceneNode__NoOpSlot5C` (`code_d294.c`, matched, never renamed): a vtable
 override whose entire behavior is "do nothing." Renaming a no-op to

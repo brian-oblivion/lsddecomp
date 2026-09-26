@@ -22,7 +22,7 @@
  * overlap test (`SceneNode__CheckBoundsOverlap`, MATCHED round 73), and a
  * plane-classification test (`SceneNode__ClassifyAgainstPlanes`, MATCHED
  * round 76); a third no-op stub
- * (`func_8001E49C`); a parent-list notify walk (`SceneNode__NotifyTaggedParents`,
+ * (`SceneNode__NoOpSlotB0`); a parent-list notify walk (`SceneNode__NotifyTaggedParents`,
  * MATCHED round 76); this unit's own
  * vtable getter (`GetSceneNodeMethods`, proposed `GetSceneNodeMethods`,
  * cross-unit); and a small free-function pair for segment/AABB clipping
@@ -568,7 +568,7 @@ void BisectSegmentToBox(TmdVec3 *out, BoundsBox_d294 *box, TmdVec3 *near, TmdVec
     }
 }
 
-void func_8001E49C(void) {}
+void SceneNode__NoOpSlotB0(void) {}
 
 /* Walks node's parent refs. For each run it finds the next entry whose class
  * kind (low nibble of its method table's first word) is 4. If that entry's
