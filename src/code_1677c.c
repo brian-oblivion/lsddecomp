@@ -131,8 +131,9 @@ void GameApplication__GameApplication(GameApplication *self, GameApplicationConf
 
 extern void SeedAndRandom(s32 day, s32 unused);
 
-/* Advances the day cursor: reads the running tick count kept in scratchpad
- * (0x1F800000, the PS-X data-cache-as-RAM region) and reduces it mod 365. */
+/* Seeds the C library's random generator from the scratchpad word at
+ * 0x1F800000 (the PS-X data-cache-as-RAM region) reduced mod 365; the
+ * random value SeedAndRandom returns is discarded. */
 void GameApplication__SeedRandom(GameApplication *self) {
     SeedAndRandom(*(s32 *)0x1F800000 % 365, 0);
 }
