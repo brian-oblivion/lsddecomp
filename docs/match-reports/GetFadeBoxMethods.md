@@ -9,12 +9,12 @@
 Unit `code_2cc8c_e`, carved round 14. `FadeBoxObj`'s own bare
 no-argument table getter, same idiom as `GetSceneNodeMethods`
 (`include/code_d294.h`) for `SceneNodeObj`: `FadeBoxMethods
-*GetFadeBoxMethods(void) { return &D_8006E99C; }`.
+*GetFadeBoxMethods(void) { return &gFadeBoxMethods; }`.
 
 ## Naming (round 61, track 3)
 
 **`GetFadeBoxMethods`** -- tier A. Bare no-argument getter,
-`return &D_8006E99C;` -- the exact same idiom as `code_d294.h`'s
+`return &gFadeBoxMethods;` -- the exact same idiom as `code_d294.h`'s
 `GetSceneNodeMethods` for `SceneNodeObj`'s own table. Mechanics fully
 determine the name.
 

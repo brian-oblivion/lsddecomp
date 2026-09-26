@@ -848,11 +848,6 @@
           "date": "2026-09-26",
           "header": "include/Class6D3C8.h"
         },
-        "D_8006E99C": {
-          "class": "FadeBox",
-          "date": "2026-09-26",
-          "header": "include/FadeBox.h"
-        },
         "gActorMethods": {
           "class": "Actor",
           "date": "2026-09-25",
@@ -937,6 +932,11 @@
           "class": "Entity",
           "date": "2026-09-26",
           "header": "include/Entity.h"
+        },
+        "gFadeBoxMethods": {
+          "class": "FadeBox",
+          "date": "2026-09-26",
+          "header": "include/FadeBox.h"
         },
         "gFileResourceMethods": {
           "class": "FileResource",

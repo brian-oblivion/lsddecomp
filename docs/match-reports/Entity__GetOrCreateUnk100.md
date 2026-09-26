@@ -141,7 +141,7 @@ not after a guess about what the object represents.
 `Entity::unk100` is now typed `FadeBox *` (include/FadeBox.h); the
 local `Unk100Obj`/`Unk100Methods` view and Entity.h's own
 `extern Unk100Obj *New_FadeBox` are deleted. This function's four slot
-calls resolve through D_8006E99C (`tools/classtable.py D_8006E99C`) and now
+calls resolve through gFadeBoxMethods (`tools/classtable.py gFadeBoxMethods`) and now
 use the unified names: slot50 -> `detachFromParent`
 (SceneNode__DetachFromParent), slot4C -> `attachToParent`
 (BoxFill__AttachToParent, `this` upcast to `SceneNode *`), slotD0 ->

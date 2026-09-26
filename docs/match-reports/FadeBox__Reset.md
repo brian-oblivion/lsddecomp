@@ -57,7 +57,7 @@ this one function alone.
 
 Renamed from `FadeBox__FinishConstruct` to `FadeBox__Reset`: it is the
 override of the inherited +0x040 slot, which SceneNode names `reset` and
-whose BoxFill occupant is `BoxFill__Reset` (`tools/classtable.py D_8006E99C
+whose BoxFill occupant is `BoxFill__Reset` (`tools/classtable.py gFadeBoxMethods
 --vs gBoxFillMethods`: +0x040 OVERRIDDEN, `BoxFill__Reset` ->
 this function). FINISHING-PLAN track 4 step 6 names an override for its
 slot, and the body does no more than a reset: it stores the ctor's

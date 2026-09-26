@@ -5,7 +5,7 @@
 
 /*
  * FadeBox -- a BoxFill that fades its colour (class id 0x164, method table
- * D_8006E99C). BoxFill's one subclass; no class derives from it. Methods in
+ * gFadeBoxMethods). BoxFill's one subclass; no class derives from it. Methods in
  * src/code_2cc8c_e.c, New_FadeBox to GetFadeBoxMethods. The ctor calls
  * GetBoxFillMethods()->ctor first, so the id parent (0x64) is the ctor-chain
  * parent. What its own methods do:
@@ -43,7 +43,7 @@ typedef struct FadeBoxMethods FadeBoxMethods;
 
 /* BoxFill's slots (overrides: +0x008 FadeBox__FadeBox, +0x040
  * FadeBox__Reset, +0x098 FadeBox__Update; `tools/classtable.py
- * D_8006E99C --vs gBoxFillMethods`), then this class's own. */
+ * gFadeBoxMethods --vs gBoxFillMethods`), then this class's own. */
 struct FadeBoxMethods {
     BOXFILL_SLOTS(FadeBox, (FadeBox * self, void *size, s32 channels, s32 pri));
     /* +0x0D0 */ void (*setStep)(FadeBox *self, s32 step); /* FadeBox__SetStep */
@@ -78,8 +78,8 @@ struct FadeBox {
     /* +0x09C */ s32 divisor; /* setDivisorMode */
 };
 
-extern FadeBoxMethods D_8006E99C;
-extern FadeBoxMethods *GetFadeBoxMethods(void); /* returns &D_8006E99C */
+extern FadeBoxMethods gFadeBoxMethods;
+extern FadeBoxMethods *GetFadeBoxMethods(void); /* returns &gFadeBoxMethods */
 
 /* +0x040's occupant, as the ctor calls it through the inherited slot. */
 typedef void (*FadeBoxResetFn)(FadeBox *self, s32 channels);

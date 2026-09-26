@@ -292,7 +292,7 @@ extern u32 GetSetBitField(u32 *word, s32 shift, s32 width, u32 value);
 
 /* GetSceneNodeMethods and its table: include/SceneNode.h (track 4, round 81). */
 
-/* FadeBox (class id 0x164, D_8006E99C): include/FadeBox.h (track 4,
+/* FadeBox (class id 0x164, gFadeBoxMethods): include/FadeBox.h (track 4,
  * round 87; it was a local FadeBoxObj view here). */
 
 /* SkipShort2 and Pair32E99C: include/BoxFill.h. */

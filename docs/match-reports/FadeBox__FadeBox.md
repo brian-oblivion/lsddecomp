@@ -58,7 +58,7 @@ already a pointer.
 (`+0x008`). Named per the project's `Class__Class` constructor convention
 (see `Entity__Entity`, `DreamSys.c`): calls the further-base ctor
 (`GetBoxFillMethods()->ctor(...)`) first, then installs this class's
-own `&D_8006E99C` table, then redispatches through `finishConstruct` --
+own `&gFadeBoxMethods` table, then redispatches through `finishConstruct` --
 the textbook "base ctor first, then own vtable, then dispatch" idiom
 already documented elsewhere in this project. Mechanics (construct an
 instance of this class) fully determine the name.

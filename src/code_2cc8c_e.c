@@ -36,7 +36,7 @@
 /*
  * WHAT THIS UNIT IS (round 61, track 3; revised rounds 85 and 87, track 4).
  * Its 17 functions are the bottom two links of `SceneNode -> BoxFill ->
- * FadeBox`: first FadeBox's (D_8006E99C, 0x164, `New_FadeBox` to
+ * FadeBox`: first FadeBox's (gFadeBoxMethods, 0x164, `New_FadeBox` to
  * `GetFadeBoxMethods`, include/FadeBox.h), then BoxFill's allocator,
  * ctor and Reset (0x64, include/BoxFill.h, a GsBOXF screen rectangle; the
  * rest of its methods open code_2cc8c_f).
@@ -257,7 +257,7 @@ void FadeBox__SetDivisorMode(FadeBox *self, s32 altMode, s32 divisor) {
 }
 
 FadeBoxMethods *GetFadeBoxMethods(void) {
-    return &D_8006E99C;
+    return &gFadeBoxMethods;
 }
 
 BoxFill *New_BoxFill(void *size, void *color, s32 pri) {
