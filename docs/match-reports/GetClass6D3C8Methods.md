@@ -60,3 +60,10 @@ functions are typed against it), and the "return my own vtable" shape is
 already named twice in this project (`GetClass6D4E8Methods`,
 `GetClass6D430Methods`, this same round). Pure leaf whose mechanics are its
 purpose.
+
+## Track 4 (2026-09-26, round 88)
+
+Retyped to `Class6D3C8Methods *GetClass6D3C8Methods(void)`, returning
+`&D_8006D3C8`; both are declared once, in `include/Class6D3C8.h`
+(`include/code_171e0.h`'s `extern s32 D_8006D3C8[]` view is deleted, and
+New_Class6D3C8 no longer casts the result). Image byte-identical.

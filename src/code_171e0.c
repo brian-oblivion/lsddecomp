@@ -24,6 +24,7 @@
 #include "common.h"
 #include "code_171e0.h"
 #include "VabDriver.h"
+#include "Class6D3C8.h"
 
 /* gActiveDataSource's two observed values are the header words of the two
  * sibling classes it selects between: D_8006D4E8 (the CD-ROM read driver,
@@ -31,8 +32,8 @@
 #define DATASOURCE_CD  0x13
 #define DATASOURCE_SPU 0x23
 
-void *GetClass6D3C8Methods(void) {
-    return D_8006D3C8;
+Class6D3C8Methods *GetClass6D3C8Methods(void) {
+    return &D_8006D3C8;
 }
 
 void *Class6D430__Release(Class6D430 *this) {
