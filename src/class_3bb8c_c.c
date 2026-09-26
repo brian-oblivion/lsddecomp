@@ -22,6 +22,7 @@
  */
 #include "common.h"
 #include "class_3bb8c.h"
+#include "DreamSys.h"
 #include "Class6B5CC.h"
 #include "Viewport.h"
 #include "Class869D8.h"
@@ -146,18 +147,18 @@ Class86B60 *New_Class86B60(void *dreamSys)
 
 void Class86B60__Class86B60(Class86B60 *self, void *dreamSys)
 {
-    DreamSysView_3bb8c_c *dream;
+    DreamSys *dream;
     Class86B60Unk48Obj *obj;
 
     Get_vtable_TaskCore()->ctor((TaskCore *)self, (TaskCoreTarget *)&D_80086D44, (char *)&D_800114DC, 0);
     self->methods = GetClass86B60Methods();
     obj = self->unk48;
     obj->methods->slot9C(obj, -1);
-    self->dreamSysView = dreamSys;
+    self->dreamSys = dreamSys;
     self->saveCtrl = 0;
     dream = dreamSys;
-    self->unkBC = dream->methods->slot1B0(dream, &self->unkC0);
-    FormatNumberIntoBuffer(dream->methods->slot1A0(dream, 0));
+    self->unkBC = (s32)dream->methods->getSaveBlock(dream, &self->unkC0);
+    FormatNumberIntoBuffer(dream->methods->getCurrentDayAndYear(dream, 0));
     self->methods->slotD8(self, &D_80086D44);
     self->methods->onConstruct(self, dreamSys);
 }

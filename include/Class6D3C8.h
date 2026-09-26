@@ -51,7 +51,7 @@ typedef struct Class6D3C8CtorArgs {
                                      * StartCinematicStream's stream branch, StartStreamTaskWithInit */
     /* +0x0C */ s32 showIntroLogos; /* gates LoadIntroLogoSequence */
     /* +0x10 */ s32 pollGraphRoom;  /* gates PollGraphRoomStatus (0: it returns 2 at once) */
-    /* +0x14 */ s32 unk14;          /* the ctor passes it to the DreamSys's func_228 */
+    /* +0x14 */ s32 unk14;          /* the ctor passes it to the DreamSys's slot228 (DreamSys__func_5ba20) */
 } Class6D3C8CtorArgs;
 
 struct Class6D3C8Methods {

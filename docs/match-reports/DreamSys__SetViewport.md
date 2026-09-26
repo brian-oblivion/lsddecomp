@@ -1,4 +1,6 @@
-# DreamSys__SetHeightCurve
+# DreamSys__SetViewport
+
+> Renamed from `DreamSys__SetHeightCurve` on 2026-09-26 (tools/rename.py). Address 0x80059384.
 
 > Renamed from `func_80059384` on 2026-09-22 (tools/rename.py). Address 0x80059384.
 
@@ -11,7 +13,7 @@ Pointer setter for `unk_0x5C`.
 ## The C
 
 ```c
-void DreamSys__SetHeightCurve(DreamSys *this, void *value)
+void DreamSys__SetViewport(DreamSys *this, void *value)
 {
 	this->unk_0x5C = value;
 }
@@ -36,7 +38,7 @@ see docs/DECOMPILATION_LEARNINGS.md on salvage splicing.
 
 ## Naming
 
-`DreamSys__SetHeightCurve` -- tier B (round 66, runner alpha, FINISHING-PLAN track 3).
+`DreamSys__SetViewport` -- tier B (round 66, runner alpha, FINISHING-PLAN track 3).
 
 Renamed from `func_80059384`.
 
@@ -50,3 +52,16 @@ offsets the far point's value (`endValue`) and `DreamSys__AdvanceMoveCycle` nudg
 both by +-50.
 Deliberately NOT called `SetCamera` or `SetView`: nothing establishes that the
 object is a camera, only that this curve is read out of it.
+
+## Track 4 (2026-09-26, round 88)
+
+Renamed from `DreamSys__SetHeightCurve`, and the field it sets from
+`heightCurve` (DreamSysUnk5C *) to `viewport` (struct Viewport *). The
+object is a Viewport: Obj865C8__Init (class_39e08) passes it the
+New_Class869D8 it built (a Viewport subclass) and Obj865C8__Deinit passes
+NULL; Entity__MoodCue74 calls +0x064 of its table, Viewport's
+setClearColor; and the offsets DreamSysUnk5C named are refView's (GsRVIEW2
+at +0x014): +0x014/+0x020 the viewpoint and reference point
+ProjectPointAtDistance interpolates between, +0x018/+0x024 their y words,
+which AdvanceMoveCycle bobs and StepLookOffset/TickDrift/StopDrift move.
+Byte-identical.

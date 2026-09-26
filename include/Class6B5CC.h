@@ -129,7 +129,7 @@ typedef struct AttachCornerList_d294b {
     /* +0x088 */ void (*notifyIfUnk20Active)(Self *self, s32 event);       /* Class6B5CC__NotifyIfUnk20Active */ \
     /* +0x08C */ void (*readUnk20Data)(Self *self, void *dest);            /* Class6B5CC__ReadUnk20Data */ \
     /* +0x090 */ void (*transformAndNotifyParents)(Self *self, GenericCountList_d294 *verts, s32 event); /* Class6B5CC__TransformAndNotifyParents */ \
-    /* +0x094 */ void (*onPadEvent)(Self *self, void *sender, s32 event);  /* func_8001D6A4, empty; onNotify's Pad (2) case; DreamSys__ApplyLinkCommand */ \
+    /* +0x094 */ void (*onPadEvent)(Self *self, void *sender, s32 event);  /* func_8001D6A4, empty; onNotify's Pad (2) case; DreamSys__OnPadEvent */ \
     /* +0x098 */ void (*update)(Self *self, void *sender, s32 event);      /* func_8001D6AC, empty; onNotify's FrameClock (5) case; Entity__Update, DreamSys__TimerTick */ \
     /* +0x09C */ void (*dispatchLinkCommand)(Self *self, void *sender, s32 event); /* Class6B5CC__DispatchLinkCommand; onNotify's Class6B5CC (4) case */ \
     /* +0x0A0 */ void (*tryAttachNearby)(Self *self);                      /* Class6B5CC__TryAttachNearby; its 2nd parameter arrives as the caller's untouched $a1 */ \

@@ -94,9 +94,9 @@ typedef struct StatusObj {
     StatusObjMethods *methods;
 } StatusObj;
 
-/* class_39e08.c's New_Obj865C8(Obj0C *, SubObjD *, s32); this unit passes
+/* class_39e08.c's New_Obj865C8(Obj0C *, DreamSys *, s32); this unit passes
  * the parent's aux (the tasks' IntermediateBaseInitArgs) and its DreamSys. */
-extern StatusObj *New_Obj865C8(IntermediateBaseInitArgs *initArgs, void *dreamSys, s32 a2);
+extern StatusObj *New_Obj865C8(IntermediateBaseInitArgs *initArgs, DreamSys *dreamSys, s32 a2);
 
 /* The `New_X` allocator for the class whose method table is D_8006D3C8:
  * allocates a 0x2C-byte instance and, on success, runs the class's own
@@ -137,7 +137,7 @@ void Class6D3C8__Class6D3C8(Class6D3C8 *self, Class6D3C8CtorArgs *arg) {
     req.path = sModelPathDreamE5;
     self->dreamSys = New_DreamSys(New_LinkResource(&req), 0, 0);
     self->skipGraphRoomPoll = 0;
-    self->dreamSys->vt->func_228(self->dreamSys, arg->unk14);
+    self->dreamSys->methods->slot228(self->dreamSys, arg->unk14);
     ((Class6D3C8SetDayFn)self->methods->setScreenDims)(self);
 }
 
@@ -236,7 +236,7 @@ s32 Class6D3C8__PollGraphRoomStatus(Class6D3C8 *self) {
     if (self->ctorArgs->pollGraphRoom != 0) {
         SetActiveDataSourceDriverMode(0, 0, 0);
 
-        status = self->dreamSys->vt->DreamSys__GetCurrentDayAndYear(self->dreamSys, 0);
+        status = self->dreamSys->methods->getCurrentDayAndYear(self->dreamSys, 0);
         if (status != 1) {
             if (self->skipGraphRoomPoll == 0) {
                 status = Class6D3C8__RunPollTask((PollTaskCtor)New_GraphRoom, self->dreamSys, (IntermediateBaseInitArgs *)self->aux);
@@ -344,7 +344,7 @@ s32 Class6D3C8__PollStatusObj(Class6D3C8 *self) {
         break;
     }
 
-    check = self->dreamSys->vt->DreamSys__GetCurrentDayAndYear(self->dreamSys, &outVal);
+    check = self->dreamSys->methods->getCurrentDayAndYear(self->dreamSys, &outVal);
     result = 0;
     if (outVal != 0) {
         result = (check == 1);
@@ -368,7 +368,7 @@ void Class6D3C8__StartCinematicStream(Class6D3C8 *self) {
     s32 lookup;
     TaskCore *task;
 
-    cc = self->dreamSys->vt->GetCinematic(self->dreamSys);
+    cc = self->dreamSys->methods->getCinematic(self->dreamSys);
     groupId = ResolveCinematicChannel(&chanBuf.chan, (u16) cc.bank | ((u32) (u16) cc.entry << 16));
     SetActiveDataSourceDriverMode(0, 0, 0);
 

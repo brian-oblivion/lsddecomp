@@ -126,7 +126,7 @@ void GraphRoom__Reset(GraphRoom *self) {
 void GraphRoom__Update(GraphRoom *self, BasicClass *sender, s32 event) {
     Get_vtable_TaskCore()->update((TaskCore *)self, sender, event);
     if (self->inputMode == 1) {
-        DreamSaveBlock *save = (DreamSaveBlock *)self->dreamSys->vt->DreamSys__GetSaveBlock(self->dreamSys, 0);
+        DreamSaveBlock *save = (DreamSaveBlock *)self->dreamSys->methods->getSaveBlock(self->dreamSys, 0);
         if (save->currentYear != 0 || save->currentDay != 0) {
             self->points[0]->methods->setDisplay(self->points[0], self->frameCounter & 1);
         }
@@ -214,7 +214,7 @@ void GraphRoom__PopulateGraphPoints(GraphRoom *self, void *parent) {
     Point2 firstPoint;
 
     Get_vtable_TaskCore()->updateSlotElements((TaskCore *)self, parent);
-    result = (DreamSaveBlock *)self->dreamSys->vt->DreamSys__GetSaveBlock(self->dreamSys, 0);
+    result = (DreamSaveBlock *)self->dreamSys->methods->getSaveBlock(self->dreamSys, 0);
     self->scored = GraphRoom__ScoreDayLog(self, result);
 
     flag = 0;

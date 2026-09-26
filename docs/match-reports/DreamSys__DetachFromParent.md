@@ -1,4 +1,6 @@
-# DreamSys__UnlinkLinkMgr
+# DreamSys__DetachFromParent
+
+> Renamed from `DreamSys__UnlinkLinkMgr` on 2026-09-26 (tools/rename.py). Address 0x80058a94.
 
 > Renamed from `func_80058A94` on 2026-09-22 (tools/rename.py). Address 0x80058a94.
 
@@ -25,7 +27,7 @@ class's method table:
 ## The C
 
 ```c
-void DreamSys__UnlinkLinkMgr(DreamSys *this)
+void DreamSys__DetachFromParent(DreamSys *this)
 {
 	this->unk_0x4C->methods->slot0xF0(this->unk_0x4C);
 	this->vt->Actor__RemoveChild(this, this->unk_0x4C);
@@ -78,3 +80,14 @@ round 2026-08-30-b, runner ALPHA, address range
 ## Naming
 
 - **Tier B.** Calls the linkMgr companion's own slot0xF0, then vt->Actor__RemoveChild(this, linkMgr) (the ctor's slot10 buddy-link's own unlink counterpart), then the shared base's own +0x050 slot. Mechanics (undoes the ctor's companion link) are solid; why it is invoked is not.
+
+## Track 4 (2026-09-26, round 88)
+
+Renamed from `DreamSys__UnlinkLinkMgr`. It is DREAMSYS_METHODS +0x050,
+the override of Class6B5CC's `detachFromParent`, and it ends by chaining
+Actor's (`GetActorMethods()->detachFromParent`). The "link manager" it
+unlinks first is Actor's `grid` field (+0x04C, the class-0x114 child
+Actor__AddChild records): it calls the grid's +0x0F0 and removes it as a
+child. (DreamSys__SpawnAtLink, the attachToParent override, adds its
+`parent` argument as a child, so when that parent is the grid this undoes
+it; not verified.)

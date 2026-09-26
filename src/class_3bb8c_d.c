@@ -24,6 +24,7 @@
  */
 #include "common.h"
 #include "class_3bb8c.h"
+#include "DreamSys.h"
 #include "TextRow.h"
 #include "TimImage.h"
 
@@ -50,7 +51,7 @@ void Class86B60__ShowTitleIcon(Class86B60 *self)
     self->unk2C = 0x190;
     self->methods->slotD4(self, &D_800114E8, 0);
     self->methods->slot6C(self, 0xA);
-    self->dreamSysView->methods->slotF0(self->dreamSysView, 0, 0);
+    self->dreamSys->methods->getSetFlashbackSession(self->dreamSys, 0, 0);
 }
 
 void Class86B60__RegisterHandlers(Class86B60 *self)
@@ -87,7 +88,7 @@ void Class86B60__Tick(Class86B60 *self)
     switch (self->state) {
     case 1:
         self->unk38 = 0;
-        self->dreamSysView->methods->slotF0(self->dreamSysView, 0, 1);
+        self->dreamSys->methods->getSetFlashbackSession(self->dreamSys, 0, 1);
         fn = self->methods->slot94;
         break;
     case 2:
@@ -112,7 +113,7 @@ void Class86B60__RefreshViewValue(Class86B60 *self)
 
     Get_vtable_TaskCore()->refreshViewValue((TaskCore *)self);
     buf = self->unk60->unk14;
-    self->dreamSysView->methods->slot19C(self->dreamSysView, &buf);
+    self->dreamSys->methods->getSetScreenShake(self->dreamSys, &buf);
 }
 
 /* Class86B60__CreateNameField's own `arg1`: only its own +0x004 field is read, forwarded
@@ -144,7 +145,7 @@ void Class86B60__CreateNameField(Class86B60 *self, Arg1DB18_3bb8c_d *arg1)
     if (arg1 == NULL) {
         return;
     }
-    if (self->dreamSysView->methods->slot1AC(self->dreamSysView)) {
+    if (self->dreamSys->methods->getNewGameFlag(self->dreamSys)) {
         strcpy((char *)D_8008AA18 + 0x18, (char *)D_8008AA14);
         CopyMemcardIconTemplate((s32)D_8008AA18, 0);
     }
@@ -238,15 +239,15 @@ void Class86B60__CommitNameEntry(Class86B60 *self)
     DecodeFullWidthSjis(buf1, D_8008AA18);
     self->nameField->methods->slotCC(self->nameField, buf1);
     BMemPMgrFree(buf1);
-    CheckObj866E8CountFlag(self, self->unk4C, self->dreamSysView);
+    CheckObj866E8CountFlag(self, self->unk4C, self->dreamSys);
     self->methods->slotE0(self, self->unk14);
-    self->dreamSysView->methods->slot19C(self->dreamSysView, &buf2);
+    self->dreamSys->methods->getSetScreenShake(self->dreamSys, &buf2);
     self->state = 5;
     self->methods->slot60(self, 0xB);
     self->methods->slot11C(self, buf2, 1);
     self->methods->slot60(self, 0xF);
     self->methods->slotF0(self, (void *)origState, 0);
-    self->dreamSysView->methods->slot19C(self->dreamSysView, &buf2);
+    self->dreamSys->methods->getSetScreenShake(self->dreamSys, &buf2);
 }
 
 void Class86B60__BeginMemcardSave(Class86B60 *self)
@@ -276,9 +277,9 @@ void Class86B60__UpdateMemcardSaveWithIcon(Class86B60 *self)
     s32 buf;
 
     buf = self->unk60->unk14;
-    self->dreamSysView->methods->slot19C(self->dreamSysView, &buf);
+    self->dreamSys->methods->getSetScreenShake(self->dreamSys, &buf);
     self->methods->slot128(self);
-    if (self->dreamSysView->methods->slot1AC(self->dreamSysView)) {
+    if (self->dreamSys->methods->getNewGameFlag(self->dreamSys)) {
         *(u8 *)D_8008AA10 = 0;
     }
     self->saveCtrl->methods->slot78(self->saveCtrl, D_8008AA10, D_8008AA18, 0xD, 3,
@@ -298,7 +299,7 @@ void Class86B60__OnTagBValue(Class86B60 *self, s32 arg1, s32 value)
         if (value >= 0x16) {
             self->methods->slot12C(self);
             if (value == 0x16) {
-                self->dreamSysView->methods->slot1A8(self->dreamSysView);
+                self->dreamSys->methods->clearNewGameFlag(self->dreamSys);
                 self->methods->slot124(self, 0x16);
             }
         }

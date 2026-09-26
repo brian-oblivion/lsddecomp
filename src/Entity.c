@@ -25,6 +25,7 @@
  */
 #include "common.h"
 #include "Entity.h"
+#include "DreamSys.h"
 
 Entity *New_Entity(s32 moodIndex, void *desc, void *arg2) {
     Entity *obj;
@@ -199,7 +200,7 @@ s32 Entity__IsNearTarget(Entity *this, void *pos, s32 arg2, s32 arg3) {
     } else {
         arg3 <<= 11;
     }
-    return ((Unk94Obj *)this->peer)->methods->slot120((Unk94Obj *)this->peer, 0, arg2 << 11, &local, arg3);
+    return ((DreamSys *)this->peer)->methods->projectPointAtDistance((DreamSys *)this->peer, 0, arg2 << 11, (s32 *)&local, arg3);
 }
 
 s32 Entity__DistanceToPeer(Entity *this, Class65650 *peer) {

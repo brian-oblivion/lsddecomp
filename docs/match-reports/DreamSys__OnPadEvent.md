@@ -1,4 +1,6 @@
-# DreamSys__ApplyLinkCommand — MATCHED, 79/79 words, byte-exact
+# DreamSys__OnPadEvent — MATCHED, 79/79 words, byte-exact
+
+> Renamed from `DreamSys__ApplyLinkCommand` on 2026-09-26 (tools/rename.py). Address 0x80058c58.
 
 > Renamed from `func_80058C58` on 2026-09-22 (tools/rename.py). Address 0x80058c58.
 
@@ -13,7 +15,7 @@ single field stores plus two vtable calls. Pre-analysed by round 24's head
 so it would stay `fresh`.
 
 ```c
-void DreamSys__ApplyLinkCommand(DreamSys *this, s32 arg1, s32 mode)
+void DreamSys__OnPadEvent(DreamSys *this, s32 arg1, s32 mode)
 {
 	if (this->unk_0x6c != 0)
 		return;
@@ -128,3 +130,13 @@ matching `default`, not a body/order defect. Add one past the table's known
 ## Naming
 
 - **Tier B.** A `switch (mode - 2)` over ~14 distinct case values, each setting one or two of the link-state fields (movementBlocked-adjacent unk_0xA0/0xA4/0x88/0x74) or calling DreamSys__ChangeMoveMode / DreamSys__RestorePreviousMoveMode, gated by three busy flags. The individual case semantics are not established, only that this is a mode/command dispatcher.
+
+## Track 4 (2026-09-26, round 88)
+
+Renamed from `DreamSys__ApplyLinkCommand`. It is DREAMSYS_METHODS +0x094,
+the slot Class6B5CC__OnNotify routes a Pad (class 2) sender's events to
+(`onPadEvent`, include/Class6B5CC.h); gActorMethods leaves it at the empty
+func_8001D6A4. The body is exactly a pad handler: `mode` is the event code,
+mapped to move/turn/look commands. Nothing in it touches a link;
+Entity__MoodCue123 drives the player the same way, sending (0, 2) and
+(0, 7) through the slot.

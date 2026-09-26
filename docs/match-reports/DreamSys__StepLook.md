@@ -37,6 +37,6 @@ and nothing else. It is the function `DreamSys__SelectCallback80(this, 1)` insta
 in `callback_0x80`, so it is one of the two things that can run every tick.
 Grouping the pair as "look" is the tier-B part: they are the same
 spring-with-decay shape driven by two command fields that
-`DreamSys__ApplyLinkCommand` sets from four adjacent command codes, one of them
+`DreamSys__OnPadEvent` sets from four adjacent command codes, one of them
 turning the object in yaw and the other tilting the height curve. That they are the
 player's look controls is the obvious reading; it is not proven here.

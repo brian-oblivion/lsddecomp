@@ -24,8 +24,8 @@
  * (a later track-4 job). No FirecatFG name survives for either class, so
  * fields are named by offset until real names are known.
  *
- * `Obj865C8__Obj865C8` (the ctor) constructs one `SubObjD` handed in by the
- * caller, one `SubObjB` VAB sound stream (`New_VabStreamObj`), and loads two
+ * `Obj865C8__Obj865C8` (the ctor) is handed the game's DreamSys (kept in
+ * `unk38`) and constructs one `SubObjB` VAB sound stream (`New_VabStreamObj`), and loads two
  * named resources verbatim from the ctor body -- "ETC\ETC.TIM" and
  * "ETC\DREAMER.TMD" (`D_800113EC`/`D_800113F8`) -- into `unk44`/`unk48`.
  * The object also carries a small state machine (`state`, 0-3, advanced by
@@ -54,7 +54,9 @@ struct Obj0C;
 typedef struct Obj865C8 Obj865C8;
 typedef struct Obj4C Obj4C;
 typedef struct SubObjA SubObjA;
-typedef struct SubObjD SubObjD;
+/* Obj865C8::unk38 is the game's DreamSys (include/DreamSys.h; class_39e08.c
+ * includes it). */
+struct DreamSys;
 typedef struct SubObjF SubObjF;
 
 /* What Obj865C8__OnNotify (Class865C8Methods slot +0x038) inspects: `arg1` is a
@@ -78,14 +80,14 @@ typedef struct Class865C8Methods {
     /* Typed because New_Obj865C8 (this unit) dispatches it as
      * GetObj865C8Methods()->ctor(self, arg1, arg2, arg3); the signature is
      * Obj865C8__Obj865C8's own, defined just below. */
-    void (*ctor)(Obj865C8 *self, struct Obj0C *arg1, SubObjD *arg2, s32 arg3); /* +0x008 Obj865C8__Obj865C8 */
+    void (*ctor)(Obj865C8 *self, struct Obj0C *arg1, struct DreamSys *arg2, s32 arg3); /* +0x008 Obj865C8__Obj865C8 */
     void (*dtor)(Obj865C8 *self);                  /* +0x00C Obj865C8__Dtor */
     /* BasicClass-inherited (BasicClass__AddChild -- same address as
      * Class6D3C8.h's own local unk10 view of this same shared slot).
      * Called by Obj865C8__EnterState2 as self->methods->slot10(self, newObj). */
     void (*slot10)(Obj865C8 *self, Obj4C *arg1);   /* +0x010 */
     /* Called by Obj865C8__Dtor as self->methods->slot14(self, self->unk38). */
-    void (*slot14)(Obj865C8 *self, SubObjD *arg1); /* +0x014 */
+    void (*slot14)(Obj865C8 *self, struct DreamSys *arg1); /* +0x014 */
     void *unk18, *unk1C;                           /* BasicClass, inherited */
     void *unk20, *unk24, *unk28, *unk2C;           /* BasicClass, inherited */
     void *unk30, *unk34;                           /* BasicClass, inherited */
@@ -139,10 +141,9 @@ typedef struct SubObjAMethods {
     u8 pad50[0x70 - 0x50];
     /* Obj865C8__StartSubA's 5-arg call: 4 register args plus a literal 0 in the
      * 5th (stack) slot. arg1/arg2/arg3 types are just "address taken, never
-     * dereferenced here" -- SubObjD* for arg1 because that's what
-     * Obj865C8::unk38 already is, void* for the two rodata symbol
+     * dereferenced here" -- the DreamSys for arg1 (Obj865C8::unk38), void* for the two rodata symbol
      * addresses (arg2/arg3, real element type unknown). */
-    void (*slot70)(SubObjA *self, SubObjD *arg1, void *arg2, void *arg3, s32 arg4); /* +0x070 */
+    void (*slot70)(SubObjA *self, struct DreamSys *arg1, void *arg2, void *arg3, s32 arg4); /* +0x070 */
     void (*slot74)(void *self);
     u8 pad78[0x8C - 0x78];
     void (*slot8C)(SubObjA *self);                          /* +0x08C, Obj865C8__StartSubA */
@@ -248,47 +249,6 @@ typedef struct Obj0C {
     SubObjG *unk10;                /* +0x010, Obj865C8__Dtor (was s32) */
 } Obj0C;
 
-/* Opaque view of whatever object Obj865C8::unk38 points to (used by
- * Obj865C8__Deinit/Obj865C8__Init): same "vtable at offset 0, only the reached
- * slots named" policy as SubObjA/SubObjB/Obj4C above. */
-typedef struct SubObjDMethods {
-    u8 pad00[0x10];
-    void (*slot10)(SubObjD *self, s32 arg1);
-    void (*slot14)(SubObjD *self, s32 arg1);
-    u8 pad18[0x10C - 0x18];
-    /* Obj865C8__Obj865C8 (ctor): called as arg2->methods->slot10C(arg2,
-     * self->subB). */
-    void (*slot10C)(SubObjD *self, SubObjB *arg1);   /* +0x10C */
-    void (*slot110)(SubObjD *self, s32 arg1);
-    /* Obj865C8__Obj865C8 (ctor): called as arg2->methods->slot114(arg2,
-     * self->unk44). */
-    void (*slot114)(SubObjD *self, SubObjG *arg1);   /* +0x114 */
-    u8 pad118[0x1B4 - 0x118];
-    /* Obj865C8__AdvanceState's `case 1`: return value used (`>= 0` check), so this
-     * is genuinely non-void. */
-    s32 (*slot1B4)(SubObjD *self);                /* +0x1B4 */
-    /* +0x1B8. RETYPED void -> s32 in round 23: Obj865C8__OnTag2Notify branches on the
-     * return value (`bnez $v0` straight off the `jalr`), which is positive
-     * evidence the slot is non-void. Obj865C8__AdvanceState, the other caller in this
-     * unit and already matched, DISCARDS it -- so this is the round-7 shared-slot
-     * hazard; re-verified byte-exact after the retype (whole-image SHA1). */
-    s32 (*slot1B8)(SubObjD *self, s32 arg1);
-    /* +0x1BC. Returns an 8-byte struct BY VALUE. GCC 2.6.3 returns any struct
-     * through a hidden pointer passed as the invisible FIRST argument, which is
-     * why Obj865C8__OnTag2Notify's call site reads `(&buf, sub)` and not `(sub)` -- the
-     * object is arg2 in the bytes. The struct's own shape is a unit-local view
-     * (SubObjDPos in src/class_39e08.c); only its size and the s16 at +2 are
-     * established. Pad split below is additive and preserves the 0x24 total. */
-    struct SubObjDPos (*slot1BC)(SubObjD *self);
-    u8 pad1C0[0x1E0 - 0x1C0];
-    /* Obj865C8__AdvanceState's `case 3`: return value used (forwarded straight into
-     * Obj865C8__EnterState2's own 2nd argument). */
-    s32 (*slot1E0)(SubObjD *self);                 /* +0x1E0 */
-} SubObjDMethods;
-struct SubObjD {
-    SubObjDMethods *methods;
-};
-
 /* 0x50 bytes (New_Obj865C8). Offsets +0x000..+0x037 are Class86668's
  * (include/Class86668.h: result, timeoutFrames, soundBankPath and sound are
  * this view's eventCode, timeoutFrames, unk30 and subB). Field offsets are
@@ -321,7 +281,7 @@ struct Obj865C8 {
     s32 timeoutFrames;             /* +0x02C, Class86668__SetTimeout */
     s32 unk30;                    /* +0x030, Class86668__Finalize (guard) */
     SubObjB *subB;                /* +0x034, Class86668__Finalize */
-    SubObjD *unk38;                /* +0x038, Obj865C8__Deinit dereferences (->methods); passed
+    struct DreamSys *unk38;        /* +0x038, the DreamSys New_Obj865C8 is given (code_1677c: Class6D3C8::dreamSys); passed
                                        through as a plain register value to
                                        unk4C->methods->slot44's 3rd arg (IntermediateBase's init slot) by Obj865C8__EnterState2 */
     /* +0x03C. Renamed from `unk3C`: the class's own small state machine

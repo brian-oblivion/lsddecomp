@@ -28,13 +28,14 @@
 #include "common.h"
 #include "class_3bb8c.h"
 #include "Class86668.h"
+#include "DreamSys.h"
 
 void ObjM__NoOpSlot40(void) {
 }
 
 void ObjM__AttachTarget(Obj87034_3bb8c_l *self, Obj87034_3bb8c_l *arg1, s32 arg2) {
     arg1->unkC->methods->slotC8(arg1->unkC, ObjM__OnRegistrantEvent, self);
-    self->target = (DreamSysObj_3bb8c_l *)arg2;
+    self->target = (DreamSys *)arg2;
     GetClass86668Methods()->init((Class86668 *)self, (IntermediateBaseInitArgs *)arg1, 1);
     self->methods->slot10(self, arg2);
 }
@@ -70,7 +71,7 @@ extern s32 D_80087118[];
 extern s32 D_80087150;
 
 void ObjM__InitStyleAndWorld(Obj87034_3bb8c_l *self, s32 arg1, Unk50Struct_3bb8c_l *arg2, s32 arg3) {
-    DreamSysObj_3bb8c_l *unk18 = self->world;
+    StyleWorldObj_3bb8c_l *unk18 = self->world;
     s32 ret1;
     s32 flag;
 
@@ -79,14 +80,14 @@ void ObjM__InitStyleAndWorld(Obj87034_3bb8c_l *self, s32 arg1, Unk50Struct_3bb8c
     ret1 = PickVariant(self->unk38, 0);
     self->unk54->methods->slot5C(self->unk54, ret1);
 
-    ret1 = self->target->methods->slot1A0(self->target, 0);
+    ret1 = self->target->methods->getCurrentDayAndYear(self->target, 0);
     ret1 = PickDailyVariant(self->unk38, 0, ret1);
     self->pendingOther = (Obj87034_3bb8c_l *) New_TimBlockSrc(ret1);
 
     unk18->methods->slot70(unk18, self->target, &D_8008715C, &D_80087168, 0);
 
     self->cachedWorld = unk18;
-    ret1 = self->target->methods->slot1A0(self->target, 0);
+    ret1 = self->target->methods->getCurrentDayAndYear(self->target, 0);
     self->styleConfig = (Unk50Struct_3bb8c_l *) RegisterStyleConfig(self->unk14, self->unk38, &self->unk6C, ret1, 0);
     if (arg2 != 0) {
         self->styleConfig = arg2;
@@ -133,7 +134,7 @@ void ObjM__InitStyleAndWorld(Obj87034_3bb8c_l *self, s32 arg1, Unk50Struct_3bb8c
     }
     func_8001EF60(flag);
 
-    self->target->methods->slotEC(self->target, D_80087118[(s32) self->unk38]);
+    self->target->methods->setPendingExtra(self->target, D_80087118[(s32) self->unk38]);
     self->phase = 5;
 }
 
@@ -161,8 +162,8 @@ void ObjM__TransferToOther(Obj87034_3bb8c_l *self, Obj87034_3bb8c_l *other) {
             other->methods->slot04(other);
             self->hasTarget = 0;
             self->methods->slot80(self);
-            ret = self->target->methods->slot108(self->target);
-            self->target->methods->slot104(self->target, ret + 0x1E);
+            ret = self->target->methods->getDreamTimerScaled(self->target);
+            self->target->methods->getSetDreamTimeLimit(self->target, ret + 0x1E);
         } else if (other->target != 0) {
             sel = self->styleConfig->unk14;
             m = other->methods;
@@ -270,19 +271,15 @@ struct UnkCObj_3bb8c_l {
     UnkCObjMethods_3bb8c_l *methods; /* +0x000 */
 };
 
-/* Uncarved cross-unit helper (code_4cd08.c, MATCHED round 43) -- no header
- * declares it, so this unit's own call-site typing is local, all-`s32`
- * per that function's own definition. */
-extern void SetDreamAuxWorld(s32 a0, s32 a1, s32 a2, s32 a3, s32 a4);
+/* code_4cd08.c's (MATCHED round 43); no header declares it. `world` is the
+ * DreamSys it installs as gDreamAuxWorld (track 4, round 88). */
+extern void SetDreamAuxWorld(s32 a0, s32 a1, DreamSys *world, s32 a3, s32 a4);
 
-/* This unit's own local reading of the already-matched `GetStageGridDimensions`
- * (include/StageGrid.h, `(s32 index)` -> `StageGridDimensions *`) -- kept
- * opaque `void *` here since the return value is only forwarded, never
- * dereferenced, and this unit does not otherwise include that header. */
-extern void *GetStageGridDimensions(s32 index);
+/* GetStageGridDimensions comes from include/StageGrid.h, through
+ * DreamSys.h (the local `void *` reading that stood here went with it). */
 
 /* VALUE-of `%gp_rel`, round 45's own local view -- a plain `s32` bias
- * added to the derived value passed to `DreamSysMethods_3bb8c_l::slot54`. */
+ * added to the derived value passed to `StyleWorldMethods_3bb8c_l::slot54`. */
 extern s32 D_8008AB34;
 
 /* VALUE-of `%gp_rel`... actually address-of only here (`&D_8008710C`),
@@ -292,7 +289,7 @@ extern s32 D_8008AB34;
 extern s32 D_8008710C;
 
 void ObjM__SetupSceneStyle(Obj87034_3bb8c_l *self) {
-    DreamSysObj_3bb8c_l *unk18 = self->world;
+    StyleWorldObj_3bb8c_l *unk18 = self->world;
     Unk50Struct_3bb8c_l *unk50 = self->styleConfig;
     UnkCObj_3bb8c_l *obj;
     s32 val;
@@ -306,7 +303,7 @@ void ObjM__SetupSceneStyle(Obj87034_3bb8c_l *self) {
 
     unk18->methods->slot70(unk18, self->target, &D_8008715C, &D_80087168, 0);
 
-    SetDreamAuxWorld((s32)self->unk38, (s32)self->unk14, (s32)self->target, self->unk34, self->unk10);
+    SetDreamAuxWorld((s32)self->unk38, (s32)self->unk14, self->target, self->unk34, self->unk10);
 
     unk14 = self->unk14;
     self->methods->slot10(self, (s32)unk14);
@@ -314,24 +311,24 @@ void ObjM__SetupSceneStyle(Obj87034_3bb8c_l *self) {
     unk14->methods->slotBC(unk14, unk50->unk8, 0);
     unk14->methods->slotC4(unk14, 3, unk50->unk0, unk50->unk4);
     unk14->methods->slotE0(unk14, GetStageGridDimensions((s32)self->unk38));
-    self->target->methods->slot4C(self->target, unk14);
+    ((DreamSysAttachToParentFn)self->target->methods->attachToParent)(self->target, unk14);
     unk14->methods->slotDC(unk14, self->unk48);
     unk14->methods->slotCC(unk14, &D_8008710C);
 }
 
 void ObjM__ExitSceneStyle(Obj87034_3bb8c_l *self) {
     self->methods->slotD4(self);
-    self->target->methods->slotFC(self->target);
-    self->target->methods->slot50(self->target);
+    self->target->methods->blockMovement(self->target);
+    self->target->methods->detachFromParent(self->target);
     self->world->methods->slot74(self->world);
     self->methods->slot14(self, self->unk14);
 }
 
 void ObjM__EnterStyleSession(Obj87034_3bb8c_l *self) {
-    DreamSysMethods_3bb8c_l *m;
-    DreamSysMethods_3bb8c_l *m2;
-    DreamSysObj_3bb8c_l *unk18;
-    DreamSysObj_3bb8c_l *newObj;
+    StyleWorldMethods_3bb8c_l *m;
+    StyleWorldMethods_3bb8c_l *m2;
+    StyleWorldObj_3bb8c_l *unk18;
+    StyleWorldObj_3bb8c_l *newObj;
     Unk50Struct_3bb8c_l *unk50;
     s32 local10;
     s32 ret;
@@ -339,7 +336,7 @@ void ObjM__EnterStyleSession(Obj87034_3bb8c_l *self) {
     void *a1;
 
     self->attached = 1;
-    self->target->methods->slotF8(self->target, self->unk44, self->unk40);
+    self->target->methods->resetLinkState(self->target, self->unk44, self->unk40);
     self->unk14->methods->slotEC(self->unk14);
 
     unk18 = self->world;
@@ -360,7 +357,7 @@ void ObjM__EnterStyleSession(Obj87034_3bb8c_l *self) {
     newObj = unk18->methods->slotAC(unk18);
     self->methods->slot10(self, (s32)newObj);
 
-    ret = self->target->methods->slotF0(self->target, &local10, -1);
+    ret = self->target->methods->getSetFlashbackSession(self->target, (DreamColors *)&local10, -1);
     newObj->methods->slotF0(newObj, (s32 *)ret, (ret != 0) ? 3 : 0);
     m2 = newObj->methods;
     if (ret == 0) {
@@ -403,7 +400,7 @@ void ObjM__HandleStateCode(Obj87034_3bb8c_l *self, void *arg1, s32 code) {
             break;
         }
     } else if (code >= 9) {
-        self->target->unk44 = 0;
+        self->target->state = 0;
     }
 }
 
@@ -425,7 +422,7 @@ void ObjM__EnterState4(Obj87034_3bb8c_l *self) {
     s32 arg3;
 
     self->phase = 4;
-    if (self->target->methods->slotF0(self->target, &local18, -1) == 0) {
+    if (self->target->methods->getSetFlashbackSession(self->target, (DreamColors *)&local18, -1) == 0) {
         span = (self->unk1C + (s32)self->unk38) & 3;
         t = span;
         if (t == 0) {
@@ -454,13 +451,13 @@ void ObjM__EnterState4(Obj87034_3bb8c_l *self) {
 void ObjM__EnterState5(Obj87034_3bb8c_l *self) {
     s32 color;
 
-    if (self->target->unk164 < 0) {
+    if (self->target->currentStage < 0) {
         self->methods->slot9C(self);
     } else {
         self->phase = 5;
-        color = self->target->methods->slot200(self->target);
+        color = self->target->methods->getDreamColor(self->target);
         ObjM__ForwardToSubChild(self, color, 0, 0xA, 1);
-        self->target->methods->slotFC(self->target);
+        self->target->methods->blockMovement(self->target);
     }
 }
 
@@ -468,7 +465,7 @@ void ObjM__EnterState6(Obj87034_3bb8c_l *self) {
     s32 color;
 
     self->phase = 6;
-    color = self->target->methods->slot200(self->target);
+    color = self->target->methods->getDreamColor(self->target);
     ObjM__ForwardToSubChild(self, color, 0, 0x1E, 1);
-    self->target->methods->slotFC(self->target);
+    self->target->methods->blockMovement(self->target);
 }

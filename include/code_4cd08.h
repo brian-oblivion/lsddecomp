@@ -138,18 +138,10 @@ typedef struct TriggerRecord {
  * that header. This file's former `TriggerWorld { void **vtable; }` view
  * is gone. */
 
-/* `*gDreamAuxWorld`'s view: method table at offset 0, of which only byte
- * +0x200 (index 0x80 as a pointer array) is called, with only `self`,
- * returning a value compared against a caller value. Used by
- * CheckDreamAuxWorldState and AdjustDreamAuxTriggerOffset. NOT a
- * TriggerWorld, whose table is 0x8C bytes: this was named `TriggerWorld`
- * until round 88, when that class was unified. The concrete class is
- * unresolved (the unit also passes gDreamAuxWorld as a Class6B5CC). */
-typedef struct DreamAuxWorld {
-    void **vtable;
-} DreamAuxWorld;
-
-typedef s32 (*DreamAuxWorldFn80)(DreamAuxWorld *self);
+/* gDreamAuxWorld is the player DreamSys (include/DreamSys.h, track 4
+ * round 88): the +0x200 its table is called at is getDreamColor, and
+ * class_3bb8c_l hands SetDreamAuxWorld its DreamSys `target`. code_4cd08.c
+ * declares it; the DreamAuxWorld view that stood here is gone. */
 
 extern bool CheckDreamAuxTriggerCondition(s32 value, TriggerRecord *record);
 /* `out` is a 4-word (0x10-byte) caller stack scratch buffer, reused across

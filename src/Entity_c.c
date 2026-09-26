@@ -27,6 +27,7 @@
  */
 #include "common.h"
 #include "Entity.h"
+#include "DreamSys.h"
 
 extern u8 SCALE_SIX[];
 extern u8 SCALE_Y2[];
@@ -196,7 +197,7 @@ void Entity__MoodCue119(Entity *this) {
 
 void Entity__MoodCue29(Entity *this) {
     if (this->moodTimer == 0) {
-        if (((Unk94Obj *)this->peer)->methods->slot200((Unk94Obj *)this->peer) == 7) {
+        if (((DreamSys *)this->peer)->methods->getDreamColor((DreamSys *)this->peer) == 7) {
             this->methods->updateScale(this, 1, D_80089E74);
             this->methods->moveLocalY(this, -0x7800, 0);
         }
@@ -209,7 +210,7 @@ void Entity__MoodCue29(Entity *this) {
 
 void Entity__MoodCue30(Entity *this) {
     if (this->state == 0) {
-        if (((Unk94Obj *)this->peer)->methods->slot200((Unk94Obj *)this->peer) == 1) {
+        if (((DreamSys *)this->peer)->methods->getDreamColor((DreamSys *)this->peer) == 1) {
             this->state = 0xB;
         } else {
             this->state = 0xC;
@@ -229,7 +230,7 @@ void Entity__MoodCue30(Entity *this) {
                 this->state = 0xD;
             }
         } else if (this->state == 0xD) {
-            this->methods->setTranslation(this, (Vec3_d294 *)&((Unk94Obj *)this->peer)->coord2->tx);
+            this->methods->setTranslation(this, (Vec3_d294 *)&((DreamSys *)this->peer)->coord2->tx);
             this->methods->addTranslation(this, D_80089DB4);
         }
     }
@@ -237,7 +238,7 @@ void Entity__MoodCue30(Entity *this) {
 
 void Entity__MoodCue31(Entity *this, EntityMoodHandlerArg *out) {
     Class6B5CC__FaceTarget((Class6B5CC *)this, (Class6B5CC *)this->peer, 1, 0, 0);
-    ((Unk94Obj *)this->peer)->methods->slot130((Unk94Obj *)this->peer, 1);
+    ((DreamSys *)this->peer)->methods->clearTickCallbacks((DreamSys *)this->peer, 1);
     if ((out->unk4 % 10) < 3) {
         out->unk10 = 0;
         out->unk1C = 0xD;

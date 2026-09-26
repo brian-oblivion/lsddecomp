@@ -811,10 +811,9 @@ extern void *BMemPMgrAlloc(s32 size);
  */
 typedef struct Class86B60 Class86B60;
 typedef struct Class86B60Methods Class86B60Methods;
-/* Forward declaration: full definition (DreamSysView_3bb8c_c /
- * DreamSysViewMethods_3bb8c_c) is below, established from Class86B60__Class86B60;
- * needed early because Class86B60::unkA4 is typed with it. */
-typedef struct DreamSysView_3bb8c_c DreamSysView_3bb8c_c;
+/* The DreamSys Class86B60::dreamSys holds (include/DreamSys.h; the units
+ * that call through it include that header). */
+struct DreamSys;
 
 /*
  * self->unkC's pointee. `unk0` is itself a pointer to a small vtable
@@ -858,7 +857,7 @@ struct Class86B60Unk4CObj_3bb8c_d {
 /*
  * self->unk60's pointee. Only `unk14` is reached, by Class86B60__RefreshViewValue, as a
  * plain `s32` copied into a one-word stack buffer before being forwarded
- * by address to `DreamSysViewMethods_3bb8c_c::slot19C`.
+ * by address to DreamSys's getSetScreenShake (+0x19C).
  */
 typedef struct Class86B60Unk60Obj_3bb8c_d Class86B60Unk60Obj_3bb8c_d;
 struct Class86B60Unk60Obj_3bb8c_d {
@@ -1047,7 +1046,7 @@ struct Class86B60Methods {
     void (*slotE0)(Class86B60 *self, void *arg1);
     u8 pad0E4[0x0F0 - 0x0E4];
     /* +0x0F0, Class86B60__SetState's own 3rd call: `(self, self->unk4C->unk8,
-     * 1)`. Distinct from `DreamSysViewMethods_3bb8c_c::slotF0` (see
+     * 1)`. Distinct from DreamSys's +0x0F0 (getSetFlashbackSession, see
      * Class86B60__ShowTitleIcon's report) -- same offset number, unrelated table.
      * Class86B60__CommitNameEntry (this round) also reaches this slot, forwarding an
      * `s32` (its own saved pre-overwrite copy of `self->unk58`) through
@@ -1057,7 +1056,7 @@ struct Class86B60Methods {
     void (*slotF0)(Class86B60 *self, void *arg1, s32 arg2);
     u8 pad0F4[0x11C - 0x0F4];
     /* +0x11C, Class86B60__CommitNameEntry's own call: `(self, buf, 1)` where `buf` is
-     * the value `DreamSysViewMethods_3bb8c_c::slot19C` (via `self->unkA4`)
+     * the value DreamSys's getSetScreenShake (+0x19C, via `self->dreamSys`)
      * just filled through a stack out-parameter. */
     void (*slot11C)(Class86B60 *self, s32 arg1, s32 arg2);
     u8 pad120[0x124 - 0x120];
@@ -1117,15 +1116,12 @@ struct Class86B60 {
      * loop iteration; real extent beyond one byte unknown. */
     u8 unk93;
     u8 pad094[0x0A4 - 0x094];
-    /* +0x0A4, Class86B60__Class86B60: stores its own dreamSys arg raw. RETYPED this
-     * round from a bare `void *` to `DreamSysView_3bb8c_c *` --
-     * Class86B60__ShowTitleIcon (this unit) is the first function to dereference it
-     * through its own vtable (`slotF0`) rather than only forwarding it
-     * opaquely. Same size (4 bytes), so no layout change; the assignment
-     * in Class86B60__Class86B60 (`self->unkA4 = dreamSys;`, `dreamSys` a `void *`
-     * parameter) still compiles under ordinary C pointer conversion
-     * rules. */
-    DreamSysView_3bb8c_c *dreamSysView;
+    /* +0x0A4, Class86B60__Class86B60: its dreamSys argument, the game's
+     * DreamSys (track 4, round 88: the six slots this class calls on it,
+     * +0x0F0/+0x19C/+0x1A0/+0x1A8/+0x1AC/+0x1B0, are DreamSys's
+     * getSetFlashbackSession, getSetScreenShake, getCurrentDayAndYear,
+     * clearNewGameFlag, getNewGameFlag and getSaveBlock). */
+    struct DreamSys *dreamSys;
     /* +0x0A8/+0x0AC, Class86B60__Dtor (this unit's destructor): two owned
      * sub-objects, each released through their own shared `release` slot.
      * BOTH releases sit inside the SAME `unkAC != NULL` guard -- retail's
@@ -1155,9 +1151,9 @@ struct Class86B60 {
     Class86B60UnkB0Obj_3bb8c_d *nameField; /* RENAMED from unkB0 -- the New_TextRow result
                                         Class86B60__CreateNameField constructs. */
     u8 pad0B4[0x0BC - 0x0B4];
-    s32 unkBC;                      /* +0x0BC, Class86B60__Class86B60: return value of dreamSys->methods->slot1B0 */
+    s32 unkBC;                      /* +0x0BC, Class86B60__Class86B60: dreamSys->methods->getSaveBlock's return (&saveMagic) */
     s32 unkC0;                      /* +0x0C0, Class86B60__Class86B60: output buffer address passed BY REFERENCE
-                                        to dreamSys->methods->slot1B0 -- last word of the 0xC4-byte
+                                        to dreamSys->methods->getSaveBlock (the save block size, 0x700) -- last word of the 0xC4-byte
                                         allocation (0xC0+4 == 0xC4), which is why this field is exactly
                                         one word wide rather than a guess */
 };
@@ -1178,52 +1174,6 @@ typedef struct Class86B60Unk48ObjMethods {
 typedef struct Class86B60Unk48Obj {
     Class86B60Unk48ObjMethods *methods;   /* +0x000 */
 } Class86B60Unk48Obj;
-
-/*
- * Local, opaque view of Class86B60__Class86B60's `dreamSys` argument -- only the
- * two vtable slots that function reaches (+0x1A0, +0x1B0) are typed. This
- * project already has a much larger, canonical `DreamSys` type
- * (include/DreamSys.h) with its own `vt` field, but neither offset is
- * established there yet and this unit does not edit that header -- kept
- * as an independent local view per this project's established convention
- * (see e.g. Obj866E8 vs. Class866E8 at the top of this file). The `void
- * *dreamSys` parameter type on New_Class86B60/Class86B60__Class86B60 themselves is
- * kept untyped/opaque to match the ALREADY-established external
- * declaration `extern PollTask *New_Class86B60(void *dreamSys);` in
- * include/Class6D3C8.h (a different unit's own independent view of this
- * same New_X allocator, used there as a `PollTaskCtor` callback) --
- * this local dispatch type is used only inside Class86B60__Class86B60's own body.
- */
-typedef struct DreamSysViewMethods_3bb8c_c DreamSysViewMethods_3bb8c_c;
-
-struct DreamSysViewMethods_3bb8c_c {
-    u8 pad000[0x0F0];
-    /* +0x0F0, Class86B60__ShowTitleIcon's own last call: `(dreamSys, 0, 0)`, both
-     * trailing arguments literal zero. */
-    void (*slotF0)(DreamSysView_3bb8c_c *self, s32 arg1, s32 arg2);
-    u8 pad0F4[0x19C - 0x0F4];
-    /* +0x19C, Class86B60__RefreshViewValue's own call: `arg1` is the address of a
-     * one-word stack buffer this function fills from
-     * `self->unk60->unk14` before the call. */
-    void (*slot19C)(DreamSysView_3bb8c_c *self, s32 *arg1);
-    /* Return value forwarded straight to FormatNumberIntoBuffer's own arg0. */
-    s32 (*slot1A0)(DreamSysView_3bb8c_c *self, s32 arg1);      /* +0x1A0 */
-    u8 pad1A4[0x1A8 - 0x1A4];
-    /* +0x1A8, Class86B60__OnTagBValue's own call, `self` only. */
-    void (*slot1A8)(DreamSysView_3bb8c_c *self);
-    /* +0x1AC, Class86B60__UpdateMemcardSaveWithIcon's own call: `self->unkA4->methods->slot1AC(
-     * self->unkA4)`. Nonzero return gates a one-byte-zero write into
-     * `*D_8008AA10` (return type therefore `s32`, not `void` -- the
-     * caller's `beqz` on `$v0` tests it directly). */
-    s32 (*slot1AC)(DreamSysView_3bb8c_c *self);
-    /* Return value stored into Class86B60::unkBC; arg1 is the address of
-     * Class86B60::unkC0 (an output buffer this slot presumably fills). */
-    s32 (*slot1B0)(DreamSysView_3bb8c_c *self, void *arg1);     /* +0x1B0 */
-};
-
-struct DreamSysView_3bb8c_c {
-    DreamSysViewMethods_3bb8c_c *methods;   /* +0x000 */
-};
 
 /* Class86B60's parent is TaskCore (include/TaskCore.h, track 4 round 84):
  * its methods reach the base implementations through Get_vtable_TaskCore()
@@ -1814,8 +1764,6 @@ typedef struct FieldM14 FieldM14;
 typedef struct FieldM14Methods FieldM14Methods;
 typedef struct FieldM18 FieldM18;
 typedef struct FieldM18Methods FieldM18Methods;
-typedef struct DreamSysObj_3bb8c_m DreamSysObj_3bb8c_m;
-typedef struct DreamSysMethods_3bb8c_m DreamSysMethods_3bb8c_m;
 typedef struct ChildM_AC ChildM_AC;
 typedef struct ChildM_ACMethods ChildM_ACMethods;
 typedef struct ChildM114 ChildM114;
@@ -1827,41 +1775,6 @@ typedef struct FieldM50 FieldM50;
 typedef struct FieldM50Methods FieldM50Methods;
 typedef struct FieldM7C FieldM7C;
 typedef struct FieldM7CMethods FieldM7CMethods;
-
-/* self->unk3C's target (ObjM__EnterState7/ObjM__EnterState8/ObjM__EnterStateA/
- * ObjM__HandleEvent5Or6/ObjM__CheckAuxTrigger). CONFIRMED DreamSys*, not just
- * a plausible guess: `tools/classtable.py 0x80087BDC` (DreamSys's real vtable,
- * include/DreamSys.h) resolves every one of the six offsets this unit
- * dispatches to a REAL, already-named DreamSys method, exact offset and exact
- * argument count both:
- *   +0x0F0 DreamSys__GetSetFlashbackSession   +0x0F4 DreamSys__SetMoveOverride
- *   +0x0FC DreamSys__BlockMovement            +0x13C DreamSys__SelectCallback98
- *   +0x17C DreamSys__StopDrift                +0x1A0 DreamSys__GetCurrentDayAndYear
- * DreamSys.h is a different, actively-shared unit's header (its own six
- * offsets above sit inside ITS padding arrays, so nothing there collides),
- * so this keeps its own minimal, independently-named LOCAL view rather than
- * `#include "DreamSys.h"`, per the project's established
- * multiple-independent-local-views convention -- the same choice
- * class_3bb8c_l already made for its own partial DreamSys view
- * (DreamSysMethods_3bb8c_l, matched against six DIFFERENT confirmed
- * offsets). Field names below are DreamSys's own REAL method names,
- * lower-camel-cased, not invented ones. */
-struct DreamSysMethods_3bb8c_m {
-    u8 pad000[0x0F0];
-    void (*getSetFlashbackSession)(DreamSysObj_3bb8c_m *self, s32 *out, s32 arg2); /* +0x0F0, ObjM__EnterState7: writes *out */
-    void (*setMoveOverride)(DreamSysObj_3bb8c_m *self, s32 arg1);           /* +0x0F4, ObjM__EnterState8/ObjM__EnterStateA/ObjM__HandleEvent5Or6 */
-    u8 pad0F8[0x0FC - 0x0F8];
-    void (*blockMovement)(DreamSysObj_3bb8c_m *self);                     /* +0x0FC, ObjM__EnterState7 */
-    u8 pad100[0x13C - 0x100];
-    void (*selectCallback98)(DreamSysObj_3bb8c_m *self, s32 arg1);          /* +0x13C, ObjM__EnterStateA */
-    u8 pad140[0x17C - 0x140];
-    void (*stopDrift)(DreamSysObj_3bb8c_m *self, s32 arg1);                 /* +0x17C, ObjM__HandleEvent5Or6 */
-    u8 pad180[0x1A0 - 0x180];
-    void *(*getCurrentDayAndYear)(DreamSysObj_3bb8c_m *self, s32 arg1);     /* +0x1A0, ObjM__CheckAuxTrigger (return discarded there) */
-};
-struct DreamSysObj_3bb8c_m {
-    DreamSysMethods_3bb8c_m *methods;   /* +0x000 */
-};
 
 /* self->unk18's target (ObjM__ForwardToSubChild/ObjM__HandleEvent5Or6). */
 struct FieldM18Methods {
@@ -1919,7 +1832,7 @@ struct ParamM {
  * only external call. Typed purely from that call site's own register
  * setup: (value, out-pointer, opaque-object) -> s32, whose result is
  * stored into a ChildM114's unk14 and tested for zero. The third arg is
- * DreamSysMethods_3bb8c_m::getCurrentDayAndYear's own return value (not `self->unk14`'s
+ * DreamSys's getCurrentDayAndYear (+0x1A0) return value (not `self->unk14`'s
  * child), so it stays void* rather than ChildM114* -- nothing ties the
  * two together. */
 extern s32 TryDreamAuxTrigger(s32 arg0, s32 *arg1, void *arg2);
@@ -2016,7 +1929,7 @@ struct ObjM {
     u8 pad024[0x034 - 0x024];
     FieldM34 *unk34;          /* +0x034, ObjM__TeardownPauseOverlay/ObjM__AdvancePauseSetup */
     u8 pad038[0x03C - 0x038];
-    DreamSysObj_3bb8c_m *dreamSys; /* +0x03C, ObjM__EnterState7/ObjM__EnterState8/ObjM__EnterStateA/ObjM__HandleEvent5Or6/ObjM__CheckAuxTrigger -- CONFIRMED DreamSys* via classtable.py, see DreamSysMethods_3bb8c_m above */
+    struct DreamSys *dreamSys; /* +0x03C, ObjM__EnterState7/ObjM__EnterState8/ObjM__EnterStateA/ObjM__HandleEvent5Or6/ObjM__CheckAuxTrigger: the six slots called on it (+0x0F0/+0x0F4/+0x0FC/+0x13C/+0x17C/+0x1A0) are DreamSys occupants (include/DreamSys.h) */
     u8 pad040[0x054 - 0x040];
     FieldM50 *unk54;          /* +0x054, ObjM__TeardownPauseOverlay/ObjM__AdvancePauseSetup -- same type as unk10 above */
     u8 pad058[0x074 - 0x058];
@@ -2114,28 +2027,15 @@ typedef struct Obj14_3bb8c_l {
     u16 unk1B4;                     /* +0x1B4, ObjM__TransferToOther */
 } Obj14_3bb8c_l;
 
-/* Whatever self->target/self->world point to. Resolved by cross-checking
- * the exact offsets this unit's functions dispatch (+0x050, +0x074,
- * +0x0FC, +0x104, +0x108, +0x200) against tools/classtable.py's dump of
- * DREAMSYS_METHODS (0x80087BDC, include/DreamSys.h): every one lands on a
- * real occupant there (DreamSys__UnlinkLinkMgr, Class6B5CC__GetSetUnk10Field0, DreamSys__BlockMovement,
- * DreamSys__GetSetDreamTimeLimit, DreamSys__GetDreamTimerScaled, DreamSys__GetDreamColor
- * respectively), and the two whose header signatures are pinned down
- * (+0x104 `s32(DreamSys*, s32)`, +0x108 `s32(DreamSys*)`) match this unit's
- * own call-site arities exactly. So this almost certainly IS DreamSys, but
- * declared as this unit's own minimal, independent, offset-only view
- * (rather than including DreamSys.h) since none of DreamSys.h's own named
- * fields cover these particular slots (they sit inside its
- * `unknown_functions_0x..` padding arrays) and DreamSys.h is a different
- * unit's header, not this one's to extend. */
-typedef struct DreamSysMethods_3bb8c_l {
-    u8 pad00[0x04C];
-    /* +0x04C, round 45's ObjM__SetupSceneStyle: `(self, self->unk14)`, dispatched
-     * on the OWNING Obj87034_3bb8c_l's own `target` (a DIFFERENT
-     * DreamSysObj_3bb8c_l instance from the `self->world` this function
-     * dispatches every other slot through). */
-    void (*slot4C)(void *self, void *arg1); /* +0x04C */
-    void (*slot50)(void *self);          /* +0x050, ObjM__ExitSceneStyle */
+/* What self->world points to (and what its +0x0AC returns): an
+ * unidentified class dispatched through style/world-setup slots. Until
+ * round 88 this type was also self->target's, as DreamSysObj_3bb8c_l; the
+ * target is the game's DreamSys (track 4: its +0x04C/+0x050/+0x0EC/+0x0F0/
+ * +0x0F8/+0x0FC/+0x104/+0x108/+0x1A0/+0x200 calls are DreamSys occupants,
+ * and +0x044/+0x164 are Actor's state and DreamSys's currentStage), and
+ * those slots left with it. Nothing ties the world to DreamSys. */
+typedef struct StyleWorldMethods_3bb8c_l {
+    u8 pad00[0x054];
     /* +0x054, round 45's ObjM__SetupSceneStyle: `(self, val)`, `val` a small
      * derived integer (`(*obj->methods->slot7C(obj, 0)) / 2 * 5 / 3 +
      * D_8008AB34`, `obj` being `*(void **)self->unkC`). */
@@ -2145,43 +2045,22 @@ typedef struct DreamSysMethods_3bb8c_l {
     void (*slot64)(void *self, void *arg1);        /* +0x064, ObjM__EnterStyleSession */
     void (*slot68)(void *self, void *arg1);        /* +0x068, ObjM__EnterStyleSession */
     void (*slot6C)(void *self, void *arg1);        /* +0x06C, ObjM__EnterStyleSession */
-    void (*slot70)(void *self, void *arg1, void *arg2, void *arg3, s32 arg4); /* +0x070, ObjM__InitStyleAndWorld */
+    void (*slot70)(void *self, void *arg1, void *arg2, void *arg3, s32 arg4); /* +0x070, ObjM__InitStyleAndWorld: (target, &D_8008715C, &D_80087168, 0) */
     void (*slot74)(void *self);          /* +0x074, ObjM__ExitSceneStyle */
     u8 pad78[0x0AC - 0x078];
-    /* Returns another DreamSysObj_3bb8c_l* -- its return value is dispatched
-     * through methods->slotF0/slotD4 the same way self->target/self->world
-     * themselves are, so it is almost certainly a "related instance"
-     * accessor rather than a plain getter of scalar data. Named via the
-     * elaborated `struct DreamSysObj_3bb8c_l *` (not the typedef, which is
-     * not yet in scope this early in the header) to avoid a forward-typedef
-     * redefinition -- GCC 2.6.3 rejects `typedef struct X X;` twice even
-     * with an identical definition. */
-    struct DreamSysObj_3bb8c_l *(*slotAC)(void *self);    /* +0x0AC, ObjM__EnterStyleSession */
+    /* Returns another object of this view, dispatched through slotF0/slotD4
+     * (elaborated tag: the typedef is not in scope yet). */
+    struct StyleWorldObj_3bb8c_l *(*slotAC)(void *self);    /* +0x0AC, ObjM__EnterStyleSession */
     void (*slotB0)(void *self, s32 arg1);          /* +0x0B0, ObjM__EnterStyleSession */
     void (*slotB4)(void *self, s32 arg1);          /* +0x0B4, ObjM__EnterStyleSession */
     u8 padB8[0x0D4 - 0x0B8];
-    void (*slotD4)(void *self, s32 arg1, s32 arg2, s32 arg3); /* +0x0D4, ObjM__EnterStyleSession */
-    u8 padD8[0x0EC - 0x0D8];
-    s32 (*slotEC)(void *self, s32 arg1);              /* +0x0EC, ObjM__InitStyleAndWorld */
-    s32 (*slotF0)(void *self, s32 *outBuf, s32 arg2); /* +0x0F0, ObjM__EnterState4 (STALLED 28/71 -- offset/signature observed directly from the disassembly, reliable independent of the stall; see docs/match-reports/ObjM__EnterState4.md). ALSO ObjM__EnterStyleSession, on a DIFFERENT instance (the slotAC return value) with a DIFFERENT 2nd-arg shape (plain s32, not a pointer) -- same slot, two call-site views, per this project's established convention; see that function's report. */
-    u8 padF4[0x0F8 - 0x0F4];
-    void (*slotF8)(void *self, s32 arg1, s32 arg2); /* +0x0F8, ObjM__EnterStyleSession */
-    void (*slotFC)(void *self);          /* +0x0FC, ObjM__ExitSceneStyle/ObjM__EnterState6 */
-    u8 pad100[0x104 - 0x100];
-    s32 (*slot104)(void *self, s32 arg1); /* +0x104, ObjM__TransferToOther */
-    s32 (*slot108)(void *self);           /* +0x108, ObjM__TransferToOther */
-    u8 pad10C[0x1A0 - 0x10C];
-    s32 (*slot1A0)(void *self, s32 arg1); /* +0x1A0, ObjM__InitStyleAndWorld (return value forwarded opaquely to two other calls) */
-    u8 pad1A4[0x200 - 0x1A4];
-    s32 (*slot200)(void *self);           /* +0x200, ObjM__EnterState6 */
-} DreamSysMethods_3bb8c_l;
-typedef struct DreamSysObj_3bb8c_l {
-    DreamSysMethods_3bb8c_l *methods;
-    u8 pad04[0x044 - 0x004];
-    s32 unk44;               /* +0x044, ObjM__HandleStateCode: cleared (only reached when self->unk20 != 0 and the event/code is >= 9) */
-    u8 pad48[0x164 - 0x048];
-    s32 unk164;             /* +0x164, ObjM__EnterState5: sign-checked gate */
-} DreamSysObj_3bb8c_l;
+    void (*slotD4)(void *self, s32 arg1, s32 arg2, s32 arg3); /* +0x0D4, ObjM__EnterStyleSession (on slotAC's result) */
+    u8 padD8[0x0F0 - 0x0D8];
+    s32 (*slotF0)(void *self, s32 *outBuf, s32 arg2); /* +0x0F0, ObjM__EnterStyleSession (on slotAC's result, as (s32 *)ret, 0 or 3) */
+} StyleWorldMethods_3bb8c_l;
+typedef struct StyleWorldObj_3bb8c_l {
+    StyleWorldMethods_3bb8c_l *methods;
+} StyleWorldObj_3bb8c_l;
 
 /* Whatever arg1->unkC points to in ObjM__AttachTarget -- a registration sink
  * of some kind (arg1->unkC->methods->slotC8(arg1->unkC, callback,
@@ -2238,13 +2117,13 @@ struct Obj87034_3bb8c_l {
     RegistrantObj_3bb8c_l *unkC;      /* +0x00C, ObjM__AttachTarget's `arg1->unkC` */
     s32 unk10;                        /* +0x010, ObjM__EnterStyleSession */
     Obj14_3bb8c_l *unk14;              /* +0x014, ObjM__TransferToOther/ObjM__TickStyle/ObjM__ExitSceneStyle */
-    DreamSysObj_3bb8c_l *world;         /* +0x018, ObjM__ExitSceneStyle; cached into `cachedWorld` by ObjM__InitStyleAndWorld -- a second DreamSysObj instance distinct from `target`, dispatched through style/world-setup slots (slot74/slotAC/slot60/slot64/slot6C/slot68/slotB0/slotB4) */
+    StyleWorldObj_3bb8c_l *world;         /* +0x018, ObjM__ExitSceneStyle; cached into `cachedWorld` by ObjM__InitStyleAndWorld -- an object distinct from `target`, dispatched through style/world-setup slots (slot74/slotAC/slot60/slot64/slot6C/slot68/slotB0/slotB4) */
     s32 unk1C;                           /* +0x01C, ObjM__TickTarget: incremented once per call */
     s32 phase;                            /* +0x020, ObjM__EnterState6: written 6 (a state/phase tag; also written 4 by ObjM__EnterState4 and 5 by ObjM__EnterState5; read by ObjM__HandleStateCode, which is 0-gated) */
     u8 pad24[0x034 - 0x024];
     s32 unk34;                            /* +0x034, round 45's ObjM__SetupSceneStyle: forwarded opaquely to SetDreamAuxWorld's own arg3 */
     void *unk38;                          /* +0x038, ObjM__OnRegistrantEvent: forwarded opaquely to GetGridRecordAt/GetGridRecordXY */
-    DreamSysObj_3bb8c_l *target;            /* +0x03C, many functions in this unit */
+    struct DreamSys *target;            /* +0x03C, many functions in this unit: the game's DreamSys (include/DreamSys.h), which SetDreamAuxWorld installs as gDreamAuxWorld */
     s32 unk40;                             /* +0x040, ObjM__EnterStyleSession */
     s32 unk44;                              /* +0x044, ObjM__EnterStyleSession */
     s32 unk48;                               /* +0x048, ObjM__InitStyleAndWorld: set from arg1, or 0xA000 if arg1==0 */
@@ -2258,7 +2137,7 @@ struct Obj87034_3bb8c_l {
     s32 attached;                                   /* +0x068, ObjM__TransferToOther/ObjM__DispatchEvent/ObjM__TickTarget: zero-checked gate */
     s32 unk6C;                                    /* +0x06C, ObjM__InitStyleAndWorld: out-parameter address passed to RegisterStyleConfig, own type unknown */
     u8 pad70[0x078 - 0x070];
-    DreamSysObj_3bb8c_l *cachedWorld;                    /* +0x078, ObjM__InitStyleAndWorld: cached copy of self->world */
+    StyleWorldObj_3bb8c_l *cachedWorld;                    /* +0x078, ObjM__InitStyleAndWorld: cached copy of self->world */
     u8 pad7C[0x080 - 0x07C];
     s32 unk80;                                    /* +0x080, ObjM__TransferToOther (on `other`)/ObjM__TickTarget/ObjM__DispatchActiveState: zero-checked gate */
 };
