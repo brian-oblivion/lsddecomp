@@ -54,7 +54,7 @@ translated to idiomatic naming:
   loop construct itself is load-bearing, not merely a new scope.
 - **This is a recognised, already-precedented project idiom, not a
   UB-flavoured trick to reject:** `docs/DECOMPILATION_LEARNINGS.md`
-  documents the exact same lever from `Class86F88__AttachTarget` ("A `do { ... }
+  documents the exact same lever from `ItemList__AttachTarget` ("A `do { ... }
   while (0)` wrapper around an otherwise-unconditional body can be
   load-bearing for delay-slot scheduling... mechanism unexplained"), and
   `src/Entity_c.c`'s `Entity__MoodCue26` already ships it in matched,
@@ -68,7 +68,7 @@ translated to idiomatic naming:
 ### Proposed learning
 
 Broadens the existing `do { ... } while (0)`-wrapper learning
-(`Class86F88__AttachTarget`, `Entity__MoodCue26`) with a third data point: the same
+(`ItemList__AttachTarget`, `Entity__MoodCue26`) with a third data point: the same
 no-op-loop lever also fixes a pure **prologue callee-save STORE ORDER**
 residue, not just a register-identity swap. Given this project's own
 "prologue store order is not reachable from C" class (this function's

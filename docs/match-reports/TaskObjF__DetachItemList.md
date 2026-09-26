@@ -47,4 +47,4 @@ teardown counterpart of `TaskObjF__AttachItemList`, exact twin of
 
 ## Track 4 (2026-09-26, round 89)
 
-Renamed from `TaskObjF__DetachChildB`: the inverse of TaskObjF__AttachItemList on `itemList` (Class86F88 detachTarget +0x050, releaseResources +0x048, release when `ownsWidget`). Called by TaskObjF__OnItemListResult through +0x0AC.
+Renamed from `TaskObjF__DetachChildB`: the inverse of TaskObjF__AttachItemList on `itemList` (ItemList detachTarget +0x050, releaseResources +0x048, release when `ownsWidget`). Called by TaskObjF__OnItemListResult through +0x0AC.

@@ -1,27 +1,17 @@
 /*
- * class_3bb8c_k -- fifth carved slice of the class_3bb8c block
- * (0x429D4..0x435E0, vram 0x800521D4..0x80052DE0), 20 functions, carved
- * round 15, all matched. Named round 75 (track 3).
+ * class_3bb8c_k -- the second half of ItemList, and the start of ObjM.
+ *  - ItemList (include/ItemList.h), the list of strings the player picks one
+ *    from: setState, tickClosing, handleInputCode and forwardToTarget, the
+ *    cursor and scroll methods, the four visible rows (createRows,
+ *    releaseRows, refreshRows, and the non-virtual helpers FormatRowText and
+ *    SetView), stepCursorInView, getCursorIndex and the table getter
+ *    GetItemListMethods. Its ctor and resource methods are in class_3bb8c_j.
+ *  - ObjM (include/ObjM.h): its allocator, ctor, finalize and onNotify,
+ *    which dispatches on the sender's class id. The rest of ObjM is in
+ *    class_3bb8c_l and class_3bb8c_m.
  *
- * Methods of two classes (`tools/classtable.py` resolves every one):
- *  - Class86F88 (table gClass86F88Methods, slots +0x054..+0x09C, plus the
- *    two non-virtual helpers FormatRowText/SetView and the table getter
- *    GetClass86F88Methods). A scrolling list selector: up to 4 visible
- *    rows of 26-character item text (one New_TextRow text object each),
- *    a highlighted cursor row (gClass86F88CursorColor, others
- *    gClass86F88RowColor), cursor up/down that scrolls the window at its
- *    edges, and a horizontal column offset. HandleInputCode maps input
- *    codes 25/23 to closing with result 2/3; SetState(4) then reports the
- *    result to the parents, which read the chosen item back through
- *    GetCursorIndex. Its ctor, child and resource methods are in
- *    class_3bb8c_j. Declared in include/Class86F88.h (track 4, round 89).
- *  - ObjM (table gObjMMethods, slots +0x008/+0x00C/+0x038, plus New_ObjM):
- *    its allocator, ctor, Finalize and OnNotify, which dispatches on the
- *    sender's class id. The rest of ObjM is in class_3bb8c_l and
- *    class_3bb8c_m; the class is include/ObjM.h (track 4, round 89).
- *
- * include/class_3bb8c.h is SHARED with every other class_3bb8c_* slice.
- * Header edits must be strictly ADDITIVE.
+ * include/class_3bb8c.h is shared with every other class_3bb8c_* unit; edits
+ * to it must be strictly additive.
  */
 #include "common.h"
 #include "class_3bb8c.h"
@@ -29,10 +19,10 @@
 #include "Class86668.h"
 #include "TextRow.h"
 #include "TimImage.h"
-#include "Class86F88.h"
+#include "ItemList.h"
 #include "ObjM.h"
 
-void Class86F88__SetState(Class86F88 *self, s32 state) {
+void ItemList__SetState(ItemList *self, s32 state) {
     self->closeTicks = 0;
     if (state < 2) {
         goto end;
@@ -55,7 +45,7 @@ end:
     return;
 }
 
-void Class86F88__TickClosing(Class86F88 *self) {
+void ItemList__TickClosing(ItemList *self) {
     s32 old;
 
     if (self->result >= 4) {
@@ -72,7 +62,7 @@ void Class86F88__TickClosing(Class86F88 *self) {
     self->methods->setState(self, 4);
 }
 
-void Class86F88__HandleInputCode(Class86F88 *self, void *source, s32 code) {
+void ItemList__HandleInputCode(ItemList *self, void *source, s32 code) {
     switch (code) {
         case 25:
             self->methods->forwardToTarget(self, 0x10);
@@ -97,7 +87,7 @@ void Class86F88__HandleInputCode(Class86F88 *self, void *source, s32 code) {
     }
 }
 
-void Class86F88__ForwardToTarget(Class86F88 *self, s32 code) {
+void ItemList__ForwardToTarget(ItemList *self, s32 code) {
     struct TargetObj86ED0 *target = self->target;
 
     if (target != NULL) {
@@ -105,8 +95,8 @@ void Class86F88__ForwardToTarget(Class86F88 *self, s32 code) {
     }
 }
 
-void Class86F88__ScrollRight(Class86F88 *self) {
-    Class86F88Methods *methods;
+void ItemList__ScrollRight(ItemList *self) {
+    ItemListMethods *methods;
     s32 tmp;
     s32 column;
 
@@ -124,7 +114,7 @@ void Class86F88__ScrollRight(Class86F88 *self) {
     methods->refreshRows(self, self->topIndex, column, self->cursorIndex, 1);
 }
 
-void Class86F88__ScrollLeft(Class86F88 *self) {
+void ItemList__ScrollLeft(ItemList *self) {
     s32 column;
 
     if (!self->panelSprite) {
@@ -138,7 +128,7 @@ void Class86F88__ScrollLeft(Class86F88 *self) {
     self->methods->refreshRows(self, self->topIndex, column, self->cursorIndex, 1);
 }
 
-void Class86F88__CursorUp(Class86F88 *self, s32 arg1, s32 arg2, s32 arg3) {
+void ItemList__CursorUp(ItemList *self, s32 arg1, s32 arg2, s32 arg3) {
     s32 cursor;
     s32 newTop;
     s32 newCursor;
@@ -161,7 +151,7 @@ void Class86F88__CursorUp(Class86F88 *self, s32 arg1, s32 arg2, s32 arg3) {
     }
 }
 
-void Class86F88__CursorDown(Class86F88 *self, s32 arg1, s32 arg2, s32 arg3) {
+void ItemList__CursorDown(ItemList *self, s32 arg1, s32 arg2, s32 arg3) {
     s32 newTop;
     s32 newCursor;
     s32 prevTop;
@@ -185,12 +175,12 @@ void Class86F88__CursorDown(Class86F88 *self, s32 arg1, s32 arg2, s32 arg3) {
 }
 
 /* The first row's position, two sdata words (-0x5C, -0xF). Read by value
- * into Class86F88__CreateRows's `pos`; each further row is 0xA lower. */
-extern s32 gClass86F88RowOriginX;
-extern s32 gClass86F88RowOriginY;
+ * into ItemList__CreateRows's `pos`; each further row is 0xA lower. */
+extern s32 gItemListRowOriginX;
+extern s32 gItemListRowOriginY;
 
-void Class86F88__CreateRows(Class86F88 *self, SceneNode *parent, TimImage *font, s32 top,
-                            s32 column, s32 cursor) {
+void ItemList__CreateRows(ItemList *self, SceneNode *parent, TimImage *font, s32 top, s32 column,
+                          s32 cursor) {
     char buf[0x20];
     ScreenSpritePos pos;
     TextRow **p;
@@ -201,8 +191,8 @@ void Class86F88__CreateRows(Class86F88 *self, SceneNode *parent, TimImage *font,
         return;
     }
 
-    pos.x = gClass86F88RowOriginX;
-    pos.y = gClass86F88RowOriginY;
+    pos.x = gItemListRowOriginX;
+    pos.y = gItemListRowOriginY;
     count = self->itemCount;
     p = &self->rows[0];
     if (count >= 5) {
@@ -210,18 +200,18 @@ void Class86F88__CreateRows(Class86F88 *self, SceneNode *parent, TimImage *font,
     }
 
     for (i = 0; i < count; i++) {
-        Class86F88__FormatRowText(self, buf, i, top, column);
+        ItemList__FormatRowText(self, buf, i, top, column);
         *p = New_TextRow(font, 0x1A, buf);
         (*p)->methods->attachToParent(*p, parent, (LongVec3 *)&pos);
-        (*p)->methods->setColor(*p, &gClass86F88RowColor);
+        (*p)->methods->setColor(*p, &gItemListRowColor);
         pos.y += 0xA;
         p++;
     }
 
-    Class86F88__SetView(self, top, column, cursor, 1);
+    ItemList__SetView(self, top, column, cursor, 1);
 }
 
-void Class86F88__ReleaseRows(Class86F88 *self) {
+void ItemList__ReleaseRows(ItemList *self) {
     s32 count;
     s32 i;
     u8 unused[8];
@@ -262,7 +252,7 @@ void Class86F88__ReleaseRows(Class86F88 *self) {
 extern s32 strlen(char *s);
 extern void *memcpy(char *dest, char *src, s32 n);
 
-void Class86F88__RefreshRows(Class86F88 *self, s32 top, s32 column, s32 cursor, s32 notify) {
+void ItemList__RefreshRows(ItemList *self, s32 top, s32 column, s32 cursor, s32 notify) {
     s32 count;
     s32 i;
     char buf[0x20];
@@ -277,17 +267,17 @@ void Class86F88__RefreshRows(Class86F88 *self, s32 top, s32 column, s32 cursor, 
         count = 4;
     }
     for (i = 0; i < count; i++) {
-        Class86F88__FormatRowText(self, buf, i, top, column);
+        ItemList__FormatRowText(self, buf, i, top, column);
         (*p)->methods->setText(*p, buf);
         p++;
     }
-    Class86F88__SetView(self, top, column, cursor, 0);
+    ItemList__SetView(self, top, column, cursor, 0);
     if (notify) {
         self->methods->forwardToTarget(self, 0);
     }
 }
 
-char *Class86F88__FormatRowText(Class86F88 *self, char *dest, s32 row, s32 top, s32 column) {
+char *ItemList__FormatRowText(ItemList *self, char *dest, s32 row, s32 top, s32 column) {
     s32 idx = top + row;
     s32 len;
     s32 i;
@@ -307,7 +297,7 @@ char *Class86F88__FormatRowText(Class86F88 *self, char *dest, s32 row, s32 top, 
     return dest;
 }
 
-void Class86F88__SetView(Class86F88 *self, s32 top, s32 column, s32 cursor, s32 highlight) {
+void ItemList__SetView(ItemList *self, s32 top, s32 column, s32 cursor, s32 highlight) {
     TextRow *elem;
     s32 flag = highlight;
 
@@ -319,10 +309,10 @@ void Class86F88__SetView(Class86F88 *self, s32 top, s32 column, s32 cursor, s32 
     }
     cursor -= top;
     elem = self->rows[cursor];
-    elem->methods->setColor(elem, &gClass86F88CursorColor);
+    elem->methods->setColor(elem, &gItemListCursorColor);
 }
 
-void Class86F88__StepCursorInView(Class86F88 *self, s32 dir, s32 notify) {
+void ItemList__StepCursorInView(ItemList *self, s32 dir, s32 notify) {
     TextRow **p;
     s32 idx;
 
@@ -331,7 +321,7 @@ void Class86F88__StepCursorInView(Class86F88 *self, s32 dir, s32 notify) {
     }
     idx = self->cursorIndex - self->topIndex;
     p = &self->rows[idx];
-    (*p)->methods->setColor(*p, &gClass86F88RowColor);
+    (*p)->methods->setColor(*p, &gItemListRowColor);
     if (dir) {
         self->cursorIndex++;
         p++;
@@ -339,18 +329,18 @@ void Class86F88__StepCursorInView(Class86F88 *self, s32 dir, s32 notify) {
         self->cursorIndex--;
         p--;
     }
-    (*p)->methods->setColor(*p, &gClass86F88CursorColor);
+    (*p)->methods->setColor(*p, &gItemListCursorColor);
     if (notify) {
         self->methods->forwardToTarget(self, 0);
     }
 }
 
-s32 Class86F88__GetCursorIndex(Class86F88 *self) {
+s32 ItemList__GetCursorIndex(ItemList *self) {
     return self->cursorIndex;
 }
 
-Class86F88Methods *GetClass86F88Methods(void) {
-    return &gClass86F88Methods;
+ItemListMethods *GetItemListMethods(void) {
+    return &gItemListMethods;
 }
 
 ObjM *New_ObjM(BasicClass *sound, struct WBgm *bgm, TimImage *etcTim,

@@ -1,20 +1,22 @@
-# Class86F88__AttachTarget -- MATCHED (27/27 words)
+# ItemList__AttachTarget -- MATCHED (27/27 words)
 
-> Renamed from `Class86F88__AddChildAndSetState` on 2026-09-26 (tools/rename.py). Address 0x80052110.
+> Renamed from `Class86F88__AttachTarget` on 2026-09-26 (tools/rename.py). Address 0x80052110.
 
-> Renamed from `Class86F88_3bb8c_j__AddChildAndSetState` on 2026-09-24 (tools/rename.py). Address 0x80052110.
+> Renamed from `ItemList__AddChildAndSetState` on 2026-09-26 (tools/rename.py). Address 0x80052110.
+
+> Renamed from `ItemList_3bb8c_j__AddChildAndSetState` on 2026-09-24 (tools/rename.py). Address 0x80052110.
 
 > Renamed from `func_80052110` on 2026-09-24 (tools/rename.py). Address 0x80052110.
 
-Unit: `src/class_3bb8c_j.c`. `self` is `Class86F88_3bb8c_j`.
+Unit: `src/class_3bb8c_j.c`. `self` is `ItemList_3bb8c_j`.
 
 ## Body
 
 ```c
-void Class86F88__AttachTarget(Class86F88_3bb8c_j *self, void *arg1, s32 arg2, s32 arg3)
+void ItemList__AttachTarget(ItemList_3bb8c_j *self, void *arg1, s32 arg2, s32 arg3)
 {
-    typedef void (*Slot10NarrowFn)(Class86F88_3bb8c_j *self, s32 arg1);
-    void (*fn)(Class86F88_3bb8c_j *self, void *arg1, s32 arg2, s32 arg3);
+    typedef void (*Slot10NarrowFn)(ItemList_3bb8c_j *self, s32 arg1);
+    void (*fn)(ItemList_3bb8c_j *self, void *arg1, s32 arg2, s32 arg3);
     s32 zero;
 
     zero = 0;
@@ -28,7 +30,7 @@ void Class86F88__AttachTarget(Class86F88_3bb8c_j *self, void *arg1, s32 arg2, s3
 }
 ```
 
-Calls `Class86F88Methods_3bb8c_j::slot10` (established this round) TWICE at
+Calls `ItemListMethods_3bb8c_j::slot10` (established this round) TWICE at
 different arities from the SAME function -- the first call is a straight
 passthrough of this function's own `(self, arg1, arg2, arg3)` (nothing
 overwrites `$a1`-`$a3` between function entry and the first `jalr`), the
@@ -38,7 +40,7 @@ second passes only `(self, arg2)` (confirmed by the disassembly: no `$a2`/
 explicit function-pointer cast (`Slot10NarrowFn`) since C cannot call a
 4-parameter function pointer with 2 arguments.
 
-Also establishes `Class86F88_3bb8c_j::unk2C` (cleared to 0) and `unk3C` (set to
+Also establishes `ItemList_3bb8c_j::unk2C` (cleared to 0) and `unk3C` (set to
 `arg3`).
 
 ## Residue and how it closed
@@ -80,11 +82,11 @@ whoever investigates next.
 
 ## Naming
 
-- `Class86F88__AttachTarget` -- tier B. The slot4C occupant (classtable.py gClass86F88Methods +0x04C): dispatches self->methods->slot10 (this class's own addChild override) twice, once at full arity and once narrowed to (self, arg2) via a local function-pointer typedef, then sets unk3C=arg3 and clears unk2C. Mechanics established across rounds 18-19's residue hunt; the double-arity dispatch's in-game reason is not.
+- `ItemList__AttachTarget` -- tier B. The slot4C occupant (classtable.py gItemListMethods +0x04C): dispatches self->methods->slot10 (this class's own addChild override) twice, once at full arity and once narrowed to (self, arg2) via a local function-pointer typedef, then sets unk3C=arg3 and clears unk2C. Mechanics established across rounds 18-19's residue hunt; the double-arity dispatch's in-game reason is not.
 
 ## Track 4 (2026-09-26, round 89)
 
-Renamed from `Class86F88__AddChildAndSetState`. The body is
+Renamed from `ItemList__AddChildAndSetState`. The body is
 TextEntry__AttachTarget's, at the same slot (+0x04C) of a sibling class with
 the same one caller: addChild(child1), addChild(child2), `target = arg3`,
 `result = 0` (TextEntry also clears altCommands). Its only caller,

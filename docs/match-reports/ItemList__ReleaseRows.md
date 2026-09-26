@@ -1,17 +1,19 @@
-# Class86F88__ReleaseRows -- MATCH
+# ItemList__ReleaseRows -- MATCH
+
+> Renamed from `Class86F88__ReleaseRows` on 2026-09-26 (tools/rename.py). Address 0x8005278c.
 
 > Renamed from `func_8005278C` on 2026-09-24 (tools/rename.py). Address 0x8005278c.
 
 Unit `class_3bb8c_k`, round 15. `./build-and-verify.sh` exit 0; whole-image
-SHA1 matches retail. `funcdiff.py Class86F88__ReleaseRows`: 36/36 words match.
+SHA1 matches retail. `funcdiff.py ItemList__ReleaseRows`: 36/36 words match.
 
-This is vtable slot `+0x090` of `gClass86F88Methods` (not declared in
-`Class86F88Methods` since nothing in this unit dispatches through it).
+This is vtable slot `+0x090` of `gItemListMethods` (not declared in
+`ItemListMethods` since nothing in this unit dispatches through it).
 
 ## Source
 
 ```c
-void Class86F88__ReleaseRows(Class86F88 *self)
+void ItemList__ReleaseRows(ItemList *self)
 {
     s32 count;
     s32 i;
@@ -38,11 +40,11 @@ void Class86F88__ReleaseRows(Class86F88 *self)
 
 ## Notes
 
-Walks `self->unk40[0..count-1]` (an array of up to 4 `Class86F88Elem *`,
+Walks `self->unk40[0..count-1]` (an array of up to 4 `ItemListElem *`,
 clamped from `self->unk10`), releasing each through its own vtable's
 `+0x004` slot (the same shared base-class implementation documented for
 `GenericReleaseMethods_3bb8c_d` elsewhere in this header -- confirmed by
-this call site to be the same shape on `Class86F88ElemMethods`) and
+this call site to be the same shape on `ItemListElemMethods`) and
 nulling the slot. Four separate residues, closed one at a time with
 `funcdiff.py` re-measured after each:
 
@@ -51,7 +53,7 @@ nulling the slot. Four separate residues, closed one at a time with
    `self->unk50` guard; retail only reads it after the guard passes.
    Moved to its own statement after the guard.
 2. **The array walk needed indexing, not a hand-rolled incrementing
-   pointer.** An explicit `Class86F88Elem **p = self->unk40; ...; p++;`
+   pointer.** An explicit `ItemListElem **p = self->unk40; ...; p++;`
    walk reproduced the wrong addressing (`p` pointing directly at
    `unk40[0]`, offset folded into the pointer, dereferenced at offset 0)
    where retail keeps `self` itself as the walking base and a CONSTANT
@@ -78,8 +80,8 @@ nulling the slot. Four separate residues, closed one at a time with
 
 ## Naming
 
-Round 75 (bravo, track 3). `func_8005278C` -> `Class86F88__ReleaseRows`, **tier A**.
+Round 75 (bravo, track 3). `func_8005278C` -> `ItemList__ReleaseRows`, **tier A**.
 
-Slot +0x090 (`tools/classtable.py gClass86F88Methods`), called by Class86F88__ReleaseResources. Releases each of the min(itemCount, 4) row objects and clears its `rows[]` entry.
+Slot +0x090 (`tools/classtable.py gItemListMethods`), called by ItemList__ReleaseResources. Releases each of the min(itemCount, 4) row objects and clears its `rows[]` entry.
 
-Class86F88, per the round-75 pass, is a scrolling list selector: up to 4 visible rows of 26-character item text, a highlighted cursor row, a horizontal column offset (see the unit header comment of `src/class_3bb8c_k.c`).
+ItemList, per the round-75 pass, is a scrolling list selector: up to 4 visible rows of 26-character item text, a highlighted cursor row, a horizontal column offset (see the unit header comment of `src/class_3bb8c_k.c`).

@@ -165,7 +165,7 @@ load through a runtime-indexed global", §"BLOCKED: the `nop_mflo_mfhi` screen r
   from hoisting above it. `Class866E8__SplitFootprintSlot` 97/97; the barriers and `do{}while(0)` it had carried were
   compensating for that missing label. (round 71)
 - **A stall whose compiled LENGTH differs from retail is a control-flow defect until shown
-  otherwise, whatever its title calls it.** `Class86F88__Class86F88`, filed "register rotation, 6/107" since
+  otherwise, whatever its title calls it.** `ItemList__ItemList`, filed "register rotation, 6/107" since
   round 9, compiled 2 long: an assignment retail runs unconditionally sat under a guard; a running
   max needed a ternary (a field load stored straight back to the same field = `x = (x < y) ? y :
   x`); two initialisations belonged before a call. (PROGRESS round 73)
@@ -394,7 +394,7 @@ load through a runtime-indexed global", §"BLOCKED: the `nop_mflo_mfhi` screen r
   (`IntermediateBase__SetState` 32/32, "unreachable" since round 13). (round 72)
 - **Split a variable REUSED for two unrelated values** — the inverse of the delete-a-local lever.
   Discriminator: an equal-length rotation among saved registers, one local assigned in two
-  independent halves. Closed `Class86F88__LoadResources` (three-way rotation, 75/95) on the
+  independent halves. Closed `ItemList__LoadResources` (three-way rotation, 75/95) on the
   first build and `Class866E8__LoadElementResources` 142/150. (PROGRESS round 73)
 - **An address whose BASE is `$a0` while the object lives in `$s0` means a second C variable
   aliasing `this`.** Scheduling and delay-slot filling move instructions but never change which

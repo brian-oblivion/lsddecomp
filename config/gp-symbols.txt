@@ -141,10 +141,6 @@ gCdTickStep
 gCdTimeoutCounter
 gCdUseVSyncCallback
 gClass6D3C8
-gClass86F88CursorColor
-gClass86F88RowColor
-gClass86F88RowOriginX
-gClass86F88RowOriginY
 gDefaultBMemPMgr
 gDefaultGridSpan
 gDefaultScreenDims
@@ -160,6 +156,10 @@ gFileTableCount
 gForcedVariant
 gForcedWeeklyGroup
 gInstantTeleportersEnabled
+gItemListCursorColor
+gItemListRowColor
+gItemListRowOriginX
+gItemListRowOriginY
 gLinkDstStage
 gLinkSpawnIndex
 gLinkSrcStage

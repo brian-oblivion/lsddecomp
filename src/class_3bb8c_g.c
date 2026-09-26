@@ -9,7 +9,7 @@
  * or open a widget); AdvanceState and ForceIdleFromState answer the input
  * source's events, TickStateDelay the tick source's. The two widgets are
  * lazily attached in mirrored pairs: `textEntry` (a TextEntry, to edit the
- * title) and `itemList` (a Class86F88, to choose among the existing files),
+ * title) and `itemList` (a ItemList, to choose among the existing files),
  * driven through the slots +0x044..+0x050 both classes put at the same
  * offsets; their results come back through OnTextEntryResult and
  * OnItemListResult. `cardIcon` is a ScreenSprite of a CARD\*.TIM message,
@@ -23,7 +23,7 @@
 #include "class_3bb8c.h"
 #include "ScreenSprite.h"
 #include "TextEntry.h"
-#include "Class86F88.h"
+#include "ItemList.h"
 #include "TimImage.h"
 #include "VabStreamObj.h"
 #include "TaskObjF.h"
@@ -274,7 +274,7 @@ void TaskObjF__OnTextEntryResult(TaskObjF *self, void *arg1, s32 arg2) {
 void TaskObjF__AttachItemList(TaskObjF *self) {
     if (self->spriteParent != 0 && self->inputSource != 0) {
         if (self->itemList == NULL) {
-            self->itemList = New_Class86F88(self->titles, 1);
+            self->itemList = New_ItemList(self->titles, 1);
             self->ownsWidget = 1;
         }
         self->methods->addChild(self, (BasicClass *)self->itemList);
@@ -295,7 +295,7 @@ void TaskObjF__DetachItemList(TaskObjF *self) {
     }
 }
 
-void TaskObjF__OnItemListResult(TaskObjF *self, Class86F88 *arg1, s32 arg2) {
+void TaskObjF__OnItemListResult(TaskObjF *self, ItemList *arg1, s32 arg2) {
     switch (arg2) {
         case 2:
             self->selectedIndex = arg1->methods->getCursorIndex(arg1);
