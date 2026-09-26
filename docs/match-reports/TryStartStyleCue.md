@@ -145,3 +145,9 @@ because failure (returning `NULL`) is a real, handled path, not an error --
 the slot stays empty and `TickStyle` retries next frame (implicit from the
 call site's `gStyleCueSlots[i] = TryStartStyleCue(...)` pattern, no
 error-log or assert on failure). MATCHED, 45/45.
+
+## Round 93 polish (delta, track 7)
+
+### Naming
+
+Parameters: `slot`, `lastCue` (TickStyle's third argument, by address: set to the negated cue when the started cue equals it), `target` (the grid target's world position), `unused`. `gStyleCueCallbacks` typed `SoundCueCallbackFn[]` and InitSoundCueSet given its real prototype (SoundCueSet.h); `EntrySlot::count`/`StyleCueEntryView::countSign` renamed `cue`: it is the record's cue index (gStyleCueCallbacks row, InitSoundCueSet tag, gStyleCueDistanceTable row), positive while free, negated while a slot holds it.

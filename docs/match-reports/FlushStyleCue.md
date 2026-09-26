@@ -79,3 +79,9 @@ same "flush this slot's pending sound state" mechanic. Called from
 `StyleTeardown` (unconditionally, both slots) and from `TickStyle` (per
 slot, when `ServiceStyleCueIfNear` reports the cue is no longer near). MATCHED,
 20/20, first build.
+
+## Round 93 polish (delta, track 7)
+
+### Naming
+
+Round 93: returns `StyleCueSlot *` (always NULL, stored back into gStyleCueSlots) rather than `s32`; FlushSoundCueSet given its real prototype. Parameter `slot`.

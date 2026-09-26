@@ -74,3 +74,9 @@ as "stop" by the established pairing with `FlushSoundCueSet`/`InitSoundCueSet`
 (init/flush/stop triad) documented in `include/Entity.h`/`include/DreamSys.h`,
 which is cross-unit evidence, not a single-call-site guess. MATCHED,
 18/18, first build.
+
+## Round 93 polish (delta, track 7)
+
+### Naming
+
+**Renamed from `StopStyleCueIfNear`, tier A.** While the slot is within range (IsStyleCueNear) it calls ServiceSoundCueSet on the slot's cue set -- the once-per-tick service pass (SoundCueSet.h) -- and returns 1; it stops nothing. The stop is TickStyle's FlushStyleCue on a 0 return. Parameters `slot`, `target`, `unused`.

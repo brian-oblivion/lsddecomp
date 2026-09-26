@@ -258,3 +258,75 @@ which is a genuine per-tick call site -- the evidence for "Tick" over a
 generic "Update", matching this codebase's existing `TickDreamAuxSlots2`
 convention. MATCHED, 77/77 (round 47, permuter-closed register-colour
 swap).
+
+## Round 93 polish (delta, track 7)
+
+### Naming
+
+Round 93: parameters `(Descriptor10 *cell, void *unused, s32 lastCue)` -- ObjM__TickStyle passes the grid's getTargetDescriptor result, 0, 0; `cell` goes through Class866E8's computeCellOffsets into `targetPos` (a LongVec3; was `u8 buf[0x10]`, same bytes). The pool is `StyleCueSlot gStyleCueSlotPool[]` (0x68-byte slots, now that `cueSet` is a SoundCueSet).
+
+### Comments moved here from src/class_3bb8c_n.c
+
+Verbatim as they stood before the round-93 comment pass (identifiers already carry this round's renames).
+
+```c
+/*
+ * class_3bb8c_n -- functions 0..22 of the old 113-function class_3bb8c
+ * remainder, 0x44F14..0x46288.  23 functions (19 matched, 4 STALL), 1245
+ * words.  Carved round 45 (2026-09-15); staffed round 46.
+ *
+ * NAMING PASS, round 72 (runner alpha).  Every function, and the thirteen
+ * globals its functions set up or gate on, renamed via `tools/rename.py`,
+ * tree-wide.  The evidence for the `Style` prefix: this unit's global-state
+ * cluster (`gStyleStage`/`gStyleDay`/`gStyleTargetObj`/`gStyleVariant`/
+ * `gStyleDecorObj`/`gStyleGrid`/`gStyleTickCount`, formerly
+ * `D_8008AC6C`/`74`/`7C`/`80`/`94`, `D_8008AB4C`/`70`) is the SAME cluster
+ * `class_3bb8c_m.c`'s already-confirmed "Style" subsystem sets
+ * (`RegisterStyleConfig`/`ApplyStyleConfig`/`FillStyleFromConfig`/
+ * `ApplyStyleDecorationIfSet`, round 69) -- a cross-unit fact, not a guess
+ * made here.
+ *
+ * None of this unit's functions are themselves class methods (no vtable
+ * self-dispatch on their OWN symbol); they are free functions dispatching
+ * into THREE separate object families through local method-table views: a
+ * decoration object (`gStyleDecorObj`, `New_BoxFill`-allocated), an
+ * 18-slot "decor set" array (`gStyleDecorSlots`, same allocator) and an
+ * Class876FC "effect slots" array (`gStyleEffectSlots`, include/
+ * Class876FC.h, `New_Class876FC`-allocated, kind-tagged 0..3 by
+ * `StyleFillEffectKind0`..`3`'s literal first argument), plus a two-slot
+ * positional sound-cue subsystem (`gStyleCueSlots`, `TryStartStyleCue`/
+ * `FindNextStyleCueInRange`/`FlushStyleCue`/`ServiceStyleCueIfNear`/
+ * `IsStyleCueNear`). `TickStyle` is the per-frame entry point (called from
+ * `src/class_3bb8c_l.c`); `StyleTeardown` is the scene-exit release of
+ * everything `TickStyle` builds.
+ *
+ * What the "Style" subsystem is FOR in gameplay terms -- which dream/link
+ * property `gStyleStage` actually selects -- remains UNESTABLISHED; every
+ * name above describes MECHANICS, not a guessed purpose, per track 3's
+ * naming rule. Full evidence and tier per function: `docs/match-reports/
+ * <name>.md`, `## Naming`.
+ *
+ * Owns NO switch jump table (zero `jtbl_` references). All four blocker
+ * constructs (`gp_rel`, `addiu_at`, `nop_mflo_mfhi`, `nop_at_expansion`) are
+ * RESOLVED project-wide (CLAUDE.md, "Open toolchain blockers"); this unit's
+ * remaining stalls are ordinary matching residues, not toolchain blockers --
+ * see their own reports (`StyleFillEffectKind0` matched round 75).
+ *
+ * This unit includes include/class_3bb8c.h, which eleven other units also
+ * include. Whoever edits this unit's C should be the ONLY runner in the
+ * class_3bb8c block that round, or price the contention with
+ * `python3 tools/headercontention.py` first.
+ */
+```
+
+```c
+/* INERT ON PURPOSE -- DO NOT DELETE. This pair is a semantic
+             * no-op (`i` is the initialized loop counter, so nothing here is
+             * an uninitialized read), and it exists solely because it
+             * perturbs GCC 2.6.3's allocator back into retail's register
+             * colours for `target`/`i`. Found by the permuter at iteration 4
+             * and kept because the WHOLE-IMAGE SHA1 verifies with it, not
+             * because the permuter's own scorer liked it (round 41: a
+             * scorer zero is a lead, an `OK: build matches retail` is an
+             * answer). Removing these two lines re-breaks TickStyle. */
+```

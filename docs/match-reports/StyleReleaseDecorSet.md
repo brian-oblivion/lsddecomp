@@ -67,3 +67,9 @@ Guarded by `gStyleDecorVariant`; calls `ReleaseBasicClassArray(gStyleDecorSlots,
 0x12)` and clears the guard -- the release half of the `StyleBuildDecorSet`/
 `StyleUpdateDecorSet`/`StyleReleaseDecorSet` triad, called from
 `StyleTeardown`. MATCHED, 13/13, first build.
+
+## Round 93 polish (delta, track 7)
+
+### Naming
+
+`0x12` is `ARRAY_COUNT(gStyleDecorSlots)` (`STYLE_DECOR_BANDS`), round 93.

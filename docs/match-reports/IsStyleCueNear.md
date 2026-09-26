@@ -143,3 +143,9 @@ under the `gStyleCueDistanceTable[-idx]` threshold (`idx` from the claimed entry
 `countSign`) else 0. Not tier A despite the boolean-getter shape: it has a
 real side effect (`lastDist` write) beyond the return value, so it is not a
 "pure leaf" by track 3's tier-A test. MATCHED, 31/31.
+
+## Round 93 polish (delta, track 7)
+
+### Naming
+
+Round 93: `posX`/`posZ` are `pos.x`/`pos.z` of the slot's LongVec3 (StyleCueSlot +0x004..+0x00F; the out-parameter FindNextStyleCueInRange fills); the target is a `LongVec3 *`. Locals `dx`, `dz`, `cue`.

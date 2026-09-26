@@ -439,3 +439,37 @@ as `StyleFillEffectKind0`/`1`/`2`.
 ## Track 4 (2026-09-26, round 88, charlie)
 
 `gStyleEffectSlots` holds Class876FC objects (New_Class876FC), so the walking pointer is `Class876FC **` and the position `LongVec3 *`; `kind` is passed as a plain `s32` (was `(void *) N`), the params block as `(Class876FCParams *)` over the separately-declared gStyleSpawnOffsetX.. symbols (one 0x24-byte Class876FCParams in the bytes; left as they are, a track 4b job), and gStyleGrid as the `SceneNode *` parent. Image byte-identical.
+
+## Round 93 polish (delta, track 7)
+
+### Naming
+
+| old | new | tier | evidence |
+| --- | --- | --- | --- |
+| `D_8008721C` | `gStyleKind3Colors` | A | 3 RGB triples stored as the params' color for kind 3. |
+| `D_80087174` | `gStyleSpawnRotations` | A | 7 Ratio16 triples, each (0/1, y/1, 0/1) with y = 0, 60, 120, 180, 230, -5 and (last) -3 with z 180: the params' rotation (SetupStyleSpawnParamsA/B pick one by `rand() % 7`); kinds 2 and 3 then take entry 0. |
+| `0xFFFF5000`, `-0x2000`, `-0x7800` | `-45056`, `-8192`, `-30720` | -- | offsets, decimal per the base rule; a name would restate them. |
+| `0xC` | `offsetof(Class876FCParams, rotation)` | A | the params block's address taken back from its rotation member. |
+
+Locals: `slots`, `pos`, `offsetZ`, `rotation`.
+
+### Comments moved here from src/class_3bb8c_n.c
+
+Verbatim as they stood before the round-93 comment pass (identifiers already carry this round's renames).
+
+```c
+/* Local view: gStyleSpawnRotation stored through a pointer to a ONE-FIELD STRUCT, not
+ * a plain `u8 **`.  Load-bearing: a store through a plain pointer is an
+ * opaque (mem (reg)) that gcc 2.6.3's scheduler will not move a later
+ * global load above; an in-struct store through a varying address does not
+ * conflict with a scalar at a fixed address, so the gStyleGrid load
+ * schedules above it and the store lands in the jal delay slot, as retail.
+ * Round 76; see docs/match-reports/StyleFillEffectKind3.md. */
+```
+
+```c
+/* Appends one kind-3 New_Class876FC object; with the decor variant active
+ * and the default colour table it pins the spawn parameters, otherwise it
+ * clamps gStyleSpawnOffsetZ and picks a random colour triple.  MATCHED round 76
+ * (charlie). */
+```

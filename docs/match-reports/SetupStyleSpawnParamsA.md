@@ -313,3 +313,29 @@ from an earlier `SetupStyleKind0Params`, which wrongly implied a link to the
 `Obj876FC` kind-tag axis (`StyleFillEffectKind0`/`1`/`2`/`3`'s literal
 first-argument values) -- this function has no such tag, it is selected by
 an unrelated modulo test. MATCHED, 110/110, ins 0/del 0.
+
+## Round 93 polish (delta, track 7)
+
+### Naming
+
+Parameters: `(LongVec3 *pos, s32 offsetY)` -- the type StyleFillEffectKind0's shared function pointer calls both setups with (round 93; `void *` before). `pos` is unused; `offsetY == 0` picks one of `gStyleSpawnYChoices`.
+
+### Comments moved here from src/class_3bb8c_n.c
+
+Verbatim as they stood before the round-93 comment pass (identifiers already carry this round's renames).
+
+```c
+/* MATCHED round 64 (charlie), 110/110, ins 0 / del 0, one build.  The
+ * round-46..48 residue (an extra callee-saved register caching
+ * `gStyleSpawnOffsetX`'s address, frame -0x18 -> -0x20) was NOT register identity:
+ * `gStyleSpawnOffsetX` was declared as an INCOMPLETE ARRAY.  Every reference to
+ * `extern T gStyleSpawnOffsetX[]` is an array decay, i.e. an address-take VALUE,
+ * which cc1 2.6.3's CSE promotes into a callee-saved register across the
+ * intervening `rand()` calls; declared `extern s32 gStyleSpawnOffsetX` it emits
+ * retail's absolute `lui $at, %hi / sw %lo($at)` fresh at each of the three
+ * accesses.  Four in-tree variants pin the axis to ARRAY vs SCALAR: the
+ * element type (`u8[]` vs `s32[]`) and the cast spelling (`*(s32 *) &D_X`
+ * vs `D_X`) are both measurably INERT.  Do not restate this as "the
+ * declared type" -- that was the first, wrong, reading.
+ * See docs/match-reports/SetupStyleSpawnParamsA.md. */
+```

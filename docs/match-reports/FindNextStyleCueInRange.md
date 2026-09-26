@@ -322,3 +322,32 @@ record under threshold in scan order, not a true nearest-of-all-candidates
 search -- named for the dominant behaviour (early-return on first hit) since
 no caller distinguishes "first under threshold" from "globally nearest".
 MATCHED, 111/111.
+
+## Round 93 polish (delta, track 7)
+
+### Naming
+
+**Renamed from `FindNearestStyleCueEntry`, tier A.** The loop returns the FIRST unclaimed record (cue > 0) whose X+Z distance to the target is under its cue's `gStyleCueDistanceTable` entry, advancing `gStyleCueRecordIndex` past every record it looks at; it never compares candidates, so "nearest" said more than the body does.
+
+| old | new | tier | evidence |
+| --- | --- | --- | --- |
+| `D_800876B4` | `gStyleCueRecordLists` | A | per-stage pointer to the stage's 8-byte cue records. |
+| `D_800876EC` | `gStyleCueRecordCounts` | A | per-stage record count, the loop bound. |
+| `D_800874EC` | `gStyleCueOffsets` | A | 6-byte s16 x/y/z entries, indexed by the record's byte 4; copied after the record's 4 cell bytes to make the 10-byte cell key (Class866E8's Descriptor10 shape) computeCellOffsets turns into a world position. |
+
+The `+0x0E8` local view on `gStyleGrid` is Class866E8's computeCellOffsets. Locals: `pos`, `outDist`, `target`, `remaining`, `records`, `dx`, `dz`, `grid`.
+
+### Comments moved here from src/class_3bb8c_n.c
+
+Verbatim as they stood before the round-93 comment pass (identifiers already carry this round's renames).
+
+```c
+/* MATCHED round 48 (alpha), 111/111 -- see docs/match-reports/FindNextStyleCueInRange.md
+ * for the round 47 (bravo) recovery and the round 48 permuter lead that
+ * closed it: the `if (n <= 0) goto fail;` early exit is redundant (the
+ * `for (j = 0; j < n; ...)` loop already falls through to the same
+ * `fail: return 0;` when n <= 0) and dropping it, plus writing the
+ * `entry` pointer's address computation as `offset + (s32) base` instead
+ * of `base + offset`, closed the last word (a pure commutative-operand
+ * encoding-order residue in the `addu`). */
+```

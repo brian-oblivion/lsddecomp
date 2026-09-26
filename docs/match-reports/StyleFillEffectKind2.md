@@ -500,3 +500,34 @@ per the round-64 revisit.
 ## Track 4 (2026-09-26, round 88, charlie)
 
 `gStyleEffectSlots` holds Class876FC objects (New_Class876FC), so the walking pointer is `Class876FC **` and the position `LongVec3 *`; `kind` is passed as a plain `s32` (was `(void *) N`), the params block as `(Class876FCParams *)` over the separately-declared gStyleSpawnOffsetX.. symbols (one 0x24-byte Class876FCParams in the bytes; left as they are, a track 4b job), and gStyleGrid as the `SceneNode *` parent. Image byte-identical.
+
+## Round 93 polish (delta, track 7)
+
+### Naming
+
+| old | new | tier | evidence |
+| --- | --- | --- | --- |
+| `D_80087228` | `gStyleKind2Colors` | A | 3 RGB triples stored as the params' color for kind 2. |
+| `D_80087430` | `gStyleKind2AltColor` | C | the word stored as the params' altColor when `gStyleDay % 20 != 0`. Its data word is 0 (the record is {0, &D_8008AB7C, -1, 0, 0}) and nothing in the tree writes it, so both paths store 0 unless a writer is found. |
+
+Locals: `slots`, `pos`, `r`, `color`, `altColor`, `rotation`.
+
+### Comments moved here from src/class_3bb8c_n.c
+
+Verbatim as they stood before the round-93 comment pass (identifiers already carry this round's renames).
+
+```c
+/* Local view, same reason as PtrBoxK3 above: the first gStyleSpawnColors store goes
+ * through a pointer to a one-field struct so the gStyleDay load may
+ * schedule above it (retail interleaves the % 20 into the % 3's multu
+ * latency).  Round 76; see docs/match-reports/StyleFillEffectKind2.md. */
+```
+
+```c
+/* Appends one kind-2 New_Class876FC object after picking a random colour
+ * triple and a per-20-ticks gStyleKind2AltColor value.  MATCHED round 76 (charlie).
+ * `val = (gStyleDay / 20) * 20; if (gStyleDay != val)` is the
+ * load-bearing spelling of `% 20 != 0`: because the tested variable is also
+ * the assigned one, jump.c cannot rewrite the if/else into `val = 0; if (..)
+ * val = gStyleKind2AltColor;`, which is what every `% 20` spelling compiles to. */
+```

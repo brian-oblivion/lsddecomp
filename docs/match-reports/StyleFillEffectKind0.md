@@ -245,3 +245,29 @@ iteration via a `gStyleDay % 7` test. STALL, 93/99, whole-function
 ## Track 4 (2026-09-26, round 88, charlie)
 
 `gStyleEffectSlots` holds Class876FC objects (New_Class876FC), so the walking pointer is `Class876FC **` and the position `LongVec3 *`; `kind` is passed as a plain `s32` (was `(void *) N`), the params block as `(Class876FCParams *)` over the separately-declared gStyleSpawnOffsetX.. symbols (one 0x24-byte Class876FCParams in the bytes; left as they are, a track 4b job), and gStyleGrid as the `SceneNode *` parent. Image byte-identical.
+
+## Round 93 polish (delta, track 7)
+
+### Naming
+
+| old | new | tier | evidence |
+| --- | --- | --- | --- |
+| `D_8008E0A4`..`D_8008E0C0` | `gStyleSpawnOffsetX`, `...OffsetY`, `...OffsetZ`, `gStyleSpawnRotation`, `gStyleSpawnScale`, `gStyleSpawnModelLayout`, `gStyleSpawnTableIndex`, `gStyleSpawnColors` | A | the 0x24-byte block passed to New_Class876FC as its `Class876FCParams` (include/Class876FC.h, which names each member: offset x/y/z, rotation, scale, modelChildLayout, tableIndex, color/altColor). Kept as separate symbols: SetupStyleSpawnParamsA's match depends on the scalar declarations. |
+| `D_800871C8` | `gStyleSpawnScales` | A | 5 Ratio16 triples, one picked by `rand() % 5` into the params' scale. |
+| `D_80087328` | `gStyleSpawnYChoices` | A | 4 words {-0x1800, -0x2800, -0x3800, -0x5000}: the offset-y values SetupStyleSpawnParamsA picks from. |
+
+Note: the offset-y pick is `rand() % 5`, and 0 means "let SetupStyleSpawnParamsA choose"; index 4 reads one word past the 4-entry table (0x80087338, the next symbol, D_80087338: 0x0A0A0200). That is retail's behaviour, reproduced as written.
+
+Locals: `slots`, `count`, `pos`, `offsetY`, `setup`.
+
+### Comments moved here from src/class_3bb8c_n.c
+
+Verbatim as they stood before the round-93 comment pass (identifiers already carry this round's renames).
+
+```c
+/* Fills arg1 slots with New_Class876FC(kind 0, ...) objects, first setting
+ * up the random style parameters and choosing the per-slot setup function by
+ * gStyleDay % 7; returns the next free slot. Matched round 75: arg0 is
+ * the walking pointer itself (a separate `arr = arg0` copy reordered the
+ * prologue's argument moves). */
+```

@@ -140,3 +140,22 @@ config row. "Fallback" is evidenced by the call site; "kind"/variant
 selection mechanics are evidenced by the body; WHY a fallback is needed, or
 what the variant means in gameplay terms, is not established (tier B, not
 A).
+
+## Round 93 polish (delta, track 7)
+
+### Naming
+
+| old | new | tier | evidence |
+| --- | --- | --- | --- |
+| `D_800873DC` | `gStyleVariantPicks` | B | 16 bytes, each 0..3, indexed `(day + stage) & 0xF`; the byte read is stored as `gStyleVariant`. |
+| `D_800873D8` | `gStyleVariantConfigCounts` | A | 4 bytes {7, 10, 12, 5}, indexed by the variant, the divisor of the config index; they are exactly the record counts of the four tables `gStyleVariantConfigs` points at (0x80087340: 7 words, ...735C: 10, ...7384: 12, ...73B4: 5). |
+| `D_800873C8` | `gStyleVariantConfigs` | A | 4 pointers, one per variant, to arrays of 4-byte config records; the function returns `table[variant] + index * 4`, the record ApplyStyleConfig/FillStyleFromConfig read. |
+| `D_8008AC84` | `gStyleConfigIndex` | A | written with the config index `(day + stage) % count`; nothing reads it. |
+| `D_800872C4` | `gStylePalette` | A | 24 RGB triples (FillStyleFromConfig, ApplyStyleConfig and this function index it by a config byte); this function takes byte 3's entry as `gStyleClearColor`. |
+| `D_80087234`, `D_8008726C` | `gStyleDecorColorsA`, `gStyleDecorColorsB` | B | two 18-triple colour tables (one per decor band); B when config byte 2 is palette entry 18 (`STYLE_DECOR_B_PALETTE_INDEX`), A otherwise. Which look each is, is not established, hence the letters. |
+| `gStyleFlushColor` | `gStyleClearColor` | A | its only reader, StyleUpdateDecorSet, hands the adjusted copy to the viewport's setClearColor. |
+| `gStyleColorTable` | `gStyleDecorColors` | A | the current band colour table: StyleBuildDecorSet colours band i from entry i. |
+| `gStyleKind` | `gStyleStage` | A | RegisterStyleConfig stores its arg1 there, and its one caller, ObjM__InitStyleAndWorld, passes `self->stage`. |
+| `gStyleCounter` | `gStyleDay` | A | RegisterStyleConfig stores its arg3 there; its one caller passes `DreamSys__GetCurrentDayAndYear()` (`currentDay + 1`). |
+
+Locals: `seed` (day + stage), `variant`, `count`, `index`, `config`, `clearIndex`/`decorIndex` (config bytes 3 and 2), `decorColors`.

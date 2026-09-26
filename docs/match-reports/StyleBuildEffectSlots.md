@@ -97,3 +97,14 @@ for the SEPARATE `gStyleEffectSlots` array (a different object class --
 ## Track 4 (2026-09-26, round 88, charlie)
 
 `gStyleEffectSlots` retyped `void *[]` -> `Class876FC *[]` (every element is a New_Class876FC object); ReleaseBasicClassArray takes it as `(void **)`. Image byte-identical.
+
+## Round 93 polish (delta, track 7)
+
+### Naming
+
+| old | new | tier | evidence |
+| --- | --- | --- | --- |
+| `D_80087324` | `gStyleKind0Counts` | A | 4 bytes {0, 3, 8, 16} picked by `rand() & 3`, passed as StyleFillEffectKind0's count. |
+| `0x10` | `STYLE_VARIANT2_EFFECTS` (16) | B | variant 2 fills kind 1 up to this many kind-0 plus kind-1 effects. |
+
+`gStyleTargetObj + 4/8/0xC` are fields of the `StyleSceneRefs` view (ObjM's dreamerTmd, etcTim, cachedViewport). Locals: `pos`, `refs`, `kind0Count`, `kind1Count`, `next`.

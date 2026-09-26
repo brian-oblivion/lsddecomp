@@ -100,3 +100,14 @@ loop).
 ## Track 4 (2026-09-26, round 88, charlie)
 
 `gStyleEffectSlots` holds Class876FC objects (New_Class876FC), so the walking pointer is `Class876FC **` and the position `LongVec3 *`; `kind` is passed as a plain `s32` (was `(void *) N`), the params block as `(Class876FCParams *)` over the separately-declared gStyleSpawnOffsetX.. symbols (one 0x24-byte Class876FCParams in the bytes; left as they are, a track 4b job), and gStyleGrid as the `SceneNode *` parent. Image byte-identical.
+
+## Round 93 polish (delta, track 7)
+
+### Naming
+
+| old | new | tier | evidence |
+| --- | --- | --- | --- |
+| `D_80087204` | `gStyleKind1Scale` | A | stored as the params' scale for every kind-1 effect. |
+| `D_80087330` | `gStyleSpawnYChoice2` | A | the word at `gStyleSpawnYChoices[2]` (-0x3800), a separate splat symbol; spelling it as the array element changes StyleFillEffectKind2's bytes (measured round 93), so the symbol stays. |
+
+Locals: `slots`, `count`, `pos`, `offsetY`.

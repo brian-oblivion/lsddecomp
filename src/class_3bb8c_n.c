@@ -1,49 +1,42 @@
 /*
- * class_3bb8c_n -- functions 0..22 of the old 113-function class_3bb8c
- * remainder, 0x44F14..0x46288.  23 functions (19 matched, 4 STALL), 1245
- * words.  Carved round 45 (2026-09-15); staffed round 46.
+ * class_3bb8c_n -- the style layer's per-scene objects: what TickStyle
+ * builds on a scene's first tick, updates on every tick, and StyleTeardown
+ * releases.
  *
- * NAMING PASS, round 72 (runner alpha).  Every function, and the thirteen
- * globals its functions set up or gate on, renamed via `tools/rename.py`,
- * tree-wide.  The evidence for the `Style` prefix: this unit's global-state
- * cluster (`gStyleStage`/`gStyleDay`/`gStyleTargetObj`/`gStyleVariant`/
- * `gStyleDecorObj`/`gStyleGrid`/`gStyleTickCount`, formerly
- * `D_8008AC6C`/`74`/`7C`/`80`/`94`, `D_8008AB4C`/`70`) is the SAME cluster
- * `class_3bb8c_m.c`'s already-confirmed "Style" subsystem sets
- * (`RegisterStyleConfig`/`ApplyStyleConfig`/`FillStyleFromConfig`/
- * `ApplyStyleDecorationIfSet`, round 69) -- a cross-unit fact, not a guess
- * made here.
+ * RegisterStyleConfig (class_3bb8c_m.c), called by ObjM__InitStyleAndWorld
+ * and a no-op until StyleTeardown clears gStyleGrid, sets the state read here: gStyleGrid (the
+ * scene's Class866E8), gStyleStage (ObjM's stage), gStyleTargetObj (ObjM's
+ * sound, resources and viewport; StyleSceneRefs below) and gStyleDay (the
+ * DreamSys day). ApplyStyleConfig then takes the stage's fixed config or,
+ * with none, PickStyleFallbackConfig's: a variant (gStyleVariant, 0..3) and
+ * a config record picked from day + stage.
  *
- * None of this unit's functions are themselves class methods (no vtable
- * self-dispatch on their OWN symbol); they are free functions dispatching
- * into THREE separate object families through local method-table views: a
- * decoration object (`gStyleDecorObj`, `New_BoxFill`-allocated), an
- * 18-slot "decor set" array (`gStyleDecorSlots`, same allocator) and an
- * Class876FC "effect slots" array (`gStyleEffectSlots`, include/
- * Class876FC.h, `New_Class876FC`-allocated, kind-tagged 0..3 by
- * `StyleFillEffectKind0`..`3`'s literal first argument), plus a two-slot
- * positional sound-cue subsystem (`gStyleCueSlots`, `TryStartStyleCue`/
- * `FindNextStyleCueInRange`/`FlushStyleCue`/`ServiceStyleCueIfNear`/
- * `IsStyleCueNear`). `TickStyle` is the per-frame entry point (called from
- * `src/class_3bb8c_l.c`); `StyleTeardown` is the scene-exit release of
- * everything `TickStyle` builds.
+ * What TickStyle keeps, each built on the first tick:
+ *  - the decoration box, gStyleDecorObj, when the config has a colour for
+ *    it (class_3bb8c_m builds it, StyleFlushDecoration releases it);
+ *  - the decor set: STYLE_DECOR_BANDS BoxFill bands (gStyleDecorSlots)
+ *    coloured from gStyleDecorColors and attached under the viewport's sub
+ *    handle; every tick StyleUpdateDecorSet shifts their colours, their
+ *    position and the viewport's clear colour by the view point's y offset
+ *    from its reference point;
+ *  - the effect slots: Class876FC objects of kinds 0..3 (gStyleEffectSlots)
+ *    built from one parameter block, gStyleSpawnOffsetX..gStyleSpawnColors,
+ *    that StyleFillEffectKindN and SetupStyleSpawnParamsA/B fill in; each
+ *    tick updates them with the target position;
+ *  - two positional sound cues (gStyleCueSlots, in gStyleCueSlotPool): a
+ *    free slot claims the next record of the stage's cue list that lies
+ *    within its cue's distance of the target and starts the record's
+ *    SoundCueSet callback (gStyleCueCallbacks, class_3bb8c_r.c); a claimed
+ *    slot is serviced while the target stays in range and flushed when it
+ *    leaves.
+ * StyleScrollVramStrips also rotates a VRAM strip one column per tick on
+ * stages 2 to 5.
  *
- * What the "Style" subsystem is FOR in gameplay terms -- which dream/link
- * property `gStyleStage` actually selects -- remains UNESTABLISHED; every
- * name above describes MECHANICS, not a guessed purpose, per track 3's
- * naming rule. Full evidence and tier per function: `docs/match-reports/
- * <name>.md`, `## Naming`.
- *
- * Owns NO switch jump table (zero `jtbl_` references). All four blocker
- * constructs (`gp_rel`, `addiu_at`, `nop_mflo_mfhi`, `nop_at_expansion`) are
- * RESOLVED project-wide (CLAUDE.md, "Open toolchain blockers"); this unit's
- * remaining stalls are ordinary matching residues, not toolchain blockers --
- * see their own reports (`StyleFillEffectKind0` matched round 75).
- *
- * This unit includes include/class_3bb8c.h, which eleven other units also
- * include. Whoever edits this unit's C should be the ONLY runner in the
- * class_3bb8c block that round, or price the contention with
- * `python3 tools/headercontention.py` first.
+ * The target is the grid's target cell (ObjM__TickStyle passes
+ * getTargetDescriptor) turned into a world position. What the style layer
+ * is in the game -- what a variant, an effect kind or a cue stands for -- is
+ * not established; the names describe mechanics. Evidence and tiers are in
+ * each function's match report, `## Naming`.
  */
 
 #include "common.h"
@@ -54,9 +47,6 @@
 #include "Class866E8.h"
 #include "SoundCueSet.h"
 
-/* What gStyleTargetObj points at: ObjM's +0x06C..+0x07B block (its one
- * caller, ObjM__InitStyleAndWorld, passes &ctorSound to RegisterStyleConfig,
- * which keeps it here; include/ObjM.h). */
 /* The decoration set: this many BoxFill bands, stacked 3 pixels apart. */
 #define STYLE_DECOR_BANDS 18
 
@@ -67,17 +57,20 @@
 /* How far down (pixels) decor variant 2 draws the set. */
 #define STYLE_DECOR_VARIANT2_DROP 30
 
-/* Camera height (the viewport's view point above its reference point) per
- * fade step of StyleUpdateDecorSet. */
+/* StyleUpdateDecorSet's fade step: the viewport's view-point y less its
+ * reference-point y, per step. */
 #define STYLE_DECOR_FADE_HEIGHT 600
 
 /* Kind-0 plus kind-1 effects built for style variant 2. */
 #define STYLE_VARIANT2_EFFECTS 16
 
-/* The palette entry that, as a kind-0 config's decor colour, selects
+/* The palette entry that, as a variant-0 config's decor colour, selects
  * gStyleDecorColorsB instead of gStyleDecorColorsA (PickStyleFallbackConfig). */
 #define STYLE_DECOR_B_PALETTE_INDEX 18
 
+/* What gStyleTargetObj points at: ObjM's +0x06C..+0x07B block
+ * (ObjM__InitStyleAndWorld passes &ctorSound to RegisterStyleConfig, which
+ * keeps it; include/ObjM.h). */
 typedef struct StyleSceneRefs {
     void *sound;        /* +0x000, ObjM::ctorSound: the sound object the cue functions take first */
     void *dreamerTmd;   /* +0x004, ObjM::dreamerTmd */
@@ -85,13 +78,10 @@ typedef struct StyleSceneRefs {
     Viewport *viewport; /* +0x00C, ObjM::cachedViewport */
 } StyleSceneRefs;
 
-/* gStyleDecorObj and gStyleDecorSlots[] hold BoxFill objects
- * (include/BoxFill.h, New_BoxFill), in globals typed `s32`/`void *[]`
- * (track 4b's to retype). */
-
 extern const u8 *gStyleDecorColor;
 extern BoxFill *gStyleDecorObj;
 
+/* Releases the decoration box, if ApplyStyleDecorationIfSet made one. */
 void StyleFlushDecoration(void) {
     if (gStyleDecorColor != 0) {
         gStyleDecorObj->methods->release(gStyleDecorObj);
@@ -113,6 +103,10 @@ extern const u8 *gStyleDecorColors;
 extern u8 gStyleDecorColorsA[];
 extern s32 gStyleDecorVariant;
 
+/* The config for a stage without a fixed one: the variant from
+ * gStyleVariantPicks[(day + stage) & 0xF], then record (day + stage) % count
+ * of that variant's table. For variant 0 it also sets the clear colour, the
+ * band colours and, for records 0..5, the decor variant (1, or 2 for 4..5). */
 void *PickStyleFallbackConfig(void) {
     s32 seed;
     s32 variant;
@@ -155,15 +149,9 @@ extern s32 gStyleDecorSizeH;
 extern BoxFill *gStyleDecorSlots[STYLE_DECOR_BANDS];
 extern StyleSceneRefs *gStyleTargetObj;
 
-/* Local view: gStyleDecorPosX/gStyleDecorPosY and gStyleDecorSizeW/gStyleDecorSizeH are two
- * adjacent 8-byte pairs, and this unit copies each into a local pair as a
- * WHOLE-STRUCT assignment rather than field by field.  That is not a style
- * choice -- it is load-bearing.  A BLKmode set makes gcc 2.6.3's cse.c call
- * invalidate_memory(), dropping every cached memory value, which is what
- * produces retail's otherwise inexplicable reload of gStyleDecorVariant for the
- * `== 2` test and its reload of the pair's second word right after writing
- * it.  Written as two scalar stores, neither reload appears and the body is
- * several words short.  Round 61; see docs/match-reports/StyleBuildDecorSet.md. */
+/* gStyleDecorPosX/Y and gStyleDecorSizeW/H are adjacent word pairs.
+ * MATCHING: copied whole, never field by field (a BLKmode copy makes cse
+ * drop cached memory values; scalar copies lose retail's reloads). */
 typedef struct PairXY PairXY;
 
 struct PairXY {
@@ -171,13 +159,9 @@ struct PairXY {
     s32 y; /* +0x004 */
 };
 
-/* Allocates the 18 decor objects into gStyleDecorSlots, each attached
- * (attachToParent, +0x04C) to slot 0, then attaches slot 0 to the target object's slotAC
- * result.  MATCHED round 76 (charlie): an indexed for loop -- loop.c's
- * strength reduction produces both the slot walker and the colour-table
- * stride (`gStyleDecorColors + i * 3`), which earlier rounds had written as
- * hand-rolled pointer/counter variables.  See
- * docs/match-reports/StyleBuildDecorSet.md. */
+/* Builds the bands: band 0 in gStyleDecorColors' first colour, bands 1..17
+ * attached under it, each 3 pixels lower and 7 shorter than the one before;
+ * band 0 then goes under the viewport's sub handle. */
 void StyleBuildDecorSet(void) {
     PairXY pos;
     PairXY size;
@@ -210,18 +194,17 @@ void StyleBuildDecorSet(void) {
         gStyleDecorSlots[0], parent, (Pair32E99C *)&pos);
 }
 
-/* MATCHED round 61 (bravo), first attempt, after the BLKmode-struct-copy
- * lever found on StyleBuildDecorSet -- see docs/match-reports/StyleUpdateDecorSet.md.
- * `rgb` is written only at [0..2] (by AdjustRgbByDelta); its declared size of 8
- * is inferred from the STACK LAYOUT (it occupies sp+0x10..0x17, with `pos`
- * at sp+0x18), not from any access. */
 void AdjustRgbByDelta(u8 *dst, u8 *src, s32 delta);
 
+/* Every tick, once the view point's y exceeds the reference point's by a
+ * fade step: each band's colour
+ * and the clear colour lose `fade` red and green and gain `fade` blue, and
+ * the set moves down 3 pixels per unit of fade. */
 void StyleUpdateDecorSet(void) {
     Viewport *viewport;
     s32 height;
     s32 fade;
-    u8 rgb[8];
+    u8 rgb[8]; /* MATCHING: 8, not 3 (the frame keeps pos at sp+0x18) */
     PairXY pos;
     s32 colorOfs;
     s32 i;
@@ -260,6 +243,7 @@ void StyleUpdateDecorSet(void) {
     viewport->methods->setClearColor(viewport, (ViewportRgb *)rgb);
 }
 
+/* dst = src with red and green less `delta`, blue more. */
 void AdjustRgbByDelta(u8 *dst, u8 *src, s32 delta) {
     dst[0] = src[0] - delta;
     dst[1] = src[1] - delta;
@@ -270,6 +254,7 @@ extern void ReleaseBasicClassArray(void **array, s32 count);
 extern s32 gStyleDecorVariant;
 extern BoxFill *gStyleDecorSlots[STYLE_DECOR_BANDS];
 
+/* Releases the bands, if StyleBuildDecorSet made them. */
 void StyleReleaseDecorSet(void) {
     if (gStyleDecorVariant != 0) {
         ReleaseBasicClassArray((void **)gStyleDecorSlots, ARRAY_COUNT(gStyleDecorSlots));
@@ -288,6 +273,10 @@ extern Class876FC **StyleFillEffectKind1(Class876FC **slots, s32 count, LongVec3
 extern Class876FC **StyleFillEffectKind3(Class876FC **slots, LongVec3 *pos);
 extern Class876FC **StyleFillEffectKind2(Class876FC **slots, LongVec3 *pos);
 
+/* Hands the variant and ObjM's resources to Actor__func_56f5c, then builds
+ * the effect slots for the variant: gStyleKind0Counts' pick of
+ * kind 0, kind 1 up to STYLE_VARIANT2_EFFECTS for variant 2, then one kind-3
+ * (variant 0) or kind-2 (variant 2). */
 void StyleBuildEffectSlots(LongVec3 *pos) {
     StyleSceneRefs *refs;
     s32 kind0Count;
@@ -335,28 +324,16 @@ void StyleUpdateEffectSlots(LongVec3 *pos) {
 extern s32 gStyleVariant;
 extern s32 gStyleEffectSlotCount;
 
+/* Releases the effect slots, if StyleBuildEffectSlots ran. */
 void StyleReleaseEffectSlots(void) {
     if (gStyleVariant >= 0) {
         ReleaseBasicClassArray((void **)gStyleEffectSlots, gStyleEffectSlotCount);
     }
 }
 
-/* Local view only: `FlushStyleCue` (defined later in this unit, in strict
- * ROM order) takes one of these two per-slot objects. `StyleCueEntryView`
- * is the SAME record `FindNextStyleCueInRange` returns as `EntrySlot *`
- * below -- a second independent local view of one struct, per the
- * multiple-independent-local-views convention, not merged with it: this
- * view only ever touches `cue` (+0x6, an `EntrySlot::count`-typed
- * byte, address-taken then chased and toggled), where `EntrySlot` names the
- * rest. `StyleCueSlot::entry` is that claimed record, released by
- * `FlushStyleCue`/`ServiceStyleCueIfNear`. `posX`/`posZ` are the slot's own 2D
- * (X/Z) position, read by `IsStyleCueNear`'s distance check; `lastDist` is
- * that check's own last-computed distance (also the out-parameter
- * `FindNextStyleCueInRange` writes). `cueSet` is only ever address-taken,
- * as an embedded sub-object handed to `FlushSoundCueSet`/`ServiceSoundCueSet`
- * (same discard-return caveat as `include/Entity.h`'s `unk9C` -- a field
- * only ever address-taken carries no evidence about its own declared
- * type). */
+/* A cue record's view here: `cue` is its cue index (the gStyleCueCallbacks
+ * and gStyleCueDistanceTable row, InitSoundCueSet's tag), negated while a
+ * slot holds the record. EntrySlot, below, is the whole 8-byte record. */
 typedef struct StyleCueEntryView StyleCueEntryView;
 
 struct StyleCueEntryView {
@@ -364,6 +341,8 @@ struct StyleCueEntryView {
     s8 cue; /* +0x006 */
 };
 
+/* One of the two positional cues: the record it holds, the record's world
+ * position, the last distance to the target, and its sound cue. */
 typedef struct StyleCueSlot StyleCueSlot;
 
 struct StyleCueSlot {
@@ -378,6 +357,7 @@ extern StyleCueSlot *FlushStyleCue(StyleCueSlot *slot);
 extern Class866E8 *gStyleGrid;
 extern StyleCueSlot *gStyleCueSlots[2];
 
+/* Releases everything TickStyle built and unregisters the scene. */
 void StyleTeardown(void) {
     s32 i;
 
@@ -388,7 +368,7 @@ void StyleTeardown(void) {
         gStyleCueSlots[i] = FlushStyleCue(gStyleCueSlots[i]);
     }
     if (gStyleGrid != 0) {
-        gStyleGrid = 0;
+        gStyleGrid = 0; /* RegisterStyleConfig registers only while this is 0 */
     }
 }
 
@@ -396,15 +376,16 @@ extern Ratio16 gStyleSpawnScales[][3];
 extern s32 gStyleSpawnYChoices[];
 extern Ratio16 *gStyleSpawnScale;
 extern s32 gStyleSpawnTableIndex;
+/* The first word of the Class876FCParams block every effect is built from
+ * (gStyleSpawnOffsetX .. gStyleSpawnColors, separate symbols in the image). */
 extern s32 gStyleSpawnOffsetX;
 extern void SetupStyleSpawnParamsA(LongVec3 *pos, s32 offsetY);
 extern void SetupStyleSpawnParamsB(LongVec3 *pos, s32 offsetY);
 
-/* Fills arg1 slots with New_Class876FC(kind 0, ...) objects, first setting
- * up the random style parameters and choosing the per-slot setup function by
- * gStyleDay % 7; returns the next free slot. Matched round 75: arg0 is
- * the walking pointer itself (a separate `arr = arg0` copy reordered the
- * prologue's argument moves). */
+/* Fills `count` slots with kind-0 effects: a table index and scale for all
+ * of them, an offset y (0: each setup picks one; a pick of 4 reads the word
+ * after gStyleSpawnYChoices, as retail does), and per slot
+ * SetupStyleSpawnParamsA, or B on every seventh day. Returns the next slot. */
 Class876FC **StyleFillEffectKind0(Class876FC **slots, s32 count, LongVec3 *pos) {
     s32 i;
     s32 offsetY;
@@ -432,6 +413,8 @@ Class876FC **StyleFillEffectKind0(Class876FC **slots, s32 count, LongVec3 *pos) 
 extern s32 gStyleSpawnYChoice2;
 extern Ratio16 gStyleKind1Scale[];
 
+/* Fills `count` slots with kind-1 effects: gStyleKind1Scale, offset y
+ * gStyleSpawnYChoice2. */
 Class876FC **StyleFillEffectKind1(Class876FC **slots, s32 count, LongVec3 *pos) {
     s32 i;
     s32 offsetY;
@@ -456,21 +439,15 @@ extern s32 gStyleSpawnOffsetY;
 extern s32 gStyleSpawnOffsetZ;
 extern u8 gStyleKind3Colors[][3];
 
-/* Local view: gStyleSpawnRotation stored through a pointer to a ONE-FIELD STRUCT, not
- * a plain `u8 **`.  Load-bearing: a store through a plain pointer is an
- * opaque (mem (reg)) that gcc 2.6.3's scheduler will not move a later
- * global load above; an in-struct store through a varying address does not
- * conflict with a scalar at a fixed address, so the gStyleGrid load
- * schedules above it and the store lands in the jal delay slot, as retail.
- * Round 76; see docs/match-reports/StyleFillEffectKind3.md. */
+/* MATCHING: the rotation store goes through a one-field struct, so the
+ * gStyleGrid load may schedule above it (a plain pointer store blocks it). */
 typedef struct PtrBoxK3 {
     Ratio16 *p; /* +0x000 */
 } PtrBoxK3;
 
-/* Appends one kind-3 New_Class876FC object; with the decor variant active
- * and the default colour table it pins the spawn parameters, otherwise it
- * clamps gStyleSpawnOffsetZ and picks a random colour triple.  MATCHED round 76
- * (charlie). */
+/* Appends one kind-3 effect. With decor variant active and band colours B
+ * its offset and colour are fixed; otherwise its z offset is folded to
+ * -30720..0 and its colour is random. */
 Class876FC **StyleFillEffectKind3(Class876FC **slots, LongVec3 *pos) {
     s32 *offsetZ;
     PtrBoxK3 *rotation;
@@ -493,6 +470,7 @@ Class876FC **StyleFillEffectKind3(Class876FC **slots, LongVec3 *pos) {
     }
     rotation = (PtrBoxK3 *)&gStyleSpawnRotation;
     rotation->p = gStyleSpawnRotations[0];
+    /* MATCHING: the block's address is taken back from its rotation member */
     *slots =
         New_Class876FC(3, (Class876FCParams *)((u8 *)rotation - offsetof(Class876FCParams, rotation)),
                        (SceneNode *)gStyleGrid, pos);
@@ -507,20 +485,14 @@ extern Ratio16 *gStyleSpawnRotation;
 extern Ratio16 gStyleSpawnRotations[][3];
 extern s32 gStyleSpawnTableIndex;
 
-/* Local view, same reason as PtrBoxK3 above: the first gStyleSpawnColors store goes
- * through a pointer to a one-field struct so the gStyleDay load may
- * schedule above it (retail interleaves the % 20 into the % 3's multu
- * latency).  Round 76; see docs/match-reports/StyleFillEffectKind2.md. */
+/* MATCHING: the first colour store goes through a one-field struct, as
+ * PtrBoxK3's does, so the gStyleDay load may schedule above it. */
 typedef struct S32BoxK2 {
     s32 v; /* +0x000 */
 } S32BoxK2;
 
-/* Appends one kind-2 New_Class876FC object after picking a random colour
- * triple and a per-20-ticks gStyleKind2AltColor value.  MATCHED round 76 (charlie).
- * `val = (gStyleDay / 20) * 20; if (gStyleDay != val)` is the
- * load-bearing spelling of `% 20 != 0`: because the tested variable is also
- * the assigned one, jump.c cannot rewrite the if/else into `val = 0; if (..)
- * val = gStyleKind2AltColor;`, which is what every `% 20` spelling compiles to. */
+/* Appends one kind-2 effect with a random colour and, except on every
+ * twentieth day, gStyleKind2AltColor as its alternate colour. */
 Class876FC **StyleFillEffectKind2(Class876FC **slots, LongVec3 *pos) {
     s32 r;
     s32 altColor;
@@ -531,7 +503,7 @@ Class876FC **StyleFillEffectKind2(Class876FC **slots, LongVec3 *pos) {
     color = (S32BoxK2 *)gStyleSpawnColors;
     color->v = (s32)gStyleKind2Colors[(u32)r % 3];
     color++;
-    altColor = (gStyleDay / 20) * 20;
+    altColor = (gStyleDay / 20) * 20; /* MATCHING: not `% 20`, which jump.c folds */
     if (gStyleDay != altColor) {
         altColor = gStyleKind2AltColor;
     } else {
@@ -542,6 +514,7 @@ Class876FC **StyleFillEffectKind2(Class876FC **slots, LongVec3 *pos) {
     rotation = &gStyleSpawnRotation;
     *rotation = gStyleSpawnRotations[0];
     gStyleSpawnTableIndex = rand() % 6;
+    /* MATCHING: the block's address is taken back from its rotation member */
     *slots =
         New_Class876FC(2, (Class876FCParams *)((u8 *)rotation - offsetof(Class876FCParams, rotation)),
                        (SceneNode *)gStyleGrid, pos);
@@ -555,19 +528,11 @@ extern Ratio16 *gStyleSpawnRotation;
 extern Ratio16 gStyleSpawnRotations[][3];
 extern s32 gStyleSpawnModelLayout;
 
-/* MATCHED round 64 (charlie), 110/110, ins 0 / del 0, one build.  The
- * round-46..48 residue (an extra callee-saved register caching
- * `gStyleSpawnOffsetX`'s address, frame -0x18 -> -0x20) was NOT register identity:
- * `gStyleSpawnOffsetX` was declared as an INCOMPLETE ARRAY.  Every reference to
- * `extern T gStyleSpawnOffsetX[]` is an array decay, i.e. an address-take VALUE,
- * which cc1 2.6.3's CSE promotes into a callee-saved register across the
- * intervening `rand()` calls; declared `extern s32 gStyleSpawnOffsetX` it emits
- * retail's absolute `lui $at, %hi / sw %lo($at)` fresh at each of the three
- * accesses.  Four in-tree variants pin the axis to ARRAY vs SCALAR: the
- * element type (`u8[]` vs `s32[]`) and the cast spelling (`*(s32 *) &D_X`
- * vs `D_X`) are both measurably INERT.  Do not restate this as "the
- * declared type" -- that was the first, wrong, reading.
- * See docs/match-reports/SetupStyleSpawnParamsA.md. */
+/* Randomises the spawn parameters: offset y (offsetY, or a random choice
+ * when 0), x and z offsets of 0..22 steps of 2048 either side, a rotation
+ * and a model layout. `pos` is unused.
+ * MATCHING: gStyleSpawnOffsetX is declared a scalar, not an array (an array
+ * decay is kept in a saved register across the rand() calls). */
 void SetupStyleSpawnParamsA(LongVec3 *pos, s32 offsetY) {
     if (offsetY == 0) {
         offsetY = gStyleSpawnYChoices[rand() & 3];
@@ -588,23 +553,12 @@ void SetupStyleSpawnParamsA(LongVec3 *pos, s32 offsetY) {
 extern s32 gStyleSpawnYChoice1;
 extern s32 gStyleSpawnModelLayout;
 
-/* MATCHED round 64 (charlie), 87/87, ins 0 / del 0.  The round-46..48
- * residue -- filed as "pervasive $v0/$v1/$a0/$a1 temp-register renaming" and
- * searched for 900s / 136367 permuter iterations without a zero -- was ONE
- * named local.  The body used a single `s32 r` for all three `rand()`
- * results, whose live range spans the calls, so cc1 could not coalesce
- * `rand`'s `$v0` into it and emitted `move $a1,$v0` after each `jal rand`
- * (two visible, a third word from the knock-on).  Deleting `r` and calling
- * `rand()` inline in each expression -- exactly the idiom the matched
- * sibling SetupStyleSpawnParamsA above already uses -- keeps the value in `$v0` and
- * recolours the whole body to retail's.  `mod3` stays a local: it has two
- * genuine use points.  A permuter mutates a body but never deletes its
- * locals, which is why the 136367-iteration negative bounded the search and
- * not the function (round 63's LOCAL COUNT corollary).
- * The signature keeps round 47's two dead void* params: StyleFillEffectKind0
- * dispatches this through a function pointer shared with SetupStyleSpawnParamsA, so
- * the ABI slot is call-site-determined.  Dead params cost nothing here.
- * See docs/match-reports/SetupStyleSpawnParamsB.md. */
+/* The every-seventh-day setup: fixed offset y, x of 0..19 steps of 2048, z
+ * by day % 3 (40960, -40960, 2048), then the same rotation and layout
+ * picks as A. Both parameters are unused; it has A's signature because
+ * StyleFillEffectKind0 calls either through one pointer.
+ * MATCHING: each rand() is used inline; one local for all three adds a move
+ * after every call. */
 void SetupStyleSpawnParamsB(LongVec3 *pos, s32 offsetY) {
     s32 dayMod3;
 
@@ -628,6 +582,8 @@ extern SoundCueCallbackFn gStyleCueCallbacks[];
 extern s32 InitSoundCueSet(void *sound, SoundCueSet *set, s32 tag, void *owner,
                            SoundCueCallbackFn callback);
 
+/* Claims the next record in range for `slot` and starts its cue. A started
+ * cue equal to *lastCue is reported back negated. Returns the slot, or NULL. */
 StyleCueSlot *TryStartStyleCue(StyleCueSlot *slot, s32 *lastCue, LongVec3 *target, void *unused) {
     StyleCueEntryView *entry;
 
@@ -651,6 +607,9 @@ extern u8 *gStyleCueRecordLists[];
 extern u8 gStyleCueRecordCounts[];
 extern s32 gStyleCueDistanceTable[];
 
+/* The cell-key halves: a record's four cell bytes and gStyleCueOffsets' s16
+ * x/y/z, copied whole into a 10-byte cell key (Class866E8's Descriptor10
+ * shape) for computeCellOffsets. */
 typedef struct Pos4 Pos4;
 
 struct Pos4 {
@@ -684,14 +643,11 @@ struct LocalBuf {
     TabEntry tab;
 };
 
-/* MATCHED round 48 (alpha), 111/111 -- see docs/match-reports/FindNextStyleCueInRange.md
- * for the round 47 (bravo) recovery and the round 48 permuter lead that
- * closed it: the `if (n <= 0) goto fail;` early exit is redundant (the
- * `for (j = 0; j < n; ...)` loop already falls through to the same
- * `fail: return 0;` when n <= 0) and dropping it, plus writing the
- * `entry` pointer's address computation as `offset + (s32) base` instead
- * of `base + offset`, closed the last word (a pure commutative-operand
- * encoding-order residue in the `addu`). */
+/* From gStyleCueRecordIndex on, the first free record of the stage's list
+ * whose X+Z distance from the target is under its cue's distance; each
+ * record looked at advances the index, so the next slot's search this tick
+ * goes on from there.
+ * Writes the record's world position and distance. */
 void *FindNextStyleCueInRange(LongVec3 *pos, s32 *outDist, LongVec3 *target) {
     s32 j, remaining;
     u8 *records;
@@ -705,7 +661,7 @@ void *FindNextStyleCueInRange(LongVec3 *pos, s32 *outDist, LongVec3 *target) {
     }
     records = gStyleCueRecordLists[gStyleStage];
     remaining = gStyleCueRecordCounts[gStyleStage] - gStyleCueRecordIndex;
-    entry = (EntrySlot *)(gStyleCueRecordIndex * 8 + (s32)records);
+    entry = (EntrySlot *)(gStyleCueRecordIndex * 8 + (s32)records); /* MATCHING: operand order */
     for (j = 0; j < remaining; j++, entry++) {
         gStyleCueRecordIndex++;
         if (entry->cue > 0) {
@@ -715,7 +671,7 @@ void *FindNextStyleCueInRange(LongVec3 *pos, s32 *outDist, LongVec3 *target) {
             grid->methods->computeCellOffsets(grid, pos, &buf);
             dx = pos->x - target->x;
             if (dx < 0) {
-                dx = ~dx + 1;
+                dx = ~dx + 1; /* MATCHING: not -dx (the nor fills the delay slot) */
             }
             dz = pos->z - target->z;
             if (dz >= 0) {
@@ -736,6 +692,7 @@ fail:
 extern StyleSceneRefs *gStyleTargetObj;
 extern void FlushSoundCueSet(void *sound, SoundCueSet *set);
 
+/* Stops the slot's cue and frees its record. Returns NULL for the slot. */
 StyleCueSlot *FlushStyleCue(StyleCueSlot *slot) {
     FlushSoundCueSet(gStyleTargetObj->sound, &slot->cueSet);
     slot->entry->cue = -slot->entry->cue;
@@ -745,6 +702,7 @@ StyleCueSlot *FlushStyleCue(StyleCueSlot *slot) {
 extern s32 IsStyleCueNear(StyleCueSlot *slot, LongVec3 *target);
 extern void ServiceSoundCueSet(void *sound, SoundCueSet *set);
 
+/* One service pass of the slot's cue while the target is in range; 0 otherwise. */
 s32 ServiceStyleCueIfNear(StyleCueSlot *slot, LongVec3 *target, void *unused) {
     if (IsStyleCueNear(slot, target) != 0) {
         ServiceSoundCueSet(gStyleTargetObj->sound, &slot->cueSet);
@@ -755,6 +713,7 @@ s32 ServiceStyleCueIfNear(StyleCueSlot *slot, LongVec3 *target, void *unused) {
 
 extern s32 gStyleCueDistanceTable[];
 
+/* Whether the target is within the held cue's distance (X+Z); keeps the distance. */
 s32 IsStyleCueNear(StyleCueSlot *slot, LongVec3 *target) {
     s32 dx, dz, dist;
     s8 cue;
@@ -764,7 +723,7 @@ s32 IsStyleCueNear(StyleCueSlot *slot, LongVec3 *target) {
     }
     dx = slot->pos.x - target->x;
     if (dx < 0) {
-        dx = ~dx + 1;
+        dx = ~dx + 1; /* MATCHING: not -dx (the nor fills the delay slot) */
     }
     dz = slot->pos.z - target->z;
     if (dz >= 0) {
@@ -775,7 +734,7 @@ s32 IsStyleCueNear(StyleCueSlot *slot, LongVec3 *target) {
     slot->lastDist = dist;
     cue = slot->entry->cue;
     if (dist < gStyleCueDistanceTable[-cue]) {
-        dist = 1;
+        dist = 1; /* MATCHING: not `return 1` (jump.c folds that to slt) */
         return dist;
     }
     return 0;
@@ -791,6 +750,9 @@ extern StyleCueSlot gStyleCueSlotPool[];
 extern StyleCueSlot *TryStartStyleCue(StyleCueSlot *slot, s32 *lastCue, LongVec3 *target, void *unused);
 extern s32 ServiceStyleCueIfNear(StyleCueSlot *slot, LongVec3 *target, void *unused);
 
+/* The per-tick entry (ObjM__TickStyle): the target position from `cell`,
+ * first-tick builds, then the updates and the two cue slots. Returns
+ * lastCue, negated if a slot started that cue this tick. */
 s32 TickStyle(Descriptor10 *cell, void *unused, s32 lastCue) {
     LongVec3 *target;
     LongVec3 targetPos;
@@ -815,15 +777,7 @@ s32 TickStyle(Descriptor10 *cell, void *unused, s32 lastCue) {
             if (ServiceStyleCueIfNear(gStyleCueSlots[i], target, unused) == 0) {
                 gStyleCueSlots[i] = FlushStyleCue(gStyleCueSlots[i]);
             }
-            /* INERT ON PURPOSE -- DO NOT DELETE. This pair is a semantic
-             * no-op (`i` is the initialized loop counter, so nothing here is
-             * an uninitialized read), and it exists solely because it
-             * perturbs GCC 2.6.3's allocator back into retail's register
-             * colours for `target`/`i`. Found by the permuter at iteration 4
-             * and kept because the WHOLE-IMAGE SHA1 verifies with it, not
-             * because the permuter's own scorer liked it (round 41: a
-             * scorer zero is a lead, an `OK: build matches retail` is an
-             * answer). Removing these two lines re-breaks TickStyle. */
+            /* MATCHING: a no-op pair that gives target/i retail's registers */
             i++;
             i--;
         } else {
@@ -840,6 +794,8 @@ extern DrawRect gStyleStripScratchA;
 extern DrawRect gStyleStripRectB;
 extern DrawRect gStyleStripScratchB;
 
+/* One step of func_8003B624's one-column VRAM rotation: stage 2 on the
+ * strip at y 496, stages 3..5 on the one at y 504. */
 void StyleScrollVramStrips(void) {
     DrawRect *rect, *scratch;
     s32 count;
@@ -847,7 +803,7 @@ void StyleScrollVramStrips(void) {
     if (gStyleStage == 2) {
         rect = &gStyleStripRectA;
         scratch = &gStyleStripScratchA;
-        count = 1;
+        count = 1; /* MATCHING: a local set in each branch, not a literal argument */
     } else if ((u32)(gStyleStage - 3) < 3) {
         count = 1;
         rect = &gStyleStripRectB;

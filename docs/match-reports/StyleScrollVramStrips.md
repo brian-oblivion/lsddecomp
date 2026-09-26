@@ -111,3 +111,16 @@ characterization, on file before this naming pass, is the evidence for
 "Draw" rather than a guess made now. Called as the last step of `TickStyle`
 every frame. MATCHED, 25/25, second build (one lever: hoist the shared `a1
 = 1` literal into each branch).
+
+## Round 93 polish (delta, track 7)
+
+### Naming
+
+**Renamed from `DrawStyleTables`, tier B.** The callee, func_8003B624 (code_2bb9c.c), does three DrawSystem moveImage calls per step: the rect's rightmost column to the scratch point, the rest one pixel right, the scratch column back to the rect's left edge -- a one-column rotation of a VRAM rectangle. This function does one step per tick on stage 2 (rect 0,496 248x8 via scratch 256,496) and stages 3 to 5 (rect 0,504 via 256,504). Drawing is not what it does; the "12-byte tuple" reading is `DrawRect`. What the strips hold is not established.
+
+| old | new | tier | evidence |
+| --- | --- | --- | --- |
+| `D_80087444`/`D_80087450` | `gStyleStripRectA`/`gStyleStripScratchA` | A | DrawRect {0, 0x1F0, 248, 8} and {256, 0x1F0, 1, 8}: func_8003B624's rect and scratch for stage 2. |
+| `D_8008745C`/`D_80087468` | `gStyleStripRectB`/`gStyleStripScratchB` | A | the same at y 0x1F8, for stages 3..5. |
+
+Locals `rect`, `count`, `scratch`.

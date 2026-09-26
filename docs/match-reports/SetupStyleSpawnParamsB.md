@@ -215,3 +215,38 @@ The other function-pointer target `StyleFillEffectKind0` dispatches
 through (selected when `gStyleDay % 7 == 0`, the ~1/7 branch). Same
 scratch-global cluster as `SetupStyleSpawnParamsA`, different constants.
 MATCHED, 87/87, ins 0/del 0.
+
+## Round 93 polish (delta, track 7)
+
+### Naming
+
+| old | new | tier | evidence |
+| --- | --- | --- | --- |
+| `D_8008732C` | `gStyleSpawnYChoice1` | A | the word at `gStyleSpawnYChoices[1]` (-0x2800), a separate splat symbol. |
+| `0xA000`, `0x800` | `40960`, `2048` | -- | offsets, decimal. |
+
+Parameters `(LongVec3 *pos, s32 offsetY)`, both unused (see SetupStyleSpawnParamsA); local `dayMod3`.
+
+### Comments moved here from src/class_3bb8c_n.c
+
+Verbatim as they stood before the round-93 comment pass (identifiers already carry this round's renames).
+
+```c
+/* MATCHED round 64 (charlie), 87/87, ins 0 / del 0.  The round-46..48
+ * residue -- filed as "pervasive $v0/$v1/$a0/$a1 temp-register renaming" and
+ * searched for 900s / 136367 permuter iterations without a zero -- was ONE
+ * named local.  The body used a single `s32 r` for all three `rand()`
+ * results, whose live range spans the calls, so cc1 could not coalesce
+ * `rand`'s `$v0` into it and emitted `move $a1,$v0` after each `jal rand`
+ * (two visible, a third word from the knock-on).  Deleting `r` and calling
+ * `rand()` inline in each expression -- exactly the idiom the matched
+ * sibling SetupStyleSpawnParamsA above already uses -- keeps the value in `$v0` and
+ * recolours the whole body to retail's.  `mod3` stays a local: it has two
+ * genuine use points.  A permuter mutates a body but never deletes its
+ * locals, which is why the 136367-iteration negative bounded the search and
+ * not the function (round 63's LOCAL COUNT corollary).
+ * The signature keeps round 47's two dead void* params: StyleFillEffectKind0
+ * dispatches this through a function pointer shared with SetupStyleSpawnParamsA, so
+ * the ABI slot is call-site-determined.  Dead params cost nothing here.
+ * See docs/match-reports/SetupStyleSpawnParamsB.md. */
+```

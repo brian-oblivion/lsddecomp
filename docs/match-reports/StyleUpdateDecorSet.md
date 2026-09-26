@@ -139,3 +139,25 @@ Computes a time-based `shift` from an `ObjAC7CSub` object's `field18`/
 `field24` delta, then per-element recolors (`AdjustRgbByDelta`) and
 repositions (`slotB8`/`slotBC`) all 18 objects every frame. MATCHED,
 93/93.
+
+## Round 93 polish (delta, track 7)
+
+### Naming
+
+| old | new | tier | evidence |
+| --- | --- | --- | --- |
+| `600` | `STYLE_DECOR_FADE_HEIGHT` | B | divisor of the viewport's `refView.vp.y - refView.vr.y` (view-point y less reference-point y; which way is up in this world is not established here) giving the fade step. |
+
+The local views were Viewport (`+0x018`/`+0x024` are `refView.vp.y`/`refView.vr.y`; `+0x064` is setClearColor) and BoxFill (`+0x0B8` setColor, `+0x0BC` setPosition). Locals: `height`, `fade`, `colorOfs`, `slot`, `band`.
+
+### Comments moved here from src/class_3bb8c_n.c
+
+Verbatim as they stood before the round-93 comment pass (identifiers already carry this round's renames).
+
+```c
+/* MATCHED round 61 (bravo), first attempt, after the BLKmode-struct-copy
+ * lever found on StyleBuildDecorSet -- see docs/match-reports/StyleUpdateDecorSet.md.
+ * `rgb` is written only at [0..2] (by AdjustRgbByDelta); its declared size of 8
+ * is inferred from the STACK LAYOUT (it occupies sp+0x10..0x17, with `pos`
+ * at sp+0x18), not from any access. */
+```
