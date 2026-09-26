@@ -7,7 +7,7 @@
 ## What it does
 
 `New_Class86B60`: the allocator for a third small sibling class (alongside
-`NodeGuardedViewport`/`New_NodeGuardedViewport` and `Class86AA0`/`New_Class86AA0`). Allocates
+`NodeGuardedViewport`/`New_NodeGuardedViewport` and `GridCell`/`New_GridCell`). Allocates
 0xC4 bytes and, on success, calls the ctor (`Class86B60__Class86B60`, occupying this
 class's own vtable slot +0x008) with the allocated object and the caller's
 own `dreamSys` argument.
@@ -43,7 +43,7 @@ both functions were derived and typed together.
 
 ## Notes
 
-Matched on the first attempt, same shape as `New_NodeGuardedViewport`/`New_Class86AA0`
+Matched on the first attempt, same shape as `New_NodeGuardedViewport`/`New_GridCell`
 (this unit's other two `New_X` allocators) plus one extra forwarded
 argument.
 
@@ -54,7 +54,7 @@ None beyond what's already documented for this unit's `New_X` idiom.
 ## Naming
 
 **New_Class86B60** -- tier A. Same `New_X` allocator idiom as
-`New_NodeGuardedViewport`/`New_Class86AA0`, one extra forwarded argument
+`New_NodeGuardedViewport`/`New_GridCell`, one extra forwarded argument
 (`dreamSys`). Also externally used as a `PollTaskCtor` callback
 (`include/Class6D3C8.h`); that unit's own independent local view keeps its
 own return/param naming and is untouched by this rename (function names

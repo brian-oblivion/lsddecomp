@@ -21,7 +21,7 @@
  * into (activate/deactivate/getProximityRatio/startSoundCue/stopSoundCue).
  * The overrides of Class65650's slots are named for their slots
  * (Entity__Finalize, Reset, AttachToParent, DetachFromParent,
- * OnClass86AA0LinkCommand; track 4, round 88).
+ * OnGridCellLinkCommand; track 4, round 88).
  */
 #include "common.h"
 #include "Entity.h"
@@ -168,8 +168,8 @@ void Entity__NotifyLinkStage(Entity *this, void *arg1, s32 arg2) {
     this->methods->notifyParents(this, arg2);
 }
 
-void Entity__OnClass86AA0LinkCommand(Entity *this, void *a1, s32 a2) {
-    Get_vtable_Class65650()->onClass86AA0LinkCommand((Class65650 *)this, a1, a2);
+void Entity__OnGridCellLinkCommand(Entity *this, void *a1, s32 a2) {
+    Get_vtable_Class65650()->onGridCellLinkCommand((Class65650 *)this, a1, a2);
     if (a2 == 4) {
         this->methods->deactivate(this);
     }

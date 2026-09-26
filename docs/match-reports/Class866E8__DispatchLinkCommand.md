@@ -75,6 +75,6 @@ Renamed `Class866E8__OnCommand` -> `Class866E8__DispatchLinkCommand` with
 tools/rename.py: the function occupies SceneNode's +0x09C
 `dispatchLinkCommand` slot (`classtable.py gClass866E8Methods --vs
 gLightRigMethods`), and its body is the same kind of override as
-`Class86AA0__DispatchLinkCommand`: route a sender whose class-id byte is 0x34
+`GridCell__DispatchLinkCommand`: route a sender whose class-id byte is 0x34
 (an Actor) onward and ignore every other sender. Nothing in the body goes
 beyond the slot's name. Image byte-identical.

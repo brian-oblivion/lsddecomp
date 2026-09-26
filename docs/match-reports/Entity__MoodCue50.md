@@ -27,7 +27,7 @@ void Entity__MoodCue50(Entity *this, EntityMoodHandlerArg *out) {
 
 Matched first attempt, no iteration needed. Uses the already-documented
 `EntityMethods::slot160` (`void (*)(Entity *self)`, previously known from
-`Entity__DetachFromParent`/`Entity__OnClass86AA0LinkCommand`/`Entity__UpdateDeactivationState` in the earlier Entity units)
+`Entity__DetachFromParent`/`Entity__OnGridCellLinkCommand`/`Entity__UpdateDeactivationState` in the earlier Entity units)
 -- no header change required here.
 
 ### Proposed learning

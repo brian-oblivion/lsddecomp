@@ -24,7 +24,7 @@
  *  - +0x008 ctor, BgLayer__BgLayer(self, src, mode): SceneNode's, this
  *    table, then reset(self, src, mode). Returns nothing; the slot keeps
  *    SceneNode's `void *` ctor type, New_BgLayer ignoring the value (as
- *    include/Class86AA0.h);
+ *    include/GridCell.h);
  *  - +0x040 reset, BgLayer__Reset(self, src, mode): lays the GsBG over
  *    src's GsMAP. Its parameter list differs from the inherited slot's
  *    (self only), so the slot keeps SceneNode's type and the ctor, its one

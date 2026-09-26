@@ -279,7 +279,7 @@ void DreamSys__DispatchInstanceEffect(DreamSys *this, void *arg1, s32 arg2) {
 }
 
 void DreamSys__WallLink(DreamSys *this, void *unk_class_86aa0, int arg2) {
-    GetActorMethods()->onClass86AA0LinkCommand((Actor *)this, unk_class_86aa0, arg2);
+    GetActorMethods()->onGridCellLinkCommand((Actor *)this, unk_class_86aa0, arg2);
     if (arg2 != 4)
         return;
     if (this->state != 0)
@@ -758,7 +758,7 @@ s32 DreamSys__ApplyMoveCommand(DreamSys *this, s32 arg1) {
             this->methods->saveLinkSnapshot(this);
             MOVE_COMMAND_DISPATCH[arg1](this, delta, (void *)(this->staircaseMoveGate < 1));
             if (this->currentStage == 0 && this->coord2->ty < -0x7D0 && this->coord2->tx >= -0x1F3) {
-                this->methods->onClass86AA0LinkCommand(this, this, 4);
+                this->methods->onGridCellLinkCommand(this, this, 4);
             }
         }
         this->coord2->flg = 0;

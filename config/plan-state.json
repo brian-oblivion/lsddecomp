@@ -928,11 +928,6 @@
           "date": "2026-09-26",
           "header": "include/Class866E8.h"
         },
-        "gClass86AA0Methods": {
-          "class": "Class86AA0",
-          "date": "2026-09-26",
-          "header": "include/Class86AA0.h"
-        },
         "gClass86B60Methods": {
           "class": "Class86B60",
           "date": "2026-09-26",
@@ -982,6 +977,11 @@
           "class": "GraphRoom",
           "date": "2026-09-26",
           "header": "include/GraphRoom.h"
+        },
+        "gGridCellMethods": {
+          "class": "GridCell",
+          "date": "2026-09-26",
+          "header": "include/GridCell.h"
         },
         "gIntermediateBaseMethods": {
           "class": "IntermediateBase",

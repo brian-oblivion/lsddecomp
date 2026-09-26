@@ -14,7 +14,7 @@
  *    Actor__ScanLinkCandidates, Actor__ScanGridWindow, AcceptGridElem) when
  *    the move alone did not set linkTarget.
  *  - The link-command pair (Actor__OnActorLinkCommand,
- *    Actor__OnClass86AA0LinkCommand) forwarding through the SceneNode base
+ *    Actor__OnGridCellLinkCommand) forwarding through the SceneNode base
  *    table and, for an event in [5,9), the object's own tryAttachNearby.
  *  - Actor__SetLastOffsetValue/SetPendingExtra, GetActorMethods: plain
  *    setters/getter.
@@ -31,7 +31,7 @@
 #include "DreamSys.h"
 #include "Class866E8.h"
 #include "Class81940.h"
-#include "Class86AA0.h"
+#include "GridCell.h"
 #include "Class879C4.h"
 
 /* Two-element s16 array -- Actor__MoveLocalX and Actor__MoveLocalY each write one
@@ -114,7 +114,7 @@ typedef struct GridQuery {
  * elements (Class866E8Elem) are what Actor__BuildLinkQueries collects: the
  * loader's headerReady gates Actor__ScanLinkCandidates, its ownerKey is the
  * element key BuildLinkQueries steps by one, and `cells` is the 20-wide grid
- * of Class86AA0 cells (each with its `nextInCell` chain) Actor__ScanGridWindow
+ * of GridCell cells (each with its `nextInCell` chain) Actor__ScanGridWindow
  * walks. */
 
 /* Output buffer filled in by the grid's computeFootprintDescriptor (a
@@ -269,7 +269,7 @@ void *Actor__ScanLinkCandidates(Actor *self, void *arg1, void *arg2, s32 count, 
     return NULL;
 }
 
-/* Scans a rectangular window of a grid of Class86AA0 cell chains, rooted
+/* Scans a rectangular window of a grid of GridCell cell chains, rooted
  * at `source->cells`, `query->numRows` rows by `query->numCols` columns,
  * starting at row `query->startRow`, column `query->startCol` (each row is
  * 0x50 bytes = 20 bucket-head pointers; each column step is one bucket-head
@@ -282,12 +282,12 @@ void *Actor__ScanLinkCandidates(Actor *self, void *arg1, void *arg2, s32 count, 
 void *Actor__ScanGridWindow(Actor *self, void *arg1, void *arg2, GridQuery *query,
                             Class866E8Elem *source) {
     s32 row, col;
-    Class86AA0 **bucket;
+    GridCell **bucket;
 
-    bucket = (Class86AA0 **)((u8 *)source->cells + query->startRow * 0x50 + query->startCol * 4);
+    bucket = (GridCell **)((u8 *)source->cells + query->startRow * 0x50 + query->startCol * 4);
     for (row = 0; row < query->numRows; row++) {
         for (col = 0; col < query->numCols; col++) {
-            Class86AA0 *node;
+            GridCell *node;
 
             if (AcceptGridElem(*bucket, arg1, arg2) != NULL) {
                 return *bucket;
@@ -299,7 +299,7 @@ void *Actor__ScanGridWindow(Actor *self, void *arg1, void *arg2, GridQuery *quer
             }
             bucket++;
         }
-        bucket = (Class86AA0 **)((u8 *)bucket - (query->numCols * 4 + 0x50));
+        bucket = (GridCell **)((u8 *)bucket - (query->numCols * 4 + 0x50));
     }
     return NULL;
 }
@@ -334,7 +334,7 @@ void Actor__OnActorLinkCommand(Actor *self, void *sender, s32 event) {
     }
 }
 
-void Actor__OnClass86AA0LinkCommand(Actor *self, void *sender, s32 event) {
+void Actor__OnGridCellLinkCommand(Actor *self, void *sender, s32 event) {
     GetSceneNodeMethods()->dispatchLinkCommand((SceneNode *)self, sender, event);
 }
 

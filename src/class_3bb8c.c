@@ -38,7 +38,7 @@
 #include "Class6D940.h"
 #include "LinkResource.h"
 #include "Class81940.h"
-#include "Class86AA0.h"
+#include "GridCell.h"
 
 s32 Class866E8__SetTargetAndBuildRates(Class866E8 *self, void *arg1, SceneNode *arg2, Descriptor10 *arg3) {
     s32 stackBuf[3];
@@ -410,7 +410,7 @@ void Class866E8__LoadElementResources(Class866E8 *self, Class866E8Elem *entry) {
     Class81940 *hdr;
     Class6D940 *target;
     LinkResource *res;
-    Class86AA0 **slot;
+    GridCell **slot;
     u8 *base;
     SceneNodeSub14 *gpu;
     SceneNodeSub44 *vec;
@@ -451,7 +451,7 @@ void Class866E8__LoadElementResources(Class866E8 *self, Class866E8Elem *entry) {
         }
         if (idxVal == -1) {
             s32 flags10a;
-            slot = (Class86AA0 **)((u8 *)entry->cells + off1);
+            slot = (GridCell **)((u8 *)entry->cells + off1);
             flags10a = (*slot)->attribute;
             (*slot)->attribute = flags10a | flagBit;
             (*slot)->model = 0;
@@ -459,10 +459,10 @@ void Class866E8__LoadElementResources(Class866E8 *self, Class866E8Elem *entry) {
         } else {
             base = (u8 *)entry->cells;
             if (outBuf.chained != 0) {
-                slot = (Class86AA0 **)(base + off2);
+                slot = (GridCell **)(base + off2);
                 off2 += 4;
             } else {
-                slot = (Class86AA0 **)(base + off1);
+                slot = (GridCell **)(base + off1);
             }
             (*slot)->model = (void *)idxVal;
             (*slot)->tmd = ((LinkResEntry *)(*slot)->model)->unk10;
@@ -490,7 +490,7 @@ void Class866E8__LoadElementResources(Class866E8 *self, Class866E8Elem *entry) {
             }
         }
         if (outBuf.next) {
-            Class86AA0 **next = (Class86AA0 **)((u8 *)entry->cells + off2);
+            GridCell **next = (GridCell **)((u8 *)entry->cells + off2);
             (*slot)->nextInCell = *next;
             continue;
         }
@@ -501,8 +501,8 @@ void Class866E8__LoadElementResources(Class866E8 *self, Class866E8Elem *entry) {
 }
 
 void Class866E8__ResetElementCells(Class866E8 *self, Class866E8Elem *entry) {
-    Class86AA0 **p;
-    Class86AA0 **end;
+    GridCell **p;
+    GridCell **end;
 
     if (entry->loader->ownerRate >= 0) {
         ((Class81940ReleaseHeaderElemFn)entry->loader->methods->releaseHeader)(entry->loader, entry);

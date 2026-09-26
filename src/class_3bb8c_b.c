@@ -7,7 +7,7 @@
  * Functionally this slice is the class's SPATIAL GRID / FOOTPRINT
  * subsystem: the seven elements (self->elems), each mapped onto up to four
  * GridSlot866E8 rectangles (self->rects), and a per-cell bit (bit 31 of a
- * Class86AA0 cell's `attribute`) that RefreshFootprint clears, recomputes
+ * GridCell cell's `attribute`) that RefreshFootprint clears, recomputes
  * (via either ComputeFootprintFromRotation or SetFootprintFromQuery, gated
  * on self->config->unk4) and sets again through SetFootprintCellFlag. A
  * second, unrelated mechanism lives at the tail of the unit: a rate/
@@ -23,7 +23,7 @@
 #include "common.h"
 #include "class_3bb8c.h"
 #include "Class81940.h"
-#include "Class86AA0.h"
+#include "GridCell.h"
 
 s32 Class866E8__FindElemIndexByUnk32(Class866E8 *self, s32 key) {
     s32 result;
@@ -305,8 +305,8 @@ void Class866E8__SetFootprintCellFlag(Class866E8 *self, s32 setBit) {
     s32 k;
     GridSlot866E8 *slot;
     Class866E8Elem *e;
-    Class86AA0 **cell;
-    Class86AA0 *next;
+    GridCell **cell;
+    GridCell *next;
 
     slot = self->rects.e;
     for (i = 0; i < self->rectCount; slot++, i++) {
@@ -416,11 +416,11 @@ void Class866E8__FlushRateLatch(Class866E8 *self) {
     }
 }
 
-void Class866E8__ApplyRateToChild(Class866E8 *self, Class86AA0 *item) {
+void Class866E8__ApplyRateToChild(Class866E8 *self, GridCell *item) {
     item->methods->updateScale(item, 0, self->rateEntry);
 }
 
-void Class866E8__ResetChildRate(Class866E8 *self, Class86AA0 *item) {
+void Class866E8__ResetChildRate(Class866E8 *self, GridCell *item) {
     item->methods->updateScale(item, 1, D_800869CC);
 }
 
@@ -438,8 +438,8 @@ void Class866E8__ForEachElem(Class866E8 *self, Class866E8CellFn arg1, Class866E8
 }
 
 void Class866E8__ForEachEntryChild(Class866E8 *self, Class866E8CellFn callback, Class866E8Elem *item) {
-    Class86AA0 **p;
-    Class86AA0 **end;
+    GridCell **p;
+    GridCell **end;
 
     end = item->cells + (0x668 / 4);
     p = item->cells;

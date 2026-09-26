@@ -27,7 +27,7 @@
  * each: dispatchLinkCommand (+0x09C, DispatchChunkChange) calls
  * processChunkChange for a grid (0x114) sender, onActorLinkCommand (+0x0DC,
  * DispatchInstanceEffect) calls instanceEffectsOnJournal for an Entity
- * (0x1F234) sender, and onClass86AA0LinkCommand (+0x0E0, WallLink) tries a
+ * (0x1F234) sender, and onGridCellLinkCommand (+0x0E0, WallLink) tries a
  * wall link on event 4.
  *
  * Round 66's naming (per-name evidence in docs/match-reports/<func>.md)
@@ -633,7 +633,7 @@ typedef enum DreamColors {
  * (DreamSys__NotifyLinkAttempt), +0x094 onPadEvent (DreamSys__OnPadEvent),
  * +0x098 update (DreamSys__TimerTick), +0x09C dispatchLinkCommand
  * (DreamSys__DispatchChunkChange), +0x0DC onActorLinkCommand
- * (DreamSys__DispatchInstanceEffect), +0x0E0 onClass86AA0LinkCommand
+ * (DreamSys__DispatchInstanceEffect), +0x0E0 onGridCellLinkCommand
  * (DreamSys__WallLink) and +0x0E8 slotE8 (DreamSys__NoOpSlotE8Default).
  *
  * Two inherited slots are called with a type other than their own, each

@@ -32,7 +32,7 @@
  *
  * Link commands. The inherited dispatchLinkCommand (+0x09C) is overridden to
  * route by the SENDER's class byte: an Actor (0x34) to onActorLinkCommand
- * (+0x0DC), a Class86AA0 (0x24) to onClass86AA0LinkCommand (+0x0E0). Both
+ * (+0x0DC), a GridCell (0x24) to onGridCellLinkCommand (+0x0E0). Both
  * base occupants chain SceneNode's dispatchLinkCommand; the first also runs
  * tryAttachNearby for events 5..8.
  *
@@ -65,7 +65,7 @@ struct Class866E8;
     /* +0x0D4 */ void (*moveLocalXOrFindLink)(Self *self, s32 val, void *notify); /* Actor__MoveLocalXOrFindLink */ \
     /* +0x0D8 */ void (*slotD8)(void);                                      /* Actor__NoOpSlotD8, empty */ \
     /* +0x0DC */ void (*onActorLinkCommand)(Self *self, void *sender, s32 event);      /* Actor__OnActorLinkCommand */ \
-    /* +0x0E0 */ void (*onClass86AA0LinkCommand)(Self *self, void *sender, s32 event); /* Actor__OnClass86AA0LinkCommand */ \
+    /* +0x0E0 */ void (*onGridCellLinkCommand)(Self *self, void *sender, s32 event); /* Actor__OnGridCellLinkCommand */ \
     /* +0x0E4 */ void (*setLastOffsetValue)(Self *self, s16 val);           /* Actor__SetLastOffsetValue */ \
     /* +0x0E8 */ void (*slotE8)(Self *self);                                /* Actor__NoOpSlotE8, empty; NotifyMove calls it on an Actor linkTarget */ \
     /* +0x0EC */ void (*setPendingExtra)(Self *self, s32 extra)             /* Actor__SetPendingExtra */
@@ -119,7 +119,7 @@ void Actor__NoOpSlotD8(void);
 void Actor__MoveOrFindNearbyLink(Actor *self, void (*move)(Actor *, s32, void *), s32 val, void *notify);
 s32 Actor__FindNearbyLink(Actor *self);
 void Actor__OnActorLinkCommand(Actor *self, void *sender, s32 event);
-void Actor__OnClass86AA0LinkCommand(Actor *self, void *sender, s32 event);
+void Actor__OnGridCellLinkCommand(Actor *self, void *sender, s32 event);
 void Actor__SetLastOffsetValue(Actor *self, s16 val);
 void Actor__NoOpSlotE8(void);
 void Actor__SetPendingExtra(Actor *self, s32 extra);
