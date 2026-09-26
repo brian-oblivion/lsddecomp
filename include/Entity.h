@@ -254,6 +254,7 @@ extern Ratio16 SCALE_HALF[];
 extern Ratio16 SCALE_DOUBLE[];
 extern Ratio16 SCALE_MINUS_SIXTY_FOURTH[];
 extern Ratio16 SCALE_EIGHT_SEVENTHS[];
+extern Ratio16 SCALE_UNIT[]; /* {1/1, 1/1, 1/1}, a .data copy of code_d294.h's SCALE_ONE */
 extern Ratio16 SCALE_EIGHTH[];
 extern Ratio16 SCALE_SIX[];
 extern Ratio16 SCALE_Y2[];

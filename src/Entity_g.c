@@ -26,8 +26,8 @@
  * ROTATION_YAW_MINUS120/ROTATION_ZPLUS9/SCALE_HALF/SCALE_SIX tables
  * (rotation/scale: three Ratio16 {num,den} pairs for X/Y(yaw)/Z, per the
  * ROTATION_YAW_MINUS120/SCALE_HALF/SCALE_SIX precedent): ROTATION_YAW_PLUS1, ROTATION_ZPLUS4, SCALE_EIGHTH,
- * SCALE_QUARTER, SCALE_THIRTY_SECOND. Six more data constants
- * (D_80089CAC, D_80089CB8, D_80089DE4, SCALE_UNIT, D_80089E2C, D_80089E44)
+ * SCALE_QUARTER, SCALE_THIRTY_SECOND (and, round 93, SCALE_UNIT). Five more
+ * data constants (D_80089CAC, D_80089CB8, D_80089DE4, D_80089E2C, D_80089E44)
  * were decoded but left unnamed -- either a non-whole-degree rotation
  * (no precedent for naming those) or a non-uniform-axis or non-unit-
  * fraction scale (no precedent either). See each function's match
@@ -49,7 +49,6 @@
  * Entity_c.c/Entity_e.c (each unit keeps its own extern, not shared).
  * The named motion templates (ROTATION_*, SCALE_*) are in include/Entity.h. */
 extern u8 D_80089CAC[];
-extern u8 SCALE_UNIT[];
 extern u8 D_80089DE4[];
 extern u8 D_80089CB8[];
 extern u8 D_80089E2C[];
