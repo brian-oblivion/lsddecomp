@@ -683,6 +683,8 @@ def track4_classes(st):
 
 
 _fp_texts = None
+SCALAR_TYPES = frozenset({"void", "char", "int", "short", "long", "unsigned",
+                          "s8", "u8", "s16", "u16", "s32", "u32", "s64", "u64"})
 
 
 def class_footprint(c, unified_types=frozenset()):
@@ -702,7 +704,11 @@ def class_footprint(c, unified_types=frozenset()):
             t = f.read_text(errors="replace")
             _fp_texts[f] = (re.sub(r"/\*.*?\*/", " ", t, flags=re.S),
                             set(re.findall(r'#include\s+"([^"]+)"', t)))
-    views = [v for v in (*c["objects"], *c["tables"]) if v not in unified_types]
+    # A scalar is a view to delete (`extern s32 D_80087034;`), never a symbol
+    # to search for: `\bs32\b` hits every file (round 89: 86 units). The
+    # table symbol already finds that extern line.
+    views = [v for v in (*c["objects"], *c["tables"])
+             if v not in unified_types and v not in SCALAR_TYPES]
     syms = {c["table"], *c["owned"], *views}
     tre = re.escape(c["table"])
     ore = "|".join(map(re.escape, [o for o in c["objects"] if o not in unified_types])) or r"(?!)"
