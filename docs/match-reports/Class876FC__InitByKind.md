@@ -46,7 +46,7 @@ void Class876FC__InitByKind(LinkNode *self, void *arg1, Vec3S *arg2) {
         Class876FC__BuildRandomSprites(self, 0);
         break;
     case 3:
-        LinkOwnerObj__func_56e1c(self, 0);
+        Class876FC__SpawnPlainSprites(self, 0);
         break;
     default:
         break;
@@ -90,9 +90,9 @@ green).
   object's true type belongs to a different, uncarved unit and there is no
   shared header to extend, so this stays a local, minimal view (project's
   multiple-independent-local-views convention).
-- **Two functions called here (`Class876FC__BuildRandomSprites`, `LinkOwnerObj__func_56e1c`) are defined
+- **Two functions called here (`Class876FC__BuildRandomSprites`, `Class876FC__SpawnPlainSprites`) are defined
   with a NARROWER real prototype than this call site uses** (`Class876FC__BuildRandomSprites`
-  takes only `self`; `LinkOwnerObj__func_56e1c` — defined in `class_3bb8c_o.c` — takes
+  takes only `self`; `Class876FC__SpawnPlainSprites` — defined in `class_3bb8c_o.c` — takes
   only `this`). Retail's own call sites still set up a dead second argument
   register for both. Reproduced with old-style (unprototyped) `extern void
   func_X();` declarations local to this file, which suppress the
@@ -138,7 +138,7 @@ into gTrackedYSnapshot; `AttachWithRotScale(self, parent, pos + offset,
 rotation, scale)`; for kind < 2, `Class6B5CC__LinkModel(self,
 D_8008ACA4->slot80(D_8008AB98[kind]))`; then kind 0 ->
 Class876FC__PlaceModelChildren(self, 0), 2 -> Class876FC__BuildRandomSprites,
-3 -> LinkOwnerObj__func_56e1c (= Class876FC__SpawnSprites(self, 0, 0, NULL)).
+3 -> Class876FC__SpawnPlainSprites (= Class876FC__SpawnSprites(self, 0, 0, NULL)).
 "Init" rests on the one ctor caller, so B.
 
 The class: every function here runs on a gClass876FCMethods instance.
@@ -206,3 +206,7 @@ For the HEAD, by type scope; none applied here (other units' views).
 `D_8008ACA4Obj *`/`void *`/`void *` in class_3bb8c_s.c. Both units now
 declare `Actor *`/`void *`/`void *`: the local `D_8008ACA4Methods` view is gone and the +0x080 call reads `getSetUnk10Flag8`, the name `Actor__func_56f5c` calls the same slot by. Byte-identical; no new `-Wall`
 warning.
+
+## Track 4 (2026-09-26, round 88, charlie)
+
+class_3bb8c_s.c's `LinkNode` view (owner and children under one type) is gone: the owner is `Class876FC` (include/Class876FC.h), `modelChildren` are `Actor *`, `sprites` are `Class879C4 *`, and the local `Vec3S` is `Vec3_d294`. Accessor renames: `kind` is Actor's `pendingExtra` (+0x054, where the ctor stores it); `offset`/`rotation`/`scale`/`modelChildLayout`/`tableIndex`/`color`/`altColor` are `params.*`; slot `slotB8` is Actor's `setTranslation` on the owner and model children and Sprite's `setColor` on sprites; `*coord2 = 0` is `coord2->flg = 0`. Image byte-identical.

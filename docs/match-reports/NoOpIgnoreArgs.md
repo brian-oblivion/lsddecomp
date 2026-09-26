@@ -30,7 +30,7 @@ a decompilation artifact.
 **`NoOpIgnoreArgs` -- tier A.** A pure leaf whose mechanics ARE its purpose: the body
 does nothing, and it is reached as the `case 2:` arm of the state switch on
 `self->unk54` in `class_3bb8c_s.c:Class876FC__UpdateByKind`, beside real arms
-(`Class876FC__DriftModelChildren`, `LinkOwnerObj__RandomizeLinks`) that take the same
+(`Class876FC__DriftModelChildren`, `Class876FC__RandomizeSprites`) that take the same
 `(self, arg1)` shape -- which rules out "this is just an unextracted stub" as
 the alternative reading. No class prefix: the function takes no `self` (a
 bare `void(void)`), and every call site passes a dead second argument the

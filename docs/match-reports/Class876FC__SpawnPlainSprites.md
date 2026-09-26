@@ -1,4 +1,6 @@
-# LinkOwnerObj__func_56e1c -- MATCHED (10/10 words)
+# Class876FC__SpawnPlainSprites -- MATCHED (10/10 words)
+
+> Renamed from `LinkOwnerObj__func_56e1c` on 2026-09-26 (tools/rename.py). Address 0x80056e1c.
 
 > Renamed from `func_80056E1C` on 2026-09-18 (tools/rename.py). Address 0x80056e1c.
 
@@ -9,7 +11,7 @@ Unit: `class_3bb8c_o` (round 17). A 4-argument forward to `Class876FC__SpawnSpri
 ```c
 extern void Class876FC__SpawnSprites(void *arg0, s32 arg1, s32 arg2, s32 arg3);
 
-void LinkOwnerObj__func_56e1c(void *this) {
+void Class876FC__SpawnPlainSprites(void *this) {
     Class876FC__SpawnSprites(this, 0, 0, 0);
 }
 ```
@@ -44,7 +46,7 @@ None beyond what's already documented -- a plain forwarding wrapper.
 
 ## Naming
 
-**`LinkOwnerObj__func_56e1c` -- tier C.** Class is known (`LinkOwnerObj`,
+**`Class876FC__SpawnPlainSprites` -- tier C.** Class is known (`LinkOwnerObj`,
 confirmed by its caller's dispatch context in `class_3bb8c_s.c`), but the
 function is a pure forward to `Class876FC__SpawnSprites(this, 0, 0, 0)`, a function
 outside this unit's carved range with no prototype or report anywhere yet.
@@ -69,7 +71,7 @@ incoming `$a0` through:
 80056e30:  move  a3,zero
 ```
 
-So one real argument, exactly as `void LinkOwnerObj__func_56e1c(void *this)`
+So one real argument, exactly as `void Class876FC__SpawnPlainSprites(void *this)`
 says — and unusually clear, since the second argument register is not merely
 ignored but overwritten.
 
@@ -77,7 +79,7 @@ ignored but overwritten.
 second argument anyway, and retail emits it:
 
 ```
-80056620:  jal   80056e1c <LinkOwnerObj__func_56e1c>
+80056620:  jal   80056e1c <Class876FC__SpawnPlainSprites>
 80056624:  move  a1,zero          <- the dead 2nd argument, in retail
 ```
 
@@ -88,3 +90,19 @@ every arm.
 
 **Declaration sites changed:** none (arity unchanged). `/* arity-ok: ... */`
 added to `src/class_3bb8c_s.c:144`. Oracle green.
+
+## Track 4 (2026-09-26, round 88, charlie)
+
+Renamed from the `LinkOwnerObj__` family to `Class876FC__` with the class's
+unification (`include/Class876FC.h`). Evidence: the only caller is
+Class876FC's own per-kind dispatch in `class_3bb8c_s.c`
+(`Class876FC__InitByKind` kind 3, `Class876FC__UpdateByKind` kind 3,
+`Class876FC__ReleaseByKind` kinds 2/3), each passing its own `self`; the
+five-element array at +0x084 ("links") is `Class876FC::sprites`, filled by
+`Class876FC__SpawnSprites` with `New_Class879C4` objects. The old
+`LinkOwnerObj`/`LinkElemObj` views were Class876FC and Class879C4 under
+another name; RandomizeSprites' `slot48` is Class879C4's inherited
+`updateScale` and its `angle` (+0x084) is `sprite.rotate` (Sprite, +0x064 +
+0x020, 4096 per degree -- the `(rand() % 360) << 12` it stores).
+
+View replaced the same day: the `LinkOwnerObj`/`LinkElemObj` views in class_3bb8c_o.c are deleted and the unit includes include/Class876FC.h (`this` is `Class876FC *self`; `links` is `sprites`, `slot48` is `updateScale`, `angle` is `sprite.rotate`). Image byte-identical.

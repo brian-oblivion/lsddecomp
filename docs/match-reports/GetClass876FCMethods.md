@@ -51,3 +51,7 @@ built on the same base" (see the file header comment); naming the FUNCTION
 would require first naming that sibling class, which is out of scope for
 this unit (`gClass876FCMethods`'s own ctor, `Class876FC__Class876FC`, is defined elsewhere).
 Left as `func_` for consistency with the rest of this getter family.
+
+## Track 4 (2026-09-26, round 88, charlie)
+
+Class876FC unified (include/Class876FC.h): the `LinkOwnerObj`/`LinkElemObj` views in class_3bb8c_o.c are deleted and the unit includes include/Class876FC.h (the getter now returns `Class876FCMethods *`; it was typed as its parent's `ActorMethods`). Image byte-identical.

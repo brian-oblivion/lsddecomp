@@ -56,3 +56,7 @@ optional clear, `ReleaseBasicClassArray` call) rather than needing its own lever
 Guarded by `gStyleVariant >= 0`; `ReleaseBasicClassArray(gStyleEffectSlots,
 gStyleEffectSlotCount)` -- the release half of the triad, called from
 `StyleTeardown`. MATCHED, 13/13, first build.
+
+## Track 4 (2026-09-26, round 88, charlie)
+
+`gStyleEffectSlots` retyped `void *[]` -> `Class876FC *[]` (every element is a New_Class876FC object); ReleaseBasicClassArray takes it as `(void **)`. Image byte-identical.
