@@ -3,7 +3,6 @@
 # addresses these off $gp. Regenerate after any sdata/sbss carve.
 D_8008A824
 D_8008A828
-D_8008A82C
 D_8008A838
 D_8008A850
 D_8008A854
@@ -196,6 +195,7 @@ gStyleKind
 gStyleTargetObj
 gStyleTickCount
 gStyleVariant
+gTexturedFaceColor
 gTimBlockClutShift
 gTimClutRowShift
 gTmdModelBoundsCount

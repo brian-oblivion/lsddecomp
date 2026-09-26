@@ -507,7 +507,7 @@ extern s32 D_80090C18;
 extern s32 gSortUseGlobalLightMode;
 extern s32 gSortLightMode;
 extern s32 GsLIGHT_MODE;
-extern s8 D_8008A82C[3];
+extern s8 gTexturedFaceColor[3];
 extern void *GsOUT_PACKET_P;
 
 extern void InitVtxRecordPtrs(void *dst, void *table, s32 count);
@@ -619,7 +619,7 @@ void SortTmdObject(void *objIn, void *otSrc, s32 otShift, void *ctxIn)
     gSortLightMode = (*(u32 *)obj >> 3) & 0x3;
 
     {
-        s8 *tint = D_8008A82C;
+        s8 *tint = gTexturedFaceColor;
 
         *(s8 *)(ctx + 0x34) = tint[0];
         *(s8 *)(ctx + 0x35) = tint[1];
@@ -1301,7 +1301,7 @@ extern s32 D_80090C18;
 extern s32 gSortUseGlobalLightMode;
 extern s32 gSortLightMode;
 extern s32 GsLIGHT_MODE;
-extern s8 D_8008A82C[3];
+extern s8 gTexturedFaceColor[3];
 
 extern void InitVtxRecordPtrs(void *arg0, void *arg1, s32 kind);
 extern s32 ProjectTriFace(void *arg0, u8 *prim, u16 idx0, u16 idx1, u16 idx2, void (*callback)(void *));
@@ -1469,9 +1469,9 @@ void SortTmdObject(void *arg0, void *arg1, s32 arg2, void *arg3)
         gSortUseGlobalLightMode = (raw >> 5) & 0x1;
         gSortLightMode = (raw >> 3) & 0x3;
     }
-    prim[0x34] = D_8008A82C[0];
-    prim[0x35] = D_8008A82C[1];
-    prim[0x36] = D_8008A82C[2];
+    prim[0x34] = gTexturedFaceColor[0];
+    prim[0x35] = gTexturedFaceColor[1];
+    prim[0x36] = gTexturedFaceColor[2];
 
     if (gSortUseGlobalLightMode != 0 && GsLIGHT_MODE != 0) {
         v0 = 9;

@@ -142,7 +142,7 @@ typedef struct {
     do {                                    \
         *(u16 *)((p) + 0xE) += (rows) << 6; \
     } while (0)
-extern s8 D_8008A82C[3];
+extern s8 gTexturedFaceColor[3];
 extern void *GsOUT_PACKET_P;
 
 extern void InitVtxRecordPtrs(void *dst, void *table, s32 count);
@@ -262,7 +262,7 @@ void SortTmdObject(void *objIn, void *otSrc, s32 otShift, void *ctxIn) {
     gSortLightMode = (((RenderObjHead *)obj)->flags >> 3) & 0x3;
     ((RenderCtxHead *)ctx)->unk8 = 0xA;
 
-    *(Rgb8 *)(ctx + 0x34) = *(Rgb8 *)D_8008A82C;
+    *(Rgb8 *)(ctx + 0x34) = *(Rgb8 *)gTexturedFaceColor;
 
     if ((gSortUseGlobalLightMode != 0 && GsLIGHT_MODE != 0) || gSortLightMode != 0) {
         dpShift = 9;

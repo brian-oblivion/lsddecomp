@@ -2880,3 +2880,4 @@ SortTmdObject = 0x80018464; // type:func
 GsLIGHT_MODE = 0x800902E0;
 gSortLightMode = 0x8008E24C;
 gSortUseGlobalLightMode = 0x8008E250;
+gTexturedFaceColor = 0x8008A82C;
