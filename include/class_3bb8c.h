@@ -821,44 +821,13 @@ extern void Class866E8__ForEachElem(Obj866E8 *self, void (*arg1)(Obj866E8 *self,
 extern s32 D_800869CC[3];
 
 /* -------------------------------------------------------------------
- * class_3bb8c_c additions below. Two small sibling classes, each built
- * by its own New_X/ctor pair (allocator + base-chain + own-vtable-set,
- * the same shape as Class86668__Class86668 in class_39e08.c). Named by their
- * vtable's address, same convention as Class866E8/Class86668.
+ * class_3bb8c_c additions below. Small sibling classes, each built by
+ * its own New_X/ctor pair (allocator + base-chain + own-vtable-set, the
+ * same shape as Class86668__Class86668 in class_39e08.c). Named by their
+ * vtable's address, same convention as Class866E8/Class86668. The first
+ * of them, Class869D8 (gClass869D8Methods, a Viewport), is defined in
+ * include/Class869D8.h (round 87, track 4).
  * ------------------------------------------------------------------- */
-
-typedef struct Class869D8 Class869D8;
-typedef struct Class869D8Methods Class869D8Methods;
-
-/*
- * Vtable gClass869D8Methods (asm/data/76DC8.data.s, header word 0x17). Only the
- * slots this unit's own functions reach are typed: +0x008 (ctor,
- * Class869D8__Class869D8, called by New_Class869D8) and +0x040 (a
- * post-construct hook, Class869D8__InitDefaults -- already matched, empty body, no
- * established purpose beyond "runs right after self->methods is installed"
- * -- same shape as Class86B60Methods::onConstruct below).
- */
-struct Class869D8Methods {
-    u8 pad000[0x008];
-    void (*ctor)(Class869D8 *self);            /* +0x008, Class869D8__Class869D8 */
-    u8 pad00C[0x040 - 0x00C];
-    void (*onConstruct)(Class869D8 *self);     /* +0x040, Class869D8__InitDefaults (empty body) */
-};
-
-struct Class869D8 {
-    Class869D8Methods *methods;                /* +0x000 */
-    u8 pad004[0x010 - 0x004];
-    s32 unk10;                                  /* +0x010, Class869D8__Update: gates the slot9C call (nonzero test) */
-    u8 pad14[0x070 - 0x014];
-    s32 unk70;                                  /* +0x070, Class869D8__Update: gates the slot9C call (nonzero test) */
-    u8 pad74[0x0DC - 0x074];                     /* struct ends at the New_Class869D8 alloc size, 0xDC */
-};
-
-extern Class869D8Methods gClass869D8Methods;
-extern Class869D8Methods *GetClass869D8Methods(void);
-
-/* Class869D8's parent is Viewport (0x7): its ctor chains to
- * GetViewportMethods()->ctor, declared in include/Viewport.h. */
 
 extern void *BMemPMgrAlloc(s32 size);
 
@@ -872,7 +841,7 @@ typedef struct GenericTagInst_3bb8c_c GenericTagInst_3bb8c_c;
 
 /*
  * Vtable gClass86AA0Methods (asm/data/76DC8.data.s, header word 0x24). Sibling of
- * Class869D8Methods above, same shape: ctor at +0x008 (Class86AA0__Class86AA0,
+ * Class869D8Methods (include/Class869D8.h), same shape: ctor at +0x008 (Class86AA0__Class86AA0,
  * called by New_Class86AA0/New_Class86AA0). +0x0B8 is dispatched by this
  * class's own Class86AA0__ForwardIfTag34 (slot +0x09C in the same table); its exact
  * purpose is unestablished beyond "called on self with no other args".
@@ -1147,8 +1116,8 @@ struct Class86B60Methods {
     void (*slot14)(Class86B60 *self, void *arg1);
     u8 pad018[0x040 - 0x018];
     /* +0x040, Class86B60__Class86B60's own last call -- same "runs right after
-     * self->methods is installed" shape as Class869D8Methods::onConstruct
-     * above. This struct (Class86B60Methods) is otherwise SHARED with
+     * self->methods is installed" shape as Class869D8Methods::initDefaults
+     * (include/Class869D8.h). This struct (Class86B60Methods) is otherwise SHARED with
      * src/class_3bb8c_d.c (many other slots below are dispatched from
      * functions there), so this rename followed the compiler-ownership
      * recipe rather than being assumed safe: renamed the definition alone,

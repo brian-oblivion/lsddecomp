@@ -24,6 +24,7 @@
 #include "class_3bb8c.h"
 #include "Class6B5CC.h"
 #include "Viewport.h"
+#include "Class869D8.h"
 
 Class869D8 *New_Class869D8(void)
 {
@@ -41,7 +42,7 @@ void Class869D8__Class869D8(Class869D8 *self)
 {
     GetViewportMethods()->ctor((Viewport *)self);
     self->methods = GetClass869D8Methods();
-    self->methods->onConstruct(self);
+    self->methods->initDefaults(self);
 }
 
 void Class869D8__InitDefaults(void) {
@@ -49,7 +50,7 @@ void Class869D8__InitDefaults(void) {
 
 void Class869D8__Update(Class869D8 *self)
 {
-    if (self->unk10 != 0 && self->unk70 != 0) {
+    if (self->viewNode != NULL && self->otReady != 0) {
         GetViewportMethods()->update((Viewport *)self);
     }
 }
