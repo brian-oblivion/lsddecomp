@@ -19,8 +19,8 @@
  * into THREE separate object families through local method-table views: a
  * decoration object (`gStyleDecorObj`, `New_BoxFill`-allocated), an
  * 18-slot "decor set" array (`gStyleDecorSlots`, same allocator) and an
- * `Obj876FC`-class "effect slots" array (`gStyleEffectSlots`,
- * `class_3bb8c_r.c`'s `New_Class876FC` allocator, kind-tagged 0..3 by
+ * Class876FC "effect slots" array (`gStyleEffectSlots`, include/
+ * Class876FC.h, `New_Class876FC`-allocated, kind-tagged 0..3 by
  * `StyleFillEffectKind0`..`3`'s literal first argument), plus a two-slot
  * positional sound-cue subsystem (`gStyleCueSlots`, `TryStartStyleCue`/
  * `FindNearestStyleCueEntry`/`FlushStyleCue`/`StopStyleCueIfNear`/
