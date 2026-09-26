@@ -137,9 +137,9 @@ TimImageMethods *GetTimImageMethods(void) {
     return &gTimImageMethods;
 }
 
-/* Not in gTimImageMethods's table. Three calls to the draw singleton's slot
- * +0x064 per iteration, built from r's edges and p; nothing but i changes
- * between iterations. */
+/* Rotates the VRAM rectangle r one column to the right, count times, through
+ * the one-column scratch area at p: the last column goes to p, the rest moves
+ * right by one, and p comes back as column 0 (three moveImage calls each). */
 void RotateVramRectRight(DrawRect *r, s32 count, DrawPoint *p) {
     DrawSystem *draw;
     void (*fn)(DrawSystem *, DrawRect *, s32, s32);
