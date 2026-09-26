@@ -228,7 +228,7 @@ struct LinkResource;
 
 /* DreamSys__DreamSys's `arg1` is a LinkResource (include/LinkResource.h;
    Class6D3C8__Class6D3C8 passes New_LinkResource("ETC\DREAME5.TMD")): the
-   ctor keeps it in unk_0x60 and adds its getModel(0), a TmdModel, as a
+   ctor keeps it in modelSource and adds its getModel(0), a TmdModel, as a
    child. This header used to carry that view as DreamSysCtorArgObj /
    DreamSysCtorArgMethods (deleted round 89, track 4). */
 
@@ -239,32 +239,16 @@ struct LinkResource;
 /* DreamSys's base class is Actor (include/Actor.h): DreamSys's own methods
    reach the base implementations through GetActorMethods() and upcast. */
 
-/* Opaque view of whatever object DreamSys__ProcessChunkChange's `entity`
-   parameter points to -- almost certainly an `Entity*` (include/Entity.h),
-   but that unit's own `EntityMethods` doesn't type these slots and
-   extending it is out of this unit's scope. Declared minimally, locally,
-   for this unit's own call sites only (round 2026-08-30-d;
-   +0x38/+0x14C/+0x150/+0x154/+0x158 added round 2026-09-06 by
-   DreamSys__InstanceEffectsOnJournal). +0x38 takes the DreamSys instance
-   as its own second argument, same shape as ActorMethods::detachFromParent (+0x050)
-   above; +0x14C returns a pointer forwarded straight into
-   LogInstanceMood, so `MoodGraphPoint *`; +0x150/+0x154 return plain s32
-   (added to/negated into DreamSys fields); +0x158's return is stored with
-   a bare `sh`, consistent with either `s16` or `s32` at this call shape,
-   kept `s32` for uniformity with its self-only siblings. */
+/* DreamSys__InstanceEffectsOnJournal's view of the Entity (include/Entity.h,
+   class 0x1F234) that sent it an instance effect: the four Entity slots it
+   calls, named as Entity.h names them. A local view because a unit including
+   both this header and Entity.h sees conflicting SoundCueSet prototypes. */
 typedef struct DreamSysEntityMethods {
-    u8 pad00[0x38];
-    /* Three arguments, not two (round 75, DreamSys__InstanceEffectsOnJournal):
-	   the caller forwards its own `effect` in $a2 untouched, which is why its
-	   switch index lives in $v1. Only caller: that function. */
-    void (*slot0x38)(void *self, struct DreamSys *arg1, s32 effect);
-    u8 pad3C[0x10C - 0x3C];
-    PlayerSpawnPoint *(*slot0x10C)(void *self, s32 arg1, s32 arg2);
-    u8 pad110[0x14C - 0x110];
-    MoodGraphPoint *(*slot0x14C)(void *self);
-    s32 (*slot0x150)(void *self);
-    s32 (*slot0x154)(void *self);
-    s32 (*slot0x158)(void *self);
+    u8 pad00[0x14C];
+    MoodGraphPoint *(*getMoodEffect)(void *self); /* Entity +0x14C */
+    s32 (*getUnlockEffect)(void *self);           /* Entity +0x150 */
+    s32 (*getLinkStage)(void *self);              /* Entity +0x154 */
+    s32 (*getEventVideo)(void *self);             /* Entity +0x158 */
 } DreamSysEntityMethods;
 
 typedef struct DreamSysEntityObj {
@@ -395,9 +379,11 @@ struct DreamSys {
     /* Set unconditionally to the constructor's `arg1` by DreamSys__DreamSys
 	   (round 2026-09-02): the LinkResource its model 0 came from. No other
 	   observed use in this unit's queued functions. */
-    struct LinkResource *unk_0x60;
-    /* Set by DreamSys__SetEtcTim(this, value); no other observed use. */
-    s32 unk_0x64;
+    struct LinkResource *modelSource;
+    /* The TimImage Class865C8__Class865C8 hands over through
+       DreamSys__SetEtcTim (vtable +0x114); cleared by the ctor, never
+       dereferenced by the DreamSys. */
+    s32 etcTim;
 
     bool isFlashbackSession;
     /* Read by DreamSys__TickMove; compared against 0 / 1, else-branch otherwise.
@@ -656,9 +642,9 @@ struct DreamSysMethods {
     /* +0x108 */ s32 (*getDreamTimerScaled)(DreamSys *self); /* DreamSys__GetDreamTimerScaled: tick / 15 */
     /* +0x10C */ void (*setSoundObj)(DreamSys *self, s32 value); /* DreamSys__SetSoundObj */
     /* +0x110 */ void (*setViewport)(DreamSys *self, struct Viewport *value); /* DreamSys__SetViewport */
-    /* +0x114 */ void (*slot114)(DreamSys *self, s32 value); /* DreamSys__SetEtcTim: unk_0x64 = value */
-    /* +0x118 */ void (*updateTickState)(DreamSys *self);  /* DreamSys__UpdateTickState */
-    /* +0x11C */ void (*runTickCallbacks)(DreamSys *self); /* DreamSys__RunTickCallbacks */
+    /* +0x114 */ void (*slot114)(DreamSys *self, s32 value); /* DreamSys__SetEtcTim: etcTim = value */
+    /* +0x118 */ void (*updateTickState)(DreamSys *self);    /* DreamSys__UpdateTickState */
+    /* +0x11C */ void (*runTickCallbacks)(DreamSys *self);   /* DreamSys__RunTickCallbacks */
     /* +0x120 */ s32 (*projectPointAtDistance)(DreamSys *self, s32 *out, s32 dist, s32 *reference,
                                                s32 tolerance); /* DreamSys__ProjectPointAtDistance */
     /* +0x124 */ void (*slot124)(DreamSys *self); /* DreamSys__func_59590: unk_0x7C = 0 */

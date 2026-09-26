@@ -94,8 +94,8 @@ DreamSys *DreamSys__DreamSys(DreamSys *this, LinkResource *arg1, s32 arg2, s32 a
     this->methods = Get_vtable_DreamSys();
     this->soundObj = arg2;
     this->viewport = (Viewport *)arg3;
-    this->unk_0x64 = 0;
-    this->unk_0x60 = arg1;
+    this->etcTim = 0;
+    this->modelSource = arg1;
     val = arg1->methods->getModel(arg1, 0);
     this->methods->addChild(this, val);
     this->methods->getSetDreamTimeLimit(this, -1);
@@ -266,14 +266,14 @@ tick_only:
 
 void DreamSys__DispatchChunkChange(DreamSys *this, void *arg1, s32 arg2) {
     GetActorMethods()->dispatchLinkCommand((Actor *)this, arg1, arg2);
-    if ((*(s32 *)(*(void **)arg1) & 0xFFF) == 0x114) {
+    if ((((BasicClass *)arg1)->methods->header & 0xFFF) == 0x114) {
         this->methods->processChunkChange(this, arg1, arg2);
     }
 }
 
 void DreamSys__DispatchInstanceEffect(DreamSys *this, void *arg1, s32 arg2) {
     GetActorMethods()->onActorLinkCommand((Actor *)this, arg1, arg2);
-    if ((*(s32 *)(*(void **)arg1) & 0xFFFFF) == 0x1F234) {
+    if ((((BasicClass *)arg1)->methods->header & 0xFFFFF) == 0x1F234) {
         this->methods->instanceEffectsOnJournal(this, arg1, arg2);
     }
 }
@@ -317,11 +317,7 @@ void DreamSys__SetMoveOverride(DreamSys *this, s32 value) {
 }
 
 void DreamSys__ResetLinkState(DreamSys *this, s32 arg1, s32 arg2) {
-    struct {
-        s8 unknown_values_0x0[8];
-        s16 field_0x8;
-        s16 field_0xA;
-    } local;
+    RotationRatios local;
 
     this->methods->logChunkMood(this, &this->linkCoordinates);
     this->methods->selectCallback80(this, 1);
@@ -351,8 +347,8 @@ void DreamSys__ResetLinkState(DreamSys *this, s32 arg1, s32 arg2) {
     this->unk_0x78 = 0;
     SceneNode__GetRotationDegrees((SceneNode *)this, (Ratio16 *)&local);
 
-    local.field_0x8 = 0;
-    local.field_0xA = 1;
+    local.z.numerator = 0;
+    local.z.denominator = 1;
     this->methods->updateRotation(this, 1, &local);
 }
 
@@ -389,7 +385,7 @@ void DreamSys__SetViewport(DreamSys *this, Viewport *value) {
 }
 
 void DreamSys__SetEtcTim(DreamSys *this, s32 value) {
-    this->unk_0x64 = value;
+    this->etcTim = value;
 }
 
 void DreamSys__UpdateTickState(DreamSys *this) {
@@ -870,7 +866,7 @@ void DreamSys__InitNewGame(DreamSys *this) {
     this->unknown_word_0x67c = 0;
     this->unknown_word_0x680 = 0;
     InitNavChallengesArray(&this->navChallengesArray, &this->amountDynamicLinksDone);
-    memset((unsigned char *)&this->unknown_values_0x684, 0, 0x1F4);
+    memset(this->unknown_values_0x684, 0, 0x1F4);
 }
 
 void DreamSys__GetSetScreenShake(DreamSys *this, bool *value) {
@@ -1244,7 +1240,8 @@ void DreamSys__ProcessChunkChange(DreamSys *this, void *entity, s32 effect) {
     PlayerSpawnPoint *pos;
 
     if (effect == 5) {
-        pos = ((DreamSysEntityObj *)entity)->methods->slot0x10C(entity, 0, 0);
+        pos = (PlayerSpawnPoint *)((Class866E8 *)entity)
+                  ->methods->getTargetDescriptor((Class866E8 *)entity, 0, 0);
         this->methods->logChunkMood(this, pos);
     }
 }
@@ -1261,7 +1258,7 @@ void DreamSys__InstanceEffectsOnJournal(DreamSys *this, void *entity, s32 effect
 
     switch (effect) {
         case 4:
-            ((DreamSysEntityObj *)entity)->methods->slot0x38(entity, this, effect);
+            ((BasicClass *)entity)->methods->onNotify((BasicClass *)entity, this, effect);
             break;
         case 5:
         case 6:
@@ -1272,15 +1269,15 @@ void DreamSys__InstanceEffectsOnJournal(DreamSys *this, void *entity, s32 effect
             if (this->isFlashbackSession != 0) {
                 return;
             }
-            this->methods->logInstanceMood(this,
-                                           ((DreamSysEntityObj *)entity)->methods->slot0x14C(entity));
+            this->methods->logInstanceMood(
+                this, ((DreamSysEntityObj *)entity)->methods->getMoodEffect(entity));
             this->instanceFlasbackUnlockScore +=
-                ((DreamSysEntityObj *)entity)->methods->slot0x150(entity);
+                ((DreamSysEntityObj *)entity)->methods->getUnlockEffect(entity);
             this->methods->flashbackSaving(this, 0, 0x10);
             break;
         case 10: {
             s32 saved = this->currentStage;
-            this->currentStage = -((DreamSysEntityObj *)entity)->methods->slot0x154(entity);
+            this->currentStage = -((DreamSysEntityObj *)entity)->methods->getLinkStage(entity);
             this->methods->dynamicLink(this);
             if (this->currentStage < 0) {
                 this->currentStage = saved;
@@ -1293,7 +1290,7 @@ void DreamSys__InstanceEffectsOnJournal(DreamSys *this, void *entity, s32 effect
             }
             this->nextCinematic.bank = -1;
             this->tick = this->dreamTimeLimit;
-            this->nextCinematic.entry = ((DreamSysEntityObj *)entity)->methods->slot0x158(entity);
+            this->nextCinematic.entry = ((DreamSysEntityObj *)entity)->methods->getEventVideo(entity);
             break;
         case 12:
             if (this->isFlashbackSession != 0) {
@@ -1396,7 +1393,7 @@ DreamColors CalcDreamColor(MoodGraphPoint *mood) {
     s8(*table)[3];
 
     local.value = mood->value;
-    p = (s8 *)&local;
+    p = &local.axis.dynamic;
     for (i = 0; i < 2; i++, p++) {
         val = *p;
         if (val >= 4) {
@@ -1604,7 +1601,7 @@ s32 Test4TunnelLinks(PlayerSpawnPoint *target, PlayerSpawnPoint *currentPos, s32
    Moved above DreamSys__CheckTunnelHeading (round 43) because that function's own arg2 is
    cast to this type before being forwarded to IsHeadingAligned below. */
 typedef struct DirectionCheckArg {
-    s8 unk0[4];
+    u8 pad0[4];
     u16 heading;
 } DirectionCheckArg;
 
@@ -1619,11 +1616,7 @@ typedef struct DirectionCheckArg {
    handed to SceneNode__UpdateRotation as a rotation. */
 typedef struct DirectionTableEntry {
     u16 angle;
-    u16 unk2;
-    u16 unk4;
-    u16 unk6;
-    u16 unk8;
-    u16 unkA;
+    u16 pad2[5];
 } DirectionTableEntry;
 
 extern DirectionTableEntry CARDINAL_ANGLES[];
@@ -1823,7 +1816,7 @@ s32 GetStaticSpawn(PlayerSpawnPoint *target, PlayerSpawnPoint *currentPos, s32 s
     s32 triggerStage;
     u32 spawnIndex;
 
-    count = *(u8 *)&triggerLens[stage];
+    count = (u8)triggerLens[stage];
     if (count == 0)
         return -1;
 
@@ -1838,7 +1831,7 @@ s32 GetStaticSpawn(PlayerSpawnPoint *target, PlayerSpawnPoint *currentPos, s32 s
         gLinkTriggerIndex = i;
         triggerStage = trig->stage;
         gLinkDstStage = triggerStage;
-        spawnIndex = *(u8 *)&trig->spawnpointIndex;
+        spawnIndex = (u8)trig->spawnpointIndex;
         entry = &spawns[triggerStage][spawnIndex];
         gLinkSpawnIndex = spawnIndex;
         *(PlayerSpawnGridPos *)target = *(PlayerSpawnGridPos *)entry;
