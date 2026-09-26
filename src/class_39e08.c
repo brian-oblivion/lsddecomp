@@ -47,8 +47,8 @@ void Class865C8__Class865C8(Class865C8 *self, IntermediateBaseInitArgs *initArgs
     SetActiveDataSourceDriverMode((u32)arg3 < 1, 1, 1);
     self->initArgs = initArgs;
     initArgs->viewport = (BasicClass *)New_NodeGuardedViewport();
-    initArgs->unk8 = (BasicClass *)New_FrameClock();
-    initArgs->unkC = (BasicClass *)New_Class866E8(NULL, 1);
+    initArgs->frameClock = (BasicClass *)New_FrameClock();
+    initArgs->lightRig = (BasicClass *)New_Class866E8(NULL, 1);
     self->dreamSys = dreamSys;
     self->methods->addChild(self, (BasicClass *)dreamSys);
     dreamSys->methods->setSoundObj(dreamSys, (s32)self->sound);
@@ -61,10 +61,10 @@ void Class865C8__Finalize(Class865C8 *self) {
     BasicClass *g;
 
     self->methods->removeChild(self, (BasicClass *)self->dreamSys);
-    g = o->unkC;
-    o->unkC = g->methods->release(g);
-    g = o->unk8;
-    o->unk8 = g->methods->release(g);
+    g = o->lightRig;
+    o->lightRig = g->methods->release(g);
+    g = o->frameClock;
+    o->frameClock = g->methods->release(g);
     g = o->viewport;
     o->viewport = g->methods->release(g);
     self->bgm->methods->release(self->bgm);
@@ -93,8 +93,8 @@ void Class865C8__ResetPhase(Class865C8 *self) {
 s32 Class865C8__Init(Class865C8 *self) {
     DreamSys *sub = self->dreamSys;
 
-    sub->methods->addChild(sub, self->initArgs->unk4);
-    sub->methods->addChild(sub, self->initArgs->unk8);
+    sub->methods->addChild(sub, self->initArgs->pad);
+    sub->methods->addChild(sub, self->initArgs->frameClock);
     sub->methods->setViewport(sub, (Viewport *)self->initArgs->viewport);
     return GetClass86668Methods()->init((Class86668 *)self, self->initArgs, 0);
 }
@@ -104,7 +104,7 @@ void Class865C8__Deinit(Class865C8 *self) {
 
     GetClass86668Methods()->deinit((Class86668 *)self);
     sub->methods->setViewport(sub, 0);
-    sub->methods->removeChild(sub, self->initArgs->unk4);
+    sub->methods->removeChild(sub, self->initArgs->pad);
     sub->methods->removeChild(sub, self->unk10);
 }
 
@@ -114,7 +114,7 @@ void Class865C8__OnInit(Class865C8 *self) {
     SceneNode *ret;
     ViewportSize *size;
 
-    obj = (SubObjE *)self->initArgs->unk0;
+    obj = (SubObjE *)self->initArgs->drawSystem;
     vp = (Viewport *)self->viewport;
     size = obj->methods->slot7C(obj, 0);
     vp->methods->setScreenSize(vp, size);

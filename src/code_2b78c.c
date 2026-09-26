@@ -45,10 +45,10 @@ void Application__InitSystems(Application *self, DrawSystem *drawSystem, struct 
         SsInit();
         GsInit3D();
         self->aux = BMemPMgrAlloc(0x14);
-        self->aux->unk0 = (BasicClass *)drawSystem;
-        self->aux->unk4 = (BasicClass *)pad;
-        self->aux->unk8 = NULL;
-        self->aux->unkC = NULL;
+        self->aux->drawSystem = (BasicClass *)drawSystem;
+        self->aux->pad = (BasicClass *)pad;
+        self->aux->frameClock = NULL;
+        self->aux->lightRig = NULL;
         self->aux->viewport = NULL;
         self->initialized = 1;
     }

@@ -35,8 +35,9 @@ void ObjM__NoOpSlot40(void) {}
  * Class866E8 (IntermediateBase__Init keeps it as unk14), whose callback
  * becomes ObjM__OnRegistrantEvent. */
 void ObjM__AttachTarget(ObjM *self, IntermediateBaseInitArgs *args, DreamSys *dreamSys) {
-    ((Class866E8 *)args->unkC)
-        ->methods->setCallback((Class866E8 *)args->unkC, (Class866E8ValueFn)ObjM__OnRegistrantEvent, self);
+    ((Class866E8 *)args->lightRig)
+        ->methods->setCallback((Class866E8 *)args->lightRig,
+                               (Class866E8ValueFn)ObjM__OnRegistrantEvent, self);
     self->dreamSys = dreamSys;
     GetClass86668Methods()->init((Class86668 *)self, args, 1);
     self->methods->addChild(self, (BasicClass *)dreamSys);
@@ -304,7 +305,7 @@ void ObjM__SetupSceneStyle(ObjM *self) {
 
     vp->methods->detachViewChild(vp);
 
-    obj = (UnkCObj_3bb8c_l *)self->initArgs->unk0;
+    obj = (UnkCObj_3bb8c_l *)self->initArgs->drawSystem;
     val = *obj->methods->slot7C(obj, 0);
     vp->methods->setProjection(vp, val / 2 * 5 / 3 + D_8008AB34);
 

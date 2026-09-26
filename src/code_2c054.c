@@ -244,12 +244,12 @@ void TaskCore__OnInit(TaskCore *self) {
         self->bgLayer->methods->setColor(self->bgLayer, 1, (BgLayerRgb *)self->baseColor);
     }
     if (self->subHandle == 0) {
-        ((TaskTextObj *)self->initArgs->unk0)
-            ->methods->slot78((TaskTextObj *)self->initArgs->unk0, self->baseColor,
+        ((TaskTextObj *)self->initArgs->drawSystem)
+            ->methods->slot78((TaskTextObj *)self->initArgs->drawSystem, self->baseColor,
                               gDefaultStreamTaskInitData);
     }
-    ((TaskTextObj *)self->initArgs->unk0)
-        ->methods->slot78((TaskTextObj *)self->initArgs->unk0, self->baseColor, 0);
+    ((TaskTextObj *)self->initArgs->drawSystem)
+        ->methods->slot78((TaskTextObj *)self->initArgs->drawSystem, self->baseColor, 0);
     core->setOtLength(viewport, self->unk28);
     core->setUnk44(viewport, self->unk2C);
     core->setUnk48(viewport, self->unk30);
@@ -264,7 +264,7 @@ void TaskCore__OnDeinit(TaskCore *self) {
     viewport->methods->detachViewChild(viewport);
     self->bgLayer->methods->detachFromParent(self->bgLayer);
     if (self->unk34 != 0) {
-        ((TaskTextObj *)self->initArgs->unk0)
-            ->methods->slot78((TaskTextObj *)self->initArgs->unk0, self->unk93, 0);
+        ((TaskTextObj *)self->initArgs->drawSystem)
+            ->methods->slot78((TaskTextObj *)self->initArgs->drawSystem, self->unk93, 0);
     }
 }

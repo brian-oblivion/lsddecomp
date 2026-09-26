@@ -98,13 +98,13 @@ void IntermediateBase__Init(IntermediateBase *self, IntermediateBaseInitArgs *ar
     BasicClass *viewport;
 
     methods = self->methods;
-    if (args->unk8 != NULL) {
-        self->unk10 = args->unk8;
+    if (args->frameClock != NULL) {
+        self->unk10 = args->frameClock;
     } else {
         self->unk10 = (BasicClass *)New_FrameClock();
     }
-    if (args->unkC != NULL) {
-        self->unk14 = args->unkC;
+    if (args->lightRig != NULL) {
+        self->unk14 = args->lightRig;
     } else {
         self->unk14 = (BasicClass *)New_LightRig();
     }
@@ -115,13 +115,13 @@ void IntermediateBase__Init(IntermediateBase *self, IntermediateBaseInitArgs *ar
     }
     self->initArgs = args;
     viewport = self->viewport;
-    methods->addChild(self, args->unk0);
-    methods->addChild(self, args->unk4);
+    methods->addChild(self, args->drawSystem);
+    methods->addChild(self, args->pad);
     methods->addChild(self, self->unk10);
     methods->onInit(self, 0, 0, 0);
     self->initMode = mode;
     if (mode == 0) {
-        viewport->methods->addChild(viewport, args->unk0);
+        viewport->methods->addChild(viewport, args->drawSystem);
         viewport->methods->addChild(viewport, self->unk10);
         self->unk14->methods->addChild(self->unk14, self->unk10);
         methods->setState(self, 2);
@@ -139,18 +139,18 @@ void IntermediateBase__Deinit(IntermediateBase *self) {
     if (self->initMode == 0) {
         self->unk14->methods->removeChild(self->unk14, self->unk10);
         viewport->methods->removeChild(viewport, self->unk10);
-        viewport->methods->removeChild(viewport, self->initArgs->unk0);
+        viewport->methods->removeChild(viewport, self->initArgs->drawSystem);
     }
     methods->removeChild(self, self->unk10);
-    methods->removeChild(self, self->initArgs->unk4);
-    methods->removeChild(self, self->initArgs->unk0);
+    methods->removeChild(self, self->initArgs->pad);
+    methods->removeChild(self, self->initArgs->drawSystem);
     if (self->initArgs->viewport != viewport) {
         self->viewport = viewport->methods->release(viewport);
     }
-    if (self->initArgs->unkC != self->unk14) {
+    if (self->initArgs->lightRig != self->unk14) {
         self->unk14 = self->unk14->methods->release(self->unk14);
     }
-    if (self->initArgs->unk8 != self->unk10) {
+    if (self->initArgs->frameClock != self->unk10) {
         self->unk10 = self->unk10->methods->release(self->unk10);
     }
 }
@@ -160,7 +160,7 @@ void IntermediateBase__OnTag1Notify(IntermediateBase *self, BasicClass *sender, 
 
     if (event == 2) {
         ((FrameClock *)self->unk10)->methods->tick((FrameClock *)self->unk10);
-        obj4 = (IntermediateBaseLinked *)self->initArgs->unk4;
+        obj4 = (IntermediateBaseLinked *)self->initArgs->pad;
         obj4->methods->slot44(obj4);
         obj4->methods->slot48(obj4);
     }
@@ -196,14 +196,14 @@ void IntermediateBase__OnState2(IntermediateBase *self) {
     IntermediateBaseLinked *obj0;
 
     self->frameCounter = 0;
-    obj0 = (IntermediateBaseLinked *)self->initArgs->unk0;
+    obj0 = (IntermediateBaseLinked *)self->initArgs->drawSystem;
     obj0->methods->slot48(obj0);
 }
 
 void IntermediateBase__OnState3(IntermediateBase *self) {
     IntermediateBaseLinked *obj0;
 
-    obj0 = (IntermediateBaseLinked *)self->initArgs->unk0;
+    obj0 = (IntermediateBaseLinked *)self->initArgs->drawSystem;
     obj0->methods->slot4C(obj0);
     self->frameCounter = 0;
 }

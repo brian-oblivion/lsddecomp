@@ -55,8 +55,9 @@ void Class86B60__OnDeinit(Class86B60 *self) {
     i = 0;
     entry = (u8 *)&D_80086DAC;
     for (; i < 2; i++) {
-        ((Class86B60UnkC0Obj_3bb8c_d *)self->initArgs->unk0)
-            ->methods->slot78((Class86B60UnkC0Obj_3bb8c_d *)self->initArgs->unk0, self->unk93, entry);
+        ((Class86B60UnkC0Obj_3bb8c_d *)self->initArgs->drawSystem)
+            ->methods->slot78((Class86B60UnkC0Obj_3bb8c_d *)self->initArgs->drawSystem, self->unk93,
+                              entry);
         entry += 0xC;
     }
 }
@@ -227,15 +228,15 @@ void Class86B60__BeginMemcardSave(Class86B60 *self) {
         self->saveCtrl = New_TaskObjF(1, 0);
     }
     self->saveCtrl->methods->init(self->saveCtrl, D_8008A9D0, (char **)&D_80086D6C,
-                                  self->initArgs->unk4, self->unk10, (struct SceneNode *)self->unk14,
+                                  self->initArgs->pad, self->unk10, (struct SceneNode *)self->unk14,
                                   (struct VabStreamObj *)self->sound);
     self->methods->addChild(self, (BasicClass *)self->saveCtrl);
-    self->methods->removeChild(self, self->initArgs->unk4);
+    self->methods->removeChild(self, self->initArgs->pad);
     self->methods->removeChild(self, self->unk10);
 }
 
 void Class86B60__EndMemcardSave(Class86B60 *self) {
-    self->methods->addChild(self, self->initArgs->unk4);
+    self->methods->addChild(self, self->initArgs->pad);
     self->methods->addChild(self, self->unk10);
     self->methods->removeChild(self, (BasicClass *)self->saveCtrl);
     self->saveCtrl->methods->deinit(self->saveCtrl);

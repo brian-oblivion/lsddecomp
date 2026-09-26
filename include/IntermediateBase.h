@@ -38,10 +38,10 @@ typedef struct IntermediateBaseInitArgs IntermediateBaseInitArgs;
  * +0x00C. Class865C8__Class865C8 fills +0x008..+0x010 itself (New_FrameClock(),
  * New_Class866E8(0, 1), New_NodeGuardedViewport()). */
 struct IntermediateBaseInitArgs {
-    /* +0x000 */ BasicClass *unk0; /* added as a child; onState2 calls its +0x048, onState3 its +0x04C */
-    /* +0x004 */ BasicClass *unk4; /* added as a child; onTag1Notify's event 2 calls its +0x044, +0x048 */
-    /* +0x008 */ BasicClass *unk8; /* becomes unk10; NULL: init makes one with New_FrameClock() */
-    /* +0x00C */ BasicClass *unkC; /* becomes unk14; NULL: init makes one with New_LightRig() */
+    /* +0x000 */ BasicClass *drawSystem; /* Application__InitSystems: the DrawSystem; added as a child; onState2 calls its +0x048, onState3 its +0x04C */
+    /* +0x004 */ BasicClass *pad; /* Application__InitSystems: the Pad; added as a child; onTag1Notify's event 2 calls its +0x044, +0x048 */
+    /* +0x008 */ BasicClass *frameClock; /* becomes unk10; NULL: init makes one with New_FrameClock() */
+    /* +0x00C */ BasicClass *lightRig; /* becomes unk14; Class865C8 passes a Class866E8 (a LightRig); NULL: init makes one with New_LightRig() */
     /* +0x010 */ BasicClass *viewport; /* becomes viewport; NULL: init makes one with New_Viewport() */
 };
 
