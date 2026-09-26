@@ -112,7 +112,7 @@ void Class866E8__Disable(Class866E8 *self) {
 /* Class866E8__UpdateFootprintTracking -- see docs/match-reports/Class866E8__UpdateFootprintTracking.md. */
 s32 Class866E8__UpdateFootprintTracking(Class866E8 *self) {
     Descriptor10Ext buf;
-    Class866E8Elem *e;
+    ChunkSlot *e;
     s32 key;
     s32 result;
     u16 oldRaw;
@@ -161,7 +161,7 @@ void Class866E8__BuildRateEntries(Class866E8 *self, s32 val, LongVec3 *arg2, Tar
     s32 savedResult;
     s32 count;
     s32 i;
-    Class866E8Elem *e;
+    ChunkSlot *e;
     Unk14Obj *u14;
     LongVec3 *tbl;
     SetupEntry866E8 stackBuf[7];
@@ -305,7 +305,7 @@ storeKey:
  * See docs/match-reports/Class866E8__ApplyRateEntries.md. */
 void Class866E8__ApplyRateEntries(Class866E8 *self, SetupEntry866E8 *arr1, s32 count) {
     s32 i;
-    Class866E8Elem *e;
+    ChunkSlot *e;
     SetupSub866E8 *sp;
 
     for (i = 0; i < count; i++) {
@@ -349,7 +349,7 @@ s32 Class866E8__CountFlaggedElements(Class866E8 *self) {
 
 void Class866E8__OnNotifyTag1(Class866E8 *self, void *arg1, s32 mode) {
     s32 i;
-    Class866E8Elem *e;
+    ChunkSlot *e;
     s32 curMode;
 
     if (mode != 2) {
@@ -404,7 +404,7 @@ typedef struct BE54LoadReq {
 
 extern void GsLinkObject4(s32 tmd, void *objp, s32 n);
 
-void Class866E8__LoadElementResources(Class866E8 *self, Class866E8Elem *entry) {
+void Class866E8__LoadElementResources(Class866E8 *self, ChunkSlot *entry) {
     LbdFileHeader *info;
     LbdFileHeader *info2;
     LbdFile *hdr;
@@ -500,7 +500,7 @@ void Class866E8__LoadElementResources(Class866E8 *self, Class866E8Elem *entry) {
     }
 }
 
-void Class866E8__ResetElementCells(Class866E8 *self, Class866E8Elem *entry) {
+void Class866E8__ResetElementCells(Class866E8 *self, ChunkSlot *entry) {
     GridCell **p;
     GridCell **end;
 
@@ -545,7 +545,7 @@ Descriptor10 *Class866E8__GetTargetDescriptor(Class866E8 *self, Descriptor10Ext 
  *      placement schedules its `sw` too early; only trailing it after the
  *      h8 store reproduces retail's order. */
 s32 Class866E8__ComputeFootprintDescriptor(Class866E8 *self, Descriptor10Ext *out, QueryPos866E8 *in) {
-    Class866E8Elem *e;
+    ChunkSlot *e;
     Unk14Obj *u14a;
     Unk14Obj *u14b;
     s32 rate;
@@ -598,14 +598,14 @@ void Class866E8__ComputeDivisorSplit(Class866E8 *self, u8 *out, s32 val) {
     out[1] = val / self->config->columns;
 }
 
-Class866E8Elem *Class866E8__GetLastTargetRateSplit(Class866E8 *self, u8 *out) {
+ChunkSlot *Class866E8__GetLastTargetRateSplit(Class866E8 *self, u8 *out) {
     Class866E8__ComputeDivisorSplit(self, out, self->lastEventElem->loader->chunkIndex);
     return self->lastEventElem;
 }
 
-Class866E8Elem *Class866E8__FindElemByUnk32(Class866E8 *self, s32 key) {
+ChunkSlot *Class866E8__FindElemByUnk32(Class866E8 *self, s32 key) {
     s32 i;
-    Class866E8Elem *e;
+    ChunkSlot *e;
 
     for (i = 0; i < 7; i++) {
         e = &self->elems[i];
@@ -624,11 +624,11 @@ Class866E8Elem *Class866E8__FindElemByUnk32(Class866E8 *self, s32 key) {
  * load, as retail schedules it (a `w = ...;` statement before the `if`
  * fixes the add but swaps those two loads). See
  * docs/match-reports/Class866E8__FindElementForPosition.md. */
-Class866E8Elem *Class866E8__FindElementForPosition(Class866E8 *self, LongVec3 *arg1) {
+ChunkSlot *Class866E8__FindElementForPosition(Class866E8 *self, LongVec3 *arg1) {
     s32 i;
     s32 tol;
     s32 threshold;
-    Class866E8Elem *candidate;
+    ChunkSlot *candidate;
     Unk14Obj *r;
     s32 w;
 

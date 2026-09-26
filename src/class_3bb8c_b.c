@@ -28,7 +28,7 @@
 s32 Class866E8__FindElemIndexByUnk32(Class866E8 *self, s32 key) {
     s32 result;
     s32 i;
-    Class866E8Elem *e;
+    ChunkSlot *e;
 
     result = 0;
     for (i = 0; i < 7; i++) {
@@ -43,7 +43,7 @@ s32 Class866E8__FindElemIndexByUnk32(Class866E8 *self, s32 key) {
 
 s32 Class866E8__FindElemIndexByUnk30(Class866E8 *self, s32 key) {
     s32 i;
-    Class866E8Elem *e;
+    ChunkSlot *e;
 
     for (i = 0; i < 7; i++) {
         e = &self->elems[i];
@@ -306,7 +306,7 @@ void Class866E8__SetFootprintCellFlag(Class866E8 *self, s32 setBit) {
     s32 j;
     s32 k;
     GridSlot866E8 *slot;
-    Class866E8Elem *e;
+    ChunkSlot *e;
     GridCell **cell;
     GridCell *next;
 
@@ -426,9 +426,9 @@ void Class866E8__ResetChildRate(Class866E8 *self, GridCell *item) {
     item->methods->updateScale(item, 1, D_800869CC);
 }
 
-void Class866E8__ForEachElem(Class866E8 *self, Class866E8CellFn arg1, Class866E8ElemFn arg2) {
+void Class866E8__ForEachElem(Class866E8 *self, Class866E8CellFn arg1, ChunkSlotFn arg2) {
     s32 i;
-    Class866E8Elem *e;
+    ChunkSlot *e;
 
     for (i = 0; i < 7; i++) {
         e = &self->elems[i];
@@ -439,7 +439,7 @@ void Class866E8__ForEachElem(Class866E8 *self, Class866E8CellFn arg1, Class866E8
     }
 }
 
-void Class866E8__ForEachEntryChild(Class866E8 *self, Class866E8CellFn callback, Class866E8Elem *item) {
+void Class866E8__ForEachEntryChild(Class866E8 *self, Class866E8CellFn callback, ChunkSlot *item) {
     GridCell **p;
     GridCell **end;
 

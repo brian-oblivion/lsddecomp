@@ -79,7 +79,7 @@ extern LongVec3 gDefaultOrigin;
 
 void Class866E8__Class866E8(Class866E8 *self, LongVec3 *origin, s32 autoLoad) {
     s32 i;
-    Class866E8Elem *entry;
+    ChunkSlot *entry;
     GridCell *obj;
     GridCell **cellp;
     u8 *p;
@@ -157,7 +157,7 @@ void Class866E8__Class866E8(Class866E8 *self, LongVec3 *origin, s32 autoLoad) {
 
 void Class866E8__Finalize(Class866E8 *self) {
     s32 i;
-    Class866E8Elem *entry;
+    ChunkSlot *entry;
     GridCell *obj;
     GridCell **cellp;
     u8 *p;
@@ -226,7 +226,7 @@ void Class866E8__Reset(Class866E8 *self) {
     self->unk1D8 = -1;
 }
 
-void Class866E8__OnElementEvent(Class866E8 *self, s32 command, Class866E8Elem *elem) {
+void Class866E8__OnElementEvent(Class866E8 *self, s32 command, ChunkSlot *elem) {
     GetSceneNodeMethods()->notifyWithHull((SceneNode *)self, command);
 
     if (command == 6)
@@ -264,7 +264,7 @@ void Class866E8__DispatchLinkCommand(Class866E8 *self, BasicClass *sender, s32 c
  * byte offset. */
 void Class866E8__ResetAllElements(Class866E8 *self) {
     s32 i;
-    Class866E8Elem *entry;
+    ChunkSlot *entry;
     Class6D940 *list;
 
     for (i = 0; i < 7; i++) {
@@ -431,7 +431,7 @@ void Class866E8__DispatchToRectCells(Class866E8 *self, SceneNode *sender, s32 co
     s32 row;
     s32 col;
     GridSlot866E8 *entry;
-    Class866E8Elem *slot;
+    ChunkSlot *slot;
     GridCell **cell;
     GridCell *obj;
 

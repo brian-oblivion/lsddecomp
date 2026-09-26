@@ -63,7 +63,7 @@ struct GridCell;
 
 typedef struct Class866E8 Class866E8;
 typedef struct Class866E8Methods Class866E8Methods;
-typedef struct Class866E8Elem Class866E8Elem;
+typedef struct ChunkSlot ChunkSlot;
 
 /* A grid-cell descriptor, 10 bytes, alignment 2 (every member s8/s16, so a
  * whole copy is lwl/lwr + swl/swr + sh: SetTargetAndBuildRates). b0/b1 the
@@ -86,7 +86,7 @@ typedef struct Descriptor10Ext {
     Descriptor10 base; /* +0x000 */
     LongVec3 chunkCentre; /* +0x00C, the slot's cellParent position + 0x5000 in x and z (half a chunk) */
     LongVec3 relPos; /* +0x018, the queried position less chunkCentre in x and z; y as queried */
-    Class866E8Elem *slot; /* +0x024, the slot findElementForPosition resolved */
+    ChunkSlot *slot; /* +0x024, the slot findElementForPosition resolved */
     s32 chunkIndex;       /* +0x028, that slot's LbdFile::chunkIndex, sign-extended */
 } Descriptor10Ext;
 
@@ -176,7 +176,7 @@ typedef struct Bounds866E8_3bb8c_b {
 } Bounds866E8_3bb8c_b;
 
 /* One of the seven elements, 0x1C bytes (the ctor, Finalize). */
-struct Class866E8Elem {
+struct ChunkSlot {
     /* +0x000 */ u16 loadPending; /* 1 while its load is pending (ApplyRateEntries; OnNotifyTag1 clears it) */
     /* +0x002 */ u16 neighbour; /* the ctor: its index; BuildRateEntries: the spec's neighbour, copied on into loader->elemKey */
     /* +0x004 */ struct LbdFile *loader; /* New_LbdFile(): the element's file (include/LbdFile.h) */
@@ -218,15 +218,15 @@ struct Class866E8Methods {
                                           s32 count); /* Class866E8__ApplyRateEntries */
     /* +0x100 */ void (*onNotifyTag1)(Class866E8 *self, void *sender,
                                       s32 mode); /* Class866E8__OnNotifyTag1; OnNotify's class-1 sender case */
-    /* +0x104 */ void (*loadElementResources)(Class866E8 *self, Class866E8Elem *elem); /* Class866E8__LoadElementResources */
-    /* +0x108 */ void (*resetElementCells)(Class866E8 *self, Class866E8Elem *elem); /* Class866E8__ResetElementCells */
+    /* +0x104 */ void (*loadElementResources)(Class866E8 *self, ChunkSlot *elem); /* Class866E8__LoadElementResources */
+    /* +0x108 */ void (*resetElementCells)(Class866E8 *self, ChunkSlot *elem); /* Class866E8__ResetElementCells */
     /* +0x10C */ Descriptor10 *(*getTargetDescriptor)(Class866E8 *self, Descriptor10Ext *out,
                                                       void **outPos); /* Class866E8__GetTargetDescriptor */
     /* +0x110 */ s32 (*computeFootprintDescriptor)(Class866E8 *self, Descriptor10Ext *out,
                                                    QueryPos866E8 *pos); /* Class866E8__ComputeFootprintDescriptor: 0, or 1 when no element holds pos */
-    /* +0x114 */ Class866E8Elem *(*getLastTargetRateSplit)(Class866E8 *self, u8 *out); /* Class866E8__GetLastTargetRateSplit */
-    /* +0x118 */ Class866E8Elem *(*findElemByUnk32)(Class866E8 *self, s32 key); /* Class866E8__FindElemByUnk32 */
-    /* +0x11C */ Class866E8Elem *(*findElementForPosition)(Class866E8 *self, LongVec3 *pos); /* Class866E8__FindElementForPosition */
+    /* +0x114 */ ChunkSlot *(*getLastTargetRateSplit)(Class866E8 *self, u8 *out); /* Class866E8__GetLastTargetRateSplit */
+    /* +0x118 */ ChunkSlot *(*findElemByUnk32)(Class866E8 *self, s32 key); /* Class866E8__FindElemByUnk32 */
+    /* +0x11C */ ChunkSlot *(*findElementForPosition)(Class866E8 *self, LongVec3 *pos); /* Class866E8__FindElementForPosition */
     /* +0x120 */ s32 (*findElemIndexByUnk32)(Class866E8 *self, s32 key); /* Class866E8__FindElemIndexByUnk32 */
     /* +0x124 */ s32 (*findElemIndexByUnk30)(Class866E8 *self, s32 key); /* Class866E8__FindElemIndexByUnk30: an index or -1 */
     /* +0x128 */ void (*refreshFootprint)(Class866E8 *self); /* Class866E8__RefreshFootprint */
@@ -259,12 +259,12 @@ struct Class866E8 {
     /* +0x08C */ GridSlotList866E8 rects; /* BuildFootprintSlots, SetFootprintRect, InitFootprintSlot write; DispatchToRectCells, SetFootprintCellFlag walk */
     /* +0x0BC */ Descriptor10Ext targetCell; /* UpdateFootprintTracking: the target's last descriptor; SetTargetAndBuildRates sets .base; getTargetDescriptor returns &.base */
     /* +0x0E8 */ s32 *acceptedTags; /* setAcceptedTags: a 0-terminated list of class ids ForwardAcceptedCommand accepts */
-    /* +0x0EC */ Class866E8Elem elems[7];
+    /* +0x0EC */ ChunkSlot elems[7];
     /* +0x1B0 */ s32 loadsPending; /* 1 while element loads are pending (ApplyRateEntries; OnNotifyTag1 clears it) */
     /* +0x1B4 */ u16 unk1B4; /* CountFlaggedElements after ApplyRateEntries; OnNotifyTag1 counts it down */
     /* +0x1B6 */ u8 pad1B6[0x1B8 - 0x1B6];
     /* +0x1B8 */ s32 chunksLoaded; /* set when that count reaches 0; RefreshFootprint does nothing while it is 0 */
-    /* +0x1BC */ Class866E8Elem *lastEventElem; /* OnElementEvent's elem; GetLastTargetRateSplit reads it */
+    /* +0x1BC */ ChunkSlot *lastEventElem; /* OnElementEvent's elem; GetLastTargetRateSplit reads it */
     /* +0x1C0 */ Descriptor10 curCell; /* DispatchToRectCells: the cell being notified (b0/b1 copied from targetCell as a u16); getCurrentCellKey returns it */
     /* +0x1CA */ u8 pad1CA[0x1CC - 0x1CA];
     /* +0x1CC */ s32 unk1CC;                  /* Reset: -1; GetUnk1CC returns its address */
@@ -277,11 +277,11 @@ struct Class866E8 {
 }; /* 0x1E8 bytes: New_Class866E8 */
 
 /* +0x088's occupant, which takes the element too (see the banner). */
-typedef void (*Class866E8OnElementEventFn)(Class866E8 *self, s32 command, Class866E8Elem *elem, s32 index);
+typedef void (*Class866E8OnElementEventFn)(Class866E8 *self, s32 command, ChunkSlot *elem, s32 index);
 
 /* ForEachElem's callbacks. */
 typedef void (*Class866E8CellFn)(Class866E8 *self, struct GridCell *cell);
-typedef void (*Class866E8ElemFn)(Class866E8 *self, Class866E8Elem *elem);
+typedef void (*ChunkSlotFn)(Class866E8 *self, ChunkSlot *elem);
 
 extern Class866E8Methods gClass866E8Methods;
 extern Class866E8Methods *GetClass866E8Methods(void); /* returns &gClass866E8Methods */
@@ -293,7 +293,7 @@ void Class866E8__Class866E8(Class866E8 *self, LongVec3 *origin, s32 autoLoad);
 void Class866E8__Finalize(Class866E8 *self);
 void Class866E8__OnNotify(Class866E8 *self, BasicClass *sender, s32 command);
 void Class866E8__Reset(Class866E8 *self);
-void Class866E8__OnElementEvent(Class866E8 *self, s32 command, Class866E8Elem *elem);
+void Class866E8__OnElementEvent(Class866E8 *self, s32 command, ChunkSlot *elem);
 void Class866E8__UpdateIfEnabled(Class866E8 *self);
 void Class866E8__DispatchLinkCommand(Class866E8 *self, BasicClass *sender, s32 command);
 void Class866E8__ResetAllElements(Class866E8 *self);
@@ -325,14 +325,14 @@ s32 Class866E8__ComputeRateEntry(Class866E8 *self, SetupEntry866E8 *entry, s32 d
 void Class866E8__ApplyRateEntries(Class866E8 *self, SetupEntry866E8 *entries, s32 count);
 s32 Class866E8__CountFlaggedElements(Class866E8 *self);
 void Class866E8__OnNotifyTag1(Class866E8 *self, void *sender, s32 mode);
-void Class866E8__LoadElementResources(Class866E8 *self, Class866E8Elem *elem);
-void Class866E8__ResetElementCells(Class866E8 *self, Class866E8Elem *elem);
+void Class866E8__LoadElementResources(Class866E8 *self, ChunkSlot *elem);
+void Class866E8__ResetElementCells(Class866E8 *self, ChunkSlot *elem);
 Descriptor10 *Class866E8__GetTargetDescriptor(Class866E8 *self, Descriptor10Ext *out, void **outPos);
 s32 Class866E8__ComputeFootprintDescriptor(Class866E8 *self, Descriptor10Ext *out, QueryPos866E8 *pos);
 void Class866E8__ComputeDivisorSplit(Class866E8 *self, u8 *out, s32 val);
-Class866E8Elem *Class866E8__GetLastTargetRateSplit(Class866E8 *self, u8 *out);
-Class866E8Elem *Class866E8__FindElemByUnk32(Class866E8 *self, s32 key);
-Class866E8Elem *Class866E8__FindElementForPosition(Class866E8 *self, LongVec3 *pos);
+ChunkSlot *Class866E8__GetLastTargetRateSplit(Class866E8 *self, u8 *out);
+ChunkSlot *Class866E8__FindElemByUnk32(Class866E8 *self, s32 key);
+ChunkSlot *Class866E8__FindElementForPosition(Class866E8 *self, LongVec3 *pos);
 s32 Class866E8__FindElemIndexByUnk32(Class866E8 *self, s32 key);
 s32 Class866E8__FindElemIndexByUnk30(Class866E8 *self, s32 key);
 void Class866E8__RefreshFootprint(Class866E8 *self);
@@ -351,7 +351,7 @@ void Class866E8__AdvanceRateCountdown(Class866E8 *self);
 void Class866E8__FlushRateLatch(Class866E8 *self);
 void Class866E8__ApplyRateToChild(Class866E8 *self, struct GridCell *cell);
 void Class866E8__ResetChildRate(Class866E8 *self, struct GridCell *cell);
-void Class866E8__ForEachElem(Class866E8 *self, Class866E8CellFn cellFn, Class866E8ElemFn elemFn);
-void Class866E8__ForEachEntryChild(Class866E8 *self, Class866E8CellFn cellFn, Class866E8Elem *elem);
+void Class866E8__ForEachElem(Class866E8 *self, Class866E8CellFn cellFn, ChunkSlotFn elemFn);
+void Class866E8__ForEachEntryChild(Class866E8 *self, Class866E8CellFn cellFn, ChunkSlot *elem);
 
 #endif

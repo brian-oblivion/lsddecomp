@@ -126,7 +126,7 @@ void ObjM__OnClass866E8Notify(ObjM *self, BasicClass *sender, s32 event) {
 s32 ObjM__CheckAuxTrigger(ObjM *self) {
     s32 out;
     s32 result;
-    Class866E8Elem *elem =
+    ChunkSlot *elem =
         ((Class866E8 *)self->unk14)->methods->getLastTargetRateSplit((Class866E8 *)self->unk14, (u8 *)&out);
     void *thing = (void *)self->dreamSys->methods->getCurrentDayAndYear(self->dreamSys, 0);
     result = TryDreamAuxTrigger((s32)elem->loader->dataBuffer, &out, thing);
