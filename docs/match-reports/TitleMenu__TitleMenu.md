@@ -145,3 +145,50 @@ Its up-calls to TaskCore (include/TaskCore.h, track 4 round 84) now go through `
 ## Track 4 (2026-09-26, round 88, bravo)
 
 TitleMenu is unified in include/TitleMenu.h (TASKCORE_SLOTS/TASKCORE_FIELDS plus its own). The body now reads at TaskCore's names: `unk48` is TaskCore's `sound`, called at +0x09C through VabStreamObj (setPitchOffset, as GraphRoom's ctor does); `slotD8` is setTarget, with D_80086D44 retyped TaskCoreTarget; `onConstruct` (+0x040) is resetCounters, called through TitleMenuResetCallFn because the call passes dreamSys and the slot (and TitleMenu__Reset) take self alone; `unkBC`/`unkC0` are `saveBlock` (`s32 *`, getSaveBlock's result, no cast now) and `saveBlockSize`. Byte-identical (whole image green, 0 new warnings, nonmatching green).
+
+## Track 6 (2026-09-26, round 93, delta): the class is TitleMenu
+
+`python3 tools/renametype.py Class86B60 TitleMenu` (was named by its table's
+address, gClass86B60Methods at 0x80086B60). Tier A for the class name, from
+data the class itself reads:
+
+- its TaskCoreTarget, D_80086D44, has `names` = D_80086CF8 = "START",
+  "FLASHBACK", "SAVE", "LOAD", "GRAPH", "SHAKE" (asm/data/7B12C.sdata.s,
+  1C34.rodata.s), and TitleMenu__Reset sets the backdrop to "ETC\TITLE.TIM";
+- tick's cases agree with that order: 1 (FLASHBACK) opens a flashback session
+  (DreamSys getSetFlashbackSession(0, 1)), 2 (SAVE) calls saveCtrl's
+  beginSave, 3 (LOAD) its beginLoad, 4 (GRAPH) returns 2, and
+  GameApplication__PollGraphRoomStatus runs GraphRoom again on a 2;
+- refreshViewValue stores slotCounts[5] (SHAKE, the one slot with an item
+  list, unk24[5] = D_80086CA8) through getSetScreenShake;
+- registrationSlots D_80086CDC = {0, 1, 0, ...}: FLASHBACK starts locked, and
+  CheckSaveScoreFlag (called from RefreshMenu with `self->target`) writes
+  registrationSlots[1];
+- the TextRow shows D_8008AA18's buffer, 0x8001149C, SJIS "LSD   Day001",
+  the memory-card save title; FormatNumberIntoBuffer writes the day at +0x12.
+
+Method renames, each its own `rename.py` commit (tier B: mechanics named,
+from the body and the menu entry that reaches them):
+
+| old | new | evidence |
+| --- | --- | --- |
+| UpdateMemcardSaveWithIcon | SaveToCard | tick's SAVE case; calls saveCtrl's beginSave |
+| UpdateMemcardSaveStatus | LoadFromCard | tick's LOAD case; calls saveCtrl's beginLoad |
+| BeginMemcardSave | BeginCardAccess | run before both save and load: makes saveCtrl, gives it input |
+| EndMemcardSave | EndCardAccess | undoes BeginCardAccess on saveCtrl's 0x16/0x17 |
+| OnTagBValue | OnCardEvent | onNotify's case for a sender whose class id ends 0xB (TaskObjF) |
+| CommitNameEntry | RefreshMenu | no name is entered here: it reloads the title text, FLASHBACK's lock, the widgets and SHAKE's cursor |
+| CreateNameField | CreateSaveTitle | the TextRow is the save title, not an editable name |
+| DestroyNameField | DestroySaveTitle | releaseTarget override |
+| ForwardToNameField | AttachSaveTitle | updateSlotElements override: attachToParent |
+| TickNameFieldCursor | CycleSaveTitleColor | broadcastToSlots override: one colour channel a frame |
+
+Header edit (one commit): the six own slots take the methods' names, and the
+fields `nameField` -> `saveTitle`, `iconHandle` -> `saveIcon`; all their
+accessors are in src/class_3bb8c_d.c. The old banner's history ("unified
+round 88", "Named by its table's address") is this section and the Track 4
+sections above.
+
+Known, pending an operator decision: renametype.py and rename.py rewrote the
+old names inside the history prose of this class's reports, so earlier
+sections read with today's names.
