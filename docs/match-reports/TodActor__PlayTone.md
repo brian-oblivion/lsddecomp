@@ -1,4 +1,6 @@
-# TodActor__func_800661D4
+# TodActor__PlayTone
+
+> Renamed from `TodActor__func_800661D4` on 2026-09-26 (tools/rename.py). Address 0x800661d4.
 
 > Renamed from `Class65650__func_800661D4` on 2026-09-26 (tools/rename.py). Address 0x800661d4.
 
@@ -19,7 +21,7 @@ literal `0x6E` twice (once as `$a2`, once — separately, in the delay slot of
 the `jalr` — as `$a3`).
 
 ```c
-void TodActor__func_800661D4(TodActor *self, void *arg1)
+void TodActor__PlayTone(TodActor *self, void *arg1)
 {
     UnkArg2Obj *obj;
 
@@ -53,7 +55,7 @@ unset (i.e. retains its function-entry value) at the call site.
 
 Round 75 (charlie), track 3.
 
-- `TodActor__func_800661D4` (was `func_800661D4`), tier C. Occupies +0x124 (classtable). If arg2 (+0x58, the ctor's third parameter) is set, calls arg2->methods->slot80(arg2, arg, 0x6E, 0x6E). Neither arg2's class nor slot80's occupant is identified and no caller of +0x124 on this class was found, so the placeholder stays with the class prefix.
+- `TodActor__PlayTone` (was `func_800661D4`), tier C. Occupies +0x124 (classtable). If arg2 (+0x58, the ctor's third parameter) is set, calls arg2->methods->slot80(arg2, arg, 0x6E, 0x6E). Neither arg2's class nor slot80's occupant is identified and no caller of +0x124 on this class was found, so the placeholder stays with the class prefix.
 
 ## Track 4 (2026-09-25, round 85, alpha)
 

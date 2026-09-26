@@ -61,7 +61,7 @@ function's *body* must not reference it.
 ### Proposed learning
 
 Refines the "forward an argument nobody names" pattern from
-`TodActor__func_800661D4.md`: forwarding only reproduces retail when the forwarded
+`TodActor__PlayTone.md`: forwarding only reproduces retail when the forwarded
 value is used **at most once, with no intervening call** (or, as here, used
 zero times but still physically present in the register at entry). The
 moment a source explicitly re-uses a parameter *after* a call that might

@@ -337,7 +337,7 @@ void TodActor__TickCallbackB(void) {}
 
 void TodActor__TickCallbackC(void) {}
 
-void TodActor__func_800661D4(TodActor *self, void *arg1) {
+void TodActor__PlayTone(TodActor *self, void *arg1) {
     UnkArg2Obj *obj;
 
     obj = self->arg2;

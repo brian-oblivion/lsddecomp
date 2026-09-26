@@ -31,7 +31,7 @@ typedef struct TagCheckArg {
 #define MODEL_DATA_CLASS_HEADER 0x5F03
 
 /* Whatever class self->arg2 points at: unidentified, only its
- * vtable slot +0x080 is needed so far, by TodActor__func_800661D4. */
+ * vtable slot +0x080 is needed so far, by TodActor__PlayTone. */
 typedef struct UnkArg2Methods {
     u8 pad00[0x80];                                         /* +0x000 .. +0x07C, unknown */
     void (*slot80)(void *self, void *arg1, s32 a2, s32 a3); /* +0x080 */
