@@ -43,6 +43,7 @@
 
 #include "common.h"
 #include "code_2cc8c.h"
+#include "VabStreamObj.h"
 
 void TaskCore__OnPadEvent(TaskCore *self, BasicClass *sender, s32 event)
 {
@@ -159,11 +160,11 @@ void TaskCore__SetFrameBound(TaskCore *self, s32 bound)
 
 void TaskCore__PlaySound(TaskCore *self, s32 tone)
 {
-    Unk48Obj *sound;
+    VabStreamObj *sound;
 
-    sound = (Unk48Obj *)self->sound;
+    sound = (VabStreamObj *)self->sound;
     if (sound != NULL) {
-        sound->methods->slot80(sound, tone, 0x60, 0x60);
+        sound->methods->playTone(sound, tone, 0x60, 0x60);
     }
 }
 

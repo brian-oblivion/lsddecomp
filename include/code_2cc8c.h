@@ -23,14 +23,12 @@ typedef struct TexPageDesc TexPageDesc;
  *
  * What stays below are this unit family's views of the classes TaskCore
  * holds and has no header for yet: TaskCore.h types those fields
- * `BasicClass *` and the accessors here cast to the view (`Unk48Obj`:
- * `sound`, a VabStreamObj; `Unk78Obj`: `bgLayer`; `Unk74Obj`: `subHandle`
+ * `BasicClass *` and the accessors here cast to the view (`sound`, a
+ * VabStreamObj, is cast to include/VabStreamObj.h's type; `Unk78Obj`: `bgLayer`; `Unk74Obj`: `subHandle`
  * and TaskCoreTarget's `handle`; `Unk64Elem`: the slot and item widgets,
  * New_Obj6EAC0; `listView` is a BoxFill, include/BoxFill.h). `SlotEntry` and
  * `SrcDesc` are two readings of one TaskCoreTarget::unk24[] record.
  */
-typedef struct Unk48Obj Unk48Obj;
-typedef struct Unk48ObjMethods Unk48ObjMethods;
 typedef struct Unk78Obj Unk78Obj;
 typedef struct Unk78ObjMethods Unk78ObjMethods;
 typedef struct Unk74Obj Unk74Obj;
@@ -116,17 +114,6 @@ struct SlotEntry {
                     passed by address to an Unk64Elem slotBC call, then
                     incremented by 10 per loop iteration -- see
                     TaskCore__CommitElementScroll/TaskCore__RefreshSlotView */
-};
-
-/* TaskCore::sound's pointee, a VabStreamObj (New_VabStreamObj): its +0x080 is
- * VabStreamObj__PlayTone. Only TaskCore__PlaySound calls through it, so only
- * that one slot is modelled. */
-struct Unk48ObjMethods {
-    u8 pad000[0x080];
-    void (*slot80)(Unk48Obj *self, s32 a1, s32 a2, s32 a3); /* +0x080 */
-};
-struct Unk48Obj {
-    Unk48ObjMethods *methods; /* +0x000 */
 };
 
 /* TaskCore::bgLayer's pointee (a BgLayer; +0x0B8 is BgLayer__SetColor). Only TaskCore__TickColorFade touches it, calling one slot
