@@ -1224,7 +1224,8 @@
     "5": {
       "checklist": {
         "docs-budget": true,
-        "nonmatching-clean": true
+        "nonmatching-clean": true,
+        "readme": true
       },
       "reason": "",
       "status": "auto"
