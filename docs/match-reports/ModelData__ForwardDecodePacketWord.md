@@ -43,3 +43,7 @@ void *ModelData__ForwardDecodePacketWord(ModelData *self, s32 arg1, s32 arg2, s3
 ## Track 4
 
 2026-09-25, round 84 (delta): ModelData (D_8006F384) is unified in `include/ModelData.h`; the unit-shared `DataSrc33808` view no longer types it. Slot +0x084 is `decodePacketWord`. The TodSet's slot +0x080 lies past Class6D430's table, and the TodSet class (D_8006F590) is not unified, so the call reaches it through `((DataSrc33808 *)self->todSet)->methods->slot80`: a pointer cast, no code. Image byte-identical.
+
+## Track 4 (2026-09-26, round 88, delta)
+
+The forwarded call now reaches the TodSet at +0x030 through its own table, `((TodSet *)self->todSet)->methods->decodePacketWord(...)`, instead of casting it to the unit-local DataSrc33808 for `slot80`; the s32 arguments (ModelData.h's slot type, unchanged) are cast to the slot's pointer types, which emits no code. Holding the pointer in a local first did NOT match (the whole-image SHA1 went red); the double cast inline does. Bytes unchanged.

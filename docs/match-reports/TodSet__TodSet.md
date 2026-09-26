@@ -43,3 +43,7 @@ First build. Slot +0x064 is `void setFlag(Self *)` in the unified macro, but thi
 ## Naming
 
 - **TodSet__TodSet**, tier A. Constructor: the parent Tod's ctor, then this table; runs Load when the argument's first word is set.
+
+## Track 4 (2026-09-26, round 88, delta)
+
+Now `void *TodSet__TodSet(TodSet *self, struct Src6F240 *src)` (include/TodSet.h). The parent call goes through the typed base table, `GetTodMethods()->ctor((Tod *)self, src)`, instead of Ctor33808 (Tod__Tod returns nothing, so the void slot fits it). `*arg != 0` is now `src->buffer != NULL`: it is the same first word, the buffer Tod__Tod adopts. The +0x064 call keeps its cast: the inherited slot is `void setFlag`, the occupant TodSet__BuildTods returns s32. Bytes unchanged.

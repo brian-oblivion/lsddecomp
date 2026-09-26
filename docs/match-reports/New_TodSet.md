@@ -45,3 +45,7 @@ void *New_TodSet(s32 arg0) {
 ## Naming
 
 - **New_TodSet**, tier A. include/code_55dd4.h's Unk30Obj is already "the TOD set, see Unk30Obj", built by this allocator over an array of Tod objects.
+
+## Track 4 (2026-09-26, round 88, delta)
+
+Now `TodSet *New_TodSet(struct Src6F240 *src)` (include/TodSet.h): the argument is the construction descriptor TodSet__TodSet hands straight to Tod__Tod, and the object is a TodSet (0x2C bytes, no own fields). The ctor is still reached through the unprototyped Ctor33808 view, because TOD_SLOTS types +0x008 returning void while this ctor returns self or NULL. ModelData__BuildResources, the one caller, casts `(Src6F240 *)&req` in and `(Class6D430 *)` out (ModelData.todSet is still `Class6D430 *`). Bytes unchanged.

@@ -31,3 +31,7 @@ void *GetTodSetMethods(void) {
 ## Naming
 
 - **GetTodSetMethods**, tier A. Table getter.
+
+## Track 4 (2026-09-26, round 88, delta)
+
+Now `TodSetMethods *GetTodSetMethods(void)` returning `&D_8006F590` (include/TodSet.h), replacing the unit-local `extern s32 D_8006F590[]` and `void *` prototype. Bytes unchanged.

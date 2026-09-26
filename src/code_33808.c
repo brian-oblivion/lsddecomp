@@ -58,8 +58,9 @@ typedef struct DataSrc33808 DataSrc33808;
 /* Unit-local view of this unit's Class6D430 data-source subclasses: the
  * interface plus the extra slots their methods call. Unprototyped where a
  * caller passes no argument. Not ModelData's (D_8006F384) nor Tod's
- * (D_8006F240): those classes are include/ModelData.h (track 4, round 84)
- * and include/Tod.h (round 86). */
+ * (D_8006F240) nor TodSet's (D_8006F590): those classes are
+ * include/ModelData.h (track 4, round 84), include/Tod.h (round 86) and
+ * include/TodSet.h (round 88). */
 typedef struct DataSrc33808Methods {
     CLASS6D430_SLOTS(DataSrc33808, (DataSrc33808 *self));
     /* +0x07C */ s32 (*slot7C)();
