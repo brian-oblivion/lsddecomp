@@ -7,32 +7,96 @@ This project's head start comes almost entirely from
 and — as far as we could find — only prior decompilation attempt on *LSD: Dream
 Emulator*. What we took from it, and what we deliberately did not:
 
-**Taken (facts about the binary):**
+**Taken at bootstrap (2026-08-28, commit `50e62526`), from lsddecomp as it
+stood at `c677d8f4e5df` (2024-09-13):**
 
 - The **splat segmentation** in `config/splat.slps01556.lsdde.yaml`: where the
   Psy-Q library blocks sit, where each rodata slot pairs to, where the game's
-  own code begins, and the `$gp` value. Finding these is slow, careful work and
-  the result is a set of measurements, not authorship.
-- The **symbol names** in `config/symbols.slps01556.lsdde.txt` — 146 of them,
-  covering the `DreamSys` and `StageGrid` subsystems, the Psy-Q entry points
-  and the class constructors.
+  own code begins, and the `$gp` value (`0x8008A808`). Finding these is slow,
+  careful work and the result is a set of measurements, not authorship.
+  lsddecomp's yaml has 55 subsegment boundaries; all 55 were taken, and 53 of
+  them are still boundaries in today's yaml, among the many added by carving
+  since.
+- **146 symbol names**, merged from lsddecomp's two symbol files
+  (`config/symbols.slps01556.lsdde.txt` and `symbols_addrs_manual.txt`) into
+  ours. Three of their names were dropped in the merge because they were an
+  earlier guess at an address the other file named again (`new_GameManager`,
+  `GameManager__GameManager`, `new_DreamEntity`); the symbols file's own header
+  records this.
 - The **project headers** `types.h`, `common.h`, `StageGrid.h` and
   `DreamSys.h`, which encode struct layouts derived from the disassembly.
-- `docs/research/DreamTimer.md`, their write-up of the dream timer mechanics.
+  `types.h` and `common.h` are byte-identical to lsddecomp's today.
+  `StageGrid.h` and `DreamSys.h` had their `//` comments rewritten as `/* */`
+  for GCC 2.6.3's C89 `cpp`; since then `StageGrid.h` has changed by 7 lines
+  and `DreamSys.h` has grown from 358 lines to 1094 as its classes
+  were decompiled (`git diff --stat 50e62526 HEAD -- include/`).
+- **Files that are not lsddecomp's own authorship but came to us through it**,
+  byte-identical to its copies: the 42 Sony Psy-Q SDK headers under
+  `include/psyq/` (including `SYS/`), and `include/gte.inc`, a table of GTE
+  opcode macros. `include/include_asm.h` and `include/macro.inc` share names
+  with lsddecomp's files but were rewritten here at bootstrap.
+- `docs/research/DreamTimer.md`, their write-up of the dream timer mechanics,
+  byte-identical to their `research-docs/DreamTimer.md`. It cites the
+  [compu-lsd wiki](https://compu-lsd.com/w/Graph#Connection_to_starting_Field)
+  for how the mood graph picks the next day's starting area.
 
-**Not taken:** their C source. `src/DreamSys.c` and `src/StageGrid.c` here are
-splat-generated `INCLUDE_ASM` stubs, and every function is being re-derived from
-the disassembly in this repo. That is a provenance choice rather than a
-criticism — lsddecomp carries no license file, so the safe reading is that its
-authored source is theirs. Facts about a binary that anyone re-measuring would
-arrive at are a different thing from a person's written code.
+**Not taken:** their C source (`src/lsdde/DreamSys.c`, `src/lsdde/StageGrid.c`)
+and their tooling (`tools/m2ctx.py` here is a separate script). Our
+`src/DreamSys.c` and `src/StageGrid.c` began as splat-generated `INCLUDE_ASM`
+stubs, 118 and 2 of them; every function in both has since been re-derived
+from the disassembly in this repo and neither file has an `INCLUDE_ASM` left.
+That is a provenance choice rather than a criticism — lsddecomp carries no
+license file, so the safe reading is that its authored source is theirs. Facts
+about a binary that anyone re-measuring would arrive at are a different thing
+from a person's written code.
 
 **A warning that came with the names, and it is worth repeating.** From
 lsddecomp's own README: there has never been a symbol file leak for this game,
-so every name in `config/symbols.slps01556.lsdde.txt` was either hand-written by
-FirecatFG or inferred by `ghidra_psx_ldr`. **None of it is the developers'
-naming.** Treat a symbol name as a hypothesis the disassembly can overturn,
-exactly as you would treat a guessed struct layout.
+so every inherited name was either hand-written by FirecatFG or inferred by
+`ghidra_psx_ldr`. **None of it is the developers' naming.** This project treats
+each one as a hypothesis the disassembly can overturn (a tier-B name, in
+`docs/FINISHING-PLAN.md` track 3's terms), and the names were how a C++ reading
+nearly got adopted before the bytes ruled it out
+(`docs/research/class-framework.md`).
+
+### What is left of the inherited names
+
+Measured 2026-09-26 (round 89), by name *and* address:
+
+```sh
+git show 50e62526:config/symbols.slps01556.lsdde.txt \
+  | grep -oE '^[A-Za-z_][A-Za-z0-9_]* = 0x[0-9A-Fa-f]+' | sort > /tmp/inherited
+grep -oE '^[A-Za-z_][A-Za-z0-9_]* = 0x[0-9A-Fa-f]+' config/symbols.slps01556.lsdde.txt \
+  | sort > /tmp/current
+wc -l < /tmp/inherited                    # 146 inherited
+comm -12 /tmp/inherited /tmp/current      # 125 still in use
+comm -23 /tmp/inherited /tmp/current      # 21 renamed (every address is still named)
+```
+
+- **21 renamed.** The 12 `BasicClass__func_*` placeholders now say what each
+  method does (`BasicClass__AddChild`, `BasicClass__NotifyParents`, ...); the
+  six `new_class_*` / `class_65650__*` names became `New_TmdModel`,
+  `New_DrawSystem`, `New_CdDriver`, `New_Class6D3C8`, `New_Class6D940`,
+  `New_Class65650` and `Class65650__Class65650`; and two `DreamSys__func_*`
+  became `DreamSys__ResetSessionState` and `DreamSys__SpawnAtLink`.
+- **25 of the 125 survivors are Sony's names for Sony's code**, not guesses:
+  each sits in a Psy-Q object the build links (`build/lsdde.map`), in a
+  `psyq_*` disassembly segment (`GsLinkObject4`, `ResetGraph`), or in
+  `config/sdk-in-game.txt` (`SetRCnt`), and where the object is linked its own
+  symbol table carries the same name — `_ExpAllocArea`, for instance, is the
+  function at the start of `libc2`'s `malloc.o`.
+- **59 are game function names**, every one with a match report under
+  `docs/match-reports/`. `BasicClass__func_18350` is the one placeholder among
+  them.
+- **41 are data names**: lsddecomp's stage tables (`STAGE_*`, `STGnn_*`,
+  `LEN_*`, `SPECIAL_*`, `SPAWN_POS_ADJUST`), `DREAMSYS_METHODS`, and the
+  globals `gpNavChallengesComplete`, `gpDinamicLinkPenalty` and
+  `Small__rand`. The last names the word at `0x8008AC68`, which the build
+  places as `libc2/rand.o`'s `.sbss` (`config/psyq-objects.ld`), where Sony's
+  object calls it `n`.
+
+Surviving is not the same as confirmed. Whether a name was checked against
+the code is recorded in that function's match report, not here.
 
 If you want to *play* a modernised LSD rather than read it,
 [LSDRevamped](https://github.com/figglewatts/LSDRevamped) is the port
