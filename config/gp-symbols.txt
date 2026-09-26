@@ -118,7 +118,7 @@ STAIRCASE_OFFSET_1
 STAIRCASE_OFFSET_2
 STAIRCASE_OFFSET_3
 Small__rand
-gActiveCdStreamObj
+gActiveCdStream
 gActiveDataSource
 gActiveMoviePlayer
 gBMemPMgrBusy

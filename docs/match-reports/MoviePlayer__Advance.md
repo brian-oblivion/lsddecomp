@@ -86,3 +86,7 @@ Third build. Body-first (`if (unk50 != 0) {...} if (unk64) return slot68(cur);`)
 ## Naming
 
 - **MoviePlayer__Advance**, tier A. Slot +0x048: while the stream is running, advances the CD stream and, once negative (finishing), decrements the loop counter and stops the stream at zero.
+
+## Track 4 (2026-09-26, round 87)
+
+The +0x060 object is a CdStream (include/CdStream.h, unified this round). `Stream45948`/`StreamMethods45948` are deleted; `unk60` is `CdStream *`; slot50 is `startRead`, slot64 is `mute`. MoviePlayer's own view and field names are unchanged. Zero bytes changed.
