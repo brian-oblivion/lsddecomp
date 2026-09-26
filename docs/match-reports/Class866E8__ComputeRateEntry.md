@@ -4,7 +4,7 @@
 
 REVISITED, round 63: MATCHED 63/63, whole-image SHA1 green; names/types not
 relevant (no header, symbol or type change was needed -- `sRateKeyMask`,
-`sRateEntryTable`, `Obj866E8::unk60`/`unk64`, `Unk54Struct` and `SetupEntry866E8`
+`sRateEntryTable`, `Obj866E8::unk60`/`unk64`, `Unk54Struct` and `ChunkLoadEntry`
 were all already correct; the stall was one variable too many).
 
 > **ROUND 63 (delta): MATCHED, 58/63 -> 63/63 in two builds.** Stalled at
@@ -315,7 +315,7 @@ prototype's return type was wrong.
 ## What it does
 
 Called once per element from `Class866E8__BuildRateEntries`'s outer loop, filling one
-`SetupEntry866E8` slot (`arg1`, `&stackBuf[count]` at the call site) and
+`ChunkLoadEntry` slot (`arg1`, `&stackBuf[count]` at the call site) and
 returning whether it produced a "real" entry (`1`) or a blank one (`0`):
 
 1. `mask = sRateKeyMask[key]` (a 7-entry `1 << key` bitmask table, proven-sized
@@ -325,7 +325,7 @@ returning whether it produced a "real" entry (`1`) or a blank one (`0`):
    reaches it via fallthrough from this path, not a duplicate store).
 2. Otherwise (mainline): compute a 32-bit "value" for the slot's `+0x4`
    word (see "rodata ownership" note below on why this is written as a raw
-   `s32`, not `SetupEntry866E8::rate`):
+   `s32`, not `ChunkLoadEntry::rate`):
    - If `self->unk68->unk4 == 0`: `value = val + key`.
    - Else, index a second table `sRateEntryTable[key]` (7-entry `Unk54Struct`
      array, same proof as `sRateKeyMask`'s bound):
@@ -418,7 +418,7 @@ round-63 entry at the top.
 ## HISTORICAL -- near-miss body before round 63 (58/63)
 
 ```c
-s32 Class866E8__ComputeRateEntry(Obj866E8 *self, SetupEntry866E8 *arg1, s32 divisor, s32 flag, s32 val, s32 savedResult, s32 key)
+s32 Class866E8__ComputeRateEntry(Obj866E8 *self, ChunkLoadEntry *arg1, s32 divisor, s32 flag, s32 val, s32 savedResult, s32 key)
 {
     s32 mask = sRateKeyMask[key];
     s32 result;
@@ -463,7 +463,7 @@ storeKey:
 ```
 
 Needs (all added to `include/class_3bb8c.h` this round): `sRateKeyMask`,
-`sRateEntryTable`, `Obj866E8::unk60`/`unk64`. `Unk54Struct` and `SetupEntry866E8`
+`sRateEntryTable`, `Obj866E8::unk60`/`unk64`. `Unk54Struct` and `ChunkLoadEntry`
 already existed.
 
 ## What was tried, in order
@@ -569,4 +569,4 @@ Round 78 (track 3, naming pass, bravo).
 
 | symbol | name | tier | evidence |
 | --- | --- | --- | --- |
-| `func_8004BA40` | `Class866E8__ComputeRateEntry` | B | Fills one `SetupEntry866E8` slot (`arg1->ptr0`/`arg1->id`) from `sRateEntryTable[key]`/`sRateKeyMask[key]` and `self->unk60(self->unk64, ...)` (a stored resolver callback), called once per enabled `TargetSpec866E8` by `Class866E8__BuildRateEntries`. "Compute...Entry" matches that caller's own "Build...Entries" name (one call computes one entry of the array the caller builds). Return type corrected `void`->`s32` in an earlier round (see the header's own note); not revisited here. |
+| `func_8004BA40` | `Class866E8__ComputeRateEntry` | B | Fills one `ChunkLoadEntry` slot (`arg1->ptr0`/`arg1->id`) from `sRateEntryTable[key]`/`sRateKeyMask[key]` and `self->unk60(self->unk64, ...)` (a stored resolver callback), called once per enabled `TargetSpec866E8` by `Class866E8__BuildRateEntries`. "Compute...Entry" matches that caller's own "Build...Entries" name (one call computes one entry of the array the caller builds). Return type corrected `void`->`s32` in an earlier round (see the header's own note); not revisited here. |

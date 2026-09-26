@@ -251,7 +251,7 @@ process:
 **The struct definitions above ARE kept live in `src/code_179d8_d.c`**
 (not only in this report) -- they compile cleanly as unused types with
 the function itself restored to `INCLUDE_ASM`, per this project's
-established precedent (see e.g. `SetupEntry866E8`/`SetupSub866E8` in
+established precedent (see e.g. `ChunkLoadEntry`/`SetupSub866E8` in
 `include/class_3bb8c.h`, kept for a function that "is not a byte-exact
 match, so its body stays raw asm, but the prototype... reflects what the
 attempt established"). The offsets are directly measured from the

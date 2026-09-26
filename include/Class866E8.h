@@ -126,17 +126,17 @@ typedef struct ChunkNeighbourDelta {
  * record valueFn returned for the chunk (NULL: cancel the slot's load), the
  * chunk's index in the stage grid and the neighbour key of the slot that
  * takes it. ComputeRateEntry writes chunkIndex as a whole word. */
-typedef struct SetupEntry866E8 {
+typedef struct ChunkLoadEntry {
     void *file;     /* +0x0 */
     s16 chunkIndex; /* +0x4 */
     u8 pad6[0x8 - 0x6];
     s32 neighbour; /* +0x8 */
-} SetupEntry866E8;
+} ChunkLoadEntry;
 
 /* The same 0xC stride based at +0x4: ApplyRateEntries' second walker
  * (strength-reduced from the parameter; its report). */
 typedef struct SetupSub866E8 {
-    s16 chunkIndex; /* +0x4 in SetupEntry866E8 terms */
+    s16 chunkIndex; /* +0x4 in ChunkLoadEntry terms */
     u8 pad2[0x4 - 0x2];
     s32 neighbour; /* +0x8 */
     u8 pad8[0xC - 0x8];
@@ -214,7 +214,7 @@ struct Class866E8Methods {
     /* +0x0F4 */ s32 (*updateFootprintTracking)(Class866E8 *self); /* Class866E8__UpdateFootprintTracking */
     /* +0x0F8 */ s32 (*buildRateEntries)(Class866E8 *self, s32 val, LongVec3 *pos,
                                          TargetSpec866E8 *specs); /* Class866E8__BuildRateEntries (returns nothing; see the banner) */
-    /* +0x0FC */ void (*applyRateEntries)(Class866E8 *self, SetupEntry866E8 *entries,
+    /* +0x0FC */ void (*applyRateEntries)(Class866E8 *self, ChunkLoadEntry *entries,
                                           s32 count); /* Class866E8__ApplyRateEntries */
     /* +0x100 */ void (*onNotifyTag1)(Class866E8 *self, void *sender,
                                       s32 mode); /* Class866E8__OnNotifyTag1; OnNotify's class-1 sender case */
@@ -320,9 +320,9 @@ void Class866E8__Disable(Class866E8 *self);
 s32 Class866E8__UpdateFootprintTracking(Class866E8 *self);
 void Class866E8__BuildRateEntries(Class866E8 *self, s32 val, LongVec3 *pos, TargetSpec866E8 *specs);
 s32 Class866E8__ComputeRateFlags(Class866E8 *self, s32 val, s32 flag);
-s32 Class866E8__ComputeRateEntry(Class866E8 *self, SetupEntry866E8 *entry, s32 divisor, s32 flag,
+s32 Class866E8__ComputeRateEntry(Class866E8 *self, ChunkLoadEntry *entry, s32 divisor, s32 flag,
                                  s32 val, s32 savedResult, s32 key); /* 0 or 1; BuildRateEntries discards it */
-void Class866E8__ApplyRateEntries(Class866E8 *self, SetupEntry866E8 *entries, s32 count);
+void Class866E8__ApplyRateEntries(Class866E8 *self, ChunkLoadEntry *entries, s32 count);
 s32 Class866E8__CountFlaggedElements(Class866E8 *self);
 void Class866E8__OnNotifyTag1(Class866E8 *self, void *sender, s32 mode);
 void Class866E8__LoadElementResources(Class866E8 *self, ChunkSlot *elem);

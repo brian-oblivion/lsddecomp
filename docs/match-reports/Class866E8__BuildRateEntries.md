@@ -355,7 +355,7 @@ If `arg3 == 0`, does nothing at all (whole body skipped). Otherwise:
    `self->unk68->unk4 == 0`) or a flat `-0x5000` adjustment (otherwise),
    zero the SAME `Unk14Obj`'s new `unk0` field (a genuine reload, not dead
    code), call the still-raw sibling `Class866E8__ComputeRateEntry` (7 args, 2 on the
-   stack) to fill one slot of a 7-entry `SetupEntry866E8` stack buffer,
+   stack) to fill one slot of a 7-entry `ChunkLoadEntry` stack buffer,
    increment `count`.
 4. A SECOND loop, `i = 0..6` again unconditionally: copies
    `self->arr[i].unk2` into `self->arr[i].unk4->unk32` (field
@@ -462,7 +462,7 @@ void Class866E8__BuildRateEntries(Obj866E8 *self, s32 val, Unk54Struct *arg2, Ta
     Elem *e2;
     Unk14Obj *u14;
     Unk54Struct *tbl;
-    SetupEntry866E8 stackBuf[7];
+    ChunkLoadEntry stackBuf[7];
 
     if (arg3 != 0) {
         divisor = self->unk68->divisor;
@@ -679,7 +679,7 @@ void Class866E8__BuildRateEntries(Obj866E8 *self, s32 val, Unk54Struct *arg2, Ta
     Elem *e2;
     Unk14Obj *u14;
     Unk54Struct *tbl;
-    SetupEntry866E8 stackBuf[7];
+    ChunkLoadEntry stackBuf[7];
 
     if (arg3 != 0) {
         divisor = self->unk68->divisor;
@@ -726,4 +726,4 @@ Round 78 (track 3, naming pass, bravo).
 
 | symbol | name | tier | evidence |
 | --- | --- | --- | --- |
-| `func_8004B700` | `Class866E8__BuildRateEntries` | B | Occupant of `gClass866E8Methods` +0x0F8 (`slotF8`, verified its own identity via classtable -- see the corrected slot comment in `include/class_3bb8c.h`). Iterates a `TargetSpec866E8[7]` (`sDefaultTargetSpecs` at its one known call site), calling `Class866E8__ComputeRateFlags` once and `Class866E8__ComputeRateEntry` per enabled entry to fill a 7-slot `SetupEntry866E8` stack buffer, then dispatches the filled count through `slotFC` (`Class866E8__ApplyRateEntries`). "Build...RateEntries" names the mechanic (assembling the entry array that the next slot applies), consistent with the sibling already-matched functions in this same vtable region (`Class866E8__ConfigureRateEntry`, `Class866E8__AdvanceRateCountdown`, `Class866E8__FlushRateLatch`). |
+| `func_8004B700` | `Class866E8__BuildRateEntries` | B | Occupant of `gClass866E8Methods` +0x0F8 (`slotF8`, verified its own identity via classtable -- see the corrected slot comment in `include/class_3bb8c.h`). Iterates a `TargetSpec866E8[7]` (`sDefaultTargetSpecs` at its one known call site), calling `Class866E8__ComputeRateFlags` once and `Class866E8__ComputeRateEntry` per enabled entry to fill a 7-slot `ChunkLoadEntry` stack buffer, then dispatches the filled count through `slotFC` (`Class866E8__ApplyRateEntries`). "Build...RateEntries" names the mechanic (assembling the entry array that the next slot applies), consistent with the sibling already-matched functions in this same vtable region (`Class866E8__ConfigureRateEntry`, `Class866E8__AdvanceRateCountdown`, `Class866E8__FlushRateLatch`). |

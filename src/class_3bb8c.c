@@ -164,7 +164,7 @@ void Class866E8__BuildRateEntries(Class866E8 *self, s32 val, LongVec3 *arg2, Tar
     ChunkSlot *e;
     Unk14Obj *u14;
     LongVec3 *tbl;
-    SetupEntry866E8 stackBuf[7];
+    ChunkLoadEntry stackBuf[7];
 
     if (arg3 != 0) {
         divisor = self->config->columns;
@@ -250,7 +250,7 @@ s32 Class866E8__ComputeRateFlags(Class866E8 *self, s32 val, s32 flag) {
  * iterations without ever reaching the merged shape.
  * The `do {} while (0);` below is LOAD-BEARING: removing it drifts the
  * image. It was inherited with the near-miss body and is verified here. */
-s32 Class866E8__ComputeRateEntry(Class866E8 *self, SetupEntry866E8 *arg1, s32 divisor, s32 flag,
+s32 Class866E8__ComputeRateEntry(Class866E8 *self, ChunkLoadEntry *arg1, s32 divisor, s32 flag,
                                  s32 val, s32 savedResult, s32 key) {
     s32 mask = sRateKeyMask[key];
     s32 result;
@@ -303,7 +303,7 @@ storeKey:
  * `sp` is therefore assigned from `arr1` inside the body and `arr1` is
  * advanced directly; the old `ep = arr1` copy is what swapped s3/s4.
  * See docs/match-reports/Class866E8__ApplyRateEntries.md. */
-void Class866E8__ApplyRateEntries(Class866E8 *self, SetupEntry866E8 *arr1, s32 count) {
+void Class866E8__ApplyRateEntries(Class866E8 *self, ChunkLoadEntry *arr1, s32 count) {
     s32 i;
     ChunkSlot *e;
     SetupSub866E8 *sp;

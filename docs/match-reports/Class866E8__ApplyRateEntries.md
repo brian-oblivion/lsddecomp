@@ -2,7 +2,7 @@
 
 > Renamed from `func_8004BB3C` on 2026-09-24 (tools/rename.py). Address 0x8004bb3c.
 
-REVISITED, round 73: MATCHED 105/105 (walker is a strength-reduced giv of the walked parameter); names/types not relevant (existing SetupEntry866E8/SetupSub866E8 views reused unchanged)
+REVISITED, round 73: MATCHED 105/105 (walker is a strength-reduced giv of the walked parameter); names/types not relevant (existing ChunkLoadEntry/SetupSub866E8 views reused unchanged)
 
 ## Round 73 (bravo) -- revisit, MATCHED
 
@@ -39,7 +39,7 @@ parameter pseudo's live range and priority change, so the giv outranks
 it for `$s3`.
 
 Header: one additive comment paragraph in `include/class_3bb8c.h` after
-the existing SetupEntry866E8 note; no declaration changed.
+the existing ChunkLoadEntry note; no declaration changed.
 
 ### Proposed learning
 
@@ -104,7 +104,7 @@ allocation wrong.
 > **Split-combined-declaration lever, tried directly:** `ep`/`sp` (the two
 > differently-based walking pointers whose introduction in round 13 is
 > what got this function to 90/105 in the first place) are declared with
-> combined initializers (`SetupEntry866E8 *ep = arr1;` / `SetupSub866E8
+> combined initializers (`ChunkLoadEntry *ep = arr1;` / `SetupSub866E8
 > *sp = (SetupSub866E8 *)((u8 *)arr1 + 4);`) -- exactly the shape the
 > lever targets. Split into separate declaration and assignment
 > statements, rebuilt: **90/105, IDENTICAL diff, no drift -- fully
@@ -372,13 +372,13 @@ allocation wrong.
 > two induction variables have different BASES, which is what stops GCC
 > 2.6.3's strength reduction proving them one family. The blocker the
 > original attempt hit -- "padding `SetupSub866E8` to 0xC would corrupt
-> `sizeof(SetupEntry866E8)`" -- dissolves once the sub type is never
-> embedded in `SetupEntry866E8` at all; it exists only as a local walking
-> pointer's target type, and `SetupEntry866E8` is already 0xC so its own
+> `sizeof(ChunkLoadEntry)`" -- dissolves once the sub type is never
+> embedded in `ChunkLoadEntry` at all; it exists only as a local walking
+> pointer's target type, and `ChunkLoadEntry` is already 0xC so its own
 > `++` needs no help:
 >
 > ```c
-> SetupEntry866E8 *ep = arr1;                                    /* ptr0  */
+> ChunkLoadEntry *ep = arr1;                                    /* ptr0  */
 > SetupSub866E8   *sp = (SetupSub866E8 *)((u8 *)arr1 + 4);       /* rate/id */
 > ```
 >
@@ -410,7 +410,7 @@ and no dense-`switch`/`jr $v0` table dispatch either.
 
 ## What it does
 
-`void Class866E8__ApplyRateEntries(Obj866E8 *self, SetupEntry866E8 *arr1, s32 count)`:
+`void Class866E8__ApplyRateEntries(Obj866E8 *self, ChunkLoadEntry *arr1, s32 count)`:
 iterates `arr1[0..count)` (a 0xC-byte-strided array). Per entry:
 
 1. `e = self->methods->slot118(self, arr1[i].id)` (resolve an `Elem` by
@@ -433,7 +433,7 @@ plain count of `self->arr[i].flag != 0`).
 
 New header additions (all committed, additive): `Obj866E8Methods::slotFC`
 (Class866E8__ApplyRateEntries's OWN identity slot, verified via classtable -- signature
-`(self, SetupEntry866E8 *arr1, s32 count)`; later corrected once
+`(self, ChunkLoadEntry *arr1, s32 count)`; later corrected once
 Class866E8__BuildRateEntries needed to CALL this slot and the earlier draft signature here
 turned out to have been copy-pasted from slot88's shape by mistake -- see
 that function's own report) and `::slot108` (split out of the
@@ -441,13 +441,13 @@ that function's own report) and `::slot108` (split out of the
 and `0x100`; `slot104` sits between them at `0x104`);
 `ElemTargetMethods::slot74`/`slot78` (split out of what was
 `pad000[0x7C]`, now `pad000[0x74]` + the two new slots + existing
-`slot7C`); `SetupEntry866E8` (new type, `void *ptr0` @0x0, `s16 rate`
+`slot7C`); `ChunkLoadEntry` (new type, `void *ptr0` @0x0, `s16 rate`
 @0x4, `s32 id` @0x8, size 0xC).
 
 ## Best body reached
 
 ```c
-void Class866E8__ApplyRateEntries(Obj866E8 *self, SetupEntry866E8 *arr1, s32 count) {
+void Class866E8__ApplyRateEntries(Obj866E8 *self, ChunkLoadEntry *arr1, s32 count) {
     s32 i;
     Elem *e;
 
@@ -483,7 +483,7 @@ elsewhere in this unit, not from within this function's own body. An
 earlier draft of this report conflated the two and, worse, propagated
 `slot88`'s parameter shape onto the `slotFC` header entry itself -- that
 header mistake was caught and fixed while deriving Class866E8__BuildRateEntries's call
-site, which needed `slotFC`'s REAL signature, `(self, SetupEntry866E8*,
+site, which needed `slotFC`'s REAL signature, `(self, ChunkLoadEntry*,
 s32 count)`, to compile. If re-deriving this function, `self->methods`
 offset `0xFC` is `slotFC` = Class866E8__ApplyRateEntries itself; do not use that name for
 the offset-`0x88` call above.)
@@ -518,12 +518,12 @@ shape that worked -- see the head update at the top of this file:
 
 1. Plain `arr1[i].field` for everything (id/ptr0/rate) -- 14/105, one
    induction variable, missing the extra `addiu`.
-2. Explicit intermediate element pointer, `SetupEntry866E8 *entry =
+2. Explicit intermediate element pointer, `ChunkLoadEntry *entry =
    &arr1[i];`, then `entry->field` throughout (the documented
    "intermediate element pointer" idiom from DECOMPILATION_LEARNINGS,
    normally a strong lever for array loops in this codebase) -- IDENTICAL
    14/105, no change at all.
-3. A nested sub-struct (`SetupEntry866E8 { void *ptr0; struct { s16 rate;
+3. A nested sub-struct (`ChunkLoadEntry { void *ptr0; struct { s16 rate;
    s32 id; } sub; }`), accessed as `arr1[i].sub.field` -- IDENTICAL 14/105.
 4. The same nested sub-struct, but with an explicit `SetupSub866E8 *sub =
    &arr1[i].sub;` computed once per iteration (mixing indexed `ptr0` access
@@ -538,11 +538,11 @@ shape that worked -- see the head update at the top of this file:
    (`sub++`/`entry++` on properly-typed, correctly-strided pointers) --
    not fully evaluated; discovered mid-attempt that giving `SetupSub866E8`
    a padded size of `0xC` (so `sub++` advances by the right amount) would
-   corrupt `sizeof(SetupEntry866E8)` if the padded type were embedded in
+   corrupt `sizeof(ChunkLoadEntry)` if the padded type were embedded in
    it, and unpicking that cleanly was not finished this round. This is the
    most promising untried direction -- a `SetupSub866E8` sized 0xC used
    ONLY as a local walking-pointer's target type, kept entirely separate
-   from the real (unpadded, 0xC via 3 flat fields) `SetupEntry866E8`.
+   from the real (unpadded, 0xC via 3 flat fields) `ChunkLoadEntry`.
 
 GCC 2.6.3's strength reduction appears to reliably PROVE that `arr1[i].ptr0`
 and `arr1[i].rate`/`arr1[i].id` (or any sub-expression derived from indexing
@@ -618,4 +618,4 @@ Round 78 (track 3, naming pass, bravo).
 
 | symbol | name | tier | evidence |
 | --- | --- | --- | --- |
-| `func_8004BB3C` | `Class866E8__ApplyRateEntries` | B | Occupant of `gClass866E8Methods` +0x0FC (`slotFC`), verified via classtable as its own identity slot (already documented in `include/class_3bb8c.h`). Iterates the `SetupEntry866E8[count]` array `Class866E8__BuildRateEntries` just filled, resolving an `Elem` per entry (`slot118`) and either attaching (`ptr0 != 0`: `slot78`, sets `rate`, `flag = 1`) or detaching (`slot74`, `flag = 0`) it, then recomputes `self->unk1B4` via `Class866E8__CountFlaggedElements`. "Apply...Entries" mirrors the "Build...Entries" name of its own caller-side producer. |
+| `func_8004BB3C` | `Class866E8__ApplyRateEntries` | B | Occupant of `gClass866E8Methods` +0x0FC (`slotFC`), verified via classtable as its own identity slot (already documented in `include/class_3bb8c.h`). Iterates the `ChunkLoadEntry[count]` array `Class866E8__BuildRateEntries` just filled, resolving an `Elem` per entry (`slot118`) and either attaching (`ptr0 != 0`: `slot78`, sets `rate`, `flag = 1`) or detaching (`slot74`, `flag = 0`) it, then recomputes `self->unk1B4` via `Class866E8__CountFlaggedElements`. "Apply...Entries" mirrors the "Build...Entries" name of its own caller-side producer. |
