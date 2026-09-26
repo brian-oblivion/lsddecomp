@@ -42,7 +42,7 @@ struct BMemPMgr {
 };
 
 /* The generic pool allocator/free pair, established already by
- * include/class_3ac78.h, include/DreamSys.h, include/Entity.h etc. --
+ * include/DreamSys.h, include/Entity.h etc. --
  * all single-argument, and every one of those ~15 headers declares its
  * own full ANSI prototype (`s32 size` / `void *ptr`), per this project's
  * multiple-independent-local-views convention -- none of them get their
