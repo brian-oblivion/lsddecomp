@@ -172,3 +172,13 @@ The class (id 0x1F234, table `gEntityMethods`) is unified as `Entity` in `includ
 ## Track 7 (round 93, bravo)
 
 Every literal in the live body is in its base: decimal for moodTimer ticks, distances, TOD frames, VAB programs, volumes and `state` phases (hex remains only for masks). Named: `ENTITY_EFFECT_EVENT_VIDEO`, `ENTITY_STATE_DONE`, `SOUND_CUE_STOP` (evidence on each definition: EntityEffect and ENTITY_STATE_DONE in include/Entity.h, SOUND_CUE_STOP in include/SoundCueSet.h). The `(u32)(moodTimer - 0x80) < 0xC2` window test reads `moodTimer >= 128 && moodTimer < 322`: the same bytes. The local `mood` (a copy of todFrame) is `frame`. Byte-identical (whole image green).
+
+## Proposed field names
+
+- `Entity::unk100` -> `fade` (and `Entity__GetOrCreateUnk100` ->
+  `Entity__GetOrCreateFade`). It is a Class6E99C, the BoxFill that fades its
+  colour (include/Class6E99C.h); Entity__GetOrCreateUnk100 is its only
+  writer (New_Class6E99C, then setStep from its fourth argument, 10 here),
+  Entity__Finalize releases it, and every other access (here, Entity_f x3,
+  Entity_g x1) calls startFadeDown or startFadeUp on it. Accessors outside
+  Entity_d (Entity.c, Entity_f.c, Entity_g.c), so proposed, not applied.

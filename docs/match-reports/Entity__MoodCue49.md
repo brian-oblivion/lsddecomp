@@ -128,3 +128,13 @@ The class (id 0x1F234, table `gEntityMethods`) is unified as `Entity` in `includ
 ## Track 7 (round 93, bravo)
 
 Every literal in the live body is in its base: decimal for moodTimer ticks, distances, TOD frames, VAB programs, volumes and `state` phases (hex remains only for masks). Named: `ENTITY_EFFECT_LINK_STAGE` (evidence on each definition: EntityEffect and ENTITY_STATE_DONE in include/Entity.h, SOUND_CUE_STOP in include/SoundCueSet.h). clearTickCallbacks' bool clearLook is `false`. Byte-identical (whole image green).
+
+## Proposed field names
+
+- `SceneNodeSub14::unk38` (the `coord2->unk38` this handler passes to the
+  peer's setTranslation): include/SceneNode.h already documents it as
+  `workm.t`, the world position, and SceneNodeSub14 is the node's
+  GsCOORDINATE2 ("GsDOBJ2.coord2: the ctor's 0x50-byte GsCOORDINATE2"). The
+  fix is track 6's: Sony's GsCOORDINATE2 in place of SceneNodeSub14, which
+  makes this `coord2->workm.t`. Not applied here (a shared header, many
+  accessors).
