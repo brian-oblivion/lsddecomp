@@ -66,5 +66,5 @@ reproduces; the symbols line carried no stale `unidentified` note by this
 round). Evidence unchanged: the body is `return &D_8006E4F0;`, Class6E4F0's
 own table, and both callers use it as the table getter
 (`Class6E4F0__Class6E4F0` installs it; `Class6D3C8__Class6D3C8` and
-`Class6D3C8__ForwardToBaseSlot44UnlessFlagged` call the base class's ctor and
+`Class6D3C8__InitSystems` call the base class's ctor and
 +0x044 slot through it). The name follows `GetClass6D3C8Methods`/`GetClass6D430Methods`.

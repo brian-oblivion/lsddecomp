@@ -88,7 +88,7 @@ typedef struct Class6D3C8Methods {
     void *unk38;                                            /* +0x038 BasicClass__OnNotify */
     void *unk3C;                                            /* +0x03C null slot */
     void (*setDayFromTickCount)(Class6D3C8 *self);          /* +0x040 Class6D3C8__SetDayFromTickCount (ignores self) */
-    void (*forwardToBaseSlot44UnlessFlagged)(Class6D3C8 *self, void *a1, void *a2);  /* +0x044 Class6D3C8__ForwardToBaseSlot44UnlessFlagged.
+    void (*forwardToBaseSlot44UnlessFlagged)(Class6D3C8 *self, void *a1, void *a2);  /* +0x044 Class6D3C8__InitSystems.
                                                              * NOT renamed to match its occupant: src/main.c
                                                              * dispatches this slot by name directly
                                                              * (gClass6D3C8->methods->slot44(...)), outside this
@@ -115,7 +115,7 @@ typedef struct Class6D3C8Methods {
 struct Class6D3C8 {
     Class6D3C8Methods *methods;    /* +0x00 */
     u8 unk04[0x14];                 /* +0x04 .. +0x17, not yet decoded */
-    s32 unk18;                       /* +0x18 guards Class6D3C8__ForwardToBaseSlot44UnlessFlagged's fallback to the base class */
+    s32 unk18;                       /* +0x18 guards Class6D3C8__InitSystems's fallback to the base class */
     s32 unk1C;                        /* +0x1C, forwarded as a plain word arg by Class6D3C8__LoadIntroLogoSequence/Class6D3C8__StartLoaderTask */
     Class6D3C8CtorArgs *arg;        /* +0x20 the constructor's `arg` parameter */
     s32 unk24;                      /* +0x24 */

@@ -55,7 +55,7 @@ void Class6D3C8__SetDayFromTickCount(void) {
 
 /* Defers to the base class's own implementation of this slot when this
  * object hasn't been given an override (unk18 == 0). */
-void Class6D3C8__ForwardToBaseSlot44UnlessFlagged(Class6D3C8 *self, void *a1, void *a2) {
+void Class6D3C8__InitSystems(Class6D3C8 *self, void *a1, void *a2) {
     if (self->unk18 == 0) {
         GetClass6E4F0Methods()->initSystems((Class6E4F0 *)self, a1, a2, 0);
     }

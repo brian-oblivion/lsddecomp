@@ -64,7 +64,7 @@ the aux block's first two fields likewise: the one caller chain is main()
 `New_DrawSystem()` and `New_Pad(0, 0)` (src/main.c). The draw system's
 +0x044 slot is `initGraph` (DrawSystem__InitGraph), `dimsArg` is `vramMode`.
 The slot type (`CLASS6E4F0_SLOTS`) carries a fourth `s32` argument this body
-does not declare: Class6D3C8__ForwardToBaseSlot44UnlessFlagged calls the slot
+does not declare: Class6D3C8__InitSystems calls the slot
 with `(self, a1, a2, 0)`, and the `move a3,zero` in its jalr delay slot is
 retail's. The slot's return is `void`, the occupant's; the old subclass view
 typed it `s32`, and its one caller ignores $v0. Bytes unchanged.
