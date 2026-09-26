@@ -1,11 +1,4 @@
-DreamSys: src/DreamSys.c: At top level:
-DreamSys: warning: `DreamSys__ApplyRelativeOffset' was previously implicitly declared to return `int'
 DreamSys: warning: control reaches end of non-void function
-DreamSys: warning: implicit declaration of function `DreamSys__ApplyRelativeOffset'
-DreamSys: warning: previous external decl of `DreamSys__ApplyRelativeOffset'
-DreamSys: warning: previous implicit declaration of `DreamSys__ApplyRelativeOffset'
-DreamSys: warning: type mismatch with previous external decl
-DreamSys: warning: type mismatch with previous implicit declaration
 Entity_g: warning: passing arg 4 of `Entity__GetOrCreateUnk100' makes pointer from integer without a cast
 class_3ac78: warning: unused variable `unused'
 class_3bb8c: src/class_3bb8c.c: At top level:
