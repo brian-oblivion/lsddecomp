@@ -1137,7 +1137,7 @@ struct Class86B60 {
      * vtable, so it is retyped a pointer here (same size, no layout
      * change). */
     GenericReleaseObj_3bb8c_d *iconHandle; /* +0x0A8, Class86B60__Dtor: released iff unkAC != NULL.
-                                        RENAMED from unkA8 -- the `func_8003B39C(D_800114F8)`
+                                        RENAMED from unkA8 -- the `New_TimImage(D_800114F8)`
                                         return value (D_800114F8 = "CARD\FILEICN1.TIM"), see
                                         Class86B60__BeginMemcardSave. */
     /* +0x0AC, Class86B60__Class86B60: zeroed; Class86B60__Dtor: guards both releases.
@@ -1245,7 +1245,7 @@ extern s32 D_800114DC;
  * address is taken here. */
 extern s32 D_800114E8;
 
-/* Class86B60__BeginMemcardSave's own path string, passed to func_8003B39C -- a real
+/* Class86B60__BeginMemcardSave's own path string, passed to New_TimImage -- a real
  * dlabel (`asm/data/1C34.rodata.s`: "CARD\FILEICN1.TIM"), so this is the
  * ONLY correct spelling (CLAUDE.md: never re-write a string splat has
  * already emitted as a symbol). */
@@ -2306,20 +2306,21 @@ extern void StyleTeardown(void);
  * resources `cursorSprite`/`textRow`/`panelSprite` and the TIM handles
  * (ChildObj86ED0), and `target` (TargetObj86ED0). The names are kept.
  */
-/* TextEntry's `textRow` (a TextRow, include/TextRow.h) and the two TIM handles
- * TextEntry__LoadCardResources and TaskObjF__LoadCardIcon load through
- * func_8003B39C: a view of the slots those calls use, not one class. */
+/* TextEntry's `textRow` (a TextRow, include/TextRow.h): a view of the slots
+ * its calls use, not one class. The TIM handles TextEntry__LoadCardResources
+ * and TaskObjF__LoadCardIcon load through New_TimImage used this view too
+ * until round 88; they are `TimImage *` now (include/TimImage.h). */
 typedef struct ChildObj86ED0 ChildObj86ED0;
 typedef struct ChildMethods86ED0 ChildMethods86ED0;
 struct ChildMethods86ED0 {
     u8 pad000[0x004];
-    void *(*release)(ChildObj86ED0 *self); /* +0x004, TextEntry__ReleaseCardResources, TextEntry__LoadCardResources (handles) */
+    void *(*release)(ChildObj86ED0 *self); /* +0x004, TextEntry__ReleaseCardResources */
     u8 pad008[0x04C - 0x008];
     /* +0x04C, textRow: (parent, &D_8008AAD4), the attachToParent shape
      * ScreenSprite's slot has (include/ScreenSprite.h). */
     void (*slot4C)(ChildObj86ED0 *self, void *arg1, void *arg2);
     u8 pad050[0x078 - 0x050];
-    void (*slot78)(ChildObj86ED0 *self); /* +0x078, TextEntry__LoadCardResources, on each handle before the sprites consume it */
+    void (*slot78)(ChildObj86ED0 *self); /* +0x078; no accessor since round 88 (it was the TIM handles' TimImage__Upload) */
     u8 pad07C[0x0B8 - 0x07C];
     void (*slotB8)(ChildObj86ED0 *self, void *arg1); /* +0x0B8, TextEntry__LoadCardResources, textRow */
     u8 pad0BC[0x0C4 - 0x0BC];

@@ -7,10 +7,10 @@
  *
  * What it holds: TimImage, a Class6D430 (data-source) subclass -- 12 of its
  * own methods (table `gTimImageMethods`, id 0x103), plus the class's own
- * alloc-then-ctor helper (`func_8003B39C`, "new TimImage(name)") and table
+ * alloc-then-ctor helper (`New_TimImage`, "new TimImage(name)") and table
  * getter (`GetTimImageMethods`). Every call site project-wide that reaches
  * TimImage does so by building "CARD\\<name>.TIM" or another `.TIM` path and
- * handing it to `func_8003B39C`, then calling the returned handle's slot78
+ * handing it to `New_TimImage`, then calling the returned handle's slot78
  * (`TimImage__Upload`) and usually slot5C (`Class6D430__FreeBuffer`) --
  * TimImage is the game's TIM-image loader: `buffer` (inherited from
  * Class6D430) holds the raw file, `TimImage__GetTimInfo` describes it with
@@ -25,64 +25,14 @@
  *
  * Fully matched in round 81 (runner echo). Naming pass round 81 (runner
  * bravo): every function and the class table named; see each function's
- * report `## Naming` for tier and evidence. `func_8003B39C` and
- * `func_8003B624` themselves kept their `func_` names -- both have an
- * explicit line in the symbols file under a stale track-2 `// unidentified:`
- * comment, which trips a known `tools/rename.py` bug (it resolves the
- * address from the name and never finds the existing line, so it appends a
- * duplicate and `make extract` fails with "Duplicate symbol"). Proposed
- * names `New_TimImage` and `ScrollImageRight` are recorded in their reports.
+ * report `## Naming` for tier and evidence. `func_8003B624` kept its
+ * `func_` name (proposed `ScrollImageRight`, recorded in its report);
+ * `New_TimImage` was renamed in track 4 (round 88).
  */
 #include "common.h"
 #include "Class6D430.h"
 #include "DrawSystem.h"
-
-/* LIBGS.H GsIMAGE, laid out as the SDK declares it: GsGetTimInfo fills it
- * and TimImage__Upload reads it field by field. */
-typedef struct GsIMAGE {
-    /* +0x00 */ u32 pmode;
-    /* +0x04 */ s16 px;
-    /* +0x06 */ s16 py;
-    /* +0x08 */ u16 pw;
-    /* +0x0A */ u16 ph;
-    /* +0x0C */ u32 *pixel;
-    /* +0x10 */ s16 cx;
-    /* +0x12 */ s16 cy;
-    /* +0x14 */ u16 cw;
-    /* +0x16 */ u16 ch;
-    /* +0x18 */ u32 *clut;
-} GsIMAGE;
-
-typedef struct TimImage TimImage;
-
-/* TimImage's own table (gTimImageMethods): Class6D430's slots with this
- * class's two-argument ctor, then its own +0x07C..+0x09C
- * (tools/classtable.py D_8006E558, the table's pre-rename address name). */
-typedef struct TimImageMethods {
-    CLASS6D430_SLOTS(TimImage, (TimImage *self, char *name));
-    /* +0x07C */ void (*slot7C)(void);
-    /* +0x080 */ void (*slot80)(void);
-    /* +0x084 */ void (*slot84)(void);
-    /* +0x088 */ void (*slot88)(void);
-    /* +0x08C */ void (*slot8C)(void);
-    /* +0x090 */ void (*slot90)(void);
-    /* +0x094 */ void (*slot94)(void);
-    /* +0x098 */ void (*slot98)(TimImage *self);
-    /* +0x09C */ void (*getTimInfo)(TimImage *self, GsIMAGE *tim);
-} TimImageMethods;
-
-/* Unit-local view of the TimImage class: a Class6D430 data source whose
- * buffer holds a TIM image (TimImage__GetTimInfo hands buffer+4, past the TIM id
- * word, to GsGetTimInfo). TimImage__Upload has the TIM described into +0x02C
- * and uploads its pixel and CLUT blocks from there. +0x048 is cleared by the
- * ctor and set to 1 by TimImage__func_8003B5E4; the ctor also clears +0x04C. The
- * object is 0x50 bytes (func_8003B39C's allocation). */
-struct TimImage {
-    CLASS6D430_FIELDS(TimImageMethods);
-    /* +0x02C */ GsIMAGE tim;
-    /* +0x048 */ s32 unk48;
-    /* +0x04C */ s32 unk4C;
-};
+#include "TimImage.h"
 
 /* LIBGS.H: void GsGetTimInfo(unsigned long *im, GsIMAGE *tim); */
 void GsGetTimInfo(u32 *im, GsIMAGE *tim);
@@ -95,13 +45,9 @@ typedef struct DrawPoint {
 
 extern void *BMemPMgrAlloc(s32 size);
 extern Class6D430Methods *GetActiveDataSourceMethods(void);
-TimImageMethods *GetTimImageMethods(void);
 
-extern TimImageMethods gTimImageMethods;
-
-/* new TimImage(name). Proposed name New_TimImage -- see "## Naming" in
- * this function's report for why the rename itself is blocked. */
-TimImage *func_8003B39C(char *name) {
+/* new TimImage(name). */
+TimImage *New_TimImage(char *name) {
     TimImage *self;
 
     self = BMemPMgrAlloc(0x50);
@@ -116,7 +62,7 @@ void TimImage__TimImage(TimImage *self, char *name) {
     GetActiveDataSourceMethods()->ctor((Class6D430 *)self);
     self->methods = GetTimImageMethods();
     self->unk48 = 0;
-    self->unk4C = 0;
+    self->clutBase = 0;
     if (name != NULL) {
         self->methods->requestLoadFile(self, name);
     }
@@ -180,7 +126,7 @@ void TimImage__func_8003B5E4(TimImage *self) {
 void TimImage__GetTimInfo(TimImage *self, GsIMAGE *tim) {
     GsGetTimInfo((u32 *)self->buffer + 1, tim);
 }
-/* The class's table getter (called by func_8003B39C and TimImage__TimImage). */
+/* The class's table getter (called by New_TimImage and TimImage__TimImage). */
 TimImageMethods *GetTimImageMethods(void) {
     return &gTimImageMethods;
 }

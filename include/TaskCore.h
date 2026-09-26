@@ -76,8 +76,8 @@ typedef struct TaskCoreTarget TaskCoreTarget;
  * first argument; Class86B60 passes &D_80086D44). One slot per `names`
  * entry. */
 struct TaskCoreTarget {
-    /* +0x000 */ const char *path;      /* non-NULL: setTarget loads `handle` from it (func_8003B39C) and releaseTarget releases that */
-    /* +0x004 */ BasicClass *handle;    /* func_8003B39C(path), or the caller's own when path is NULL; the slot widgets' first argument */
+    /* +0x000 */ const char *path;      /* non-NULL: setTarget loads `handle` from it (New_TimImage) and releaseTarget releases that */
+    /* +0x004 */ BasicClass *handle;    /* New_TimImage(path), or the caller's own when path is NULL; the slot widgets' first argument */
     /* +0x008 */ s32 unk8;              /* setState(5): setActiveSlot(unk8, 0) */
     /* +0x00C */ s32 unkC;              /* tick: confirming this slot runs refreshViewValue */
     /* +0x010 */ u8 unselectedColor[3]; /* broadcastToSlots at state 5; the colour a slot or item loses focus to */
@@ -162,7 +162,7 @@ struct TaskCoreTarget {
     /* +0x068 */ BasicClass *listView;  /* New_BoxFill: the frame around the scrolled list */    \
     /* +0x06C */ u8 pad06C[4];                                                                     \
     /* +0x070 */ const char *subHandlePath; /* setSubHandle's path; nonzero: the handle is owned */ \
-    /* +0x074 */ BasicClass *subHandle; /* func_8003B39C(subHandlePath), or the caller's; NULL: onInit also passes baseColor with gDefaultStreamTaskInitData */ \
+    /* +0x074 */ BasicClass *subHandle; /* New_TimImage(subHandlePath), or the caller's; NULL: onInit also passes baseColor with gDefaultStreamTaskInitData */ \
     /* +0x078 */ BasicClass *bgLayer;   /* New_BgLayer(tileMap, 1) */                              \
     /* +0x07C */ BasicClass *tileMap;   /* New_TileMap(0, tileAtlas) */                            \
     /* +0x080 */ BasicClass *tileAtlas; /* New_TileAtlas(0) */                                     \

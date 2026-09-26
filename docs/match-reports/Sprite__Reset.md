@@ -17,3 +17,11 @@ void Sprite__Reset(Sprite *self, void *texture, s32 abr, SpriteRect *rect) {
     self->unk58 = 0;
 }
 ```
+
+## Track 4 (2026-09-26, round 88)
+
+TimImage is unified (`include/TimImage.h`, which now holds GsIMAGE).
+`src/code_322b4.c`'s own copy of `struct GsIMAGE` is deleted and the unit
+includes TimImage.h; `self->image = (struct GsIMAGE *)((u8 *)texture +
+0x2C)` is now `&((TimImage *)texture)->tim` (`texture` stays `void *`, as
+Sprite's slot types it). Same `addiu 0x2C`; image byte-identical.

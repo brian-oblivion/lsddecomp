@@ -34,13 +34,22 @@ the local-view convention `code_179d8_d.c` / `_e.c` already use.
 ## Naming
 
 - **Class `TimImage`** (was `D_8006E558Obj`/`D_8006E558`), tier A. Every
-  project-wide caller of `func_8003B39C` (this class's `New_` helper) builds
+  project-wide caller of `New_TimImage` (this class's `New_` helper) builds
   a `"...\ .TIM"` path and passes it in; `TimImage__GetTimInfo` calls Sony's
   `GsGetTimInfo` on the loaded buffer; `TimImage__Upload` reads the result
   and uploads the pixel/CLUT blocks. The class is a TIM-image loader/upload
   handle, not merely "a Class6D430 subclass".
 - **`TimImage__TimImage`**, tier A (constructor: `Class__Class` convention).
-  Slot +0x008, dispatched by `func_8003B39C`/the table getter as `ctor`.
+  Slot +0x008, dispatched by `New_TimImage`/the table getter as `ctor`.
 - **`gTimImageMethods`** (was `D_8006E558`), tier A: `g<Class>Methods`
   convention for the class's static method table, matching
   `gVabDriverMethods`/`gClass86B60Methods`/etc. project-wide.
+
+## Track 4 (2026-09-26, round 88)
+
+TimImage is unified in `include/TimImage.h`; `src/code_2bb9c.c`'s local
+views are gone. The field this ctor clears at +0x04C, `unk4C`, is now
+`clutBase`: TimArraySrc__BuildImages (src/code_33808.c) stores
+`((info.cy - 0x1E0) >> gTimClutRowShift) * 16 + base` there for each
+TimImage it makes, which its own view already called `clutBase`. Image
+byte-identical.

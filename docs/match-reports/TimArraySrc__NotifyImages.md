@@ -41,3 +41,11 @@ First build. Pointer walk with the increment after the call (the addiu lands in 
 ## Naming
 
 - **TimArraySrc__NotifyImages**, tier A. Slot +0x078: forwards slot78 to every image in the array.
+
+## Track 4 (2026-09-26, round 88)
+
+The array at +0x30 holds TimImages (TimArraySrc__BuildImages fills it with
+New_TimImage(NULL)), so `objs` is `TimImage **` and the +0x078 call goes
+through `TimImageUploadFn` (include/TimImage.h: Class6D430's `void *slot78`,
+whose occupant here is TimImage__Upload) instead of an unprototyped cast of
+DataSrc33808's slot. Image byte-identical.

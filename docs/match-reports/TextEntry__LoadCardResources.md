@@ -12,7 +12,7 @@ object stashed on `self` (`unk48`, `unk44`, `unk40`).
 
 ```c
 extern char *BuildFileName(char *dest, char *arg1, char *arg2, char *arg3);
-extern ChildObj86ED0 *func_8003B39C(char *path);
+extern ChildObj86ED0 *New_TimImage(char *path);
 extern ChildObj86ED0 *New_ScreenSprite(ChildObj86ED0 *arg0, void *arg1, s32 arg2);
 
 extern const char sStrComInput[]; /* "COMINPUT" */
@@ -43,13 +43,13 @@ void TextEntry__LoadCardResources(Obj86ED0 *self, void *arg1)
     dir = sCardPathPrefix;
     ext = sTimExt;
 
-    handle1 = func_8003B39C(BuildFileName(path, sStrComInput, dir, ext));
+    handle1 = New_TimImage(BuildFileName(path, sStrComInput, dir, ext));
     handle1->methods->slot78(handle1);
     self->unk48 = New_ScreenSprite(handle1, (void *)&D_80086F7C, 0);
     handle1->methods->release(handle1);
     self->unk48->methods->slot4C(self->unk48, arg1, (void *)&D_8008AACC);
 
-    handle2 = func_8003B39C(BuildFileName(path, sStrFontIcon, dir, ext));
+    handle2 = New_TimImage(BuildFileName(path, sStrFontIcon, dir, ext));
     handle2->methods->slot78(handle2);
     self->unk44 = New_TextRow(handle2, self->unk10, self->unk28);
     self->unk40 = (ChildObj86ED0 *)New_CharSprite(handle2, 0x5F);
@@ -71,7 +71,7 @@ pass `(path, "COMINPUT", "CARD\\", ".TIM")` and
 rodata bytes at `sStrComInput`/`sStrFontIcon`/`sCardPathPrefix`/`sTimExt`
 (`asm/data/1DD0.rodata.s`, `asm/data/7B008.sdata.s`).
 
-`func_8003B39C` (a resource loader taking a path, returning a handle) is
+`New_TimImage` (a resource loader taking a path, returning a handle) is
 already typed at several OTHER call sites in the project
 (`code_2cc8c.h`/`class_39e08.h`/`class_3bb8c_j.c`, all with their own local
 return-type view per this project's established convention) -- confirmed
@@ -160,3 +160,11 @@ three-value swap was resolved by touching only the non-persistent one.
 ## Track 4 (2026-09-26, round 87)
 
 Class unified as `TextEntry` (include/TextEntry.h; table gObj86ED0Methods -> gTextEntryMethods, type Obj86ED0 -> TextEntry). The class name is for what its methods do: setText keeps a caller's string buffer and a working copy, the cursor and char methods edit the copy, command 25 writes it back, 23 closes without writing (banner of include/TextEntry.h). Fields renamed from their accessors: unk14 charCount, unk1C charIndex, unk20 altCommands, nameLen textLen, nameBuf textBuf, unk28 editBuf, unk40 cursorSprite (CharSprite *), unk44 textRow, unk48 panelSprite (ScreenSprite *). Zero bytes changed.
+
+## Track 4 (2026-09-26, round 88)
+
+TimImage is unified (`include/TimImage.h`); this unit's local `extern
+ChildObj86ED0 *New_TimImage(char *)` is deleted. `handle1`/`handle2` are
+`TimImage *`: +0x078 (Class6D430's `void *slot78`, occupant
+TimImage__Upload) through `TimImageUploadFn`, +0x004 the inherited
+`release`. `ChildObj86ED0` stays for `textRow`. Image byte-identical.

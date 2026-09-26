@@ -1,4 +1,6 @@
-# func_8003B39C -- MATCHED (24/24 words), round 81
+# New_TimImage -- MATCHED (24/24 words), round 81
+
+> Renamed from `func_8003B39C` on 2026-09-26 (tools/rename.py). Address 0x8003b39c.
 
 Round 81, runner echo. Unit `src/code_2bb9c.c`. Fresh ground, no prior attempt.
 
@@ -9,12 +11,12 @@ Round 81, runner echo. Unit `src/code_2bb9c.c`. Fresh ground, no prior attempt.
 - **Lever used:** the round's posted alloc-then-ctor shape
   `if (p != NULL) { ctor; return p; } return NULL;` (alpha, round 81).
 - **Result:** byte-exact on the first build, whole-image SHA1 green.
-- **Name:** kept `func_`; see `## Naming` below.
+- **Name:** `New_TimImage` (renamed 2026-09-26, track 4); see `## Naming` below.
 
 ## Source
 
 ```c
-TimImage *func_8003B39C(char *name) {
+TimImage *New_TimImage(char *name) {
     TimImage *self;
 
     self = BMemPMgrAlloc(0x50);
@@ -33,8 +35,7 @@ plus slots +0x07C..+0x09C; `extern void *BMemPMgrAlloc(s32 size);`;
 
 ## Naming
 
-- **`func_8003B39C` -- RENAME BLOCKED: rename.py explicit-placeholder bug.**
-  Proposed name `New_TimImage`, tier A. Evidence: matches the project's
+- **`New_TimImage`**, tier A (proposed round 81, applied 2026-09-26). Evidence: matches the project's
   `New_Class` constructor-helper convention (`New_Obj865C8`,
   `New_BoxFill`, ...: `alloc(size); if (self) { ctor(); return self; }
   return NULL;`); every project-wide call site (`class_39e08.c`,
@@ -43,10 +44,17 @@ plus slots +0x07C..+0x09C; `extern void *BMemPMgrAlloc(s32 size);`;
   literal `D_800113EC`/`D_800114F8`/`D_800113F8`/`gCardPathSuffix`) and hands
   it straight to this function, then calls the result's slot78
   (`TimImage__Upload`) and usually slot5C (`Class6D430__FreeBuffer`) -- the
-  exact shape the class's own methods implement. The tool's
-  explicit-placeholder bug (this file has an explicit `func_8003B39C =
-  0x8003B39C;` line under a stale track-2 `// unidentified:` comment; the
-  tool resolves the address from the name, never finds the existing line,
-  and appends a duplicate, so `make extract` fails with "Duplicate symbol")
-  blocks the actual rename; per the runner instructions this was not
-  hand-edited into the symbols file.
+  exact shape the class's own methods implement. The round-81 rename was blocked by a
+  `tools/rename.py` explicit-placeholder bug (a stale track-2
+  `// unidentified:` line for `func_8003B39C`), fixed in FINISHING-PLAN
+  revision 19.
+
+## Track 4 (2026-09-26, round 88)
+
+Renamed `func_8003B39C` -> `New_TimImage` with `tools/rename.py` during
+TimImage's unification (`include/TimImage.h`): the round-81 evidence above
+stands (0x50-byte allocation = `sizeof(TimImage)`, then
+`GetTimImageMethods()->ctor(self, name)`), and the rename.py bug that
+blocked it is fixed. Image byte-identical. The six per-unit local externs of
+this function (each with its own return type) are replaced by the one
+prototype in `include/TimImage.h`.

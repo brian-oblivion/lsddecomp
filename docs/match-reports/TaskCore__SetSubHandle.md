@@ -10,7 +10,7 @@
 
 Replaces `self`'s cached sub-resource handle (`self->unk74`). If a path
 string is given, tears down the old handle (if one was live), loads a new
-one via `func_8003B39C` (already matched in `class_39e08.c`), and runs two
+one via `New_TimImage` (already matched in `class_39e08.c`), and runs two
 init calls on it. If no path is given, the caller-supplied handle `a2` is
 installed directly with no teardown/init calls at all.
 
@@ -21,7 +21,7 @@ void TaskCore__SetSubHandle(Obj86B60 *self, const char *a1, Unk74Obj *a2)
         if (self->unk70 != NULL) {
             self->unk74->methods->slot4(self->unk74);
         }
-        self->unk74 = func_8003B39C(a1);
+        self->unk74 = New_TimImage(a1);
         self->unk74->methods->slot78(self->unk74);
         self->unk74->methods->slot5C(self->unk74);
     } else {
@@ -53,7 +53,7 @@ each arm by the compiler rather than needing to be written twice by hand.
   (`pad05C[0x078-0x05C]`). This is a new field inside previously-unread
   padding, not a change to any already-typed field, so it does not affect
   `code_2cc8c.c`'s 16 already-matched functions.
-- `extern Unk74Obj *func_8003B39C(const char *path);` — a local retyped view
+- `extern Unk74Obj *New_TimImage(const char *path);` — a local retyped view
   of the already-matched `class_39e08.c` function of the same name, which
   there returns its own unit's local view `SubObjG *`. Per this project's
   established multiple-independent-local-views convention (see
@@ -93,3 +93,14 @@ Renamed `func_` -> `Obj86B60__SetSubHandle`. **Tier A**: A setter for `self->unk
 ## Track 4 (2026-09-25, round 84, alpha)
 
 Renamed from Obj86B60__SetSubHandle (tools/rename.py): the class prefix. Occupant of its gTaskCoreMethods slot, named for it in TASKCORE_SLOTS (`classtable.py gTaskCoreMethods`). The class (id 0x130, table gTaskCoreMethods) is unified as `TaskCore` in `include/TaskCore.h`; `self` is `TaskCore *` (it was the `Obj86B60` or `StreamTaskObj` view). Any source block above is the pre-unification spelling; the live body takes the unified types and slot names, byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).
+
+## Track 4 (2026-09-26, round 88)
+
+TimImage is unified (`include/TimImage.h`) and `include/code_2cc8c.h`'s
+`Unk74Obj`/`Unk74ObjMethods` view of it is deleted, together with that
+header's local `extern` of New_TimImage. The handle is cast to
+`TimImage *` (TaskCore.h still types the field `BasicClass *`); its slots are
+TimImage's: +0x004 `release`, +0x05C `freeBuffer` (was `slot5C`), and
++0x078, Class6D430's `void *slot78` whose occupant is TimImage__Upload,
+called through `TimImageUploadFn`. `path` is cast to `char *` for
+New_TimImage. Image byte-identical.

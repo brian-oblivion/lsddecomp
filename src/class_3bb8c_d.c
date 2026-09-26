@@ -25,6 +25,7 @@
 #include "common.h"
 #include "class_3bb8c.h"
 #include "TextRow.h"
+#include "TimImage.h"
 
 void Class86B60__Dtor(Class86B60 *self)
 {
@@ -248,16 +249,10 @@ void Class86B60__CommitNameEntry(Class86B60 *self)
     self->dreamSysView->methods->slot19C(self->dreamSysView, &buf2);
 }
 
-/* This unit's own local view of func_8003B39C (already matched elsewhere,
- * many independent-arity views project-wide -- see e.g.
- * src/class_3bb8c_g.c, src/class_3bb8c_i.c). Return type matches what
- * this call site actually stores it into (`self->iconHandle`). */
-extern GenericReleaseObj_3bb8c_d *func_8003B39C(const char *path);
-
 void Class86B60__BeginMemcardSave(Class86B60 *self)
 {
     if (self->saveCtrl == NULL) {
-        self->iconHandle = func_8003B39C(D_800114F8);
+        self->iconHandle = (GenericReleaseObj_3bb8c_d *)New_TimImage((char *)D_800114F8);
         self->saveCtrl = New_TaskObjF((void *)1, NULL);
     }
     self->saveCtrl->methods->slot6C(self->saveCtrl, D_8008A9D0, &D_80086D6C,

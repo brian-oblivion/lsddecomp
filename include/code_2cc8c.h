@@ -25,15 +25,14 @@ typedef struct TexPageDesc TexPageDesc;
  * What stays below are this unit family's views of the classes TaskCore
  * holds and has no header for yet: TaskCore.h types those fields
  * `BasicClass *` and the accessors here cast to the view (`sound`, a
- * VabStreamObj, is cast to include/VabStreamObj.h's type; `Unk78Obj`: `bgLayer`; `Unk74Obj`: `subHandle`
- * and TaskCoreTarget's `handle`; the slot and item widgets are TextRows,
+ * VabStreamObj, is cast to include/VabStreamObj.h's type; `Unk78Obj`: `bgLayer`;
+ * `subHandle` and TaskCoreTarget's `handle` are TimImages, include/TimImage.h,
+ * cast at code_2cc8c_b's accessors; the slot and item widgets are TextRows,
  * include/TextRow.h; `listView` is a BoxFill, include/BoxFill.h). `SlotEntry` and
  * `SrcDesc` are two readings of one TaskCoreTarget::unk24[] record.
  */
 typedef struct Unk78Obj Unk78Obj;
 typedef struct Unk78ObjMethods Unk78ObjMethods;
-typedef struct Unk74Obj Unk74Obj;
-typedef struct Unk74ObjMethods Unk74ObjMethods;
 typedef struct SrcDesc SrcDesc;
 typedef struct HeaderObj HeaderObj;
 typedef struct EventArg EventArg;
@@ -125,33 +124,6 @@ struct Unk78ObjMethods {
 struct Unk78Obj {
     Unk78ObjMethods *methods; /* +0x000 */
 };
-
-/* TaskCore::subHandle's pointee ("sub-resource handle"). Only TaskCore__SetSubHandle touches
- * it, loaded via `func_8003B39C(path)` (already matched, `class_39e08.c`,
- * where it returns the unit's own local view `SubObjG *` -- this unit keeps
- * its own local view of the same table per the project's established
- * multiple-independent-local-views convention). slot4's return value is
- * discarded at its one call site here, so it is typed `void *` rather than
- * copying `class_39e08.h`'s `SubObjG *` return type -- a discarded return is
- * never evidence of the callee's real return type (see
- * DECOMPILATION_LEARNINGS), and this unit has no use for the more specific
- * type. */
-struct Unk74ObjMethods {
-    u8 pad000[0x004];
-    void *(*slot4)(Unk74Obj *self);  /* +0x004 */
-    u8 pad008[0x05C - 0x008];
-    void (*slot5C)(Unk74Obj *self);  /* +0x05C */
-    u8 pad060[0x078 - 0x060];
-    void (*slot78)(Unk74Obj *self);  /* +0x078 */
-};
-struct Unk74Obj {
-    Unk74ObjMethods *methods;        /* +0x000 */
-};
-
-extern Unk74Obj *func_8003B39C(const char *path); /* already matched in
-                                                       class_39e08.c; local
-                                                       view retyped to this
-                                                       unit's own Unk74Obj */
 
 extern void *BMemPMgrAlloc(s32 size);   /* allocator, confirmed across many
                                             units */

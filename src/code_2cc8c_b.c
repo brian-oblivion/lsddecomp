@@ -1,5 +1,6 @@
 #include "common.h"
 #include "code_2cc8c.h"
+#include "TimImage.h"
 
 /*
  * code_2cc8c_b -- 20 of TaskCore's own methods (gTaskCoreMethods +0x0C4 to
@@ -60,9 +61,9 @@ void TaskCore__SetSubHandle(TaskCore *self, const char *path, BasicClass *handle
         if (self->subHandlePath != NULL) {
             self->subHandle->methods->release(self->subHandle);
         }
-        self->subHandle = (BasicClass *)func_8003B39C(path);
-        ((Unk74Obj *)self->subHandle)->methods->slot78((Unk74Obj *)self->subHandle);
-        ((Unk74Obj *)self->subHandle)->methods->slot5C((Unk74Obj *)self->subHandle);
+        self->subHandle = (BasicClass *)New_TimImage((char *)path);
+        ((TimImageUploadFn)((TimImage *)self->subHandle)->methods->slot78)((TimImage *)self->subHandle);
+        ((TimImage *)self->subHandle)->methods->freeBuffer((TimImage *)self->subHandle);
     } else {
         self->subHandle = handle;
     }
@@ -75,7 +76,7 @@ void TaskCore__SetTarget(TaskCore *self, TaskCoreTarget *a1)
     s32 count;
     s32 size;
     TextRow **arr;
-    Unk74Obj *handle;
+    TimImage *handle;
     s32 i;
 
     self->target = a1;
@@ -97,11 +98,11 @@ void TaskCore__SetTarget(TaskCore *self, TaskCoreTarget *a1)
     self->slotCount = count;
 
     if (a1->path != NULL) {
-        handle = func_8003B39C(a1->path);
-        handle->methods->slot78(handle);
-        handle->methods->slot5C(handle);
+        handle = New_TimImage((char *)a1->path);
+        ((TimImageUploadFn)handle->methods->slot78)(handle);
+        handle->methods->freeBuffer(handle);
     } else {
-        handle = (Unk74Obj *)a1->handle;
+        handle = (TimImage *)a1->handle;
     }
 
     list = a1->names;
@@ -135,8 +136,8 @@ void TaskCore__ReleaseTarget(TaskCore *self)
         return;
     }
     if (self->target->path != NULL) {
-        Unk74Obj *o = (Unk74Obj *)self->target->handle;
-        o->methods->slot4(o);
+        TimImage *o = (TimImage *)self->target->handle;
+        o->methods->release(o);
     }
     self->listView->methods->release(self->listView);
     arr = (TextRow **)self->slotElements;

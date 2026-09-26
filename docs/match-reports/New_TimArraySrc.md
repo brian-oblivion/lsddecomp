@@ -42,4 +42,4 @@ void *New_TimArraySrc(s32 arg0) {
 
 ## Naming
 
-- **New_TimArraySrc**, tier A. Allocator for D_8006F1C4, which builds arrays of TimImage objects (func_8003B39C, confirmed elsewhere as "new TimImage(name)", src/code_2bb9c.c).
+- **New_TimArraySrc**, tier A. Allocator for D_8006F1C4, which builds arrays of TimImage objects (New_TimImage, confirmed elsewhere as "new TimImage(name)", src/code_2bb9c.c).

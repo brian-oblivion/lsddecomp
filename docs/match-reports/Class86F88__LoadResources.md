@@ -11,7 +11,7 @@ Unit: `src/class_3bb8c_j.c`. `self` is `Class86F88_3bb8c_j`.
 ```c
 #if 0
 extern void *BuildFileName(void *out, void *a1, void *a2, void *a3);
-extern Class86F88Handle_3bb8c_j *func_8003B39C(void *arg0);
+extern Class86F88Handle_3bb8c_j *New_TimImage(void *arg0);
 extern Class86F88Handle_3bb8c_j *New_ScreenSprite(Class86F88Handle_3bb8c_j *arg0, void *arg1, s32 arg2);
 extern s32 D_8008AB14;
 extern s32 D_8008AB1C;
@@ -32,13 +32,13 @@ void Class86F88__LoadResources(Class86F88_3bb8c_j *self, void *arg1)
         return;
     }
 
-    h = func_8003B39C(BuildFileName(local, &D_8008AB14, &D_8008AB1C, &D_8008AB24));
+    h = New_TimImage(BuildFileName(local, &D_8008AB14, &D_8008AB1C, &D_8008AB24));
     h->methods->slot78(h);
     self->unk50 = New_ScreenSprite(h, &D_80087028, 0);
     h->methods->slot4(h);
     self->unk50->methods->slot4C(self->unk50, arg1, &D_8008AAF8);
 
-    h = func_8003B39C(BuildFileName(local, &D_800116E4, &D_8008AB1C, &D_8008AB24));
+    h = New_TimImage(BuildFileName(local, &D_800116E4, &D_8008AB1C, &D_8008AB24));
     h->methods->slot78(h);
     self->methods->slot8C(self, arg1, h, self->unk20, self->unk24, self->unk28);
     h->methods->slot4(h);
@@ -48,7 +48,7 @@ void Class86F88__LoadResources(Class86F88_3bb8c_j *self, void *arg1)
 
 If (`arg1` non-NULL AND `self->unk50` not already set): builds a
 16-byte-ish stack descriptor via `BuildFileName(&local, ...)` fed into
-`func_8003B39C`, producing an opaque "handle" (`Class86F88Handle_3bb8c_j *`, the
+`New_TimImage`, producing an opaque "handle" (`Class86F88Handle_3bb8c_j *`, the
 same type `Class86F88__ReleaseResources` -- matched this round -- also uses via
 `self->unk50`). Calls the handle's own `slot78` (init?), stores a SECOND
 derived handle into `self->unk50` via `New_ScreenSprite`, releases the FIRST
@@ -109,7 +109,7 @@ differently.
 Given the residue is a THREE-WAY rotation with `self`/`arg1` already
 correct, the lever is most likely in exactly WHICH new value gets
 introduced FIRST after `self`/`arg1` are already live -- try writing the
-FIRST `BuildFileName`/`func_8003B39C` pair's result assignment before
+FIRST `BuildFileName`/`New_TimImage` pair's result assignment before
 computing `&D_8008AB1C`/`&D_8008AB24` at all (i.e. reorder so the
 call happens before the two address-of expressions are bound to named
 locals, forcing GCC to allocate the handle's register before the two
@@ -176,8 +176,8 @@ outside "ordering" have a track record of not helping this class.
 This round's brief lists "split one combined expression into two sequential
 statements" as a lever that closed `GetSetBitField` elsewhere, distinct from
 mere declaration-order shuffling. Tried here: split the nested
-`h = func_8003B39C(BuildFileName(...));` expression into two statements
-(`desc = BuildFileName(...); h = func_8003B39C(desc);`) for BOTH
+`h = New_TimImage(BuildFileName(...));` expression into two statements
+(`desc = BuildFileName(...); h = New_TimImage(desc);`) for BOTH
 occurrences, rather than only renaming the two address locals or
 reordering their declarations (which is all round 18 tried). **Result:
 byte-for-byte identical 75/95, same three-register rotation.** No
@@ -258,7 +258,7 @@ The template was the MATCHED sibling `TextEntry__LoadCardResources` in
 `src/class_3bb8c_i.c`: the same "CARD\\<name>.TIM" resource loader, with
 `char path[0x20]`, `dir`/`ext` locals and `handle1`/`handle2`. Screen for the
 next case: a cross-unit sibling with the same call skeleton (here
-`BuildFileName` -> `func_8003B39C` -> `slot78` -> `New_ScreenSprite`).
+`BuildFileName` -> `New_TimImage` -> `slot78` -> `New_ScreenSprite`).
 
 Builds, all through `./build-and-verify.sh`:
 
@@ -298,8 +298,17 @@ cross-unit sibling with the same call skeleton first.
 
 ## Naming
 
-- `Class86F88__LoadResources` -- tier B. The slot44 occupant (classtable.py gClass86F88Methods +0x044): builds two "CARD\\<name>.TIM" paths, loads them through func_8003B39C/New_D8006ED4C, and dispatches the second through self->methods->slot8C. Mechanics (load a pair of card-icon-shaped resources) are clear from the BuildFileName/CARD path evidence; what the two resources are FOR is not.
+- `Class86F88__LoadResources` -- tier B. The slot44 occupant (classtable.py gClass86F88Methods +0x044): builds two "CARD\\<name>.TIM" paths, loads them through New_TimImage/New_D8006ED4C, and dispatches the second through self->methods->slot8C. Mechanics (load a pair of card-icon-shaped resources) are clear from the BuildFileName/CARD path evidence; what the two resources are FOR is not.
 
 ## Track 4
 
 2026-09-25, round 84 (charlie): The class `New_D8006ED4C` constructs is unified as ScreenSprite in `include/ScreenSprite.h`; the unit includes it and its local extern is gone. The call reads `self->unk50 = (Class86F88Handle_3bb8c_j *)New_ScreenSprite(handle1, (SpriteRect *)&D_80087028, 0)`: D_80087028 is the rect (words 0, 256, 160), and unk50's +0x04C call passes the screen position D_8008AAF8 = (-100, -60). Image byte-identical.
+
+## Track 4 (2026-09-26, round 88)
+
+TimImage is unified (`include/TimImage.h`); this unit's local `extern
+Class86F88Handle_3bb8c_j *New_TimImage(char *)` is deleted. `handle1`/
+`handle2` are `TimImage *`: +0x078 through `TimImageUploadFn` (occupant
+TimImage__Upload), `slot4` -> the inherited `release`; `handle2` is cast to
+`Class86F88Handle_3bb8c_j *` for slot8C, whose parameter is this class's
+own view (not TimImage's to retype). Image byte-identical.
