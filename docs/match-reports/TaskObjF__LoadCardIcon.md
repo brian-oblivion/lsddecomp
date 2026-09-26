@@ -91,7 +91,7 @@ type from `class_3bb8c.h` (`slot78`/`release` already declared there).
 (established by the already-matched `TaskObjF__TickCardIcon`, same file). Assigning
 `New_ScreenSprite`'s `ChildObj86ED0 *` return into it is the same
 implicit-pointer-type-mismatch-is-harmless pattern already documented in
-`TextEntry__LoadCardResources`'s own report (`self->unk44 = New_Obj6EAC0(...)` there) --
+`TextEntry__LoadCardResources`'s own report (`self->unk44 = New_TextRow(...)` there) --
 a warning, not an error, zero byte cost. Extended
 `Class86E00Unk70ObjMethods_3bb8c_g` (in `include/class_3bb8c.h`)
 ADDITIVELY with `slot4C` at `+0x04C`

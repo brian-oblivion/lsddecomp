@@ -47,7 +47,7 @@ void Class86F88__CreateRows(Class86F88 *self, s32 arg1, s32 arg2, s32 arg3, s32 
 
     for (i = 0; i < count; i++) {
         Class86F88__FormatRowText(self, buf, i, arg3, (char *)arg4);
-        *p = (Class86F88Elem *)New_Obj6EAC0((void *)arg2, 0x1A, buf);
+        *p = (Class86F88Elem *)New_TextRow((void *)arg2, 0x1A, buf);
         (*p)->methods->slot4C(*p, arg1, &local);
         (*p)->methods->slotB8(*p, &gClass86F88RowColor);
         local.b += 0xA;
@@ -75,8 +75,8 @@ this one call site's own reading) — its offset and neighbor (`release` at
 `ObjM__AdvancePauseSetup`), which is suggestive but not something this round needed
 to resolve.
 
-`New_Obj6EAC0` already has a SHARED declaration in `include/class_3bb8c.h`
-(`extern FieldM7C *New_Obj6EAC0(void *ctx, s32 len, char *name);`, a
+`New_TextRow` already has a SHARED declaration in `include/class_3bb8c.h`
+(`extern FieldM7C *New_TextRow(void *ctx, s32 len, char *name);`, a
 different unit's own independent view of the same uncarved external
 function) — this unit's `self->unk40[]` is typed `Class86F88Elem *`, a
 different local name for what the header comment already notes might be
@@ -91,7 +91,7 @@ already used for `Obj865C8__EnterState2`/`TextEntry__ClearChildRefs` elsewhere t
 **One register-identity trap, closed by reordering two local
 declarations — no logic change.** With `Elem4CArg_3bb8c_k local;` declared
 before `char buf[0x20];`, GCC decided `buf`'s address (used at two call
-sites, `Class86F88__FormatRowText` and `New_Obj6EAC0`) was worth caching in a
+sites, `Class86F88__FormatRowText` and `New_TextRow`) was worth caching in a
 callee-saved register across both uses, rather than recomputing the cheap
 `sp`-relative address each time — retail does NOT cache it (two separate
 `addiu $a1/$a2, $sp, 0x18` computations). That one cached register pushed
@@ -120,6 +120,6 @@ shifts register allocation across the whole function").
 
 Round 75 (bravo, track 3). `func_80052644` -> `Class86F88__CreateRows`, **tier A**.
 
-Slot +0x08C (`tools/classtable.py gClass86F88Methods`). Called by Class86F88__LoadResources (class_3bb8c_j) as (self, parent, FONTICON handle, topIndex, column, cursorIndex). Builds min(itemCount, 4) row text objects with New_Obj6EAC0(font, 26, text), lays each out at (gClass86F88RowOriginX, gClass86F88RowOriginY + 0xA*i), colours it gClass86F88RowColor, then SetView(..., highlight=1).
+Slot +0x08C (`tools/classtable.py gClass86F88Methods`). Called by Class86F88__LoadResources (class_3bb8c_j) as (self, parent, FONTICON handle, topIndex, column, cursorIndex). Builds min(itemCount, 4) row text objects with New_TextRow(font, 26, text), lays each out at (gClass86F88RowOriginX, gClass86F88RowOriginY + 0xA*i), colours it gClass86F88RowColor, then SetView(..., highlight=1).
 
 Class86F88, per the round-75 pass, is a scrolling list selector: up to 4 visible rows of 26-character item text, a highlighted cursor row, a horizontal column offset (see the unit header comment of `src/class_3bb8c_k.c`).

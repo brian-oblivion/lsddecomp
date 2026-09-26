@@ -906,8 +906,8 @@ struct Class86B60UnkB0ObjMethods_3bb8c_d {
     /* +0x0B8, Class86B60__TickNameFieldCursor's own last call: `(self, buf)` where `buf` is
      * that function's own 3-byte stack buffer. Lands at the SAME offset
      * as `include/class_3bb8c.h`'s own `FieldM7CMethods::slotB8` (a
-     * different unit's independent view) and `code_2cc8c.h`'s
-     * `Unk64ElemMethods` -- further confirmation (on top of `release`
+     * different unit's independent view) and TextRow's table
+     * (include/TextRow.h) -- further confirmation (on top of `release`
      * +0x004 and `slot4C` +0x04C already matching both) that `unkB0` is
      * that same real class. */
     void (*slotB8)(Class86B60UnkB0Obj_3bb8c_d *self, void *arg1);
@@ -925,12 +925,9 @@ struct Class86B60UnkB0Obj_3bb8c_d {
      * an allocation SIZE (`BMemPMgrAlloc`'s own argument). */
     u8 unkA9;
     /* +0x0AA/+0x0AB/+0x0AC, Class86B60__CreateNameField: three literal byte fields
-     * (9/8/4) set right after allocation via `New_Obj6EAC0` -- this is
-     * the SAME real object as `code_2cc8c.h`'s `Unk64Elem` (matching
-     * slot offsets 0x004/0x04C/0x0B8, see that header's own note), so
-     * these three bytes are almost certainly flags/type-tag data on that
-     * class; kept opaque byte fields since this unit never reads them
-     * back. */
+     * (9/8/4) set right after allocation via `New_TextRow` -- this is
+     * a TextRow (include/TextRow.h): +0x0A9 cellCount, +0x0AA gapIndex,
+     * +0x0AB visibleCount, +0x0AC firstVisible. */
     u8 unkAA;
     u8 unkAB;
     u8 unkAC;
@@ -1155,7 +1152,7 @@ struct Class86B60 {
      * reaches a SECOND slot (`+0x04C`) on the same pointer that
      * `unkA8`/`unkAC` never do, so it is kept a distinct local view
      * rather than assuming the other two share its fuller shape. */
-    Class86B60UnkB0Obj_3bb8c_d *nameField; /* RENAMED from unkB0 -- the New_Obj6EAC0 result
+    Class86B60UnkB0Obj_3bb8c_d *nameField; /* RENAMED from unkB0 -- the New_TextRow result
                                         Class86B60__CreateNameField constructs. */
     u8 pad0B4[0x0BC - 0x0B4];
     s32 unkBC;                      /* +0x0BC, Class86B60__Class86B60: return value of dreamSys->methods->slot1B0 */
@@ -1938,10 +1935,10 @@ struct FieldM34 {
 };
 
 /* self->unk10/self->unk54's shared target (ObjM__TeardownPauseOverlay/ObjM__AdvancePauseSetup).
- * Distinct from `Unk64Elem` (include/code_2cc8c.h) despite sharing slot
+ * Distinct from TextRow (include/TextRow.h) despite sharing slot
  * NUMBERS with it (0x4C/0x50): self->unk10's own slot4C call site here
  * (ObjM__AdvancePauseSetup) sets up only ONE argument (self), which conflicts with
- * `Unk64ElemMethods::slot4C`'s already-established 3-argument signature
+ * TextRow's attachToParent (+0x04C), a 3-argument slot
  * (from that unit's own call sites) -- real counter-evidence against
  * unifying the two, per this project's established arity-conflict rule.
  * Kept as its own type. */
@@ -1955,15 +1952,10 @@ struct FieldM50 {
 };
 
 /* self->unk7C's target (ObjM__TeardownPauseOverlay/ObjM__AdvancePauseSetup). Returned by
- * New_Obj6EAC0, matched elsewhere (src/code_2cc8c_f.c) with return type
- * `Unk64Elem *` (include/code_2cc8c.h). This unit keeps its own
- * independent local view rather than including code_2cc8c.h, per the
- * project's established multiple-independent-local-views convention --
- * every slot below (0x004/0x04C/0x0B8) matches `Unk64ElemMethods` exactly
- * in both offset and signature, which is suggestive (not proof) that this
- * IS that same class. A different translation unit is free to type a
- * shared external function's return differently; this does not disturb
- * code_2cc8c_f.c's already-matched bytes. */
+ * New_TextRow (src/code_2cc8c_f.c), which returns `TextRow *`
+ * (include/TextRow.h); the call site casts. The slots below (0x004/0x04C/
+ * 0x0B8) are TextRow's release/attachToParent/setColor; the view is kept
+ * (ObjM's, not TextRow's job). */
 struct FieldM7CMethods {
     u8 pad000[0x004];
     void (*slot4)(FieldM7C *self);                              /* +0x004, ObjM__TeardownPauseOverlay */
@@ -1976,10 +1968,8 @@ struct FieldM7C {
     FieldM7CMethods *methods;   /* +0x000 */
 };
 
-/* This unit's own view of the uncarved New_Obj6EAC0 (see FieldM7C's
- * comment above for why the return type differs from the other unit's
- * already-matched view of the same external symbol). */
-extern FieldM7C *New_Obj6EAC0(void *ctx, s32 len, char *name);
+/* New_TextRow: include/TextRow.h (track 4, round 88), included by the units
+ * that call it; its callers cast the TextRow to their own view. */
 
 /* ObjM__AdvancePauseSetup's own literal arguments -- a "Pause" name string plus two
  * small opaque blocks, all reached only by address (never dereferenced in
@@ -2030,7 +2020,7 @@ struct ObjM {
     u8 pad040[0x054 - 0x040];
     FieldM50 *unk54;          /* +0x054, ObjM__TeardownPauseOverlay/ObjM__AdvancePauseSetup -- same type as unk10 above */
     u8 pad058[0x074 - 0x058];
-    void *unk74;               /* +0x074, ObjM__AdvancePauseSetup: forwarded opaquely to New_Obj6EAC0's ctx arg */
+    void *unk74;               /* +0x074, ObjM__AdvancePauseSetup: forwarded opaquely to New_TextRow's ctx arg */
     u8 pad078[0x07C - 0x078];
     FieldM7C *unk7C;          /* +0x07C, ObjM__AdvancePauseSetup (written)/ObjM__TeardownPauseOverlay (dispatched) */
     s32 pauseSetupStep;                 /* +0x080, ObjM__UpdateCloseReadyFlag/ObjM__AdvancePauseSetup */
@@ -2316,7 +2306,7 @@ extern void StyleTeardown(void);
  * resources `cursorSprite`/`textRow`/`panelSprite` and the TIM handles
  * (ChildObj86ED0), and `target` (TargetObj86ED0). The names are kept.
  */
-/* TextEntry's `textRow` (an Obj6EAC0, New_Obj6EAC0) and the two TIM handles
+/* TextEntry's `textRow` (a TextRow, include/TextRow.h) and the two TIM handles
  * TextEntry__LoadCardResources and TaskObjF__LoadCardIcon load through
  * func_8003B39C: a view of the slots those calls use, not one class. */
 typedef struct ChildObj86ED0 ChildObj86ED0;
@@ -2333,7 +2323,7 @@ struct ChildMethods86ED0 {
     u8 pad07C[0x0B8 - 0x07C];
     void (*slotB8)(ChildObj86ED0 *self, void *arg1); /* +0x0B8, TextEntry__LoadCardResources, textRow */
     u8 pad0BC[0x0C4 - 0x0BC];
-    void (*slotC4)(ChildObj86ED0 *self, s32 arg1, s32 arg2); /* +0x0C4, TextEntry__SetCharAt, textRow: (char, pos); Obj6EAC0__SetChildChar */
+    void (*slotC4)(ChildObj86ED0 *self, s32 arg1, s32 arg2); /* +0x0C4, TextEntry__SetCharAt, textRow: (char, pos); TextRow__SetCellAt */
 };
 struct ChildObj86ED0 {
     ChildMethods86ED0 *methods; /* +0x000 */
@@ -2411,7 +2401,7 @@ struct TargetObj86ED0 {
  * header word 0x20; class_3bb8c_j holds its ctor/dtor/child/resource
  * methods under its own local view `Class86F88_3bb8c_j`). Round 75 naming
  * pass: a scrolling list selector. It shows up to 4 rows of its item
- * strings (26 characters each, one `New_Obj6EAC0` text object per row),
+ * strings (26 characters each, one `New_TextRow` text object per row),
  * with a highlighted cursor row, vertical cursor movement that scrolls the
  * window at its edges, and a horizontal column offset into every string.
  * Confirm/cancel set `result` (2/3), and the parent reads the chosen item
@@ -2467,10 +2457,10 @@ struct Class86F88Methods {
 };
 
 /*
- * Each element of Class86F88::rows[] -- a `New_Obj6EAC0` text object
- * (derived table D_8006EB90, `tools/classtable.py D_8006EB90`: +0x04C
- * Obj6EAC0__LayoutChildrenWithGap, +0x0B8 Obj6EAC0__PropagateColor, +0x0CC
- * Obj6EAC0__SetText). `release` at +0x004 is BasicClass__Release.
+ * Each element of Class86F88::rows[] -- a `New_TextRow` text object
+ * (derived table gTextRowMethods, `tools/classtable.py gTextRowMethods`: +0x04C
+ * TextRow__AttachToParent, +0x0B8 TextRow__SetColor, +0x0CC
+ * TextRow__SetText). `release` at +0x004 is BasicClass__Release.
  */
 struct Class86F88ElemMethods {
     u8 pad000[0x004];

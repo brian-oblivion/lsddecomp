@@ -15,16 +15,15 @@
  *    32-wide grid is the ASCII layout.
  *  - The ctor sizes the sprite from cell 0x20, ASCII space, before it
  *    selects the caller's cell.
- *  - Its callers agree: D_8006EB90 (0x11144, the class below this one) makes
+ *  - Its callers agree: TextRow (0x11144, the class below this one) makes
  *    a row of CharSprites and hands each the next byte of a NUL-terminated
- *    string through setCell (Obj6EAC0__SetText), and TextEntry__
+ *    string through setCell (TextRow__SetText), and TextEntry__
  *    LoadCardResources makes one on FONTICON.TIM with 0x5F, '_'.
  *
  * The ctor chains to ScreenSprite's first (GetScreenSpriteMethods()->ctor
  * with cell 0x20's rect and 0), so the id tree (0x144 -> 0x1144) is the ctor
- * chain. One class derives from it: D_8006EB90 (0x11144), whose view is its
- * own (include/code_2cc8c.h's `Obj6EAC0`); it does not expand these macros
- * yet.
+ * chain. One class derives from it: TextRow (0x11144, include/TextRow.h),
+ * which expands these macros.
  *
  * reset (+0x040) is overridden with a parameter list Class6B5CC's slot does
  * not have: CharSprite__Reset takes the cell. The slot keeps Class6B5CC's
@@ -33,8 +32,8 @@
  *
  * The object is 0xAC bytes (New_CharSprite): `cellIndex` at +0x0A8 is the
  * one field this class's methods touch, and 0xAC is sizeof rounded to the
- * word alignment the method pointer gives the struct. D_8006EB90's view
- * names u8 fields from +0x0A9, inside that padding, which a flat expansion
+ * word alignment the method pointer gives the struct. TextRow's own u8
+ * fields start at +0x0A9, inside that padding, which a flat expansion
  * of CHARSPRITE_FIELDS puts exactly there.
  */
 
@@ -46,8 +45,8 @@ typedef struct CharSpriteMethods CharSpriteMethods;
  * inherited ones (CharSprite__CharSprite, CharSprite__Reset). */
 #define CHARSPRITE_SLOTS(Self, CtorParams)                                                         \
     SCREENSPRITE_SLOTS(Self, CtorParams);                                                          \
-    /* +0x0C4 */ void (*setCell)(Self *self, u8 cell); /* CharSprite__SetCell; D_8006EB90: Obj6EAC0__SetChildChar */ \
-    /* +0x0C8 */ u8 (*getCell)(Self *self)             /* CharSprite__GetCell; D_8006EB90: Obj6EAC0__NoOpSetter (empty) */
+    /* +0x0C4 */ void (*setCell)(Self *self, u8 cell); /* CharSprite__SetCell; gTextRowMethods: TextRow__SetCellAt */ \
+    /* +0x0C8 */ u8 (*getCell)(Self *self)             /* CharSprite__GetCell; gTextRowMethods: TextRow__NoOpGetCell (empty) */
 
 #define CHARSPRITE_FIELDS(Methods)                                                                 \
     SCREENSPRITE_FIELDS(Methods);                                                                  \

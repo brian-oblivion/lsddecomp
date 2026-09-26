@@ -12,7 +12,7 @@ void BoxFill__SetPri(Obj6EAC0 *self, s32 a1) {
 
 Base-table occupant of `Obj6EAC0Methods::slot0xC8` (see
 `include/code_2cc8c.h`); the derived table's slot0xC8 is
-`Obj6EAC0__NoOpSetter`, a splat-generated trivial `jr $ra; nop` already present
+`TextRow__NoOpGetCell`, a splat-generated trivial `jr $ra; nop` already present
 in `src/code_2cc8c_f.c` before this unit was carved.
 
 ### Proposed learning
@@ -29,7 +29,7 @@ Round 54 (alpha), FINISHING-PLAN track 3.
 
 **What is known.** Base-table occupant of `slotC8`: a plain one-field
 setter, `self->unk44 = a1`. The derived table's own `slotC8` occupant
-(`Obj6EAC0__NoOpSetter`) does nothing at all for this same slot, which
+(`TextRow__NoOpGetCell`) does nothing at all for this same slot, which
 argues `unk44` is a container-level attribute meaningless for leaf/child
 instances -- but nothing in this unit ever READS `unk44` back, so its
 real purpose (beyond "a stored word") is not established. Kept `func_`

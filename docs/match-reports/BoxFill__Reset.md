@@ -62,7 +62,7 @@ type" caution, just for a parameter rather than a return.
 (`+0x040`), dispatched by `BoxFill__BoxFill` immediately after
 installing `self->methods` -- the identical architectural role, at the
 identical offset, as `Class6E99C__Reset` one level up and
-`Obj6EAC0__FinishConstruct` (round 54, this same table family) one level
+`TextRow__Reset` (round 54, this same table family) one level
 further down. See `Class6E99C__Reset.md`'s naming note for the
 full three-occupant cross-check.
 

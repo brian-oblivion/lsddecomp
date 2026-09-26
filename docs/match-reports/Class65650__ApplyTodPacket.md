@@ -537,7 +537,7 @@ of the two symmetric clusters -- e.g. cluster 1: retail
 b7602935]` (mine's word N = retail's word N+2, mod 3; the SAME three
 32-bit values appear on both sides, only their relative order differs).
 This positively rules out the "missing field-offset term" mechanism the
-head flagged as a live hypothesis (round 18's `func_80040C00`, and this
+head flagged as a live hypothesis (round 18's `TextRow__DetachFromParent`, and this
 round's several other functions, show that class produces a genuinely
 DIFFERENT or MISSING instruction, not a same-set reordering) -- there is
 no missing `+ self->something` here, just a scheduling-position

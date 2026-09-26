@@ -134,9 +134,9 @@ store ORDER is not reachable from C" class.
 ## Round 15 update: two more attempts, still resistant
 
 Re-attempted after the coordinator flagged this as one of the three
-closest stalls to revisit, with `Obj6EAC0__Construct`'s freshly-discovered
+closest stalls to revisit, with `TextRow__TextRow`'s freshly-discovered
 "leftover register" and "narrower cast" levers in mind. Neither
-applied here -- unlike `Obj6EAC0__Construct`, the CALL setup itself is
+applied here -- unlike `TextRow__TextRow`, the CALL setup itself is
 already exactly right (retail's own `self->methods->slot4C` call also
 forwards `self`/`a1`/`a2`/`a3` with NO explicit register moves at all,
 since none of the four have been touched since function entry; the
@@ -195,9 +195,9 @@ Round 54 (alpha), FINISHING-PLAN track 3.
 **Evidence.** Base occupant of `slotC4`: forwards `(a1, a2, a3)` to
 `self->methods->slot4C` (the "layout" slot -- see `BoxFill__AttachToParent`),
 then `self->unk48 = 0; self->unk4C = a3;`. `slotC4`'s DERIVED occupant
-(`Obj6EAC0__SetChildChar`, this unit) indexes into `self->children[a2]`
+(`TextRow__SetCellAt`, this unit) indexes into `self->children[a2]`
 and dispatches THAT child's own `slotC4` with `a1 & 0xFF` -- an 8-bit
-value. `Obj6EAC0__SetText` (this unit, `slotCC`'s derived occupant)
+value. `TextRow__SetText` (this unit, `slotCC`'s derived occupant)
 independently walks a byte string dispatching `elem->methods->slotC4(elem,
 *p)` per child -- i.e. `slotC4` is called elsewhere with individual
 string bytes, which is the evidence this slot sets a per-glyph character
@@ -207,4 +207,4 @@ code outside this unit).
 
 ## Track 4 (2026-09-25, round 85, charlie)
 
-Class 0x64 (was D_8006EAC0) is unified as BoxFill in include/BoxFill.h: Viewport__DrawNode draws a node whose class-id low byte is 0x64 with GsSortBoxFill over the GsBOXF at +0x058 (pri +0x044, `relative` +0x048, x/y +0x050/+0x054). The body now takes `BoxFill *`; zero bytes changed. Renamed from `Obj6EAC0__SetChar`. That name came from D_8006EB90's class, whose SetText/SetChildChar hand a character to each CHILD's +0x0C4, but those children are CharSprite cells, not BoxFills, so it described another class's slot. The body: attachToParent(self, parent, pos) through the inherited +0x04C slot (with a fourth argument, through an unprototyped pointer, kept for the bytes), then `relative` = 0 (DrawNode then reads posX/posY as pixels, not percent of half the screen) and unk4C = the fourth argument. GraphRoom__PopulateGraphPoints is its caller, with (parent, &point, 0). Tier B: the mechanics are that; what unk4C is for is not shown (no reader).
+Class 0x64 (was D_8006EAC0) is unified as BoxFill in include/BoxFill.h: Viewport__DrawNode draws a node whose class-id low byte is 0x64 with GsSortBoxFill over the GsBOXF at +0x058 (pri +0x044, `relative` +0x048, x/y +0x050/+0x054). The body now takes `BoxFill *`; zero bytes changed. Renamed from `Obj6EAC0__SetChar`. That name came from gTextRowMethods's class, whose SetText/SetChildChar hand a character to each CHILD's +0x0C4, but those children are CharSprite cells, not BoxFills, so it described another class's slot. The body: attachToParent(self, parent, pos) through the inherited +0x04C slot (with a fourth argument, through an unprototyped pointer, kept for the bytes), then `relative` = 0 (DrawNode then reads posX/posY as pixels, not percent of half the screen) and unk4C = the fourth argument. GraphRoom__PopulateGraphPoints is its caller, with (parent, &point, 0). Tier B: the mechanics are that; what unk4C is for is not shown (no reader).

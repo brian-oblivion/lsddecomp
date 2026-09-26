@@ -16,6 +16,7 @@
 #include "class_3bb8c.h"
 #include "TextEntry.h"
 #include "CharSprite.h"
+#include "TextRow.h"
 
 /* This project's own strcpy (matched elsewhere) -- TextEntry__SetText's own
  * caller, same local-declaration convention as class_3bb8c_e.c/others. */
@@ -163,7 +164,7 @@ void TextEntry__SetText(TextEntry *self, char *arg1, s32 mode)
 /*
  * TextEntry__LoadCardResources's own helpers/data -- builds two "CARD\\<name>.TIM"
  * paths (BuildFileName, code_171e0.c), loads each through func_8003B39C, and
- * makes panelSprite (New_ScreenSprite), textRow (New_Obj6EAC0) and
+ * makes panelSprite (New_ScreenSprite), textRow (New_TextRow) and
  * cursorSprite (New_CharSprite) from the loaded handles.
  */
 extern char *BuildFileName(char *dest, char *arg1, char *arg2, char *arg3);
@@ -205,7 +206,7 @@ void TextEntry__LoadCardResources(TextEntry *self, void *arg1)
 
     handle2 = func_8003B39C(BuildFileName(path, sStrFontIcon, dir, ext));
     handle2->methods->slot78(handle2);
-    self->textRow = (ChildObj86ED0 *)New_Obj6EAC0(handle2, self->textLen, self->editBuf);
+    self->textRow = (ChildObj86ED0 *)New_TextRow(handle2, self->textLen, self->editBuf);
     self->cursorSprite = New_CharSprite(handle2, 0x5F);
     handle2->methods->release(handle2);
     self->textRow->methods->slot4C(self->textRow, arg1, (void *)&D_8008AAD4);

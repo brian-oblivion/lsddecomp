@@ -24,8 +24,8 @@
  * id tree (0x44 -> 0x144 -> 0x1144) is the ctor chain. Two classes derive
  * from it (`typeviews.py --tree`): CharSprite (0x1144, one 8x8 font
  * character, include/CharSprite.h, own fields from +0x0A8), which expands
- * these macros, and D_8006EB90 (0x11144, below CharSprite), whose view is
- * its own (include/code_2cc8c.h) and does not expand them yet.
+ * these macros, and TextRow (0x11144, below CharSprite, include/TextRow.h),
+ * which expands CharSprite's.
  *
  * Not settled here: the ctor occupant returns nothing where the slot, from
  * Class6B5CC, returns `void *`; and the attachToParent override's third
@@ -53,7 +53,7 @@ struct ScreenSpritePos {
  * ScreenSprite__AttachToParent). */
 #define SCREENSPRITE_SLOTS(Self, CtorParams)                                                       \
     SPRITE_SLOTS(Self, CtorParams);                                                                \
-    /* +0x0BC */ void (*setPosition)(Self *self, ScreenSpritePos *pos); /* ScreenSprite__SetPosition; D_8006EB90: Obj6EAC0__LayoutChildren */ \
+    /* +0x0BC */ void (*setPosition)(Self *self, ScreenSpritePos *pos); /* ScreenSprite__SetPosition; gTextRowMethods: TextRow__SetPosition */ \
     /* +0x0C0 */ void (*setPivotAnchor)(Self *self, u32 anchor)         /* ScreenSprite__SetPivotAnchor: 0 centre, 1 left, 2 right, 3 top, 4 bottom */
 
 #define SCREENSPRITE_FIELDS(Methods)                                                               \

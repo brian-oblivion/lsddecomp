@@ -86,7 +86,7 @@ struct TextEntry {
     /* +0x038 */ void *childType5;   /* ... whose low nibble is 5 */
     /* +0x03C */ struct TargetObj86ED0 *target; /* attachTarget; notifyTarget calls its +0x080 with (arg1, 0x60, 0x60) */
     /* +0x040 */ CharSprite *cursorSprite;         /* loadCardResources: New_CharSprite(FONTICON, '_'); setCursorPos moves it to x = pos * 7 */
-    /* +0x044 */ struct ChildObj86ED0 *textRow; /* an Obj6EAC0 (D_8006EB90, below CharSprite; its view is code_2cc8c.h's own): loadCardResources: New_Obj6EAC0(FONTICON, textLen, editBuf); setCharAt sets a cell (+0x0C4) */
+    /* +0x044 */ struct ChildObj86ED0 *textRow; /* a TextRow (include/TextRow.h): loadCardResources: New_TextRow(FONTICON, textLen, editBuf); setCharAt sets a cell (+0x0C4) */
     /* +0x048 */ ScreenSprite *panelSprite;        /* loadCardResources: New_ScreenSprite(COMINPUT, 224x120); non-NULL gates every editing method */
 };
 

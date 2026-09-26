@@ -1,11 +1,13 @@
-# Obj6EAC0__Destruct — MATCHED (22/22 words)
+# TextRow__Finalize — MATCHED (22/22 words)
+
+> Renamed from `Obj6EAC0__Destruct` on 2026-09-26 (tools/rename.py). Address 0x80040a30.
 
 > Renamed from `func_80040A30` on 2026-09-18 (tools/rename.py). Address 0x80040a30.
 
 Unit: `src/code_2cc8c_f.c`. First attempt.
 
 ```c
-void Obj6EAC0__Destruct(Obj6EAC0 *self) {
+void TextRow__Finalize(Obj6EAC0 *self) {
     ReleaseBasicClassArray(self->unkB4, self->unkA9);
     self->unkB4 = BMemPMgrFree(self->unkB4);
     GetCharSpriteMethods()->finalize((CharSprite *)self);
@@ -46,13 +48,13 @@ Round 54 (alpha), FINISHING-PLAN track 3.
 
 | was | now | tier |
 | --- | --- | --- |
-| `func_80040A30` | `Obj6EAC0__Destruct` | B |
+| `func_80040A30` | `TextRow__Finalize` | B |
 
 **Evidence.** Derived occupant of `slot0C`: releases the whole
 `children` array (`ReleaseBasicClassArray(self->children,
 self->totalChildCount)`), frees the array pointer itself
 (`BMemPMgrFree`), then chains to the third sibling table's own `slot0C`
--- the mirror-image teardown of `Obj6EAC0__Construct`'s own setup. Tier B
+-- the mirror-image teardown of `TextRow__TextRow`'s own setup. Tier B
 for the same reason as `Construct`: the destructor role is certain from
 the mechanics, the class's broader purpose is not independently
 confirmed.
@@ -60,3 +62,7 @@ confirmed.
 ## Track 4
 
 2026-09-26, round 86 (bravo): the parent class 0x1144 is unified as CharSprite (`include/CharSprite.h`, formerly D_8006EC74). The base call is `GetCharSpriteMethods()->finalize((CharSprite *)self)` (was `->slot0C(self)`): an upcast, no code. Image byte-identical.
+
+## Track 4 (2026-09-26, round 88, charlie)
+
+2026-09-26, round 88 (charlie): class 0x11144 unified as TextRow in `include/TextRow.h` (a row of CharSprite cells: the ctor makes `count` New_CharSprite cells, setText hands each the next byte of a string, the layout slots step `cellPitch` along x). The view `Obj6EAC0` (named after BoxFill's old table address) is gone; its +0x00C `hasChildren` is Class6B5CC's `parent` (--merge CONFLICT s32 vs pointer: only tested against 0, bytes unchanged), `children` (+0x0B4) is `CharSprite **cells`, and the per-cell calls go through CharSprite's slots by name. Renamed from `Obj6EAC0__Destruct`: the +0x00C finalize occupant. Releases `cellCount` cells (ReleaseBasicClassArray), frees `cells`, then CharSprite's finalize. Image byte-identical; the current source is src/code_2cc8c_f.c.

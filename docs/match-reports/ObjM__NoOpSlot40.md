@@ -22,4 +22,4 @@ Round 78 (charlie), FINISHING-PLAN track 3.
 
 | was | now | tier | evidence |
 | --- | --- | --- | --- |
-| `func_80052DE0` | `ObjM__NoOpSlot40` | A | empty body, splat-generated stub; slot number is the only real content, matching the project's established `Class__NoOpSlotXX` convention (e.g. `Obj6EAC0__NoOpSlotD0`, `Actor__NoOpSlotD8`) |
+| `func_80052DE0` | `ObjM__NoOpSlot40` | A | empty body, splat-generated stub; slot number is the only real content, matching the project's established `Class__NoOpSlotXX` convention (e.g. `TextRow__NoOpSlotD0`, `Actor__NoOpSlotD8`) |

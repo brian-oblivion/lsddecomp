@@ -386,7 +386,7 @@ LITERAL preserved body below verbatim before touching anything. It
 compiles to exactly 145 words with NO outside-range drift warning --
 the round-12 report's "40/145 with matching total length" claim is
 CONFIRMED accurate, unlike the false "clean" claims found this round in
-`func_80040C00.md` (and reported elsewhere by other runners for
+`TextRow__DetachFromParent.md` (and reported elsewhere by other runners for
 `DreamSys__AdvanceMoveCycle`/`Entity__MoodCue81`). Recording the negative explicitly per
 the coordinator's request: this one checked out.
 

@@ -1,4 +1,6 @@
-# Obj6EAC0__PropagateColor -- MATCHED (40/40 words)
+# TextRow__SetColor -- MATCHED (40/40 words)
+
+> Renamed from `Obj6EAC0__PropagateColor` on 2026-09-26 (tools/rename.py). Address 0x80040d74.
 
 > Renamed from `func_80040D74` on 2026-09-18 (tools/rename.py). Address 0x80040d74.
 
@@ -7,7 +9,7 @@ Unit: `src/code_2cc8c_f.c`.
 ## Final body
 
 ```c
-void Obj6EAC0__PropagateColor(Obj6EAC0 *self, s32 a1) {
+void TextRow__SetColor(Obj6EAC0 *self, s32 a1) {
     Obj6EAC0 **elemp = self->unkB4 + self->unkAC;
     s32 i = self->unkAC;
     s32 bound = i;
@@ -73,7 +75,7 @@ is the structural fix; the `ab` load happening before the call
 once written this way) came along for free.
 
 Verified against the real oracle: `./build-and-verify.sh` exits 0,
-whole-image SHA1 matches, `funcdiff.py Obj6EAC0__PropagateColor` reports `40/40
+whole-image SHA1 matches, `funcdiff.py TextRow__SetColor` reports `40/40
 words match`.
 
 ## Attempts (7 manual, round 15, preserved from the prior report)
@@ -108,7 +110,7 @@ expression-lowering level: a maintained loop variable and a
 recomputed-inline condition can be semantically identical yet compile
 to different code, and only the permuter's blind search (not word-count
 diffing) surfaced which one retail used. Cross-reference
-`Obj6EAC0__QueryChildren.md` and `func_80040C00.md` -- this unit's OTHER
+`TextRow__SetDisplay.md` and `TextRow__DetachFromParent.md` -- this unit's OTHER
 `unkB4[unkAC..unkAC+unkAB)` loop functions -- to check whether this same
 "condition is a fresh expression, not the maintained variable" shape
 applies to their own remaining residues too.
@@ -119,7 +121,7 @@ Round 54 (alpha), FINISHING-PLAN track 3.
 
 | was | now | tier |
 | --- | --- | --- |
-| `func_80040D74` | `Obj6EAC0__PropagateColor` | B |
+| `func_80040D74` | `TextRow__SetColor` | B |
 
 **Evidence.** Derived occupant of `slotB8` (the same slot
 `BoxFill__SetColor`, this unit's base occupant, fills with the real
@@ -130,3 +132,7 @@ child. Mechanics fully established (a for-each-child dispatch through the
 identical slot); whether the game actually uses this to recolour a whole
 row of children (vs. some other meaning `a1` carries) is not independently
 confirmed, hence tier B rather than A.
+
+## Track 4 (2026-09-26, round 88, charlie)
+
+2026-09-26, round 88 (charlie): class 0x11144 unified as TextRow in `include/TextRow.h` (a row of CharSprite cells: the ctor makes `count` New_CharSprite cells, setText hands each the next byte of a string, the layout slots step `cellPitch` along x). The view `Obj6EAC0` (named after BoxFill's old table address) is gone; its +0x00C `hasChildren` is Class6B5CC's `parent` (--merge CONFLICT s32 vs pointer: only tested against 0, bytes unchanged), `children` (+0x0B4) is `CharSprite **cells`, and the per-cell calls go through CharSprite's slots by name. Renamed from `Obj6EAC0__PropagateColor`: the +0x0B8 setColor occupant, `(TextRow *self, SpriteRgb *rgb)`, forwarded to each visible cell. Callers pass TaskCoreTarget's 3-byte selected/unselected colours and Class86F88's row colours. Image byte-identical; the current source is src/code_2cc8c_f.c.

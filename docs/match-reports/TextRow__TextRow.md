@@ -1,4 +1,6 @@
-# Obj6EAC0__Construct — MATCHED (58/58 words)
+# TextRow__TextRow — MATCHED (58/58 words)
+
+> Renamed from `Obj6EAC0__Construct` on 2026-09-26 (tools/rename.py). Address 0x80040948.
 
 > Renamed from `func_80040948` on 2026-09-18 (tools/rename.py). Address 0x80040948.
 
@@ -11,12 +13,12 @@ pooled census across rounds 13+14 (81 matched, 10 stalled) showed the
 this function proves it.
 
 ```c
-void Obj6EAC0__Construct(Obj6EAC0 *self, s32 a1, s32 a2, s32 a3) {
+void TextRow__TextRow(Obj6EAC0 *self, s32 a1, s32 a2, s32 a3) {
     s32 i;
     Obj6EAC0 **cursor;
 
     GetCharSpriteMethods()->ctor((CharSprite *)self, (void *)a1, 0x20);
-    self->methods = Obj6EAC0__GetDerivedMethods();
+    self->methods = GetTextRowMethods();
     self->unkA9 = a2;
     self->unkAB = a2;
     self->unkAC = 0;
@@ -38,11 +40,11 @@ void Obj6EAC0__Construct(Obj6EAC0 *self, s32 a1, s32 a2, s32 a3) {
 ```
 
 The derived table's constructor (`Obj6EAC0Methods::slot08`), called by
-this unit's own `New_Obj6EAC0` via
-`Obj6EAC0__GetDerivedMethods()->slot08(self, ctx, len, name)`. Chains to the THIRD
+this unit's own `New_TextRow` via
+`GetTextRowMethods()->slot08(self, ctx, len, name)`. Chains to the THIRD
 sibling table's own `slot08` (a base-class-style constructor call
-through `GetCharSpriteMethods()`, same shape as `New_Obj6EAC0` calling
-`Obj6EAC0__GetDerivedMethods()->slot08`), then sets up `self->methods` to the
+through `GetCharSpriteMethods()`, same shape as `New_TextRow` calling
+`GetTextRowMethods()->slot08`), then sets up `self->methods` to the
 DERIVED table, zeroes/initialises the slice-index fields, allocates an
 `a2`-element child array via `BMemPMgrAlloc`, fills each slot by
 calling the external New_X-shaped allocator `New_CharSprite(a1, 0x20)`
@@ -76,7 +78,7 @@ THIS call site only —
 argument register at all, and the leftover value in `$a3` (never
 touched since function entry) does the rest for free. Zero-attempt
 verification that this doesn't disturb the OTHER call through
-`slot08` (`New_Obj6EAC0`, which genuinely does use 4 args): that call
+`slot08` (`New_TextRow`, which genuinely does use 4 args): that call
 still goes through the struct's own canonical 4-arg field, untouched.
 
 ## Attempts (12)
@@ -145,7 +147,7 @@ Round 54 (alpha), FINISHING-PLAN track 3.
 
 | was | now | tier |
 | --- | --- | --- |
-| `func_80040948` | `Obj6EAC0__Construct` | B |
+| `func_80040948` | `TextRow__TextRow` | B |
 
 **Evidence.** Derived occupant of `slot08`: chains to the third sibling
 table's own `slot08` first (base-class-style construction), sets
@@ -163,3 +165,7 @@ purpose is the unit's working hypothesis only).
 ## Track 4
 
 2026-09-26, round 86 (bravo): the parent class 0x1144 is unified as CharSprite (`include/CharSprite.h`, formerly D_8006EC74; this class, 0x11144, is still its own job). The chain to the parent ctor is now `GetCharSpriteMethods()->ctor((CharSprite *)self, (void *)a1, 0x20)`, still a genuine 3-argument prototyped call, which this report's lever needs; the old spelling cast `slot08` to a local function type. New_CharSprite's result is cast back to the view's `Obj6EAC0 *`: the children are CharSprites, not objects of this class, which the view's `children` comment does not say. Both casts emit no code. Image byte-identical.
+
+## Track 4 (2026-09-26, round 88, charlie)
+
+2026-09-26, round 88 (charlie): class 0x11144 unified as TextRow in `include/TextRow.h` (a row of CharSprite cells: the ctor makes `count` New_CharSprite cells, setText hands each the next byte of a string, the layout slots step `cellPitch` along x). The view `Obj6EAC0` (named after BoxFill's old table address) is gone; its +0x00C `hasChildren` is Class6B5CC's `parent` (--merge CONFLICT s32 vs pointer: only tested against 0, bytes unchanged), `children` (+0x0B4) is `CharSprite **cells`, and the per-cell calls go through CharSprite's slots by name. Renamed from `Obj6EAC0__Construct`: the +0x008 ctor occupant (chains to GetCharSpriteMethods()->ctor with cell 0x20). `(TextRow *self, void *texture, s32 count, char *text)`; `cellCount` = `visibleCount` = count, `firstVisible` = `gapIndex` = 0, then count New_CharSprite cells and reset(text) through TextRowResetFn, the override's parameter list (the slot is Class6B5CC's `reset(self)`). Image byte-identical; the current source is src/code_2cc8c_f.c.

@@ -88,7 +88,7 @@ the middle.
   return value opaquely, so a local `void *`-returning declaration is used
   instead — a different return type from the canonical one is fine for an
   external function across separate translation units, same convention as
-  `New_Obj6EAC0`'s `FieldM7C *` vs. `Unk64Elem *` split noted in the
+  `New_TextRow`'s `FieldM7C *` vs. `Unk64Elem *` split noted in the
   shared header already.
 
 **Two register/ordering traps, both closed without changing any dispatch

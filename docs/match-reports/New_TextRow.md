@@ -1,16 +1,18 @@
-# New_Obj6EAC0 — MATCHED (31/31 words)
+# New_TextRow — MATCHED (31/31 words)
+
+> Renamed from `New_Obj6EAC0` on 2026-09-26 (tools/rename.py). Address 0x800408cc.
 
 > Renamed from `func_800408CC` on 2026-09-18 (tools/rename.py). Address 0x800408cc.
 
 Unit: `src/code_2cc8c_f.c`. 3 attempts.
 
 ```c
-Obj6EAC0Methods *Obj6EAC0__GetDerivedMethods(void);
+Obj6EAC0Methods *GetTextRowMethods(void);
 
-Unk64Elem *New_Obj6EAC0(void *ctx, s32 len, char *name) {
+Unk64Elem *New_TextRow(void *ctx, s32 len, char *name) {
     Obj6EAC0 *self = BMemPMgrAlloc(0xB8);
     if (self != NULL) {
-        Obj6EAC0__GetDerivedMethods()->slot08(self, (s32)ctx, len, (s32)name);
+        GetTextRowMethods()->slot08(self, (s32)ctx, len, (s32)name);
         return (Unk64Elem *)self;
     }
     return NULL;
@@ -20,23 +22,23 @@ Unk64Elem *New_Obj6EAC0(void *ctx, s32 len, char *name) {
 A `New_X`-shaped allocator: `BMemPMgrAlloc` (the project's generic pool
 allocator, already declared in this header) allocates 0xB8 bytes, then
 on success dispatches through the DERIVED class table's constructor
-slot (`Obj6EAC0__GetDerivedMethods()` returns `&D_8006EB90`, `slot08` is the ctor,
-resolved as `Obj6EAC0__Construct` -- this unit's own hard queue member, still
+slot (`GetTextRowMethods()` returns `&gTextRowMethods`, `slot08` is the ctor,
+resolved as `TextRow__TextRow` -- this unit's own hard queue member, still
 `INCLUDE_ASM`; calling into it while unmatched is fine per the
 established convention).
 
 ## A real cross-unit signature collision, corrected
 
 `include/code_2cc8c.h` already declared
-`extern Unk64Elem *New_Obj6EAC0(void *ctx, s32 len, char *name);`
+`extern Unk64Elem *New_TextRow(void *ctx, s32 len, char *name);`
 from a DIFFERENT unit's caller-side guess (`src/code_2cc8c_b.c`, two
-call sites: `New_Obj6EAC0(handle, len, *list)`). That guess is
+call sites: `New_TextRow(handle, len, *list)`). That guess is
 actually CORRECT at the ABI level -- `handle`/`len`/`*list` forward
 straight through to the constructor as raw register values, so typing
 them `(void*, s32, char*)` instead of my first cut's generic
 `(s32, s32, s32)` changes nothing about the compiled bytes, only the
 C-level abstraction. My own first attempt used the generic types and
-got `error: conflicting types for 'New_Obj6EAC0'` against that
+got `error: conflicting types for 'New_TextRow'` against that
 existing declaration -- retyping MY definition to match the EXISTING
 one (rather than editing the header) resolved it with zero header
 churn. Both `code_2cc8c_b.c` call sites still compile and the full
@@ -48,7 +50,7 @@ different signature") almost recurring -- except caught immediately by
 the compiler's own `conflicting types` error rather than silently
 merging, because both declaration and definition now live in the same
 build. No header edit was needed to resolve it, and the return type
-`Unk64Elem *` / cast pattern here is worth reusing if `New_Obj6EAC0`
+`Unk64Elem *` / cast pattern here is worth reusing if `New_TextRow`
 turns out to have further callers.
 
 ## The residue and its fix
@@ -99,17 +101,21 @@ Round 54 (alpha), FINISHING-PLAN track 3.
 
 | was | now | tier |
 | --- | --- | --- |
-| `func_800408CC` | `New_Obj6EAC0` | B |
+| `func_800408CC` | `New_TextRow` | B |
 
 **Evidence.** The class's `New_X`-shaped public allocator (matches the
 project's established `New_Class` constructor convention): allocates
 `0xB8` bytes then dispatches the derived table's own `slot08`
-(`Obj6EAC0__Construct`) with `(ctx, len, name)` forwarded as
+(`TextRow__TextRow`) with `(ctx, len, name)` forwarded as
 `Construct`'s `(a1, a2, a3)`. Confirmed the `len`/`a2` argument becomes
 `totalChildCount`/`childCount` (a genuine "how many children" parameter,
 via `Construct`'s own body) and `name`/`a3` flows through
-`Obj6EAC0__FinishConstruct` into `Obj6EAC0__SetText` on a derived
+`TextRow__Reset` into `TextRow__SetText` on a derived
 instance -- consistent with "construct an N-character text display and
 immediately set its text", the unit's own header-comment hypothesis.
 Tier B: the allocate-then-construct mechanics and the parameter-flow
 chain are certain; the specific in-game role is this unit's own reading.
+
+## Track 4 (2026-09-26, round 88, charlie)
+
+2026-09-26, round 88 (charlie): class 0x11144 unified as TextRow in `include/TextRow.h` (a row of CharSprite cells: the ctor makes `count` New_CharSprite cells, setText hands each the next byte of a string, the layout slots step `cellPitch` along x). The view `Obj6EAC0` (named after BoxFill's old table address) is gone; its +0x00C `hasChildren` is Class6B5CC's `parent` (--merge CONFLICT s32 vs pointer: only tested against 0, bytes unchanged), `children` (+0x0B4) is `CharSprite **cells`, and the per-cell calls go through CharSprite's slots by name. Renamed from `New_Obj6EAC0`: the allocator (0xB8 bytes, the object size), now `TextRow *New_TextRow(void *texture, s32 count, char *text)` calling ctor through GetTextRowMethods(). Its callers make one per string: TaskCore__CreateSlotElements and the item lists (code_2cc8c_b, stored as TextRow in TaskCore's slotElements/itemLists, which were the `Unk64Elem` view), Class86F88__CreateRows, Class86B60__CreateNameField, TextEntry__LoadCardResources, ObjM__AdvancePauseSetup ("Pause"). Image byte-identical; the current source is src/code_2cc8c_f.c.

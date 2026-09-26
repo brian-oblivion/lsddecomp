@@ -1,4 +1,6 @@
-# Obj6EAC0__LayoutChildren — MATCHED (50/50), round 19
+# TextRow__SetPosition — MATCHED (50/50), round 19
+
+> Renamed from `Obj6EAC0__LayoutChildren` on 2026-09-26 (tools/rename.py). Address 0x80040e14.
 
 > Renamed from `func_80040E14` on 2026-09-18 (tools/rename.py). Address 0x80040e14.
 
@@ -8,7 +10,7 @@ below saturation.
 ## Final body (byte-exact, full oracle green)
 
 ```c
-void Obj6EAC0__LayoutChildren(Obj6EAC0 *self, Pair32E99C *a1) {
+void TextRow__SetPosition(Obj6EAC0 *self, Pair32E99C *a1) {
     if (self->unkC != 0) {
         Pair32E99C buf;
         s32 i;
@@ -97,7 +99,7 @@ Round 54 (alpha), FINISHING-PLAN track 3.
 
 | was | now | tier |
 | --- | --- | --- |
-| `func_80040E14` | `Obj6EAC0__LayoutChildren` | B |
+| `func_80040E14` | `TextRow__SetPosition` | B |
 
 **Evidence.** Derived occupant of `slotBC` (same slot
 `BoxFill__SetPosition` fills for the base/leaf case): when
@@ -108,9 +110,13 @@ recursive "place each child along a line, `childPitch` apart" layout
 pass. Mechanics well-established from the loop shape itself; the
 in-game purpose (text layout, per this unit's own header-comment
 hypothesis) is not independently confirmed, hence tier B. Sibling of
-`Obj6EAC0__LayoutChildrenWithGap` (same shape, plus one extra offset at
+`TextRow__AttachToParent` (same shape, plus one extra offset at
 `gapIndex`).
 
 ## Track 4
 
 2026-09-26, round 86 (bravo): the parent class 0x1144 is unified as CharSprite (`include/CharSprite.h`, formerly D_8006EC74). The base call is `GetCharSpriteMethods()->setPosition((CharSprite *)self, (ScreenSpritePos *)a1)` (was `->slotBC(self, a1)`): an upcast and a cast of the view's Pair32E99C to ScreenSprite's pair, no code. Image byte-identical.
+
+## Track 4 (2026-09-26, round 88, charlie)
+
+2026-09-26, round 88 (charlie): class 0x11144 unified as TextRow in `include/TextRow.h` (a row of CharSprite cells: the ctor makes `count` New_CharSprite cells, setText hands each the next byte of a string, the layout slots step `cellPitch` along x). The view `Obj6EAC0` (named after BoxFill's old table address) is gone; its +0x00C `hasChildren` is Class6B5CC's `parent` (--merge CONFLICT s32 vs pointer: only tested against 0, bytes unchanged), `children` (+0x0B4) is `CharSprite **cells`, and the per-cell calls go through CharSprite's slots by name. Renamed from `Obj6EAC0__LayoutChildren`: the +0x0BC setPosition occupant, `(TextRow *self, ScreenSpritePos *pos)`. While attached it sets its own position through CharSprite's slot, then all `cellCount` cells at x + i*cellPitch. Image byte-identical; the current source is src/code_2cc8c_f.c.

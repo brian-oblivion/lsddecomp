@@ -91,7 +91,7 @@ Round 54 (alpha), FINISHING-PLAN track 3.
 *(Pair32E99C *)&self->posX = *a1; }` -- stores an incoming 2-word pair
 into `posX`/`posY` (renamed from `unk50`/`unk54`), but only when the
 object has children. The derived occupant of the SAME slot
-(`Obj6EAC0__LayoutChildren`, this unit) treats the equivalent pair as a
+(`TextRow__SetPosition`, this unit) treats the equivalent pair as a
 running CURSOR it advances per child by `childPitch`, which is the
 evidence `posX`/`posY` really is a position rather than an arbitrary
 2-word pair -- but nothing independently confirms which axis is X vs Y

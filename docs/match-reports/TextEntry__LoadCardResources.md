@@ -51,7 +51,7 @@ void TextEntry__LoadCardResources(Obj86ED0 *self, void *arg1)
 
     handle2 = func_8003B39C(BuildFileName(path, sStrFontIcon, dir, ext));
     handle2->methods->slot78(handle2);
-    self->unk44 = New_Obj6EAC0(handle2, self->unk10, self->unk28);
+    self->unk44 = New_TextRow(handle2, self->unk10, self->unk28);
     self->unk40 = (ChildObj86ED0 *)New_CharSprite(handle2, 0x5F);
     handle2->methods->release(handle2);
     self->unk44->methods->slot4C(self->unk44, arg1, (void *)&D_8008AAD4);
@@ -94,9 +94,9 @@ documented multiple-independent-local-views convention, this is NOT
 unified with `ChildMethods86ED0`; they stay two separate local readings of
 what may well be the same underlying vtable.
 
-`New_Obj6EAC0` is ALREADY declared in the shared `include/class_3bb8c.h`
+`New_TextRow` is ALREADY declared in the shared `include/class_3bb8c.h`
 (a different unit's local view, return type `FieldM7C *`), so
-`self->unk44 = New_Obj6EAC0(...)` is an implicit-conversion assignment
+`self->unk44 = New_TextRow(...)` is an implicit-conversion assignment
 (`FieldM7C *` into `ChildObj86ED0 *`) -- a harmless warning under this
 project's `-Wall`-without-`-Werror` build, not a compile error, and zero
 bytes of cost (pointer reinterpretation is free). `New_CharSprite` and

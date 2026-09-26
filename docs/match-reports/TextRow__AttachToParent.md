@@ -1,11 +1,13 @@
-# Obj6EAC0__LayoutChildrenWithGap — MATCHED (70/70), round 19
+# TextRow__AttachToParent — MATCHED (70/70), round 19
+
+> Renamed from `Obj6EAC0__LayoutChildrenWithGap` on 2026-09-26 (tools/rename.py). Address 0x80040ae8.
 
 > Renamed from `func_80040AE8` on 2026-09-18 (tools/rename.py). Address 0x80040ae8.
 
 ## Final body (byte-exact, full oracle green)
 
 ```c
-void Obj6EAC0__LayoutChildrenWithGap(Obj6EAC0 *self, s32 a1, Pair32E99C *a2) {
+void TextRow__AttachToParent(Obj6EAC0 *self, s32 a1, Pair32E99C *a2) {
     Pair32E99C buf;
     s32 i, bound;
     Obj6EAC0 **elemp;
@@ -40,18 +42,18 @@ genuinely whole-image byte-exact.
 
 1. **Whole-struct assignment for the `a2`-copy buffer** (this round's
    recurring lever -- see `Class6E99C__PushPosition`/`BoxFill__SetPosition`/`TaskCore__SetColors`/
-   `BoxFill__ApplyColor`/`Obj6EAC0__LayoutChildren`): retyped the local `s32 buf[2]` to
+   `BoxFill__ApplyColor`/`TextRow__SetPosition`): retyped the local `s32 buf[2]` to
    the existing `Pair32E99C` and `a2` to `Pair32E99C *`, replaced
    `buf[0]=a2[0]; buf[1]=a2[1];` with `buf = *a2;`. This alone closed
    the ORIGINAL report's +2-word length gap outright and jumped the
    score from 16/70 to 62/70 in one step.
 2. **Statement-order swap for the loop increment** (the same lever that
-   closed `Obj6EAC0__LayoutChildren` this round): swapping `i++; elemp++;` to
+   closed `TextRow__SetPosition` this round): swapping `i++; elemp++;` to
    `elemp++; i++;` fixed a delay-slot-filler placement residue --
    confirmed NOT a register-identity issue (same registers both ways,
    only which of two adjacent slots got the `addiu $s1,$s1,1` vs a
    `nop`).
-3. **Matching `Obj6EAC0__PropagateColor`'s own idiom for the recomputed bound**
+3. **Matching `TextRow__SetColor`'s own idiom for the recomputed bound**
    (this unit's sibling in the same `unkB4[unkAC..unkAC+unkAB)` loop
    family, already matched): rather than storing `self->unkAC +
    self->unkAB` into a single combined `bound` local each iteration (my
@@ -59,7 +61,7 @@ genuinely whole-image byte-exact.
    residue no amount of `+`-operand reordering closed -- tried both
    `i + self->unkAB` and `self->unkAB + i`, each fixed one of two
    residue instances while breaking the other), split it exactly the
-   way `Obj6EAC0__PropagateColor` already does: `bound = self->unkAC;` (JUST the
+   way `TextRow__SetColor` already does: `bound = self->unkAC;` (JUST the
    base, no addition) with the comparison itself written as
    `i < bound + self->unkAB` at BOTH the pre-loop guard and the
    `while` condition, rather than pre-summing into `bound`. This closed
@@ -69,7 +71,7 @@ This confirms the round-2 report's own cross-reference note (a lever
 that closes one sibling doesn't reliably transfer to another) needed
 one addition: it DOES transfer once applied to BOTH the pre-loop guard
 and the loop-exit condition identically, not just the in-loop
-recompute alone -- `Obj6EAC0__PropagateColor`'s own body already keeps `bound` as
+recompute alone -- `TextRow__SetColor`'s own body already keeps `bound` as
 a bare field read and defers the `+ self->unkAB` to each COMPARISON
 site rather than ever materializing the sum into a variable, and that
 detail (not merely "use named field reads") is what this function
@@ -87,7 +89,7 @@ Body reached (near-miss, preserved literally):
 
 ```c
 #if 0
-void Obj6EAC0__LayoutChildrenWithGap(Obj6EAC0 *self, s32 a1, s32 *a2) {
+void TextRow__AttachToParent(Obj6EAC0 *self, s32 a1, s32 *a2) {
     s32 buf[2];
     s32 i, count;
     Obj6EAC0 **elemp;
@@ -139,7 +141,7 @@ void Obj6EAC0__LayoutChildrenWithGap(Obj6EAC0 *self, s32 a1, s32 *a2) {
 ## Measured residue
 
 At the best form reached, retail is **70 words** (`0x118`, confirmed
-against the `.s` file's `nonmatching Obj6EAC0__LayoutChildrenWithGap, 0x118`); my
+against the `.s` file's `nonmatching TextRow__AttachToParent, 0x118`); my
 compiled form is **72 words** (confirmed via
 `objdump -d build/src/code_2cc8c_f.c.o`: spans `0x484`-`0x5a4` =
 `0x120` bytes = 72 words) -- 2 words LONG, not a same-length pure
@@ -201,11 +203,11 @@ Round 54 (alpha), FINISHING-PLAN track 3.
 
 | was | now | tier |
 | --- | --- | --- |
-| `func_80040AE8` | `Obj6EAC0__LayoutChildrenWithGap` | B |
+| `func_80040AE8` | `TextRow__AttachToParent` | B |
 
 **Evidence.** Derived occupant of `slot4C` (same slot `BoxFill__AttachToParent`
 fills for the leaf case): the SAME "walk children, advance a position
-cursor by `childPitch` per child" shape as `Obj6EAC0__LayoutChildren`
+cursor by `childPitch` per child" shape as `TextRow__SetPosition`
 (this unit, `slotBC`'s derived occupant), but with one extra difference:
 when the loop index equals `self->gapIndex`, an additional `0x10` is
 added to the cursor before that child is placed -- a one-shot extra gap
@@ -219,3 +221,7 @@ advances), not for that specific guess.
 ## Track 4
 
 2026-09-26, round 86 (bravo): the parent class 0x1144 is unified as CharSprite (`include/CharSprite.h`, formerly D_8006EC74). The base call is `GetCharSpriteMethods()->attachToParent((CharSprite *)self, (Class6B5CC *)a1, (Vec3_d294 *)a2)`, through the prototyped inherited slot (was the unprototyped `slot4C`); the argument casts are to Class6B5CC's slot types, and its occupant, ScreenSprite__AttachToParent, reads the third as a ScreenSpritePos (ScreenSprite.h, "Not settled"). No code. Image byte-identical.
+
+## Track 4 (2026-09-26, round 88, charlie)
+
+2026-09-26, round 88 (charlie): class 0x11144 unified as TextRow in `include/TextRow.h` (a row of CharSprite cells: the ctor makes `count` New_CharSprite cells, setText hands each the next byte of a string, the layout slots step `cellPitch` along x). The view `Obj6EAC0` (named after BoxFill's old table address) is gone; its +0x00C `hasChildren` is Class6B5CC's `parent` (--merge CONFLICT s32 vs pointer: only tested against 0, bytes unchanged), `children` (+0x0B4) is `CharSprite **cells`, and the per-cell calls go through CharSprite's slots by name. Renamed from `Obj6EAC0__LayoutChildrenWithGap`: the +0x04C attachToParent occupant, `(TextRow *self, Class6B5CC *parent, ScreenSpritePos *pos)`. While `parent` is NULL it attaches itself through CharSprite's slot, then attaches each visible cell to self at a running position, adding `cellPitch` to x per cell and 0x10 more before cell `gapIndex`. The slot keeps Class6B5CC's Vec3_d294 offset type; the position is cast (ScreenSprite's banner). Image byte-identical; the current source is src/code_2cc8c_f.c.

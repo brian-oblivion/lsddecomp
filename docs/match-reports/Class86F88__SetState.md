@@ -87,7 +87,7 @@ Globals (`tools/rename.py`):
 | `D_80086F88` | `gClass86F88Methods` | A | the class's method table (39 slots, header word 0x20), returned by GetClass86F88Methods |
 | `D_8008AB00` | `gClass86F88RowOriginX` | B | sdata word -0x5C, row 0's x in Class86F88__CreateRows's `pos` |
 | `D_8008AB04` | `gClass86F88RowOriginY` | B | sdata word -0xF, row 0's y; each further row +0xA |
-| `D_8008AB0C` | `gClass86F88RowColor` | A | bytes 50 50 50 00, passed to the rows' +0x0B8 (Obj6EAC0__PropagateColor in D_8006EB90) for every non-cursor row |
+| `D_8008AB0C` | `gClass86F88RowColor` | A | bytes 50 50 50 00, passed to the rows' +0x0B8 (TextRow__SetColor in gTextRowMethods) for every non-cursor row |
 | `D_8008AB10` | `gClass86F88CursorColor` | A | bytes 80 80 00 00, the same colour slot for the cursor row |
 
 Fields and slots (`include/class_3bb8c.h`, renamed definition-first; every
@@ -105,7 +105,7 @@ accessor the compiler listed, in both the build and
   `cursorDown` (new, +0x07C..+0x088), `refreshRows`, `stepCursorInView`, each
   the method gClass86F88Methods holds at that offset.
 - Class86F88ElemMethods: `layout` (+0x04C), `setColor` (+0x0B8), `setText`
-  (+0x0CC), from D_8006EB90, the derived Obj6EAC0 table New_Obj6EAC0 builds.
+  (+0x0CC), from gTextRowMethods, the derived Obj6EAC0 table New_TextRow builds.
 
 ## Proposed field names
 

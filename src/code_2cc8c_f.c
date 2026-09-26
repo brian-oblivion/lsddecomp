@@ -6,21 +6,20 @@
  * screen rectangle's attach, attribute bits, colour, position, size,
  * priority and mask (its allocator, ctor and Reset close code_2cc8c_e).
  *
- * D_8006EB90's class (id 0x11144, below gCharSpriteMethods and ScreenSprite, NOT
- * below BoxFill), from New_Obj6EAC0 to Obj6EAC0__GetDerivedMethods, through
- * include/code_2cc8c.h's `Obj6EAC0` view: a row of gCharSpriteMethods character
- * cells (tier B; that view's banner).
+ * TextRow (class id 0x11144, gTextRowMethods, include/TextRow.h; below
+ * CharSprite, NOT below BoxFill), from New_TextRow to GetTextRowMethods: a
+ * row of CharSprite character cells.
  *
  * Then `DecodeFullWidthSjis`/`EncodeFullWidthSjis`/`FormatFullWidthNumber`,
  * confirmed by their OWN callers elsewhere to take a plain buffer.
  *
  * All non-trivial functions are MATCHED; zero live INCLUDE_ASM, zero
- * NON_MATCHING bodies. `Obj6EAC0__NoOpSetter`/`Obj6EAC0__NoOpSlotD0` are
+ * NON_MATCHING bodies. `TextRow__NoOpGetCell`/`TextRow__NoOpSlotD0` are
  * splat-generated `jr $ra; nop` occupants.
  */
 #include "common.h"
 #include "code_2cc8c.h"
-#include "CharSprite.h"
+#include "TextRow.h"
 
 void BoxFill__AttachToParent(BoxFill *self, Class6B5CC *parent, Pair32E99C *pos) {
     if (self->parent == NULL) {
@@ -104,154 +103,152 @@ BoxFillMethods *GetBoxFillMethods(void) {
     return &gBoxFillMethods;
 }
 
-Obj6EAC0Methods *Obj6EAC0__GetDerivedMethods(void);
-
-Unk64Elem *New_Obj6EAC0(void *ctx, s32 len, char *name) {
-    Obj6EAC0 *self = BMemPMgrAlloc(0xB8);
+TextRow *New_TextRow(void *texture, s32 count, char *text) {
+    TextRow *self = BMemPMgrAlloc(0xB8);
     if (self != NULL) {
-        Obj6EAC0__GetDerivedMethods()->slot08(self, (s32)ctx, len, (s32)name);
-        return (Unk64Elem *)self;
+        GetTextRowMethods()->ctor(self, texture, count, text);
+        return self;
     }
     return NULL;
 }
 
-void Obj6EAC0__Construct(Obj6EAC0 *self, s32 a1, s32 a2, s32 a3) {
+void TextRow__TextRow(TextRow *self, void *texture, s32 count, char *text) {
     s32 i;
-    Obj6EAC0 **cursor;
+    CharSprite **cursor;
 
-    GetCharSpriteMethods()->ctor((CharSprite *)self, (void *)a1, 0x20);
-    self->methods = Obj6EAC0__GetDerivedMethods();
-    self->totalChildCount = a2;
-    self->childCount = a2;
-    self->childStart = 0;
+    GetCharSpriteMethods()->ctor((CharSprite *)self, texture, 0x20);
+    self->methods = GetTextRowMethods();
+    self->cellCount = count;
+    self->visibleCount = count;
+    self->firstVisible = 0;
     self->gapIndex = 0;
-    cursor = BMemPMgrAlloc(a2 * 4);
+    cursor = BMemPMgrAlloc(count * 4);
     if (cursor != NULL) {
-        self->children = cursor;
+        self->cells = cursor;
         i = 0;
-        if (i < a2) {
+        if (i < count) {
             do {
-                *cursor = (Obj6EAC0 *)New_CharSprite((void *)a1, 0x20);
+                *cursor = New_CharSprite(texture, 0x20);
                 i++;
                 cursor++;
-            } while (i < a2);
+            } while (i < count);
         }
-        self->methods->slot40(self, a3);
+        ((TextRowResetFn)self->methods->reset)(self, text);
     }
 }
 
-void Obj6EAC0__Destruct(Obj6EAC0 *self) {
-    ReleaseBasicClassArray(self->children, self->totalChildCount);
-    self->children = BMemPMgrFree(self->children);
+void TextRow__Finalize(TextRow *self) {
+    ReleaseBasicClassArray(self->cells, self->cellCount);
+    self->cells = BMemPMgrFree(self->cells);
     GetCharSpriteMethods()->finalize((CharSprite *)self);
 }
 
-void Obj6EAC0__FinishConstruct(Obj6EAC0 *self, s32 a1) {
-    self->methods->slotD4(self, 7);
-    self->methods->slotCC(self, a1);
+void TextRow__Reset(TextRow *self, char *text) {
+    self->methods->setCellPitch(self, 7);
+    self->methods->setText(self, text);
 }
 
-void Obj6EAC0__LayoutChildrenWithGap(Obj6EAC0 *self, s32 a1, Pair32E99C *a2) {
-    Pair32E99C buf;
+void TextRow__AttachToParent(TextRow *self, Class6B5CC *parent, ScreenSpritePos *pos) {
+    ScreenSpritePos buf;
     s32 i, bound;
-    Obj6EAC0 **elemp;
+    CharSprite **elemp;
 
-    if (self->hasChildren != 0) {
+    if (self->parent != NULL) {
         return;
     }
-    GetCharSpriteMethods()->attachToParent((CharSprite *)self, (Class6B5CC *)a1, (Vec3_d294 *)a2);
-    buf = *a2;
-    elemp = self->children + self->childStart;
-    i = self->childStart;
+    GetCharSpriteMethods()->attachToParent((CharSprite *)self, parent, (Vec3_d294 *)pos);
+    buf = *pos;
+    elemp = self->cells + self->firstVisible;
+    i = self->firstVisible;
     bound = i;
-    if (i < bound + self->childCount) {
+    if (i < bound + self->visibleCount) {
         do {
             if (self->gapIndex != 0 && i == self->gapIndex) {
-                buf.a += 0x10;
+                buf.x += 0x10;
             }
-            (*elemp)->methods->slot4C(*elemp, self, &buf);
-            buf.a += self->childPitch;
-            bound = self->childStart;
+            (*elemp)->methods->attachToParent(*elemp, (Class6B5CC *)self, (Vec3_d294 *)&buf);
+            buf.x += self->cellPitch;
+            bound = self->firstVisible;
             elemp++;
             i++;
-        } while (i < bound + self->childCount);
+        } while (i < bound + self->visibleCount);
     }
 }
 
-void func_80040C00(Obj6EAC0 *self) {
-    Obj6EAC0 **elemp;
+void TextRow__DetachFromParent(TextRow *self) {
+    CharSprite **elemp;
     s32 i, bound;
 
-    if (self->hasChildren != 0) {
-        if (self->children != NULL) {
-            elemp = self->children + self->childStart;
-            i = self->childStart;
+    if (self->parent != NULL) {
+        if (self->cells != NULL) {
+            elemp = self->cells + self->firstVisible;
+            i = self->firstVisible;
             bound = i;
-            if (i < bound + self->childCount) {
+            if (i < bound + self->visibleCount) {
                 do {
-                    (*elemp)->methods->slot50(*elemp);
+                    (*elemp)->methods->detachFromParent(*elemp);
                     elemp++;
-                    bound = self->childStart;
+                    bound = self->firstVisible;
                     i++;
-                } while (i < bound + self->childCount);
+                } while (i < bound + self->visibleCount);
             }
         }
         GetCharSpriteMethods()->detachFromParent((CharSprite *)self);
     }
 }
 
-s32 Obj6EAC0__QueryChildren(Obj6EAC0 *self, s32 a1, s32 a2) {
-    Obj6EAC0 **elemp = self->children + self->childStart;
-    s32 i = self->childStart;
+s32 TextRow__SetDisplay(TextRow *self, s32 on, s32 result) {
+    CharSprite **elemp = self->cells + self->firstVisible;
+    s32 i = self->firstVisible;
     s32 bound = i;
-    if (i < bound + self->childCount) {
+    if (i < bound + self->visibleCount) {
         do {
-            Obj6EAC0 *elem = *elemp;
-            s32 result;
+            CharSprite *elem = *elemp;
+            s32 r;
             elemp++;
             i++;
-            result = elem->methods->slot60(elem, a1);
-            bound = self->childStart;
-            a2 = result;
-        } while (i < bound + self->childCount);
+            r = elem->methods->setDisplay(elem, on);
+            bound = self->firstVisible;
+            result = r;
+        } while (i < bound + self->visibleCount);
     }
-    return a2;
+    return result;
 }
 
-void Obj6EAC0__PropagateColor(Obj6EAC0 *self, s32 a1) {
-    Obj6EAC0 **elemp = self->children + self->childStart;
-    s32 i = self->childStart;
+void TextRow__SetColor(TextRow *self, SpriteRgb *rgb) {
+    CharSprite **elemp = self->cells + self->firstVisible;
+    s32 i = self->firstVisible;
     s32 bound = i;
-    s32 count = i + self->childCount;
+    s32 count = i + self->visibleCount;
     if (i < count) {
         do {
-            Obj6EAC0 *elem = *elemp;
+            CharSprite *elem = *elemp;
             s32 ab;
             elemp++;
-            ab = self->childCount;
-            elem->methods->slotB8(elem, a1);
+            ab = self->visibleCount;
+            elem->methods->setColor(elem, rgb);
             i++;
-            bound = self->childStart;
-        } while (i < (bound + self->childCount));
+            bound = self->firstVisible;
+        } while (i < (bound + self->visibleCount));
     }
 }
 
-void Obj6EAC0__LayoutChildren(Obj6EAC0 *self, Pair32E99C *a1) {
-    if (self->hasChildren != 0) {
-        Pair32E99C buf;
+void TextRow__SetPosition(TextRow *self, ScreenSpritePos *pos) {
+    if (self->parent != NULL) {
+        ScreenSpritePos buf;
         s32 i;
         s32 bound;
-        Obj6EAC0 **elemp;
+        CharSprite **elemp;
 
-        GetCharSpriteMethods()->setPosition((CharSprite *)self, (ScreenSpritePos *)a1);
-        buf = *a1;
+        GetCharSpriteMethods()->setPosition((CharSprite *)self, pos);
+        buf = *pos;
         i = 0;
-        elemp = self->children;
-        if (i < self->totalChildCount) {
+        elemp = self->cells;
+        if (i < self->cellCount) {
             do {
-                (*elemp)->methods->slotBC(*elemp, &buf);
-                buf.a += self->childPitch;
-                bound = self->totalChildCount;
+                (*elemp)->methods->setPosition(*elemp, &buf);
+                buf.x += self->cellPitch;
+                bound = self->cellCount;
                 elemp++;
                 i++;
             } while (i < bound);
@@ -259,36 +256,36 @@ void Obj6EAC0__LayoutChildren(Obj6EAC0 *self, Pair32E99C *a1) {
     }
 }
 
-void Obj6EAC0__SetChildChar(Obj6EAC0 *self, s32 a1, s32 a2) {
-    Obj6EAC0 *elem = self->children[a2];
-    elem->methods->slotC4(elem, a1 & 0xFF);
+void TextRow__SetCellAt(TextRow *self, s32 cell, s32 index) {
+    CharSprite *elem = self->cells[index];
+    elem->methods->setCell(elem, cell & 0xFF);
 }
 
-void Obj6EAC0__NoOpSetter(void) {
+void TextRow__NoOpGetCell(void) {
 }
 
-void Obj6EAC0__SetText(Obj6EAC0 *self, u8 *a1) {
-    Obj6EAC0 **elemp = self->children;
-    u8 *p = a1;
+void TextRow__SetText(TextRow *self, char *text) {
+    CharSprite **elemp = self->cells;
+    char *p = text;
     if (p != NULL && *p != 0) {
         do {
-            Obj6EAC0 *elem = *elemp;
-            elem->methods->slotC4(elem, *p);
+            CharSprite *elem = *elemp;
+            elem->methods->setCell(elem, *p);
             p++;
             elemp++;
         } while (*p != 0);
     }
 }
 
-void Obj6EAC0__NoOpSlotD0(void) {
+void TextRow__NoOpSlotD0(void) {
 }
 
-void Obj6EAC0__SetChildPitch(Obj6EAC0 *self, s32 a1) {
-    self->childPitch = a1;
+void TextRow__SetCellPitch(TextRow *self, s32 pitch) {
+    self->cellPitch = pitch;
 }
 
-Obj6EAC0Methods *Obj6EAC0__GetDerivedMethods(void) {
-    return &D_8006EB90;
+TextRowMethods *GetTextRowMethods(void) {
+    return &gTextRowMethods;
 }
 
 /* DecodeFullWidthSjis -- MATCHED round 38 (24/24). A permuter search (208
@@ -379,14 +376,15 @@ u8 *EncodeFullWidthSjis(u8 *dst, u8 *src) {
  * reproduce retail's exact register assignment. Also fixed a stale
  * prototype: the preserved body's forward declaration of EncodeFullWidthSjis
  * as `(Obj6EAC0 *, char *)` predates that function's own round-38 match
- * as `u8 *EncodeFullWidthSjis(u8 *, u8 *)` -- calling it now needs `self` cast
- * to `u8 *`. See docs/match-reports/FormatFullWidthNumber.md. */
+ * as `u8 *EncodeFullWidthSjis(u8 *, u8 *)`. Its first parameter was typed as
+ * the TextRow view `Obj6EAC0 *` and cast to `u8 *`; it is the output buffer
+ * (track 4, round 88: `u8 *dst`, no cast). See docs/match-reports/FormatFullWidthNumber.md. */
 extern char *strcpy(char *dst, char *src);
 extern void *memset(unsigned char *dst, unsigned char c, int n);
 extern int strlen(char *s);
 extern char *itoa(int n);
 
-void FormatFullWidthNumber(Obj6EAC0 *self, s32 a1, s32 width, s32 unpadded) {
+void FormatFullWidthNumber(u8 *dst, s32 a1, s32 width, s32 unpadded) {
     char text[width + 1];
     s32 fill;
     char padded[width + 1];
@@ -397,5 +395,5 @@ void FormatFullWidthNumber(Obj6EAC0 *self, s32 a1, s32 width, s32 unpadded) {
         memset((unsigned char *)padded, '0', width);
         strcpy(&padded[fill], text);
     }
-    EncodeFullWidthSjis((u8 *)self, (u8 *)(unpadded != 0 ? text : padded));
+    EncodeFullWidthSjis(dst, (u8 *)(unpadded != 0 ? text : padded));
 }

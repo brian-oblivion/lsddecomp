@@ -84,7 +84,7 @@ struct TaskCoreTarget {
     /* +0x013 */ u8 selectedColor[3];   /* setActiveSlot's colour for the new slot */
     /* +0x016 */ u8 pad16[2];
     /* +0x018 */ void **registrationSlots; /* NULL entries are the slots find{Next,Prev}FreeSlot stop at */
-    /* +0x01C */ char **names;          /* NULL-terminated; one New_Obj6EAC0 widget per name */
+    /* +0x01C */ char **names;          /* NULL-terminated; one New_TextRow widget per name */
     /* +0x020 */ u8 *externalRecords;   /* 8 bytes a slot, updateSlotElements' position for each widget */
     /* +0x024 */ void **unk24;          /* per slot: NULL, or the item-list record createSlotElements and the scroll methods read */
 };
@@ -154,7 +154,7 @@ struct TaskCoreTarget {
     /* +0x048 */ BasicClass *sound;     /* New_VabStreamObj(soundBankPath) or the ctor's own; playSound's target */ \
     /* +0x04C */ TaskCoreTarget *target; /* setTarget */                                           \
     /* +0x050 */ s32 slotCount;         /* target->names' length */                               \
-    /* +0x054 */ BasicClass **slotElements; /* one widget a slot (New_Obj6EAC0) */                \
+    /* +0x054 */ BasicClass **slotElements; /* one widget a slot (New_TextRow) */                \
     /* +0x058 */ s32 activeSlot;                                                                   \
     /* +0x05C */ s32 *itemCounts;       /* per slot: its item list's length */                     \
     /* +0x060 */ s32 *slotCounts;       /* per slot: the item cursor, a ring over itemCounts */    \
