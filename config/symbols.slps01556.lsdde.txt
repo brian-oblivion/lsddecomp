@@ -2899,3 +2899,4 @@ GsLIGHT_MODE = 0x800902E0;
 gSortLightMode = 0x8008E24C;
 gSortUseGlobalLightMode = 0x8008E250;
 gTexturedFaceColor = 0x8008A82C;
+NodeGuardedViewport__NoOpSlotB8 = 0x8004D35C; // type:func

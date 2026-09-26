@@ -54,7 +54,7 @@ void NodeGuardedViewport__Update(NodeGuardedViewport *self) {
     }
 }
 
-void func_8004D35C(void) {}
+void NodeGuardedViewport__NoOpSlotB8(void) {}
 
 void func_8004D364(void) {}
 

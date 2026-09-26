@@ -39,7 +39,7 @@ typedef struct NodeGuardedViewportMethods NodeGuardedViewportMethods;
 /* clang-format off */
 #define NODEGUARDEDVIEWPORT_SLOTS(Self, CtorParams)                                                         \
     VIEWPORT_SLOTS(Self, CtorParams);                                                              \
-    /* +0x0B8 */ void (*slotB8)(void); /* func_8004D35C, empty; no known caller */                 \
+    /* +0x0B8 */ void (*slotB8)(void); /* NodeGuardedViewport__NoOpSlotB8, empty; no known caller */                 \
     /* +0x0BC */ void (*slotBC)(void); /* func_8004D364, empty; no known caller */                 \
     /* +0x0C0 */ void (*slotC0)(void); /* func_8004D36C, empty; no known caller */                 \
     /* +0x0C4 */ void (*slotC4)(void)  /* func_8004D374, empty; no known caller */
@@ -67,7 +67,7 @@ NodeGuardedViewport *New_NodeGuardedViewport(void); /* BMemPMgrAlloc(0xDC), then
 void NodeGuardedViewport__NodeGuardedViewport(NodeGuardedViewport *self);
 void NodeGuardedViewport__InitDefaults(void); /* +0x040; empty, reads no argument */
 void NodeGuardedViewport__Update(NodeGuardedViewport *self);
-void func_8004D35C(void);
+void NodeGuardedViewport__NoOpSlotB8(void);
 void func_8004D364(void);
 void func_8004D36C(void);
 void func_8004D374(void);
