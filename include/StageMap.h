@@ -352,6 +352,6 @@ void StageMap__EndScaleRamp(StageMap *self);
 void StageMap__AddScaleStepToCell(StageMap *self, struct GridCell *cell);
 void StageMap__ResetCellScale(StageMap *self, struct GridCell *cell);
 void StageMap__ForEachSlot(StageMap *self, StageMapCellFn cellFn, ChunkSlotFn elemFn);
-void StageMap__ForEachEntryChild(StageMap *self, StageMapCellFn cellFn, ChunkSlot *elem);
+void StageMap__ForEachSlotCell(StageMap *self, StageMapCellFn cellFn, ChunkSlot *elem);
 
 #endif

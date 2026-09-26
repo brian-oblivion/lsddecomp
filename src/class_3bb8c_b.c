@@ -435,11 +435,11 @@ void StageMap__ForEachSlot(StageMap *self, StageMapCellFn arg1, ChunkSlotFn arg2
         if (arg2 != 0) {
             arg2(self, e);
         }
-        StageMap__ForEachEntryChild(self, arg1, e);
+        StageMap__ForEachSlotCell(self, arg1, e);
     }
 }
 
-void StageMap__ForEachEntryChild(StageMap *self, StageMapCellFn callback, ChunkSlot *item) {
+void StageMap__ForEachSlotCell(StageMap *self, StageMapCellFn callback, ChunkSlot *item) {
     GridCell **p;
     GridCell **end;
 

@@ -8,7 +8,7 @@
 
 Iterates `self->arr[0..6]`, invoking an optional per-element callback
 (`arg2`, called `(self, &arr[i])` when non-NULL) and then always forwarding
-`(self, arg1, &arr[i])` to `StageMap__ForEachEntryChild`. Already had a prototype and a
+`(self, arg1, &arr[i])` to `StageMap__ForEachSlotCell`. Already had a prototype and a
 two-hop derivation in `include/class_3bb8c.h` from a previous round
 (established from `StageMap__StepScaleRamp`/`StageMap__EndScaleRamp`'s call sites); this round
 supplied the body.
@@ -29,7 +29,7 @@ void StageMap__ForEachSlot(Obj866E8 *self, void (*arg1)(Obj866E8 *self, EntryChi
         if (arg2 != 0) {
             arg2(self, e);
         }
-        StageMap__ForEachEntryChild(self, arg1, e);
+        StageMap__ForEachSlotCell(self, arg1, e);
     }
 }
 ```
@@ -51,7 +51,7 @@ than the pointer itself).
 
 **Tier A.** Not a vtable slot -- a generic iteration helper: loops
 `self->arr[0..6]`, optionally invoking a per-`Elem` callback (`arg2`),
-then always forwarding to `StageMap__ForEachEntryChild` for each
+then always forwarding to `StageMap__ForEachSlotCell` for each
 element. Mechanics-is-purpose: it is exactly what its name says, a
 for-each over the object's `Elem` array, used by both the rate/countdown
 callers this round and (per the header's existing prototype) elsewhere.

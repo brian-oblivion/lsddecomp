@@ -1,4 +1,6 @@
-# StageMap__ForEachEntryChild — MATCHED 29/29
+# StageMap__ForEachSlotCell — MATCHED 29/29
+
+> Renamed from `StageMap__ForEachEntryChild` on 2026-09-26 (tools/rename.py). Address 0x8004d1d0.
 
 > Renamed from `Class866E8__ForEachEntryChild` on 2026-09-26 (tools/rename.py). Address 0x8004d1d0.
 
@@ -16,7 +18,7 @@ Walks `item->unk10[]` (an array of `EntryChildObj *`, `0x668` bytes /
 ## RESOLUTION — mention the field twice, bound first
 
 ```c
-void StageMap__ForEachEntryChild(Obj866E8 *self, void (*callback)(Obj866E8 *self, EntryChildObj *item), Elem *item) {
+void StageMap__ForEachSlotCell(Obj866E8 *self, void (*callback)(Obj866E8 *self, EntryChildObj *item), Elem *item) {
     EntryChildObj **p;
     EntryChildObj **end;
 
@@ -92,7 +94,7 @@ Per the documented guidance, did not burn further attempts chasing this
 
 ```c
 #if 0
-void StageMap__ForEachEntryChild(Obj866E8 *self, void (*callback)(Obj866E8 *self, EntryChildObj *item), Elem *item) {
+void StageMap__ForEachSlotCell(Obj866E8 *self, void (*callback)(Obj866E8 *self, EntryChildObj *item), Elem *item) {
     EntryChildObj **p;
     EntryChildObj **end;
 

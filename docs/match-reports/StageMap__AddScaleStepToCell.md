@@ -15,9 +15,9 @@ function-pointer VALUE (`lui`/`addiu` of its address, never a direct
 to `StageMap__ForEachSlot`. Reading `StageMap__ForEachSlot` in isolation makes it look
 like `StageMap__AddScaleStepToCell` is invoked there directly as `callback(self, &arr[i])`
 — but `StageMap__ForEachSlot` (own body: `s5 = a1`, forwarded unchanged to
-`StageMap__ForEachEntryChild`'s own second argument) actually treats its OWN second
+`StageMap__ForEachSlotCell`'s own second argument) actually treats its OWN second
 argument as a pass-through value, not a callback it calls itself. The
-real call site is one level further down, inside `StageMap__ForEachEntryChild`, which
+real call site is one level further down, inside `StageMap__ForEachSlotCell`, which
 walks `item->unk10[]` (an array of `Unk10ChildObj_3bb8c_b*`, up to
 `+0x668` bytes from the base) and calls `callback(self, element)` for
 each entry. So `StageMap__AddScaleStepToCell`'s true "item" parameter is one of THOSE
@@ -63,7 +63,7 @@ void StageMap__AddScaleStepToCell(Obj866E8 *self, Unk10ChildObj_3bb8c_b *item) {
   descriptions agree on offset and "array of pointers, walked to +0x668".
 - `Obj866E8::unk1E4` (`void *`, +0x1E4) — forwarded opaquely as `slot48`'s
   third argument; never dereferenced in this unit.
-- `extern void StageMap__ForEachSlot(...)` / `extern void StageMap__ForEachEntryChild(...)` —
+- `extern void StageMap__ForEachSlot(...)` / `extern void StageMap__ForEachSlotCell(...)` —
   both still `INCLUDE_ASM` in this same unit; forward-declared per the
   established "calling into a still-`INCLUDE_ASM` function is fine"
   convention, typed from their own call sites (see those functions' future
@@ -72,13 +72,13 @@ void StageMap__AddScaleStepToCell(Obj866E8 *self, Unk10ChildObj_3bb8c_b *item) {
 ## Attempts
 
 1 (matched on first attempt, once the true call chain — two hops through
-`StageMap__ForEachSlot`/`StageMap__ForEachEntryChild`, not one — was traced).
+`StageMap__ForEachSlot`/`StageMap__ForEachSlotCell`, not one — was traced).
 
 ### Proposed learning
 
 **A function passed by address is not necessarily called by its immediate
 receiver.** `StageMap__ForEachSlot` receives `StageMap__AddScaleStepToCell`'s address only to
-forward it, unclobbered, to a second function (`StageMap__ForEachEntryChild`) that does
+forward it, unclobbered, to a second function (`StageMap__ForEachSlotCell`) that does
 the actual `jalr`. Reading the receiver's own body (which never does
 `jalr` on that register) is itself the signal to keep tracing one hop
 further before typing the passed function's parameters from the wrong
@@ -87,7 +87,7 @@ call site.
 ## Naming
 
 **Tier B.** Not a vtable slot -- a callback, passed as a function pointer
-to `StageMap__ForEachSlot`/`StageMap__ForEachEntryChild` by
+to `StageMap__ForEachSlot`/`StageMap__ForEachSlotCell` by
 `StageMap__StepScaleRamp`. Body: `item->methods->slot48(item, 0,
 self->rateEntry)`. Named for what it does to each child entry (forwards
 the parent's current rate entry to it), mirrored by
