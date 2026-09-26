@@ -102,7 +102,7 @@ it emits nothing — all three call sites already have the value in the register
 8004aa88:  jal   8001e57c <GetSceneNodeMethods>   ; Class866E8__OnElementEvent (class_3ac78.c, 2-arg call)
 8004aa8c:  move  s2,a2                             ; ditto
 
-8004d3e8:  jal   8001e57c <GetSceneNodeMethods>   ; Class86AA0__Class86AA0 (via include/class_3bb8c.h, 1-arg call)
+8004d3e8:  jal   8001e57c <GetSceneNodeMethods>   ; GridCell__GridCell (via include/class_3bb8c.h, 1-arg call)
 8004d3ec:  move  s0,a0                             ; ditto
 ```
 

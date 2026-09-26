@@ -1,4 +1,6 @@
-# New_Class86AA0
+# New_GridCell
+
+> Renamed from `New_Class86AA0` on 2026-09-26 (tools/rename.py). Address 0x8004d38c.
 
 > Renamed from `func_8004D38C` on 2026-09-22 (tools/rename.py). Address 0x8004d38c.
 
@@ -6,20 +8,20 @@
 
 ## What it does
 
-`New_Class86AA0`: the allocator for `Class86AA0`, mirroring New_NodeGuardedViewport
+`New_GridCell`: the allocator for `GridCell`, mirroring New_NodeGuardedViewport
 exactly but for the sibling class (`0x3C`-byte allocation, ctor
-`Class86AA0__Class86AA0` fetched through `GetClass86AA0Methods()->ctor`).
+`GridCell__GridCell` fetched through `GetGridCellMethods()->ctor`).
 
 ## The C
 
 ```c
-Class86AA0 *New_Class86AA0(void)
+GridCell *New_GridCell(void)
 {
-    Class86AA0 *self;
+    GridCell *self;
 
     self = BMemPMgrAlloc(0x3C);
     if (self != NULL) {
-        GetClass86AA0Methods()->ctor(self);
+        GetGridCellMethods()->ctor(self);
         return self;
     }
     return NULL;
@@ -32,6 +34,6 @@ Matched on the first attempt; same idiom as New_NodeGuardedViewport. No residue.
 
 ## Naming
 
-**New_Class86AA0** -- tier A. Same `New_X` allocator idiom as
+**New_GridCell** -- tier A. Same `New_X` allocator idiom as
 `New_NodeGuardedViewport` (see that report), mirrored exactly for this sibling
 class.

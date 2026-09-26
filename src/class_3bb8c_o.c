@@ -230,7 +230,7 @@ void Actor__DispatchLinkCommand(Actor *self, BasicClass *sender, s32 event) {
     if (*(u8 *)sender->methods == 0x34) {
         self->methods->onActorLinkCommand(self, sender, event);
     } else if (*(u8 *)sender->methods == 0x24) {
-        self->methods->onClass86AA0LinkCommand(self, sender, event);
+        self->methods->onGridCellLinkCommand(self, sender, event);
     }
 }
 

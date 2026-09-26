@@ -1,7 +1,7 @@
 /*
  * class_3bb8c_c -- three small sibling classes, each built by its own
  * New_X/ctor pair (allocate, chain a base ctor, install the class's own
- * vtable): NodeGuardedViewport, Class86AA0 and Class86B60. All three follow
+ * vtable): NodeGuardedViewport, GridCell and Class86B60. All three follow
  * the same class-framework shape documented in
  * docs/research/class-framework.md and already used elsewhere in this
  * codebase (e.g. class_3ac78.c's Class866E8).
@@ -29,7 +29,7 @@
 #include "SceneNode.h"
 #include "Viewport.h"
 #include "NodeGuardedViewport.h"
-#include "Class86AA0.h"
+#include "GridCell.h"
 #include "Class86B60.h"
 #include "VabStreamObj.h"
 
@@ -70,30 +70,30 @@ NodeGuardedViewportMethods *GetNodeGuardedViewportMethods(void) {
     return &gNodeGuardedViewportMethods;
 }
 
-Class86AA0 *New_Class86AA0(void) {
-    Class86AA0 *self;
+GridCell *New_GridCell(void) {
+    GridCell *self;
 
     self = BMemPMgrAlloc(0x3C);
     if (self != NULL) {
-        GetClass86AA0Methods()->ctor(self);
+        GetGridCellMethods()->ctor(self);
         return self;
     }
     return NULL;
 }
 
-void Class86AA0__Class86AA0(Class86AA0 *self) {
+void GridCell__GridCell(GridCell *self) {
     GetSceneNodeMethods()->ctor((SceneNode *)self);
-    self->methods = GetClass86AA0Methods();
+    self->methods = GetGridCellMethods();
     self->unk34 = 0;
     self->flags36 = 0;
     self->nextInCell = NULL;
 }
 
-void Class86AA0__Reset(void) {}
+void GridCell__Reset(void) {}
 
 /* Only the low byte of the sender's class id is read: 0x34 is an Actor
  * (Actor__DispatchLinkCommand makes the same test the other way round). */
-void Class86AA0__DispatchLinkCommand(Class86AA0 *self, BasicClass *sender, s32 event) {
+void GridCell__DispatchLinkCommand(GridCell *self, BasicClass *sender, s32 event) {
     if (*(u8 *)sender->methods == 0x34) {
         self->methods->onActorLinkCommand(self, sender, event);
     }
@@ -101,7 +101,7 @@ void Class86AA0__DispatchLinkCommand(Class86AA0 *self, BasicClass *sender, s32 e
 
 /* tryAttachNearby keeps SceneNode's one-parameter slot type; this caller
  * passes the sender and event too, as Actor__OnActorLinkCommand does. */
-void Class86AA0__OnActorLinkCommand(Class86AA0 *self, void *sender, s32 event) {
+void GridCell__OnActorLinkCommand(GridCell *self, void *sender, s32 event) {
     GetSceneNodeMethods()->dispatchLinkCommand((SceneNode *)self, sender, event);
     if (event >= 9) {
         return;
@@ -111,15 +111,15 @@ void Class86AA0__OnActorLinkCommand(Class86AA0 *self, void *sender, s32 event) {
             return;
         }
     } while (0);
-    ((void (*)(Class86AA0 *, void *, s32))self->methods->tryAttachNearby)(self, sender, event);
+    ((void (*)(GridCell *, void *, s32))self->methods->tryAttachNearby)(self, sender, event);
 }
 
-void *Class86AA0__ReturnSelf(Class86AA0 *self) {
+void *GridCell__ReturnSelf(GridCell *self) {
     return self;
 }
 
-Class86AA0Methods *GetClass86AA0Methods(void) {
-    return &gClass86AA0Methods;
+GridCellMethods *GetGridCellMethods(void) {
+    return &gGridCellMethods;
 }
 
 Class86B60 *New_Class86B60(struct DreamSys *dreamSys) {

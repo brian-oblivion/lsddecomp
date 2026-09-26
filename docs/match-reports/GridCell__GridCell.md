@@ -1,4 +1,6 @@
-# Class86AA0__Class86AA0
+# GridCell__GridCell
+
+> Renamed from `Class86AA0__Class86AA0` on 2026-09-26 (tools/rename.py). Address 0x8004d3dc.
 
 > Renamed from `func_8004D3DC` on 2026-09-22 (tools/rename.py). Address 0x8004d3dc.
 
@@ -6,7 +8,7 @@
 
 ## What it does
 
-The constructor (`ctor`, slot +0x008) for `Class86AA0`. Chains to a base
+The constructor (`ctor`, slot +0x008) for `GridCell`. Chains to a base
 ctor (fetched via `GetSceneNodeMethods(self)`), installs this class's own vtable,
 then zeroes three of its own fields (`unk34` u16, `unk36` u16, `unk38`
 s32) directly -- unlike NodeGuardedViewport__NodeGuardedViewport's sibling ctor, there is no
@@ -16,10 +18,10 @@ after the zero-stores).
 ## The C
 
 ```c
-void Class86AA0__Class86AA0(Class86AA0 *self)
+void GridCell__GridCell(GridCell *self)
 {
     GetSceneNodeMethods(self)->ctor(self);
-    self->methods = GetClass86AA0Methods();
+    self->methods = GetGridCellMethods();
     self->unk34 = 0;
     self->unk36 = 0;
     self->unk38 = 0;
@@ -100,16 +102,16 @@ question.
 
 ## Naming
 
-**Class86AA0__Class86AA0** -- tier A. Canonical ctor (`Class__Class`
+**GridCell__GridCell** -- tier A. Canonical ctor (`Class__Class`
 convention): chains a base ctor (`GetSceneNodeMethods`), installs this
 class's own vtable, zeroes three of its own fields. Same shape and
 evidence class as `NodeGuardedViewport__NodeGuardedViewport`.
 
 ## Track 4 (2026-09-26, round 88, alpha)
 
-Class86AA0 is unified in `include/Class86AA0.h` and expands
+GridCell is unified in `include/GridCell.h` and expands
 SCENENODE_FIELDS: the three fields this ctor zeroes are SceneNode's, so
 `unk36` -> `flags36` and `unk38` (s32) -> `nextInCell` (void *, written as
 `NULL`; Class866E8__DispatchToRectCells walks it as a pointer). The store is
-`sw $zero` either way; image byte-identical. Class86AA0 has no own fields:
-New_Class86AA0 allocates 0x3C bytes, shorter than SceneNode's 0x44.
+`sw $zero` either way; image byte-identical. GridCell has no own fields:
+New_GridCell allocates 0x3C bytes, shorter than SceneNode's 0x44.

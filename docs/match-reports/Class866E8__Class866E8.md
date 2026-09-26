@@ -21,7 +21,7 @@ struct BaseCtorTable_3ac78 {
 extern BaseCtorTable_3ac78 *GetLightRigMethods(void);
 extern UnkSlotChildObj_3ac78 *New_Class81940(void);
 extern UnkSlotListObj_3ac78 *New_Class6D940(s32 arg1);
-extern GenericObject *New_Class86AA0(void);
+extern GenericObject *New_GridCell(void);
 extern s32 GetDrawSystem(void);
 extern Vec3_3ac78 gDefaultOrigin;
 
@@ -66,7 +66,7 @@ void Class866E8__Class866E8(Class866E8 *self, Vec3_3ac78 *arg1, s32 arg2)
         entry->unk0 = 0;
 
         entry->unk8 = New_Class6D940(0);
-        entry->unkC = New_Class86AA0();
+        entry->unkC = New_GridCell();
         entry->unkC->methods->slot4C(entry->unkC, self, &self->unk54);
 
         entry->unk10 = (Class866E8 **)BMemPMgrAlloc(0x668);
@@ -82,7 +82,7 @@ void Class866E8__Class866E8(Class866E8 *self, Vec3_3ac78 *arg1, s32 arg2)
         end = (u8 *)cellp + 0x668;
         p = (u8 *)cellp;
         while (p < end) {
-            obj = New_Class86AA0();
+            obj = New_GridCell();
             *(GenericObject **)p = obj;
             obj->methods->slot4C(obj, entry->unkC, buf);
 
@@ -113,9 +113,9 @@ established elsewhere in this project), sets `self->methods`, copies a
 3-word block into `self->unk54` (from `arg1` if given, else a default
 global), zeroes several scalar fields, then fills `self->unkEC[0..6]`
 (7 slot entries): each gets a child object (`New_Class81940`), a list object
-(`New_Class6D940`), a generic object (`New_Class86AA0`) dispatched with the
+(`New_Class6D940`), a generic object (`New_GridCell`) dispatched with the
 just-copied `self->unk54` block, and a freshly-allocated 0x668-byte buffer
-of pointers -- each pointer itself a `New_Class86AA0()`-created object,
+of pointers -- each pointer itself a `New_GridCell()`-created object,
 initialized via a rect-packing-style budget (`buf[0]`/`buf[2]`, wrapping
 at `0xA400` back to `0x400`, stepping `0x800` per cell) and flagged with a
 high bit on `unk10` after a `slot70(obj, 1)` dispatch. Finishes with two
@@ -245,17 +245,17 @@ unknown. Do not "correct" the stride to 21 on this function's evidence alone.
 
 The local GetDrawSystem/New_DrawSystem extern this unit carried is gone; it comes from `include/DrawSystem.h` (gDrawSystemMethods unified), with a pointer cast where this unit's own slot type asks for one. Byte-identical.
 
-## Track 4 (2026-09-26, round 88, alpha: Class86AA0's unification)
+## Track 4 (2026-09-26, round 88, alpha: GridCell's unification)
 
-The objects this ctor builds with `New_Class86AA0()` are typed as what they
-are: `UnkSlotEntry_3ac78::cellParent` is `struct Class86AA0 *` and the
-cell-building local `obj` is `Class86AA0 *` (include/Class86AA0.h), and the
-local `extern GenericObject *New_Class86AA0(void)` is gone. The generic
+The objects this ctor builds with `New_GridCell()` are typed as what they
+are: `UnkSlotEntry_3ac78::cellParent` is `struct GridCell *` and the
+cell-building local `obj` is `GridCell *` (include/GridCell.h), and the
+local `extern GenericObject *New_GridCell(void)` is gone. The generic
 slots resolve to SceneNode's: `slot4C` is `attachToParent` (the cellParent
 attached to the Class866E8 at `origin`, each cell attached to the
 cellParent at `buf`), `slot70` is `setLightMode(obj, 1)`, and `unk10` is
 `attribute`. Casts at the two attachToParent calls (`(SceneNode *)`,
 `(LongVec3 *)`) emit no code; image byte-identical. `cells` is still
-declared `Class866E8 **` although it holds these same Class86AA0 objects:
+declared `Class866E8 **` although it holds these same GridCell objects:
 that field, NotifyGridCell's parameter and Class866E8__DispatchToRectCells
 are Class866E8's own track 4 job (gClass866E8Methods) and were left alone.

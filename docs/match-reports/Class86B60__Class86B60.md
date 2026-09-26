@@ -52,7 +52,7 @@ presence anywhere in the project. Placed as one new block right before the
   function's own second-to-last call). Vtable is `gClass86B60Methods`, resolved
   via `GetClass86B60Methods` (still raw asm in the uncarved
   `asm/class_3bb8c_d.s`, called directly by `jal` -- same "vtable getter"
-  shape as `GetNodeGuardedViewportMethods`/`GetClass86AA0Methods`).
+  shape as `GetNodeGuardedViewportMethods`/`GetGridCellMethods`).
 - `Class86B60` struct fields: `unk48` (`Class86B60Unk48Obj *`, set up by
   the base ctor chain, read here), `unkA4` (`void *`, stores `dreamSys`
   raw), `unkAC` (`s32`, zeroed), `unkBC` (`s32`, holds `slot1B0`'s return),

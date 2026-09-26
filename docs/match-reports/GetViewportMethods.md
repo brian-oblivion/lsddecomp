@@ -39,7 +39,7 @@ comment to reflect it is now matched, not external.
 
 ## Naming
 
-`GetUnk18ObjMethods` -- tier A. Plain no-argument getter, `return &gViewportMethods;` -- `Unk18Obj`'s own class table. Named to match the established sibling convention for this exact shape (`Get_vtable_BasicClass`, `GetClass6E99CMethods`, `GetClass86AA0Methods`), which is a free function (no `self`), not a `Class__Method`.
+`GetUnk18ObjMethods` -- tier A. Plain no-argument getter, `return &gViewportMethods;` -- `Unk18Obj`'s own class table. Named to match the established sibling convention for this exact shape (`Get_vtable_BasicClass`, `GetClass6E99CMethods`, `GetGridCellMethods`), which is a free function (no `self`), not a `Class__Method`.
 
 ## Track 4 (2026-09-25, round 85, bravo)
 

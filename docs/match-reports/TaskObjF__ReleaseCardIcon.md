@@ -43,7 +43,7 @@ for those function names) -- this round's other two runners sharing
 `include/class_3bb8c.h`.
 
 **Every new type is suffixed `_3bb8c_g`, including the class name itself**
--- unlike the single-owner `Class86B60`/`NodeGuardedViewport`/`Class86AA0` already
+-- unlike the single-owner `Class86B60`/`NodeGuardedViewport`/`GridCell` already
 in this header. Since three units reach into this ONE real table this
 round, an unsuffixed `Class86E00` risks a same-named, differently-shaped
 definition arriving from `class_3bb8c_e` or `class_3bb8c_f` at merge time

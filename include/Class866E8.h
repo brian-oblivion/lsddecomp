@@ -16,8 +16,8 @@
  *
  * What its own methods do:
  *  - the ctor makes seven elements (`elems`), each a Class81940 `loader`, a
- *    Class6D940 `placements`, a Class86AA0 `cellParent` attached to this
- *    object at `origin`, and a 0x668-byte block of Class86AA0 `cells`
+ *    Class6D940 `placements`, a GridCell `cellParent` attached to this
+ *    object at `origin`, and a 0x668-byte block of GridCell `cells`
  *    attached to the cellParent on a 0x800-unit lattice. Every grid index
  *    uses a row stride of 20 cells: gDefaultGridSpan (0xA000) >> 11, stored
  *    by setGridSpan in `gridCells`.
@@ -58,7 +58,7 @@
 
 struct Class81940;
 struct Class6D940;
-struct Class86AA0;
+struct GridCell;
 
 typedef struct Class866E8 Class866E8;
 typedef struct Class866E8Methods Class866E8Methods;
@@ -197,8 +197,8 @@ struct Class866E8Elem {
     /* +0x002 */ u16 key; /* the ctor: its index; BuildRateEntries: the spec's key, copied on into loader->ownerKey */
     /* +0x004 */ struct Class81940 *loader; /* New_Class81940(): the element's file (include/Class81940.h) */
     /* +0x008 */ struct Class6D940 *placements; /* New_Class6D940(0): its placement records (include/Class6D940.h) */
-    /* +0x00C */ struct Class86AA0 *cellParent; /* New_Class86AA0(), attached to the Class866E8 at `origin`; every cell's parent */
-    /* +0x010 */ struct Class86AA0 **cells; /* BMemPMgrAlloc(0x668): 410 New_Class86AA0() cells, row stride 20 */
+    /* +0x00C */ struct GridCell *cellParent; /* New_GridCell(), attached to the Class866E8 at `origin`; every cell's parent */
+    /* +0x010 */ struct GridCell **cells; /* BMemPMgrAlloc(0x668): 410 New_GridCell() cells, row stride 20 */
     /* +0x014 */ BasicClass *heldObj; /* zeroed by the ctor; OnElementEvent releases it on event 6 */
     /* +0x018 */ s32 unk18;           /* zeroed by the ctor */
 };
@@ -296,7 +296,7 @@ struct Class866E8 {
 typedef void (*Class866E8OnElementEventFn)(Class866E8 *self, s32 command, Class866E8Elem *elem, s32 index);
 
 /* ForEachElem's callbacks. */
-typedef void (*Class866E8CellFn)(Class866E8 *self, struct Class86AA0 *cell);
+typedef void (*Class866E8CellFn)(Class866E8 *self, struct GridCell *cell);
 typedef void (*Class866E8ElemFn)(Class866E8 *self, Class866E8Elem *elem);
 
 extern Class866E8Methods gClass866E8Methods;
@@ -321,7 +321,7 @@ void Class866E8__ApplyToSenderFootprint(Class866E8 *self, SceneNode *sender, s32
 void Class866E8__SetFootprintFromCell(Class866E8 *self, Descriptor10Ext *desc, s32 span);
 void Class866E8__SetFootprintRect(Class866E8 *self, Descriptor10Ext *desc, s32 span);
 void Class866E8__DispatchToRectCells(Class866E8 *self, SceneNode *sender, s32 command);
-void NotifyGridCell(struct Class86AA0 *cell, SceneNode *sender, s32 command);
+void NotifyGridCell(struct GridCell *cell, SceneNode *sender, s32 command);
 Descriptor10 *Class866E8__GetCurrentCellKey(Class866E8 *self);
 void func_8004B324(void);
 void Class866E8__SetGridSpan(Class866E8 *self, s32 span);
@@ -365,8 +365,8 @@ void Class866E8__SetBounds(Class866E8 *self, Bounds866E8_3bb8c_b *bounds);
 void Class866E8__ConfigureRateEntry(Class866E8 *self, s32 rate, s32 flag);
 void Class866E8__AdvanceRateCountdown(Class866E8 *self);
 void Class866E8__FlushRateLatch(Class866E8 *self);
-void Class866E8__ApplyRateToChild(Class866E8 *self, struct Class86AA0 *cell);
-void Class866E8__ResetChildRate(Class866E8 *self, struct Class86AA0 *cell);
+void Class866E8__ApplyRateToChild(Class866E8 *self, struct GridCell *cell);
+void Class866E8__ResetChildRate(Class866E8 *self, struct GridCell *cell);
 void Class866E8__ForEachElem(Class866E8 *self, Class866E8CellFn cellFn, Class866E8ElemFn elemFn);
 void Class866E8__ForEachEntryChild(Class866E8 *self, Class866E8CellFn cellFn, Class866E8Elem *elem);
 

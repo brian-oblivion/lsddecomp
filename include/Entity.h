@@ -66,7 +66,7 @@ typedef struct EntityMoodHandlerArg EntityMoodHandlerArg;
 /* Class65650's slots (overrides: +0x008 Entity__Entity, +0x00C
  * Entity__Finalize, +0x040 Entity__Reset, +0x04C Entity__AttachToParent,
  * +0x050 Entity__DetachFromParent, +0x098 Entity__Update, +0x0DC
- * Entity__NotifyLinkStage, +0x0E0 Entity__OnClass86AA0LinkCommand, +0x11C
+ * Entity__NotifyLinkStage, +0x0E0 Entity__OnGridCellLinkCommand, +0x11C
  * Entity__TickSoundCue; `tools/classtable.py gEntityMethods --vs
  * gClass65650Methods`), then this class's own. */
 struct EntityMethods {
@@ -196,7 +196,7 @@ void Entity__AttachToParent(Entity *self, Class65650 *peer, void *companion,
 void Entity__DetachFromParent(Entity *self);
 void Entity__Update(Entity *self, void *sender, s32 event);
 void Entity__NotifyLinkStage(Entity *self, void *sender, s32 event);
-void Entity__OnClass86AA0LinkCommand(Entity *self, void *sender, s32 event);
+void Entity__OnGridCellLinkCommand(Entity *self, void *sender, s32 event);
 void Entity__TickSoundCue(Entity *self);
 s32 Entity__IsNearTarget(Entity *self, void *pos, s32 arg2, s32 arg3);
 s32 Entity__DistanceToPeer(Entity *self, Class65650 *peer);

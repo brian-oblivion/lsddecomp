@@ -127,13 +127,13 @@ extern s32 D_800869CC[3];
 
 extern void *BMemPMgrAlloc(s32 size);
 
-/* Class86AA0 (gClass86AA0Methods, a SceneNode) is defined in
- * include/Class86AA0.h (round 88, track 4). */
+/* GridCell (gGridCellMethods, a SceneNode) is defined in
+ * include/GridCell.h (round 88, track 4). */
 
 /* GetSceneNodeMethods and its table: include/SceneNode.h (track 4, round
  * 81). The local BaseCtorTableB_3bb8c_c view and the unprototyped getter that
  * lived here are gone; round 59 measured both arguments class_3bb8c_c.c passed
- * to the no-argument getter as zero-cost (docs/match-reports/Class86AA0__Class86AA0.md). */
+ * to the no-argument getter as zero-cost (docs/match-reports/GridCell__GridCell.md). */
 
 
 /* Class86B60 (gClass86B60Methods, a TaskCore) is defined in

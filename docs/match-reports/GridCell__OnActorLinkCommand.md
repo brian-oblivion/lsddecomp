@@ -1,6 +1,8 @@
-# Class86AA0__OnActorLinkCommand -- MATCHED (33/33 words), round 17 permuter pass
+# GridCell__OnActorLinkCommand -- MATCHED (33/33 words), round 17 permuter pass
 
-> Renamed from `Class86AA0__ForwardIfArg2InRange` on 2026-09-26 (tools/rename.py). Address 0x8004d47c.
+> Renamed from `Class86AA0__OnActorLinkCommand` on 2026-09-26 (tools/rename.py). Address 0x8004d47c.
+
+> Renamed from `GridCell__ForwardIfArg2InRange` on 2026-09-26 (tools/rename.py). Address 0x8004d47c.
 
 > Renamed from `func_8004D47C` on 2026-09-22 (tools/rename.py). Address 0x8004d47c.
 
@@ -25,7 +27,7 @@ was a single, minimal change: wrapping the SECOND early-return guard in
 a `do { ... } while (0)`:
 
 ```c
-void Class86AA0__OnActorLinkCommand(Class86AA0 *self, GenericTagInst_3bb8c_c *arg1, s32 arg2)
+void GridCell__OnActorLinkCommand(GridCell *self, GenericTagInst_3bb8c_c *arg1, s32 arg2)
 {
     GetSceneNodeMethods(self)->slot9C(self, arg1, arg2);
     if (arg2 >= 9) {
@@ -44,7 +46,7 @@ void Class86AA0__OnActorLinkCommand(Class86AA0 *self, GenericTagInst_3bb8c_c *ar
 NOT taken on faith from the permuter's own scorer: the exact candidate was
 recompiled through the pinned pipeline by hand (`cpp | cc1 | maspsx | as`,
 same invocation as CLAUDE.md's own escalation recipe) and `objdump`-diffed
-against `permuter-work/Class86AA0__OnActorLinkCommand/target.o` (retail's own bytes,
+against `permuter-work/GridCell__OnActorLinkCommand/target.o` (retail's own bytes,
 independently assembled by the setup script) -- byte-identical, not just
 permuter-score-zero. Two plainer-looking alternatives were tried and
 REJECTED because they did NOT reproduce retail: a bare `{ }` compound
@@ -84,7 +86,7 @@ insertion/deletion/reordering penalty).
 
 ## What it does
 
-`Class86AA0`'s own slot +0x0B8 occupant (called by `Class86AA0__DispatchLinkCommand`, already
+`GridCell`'s own slot +0x0B8 occupant (called by `GridCell__DispatchLinkCommand`, already
 matched, as `self->methods->slotB8(self)` -- but see the arity note below).
 Unconditionally forwards `(self, arg1, arg2)` to the base ctor table's own
 `+0x09C` slot, then, if `5 <= arg2 < 9`, forwards the same three arguments
@@ -93,7 +95,7 @@ to `self`'s own `+0x0A0` slot.
 ## The C (closest attempt, 23/33 -- shape-correct, register-identity wrong)
 
 ```c
-void Class86AA0__OnActorLinkCommand(Class86AA0 *self, GenericTagInst_3bb8c_c *arg1, s32 arg2)
+void GridCell__OnActorLinkCommand(GridCell *self, GenericTagInst_3bb8c_c *arg1, s32 arg2)
 {
     GetSceneNodeMethods(self)->slot9C(self, arg1, arg2);
     if (arg2 >= 9) {
@@ -146,16 +148,16 @@ own disassembly, independent of the register-identity residue (same
 policy as `ComputeCellWorldOffsets`'s report, which kept its prototype after a
 near-miss):
 
-- **`Class86AA0Methods`**: added `slotA0`
-  (`void (*)(Class86AA0 *self, GenericTagInst_3bb8c_c *arg1, s32 arg2)`,
+- **`GridCellMethods`**: added `slotA0`
+  (`void (*)(GridCell *self, GenericTagInst_3bb8c_c *arg1, s32 arg2)`,
   +0x0A0), called by this function when `5 <= arg2 < 9`. Additive; existing
   `ctor` (+0x008) and `slotB8` (+0x0B8) fields untouched, only the padding
   between them was split to make room.
 - **`GenericTagInst_3bb8c_c`**: added a forward `typedef struct
   GenericTagInst_3bb8c_c GenericTagInst_3bb8c_c;` ahead of
-  `Class86AA0Methods` (needed for `slotA0`'s parameter type; the type's
+  `GridCellMethods` (needed for `slotA0`'s parameter type; the type's
   full definition, further down the file, already existed from
-  `Class86AA0__DispatchLinkCommand`'s round). The later definition's OWN `typedef ... {
+  `GridCell__DispatchLinkCommand`'s round). The later definition's OWN `typedef ... {
   } GenericTagInst_3bb8c_c;` had to become a plain `struct
   GenericTagInst_3bb8c_c { ... };` (drop the trailing re-typedef) because
   cc1 (this project's pinned GCC 2.6.3) rejects redefining an existing
@@ -171,13 +173,13 @@ near-miss):
   global/table). Same-offset arity conflict means different table/different
   class, per this project's established split policy (see
   `TaskCoreObjMethods` in `include/code_2c054.h` for the precedent this
-  follows). This is a type-NAME change only: `Class86AA0__Class86AA0`'s own
+  follows). This is a type-NAME change only: `GridCell__GridCell`'s own
   already-matched call (`GetSceneNodeMethods(self)->ctor(self)`) only touches the
   `+0x008 ctor` slot, whose layout is byte-identical in both names, so
   renaming changes no bytes and does not disturb that match (confirmed:
-  `./build-and-verify.sh` stays green with `Class86AA0__OnActorLinkCommand` back on
+  `./build-and-verify.sh` stays green with `GridCell__OnActorLinkCommand` back on
   `INCLUDE_ASM`).
-- New `BaseCtorTableB_3bb8c_c` type: `ctor` at +0x008 (`Class86AA0__Class86AA0`),
+- New `BaseCtorTableB_3bb8c_c` type: `ctor` at +0x008 (`GridCell__GridCell`),
   `slot9C` at +0x09C (`void (*)(void *self, void *arg1, s32 arg2)`, this
   function's own first, unconditional statement).
 
@@ -209,16 +211,16 @@ like the whole game.
 Both ways of doing it failed:
 
 1. **Block-scope `extern BaseCtorTableB_3bb8c_c *GetSceneNodeMethods();`** inside
-   `Class86AA0__OnActorLinkCommand`, so the zero-argument call could coexist with
-   `Class86AA0__Class86AA0`'s one-argument call in the same unit. Does not compile:
+   `GridCell__OnActorLinkCommand`, so the zero-argument call could coexist with
+   `GridCell__GridCell`'s one-argument call in the same unit. Does not compile:
    C89 keeps the outer prototype in scope and applies its arity —
    `too few arguments to function 'GetSceneNodeMethods'`. A block-scope
    redeclaration cannot narrow an outer prototype.
 2. **File-scope declaration changed to empty parens** (`GetSceneNodeMethods()`), no
    prototype, each call site passing its own argument list — which is what
    round 9 concluded retail's own source must have had. This compiles and is
-   *worse*: `Class86AA0__OnActorLinkCommand` drops **23/33 -> 15/33**, and it regresses
-   `Class86AA0__Class86AA0` from **20/20 -> 19/20**. So `Class86AA0__Class86AA0` genuinely needs
+   *worse*: `GridCell__OnActorLinkCommand` drops **23/33 -> 15/33**, and it regresses
+   `GridCell__GridCell` from **20/20 -> 19/20**. So `GridCell__GridCell` genuinely needs
    the `$a0` setup that a prototype-less call elides, and round 9's
    do-not-reconcile note on this declaration is load-bearing in the other
    direction too: not just `(void)`, but any change that lets the argument
@@ -264,14 +266,14 @@ declaration.
 
 ## Naming
 
-**Class86AA0__OnActorLinkCommand** -- tier B. Mechanics are fully
+**GridCell__OnActorLinkCommand** -- tier B. Mechanics are fully
 established (round 17's permuter pass pinned the byte-exact body):
 unconditionally forwards `(self, arg1, arg2)` to the base ctor table's own
 `slot9C`, then, only when `5 <= arg2 < 9`, forwards the same three
 arguments again to `self`'s own `slotA0`. Purpose is explicitly NOT
 established -- the function's own history section already documents an
 open arity/purpose conflict with its nominal vtable slot (`slotB8`, whose
-call site from `Class86AA0__DispatchLinkCommand` passes only `self`, one
+call site from `GridCell__DispatchLinkCommand` passes only `self`, one
 argument short of what this function's own body reads) that round 9/10
 deliberately left unreconciled. Named for the one concrete, evidenced
 mechanic (a numeric range gate on `arg2`) rather than for either disputed
@@ -283,9 +285,9 @@ unresolved fact as settled.
 
 ## Track 4 (2026-09-26, round 88, alpha)
 
-Renamed `Class86AA0__ForwardIfArg2InRange` -> `Class86AA0__OnActorLinkCommand`
-(tools/rename.py). It is the sole occupant of gClass86AA0Methods's own slot
-+0x0B8, and its only caller is `Class86AA0__DispatchLinkCommand`'s branch for
+Renamed `GridCell__ForwardIfArg2InRange` -> `GridCell__OnActorLinkCommand`
+(tools/rename.py). It is the sole occupant of gGridCellMethods's own slot
++0x0B8, and its only caller is `GridCell__DispatchLinkCommand`'s branch for
 a sender whose class id byte is 0x34 (gActorMethods). The body is the same
 as Actor's `onActorLinkCommand` base occupant: chain SceneNode's
 dispatchLinkCommand, then for events 5..8 run `tryAttachNearby` with the
@@ -300,7 +302,7 @@ retired: the call site has the three arguments in $a0..$a2 already.
 The C since round 88 (byte-identical, whole image verified):
 
 ```c
-void Class86AA0__OnActorLinkCommand(Class86AA0 *self, void *sender, s32 event)
+void GridCell__OnActorLinkCommand(GridCell *self, void *sender, s32 event)
 {
     GetSceneNodeMethods()->dispatchLinkCommand((SceneNode *)self, sender, event);
     if (event >= 9) {
@@ -311,6 +313,6 @@ void Class86AA0__OnActorLinkCommand(Class86AA0 *self, void *sender, s32 event)
             return;
         }
     } while (0);
-    ((void (*)(Class86AA0 *, void *, s32))self->methods->tryAttachNearby)(self, sender, event);
+    ((void (*)(GridCell *, void *, s32))self->methods->tryAttachNearby)(self, sender, event);
 }
 ```

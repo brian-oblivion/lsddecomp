@@ -107,7 +107,7 @@ function ALSO dispatches `slotF0` a second time, on a *different* instance
 cast through a pointer type, not a real buffer pointer. Per this project's
 "multiple call sites can type one slot's argument differently, as long as
 each reproduces its own site's codegen" convention (see e.g.
-`Class86AA0Methods::slotB8` in this same header), both are left as-is; the
+`GridCellMethods::slotB8` in this same header), both are left as-is; the
 cast documents the mismatch rather than hiding it.
 
 ## The levers that mattered (both are the same lever twice)

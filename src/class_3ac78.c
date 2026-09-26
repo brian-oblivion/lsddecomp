@@ -7,7 +7,7 @@
  *
  * What it manages is a GRID. The object owns seven elements (elems[7]), each
  * pairing a loader, a placement list, a parent node, and a 0x668-byte heap
- * block holding that element's grid of Class86AA0 cells; the constructor seeds every
+ * block holding that element's grid of GridCell cells; the constructor seeds every
  * cell with a world position on a 0x800 lattice. Indexing the grid uses a row
  * stride of 20 cells -- the same 20 that gDefaultGridSpan >> 11 produces
  * (0xA000 / 0x800, see Class866E8__SetGridSpan) and the same stride
@@ -37,7 +37,7 @@
 #include "Class6D940.h"
 #include "LinkResource.h"
 #include "Class81940.h"
-#include "Class86AA0.h"
+#include "GridCell.h"
 #include "FlatLightObj.h"
 
 extern void *BMemPMgrAlloc(s32 size);
@@ -78,8 +78,8 @@ extern Unk54Struct gDefaultOrigin;
 void Class866E8__Class866E8(Class866E8 *self, Unk54Struct *origin, s32 autoLoad) {
     s32 i;
     Class866E8Elem *entry;
-    Class86AA0 *obj;
-    Class86AA0 **cellp;
+    GridCell *obj;
+    GridCell **cellp;
     u8 *p;
     u8 *end;
     s32 buf[3];
@@ -115,11 +115,11 @@ void Class866E8__Class866E8(Class866E8 *self, Unk54Struct *origin, s32 autoLoad)
         entry->flag = 0;
 
         entry->placements = New_Class6D940(0);
-        entry->cellParent = New_Class86AA0();
+        entry->cellParent = New_GridCell();
         entry->cellParent->methods->attachToParent(entry->cellParent, (SceneNode *)self,
                                                    (LongVec3 *)&self->origin);
 
-        entry->cells = (Class86AA0 **)BMemPMgrAlloc(0x668);
+        entry->cells = (GridCell **)BMemPMgrAlloc(0x668);
         if (entry->cells == NULL) {
             return;
         }
@@ -132,8 +132,8 @@ void Class866E8__Class866E8(Class866E8 *self, Unk54Struct *origin, s32 autoLoad)
         end = (u8 *)cellp + 0x668;
         p = (u8 *)cellp;
         while (p < end) {
-            obj = New_Class86AA0();
-            *(Class86AA0 **)p = obj;
+            obj = New_GridCell();
+            *(GridCell **)p = obj;
             obj->methods->attachToParent(obj, (SceneNode *)entry->cellParent, (LongVec3 *)buf);
 
             buf[0] += 0x800;
@@ -142,9 +142,9 @@ void Class866E8__Class866E8(Class866E8 *self, Unk54Struct *origin, s32 autoLoad)
                 buf[2] += 0x800;
             }
 
-            obj = *(Class86AA0 **)p;
+            obj = *(GridCell **)p;
             obj->methods->setLightMode(obj, 1);
-            obj = *(Class86AA0 **)p;
+            obj = *(GridCell **)p;
             p += 4;
             obj->attribute |= 0x80000000;
         }
@@ -157,8 +157,8 @@ void Class866E8__Class866E8(Class866E8 *self, Unk54Struct *origin, s32 autoLoad)
 void Class866E8__Finalize(Class866E8 *self) {
     s32 i;
     Class866E8Elem *entry;
-    Class86AA0 *obj;
-    Class86AA0 **cellp;
+    GridCell *obj;
+    GridCell **cellp;
     u8 *p;
     u8 *end;
 
@@ -187,7 +187,7 @@ void Class866E8__Finalize(Class866E8 *self) {
         end = (u8 *)cellp + 0x668;
         p = (u8 *)cellp;
         while (p < end) {
-            obj = *(Class86AA0 **)p;
+            obj = *(GridCell **)p;
             if (obj != NULL) {
                 obj->methods->release(obj);
             }
@@ -431,8 +431,8 @@ void Class866E8__DispatchToRectCells(Class866E8 *self, SceneNode *sender, s32 co
     s32 col;
     GridSlot866E8 *entry;
     Class866E8Elem *slot;
-    Class86AA0 **cell;
-    Class86AA0 *obj;
+    GridCell **cell;
+    GridCell *obj;
 
     entry = self->rects.e;
     for (i = 0; i < self->rectCount; entry++, i++) {
@@ -465,7 +465,7 @@ void Class866E8__DispatchToRectCells(Class866E8 *self, SceneNode *sender, s32 co
  * reserve stack space for unused trailing integer/pointer args on this
  * target, so the definition's own bytes are unaffected (reverified
  * 18/18 after the widening). */
-void NotifyGridCell(Class86AA0 *cell, SceneNode *sender, s32 command) {
+void NotifyGridCell(GridCell *cell, SceneNode *sender, s32 command) {
     if (cell != NULL && (cell->flags36 & 0x80)) {
         cell->methods->onNotify(cell, sender, command);
     }
