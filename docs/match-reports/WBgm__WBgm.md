@@ -5,7 +5,7 @@
 Round 81, runner delta. Unit `src/code_2a0e0.c` (carved from `psyq_2a0e0` in
 FINISHING-PLAN revision 18). Fresh ground, no prior attempt.
 
-- **Where:** D_8006E48C slot +0x008 (ctor) (slots resolved with `tools/classtable.py D_8006E48C`).
+- **Where:** gWBgmMethods slot +0x008 (ctor) (slots resolved with `tools/classtable.py gWBgmMethods`).
 - **What:** constructor: base ctor via `Get_vtable_BasicClass()->ctor`, installs `Get_vtable_WBgm()`, zeroes +0x0C/+0x10/+0x14/+0x1A/+0x1C/+0x1E, stores the third argument at +0x20 (auto-play flag), sets `gWBgmActive = 1` (gp_rel global), then calls its own slots +0x05C (with arg 2) and +0x060 (with arg 1) and registers itself as a child of the `GetDrawSystem()` singleton.
 - **Result:** byte-exact on the first build. `funcdiff.py` reports 54/54
   words, 0 insertions / 0 deletions, and the whole-image SHA1 is green
@@ -72,7 +72,7 @@ The unit-local view it needs, from the top of `src/code_2a0e0.c`:
 ```c
 #include "BasicClass.h"
 
-/* Local view of D_8006E48C's objects: a SEQ player. Fields named from the
+/* Local view of gWBgmMethods's objects: a SEQ player. Fields named from the
  * libsnd calls they feed. */
 typedef struct WBgm WBgm;
 typedef struct WBgmMethods WBgmMethods;
@@ -141,7 +141,7 @@ WBgmMethods *Get_vtable_WBgm(void);
 extern s32 func_8002CC28(void);
 s32 WBgm__HandleMonitorEvent(WBgm *self);
 
-extern WBgmMethods D_8006E48C;
+extern WBgmMethods gWBgmMethods;
 extern s32 gWBgmActive;
 extern u8 gSsSizeTableBuf[];
 ```
@@ -149,3 +149,9 @@ extern u8 gSsSizeTableBuf[];
 ## Track 4 (2026-09-26, round 87, bravo)
 
 The local GetDrawSystem/New_DrawSystem extern this unit carried is gone; it comes from `include/DrawSystem.h` (D_8006C070 unified), with a pointer cast where this unit's own slot type asks for one. Byte-identical.
+
+## Track 4 (2026-09-26, round 88, alpha)
+
+The class is now declared once, in `include/WBgm.h` (table `gWBgmMethods`, renamed from `D_8006E48C` with tools/rename.py this round); `src/code_2a0e0.c` keeps no view of it, so the view quoted in this report's source section is historical. Image byte-identical after every step.
+
+Parameters retyped to `(WBgm *self, char *vabPath, char *seqPath, s32 autoPlay)`, and the ctor slot with them: both paths are forwarded unchanged to setSeq/setVab, whose bodies hand them to New_Class6EED8(char *) and New_VabStreamObj(char *). See New_WBgm's Track 4 paragraph for the one caller.

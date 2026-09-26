@@ -5,7 +5,7 @@
 Round 81, runner delta. Unit `src/code_2a0e0.c` (carved from `psyq_2a0e0` in
 FINISHING-PLAN revision 18). Fresh ground, no prior attempt.
 
-- **Where:** D_8006E48C slot +0x060 (setVab) (slots resolved with `tools/classtable.py D_8006E48C`).
+- **Where:** gWBgmMethods slot +0x060 (setVab) (slots resolved with `tools/classtable.py gWBgmMethods`).
 - **What:** set the VAB: the twin of WBgm__SetSeq on +0x0C with `New_VabStreamObj(arg)`.
 - **Result:** byte-exact on the first build. `funcdiff.py` reports 58/58
   words, 0 insertions / 0 deletions, and the whole-image SHA1 is green
@@ -55,7 +55,7 @@ The unit-local view it needs, from the top of `src/code_2a0e0.c`:
 ```c
 #include "BasicClass.h"
 
-/* Local view of D_8006E48C's objects: a SEQ player. Fields named from the
+/* Local view of gWBgmMethods's objects: a SEQ player. Fields named from the
  * libsnd calls they feed. */
 typedef struct WBgm WBgm;
 typedef struct WBgmMethods WBgmMethods;
@@ -124,7 +124,7 @@ WBgmMethods *Get_vtable_WBgm(void);
 extern s32 func_8002CC28(void);
 s32 WBgm__HandleMonitorEvent(WBgm *self);
 
-extern WBgmMethods D_8006E48C;
+extern WBgmMethods gWBgmMethods;
 extern s32 gWBgmActive;
 extern u8 gSsSizeTableBuf[];
 ```
@@ -139,3 +139,9 @@ transferred. `vabId` (+0x054) is the same field under the same name. The
 release calls no longer cast, and `WBgm__SetVab` casts its s32 `arg` to
 the `char *` path New_VabStreamObj takes. WBgm's own slot types are
 unchanged.
+
+## Track 4 (2026-09-26, round 88, alpha)
+
+The class is now declared once, in `include/WBgm.h` (table `gWBgmMethods`, renamed from `D_8006E48C` with tools/rename.py this round); `src/code_2a0e0.c` keeps no view of it, so the view quoted in this report's source section is historical. Image byte-identical after every step.
+
+Parameter retyped `s32 arg` -> `char *vabPath` (slot +0x060 with it); the `(char *)` cast before New_VabStreamObj is gone and the test reads `vabPath != NULL`. Callers: WBgm__WBgm, whose vabPath is one of the gWeeklyGroupTable VAB paths (see New_WBgm's Track 4 paragraph).

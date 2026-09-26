@@ -5,7 +5,7 @@
 Round 81, runner delta. Unit `src/code_2a0e0.c` (carved from `psyq_2a0e0` in
 FINISHING-PLAN revision 18). Fresh ground, no prior attempt.
 
-- **Where:** D_8006E48C slot none (not in the table); allocator (slots resolved with `tools/classtable.py D_8006E48C`).
+- **Where:** gWBgmMethods slot none (not in the table); allocator (slots resolved with `tools/classtable.py gWBgmMethods`).
 - **What:** `New_` wrapper: `BMemPMgrAlloc(0x24)`, then the ctor through `Get_vtable_WBgm()->ctor` (slot +0x008) with the three arguments, `return self` / `return NULL`.
 - **Result:** byte-exact on the first build. `funcdiff.py` reports 31/31
   words, 0 insertions / 0 deletions, and the whole-image SHA1 is green
@@ -46,7 +46,7 @@ The unit-local view it needs, from the top of `src/code_2a0e0.c`:
 ```c
 #include "BasicClass.h"
 
-/* Local view of D_8006E48C's objects: a SEQ player. Fields named from the
+/* Local view of gWBgmMethods's objects: a SEQ player. Fields named from the
  * libsnd calls they feed. */
 typedef struct WBgm WBgm;
 typedef struct WBgmMethods WBgmMethods;
@@ -115,7 +115,19 @@ WBgmMethods *Get_vtable_WBgm(void);
 extern s32 func_8002CC28(void);
 s32 WBgm__HandleMonitorEvent(WBgm *self);
 
-extern WBgmMethods D_8006E48C;
+extern WBgmMethods gWBgmMethods;
 extern s32 gWBgmActive;
 extern u8 gSsSizeTableBuf[];
 ```
+
+## Track 4 (2026-09-26, round 88, alpha)
+
+The class is now declared once, in `include/WBgm.h` (table `gWBgmMethods`, renamed from `D_8006E48C` with tools/rename.py this round); `src/code_2a0e0.c` keeps no view of it, so the view quoted in this report's source section is historical. Image byte-identical after every step.
+
+Parameters retyped `(s32 vabArg, s32 seqArg, s32 autoPlay)` -> `(char *vabPath, char *seqPath, s32 autoPlay)`. Caller checked: the only one is `Obj865C8__Obj865C8` (src/class_39e08.c), `New_WBgm(PickWeeklyGroup(0), 0, 1)`; PickWeeklyGroup (src/code_39094.c) returns a word of gWeeklyGroupTable, and all seven words point at VAB path strings ("SND\\AMBIENT", "SND\\CARTOON", "SND\\ELECTRO", "SND\\ETHNOVA", "SND\\HUMAN", "SND\\LOVELY", "SND\\STANDERD"; asm/data/1B84.rodata.s), and the path reaches New_VabStreamObj(char *) through setVab. That call site now casts `(char *)` on the word and `(SubObjG *)` on the result, and `include/class_39e08.h`'s local `extern SubObjG *New_WBgm(s32, s32, s32)` view is deleted.
+
+## Proposed field names
+
+For the owners of those classes (NOT applied: they are other classes' views):
+- `Obj865C8::unk40` (include/class_39e08.h, table D_80087034 family): `bgm`, typed `struct WBgm *`, tier A. Evidence: assigned from `New_WBgm` in Obj865C8__Obj865C8, released through +0x004 in Obj865C8__Dtor, forwarded as New_ObjM's 2nd argument.
+- The ObjM field at +0x054 (`ObjM_3bb8c_k::unk54`, src/class_3bb8c_k.c; shared view `FieldM50 *unk54`, include/class_3bb8c.h): `bgm`, `struct WBgm *`, tier A. Evidence: ObjM__ObjM stores New_ObjM's 2nd argument there (the WBgm above); ObjM__AdvancePauseSetup calls its +0x04C (WBgm__Pause) and ObjM__TeardownPauseOverlay its +0x050 (WBgm__Resume), both with `self` only, which agrees with WBgm's slot arity. `FieldM50` is also the type of ObjM's +0x010, a different object, so the retype would split the two fields' types rather than retype FieldM50.

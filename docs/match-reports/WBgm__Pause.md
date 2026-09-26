@@ -5,7 +5,7 @@
 Round 81, runner echo. Unit `src/code_2a0e0.c` (carved from `psyq_2a0e0` in
 FINISHING-PLAN revision 18). This was fresh ground with no prior attempt.
 
-- **Where:** D_8006E48C slot +0x04C (resolved with `tools/classtable.py D_8006E48C`).
+- **Where:** gWBgmMethods slot +0x04C (resolved with `tools/classtable.py gWBgmMethods`).
 - **What:** pause: if not `paused`, `SsSeqPause` and set it to 1.
 - **Result:** byte-exact on the first build. `funcdiff.py` reports 0
   insertions / 0 deletions, and the whole-image SHA1 is green
@@ -33,7 +33,7 @@ The unit-local view it needs, from the top of `src/code_2a0e0.c`:
 #include "BasicClass.h"
 
 
-/* Local view of D_8006E48C's objects: a SEQ player. Fields named from the
+/* Local view of gWBgmMethods's objects: a SEQ player. Fields named from the
  * libsnd calls they feed. */
 typedef struct WBgm WBgm;
 typedef struct WBgmMethods WBgmMethods;
@@ -68,7 +68,13 @@ extern void SsSeqClose(short);
 extern s32 func_8002CC28(void);
 s32 WBgm__HandleMonitorEvent(WBgm *self);
 
-extern WBgmMethods D_8006E48C;
+extern WBgmMethods gWBgmMethods;
 extern s32 gWBgmActive;
 extern u8 gSsSizeTableBuf[];
 ```
+
+## Track 4 (2026-09-26, round 88, alpha)
+
+The class is now declared once, in `include/WBgm.h` (table `gWBgmMethods`, renamed from `D_8006E48C` with tools/rename.py this round); `src/code_2a0e0.c` keeps no view of it, so the view quoted in this report's source section is historical. Image byte-identical after every step.
+
+No change to this function's signature or body.

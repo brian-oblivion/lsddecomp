@@ -6,7 +6,7 @@ Round 81, runner echo. Unit `src/code_2a0e0.c` (carved from `psyq_2a0e0` in
 FINISHING-PLAN revision 18). This was fresh ground with no prior attempt.
 
 - **Where:** not a class slot; unit-level getter.
-- **What:** table getter `return &D_8006E48C;` -- the class's own method table.
+- **What:** table getter `return &gWBgmMethods;` -- the class's own method table.
 - **Result:** byte-exact on the first build. `funcdiff.py` reports 0
   insertions / 0 deletions, and the whole-image SHA1 is green
   (`OK: build matches retail`). No levers were needed.
@@ -14,13 +14,13 @@ FINISHING-PLAN revision 18). This was fresh ground with no prior attempt.
 
 ## Naming
 
-`Get_vtable_WBgm`, tier A. matches the `Get_vtable_<Class>` convention (`Get_vtable_BasicClass`, BasicClass.h); returns `&D_8006E48C`, the table this class installs in its own ctor.
+`Get_vtable_WBgm`, tier A. matches the `Get_vtable_<Class>` convention (`Get_vtable_BasicClass`, BasicClass.h); returns `&gWBgmMethods`, the table this class installs in its own ctor.
 
 ## Source
 
 ```c
 WBgmMethods *Get_vtable_WBgm(void) {
-    return &D_8006E48C;
+    return &gWBgmMethods;
 }
 ```
 
@@ -30,7 +30,7 @@ The unit-local view it needs, from the top of `src/code_2a0e0.c`:
 #include "BasicClass.h"
 
 
-/* Local view of D_8006E48C's objects: a SEQ player. Fields named from the
+/* Local view of gWBgmMethods's objects: a SEQ player. Fields named from the
  * libsnd calls they feed. */
 typedef struct WBgm WBgm;
 typedef struct WBgmMethods WBgmMethods;
@@ -65,7 +65,13 @@ extern void SsSeqClose(short);
 extern s32 func_8002CC28(void);
 s32 WBgm__HandleMonitorEvent(WBgm *self);
 
-extern WBgmMethods D_8006E48C;
+extern WBgmMethods gWBgmMethods;
 extern s32 gWBgmActive;
 extern u8 gSsSizeTableBuf[];
 ```
+
+## Track 4 (2026-09-26, round 88, alpha)
+
+The class is now declared once, in `include/WBgm.h` (table `gWBgmMethods`, renamed from `D_8006E48C` with tools/rename.py this round); `src/code_2a0e0.c` keeps no view of it, so the view quoted in this report's source section is historical. Image byte-identical after every step.
+
+No change to this function's signature or body.

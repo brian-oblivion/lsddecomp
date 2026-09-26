@@ -423,15 +423,10 @@ typedef struct LoadRequest {
  * (`Obj865C8::unk48`). */
 extern SubObjG *New_LinkResource(LoadRequest *req);
 
-/* Uncarved, asm/psyq_memset.s: a magic-multiply division idiom over its one
- * argument (not an allocator -- no `BMemPMgrAlloc` call in its own body).
- * Its return value is forwarded as `New_WBgm`'s own 1st argument. */
+/* src/code_39094.c: one of the seven gWeeklyGroupTable words, each a VAB
+ * path string ("SND\\AMBIENT" ... "SND\\STANDERD"). Its return value is
+ * forwarded as `New_WBgm`'s own 1st argument (include/WBgm.h). */
 extern s32 PickWeeklyGroup(s32 arg1);
-
-/* "New_X"-shaped allocator (uncarved, in the Psy-Q SPU/SND block at
- * 0x272C8..0x2C054), 3 forwarded
- * arguments. Stored into `Obj865C8::unk40`. */
-extern SubObjG *New_WBgm(s32 arg1, s32 arg2, s32 arg3);
 
 /* Already declared elsewhere (code_1677c.c) as `extern s32
  * func_8004A070(s32 a0)`; this unit's own local view, same signature.

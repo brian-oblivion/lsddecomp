@@ -2868,3 +2868,4 @@ gClass81940Methods = 0x80081940;
 Class86AA0__Reset = 0x8004D42C; // type:func
 gTextRowMethods = 0x8006EB90;
 TextRow__DetachFromParent = 0x80040C00; // type:func
+gWBgmMethods = 0x8006E48C;
