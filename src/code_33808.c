@@ -48,6 +48,7 @@
 #include "TimBlockSrc.h"
 #include "ModelData.h"
 #include "Tod.h"
+#include "TodSet.h"
 #include "TmdModel.h"
 #include "DrawSystem.h"
 #include "CdStream.h"
@@ -57,8 +58,9 @@ typedef struct DataSrc33808 DataSrc33808;
 /* Unit-local view of this unit's Class6D430 data-source subclasses: the
  * interface plus the extra slots their methods call. Unprototyped where a
  * caller passes no argument. Not ModelData's (D_8006F384) nor Tod's
- * (D_8006F240): those classes are include/ModelData.h (track 4, round 84)
- * and include/Tod.h (round 86). */
+ * (D_8006F240) nor TodSet's (D_8006F590): those classes are
+ * include/ModelData.h (track 4, round 84), include/Tod.h (round 86) and
+ * include/TodSet.h (round 88). */
 typedef struct DataSrc33808Methods {
     CLASS6D430_SLOTS(DataSrc33808, (DataSrc33808 *self));
     /* +0x07C */ s32 (*slot7C)();
@@ -90,7 +92,6 @@ void *GetBgLayerMethods(void);
 void *GetTriggerWorldMethods(void);
 void *GetTileMapMethods(void);
 void *GetTileAtlasMethods(void);
-void *GetTodSetMethods(void);
 
 /* The allocators below reach a class's constructor through its table
  * getter; the constructor's parameters vary, so the slot is unprototyped. */
@@ -963,7 +964,6 @@ typedef struct Buf44858 {
 } Buf44858;
 
 extern Req44858 *SetVec3(Req44858 *req, void *buffer, s32 unk4, s32 unk8);  /* code_171e0.c: stores its three words into *req, returns req */
-void *New_TodSet(s32 arg0);  /* defined below (ROM order) */
 
 s32 ModelData__BuildResources(ModelData *self) {
     Req44858 req;
@@ -973,7 +973,7 @@ s32 ModelData__BuildResources(ModelData *self) {
         self->linkResource = New_LinkResource((s32)&req);
         if (self->linkResource != NULL) {
             req.buffer = (u8 *)self->buffer + 0xC;
-            self->todSet = New_TodSet((s32)&req);
+            self->todSet = (Class6D430 *)New_TodSet((Src6F240 *)&req);
             if (self->todSet != NULL) {
                 return 0;
             }
@@ -1002,7 +1002,7 @@ u8 ModelData__ForwardScanPackets(ModelData *self, s32 arg1, s32 arg2) {
 }
 /* D_8006F384/D_8006F40C +0x084: forwarded to slot +0x080 of the object at +0x30. */
 void *ModelData__ForwardDecodePacketWord(ModelData *self, s32 arg1, s32 arg2, s32 arg3, s32 arg4, s32 arg5) {
-    return ((DataSrc33808 *)self->todSet)->methods->slot80(self->todSet, arg1, arg2, arg3, arg4, arg5);
+    return ((TodSet *)self->todSet)->methods->decodePacketWord((TodSet *)self->todSet, (u32 *)arg1, (u8 *)arg2, (u8 *)arg3, (u8 *)arg4, (u8 *)arg5);
 }
 ModelDataMethods *GetModelDataMethods(void) {
     return &D_8006F384;
@@ -1293,61 +1293,46 @@ extern s32 D_8006F514[];
 void *GetTileAtlasMethods(void) {
     return D_8006F514;
 }
-/* Allocate and construct a D_8006F590 object; freed and NULL when the constructor fails. */
-void *New_TodSet(s32 arg0) {
+/* Allocate and construct a TodSet; freed and NULL when the constructor fails. */
+TodSet *New_TodSet(Src6F240 *src) {
     void *obj = BMemPMgrAlloc(0x2C);
 
     if (obj != NULL) {
-        if (((Ctor33808 *)GetTodSetMethods())->ctor(obj, arg0)) {
+        if (((Ctor33808 *)GetTodSetMethods())->ctor(obj, src)) {
             return obj;
         }
         BMemPMgrFree(obj);
     }
     return NULL;
 }
-/* D_8006F590 +0x008: constructor -- the parent D_8006F240's, then this
- * table; when the argument's first word is set, its own +0x064 runs, and a
- * nonzero result fails the construction (NULL). */
-void *TodSet__TodSet(DataSrc33808 *self, s32 *arg) {
-    ((Ctor33808 *)GetTodMethods())->ctor(self, arg);
+/* D_8006F590 +0x008: constructor -- the parent Tod's, then this table; when
+ * the descriptor holds a buffer, its own +0x064 (TodSet__BuildTods) runs,
+ * and a nonzero result fails the construction (NULL). */
+void *TodSet__TodSet(TodSet *self, Src6F240 *src) {
+    GetTodMethods()->ctor((Tod *)self, src);
     self->methods = GetTodSetMethods();
-    if (*arg != 0) {
+    if (src->buffer != NULL) {
         if (((s32 (*)())self->methods->setFlag)(self)) {
             return NULL;
         }
     }
     return self;
 }
-/* D_8006F590 +0x00C: finalize -- release the buffer's counted object array,
- * then the parent D_8006F240's. */
-void TodSet__Finalize(DataSrc33808 *self) {
+/* D_8006F590 +0x00C: finalize -- release the buffer's counted Tod array,
+ * then the parent Tod's. */
+void TodSet__Finalize(TodSet *self) {
     CountedBuf33808 *buf = self->buffer;
 
     ReleaseBasicClassArray((BasicClass **)buf->entries, buf->count);
-    ((DataSrc33808Methods *)GetTodMethods())->finalize(self);
+    GetTodMethods()->finalize((Tod *)self);
 }
-/* D_8006F590 +0x064: build a D_8006F240 source over each sub-block of the
- * buffer's counted offset table, into the table's own words; 0 when all
- * exist, otherwise release the ones already built and 1. */
-/* D_8006F590 +0x064: build a D_8006F240 source over each sub-block of the
- * buffer's counted offset table, into the table's own words; 0 when all
- * exist, otherwise release the ones already built and 1. */
-/* D_8006F590 +0x064: build a D_8006F240 source over each sub-block of the
- * buffer's counted offset table, into the table's own words; 0 when all
- * exist, otherwise release the ones already built and 1. */
-/* D_8006F590 +0x064: build a D_8006F240 source over each sub-block of the
- * buffer's counted offset table, into the table's own words; 0 when all
- * exist, otherwise release the ones already built and 1. */
-/* D_8006F590 +0x064: build a D_8006F240 source over each sub-block of the
- * buffer's counted offset table, into the table's own words; 0 when all
- * exist, otherwise release the ones already built and 1. */
-/* D_8006F590 +0x064: build a D_8006F240 source over each sub-block of the
- * buffer's counted offset table, into the table's own words; 0 when all
- * exist, otherwise release the ones already built and 1. */
-s32 TodSet__BuildTods(DataSrc33808 *self) {
+/* D_8006F590 +0x064: build a Tod over each sub-block of the buffer's
+ * counted offset table, into the table's own words; 0 when all exist,
+ * otherwise release the ones already built and 1. */
+s32 TodSet__BuildTods(TodSet *self) {
     Req44858 req;
     CountedBuf33808 *buf;
-    DataSrc33808 **p;
+    Tod **p;
     s32 i;
     s32 n;
 
@@ -1355,33 +1340,31 @@ s32 TodSet__BuildTods(DataSrc33808 *self) {
     buf = self->buffer;
     i = 0;
     n = buf->count;
-    p = (DataSrc33808 **)buf->entries;
+    p = (Tod **)buf->entries;
     for (; i < n; i++) {
         req.buffer = (u8 *)self->buffer + ((CountedBuf33808 *)self->buffer)->entries[i];
-        *p = (DataSrc33808 *)New_Tod((Src6F240 *)&req);
+        *p = New_Tod((Src6F240 *)&req);
         if (*p == NULL) {
-while (i != 0) {
- i--;
- p--;
- (*p)->methods->release(*p);
- }
+            while (i != 0) {
+                i--;
+                p--;
+                (*p)->methods->release(*p);
+            }
             return 1;
         }
         p++;
     }
     return 0;
 }
-/* D_8006F590 +0x078: slot +0x07C over the data past the buffer's counted
- * array. */
-u8 TodSet__ScanPackets(DataSrc33808 *self, s32 arg1, s32 arg2) {
+/* D_8006F590 +0x078: Tod's +0x07C scanner over the data past the buffer's
+ * counted array. */
+u8 TodSet__ScanPackets(TodSet *self, u8 *out, u32 *sel) {
     CountedBuf33808 *buf = self->buffer;
 
-    return self->methods->slot7C(self, arg1, arg2, &buf->entries[buf->count] + 2);
+    return self->methods->scanTodPackets(self, out, sel, (u32 *)&buf->entries[buf->count] + 2);
 }
-extern s32 D_8006F590[];
-
-void *GetTodSetMethods(void) {
-    return D_8006F590;
+TodSetMethods *GetTodSetMethods(void) {
+    return &D_8006F590;
 }
 /* Allocate and construct a D_8006F614 object; freed and NULL when the
  * constructor returns nonzero (this ctor reports failure, not self). */
