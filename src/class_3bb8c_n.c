@@ -69,7 +69,7 @@ extern s32 gStyleCounter;
 extern s32 gStyleKind;
 extern s8 D_800873DC[];
 extern s32 gStyleVariant;
-extern s8 D_800873D8[];
+extern s8 gStyleVariantConfigCounts[];
 extern s32 D_8008AC84;
 extern s32 gStyleVariantConfigs[];
 extern s32 gStyleFlushColor;
@@ -92,7 +92,7 @@ void *PickStyleFallbackConfig(void) {
     sum = gStyleCounter + gStyleKind;
     kind = D_800873DC[sum & 0xF];
     gStyleVariant = kind;
-    divisor = D_800873D8[kind];
+    divisor = gStyleVariantConfigCounts[kind];
     remainder = sum % divisor;
     D_8008AC84 = remainder;
     result = (s8 *)gStyleVariantConfigs[kind] + remainder * 4;
