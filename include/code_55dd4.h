@@ -4,12 +4,14 @@
 #include "common.h"
 #include "Class65650.h"
 #include "ModelData.h"
+#include "LinkResource.h"
 
 /*
  * code_55dd4's own readings of the objects Class65650 (include/Class65650.h)
  * reaches that are not Class65650: the ctor's two arguments, onNotify's
- * sender, the TOD coordinate parameters of a part, and the TodSet/
- * LinkResource internals behind ModelData's `todSet`/`linkResource`. The
+ * sender, the TOD coordinate parameters of a part, and the TodSet
+ * internals behind ModelData's `todSet` (its `linkResource` is
+ * include/LinkResource.h's, round 89). The
  * class itself -- object, table, getter, method prototypes -- is
  * include/Class65650.h's.
  */
@@ -61,17 +63,6 @@ typedef struct TimeTargetObj {
 #define TOD_COORD_ROTATE       2
 #define TOD_COORD_SCALE        4
 #define TOD_COORD_TRANSLATE    8
-
-/* self->modelData->linkResource (gLinkResourceMethods): only its slot +0x080 is
- * needed, by Class65650__ApplyTodPacket's model-id packet. */
-typedef struct Unk2CMethods {
-    u8 pad00[0x80];                           /* +0x000 .. +0x07C, unknown */
-    s32 (*getModel)(void *self, s32 arg);         /* +0x080 (self, modelId - 1) -> value passed to Class6B5CC__LinkModel */
-} Unk2CMethods;
-
-typedef struct Unk2CObj {
-    Unk2CMethods *methods;
-} Unk2CObj;
 
 /* self->modelData->todSet (Class65650__SetTod, Class65650__Tick): its
  * buffer (Class6D430 +0x010) + 8 + i * 4 holds a pointer to the i-th TOD's
