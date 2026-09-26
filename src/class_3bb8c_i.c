@@ -1,36 +1,27 @@
 /*
  * class_3bb8c_i -- third carved slice of the class_3bb8c block, 20 functions,
- * carved round 14. include/class_3bb8c.h is SHARED with every other
- * class_3bb8c_* slice; header edits here must be strictly ADDITIVE.
- *
- * All 20 functions are `Obj86ED0` methods (vtable `gTextEntryMethods`,
- * `D_80086ED0`, 42 slots, `tools/classtable.py gTextEntryMethods`) -- the
- * ONLY class this unit defines methods for. `Obj86ED0` is a BasicClass
- * subclass that resolves and drives the memory-card save-name-entry UI: it
- * loads the `CARD\COMINPUT.TIM`/`CARD\FONTICON.TIM` icon/font resources
- * (`TextEntry__LoadCardResources`), holds both a caller-owned name buffer
- * (`nameBuf`) and its own half-width working copy (`unk28`, decoded/encoded
- * via `DecodeFullWidthSjis`/`EncodeFullWidthSjis`), and routes a dense
- * numeric command switch (`TextEntry__HandleCommand`) to cursor-move
- * (`MoveCursorRight`/`Left`), character-select-cycle (`AdvanceCharSelect`)
- * and the countdown/blink group class_3bb8c_j already named
- * (`AdvanceCountdown`/`ToggleFlag20`/`ResetCountdown`/`ResetAllAndFinish`).
- * Four vtable slots (`advanceCountdown`/`toggleFlag20`/`resetCountdown`/
- * `resetAllAndFinish`) resolve to class_3bb8c_j's own functions but are
- * referenced ONLY here, so they are named in the shared header as this
- * unit's own (classtable.py-verified, compiler-checked clean). See
- * `docs/match-reports/TextEntry__HandleCommand.md` for the remaining
- * cross-unit fields/slots this unit could not rename alone.
+ * carved round 14. All 20 are TextEntry methods (gTextEntryMethods,
+ * `D_80086ED0`, 42 slots; `tools/classtable.py gTextEntryMethods`), declared
+ * in include/TextEntry.h, whose banner has the evidence for the class name.
+ * The other seven own methods (PrevChar .. SetCharAt, GetTextEntryMethods)
+ * are class_3bb8c_j's. TextEntry edits a caller-owned string: it loads the
+ * `CARD\COMINPUT.TIM`/`CARD\FONTICON.TIM` panel, text row and cursor
+ * (LoadCardResources), keeps the caller's buffer (`textBuf`) and its own
+ * working copy (`editBuf`, decoded/encoded with DecodeFullWidthSjis/
+ * EncodeFullWidthSjis in mode 1), and routes a numeric command switch
+ * (HandleCommand) to cursor moves, character stepping, commit (25) and
+ * cancel (23).
  */
 #include "common.h"
 #include "class_3bb8c.h"
+#include "TextEntry.h"
 #include "CharSprite.h"
 
-/* This project's own strcpy (matched elsewhere) -- TextEntry__SetName's own
+/* This project's own strcpy (matched elsewhere) -- TextEntry__SetText's own
  * caller, same local-declaration convention as class_3bb8c_e.c/others. */
 extern char *strcpy(char *dest, char *src);
 
-/* Uncarved helper, `code_2cc8c_f`, still INCLUDE_ASM -- TextEntry__SetName's own
+/* Uncarved helper, `code_2cc8c_f`, still INCLUDE_ASM -- TextEntry__SetText's own
  * call. Translates each byte of `src` (a name string) into `dest` (folding a
  * couple of special-case byte ranges) and returns `dest`, same convention as
  * `strcpy`. Typed purely from this call site's own register usage. Declared
@@ -39,29 +30,13 @@ extern char *strcpy(char *dest, char *src);
  * site, and two call-site typings of one function cannot share a header. */
 extern char *DecodeFullWidthSjis(char *dest, char *src);
 
-/* This class's method table. Declared HERE and not in include/class_3bb8c.h
- * because src/class_3bb8c_j.c declares the same object as its own
- * `Class86ED0Methods` local view, and two incompatible declarations of one
- * symbol in a shared header reach both translation units. See the HEAD NOTE
- * next to Obj86ED0Methods in that header. */
-extern Obj86ED0Methods gTextEntryMethods;
-
-/* This class's own table getter -- New_TextEntry/TextEntry__TextEntry's shared
- * dispatch. DEFINED in src/class_3bb8c_j.c (matched round 15 by runner
- * bravo, which returns it as its own `Class86ED0Methods *` local view of
- * the same table). Returns `&gTextEntryMethods`; confirmed in the disassembly as
- * `lui/addiu` materialising that exact address then `jr $ra`, the same
- * no-argument-getter shape as `Get_vtable_BasicClass`. Declared here rather than
- * in the shared header because the two units' return types differ. */
-extern Obj86ED0Methods *GetTextEntryMethods(void);
-
-void *New_TextEntry(s32 arg0, s32 arg1)
+TextEntry *New_TextEntry(char *text, s32 mode)
 {
-    Obj86ED0 *self;
+    TextEntry *self;
 
     self = BMemPMgrAlloc(0x4C);
     if (self != NULL) {
-        GetTextEntryMethods()->ctor(self, arg0, arg1);
+        GetTextEntryMethods()->ctor(self, text, mode);
         return self;
     }
     return NULL;
@@ -78,20 +53,15 @@ extern s32 strlen(char *s);
  * inline loop below has to be literal source, not a call). */
 extern u8 *gNameCharTable;
 
-/* Defined later in this file (ROM order); forward-declared here since
- * TextEntry__TextEntry calls it, same convention as Obj865C8__EnterState2 in
- * src/class_39e08.c. */
-extern void TextEntry__ClearChildRefs(Obj86ED0 *self);
-
-void TextEntry__TextEntry(Obj86ED0 *self, char *arg1, s32 arg2)
+void TextEntry__TextEntry(TextEntry *self, char *arg1, s32 arg2)
 {
     u8 *p;
     s32 count;
 
     Get_vtable_BasicClass()->ctor((BasicClass *)self);
     self->methods = GetTextEntryMethods();
-    self->nameLen = strlen(arg1);
-    self->unk28 = BMemPMgrAlloc(self->nameLen + 4);
+    self->textLen = strlen(arg1);
+    self->editBuf = BMemPMgrAlloc(self->textLen + 4);
 
     p = gNameCharTable;
     count = 0;
@@ -99,26 +69,26 @@ void TextEntry__TextEntry(Obj86ED0 *self, char *arg1, s32 arg2)
         p++;
         count++;
     }
-    self->unk14 = count;
+    self->charCount = count;
 
     TextEntry__ClearChildRefs(self);
-    self->methods->setName(self, arg1, arg2);
+    self->methods->setText(self, arg1, arg2);
 }
 
-void TextEntry__ClearChildRefs(Obj86ED0 *self)
+void TextEntry__ClearChildRefs(TextEntry *self)
 {
     self->childType2 = NULL;
     self->childType5 = NULL;
-    self->unk48 = NULL;
+    self->panelSprite = NULL;
 }
 
-void TextEntry__Finalize(Obj86ED0 *self)
+void TextEntry__Finalize(TextEntry *self)
 {
-    BMemPMgrFree(self->unk28);
+    BMemPMgrFree(self->editBuf);
     Get_vtable_BasicClass()->finalize((BasicClass *)self);
 }
 
-void TextEntry__AddChild(Obj86ED0 *self, void *arg1)
+void TextEntry__AddChild(TextEntry *self, void *arg1)
 {
     s32 tag;
     s32 mask;
@@ -135,7 +105,7 @@ void TextEntry__AddChild(Obj86ED0 *self, void *arg1)
     }
 }
 
-void TextEntry__RemoveChild(Obj86ED0 *self, void *arg1)
+void TextEntry__RemoveChild(TextEntry *self, void *arg1)
 {
     s32 tag;
     s32 mask;
@@ -152,15 +122,15 @@ void TextEntry__RemoveChild(Obj86ED0 *self, void *arg1)
     }
 }
 
-void TextEntry__RemoveAllChildren(Obj86ED0 *self)
+void TextEntry__RemoveAllChildren(TextEntry *self)
 {
     self->childType2 = NULL;
     self->childType5 = NULL;
-    self->unk48 = NULL;
+    self->panelSprite = NULL;
     Get_vtable_BasicClass()->removeAllChildren((BasicClass *)self);
 }
 
-void TextEntry__OnNotify(Obj86ED0 *self, void *arg1, s32 arg2)
+void TextEntry__OnNotify(TextEntry *self, void *arg1, s32 arg2)
 {
     s32 tag;
     s32 mask;
@@ -176,29 +146,25 @@ void TextEntry__OnNotify(Obj86ED0 *self, void *arg1, s32 arg2)
     }
 }
 
-void TextEntry__SetName(Obj86ED0 *self, char *arg1, s32 mode)
+void TextEntry__SetText(TextEntry *self, char *arg1, s32 mode)
 {
     self->mode = mode;
-    self->nameBuf = arg1;
+    self->textBuf = arg1;
     self->cursorIndex = 0;
-    self->unk1C = 0;
+    self->charIndex = 0;
     if (mode == 1) {
-        DecodeFullWidthSjis(self->unk28, arg1);
-        self->nameLen /= 2;
+        DecodeFullWidthSjis(self->editBuf, arg1);
+        self->textLen /= 2;
     } else {
-        strcpy(self->unk28, arg1);
+        strcpy(self->editBuf, arg1);
     }
 }
 
 /*
- * TextEntry__LoadCardResources's own helpers/data -- resolves two "CARD\\<name>.TIM"
- * memory-card icon/font resource paths (BuildFileName, already matched in
- * code_171e0.c) and loads each through func_8003B39C, then converts/wraps
- * the loaded handle into a ChildObj86ED0-shaped resource object (unk48 via
- * New_ScreenSprite (include/ScreenSprite.h), unk40 via New_CharSprite
- * (include/CharSprite.h, which includes ScreenSprite.h), unk44 via
- * New_Obj6EAC0 (include/class_3bb8c.h's declaration, typed from a call
- * site's own register usage, same convention as DecodeFullWidthSjis above).
+ * TextEntry__LoadCardResources's own helpers/data -- builds two "CARD\\<name>.TIM"
+ * paths (BuildFileName, code_171e0.c), loads each through func_8003B39C, and
+ * makes panelSprite (New_ScreenSprite), textRow (New_Obj6EAC0) and
+ * cursorSprite (New_CharSprite) from the loaded handles.
  */
 extern char *BuildFileName(char *dest, char *arg1, char *arg2, char *arg3);
 extern ChildObj86ED0 *func_8003B39C(char *path);
@@ -209,11 +175,11 @@ extern const char sCardPathPrefix[]; /* "CARD\\" */
 extern const char sTimExt[]; /* ".TIM" */
 extern s32 D_80086F7C; /* 3 words, New_ScreenSprite's rect: a SpriteRect {0, 0, 224, 120} */
 extern s32 D_8008AAC8; /* opaque block, slotB8's arg1, address-only here */
-extern s32 D_8008AACC; /* opaque block, self->unk48's slot4C arg2, address-only here */
-extern s32 D_8008AAD4; /* opaque block, self->unk44's slot4C arg2, address-only here */
-extern s32 D_8008AADC; /* opaque block, self->unk40's slot4C arg2, address-only here */
+extern s32 D_8008AACC; /* panelSprite's attachToParent position, address-only here */
+extern s32 D_8008AAD4; /* textRow's slot4C position, address-only here */
+extern s32 D_8008AADC; /* cursorSprite's attachToParent position; class_3bb8c_j reads its x */
 
-void TextEntry__LoadCardResources(Obj86ED0 *self, void *arg1)
+void TextEntry__LoadCardResources(TextEntry *self, void *arg1)
 {
     char path[0x20];
     const char *dir;
@@ -224,7 +190,7 @@ void TextEntry__LoadCardResources(Obj86ED0 *self, void *arg1)
     if (arg1 == NULL) {
         return;
     }
-    if (self->unk48 != NULL) {
+    if (self->panelSprite != NULL) {
         return;
     }
 
@@ -233,46 +199,46 @@ void TextEntry__LoadCardResources(Obj86ED0 *self, void *arg1)
 
     handle1 = func_8003B39C(BuildFileName(path, sStrComInput, dir, ext));
     handle1->methods->slot78(handle1);
-    self->unk48 = (ChildObj86ED0 *)New_ScreenSprite(handle1, (SpriteRect *)&D_80086F7C, 0);
+    self->panelSprite = New_ScreenSprite(handle1, (SpriteRect *)&D_80086F7C, 0);
     handle1->methods->release(handle1);
-    self->unk48->methods->slot4C(self->unk48, arg1, (void *)&D_8008AACC);
+    self->panelSprite->methods->attachToParent(self->panelSprite, (Class6B5CC *)arg1, (Vec3_d294 *)&D_8008AACC);
 
     handle2 = func_8003B39C(BuildFileName(path, sStrFontIcon, dir, ext));
     handle2->methods->slot78(handle2);
-    self->unk44 = New_Obj6EAC0(handle2, self->nameLen, self->unk28);
-    self->unk40 = (ChildObj86ED0 *)New_CharSprite(handle2, 0x5F);
+    self->textRow = (ChildObj86ED0 *)New_Obj6EAC0(handle2, self->textLen, self->editBuf);
+    self->cursorSprite = New_CharSprite(handle2, 0x5F);
     handle2->methods->release(handle2);
-    self->unk44->methods->slot4C(self->unk44, arg1, (void *)&D_8008AAD4);
-    self->unk44->methods->slotB8(self->unk44, (void *)&D_8008AAC8);
-    self->unk40->methods->slot4C(self->unk40, arg1, (void *)&D_8008AADC);
+    self->textRow->methods->slot4C(self->textRow, arg1, (void *)&D_8008AAD4);
+    self->textRow->methods->slotB8(self->textRow, (void *)&D_8008AAC8);
+    self->cursorSprite->methods->attachToParent(self->cursorSprite, (Class6B5CC *)arg1, (Vec3_d294 *)&D_8008AADC);
 }
 
-void TextEntry__ReleaseCardResources(Obj86ED0 *self)
+void TextEntry__ReleaseCardResources(TextEntry *self)
 {
-    if (self->unk48 != NULL) {
-        self->unk48 = self->unk48->methods->release(self->unk48);
-        self->unk44->methods->release(self->unk44);
-        self->unk40->methods->release(self->unk40);
+    if (self->panelSprite != NULL) {
+        self->panelSprite = self->panelSprite->methods->release(self->panelSprite);
+        self->textRow->methods->release(self->textRow);
+        self->cursorSprite->methods->release(self->cursorSprite);
     }
 }
 
-void TextEntry__AttachTarget(Obj86ED0 *self, void *arg1, void *arg2, TargetObj86ED0 *arg3)
+void TextEntry__AttachTarget(TextEntry *self, void *arg1, void *arg2, TargetObj86ED0 *arg3)
 {
     self->methods->addChild(self, arg1);
     self->methods->addChild(self, arg2);
     self->target = arg3;
     self->closeState = 0;
-    self->unk20 = 0;
+    self->altCommands = 0;
 }
 
-void TextEntry__DetachTarget(Obj86ED0 *self)
+void TextEntry__DetachTarget(TextEntry *self)
 {
     self->methods->removeChild(self, self->childType2);
     self->methods->removeChild(self, self->childType5);
     self->target = NULL;
 }
 
-void TextEntry__SetState(Obj86ED0 *self, s32 arg1)
+void TextEntry__SetState(TextEntry *self, s32 arg1)
 {
     self->closeTickCount = 0;
     if (arg1 < 2) {
@@ -291,7 +257,7 @@ void TextEntry__SetState(Obj86ED0 *self, s32 arg1)
     }
 }
 
-void TextEntry__TickState(Obj86ED0 *self)
+void TextEntry__TickState(TextEntry *self)
 {
     s32 tag;
     s32 old;
@@ -312,92 +278,92 @@ void TextEntry__TickState(Obj86ED0 *self)
 
 /* TextEntry__HandleCommand's own name-copy helper -- uncarved elsewhere (`code_2cc8c_f`,
  * still `INCLUDE_ASM`), typed purely from this call site's own register
- * usage: `a0`/`a1` are `self->nameBuf`/`self->unk28` (both `char *`, the same
+ * usage: `a0`/`a1` are `self->textBuf`/`self->editBuf` (both `char *`, the same
  * pair `strcpy` is fed in the other arm), return value unused. Same
  * declare-locally convention as `DecodeFullWidthSjis` above (a different unit
  * types this same-shaped function with a different signature from its own
  * call site). */
 extern void EncodeFullWidthSjis(char *dest, char *src);
 
-void TextEntry__HandleCommand(Obj86ED0 *self, void *arg1, s32 arg2)
+void TextEntry__HandleCommand(TextEntry *self, void *arg1, s32 arg2)
 {
     switch (arg2) {
     default:
         return;
     case 25:
         if (self->mode == 1) {
-            EncodeFullWidthSjis(self->nameBuf, self->unk28);
+            EncodeFullWidthSjis(self->textBuf, self->editBuf);
         } else {
-            strcpy(self->nameBuf, self->unk28);
+            strcpy(self->textBuf, self->editBuf);
         }
-        self->methods->slot60(self, 0x10);
+        self->methods->notifyTarget(self, 0x10);
         self->methods->setState(self, 2);
         return;
     case 23:
-        self->methods->slot60(self, 0x10);
+        self->methods->notifyTarget(self, 0x10);
         self->methods->setState(self, 3);
         return;
     case 32:
-        self->methods->resetAllAndFinish(self);
+        self->methods->resetAllChars(self);
         return;
     case 31:
-        self->methods->resetCountdown(self);
+        self->methods->resetChar(self);
         return;
     case 28:
-        self->methods->toggleFlag20(self);
+        self->methods->toggleAltCommands(self);
         return;
     case 21:
-        if (self->unk20 != 0) {
+        if (self->altCommands != 0) {
             return;
         }
         self->methods->moveCursorRight(self);
         return;
     case 5:
-        if (self->unk20 == 0) {
+        if (self->altCommands == 0) {
             return;
         }
         self->methods->moveCursorRight(self);
         return;
     case 20:
-        if (self->unk20 != 0) {
+        if (self->altCommands != 0) {
             return;
         }
         self->methods->moveCursorLeft(self);
         return;
     case 4:
-        if (self->unk20 == 0) {
+        if (self->altCommands == 0) {
             return;
         }
         self->methods->moveCursorLeft(self);
         return;
     case 18:
-        if (self->unk20 != 0) {
+        if (self->altCommands != 0) {
             return;
         }
-        self->methods->advanceCharSelect(self);
+        self->methods->nextChar(self);
         return;
     case 2:
-        if (self->unk20 == 0) {
+        if (self->altCommands == 0) {
             return;
         }
-        self->methods->advanceCharSelect(self);
+        self->methods->nextChar(self);
         return;
     case 19:
-        if (self->unk20 == 0) {
+        if (self->altCommands == 0) {
             goto slot94Call;
         }
         return;
     case 3:
-        if (self->unk20 == 0) {
+        if (self->altCommands == 0) {
             return;
         }
 slot94Call:
-        self->methods->advanceCountdown(self);
+        self->methods->prevChar(self);
         return;
     }
 }
 
-void TextEntry__NotifyTarget(Obj86ED0 *self, s32 arg1)
+void TextEntry__NotifyTarget(TextEntry *self, s32 arg1)
 {
     TargetObj86ED0 *target;
 
@@ -407,51 +373,51 @@ void TextEntry__NotifyTarget(Obj86ED0 *self, s32 arg1)
     }
 }
 
-void TextEntry__MoveCursorRight(Obj86ED0 *self)
+void TextEntry__MoveCursorRight(TextEntry *self)
 {
     s32 old;
     s32 v;
 
-    if (self->unk48 != NULL) {
+    if (self->panelSprite != NULL) {
         old = self->cursorIndex;
         v = old + 1;
         self->cursorIndex = v;
-        if (v < self->nameLen) {
-            self->methods->slotA4(self, v, 1);
+        if (v < self->textLen) {
+            self->methods->setCursorPos(self, v, 1);
         } else {
             self->cursorIndex = old;
         }
     }
 }
 
-void TextEntry__MoveCursorLeft(Obj86ED0 *self)
+void TextEntry__MoveCursorLeft(TextEntry *self)
 {
     s32 old;
     s32 v;
 
-    if (self->unk48 != NULL) {
+    if (self->panelSprite != NULL) {
         old = self->cursorIndex;
         v = old - 1;
         self->cursorIndex = v;
         if (v >= 0) {
-            self->methods->slotA4(self, v, 1);
+            self->methods->setCursorPos(self, v, 1);
         } else {
             self->cursorIndex = old;
         }
     }
 }
 
-void TextEntry__NextChar(Obj86ED0 *self)
+void TextEntry__NextChar(TextEntry *self)
 {
     s32 v;
 
-    if (self->unk48 != NULL) {
-        v = self->unk1C + 1;
-        self->unk1C = v;
-        if (v < self->unk14) {
-            self->methods->slotA8(self, self->cursorIndex, v, 1);
+    if (self->panelSprite != NULL) {
+        v = self->charIndex + 1;
+        self->charIndex = v;
+        if (v < self->charCount) {
+            self->methods->setCharAt(self, self->cursorIndex, v, 1);
         } else {
-            self->unk1C = 0;
+            self->charIndex = 0;
         }
     }
 }

@@ -1,4 +1,6 @@
-# TextEntry__SetName -- MATCHED (28/28 words)
+# TextEntry__SetText -- MATCHED (28/28 words)
+
+> Renamed from `TextEntry__SetName` on 2026-09-26 (tools/rename.py). Address 0x80050f28.
 
 > Renamed from `Obj86ED0__SetName` on 2026-09-26 (tools/rename.py). Address 0x80050f28.
 
@@ -15,7 +17,7 @@ round-toward-zero sequence), or falls back to a straight `strcpy` when
 `mode != 1`.
 
 ```c
-void TextEntry__SetName(Obj86ED0 *self, char *arg1, s32 mode)
+void TextEntry__SetText(Obj86ED0 *self, char *arg1, s32 mode)
 {
     self->unkC = mode;
     self->unk24 = arg1;
@@ -52,4 +54,4 @@ regardless of which branch runs) before deciding it is conditional.
 
 ## Naming
 
-- `TextEntry__SetName` -- tier A. gTextEntryMethods +0x040 (setName slot, classtable.py), the ctor's own tail dispatch: sets mode and copies/decodes the name string into unk28 (DecodeFullWidthSjis when mode==1, else plain strcpy). Pure setter, mechanics are the purpose.
+- `TextEntry__SetText` -- tier A. gTextEntryMethods +0x040 (setName slot, classtable.py), the ctor's own tail dispatch: sets mode and copies/decodes the name string into unk28 (DecodeFullWidthSjis when mode==1, else plain strcpy). Pure setter, mechanics are the purpose.

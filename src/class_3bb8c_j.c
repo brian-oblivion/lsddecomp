@@ -5,135 +5,109 @@
  * slice; header edits here must be strictly ADDITIVE.
  *
  * Two unrelated classes' methods live in this address range:
- *  - The first six functions (TextEntry__PrevChar ..
- *    TextEntry__SetCharAt, +GetTextEntryMethods) are `Obj86ED0`
- *    methods -- gTextEntryMethods, a class ALREADY shared and fully typed in
- *    include/class_3bb8c.h, established by class_3bb8c_i.
+ *  - The first six functions (TextEntry__PrevChar .. TextEntry__SetCharAt)
+ *    and GetTextEntryMethods are TextEntry's (gTextEntryMethods slots
+ *    +0x094..+0x0A8, `tools/classtable.py gTextEntryMethods`), declared in
+ *    include/TextEntry.h; the rest of the class is class_3bb8c_i.
  *  - Everything else is `Class86F88_3bb8c_j` (gClass86F88Methods, a BasicClass
  *    subclass, alloc size 0x54, reached through `GetClass86F88Methods()` in
  *    class_3bb8c_k which already holds this SAME table under the bare
  *    name `Class86F88`) -- kept LOCAL under a disambiguating suffix
  *    rather than reusing that name, to avoid a collision in this TU.
  *
- * Both attributions were WRONG before round 75 (this unit's own C
- * originally used a locally-defined, differently-tabled `Obj866E8` for
- * the first group, and named the second group after `gTextEntryMethods` by
- * mistake). See `Class86F88__Class86F88.md` for the full
- * `tools/classtable.py` evidence trail -- this file's own git history has
- * the mechanical fix (functions renamed via `tools/rename.py`, types
- * fixed via plain Edit, zero bytes changed throughout).
+ * Both attributions were WRONG before round 75 (the first group was typed
+ * as Class866E8's `Obj866E8`, the second named after gTextEntryMethods).
+ * See `Class86F88__Class86F88.md` for the `tools/classtable.py` evidence.
  */
 #include "common.h"
 #include "class_3bb8c.h"
+#include "TextEntry.h"
 #include "ScreenSprite.h"
 
-void TextEntry__PrevChar(Obj86ED0 *self)
+void TextEntry__PrevChar(TextEntry *self)
 {
     s32 count;
 
-    if (self->unk48) {
-        count = self->unk1C - 1;
-        self->unk1C = count;
+    if (self->panelSprite) {
+        count = self->charIndex - 1;
+        self->charIndex = count;
         if (count > 0) {
-            self->methods->slotA8(self, self->cursorIndex, count, 1);
+            self->methods->setCharAt(self, self->cursorIndex, count, 1);
         } else {
-            self->unk1C = self->unk14;
+            self->charIndex = self->charCount;
         }
     }
 }
 
-void TextEntry__ToggleAltCommands(Obj86ED0 *self)
+void TextEntry__ToggleAltCommands(TextEntry *self)
 {
-    if (self->unk48) {
-        self->unk20 ^= 1;
+    if (self->panelSprite) {
+        self->altCommands ^= 1;
     }
 }
 
-void TextEntry__ResetChar(Obj86ED0 *self)
+void TextEntry__ResetChar(TextEntry *self)
 {
-    if (self->unk48) {
-        self->unk1C = 0;
-        self->methods->slotA8(self, self->cursorIndex, 0, 1);
+    if (self->panelSprite) {
+        self->charIndex = 0;
+        self->methods->setCharAt(self, self->cursorIndex, 0, 1);
     }
 }
 
-void TextEntry__ResetAllChars(Obj86ED0 *self)
+void TextEntry__ResetAllChars(TextEntry *self)
 {
     s32 i;
 
-    if (self->unk48) {
-        self->unk1C = 0;
-        i = self->nameLen - 1;
+    if (self->panelSprite) {
+        self->charIndex = 0;
+        i = self->textLen - 1;
         if (i >= 0) {
             do {
                 self->cursorIndex = i;
-                self->methods->slotA8(self, i, self->unk1C, 0);
+                self->methods->setCharAt(self, i, self->charIndex, 0);
                 i--;
             } while (i >= 0);
         }
-        self->methods->slotA4(self, self->cursorIndex, 1);
+        self->methods->setCursorPos(self, self->cursorIndex, 1);
     }
 }
 
-/* round 75 CORRECTION (track 3 naming) -- the round-45 comment that used to
- * stand here declared a local Unk40Obj866E8/Unk40Obj866E8Methods type for
- * self->unk40 and argued it was NOT class_3bb8c_i's ChildObj86ED0. That
- * argument was about D_8008AADC (a value-vs-address reading of an
- * unrelated global), not about self->unk40's own type -- and self is now
- * confirmed (classtable.py, see the file header) to be Obj86ED0 itself,
- * whose OWN shared struct in include/class_3bb8c.h already types unk40 as
- * `ChildObj86ED0 *`. So self->unk40 IS a ChildObj86ED0, established by
- * class_3bb8c_i, not a coincidence -- this unit just adds the +0x0BC slot
- * that ChildMethods86ED0 didn't have a name for yet (additive, see that
- * header's own comment on the change). No local duplicate type needed. */
+extern s32 D_8008AADC; /* VALUE-of here: the cursor's x at position 0 (class_3bb8c_i takes its address) */
+extern s32 D_8008AAE0; /* VALUE-of, TextEntry__SetCursorPos only: the cursor's y */
 
-/* TextEntry__SetCursorPos's own stack-local argument to slotBC -- a 2-word block
- * (D_8008AADC-derived value at +0x0, the D_8008AAE0 constant at +0x4). */
-typedef struct {
-    s32 unk0;
-    s32 unk4;
-} SlotBCArg866E8_3bb8c_j;
-
-extern s32 D_8008AADC; /* VALUE-of here (round 45): see the type comment above */
-extern s32 D_8008AAE0; /* VALUE-of, round 45's TextEntry__SetCursorPos only */
-
-void TextEntry__SetCursorPos(Obj86ED0 *self, s32 arg1, s32 arg2)
+void TextEntry__SetCursorPos(TextEntry *self, s32 pos, s32 notify)
 {
-    SlotBCArg866E8_3bb8c_j local;
-    ChildObj86ED0 *obj;
+    ScreenSpritePos local;
+    CharSprite *obj;
 
-    if (self->unk48) {
-        local.unk4 = D_8008AAE0;
-        local.unk0 = arg1 * 7 + D_8008AADC;
-        obj = self->unk40;
-        obj->methods->slotBC(obj, &local);
-        self->cursorIndex = arg1;
-        if (arg2) {
-            self->methods->slot60(self, 0);
+    if (self->panelSprite) {
+        local.y = D_8008AAE0;
+        local.x = pos * 7 + D_8008AADC;
+        obj = self->cursorSprite;
+        obj->methods->setPosition(obj, &local);
+        self->cursorIndex = pos;
+        if (notify) {
+            self->methods->notifyTarget(self, 0);
         }
     }
 }
-
-/* round 75 CORRECTION (track 3 naming): self->unk44 is likewise Obj86ED0's
- * own ChildObj86ED0 *unk44 (see the note above TextEntry__SetCursorPos) -- no local
- * duplicate type. */
 
 /* VALUE-of `%gp_rel`, round 45's TextEntry__SetCharAt only -- a byte lookup table
  * (ROM image initialises it to D_800115D0, still-uncarved rodata). */
 extern u8 *gNameCharTable;
 
-void TextEntry__SetCharAt(Obj86ED0 *self, s32 arg1, s32 arg2, s32 arg3)
+void TextEntry__SetCharAt(TextEntry *self, s32 pos, s32 charIndex, s32 notify)
 {
     ChildObj86ED0 *obj;
 
-    if (self->unk48) {
-        self->unk28[arg1] = gNameCharTable[arg2];
-        obj = self->unk44;
-        obj->methods->slotC4(obj, gNameCharTable[arg2], arg1);
-        self->cursorIndex = arg1;
-        self->unk1C = arg2;
-        if (arg3) {
-            self->methods->slot60(self, 0);
+    if (self->panelSprite) {
+        self->editBuf[pos] = gNameCharTable[charIndex];
+        obj = self->textRow;
+        obj->methods->slotC4(obj, gNameCharTable[charIndex], pos);
+        self->cursorIndex = pos;
+        self->charIndex = charIndex;
+        if (notify) {
+            self->methods->notifyTarget(self, 0);
         }
     }
 }
@@ -143,9 +117,9 @@ void TextEntry__SetCharAt(Obj86ED0 *self, s32 arg1, s32 arg2, s32 arg3)
  * unit (see the file header comment for why this is not added to the
  * shared class_3bb8c.h). Alloc size 0x54 (New_Class86F88). Its real
  * vtable is gClass86F88Methods, reached through GetClass86F88Methods() (class_3bb8c_k).
- * `GetTextEntryMethods`/gTextEntryMethods immediately below are UNRELATED to this
- * class -- they are Obj86ED0's own table and getter (see the file header
- * comment), merely defined in this same file.
+ * `GetTextEntryMethods` immediately below is UNRELATED to this class -- it
+ * is TextEntry's own getter (include/TextEntry.h), merely defined in this
+ * same file.
  *
  * unk34/unk38 are single-slot caches for the most recently added child of
  * two distinguished "tag" kinds (established from Class86F88__AddChild/
@@ -229,12 +203,9 @@ struct Class86F88_3bb8c_j {
     Class86F88Handle_3bb8c_j *unk50;                  /* +0x050 */
 };
 
-/* gTextEntryMethods is Obj86ED0's OWN table (Obj86ED0Methods, already shared in
- * include/class_3bb8c.h, established by class_3bb8c_i) -- NOT this file's
- * local Class86F88Methods_3bb8c_j. See the file header comment. */
-extern Obj86ED0Methods gTextEntryMethods;
-
-Obj86ED0Methods *GetTextEntryMethods(void)
+/* TextEntry's own table getter (include/TextEntry.h), defined here in ROM
+ * order; not Class86F88's. */
+TextEntryMethods *GetTextEntryMethods(void)
 {
     return &gTextEntryMethods;
 }

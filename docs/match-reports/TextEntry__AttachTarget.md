@@ -26,7 +26,7 @@ void TextEntry__AttachTarget(Obj86ED0 *self, void *arg1, void *arg2, TargetObj86
 
 First attempt, transcribed directly (order matters: both `addChild` calls
 before any of the three stores), matched immediately once the earlier
-in-unit drift (from `TextEntry__OnNotify`/`TextEntry__SetName`, fixed first) was
+in-unit drift (from `TextEntry__OnNotify`/`TextEntry__SetText`, fixed first) was
 resolved -- this function's own C never changed.
 
 ## Naming

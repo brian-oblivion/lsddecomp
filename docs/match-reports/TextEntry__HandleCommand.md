@@ -146,7 +146,7 @@ class_3bb8c_j's `TextEntry__PrevChar`/`TextEntry__ToggleAltCommands`/
 accessors). PROPOSED for whoever next runs track 3 on class_3bb8c_j, or for
 the head to apply by type scope:
 
-- `unk10` -> `nameLen` (tier B). Set by `TextEntry__SetName` from
+- `unk10` -> `nameLen` (tier B). Set by `TextEntry__SetText` from
   `strlen(arg1)` (halved when `mode==1`); read as the upper bound in
   `TextEntry__MoveCursorRight`'s `unk18` test.
 - `unk14` -> `charTableLen` (tier B). Set by `TextEntry__TextEntry`'s own hand
@@ -180,7 +180,7 @@ the head to apply by type scope:
   not a confident proposal.
 - `unk28` -> `workName` (tier B). `BMemPMgrAlloc`'d by `TextEntry__TextEntry`,
   freed by `TextEntry__Finalize`; the decode/copy destination in
-  `TextEntry__SetName` and the encode SOURCE in this function's own `case 25`;
+  `TextEntry__SetText` and the encode SOURCE in this function's own `case 25`;
   also the per-index byte array class_3bb8c_j's `TextEntry__SetCharAt`
   writes through `gNameCharTable`. Working (half-width-decoded) copy of the
   name the caller supplies via `nameBuf`.
