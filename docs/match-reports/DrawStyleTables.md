@@ -26,8 +26,8 @@ Fresh ground, carved round 45, never attempted. No blockers.
 /* 46254 80055A54 0300422C */  sltiu $v0, $v0, 0x3
 /* 46258 80055A58 07004010 */  beqz  $v0, .L80055A78
 /* 4625C 80055A5C 01000534 */   ori  $a1, $zero, 0x1
-/* 46260 80055A60 0880043C */  lui   $a0, %hi(D_8008745C)
-/* 46264 80055A64 5C748424 */  addiu $a0, $a0, %lo(D_8008745C)
+/* 46260 80055A60 0880043C */  lui   $a0, %hi(gStyleStripRectB)
+/* 46264 80055A64 5C748424 */  addiu $a0, $a0, %lo(gStyleStripRectB)
 /* 46268 80055A68 0880063C */  lui   $a2, %hi(D_80087468)
 /* 4626C 80055A6C 6874C624 */  addiu $a2, $a2, %lo(D_80087468)
 .L80055A70:
@@ -52,7 +52,7 @@ extern s32 gStyleKind;
 extern void func_8003B624(void *arg0, s32 arg1, void *arg2);
 extern s32 gStyleStripRectA[];
 extern s32 gStyleStripScratchA[];
-extern s32 D_8008745C[];
+extern s32 gStyleStripRectB[];
 extern s32 D_80087468[];
 
 void DrawStyleTables(void) {
@@ -65,7 +65,7 @@ void DrawStyleTables(void) {
         a1 = 1;
     } else if ((u32) (gStyleKind - 3) < 3) {
         a1 = 1;
-        a0 = D_8008745C;
+        a0 = gStyleStripRectB;
         a2 = D_80087468;
     } else {
         return;

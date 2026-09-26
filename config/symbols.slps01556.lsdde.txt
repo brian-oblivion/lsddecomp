@@ -2921,3 +2921,4 @@ gStyleVariantPicks = 0x800873DC;
 gStyleKind2AltColor = 0x80087430;
 gStyleStripRectA = 0x80087444;
 gStyleStripScratchA = 0x80087450;
+gStyleStripRectB = 0x8008745C;
