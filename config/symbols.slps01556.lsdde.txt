@@ -2929,3 +2929,4 @@ gStyleCueRecordCounts = 0x800876EC;
 gStyleConfigIndex = 0x8008AC84;
 gStyleSpawnOffsetX = 0x8008E0A4;
 gStyleSpawnOffsetY = 0x8008E0A8;
+gStyleSpawnOffsetZ = 0x8008E0AC;

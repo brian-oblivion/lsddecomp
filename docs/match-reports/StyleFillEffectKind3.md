@@ -90,8 +90,8 @@ function sat for fourteen rounds.
 - The equal LENGTH was **two defects cancelling**, not zero defects:
   - my build **cross-jumped** (tail-merged) the two arms' shared
     `D_8008E0C0[0] = ...` store, where retail duplicates it: **2 words short**;
-  - my build **recomputed `lui`/`%lo` for `D_8008E0AC` at each of its four
-    accesses**, where retail caches `&D_8008E0AC` in `$v1`: **2 words long**.
+  - my build **recomputed `lui`/`%lo` for `gStyleSpawnOffsetZ` at each of its four
+    accesses**, where retail caches `&gStyleSpawnOffsetZ` in `$v1`: **2 words long**.
 
 This is the round-58 lesson arriving with a worked instance: **equal length
 does not imply 0/0**, and a report that infers "no structural difference" from
@@ -105,7 +105,7 @@ build (`./build-and-verify.sh`, then `tools/funcdiff.py`).
 | # | change | score |
 | --- | --- | --- |
 | 1 | baseline: round 46's preserved body, rebuilt | 38/81 |
-| 2 | `s32 *p = &D_8008E0AC;` for the clamp block | 38, length 79 (2 short), drift |
+| 2 | `s32 *p = &gStyleSpawnOffsetZ;` for the clamp block | 38, length 79 (2 short), drift |
 | 3 | **+ inline the `rand() % 3` instead of an `idx` local** | **66/81** |
 | 4 | + `u8 **q = &D_8008E0B0;` for the tail store/arg pair | **71/81** |
 | 5 | + signature `void **StyleFillEffectKind3(void **arg0, void *arg1)` with `*arg0 = ...; arg0++; return arg0;` | **78/81** |
@@ -250,7 +250,7 @@ invariant to every one of them, not merely unimproved):
   `(void *) (q - 3)`;
 - `p` declared at function scope vs inside the `else` block; `q` declared at
   function scope vs inside a trailing block;
-- reusing ONE pointer variable for both `&D_8008E0AC` and `&D_8008E0B0`
+- reusing ONE pointer variable for both `&gStyleSpawnOffsetZ` and `&D_8008E0B0`
   (73/81 -- worse, and the only one of these that moved the score).
 
 Two further axes were tried on the 78/81 body and made it worse, recorded so
@@ -339,7 +339,7 @@ extern s32 D_8008E0C0[];
 extern u8 *D_8008E0B0;
 extern u8 gStyleSpawnRotations[];
 extern s32 gStyleSpawnOffsetY;
-extern s32 D_8008E0AC;
+extern s32 gStyleSpawnOffsetZ;
 extern u8 gStyleKind3Colors[];
 extern s32 rand(void);
 extern void *New_Class876FC(void *arg0, void *arg1, void *arg2, void *arg3);
@@ -353,10 +353,10 @@ void **StyleFillEffectKind3(void **arg0, void *arg1) {
     if (gStyleDecorVariant != 0 && gStyleColorTable == (s32) gStyleDecorColorsB) {
         *(s32 *) gStyleSpawnOffsetX = 0xFFFF5000;
         gStyleSpawnOffsetY = -0x2000;
-        D_8008E0AC = 0;
+        gStyleSpawnOffsetZ = 0;
         D_8008E0C0[0] = (s32) (gStyleKind3Colors + 3);
     } else {
-        p = &D_8008E0AC;
+        p = &gStyleSpawnOffsetZ;
         if (*p > 0) {
             *p = -*p;
         }
@@ -397,7 +397,7 @@ duplicated instruction pair present in retail and absent in yours.
 positive -- it depends on whether a CALL sits between the accesses" is
 RETRACTED.** That learning was derived from exactly this function, from step 2
 above, and it was derived from a drift number rather than from a diff. There
-is no call between the three `D_8008E0AC` accesses and the pointer cache is
+is no call between the three `gStyleSpawnOffsetZ` accesses and the pointer cache is
 nevertheless correct -- it is precisely what retail does. The rule it was
 generalising from (`StyleFillEffectKind1`'s and `StyleFillEffectKind2`'s wins) may still
 hold on its own evidence, but this function is not an instance of it and must

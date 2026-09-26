@@ -161,7 +161,7 @@ the retype, so the retype cost it nothing.
 extern s32 gStyleSpawnYChoices[];
 extern s32 gStyleSpawnOffsetX;
 extern s32 gStyleSpawnOffsetY;
-extern s32 D_8008E0AC;
+extern s32 gStyleSpawnOffsetZ;
 extern u8 *D_8008E0B0;
 extern u8 gStyleSpawnRotations[];
 extern s32 D_8008E0B8;
@@ -175,9 +175,9 @@ void SetupStyleSpawnParamsA(void *arg0, void *arg1) {
     if (rand() & 1) {
         gStyleSpawnOffsetX = -gStyleSpawnOffsetX;
     }
-    D_8008E0AC = (rand() % 23) << 11;
+    gStyleSpawnOffsetZ = (rand() % 23) << 11;
     if (rand() & 1) {
-        D_8008E0AC = -D_8008E0AC;
+        gStyleSpawnOffsetZ = -gStyleSpawnOffsetZ;
     }
     D_8008E0B0 = gStyleSpawnRotations + ((u32) rand() % 7) * 12;
     D_8008E0B8 = rand() % 5;
@@ -209,9 +209,9 @@ source shape, spelled as a cast.
 ### The interesting asymmetry from round 48, now explained
 
 Round 48 flagged, unexplained, that the textually identical
-write/conditional-negate pattern on `D_8008E0AC` did **not** get an address
+write/conditional-negate pattern on `gStyleSpawnOffsetZ` did **not** get an address
 cached in either build, and guessed at register-pressure/CSE-table state.
-The real reason is that `D_8008E0AC` was declared `extern s32 D_8008E0AC;`
+The real reason is that `gStyleSpawnOffsetZ` was declared `extern s32 gStyleSpawnOffsetZ;`
 and assigned by name all along, one statement below the `u8[]`-plus-cast
 spelling. The two globals differed only in their declarations, and that
 difference was the whole residue. The discriminator was sitting in the same
@@ -252,7 +252,7 @@ practice. Confirmed here whole-image green with an already-matched sibling
   by that pair. When ins/del is entirely prologue/epilogue, the residue is
   ONE structural cause, not a diffuse allocation difference.
 - **Look for a sibling global in the SAME function that already gets retail's
-  shape.** Here `D_8008E0AC`, one statement later, was already correct; the
+  shape.** Here `gStyleSpawnOffsetZ`, one statement later, was already correct; the
   only difference between the two was the declaration. Round 63's "check
   whether a sibling loop in the SAME function already uses the correct idiom"
   applies to declarations too.
