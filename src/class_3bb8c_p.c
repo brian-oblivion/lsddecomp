@@ -18,8 +18,9 @@
  *    table and, for an event in [5,9), the object's own tryAttachNearby.
  *  - Actor__SetLastOffsetValue/SetPendingExtra, GetActorMethods: plain
  *    setters/getter.
- *  - New_Class879C4 + Class879C4__Class879C4: allocator and constructor of
- *    an unrelated class, Class879C4 (a Sprite subclass, include/Class879C4.h).
+ *  - New_VariantSprite + VariantSprite__VariantSprite: allocator and
+ *    constructor of an unrelated class, VariantSprite (a Sprite subclass,
+ *    include/VariantSprite.h).
  *
  * No stalls: Actor__BuildLinkQueries, the last one, matched in round 75
  * (2-argument method call, see its report). No switch jump table in this slice, and no gp_rel/addiu_at/
@@ -32,7 +33,7 @@
 #include "Class866E8.h"
 #include "LbdFile.h"
 #include "GridCell.h"
-#include "Class879C4.h"
+#include "VariantSprite.h"
 
 /* Two-element s16 array -- Actor__MoveLocalX and Actor__MoveLocalY each write one
  * element (index 0 and 1 respectively) via a plain `sh` through a pointer
@@ -354,30 +355,30 @@ ActorMethods *GetActorMethods(void) {
 
 extern void *BMemPMgrAlloc(s32 size);
 
-/* Class879C4 (include/Class879C4.h, track 4, round 87): its allocator and
+/* VariantSprite (include/VariantSprite.h, track 4, round 87): its allocator and
  * ctor. The other methods are in class_3bb8c_q.c and class_3bb8c_t.c. */
-Class879C4 *New_Class879C4(s32 variant, void *arg2, void *texture) {
+VariantSprite *New_VariantSprite(s32 variant, void *arg2, void *texture) {
     void *obj = BMemPMgrAlloc(0xA8);
     if (obj != NULL) {
-        GetClass879C4Methods()->ctor(obj, variant, arg2, texture);
+        GetVariantSpriteMethods()->ctor(obj, variant, arg2, texture);
         return obj;
     }
     return NULL;
 }
 
-/* Class879C4's two texture cells, forwarded as the Sprite ctor's `rect`
+/* VariantSprite's two texture cells, forwarded as the Sprite ctor's `rect`
  * (Sprite__Reset copies it into Sprite.rect): u,v = (0x00,0x20) and
  * (0x10,0x20), 16x16. */
-extern SpriteRect gClass879C4Cells[2];
+extern SpriteRect gVariantSpriteCells[2];
 
 /* The base-class ctor, Sprite__Sprite, through GetSpriteMethods(), with
  * `self` upcast; then this class's table, and its reset slot
- * (Class879C4__SetVariantClut) with the variant, through Class879C4ResetFn.
+ * (VariantSprite__SetVariantClut) with the variant, through VariantSpriteResetFn.
  * The retail ctor ends in that call without setting $v0: it returns
  * nothing. */
-void Class879C4__Class879C4(Class879C4 *self, s32 variant, void *arg2, void *texture) {
-    GetSpriteMethods()->ctor((Sprite *)self, texture, 0, &gClass879C4Cells[variant], arg2, 0);
-    self->methods = GetClass879C4Methods();
+void VariantSprite__VariantSprite(VariantSprite *self, s32 variant, void *arg2, void *texture) {
+    GetSpriteMethods()->ctor((Sprite *)self, texture, 0, &gVariantSpriteCells[variant], arg2, 0);
+    self->methods = GetVariantSpriteMethods();
     self->unkA4 = 0;
-    ((Class879C4ResetFn)self->methods->reset)(self, variant);
+    ((VariantSpriteResetFn)self->methods->reset)(self, variant);
 }

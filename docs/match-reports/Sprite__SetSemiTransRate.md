@@ -4,7 +4,7 @@
 
 Round 82, runner alpha (third re-staffed slot of the round). Unit `src/code_322b4.c`. Fresh ground (carved in FINISHING-PLAN revision 18), no prior attempt, no report before this one.
 
-- **Where:** slot +0x068 of gCharSpriteMethods, gScreenSpriteMethods, gSpriteMethods, gTextRowMethods and gClass879C4Methods (`tools/classtable.py`).
+- **Where:** slot +0x068 of gCharSpriteMethods, gScreenSpriteMethods, gSpriteMethods, gTextRowMethods and gVariantSpriteMethods (`tools/classtable.py`).
 - **What:** `GetSetBitField(&self->sprite.attribute, 0x1C, 2, a1)` (bits 28..29 of the GsSPRITE attribute).
 - **Result:** byte-exact; 11/11 words, 0 insertions / 0 deletions, whole-image SHA1 green (`./build-and-verify.sh` OK). First build.
 - **Types:** local views and prototypes live in the unit; no shared header was touched.

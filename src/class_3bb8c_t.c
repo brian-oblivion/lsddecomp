@@ -8,10 +8,10 @@
  * addresses, not class boundaries.  Identify each with tools/classtable.py.
  * It holds two classes:
  *
- * - Four empty leaves plus the table getter (Class879C4__Update,
- *   Class879C4__func_57f40/48/50, GetClass879C4Methods) of the unrelated
- *   Class879C4 (table `gClass879C4Methods`, 49 slots; include/Class879C4.h;
- *   its ctor is in `class_3bb8c_p`, two more methods in `class_3bb8c_q`).
+ * - Four empty leaves plus the table getter (VariantSprite__Update,
+ *   VariantSprite__NoOpSlotBC/C0/C4, GetVariantSpriteMethods) of the
+ *   unrelated VariantSprite (include/VariantSprite.h; its ctor is in
+ *   `class_3bb8c_p`, two more methods in `class_3bb8c_q`).
  * - The WHOLE of `GraphRoom` (round 75 name; table `gGraphRoomMethods`,
  *   73 slots), a TaskCore subclass, unified in include/GraphRoom.h (track 4,
  *   round 87; the header's banner has the slots, fields and evidence).
@@ -42,26 +42,26 @@
 #include "GraphRoom.h"
 #include "BoxFill.h"
 #include "DreamSys.h"
-#include "Class879C4.h"
+#include "VariantSprite.h"
 #include "VabStreamObj.h"
 
 extern void *BMemPMgrAlloc(s32 size);
 
-/* Class879C4's (include/Class879C4.h) four empty leaves, `jr $ra; nop`
- * (splat matched them itself), and its table getter. Class879C4__Update is
+/* VariantSprite's (include/VariantSprite.h) four empty leaves, `jr $ra; nop`
+ * (splat matched them itself), and its table getter. VariantSprite__Update is
  * the +0x098 update override of Sprite__Update, typed as that slot; the
  * other three occupy the class's own slots +0x0BC/+0x0C0/+0x0C4, which
- * nothing calls, so they keep the tier-C `Class__func_xxxxx` form. */
-void Class879C4__Update(Class879C4 *self, void *sender, s32 event) {}
+ * nothing calls. */
+void VariantSprite__Update(VariantSprite *self, void *sender, s32 event) {}
 
-void Class879C4__func_57f40(void) {}
+void VariantSprite__NoOpSlotBC(void) {}
 
-void Class879C4__func_57f48(void) {}
+void VariantSprite__NoOpSlotC0(void) {}
 
-void Class879C4__func_57f50(void) {}
+void VariantSprite__NoOpSlotC4(void) {}
 
-Class879C4Methods *GetClass879C4Methods(void) {
-    return &gClass879C4Methods;
+VariantSpriteMethods *GetVariantSpriteMethods(void) {
+    return &gVariantSpriteMethods;
 }
 
 /* GraphRoom's object, table and methods: include/GraphRoom.h (track 4,

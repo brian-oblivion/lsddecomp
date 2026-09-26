@@ -38,7 +38,7 @@ opaque object type, `D_80087AACUnk48Obj`), stashes `arg1` into
 `self->unk_0xA4`, and finally TAIL-CALLS its own class's `+0x040` slot
 (`slot40`), forwarding its return value -- the exact same "ctor ends by
 calling another of its own class's slots" shape already seen in
-`class_3bb8c_p`'s `Class879C4__Class879C4`.
+`class_3bb8c_p`'s `VariantSprite__VariantSprite`.
 
 Uses `D_8001176C` (the `"ETC\ETCSE"` string, the other of this unit's two
 standalone strings named in its own header comment).

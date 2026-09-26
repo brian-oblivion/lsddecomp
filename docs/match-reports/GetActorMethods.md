@@ -7,7 +7,7 @@
 Unit: `src/class_3bb8c_p.c`. Class: `DreamSys` family -- plain getter, not
 a vtable slot itself (checked all 6 method tables reachable from this
 unit's addresses, no hit; called directly by symbol name from
-`New_Class879C4`, `Class879C4__Class879C4`, and this unit's own already-typed
+`New_VariantSprite`, `VariantSprite__VariantSprite`, and this unit's own already-typed
 `extern DreamSysBaseMethods *GetActorMethods(void);` declaration in
 `include/DreamSys.h`, added by an earlier round before this unit existed).
 
@@ -34,7 +34,7 @@ convention.
 **`GetActorMethods` -- tier A.** A pure no-argument getter
 (`return &gActorMethods;`) for the shared intermediate base-class table --
 mechanics ARE the purpose, matching the project's own convention for
-such getters (compare `GetClass879C4Methods`/`GetSpriteMethods`, still `func_`
+such getters (compare `GetVariantSpriteMethods`/`GetSpriteMethods`, still `func_`
 because they live in uncarved ground this runner cannot touch).
 
 ## Verify

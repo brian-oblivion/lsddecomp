@@ -174,9 +174,9 @@ method signatures; zero bytes changed.
 | +0x074 | unk74 | color | B | every sprite's slotB8 (Sprite__SetColor copies 3 bytes to GsSPRITE r,g,b) |
 | +0x078 | unk78 | altColor | B | sprites[1]'s slotB8 argument instead of color when non-NULL |
 | +0x07C | arr7C | modelChildren | B | New_Actor objects, linked to the owner's model |
-| +0x084 | arr84 | sprites | B | New_Class879C4 objects (GsSPRITE at +0x64, see Class876FC__SpawnSprites) |
+| +0x084 | arr84 | sprites | B | New_VariantSprite objects (GsSPRITE at +0x64, see Class876FC__SpawnSprites) |
 | slot +0x044 | slot44 | updateRotation | B | SceneNode__UpdateRotation (set/add GsCOORD2PARAM.rotate, degrees) |
-| slot +0x048 | slot48 | updateScale | B | SceneNode__UpdateScale (set/add .scale); sprite override Class879C4__UpdateScale also a scale |
+| slot +0x048 | slot48 | updateScale | B | SceneNode__UpdateScale (set/add .scale); sprite override VariantSprite__UpdateScale also a scale |
 | slot +0x04C | slot4C | attachToParent | B | SceneNode__AttachToParent (parent link, coord2 super, coord.t) |
 | slot +0x060 | slot60 | setDisplay | B | SceneNode__SetDisplay / Sprite__SetDisplay: attribute bit 31 = !on (GsDOFF) |
 | slot +0x064 | slot64 | setSemiTrans | B | SceneNode__SetSemiTrans / Sprite__SetSemiTrans: bit 30 (GsALON) |
@@ -209,4 +209,4 @@ warning.
 
 ## Track 4 (2026-09-26, round 88, charlie)
 
-class_3bb8c_s.c's `LinkNode` view (owner and children under one type) is gone: the owner is `Class876FC` (include/Class876FC.h), `modelChildren` are `Actor *`, `sprites` are `Class879C4 *`, and the local `Vec3S` is `LongVec3`. Accessor renames: `kind` is Actor's `pendingExtra` (+0x054, where the ctor stores it); `offset`/`rotation`/`scale`/`modelChildLayout`/`tableIndex`/`color`/`altColor` are `params.*`; slot `slotB8` is Actor's `setTranslation` on the owner and model children and Sprite's `setColor` on sprites; `*coord2 = 0` is `coord2->flg = 0`. Image byte-identical.
+class_3bb8c_s.c's `LinkNode` view (owner and children under one type) is gone: the owner is `Class876FC` (include/Class876FC.h), `modelChildren` are `Actor *`, `sprites` are `VariantSprite *`, and the local `Vec3S` is `LongVec3`. Accessor renames: `kind` is Actor's `pendingExtra` (+0x054, where the ctor stores it); `offset`/`rotation`/`scale`/`modelChildLayout`/`tableIndex`/`color`/`altColor` are `params.*`; slot `slotB8` is Actor's `setTranslation` on the owner and model children and Sprite's `setColor` on sprites; `*coord2 = 0` is `coord2->flg = 0`. Image byte-identical.

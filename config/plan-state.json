@@ -908,11 +908,6 @@
           "date": "2026-09-26",
           "header": "include/Class876FC.h"
         },
-        "gClass879C4Methods": {
-          "class": "Class879C4",
-          "date": "2026-09-26",
-          "header": "include/Class879C4.h"
-        },
         "gDrawSystemMethods": {
           "class": "DrawSystem",
           "date": "2026-09-26",
@@ -1122,6 +1117,11 @@
           "class": "VabStreamObj",
           "date": "2026-09-26",
           "header": "include/VabStreamObj.h"
+        },
+        "gVariantSpriteMethods": {
+          "class": "VariantSprite",
+          "date": "2026-09-26",
+          "header": "include/VariantSprite.h"
         },
         "gViewportMethods": {
           "class": "Viewport",

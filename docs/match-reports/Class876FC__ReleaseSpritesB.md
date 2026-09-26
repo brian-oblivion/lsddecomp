@@ -48,9 +48,9 @@ Class876FC's own per-kind dispatch in `class_3bb8c_s.c`
 (`Class876FC__InitByKind` kind 3, `Class876FC__UpdateByKind` kind 3,
 `Class876FC__ReleaseByKind` kinds 2/3), each passing its own `self`; the
 five-element array at +0x084 ("links") is `Class876FC::sprites`, filled by
-`Class876FC__SpawnSprites` with `New_Class879C4` objects. The old
-`LinkOwnerObj`/`LinkElemObj` views were Class876FC and Class879C4 under
-another name; RandomizeSprites' `slot48` is Class879C4's inherited
+`Class876FC__SpawnSprites` with `New_VariantSprite` objects. The old
+`LinkOwnerObj`/`LinkElemObj` views were Class876FC and VariantSprite under
+another name; RandomizeSprites' `slot48` is VariantSprite's inherited
 `updateScale` and its `angle` (+0x084) is `sprite.rotate` (Sprite, +0x064 +
 0x020, 4096 per degree -- the `(rand() % 360) << 12` it stores).
 

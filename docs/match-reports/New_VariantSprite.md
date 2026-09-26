@@ -1,4 +1,6 @@
-# New_Class879C4 -- MATCHED (31/31)
+# New_VariantSprite -- MATCHED (31/31)
+
+> Renamed from `New_Class879C4` on 2026-09-26 (tools/rename.py). Address 0x80057c94.
 
 > Renamed from `New_D800879C4` on 2026-09-26 (tools/rename.py). Address 0x80057c94.
 
@@ -11,16 +13,16 @@ description), not a vtable slot itself.
 ## Signature
 
 ```c
-void *New_Class879C4(void *arg1, void *arg2, void *arg3);
+void *New_VariantSprite(void *arg1, void *arg2, void *arg3);
 ```
 
 ## Body
 
 ```c
-void *New_Class879C4(void *arg1, void *arg2, void *arg3) {
+void *New_VariantSprite(void *arg1, void *arg2, void *arg3) {
     void *obj = BMemPMgrAlloc(0xA8);
     if (obj != NULL) {
-        GetClass879C4Methods()->ctor(obj, arg1, arg2, arg3);
+        GetVariantSpriteMethods()->ctor(obj, arg1, arg2, arg3);
         return obj;
     }
     return NULL;
@@ -32,15 +34,15 @@ the constructor fetched from a table's `+0x008` slot with `(obj, arg1,
 arg2, arg3)`, return the allocation (the ctor's own return value is
 discarded).
 
-## `GetClass879C4Methods` and `gClass879C4Methods` are in UNCARVED ground
+## `GetVariantSpriteMethods` and `gVariantSpriteMethods` are in UNCARVED ground
 
-`GetClass879C4Methods` is a plain no-argument getter (`return &gClass879C4Methods;`),
+`GetVariantSpriteMethods` is a plain no-argument getter (`return &gVariantSpriteMethods;`),
 confirmed by reading its body directly in `asm/class_3bb8c_q.s` -- the
 still-monolithic segment immediately behind this unit
 (`class_3bb8c_o.c`'s own file banner already names it as this unit's
-successor, `class_3bb8c_q`). `gClass879C4Methods` is a 49-slot table
+successor, `class_3bb8c_q`). `gVariantSpriteMethods` is a 49-slot table
 (`tools/classtable.py` header `0x1F44`) whose `+0x008` slot resolves to
-THIS unit's own `Class879C4__Class879C4` (still queued at the time this was
+THIS unit's own `VariantSprite__VariantSprite` (still queued at the time this was
 written; see its own report). Only the ctor slot is typed here
 (`D800879C4Methods`, local to this file) -- the rest of that class is out
 of this unit's scope (uncarved, belongs to whoever carves
@@ -70,10 +72,10 @@ v0,s0`.
 
 ## Naming
 
-**`New_Class879C4` -- tier A.** Textbook `New_X` shape per CLAUDE.md's own
+**`New_VariantSprite` -- tier A.** Textbook `New_X` shape per CLAUDE.md's own
 convention ("constructors `New_Class`/`Class__Class`"): allocate, null
 check, construct, return -- mechanics ARE the purpose. `D800879C4` names
-the class this allocates (its own ctor's table, `gClass879C4Methods`, with the
+the class this allocates (its own ctor's table, `gVariantSpriteMethods`, with the
 underscore dropped per this project's `D800878D4Methods`-style convention
 for an as-yet-unnamed class, since the class itself lives in uncarved
 ground `class_3bb8c_q.s` this runner cannot rename).
@@ -82,7 +84,7 @@ ground `class_3bb8c_q.s` this runner cannot rename).
 
 ```
 ./build-and-verify.sh   # build exit=0, OK: build matches retail
-tools/funcdiff.py New_Class879C4   # 31/31
+tools/funcdiff.py New_VariantSprite   # 31/31
 ```
 
 ### Proposed learning
@@ -113,15 +115,32 @@ further work (that one).
 
 ## Track 4 (2026-09-26, round 87, alpha)
 
-Renamed from `New_D800879C4` (tools/rename.py); the class is `Class879C4`
-(`include/Class879C4.h`). The prototype is now
-`Class879C4 *New_Class879C4(s32 variant, void *arg2, void *texture)`: the
+Renamed from `New_D800879C4` (tools/rename.py); the class is `VariantSprite`
+(`include/VariantSprite.h`). The prototype is now
+`VariantSprite *New_VariantSprite(s32 variant, void *arg2, void *texture)`: the
 three arguments are forwarded unchanged to the ctor, whose parameters they
-name (see `Class879C4__Class879C4`'s report), and the result is the object.
+name (see `VariantSprite__VariantSprite`'s report), and the result is the object.
 The body is unchanged but for the parameter names; the one caller outside
 this unit, `Class876FC__SpawnSprites` (class_3bb8c_s.c), passes its `a2`
 as the variant without a cast and casts the result to its `LinkNode *`
 view, and its local `extern` of this function is gone. The "UNCARVED
 ground" section above is history: the getter and table are
-`GetClass879C4Methods` / `gClass879C4Methods` in class_3bb8c_t.c.
+`GetVariantSpriteMethods` / `gVariantSpriteMethods` in class_3bb8c_t.c.
 Byte-identical.
+
+## Track 6 (2026-09-26, round 93, bravo)
+
+The class `Class879C4` is now `VariantSprite` (`include/VariantSprite.h`,
+`python3 tools/renametype.py Class879C4 VariantSprite`), tier B: the
+mechanics are certain and are the whole of what the class adds to Sprite --
+`variant` (0 or 1) picks the texture cell the Sprite ctor binds
+(`gVariantSpriteCells`) and the CLUT row the reset slot sets
+(`gVariantSpriteClutX/Y`). What the sprites are in the game is not
+established (their only builder is Class876FC, kinds 2 and 3, and every
+path passes variant 0), which is why it is not tier A. The table, getter,
+allocator, methods and the three data tables followed the class name.
+The same tool run rewrote `Class879C4` tokens inside this report's older
+history prose (the known renametype behaviour pending an operator
+decision); those lines were left as the tool wrote them.
+
+Its only caller is `Class876FC__SpawnSprites`, with variant 0.
