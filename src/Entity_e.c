@@ -25,27 +25,27 @@
 
 void Entity__MoodCue59(Entity *this, SoundCueSet *out) {
     if (this->moodTimer == 0 && rand() % 10 == 0) {
-        this->state = 0xC;
+        this->state = 12;
     }
     if (out->tick % 10 == 0) {
         out->attenuation = this->methods->getProximityRatio(this);
-        out->slots[0].program = 0xC;
+        out->slots[0].program = 12;
         out->slots[0].octave = -1;
     }
     if (this->moodTimer == 0) {
         if (rand() & 1) {
-            this->methods->moveLocalY(this, 0x800, 0);
+            this->methods->moveLocalY(this, 2048, 0);
         }
     }
-    this->methods->moveLocalZ(this, -0x80, 0);
-    if (this->state == 0xC && this->moodTimer == 0x12C) {
+    this->methods->moveLocalZ(this, -128, 0);
+    if (this->state == 12 && this->moodTimer == 300) {
         this->grid->methods->configureRateEntry(this->grid, 1, 1);
     }
 }
 
 void Entity__MoodCue61(Entity *this, SoundCueSet *out) {
-    if (this->todFrame == 0x1E) {
-        out->slots[0].program = 0x12;
+    if (this->todFrame == 30) {
+        out->slots[0].program = 18;
         out->attenuation = 0;
         out->slots[0].octave = -1;
     }
@@ -57,17 +57,19 @@ void Entity__MoodCue62(Entity *this, SoundCueSet *out) {
         out->attenuation = 0;
         out->slots[0].octave = -2;
     }
-    if (this->moodTimer >= 0x65) {
+    if (this->moodTimer >= 101) {
         SceneNode__FaceTarget((SceneNode *)this, (SceneNode *)this->peer, 1, 0, 0);
     }
     this->methods->moveLocalZ(this, -5, 0);
-    if (this->moodTimer == 0x12C && this->methods->distanceToPeer(this, this->peer) < 0x1000) {
-        ((DreamSys *)this->peer)->methods->clearTickCallbacks((DreamSys *)this->peer, 0);
-    } else if (this->moodTimer == 0x1F4) {
-        ((DreamSys *)this->peer)->methods->setTickCallbacks((DreamSys *)this->peer, 1, 1);
+    if (this->moodTimer == 300 && this->methods->distanceToPeer(this, this->peer) < 4096) {
+        ((DreamSys *)this->peer)->methods->clearTickCallbacks((DreamSys *)this->peer, false);
+    } else if (this->moodTimer == 500) {
+        ((DreamSys *)this->peer)
+            ->methods->setTickCallbacks((DreamSys *)this->peer, MOVE_CALLBACK_TICK_MOVE,
+                                        LOOK_CALLBACK_STEP_LOOK);
     }
     if (this->state == 0) {
-        if (this->methods->distanceToPeer(this, this->peer) < 0x400) {
+        if (this->methods->distanceToPeer(this, this->peer) < 1024) {
             if (rand() & 1) {
                 out->slots[1].program = 6;
                 out->attenuation = 0;
@@ -76,14 +78,15 @@ void Entity__MoodCue62(Entity *this, SoundCueSet *out) {
                     this->grid->methods->configureRateEntry(this->grid, -1, 0);
                 }
                 this->moodTimer = 0;
-                this->state = 0xA;
+                this->state = 10;
             } else {
-                this->state = 0xB;
+                this->state = 11;
             }
         }
     }
-    if (this->state == 0xA && this->moodTimer == 0x46) {
-        this->methods->notifyParents(this, (rand() & 1) ? 0xC : 0xB);
+    if (this->state == 10 && this->moodTimer == 70) {
+        this->methods->notifyParents(this, (rand() & 1) ? ENTITY_EFFECT_END_DREAM
+                                                        : ENTITY_EFFECT_EVENT_VIDEO);
     }
 }
 
@@ -91,52 +94,52 @@ void Entity__MoodCue64(Entity *this, SoundCueSet *out) {
     s32 phase = out->tick % 300;
 
     out->attenuation = this->methods->getProximityRatio(this);
-    if (phase < 0x14) {
+    if (phase < 20) {
         out->slots[0].program = 5;
         out->slots[0].octave = -2;
-    } else if (phase == 0x16) {
-        out->slots[0].program = -2;
+    } else if (phase == 22) {
+        out->slots[0].program = SOUND_CUE_STOP;
     }
-    this->methods->moveLocalZ(this, -0xA, 0);
+    this->methods->moveLocalZ(this, -10, 0);
 }
 
 void Entity__MoodCue65(Entity *this, SoundCueSet *out) {
     if (this->moodTimer == 0) {
         if (rand() % 3 == 0) {
             this->methods->updateScale(this, 1, SCALE_HALF);
-            this->methods->moveLocalY(this, -0x12C, 0);
+            this->methods->moveLocalY(this, -300, 0);
             this->methods->updateRotation(this, 1, ROTATION_YAW_PLUS90);
-            this->state = 0xB;
+            this->state = 11;
         }
     }
-    if (this->state == 0xB) {
-        if (this->moodTimer == 0x7D0) {
+    if (this->state == 11) {
+        if (this->moodTimer == 2000) {
             this->methods->updateRotation(this, 0, ROTATION_YAW_MINUS90);
         }
-        this->methods->moveLocalZ(this, -0x14, 0);
+        this->methods->moveLocalZ(this, -20, 0);
     }
 }
 
 void Entity__MoodCue66(Entity *this, SoundCueSet *out) {
     out->attenuation = this->methods->getProximityRatio(this);
     if (out->tick % 30 == 0) {
-        out->slots[0].program = 0xD;
+        out->slots[0].program = 13;
     }
 }
 
 void Entity__MoodCue67(Entity *this, SoundCueSet *out) {
     if (this->moodTimer == 0) {
         if (rand() % 3 == 0) {
-            this->state = 0xB;
+            this->state = 11;
         }
     }
-    if (this->state == 0xB) {
-        if (this->moodTimer == 0x1F6) {
-            this->methods->moveLocalY(this, 0x800, 0);
+    if (this->state == 11) {
+        if (this->moodTimer == 502) {
+            this->methods->moveLocalY(this, 2048, 0);
             SceneNode__FaceTarget((SceneNode *)this, (SceneNode *)this->peer, 1, 0, 0);
         }
-        if (this->moodTimer >= 0x1F5) {
-            this->methods->moveLocalZ(this, -0x200, 0);
+        if (this->moodTimer >= 501) {
+            this->methods->moveLocalZ(this, -512, 0);
         }
     }
 }
@@ -144,38 +147,38 @@ void Entity__MoodCue67(Entity *this, SoundCueSet *out) {
 void Entity__MoodCue68(Entity *this, SoundCueSet *out) {
     out->attenuation = this->methods->getProximityRatio(this);
     if (out->tick == 0) {
-        this->lastOffsetValue = (rand() & 1) ? -0x176 : -0xC0;
+        this->lastOffsetValue = (rand() & 1) ? -374 : -192;
     }
     if (this->state == 0) {
         if (out->tick % 10 == 0) {
-            out->slots[0].program = 0x1C;
+            out->slots[0].program = 28;
         }
         if (out->tick % 20 == 0) {
-            out->slots[1].program = 0x17;
+            out->slots[1].program = 23;
             out->slots[1].octave = -1;
-            out->slots[2].program = 0x17;
+            out->slots[2].program = 23;
             out->slots[2].octave = -1;
-        } else if (out->tick % 20 == 0xE) {
-            out->slots[1].program = -2;
-            out->slots[2].program = -2;
+        } else if (out->tick % 20 == 14) {
+            out->slots[1].program = SOUND_CUE_STOP;
+            out->slots[2].program = SOUND_CUE_STOP;
         }
         if ((this->moodTimer & 1) == 0) {
             if (((DreamSys *)this->peer)->methods->getLinkCommandFlag((DreamSys *)this->peer) != 0) {
                 this->moodTimer = -1;
-                this->state = 0xA;
-                out->slots[0].program = 0x12;
+                this->state = 10;
+                out->slots[0].program = 18;
             }
         }
         SceneNode__FaceTarget((SceneNode *)this, (SceneNode *)this->peer, 1, 0, 0);
         this->methods->moveLocalZ(this, this->lastOffsetValue, (void *)1);
-    } else if (this->state == 0xA) {
+    } else if (this->state == 10) {
         if (this->moodTimer < 8) {
             this->methods->updateRotation(this, 0, ROTATION_ZPLUS9);
             this->methods->addTranslation(this, TRANSLATE_Y_PLUS8);
         } else {
             u32 coin;
 
-            out->slots[0].program = 0x12;
+            out->slots[0].program = 18;
             out->slots[1].program = 3;
             this->methods->stopSoundCue(this);
             coin = rand() & 1;
@@ -187,15 +190,15 @@ void Entity__MoodCue68(Entity *this, SoundCueSet *out) {
 void Entity__MoodCue69(Entity *this, SoundCueSet *out) {
     out->attenuation = this->methods->getProximityRatio(this);
     if (this->todFrame == this->todFrameCount - 1) {
-        out->slots[0].program = 0x19;
+        out->slots[0].program = 25;
         out->slots[0].octave = -2;
     }
     if (out->tick % 4 == 0) {
-        out->slots[1].program = 0x15;
+        out->slots[1].program = 21;
         out->slots[1].octave = -1;
     }
     if (out->tick % 200 == 0) {
-        out->slots[2].program = 0xD;
+        out->slots[2].program = 13;
         out->slots[2].octave = 1;
     }
 }
@@ -203,14 +206,14 @@ void Entity__MoodCue69(Entity *this, SoundCueSet *out) {
 void Entity__MoodCue70(Entity *this, SoundCueSet *out) {
     if (this->moodTimer == 0) {
         if (rand() & 1) {
-            this->state = 0xB;
+            this->state = 11;
         }
     }
-    if (this->moodTimer == 0x12C) {
+    if (this->moodTimer == 300) {
         this->methods->updateRotation(this, 0, ROTATION_YAW_PLUS180);
     }
-    if (this->moodTimer < 0x258) {
-        this->methods->moveLocalZ(this, this->state == 0 ? -0x100 : 0x100, 0);
+    if (this->moodTimer < 600) {
+        this->methods->moveLocalZ(this, this->state == 0 ? -256 : 256, 0);
     }
 }
 
@@ -223,22 +226,22 @@ void Entity__MoodCue71(Entity *this, SoundCueSet *out) {
         lane = rand() % 3;
         this->methods->moveLocalX(this, lane * 51200, 0);
     }
-    if (this->moodTimer >= 0x961) {
+    if (this->moodTimer >= 2401) {
         SceneNode__FaceTarget((SceneNode *)this, (SceneNode *)this->peer, 1, 0, 0);
     }
-    this->methods->moveLocalZ(this, -0x1E, 0);
+    this->methods->moveLocalZ(this, -30, 0);
 }
 
 void Entity__MoodCue73(Entity *this, SoundCueSet *out) {
     out->attenuation = 0;
     if (out->tick == 0) {
         ((DreamSys *)this->peer)->methods->updateRotation((DreamSys *)this->peer, 1, ROTATION_YAW_PLUS90);
-        ((DreamSys *)this->peer)->methods->clearTickCallbacks((DreamSys *)this->peer, 1);
-        out->slots[0].program = 0x19;
-        out->slots[1].program = 0x19;
-        out->slots[2].program = 0x19;
-    } else if (out->tick == 0x14) {
-        out->slots[1].program = 0xD;
+        ((DreamSys *)this->peer)->methods->clearTickCallbacks((DreamSys *)this->peer, true);
+        out->slots[0].program = 25;
+        out->slots[1].program = 25;
+        out->slots[2].program = 25;
+    } else if (out->tick == 20) {
+        out->slots[1].program = 13;
     }
     if (this->moodTimer == this->todFrameCount - 1) {
         this->methods->deactivate(this);
@@ -253,24 +256,25 @@ void Entity__MoodCue74(Entity *this, SoundCueSet *out) {
         ((DreamSys *)this->peer)
             ->viewport->methods->setClearColor(((DreamSys *)this->peer)->viewport, &sMoodCue74ClearColor);
         this->state = rand() % 3;
-        if (((DreamSys *)this->peer)->coord2->tz < 0x262) {
+        if (((DreamSys *)this->peer)->coord2->tz < 610) {
             this->state = 0;
         }
     }
     if (this->state != 0) {
         if (this->todFrameCount / 2 < this->moodTimer) {
-            ((DreamSys *)this->peer)->methods->moveLocalZ((DreamSys *)this->peer, 0x80, 0);
+            ((DreamSys *)this->peer)->methods->moveLocalZ((DreamSys *)this->peer, 128, 0);
         }
-        if (this->moodTimer == this->todFrameCount - 0x1E) {
-            this->methods->notifyParents(this, 0xA);
+        if (this->moodTimer == this->todFrameCount - 30) {
+            this->methods->notifyParents(this, ENTITY_EFFECT_LINK_STAGE);
         }
     } else {
-        if ((u32)(this->moodTimer - 0x14) < 0x64) {
+        if (this->moodTimer >= 20 && this->moodTimer < 120) {
             ((DreamSys *)this->peer)
-                ->methods->moveLocalZ((DreamSys *)this->peer, -((this->moodTimer - 0x13) * 0x20),
-                                      (void *)1);
-            if (this->moodTimer == 0x55) {
-                ((DreamSys *)this->peer)->methods->setTickCallbacks((DreamSys *)this->peer, 1, 1);
+                ->methods->moveLocalZ((DreamSys *)this->peer, -((this->moodTimer - 19) * 32), (void *)1);
+            if (this->moodTimer == 85) {
+                ((DreamSys *)this->peer)
+                    ->methods->setTickCallbacks((DreamSys *)this->peer, MOVE_CALLBACK_TICK_MOVE,
+                                                LOOK_CALLBACK_STEP_LOOK);
             }
         }
     }
@@ -279,14 +283,14 @@ void Entity__MoodCue74(Entity *this, SoundCueSet *out) {
 void Entity__MoodCue75(Entity *this, SoundCueSet *out) {
     if (out->tick == 0) {
         out->attenuation = 0;
-        out->slots[0].program = 0x19;
-        out->slots[1].program = 0x19;
-        out->slots[2].program = 0x19;
+        out->slots[0].program = 25;
+        out->slots[1].program = 25;
+        out->slots[2].program = 25;
         SceneNode__FaceTarget((SceneNode *)this, (SceneNode *)this->peer, 1, 0, 0);
     }
     if (this->moodTimer == this->todFrameCount) {
         this->methods->stopTod(this);
-        this->methods->notifyParents(this, 0xA);
+        this->methods->notifyParents(this, ENTITY_EFFECT_LINK_STAGE);
     }
 }
 
@@ -306,38 +310,38 @@ void Entity__MoodCue76(Entity *this, SoundCueSet *out) {
 void Entity__MoodCue77(Entity *this, SoundCueSet *out) {
     out->attenuation = this->methods->getProximityRatio(this);
     if (out->tick % 5 == 0) {
-        out->slots[0].program = 0x11;
+        out->slots[0].program = 17;
         out->slots[0].octave = -2;
     }
     if (this->todIndex == 0) {
         if (this->moodTimer == this->todFrameCount) {
             this->methods->setTod(this, 1);
             if (rand() & 1) {
-                this->state = 0xB;
+                this->state = 11;
             }
         }
         return;
     }
     if (this->state == 0) {
-        if (this->moodTimer == 0x3C || this->moodTimer == 0xD4 || this->moodTimer == 0x122 ||
-            this->moodTimer == 0x140) {
+        if (this->moodTimer == 60 || this->moodTimer == 212 || this->moodTimer == 290 ||
+            this->moodTimer == 320) {
             this->methods->updateRotation(this, 0, ROTATION_YAW_PLUS90);
         }
-        if (this->moodTimer == 0x18E) {
+        if (this->moodTimer == 398) {
             this->methods->updateRotation(this, 0, ROTATION_YAW_MINUS90);
         }
-        this->methods->moveLocalZOrFindLink(this, -0x32, 0);
+        this->methods->moveLocalZOrFindLink(this, -50, 0);
         return;
     }
-    if (this->moodTimer == 0x3C || this->moodTimer == 0x8C) {
+    if (this->moodTimer == 60 || this->moodTimer == 140) {
         this->methods->updateRotation(this, 0, ROTATION_YAW_PLUS90);
     }
-    if (this->moodTimer < 0xAE) {
-        this->methods->moveLocalZOrFindLink(this, -0x32, 0);
+    if (this->moodTimer < 174) {
+        this->methods->moveLocalZOrFindLink(this, -50, 0);
     }
-    if (this->moodTimer == 0xAE) {
+    if (this->moodTimer == 174) {
         this->methods->stopSoundCue(this);
-        this->state = 1;
+        this->state = ENTITY_STATE_DONE;
     }
 }
 
@@ -354,17 +358,17 @@ void Entity__MoodCue78(Entity *this, SoundCueSet *out) {
         sMoodCue78TransitionDone = 0;
         rollOrDy = rand() % 3;
         if (rollOrDy == 1) {
-            this->state = 0xB;
+            this->state = 11;
         }
         if (rollOrDy == 2) {
-            this->state = 0xC;
+            this->state = 12;
         }
     }
 
     out->attenuation = this->methods->getProximityRatio(this);
 
     if (this->todPlaying != 0 && (out->tick & 3) == 0) {
-        out->slots[0].program = 0x1C;
+        out->slots[0].program = 28;
     }
 
     if (this->moodTimer == this->todFrameCount - 1) {
@@ -374,65 +378,65 @@ void Entity__MoodCue78(Entity *this, SoundCueSet *out) {
             ((EntityPlayTodFn)this->methods->playTod)(this);
         } else if (this->moodTimer >= this->todFrameCount / 2) {
             if (this->moodTimer == this->todFrameCount / 2) {
-                out->slots[0].program = 0x10;
+                out->slots[0].program = 16;
             }
-            this->methods->moveLocalZ(this, 0x6E, 0);
+            this->methods->moveLocalZ(this, 110, 0);
         } else if (this->moodTimer < this->todFrameCount / 4) {
             /* nothing */
         } else {
             this->methods->stopTod(this);
-            this->methods->moveLocalZ(this, -0x6E, 0);
+            this->methods->moveLocalZ(this, -110, 0);
         }
     }
 
-    if (this->state == 0xB && out->tick == 0x1FE) {
-        this->methods->moveLocalY(this, -0x17C, 0);
+    if (this->state == 11 && out->tick == 510) {
+        this->methods->moveLocalY(this, -380, 0);
         this->methods->updateRotation(this, 0, ROTATION_XPLUS90);
         this->methods->stopSoundCue(this);
-        this->state = 1;
+        this->state = ENTITY_STATE_DONE;
         sMoodCue78TransitionDone = 1;
-    } else if (this->state >= 0xC && out->tick >= 0x14A && (out->tick % 60) == 30) {
+    } else if (this->state >= 12 && out->tick >= 330 && (out->tick % 60) == 30) {
         rollOrDy = 0;
         if (rand() & 1) {
             table = SCALE_Y2;
-            rollOrDy = (this->state == 0xC) ? 0x190 : 0;
-            this->state = 0xD;
+            rollOrDy = (this->state == 12) ? 400 : 0;
+            this->state = 13;
         } else {
             table = D_80089E14;
-            if (this->state == 0xD) {
-                rollOrDy = -0x190;
+            if (this->state == 13) {
+                rollOrDy = -400;
             }
-            this->state = 0xC;
+            this->state = 12;
         }
         this->methods->updateScale(this, 1, table);
         this->methods->moveLocalY(this, rollOrDy, 0);
     }
 
-    if (out->tick == 0x208 && sMoodCue78TransitionDone != 0) {
+    if (out->tick == 520 && sMoodCue78TransitionDone != 0) {
         this->methods->stopSoundCue(this);
-        this->state = 1;
+        this->state = ENTITY_STATE_DONE;
     }
 }
 
 void Entity__MoodCue79(Entity *this, SoundCueSet *out) {
     out->attenuation = this->methods->getProximityRatio(this);
     if (out->tick % 10 == 0) {
-        out->slots[0].program = 0x19;
+        out->slots[0].program = 25;
         out->slots[0].octave = 2;
     }
     this->methods->updateRotation(this, 0, ROTATION_YAW_PLUS2);
     if (this->state == 0 && this->targetReached != 0) {
-        this->methods->notifyParents(this, 0xB);
-        this->state = 0xB;
+        this->methods->notifyParents(this, ENTITY_EFFECT_EVENT_VIDEO);
+        this->state = 11;
     }
 }
 
 void Entity__MoodCue80(Entity *this, SoundCueSet *out) {
     if (this->moodTimer < this->todFrameCount) {
         if (this->todFrame != 0) {
-            if (this->todFrame == 0x14) {
+            if (this->todFrame == 20) {
                 out->attenuation = 0;
-                out->slots[0].program = 0x10;
+                out->slots[0].program = 16;
             }
         }
     } else {
@@ -450,39 +454,39 @@ void Entity__MoodCue81(Entity *this, SoundCueSet *out) {
         this->state = rand() % 3;
     }
     if (this->state != 0 && this->targetReached != 0) {
-        if (out->tick >= 0x3D) {
+        if (out->tick >= 61) {
             out->tick = 0;
         }
         if (out->tick % 20 == 0) {
-            out->slots[0].program = 0x17;
+            out->slots[0].program = 23;
             out->attenuation = 0;
             out->slots[0].octave = -1;
-            out->slots[2].program = out->slots[1].program = 0x17;
+            out->slots[2].program = out->slots[1].program = 23;
             out->slots[1].octave = -1;
             out->slots[2].octave = -2;
-        } else if (out->tick % 20 == 0xE) {
-            out->slots[0].program = -2;
-            out->slots[1].program = -2;
-            out->slots[2].program = -2;
+        } else if (out->tick % 20 == 14) {
+            out->slots[0].program = SOUND_CUE_STOP;
+            out->slots[1].program = SOUND_CUE_STOP;
+            out->slots[2].program = SOUND_CUE_STOP;
         }
         SceneNode__FaceTarget((SceneNode *)this, (SceneNode *)this->peer, 1, 0, 0);
         state = this->state;
         if (state == 1) {
             this->methods->updateScale(this, 0, SCALE_EIGHT_SEVENTHS);
-            dz = -0x176;
-            if (this->methods->distanceToPeer(this, this->peer) < 0x200) {
+            dz = -374;
+            if (this->methods->distanceToPeer(this, this->peer) < 512) {
                 this->methods->deactivate(this);
                 this->state = state;
             }
         } else {
-            ((DreamSys *)this->peer)->methods->clearTickCallbacks((DreamSys *)this->peer, 1);
+            ((DreamSys *)this->peer)->methods->clearTickCallbacks((DreamSys *)this->peer, true);
             SceneNode__FaceTarget((SceneNode *)this->peer, (SceneNode *)this, 1, 1, 0);
             if (this->state == 2) {
-                if (this->methods->distanceToPeer(this, this->peer) < 0x960) {
-                    this->state = 0xB;
-                    this->methods->notifyParents(this, 0xC);
+                if (this->methods->distanceToPeer(this, this->peer) < 2400) {
+                    this->state = 11;
+                    this->methods->notifyParents(this, ENTITY_EFFECT_END_DREAM);
                 }
-                dz = -0x60;
+                dz = -96;
             } else {
                 dz = 0;
             }
@@ -490,18 +494,18 @@ void Entity__MoodCue81(Entity *this, SoundCueSet *out) {
     } else {
         out->attenuation = this->methods->getProximityRatio(this);
         if (out->tick % 22 == 0) {
-            out->slots[0].program = 0x1C;
+            out->slots[0].program = 28;
         }
-        if (this->moodTimer >= 0x1F5) {
+        if (this->moodTimer >= 501) {
             SceneNode__FaceTarget((SceneNode *)this, (SceneNode *)this->peer, 1, 0, 0);
         }
-        if (this->methods->distanceToPeer(this, this->peer) < 0x800) {
-            ((DreamSys *)this->peer)->methods->moveLocalZ((DreamSys *)this->peer, -0x800, 0);
+        if (this->methods->distanceToPeer(this, this->peer) < 2048) {
+            ((DreamSys *)this->peer)->methods->moveLocalZ((DreamSys *)this->peer, -2048, 0);
         }
-        dz = -0x14;
+        dz = -20;
     }
     this->methods->moveLocalZOrFindLink(this, dz, (void *)1);
     if (this->linkTarget != 0) {
-        this->methods->moveLocalY(this, -0xC8, 0);
+        this->methods->moveLocalY(this, -200, 0);
     }
 }
