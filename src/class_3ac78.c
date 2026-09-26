@@ -1,5 +1,7 @@
 /*
- * class_3ac78 -- the front half of Class866E8, the class whose method table is
+ * class_3ac78 -- TimedTask's last two functions (TimedTask__PlaySound and
+ * GetTimedTaskMethods, include/TimedTask.h; the rest are in class_39e08),
+ * then the front half of Class866E8, the class whose method table is
  * gClass866E8Methods (80 slots, header 0x114; tools/classtable.py gClass866E8Methods). It
  * derives from SceneNode (code_d294) through LightRig (include/LightRig.h,
  * gLightRigMethods: the three flat lights and the ambient colour), whose ctor
@@ -32,7 +34,7 @@
 #include "Class866E8.h"
 #include "VabStreamObj.h"
 #include "LightRig.h"
-#include "Class86668.h"
+#include "TimedTask.h"
 #include "DrawSystem.h"
 #include "Class6D940.h"
 #include "LinkResource.h"
@@ -42,10 +44,10 @@
 
 extern void *BMemPMgrAlloc(s32 size);
 
-/* Class86668::sound is BasicClass * (it may be the ctor's own argument); when
+/* TimedTask::sound is BasicClass * (it may be the ctor's own argument); when
  * it is a New_VabStreamObj object, +0x080 is VabStreamObj__PlayTone. */
 
-void Class86668__PlaySound(Class86668 *self, s32 tone) {
+void TimedTask__PlaySound(TimedTask *self, s32 tone) {
     VabStreamObj *sound = (VabStreamObj *)self->sound;
 
     if (sound != NULL) {
@@ -53,8 +55,8 @@ void Class86668__PlaySound(Class86668 *self, s32 tone) {
     }
 }
 
-Class86668Methods *GetClass86668Methods(void) {
-    return &gClass86668Methods;
+TimedTaskMethods *GetTimedTaskMethods(void) {
+    return &gTimedTaskMethods;
 }
 
 Class866E8 *New_Class866E8(Unk54Struct *origin, s32 autoLoad) {

@@ -9,7 +9,7 @@
 ## What it does
 
 The constructor (`ctor`, slot +0x008) for `NodeGuardedViewport`. Standard
-class-framework shape, same as e.g. class_39e08.c's `Class86668__Class86668`: chain
+class-framework shape, same as e.g. class_39e08.c's `TimedTask__TimedTask`: chain
 to a base class's ctor (fetched via `GetViewportMethods()`), install this
 class's own vtable, then call the just-installed vtable's own
 post-construct hook (slot +0x040, currently `NodeGuardedViewport__InitDefaults` -- already

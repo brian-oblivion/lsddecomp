@@ -8,12 +8,11 @@
  * Unit class_39e08: the methods of two classes, in ROM order.
  *  - Class865C8 (gClass865C8Methods, 0x1F230), New_Class865C8 through
  *    GetClass865C8Methods: include/Class865C8.h (track 4, round 88).
- *  - Class86668 (gClass86668Methods, 0x230), its parent, from
- *    New_Class86668 on: include/Class86668.h (track 4, round 84). Slots
- *    +0x058..+0x06C (NoOpSlot58, CheckTimeout, SetState, SetTimeout) sit at
- *    the same offsets in both tables and lie in ROM between Class86668's
- *    finalize and Class86668__PlaySound: they are Class86668 methods that
- *    Class865C8 inherits (round 73 head correction).
+ *  - TimedTask (gTimedTaskMethods, 0x230), its parent, New_TimedTask
+ *    through TimedTask__SetTimeout: include/TimedTask.h. Its last two
+ *    functions, TimedTask__PlaySound and GetTimedTaskMethods, open
+ *    class_3ac78. NoOpSlot58, CheckTimeout, SetState and SetTimeout are
+ *    TimedTask's own methods that Class865C8 inherits unchanged.
  * plus func_8004A070, called once from Class865C8's ctor and once from
  * code_1677c: it manages a pair of file-scope globals (D_8008A978/
  * D_8008A97C) and loops on RegisterFileTableEntries; nothing pins down
@@ -50,7 +49,7 @@ extern void TickDreamAuxSlots(void);
 
 /* MATCHED, src/code_39094.c (`char *GetSoundEffectDir(void)`): returns the
  * "SND\\SE" directory string pointer; Class865C8's ctor passes it as
- * Class86668's soundBankPath. */
+ * TimedTask's soundBankPath. */
 extern s32 GetSoundEffectDir(s32 arg1); /* arity-ok: the definition takes no parameter and reads no argument register, but this dead argument IS byte-load-bearing -- retail emits `move a0,zero` at 0x800496A8 ahead of the jal at 0x800496B0 */
 
 /* Matched in code_4cd08.c (still called `InitDreamAux` there, STALLED at

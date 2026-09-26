@@ -6,7 +6,7 @@
 
 This is the **canonical account of how the `New_X` epilogue-merge residue
 class was closed.** Four other reports point here:
-`New_Class865C8`, `New_Class86668` (class_39e08), `New_StreamTask`,
+`New_Class865C8`, `New_TimedTask` (class_39e08), `New_StreamTask`,
 `New_TaskCore` (code_2c054).
 
 ## What it does
@@ -71,7 +71,7 @@ Five instances closed in one pass, all byte-exact:
 | function | unit | words |
 | --- | --- | --- |
 | `New_Class866E8` | class_3ac78 | 27/27 |
-| `New_Class86668` | class_39e08 | 27/27 |
+| `New_TimedTask` | class_39e08 | 27/27 |
 | `New_Class865C8` | class_39e08 | 31/31 |
 | `New_StreamTask` | code_2c054 | 36/36 |
 | `New_TaskCore` | code_2c054 | 31/31 |

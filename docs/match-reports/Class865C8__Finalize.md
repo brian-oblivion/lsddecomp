@@ -50,11 +50,11 @@ lw    $a0, 0x44($s1)         ; self->unk44
 ...(same shape)...            ; self->unk44->methods->slot4(self->unk44), result discarded
 jal   TickDreamAuxSlots
  nop
-jal   GetClass86668Methods
+jal   GetTimedTaskMethods
  nop
-lw    $v0, 0xC($v0)          ; gClass86668Methods's own +0x00C
+lw    $v0, 0xC($v0)          ; gTimedTaskMethods's own +0x00C
 jalr  $v0
- addu $a0, $s1, $zero        ; GetClass86668Methods()->dtor(self)
+ addu $a0, $s1, $zero        ; GetTimedTaskMethods()->dtor(self)
 ...
 jr $ra
 ```
@@ -77,7 +77,7 @@ void Class865C8__Finalize(Obj865C8 *self) {
     self->unk48->methods->slot4(self->unk48);
     self->unk44->methods->slot4(self->unk44);
     TickDreamAuxSlots();
-    GetClass86668Methods()->dtor(self);
+    GetTimedTaskMethods()->dtor(self);
 }
 ```
 
@@ -111,8 +111,8 @@ only ever reads the struct field once per step. 74/74 on the rebuild.
 
 - `Class865C8Methods::dtor` (+0x00C) and `::slot14` (+0x014) typed (were
   untyped placeholders / grouped `void *` padding).
-- `Class86668Methods::dtor` added at +0x00C, typed from this function's own
-  `GetClass86668Methods()->dtor(self)` call — occupied by `Class86668__Finalize`
+- `TimedTaskMethods::dtor` added at +0x00C, typed from this function's own
+  `GetTimedTaskMethods()->dtor(self)` call — occupied by `TimedTask__Finalize`
   (already matched), the sibling class's own dtor override.
 - New opaque type `SubObjG`/`SubObjGMethods` — a self-consuming "step"
   object: `slot4` takes and returns the same type. Confirmed at SIX
@@ -154,8 +154,8 @@ original derivation, so the original reasoning stays intact and inspectable.)
 
 **Still no instance of "field name describes layout, not which function
 runs once `self->methods` is reassigned"** in this function — the dtor's
-`self->methods->slot14` call happens BEFORE `GetClass86668Methods()->dtor(self)`,
-and nothing here reassigns `self->methods` at all (unlike `Class86668__Class86668`'s
+`self->methods->slot14` call happens BEFORE `GetTimedTaskMethods()->dtor(self)`,
+and nothing here reassigns `self->methods` at all (unlike `TimedTask__TimedTask`'s
 ctor, which is the one confirmed instance so far, from the earlier round).
 Three functions in, reporting negative again as requested.
 
@@ -177,4 +177,4 @@ from memory each time it's used).
 
 ## Track 4 (2026-09-26, round 88, Class865C8)
 
-The class (table D_800865C8, id 0x1F230, Class86668's subclass) is unified as Class865C8 in include/Class865C8.h; the Obj865C8/Class865C8Methods views in class_39e08.h are gone. Renamed from Obj865C8__Dtor: the +0x00C finalize override (it ends in Class86668's finalize). SubObjG's slot4 is BasicClass's release, so the six `x = x->methods->slot4(x)` calls are `release`; slot14 is removeChild.
+The class (table D_800865C8, id 0x1F230, TimedTask's subclass) is unified as Class865C8 in include/Class865C8.h; the Obj865C8/Class865C8Methods views in class_39e08.h are gone. Renamed from Obj865C8__Dtor: the +0x00C finalize override (it ends in TimedTask's finalize). SubObjG's slot4 is BasicClass's release, so the six `x = x->methods->slot4(x)` calls are `release`; slot14 is removeChild.

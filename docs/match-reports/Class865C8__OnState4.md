@@ -18,4 +18,4 @@ An empty override, byte-exact by construction (`jr $ra` / `nop`). Never had its 
 
 ## Track 4 (2026-09-26, round 88, Class865C8)
 
-The class (table D_800865C8, id 0x1F230, Class86668's subclass) is unified as Class865C8 in include/Class865C8.h; the Obj865C8/Class865C8Methods views in class_39e08.h are gone. Renamed from Obj865C8__Noop7C: occupant of Class86668's +0x07C onState4 (setState(4) calls it), empty.
+The class (table D_800865C8, id 0x1F230, TimedTask's subclass) is unified as Class865C8 in include/Class865C8.h; the Obj865C8/Class865C8Methods views in class_39e08.h are gone. Renamed from Obj865C8__Noop7C: occupant of TimedTask's +0x07C onState4 (setState(4) calls it), empty.

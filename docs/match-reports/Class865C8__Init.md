@@ -33,13 +33,13 @@ lw    $a1, 0x10($v0)         ; (self->unk0C)->unk10
 lw    $v0, 0x110($v1)        ; methods->slot110
 jalr  $v0
  addu $a0, $s0, $zero        ; s0->methods->slot110(s0, self->unk0C->unk10)
-jal   GetClass86668Methods
+jal   GetTimedTaskMethods
  nop
 addu  $a0, $s1, $zero        ; self
 lw    $a1, 0xC($a0)          ; self->unk0C (passed as the RAW pointer, not deref'd)
-lw    $v0, 0x44($v0)         ; gClass86668Methods's own +0x044
+lw    $v0, 0x44($v0)         ; gTimedTaskMethods's own +0x044
 jalr  $v0
- addu $a2, $zero, $zero      ; GetClass86668Methods()->slot44(self, self->unk0C, 0)
+ addu $a2, $zero, $zero      ; GetTimedTaskMethods()->slot44(self, self->unk0C, 0)
 ...
 jr $ra
 ```
@@ -53,7 +53,7 @@ void Class865C8__Init(Obj865C8 *self) {
     sub->methods->slot10(sub, self->unk0C->unk4);
     sub->methods->slot10(sub, (s32)self->unk0C->unk8);
     sub->methods->slot110(sub, (s32)self->unk0C->unk10);
-    GetClass86668Methods()->slot44(self, (s32)self->unk0C, 0);
+    GetTimedTaskMethods()->slot44(self, (s32)self->unk0C, 0);
 }
 ```
 
@@ -63,8 +63,8 @@ void Class865C8__Init(Obj865C8 *self) {
 CURRENT committed source, not what compiled at the time this report was
 first written.)
 
-`GetClass86668Methods()->slot44` resolves to this unit's own `Class86668__Init`
-(`gClass86668Methods`'s +0x044, already matched: zeroes `self->unk28`, forwards to
+`GetTimedTaskMethods()->slot44` resolves to this unit's own `TimedTask__Init`
+(`gTimedTaskMethods`'s +0x044, already matched: zeroes `self->unk28`, forwards to
 the base's own slot44, returns `self->unk28`) — its `s32` return is discarded
 here.
 
@@ -73,8 +73,8 @@ here.
 Continues carving `Obj0C` (fields `unk8`, `unk10` added alongside the
 already-known `unk4`) and `SubObjDMethods` (`slot10` added alongside the
 already-known `slot14`/`slot110`), both established by `Class865C8__Deinit` in
-this same round. `Class86668Methods::slot44` added, typed `s32 (*)(Obj865C8
-*self, s32 arg1, s32 arg2)` from `Class86668__Init`'s own established
+this same round. `TimedTaskMethods::slot44` added, typed `s32 (*)(Obj865C8
+*self, s32 arg1, s32 arg2)` from `TimedTask__Init`'s own established
 signature.
 
 ## Attempts
@@ -104,8 +104,8 @@ this function was reconfirmed at 41/41 after the change.
 
 ## Naming
 
-`Class865C8__Init` -- tier B. Occupies +0x044 -- compared against `gIntermediateBaseMethods`'s own +0x044 slot, which forwards to `IntermediateBase__Init` (code_2cc8c.h), the established base-class Init slot at this exact offset. This override configures the `subD` sub-object and forwards to the sibling class's own +0x044 (`Class86668__Init`); what 'init' accomplishes for THIS class beyond that is not established.
+`Class865C8__Init` -- tier B. Occupies +0x044 -- compared against `gIntermediateBaseMethods`'s own +0x044 slot, which forwards to `IntermediateBase__Init` (code_2cc8c.h), the established base-class Init slot at this exact offset. This override configures the `subD` sub-object and forwards to the sibling class's own +0x044 (`TimedTask__Init`); what 'init' accomplishes for THIS class beyond that is not established.
 
 ## Track 4 (2026-09-26, round 88, Class865C8)
 
-The class (table D_800865C8, id 0x1F230, Class86668's subclass) is unified as Class865C8 in include/Class865C8.h; the Obj865C8/Class865C8Methods views in class_39e08.h are gone. Prefix only. Now returns s32 (the parent init's result, `return GetClass86668Methods()->init(...)`), byte-identical: the slot is s32 and PollStatusObj switches on it. It takes self alone, unlike the slot's (self, args, mode); the slot keeps IntermediateBase's type and PollStatusObj calls through Class865C8InitFn.
+The class (table D_800865C8, id 0x1F230, TimedTask's subclass) is unified as Class865C8 in include/Class865C8.h; the Obj865C8/Class865C8Methods views in class_39e08.h are gone. Prefix only. Now returns s32 (the parent init's result, `return GetTimedTaskMethods()->init(...)`), byte-identical: the slot is s32 and PollStatusObj switches on it. It takes self alone, unlike the slot's (self, args, mode); the slot keeps IntermediateBase's type and PollStatusObj calls through Class865C8InitFn.

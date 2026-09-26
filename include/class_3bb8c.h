@@ -119,8 +119,8 @@ extern s32 D_800869CC[3];
 /* -------------------------------------------------------------------
  * class_3bb8c_c additions below. Small sibling classes, each built by
  * its own New_X/ctor pair (allocator + base-chain + own-vtable-set, the
- * same shape as Class86668__Class86668 in class_39e08.c). Named by their
- * vtable's address, same convention as Class866E8/Class86668. The first
+ * same shape as TimedTask__TimedTask in class_39e08.c). Named by their
+ * vtable's address, same convention as Class866E8/TimedTask. The first
  * of them, NodeGuardedViewport (gNodeGuardedViewportMethods, a Viewport), is defined in
  * include/NodeGuardedViewport.h (round 87, track 4).
  * ------------------------------------------------------------------- */

@@ -12,14 +12,14 @@
 `include/class_3bb8c.h` for the full derivation). This function registers a
 callback with some other object (`arg1->unkC`, an unidentified
 "registrant" class reached only here), stashes `arg2` into `self->unk3C`,
-forwards to the shared BasicClass-family base accessor `GetClass86668Methods()`'s
+forwards to the shared BasicClass-family base accessor `GetTimedTaskMethods()`'s
 slot `+0x44`, then calls its own `slot10`.
 
 ```c
 void ObjM__AttachTarget(Obj87034_3bb8c_l *self, Obj87034_3bb8c_l *arg1, s32 arg2) {
     arg1->unkC->methods->slotC8(arg1->unkC, ObjM__OnRegistrantEvent, self);
     self->unk3C = (DreamSysObj_3bb8c_l *)arg2;
-    GetClass86668Methods()->slot44(self, arg1, 1);
+    GetTimedTaskMethods()->slot44(self, arg1, 1);
     self->methods->slot10(self, arg2);
 }
 ```

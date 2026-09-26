@@ -19,12 +19,12 @@ jr $ra
 
 A two-field setter, both `s32` (plain `sw`, no shift/sign-extend). Field
 offsets and the `Class866E8` type come from `include/class_3ac78.h`
-(established this round; see `Class86668__PlaySound.md` for how the class was
+(established this round; see `TimedTask__PlaySound.md` for how the class was
 identified via `tools/classtable.py gClass866E8Methods`).
 
 ## Proposed learning
 
-None beyond what's already documented for `Class866E8` in `Class86668__PlaySound.md`.
+None beyond what's already documented for `Class866E8` in `TimedTask__PlaySound.md`.
 
 ## Naming
 

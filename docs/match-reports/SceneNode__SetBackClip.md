@@ -34,7 +34,7 @@ sltiu $v0, $v0, 0x1       # result = (raw == 0)
 
 Note: `include/class_3ac78.h` documents an UNRELATED cross-unit call that
 also names this symbol `SceneNode__SetBackClip` but through a different table
-(`Class86668::unk34`) with a 4-argument `(self, arg1, arg2, arg3)` shape at
+(`TimedTask::unk34`) with a 4-argument `(self, arg1, arg2, arg3)` shape at
 its own local slot `+0x080`. That's the same "same code address, different
 argument count per call site" precedent already established for
 `GetSceneNodeMethods` elsewhere in this unit -- it does not affect this unit's own

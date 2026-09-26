@@ -19,7 +19,7 @@ ItemListMethods *GetItemListMethods(void)
 ## Notes
 
 A plain no-argument accessor returning `&gItemListMethods`, the same shape as
-`GetClass86668Methods`/`gClass86668Methods` documented elsewhere in this project (base
+`GetTimedTaskMethods`/`gTimedTaskMethods` documented elsewhere in this project (base
 class table getters). `gItemListMethods` is this unit's own class's vtable
 (39 slots, `tools/classtable.py gItemListMethods`); the words at `+0x054`,
 `+0x058`, `+0x07C`..`+0x09C` of that table are this unit's own
@@ -30,4 +30,4 @@ matched this round. Matched first attempt.
 
 Round 75 (bravo, track 3). `func_80052B60` -> `GetItemListMethods`, **tier A**.
 
-Returns &gItemListMethods. Used as the ctor table by New_ItemList and ItemList__ItemList (class_3bb8c_j). Named like GetClass86668Methods/GetObjMMethods.
+Returns &gItemListMethods. Used as the ctor table by New_ItemList and ItemList__ItemList (class_3bb8c_j). Named like GetTimedTaskMethods/GetObjMMethods.

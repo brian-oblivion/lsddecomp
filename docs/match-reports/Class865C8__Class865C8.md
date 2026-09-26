@@ -16,13 +16,13 @@ addu  $a0, $zero, $zero
 sw    $ra, 0x34($sp)
 jal   GetSoundEffectDir
  sw   $s0, 0x20($sp)
-jal   GetClass86668Methods
+jal   GetTimedTaskMethods
  addu $s0, $v0, $zero          ; s0 = GetSoundEffectDir(0)'s return
 addu  $a0, $s1, $zero
 addu  $a1, $s0, $zero
-lw    $v0, 0x8($v0)            ; gClass86668Methods's own ctor slot
+lw    $v0, 0x8($v0)            ; gTimedTaskMethods's own ctor slot
 jalr  $v0
- addu $a2, $zero, $zero        ; GetClass86668Methods()->ctor(self, s0, NULL)
+ addu $a2, $zero, $zero        ; GetTimedTaskMethods()->ctor(self, s0, NULL)
 jal   GetClass865C8Methods
  nop
 jal   InitDreamAux
@@ -105,7 +105,7 @@ void Class865C8__Class865C8(Obj865C8 *self, Obj0C *arg1, SubObjD *arg2, s32 arg3
     LoadRequest req;
     s32 tmp;
 
-    GetClass86668Methods()->ctor(self, GetSoundEffectDir(0), 0);
+    GetTimedTaskMethods()->ctor(self, GetSoundEffectDir(0), 0);
     self->methods = GetClass865C8Methods();
     InitDreamAux();
     self->unk44 = New_TimImage(D_800113EC);
@@ -134,19 +134,19 @@ void Class865C8__Class865C8(Obj865C8 *self, Obj0C *arg1, SubObjD *arg2, s32 arg3
 
 Attempt 1 wrote the comparison as `arg3 < 1` on the plain `s32` parameter,
 which compiles to `slti` (signed). Retail uses `sltiu` (unsigned) — same
-opcode-family residue already seen this round on `Class86668__CheckTimeout`. Cast the
+opcode-family residue already seen this round on `TimedTask__CheckTimeout`. Cast the
 comparison's operand: `(u32)arg3 < 1`. 106/107 -> 107/107, no other change
 needed anywhere in this 107-word function.
 
 ## Shape notes
 
-- This ctor delegates to the SIBLING class's own ctor (`GetClass86668Methods()->
-  ctor`, i.e. `Class86668__Class86668`) for shared base construction FIRST — same
+- This ctor delegates to the SIBLING class's own ctor (`GetTimedTaskMethods()->
+  ctor`, i.e. `TimedTask__TimedTask`) for shared base construction FIRST — same
   "override calls base impl via the other table" pattern already documented
   for the dtor (`Class865C8__Finalize`) and several slot forwarders this round —
   then immediately re-asserts `self->methods = GetClass865C8Methods()` (`&
   gClass865C8Methods`, this class's REAL vtable), overwriting what the delegated
-  ctor had just set to `&gClass86668Methods`. Two `self->methods` writes in one
+  ctor had just set to `&gTimedTaskMethods`. Two `self->methods` writes in one
   function, back to back, both legitimate.
 - `arg1` (this function's own 2nd parameter, `Obj0C *`) is both stored
   wholesale into `self->unk0C` AND has its OWN sub-fields (`unk8`, `unkC`,
@@ -232,7 +232,7 @@ after both writes have settled to the FINAL value (`&gClass865C8Methods`,
 `GetClass865C8Methods()`'s return), so every actual dispatch through
 `self->methods` in this function sees the same, final table. Six functions
 into this round, reporting negative consistently. The one confirmed
-instance remains `Class86668__Class86668`'s ctor from the earlier round (where a
+instance remains `TimedTask__TimedTask`'s ctor from the earlier round (where a
 call through `self->methods` genuinely DOES happen between the
 reassignment and the read, resolving to the overridden implementation).
 
@@ -271,4 +271,4 @@ occupant TimImage__Upload) through `TimImageUploadFn`, +0x05C is
 
 ## Track 4 (2026-09-26, round 88, Class865C8)
 
-The class (table D_800865C8, id 0x1F230, Class86668's subclass) is unified as Class865C8 in include/Class865C8.h; the Obj865C8/Class865C8Methods views in class_39e08.h are gone. Renamed from Obj865C8__Obj865C8. Accessors now use the parent's names: unk0C -> initArgs, Obj0C::unk8/unkC/unk10 -> IntermediateBaseInitArgs unk8/unkC/viewport, subB -> sound, slot10 -> addChild, resetState -> resetCounters. Own fields named from this body: dreamSys (+0x038, arg2), etcTim (+0x044, New_TimImage("ETC\ETC.TIM"), TimImage *), dreamerTmd (+0x048, New_LinkResource("ETC\DREAMER.TMD")), bgm (+0x040, New_WBgm, WBgm *; the WBgm runner's proposal in New_WBgm.md). Byte-identical.
+The class (table D_800865C8, id 0x1F230, TimedTask's subclass) is unified as Class865C8 in include/Class865C8.h; the Obj865C8/Class865C8Methods views in class_39e08.h are gone. Renamed from Obj865C8__Obj865C8. Accessors now use the parent's names: unk0C -> initArgs, Obj0C::unk8/unkC/unk10 -> IntermediateBaseInitArgs unk8/unkC/viewport, subB -> sound, slot10 -> addChild, resetState -> resetCounters. Own fields named from this body: dreamSys (+0x038, arg2), etcTim (+0x044, New_TimImage("ETC\ETC.TIM"), TimImage *), dreamerTmd (+0x048, New_LinkResource("ETC\DREAMER.TMD")), bgm (+0x040, New_WBgm, WBgm *; the WBgm runner's proposal in New_WBgm.md). Byte-identical.

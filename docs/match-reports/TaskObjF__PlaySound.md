@@ -56,7 +56,7 @@ None new.
 
 `TaskObjF__PlaySound` (was `func_8004FFF4`), tier B: forwards
 `(self->unk6C, arg1, 0x7F, 0x7F)` to `self->unk6C`'s own vtable slot,
-the exact call shape of the already-named `Class86668__SetChildFlag8` (renamed `Class86668__PlaySound` in round 84)
+the exact call shape of the already-named `TimedTask__SetChildFlag8` (renamed `TimedTask__PlaySound` in round 84)
 (`src/class_3ac78.c`: `sub->methods->setFlag8(sub, value, 0x7F, 0x7F)`,
 that slot itself named `SceneNode__SetBackClip`) -- same argument
 count, same two trailing literals. Named by analogy to that established
@@ -65,4 +65,4 @@ means here, so kept at tier B rather than A.
 
 ## Track 4 (2026-09-26, round 89)
 
-Renamed from `TaskObjF__SetChildFlag8`. The field it calls (+0x06C, was `childC`) is set only by TaskObjF__Init's 7th argument, and Init's one caller, Class86B60__BeginMemcardSave, passes `self->sound` (TaskCore's VabStreamObj, include/TaskCore.h). +0x080 of that table is `playTone(index, vol, endVol)` (include/VabStreamObj.h), called here with (index, 0x7F, 0x7F): the same shape and the same rename as `Class86668__PlaySound` (round 84). Callers: TaskObjF__AdvanceState (index 0 and 0x10), TaskObjF__ForceIdleFromState (0x10), through slot +0x08C.
+Renamed from `TaskObjF__SetChildFlag8`. The field it calls (+0x06C, was `childC`) is set only by TaskObjF__Init's 7th argument, and Init's one caller, Class86B60__BeginMemcardSave, passes `self->sound` (TaskCore's VabStreamObj, include/TaskCore.h). +0x080 of that table is `playTone(index, vol, endVol)` (include/VabStreamObj.h), called here with (index, 0x7F, 0x7F): the same shape and the same rename as `TimedTask__PlaySound` (round 84). Callers: TaskObjF__AdvanceState (index 0 and 0x10), TaskObjF__ForceIdleFromState (0x10), through slot +0x08C.

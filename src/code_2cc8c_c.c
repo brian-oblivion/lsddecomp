@@ -4,7 +4,7 @@
  * After TaskCore's TaskCore__GetActiveSlotCount and the two getters come
  * IntermediateBase's own methods, the ctor through OnState3 and its getter
  * Get_vtable_IntermediateBase (class id 0x30, gIntermediateBaseMethods, the
- * parent of TaskCore and Class86668). The class is declared once, in
+ * parent of TaskCore and TimedTask). The class is declared once, in
  * include/IntermediateBase.h, whose banner says what it does (track 4,
  * round 82); these functions take `IntermediateBase *self`.
  *

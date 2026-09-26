@@ -18,13 +18,13 @@ sw    $s0, 0x10($sp)
 addu  $s0, $a1, $zero        ; s0 = arg1
 sw    $s2, 0x18($sp)
 sw    $ra, 0x1C($sp)
-jal   GetClass86668Methods
+jal   GetTimedTaskMethods
  addu $s2, $a2, $zero        ; s2 = arg2
 addu  $a0, $s1, $zero
 addu  $a1, $s0, $zero
-lw    $v0, 0x54($v0)         ; gClass86668Methods's own +0x054
+lw    $v0, 0x54($v0)         ; gTimedTaskMethods's own +0x054
 jalr  $v0
- addu $a2, $s2, $zero        ; GetClass86668Methods()->slot54(self, arg1, arg2), return discarded
+ addu $a2, $s2, $zero        ; GetTimedTaskMethods()->slot54(self, arg1, arg2), return discarded
 ori   $v0, $zero, 0x2
 bne   $s2, $v0, END          ; if (arg2 != 2) goto END
  nop
@@ -98,7 +98,7 @@ extern void Class865C8__StartObjM(Obj865C8 *self, s32 arg1);
 void Class865C8__AdvancePhase(Obj865C8 *self, s32 arg1, s32 arg2) {
     s32 result;
 
-    GetClass86668Methods()->slot54(self, arg1, arg2);
+    GetTimedTaskMethods()->slot54(self, arg1, arg2);
     if (arg2 == 2 && self->unk3C != arg2) {
         switch (self->unk3C) {
         case 1:
@@ -186,7 +186,7 @@ double-branch tail, or vice versa:
 
 ## New struct knowledge (`include/class_39e08.h`)
 
-- `Class86668Methods::slot54` added — inherited, shared verbatim with
+- `TimedTaskMethods::slot54` added — inherited, shared verbatim with
   `gClass865C8Methods`'s own occupant of this slot (this function itself); the
   sibling's own occupant is `IntermediateBase__OnTag1Notify`, out of this unit's scope.
 - `SubObjDMethods` extended with `slot1B4` (`s32 (*)(SubObjD *self)`,
@@ -205,7 +205,7 @@ double-branch tail, or vice versa:
 **Still no instance of "field name describes layout, not which function
 runs once `self->methods` is reassigned"** — no vtable-pointer reassignment
 anywhere in this function. Five functions into this round now, reporting
-negative consistently; the one confirmed instance remains `Class86668__Class86668`'s
+negative consistently; the one confirmed instance remains `TimedTask__TimedTask`'s
 ctor from the earlier round.
 
 **New, well-tested lever worth generalizing:** for a small dense-ish switch
@@ -230,4 +230,4 @@ the visible cases is itself informative about a missing empty case.
 
 ## Track 4 (2026-09-26, round 88, Class865C8)
 
-The class (table D_800865C8, id 0x1F230, Class86668's subclass) is unified as Class865C8 in include/Class865C8.h; the Obj865C8/Class865C8Methods views in class_39e08.h are gone. Renamed from Obj865C8__AdvanceState (the field is `phase`, see Class865C8__ResetPhase). +0x054 onTag1Notify override: runs the base's, then on event 2 moves phase 1 (startDay) or 3 (release the old objM, getCurrentStage) to 2 through StartObjM. eventCode is Class86668's `result`; onEventArg is setState.
+The class (table D_800865C8, id 0x1F230, TimedTask's subclass) is unified as Class865C8 in include/Class865C8.h; the Obj865C8/Class865C8Methods views in class_39e08.h are gone. Renamed from Obj865C8__AdvanceState (the field is `phase`, see Class865C8__ResetPhase). +0x054 onTag1Notify override: runs the base's, then on event 2 moves phase 1 (startDay) or 3 (release the old objM, getCurrentStage) to 2 through StartObjM. eventCode is TimedTask's `result`; onEventArg is setState.

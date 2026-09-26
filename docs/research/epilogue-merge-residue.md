@@ -16,7 +16,7 @@ Corrections are inline.
 ## The shape
 
 Every instance is a `New_X` class allocator. Canonical form, from
-`New_Class86668` (class_39e08):
+`New_TimedTask` (class_39e08):
 
 ```
     ori   $a0, $zero, 0x38          ; sizeof the instance
@@ -106,7 +106,7 @@ Roughly 25 build-and-diff attempts across five functions and four units:
 - `New_Class6D3C8` (code_1677c, 23/24) — 14+ attempts. `if`/`goto` reshaping
   both directions, `__asm__("")` in every position, `volatile`.
 - `Pad__DispatchEvents` (two broadcast instances).
-- `New_Class86668` (class_39e08, 26/27) — runner: `__asm__("")` after the malloc;
+- `New_TimedTask` (class_39e08, 26/27) — runner: `__asm__("")` after the malloc;
   early return. Head: result variable (0/27); comma-ternary (16/27).
 - `New_Class866E8` (class_3ac78, 26/27) — 5 reshapes, two with size regressions.
 
@@ -138,7 +138,7 @@ PY
 
 | where | instances |
 | --- | --- |
-| carved, queued now | **5** — `New_Class865C8`, `New_Class86668` (class_39e08); `New_Class866E8` (class_3ac78); `New_StreamTask`, `New_TaskCore` (code_2c054) |
+| carved, queued now | **5** — `New_Class865C8`, `New_TimedTask` (class_39e08); `New_Class866E8` (class_3ac78); `New_StreamTask`, `New_TaskCore` (code_2c054) |
 | `class_3bb8c` (uncarved) | 11 |
 | `code_2cc8c` (uncarved) | 4 |
 | `code_179d8` (uncarved) | 3 |
@@ -151,7 +151,7 @@ yet, so `progress.py` counts them FRESH; they are not.
 ## What survived, and what to do now
 
 **Do not run a permuter on this.** The recommendation that used to stand here —
-permute `New_Class86668` or `New_Class866E8` — was based on the false
+permute `New_TimedTask` or `New_Class866E8` — was based on the false
 discriminator above. Both matched by hand, first attempt, once the statement
 order was the thing being varied.
 
@@ -162,7 +162,7 @@ Five instances, all byte-exact, all with `return NULL;` last:
 | function | unit | words |
 | --- | --- | --- |
 | `New_Class866E8` | class_3ac78 | 27/27 |
-| `New_Class86668` | class_39e08 | 27/27 |
+| `New_TimedTask` | class_39e08 | 27/27 |
 | `New_Class865C8` | class_39e08 | 31/31 |
 | `New_StreamTask` | code_2c054 | 36/36 |
 | `New_TaskCore` | code_2c054 | 31/31 |

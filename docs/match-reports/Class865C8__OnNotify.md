@@ -16,13 +16,13 @@ sw    $s0, 0x10($sp)
 addu  $s0, $a1, $zero        ; s0 = arg1
 sw    $s2, 0x18($sp)
 sw    $ra, 0x1C($sp)
-jal   GetClass86668Methods
+jal   GetTimedTaskMethods
  addu $s2, $a2, $zero        ; s2 = arg2
 addu  $a0, $s1, $zero
 addu  $a1, $s0, $zero
-lw    $v0, 0x38($v0)         ; gClass86668Methods's own +0x038
+lw    $v0, 0x38($v0)         ; gTimedTaskMethods's own +0x038
 jalr  $v0
- addu $a2, $s2, $zero        ; GetClass86668Methods()->slot38(self, arg1, arg2)
+ addu $a2, $s2, $zero        ; GetTimedTaskMethods()->slot38(self, arg1, arg2)
 lw    $v0, 0x0($s0)          ; arg1->target
 nop
 lw    $a0, 0x0($v0)          ; arg1->target->header
@@ -61,7 +61,7 @@ jr $ra
 void Class865C8__OnNotify(Obj865C8 *self, EventArg *arg1, s32 arg2) {
     s32 tag;
 
-    GetClass86668Methods()->slot38(self, arg1, arg2);
+    GetTimedTaskMethods()->slot38(self, arg1, arg2);
     tag = arg1->target->header;
     if ((tag & 0xFFFF) == 0x1F34) {
         self->methods->slot80(self, arg1, arg2);
@@ -80,10 +80,10 @@ void Class865C8__OnNotify(Obj865C8 *self, EventArg *arg1, s32 arg2) {
   down as two separate objects, not a single struct with a field at a
   larger offset.
 - `Class865C8Methods::slot38` typed (was an untyped `void *`, this
-  function's own slot). `Class86668Methods::slot38` added (the sibling's
+  function's own slot). `TimedTaskMethods::slot38` added (the sibling's
   inherited occupant, `IntermediateBase__OnNotify`, out of this unit's scope) — same
   signature, needed because this function calls through THAT table via
-  `GetClass86668Methods()`, not its own.
+  `GetTimedTaskMethods()`, not its own.
 - **`Class865C8Methods::slot80` and `::slot84` retyped** from `void
   (*noop80)(void)` / opaque `void *slot84` to `void (*)(Obj865C8 *self,
   EventArg *arg1, s32 arg2)`. This is the significant correction: `slot80`
@@ -127,4 +127,4 @@ the full signature before trusting an empty-body occupant's parameter count.
 
 ## Track 4 (2026-09-26, round 88, Class865C8)
 
-The class (table D_800865C8, id 0x1F230, Class86668's subclass) is unified as Class865C8 in include/Class865C8.h; the Obj865C8/Class865C8Methods views in class_39e08.h are gone. Prefix only. Its sender argument is typed BasicClass * (EventArg/HeaderObj were BasicClass/BasicClassMethods::header views): the two tags it tests are 0x1F34 (DreamSys) and 0x2F230 (gObjMMethods, the ObjM this class builds), so the slots it dispatches to are named onDreamSysNotify (+0x080) and onObjMNotify (+0x084).
+The class (table D_800865C8, id 0x1F230, TimedTask's subclass) is unified as Class865C8 in include/Class865C8.h; the Obj865C8/Class865C8Methods views in class_39e08.h are gone. Prefix only. Its sender argument is typed BasicClass * (EventArg/HeaderObj were BasicClass/BasicClassMethods::header views): the two tags it tests are 0x1F34 (DreamSys) and 0x2F230 (gObjMMethods, the ObjM this class builds), so the slots it dispatches to are named onDreamSysNotify (+0x080) and onObjMNotify (+0x084).

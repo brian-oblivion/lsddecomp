@@ -8,11 +8,11 @@
  * BasicClass subclass that runs one attached job to a result. Methods in
  * src/code_2cc8c_c.c. Two classes derive from it (`typeviews.py --tree`):
  * TaskCore (0x130, gTaskCoreMethods: StreamTask, Class86B60, GraphRoom
- * below it) and Class86668 (0x230: gClass865C8Methods's Class865C8 and gObjMMethods's ObjM
+ * below it) and TimedTask (0x230: gClass865C8Methods's Class865C8 and gObjMMethods's ObjM
  * below it). It is abstract: +0x04C, +0x050 and +0x058 are NULL in its own
  * table, and init/deinit call the first two. It has no allocator; the object
  * is 0x28 bytes because both subclasses' own fields start at +0x028
- * (Class86668's result, the +0x028 TaskCore__Reset sets).
+ * (TimedTask's result, the +0x028 TaskCore__Reset sets).
  *
  * init(args, mode) keeps `args`, adds args->unk0, args->unk4 and the +0x010
  * helper as children, runs onInit and records `mode`. With mode 0 it also
@@ -21,7 +21,7 @@
  * and releases whatever init created itself. Callers construct an object,
  * call init and use what it RETURNS (Class6D3C8__RunPollTask,
  * Class6D3C8__PollStatusObj); the subclass overrides return a result field
- * (Class86668__Init: +0x028 result; TaskCore__Init: +0x038 result).
+ * (TimedTask__Init: +0x028 result; TaskCore__Init: +0x038 result).
  *
  * onNotify splits by the SENDER's root class nibble, as SceneNode's does:
  * a gDrawSystemMethods (1) goes to onTag1Notify, a Pad (2) to onPadEvent, a

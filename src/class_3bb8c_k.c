@@ -16,7 +16,7 @@
 #include "common.h"
 #include "class_3bb8c.h"
 #include "class_39e08.h"
-#include "Class86668.h"
+#include "TimedTask.h"
 #include "TextRow.h"
 #include "TimImage.h"
 #include "ItemList.h"
@@ -359,7 +359,7 @@ ObjM *New_ObjM(BasicClass *sound, struct WBgm *bgm, TimImage *etcTim,
 
 void ObjM__ObjM(ObjM *self, BasicClass *sound, struct WBgm *bgm, TimImage *etcTim,
                 struct LinkResource *dreamerTmd, s32 stage) {
-    GetClass86668Methods()->ctor((Class86668 *)self, 0, sound);
+    GetTimedTaskMethods()->ctor((TimedTask *)self, 0, sound);
     self->methods = GetObjMMethods();
     self->unk64 = 0;
     self->inSession = 0;
@@ -375,13 +375,13 @@ void ObjM__ObjM(ObjM *self, BasicClass *sound, struct WBgm *bgm, TimImage *etcTi
 }
 
 void ObjM__Finalize(ObjM *self) {
-    GetClass86668Methods()->finalize((Class86668 *)self);
+    GetTimedTaskMethods()->finalize((TimedTask *)self);
 }
 
 void ObjM__OnNotify(ObjM *self, BasicClass *sender, s32 event) {
     s32 tag;
 
-    GetClass86668Methods()->onNotify((Class86668 *)self, sender, event);
+    GetTimedTaskMethods()->onNotify((TimedTask *)self, sender, event);
     tag = sender->methods->header;
     if ((tag & 0xFFF) == 0x114) {
         self->methods->onClass866E8Notify(self, sender, event);

@@ -41,4 +41,4 @@ None beyond what's already documented for this residue-free shape.
 
 ## Track 4 (2026-09-26, round 88, Class865C8)
 
-The class (table D_800865C8, id 0x1F230, Class86668's subclass) is unified as Class865C8 in include/Class865C8.h; the Obj865C8/Class865C8Methods views in class_39e08.h are gone. Renamed from Obj865C8__ResetState. The field is `phase` (+0x03C): IntermediateBase already names +0x020 `state`, a different field. This is the +0x040 resetCounters override and clears only phase. Tier A.
+The class (table D_800865C8, id 0x1F230, TimedTask's subclass) is unified as Class865C8 in include/Class865C8.h; the Obj865C8/Class865C8Methods views in class_39e08.h are gone. Renamed from Obj865C8__ResetState. The field is `phase` (+0x03C): IntermediateBase already names +0x020 `state`, a different field. This is the +0x040 resetCounters override and clears only phase. Tier A.

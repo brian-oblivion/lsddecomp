@@ -10,13 +10,13 @@
 ```c
 void ObjM__DetachTarget(Obj87034_3bb8c_l *self) {
     self->methods->slot14(self, self->unk3C);
-    GetClass86668Methods()->slot48(self);
+    GetTimedTaskMethods()->slot48(self);
 }
 ```
 
 Straight-line: dispatch through `self`'s own vtable slot `+0x14`, then
 through the shared BasicClass-family base table's slot `+0x48` (via
-`GetClass86668Methods()`, the same accessor `ObjM__AttachTarget` uses at a different
+`GetTimedTaskMethods()`, the same accessor `ObjM__AttachTarget` uses at a different
 slot). No branches, matched on the first correctly-typed attempt.
 
 ## Notes

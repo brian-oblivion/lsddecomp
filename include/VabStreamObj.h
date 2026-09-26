@@ -28,7 +28,7 @@
  * index & 0xF, at the tone's centre note plus `pitchOffset`. It returns the
  * voice, or -1. stopVoice(voice) keys one voice off, or all voices when
  * voice >= 24. The holders keep the object as whatever their own field type
- * is (TaskCore::sound, Class86668::sound, DreamSys::soundObj, WBgm::vab) and
+ * is (TaskCore::sound, TimedTask::sound, DreamSys::soundObj, WBgm::vab) and
  * cast to VabStreamObj * where they call through it. The SoundCueSet queue
  * (InitSoundCueSet/FlushSoundCueSet/ServiceSoundCueSet) takes this object
  * as its first argument, but those are free functions, not methods.

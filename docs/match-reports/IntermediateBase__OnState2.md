@@ -10,7 +10,7 @@
 
 A shared "base-class" method, reached through `Obj86B60Methods::slot64`
 -- and, per `include/class_39e08.h`'s own note on an UNRELATED class
-(`Obj865C8Methods`/`Class86668Methods` both list `IntermediateBase__OnState2` at their
+(`Obj865C8Methods`/`TimedTaskMethods` both list `IntermediateBase__OnState2` at their
 own `+0x064`), this function is genuinely shared across multiple otherwise-
 unrelated classes at the same vtable slot, not something `Obj86B60`
 introduces itself.

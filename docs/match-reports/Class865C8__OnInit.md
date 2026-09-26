@@ -103,7 +103,7 @@ void Class865C8__OnInit(Obj865C8 *self) {
   *self, s32 arg1)`) — what `slot0xAC` returns.
 - Two new rodata symbol externs, `D_80086650`/`D_8008665C` (`extern u8 [];`,
   address-only, real element type unknown) — both sit just before this
-  unit's own `gClass86668Methods` vtable in memory (0x18 and 0xC bytes before it
+  unit's own `gTimedTaskMethods` vtable in memory (0x18 and 0xC bytes before it
   respectively), passed straight through to `slot70` without dereferencing.
 
 ## Header mechanics note (not a match residue, just a C89 trap)
@@ -150,4 +150,4 @@ forward-declared struct bodies as a bare `struct X { ... };`, never repeat
 
 ## Track 4 (2026-09-26, round 88, Class865C8)
 
-The class (table D_800865C8, id 0x1F230, Class86668's subclass) is unified as Class865C8 in include/Class865C8.h; the Obj865C8/Class865C8Methods views in class_39e08.h are gone. Renamed from Obj865C8__StartSubA: it is the +0x04C onInit override (IntermediateBase__Init calls it). subA was IntermediateBase's viewport (+0x018), which holds the NodeGuardedViewport the ctor made, and SubObjA's slots are Viewport's: setScreenSize, getSubHandle (then SceneNode setDisplay(1)), setUnk44(0x4B0), attachViewChild(dreamSys, &D_80086650, &D_8008665C, NULL), initOt. It takes self alone; the slot keeps (self, s32, s32, s32).
+The class (table D_800865C8, id 0x1F230, TimedTask's subclass) is unified as Class865C8 in include/Class865C8.h; the Obj865C8/Class865C8Methods views in class_39e08.h are gone. Renamed from Obj865C8__StartSubA: it is the +0x04C onInit override (IntermediateBase__Init calls it). subA was IntermediateBase's viewport (+0x018), which holds the NodeGuardedViewport the ctor made, and SubObjA's slots are Viewport's: setScreenSize, getSubHandle (then SceneNode setDisplay(1)), setUnk44(0x4B0), attachViewChild(dreamSys, &D_80086650, &D_8008665C, NULL), initOt. It takes self alone; the slot keeps (self, s32, s32, s32).

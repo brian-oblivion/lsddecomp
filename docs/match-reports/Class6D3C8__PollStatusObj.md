@@ -262,7 +262,7 @@ The "StatusObj" is Class865C8 (gClass865C8Methods, include/Class865C8.h):
 `obj->methods->release(obj)`: slot +0x044 is IntermediateBase's
 `init(self, args, mode)`, and Class865C8's occupant, `Class865C8__Init`,
 takes self alone, so the call keeps passing only `$a0` through a typedef of
-the override (a pointer cast, no code). The status code is Class86668's
+the override (a pointer cast, no code). The status code is TimedTask's
 `result`: 2 and 3 are values `Class865C8__OnObjMNotify` sets when the ObjM
 it built ends the day (`endDay` returned 0 with a cinematic entry: 2;
 `endDay` failed, or events 0xC/0xD: 3). Byte-identical.

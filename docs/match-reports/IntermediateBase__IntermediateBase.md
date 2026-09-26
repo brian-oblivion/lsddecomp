@@ -42,7 +42,7 @@ void IntermediateBase__IntermediateBase(Obj86B60 *self)
   `IntermediateBase__ResetCounters`, already matched elsewhere in this unit.
 - The explicit cast `(Obj86B60Methods *)Get_vtable_IntermediateBase()` mirrors
   `src/class_39e08.c`'s own `self->methods = (Class865C8Methods *)
-  GetClass86668Methods();` -- assigning a shared/generic table getter's return
+  GetTimedTaskMethods();` -- assigning a shared/generic table getter's return
   into a locally-typed `methods` field is an established idiom in this
   codebase, not a workaround.
 
