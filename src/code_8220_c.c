@@ -263,8 +263,8 @@ void *SubmitPolyGT4(void *prim, void *ctx) {
 }
 
 /* Called twice, once per arity, from the render-context setup in
- * code_8220_b (`InitVtxRecordPtrs(ctx + 0x88, gDivPolygon3, 3)`,
- * `InitVtxRecordPtrs(ctx + 0x94, gDivPolygon4, 4)`): writes a
+ * code_8220_b (`InitDivPolygonPtrs(ctx + 0x88, gDivPolygon3, 3)`,
+ * `InitDivPolygonPtrs(ctx + 0x94, gDivPolygon4, 4)`): writes a
  * running pointer through `table`'s own per-vertex records (stride 0x18,
  * starting at `table + 0x18`) into two parallel arrays -- `dst[i]` (the
  * context's own vertex-record pointer slots that the SubmitPoly* wrappers'
@@ -273,7 +273,7 @@ void *SubmitPolyGT4(void *prim, void *ctx) {
  * matching ProjectTriFace/ProjectQuadFace's own arity code. Mechanics
  * established; WHY the table also keeps its own copy of the same pointers
  * is not (round 77, tier B). */
-void InitVtxRecordPtrs(void *dst, void *table, s32 kind) {
+void InitDivPolygonPtrs(void *dst, void *table, s32 kind) {
     u8 *src = (u8 *)table + 0x18;
     u8 *dst0 = (u8 *)dst;
     u8 *dst1 = (kind == 4) ? (u8 *)table + 0xF0 : (u8 *)table + 0xA8;

@@ -145,7 +145,7 @@ typedef struct {
 extern s8 D_8008A82C[3];
 extern void *GsOUT_PACKET_P;
 
-extern void InitVtxRecordPtrs(void *dst, void *table, s32 count);
+extern void InitDivPolygonPtrs(void *dst, void *table, s32 count);
 extern void StoreSxyPolyFT4(void *dst, s32 storeFirst3);
 extern void StoreSxyPolyGT4(void *dst, s32 storeFirst3);
 
@@ -221,8 +221,8 @@ void func_80018464(void *objIn, void *otSrc, s32 otShift, void *ctxIn) {
 
     *(void **)(ctx + 0x0) = *(void **)((u8 *)otSrc + 0x4);
     *(s32 *)(ctx + 0x4) = otShift;
-    InitVtxRecordPtrs(ctx + 0x88, gDivPolygon3, 3);
-    InitVtxRecordPtrs(ctx + 0x94, gDivPolygon4, 4);
+    InitDivPolygonPtrs(ctx + 0x88, gDivPolygon3, 3);
+    InitDivPolygonPtrs(ctx + 0x94, gDivPolygon4, 4);
 
     remaining = *(s32 *)(*(u8 **)(obj + 0x8) + 0x14);
     list = *(u8 **)(*(u8 **)(obj + 0x8) + 0x10);
