@@ -63,8 +63,8 @@ void SceneNode__LocalOffsetToWorldPos(SceneNode *self, s32 *dst, s32 *src, s32 u
  * divides by, below) a constant 1. The same {degrees, 1} shape
  * SceneNode__FaceTarget builds and updateRotation consumes.
  *
- * Statement order is load-bearing and counter-intuitive: `.whole` is
- * written BEFORE `.frac` even though retail EMITS the `frac` store first
+ * Statement order is load-bearing and counter-intuitive: `.num` is
+ * written BEFORE `.den` even though retail EMITS the `den` store first
  * (the compiler sinks the constant store into the delay slot itself).
  * See docs/match-reports/SceneNode__GetRotationDegrees.md. */
 void SceneNode__GetRotationDegrees(SceneNode *self, Ratio16 *out) {
@@ -277,15 +277,13 @@ void SceneNode__FaceTarget(SceneNode *self, SceneNode *target, s32 arg2, s32 arg
     }
 }
 
-/* `(pair->whole << 12) / pair->frac` in 20.12 fixed point, computed as a
+/* `(pair->num << 12) / pair->den` in 20.12 fixed point, computed as a
  * split division so the shift cannot overflow: quotient and remainder from
  * one divide, then the shifted remainder divided again. GCC 2.6.3 fuses the
  * `/` and `%` over the same operands into a single `div`.
  *
- * So the pair is a RATIO, numerator over denominator -- the field names
- * `whole`/`frac` (inherited, include/code_d294.h) describe a mixed number
- * and are the weaker reading. Every producer in this unit sets the second
- * field to 1. */
+ * The pair is a ratio, numerator over denominator; every producer in this
+ * unit sets `den` to 1. */
 s32 RatioToFixed12(void *pair) {
     Ratio16 *p;
     s32 q1, r1, q2;

@@ -270,7 +270,7 @@ extern s32 ratan2(s32 dy, s32 dx);
  * `target` via two `ratan2` calls, converts both to degrees (see
  * `SceneNode__GetRotationDegrees`'s same `x*360>>12` idiom -- pitch gets an EXTRA `+
  * 0x400` [90 degrees] added before conversion, yaw does not), builds a
- * `Ratio16[3]` {pitch, yaw, 0} table (each `.frac = 1`), and
+ * `Ratio16[3]` {pitch, yaw, 0} table (each `.den = 1`), and
  * dispatches it to `updateRotation`. `arg2 != 0` forces the pitch entry to 0
  * (a "yaw only" mode); `arg3 == 0` adds 180 degrees to yaw (see below);
  * a non-NULL `arg4` fires a SECOND `updateRotation(self, 0, arg4)` call with the

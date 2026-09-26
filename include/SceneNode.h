@@ -71,9 +71,9 @@ typedef struct LongVec3 {
     s32 z;
 } LongVec3;
 
-/* A ratio of two s16s, whole / frac, which RatioToFixed12 turns into 20.12
+/* A ratio of two s16s, num / den, which RatioToFixed12 turns into 20.12
  * fixed point. updateRotation and updateScale take three (ROTATION_ZERO,
- * SCALE_ONE); every producer in the class sets frac to 1. */
+ * SCALE_ONE); every producer in the class sets den to 1. */
 typedef struct Ratio16 Ratio16;
 
 struct Ratio16 {
