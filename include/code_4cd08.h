@@ -36,7 +36,7 @@ typedef DreamAuxObj *(*DreamAuxTickFn)(DreamAuxObj *self);
  * detaches and re-attaches (detachFromParent, attachToParent with the
  * player gDreamAuxWorld as the peer);
  * and a 3-word position vector at +0x8 that DespawnDreamAuxEntity passes as
- * `Class6B5CC__LocalOffsetToWorldPos`'s `src` (that function's own signature, `code_d294.h`,
+ * `SceneNode__LocalOffsetToWorldPos`'s `src` (that function's own signature, `code_d294.h`,
  * takes `s32 *src` and treats it as a 3-word vector). Stride is 0x14,
  * confirmed by SetDreamAuxWorld's walk over gDreamAuxSlots. */
 typedef struct DreamAuxSlot {

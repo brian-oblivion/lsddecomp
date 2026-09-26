@@ -7,12 +7,12 @@
 Round 82, runner alpha (re-staffed slot). Unit `src/code_322b4.c`. Fresh
 ground (carved in FINISHING-PLAN revision 18), no prior attempt.
 
-- **Where:** gLightRigMethods slot +0x040 (reset, over Class6B5CC__Reset) (`tools/classtable.py`).
+- **Where:** gLightRigMethods slot +0x040 (reset, over SceneNode__Reset) (`tools/classtable.py`).
 - **What:** `self->coord2->flg = 0`: marks the GsCOORDINATE2 for recompute, the same thing updateRotation/updateScale/attachToParent do.
 - **Result:** byte-exact on the FIRST build; 3/3 words, 0 insertions /
   0 deletions, whole-image SHA1 green. No levers needed.
-- **Types:** Class6B5CC-derived methods take `Class6B5CC *` from the UNIFIED
-  `include/Class6B5CC.h` (untouched). The FrameClock and Class6EED8 objects use
+- **Types:** SceneNode-derived methods take `SceneNode *` from the UNIFIED
+  `include/SceneNode.h` (untouched). The FrameClock and Class6EED8 objects use
   unit-local views (`D_8006EF50Obj`, `D_8006EED8Obj`) declared at the top of
   the unit; nothing was added to a shared header.
 
@@ -27,8 +27,8 @@ void LightRig__Reset(LightRig *self) {
 
 ## Naming
 
-- `D8006EFAC__Reset` -- tier A. Reset override (slot +0x040): marks the Class6B5CC coordinate dirty (coord2->flg = 0, include/Class6B5CC.h's documented "0 = recompute").
+- `D8006EFAC__Reset` -- tier A. Reset override (slot +0x040): marks the SceneNode coordinate dirty (coord2->flg = 0, include/SceneNode.h's documented "0 = recompute").
 
 ## Track 4
 
-2026-09-26, round 86 (delta): class 0x14 unified as LightRig in `include/LightRig.h`. Renamed from `D8006EFAC__Reset`, tier A: slot +0x040. `self` is `LightRig *` (was `Class6B5CC *`; `coord2` is inherited, so the access is unchanged). The Source block above is the unified spelling. Image byte-identical.
+2026-09-26, round 86 (delta): class 0x14 unified as LightRig in `include/LightRig.h`. Renamed from `D8006EFAC__Reset`, tier A: slot +0x040. `self` is `LightRig *` (was `SceneNode *`; `coord2` is inherited, so the access is unchanged). The Source block above is the unified spelling. Image byte-identical.

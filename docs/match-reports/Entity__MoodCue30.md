@@ -25,7 +25,7 @@ void Entity__MoodCue30(Entity *this) {
         this->methods->slot48(this, 1, SCALE_DOUBLE);
         this->methods->slotCC(this, -0x1E, 0);
     } else {
-        Class6B5CC__FaceTarget(this, this->unk94, 1, 0, 0);
+        SceneNode__FaceTarget(this, this->unk94, 1, 0, 0);
         if (this->unk44 == 0xB) {
             this->methods->slotC4(this, -0x64, 0);
             if ((u32)(this->unkFC - 0x55) < 0x1E) {

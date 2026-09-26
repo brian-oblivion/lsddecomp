@@ -33,7 +33,7 @@
  * sets `loaded` when the driver reports it done; its own methods
  * (New_Class6EED8, Class6EED8__*, GetClass6EED8Methods) live here.
  * LightRig (include/LightRig.h, gLightRigMethods, id 0x14) is unified too: a
- * Class6B5CC subclass owning three FlatLightObj children and an ambient
+ * SceneNode subclass owning three FlatLightObj children and an ambient
  * colour (SetAmbientColor -> GsSetAmbient); its own methods (New_LightRig,
  * LightRig__*, GetLightRigMethods) live here. Its getLight (+0x0B8) is
  * inherited unchanged by Class866E8's own table (gClass866E8Methods), which is why
@@ -53,7 +53,7 @@ extern u16 GetTPage(s32 tp, s32 abr, s32 x, s32 y);
 
 
 /* The zero offset ScreenSprite__AttachToParent attaches with. */
-extern Vec3_d294 gVec3Zero;
+extern LongVec3 gVec3Zero;
 extern char *strcpy(char *dst, char *src);
 
 /* The cell origin GetCellRect copies: {0, 0, 8, 8}. */
@@ -146,7 +146,7 @@ void ScreenSprite__Reset(ScreenSprite *self) {}
 /* gCharSpriteMethods and gScreenSpriteMethods slot +0x04C (attachToParent): when not yet
  * attached, attach through Sprite's with a zero offset, then hand the
  * caller's third argument to slot +0x0BC. */
-void ScreenSprite__AttachToParent(ScreenSprite *self, Class6B5CC *parent, ScreenSpritePos *pos) {
+void ScreenSprite__AttachToParent(ScreenSprite *self, SceneNode *parent, ScreenSpritePos *pos) {
     if (self->parent == NULL) {
         GetSpriteMethods()->attachToParent((Sprite *)self, parent, &gVec3Zero);
         self->methods->setPosition(self, pos);
@@ -202,14 +202,14 @@ Sprite *New_Sprite(void *texture, s32 abr, SpriteRect *rect, void *arg3, s32 arg
 }
 
 /* Sprite's reset as its ctor calls it: with all five ctor arguments (the
- * slot is Class6B5CC's, typed without them; Sprite.h, "Not settled"). */
+ * slot is SceneNode's, typed without them; Sprite.h, "Not settled"). */
 typedef void *(*SpriteCtorReset_322b4)(Sprite *self, void *texture, s32 abr, SpriteRect *rect,
                                        void *arg4, s32 arg5);
 
-/* gSpriteMethods slot +0x008 (ctor): the Class6B5CC ctor, install the table,
+/* gSpriteMethods slot +0x008 (ctor): the SceneNode ctor, install the table,
  * and hand every argument to reset. */
 void *Sprite__Sprite(Sprite *self, void *texture, s32 abr, SpriteRect *rect, void *arg4, s32 arg5) {
-    GetClass6B5CCMethods()->ctor((Class6B5CC *)self);
+    GetSceneNodeMethods()->ctor((SceneNode *)self);
     self->methods = GetSpriteMethods();
     return ((SpriteCtorReset_322b4)self->methods->reset)(self, texture, abr, rect, arg4, arg5);
 }
@@ -251,7 +251,7 @@ void InitGsSprite(SpriteGs *sprite, s32 abr, SpriteRect *rect, struct GsIMAGE *i
 
 /* gSpriteMethods slot +0x044 (updateRotation): table[2] as a fraction of
  * degrees, in 4096ths; set or add to the GsSPRITE's rotate. */
-void Sprite__UpdateRotation(Sprite *self, s32 set, WholeFrac_d294 *table) {
+void Sprite__UpdateRotation(Sprite *self, s32 set, Ratio16 *table) {
     s32 angle;
 
     angle = ((table[2].whole / table[2].frac) << 12) +
@@ -447,13 +447,13 @@ LightRig *New_LightRig(void) {
     return NULL;
 }
 
-/* LightRig slot +0x008 (ctor): the Class6B5CC ctor, install the table,
+/* LightRig slot +0x008 (ctor): the SceneNode ctor, install the table,
  * create and add the three flat lights, then reset. */
 void LightRig__LightRig(LightRig *self) {
     s32 i;
     BasicClass **light;
 
-    GetClass6B5CCMethods()->ctor((Class6B5CC *)self);
+    GetSceneNodeMethods()->ctor((SceneNode *)self);
     self->methods = GetLightRigMethods();
     for (i = 0, light = self->lights; i < 3; i++, light++) {
         *light = (BasicClass *)New_FlatLightObj(i);
@@ -463,7 +463,7 @@ void LightRig__LightRig(LightRig *self) {
 }
 
 /* LightRig slot +0x00C (finalize): release the three lights, then the
- * Class6B5CC finalize. */
+ * SceneNode finalize. */
 void LightRig__Finalize(LightRig *self) {
     s32 i;
     BasicClass *light;
@@ -472,7 +472,7 @@ void LightRig__Finalize(LightRig *self) {
         light = self->methods->getLight(self, i);
         light->methods->release(light);
     }
-    GetClass6B5CCMethods()->finalize((Class6B5CC *)self);
+    GetSceneNodeMethods()->finalize((SceneNode *)self);
 }
 
 /* LightRig slot +0x040 (reset): mark the coordinate for recompute. */

@@ -34,7 +34,7 @@ void Class876FC__InitByKind(LinkNode *self, void *arg1, Vec3S *arg2) {
     state = self->unk54;
     if (state < 2) {
         s32 ret = D_8008ACA4->methods->slot80(D_8008ACA4, D_8008AB98[state]);
-        Class6B5CC__LinkModel(self, ret);
+        SceneNode__LinkModel(self, ret);
         state = self->unk54;
     }
 
@@ -135,7 +135,7 @@ Round 70 (alpha). `func_80056520` -> `Class876FC__InitByKind`, **tier B**.
 Only caller is the class's ctor `Class876FC__Class876FC` (class_3bb8c_r.c), with the
 ctor's own arg3/arg4 as (parent, pos). Body: snapshot `*(D_8008ACAC + 0x18)`
 into gTrackedYSnapshot; `AttachWithRotScale(self, parent, pos + offset,
-rotation, scale)`; for kind < 2, `Class6B5CC__LinkModel(self,
+rotation, scale)`; for kind < 2, `SceneNode__LinkModel(self,
 D_8008ACA4->slot80(D_8008AB98[kind]))`; then kind 0 ->
 Class876FC__PlaceModelChildren(self, 0), 2 -> Class876FC__BuildRandomSprites,
 3 -> Class876FC__SpawnPlainSprites (= Class876FC__SpawnSprites(self, 0, 0, NULL)).
@@ -146,7 +146,7 @@ The class: every function here runs on a gClass876FCMethods instance.
 kind 0..3 as its first argument (class_3bb8c_n.c passes 0, 1, 2, 3 at its
 four call sites); `Class876FC__Class876FC` (table +0x008, the ctor) stores it at
 +0x054. `Class876FC` is the table-address class name, the
-`Class6B5CC`/`Class65650` convention.
+`SceneNode`/`Class65650` convention.
 
 Globals named in this pass: `gTrackedYSnapshot` (was D_8008ACB0, tier B:
 written here from D_8008ACAC's +0x018 word, subtracted from it again by
@@ -162,8 +162,8 @@ method signatures; zero bytes changed.
 
 | offset | old | new | tier | evidence |
 | --- | --- | --- | --- | --- |
-| +0x014 | unk14 | coord2 | B | code_d294.h maps Class6B5CCObj +0x14 to GsDOBJ2.coord2; `*coord2 = 0` is its flg |
-| +0x020 | unk20 | model | A | Class6B5CC__LinkModel stores its 2nd argument here; PlaceModelChildren hands it to each child |
+| +0x014 | unk14 | coord2 | B | code_d294.h maps SceneNodeObj +0x14 to GsDOBJ2.coord2; `*coord2 = 0` is its flg |
+| +0x020 | unk20 | model | A | SceneNode__LinkModel stores its 2nd argument here; PlaceModelChildren hands it to each child |
 | +0x024 | unk24 | tick | B | Class876FC__SetParams zeroes it, Class876FC__Update (slot +0x0EC) increments it before every update |
 | +0x054 | unk54 | kind | B | ctor stores New's first argument, 0..3 at the four class_3bb8c_n.c call sites; three switches on it |
 | +0x058 | unk58 | offset | B | added to the caller's position in Init and Update |
@@ -175,12 +175,12 @@ method signatures; zero bytes changed.
 | +0x078 | unk78 | altColor | B | sprites[1]'s slotB8 argument instead of color when non-NULL |
 | +0x07C | arr7C | modelChildren | B | New_Actor objects, linked to the owner's model |
 | +0x084 | arr84 | sprites | B | New_Class879C4 objects (GsSPRITE at +0x64, see Class876FC__SpawnSprites) |
-| slot +0x044 | slot44 | updateRotation | B | Class6B5CC__UpdateRotation (set/add GsCOORD2PARAM.rotate, degrees) |
-| slot +0x048 | slot48 | updateScale | B | Class6B5CC__UpdateScale (set/add .scale); sprite override Class879C4__UpdateScale also a scale |
-| slot +0x04C | slot4C | attachToParent | B | Class6B5CC__AttachToParent (parent link, coord2 super, coord.t) |
-| slot +0x060 | slot60 | setDisplay | B | Class6B5CC__SetDisplay / Sprite__SetDisplay: attribute bit 31 = !on (GsDOFF) |
-| slot +0x064 | slot64 | setSemiTrans | B | Class6B5CC__SetSemiTrans / Sprite__SetSemiTrans: bit 30 (GsALON) |
-| slot +0x068 | slot68 | setSemiTransRate | B | Class6B5CC__SetSemiTransRate / Sprite__SetSemiTransRate: bits 28-29 (GsAZERO..GsATHREE) |
+| slot +0x044 | slot44 | updateRotation | B | SceneNode__UpdateRotation (set/add GsCOORD2PARAM.rotate, degrees) |
+| slot +0x048 | slot48 | updateScale | B | SceneNode__UpdateScale (set/add .scale); sprite override Class879C4__UpdateScale also a scale |
+| slot +0x04C | slot4C | attachToParent | B | SceneNode__AttachToParent (parent link, coord2 super, coord.t) |
+| slot +0x060 | slot60 | setDisplay | B | SceneNode__SetDisplay / Sprite__SetDisplay: attribute bit 31 = !on (GsDOFF) |
+| slot +0x064 | slot64 | setSemiTrans | B | SceneNode__SetSemiTrans / Sprite__SetSemiTrans: bit 30 (GsALON) |
+| slot +0x068 | slot68 | setSemiTransRate | B | SceneNode__SetSemiTransRate / Sprite__SetSemiTransRate: bits 28-29 (GsAZERO..GsATHREE) |
 | slot +0x0B8 | slotB8 | kept | C | class-dependent: Actor__SetTranslation (translation) on the owner and model children, RGB on sprites |
 | slot +0x0BC | slotBC | addTranslation | B | Actor__AddTranslation; only called on model children (sprite override is a no-op) |
 
@@ -196,8 +196,8 @@ For the HEAD, by type scope; none applied here (other units' views).
   `unk54` -> `kind` (B); `block58` -> `params` (B: the 0x24-byte block this
   unit reads as offset/rotation/scale/modelChildLayout/tableIndex/color/
   altColor).
-- `include/code_d294.h` `Class6B5CCMethods`: `slot44` -> `updateRotation`,
-  `slot48` -> `updateScale` (B; Class6B5CC__UpdateRotation / Class6B5CC__UpdateScale bodies, both
+- `include/code_d294.h` `SceneNodeMethods`: `slot44` -> `updateRotation`,
+  `slot48` -> `updateScale` (B; SceneNode__UpdateRotation / SceneNode__UpdateScale bodies, both
   matched since those comments said "still queued").
 
 ## Track 4b (2026-09-25, round 85)
@@ -209,4 +209,4 @@ warning.
 
 ## Track 4 (2026-09-26, round 88, charlie)
 
-class_3bb8c_s.c's `LinkNode` view (owner and children under one type) is gone: the owner is `Class876FC` (include/Class876FC.h), `modelChildren` are `Actor *`, `sprites` are `Class879C4 *`, and the local `Vec3S` is `Vec3_d294`. Accessor renames: `kind` is Actor's `pendingExtra` (+0x054, where the ctor stores it); `offset`/`rotation`/`scale`/`modelChildLayout`/`tableIndex`/`color`/`altColor` are `params.*`; slot `slotB8` is Actor's `setTranslation` on the owner and model children and Sprite's `setColor` on sprites; `*coord2 = 0` is `coord2->flg = 0`. Image byte-identical.
+class_3bb8c_s.c's `LinkNode` view (owner and children under one type) is gone: the owner is `Class876FC` (include/Class876FC.h), `modelChildren` are `Actor *`, `sprites` are `Class879C4 *`, and the local `Vec3S` is `LongVec3`. Accessor renames: `kind` is Actor's `pendingExtra` (+0x054, where the ctor stores it); `offset`/`rotation`/`scale`/`modelChildLayout`/`tableIndex`/`color`/`altColor` are `params.*`; slot `slotB8` is Actor's `setTranslation` on the owner and model children and Sprite's `setColor` on sprites; `*coord2 = 0` is `coord2->flg = 0`. Image byte-identical.

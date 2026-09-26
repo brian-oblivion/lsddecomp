@@ -5,7 +5,7 @@
 > Renamed from `func_800571F8` on 2026-09-18 (tools/rename.py). Address 0x800571f8.
 
 Unit: `class_3bb8c_o` (round 17). `BaseObjOMethods::slot88` (via the fixed
-`GetClass6B5CCMethods()` table) followed by a guarded body that only runs for
+`GetSceneNodeMethods()` table) followed by a guarded body that only runs for
 `arg1` in `[5, 9)`: an "is armed" check on `self->unk20`, an own-`slot8C`
 call, a conditional angle-adjustment helper call, an own-`slot90` call, and
 a tag-gated `slotE8` notification through `self->unk28`. The most
@@ -17,7 +17,7 @@ iteration to close.
 
 ```c
 void Actor__NotifyMove(BaseObjO *self, s32 arg1) {
-    GetClass6B5CCMethods()->slot88(self, arg1);
+    GetSceneNodeMethods()->slot88(self, arg1);
     /* Written as two nested guards, not a combined `arg1 >= 5 && arg1 < 9`
      * range test -- the combined form optimizes into a single unsigned
      * `(arg1-5) < 4` comparison, which is not what retail does (two
@@ -148,4 +148,4 @@ most consequential unknown in the unit.
 
 ## Track 4 (2026-09-25, round 82, delta)
 
-Renamed from `BaseObjO__func_571f8`. Override of +0x088 (notifyIfUnk20Active). Not named for the slot because the body does more: it chains the base, then for events 5..8 with an active model reads the model data (readUnk20Data, +0x08C), for events other than 5 adjusts it by lastOffsetValue +- pendingExtra (RotateAndOffsetHullList), hands it to transformAndNotifyParents (+0x090), and calls slotE8 on an Actor linkTarget. Events 6, 7 and 8 are exactly the ones Actor__MoveLocalZ/X/Y pass (through Actor__MoveAlongLocalAxis); tier B. The fields read here: unk20 = Class6B5CC.model, unk28 = linkTarget, unk48 = lastOffsetValue, unk54 = pendingExtra (s32: this function's addu/subu settle the merge CONFLICT with DreamSys's void *). The class (id 0x34, table `gActorMethods`, formerly `D_800878D4`) is unified as `Actor` in `include/Actor.h`: a Class6B5CC subclass and the base of Class65650/Entity, DreamSys and Class876FC. Any source block above is the pre-unification spelling; the live body in `src/class_3bb8c_o.c` takes the unified types and field/slot names, byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).
+Renamed from `BaseObjO__func_571f8`. Override of +0x088 (notifyIfUnk20Active). Not named for the slot because the body does more: it chains the base, then for events 5..8 with an active model reads the model data (readUnk20Data, +0x08C), for events other than 5 adjusts it by lastOffsetValue +- pendingExtra (RotateAndOffsetHullList), hands it to transformAndNotifyParents (+0x090), and calls slotE8 on an Actor linkTarget. Events 6, 7 and 8 are exactly the ones Actor__MoveLocalZ/X/Y pass (through Actor__MoveAlongLocalAxis); tier B. The fields read here: unk20 = SceneNode.model, unk28 = linkTarget, unk48 = lastOffsetValue, unk54 = pendingExtra (s32: this function's addu/subu settle the merge CONFLICT with DreamSys's void *). The class (id 0x34, table `gActorMethods`, formerly `D_800878D4`) is unified as `Actor` in `include/Actor.h`: a SceneNode subclass and the base of Class65650/Entity, DreamSys and Class876FC. Any source block above is the pre-unification spelling; the live body in `src/class_3bb8c_o.c` takes the unified types and field/slot names, byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).

@@ -57,8 +57,8 @@ through) are left as-is; they are already named for exactly what they are.
 
 Renamed `Class86AA0__ForwardIfTag34` -> `Class86AA0__DispatchLinkCommand`
 (tools/rename.py). It occupies +0x09C of gClass86AA0Methods, the slot
-Class6B5CC calls `dispatchLinkCommand` (`classtable.py gClass86AA0Methods
---vs gClass6B5CCMethods`: an override), and Class6B5CC__OnNotify reaches it
+SceneNode calls `dispatchLinkCommand` (`classtable.py gClass86AA0Methods
+--vs gSceneNodeMethods`: an override), and SceneNode__OnNotify reaches it
 with (self, sender, event) for a sender of class nibble 4. The tag it tests
 is now identified: `0x34` is gActorMethods's class id byte, the same test
 `Actor__DispatchLinkCommand` makes (`*(u8 *)sender->methods == 0x34` ->

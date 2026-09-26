@@ -3,7 +3,7 @@
  * gClass879C4Methods, 49 slots; include/Class879C4.h). Class879C4 is a 0xA8-byte
  * sprite object: a subclass of the sprite class whose table is gSpriteMethods
  * (tag 0x44; GsSPRITE embedded at +0x64, drawn by Viewport__DrawNode through
- * GsSortSprite), which is itself a Class6B5CC subclass. Its ctor and
+ * GsSortSprite), which is itself a SceneNode subclass. Its ctor and
  * allocator (Class879C4__Class879C4, New_Class879C4) are in class_3bb8c_p.c,
  * its empty leaves and table getter in class_3bb8c_t.c; Class876FC
  * (class_3bb8c_s.c) builds five of them per instance.
@@ -12,7 +12,7 @@
  *   arg1): records the variant and points the sprite's CLUT at that
  *   variant's palette row, overriding the one the base init took from the
  *   texture.
- * - Class879C4__UpdateScale (slot +0x048, overrides Class6B5CC__UpdateScale):
+ * - Class879C4__UpdateScale (slot +0x048, overrides SceneNode__UpdateScale):
  *   the 2-D version, two num/den ratios into GsSPRITE scalex/scaley.
  *
  * Named round 79; tiers in the reports. Game-level role of the sprites is
@@ -41,8 +41,8 @@ void Class879C4__SetVariantClut(Class879C4 *self, s32 variant) {
 }
 
 /*
- * Slot +0x048, overriding Class6B5CC__UpdateScale (tools/classtable.py
- * gClass879C4Methods --vs gClass6B5CCMethods). `ratios` is two s16 num/den pairs
+ * Slot +0x048, overriding SceneNode__UpdateScale (tools/classtable.py
+ * gClass879C4Methods --vs gSceneNodeMethods). `ratios` is two s16 num/den pairs
  * (x at +0x0/+0x2, y at +0x4/+0x6) -- every caller passes one of
  * gSpriteScaleLarge/gSpriteScaleSmall ({6,5}, {4,6}) or a table forwarded
  * from Class876FC__SpawnSprites -- each turned into a 20.12 fixed-point

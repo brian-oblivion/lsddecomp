@@ -126,7 +126,7 @@ load through a runtime-indexed global", §"BLOCKED: the `nop_mflo_mfhi` screen r
   and a bigger frame, every loop carrying a second induction variable, closed at 954/954 once all
   13 inner loops were `label: ...; if (--n != 0) goto label;` (`func_80018464`, round 76).
   The MIRROR: a constant retail hoists into `$sN` before a loop (`li s1,4`) needs a `do/while`, since
-  loop.c cannot see a goto loop (`Class6B5CC__NotifyTaggedParents`, 48/54 -> 54/54 first build).
+  loop.c cannot see a goto loop (`SceneNode__NotifyTaggedParents`, 48/54 -> 54/54 first build).
 - **A redundant guard is NOT dead code — 2.6.3 compiles it literally.** GCC does not dedupe an
   explicit `if` against a loop's implicit entry test (where retail has ONE check, `guard + do-while`
   says so), and a provably-dead `x != 5 && x != 8 && x == 0xA` chain is byte-exact while its
@@ -350,7 +350,7 @@ load through a runtime-indexed global", §"BLOCKED: the `nop_mflo_mfhi` screen r
   (round 73): the inline copy (`movstrsi_internal`) CLOBBERS `$v0`/`$v1`/`$a0`/`$a1`, so a parameter
   live across a whole-struct assignment loses its incoming register; an unexplained entry `move
   $a3,$a0` next to batched `lw/lw/sw/sw` is the tell (`Class6E99C__PushPosition`). (a
-  docs/match-reports/func_8001E7BC.md, round 57)
+  docs/match-reports/SceneNode__RaycastVertical.md, round 57)
 - **When a residue is a missing register-to-register COPY, try DELETING the named local and
   inlining the expression** — the inverse of the "name the subexpression" lever. 2.6.3's
   signed `x / 2**k` (k > 1) opens with `t = x`, and whether that copy survives is coalescing
@@ -420,7 +420,7 @@ load through a runtime-indexed global", §"BLOCKED: the `nop_mflo_mfhi` screen r
 - **An array or struct gets its stack slot when its declaration expands; an address-taken SCALAR only
   at its first `&`**, so a lone scalar always lands after every array and no declaration order moves it.
   A scalar/array slot swap that resists reordering is ONE struct (`{s32 count; Vec3S16 v[8];}` in
-  `Class6B5CC__TryAttachNearby`, 140/143 -> 143/143 after seven order variants failed, round 76).
+  `SceneNode__TryAttachNearby`, 140/143 -> 143/143 after seven order variants failed, round 76).
 
 - **An unused stack frame is reserved by an unused local ARRAY, never a scalar.** `s32 unused[2]`
   and `s16 unused[4]` green at 8 bytes; one scalar, two scalars, a 4-byte array and no local all
@@ -514,7 +514,7 @@ load through a runtime-indexed global", §"BLOCKED: the `nop_mflo_mfhi` screen r
   byte-load-bearing: keep the arity, annotate `/* arity-ok: */`. Delay slot a callee-save spill or a
   bare `nop` with the register already loaded? Then a disagreement with the definition is false. 15
   of 17 were the idiom (round 59; 11 of 18 in round 58). **The fix that touches no call site is an
-  unspecified list `()`, not `(void)`.** (a docs/match-reports/GetClass6B5CCMethods.md, round 59)
+  unspecified list `()`, not `(void)`.** (a docs/match-reports/GetSceneNodeMethods.md, round 59)
 - **A literal argument "scheduled late" after a call that sets only `$a0` can be a
   FORWARDED-PARAMETER arity defect.** Check the previous call: if its callee reads `$aN` and the
   caller never writes it, declare and pass the caller's own parameter (a file-local fn-pointer view
@@ -664,10 +664,10 @@ load through a runtime-indexed global", §"BLOCKED: the `nop_mflo_mfhi` screen r
   closed in single-digit builds after 14 and 46 rounds. A revisit's first act is to re-derive the
   CLASS from the disassembly. (a round 59)
 - **A register-identity verdict is a claim about the RESIDUE, not about the function, and it DECAYS
-  as the rest of the function changes.** All three of round 44's residues on `func_8001E7BC` were
+  as the rest of the function changes.** All three of round 44's residues on `SceneNode__RaycastVertical` were
   filed as one class; two were ordinary source-shape differences elsewhere in the body. When a stall
   carries SEVERAL same-class residues, fix the STRUCTURE first and re-measure. (a
-  docs/match-reports/func_8001E7BC.md, round 57)
+  docs/match-reports/SceneNode__RaycastVertical.md, round 57)
 - **A lever's NEGATIVE is scoped to the (function, lever, STATE) triple, and so is a POSITIVE.** A
   guard polarity inert in round 19 closed three words in round 33; a fix rejected in rounds 19 and
   20 closed the function in round 49. **If you have changed anything else since a lever was

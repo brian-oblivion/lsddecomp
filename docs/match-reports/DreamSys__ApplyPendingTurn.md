@@ -7,7 +7,7 @@
 ## What it does
 
 Vtable slot `+0x174`. If `this->unk_0xA4` (a new index field) is nonzero,
-calls `this->vt->Class6B5CC__UpdateRotation(this, 0, &TURN_ROTATIONS[idx])` and resets
+calls `this->vt->SceneNode__UpdateRotation(this, 0, &TURN_ROTATIONS[idx])` and resets
 `unk_0xA4` to 0. `TURN_ROTATIONS` is address-of only here -- never loaded
 through -- so this is safe against the `addiu_at` runtime-indexed-load
 blocker (`docs/research/addiu-at-blocker.md`): "Address-only table
@@ -22,7 +22,7 @@ void DreamSys__ApplyPendingTurn(DreamSys *this)
 
 	idx = this->unk_0xA4;
 	if (idx != 0) {
-		this->vt->Class6B5CC__UpdateRotation(this, 0, &TURN_ROTATIONS[idx]);
+		this->vt->SceneNode__UpdateRotation(this, 0, &TURN_ROTATIONS[idx]);
 		this->unk_0xA4 = 0;
 	}
 }
@@ -65,7 +65,7 @@ round 2026-08-30-b, runner ALPHA, address range
 
 Renamed from `func_8005A050`.
 
-Consumes `turnCommand`: `Class6B5CC__UpdateRotation(this, 0,
+Consumes `turnCommand`: `SceneNode__UpdateRotation(this, 0,
 &TURN_ROTATIONS[idx])` and reset to 0. That slot is the rotation setter (matched,
 src/code_d294.c) and flag 0 means RELATIVE, so this turns the object; the table
 entries for the only two values `DreamSys__OnPadEvent` ever writes (1 and 2)

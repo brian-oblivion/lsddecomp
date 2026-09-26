@@ -55,7 +55,7 @@ None new beyond `StreamTask__SetUnkC4`'s.
 **StreamTask__Reset** -- tier A. Occupies `gStreamTaskMethods` slot
 `+0x040`, the SAME numbered slot independently named `Reset` in two other,
 unrelated classes in this codebase (`Class866E8__Reset`,
-`include/class_3ac78.h`; `Class6B5CC__Reset`, `include/code_d294.h`) --
+`include/class_3ac78.h`; `SceneNode__Reset`, `include/code_d294.h`) --
 both also called from their own class's ctor chain, both also just a run of
 fixed-literal field stores, exactly this function's own shape.
 

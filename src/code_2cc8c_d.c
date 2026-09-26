@@ -129,8 +129,8 @@ extern void GsSetRefView2(void *arg0);
  * (addChild caches it as viewNode), sets the viewpoint, reference point and
  * twist (D_8008A8F4 when `twist` is NULL), then hands refView to
  * GsSetRefView2. */
-void Viewport__AttachViewChild(Viewport *self, BasicClass *node, Vec3_d294 *vp, Vec3_d294 *vr,
-                               WholeFrac_d294 *twist) {
+void Viewport__AttachViewChild(Viewport *self, BasicClass *node, LongVec3 *vp, LongVec3 *vr,
+                               Ratio16 *twist) {
     ViewportMethods *m = self->methods;
 
     if (self->viewNode != NULL) {
@@ -152,7 +152,7 @@ void Viewport__DetachViewChild(Viewport *self) {
 }
 
 /* Copies vp into refView.vp, only while a view node is set. */
-void Viewport__SetViewPoint(Viewport *self, Vec3_d294 *vp) {
+void Viewport__SetViewPoint(Viewport *self, LongVec3 *vp) {
     if (self->viewNode != NULL) {
         self->refView.vp = *vp;
     }
@@ -160,13 +160,13 @@ void Viewport__SetViewPoint(Viewport *self, Vec3_d294 *vp) {
 
 /* Sibling of Viewport__SetViewPoint: copies vr into refView.vr, guarded the
  * same way. */
-void Viewport__SetViewRef(Viewport *self, Vec3_d294 *vr) {
+void Viewport__SetViewRef(Viewport *self, LongVec3 *vr) {
     if (self->viewNode != NULL) {
         self->refView.vr = *vr;
     }
 }
 
-void Viewport__SetTwist(Viewport *self, WholeFrac_d294 *twist) {
+void Viewport__SetTwist(Viewport *self, Ratio16 *twist) {
     s32 q1, r1, q2;
 
     if (self->viewNode != NULL) {
@@ -303,7 +303,7 @@ extern void GsClearOt(s32 a0, s32 a1, ViewportOt *ot);
 
 void Viewport__Update(Viewport *self) {
     s32 idx;
-    Class6B5CC *root;
+    SceneNode *root;
 
     if (self->otReady == 0) {
         return;
@@ -404,9 +404,9 @@ tail_check:
 /* Only while no view node is set: releases the current subHandle, installs
  * `handle`, and attaches it under sceneRoot at D_8008A904 (-100, -100). The
  * occupant of handle's +0x04C (BoxFill__AttachToParent, a Class6E99C's) takes a
- * screen position where Class6B5CC's attachToParent slot types a Vec3_d294
+ * screen position where SceneNode's attachToParent slot types a LongVec3
  * offset, hence the cast (include/Viewport.h, "Not settled here"). */
-void Viewport__SetSubHandle(Viewport *self, Class6B5CC *handle) {
+void Viewport__SetSubHandle(Viewport *self, SceneNode *handle) {
     if (self->viewNode != NULL) {
         return;
     }
@@ -417,11 +417,11 @@ void Viewport__SetSubHandle(Viewport *self, Class6B5CC *handle) {
 
     self->subHandle = handle;
     if (handle != NULL) {
-        handle->methods->attachToParent(handle, self->sceneRoot, (Vec3_d294 *)D_8008A904);
+        handle->methods->attachToParent(handle, self->sceneRoot, (LongVec3 *)D_8008A904);
     }
 }
 
-Class6B5CC *Viewport__GetSubHandle(Viewport *self) {
+SceneNode *Viewport__GetSubHandle(Viewport *self) {
     return self->subHandle;
 }
 
@@ -440,7 +440,7 @@ ViewportMethods *GetViewportMethods(void) {
 
 /* Follows `parent` from `node` to the top of its hierarchy. Not a method
  * (in no table): Viewport__Update passes it the view node. */
-Class6B5CC *GetRootNode(Class6B5CC *node) {
+SceneNode *GetRootNode(SceneNode *node) {
     while (node->parent != NULL) {
         node = node->parent;
     }

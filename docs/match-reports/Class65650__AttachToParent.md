@@ -60,10 +60,10 @@ slot untyped.
 
 Round 75 (charlie), track 3.
 
-- `Class65650__AttachToParent` (was `func_80065918`), tier A. Occupies +0x04C, overriding Class6B5CC__AttachToParent. While parent (+0x0C) is NULL: chains the base attach with (arg3, arg4) = (parent, offset), links arg2 as a companion if companion2 is empty, then linkPeer(arg1).
+- `Class65650__AttachToParent` (was `func_80065918`), tier A. Occupies +0x04C, overriding SceneNode__AttachToParent. While parent (+0x0C) is NULL: chains the base attach with (arg3, arg4) = (parent, offset), links arg2 as a companion if companion2 is empty, then linkPeer(arg1).
 
 ## Track 4 (2026-09-25, round 85, alpha)
 
 The class (id 0x234, table `gClass65650Methods`) is unified as `Class65650` in `include/Class65650.h`: an Actor subclass (its ctor chains to Actor's first) and Entity's base. Any source block above is the pre-unification spelling (the local `Class65650Methods` of `include/code_55dd4.h`, `linkCompanion`/`unlinkCompanion`, `companion2`, `Unk5CObj`/`Unk70ElemObj`); the live body in `src/code_55dd4.c` takes the unified types and the inherited slot and field names (`addChild`/`removeChild`, Actor's `ticker`, `Actor *` parts, `ModelData *` modelData), byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).
 
-The occupant of +0x04C takes (self, peer, companion, parent, offset), two more leading arguments than the slot's Class6B5CC type (self, parent, offset), which it forwards to Class6B5CC's attachToParent as (arg3, arg4). The unified table keeps the inherited type at +0x04C; Entity__AttachToParent, the one C caller through the slot, casts it to `Class65650AttachToParentFn` (a function-pointer cast emits no code).
+The occupant of +0x04C takes (self, peer, companion, parent, offset), two more leading arguments than the slot's SceneNode type (self, parent, offset), which it forwards to SceneNode's attachToParent as (arg3, arg4). The unified table keeps the inherited type at +0x04C; Entity__AttachToParent, the one C caller through the slot, casts it to `Class65650AttachToParentFn` (a function-pointer cast emits no code).

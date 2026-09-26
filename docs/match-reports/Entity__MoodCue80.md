@@ -22,13 +22,13 @@ void Entity__MoodCue80(Entity *this, EntityMoodHandlerArg *out) {
         this->methods->slot130(this);
         this->methods->slotBC(this, TRANSLATE_Y_MINUS512);
     }
-    Class6B5CC__FaceTarget(this, this->unk94, 1, 0, 0);
+    SceneNode__FaceTarget(this, this->unk94, 1, 0, 0);
 }
 ```
 
 ## Derivation notes
 
-`Class6B5CC__FaceTarget`'s call shape and `slot130`/`slotBC` were all already
+`SceneNode__FaceTarget`'s call shape and `slot130`/`slotBC` were all already
 established. The interesting part is the doubled guard on `this->unk84`:
 the disassembly has `beqz $v1, L80063118` (skip to the "do nothing extra"
 merge point when `unk84 == 0`) immediately followed by a *second*,

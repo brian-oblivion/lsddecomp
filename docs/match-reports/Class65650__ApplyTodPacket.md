@@ -63,7 +63,7 @@ void *Class65650__ApplyTodPacket(Class65650 *self, void *acc, void *extra)
             s32 v;
 
             v = self->unk5C->unk2C->methods->slot80(self->unk5C->unk2C, count - 1);
-            Class6B5CC__LinkModel(elem, v);
+            SceneNode__LinkModel(elem, v);
         }
         break;
     }
@@ -153,11 +153,11 @@ unchanged if not):
 ```c
 if (*(u16 *)s0 != 0 && elem->unk20 == 0) {
     v = self->unk5C->unk2C->methods->slot80(self->unk5C->unk2C, *(u16*)s0 - 1);
-    Class6B5CC__LinkModel(elem, v);
+    SceneNode__LinkModel(elem, v);
 }
 ```
 New field `Unk5CObj+0x2C` (`Unk2CObj *`, an unidentified class whose only
-known member is vtable slot `+0x080`). **Corrects `Class6B5CC__LinkModel`'s
+known member is vtable slot `+0x080`). **Corrects `SceneNode__LinkModel`'s
 signature**: previously typed `(Class65650 *, s32)` from `Class65650__Reset`'s
 usage; this call site passes `elem` (`Unk70ElemObj *`), so the first
 parameter is generically `void *` — a real, useful correction, not a
@@ -178,7 +178,7 @@ if (v1 == 0 || v1 == 0xFFFF) {
 New slot `Unk70ElemMethods+0x04C` (`slot4C`) — its second argument is
 `self` (`Class65650 *`) on one path and `self->unk70[idx2]`
 (`Unk70ElemObj *`) on the other, so it's typed generically `void *`, same
-reasoning as `Class6B5CC__LinkModel` above.
+reasoning as `SceneNode__LinkModel` above.
 
 ## Six real residues found and closed (in order of discovery)
 
@@ -416,7 +416,7 @@ void *Class65650__ApplyTodPacket(Class65650 *self, void *acc, void *extra)
             s32 v;
 
             v = self->unk5C->unk2C->methods->slot80(self->unk5C->unk2C, count - 1);
-            Class6B5CC__LinkModel(elem, v);
+            SceneNode__LinkModel(elem, v);
         }
         break;
     }
@@ -444,7 +444,7 @@ end:
 
 All types this body depends on (`TimeTargetObj`, `Elem14Obj`, `Unk2CObj`/
 `Unk2CMethods`, the `Unk70ElemObj`/`Unk70ElemMethods`/`Unk5CMethods` field
-and slot additions, and the `Class6B5CC__LinkModel` signature correction) are kept
+and slot additions, and the `SceneNode__LinkModel` signature correction) are kept
 live in `include/code_55dd4.h` — every one of them is confirmed correct by
 byte-identical surrounding code, independent of the six-word residue above.
 

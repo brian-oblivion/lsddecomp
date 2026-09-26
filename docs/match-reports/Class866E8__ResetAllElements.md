@@ -69,7 +69,7 @@ New struct/vtable knowledge added regardless of the stall (all verified
 straight from the disassembly): `Class866E8Methods::slot88` (declared with
 a 4th `s32 arg3` parameter that the occupant, `Class866E8__OnElementEvent`, doesn't
 read — same "field type need not match every occupant's real signature"
-precedent as `Class866E8__OnNotify`/`Class866E8__OnElementEvent`'s `GetClass6B5CCMethods`), `slot108`
+precedent as `Class866E8__OnNotify`/`Class866E8__OnElementEvent`'s `GetSceneNodeMethods`), `slot108`
 (`Class866E8__ResetElementCells`, not decompiled), `slot140` (`Class866E8__FlushRateLatch`, not
 decompiled — this promotes what was previously just end-of-struct
 padding into a real slot), `Class866E8::unkEC[7]` (`UnkSlotEntry_3ac78`,

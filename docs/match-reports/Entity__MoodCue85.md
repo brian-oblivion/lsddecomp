@@ -11,7 +11,7 @@ The biggest function in this unit: a `this->unk44`-keyed state machine
 see below) driving this Entity's mood/AI transitions. Calls
 `SetCueTones7_7_7`/`SetCueTones18_3_3` (this unit's own trivial `out`-only
 setters, matched separately) at several transition points, plus
-`Class6B5CC__FaceTarget`, `Entity__GetOrCreateUnk100`, and two new `Unk100Methods` slots
+`SceneNode__FaceTarget`, `Entity__GetOrCreateUnk100`, and two new `Unk100Methods` slots
 (`slotD4`, `slotD8`).
 
 ## Derivation

@@ -37,7 +37,7 @@ u32 *DecodeTodPacketWord(DataSrc33808 *self, u32 *acc, u8 *out0, u8 *out1, u8 *o
 
 ## Notes
 
-- No shared header was edited. `FileResource.h`, `Class6B5CC.h`, `BasicClass.h` are
+- No shared header was edited. `FileResource.h`, `SceneNode.h`, `BasicClass.h` are
   included; prototypes for other units' functions (GetActiveDataSourceMethods,
   ReleaseBasicClassArray, BMemPMgrFree) are local to the unit.
 - Types of arguments and returns are readings of the registers used, not proven.

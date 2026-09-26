@@ -20,9 +20,9 @@ unit's mood-dispatch handler family:
    - `< 0x79` and (`>= 0x38` (56) or `Entity__IsNearTarget(this, &this->unk14->x, 1,
      1) != 0`): `this->methods->slotBC(this, TRANSLATE_Y_MINUS64);`
    - `< 0x38` and `Entity__IsNearTarget(...) == 0`, sub-dispatch on `this->unkFC`
-     again: `>= 0xA` (10) calls `Class6B5CC__FaceTarget(...)` then
+     again: `>= 0xA` (10) calls `SceneNode__FaceTarget(...)` then
      `this->methods->slotC4(this, -0x100, 0)`; `< 0xA` calls only
-     `Class6B5CC__FaceTarget(...)`.
+     `SceneNode__FaceTarget(...)`.
 
 The magic-multiply constant `0xB60B60B7` at shift 6, reconstructed by
 retail's own multiply-back sequence (`*3`, `*15` via `<<4` minus itself,
@@ -63,15 +63,15 @@ void Entity__MoodCue07(Entity *this, EntityMoodHandlerArg *out) {
                Entity__IsNearTarget(this, &this->unk14->x, 1, 1) != 0) {
         this->methods->slotBC(this, TRANSLATE_Y_MINUS64);
     } else if (this->unkFC >= 0xA) {
-        Class6B5CC__FaceTarget(this, this->unk94, 1, 0, 0);
+        SceneNode__FaceTarget(this, this->unk94, 1, 0, 0);
         this->methods->slotC4(this, -0x100, 0);
     } else {
-        Class6B5CC__FaceTarget(this, this->unk94, 1, 0, 0);
+        SceneNode__FaceTarget(this, this->unk94, 1, 0, 0);
     }
 }
 ```
 
-Note the duplicated `Class6B5CC__FaceTarget(this, this->unk94, 1, 0, 0);` call in the
+Note the duplicated `SceneNode__FaceTarget(this, this->unk94, 1, 0, 0);` call in the
 last two arms — retail's own bytes call it identically in both, one arm just
 has an extra `slotC4` call afterward. Not a shared/hoisted call: written as
 two literal statements, matching retail's own (redundant-looking but

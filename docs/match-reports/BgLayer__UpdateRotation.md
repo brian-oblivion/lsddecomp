@@ -13,7 +13,7 @@ drift. Fresh ground (carved revision 18, no prior report).
 
 Computes the 20.12 fixed-point ratio of two s16 fields of the third argument (+0x08 / +0x0A) as (q << 12) + ((r << 12) / den) from one div's quotient and remainder, and stores it at +0x64 when the second argument is nonzero, otherwise adds it to +0x64.
 
-Table slot (`tools/classtable.py`): gBgLayerMethods +0x044 (a Class6B5CC subclass; slot +0x044 is its first own slot past the Class6B5CC reset slot at +0x040).
+Table slot (`tools/classtable.py`): gBgLayerMethods +0x044 (a SceneNode subclass; slot +0x044 is its first own slot past the SceneNode reset slot at +0x040).
 
 ## Source
 
@@ -24,7 +24,7 @@ fields +0x2C..+0x38), `Ctor33808` and `CountedBuf33808` sit at the top of
 
 ```c
 typedef struct Obj6F2C4 {
-    CLASS6B5CC_FIELDS(Class6B5CCMethods);
+    SCENENODE_FIELDS(SceneNodeMethods);
     /* +0x044 */ u8 pad44[0x10];
     /* +0x054 */ Vec3S8 unk54;
     /* +0x057 */ u8 pad57[0xD];
@@ -60,4 +60,4 @@ First build. `/` and `%` of the same operands share one div (mflo then mfhi). Th
 
 ## Track 4 (2026-09-26, round 88, alpha)
 
-Renamed from `BgLayer__SetRotation` for the slot it overrides: gBgLayerMethods +0x044 is Class6B5CC's `updateRotation` (Class6B5CC__UpdateRotation), and the body does what that slot does, set (flag nonzero) or add, from the same three-entry `WholeFrac_d294` {num, den} ratio table Class6B5CC's version reads through RatioToFixed12 (entries at +0/+4/+8). A GsBG has one rotation, so this override reads only entry [2], the z angle: the `Ratio44380` view's +0x08/+0x0A. That view is gone; the live body takes `WholeFrac_d294 *table` and reads `table[2].whole` / `table[2].frac`, `self` is `BgLayer *` (include/BgLayer.h) and +0x064 is `rotate` (GsBG.rotate; was unk64). Byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).
+Renamed from `BgLayer__SetRotation` for the slot it overrides: gBgLayerMethods +0x044 is SceneNode's `updateRotation` (SceneNode__UpdateRotation), and the body does what that slot does, set (flag nonzero) or add, from the same three-entry `Ratio16` {num, den} ratio table SceneNode's version reads through RatioToFixed12 (entries at +0/+4/+8). A GsBG has one rotation, so this override reads only entry [2], the z angle: the `Ratio44380` view's +0x08/+0x0A. That view is gone; the live body takes `Ratio16 *table` and reads `table[2].whole` / `table[2].frac`, `self` is `BgLayer *` (include/BgLayer.h) and +0x064 is `rotate` (GsBG.rotate; was unk64). Byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).

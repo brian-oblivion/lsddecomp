@@ -26,9 +26,9 @@ extern s32 gSpriteShiftX[];
 extern s32 gSpriteScaleLarge[];
 extern s32 gSpriteScaleHalf[];
 extern s32 gSpriteScaleSmall[];
-extern Vec3_d294 gSpriteShiftScratch;
+extern LongVec3 gSpriteShiftScratch;
 
-void AddVec3(Vec3_d294 *dst, Vec3_d294 *a, Vec3_d294 *b);
+void AddVec3(LongVec3 *dst, LongVec3 *a, LongVec3 *b);
 void AttachWithRotScale(Actor *node, void *parent, void *trans, void *rotation, void *scale);
 
 /* Four of the class's one-parameter helpers are called here with a dead
@@ -53,7 +53,7 @@ extern void NoOpIgnoreArgs();
 
 /* Three globals class_3bb8c_o.c's Actor__func_56f5c captures once from its
  * parameters (declared there with the same types; track 4b, round 85):
- * D_8008ACA4 is the Actor it ran on, called here through Class6B5CC's
+ * D_8008ACA4 is the Actor it ran on, called here through SceneNode's
  * +0x080 getSetUnk10Flag8 as that function calls it; D_8008ACA8 is
  * forwarded opaquely to New_Class879C4 as its third argument; D_8008ACAC's
  * pointee has a field at +0x018 that Class876FC__InitByKind and
@@ -70,8 +70,8 @@ extern s32 D_8008AB98[];
  * gets two model children, kind 2 five randomised sprites, kind 3 five
  * plain sprites (Class876FC__SpawnPlainSprites is Class876FC__SpawnSprites(self,
  * 0, 0, NULL)). */
-void Class876FC__InitByKind(Class876FC *self, Class6B5CC *parent, Vec3_d294 *pos) {
-    Vec3_d294 local;
+void Class876FC__InitByKind(Class876FC *self, SceneNode *parent, LongVec3 *pos) {
+    LongVec3 local;
     s32 state;
 
     gTrackedYSnapshot = *(s32 *)((u8 *)D_8008ACAC + 0x18);
@@ -81,7 +81,7 @@ void Class876FC__InitByKind(Class876FC *self, Class6B5CC *parent, Vec3_d294 *pos
     state = self->pendingExtra;
     if (state < 2) {
         s32 ret = D_8008ACA4->methods->getSetUnk10Flag8(D_8008ACA4, D_8008AB98[state]);
-        Class6B5CC__LinkModel((Class6B5CC *)self, (void *)ret);
+        SceneNode__LinkModel((SceneNode *)self, (void *)ret);
         state = self->pendingExtra;
     }
 
@@ -105,8 +105,8 @@ void Class876FC__InitByKind(Class876FC *self, Class6B5CC *parent, Vec3_d294 *pos
  * setTranslation) to pos + offset, plus however far D_8008ACAC's +0x018
  * word has moved since Class876FC__InitByKind snapshotted it, then run the
  * per-kind update. */
-void Class876FC__UpdateByKind(Class876FC *self, Vec3_d294 *pos) {
-    Vec3_d294 local;
+void Class876FC__UpdateByKind(Class876FC *self, LongVec3 *pos) {
+    LongVec3 local;
 
     AddVec3(&local, pos, &self->params.offset);
     local.y += *(s32 *)((u8 *)D_8008ACAC + 0x18) - gTrackedYSnapshot;
@@ -147,7 +147,7 @@ void Class876FC__ReleaseByKind(Class876FC *self) {
 }
 
 /* Plain Vec3 add: dst = a + b. Frameless -- no self/vtable involved. */
-void AddVec3(Vec3_d294 *dst, Vec3_d294 *a, Vec3_d294 *b) {
+void AddVec3(LongVec3 *dst, LongVec3 *a, LongVec3 *b) {
     dst->x = a->x + b->x;
     dst->y = a->y + b->y;
     dst->z = a->z + b->z;
@@ -166,11 +166,11 @@ void AttachWithRotScale(Actor *node, void *parent, void *trans, void *rotation, 
  * numerator) for layouts 1-2 and along y for 3-4. reuse = 0 creates them
  * (New_Actor, sharing the owner's model, attached to the owner);
  * reuse = 1 only resets their translation (setTranslation). */
-extern Vec3_d294 gModelChildOffsetInit;
+extern LongVec3 gModelChildOffsetInit;
 extern s32 gModelChildSpacing[];
 
 void Class876FC__PlaceModelChildren(Class876FC *self, s32 reuse) {
-    Vec3_d294 accum;
+    LongVec3 accum;
     Actor **p;
     s32 i;
     s32 count = self->params.modelChildLayout;
@@ -192,7 +192,7 @@ void Class876FC__PlaceModelChildren(Class876FC *self, s32 reuse) {
         } else {
             Actor *child = New_Actor();
             *p = child;
-            Class6B5CC__LinkModel((Class6B5CC *)child, self->model);
+            SceneNode__LinkModel((SceneNode *)child, self->model);
             AttachWithRotScale(*p, self, &accum, self->params.rotation, self->params.scale);
         }
     }
@@ -202,8 +202,8 @@ void Class876FC__PlaceModelChildren(Class876FC *self, s32 reuse) {
  * divisor of the 24500 / step reset period below. Same index space as
  * gSpriteShiftX. */
 extern s32 gModelChildDriftZ[];
-/* All-zero Vec3_d294, the start value of each child's per-frame z delta. */
-extern Vec3_d294 gModelChildDriftInit;
+/* All-zero LongVec3, the start value of each child's per-frame z delta. */
+extern LongVec3 gModelChildDriftInit;
 /* Ratio triple {0/1, 1/10, 0/1}: the per-frame rotation increment
  * updateRotation(.., 0, ..) adds to self and to each model child. */
 extern s32 gSpinRotStep[];
@@ -233,7 +233,7 @@ void Class876FC__DriftModelChildren(Class876FC *self) {
         stepZ = &gModelChildDriftZ[idx];
         accumOffset = 0;
         for (; i < 2; i++) {
-            Vec3_d294 local = gModelChildDriftInit;
+            LongVec3 local = gModelChildDriftInit;
             local.z += accumOffset + *stepZ;
             (*p)->methods->addTranslation(*p, &local);
             accumOffset += 3;
@@ -283,7 +283,7 @@ void Class876FC__BuildRandomSprites(Class876FC *self) {
         gSpriteShiftScratch.x = gSpriteShiftX[self->params.tableIndex];
         /* Called directly, not through the child's table: the child is a
          * sprite (Class879C4, a Sprite), not an Actor, and the function only
-         * touches the Class6B5CC coord2 both share. */
+         * touches the SceneNode coord2 both share. */
         Actor__AddTranslation((Actor *)child, &gSpriteShiftScratch);
         m = child->methods;
         arg = (self->params.altColor != NULL) ? self->params.altColor : self->params.color;

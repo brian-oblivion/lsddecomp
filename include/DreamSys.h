@@ -12,7 +12,7 @@
  * `target` class_3bb8c_l hands SetDreamAuxWorld (code_4cd08's
  * gDreamAuxWorld), and the `peer` every Entity links to.
  *
- * It owns the dream clock (Class6B5CC's `tick`, advanced by
+ * It owns the dream clock (SceneNode's `tick`, advanced by
  * DreamSys__TimerTick, the update (+0x098) override, against
  * dreamTimeLimit), the player's movement (the pad handler OnPadEvent,
  * +0x094, sets move/turn/look commands that the tick callbacks installed by
@@ -90,7 +90,7 @@ extern s8 MOVE_COMMAND_SIGNS[8];
    holds pointers to. */
 
 /* A single {numerator, denominator} degree ratio. This is not a guess about
-   the LAYOUT any more (round 66): Class6B5CC__UpdateRotation -- vtable slot +0x044, the
+   the LAYOUT any more (round 66): SceneNode__UpdateRotation -- vtable slot +0x044, the
    inherited rotation setter, MATCHED in src/code_d294.c -- reads exactly
    three of these from its `data` argument, one per axis, converts each with
    RatioToFixed12 and divides by 360, then either STORES them into the
@@ -103,7 +103,7 @@ typedef struct RotationRatio {
     s16 denominator;
 } RotationRatio;
 
-/* The x/y/z triple Class6B5CC__UpdateRotation actually consumes. */
+/* The x/y/z triple SceneNode__UpdateRotation actually consumes. */
 typedef struct RotationRatios {
     RotationRatio x;
     RotationRatio y;
@@ -122,7 +122,7 @@ typedef struct RotationRatios {
 extern RotationRatio TURN_ROTATION_YAW[]; /* == &TURN_ROTATIONS[0].y */
 extern RotationRatios TURN_ROTATIONS[];
 
-/* (0 deg, 180 deg, 0 deg). Address-of only, forwarded as Class6B5CC__UpdateRotation's
+/* (0 deg, 180 deg, 0 deg). Address-of only, forwarded as SceneNode__UpdateRotation's
    arg2 with flag 1 (absolute) by DreamSys__ResetSessionState. */
 extern RotationRatios ROTATION_YAW_180;
 
@@ -288,15 +288,15 @@ typedef struct SoundCueCallbackArg {
 } SoundCueCallbackArg;
 
 /* DreamSys__TickDrift's per-tick addTranslation (+0x0BC) step. */
-extern Vec3_d294 DRIFT_STEP;
+extern LongVec3 DRIFT_STEP;
 
-/* gProjectOffsetZ is the LAST word of an unnamed 3-word (Vec3_d294-shaped)
+/* gProjectOffsetZ is the LAST word of an unnamed 3-word (LongVec3-shaped)
    global scratch vector; the other two words are NOT independently named
    -- splat's dlabel boundary put them inside `VOICE_PITCH_BY_SELECT`'s dlabel as
    unlabeled tail bytes (asm/data/783DC.data.s), because nothing took their
    address directly until DreamSys__ProjectPointAtDistance (round 19). Do not rename/resegment
    this round (config/ out of scope); reach the vector's start with pointer
-   arithmetic off this symbol instead: `(Vec3_d294 *)((s32 *)&gProjectOffsetZ
+   arithmetic off this symbol instead: `(LongVec3 *)((s32 *)&gProjectOffsetZ
    - 2)`.
 
    Two independent pieces of evidence pin this down, not a guess:
@@ -309,7 +309,7 @@ extern Vec3_d294 DRIFT_STEP;
      exactly 24 bytes (`0x80087EC8`-`0x80087EDF`) -- the 8 trailing zero
      bytes splat lumped into its dlabel (`0x80087EE0`-`0x80087EE7`) are
      never reached by that indexed access and belong to something else.
-   - `Class6B5CC__LocalOffsetToWorldPos` (code_d294_c, already matched) forwards its own `src`
+   - `SceneNode__LocalOffsetToWorldPos` (code_d294_c, already matched) forwards its own `src`
      parameter to `ApplyMatrixToLVArray(dst, src, 1, buf)`, and `ApplyMatrixToLVArray`'s
      own doc comment (include/code_d294.h) confirms it treats both
      pointers as 0xC-byte (3-word) elements. `DreamSys__ProjectPointAtDistance` passes
@@ -338,7 +338,7 @@ extern struct RelativePos STAIRCASE_OFFSET_1;
    above, just a different constant (round 2026-09-02). */
 extern struct RelativePos STAIRCASE_OFFSET_3;
 
-/* (0 deg, +45 deg, 0 deg), forwarded as vtable slot +0x044's (Class6B5CC__UpdateRotation)
+/* (0 deg, +45 deg, 0 deg), forwarded as vtable slot +0x044's (SceneNode__UpdateRotation)
    arg2 with flag 0 (relative) by DreamSys__TickStaircaseCase0 and
    DreamSys__TickStaircaseCase2. Typed RotationRatios round 66: its three
    {numerator, denominator} words are {0,1} {0x2D,1} {0,1}, byte-identical in
@@ -542,7 +542,7 @@ struct DreamSys {
     s32 stageLinkAngle;
     /* Gate flag read by DreamSys__SetMoveOverride (round 2026-08-30-b): when nonzero
 	   (reusing the SAME loaded value, not a fresh 0/1 test), forwarded as
-	   Class6B5CC__UpdateRotation's arg2 -- cast from s32 to void*, not dereferenced. */
+	   SceneNode__UpdateRotation's arg2 -- cast from s32 to void*, not dereferenced. */
     s32 enterRotation;
     /* Zeroed (whole word) by DreamSys__TryStageTimerLink alongside enterRotation
 	   (round 2026-09-02). */
@@ -560,9 +560,9 @@ struct DreamSys {
 	   *coord2 (the 0x50-byte GsCOORDINATE2) then *coord2->param (the
 	   0x28-byte GsCOORD2PARAM) into these two fields;
 	   DreamSys__RestoreLinkSnapshot copies them back and then clears
-	   coord2->flg (round 2026-09-02; Class6B5CC's own types, track 4). */
-    Class6B5CCSub14 coord2Snapshot;
-    Class6B5CCSub44 coord2ParamSnapshot;
+	   coord2->flg (round 2026-09-02; SceneNode's own types, track 4). */
+    SceneNodeSub14 coord2Snapshot;
+    SceneNodeSub44 coord2ParamSnapshot;
     s32 staircaseActive;
     /* Compared with an UNSIGNED `< 1` (sltiu) by DreamSys__ApplyMoveCommand (round
 	   2026-09-06) -- typed `u32` rather than `s32` to reproduce that,
@@ -825,11 +825,11 @@ extern s32 Test4StageTransition(PlayerSpawnPoint *target, s32 stage, PlayerSpawn
    blocker resolved; see docs/match-reports/GetStageLinkAngle.md). */
 extern s32 GetStageLinkAngle(void);
 
-/* Class6B5CC__GetRotationDegrees (DreamSys__TryTunnelLink fills its 0x10-byte
-   `local` with it): include/Class6B5CC.h. */
+/* SceneNode__GetRotationDegrees (DreamSys__TryTunnelLink fills its 0x10-byte
+   `local` with it): include/SceneNode.h. */
 
 /* Called by DreamSys__TryTunnelLink as (&this->exitRotation, &this->enterRotation, &local) --
-   same `local` buffer Class6B5CC__GetRotationDegrees fills above; result used as a truth
+   same `local` buffer SceneNode__GetRotationDegrees fills above; result used as a truth
    value (`beqz`), so s32 (round 2026-09-02). MATCHED, defined later in
    this unit's own ROM order -- forward declaration only (the gp-relative
    and addiu_at blockers this was once filed under are both resolved; see

@@ -11,7 +11,7 @@ first.
 ## Final body (landed in `src/DreamSys.c`)
 
 ```c
-extern void Class6B5CC__LocalOffsetToWorldPos(void *self, s32 *dst, s32 *src, s32 arg4);
+extern void SceneNode__LocalOffsetToWorldPos(void *self, s32 *dst, s32 *src, s32 arg4);
 extern s32 InterpolateKeyframeValue(void *a, void *b, s32 day);
 extern s32 IsVec3WithinRange(s32 *a, s32 range, s32 *b);
 
@@ -24,7 +24,7 @@ s32 DreamSys__ProjectPointAtDistance(DreamSys *this, s32 *out, s32 day, s32 *ref
 
 	p = &gProjectOffsetZ;
 	*p = day;
-	Class6B5CC__LocalOffsetToWorldPos(this, local, p - 2, 0);
+	SceneNode__LocalOffsetToWorldPos(this, local, p - 2, 0);
 
 	ret = InterpolateKeyframeValue((void *)((u8 *)this->unk_0x5C + 0x14),
 	                     (void *)((u8 *)this->unk_0x5C + 0x20), day);
@@ -76,7 +76,7 @@ is a `config/` change and out of scope this round.
    (`0x80087EC8`-`0x80087EDF`) -- the 8 trailing zero bytes splat lumped
    into its dlabel (`0x80087EE0`-`0x80087EE7`) are never reached by that
    indexed access and belong to something else.
-2. `Class6B5CC__LocalOffsetToWorldPos` (code_d294_c, already matched) forwards its own `src`
+2. `SceneNode__LocalOffsetToWorldPos` (code_d294_c, already matched) forwards its own `src`
    parameter to `ApplyMatrixToLVArray(dst, src, 1, buf)`, and `ApplyMatrixToLVArray`'s
    own doc comment (`include/code_d294.h`) confirms it treats both pointers
    as 0xC-byte (3-word) elements. `DreamSys__ProjectPointAtDistance` passes
@@ -103,7 +103,7 @@ to a named pointer once, use it for both:
 ```c
 p = &gProjectOffsetZ;
 *p = day;
-Class6B5CC__LocalOffsetToWorldPos(this, local, p - 2, 0);
+SceneNode__LocalOffsetToWorldPos(this, local, p - 2, 0);
 ```
 This alone was worth several words and, more importantly, is what makes
 `gProjectOffsetZ`'s own later uses read as a genuine defect rather than random
@@ -123,7 +123,7 @@ literal null-pointer-plus-4 dereference when `unk_0xC == 0` -- the ADD
 itself is never skipped, only the POINTER varies. This exact idiom (a
 ternary yielding a null pointer, then indexed unconditionally) is not
 invented for this function: it is already proven byte-exact in
-`Class6B5CC__LocalOffsetToWorldPos`'s own matched body (`code_d294_c.c`): `table = self->unkC
+`SceneNode__LocalOffsetToWorldPos`'s own matched body (`code_d294_c.c`): `table = self->unkC
 != 0 ? self->unk14->unk38 : 0; dst[0] = dst[0] + table[0];`. Recognising
 the SAME pattern here (rather than writing the more "obviously safe"
 guarded form) is what closed this bug:
@@ -159,7 +159,7 @@ near-miss, do not treat it as one" -- and it was right to signal that. But
 it did not, and could not, point at which of the three bugs above mattered
 most: all three were found by re-deriving the control flow from the raw
 disassembly line by line and cross-checking each already-proven idiom
-against a SIBLING function's own matched body (`Class6B5CC__LocalOffsetToWorldPos`), not by
+against a SIBLING function's own matched body (`SceneNode__LocalOffsetToWorldPos`), not by
 reading the drift number harder. The number's job is "stop treating this
 as close"; it is not a diagnostic for what to fix. That distinction is
 worth keeping separate from this round's other finding (that an unverified
@@ -203,7 +203,7 @@ OUTSIDE the range**.
 ```c
 #if 0
 extern s32 gProjectOffsetZ;
-extern s32 Class6B5CC__LocalOffsetToWorldPos();
+extern s32 SceneNode__LocalOffsetToWorldPos();
 extern s32 InterpolateKeyframeValue();
 extern s32 IsVec3WithinRange();
 
@@ -213,7 +213,7 @@ s32 DreamSys__ProjectPointAtDistance(DreamSys *this, s32 *out, s32 day, s32 *ref
 	s32 v0;
 
 	gProjectOffsetZ = day;
-	Class6B5CC__LocalOffsetToWorldPos(this, local, &gProjectOffsetZ - 2, 0);
+	SceneNode__LocalOffsetToWorldPos(this, local, &gProjectOffsetZ - 2, 0);
 
 	v0 = InterpolateKeyframeValue((void *)((u8 *)this->unk_0x5C + 0x14),
 	                    (void *)((u8 *)this->unk_0x5C + 0x20), day);
@@ -255,7 +255,7 @@ Renamed from `func_8005942C`.
 
 Writes `dist` into the z word of the three-word global scratch
 offset vector, converts that LOCAL offset to a world position through
-`Class6B5CC__LocalOffsetToWorldPos` (code_d294_c, matched), replaces the result's Y
+`SceneNode__LocalOffsetToWorldPos` (code_d294_c, matched), replaces the result's Y
 with `InterpolateKeyframeValue(heightCurve+0x14, heightCurve+0x20, dist)` plus the
 object's own world-base Y, optionally copies the point out, and optionally returns
 whether it lies within `tolerance` of `reference`.

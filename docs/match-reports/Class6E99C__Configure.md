@@ -366,7 +366,7 @@ from the matched body and already documented in this function's own
 ## Track 4 (2026-09-26, round 87, echo)
 
 Slots under their unified names. The call at +0x010 was `slot10(self)`
-and is now `addChild(self, source)`: the occupant is Class6B5CC__AddChild,
+and is now `addChild(self, source)`: the occupant is SceneNode__AddChild,
 and this function never writes `$a1` before that jalr, so its own second
 argument (now `BasicClass *source`) is the child; the build stayed
 byte-identical with the argument spelled. The two StartFade functions

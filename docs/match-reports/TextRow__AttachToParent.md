@@ -15,7 +15,7 @@ void TextRow__AttachToParent(Obj6EAC0 *self, s32 a1, Pair32E99C *a2) {
     if (self->unkC != 0) {
         return;
     }
-    GetCharSpriteMethods()->attachToParent((CharSprite *)self, (Class6B5CC *)a1, (Vec3_d294 *)a2);
+    GetCharSpriteMethods()->attachToParent((CharSprite *)self, (SceneNode *)a1, (LongVec3 *)a2);
     buf = *a2;
     elemp = self->unkB4 + self->unkAC;
     i = self->unkAC;
@@ -220,8 +220,8 @@ advances), not for that specific guess.
 
 ## Track 4
 
-2026-09-26, round 86 (bravo): the parent class 0x1144 is unified as CharSprite (`include/CharSprite.h`, formerly D_8006EC74). The base call is `GetCharSpriteMethods()->attachToParent((CharSprite *)self, (Class6B5CC *)a1, (Vec3_d294 *)a2)`, through the prototyped inherited slot (was the unprototyped `slot4C`); the argument casts are to Class6B5CC's slot types, and its occupant, ScreenSprite__AttachToParent, reads the third as a ScreenSpritePos (ScreenSprite.h, "Not settled"). No code. Image byte-identical.
+2026-09-26, round 86 (bravo): the parent class 0x1144 is unified as CharSprite (`include/CharSprite.h`, formerly D_8006EC74). The base call is `GetCharSpriteMethods()->attachToParent((CharSprite *)self, (SceneNode *)a1, (LongVec3 *)a2)`, through the prototyped inherited slot (was the unprototyped `slot4C`); the argument casts are to SceneNode's slot types, and its occupant, ScreenSprite__AttachToParent, reads the third as a ScreenSpritePos (ScreenSprite.h, "Not settled"). No code. Image byte-identical.
 
 ## Track 4 (2026-09-26, round 88, charlie)
 
-2026-09-26, round 88 (charlie): class 0x11144 unified as TextRow in `include/TextRow.h` (a row of CharSprite cells: the ctor makes `count` New_CharSprite cells, setText hands each the next byte of a string, the layout slots step `cellPitch` along x). The view `Obj6EAC0` (named after BoxFill's old table address) is gone; its +0x00C `hasChildren` is Class6B5CC's `parent` (--merge CONFLICT s32 vs pointer: only tested against 0, bytes unchanged), `children` (+0x0B4) is `CharSprite **cells`, and the per-cell calls go through CharSprite's slots by name. Renamed from `Obj6EAC0__LayoutChildrenWithGap`: the +0x04C attachToParent occupant, `(TextRow *self, Class6B5CC *parent, ScreenSpritePos *pos)`. While `parent` is NULL it attaches itself through CharSprite's slot, then attaches each visible cell to self at a running position, adding `cellPitch` to x per cell and 0x10 more before cell `gapIndex`. The slot keeps Class6B5CC's Vec3_d294 offset type; the position is cast (ScreenSprite's banner). Image byte-identical; the current source is src/code_2cc8c_f.c.
+2026-09-26, round 88 (charlie): class 0x11144 unified as TextRow in `include/TextRow.h` (a row of CharSprite cells: the ctor makes `count` New_CharSprite cells, setText hands each the next byte of a string, the layout slots step `cellPitch` along x). The view `Obj6EAC0` (named after BoxFill's old table address) is gone; its +0x00C `hasChildren` is SceneNode's `parent` (--merge CONFLICT s32 vs pointer: only tested against 0, bytes unchanged), `children` (+0x0B4) is `CharSprite **cells`, and the per-cell calls go through CharSprite's slots by name. Renamed from `Obj6EAC0__LayoutChildrenWithGap`: the +0x04C attachToParent occupant, `(TextRow *self, SceneNode *parent, ScreenSpritePos *pos)`. While `parent` is NULL it attaches itself through CharSprite's slot, then attaches each visible cell to self at a running position, adding `cellPitch` to x per cell and 0x10 more before cell `gapIndex`. The slot keeps SceneNode's LongVec3 offset type; the position is cast (ScreenSprite's banner). Image byte-identical; the current source is src/code_2cc8c_f.c.

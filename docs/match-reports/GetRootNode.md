@@ -43,7 +43,7 @@ that was the first attempt, and it compiled to an EXTRA `j` at the very top
 loop's own condition test), one word longer than retail and consequently
 not aligned with it at all past word 0. A second attempt spelling the same
 thing with explicit `goto`/labels produced BIT-IDENTICAL output to the
-`do`/`while` version — consistent with this round's `Class6B5CC__TryAttachNearby`
+`do`/`while` version — consistent with this round's `SceneNode__TryAttachNearby`
 finding (previous unit) that `goto` does not reliably escape a GCC 2.6.3
 merge/rotation decision once the compiler has already decided on one.
 
@@ -75,4 +75,4 @@ rather than recognizing the guard as already covered by the loop.
 
 ## Track 4 (2026-09-25, round 85, bravo)
 
-Renamed from `Unk18Obj__GetTail`. Not a Viewport method: it is in no table, and its one caller, Viewport__Update, passes it the view node, a Class6B5CC. The chain it walks is +0x00C, Class6B5CC's `parent` (DrawNode's `parent` too), so it returns the top of the node's hierarchy: renamed GetRootNode, typed `Class6B5CC *GetRootNode(Class6B5CC *node)`, byte-identical. The Viewport class is unified in `include/Viewport.h` (round 85).
+Renamed from `Unk18Obj__GetTail`. Not a Viewport method: it is in no table, and its one caller, Viewport__Update, passes it the view node, a SceneNode. The chain it walks is +0x00C, SceneNode's `parent` (DrawNode's `parent` too), so it returns the top of the node's hierarchy: renamed GetRootNode, typed `SceneNode *GetRootNode(SceneNode *node)`, byte-identical. The Viewport class is unified in `include/Viewport.h` (round 85).

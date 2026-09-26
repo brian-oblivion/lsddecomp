@@ -50,7 +50,7 @@ class, unlinked through the identical `slot14`.
 
 Round 75 (charlie), track 3.
 
-- `Class65650__DetachFromParent` (was `func_800659D0`), tier A. Occupies +0x050, overriding Class6B5CC__DetachFromParent. While parent is set: unlinkPeer, unlink companion2 if set, chain the base detach. The mirror of AttachToParent.
+- `Class65650__DetachFromParent` (was `func_800659D0`), tier A. Occupies +0x050, overriding SceneNode__DetachFromParent. While parent is set: unlinkPeer, unlink companion2 if set, chain the base detach. The mirror of AttachToParent.
 
 ## Track 4 (2026-09-25, round 85, alpha)
 

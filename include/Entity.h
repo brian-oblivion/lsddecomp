@@ -52,7 +52,7 @@
  *    Entity__MoodCue115.md). Entity__MoodCue32/37 compile the same either way.
  *  - applyTodFrame (+0x134) returns the next frame: Entity__MoodCue91/92
  *    thread todFramePtr through it.
- *  - attachToParent (+0x04C) keeps Class6B5CC's type; callers of Entity's
+ *  - attachToParent (+0x04C) keeps SceneNode's type; callers of Entity's
  *    occupant cast to Class65650AttachToParentFn (Class65650.h's banner).
  *
  * The object is 0x108 bytes (New_Entity); Class65650's fields end at +0x098.

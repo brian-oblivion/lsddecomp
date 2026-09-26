@@ -22,7 +22,7 @@
 #include "common.h"
 #include "class_3bb8c.h"
 #include "DreamSys.h"
-#include "Class6B5CC.h"
+#include "SceneNode.h"
 #include "Viewport.h"
 #include "Class869D8.h"
 #include "Class86AA0.h"
@@ -78,7 +78,7 @@ Class86AA0 *New_Class86AA0(void) {
 }
 
 void Class86AA0__Class86AA0(Class86AA0 *self) {
-    GetClass6B5CCMethods()->ctor((Class6B5CC *)self);
+    GetSceneNodeMethods()->ctor((SceneNode *)self);
     self->methods = GetClass86AA0Methods();
     self->unk34 = 0;
     self->flags36 = 0;
@@ -95,10 +95,10 @@ void Class86AA0__DispatchLinkCommand(Class86AA0 *self, BasicClass *sender, s32 e
     }
 }
 
-/* tryAttachNearby keeps Class6B5CC's one-parameter slot type; this caller
+/* tryAttachNearby keeps SceneNode's one-parameter slot type; this caller
  * passes the sender and event too, as Actor__OnActorLinkCommand does. */
 void Class86AA0__OnActorLinkCommand(Class86AA0 *self, void *sender, s32 event) {
-    GetClass6B5CCMethods()->dispatchLinkCommand((Class6B5CC *)self, sender, event);
+    GetSceneNodeMethods()->dispatchLinkCommand((SceneNode *)self, sender, event);
     if (event >= 9) {
         return;
     }

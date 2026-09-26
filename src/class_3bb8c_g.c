@@ -125,7 +125,7 @@ void TaskObjF__LoadCardIcon(TaskObjF *self, s32 arg1) {
     newVal = New_ScreenSprite(handle, (SpriteRect *)&D_80086EC4, 0);
     self->cardIcon = newVal;
     handle->methods->release(handle);
-    newVal->methods->attachToParent(newVal, self->spriteParent, (Vec3_d294 *)&D_8008AA94);
+    newVal->methods->attachToParent(newVal, self->spriteParent, (LongVec3 *)&D_8008AA94);
 }
 
 void TaskObjF__ReleaseCardIcon(TaskObjF *self) {

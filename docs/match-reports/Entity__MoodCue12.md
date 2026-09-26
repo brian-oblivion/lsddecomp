@@ -14,7 +14,7 @@ see `Entity__MoodCue13.md`):
 1. If `this->unkFC == 0` and a coin flip (`rand() & 1 == 0`) lands, sets
    `this->unk44 = 0xB`.
 2. If `this->unk14->y < 0x7D0` (2000), fires the still-uncarved
-   `Class6B5CC__FaceTarget(this, this->unk94, 1, 0, 0)`.
+   `SceneNode__FaceTarget(this, this->unk94, 1, 0, 0)`.
 3. Then, depending on `this->unk44`:
    - `== 0xB`: calls `this->methods->slot144(this, this->unk94)`; if the
      result is `< 0xA00` (2560), calls `this->unk4C->methods->slot138(this->unk4C,
@@ -80,7 +80,7 @@ void Entity__MoodCue12(Entity *this) {
     }
     y = this->unk14->y;
     if (y < 0x7D0) {
-        Class6B5CC__FaceTarget(this, this->unk94, 1, 0, 0);
+        SceneNode__FaceTarget(this, this->unk94, 1, 0, 0);
     }
     if (this->unk44 == 0xB) {
         result = this->methods->slot144(this, this->unk94);

@@ -5,7 +5,7 @@ Round 82, runner alpha (fourth slot on code_322b4). Unit `src/code_322b4.c`. Nam
 - **Where:** gSpriteMethods slot +0x040 (reset), declared in `include/Sprite.h` as `void Sprite__Reset(Sprite *self, void *texture, s32 abr, SpriteRect *rect)`.
 - **What:** `image = texture + 0x2C` (the TimImage's GsIMAGE), copies the 12-byte cell into `rect`, calls `InitGsSprite(&self->sprite, abr, rect, self->image)` (image RELOADED from the object, which is what the retail `lw a3,0x48(s0)` is), then zeroes `unk58`.
 - **Result:** byte-exact, 24/24 words, 0 ins / 0 del, whole-image SHA1 green. First build, against the header's prototype unchanged.
-- **Track 4:** confirms Sprite.h's reading of reset's three parameters (texture, abr, rect). The Class6B5CC slot +0x040 type question in the Sprite.h banner is unchanged: this function is only defined here, never called through the slot. No header touched.
+- **Track 4:** confirms Sprite.h's reading of reset's three parameters (texture, abr, rect). The SceneNode slot +0x040 type question in the Sprite.h banner is unchanged: this function is only defined here, never called through the slot. No header touched.
 
 ## Source
 

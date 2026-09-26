@@ -3,7 +3,7 @@
 
 #include "common.h"
 #include "BasicClass.h"
-#include "Class6B5CC.h"
+#include "SceneNode.h"
 #include "BoxFill.h"
 #include "Class6E99C.h"
 #include "IntermediateBase.h"
@@ -173,13 +173,13 @@ extern s32 D_8008A8E8[2];  /* address-taken only by this unit */
 extern char D_8008A8F0[4]; /* address-taken only by this unit */
 
 /* New_Class6E99C: include/Class6E99C.h. */
-/* New_Class6B5CC: include/Class6B5CC.h (it was a local Unk18AcObj view). */
+/* New_SceneNode: include/SceneNode.h (it was a local Unk18AcObj view). */
 extern u8 D_8008A90C[];           /* address-taken only by this unit: (320, 240), the
                             size Viewport's ctor passes New_Class6E99C */
 extern u8 D_8008A904[];           /* address-taken only by this unit: (-100, -100), the
                             screen position Viewport's ctor and SetSubHandle
                             attach the sub handle at (include/Viewport.h) */
-extern WholeFrac_d294 D_8008A8F4; /* {0, 1}: Viewport__AttachViewChild's twist
+extern Ratio16 D_8008A8F4; /* {0, 1}: Viewport__AttachViewChild's twist
                             when its own is NULL (asm/data/7B048.sdata.s) */
 
 /* GsSetRefView2 is NO LONGER DECLARED HERE, round 33. It is Sony's
@@ -212,7 +212,7 @@ extern WholeFrac_d294 D_8008A8F4; /* {0, 1}: Viewport__AttachViewChild's twist
 /* The following are called only from Viewport__Update (this unit). They are
    plain `void *` global setters (this call site happens to pass an
    already-`s32`-shaped value, which is an ordinary int-to-pointer conversion
-   with identical codegen, same precedent as Class6B5CC__DispatchLinkCommand/Class6B5CC__TryAttachNearby in
+   with identical codegen, same precedent as SceneNode__DispatchLinkCommand/SceneNode__TryAttachNearby in
    code_d294.h); the retypes come from the functions' own definitions and are
    ABI-identical (word-sized values either way), so they do not change this
    call site's own compiled bytes.
@@ -282,7 +282,7 @@ extern s32 ResetGraph(s32 mode);
  * TaskCore holds (`slotElements`, `itemLists`), which New_TextRow makes.
  */
 
-/* The packed-bitfield accessor Class6B5CC's attribute setters use
+/* The packed-bitfield accessor SceneNode's attribute setters use
  * (code_d294), reached here by BoxFill's over `&self->boxAttribute`. */
 extern u32 GetSetBitField(u32 *word, s32 shift, s32 width, u32 value);
 
@@ -290,7 +290,7 @@ extern u32 GetSetBitField(u32 *word, s32 shift, s32 width, u32 value);
 /* gTextRowMethods, GetTextRowMethods and New_TextRow: include/TextRow.h.
  * GetCharSpriteMethods and New_CharSprite: include/CharSprite.h. */
 
-/* GetClass6B5CCMethods and its table: include/Class6B5CC.h (track 4, round 81). */
+/* GetSceneNodeMethods and its table: include/SceneNode.h (track 4, round 81). */
 
 /* Class6E99C (class id 0x164, D_8006E99C): include/Class6E99C.h (track 4,
  * round 87; it was a local Class6E99CObj view here). */

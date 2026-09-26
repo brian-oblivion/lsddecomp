@@ -29,11 +29,11 @@ extern u8 D_8006E860[];
 
 /* Two more rodata symbols reached only by address (round 2, TaskCore__OnInit):
  * `gDefaultStreamTaskInitData`, passed as `TaskTextMethods::slot78`'s 3rd argument, and
- * `D_8006E86C`, a zero Vec3_d294 passed TWICE (same address) as the
+ * `D_8006E86C`, a zero LongVec3 passed TWICE (same address) as the
  * viewport's attachViewChild viewpoint AND reference point (Viewport.h
  * +0x070). Neither is dereferenced by this unit. */
 extern u8 gDefaultStreamTaskInitData[];
-extern Vec3_d294 D_8006E86C;
+extern LongVec3 D_8006E86C;
 
 /* initArgs->unk0's class (IntermediateBaseInitArgs, BasicClass * there) as
  * TaskCore__OnInit/OnDeinit call its +0x078 with baseColor or unk93. */

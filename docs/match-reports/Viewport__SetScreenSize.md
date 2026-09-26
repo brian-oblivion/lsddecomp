@@ -44,7 +44,7 @@ gains `unk34` (`+0x034`, `Pair32_d294`, spanning what would have been
 
 ## Proposed learning
 
-Third instance this unit of the same tell (after `Class6B5CC__GetRotMatrix`'s
+Third instance this unit of the same tell (after `SceneNode__GetRotMatrix`'s
 all-`s16` `lwl`/`lwr` case last round and `Viewport__SetClearColor` earlier this
 round): **when retail's disassembly loads every source field into a
 register before storing any of them, the fix is a whole-struct assignment,

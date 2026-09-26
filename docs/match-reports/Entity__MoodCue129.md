@@ -12,7 +12,7 @@ No hits.
 
 `gEntityMoodHandlerTable` handler row; `out` unused. Sets `this->unk44 = rand() % 2 +
 0xA` (either 0xA or 0xB) when `this->unkFC == 0`. Dispatches `slot130`
-unconditionally. When `this->unkFC >= 0xC9`: calls `Class6B5CC__FaceTarget(this,
+unconditionally. When `this->unkFC >= 0xC9`: calls `SceneNode__FaceTarget(this,
 this->unk94, 1, 0, 0)`, then `slotD0(this, -0x200, 0)` if `this->unk44 ==
 0xA`.
 
@@ -25,7 +25,7 @@ void Entity__MoodCue129(Entity *this, EntityMoodHandlerArg *out) {
     }
     this->methods->slot130(this);
     if (this->unkFC >= 0xC9) {
-        Class6B5CC__FaceTarget(this, this->unk94, 1, 0, 0);
+        SceneNode__FaceTarget(this, this->unk94, 1, 0, 0);
         if (this->unk44 == 0xA) {
             this->methods->slotD0(this, -0x200, 0);
         }

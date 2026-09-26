@@ -66,7 +66,7 @@ bool DreamSys__TryStaircaseLink(DreamSys *this, PlayerSpawnPoint *currentPos)
 				}
 			}
 		} else if (Test4StaircaseNodes(&this->linkCoordinates, currentPos, this->currentStage) >= 0) {
-			Class6B5CC__GetRotationDegrees(this, local);
+			SceneNode__GetRotationDegrees(this, local);
 			if (DreamSys__CheckStaircaseHeading(&this->exitRotation, &this->enterRotation, local)
 			    && this->moveCommandLatch != 0) {
 				*(PlayerSpawnPoint *)&this->staircaseGridPos = *currentPos;
@@ -74,7 +74,7 @@ bool DreamSys__TryStaircaseLink(DreamSys *this, PlayerSpawnPoint *currentPos)
 				this->staircaseMoveGate = 1;
 				this->staircaseFrame = 0;
 				this->staircaseTickFn = STAIRCASE_TICK_FNS[GetLastSpawnExtra()];
-				this->vt->Class6B5CC__UpdateRotation(this, 1, (void *)this->enterRotation);
+				this->vt->SceneNode__UpdateRotation(this, 1, (void *)this->enterRotation);
 				this->staircaseTickFn(this);
 			}
 		}
@@ -219,7 +219,7 @@ staircase:
 	if (result < 0) {
 		return false;
 	}
-	Class6B5CC__GetRotationDegrees(this, local);
+	SceneNode__GetRotationDegrees(this, local);
 	if (!DreamSys__CheckStaircaseHeading(&this->unk_0x888, &this->unk_0x884, local)) {
 		return false;
 	}
@@ -233,7 +233,7 @@ staircase:
 	this->unk_0x90C = 1;
 	this->unk_0x914 = 0;
 	this->unk_0x910 = STAIRCASE_TICK_FNS[GetLastSpawnExtra()];
-	this->vt->Class6B5CC__UpdateRotation(this, 1, (void *)this->unk_0x884);
+	this->vt->SceneNode__UpdateRotation(this, 1, (void *)this->unk_0x884);
 	this->unk_0x910(this);
 	return false;
 }

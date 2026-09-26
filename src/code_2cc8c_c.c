@@ -224,16 +224,16 @@ Viewport *New_Viewport(void) {
 }
 
 void Viewport__Viewport(Viewport *self) {
-    Class6B5CC *obj;
+    SceneNode *obj;
 
     Get_vtable_BasicClass()->ctor((BasicClass *)self);
     self->methods = GetViewportMethods();
     self->drawSystem = 0;
     self->viewNode = 0;
-    self->sceneRoot = New_Class6B5CC();
-    obj = (Class6B5CC *)New_Class6E99C(D_8008A90C, 0, 0);
+    self->sceneRoot = New_SceneNode();
+    obj = (SceneNode *)New_Class6E99C(D_8008A90C, 0, 0);
     self->subHandle = obj;
-    obj->methods->attachToParent(obj, self->sceneRoot, (Vec3_d294 *)D_8008A904);
+    obj->methods->attachToParent(obj, self->sceneRoot, (LongVec3 *)D_8008A904);
     self->methods->initDefaults(self);
 }
 
@@ -251,8 +251,8 @@ void Viewport__AddChild(Viewport *self, BasicClass *child) {
     Get_vtable_BasicClass()->addChild((BasicClass *)self, child);
     header = child->methods->header & 0xF;
     if (header == 4) {
-        self->viewNode = (Class6B5CC *)child;
-        self->refView.super = ((Class6B5CC *)child)->coord2;
+        self->viewNode = (SceneNode *)child;
+        self->refView.super = ((SceneNode *)child)->coord2;
     } else if (header == 1) {
         self->drawSystem = (DrawSystem *)child;
     }

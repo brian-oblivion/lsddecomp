@@ -194,7 +194,7 @@ op code it enqueues.
 
 **Why tier B, not A.** The behaviour is established, but the class's identity
 is not: `Class6D4E8` is a placeholder token for the table address, following
-the existing `Class6B5CC__RotateLocalVector` convention in the symbols file.
+the existing `SceneNode__RotateLocalVector` convention in the symbols file.
 The unit as a whole is demonstrably the CD-ROM read driver, but no evidence
 here says what the developers called this class -- see
 `GetCdDriverMethods.md`.

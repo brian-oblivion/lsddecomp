@@ -326,7 +326,7 @@ reference (mirroring `self`'s early use via `p = self->unk70;`) might
 persuade GCC to materialize its callee-saved copy at the same point.
 Result: **33/40, IDENTICAL residue, no change whatsoever** (same 7-word
 diff, same values, no drift either way) -- this axis, which helped
-close/narrow register-identity residues on `Class6B5CC__NotifyTaggedParents` and
+close/narrow register-identity residues on `SceneNode__NotifyTaggedParents` and
 `Class866E8__Finalize` earlier this round, does nothing for a parameter-copy-
 TIMING residue. Reverted immediately.
 
@@ -729,7 +729,7 @@ promotion only.
 
 Round 75 (charlie), track 3.
 
-- `Class65650__SetLightMode` (was `func_80065AE0`), tier A. Occupies +0x070, overriding Class6B5CC__SetLightMode; forwards to every part's SetLightMode, then chains the base.
+- `Class65650__SetLightMode` (was `func_80065AE0`), tier A. Occupies +0x070, overriding SceneNode__SetLightMode; forwards to every part's SetLightMode, then chains the base.
 
 ## Track 4 (2026-09-25, round 85, alpha)
 

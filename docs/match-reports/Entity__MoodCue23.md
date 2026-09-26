@@ -15,7 +15,7 @@ different rodata pointer / literal:
 void Entity__MoodCue23(Entity *this) {
     s32 arg1;
 
-    Class6B5CC__FaceTarget(this, this->unk94, 1, 0, 0);
+    SceneNode__FaceTarget(this, this->unk94, 1, 0, 0);
 
     if (this->unkF4 != 0) {
         if (this->unkFC >= 0x41) {

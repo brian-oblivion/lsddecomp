@@ -41,7 +41,7 @@ void Entity__MoodCue102(Entity *this, EntityMoodHandlerArg *out) {
         this->methods->slot44(this, 0, D_80089CAC);
     }
     if (this->unkFC >= 0x30D) {
-        Class6B5CC__FaceTarget(this, this->unk94, 1, 0, 0);
+        SceneNode__FaceTarget(this, this->unk94, 1, 0, 0);
         if (this->unkFC >= 0x790) {
             a2 = D_80089E14;
         } else if (this->unkFC >= 0x78B) {
@@ -156,7 +156,7 @@ elsewhere in this unit -- same symbol, not redecoded per call site.
 - `D_80089E14` (`updateScale` arg, `moodTimer >= 0x790` arm): decoded
   `(1,1, 1,1, 1,1, 1,8)` -- uniform X=Y=Z=1/1, i.e. the same VALUE as the
   existing (structurally distinct, different address, 0xC-byte/3-entry)
-  `SCALE_ONE` used by `Class6B5CC__UpdateScale`. Not renamed to `SCALE_ONE`
+  `SCALE_ONE` used by `SceneNode__UpdateScale`. Not renamed to `SCALE_ONE`
   or a variant: two differently-addressed, differently-shaped symbols
   sharing one implied meaning is confusing, not clarifying.
 - `D_80089DE4` (`updateScale` arg, `moodTimer >= 0x78B` arm): decoded

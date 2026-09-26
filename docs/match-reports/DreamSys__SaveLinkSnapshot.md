@@ -29,7 +29,7 @@ header). `DreamSys__RestoreLinkSnapshot` copies the SAME two regions back, then 
 
 This resolves concrete new fields of the struct `unk_0x14` points to,
 previously only known to hold "a 3-word vector at +0x38" (read by
-`Class6B5CC__LocalOffsetToWorldPos`/`DreamSys__ProjectPointAtDistance`, both still `INCLUDE_ASM`):
+`SceneNode__LocalOffsetToWorldPos`/`DreamSys__ProjectPointAtDistance`, both still `INCLUDE_ASM`):
 
 - `+0x0`: a word, cleared to 0 by `DreamSys__RestoreLinkSnapshot`'s restore, after the rest
   of the struct has already been overwritten.

@@ -20,7 +20,7 @@ void Entity__MoodCue67(Entity *this, EntityMoodHandlerArg *out) {
     if (this->unk44 == 0xB) {
         if (this->unkFC == 0x1F6) {
             this->methods->slotCC(this, 0x800, 0);
-            Class6B5CC__FaceTarget(this, this->unk94, 1, 0, 0);
+            SceneNode__FaceTarget(this, this->unk94, 1, 0, 0);
         }
         if (this->unkFC >= 0x1F5) {
             this->methods->slotC4(this, -0x200, 0);

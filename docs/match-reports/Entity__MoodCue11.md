@@ -25,7 +25,7 @@ smaller handlers established individually:
      below), then a range-checked call through `this->unk94`'s OWN vtable
      (`Unk94Methods::slot100`) that can reset `this->unkFC`/`this->unk44`.
    - `== 0xC`: single `unkFC == 0x7BC` check, sets `row`.
-   - `== 0xD`: `this->unk48 = -0x78;` + `Class6B5CC__FaceTarget(...)` +
+   - `== 0xD`: `this->unk48 = -0x78;` + `SceneNode__FaceTarget(...)` +
      `slot48(this, 1, SCALE_HALF)` (return discarded) + a `slot144`
      threshold check (the SAME 2-argument `slot144` established in
      `Entity__IsTargetInRange`/`Entity__MoodCue12`) gating a `slot30(this, 0xB)` call.
@@ -109,7 +109,7 @@ void Entity__MoodCue11(Entity *this, EntityMoodHandlerArg *out) {
         }
     } else if (this->unk44 == 0xD) {
         this->unk48 = -0x78;
-        Class6B5CC__FaceTarget(this, this->unk94, 1, 0, 0);
+        SceneNode__FaceTarget(this, this->unk94, 1, 0, 0);
         this->methods->slot48(this, 1, SCALE_HALF);
         if (this->methods->slot144(this, this->unk94) < 0x400) {
             this->methods->slot30(this, 0xB);

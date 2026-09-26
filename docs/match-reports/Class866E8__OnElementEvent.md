@@ -7,7 +7,7 @@
 ## What it does
 
 `Class866E8Methods` slot `+0x088`. Calls the same external, not-decompiled
-table lookup as `Class866E8__OnNotify` (`GetClass6B5CCMethods(self, arg1)`), but through
+table lookup as `Class866E8__OnNotify` (`GetSceneNodeMethods(self, arg1)`), but through
 that table's slot `+0x088` with only `(self, arg1)` (a genuinely 2-arg
 call — `$a2` is left live/unset). Then:
 
@@ -27,7 +27,7 @@ void Class866E8__OnElementEvent(Class866E8 *self, s32 arg1, UnkListObj_3ac78 *ar
 {
     void (*fn)(Class866E8 *self, s32 arg1);
 
-    fn = *(void (**)(Class866E8 *, s32))((u8 *)GetClass6B5CCMethods(self, arg1) + 0x88);
+    fn = *(void (**)(Class866E8 *, s32))((u8 *)GetSceneNodeMethods(self, arg1) + 0x88);
     fn(self, arg1);
 
     if (arg1 == 6)
@@ -91,7 +91,7 @@ Round 67 (track 3, naming pass).
 
 | symbol | name | tier | evidence |
 | --- | --- | --- | --- |
-| `func_8004AA6C` | `Class866E8__OnElementEvent` | B | Occupant of vtable slot `+0x088`. Three call sites agree on the argument shape `(self, command, elem, index)`: `Class866E8__Finalize` and `Class866E8__ResetAllElements` here (command 6), and `class_3bb8c`'s `Class866E8__OnNotifyTag1` (command 7). The body forwards to the BASE table's `+0x088` -- `Class6B5CC__NotifyIfUnk20Active`, which itself gates on a command code in `{2,3}` -- then, for command 6, releases the element's own held object, and for 6 and 7 records the element in `lastEventElem` and re-emits with `notifyParents(self, command)`. So: an element-scoped event arrives, is handled, and is passed up. Tier B: the mechanics are complete, what commands 6 and 7 MEAN in the game is not established. |
+| `func_8004AA6C` | `Class866E8__OnElementEvent` | B | Occupant of vtable slot `+0x088`. Three call sites agree on the argument shape `(self, command, elem, index)`: `Class866E8__Finalize` and `Class866E8__ResetAllElements` here (command 6), and `class_3bb8c`'s `Class866E8__OnNotifyTag1` (command 7). The body forwards to the BASE table's `+0x088` -- `SceneNode__NotifyWithHull`, which itself gates on a command code in `{2,3}` -- then, for command 6, releases the element's own held object, and for 6 and 7 records the element in `lastEventElem` and re-emits with `notifyParents(self, command)`. So: an element-scoped event arrives, is handled, and is passed up. Tier B: the mechanics are complete, what commands 6 and 7 MEAN in the game is not established. |
 
 Type correction made this round, byte-neutral and oracle-verified: the third
 parameter was typed `UnkListObj_3ac78 *` (this unit's SENDER type). All three

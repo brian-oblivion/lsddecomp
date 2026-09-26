@@ -1,0 +1,101 @@
+# SceneNode__SceneNode
+
+> Renamed from `Class6B5CC__Class6B5CC` on 2026-09-26 (tools/rename.py). Address 0x8001caf4.
+
+> Renamed from `func_8001CAF4` on 2026-09-23 (tools/rename.py). Address 0x8001caf4.
+
+**Unit:** code_d294 · **Size:** 44 words · **Status:** MATCHED (44/44 words)
+
+## What it does
+
+`SceneNode`'s own constructor — vtable slot `+0x008` of `gSceneNodeMethods`
+(confirmed directly: `tools/classtable.py gSceneNodeMethods` names `SceneNode__SceneNode`
+as the occupant of that slot). Takes an already-allocated `self` (the
+allocation itself is `New_SceneNode`, a separate `New_X` wrapper, not this
+function). Allocates two sub-blocks (`self->unk14`, 0x50 bytes, then
+`self->unk14->unk44`, 0x28 bytes), frees the first and bails out if the
+second allocation fails, otherwise calls the BasicClass base constructor
+(`Get_vtable_BasicClass()->ctor(self)`), overwrites `self->methods` with this
+class's own vtable (`GetSceneNodeMethods()`, i.e. `&gSceneNodeMethods`), zeroes several
+freshly-added fields, and finally calls its own virtual init hook
+(`self->methods->slot40`, `SceneNode__Reset` — still queued) before returning
+`self` unconditionally.
+
+## The C
+
+```c
+void *SceneNode__SceneNode(SceneNodeObj *self) {
+    void *blockB;
+
+    self->unk14 = BMemPMgrAlloc(0x50);
+    if (self->unk14 == NULL) {
+        return NULL;
+    }
+    blockB = BMemPMgrAlloc(0x28);
+    self->unk14->unk44 = blockB;
+    if (blockB == NULL) {
+        BMemPMgrFree(self->unk14);
+        return NULL;
+    }
+    Get_vtable_BasicClass()->ctor(self);
+    self->methods = GetSceneNodeMethods();
+    self->unk20 = 0;
+    self->unk18 = 0;
+    self->unkC = NULL;
+    self->unk14->unk48 = 0;
+    self->methods->slot40(self);
+    return self;
+}
+```
+
+## Two source-shape lessons, both confirmed by measured attempts
+
+- **Do not cache a re-read field in a local across a call sequence.** A
+  first attempt cached `self->unk14` once into a local `sub` and reused it
+  for both `sub->unk44 = ...` and, much later (after 3 intervening calls),
+  `sub->unk48 = 0`. That forced the compiler to promote the cache to a
+  callee-saved register (`$s1`), which changed the frame size by 8 bytes
+  (`-0x18` retail vs `-0x20` mine) and shifted every following byte in the
+  whole ROM image — the classic address-drift failure mode. Writing
+  `self->unk14->unk44 = ...` and `self->unk14->unk48 = 0` as two
+  independent re-derivations (no cached local surviving the calls between
+  them) let the compiler use a cheap caller-saved `$v1`, reloaded fresh
+  right where retail reloads it, and the frame size matched immediately.
+  This is the "mention the value multiple times, don't cache across a
+  call" idiom, but for a struct-field re-read rather than a redundant
+  `move` — worth adding to the general pattern in
+  DECOMPILATION_LEARNINGS.md if a second instance turns up.
+- **Instruction ORDER (store vs. call-argument setup) around a `jal`'s
+  delay slot is source-order-sensitive in a way that isn't just "which
+  statement is textually first".** `self->unk14 = BMemPMgrAlloc(0x50);`
+  compiled with the STORE and the FOLLOWING call's `li $a0` juggled by the
+  scheduler; the version that matched byte-for-byte was writing the
+  allocation call directly into the assignment
+  (`self->unk14 = BMemPMgrAlloc(0x50);`) rather than staging it through an
+  intermediate local (`blockA = BMemPMgrAlloc(0x50); ...; self->unk14 =
+  blockA;`), even though both are logically identical. Prefer assigning a
+  struct-field/global destination directly from the call expression over
+  round-tripping it through a temporary, when a residue looks like two
+  independent instructions swapped around a `jal`.
+
+## Provenance
+
+round 11 (2026-09-03), runner charlie, unit code_d294 (fresh carve, first attempt).
+Both fixes above were found within the 30-attempt budget (2 rebuild
+iterations total).
+
+## Naming
+
+Round 71 (alpha). `func_8001CAF4` -> `SceneNode__SceneNode`, **tier A**. Table slot +0x008 (ctor) of gSceneNodeMethods. Allocates the 0x50-byte GsCOORDINATE2 and 0x28-byte GsCOORD2PARAM, runs the BasicClass ctor, installs gSceneNodeMethods, zeroes fields, then calls `reset`. `Class__Class` constructor convention (BasicClass__BasicClass).
+
+## Proposed field names
+
+For the head to apply by type scope. Each one fails to compile in another unit when renamed in the definition, so this unit did not apply it.
+
+- `SceneNodeObj.unk14` -> `coord2` (tier A): the ctor allocates exactly sizeof(GsCOORDINATE2) = 0x50 for it and Reset runs GsInitCoordinate2 on it; +0x14 of the embedded GsDOBJ2 is `coord2` in LIBGS.H. Accessors: code_d294, code_d294_b, code_d294_c (compiler-measured).
+- `UnkOwner_d294.unk14` and `GenericObj_d294.unk14` -> `coord2` (tier A): the same field on the parent and on a sibling object (AttachToParent copies the parent's into `super`). Accessors: code_d294, code_d294_c.
+- `SceneNodeSub14.unk44` -> `param` (tier A): GsCOORDINATE2.param, the 0x28-byte GsCOORD2PARAM the ctor allocates. Accessors: code_d294, code_d294_b, code_d294_c.
+
+## Track 6 (round 91, echo): the class is SceneNode
+
+Class6B5CC -> SceneNode (`renametype.py`), tier A for what it is: the ctor allocates a GsCOORDINATE2 (0x50) and a GsCOORD2PARAM (0x28) and the object embeds a GsDOBJ2 at +0x010 (SceneNode__LinkModel passes &attribute to GsLinkObject4); attachToParent/detachFromParent maintain `parent` and coord2->super, a libgs transform hierarchy; sixteen classes derive from it (Actor, Sprite, LightRig, BoxFill, ...). The libgs member types (SceneNodeSub14 = GsCOORDINATE2, SceneNodeSub44 = GsCOORD2PARAM, S16Quad_d294 = SVECTOR) are not yet substituted: including <libgs.h> in SceneNode.h breaks 24 units whose headers declare Sony names their own way (measured this round).

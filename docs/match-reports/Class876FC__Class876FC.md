@@ -30,10 +30,10 @@ fail:
 
 ## Derivation
 
-- **`GetActorMethods()`, not `GetClass6B5CCMethods()`.** Both are fixed-table
+- **`GetActorMethods()`, not `GetSceneNodeMethods()`.** Both are fixed-table
   getters `class_3bb8c_o.c` already resolved last pass for the SAME
   shared intermediate base class, but they are DIFFERENT symbols with
-  DIFFERENT call sites in that unit (`GetClass6B5CCMethods` for the ctor CHAIN
+  DIFFERENT call sites in that unit (`GetSceneNodeMethods` for the ctor CHAIN
   inside `Actor__Actor`; `GetActorMethods` for the plain-allocator
   `New_Actor`'s own ctor dispatch). This function's own disassembly
   calls `GetActorMethods`, confirmed directly rather than assumed from
@@ -73,8 +73,8 @@ fail:
 
 ## Naming
 
-**Tier A.** `Class876FC` is the class name class_3bb8c_s.c already uses for `gClass876FCMethods` (its own comment: "`Class876FC` here; class_3bb8c_r.c's `Obj876FC`" -- confirmed via `tools/classtable.py 0x800876FC`, whose slot list mixes `Class6B5CC__`/`BaseObjO__`/`DreamSys__`-prefixed inherited slots with this unit's own `+0x008`/`+0x00C`/`+0x040`/`+0x0EC`). Ctor naming follows the `Class__Class` convention already used for `Actor__Actor`/`Class6B5CC__Class6B5CC`. The body is a constructor by construction (chains the shared base ctor, installs the vtable, dispatches init) -- purpose evident from the body.
+**Tier A.** `Class876FC` is the class name class_3bb8c_s.c already uses for `gClass876FCMethods` (its own comment: "`Class876FC` here; class_3bb8c_r.c's `Obj876FC`" -- confirmed via `tools/classtable.py 0x800876FC`, whose slot list mixes `SceneNode__`/`BaseObjO__`/`DreamSys__`-prefixed inherited slots with this unit's own `+0x008`/`+0x00C`/`+0x040`/`+0x0EC`). Ctor naming follows the `Class__Class` convention already used for `Actor__Actor`/`SceneNode__SceneNode`. The body is a constructor by construction (chains the shared base ctor, installs the vtable, dispatches init) -- purpose evident from the body.
 
 ## Track 4 (2026-09-26, round 88, charlie)
 
-Retyped with the class's unification (include/Class876FC.h): same parameters as New_Class876FC. The two stores the old view called `unk44` and `kind` are Actor's `state` (+0x044) and `pendingExtra` (+0x054): the ctor keeps `kind` in pendingExtra, and the class overrides pendingExtra's setter slot (+0x0EC) with its update, so nothing else writes it. The old own slot `setParams` at +0x040 is Class6B5CC's `reset`; the call casts to Class876FCSetParamsFn (no code). Image byte-identical.
+Retyped with the class's unification (include/Class876FC.h): same parameters as New_Class876FC. The two stores the old view called `unk44` and `kind` are Actor's `state` (+0x044) and `pendingExtra` (+0x054): the ctor keeps `kind` in pendingExtra, and the class overrides pendingExtra's setter slot (+0x0EC) with its update, so nothing else writes it. The old own slot `setParams` at +0x040 is SceneNode's `reset`; the call casts to Class876FCSetParamsFn (no code). Image byte-identical.

@@ -28,10 +28,10 @@
  * which expands CharSprite's.
  *
  * Not settled here: the ctor occupant returns nothing where the slot, from
- * Class6B5CC, returns `void *`; and the attachToParent override's third
- * argument is a ScreenSpritePos where the slot, Class6B5CC's, types it
- * `Vec3_d294 *offset`, so a call through the slot with a position needs a
- * cast. Both slots are Class6B5CC's to change.
+ * SceneNode, returns `void *`; and the attachToParent override's third
+ * argument is a ScreenSpritePos where the slot, SceneNode's, types it
+ * `LongVec3 *offset`, so a call through the slot with a position needs a
+ * cast. Both slots are SceneNode's to change.
  *
  * The object is 0xA8 bytes (New_ScreenSprite).
  */
@@ -79,7 +79,7 @@ extern ScreenSpriteMethods *GetScreenSpriteMethods(void); /* returns &gScreenSpr
 ScreenSprite *New_ScreenSprite(void *texture, SpriteRect *rect, s32 arg3);
 void ScreenSprite__ScreenSprite(ScreenSprite *self, void *texture, SpriteRect *rect, s32 arg3);
 void ScreenSprite__Reset(ScreenSprite *self);
-void ScreenSprite__AttachToParent(ScreenSprite *self, Class6B5CC *parent, ScreenSpritePos *pos);
+void ScreenSprite__AttachToParent(ScreenSprite *self, SceneNode *parent, ScreenSpritePos *pos);
 void ScreenSprite__SetPosition(ScreenSprite *self, ScreenSpritePos *pos);
 void ScreenSprite__SetPivotAnchor(ScreenSprite *self, u32 anchor);
 

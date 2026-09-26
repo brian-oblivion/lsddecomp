@@ -41,7 +41,7 @@ Rec6F13C *LinkResource__GetTmdObject(FileResource *self, s32 index) {
 
 ## Notes
 
-- No shared header was edited. `FileResource.h`, `Class6B5CC.h`, `BasicClass.h` are
+- No shared header was edited. `FileResource.h`, `SceneNode.h`, `BasicClass.h` are
   included; prototypes for other units' functions (GetActiveDataSourceMethods,
   ReleaseBasicClassArray, BMemPMgrFree) are local to the unit.
 - Types of arguments and returns are readings of the registers used, not proven.

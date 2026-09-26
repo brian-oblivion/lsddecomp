@@ -83,7 +83,7 @@ found.
 
 Round 75 (charlie), track 3.
 
-- `Class65650__Tick` (was `func_80065FD8`), tier B. Occupies +0x108; reached from Class65650__Update (formerly OnClass6EF50Notify) code 2. Increments Class6B5CC's tick (+0x24), calls tickCallback while tickCallbackEnabled, and while todPlaying with todFrameCount >= 2 applies the next frame (applyTodFrame), advances todFrame and wraps to the TOD's first frame at todFrameCount; finally clears coord2->flg. Mechanics are all in the body; B because the per-call driver is known only as 'code 2 from the tag-5 companion'.
+- `Class65650__Tick` (was `func_80065FD8`), tier B. Occupies +0x108; reached from Class65650__Update (formerly OnClass6EF50Notify) code 2. Increments SceneNode's tick (+0x24), calls tickCallback while tickCallbackEnabled, and while todPlaying with todFrameCount >= 2 applies the next frame (applyTodFrame), advances todFrame and wraps to the TOD's first frame at todFrameCount; finally clears coord2->flg. Mechanics are all in the body; B because the per-call driver is known only as 'code 2 from the tag-5 companion'.
 
 ## Track 4 (2026-09-25, round 85, alpha)
 

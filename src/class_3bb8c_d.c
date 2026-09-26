@@ -151,8 +151,8 @@ void Class86B60__DestroyNameField(Class86B60 *self) {
 
 void Class86B60__ForwardToNameField(Class86B60 *self, void *parent) {
     Get_vtable_TaskCore()->updateSlotElements((TaskCore *)self, parent);
-    self->nameField->methods->attachToParent(self->nameField, (Class6B5CC *)parent,
-                                             (Vec3_d294 *)&D_8008A9B4);
+    self->nameField->methods->attachToParent(self->nameField, (SceneNode *)parent,
+                                             (LongVec3 *)&D_8008A9B4);
 }
 
 /* MATCHED round 75 (was STALL round 43) -- see
@@ -227,7 +227,7 @@ void Class86B60__BeginMemcardSave(Class86B60 *self) {
         self->saveCtrl = New_TaskObjF(1, 0);
     }
     self->saveCtrl->methods->init(self->saveCtrl, D_8008A9D0, (char **)&D_80086D6C,
-                                  self->initArgs->unk4, self->unk10, (struct Class6B5CC *)self->unk14,
+                                  self->initArgs->unk4, self->unk10, (struct SceneNode *)self->unk14,
                                   (struct VabStreamObj *)self->sound);
     self->methods->addChild(self, (BasicClass *)self->saveCtrl);
     self->methods->removeChild(self, self->initArgs->unk4);

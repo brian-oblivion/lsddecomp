@@ -34,7 +34,7 @@ decompiled here; declared with the opaque `void *` shape its own body
 forwards without dereferencing.
 
 `self->unk10` (`Class6E99CObj`, `include/code_2cc8c.h`) is loaded as a plain
-word and forwarded unmodified -- same base offset as `Class6B5CCObj`'s own
+word and forwarded unmodified -- same base offset as `SceneNodeObj`'s own
 inherited `unk10` field in `code_d294.h` (a `u32` packed bit-flags word),
 plausibly the same underlying field reused opaquely here, but kept as an
 independent local view per this project's convention.

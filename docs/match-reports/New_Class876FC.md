@@ -48,8 +48,8 @@ this time reached through a vtable dispatch rather than a bare `jal`.
 
 ## Naming
 
-**Tier A.** `New_X` allocator convention (`New_Actor`, `New_Class6B5CC`, `New_Class866E8`, `New_BoxFill`, `New_VabStreamObj`), matching this unit's own established allocator shape and `Class876FC` (see below).
+**Tier A.** `New_X` allocator convention (`New_Actor`, `New_SceneNode`, `New_Class866E8`, `New_BoxFill`, `New_VabStreamObj`), matching this unit's own established allocator shape and `Class876FC` (see below).
 
 ## Track 4 (2026-09-26, round 88, charlie)
 
-Retyped with the class's unification (include/Class876FC.h): returns `Class876FC *` and takes `(s32 kind, Class876FCParams *params, Class6B5CC *parent, Vec3_d294 *pos)` -- kind 0..3 from StyleFillEffectKind0..3's constants, params the D_8008E0A4 block the reset slot copies, parent gStyleCueSelf (attachToParent's parent), pos the caller's position (AddVec3's input). Image byte-identical.
+Retyped with the class's unification (include/Class876FC.h): returns `Class876FC *` and takes `(s32 kind, Class876FCParams *params, SceneNode *parent, LongVec3 *pos)` -- kind 0..3 from StyleFillEffectKind0..3's constants, params the D_8008E0A4 block the reset slot copies, parent gStyleCueSelf (attachToParent's parent), pos the caller's position (AddVec3's input). Image byte-identical.

@@ -20,7 +20,7 @@ blocked) that consumes that buffer and gates the rest of the function.
 *currentPos, s32 stage)`) -- this function calls it with exactly that
 signature.
 
-`Class6B5CC__GetRotationDegrees` is NOT in this unit at all; its body disassembles into
+`SceneNode__GetRotationDegrees` is NOT in this unit at all; its body disassembles into
 `asm/code_d294.s`, an uncarved segment untouched by this round. Per
 `DECOMPILATION_LEARNINGS.md` ("calling into a function that is still
 `INCLUDE_ASM` elsewhere is fine"), it gets a local `extern` prototype typed
@@ -40,7 +40,7 @@ bool DreamSys__TryTunnelLink(DreamSys *this, PlayerSpawnPoint *currentPos)
 	result = Test4TunnelLinks(&this->linkCoordinates, currentPos, this->currentStage);
 	if (result < 0)
 		return false;
-	Class6B5CC__GetRotationDegrees(this, local);
+	SceneNode__GetRotationDegrees(this, local);
 	if (!DreamSys__CheckTunnelHeading(&this->unk_0x888, &this->unk_0x884, local))
 		return false;
 	if (this->unk_0xA8 == 0)
@@ -53,7 +53,7 @@ bool DreamSys__TryTunnelLink(DreamSys *this, PlayerSpawnPoint *currentPos)
 Supporting header additions (`include/DreamSys.h`):
 
 ```c
-extern void Class6B5CC__GetRotationDegrees(DreamSys *this, void *arg1);
+extern void SceneNode__GetRotationDegrees(DreamSys *this, void *arg1);
 extern s32 DreamSys__CheckTunnelHeading(s32 *arg0, s32 *arg1, void *arg2);
 ```
 

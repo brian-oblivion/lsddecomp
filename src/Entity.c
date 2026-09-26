@@ -79,7 +79,7 @@ Class6E99C *Entity__GetOrCreateUnk100(Entity *this, void *name, void *arg2, void
     if (dispatchArg2 == NULL) {
         dispatchArg2 = gEntityDefaultOffset;
     }
-    m->attachToParent(sub, (Class6B5CC *)this, dispatchArg2);
+    m->attachToParent(sub, (SceneNode *)this, dispatchArg2);
     sub->methods->setStep(sub, (s32)arg3);
     return sub;
 }
@@ -208,7 +208,7 @@ s32 Entity__IsNearTarget(Entity *this, void *pos, s32 arg2, s32 arg3) {
 
 s32 Entity__DistanceToPeer(Entity *this, Class65650 *peer) {
     s32 *world;
-    Class6B5CCSub14 *pos;
+    SceneNodeSub14 *pos;
     s32 dx;
     s32 dz;
 

@@ -313,7 +313,7 @@ s32 WaitForReadyEvent(s32 *arr, s32 count) {
 }
 
 void TaskObjF__Init(TaskObjF *self, char *namePrefix, char **nameSuffixes, BasicClass *inputSource,
-                    BasicClass *tickSource, struct Class6B5CC *spriteParent, struct VabStreamObj *sound) {
+                    BasicClass *tickSource, struct SceneNode *spriteParent, struct VabStreamObj *sound) {
     self->namePrefix = namePrefix;
     self->nameSuffixes = nameSuffixes;
     self->titles = 0;

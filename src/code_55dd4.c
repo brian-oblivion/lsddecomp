@@ -84,7 +84,7 @@ void Class65650__Reset(Class65650 *self) {
     self->methods->stopTod(self);
     self->methods->setTod(self, 0);
     if (self->mainPart != NULL) {
-        Class6B5CC__LinkModel((Class6B5CC *)self, self->mainPart->model);
+        SceneNode__LinkModel((SceneNode *)self, self->mainPart->model);
     }
 }
 
@@ -382,7 +382,7 @@ void *Class65650__ApplyTodPacket(Class65650 *self, void *acc, void *extra) {
     void *data;
     s32 idx;
     Actor *elem;
-    Class6B5CCSub14 *coord;
+    SceneNodeSub14 *coord;
     TimeTargetObj *param;
     s32 i;
 
@@ -462,7 +462,7 @@ void *Class65650__ApplyTodPacket(Class65650 *self, void *acc, void *extra) {
                 }
             }
             {
-                Class6B5CCSub14 *coordB;
+                SceneNodeSub14 *coordB;
                 s32 v1, v2, v3;
 
                 coordB = elem->coord2;
@@ -487,7 +487,7 @@ void *Class65650__ApplyTodPacket(Class65650 *self, void *acc, void *extra) {
 
                 v = (s32)self->modelData->linkResource->methods->getModel(
                     self->modelData->linkResource, count - 1);
-                Class6B5CC__LinkModel((Class6B5CC *)elem, (void *)v);
+                SceneNode__LinkModel((SceneNode *)elem, (void *)v);
             }
             break;
         }
@@ -496,12 +496,12 @@ void *Class65650__ApplyTodPacket(Class65650 *self, void *acc, void *extra) {
 
             v1 = *(s32 *)data;
             if (v1 == 0 || v1 == 0xFFFF) {
-                elem->methods->attachToParent(elem, (Class6B5CC *)self, NULL);
+                elem->methods->attachToParent(elem, (SceneNode *)self, NULL);
             } else {
                 s32 idx2;
 
                 idx2 = Class65650__FindPartIndex(self, *(u8 *)data);
-                elem->methods->attachToParent(elem, (Class6B5CC *)self->parts[idx2], NULL);
+                elem->methods->attachToParent(elem, (SceneNode *)self->parts[idx2], NULL);
             }
             break;
         }

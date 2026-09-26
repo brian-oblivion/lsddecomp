@@ -1,11 +1,11 @@
 #ifndef BGLAYER_H
 #define BGLAYER_H
 
-#include "Class6B5CC.h"
+#include "SceneNode.h"
 
 /*
- * BgLayer -- class id 0x54, method table gBgLayerMethods: a Class6B5CC subclass
- * (its ctor chains to GetClass6B5CCMethods()->ctor first, so the id tree
+ * BgLayer -- class id 0x54, method table gBgLayerMethods: a SceneNode subclass
+ * (its ctor chains to GetSceneNodeMethods()->ctor first, so the id tree
  * 0x4 -> 0x54 is the ctor chain) whose own fields, +0x044..+0x067, are
  * exactly libgs's GsBG (LIBGS.H: attribute, x, y, w, h, scrollx, scrolly,
  * r, g, b, map, mx, my, scalex, scaley, rotate). Methods in
@@ -20,18 +20,18 @@
  * Finalize releases it, and the colour fades (TaskCore__TickColorFade,
  * TaskCore__TickFadeColor) call setColor every frame.
  *
- * SLOTS (`classtable.py gBgLayerMethods --vs gClass6B5CCMethods`, 47 against 45):
- *  - +0x008 ctor, BgLayer__BgLayer(self, src, mode): Class6B5CC's, this
+ * SLOTS (`classtable.py gBgLayerMethods --vs gSceneNodeMethods`, 47 against 45):
+ *  - +0x008 ctor, BgLayer__BgLayer(self, src, mode): SceneNode's, this
  *    table, then reset(self, src, mode). Returns nothing; the slot keeps
- *    Class6B5CC's `void *` ctor type, New_BgLayer ignoring the value (as
+ *    SceneNode's `void *` ctor type, New_BgLayer ignoring the value (as
  *    include/Class86AA0.h);
  *  - +0x040 reset, BgLayer__Reset(self, src, mode): lays the GsBG over
  *    src's GsMAP. Its parameter list differs from the inherited slot's
- *    (self only), so the slot keeps Class6B5CC's type and the ctor, its one
+ *    (self only), so the slot keeps SceneNode's type and the ctor, its one
  *    caller, casts to BgLayerResetFn (FINISHING-PLAN track 4 step 6);
  *  - +0x044 updateRotation (BgLayer__UpdateRotation) and +0x048 updateScale
- *    (BgLayer__UpdateScale): set or add, from the same WholeFrac_d294
- *    {num, den} ratio table Class6B5CC's reads; the GsBG's rotate from entry
+ *    (BgLayer__UpdateScale): set or add, from the same Ratio16
+ *    {num, den} ratio table SceneNode's reads; the GsBG's rotate from entry
  *    [2] (the z angle, the only one a 2D layer has), its scalex/scaley from
  *    entries [0] and [1];
  *  - two own slots: +0x0B8 setColor (BgLayer__SetColor: the GsBG's r, g, b,
@@ -39,7 +39,7 @@
  *    +0x0BC slotBC (BgLayer__NoOp, empty; no known caller).
  *
  * FIELDS: the GsBG, +0x044..+0x067; the object is 0x68 bytes (New_BgLayer).
- * `bgAttribute` because Class6B5CC's +0x010 (GsDOBJ2.attribute) already has
+ * `bgAttribute` because SceneNode's +0x010 (GsDOBJ2.attribute) already has
  * the name. r, g, b are one signed three-byte struct (BgLayerRgb): retail
  * copies them lb/lb/lb, sb/sb/sb (BgLayer__SetColor, BgLayer__Reset), which
  * three u8 members would not give.
@@ -62,7 +62,7 @@ typedef struct BgLayerRgb {
 } BgLayerRgb;
 
 struct BgLayerMethods {
-    CLASS6B5CC_SLOTS(BgLayer, (BgLayer * self, struct TileMap *src, s32 mode));
+    SCENENODE_SLOTS(BgLayer, (BgLayer * self, struct TileMap *src, s32 mode));
     /* +0x0B8 */ void (*setColor)(BgLayer *self, s32 enable, BgLayerRgb *rgb); /* BgLayer__SetColor */
     /* +0x0BC */ void (*slotBC)(void); /* BgLayer__NoOp, empty; no known caller */
 };
@@ -72,7 +72,7 @@ struct BgLayerMethods {
 typedef void (*BgLayerResetFn)(BgLayer *self, struct TileMap *src, s32 mode);
 
 struct BgLayer {
-    CLASS6B5CC_FIELDS(BgLayerMethods);
+    SCENENODE_FIELDS(BgLayerMethods);
     /* +0x044 */ u32 bgAttribute; /* GsBG.attribute: 0x1000000 (sized to the map) or 0x2000000 (320 x 240), BgLayer__Reset */
     /* +0x048 */ s16 x;
     /* +0x04A */ s16 y;
@@ -97,8 +97,8 @@ extern BgLayerMethods *GetBgLayerMethods(void); /* returns &gBgLayerMethods */
 BgLayer *New_BgLayer(struct TileMap *src, s32 mode); /* BMemPMgrAlloc(0x68), then ctor */
 void BgLayer__BgLayer(BgLayer *self, struct TileMap *src, s32 mode);
 void BgLayer__Reset(BgLayer *self, struct TileMap *src, s32 mode);
-void BgLayer__UpdateRotation(BgLayer *self, s32 set, WholeFrac_d294 *table);
-void BgLayer__UpdateScale(BgLayer *self, s32 set, WholeFrac_d294 *table);
+void BgLayer__UpdateRotation(BgLayer *self, s32 set, Ratio16 *table);
+void BgLayer__UpdateScale(BgLayer *self, s32 set, Ratio16 *table);
 void BgLayer__SetColor(BgLayer *self, s32 enable, BgLayerRgb *rgb);
 void BgLayer__NoOp(void);
 

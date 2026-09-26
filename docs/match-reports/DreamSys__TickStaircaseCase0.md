@@ -27,7 +27,7 @@ s32 DreamSys__TickStaircaseCase0(DreamSys *this)
 		if (this->unk_0x914 >= 0x13)
 			return 1;
 		if ((u32)(this->unk_0x914 - 8) < 2 || (u32)(this->unk_0x914 - 0xD) < 2) {
-			this->vt->Class6B5CC__UpdateRotation(this, 0, &ROTATION_YAW_PLUS45);
+			this->vt->SceneNode__UpdateRotation(this, 0, &ROTATION_YAW_PLUS45);
 		}
 	}
 	this->unk_0xA0 = 1;
@@ -39,7 +39,7 @@ s32 DreamSys__TickStaircaseCase0(DreamSys *this)
 | arm | band guard | in-band windows (either) | in-band action |
 | --- | --- | --- | --- |
 | `unk_0xAC != 4` | `< 0x85` | `0x2B..0x39`, `0x4B..0x59` | `this->unk_0xA4 = 2` |
-| `unk_0xAC == 4` | `< 0x13` | `8..9`, `0xD..0xE` | `vt->Class6B5CC__UpdateRotation(this, 0, &ROTATION_YAW_PLUS45)` |
+| `unk_0xAC == 4` | `< 0x13` | `8..9`, `0xD..0xE` | `vt->SceneNode__UpdateRotation(this, 0, &ROTATION_YAW_PLUS45)` |
 
 Past the band guard, both arms `return 1` immediately; otherwise both fall to
 a shared tail: `unk_0xA0 = 1`, `unk_0x914++`, `return 0`.

@@ -11,14 +11,14 @@ chain `Class6E99C__Class6E99C` uses one level up:
 
 ```c
 void BoxFill__BoxFill(ClassEAC0Obj *self, SkipShort2 *a1, void *a2, s32 a3) {
-    GetClass6B5CCMethods()->ctor(self);
+    GetSceneNodeMethods()->ctor(self);
     self->methods = GetBoxFillMethods();
     self->methods->finishConstruct(self, a1, a2, a3);
 }
 ```
 
-`GetClass6B5CCMethods` is `code_d294.h`'s own bare getter for the ACTUAL
-`Class6B5CCObj` table (`gClass6B5CCMethods`) -- this is the point where the chain
+`GetSceneNodeMethods` is `code_d294.h`'s own bare getter for the ACTUAL
+`SceneNodeObj` table (`gSceneNodeMethods`) -- this is the point where the chain
 bottoms out at the REAL base class two units over. Its `ctor` slot there
 takes only `self` (`void *(*ctor)(void *self)`, `code_d294.h`), matching
 this call site's own single-argument setup.
@@ -33,4 +33,4 @@ one level further down the same "call the further-base ctor first, reset
 
 ## Track 4 (2026-09-25, round 85, charlie)
 
-Class 0x64 (was D_8006EAC0) is unified as BoxFill in include/BoxFill.h: Viewport__DrawNode draws a node whose class-id low byte is 0x64 with GsSortBoxFill over the GsBOXF at +0x058 (pri +0x044, `relative` +0x048, x/y +0x050/+0x054). The body now takes `BoxFill *`; zero bytes changed. Renamed from `ClassEAC0__ClassEAC0`: gBoxFillMethods's +0x008 occupant (tier A). Ctor chain: it calls GetClass6B5CCMethods()->ctor first, so the id parent (0x4) is the ctor-chain parent; Class6E99C__Class6E99C calls this one first. The +0x040 dispatch now goes through the inherited `reset` slot, cast to BoxFillResetFn (Reset takes the ctor's arguments).
+Class 0x64 (was D_8006EAC0) is unified as BoxFill in include/BoxFill.h: Viewport__DrawNode draws a node whose class-id low byte is 0x64 with GsSortBoxFill over the GsBOXF at +0x058 (pri +0x044, `relative` +0x048, x/y +0x050/+0x054). The body now takes `BoxFill *`; zero bytes changed. Renamed from `ClassEAC0__ClassEAC0`: gBoxFillMethods's +0x008 occupant (tier A). Ctor chain: it calls GetSceneNodeMethods()->ctor first, so the id parent (0x4) is the ctor-chain parent; Class6E99C__Class6E99C calls this one first. The +0x040 dispatch now goes through the inherited `reset` slot, cast to BoxFillResetFn (Reset takes the ctor's arguments).

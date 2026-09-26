@@ -34,7 +34,7 @@ extern u8 ROTATION_YAW_PLUS9[];
 extern u8 ROTATION_YAW_PLUS180[];
 extern u8 ROTATION_ZPLUS1[];
 extern u8 ROTATION_ZMINUS9[];
-extern Vec3_d294 TRANSLATE_Y_MINUS256[];
+extern LongVec3 TRANSLATE_Y_MINUS256[];
 extern u8 D_80089DE4[];
 extern u8 SCALE_SIX[];
 
@@ -55,7 +55,7 @@ void Entity__MoodCue82(Entity *this, EntityMoodHandlerArg *out) {
         }
     }
     if (this->state == 0xC) {
-        Class6B5CC__FaceTarget((Class6B5CC *)this, (Class6B5CC *)this->peer, 1, 0, 0);
+        SceneNode__FaceTarget((SceneNode *)this, (SceneNode *)this->peer, 1, 0, 0);
         if (this->moodTimer == 0x14) {
             out->unk1C = 0x12;
             out->unk10 = 0;
@@ -146,7 +146,7 @@ void Entity__MoodCue85(Entity *this, EntityMoodHandlerArg *out) {
             this->moodTimer = -1;
         }
     } else if (this->state == 0xB) {
-        Class6B5CC__FaceTarget((Class6B5CC *)this, (Class6B5CC *)this->peer, 1, 0, 0);
+        SceneNode__FaceTarget((SceneNode *)this, (SceneNode *)this->peer, 1, 0, 0);
         if (this->moodTimer < 0x1E) {
             this->methods->moveLocalZ(this, -0xA, 0);
         } else {
@@ -290,7 +290,7 @@ void Entity__MoodCue91(Entity *this, EntityMoodHandlerArg *out) {
 void Entity__MoodCue92(Entity *this, EntityMoodHandlerArg *out) {
     if (this->todIndex == 0) {
         if (this->targetReached != 0) {
-            Class6B5CC__FaceTarget((Class6B5CC *)this, (Class6B5CC *)this->peer, 1, 0, 0);
+            SceneNode__FaceTarget((SceneNode *)this, (SceneNode *)this->peer, 1, 0, 0);
             this->methods->setTod(this, 1);
             ((DreamSys *)this->peer)->methods->clearTickCallbacks((DreamSys *)this->peer, 1);
         } else if (this->todFrame == 0) {

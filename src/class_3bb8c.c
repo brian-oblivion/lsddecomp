@@ -40,7 +40,7 @@
 #include "Class81940.h"
 #include "Class86AA0.h"
 
-s32 Class866E8__SetTargetAndBuildRates(Class866E8 *self, void *arg1, Class6B5CC *arg2,
+s32 Class866E8__SetTargetAndBuildRates(Class866E8 *self, void *arg1, SceneNode *arg2,
                                        Descriptor10 *arg3) {
     s32 stackBuf[3];
     s32 ret;
@@ -413,8 +413,8 @@ void Class866E8__LoadElementResources(Class866E8 *self, Class866E8Elem *entry) {
     LinkResource *res;
     Class86AA0 **slot;
     u8 *base;
-    Class6B5CCSub14 *gpu;
-    Class6B5CCSub44 *vec;
+    SceneNodeSub14 *gpu;
+    SceneNodeSub44 *vec;
     s32 b;
     s32 c;
     s32 d;

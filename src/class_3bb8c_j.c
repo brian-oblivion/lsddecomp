@@ -274,7 +274,7 @@ extern const char D_800116E4[]; /* "FONTICON" */
  * round-18/19 stall (75/95, both addresses and the handle swapped among
  * $s0-$s2). Same shape as class_3bb8c_i's TextEntry__LoadCardResources.
  */
-void Class86F88__LoadResources(Class86F88 *self, Class6B5CC *parent) {
+void Class86F88__LoadResources(Class86F88 *self, SceneNode *parent) {
     char path[0x20];
     const char *dir;
     const char *ext;
@@ -295,7 +295,7 @@ void Class86F88__LoadResources(Class86F88 *self, Class6B5CC *parent) {
     ((TimImageUploadFn)handle1->methods->slot78)(handle1);
     self->panelSprite = New_ScreenSprite(handle1, (SpriteRect *)&D_80087028, 0);
     handle1->methods->release(handle1);
-    self->panelSprite->methods->attachToParent(self->panelSprite, parent, (Vec3_d294 *)&D_8008AAF8);
+    self->panelSprite->methods->attachToParent(self->panelSprite, parent, (LongVec3 *)&D_8008AAF8);
 
     handle2 = New_TimImage(BuildFileName(path, D_800116E4, dir, ext));
     ((TimImageUploadFn)handle2->methods->slot78)(handle2);

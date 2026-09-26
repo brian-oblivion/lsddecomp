@@ -40,7 +40,7 @@
 
 /* The objects it holds, by tag (TargetObj86ED0 is a helper view in
  * include/class_3bb8c.h: TaskObjF's `sound`, a VabStreamObj, TextEntry's target too). */
-struct Class6B5CC;
+struct SceneNode;
 struct ScreenSprite;
 struct TextRow;
 struct TimImage;
@@ -57,7 +57,7 @@ typedef struct Class86F88Methods Class86F88Methods;
 struct Class86F88Methods {
     BASICCLASS_SLOTS(Class86F88, (Class86F88 * self, char **items, s32 mode));
     /* +0x040 */ void (*resetView)(Class86F88 *self); /* Class86F88__ResetView; the ctor's tail */
-    /* +0x044 */ void (*loadResources)(Class86F88 *self, struct Class6B5CC *parent); /* Class86F88__LoadResources */
+    /* +0x044 */ void (*loadResources)(Class86F88 *self, struct SceneNode *parent); /* Class86F88__LoadResources */
     /* +0x048 */ void (*releaseResources)(Class86F88 *self); /* Class86F88__ReleaseResources */
     /* +0x04C */ void (*attachTarget)(Class86F88 *self, void *child1, void *child2,
                                       struct TargetObj86ED0 *target); /* Class86F88__AttachTarget */
@@ -72,7 +72,7 @@ struct Class86F88Methods {
     /* +0x080 */ void (*scrollLeft)(Class86F88 *self);                /* Class86F88__ScrollLeft */
     /* +0x084 */ void (*cursorUp)(Class86F88 *self);   /* Class86F88__CursorUp (see the banner) */
     /* +0x088 */ void (*cursorDown)(Class86F88 *self); /* Class86F88__CursorDown (see the banner) */
-    /* +0x08C */ void (*createRows)(Class86F88 *self, struct Class6B5CC *parent, struct TimImage *font,
+    /* +0x08C */ void (*createRows)(Class86F88 *self, struct SceneNode *parent, struct TimImage *font,
                                     s32 top, s32 column, s32 cursor); /* Class86F88__CreateRows */
     /* +0x090 */ void (*releaseRows)(Class86F88 *self);               /* Class86F88__ReleaseRows */
     /* +0x094 */ void (*refreshRows)(Class86F88 *self, s32 top, s32 column, s32 cursor,
@@ -125,7 +125,7 @@ void Class86F88__RemoveChild(Class86F88 *self, void *child);
 void Class86F88__RemoveAllChildren(Class86F88 *self);
 void Class86F88__OnNotify(Class86F88 *self, void *sender, s32 event);
 void Class86F88__ResetView(Class86F88 *self);
-void Class86F88__LoadResources(Class86F88 *self, struct Class6B5CC *parent);
+void Class86F88__LoadResources(Class86F88 *self, struct SceneNode *parent);
 void Class86F88__ReleaseResources(Class86F88 *self);
 void Class86F88__AttachTarget(Class86F88 *self, void *child1, void *child2, struct TargetObj86ED0 *target);
 void Class86F88__DetachTarget(Class86F88 *self);
@@ -137,7 +137,7 @@ void Class86F88__ScrollRight(Class86F88 *self);
 void Class86F88__ScrollLeft(Class86F88 *self);
 void Class86F88__CursorUp(Class86F88 *self, s32 arg1, s32 arg2, s32 arg3);
 void Class86F88__CursorDown(Class86F88 *self, s32 arg1, s32 arg2, s32 arg3);
-void Class86F88__CreateRows(Class86F88 *self, struct Class6B5CC *parent, struct TimImage *font,
+void Class86F88__CreateRows(Class86F88 *self, struct SceneNode *parent, struct TimImage *font,
                             s32 top, s32 column, s32 cursor);
 void Class86F88__ReleaseRows(Class86F88 *self);
 void Class86F88__RefreshRows(Class86F88 *self, s32 top, s32 column, s32 cursor, s32 notify);

@@ -31,11 +31,11 @@
  * packet's object id names.
  *
  * Peer and companion. attachToParent (+0x04C) takes TWO more leading
- * arguments than Class6B5CC's slot it overrides: (self, peer, companion,
+ * arguments than SceneNode's slot it overrides: (self, peer, companion,
  * parent, offset). It adds `companion` as a child (Actor__AddChild records
  * a class-5 one in Actor.ticker), links `peer` mutually through linkPeer
- * (+0x13C), and passes (parent, offset) to Class6B5CC's attachToParent. The
- * slot keeps Class6B5CC's type, as an inherited slot does; a caller that
+ * (+0x13C), and passes (parent, offset) to SceneNode's attachToParent. The
+ * slot keeps SceneNode's type, as an inherited slot does; a caller that
  * reaches Class65650__AttachToParent through it casts the slot to
  * Class65650AttachToParentFn (a function-pointer cast emits no code).
  *

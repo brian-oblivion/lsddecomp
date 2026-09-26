@@ -91,7 +91,7 @@ DreamSys__StepLookYaw -- STALL: 1 word SHORT (76/77 instructions), whole CFG mat
 > equivalent explicit `this->unk_0x94 = this->unk_0x94 + delta;` (an
 > untried spelling; the `+=` compound form had never been split here) and,
 > separately, a bare `__asm__("")` immediately after the
-> `this->vt->Class6B5CC__UpdateRotation(...)` call in the decay branch (a position not
+> `this->vt->SceneNode__UpdateRotation(...)` call in the decay branch (a position not
 > previously tried -- round 32's barrier was at the shared `call_tail:`
 > label, several instructions later). **Both byte-identical to the kept
 > 76/77 body**, confirmed via `asm-differ`. Reverted immediately.
@@ -113,7 +113,7 @@ DreamSys__StepLookYaw -- STALL: 1 word SHORT (76/77 instructions), whole CFG mat
 > Read by hand per round 48's "a low-but-nonzero score is worth reading"
 > lever -- and this is the **identical candidate round 37 already found and
 > rejected** (a `DreamSys *new_var` assigned only on the `goto call_tail`
-> paths, then read unconditionally as `new_var->vt->Class6B5CC__UpdateRotation(...)` at
+> paths, then read unconditionally as `new_var->vt->SceneNode__UpdateRotation(...)` at
 > the `apply:` label, which every path reached via the `goto apply;`
 > fallthrough never assigns -- the same uninitialized-alias shape round 37
 > traced through the full oracle to a real regression, 59/77 with 2 words
@@ -192,7 +192,7 @@ the pattern `DreamSys__StepLookOffset` closed. Applying the identical rename:
 	if (this->unk_0x94 < 0)
 		delta = 0x2D;
 	TURN_ROTATION_YAW[0].value = delta;
-	this->vt->Class6B5CC__UpdateRotation(this, 0, &TURN_ROTATION_YAW[-1]);
+	this->vt->SceneNode__UpdateRotation(this, 0, &TURN_ROTATION_YAW[-1]);
 	this->unk_0x94 += delta;
 }
 ```
@@ -359,7 +359,7 @@ if ((~sum + 1) >= threshold) {
 }
 apply:
 	TURN_ROTATION_YAW[0].value = delta;
-	this->vt->Class6B5CC__UpdateRotation(this, 0, &TURN_ROTATION_YAW[-1]);
+	this->vt->SceneNode__UpdateRotation(this, 0, &TURN_ROTATION_YAW[-1]);
 	this->unk_0x94 = sum;
 	this->unk_0x90 = 0;
 ```
@@ -377,7 +377,7 @@ matching length), this function is **2 words SHORT** with a **different
 root cause**: retail's prologue saves FOUR registers (`s0`, `s1`, `s2`,
 `ra`); this build's only saves three (`s0`, `s1`, `ra`) -- `s2` never gets
 allocated at all. `s1` correctly holds `sum` in both (it must survive past
-the `Class6B5CC__UpdateRotation` call for the post-call `this->unk_0x94 = sum`, and both
+the `SceneNode__UpdateRotation` call for the post-call `this->unk_0x94 = sum`, and both
 retail and this build agree on that). `delta`, which is ALSO read after the
 branch merges into `apply` (for `TURN_ROTATION_YAW[0].value = delta`, itself
 BEFORE the call, not after), gets `$s2` in retail but a plain scratch `$a1`
@@ -489,14 +489,14 @@ void DreamSys__StepLookYaw(DreamSys *this)
 		inRange = (sum < 0) ? (-sum < threshold) : (sum < threshold);
 		if (inRange) {
 			TURN_ROTATION_YAW[0].value = (s16)delta;
-			this->vt->Class6B5CC__UpdateRotation(this, 0, &TURN_ROTATION_YAW[-1]);
+			this->vt->SceneNode__UpdateRotation(this, 0, &TURN_ROTATION_YAW[-1]);
 			this->unk_0x94 = sum;
 		}
 		this->unk_0x90 = 0;
 	} else if (this->unk_0x94 != 0) {
 		s16 fixed = (this->unk_0x94 < 0) ? 0x2D : -0x2D;
 		TURN_ROTATION_YAW[0].value = fixed;
-		this->vt->Class6B5CC__UpdateRotation(this, 0, &TURN_ROTATION_YAW[-1]);
+		this->vt->SceneNode__UpdateRotation(this, 0, &TURN_ROTATION_YAW[-1]);
 		this->unk_0x94 += fixed;
 	}
 	DreamSys__FlipMoveCommand(this);
@@ -509,7 +509,7 @@ Vtable slot `0x148`. Same shape as `DreamSys__StepLookOffset`, one table pair ov
 `unk_0x88`/`unk_0x8C`), plus: computes `unk_0xA8 = (unk_0xA0 == 1)` up
 front unconditionally, and — instead of directly mutating a struct field
 through `unk_0x5C` — writes a 16-bit "pending value" into `TURN_ROTATION_YAW[0]`
-and calls the vtable slot `0x44` function (`Class6B5CC__UpdateRotation`, not yet
+and calls the vtable slot `0x44` function (`SceneNode__UpdateRotation`, not yet
 decompiled, still `INCLUDE_ASM` in `code_179d8`) with a pointer to
 `TURN_ROTATION_YAW[-1]` (== `&TURN_ROTATIONS`, a distinct label immediately before it —
 see the `TURN_ROTATION_YAW` array's header comment in `include/DreamSys.h`).
@@ -564,7 +564,7 @@ something else.)
 before the `apply:` label -- but ONLY on the fallthrough path (the path that
 reaches `apply:` via the earlier `goto apply;`, from the `sum >= 0 && sum <
 threshold` branch, never executes this assignment) -- then read
-`new_var->vt` instead of `this->vt` for the `Class6B5CC__UpdateRotation` call inside
+`new_var->vt` instead of `this->vt` for the `SceneNode__UpdateRotation` call inside
 `apply:`. **This is the same this-aliasing shape found (and rejected) for
 `DreamSys__TryStaircaseLink` and `DreamSys__InstanceEffectsOnJournal` this same round**:
 `new_var` is uninitialized on the `goto`-only path, a genuine
@@ -634,7 +634,7 @@ sharing the label as before.
 	if (this->unk_0x94 < 0)
 		delta = 0x2D;
 	TURN_ROTATION_YAW[0].value = delta;
-	this->vt->Class6B5CC__UpdateRotation(this, 0, &TURN_ROTATION_YAW[-1]);
+	this->vt->SceneNode__UpdateRotation(this, 0, &TURN_ROTATION_YAW[-1]);
 	this->unk_0x94 += delta;
 	DreamSys__FlipMoveCommand(this);
 	return;
@@ -681,7 +681,7 @@ Renamed from `func_800598E8`.
 
 Same spring-with-decay shape as `DreamSys__StepLookOffset`, but
 what it steps is a ROTATION, and that is measured rather than inferred:
-`Class6B5CC__UpdateRotation` is vtable slot +0x044, matched in src/code_d294.c, and it reads its
+`SceneNode__UpdateRotation` is vtable slot +0x044, matched in src/code_d294.c, and it reads its
 `data` argument as three {numerator, denominator} degree ratios, adding them to the
 object's rotation vector when its `flag` argument is 0 -- which is the flag this
 function passes. The halfword it overwrites first is

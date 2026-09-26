@@ -477,7 +477,7 @@ regressed the 188/240 best, none improved it.
 Evidence: this unit's own `TaskObjF__WriteMemcardSaveFile` (its only
 caller) is the bounded-retry wrapper around it, and the "Try" prefix
 matches this project's existing convention for a single, non-retrying
-attempt a caller may retry (`Class6B5CC__TryAttachNearby`,
+attempt a caller may retry (`SceneNode__TryAttachNearby`,
 `src/code_d294_b.c`). "Memcard" is established by `BuildMemcardPath`'s
 own `bu00:`/`bu10:` device templates; "SaveFile" is established by the
 0x200-byte buffer's structural match to the PS1 memory-card save file

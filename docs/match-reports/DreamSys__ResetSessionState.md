@@ -7,8 +7,8 @@
 ## What it does
 
 Vtable slot `+0x040`. Resets a batch of session/journal state: calls two
-helper methods (`this->vt->Class6B5CC__SetDisplay(this, 0)` then
-`this->vt->Class6B5CC__UpdateRotation(this, 1, ROTATION_YAW_180)`), then clears eight fields to
+helper methods (`this->vt->SceneNode__SetDisplay(this, 0)` then
+`this->vt->SceneNode__UpdateRotation(this, 1, ROTATION_YAW_180)`), then clears eight fields to
 zero: `callback_0x80`, `callback_0x98`, the first word of the still-opaque
 `unk_0xCC` block, three fields in the previously-undiscovered struct tail
 (`unk_0x908`, `unk_0x90C`, `unk_0x910`), `unk_0x78`, and `unk_0x924`.
@@ -18,8 +18,8 @@ zero: `callback_0x80`, `callback_0x98`, the first word of the still-opaque
 ```c
 void DreamSys__ResetSessionState(DreamSys *this)
 {
-	this->vt->Class6B5CC__SetDisplay(this, 0);
-	this->vt->Class6B5CC__UpdateRotation(this, 1, ROTATION_YAW_180);
+	this->vt->SceneNode__SetDisplay(this, 0);
+	this->vt->SceneNode__UpdateRotation(this, 1, ROTATION_YAW_180);
 	this->callback_0x80 = NULL;
 	this->callback_0x98 = NULL;
 	*(s32 *)this->unk_0xCC = 0;
@@ -65,7 +65,7 @@ object into its idle state: both tick callback slots NULLed directly (not via
 `SoundCueSet::tag`, and `InitSoundCueSet` (src/code_179d8_e.c, matched) refuses to
 run unless it is 0, so this frees the cue set -- the three staircase-walk words
 `staircaseActive`/`staircaseMoveGate`/`staircaseTickFn` cleared, `unk_0x78` and
-`unk_0x924` cleared, and `Class6B5CC__UpdateRotation(this, 1, &ROTATION_YAW_180)`, an ABSOLUTE
+`unk_0x924` cleared, and `SceneNode__UpdateRotation(this, 1, &ROTATION_YAW_180)`, an ABSOLUTE
 rotation to yaw 180.
 "Session" is the soft half: nothing establishes that the state it clears is
 per-dream rather than per-object, so tier B, not A.

@@ -96,7 +96,7 @@ iteration — this is why there are two 6-byte stack slots (`sp+0x0`,
 - **`Vec3S16_d294` (all-`s16` fields, alignment 2) is what makes `*dst =
   *out;` compile to unaligned `lwl`/`lwr` + `swl`/`swr`** instead of a
   plain `lw`/`sw`, matching retail's own loop-tail struct copy exactly —
-  same confirmed idiom as `S16Quad_d294` (`Class6B5CC__GetRotMatrix`, this unit,
+  same confirmed idiom as `S16Quad_d294` (`SceneNode__GetRotMatrix`, this unit,
   earlier this round) and `FlashbackRotation` (DECOMPILATION_LEARNINGS).
 
 ## Header changes
@@ -111,7 +111,7 @@ iteration — this is why there are two 6-byte stack slots (`sp+0x0`,
 
 None beyond confirming, a second time this round, that an all-`s16`
 struct's whole-value assignment is the way to reliably reproduce retail's
-`lwl`/`lwr` struct-copy codegen (see `Class6B5CC__GetRotMatrix`'s report for the first
+`lwl`/`lwr` struct-copy codegen (see `SceneNode__GetRotMatrix`'s report for the first
 instance) — worth promoting to DECOMPILATION_LEARNINGS as a standing idiom
 alongside the existing `FlashbackRotation` entry, since this project now has
 three independent confirming instances across two units.

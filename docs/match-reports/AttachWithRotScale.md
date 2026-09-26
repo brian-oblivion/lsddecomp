@@ -47,10 +47,10 @@ value sitting stale in the register from far earlier in that function.
 
 Round 70 (alpha). `func_800567D4` -> `AttachWithRotScale`, **tier A**.
 
-Pure forwarder: slot +0x04C (Class6B5CC__AttachToParent: sets the parent link and
+Pure forwarder: slot +0x04C (SceneNode__AttachToParent: sets the parent link and
 coord2 `super`, writes `trans` into coord.t), then slots +0x044 and +0x048
-with set = 1 (Class6B5CC__UpdateRotation assigns GsCOORD2PARAM.rotate from a degree ratio
-triple; Class6B5CC__UpdateScale assigns .scale). Both callers
+with set = 1 (SceneNode__UpdateRotation assigns GsCOORD2PARAM.rotate from a degree ratio
+triple; SceneNode__UpdateScale assigns .scale). Both callers
 (Class876FC__InitByKind on the owner, Class876FC__PlaceModelChildren on
 each BaseObjO child) pass objects whose tables resolve those three slots to
 exactly those functions (tools/classtable.py on gClass876FCMethods and gActorMethods).
@@ -58,4 +58,4 @@ Free function because `node` is not always the owner.
 
 ## Track 4 (2026-09-26, round 88, charlie)
 
-Retyped with Class876FC's unification: `Vec3S` is `Vec3_d294`; `node` is `Actor *` (the owner, upcast, and each model child) and `rotation` is `void *`, the type of Class6B5CC's updateRotation table. Image byte-identical.
+Retyped with Class876FC's unification: `Vec3S` is `LongVec3`; `node` is `Actor *` (the owner, upcast, and each model child) and `rotation` is `void *`, the type of SceneNode's updateRotation table. Image byte-identical.

@@ -68,7 +68,7 @@ unit's own header already predicted ("Not yet named or typed field-by-field"):
 
 | type | proposed name | tier | evidence |
 | --- | --- | --- | --- |
-| `FileResource` | `FileResource` | C | Matches this round's `FileResource__*` function-name token (the vtable's own address, per the project's existing `Class6B5CC`/`Class6D3C8`/`Class6D4E8` convention for a class whose real name is not yet established). |
+| `FileResource` | `FileResource` | C | Matches this round's `FileResource__*` function-name token (the vtable's own address, per the project's existing `SceneNode`/`Class6D3C8`/`Class6D4E8` convention for a class whose real name is not yet established). |
 | `FileResourceMethods` | `FileResourceMethods` | C | Same convention, applied to the method-table type. |
 
 Posted to the broadcast.
@@ -76,7 +76,7 @@ Posted to the broadcast.
 ## Extern arity (round 59)
 
 **Verdict: extern FIXED.** The second of the round's two genuinely wrong
-declarations; same shape and same discriminator as `GetClass6B5CCMethods`.
+declarations; same shape and same discriminator as `GetSceneNodeMethods`.
 
 **Callee evidence** (`0x80026C9C`, and the definition in `src/code_171e0.c`):
 

@@ -645,7 +645,7 @@ NON_MATCHING body promoted, round 61.
 
 Round 75 (charlie), track 3.
 
-- `Class65650__SetDisplay` (was `func_80065A5C`), tier A. Occupies +0x060, overriding Class6B5CC__SetDisplay; forwards its argument to every part's SetDisplay (Unk70ElemMethods +0x060 = Class6B5CC__SetDisplay, the parts being BaseObjO from New_Actor).
+- `Class65650__SetDisplay` (was `func_80065A5C`), tier A. Occupies +0x060, overriding SceneNode__SetDisplay; forwards its argument to every part's SetDisplay (Unk70ElemMethods +0x060 = SceneNode__SetDisplay, the parts being BaseObjO from New_Actor).
 
 ## Track 4 (2026-09-25, round 85, alpha)
 

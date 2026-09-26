@@ -85,7 +85,7 @@ What is NOT established is what the developers CALLED it. Naming it
 `CdStream` or `CdFile` would be a tier-A assertion drawn from behaviour
 alone, and it would propagate into every method name in three units, so this
 round used the address token instead -- the convention the symbols file
-already carries as `Class6B5CC__RotateLocalVector`. **Proposed for track 4,
+already carries as `SceneNode__RotateLocalVector`. **Proposed for track 4,
 when the class's views are unified:** `CdReader` or `CdFile`, on the evidence
 above. That is a proposal, not a name.
 
@@ -97,7 +97,7 @@ method in every unit that touches the class.** The cost of being wrong scales
 with the class's method count, while the cost of a placeholder token is one
 `rename.py` run per method later. Where the plan's "a wrong tier-A name is
 worse than a placeholder" bites hardest is exactly here, and the existing
-`Class6B5CC__` spelling shows the project already settled on the hedge:
+`SceneNode__` spelling shows the project already settled on the hedge:
 placeholder CLASS, evidence-based METHOD.
 
 

@@ -1,18 +1,12 @@
 /*
- * code_d294 -- 0xD294.., the first 20 methods of Class6B5CC (method table
- * gClass6B5CCMethods, class tag 4), a BasicClass subclass and the base of
- * every class table whose tag nibble is 4 (DreamSys, Entity, BaseObjO and
- * about a dozen more, per tools/classtable.py --scan). An instance embeds a libgs GsDOBJ2 at +0x10
- * (attribute, coord2, tmd) and owns its GsCOORDINATE2 and GsCOORD2PARAM.
- * This slice holds: New / ctor / Finalize; the BasicClass child-list
- * overrides, which link or unlink a tag-9 model child as it is added or
- * removed; OnNotify, which fans a notification out by the sender's tag;
- * Reset (identity transform); UpdateRotation / UpdateScale (set or
- * accumulate a ratio triple into the GsCOORD2PARAM); attach to and detach
- * from a parent's coordinate; and five setters over GsDOBJ2.attribute.
- * The class continues in code_d294_b (slots +0x074..+0x0B4) and its free
- * helpers in code_d294_c. All 20 functions are matched. Named round 71;
- * tiers and evidence in each function's match report.
+ * code_d294 -- SceneNode (include/SceneNode.h), part 1 of 3: slots +0x000
+ * to +0x070. New, the ctor (allocates the GsCOORDINATE2 and GsCOORD2PARAM)
+ * and Finalize; the BasicClass child-list overrides, which link or unlink a
+ * TmdModel child as it is added or removed; OnNotify, which dispatches on
+ * the sender's class id; Reset (identity transform); UpdateRotation and
+ * UpdateScale (set or add three Ratio16s into the GsCOORD2PARAM); attach to
+ * and detach from a parent's coordinate; and the first five setters over
+ * GsDOBJ2.attribute. Part 2 is code_d294_b.c, part 3 code_d294_c.c.
  */
 #include "common.h"
 #include "code_d294.h"
@@ -20,10 +14,10 @@
 /* The low nibble of a class table's header word is its class tag. */
 #define CLASS_TAG_MASK 0xF
 #define TAG_PAD 2        /* gPadMethods, PadMethods (include/Pad.h) */
-#define TAG_CLASS6B5CC 4 /* this class and every subclass of it */
+#define TAG_SCENENODE 4  /* this class and every subclass of it */
 #define TAG_CLASS6EF50 5 /* gFrameClockMethods */
 #define TAG_TMDMODEL \
-    9 /* gTmdModelMethods (include/TmdModel.h): the object Class6B5CC__LinkModel links */
+    9 /* gTmdModelMethods (include/TmdModel.h): the object SceneNode__LinkModel links */
 
 /* Bit positions in GsDOBJ2.attribute (self->unk10), include/psyq/libgs.h. */
 #define ATTR_LIGHTMODE_SHIFT 3 /* GsFOG|GsMATE|GsLLMOD, 3 bits */
@@ -32,21 +26,21 @@
 #define ATTR_ALON_SHIFT 30     /* GsALON */
 #define ATTR_DOFF_SHIFT 31     /* GsDOFF */
 
-Class6B5CC *New_Class6B5CC(void) {
-    Class6B5CC *obj;
+SceneNode *New_SceneNode(void) {
+    SceneNode *obj;
 
     obj = BMemPMgrAlloc(0x44);
     if (obj == NULL) {
         return NULL;
     }
-    if (GetClass6B5CCMethods()->ctor(obj) != NULL) {
+    if (GetSceneNodeMethods()->ctor(obj) != NULL) {
         return obj;
     }
     BMemPMgrFree(obj);
     return NULL;
 }
 
-void *Class6B5CC__Class6B5CC(Class6B5CC *self) {
+void *SceneNode__SceneNode(SceneNode *self) {
     void *blockB;
 
     self->coord2 = BMemPMgrAlloc(0x50);
@@ -60,7 +54,7 @@ void *Class6B5CC__Class6B5CC(Class6B5CC *self) {
         return NULL;
     }
     Get_vtable_BasicClass()->ctor((BasicClass *)self);
-    self->methods = GetClass6B5CCMethods();
+    self->methods = GetSceneNodeMethods();
     self->model = 0;
     self->tmd = 0;
     self->parent = NULL;
@@ -69,8 +63,8 @@ void *Class6B5CC__Class6B5CC(Class6B5CC *self) {
     return self;
 }
 
-void Class6B5CC__Finalize(Class6B5CC *self) {
-    Class6B5CCSub14 *sub;
+void SceneNode__Finalize(SceneNode *self) {
+    SceneNodeSub14 *sub;
 
     self->methods->detachFromParent(self);
     self->methods->detachAttachedChildren(self);
@@ -81,26 +75,26 @@ void Class6B5CC__Finalize(Class6B5CC *self) {
     Get_vtable_BasicClass()->finalize((BasicClass *)self);
 }
 
-void Class6B5CC__AddChild(Class6B5CC *self, BasicClass *child) {
+void SceneNode__AddChild(SceneNode *self, BasicClass *child) {
     Get_vtable_BasicClass()->addChild((BasicClass *)self, child);
     if ((child->methods->header & CLASS_TAG_MASK) == TAG_TMDMODEL) {
-        Class6B5CC__LinkModel(self, child);
+        SceneNode__LinkModel(self, child);
     }
 }
 
-void Class6B5CC__RemoveChild(Class6B5CC *self, BasicClass *child) {
+void SceneNode__RemoveChild(SceneNode *self, BasicClass *child) {
     if ((child->methods->header & CLASS_TAG_MASK) == TAG_TMDMODEL) {
-        Class6B5CC__UnlinkModel(self);
+        SceneNode__UnlinkModel(self);
     }
     Get_vtable_BasicClass()->removeChild((BasicClass *)self, child);
 }
 
-void Class6B5CC__RemoveAllChildren(Class6B5CC *self) {
-    Class6B5CC__UnlinkModel(self);
+void SceneNode__RemoveAllChildren(SceneNode *self) {
+    SceneNode__UnlinkModel(self);
     Get_vtable_BasicClass()->removeAllChildren((BasicClass *)self);
 }
 
-void Class6B5CC__OnNotify(Class6B5CC *self, BasicClass *sender, s32 event) {
+void SceneNode__OnNotify(SceneNode *self, BasicClass *sender, s32 event) {
     s32 tag;
 
     Get_vtable_BasicClass()->onNotify((BasicClass *)self, sender, event);
@@ -109,12 +103,12 @@ void Class6B5CC__OnNotify(Class6B5CC *self, BasicClass *sender, s32 event) {
         self->methods->onPadEvent(self, sender, event);
     } else if (tag == TAG_CLASS6EF50) {
         self->methods->update(self, sender, event);
-    } else if (tag == TAG_CLASS6B5CC) {
+    } else if (tag == TAG_SCENENODE) {
         self->methods->dispatchLinkCommand(self, sender, event);
     }
 }
 
-void Class6B5CC__Reset(Class6B5CC *self) {
+void SceneNode__Reset(SceneNode *self) {
     self->tick = 0;
     self->attribute = 0;
     GsInitCoordinate2(0, self->coord2);
@@ -123,9 +117,9 @@ void Class6B5CC__Reset(Class6B5CC *self) {
     self->coord2->flg = 1;
 }
 
-void Class6B5CC__UpdateRotation(Class6B5CC *self, s32 flag, void *data) {
+void SceneNode__UpdateRotation(SceneNode *self, s32 flag, void *data) {
     s32 vals[3];
-    Class6B5CCSub44 *dst;
+    SceneNodeSub44 *dst;
     s16 *field;
 
     vals[0] = RatioToFixed12(data);
@@ -153,9 +147,9 @@ void Class6B5CC__UpdateRotation(Class6B5CC *self, s32 flag, void *data) {
     self->coord2->flg = 0;
 }
 
-void Class6B5CC__UpdateScale(Class6B5CC *self, s32 flag, void *data) {
+void SceneNode__UpdateScale(SceneNode *self, s32 flag, void *data) {
     s32 r0, r1, r2;
-    Class6B5CCSub44 *dst;
+    SceneNodeSub44 *dst;
 
     r0 = RatioToFixed12(data);
     r1 = RatioToFixed12((u8 *)data + 4);
@@ -173,8 +167,8 @@ void Class6B5CC__UpdateScale(Class6B5CC *self, s32 flag, void *data) {
     self->coord2->flg = 0;
 }
 
-Class6B5CC *Class6B5CC__AttachToParent(Class6B5CC *self, Class6B5CC *obj, Vec3_d294 *vec) {
-    Class6B5CCSub14 *sub;
+SceneNode *SceneNode__AttachToParent(SceneNode *self, SceneNode *obj, LongVec3 *vec) {
+    SceneNodeSub14 *sub;
 
     if (self->parent == NULL) {
         self->parent = obj;
@@ -196,8 +190,8 @@ Class6B5CC *Class6B5CC__AttachToParent(Class6B5CC *self, Class6B5CC *obj, Vec3_d
     return self;
 }
 
-Class6B5CC *Class6B5CC__DetachFromParent(Class6B5CC *self) {
-    Class6B5CC *owner;
+SceneNode *SceneNode__DetachFromParent(SceneNode *self) {
+    SceneNode *owner;
 
     owner = self->parent;
     if (owner != NULL) {
@@ -208,8 +202,8 @@ Class6B5CC *Class6B5CC__DetachFromParent(Class6B5CC *self) {
     return self;
 }
 
-void Class6B5CC__DetachAttachedChildren(Class6B5CC *self) {
-    Class6B5CC *entry = NULL;
+void SceneNode__DetachAttachedChildren(SceneNode *self) {
+    SceneNode *entry = NULL;
     BasicClassListNode *cursor;
 
     do {
@@ -220,10 +214,10 @@ void Class6B5CC__DetachAttachedChildren(Class6B5CC *self) {
     } while (cursor);
 }
 
-void Class6B5CC__GetNextAttachedChild(Class6B5CC *self, Class6B5CC **entry, BasicClassListNode **cursor) {
+void SceneNode__GetNextAttachedChild(SceneNode *self, SceneNode **entry, BasicClassListNode **cursor) {
     s32 tag;
 
-    tag = TAG_CLASS6B5CC;
+    tag = TAG_SCENENODE;
     do {
         if (*entry == NULL) {
             *cursor = self->children;
@@ -240,24 +234,24 @@ void Class6B5CC__GetNextAttachedChild(Class6B5CC *self, Class6B5CC **entry, Basi
     *entry = NULL;
 }
 
-void Class6B5CC__func_1d33c(void) {}
+void SceneNode__NoOpSlot5C(void) {}
 
-s32 Class6B5CC__SetDisplay(Class6B5CC *self, s32 a1) {
+s32 SceneNode__SetDisplay(SceneNode *self, s32 a1) {
     return GetSetBitField(&self->attribute, ATTR_DOFF_SHIFT, 1, a1 == 0) == 0;
 }
 
-u32 Class6B5CC__SetSemiTrans(Class6B5CC *self, s32 a1) {
+u32 SceneNode__SetSemiTrans(SceneNode *self, s32 a1) {
     return GetSetBitField(&self->attribute, ATTR_ALON_SHIFT, 1, a1 != 0);
 }
 
-u32 Class6B5CC__SetSemiTransRate(Class6B5CC *self, u32 a1) {
+u32 SceneNode__SetSemiTransRate(SceneNode *self, u32 a1) {
     return GetSetBitField(&self->attribute, ATTR_ABR_SHIFT, 2, a1);
 }
 
-u32 Class6B5CC__SetLighting(Class6B5CC *self, s32 a1) {
+u32 SceneNode__SetLighting(SceneNode *self, s32 a1) {
     return GetSetBitField(&self->attribute, ATTR_LOFF_SHIFT, 1, a1 == 0);
 }
 
-u32 Class6B5CC__SetLightMode(Class6B5CC *self, u32 a1) {
+u32 SceneNode__SetLightMode(SceneNode *self, u32 a1) {
     return GetSetBitField(&self->attribute, ATTR_LIGHTMODE_SHIFT, 3, a1);
 }

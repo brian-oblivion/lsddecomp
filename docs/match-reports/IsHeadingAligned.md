@@ -53,16 +53,16 @@ entry are left as `unkN` padding.
 Both callers of this function (`DreamSys__CheckTunnelHeading`, `DreamSys__CheckStaircaseHeading`, both
 themselves stalled on the `gp_rel` blocker per their own reports) pass down,
 two levels removed, the `s32 local[4]` buffer that `DreamSys.c:727` fills via
-`Class6B5CC__GetRotationDegrees(this, local)`. That function's own report
-(`docs/match-reports/Class6B5CC__GetRotationDegrees.md`, unit `code_d294_c`) establishes it
-writes a 3-entry `WholeFrac_d294 {s16 whole; s16 frac;}` table there, so byte
+`SceneNode__GetRotationDegrees(this, local)`. That function's own report
+(`docs/match-reports/SceneNode__GetRotationDegrees.md`, unit `code_d294_c`) establishes it
+writes a 3-entry `Ratio16 {s16 whole; s16 frac;}` table there, so byte
 offset +4 of `local` is `out[1].whole` — a degrees value.
 
 This function reads that same offset with `lhu` (unsigned), not the `lh` an
 `s16 whole` field would emit — a second, disjoint reading of the same bytes.
 Per the project's multiple-independent-local-views convention this is kept as
 a small unit-local type (`DirectionCheckArg`) rather than folded into
-`WholeFrac_d294` in the shared header; the two views simply disagree on
+`Ratio16` in the shared header; the two views simply disagree on
 signedness of the same halfword; because `diff`'s magnitude here never exceeds
 one full rotation either way, the unsigned load and immediate signed
 truncation to `s16 diff` produce the same numeric value as a signed load
@@ -82,7 +82,7 @@ from the control flow actually present.
 ### Proposed learning
 
 Confirms the existing "multiple independent local views" convention with a
-concrete cross-unit instance: a `WholeFrac_d294.whole` (`s16`) established by
+concrete cross-unit instance: a `Ratio16.whole` (`s16`) established by
 one unit's report is read as `u16` by an unrelated function in a different
 unit two calls downstream, and both are correct for the byte-match goal
 because the value's magnitude never triggers a difference between the two

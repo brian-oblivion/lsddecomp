@@ -33,7 +33,7 @@ extern s16 sScaleTemplateZDenom;
 extern u8 ROTATION_YAW_PLUS9[];
 extern u8 ROTATION_YAW_MINUS9[];
 extern u8 SCALE_X3[];
-extern Vec3_d294 TRANSLATE_Z_MINUS256[];
+extern LongVec3 TRANSLATE_Z_MINUS256[];
 extern u8 SCALE_Y2[];
 extern u8 SCALE_SIX[];
 extern u8 ROTATION_YAW_PLUS180[];
@@ -231,7 +231,7 @@ skip48:
         out->unk10 = 0;
         out->unk1C = 0x12;
     }
-    Class6B5CC__FaceTarget((Class6B5CC *)this, (Class6B5CC *)this->peer, 1, 0, 0);
+    SceneNode__FaceTarget((SceneNode *)this, (SceneNode *)this->peer, 1, 0, 0);
 }
 
 void Entity__MoodCue47(Entity *this) {
@@ -268,7 +268,7 @@ void Entity__MoodCue48(Entity *this, EntityMoodHandlerArg *out) {
     EntityMethods *methods;
 
     if (this->todFrame == 0x26) {
-        Class6B5CC__FaceTarget((Class6B5CC *)this, (Class6B5CC *)this->peer, 1, 0, 0);
+        SceneNode__FaceTarget((SceneNode *)this, (SceneNode *)this->peer, 1, 0, 0);
         out->unk10 = this->methods->getProximityRatio(this);
         out->unk1C = 6;
     }
@@ -510,8 +510,8 @@ void Entity__MoodCue115(Entity *this, EntityMoodHandlerArg *out) {
     if (this->state == 0) {
         if (Entity__IsTargetInRange(this, 0x800) != 0) {
             this->state = 0xB;
-            Class6B5CC__FaceTarget((Class6B5CC *)this, (Class6B5CC *)this->peer, 1, 0, 0);
-            Class6B5CC__FaceTarget((Class6B5CC *)this->peer, (Class6B5CC *)this, 1, 1, 0);
+            SceneNode__FaceTarget((SceneNode *)this, (SceneNode *)this->peer, 1, 0, 0);
+            SceneNode__FaceTarget((SceneNode *)this->peer, (SceneNode *)this, 1, 1, 0);
             this->methods->activate(this);
             this->methods->startSoundCue(this);
             ((DreamSys *)this->peer)->methods->clearTickCallbacks((DreamSys *)this->peer, 1);
@@ -550,7 +550,7 @@ void Entity__MoodCue115(Entity *this, EntityMoodHandlerArg *out) {
         } else if (this->moodTimer < 0x12D) {
             /* nothing */
         } else {
-            Class6B5CC__FaceTarget((Class6B5CC *)this, (Class6B5CC *)this->peer, 1, 0, 0);
+            SceneNode__FaceTarget((SceneNode *)this, (SceneNode *)this->peer, 1, 0, 0);
             this->methods->moveLocalZ(this, -0x1E, 0);
         }
     }

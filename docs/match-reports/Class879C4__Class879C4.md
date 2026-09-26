@@ -102,8 +102,8 @@ void Class879C4__Class879C4(Class879C4 *self, s32 variant, void *arg2, void *tex
   s1` after it. A void ctor ending in a void call compiles to the same 43
   words (whole image green), so the slot keeps the occupant's `void` and the
   ctor returns nothing, as ScreenSprite's does. The ctor slot, from
-  Class6B5CC, still says `void *`; New_Class879C4 ignores the result.
-- **The reset call's cast.** The slot (Class6B5CC's `reset(Self *self)`)
+  SceneNode, still says `void *`; New_Class879C4 ignores the result.
+- **The reset call's cast.** The slot (SceneNode's `reset(Self *self)`)
   takes no argument; the occupant takes the variant, so the call casts to
   `Class879C4ResetFn` (round 85's Class65650 precedent; no code).
 - Parameter names: `variant` picks the texture cell here and the CLUT row in

@@ -141,7 +141,7 @@ learning below.
 
 **Third instance in two rounds of "insert a new field, forget the leading
 pad, break a DIFFERENT already-matched function silently."** (First:
-`Class6B5CC__DetachAttachedChildren`/round 13's delta, a different unit entirely. Second:
+`SceneNode__DetachAttachedChildren`/round 13's delta, a different unit entirely. Second:
 `Viewport__Finalize`/this round's `Viewport__OnNotify`. Third: this report.) All
 three were caught the same way — `build exit` non-zero with no compile
 error, localized via `cmp -l` (1-based!) + `lsdde.map`. This is now
@@ -211,4 +211,4 @@ runner.
 
 ## Track 4 (2026-09-25, round 85, bravo)
 
-Renamed from `Unk18Obj__Update`. Slot +0x09C `update` (Class869D8's override forwards here). +0x0A0 is now typed `drawNode(Self *, Class6B5CC *)`: all three calls pass a Class6B5CC (viewNode, sceneRoot, GetRootNode's result), so the function-pointer casts are gone. `self->unk10->unkC` is `viewNode->parent`, `*(s32 *)unk30 = 0` is `refView.super->flg = 0` (mark the super coordinate for recompute), `unk98` is `zDiv` = (farZ - nearZ) / (1 << otLength) + 1, and the raw `self + 0x78/0x88 + idx * 4` reads are `ot[idx]` and `workBase[idx]`, all byte-identical. The class (id 0x7, table `gViewportMethods`, formerly `D_8006E8E4`) is unified as `Viewport` in `include/Viewport.h`, whose banner gives the evidence for the name: its methods hold a GsRVIEW2 (GsSetRefView2), the projection and near clip, a double-buffered GsOT pair, draw the scene tree into it and flip it; IntermediateBase and TaskCore already called the field holding it `viewport`. Any source block above is the pre-unification spelling; the live body takes the unified types and field and slot names, byte-identical.
+Renamed from `Unk18Obj__Update`. Slot +0x09C `update` (Class869D8's override forwards here). +0x0A0 is now typed `drawNode(Self *, SceneNode *)`: all three calls pass a SceneNode (viewNode, sceneRoot, GetRootNode's result), so the function-pointer casts are gone. `self->unk10->unkC` is `viewNode->parent`, `*(s32 *)unk30 = 0` is `refView.super->flg = 0` (mark the super coordinate for recompute), `unk98` is `zDiv` = (farZ - nearZ) / (1 << otLength) + 1, and the raw `self + 0x78/0x88 + idx * 4` reads are `ot[idx]` and `workBase[idx]`, all byte-identical. The class (id 0x7, table `gViewportMethods`, formerly `D_8006E8E4`) is unified as `Viewport` in `include/Viewport.h`, whose banner gives the evidence for the name: its methods hold a GsRVIEW2 (GsSetRefView2), the projection and near clip, a double-buffered GsOT pair, draw the scene tree into it and flip it; IntermediateBase and TaskCore already called the field holding it `viewport`. Any source block above is the pre-unification spelling; the live body takes the unified types and field and slot names, byte-identical.

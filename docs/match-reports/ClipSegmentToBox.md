@@ -12,11 +12,11 @@ historical STALL analysis below (rounds 13/19/20) is kept for context.
 
 ## Historical title (superseded): STALL, but see round 20: the register-identity diagnosis was wrong
 
-**Round 20 update (read this first): the "same class as `Class6B5CC__NotifyTaggedParents`"
+**Round 20 update (read this first): the "same class as `SceneNode__NotifyTaggedParents`"
 title and the round-13/19 "register rotation is the whole residue" framing
 are WRONG.** Re-derivation from retail's own disassembly found the real
 mechanism is a tail-merge/shared-block CFG (the SAME class the head
-flagged for `Class6B5CC__TryAttachNearby` this round), and reproducing it closed the
+flagged for `SceneNode__TryAttachNearby` this round), and reproducing it closed the
 register mapping COMPLETELY and moved the score from 16/118 to **95/118**
 (80.5%), leaving one precisely-localized residue: a single extra `move
 v1,v0` before the SECOND recursive call's result test. See "Round 20"
@@ -125,7 +125,7 @@ slot register flow through retail's own asm.
 
 Two related but distinguishable problems, found in this order:
 
-### 1. Register identity: a clean 3-way rotation, same class as `Class6B5CC__NotifyTaggedParents`
+### 1. Register identity: a clean 3-way rotation, same class as `SceneNode__NotifyTaggedParents`
 
 Retail: `out`→`$s3`, `box`→`$s4` (both match this attempt already), but
 `p1`→`$s1`, `p2`→`$s2`, `r1`→`$s0`. This attempt: `p1`→`$s0`, `p2`→`$s1`,
@@ -137,7 +137,7 @@ instruction-by-instruction diff, not just the summary count.
 
 **This resisted every reshaping lever that worked elsewhere this round**:
 - Extracting `p1`/`p2` into freshly-assigned local aliases (the
-  `Class6B5CC__NotifyTaggedParents`/`Class6B5CC__ComposeAndApplyRotation` lever) — tried both "alias assigned before
+  `SceneNode__NotifyTaggedParents`/`SceneNode__ComposeAndApplyRotation` lever) — tried both "alias assigned before
   the first `CalcBoxOutcode` call" and (implicitly, since they're already
   direct parameter references) "used as-is" — no combination moved the
   mapping.
@@ -153,13 +153,13 @@ instruction-by-instruction diff, not just the summary count.
   progress, per this project's "branch targets outrank everything else in
   triage" rule.
 
-**Working theory, not yet actionable:** in `Class6B5CC__NotifyTaggedParents`, retail put the
+**Working theory, not yet actionable:** in `SceneNode__NotifyTaggedParents`, retail put the
 PARAMETER used most often (`node`) in the lowest register (`$s0`) and a
 brand-new LOCAL (`tag`) in the middle. Here, retail puts a brand-new LOCAL
 (`r1`) in the lowest register (`$s0`) and both PARAMETERS in the higher
 ones. These two data points are not consistent with a single rule ("locals
-get priority" fits this function but contradicts `Class6B5CC__NotifyTaggedParents`; "most-
-referenced value gets priority" fits `Class6B5CC__NotifyTaggedParents` but is unclear here
+get priority" fits this function but contradicts `SceneNode__NotifyTaggedParents`; "most-
+referenced value gets priority" fits `SceneNode__NotifyTaggedParents` but is unclear here
 since `r1` and `p1`/`p2` all have comparable reference counts). This reads
 as genuine per-function idiosyncrasy in GCC 2.6.3's old register allocator,
 not a discoverable general rule — consistent with
@@ -198,12 +198,12 @@ issue #1, not an independent defect — worth re-checking automatically once
 
 **No existing declaration was modified for this function** — only new
 externs/prototypes were added. (Earlier in this session, work on
-`Class6B5CC__NotifyTaggedParents` DID modify an existing declaration — see that report and
+`SceneNode__NotifyTaggedParents` DID modify an existing declaration — see that report and
 this round's summary for the `GenericMethods_d294` padding fix.)
 
 ## Proposed learning
 
-Promote `ClipSegmentToBox` and `Class6B5CC__NotifyTaggedParents` in the round's consolidation as
+Promote `ClipSegmentToBox` and `SceneNode__NotifyTaggedParents` in the round's consolidation as
 **confirmed instances of the same open question**: this project has now
 seen two functions, in the same unit, both `INCLUDE_ASM`-worthy near
 matches, both blocked by a register-to-value mapping that's provably
@@ -330,7 +330,7 @@ RE-compute `r1&0xFF` (a value already known nonzero on this path) before
 falling into the same shared `0x8001E1A4` test. Retail's compiler shares
 one code block for two logically-different arrivals rather than
 duplicating it -- a cross-jump/tail-merge, the exact class the head
-flagged for `Class6B5CC__TryAttachNearby` this round, just manifesting through a
+flagged for `SceneNode__TryAttachNearby` this round, just manifesting through a
 redundant RECOMPUTE instead of a redundant COMPARISON.
 
 **Reproducing this exact shared-block structure as `goto`s closed the
@@ -586,7 +586,7 @@ red herring in the next reader's mental model of what code was
 ## Naming (round 54, bravo, track 3)
 
 Renamed from `func_8001E110` via `tools/rename.py`. **Tier A** -- a free
-function (no `self`/`Class6B5CCObj` argument at all): a recursive
+function (no `self`/`SceneNodeObj` argument at all): a recursive
 Cohen-Sutherland-style line-segment-vs-AABB clip, using `CalcBoxOutcode`
 (already named, `code_d294_c.c`) for the outcode test and
 `BisectSegmentToBox` (this unit, below) for the bisection step when the

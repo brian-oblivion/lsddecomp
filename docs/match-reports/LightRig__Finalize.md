@@ -7,7 +7,7 @@
 Round 82, runner alpha (fifth slot on code_322b4). Unit `src/code_322b4.c`. Fresh ground, no prior body attempt.
 
 - **Where:** gLightRigMethods slot +0x00C (finalize) (`tools/classtable.py`).
-- **What:** For i = 0..2, fetches child i through its own slot +0x0B8 (LightRig__GetLight) and calls that child's release (+0x004); then Class6B5CC's finalize via `GetClass6B5CCMethods()`.
+- **What:** For i = 0..2, fetches child i through its own slot +0x0B8 (LightRig__GetLight) and calls that child's release (+0x004); then SceneNode's finalize via `GetSceneNodeMethods()`.
 - **Result:** byte-exact; 33/33 words, 0 insertions / 0 deletions, whole-image SHA1 green (`./build-and-verify.sh` OK). First build.
 - **Types:** the unit-local `D_8006EFACObj` view (see LightRig__LightRig).
 
@@ -15,7 +15,7 @@ Round 82, runner alpha (fifth slot on code_322b4). Unit `src/code_322b4.c`. Fres
 
 ```c
 /* LightRig slot +0x00C (finalize): release the three lights, then the
- * Class6B5CC finalize. */
+ * SceneNode finalize. */
 void LightRig__Finalize(LightRig *self) {
     s32 i;
     BasicClass *light;
@@ -24,13 +24,13 @@ void LightRig__Finalize(LightRig *self) {
         light = self->methods->getLight(self, i);
         light->methods->release(light);
     }
-    GetClass6B5CCMethods()->finalize((Class6B5CC *)self);
+    GetSceneNodeMethods()->finalize((SceneNode *)self);
 }
 ```
 
 ## Naming
 
-- `D8006EFAC__Finalize` -- tier A. Finalize (slot +0x00C): releases the three light children then calls the Class6B5CC finalize.
+- `D8006EFAC__Finalize` -- tier A. Finalize (slot +0x00C): releases the three light children then calls the SceneNode finalize.
 
 ## Track 4
 

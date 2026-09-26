@@ -22,7 +22,7 @@
  *
  * Fields and slots are the unified Entity's (include/Entity.h, track 4
  * round 88): the inherited ones carry Class65650's, Actor's and
- * Class6B5CC's names (`state`, `linkTarget`, `peer`, moveLocalZ/X/Y,
+ * SceneNode's names (`state`, `linkTarget`, `peer`, moveLocalZ/X/Y,
  * moveLocalZOrFindLink, ...), Entity's own are named for their occupants.
  */
 #include "common.h"
@@ -39,11 +39,11 @@ extern u8 ROTATION_YAW_MINUS9[];
 extern u8 D_80089C58[];
 extern u8 D_80089E74[];
 extern u8 ROTATION_YAW_PLUS1[];
-extern Vec3_d294 D_80089DB4[];
-extern Vec3_d294 TRANSLATE_Y_MINUS64[];
-extern Vec3_d294 D_80089D9C[];
-extern Vec3_d294 D_80089D48[];
-extern Vec3_d294 D_80089D60[];
+extern LongVec3 D_80089DB4[];
+extern LongVec3 TRANSLATE_Y_MINUS64[];
+extern LongVec3 D_80089D9C[];
+extern LongVec3 D_80089D48[];
+extern LongVec3 D_80089D60[];
 
 void Entity__MoodCue19(Entity *this, EntityMoodHandlerArg *out) {
     out->unk10 = this->methods->getProximityRatio(this);
@@ -80,13 +80,13 @@ void Entity__MoodCue21(Entity *this, EntityMoodHandlerArg *out) {
 }
 
 void Entity__MoodCue22(Entity *this) {
-    Class6B5CC__FaceTarget((Class6B5CC *)this, (Class6B5CC *)this->peer, 1, 0, 0);
+    SceneNode__FaceTarget((SceneNode *)this, (SceneNode *)this->peer, 1, 0, 0);
 }
 
 void Entity__MoodCue23(Entity *this) {
     s32 arg1;
 
-    Class6B5CC__FaceTarget((Class6B5CC *)this, (Class6B5CC *)this->peer, 1, 0, 0);
+    SceneNode__FaceTarget((SceneNode *)this, (SceneNode *)this->peer, 1, 0, 0);
 
     if (this->targetReached != 0) {
         if (this->moodTimer >= 0x41) {
@@ -223,7 +223,7 @@ void Entity__MoodCue30(Entity *this) {
         this->methods->updateScale(this, 1, SCALE_DOUBLE);
         this->methods->moveLocalY(this, -0x1E, 0);
     } else {
-        Class6B5CC__FaceTarget((Class6B5CC *)this, (Class6B5CC *)this->peer, 1, 0, 0);
+        SceneNode__FaceTarget((SceneNode *)this, (SceneNode *)this->peer, 1, 0, 0);
         if (this->state == 0xB) {
             this->methods->moveLocalZ(this, -0x64, 0);
             if ((u32)(this->moodTimer - 0x55) < 0x1E) {
@@ -232,14 +232,14 @@ void Entity__MoodCue30(Entity *this) {
                 this->state = 0xD;
             }
         } else if (this->state == 0xD) {
-            this->methods->setTranslation(this, (Vec3_d294 *)&((DreamSys *)this->peer)->coord2->tx);
+            this->methods->setTranslation(this, (LongVec3 *)&((DreamSys *)this->peer)->coord2->tx);
             this->methods->addTranslation(this, D_80089DB4);
         }
     }
 }
 
 void Entity__MoodCue31(Entity *this, EntityMoodHandlerArg *out) {
-    Class6B5CC__FaceTarget((Class6B5CC *)this, (Class6B5CC *)this->peer, 1, 0, 0);
+    SceneNode__FaceTarget((SceneNode *)this, (SceneNode *)this->peer, 1, 0, 0);
     ((DreamSys *)this->peer)->methods->clearTickCallbacks((DreamSys *)this->peer, 1);
     if ((out->unk4 % 10) < 3) {
         out->unk10 = 0;
@@ -346,7 +346,7 @@ void Entity__MoodCue36(Entity *this) {
         this->methods->updateScale(this, 1, arg2);
         this->state = 0xB;
     }
-    Class6B5CC__FaceTarget((Class6B5CC *)this, (Class6B5CC *)this->peer, 1, 0, 0);
+    SceneNode__FaceTarget((SceneNode *)this, (SceneNode *)this->peer, 1, 0, 0);
     if (this->methods->distanceToPeer(this, this->peer) < 0x7000) {
         this->methods->moveLocalZ(this, 0x100, 0);
     }

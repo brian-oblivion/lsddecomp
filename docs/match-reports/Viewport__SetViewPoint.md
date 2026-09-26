@@ -33,7 +33,7 @@ void Viewport__SetViewPoint(Unk18Obj *self, Vec3_2cc8c *a1) {
 
 `include/code_2cc8c.h`:
 - New `Vec3_2cc8c` type (`{ s32 x, y, z; }`, local view — same shape as
-  `code_d294.h`'s own `Vec3_d294`, not unified per this project's
+  `code_d294.h`'s own `LongVec3`, not unified per this project's
   convention).
 - `Unk18Obj::unk14` **retyped** from an opaque `u8[0x030-0x014]` span
   (added earlier this round by `Viewport__AttachViewChild`, which only ever took its
@@ -53,4 +53,4 @@ void Viewport__SetViewPoint(Unk18Obj *self, Vec3_2cc8c *a1) {
 
 ## Track 4 (2026-09-25, round 85, bravo)
 
-Renamed from `Unk18Obj__SetViewPos`. Renamed for the GsRVIEW2 member it writes: `refView.vp`, the viewpoint (&self+0x014 is GsSetRefView2's argument). Slot +0x078 `setViewPoint`, parameter `Vec3_d294 *`. The class (id 0x7, table `gViewportMethods`, formerly `D_8006E8E4`) is unified as `Viewport` in `include/Viewport.h`, whose banner gives the evidence for the name: its methods hold a GsRVIEW2 (GsSetRefView2), the projection and near clip, a double-buffered GsOT pair, draw the scene tree into it and flip it; IntermediateBase and TaskCore already called the field holding it `viewport`. Any source block above is the pre-unification spelling; the live body takes the unified types and field and slot names, byte-identical.
+Renamed from `Unk18Obj__SetViewPos`. Renamed for the GsRVIEW2 member it writes: `refView.vp`, the viewpoint (&self+0x014 is GsSetRefView2's argument). Slot +0x078 `setViewPoint`, parameter `LongVec3 *`. The class (id 0x7, table `gViewportMethods`, formerly `D_8006E8E4`) is unified as `Viewport` in `include/Viewport.h`, whose banner gives the evidence for the name: its methods hold a GsRVIEW2 (GsSetRefView2), the projection and near clip, a double-buffered GsOT pair, draw the scene tree into it and flip it; IntermediateBase and TaskCore already called the field holding it `viewport`. Any source block above is the pre-unification spelling; the live body takes the unified types and field and slot names, byte-identical.
