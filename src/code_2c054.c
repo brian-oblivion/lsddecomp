@@ -2,89 +2,91 @@
 #include "code_2c054.h"
 #include "VabStreamObj.h"
 
-StreamTaskObj *New_StreamTask(s32 a1, s32 a2, s32 a3, s32 a4)
+#define PLAYER(self) ((StreamTaskUnkB4Obj *)(self)->player)
+
+StreamTask *New_StreamTask(TaskCoreTarget *target, char *soundBankPath, BasicClass *sound, StreamTaskInitData *initData)
 {
-    StreamTaskObj *self;
+    StreamTask *self;
 
     self = BMemPMgrAlloc(0xDC);
     if (self != NULL) {
-        Get_vtable_StreamTask()->ctor(self, a1, a2, a3, (StreamTaskInitData *)a4);
+        Get_vtable_StreamTask()->ctor(self, target, soundBankPath, sound, initData);
         return self;
     }
     return NULL;
 }
 
-void StreamTask__StreamTask(StreamTaskObj *self, s32 a1, s32 a2, s32 a3, StreamTaskInitData *a4) {
-    Get_vtable_TaskCore()->ctor((TaskCore *)self, (TaskCoreTarget *)a1, (char *)a2, (BasicClass *)a3);
+void StreamTask__StreamTask(StreamTask *self, TaskCoreTarget *target, char *soundBankPath, BasicClass *sound, StreamTaskInitData *initData) {
+    Get_vtable_TaskCore()->ctor((TaskCore *)self, target, soundBankPath, sound);
     self->methods = Get_vtable_StreamTask();
-    if (a4 != NULL) {
-        self->unkA8 = *a4;
+    if (initData != NULL) {
+        self->initData = *initData;
     } else {
-        self->unkA8 = *GetDefaultStreamTaskInitData();
+        self->initData = *GetDefaultStreamTaskInitData();
     }
-    self->unkB4 = New_MoviePlayer(GetDefaultStreamTaskInitData(), 0, 0);
-    self->unkB8 = 0;
+    self->player = (BasicClass *)New_MoviePlayer(GetDefaultStreamTaskInitData(), 0, 0);
+    self->streamName = 0;
     self->methods->resetCounters(self);
 }
 
-void StreamTask__Finalize(StreamTaskObj *self) {
-    self->unkB4->methods->slot04(self->unkB4);
+void StreamTask__Finalize(StreamTask *self) {
+    PLAYER(self)->methods->slot04(PLAYER(self));
     Get_vtable_TaskCore()->finalize((TaskCore *)self);
 }
 
-void StreamTask__Reset(StreamTaskObj *self) {
-    self->unkC8 = -1;
+void StreamTask__Reset(StreamTask *self) {
+    self->loopCount = -1;
     self->unkC4 = 0;
-    self->unkCC = 1;
+    self->skipOnConfirm = 1;
     self->unkD0 = 0;
-    self->unkD4 = 1;
+    self->abortBeforeFade = 1;
 }
 
-void StreamTask__Init(StreamTaskObj *self, s32 a1, s32 arg2, s32 typeLookup, s32 flag) {
-    self->unkB8 = arg2;
-    self->unkBC = typeLookup;
-    self->unkC0 = flag;
-    Get_vtable_TaskCore()->init((TaskCore *)self, (IntermediateBaseInitArgs *)a1, 0);
+void StreamTask__Init(StreamTask *self, IntermediateBaseInitArgs *args, s32 streamName, s32 streamGroup, s32 autoPlay) {
+    self->streamName = streamName;
+    self->streamGroup = streamGroup;
+    self->autoPlay = autoPlay;
+    Get_vtable_TaskCore()->init((TaskCore *)self, args, 0);
 }
 
-void StreamTask__OnInit(StreamTaskObj *self) {
+void StreamTask__OnInit(StreamTask *self) {
     /* IntermediateBase's onInit slot names init's (0, 0, 0); TaskCore__OnInit
      * takes self alone, and this up-call passes nothing else. */
     ((void (*)(TaskCore *))Get_vtable_TaskCore()->onInit)((TaskCore *)self);
-    self->unkA4 = 0;
-    self->unkB4->methods->slot6C(self->unkB4, self->unkC0);
-    if (self->unkB4->methods->slot40(self->unkB4, self->unkB8, self->unkBC, self->unkC4, self->unkC8) != 0) {
+    self->playDone = 0;
+    PLAYER(self)->methods->slot6C(PLAYER(self), self->autoPlay);
+    if (PLAYER(self)->methods->slot40(PLAYER(self), self->streamName, self->streamGroup, self->unkC4, self->loopCount) != 0) {
         self->methods->setFrameBound(self, 0);
     }
 }
 
-void StreamTask__Update(StreamTaskObj *self, s32 a1, s32 a2) {
-    Get_vtable_TaskCore()->update((TaskCore *)self, (BasicClass *)a1, a2);
-    if (self->unkA4 != 0) {
+void StreamTask__Update(StreamTask *self, BasicClass *sender, s32 event) {
+    Get_vtable_TaskCore()->update((TaskCore *)self, sender, event);
+    if (self->playDone != 0) {
         return;
     }
-    self->unkA4 = self->unkB4->methods->slot48(self->unkB4);
-    if (self->unkA4 == 0) {
+    self->playDone = PLAYER(self)->methods->slot48(PLAYER(self));
+    if (self->playDone == 0) {
         return;
     }
-    if (self->unkD8 != 0) {
+    if (self->fadingOut != 0) {
         return;
     }
     self->methods->setState(self, 7);
 }
 
-void StreamTask__SetState(StreamTaskObj *self, s32 a1) {
-    Get_vtable_TaskCore()->setState((TaskCore *)self, a1);
-    switch (a1) {
+void StreamTask__SetState(StreamTask *self, s32 state) {
+    Get_vtable_TaskCore()->setState((TaskCore *)self, state);
+    switch (state) {
     case 5:
-        self->unkD8 = 0;
+        self->fadingOut = 0;
         break;
     case 7:
-        self->unkD8 = 1;
+        self->fadingOut = 1;
         break;
     case 8:
-        if (self->unkD4 == 0) {
-            self->unkB4->methods->slot4C(self->unkB4);
+        if (self->abortBeforeFade == 0) {
+            PLAYER(self)->methods->slot4C(PLAYER(self));
         }
         break;
     case 0x12:
@@ -93,26 +95,26 @@ void StreamTask__SetState(StreamTaskObj *self, s32 a1) {
     }
 }
 
-void StreamTask__SetFrameBound(StreamTaskObj *self, s32 a1) {
-    self->frameBound = a1;
-    if (a1 >= 0) {
-        self->frameBound = a1 * 15;
+void StreamTask__SetFrameBound(StreamTask *self, s32 bound) {
+    self->frameBound = bound;
+    if (bound >= 0) {
+        self->frameBound = bound * 15;
     }
 }
 
-void StreamTask__OnPadConfirm(StreamTaskObj *self) {
+void StreamTask__OnPadConfirm(StreamTask *self) {
     Get_vtable_TaskCore()->onPadConfirm((TaskCore *)self);
-    if (self->unkCC != 0) {
+    if (self->skipOnConfirm != 0) {
         self->result = 2;
         self->methods->setState(self, 0x12);
     }
 }
 
-void StreamTask__OnPadPrev(StreamTaskObj *self) {
+void StreamTask__OnPadPrev(StreamTask *self) {
     Get_vtable_TaskCore()->onPadPrev((TaskCore *)self);
 }
 
-void StreamTask__OnPadNext(StreamTaskObj *self) {
+void StreamTask__OnPadNext(StreamTask *self) {
     Get_vtable_TaskCore()->onPadNext((TaskCore *)self);
 }
 
@@ -122,35 +124,35 @@ void StreamTask__NoOpSlot88(void) {
 void StreamTask__NoOpSlot8C(void) {
 }
 
-void StreamTask__RefreshViewValue(StreamTaskObj *self) {
-    if (self->unkD4 != 0) {
-        self->unkB4->methods->slot4C(self->unkB4);
+void StreamTask__RefreshViewValue(StreamTask *self) {
+    if (self->abortBeforeFade != 0) {
+        PLAYER(self)->methods->slot4C(PLAYER(self));
     } else {
         self->methods->setState(self, 7);
     }
 }
 
-void StreamTask__SetUnkC4(StreamTaskObj *self, s32 a1) {
-    self->unkC4 = a1;
+void StreamTask__SetUnkC4(StreamTask *self, s32 value) {
+    self->unkC4 = value;
 }
 
-void StreamTask__SetLoopCount(StreamTaskObj *self, s32 a1) {
-    self->unkC8 = a1;
+void StreamTask__SetLoopCount(StreamTask *self, s32 count) {
+    self->loopCount = count;
 }
 
-void StreamTask__SetSkipOnConfirm(StreamTaskObj *self, s32 a1) {
-    self->unkCC = a1;
+void StreamTask__SetSkipOnConfirm(StreamTask *self, s32 enable) {
+    self->skipOnConfirm = enable;
 }
 
-void StreamTask__SetUnkD0(StreamTaskObj *self, s32 a1) {
-    self->unkD0 = a1;
+void StreamTask__SetUnkD0(StreamTask *self, s32 value) {
+    self->unkD0 = value;
 }
 
-void StreamTask__SetAbortBeforeFade(StreamTaskObj *self, s32 a1) {
-    self->unkD4 = a1;
+void StreamTask__SetAbortBeforeFade(StreamTask *self, s32 enable) {
+    self->abortBeforeFade = enable;
 }
 
-StreamTaskObjMethods *Get_vtable_StreamTask(void) {
+StreamTaskMethods *Get_vtable_StreamTask(void) {
     return &gStreamTaskMethods;
 }
 

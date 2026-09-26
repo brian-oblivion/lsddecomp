@@ -3,95 +3,26 @@
 
 #include "common.h"
 #include "TaskCore.h"
+#include "StreamTask.h"
 #include "Viewport.h"
 
 /*
- * code_2c054: StreamTaskObj (class id 0x1130, gStreamTaskMethods), the
- * streaming-task class (`New_StreamTask`, 0xDC bytes) used to load and
- * drive named "ETC\*.STR" stream files, and the first seven methods of its
- * parent TaskCore (`New_TaskCore`, 0xA4 bytes: ctor, finalize, reset, init
- * and the onInit/onDeinit hooks). TaskCore is declared once, in
- * include/TaskCore.h (track 4, round 84); StreamTaskObj's own class is not
- * unified yet, and its object and table below expand TaskCore's macros.
- *
- * `classtable.py gStreamTaskMethods --vs gTaskCoreMethods`: every slot
- * StreamTaskObj does not override points at TaskCore's function, and the
- * overrides (008/00C/040/044/04C/05C/060/06C/078/080/084/088/08C/094) up-call
- * `Get_vtable_TaskCore()` at the same slot where they need to.
- *
- * `include/Class6D3C8.h` independently views StreamTaskObj's table as
- * `StreamTask` from code_1677c's call sites. Its +0x044 is `configure`,
- * five arguments: StreamTask__Init's own list. TASKCORE_SLOTS types
- * +0x044 as IntermediateBase's init(args, mode), so this unit's table view
- * and that one disagree there; neither calls +0x044 through this table.
+ * code_2c054: the whole of StreamTask (class id 0x1130, gStreamTaskMethods;
+ * include/StreamTask.h, track 4, round 87) and the first seven methods of
+ * its parent TaskCore (include/TaskCore.h: allocator, ctor, finalize,
+ * reset, init and the onInit/onDeinit hooks). What remains here are this
+ * unit's views of the objects both classes hold from classes with no header
+ * yet, and the data and allocators only this unit reaches.
  */
-typedef struct StreamTaskObj StreamTaskObj;
-typedef struct StreamTaskObjMethods StreamTaskObjMethods;
 typedef struct StreamTaskUnkB4Obj StreamTaskUnkB4Obj;
 typedef struct StreamTaskUnkB4Methods StreamTaskUnkB4Methods;
 typedef struct StreamTaskUnk78Obj StreamTaskUnk78Obj;
 typedef struct StreamTaskUnk78Methods StreamTaskUnk78Methods;
 typedef struct TaskTextObj TaskTextObj;
 typedef struct TaskTextMethods TaskTextMethods;
-typedef struct StreamTaskInitData StreamTaskInitData;
 
-/* A 3-word struct: StreamTask__StreamTask's optional 5th (stack) argument, and also
- * GetDefaultStreamTaskInitData()'s return type -- both feed the exact same 3-word copy into
- * StreamTaskObj::unkA8/unkAC/unkB0, so they're the same shape. Real field
- * meanings unknown (never dereferenced beyond word offset by this unit's
- * queued functions). */
-struct StreamTaskInitData {
-    s32 unk0; /* +0x000 */
-    s32 unk4; /* +0x004 */
-    s32 unk8; /* +0x008 */
-};
-
+/* Defined in code_2cc8c_c.c (as void *): &gDefaultStreamTaskInitData. */
 extern StreamTaskInitData *GetDefaultStreamTaskInitData(void);
-
-/* TaskCore's 72 slots, then StreamTaskObj's five setters. The ctor takes
- * FIVE parameters: New_StreamTask dispatches it with $a0-$a3 plus a fifth
- * argument stored to 0x10($sp), the o32 stack-argument slot
- * (docs/match-reports/New_StreamTask.md). */
-struct StreamTaskObjMethods {
-    TASKCORE_SLOTS(StreamTaskObj, (StreamTaskObj *self, s32 a1, s32 a2, s32 a3, StreamTaskInitData *a4));
-    /* +0x124 */ void (*setUnkC4)(StreamTaskObj *self, s32 a1); /* StreamTask__SetUnkC4 */
-    /* +0x128 */ void (*setUnkC8)(StreamTaskObj *self, s32 a1); /* StreamTask__SetLoopCount */
-    /* +0x12C */ void (*setUnkCC)(StreamTaskObj *self, s32 a1); /* StreamTask__SetSkipOnConfirm */
-    /* +0x130 */ void (*setUnkD0)(StreamTaskObj *self, s32 a1); /* StreamTask__SetUnkD0 */
-    /* +0x134 */ void (*setUnkD4)(StreamTaskObj *self, s32 a1); /* StreamTask__SetAbortBeforeFade */
-};
-
-/* Object size is 0xDC (from New_StreamTask's allocator call); TaskCore's
- * 0xA4 bytes, then StreamTaskObj's own. */
-struct StreamTaskObj {
-    TASKCORE_FIELDS(StreamTaskObjMethods);
-    s32 unkA4;                     /* +0x0A4, reset to 0 by StreamTask__OnInit; read
-                                        and set to a call result by StreamTask__Update */
-    StreamTaskInitData unkA8;         /* +0x0A8, whole-struct-copied by StreamTask__StreamTask from
-                                          either its 5th argument or GetDefaultStreamTaskInitData()'s
-                                          default (retail batches all 3 loads before all
-                                          3 stores -- a struct assignment, not 3 separate
-                                          field writes) */
-    StreamTaskUnkB4Obj *unkB4;      /* +0x0B4, an object with its own vtable
-                                        (see StreamTaskUnkB4Obj below); dispatched
-                                        through by StreamTask__Finalize */
-    s32 unkB8;                       /* +0x0B8, set by StreamTask__Init's arg2 */
-    s32 unkBC;                        /* +0x0BC, set by StreamTask__Init's typeLookup */
-    s32 unkC0;                         /* +0x0C0, set by StreamTask__Init's flag (5th, stack-spilled) */
-    s32 unkC4;                          /* +0x0C4, get/set by StreamTask__SetUnkC4 */
-    s32 unkC8;                           /* +0x0C8, get/set by StreamTask__SetLoopCount */
-    s32 unkCC;                            /* +0x0CC, get/set by StreamTask__SetSkipOnConfirm */
-    s32 unkD0;                             /* +0x0D0, get/set by StreamTask__SetUnkD0 */
-    s32 unkD4;                              /* +0x0D4, get/set by StreamTask__SetAbortBeforeFade */
-    s32 unkD8;                               /* +0x0D8, read by StreamTask__Update (object end, 0xDC) */
-};
-
-/* This class's own "GetMethods" accessor (compare `Get_vtable_Entity` in
- * Entity.h) -- returns &gStreamTaskMethods with no other side effect. Called by
- * New_StreamTask/StreamTask__StreamTask (both still INCLUDE_ASM, not this batch) to
- * fetch the ctor at slot +0x008. */
-extern StreamTaskObjMethods *Get_vtable_StreamTask(void);
-extern StreamTaskObjMethods gStreamTaskMethods;
 
 /* A rodata table TaskCore__Reset reaches only by ADDRESS (`lui`/`addiu`, no
  * `lw`/`sw` here) -- passed to setColors as three pointers 3 bytes apart
@@ -107,9 +38,11 @@ extern u8 D_8006E860[];
 extern u8 gDefaultStreamTaskInitData[];
 extern Vec3_d294 D_8006E86C;
 
-/* self->unkB4's class (New_MoviePlayer), dispatched through by
- * StreamTask__Finalize, __func_8003BAB4, __func_8003BB5C and
- * __func_8003BDF4. Until round 84 it also stood for TaskCore's
+/* StreamTask::player's class, MoviePlayer (New_MoviePlayer, D_8006F614:
+ * +0x040 Play, +0x048 Advance, +0x04C Abort, +0x06C SetResult), as
+ * StreamTask__Finalize, __OnInit, __Update, __SetState and
+ * __RefreshViewValue call it; StreamTask.h types the field `BasicClass *`
+ * and they cast. Until round 84 it also stood for TaskCore's
  * sound/subHandle/tileMap/tileAtlas, which TaskCore.h types `BasicClass *`
  * (only their +0x004 release is ever called). The BgLayer (TaskCore::bgLayer)
  * is StreamTaskUnk78Obj below: its +0x04C takes three arguments where this
@@ -123,7 +56,7 @@ struct StreamTaskUnkB4Methods {
                                         directly (not stored) there */
     u8 pad44[0x048 - 0x044];
     s32 (*slot48)(StreamTaskUnkB4Obj *self); /* +0x048, StreamTask__Update's forward target;
-                                        return stored into StreamTaskObj::unkA4 there */
+                                        return stored into StreamTask::playDone there */
     void (*slot4C)(StreamTaskUnkB4Obj *self); /* +0x04C, StreamTask__RefreshViewValue's forward target;
                                         1 argument -- see the struct comment for why this
                                         is NOT the same slot as StreamTaskUnk78Methods::slot4C */
@@ -177,7 +110,7 @@ struct TaskTextObj {
  * Its local view here (StreamTaskUnk18Obj) was merged there in round 85. */
 
 
-/* Allocates/initializes self->unkB4 (a StreamTaskUnkB4Obj); called by
+/* Allocates StreamTask::player (a StreamTaskUnkB4Obj); called by
  * StreamTask__StreamTask as `New_MoviePlayer(GetDefaultStreamTaskInitData(), 0, 0)`. Not this unit's
  * own function (no INCLUDE_ASM here), so only the call site's own argument
  * and return types are modeled. */
