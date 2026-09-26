@@ -579,7 +579,7 @@ mismatch itself is root-caused.
 
 Assigned as one of three functions in a round-53 Sonnet calibration slot for
 the track-1 stop rule (`docs/FINISHING-PLAN.md`), alongside `IsPointOutOfBounds`
-and `StageMap__ConfigureRateEntry`. Round 33's disposition ("still a pure register-identity
+and `StageMap__StartScaleRamp`. Round 33's disposition ("still a pure register-identity
 rotation with no new lever found") is the reason this unit was picked over
 the plan's higher-ranked but levers-measurably-spent `code_2cc8c_e` job.
 

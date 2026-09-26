@@ -477,7 +477,7 @@ real residue cascades widely.
 Bounded search (`timeout 600`, `-j 6 --stop-on-zero`): **71363
 iterations**, best score **770** (down from 1040, never reached zero).
 `timeout`'s own exit code line was not captured (same outer-Bash/inner-
-`timeout` race as `StageMap__ConfigureRateEntry`/`strcpy` this round -- the trailing
+`timeout` race as `StageMap__StartScaleRamp`/`strcpy` this round -- the trailing
 `echo "permuter exit=$?"` never lands in the log); treated as an ordinary
 self-stop given the clean iteration count and no crash signature.
 

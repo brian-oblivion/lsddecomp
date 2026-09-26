@@ -1,4 +1,6 @@
-# StageMap__ConfigureRateEntry — MATCHED (round 58), 28/28, whole-image SHA1 green
+# StageMap__StartScaleRamp — MATCHED (round 58), 28/28, whole-image SHA1 green
+
+> Renamed from `StageMap__ConfigureRateEntry` on 2026-09-26 (tools/rename.py). Address 0x8004cfb8.
 
 > Renamed from `Class866E8__ConfigureRateEntry` on 2026-09-26 (tools/rename.py). Address 0x8004cfb8.
 
@@ -128,7 +130,7 @@ tool artifact.
 
 ```c
 #if 0
-void StageMap__ConfigureRateEntry(Obj866E8 *self, s32 rate, s32 flag) {
+void StageMap__StartScaleRamp(Obj866E8 *self, s32 rate, s32 flag) {
     EntryDesc866E8 *table;
     s32 val;
 
@@ -215,7 +217,7 @@ well-characterized.
 
 Seed: the "Best-attempt body" above (25/28-equivalent shape after the
 first, byte-exact half). `--debug` base score: **360** (1 reordering + 3
-insertions, `StageMap__ConfigureRateEntry` header), consistent with the report's own
+insertions, `StageMap__StartScaleRamp` header), consistent with the report's own
 "3 extra words" reading of the second half's residue (the eager `mflo`
 plus its knock-on reordering).
 

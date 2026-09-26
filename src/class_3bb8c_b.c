@@ -366,10 +366,10 @@ void StageMap__SetBounds(StageMap *self, CellBounds *arg1) {
  *    default-then-overwrite spelling makes cc1 extract it eagerly, and
  *    storing to self->rateCountdown directly instead of through `val` perturbs the
  *    table-selection half as well. Both were measured -- round 58 and
- *    docs/match-reports/StageMap__ConfigureRateEntry.md.
+ *    docs/match-reports/StageMap__StartScaleRamp.md.
  *
  * `~rate + 1` is retail's own negation (`nor`/`addiu`), not `-rate`. */
-void StageMap__ConfigureRateEntry(StageMap *self, s32 rate, s32 flag) {
+void StageMap__StartScaleRamp(StageMap *self, s32 rate, s32 flag) {
     Ratio16 *table;
     s32 val;
     s32 scale;

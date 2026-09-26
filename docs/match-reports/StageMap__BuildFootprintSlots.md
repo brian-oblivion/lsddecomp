@@ -578,7 +578,7 @@ existing gap's size, so no other offset in the struct moves.
   `%N`/receiver-timing lore (all of which involved 1-2 registers, not a
   whole-function permutation) — worth flagging for whoever revisits this
   unit's remaining stalls, since `StageMap__ComputeFootprintFromRotation` (this round's other
-  target) and `IsPointOutOfBounds`/`StageMap__ConfigureRateEntry` (already-documented stalls)
+  target) and `IsPointOutOfBounds`/`StageMap__StartScaleRamp` (already-documented stalls)
   are all in the same header/class and may share whatever is driving it.
 
 ---

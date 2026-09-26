@@ -78,4 +78,4 @@ the configured rate entry to every child via
 clamping to -1 once it reaches 0 (a "done" sentinel, distinct from the
 0 the sibling `StageMap__FlushRateLatch` uses for "off"). Named for the
 mechanics: it is the per-tick advance of the rate/countdown pair
-established by `StageMap__ConfigureRateEntry`.
+established by `StageMap__StartScaleRamp`.
