@@ -2,7 +2,7 @@
 
 > Renamed from `func_8002A6EC` on 2026-09-23 (tools/rename.py). Address 0x8002a6ec.
 
-**Unit:** code_179d8_b · **Size:** 28 words · **Status:** MATCHED (28/28 words)
+**Unit:** libcd_bios · **Size:** 28 words · **Status:** MATCHED (28/28 words)
 
 ## What it does
 

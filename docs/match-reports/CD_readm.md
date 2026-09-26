@@ -2,7 +2,7 @@
 
 > Renamed from `func_8002ADE8` on 2026-09-23 (tools/rename.py). Address 0x8002ade8.
 
-**Unit:** code_179d8_b · **Size:** 62 words · **Status:** MATCHED (62/62 words)
+**Unit:** libcd_bios · **Size:** 62 words · **Status:** MATCHED (62/62 words)
 
 ## What it does
 
@@ -139,7 +139,7 @@ by testing and reading which pair re-merged after each change.
 
 Round 89 (runner delta, track 5 `asm-sites`): the bare `__asm__("")` after
 case1's `D_8006D8F0 = 0x200;` store is **retired**. Measured by deleting it
-alone and rebuilding: `build/src/code_179d8_b.c.o` came out byte-identical to
+alone and rebuilding: `build/src/libcd_bios.c.o` came out byte-identical to
 the object built with it (`cmp`), and `./build-and-verify.sh` stayed green. So
 in the current source no pair of the three stores re-merges without it; the
 "barrier only on case1" part of the combination above is no longer load-bearing.

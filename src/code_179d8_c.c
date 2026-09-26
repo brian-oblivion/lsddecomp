@@ -28,7 +28,7 @@
  * (jtbl_80010CD8), which went to code_179d8_c_b, and the yaml attach moved
  * with it. Do not move it back.
  *
- * Carved round 16 by blocker DENSITY (see code_179d8_b's header for the
+ * Carved round 16 by blocker DENSITY (see libcd_bios's header for the
  * full window census). This window screened 16/20 clean.
  *
  * STALE CLAIM REMOVED, round 23 (2026-09-07): this comment listed

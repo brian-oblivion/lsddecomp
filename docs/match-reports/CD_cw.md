@@ -2,7 +2,7 @@
 
 > Renamed from `func_80029F10` on 2026-09-23 (tools/rename.py). Address 0x80029f10.
 
-Unit `code_179d8_b`. Runner echo, round 26. Carved this round; no prior report exists.
+Unit `libcd_bios`. Runner echo, round 26. Carved this round; no prior report exists.
 
 ## Signature
 
@@ -10,7 +10,7 @@ Unit `code_179d8_b`. Runner echo, round 26. Carved this round; no prior report e
 s32 CD_cw(s32 arg0, s32 arg1, s32 arg2, s32 arg3);
 ```
 
-Confirmed by two already-matched call sites in the sibling unit `code_179d8_b.c`: `CD_shell` (`CD_cw(1, 0, 0, 0);` and `CD_cw(0x16, D_8006D908, 0, 0)` used as a `while` condition -- i.e. the return value IS a truth value) and `CD_readm` (`CD_cw(9, 0, 0, 0);`). This function is itself called by `CD_sync`... no -- by NOTHING inside this unit; it is the unit's own entry point CALLED BY `CD_shell`/`CD_readm` above, and it itself calls `CD_sync(0, 0)` (blocking wait for CD sync) partway through its own body.
+Confirmed by two already-matched call sites in the sibling unit `libcd_bios.c`: `CD_shell` (`CD_cw(1, 0, 0, 0);` and `CD_cw(0x16, D_8006D908, 0, 0)` used as a `while` condition -- i.e. the return value IS a truth value) and `CD_readm` (`CD_cw(9, 0, 0, 0);`). This function is itself called by `CD_sync`... no -- by NOTHING inside this unit; it is the unit's own entry point CALLED BY `CD_shell`/`CD_readm` above, and it itself calls `CD_sync(0, 0)` (blocking wait for CD sync) partway through its own body.
 
 ## What this function does
 
@@ -216,8 +216,8 @@ skip_timeout3:
 ## What is known independently of this body
 
 - Screened blocker-clean at carve time (round 26). Biggest function in the unit (282 retail words).
-- Calling convention confirmed against two ALREADY-MATCHED call sites in `code_179d8_b.c` (`CD_shell`, `CD_readm`) -- both pass `0`/constant literals for `arg2`/`arg3` and use the return value as a truth value in one case (`while (CD_cw(0x16, D_8006D908, 0, 0))`), confirming `s32` return, not `void`.
-- `D_8006D618` is this unit's own local reading of a symbol `code_179d8_b.c` declares as a bare `extern u8 D_8006D618;` (singular) -- this function indexes it `[0..3]`, a genuinely different (but not conflicting, since neither file shares a header) local view. Flagged per the project's multiple-independent-local-views convention.
+- Calling convention confirmed against two ALREADY-MATCHED call sites in `libcd_bios.c` (`CD_shell`, `CD_readm`) -- both pass `0`/constant literals for `arg2`/`arg3` and use the return value as a truth value in one case (`while (CD_cw(0x16, D_8006D908, 0, 0))`), confirming `s32` return, not `void`.
+- `D_8006D618` is this unit's own local reading of a symbol `libcd_bios.c` declares as a bare `extern u8 D_8006D618;` (singular) -- this function indexes it `[0..3]`, a genuinely different (but not conflicting, since neither file shares a header) local view. Flagged per the project's multiple-independent-local-views convention.
 
 ### Proposed learning
 
@@ -341,7 +341,7 @@ shape (`src++` per iteration), so nothing new was tried here this round.
 genuine, oracle-verified 3-word gain from a single permuter-found lever.**
 The remaining 1-word gap is the same already-characterized,
 already-negative-tested residue class this report named before the
-search. `INCLUDE_ASM` restored; preserved body in `src/code_179d8_b.c`
+search. `INCLUDE_ASM` restored; preserved body in `src/libcd_bios.c`
 updated to this round's improved version. Given the remaining residue is
 explicitly the kind DECOMPILATION_LEARNINGS says not to spend block-order
 attempts on, a SECOND permuter search seeded from this improved body would

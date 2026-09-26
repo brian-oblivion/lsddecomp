@@ -5,7 +5,7 @@
 > an INCLUDE_ASM stall; the object owns its bytes, so the C is gone from
 > `src/` and the game-code count shrank by it -- the correction CLAUDE.md asks
 > for, not a regression. The run `libcd/iso9660` + `libc2/strcmp` +
-> `libc2/strncmp` tiles 0x1BE40..0x1C92C and crosses the code_179d8_b /
+> `libc2/strncmp` tiles 0x1BE40..0x1C92C and crosses the libcd_bios /
 > code_179d8_d boundary; both units trimmed. Whole-image SHA1 green. Nothing
 > here is assignable and there is no stall left to work. The text below is the
 > pre-conversion record.
@@ -106,7 +106,7 @@ realigned — see below)
 ```c
 /* A 4-byte, alignment-1 view used only to force the unaligned lwl/lwr +
  * swl/swr load/store shape two of IsoDirRecord's fields need -- the same
- * idiom code_179d8_b.c's own `UWord` type uses for the identical purpose
+ * idiom libcd_bios.c's own `UWord` type uses for the identical purpose
  * (all-u8 members so the struct's own alignment is 1, forcing GCC to use
  * an unaligned move rather than assuming a 4-byte-aligned `lw`/`sw`). */
 typedef struct UWord {
@@ -155,10 +155,10 @@ extern EntryB3F0 D_8008B3F0[0x40];
  * read's target as its own symbol denies the compiler the syntactic link. */
 extern s32 D_8008B3F4[];
 
-extern u8 D_8008CFF0[]; /* PVD/dir-listing buffer -- code_179d8_b.c's own
+extern u8 D_8008CFF0[]; /* PVD/dir-listing buffer -- libcd_bios.c's own
                          * comment on this symbol */
 extern u8 _svm_sreg_buf[]; /* upper-bound sentinel on the scan cursor --
-                         * address-only use, per code_179d8_b.c's comment */
+                         * address-only use, per libcd_bios.c's comment */
 
 /* This function's own "id -> handle" lookup, a DIFFERENT 0x2C-stride table
  * from this file's own Entry8008B9F4 -- D_8008B9CC is not a multiple of
@@ -404,7 +404,7 @@ compiled body is otherwise the correct length; omitting this specific
 3-instruction sequence is the WHOLE of the 3-word shortfall.
 
 **This is the identical class already investigated and left OPEN in
-`docs/match-reports/func_8002B94C.md`** (`code_179d8_b`, this function's
+`docs/match-reports/func_8002B94C.md`** (`libcd_bios`, this function's
 own closest sibling — both are `CD_*` directory-scan functions built from
 the same `func_8002BFA8`/`D_8008CFF0` plumbing). That report's own words:
 *"GCC's own dead-code elimination at -O2 will remove a directly-reproduced
@@ -556,7 +556,7 @@ object was linked in the interim (rounds 29-30's SDK-objects work; see
 `include/code_8220.h`'s own note that the old `func_80012C20` declarations
 "moved into src/code_8220.c when the SDK objects were linked"). Every other
 unit that calls this function now declares it as `printf` directly (see
-`src/code_179d8_b.c`, `src/code_179d8_h.c`, `src/class_3bb8c_f.c`,
+`src/libcd_bios.c`, `src/code_179d8_h.c`, `src/class_3bb8c_f.c`,
 `src/code_2cc8c_e.c`, each with the argument shape their own call site
 needs — per-unit local views, not a shared header, matching this project's
 convention). Fixed in `src/code_179d8_d.c` by declaring

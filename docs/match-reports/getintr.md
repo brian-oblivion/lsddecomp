@@ -4,8 +4,8 @@
 
 REVISITED, round 70: MATCHED (337/337, whole-image SHA1 green); names/types not relevant.
 
-Unit: `src/code_179d8_b.c`. 337 words. Owns `jtbl_800109F8` (rodata sub-slot
-`[0x11F8, .rodata, code_179d8_b]`), which the `switch` lowering generates and
+Unit: `src/libcd_bios.c`. 337 words. Owns `jtbl_800109F8` (rodata sub-slot
+`[0x11F8, .rodata, libcd_bios]`), which the `switch` lowering generates and
 which matches with no hand-authoring.
 
 **Provenance.** This is libcd's `bios.c` `getintr` (build 1.71, December
@@ -109,15 +109,15 @@ missed condition or wrong constant anywhere):
    `0x2` and `0x4`, consistent with a flag word.
 
 `s32 getintr(void)` -- confirmed against three call sites
-(`asm/code_179d8_mid.s`, `asm/nonmatchings/code_179d8_b/callback.s`,
-`asm/nonmatchings/code_179d8_b/CD_readsync.s`), all `jal` with a `nop`
-delay slot and no argument setup, and against `code_179d8_b.c`'s own
+(`asm/code_179d8_mid.s`, `asm/nonmatchings/libcd_bios/callback.s`,
+`asm/nonmatchings/libcd_bios/CD_readsync.s`), all `jal` with a `nop`
+delay slot and no argument setup, and against `libcd_bios.c`'s own
 existing forward declaration (`extern s32 getintr(void);`).
 
 
 ## The source as matched
 
-It is live in `src/code_179d8_b.c`. The load-bearing shapes:
+It is live in `src/libcd_bios.c`. The load-bearing shapes:
 
 ```c
 static __inline__ void copy8(u8 *d, const u8 *s)

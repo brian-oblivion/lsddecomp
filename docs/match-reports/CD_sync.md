@@ -2,7 +2,7 @@
 
 > Renamed from `func_800299BC` on 2026-09-23 (tools/rename.py). Address 0x800299bc.
 
-Unit `code_179d8_b`. Runner echo, round 26. Carved this round; no prior report exists.
+Unit `libcd_bios`. Runner echo, round 26. Carved this round; no prior report exists.
 
 ## Signature
 
@@ -10,14 +10,14 @@ Unit `code_179d8_b`. Runner echo, round 26. Carved this round; no prior report e
 s32 CD_sync(s32 arg0, s32 arg1);
 ```
 
-Confirmed by two already-matched call sites: `src/code_179d8_b.c:110` (`return CD_sync(arg0, arg1);`) and `src/code_179d8_b.c`'s own sibling `CD_cw` (`CD_sync(0, 0);`).
+Confirmed by two already-matched call sites: `src/libcd_bios.c:110` (`return CD_sync(arg0, arg1);`) and `src/libcd_bios.c`'s own sibling `CD_cw` (`CD_sync(0, 0);`).
 
 ## What this function does
 
 Waits for CD-ROM "Sync" status (`D_8008B3EC` is set to `D_80010A0C`, the string `"CD_sync"`). A `do`/`while` loop:
 
-1. Checks a deadline (`D_8008B3E4`, set to `func_80025900(-1) + 0x1E0` before the loop) and a spin counter (`D_8008B3E8`) against a `0x1E0000` threshold. On either timeout condition it prints `"CD timeout: "` + a formatted diagnostic (`"%s:(%s) Sync=%s, Ready=%s\n"`), calls `CD_flush()` (a reset, matched in `code_179d8_b.c`), and returns `-1`.
-2. Otherwise, if `func_80024E64()` (a busy/status getter) is nonzero, drains a message-flush loop (`getintr()`, still `INCLUDE_ASM` in `code_179d8_b.c` but blocker-clean) that dispatches through two global callback pointers, `D_8006D600` and `D_8006D5FC`.
+1. Checks a deadline (`D_8008B3E4`, set to `func_80025900(-1) + 0x1E0` before the loop) and a spin counter (`D_8008B3E8`) against a `0x1E0000` threshold. On either timeout condition it prints `"CD timeout: "` + a formatted diagnostic (`"%s:(%s) Sync=%s, Ready=%s\n"`), calls `CD_flush()` (a reset, matched in `libcd_bios.c`), and returns `-1`.
+2. Otherwise, if `func_80024E64()` (a busy/status getter) is nonzero, drains a message-flush loop (`getintr()`, still `INCLUDE_ASM` in `libcd_bios.c` but blocker-clean) that dispatches through two global callback pointers, `D_8006D600` and `D_8006D5FC`.
 3. Reads the CD-ROM's driver state byte `D_8006D8D8[0]`. If it is `2` or `5`, normalizes it to `2`, optionally copies an 8-byte snapshot (`D_8008B3CC`) into `arg1`, and returns the ORIGINAL state value.
 4. Otherwise, loops again if `arg0 == 0` (blocking wait), or returns `0` immediately (single non-blocking poll) if `arg0 != 0`.
 
@@ -42,11 +42,11 @@ Two block-order fixes DID matter and are already folded into the body below (doc
 
 ```c
 /* stalesyms --fix 2026-09-22: func_80012C20 -> printf, func_80024E64 -> CheckCallback, func_80025900 -> VSync, func_80025AE4 -> puts -- names retrofitted so this body links as written; the residue it recorded is unverified until rebuilt. */
-extern s32 D_8006D608;                 /* verbosity level; code_179d8_b.c's func_80028CE0 accessor */
+extern s32 D_8006D608;                 /* verbosity level; libcd_bios.c's func_80028CE0 accessor */
 extern u8 D_8006D61C;
 extern u8 D_8006D61D;                  /* selector into D_8006D620 for the "name" of the current wait */
-extern const char *D_8006D620[];       /* string table, selector 0..0x1B -- shared reading, code_179d8_b.c */
-extern const char *D_8006D6A0[];       /* string table, selector 0..0x6 -- shared reading, code_179d8_b.c */
+extern const char *D_8006D620[];       /* string table, selector 0..0x1B -- shared reading, libcd_bios.c */
+extern const char *D_8006D6A0[];       /* string table, selector 0..0x6 -- shared reading, libcd_bios.c */
 
 extern volatile u8 *D_8006D8C0;
 extern u8 D_8006D8D8[3];
@@ -58,16 +58,16 @@ extern u8 D_8008B3CC[];                /* 8-byte record, "Sync" wait's snapshot 
 extern u8 D_8008B3D4[];                /* 8-byte record, "Ready" wait's snapshot buffer */
 
 /* This unit's own local view: called through, not just stored-and-compared
- * like code_179d8_b.c/_g.c's plain-s32 reading of the same globals. */
+ * like libcd_bios.c/_g.c's plain-s32 reading of the same globals. */
 extern void (*D_8006D600)(s32 arg0, void *arg1);
 extern void (*D_8006D5FC)(s32 arg0, void *arg1);
 
 extern s32 VSync(s32 arg0);                             /* asm/psyq_15d04.s */
 extern void puts(const char *arg0);                    /* asm/psyq_15d04.s */
 extern void printf(const char *fmt, ...);                /* Psy-Q printf wrapper */
-extern void CD_flush(void);                                /* code_179d8_b.c, matched */
+extern void CD_flush(void);                                /* libcd_bios.c, matched */
 extern s32 CheckCallback(void);                                 /* asm/psyq_GsLinkObject4.s */
-extern s32 getintr(void);                                 /* code_179d8_b.c, still INCLUDE_ASM there */
+extern s32 getintr(void);                                 /* libcd_bios.c, still INCLUDE_ASM there */
 
 extern const char D_80010984[];        /* "CD timeout: " */
 extern const char D_80010994[];        /* "%s:(%s) Sync=%s, Ready=%s\n" */
@@ -168,7 +168,7 @@ ready:
 - Screened blocker-clean at carve time (round 26): no `gp_rel`, no forward `mflo`/`mfhi`-before-`mult`/`div`, no `jr $t2` trampoline, no `jtbl_`.
 - `D_8008B3E4`/`D_8008B3E8`/`D_8008B3EC` are a poll-deadline/counter/message-pointer trio shared with the unit's other two functions (`CD_ready`, `CD_cw`) -- all three run the identical timeout-and-print idiom against a different `D_8008B3EC` message.
 - `D_8006D8D8` is a 3-byte driver-state array (bytes `[0]`, `[1]`, `[2]` each independently meaningful -- `CD_ready` reads all three, this function only `[0]`/`[1]`).
-- `getintr`'s return value is a bitmask: bit `0x4` gates a call through `D_8006D600(state[1], D_8008B3D4)`, bit `0x2` gates a call through `D_8006D5FC(state[0], D_8008B3CC)`. `CD_readm` (`code_179d8_b.c`, matched) independently documents `D_8006D600` being assigned `cb_read` as a callback, consistent with this reading.
+- `getintr`'s return value is a bitmask: bit `0x4` gates a call through `D_8006D600(state[1], D_8008B3D4)`, bit `0x2` gates a call through `D_8006D5FC(state[0], D_8008B3CC)`. `CD_readm` (`libcd_bios.c`, matched) independently documents `D_8006D600` being assigned `cb_read` as a callback, consistent with this reading.
 - The format string `D_80010994` is confirmed via `asm/data/FD8.rodata.s`: `"%s:(%s) Sync=%s, Ready=%s\n"` -- 4 `%s`, matching the 4 non-format arguments in the `func_80012C20` call.
 
 ### Proposed learning
@@ -186,7 +186,7 @@ those six are now stale -- SDK-object conversion rounds between 26 and 35
 renamed them to their real Sony symbols: `func_80025900` -> `VSync`,
 `func_80025AE4` -> `puts`, `func_80024E64` -> `CheckCallback`,
 `func_80012C20` -> `printf` (all confirmed via `config/symbols.slps01556.lsdde.txt`
-and already reflected in `src/code_179d8_b.c`'s own local declarations for
+and already reflected in `src/libcd_bios.c`'s own local declarations for
 the same globals). Spliced verbatim with the round-26 names, this body would
 not have linked; that was never tested, since round 26's own build always
 had all three functions as `INCLUDE_ASM` together after the stall.
@@ -270,7 +270,7 @@ this same round (where a length-exact state was adopted despite a raw-
 match tradeoff, because the structural gap count did not worsen), here
 the length gap did not close at all -- it merely changed sign, and the
 mechanism achieving the raw-match improvement is pushing AGAINST the
-documented root cause rather than around it. Reverted; `src/code_179d8_b.c`
+documented root cause rather than around it. Reverted; `src/libcd_bios.c`
 confirmed back to its committed state (`build-and-verify.sh` clean,
 `git status` empty) before moving on. Filing as STALL, figures unchanged
 from the round-35 addendum (162/161 words LONG, same residue).

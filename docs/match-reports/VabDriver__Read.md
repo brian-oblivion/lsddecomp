@@ -34,7 +34,7 @@ chosen for simplicity.
 `code_179d8_e`'s globals (`gVabDriverMethods`, `gVabStreamObjMethods`) ARE class-framework
 tables -- `tools/classtable.py --scan` hits both (29 and 39 slots). The
 "code_179d8 is not class-framework code" finding from round 16 is
-neighbourhood-scoped (code_179d8_b's SIO globals, code_179d8_d's driver
+neighbourhood-scoped (libcd_bios's SIO globals, code_179d8_d's driver
 globals), not monolith-wide, and should not be inherited by every future
 slice of this monolith without re-checking `classtable.py --scan` against
 that slice's own globals.

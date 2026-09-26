@@ -2,13 +2,13 @@
 
 > Renamed from `func_8002A378` on 2026-09-23 (tools/rename.py). Address 0x8002a378.
 
-**Unit:** code_179d8_b · **Size:** 34 words · **Status:** MATCHED (34/34 words)
+**Unit:** libcd_bios · **Size:** 34 words · **Status:** MATCHED (34/34 words)
 
 ## What it does
 
 Stages a 4-byte address into four raw HW pointer variables that this window's
 globals reading treats as the link/SIO driver's register staging area (see
-`code_179d8_b.c`'s header comment). Writes a mode byte (2, then 3), copies
+`libcd_bios.c`'s header comment). Writes a mode byte (2, then 3), copies
 `arg0[0..3]` byte-by-byte through `D_8006D8C8`/`D_8006D8CC`/`D_8006D8C4`, and
 finishes with a fixed terminator byte `0x20`.
 
@@ -36,7 +36,7 @@ arrays. Declared `volatile u8 *` locally in this unit; the `volatile` on the
 pointee matters for later functions that spin-poll through similarly-shaped
 pointers (see `CD_getsector`), so the whole family is typed consistently.
 
-Sibling `code_179d8_b.c` already carries its own extern for this function as
+Sibling `libcd_bios.c` already carries its own extern for this function as
 `s32 CD_vol(void *arg0)` (called from `func_800291C8`). This unit's own
 reading uses `u8 *` since the body indexes it byte-wise -- kept local per the
 project's multiple-independent-local-views convention, not promoted to a

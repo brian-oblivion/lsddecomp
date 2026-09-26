@@ -10,7 +10,7 @@
  * comment still stands -- only the blocker verdicts are withdrawn.
  * Screen: `python3 tools/nearmiss.py`, round 43 (2026-09-15).
  *
- * code_179d8_b -- window [60..79] of the original 274-function code_179d8
+ * libcd_bios -- window [60..79] of the original 274-function code_179d8
  * monolith, originally 0x194E0..0x1A1BC (vram 0x80028CE0..0x800299BC).
  *
  * ROUND 34 (head): NINETEEN of the twenty functions left this unit.  Everything
@@ -301,7 +301,7 @@ s32 getintr(void)
  * the search results.
  */
 
-INCLUDE_ASM("asm/nonmatchings/code_179d8_b", CD_sync);
+INCLUDE_ASM("asm/nonmatchings/libcd_bios", CD_sync);
 
 /* Round 37 (echo): re-splice of the round-35 rebuild, verbatim, to confirm
  * the recorded 178/180 score before a permuter search -- per CLAUDE.md's
@@ -449,7 +449,7 @@ ret1:
     return 0;
 }
 #endif
-INCLUDE_ASM("asm/nonmatchings/code_179d8_b", CD_ready);
+INCLUDE_ASM("asm/nonmatchings/libcd_bios", CD_ready);
 
 /* Round 37 (echo): STALL, now 282/282 (LENGTH exact, no drift into
  * anything downstream) -- up from 278/282, via two stacked permuter-found
@@ -628,7 +628,7 @@ skip_timeout3:
     return (D_8006D8D8[0] == 5) ? -1 : 0;
 }
 #endif
-INCLUDE_ASM("asm/nonmatchings/code_179d8_b", CD_cw);
+INCLUDE_ASM("asm/nonmatchings/libcd_bios", CD_cw);
 
 /* ---- merged from code_179d8_g ---- */
 
@@ -652,7 +652,7 @@ INCLUDE_ASM("asm/nonmatchings/code_179d8_b", CD_cw);
  * (2026-09-08) that is FALSE -- CD_sync (161w), CD_ready (180w)
  * and CD_cw (282w) are ALL THREE blocker-clean now that `addiu_at`
  * is resolved. Round 26 (2026-09-09) acted on that and CARVED them as the
- * C unit `code_179d8_b`; no `code_179d8_mid` segment exists any more.
+ * C unit `libcd_bios`; no `code_179d8_mid` segment exists any more.
  *
  * Blocker census, three-grep screen run per function at carve time:
  * 14 of the 17 clean, zero trivial leaves.  These are BIG bodies -- 196,
@@ -705,11 +705,11 @@ INCLUDE_ASM("asm/nonmatchings/code_179d8_b", CD_cw);
  * rodata sub-slot is attached to this unit.
  */
 
-/* code_179d8_g -- this window's globals continue code_179d8_b's reading:
+/* code_179d8_g -- this window's globals continue libcd_bios's reading:
  * plain scalar/pointer driver state, not object fields (no classtable.py
  * hit near D_8006D5FC..D_8006D934). This unit's own extern declarations,
  * kept local per the project's multiple-independent-local-views convention
- * -- see code_179d8_b.c's header comment for why no shared header. */
+ * -- see libcd_bios.c's header comment for why no shared header. */
 
 extern s32 D_8006D8A4;
 extern s32 D_8006D5FC;
@@ -776,9 +776,9 @@ extern void (*InterruptCallback(s32 arg0, void (*callback)(void)))(void); /* lib
 extern s32 VSync(s32 arg0);                            /* asm/psyq_15d04.s */
 extern void puts(const char *arg0);                   /* asm/psyq_15d04.s */
 extern void printf(const char *fmt, ...);                /* Psy-Q printf wrapper */
-extern s32 CD_cw(s32 arg0, s32 arg1, s32 arg2, s32 arg3); /* defined in code_179d8_b */
-extern s32 CD_sync(s32 arg0, s32 arg1);                   /* defined in code_179d8_b, per code_179d8_b.c */
-extern s32 getintr(void);                                /* code_179d8_b.c, MATCHED round 70
+extern s32 CD_cw(s32 arg0, s32 arg1, s32 arg2, s32 arg3); /* defined in libcd_bios */
+extern s32 CD_sync(s32 arg0, s32 arg1);                   /* defined in libcd_bios, per libcd_bios.c */
+extern s32 getintr(void);                                /* libcd_bios.c, MATCHED round 70
                                                                    (libcd getintr by its strings) */
 extern s32 CheckCallback(void);                                /* lib/libetc/intr.o -- trivial
                                                                    (u16)D_8006C272 getter */
@@ -986,7 +986,7 @@ s32 CD_init(void)
     return -(CD_sync(0, 0) != 2);
 }
 #else
-INCLUDE_ASM("asm/nonmatchings/code_179d8_b", CD_init);
+INCLUDE_ASM("asm/nonmatchings/libcd_bios", CD_init);
 #endif
 
 #ifdef NON_MATCHING
@@ -1107,7 +1107,7 @@ s32 cd_read_retry(void)
     }
 }
 #else
-INCLUDE_ASM("asm/nonmatchings/code_179d8_b", cd_read_retry);
+INCLUDE_ASM("asm/nonmatchings/libcd_bios", cd_read_retry);
 #endif
 
 s32 CD_readm(s32 arg0, s32 arg1, s32 arg2)
@@ -1380,7 +1380,7 @@ s32 CD_datasync(s32 arg0)
     }
 }
 #else
-INCLUDE_ASM("asm/nonmatchings/code_179d8_b", CD_datasync);
+INCLUDE_ASM("asm/nonmatchings/libcd_bios", CD_datasync);
 #endif
 
 s32 CD_getsector(s32 arg0, s32 arg1)
@@ -1440,7 +1440,7 @@ void callback(void)
     *D_8006D8C0 = status;
 }
 #else
-INCLUDE_ASM("asm/nonmatchings/code_179d8_b", callback);
+INCLUDE_ASM("asm/nonmatchings/libcd_bios", callback);
 #endif
 
 void cb_read(s32 arg0, s32 arg1)

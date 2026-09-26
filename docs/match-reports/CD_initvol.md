@@ -2,7 +2,7 @@
 
 > Renamed from `func_8002A5F8` on 2026-09-23 (tools/rename.py). Address 0x8002a5f8.
 
-**Unit:** code_179d8_b · **Size:** 61 words · **Status:** MATCHED (61/61 words)
+**Unit:** libcd_bios · **Size:** 61 words · **Status:** MATCHED (61/61 words)
 
 ## What it does
 
@@ -47,7 +47,7 @@ s32 CD_initvol(void)
 Matched on the first attempt -- straightforward translation once
 `D_8006D8D4` was already established as `volatile u16 *` in this unit's
 header (declared while matching `CD_vol`/`CD_getsector`'s neighbours;
-see `code_179d8_b.c`'s extern block). Indices are the halfword offsets
+see `libcd_bios.c`'s extern block). Indices are the halfword offsets
 divided by 2 (`0x180/2 = 0xC0`, etc), matching retail's byte-offset
 immediates exactly through ordinary `u16 *` pointer arithmetic -- no cast
 juggling needed.
