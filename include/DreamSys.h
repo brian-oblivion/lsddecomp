@@ -863,8 +863,8 @@ extern s32 Test4InstantTeleporters(PlayerSpawnPoint *target, PlayerSpawnPoint *c
    above; return value is forwarded straight into ExecuteLink's stage-type
    argument, hence s32 (round 2026-09-02). MATCHED, defined later in this
    unit's own ROM order -- forward declaration only (gp-relative blocker
-   resolved; see docs/match-reports/func_8005BFC4.md). */
-extern s32 func_8005BFC4(void);
+   resolved; see docs/match-reports/GetTeleportTimeBonus.md). */
+extern s32 GetTeleportTimeBonus(void);
 
 /* Table triple for Test4TunnelLinks (round 2026-08-30-d), same roles as the
    STAGE_PERMALINK_* triple above but for tunnel links specifically. */

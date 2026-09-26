@@ -50,7 +50,7 @@ pair after the call to skip over the `-1` case and reach the shared
 epilogue -- retail has no such pair. That extra pair is exactly one word,
 which is why every one of these attempts is 21 words long (0x54 bytes)
 instead of retail's 20 (0x50) and reports 131461 bytes of drift across the
-rest of the image (`build/lsdde.map` confirms: built `func_8005BFC4` lands
+rest of the image (`build/lsdde.map` confirms: built `GetTeleportTimeBonus` lands
 at `0x8005BFC8`, four bytes past retail's `0x8005BFC4`).
 
 Retail's OWN layout is the opposite: the `-1` case comes FIRST in memory

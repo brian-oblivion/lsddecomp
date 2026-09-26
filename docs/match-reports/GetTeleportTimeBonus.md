@@ -1,4 +1,6 @@
-# func_8005BFC4 — MATCHED 6/6
+# GetTeleportTimeBonus — MATCHED 6/6
+
+> Renamed from `func_8005BFC4` on 2026-09-26 (tools/rename.py). Address 0x8005bfc4.
 
 **Unit:** DreamSys · **Size:** 6 words · **Status:** MATCHED, round 43.
 
@@ -18,13 +20,13 @@ emits for a ternary on a simple equality-to-zero test; no special shape was
 needed to reproduce it.
 
 Called by `DreamSys__TryInstantTeleportLink` (still `INCLUDE_ASM`, see that function's own
-report) as `saved = func_8005BFC4();` with no arguments -- consistent with
-the existing header prototype `extern s32 func_8005BFC4(void);`.
+report) as `saved = GetTeleportTimeBonus();` with no arguments -- consistent with
+the existing header prototype `extern s32 GetTeleportTimeBonus(void);`.
 
 ## Final body
 
 ```c
-s32 func_8005BFC4(void)
+s32 GetTeleportTimeBonus(void)
 {
 	return (gLinkSrcStage == 0) ? 0xA : 0;
 }
@@ -35,7 +37,7 @@ s32 func_8005BFC4(void)
 ## Verification
 
 `./build-and-verify.sh` -> `build exit=0`, whole-image SHA1 matches retail.
-`tools/funcdiff.py func_8005BFC4` -> `6/6 words match`.
+`tools/funcdiff.py GetTeleportTimeBonus` -> `6/6 words match`.
 
 ## Provenance
 
@@ -43,7 +45,7 @@ round 43, runner ALPHA, unit DreamSys.
 
 ## Naming
 
-`func_8005BFC4` -- tier C (round 66, runner alpha, FINISHING-PLAN track 3).
+`GetTeleportTimeBonus` -- tier C (round 66, runner alpha, FINISHING-PLAN track 3).
 
 NOT RENAMED, and this records why. It is a free function whose
 whole body is `return (gLinkSrcStage == 0) ? 0xA : 0;` -- gLinkSrcStage being the

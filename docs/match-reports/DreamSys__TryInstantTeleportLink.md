@@ -15,7 +15,7 @@ so this really is a delay-slot residue, filled by reorg (`dbr`).
 
 The round-73 broadcast levers were checked first and did not apply. Every
 callee's argument registers are written by the caller in retail
-(`Test4InstantTeleporters` a0-a2 with a1 forwarded, `func_8005BFC4` void,
+(`Test4InstantTeleporters` a0-a2 with a1 forwarded, `GetTeleportTimeBonus` void,
 `ExecuteLink` a0-a3, slot 0xE8 a0-a2), there is no struct copy, and the
 shared `$s1` (result, then saved) is two pseudos with disjoint lives, the
 same in both builds.
@@ -165,7 +165,7 @@ bool DreamSys__TryInstantTeleportLink(DreamSys *this, PlayerSpawnPoint *currentP
 	result = Test4InstantTeleporters(&this->linkCoordinates, currentPos, this->currentStage);
 	if (result < 0)
 		return false;
-	saved = func_8005BFC4();
+	saved = GetTeleportTimeBonus();
 	if (!ExecuteLink(this, result, 0x11, 0))
 		return true;
 	this->unknwon_int_0x44 = 0;
@@ -342,7 +342,7 @@ The improving candidate introduces a spare local (`int new_var`) and
 reshapes the final two early-return sites as:
 
 ```c
-saved = (new_var = func_8005BFC4());
+saved = (new_var = GetTeleportTimeBonus());
 ...
 if (this->isFlashbackSession) {
 	new_var = true;
@@ -354,7 +354,7 @@ return new_var;   /* <-- new_var was never (re)assigned on THIS path */
 
 The final `return new_var;` reads a variable that is only ever assigned
 on a DIFFERENT, non-overlapping control path (the `isFlashbackSession`
-early exit) or as an alias for `func_8005BFC4()`'s return value earlier.
+early exit) or as an alias for `GetTeleportTimeBonus()`'s return value earlier.
 On the path that actually reaches this statement, `new_var` holds
 whatever was last written to its register for an unrelated purpose --
 which happens, for THIS compiler and THIS function's register pressure,

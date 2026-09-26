@@ -41,7 +41,7 @@
  * Naming pass: round 66 (Opus). Everything above is measured, not guessed --
  * the evidence for each name is in that function's match report under
  * `## Naming`. Four functions are deliberately still `func_`-shaped
- * (DreamSys__func_5938c/59590/59598/5ba20 and the free func_8005BFC4): each
+ * (DreamSys__func_5938c/59590/59598/5ba20 and the free GetTeleportTimeBonus): each
  * touches exactly one field or global that nothing in any carved unit ever
  * reads back, so there is nothing to name them after. */
 #include "common.h"
@@ -1046,7 +1046,7 @@ bool DreamSys__TryInstantTeleportLink(DreamSys *this, PlayerSpawnPoint *currentP
 
     result = Test4InstantTeleporters(&this->linkCoordinates, currentPos, this->currentStage);
     if (result >= 0) {
-        saved = func_8005BFC4();
+        saved = GetTeleportTimeBonus();
         if (ExecuteLink(this, result, 0x11, 0)) {
             this->state = 0;
             this->grid->methods->computeCellOffsets(this->grid, local, &this->linkCoordinates);
@@ -1772,7 +1772,7 @@ s32 Test4InstantTeleporters(PlayerSpawnPoint *target, PlayerSpawnPoint *currentP
     return result;
 }
 
-s32 func_8005BFC4(void) {
+s32 GetTeleportTimeBonus(void) {
     return (gLinkSrcStage == 0) ? 0xA : 0;
 }
 
