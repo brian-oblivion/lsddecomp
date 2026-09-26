@@ -1,21 +1,23 @@
-/* Third 20-function slice of the Entity class's 97-function remainder,
- * following Entity_c and Entity_d (Entity_d's own header comment names the
- * split). Every function in this unit is a `gEntityMoodHandlerTable`
- * callback (Entity.h), named `Entity__MoodCueNN` for the row it occupies --
- * rows 59, 61-62, 64-71, 73-81; row order does not track code address (see
- * each function's match report for the row derivation). Rows 60, 63 and 72
- * have a NULL handler word in the table -- those mood indices legitimately
- * dispatch no per-tick cue callback at all, not a gap in this unit's queue.
+/* Entity_e: twenty of Entity's MoodCue handlers.
  *
- * `Entity__MoodCue81` also occupies a second row of the same table, under
- * different tuning data; `Entity__MoodCue71` is also called cross-unit, from
- * Entity_g (see each function's own match report).
+ * Each Entity__MoodCueNN is the `handler` of gEntityMoodHandlerTable's row
+ * NN (include/Entity.h): rows 59, 61, 62, 64 to 71 and 73 to 81, and
+ * Entity__MoodCue81 is row 120's handler too (the row's data words
+ * differ). Rows 60, 63 and 72 have no handler. An Entity whose moodIndex
+ * selects the row installs it as its SoundCueSet callback, so
+ * ServiceSoundCueSet calls it once per tick with the Entity and its cue
+ * set. A handler requests tones by filling the set's slots (a VAB program
+ * of the cue's sound object, or SOUND_CUE_STOP), moves and turns the
+ * entity (or the player, its `peer`) on moodTimer, the ticks since
+ * startSoundCue, on the cue set's own `tick`, or on todFrame, the frame of
+ * its TOD animation, and sends the dream an EntityEffect through
+ * notifyParents. Entity__MoodCue108 (Entity_g) runs Entity__MoodCue71 and
+ * then sets its scale to SCALE_SIX.
  *
- * Rotation/scale tables are three s16 {num,den} pairs for X/Y(yaw)/Z;
- * translate tables are three consecutive s32 for X/Y/Z. `sMoodCue78TransitionDone`
- * is a one-shot s32 flag local to Entity__MoodCue78's own state machine,
- * referenced nowhere else in `src/`. See each function's match report's
- * `## Naming` section for the per-constant evidence.
+ * The literals are left unnamed where they are one handler's tuning: tick
+ * counts, distances in world units, TOD frame numbers, VAB program numbers,
+ * and the `state` values other than 0 and ENTITY_STATE_DONE, which are each
+ * handler's own phases.
  */
 #include "common.h"
 #include "Entity.h"
@@ -182,6 +184,7 @@ void Entity__MoodCue68(Entity *this, SoundCueSet *out) {
             out->slots[1].program = 3;
             this->methods->stopSoundCue(this);
             coin = rand() & 1;
+            /* Half the time ENTITY_STATE_DONE, else back to phase 0. */
             this->state = coin < 1;
         }
     }
@@ -345,7 +348,11 @@ void Entity__MoodCue77(Entity *this, SoundCueSet *out) {
     }
 }
 
+/* {1/1, 1/1, 1/1}: the identity scale, a copy in .data of the values
+ * code_d294.h's SCALE_ONE holds in .rodata. Entity_g passes it too. */
 extern u8 D_80089E14[];
+/* Entity__MoodCue78's: cleared on the cue's first tick, set when its phase
+ * 11 ends the cue at tick 510; at tick 520 a set flag ends it again. */
 extern s32 sMoodCue78TransitionDone;
 
 void Entity__MoodCue78(Entity *this, SoundCueSet *out) {
