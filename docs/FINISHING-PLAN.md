@@ -19,9 +19,8 @@ and wrong for every round after. Run the tool. The mechanics of a round
 the per-function matching loop is CLAUDE.md and `docs/MATCHING-GUIDE.md`.
 This file does not repeat them.
 
-Plan revision: 24 (2026-09-26, operator review of rounds 85 to 87: revisions
-21 to 23 kept; a premium head may make plan changes; track 4 retypes the
-globals that hold a class's objects; `plan.py amend-round`).
+Plan revision: 25 (2026-09-26, round 88's premium head: track 4's footprint
+counts allocator callers and ignores unified ancestors' types).
 Changing the plan is a premium head task (§2); record the change in
 `docs/PROGRESS.md` and bump this line.
 
@@ -321,7 +320,9 @@ view again, and `plan.py classes` lists any that appears as a STRAY VIEW.
 **Staffing.** Opus runners, one class each. A class merge touches every
 unit that sees the class, so `plan.py` gives each ready class a measured
 FOOTPRINT (units naming its table, getter, own methods or view types, plus
-every unit including a header that does) and lists every ready class, most
+every unit including a header that does, plus the units calling any function
+whose body calls the getter, i.e. its allocator; a unified ancestor's type is
+not a view: revision 25, round 88) and lists every ready class, most
 classes below it first; one whose footprint shares a unit with a class
 above it is DEFERRED (a class renames only what its footprint holds, so the
 call-graph test applies to other jobs only; revision 23: revision 20's
