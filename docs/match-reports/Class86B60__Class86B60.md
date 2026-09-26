@@ -80,7 +80,7 @@ presence anywhere in the project. Placed as one new block right before the
   `gTaskCoreMethods`, as `include/code_2c054.h`'s already-established
   `TaskCoreMethods`** (that header's own comment documents `Get_vtable_TaskCore`
   returning `&gTaskCoreMethods`, and its `slot08` is independently confirmed
-  3-argument-plus-self by a byte-exact call in `StreamTaskObj__StreamTaskObj`, matching
+  3-argument-plus-self by a byte-exact call in `StreamTask__StreamTask`, matching
   THIS call site's arity exactly -- both units agree on the real arity
   here, unlike the `GetClass6B5CCMethods` situation elsewhere in this file). Kept
   as a separate local declaration rather than `#include "code_2c054.h"`,

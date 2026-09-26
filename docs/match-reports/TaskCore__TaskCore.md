@@ -9,11 +9,11 @@
 ## Summary
 
 This occupies `TaskCoreMethods`'s (`gTaskCoreMethods`) own slot `+0x008` (per
-`classtable.py gTaskCoreMethods`), and is called from this unit's `StreamTaskObj__StreamTaskObj`
+`classtable.py gTaskCoreMethods`), and is called from this unit's `StreamTask__StreamTask`
 (`StreamTaskObj`'s own ctor) as `Get_vtable_TaskCore()->slot08(self, a1, a2, a3)`.
 It is a **base-class constructor**: it briefly points `self->methods` at its
-own table (`gTaskCoreMethods`) before the derived ctor (`StreamTaskObj__StreamTaskObj`)
-overwrites it with the real `gStreamTaskObjMethods` table right after this call
+own table (`gTaskCoreMethods`) before the derived ctor (`StreamTask__StreamTask`)
+overwrites it with the real `gStreamTaskMethods` table right after this call
 returns — the classic constructor-chaining shape, now confirmed directly
 rather than inferred.
 
@@ -55,7 +55,7 @@ only the header's declared types.
 - `Get_vtable_TaskCore()->slotD8(self, a1)`: new `TaskCoreMethods` slot `+0x0D8`
   (`gTaskCoreMethods+0x0D8 = TaskCore__SetTarget`, extern, void).
 - `self->methods->slotD4(self, 0, 0)`: new `StreamTaskObjMethods` slot
-  `+0x0D4` (`gStreamTaskObjMethods+0x0D4 = TaskCore__SetSubHandle`, extern, void).
+  `+0x0D4` (`gStreamTaskMethods+0x0D4 = TaskCore__SetSubHandle`, extern, void).
 - New fields: `unk44` (`+0x044`, `s32`, set from `a2`), `unk48` (`+0x048`,
   originally guessed `s32`, either a call result or `a3` verbatim), `unk7C`
   (`+0x07C`, originally guessed `s32`, call result), `unk80` (`+0x080`,
@@ -86,7 +86,7 @@ impossible for a plain integer. Retyped all three (and `TaskCore__TaskCore`'s ow
 **None of this changed a single compiled byte.** A pointer and an `s32` are
 the same register width; the retype is pure relabeling. A full rebuild after
 the change reconfirmed all nine of this round's prior matches
-(`StreamTaskObj__func_8003BD10` through this function) byte-exact before writing
+(`StreamTask__OnPadConfirm` through this function) byte-exact before writing
 `TaskCore__Finalize`'s own body. This is the concrete instance of this round's
 "field whose only known use is a call result carries no type evidence"
 lesson — see `TaskCore__Finalize.md`'s own proposed learning.
@@ -119,7 +119,7 @@ form slightly — the actual rule is *any* live value used again after an
 intervening `jalr` needs a local, whether that value came from a struct field
 or, as here, directly from a call's return register. `self->methods` itself
 was never re-read across a call in this function (it's read fresh once,
-right before the final `slot40` call, same as `StreamTaskObj__StreamTaskObj`); the residue
+right before the final `slot40` call, same as `StreamTask__StreamTask`); the residue
 was entirely about the `Get_vtable_TaskCore()` return value's reuse.
 
 ## Proposed learning
@@ -140,9 +140,9 @@ back-to-back C statements that both mention `Get_vtable_TaskCore()`.
 **TaskCoreObj__TaskCoreObj** -- tier A. Occupies `gTaskCoreMethods`'s own
 ctor slot `+0x008`; confirmed a base-class constructor by its own body
 (`self->methods = (StreamTaskObjMethods *)core;`, temporarily pointing the
-object at its own table before the derived `StreamTaskObj__StreamTaskObj`
+object at its own table before the derived `StreamTask__StreamTask`
 overwrites it). `Class__Class` convention, same precedent as
-`StreamTaskObj__StreamTaskObj`.
+`StreamTask__StreamTask`.
 
 ## Track 4 (2026-09-25, round 84, alpha)
 

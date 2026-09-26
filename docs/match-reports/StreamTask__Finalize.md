@@ -1,4 +1,6 @@
-# StreamTaskObj__Destroy
+# StreamTask__Finalize
+
+> Renamed from `StreamTaskObj__Destroy` on 2026-09-26 (tools/rename.py). Address 0x8003b9dc.
 
 > Renamed from `func_8003B9DC` on 2026-09-23 (tools/rename.py). Address 0x8003b9dc.
 
@@ -11,8 +13,8 @@ side effect. First, a genuine virtual call through `self->unkB4`'s own
 1-slot vtable (a small object type distinct from `StreamTaskObj`, discovered
 here for the first time in this unit); second, the same
 `Get_vtable_TaskCore()`-mediated delegation to the sibling class `gTaskCoreMethods`
-(`LoaderTaskMethods`) used by `StreamTaskObj__func_8003BD74`/`StreamTaskObj__func_8003BDAC`, this time
-slot `+0x00C`. Occupies `gStreamTaskObjMethods` slot `+0x00C` itself.
+(`LoaderTaskMethods`) used by `StreamTask__OnPadPrev`/`StreamTask__OnPadNext`, this time
+slot `+0x00C`. Occupies `gStreamTaskMethods` slot `+0x00C` itself.
 
 ## Derivation
 
@@ -29,7 +31,7 @@ jalr $v0
 ```
 
 ```c
-void StreamTaskObj__Destroy(StreamTaskObj *self) {
+void StreamTask__Finalize(StreamTaskObj *self) {
     self->unkB4->methods->slot04(self->unkB4);
     Get_vtable_TaskCore()->slot0C(self);
 }
@@ -44,17 +46,17 @@ is `self->unkB4` itself (a virtual self-call on the sub-object), not `self`.
 Added `include/code_2c054.h`'s `StreamTaskUnkB4Obj`/`StreamTaskUnkB4Methods`
 (a new, previously-unseen 1-slot-vtable object reached through
 `StreamTaskObj::unkB4`, `+0x0B4`) and `TaskCoreMethods::slot0C` (this unit's
-local view of `gTaskCoreMethods`, see `StreamTaskObj__func_8003BD74`'s report).
+local view of `gTaskCoreMethods`, see `StreamTask__OnPadPrev`'s report).
 
 ## Proposed learning
 
-Same open return-type question as `StreamTaskObj__func_8003BD74`/`StreamTaskObj__func_8003BDAC` for the
+Same open return-type question as `StreamTask__OnPadPrev`/`StreamTask__OnPadNext` for the
 tail call through `slot0C` -- typed `void` on the same sibling-slot-
 convention basis, unconfirmed by any found caller.
 
 ## Naming
 
-**StreamTaskObj__Destroy** -- tier A. Occupies `gStreamTaskObjMethods`'s dtor
+**StreamTask__Finalize** -- tier A. Occupies `gStreamTaskMethods`'s dtor
 slot `+0x00C` (a base-class layout convention independently confirmed in
 `include/class_39e08.h`'s own `ctor`/`dtor` pair at `+0x008`/`+0x00C`, and in
 `include/code_171e0.h`'s `Class6D430__Finalize`). Tears down the private
@@ -65,3 +67,7 @@ comparison confirms (see the unit header comment).
 ## Track 4 (2026-09-25, round 84, alpha)
 
 Its up-calls to TaskCore (include/TaskCore.h, track 4 round 84) now go through `Get_vtable_TaskCore()` with `self` upcast to `TaskCore *` and TaskCore's slot names; byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).
+
+## Track 4 (2026-09-26, round 87)
+
+Renamed with the class unification (gStreamTaskObjMethods -> class StreamTask, include/StreamTask.h): the `Obj` suffix is dropped (track 4 step 2; include/Class6D3C8.h already viewed the class as `StreamTask`). Was StreamTaskObj__Destroy. It occupies +0x00C, the finalize slot (TaskCore__Finalize in the parent, `classtable.py gStreamTaskMethods --vs gTaskCoreMethods`), releases the MoviePlayer at +0x0B4 and up-calls TaskCore's finalize: named for its slot.

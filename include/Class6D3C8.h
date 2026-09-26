@@ -4,6 +4,7 @@
 #include "common.h"
 #include "DreamSys.h"
 #include "TaskCore.h"
+#include "StreamTask.h"
 #include "Class6E4F0.h"
 
 /*
@@ -148,62 +149,8 @@ extern s32 func_80048CF0(void);        /* reads a small-data global, unnamed so 
 extern void func_800270AC(s32 value);   /* stores its arg to a small-data global */
 extern void *New_LinkResource(void *arg); /* defined in code_33808.c (LinkResource allocator) */
 
-/* A "New_X"-shaped task object allocated by New_StreamTaskObj -- 0xDC bytes,
- * constructed through Get_vtable_StreamTaskObj's slot +0x008. `New_StreamTaskObj`
- * itself is matched, byte-exact, as `StreamTaskObj` in src/code_2c054.c (same
- * function name, same allocator, same 0xDC size) -- this typedef stays a
- * separate LOCAL view rather than including that unit's header, per this
- * project's multiple-independent-local-views convention (only the slots this
- * unit actually dispatches through are typed here). Only the four slots
- * Class6D3C8__LoadIntroLogoSequence and its siblings dispatch through are
- * typed; everything else about this class is unknown. */
-typedef struct StreamTaskMethods {
-    s32 header;                                                    /* +0x000 */
-    void *(*release)(void *self);                                   /* +0x004: BasicClass's release, the LAST call
-                                                                         at every use site: configure runs the task
-                                                                         to its end (init, mode 0), release frees it.
-                                                                         Was `void (*start)`; round 84 retyped it to
-                                                                         BasicClass's void * because
-                                                                         StartCinematicStream's two branches
-                                                                         cross-jump into ONE release call only when
-                                                                         this and TaskCore's release return alike. */
-    u8 pad08[0x044 - 0x008];                                          /* +0x008 .. +0x043 */
-    /* +0x044, named `configure`: called with (self, a fixed word from the
-     * caller's own object, a second word whose meaning varies by call site --
-     * a filename string in Class6D3C8__LoadIntroLogoSequence, a plain derived
-     * count in Class6D3C8__StartWeeklyStreamTask, GetGraphRoomStreamChannel's return
-     * value in Class6D3C8__StartGraphRoomStreamTask -- a type/format code,
-     * and a literal 1 spilled onto the stack as a 5th argument -- confirmed a
-     * real 5th argument, not a scheduling artifact, because MIPS o32 only
-     * spills to the stack once a0-a3 are all otherwise assigned; a <=4-arg
-     * call would never need the sp+0x10 store.
-     *
-     * Tier A, cross-unit evidence: `src/code_2c054.c`'s
-     * `StreamTaskObj__Configure(self, a1, arg2, typeLookup, flag)` has this
-     * EXACT parameter list, for the exact class this typedef is a local view
-     * of (both go through `New_StreamTaskObj`). */
-    void (*configure)(void *self, s32 a1, s32 arg2, s32 typeLookup, s32 flag);
-    u8 pad48[0x06C - 0x048];                                          /* +0x048 .. +0x06B */
-    void (*slot6C)(void *self, s32 a1);                                 /* +0x06C: NOT renamed. Weak correlation
-                                                                            only -- `code_2c054.c`'s
-                                                                            `StreamTaskObj__SetUnk40(self, a1)` sets
-                                                                            self->unk40 = (a1 >= 0) ? a1*15 : a1,
-                                                                            and this unit's only two call sites pass
-                                                                            either 0 or `buf.count / 15` -- a
-                                                                            round-trip that fits, but is not proof
-                                                                            of slot alignment across the
-                                                                            TaskCore/StreamTaskObj override chain. */
-    u8 pad70[0x12C - 0x070];                                              /* +0x070 .. +0x12B */
-    void (*slot12C)(void *self, s32 a1);                                    /* +0x12C: both call sites here pass a
-                                                                                literal 0 -- not enough evidence for
-                                                                                a name. */
-} StreamTaskMethods;
-
-typedef struct StreamTask {
-    StreamTaskMethods *methods;
-} StreamTask;
-
-extern StreamTask *New_StreamTaskObj(s32 a0, s32 a1, s32 a2, s32 a3);
+/* The stream tasks this class starts are StreamTasks (include/StreamTask.h,
+ * round 87; this header's local StreamTask view was merged there). */
 
 extern s32 SetActiveDataSourceDriverMode(s32 a0, s32 a1, s32 a2); /* code_171e0, still INCLUDE_ASM there; returns
                                                        the last value its internal dispatch loop got --

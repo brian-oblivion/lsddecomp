@@ -34,7 +34,7 @@ The "`StreamTaskUnk78Obj` folded into `StreamTaskUnkB4Obj`" unification
 described just below was **reversed** by `TaskCore__OnInit`: it calls
 `self->unk78`'s own slot `+0x04C` with 3 arguments, where
 `StreamTaskUnkB4Methods::slot4C` (this same offset, established
-single-argument by the already-matched `StreamTaskObj__func_8003BDF4`) cannot take 3. A
+single-argument by the already-matched `StreamTask__RefreshViewValue`) cannot take 3. A
 real arity conflict at a shared slot means the two are sibling classes that
 merely agree at `slot04` (this function's own evidence), not one class.
 `self->unk78` is back to its own `StreamTaskUnk78Obj/Methods` type; the code
@@ -54,7 +54,7 @@ time — they were just call results). Here, all three are dereferenced as
 all three to `StreamTaskUnkB4Obj *` in `include/code_2c054.h`; this changes
 no compiled bytes anywhere (same register width, pure pointer/int
 relabeling) and a full rebuild confirmed every one of this round's nine
-prior matches (`StreamTaskObj__func_8003BD10` through `TaskCore__TaskCore`) is still
+prior matches (`StreamTask__OnPadConfirm` through `TaskCore__TaskCore`) is still
 byte-exact. See `TaskCore__TaskCore.md` for the addendum recording this.
 
 Beyond the correction:
@@ -65,7 +65,7 @@ Beyond the correction:
   `unk78`, `unk7C`, and `unk80` are all the SAME generic sub-object class:
   every one of them is town down identically, by the SAME function, in
   sequence, through the SAME slot number (`+0x004`) that `StreamTaskUnkB4Obj`
-  (`self->unkB4`) already had from `StreamTaskObj__Destroy`. `StreamTaskUnkB4Methods`
+  (`self->unkB4`) already had from `StreamTask__Finalize`. `StreamTaskUnkB4Methods`
   gained the former `StreamTaskUnk78Methods::slot50` as its own `+0x050`
   (both now point at the same code, `TaskCore__OnDeinit`'s call still compiles
   identically). This is a deliberate unification, not the project's default
@@ -74,8 +74,8 @@ Beyond the correction:
 - New fields `unk70` (`+0x070`, `s32`, boolean guard) and `unk74` (`+0x074`,
   `StreamTaskUnkB4Obj *`).
 - New `StreamTaskObjMethods` slot `+0x0DC`, called (not occupied) by this
-  function: `gStreamTaskObjMethods+0x0DC = TaskCore__ReleaseTarget`, extern, void, confirmed to
-  exist via `classtable.py gStreamTaskObjMethods`.
+  function: `gStreamTaskMethods+0x0DC = TaskCore__ReleaseTarget`, extern, void, confirmed to
+  exist via `classtable.py gStreamTaskMethods`.
 - New `TaskUtilMethods` slot `+0x00C` (`gIntermediateBaseMethods+0x00C =
   BasicClass__Finalize`, extern, void — the generic base-class slot name
   already seen elsewhere in this game).
@@ -105,7 +105,7 @@ and when the correction comes, retype-and-rebuild-full-unit is cheap
 **TaskCoreObj__Destroy** -- tier A. Occupies `gTaskCoreMethods`'s dtor slot
 `+0x00C`; tears down five sub-objects then up-calls `IntermediateBase`'s own
 dtor at the same slot. Same `Class__Destroy` convention as
-`StreamTaskObj__Destroy`.
+`StreamTask__Finalize`.
 
 ## Track 4 (2026-09-25, round 84, alpha)
 

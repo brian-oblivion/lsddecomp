@@ -22,7 +22,7 @@ beqz $v0, .L80026238            ; whole body gated on this
  ...
 jal  SetActiveDataSourceDriverMode(0, 0, 0)
 jal  Class6D3C8__StartLoaderTask(self, sLogoPathAsmk)     ; "ETC\ASMKLOGO.TIM"
-jal  New_StreamTaskObj(0, 0, 0, 0)            ; -> s1 = task (New_X shape, 0xDC bytes)
+jal  New_StreamTask(0, 0, 0, 0)            ; -> s1 = task (New_X shape, 0xDC bytes)
 addiu $a0, $sp, 0x18
 jal  GetIntroStreamName                          ; writes 0x31 to local, returns &sAsmkStreamPath
  (delay: s1 = v0, i.e. the PRECEDING call's return = task)
@@ -56,7 +56,7 @@ void Class6D3C8__LoadIntroLogoSequence(Class6D3C8 *self) {
     if (self->arg->unk0C != 0) {
         SetActiveDataSourceDriverMode(0, 0, 0);
         Class6D3C8__StartLoaderTask(self, sLogoPathAsmk);
-        task = New_StreamTaskObj(0, 0, 0, 0);
+        task = New_StreamTask(0, 0, 0, 0);
         streamName = GetIntroStreamName(&typeCode);
         typeLookup = GetStreamGroupForType(typeCode);
         task->methods->slot44(task, self->unk1C, streamName, typeLookup, 1);
@@ -86,7 +86,7 @@ a memory load) exposed the real data flow. Always check what the delay slot
 
 **2. Register (s0 vs s1) assignment for two callee-saved temporaries tracked
 declaration order, not statement/liveness order.** `task` (from
-`New_StreamTaskObj`) and `streamName` (from `GetIntroStreamName`) are both live
+`New_StreamTask`) and `streamName` (from `GetIntroStreamName`) are both live
 across further calls, `task` for longer (reloaded twice more). The first
 attempt declared `task` before `streamName` and code assigned `task` first
 (chronologically first live); GCC put `task` in `s0` and `streamName` in

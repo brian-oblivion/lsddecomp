@@ -74,10 +74,10 @@ void Class6D3C8__LoadIntroLogoSequence(Class6D3C8 *self) {
     if (self->arg->unk0C != 0) {
         SetActiveDataSourceDriverMode(0, 0, 0);
         Class6D3C8__StartLoaderTask(self, sLogoPathAsmk);
-        task = New_StreamTaskObj(0, 0, 0, 0);
+        task = New_StreamTask(0, 0, 0, 0);
         streamName = GetIntroStreamName(&typeCode);
         typeLookup = GetStreamGroupForType(typeCode);
-        task->methods->configure(task, self->unk1C, streamName, typeLookup, 1);
+        ((StreamTaskInitFn)task->methods->init)(task, (IntermediateBaseInitArgs *)self->unk1C, streamName, typeLookup, 1);
         task->methods->release(task);
         Class6D3C8__StartLoaderTask(self, sLogoPathOsd);
     }
@@ -118,10 +118,10 @@ void Class6D3C8__StartWeeklyStreamTask(Class6D3C8 *self) {
 
     if (self->arg->unk08 != 0) {
         SetActiveDataSourceDriverMode(0, 0, 0);
-        task = New_StreamTaskObj(0, 0, 0, 0);
+        task = New_StreamTask(0, 0, 0, 0);
         derivedValue = PickWeeklyStreamChannel(&typeCode, 0);
         typeLookup = GetStreamGroupForType(typeCode);
-        task->methods->configure(task, self->unk1C, derivedValue, typeLookup, 1);
+        ((StreamTaskInitFn)task->methods->init)(task, (IntermediateBaseInitArgs *)self->unk1C, derivedValue, typeLookup, 1);
         task->methods->release(task);
     }
 }
@@ -177,9 +177,9 @@ s32 Class6D3C8__RunPollTask(PollTaskCtor ctor, void *dreamSys, s32 extra) {
 
 /* Called by Class6D3C8__PollGraphRoomStatus when its first PollTask reports "2". Gated by
  * self->arg->unk08 (same gate as Class6D3C8__StartWeeklyStreamTask). Builds a StreamTask,
- * derives a count via GetGraphRoomStreamChannel, initializes the task with that
- * count's quotient-by-9 and a fixed sub-slot, then a 5-argument slot44
- * call (a3 = -1, unlike the other slot44 call sites), then starts it. */
+ * derives a count via GetGraphRoomStreamChannel, sets the task's frame bound
+ * to that count / 15 and clears skipOnConfirm, then runs its init (stream
+ * group -1, unlike the other call sites) and releases it. */
 void Class6D3C8__StartGraphRoomStreamTask(Class6D3C8 *self) {
     StreamTask *task;
     struct {
@@ -191,11 +191,11 @@ void Class6D3C8__StartGraphRoomStreamTask(Class6D3C8 *self) {
 
     if (self->arg->unk08 != 0) {
         SetActiveDataSourceDriverMode(0, 0, 0);
-        task = New_StreamTaskObj(0, 0, 0, 0);
+        task = New_StreamTask(0, 0, 0, 0);
         extra = GetGraphRoomStreamChannel(&buf.count, 0, 10);
-        task->methods->slot6C(task, buf.count / 15);
-        task->methods->slot12C(task, 0);
-        task->methods->configure(task, self->unk1C, extra, -1, 1);
+        task->methods->setFrameBound(task, buf.count / 15);
+        task->methods->setSkipOnConfirm(task, 0);
+        ((StreamTaskInitFn)task->methods->init)(task, (IntermediateBaseInitArgs *)self->unk1C, extra, -1, 1);
         task->methods->release(task);
     }
 }
@@ -278,11 +278,11 @@ void Class6D3C8__StartCinematicStream(Class6D3C8 *self) {
 
     if (chanBuf.chan != -1) {
         if (self->arg->unk08 != 0) {
-            StreamTask *streamTask = New_StreamTaskObj(0, 0, 0, 0);
+            StreamTask *streamTask = New_StreamTask(0, 0, 0, 0);
 
-            streamTask->methods->slot12C(streamTask, 0);
+            streamTask->methods->setSkipOnConfirm(streamTask, 0);
             lookup = GetStreamGroupForType(chanBuf.chan);
-            streamTask->methods->configure(streamTask, self->unk1C, groupId, lookup, 1);
+            ((StreamTaskInitFn)streamTask->methods->init)(streamTask, (IntermediateBaseInitArgs *)self->unk1C, groupId, lookup, 1);
             streamTask->methods->release(streamTask);
         }
     } else {
@@ -295,10 +295,10 @@ void Class6D3C8__StartCinematicStream(Class6D3C8 *self) {
 }
 
 /* Class6D3C8Methods slot +0x064. Gated by self->arg->unk08 (same gate as
- * Class6D3C8__StartWeeklyStreamTask/Class6D3C8__StartGraphRoomStreamTask). Builds a StreamTask, runs its slot12C,
+ * Class6D3C8__StartWeeklyStreamTask/Class6D3C8__StartGraphRoomStreamTask). Builds a StreamTask, clears its skipOnConfirm,
  * derives a type code via GetStreamChannelInit, looks it up via GetStreamGroupForType,
  * initializes the task with it, then starts it -- the same shape as
- * Class6D3C8__LoadIntroLogoSequence/Class6D3C8__StartWeeklyStreamTask, but with slot12C added and GetStreamChannelInit
+ * Class6D3C8__LoadIntroLogoSequence/Class6D3C8__StartWeeklyStreamTask, but with setSkipOnConfirm(0) added and GetStreamChannelInit
  * in place of GetIntroStreamName/PickWeeklyStreamChannel. */
 void Class6D3C8__StartStreamTaskWithInit(Class6D3C8 *self) {
     StreamTask *task;
@@ -308,11 +308,11 @@ void Class6D3C8__StartStreamTaskWithInit(Class6D3C8 *self) {
 
     if (self->arg->unk08 != 0) {
         SetActiveDataSourceDriverMode(0, 0, 0);
-        task = New_StreamTaskObj(0, 0, 0, 0);
-        task->methods->slot12C(task, 0);
+        task = New_StreamTask(0, 0, 0, 0);
+        task->methods->setSkipOnConfirm(task, 0);
         outerValue = GetStreamChannelInit(&typeCode, 0);
         typeLookup = GetStreamGroupForType(typeCode);
-        task->methods->configure(task, self->unk1C, outerValue, typeLookup, 1);
+        ((StreamTaskInitFn)task->methods->init)(task, (IntermediateBaseInitArgs *)self->unk1C, outerValue, typeLookup, 1);
         task->methods->release(task);
     }
 }

@@ -28,7 +28,7 @@ void Class6D3C8__StartGraphRoomStreamTask(Class6D3C8 *self) {
 
     if (self->arg->unk08 != 0) {
         SetActiveDataSourceDriverMode(0, 0, 0);
-        task = New_StreamTaskObj(0, 0, 0, 0);
+        task = New_StreamTask(0, 0, 0, 0);
         extra = GetGraphRoomStreamChannel(&buf.count, 0, 10);
         task->methods->slot6C(task, buf.count / 15);
         task->methods->slot12C(task, 0);

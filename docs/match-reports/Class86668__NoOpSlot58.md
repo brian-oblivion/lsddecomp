@@ -20,4 +20,4 @@ An empty override, byte-exact by construction. Never had its own report before t
 
 ## Track 4
 
-2026-09-25, round 84 (bravo): class unified in `include/Class86668.h`. Renamed from `Class86668__Noop58` to the project's spelling for an empty override (`StreamTaskObj__NoOpSlot88`, `ObjM__NoOpSlot40`). It fills +0x058, IntermediateBase's `onPadEvent` slot (NULL in the parent table), so a Pad notification reaching a Class86668 does nothing. Image byte-identical.
+2026-09-25, round 84 (bravo): class unified in `include/Class86668.h`. Renamed from `Class86668__Noop58` to the project's spelling for an empty override (`StreamTask__NoOpSlot88`, `ObjM__NoOpSlot40`). It fills +0x058, IntermediateBase's `onPadEvent` slot (NULL in the parent table), so a Pad notification reaching a Class86668 does nothing. Image byte-identical.

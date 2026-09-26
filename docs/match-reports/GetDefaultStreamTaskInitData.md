@@ -8,7 +8,7 @@
 
 A tiny getter: returns the address of the static table `gDefaultStreamTaskInitData`, a
 3-word struct per `include/code_2c054.h`'s own `StreamTaskInitData` local
-view (that unit's `StreamTaskObj__StreamTaskObj` uses it as the 5th/stack argument to a
+view (that unit's `StreamTask__StreamTask` uses it as the 5th/stack argument to a
 constructor call, and `GetDefaultStreamTaskInitData()`'s return value feeds the same
 3-word copy). This unit never dereferences it, only returns its address,
 so it is declared here as an opaque `u8[]`.

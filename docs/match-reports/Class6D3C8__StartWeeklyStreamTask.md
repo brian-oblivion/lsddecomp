@@ -29,7 +29,7 @@ void Class6D3C8__StartWeeklyStreamTask(Class6D3C8 *self) {
 
     if (self->arg->unk08 != 0) {
         SetActiveDataSourceDriverMode(0, 0, 0);
-        task = New_StreamTaskObj(0, 0, 0, 0);
+        task = New_StreamTask(0, 0, 0, 0);
         derivedValue = PickWeeklyStreamChannel(&typeCode, 0);
         typeLookup = GetStreamGroupForType(typeCode);
         task->methods->slot44(task, self->unk1C, derivedValue, typeLookup, 1);

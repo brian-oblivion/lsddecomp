@@ -29,7 +29,7 @@ references any argument, so the definition needs none).
 purpose (nothing happens). Named after the established project convention
 for exactly this shape -- compare `Actor__NoOpSlotD8`/`NoOpSlotE8`
 (`src/class_3bb8c_p.c`), `Obj6EAC0__NoOpSlotD0` (`src/code_2cc8c_f.c`),
-`StreamTaskObj__NoOpSlot88`/`NoOpSlot8C` (`src/code_2c054.c`) -- all
+`StreamTask__NoOpSlot88`/`NoOpSlot8C` (`src/code_2c054.c`) -- all
 `Class__NoOpSlotOFFSET` for an empty vtable-slot implementation of otherwise-
 unknown purpose. No carved caller currently dispatches this slot on a
 `Class6D3C8` instance.

@@ -1,4 +1,6 @@
-# StreamTaskObj__func_8003BD74
+# StreamTask__OnPadPrev
+
+> Renamed from `StreamTaskObj__func_8003BD74` on 2026-09-26 (tools/rename.py). Address 0x8003bd74.
 
 > Renamed from `func_8003BD74` on 2026-09-23 (tools/rename.py). Address 0x8003bd74.
 
@@ -8,9 +10,9 @@
 
 A one-line forwarder: fetches the sibling class's method table via
 `Get_vtable_TaskCore()` (returns `&gTaskCoreMethods`, `Class6D3C8.h`'s `LoaderTaskMethods`
--- see `Get_vtable_StreamTaskObj`'s report for how the delegation between the two
+-- see `Get_vtable_StreamTask`'s report for how the delegation between the two
 sibling classes was established) and calls its slot `+0x080`, passing
-`self` straight through. Occupies `gStreamTaskObjMethods` slot `+0x080` itself.
+`self` straight through. Occupies `gStreamTaskMethods` slot `+0x080` itself.
 
 ## Derivation
 
@@ -27,7 +29,7 @@ jalr  $v0
 ```
 
 ```c
-void StreamTaskObj__func_8003BD74(StreamTaskObj *self) {
+void StreamTask__OnPadPrev(StreamTaskObj *self) {
     Get_vtable_TaskCore()->slot80(self);
 }
 ```
@@ -47,17 +49,17 @@ specifically was found to confirm either way -- flagged for whoever adds one.
 
 Added `include/code_2c054.h`'s `TaskCoreMethods` (this unit's own local view
 of `gTaskCoreMethods`, independent of `Class6D3C8.h`'s `LoaderTaskMethods`, same
-precedent as `Get_vtable_StreamTaskObj`'s report) with slot `+0x080` typed
+precedent as `Get_vtable_StreamTask`'s report) with slot `+0x080` typed
 `void (*)(StreamTaskObj *self)`.
 
 ## Proposed learning
 
-See `StreamTaskObj__func_8003BDAC`'s report (same shape, slot `+0x084`) and
-`Get_vtable_StreamTaskObj`'s (the delegation pattern itself).
+See `StreamTask__OnPadNext`'s report (same shape, slot `+0x084`) and
+`Get_vtable_StreamTask`'s (the delegation pattern itself).
 
 ## Naming
 
-**StreamTaskObj__func_8003BD74** -- tier C. Occupies `gStreamTaskObjMethods`
+**StreamTask__OnPadPrev** -- tier C. Occupies `gStreamTaskMethods`
 slot `+0x080`; a pure one-line up-call to the base slot with no
 StreamTaskObj-specific logic at all (see the report's own return-type
 discussion). There is nothing here to name beyond "this class's own
@@ -66,3 +68,7 @@ override of that slot," so left `Class__func_xxxxx`.
 ## Track 4 (2026-09-25, round 84, alpha)
 
 Its up-calls to TaskCore (include/TaskCore.h, track 4 round 84) now go through `Get_vtable_TaskCore()` with `self` upcast to `TaskCore *` and TaskCore's slot names; byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).
+
+## Track 4 (2026-09-26, round 87)
+
+Renamed with the class unification (gStreamTaskObjMethods -> class StreamTask, include/StreamTask.h): the `Obj` suffix is dropped (track 4 step 2; include/Class6D3C8.h already viewed the class as `StreamTask`). Was StreamTaskObj__func_8003BD74. Occupies +0x080 onPadPrev and only up-calls TaskCore's.

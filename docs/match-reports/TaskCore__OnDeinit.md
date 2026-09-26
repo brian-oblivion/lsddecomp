@@ -45,7 +45,7 @@ ties them to the same concrete class beyond the shared idiom):
   `TaskCore__OnInit` calls three more slots on `self->unk18`
   (`+0x048`/`+0x04C`/`+0x050`) with an arity `TaskCoreMethods`'s own
   `+0x04C` (occupied by `TaskCore__OnInit` itself, confirmed single-argument by
-  `StreamTaskObj__func_8003BAB4`'s byte-exact call) cannot have. `self->unk18`'s vtable is
+  `StreamTask__OnInit`'s byte-exact call) cannot have. `self->unk18`'s vtable is
   now its own separate type, `TaskCoreObjMethods` — see `TaskCore__OnInit.md`
   for the full reasoning. `slot74`/`slot90` (below) now live there, not in
   `TaskCoreMethods`.
@@ -92,7 +92,7 @@ tell for this class, distinguishable at a glance from a same-size residue.
 ## Naming
 
 **TaskCoreObj__func_8003C3D0** -- tier C. Occupies slot `+0x050` in BOTH
-`gTaskCoreMethods` and `gStreamTaskObjMethods` at the identical address --
+`gTaskCoreMethods` and `gStreamTaskMethods` at the identical address --
 i.e. StreamTaskObj does NOT override this slot, so the function genuinely
 belongs to `TaskCoreObj` (confirmed by `classtable.py`'s slot-for-slot
 comparison, see the unit header comment), not to `StreamTaskObj` despite its

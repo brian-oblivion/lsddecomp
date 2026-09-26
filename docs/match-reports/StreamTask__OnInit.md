@@ -1,4 +1,6 @@
-# StreamTaskObj__func_8003BAB4
+# StreamTask__OnInit
+
+> Renamed from `StreamTaskObj__func_8003BAB4` on 2026-09-26 (tools/rename.py). Address 0x8003bab4.
 
 > Renamed from `func_8003BAB4` on 2026-09-23 (tools/rename.py). Address 0x8003bab4.
 
@@ -7,7 +9,7 @@
 ## Summary
 
 ```c
-void StreamTaskObj__func_8003BAB4(StreamTaskObj *self) {
+void StreamTask__OnInit(StreamTaskObj *self) {
     Get_vtable_TaskCore()->slot4C(self);
     self->unkA4 = 0;
     self->unkB4->methods->slot6C(self->unkB4, self->unkC0);
@@ -29,17 +31,17 @@ void StreamTaskObj__func_8003BAB4(StreamTaskObj *self) {
   plus one stack-spilled 5th, `self->unkC8`), **return value tested directly
   by the following `beqz`, never stored anywhere** — typed `s32`.
 - `self->methods->slot6C(self, 0)`: reuses the slot established to be
-  `StreamTaskObj__SetUnk40`'s occupied slot (`+0x06C` on `gStreamTaskObjMethods`), called only
+  `StreamTask__SetFrameBound`'s occupied slot (`+0x06C` on `gStreamTaskMethods`), called only
   when `slot40`'s result is nonzero.
 - New field `self->unkA4` (`+0x0A4`, `s32`): reset to 0 unconditionally here;
-  a different function (`StreamTaskObj__func_8003BB5C`, this same round) both reads it and
+  a different function (`StreamTask__Update`, this same round) both reads it and
   assigns a call result to it — this function only zeroes it.
 
 ## Pitfall hit and corrected
 
 First attempt wrongly assumed the `slot40` call's return was stored into
 `self->unkA4` before the test (`self->unkA4 = ...; if (self->unkA4 != 0)`),
-by analogy with a structurally similar pattern in `StreamTaskObj__func_8003BB5C` seen while
+by analogy with a structurally similar pattern in `StreamTask__Update` seen while
 reading ahead in the same unit. That produced a **41/42-ish residue**: retail
 computes the branch's argument-setup (`move a0, s0` — preparing the call
 inside the `if`-body) *in the branch's own delay slot*, which only happens
@@ -55,7 +57,7 @@ residue words at once.
 different, structurally similar function in the same unit — reread that
 function's own disassembly line by line first.** Two calls to the same
 vtable slot (`slot40` here) can differ in whether the caller *stores* the
-return value at all; only one of `StreamTaskObj__func_8003BAB4`/`StreamTaskObj__func_8003BB5C` does. The
+return value at all; only one of `StreamTask__OnInit`/`StreamTask__Update` does. The
 tell, from the delay-slot-scheduling angle already documented for `if`-body
 argument setup: if retail schedules an unconditional value (like the callee's
 `self` argument) into the guarding branch's own delay slot, the source is not
@@ -64,10 +66,10 @@ directly.
 
 ## Naming
 
-**StreamTaskObj__func_8003BAB4** -- tier C (class known, purpose not
-established). Occupies `gStreamTaskObjMethods` slot `+0x04C`; up-calls
+**StreamTask__OnInit** -- tier C (class known, purpose not
+established). Occupies `gStreamTaskMethods` slot `+0x04C`; up-calls
 `TaskCore__OnInit` at the same slot, then forwards the fields
-`StreamTaskObj__Configure` set into the private `unkB4` sub-object and
+`StreamTask__Init` set into the private `unkB4` sub-object and
 conditionally resets a value. No external caller was found (dispatched only
 through the vtable), and no single verb for the combined effect is
 confidently supported by the body alone -- kept `Class__func_xxxxx` rather
@@ -76,3 +78,7 @@ than guess.
 ## Track 4 (2026-09-25, round 84, alpha)
 
 Its up-calls to TaskCore (include/TaskCore.h, track 4 round 84) now go through `Get_vtable_TaskCore()` with `self` upcast to `TaskCore *` and TaskCore's slot names; byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green). The onInit up-call casts the slot to `void (*)(TaskCore *)`: IntermediateBase types onInit (self, s32, s32, s32) from init's call, and this call passes self alone.
+
+## Track 4 (2026-09-26, round 87)
+
+Renamed with the class unification (gStreamTaskObjMethods -> class StreamTask, include/StreamTask.h): the `Obj` suffix is dropped (track 4 step 2; include/Class6D3C8.h already viewed the class as `StreamTask`). Was StreamTaskObj__func_8003BAB4. Occupies +0x04C onInit and up-calls TaskCore's first, then MoviePlayer__SetResult(autoPlay) and MoviePlayer__Play(streamName, streamGroup, unkC4, loopCount); a nonzero Play result is setFrameBound(0).
