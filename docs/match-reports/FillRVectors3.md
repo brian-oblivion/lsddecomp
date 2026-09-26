@@ -25,7 +25,7 @@
 > this project, twice before this round and once during it: **a struct whose
 > members are all `s8`/`s16` has alignment 2, and that is what makes a
 > whole-struct assignment compile to unaligned `lwl`/`lwr` + `swl`/`swr`
-> instead of aligned `lw`/`sw`** (DECOMPILATION_LEARNINGS; `StageMap__SetTargetAndBuildRates`,
+> instead of aligned `lw`/`sw`** (DECOMPILATION_LEARNINGS; `StageMap__SetTargetAndLoadChunks`,
 > `FlashbackRotation`, and delta's `BisectSegmentToBox` this round). `PolyXY8` is
 > four `s16`, `PolyUV4` is two, and both live in `include/code_8220.h` with
 > the alignment requirement stated next to them, because one stray `s32`
@@ -146,7 +146,7 @@ void FillRVectors3(void *arg0, void *arg1, void *arg2, void *arg3, void *arg4)
 Retail's copy pattern is `lwl`/`lwr` word-unaligned addressing, which is
 what a plain C struct assignment produces automatically ONLY when the
 struct's declared type has an alignment less than 4 (the project's
-established `FlashbackRotation`/`StageMap__SetTargetAndBuildRates` precedent: "a struct whose
+established `FlashbackRotation`/`StageMap__SetTargetAndLoadChunks` precedent: "a struct whose
 members are all `s8`/`s16` has alignment 2"). Here the SAME destination
 pointer (`arg0[i]`) is written twice — once at offset 0 (the 8-byte field)
 and again at offset `0x10` (the 4-byte field) — and both are unaligned, so

@@ -28,7 +28,7 @@ Descriptor10 *StageMap__GetTargetDescriptor(Obj866E8 *self, s32 arg1, void **out
 ## Derivation
 
 Two independent gates, both falling through to the same `return
-&self->unkBC;` (the `unkBC` `Descriptor10` established by `StageMap__SetTargetAndBuildRates`
+&self->unkBC;` (the `unkBC` `Descriptor10` established by `StageMap__SetTargetAndLoadChunks`
 this same round):
 
 - `arg1 == 0`: skip the `slot110` dispatch entirely, go straight to the
@@ -40,7 +40,7 @@ this same round):
   a `bnez`+`li v0,0` pair encodes "return 0 iff call succeeded").
 
 `self->unk6C` turned out to be a pointer (`Unk6CObj`), not the raw `s32` an
-earlier guess might suggest -- `StageMap__SetTargetAndBuildRates` (matched later in the same
+earlier guess might suggest -- `StageMap__SetTargetAndLoadChunks` (matched later in the same
 round) only ever stores its own `arg2` there raw, never dereferencing it, so
 nothing in that function alone would have caught the mistake; this function's
 own `+0x014` dereference is what pins the type down. `unk6C->unk14` is itself
@@ -65,4 +65,4 @@ Round 78 (track 3, naming pass, bravo).
 
 | symbol | name | tier | evidence |
 | --- | --- | --- | --- |
-| `func_8004C158` | `StageMap__GetTargetDescriptor` | B | Occupant of `gStageMapMethods` +0x10C. Resolves `self->unk6C`'s own position substruct, optionally hands it to `slot110` (`StageMap__ComputeFootprintDescriptor`) to fill a caller-supplied `Descriptor10Ext`, and always returns `&self->unkBC` -- this object's own current footprint descriptor. "Get...Descriptor" names the return value's role; "Target" reflects `self->unk6C`'s established role as the stored position source (`StageMap__SetTargetAndBuildRates` sets it). |
+| `func_8004C158` | `StageMap__GetTargetDescriptor` | B | Occupant of `gStageMapMethods` +0x10C. Resolves `self->unk6C`'s own position substruct, optionally hands it to `slot110` (`StageMap__ComputeFootprintDescriptor`) to fill a caller-supplied `Descriptor10Ext`, and always returns `&self->unkBC` -- this object's own current footprint descriptor. "Get...Descriptor" names the return value's role; "Target" reflects `self->unk6C`'s established role as the stored position source (`StageMap__SetTargetAndLoadChunks` sets it). |

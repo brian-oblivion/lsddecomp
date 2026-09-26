@@ -206,7 +206,7 @@ struct StageMapMethods {
     /* +0x0DC */ void (*setGridSpan)(StageMap *self, s32 span); /* StageMap__SetGridSpan */
     /* +0x0E0 */ void (*setConfig)(StageMap *self, StageGridDimensions *config); /* StageMap__SetConfig */
     /* +0x0E4 */ s32 (*setTargetAndBuildRates)(StageMap *self, void *outPos, SceneNode *target,
-                                               Descriptor10 *cell); /* StageMap__SetTargetAndBuildRates */
+                                               Descriptor10 *cell); /* StageMap__SetTargetAndLoadChunks */
     /* +0x0E8 */ s32 (*computeCellOffsets)(StageMap *self, void *outPos,
                                            void *cell); /* StageMap__ComputeCellOffsets */
     /* +0x0EC */ void (*enable)(StageMap *self);      /* StageMap__Enable */
@@ -310,7 +310,7 @@ Descriptor10 *StageMap__GetCurrentCellKey(StageMap *self);
 void func_8004B324(void);
 void StageMap__SetGridSpan(StageMap *self, s32 span);
 void StageMap__SetConfig(StageMap *self, StageGridDimensions *config);
-s32 StageMap__SetTargetAndBuildRates(StageMap *self, void *outPos, SceneNode *target,
+s32 StageMap__SetTargetAndLoadChunks(StageMap *self, void *outPos, SceneNode *target,
                                        Descriptor10 *cell);
 s32 StageMap__ComputeCellOffsets(StageMap *self, void *outPos, void *cell);
 s32 ComputeCellWorldOffsets(s32 *outPos, s32 *outBuf, StageGridDimensions *config, LongVec3 *origin,

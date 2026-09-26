@@ -40,7 +40,7 @@
 #include "LbdFile.h"
 #include "GridCell.h"
 
-s32 StageMap__SetTargetAndBuildRates(StageMap *self, void *arg1, SceneNode *arg2, Descriptor10 *arg3) {
+s32 StageMap__SetTargetAndLoadChunks(StageMap *self, void *arg1, SceneNode *arg2, Descriptor10 *arg3) {
     s32 stackBuf[3];
     s32 ret;
 

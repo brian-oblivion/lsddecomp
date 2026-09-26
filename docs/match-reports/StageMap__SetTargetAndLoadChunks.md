@@ -1,4 +1,6 @@
-# StageMap__SetTargetAndBuildRates
+# StageMap__SetTargetAndLoadChunks
+
+> Renamed from `StageMap__SetTargetAndBuildRates` on 2026-09-26 (tools/rename.py). Address 0x8004b38c.
 
 > Renamed from `Class866E8__SetTargetAndBuildRates` on 2026-09-26 (tools/rename.py). Address 0x8004b38c.
 
@@ -9,7 +11,7 @@
 ## Result
 
 ```c
-s32 StageMap__SetTargetAndBuildRates(Obj866E8 *self, void *arg1, Unk6CObj *arg2, Descriptor10 *arg3) {
+s32 StageMap__SetTargetAndLoadChunks(Obj866E8 *self, void *arg1, Unk6CObj *arg2, Descriptor10 *arg3) {
     s32 stackBuf[3];
     s32 ret;
 
@@ -70,7 +72,7 @@ Round 78 (track 3, naming pass, bravo).
 
 | symbol | name | tier | evidence |
 | --- | --- | --- | --- |
-| `func_8004B38C` | `StageMap__SetTargetAndBuildRates` | B | Occupant of `gStageMapMethods` +0x0E4 (`tools/classtable.py 0x800866E8`), class prefix confirmed. Stores its own `arg2`/`arg3` into `self->unk6C`/`self->unkBC` (the tracked position source and current footprint descriptor), then computes offsets via `ComputeCellWorldOffsets` and forwards the result through its own vtable slot `slotF8`, which is `StageMap__LoadChunksAround`'s identity slot. Mechanics only -- "sets the target/descriptor, then builds rates from it" describes what the body does, not why. |
+| `func_8004B38C` | `StageMap__SetTargetAndLoadChunks` | B | Occupant of `gStageMapMethods` +0x0E4 (`tools/classtable.py 0x800866E8`), class prefix confirmed. Stores its own `arg2`/`arg3` into `self->unk6C`/`self->unkBC` (the tracked position source and current footprint descriptor), then computes offsets via `ComputeCellWorldOffsets` and forwards the result through its own vtable slot `slotF8`, which is `StageMap__LoadChunksAround`'s identity slot. Mechanics only -- "sets the target/descriptor, then builds rates from it" describes what the body does, not why. |
 
 ## Proposed field names
 
@@ -84,8 +86,8 @@ to apply by type scope.
 
 | field | proposed name | tier | evidence |
 | --- | --- | --- | --- |
-| `Obj866E8::unk6C` | `posSource` | B | Stored raw by `StageMap__SetTargetAndBuildRates` (`self->unk6C = arg2`, never dereferenced there); dereferenced by `StageMap__GetTargetDescriptor` as `self->unk6C->unk14 + 0x18` to obtain the `SplitLongVec3` (world-position triple) fed to `StageMap__ComputeFootprintDescriptor`; `class_3bb8c_b.c`'s `StageMap__ComputeFootprintFromRotation` independently reaches the SAME `->unk14->unk44` chain. "posSource" names the mechanic (an object whose `unk14` substruct supplies positions), not an asserted game identity. |
-| `Obj866E8::unkBC` | `descriptor` | B | Whole-struct-copied from a caller `Descriptor10*` in `StageMap__SetTargetAndBuildRates`; overwritten wholesale (44 bytes, past the declared field into trailing padding -- see `StageMap__UpdateFootprintTracking.md`'s own derivation) and read back (`StageMap__GetTargetDescriptor` returns `&self->unkBC` directly) as "the object's current footprint descriptor". Not tested for cross-unit accessors this round (only `unk6C` was); the head should re-run the same compiler check before applying. |
+| `Obj866E8::unk6C` | `posSource` | B | Stored raw by `StageMap__SetTargetAndLoadChunks` (`self->unk6C = arg2`, never dereferenced there); dereferenced by `StageMap__GetTargetDescriptor` as `self->unk6C->unk14 + 0x18` to obtain the `SplitLongVec3` (world-position triple) fed to `StageMap__ComputeFootprintDescriptor`; `class_3bb8c_b.c`'s `StageMap__ComputeFootprintFromRotation` independently reaches the SAME `->unk14->unk44` chain. "posSource" names the mechanic (an object whose `unk14` substruct supplies positions), not an asserted game identity. |
+| `Obj866E8::unkBC` | `descriptor` | B | Whole-struct-copied from a caller `Descriptor10*` in `StageMap__SetTargetAndLoadChunks`; overwritten wholesale (44 bytes, past the declared field into trailing padding -- see `StageMap__UpdateFootprintTracking.md`'s own derivation) and read back (`StageMap__GetTargetDescriptor` returns `&self->unkBC` directly) as "the object's current footprint descriptor". Not tested for cross-unit accessors this round (only `unk6C` was); the head should re-run the same compiler check before applying. |
 
 **Head disposition, round 78.** `unk6C` applied by type scope as `target`
 (3 accessors: class_3bb8c.c x2, class_3bb8c_b.c x1), not `posSource`: this
