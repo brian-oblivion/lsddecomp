@@ -531,8 +531,8 @@ the keyboard:
   You cannot read it off the disassembly. Resolve it:
 
   ```sh
-  .venv/bin/python3 tools/classtable.py DREAMSYS_METHODS
-  .venv/bin/python3 tools/classtable.py DREAMSYS_METHODS --vs 0x800878D4
+  .venv/bin/python3 tools/classtable.py gDreamSysMethods
+  .venv/bin/python3 tools/classtable.py gDreamSysMethods --vs 0x800878D4
   ```
 
   Do not count slots by hand — an off-by-one silently names the wrong function,

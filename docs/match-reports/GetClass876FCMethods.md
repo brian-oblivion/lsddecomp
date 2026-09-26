@@ -32,7 +32,7 @@ this class's `+0x010`/`+0x014`/`+0x018`/`+0x088`/`+0x09C`/`+0x0B8`/`+0x0BC`/
 `Actor__DispatchLinkCommand`, `Actor__SetTranslation`, `Actor__AddTranslation`, `Actor__AddLocalTranslation`,
 `Actor__MoveLocalZ`) -- i.e. `gClass876FCMethods` is a SIBLING concrete class built on
 the same intermediate base, the same relationship `gClass65650Methods`
-(Class65650) and `DREAMSYS_METHODS` (DreamSys) already have to it.
+(Class65650) and `gDreamSysMethods` (DreamSys) already have to it.
 
 ### Proposed learning
 

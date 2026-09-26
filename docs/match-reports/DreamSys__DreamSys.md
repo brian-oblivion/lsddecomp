@@ -6,7 +6,7 @@
 ## What it does
 
 The class constructor, called through the method table's own `Constructor`
-slot (`+0x008`, resolved via `tools/classtable.py DREAMSYS_METHODS`) by
+slot (`+0x008`, resolved via `tools/classtable.py gDreamSysMethods`) by
 `New_DreamSys`. Chains into the shared base class's own constructor, installs
 DreamSys's own vtable, stashes the three forwarded constructor arguments,
 performs a "buddy-link" step against its `arg1` companion object, and tail-

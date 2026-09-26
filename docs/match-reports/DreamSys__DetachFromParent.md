@@ -15,7 +15,7 @@ class's method table:
    unidentified object's OWN vtable (not `this->vt`), with itself as the
    sole argument.
 2. `this->vt->Actor__RemoveChild(this, this->unk_0x4C)` -- resolved via
-   `tools/classtable.py DREAMSYS_METHODS` to vtable offset `+0x014`, shared
+   `tools/classtable.py gDreamSysMethods` to vtable offset `+0x014`, shared
    with `Class65650`'s inherited "slot14" (`code_55dd4.h` calls it the
    "'unlink' companion of slot10"). Still `INCLUDE_ASM`; its address
    (`0x80057130`) is below this unit/runner's range.
@@ -83,7 +83,7 @@ round 2026-08-30-b, runner ALPHA, address range
 
 ## Track 4 (2026-09-26, round 88)
 
-Renamed from `DreamSys__UnlinkLinkMgr`. It is DREAMSYS_METHODS +0x050,
+Renamed from `DreamSys__UnlinkLinkMgr`. It is gDreamSysMethods +0x050,
 the override of Class6B5CC's `detachFromParent`, and it ends by chaining
 Actor's (`GetActorMethods()->detachFromParent`). The "link manager" it
 unlinks first is Actor's `grid` field (+0x04C, the class-0x114 child

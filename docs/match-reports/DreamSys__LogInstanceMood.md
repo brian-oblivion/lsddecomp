@@ -20,7 +20,7 @@ void DreamSys__LogInstanceMood(DreamSys *this, MoodGraphPoint *source)
 `entityMoods` exactly (`areaMoods` is a `MoodGraphContributor`, 0x10 bytes,
 starting at `0x144`; `entityMoods` immediately follows at `0x154`). The
 called vtable slot (`this->vt->LogMood`) was confirmed at `+0x208` via
-`tools/classtable.py DREAMSYS_METHODS`, matching the already-declared
+`tools/classtable.py gDreamSysMethods`, matching the already-declared
 `LogMood` field exactly -- `DreamSys__LogMood` itself is `+0x208`
 (`0x8005B5B8`), the function right after `DreamSys__ClearMoodGraph`
 (`+0x204`) in address order, same pattern the whole table follows.

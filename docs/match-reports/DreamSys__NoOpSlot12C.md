@@ -43,7 +43,7 @@ Renamed from `func_800595A0`.
 `return 0;` and nothing else. The unit already names its empty
 slots this way (`DreamSys__NoOpSlot14C`, `DreamSys__NoOpSlot150`,
 `Actor__NoOpSlotD8`, `DreamSys__NoOpSlotE8Default`); the offset +0x12C is
-`tools/classtable.py DREAMSYS_METHODS`. Its one caller,
+`tools/classtable.py gDreamSysMethods`. Its one caller,
 `DreamSys__ApplyMoveCommand`, discards the result, so this is an override hook that
 DreamSys itself declines. Tier A: evident from the body alone, and the name asserts
 nothing the body does not show.

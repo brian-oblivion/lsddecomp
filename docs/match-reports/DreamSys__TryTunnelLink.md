@@ -3,7 +3,7 @@
 > Renamed from `func_8005A700` on 2026-09-22 (tools/rename.py). Address 0x8005a700.
 
 **Unit:** DreamSys · **Size:** 40 words · **Status:** MATCHED (40/40 words, full build verified byte-exact)
-**Vtable slot:** `DREAMSYS_METHODS +0x1D0` (first of a run of four previously-unnamed slots)
+**Vtable slot:** `gDreamSysMethods +0x1D0` (first of a run of four previously-unnamed slots)
 
 ## Context
 

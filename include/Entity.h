@@ -27,7 +27,7 @@
  * offset) is Class65650's; code_4cd08 passes gDreamAuxWorld as the peer, and
  * the slots Entity calls on `peer` (+0x100, +0x120, +0x1A0, +0x200, +0x21C)
  * lie past the end of Class65650's table: their occupants in
- * DREAMSYS_METHODS are DreamSys__GetLinkCommandFlag,
+ * gDreamSysMethods are DreamSys__GetLinkCommandFlag,
  * DreamSys__ProjectPointAtDistance, DreamSys__GetCurrentDayAndYear,
  * DreamSys__GetDreamColor and DreamSys__ResetFlashbackList. The units that
  * call it include include/DreamSys.h and cast `peer` (Class65650's field,

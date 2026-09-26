@@ -14,7 +14,7 @@ gate, no computation.
 ```c
 struct vtable_DreamSys *Get_vtable_DreamSys(void)
 {
-	return &DREAMSYS_METHODS;
+	return &gDreamSysMethods;
 }
 ```
 

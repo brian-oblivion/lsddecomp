@@ -5,7 +5,7 @@
 
 ## What it does
 
-`DREAMSYS_METHODS` slot `+0x0E0` (this function's own slot, confirmed via
+`gDreamSysMethods` slot `+0x0E0` (this function's own slot, confirmed via
 `tools/classtable.py`, and previously an untyped `void *LinkWall` placeholder
 in the header). Forwards through a base-class hook; if the link type is `4`
 and no link is already in progress, snapshots a spawn position into

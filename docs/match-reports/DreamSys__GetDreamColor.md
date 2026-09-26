@@ -21,7 +21,7 @@ DreamColors DreamSys__GetDreamColor(DreamSys *this)
 ```
 
 `UpdateDreamChart` was already declared with the right signature; confirmed
-at vtable `+0x1FC` via `tools/classtable.py DREAMSYS_METHODS`
+at vtable `+0x1FC` via `tools/classtable.py gDreamSysMethods`
 (`DreamSys__UpdateDreamChart`, `0x8005B420`, the function immediately
 before `DreamSys__GetDreamColor` itself at `+0x200`).
 

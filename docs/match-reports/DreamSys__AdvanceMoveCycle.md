@@ -159,7 +159,7 @@ function itself did not close:
 - `DreamSys::unk_0xB4` (was `unknown_values_0xB4[8]`) — the attempt/beat
   counter described above, bounded to `[0,4)` while `unk_0xA0` is nonzero.
 - `vtable_DreamSys::DreamSys__StartVoice` (was `unknown_functions_0x168[1]`) — named
-  from `tools/classtable.py DREAMSYS_METHODS` (`+0x168`); the symbol already
+  from `tools/classtable.py gDreamSysMethods` (`+0x168`); the symbol already
   existed as an `INCLUDE_ASM` entry in `src/DreamSys.c`, just not yet wired
   into the vtable struct.
 - `DreamSys::unk_0x678` is exactly `DreamSys::screenShakeOn` — confirmed by

@@ -7,7 +7,7 @@
 
 ## What it does
 
-`DREAMSYS_METHODS` slot `+0x04C` (this function's own slot, confirmed via
+`gDreamSysMethods` slot `+0x04C` (this function's own slot, confirmed via
 `tools/classtable.py`). Forwards `arg1` through two base-class hooks and the
 "link" step, and — while a flashback is in the specific `0xE` link state —
 consumes the CURRENT flashback entry's rotation/time-limit and advances the

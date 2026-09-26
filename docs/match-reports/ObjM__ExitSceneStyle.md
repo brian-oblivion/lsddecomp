@@ -25,11 +25,11 @@ passed as a plain argument). Matched on the first attempt.
 
 - This function is the primary evidence tying `self->unk3C` AND
   `self->unk18` to the SAME class (both dispatch through offsets that
-  independently cross-check against `DREAMSYS_METHODS`, `0x80087BDC` —
+  independently cross-check against `gDreamSysMethods`, `0x80087BDC` —
   `+0x0FC`/`+0x050` on `unk3C`, `+0x074` on `unk18`). See the
   `DreamSysObj_3bb8c_l` header comment in `include/class_3bb8c.h`.
 - `self->unk14` is a DIFFERENT, unidentified class (`Obj14_3bb8c_l`) —
-  offset `+0x10C` happens to also exist in `DREAMSYS_METHODS` but with a
+  offset `+0x10C` happens to also exist in `gDreamSysMethods` but with a
   different arity at its own call site (`ObjM__TickStyle`, see that report),
   so it is NOT assumed to be DreamSys despite the coincidental offset
   match.

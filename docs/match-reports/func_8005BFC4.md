@@ -48,7 +48,7 @@ round 43, runner ALPHA, unit DreamSys.
 NOT RENAMED, and this records why. It is a free function whose
 whole body is `return (gLinkSrcStage == 0) ? 0xA : 0;` -- gLinkSrcStage being the
 source stage `GetStaticSpawn` records for the trigger it matched. Nothing in any
-carved unit calls it and it is not a DREAMSYS_METHODS slot, so there is no call site
+carved unit calls it and it is not a gDreamSysMethods slot, so there is no call site
 to type the return value, and 0xA on its own names nothing. The tier-C
 `Class__func_xxxxx` form does not apply either: it is not a method, so it keeps the
 bare placeholder.

@@ -54,7 +54,7 @@ function, genuinely shared, unlike the residue below.
 CLAUDE.md's "one-line wrapper" note; `callback_0x98`'s declared type is
 `void(*)(DreamSys*)` so the assignment needs an explicit cast to silence the
 warning without touching codegen), `DreamSys__TickDrift`, and `DreamSys__SoundCueCallback` all
-resolved via `tools/classtable.py DREAMSYS_METHODS` against the vtable slots
+resolved via `tools/classtable.py gDreamSysMethods` against the vtable slots
 read in the disassembly (`0x17C`, `0x154`, `0x178`, `0x194`).
 
 ## Residues fixed, in order

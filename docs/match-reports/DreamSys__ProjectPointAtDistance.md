@@ -49,7 +49,7 @@ confirmed against the O32 ABI's arithmetic: frame is `-0x38`, +0x10 for the
 reserved a0-a3 spill slots = 0x48). The project's own vtable slot
 (`vtable_DreamSys::DreamSys__ProjectPointAtDistance`) was declared with only 4 params before
 this round; corrected in `include/DreamSys.h` (function-pointer prototype
-only, no struct-size change -- verified safe since `DREAMSYS_METHODS`
+only, no struct-size change -- verified safe since `gDreamSysMethods`
 itself is not yet a C data definition anywhere, so nothing could break from
 the signature edit).
 

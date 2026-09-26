@@ -12,7 +12,7 @@ derivation history.
 
 ## What it does
 
-`DREAMSYS_METHODS` slot `+0x98` (`TimerTick`). Advances the dream timer once
+`gDreamSysMethods` slot `+0x98` (`TimerTick`). Advances the dream timer once
 per call when `arg2 == 2`; once the timer catches up to `dreamTimeLimit`, it
 either handles a flashback-session continuation/abort or a normal-session
 flashback save + link-abort:
@@ -105,7 +105,7 @@ future attempt wants to burn one try confirming that.
 
 ## New knowledge
 
-- **Confirms `DREAMSYS_METHODS+0x98` is this function's own slot**, already
+- **Confirms `gDreamSysMethods+0x98` is this function's own slot**, already
   named `TimerTick` in the header.
 - **Second confirmed instance of the "identical assignment reaching different
   merge points" class**, this time on a `bnez` rather than `Entity__UpdateActivationState`'s

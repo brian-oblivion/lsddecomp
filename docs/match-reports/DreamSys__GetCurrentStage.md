@@ -18,7 +18,7 @@ s32 DreamSys__GetCurrentStage(DreamSys *this)
 ```
 
 Split out of `unknown_functions_0x1d0[5]` (was the LAST word of that gap,
-`+0x1E0`; resolved via `tools/classtable.py DREAMSYS_METHODS`, which
+`+0x1E0`; resolved via `tools/classtable.py gDreamSysMethods`, which
 confirmed `DreamSys__ProcessChunkChange` immediately follows at `+0x1E4`,
 matching the existing header entry exactly).
 

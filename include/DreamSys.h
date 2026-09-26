@@ -3,7 +3,7 @@
 
 /*
  * DreamSys -- the dream in progress (class id 0x1F34, method table
- * DREAMSYS_METHODS, getter Get_vtable_DreamSys): an Actor subclass
+ * gDreamSysMethods, getter Get_vtable_DreamSys): an Actor subclass
  * (include/Actor.h); no class derives from it. The ctor calls Actor's first
  * (DreamSys__DreamSys: GetActorMethods()->ctor), so the id parent is the
  * ctor-chain parent. Every method is in src/DreamSys.c. One instance, made
@@ -624,8 +624,8 @@ typedef enum DreamColors {
     DREAM_COLOR_WHITE,
 } DreamColors;
 
-/* Occupants in DREAMSYS_METHODS named at each slot (`tools/classtable.py
- * DREAMSYS_METHODS --vs gActorMethods`). The inherited slots keep Actor's
+/* Occupants in gDreamSysMethods named at each slot (`tools/classtable.py
+ * gDreamSysMethods --vs gActorMethods`). The inherited slots keep Actor's
  * names and types; this class overrides +0x008 (DreamSys__DreamSys), +0x040
  * reset (DreamSys__ResetSessionState), +0x04C attachToParent
  * (DreamSys__SpawnAtLink), +0x050 detachFromParent
@@ -766,7 +766,7 @@ typedef struct StaticLinkTrigger {
 } StaticLinkTrigger;
 
 /* Jumptable holding all of DreamSys "virtual" methods */
-extern DreamSysMethods DREAMSYS_METHODS;
+extern DreamSysMethods gDreamSysMethods;
 
 extern s16 STAGE_TIME_LIMITS[];
 
@@ -1000,7 +1000,7 @@ void DreamSys__AddFlashback(DreamSys *this, s32 stage, PlayerSpawnPoint *pos, s3
 void DreamSys__ResetFlashbackList(DreamSys *this);
 
 /* @brief Gets the jumptable of "Virtual methods" assigned to the DreamSys class. */
-/* @return &DREAMSYS_METHODS */
+/* @return &gDreamSysMethods */
 DreamSysMethods *Get_vtable_DreamSys(void);
 
 /* @brief Allocates and constructs a DreamSys instance.
@@ -1045,7 +1045,7 @@ s32 GetRandomSpawnFromStage(PlayerSpawnPoint *target, s32 stg, s32 unused);
 MoodGraphPoint *IsDaySpecial(CinematicCall *cinematic, int day);
 
 
-/* The occupants of DREAMSYS_METHODS not declared above, in slot order. */
+/* The occupants of gDreamSysMethods not declared above, in slot order. */
 DreamSys *DreamSys__DreamSys(DreamSys *this, struct LinkResource *arg1, s32 arg2, s32 arg3);
 void DreamSys__ResetSessionState(DreamSys *this);
 void DreamSys__SpawnAtLink(DreamSys *this, struct Class866E8 *arg1);

@@ -3,7 +3,7 @@
 > Renamed from `func_80058F18` on 2026-09-22 (tools/rename.py). Address 0x80058f18.
 
 **Unit:** DreamSys · **Size:** 37 words · **Status:** MATCHED (37/37 words, full build verified byte-exact)
-**Vtable slot:** `DREAMSYS_METHODS +0xDC` (this function's own slot)
+**Vtable slot:** `gDreamSysMethods +0xDC` (this function's own slot)
 
 ## Context
 
@@ -16,7 +16,7 @@ offsets involved and the class-id constant being compared.
 
 `GetActorMethods()->slot0xDC` resolves (via `tools/classtable.py gActorMethods`)
 to `Actor__OnActorLinkCommand`, out of this unit's scope. `this->vt->slot0x1E8` resolves
-(via `tools/classtable.py DREAMSYS_METHODS`) to
+(via `tools/classtable.py gDreamSysMethods`) to
 `DreamSys__InstanceEffectsOnJournal` -- already forward-declared in
 `include/DreamSys.h` and already has a real body pending as
 `DreamSys__InstanceEffectsOnJournal` (`INCLUDE_ASM` elsewhere in this file).

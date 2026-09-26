@@ -58,7 +58,7 @@ what makes matching the existing convention worth more than a tidier one.
 
 `gBasicClassMethods` -> `BASICCLASS_METHODS`. **Tier A.** It is the name
 `docs/research/class-framework.md` already uses for this exact table, and
-it matches `DREAMSYS_METHODS`, the one method table in the tree that is
+it matches `gDreamSysMethods`, the one method table in the tree that is
 already named. **`tools/rename.py` refuses it** and I did not work around
 it: its "NEW already appears" guard fires because six files
 (`docs/match-reports/BasicClass__BasicClass.md`, this report,

@@ -30,7 +30,7 @@ ori   $a0, $zero, 0x928        ; size
 jal   BMemPMgrAlloc            ; allocator
 addu  $s0, $v0, $zero
 beqz  $s0, .L800587D0          ; NULL CHECK
-jal   Get_vtable_DreamSys      ; -> &DREAMSYS_METHODS
+jal   Get_vtable_DreamSys      ; -> &gDreamSysMethods
 lw    $v0, 0x8($v0)            ; slot +0x008
 addu  $a0, $s0, $zero          ; this
 jalr  $v0                      ; CONSTRUCTOR, CALLED INDIRECTLY
@@ -137,8 +137,8 @@ flat 4-byte function-pointer tables (>=8 slots):    128
   identifies it. Resolve it with:
 
   ```sh
-  .venv/bin/python3 tools/classtable.py DREAMSYS_METHODS
-  .venv/bin/python3 tools/classtable.py DREAMSYS_METHODS --vs 0x800878D4
+  .venv/bin/python3 tools/classtable.py gDreamSysMethods
+  .venv/bin/python3 tools/classtable.py gDreamSysMethods --vs 0x800878D4
   ```
 
   The `--vs` form is the useful one: a derived table is its base's with some

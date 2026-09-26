@@ -7,7 +7,7 @@
 ## What it does
 
 Vtable slot `+0x180` (first of a five-function run resolved this round via
-`tools/classtable.py DREAMSYS_METHODS` -- see `DreamSys__ChangeMoveMode.md`,
+`tools/classtable.py gDreamSysMethods` -- see `DreamSys__ChangeMoveMode.md`,
 `DreamSys__RestorePreviousMoveMode.md`, `DreamSys__SetGateFlags.md`, `DreamSys__SetTickPeriod.md` for the rest;
 `+0x180`..`+0x190` map onto the five functions at consecutive addresses
 `0x8005A168`..`0x8005A1EC`, confirmed by the tool, not assumed). A

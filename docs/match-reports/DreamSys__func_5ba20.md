@@ -47,7 +47,7 @@ write.
 This slot was previously documented as a standalone tail field named
 `func_228` (with an incorrect note that it "lives past the previously-
 documented end of this struct at 0x21c"). `tools/classtable.py
-DREAMSYS_METHODS` resolves it this round to be DreamSys__func_5ba20's own slot,
+gDreamSysMethods` resolves it this round to be DreamSys__func_5ba20's own slot,
 directly following `ResetFlashbackList`/`DreamSys__SaveLinkSnapshot`/`DreamSys__RestoreLinkSnapshot` --
 no gap, and no "past the end" special case. The field is NOT renamed,
 though: `src/code_1677c.c` (a different unit, out of this runner's scope)

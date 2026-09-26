@@ -842,11 +842,6 @@
     },
     "4": {
       "classes": {
-        "DREAMSYS_METHODS": {
-          "class": "DreamSys",
-          "date": "2026-09-26",
-          "header": "include/DreamSys.h"
-        },
         "D_8006D3C8": {
           "class": "Class6D3C8",
           "date": "2026-09-26",
@@ -991,6 +986,11 @@
           "class": "DrawSystem",
           "date": "2026-09-26",
           "header": "include/DrawSystem.h"
+        },
+        "gDreamSysMethods": {
+          "class": "DreamSys",
+          "date": "2026-09-26",
+          "header": "include/DreamSys.h"
         },
         "gFlatLightObjMethods": {
           "class": "FlatLightObj",
