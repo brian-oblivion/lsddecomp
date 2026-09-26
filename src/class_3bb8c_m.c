@@ -60,6 +60,7 @@
  */
 #include "common.h"
 #include "class_3bb8c.h"
+#include "Class81940.h"
 #include "BoxFill.h"
 
 /* Forward declaration: defined later in this same unit, but called by
@@ -135,12 +136,12 @@ s32 ObjM__CheckAuxTrigger(ObjM *self) {
     s32 result;
     ChildM114 *child = self->unk14->methods->slot114(self->unk14, &out);
     void *thing = self->dreamSys->methods->getCurrentDayAndYear(self->dreamSys, 0);
-    result = TryDreamAuxTrigger(child->unk4->unk34, &out, thing);
+    result = TryDreamAuxTrigger((s32)child->unk4->dataBuffer, &out, thing);
     child->unk14 = result;
     if (result != 0) {
         return 0;
     }
-    child->unk4->methods->slot84(child->unk4);
+    child->unk4->methods->releaseDataBlock(child->unk4);
     return 1;
 }
 

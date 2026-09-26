@@ -23,6 +23,7 @@
  * names were chosen to agree with that vocabulary. */
 #include "common.h"
 #include "class_3bb8c.h"
+#include "Class81940.h"
 
 s32 Class866E8__FindElemIndexByUnk32(Obj866E8 *self, s32 key) {
     s32 result;
@@ -32,7 +33,7 @@ s32 Class866E8__FindElemIndexByUnk32(Obj866E8 *self, s32 key) {
     result = 0;
     for (i = 0; i < 7; i++) {
         e = &self->arr[i];
-        if (e->unk4->unk32 == key) {
+        if (e->unk4->ownerKey == key) {
             result = i;
             break;
         }
@@ -46,7 +47,7 @@ s32 Class866E8__FindElemIndexByUnk30(Obj866E8 *self, s32 key) {
 
     for (i = 0; i < 7; i++) {
         e = &self->arr[i];
-        if (e->unk4->unk30 == key && e->unk4->unk2C != 0) {
+        if (e->unk4->ownerRate == key && e->unk4->headerReady != 0) {
             return i;
         }
     }
@@ -335,7 +336,7 @@ void Class866E8__SetFootprintCellFlag(Obj866E8 *self, s32 setBit) {
     slot = self->gridSlots;
     for (i = 0; i < self->gridSlotCount; slot++, i++) {
         e = &self->arr[slot->elemIdx];
-        if (e->unk4->unk2C == 0) {
+        if (e->unk4->headerReady == 0) {
             continue;
         }
         cell = e->unk10 + slot->col + slot->row * 20;
