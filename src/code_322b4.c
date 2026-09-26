@@ -42,6 +42,7 @@
 #include "common.h"
 #include "CharSprite.h"
 #include "LightRig.h"
+#include "FlatLightObj.h"
 
 /* Local view of a D_8006EF50 (class id 0x5) object: only the three words its
  * +0x048..+0x058 accessors touch. */
@@ -62,7 +63,6 @@ struct D_8006EF50Methods {
     void (*reset)(D_8006EF50Obj *self, s32 a1); /* +0x040 = D8006EF50__Reset */
 };
 
-extern BasicClass *New_FlatLightObj(s32 lightId);
 extern void GsSetAmbient(long r, long g, long b);
 
 /* libgs GsIMAGE (LIBGS.H), as code_2bb9c.c defines it; Sprite.h keeps only
@@ -477,7 +477,7 @@ void LightRig__LightRig(LightRig *self) {
     GetClass6B5CCMethods()->ctor((Class6B5CC *)self);
     self->methods = GetLightRigMethods();
     for (i = 0, light = self->lights; i < 3; i++, light++) {
-        *light = New_FlatLightObj(i);
+        *light = (BasicClass *)New_FlatLightObj(i);
         self->methods->addChild(self, *light);
     }
     self->methods->reset(self);
