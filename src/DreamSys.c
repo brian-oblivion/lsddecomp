@@ -250,6 +250,9 @@ void DreamSys__TimerTick(DreamSys *this, s32 arg1, s32 arg2)
 
 	if (this->isFlashbackSession) {
 		if (this->state != 0 || this->methods->loadNextFlashback(this, 0)) {
+			/* Keeps the `state != 0` branch targeting this block's own
+			 * `this->tick = 0` + return tail; without it GCC cross-jumps that
+			 * branch to the identical tail after the notifyParents(0xA) call. */
 			__asm__("");
 			this->tick = 0;
 			return;
