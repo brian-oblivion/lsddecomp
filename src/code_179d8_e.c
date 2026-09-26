@@ -159,22 +159,13 @@ VabStreamObj *New_VabStreamObj(char *path) {
     return NULL;
 }
 
-/* Base-class table reached via the uncarved accessor `GetActiveDataSourceMethods()` --
- * not this unit's function to define.  Only the two slots this unit's own
- * functions dispatch through are typed, per the same convention as
- * code_179d8_d.c's own independent reading of the same physical table.
- * `GetActiveDataSourceMethods` (code_171e0.c) returns EITHER gVabDriverMethods (when
- * `gActiveDataSource == 0x23`) or the CD-driver class's own methods
- * otherwise -- see the unit header comment. */
-typedef struct DriverBaseMethods {
-    u8 pad000[0x008];
-    void (*slot08)(void *self);  /* VabStreamObj__VabStreamObj's own base-chain call */
-    /* VabStreamObj__Finalize's own base-chain call. Class6D430's finalize
-     * returns void; VabStreamObj__Finalize is void and discards this s32,
-     * byte-identical (round 87). */
-    s32 (*slot0C)(void *self);
-} DriverBaseMethods;
-extern DriverBaseMethods *GetActiveDataSourceMethods(void);
+/* GetActiveDataSourceMethods (code_171e0.c) returns gVabDriverMethods when
+ * gActiveDataSource is DATASOURCE_SPU and gCdDriverMethods otherwise; both
+ * are CLASS6D430_SLOTS tables, so it is typed Class6D430Methods * as in
+ * every other unit that calls it. VabStreamObj's ctor and finalize chain
+ * through its +0x008 ctor and +0x00C finalize (round 88; this unit's own
+ * DriverBaseMethods view, slot08/slot0C, until then). */
+extern Class6D430Methods *GetActiveDataSourceMethods(void);
 
 /* Sony's own VAB streaming calls (include/psyq/LIBSND.H), declared locally
  * per this project's convention of not sharing Psy-Q prototypes across
@@ -219,7 +210,7 @@ void VabStreamObj__VabStreamObj(VabStreamObj *self, char *path) {
     void *buf;
     char vhPath[0x20];
 
-    GetActiveDataSourceMethods()->slot08(self);
+    GetActiveDataSourceMethods()->ctor((Class6D430 *)self);
     self->methods = GetVabStreamObjMethods();
     self->vagAttrPool = NULL;
     self->progVagTable = NULL;
@@ -267,7 +258,7 @@ void VabStreamObj__Finalize(VabStreamObj *self) {
     BMemPMgrFree(self->vagAttrPool);
     BMemPMgrFree(self->progVagTable);
     BMemPMgrFree(self->baseFilename);
-    GetActiveDataSourceMethods()->slot0C(self);
+    GetActiveDataSourceMethods()->finalize((Class6D430 *)self);
 }
 
 void VabStreamObj__AdvanceLoadState(VabStreamObj *self) {
