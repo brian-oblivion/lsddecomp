@@ -36,6 +36,7 @@
 #include "common.h"
 #include "class_3bb8c.h"
 #include "Class6D940.h"
+#include "Class81940.h"
 
 s32 Class866E8__SetTargetAndBuildRates(Obj866E8 *self, void *arg1, Unk6CObj *arg2, Descriptor10 *arg3) {
     s32 stackBuf[3];
@@ -118,7 +119,7 @@ s32 Class866E8__UpdateFootprintTracking(Obj866E8 *self) {
     }
 
     e = buf.unk24;
-    key = e->unk4->unk32;
+    key = e->unk4->ownerKey;
     result = sFootprintResultRemap[key];
 
     if (self->unk68->unk4 == 0) {
@@ -190,7 +191,7 @@ void Class866E8__BuildRateEntries(Obj866E8 *self, s32 val, Unk54Struct *arg2, Ta
 
         for (i = 0; i < 7; i++) {
             e = &self->arr[i];
-            e->unk4->unk32 = e->unk2;
+            e->unk4->ownerKey = e->unk2;
         }
 
         self->methods->slotFC(self, stackBuf, count);
@@ -308,19 +309,19 @@ void Class866E8__ApplyRateEntries(Obj866E8 *self, SetupEntry866E8 *arr1, s32 cou
         e = self->methods->slot118(self, sp->id);
         self->methods->slot88(self, 6, e, i);
         if (arr1->ptr0 != 0) {
-            if (e->unk4->unk2C != 0) {
+            if (e->unk4->headerReady != 0) {
                 self->methods->slot108(self, e);
             }
-            e->unk4->unk30 = sp->rate;
-            e->unk4->methods->slot78(e->unk4, arr1->ptr0);
+            e->unk4->ownerRate = sp->rate;
+            ((Class81940LoadHeaderFn)e->unk4->methods->slot78)(e->unk4, arr1->ptr0);
             e->flag = 1;
             self->unk1B0 = 1;
         } else {
-            if (e->unk4->unk2C != 0) {
+            if (e->unk4->headerReady != 0) {
                 self->methods->slot108(self, e);
             }
             if (e->unk4->unk2A != 0) {
-                e->unk4->methods->slot74(e->unk4);
+                e->unk4->methods->cancelRequests(e->unk4);
                 e->flag = 0;
             }
         }
@@ -352,15 +353,15 @@ void Class866E8__OnNotifyTag1(Obj866E8 *self, void *arg1, s32 mode) {
     }
     for (i = 0; i < 7; i++) {
         e = &self->arr[i];
-        if (e->unk4->unk2E != 0) {
-            e->unk4->unk2E = 0;
+        if (e->unk4->dataReady != 0) {
+            e->unk4->dataReady = 0;
             self->methods->slot88(self, 7, e, i);
         }
         curMode = self->unk1B0;
         if (curMode == 1 && e->flag != 0) {
-            if (e->unk4->unk2C != 0) {
+            if (e->unk4->headerReady != 0) {
                 self->methods->slot104(self, e);
-                e->unk4->unk2C = 2;
+                e->unk4->headerReady = 2;
                 e->flag = 0;
                 if (--self->unk1B4 == 0) {
                     self->unk1B4 = 0;
@@ -382,13 +383,6 @@ void Class866E8__OnNotifyTag1(Obj866E8 *self, void *arg1, s32 mode) {
 /* Class866E8__LoadElementResources (Obj866E8Methods::slot104) -- own local view of several
  * classes reached only from here. Kept in this .c, not class_3bb8c.h: none
  * of the 11 sibling units sharing that header touch these. */
-
-/* ElemTarget::field10's pointee -- a small size/offset header block. */
-struct ResInfo866E8 {
-    u8 pad0[0x4];
-    s32 unk4;   /* +0x004 */
-    s32 unk8;   /* +0x008 */
-};
 
 /* Class6D940__ResolveEntry's non-0/non-(-1) return value (what
  * LinkResource__GetEntry returns) -- a resolved link-target record, read
@@ -424,9 +418,9 @@ extern void *New_LinkResource(BE54LoadReq *req);
 extern void GsLinkObject4(s32 tmd, void *objp, s32 n);
 
 void Class866E8__LoadElementResources(Obj866E8 *self, Elem *entry) {
-    ResInfo866E8 *info;
-    ResInfo866E8 *info2;
-    ElemTarget *hdr;
+    Class81940Header *info;
+    Class81940Header *info2;
+    Class81940 *hdr;
     Class6D940 *target;
     Class6D430 *res;
     EntryChildObj **slot;
@@ -447,15 +441,15 @@ void Class866E8__LoadElementResources(Obj866E8 *self, Elem *entry) {
 
     hdr = entry->unk4;
     target = entry->unk8;
-    info = hdr->field10;
-    target->buffer = (u8 *)info + info->unk4;
+    info = hdr->buffer;
+    target->buffer = (u8 *)info + info->gridOffset;
     target->bufferSize = 0;
     res = target->linkResource;
     if (res != 0) {
         res->methods->release(res);
     }
-    info2 = hdr->field10;
-    req.field0 = (s32)info2 + info2->unk4 + info2->unk8;
+    info2 = hdr->buffer;
+    req.field0 = (s32)info2 + info2->gridOffset + info2->gridSize;
     target->linkResource = New_LinkResource(&req);
     outBuf.next = 0;
 
@@ -521,8 +515,8 @@ void Class866E8__ResetElementCells(Obj866E8 *self, Elem *entry) {
     EntryChildObj **p;
     EntryChildObj **end;
 
-    if (entry->unk4->unk30 >= 0) {
-        entry->unk4->methods->slot7C(entry->unk4, entry);
+    if (entry->unk4->ownerRate >= 0) {
+        ((Class81940ReleaseHeaderElemFn)entry->unk4->methods->releaseHeader)(entry->unk4, entry);
         end = entry->unk10 + 0x19A;
         for (p = entry->unk10; p < end; p++) {
             (*p)->unk10 |= 0x80000000;
@@ -572,11 +566,11 @@ s32 Class866E8__ComputeFootprintDescriptor(Obj866E8 *self, Descriptor10Ext *out,
 
     e = self->methods->slot11C(self, in);
     if (e != 0) {
-        rate = e->unk4->unk30;
+        rate = e->unk4->ownerRate;
         out->unk28 = rate;
         Class866E8__ComputeDivisorSplit(self, (u8 *)out, rate);
 
-        u14a = self->methods->slot118(self, e->unk4->unk32)->unkC->unk14;
+        u14a = self->methods->slot118(self, e->unk4->ownerKey)->unkC->unk14;
         out->unkC = u14a->unk18.w + 0x5000;
         out->unk10 = u14a->unk1C;
         out->unk14 = u14a->unk20.w + 0x5000;
@@ -617,7 +611,7 @@ void Class866E8__ComputeDivisorSplit(Obj866E8 *self, u8 *out, s32 val) {
 }
 
 Unk1BCObj *Class866E8__GetLastTargetRateSplit(Obj866E8 *self, u8 *out) {
-    Class866E8__ComputeDivisorSplit(self, out, self->unk1BC->unk4->unk30);
+    Class866E8__ComputeDivisorSplit(self, out, self->unk1BC->unk4->ownerRate);
     return self->unk1BC;
 }
 
@@ -627,7 +621,7 @@ Elem *Class866E8__FindElemByUnk32(Obj866E8 *self, s32 key) {
 
     for (i = 0; i < 7; i++) {
         e = &self->arr[i];
-        if (e->unk4->unk32 == key) {
+        if (e->unk4->ownerKey == key) {
             return e;
         }
     }

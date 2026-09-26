@@ -24,8 +24,6 @@
  * concrete types; the rest stay opaque padding.
  */
 typedef struct Obj866E8 Obj866E8;
-typedef struct ElemTargetMethods ElemTargetMethods;
-typedef struct ElemTarget ElemTarget;
 typedef struct EntryChildObj EntryChildObj;
 typedef struct Elem Elem;
 typedef struct UnkCObj UnkCObj;
@@ -35,7 +33,6 @@ typedef struct Unk6CObj Unk6CObj;
 typedef struct Unk6C14Obj Unk6C14Obj;
 typedef struct Unk6C14SubObj Unk6C14SubObj;
 typedef struct QueryTemplate866E8 QueryTemplate866E8;
-typedef struct ResInfo866E8 ResInfo866E8;
 typedef struct EntryGpu EntryGpu;
 
 /* self+0x54: an inline (not pointer) 3-word sub-struct, dereferenced by
@@ -127,7 +124,7 @@ typedef struct Descriptor10Ext {
     s32 unk1C;           /* +0x01C */
     s32 unk20;           /* +0x020 */
     Elem *unk24;         /* +0x024, Class866E8__ComputeFootprintDescriptor: the Elem it resolved via slot11C */
-    s32 unk28;           /* +0x028, Class866E8__ComputeFootprintDescriptor: the raw ElemTarget->unk30 rate, sign-extended */
+    s32 unk28;           /* +0x028, Class866E8__ComputeFootprintDescriptor: the raw Class81940::ownerRate, sign-extended */
 } Descriptor10Ext;
 
 /*
@@ -151,10 +148,10 @@ typedef struct QueryPos866E8 {
  * Class866E8__ApplyRateEntries's 2nd parameter: a 0xC-byte-strided array, one entry per
  * loop iteration. Established from that function alone: `ptr0` is tested
  * for NULL to pick a branch and then, on the non-NULL branch, forwarded
- * VERBATIM (untouched) to `ElemTargetMethods::slot78` -- consistent with a
+ * VERBATIM (untouched) to the element's Class81940 +0x078 (loadHeader's name) -- consistent with a
  * pointer, though its pointee is never dereferenced in this unit; `rate`
  * is read as a plain halfword and copied into the resolved Elem's
- * `unk4->unk30` (already an `s16` there); `id` is read as a full word and
+ * `unk4->ownerRate` (an `s16` there); `id` is read as a full word and
  * passed as `Obj866E8Methods::slot118`'s index argument.
  *
  * NOTE for whoever revisits Class866E8__ApplyRateEntries: retail walks `ptr0` and the
@@ -277,7 +274,7 @@ extern const s32 sRateKeyMask[7];
  * where `sRateOffsetTable` above is not). */
 extern const Unk54Struct sRateEntryTable[7];
 
-/* `ElemTarget::unk32`-indexed remap table, read by Class866E8__UpdateFootprintTracking as a
+/* `Class81940::ownerKey`-indexed remap table, read by Class866E8__UpdateFootprintTracking as a
  * signed byte (`lb`). 8-entry bound is PROVEN, not guessed: the data file
  * (`asm/data/76DC8.data.s`) places exactly 8 bytes here (values
  * `01 02 03 00 04 05 06 00`) before `sDefaultTargetSpecs` starts. The fetched byte
@@ -449,44 +446,6 @@ struct UnkCObj {
     Unk14Obj *unk14;    /* +0x014, Class866E8__FindElementForPosition */
 };
 
-/* self+0xEC's array-element target object. Class866E8__ResetElementCells dispatches
- * through its own method table (offset 0) and reads a signed halfword at
- * +0x030; Class866E8__GetLastTargetRateSplit (via self->unk1BC->unk4) and Class866E8__ComputeFootprintDescriptor (not
- * this round's function) read the SAME +0x030 field, and Class866E8__FindElemByUnk32
- * (already matched) established +0x032. Class866E8__OnNotifyTag1 additionally reads
- * +0x02A/+0x02C/+0x02E on this same pointer. */
-struct ElemTargetMethods {
-    u8 pad000[0x74];
-    /* = called by Class866E8__ApplyRateEntries (this round) as `e->unk4->methods->slot74(
-     * e->unk4)` when `e->unk4->unk2A != 0`, right before zeroing the
-     * Elem's own `flag`. Single arg (self), return unused. */
-    void (*slot74)(ElemTarget *self);  /* +0x074 */
-    /* = called by Class866E8__ApplyRateEntries (this round) as `e->unk4->methods->slot78(
-     * e->unk4, arr1[i].ptr0)` -- the SAME raw pointer that gated the
-     * branch (tested non-NULL, then forwarded verbatim). Return unused. */
-    void (*slot78)(ElemTarget *self, void *arg1);  /* +0x078 */
-    /* Called by Class866E8__ResetElementCells as `entry->unk4->methods->slot7C(entry->unk4,
-     * entry)` -- dispatch target is the ElemTarget itself, not self. */
-    void (*slot7C)(ElemTarget *self, Elem *entry);  /* +0x07C */
-};
-
-struct ElemTarget {
-    ElemTargetMethods *methods;    /* +0x000, Class866E8__ResetElementCells */
-    u8 pad004[0x010 - 0x004];
-    /* Class866E8__LoadElementResources: a small size/offset header block, read at ITS OWN
-     * +0x004 and +0x008 (both s32) and combined with this pointer's own
-     * address to build byte ranges for a resource-load request. Full body
-     * (`ResInfo866E8`) kept in class_3bb8c.c -- nothing else in this unit
-     * needs it. */
-    ResInfo866E8 *field10;          /* +0x010, Class866E8__LoadElementResources */
-    u8 pad014[0x02A - 0x014];
-    u16 unk2A;                     /* +0x02A, Class866E8__OnNotifyTag1 */
-    s16 unk2C;                     /* +0x02C, Class866E8__OnNotifyTag1/Class866E8__FindElemIndexByUnk30 (nonzero test) */
-    s16 unk2E;                     /* +0x02E, Class866E8__OnNotifyTag1 */
-    s16 unk30;                     /* +0x030, Class866E8__ResetElementCells/Class866E8__GetLastTargetRateSplit/Class866E8__FindElemIndexByUnk30 */
-    s16 unk32;                     /* +0x032, Class866E8__FindElemByUnk32/Class866E8__FindElemIndexByUnk32 */
-};
-
 /*
  * self+0xEC's array element, one of Obj866E8::arr[7]. Established from
  * Class866E8__CountFlaggedElements (+0x000), Class866E8__FindElemByUnk32 (+0x004), and this round's
@@ -502,7 +461,7 @@ struct Elem {
      * separate loop over all 7 elements, copied onward into
      * `unk4->unk32` (already established). */
     u16 unk2;                      /* +0x002 */
-    ElemTarget *unk4;               /* +0x004 */
+    struct Class81940 *unk4;        /* +0x004, New_Class81940 (Class866E8__Class866E8); include/Class81940.h */
     /* New_Class6D940(0) (Class866E8__Class866E8): the element's placement
      * grid; Class866E8__LoadElementResources points its buffer into the
      * element's resource and walks its +0x078 (Class6D940__ResolveEntry)
@@ -559,13 +518,12 @@ struct EntryChildObj {
 
 /*
  * Opaque target of self->unk1BC. Only field established: Class866E8__GetLastTargetRateSplit
- * reads +0x004, a pointer that turns out to be the same ElemTarget type
- * (its own +0x030 field is read straight afterward, matching ElemTarget's
- * already-established +0x030).
+ * reads +0x004, an element's Class81940 (its +0x030 ownerRate is read
+ * straight afterward).
  */
 struct Unk1BCObj {
     u8 pad0[0x4];
-    ElemTarget *unk4;               /* +0x004, Class866E8__GetLastTargetRateSplit */
+    struct Class81940 *unk4;        /* +0x004, Class866E8__GetLastTargetRateSplit */
 };
 
 /*
@@ -1955,8 +1913,6 @@ typedef struct DreamSysMethods_3bb8c_m DreamSysMethods_3bb8c_m;
 typedef struct ChildM_AC ChildM_AC;
 typedef struct ChildM_ACMethods ChildM_ACMethods;
 typedef struct ChildM114 ChildM114;
-typedef struct SubM4 SubM4;
-typedef struct SubM4Methods SubM4Methods;
 typedef struct ParamM ParamM;
 typedef struct ParamMMethods ParamMMethods;
 typedef struct FieldM34 FieldM34;
@@ -2035,18 +1991,9 @@ struct FieldM14 {
 };
 
 /* Returned by FieldM14Methods::slot114 (ObjM__CheckAuxTrigger). */
-struct SubM4Methods {
-    u8 pad000[0x084];
-    void (*slot84)(SubM4 *self);  /* +0x084, ObjM__CheckAuxTrigger */
-};
-struct SubM4 {
-    SubM4Methods *methods;      /* +0x000 */
-    u8 pad004[0x034 - 0x004];
-    s32 unk34;                   /* +0x034, ObjM__CheckAuxTrigger */
-};
 struct ChildM114 {
     u8 pad0[0x004];
-    SubM4 *unk4;                 /* +0x004, ObjM__CheckAuxTrigger */
+    struct Class81940 *unk4;     /* +0x004, ObjM__CheckAuxTrigger: an element's Class81940 (include/Class81940.h) */
     u8 pad8[0x014 - 0x008];
     s32 unk14;                    /* +0x014, ObjM__CheckAuxTrigger: set from TryDreamAuxTrigger's return */
 };
