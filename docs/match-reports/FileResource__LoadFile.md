@@ -95,14 +95,14 @@ emitted a **separate, non-delay-slot** `move a0,s2` plus a redundant
 `move a1,zero` in the delay slot — i.e. two wrong instructions from supplying
 an argument retail's call site never sets up at all.
 
-Cross-checked against `docs/match-reports/New_Class6D3C8.md` (a different
+Cross-checked against `docs/match-reports/New_GameApplication.md` (a different
 unit, `code_1677c`), which independently derived `BMemPMgrAlloc(0x2C)` — one
 argument — for the same function. **The two-argument signature in
 `include/class_16334.h` (`s32 size, s32 zone`) is wrong**; it was never
 exercised against a call site where the phantom second argument's register
 happened to differ from whatever was already sitting in `$a1`, so the bug was
 invisible there. `include/code_171e0.h` now declares the one-argument form
-locally with a comment pointing at `New_Class6D3C8.md` as the confirming
+locally with a comment pointing at `New_GameApplication.md` as the confirming
 evidence; `class_16334.h` is out of this unit's scope to fix, but is flagged
 below as a proposed learning / spawn candidate.
 
@@ -134,7 +134,7 @@ See `docs/match-reports/BMemPMgrAlloc.md`, `## Extern arity (round 59)`.
 **`BMemPMgrAlloc` takes one argument (`size`), not two.**
 `include/class_16334.h:74`'s `extern void *BMemPMgrAlloc(s32 size, s32 zone);`
 should be corrected to `extern void *BMemPMgrAlloc(s32 size);` — confirmed
-independently in two units (`New_Class6D3C8` in `code_1677c`, and this
+independently in two units (`New_GameApplication` in `code_1677c`, and this
 function). Left unfixed for now since `class_16334.h` is outside this unit's
 scope; flagged for a spawned follow-up.
 

@@ -108,4 +108,4 @@ Its up-calls to TaskCore (include/TaskCore.h, track 4 round 84) now go through `
 
 ## Track 4 (2026-09-26, round 88, bravo)
 
-Class86B60 is unified in include/Class86B60.h (TASKCORE_SLOTS/TASKCORE_FIELDS plus its own). `state` (+0x058) is TaskCore's `activeSlot` and `unk38` its `result` (TaskCore__Init returns it: 0 on activeSlot 1, 2 on activeSlot 4, the value Class6D3C8__PollGraphRoomStatus retries on); slot94 is refreshViewValue, slot130/134 this class's updateMemcardSaveWithIcon/updateMemcardSaveStatus. Byte-identical (whole image green, 0 new warnings, nonmatching green).
+Class86B60 is unified in include/Class86B60.h (TASKCORE_SLOTS/TASKCORE_FIELDS plus its own). `state` (+0x058) is TaskCore's `activeSlot` and `unk38` its `result` (TaskCore__Init returns it: 0 on activeSlot 1, 2 on activeSlot 4, the value GameApplication__PollGraphRoomStatus retries on); slot94 is refreshViewValue, slot130/134 this class's updateMemcardSaveWithIcon/updateMemcardSaveStatus. Byte-identical (whole image green, 0 new warnings, nonmatching green).

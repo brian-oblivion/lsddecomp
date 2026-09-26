@@ -82,7 +82,7 @@ initialized at declaration and conditionally overwritten -- not as an
 `if { a = X; } else { a = default; }` pair. The two forms are
 value-equivalent but the register the compiler settles on for the
 whole-function-tail lifetime of the variable can differ between them; this
-matches the project's existing `New_Class6D3C8`/`strcat`
+matches the project's existing `New_GameApplication`/`strcat`
 "how a value is mentioned, not how it's computed" finding, but for
 *initialization* shape rather than *return* shape.
 

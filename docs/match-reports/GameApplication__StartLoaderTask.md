@@ -1,4 +1,6 @@
-# Class6D3C8__StartLoaderTask
+# GameApplication__StartLoaderTask
+
+> Renamed from `Class6D3C8__StartLoaderTask` on 2026-09-26 (tools/rename.py). Address 0x80026254.
 
 > Renamed from `func_80026254` on 2026-09-24 (tools/rename.py). Address 0x80026254.
 
@@ -8,21 +10,21 @@
 
 Registers a "loader" task for a named resource: allocates a `LoaderTask`
 (`New_TaskCore`, a `New_X`-shaped allocator in uncarved `code_2c054`, 0xA4
-bytes), gives it a completion callback (`Class6D3C8__LoaderTaskDoneCallback`, already matched in
+bytes), gives it a completion callback (`GameApplication__LoaderTaskDoneCallback`, already matched in
 this unit) and a context pointer (`self`), then sets its remaining
 parameters (`path`, `self->unk1C`) and starts it. Called twice by
-`Class6D3C8__LoadIntroLogoSequence` (already matched, same unit), once for
+`GameApplication__LoadIntroLogoSequence` (already matched, same unit), once for
 `"ETC\ASMKLOGO.TIM"` and once for `"ETC\OSDLOGO.TIM"`.
 
 ## Derivation
 
 ```
 jal  New_TaskCore(0, 0, 0)             ; -> s0 = task
-lui  $a1, %hi(Class6D3C8__LoaderTaskDoneCallback)
-addiu $a1, $a1, %lo(Class6D3C8__LoaderTaskDoneCallback)
+lui  $a1, %hi(GameApplication__LoaderTaskDoneCallback)
+addiu $a1, $a1, %lo(GameApplication__LoaderTaskDoneCallback)
 lw   $v0, 0x0($s0)                       ; task->methods
 lw   $v0, 0x98($v0)                       ; slot98
-jalr $v0                                    ; task->methods->slot98(task, &Class6D3C8__LoaderTaskDoneCallback, self)
+jalr $v0                                    ; task->methods->slot98(task, &GameApplication__LoaderTaskDoneCallback, self)
  a2 = s1 (self)
 lw   $v0, 0x0($s0)
 lw   $v0, 0x6C($v0)                          ; slot6C
@@ -45,10 +47,10 @@ jalr $v0                                                    ; task->methods->slo
 ```
 
 ```c
-void Class6D3C8__StartLoaderTask(Class6D3C8 *self, const char *path) {
+void GameApplication__StartLoaderTask(GameApplication *self, const char *path) {
     LoaderTask *task = New_TaskCore(0, 0, 0);
 
-    task->methods->slot98(task, Class6D3C8__LoaderTaskDoneCallback, self);
+    task->methods->slot98(task, GameApplication__LoaderTaskDoneCallback, self);
     task->methods->slot6C(task, 0);
     task->methods->slotD4(task, path, 0);
     task->methods->slot44(task, self->unk1C, 0);
@@ -56,19 +58,19 @@ void Class6D3C8__StartLoaderTask(Class6D3C8 *self, const char *path) {
 }
 ```
 
-Matched first attempt: the caller (`Class6D3C8__LoadIntroLogoSequence`) had already forced a
+Matched first attempt: the caller (`GameApplication__LoadIntroLogoSequence`) had already forced a
 careful read of this exact vtable-call idiom (task->methods reloaded fresh
-before every dispatch), and `Class6D3C8__LoaderTaskDoneCallback`'s signature (`s32 (void)`)
+before every dispatch), and `GameApplication__LoaderTaskDoneCallback`'s signature (`s32 (void)`)
 happened to be exactly the type `slot98`'s callback parameter needed, so no
 cast was required.
 
 ## New struct/header knowledge
 
-`include/Class6D3C8.h`: added `LoaderTaskMethods`/`LoaderTask` (the class
+`include/GameApplication.h`: added `LoaderTaskMethods`/`LoaderTask` (the class
 behind `New_TaskCore`, distinct from `StreamTaskMethods` used by
-`Class6D3C8__LoadIntroLogoSequence` -- different allocator, different signatures at the same
+`GameApplication__LoadIntroLogoSequence` -- different allocator, different signatures at the same
 slot offsets) and the `New_TaskCore` extern. Forward-declared
-`Class6D3C8__LoaderTaskDoneCallback` (defined later in this same file/ROM order) so it can be
+`GameApplication__LoaderTaskDoneCallback` (defined later in this same file/ROM order) so it can be
 passed as `slot98`'s callback argument.
 
 ## Proposed learning
@@ -90,16 +92,16 @@ offset against an already-typed sibling class.
 
 ## Naming
 
-**`Class6D3C8__StartLoaderTask` -- tier A.** Pure leaf helper, mechanics ARE
+**`GameApplication__StartLoaderTask` -- tier A.** Pure leaf helper, mechanics ARE
 the purpose: allocates a `LoaderTask` (`New_TaskCore`), registers a
-completion callback and context (`slot98`, `Class6D3C8__LoaderTaskDoneCallback`,
+completion callback and context (`slot98`, `GameApplication__LoaderTaskDoneCallback`,
 `self`), sets its remaining parameters (path, `self->unk1C`) via `slot6C`/
 `slotD4`/`slot44`, and starts it (`start`, this unit's renamed
 `LoaderTaskMethods.start`). Called twice from
-`Class6D3C8__LoadIntroLogoSequence` with two different fixed paths, so the
+`GameApplication__LoadIntroLogoSequence` with two different fixed paths, so the
 name is generic to the mechanic (registering and starting a LoaderTask for
 a given resource path) rather than either specific asset.
 
 ## Track 4 (2026-09-25, round 84, alpha)
 
-The task these functions build with New_TaskCore is a plain TaskCore (include/TaskCore.h, track 4 round 84); Class6D3C8.h's LoaderTask view is gone and the calls use TaskCore's slot names (setCallback, setFrameBound, setSubHandle, init, release). The old `start` slot at +0x004 is BasicClass's release, and StreamTask's own +0x004 is typed `void *(*release)` too: with one void and one value-returning, StartCinematicStream's two branches stopped cross-jumping into one call (+6 instructions). Byte-identical.
+The task these functions build with New_TaskCore is a plain TaskCore (include/TaskCore.h, track 4 round 84); GameApplication.h's LoaderTask view is gone and the calls use TaskCore's slot names (setCallback, setFrameBound, setSubHandle, init, release). The old `start` slot at +0x004 is BasicClass's release, and StreamTask's own +0x004 is typed `void *(*release)` too: with one void and one value-returning, StartCinematicStream's two branches stopped cross-jumping into one call (+6 instructions). Byte-identical.

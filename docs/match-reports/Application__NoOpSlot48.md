@@ -9,7 +9,7 @@
 ## What it does
 
 Empty. Slot `+0x048` of gApplicationMethods, the third of the class's own four
-slots; Class6D3C8 inherits it unchanged. No caller dispatches it in carved
+slots; GameApplication inherits it unchanged. No caller dispatches it in carved
 code that this unit sees.
 
 ```c

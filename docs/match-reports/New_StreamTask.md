@@ -62,7 +62,7 @@ updated with what survived and what did not.
 **New_StreamTask** -- tier A. Canonical `New_X` allocator shape (allocate,
 dispatch the ctor slot, return); the class is independently established both
 by `gStreamTaskMethods`'s own ctor-slot dispatch (`classtable.py`) and by
-`include/Class6D3C8.h`'s cross-unit `StreamTask` view of the same call site.
+`include/GameApplication.h`'s cross-unit `StreamTask` view of the same call site.
 
 ## Track 4 (2026-09-25, round 84, alpha)
 
@@ -70,4 +70,4 @@ StreamTaskObj's table now expands TASKCORE_SLOTS (include/TaskCore.h, round 84):
 
 ## Track 4 (2026-09-26, round 87)
 
-Renamed with the class unification (gStreamTaskObjMethods -> class StreamTask, include/StreamTask.h): the `Obj` suffix is dropped (track 4 step 2; include/Class6D3C8.h already viewed the class as `StreamTask`). The 0xDC-byte allocator.
+Renamed with the class unification (gStreamTaskObjMethods -> class StreamTask, include/StreamTask.h): the `Obj` suffix is dropped (track 4 step 2; include/GameApplication.h already viewed the class as `StreamTask`). The 0xDC-byte allocator.

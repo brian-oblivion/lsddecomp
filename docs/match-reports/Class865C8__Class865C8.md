@@ -197,8 +197,8 @@ needed anywhere in this 107-word function.
   *arg1)`).
 - New local type `LoadRequest` (`{ s32 type; const char *path; s32 unk08;
   s32 unk0C; }`, 0x10 bytes) — this unit's own local view of the SAME
-  request-block shape `Class6D3C8.h` already established as
-  `LoadModelRequest` at a different unit's ctor (`Class6D3C8__Class6D3C8`); reused
+  request-block shape `GameApplication.h` already established as
+  `LoadModelRequest` at a different unit's ctor (`GameApplication__GameApplication`); reused
   here rather than cross-including that header, per the per-unit-view
   convention. Declared 0x10 bytes (4 fields) even though only the first two
   are written, per that report's own hard-won lesson ("local struct SIZE
@@ -209,7 +209,7 @@ needed anywhere in this 107-word function.
   a DIFFERENT (but ABI-compatible) type than an existing declaration
   elsewhere in the project (`New_LinkResource`, `func_8004A070`,
   `SetActiveDataSourceDriverMode`, `New_Class866E8`) — all four already have an extern
-  somewhere else (`Class6D3C8.h` or `code_1677c.c`); this unit keeps its
+  somewhere else (`GameApplication.h` or `code_1677c.c`); this unit keeps its
   own local view rather than cross-including, per established policy. The
   other five (`GetSoundEffectDir`, `InitDreamAux`, `New_TimImage`,
   `PickWeeklyGroup`, `New_WBgm`, `New_NodeGuardedViewport`, `New_FrameClock`) are

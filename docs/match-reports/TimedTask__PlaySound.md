@@ -45,7 +45,7 @@ which can only be `TimedTask__PlaySound`'s own second parameter, forwarded uncha
 (no `move` needed since it's already resident in the right register).
 
 Named the two classes by vtable address per project convention (see
-`Class6D3C8.h`): `TimedTask` (gTimedTaskMethods) and `Class866E8` (gClass866E8Methods).
+`GameApplication.h`): `TimedTask` (gTimedTaskMethods) and `Class866E8` (gClass866E8Methods).
 Both declared in the new `include/class_3ac78.h`.
 
 ## Proposed learning

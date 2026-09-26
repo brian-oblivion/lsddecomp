@@ -88,4 +88,4 @@ pair turns up.
 
 ## Track 4
 
-2026-09-25, round 84 (bravo): class unified in `include/TimedTask.h`. Not renamed. Signature `s32 (TimedTask *self, IntermediateBaseInitArgs *args, s32 mode)`, IntermediateBase's `init` slot; `eventCode` is `result`, which Class6D3C8__PollStatusObj switches on through Obj865C8 (1 is a timeout, TimedTask__SetState's state 4). Class865C8__Init and ObjM__AttachTarget call it as `GetTimedTaskMethods()->init((TimedTask *)self, (IntermediateBaseInitArgs *)..., mode)`. Image byte-identical.
+2026-09-25, round 84 (bravo): class unified in `include/TimedTask.h`. Not renamed. Signature `s32 (TimedTask *self, IntermediateBaseInitArgs *args, s32 mode)`, IntermediateBase's `init` slot; `eventCode` is `result`, which GameApplication__PollStatusObj switches on through Obj865C8 (1 is a timeout, TimedTask__SetState's state 4). Class865C8__Init and ObjM__AttachTarget call it as `GetTimedTaskMethods()->init((TimedTask *)self, (IntermediateBaseInitArgs *)..., mode)`. Image byte-identical.

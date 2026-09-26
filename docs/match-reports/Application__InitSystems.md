@@ -8,7 +8,7 @@
 
 ## What it does
 
-Slot `+0x044` of gApplicationMethods; Class6D3C8's own +0x044
+Slot `+0x044` of gApplicationMethods; GameApplication's own +0x044
 (ForwardToBaseSlot44UnlessFlagged) forwards here. One-time system init,
 guarded by `self->initialized` (+0x18):
 
@@ -62,11 +62,11 @@ established, only which SDK calls it makes.
 **2026-09-25, round 84 (echo).** The class is declared once, in
 `include/Application.h`. The parameters are now `drawSystem` and `pad`, and
 the aux block's first two fields likewise: the one caller chain is main()
--> Class6D3C8's +0x044 override -> this slot, and main passes
+-> GameApplication's +0x044 override -> this slot, and main passes
 `New_DrawSystem()` and `New_Pad(0, 0)` (src/main.c). The draw system's
 +0x044 slot is `initGraph` (DrawSystem__InitGraph), `dimsArg` is `vramMode`.
 The slot type (`APPLICATION_SLOTS`) carries a fourth `s32` argument this body
-does not declare: Class6D3C8__InitSystems calls the slot
+does not declare: GameApplication__InitSystems calls the slot
 with `(self, a1, a2, 0)`, and the `move a3,zero` in its jalr delay slot is
 retail's. The slot's return is `void`, the occupant's; the old subclass view
 typed it `s32`, and its one caller ignores $v0. Bytes unchanged.

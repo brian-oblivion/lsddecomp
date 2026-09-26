@@ -7,8 +7,8 @@
  * (include/Actor.h); no class derives from it. The ctor calls Actor's first
  * (DreamSys__DreamSys: GetActorMethods()->ctor), so the id parent is the
  * ctor-chain parent. Every method is in src/DreamSys.c. One instance, made
- * by Class6D3C8__Class6D3C8 (src/code_1677c.c, New_DreamSys) and kept in
- * Class6D3C8::dreamSys; the same object is GraphRoom::dreamSys, the
+ * by GameApplication__GameApplication (src/code_1677c.c, New_DreamSys) and kept in
+ * GameApplication::dreamSys; the same object is GraphRoom::dreamSys, the
  * `target` class_3bb8c_l hands SetDreamAuxWorld (code_4cd08's
  * gDreamAuxWorld), and the `peer` every Entity links to.
  *
@@ -291,7 +291,7 @@ struct Viewport;
 struct LinkResource;
 
 /* DreamSys__DreamSys's `arg1` is a LinkResource (include/LinkResource.h;
-   Class6D3C8__Class6D3C8 passes New_LinkResource("ETC\DREAME5.TMD")): the
+   GameApplication__GameApplication passes New_LinkResource("ETC\DREAME5.TMD")): the
    ctor keeps it in modelSource and adds its getModel(0), a TmdModel, as a
    child. This header used to carry that view as DreamSysCtorArgObj /
    DreamSysCtorArgMethods (deleted round 89, track 4). */
@@ -770,7 +770,7 @@ struct DreamSysMethods {
     /* +0x21C */ void (*resetFlashbackList)(DreamSys *self); /* DreamSys__ResetFlashbackList */
     /* +0x220 */ void (*saveLinkSnapshot)(DreamSys *self); /* DreamSys__SaveLinkSnapshot: coord2 and its param into the snapshot fields */
     /* +0x224 */ void (*restoreLinkSnapshot)(DreamSys *self); /* DreamSys__RestoreLinkSnapshot */
-    /* +0x228 */ s32 (*slot228)(DreamSys *self, s32 value); /* DreamSys__func_5ba20: get/set; Class6D3C8__Class6D3C8 calls it */
+    /* +0x228 */ s32 (*slot228)(DreamSys *self, s32 value); /* DreamSys__func_5ba20: get/set; GameApplication__GameApplication calls it */
 }; /* 139 slots, 0x22C bytes */
 
 /* reset (+0x040) as DreamSys__DreamSys calls it (see above). */
@@ -1042,7 +1042,7 @@ DreamSysMethods *Get_vtable_DreamSys(void);
 
 /* @brief Allocates and constructs a DreamSys instance.
  * Still INCLUDE_ASM in src/DreamSys.c; declared here so other units'
- * matched C (e.g. Class6D3C8__Class6D3C8 in src/code_1677c.c) can call it -- see
+ * matched C (e.g. GameApplication__GameApplication in src/code_1677c.c) can call it -- see
  * "Calling into a function that is still INCLUDE_ASM in another unit is
  * fine" in docs/DECOMPILATION_LEARNINGS.md. */
 DreamSys *New_DreamSys(struct LinkResource *arg0, s32 arg1, s32 arg2);

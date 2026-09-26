@@ -43,4 +43,4 @@ five described in `StreamTask__SetUnkC4`'s report; same convention.
 
 ## Track 4 (2026-09-26, round 87)
 
-Renamed with the class unification (gStreamTaskObjMethods -> class StreamTask, include/StreamTask.h): the `Obj` suffix is dropped (track 4 step 2; include/Class6D3C8.h already viewed the class as `StreamTask`). Was StreamTaskObj__SetUnkC8. Own slot +0x128. unkC8 is MoviePlayer__Play's fourth argument, which Play stores at the player's +0x058, the field MoviePlayer__Advance counts down as `loops`; StreamTask__Reset sets it to -1. Field `loopCount`, slot `setLoopCount`.
+Renamed with the class unification (gStreamTaskObjMethods -> class StreamTask, include/StreamTask.h): the `Obj` suffix is dropped (track 4 step 2; include/GameApplication.h already viewed the class as `StreamTask`). Was StreamTaskObj__SetUnkC8. Own slot +0x128. unkC8 is MoviePlayer__Play's fourth argument, which Play stores at the player's +0x058, the field MoviePlayer__Advance counts down as `loops`; StreamTask__Reset sets it to -1. Field `loopCount`, slot `setLoopCount`.

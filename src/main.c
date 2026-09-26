@@ -2,7 +2,7 @@
  * The game's entry point. `main` (formerly `func_800118DC`) is called
  * directly by Sony's `crt0` (config/splat.slps01556.lsdde.yaml, the `main`
  * c-segment) and runs once: it sets the Psy-Q memory mode, stands up the
- * game's `BMemPMgr` heap, constructs the root `Class6D3C8` object from a
+ * game's `BMemPMgr` heap, constructs the root `GameApplication` object from a
  * fixed ctor-args block, opens a `Pad`, and dispatches into the root
  * object's own vtable (+0x044, +0x04C) before returning. It never loops --
  * the real game loop lives inside whatever the dispatched vtable slots (or
@@ -16,7 +16,7 @@
  * entry). It lives here as matched C only because no object places it.
  */
 #include "common.h"
-#include "Class6D3C8.h"
+#include "GameApplication.h"
 #include "class_16334.h"
 
 /* Local, opaque: nothing here dereferences a BMemPMgr (code_8220.h), it
@@ -40,11 +40,11 @@ extern void *BMemPMgrInit(); /* arity-ok: the dead 2nd argument IS byte-load-bea
  * existed until now). */
 extern void SetDefaultBMemPMgr(BMemPMgr *pool);
 
-/* New_DrawSystem comes from include/DrawSystem.h (through Class6D3C8.h). */
+/* New_DrawSystem comes from include/DrawSystem.h (through GameApplication.h). */
 
 extern BMemPMgr *gStartupBMemPMgr;
-extern Class6D3C8 *gClass6D3C8;
-extern Class6D3C8CtorArgs gClass6D3C8CtorArgs;
+extern GameApplication *gGameApplication;
+extern GameApplicationConfig gGameApplicationConfig;
 
 void main(void) {
     DrawSystem *obj;
@@ -53,12 +53,12 @@ void main(void) {
     SetMem(2);
     gStartupBMemPMgr = BMemPMgrInit(0x166C00, 0);
     SetDefaultBMemPMgr(gStartupBMemPMgr);
-    gClass6D3C8 = New_Class6D3C8(&gClass6D3C8CtorArgs);
+    gGameApplication = New_GameApplication(&gGameApplicationConfig);
     obj = New_DrawSystem();
     pad = New_Pad(0, 0);
-    /* Class6D3C8__InitSystems takes no 4th argument: include/Class6D3C8.h. */
-    ((Class6D3C8InitSystemsFn)gClass6D3C8->methods->initSystems)(gClass6D3C8, obj, pad);
-    gClass6D3C8->methods->runMainLoop(gClass6D3C8);
+    /* GameApplication__InitSystems takes no 4th argument: include/GameApplication.h. */
+    ((GameApplicationInitSystemsFn)gGameApplication->methods->initSystems)(gGameApplication, obj, pad);
+    gGameApplication->methods->runMainLoop(gGameApplication);
 }
 
 /* Sony's _obj/none (round 79); the call to it is cc1's, inside main. */

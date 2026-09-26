@@ -7,7 +7,7 @@ FINISHING-PLAN revision 18). Fresh ground, no prior attempt. Byte-exact on
 the first build; whole-image SHA1 green.
 
 - **Where:** not a slot; called from src/code_1677c.c.
-- **What:** `if (typeCodeOut != NULL) *typeCodeOut = 0x31; return sAsmkStreamPath;` -- signature copied from `include/Class6D3C8.h` (`const char *`; rodata `sAsmkStreamPath` referenced as a symbol, no literal).
+- **What:** `if (typeCodeOut != NULL) *typeCodeOut = 0x31; return sAsmkStreamPath;` -- signature copied from `include/GameApplication.h` (`const char *`; rodata `sAsmkStreamPath` referenced as a symbol, no literal).
 - **Levers:** none needed.
 - **Name:** kept `func_`; role not yet identified beyond the above.
 
@@ -26,4 +26,4 @@ const char *GetIntroStreamName(s32 *typeCodeOut) {
 
 - **Name:** `GetIntroStreamName`
 - **Tier:** A
-- **Evidence:** its one caller, Class6D3C8__LoadIntroLogoSequence, uses the returned path directly as a StreamTask's stream name; matches exactly.
+- **Evidence:** its one caller, GameApplication__LoadIntroLogoSequence, uses the returned path directly as a StreamTask's stream name; matches exactly.

@@ -18,7 +18,7 @@ ApplicationMethods *GetApplicationMethods(void) {
 
 ## Declarations
 
-`include/Class6D3C8.h` already declares `extern MiddleClassMethods
+`include/GameApplication.h` already declares `extern MiddleClassMethods
 *func_8003B20C(void);` with its own view of the table. This unit does NOT
 include that header and declares its own local `ApplicationMethods` view,
 so the two never meet in one translation unit (the multiple-local-views
@@ -32,7 +32,7 @@ body matches; the bytes cannot say whether callers use a return value.
 
 **Round 81 (delta), track 3. NOT RENAMED -- tool-blocked, see below.**
 Proposed `GetApplicationMethods` (matches the sibling class's
-`GetClass6D3C8Methods`). **Tier A**: a pure getter, mechanics is the
+`GetGameApplicationMethods`). **Tier A**: a pure getter, mechanics is the
 purpose.
 
 **Why it wasn't applied.** `func_8003B20C` matches `rename.py`'s
@@ -54,7 +54,7 @@ through `tools/rename.py`). Posted to the broadcast for the head.
 
 Note in passing: this round's byte-exact match of `func_8003B20C` as
 ordinary game C (`return &gApplicationMethods;`, called directly by
-`Class6D3C8__Class6D3C8`, confirmed game code) also resolves that stale
+`GameApplication__GameApplication`, confirmed game code) also resolves that stale
 track-2 ambiguity note -- it is not Sony's `DrawPrim`/`SpuRead`/`SpuWrite`,
 it is this class's table getter. The note should be dropped when the head
 applies the rename.
@@ -67,6 +67,6 @@ address's existing symbols-file line (the blocker above no longer
 reproduces; the symbols line carried no stale `unidentified` note by this
 round). Evidence unchanged: the body is `return &gApplicationMethods;`, Application's
 own table, and both callers use it as the table getter
-(`Application__Application` installs it; `Class6D3C8__Class6D3C8` and
-`Class6D3C8__InitSystems` call the base class's ctor and
-+0x044 slot through it). The name follows `GetClass6D3C8Methods`/`GetFileResourceMethods`.
+(`Application__Application` installs it; `GameApplication__GameApplication` and
+`GameApplication__InitSystems` call the base class's ctor and
++0x044 slot through it). The name follows `GetGameApplicationMethods`/`GetFileResourceMethods`.

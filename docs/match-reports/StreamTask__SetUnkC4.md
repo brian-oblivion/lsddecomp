@@ -21,7 +21,7 @@ identified: `New_StreamTask`'s allocator call sizes the object at `0xDC`
 bytes and constructs it through `Get_vtable_StreamTask`'s slot `+0x008`, so all five
 setters, plus `Get_vtable_StreamTask` itself, operate on that same `0xDC`-byte
 class (already named `StreamTask`/`StreamTaskMethods` in
-`include/Class6D3C8.h`, established independently by a different unit from
+`include/GameApplication.h`, established independently by a different unit from
 `New_StreamTask`'s cross-unit call site).
 
 ## Derivation
@@ -44,7 +44,7 @@ return's delay slot", no residue.
 
 Added `include/code_2c054.h`: this unit's own local view of the `StreamTask`
 class (named `StreamTaskObj`/`StreamTaskObjMethods` here, independent of
-`Class6D3C8.h`'s same-named-concept `StreamTask`, per the `Entity.h` /
+`GameApplication.h`'s same-named-concept `StreamTask`, per the `Entity.h` /
 `code_55dd4.h` precedent of keeping local views separate rather than editing
 another unit's header) — fields `unkC4`/`unkC8`/`unkCC`/`unkD0`/`unkD4` (this
 run of setters), plus everything else this unit's other queued functions in
@@ -68,4 +68,4 @@ run of five identical-shape setters at consecutive table slots
 
 ## Track 4 (2026-09-26, round 87)
 
-Renamed with the class unification (gStreamTaskObjMethods -> class StreamTask, include/StreamTask.h): the `Obj` suffix is dropped (track 4 step 2; include/Class6D3C8.h already viewed the class as `StreamTask`). Own slot +0x124. unkC4 is MoviePlayer__Play's third argument (stored at the player's +0x054); left unnamed until MoviePlayer's class is.
+Renamed with the class unification (gStreamTaskObjMethods -> class StreamTask, include/StreamTask.h): the `Obj` suffix is dropped (track 4 step 2; include/GameApplication.h already viewed the class as `StreamTask`). Own slot +0x124. unkC4 is MoviePlayer__Play's third argument (stored at the player's +0x054); left unnamed until MoviePlayer's class is.

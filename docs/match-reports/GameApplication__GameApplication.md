@@ -1,4 +1,6 @@
-# Class6D3C8__Class6D3C8
+# GameApplication__GameApplication
+
+> Renamed from `Class6D3C8__Class6D3C8` on 2026-09-26 (tools/rename.py). Address 0x80025fdc.
 
 > Renamed from `func_80025FDC` on 2026-09-24 (tools/rename.py). Address 0x80025fdc.
 
@@ -6,13 +8,13 @@
 
 ## What it does
 
-The constructor for the class whose method table is `D_8006D3C8`
-(`Class6D3C8`, slot `+0x008`): runs the intermediate base class's own
+The constructor for the class whose method table is `gGameApplicationMethods`
+(`GameApplication`, slot `+0x008`): runs the intermediate base class's own
 constructor through its ctor slot, installs this class's own vtable, stores
 the ctor argument, loads a 3D model ("ETC\DREAME5.TMD"), builds this
 object's owned `DreamSys` from the loaded model, makes one call into a
 not-yet-understood `DreamSys` vtable slot (`+0x228`), then finally invokes
-its own `slot40` (`Class6D3C8__SetDayFromTickCount`, the day-cursor advance already matched in
+its own `slot40` (`GameApplication__SeedRandom`, the day-cursor advance already matched in
 this unit).
 
 ## Derivation
@@ -30,7 +32,7 @@ lw    $v0, 0x8($v0)              ; base table's ctor slot
 nop
 jalr  $v0                         ; base_ctor(self, arg->unk00), return discarded
  addu $a0, $s0, $zero
-jal   GetClass6D3C8Methods                ; -> &D_8006D3C8 (own vtable)
+jal   GetGameApplicationMethods                ; -> &gGameApplicationMethods (own vtable)
  nop
 sw    $v0, 0x0($s0)                 ; self->methods = own vtable
 jal   func_80048CF0                  ; reads an unnamed small-data global
@@ -68,11 +70,11 @@ jalr  $v0                                                  ; self->methods->slot
 Written as:
 
 ```c
-void Class6D3C8__Class6D3C8(Class6D3C8 *self, Class6D3C8CtorArgs *arg) {
+void GameApplication__GameApplication(GameApplication *self, GameApplicationConfig *arg) {
     LoadModelRequest req;
 
     GetApplicationMethods()->ctor(self, arg->unk00);
-    self->methods = GetClass6D3C8Methods();
+    self->methods = GetGameApplicationMethods();
     self->arg = arg;
     func_800270AC(func_80048CF0());
     req.type = 0;
@@ -112,15 +114,15 @@ another caller is found that writes them.
 
 ## New struct/header knowledge (recorded in `include/`)
 
-- `include/Class6D3C8.h`: added `Class6D3C8CtorArgs` (the ctor's `arg`
+- `include/GameApplication.h`: added `GameApplicationConfig` (the ctor's `arg`
   parameter type — only `+0x00` and `+0x14` are read here, observed against
-  the one call site's data, `asm/main.s`'s `gClass6D3C8CtorArgs` global:
+  the one call site's data, `asm/main.s`'s `gGameApplicationConfig` global:
   `{0x13, 0, 1, 1, 1, 1}`), added `LoadModelRequest`, retyped
-  `MiddleClassMethods.ctor` and `Class6D3C8Methods.ctor`/`.slot40` from
+  `MiddleClassMethods.ctor` and `GameApplicationMethods.ctor`/`.slot40` from
   opaque `void *` to real callable signatures now that this function
-  exercises them, retyped `Class6D3C8::arg` and `::dreamSys` from `void *`
+  exercises them, retyped `GameApplication::arg` and `::dreamSys` from `void *`
   to their real pointer types, and declared the small externs this function
-  needed (`GetClass6D3C8Methods`, `sModelPathDreamE5`, `func_80048CF0`, `func_800270AC`,
+  needed (`GetGameApplicationMethods`, `sModelPathDreamE5`, `func_80048CF0`, `func_800270AC`,
   `New_LinkResource`).
 - `include/DreamSys.h`: extended `struct vtable_DreamSys` past its
   previously-documented end (`0x21c`) with 3 padding words and a new named
@@ -142,10 +144,10 @@ second hidden local.
 
 ## Naming
 
-**`Class6D3C8__Class6D3C8` -- tier A.** Convention `Class__Class` for a
+**`GameApplication__GameApplication` -- tier A.** Convention `Class__Class` for a
 constructor (compare `Class865C8__Class865C8`, `BasicClass__BasicClass`,
 `Class65650__Class65650`, etc. -- `grep -rnP '(\w+)__\1\(' src/*.c`). Evident
-from the body itself: dispatched through `Class6D3C8Methods.ctor`
+from the body itself: dispatched through `GameApplicationMethods.ctor`
 (vtable slot +0x008), calls the base class's own ctor slot first, then
 installs this class's own vtable pointer -- the base-constructor-through-
 slot+8 shape documented in `docs/research/class-framework.md`.
@@ -156,3 +158,52 @@ slot+8 shape documented in `docs/research/class-framework.md`.
 `include/Application.h`; the base-ctor call is
 `GetApplicationMethods()->ctor((Application *)self, arg->unk00)`, an upcast
 that emits no code. Bytes unchanged.
+
+## Track 6 (round 93, echo)
+
+Class `Class6D3C8` renamed `GameApplication` (`tools/renametype.py
+Class6D3C8 GameApplication`), table `D_8006D3C8` renamed
+`gGameApplicationMethods` (`tools/rename.py`). **Tier A.** It is the only
+Application subclass and the one object main() builds (`New_GameApplication(
+&gGameApplicationConfig)` into `gGameApplication`, then initSystems and the
+never-returning runMainLoop); its ctor builds and keeps the game's DreamSys,
+and its own methods are exactly the six hooks Application's main loop calls
+(intro logos, weekly stream, GraphRoom poll, Class865C8 run, cinematic and
+follow-up streams). Main and Application's runMainLoop, its two callers, agree.
+The name claims only "the game's application object", which is what those
+callers make it; it does not name what the sequence is for.
+
+Types renamed with it:
+
+- `Class6D3C8CtorArgs` -> `GameApplicationConfig` (`renametype.py
+  GameApplicationCtorArgs GameApplicationConfig --any-stem`, after the family
+  rename), with `gClass6D3C8CtorArgs` -> `gGameApplicationConfig`. Tier A: one
+  static instance, `{0x13, 0, 1, 1, 1, 1}`, whose words are the data source and
+  on/off switches the hooks test (`playStreams`, `showIntroLogos`,
+  `pollGraphRoom`). The field that keeps it, `ctorArgs`, is now `config`
+  (header edit; the compiler listed 8 accessors, all in code_1677c.c).
+- `Class6D3C8SetDayFn` -> `GameApplicationSeedRandomFn`, following its occupant
+  `GameApplication__SeedRandom` (see that report).
+- `Class6D3C8InitSystemsFn` -> `GameApplicationInitSystemsFn`,
+  `Class6D3C8Methods` -> `GameApplicationMethods`: the family rename.
+- Header guard `CLASS_6D3C8_H` -> `GAMEAPPLICATION_H` by hand: renametype.py's
+  upper-case pattern is `CLASS6D3C8`, so an underscored guard is invisible to it.
+
+Kept: `GameApplicationConfig::unk04` (Class865C8's ctor passes `unk04 == 0` to
+SetActiveDataSourceDriverMode; the driver mode's meaning is not established)
+and `unk14` (handed to DreamSys__func_5ba20, which stores a value >= 0 at the
+still-unnamed DreamSys +0x924). No Sony type applies: the class's fields are a
+config pointer, a flag and a DreamSys pointer.
+
+renametype.py rewrote the old class name inside this and the sibling reports'
+history prose (pending an operator decision; not undone by hand).
+
+Facts the header banner carried, kept here: `classtable.py
+gGameApplicationMethods --vs gApplicationMethods` shares every slot but
++0x008/+0x040/+0x044 and the six +0x050..+0x064 slots Application leaves
+NULL (25 slots, i.e. Application's 0x68-byte table fully populated); the
+object size 0x2C is New_GameApplication's BMemPMgrAlloc(0x2C); the config
+instance is in asm/data/57028.data.s; the previous banner kept the table's
+address as the name because "nothing yet names what the class IS beyond the
+object main runs" -- the pass above is the reading that settles it at the
+level the name claims.

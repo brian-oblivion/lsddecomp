@@ -1,4 +1,6 @@
-# Class6D3C8__PollGraphRoomStatus
+# GameApplication__PollGraphRoomStatus
+
+> Renamed from `Class6D3C8__PollGraphRoomStatus` on 2026-09-26 (tools/rename.py). Address 0x80026410.
 
 > Renamed from `func_80026410` on 2026-09-24 (tools/rename.py). Address 0x80026410.
 
@@ -6,12 +8,12 @@
 
 ## What it does
 
-`Class6D3C8Methods` slot `+0x058`. Gated by `self->arg->unk10 != 0` (a third
-sibling gate on the ctor argument, alongside `Class6D3C8__LoadIntroLogoSequence`'s `unk0C` and
-`Class6D3C8__StartWeeklyStreamTask`'s `unk08`). Checks the owned `DreamSys`'s own status slot
+`GameApplicationMethods` slot `+0x058`. Gated by `self->arg->unk10 != 0` (a third
+sibling gate on the ctor argument, alongside `GameApplication__LoadIntroLogoSequence`'s `unk0C` and
+`GameApplication__StartWeeklyStreamTask`'s `unk08`). Checks the owned `DreamSys`'s own status slot
 (`+0x1A0`); if it isn't already `1` and `self->unk24` hasn't latched, kicks
 off one `PollTask` (`New_GraphRoom`) and, if *that* reports `2`, runs
-`Class6D3C8__StartGraphRoomStreamTask`. Then polls a second `PollTask` (`New_Class86B60`) in a loop,
+`GameApplication__StartGraphRoomStreamTask`. Then polls a second `PollTask` (`New_Class86B60`) in a loop,
 restarting the first `PollTask` each time it reports `2`, until it reports
 anything else; clears `self->unk24` and returns `0` or `2` depending on
 whether that final status was below `1` (unsigned).
@@ -19,7 +21,7 @@ whether that final status was below `1` (unsigned).
 ## Final C
 
 ```c
-s32 Class6D3C8__PollGraphRoomStatus(Class6D3C8 *self) {
+s32 GameApplication__PollGraphRoomStatus(GameApplication *self) {
     s32 status;
     s32 pollDone;
 
@@ -29,18 +31,18 @@ s32 Class6D3C8__PollGraphRoomStatus(Class6D3C8 *self) {
         status = self->dreamSys->vt->DreamSys__GetCurrentDayAndYear(self->dreamSys, 0);
         if (status != 1) {
             if (self->unk24 == 0) {
-                status = Class6D3C8__RunPollTask(New_GraphRoom, self->dreamSys, self->unk1C);
+                status = GameApplication__RunPollTask(New_GraphRoom, self->dreamSys, self->unk1C);
                 if (status == 2) {
-                    Class6D3C8__StartGraphRoomStreamTask(self);
+                    GameApplication__StartGraphRoomStreamTask(self);
                 }
             }
         }
 
         pollDone = 2;
     retry:
-        status = Class6D3C8__RunPollTask(New_Class86B60, self->dreamSys, self->unk1C);
+        status = GameApplication__RunPollTask(New_Class86B60, self->dreamSys, self->unk1C);
         if (status == pollDone) {
-            Class6D3C8__RunPollTask(New_GraphRoom, self->dreamSys, self->unk1C);
+            GameApplication__RunPollTask(New_GraphRoom, self->dreamSys, self->unk1C);
             goto retry;
         }
 
@@ -137,10 +139,10 @@ sequential code, not an early return.
 
 ## Naming
 
-**`Class6D3C8__PollGraphRoomStatus` -- tier B.** Mechanics: gated by
+**`GameApplication__PollGraphRoomStatus` -- tier B.** Mechanics: gated by
 `arg->unk10`, checks the owned `DreamSys`'s own status accessor, then loops
-`Class6D3C8__RunPollTask(New_Class86B60, ...)`, restarting
-`Class6D3C8__RunPollTask(New_GraphRoom, ...)` on every "2" report, until
+`GameApplication__RunPollTask(New_Class86B60, ...)`, restarting
+`GameApplication__RunPollTask(New_GraphRoom, ...)` on every "2" report, until
 the second poll task reports something else. `New_GraphRoom` is an
 established, evidence-backed name from another unit
 (`src/class_3bb8c_t.c:315`, `GraphRoom__GraphRoom`), so "GraphRoom" is

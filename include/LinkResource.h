@@ -21,7 +21,7 @@
  * TMD sub-block of a MOM file), PlacementGrid's `linkResource`
  * (Class866E8__LoadElementResources, the element's models), Class865C8's
  * `dreamerTmd` ("ETC\DREAMER.TMD") and DreamSys's ctor argument
- * (Class6D3C8__Class6D3C8, "ETC\DREAME5.TMD": DreamSys__DreamSys adds
+ * (GameApplication__GameApplication, "ETC\DREAME5.TMD": DreamSys__DreamSys adds
  * getModel(0) as its child).
  *
  * Its parent ctor is the active driver's (GetActiveDataSourceMethods()->ctor,

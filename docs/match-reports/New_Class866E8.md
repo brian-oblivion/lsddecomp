@@ -76,14 +76,14 @@ Five instances closed in one pass, all byte-exact:
 | `New_StreamTask` | code_2c054 | 36/36 |
 | `New_TaskCore` | code_2c054 | 31/31 |
 
-**It does NOT close `New_Class6D3C8`** (code_1677c, 23/24), and that negative
+**It does NOT close `New_GameApplication`** (code_1677c, 23/24), and that negative
 matters: the class has **two sub-shapes**, distinguished by what retail puts
 in the `beqz` delay slot.
 
 - **`move $v0, $zero`** — retail materializes the NULL return. Closed by this
   rule. All five above.
 - **`nop`** — retail materializes nothing, relying on `$v0` still holding the
-  allocator's own zero return. `New_Class6D3C8` is this shape, and both the
+  allocator's own zero return. `New_GameApplication` is this shape, and both the
   rule and a `return self;`-on-the-null-path variant were measured against it
   and rejected. Still open.
 

@@ -33,7 +33,7 @@
  * `TickHighlight` later highlights the matching point. Together this is
  * the in-game graph screen that plots mood history as coloured dots.
  * Round 87 correction: the ring IS DreamSys's `moodPreviousDays` -- the
- * ctor's argument is Class6D3C8's dreamSys, and the record's offsets are
+ * ctor's argument is GameApplication's dreamSys, and the record's offsets are
  * DreamSys's fields relative to saveMagic (see DreamSaveBlock below). The
  * earlier "not DreamSys, the offsets don't line up" compared them against
  * the start of DreamSys rather than the save block.
@@ -74,7 +74,7 @@ Class879C4Methods *GetClass879C4Methods(void) {
  * currentYear, currentDay, moodPreviousDays[365] (include/DreamSys.h). The
  * round-24 reading of this record ("a separate day-log object, not
  * DreamSys") predates knowing who passes the ctor's argument:
- * Class6D3C8__PollGraphRoomStatus passes its dreamSys.
+ * GameApplication__PollGraphRoomStatus passes its dreamSys.
  *
  * +0x467 is DreamSys +0x5DF, the last byte of DreamSys's
  * unknown_values_0x5d8[8]: ScoreDayLog fails once it is set and sets it on

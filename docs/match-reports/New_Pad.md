@@ -76,9 +76,9 @@ list says to try `__asm__("")` against. It is not. It is a block-placement
 difference driven by the source's spelling of the early exit, and the lever is
 `goto`.
 
-## Relationship to `New_Class6D3C8`
+## Relationship to `New_GameApplication`
 
-`docs/match-reports/New_Class6D3C8.md` is a stall on the *other* `New_X`
+`docs/match-reports/New_GameApplication.md` is a stall on the *other* `New_X`
 variant — the one that returns the allocation unconditionally, where retail
 leaves the `beqz` delay slot as a literal `nop` and every shape tried compiled
 `move $v0, $s0` into it. That report tried `goto`, but in the
@@ -111,7 +111,7 @@ one shared epilogue. Try both before spending attempts on scheduling barriers.
 
 ## Naming
 
-**Tier A.** `New_X` allocator+ctor-wrapper shape (matches `New_Class6D3C8`,
+**Tier A.** `New_X` allocator+ctor-wrapper shape (matches `New_GameApplication`,
 `New_DreamSys`, `New_Class65650`, etc. project-wide): allocates the instance
 through `BMemPMgrAlloc`, then calls the class's own ctor slot through
 `Get_vtable_Pad()`. `Pad` is the class name established for this whole unit

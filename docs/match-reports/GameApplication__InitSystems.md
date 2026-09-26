@@ -1,8 +1,10 @@
-# Class6D3C8__InitSystems
+# GameApplication__InitSystems
 
-> Renamed from `Class6D3C8__ForwardToBaseSlot44UnlessFlagged` on 2026-09-26 (tools/rename.py). Address 0x80026108.
+> Renamed from `Class6D3C8__InitSystems` on 2026-09-26 (tools/rename.py). Address 0x80026108.
 
-> Renamed from `Class6D3C8__ForwardToBaseUnlessOverridden` on 2026-09-24 (tools/rename.py). Address 0x80026108.
+> Renamed from `GameApplication__ForwardToBaseSlot44UnlessFlagged` on 2026-09-26 (tools/rename.py). Address 0x80026108.
+
+> Renamed from `GameApplication__ForwardToBaseUnlessOverridden` on 2026-09-24 (tools/rename.py). Address 0x80026108.
 
 > Renamed from `func_80026108` on 2026-09-24 (tools/rename.py). Address 0x80026108.
 
@@ -10,7 +12,7 @@
 
 ## What it does
 
-A method on the class at `D_8006D3C8` (slot `+0x044`) that falls back to
+A method on the class at `gGameApplicationMethods` (slot `+0x044`) that falls back to
 the base class's own implementation of the same slot when this object
 hasn't been given an override (`self->unk18 == 0`).
 
@@ -47,14 +49,14 @@ that is itself derived from BasicClass, and `classtable.py 0x8006D3C8 --vs
 with that intermediate table — evidence this class's real parent is that
 intermediate class, not BasicClass directly (the earlier `--vs 0x8006B58C`
 comparison only showed a match on the BasicClass-common low slots, which
-both classes inherit). Recorded in `include/Class6D3C8.h`.
+both classes inherit). Recorded in `include/GameApplication.h`.
 
 No instruction sets `$v0` after the conditional call, so the function's own
 return value (if used at all) is whatever the base method leaves behind —
 treated as `void` here since nothing in this unit consumes it.
 
 ```c
-void Class6D3C8__InitSystems(Class6D3C8 *self, void *a1, void *a2) {
+void GameApplication__InitSystems(GameApplication *self, void *a1, void *a2) {
     if (self->unk18 == 0) {
         GetApplicationMethods()->slot44(self, a1, a2, 0);
     }
@@ -73,7 +75,7 @@ BasicClass and this class) was only found this way.
 
 ## Naming
 
-**`Class6D3C8__InitSystems` -- tier B.** Mechanics are
+**`GameApplication__InitSystems` -- tier B.** Mechanics are
 clear from the body: when `self->unk18 == 0` it forwards straight to the
 intermediate base class's own `slot44` occupant (`GetApplicationMethods()->slot44`,
 same slot number as the one this function itself occupies, `+0x044`), and
@@ -82,10 +84,10 @@ override flag set by some other, uncarved code path) is not established, so
 the name describes the forwarding mechanism only, not why a caller would
 set the flag.
 
-**Field `Class6D3C8Methods.slot44` was NOT renamed** despite this
+**Field `GameApplicationMethods.slot44` was NOT renamed** despite this
 function's clear mechanics, because `src/main.c` (`main`, another
 unit) dispatches it by field name directly
-(`gClass6D3C8->methods->slot44(gClass6D3C8, obj, pad)`) -- renaming the
+(`gGameApplication->methods->slot44(gGameApplication, obj, pad)`) -- renaming the
 struct definition here would break that unit's build, which is outside this
 runner's ownership. See `## Proposed field names` below.
 
@@ -93,15 +95,15 @@ runner's ownership. See `## Proposed field names` below.
 
 ## Proposed field names
 
-- **`Class6D3C8Methods.slot44` -> `forwardToBaseUnlessOverridden`**, tier B,
+- **`GameApplicationMethods.slot44` -> `forwardToBaseUnlessOverridden`**, tier B,
   same evidence as the function name above. Only accessor outside this unit
-  is `src/main.c:60-61` (`gClass6D3C8->methods->slot44(gClass6D3C8, obj, pad)`),
+  is `src/main.c:60-61` (`gGameApplication->methods->slot44(gGameApplication, obj, pad)`),
   so the rename needs that call site updated in the same commit as the
   struct definition.
-- **`Class6D3C8Methods.slot4C`** -- NOT proposing a name. Its occupant
+- **`GameApplicationMethods.slot4C`** -- NOT proposing a name. Its occupant
   (`Application__RunMainLoop`) is not in this unit and was not derived this round; all
   that's observable locally is the call shape at `src/main.c:61`
-  (`gClass6D3C8->methods->slot4C(gClass6D3C8)`, no extra arguments, dispatched
+  (`gGameApplication->methods->slot4C(gGameApplication)`, no extra arguments, dispatched
   once right after `slot44` during startup). That's a call-site pattern, not
   a mechanics derivation of what the function itself does -- naming it from
   that alone would be the "guess at purpose" the naming rules warn against.
@@ -123,7 +125,7 @@ body's `move a3,zero` shows. The upcast emits no code. Bytes unchanged.
 Renamed for its slot. `+0x044` is Application's `initSystems`
 (`include/Application.h`), and this override does nothing but chain to it:
 `GetApplicationMethods()->initSystems(self, drawSystem, pad, 0)`. The guard
-field `+0x018` is not a Class6D3C8 field at all: it lies inside the parent's
+field `+0x018` is not a GameApplication field at all: it lies inside the parent's
 0x20-byte object, where Application's view already names it `initialized`
 ("cleared by the ctor, set by initSystems; runMainLoop runs only once
 set"). So the body reads "initialise the systems once": the "override flag"
@@ -131,4 +133,4 @@ this report's Naming section could not explain is the parent's own
 initialized latch, and the tier-B mechanism name gives way to the slot name
 under FINISHING-PLAN track 4 step 6. The override takes three parameters
 where the slot takes four (the caller in `main` passes three), so the slot
-keeps the inherited type and `main` casts to `Class6D3C8InitSystemsFn`.
+keeps the inherited type and `main` casts to `GameApplicationInitSystemsFn`.

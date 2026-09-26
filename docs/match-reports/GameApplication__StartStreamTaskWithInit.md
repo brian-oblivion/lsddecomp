@@ -1,4 +1,6 @@
-# Class6D3C8__StartStreamTaskWithInit
+# GameApplication__StartStreamTaskWithInit
+
+> Renamed from `Class6D3C8__StartStreamTaskWithInit` on 2026-09-26 (tools/rename.py). Address 0x80026900.
 
 > Renamed from `func_80026900` on 2026-09-24 (tools/rename.py). Address 0x80026900.
 
@@ -6,20 +8,20 @@
 
 ## What it does
 
-`Class6D3C8Methods` slot `+0x064`, the last function in this unit's queue.
-Gated by `self->arg->unk08` (the same gate `Class6D3C8__StartWeeklyStreamTask` and
-`Class6D3C8__StartGraphRoomStreamTask` use). Builds a `StreamTask`, runs its `slot12C`, derives a
+`GameApplicationMethods` slot `+0x064`, the last function in this unit's queue.
+Gated by `self->arg->unk08` (the same gate `GameApplication__StartWeeklyStreamTask` and
+`GameApplication__StartGraphRoomStreamTask` use). Builds a `StreamTask`, runs its `slot12C`, derives a
 type code via `GetStreamChannelInit` (a new library helper with the same
 "write-to-`*out`, return-a-separate-value" shape as
 `GetIntroStreamName`/`PickWeeklyStreamChannel`/`GetGraphRoomStreamChannel`), looks it up via
 `GetStreamGroupForType`, initializes the task with it, then starts it -- the same
-overall shape as `Class6D3C8__LoadIntroLogoSequence`/`Class6D3C8__StartWeeklyStreamTask`, with a `slot12C` call
-added (matching `Class6D3C8__StartGraphRoomStreamTask`'s use of that slot).
+overall shape as `GameApplication__LoadIntroLogoSequence`/`GameApplication__StartWeeklyStreamTask`, with a `slot12C` call
+added (matching `GameApplication__StartGraphRoomStreamTask`'s use of that slot).
 
 ## Final C
 
 ```c
-void Class6D3C8__StartStreamTaskWithInit(Class6D3C8 *self) {
+void GameApplication__StartStreamTaskWithInit(GameApplication *self) {
     StreamTask *task;
     s32 typeCode;
     s32 outerValue;
@@ -44,9 +46,9 @@ across --
   `outerValue` is a PRECEDING call's return (`GetStreamChannelInit`, captured via
   the delay slot of the `GetStreamGroupForType` `jal` right after it) and
   `typeLookup` is the REAL 4th argument (the delay slot of `slot44`'s own
-  `jalr`, per the idiom `Class6D3C8__LoadIntroLogoSequence`'s report first documented);
+  `jalr`, per the idiom `GameApplication__LoadIntroLogoSequence`'s report first documented);
 - declaring `typeCode`/`outerValue`/`typeLookup` before `task` (the
-  register-allocation-by-declaration-order lesson from `Class6D3C8__LoadIntroLogoSequence`),
+  register-allocation-by-declaration-order lesson from `GameApplication__LoadIntroLogoSequence`),
   though here it turned out not to matter -- the natural declaration order
   already put `task` last relative to its own first use, so no reordering
   was needed this time.
@@ -55,8 +57,8 @@ across --
 
 None beyond what this unit's earlier reports already established; this
 function is a clean fourth instance of the "StreamTask init" shape
-(`Class6D3C8__LoadIntroLogoSequence`, `Class6D3C8__StartWeeklyStreamTask`, `Class6D3C8__StartGraphRoomStreamTask`, now this one), each
-gated by a different `Class6D3C8CtorArgs` field and differing only in
+(`GameApplication__LoadIntroLogoSequence`, `GameApplication__StartWeeklyStreamTask`, `GameApplication__StartGraphRoomStreamTask`, now this one), each
+gated by a different `GameApplicationConfig` field and differing only in
 which library helper derives the type code and whether extra slots
 (`slot12C`) are involved.
 
@@ -68,16 +70,16 @@ which library helper derives the type code and whether extra slots
 
 ## Naming
 
-**`Class6D3C8__StartStreamTaskWithInit` -- tier B.** Mechanics: gated by
-`arg->unk08` (same gate as `Class6D3C8__StartWeeklyStreamTask`), builds a
+**`GameApplication__StartStreamTaskWithInit` -- tier B.** Mechanics: gated by
+`arg->unk08` (same gate as `GameApplication__StartWeeklyStreamTask`), builds a
 `StreamTask`, runs its `slot12C` (a step none of the other three
-StreamTask-launcher siblings besides `Class6D3C8__StartCinematicStream`
+StreamTask-launcher siblings besides `GameApplication__StartCinematicStream`
 perform), derives a type code via `GetStreamChannelInit`, looks it up, configures
 and starts the task. "WithInit" names the one mechanical difference from
-its closest sibling `Class6D3C8__StartWeeklyStreamTask` (the extra
+its closest sibling `GameApplication__StartWeeklyStreamTask` (the extra
 `slot12C` call); `GetStreamChannelInit`'s own meaning is not established, so no
 stronger, purpose-based name is supported yet.
 
 ## Track 4 (2026-09-25, round 84, alpha)
 
-Class6D3C8.h's StreamTask view names +0x004 `release` (BasicClass's, `void *`), was `start` (track 4 round 84; see Class6D3C8__StartCinematicStream for the bytes that settled the return type). Byte-identical.
+GameApplication.h's StreamTask view names +0x004 `release` (BasicClass's, `void *`), was `start` (track 4 round 84; see GameApplication__StartCinematicStream for the bytes that settled the return type). Byte-identical.

@@ -38,11 +38,11 @@ Rec1C *GetStreamChannelInit(s32 *countOut) {
   (`s32 unused`): PickWeeklyGroup passes one in `$a1`, as code_1677c's own
   prototype already says. Byte-neutral for SeedAndRandom.
 - No shared header was edited. Other units' prototypes for these functions
-  (class_39e08.h, class_3bb8c.h, Class6D3C8.h) are independent and untouched.
+  (class_39e08.h, class_3bb8c.h, GameApplication.h) are independent and untouched.
 
 ## Arity (round 82, alpha, track 3 externcheck)
 
-externcheck flags Class6D3C8.h's 2-parameter extern against this
+externcheck flags GameApplication.h's 2-parameter extern against this
 1-parameter definition. The body reads only `$a0` and does not forward
 `$a1` (GetStreamPool2 takes one argument), so this is not the forwarding
 idiom; but the caller's second argument is retail (`move a1,zero` in the
@@ -53,4 +53,4 @@ line carries `/* arity-ok: ... */`.
 
 - **Name:** `GetStreamChannelInit`
 - **Tier:** A
-- **Evidence:** its one caller, Class6D3C8__StartStreamTaskWithInit, uses the return value as the StreamTask's group id directly; matches exactly.
+- **Evidence:** its one caller, GameApplication__StartStreamTaskWithInit, uses the return value as the StreamTask's group id directly; matches exactly.

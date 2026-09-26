@@ -10,8 +10,8 @@
 Returns the address of `gClass65650Methods`, this class's own 80-slot method table
 (header word `0x234`, per `tools/classtable.py gClass65650Methods --vs 0x800878D4`).
 The `Get_vtable`-style accessor for this class, same shape as
-`Get_vtable_DreamSys` and `GetClass6D3C8Methods` (`code_171e0`'s equivalent for
-`D_8006D3C8`): a plain `lui`/`addiu` address computation, no load — this is
+`Get_vtable_DreamSys` and `GetGameApplicationMethods` (`code_171e0`'s equivalent for
+`gGameApplicationMethods`): a plain `lui`/`addiu` address computation, no load — this is
 `&gClass65650Methods`, not `*gClass65650Methods`.
 
 ```c
@@ -29,7 +29,7 @@ instruction.
 
 ### Proposed learning
 
-Same as `GetClass6D3C8Methods.md`: a function that only does `lui`/`addiu` to a
+Same as `GetGameApplicationMethods.md`: a function that only does `lui`/`addiu` to a
 symbol with no surrounding `lw`/`sw` is returning `&symbol`. Additionally
 worth stating explicitly: when OTHER functions in the unit call this
 accessor rather than referencing the symbol directly, write the call in the

@@ -8,11 +8,11 @@
 
 ## What it does
 
-Slot `+0x04C` of gApplicationMethods (inherited by Class6D3C8; `main` dispatches
+Slot `+0x04C` of gApplicationMethods (inherited by GameApplication; `main` dispatches
 it). If `initialized`, calls `+0x050` once, then runs forever: `+0x054`,
 then polls `+0x058` for a status and dispatches: 1 -> `+0x05C` and poll
 again, 2 -> `+0x064` if `+0x060` says so, 0 -> back to `+0x054`. Slots
-+0x050..+0x064 exist only in the subclass table (Class6D3C8's
++0x050..+0x064 exist only in the subclass table (GameApplication's
 LoadIntroLogoSequence, StartWeeklyStreamTask, PollGraphRoomStatus,
 NoOpSlot5C, PollStatusObj, StartStreamTaskWithInit). It never returns
 while initialized: the game's main loop.
@@ -73,7 +73,7 @@ usual switch.
 **Round 81 (delta), track 3.** Renamed `func_8003B110` -> `Application__RunMainLoop`.
 **Tier B**: "runs forever while initialized, dispatching the subclass's own
 state-machine slots" is evident from the body alone; "main loop" is
-corroborated by `include/Class6D3C8.h`'s own note that this is the slot
+corroborated by `include/GameApplication.h`'s own note that this is the slot
 "first dispatched by main" (`src/main.c`), but that is one caller, not two
 agreeing ones, so it stays B rather than A.
 
@@ -86,4 +86,4 @@ slots classtable.py prints); they are named for the subclass's occupants
 (`loadIntroLogoSequence`, `startWeeklyStreamTask`, `pollGraphRoomStatus`,
 `slot5C` for the no-op, `pollStatusObj`, `startStreamTaskWithInit`). +0x060
 stays `s32`: this body tests its return, and the occupant,
-Class6D3C8__PollStatusObj, returns `s32`. Bytes unchanged.
+GameApplication__PollStatusObj, returns `s32`. Bytes unchanged.

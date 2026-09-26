@@ -40,7 +40,7 @@ s32 SeedAndRandom(s32 seed, s32 unused) {
 The source block above had drifted from `src/code_39094.c`, which has
 always compiled the 2-parameter form. The second parameter is dead in the
 body (`$a1` is never read), but it is real at every call: two callers load
-it explicitly (Class6D3C8__SetDayFromTickCount: `move a1,zero` at
+it explicitly (GameApplication__SeedRandom: `move a1,zero` at
 0x800260F4; PickWeeklyGroup: `move a1,a0` at 0x80048D78), and the other
 three (PickDailyVariant, PickVariant, PickWeeklyStreamChannel) forward their
 own incoming second parameter. PickVariant and PickWeeklyStreamChannel used

@@ -1,4 +1,6 @@
-# Class6D3C8__LoadIntroLogoSequence
+# GameApplication__LoadIntroLogoSequence
+
+> Renamed from `Class6D3C8__LoadIntroLogoSequence` on 2026-09-26 (tools/rename.py). Address 0x80026170.
 
 > Renamed from `func_80026170` on 2026-09-24 (tools/rename.py). Address 0x80026170.
 
@@ -6,9 +8,9 @@
 
 ## What it does
 
-`Class6D3C8Methods` slot `+0x050`. Gated entirely by `self->arg->unk0C != 0`
+`GameApplicationMethods` slot `+0x050`. Gated entirely by `self->arg->unk0C != 0`
 (the ctor argument's `+0x0C` field, opaque until this function): registers a
-"loader" task for `"ETC\ASMKLOGO.TIM"` (`Class6D3C8__StartLoaderTask`), then builds a
+"loader" task for `"ETC\ASMKLOGO.TIM"` (`GameApplication__StartLoaderTask`), then builds a
 separate "stream" task, initializes it with a filename
 (`"ETC\ASMK.STR"`) and a type/format code looked up from a table, starts it,
 then registers a second loader task for `"ETC\OSDLOGO.TIM"`.
@@ -21,7 +23,7 @@ lw   $v0, 0xC($v0)            ; v0 = arg->unk0C
 beqz $v0, .L80026238            ; whole body gated on this
  ...
 jal  SetActiveDataSourceDriverMode(0, 0, 0)
-jal  Class6D3C8__StartLoaderTask(self, sLogoPathAsmk)     ; "ETC\ASMKLOGO.TIM"
+jal  GameApplication__StartLoaderTask(self, sLogoPathAsmk)     ; "ETC\ASMKLOGO.TIM"
 jal  New_StreamTask(0, 0, 0, 0)            ; -> s1 = task (New_X shape, 0xDC bytes)
 addiu $a0, $sp, 0x18
 jal  GetIntroStreamName                          ; writes 0x31 to local, returns &sAsmkStreamPath
@@ -43,11 +45,11 @@ lw   $v0, 0x0($s1)                                          ; reload task->metho
 lw   $v0, 0x4($v0)                                           ; slot4
 jalr $v0
  (delay: a0 = s1 = task)
-jal  Class6D3C8__StartLoaderTask(self, sLogoPathOsd)                          ; "ETC\OSDLOGO.TIM"
+jal  GameApplication__StartLoaderTask(self, sLogoPathOsd)                          ; "ETC\OSDLOGO.TIM"
 ```
 
 ```c
-void Class6D3C8__LoadIntroLogoSequence(Class6D3C8 *self) {
+void GameApplication__LoadIntroLogoSequence(GameApplication *self) {
     const char *streamName;
     s32 typeCode;
     s32 typeLookup;
@@ -55,13 +57,13 @@ void Class6D3C8__LoadIntroLogoSequence(Class6D3C8 *self) {
 
     if (self->arg->unk0C != 0) {
         SetActiveDataSourceDriverMode(0, 0, 0);
-        Class6D3C8__StartLoaderTask(self, sLogoPathAsmk);
+        GameApplication__StartLoaderTask(self, sLogoPathAsmk);
         task = New_StreamTask(0, 0, 0, 0);
         streamName = GetIntroStreamName(&typeCode);
         typeLookup = GetStreamGroupForType(typeCode);
         task->methods->slot44(task, self->unk1C, streamName, typeLookup, 1);
         task->methods->slot4(task);
-        Class6D3C8__StartLoaderTask(self, sLogoPathOsd);
+        GameApplication__StartLoaderTask(self, sLogoPathOsd);
     }
 }
 ```
@@ -118,7 +120,7 @@ register, a different axis).
 
 ## Naming
 
-**`Class6D3C8__LoadIntroLogoSequence` -- tier B.** Mechanics established
+**`GameApplication__LoadIntroLogoSequence` -- tier B.** Mechanics established
 from the body and its string constants: gated by `arg->unk0C`, registers a
 loader task for `"ETC\ASMKLOGO.TIM"`, then a stream task for whatever
 `GetIntroStreamName` resolves (`"ETC\ASMK.STR"` per the header comment), then a
@@ -130,4 +132,4 @@ inference from the filenames but not confirmed by any code in this unit).
 
 ## Track 4 (2026-09-25, round 84, alpha)
 
-Class6D3C8.h's StreamTask view names +0x004 `release` (BasicClass's, `void *`), was `start` (track 4 round 84; see Class6D3C8__StartCinematicStream for the bytes that settled the return type). Byte-identical.
+GameApplication.h's StreamTask view names +0x004 `release` (BasicClass's, `void *`), was `start` (track 4 round 84; see GameApplication__StartCinematicStream for the bytes that settled the return type). Byte-identical.

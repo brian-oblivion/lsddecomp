@@ -12,10 +12,10 @@
 class's own vtable slot +0x008) with the allocated object and the caller's
 own `dreamSys` argument.
 
-Also externally visible as a `PollTaskCtor` callback -- `include/Class6D3C8.h`
+Also externally visible as a `PollTaskCtor` callback -- `include/GameApplication.h`
 (a different unit) already declares this exact symbol,
-`extern PollTask *New_Class86B60(void *dreamSys);`, used by `Class6D3C8__PollGraphRoomStatus`
-as `Class6D3C8__RunPollTask`'s `ctor` argument. That declaration's return/param
+`extern PollTask *New_Class86B60(void *dreamSys);`, used by `GameApplication__PollGraphRoomStatus`
+as `GameApplication__RunPollTask`'s `ctor` argument. That declaration's return/param
 naming is kept as-is there (independent local view); this unit's own
 `dreamSys` parameter name/type was chosen to match it.
 
@@ -56,11 +56,11 @@ None beyond what's already documented for this unit's `New_X` idiom.
 **New_Class86B60** -- tier A. Same `New_X` allocator idiom as
 `New_NodeGuardedViewport`/`New_GridCell`, one extra forwarded argument
 (`dreamSys`). Also externally used as a `PollTaskCtor` callback
-(`include/Class6D3C8.h`); that unit's own independent local view keeps its
+(`include/GameApplication.h`); that unit's own independent local view keeps its
 own return/param naming and is untouched by this rename (function names
 are unique symbols, tree-wide by construction, so that call site now reads
 `New_Class86B60` too).
 
 ## Track 4 (2026-09-26, round 88, bravo)
 
-Class86B60 is unified in include/Class86B60.h (TASKCORE_SLOTS/TASKCORE_FIELDS plus its own). Its parameter is now `struct DreamSys *dreamSys` (the ctor's; Class6D3C8__PollGraphRoomStatus passes self->dreamSys). code_1677c's local `PollTask *` extern is gone; it casts to PollTaskCtor as for New_GraphRoom. Byte-identical (whole image green, 0 new warnings, nonmatching green).
+Class86B60 is unified in include/Class86B60.h (TASKCORE_SLOTS/TASKCORE_FIELDS plus its own). Its parameter is now `struct DreamSys *dreamSys` (the ctor's; GameApplication__PollGraphRoomStatus passes self->dreamSys). code_1677c's local `PollTask *` extern is gone; it casts to PollTaskCtor as for New_GraphRoom. Byte-identical (whole image green, 0 new warnings, nonmatching green).
