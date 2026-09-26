@@ -15,7 +15,7 @@
  * helpers of Entity__MoodCue85/86 that take only the SoundCueSet and write
  * a fixed three-voice tone request into it.
  *
- * Entity derives from Class65650 (code_55dd4.h), whose TOD fields and slots
+ * Entity derives from TodActor (code_55dd4.h), whose TOD fields and slots
  * it inherits at the same offsets: this round renamed the two only this unit
  * touches (`todFramePtr` +0x88, `applyTodFrame` +0x134) and proposed the
  * shared ones (setTod/playTod/stopTod, todIndex/todFrame, companion2 --

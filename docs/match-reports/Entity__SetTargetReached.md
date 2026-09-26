@@ -46,7 +46,7 @@ void Entity__SetTargetReached(Entity *this, s32 arg1) {
 Matched on the first attempt. The single branch here never affects the
 return value (the function is `void`, and the store after the branch runs
 unconditionally either way) — not the `goto`-lever shape from
-`New_Pad`/`New_Class65650`, just a plain `if`.
+`New_Pad`/`New_TodActor`, just a plain `if`.
 
 ## Proposed learning
 
@@ -64,7 +64,7 @@ own broader significance (read by every Entity_x unit) is not established.
 - `EntityMethods::slot30` -> `notifyParents` -- **tier B.** `tools/
   classtable.py` on `gEntityMethods` shows +0x030 occupied by the already-
   named `BasicClass__NotifyParents` (a slot inherited from the shared
-  ancestor `Get_vtable_Class65650()` also returns -- same idiom, confirmed by
+  ancestor `GetTodActorMethods()` also returns -- same idiom, confirmed by
   offset match against that table). CROSS-UNIT: `slot30` is dispatched from
   every one of Entity_b/c/d/e/f/g (`grep -rn -- '->slot30(' src/Entity_*.c`)
   as well as this unit's own `Entity__SetTargetReached`/`Entity__NotifyIfTargetInRange` (the latter
@@ -72,4 +72,4 @@ own broader significance (read by every Entity_x unit) is not established.
 
 ## Track 4 (2026-09-26, round 88, echo)
 
-The class (id 0x1F234, table `gEntityMethods`) is unified as `Entity` in `include/Entity.h`: a Class65650 subclass whose table and object expand `CLASS65650_SLOTS`/`CLASS65650_FIELDS`. Any source block above is the pre-unification spelling; the live body takes the inherited names (fields `parent`, `coord2`->`tx/ty/tz`, `tick`, `linkTarget`, `state` (was `moodState`), `lastOffsetValue`, `grid` (was `unk4C`), `ticker` (was `companion2`), `arg2` (was `soundCueChannel`), `parts`, `todPlaying`, `peer` (was `target`, cast to the `Unk94Obj` DreamSys view where its own slots are called); slots `reset`, `setDisplay`, `setLightMode`, `setTranslation`/`addTranslation`, `moveLocalZ/X/Y`, `moveLocalZOrFindLink`, `selectTickCallback`, `enableTickCallback`/`disableTickCallback`, `distanceToPeer`, `setTargetReached`, `updateActivationState`/`updateDeactivationState`), byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).
+The class (id 0x1F234, table `gEntityMethods`) is unified as `Entity` in `include/Entity.h`: a TodActor subclass whose table and object expand `TODACTOR_SLOTS`/`TODACTOR_FIELDS`. Any source block above is the pre-unification spelling; the live body takes the inherited names (fields `parent`, `coord2`->`tx/ty/tz`, `tick`, `linkTarget`, `state` (was `moodState`), `lastOffsetValue`, `grid` (was `unk4C`), `ticker` (was `companion2`), `arg2` (was `soundCueChannel`), `parts`, `todPlaying`, `peer` (was `target`, cast to the `Unk94Obj` DreamSys view where its own slots are called); slots `reset`, `setDisplay`, `setLightMode`, `setTranslation`/`addTranslation`, `moveLocalZ/X/Y`, `moveLocalZOrFindLink`, `selectTickCallback`, `enableTickCallback`/`disableTickCallback`, `distanceToPeer`, `setTargetReached`, `updateActivationState`/`updateDeactivationState`), byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).

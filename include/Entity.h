@@ -2,16 +2,16 @@
 #define ENTITY_H
 
 #include "common.h"
-#include "Class65650.h"
+#include "TodActor.h"
 #include "FadeBox.h"
 #include "SoundCueSet.h"
 
 /*
- * Entity -- a Class65650 (TOD-animated Actor) driven by a per-mood row of
+ * Entity -- a TodActor (TOD-animated Actor) driven by a per-mood row of
  * tables (class id 0x1F234, method table gEntityMethods, getter
- * Get_vtable_Entity): Class65650's one subclass (include/Class65650.h); no
- * class derives from it. The ctor calls Class65650's first
- * (Get_vtable_Class65650()->ctor), so the id parent is the ctor-chain
+ * Get_vtable_Entity): TodActor's one subclass (include/TodActor.h); no
+ * class derives from it. The ctor calls TodActor's first
+ * (GetTodActorMethods()->ctor), so the id parent is the ctor-chain
  * parent. Methods in src/Entity.c (New_Entity .. Entity__UpdateDeactivationState)
  * and src/Entity_b.c (the last three slots, the range helpers, the getter).
  * The MoodCue handlers in Entity_b..Entity_g are not in the table: they are
@@ -22,22 +22,22 @@
  * 16-byte row of gEntityMoodTable and of the parallel byte tables below.
  * Every tick, update (+0x098) runs updateActivationState (activate when the
  * row's detachKind condition holds), updateDeactivationState, the sound-cue
- * start/stop pair and updateTargetProximity, then Class65650's update.
+ * start/stop pair and updateTargetProximity, then TodActor's update.
  *
  * The peer is the player. attachToParent's (self, peer, companion, parent,
- * offset) is Class65650's; code_4cd08 passes gDreamAuxWorld as the peer, and
+ * offset) is TodActor's; code_4cd08 passes gDreamAuxWorld as the peer, and
  * the slots Entity calls on `peer` (+0x100, +0x120, +0x1A0, +0x200, +0x21C)
- * lie past the end of Class65650's table: their occupants in
+ * lie past the end of TodActor's table: their occupants in
  * gDreamSysMethods are DreamSys__GetLinkCommandFlag,
  * DreamSys__ProjectPointAtDistance, DreamSys__GetCurrentDayAndYear,
  * DreamSys__GetDreamColor and DreamSys__ResetFlashbackList. The units that
- * call it include include/DreamSys.h and cast `peer` (Class65650's field,
- * typed Class65650 *) to DreamSys *; the Unk94Obj view that stood here was
+ * call it include include/DreamSys.h and cast `peer` (TodActor's field,
+ * typed TodActor *) to DreamSys *; the Unk94Obj view that stood here was
  * deleted in track 4 (round 88). Entity's attachToParent keeps its `parent` argument in
  * Actor's `grid` field (+0x04C).
  *
  * Sound cues. startSoundCue calls InitSoundCueSet on `soundCueSet` with
- * Class65650's `arg2` (the ctor's third argument; code_4cd08 passes
+ * TodActor's `arg2` (the ctor's third argument; code_4cd08 passes
  * D_8008AC04) as the sound object, itself as the owner and the mood row's
  * handler as the callback, and selects tick callback 'B' in reset
  * (Entity__TickSoundCue, +0x11C), which services the set once per tick. So a
@@ -54,24 +54,24 @@
  *  - applyTodFrame (+0x134) returns the next frame: Entity__MoodCue91/92
  *    thread todFramePtr through it.
  *  - attachToParent (+0x04C) keeps SceneNode's type; callers of Entity's
- *    occupant cast to Class65650AttachToParentFn (Class65650.h's banner).
+ *    occupant cast to TodActorAttachToParentFn (TodActor.h's banner).
  *
- * The object is 0x108 bytes (New_Entity); Class65650's fields end at +0x098.
+ * The object is 0x108 bytes (New_Entity); TodActor's fields end at +0x098.
  */
 
 typedef struct Entity Entity;
 typedef struct EntityMethods EntityMethods;
 typedef struct EntityMoodRow EntityMoodRow;
 
-/* Class65650's slots (overrides: +0x008 Entity__Entity, +0x00C
+/* TodActor's slots (overrides: +0x008 Entity__Entity, +0x00C
  * Entity__Finalize, +0x040 Entity__Reset, +0x04C Entity__AttachToParent,
  * +0x050 Entity__DetachFromParent, +0x098 Entity__Update, +0x0DC
  * Entity__NotifyLinkStage, +0x0E0 Entity__OnGridCellLinkCommand, +0x11C
  * Entity__TickSoundCue; `tools/classtable.py gEntityMethods --vs
- * gClass65650Methods`), then this class's own. */
+ * gTodActorMethods`), then this class's own. */
 struct EntityMethods {
-    CLASS65650_SLOTS(Entity, (Entity * self, s32 moodIndex, void *desc, void *arg2));
-    /* +0x144 */ s32 (*distanceToPeer)(Entity *self, Class65650 *peer); /* Entity__DistanceToPeer: |dx| + |dz| from coord2's translation to peer's world position */
+    TODACTOR_SLOTS(Entity, (Entity * self, s32 moodIndex, void *desc, void *arg2));
+    /* +0x144 */ s32 (*distanceToPeer)(Entity *self, TodActor *peer); /* Entity__DistanceToPeer: |dx| + |dz| from coord2's translation to peer's world position */
     /* +0x148 */ s32 (*getProximityRatio)(Entity *self); /* Entity__GetProximityRatio: -1 when no peer or out of range */
     /* +0x14C */ EntityMoodRow *(*getMoodEffect)(Entity *self); /* Entity__GetMoodEffect: &gEntityMoodTable[moodIndex] */
     /* +0x150 */ s32 (*getUnlockEffect)(Entity *self); /* Entity__GetUnlockEffect */
@@ -90,7 +90,7 @@ struct EntityMethods {
 }; /* 97 slots, 0x184 bytes */
 
 struct Entity {
-    CLASS65650_FIELDS(EntityMethods);
+    TODACTOR_FIELDS(EntityMethods);
     /* +0x098 */ s32 moodIndex; /* New_Entity's first argument: the row of gEntityMoodTable and the byte tables */
     /* +0x09C */ SoundCueSet soundCueSet; /* startSoundCue starts it; the MoodCue handlers are its callback */
     /* +0x0F0 */ s32 active;              /* activate / deactivate */
@@ -101,7 +101,7 @@ struct Entity {
     /* +0x104 */ BasicClass *unk104; /* released by Entity__Finalize, never set in Entity code: nothing shows its class. The object is 0x108 bytes (New_Entity) */
 };
 
-/* playTod (+0x12C) is Class65650's slot and returns the flag its occupant
+/* playTod (+0x12C) is TodActor's slot and returns the flag its occupant
  * sets, but Entity's callers call it as void: Entity__MoodCue39/57 (Entity_d)
  * and Entity__MoodCue86 (Entity_f) cross-jump a playTod call with a void
  * sibling (stopTod), which GCC 2.6.3 does only when both are void (the
@@ -179,13 +179,13 @@ extern s8 gEntityProximityThresholdTable[]; /* read by Entity__GetProximityRatio
 extern s8 D_80089EAF[]; /* read by Entity__AttachToParent, own base symbol immediately after gEntityEventVideoTable, moodIndex*0x10-indexed like the rest of this family */
 
 /* The class's own methods, in ROM order (Entity, then Entity_b). A caller
- * reaching the base ones goes through Get_vtable_Class65650() and upcasts. */
+ * reaching the base ones goes through GetTodActorMethods() and upcasts. */
 Entity *New_Entity(s32 moodIndex, void *desc, void *arg2);
 Entity *Entity__Entity(Entity *self, s32 moodIndex, void *desc, void *arg2);
 FadeBox *Entity__GetOrCreateFadeBox(Entity *self, void *name, void *arg2, void *arg3, s32 arg4);
 void Entity__Finalize(Entity *self);
 void Entity__Reset(Entity *self);
-void Entity__AttachToParent(Entity *self, Class65650 *peer, void *companion,
+void Entity__AttachToParent(Entity *self, TodActor *peer, void *companion,
                             struct Class866E8 *parent, void *offset);
 void Entity__DetachFromParent(Entity *self);
 void Entity__Update(Entity *self, void *sender, s32 event);
@@ -193,7 +193,7 @@ void Entity__NotifyLinkStage(Entity *self, void *sender, s32 event);
 void Entity__OnGridCellLinkCommand(Entity *self, void *sender, s32 event);
 void Entity__TickSoundCue(Entity *self);
 s32 Entity__IsNearTarget(Entity *self, void *pos, s32 arg2, s32 arg3);
-s32 Entity__DistanceToPeer(Entity *self, Class65650 *peer);
+s32 Entity__DistanceToPeer(Entity *self, TodActor *peer);
 s32 Entity__GetProximityRatio(Entity *self);
 EntityMoodRow *Entity__GetMoodEffect(Entity *self);
 s32 Entity__GetUnlockEffect(Entity *self);
@@ -220,7 +220,7 @@ void Entity__StepYawInWindowsThenDeactivate(Entity *self, SoundCueSet *out, s32 
 
 /* Functions of other units Entity calls directly. The SoundCueSet functions
  * are defined in code_179d8_e/l as (VabStreamObj *, SoundCueSet *); these
- * declarations take Class65650's `arg2` untyped, and their results are
+ * declarations take TodActor's `arg2` untyped, and their results are
  * unused. */
 extern void *BMemPMgrAlloc(s32 size);
 extern void BMemPMgrFree(void *arg);

@@ -59,7 +59,7 @@ The caller confirms it. `ProcessDreamAuxTriggerRecord` (code_4cd08) gets its
 object from `New_TriggerWorld` (FireDreamAuxTriggerEntries), calls this slot
 (+0x088) with the record's parity, and stores the result at `scratch[3]`
 (+0x00C), which `SpawnDreamAuxTriggerEntity` passes as `New_Entity`'s
-descriptor; Entity__Entity hands it to Class65650__Class65650, whose
-Class65650__AcquireModelData borrows the ModelData at the descriptor's
-+0x00C (UnkArg1Obj.modelData). Class unified in `include/TriggerWorld.h`
+descriptor; Entity__Entity hands it to TodActor__TodActor, whose
+TodActor__AcquireModelData borrows the ModelData at the descriptor's
++0x00C (TodActorDesc.modelData). Class unified in `include/TriggerWorld.h`
 (slot +0x088 `getModelData`).

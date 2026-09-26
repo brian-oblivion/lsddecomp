@@ -110,6 +110,6 @@ not read directly off any single instruction.
 
 ## Track 4 (2026-09-26, round 88, echo)
 
-`a0->entity` is now `Entity *` and its raw `vtable[0x14]`/`vtable[0x13]` calls are detachFromParent and attachToParent (through Class65650AttachToParentFn), same bytes. DreamAuxObjFn13/14 deleted.
+`a0->entity` is now `Entity *` and its raw `vtable[0x14]`/`vtable[0x13]` calls are detachFromParent and attachToParent (through TodActorAttachToParentFn), same bytes. DreamAuxObjFn13/14 deleted.
 
 Byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).

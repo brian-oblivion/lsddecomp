@@ -58,7 +58,7 @@
  * The overrides of +0x04C/+0x080/+0x084 (and TaskCore's) take self alone;
  * the up-call to onInit casts the slot, as TaskCore.h's banner says.
  *
- * +0x044's contradiction, settled by track 4 step 6 (round 85's Class65650
+ * +0x044's contradiction, settled by track 4 step 6 (round 85's TodActor
  * +0x04C rule): StreamTask__Init takes (self, args, streamName, streamGroup,
  * autoPlay) where IntermediateBase's init takes (self, args, mode) and
  * returns s32. The table keeps the inherited slot type, and code_1677c's

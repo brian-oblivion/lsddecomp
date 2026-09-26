@@ -59,15 +59,15 @@ allocator sub-shape #3 exactly (alloc, test, ctor, test-ctor's-own-return,
 free-on-failure) -- mechanics are the entire visible purpose of this
 function, which is why the previous round's own report already used this
 name in prose before anyone renamed it. Constructs a `BaseObjO`, not a
-`Class65650`: it calls `GetActorMethods()->ctor(self)` with a SINGLE
+`TodActor`: it calls `GetActorMethods()->ctor(self)` with a SINGLE
 argument, which only makes sense if that slot resolves to
 `Actor__Actor` (this unit's own 1-argument base ctor) rather than to
-`Class65650`'s real, 3-argument constructor
-(`code_55dd4.c:Class65650__Class65650`) -- confirmed directly by
+`TodActor`'s real, 3-argument constructor
+(`code_55dd4.c:TodActor__TodActor`) -- confirmed directly by
 `GetActorMethods`'s declared return type, `BaseObjOMethods *` here (this
 unit's own reading of the SAME table `code_55dd4.h` calls
 `D800878D4Methods`).
 
 ## Track 4 (2026-09-25, round 82, delta)
 
-Renamed from `New_BaseObjO`. BMemPMgrAlloc(0x58) then the table's ctor: the allocator, and the source of the class size 0x58. The class (id 0x34, table `gActorMethods`, formerly `D_800878D4`) is unified as `Actor` in `include/Actor.h`: a SceneNode subclass and the base of Class65650/Entity, DreamSys and Class876FC. Any source block above is the pre-unification spelling; the live body in `src/class_3bb8c_o.c` takes the unified types and field/slot names, byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).
+Renamed from `New_BaseObjO`. BMemPMgrAlloc(0x58) then the table's ctor: the allocator, and the source of the class size 0x58. The class (id 0x34, table `gActorMethods`, formerly `D_800878D4`) is unified as `Actor` in `include/Actor.h`: a SceneNode subclass and the base of TodActor/Entity, DreamSys and Class876FC. Any source block above is the pre-unification spelling; the live body in `src/class_3bb8c_o.c` takes the unified types and field/slot names, byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).

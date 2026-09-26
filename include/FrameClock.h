@@ -23,7 +23,7 @@
  * Its listeners, all dispatching on the sender's class nibble 5:
  * IntermediateBase's update counts every event; Viewport__OnNotifyTag5
  * redraws on 2 and 3 but not 4; DreamSys__TimerTick advances the dream timer
- * on 2 only; Class65650__Update ticks on 2 and releases itself on 4.
+ * on 2 only; TodActor__Update ticks on 2 and releases itself on 4.
  * `paused` is named from ObjM (src/class_3bb8c_m.c): ObjM__AdvancePauseSetup
  * calls +0x04C pause on its +0x010 FrameClock in the same step as WBgm__Pause
  * on its WBgm (the same slot, +0x04C), and ObjM__TeardownPauseOverlay calls
@@ -32,7 +32,7 @@
  *
  * removeParentRef and notifyParents are overridden only to keep
  * `parentCursor` valid: notifyParents walks parentRefs with it, and a parent
- * that drops the clock mid-walk (a Class65650 releasing itself on event 4
+ * that drops the clock mid-walk (a TodActor releasing itself on event 4
  * removes its children, this clock among them) steps the cursor past its own
  * node first.
  */

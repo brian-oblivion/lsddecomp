@@ -2,21 +2,22 @@
 #define CODE_55DD4_H
 
 #include "common.h"
-#include "Class65650.h"
+#include "TodActor.h"
 #include "ModelData.h"
+#include "Tod.h"
 #include "LinkResource.h"
+#include "VabStreamObj.h"
 
 /*
- * code_55dd4's own readings of the objects Class65650 (include/Class65650.h)
- * reaches that are not Class65650: the ctor's two arguments, onNotify's
- * sender, the TOD coordinate parameters of a part, and the TodSet
- * internals behind ModelData's `todSet` (its `linkResource` is
- * include/LinkResource.h's, round 89). The
+ * code_55dd4's own readings of what TodActor (include/TodActor.h) reaches
+ * that is not TodActor: the ctor's descriptor, onNotify's sender, the TOD
+ * format (file header, packet types) and a TodSet's table of Tods. The
  * class itself -- object, table, getter, method prototypes -- is
- * include/Class65650.h's.
+ * include/TodActor.h's; the sound bank is include/VabStreamObj.h's and a
+ * part's coordinate parameters are Sony's GsCOORD2PARAM.
  */
 
-/* Class65650__OnNotify's sender: any object. Only its method table's header
+/* TodActor__OnNotify's sender: any object. Only its method table's header
  * word is read (the low 16 bits), compared with MODEL_DATA_CLASS_HEADER. */
 typedef struct TaggedObj {
     u16 header; /* +0x000, the method table's header word */
@@ -27,33 +28,11 @@ typedef struct TagCheckArg {
 } TagCheckArg;
 
 /* Header word of gModelDataMethods (tools/classtable.py), the class New_ModelData
- * allocates and Class65650.modelData points at. */
+ * allocates and TodActor.modelData points at. */
 #define MODEL_DATA_CLASS_HEADER 0x5F03
 
-/* Whatever class self->arg2 points at: unidentified, only its
- * vtable slot +0x080 is needed so far, by Class65650__func_800661D4. */
-typedef struct UnkArg2Methods {
-    u8 pad00[0x80];                                         /* +0x000 .. +0x07C, unknown */
-    void (*slot80)(void *self, void *arg1, s32 a2, s32 a3); /* +0x080 */
-} UnkArg2Methods;
-
-typedef struct UnkArg2Obj {
-    UnkArg2Methods *methods;
-} UnkArg2Obj;
-
-/* A part's coord2->param (SceneNodeSub44, GsCOORD2PARAM) as
- * Class65650__ApplyTodPacket writes it from a TOD coordinate packet: the
- * scale, rotate and trans vectors as arrays. */
-typedef struct TimeTargetObj {
-    s32 scale[3];   /* +0x000 .. +0x00B GsCOORD2PARAM.scale: TOD_COORD_SCALE */
-    u8 pad0C[0x04]; /* +0x00C .. +0x00F */
-    s16 rotate[3];  /* +0x010 .. +0x015 GsCOORD2PARAM.rotate: TOD_COORD_ROTATE */
-    u8 pad16[0x02]; /* +0x016 .. +0x017 */
-    s32 trans[3]; /* +0x018 .. +0x023 GsCOORD2PARAM.trans: TOD_COORD_TRANSLATE, then copied to coord.t */
-} TimeTargetObj;
-
 /* TOD packet types and coordinate-packet flag bits, as
- * Class65650__ApplyTodPacket decodes them (the decoded header is
+ * TodActor__ApplyTodPacket decodes them (the decoded header is
  * {object id, type, flag, length in words}). */
 #define TOD_PACKET_ATTRIBUTE 0
 #define TOD_PACKET_COORDINATE 1
@@ -64,28 +43,26 @@ typedef struct TimeTargetObj {
 #define TOD_COORD_SCALE 4
 #define TOD_COORD_TRANSLATE 8
 
-/* self->modelData->todSet (Class65650__SetTod, Class65650__Tick): its
- * buffer (FileResource +0x010) + 8 + i * 4 holds a pointer to the i-th TOD's
- * holder, whose +0x10 is the TOD data itself: +0x4 the frame count, frames
- * starting at +0x8. */
-typedef struct EntryObj2 {
-    u8 pad00[0x04];
-    s32 frameCount; /* +0x004 TOD header: number of frames */
-} EntryObj2;
+/* A TOD file's header (Sony's TOD format: id, version, resolution, then the
+ * frame count); its frames start at +0x8. */
+typedef struct TodHeader {
+    u8 pad00[0x04]; /* +0x000 id, version, resolution: not read */
+    s32 frameCount; /* +0x004 */
+} TodHeader;
 
-typedef struct GroupObj {
-    u8 pad00[0x10];
-    EntryObj2 *tod; /* +0x010 */
-} GroupObj;
+/* The i-th Tod of a TodSet (TodActor__SetTod, TodActor__Tick):
+ * TodSet__BuildTods replaces each word of its buffer's counted offset
+ * table, from +0x8, with the Tod it built over that sub-block. */
+#define TODSET_TOD(set, i) (*(Tod **)((u8 *)(set)->buffer + 8 + (i) * 4))
 
-/* The constructor's `arg1`, forwarded through setupModelData into
- * Class65650__AcquireModelData: if its +0x0C already holds a model-data
- * object it is borrowed, otherwise New_ModelData(arg1) makes one that this
- * instance owns. */
-typedef struct UnkArg1Obj {
-    u8 pad00[0x0C];
-    ModelData *modelData;
-} UnkArg1Obj;
+/* The ctor's descriptor, forwarded through setupModelData into
+ * TodActor__AcquireModelData: the ModelData at +0x0C is borrowed; when there
+ * is none, New_ModelData(desc) makes one from the descriptor's leading
+ * {buffer, name} (code_33808.c's Src6F240) and the TodActor owns it. */
+typedef struct TodActorDesc {
+    u8 pad00[0x0C];       /* +0x000 New_ModelData's source; not read here */
+    ModelData *modelData; /* +0x00C */
+} TodActorDesc;
 
 extern void *BMemPMgrAlloc(s32 size);
 extern void *BMemPMgrFree(void *ptr);

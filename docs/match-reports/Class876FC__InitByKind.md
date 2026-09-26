@@ -146,7 +146,7 @@ The class: every function here runs on a gClass876FCMethods instance.
 kind 0..3 as its first argument (class_3bb8c_n.c passes 0, 1, 2, 3 at its
 four call sites); `Class876FC__Class876FC` (table +0x008, the ctor) stores it at
 +0x054. `Class876FC` is the table-address class name, the
-`SceneNode`/`Class65650` convention.
+`SceneNode`/`TodActor` convention.
 
 Globals named in this pass: `gTrackedYSnapshot` (was D_8008ACB0, tier B:
 written here from D_8008ACAC's +0x018 word, subtracted from it again by

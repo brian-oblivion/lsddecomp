@@ -154,7 +154,7 @@ flat 4-byte function-pointer tables (>=8 slots):    128
 Word +0x000 of every table is the class id, read as a path of nibbles from
 the low end: each nibble above the lowest non-zero one is one more level of
 derivation, so the parent of `0x1F234` (Entity) is `0xF234` (no table of its
-own), then `0x234` (Class65650), `0x34`, `0x4` and `0x0` (BasicClass). Three
+own), then `0x234` (TodActor), `0x34`, `0x4` and `0x0` (BasicClass). Three
 independent checks agree:
 
 - **Slot sharing.** For all 57 derived tables, the table sharing the most

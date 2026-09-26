@@ -54,7 +54,7 @@ void Actor__AddChild(BaseObjO *self, TagWordObjO *arg) {
   `lbu`) -- kept as a separate local type, `TagWordObjO`, rather than
   conflating the two shapes.
 - **`self->unk4C = arg;` / `self->unk50 = arg;` are companion-object
-  pointers**, mirroring `code_55dd4.h`'s already-documented `Class65650`
+  pointers**, mirroring `code_55dd4.h`'s already-documented `TodActor`
   field `unk50` ("companion-object pointer, unlinked via slot14") at the
   exact same offset in a sibling class built on the same base -- this
   function is the "link" (sets the pointer); `Actor__RemoveChild` right after
@@ -85,4 +85,4 @@ half, right after it in ROM order.
 
 ## Track 4 (2026-09-25, round 82, delta)
 
-Renamed from `BaseObjO__LinkCompanion`. Override of +0x010 (addChild), named for its slot: chains SceneNode's addChild, then records the child as `grid` when its class id & 0xFFF is 0x114 (Class866E8, the grid manager) or as `ticker` when id & 0xF is 5 (FrameClock). The class (id 0x34, table `gActorMethods`, formerly `D_800878D4`) is unified as `Actor` in `include/Actor.h`: a SceneNode subclass and the base of Class65650/Entity, DreamSys and Class876FC. Any source block above is the pre-unification spelling; the live body in `src/class_3bb8c_o.c` takes the unified types and field/slot names, byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).
+Renamed from `BaseObjO__LinkCompanion`. Override of +0x010 (addChild), named for its slot: chains SceneNode's addChild, then records the child as `grid` when its class id & 0xFFF is 0x114 (Class866E8, the grid manager) or as `ticker` when id & 0xF is 5 (FrameClock). The class (id 0x34, table `gActorMethods`, formerly `D_800878D4`) is unified as `Actor` in `include/Actor.h`: a SceneNode subclass and the base of TodActor/Entity, DreamSys and Class876FC. Any source block above is the pre-unification spelling; the live body in `src/class_3bb8c_o.c` takes the unified types and field/slot names, byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).

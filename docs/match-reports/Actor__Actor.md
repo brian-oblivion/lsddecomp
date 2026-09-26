@@ -29,11 +29,11 @@ fail:
 
 ## Class identification (this file's central finding)
 
-This function IS `D800878D4Methods::ctor` (`code_55dd4.h`, Class65650's own
+This function IS `D800878D4Methods::ctor` (`code_55dd4.h`, TodActor's own
 reading of the shared base) and simultaneously IS `vtable_DreamSys`'s
 implicit base-construction step -- confirmed three ways:
 
-1. `GetActorMethods()` (Class65650's own getter, already declared in
+1. `GetActorMethods()` (TodActor's own getter, already declared in
    `code_55dd4.h` returning `D800878D4Methods *`) is called here to
    install `self->methods`, i.e. this function is establishing the exact
    table `GetActorMethods` returns.
@@ -100,16 +100,16 @@ takes an already-allocated `self`, chains to the true root
 (`GetSceneNodeMethods()->ctor`), installs `self->methods`, zeroes three fields
 and dispatches `slot40`. The report's own "Class identification" section
 establishes THREE independent ways that this is the shared intermediate
-base's own constructor, not `Class65650`'s: (1) it installs the exact
+base's own constructor, not `TodActor`'s: (1) it installs the exact
 table `GetActorMethods()` returns, (2) the functions defined right after it
 in this unit occupy that same table's `+0x010`/`+0x014`/`+0x018` slots and
 are independently named at the identical offsets in two sibling headers'
 own local views (`DreamSys.h`, `code_55dd4.h`), (3) `code_55dd4.c`'s real
-`Class65650` constructor (`Class65650__Class65650`) calls THIS function
+`TodActor` constructor (`TodActor__TodActor`) calls THIS function
 through `base->ctor(self)` to chain to it first, then immediately
-overwrites `self->methods` with `Class65650`'s own, more specific table --
-i.e. `Class65650` derives from this class, it is not this class.
+overwrites `self->methods` with `TodActor`'s own, more specific table --
+i.e. `TodActor` derives from this class, it is not this class.
 
 ## Track 4 (2026-09-25, round 82, delta)
 
-Renamed from `BaseObjO__BaseObjO`. Occupant of +0x008 in gActorMethods: the ctor, named for its slot. Chains SceneNode's ctor, zeroes state/grid/ticker, calls reset. The class (id 0x34, table `gActorMethods`, formerly `D_800878D4`) is unified as `Actor` in `include/Actor.h`: a SceneNode subclass and the base of Class65650/Entity, DreamSys and Class876FC. Any source block above is the pre-unification spelling; the live body in `src/class_3bb8c_o.c` takes the unified types and field/slot names, byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).
+Renamed from `BaseObjO__BaseObjO`. Occupant of +0x008 in gActorMethods: the ctor, named for its slot. Chains SceneNode's ctor, zeroes state/grid/ticker, calls reset. The class (id 0x34, table `gActorMethods`, formerly `D_800878D4`) is unified as `Actor` in `include/Actor.h`: a SceneNode subclass and the base of TodActor/Entity, DreamSys and Class876FC. Any source block above is the pre-unification spelling; the live body in `src/class_3bb8c_o.c` takes the unified types and field/slot names, byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).

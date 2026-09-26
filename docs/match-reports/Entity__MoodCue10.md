@@ -15,10 +15,10 @@ calls `this->methods->slotC4(this, -0x1E, 0)`.
 
 `slotC4` is a shared BasicClass-inherited slot: confirmed with
 `tools/classtable.py` that BOTH this unit's own vtable (`gEntityMethods`) and
-Class65650's vtable (`gClass65650Methods`, `include/code_55dd4.h`) hold the identical
+TodActor's vtable (`gTodActorMethods`, `include/code_55dd4.h`) hold the identical
 function (`Actor__MoveLocalZ`) at `+0xC4`, and `code_55dd4.h`'s own
-`Class65650Methods.slotC4` already documents the exact same call shape
-(`slotC4(self, -0x1E, 0)`, from `Class65650__TickCallbackA`) — so this is not a
+`TodActorMethods.slotC4` already documents the exact same call shape
+(`slotC4(self, -0x1E, 0)`, from `TodActor__TickCallbackA`) — so this is not a
 coincidence, it is the shared ancestor's method, reached the same way in two
 unrelated classes.
 
@@ -48,7 +48,7 @@ which needed a correction for the analogous shape).
 
 Cross-referencing `tools/classtable.py`'s output for a suspicious 3-argument
 vtable call against `include/code_55dd4.h`'s already-documented
-`Class65650Methods` slots is a fast way to confirm a shared-ancestor slot's
+`TodActorMethods` slots is a fast way to confirm a shared-ancestor slot's
 signature without deriving it from scratch — the same physical function
 occupying the same offset in two different classes' tables is strong
 corroboration, not just a coincidence to note.
@@ -63,4 +63,4 @@ Why `MoodCueNN`: the function's address sits in `gEntityMoodHandlerTable` row NN
 
 ## Track 4 (2026-09-26, round 88, echo)
 
-The class (id 0x1F234, table `gEntityMethods`) is unified as `Entity` in `include/Entity.h`: a Class65650 subclass whose table and object expand `CLASS65650_SLOTS`/`CLASS65650_FIELDS`. Any source block above is the pre-unification spelling; the live body takes the inherited names (fields `parent`, `coord2`->`tx/ty/tz`, `tick`, `linkTarget`, `state` (was `moodState`), `lastOffsetValue`, `grid` (was `unk4C`), `ticker` (was `companion2`), `arg2` (was `soundCueChannel`), `parts`, `todPlaying`, `peer` (was `target`, cast to the `Unk94Obj` DreamSys view where its own slots are called); slots `reset`, `setDisplay`, `setLightMode`, `setTranslation`/`addTranslation`, `moveLocalZ/X/Y`, `moveLocalZOrFindLink`, `selectTickCallback`, `enableTickCallback`/`disableTickCallback`, `distanceToPeer`, `setTargetReached`, `updateActivationState`/`updateDeactivationState`), byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).
+The class (id 0x1F234, table `gEntityMethods`) is unified as `Entity` in `include/Entity.h`: a TodActor subclass whose table and object expand `TODACTOR_SLOTS`/`TODACTOR_FIELDS`. Any source block above is the pre-unification spelling; the live body takes the inherited names (fields `parent`, `coord2`->`tx/ty/tz`, `tick`, `linkTarget`, `state` (was `moodState`), `lastOffsetValue`, `grid` (was `unk4C`), `ticker` (was `companion2`), `arg2` (was `soundCueChannel`), `parts`, `todPlaying`, `peer` (was `target`, cast to the `Unk94Obj` DreamSys view where its own slots are called); slots `reset`, `setDisplay`, `setLightMode`, `setTranslation`/`addTranslation`, `moveLocalZ/X/Y`, `moveLocalZOrFindLink`, `selectTickCallback`, `enableTickCallback`/`disableTickCallback`, `distanceToPeer`, `setTargetReached`, `updateActivationState`/`updateDeactivationState`), byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).

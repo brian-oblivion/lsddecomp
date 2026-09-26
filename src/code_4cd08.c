@@ -411,8 +411,8 @@ bool SpawnDreamAuxTriggerEntity(s32 kind, void *out, void *ctx, s32 entry) {
 
         D_8008ABFC->methods->computeCellOffsets(D_8008ABFC, outBuf, &coords);
         entity->methods->updateRotation(entity, 1, D_80088F18 + rec->val2 * 12);
-        ((Class65650AttachToParentFn)entity->methods->attachToParent)(
-            (Class65650 *)entity, (Class65650 *)gDreamAuxWorld, (void *)D_8008AC08,
+        ((TodActorAttachToParentFn)entity->methods->attachToParent)(
+            (TodActor *)entity, (TodActor *)gDreamAuxWorld, (void *)D_8008AC08,
             (void *)D_8008ABFC, outBuf);
         return false;
     }
@@ -425,8 +425,8 @@ void DespawnDreamAuxEntity(DreamAuxSlot *a0) {
 
         a0->entity->methods->detachFromParent(a0->entity);
         SceneNode__LocalOffsetToWorldPos((SceneNode *)gDreamAuxWorld, localPos, a0->pos, 0);
-        ((Class65650AttachToParentFn)a0->entity->methods->attachToParent)(
-            (Class65650 *)a0->entity, (Class65650 *)gDreamAuxWorld, (void *)D_8008AC08,
+        ((TodActorAttachToParentFn)a0->entity->methods->attachToParent)(
+            (TodActor *)a0->entity, (TodActor *)gDreamAuxWorld, (void *)D_8008AC08,
             (void *)D_8008ABFC, localPos);
         SceneNode__FaceTarget((SceneNode *)a0->entity, (SceneNode *)gDreamAuxWorld, 1, 0, 0);
     }

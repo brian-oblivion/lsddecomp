@@ -25,7 +25,7 @@ void Entity__NotifyLinkStage(Entity *this, s32 arg1, s32 arg2) {
             return;
         }
     }
-    Get_vtable_Class65650()->slotDC(this, arg1, arg2);
+    GetTodActorMethods()->slotDC(this, arg1, arg2);
     if (arg2 != 4) {
         return;
     }
@@ -52,7 +52,7 @@ Byte-exact, whole-image build verified.
    `arg2`. Scored 37/62 with NO whole-image drift (good sign -- pure
    register-identity residue, not a size mismatch): retail assigns `arg2`
    to `$s0` and the loaded table byte to `$s1` (both need to survive the
-   `Get_vtable_Class65650()` call); my build had them swapped. Two follow-up
+   `GetTodActorMethods()` call); my build had them swapped. Two follow-up
    attempts trying to fix the order by literally reordering the two
    statements, or introducing a boolean `inRange` computed first, both
    made it WORSE (32/62 and 5/62 respectively) -- the second duplicated
@@ -128,11 +128,11 @@ already established, tier A, in an earlier round) via the identical
 - `EntityMethods::slot30` -> `notifyParents` -- **tier B.** `tools/
   classtable.py` on `gEntityMethods` shows +0x030 occupied by the already-
   named `BasicClass__NotifyParents` (a shared-ancestor slot, same idiom as
-  `Get_vtable_Class65650()`'s table). CROSS-UNIT: called from every one of Entity_b/
+  `GetTodActorMethods()`'s table). CROSS-UNIT: called from every one of Entity_b/
   c/d/e/f/g (grep -rn -- '->slot30(' src/Entity_*.c), so proposed here
   rather than applied. Evidence and full writeup in `Entity__SetTargetReached.md`,
   which also dispatches through it.
 
 ## Track 4 (2026-09-26, round 88, echo)
 
-The class (id 0x1F234, table `gEntityMethods`) is unified as `Entity` in `include/Entity.h`: a Class65650 subclass whose table and object expand `CLASS65650_SLOTS`/`CLASS65650_FIELDS`. Any source block above is the pre-unification spelling; the live body takes the inherited names (fields `parent`, `coord2`->`tx/ty/tz`, `tick`, `linkTarget`, `state` (was `moodState`), `lastOffsetValue`, `grid` (was `unk4C`), `ticker` (was `companion2`), `arg2` (was `soundCueChannel`), `parts`, `todPlaying`, `peer` (was `target`, cast to the `Unk94Obj` DreamSys view where its own slots are called); slots `reset`, `setDisplay`, `setLightMode`, `setTranslation`/`addTranslation`, `moveLocalZ/X/Y`, `moveLocalZOrFindLink`, `selectTickCallback`, `enableTickCallback`/`disableTickCallback`, `distanceToPeer`, `setTargetReached`, `updateActivationState`/`updateDeactivationState`), byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).
+The class (id 0x1F234, table `gEntityMethods`) is unified as `Entity` in `include/Entity.h`: a TodActor subclass whose table and object expand `TODACTOR_SLOTS`/`TODACTOR_FIELDS`. Any source block above is the pre-unification spelling; the live body takes the inherited names (fields `parent`, `coord2`->`tx/ty/tz`, `tick`, `linkTarget`, `state` (was `moodState`), `lastOffsetValue`, `grid` (was `unk4C`), `ticker` (was `companion2`), `arg2` (was `soundCueChannel`), `parts`, `todPlaying`, `peer` (was `target`, cast to the `Unk94Obj` DreamSys view where its own slots are called); slots `reset`, `setDisplay`, `setLightMode`, `setTranslation`/`addTranslation`, `moveLocalZ/X/Y`, `moveLocalZOrFindLink`, `selectTickCallback`, `enableTickCallback`/`disableTickCallback`, `distanceToPeer`, `setTargetReached`, `updateActivationState`/`updateDeactivationState`), byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).

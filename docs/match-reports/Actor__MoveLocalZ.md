@@ -6,7 +6,7 @@
 
 Unit: `class_3bb8c_o` (round 17). A shared `BasicClass`-inherited slot
 occupant (`slotC4`), already independently confirmed `void` from BOTH
-`Entity.h` and `code_55dd4.h`'s `Class65650Methods::slotC4` (both tables
+`Entity.h` and `code_55dd4.h`'s `TodActorMethods::slotC4` (both tables
 hold this exact function at `+0xC4`, per `Entity.h`'s own comment). Tail-
 calls `Actor__MoveAlongLocalAxis` (still `INCLUDE_ASM`, sibling unit
 `class_3bb8c_p`) with a fixed global address and a literal `6`.
@@ -68,4 +68,4 @@ not what the slot means). Kept the tier-C `Class__func_xxxxx` form.
 
 ## Track 4 (2026-09-25, round 82, delta)
 
-Renamed from `BaseObjO__func_5748c`. Occupant of +0x0C4: Actor__MoveAlongLocalAxis(self, &D_8008ABA8, val, notify, 6). D_8008ABA4 is an s16 vector passed whole to addLocalTranslation (RotateLocalVector reads src[0..2]), so ABA4/ABA6/ABA8 are x/y/z and this is the z move. The class (id 0x34, table `gActorMethods`, formerly `D_800878D4`) is unified as `Actor` in `include/Actor.h`: a SceneNode subclass and the base of Class65650/Entity, DreamSys and Class876FC. Any source block above is the pre-unification spelling; the live body in `src/class_3bb8c_o.c` takes the unified types and field/slot names, byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).
+Renamed from `BaseObjO__func_5748c`. Occupant of +0x0C4: Actor__MoveAlongLocalAxis(self, &D_8008ABA8, val, notify, 6). D_8008ABA4 is an s16 vector passed whole to addLocalTranslation (RotateLocalVector reads src[0..2]), so ABA4/ABA6/ABA8 are x/y/z and this is the z move. The class (id 0x34, table `gActorMethods`, formerly `D_800878D4`) is unified as `Actor` in `include/Actor.h`: a SceneNode subclass and the base of TodActor/Entity, DreamSys and Class876FC. Any source block above is the pre-unification spelling; the live body in `src/class_3bb8c_o.c` takes the unified types and field/slot names, byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).

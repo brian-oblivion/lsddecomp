@@ -16,7 +16,7 @@
  * TMD model source and a TOD set over one buffer (ModelData__BuildResources:
  * New_LinkResource over the sub-block at the buffer's third word, New_TodSet
  * over the buffer past +0x0C) and forward TOD packet decoding to the set
- * (+0x080/+0x084); its outside users, code_55dd4 (Class65650.modelData,
+ * (+0x080/+0x084); its outside users, code_55dd4 (TodActor.modelData,
  * `tmd`/`tods`) and code_4cd08 (InitDreamAux's MOM files), hold it as the
  * model and animation data of an actor.
  *
