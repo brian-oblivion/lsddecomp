@@ -37,7 +37,7 @@ void ObjM__NoOpSlot40(void) {}
 void ObjM__AttachTarget(ObjM *self, IntermediateBaseInitArgs *args, DreamSys *dreamSys) {
     ((Class866E8 *)args->lightRig)
         ->methods->setCallback((Class866E8 *)args->lightRig,
-                               (Class866E8ValueFn)ObjM__OnRegistrantEvent, self);
+                               (ChunkFileFn)ObjM__OnRegistrantEvent, self);
     self->dreamSys = dreamSys;
     GetTimedTaskMethods()->init((TimedTask *)self, args, 1);
     self->methods->addChild(self, (BasicClass *)dreamSys);

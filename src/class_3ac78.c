@@ -298,7 +298,7 @@ void Class866E8__SetChildParams(Class866E8 *self, s32 count, s32 dirs, s32 color
     }
 }
 
-void Class866E8__SetCallback(Class866E8 *self, Class866E8ValueFn fn, void *ctx) {
+void Class866E8__SetCallback(Class866E8 *self, ChunkFileFn fn, void *ctx) {
     self->valueFn = fn;
     self->valueFnCtx = ctx;
 }

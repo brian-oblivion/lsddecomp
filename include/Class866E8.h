@@ -189,7 +189,7 @@ struct ChunkSlot {
 
 /* The ctor's callback pair (setCallback): ComputeRateEntry calls
  * valueFn(valueFnCtx, value, 0, 0) and keeps the result as an entry's name. */
-typedef void *(*Class866E8ValueFn)(void *ctx, s32 value, s32 arg2, s32 arg3);
+typedef void *(*ChunkFileFn)(void *ctx, s32 value, s32 arg2, s32 arg3);
 
 /* LightRig's slots, then this class's own. */
 struct Class866E8Methods {
@@ -197,7 +197,7 @@ struct Class866E8Methods {
     /* +0x0C0 */ void (*resetAllElements)(Class866E8 *self); /* Class866E8__ResetAllElements */
     /* +0x0C4 */ void (*setChildParams)(Class866E8 *self, s32 count, s32 dirs,
                                         s32 colors); /* Class866E8__SetChildParams */
-    /* +0x0C8 */ void (*setCallback)(Class866E8 *self, Class866E8ValueFn fn, void *ctx); /* Class866E8__SetCallback */
+    /* +0x0C8 */ void (*setCallback)(Class866E8 *self, ChunkFileFn fn, void *ctx); /* Class866E8__SetCallback */
     /* +0x0CC */ void (*setAcceptedTags)(Class866E8 *self, s32 *tags); /* Class866E8__SetAcceptedTags */
     /* +0x0D0 */ void (*forwardAcceptedCommand)(Class866E8 *self, void *sender,
                                                 s32 command); /* Class866E8__ForwardAcceptedCommand */
@@ -243,7 +243,7 @@ struct Class866E8Methods {
 struct Class866E8 {
     LIGHTRIG_FIELDS(Class866E8Methods);
     /* +0x054 */ LongVec3 origin; /* the ctor: its argument, or gDefaultOrigin; the cellParents attach here */
-    /* +0x060 */ Class866E8ValueFn valueFn; /* setCallback */
+    /* +0x060 */ ChunkFileFn valueFn; /* setCallback */
     /* +0x064 */ void *valueFnCtx;          /* setCallback */
     /* +0x068 */ StageGridDimensions *config; /* setConfig (ObjM: GetStageGridDimensions(stage)); NULL after Reset */
     /* +0x06C */ SceneNode *target; /* setTargetAndBuildRates (DreamSys__SpawnAtLink passes the DreamSys); its coord2 is the tracked position */
@@ -298,7 +298,7 @@ void Class866E8__UpdateIfEnabled(Class866E8 *self);
 void Class866E8__DispatchLinkCommand(Class866E8 *self, BasicClass *sender, s32 command);
 void Class866E8__ResetAllElements(Class866E8 *self);
 void Class866E8__SetChildParams(Class866E8 *self, s32 count, s32 dirs, s32 colors);
-void Class866E8__SetCallback(Class866E8 *self, Class866E8ValueFn fn, void *ctx);
+void Class866E8__SetCallback(Class866E8 *self, ChunkFileFn fn, void *ctx);
 void Class866E8__SetAcceptedTags(Class866E8 *self, s32 *tags);
 void Class866E8__ForwardAcceptedCommand(Class866E8 *self, void *sender, s32 command);
 void Class866E8__ApplyToSenderFootprint(Class866E8 *self, SceneNode *sender, s32 command);
