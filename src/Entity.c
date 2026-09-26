@@ -8,7 +8,7 @@
  * (New_Entity/Entity__Entity/Entity__Finalize), its per-tick dispatcher
  * (Entity__Update, chaining through most of EntityMethods), the sound-cue
  * lifecycle (Entity__StartSoundCue/TickSoundCue/StopSoundCue on the
- * Class65650 `arg2`/soundCueSet pair), the active-flag toggle
+ * TodActor `arg2`/soundCueSet pair), the active-flag toggle
  * (Entity__Activate/Deactivate and the two functions that decide whether to
  * fire them, Entity__UpdateActivationState/DeactivationState), and four
  * small getters over the moodIndex-selected per-mood tables
@@ -19,7 +19,7 @@
  * the ground truth for which function occupies which slot, including the
  * several self-referential slots this unit's own functions dispatch back
  * into (activate/deactivate/getProximityRatio/startSoundCue/stopSoundCue).
- * The overrides of Class65650's slots are named for their slots
+ * The overrides of TodActor's slots are named for their slots
  * (Entity__Finalize, Reset, AttachToParent, DetachFromParent,
  * OnGridCellLinkCommand; track 4, round 88).
  */
@@ -42,7 +42,7 @@ Entity *New_Entity(s32 moodIndex, void *desc, void *arg2) {
 }
 
 Entity *Entity__Entity(Entity *this, s32 moodIndex, void *desc, void *arg2) {
-    if (Get_vtable_Class65650()->ctor((Class65650 *)this, desc, arg2) != NULL) {
+    if (Get_vtable_TodActor()->ctor((TodActor *)this, desc, arg2) != NULL) {
         this->methods = Get_vtable_Entity();
         this->moodIndex = moodIndex;
         this->soundCueSet.tag = 0;
@@ -91,7 +91,7 @@ void Entity__Finalize(Entity *this) {
     if (this->unk104 != NULL) {
         this->unk104->methods->release(this->unk104);
     }
-    Get_vtable_Class65650()->finalize((Class65650 *)this);
+    Get_vtable_TodActor()->finalize((TodActor *)this);
 }
 
 void Entity__Reset(Entity *this) {
@@ -105,12 +105,12 @@ void Entity__Reset(Entity *this) {
     this->methods->deactivate(this);
 }
 
-void Entity__AttachToParent(Entity *this, Class65650 *peer, void *companion,
+void Entity__AttachToParent(Entity *this, TodActor *peer, void *companion,
                             struct Class866E8 *parent, void *offset) {
     if (this->parent != 0) {
         return;
     }
-    ((Class65650AttachToParentFn)Get_vtable_Class65650()->attachToParent)((Class65650 *)this, peer,
+    ((TodActorAttachToParentFn)Get_vtable_TodActor()->attachToParent)((TodActor *)this, peer,
                                                                           companion, parent, offset);
     this->grid = parent;
     if (D_80089EA7[this->moodIndex * 0x10] != 0) {
@@ -126,7 +126,7 @@ void Entity__AttachToParent(Entity *this, Class65650 *peer, void *companion,
 void Entity__DetachFromParent(Entity *this) {
     if (this->parent != 0) {
         this->methods->deactivate(this);
-        Get_vtable_Class65650()->detachFromParent((Class65650 *)this);
+        Get_vtable_TodActor()->detachFromParent((TodActor *)this);
         this->grid = NULL;
     }
 }
@@ -139,7 +139,7 @@ void Entity__Update(Entity *this, void *a1, s32 a2) {
         this->methods->updateSoundCueStop(this);
     }
     this->methods->updateTargetProximity(this);
-    Get_vtable_Class65650()->update((Class65650 *)this, a1, a2);
+    Get_vtable_TodActor()->update((TodActor *)this, a1, a2);
 }
 
 void Entity__NotifyLinkStage(Entity *this, void *arg1, s32 arg2) {
@@ -151,7 +151,7 @@ void Entity__NotifyLinkStage(Entity *this, void *arg1, s32 arg2) {
             return;
         }
     }
-    Get_vtable_Class65650()->onActorLinkCommand((Class65650 *)this, arg1, arg2);
+    Get_vtable_TodActor()->onActorLinkCommand((TodActor *)this, arg1, arg2);
     if (arg2 != 4) {
         return;
     }
@@ -169,7 +169,7 @@ void Entity__NotifyLinkStage(Entity *this, void *arg1, s32 arg2) {
 }
 
 void Entity__OnGridCellLinkCommand(Entity *this, void *a1, s32 a2) {
-    Get_vtable_Class65650()->onGridCellLinkCommand((Class65650 *)this, a1, a2);
+    Get_vtable_TodActor()->onGridCellLinkCommand((TodActor *)this, a1, a2);
     if (a2 == 4) {
         this->methods->deactivate(this);
     }
@@ -206,7 +206,7 @@ s32 Entity__IsNearTarget(Entity *this, void *pos, s32 arg2, s32 arg3) {
         ->methods->projectPointAtDistance((DreamSys *)this->peer, 0, arg2 << 11, (s32 *)&local, arg3);
 }
 
-s32 Entity__DistanceToPeer(Entity *this, Class65650 *peer) {
+s32 Entity__DistanceToPeer(Entity *this, TodActor *peer) {
     s32 *world;
     SceneNodeSub14 *pos;
     s32 dx;

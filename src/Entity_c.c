@@ -21,7 +21,7 @@
  * (same precedent as `Entity__MoodCue81`, Entity_e).
  *
  * Fields and slots are the unified Entity's (include/Entity.h, track 4
- * round 88): the inherited ones carry Class65650's, Actor's and
+ * round 88): the inherited ones carry TodActor's, Actor's and
  * SceneNode's names (`state`, `linkTarget`, `peer`, moveLocalZ/X/Y,
  * moveLocalZOrFindLink, ...), Entity's own are named for their occupants.
  */

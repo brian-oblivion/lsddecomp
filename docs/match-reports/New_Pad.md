@@ -112,7 +112,7 @@ one shared epilogue. Try both before spending attempts on scheduling barriers.
 ## Naming
 
 **Tier A.** `New_X` allocator+ctor-wrapper shape (matches `New_GameApplication`,
-`New_DreamSys`, `New_Class65650`, etc. project-wide): allocates the instance
+`New_DreamSys`, `New_TodActor`, etc. project-wide): allocates the instance
 through `BMemPMgrAlloc`, then calls the class's own ctor slot through
 `Get_vtable_Pad()`. `Pad` is the class name established for this whole unit
 (see `include/class_16334.h`'s header comment, confirmed by the direct

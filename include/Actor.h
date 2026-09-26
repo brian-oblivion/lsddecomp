@@ -7,7 +7,7 @@
  * Actor -- a positioned scene object that moves (class id 0x34, method table
  * gActorMethods): a SceneNode subclass. Methods in src/class_3bb8c_o.c and
  * src/class_3bb8c_p.c. Three classes derive from it directly
- * (`typeviews.py --tree`): Class65650 (0x234, code_55dd4; Entity below it),
+ * (`typeviews.py --tree`): TodActor (0x234, code_55dd4; Entity below it),
  * DreamSys (0x1F34) and Class876FC (0xEF34, class_3bb8c_r/s).
  *
  * Children and companions. addChild/removeChild/removeAllChildren chain
@@ -15,7 +15,7 @@
  * `(id & 0xFFF) == 0x114` is the grid manager (Class866E8, include/
  * Class866E8.h), kept in `grid`; `(id & 0xF) == 5` is a FrameClock object,
  * kept in `ticker` (SceneNode's onNotify routes that class's events to
- * `update`, +0x098, which the subclasses override as Class65650's
+ * `update`, +0x098, which the subclasses override as TodActor's
  * Update (formerly OnClass6EF50Notify), Entity__Update and DreamSys__TimerTick).
  *
  * Movement. setTranslation/addTranslation (+0x0B8/+0x0BC) set or add

@@ -23,7 +23,7 @@
  * Its one outside user, code_4cd08's FireDreamAuxTriggerEntries, builds one
  * over a trigger group's buffer, and ProcessDreamAuxTriggerRecord passes
  * getModelData(record->parity) on as New_Entity's descriptor word +0x00C,
- * which Class65650__AcquireModelData borrows as the entity's ModelData.
+ * which TodActor__AcquireModelData borrows as the entity's ModelData.
  *
  * SLOTS (`classtable.py gTriggerWorldMethods --vs gModelDataMethods`: 34 against 33): the
  * overrides are +0x008 (ctor), +0x00C (TriggerWorld__Finalize), +0x064

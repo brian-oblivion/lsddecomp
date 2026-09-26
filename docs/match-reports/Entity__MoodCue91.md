@@ -81,10 +81,10 @@ same symbol: no precedent for naming a non-uniform, non-unit-fraction scale.
 
 | old | new | tier | evidence |
 | --- | --- | --- | --- |
-| `EntityMethods::slot134` (+0x134) | `applyTodFrame` | A | `tools/classtable.py gEntityMethods` +0x134 = `Class65650__ApplyTodFrame`; `code_55dd4.h` already calls the same slot `applyTodFrame` in Class65650's own method table. Here: `todFramePtr = applyTodFrame(this, todFramePtr, 0)` 24 times, i.e. fast-forward 24 TOD frames |
-| `Entity::unk88` (+0x88) | `todFramePtr` | A | Class65650's own +0x88 is `todFramePtr` (`code_55dd4.h`; `Class65650__SetTod` writes it, `Class65650__Tick` stores `applyTodFrame`'s return in it), and Entity inherits Class65650's layout (`Entity__Entity` runs Class65650's ctor). The only accessor, this loop, uses it exactly that way |
+| `EntityMethods::slot134` (+0x134) | `applyTodFrame` | A | `tools/classtable.py gEntityMethods` +0x134 = `TodActor__ApplyTodFrame`; `code_55dd4.h` already calls the same slot `applyTodFrame` in TodActor's own method table. Here: `todFramePtr = applyTodFrame(this, todFramePtr, 0)` 24 times, i.e. fast-forward 24 TOD frames |
+| `Entity::unk88` (+0x88) | `todFramePtr` | A | TodActor's own +0x88 is `todFramePtr` (`code_55dd4.h`; `TodActor__SetTod` writes it, `TodActor__Tick` stores `applyTodFrame`'s return in it), and Entity inherits TodActor's layout (`Entity__Entity` runs TodActor's ctor). The only accessor, this loop, uses it exactly that way |
 
-Types were left as they were (`s32`), not corrected to Class65650's `u8 *`;
+Types were left as they were (`s32`), not corrected to TodActor's `u8 *`;
 no offset or size moved. Both oracles green after each.
 
 ## Track 4 (2026-09-26, round 87, echo)
@@ -96,4 +96,4 @@ configure adds it as a child; no code). Image byte-identical.
 
 ## Track 4 (2026-09-26, round 88, echo)
 
-The class (id 0x1F234, table `gEntityMethods`) is unified as `Entity` in `include/Entity.h`: a Class65650 subclass whose table and object expand `CLASS65650_SLOTS`/`CLASS65650_FIELDS`. Any source block above is the pre-unification spelling; the live body takes the inherited names (fields `parent`, `coord2`->`tx/ty/tz`, `tick`, `linkTarget`, `state` (was `moodState`), `lastOffsetValue`, `grid` (was `unk4C`), `ticker` (was `companion2`), `arg2` (was `soundCueChannel`), `parts`, `todPlaying`, `peer` (was `target`, cast to the `Unk94Obj` DreamSys view where its own slots are called); slots `reset`, `setDisplay`, `setLightMode`, `setTranslation`/`addTranslation`, `moveLocalZ/X/Y`, `moveLocalZOrFindLink`, `selectTickCallback`, `enableTickCallback`/`disableTickCallback`, `distanceToPeer`, `setTargetReached`, `updateActivationState`/`updateDeactivationState`), byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).
+The class (id 0x1F234, table `gEntityMethods`) is unified as `Entity` in `include/Entity.h`: a TodActor subclass whose table and object expand `TODACTOR_SLOTS`/`TODACTOR_FIELDS`. Any source block above is the pre-unification spelling; the live body takes the inherited names (fields `parent`, `coord2`->`tx/ty/tz`, `tick`, `linkTarget`, `state` (was `moodState`), `lastOffsetValue`, `grid` (was `unk4C`), `ticker` (was `companion2`), `arg2` (was `soundCueChannel`), `parts`, `todPlaying`, `peer` (was `target`, cast to the `Unk94Obj` DreamSys view where its own slots are called); slots `reset`, `setDisplay`, `setLightMode`, `setTranslation`/`addTranslation`, `moveLocalZ/X/Y`, `moveLocalZOrFindLink`, `selectTickCallback`, `enableTickCallback`/`disableTickCallback`, `distanceToPeer`, `setTargetReached`, `updateActivationState`/`updateDeactivationState`), byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).

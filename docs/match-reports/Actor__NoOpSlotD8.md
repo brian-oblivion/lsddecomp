@@ -42,4 +42,4 @@ tools/funcdiff.py Actor__NoOpSlotD8   # 2/2
 
 ## Track 4 (2026-09-25, round 82, delta)
 
-Renamed from `DreamSys__NoOpSlotD8`. Occupant of +0x0D8 in gActorMethods, empty; the prefix follows the table it sits in. The class (id 0x34, table `gActorMethods`, formerly `D_800878D4`) is unified as `Actor` in `include/Actor.h`: a SceneNode subclass and the base of Class65650/Entity, DreamSys and Class876FC. Any source block above is the pre-unification spelling; the live body in `src/class_3bb8c_p.c` takes the unified types and field/slot names, byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).
+Renamed from `DreamSys__NoOpSlotD8`. Occupant of +0x0D8 in gActorMethods, empty; the prefix follows the table it sits in. The class (id 0x34, table `gActorMethods`, formerly `D_800878D4`) is unified as `Actor` in `include/Actor.h`: a SceneNode subclass and the base of TodActor/Entity, DreamSys and Class876FC. Any source block above is the pre-unification spelling; the live body in `src/class_3bb8c_p.c` takes the unified types and field/slot names, byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).

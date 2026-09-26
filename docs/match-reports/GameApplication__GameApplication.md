@@ -146,7 +146,7 @@ second hidden local.
 
 **`GameApplication__GameApplication` -- tier A.** Convention `Class__Class` for a
 constructor (compare `Class865C8__Class865C8`, `BasicClass__BasicClass`,
-`Class65650__Class65650`, etc. -- `grep -rnP '(\w+)__\1\(' src/*.c`). Evident
+`TodActor__TodActor`, etc. -- `grep -rnP '(\w+)__\1\(' src/*.c`). Evident
 from the body itself: dispatched through `GameApplicationMethods.ctor`
 (vtable slot +0x008), calls the base class's own ctor slot first, then
 installs this class's own vtable pointer -- the base-constructor-through-

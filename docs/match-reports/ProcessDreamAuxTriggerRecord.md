@@ -173,6 +173,6 @@ gTriggerWorldMethods), and the slot-0x22 pointer-array call is its own slot +0x0
 (TriggerWorld__GetModelData, `ModelData *(TriggerWorld *, u32)`; the s8 parity
 converts to u32 with the same sign-extended register). The result is a
 ModelData, which is why it goes to `scratch[3]`: New_Entity's descriptor word
-+0x00C is the ModelData Class65650__AcquireModelData borrows. The former
++0x00C is the ModelData TodActor__AcquireModelData borrows. The former
 `TriggerWorld { void **vtable; }` / `TriggerWorldFn` view in
 include/code_4cd08.h is gone. Bytes unchanged.

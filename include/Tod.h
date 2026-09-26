@@ -15,7 +15,7 @@
  * packet count at +2 before it) decoding each into a low byte, the nibbles
  * at bits 16 and 20 and a top-byte length in words (DecodeTodPacketWord);
  * ModelData forwards its TOD packet scans to the TodSet it holds
- * (ModelData__ForwardScanPackets: todSet's +0x078), and Class65650 plays
+ * (ModelData__ForwardScanPackets: todSet's +0x078), and TodActor plays
  * TODs through that ModelData.
  *
  * PARENT BY CTOR CHAIN, NOT BY ID. The id 0x4F03 puts it under TimBlockSrc

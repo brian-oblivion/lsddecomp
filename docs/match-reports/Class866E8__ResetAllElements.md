@@ -132,7 +132,7 @@ increment statement sits in the C source:**
    `entry`/`unk0`, one specifically for `&entry->unk4`), which retail does
    not do — retail re-reads `entry->unk4` twice through the SAME pointer.
 2. `entry++` (persisted incrementing pointer, C89-idiomatic "increment
-   pointer" per the project's own `Class65650__ApplyTodPacket` lesson): 8/74. Same
+   pointer" per the project's own `TodActor__ApplyTodPacket` lesson): 8/74. Same
    general shape as (1) but with a single induction variable; still not
    retail's "fresh add each iteration" shape.
 3. `offset` accumulator (plain `s32`), `entry` recomputed from
@@ -173,7 +173,7 @@ here appears to search past several intervening independent instructions
 residue, which stayed local) to find and hoist it, regardless of textual
 distance from where the C source puts it. A bare `__asm__("")` scheduling
 barrier did NOT block this hoist, which contradicts the working
-assumption from `Class65650__CreateParts`/`Class65650__SetLightMode` that the barrier is a
+assumption from `TodActor__CreateParts`/`TodActor__SetLightMode` that the barrier is a
 reliable local lever — worth flagging for whoever revisits the barrier's
 actual scope in this compiler. The remaining structural difference (two
 separate registers recomputed by addition vs. one incrementing pointer)

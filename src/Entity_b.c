@@ -95,7 +95,7 @@ void Entity__NotifyIfTargetInRange(Entity *this, s32 arg1) {
 }
 
 s32 Entity__IsTargetInRange(Entity *this, s32 range) {
-    Class65650 *other;
+    TodActor *other;
     s32 oy, ty;
 
     other = this->peer;

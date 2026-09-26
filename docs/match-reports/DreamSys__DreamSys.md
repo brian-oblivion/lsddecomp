@@ -56,14 +56,14 @@ anywhere) made it obvious before writing any C.
   base table) gets a new slot at `+0x008`: `ctor`.** Cross-confirmed against
   `include/code_55dd4.h`'s `D800878D4Methods`, which ALREADY names and
   resolves this exact slot as `Actor__Actor`, taking/returning
-  `Class65650 *self` — the same base constructor, just viewed through a
+  `TodActor *self` — the same base constructor, just viewed through a
   different subclass's local header (per this project's established
   "multiple independent local views of the same table" convention). Typed
   `struct DreamSys *(*ctor)(struct DreamSys *self)` here, matching this
   unit's existing forward-tag convention for `DreamSysBaseMethods`. Its
   return value is discarded at this call site (the base ctor returns `self`
   for chaining, unneeded since the caller already holds `this`).
-- **`vtable_DreamSys+0x010` is `slot10`, shared with Class65650's OWN vtable
+- **`vtable_DreamSys+0x010` is `slot10`, shared with TodActor's OWN vtable
   at the identical offset.** `code_55dd4.h` already names and resolves it
   there as `Actor__AddChild`, and its own comment identifies it as the "link"
   companion of `slot14`/`Actor__RemoveChild` — a slot THIS unit's header already

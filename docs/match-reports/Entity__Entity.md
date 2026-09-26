@@ -7,9 +7,9 @@
 Entity's constructor, reached both directly (this function) and indirectly
 through the vtable's own `ctor` slot (`Get_vtable_Entity()->ctor`, see
 `New_Entity`). First calls the shared base-class constructor,
-`Get_vtable_Class65650()->ctor(this, arg2, arg3)` — `Get_vtable_Class65650()` (matched in
+`Get_vtable_TodActor()->ctor(this, arg2, arg3)` — `Get_vtable_TodActor()` (matched in
 `code_55dd4.c`) returns the SAME shared "BasicClass" ancestor vtable that
-`Class65650` also derives from (see the big comment at the top of
+`TodActor` also derives from (see the big comment at the top of
 `include/Entity.h`). Only on success does it finish initializing: assigns
 `this->methods` to `Get_vtable_Entity()` (Entity's OWN vtable — the base
 ctor call above runs before this entity is "really" an Entity), stores
@@ -30,7 +30,7 @@ convention (`docs/research/class-framework.md`).
 
 ```c
 Entity *Entity__Entity(Entity *this, s32 arg1, s32 arg2, s32 arg3) {
-    if (Get_vtable_Class65650()->ctor(this, arg2, arg3) != NULL) {
+    if (Get_vtable_TodActor()->ctor(this, arg2, arg3) != NULL) {
         this->methods = Get_vtable_Entity();
         this->moodIndex = arg1;
         this->unk9C = 0;
@@ -75,11 +75,11 @@ choice.
 
 **Tier A.** Occupies `EntityMethods::ctor` (+0x008, `tools/classtable.py`).
 A constructor's mechanics are its purpose; matches the `Class__Class`
-convention already used by `Class65650__Class65650`/`DreamSys__DreamSys`.
+convention already used by `TodActor__TodActor`/`DreamSys__DreamSys`.
 Not renamed (already correct).
 
 ## Track 4 (2026-09-26, round 88, echo)
 
-Parameters retyped to (moodIndex, desc, arg2), the ctor slot's CtorParams; `desc`/`arg2` go to Class65650's ctor without casts. `soundCueSet = 0` is now `soundCueSet.tag = 0` (the SoundCueSet is embedded).
+Parameters retyped to (moodIndex, desc, arg2), the ctor slot's CtorParams; `desc`/`arg2` go to TodActor's ctor without casts. `soundCueSet = 0` is now `soundCueSet.tag = 0` (the SoundCueSet is embedded).
 
-The class (id 0x1F234, table `gEntityMethods`) is unified as `Entity` in `include/Entity.h`: a Class65650 subclass whose table and object expand `CLASS65650_SLOTS`/`CLASS65650_FIELDS`. Any source block above is the pre-unification spelling; the live body takes the inherited names (fields `parent`, `coord2`->`tx/ty/tz`, `tick`, `linkTarget`, `state` (was `moodState`), `lastOffsetValue`, `grid` (was `unk4C`), `ticker` (was `companion2`), `arg2` (was `soundCueChannel`), `parts`, `todPlaying`, `peer` (was `target`, cast to the `Unk94Obj` DreamSys view where its own slots are called); slots `reset`, `setDisplay`, `setLightMode`, `setTranslation`/`addTranslation`, `moveLocalZ/X/Y`, `moveLocalZOrFindLink`, `selectTickCallback`, `enableTickCallback`/`disableTickCallback`, `distanceToPeer`, `setTargetReached`, `updateActivationState`/`updateDeactivationState`), byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).
+The class (id 0x1F234, table `gEntityMethods`) is unified as `Entity` in `include/Entity.h`: a TodActor subclass whose table and object expand `TODACTOR_SLOTS`/`TODACTOR_FIELDS`. Any source block above is the pre-unification spelling; the live body takes the inherited names (fields `parent`, `coord2`->`tx/ty/tz`, `tick`, `linkTarget`, `state` (was `moodState`), `lastOffsetValue`, `grid` (was `unk4C`), `ticker` (was `companion2`), `arg2` (was `soundCueChannel`), `parts`, `todPlaying`, `peer` (was `target`, cast to the `Unk94Obj` DreamSys view where its own slots are called); slots `reset`, `setDisplay`, `setLightMode`, `setTranslation`/`addTranslation`, `moveLocalZ/X/Y`, `moveLocalZOrFindLink`, `selectTickCallback`, `enableTickCallback`/`disableTickCallback`, `distanceToPeer`, `setTargetReached`, `updateActivationState`/`updateDeactivationState`), byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).

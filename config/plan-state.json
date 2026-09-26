@@ -888,11 +888,6 @@
           "date": "2026-09-26",
           "header": "include/CharSprite.h"
         },
-        "gClass65650Methods": {
-          "class": "Class65650",
-          "date": "2026-09-25",
-          "header": "include/Class65650.h"
-        },
         "gClass865C8Methods": {
           "class": "Class865C8",
           "date": "2026-09-26",
@@ -1097,6 +1092,11 @@
           "class": "TmdModel",
           "date": "2026-09-26",
           "header": "include/TmdModel.h"
+        },
+        "gTodActorMethods": {
+          "class": "TodActor",
+          "date": "2026-09-25",
+          "header": "include/TodActor.h"
         },
         "gTodMethods": {
           "class": "Tod",

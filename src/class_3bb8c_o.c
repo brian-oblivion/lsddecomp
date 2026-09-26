@@ -13,8 +13,8 @@
  *    `Class876FC__ReleaseSprites[B]`, `Class876FC__RandomizeSprites`,
  *    `Class876FC__SpawnPlainSprites`; include/Class876FC.h, round 88).
  *  - `Actor` (`GetClass876FCMethods` onward; include/Actor.h, unified round
- *    82): the base class of `DreamSys`, `Class65650` and `Class876FC`.
- *    `Actor__Actor` is the BASE's own constructor: `Class65650__Class65650`
+ *    82): the base class of `DreamSys`, `TodActor` and `Class876FC`.
+ *    `Actor__Actor` is the BASE's own constructor: `TodActor__TodActor`
  *    calls it to chain to the base first, then overwrites `self->methods`
  *    with its own table. `GetClass876FCMethods` is the Class876FC
  *    subclass's table getter (named round 73), placed here by ROM address.
@@ -72,7 +72,7 @@ void Class876FC__ReleaseSpritesB(Class876FC *self) {
 
 /* ------------------------------------------------------------------ *
  * Group 2: GetClass876FCMethods onward -- Actor (include/Actor.h), the
- * shared base of DreamSys, Class65650 and Class876FC.
+ * shared base of DreamSys, TodActor and Class876FC.
  * ------------------------------------------------------------------ */
 
 /* Actor__NotifyMove's model-data buffer, filled by readUnk20Data and handed

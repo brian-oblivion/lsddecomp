@@ -105,7 +105,7 @@ void Class879C4__Class879C4(Class879C4 *self, s32 variant, void *arg2, void *tex
   SceneNode, still says `void *`; New_Class879C4 ignores the result.
 - **The reset call's cast.** The slot (SceneNode's `reset(Self *self)`)
   takes no argument; the occupant takes the variant, so the call casts to
-  `Class879C4ResetFn` (round 85's Class65650 precedent; no code).
+  `Class879C4ResetFn` (round 85's TodActor precedent; no code).
 - Parameter names: `variant` picks the texture cell here and the CLUT row in
   SetVariantClut; `texture` is forwarded as Sprite's `texture`; `arg2` as
   Sprite's opaque `arg4`. `unk_0xA4` -> `unkA4` (only this ctor writes it).

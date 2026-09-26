@@ -2,21 +2,21 @@
 #define CODE_55DD4_H
 
 #include "common.h"
-#include "Class65650.h"
+#include "TodActor.h"
 #include "ModelData.h"
 #include "LinkResource.h"
 
 /*
- * code_55dd4's own readings of the objects Class65650 (include/Class65650.h)
- * reaches that are not Class65650: the ctor's two arguments, onNotify's
+ * code_55dd4's own readings of the objects TodActor (include/TodActor.h)
+ * reaches that are not TodActor: the ctor's two arguments, onNotify's
  * sender, the TOD coordinate parameters of a part, and the TodSet
  * internals behind ModelData's `todSet` (its `linkResource` is
  * include/LinkResource.h's, round 89). The
  * class itself -- object, table, getter, method prototypes -- is
- * include/Class65650.h's.
+ * include/TodActor.h's.
  */
 
-/* Class65650__OnNotify's sender: any object. Only its method table's header
+/* TodActor__OnNotify's sender: any object. Only its method table's header
  * word is read (the low 16 bits), compared with MODEL_DATA_CLASS_HEADER. */
 typedef struct TaggedObj {
     u16 header; /* +0x000, the method table's header word */
@@ -27,11 +27,11 @@ typedef struct TagCheckArg {
 } TagCheckArg;
 
 /* Header word of gModelDataMethods (tools/classtable.py), the class New_ModelData
- * allocates and Class65650.modelData points at. */
+ * allocates and TodActor.modelData points at. */
 #define MODEL_DATA_CLASS_HEADER 0x5F03
 
 /* Whatever class self->arg2 points at: unidentified, only its
- * vtable slot +0x080 is needed so far, by Class65650__func_800661D4. */
+ * vtable slot +0x080 is needed so far, by TodActor__func_800661D4. */
 typedef struct UnkArg2Methods {
     u8 pad00[0x80];                                         /* +0x000 .. +0x07C, unknown */
     void (*slot80)(void *self, void *arg1, s32 a2, s32 a3); /* +0x080 */
@@ -42,7 +42,7 @@ typedef struct UnkArg2Obj {
 } UnkArg2Obj;
 
 /* A part's coord2->param (SceneNodeSub44, GsCOORD2PARAM) as
- * Class65650__ApplyTodPacket writes it from a TOD coordinate packet: the
+ * TodActor__ApplyTodPacket writes it from a TOD coordinate packet: the
  * scale, rotate and trans vectors as arrays. */
 typedef struct TimeTargetObj {
     s32 scale[3];   /* +0x000 .. +0x00B GsCOORD2PARAM.scale: TOD_COORD_SCALE */
@@ -53,7 +53,7 @@ typedef struct TimeTargetObj {
 } TimeTargetObj;
 
 /* TOD packet types and coordinate-packet flag bits, as
- * Class65650__ApplyTodPacket decodes them (the decoded header is
+ * TodActor__ApplyTodPacket decodes them (the decoded header is
  * {object id, type, flag, length in words}). */
 #define TOD_PACKET_ATTRIBUTE 0
 #define TOD_PACKET_COORDINATE 1
@@ -64,7 +64,7 @@ typedef struct TimeTargetObj {
 #define TOD_COORD_SCALE 4
 #define TOD_COORD_TRANSLATE 8
 
-/* self->modelData->todSet (Class65650__SetTod, Class65650__Tick): its
+/* self->modelData->todSet (TodActor__SetTod, TodActor__Tick): its
  * buffer (FileResource +0x010) + 8 + i * 4 holds a pointer to the i-th TOD's
  * holder, whose +0x10 is the TOD data itself: +0x4 the frame count, frames
  * starting at +0x8. */
@@ -79,7 +79,7 @@ typedef struct GroupObj {
 } GroupObj;
 
 /* The constructor's `arg1`, forwarded through setupModelData into
- * Class65650__AcquireModelData: if its +0x0C already holds a model-data
+ * TodActor__AcquireModelData: if its +0x0C already holds a model-data
  * object it is borrowed, otherwise New_ModelData(arg1) makes one that this
  * instance owns. */
 typedef struct UnkArg1Obj {

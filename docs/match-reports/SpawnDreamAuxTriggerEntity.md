@@ -169,6 +169,6 @@ rename, confirmed confined to this unit by rebuild).
 
 ## Track 4 (2026-09-26, round 88, echo)
 
-The entity is now `Entity *` and its raw `vtable[0x11]`/`vtable[0x13]` calls are the typed slots updateRotation and attachToParent (through Class65650AttachToParentFn: peer gDreamAuxWorld, companion D_8008AC08, parent D_8008ABFC, offset outBuf), same bytes. DreamAuxObjFn11/13 deleted.
+The entity is now `Entity *` and its raw `vtable[0x11]`/`vtable[0x13]` calls are the typed slots updateRotation and attachToParent (through TodActorAttachToParentFn: peer gDreamAuxWorld, companion D_8008AC08, parent D_8008ABFC, offset outBuf), same bytes. DreamAuxObjFn11/13 deleted.
 
 Byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).

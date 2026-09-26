@@ -23,7 +23,7 @@ void Entity__AttachToParent(Entity *this, s32 arg1, s32 arg2, Unk4CObj *arg3, s3
     if (this->unk0C != 0) {
         return;
     }
-    Get_vtable_Class65650()->slot4C(this, arg1, arg2, arg3, arg4);
+    Get_vtable_TodActor()->slot4C(this, arg1, arg2, arg3, arg4);
     this->unk4C = arg3;
     if (D_80089EA7[this->moodIndex * 0x10] != 0) {
         return;
@@ -87,6 +87,6 @@ same `this->unk0C` gate.
 
 ## Track 4 (2026-09-26, round 88, echo)
 
-Renamed from `Entity__AttachUnk4C`: the occupant of +0x04C, whose parameters are Class65650's (self, peer, companion, parent, offset); it now takes them by those names and forwards them to Class65650's occupant without casts. The `parent` it keeps is stored in Actor's `grid` field (was `unk4C`). code_4cd08 is its C caller through the slot (peer gDreamAuxWorld, parent D_8008ABFC). The extra (activate unless D_80089EA7, then startSoundCue unless D_80089EAF) is in the header banner. Tier A: an override named for its slot (FINISHING-PLAN track 4 step 6).
+Renamed from `Entity__AttachUnk4C`: the occupant of +0x04C, whose parameters are TodActor's (self, peer, companion, parent, offset); it now takes them by those names and forwards them to TodActor's occupant without casts. The `parent` it keeps is stored in Actor's `grid` field (was `unk4C`). code_4cd08 is its C caller through the slot (peer gDreamAuxWorld, parent D_8008ABFC). The extra (activate unless D_80089EA7, then startSoundCue unless D_80089EAF) is in the header banner. Tier A: an override named for its slot (FINISHING-PLAN track 4 step 6).
 
-The class (id 0x1F234, table `gEntityMethods`) is unified as `Entity` in `include/Entity.h`: a Class65650 subclass whose table and object expand `CLASS65650_SLOTS`/`CLASS65650_FIELDS`. Any source block above is the pre-unification spelling; the live body takes the inherited names (fields `parent`, `coord2`->`tx/ty/tz`, `tick`, `linkTarget`, `state` (was `moodState`), `lastOffsetValue`, `grid` (was `unk4C`), `ticker` (was `companion2`), `arg2` (was `soundCueChannel`), `parts`, `todPlaying`, `peer` (was `target`, cast to the `Unk94Obj` DreamSys view where its own slots are called); slots `reset`, `setDisplay`, `setLightMode`, `setTranslation`/`addTranslation`, `moveLocalZ/X/Y`, `moveLocalZOrFindLink`, `selectTickCallback`, `enableTickCallback`/`disableTickCallback`, `distanceToPeer`, `setTargetReached`, `updateActivationState`/`updateDeactivationState`), byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).
+The class (id 0x1F234, table `gEntityMethods`) is unified as `Entity` in `include/Entity.h`: a TodActor subclass whose table and object expand `TODACTOR_SLOTS`/`TODACTOR_FIELDS`. Any source block above is the pre-unification spelling; the live body takes the inherited names (fields `parent`, `coord2`->`tx/ty/tz`, `tick`, `linkTarget`, `state` (was `moodState`), `lastOffsetValue`, `grid` (was `unk4C`), `ticker` (was `companion2`), `arg2` (was `soundCueChannel`), `parts`, `todPlaying`, `peer` (was `target`, cast to the `Unk94Obj` DreamSys view where its own slots are called); slots `reset`, `setDisplay`, `setLightMode`, `setTranslation`/`addTranslation`, `moveLocalZ/X/Y`, `moveLocalZOrFindLink`, `selectTickCallback`, `enableTickCallback`/`disableTickCallback`, `distanceToPeer`, `setTargetReached`, `updateActivationState`/`updateDeactivationState`), byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).
