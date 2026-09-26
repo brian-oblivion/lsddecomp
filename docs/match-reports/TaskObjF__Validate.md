@@ -34,7 +34,7 @@ derivation; `5` or `6` depending on `self->unk24 == 1`), dispatches
    reproduced retail's own single `.L8004FACC` (one fetch, one `jalr`,
    five predecessors) exactly, with no extra instructions. This is the
    "generic pool of gotos into one call" pattern, and it worked cleanly
-   here (contrast `TaskObjF__func_8004F8A4`'s stall, where retail's OWN tail is NOT
+   here (contrast `TaskObjF__BeginSave`'s stall, where retail's OWN tail is NOT
    a single shared fetch+call — see that report).
 3. **`buf10 != 0` / `buf14 != 0`, not `== 0`.** The first working
    transcription had these inverted (`buf10 == 0 -> code = 3`); this

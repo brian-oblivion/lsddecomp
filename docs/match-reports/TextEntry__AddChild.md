@@ -12,7 +12,7 @@ class's own `addChild` first, then reads the new child's method-table
 elsewhere in this project -- a per-class type tag, first word of every
 BasicClass-family vtable) and stashes the child pointer into one of two
 typed slots depending on the tag, mirroring the ALREADY-MATCHED
-`TaskObjF__Notify` (`src/class_3bb8c_f.c`) which reads the identical tag the
+`TaskObjF__OnNotify` (`src/class_3bb8c_f.c`) which reads the identical tag the
 identical way (`**(s32 **)arg1`, masked `& 0xF`).
 
 ```c
@@ -34,12 +34,12 @@ void TextEntry__AddChild(Obj86ED0 *self, void *arg1)
 }
 ```
 
-First attempt, mirroring `TaskObjF__Notify`'s proven idiom, matched
+First attempt, mirroring `TaskObjF__OnNotify`'s proven idiom, matched
 immediately.
 
 ## Naming
 
-- `TextEntry__AddChild` -- tier A. gTextEntryMethods +0x010 (classtable.py), overrides BasicClass's addChild: calls the base addChild, then reads the new child's type tag and stashes it into childType2/childType5 by mask. Mirrors the already-matched TaskObjF__Notify idiom.
+- `TextEntry__AddChild` -- tier A. gTextEntryMethods +0x010 (classtable.py), overrides BasicClass's addChild: calls the base addChild, then reads the new child's type tag and stashes it into childType2/childType5 by mask. Mirrors the already-matched TaskObjF__OnNotify idiom.
 
 ## Track 4 (2026-09-26, round 87)
 

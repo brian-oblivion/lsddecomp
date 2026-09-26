@@ -89,7 +89,7 @@ placeholder, not a correct-BYTES one.
 > no zero, which this round's own thesis (prioritize the NEVER-searched
 > 38-function queue) explicitly weighs against a third run. Not
 > re-searched this round; time spent instead on TaskObjF__TryWriteMemcardSaveFile,
-> TaskObjF__func_8004F8A4 and TaskObjF__CheckCardStatus, all higher priority on this round's
+> TaskObjF__BeginSave and TaskObjF__CheckCardStatus, all higher priority on this round's
 > own list. Restored to `INCLUDE_ASM`, unchanged.
 
 ## What it does

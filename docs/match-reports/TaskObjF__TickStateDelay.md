@@ -87,7 +87,7 @@ notification call only fires once the counter has reached 6 or more.
 ## Struct changes (additive, `include/class_3bb8c.h`)
 
 None new -- `slot7C` was already declared while surveying the unit
-(`TaskObjF__TickCardIcon`'s report).
+(`TaskObjF__ReleaseCardIcon`'s report).
 
 ### Proposed learning
 

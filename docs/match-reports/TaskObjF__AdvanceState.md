@@ -70,14 +70,14 @@ it because it's included in the function's line range in the `.s` file.
 
 Every case body's shared tail (`slot8C(self, N); [slot7C(self, M);]`)
 matches the SAME `self->methods->slot8C`/`slot7C` shared-tail idiom
-already established by `TaskObjF__ForceIdleFromState`/`TaskObjF__TickStateDelay`/`TaskObjF__OnCommand`/
-`TaskObjF__OnItemSelected` elsewhere in this unit (`slot7C`'s header comment already
+already established by `TaskObjF__ForceIdleFromState`/`TaskObjF__TickStateDelay`/`TaskObjF__OnTextEntryResult`/
+`TaskObjF__OnItemListResult` elsewhere in this unit (`slot7C`'s header comment already
 documents it as a common tail for exactly this reason).
 
 The `self->unk28==0xE` sub-case's three calls read `self->unk40` as a
 `char *` destination and `self->unk44` likewise -- both fields are
-ALREADY typed `s32` in the header (established by `TaskObjF__AttachChildA`/
-`TaskObjF__OnCommand`, which forward them as opaque `s32` args to
+ALREADY typed `s32` in the header (established by `TaskObjF__AttachTextEntry`/
+`TaskObjF__OnTextEntryResult`, which forward them as opaque `s32` args to
 `slot78`/`slot4C`). Cast at the use site (`(char *)self->unk40`) rather
 than retyping the field, per the project's documented
 "reinterpretation is free, retyping a field read elsewhere is not"
@@ -85,7 +85,7 @@ convention -- `self->unk40`/`unk44` are read as plain `s32` by THREE
 already-matched functions in this same file.
 
 `self->unk80` is similarly already typed `void *` in the header
-(`TaskObjF__OnItemSelected`'s own return-value store), but here it's used as an
+(`TaskObjF__OnItemListResult`'s own return-value store), but here it's used as an
 INTEGER ARRAY INDEX (shifted left 2, added to a base pointer) -- cast
 `(s32)self->unk80` at the use site, same free-reinterpretation reasoning,
 same field, opposite direction (pointer read as an integer here instead

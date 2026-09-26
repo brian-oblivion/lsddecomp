@@ -1,16 +1,18 @@
-# TaskObjF__AttachChildB -- MATCH
+# TaskObjF__AttachItemList -- MATCH
+
+> Renamed from `TaskObjF__AttachChildB` on 2026-09-26 (tools/rename.py). Address 0x800505a8.
 
 > Renamed from `Class86E00_3bb8c_g__AttachChildB` on 2026-09-23 (tools/rename.py). Address 0x800505a8.
 
 > Renamed from `func_800505A8` on 2026-09-23 (tools/rename.py). Address 0x800505a8.
 
 Unit `class_3bb8c_g`, round 14. `./build-and-verify.sh` exit 0; whole-image
-SHA1 matches retail. `funcdiff.py TaskObjF__AttachChildB`: 50/50 words match.
+SHA1 matches retail. `funcdiff.py TaskObjF__AttachItemList`: 50/50 words match.
 
 ## Source
 
 ```c
-void TaskObjF__AttachChildB(Class86E00_3bb8c_g *self)
+void TaskObjF__AttachItemList(Class86E00_3bb8c_g *self)
 {
     if (self->unk68 != 0 && self->unk60 != 0) {
         if (self->unk7C == NULL) {
@@ -24,32 +26,36 @@ void TaskObjF__AttachChildB(Class86E00_3bb8c_g *self)
 }
 ```
 
-First attempt, byte-exact. The exact twin of `TaskObjF__AttachChildA` (same guard
+First attempt, byte-exact. The exact twin of `TaskObjF__AttachTextEntry` (same guard
 shape, same lazy-init-then-attach sequence), operating on `unk7C` instead
 of `unk78` and calling `New_Class86F88` instead of `New_TextEntry`. Unlike
-`TaskObjF__AttachChildA`, `New_Class86F88`'s second argument (`1`) is materialized
+`TaskObjF__AttachTextEntry`, `New_Class86F88`'s second argument (`1`) is materialized
 right in the `jal`'s own delay slot -- an ordinary, unremarkable argument
 setup, not the "surprise 2nd parameter hoisted several instructions
-early" residue `TaskObjF__AttachChildA` needed to diagnose. Applying that
+early" residue `TaskObjF__AttachTextEntry` needed to diagnose. Applying that
 function's already-corrected `slot44` arity (`self, s32 arg1`) here
 directly is what made this one match cold.
 
 ## Struct changes (additive, `include/class_3bb8c.h`)
 
 None new -- every slot and the `New_Class86F88` extern were already
-declared correctly (the `slot44` arity fix came from `TaskObjF__AttachChildA`'s
+declared correctly (the `slot44` arity fix came from `TaskObjF__AttachTextEntry`'s
 report, applied here without needing its own derivation).
 
 ### Proposed learning
 
 None new. Worth noting as a case where reading a SIBLING function's match
 report before starting paid off directly -- no repeat of the arity
-mistake that cost `TaskObjF__AttachChildA` an extra attempt.
+mistake that cost `TaskObjF__AttachTextEntry` an extra attempt.
 
 ## Naming
 
-`TaskObjF__AttachChildB` (was `func_800505A8`), tier B: the
-"B" twin of `TaskObjF__AttachChildA` -- identical guard and
+`TaskObjF__AttachItemList` (was `func_800505A8`), tier B: the
+"B" twin of `TaskObjF__AttachTextEntry` -- identical guard and
 attach sequence, operating on `self->unk7C` via `New_Class86F88` instead of
 `self->unk78` via `New_TextEntry`. See `AttachChildA`'s naming note: the
 A/B suffixes are positional labels, not an established functional split.
+
+## Track 4 (2026-09-26, round 89)
+
+Renamed from `TaskObjF__AttachChildB`. The child it makes is a Class86F88, the list selector (New_Class86F88(titles, 1), include/Class86F88.h), kept in `itemList` (+0x07C, was `childB`), the slot TaskObjF__AddChild fills for a child of class id 0x20 (gClass86F88Methods). Its calls are Class86F88's loadResources (+0x044) and attachTarget (+0x04C). SetState(0x12) calls it through +0x0A8.

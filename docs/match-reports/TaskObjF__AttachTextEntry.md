@@ -1,16 +1,18 @@
-# TaskObjF__AttachChildA -- MATCH
+# TaskObjF__AttachTextEntry -- MATCH
+
+> Renamed from `TaskObjF__AttachChildA` on 2026-09-26 (tools/rename.py). Address 0x80050340.
 
 > Renamed from `Class86E00_3bb8c_g__AttachChildA` on 2026-09-23 (tools/rename.py). Address 0x80050340.
 
 > Renamed from `func_80050340` on 2026-09-23 (tools/rename.py). Address 0x80050340.
 
 Unit `class_3bb8c_g`, round 14. `./build-and-verify.sh` exit 0; whole-image
-SHA1 matches retail. `funcdiff.py TaskObjF__AttachChildA`: 52/52 words match.
+SHA1 matches retail. `funcdiff.py TaskObjF__AttachTextEntry`: 52/52 words match.
 
 ## Source
 
 ```c
-void TaskObjF__AttachChildA(Class86E00_3bb8c_g *self)
+void TaskObjF__AttachTextEntry(Class86E00_3bb8c_g *self)
 {
     if (self->unk68 != 0 && self->unk60 != 0) {
         if (self->unk78 == NULL) {
@@ -61,12 +63,12 @@ unk74 = 1;`) restored.
 
 - `extern void *New_TextEntry(s32 arg0, s32 arg1);` **retyped** from a
   single-argument declaration added while surveying the unit
-  (`TaskObjF__TickCardIcon`'s report) -- this function is the only call site in
+  (`TaskObjF__ReleaseCardIcon`'s report) -- this function is the only call site in
   this unit, so the correction is fully contained.
 - `Class86E00SubObjMethods_3bb8c_g::slot44` **retyped** from `(self)` to
   `(self, s32 arg1)` -- the earlier single-argument declaration (also
   from the initial survey) missed that `self->unk68` is loaded into `$a1`
-  immediately before this call. Confirmed against `TaskObjF__AttachChildB`'s own
+  immediately before this call. Confirmed against `TaskObjF__AttachItemList`'s own
   identical call shape (not yet matched, but its `.s` shows the same
   `lw $a1, 0x68($s0)` pattern), so both callers agree on the corrected
   arity.
@@ -85,7 +87,7 @@ call arity) cost one wasted, and materially WORSE, attempt.
 
 ## Naming
 
-`TaskObjF__AttachChildA` (was `func_80050340`), tier B: lazily
+`TaskObjF__AttachTextEntry` (was `func_80050340`), tier B: lazily
 allocates `self->unk78` via `New_TextEntry` (an already-named `New_X`-shaped
 factory for the same real class the sibling `class_3bb8c_i`/`class_3bb8c_j`
 units call `Obj86ED0`/`Class86ED0`, vtable `gTextEntryMethods`) on first use, then
@@ -98,3 +100,7 @@ suffixes are arbitrary labels, not a claim about purpose.
 ## Track 4 (2026-09-26, round 87)
 
 TaskObjF's childA (+0x078) is now `struct TextEntry *` (it was the Class86E00SubObj_3bb8c_g view shared with childB, a Class86F88). Its calls go through TextEntry's slots: New_TextEntry((char *)..., 1), loadCardResources((void *)childReady), attachTarget((void *)unk60, (void *)unk64, (struct TargetObj86ED0 *)childC); slot10's argument is cast back to the SubObj view. Casts only; zero bytes changed.
+
+## Track 4 (2026-09-26, round 89)
+
+Renamed from `TaskObjF__AttachChildA`. The child it makes is a TextEntry (New_TextEntry, include/TextEntry.h), kept in `textEntry` (+0x078, was `childA`), the slot TaskObjF__AddChild fills for a child of class id 0x10 (gTextEntryMethods). SetState(0x11) calls it through +0x09C.

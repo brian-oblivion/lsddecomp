@@ -396,7 +396,7 @@ typedef struct Class86E00_3bb8c_g Class86E00_3bb8c_g;
 typedef struct Class86E00Methods_3bb8c_g Class86E00Methods_3bb8c_g;
 
 /*
- * self->childC's pointee. TaskObjF__SetChildFlag8 is the function that PROVES this
+ * self->childC's pointee. TaskObjF__PlaySound is the function that PROVES this
  * is a pointer (dereferences its `+0x080` vtable slot) -- before that
  * function was read, `childC` looked like a plain `s32` value forwarded
  * opaquely to `Class86E00SubObj_3bb8c_g::slot4C`'s 3rd argument, which is
@@ -407,8 +407,8 @@ typedef struct Class86E00Unk6CObjMethods_3bb8c_g Class86E00Unk6CObjMethods_3bb8c
 
 struct Class86E00Unk6CObjMethods_3bb8c_g {
     u8 pad000[0x080];
-    /* +0x080, TaskObjF__SetChildFlag8's own call: `(self, arg1, 0x7F, 0x7F)`,
-     * `arg1` forwarded verbatim from TaskObjF__SetChildFlag8's own 2nd parameter. */
+    /* +0x080, TaskObjF__PlaySound's own call: `(self, arg1, 0x7F, 0x7F)`,
+     * `arg1` forwarded verbatim from TaskObjF__PlaySound's own 2nd parameter. */
     void (*slot80)(Class86E00Unk6CObj_3bb8c_g *self, s32 arg1, s32 arg2, s32 arg3);
 };
 
@@ -418,8 +418,8 @@ struct Class86E00Unk6CObj_3bb8c_g {
 
 /*
  * self->childA's and self->childB's shared pointee -- two parallel fields
- * of the SAME sub-object shape (TaskObjF__AttachChildA/TaskObjF__DetachChildA exercise
- * `childA`; TaskObjF__AttachChildB/TaskObjF__DetachChildB exercise `childB` the identical
+ * of the SAME sub-object shape (TaskObjF__AttachTextEntry/TaskObjF__DetachTextEntry exercise
+ * `childA`; TaskObjF__AttachItemList/TaskObjF__DetachItemList exercise `childB` the identical
  * way), each independently attached via `Class86E00Methods_3bb8c_g::
  * slot10` and torn down via a fixed `slot50`/`slot48`/`release` sequence.
  */
@@ -428,16 +428,16 @@ typedef struct Class86E00SubObjMethods_3bb8c_g Class86E00SubObjMethods_3bb8c_g;
 
 struct Class86E00SubObjMethods_3bb8c_g {
     u8 pad000[0x004];
-    void (*release)(Class86E00SubObj_3bb8c_g *self); /* +0x004, TaskObjF__DetachChildA/TaskObjF__DetachChildB */
+    void (*release)(Class86E00SubObj_3bb8c_g *self); /* +0x004, TaskObjF__DetachTextEntry/TaskObjF__DetachItemList */
     u8 pad008[0x044 - 0x008];
-    /* +0x044, TaskObjF__AttachChildA/TaskObjF__AttachChildB's own call: `(self, childReady)`
+    /* +0x044, TaskObjF__AttachTextEntry/TaskObjF__AttachItemList's own call: `(self, childReady)`
      * from the OWNING `Class86E00_3bb8c_g`. */
     void (*slot44)(Class86E00SubObj_3bb8c_g *self, s32 arg1);
-    void (*slot48)(Class86E00SubObj_3bb8c_g *self); /* +0x048, TaskObjF__DetachChildA/TaskObjF__DetachChildB */
-    /* +0x04C, TaskObjF__AttachChildA/TaskObjF__AttachChildB's own call:
+    void (*slot48)(Class86E00SubObj_3bb8c_g *self); /* +0x048, TaskObjF__DetachTextEntry/TaskObjF__DetachItemList */
+    /* +0x04C, TaskObjF__AttachTextEntry/TaskObjF__AttachItemList's own call:
      * `(self, unk60, unk64, childC)` from the OWNING `Class86E00_3bb8c_g`. */
     void (*slot4C)(Class86E00SubObj_3bb8c_g *self, s32 a1, s32 a2, Class86E00Unk6CObj_3bb8c_g *a3);
-    void (*slot50)(Class86E00SubObj_3bb8c_g *self); /* +0x050, TaskObjF__DetachChildA/TaskObjF__DetachChildB */
+    void (*slot50)(Class86E00SubObj_3bb8c_g *self); /* +0x050, TaskObjF__DetachTextEntry/TaskObjF__DetachItemList */
 };
 
 struct Class86E00SubObj_3bb8c_g {
@@ -449,9 +449,9 @@ struct Class86E00SubObj_3bb8c_g {
  * `Class86E00SubObj_3bb8c_g` above. It shares the same `+0x004` slot
  * offset only because every BasicClass-family table keeps a slot there
  * (see `BasicClassMethods::release` in code_8220.h) -- the USAGE differs:
- * TaskObjF__TickCardIcon assigns this call's RETURN VALUE back into `cardIcon` (an
+ * TaskObjF__ReleaseCardIcon assigns this call's RETURN VALUE back into `cardIcon` (an
  * "advance" pattern), where `Class86E00SubObj_3bb8c_g::release`'s callers
- * (TaskObjF__DetachChildA/TaskObjF__DetachChildB) discard the return and unconditionally
+ * (TaskObjF__DetachTextEntry/TaskObjF__DetachItemList) discard the return and unconditionally
  * null the field afterward instead. Different enough to keep separate
  * rather than unify.
  */
@@ -460,7 +460,7 @@ typedef struct Class86E00Unk70ObjMethods_3bb8c_g Class86E00Unk70ObjMethods_3bb8c
 
 struct Class86E00Unk70ObjMethods_3bb8c_g {
     u8 pad000[0x004];
-    /* +0x004, TaskObjF__TickCardIcon's own call: return value stored back into
+    /* +0x004, TaskObjF__ReleaseCardIcon's own call: return value stored back into
      * `Class86E00_3bb8c_g::cardIcon` itself. */
     Class86E00Unk70Obj_3bb8c_g *(*slot4)(Class86E00Unk70Obj_3bb8c_g *self);
     u8 pad008[0x04C - 0x008];
@@ -476,7 +476,7 @@ struct Class86E00Unk70Obj_3bb8c_g {
 };
 
 /*
- * TaskObjF__OnItemSelected's own `arg1` -- a third, unrelated small object, reached
+ * TaskObjF__OnItemListResult's own `arg1` -- a third, unrelated small object, reached
  * only through its own `+0x09C` slot, whose return value is stored into
  * `Class86E00_3bb8c_g::selectedItem`.
  */
@@ -485,7 +485,7 @@ typedef struct GenericSlot9CMethods_3bb8c_g GenericSlot9CMethods_3bb8c_g;
 
 struct GenericSlot9CMethods_3bb8c_g {
     u8 pad000[0x09C];
-    void *(*slot9C)(GenericSlot9CObj_3bb8c_g *self); /* +0x09C, TaskObjF__OnItemSelected */
+    void *(*slot9C)(GenericSlot9CObj_3bb8c_g *self); /* +0x09C, TaskObjF__OnItemListResult */
 };
 
 struct GenericSlot9CObj_3bb8c_g {
@@ -494,7 +494,7 @@ struct GenericSlot9CObj_3bb8c_g {
 
 struct Class86E00Methods_3bb8c_g {
     u8 pad000[0x010];
-    /* +0x010, TaskObjF__AttachChildA/TaskObjF__AttachChildB's own first call: `(self,
+    /* +0x010, TaskObjF__AttachTextEntry/TaskObjF__AttachItemList's own first call: `(self,
      * subObj)`, registering/attaching whichever of `childA`/`childB` that
      * function owns. */
     void (*slot10)(Class86E00_3bb8c_g *self, Class86E00SubObj_3bb8c_g *arg1);
@@ -527,13 +527,13 @@ struct Class86E00Methods_3bb8c_g {
      * `slot78` just below but with only the last two of that call's
      * trailing four. */
     void (*slot74)(Class86E00_3bb8c_g *self, s32 a1, s32 a2, s32 a3, s32 a4);
-    /* +0x078, TaskObjF__OnCommand's own call for its `arg2==2` case: 7 extra
+    /* +0x078, TaskObjF__OnTextEntryResult's own call for its `arg2==2` case: 7 extra
      * arguments, the last four passed on the stack (`unk4C`, promoted
      * from its native `u8` to a full word, then `unk50`/`unk54`/`unk58`). */
     void (*slot78)(Class86E00_3bb8c_g *self, s32 a1, s32 a2, s32 a3,
                     s32 a4, s32 a5, s32 a6, s32 a7);
     /* +0x07C, the shared tail call of TaskObjF__ForceIdleFromState/TaskObjF__TickStateDelay/
-     * TaskObjF__OnCommand/TaskObjF__OnItemSelected: `(self, literal state code)`. */
+     * TaskObjF__OnTextEntryResult/TaskObjF__OnItemListResult: `(self, literal state code)`. */
     void (*slot7C)(Class86E00_3bb8c_g *self, s32 arg1);
     /* +0x080, TaskObjF__SetState's own 3rd call, every path: `(self, arg1)`,
      * same `arg1` value as `slot30` above. */
@@ -542,18 +542,18 @@ struct Class86E00Methods_3bb8c_g {
     void (*slot84)(Class86E00_3bb8c_g *self);
     u8 pad088[0x08C - 0x088];
     void (*slot8C)(Class86E00_3bb8c_g *self, s32 arg1); /* +0x08C, TaskObjF__ForceIdleFromState */
-    void (*slot90)(Class86E00_3bb8c_g *self); /* +0x090, TaskObjF__OnNotify's `arg2==0x19` case */
-    void (*slot94)(Class86E00_3bb8c_g *self); /* +0x094, TaskObjF__OnNotify's `arg2==0x17` case */
+    void (*slot90)(Class86E00_3bb8c_g *self); /* +0x090, TaskObjF__OnInputEvent's `arg2==0x19` case */
+    void (*slot94)(Class86E00_3bb8c_g *self); /* +0x094, TaskObjF__OnInputEvent's `arg2==0x17` case */
     u8 pad098[0x09C - 0x098];
     /* +0x09C, TaskObjF__SetState's own `arg1==0x11` case: `(self)`, no
      * return value read. */
     void (*slot9C)(Class86E00_3bb8c_g *self);
-    void (*slotA0)(Class86E00_3bb8c_g *self); /* +0x0A0, TaskObjF__OnCommand's own first call, both cases */
+    void (*slotA0)(Class86E00_3bb8c_g *self); /* +0x0A0, TaskObjF__OnTextEntryResult's own first call, both cases */
     u8 pad0A4[0x0A8 - 0x0A4];
     /* +0x0A8, TaskObjF__SetState's own `arg1==0x12` case: `(self)`, same
      * shape as `slot9C` above. */
     void (*slotA8)(Class86E00_3bb8c_g *self);
-    void (*slotAC)(Class86E00_3bb8c_g *self); /* +0x0AC, TaskObjF__OnItemSelected's own 2nd call, both cases */
+    void (*slotAC)(Class86E00_3bb8c_g *self); /* +0x0AC, TaskObjF__OnItemListResult's own 2nd call, both cases */
 };
 
 struct Class86E00_3bb8c_g {
@@ -573,47 +573,47 @@ struct Class86E00_3bb8c_g {
     /* +0x034, TaskObjF__SetState's own `slot58` arg3, forwarded verbatim
      * alongside `unk30` above. */
     s32 unk34;
-    void *unk38; /* +0x038, TaskObjF__AttachChildB: forwarded opaquely to `New_Class86F88`'s arg0 */
+    void *unk38; /* +0x038, TaskObjF__AttachItemList: forwarded opaquely to `New_Class86F88`'s arg0 */
     /* +0x03C, TaskObjF__AdvanceState's own `self->state==0xE` sub-case: base of a
      * pointer array indexed by `(s32)self->selectedItem`, `strcat`ed onto
      * `self->unk40` -- same shape as `unk38` just below, indexed the
      * same way for `self->unk44`'s own `strcpy`. */
     void *unk3C;
-    s32 unk40;   /* +0x040, TaskObjF__AttachChildA/TaskObjF__OnCommand */
-    s32 unk44;   /* +0x044, TaskObjF__AttachChildA/TaskObjF__OnCommand */
-    s32 unk48;   /* +0x048, TaskObjF__AttachChildA/TaskObjF__OnCommand */
-    u8 unk4C;    /* +0x04C, TaskObjF__OnCommand: read `lbu`, promoted to a full word for `slot78`'s call */
+    s32 unk40;   /* +0x040, TaskObjF__AttachTextEntry/TaskObjF__OnTextEntryResult */
+    s32 unk44;   /* +0x044, TaskObjF__AttachTextEntry/TaskObjF__OnTextEntryResult */
+    s32 unk48;   /* +0x048, TaskObjF__AttachTextEntry/TaskObjF__OnTextEntryResult */
+    u8 unk4C;    /* +0x04C, TaskObjF__OnTextEntryResult: read `lbu`, promoted to a full word for `slot78`'s call */
     u8 pad04D[0x050 - 0x04D];
-    s32 unk50;   /* +0x050, TaskObjF__OnCommand */
-    s32 unk54;   /* +0x054, TaskObjF__OnCommand */
-    s32 unk58;   /* +0x058, TaskObjF__OnCommand */
+    s32 unk50;   /* +0x050, TaskObjF__OnTextEntryResult */
+    s32 unk54;   /* +0x054, TaskObjF__OnTextEntryResult */
+    s32 unk58;   /* +0x058, TaskObjF__OnTextEntryResult */
     s32 waitCounter;   /* +0x05C, TaskObjF__TickStateDelay: incremented, capped at 6 */
     s32 unk60;   /* +0x060, forwarded to `childA`/`childB`'s own `slot4C` arg1 */
     s32 unk64;   /* +0x064, forwarded to `childA`/`childB`'s own `slot4C` arg2 */
     /* +0x068, a readiness gate checked alongside `unk60` in four
-     * functions (TaskObjF__AttachChildA/TaskObjF__DetachChildA/TaskObjF__AttachChildB/
-     * TaskObjF__DetachChildB) -- both must be non-zero before the body runs.
+     * functions (TaskObjF__AttachTextEntry/TaskObjF__DetachTextEntry/TaskObjF__AttachItemList/
+     * TaskObjF__DetachItemList) -- both must be non-zero before the body runs.
      * Kept a bare `s32`; never dereferenced in this unit. */
     s32 childReady;
     /* +0x06C, forwarded to `childA`/`childB`'s own `slot4C` arg3.
-     * TaskObjF__SetChildFlag8 proves this is a pointer (dereferences its `+0x080`
+     * TaskObjF__PlaySound proves this is a pointer (dereferences its `+0x080`
      * vtable slot), not the plain `s32` it looked like from the slot4C
      * call site alone -- retyped here, same size, no layout change. */
     Class86E00Unk6CObj_3bb8c_g *childC;
-    Class86E00Unk70Obj_3bb8c_g *cardIcon; /* +0x070, TaskObjF__TickCardIcon */
-    /* +0x074, a one-shot flag set to 1 by TaskObjF__AttachChildA/TaskObjF__AttachChildB
+    Class86E00Unk70Obj_3bb8c_g *cardIcon; /* +0x070, TaskObjF__ReleaseCardIcon */
+    /* +0x074, a one-shot flag set to 1 by TaskObjF__AttachTextEntry/TaskObjF__AttachItemList
      * right after attaching `childA`/`childB`, and consumed (guarding a
-     * teardown callback) by TaskObjF__DetachChildA/TaskObjF__DetachChildB. */
+     * teardown callback) by TaskObjF__DetachTextEntry/TaskObjF__DetachItemList. */
     s32 childAttached;
-    struct TextEntry *childA;         /* +0x078, TaskObjF__AttachChildA/TaskObjF__DetachChildA: New_TextEntry (include/TextEntry.h) */
-    Class86E00SubObj_3bb8c_g *childB; /* +0x07C, TaskObjF__AttachChildB/TaskObjF__DetachChildB */
-    void *selectedItem; /* +0x080, TaskObjF__OnItemSelected: set from `arg1->methods->slot9C(arg1)`'s return */
+    struct TextEntry *childA;         /* +0x078, TaskObjF__AttachTextEntry/TaskObjF__DetachTextEntry: New_TextEntry (include/TextEntry.h) */
+    Class86E00SubObj_3bb8c_g *childB; /* +0x07C, TaskObjF__AttachItemList/TaskObjF__DetachItemList */
+    void *selectedItem; /* +0x080, TaskObjF__OnItemListResult: set from `arg1->methods->slot9C(arg1)`'s return */
 };
 
-/* New_Class86F88 (TaskObjF__AttachChildB's childB) is declared in
+/* New_Class86F88 (TaskObjF__AttachItemList's childB) is declared in
  * include/Class86F88.h. */
 
-/* New_TextEntry (TaskObjF__AttachChildA's childA) is declared in
+/* New_TextEntry (TaskObjF__AttachTextEntry's childA) is declared in
  * include/TextEntry.h. */
 
 /*
@@ -648,20 +648,20 @@ struct TaskObjFMethods {
     s32 (*slot48)(TaskObjF *self);                                     /* +0x048, TaskObjF__Validate */
     s32 (*slot4C)(TaskObjF *self, s32 *out1, s32 *out2, s32 *out3);      /* +0x04C, TaskObjF__Validate */
     u8 pad50[0x054 - 0x050];
-    s32 (*slot54)(TaskObjF *self, s32 a1, s32 a2);                          /* +0x054, TaskObjF__func_8004F8A4 */
+    s32 (*slot54)(TaskObjF *self, s32 a1, s32 a2);                          /* +0x054, TaskObjF__BeginSave */
     u8 pad58[0x05C - 0x058];
-    s32 (*slot5C)(TaskObjF *self, void *a1, void *a2, s32 a3, s32 a4);        /* +0x05C, TaskObjF__func_8004F638 */
-    s32 (*slot60)(TaskObjF *self, s32 a1, s32 a2);                              /* +0x060, TaskObjF__func_8004F8A4 */
+    s32 (*slot5C)(TaskObjF *self, void *a1, void *a2, s32 a3, s32 a4);        /* +0x05C, TaskObjF__BeginLoad */
+    s32 (*slot60)(TaskObjF *self, s32 a1, s32 a2);                              /* +0x060, TaskObjF__BeginSave */
     u8 pad64[0x07C - 0x064];
-    s32 (*slot7C)(TaskObjF *self, s32 a1);                                        /* +0x07C, TaskObjF__func_8004F638/TaskObjF__func_8004F8A4/TaskObjF__Validate */
+    s32 (*slot7C)(TaskObjF *self, s32 a1);                                        /* +0x07C, TaskObjF__BeginLoad/TaskObjF__BeginSave/TaskObjF__Validate */
     u8 pad80[0x088 - 0x080];
-    void (*slot88)(TaskObjF *self, void *arg1, s32 arg2);                          /* +0x088, TaskObjF__Notify */
+    void (*slot88)(TaskObjF *self, void *arg1, s32 arg2);                          /* +0x088, TaskObjF__OnNotify */
     u8 pad8C[0x098 - 0x08C];
-    void (*slot98)(TaskObjF *self, void *arg1, s32 arg2);                            /* +0x098, TaskObjF__Notify */
+    void (*slot98)(TaskObjF *self, void *arg1, s32 arg2);                            /* +0x098, TaskObjF__OnNotify */
     u8 pad9C[0x0A4 - 0x09C];
-    void (*slotA4)(TaskObjF *self, void *arg1, s32 arg2);                              /* +0x0A4, TaskObjF__Notify */
+    void (*slotA4)(TaskObjF *self, void *arg1, s32 arg2);                              /* +0x0A4, TaskObjF__OnNotify */
     u8 padA8[0x0B0 - 0x0A8];
-    void (*slotB0)(TaskObjF *self, void *arg1, s32 arg2);                                /* +0x0B0, TaskObjF__Notify */
+    void (*slotB0)(TaskObjF *self, void *arg1, s32 arg2);                                /* +0x0B0, TaskObjF__OnNotify */
 };
 
 struct TaskObjF {
@@ -670,21 +670,21 @@ struct TaskObjF {
     s32 cardSlot;                  /* +0x00C, TaskObjF__TryReadMemcardFile: passed as BuildMemcardPath's "selector" (device slot 0/1) -- RENAMED round 60 (was unk0C) */
     u8 pad10[0x014 - 0x010];
     s32 events[4];                  /* +0x014, TaskObjF__ForEachEvent (walks all 4, early-exit)/TaskObjF__WaitForReadyEvent (passes &events[0], count 4) -- RENAMED round 60 (was field14): 4 kernel event descriptors, corroborated cross-unit by class_3bb8c_e.c's TaskObjF__OpenEvents, which fills the identical offset via OpenEvent() then passes the same object to this unit's own EnableEvents wrapper (see TaskObjF__EnableEvents's report) */
-    s32 opMode;                       /* +0x024, RENAMED round 60 (was unk24): distinguishes which of this class's two operations is active -- TaskObjF__func_8004F638 sets 1, TaskObjF__func_8004F8A4 sets 2, TaskObjF__Validate reads (==1?); the values' exact meaning is not established */
-    s32 statusCode;                    /* +0x028, RENAMED round 60 (was unk28): TaskObjF__Init/TaskObjF__func_8004F638 clear or set it, TaskObjF__func_8004F8A4/TaskObjF__Validate read it and dispatch it through slot7C -- a status/completion code, not confirmed to be error-only */
-    s32 bufCount;                       /* +0x02C, RENAMED round 60 (was unk2C): TaskObjF__func_8004F638 (slot5C's return)/TaskObjF__FreeUnusedBuffers/TaskObjF__FreeBuffers (loop bound over bufArray) -- the number of bufArray entries actually in use */
-    s32 unk30;                          /* +0x030, TaskObjF__Init (arg1)/TaskObjF__func_8004F638 (slot5C's arg3) */
-    s32 unk34;                           /* +0x034, TaskObjF__Init (arg2)/TaskObjF__func_8004F638 (slot5C's stack arg4) */
-    void **bufArray;                      /* +0x038, RENAMED round 60 (was unk38): a 16-entry pointer array allocated by TaskObjF__AllocBuffers, torn down by TaskObjF__FreeBuffers, walked by TaskObjF__FreeUnusedBuffers; also TaskObjF__func_8004F638's slot5C arg1 */
-    void *scratchBuf;                       /* +0x03C, RENAMED round 60 (was unk3C): a single buffer allocated by TaskObjF__AllocBuffers, freed by TaskObjF__FreeBuffers; also TaskObjF__func_8004F638's slot5C arg2 */
-    s32 unk40;                                /* +0x040, TaskObjF__func_8004F638 (arg1)/TaskObjF__func_8004F8A4 (arg1, forwarded to slot54 as its own arg2) */
-    s32 unk44;                                 /* +0x044, TaskObjF__func_8004F638 (arg2)/TaskObjF__func_8004F8A4 (arg2) */
-    s32 unk48;                                  /* +0x048, TaskObjF__func_8004F8A4 (arg3) */
-    u8 unk4C;                                     /* +0x04C, TaskObjF__func_8004F8A4's 5th (byte) arg; also forwarded live to slot60's arg1 */
+    s32 opMode;                       /* +0x024, RENAMED round 60 (was unk24): distinguishes which of this class's two operations is active -- TaskObjF__BeginLoad sets 1, TaskObjF__BeginSave sets 2, TaskObjF__Validate reads (==1?); the values' exact meaning is not established */
+    s32 statusCode;                    /* +0x028, RENAMED round 60 (was unk28): TaskObjF__Init/TaskObjF__BeginLoad clear or set it, TaskObjF__BeginSave/TaskObjF__Validate read it and dispatch it through slot7C -- a status/completion code, not confirmed to be error-only */
+    s32 bufCount;                       /* +0x02C, RENAMED round 60 (was unk2C): TaskObjF__BeginLoad (slot5C's return)/TaskObjF__FreeUnusedBuffers/TaskObjF__FreeBuffers (loop bound over bufArray) -- the number of bufArray entries actually in use */
+    s32 unk30;                          /* +0x030, TaskObjF__Init (arg1)/TaskObjF__BeginLoad (slot5C's arg3) */
+    s32 unk34;                           /* +0x034, TaskObjF__Init (arg2)/TaskObjF__BeginLoad (slot5C's stack arg4) */
+    void **bufArray;                      /* +0x038, RENAMED round 60 (was unk38): a 16-entry pointer array allocated by TaskObjF__AllocBuffers, torn down by TaskObjF__FreeBuffers, walked by TaskObjF__FreeUnusedBuffers; also TaskObjF__BeginLoad's slot5C arg1 */
+    void *scratchBuf;                       /* +0x03C, RENAMED round 60 (was unk3C): a single buffer allocated by TaskObjF__AllocBuffers, freed by TaskObjF__FreeBuffers; also TaskObjF__BeginLoad's slot5C arg2 */
+    s32 unk40;                                /* +0x040, TaskObjF__BeginLoad (arg1)/TaskObjF__BeginSave (arg1, forwarded to slot54 as its own arg2) */
+    s32 unk44;                                 /* +0x044, TaskObjF__BeginLoad (arg2)/TaskObjF__BeginSave (arg2) */
+    s32 unk48;                                  /* +0x048, TaskObjF__BeginSave (arg3) */
+    u8 unk4C;                                     /* +0x04C, TaskObjF__BeginSave's 5th (byte) arg; also forwarded live to slot60's arg1 */
     u8 pad4D[0x050 - 0x04D];
-    s32 unk50;                                      /* +0x050, TaskObjF__func_8004F8A4's 6th arg */
-    s32 unk54;                                       /* +0x054, TaskObjF__func_8004F638 (arg3)/TaskObjF__func_8004F8A4's 7th arg */
-    s32 unk58;                                        /* +0x058, TaskObjF__func_8004F638's 5th/stack arg/TaskObjF__func_8004F8A4's 8th arg; also forwarded live to slot60's arg2 */
+    s32 unk50;                                      /* +0x050, TaskObjF__BeginSave's 6th arg */
+    s32 unk54;                                       /* +0x054, TaskObjF__BeginLoad (arg3)/TaskObjF__BeginSave's 7th arg */
+    s32 unk58;                                        /* +0x058, TaskObjF__BeginLoad's 5th/stack arg/TaskObjF__BeginSave's 8th arg; also forwarded live to slot60's arg2 */
     u8 pad5C[0x060 - 0x05C];
     s32 unk60;                                          /* +0x060, TaskObjF__Deinit: removeChild's arg */
     s32 unk64;                                            /* +0x064, TaskObjF__Deinit: removeChild's arg */

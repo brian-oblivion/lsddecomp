@@ -114,7 +114,7 @@ Previous title: TaskObjF__CheckCardStatus — NON_MATCHING body promoted, round 
 > **Also seeded and ran a permuter search**, since a different source
 > shape reproducing retail's actual partial-sharing structure is exactly
 > the kind of thing this project's own permuter guidance says the tool
-> can find (see `TaskObjF__func_8004F8A4`'s own tail-merge family for precedent).
+> can find (see `TaskObjF__BeginSave`'s own tail-merge family for precedent).
 > Scaffold sanity-checked first: `--debug --stack-diffs` base score
 > **1279** (`Stack Differences: 24 (1)`, `Register Differences: 19 (5)`,
 > `Reorderings: 1 (60)`, `Insertions: 5 (100)`, `Deletions: 6 (100)`),

@@ -6,7 +6,7 @@
 
 ## The class this unit's back half operates on
 
-Every function from here through `TaskObjF__Notify` in this unit shares one
+Every function from here through `TaskObjF__OnNotify` in this unit shares one
 object type — call it `TaskObjF` — that is **not** `Obj866E8`
 (class_3bb8c_b/c/d/e's class) and not any previously-documented class in
 this codebase. Established from first principles across this whole batch:
@@ -14,7 +14,7 @@ this codebase. Established from first principles across this whole batch:
 - `TaskObjF`'s vtable pointer sits at offset 0, and its first several
   slots (+0x010 `addChild`, +0x014 `removeChild`) are **inherited,
   unmodified `BasicClass` slots** (`include/code_8220.h`'s
-  `BasicClassMethods`) — confirmed because `TaskObjF__Notify` fetches
+  `BasicClassMethods`) — confirmed because `TaskObjF__OnNotify` fetches
   `BasicClass`'s own table directly (`Get_vtable_BasicClass()`, which
   `include/code_8220.h` already establishes returns `&D_8006B58C`) and
   dispatches its slot +0x038 with a `(self, arg1, arg2)` signature that

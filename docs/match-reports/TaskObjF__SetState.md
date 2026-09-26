@@ -111,7 +111,7 @@ touch them), added ADDITIVELY to `include/class_3bb8c.h`:
 
 `self->unk40` (read as `*(u8 *)self->unk40` here, and forwarded opaquely
 elsewhere) and `self->unk4C` (`u8`, promoted to a full word for `slot68`'s
-call, same promotion `slot78` already does with it in `TaskObjF__OnCommand`)
+call, same promotion `slot78` already does with it in `TaskObjF__OnTextEntryResult`)
 are both ALREADY established fields -- no retyping, just the same
 free-reinterpretation-at-the-use-site pattern used throughout this unit
 this round.
@@ -122,7 +122,7 @@ this round.
 Methods struct padding**: an errant `u8 pad0A0[0x0A4-0x0A0];` was placed
 BEFORE `slotA0` instead of after it while splitting the pad range for
 `slot9C`/`slotA8`, which would have silently pushed `slotA0` (an
-ALREADY-established, already-matched slot used by `TaskObjF__OnCommand`) to the
+ALREADY-established, already-matched slot used by `TaskObjF__OnTextEntryResult`) to the
 wrong offset. Caught before ever building, by re-reading the edited
 struct rather than trusting the diff -- worth flagging as the single
 easiest way to introduce a non-local struct-layout break this round,

@@ -1,49 +1,74 @@
-# TaskObjF__OnNotify -- MATCH
+# TaskObjF__OnNotify
 
-> Renamed from `Class86E00_3bb8c_g__OnNotify` on 2026-09-23 (tools/rename.py). Address 0x8004ff90.
+> Renamed from `TaskObjF__Notify` on 2026-09-26 (tools/rename.py). Address 0x8004fb04.
 
-> Renamed from `func_8004FF90` on 2026-09-23 (tools/rename.py). Address 0x8004ff90.
+> Renamed from `func_8004FB04` on 2026-09-20 (tools/rename.py). Address 0x8004fb04.
 
-Unit `class_3bb8c_g`, round 14. `./build-and-verify.sh` exit 0; whole-image
-SHA1 matches retail. `funcdiff.py TaskObjF__OnNotify`: 25/25 words match.
+**Unit:** class_3bb8c_f · **Size:** 56 words (0xE0) · **Status:** MATCH
 
-## Source
+## What it does
 
-```c
-void TaskObjF__OnNotify(Class86E00_3bb8c_g *self, s32 arg1, s32 arg2)
-{
-    if (self->unk28 != 0) {
-        if (arg2 == 0x19) {
-            self->methods->slot90(self);
-        } else if (arg2 == 0x17) {
-            self->methods->slot94(self);
-        }
-    }
-}
-```
+`void TaskObjF__OnNotify(TaskObjF *self, void *arg1, s32 arg2)`. First forwards
+`(self, arg1, arg2)` to the BASE class's own generic notification slot —
+`Get_vtable_BasicClass()` returns `BasicClass`'s method table
+(`include/code_8220.h`), and its slot +0x038 (`BasicClassMethods::slot38`)
+is dispatched directly on `self` cast as a `BasicClass` (this is the
+`notifyParents`-style "notify every parent" mechanism that class documents).
+Then reads a type tag from `**(s32 **)arg1` and dispatches one of four of
+`TaskObjF`'s OWN vtable slots (+0x088/+0x098/+0x0A4/+0x0B0, each `(self,
+arg1, arg2)`) depending on the tag, masked two different ways.
 
-First attempt, byte-exact. `arg1` (`$a1`) is never read anywhere in the
-body -- confirmed genuinely unused, kept as a declared-but-unread
-parameter per the established "an unused parameter just needs declaring,
-not using" convention.
+## Levers
 
-## Struct changes (additive, `include/class_3bb8c.h`)
+1. **Cache `self->methods` in a local BEFORE the `Get_vtable_BasicClass()` call,
+   reuse it for the final four-way dispatch.** The first attempt re-read
+   `self->methods` fresh at each of the four dispatch sites; retail reads
+   it ONCE, into a register that survives the intervening
+   `Get_vtable_BasicClass()`/`slot38` calls, and reuses it for `slot88`/`slot98`/
+   `slotA4`/`slotB0`. Not caching it costs exactly one whole callee-saved
+   register — the prologue drops from `$s0`-`$s3` (retail, `-0x28` frame)
+   to `$s0`-`$s2` (`-0x20` frame), and the WHOLE REST OF THE OBJECT FILE
+   shifts by 8 bytes. This is the same "cache `self->field` across an
+   intervening call" idiom documented elsewhere in this project, just in
+   the opposite direction from its usual warning (there it's "don't cache
+   across a call"; here retail explicitly DOES cache, because the field is
+   read again only after the call).
+2. **The tag dispatch reuses the NARROW mask for the `==5` case, only
+   widening for `0x10`/`0x20`.** `mask = tag & 0xF; if (mask == 2) ...
+   else if (mask == 5) ... else { mask = tag & 0xFF; if (mask == 0x10) ...
+   else if (mask == 0x20) ... }` — since 5 fits inside a 4-bit mask, the
+   `==5` check is valid against EITHER width, and retail's own source
+   evidently used the already-computed narrow mask rather than
+   recomputing the wide one early. Writing the wide-mask recompute inside
+   the `else` (nested with `==2`) but testing `==5` at the SAME (narrow)
+   level as `==2`, rather than nesting `==5` inside the widened branch,
+   reproduced retail's exact instruction order; nesting `==5` under the
+   widened mask (equally correct semantically, since a widened 5 still
+   equals 5) put the constant materializations in the wrong order and
+   cost one extra instruction's worth of drift relative to the following
+   function.
+3. **The four dispatch calls share ONE physical `jalr`, reached by three
+   explicit `goto`-style jumps plus one natural fallthrough on the last
+   `else if`.** A plain `if/else if/else if` chain, each arm ending in its
+   own `methods->slotNN(self, arg1, arg2)` call, reproduced this sharing
+   automatically — no manual `goto`/shared-call-site restructuring was
+   needed here (contrast `TaskObjF__BeginSave`, where the equivalent sharing did
+   need an explicit local function-pointer variable).
 
-- `Class86E00Methods_3bb8c_g::slot90`/`slot94` -- both already declared
-  ahead of this function while surveying the whole unit
-  (`TaskObjF__TickCardIcon`'s report); this is the function that exercises them.
+See `TaskObjF__ForEachEvent`'s report for the `TaskObjF` class and the
+`BasicMethods866E8F`/`Get_vtable_BasicClass` local view.
 
-### Proposed learning
+## Naming (round 60, track 3)
 
-None new.
+`func_8004FB04` -> `TaskObjF__OnNotify`. **Tier A.** Forwards `(self, arg1,
+arg2)` to the inherited `BasicClass` notify slot
+(`Get_vtable_BasicClass()->slot38`, the project's own established
+"notify every parent" mechanism, `include/code_8220.h`), then reads a
+type tag out of `arg1` and dispatches one of this class's own four
+vtable slots (+0x088/+0x098/+0x0A4/+0x0B0) accordingly -- a message
+dispatcher, directly evident from the body and the established
+`BasicClass` precedent.
 
-## Naming
+## Track 4 (2026-09-26, round 89)
 
-`TaskObjF__OnNotify` (was `func_8004FF90`), tier B: signature
-shape `(self, arg1, arg2)` with `arg1` unread and `arg2` a small dispatch
-code (`0x19`/`0x17`) gated on `self->unk28 != 0` matches this project's
-established `(self, sender, event)` notify-receiver shape
-(`BasicClass__OnNotify`/`slot38`, `include/code_8220.h`) closely enough to
-use the same verb, though this class's own table is not BasicClass's and
-`arg1` is never read as a sender here. What the two event codes mean is
-not established.
+Renamed from `TaskObjF__Notify`: it occupies BasicClass's onNotify slot (+0x038) and calls the base onNotify first, so it takes the slot's name (FINISHING-PLAN track 4 step 6), as TextEntry__OnNotify and Class86F88__OnNotify do for the same tag dispatch. The old +0x088 occupant of that name is now TaskObjF__OnInputEvent.

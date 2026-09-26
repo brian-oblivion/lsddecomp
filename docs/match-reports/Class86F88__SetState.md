@@ -74,7 +74,7 @@ than continuing to reshape nested conditionals.
 
 Round 75 (bravo, track 3). `func_800521D4` -> `Class86F88__SetState`, **tier B**.
 
-Slot +0x054 of gClass86F88Methods (`tools/classtable.py gClass86F88Methods`). Clears `closeTicks`; for state 2 or 3 it removes the cached `inputSource` child, releases resources (slot +0x048, Class86F88__ReleaseResources) and stores the state in `result`; for state 4 it calls notifyParents(self, result). Callers: Class86F88__HandleInputCode (2 after input code 25, 3 after code 23) and Class86F88__TickClosing (4). The one parent-side reader, TaskObjF__OnItemSelected (class_3bb8c_g), takes code 2 as "read the selected item" and 3 as the other outcome. Tier B: `SetState` names the mechanics; the states' game meaning (confirm/cancel) is only suggested by that one caller.
+Slot +0x054 of gClass86F88Methods (`tools/classtable.py gClass86F88Methods`). Clears `closeTicks`; for state 2 or 3 it removes the cached `inputSource` child, releases resources (slot +0x048, Class86F88__ReleaseResources) and stores the state in `result`; for state 4 it calls notifyParents(self, result). Callers: Class86F88__HandleInputCode (2 after input code 25, 3 after code 23) and Class86F88__TickClosing (4). The one parent-side reader, TaskObjF__OnItemListResult (class_3bb8c_g), takes code 2 as "read the selected item" and 3 as the other outcome. Tier B: `SetState` names the mechanics; the states' game meaning (confirm/cancel) is only suggested by that one caller.
 
 Class86F88, per the round-75 pass, is a scrolling list selector: up to 4 visible rows of 26-character item text, a highlighted cursor row, a horizontal column offset (see the unit header comment of `src/class_3bb8c_k.c`).
 

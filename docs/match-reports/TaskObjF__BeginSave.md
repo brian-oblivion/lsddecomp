@@ -1,4 +1,6 @@
-# TaskObjF__func_8004F8A4 -- MATCHED 77/77, round 75 (delta). Levers: return type `void` (no return value), and three ordinary leaf `slot7C` calls instead of the shared `dispatch` function-pointer local + `goto call_it`.
+# TaskObjF__BeginSave -- MATCHED 77/77, round 75 (delta). Levers: return type `void` (no return value), and three ordinary leaf `slot7C` calls instead of the shared `dispatch` function-pointer local + `goto call_it`.
+
+> Renamed from `TaskObjF__func_8004F8A4` on 2026-09-26 (tools/rename.py). Address 0x8004f8a4.
 
 REVISITED, round 75: MATCHED 77/77 in 3 builds, whole image `OK: build matches retail`; names/types used (the return TYPE was the first lever).
 
@@ -14,7 +16,7 @@ skip-jump". Read the other way round, retail's `beqz $v0,<epilogue>`
 lands on `lw $ra` with nothing setting `$v0` and the `jalr` path also
 falls into the epilogue without touching `$v0` -- which is exactly what a
 `void` function compiles to. The function is reached only through a
-class table (`asm/data/76DC8.data.s`, `.word TaskObjF__func_8004F8A4`),
+class table (`asm/data/76DC8.data.s`, `.word TaskObjF__BeginSave`),
 so no caller constrains its return type.
 
 | build | change | score | ins/del |
@@ -47,7 +49,7 @@ cross-jump; with `void` the three calls merge exactly as retail does.
 ## Final C (matched)
 
 ```c
-void TaskObjF__func_8004F8A4(TaskObjF *self, s32 a1, s32 a2, s32 a3, u8 a5, s32 a6, s32 a7, s32 a8) {
+void TaskObjF__BeginSave(TaskObjF *self, s32 a1, s32 a2, s32 a3, u8 a5, s32 a6, s32 a7, s32 a8) {
     s32 code;
     TaskObjFMethods *m;
 
@@ -86,7 +88,7 @@ void TaskObjF__func_8004F8A4(TaskObjF *self, s32 a1, s32 a2, s32 a3, u8 a5, s32 
 
 ## Previous title (superseded)
 
-TaskObjF__func_8004F8A4 -- STALL. Length: 3 words TOO LONG (80/77, 0x140/0x134). Word-match: 63/77. First real diff: file 0x40158 / vram 0x8004F958 (delay-slot fill: retail `move $a0,$s0`, built `nop`).
+TaskObjF__BeginSave -- STALL. Length: 3 words TOO LONG (80/77, 0x140/0x134). Word-match: 63/77. First real diff: file 0x40158 / vram 0x8004F958 (delay-slot fill: retail `move $a0,$s0`, built `nop`).
 
 NON_MATCHING body promoted, round 73
 
@@ -196,7 +198,7 @@ word-match or first-diff location.
 
 ## What it does
 
-`s32 TaskObjF__func_8004F8A4(TaskObjF *self, s32 a1, s32 a2, s32 a3, u8 a5, s32 a6,
+`s32 TaskObjF__BeginSave(TaskObjF *self, s32 a1, s32 a2, s32 a3, u8 a5, s32 a6,
 s32 a7, s32 a8)`. A constructor-ish setup: stores the first three
 parameters plus four stack args into `self->unk40..unk58` (one of them a
 byte field, `unk4C`), sets the state tag `self->unk24 = 2`, then — only if
@@ -218,7 +220,7 @@ code)` call retail's own compiler chose.
 ## The residue
 
 Retail's tail dispatch is **not** one single shared fetch+call (contrast
-`TaskObjF__Validate` and `TaskObjF__Notify`, both matched, where the whole
+`TaskObjF__Validate` and `TaskObjF__OnNotify`, both matched, where the whole
 multi-predecessor tail collapses to one `lw;lw;jalr` triple). Instead
 retail has **three independent `self->methods->slot7C` FETCHES** (one for
 the `unk28`-check "top" merge point reached by all 3 of its own
@@ -237,7 +239,7 @@ worked elsewhere reproduced it exactly.
    cross-jump-merge these into anything: 0x194 (100 bytes too long, no
    sharing at all).
 2. **One shared `goto dispatch; ... dispatch: self->methods->slot7C(self,
-   code); return 0;`** (the `TaskObjF__Validate`/`TaskObjF__Notify` lever) — fully
+   code); return 0;`** (the `TaskObjF__Validate`/`TaskObjF__OnNotify` lever) — fully
    shares the fetch AND the call across all 5 predecessors. 0x12C (8 bytes
    / 2 words short) — undershoots because retail does NOT share this much.
 3. **A local function-pointer variable** (`s32 (*dispatch)(TaskObjF*,
@@ -380,7 +382,7 @@ remaining residue being the isolated early-exit tail described above.
 
 ```c
 #if 0
-s32 TaskObjF__func_8004F8A4(TaskObjF *self, s32 a1, s32 a2, s32 a3, u8 a5, s32 a6, s32 a7, s32 a8) {
+s32 TaskObjF__BeginSave(TaskObjF *self, s32 a1, s32 a2, s32 a3, u8 a5, s32 a6, s32 a7, s32 a8) {
     s32 code;
     s32 (*dispatch)(TaskObjF *, s32);
 
@@ -438,9 +440,9 @@ order; already present near the top of `src/class_3bb8c_f.c`).
 
 **A multi-predecessor shared tail has (at least) three distinct
 sub-shapes, not one "tail merge" lever**: (a) fully shared fetch+call
-(`TaskObjF__Validate`, `TaskObjF__Notify`, this unit, both matched with a plain
+(`TaskObjF__Validate`, `TaskObjF__OnNotify`, this unit, both matched with a plain
 `goto`), (b) fully independent, no sharing at all, and (c) shared CALL
-only, with each predecessor doing its own fetch (`TaskObjF__func_8004F8A4`, this
+only, with each predecessor doing its own fetch (`TaskObjF__BeginSave`, this
 report). GCC 2.6.3 chooses which of these three a given call site gets
 based on something not yet identified from source reshaping alone.
 
@@ -460,7 +462,7 @@ SAME lever (named function-pointer local vs. inline call) with OPPOSITE
 correct answers, confirmed by testing both directions on both
 functions.** `TextEntry__HandleCommand` needed the local REMOVED (retail keeps two
 guard blocks separate that a shared local caused GCC to merge).
-`TaskObjF__func_8004F8A4` needs the local KEPT (retail's own partial-sharing shape
+`TaskObjF__BeginSave` needs the local KEPT (retail's own partial-sharing shape
 is UNREACHABLE without it -- the fully-inlined form is 4 words too long
 here). Never apply either direction of this lever without testing the
 specific function; "does retail merge here" is measured per call site,
@@ -480,10 +482,14 @@ lever already tried.
 
 ## Naming (round 60, track 3)
 
-`func_8004F8A4` -> `TaskObjF__func_8004F8A4`. **Tier C placeholder**, same
-reasoning as `TaskObjF__func_8004F638`: class established, concrete
+`func_8004F8A4` -> `TaskObjF__BeginSave`. **Tier C placeholder**, same
+reasoning as `TaskObjF__BeginLoad`: class established, concrete
 operation not. This one sets `self->opMode = 2` and dispatches through
 `slot54`/`slot60`/`slot7C`, all implemented by a subclass outside this
 unit. STALL; preserved body unchanged by this naming pass beyond the
 field renames (`unk24`/`unk28` -> `opMode`/`statusCode`) already applied
 project-wide to `TaskObjF`.
+
+## Track 4 (2026-09-26, round 89)
+
+Renamed from `TaskObjF__func_8004F8A4`. Slot +0x078. It stores (fileName, title, titleEditPos, iconFrames, iconImage, data, dataSize), sets opMode 2, validates the card, then asks +0x054 TaskObjF__ProbeMemcardFile whether `fileName` exists and +0x060 TaskObjF__CheckCardSpace whether `dataSize` fits (code 9 when not). The codes lead to 0x11 (TaskObjF__AttachTextEntry: edit the title) and 0xB, which TaskObjF__TickStateDelay turns into 0x14, and SetState(0x14) calls +0x068 TaskObjF__WriteMemcardSaveFile with exactly these fields. Its one outside caller is Class86B60__UpdateMemcardSaveWithIcon (the save block, its size, and a TIM icon with 3 frames).

@@ -88,7 +88,7 @@ the temp `handle` is the exact idiom already established by
 type from `class_3bb8c.h` (`slot78`/`release` already declared there).
 
 `self->unk70` is ALREADY typed `Class86E00Unk70Obj_3bb8c_g *` in this unit
-(established by the already-matched `TaskObjF__TickCardIcon`, same file). Assigning
+(established by the already-matched `TaskObjF__ReleaseCardIcon`, same file). Assigning
 `New_ScreenSprite`'s `ChildObj86ED0 *` return into it is the same
 implicit-pointer-type-mismatch-is-harmless pattern already documented in
 `TextEntry__LoadCardResources`'s own report (`self->unk44 = New_TextRow(...)` there) --

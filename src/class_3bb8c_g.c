@@ -132,14 +132,14 @@ void TaskObjF__LoadCardIcon(Class86E00_3bb8c_g *self, s32 arg1)
     newVal->methods->slot4C(newVal, self->childReady, (void *)&D_8008AA94);
 }
 
-void TaskObjF__TickCardIcon(Class86E00_3bb8c_g *self)
+void TaskObjF__ReleaseCardIcon(Class86E00_3bb8c_g *self)
 {
     if (self->cardIcon != NULL) {
         self->cardIcon = self->cardIcon->methods->slot4(self->cardIcon);
     }
 }
 
-void TaskObjF__OnNotify(Class86E00_3bb8c_g *self, s32 arg1, s32 arg2)
+void TaskObjF__OnInputEvent(Class86E00_3bb8c_g *self, s32 arg1, s32 arg2)
 {
     if (self->state != 0) {
         if (arg2 == 0x19) {
@@ -150,7 +150,7 @@ void TaskObjF__OnNotify(Class86E00_3bb8c_g *self, s32 arg1, s32 arg2)
     }
 }
 
-void TaskObjF__SetChildFlag8(Class86E00_3bb8c_g *self, s32 arg1)
+void TaskObjF__PlaySound(Class86E00_3bb8c_g *self, s32 arg1)
 {
     if (self->childC != NULL) {
         self->childC->methods->slot80(self->childC, arg1, 0x7F, 0x7F);
@@ -243,7 +243,7 @@ void TaskObjF__TickStateDelay(Class86E00_3bb8c_g *self)
     }
 }
 
-void TaskObjF__AttachChildA(Class86E00_3bb8c_g *self)
+void TaskObjF__AttachTextEntry(Class86E00_3bb8c_g *self)
 {
     if (self->childReady != 0 && self->unk60 != 0) {
         if (self->childA == NULL) {
@@ -257,7 +257,7 @@ void TaskObjF__AttachChildA(Class86E00_3bb8c_g *self)
     }
 }
 
-void TaskObjF__DetachChildA(Class86E00_3bb8c_g *self)
+void TaskObjF__DetachTextEntry(Class86E00_3bb8c_g *self)
 {
     if (self->childReady != 0 && self->unk60 != 0 && self->childA != NULL) {
         self->childA->methods->detachTarget(self->childA);
@@ -269,7 +269,7 @@ void TaskObjF__DetachChildA(Class86E00_3bb8c_g *self)
     }
 }
 
-void TaskObjF__OnCommand(Class86E00_3bb8c_g *self, void *arg1, s32 arg2)
+void TaskObjF__OnTextEntryResult(Class86E00_3bb8c_g *self, void *arg1, s32 arg2)
 {
     switch (arg2) {
     case 2:
@@ -284,7 +284,7 @@ void TaskObjF__OnCommand(Class86E00_3bb8c_g *self, void *arg1, s32 arg2)
     }
 }
 
-void TaskObjF__AttachChildB(Class86E00_3bb8c_g *self)
+void TaskObjF__AttachItemList(Class86E00_3bb8c_g *self)
 {
     if (self->childReady != 0 && self->unk60 != 0) {
         if (self->childB == NULL) {
@@ -297,7 +297,7 @@ void TaskObjF__AttachChildB(Class86E00_3bb8c_g *self)
     }
 }
 
-void TaskObjF__DetachChildB(Class86E00_3bb8c_g *self)
+void TaskObjF__DetachItemList(Class86E00_3bb8c_g *self)
 {
     if (self->childReady != 0 && self->unk60 != 0 && self->childB != NULL) {
         self->childB->methods->slot50(self->childB);
@@ -309,7 +309,7 @@ void TaskObjF__DetachChildB(Class86E00_3bb8c_g *self)
     }
 }
 
-void TaskObjF__OnItemSelected(Class86E00_3bb8c_g *self, GenericSlot9CObj_3bb8c_g *arg1, s32 arg2)
+void TaskObjF__OnItemListResult(Class86E00_3bb8c_g *self, GenericSlot9CObj_3bb8c_g *arg1, s32 arg2)
 {
     switch (arg2) {
     case 2:

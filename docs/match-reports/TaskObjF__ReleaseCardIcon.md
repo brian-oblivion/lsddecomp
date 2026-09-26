@@ -1,16 +1,18 @@
-# TaskObjF__TickCardIcon -- MATCH
+# TaskObjF__ReleaseCardIcon -- MATCH
+
+> Renamed from `TaskObjF__TickCardIcon` on 2026-09-26 (tools/rename.py). Address 0x8004ff40.
 
 > Renamed from `Class86E00_3bb8c_g__TickCardIcon` on 2026-09-23 (tools/rename.py). Address 0x8004ff40.
 
 > Renamed from `func_8004FF40` on 2026-09-23 (tools/rename.py). Address 0x8004ff40.
 
 Unit `class_3bb8c_g`, round 14. `./build-and-verify.sh` exit 0; whole-image
-SHA1 matches retail. `funcdiff.py TaskObjF__TickCardIcon`: 20/20 words match.
+SHA1 matches retail. `funcdiff.py TaskObjF__ReleaseCardIcon`: 20/20 words match.
 
 ## Source
 
 ```c
-void TaskObjF__TickCardIcon(Class86E00_3bb8c_g *self)
+void TaskObjF__ReleaseCardIcon(Class86E00_3bb8c_g *self)
 {
     if (self->unk70 != NULL) {
         self->unk70 = self->unk70->methods->slot4(self->unk70);
@@ -60,7 +62,7 @@ no existing-declaration retype to flag for this function.
 - Also pre-declared, while surveying the whole unit before writing any
   code, the remaining struct surface this unit's other 11 fresh functions
   need: `Class86E00SubObj_3bb8c_g` (self->unk78/unk7C's shared pointee),
-  `GenericSlot9CObj_3bb8c_g` (TaskObjF__OnItemSelected's arg1), and
+  `GenericSlot9CObj_3bb8c_g` (TaskObjF__OnItemListResult's arg1), and
   `Class86E00Methods_3bb8c_g`'s `slot10`/`slot78`/`slot7C`/`slot8C`/
   `slot90`/`slot94`/`slotA0`/`slotAC`, plus `extern` declarations for two
   external helpers this unit calls but does not own
@@ -76,10 +78,14 @@ applied to a return value instead of a parameter.
 
 ## Naming
 
-`TaskObjF__TickCardIcon` (was `func_8004FF40`), tier B: calls
+`TaskObjF__ReleaseCardIcon` (was `func_8004FF40`), tier B: calls
 `self->unk70`'s own generic per-step "advance" slot and stores the
 result back (the same `self->field = self->field->methods->slot4(...)`
 shape recurring across many unrelated classes in this project, e.g.
 `class_39e08.c`, `code_2cc8c_b.c`, `code_55dd4.c` -- read here as an
 ordinary per-frame/per-step tick of the loaded card icon object). What
 "advancing" the icon actually changes on screen is not established.
+
+## Track 4 (2026-09-26, round 89)
+
+Renamed from `TaskObjF__TickCardIcon`. `cardIcon` (+0x070) is only ever assigned from `New_ScreenSprite` (TaskObjF__LoadCardIcon), and +0x004 of gScreenSpriteMethods is `BasicClass__Release` (`tools/classtable.py gScreenSpriteMethods`), which finalizes, frees and returns NULL. So the call stores NULL back: the function releases the icon, it does not tick it. Its one caller is TaskObjF__SetState's second call (slot +0x084, every path), right before loadCardIcon (+0x080) makes the next one.

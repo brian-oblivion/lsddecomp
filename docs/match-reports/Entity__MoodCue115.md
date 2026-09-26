@@ -334,11 +334,11 @@ docs/match-reports/`, then filter to the ones whose first lines say STALL):
 `DreamSys__TryInstantTeleportLink`, `cd_read_retry`, `func_80032148`,
 `func_80033AB0`, `Snd_decrescendo`, `_SsSetControlChange`, `ContDataEntry`,
 `TaskCore__CommitElementScroll`, `Class866E8__SplitFootprintSlot`, `TaskObjF__CheckCardStatus`, `StyleFillEffectKind3`,
-`Entity__MoodCue111`, `TaskObjF__func_8004F8A4`. I did not screen these — that is
+`Entity__MoodCue111`, `TaskObjF__BeginSave`. I did not screen these — that is
 other units' work and outside this brief — but the ordering heuristic is
 cheap: **rank by LENGTH-OFF first**, because an un-merged arm costs words
 (~3 here) while a merge that lands in the wrong place at the right size does
-not. `TaskObjF__func_8004F8A4` self-describes as a tail-merge stall one word
+not. `TaskObjF__BeginSave` self-describes as a tail-merge stall one word
 off, which makes it the nearest thing to a control: one word is too small for
 a foreclosed merge, so if the return-type check fires there it would be
 evidence the mechanism has a second, cheaper mode, and if it does not fire the

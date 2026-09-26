@@ -14,7 +14,7 @@
  *   palette, up to three icon frames).
  * - A generic async-task skeleton (TaskObjF__Init/Deinit,
  *   TaskObjF__AllocBuffers/FreeBuffers/FreeUnusedBuffers,
- *   TaskObjF__Validate, TaskObjF__Notify, TaskObjF__func_8004F638/
+ *   TaskObjF__Validate, TaskObjF__OnNotify, TaskObjF__BeginLoad/
  *   func_8004F8A4) managing a 16-entry buffer pool and dispatching the
  *   actual work through vtable slots a subclass outside this unit
  *   implements -- what those two entry points DO is not established
@@ -343,7 +343,7 @@ void TaskObjF__Deinit(TaskObjF *self) {
     self->methods->removeChild(self, (void *)self->unk64);
 }
 
-void TaskObjF__func_8004F638(TaskObjF *self, s32 a1, s32 a2, s32 a3, s32 a4) {
+void TaskObjF__BeginLoad(TaskObjF *self, s32 a1, s32 a2, s32 a3, s32 a4) {
     s32 result;
     s32 code;
 
@@ -406,11 +406,11 @@ void TaskObjF__FreeBuffers(TaskObjF *self) {
     }
 }
 
-/* MATCHED round 75 (docs/match-reports/TaskObjF__func_8004F8A4.md): the
+/* MATCHED round 75 (docs/match-reports/TaskObjF__BeginSave.md): the
  * function returns nothing -- the early exit falls straight into the
  * epilogue with Validate's own $v0 -- and each of the three leaves makes its
  * own slot7C call, which GCC cross-jumps down to one shared `jalr`. */
-void TaskObjF__func_8004F8A4(TaskObjF *self, s32 a1, s32 a2, s32 a3, u8 a5, s32 a6, s32 a7, s32 a8) {
+void TaskObjF__BeginSave(TaskObjF *self, s32 a1, s32 a2, s32 a3, u8 a5, s32 a6, s32 a7, s32 a8) {
     s32 code;
     TaskObjFMethods *m;
 
@@ -481,7 +481,7 @@ dispatch:
     return 0;
 }
 
-void TaskObjF__Notify(TaskObjF *self, void *arg1, s32 arg2) {
+void TaskObjF__OnNotify(TaskObjF *self, void *arg1, s32 arg2) {
     TaskObjFMethods *methods;
     BasicClassMethods *bm;
     s32 tag;
