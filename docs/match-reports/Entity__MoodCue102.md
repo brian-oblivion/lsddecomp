@@ -38,14 +38,14 @@ void Entity__MoodCue102(Entity *this, EntityMoodHandlerArg *out) {
         out->unk34 = -2;
     }
     if (this->unkFC >= 0x33) {
-        this->methods->slot44(this, 0, D_80089CAC);
+        this->methods->slot44(this, 0, ROTATION_YAW_MINUS_THIRD);
     }
     if (this->unkFC >= 0x30D) {
         SceneNode__FaceTarget(this, this->unk94, 1, 0, 0);
         if (this->unkFC >= 0x790) {
             a2 = SCALE_UNIT;
         } else if (this->unkFC >= 0x78B) {
-            a2 = D_80089DE4;
+            a2 = SCALE_X_FOUR_FIFTHS_Y_SIX_FIFTHS;
         } else if (this->unkFC >= 0x786) {
             a2 = SCALE_HALF;
         } else if (this->unkFC >= 0x781) {
@@ -146,7 +146,7 @@ elsewhere in this unit -- same symbol, not redecoded per call site.
 
 ## Three constants left unnamed this round
 
-- `D_80089CAC` (`updateRotation` arg, `moodTimer >= 0x33` branch): s16-pair
+- `ROTATION_YAW_MINUS_THIRD` (`updateRotation` arg, `moodTimer >= 0x33` branch): s16-pair
   decoded `(0,1, -1,3, 0,1, 0,1)` -- only Y nonzero, but -1/3 degree is not
   a whole number, so it does not fit the established `ROTATION_YAW_PLUS2`/
   `ROTATION_YAW_PLUS9`/`ROTATION_YAW_PLUS1` whole-degree convention. No
@@ -159,10 +159,36 @@ elsewhere in this unit -- same symbol, not redecoded per call site.
   `SCALE_ONE` used by `SceneNode__UpdateScale`. Not renamed to `SCALE_ONE`
   or a variant: two differently-addressed, differently-shaped symbols
   sharing one implied meaning is confusing, not clarifying.
-- `D_80089DE4` (`updateScale` arg, `moodTimer >= 0x78B` arm): decoded
+- `SCALE_X_FOUR_FIFTHS_Y_SIX_FIFTHS` (`updateScale` arg, `moodTimer >= 0x78B` arm): decoded
   `(4,5, 6,5, 5,5, 2,1)` -- X=4/5, Y=6/5, Z=1, not uniform, so it is not
   one of this project's single-ratio `SCALE_*` names.
 
 ## Track 4 (2026-09-26, round 88, echo)
 
 The class (id 0x1F234, table `gEntityMethods`) is unified as `Entity` in `include/Entity.h`: a TodActor subclass whose table and object expand `TODACTOR_SLOTS`/`TODACTOR_FIELDS`. Any source block above is the pre-unification spelling; the live body takes the inherited names (fields `parent`, `coord2`->`tx/ty/tz`, `tick`, `linkTarget`, `state` (was `moodState`), `lastOffsetValue`, `grid` (was `unk4C`), `ticker` (was `companion2`), `arg2` (was `soundCueChannel`), `parts`, `todPlaying`, `peer` (was `target`, cast to the `Unk94Obj` DreamSys view where its own slots are called); slots `reset`, `setDisplay`, `setLightMode`, `setTranslation`/`addTranslation`, `moveLocalZ/X/Y`, `moveLocalZOrFindLink`, `selectTickCallback`, `enableTickCallback`/`disableTickCallback`, `distanceToPeer`, `setTargetReached`, `updateActivationState`/`updateDeactivationState`), byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).
+
+## Track 7 (2026-09-26, round 94, alpha)
+
+### Naming
+
+| old | new | tier | evidence |
+| --- | --- | --- | --- |
+| `D_80089CAC` | `ROTATION_YAW_MINUS_THIRD` | A (by value) | `.word 0x00010000, 0x0003FFFF, 0x00010000` = {0/1, -1/3, 0/1}: yaw -1/3 degree per call |
+| `D_80089DE4` | `SCALE_X_FOUR_FIFTHS_Y_SIX_FIFTHS` | A (by value) | `.word 0x00050004, 0x00050006, 0x00050005` = {4/5, 6/5, 5/5}; z is 5/5 = 1, omitted like `SCALE_Y2`'s unit axes |
+| local `a2` | `scale` (now `Ratio16 *`, was `void *`) | -- | the `updateScale` argument; byte-exact |
+
+The "left unnamed" section above predates the precedent: round 94's
+`ROTATION_XPLUS_EIGHTH` (x = 1/8 degree) and `SCALE_X3`/`SCALE_Y2` are the
+fractional-degree and non-uniform-scale precedents it asked for.
+
+### `state = 1` at `moodTimer >= 2000` is `ENTITY_STATE_DONE`
+
+Not a phase of this handler: nothing here reads `state == 1`, and the value
+is the one `Entity__UpdateActivationState` (`this->active == 0 &&
+this->state != 1`) and `Entity__UpdateSoundCueStart` read as "done, do not
+reactivate or restart the cue". By 2000 ticks the scale has settled at
+`SCALE_UNIT` (from 1936) and the handler stops its own `moveLocalZ`; setting
+1 also stops the `state == 0` link-stage trigger from firing. The same
+value is stored without a `deactivate` by `Entity__MoodCue123` and by
+Entity_e's MoodCue after `stopSoundCue`, so the header comment's "after
+deactivate" is narrower than the uses (proposed to the head).

@@ -28,7 +28,7 @@ void Entity__MoodCue103(Entity *this, EntityMoodHandlerArg *out) {
     }
     if (this->unk44 == 0xB) {
         if (this->unkFC < 0x3FC) {
-            this->methods->slot44(this, 0, D_80089CB8);
+            this->methods->slot44(this, 0, ROTATION_YAW_MINUS_HALF);
             this->methods->slotCC(this, 0x1E, 0);
         }
         if (this->unkFC == 0x3A2) {
@@ -48,7 +48,7 @@ Matched on the first build.
 ## Provenance
 
 round 13 (2026-09-03), runner alpha, unit Entity_g. Matched on the first
-build. Adds `D_80089CB8` to this unit's local externs.
+build. Adds `ROTATION_YAW_MINUS_HALF` to this unit's local externs.
 
 
 ## Naming
@@ -65,9 +65,9 @@ names sort in table order.
 
 ## Data constant left unnamed this round
 
-`D_80089CB8` (`updateRotation` arg, `moodState == 0xB` branch): s16-pair
+`ROTATION_YAW_MINUS_HALF` (`updateRotation` arg, `moodState == 0xB` branch): s16-pair
 decoded `(0,1, -1,2, 0,1, 0,1)` -- only Y nonzero, -1/2 degree. Same
-reasoning as `D_80089CAC` (Entity__MoodCue102's report): no fractional-degree
+reasoning as `ROTATION_YAW_MINUS_THIRD` (Entity__MoodCue102's report): no fractional-degree
 rotation constant is named anywhere in the project, so a half-degree
 per-tick wobble rate does not fit the established whole-degree
 `ROTATION_YAW_*` convention.
@@ -75,3 +75,14 @@ per-tick wobble rate does not fit the established whole-degree
 ## Track 4 (2026-09-26, round 88, echo)
 
 The class (id 0x1F234, table `gEntityMethods`) is unified as `Entity` in `include/Entity.h`: a TodActor subclass whose table and object expand `TODACTOR_SLOTS`/`TODACTOR_FIELDS`. Any source block above is the pre-unification spelling; the live body takes the inherited names (fields `parent`, `coord2`->`tx/ty/tz`, `tick`, `linkTarget`, `state` (was `moodState`), `lastOffsetValue`, `grid` (was `unk4C`), `ticker` (was `companion2`), `arg2` (was `soundCueChannel`), `parts`, `todPlaying`, `peer` (was `target`, cast to the `Unk94Obj` DreamSys view where its own slots are called); slots `reset`, `setDisplay`, `setLightMode`, `setTranslation`/`addTranslation`, `moveLocalZ/X/Y`, `moveLocalZOrFindLink`, `selectTickCallback`, `enableTickCallback`/`disableTickCallback`, `distanceToPeer`, `setTargetReached`, `updateActivationState`/`updateDeactivationState`), byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).
+
+## Track 7 (2026-09-26, round 94, alpha)
+
+### Naming
+
+| old | new | tier | evidence |
+| --- | --- | --- | --- |
+| `D_80089CB8` | `ROTATION_YAW_MINUS_HALF` | A (by value) | `.word 0x00010000, 0x0002FFFF, 0x00010000` = {0/1, -1/2, 0/1}: yaw -1/2 degree per call |
+
+The fractional-degree precedent the section above wanted is
+`ROTATION_XPLUS_EIGHTH` (0x80089C58, x = 1/8).

@@ -97,3 +97,43 @@ configure adds it as a child; no code). Image byte-identical.
 ## Track 4 (2026-09-26, round 88, echo)
 
 The class (id 0x1F234, table `gEntityMethods`) is unified as `Entity` in `include/Entity.h`: a TodActor subclass whose table and object expand `TODACTOR_SLOTS`/`TODACTOR_FIELDS`. Any source block above is the pre-unification spelling; the live body takes the inherited names (fields `parent`, `coord2`->`tx/ty/tz`, `tick`, `linkTarget`, `state` (was `moodState`), `lastOffsetValue`, `grid` (was `unk4C`), `ticker` (was `companion2`), `arg2` (was `soundCueChannel`), `parts`, `todPlaying`, `peer` (was `target`, cast to the `Unk94Obj` DreamSys view where its own slots are called); slots `reset`, `setDisplay`, `setLightMode`, `setTranslation`/`addTranslation`, `moveLocalZ/X/Y`, `moveLocalZOrFindLink`, `selectTickCallback`, `enableTickCallback`/`disableTickCallback`, `distanceToPeer`, `setTargetReached`, `updateActivationState`/`updateDeactivationState`), byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).
+
+## Track 7 (2026-09-26, round 94, alpha)
+
+### Unit history (moved from `src/Entity_g.c`'s banner)
+
+The banner the round-94 polish replaced carried these facts; they live
+here, the unit's first function, so the banner can say only what the file
+holds:
+
+- Entity_g is one of the Entity class's split units (Entity_c through
+  Entity_g cover its 97-function remainder after Entity/Entity_b), range
+  0x80064618..0x800655D4, directly following Entity_e. Entity_f is a
+  separate unit interleaved with this one; its address range is not
+  contiguous with Entity_g's.
+- The row numbers of the 19 `Entity__MoodCueNN` handlers were confirmed
+  by reading `disk/SLPS_015.56`: `0x80089EB0 + 0x10 * row` is the row's
+  own `handler` word, checked against each candidate function's address.
+  Row order does not track code address (same finding as Entity_d/Entity_e,
+  rounds 76-77).
+- `Entity__MoodCue123` (0x80065238) also occupies row 126 (identical
+  `handler` word, different data0/data1/data2): one function shared by two
+  mood-row configurations, named for its lower row.
+- `Entity__StepYawInWindowsThenDeactivate` (formerly `func_80064FBC`) is
+  called by `jal`, not through a table, from `Entity__MoodCue111` (twice)
+  and `Entity__MoodCue40` (Entity_d.c, its first caller from outside this
+  unit).
+- Motion templates: `ROTATION_YAW_PLUS1`, `ROTATION_ZPLUS4` (renamed
+  `ROTATION_YAW_PLUS4` in round 94, see `Entity__MoodCue110`),
+  `SCALE_EIGHTH`, `SCALE_QUARTER` and `SCALE_THIRTY_SECOND` were named in an
+  earlier round, decoded from `disk/SLPS_015.56` against the existing
+  `ROTATION_YAW_PLUS2`/`ROTATION_YAW_MINUS120`/`ROTATION_ZPLUS9`/
+  `SCALE_HALF`/`SCALE_SIX` tables (three Ratio16 `{num,den}` pairs, X/Y
+  (yaw)/Z); `SCALE_UNIT` in round 93. The other five
+  (0x80089CAC, 0x80089CB8, 0x80089DE4, 0x80089E2C, 0x80089E44) were decoded
+  then but left unnamed for want of a fractional-degree or non-uniform
+  precedent; round 94 named them by value (see `Entity__MoodCue102`,
+  `Entity__MoodCue103`, `Entity__MoodCue106`, `Entity__MoodCue110`).
+  `ROTATION_YAW_PLUS1` and `SCALE_QUARTER` are also referenced from
+  `src/Entity_c.c`; since track 4b (round 93) every named template has one
+  declaration, `Ratio16[]` in `include/Entity.h`.

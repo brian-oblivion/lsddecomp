@@ -1,5 +1,5 @@
-/* Entity_g: twenty of Entity's MoodCue handlers and the helper one of them
- * shares.
+/* Entity_g: nineteen of Entity's MoodCue handlers and a per-tick helper
+ * one of them shares with Entity_d.
  *
  * Each Entity__MoodCueNN is the `handler` of gEntityMoodHandlerTable's row
  * NN (include/Entity.h): rows 98, 102 to 106, 108 to 111, 113, 114, 117,
@@ -21,31 +21,14 @@
  * The literals are left unnamed where they are one handler's tuning: tick
  * counts, distances in world units, TOD frame numbers, VAB program
  * numbers, and the `state` values other than 0 and ENTITY_STATE_DONE,
- * which are each handler's own phases. The named motion templates
- * (ROTATION_YAW_PLUS1, ROTATION_ZPLUS4, SCALE_EIGHTH, SCALE_QUARTER,
- * SCALE_THIRTY_SECOND, SCALE_UNIT) are declared once in include/Entity.h.
- * Five more data constants (D_80089CAC, D_80089CB8, D_80089DE4, D_80089E2C,
- * D_80089E44) are left unnamed for lack of a naming precedent -- a
- * non-whole-degree rotation or a non-uniform/non-unit-fraction scale; see
- * each function's match report (`## Naming` / `## Data constant(s) ...
- * unnamed`) for the per-constant evidence.
+ * which are each handler's own phases. The motion templates the handlers
+ * pass to updateRotation and updateScale (ROTATION_*, SCALE_*) are named
+ * by value and declared once in include/Entity.h.
  */
 #include "common.h"
 #include "Entity.h"
 #include "DreamSys.h"
 #include "StageMap.h"
-
-/* Data rows this unit's mood-dispatch handlers pass through to a vtable
- * call as an opaque argument -- never dereferenced here, so an opaque byte
- * array is enough to form &D_8008xxxx correctly. Real element type/count
- * unknown. Same per-unit local-declaration convention as Entity_b.c/
- * Entity_c.c/Entity_e.c (each unit keeps its own extern, not shared).
- * The named motion templates (ROTATION_*, SCALE_*) are in include/Entity.h. */
-extern u8 D_80089CAC[];
-extern u8 D_80089DE4[];
-extern u8 D_80089CB8[];
-extern u8 D_80089E2C[];
-extern u8 D_80089E44[];
 
 void Entity__MoodCue98(Entity *this, SoundCueSet *out) {
     if (this->targetReached != 0) {
@@ -59,7 +42,7 @@ void Entity__MoodCue98(Entity *this, SoundCueSet *out) {
 }
 
 void Entity__MoodCue102(Entity *this, SoundCueSet *out) {
-    void *a2;
+    Ratio16 *scale;
 
     if (this->moodTimer == 0) {
         this->methods->moveLocalY(this, -512, 0);
@@ -72,26 +55,26 @@ void Entity__MoodCue102(Entity *this, SoundCueSet *out) {
         out->slots[1].octave = -2;
     }
     if (this->moodTimer >= 51) {
-        this->methods->updateRotation(this, 0, D_80089CAC);
+        this->methods->updateRotation(this, 0, ROTATION_YAW_MINUS_THIRD);
     }
     if (this->moodTimer >= 781) {
         SceneNode__FaceTarget((SceneNode *)this, (SceneNode *)this->peer, 1, 0, 0);
         if (this->moodTimer >= 1936) {
-            a2 = SCALE_UNIT;
+            scale = SCALE_UNIT;
         } else if (this->moodTimer >= 1931) {
-            a2 = D_80089DE4;
+            scale = SCALE_X_FOUR_FIFTHS_Y_SIX_FIFTHS;
         } else if (this->moodTimer >= 1926) {
-            a2 = SCALE_HALF;
+            scale = SCALE_HALF;
         } else if (this->moodTimer >= 1921) {
-            a2 = SCALE_QUARTER;
+            scale = SCALE_QUARTER;
         } else {
-            a2 = SCALE_EIGHTH;
+            scale = SCALE_EIGHTH;
         }
-        this->methods->updateScale(this, 1, a2);
+        this->methods->updateScale(this, 1, scale);
         if (this->moodTimer < 2000) {
             this->methods->moveLocalZ(this, -64, 0);
         } else {
-            this->state = 1;
+            this->state = ENTITY_STATE_DONE;
         }
     } else {
         this->methods->moveLocalZ(this, -256, 0);
@@ -114,7 +97,7 @@ void Entity__MoodCue103(Entity *this, SoundCueSet *out) {
     }
     if (this->state == 11) {
         if (this->moodTimer < 1020) {
-            this->methods->updateRotation(this, 0, D_80089CB8);
+            this->methods->updateRotation(this, 0, ROTATION_YAW_MINUS_HALF);
             this->methods->moveLocalY(this, 30, 0);
         }
         if (this->moodTimer == 930) {
@@ -130,7 +113,7 @@ void Entity__MoodCue103(Entity *this, SoundCueSet *out) {
 
 void Entity__MoodCue104(Entity *this, SoundCueSet *out) {
     this->methods->updateScale(this, 1, SCALE_QUARTER);
-    if ((u32)(this->moodTimer - 201) < 99) {
+    if (this->moodTimer >= 201 && this->moodTimer < 300) {
         this->methods->moveLocalY(this, -32, 0);
     }
 }
@@ -146,13 +129,10 @@ void Entity__MoodCue106(Entity *this, SoundCueSet *out) {
         }
     }
     if (this->state == 11) {
-        void *fn;
-
         if (this->moodTimer == 0) {
             this->methods->stopTod(this);
         }
-        fn = this->methods->updateScale;
-        ((void (*)(Entity *, s32, void *))fn)(this, 1, D_80089E2C);
+        this->methods->updateScale(this, 1, SCALE_X_EIGHTH_Y2_Z_EIGHTH);
         return;
     }
     if (this->moodTimer == 0) {
@@ -172,7 +152,7 @@ void Entity__MoodCue109(Entity *this, SoundCueSet *out) {
 }
 
 void Entity__MoodCue110(Entity *this, SoundCueSet *out) {
-    this->methods->updateScale(this, 1, D_80089E44);
+    this->methods->updateScale(this, 1, SCALE_TWO_FIFTHS);
     this->methods->stopTod(this);
     if (this->state == 0) {
         if (this->methods->distanceToPeer(this, this->peer) < 2048) {
@@ -182,7 +162,7 @@ void Entity__MoodCue110(Entity *this, SoundCueSet *out) {
     }
     if (this->state == 10) {
         if (this->moodTimer < 45) {
-            this->methods->updateRotation(this, 0, ROTATION_ZPLUS4);
+            this->methods->updateRotation(this, 0, ROTATION_YAW_PLUS4);
         }
         if (this->moodTimer >= 501) {
             this->state = 0;
@@ -192,20 +172,21 @@ void Entity__MoodCue110(Entity *this, SoundCueSet *out) {
 
 void Entity__MoodCue111(Entity *this, SoundCueSet *out) {
     if (this->moodTimer == 0) {
-        if (((DreamSys *)this->peer)->methods->getDreamColor((DreamSys *)this->peer) == 5) {
+        if (((DreamSys *)this->peer)->methods->getDreamColor((DreamSys *)this->peer) == DREAM_COLOR_PINK) {
             this->state = 11;
         }
     }
     if (this->state != 0 && this->moodTimer >= 2160) {
-        if ((u32)(this->moodTimer - 2160) < 401) {
+        /* MATCHING: the repeated `>= 2160` is retail's second range test. */
+        if (this->moodTimer >= 2160 && this->moodTimer <= 2560) {
             if (this->moodTimer == 2160) {
                 this->methods->stopTod(this);
-                out->slots[0].program = -2;
-                out->slots[1].program = -2;
-                out->slots[2].program = -2;
+                out->slots[0].program = SOUND_CUE_STOP;
+                out->slots[1].program = SOUND_CUE_STOP;
+                out->slots[2].program = SOUND_CUE_STOP;
                 return;
             }
-            if ((u32)(this->moodTimer - 2550) < 10) {
+            if (this->moodTimer >= 2550 && this->moodTimer < 2560) {
                 out->slots[0].program = 5;
                 out->slots[0].octave = -2;
                 return;
@@ -240,29 +221,11 @@ void Entity__StepYawInWindowsThenDeactivate(Entity *this, SoundCueSet *out, s32 
         out->slots[2].program = 4;
     }
     timer = this->moodTimer;
-    if (timer < windowStart) {
-        goto L18;
+    if ((timer >= windowStart && timer <= windowStart + 91) ||
+        (timer >= windowStart + 341 && timer <= windowStart + 433) ||
+        (timer >= windowStart + 698 && timer <= windowStart + 791)) {
+        this->methods->updateRotation(this, 0, ROTATION_YAW_PLUS1);
     }
-    if (!(windowStart + 91 < timer)) {
-        goto L50;
-    }
-L18:
-    if (timer < windowStart + 341) {
-        goto L34;
-    }
-    if (!(windowStart + 433 < timer)) {
-        goto L50;
-    }
-L34:
-    if (timer < windowStart + 698) {
-        goto L74;
-    }
-    if (windowStart + 791 < timer) {
-        goto L74;
-    }
-L50:
-    this->methods->updateRotation(this, 0, ROTATION_YAW_PLUS1);
-L74:
     this->methods->moveLocalZ(this, zStep, 0);
     if (this->moodTimer == deactivateTimer) {
         this->methods->deactivate(this);
@@ -275,17 +238,17 @@ void Entity__MoodCue113(Entity *this, SoundCueSet *out) {
 }
 
 void Entity__MoodCue114(Entity *this, SoundCueSet *out) {
-    Ratio16 *a2;
+    Ratio16 *rotation;
 
     if (rand() % 3 == 0) {
         return;
     }
     if (rand() % 3 != 0) {
-        a2 = ROTATION_YAW_PLUS9;
+        rotation = ROTATION_YAW_PLUS9;
     } else {
-        a2 = ROTATION_YAW_MINUS9;
+        rotation = ROTATION_YAW_MINUS9;
     }
-    this->methods->updateRotation(this, 0, a2);
+    this->methods->updateRotation(this, 0, rotation);
 }
 
 void Entity__MoodCue117(Entity *this, SoundCueSet *out) {
@@ -314,6 +277,7 @@ void Entity__MoodCue123(Entity *this, SoundCueSet *out) {
     }
     if (this->state == 11) {
         if (this->moodTimer >= 301) {
+            /* DreamSys__OnPadEvent's events 2 and 7: walk forward, then run. */
             ((DreamSys *)this->peer)->methods->onPadEvent((DreamSys *)this->peer, 0, 2);
             ((DreamSys *)this->peer)->methods->onPadEvent((DreamSys *)this->peer, 0, 7);
         }
@@ -321,19 +285,11 @@ void Entity__MoodCue123(Entity *this, SoundCueSet *out) {
 }
 
 void Entity__MoodCue125(Entity *this, SoundCueSet *out) {
-    if (this->moodTimer == 0) {
-        if ((rand() & 3) == 0) {
-            goto trigger;
-        }
+    if ((this->moodTimer == 0 && (rand() & 3) == 0) || this->moodTimer == 3600) {
+        this->methods->deactivate(this);
+        this->state = ENTITY_STATE_DONE;
     }
-    if (this->moodTimer != 3600) {
-        goto merge;
-    }
-trigger:
-    this->methods->deactivate(this);
-    this->state = ENTITY_STATE_DONE;
-merge:
-    this->methods->updateScale(this, 1, D_80089E44);
+    this->methods->updateScale(this, 1, SCALE_TWO_FIFTHS);
     out->attenuation = this->methods->getProximityRatio(this);
     if (out->tick % (this->todFrameCount / 2) == 0) {
         out->slots[0].program = 10;

@@ -12,7 +12,7 @@ else if `this->unk84 == 0`, runs the same `slot134` do-while loop as
 `Entity__MoodCue91` (this unit). On `this->unk7C != 0`: if `this->unk84 == 0`,
 sets `out->unk10=0; out->unk1C=0x16;`; else if `this->unk84 ==
 this->unk80 - 1`, sets `out->unk10=0; out->unk30=0x12;` and calls
-`slot30(this, 0xA)`. Unconditionally, `slot48(this, 1, D_80089DE4)`.
+`slot30(this, 0xA)`. Unconditionally, `slot48(this, 1, SCALE_X_FOUR_FIFTHS_Y_SIX_FIFTHS)`.
 
 ## Derivation
 
@@ -42,7 +42,7 @@ Tier B, same as every sibling `Entity__MoodCueNN` (Entity_b..Entity_g): the
 row mapping is a fact of the binary, which dream object or state a row is
 for is not established. Row kept decimal so names sort in table order.
 
-What it does, in the unit's current field names: With `unk7C` (TOD index, proposed) 0: if `targetReached`, faces the target, `slot128(1)` (SetTod) and `target->slot130(1)`, else fast-forwards 24 TOD frames as `Entity__MoodCue91` does; with `unk7C` nonzero: voice-0 tone 22 at frame 0, voice-1 tone 18 and `notifyParents(0xA)` at the last frame (`moodDuration - 1`); `updateScale(1, D_80089DE4)` every tick.
+What it does, in the unit's current field names: With `unk7C` (TOD index, proposed) 0: if `targetReached`, faces the target, `slot128(1)` (SetTod) and `target->slot130(1)`, else fast-forwards 24 TOD frames as `Entity__MoodCue91` does; with `unk7C` nonzero: voice-0 tone 22 at frame 0, voice-1 tone 18 and `notifyParents(0xA)` at the last frame (`moodDuration - 1`); `updateScale(1, SCALE_X_FOUR_FIFTHS_Y_SIX_FIFTHS)` every tick.
 
 ## Track 4 (2026-09-26, round 88, echo)
 
