@@ -32,7 +32,7 @@
 extern u8 ROTATION_XPLUS_EIGHTH[];
 extern u8 D_80089E74[];
 extern LongVec3 D_80089DB4[];
-extern LongVec3 D_80089D9C[];
+extern LongVec3 TRANSLATE_X_MINUS64[];
 extern LongVec3 TRANSLATE_Y_MINUS4096[];
 extern LongVec3 TRANSLATE_Y_PLUS64[];
 
@@ -87,7 +87,7 @@ void Entity__MoodCue23(Entity *this) {
             this->methods->addTranslation(this, TRANSLATE_Y_MINUS64);
             this->methods->moveLocalZ(this, 0xA, 0);
         } else {
-            this->methods->addTranslation(this, D_80089D9C);
+            this->methods->addTranslation(this, TRANSLATE_X_MINUS64);
         }
     } else if (this->moodTimer == 0) {
         this->methods->addTranslation(this, TRANSLATE_Y_MINUS4096);
