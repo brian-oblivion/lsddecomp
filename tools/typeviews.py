@@ -125,6 +125,14 @@ class Stabs:
             if kind == 128:           # N_LSYM: types and typedefs
                 m = re.match(r"([^:]*):([Tt])(.*)", s)
                 if not m:
+                    # a local variable (`name:NNN...`, no letter): parse its
+                    # type anyway, since cc1 can first define a type number
+                    # there (round 88: TimBlockSrc__AdvanceLoadState's
+                    # `p:606=*607=*163` defined TimArraySrc * for every
+                    # TimArraySrc method after it, which then read `<t607>`)
+                    m = re.match(r"[^:]*:([0-9(].*)", s)
+                    if m:
+                        self.type_at(m.group(1), 0)
                     continue
                 name, tt, rest = m.groups()
                 t, _ = self.type_at(rest, 0, defname=name)

@@ -17,7 +17,8 @@
  *     (New_TmdModel); named from external call sites (class_3bb8c.c,
  *     code_55dd4.h) that already declare it `LinkResource *`.
  *   - TimArraySrc  (D_8006F1C4): an array of TimImage objects
- *     (code_2bb9c.c's New_TimImage).
+ *     (code_2bb9c.c's New_TimImage), one per TimBlockSrc block
+ *     (include/TimArraySrc.h, track 4, round 88).
  *   - Tod / TodSet (D_8006F240 / D_8006F590, TodSet a Tod subclass): one
  *     TOD's packet stream (ScanTodPackets/DecodeTodPacketWord) and an array
  *     of them; named from include/code_55dd4.h's own "TOD set" (Unk30Obj).
@@ -53,6 +54,7 @@
 #include "TodSet.h"
 #include "TriggerWorld.h"
 #include "TimImage.h"
+#include "TimArraySrc.h"
 #include "BgLayer.h"
 #include "TileMap.h"
 #include "TileAtlas.h"
@@ -65,9 +67,10 @@ typedef struct DataSrc33808 DataSrc33808;
 /* Unit-local view of this unit's Class6D430 data-source subclasses: the
  * interface plus the extra slots their methods call. Unprototyped where a
  * caller passes no argument. Not ModelData's (D_8006F384) nor Tod's
- * (D_8006F240) nor TodSet's (D_8006F590) nor TriggerWorld's (D_8006F40C):
- * those classes are include/ModelData.h (track 4, round 84), include/Tod.h
- * (round 86), include/TodSet.h and include/TriggerWorld.h (round 88). */
+ * (D_8006F240) nor TodSet's (D_8006F590) nor TriggerWorld's (D_8006F40C)
+ * nor TimArraySrc's (D_8006F1C4): those classes are include/ModelData.h
+ * (track 4, round 84), include/Tod.h (round 86), include/TodSet.h,
+ * include/TriggerWorld.h and include/TimArraySrc.h (round 88). */
 typedef struct DataSrc33808Methods {
     CLASS6D430_SLOTS(DataSrc33808, (DataSrc33808 *self));
     /* +0x07C */ s32 (*slot7C)();
@@ -94,7 +97,6 @@ extern void ReleaseBasicClassArray(BasicClass **array, s32 count);
 extern void BMemPMgrFree(void *arg);
 extern void *BMemPMgrAlloc(s32 size);
 void *GetLinkResourceMethods(void);
-void *GetTimArraySrcMethods(void);
 
 /* The allocators below reach a class's constructor through its table
  * getter; the constructor's parameters vary, so the slot is unprototyped. */
@@ -186,10 +188,9 @@ typedef struct Hdr43200 {
 extern void LockActiveDataSource(void);
 extern void UnlockActiveDataSource(void);
 u32 MaxOfBufferWords(Class6D430 *self);
-void *New_TimArraySrc(s32 arg0);
 
 void TimBlockSrc__AdvanceLoadState(TimBlockSrc *self) {
-    DataSrc33808 **p;
+    TimArraySrc **p;
     s32 max;
     s32 n;
 
@@ -217,14 +218,14 @@ void TimBlockSrc__AdvanceLoadState(TimBlockSrc *self) {
         case 10:
             if (self->flags & 0x80) {
                 n = self->blockCount;
-                p = (DataSrc33808 **)self->blocks + n;
-                *p = New_TimArraySrc(0);
+                p = self->blocks + n;
+                *p = New_TimArraySrc(NULL);
                 (*p)->buffer = self->sector;
                 (*p)->bufferSize = 0;
-                (*p)->unk34 = (s32)self->entries;
+                (*p)->clutBase = (s32)self->entries;
                 n++;
                 (*p)->methods->setFlag(*p);
-                ((void (*)())(*p)->methods->slot78)(*p);
+                ((TimArraySrcUploadFn)(*p)->methods->slot78)(*p);
                 self->blockCount = n;
                 if (n < *(u32 *)self->buffer) {
                     self->methods->seek(self, ((u32 *)self->buffer)[n + 1], 0);
@@ -506,51 +507,43 @@ void *GetLinkResourceMethods(void) {
     return D_8006F13C;
 }
 /* Allocate and construct a D_8006F1C4 object. */
-void *New_TimArraySrc(s32 arg0) {
+TimArraySrc *New_TimArraySrc(char *name) {
     void *obj = BMemPMgrAlloc(0x3C);
 
     if (obj != NULL) {
-        ((Ctor33808 *)GetTimArraySrcMethods())->ctor(obj, arg0);
+        GetTimArraySrcMethods()->ctor(obj, name);
         return obj;
     }
     return NULL;
 }
 /* D_8006F1C4 +0x008: constructor -- the active driver's, then this table,
- * clear +0x2C/+0x30/+0x38, and request `name` when there is one. */
-void TimArraySrc__TimArraySrc(DataSrc33808 *self, char *name) {
+ * clear count/images/ready, and request `name` when there is one. */
+void TimArraySrc__TimArraySrc(TimArraySrc *self, char *name) {
     GetActiveDataSourceMethods()->ctor((Class6D430 *)self);
     self->methods = GetTimArraySrcMethods();
-    self->unk2C = 0;
-    self->unk30 = NULL;
-    self->unk38 = 0;
+    self->count = 0;
+    self->images = NULL;
+    self->ready = 0;
     if (name != NULL) {
         self->methods->requestLoadFile(self, name);
     }
 }
 /* D_8006F1C4 +0x00C: finalize -- same shape as D_8006F0B8's. */
-void TimArraySrc__Finalize(DataSrc33808 *self) {
-    ReleaseBasicClassArray((BasicClass **)self->unk30, self->unk2C);
-    BMemPMgrFree(self->unk30);
+void TimArraySrc__Finalize(TimArraySrc *self) {
+    ReleaseBasicClassArray((BasicClass **)self->images, self->count);
+    BMemPMgrFree(self->images);
     GetActiveDataSourceMethods()->finalize((Class6D430 *)self);
 }
 /* D_8006F1C4 +0x064: when the buffer is there (or flag 0x200 is set),
  * build one TimImage (New_TimImage(NULL)) per image of the buffer -- a
- * count, then that many offsets -- into an array at +0x30 (+0x2C entries),
- * each adopting its image in place (size 0), and set each one's +0x4C from
- * the CLUT row its GsGetTimInfo reports (from y 0x1E0, >> gTimClutRowShift, 16
- * bytes a step past +0x34); then mark +0x38 and the active driver's
- * setFlag. */
-typedef struct Obj43CB8 {
-    CLASS6D430_FIELDS(DataSrc33808Methods);
-    /* +0x02C */ s32 count;
-    /* +0x030 */ TimImage **images;
-    /* +0x034 */ s32 base;
-    /* +0x038 */ s32 ready;
-} Obj43CB8;
-
+ * count, then that many offsets -- into `images` (`count` entries),
+ * each adopting its image in place (size 0), and set each one's clutBase
+ * from the CLUT row its GsGetTimInfo reports (from y 0x1E0, >>
+ * gTimClutRowShift, 16 bytes a step past `clutBase`); then mark `ready`
+ * and run the active driver's setFlag. */
 extern s16 gTimClutRowShift;
 
-void TimArraySrc__BuildImages(Obj43CB8 *self) {
+void TimArraySrc__BuildImages(TimArraySrc *self) {
     GsIMAGE info;
     TimImage **objs;
     s32 i;
@@ -567,7 +560,7 @@ void TimArraySrc__BuildImages(Obj43CB8 *self) {
                 (*objs)->buffer = (u8 *)self->buffer + *offs;
                 (*objs)->bufferSize = 0;
                 (*objs)->methods->getTimInfo(*objs, &info);
-                (*objs)->clutBase = ((info.cy - 0x1E0) >> gTimClutRowShift) * 16 + self->base;
+                (*objs)->clutBase = ((info.cy - 0x1E0) >> gTimClutRowShift) * 16 + self->clutBase;
                 offs++;
                 objs++;
             }
@@ -576,21 +569,18 @@ void TimArraySrc__BuildImages(Obj43CB8 *self) {
         }
     }
 }
-/* D_8006F1C4 +0x078: slot +0x078 of every object in the array at +0x30
- * (+0x2C entries). */
-void TimArraySrc__NotifyImages(DataSrc33808 *self) {
-    TimImage **objs = (TimImage **)self->unk30;
+/* D_8006F1C4 +0x078: every image's +0x078 (TimImage__Upload). */
+void TimArraySrc__UploadImages(TimArraySrc *self) {
+    TimImage **objs = self->images;
     s32 i;
 
-    for (i = 0; i < self->unk2C; i++) {
+    for (i = 0; i < self->count; i++) {
         ((TimImageUploadFn)(*objs)->methods->slot78)(*objs);
         objs++;
     }
 }
-extern s32 D_8006F1C4[];
-
-void *GetTimArraySrcMethods(void) {
-    return D_8006F1C4;
+TimArraySrcMethods *GetTimArraySrcMethods(void) {
+    return &D_8006F1C4;
 }
 /* Allocate and construct a D_8006F240 object. */
 Tod *New_Tod(Src6F240 *src) {
