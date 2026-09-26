@@ -176,6 +176,17 @@ typedef struct TmdGroupHeader {
 #define TMD_FLAG_LGT 0x01    /* flag: light source calculation off */
 #define TMD_TYPE_MASK 0xFD07 /* mode less its ABE bit 0x02; flag's LGT, FCE, GRD */
 
+/* The mode byte's ABE (semi-transparency) bit, read in the packet's first
+ * word: mode is its top byte, ABE that byte's bit 1. */
+#define TMD_WORD_ABE_SHIFT 25
+
+/* A textured face's CLUT is moved down dp >> shift palette rows (dp, the
+ * GTE depth-cue factor, is below ONE, 4096): 9 gives 0..7 rows of
+ * depth-cued palettes for an object whose light mode is not plain (GsFOG,
+ * GsMATE, or GsLIGHT_MODE through GsLLMOD), 16 gives none. */
+#define DP_CLUT_SHIFT_CUED 9
+#define DP_CLUT_SHIFT_NONE 16
+
 /* GTE FLAG bit 18: SZ3 or OTZ saturated. The one FLAG state
  * TransformAndCullPoly keeps a polygon for, routed to subdivision. */
 #define GTE_FLAG_SZ3_OTZ_SAT 0x40000
@@ -308,9 +319,9 @@ void SortTmdObject(GsDOBJ2 *obj, GsOT *ot, s32 otShift, void *scratch) {
     ctx->faceColor = gTexturedFaceColor;
 
     if ((gSortUseGlobalLightMode != 0 && GsLIGHT_MODE != 0) || gSortLightMode != 0) {
-        dpShift = 9;
+        dpShift = DP_CLUT_SHIFT_CUED;
     } else {
-        dpShift = 16;
+        dpShift = DP_CLUT_SHIFT_NONE;
     }
     ctx->dpShift = dpShift;
 
@@ -327,7 +338,7 @@ void SortTmdObject(GsDOBJ2 *obj, GsOT *ot, s32 otShift, void *scratch) {
             prim = GsOUT_PACKET_P;
             ctx->packetType = ((TmdGroupHeader *)packet)->type & TMD_TYPE_MASK;
             count = ((TmdGroupHeader *)packet)->count;
-            ctx->semiTrans = (*(u32 *)packet >> 25) & 0x1;
+            ctx->semiTrans = (*(u32 *)packet >> TMD_WORD_ABE_SHIFT) & 0x1;
             packetsLeft -= count;
 
             /* Thirteen Psy-Q primitive flavours, one case each, in ascending
