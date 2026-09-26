@@ -1,4 +1,6 @@
-# ObjM__HandleEvent7
+# ObjM__OnClass866E8Notify
+
+> Renamed from `ObjM__HandleEvent7` on 2026-09-26 (tools/rename.py). Address 0x800540e8.
 
 > Renamed from `func_800540E8` on 2026-09-23 (tools/rename.py). Address 0x800540e8.
 
@@ -12,7 +14,7 @@
 ## The C
 
 ```c
-void ObjM__HandleEvent7(ObjM *self, s32 arg1, s32 arg2) {
+void ObjM__OnClass866E8Notify(ObjM *self, s32 arg1, s32 arg2) {
     if (arg2 == 7) {
         self->methods->slotB8(self);
     }
@@ -33,4 +35,4 @@ round 15 (2026-09-04), runner echo, fresh carve `class_3bb8c_m`.
 
 ## Naming
 
-**ObjM__HandleEvent7** -- tier B. `arg1` is dead; if `arg2 == 7`, dispatches `self->methods->checkAuxTrigger(self)` (CONFIRMED as this unit's own `ObjM__CheckAuxTrigger` via `tools/classtable.py 0x80087034`, +0x0B8), otherwise a no-op. Named for the mechanical event-code gate.
+**ObjM__OnClass866E8Notify** -- tier B. `arg1` is dead; if `arg2 == 7`, dispatches `self->methods->checkAuxTrigger(self)` (CONFIRMED as this unit's own `ObjM__CheckAuxTrigger` via `tools/classtable.py 0x80087034`, +0x0B8), otherwise a no-op. Named for the mechanical event-code gate.

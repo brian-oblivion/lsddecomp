@@ -13,7 +13,7 @@ through `self->unk18` (a `DreamSysObj_3bb8c_l*`), `self->unk54` (another
 `self->unk14` (`Obj14_3bb8c_l*`), sets up several state fields, and ends by
 notifying `self->unk3C` and marking `self->unk20 = 5` (a phase tag this
 unit's other functions also write with 4/5/6 -- see
-`docs/match-reports/ObjM__HandleStateCode.md` and the header's own comment on it).
+`docs/match-reports/ObjM__OnDreamSysNotify.md` and the header's own comment on it).
 
 ```c
 extern s32 PickVariant(void *arg0, s32 arg1);
@@ -144,7 +144,7 @@ different residue, closed it:
    order fix, this one resolved by plain statement reordering (no barrier
    needed).
 
-## Struct edits (all additive; see `ObjM__HandleStateCode.md` for the sibling
+## Struct edits (all additive; see `ObjM__OnDreamSysNotify.md` for the sibling
 edits made in the same session)
 
 - `Obj87034Methods_3bb8c_l`: added `slot5C` (`void (*)(Obj87034_3bb8c_l

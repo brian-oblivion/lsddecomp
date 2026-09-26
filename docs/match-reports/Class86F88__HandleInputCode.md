@@ -43,18 +43,18 @@ void Class86F88__HandleInputCode(Obj87034_3bb8c_k *self, void *arg1, s32 code) {
 `arg1` (the incoming second register argument) is never referenced in the
 body -- matches this project's established event-dispatcher signature
 shape (`self`, an unused/opaque second argument, an `s32` code), the same
-one `class_3bb8c_l`'s `ObjM__HandleStateCode`/`ObjM__DispatchPadEvent` use.
+one `class_3bb8c_l`'s `ObjM__OnDreamSysNotify`/`ObjM__DispatchPadEvent` use.
 
 ## HEAD BROADCAST 1 (source-declaration-order case layout) DOES apply here
 
-Unlike the sibling `ObjM__HandleStateCode` (`class_3bb8c_l`, same round), whose
+Unlike the sibling `ObjM__OnDreamSysNotify` (`class_3bb8c_l`, same round), whose
 jump-table entry order already coincided with ascending case-value order,
 THIS function's case bodies are laid out in the file in the order
 **25, 23, 5, 4, 18, 19** -- neither ascending nor descending by value, and
 clearly the SOURCE's own declaration order rather than anything the
 compiler would choose on its own. The `switch` above lists the cases in
 that exact order and matched on the first attempt with no further
-reshaping. Between this function and `ObjM__HandleStateCode`, the two ends of the
+reshaping. Between this function and `ObjM__OnDreamSysNotify`, the two ends of the
 broadcast's claim are both now directly confirmed in this project: some
 dense switches need the reorder, some don't, and the only way to tell is
 to read the jump table's own body layout off the `.s` before writing the
@@ -86,7 +86,7 @@ for this unit, and neither was touched.
 ## Proposed learning
 
 Two back-to-back same-round data points on HEAD BROADCAST 1
-(`ObjM__HandleStateCode`: table order == ascending value order, lever not needed;
+(`ObjM__OnDreamSysNotify`: table order == ascending value order, lever not needed;
 `Class86F88__HandleInputCode`: table order == source declaration order, lever
 essential) make the discriminator concrete: **check the jump table's own
 label order against sorted case-value order before writing the switch,

@@ -7,7 +7,7 @@
 ## What this function does
 
 Sets `self->unk20` (the same mode/state field `ObjM__EnterState7` writes) to 8,
-calls the shared helper `ObjM__ForwardToSubChild(self, 0, 0, 6, 1)`, then tells
+calls the shared helper `ObjM__StartFadeUp(self, 0, 0, 6, 1)`, then tells
 `self->unk3C` (via vtable slot `0xF4`) to run with argument 1.
 
 ## The C
@@ -15,7 +15,7 @@ calls the shared helper `ObjM__ForwardToSubChild(self, 0, 0, 6, 1)`, then tells
 ```c
 void ObjM__EnterState8(ObjM *self) {
     self->unk20 = 8;
-    ObjM__ForwardToSubChild(self, 0, 0, 6, 1);
+    ObjM__StartFadeUp(self, 0, 0, 6, 1);
     self->unk3C->methods->slotF4(self->unk3C, 1);
 }
 ```

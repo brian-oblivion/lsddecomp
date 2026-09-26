@@ -789,12 +789,12 @@ typedef struct FieldM50Methods FieldM50Methods;
 typedef struct FieldM7C FieldM7C;
 typedef struct FieldM7CMethods FieldM7CMethods;
 
-/* self->unk18's target (ObjM__ForwardToSubChild/ObjM__HandleEvent5Or6). */
+/* self->unk18's target (ObjM__StartFadeUp/ObjM__OnFadeNotify). */
 struct FieldM18Methods {
     u8 pad000[0x064];
-    void (*slot64)(FieldM18 *self, s32 arg1);   /* +0x064, ObjM__HandleEvent5Or6 */
+    void (*slot64)(FieldM18 *self, s32 arg1);   /* +0x064, ObjM__OnFadeNotify */
     u8 pad068[0x0AC - 0x068];
-    ChildM_AC *(*slotAC)(FieldM18 *self);       /* +0x0AC, ObjM__ForwardToSubChild */
+    ChildM_AC *(*slotAC)(FieldM18 *self);       /* +0x0AC, ObjM__StartFadeUp */
     u8 pad0B0[0x0B4 - 0x0B0];
     void (*slotB4)(FieldM18 *self, s32 arg1);   /* +0x0B4, ObjM__TeardownPauseOverlay (not this round's target) */
 };
@@ -802,7 +802,7 @@ struct FieldM18 {
     FieldM18Methods *methods;   /* +0x000 */
 };
 
-/* Returned by FieldM18Methods::slotAC (ObjM__ForwardToSubChild). */
+/* Returned by FieldM18Methods::slotAC (ObjM__StartFadeUp). */
 struct ChildM_ACMethods {
     u8 pad000[0x0D0];
     void (*slotD0)(ChildM_AC *self, s32 arg1);                      /* +0x0D0 */
@@ -830,12 +830,12 @@ struct ChildM114 {
     s32 unk14;                    /* +0x014, ObjM__CheckAuxTrigger: set from TryDreamAuxTrigger's return */
 };
 
-/* ObjM__HandleEvent5Or6's own arg1 parameter -- dispatched via its own vtable
+/* ObjM__OnFadeNotify's own arg1 parameter -- dispatched via its own vtable
  * slot 0xE4. Independent of FieldM14 above (unrelated numeric slot
  * range, nothing ties the two together). */
 struct ParamMMethods {
     u8 pad000[0x0E4];
-    s32 (*slotE4)(ParamM *self);  /* +0x0E4, ObjM__HandleEvent5Or6 */
+    s32 (*slotE4)(ParamM *self);  /* +0x0E4, ObjM__OnFadeNotify */
 };
 struct ParamM {
     ParamMMethods *methods;      /* +0x000 */
@@ -908,16 +908,16 @@ extern s32 D_8008AB40;      /* one-word opaque block, address-only here */
  * Only the slots/fields these functions actually reach are typed. */
 struct ObjMMethods {
     u8 pad000[0x010];
-    void (*slot10)(ObjM *self, ChildM_AC *arg1);  /* +0x010, ObjM__ForwardToSubChild */
-    void (*slot14)(ObjM *self, ParamM *arg1);     /* +0x014, ObjM__HandleEvent5Or6 */
+    void (*slot10)(ObjM *self, ChildM_AC *arg1);  /* +0x010, ObjM__StartFadeUp */
+    void (*slot14)(ObjM *self, ParamM *arg1);     /* +0x014, ObjM__OnFadeNotify */
     u8 pad018[0x030 - 0x018];
     /* +0x030 == BasicClass__NotifyParents's own slot (confirmed with
      * `tools/classtable.py 0x80087034`, same table as the rest of ObjMMethods
      * -- self->methods IS gObjMMethods), so this is a plain notify-parents
      * dispatch with a class-specific event code, not an unknown slot. */
-    void (*notifyParents)(ObjM *self, s32 code);   /* +0x030, ObjM__NotifyParentsCodeB/ObjM__HandleEvent5Or6/ObjM__CloseAndNotifyD/ObjM__CloseAndNotifyC */
+    void (*notifyParents)(ObjM *self, s32 code);   /* +0x030, ObjM__NotifyParentsCodeB/ObjM__OnFadeNotify/ObjM__CloseAndNotifyD/ObjM__CloseAndNotifyC */
     u8 pad034[0x0B8 - 0x034];
-    void (*checkAuxTrigger)(ObjM *self);            /* +0x0B8, ObjM__HandleEvent7: this class's OWN ObjM__CheckAuxTrigger, confirmed via classtable.py against gObjMMethods */
+    void (*checkAuxTrigger)(ObjM *self);            /* +0x0B8, ObjM__OnClass866E8Notify: this class's OWN ObjM__CheckAuxTrigger, confirmed via classtable.py against gObjMMethods */
     u8 pad0BC[0x0D4 - 0x0BC];
     void (*teardownPauseOverlay)(ObjM *self);       /* +0x0D4, ObjM__CloseAndNotifyD/ObjM__CloseAndNotifyC: this class's OWN ObjM__TeardownPauseOverlay, confirmed via classtable.py */
 };
@@ -926,23 +926,23 @@ struct ObjM {
     ObjMMethods *methods;   /* +0x000 */
     u8 pad004[0x010 - 0x004];
     /* RETYPED round 15b (ObjM__AdvancePauseSetup/ObjM__TeardownPauseOverlay): was `s32 unk10`,
-     * established from ObjM__ForwardToSubChild's OWN call site as a plain forwarded
+     * established from ObjM__StartFadeUp's OWN call site as a plain forwarded
      * register value (never dereferenced there). ObjM__TeardownPauseOverlay/
      * ObjM__AdvancePauseSetup dereference this same field's vtable directly, so it
-     * IS a pointer -- ObjM__ForwardToSubChild forwards it opaquely either way, and
+     * IS a pointer -- ObjM__StartFadeUp forwards it opaquely either way, and
      * a pointer-typed argument passed as a raw register value compiles to
      * the identical `lw`/`move` regardless of C-level pointer-vs-s32
      * typing (ABI-neutral retype, zero byte cost -- verified: full
      * rebuild stays whole-image green after this change). */
-    FieldM50 *unk10;         /* +0x010, ObjM__ForwardToSubChild (opaque forward)/ObjM__TeardownPauseOverlay/ObjM__AdvancePauseSetup */
+    FieldM50 *unk10;         /* +0x010, ObjM__StartFadeUp (opaque forward)/ObjM__TeardownPauseOverlay/ObjM__AdvancePauseSetup */
     FieldM14 *unk14;         /* +0x014, ObjM__CheckAuxTrigger */
-    FieldM18 *unk18;         /* +0x018, ObjM__ForwardToSubChild/ObjM__HandleEvent5Or6 */
+    FieldM18 *unk18;         /* +0x018, ObjM__StartFadeUp/ObjM__OnFadeNotify */
     u8 pad01C[0x020 - 0x01C];
-    s32 mode;                 /* +0x020, ObjM__EnterState7/ObjM__EnterState8/ObjM__EnterStateA/ObjM__HandleEvent5Or6: a mode/state code (already documented as such before this round; renamed from unk20 since every accessor is exclusively this unit's -- called `mode` rather than `state` to avoid colliding, in a reader's head, with ObjM__AdvancePauseSetup's own local `state` variable, which is `self->unk80`'s step counter, an unrelated field) */
+    s32 mode;                 /* +0x020, ObjM__EnterState7/ObjM__EnterState8/ObjM__EnterStateA/ObjM__OnFadeNotify: a mode/state code (already documented as such before this round; renamed from unk20 since every accessor is exclusively this unit's -- called `mode` rather than `state` to avoid colliding, in a reader's head, with ObjM__AdvancePauseSetup's own local `state` variable, which is `self->unk80`'s step counter, an unrelated field) */
     u8 pad024[0x034 - 0x024];
     FieldM34 *unk34;          /* +0x034, ObjM__TeardownPauseOverlay/ObjM__AdvancePauseSetup */
     u8 pad038[0x03C - 0x038];
-    struct DreamSys *dreamSys; /* +0x03C, ObjM__EnterState7/ObjM__EnterState8/ObjM__EnterStateA/ObjM__HandleEvent5Or6/ObjM__CheckAuxTrigger: the six slots called on it (+0x0F0/+0x0F4/+0x0FC/+0x13C/+0x17C/+0x1A0) are DreamSys occupants (include/DreamSys.h) */
+    struct DreamSys *dreamSys; /* +0x03C, ObjM__EnterState7/ObjM__EnterState8/ObjM__EnterStateA/ObjM__OnFadeNotify/ObjM__CheckAuxTrigger: the six slots called on it (+0x0F0/+0x0F4/+0x0FC/+0x13C/+0x17C/+0x1A0) are DreamSys occupants (include/DreamSys.h) */
     u8 pad040[0x054 - 0x040];
     FieldM50 *unk54;          /* +0x054, ObjM__TeardownPauseOverlay/ObjM__AdvancePauseSetup -- same type as unk10 above */
     u8 pad058[0x074 - 0x058];
@@ -959,7 +959,7 @@ struct ObjM {
  * Both units independently reached method table gObjMMethods, which is
  * exactly the collision runner delta anticipated when it suffixed its
  * type names. The proof is a cross-unit call, not a guess:
- * ObjM__ForwardToSubChild is DEFINED in class_3bb8c_m.c taking `ObjM *self` and
+ * ObjM__StartFadeUp is DEFINED in class_3bb8c_m.c taking `ObjM *self` and
  * CALLED from class_3bb8c_l.c (ObjM__EnterState6) passing its own
  * `Obj87034_3bb8c_l *self` as the same first argument.
  *
@@ -1108,13 +1108,13 @@ typedef struct Obj87034Methods_3bb8c_l {
     void (*slot88)(Obj87034_3bb8c_l *self);                        /* +0x088, ObjM__PollTimBlockLoad */
     void (*slot8C)(Obj87034_3bb8c_l *self);                        /* +0x08C, ObjM__Update */
     u8 pad90[0x094 - 0x090];
-    void (*slot94)(Obj87034_3bb8c_l *self);                        /* +0x094, ObjM__HandleStateCode (event/code 0xA, dense switch) */
-    void (*slot98)(Obj87034_3bb8c_l *self);                        /* +0x098, ObjM__HandleStateCode (event/code 0xC) */
-    void (*slot9C)(Obj87034_3bb8c_l *self);                        /* +0x09C, ObjM__EnterState5; ALSO ObjM__HandleStateCode (event/code 0xD) */
-    void (*slotA0)(Obj87034_3bb8c_l *self);                        /* +0x0A0, ObjM__HandleStateCode (event/code 0xE) */
-    void (*slotA4)(Obj87034_3bb8c_l *self);                        /* +0x0A4, ObjM__HandleStateCode (event/code 0xF) */
-    void (*slotA8)(Obj87034_3bb8c_l *self);                        /* +0x0A8, ObjM__HandleStateCode (event/code 0x10) */
-    void (*slotAC)(Obj87034_3bb8c_l *self);                        /* +0x0AC, ObjM__HandleStateCode (event/code 0x11) */
+    void (*slot94)(Obj87034_3bb8c_l *self);                        /* +0x094, ObjM__OnDreamSysNotify (event/code 0xA, dense switch) */
+    void (*slot98)(Obj87034_3bb8c_l *self);                        /* +0x098, ObjM__OnDreamSysNotify (event/code 0xC) */
+    void (*slot9C)(Obj87034_3bb8c_l *self);                        /* +0x09C, ObjM__EnterState5; ALSO ObjM__OnDreamSysNotify (event/code 0xD) */
+    void (*slotA0)(Obj87034_3bb8c_l *self);                        /* +0x0A0, ObjM__OnDreamSysNotify (event/code 0xE) */
+    void (*slotA4)(Obj87034_3bb8c_l *self);                        /* +0x0A4, ObjM__OnDreamSysNotify (event/code 0xF) */
+    void (*slotA8)(Obj87034_3bb8c_l *self);                        /* +0x0A8, ObjM__OnDreamSysNotify (event/code 0x10) */
+    void (*slotAC)(Obj87034_3bb8c_l *self);                        /* +0x0AC, ObjM__OnDreamSysNotify (event/code 0x11) */
     u8 padB0[0x0C0 - 0x0B0];
     void (*slotC0)(Obj87034_3bb8c_l *self);                        /* +0x0C0, ObjM__DispatchPadEvent (event 0xC) */
     void (*slotC4)(Obj87034_3bb8c_l *self);                        /* +0x0C4, ObjM__DispatchPadEvent (event 0x2C)/ObjM__TogglePause */
@@ -1132,7 +1132,7 @@ struct Obj87034_3bb8c_l {
     Obj14_3bb8c_l *unk14;              /* +0x014, ObjM__PollTimBlockLoad/ObjM__TickStyle/ObjM__ExitSceneStyle */
     StyleWorldObj_3bb8c_l *world;         /* +0x018, ObjM__ExitSceneStyle; cached into `cachedWorld` by ObjM__InitStyleAndWorld -- an object distinct from `target`, dispatched through style/world-setup slots (slot74/slotAC/slot60/slot64/slot6C/slot68/slotB0/slotB4) */
     s32 unk1C;                           /* +0x01C, ObjM__Update: incremented once per call */
-    s32 phase;                            /* +0x020, ObjM__EnterState6: written 6 (a state/phase tag; also written 4 by ObjM__EnterState4 and 5 by ObjM__EnterState5; read by ObjM__HandleStateCode, which is 0-gated) */
+    s32 phase;                            /* +0x020, ObjM__EnterState6: written 6 (a state/phase tag; also written 4 by ObjM__EnterState4 and 5 by ObjM__EnterState5; read by ObjM__OnDreamSysNotify, which is 0-gated) */
     u8 pad24[0x034 - 0x024];
     s32 unk34;                            /* +0x034, round 45's ObjM__SetupSceneStyle: forwarded opaquely to SetDreamAuxWorld's own arg3 */
     void *unk38;                          /* +0x038, ObjM__OnRegistrantEvent: forwarded opaquely to GetGridRecordAt/GetGridRecordXY */

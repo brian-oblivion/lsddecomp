@@ -1,4 +1,6 @@
-# ObjM__HandleStateCode -- MATCHED (82/82 words, first attempt)
+# ObjM__OnDreamSysNotify -- MATCHED (82/82 words, first attempt)
+
+> Renamed from `ObjM__HandleStateCode` on 2026-09-26 (tools/rename.py). Address 0x80053984.
 
 > Renamed from `func_80053984` on 2026-09-24 (tools/rename.py). Address 0x80053984.
 
@@ -12,7 +14,7 @@ An event/code dispatcher for `Obj87034_3bb8c_l` (method table `gObjMMethods`,
 (`self->methods->slotXX`):
 
 ```c
-void ObjM__HandleStateCode(Obj87034_3bb8c_l *self, void *arg1, s32 code) {
+void ObjM__OnDreamSysNotify(Obj87034_3bb8c_l *self, void *arg1, s32 code) {
     if (self->unk20 == 0) {
         switch (code - 0xA) {
         case 0:
@@ -105,6 +107,6 @@ Round 78 (charlie), FINISHING-PLAN track 3.
 
 | was | now | tier | evidence |
 | --- | --- | --- | --- |
-| `func_80053984` | `ObjM__HandleStateCode` | B | see below |
+| `func_80053984` | `ObjM__OnDreamSysNotify` | B | see below |
 
 **Evidence.** vtable slot +0x090. The class's own state-transition dispatcher: gated on `self->phase == 0`, switches on `code - 0xA` (`jtbl_8001174C`, codes 0xA..0x11) and routes each case onto the SAME class's own `slot94`..`slotAC` -- i.e. `ObjM__EnterState4`, `ObjM__EnterState5`, `ObjM__EnterState6` (this unit) and `ObjM__EnterState7`, `ObjM__EnterState8`, `ObjM__EnterStateA`, `ObjM__NotifyParentsCodeB` (sibling unit class_3bb8c_m) one-to-one, confirmed directly off `tools/classtable.py 0x80087034`'s slot list. When `phase != 0` and `code >= 9` it instead clears `self->target->unk44`.

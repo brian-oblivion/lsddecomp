@@ -6,7 +6,7 @@
 
 ## What this function does
 
-Sets `self->unk20 = 0xA`, calls `ObjM__ForwardToSubChild(self, 0, 0, 6, 1)`, then
+Sets `self->unk20 = 0xA`, calls `ObjM__StartFadeUp(self, 0, 0, 6, 1)`, then
 makes two further calls on `self->unk3C`: slot `0x13C` with argument 2,
 then slot `0xF4` (the same slot `ObjM__EnterState8` uses) also with argument 2.
 
@@ -15,7 +15,7 @@ then slot `0xF4` (the same slot `ObjM__EnterState8` uses) also with argument 2.
 ```c
 void ObjM__EnterStateA(ObjM *self) {
     self->unk20 = 0xA;
-    ObjM__ForwardToSubChild(self, 0, 0, 6, 1);
+    ObjM__StartFadeUp(self, 0, 0, 6, 1);
     self->unk3C->methods->slot13C(self->unk3C, 2);
     self->unk3C->methods->slotF4(self->unk3C, 2);
 }

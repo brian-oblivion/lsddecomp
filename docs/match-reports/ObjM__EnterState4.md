@@ -110,10 +110,10 @@ void ObjM__EnterState4(Obj87034_3bb8c_l *self) {
             arg3 = 5;
             break;
         }
-        ObjM__ForwardToSubChild(self, local18, 0, arg3, 1);
+        ObjM__StartFadeUp(self, local18, 0, arg3, 1);
         return;
     }
-    ObjM__ForwardToSubChild(self, 0, 0, 5, 1);
+    ObjM__StartFadeUp(self, 0, 0, 5, 1);
 }
 ```
 
@@ -128,7 +128,7 @@ void ObjM__EnterState4(Obj87034_3bb8c_l *self) {
   question, not the struct layout.
 - All literal values (`unk20=4`, mask `&3`, case values 0/4/7, `arg3`
   0xA/5, the trailing `1`/`0`) are confirmed against the raw bytes.
-- `ObjM__ForwardToSubChild` (the sibling-unit helper from `class_3bb8c_m`, matched by
+- `ObjM__StartFadeUp` (the sibling-unit helper from `class_3bb8c_m`, matched by
   echo round 15) is called TWICE in source -- once at the end of the
   `ret==0`+switch path, once for the `ret!=0` path -- not once after a
   shared if/else. This was itself a finding: see "the two-call lever" below.
@@ -173,7 +173,7 @@ not force from any source variant tried.
 ## What was tried (12+ distinct builds)
 
 1. **If/else with a single shared call at the end** (`arg1 = local18` /
-   `arg1 = 0` merging into one `ObjM__ForwardToSubChild(...)` call) -- 66/71 total
+   `arg1 = 0` merging into one `ObjM__StartFadeUp(...)` call) -- 66/71 total
    function length (5 words SHORT). GCC CSE'd the `ret==0` and `ret!=0`
    paths' call setup (`a0=self`, `sp[0x10]=1`, `a2=0`) into one shared tail,
    which retail does NOT do -- retail duplicates that setup once per path,
@@ -302,4 +302,4 @@ Round 78 (charlie), FINISHING-PLAN track 3.
 | --- | --- | --- | --- |
 | `func_80053ACC` | `ObjM__EnterState4` | B | see below |
 
-**Evidence.** vtable slot +0x094. Sets `self->phase = 4`. The state-code numbering is confirmed, not guessed: sibling unit class_3bb8c_m already established `ObjM__EnterState7`/`ObjM__EnterState8`/`ObjM__EnterStateA` for the SAME field on the SAME class, and this unit's own `ObjM__HandleStateCode` dispatches codes 0xA..0x11 onto exactly the same run of vtable slots (+0x094..+0x0AC) that these three functions occupy, so 4/5/6 continue that one numbering.
+**Evidence.** vtable slot +0x094. Sets `self->phase = 4`. The state-code numbering is confirmed, not guessed: sibling unit class_3bb8c_m already established `ObjM__EnterState7`/`ObjM__EnterState8`/`ObjM__EnterStateA` for the SAME field on the SAME class, and this unit's own `ObjM__OnDreamSysNotify` dispatches codes 0xA..0x11 onto exactly the same run of vtable slots (+0x094..+0x0AC) that these three functions occupy, so 4/5/6 continue that one numbering.

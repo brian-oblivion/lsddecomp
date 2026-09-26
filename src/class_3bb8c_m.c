@@ -63,25 +63,25 @@
 
 /* Forward declaration: defined later in this same unit, but called by
  * ObjM__EnterState7/ObjM__EnterState8/ObjM__EnterStateA above its own definition. */
-extern void ObjM__ForwardToSubChild(ObjM *self, s32 arg1, s32 arg2, s32 arg3, s32 arg4);
+extern void ObjM__StartFadeUp(ObjM *self, s32 arg1, s32 arg2, s32 arg3, s32 arg4);
 
 void ObjM__EnterState7(ObjM *self) {
     s32 val;
     self->mode = 7;
     self->dreamSys->methods->getSetFlashbackSession(self->dreamSys, (DreamColors *)&val, -1);
-    ObjM__ForwardToSubChild(self, val, 0, 5, 1);
+    ObjM__StartFadeUp(self, val, 0, 5, 1);
     self->dreamSys->methods->blockMovement(self->dreamSys);
 }
 
 void ObjM__EnterState8(ObjM *self) {
     self->mode = 8;
-    ObjM__ForwardToSubChild(self, 0, 0, 6, 1);
+    ObjM__StartFadeUp(self, 0, 0, 6, 1);
     self->dreamSys->methods->setMoveOverride(self->dreamSys, 1);
 }
 
 void ObjM__EnterStateA(ObjM *self) {
     self->mode = 0xA;
-    ObjM__ForwardToSubChild(self, 0, 0, 6, 1);
+    ObjM__StartFadeUp(self, 0, 0, 6, 1);
     self->dreamSys->methods->selectCallback98(self->dreamSys, 2);
     self->dreamSys->methods->setMoveOverride(self->dreamSys, 2);
 }
@@ -90,7 +90,7 @@ void ObjM__NotifyParentsCodeB(ObjM *self) {
     self->methods->notifyParents(self, 0xB);
 }
 
-void ObjM__ForwardToSubChild(ObjM *self, s32 arg1, s32 arg2, s32 arg3, s32 arg4) {
+void ObjM__StartFadeUp(ObjM *self, s32 arg1, s32 arg2, s32 arg3, s32 arg4) {
     ChildM_AC *obj = self->unk18->methods->slotAC(self->unk18);
     if (arg3 != 0) {
         obj->methods->slotD0(obj, arg3);
@@ -101,7 +101,7 @@ void ObjM__ForwardToSubChild(ObjM *self, s32 arg1, s32 arg2, s32 arg3, s32 arg4)
     obj->methods->slotD8(obj, self->unk10, arg1, arg2);
 }
 
-void ObjM__HandleEvent5Or6(ObjM *self, ParamM *p1, s32 sel) {
+void ObjM__OnFadeNotify(ObjM *self, ParamM *p1, s32 sel) {
     s32 v;
     switch (sel) {
     case 5:
@@ -123,7 +123,7 @@ void ObjM__HandleEvent5Or6(ObjM *self, ParamM *p1, s32 sel) {
     }
 }
 
-void ObjM__HandleEvent7(ObjM *self, s32 arg1, s32 arg2) {
+void ObjM__OnClass866E8Notify(ObjM *self, s32 arg1, s32 arg2) {
     if (arg2 == 7) {
         self->methods->checkAuxTrigger(self);
     }

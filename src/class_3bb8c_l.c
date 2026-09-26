@@ -17,7 +17,7 @@
  * and teardown routines, an event dispatcher, and three of the class's
  * `EnterStateN` handlers (`ObjM__EnterState4/5/6`) -- continuing, on the
  * same `phase` field, the numbering class_3bb8c_m already established for
- * `ObjM__EnterState7/8/A`. `ObjM__HandleStateCode` is the state-transition
+ * `ObjM__EnterState7/8/A`. `ObjM__OnDreamSysNotify` is the state-transition
  * dispatcher that routes codes 0xA..0x11 onto those `EnterStateN` slots
  * one-to-one (owns `jtbl_8001174C`). Two slots (`ObjM__NoOpSlot40`,
  * `ObjM__NoOpSlot7C`) are splat-generated `jr $ra; nop` stubs, not work.
@@ -372,7 +372,7 @@ void ObjM__TickStyle(Obj87034_3bb8c_l *self) {
     TickStyle(self->unk14->methods->slot10C(self->unk14, 0, 0), 0, 0);
 }
 
-void ObjM__HandleStateCode(Obj87034_3bb8c_l *self, void *arg1, s32 code) {
+void ObjM__OnDreamSysNotify(Obj87034_3bb8c_l *self, void *arg1, s32 code) {
     if (self->phase == 0) {
         switch (code - 0xA) {
         case 0:
@@ -406,14 +406,14 @@ void ObjM__HandleStateCode(Obj87034_3bb8c_l *self, void *arg1, s32 code) {
 
 /* ObjM__EnterState4's (and ObjM__EnterState5's/ObjM__EnterState6's, further below) own
  * helper, and it lives in the sibling slice class_3bb8c_m, where round 15's
- * runner echo matched it byte-exact as `void ObjM__ForwardToSubChild(ObjM *self, s32,
+ * runner echo matched it byte-exact as `void ObjM__StartFadeUp(ObjM *self, s32,
  * s32, s32, s32)`. Declared locally rather than in include/class_3bb8c.h on
  * purpose: this unit's view of the class is `Obj87034_3bb8c_l` and echo's is
  * `ObjM`, the two are the same class (see the HEAD NOTE in that header), and
  * a shared-header declaration would put two incompatible prototypes for one
  * function in front of both translation units. The return type is echo's,
  * from the definition. */
-extern void ObjM__ForwardToSubChild(Obj87034_3bb8c_l *self, s32 arg1, s32 arg2, s32 arg3, s32 arg4);
+extern void ObjM__StartFadeUp(Obj87034_3bb8c_l *self, s32 arg1, s32 arg2, s32 arg3, s32 arg4);
 
 void ObjM__EnterState4(Obj87034_3bb8c_l *self) {
     s32 local18;
@@ -442,10 +442,10 @@ void ObjM__EnterState4(Obj87034_3bb8c_l *self) {
             arg3 = 5;
             break;
         }
-        ObjM__ForwardToSubChild(self, local18, 0, arg3, 1);
+        ObjM__StartFadeUp(self, local18, 0, arg3, 1);
         return;
     }
-    ObjM__ForwardToSubChild(self, 0, 0, 5, 1);
+    ObjM__StartFadeUp(self, 0, 0, 5, 1);
 }
 
 void ObjM__EnterState5(Obj87034_3bb8c_l *self) {
@@ -456,7 +456,7 @@ void ObjM__EnterState5(Obj87034_3bb8c_l *self) {
     } else {
         self->phase = 5;
         color = self->target->methods->getDreamColor(self->target);
-        ObjM__ForwardToSubChild(self, color, 0, 0xA, 1);
+        ObjM__StartFadeUp(self, color, 0, 0xA, 1);
         self->target->methods->blockMovement(self->target);
     }
 }
@@ -466,6 +466,6 @@ void ObjM__EnterState6(Obj87034_3bb8c_l *self) {
 
     self->phase = 6;
     color = self->target->methods->getDreamColor(self->target);
-    ObjM__ForwardToSubChild(self, color, 0, 0x1E, 1);
+    ObjM__StartFadeUp(self, color, 0, 0x1E, 1);
     self->target->methods->blockMovement(self->target);
 }
