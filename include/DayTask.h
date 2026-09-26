@@ -4,39 +4,52 @@
 #include "TimedTask.h"
 
 /*
- * DayTask -- class id 0x1F230, method table gDayTaskMethods:
- * TimedTask's subclass (its ctor calls TimedTask__TimedTask first).
- * Methods in src/class_39e08.c (New_DayTask through
- * GetDayTaskMethods). No class derives from it. The object is 0x50 bytes
- * (New_DayTask); its own fields run from TimedTask's 0x38.
+ * DayTask -- class id 0x1F230, method table gDayTaskMethods. A TimedTask
+ * that runs one day of the dream: it brackets a DreamSys startDay/endDay
+ * pair and, in between, runs the day's play as ObjM children (one per
+ * stage), and init returns how the day ended. The object is 0x50 bytes; its
+ * own fields run from TimedTask's 0x38. No class derives from it. Methods:
+ * src/class_39e08.c, New_DayTask through GetDayTaskMethods.
  *
- * The game builds one, in GameApplication__PollStatusObj (src/code_1677c.c):
- * New_DayTask(the task's IntermediateBaseInitArgs, the DreamSys, a flag),
- * init, release, and a switch on init's result, TimedTask::result (2 and 3
- * are values OnObjMNotify sets). What its methods do, measured:
- *  - the ctor passes GetSoundEffectDir() as the base's soundBankPath, loads
- *    "ETC\ETC.TIM" (etcTim), "ETC\DREAMER.TMD" (dreamerTmd) and the
- *    week's BGM (bgm, New_WBgm(PickWeeklyGroup(0), NULL, 1)), fills the init
- *    args' +0x008..+0x010 with a FrameClock, a StageMap and a NodeGuardedViewport
- *    viewport, keeps the DreamSys as a child and hands it `sound` and etcTim;
- *  - init hands the DreamSys the init args' children and viewport, onInit
- *    sets up the viewport and attaches the DreamSys to it (phase 1);
- *  - onTag1Notify's event 2 (DayTask__AdvancePhase) runs the DreamSys's
- *    startDay (or, from phase 3, releases the old objM and asks for the
- *    current stage) and StartObjM builds a New_ObjM (gObjMMethods, 0x2F230)
- *    from sound, bgm, etcTim and dreamerTmd, adds it as a child and inits it
- *    (phase 2);
- *  - onObjMNotify (+0x084, the notifications of a 0x2F230 sender) ends the
- *    day through the DreamSys on events 4, 0xC and 0xD, sets result and
- *    setState(3); events 5..8 and 0xA set phase 3.
- * That describes a day's loop but not enough to name it, so the name stays
- * the table's address.
+ * Who creates it. Application__RunMainLoop (src/code_2b78c.c) calls
+ * GameApplication__PollStatusObj (src/code_1677c.c) when the GraphRoom poll
+ * returns 2, and that builds one with New_DayTask(the application's
+ * IntermediateBaseInitArgs, its DreamSys, config->unk04), runs its init to
+ * completion and releases it. init's return is TimedTask::result:
+ *   1 or 2 -- ObjM's event 4 and endDay(0) returned 0: 2 when the
+ *             DreamSys's getCinematic then has an entry (PollStatusObj
+ *             plays it), else 1; also 2 when startDay refused the day
+ *             (returned < 0; a special day, by DreamSys's reading);
+ *   3      -- event 4 in a flashback session (endDay returned nonzero), or
+ *             ObjM's close codes 0xC/0xD; PollStatusObj then sets
+ *             skipGraphRoomPoll.
  *
- * Two overrides take fewer arguments than their slots: init
- * (DayTask__Init, self only; PollStatusObj calls it through
- * DayTaskInitFn and passes self alone) and onInit (DayTask__OnInit,
- * self only; IntermediateBase__Init calls it with (0, 0, 0)). The slots keep
- * IntermediateBase's types.
+ * Lifecycle, by phase (`phase`):
+ *  - ctor: TimedTask's with GetSoundEffectDir() as soundBankPath; loads
+ *    "ETC\ETC.TIM" (etcTim, uploaded and its buffer freed),
+ *    "ETC\DREAMER.TMD" (dreamerTmd) and the week's BGM (bgm); fills the
+ *    init args' frameClock, lightRig (a StageMap) and viewport (a
+ *    NodeGuardedViewport); adopts the DreamSys as a child and hands it
+ *    `sound` and etcTim. finalize releases all of it.
+ *  - init hands the DreamSys the pad, the FrameClock and the viewport;
+ *    onInit sizes the viewport, shows its fade box and attaches the
+ *    DreamSys as its view child (phase 1).
+ *  - onTag1Notify event 2 (DayTask__AdvancePhase): in phase 1 runs
+ *    startDay and StartObjM on the stage it returns; in phase 3 releases
+ *    the old ObjM and StartObjM on getCurrentStage. StartObjM builds the
+ *    ObjM from sound, bgm, etcTim, dreamerTmd and the stage, adopts it and
+ *    inits it with the DreamSys (phase 2).
+ *  - onObjMNotify (+0x084; onNotify routes a 0x2F230 sender here, a 0x1F34
+ *    DreamSys to the empty +0x080): events 5..8 and 0xA set phase 3, so
+ *    the next AdvancePhase replaces the ObjM with one on the DreamSys's
+ *    current stage; events 4, 0xC and 0xD release the ObjM, call endDay
+ *    (0, 1 or 2 respectively; 2 is DreamSys's new-game reset), set
+ *    `result` and setState(3).
+ *
+ * Two overrides take fewer arguments than their slots and the slots keep
+ * IntermediateBase's types: init (DayTask__Init, self only; PollStatusObj
+ * calls it through DayTaskInitFn) and onInit (DayTask__OnInit, self only;
+ * IntermediateBase__Init calls it with (0, 0, 0)).
  */
 
 typedef struct DayTask DayTask;
@@ -71,7 +84,7 @@ struct ObjM; /* include/ObjM.h */
 
 struct DayTaskMethods {
     DAYTASK_SLOTS(DayTask, (DayTask * self, IntermediateBaseInitArgs *initArgs,
-                                  struct DreamSys *dreamSys, s32 arg3));
+                            struct DreamSys *dreamSys, s32 arg3));
 };
 
 struct DayTask {
@@ -86,9 +99,9 @@ typedef s32 (*DayTaskInitFn)(DayTask *self);
 
 /* The class's own methods, in address order. */
 DayTask *New_DayTask(IntermediateBaseInitArgs *initArgs, struct DreamSys *dreamSys,
-                           s32 arg3); /* BMemPMgrAlloc(0x50), then ctor */
-void DayTask__DayTask(DayTask *self, IntermediateBaseInitArgs *initArgs,
-                            struct DreamSys *dreamSys, s32 arg3);
+                     s32 arg3); /* BMemPMgrAlloc(0x50), then ctor */
+void DayTask__DayTask(DayTask *self, IntermediateBaseInitArgs *initArgs, struct DreamSys *dreamSys,
+                      s32 arg3);
 void DayTask__Finalize(DayTask *self);
 void DayTask__OnNotify(DayTask *self, BasicClass *sender, s32 event);
 void DayTask__ResetPhase(DayTask *self);

@@ -274,3 +274,31 @@ occupant TimImage__Upload) through `TimImageUploadFn`, +0x05C is
 ## Track 4 (2026-09-26, round 88, DayTask)
 
 The class (table D_800865C8, id 0x1F230, TimedTask's subclass) is unified as DayTask in include/DayTask.h; the Obj865C8/DayTaskMethods views in class_39e08.h are gone. Renamed from Obj865C8__Obj865C8. Accessors now use the parent's names: unk0C -> initArgs, Obj0C::unk8/unkC/unk10 -> IntermediateBaseInitArgs unk8/unkC/viewport, subB -> sound, slot10 -> addChild, resetState -> resetCounters. Own fields named from this body: dreamSys (+0x038, arg2), etcTim (+0x044, New_TimImage("ETC\ETC.TIM"), TimImage *), dreamerTmd (+0x048, New_LinkResource("ETC\DREAMER.TMD")), bgm (+0x040, New_WBgm, WBgm *; the WBgm runner's proposal in New_WBgm.md). Byte-identical.
+
+## Track 6 (2026-09-26, round 94, alpha): the class name
+
+`Class865C8` (the table's address, D_800865C8, kept through tracks 4 and 5:
+the header was unified in round 88 and said "a day's loop but not enough to
+name it") is now `DayTask`, with `python3 tools/renametype.py Class865C8
+DayTask` (the family: DayTaskMethods, DayTaskInitFn, DAYTASK_FIELDS/SLOTS,
+gDayTaskMethods, New_DayTask, GetDayTaskMethods and the twelve methods).
+Tier B. Evidence, all from this class's own bodies and its one caller:
+
+- every exit brackets one DreamSys `startDay`/`endDay` pair: AdvancePhase's
+  phase 1 calls startDay and starts an ObjM on the stage it returns (or, on
+  a refusal, endDay(0) and ends); every path of OnObjMNotify that ends the
+  task calls endDay first;
+- between the two it runs ObjM children, replacing one with a fresh ObjM on
+  `getCurrentStage` (phase 3) on ObjM's events 5..8 and 0xA;
+- `result` (init's return) encodes how the day ended, and its one caller
+  (GameApplication__PollStatusObj, reached from Application__RunMainLoop on
+  GraphRoom status 2) acts on it: 2 plays the cinematic, 3 sets
+  skipGraphRoomPoll.
+
+It is tier B, not A, because the "day" reading rests on DreamSys's
+startDay/endDay, which are FirecatFG's names (tier-B hypotheses by rule).
+The `Task` suffix follows the project's other IntermediateBase jobs run to
+a result (StreamTask) and its parent, TimedTask.
+
+The unit banner (include/class_39e08.h) no longer carries "track 4, round
+88/89"; that history is this section and the Track 4 sections above.
