@@ -404,7 +404,7 @@ void StyleTeardown(void) {
 extern u8 gStyleSpawnScales[];
 extern s32 gStyleSpawnYChoices[];
 extern u8 *gStyleSpawnScale;
-extern s32 D_8008E0BC;
+extern s32 gStyleSpawnTableIndex;
 extern s32 gStyleSpawnOffsetX;
 extern void SetupStyleSpawnParamsA(void *arg0, void *arg1);
 extern void SetupStyleSpawnParamsB(void *arg0, void *arg1);
@@ -419,7 +419,7 @@ Class876FC **StyleFillEffectKind0(Class876FC **arg0, s32 arg1, LongVec3 *arg2) {
     s32 t3;
     void (*fp)(void *, void *);
 
-    D_8008E0BC = rand() % 7;
+    gStyleSpawnTableIndex = rand() % 7;
     gStyleSpawnScale = (u8 *)gStyleSpawnScales + ((u32)rand() % 5) * 12;
     t3 = (u32)rand() % 5;
     if (t3 != 0) {
@@ -512,7 +512,7 @@ extern u8 gStyleKind2Colors[];
 extern s32 D_8008E0C0[];
 extern u8 *gStyleSpawnRotation;
 extern u8 gStyleSpawnRotations[];
-extern s32 D_8008E0BC;
+extern s32 gStyleSpawnTableIndex;
 
 /* Local view, same reason as PtrBoxK3 above: the first D_8008E0C0 store goes
  * through a pointer to a one-field struct so the gStyleCounter load may
@@ -548,7 +548,7 @@ Class876FC **StyleFillEffectKind2(Class876FC **arg0, LongVec3 *arg1) {
     SetupStyleSpawnParamsA(arg1, (void *)D_80087330);
     q = &gStyleSpawnRotation;
     *q = gStyleSpawnRotations;
-    D_8008E0BC = rand() % 6;
+    gStyleSpawnTableIndex = rand() % 6;
     *arg0 = New_Class876FC(2, (Class876FCParams *)((u8 *)q - 0xC), (SceneNode *)gStyleCueSelf, arg1);
     arg0++;
     return arg0;

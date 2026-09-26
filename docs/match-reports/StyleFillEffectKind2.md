@@ -13,7 +13,7 @@ local. Four separate things were wrong, found in this order:
 
 | # | change | effect |
 | --- | --- | --- |
-| 1 | `D_8008E0BC = randval % 6;` | retail's magic is `0x2AAAAAAB` with no shift = signed **/6**; the preserved `randval - (randval / 3) * 6` computed a different function. 49 -> 51/79 |
+| 1 | `gStyleSpawnTableIndex = randval % 6;` | retail's magic is `0x2AAAAAAB` with no shift = signed **/6**; the preserved `randval - (randval / 3) * 6` computed a different function. 49 -> 51/79 |
 | 2 | first `D_8008E0C0` store through `S32BoxK2 *slot` (`slot->v = ...`) | the whole `% 20` prefix (`lui 0x6666`, `lw gStyleCounter`, `mult`) now interleaves into the `% 3`'s `multu` latency exactly as retail. Same mechanism as StyleFillEffectKind3 this round: a store through a plain `s32 *` is an opaque `(mem (reg))` the scheduler will not hoist a global load above; an in-struct store at a varying address does not conflict with a scalar at a fixed address. Went 1 word short (the if/else, below). |
 | 3 | `r = rand();` then `(u32) r % 3`, instead of inlining `rand()` or a separate `idx = rand() % 3` | inline put `slot` in `$s0`; `idx` put the remainder in `$a0`. With the rand RESULT in a local, both `$a2` (slot) and `$v0` (remainder) are retail's. |
 | 4 | `val = (gStyleCounter / 20) * 20; if (gStyleCounter != val) val = gStyleKind2AltColor; else val = 0;` | **79/79**, `OK: build matches retail` |
@@ -78,7 +78,7 @@ void **StyleFillEffectKind2(void **arg0, void *arg1) {
     SetupStyleSpawnParamsA(arg1, (void *) D_80087330);
     q = &gStyleSpawnRotation;
     *q = gStyleSpawnRotations;
-    D_8008E0BC = rand() % 6;
+    gStyleSpawnTableIndex = rand() % 6;
     *arg0 = New_Class876FC((void *) 2, (u8 *) q - 0xC, (void *) gStyleCueSelf, arg1);
     arg0++;
     return arg0;
@@ -387,7 +387,7 @@ extern u8 gStyleKind2Colors[];
 extern s32 D_8008E0C0[];
 extern u8 *gStyleSpawnRotation;
 extern u8 gStyleSpawnRotations[];
-extern s32 D_8008E0BC;
+extern s32 gStyleSpawnTableIndex;
 extern void SetupStyleSpawnParamsA(void *arg0, void *arg1);
 extern void *New_Class876FC(void *arg0, void *arg1, void *arg2, void *arg3);
 
@@ -412,7 +412,7 @@ void **StyleFillEffectKind2(void **arg0, void *arg1) {
     q = &gStyleSpawnRotation;
     *q = gStyleSpawnRotations;
     randval = rand();
-    D_8008E0BC = randval - (randval / 3) * 6;
+    gStyleSpawnTableIndex = randval - (randval / 3) * 6;
     *arg0 = New_Class876FC((void *) 2, (u8 *) q - 0xC, (void *) gStyleCueSelf, arg1);
     arg0++;
     return arg0;

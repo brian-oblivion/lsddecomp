@@ -127,7 +127,7 @@ the output array walked and returned one slot advanced (the same
 extern u8 gStyleSpawnScales[];
 extern s32 gStyleSpawnYChoices[];
 extern u8 *gStyleSpawnScale;
-extern s32 D_8008E0BC;
+extern s32 gStyleSpawnTableIndex;
 extern u8 gStyleSpawnOffsetX[];
 extern void SetupStyleSpawnParamsA(void *arg0, void *arg1);   /* this unit, cold */
 extern void SetupStyleSpawnParamsB(void *arg0, void *arg1);   /* this unit, cold,
@@ -141,7 +141,7 @@ void *StyleFillEffectKind0(void *arg0, s32 arg1, void *arg2) {
     void (*fp)(void *, void *);
 
     arr = (void **) arg0;
-    D_8008E0BC = rand() % 7;
+    gStyleSpawnTableIndex = rand() % 7;
     gStyleSpawnScale = (u8 *) gStyleSpawnScales + ((u32) rand() % 5) * 12;
     t3 = (u32) rand() % 5;
     if (t3 != 0) {
