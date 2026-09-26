@@ -2,6 +2,7 @@
 #include "code_4cd08.h"
 #include "Class6B5CC.h"
 #include "ModelData.h"
+#include "TriggerWorld.h"
 
 const char gMomPathSymSpy[] = "ETC\\SYMSPY.MOM";
 const char gMomPathSymDog[] = "ETC\\SYMDOG.MOM";
@@ -163,8 +164,8 @@ s32 AdjustDreamAuxTriggerOffset(s32 a0, s32 a1)
     s32 val = gDreamAuxStage;
 
     if (val == 4 && a1 == 0x10) {
-        TriggerWorld *w = (TriggerWorld *)gDreamAuxWorld;
-        s32 result = ((TriggerWorldFn80)w->vtable[0x80])(w);
+        DreamAuxWorld *w = (DreamAuxWorld *)gDreamAuxWorld;
+        s32 result = ((DreamAuxWorldFn80)w->vtable[0x80])(w);
 
         if (result == val) {
             a0 += 0x1E;
@@ -190,7 +191,6 @@ bool CheckTriggerParity(s32 coordParity, s8 *entry)
     return result;
 }
 
-extern TriggerWorld *New_TriggerWorld(s32 *ctx);
 bool ProcessDreamAuxTriggerRecord(s32 value, void *ctx, TriggerRecord *record, TriggerWorld *world);
 
 s32 FireDreamAuxTriggerEntries(s32 a0, s8 *a1, s32 a2)
@@ -199,7 +199,7 @@ s32 FireDreamAuxTriggerEntries(s32 a0, s8 *a1, s32 a2)
     TriggerWorld *world;
 
     ctxArg[0] = a2;
-    world = New_TriggerWorld(ctxArg);
+    world = New_TriggerWorld((struct Src6F240 *)ctxArg);
 
     if (world != NULL) {
         DreamAuxGroupRecord *base = gDreamAuxGroupRecords[gDreamAuxStage];
@@ -235,7 +235,7 @@ bool ProcessDreamAuxTriggerRecord(s32 value, void *ctx, TriggerRecord *record, T
 
     p = record->entries;
     end = record->entries + 4;
-    callResult = ((TriggerWorldFn)world->vtable[0x22])(world, record->parity);
+    callResult = world->methods->getModelData(world, record->parity);
     scratch[3] = (s32)callResult;
 
     if (callResult == NULL) {
@@ -349,13 +349,13 @@ success:
     return true;
 }
 
-/* Compares the vtable-slot-0x80 result of `*gDreamAuxWorld` (TriggerWorldFn80,
+/* Compares the vtable-slot-0x80 result of `*gDreamAuxWorld` (DreamAuxWorldFn80,
  * include/code_4cd08.h) against a per-idx signed byte from D_80088D16. */
 bool CheckDreamAuxWorldState(s32 idx)
 {
-    TriggerWorld *w = (TriggerWorld *)gDreamAuxWorld;
+    DreamAuxWorld *w = (DreamAuxWorld *)gDreamAuxWorld;
     s32 val = D_80088D16[idx];
-    s32 result = ((TriggerWorldFn80)w->vtable[0x80])(w);
+    s32 result = ((DreamAuxWorldFn80)w->vtable[0x80])(w);
 
     return val == result;
 }
