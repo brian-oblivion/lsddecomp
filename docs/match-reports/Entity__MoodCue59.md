@@ -69,3 +69,21 @@ Reading this function's `out->` writes with the proposed `SoundCueSet` field nam
 ## Track 4 (2026-09-26, round 88, echo)
 
 The class (id 0x1F234, table `gEntityMethods`) is unified as `Entity` in `include/Entity.h`: a TodActor subclass whose table and object expand `TODACTOR_SLOTS`/`TODACTOR_FIELDS`. Any source block above is the pre-unification spelling; the live body takes the inherited names (fields `parent`, `coord2`->`tx/ty/tz`, `tick`, `linkTarget`, `state` (was `moodState`), `lastOffsetValue`, `grid` (was `unk4C`), `ticker` (was `companion2`), `arg2` (was `soundCueChannel`), `parts`, `todPlaying`, `peer` (was `target`, cast to the `Unk94Obj` DreamSys view where its own slots are called); slots `reset`, `setDisplay`, `setLightMode`, `setTranslation`/`addTranslation`, `moveLocalZ/X/Y`, `moveLocalZOrFindLink`, `selectTickCallback`, `enableTickCallback`/`disableTickCallback`, `distanceToPeer`, `setTargetReached`, `updateActivationState`/`updateDeactivationState`), byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).
+
+## Track 7 (round 93, echo)
+
+Every literal in the live body is in its base: decimal for moodTimer and cue-set ticks, TOD frames, distances, VAB programs and `state` phases (the unit has no hex literal left). Byte-identical (whole image green).
+
+## Unit notes (moved from src/Entity_e.c's banner, round 93)
+
+The pre-track-7 banner of `src/Entity_e.c` carried this history, now here:
+the unit was carved as the third 20-function slice of the Entity class's
+97-function remainder, after Entity_c and Entity_d. Its functions are the
+`gEntityMoodHandlerTable` handlers of rows 59, 61-62, 64-71 and 73-81, each
+named `Entity__MoodCueNN` for its row; row order does not track code
+address (each report derives its row). Rows 60, 63 and 72 have a NULL
+handler word: those mood indices dispatch no per-tick callback, not a gap
+in the unit. `Entity__MoodCue81` also occupies row 120 (its report), and
+`Entity__MoodCue71` is called from Entity_g's `Entity__MoodCue108`.
+`sMoodCue78TransitionDone` is a one-shot s32 flag used only by
+`Entity__MoodCue78`.

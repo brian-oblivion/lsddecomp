@@ -280,7 +280,7 @@ reshaping tried reproduces that extra register.
 ## due to the one-word drift -- restored to `INCLUDE_ASM` per project rule)
 
 ```c
-extern u8 D_80089E08[];
+extern u8 SCALE_EIGHT_SEVENTHS[];
 
 void Entity__MoodCue81(Entity *this, EntityMoodHandlerArg *out) {
     s32 mod;
@@ -309,7 +309,7 @@ void Entity__MoodCue81(Entity *this, EntityMoodHandlerArg *out) {
         SceneNode__FaceTarget(this, this->unk94, 1, 0, 0);
         mood = this->unk44;
         if (mood == 1) {
-            this->methods->slot48(this, 0, D_80089E08);
+            this->methods->slot48(this, 0, SCALE_EIGHT_SEVENTHS);
             mod = -0x176;
             if (this->methods->slot144(this, this->unk94) < 0x200) {
                 this->methods->slot160(this);
@@ -353,7 +353,7 @@ into `src/Entity_e.c` in place of the current `INCLUDE_ASM`):
 
 ```c
 #if 0
-extern u8 D_80089E08[];
+extern u8 SCALE_EIGHT_SEVENTHS[];
 
 void Entity__MoodCue81(Entity *this, EntityMoodHandlerArg *out) {
     s32 mod;
@@ -382,7 +382,7 @@ void Entity__MoodCue81(Entity *this, EntityMoodHandlerArg *out) {
         SceneNode__FaceTarget(this, this->unk94, 1, 0, 0);
         mood = this->unk44;
         if (mood == 1) {
-            this->methods->slot48(this, 0, D_80089E08);
+            this->methods->slot48(this, 0, SCALE_EIGHT_SEVENTHS);
             mod = -0x176;
             if (this->methods->slot144(this, this->unk94) < 0x200) {
                 this->methods->slot160(this);
@@ -649,7 +649,7 @@ current `INCLUDE_ASM`):
 
 ```c
 #if 0
-extern u8 D_80089E08[];
+extern u8 SCALE_EIGHT_SEVENTHS[];
 
 void Entity__MoodCue81(Entity *this, EntityMoodHandlerArg *out) {
     s32 mod;
@@ -677,7 +677,7 @@ void Entity__MoodCue81(Entity *this, EntityMoodHandlerArg *out) {
         SceneNode__FaceTarget(this, this->unk94, 1, 0, 0);
         mood = this->unk44;
         if (mood == 1) {
-            this->methods->slot48(this, 0, D_80089E08);
+            this->methods->slot48(this, 0, SCALE_EIGHT_SEVENTHS);
             mod = -0x176;
             if (this->methods->slot144(this, this->unk94) < 0x200) {
                 this->methods->slot160(this);
@@ -791,7 +791,7 @@ the report's original best-reached body above, which closed neither):
 
 ```c
 #if 0
-extern u8 D_80089E08[];
+extern u8 SCALE_EIGHT_SEVENTHS[];
 
 void Entity__MoodCue81(Entity *this, EntityMoodHandlerArg *out) {
     s32 mod;
@@ -819,7 +819,7 @@ void Entity__MoodCue81(Entity *this, EntityMoodHandlerArg *out) {
         SceneNode__FaceTarget(this, this->unk94, 1, 0, 0);
         mood = this->unk44;
         if (mood == 1) {
-            this->methods->slot48(this, 0, D_80089E08);
+            this->methods->slot48(this, 0, SCALE_EIGHT_SEVENTHS);
             mod = -0x176;
             if (this->methods->slot144(this, this->unk94) < 0x200) {
                 this->methods->slot160(this);
@@ -1050,8 +1050,12 @@ Reading this function's `out->` writes with the proposed `SoundCueSet` field nam
 
 **This handler also occupies row 120** of `gEntityMoodHandlerTable` (same `handler` word at both `0x80089EB0+0x10*81` and `0x80089EB0+0x10*120`; the row's other three words -- data0/data1/data2 -- differ between the two rows, so it is one function shared by two distinct mood-row configurations, not a naming collision). Named for its lower/first row per the existing convention; not a second name.
 
-**`D_80089E08` left unnamed this round.** s16-pair-decoded it reads (8,7, 8,7, 8,7, 1,1) -- X=Y=Z=8/7, a uniform ~1.14x enlarge, but 8/7 is not one of the round ratios (1/2, 6/1, 3/1, ...) any named `SCALE_*` table uses, so there is no clean `SCALE_EIGHTSEVENTHS`-style name to give it with confidence.
+**`SCALE_EIGHT_SEVENTHS` left unnamed this round.** s16-pair-decoded it reads (8,7, 8,7, 8,7, 1,1) -- X=Y=Z=8/7, a uniform ~1.14x enlarge, but 8/7 is not one of the round ratios (1/2, 6/1, 3/1, ...) any named `SCALE_*` table uses, so there is no clean `SCALE_EIGHTSEVENTHS`-style name to give it with confidence.
 
 ## Track 4 (2026-09-26, round 88, echo)
 
 The class (id 0x1F234, table `gEntityMethods`) is unified as `Entity` in `include/Entity.h`: a TodActor subclass whose table and object expand `TODACTOR_SLOTS`/`TODACTOR_FIELDS`. Any source block above is the pre-unification spelling; the live body takes the inherited names (fields `parent`, `coord2`->`tx/ty/tz`, `tick`, `linkTarget`, `state` (was `moodState`), `lastOffsetValue`, `grid` (was `unk4C`), `ticker` (was `companion2`), `arg2` (was `soundCueChannel`), `parts`, `todPlaying`, `peer` (was `target`, cast to the `Unk94Obj` DreamSys view where its own slots are called); slots `reset`, `setDisplay`, `setLightMode`, `setTranslation`/`addTranslation`, `moveLocalZ/X/Y`, `moveLocalZOrFindLink`, `selectTickCallback`, `enableTickCallback`/`disableTickCallback`, `distanceToPeer`, `setTargetReached`, `updateActivationState`/`updateDeactivationState`), byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).
+
+## Track 7 (round 93, echo)
+
+Every literal in the live body is in its base: decimal for moodTimer and cue-set ticks, TOD frames, distances, VAB programs and `state` phases (the unit has no hex literal left). `D_80089E08` -> `SCALE_EIGHT_SEVENTHS` (`python3 tools/rename.py`, tier A, named by value): three Ratio16 {8, 7} (words 0x00070008), passed to updateScale with set 0 (adds 8/7 to each axis's scale per call). Its extern is in include/Entity.h's block as Ratio16[]. Locals `mod` -> `dz` (the move moveLocalZOrFindLink takes) and `mood` -> `state` (its copy of this->state, written back after deactivate). notifyParents' 12 is ENTITY_EFFECT_END_DREAM; program -2 is SOUND_CUE_STOP; clearTickCallbacks' 1 is `true`. Byte-identical (whole image green).
