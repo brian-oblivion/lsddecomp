@@ -50,6 +50,7 @@
 #include "Tod.h"
 #include "TodSet.h"
 #include "TriggerWorld.h"
+#include "TimImage.h"
 #include "TmdModel.h"
 #include "DrawSystem.h"
 #include "CdStream.h"
@@ -544,48 +545,19 @@ void TimArraySrc__Finalize(DataSrc33808 *self) {
  * the CLUT row its GsGetTimInfo reports (from y 0x1E0, >> gTimClutRowShift, 16
  * bytes a step past +0x34); then mark +0x38 and the active driver's
  * setFlag. */
-typedef struct Image43CB8 {      /* LIBGS.H GsIMAGE */
-    /* +0x00 */ u32 pmode;
-    /* +0x04 */ s16 px;
-    /* +0x06 */ s16 py;
-    /* +0x08 */ u16 pw;
-    /* +0x0A */ u16 ph;
-    /* +0x0C */ u32 *pixel;
-    /* +0x10 */ s16 cx;
-    /* +0x12 */ s16 cy;
-    /* +0x14 */ u16 cw;
-    /* +0x16 */ u16 ch;
-    /* +0x18 */ u32 *clut;
-} Image43CB8;
-
-typedef struct Tim43CB8 Tim43CB8;
-
-typedef struct TimMethods43CB8 {
-    CLASS6D430_SLOTS(Tim43CB8, (Tim43CB8 *self, char *name));
-    /* +0x07C */ u8 pad7C[0x20];
-    /* +0x09C */ void (*getTimInfo)(Tim43CB8 *self, Image43CB8 *info);
-} TimMethods43CB8;
-
-struct Tim43CB8 {                /* TimImage (code_2bb9c.c) */
-    CLASS6D430_FIELDS(TimMethods43CB8);
-    /* +0x02C */ u8 pad2C[0x20];
-    /* +0x04C */ s32 clutBase;
-};
-
 typedef struct Obj43CB8 {
     CLASS6D430_FIELDS(DataSrc33808Methods);
     /* +0x02C */ s32 count;
-    /* +0x030 */ Tim43CB8 **images;
+    /* +0x030 */ TimImage **images;
     /* +0x034 */ s32 base;
     /* +0x038 */ s32 ready;
 } Obj43CB8;
 
-extern Tim43CB8 *New_TimImage(char *name);
 extern s16 gTimClutRowShift;
 
 void TimArraySrc__BuildImages(Obj43CB8 *self) {
-    Image43CB8 info;
-    Tim43CB8 **objs;
+    GsIMAGE info;
+    TimImage **objs;
     s32 i;
     s32 *offs;
 
@@ -612,11 +584,11 @@ void TimArraySrc__BuildImages(Obj43CB8 *self) {
 /* D_8006F1C4 +0x078: slot +0x078 of every object in the array at +0x30
  * (+0x2C entries). */
 void TimArraySrc__NotifyImages(DataSrc33808 *self) {
-    DataSrc33808 **objs = (DataSrc33808 **)self->unk30;
+    TimImage **objs = (TimImage **)self->unk30;
     s32 i;
 
     for (i = 0; i < self->unk2C; i++) {
-        ((void (*)())(*objs)->methods->slot78)(*objs);
+        ((TimImageUploadFn)(*objs)->methods->slot78)(*objs);
         objs++;
     }
 }

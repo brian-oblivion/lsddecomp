@@ -102,3 +102,11 @@ First build. The GsIMAGE local (0x1C bytes) is what gives retail's 0x50 frame. L
 ## Naming
 
 - **TimArraySrc__BuildImages**, tier A. Slot +0x064: builds one TimImage (New_TimImage(NULL)) per image record in the buffer, each adopting its sub-buffer and computing its CLUT base from GsGetTimInfo-style fields.
+
+## Track 4 (2026-09-26, round 88)
+
+TimImage is unified (`include/TimImage.h`). This function's local views of
+it -- `Tim43CB8`, `TimMethods43CB8` and `Image43CB8` (GsIMAGE) -- and its
+local `extern` of New_TimImage are deleted; `objs` is `TimImage **`,
+`info` a `GsIMAGE`, and `Obj43CB8::images` is `TimImage **`. `clutBase`
+(+0x04C) is the name TimImage.h took from this view. Image byte-identical.
