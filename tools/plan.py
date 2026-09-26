@@ -918,6 +918,12 @@ def select_jobs(d, order, n):
         for tj, tu in taken:
             if units & tu:
                 reason = "same unit as {#}"
+            elif job[1].startswith("unify class") and tj[1].startswith("unify class"):
+                # a class job renames only its own table and methods, and
+                # class_footprint already holds every unit naming them, so
+                # disjoint footprints ARE the rename test (round 87: eleven
+                # class merges, no conflict beyond adjacent lines)
+                pass
             elif units and tu and ((job[1].startswith(RENAMES) and rewrites(units, tu))
                                    or (tj[1].startswith(RENAMES) and rewrites(tu, units))):
                 reason = "call-graph contention with {#} (a rename in one rewrites the other)"
