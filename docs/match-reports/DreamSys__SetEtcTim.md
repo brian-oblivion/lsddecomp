@@ -38,12 +38,16 @@ see docs/DECOMPILATION_LEARNINGS.md on salvage splicing.
 
 ## Naming
 
-`DreamSys__SetEtcTim` -- tier C (round 66, runner alpha, FINISHING-PLAN track 3).
+`DreamSys__SetEtcTim` -- tier A (round 92, runner delta, FINISHING-PLAN track 7).
+Renamed from `DreamSys__func_5938c` (tier C since round 66).
 
-Renamed from `func_8005938C`.
-
-Kept as a tier-C placeholder in the unit's existing
-`Class__func_xxxxx` form. Known: a one-line setter, `this->unk_0x64 = value`,
-vtable slot +0x114; `DreamSys__DreamSys` initializes the same field to 0. Nothing
-in any carved unit ever READS `unk_0x64`, so there is nothing to name the setter
-after. Name it when a reader turns up.
+A pure setter (`this->etcTim = value`, vtable slot +0x114), so its mechanics are
+its purpose; what was missing in round 66 was a name for the field. The one
+caller, `Class865C8__Class865C8` (src/class_39e08.c), passes `self->etcTim` --
+the `TimImage` it has just loaded, uploaded and freed the buffer of -- right after
+handing the DreamSys its sound object through `setSoundObj`. The field
+(`unk_0x64` until this round, renamed `etcTim` in include/DreamSys.h; its only
+accessors are this setter and `DreamSys__DreamSys`, which clears it) is typed
+`s32` because nothing in the DreamSys ever dereferences it. Slot +0x114 is still
+`slot114`: its accessor is in src/class_39e08.c, outside this job, so the slot
+name `setEtcTim` is a proposal for the head.

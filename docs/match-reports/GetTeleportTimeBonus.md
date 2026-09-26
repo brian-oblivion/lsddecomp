@@ -45,12 +45,16 @@ round 43, runner ALPHA, unit DreamSys.
 
 ## Naming
 
-`GetTeleportTimeBonus` -- tier C (round 66, runner alpha, FINISHING-PLAN track 3).
+`GetTeleportTimeBonus` -- tier B (round 92, runner delta, FINISHING-PLAN track 7).
+Renamed from `func_8005BFC4` (tier C since round 66).
 
-NOT RENAMED, and this records why. It is a free function whose
-whole body is `return (gLinkSrcStage == 0) ? 0xA : 0;` -- gLinkSrcStage being the
-source stage `GetStaticSpawn` records for the trigger it matched. Nothing in any
-carved unit calls it and it is not a gDreamSysMethods slot, so there is no call site
-to type the return value, and 0xA on its own names nothing. The tier-C
-`Class__func_xxxxx` form does not apply either: it is not a method, so it keeps the
-bare placeholder.
+Round 66 kept the placeholder because "nothing in any carved unit calls it"; that
+stopped being true when `DreamSys__TryInstantTeleportLink` was matched. That
+caller, after `Test4InstantTeleporters` has found a link (which leaves the
+trigger's stage in `gLinkSrcStage`), calls this with no arguments and, when the
+result is non-zero and the dream is not a flashback session, sets the dream time
+limit to `getDreamTimerScaled() + result` -- i.e. the result is extra time, in
+the same units as `DreamSys__GetSetDreamTimeLimit`, granted by the teleport. The
+body gives 10 of those units when the teleporter was on stage 0 and none
+otherwise. Tier B: the mechanics (a time bonus that depends on the source
+stage) are established; why stage 0 alone earns it is not.
