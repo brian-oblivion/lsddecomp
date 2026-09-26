@@ -30,7 +30,7 @@
  * no methods in this unit.
  * D_8006EF50 (class id 0x5) is a BasicClass subclass holding a parentRefs
  * cursor; NotifyParents walks it, picking event 4/3/2 from two flags and a
- * counter. D_8006EED8 (class id 0xB03) is a GetActiveDataSourceMethods
+ * counter. gClass6EED8Methods (class id 0xB03) is a GetActiveDataSourceMethods
  * subclass that copies a name string to slot +0x06C.
  * LightRig (include/LightRig.h, gLightRigMethods, id 0x14) is unified too: a
  * Class6B5CC subclass owning three FlatLightObj children and an ambient
@@ -83,10 +83,10 @@ struct GsIMAGE {
 extern u16 GetTPage(s32 tp, s32 abr, s32 x, s32 y);
 
 /* The method tables the getters below return. */
-extern s32 D_8006EED8[];
+extern s32 gClass6EED8Methods[];
 extern s32 D_8006EF50[];
 
-/* Local view of a D_8006EED8 (class id 0xB03) object: D8006EED8__SetFlag2C sets +0x2C. */
+/* Local view of a gClass6EED8Methods (class id 0xB03) object: Class6EED8__SetFlag sets +0x2C. */
 typedef struct D_8006EED8Methods D_8006EED8Methods;
 typedef struct D_8006EED8Obj {
     D_8006EED8Methods *methods; /* +0x000 */
@@ -115,7 +115,7 @@ typedef struct Slot08Methods_322b4 {
     void (*init)(void *self); /* +0x008 */
 } Slot08Methods_322b4;
 void *Get_vtable_D8006EF50(void);
-void *Get_vtable_D8006EED8(void);
+void *GetClass6EED8Methods(void);
 
 
 
@@ -336,41 +336,41 @@ void Sprite__SetColor(Sprite *self, SpriteRgb *rgb) {
 SpriteMethods *GetSpriteMethods(void) {
     return &gSpriteMethods;
 }
-/* Allocate and construct a D_8006EED8 object (0x30 bytes). */
-void *New_D8006EED8(s32 arg) {
+/* Allocate and construct a gClass6EED8Methods object (0x30 bytes). */
+void *New_Class6EED8(s32 arg) {
     void *obj = BMemPMgrAlloc(0x30);
 
     if (obj != NULL) {
-        ((CtorArg1Methods_322b4 *)Get_vtable_D8006EED8())->ctor(obj, arg);
+        ((CtorArg1Methods_322b4 *)GetClass6EED8Methods())->ctor(obj, arg);
         return obj;
     }
     return NULL;
 }
-/* D_8006EED8 slot +0x008 (ctor): the base ctor, install the table, clear
+/* gClass6EED8Methods slot +0x008 (ctor): the base ctor, install the table, clear
  * +0x2C, and pass a stack copy of the name to slot +0x06C. */
-void D8006EED8__D8006EED8(D_8006EED8Obj *self, char *name) {
+void Class6EED8__Class6EED8(D_8006EED8Obj *self, char *name) {
     char buf[32];
 
     ((Slot08Arg0Methods_322b4 *)GetActiveDataSourceMethods())->ctor(self);
-    self->methods = Get_vtable_D8006EED8();
+    self->methods = GetClass6EED8Methods();
     self->flag2C = 0;
     if (name != NULL) {
         strcpy(buf, name);
         self->methods->slot6C(self, buf);
     }
 }
-/* D_8006EED8 slot +0x00C (finalize): clear +0x2C, then the base finalize. */
-void D8006EED8__Finalize(D_8006EED8Obj *self) {
+/* gClass6EED8Methods slot +0x00C (finalize): clear +0x2C, then the base finalize. */
+void Class6EED8__Finalize(D_8006EED8Obj *self) {
     self->flag2C = 0;
     GetActiveDataSourceMethods()->slot0C(self);
 }
-/* D_8006EED8 slot +0x064. */
-void D8006EED8__SetFlag2C(D_8006EED8Obj *self) {
+/* gClass6EED8Methods slot +0x064. */
+void Class6EED8__SetFlag(D_8006EED8Obj *self) {
     self->flag2C = 1;
 }
-/* Returns the D_8006EED8 method table. */
-void *Get_vtable_D8006EED8(void) {
-    return D_8006EED8;
+/* Returns the gClass6EED8Methods method table. */
+void *GetClass6EED8Methods(void) {
+    return gClass6EED8Methods;
 }
 /* Allocate and construct a D_8006EF50 object (0x1C bytes). */
 void *New_D8006EF50(void) {

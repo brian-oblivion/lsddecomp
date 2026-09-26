@@ -37,7 +37,7 @@ struct WBgmMethods {
     /* +0x060 */ void (*setVab)(WBgm *self, s32 arg);            /* WBgm__SetVab */
 };
 
-/* What +0x10 holds: a New_D8006EED8 object. Only the fields read here. */
+/* What +0x10 holds: a New_Class6EED8 object. Only the fields read here. */
 typedef struct SeqData {
     BASICCLASS_FIELDS(BasicClassMethods);
     /* +0x00C */ u8 padC[0x10 - 0xC];
@@ -69,7 +69,7 @@ extern void SsSeqClose(short);
 extern short SsSeqOpen(unsigned long *addr, short vab_id);
 
 extern void *BMemPMgrAlloc(s32 size);
-extern SeqData *New_D8006EED8(s32 arg);
+extern SeqData *New_Class6EED8(s32 arg);
 extern void printf(const char *fmt);
 extern const char D_80010FEC[]; /* "Seq Open error in WBgmHandleMonitorEvent" */
 WBgmMethods *Get_vtable_WBgm(void);
@@ -198,7 +198,7 @@ void WBgm__SetSeq(WBgm *self, s32 arg) {
         self->seqData = NULL;
     }
     if (arg != 0) {
-        self->seqData = New_D8006EED8(arg);
+        self->seqData = New_Class6EED8(arg);
         if (WBgm__HandleMonitorEvent(self)) {
             if (self->autoPlay != 0) {
                 self->methods->play(self);
