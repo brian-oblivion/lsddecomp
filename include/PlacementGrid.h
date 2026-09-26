@@ -5,7 +5,7 @@
 
 /*
  * PlacementGrid -- a FileResource data source (class id 0xE03, method table
- * D_8006D940) over a 20x20 grid of placement records. Methods in
+ * gPlacementGridMethods) over a 20x20 grid of placement records. Methods in
  * src/code_179d8_d.c. No classes derive from it. Its getter is the first
  * entry of gDataSourceClientGetters, so SetActiveDataSource rebinds its
  * interface slots like every other client's.
@@ -80,7 +80,7 @@ struct PlacementGrid {
     /* +0x030 */ s32 loaded; /* set by PlacementGrid__SetFlag; zeroed by the ctor */
 }; /* 0x34 bytes: New_PlacementGrid */
 
-extern PlacementGridMethods D_8006D940;
+extern PlacementGridMethods gPlacementGridMethods;
 extern PlacementGridMethods *GetPlacementGridMethods(void);
 
 PlacementGrid *New_PlacementGrid(char *name);

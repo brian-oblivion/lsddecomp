@@ -34,7 +34,7 @@ void PlacementGrid__PlacementGrid(Obj6D940 *self, s32 arg1)
 
 Structurally identical to a class-framework ctor-chain (base ctor call,
 own vtable install, field reset, conditional post-init dispatch) --
-**and IS one**: round-77 correction, `D_8006D940` is a real 30-slot
+**and IS one**: round-77 correction, `gPlacementGridMethods` is a real 30-slot
 FileResource-derived vtable (see the unit header comment). `Obj6D940` (the
 0x34-byte allocated object, matching `New_PlacementGrid`'s own alloc size)
 added as a new unit-local type with only the two fields this function
@@ -43,7 +43,7 @@ touches (`unk2C`, `unk30`) plus the `methods` pointer at offset 0.
 ## Naming (round 77, charlie -- track 3)
 
 Renamed `func_8002C18C -> PlacementGrid__PlacementGrid`, tier A. `+0x008` (ctor)
-slot of `D_8006D940`, confirmed by `tools/classtable.py 0x8006D940`. Matches
+slot of `gPlacementGridMethods`, confirmed by `tools/classtable.py 0x8006D940`. Matches
 the `Class__Class` ctor convention exactly, same slot position as
 `FileResource__FileResource` and `VabStreamObj__VabStreamObj`. Also renamed the
 unit-local types `Table6D940 -> PlacementGridMethods`, `Obj6D940 -> PlacementGrid`

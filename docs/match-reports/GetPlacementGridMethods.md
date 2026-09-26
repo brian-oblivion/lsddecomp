@@ -9,7 +9,7 @@
 
 ## Role
 
-Plain accessor, no parameters: returns `&D_8006D940`. Same shape as the
+Plain accessor, no parameters: returns `&gPlacementGridMethods`. Same shape as the
 class-framework "get vtable" accessors documented elsewhere in this
 project (`docs/research/class-framework.md`), but this unit is NOT
 class-framework code (per the unit's own header comment / charlie's
@@ -21,7 +21,7 @@ through the returned table.
 ```c
 Table6D940 *GetPlacementGridMethods(void)
 {
-    return &D_8006D940;
+    return &gPlacementGridMethods;
 }
 ```
 
@@ -31,8 +31,8 @@ Table6D940 *GetPlacementGridMethods(void)
 slots: `+0x008` (`slot08`, 2-arg `(self, s32)` -- this IS `PlacementGrid__PlacementGrid`
 itself, confirmed by `New_PlacementGrid`'s own dispatch through this exact
 slot) and `+0x06C` (`slot6C`, same 2-arg shape, dispatched conditionally
-from inside `PlacementGrid__PlacementGrid`'s own body). `D_8006D940` declared `extern
-Table6D940 D_8006D940;`.
+from inside `PlacementGrid__PlacementGrid`'s own body). `gPlacementGridMethods` declared `extern
+Table6D940 gPlacementGridMethods;`.
 
 Also added `BaseTable6D940` (this file only) -- a SEPARATE table reached
 only via the uncarved accessor `GetActiveDataSourceMethods()`, with three known slots
@@ -44,9 +44,9 @@ local to `code_179d8_d.c`, no shared header, per this round's rule for the
 ## Naming (round 77, charlie -- track 3)
 
 Renamed `func_8002C3A8 -> GetPlacementGridMethods`, tier A. This unit's earlier
-"NOT class-framework code" finding (round 16) was WRONG for `D_8006D940`
+"NOT class-framework code" finding (round 16) was WRONG for `gPlacementGridMethods`
 specifically -- see the unit header comment's round-77 correction.
-`D_8006D940` is a real 30-slot FileResource-derived vtable
+`gPlacementGridMethods` is a real 30-slot FileResource-derived vtable
 (`tools/classtable.py 0x8006D940`), and this function is its getter,
 confirmed as the FIRST entry of `gDataSourceClientGetters` (code_171e0.c's
 NULL-terminated array of "class-method-table getters of every
@@ -60,4 +60,4 @@ section are authoritative).
 
 ## Track 4 (2026-09-26, round 87, echo)
 
-The paragraph above ("NOT class-framework code") is superseded: D_8006D940 is a FileResource method table and this is its getter, the first entry of gDataSourceClientGetters. Declared in `include/PlacementGrid.h`.
+The paragraph above ("NOT class-framework code") is superseded: gPlacementGridMethods is a FileResource method table and this is its getter, the first entry of gDataSourceClientGetters. Declared in `include/PlacementGrid.h`.

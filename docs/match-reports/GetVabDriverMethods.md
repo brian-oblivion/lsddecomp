@@ -22,7 +22,7 @@ Byte-exact, 4/4 words (`lui`/`addiu` computing `&gVabDriverMethods`, then `jr`/`
 
 The "get methods table" accessor for the `gVabDriverMethods` class -- same idiom as
 `GetVabStreamObjMethods` (this unit) returning `&gVabStreamObjMethods`, and `GetPlacementGridMethods` in
-the sibling `code_179d8_d.c` returning `&D_8006D940`. Confirmed void-argument
+the sibling `code_179d8_d.c` returning `&gPlacementGridMethods`. Confirmed void-argument
 by checking its two call sites (`code_171e0/func_80026CAC.s`,
 `code_171e0/func_80026FE8.s`): both `jal GetVabDriverMethods` with no argument
 register set up beforehand.

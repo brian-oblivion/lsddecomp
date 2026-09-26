@@ -33,15 +33,15 @@ is a documented choice, not a measured one.
 ## Naming (round 77, charlie -- track 3)
 
 Renamed `func_8002C200 -> PlacementGrid__Finalize`, tier A. `+0x00C` (dtor)
-slot of `D_8006D940` (confirmed by `tools/classtable.py 0x8006D940`),
+slot of `gPlacementGridMethods` (confirmed by `tools/classtable.py 0x8006D940`),
 matching the `FileResource__Finalize` naming precedent at the same slot
 position in the base class.
 
 ## Track 4 (2026-09-26, round 87, echo)
 
 Renamed `PlacementGrid__Destroy -> PlacementGrid__Finalize`: it occupies slot
-+0x00C of D_8006D940, which is `finalize` in every class
-(`include/BasicClass.h`; `tools/classtable.py D_8006D940 --vs gFileResourceMethods`
++0x00C of gPlacementGridMethods, which is `finalize` in every class
+(`include/BasicClass.h`; `tools/classtable.py gPlacementGridMethods --vs gFileResourceMethods`
 shows it overriding `FileResource__Finalize`), and its body is only the
 parent's finalize, reached through the active data source's table
 (`GetActiveDataSourceMethods()->finalize`). The slot is `void`, so the

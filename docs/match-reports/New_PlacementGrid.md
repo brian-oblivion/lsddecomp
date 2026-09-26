@@ -57,7 +57,7 @@ since neither shared header is included here.
 
 Renamed `new_class_6d940 -> New_PlacementGrid`, tier A. Matches the project's
 `New_Class` allocator convention exactly. This function's own class,
-`D_8006D940`/`PlacementGridMethods`, IS real class-framework data
+`gPlacementGridMethods`/`PlacementGridMethods`, IS real class-framework data
 (`tools/classtable.py 0x8006D940`, 30 slots) -- the "NOT class-framework
 code" language in the `## Role` section above predates the round-77
 correction recorded in the unit header comment and is left as written

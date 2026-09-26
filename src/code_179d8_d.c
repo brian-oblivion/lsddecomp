@@ -61,13 +61,13 @@
  * ROUND 77 CORRECTION (naming pass, charlie): the paragraph below (round 16,
  * libcd_bios's sibling-slice finding) is WRONG for this unit and must not
  * be trusted for it again. `python3 tools/classtable.py --scan` DOES hit
- * this unit's own globals: `D_8006D940` is a real 30-slot FileResource-derived
+ * this unit's own globals: `gPlacementGridMethods` is a real 30-slot FileResource-derived
  * vtable (header word 0x00000E03), confirmed by `tools/classtable.py
  * 0x8006D940` -- slots +0x004/+0x05C/+0x060 are the SAME
  * `FileResource__Release`/`FileResource__FreeBuffer`/`NoOp` symbols the base class and
  * its CD-driver sibling (`gCdDriverMethods`, code_179d8_q.c) share verbatim, +0x008
  * is a genuine ctor (`PlacementGrid__PlacementGrid`), +0x00C a genuine dtor
- * (`PlacementGrid__Finalize`), and `D_8006D940`'s own getter (`GetPlacementGridMethods`,
+ * (`PlacementGrid__Finalize`), and `gPlacementGridMethods`'s own getter (`GetPlacementGridMethods`,
  * ex-`func_8002C3A8`) is registered in `gDataSourceClientGetters` (code_171e0.c) -- the
  * NULL-terminated array of "class-method-table getters of every
  * FileResource-derived client" -- as that array's FIRST entry
@@ -78,7 +78,7 @@
  * for `this->methods->slotN(this, ...)` dispatch here; it is real. This does
  * NOT extend to the REST of the unit's globals: no other classtable.py hit
  * exists in this window, so the "low-level control-word staging" read below
- * may still hold for whatever is not `D_8006D940`/`PlacementGridMethods`-shaped.
+ * may still hold for whatever is not `gPlacementGridMethods`/`PlacementGridMethods`-shaped.
  *
  * Declarations: keep anything that encodes THIS unit's reading of the region
  * next to the code, in this file. Do NOT create a shared code_179d8*.h --
@@ -174,7 +174,7 @@ s32 PlacementGrid__ResolveEntry(PlacementGrid *self, PlacementGridPlacement *pla
 }
 
 PlacementGridMethods *GetPlacementGridMethods(void) {
-    return &D_8006D940;
+    return &gPlacementGridMethods;
 }
 
 s32 func_8002C3B8(void) {

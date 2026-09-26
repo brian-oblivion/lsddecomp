@@ -34,7 +34,7 @@ table `PlacementGrid__Finalize` uses.
 ## Naming (round 77, charlie -- track 3)
 
 Renamed `func_8002C238 -> PlacementGrid__SetFlag`, tier B (mechanics, not
-purpose). Occupies `+0x064` of `D_8006D940` -- the exact slot
+purpose). Occupies `+0x064` of `gPlacementGridMethods` -- the exact slot
 `FileResource__SetFlag` fills in the base class (`tools/classtable.py
 0x8006D430`) and its own verbatim-shared copy in `gCdDriverMethods`
 (`tools/classtable.py 0x8006D4E8`). Named by SLOT POSITION, not by
