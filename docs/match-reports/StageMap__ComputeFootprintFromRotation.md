@@ -765,3 +765,18 @@ new `ChunkNeighbourDelta` for `sChunkNeighbourDeltas` (was typed as the
 3-word placeholder). renametype.py also rewrote the old names inside
 earlier sections' history prose in this and sibling reports (known, pending
 an operator decision; not hand-reverted).
+
+## Round 94 (track 6, charlie): the template is Sony's MATRIX
+
+`QueryTemplate866E8` was libgte's `MATRIX` offset for offset: `short m[3][3]`
+(18 bytes, padded to 0x14), then `long t[3]` at +0x014/+0x018/+0x01C. The
+function copies `D_8008E98C`, zeroes `t[0]`/`t[1]`, sets `t[2]` to
+`gridSpan`, lets `RotMatrix` fill `m` from the target's rotation, then
+`ApplyMatrixLV(&mat, t, t)` rotates (0, 0, gridSpan) in place (retail passes
+`$a1` and `$a2` both as `sp+0x54`, i.e. `&mat.t`). The type is deleted; the
+local is `MATRIX mat`, `unk14`/`unk18`/`unk1C` are `t[0]`/`t[1]`/`t[2]`, and
+the two libgte prototypes come from `<libgte.h>`, which class_3bb8c_b.c now
+includes (the header's own `void RotMatrix(void *, QueryTemplate866E8 *)` and
+`void ApplyMatrixLV(QueryTemplate866E8 *, s32 *, s32 *)` re-declarations are
+gone). `extern MATRIX D_8008E98C;` moved into class_3bb8c_b.c, its only
+reader. Byte-exact, zero bytes changed.

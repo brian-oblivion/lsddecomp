@@ -14,7 +14,6 @@
  * read through casts.
  */
 typedef struct Unk14Obj Unk14Obj;
-typedef struct QueryTemplate866E8 QueryTemplate866E8;
 
 /* The rectangle StageMap__InitFootprintSlot copies into rects[key] before
  * setting its element: no element (-1), the whole 20 x 20 cells from (0, 0). */
@@ -77,33 +76,6 @@ struct Unk14Obj {
         u16 h;
     } unk20; /* +0x020, tz */
 };
-
-/*
- * Template struct copied wholesale by StageMap__ComputeFootprintFromRotation from the constant
- * global `D_8008E98C` into a stack-local descriptor, then partially
- * overwritten (`unk14`/`unk18` zeroed, `unk1C` set from `self->gridSpan`)
- * before being handed to two uncarved library helpers
- * (`RotMatrix`/`ApplyMatrixLV`) as an in/out parameter block. Field
- * meaning beyond "8 words, offsets 0x00-0x1C" is unestablished; the first
- * five words are read/written only as the opaque whole-struct copy.
- */
-struct QueryTemplate866E8 {
-    s32 unk0[5]; /* +0x000..+0x010, opaque (untouched by StageMap__ComputeFootprintFromRotation) */
-    s32 unk14; /* +0x014, StageMap__ComputeFootprintFromRotation: zeroed before the call, then an in/out arg to ApplyMatrixLV */
-    s32 unk18; /* +0x018, StageMap__ComputeFootprintFromRotation: zeroed before the call */
-    s32 unk1C; /* +0x01C, StageMap__ComputeFootprintFromRotation: set to self->gridSpan before the call */
-};
-
-extern QueryTemplate866E8 D_8008E98C;
-
-/* Library helpers (StageMap__ComputeFootprintFromRotation's only call
- * site). `RotMatrix`'s first argument is the target's coord2->param->rotate.
- * `ApplyMatrixLV` is called with its 2nd and 3rd arguments pointing at the
- * SAME address (`&desc.unk14` passed twice) -- confirmed against the raw
- * disassembly (`$a1`/`$a2` both `sp+0x54`). */
-extern void RotMatrix(void *arg0, QueryTemplate866E8 *arg1);
-extern void ApplyMatrixLV(QueryTemplate866E8 *arg0, s32 *arg1,
-                          s32 *arg2); /* arity-ok: this IS the callee's real signature (Sony libgte, 0x80015618 reads $a0 matrix / $a1 in / $a2 out); include/code_d294.h's unprototyped copy is round 19's deliberate frame-sizing shape, not a claim about arity */
 
 /* The four scale steps (Ratio16[3], x/y/z) startScaleRamp picks for
  * `scaleStep`: y +1/64, +1/4 (rate > 0; flag 0, nonzero), -1/64, -1/4
