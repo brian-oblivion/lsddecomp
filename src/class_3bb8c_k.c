@@ -460,7 +460,7 @@ void ObjM__ObjM(ObjM_3bb8c_k *self, SubObjB *arg1, s32 arg2, s32 arg3, s32 arg4,
     self->methods->slot40(self);
 }
 
-void ObjM__Dtor(Obj865C8 *self)
+void ObjM__Dtor(ObjM_3bb8c_k *self)
 {
     GetClass86668Methods()->finalize((Class86668 *)self);
 }
