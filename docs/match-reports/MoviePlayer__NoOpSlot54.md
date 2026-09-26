@@ -11,7 +11,7 @@ deletions, no out-of-range drift. Fresh ground (carved revision 18, no prior rep
 
 Empty method (`jr ra; nop`).
 
-Table slot (`tools/classtable.py`): `D_8006F614` +0x054.
+Table slot (`tools/classtable.py`): `gMoviePlayerMethods` +0x054.
 
 ## Source
 
@@ -29,3 +29,7 @@ void MoviePlayer__NoOpSlot54(void) {
 ## Naming
 
 - **MoviePlayer__NoOpSlot54**, tier C. Empty override of slot +0x054; no further evidence of intended behaviour.
+
+## Track 4 (2026-09-26, round 89)
+
+Class unified in `include/MoviePlayer.h` (id 0x70, table `gMoviePlayerMethods`, was `D_8006F614`; a direct BasicClass subclass, 0x6C bytes). The unit-local views in `src/code_33808.c` are gone; nothing in this body changed. Byte-identical; `typeviews.py --warnings` 0 new.

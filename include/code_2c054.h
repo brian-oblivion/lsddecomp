@@ -5,6 +5,7 @@
 #include "TaskCore.h"
 #include "StreamTask.h"
 #include "Viewport.h"
+#include "MoviePlayer.h"
 
 /*
  * code_2c054: the whole of StreamTask (class id 0x1130, gStreamTaskMethods;
@@ -14,8 +15,6 @@
  * unit's views of the objects both classes hold from classes with no header
  * yet, and the data and allocators only this unit reaches.
  */
-typedef struct StreamTaskUnkB4Obj StreamTaskUnkB4Obj;
-typedef struct StreamTaskUnkB4Methods StreamTaskUnkB4Methods;
 typedef struct TaskTextObj TaskTextObj;
 typedef struct TaskTextMethods TaskTextMethods;
 
@@ -36,37 +35,6 @@ extern u8 D_8006E860[];
 extern u8 gDefaultStreamTaskInitData[];
 extern Vec3_d294 D_8006E86C;
 
-/* StreamTask::player's class, MoviePlayer (New_MoviePlayer, D_8006F614:
- * +0x040 Play, +0x048 Advance, +0x04C Abort, +0x06C SetResult), as
- * StreamTask__Finalize, __OnInit, __Update, __SetState and
- * __RefreshViewValue call it; StreamTask.h types the field `BasicClass *`
- * and they cast. Until round 84 it also stood for TaskCore's
- * sound/subHandle/tileMap/tileAtlas (only their +0x004 release is ever
- * called). The BgLayer (TaskCore::bgLayer,
- * include/BgLayer.h since round 88) is not this class: its +0x04C
- * (Class6B5CC's attachToParent) takes three arguments where this class's
- * takes one. */
-struct StreamTaskUnkB4Methods {
-    u8 pad00[0x04];
-    void (*slot04)(StreamTaskUnkB4Obj *self); /* +0x004 */
-    u8 pad08[0x040 - 0x008];
-    s32 (*slot40)(StreamTaskUnkB4Obj *self, s32 a1, s32 a2, s32 a3, s32 a4); /* +0x040,
-                                        StreamTask__OnInit's forward target; return tested
-                                        directly (not stored) there */
-    u8 pad44[0x048 - 0x044];
-    s32 (*slot48)(StreamTaskUnkB4Obj *self); /* +0x048, StreamTask__Update's forward target;
-                                        return stored into StreamTask::playDone there */
-    void (*slot4C)(StreamTaskUnkB4Obj *self); /* +0x04C, StreamTask__RefreshViewValue's forward target;
-                                        1 argument -- see the struct comment for why this
-                                        is NOT the same slot as BgLayer's attachToParent */
-    u8 pad50[0x06C - 0x050];
-    void (*slot6C)(StreamTaskUnkB4Obj *self, s32 a1); /* +0x06C, StreamTask__OnInit's forward target */
-};
-
-struct StreamTaskUnkB4Obj {
-    StreamTaskUnkB4Methods *methods; /* +0x000 */
-};
-
 /* initArgs->unk0's class (IntermediateBaseInitArgs, BasicClass * there) as
  * TaskCore__OnInit/OnDeinit call its +0x078 with baseColor or unk93. */
 struct TaskTextMethods {
@@ -86,13 +54,10 @@ struct TaskTextObj {
 
 /* The viewport (TaskCore::viewport, `BasicClass *` in IntermediateBase.h) is a
  * Viewport: TaskCore__OnInit/OnDeinit cast it to include/Viewport.h's type.
- * Its local view here (StreamTaskUnk18Obj) was merged there in round 85. */
+ * Its local view here (StreamTaskUnk18Obj) was merged there in round 85.
+ * StreamTask::player (`BasicClass *` in StreamTask.h) is a MoviePlayer:
+ * code_2c054.c's PLAYER() casts it to include/MoviePlayer.h's type. Its local
+ * view here (StreamTaskUnkB4Obj) was merged there in round 89. */
 
-
-/* Allocates StreamTask::player (a StreamTaskUnkB4Obj); called by
- * StreamTask__StreamTask as `New_MoviePlayer(GetDefaultStreamTaskInitData(), 0, 0)`. Not this unit's
- * own function (no INCLUDE_ASM here), so only the call site's own argument
- * and return types are modeled. */
-extern StreamTaskUnkB4Obj *New_MoviePlayer(StreamTaskInitData *a0, s32 a1, s32 a2);
 
 #endif

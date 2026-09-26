@@ -37,3 +37,7 @@ void MoviePlayer__MarkPlaying(Obj33808_50 *self) {
 ## Naming
 
 - **MoviePlayer__MarkPlaying**, tier A. Sets the tri-state play flag (+0x50 in the movie-player's own struct) to 1; called from Play.
+
+## Track 4 (2026-09-26, round 89)
+
+Class unified in `include/MoviePlayer.h` (id 0x70, table `gMoviePlayerMethods`, was `D_8006F614`; a direct BasicClass subclass, 0x6C bytes). The unit-local views in `src/code_33808.c` are gone; Obj33808_50 is gone; its "class not yet identified" was MoviePlayer (Play is the one caller). `unk50` kept (1 here, -1 in MarkStopped; Advance reads it). Byte-identical; `typeviews.py --warnings` 0 new.

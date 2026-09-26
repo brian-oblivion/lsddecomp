@@ -11,7 +11,7 @@ drift. Fresh ground (carved revision 18, no prior report).
 
 Per-frame step of the MDEC movie player, active only when `self` is the object in gActiveMoviePlayer: when a finished frame is pending (+0x44) it tail-returns its own +0x064; otherwise, when a frame is running (+0x40) it waits for the last strip (MoviePlayer__WaitFrameReady spins on +0x4C), clears +0x4C, DrawSyncs when +0x34 is under 0x80, feeds the bitstream at +0x14[+0x3C] to DecDCTin (mode 2) and the first strip buffer (+0x1C, +0x38 words) to DecDCTout; then stores (own +0x058 returned 0) at +0x40 and returns 0. When not the active object it falls off the end (no return value set).
 
-Table slot (`tools/classtable.py`): D_8006F614 +0x068.
+Table slot (`tools/classtable.py`): gMoviePlayerMethods +0x068.
 
 ## Source
 
@@ -21,7 +21,7 @@ fields +0x2C..+0x38), `Ctor33808`, `CountedBuf33808` and `Req44858` sit at the
 top of / earlier in `src/code_33808.c`.
 
 ```c
-/* D_8006F614 +0x068: when this is the object in gActiveMoviePlayer -- with a
+/* gMoviePlayerMethods +0x068: when this is the object in gActiveMoviePlayer -- with a
  * finished frame pending (+0x44) run its own +0x064 and return that;
  * otherwise, when a frame is going (+0x40), wait for its last strip (+0x4C),
  * clear the flag, DrawSync when +0x34 is under 0x80, and feed the next
@@ -81,3 +81,7 @@ Second build. The first shape, `if (cur->unk44 != 0) return slot64(cur);` ahead 
 ## Naming
 
 - **MoviePlayer__DecodeFrame**, tier A. Slot +0x068: when a frame finished pending, runs PollActive's own result; otherwise waits for the last strip, decodes the next frame's bitstream and its first strip.
+
+## Track 4 (2026-09-26, round 89)
+
+Class unified in `include/MoviePlayer.h` (id 0x70, table `gMoviePlayerMethods`, was `D_8006F614`; a direct BasicClass subclass, 0x6C bytes). The unit-local views in `src/code_33808.c` are gone; Obj45CFC/Methods45CFC are gone; +0x058 is `pullFrame`, +0x064 `pollActive`, `unk40`/`unk44`/`unk4C` are `haveFrame`/`finished`/`frameDone`, `unk34` is `stripRect.h`. Byte-identical; `typeviews.py --warnings` 0 new.

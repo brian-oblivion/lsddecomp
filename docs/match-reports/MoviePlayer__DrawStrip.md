@@ -9,9 +9,9 @@ drift. Fresh ground (carved revision 18, no prior report).
 
 ## What it does
 
-Uploads the strip buffer at +0x1C into the rectangle at +0x2C through the DrawSystem singleton's +0x058 (LoadImage per bravo's round-82 DrawSystem naming), advances rect.x by rect.w; while rect.x is still below +0x20 + +0x24, decodes the next strip (DecDCTout(+0x1C, +0x38), preceded by DrawSync(0) when +0x34 < 0x80); otherwise sets +0x4C = 1, rewinds the rectangle to (+0x20, +0x22), and sets +0x44 when +0x48 is set. The MDEC movie-strip pump of D_8006F614.
+Uploads the strip buffer at +0x1C into the rectangle at +0x2C through the DrawSystem singleton's +0x058 (LoadImage per bravo's round-82 DrawSystem naming), advances rect.x by rect.w; while rect.x is still below +0x20 + +0x24, decodes the next strip (DecDCTout(+0x1C, +0x38), preceded by DrawSync(0) when +0x34 < 0x80); otherwise sets +0x4C = 1, rewinds the rectangle to (+0x20, +0x22), and sets +0x44 when +0x48 is set. The MDEC movie-strip pump of gMoviePlayerMethods.
 
-Table slot (`tools/classtable.py`): D_8006F614 +0x060.
+Table slot (`tools/classtable.py`): gMoviePlayerMethods +0x060.
 
 ## Source
 
@@ -85,3 +85,7 @@ First build. DrawSystem is reached through a per-function methods view (the type
 ## Track 4 (2026-09-26, round 87, bravo)
 
 The local view of the DrawSystem singleton quoted above is gone; the unit takes DrawSystem, its method table and GetDrawSystem from `include/DrawSystem.h` (D_8006C070 unified). Byte-identical.
+
+## Track 4 (2026-09-26, round 89)
+
+Class unified in `include/MoviePlayer.h` (id 0x70, table `gMoviePlayerMethods`, was `D_8006F614`; a direct BasicClass subclass, 0x6C bytes). The unit-local views in `src/code_33808.c` are gone; Obj45BC8 and Rect45BC8 are gone. `rect` is `stripRect`, a DrawRect with an s32 w: retail's `lhu +0x030` is cc1 narrowing the load of that word, measured by building this view with `s32 w` byte-identical before the merge. `x0`/`y0`/`width` are `frame.x`/`frame.y`/`frame.w`, `unk34` is `stripRect.h` (the frame height), `unk4C`/`unk48`/`unk44` are `frameDone`/`streamEnded`/`finished`. Byte-identical; `typeviews.py --warnings` 0 new.

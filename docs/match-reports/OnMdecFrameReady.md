@@ -41,3 +41,7 @@ void OnMdecFrameReady(void) {
 ## Naming
 
 - **OnMdecFrameReady**, tier A. The DecDCToutCallback target: forwards to the active movie's own slot60 when there is one.
+
+## Track 4 (2026-09-26, round 89)
+
+Class unified in `include/MoviePlayer.h` (id 0x70, table `gMoviePlayerMethods`, was `D_8006F614`; a direct BasicClass subclass, 0x6C bytes). The unit-local views in `src/code_33808.c` are gone; `gActiveMoviePlayer` is a `MoviePlayer *`, so the call is `gActiveMoviePlayer->methods->drawStrip(gActiveMoviePlayer)` with no function-pointer cast. Byte-identical; `typeviews.py --warnings` 0 new.

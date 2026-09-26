@@ -11,7 +11,7 @@ drift. Fresh ground (carved revision 18, no prior report).
 
 Only when self is the object held in the global gActiveMoviePlayer: zero +0x3C/+0x40/+0x44/+0x48, set +0x4C = 1, call the +0x60 object's slot +0x07C with (obj, MoviePlayer__MarkStopped, self) -- MoviePlayer__MarkStopped sets +0x50 = -1, so it is a completion callback --, clear +0x64, then call the +0x60 object's slot +0x058 with it alone. This is the slot +0x044 that MoviePlayer__PollActive calls every ~100 polls.
 
-Table slot (`tools/classtable.py`): D_8006F614 +0x044.
+Table slot (`tools/classtable.py`): gMoviePlayerMethods +0x044.
 
 ## Source
 
@@ -75,3 +75,7 @@ First build. Written through a local copy of the global (`cur`) -- retail keeps 
 ## Track 4 (2026-09-26, round 87)
 
 The +0x060 object is a CdStream (include/CdStream.h, unified this round). `Sub458B8`/`Methods458B8` are deleted; `unk60` is `CdStream *`; slot58 is `restart`, slot7C stays `slot7C` (empty occupant, typed from this call's arguments). MoviePlayer's own view and field names are unchanged. Zero bytes changed.
+
+## Track 4 (2026-09-26, round 89)
+
+Class unified in `include/MoviePlayer.h` (id 0x70, table `gMoviePlayerMethods`, was `D_8006F614`; a direct BasicClass subclass, 0x6C bytes). The unit-local views in `src/code_33808.c` are gone; Obj458B8 is gone; `cur` is a `MoviePlayer *` straight from `gActiveMoviePlayer` (now declared `MoviePlayer *`, was the unit's DataSrc33808 view). `unk64` -> `started`. Byte-identical; `typeviews.py --warnings` 0 new.

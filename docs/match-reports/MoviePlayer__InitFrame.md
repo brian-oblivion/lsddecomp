@@ -11,7 +11,7 @@ drift. Fresh ground (carved revision 18, no prior report).
 
 Set up the MDEC player's buffers and frame: store `external` at +0x0C; unless external, zero +0x1C/+0x18/+0x14/+0x10, then allocate the two decode buffers (w * h * 2 + 0x1000 each) at +0x14/+0x18, the 0x12000 stream ring at +0x10 and the h * 32 strip buffer at +0x1C, any failure going to MoviePlayer__FreeFrameBuffers (free them) and return 1. Then copy the 12-byte frame descriptor {s16 x, y; s32 w, h} to +0x2C and from there to +0x20, set the strip width (+0x30) to 16 and +0x38 = (h << 4) >> 1 (the strip's size in words, the DecDCTout size MoviePlayer__DrawStrip uses). 0.
 
-Table slot (`tools/classtable.py`): not in any method table (called by the D_8006F614 ctor MoviePlayer__MoviePlayer).
+Table slot (`tools/classtable.py`): not in any method table (called by the gMoviePlayerMethods ctor MoviePlayer__MoviePlayer).
 
 ## Source
 
@@ -87,3 +87,7 @@ Second build. The first build was byte-identical except the frame (0x20 against 
 ## Naming
 
 - **MoviePlayer__InitFrame**, tier A. Sets up the frame descriptor and, unless the caller supplies its own buffers, allocates the two decode buffers, the ring buffer and the strip buffer.
+
+## Track 4 (2026-09-26, round 89)
+
+Class unified in `include/MoviePlayer.h` (id 0x70, table `gMoviePlayerMethods`, was `D_8006F614`; a direct BasicClass subclass, 0x6C bytes). The unit-local views in `src/code_33808.c` are gone; Obj4564C and Frame4564C are gone: Frame4564C was DrawSystem.h's DrawRect, `cur` is `stripRect` and `frame` stays `frame`. The `--merge` CONFLICT at +0x02C (DrawRect here, all-s16 Rect45BC8 in DrawStrip) is settled by this function's `sw` of w = 16 and the 12-byte whole-struct copy: DrawRect. Byte-identical; `typeviews.py --warnings` 0 new.

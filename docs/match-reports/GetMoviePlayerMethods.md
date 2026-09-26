@@ -9,17 +9,17 @@ deletions, no out-of-range drift. Fresh ground (carved revision 18, no prior rep
 
 ## What it does
 
-Table getter: returns the method table `D_8006F614` (`lui/addiu; jr; nop`), declared locally as `extern s32 D_8006F614[];`.
+Table getter: returns the method table `gMoviePlayerMethods` (`lui/addiu; jr; nop`), declared locally as `extern s32 gMoviePlayerMethods[];`.
 
 Table slot (`tools/classtable.py`): none: no data word references it (reached some other way).
 
 ## Source
 
 ```c
-extern s32 D_8006F614[];
+extern s32 gMoviePlayerMethods[];
 
 void *GetMoviePlayerMethods(void) {
-    return D_8006F614;
+    return gMoviePlayerMethods;
 }
 ```
 
@@ -31,3 +31,7 @@ void *GetMoviePlayerMethods(void) {
 ## Naming
 
 - **GetMoviePlayerMethods**, tier A. Table getter.
+
+## Track 4 (2026-09-26, round 89)
+
+Class unified in `include/MoviePlayer.h` (id 0x70, table `gMoviePlayerMethods`, was `D_8006F614`; a direct BasicClass subclass, 0x6C bytes). The unit-local views in `src/code_33808.c` are gone; it returns `MoviePlayerMethods *` (`&gMoviePlayerMethods`; the local `extern s32 gMoviePlayerMethods[]` is gone). Byte-identical; `typeviews.py --warnings` 0 new.

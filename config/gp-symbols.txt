@@ -169,7 +169,7 @@ gMcDevicePath0
 gMcDevicePath1
 gMdecInitialized
 gMemcardIconTemplate
-gMovieFrameRect
+gMovieClearColor
 gMoviePollCounter
 gNameCharTable
 gOpenVabCount

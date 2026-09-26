@@ -30,3 +30,7 @@ void MoviePlayer__MarkStopped(Obj33808_50 *self) {
 ## Naming
 
 - **MoviePlayer__MarkStopped**, tier A. Sets the tri-state play flag to -1; called from Stop.
+
+## Track 4 (2026-09-26, round 89)
+
+Class unified in `include/MoviePlayer.h` (id 0x70, table `gMoviePlayerMethods`, was `D_8006F614`; a direct BasicClass subclass, 0x6C bytes). The unit-local views in `src/code_33808.c` are gone; Obj33808_50 is gone (see MarkPlaying). Stop passes this function and the player to CdStream's slot7C. Byte-identical; `typeviews.py --warnings` 0 new.

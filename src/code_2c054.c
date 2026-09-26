@@ -5,7 +5,8 @@
 #include "TileMap.h"
 #include "TileAtlas.h"
 
-#define PLAYER(self) ((StreamTaskUnkB4Obj *)(self)->player)
+/* StreamTask.h types `player` BasicClass *; it holds a MoviePlayer. */
+#define PLAYER(self) ((MoviePlayer *)(self)->player)
 
 StreamTask *New_StreamTask(TaskCoreTarget *target, char *soundBankPath, BasicClass *sound, StreamTaskInitData *initData)
 {
@@ -27,13 +28,13 @@ void StreamTask__StreamTask(StreamTask *self, TaskCoreTarget *target, char *soun
     } else {
         self->initData = *GetDefaultStreamTaskInitData();
     }
-    self->player = (BasicClass *)New_MoviePlayer(GetDefaultStreamTaskInitData(), 0, 0);
+    self->player = (BasicClass *)New_MoviePlayer((DrawRect *)GetDefaultStreamTaskInitData(), 0, 0);
     self->streamName = 0;
     self->methods->resetCounters(self);
 }
 
 void StreamTask__Finalize(StreamTask *self) {
-    PLAYER(self)->methods->slot04(PLAYER(self));
+    PLAYER(self)->methods->release(PLAYER(self));
     Get_vtable_TaskCore()->finalize((TaskCore *)self);
 }
 
@@ -57,8 +58,8 @@ void StreamTask__OnInit(StreamTask *self) {
      * takes self alone, and this up-call passes nothing else. */
     ((void (*)(TaskCore *))Get_vtable_TaskCore()->onInit)((TaskCore *)self);
     self->playDone = 0;
-    PLAYER(self)->methods->slot6C(PLAYER(self), self->autoPlay);
-    if (PLAYER(self)->methods->slot40(PLAYER(self), self->streamName, self->streamGroup, self->unkC4, self->loopCount) != 0) {
+    PLAYER(self)->methods->setAutoPlay(PLAYER(self), self->autoPlay);
+    if (PLAYER(self)->methods->play(PLAYER(self), (char *)self->streamName, self->streamGroup, self->unkC4, self->loopCount) != 0) {
         self->methods->setFrameBound(self, 0);
     }
 }
@@ -68,7 +69,7 @@ void StreamTask__Update(StreamTask *self, BasicClass *sender, s32 event) {
     if (self->playDone != 0) {
         return;
     }
-    self->playDone = PLAYER(self)->methods->slot48(PLAYER(self));
+    self->playDone = PLAYER(self)->methods->advance(PLAYER(self));
     if (self->playDone == 0) {
         return;
     }
@@ -89,7 +90,7 @@ void StreamTask__SetState(StreamTask *self, s32 state) {
         break;
     case 8:
         if (self->abortBeforeFade == 0) {
-            PLAYER(self)->methods->slot4C(PLAYER(self));
+            PLAYER(self)->methods->abort(PLAYER(self));
         }
         break;
     case 0x12:
@@ -129,7 +130,7 @@ void StreamTask__NoOpSlot8C(void) {
 
 void StreamTask__RefreshViewValue(StreamTask *self) {
     if (self->abortBeforeFade != 0) {
-        PLAYER(self)->methods->slot4C(PLAYER(self));
+        PLAYER(self)->methods->abort(PLAYER(self));
     } else {
         self->methods->setState(self, 7);
     }

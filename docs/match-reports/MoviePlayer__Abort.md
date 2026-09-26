@@ -11,7 +11,7 @@ drift. Fresh ground (carved revision 18, no prior report).
 
 Only when self is the object in gActiveMoviePlayer: set +0x48 = 1, clear +0x54, call the +0x60 object's +0x048 with it, set +0x44 = 1; then, if +0x64 is clear, call the +0x60 object's +0x07C with (obj, 0, 0) (clearing the callback MoviePlayer__Stop installed), set +0x64 = 1 and +0x44 = 1 again.
 
-Table slot (`tools/classtable.py`): D_8006F614 +0x04C.
+Table slot (`tools/classtable.py`): gMoviePlayerMethods +0x04C.
 
 ## Source
 
@@ -48,7 +48,7 @@ typedef struct Obj458B8 {
     /* +0x064 */ s32 unk64;
 } Obj458B8;
 
-/* D_8006F614 +0x04C: when this is the object in gActiveMoviePlayer, set +0x48,
+/* gMoviePlayerMethods +0x04C: when this is the object in gActiveMoviePlayer, set +0x48,
  * clear +0x54, call the +0x60 object's +0x048, set +0x44, and the first
  * time (+0x64 clear) clear that object's +0x07C callback and set +0x64. */
 void MoviePlayer__Abort(Obj458B8 *self) {
@@ -79,3 +79,7 @@ First build. The same through-the-global shape as MoviePlayer__Stop (a local `cu
 ## Track 4 (2026-09-26, round 87)
 
 The +0x060 object is a CdStream (include/CdStream.h, unified this round). `Sub458B8`/`Methods458B8` are deleted; `unk60` is `CdStream *`; slot48 is `close`, slot7C stays `slot7C`. MoviePlayer's own view and field names are unchanged. Zero bytes changed.
+
+## Track 4 (2026-09-26, round 89)
+
+Class unified in `include/MoviePlayer.h` (id 0x70, table `gMoviePlayerMethods`, was `D_8006F614`; a direct BasicClass subclass, 0x6C bytes). The unit-local views in `src/code_33808.c` are gone; Obj458B8 is gone; `unk48` -> `streamEnded`, `unk44` -> `finished`, `unk64` -> `started`. Byte-identical; `typeviews.py --warnings` 0 new.

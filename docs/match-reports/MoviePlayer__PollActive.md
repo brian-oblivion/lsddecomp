@@ -11,7 +11,7 @@ drift. Fresh ground (carved revision 18, no prior report).
 
 If +0x54 is set: post-increments the global gMoviePollCounter and, when its old value was over 100, resets it to 1 and calls slot +0x044 with self; returns 0. Otherwise clears gActiveMoviePlayer and returns 1.
 
-Table slot (`tools/classtable.py`): D_8006F614 +0x064.
+Table slot (`tools/classtable.py`): gMoviePlayerMethods +0x064.
 
 ## Source
 
@@ -20,7 +20,7 @@ The unit-local view `DataSrc33808` (a Class6D430 subclass built with the unified
 fields +0x2C..+0x38) and `CountedBuf33808` sit at the top of `src/code_33808.c`.
 
 ```c
-/* D_8006F614 +0x064: while +0x54 is set, count calls in gMoviePollCounter and
+/* gMoviePlayerMethods +0x064: while +0x54 is set, count calls in gMoviePollCounter and
  * once the count before the increment passes 100, resets it to 1 and calls
  * slot +0x044; returns 0. Otherwise
  * clears gActiveMoviePlayer and returns 1. */
@@ -71,3 +71,7 @@ with `f(self)`, so when one form misses, flip it before anything else.
 ## Naming
 
 - **MoviePlayer__PollActive**, tier A. Slot +0x064: while the stream is still running, throttles a periodic callback (slot44) every 100 ticks; otherwise clears the active-movie global and reports done.
+
+## Track 4 (2026-09-26, round 89)
+
+Class unified in `include/MoviePlayer.h` (id 0x70, table `gMoviePlayerMethods`, was `D_8006F614`; a direct BasicClass subclass, 0x6C bytes). The unit-local views in `src/code_33808.c` are gone; Obj45C94/Methods45C94 are gone; the +0x044 call is `stop`. Byte-identical; `typeviews.py --warnings` 0 new.

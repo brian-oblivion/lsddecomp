@@ -12,14 +12,15 @@
  *
  * The name is the table's stem with its `Obj` dropped (track 4 step 2);
  * include/Class6D3C8.h's view already called it StreamTask. What it does,
- * measured: it owns a MoviePlayer (`player`, New_MoviePlayer, D_8006F614)
+ * measured: it owns a MoviePlayer (`player`, New_MoviePlayer, gMoviePlayerMethods)
  * and runs one "ETC\*.STR" stream through it inside TaskCore's fade/state
  * machine. Every caller is code_1677c's Class6D3C8 (intro logo, weekly,
  * GraphRoom and cinematic streams): New_StreamTask(NULL, NULL, NULL, NULL),
  * optionally setFrameBound / setSkipOnConfirm(0), then init with the stream,
- * then release. The player's slots as this class calls them (code_2c054.h's
- * StreamTaskUnkB4Obj view): +0x040 MoviePlayer__Play, +0x048 __Advance,
- * +0x04C __Abort, +0x06C __SetResult.
+ * then release. The player's slots as this class calls them
+ * (include/MoviePlayer.h; code_2c054.c's PLAYER() casts `player` to it):
+ * +0x040 play, +0x048 advance, +0x04C abort, +0x06C setAutoPlay, and
+ * +0x004 release.
  *
  * Overrides, each named for its slot:
  *   +0x008 ctor           StreamTask__StreamTask: TaskCore's ctor, this
@@ -35,7 +36,7 @@
  *                         autoPlay): stores the three, then TaskCore's
  *                         init(args, 0). See StreamTaskInitFn below.
  *   +0x04C onInit         StreamTask__OnInit: TaskCore's, playDone 0, the
- *                         player's SetResult(autoPlay) and Play(streamName,
+ *                         player's setAutoPlay(autoPlay) and Play(streamName,
  *                         streamGroup, unkC4, loopCount); a nonzero Play is
  *                         setFrameBound(0).
  *   +0x05C update         StreamTask__Update: TaskCore's; until playDone,
@@ -106,7 +107,7 @@ struct StreamTask {
     /* +0x0B4 */ BasicClass *player;    /* New_MoviePlayer(GetDefaultStreamTaskInitData(), 0, 0); finalize releases it */
     /* +0x0B8 */ s32 streamName;        /* Init's; the player's Play name. ctor: 0 */
     /* +0x0BC */ s32 streamGroup;       /* Init's (GetStreamGroupForType, or -1); Play's second argument */
-    /* +0x0C0 */ s32 autoPlay;          /* Init's (every caller 1); the player's SetResult, its +0x068, which Play tests to MarkPlaying at once */
+    /* +0x0C0 */ s32 autoPlay;          /* Init's (every caller 1); the player's setAutoPlay (MoviePlayer::autoPlay, +0x068), which Play tests to MarkPlaying at once */
     /* +0x0C4 */ s32 unkC4;             /* setUnkC4; reset 0; Play's third argument (the player's +0x054) */
     /* +0x0C8 */ s32 loopCount;         /* setLoopCount; reset -1; Play's fourth argument, the player's `loops` (MoviePlayer__Advance) */
     /* +0x0CC */ s32 skipOnConfirm;     /* setSkipOnConfirm; reset 1; OnPadConfirm: nonzero ends the task with result 2 */

@@ -9,9 +9,9 @@ drift. Fresh ground (carved revision 18, no prior report).
 
 ## What it does
 
-Constructor of the MDEC movie player: BasicClass's ctor, install D_8006F614, open a CD stream object with New_CdStream(arg2, 15, 0) into +0x60, then MoviePlayer__InitFrame(self, arg1, arg3) sets up the decode buffers. Returns 1 if either fails. Otherwise DecDCTReset(0) the first time any player is built (gMdecInitialized latch), set the DecDCTout callback to OnMdecFrameReady, hand the stream the ring buffer at +0x10 with size 0x12000 (its +0x040), clear +0x50, call its own +0x06C with 1 (MoviePlayer__SetResult stores it at +0x68) and return 0.
+Constructor of the MDEC movie player: BasicClass's ctor, install gMoviePlayerMethods, open a CD stream object with New_CdStream(arg2, 15, 0) into +0x60, then MoviePlayer__InitFrame(self, arg1, arg3) sets up the decode buffers. Returns 1 if either fails. Otherwise DecDCTReset(0) the first time any player is built (gMdecInitialized latch), set the DecDCTout callback to OnMdecFrameReady, hand the stream the ring buffer at +0x10 with size 0x12000 (its +0x040), clear +0x50, call its own +0x06C with 1 (MoviePlayer__SetAutoPlay stores it at +0x68) and return 0.
 
-Table slot (`tools/classtable.py`): D_8006F614 +0x008 (its allocator New_MoviePlayer treats 0 as success).
+Table slot (`tools/classtable.py`): gMoviePlayerMethods +0x008 (its allocator New_MoviePlayer treats 0 as success).
 
 ## Source
 
@@ -21,7 +21,7 @@ fields +0x2C..+0x38), `Ctor33808`, `CountedBuf33808` and `Req44858` sit at the
 top of / earlier in `src/code_33808.c`.
 
 ```c
-/* D_8006F614 +0x008: constructor -- BasicClass's, then this table; open a
+/* gMoviePlayerMethods +0x008: constructor -- BasicClass's, then this table; open a
  * CD stream object (New_CdStream(arg2, 15, 0)) at +0x60 and set up the
  * decode buffers (MoviePlayer__InitFrame); 1 when either fails. Then reset the MDEC
  * the first time any player is built (gMdecInitialized), route its output
@@ -90,3 +90,7 @@ First build, written straight away in the nested success-path shape (`if (stream
 ## Track 4 (2026-09-26, round 87)
 
 The +0x060 object is a CdStream (include/CdStream.h, unified this round). `Stream454C4`/`StreamMethods454C4` and the local New_CdStream extern are deleted; +0x060 `stream` is `CdStream *` and slot40 is `setRing`. MoviePlayer's own view and field names are unchanged. Zero bytes changed.
+
+## Track 4 (2026-09-26, round 89)
+
+Class unified in `include/MoviePlayer.h` (id 0x70, table `gMoviePlayerMethods`, was `D_8006F614`; a direct BasicClass subclass, 0x6C bytes). The unit-local views in `src/code_33808.c` are gone; it takes `(MoviePlayer *self, DrawRect *frame, s32 speed, s32 external)` (BASICCLASS_SLOTS_R with an `s32` return: 0 success, 1 failure). `unk60` -> `stream`, `ring`, `unk50`; the +0x06C call is `setAutoPlay(self, 1)`. Byte-identical; `typeviews.py --warnings` 0 new.
