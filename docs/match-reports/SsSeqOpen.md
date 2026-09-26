@@ -13,7 +13,7 @@ segment.
 - **Position**: after placed `libsnd/vol` (3.3, ends `0x8003a670`), before
   placed `libsnd/ssplay` (3.3, starts `0x8003aa68`) -- both `libsnd`
   objects, consistent with a `libsnd` module in between.
-- **Header**: `include/psyq/LIBSND.H`:
+- **Header**: `include/psyq/libsnd.h`:
   `extern short SsSeqOpen (unsigned long*, short);`
 
 No C call site; no extern needed. Renamed with `tools/rename.py`.

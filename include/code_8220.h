@@ -141,7 +141,7 @@ extern s32 TransformAndCullPoly(void *arg0, void *arg1);
 extern void UpdatePolyBBoxAndCull(void *ctx, s32 count);
 
 /* Round 13: this unit's own minimal, local view of the Psy-Q GPU primitive
- * tag word -- the same shape as `P_TAG` in include/psyq/LIBGPU.H, declared
+ * tag word -- the same shape as `P_TAG` in include/psyq/libgpu.h, declared
  * locally because that SDK header does not compile standalone under this
  * toolchain (it needs the LIBGTE/RECT chain) and no unit includes it yet.
  *

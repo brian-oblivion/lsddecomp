@@ -41,7 +41,7 @@ then a do-while retry loop calling `CdControlB(0xE /* CdlSetmode */, &mode,
 
 `CdSetDebug`/`CdControlB` are libcd/sys.o entry points (Psy-Q `libcd`,
 linked since round 34 per `src/code_179d8_h.c`'s header comment) — real
-signatures are in `include/psyq/LIBCD.H` (`int CdSetDebug(int level);`,
+signatures are in `include/psyq/libcd.h` (`int CdSetDebug(int level);`,
 `int CdControlB(u_char com, u_char *param, u_char *result);`). Followed the
 existing `code_179d8_h.c` convention of a unit-local, per-call-site `extern`
 rather than including `LIBCD.H` — this call site never touches `result`, so
@@ -70,7 +70,7 @@ Round 51 (alpha), FINISHING-PLAN track 3.
 **Evidence.** Guarded by a one-shot flag, it calls `CdSetDebug(0)` and then
 retries `CdControlB(0x0E, &mode, 0)` with `mode = 0x80` until it is accepted,
 then sets the flag. `0x0E` is Psy-Q's `CdlSetmode` and `0x80` its
-`CdlModeSpeed` (double speed) -- `include/psyq/LIBCD.H`. So: put the drive
+`CdlModeSpeed` (double speed) -- `include/psyq/libcd.h`. So: put the drive
 into double-speed mode, once. Both constants are now spelled
 `CD_CMD_SETMODE` / `CD_MODE_DOUBLE_SPEED` in the `.c` rather than as bare
 literals; they are NOT spelled with Sony's own macro names, because this unit

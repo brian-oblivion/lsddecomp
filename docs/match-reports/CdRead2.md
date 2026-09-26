@@ -19,7 +19,7 @@ Sony's `CdRead2` (`libcd/cdread2.o`). Uncarved `asm/psyq_381c8.s` segment.
   `libgpu`/`libcd` elsewhere carry RCS ids matching neither 3.5 nor 3.6) --
   which disc owns which object is measured per-function, not inferred from
   neighbours.
-- **Header**: not in `include/psyq/LIBCD.H` -- `CdRead2` is an
+- **Header**: not in `include/psyq/libcd.h` -- `CdRead2` is an
   undocumented/internal `libcd` export (no public prototype shipped).
 
 Fingerprint (unique EXACT, unambiguous) plus position (bracketed by

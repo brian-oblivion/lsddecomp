@@ -167,7 +167,7 @@ VabStreamObj *New_VabStreamObj(char *path) {
  * DriverBaseMethods view, slot08/slot0C, until then). */
 extern Class6D430Methods *GetActiveDataSourceMethods(void);
 
-/* Sony's own VAB streaming calls (include/psyq/LIBSND.H), declared locally
+/* Sony's own VAB streaming calls (include/psyq/libsnd.h), declared locally
  * per this project's convention of not sharing Psy-Q prototypes across
  * units (see the SsVabTransCompleted/SsSetMute comment above). */
 extern void SsVabClose(s16 vabId);
@@ -311,7 +311,7 @@ s32 VabStreamObj__OnBodyReady(VabStreamObj *self, s32 done) {
     return result;
 }
 
-/* This unit's own reduced view of Sony's `ProgAtr` (include/psyq/LIBSND.H,
+/* This unit's own reduced view of Sony's `ProgAtr` (include/psyq/libsnd.h,
  * 16 bytes) -- only the one field VabStreamObj__LoadVagAttrs itself reads is
  * named, per the same local-struct convention used for VabHdrView above (and
  * matching code_179d8_k.c's own reduced `ProgAtr` reading). */

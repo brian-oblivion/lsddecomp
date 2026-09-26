@@ -54,7 +54,7 @@ extern s32 CdRead(s32 sectors, void *buf, s32 mode);
 extern s32 CdReadSync(s32 mode, s32 result);
 extern void CdFlush(void);
 
-/* Psy-Q's own command code (include/psyq/LIBCD.H documents the command list
+/* Psy-Q's own command code (include/psyq/libcd.h documents the command list
  * but not the numeric values; this one is confirmed the same way
  * code_179d8_q.c's CD_CMD_SETMODE is, by the sibling unit's independently
  * derived 0x0E == CdlSetmode matching the well-known Psy-Q CdlCommand

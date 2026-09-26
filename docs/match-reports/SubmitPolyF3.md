@@ -521,7 +521,7 @@ Every attempt in the log below wrote the masks by hand:
 ```
 
 Retail's source wrote a **24-bit bitfield**. This is Psy-Q's GPU primitive tag
-(`P_TAG` in `include/psyq/LIBGPU.H`, whose first member is
+(`P_TAG` in `include/psyq/libgpu.h`, whose first member is
 `unsigned addr : 24`), reached through `setaddr`/`getaddr`/`addPrim`. On
 little-endian MIPS `addr` occupies bits 0..23, so assigning it is a
 read-modify-write that GCC 2.6.3 emits as `& 0xFF000000` on the old word,
@@ -529,7 +529,7 @@ read-modify-write that GCC 2.6.3 emits as `& 0xFF000000` on the old word,
 hand-written form, with different register allocation.** That is the whole
 reason the residue looked like an unreachable register choice.
 
-`include/psyq/LIBGPU.H` does **not** compile standalone under this toolchain
+`include/psyq/libgpu.h` does **not** compile standalone under this toolchain
 (it needs the `LIBGTE`/`RECT` chain, and no unit includes it yet), so this
 unit carries a minimal local view instead, in the project's usual
 local-minimal-view style:

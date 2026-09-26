@@ -34,8 +34,8 @@ sll $13,$13,16; and $12,$12,$13; sw $12,0(reg)`), preceded by an
 
 `include/gte.h` gained `gte_rtpt`, `gte_nclip`, `gte_avsz3`, `gte_stflg`,
 `gte_stopz`, `gte_stdp`, `gte_stotz` and the three-pointer `gte_stsxy3`
-for this function; names follow `include/psyq/INLINE.H`, COP2 register
-numbers were cross-checked against `include/psyq/GTENOM.H` (`read_opz` =
+for this function; names follow `include/psyq/inline.h`, COP2 register
+numbers were cross-checked against `include/psyq/gtenom.h` (`read_opz` =
 r24, `read_p` = r8, `read_otz` = r7, `read_flag` = cfc2 r31).
 
 ```c

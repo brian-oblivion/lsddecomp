@@ -10,7 +10,7 @@
 
 extern void *BMemPMgrAlloc(s32 size);
 
-/* Psy-Q pad library (libetc, include/psyq/LIBETC.H). */
+/* Psy-Q pad library (libetc, include/psyq/libetc.h). */
 extern void PadInit(void *arg1);
 extern u32 PadRead(s32 port);
 extern void PadStop(void);

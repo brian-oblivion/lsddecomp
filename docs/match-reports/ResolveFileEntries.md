@@ -30,7 +30,7 @@ struct CdLoc16 {
 };
 
 /* CdSearchFile's output buffer, which is Sony's CdlFILE: pos, size, name[16]
- * = 0x18 bytes (include/psyq/LIBCD.H). The 0x18 was derived here
+ * = 0x18 bytes (include/psyq/libcd.h). The 0x18 was derived here
  * independently, from the span between this local's stack slot (sp+0x50) and
  * the next saved register (sp+0x68), and it is the same figure
  * code_179d8_h.c's OpenCdFile derived for the same Sony function. Only
@@ -189,7 +189,7 @@ element. Turning names into disc positions is the entire function; tier A.
 **Types and fields established here**, all local to this `.c`:
 
 - `CdStatBufQ` -> `CdFileInfo`, fields `unk0`/`unk4` -> `pos`/`size`. The
-  0x18-byte buffer is Sony's `CdlFILE` exactly (`include/psyq/LIBCD.H`:
+  0x18-byte buffer is Sony's `CdlFILE` exactly (`include/psyq/libcd.h`:
   `CdlLOC pos; u_long size; char name[16];` = 4 + 4 + 16). Round 45 derived
   the 0x18 independently from the stack-slot span; this round matched the
   shape to the declared Sony struct, which also confirms field order. Tier A.

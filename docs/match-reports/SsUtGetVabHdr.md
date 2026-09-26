@@ -2,7 +2,7 @@
 
 > **ROUND 34 (2026-09-12), runner alpha. THIS FUNCTION IS NOW LINKED FROM
 > SONY'S OWN OBJECT `libsnd/ut_gvh.o` (Psy-Q 3.3).** The name this report
-> already used was a hypothesis read off `include/psyq/LIBSND.H`; the object
+> already used was a hypothesis read off `include/psyq/libsnd.h`; the object
 > CONFIRMS it at the same address.
 >
 > It was the first of ELEVEN functions in the `code_179d8_i` PREFIX run
@@ -27,7 +27,7 @@ Unit: `code_179d8_i`. Blocker screens clean.
 
 ## This IS the Psy-Q SDK function, not a coincidental name
 
-`include/psyq/LIBSND.H:229` declares `extern short SsUtGetVabHdr (short,
+`include/psyq/libsnd.h:229` declares `extern short SsUtGetVabHdr (short,
 VabHdr*);` — the game unit's function has the exact SDK name, and its
 disassembly copies exactly the fields `VabHdr` (LIBSND.H:65-81) declares,
 at exactly their declared offsets, skipping only the three `reserved`/`fsize`
@@ -37,13 +37,13 @@ per this task's own framing that a name alone is only a hypothesis.
 **Not `#include`-d directly.** `LIBSND.H` itself does `#include <sys/types.h>`,
 and that does not resolve under the pinned include path
 (`-Iinclude -Iinclude/psyq`) on this case-sensitive filesystem — only
-`include/psyq/SYS/TYPES.H` exists (uppercase). Confirmed in isolation with
+`include/psyq/sys/types.h` exists (uppercase). Confirmed in isolation with
 the pinned `cpp`:
 
 ```
 $ tools/gcc263/cpp -Iinclude -Iinclude/psyq -undef -lang-c -nostdinc \
     -Dmips -D__GNUC__=2 t.c
-include/psyq/LIBSND.H:18: sys/types.h: No such file or directory
+include/psyq/libsnd.h:18: sys/types.h: No such file or directory
 ```
 (exit 33). So a local copy of the same 0x20-byte layout is used instead, per
 this project's established multiple-independent-local-view convention —

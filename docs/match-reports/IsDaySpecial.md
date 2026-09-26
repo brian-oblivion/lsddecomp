@@ -25,7 +25,7 @@
 ## The body. It is correct — all 52 instructions.
 
 ```c
-/* Not #included by this unit (only include/psyq/RAND.H and Entity.h declare
+/* Not #included by this unit (only include/psyq/rand.h and Entity.h declare
    it); forward-declared locally, matching Entity.h's own s32 rand(void). */
 extern s32 rand(void);
 extern MoodGraphPoint SPECIAL_DAY_MOOD;

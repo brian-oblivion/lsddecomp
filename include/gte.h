@@ -5,7 +5,7 @@
  * GNU-syntax GTE inline macros.
  *
  * These are the Psy-Q `gte_*` macros the game's source actually called. The
- * SDK's own include/psyq/INLINE.H cannot be used through this pipeline: it is
+ * SDK's own include/psyq/inline.h cannot be used through this pipeline: it is
  * the ASPSX flavour, which loads the base pointer into $12 and then emits
  * Sony macro-call words (`.word 0x0000227f`) that only Sony's assembler
  * expands. maspsx passes those through and gas emits the literal word, so the
@@ -17,10 +17,10 @@
  * the GPRs: 0 VXY0, 1 VZ0, 2 VXY1, 3 VZ1, 4 VXY2, 5 VZ2, 7 OTZ, 8 IR0,
  * 12 SXY0, 13 SXY1, 14 SXY2, 16 SZ0, 17 SZ1, 18 SZ2, 19 SZ3, 24 MAC0.
  * `cfc2 ..., $31` reads COP2 CONTROL register 31, FLAG. The register
- * conventions are cross-checked against include/psyq/GTENOM.H, which
+ * conventions are cross-checked against include/psyq/gtenom.h, which
  * documents the same assignments for the ASPSX macro forms.
  *
- * Macro NAMES follow include/psyq/INLINE.H exactly, so a reader with the SDK
+ * Macro NAMES follow include/psyq/inline.h exactly, so a reader with the SDK
  * manual can look one up. When retail shows a GTE instruction this file does
  * not cover yet, add the macro here under the SDK's name rather than
  * open-coding the instruction at the call site (docs/MATCHING-GUIDE.md,
@@ -137,7 +137,7 @@
 
 /* Local-matrix / IR-vector multiply-add: mvmva(sf=1, mx=0 "local matrix",
  * v=3 "long IR vector", cv=3 "none", lm=0). Confirmed against retail, not
- * against include/psyq/INLINE.H's gte_llir() -- that header's `.word
+ * against include/psyq/inline.h's gte_llir() -- that header's `.word
  * 0x0000133f/0x133e/0x133e` is the ASPSX macro-CALL encoding (only Sony's
  * assembler expands it, see the file banner above), and is a different
  * value from the actual COP2 cofun word. The word below is retail's own
@@ -181,7 +181,7 @@
 /* RGB load/store. COP2 data register 6 is RGB (the colour INPUT the
  * depth-cue and normal-colour ops read); 20/21/22 are RGB0/RGB1/RGB2, the
  * three colour OUTPUTS. These are Sony's own operand shapes, read off
- * include/psyq/INLINE.H and confirmed instruction-for-instruction against
+ * include/psyq/inline.h and confirmed instruction-for-instruction against
  * retail in func_80018464:
  *
  *   gte_ldrgb(p)          one pointer,   1 op
@@ -248,7 +248,7 @@
  * below, not the "wrong clobbers" trap, since these instructions really do
  * move through general registers.
  *
- * Sony's include/psyq/INLINE.H settles which op belongs to which name by
+ * Sony's include/psyq/inline.h settles which op belongs to which name by
  * operand count and op count even though its macro-call words say nothing
  * about the encodings: gte_ReadRotMatrix is 16 ops, gte_SetRotMatrix 10,
  * gte_ldclmv and gte_stclmv 6 each. Retail's func_80018464 preamble has

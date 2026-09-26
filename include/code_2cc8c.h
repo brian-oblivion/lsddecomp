@@ -182,7 +182,7 @@ extern WholeFrac_d294 D_8008A8F4; /* {0, 1}: Viewport__AttachViewChild's twist
 
 /* GsSetRefView2 is NO LONGER DECLARED HERE, round 33. It is Sony's
    (`libgs/gs_131.o`, linked from the SDK object) and will one day sit next to
-   `include/psyq/LIBGS.H`'s own prototype for it -- two declarations of one
+   `include/psyq/libgs.h`'s own prototype for it -- two declarations of one
    Sony name in a header six units include is the `conflicting types` failure
    that CLAUDE.md and the SDK guide both warn about, and it would surface in a
    unit that never touched this line. Its one caller, Viewport__AttachViewChild, now

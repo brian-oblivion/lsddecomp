@@ -21,7 +21,7 @@
  * Class6B5CC is a POSITIONED 3D OBJECT class built directly on libgs's own
  * scene-graph types, and three of the structs below are Sony's, reached
  * under this project's own placeholder names. This is offset arithmetic
- * against include/psyq/LIBGS.H, not a resemblance argument -- every field
+ * against include/psyq/libgs.h, not a resemblance argument -- every field
  * already recorded below lands where Sony's does, and the two sizes the
  * ctor allocates (0x50 and 0x28) are the two Sony struct sizes exactly.
  *

@@ -26,11 +26,11 @@ both identified this round.
   work-buffer-pointer slot, and shifts the second (`$s0` = `$a1`) right by 5
   (`>> 5`, i.e. `/32`) before combining it into a DMA block-count word. That
   is exactly the `(buf, size)` shape of `DecDCTout(u_long *buf, int size)`
-  from `include/psyq/LIBPRESS.H` -- a buffer pointer plus a byte count
+  from `include/psyq/libpress.h` -- a buffer pointer plus a byte count
   converted to 32-byte DMA blocks -- and rules out `DecDCTinSync(int mode)`
   and `DecDCToutSync(int mode)`, which take a single `int`, and
   `DecDCTvlcSize(u_long *bs)`, which takes a single pointer.
-- **Header**: `include/psyq/LIBPRESS.H`:
+- **Header**: `include/psyq/libpress.h`:
   `extern void DecDCTout(u_long *buf, int size);`
 
 Two independent evidence kinds (position narrowing the fingerprint tie to

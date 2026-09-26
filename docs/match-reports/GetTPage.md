@@ -12,7 +12,7 @@ Sony's `GetTPage` (`libgpu/prim.o`). Uncarved `asm/psyq_140dc.s` segment.
 - **Position**: same bracket as `GsInitGraph` (after `libc2/memcpy` 3.3,
   before `libgs/gs_103` 3.3) -- the GPU-primitive helper module sits inside
   the same gap as `GsInitGraph`.
-- **Header**: `include/psyq/LIBGPU.H`:
+- **Header**: `include/psyq/libgpu.h`:
   `extern u_short GetTPage(int tp, int abr, int x, int y);`
 
 No C call site; no extern needed. Renamed with `tools/rename.py`.

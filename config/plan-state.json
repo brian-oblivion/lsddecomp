@@ -1255,7 +1255,9 @@
       "status": "auto"
     },
     "6": {
-      "checklist": {},
+      "checklist": {
+        "sdk-headers": true
+      },
       "flagged": {},
       "parked": {},
       "reason": "",

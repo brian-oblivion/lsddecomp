@@ -209,7 +209,7 @@ In `config/splat.slps01556.lsdde.yaml`:
   three units, reachable from five) declaring `func_80011D34`,
   `func_80011F68` and `func_80012C20`. Renamed in place those become
   `malloc`, `free` and a three-argument `printf` in a header that will one
-  day sit next to `include/psyq/MALLOC.H`'s real prototypes -- a
+  day sit next to `include/psyq/malloc.h`'s real prototypes -- a
   `conflicting types` failure in whichever sibling includes both first.
   The correct move is CLAUDE.md's: a prototype for a function another unit
   (here, a Sony object) defines belongs in the `.c` that calls it, as a

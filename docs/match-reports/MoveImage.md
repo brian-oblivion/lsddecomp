@@ -12,7 +12,7 @@ same GPU-trampoline region.
   masked 0.18 -- far below.
 - **Position**: same bracket (after `libgte/msc01` 3.3, before `libapi/c73`
   3.3).
-- **Header**: `include/psyq/LIBGPU.H`:
+- **Header**: `include/psyq/libgpu.h`:
   `extern int MoveImage(RECT *rect, int x, int y);`
 
 No C call site; no extern needed. Renamed with `tools/rename.py`.

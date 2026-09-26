@@ -35,7 +35,7 @@ established what struct these three functions' callers actually pass (out
 of scope: their callers are outside `code_8220_b`), so typing the pointer
 would be inventing a field name with no evidence behind it.
 
-None of `include/psyq/INLINE.H`'s `gte_st*` macros (`gte_stlvnl`, `gte_stsv`,
+None of `include/psyq/inline.h`'s `gte_st*` macros (`gte_stlvnl`, `gte_stsv`,
 etc.) reproduce this — they all emit multi-instruction GTE OPERATION
 `.word` sequences (matrix ops), not a bare three-register store to arbitrary
 offsets. This had to be hand-written `swc2` inline asm; verified byte-exact
@@ -68,7 +68,7 @@ memory address is identical.
 **The rule-6 analysis above is correct and I re-derived it independently.**
 `"r"(ptr)` leaves the GPR to the allocator, `$12`/`$13`/`$14` are COP2 *data*
 registers named in the instruction text with no GPR identity to pin, and the
-project already ships Sony headers (`include/psyq/INLINE.H`) built out of
+project already ships Sony headers (`include/psyq/inline.h`) built out of
 exactly this construct. The CLAUDE.md test — "if removing it changes WHICH
 REGISTER holds a value it is banned" — is not triggered. All eight of this
 runner's matches re-verified byte-exact in `main` after merging, whole-image
@@ -86,7 +86,7 @@ Two corrections to the claim as written:
    And measuring it nearly produced a **false negative**, which is the part
    worth carrying forward: the first test showed `gte_stsxy3` emitting nothing
    at all, which looks like confirmation and is not. The real cause is that
-   `include/psyq/INLINE.H` has **CRLF line endings**, so `\`+`CR`+`LF` never
+   `include/psyq/inline.h` has **CRLF line endings**, so `\`+`CR`+`LF` never
    splices and all 1043 of its multi-line macros expand to `{\ ;` — valid C,
    compiles clean, does nothing. Full census and reproducer:
    `docs/research/psyq-header-crlf-blocker.md`. Had the header been LF-clean,

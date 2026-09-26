@@ -133,7 +133,7 @@ CdDriverMethods *GetCdDriverMethods(void)
 
 /* libcd/sys entry points (lib/libcd/sys.o, linked since round 34) --
  * per-call-site typed for this unit, per the code_179d8_h.c convention.
- * The two constants are Psy-Q's own (include/psyq/LIBCD.H: CdlSetmode 0x0E,
+ * The two constants are Psy-Q's own (include/psyq/libcd.h: CdlSetmode 0x0E,
  * CdlModeSpeed 0x80 = double speed); they are spelled locally rather than by
  * including LIBCD.H, because this unit's libcd declarations are deliberately
  * per-call-site and Sony's prototypes would conflict with them. */
@@ -248,7 +248,7 @@ s32 GetFileTableCount(void)
 }
 
 /* CdSearchFile's output buffer, which is Sony's CdlFILE: pos, size, name[16]
- * = 0x18 bytes (include/psyq/LIBCD.H). The 0x18 was derived here
+ * = 0x18 bytes (include/psyq/libcd.h). The 0x18 was derived here
  * independently, from the span between this local's stack slot (sp+0x50) and
  * the next saved register (sp+0x68), and it is the same figure
  * code_179d8_h.c's OpenCdFile derived for the same Sony function. Only

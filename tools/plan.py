@@ -102,8 +102,8 @@ TRACK5_ITEMS = {
 # One-time setup items a PREMIUM head does before its track staffs runners
 # (operator decisions of 2026-09-26), then the close-out.
 TRACK6_SETUP = {
-    "sdk-headers": "include/psyq/*.H normalized to LF and include/types.h reconciled, so game code can "
-                   "#include LIBGTE.H/LIBGS.H/LIBGPU.H; proven byte-identical (docs/research/psyq-header-crlf-blocker.md)",
+    "sdk-headers": "include/psyq/*.h normalized to LF and include/types.h reconciled, so game code can "
+                   "#include <libgte.h>/<libgs.h>/<libgpu.h>; proven byte-identical (docs/research/psyq-header-crlf-blocker.md)",
 }
 TRACK7_SETUP = {
     "format": ".clang-format checked in matching the house style, every src/include file formatted once "
@@ -730,7 +730,15 @@ def collect_phase2(st, info, t5_status, classes, units_meta):
             continue
         homes.setdefault(sorted(fs)[0] if fs else "?", []).append(n)
     t6_setup = all(t6["checklist"].get(k) for k in TRACK6_SETUP)
-    left6 = len(class_jobs) + sum(len(v) for v in homes.values())
+    # Files that re-declare a Sony name cannot include Sony's headers
+    # (tools/sonyheaders.py): a header's is track 6's, a unit's its polish pass's.
+    sony = {}
+    if phase2 and t6_setup:
+        import sonyheaders
+        sony = sonyheaders.collect()
+    jobbed = {j["header"] for j in class_jobs} | set(homes)
+    sony_left = {f: n for f, n in sony.items() if f.startswith("include/") and f not in jobbed}
+    left6 = len(class_jobs) + sum(len(v) for v in homes.values()) + len(sony_left)
     if t6["status"] != "auto":
         s6 = t6["status"]
     elif not phase2:
@@ -810,7 +818,9 @@ def collect_phase2(st, info, t5_status, classes, units_meta):
         "6": {"status": s6, "setup": {k: bool(t6["checklist"].get(k)) for k in TRACK6_SETUP},
               "placeholder_types": len(types), "class_jobs": len(class_jobs),
               "type_homes": len(homes), "parked": len(parked6), "flagged": len(flagged),
-              "ph_prefix_defs": rd["totals"]["ph_prefix"]},
+              "ph_prefix_defs": rd["totals"]["ph_prefix"],
+              "sony_headers": sum(f.startswith("include/") for f in sony),
+              "sony_units": sum(f.startswith("src/") for f in sony)},
         "7": {"status": s7, "setup": {k: bool(t7["checklist"].get(k)) for k in TRACK7_SETUP},
               "units_done": len(done7), "units_total": len(done7) + len(todo7),
               "totals": {k: rd["totals"][k] for k in keys},
@@ -823,7 +833,7 @@ def collect_phase2(st, info, t5_status, classes, units_meta):
         "9": {"status": s9, "checklist": {k: bool(ticked9.get(k)) for k in TRACK9_ITEMS},
               "history": rd["totals"]["history"] + rd["totals"]["header_history"]},
         "_class_jobs": class_jobs, "_homes": homes, "_types": types, "_todo7": todo7,
-        "_rd": rd, "_regions": region_rows,
+        "_rd": rd, "_regions": region_rows, "_sony": sony, "_sony_left": sony_left,
     }
 
 
@@ -1119,6 +1129,10 @@ def jobs(d, n):
     p2 = d["_p2"]
     P = MODELS["head_when_new_procedure"]
     q6, q7, q8, q9 = [], [], [], []
+    def sony_note(f):
+        names = p2["_sony"].get(f) or next((n for k, n in p2["_sony"].items()
+                                             if k.startswith("src/") and Path(k).stem == f), None)
+        return f"; re-declares Sony's {', '.join(names)} (tools/sonyheaders.py)" if names else ""
     if t["6"]["status"] == "open":
         for k, done in t["6"]["setup"].items():
             if not done:
@@ -1136,13 +1150,18 @@ def jobs(d, n):
                 if not j["ph_name"]:
                     continue
                 extra = f"; placeholder types in its header: {', '.join(j['types'])}" if j["types"] else ""
+                extra += sony_note(j["header"])
                 tab = f" and table {j['table']}" if j["ph_table"] else ""
                 q6.append(("6", f"name class {j['class']}{tab} (parent {j['parent'] or 'none'}, {j['methods']} own "
                                 f"methods, {j['header']}{extra}) (units: {j['header']})", MODELS["types_runner"]))
             for f, names in sorted(p2["_homes"].items(), key=lambda kv: (-len(kv[1]), kv[0])):
                 u = Path(f).stem if f.startswith("src/") else f
-                q6.append(("6", f"name {len(names)} placeholder type(s) defined in {f}: {', '.join(sorted(names))} "
-                                f"(units: {u})", MODELS["types_runner"]))
+                q6.append(("6", f"name {len(names)} placeholder type(s) defined in {f}: {', '.join(sorted(names))}"
+                                f"{sony_note(f)} (units: {u})", MODELS["types_runner"]))
+            for f, names in sorted(p2["_sony_left"].items()):
+                q6.append(("6", f"use Sony's own declarations in {f}: it re-declares {', '.join(names)} "
+                                f"(FINISHING-PLAN track 6 step 4; tools/sonyheaders.py) (units: {f})",
+                           MODELS["types_runner"]))
     if t["7"]["status"] == "open":
         for k, done in t["7"]["setup"].items():
             if not done:
@@ -1153,7 +1172,8 @@ def jobs(d, n):
                 m = rdu[u]
                 debt = ", ".join(f"{m[k]} {k}" for k in ("func_", "D_", "unk", "magic", "rawoff", "m2c", "history")
                                  if m[k])
-                q7.append(("7", f"polish pass on {u} ({m['defs']} defs; {debt or 'no measured debt'}) (units: {u})",
+                q7.append(("7", f"polish pass on {u} ({m['defs']} defs; {debt or 'no measured debt'}"
+                                f"{sony_note(u)}) (units: {u})",
                            t["7"]["model"]))
     if t["8"]["status"] == "open":
         # Ready regions in text order, batched to about REGION_UNITS units a
@@ -1314,7 +1334,8 @@ def print_status(d, n, st):
     print("  -- phase 2: the code reads like a game's source (revision 27; python3 tools/readability.py)")
     print(f"  6      {t6['status'].split(' (')[0]:<10} type names: {t6['placeholder_types']} placeholder type name(s), "
           f"{t6['class_jobs']} class(es) with a placeholder name or table, {t6['type_homes']} other file(s) defining them; "
-          f"{t6['ph_prefix_defs']} defs under a placeholder class prefix; {t6['parked']} parked"
+          f"{t6['ph_prefix_defs']} defs under a placeholder class prefix; {t6['parked']} parked; "
+          f"{t6['sony_headers']} header(s) and {t6['sony_units']} unit(s) re-declare a Sony name"
           f"{setup(t6)}")
     tt7 = t7["totals"]
     print(f"  7      {t7['status'].split(' (')[0]:<10} polish: {t7['units_done']}/{t7['units_total']} units passed; "

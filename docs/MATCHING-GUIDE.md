@@ -33,7 +33,7 @@ worth noticing on the first pass, all of which change how you write the C:
   `.word 0x4Axxxxxx`/`0x4Bxxxxxx` (a COP2 "cofun" op that this binutils has
   no mnemonic for) means the source called a Psy-Q `gte_*` macro. Look it up
   in `include/gte.h` before writing anything, and if the macro is not there
-  yet, add it there under the SDK's name (`include/psyq/INLINE.H` has the
+  yet, add it there under the SDK's name (`include/psyq/inline.h` has the
   names, `GTENOM.H` the COP2 register map) rather than open-coding the
   instruction at the call site. A run of `nop; nop; .word` is a transform
   macro; a `cfc2 $12,$31; addi $13,$zero,4; sll; and; sw` run is

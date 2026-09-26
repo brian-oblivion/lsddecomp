@@ -24,7 +24,7 @@
 #define TAG_CLASS6EF50   5   /* gFrameClockMethods */
 #define TAG_TMDMODEL     9   /* gTmdModelMethods (include/TmdModel.h): the object Class6B5CC__LinkModel links */
 
-/* Bit positions in GsDOBJ2.attribute (self->unk10), include/psyq/LIBGS.H. */
+/* Bit positions in GsDOBJ2.attribute (self->unk10), include/psyq/libgs.h. */
 #define ATTR_LIGHTMODE_SHIFT  3   /* GsFOG|GsMATE|GsLLMOD, 3 bits */
 #define ATTR_LOFF_SHIFT       6   /* GsLOFF */
 #define ATTR_ABR_SHIFT        28  /* GsAZERO..GsATHREE, 2 bits */

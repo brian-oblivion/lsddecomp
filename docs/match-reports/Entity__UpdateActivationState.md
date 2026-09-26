@@ -233,7 +233,7 @@ but not what retail has.
 - The argument-register lever (per the head's mid-round broadcast): checked
   every call in this function (`Entity__IsNearTarget` — already fully matched,
   4-argument call site confirmed correct; `rand()` — genuinely no
-  arguments, confirmed against `include/psyq/RAND.H`'s
+  arguments, confirmed against `include/psyq/rand.h`'s
   `extern int rand(void);`; `this->methods->slot15C(this)` — single-argument
   vtable dispatch, matches). **No hidden-argument instance found in this
   function** — every call's argument registers are fully accounted for.

@@ -14,6 +14,6 @@ Load/Store pair.
   `StoreImage`.
 - **Position**: same bracket (after `libgte/msc01` 3.3, before `libapi/c73`
   3.3).
-- **Header**: `include/psyq/LIBGPU.H`: `extern int StoreImage(RECT *rect, u_long *p);`
+- **Header**: `include/psyq/libgpu.h`: `extern int StoreImage(RECT *rect, u_long *p);`
 
 No C call site; no extern needed. Renamed with `tools/rename.py`.

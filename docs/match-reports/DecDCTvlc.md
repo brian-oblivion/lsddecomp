@@ -14,7 +14,7 @@ round.
 - **Position**: after placed `libc2/exit` (3.3, ends `0x80046548`), before
   placed `libpress/vlc` (3.3, starts `0x800465b8`) -- directly bracketed by
   a `libpress` object on one side.
-- **Header**: `include/psyq/LIBPRESS.H`:
+- **Header**: `include/psyq/libpress.h`:
   `extern int DecDCTvlc(u_long *bs, u_long *buf);`
 
 No C call site; no extern needed. Renamed with `tools/rename.py`.

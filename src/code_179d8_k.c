@@ -512,7 +512,7 @@ void _SsSetControlChange(s16 a0, s16 a1, u8 a2)
  * `libsnd/ut_sva`.  The signatures below stay as this call site's own reading
  * (the return types and the second argument's width are what retail's code
  * here uses); they are LOCAL views and must never move into a shared header
- * next to include/psyq/LIBSND.H's real prototypes.  Modeled as one struct, not two separate
+ * next to include/psyq/libsnd.h's real prototypes.  Modeled as one struct, not two separate
  * locals, because the loop's exit test re-reads `unk0` from memory on
  * every iteration even though nothing in this function's own source
  * writes it after the first call -- the per-item pointer passed to the
@@ -759,7 +759,7 @@ void ContRpn2(s16 a0, s16 a1, u8 a2)
 
 /* This unit's own reduced view of the VagAtr SsUtGetVagAtr/SsUtSetVagAtr
  * fill (round 35): only the 8 fields this function actually touches, at
- * their real include/psyq/LIBSND.H VagAtr offsets. Total size (0x20) is
+ * their real include/psyq/libsnd.h VagAtr offsets. Total size (0x20) is
  * load-bearing -- Snd_setVabAttr receives it as a BY-VALUE 4th parameter
  * (its first word arrives in $a3, the rest already spilled to the stack by
  * the caller), and its own incoming value is immediately discarded: every

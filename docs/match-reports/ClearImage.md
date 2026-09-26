@@ -15,7 +15,7 @@ Sony's `ClearImage` (`libgpu/sys.o`). Not game code; lives in the uncarved
 - **Position**: after placed `libgte/msc01` (3.3, ends `0x800206e0`), before
   placed `libapi/c73` (3.3, starts `0x80023898`) -- both bracketing objects
   are disc 3.3.
-- **Header**: `include/psyq/LIBGPU.H`:
+- **Header**: `include/psyq/libgpu.h`:
   `extern int ClearImage(RECT *rect, u_char r, u_char g, u_char b);`
 
 No C call site exists yet (`grep -rn ClearImage src/` -- no hits); the

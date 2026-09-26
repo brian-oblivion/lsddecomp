@@ -1,8 +1,16 @@
 # The Psy-Q inline macro layer is silently inert (CRLF line endings)
 
-**Status: DECIDED 2026-09-26 by the operator: normalise the headers to LF so game code
-includes Sony's types by Sony's names (FINISHING-PLAN track 6, setup item `sdk-headers`,
-a premium head's job). Until `plan.py` shows that item ticked, the finding below still holds.**
+**Status: RESOLVED round 91, 2026-09-26 (premium head, plan setup item
+`sdk-headers`).** Per the operator's decision of the same day, every header
+under `include/psyq/` is now LF and lowercase (as Sony's own `#include`s spell
+them, and as the pe2 and sotn decomps keep them), `include/types.h` defines
+Sony's `u_*` names under `<sys/types.h>`'s guards, and `src/code_10ee0.c`
+includes `<libgte.h>`, `<libgpu.h>`, `<libgs.h>` and `<libetc.h>` with the image
+byte-identical. `setPolyFT4()` and friends expand again. The include route is
+FINISHING-PLAN track 6; `tools/sonyheaders.py` lists what still collides. The
+paths below were rewritten to the new names. `inline.h` stays unused: its
+`gte_*` macros are ASPSX-flavoured (`include/gte.h`, and the section at the end).
+
 **Found: round 12, 2026-09-03, by the head while adjudicating a runner's
 proposed learning about GTE stores.**
 
@@ -18,9 +26,9 @@ discarded.**
 
 | header | broken multi-line macros | CR lines |
 | --- | --- | --- |
-| `include/psyq/INLINE.H` | 1043 | 1229 |
-| `include/psyq/LIBGPU.H` | 87 | 805 |
-| `include/psyq/LIBGS.H` | 4 | 1436 |
+| `include/psyq/inline.h` | 1043 | 1229 |
+| `include/psyq/libgpu.h` | 87 | 805 |
+| `include/psyq/libgs.h` | 4 | 1436 |
 | `LIBSND.H`, `LIBETC.H`, `LIBPRESS.H`, `LIBMATH.H`, `STDLIB.H` | 0 | 29–275 |
 
 That is the entire Psy-Q **inline GTE layer** (`gte_*`) and most of the
@@ -64,7 +72,7 @@ whoever first carves the renderer.
 Under a second. `gte.c`:
 
 ```c
-#include "psyq/INLINE.H"
+#include "psyq/inline.h"
 
 /* What retail actually contains, hand-rolled: */
 void charlie_version(void *dst) {
@@ -120,7 +128,7 @@ void sdk_stsxy3(void *dst) {
 And the cause, byte-exact:
 
 ```sh
-sed -n '780p' include/psyq/INLINE.H | od -c
+sed -n '780p' include/psyq/inline.h | od -c
 #   d   e   f   i   n   e       g   t   e   _   s   t   s   x
 y   3   (   r   1   ,   r   2   ,   r   3   )       {   \  \r
 \n

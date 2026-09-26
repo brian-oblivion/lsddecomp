@@ -19,16 +19,16 @@ callees from a local guess into a real, named Psy-Q symbol:
 
 | old local-guess name | real symbol | source |
 | --- | --- | --- |
-| `func_80033260` (entry fill) | `SsUtGetVagAtr` | `include/psyq/LIBSND.H` |
-| `func_80036230` (all three "set" calls) | `SsUtSetVagAtr` | `include/psyq/LIBSND.H` |
-| `func_80036044` | `SsUtReverbOff` | `include/psyq/LIBSND.H` |
-| `func_80036024` | `SsUtReverbOn` | `include/psyq/LIBSND.H` |
+| `func_80033260` (entry fill) | `SsUtGetVagAtr` | `include/psyq/libsnd.h` |
+| `func_80036230` (all three "set" calls) | `SsUtSetVagAtr` | `include/psyq/libsnd.h` |
+| `func_80036044` | `SsUtReverbOff` | `include/psyq/libsnd.h` |
+| `func_80036024` | `SsUtReverbOn` | `include/psyq/libsnd.h` |
 | `func_80035F3C` | `_SsUtResolveADSR` | matched, `docs/match-reports/func_80035F3C.md` |
 | `func_80035F98` | `_SsUtBuildADSR` | matched, `docs/match-reports/func_80035F98.md` |
-| `func_80036064` | `SsUtSetReverbType` | `include/psyq/LIBSND.H` |
-| `func_80036118` | `SsUtSetReverbDepth` | `include/psyq/LIBSND.H` |
-| `func_800361B0` | `SsUtSetReverbFeedback` | `include/psyq/LIBSND.H` |
-| `func_800361F0` | `SsUtSetReverbDelay` | `include/psyq/LIBSND.H` |
+| `func_80036064` | `SsUtSetReverbType` | `include/psyq/libsnd.h` |
+| `func_80036118` | `SsUtSetReverbDepth` | `include/psyq/libsnd.h` |
+| `func_800361B0` | `SsUtSetReverbFeedback` | `include/psyq/libsnd.h` |
+| `func_800361F0` | `SsUtSetReverbDelay` | `include/psyq/libsnd.h` |
 
 With every callee real, the function is now a **163/179-word near-miss,
 length EXACT, zero out-of-range drift** -- a completely different situation
@@ -86,7 +86,7 @@ typedef struct {
     u16 adsr1;   /* +0x10 */
     u16 adsr2;   /* +0x12 */
     u8 pad14[0x20 - 0x14];
-} Scratch_800357B0;   /* this unit's reduced view of include/psyq/LIBSND.H's VagAtr */
+} Scratch_800357B0;   /* this unit's reduced view of include/psyq/libsnd.h's VagAtr */
 
 typedef struct {
     s16 unk0; s16 unk2; s16 unk4; s16 unk6; s16 unk8;
@@ -103,7 +103,7 @@ this unit's existing `SsUtGetVagAtr`/`SsUtSetVagAtr` extern declared their
 a genuine byte read like `p[0x2C]`); this call site passes the function's
 own `s16 slot` parameter directly, already widened by the standard
 per-parameter `sll`/`sra` re-widen every s16 local gets in this codebase.
-Widening the shared declaration to `s16` (matching `include/psyq/LIBSND.H`'s
+Widening the shared declaration to `s16` (matching `include/psyq/libsnd.h`'s
 real `short SsUtGetVagAtr(short, short, short, VagAtr*)` exactly) fixed this
 call site with **zero effect on any already-matched call site in the same
 unit** (confirmed by rebuilding after the prototype change alone, before

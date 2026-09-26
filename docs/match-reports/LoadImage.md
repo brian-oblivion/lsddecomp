@@ -14,7 +14,7 @@ same GPU-trampoline region as `ClearImage`/`DrawSync`/`GsSortClear` above.
   EXACT tie for THIS address is unique to `LoadImage`.
 - **Position**: same bracket as `ClearImage` (after `libgte/msc01` 3.3,
   before `libapi/c73` 3.3).
-- **Header**: `include/psyq/LIBGPU.H`: `extern int LoadImage(RECT *rect, u_long *p);`
+- **Header**: `include/psyq/libgpu.h`: `extern int LoadImage(RECT *rect, u_long *p);`
 
 No C call site (`grep -rn LoadImage src/` -- no hits); no extern needed.
 Renamed with `tools/rename.py`.

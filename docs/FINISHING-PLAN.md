@@ -176,15 +176,19 @@ no unit declares its own view of it; `plan.py classes` lists a STRAY VIEW.
 
 ### Track 6: every type says what it is
 
-**Setup (premium head, once): `sdk-headers`.** The operator decided on
-2026-09-26 that Sony's types appear under Sony's names from Sony's headers,
-resolving `docs/research/psyq-header-crlf-blocker.md`. Normalise
-`include/psyq/*.H` to LF; reconcile `include/types.h` with `SYS/TYPES.H` (the
-`u_long` clash; measured in scratch, the CR-stripped headers otherwise
-parse); prove a unit that includes `LIBGTE.H`, `LIBGPU.H` and `LIBGS.H` builds
-byte-identical; never include `INLINE.H` (ASPSX flavour; `include/gte.h`
-replaces it). Write the include route into this section and the research
-doc's status, then `plan.py check --item sdk-headers`.
+**Sony's headers (setup `sdk-headers`, done round 91).** `include/psyq/` holds
+the SDK headers in LF, lowercase, as Sony's own `#include`s spell them. A unit
+takes Sony's types and prototypes from them: `#include "common.h"`, then
+`<libgte.h>`, `<libgpu.h>`, `<libgs.h>` in that order, then whichever of
+`<libetc.h>`, `<libcd.h>`, `<libsnd.h>`, `<libspu.h>`, `<libpress.h>` it
+calls; project headers last. `include/types.h` defines `u_char` to `u_long`
+under `<sys/types.h>`'s guards (`u_long` stays `unsigned int`, so a `u32 *`
+passes without a cast). Never include `<inline.h>` (ASPSX flavour;
+`include/gte.h` replaces it). A file that re-declares a Sony name its own way
+(a local `GsIMAGE`, a local `PadInit` prototype) cannot sit beside these;
+`python3 tools/sonyheaders.py` lists them, and `plan.py` attaches each to its
+job: a header's to track 6, a unit's to its polish pass. The fix is always
+Sony's declaration, never a rename of Sony's.
 
 **Jobs**, from `plan.py`, root class first: one per class whose type or table
 name is a placeholder, carrying the placeholder types its header defines, and

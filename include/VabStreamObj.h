@@ -39,7 +39,7 @@
 typedef struct VabStreamObj VabStreamObj;
 typedef struct VabStreamObjMethods VabStreamObjMethods;
 
-/* The two bytes of Sony's VagAtr (include/psyq/LIBSND.H, 32 bytes) that
+/* The two bytes of Sony's VagAtr (include/psyq/libsnd.h, 32 bytes) that
  * PlayTone reads, at VagAtr's own offsets. Kept reduced so this header does
  * not bring in LIBSND.H's prototypes, which the units declare locally. */
 typedef struct VabStreamVagAtr {

@@ -1,6 +1,6 @@
 # GsSetNearClip -- MATCH (4/4 words, first attempt)
 
-> **Head, round 78: SONY CODE, re-identified under FINISHING-PLAN track 2.** This is `GsSetNearClip` (libgs/gs_101, Psy-Q 3.3/3.5/3.6), not game code. Evidence: `sdkname.py` EXACT masked 1.00 (TINY, 4 words) against libgs/gs_101; its sole store target is Sony's `GsCLIP3near` (pinned in `config/psyq-objects.ld`); position inside the run of placed libgs objects; prototype from `include/psyq/LIBGS.H`. The runner's game name `SetClipNear` in the `## Naming` section below is SUPERSEDED (a game name on Sony code is the thing track 3 forbids); the recorded mechanics are right. The function now counts as library and is outside every game queue.
+> **Head, round 78: SONY CODE, re-identified under FINISHING-PLAN track 2.** This is `GsSetNearClip` (libgs/gs_101, Psy-Q 3.3/3.5/3.6), not game code. Evidence: `sdkname.py` EXACT masked 1.00 (TINY, 4 words) against libgs/gs_101; its sole store target is Sony's `GsCLIP3near` (pinned in `config/psyq-objects.ld`); position inside the run of placed libgs objects; prototype from `include/psyq/libgs.h`. The runner's game name `SetClipNear` in the `## Naming` section below is SUPERSEDED (a game name on Sony code is the thing track 3 forbids); the recorded mechanics are right. The function now counts as library and is outside every game queue.
 
 > Renamed from `SetClipNear` on 2026-09-24 (tools/rename.py). Address 0x8003fb0c.
 

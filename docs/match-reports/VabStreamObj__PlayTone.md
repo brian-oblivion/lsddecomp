@@ -48,7 +48,7 @@ fold, so it is not a volatile-insn check that stops combine here.
 
 **SsUtKeyOn extern: observed, NOT changed, because this function did not need
 it.** The unit declares `extern s16 SsUtKeyOn(s16, s16, s16, s16, s32, s32,
-s32);`. `include/psyq/LIBSND.H` has `short SsUtKeyOn(short x7)`, and the
+s32);`. `include/psyq/libsnd.h` has `short SsUtKeyOn(short x7)`, and the
 `#ifdef NON_MATCHING` definition in `src/code_179d8_j_b.c` reads it as `s32
 SsUtKeyOn(s16, s16, s16, s16, u16, s16, s16)`. That definition is a stall
 (65/252), not a byte-exact one. Callers checked: `grep -rln "jal *SsUtKeyOn$"
@@ -269,7 +269,7 @@ s32 VabStreamObj__PlayTone(VabStreamObj *self, s32 index, s32 arg2, s32 arg3) {
 `VabStreamObj`/`VagAtrView`; `self->unk50/unk54/unk60` are now
 `progVagTable`/`vabId`/`pitchOffset`; `entry->unk4/unk5` are now
 `entry->center/shift` -- confirmed round 52 against Sony's real `VagAtr`
-in `include/psyq/LIBSND.H`, where they land on the struct's own
+in `include/psyq/libsnd.h`, where they land on the struct's own
 same-named bytes. Bytes/derivation unchanged.)
 
 Needs, from this unit's top-of-file scaffolding: `VabStreamObj`,

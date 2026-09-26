@@ -16,6 +16,6 @@ all identified this round -- see their own reports.
 - **Position**: after placed `libgs/gs_107` (3.3, ends `0x80043008`), before
   placed `libc2/exit` (3.3, starts `0x80046538`) -- a wide gap that this
   round's cluster of five identifications fills entirely with `libpress`.
-- **Header**: `include/psyq/LIBPRESS.H`: `extern void DecDCTReset(int mode);`
+- **Header**: `include/psyq/libpress.h`: `extern void DecDCTReset(int mode);`
 
 No C call site; no extern needed. Renamed with `tools/rename.py`.

@@ -34,7 +34,7 @@
 typedef struct CdStream CdStream;
 typedef struct CdStreamMethods CdStreamMethods;
 
-/* Sony's CdlFILE (include/psyq/LIBCD.H, 24 bytes), which CdSearchFile fills.
+/* Sony's CdlFILE (include/psyq/libcd.h, 24 bytes), which CdSearchFile fills.
  * Spelled here so this header does not bring in LIBCD.H's prototypes, which
  * the units declare locally. `pos` is the CdlLOC that seek and CdlSetloc take. */
 typedef struct CdStreamFile {

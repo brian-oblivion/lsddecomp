@@ -27,6 +27,6 @@ segment.
 Two independent evidence kinds (fingerprint tie broken by position, plus
 body/sibling semantics) settle it as `GsGetActiveBuff`.
 
-- **Header**: `include/psyq/LIBGS.H`: `int GsGetActiveBuff(void);`
+- **Header**: `include/psyq/libgs.h`: `int GsGetActiveBuff(void);`
 
 No C call site; no extern needed. Renamed with `tools/rename.py`.

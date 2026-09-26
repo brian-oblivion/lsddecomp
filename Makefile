@@ -130,8 +130,8 @@ $(BUILD_DIR)/%.s.o: %.s
 # that never saw it -- a stale number that is plausible and self-consistent,
 # which is the worst kind. A full build is a few seconds; correctness is
 # cheaper than the fine-grained version here.
-HEADERS := $(wildcard include/*.h include/*.inc include/psyq/*.H \
-                      include/psyq/SYS/*.H)
+HEADERS := $(wildcard include/*.h include/*.inc include/psyq/*.h \
+                      include/psyq/sys/*.h)
 
 .SECONDEXPANSION:
 $(BUILD_DIR)/%.c.o: %.c $(HEADERS) config/gp-symbols.txt $$(wildcard asm/nonmatchings/$$(notdir $$*)/*.s)

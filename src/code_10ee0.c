@@ -29,31 +29,16 @@
  * each function's report `## Naming` for tier and evidence.
  *
  * Round 87 (bravo, track 4): the class is unified. Its one definition is
- * include/DrawSystem.h (object, table, both value types); this unit keeps
- * only libgpu's RECT and the SDK prototypes it calls.
+ * include/DrawSystem.h (object, table, both value types); the SDK types and
+ * prototypes it uses come from Sony's <libgpu.h>, <libgs.h> and <libetc.h>.
  */
 #include "common.h"
+#include <libgte.h>
+#include <libgpu.h>
+#include <libgs.h>
+#include <libetc.h>
 #include "DrawSystem.h"
 
-/* LIBGPU.H's RECT, declared locally (never #include a psyq header). */
-typedef struct {
-    short x, y;
-    short w, h;
-} RECT;
-
-extern void GsSwapDispBuff(void);     /* LIBGS.H */
-extern void GsInitGraph(unsigned short x_res, unsigned short y_res,
-                        unsigned short intmode, unsigned short dith,
-                        unsigned short varmmode);   /* LIBGS.H */
-extern void GsDefDispBuff(unsigned short x0, unsigned short y0,
-                          unsigned short x1, unsigned short y1); /* LIBGS.H */
-extern int GsGetActiveBuff(void);     /* LIBGS.H */
-extern int LoadImage(RECT *rect, u_long *p);        /* LIBGPU.H */
-extern int MoveImage(RECT *rect, int x, int y);     /* LIBGPU.H */
-extern int DrawSync(int mode);                      /* LIBGPU.H */
-extern int ClearImage(RECT *rect, u_char r, u_char g, u_char b); /* LIBGPU.H */
-extern int VSync(int mode);                         /* LIBETC.H */
-extern int StoreImage(RECT *rect, u_long *p);       /* LIBGPU.H */
 extern void *BMemPMgrAlloc(s32 size);
 
 extern DrawSystem *gDrawSystem;        /* sdata: the singleton GetDrawSystem returns */

@@ -14,7 +14,7 @@ the `libpress` DecDCT-family run.
   competing name). Next unrelated candidate (`SpuQuit`) scores masked 0.23.
 - **Position**: same `libpress` bracket as `DecDCTReset` (after
   `libgs/gs_107` 3.3, before `libc2/exit` 3.3).
-- **Header**: `include/psyq/LIBPRESS.H`:
+- **Header**: `include/psyq/libpress.h`:
   `extern void DecDCTin(u_long *buf, int mode);`
 
 No C call site; no extern needed. Renamed with `tools/rename.py`.

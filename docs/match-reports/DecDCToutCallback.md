@@ -22,7 +22,7 @@ Sony's `DecDCToutCallback` (`libpress/libpress.o`). Uncarved
   not call `DMACallback` at all, so it is ruled out; the sibling wrapper at
   `func_80046060` (channel 0 = MDEC-in, not part of this round's
   assignment) is the matching `DecDCTinCallback`.
-- **Header**: `include/psyq/LIBPRESS.H`:
+- **Header**: `include/psyq/libpress.h`:
   `extern int DecDCToutCallback(void (*func)());`
 
 Two independent evidence kinds (position + call-target/DMA-channel

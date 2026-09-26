@@ -12,7 +12,7 @@
 > (`src/code_179d8_j.c`, `src/code_179d8_k.c`, `src/code_179d8_j_c.c`) keep
 > their existing byte-exact local `extern` signatures rather than a
 > LIBSND.H copy: unlike `SsUtKeyOn`, `SpuVmKeyOn` is libsnd/vmanager
-> INTERNAL and has no public prototype in `include/psyq/LIBSND.H` (grep
+> INTERNAL and has no public prototype in `include/psyq/libsnd.h` (grep
 > confirms no `Vm`-prefixed extern anywhere in that header) -- a finding,
 > not something to paper over.
 

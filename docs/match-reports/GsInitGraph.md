@@ -12,7 +12,7 @@ segment, the same region round 53 identified `GsSortClear` in.
   (`__fixdfdi`, libsn) scores masked 0.17 -- far below.
 - **Position**: after placed `libc2/memcpy` (3.3, ends `0x800238dc`), before
   placed `libgs/gs_103` (3.3, starts `0x80024734`) -- both disc 3.3.
-- **Header**: `include/psyq/LIBGS.H`:
+- **Header**: `include/psyq/libgs.h`:
   `void GsInitGraph(unsigned short x, unsigned short y, unsigned short intmode, unsigned short dith, unsigned short vrammode);`
 
 No C call site; no extern needed. Renamed with `tools/rename.py`.
