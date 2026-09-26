@@ -76,7 +76,7 @@ extern s32 gStyleFlushColor;
 extern u8 D_8008726C[];
 extern u8 gStylePalette[];
 extern s32 gStyleColorTable;
-extern u8 D_80087234[];
+extern u8 gStyleDecorColorsA[];
 extern s32 gStyleDecorVariant;
 
 void *PickStyleFallbackConfig(void) {
@@ -102,7 +102,7 @@ void *PickStyleFallbackConfig(void) {
         b2 = result[2];
         tab = D_8008726C;
         if (b2 != 0x12) {
-            tab = D_80087234;
+            tab = gStyleDecorColorsA;
         }
         gStyleColorTable = (s32)tab;
         if (remainder < 4) {
