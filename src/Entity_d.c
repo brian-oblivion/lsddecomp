@@ -6,9 +6,11 @@
  * consecutive with Entity_c's own tail, row 115 (Entity__MoodCue115, this
  * unit's last function) is not, confirming row order tracks moodIndex
  * assignment, not code address. The names were confirmed by reading
- * disk/SLPS_015.56 directly rather than trusting address proximity: for
- * each row, base 0x80089EB0 + 0x10*row is the row's `handler` word, and it
- * was checked against every candidate function's own address. The one
+ * disk/SLPS_015.56 directly rather than trusting address proximity:
+ * gEntityMoodHandlerTable's own base plus a fixed per-row stride locates
+ * each row's `handler` word (the arithmetic and addresses are in each
+ * function's docs/match-reports/Entity__MoodCueNN.md), and it was checked
+ * against every candidate function's own address. The one
  * exception, `Entity__func_80060710`, is not itself a table row -- it is a
  * private helper Entity__MoodCue43/44 both call directly (`jal`, not
  * through any vtable or table), tier C because its own purpose beyond
@@ -47,20 +49,21 @@ extern u8 ROTATION_ZMINUS90[];
 void Entity__func_80060710(Entity *this);
 
 void Entity__MoodCue39(Entity *this, EntityMoodHandlerArg *out) {
-    s32 r;
+    s32 dayYearPhase;
 
     if (this->moodTimer == 0) {
-        r = ((DreamSys *)this->peer)->methods->getCurrentDayAndYear((DreamSys *)this->peer, 0) % 3;
-        if (r == 0) {
+        dayYearPhase =
+            ((DreamSys *)this->peer)->methods->getCurrentDayAndYear((DreamSys *)this->peer, 0) % 3;
+        if (dayYearPhase == 0) {
             if (rand() % 3 != 0) {
-                goto skip48;
+                goto skipScaleBump;
             }
-        } else if (r != 2) {
-            goto skip48;
+        } else if (dayYearPhase != 2) {
+            goto skipScaleBump;
         }
         this->methods->updateScale(this, 1, SCALE_Y4);
     }
-skip48:
+skipScaleBump:
     if (out->unk4 % 22 == 0) {
         out->unk10 = this->methods->getProximityRatio(this);
         out->unk1C = 2;
@@ -116,6 +119,11 @@ void Entity__MoodCue41(Entity *this, EntityMoodHandlerArg *out) {
             rv = rand();
             tablePtr = &sScaleTemplateZDenom;
             *tablePtr = rv % 32 + 1;
+            /* sScaleTemplateZDenom sits directly after SCALE_X3 in rodata;
+             * this reaches 0xA bytes back into SCALE_X3's tail to reuse it
+             * as the fixed part of a template, with the just-randomized
+             * denominator as its final field (see
+             * docs/match-reports/Entity__MoodCue41.md). */
             this->methods->updateScale(this, 1, (u8 *)tablePtr - 0xA);
         }
     }
@@ -141,8 +149,8 @@ void Entity__MoodCue42(Entity *this, EntityMoodHandlerArg *out) {
 }
 
 void Entity__MoodCue43(Entity *this, EntityMoodHandlerArg *out) {
-    s32 a1val;
-    s32 r2;
+    s32 dx;
+    s32 rotPick;
     u8 *table;
 
     Entity__func_80060710(this);
@@ -152,11 +160,11 @@ void Entity__MoodCue43(Entity *this, EntityMoodHandlerArg *out) {
         out->unk30 = 0x12;
     }
     if (this->moodTimer >= 0x141) {
-        a1val = (rand() & 1) ? -0x3C : 0x3C;
-        this->methods->moveLocalX(this, a1val, 0);
-        r2 = rand();
+        dx = (rand() & 1) ? -0x3C : 0x3C;
+        this->methods->moveLocalX(this, dx, 0);
+        rotPick = rand();
         table = ROTATION_YAW_PLUS9;
-        if ((r2 & 3) != 0) {
+        if ((rotPick & 3) != 0) {
             table = ROTATION_YAW_MINUS9;
         }
         this->methods->updateRotation(this, 0, table);
@@ -164,9 +172,9 @@ void Entity__MoodCue43(Entity *this, EntityMoodHandlerArg *out) {
 }
 
 void Entity__MoodCue44(Entity *this, EntityMoodHandlerArg *out) {
-    s32 a1val;
-    s32 r1;
-    s32 r2;
+    s32 dx;
+    s32 dxPick;
+    s32 rotPick;
     u8 *table;
 
     Entity__func_80060710(this);
@@ -179,15 +187,15 @@ void Entity__MoodCue44(Entity *this, EntityMoodHandlerArg *out) {
     } else if ((u32)(this->moodTimer - 0x141) < 0x13) {
         this->methods->updateRotation(this, 0, ROTATION_YAW_MINUS9);
     } else if (this->moodTimer >= 0x141) {
-        r1 = rand();
-        a1val = -0x80;
-        if ((r1 & 1) != 0) {
-            a1val = 0x80;
+        dxPick = rand();
+        dx = -0x80;
+        if ((dxPick & 1) != 0) {
+            dx = 0x80;
         }
-        this->methods->moveLocalX(this, a1val, (void *)1);
-        r2 = rand();
+        this->methods->moveLocalX(this, dx, (void *)1);
+        rotPick = rand();
         table = ROTATION_YAW_PLUS9;
-        if ((r2 & 3) != 0) {
+        if ((rotPick & 3) != 0) {
             table = ROTATION_YAW_MINUS9;
         }
         this->methods->updateRotation(this, 0, table);
@@ -213,20 +221,21 @@ void Entity__func_80060710(Entity *this) {
 void Entity__MoodCue45(void) {}
 
 void Entity__MoodCue46(Entity *this, EntityMoodHandlerArg *out) {
-    s32 r;
+    s32 dayYearPhase;
 
     if (this->moodTimer == 0) {
-        r = ((DreamSys *)this->peer)->methods->getCurrentDayAndYear((DreamSys *)this->peer, 0) % 3;
-        if (r == 0) {
+        dayYearPhase =
+            ((DreamSys *)this->peer)->methods->getCurrentDayAndYear((DreamSys *)this->peer, 0) % 3;
+        if (dayYearPhase == 0) {
             if (rand() % 3 != 0) {
-                goto skip48;
+                goto skipScaleBump;
             }
-        } else if (r != 1) {
-            goto skip48;
+        } else if (dayYearPhase != 1) {
+            goto skipScaleBump;
         }
         this->methods->updateScale(this, 1, SCALE_SIX);
     }
-skip48:
+skipScaleBump:
     if (out->unk4 == 0) {
         out->unk10 = 0;
         out->unk1C = 0x12;
@@ -264,7 +273,7 @@ void Entity__MoodCue47(Entity *this) {
 }
 
 void Entity__MoodCue48(Entity *this, EntityMoodHandlerArg *out) {
-    s32 a1val;
+    s32 dy;
     EntityMethods *methods;
 
     if (this->todFrame == 0x26) {
@@ -273,14 +282,14 @@ void Entity__MoodCue48(Entity *this, EntityMoodHandlerArg *out) {
         out->unk1C = 6;
     }
     methods = this->methods;
-    a1val = (this->moodTimer % 10 < 5) ? -0x1E : 0x1E;
-    methods->moveLocalY(this, a1val, 0);
+    dy = (this->moodTimer % 10 < 5) ? -0x1E : 0x1E;
+    methods->moveLocalY(this, dy, 0);
     this->methods->moveLocalZ(this, -0x1E, (void *)1);
 }
 
 void Entity__MoodCue49(Entity *this, EntityMoodHandlerArg *out) {
-    DreamSysMethods *methods94;
-    void *a1;
+    DreamSysMethods *peerMethods;
+    void *translation;
 
     if (out->unk4 == 6) {
         out->unk10 = 0;
@@ -296,18 +305,18 @@ void Entity__MoodCue49(Entity *this, EntityMoodHandlerArg *out) {
             if (this->moodTimer == 0xA) {
                 this->methods->notifyParents(this, 0xA);
             } else if (((DreamSys *)this->peer)->methods->getLinkCommandFlag((DreamSys *)this->peer) != 0) {
-                methods94 = ((DreamSys *)this->peer)->methods;
-                a1 = this->parent ? this->coord2->unk38 : NULL;
-                methods94->setTranslation((DreamSys *)this->peer, a1);
+                peerMethods = ((DreamSys *)this->peer)->methods;
+                translation = this->parent ? this->coord2->unk38 : NULL;
+                peerMethods->setTranslation((DreamSys *)this->peer, translation);
                 ((DreamSys *)this->peer)->methods->updateRotation((DreamSys *)this->peer, 1, ROTATION_YAW_MINUS90);
                 ((DreamSys *)this->peer)->methods->clearTickCallbacks((DreamSys *)this->peer, 0);
                 this->moodTimer = 0;
                 this->state = 0xB;
             }
         } else if (this->state == 0xB) {
-            methods94 = ((DreamSys *)this->peer)->methods;
-            a1 = this->parent ? this->coord2->unk38 : NULL;
-            methods94->setTranslation((DreamSys *)this->peer, a1);
+            peerMethods = ((DreamSys *)this->peer)->methods;
+            translation = this->parent ? this->coord2->unk38 : NULL;
+            peerMethods->setTranslation((DreamSys *)this->peer, translation);
             if (this->moodTimer == 0x64) {
                 this->methods->notifyParents(this, 0xA);
             }
