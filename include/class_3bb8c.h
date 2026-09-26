@@ -811,10 +811,9 @@ extern void *BMemPMgrAlloc(s32 size);
  */
 typedef struct Class86B60 Class86B60;
 typedef struct Class86B60Methods Class86B60Methods;
-/* Forward declaration: full definition (DreamSysView_3bb8c_c /
- * DreamSysViewMethods_3bb8c_c) is below, established from Class86B60__Class86B60;
- * needed early because Class86B60::unkA4 is typed with it. */
-typedef struct DreamSysView_3bb8c_c DreamSysView_3bb8c_c;
+/* The DreamSys Class86B60::dreamSys holds (include/DreamSys.h; the units
+ * that call through it include that header). */
+struct DreamSys;
 
 /*
  * self->unkC's pointee. `unk0` is itself a pointer to a small vtable
@@ -858,7 +857,7 @@ struct Class86B60Unk4CObj_3bb8c_d {
 /*
  * self->unk60's pointee. Only `unk14` is reached, by Class86B60__RefreshViewValue, as a
  * plain `s32` copied into a one-word stack buffer before being forwarded
- * by address to `DreamSysViewMethods_3bb8c_c::slot19C`.
+ * by address to DreamSys's getSetScreenShake (+0x19C).
  */
 typedef struct Class86B60Unk60Obj_3bb8c_d Class86B60Unk60Obj_3bb8c_d;
 struct Class86B60Unk60Obj_3bb8c_d {
@@ -1047,7 +1046,7 @@ struct Class86B60Methods {
     void (*slotE0)(Class86B60 *self, void *arg1);
     u8 pad0E4[0x0F0 - 0x0E4];
     /* +0x0F0, Class86B60__SetState's own 3rd call: `(self, self->unk4C->unk8,
-     * 1)`. Distinct from `DreamSysViewMethods_3bb8c_c::slotF0` (see
+     * 1)`. Distinct from DreamSys's +0x0F0 (getSetFlashbackSession, see
      * Class86B60__ShowTitleIcon's report) -- same offset number, unrelated table.
      * Class86B60__CommitNameEntry (this round) also reaches this slot, forwarding an
      * `s32` (its own saved pre-overwrite copy of `self->unk58`) through
@@ -1057,7 +1056,7 @@ struct Class86B60Methods {
     void (*slotF0)(Class86B60 *self, void *arg1, s32 arg2);
     u8 pad0F4[0x11C - 0x0F4];
     /* +0x11C, Class86B60__CommitNameEntry's own call: `(self, buf, 1)` where `buf` is
-     * the value `DreamSysViewMethods_3bb8c_c::slot19C` (via `self->unkA4`)
+     * the value DreamSys's getSetScreenShake (+0x19C, via `self->dreamSys`)
      * just filled through a stack out-parameter. */
     void (*slot11C)(Class86B60 *self, s32 arg1, s32 arg2);
     u8 pad120[0x124 - 0x120];
@@ -1117,15 +1116,12 @@ struct Class86B60 {
      * loop iteration; real extent beyond one byte unknown. */
     u8 unk93;
     u8 pad094[0x0A4 - 0x094];
-    /* +0x0A4, Class86B60__Class86B60: stores its own dreamSys arg raw. RETYPED this
-     * round from a bare `void *` to `DreamSysView_3bb8c_c *` --
-     * Class86B60__ShowTitleIcon (this unit) is the first function to dereference it
-     * through its own vtable (`slotF0`) rather than only forwarding it
-     * opaquely. Same size (4 bytes), so no layout change; the assignment
-     * in Class86B60__Class86B60 (`self->unkA4 = dreamSys;`, `dreamSys` a `void *`
-     * parameter) still compiles under ordinary C pointer conversion
-     * rules. */
-    DreamSysView_3bb8c_c *dreamSysView;
+    /* +0x0A4, Class86B60__Class86B60: its dreamSys argument, the game's
+     * DreamSys (track 4, round 88: the six slots this class calls on it,
+     * +0x0F0/+0x19C/+0x1A0/+0x1A8/+0x1AC/+0x1B0, are DreamSys's
+     * getSetFlashbackSession, getSetScreenShake, getCurrentDayAndYear,
+     * clearNewGameFlag, getNewGameFlag and getSaveBlock). */
+    struct DreamSys *dreamSys;
     /* +0x0A8/+0x0AC, Class86B60__Dtor (this unit's destructor): two owned
      * sub-objects, each released through their own shared `release` slot.
      * BOTH releases sit inside the SAME `unkAC != NULL` guard -- retail's
@@ -1155,9 +1151,9 @@ struct Class86B60 {
     Class86B60UnkB0Obj_3bb8c_d *nameField; /* RENAMED from unkB0 -- the New_TextRow result
                                         Class86B60__CreateNameField constructs. */
     u8 pad0B4[0x0BC - 0x0B4];
-    s32 unkBC;                      /* +0x0BC, Class86B60__Class86B60: return value of dreamSys->methods->slot1B0 */
+    s32 unkBC;                      /* +0x0BC, Class86B60__Class86B60: dreamSys->methods->getSaveBlock's return (&saveMagic) */
     s32 unkC0;                      /* +0x0C0, Class86B60__Class86B60: output buffer address passed BY REFERENCE
-                                        to dreamSys->methods->slot1B0 -- last word of the 0xC4-byte
+                                        to dreamSys->methods->getSaveBlock (the save block size, 0x700) -- last word of the 0xC4-byte
                                         allocation (0xC0+4 == 0xC4), which is why this field is exactly
                                         one word wide rather than a guess */
 };
@@ -1178,52 +1174,6 @@ typedef struct Class86B60Unk48ObjMethods {
 typedef struct Class86B60Unk48Obj {
     Class86B60Unk48ObjMethods *methods;   /* +0x000 */
 } Class86B60Unk48Obj;
-
-/*
- * Local, opaque view of Class86B60__Class86B60's `dreamSys` argument -- only the
- * two vtable slots that function reaches (+0x1A0, +0x1B0) are typed. This
- * project already has a much larger, canonical `DreamSys` type
- * (include/DreamSys.h) with its own `vt` field, but neither offset is
- * established there yet and this unit does not edit that header -- kept
- * as an independent local view per this project's established convention
- * (see e.g. Obj866E8 vs. Class866E8 at the top of this file). The `void
- * *dreamSys` parameter type on New_Class86B60/Class86B60__Class86B60 themselves is
- * kept untyped/opaque to match the ALREADY-established external
- * declaration `extern PollTask *New_Class86B60(void *dreamSys);` in
- * include/Class6D3C8.h (a different unit's own independent view of this
- * same New_X allocator, used there as a `PollTaskCtor` callback) --
- * this local dispatch type is used only inside Class86B60__Class86B60's own body.
- */
-typedef struct DreamSysViewMethods_3bb8c_c DreamSysViewMethods_3bb8c_c;
-
-struct DreamSysViewMethods_3bb8c_c {
-    u8 pad000[0x0F0];
-    /* +0x0F0, Class86B60__ShowTitleIcon's own last call: `(dreamSys, 0, 0)`, both
-     * trailing arguments literal zero. */
-    void (*slotF0)(DreamSysView_3bb8c_c *self, s32 arg1, s32 arg2);
-    u8 pad0F4[0x19C - 0x0F4];
-    /* +0x19C, Class86B60__RefreshViewValue's own call: `arg1` is the address of a
-     * one-word stack buffer this function fills from
-     * `self->unk60->unk14` before the call. */
-    void (*slot19C)(DreamSysView_3bb8c_c *self, s32 *arg1);
-    /* Return value forwarded straight to FormatNumberIntoBuffer's own arg0. */
-    s32 (*slot1A0)(DreamSysView_3bb8c_c *self, s32 arg1);      /* +0x1A0 */
-    u8 pad1A4[0x1A8 - 0x1A4];
-    /* +0x1A8, Class86B60__OnTagBValue's own call, `self` only. */
-    void (*slot1A8)(DreamSysView_3bb8c_c *self);
-    /* +0x1AC, Class86B60__UpdateMemcardSaveWithIcon's own call: `self->unkA4->methods->slot1AC(
-     * self->unkA4)`. Nonzero return gates a one-byte-zero write into
-     * `*D_8008AA10` (return type therefore `s32`, not `void` -- the
-     * caller's `beqz` on `$v0` tests it directly). */
-    s32 (*slot1AC)(DreamSysView_3bb8c_c *self);
-    /* Return value stored into Class86B60::unkBC; arg1 is the address of
-     * Class86B60::unkC0 (an output buffer this slot presumably fills). */
-    s32 (*slot1B0)(DreamSysView_3bb8c_c *self, void *arg1);     /* +0x1B0 */
-};
-
-struct DreamSysView_3bb8c_c {
-    DreamSysViewMethods_3bb8c_c *methods;   /* +0x000 */
-};
 
 /* Class86B60's parent is TaskCore (include/TaskCore.h, track 4 round 84):
  * its methods reach the base implementations through Get_vtable_TaskCore()
