@@ -618,6 +618,8 @@ load through a runtime-indexed global", §"BLOCKED: the `nop_mflo_mfhi` screen r
   in the other direction: read a flags word through a struct field to let loads hoist above global
   stores. Discriminator: the built code has the store first and the load after, with identical words.
   Three closes in round 76 (`StyleFillEffectKind3` 81/81, `StyleFillEffectKind2`, `SortTmdObject`).
+  **So a track 7 raw-offset-to-field rewrite of STORES is not byte-neutral**: `ctx->faceVtx[i] = v`
+  hoisted a reload 67 bytes off; `SVECTOR **vtx = ctx->faceVtx; vtx[i] = v` matched (round 91, delta).
 
 - **`volatile` is the NARROW instrument for the instruction-ORDER class, not the banned construct**
   — it names no register, exactly like the sanctioned bare `__asm__("")`. Where three barrier
