@@ -6,43 +6,19 @@
  * `gp_rel` were resolved project-wide (CLAUDE.md, "Open toolchain
  * blockers"). This unit owns no switch jump table.
  *
- * NAMING PASS, round 69 (runner alpha). Two class identifications drive
- * every name below, both confirmed with `tools/classtable.py`, never by
- * guessing from a slot number:
- *
- *   - This unit's `self` (`ObjM`) is a subclass whose OWN vtable is
- *     `D_80087034` (`tools/classtable.py 0x80087034`, 53 slots) -- the same
- *     class as class_3bb8c_l's `Obj87034_3bb8c_l` (see that HEAD NOTE in
- *     include/class_3bb8c.h; NOT unified with it here, a struct-merge is its
- *     own change per that note). This unit's own 14 functions occupy that
- *     table's tail, offsets +0xA0..+0xD4, i.e. this class's own new virtual
- *     methods (the base Class86668/Obj865C8 table --
- *     docs/match-reports/ObjM__Dtor.md -- only goes up to about +0x88).
- *     `ObjMMethods::notifyParents`/`checkAuxTrigger`/`teardownPauseOverlay`
- *     (+0x030/+0x0B8/+0x0D4) are confirmed the same way: +0x030 is
- *     `BasicClass__NotifyParents`, and +0x0B8/+0x0D4 are this unit's own
- *     `ObjM__CheckAuxTrigger`/`ObjM__TeardownPauseOverlay`.
- *   - `self->dreamSys` (formerly `unk3C`) is `DreamSys*`
- *     (`tools/classtable.py 0x80087BDC`, DreamSys's real vtable,
- *     include/DreamSys.h): the six offsets this unit dispatches
- *     (0xF0/0xF4/0xFC/0x13C/0x17C/0x1A0) land EXACTLY on
- *     DreamSys__GetSetFlashbackSession/SetMoveOverride/BlockMovement/
- *     SelectCallback98/StopDrift/GetCurrentDayAndYear, both offset and
- *     argument count. Since track 4 (round 88) it is typed with the
- *     unified header, include/DreamSys.h.
- *
- * What the class itself IS remains TIER B, not asserted further:
- * `ObjM__AdvancePauseSetup`/`ObjM__TeardownPauseOverlay` build and tear down
- * an object literally constructed with the name "Pause"
- * (`D_8008AB44`, "Pause", asm/data/7B008.sdata.s), gated by a 5-step
- * counter and a `mode` field (`ObjM::mode`, ex-`unk20`) that other
- * functions here set to fixed small codes (0,4,5,6,7,8,0xA,0xB,0xC,0xD) and
- * forward to `ObjMMethods::notifyParents` -- consistent with a pause/dialog
- * overlay controller driving a small state machine and notifying its
- * parent object of transitions, but nothing here pins down the exact
- * gameplay meaning of any one mode code. `func_800541CC` (vtable slot
- * +0x0BC) is an empty `{}` body with no further evidence and is left
- * unnamed.
+ * ObjM's methods from +0x0A0 to the end of its table (gObjMMethods,
+ * include/ObjM.h; track 4, round 89 unified the class_3bb8c_k/_l/_m views
+ * there), and its getter: EnterState7/8/A and NotifyParentsCodeB (the
+ * DreamSys codes 0xE..0x11, which set IntermediateBase::state and start a
+ * fade), StartFadeUp (the viewport's Class6E99C fade box), the fade box's
+ * and the Class866E8's notification handlers (OnFadeNotify: 5 fade down
+ * done, 6 fade up done; OnClass866E8Notify: 7 runs CheckAuxTrigger), and
+ * the "Pause" overlay: AdvancePauseSetup builds the TextRow and, four
+ * calls later, pauses the FrameClock, the WBgm and the VabStreamObj and
+ * hides the viewport; TeardownPauseOverlay undoes it; the close-ready flag
+ * and CloseAndNotifyC/D report 0xC/0xD to the parent (Class865C8's
+ * onObjMNotify). NoOpSlotBC is empty. What the state codes mean in the
+ * game is not established.
  *
  * A separate, unrelated cluster of free functions (RegisterStyleConfig /
  * ApplyStyleConfig / FillStyleFromConfig / ApplyStyleDecorationIfSet) reads
@@ -60,28 +36,42 @@
 #include "Class81940.h"
 #include "BoxFill.h"
 #include "TextRow.h"
+#include "ObjM.h"
+#include "Class866E8.h"
+#include "Class869D8.h"
+#include "Class6E99C.h"
+#include "FrameClock.h"
+#include "WBgm.h"
+#include "VabStreamObj.h"
 
-/* Forward declaration: defined later in this same unit, but called by
- * ObjM__EnterState7/ObjM__EnterState8/ObjM__EnterStateA above its own definition. */
-extern void ObjM__ForwardToSubChild(ObjM *self, s32 arg1, s32 arg2, s32 arg3, s32 arg4);
+/* ObjM__CheckAuxTrigger's one external call, src/code_4cd08.c (MATCHED; its
+ * definition reads the second argument as `s16 *`). The third argument is
+ * the DreamSys's getCurrentDayAndYear result. */
+extern s32 TryDreamAuxTrigger(s32 arg0, s32 *arg1, void *arg2);
+
+/* ObjM__AdvancePauseSetup's literals, all reached by address: the "Pause"
+ * text, the TextRow's position (attachToParent) and its colour (setColor). */
+extern char D_8008AB44[];   /* "Pause" (asm/data/7B008.sdata.s) */
+extern s32 D_8008AB38;      /* two words: the position */
+extern s32 D_8008AB40;      /* one word: the colour */
 
 void ObjM__EnterState7(ObjM *self) {
     s32 val;
-    self->mode = 7;
+    self->state = 7;
     self->dreamSys->methods->getSetFlashbackSession(self->dreamSys, (DreamColors *)&val, -1);
-    ObjM__ForwardToSubChild(self, val, 0, 5, 1);
+    ObjM__StartFadeUp(self, val, 0, 5, 1);
     self->dreamSys->methods->blockMovement(self->dreamSys);
 }
 
 void ObjM__EnterState8(ObjM *self) {
-    self->mode = 8;
-    ObjM__ForwardToSubChild(self, 0, 0, 6, 1);
+    self->state = 8;
+    ObjM__StartFadeUp(self, 0, 0, 6, 1);
     self->dreamSys->methods->setMoveOverride(self->dreamSys, 1);
 }
 
 void ObjM__EnterStateA(ObjM *self) {
-    self->mode = 0xA;
-    ObjM__ForwardToSubChild(self, 0, 0, 6, 1);
+    self->state = 0xA;
+    ObjM__StartFadeUp(self, 0, 0, 6, 1);
     self->dreamSys->methods->selectCallback98(self->dreamSys, 2);
     self->dreamSys->methods->setMoveOverride(self->dreamSys, 2);
 }
@@ -90,41 +80,43 @@ void ObjM__NotifyParentsCodeB(ObjM *self) {
     self->methods->notifyParents(self, 0xB);
 }
 
-void ObjM__ForwardToSubChild(ObjM *self, s32 arg1, s32 arg2, s32 arg3, s32 arg4) {
-    ChildM_AC *obj = self->unk18->methods->slotAC(self->unk18);
-    if (arg3 != 0) {
-        obj->methods->slotD0(obj, arg3);
+/* The viewport (IntermediateBase::viewport, a Class869D8) hands out its fade
+ * box (getSubHandle, Viewport's New_Class6E99C). */
+void ObjM__StartFadeUp(ObjM *self, s32 channels, s32 arg2, s32 step, s32 addChild) {
+    Class6E99C *fade = (Class6E99C *)((Class869D8 *)self->viewport)->methods->getSubHandle((Class869D8 *)self->viewport);
+    if (step != 0) {
+        fade->methods->setStep(fade, step);
     }
-    if (arg4 != 0) {
-        self->methods->slot10(self, obj);
+    if (addChild != 0) {
+        self->methods->addChild(self, (BasicClass *)fade);
     }
-    obj->methods->slotD8(obj, self->unk10, arg1, arg2);
+    fade->methods->startFadeUp(fade, self->unk10, channels, arg2);
 }
 
-void ObjM__HandleEvent5Or6(ObjM *self, ParamM *p1, s32 sel) {
-    s32 v;
-    switch (sel) {
+void ObjM__OnFadeNotify(ObjM *self, Class6E99C *sender, s32 event) {
+    void *color;
+    switch (event) {
     case 5:
-        self->methods->slot14(self, p1);
+        self->methods->removeChild(self, (BasicClass *)sender);
         self->dreamSys->methods->setMoveOverride(self->dreamSys, 0);
-        self->mode = 0;
+        self->state = 0;
         break;
     case 6:
-        self->methods->slot14(self, p1);
-        v = p1->methods->slotE4(p1);
-        self->unk18->methods->slot64(self->unk18, v);
-        if (self->mode != 5 && self->mode != 8 && self->mode == 0xA) {
+        self->methods->removeChild(self, (BasicClass *)sender);
+        color = sender->methods->getColor(sender);
+        ((Class869D8 *)self->viewport)->methods->setClearColor((Class869D8 *)self->viewport, (ViewportRgb *)color);
+        if (self->state != 5 && self->state != 8 && self->state == 0xA) {
             self->dreamSys->methods->stopDrift(self->dreamSys, 1);
             self->dreamSys->methods->setMoveOverride(self->dreamSys, 0);
-            self->mode = 4;
+            self->state = 4;
         }
-        self->methods->notifyParents(self, self->mode);
+        self->methods->notifyParents(self, self->state);
         break;
     }
 }
 
-void ObjM__HandleEvent7(ObjM *self, s32 arg1, s32 arg2) {
-    if (arg2 == 7) {
+void ObjM__OnClass866E8Notify(ObjM *self, BasicClass *sender, s32 event) {
+    if (event == 7) {
         self->methods->checkAuxTrigger(self);
     }
 }
@@ -132,22 +124,22 @@ void ObjM__HandleEvent7(ObjM *self, s32 arg1, s32 arg2) {
 s32 ObjM__CheckAuxTrigger(ObjM *self) {
     s32 out;
     s32 result;
-    ChildM114 *child = self->unk14->methods->slot114(self->unk14, &out);
+    Class866E8Elem *elem = ((Class866E8 *)self->unk14)->methods->getLastTargetRateSplit((Class866E8 *)self->unk14, (u8 *)&out);
     void *thing = (void *)self->dreamSys->methods->getCurrentDayAndYear(self->dreamSys, 0);
-    result = TryDreamAuxTrigger((s32)child->unk4->dataBuffer, &out, thing);
-    child->unk14 = result;
+    result = TryDreamAuxTrigger((s32)elem->loader->dataBuffer, &out, thing);
+    elem->heldObj = (BasicClass *)result;
     if (result != 0) {
         return 0;
     }
-    child->unk4->methods->releaseDataBlock(child->unk4);
+    elem->loader->methods->releaseDataBlock(elem->loader);
     return 1;
 }
 
-void func_800541CC(void) {
+void ObjM__NoOpSlotBC(void) {
 }
 
 void ObjM__UpdateCloseReadyFlag(ObjM *self) {
-    if (self->pauseSetupStep != 0 && self->mode == 0) {
+    if (self->pauseSetupStep != 0 && self->state == 0) {
         self->closeReady = 1;
     }
 }
@@ -170,12 +162,15 @@ void ObjM__CloseAndNotifyC(ObjM *self) {
     }
 }
 
+/* The pause: step 0 builds the "Pause" TextRow under the Class866E8; the
+ * fourth call after it hides the viewport and pauses the FrameClock, the
+ * WBgm and the VabStreamObj (IntermediateBase::unk10, bgm, Class86668::sound). */
 void ObjM__AdvancePauseSetup(ObjM *self) {
     s32 state = self->pauseSetupStep;
     if (state == 0) {
-        self->unk7C = (FieldM7C *)New_TextRow(self->unk74, 5, &D_8008AB44[0]);
-        self->unk7C->methods->slot4C(self->unk7C, self->unk14, &D_8008AB38);
-        self->unk7C->methods->slotB8(self->unk7C, &D_8008AB40);
+        self->pauseText = New_TextRow(self->etcTim, 5, &D_8008AB44[0]);
+        self->pauseText->methods->attachToParent(self->pauseText, (Class6B5CC *)self->unk14, (Vec3_d294 *)&D_8008AB38);
+        self->pauseText->methods->setColor(self->pauseText, (SpriteRgb *)&D_8008AB40);
         self->pauseSetupStep = state + 1;
         return;
     }
@@ -183,25 +178,25 @@ void ObjM__AdvancePauseSetup(ObjM *self) {
     if (state != 4) {
         return;
     }
-    self->unk18->methods->slotB4(self->unk18, 0);
-    self->unk10->methods->slot4C(self->unk10);
-    self->unk54->methods->slot4C(self->unk54);
-    self->unk34->methods->slot88(self->unk34);
+    ((Class869D8 *)self->viewport)->methods->setDrawEnabled((Class869D8 *)self->viewport, 0);
+    ((FrameClock *)self->unk10)->methods->pause((FrameClock *)self->unk10);
+    self->bgm->methods->pause(self->bgm);
+    ((VabStreamObj *)self->sound)->methods->mute((VabStreamObj *)self->sound);
 }
 
 void ObjM__TeardownPauseOverlay(ObjM *self) {
     if (self->pauseSetupStep != 0) {
-        self->unk7C->methods->slot4(self->unk7C);
+        self->pauseText->methods->release(self->pauseText);
     }
-    self->unk34->methods->slot8C(self->unk34);
-    self->unk54->methods->slot50(self->unk54);
-    self->unk10->methods->slot50(self->unk10);
-    self->unk18->methods->slotB4(self->unk18, 1);
+    ((VabStreamObj *)self->sound)->methods->unmute((VabStreamObj *)self->sound);
+    self->bgm->methods->resume(self->bgm);
+    ((FrameClock *)self->unk10)->methods->resume((FrameClock *)self->unk10);
+    ((Class869D8 *)self->viewport)->methods->setDrawEnabled((Class869D8 *)self->viewport, 1);
     self->pauseSetupStep = 0;
 }
 
-void *GetObjMMethods(void) {
-    return &D_80087034;
+ObjMMethods *GetObjMMethods(void) {
+    return &gObjMMethods;
 }
 
 struct StyleM;
@@ -261,14 +256,12 @@ void *ApplyStyleConfig(void) {
     return &D_80087424;
 }
 
-/* FillStyleFromConfig's destination is NOT an `ObjM`. That struct's +0x014 and +0x018
- * are already established as unrelated object pointers by five other functions
- * in this unit (`FieldM14 *`/`FieldM18 *`), whereas this function writes a
- * colour-table POINTER to +0x018 and a plain sign-extended byte to +0x014. So
- * this is a separate descriptor, and its view stays LOCAL rather than going
- * into include/class_3bb8c.h -- which eleven units share, and where adding
- * `unkC`/`unk1C` to `ObjM` on this evidence would be a claim the bytes do not
- * support.
+/* FillStyleFromConfig's destination (D_80087424, via ApplyStyleConfig) is
+ * not an ObjM: it is the record ObjM keeps as `styleConfig`, which
+ * include/class_3bb8c.h views as Unk50Struct_3bb8c_l (its +0x00C/+0x018
+ * colours and +0x01C fog value agree with the fields below). The two views
+ * stay separate here: the record is not a class, and merging them is a
+ * global's type (track 4b).
  *
  * D_800872C4 is a table of 24 three-byte entries (0x48 bytes; the first four
  * are 00/00/00, 40/40/40, 80/80/80, FF/FF/FF -- a greyscale ramp, so RGB

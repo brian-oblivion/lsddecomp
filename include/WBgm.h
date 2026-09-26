@@ -31,7 +31,7 @@
  * object as Class865C8::bgm (include/Class865C8.h), and
  * hands it to New_ObjM, whose ObjM keeps it at +0x054 and calls +0x04C
  * pause and +0x050 resume on it (ObjM__AdvancePauseSetup,
- * ObjM__TeardownPauseOverlay; include/class_3bb8c.h's FieldM50 view).
+ * ObjM__TeardownPauseOverlay; include/ObjM.h).
  *
  * gWBgmActive is 1 from the ctor to finalize; IsWBgmActive returns it, and
  * VabStreamObj__Finalize (src/code_179d8_e.c) shuts libsnd down (SsEnd,

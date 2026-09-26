@@ -23,7 +23,7 @@
  *    sets up the viewport and attaches the DreamSys to it (phase 1);
  *  - onTag1Notify's event 2 (Class865C8__AdvancePhase) runs the DreamSys's
  *    startDay (or, from phase 3, releases the old objM and asks for the
- *    current stage) and StartObjM builds a New_ObjM (D_80087034, 0x2F230)
+ *    current stage) and StartObjM builds a New_ObjM (gObjMMethods, 0x2F230)
  *    from sound, bgm, etcTim and dreamerTmd, adds it as a child and inits it
  *    (phase 2);
  *  - onObjMNotify (+0x084, the notifications of a 0x2F230 sender) ends the
@@ -46,7 +46,7 @@ struct DreamSys;
 struct WBgm;
 struct TimImage;
 struct LinkResource;
-struct Obj4C; /* D_80087034's object as class_39e08.h views it (New_ObjM's result) */
+struct ObjM;  /* include/ObjM.h */
 
 /* Class86668's slots, then this class's own. Overridden: ctor, finalize,
  * onNotify, resetCounters (Class865C8__ResetPhase), init, deinit, onInit,
@@ -54,7 +54,7 @@ struct Obj4C; /* D_80087034's object as class_39e08.h views it (New_ObjM's resul
 #define CLASS865C8_SLOTS(Self, CtorParams)                                                         \
     CLASS86668_SLOTS(Self, CtorParams);                                                            \
     /* +0x080 */ void (*onDreamSysNotify)(Self *self, BasicClass *sender, s32 event); /* Class865C8__OnDreamSysNotify, empty; onNotify's 0x1F34 (DreamSys) sender */ \
-    /* +0x084 */ void (*onObjMNotify)(Self *self, BasicClass *sender, s32 event)      /* Class865C8__OnObjMNotify; onNotify's 0x2F230 (D_80087034) sender */
+    /* +0x084 */ void (*onObjMNotify)(Self *self, BasicClass *sender, s32 event)      /* Class865C8__OnObjMNotify; onNotify's 0x2F230 (gObjMMethods) sender */
 
 #define CLASS865C8_FIELDS(Methods)                                                                 \
     CLASS86668_FIELDS(Methods);                                                                    \
@@ -63,7 +63,7 @@ struct Obj4C; /* D_80087034's object as class_39e08.h views it (New_ObjM's resul
     /* +0x040 */ struct WBgm *bgm;          /* New_WBgm(PickWeeklyGroup(0), NULL, 1); New_ObjM's 2nd argument; finalize releases it */ \
     /* +0x044 */ struct TimImage *etcTim;   /* New_TimImage("ETC\ETC.TIM"), uploaded and its buffer freed; DreamSys +0x114; New_ObjM's 3rd */ \
     /* +0x048 */ struct LinkResource *dreamerTmd;    /* New_LinkResource("ETC\DREAMER.TMD"); New_ObjM's 4th; finalize releases it */ \
-    /* +0x04C */ struct Obj4C *objM         /* StartObjM's New_ObjM(...); a child; released by AdvancePhase/OnObjMNotify */
+    /* +0x04C */ struct ObjM *objM          /* StartObjM's New_ObjM(...); a child; released by AdvancePhase/OnObjMNotify */
 
 struct Class865C8Methods {
     CLASS865C8_SLOTS(Class865C8, (Class865C8 *self, IntermediateBaseInitArgs *initArgs, struct DreamSys *dreamSys, s32 arg3));

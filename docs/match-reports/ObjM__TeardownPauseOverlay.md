@@ -14,13 +14,13 @@ Establishes three new `ObjM` fields and their target types: `unk34`
 
 **One RETYPE of an existing field, flagged explicitly (per the shared-
 header rule):** `ObjM::unk10` was `s32` from round 15a's
-`ObjM__ForwardToSubChild` (established there as a plain forwarded register value,
+`ObjM__StartFadeUp` (established there as a plain forwarded register value,
 never dereferenced). This function dereferences the SAME field's vtable
 directly (`self->unk10->methods->slot50(self->unk10)`), so it IS a
 pointer -- retyped to `FieldM50 *`. This is the established ABI-neutral
 retype pattern: a pointer value forwarded as a raw register argument
 compiles identically whether declared `s32` or a pointer type. Verified:
-full rebuild stays whole-image green, and `ObjM__ForwardToSubChild` itself still
+full rebuild stays whole-image green, and `ObjM__StartFadeUp` itself still
 scores 52/52 unchanged.
 
 `FieldM50` is deliberately NOT unified with `include/code_2cc8c.h`'s
@@ -64,3 +64,8 @@ round 15b (2026-09-04), runner echo, second pass on `class_3bb8c_m`.
 ## Naming
 
 **ObjM__TeardownPauseOverlay** -- tier B. Mirror of `ObjM__AdvancePauseSetup`: if the pause-setup counter is non-zero, destroys the "Pause"-named object (`self->unk7C`'s `slot4`) and notifies the same siblings (`unk34`/`unk54`/`unk10`/`unk18`), then resets the counter. Same evidence and tier as its counterpart.
+
+
+## Track 4 (2026-09-26, round 89, echo)
+
+The class is unified as ObjM in include/ObjM.h (table gObjMMethods, was D_80087034); the class_3bb8c_k/_l/_m views (ObjM_3bb8c_k, Obj87034_3bb8c_l, ObjM) and class_39e08.h's Obj4C/SubObjB/EventArg are gone. Byte-identical. Holders now typed: pauseText (TextRow release), sound (VabStreamObj unmute), bgm (WBgm resume), unk10 (FrameClock resume), viewport (Class869D8 setDrawEnabled).

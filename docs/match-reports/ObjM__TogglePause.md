@@ -1,4 +1,6 @@
-# ObjM__DispatchActiveState
+# ObjM__TogglePause
+
+> Renamed from `ObjM__DispatchActiveState` on 2026-09-26 (tools/rename.py). Address 0x80053458.
 
 > Renamed from `func_80053458` on 2026-09-24 (tools/rename.py). Address 0x80053458.
 
@@ -8,7 +10,7 @@
 ## What it does
 
 ```c
-void ObjM__DispatchActiveState(Obj87034_3bb8c_l *self) {
+void ObjM__TogglePause(Obj87034_3bb8c_l *self) {
     Obj87034Methods_3bb8c_l *m = self->methods;
 
     if (self->unk80 != 0) {
@@ -23,7 +25,7 @@ void ObjM__DispatchActiveState(Obj87034_3bb8c_l *self) {
 ## Residue: register identity, fixed by removing a `void (*fn)(...)` local
 
 The first form used a `void (*fn)(Obj87034_3bb8c_l *)` local, set inside
-each branch and called once at the end (mirroring `ObjM__TickTarget`'s
+each branch and called once at the end (mirroring `ObjM__Update`'s
 matched shape, which uses exactly that pattern one function earlier in
 this same unit):
 
@@ -71,6 +73,11 @@ Round 78 (charlie), FINISHING-PLAN track 3.
 
 | was | now | tier | evidence |
 | --- | --- | --- | --- |
-| `func_80053458` | `ObjM__DispatchActiveState` | B | see below |
+| `func_80053458` | `ObjM__TogglePause` | B | see below |
 
-**Evidence.** vtable slot +0x074. Gated on `self->unk80`: dispatches `slotC4` then `slotD4` when set, else `slotD0` alone -- structurally similar to `ObjM__TickTarget`'s own `unk80` branch but a distinct slot pair.
+**Evidence.** vtable slot +0x074. Gated on `self->unk80`: dispatches `slotC4` then `slotD4` when set, else `slotD0` alone -- structurally similar to `ObjM__Update`'s own `unk80` branch but a distinct slot pair.
+
+
+## Track 4 (2026-09-26, round 89, echo)
+
+Renamed from `ObjM__DispatchActiveState` (rename.py). The two branches are the pause overlay's: with `pauseSetupStep` (+0x080) nonzero it runs clearCloseReadyFlag (+0x0C4) and teardownPauseOverlay (+0x0D4), else advancePauseSetup (+0x0D0), which builds the "Pause" TextRow. It fills Class86668's `slot74`, which `ObjM__DispatchPadEvent` runs for pad code 0x21. Tier B (a toggle of the pause overlay; which button 0x21 is, is not established).

@@ -1,4 +1,6 @@
-# ObjM__DispatchEvent
+# ObjM__DispatchPadEvent
+
+> Renamed from `ObjM__DispatchEvent` on 2026-09-26 (tools/rename.py). Address 0x80053358.
 
 > Renamed from `func_80053358` on 2026-09-24 (tools/rename.py). Address 0x80053358.
 
@@ -12,7 +14,7 @@ slots on `self` (or does nothing if `self->unk68` is zero, or the event
 isn't one of the four recognised values).
 
 ```c
-void ObjM__DispatchEvent(Obj87034_3bb8c_l *self, void *arg1, s32 eventId) {
+void ObjM__DispatchPadEvent(Obj87034_3bb8c_l *self, void *arg1, s32 eventId) {
     Obj87034Methods_3bb8c_l *m = self->methods;
     void (*fn)(Obj87034_3bb8c_l *);
 
@@ -72,7 +74,7 @@ Three source forms were tried before this one matched, in order:
    0x17) { if (eventId == 0xC) ...; else return; } else ...`). This fixed
    the comparison ORDER but every individual `==` test came out with the
    wrong branch polarity (body at fallthrough instead of target, same
-   class of residue as `ObjM__OnRegistrantEvent`/`ObjM__TransferToOther`) AND, worse, GCC
+   class of residue as `ObjM__OnRegistrantEvent`/`ObjM__PollTimBlockLoad`) AND, worse, GCC
    inlined each case body at its own comparison site instead of placing
    all four bodies out-of-line after the full compare chain the way
    retail does. Scored the same 11/38, different residue shape.
@@ -113,6 +115,11 @@ Round 78 (charlie), FINISHING-PLAN track 3.
 
 | was | now | tier | evidence |
 | --- | --- | --- | --- |
-| `func_80053358` | `ObjM__DispatchEvent` | B | see below |
+| `func_80053358` | `ObjM__DispatchPadEvent` | B | see below |
 
 **Evidence.** vtable slot +0x058. A generic `eventId` dispatcher: four recognised numeric codes (0xC, 0x16, 0x21, 0x2C) each forward to one of self's own vtable slots; anything else, or `self->unk68 == 0`, is a no-op.
+
+
+## Track 4 (2026-09-26, round 89, echo)
+
+Renamed from `ObjM__DispatchEvent` (rename.py): it occupies IntermediateBase's `onPadEvent` (+0x058, onNotify's Pad case), so the codes are pad codes: 0x21 slot74 (TogglePause), 0xC updateCloseReadyFlag, 0x2C clearCloseReadyFlag, 0x16 closeAndNotifyD; only while `inSession`. Tier B (which buttons the codes are is not established).

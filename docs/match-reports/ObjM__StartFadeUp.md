@@ -1,4 +1,6 @@
-# ObjM__ForwardToSubChild
+# ObjM__StartFadeUp
+
+> Renamed from `ObjM__ForwardToSubChild` on 2026-09-26 (tools/rename.py). Address 0x80053eb4.
 
 > Renamed from `func_80053EB4` on 2026-09-23 (tools/rename.py). Address 0x80053eb4.
 
@@ -19,7 +21,7 @@ whose own vtable exposes `slotD0` and `slotD8`.
 ## What this function does
 
 ```c
-void ObjM__ForwardToSubChild(ObjM *self, s32 arg1, s32 arg2, s32 arg3, s32 arg4) {
+void ObjM__StartFadeUp(ObjM *self, s32 arg1, s32 arg2, s32 arg3, s32 arg4) {
     ChildM_AC *obj = self->unk18->methods->slotAC(self->unk18);
     if (arg3 != 0) {
         obj->methods->slotD0(obj, arg3);
@@ -50,4 +52,9 @@ round 15 (2026-09-04), runner echo, fresh carve `class_3bb8c_m`.
 
 ## Naming
 
-**ObjM__ForwardToSubChild** -- tier B. Shared helper for the three `EnterState*` functions: fetches a `ChildM_AC` from `self->unk18`'s `slotAC`, optionally sets it up (`slotD0`) and notifies the base (`self->methods->slot10`), then dispatches `slotD8(self->unk10, arg1, arg2)`. Mechanically clear; what the pushed value represents in-game is not established.
+**ObjM__StartFadeUp** -- tier B. Shared helper for the three `EnterState*` functions: fetches a `ChildM_AC` from `self->unk18`'s `slotAC`, optionally sets it up (`slotD0`) and notifies the base (`self->methods->slot10`), then dispatches `slotD8(self->unk10, arg1, arg2)`. Mechanically clear; what the pushed value represents in-game is not established.
+
+
+## Track 4 (2026-09-26, round 89, echo)
+
+Renamed from `ObjM__ForwardToSubChild` (rename.py). The "sub child" is the viewport's fade box: IntermediateBase::viewport (+0x018) is the Class869D8 of the building Class865C8's init args, its +0x0AC is Viewport's getSubHandle, whose object is Viewport's New_Class6E99C; +0x0D0 and +0x0D8 on it are Class6E99C's setStep and startFadeUp, the source being IntermediateBase::unk10 (the FrameClock). So: set the fade step (when nonzero), add the box as a child (when asked, so its 5/6 notifications reach ObjM__OnFadeNotify), start a fade up with the given channels. Tier A for the mechanics. Parameters named (channels, arg2, step, addChild).

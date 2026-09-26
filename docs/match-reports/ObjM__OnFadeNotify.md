@@ -1,4 +1,6 @@
-# ObjM__HandleEvent5Or6
+# ObjM__OnFadeNotify
+
+> Renamed from `ObjM__HandleEvent5Or6` on 2026-09-26 (tools/rename.py). Address 0x80053f84.
 
 > Renamed from `func_80053F84` on 2026-09-23 (tools/rename.py). Address 0x80053f84.
 
@@ -16,7 +18,7 @@ proximity of "14"; nothing ties the two together).
 ## The C
 
 ```c
-void ObjM__HandleEvent5Or6(ObjM *self, ParamM *p1, s32 sel) {
+void ObjM__OnFadeNotify(ObjM *self, ParamM *p1, s32 sel) {
     s32 v;
     switch (sel) {
     case 5:
@@ -89,10 +91,15 @@ pattern per arm.
 
 round 15 (2026-09-04), runner echo, fresh carve `class_3bb8c_m`. This
 residue's fix unblocked accurate scoring for the rest of the unit's
-functions in ROM order after it (`ObjM__HandleEvent7` onward), which had all
+functions in ROM order after it (`ObjM__OnClass866E8Notify` onward), which had all
 been reading as near-total mismatches purely from this function's address
 drift.
 
 ## Naming
 
-**ObjM__HandleEvent5Or6** -- tier B. Two-case switch on its own `sel` parameter (5 and 6), each calling `self->methods->slot14` then adjusting `dreamSys`/`ObjM::mode`, ending case 6 by forwarding the (possibly just updated) mode to `notifyParents`. Named for the mechanical shape (a selector-driven event handler on two codes); the codes' own meaning is unknown.
+**ObjM__OnFadeNotify** -- tier B. Two-case switch on its own `sel` parameter (5 and 6), each calling `self->methods->slot14` then adjusting `dreamSys`/`ObjM::mode`, ending case 6 by forwarding the (possibly just updated) mode to `notifyParents`. Named for the mechanical shape (a selector-driven event handler on two codes); the codes' own meaning is unknown.
+
+
+## Track 4 (2026-09-26, round 89, echo)
+
+Renamed from `ObjM__HandleEvent5Or6` (rename.py): it occupies +0x0B0, which `ObjM__OnNotify` runs for a sender of class id 0x164, Class6E99C (include/Class6E99C.h), whose stop notifies its parents with 5 after a fade down and 6 after a fade up. The ObjM added that fade box as a child (`ObjM__StartFadeUp`, `ObjM__EnterStyleSession`: the viewport's getSubHandle). On 5 it drops the child, clears the DreamSys's move override and state 0; on 6 it drops the child, sets the viewport's clear colour from the box's getColor (+0x0E4), maps state 0xA to 4 (stopDrift, move override 0) and notifies the parents with the state. Former views ParamM (sender) and FieldM18 (viewport) replaced by Class6E99C and Class869D8. Tier A for the mechanics.

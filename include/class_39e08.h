@@ -21,19 +21,9 @@
  *
  * What stays here are the call-site views of objects this unit reaches
  * without a unified class to type them, each with only the slot or word its
- * one caller touches. EventArg, SubObjB and Obj4C are also class_3bb8c_k's
- * (ObjM's methods and New_ObjM).
+ * one caller touches. ObjM (Class865C8::objM) is include/ObjM.h (track 4,
+ * round 89).
  */
-
-/* What an onNotify's sender looks like to class_3bb8c_k's ObjM__OnNotify:
- * `arg1` is the sender, whose word 0 is its method table, whose word 0 is
- * the class id (a BasicClass and its BasicClassMethods::header). */
-typedef struct HeaderObj {
-    s32 header;
-} HeaderObj;
-typedef struct EventArg {
-    HeaderObj *target;
-} EventArg;
 
 /* Opaque view of whatever object Class865C8__OnInit reaches through
  * IntermediateBaseInitArgs::unk0: its +0x07C returns the size it hands the
@@ -47,35 +37,7 @@ struct SubObjE {
     SubObjEMethods *methods;
 };
 
-/* New_ObjM's first argument as class_3bb8c_k types it: the sound object
- * (Class86668::sound) of the Class865C8 that builds the ObjM. */
-typedef struct SubObjBMethods {
-    u8 pad00[0x04];
-    void (*slot4)(void *self);
-} SubObjBMethods;
-typedef struct SubObjB {
-    SubObjBMethods *methods;
-} SubObjB;
-
-/* D_80087034's object (ObjM) as New_ObjM returns it and Class865C8 keeps it
- * (Class865C8::objM): the three slots Class865C8's methods call. */
-typedef struct Obj4C Obj4C;
-typedef struct Obj4CMethods {
-    u8 pad00[0x4];
-    void (*slot4)(Obj4C *self);                       /* +0x004 release, return discarded */
-    u8 pad8[0x44 - 0x8];
-    void (*slot44)(Obj4C *self, s32 arg1, s32 arg2);  /* +0x044 init (initArgs, DreamSys) */
-    void (*slot48)(Obj4C *self);                       /* +0x048 deinit */
-} Obj4CMethods;
-struct Obj4C {
-    Obj4CMethods *methods;
-};
-
-/* Allocator in class_3bb8c_k: allocates an 0x88-byte instance, ctors it
- * with the 5 forwarded arguments, and returns it (or 0 on allocation
- * failure). Class865C8__StartObjM passes sound, bgm, etcTim, dreamerTmd
- * and a stage number. */
-extern Obj4C *New_ObjM(SubObjB *a0, s32 a1, s32 a2, s32 a3, s32 a4);
+/* New_ObjM and ObjM, the class of Class865C8::objM: include/ObjM.h. */
 
 /* BasicClass-family allocator; see code_171e0.h / code_55dd4.h / Entity.h /
  * class_16334.h for the other units that also declare it locally. */

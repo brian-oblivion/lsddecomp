@@ -29,3 +29,8 @@ round 15 (2026-09-04), runner echo, fresh carve `class_3bb8c_m`.
 ## Naming
 
 **ObjM__UpdateCloseReadyFlag** -- tier B. Sets `self->unk84 = 1` (the flag `ObjM__CloseAndNotifyC`/`ObjM__CloseAndNotifyD` read) when `self->unk80 != 0` (the pause-setup counter is running) and `ObjM::mode == 0` (idle). Named for the mechanical poll; "close-ready" describes the flag's later use, not an established game concept.
+
+
+## Track 4 (2026-09-26, round 89, echo)
+
+The class is unified as ObjM in include/ObjM.h (table gObjMMethods, was D_80087034); the class_3bb8c_k/_l/_m views (ObjM_3bb8c_k, Obj87034_3bb8c_l, ObjM) and class_39e08.h's Obj4C/SubObjB/EventArg are gone. Byte-identical.

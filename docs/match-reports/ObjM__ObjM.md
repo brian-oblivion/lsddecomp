@@ -10,7 +10,7 @@ attempt at its final source shape).
 
 ## Role
 
-The ctor for the class whose method table is `D_80087034` (`GetObjMMethods`'s
+The ctor for the class whose method table is `gObjMMethods` (`GetObjMMethods`'s
 return value) -- this IS the function `New_ObjM`'s `New_X` allocator
 dispatches to through that vtable's `+0x008` slot. First chains to the base
 class's ctor (`GetClass86668Methods()->ctor(self, 0, arg1)`, the shared
@@ -87,7 +87,7 @@ register reuse.
 
 Round 75 (bravo, track 3). `func_80052C10` -> `ObjM__ObjM`, **tier A**.
 
-Slot +0x008 of D_80087034 (`tools/classtable.py 0x80087034`), the ctor New_ObjM calls. Runs the base Class86668 ctor, sets methods = GetObjMMethods(), stores its arguments and clears fields, then calls +0x040.
+Slot +0x008 of gObjMMethods (`tools/classtable.py 0x80087034`), the ctor New_ObjM calls. Runs the base Class86668 ctor, sets methods = GetObjMMethods(), stores its arguments and clears fields, then calls +0x040.
 
 Local view fields named round 75 (class_3bb8c_k's `ObjM_3bb8c_k` only):
 `pauseSetupStep` (+0x080) and `closeReady` (+0x084), tier B, from the
@@ -105,3 +105,8 @@ class_3bb8c_m, not this unit, so not applied here):
 | --- | --- | --- | --- |
 | `ObjM::unk80` | `pauseSetupStep` | B | ObjM__AdvancePauseSetup's step counter; ObjM__UpdateCloseReadyFlag requires it non-zero; ObjM__ObjM zeroes it |
 | `ObjM::unk84` | `closeReady` | B | set by ObjM__UpdateCloseReadyFlag, cleared by ObjM__ClearCloseReadyFlag, gates ObjM__CloseAndNotifyC/D |
+
+
+## Track 4 (2026-09-26, round 89, echo)
+
+The class is unified as ObjM in include/ObjM.h (table gObjMMethods, was D_80087034); the class_3bb8c_k/_l/_m views (ObjM_3bb8c_k, Obj87034_3bb8c_l, ObjM) and class_39e08.h's Obj4C/SubObjB/EventArg are gone. Byte-identical. Fields stored: bgm +0x054, stage +0x038, ctorSound +0x06C (the sound again, beside Class86668::sound), etcTim +0x074, dreamerTmd +0x070 (LinkResource, never read by ObjM), timBlockPending +0x060 = 1, unk64/inSession/pauseSetupStep/closeReady zeroed; the last call is resetCounters (+0x040).

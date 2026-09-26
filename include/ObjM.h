@@ -1,0 +1,172 @@
+#ifndef OBJM_H
+#define OBJM_H
+
+#include "Class86668.h"
+
+/*
+ * ObjM -- class id 0x2F230, method table gObjMMethods: Class86668's second
+ * subclass (its ctor calls Class86668__Class86668 first; the first is
+ * Class865C8). No class derives from it. Methods, in ROM order:
+ * src/class_3bb8c_k.c (New_ObjM, ctor, Finalize, OnNotify),
+ * src/class_3bb8c_l.c (NoOpSlot40 through EnterState6) and
+ * src/class_3bb8c_m.c (EnterState7 through GetObjMMethods). The object is
+ * 0x88 bytes (New_ObjM); its own fields run from Class86668's 0x38.
+ *
+ * Built by Class865C8__StartObjM (src/class_39e08.c): New_ObjM(Class865C8's
+ * sound, bgm, etcTim, dreamerTmd, stage), added as a child and init'ed with
+ * Class865C8's init args and its DreamSys. So the inherited
+ * IntermediateBase fields hold that Class865C8's init-arg objects:
+ * unk10 its FrameClock, unk14 its Class866E8, viewport its Class869D8, and
+ * Class86668's sound its VabStreamObj. Those fields keep their parents'
+ * `BasicClass *` types and ObjM's methods cast them (no code).
+ *
+ * What its methods do, measured:
+ *  - init (ObjM__AttachTarget) registers ObjM__OnRegistrantEvent as the
+ *    Class866E8's callback, keeps the DreamSys and adds it as a child;
+ *    onInit (ObjM__InitStyleAndWorld) builds `timBlockSrc`
+ *    (New_TimBlockSrc of the day's variant) and `styleConfig`
+ *    (RegisterStyleConfig);
+ *  - onTag1Notify's event 2 (ObjM__PollTimBlockLoad) waits for the
+ *    TimBlockSrc: loaded, it fades its CLUT rows to a styleConfig colour;
+ *    either way releases it and runs setupSceneStyle, then, once the
+ *    Class866E8 has nothing pending, enterStyleSession (`inSession`);
+ *  - update (ObjM__Update) counts frames and runs tickStyle, or
+ *    advancePauseSetup while the "Pause" overlay is up; onPadEvent maps
+ *    pad codes onto togglePause (slot74) and the close-ready slots;
+ *  - onNotify splits by the sender's class id: the DreamSys's codes
+ *    0xA..0x11 go to enterState4..A, the viewport's fade object
+ *    (Class6E99C) reports fade down/up done (5/6), and the Class866E8's
+ *    event 7 runs checkAuxTrigger. The enterState/close methods set
+ *    IntermediateBase::state and notifyParents it; Class865C8's
+ *    onObjMNotify acts on those codes.
+ * A day's play loop is the reading the evidence invites, but none of it
+ * names the class, so the name stays round 15's.
+ *
+ * Overrides whose parameter list differs from the inherited slot keep the
+ * slot's type (FINISHING-PLAN track 4 step 6):
+ *  - +0x044 init: ObjM__AttachTarget takes (args, DreamSys *);
+ *    Class865C8__StartObjM passes the DreamSys as the slot's s32 `mode`.
+ *  - +0x04C onInit: ObjM__InitStyleAndWorld takes (gridSpan, style
+ *    override, unk4C); IntermediateBase__Init calls it with (0, 0, 0).
+ *  - +0x054 onTag1Notify, +0x058 onPadEvent: the occupants take `void *`
+ *    for the unused sender.
+ *
+ * The +0x06C..+0x07B words are read as one block from outside:
+ * ObjM__InitStyleAndWorld passes &ctorSound to RegisterStyleConfig, which
+ * keeps it in gStyleTargetObj, and ApplyStyleDecorationIfSet
+ * (class_3bb8c_m) calls +0x0AC on that block's +0x00C, cachedViewport
+ * (Viewport's getSubHandle). The fields are kept flat.
+ */
+
+typedef struct ObjM ObjM;
+typedef struct ObjMMethods ObjMMethods;
+
+struct DreamSys;
+struct WBgm;
+struct TimBlockSrc;
+struct TimImage;
+struct LinkResource;
+struct Class869D8;
+struct Class6E99C;
+struct TextRow;
+struct Unk50Struct_3bb8c_l; /* styleConfig's view, include/class_3bb8c.h */
+
+/* Overridden: ctor, finalize, onNotify, resetCounters (NoOpSlot40), init
+ * (AttachTarget), deinit (DetachTarget), onInit (InitStyleAndWorld),
+ * onDeinit (TeardownStyle), onTag1Notify, onPadEvent (DispatchPadEvent),
+ * update, slot74 (TogglePause) and onState4 (NoOpSlot7C). */
+struct ObjMMethods {
+    CLASS86668_SLOTS(ObjM, (ObjM *self, BasicClass *sound, struct WBgm *bgm, struct TimImage *etcTim, struct LinkResource *dreamerTmd, s32 stage));
+    /* +0x080 */ void (*setupSceneStyle)(ObjM *self);         /* ObjM__SetupSceneStyle: PollTimBlockLoad, once the TimBlockSrc is done */
+    /* +0x084 */ void (*exitSceneStyle)(ObjM *self);          /* ObjM__ExitSceneStyle: TeardownStyle */
+    /* +0x088 */ void (*enterStyleSession)(ObjM *self);       /* ObjM__EnterStyleSession: PollTimBlockLoad; sets inSession */
+    /* +0x08C */ void (*tickStyle)(ObjM *self);               /* ObjM__TickStyle: update, no pause overlay */
+    /* +0x090 */ void (*onDreamSysNotify)(ObjM *self, BasicClass *sender, s32 event); /* ObjM__OnDreamSysNotify: onNotify's 0x1F34 sender */
+    /* +0x094 */ void (*enterState4)(ObjM *self);             /* ObjM__EnterState4: OnDreamSysNotify's code 0xA */
+    /* +0x098 */ void (*enterState5)(ObjM *self);             /* ObjM__EnterState5: code 0xC */
+    /* +0x09C */ void (*enterState6)(ObjM *self);             /* ObjM__EnterState6: code 0xD; EnterState5 before a stage */
+    /* +0x0A0 */ void (*enterState7)(ObjM *self);             /* ObjM__EnterState7: code 0xE */
+    /* +0x0A4 */ void (*enterState8)(ObjM *self);             /* ObjM__EnterState8: code 0xF */
+    /* +0x0A8 */ void (*enterStateA)(ObjM *self);             /* ObjM__EnterStateA: code 0x10 */
+    /* +0x0AC */ void (*notifyParentsCodeB)(ObjM *self);      /* ObjM__NotifyParentsCodeB: code 0x11 */
+    /* +0x0B0 */ void (*onFadeNotify)(ObjM *self, struct Class6E99C *sender, s32 event); /* ObjM__OnFadeNotify: onNotify's 0x164 sender; 5 fade down done, 6 up */
+    /* +0x0B4 */ void (*onClass866E8Notify)(ObjM *self, BasicClass *sender, s32 event); /* ObjM__OnClass866E8Notify: onNotify's 0x114 sender */
+    /* +0x0B8 */ s32 (*checkAuxTrigger)(ObjM *self);          /* ObjM__CheckAuxTrigger: OnClass866E8Notify's event 7 */
+    /* +0x0BC */ void (*slotBC)(void);                        /* ObjM__NoOpSlotBC, empty; never called */
+    /* +0x0C0 */ void (*updateCloseReadyFlag)(ObjM *self);    /* ObjM__UpdateCloseReadyFlag: DispatchPadEvent's 0xC */
+    /* +0x0C4 */ void (*clearCloseReadyFlag)(ObjM *self);     /* ObjM__ClearCloseReadyFlag: DispatchPadEvent's 0x2C, TogglePause */
+    /* +0x0C8 */ void (*closeAndNotifyD)(ObjM *self);         /* ObjM__CloseAndNotifyD: DispatchPadEvent's 0x16 */
+    /* +0x0CC */ void (*closeAndNotifyC)(ObjM *self);         /* ObjM__CloseAndNotifyC: no caller in C */
+    /* +0x0D0 */ void (*advancePauseSetup)(ObjM *self);       /* ObjM__AdvancePauseSetup: update and TogglePause */
+    /* +0x0D4 */ void (*teardownPauseOverlay)(ObjM *self);    /* ObjM__TeardownPauseOverlay: TogglePause, ExitSceneStyle, CloseAndNotifyC/D */
+};
+
+struct ObjM {
+    CLASS86668_FIELDS(ObjMMethods);
+    /* +0x038 */ s32 stage;                   /* the ctor's; Class865C8__StartObjM's stage. PickVariant, GetGridRecordAt, GetStageGridDimensions, D_80087118[stage], EnterState4 */
+    /* +0x03C */ struct DreamSys *dreamSys;   /* init's third argument (AttachTarget); a child. Every DreamSys slot ObjM calls */
+    /* +0x040 */ s32 unk40;                   /* InitStyleAndWorld: 0x10; the DreamSys's resetLinkState's arg2 */
+    /* +0x044 */ s32 unk44;                   /* InitStyleAndWorld: 2 or 3; resetLinkState's arg1 */
+    /* +0x048 */ s32 gridSpan;                /* onInit's arg1, 0 meaning 0xA000; the Class866E8's setGridSpan (SetupSceneStyle) */
+    /* +0x04C */ s32 unk4C;                   /* onInit's arg3; no reader */
+    /* +0x050 */ struct Unk50Struct_3bb8c_l *styleConfig; /* RegisterStyleConfig's result, or onInit's arg2 */
+    /* +0x054 */ struct WBgm *bgm;            /* the ctor's (Class865C8's bgm): setSeq, stop, pause, resume */
+    /* +0x058 */ struct TimBlockSrc *timBlockSrc; /* InitStyleAndWorld's New_TimBlockSrc; PollTimBlockLoad releases it */
+    /* +0x05C */ u8 pad05C[0x060 - 0x05C];
+    /* +0x060 */ s32 timBlockPending;         /* the ctor and InitStyleAndWorld set it; PollTimBlockLoad clears it */
+    /* +0x064 */ s32 unk64;                   /* the ctor zeroes it; PollTimBlockLoad sets 1 before enterStyleSession */
+    /* +0x068 */ s32 inSession;               /* the ctor zeroes it; EnterStyleSession sets it; gates update, onPadEvent, enterStyleSession */
+    /* +0x06C */ BasicClass *ctorSound;       /* the ctor's sound again (also Class86668::sound); &ctorSound is RegisterStyleConfig's arg2 (see the banner) */
+    /* +0x070 */ struct LinkResource *dreamerTmd; /* the ctor's (Class865C8's "ETC\DREAMER.TMD"); no reader */
+    /* +0x074 */ struct TimImage *etcTim;     /* the ctor's (Class865C8's "ETC\ETC.TIM"); AdvancePauseSetup's New_TextRow font */
+    /* +0x078 */ struct Class869D8 *cachedViewport; /* InitStyleAndWorld: IntermediateBase::viewport */
+    /* +0x07C */ struct TextRow *pauseText;   /* AdvancePauseSetup's New_TextRow(etcTim, 5, "Pause"); TeardownPauseOverlay releases it */
+    /* +0x080 */ s32 pauseSetupStep;          /* the ctor zeroes it; AdvancePauseSetup counts 0..4, TeardownPauseOverlay clears it */
+    /* +0x084 */ s32 closeReady;              /* UpdateCloseReadyFlag sets, ClearCloseReadyFlag clears; CloseAndNotifyC/D test it */
+};                                            /* 0x88 bytes: New_ObjM */
+
+extern ObjMMethods gObjMMethods;
+extern ObjMMethods *GetObjMMethods(void); /* returns &gObjMMethods */
+
+/* The class's own methods, in address order. */
+ObjM *New_ObjM(BasicClass *sound, struct WBgm *bgm, struct TimImage *etcTim, struct LinkResource *dreamerTmd, s32 stage); /* BMemPMgrAlloc(0x88), then ctor */
+void ObjM__ObjM(ObjM *self, BasicClass *sound, struct WBgm *bgm, struct TimImage *etcTim, struct LinkResource *dreamerTmd, s32 stage);
+void ObjM__Finalize(ObjM *self);
+void ObjM__OnNotify(ObjM *self, BasicClass *sender, s32 event);
+void ObjM__NoOpSlot40(void);
+void ObjM__AttachTarget(ObjM *self, IntermediateBaseInitArgs *args, struct DreamSys *dreamSys);
+void ObjM__OnRegistrantEvent(ObjM *self, s32 code, s32 arg2, s32 arg3);
+void ObjM__DetachTarget(ObjM *self);
+void ObjM__InitStyleAndWorld(ObjM *self, s32 gridSpan, struct Unk50Struct_3bb8c_l *style, s32 arg3);
+void ObjM__TeardownStyle(ObjM *self);
+void ObjM__OnTag1Notify(ObjM *self, void *sender, s32 event);
+void ObjM__PollTimBlockLoad(ObjM *self, struct TimBlockSrc *src);
+void ObjM__DispatchPadEvent(ObjM *self, void *sender, s32 code);
+void ObjM__Update(ObjM *self);
+void ObjM__TogglePause(ObjM *self);
+void ObjM__NoOpSlot7C(void);
+void ObjM__SetupSceneStyle(ObjM *self);
+void ObjM__ExitSceneStyle(ObjM *self);
+void ObjM__EnterStyleSession(ObjM *self);
+void ObjM__TickStyle(ObjM *self);
+void ObjM__OnDreamSysNotify(ObjM *self, BasicClass *sender, s32 code);
+void ObjM__EnterState4(ObjM *self);
+void ObjM__EnterState5(ObjM *self);
+void ObjM__EnterState6(ObjM *self);
+void ObjM__EnterState7(ObjM *self);
+void ObjM__EnterState8(ObjM *self);
+void ObjM__EnterStateA(ObjM *self);
+void ObjM__NotifyParentsCodeB(ObjM *self);
+void ObjM__StartFadeUp(ObjM *self, s32 channels, s32 arg2, s32 step, s32 addChild);
+void ObjM__OnFadeNotify(ObjM *self, struct Class6E99C *sender, s32 event);
+void ObjM__OnClass866E8Notify(ObjM *self, BasicClass *sender, s32 event);
+s32 ObjM__CheckAuxTrigger(ObjM *self);
+void ObjM__NoOpSlotBC(void);
+void ObjM__UpdateCloseReadyFlag(ObjM *self);
+void ObjM__ClearCloseReadyFlag(ObjM *self);
+void ObjM__CloseAndNotifyD(ObjM *self);
+void ObjM__CloseAndNotifyC(ObjM *self);
+void ObjM__AdvancePauseSetup(ObjM *self);
+void ObjM__TeardownPauseOverlay(ObjM *self);
+
+#endif

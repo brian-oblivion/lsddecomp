@@ -23,7 +23,7 @@ void ObjM__EnterState5(Obj87034_3bb8c_l *self) {
     } else {
         self->unk20 = 5;
         color = self->unk3C->methods->slot200(self->unk3C);
-        ObjM__ForwardToSubChild(self, color, 0, 0xA, 1);
+        ObjM__StartFadeUp(self, color, 0, 0xA, 1);
         self->unk3C->methods->slotFC(self->unk3C);
     }
 }
@@ -39,10 +39,10 @@ void ObjM__EnterState5(Obj87034_3bb8c_l *self) {
   since this type has no other fields past `methods` yet and nothing else
   in the tree references `DreamSysObj_3bb8c_l` by name.
 - `self->methods->slot9C` is a NEW vtable slot on `Obj87034Methods_3bb8c_l`
-  (the class whose table is `D_80087034`), a bare `void(Obj87034_3bb8c_l*)`
+  (the class whose table is `gObjMMethods`), a bare `void(Obj87034_3bb8c_l*)`
   dispatch. Added at `+0x09C`, splitting the existing `0x090..0x0C0`
   padding gap additively.
-- `ObjM__ForwardToSubChild` is the sibling-unit helper (`class_3bb8c_m`, matched by
+- `ObjM__StartFadeUp` is the sibling-unit helper (`class_3bb8c_m`, matched by
   echo round 15) already forward-declared in this file for
   `ObjM__EnterState6`'s use; that `extern` declaration was moved earlier in the
   file (still unit-local, not the shared header) since `ObjM__EnterState5`
@@ -82,3 +82,8 @@ Round 78 (charlie), FINISHING-PLAN track 3.
 | `func_80053BE8` | `ObjM__EnterState5` | B | see below |
 
 **Evidence.** vtable slot +0x098. Sets `self->phase = 5`; same evidence as `ObjM__EnterState4`.
+
+
+## Track 4 (2026-09-26, round 89, echo)
+
+The class is unified as ObjM in include/ObjM.h (table gObjMMethods, was D_80087034); the class_3bb8c_k/_l/_m views (ObjM_3bb8c_k, Obj87034_3bb8c_l, ObjM) and class_39e08.h's Obj4C/SubObjB/EventArg are gone. Byte-identical.

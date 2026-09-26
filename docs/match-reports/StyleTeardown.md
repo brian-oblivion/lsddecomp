@@ -47,7 +47,7 @@ loops twice over `gStyleCueSlots[i]`, replacing each element with
 the two-slot array), then clears the `gStyleCueSelf` flag if set. Since
 `FlushStyleCue` is defined later in this unit (higher ROM address) but
 called here, it needs a forward declaration -- matching the pattern already
-used for `ObjM__ForwardToSubChild` in `src/class_3bb8c_m.c`.
+used for `ObjM__StartFadeUp` in `src/class_3bb8c_m.c`.
 
 `gStyleCueSlots` holds two elements of a local per-unit type introduced here,
 `ObjN14` (named for its two accessed fields: `unk0`, address-taken then
@@ -98,7 +98,7 @@ pointer-increment loop (`$s0 += 4` each iteration) with no rewriting needed
 ### Proposed learning
 
 None beyond confirming the standing forward-declaration idiom
-(`class_3bb8c_m.c`'s `ObjM__ForwardToSubChild` precedent) generalises cleanly to a
+(`class_3bb8c_m.c`'s `ObjM__StartFadeUp` precedent) generalises cleanly to a
 function defined in the SAME slice rather than the same file examined
 before.
 
