@@ -50,10 +50,10 @@ LbdFile *New_LbdFile(void) {
 void LbdFile__LbdFile(LbdFile *self) {
     GetActiveDataSourceMethods()->ctor((FileResource *)self);
     self->methods = GetLbdFileMethods();
-    self->ownerRate = -1;
+    self->chunkIndex = -1;
     self->headerReady = 0;
     self->dataReady = 0;
-    self->ownerKey = 0;
+    self->elemKey = 0;
     self->dataBuffer = NULL;
     self->autoLoadData = 1;
     self->buffer = BMemPMgrAlloc(0xB358);
@@ -113,7 +113,7 @@ void LbdFile__LoadHeader(LbdFile *self, char *name) {
 void LbdFile__ReleaseHeader(LbdFile *self) {
     self->methods->freeBuffer(self);
     self->headerReady = 0;
-    self->ownerRate = -1;
+    self->chunkIndex = -1;
 }
 
 /* slot +0x080 of gLbdFileMethods: load the data block the header describes */

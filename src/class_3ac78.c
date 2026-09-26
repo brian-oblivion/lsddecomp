@@ -108,7 +108,7 @@ void Class866E8__Class866E8(Class866E8 *self, Unk54Struct *origin, s32 autoLoad)
 
         entry->loader = New_LbdFile();
         entry->loader->freeGuard = (entry->loader->buffer != NULL);
-        entry->loader->ownerKey = i;
+        entry->loader->elemKey = i;
         entry->loader->methods->setAutoLoadData(entry->loader, autoLoad);
 
         entry->heldObj = NULL;

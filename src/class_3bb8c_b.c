@@ -33,7 +33,7 @@ s32 Class866E8__FindElemIndexByUnk32(Class866E8 *self, s32 key) {
     result = 0;
     for (i = 0; i < 7; i++) {
         e = &self->elems[i];
-        if (e->loader->ownerKey == key) {
+        if (e->loader->elemKey == key) {
             result = i;
             break;
         }
@@ -47,7 +47,7 @@ s32 Class866E8__FindElemIndexByUnk30(Class866E8 *self, s32 key) {
 
     for (i = 0; i < 7; i++) {
         e = &self->elems[i];
-        if (e->loader->ownerRate == key && e->loader->headerReady != 0) {
+        if (e->loader->chunkIndex == key && e->loader->headerReady != 0) {
             return i;
         }
     }

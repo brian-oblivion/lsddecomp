@@ -122,7 +122,7 @@ s32 Class866E8__UpdateFootprintTracking(Class866E8 *self) {
     }
 
     e = buf.unk24;
-    key = e->loader->ownerKey;
+    key = e->loader->elemKey;
     result = sFootprintResultRemap[key];
 
     if (self->config->unk4 == 0) {
@@ -196,7 +196,7 @@ void Class866E8__BuildRateEntries(Class866E8 *self, s32 val, Unk54Struct *arg2, 
 
         for (i = 0; i < 7; i++) {
             e = &self->elems[i];
-            e->loader->ownerKey = e->key;
+            e->loader->elemKey = e->key;
         }
 
         self->methods->applyRateEntries(self, stackBuf, count);
@@ -316,7 +316,7 @@ void Class866E8__ApplyRateEntries(Class866E8 *self, SetupEntry866E8 *arr1, s32 c
             if (e->loader->headerReady != 0) {
                 self->methods->resetElementCells(self, e);
             }
-            e->loader->ownerRate = sp->rate;
+            e->loader->chunkIndex = sp->rate;
             ((LbdFileLoadHeaderFn)e->loader->methods->processBuffer)(e->loader, arr1->ptr0);
             e->flag = 1;
             self->unk1B0 = 1;
@@ -429,14 +429,14 @@ void Class866E8__LoadElementResources(Class866E8 *self, Class866E8Elem *entry) {
     hdr = entry->loader;
     target = entry->placements;
     info = hdr->buffer;
-    target->buffer = (u8 *)info + info->gridOffset;
+    target->buffer = (u8 *)info + info->placementsOffset;
     target->bufferSize = 0;
     res = target->linkResource;
     if (res != 0) {
         res->methods->release(res);
     }
     info2 = hdr->buffer;
-    req.field0 = (s32)info2 + info2->gridOffset + info2->gridSize;
+    req.field0 = (s32)info2 + info2->placementsOffset + info2->placementsSize;
     target->linkResource = New_LinkResource((struct Src6F240 *)&req);
     outBuf.next = 0;
 
@@ -504,7 +504,7 @@ void Class866E8__ResetElementCells(Class866E8 *self, Class866E8Elem *entry) {
     GridCell **p;
     GridCell **end;
 
-    if (entry->loader->ownerRate >= 0) {
+    if (entry->loader->chunkIndex >= 0) {
         ((LbdFileReleaseHeaderElemFn)entry->loader->methods->releaseHeader)(entry->loader, entry);
         end = entry->cells + 0x19A;
         for (p = entry->cells; p < end; p++) {
@@ -555,11 +555,11 @@ s32 Class866E8__ComputeFootprintDescriptor(Class866E8 *self, Descriptor10Ext *ou
 
     e = self->methods->findElementForPosition(self, (Unk54Struct *)in);
     if (e != 0) {
-        rate = e->loader->ownerRate;
+        rate = e->loader->chunkIndex;
         out->unk28 = rate;
         Class866E8__ComputeDivisorSplit(self, (u8 *)out, rate);
 
-        u14a = (Unk14Obj *)self->methods->findElemByUnk32(self, e->loader->ownerKey)->cellParent->coord2;
+        u14a = (Unk14Obj *)self->methods->findElemByUnk32(self, e->loader->elemKey)->cellParent->coord2;
         out->unkC = u14a->unk18.w + 0x5000;
         out->unk10 = u14a->unk1C;
         out->unk14 = u14a->unk20.w + 0x5000;
@@ -599,7 +599,7 @@ void Class866E8__ComputeDivisorSplit(Class866E8 *self, u8 *out, s32 val) {
 }
 
 Class866E8Elem *Class866E8__GetLastTargetRateSplit(Class866E8 *self, u8 *out) {
-    Class866E8__ComputeDivisorSplit(self, out, self->lastEventElem->loader->ownerRate);
+    Class866E8__ComputeDivisorSplit(self, out, self->lastEventElem->loader->chunkIndex);
     return self->lastEventElem;
 }
 
@@ -609,7 +609,7 @@ Class866E8Elem *Class866E8__FindElemByUnk32(Class866E8 *self, s32 key) {
 
     for (i = 0; i < 7; i++) {
         e = &self->elems[i];
-        if (e->loader->ownerKey == key) {
+        if (e->loader->elemKey == key) {
             return e;
         }
     }

@@ -202,7 +202,7 @@ s32 Actor__BuildLinkQueries(Actor *self, GridQuery *arr1, Class866E8Elem **arr2,
         if (unk68->unk4 != idx) {
             return 1;
         }
-        s3 = src->loader->ownerKey;
+        s3 = src->loader->elemKey;
         pos = s3 + 1;
         if (pos < unk68->count) {
             arr2[1] = unk4C->methods->findElemByUnk32(unk4C, pos);
