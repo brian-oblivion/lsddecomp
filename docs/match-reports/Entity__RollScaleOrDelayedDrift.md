@@ -98,3 +98,60 @@ a purpose.
 ## Track 4 (2026-09-26, round 88, echo)
 
 The class (id 0x1F234, table `gEntityMethods`) is unified as `Entity` in `include/Entity.h`: a Class65650 subclass whose table and object expand `CLASS65650_SLOTS`/`CLASS65650_FIELDS`. Any source block above is the pre-unification spelling; the live body takes the inherited names (fields `parent`, `coord2`->`tx/ty/tz`, `tick`, `linkTarget`, `state` (was `moodState`), `lastOffsetValue`, `grid` (was `unk4C`), `ticker` (was `companion2`), `arg2` (was `soundCueChannel`), `parts`, `todPlaying`, `peer` (was `target`, cast to the `Unk94Obj` DreamSys view where its own slots are called); slots `reset`, `setDisplay`, `setLightMode`, `setTranslation`/`addTranslation`, `moveLocalZ/X/Y`, `moveLocalZOrFindLink`, `selectTickCallback`, `enableTickCallback`/`disableTickCallback`, `distanceToPeer`, `setTargetReached`, `updateActivationState`/`updateDeactivationState`), byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).
+
+## Track 7 (round 93, bravo)
+
+Every literal in the live body is in its base: decimal for moodTimer ticks, distances, TOD frames, VAB programs, volumes and `state` phases (hex remains only for masks). Byte-identical (whole image green).
+
+## Naming (round 93, bravo, track 7)
+
+`Entity__func_80060710` -> `Entity__RollScaleOrDelayedDrift` -- **tier B**.
+What the body does: on the cue's first tick (`moodTimer == 0`) it rolls
+`rand() % 10`; 8 or 9 sets the scale to `SCALE_X3` ({3/1, 1/1, 1/1}), 5 to 7
+sets `state` to 10; while `state` is 10 and `moodTimer >= 201` it calls
+addTranslation with `TRANSLATE_Z_MINUS256` every tick. "Roll", "scale" and
+"delayed drift" are those mechanics. Its callers are Entity__MoodCue43 and
+Entity__MoodCue44, which call it first every tick; what the effect is for in
+the game (which dream objects use rows 43/44) is not established, hence B.
+The literals are decimal (10, 201); the `state` value 10 is this helper's
+own phase, shared with nothing.
+
+## Entity_d banner before round 93 (moved here, not deleted)
+
+The unit banner was rewritten as documentation in round 93. Its history and
+derivation, verbatim:
+
+```text
+/* Second 20-function slice of the Entity class's 97-function remainder,
+ * 0x5077C..0x52290 (Entity_c is the first slice, Entity_e the third).
+ *
+ * 19 of the 20 are gEntityMoodHandlerTable callbacks (Entity.h), named
+ * Entity__MoodCueNN for the row they occupy -- rows 39-52 and 55-58 are
+ * consecutive with Entity_c's own tail, row 115 (Entity__MoodCue115, this
+ * unit's last function) is not, confirming row order tracks moodIndex
+ * assignment, not code address. The names were confirmed by reading
+ * disk/SLPS_015.56 directly rather than trusting address proximity:
+ * gEntityMoodHandlerTable's own base plus a fixed per-row stride locates
+ * each row's `handler` word (the arithmetic and addresses are in each
+ * function's docs/match-reports/Entity__MoodCueNN.md), and it was checked
+ * against every candidate function's own address. The one
+ * exception, `Entity__func_80060710`, is not itself a table row -- it is a
+ * private helper Entity__MoodCue43/44 both call directly (`jal`, not
+ * through any vtable or table), tier C because its own purpose beyond
+ * "sometimes bump scale, sometimes queue a delayed addTranslation" is not
+ * established.
+ *
+ * `Entity__MoodCue45` is a real, matched, genuinely empty function (`{}`,
+ * `jr $ra; nop` after splat's own frame elision) -- row 45 of the table is
+ * a legitimate "this mood has no per-tick cue effect" entry, not an
+ * unfinished stub.
+ */
+```
+
+(The per-row handler-address arithmetic it cites is in each
+`Entity__MoodCueNN.md`'s `## Naming`; the row-115 ordering point is in
+`Entity__MoodCue115.md`'s. In the text above the helper appears under its
+old name. The old extern comment also said the tables followed "the same
+convention as Entity_c.c's own SCALE_Y2/SCALE_SIX/etc externs (separate
+local view per translation unit, not shared via the header)"; round 93
+retyped them from `u8[]` to `Ratio16[]`, byte-identical.)
