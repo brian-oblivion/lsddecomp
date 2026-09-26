@@ -987,6 +987,11 @@
           "date": "2026-09-26",
           "header": "include/Class86AA0.h"
         },
+        "gClass86B60Methods": {
+          "class": "Class86B60",
+          "date": "2026-09-26",
+          "header": "include/Class86B60.h"
+        },
         "gClass876FCMethods": {
           "class": "Class876FC",
           "date": "2026-09-26",
