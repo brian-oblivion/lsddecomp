@@ -1,4 +1,6 @@
-# Viewport__GetSubHandle — MATCHED
+# Viewport__GetFadeBox — MATCHED
+
+> Renamed from `Viewport__GetSubHandle` on 2026-09-26 (tools/rename.py). Address 0x8003f230.
 
 > Renamed from `Unk18Obj__GetSubHandle` on 2026-09-25 (tools/rename.py). Address 0x8003f230.
 
@@ -9,7 +11,7 @@ Unit: `code_2cc8c_d`. Round 14, runner delta. 3/3 words, full match.
 ## Signature
 
 ```c
-SubHandleObj *Viewport__GetSubHandle(Unk18Obj *self);
+SubHandleObj *Viewport__GetFadeBox(Unk18Obj *self);
 ```
 
 `Unk18ObjMethods`'s own `+0x0AC` slot occupant.
@@ -20,7 +22,7 @@ A plain getter for the already-typed `unkB0` field (established by alpha's
 round-13 `Viewport__Viewport`).
 
 ```c
-SubHandleObj *Viewport__GetSubHandle(Unk18Obj *self) {
+SubHandleObj *Viewport__GetFadeBox(Unk18Obj *self) {
     return self->unkB0;
 }
 ```

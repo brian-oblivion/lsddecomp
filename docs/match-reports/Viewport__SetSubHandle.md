@@ -73,7 +73,7 @@ Not applied -- `unkB0`/`unkAC` are both shared with `code_2cc8c_c.c`
 outside this unit's ownership per track 3's rule.
 
 - `unkB0` -> `subHandle` (tier B): the field this function and
-  `Viewport__GetSubHandle` (this unit) exclusively set/get; matches
+  `Viewport__GetFadeBox` (this unit) exclusively set/get; matches
   `SubHandleObj`'s own existing type name.
 - `unkAC` -> not proposed beyond the existing `Unk18AcObj` typedef's own
   documentation; this unit only forwards it opaquely (`arg1->methods->

@@ -421,7 +421,7 @@ void Viewport__SetSubHandle(Viewport *self, SceneNode *handle) {
     }
 }
 
-SceneNode *Viewport__GetSubHandle(Viewport *self) {
+SceneNode *Viewport__GetFadeBox(Viewport *self) {
     return self->subHandle;
 }
 
