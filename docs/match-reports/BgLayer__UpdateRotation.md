@@ -1,4 +1,6 @@
-# BgLayer__SetRotation -- MATCHED (39/39 words)
+# BgLayer__UpdateRotation -- MATCHED (39/39 words)
+
+> Renamed from `BgLayer__SetRotation` on 2026-09-26 (tools/rename.py). Address 0x80044380.
 
 > Renamed from `func_80044380` on 2026-09-25 (tools/rename.py). Address 0x80044380.
 
@@ -35,7 +37,7 @@ typedef struct Ratio44380 {
     /* +0x0A */ s16 den;
 } Ratio44380;
 
-void BgLayer__SetRotation(Obj6F2C4 *self, s32 set, Ratio44380 *src) {
+void BgLayer__UpdateRotation(Obj6F2C4 *self, s32 set, Ratio44380 *src) {
     s32 num = src->num;
     s32 den = src->den;
     s32 v = ((num / den) << 12) + (((num % den) << 12) / den);
@@ -54,4 +56,4 @@ First build. `/` and `%` of the same operands share one div (mflo then mfhi). Th
 
 ## Naming
 
-- **BgLayer__SetRotation**, tier B. Slot +0x044: a ratio converted to 20.12 fixed point, stored or added into the rotate field.
+- **BgLayer__UpdateRotation**, tier B. Slot +0x044: a ratio converted to 20.12 fixed point, stored or added into the rotate field.

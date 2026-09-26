@@ -778,7 +778,7 @@ typedef struct Ratio44380 {
     /* +0x0A */ s16 den;
 } Ratio44380;
 
-void BgLayer__SetRotation(Obj6F2C4 *self, s32 set, Ratio44380 *src) {
+void BgLayer__UpdateRotation(Obj6F2C4 *self, s32 set, Ratio44380 *src) {
     s32 num = src->num;
     s32 den = src->den;
     s32 v = ((num / den) << 12) + (((num % den) << 12) / den);
@@ -800,7 +800,7 @@ typedef struct Scale4441C {
     /* +0x06 */ s16 yden;
 } Scale4441C;
 
-void BgLayer__SetScale(Obj6F2C4 *self, s32 set, Scale4441C *src) {
+void BgLayer__UpdateScale(Obj6F2C4 *self, s32 set, Scale4441C *src) {
     s32 negX;
     s32 negY;
     s32 den;
