@@ -126,3 +126,31 @@ merge's +0x040 CONFLICT: the old `void *` was the ctor's local reading; see
 `VariantSprite__VariantSprite`'s report). The local view's `spriteClutX/Y` are
 now `sprite.cx` / `sprite.cy` (Sprite.h's SpriteGs, the same s16 at
 +0x074 / +0x076). Byte-identical.
+
+## Track 6 (2026-09-26, round 93, bravo)
+
+The class `Class879C4` is now `VariantSprite` (`include/VariantSprite.h`,
+`python3 tools/renametype.py Class879C4 VariantSprite`), tier B: the
+mechanics are certain and are the whole of what the class adds to Sprite --
+`variant` (0 or 1) picks the texture cell the Sprite ctor binds
+(`gVariantSpriteCells`) and the CLUT row the reset slot sets
+(`gVariantSpriteClutX/Y`). What the sprites are in the game is not
+established (their only builder is Class876FC, kinds 2 and 3, and every
+path passes variant 0), which is why it is not tier A. The table, getter,
+allocator, methods and the three data tables followed the class name.
+The same tool run rewrote `Class879C4` tokens inside this report's older
+history prose (the known renametype behaviour pending an operator
+decision); those lines were left as the tool wrote them.
+
+History moved here from `src/class_3bb8c_q.c`'s banner: the unit is ROM
+0x485BC..0x48738, and its two functions were named in round 79 (tiers
+above). `variant` (+0x0A0) keeps its name: it is written here and read by
+nothing, which the header now says.
+
+## Proposed (not applied)
+
+- `VariantSprite__UpdateScale`'s `s16 *ratios` -> `Ratio16 *ratios`
+  (SceneNode.h's num/den pair, the type `Sprite__UpdateRotation` already
+  takes): the body reads `ratios[0]/[1]` and `[2]/[3]` as two such pairs.
+  A body edit in `src/class_3bb8c_q.c`, so it is track 7's, not this
+  pass's.
