@@ -9,7 +9,7 @@
 ## Provenance
 
 Round-42's "REOPENED -- ASSIGNABLE" banner applies: stub-stalled as
-`gp_rel`-blocked on `gStyleEffectViewport`/`gTrackedYSnapshot`, both already present in
+`gp_rel`-blocked on `gStyleEffectViewport`/`gStyleEffectBaseViewY`, both already present in
 `config/gp-symbols.txt`. Matched byte-exact this round (after fixing an
 unrelated whole-image size regression caused by a sibling function in the
 same session -- see `StyleEffect__SpawnSprites`'s report).
@@ -20,7 +20,7 @@ The second of this unit's three `self->unk54`-dispatch handlers (see
 `StyleEffect__ReleaseByKind`'s comment and `StyleEffect__InitByKind`, the first). Folds
 `*(Vec3S*)arg1 + self->unk58` into a stack-local, adds the delta between
 `gStyleEffectViewport`'s pointee's `+0x18` field and the snapshot `StyleEffect__InitByKind` left
-in `gTrackedYSnapshot`, forwards the result through `slotB8`, then dispatches on
+in `gStyleEffectBaseViewY`, forwards the result through `slotB8`, then dispatches on
 `unk54` to one of three different callees than `StyleEffect__InitByKind`'s own switch.
 
 ## C
@@ -30,7 +30,7 @@ void StyleEffect__UpdateByKind(LinkNode *self, void *arg1) {
     Vec3S local;
 
     AddVec3(&local, (Vec3S *)arg1, &self->unk58);
-    local.y += *(s32 *)((u8 *)gStyleEffectViewport + 0x18) - gTrackedYSnapshot;
+    local.y += *(s32 *)((u8 *)gStyleEffectViewport + 0x18) - gStyleEffectBaseViewY;
     self->methods->slotB8(self, &local);
 
     switch (self->unk54) {
@@ -62,9 +62,9 @@ void StyleEffect__UpdateByKind(LinkNode *self, void *arg1) {
   `INCLUDE_ASM` as of this report) and is likewise called here with a dead
   second argument; same old-style-declaration treatment, needed so the
   eventual real (one-argument) definition doesn't conflict.
-- This function and `StyleEffect__InitByKind` share the `gStyleEffectViewport`/`gTrackedYSnapshot`
+- This function and `StyleEffect__InitByKind` share the `gStyleEffectViewport`/`gStyleEffectBaseViewY`
   snapshot-and-diff pattern; `StyleEffect__InitByKind` always runs first for a given
-  node (it's the one that WRITES `gTrackedYSnapshot`), so the diff computed here is
+  node (it's the one that WRITES `gStyleEffectBaseViewY`), so the diff computed here is
   "how much did the tracked field move since the last time `StyleEffect__InitByKind`
   ran" -- descriptive only, doesn't affect the C shape.
 
@@ -129,7 +129,7 @@ Only caller is `StyleEffect__Update`, which sits in gStyleEffectMethods's slot +
 (asm/data/76DC8.data.s, the table's last word) and increments `tick` (+0x024)
 before the call. Body: owner's slotB8 (Actor__SetTranslation in gStyleEffectMethods,
 i.e. set translation) with pos + offset + (gStyleEffectViewport's +0x018 word now -
-gTrackedYSnapshot); then kind 0 -> StyleEffect__DriftModelChildren, 2 ->
+gStyleEffectBaseViewY); then kind 0 -> StyleEffect__DriftModelChildren, 2 ->
 NoOpIgnoreArgs, 3 -> StyleEffect__RandomizeSprites. "Update" rests on the
 per-frame counter in its one caller, so B.
 

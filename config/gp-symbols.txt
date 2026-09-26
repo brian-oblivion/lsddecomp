@@ -183,6 +183,7 @@ gStyleDecorPosY
 gStyleDecorSizeH
 gStyleDecorSizeW
 gStyleDecorVariant
+gStyleEffectBaseViewY
 gStyleEffectModelIds
 gStyleEffectSlotCount
 gStyleEffectTim
@@ -197,7 +198,6 @@ gTexturedFaceColor
 gTimBlockClutShift
 gTimClutRowShift
 gTmdModelBoundsCount
-gTrackedYSnapshot
 gVabBodySuffix
 gVabDriverMode
 gVabDriverModeArg

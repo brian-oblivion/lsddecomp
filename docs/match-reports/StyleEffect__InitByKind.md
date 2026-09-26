@@ -9,7 +9,7 @@
 ## Provenance
 
 Round-42's "REOPENED -- ASSIGNABLE" banner applies: stub-stalled as
-`gp_rel`-blocked on `gStyleEffectViewport`/`gTrackedYSnapshot` (and, in an even older revision
+`gp_rel`-blocked on `gStyleEffectViewport`/`gStyleEffectBaseViewY` (and, in an even older revision
 of this report, `addiu_at`, itself resolved round 21). Both globals were
 already present in `config/gp-symbols.txt`. Matched byte-exact this round.
 
@@ -18,7 +18,7 @@ already present in `config/gp-symbols.txt`. Matched byte-exact this round.
 One of this unit's three `self->unk54`-dispatch handlers (see
 `StyleEffect__ReleaseByKind`'s comment). Folds `*arg2 + self->unk58` into a stack-local
 Vec3, forwards it through `AttachWithRotScale`, snapshots a lookup table's current
-value into `gTrackedYSnapshot`, and — only when `unk54` is 0 or 1 — calls through a
+value into `gStyleEffectBaseViewY`, and — only when `unk54` is 0 or 1 — calls through a
 NEW cross-class vtable slot (`+0x080` on the object pointed to by the global
 `gStyleEffectTmd`) before dispatching on `unk54` a second time.
 
@@ -29,7 +29,7 @@ void StyleEffect__InitByKind(LinkNode *self, void *arg1, Vec3S *arg2) {
     Vec3S local;
     s32 state;
 
-    gTrackedYSnapshot = *(s32 *)((u8 *)gStyleEffectViewport + 0x18);
+    gStyleEffectBaseViewY = *(s32 *)((u8 *)gStyleEffectViewport + 0x18);
     AddVec3(&local, arg2, &self->unk58);
     AttachWithRotScale(self, arg1, &local, self->unk64, self->unk68);
 
@@ -70,7 +70,7 @@ typedef struct {
 extern D_8008ACA4Obj *gStyleEffectTmd;
 extern void *gStyleEffectTim;
 extern void *gStyleEffectViewport;
-extern s32 gTrackedYSnapshot;
+extern s32 gStyleEffectBaseViewY;
 extern s32 gStyleEffectModelIds[];
 ```
 
@@ -136,7 +136,7 @@ Round 70 (alpha). `func_80056520` -> `StyleEffect__InitByKind`, **tier B**.
 
 Only caller is the class's ctor `StyleEffect__StyleEffect` (class_3bb8c_r.c), with the
 ctor's own arg3/arg4 as (parent, pos). Body: snapshot `*(gStyleEffectViewport + 0x18)`
-into gTrackedYSnapshot; `AttachWithRotScale(self, parent, pos + offset,
+into gStyleEffectBaseViewY; `AttachWithRotScale(self, parent, pos + offset,
 rotation, scale)`; for kind < 2, `SceneNode__LinkModel(self,
 gStyleEffectTmd->slot80(gStyleEffectModelIds[kind]))`; then kind 0 ->
 StyleEffect__PlaceModelChildren(self, 0), 2 -> StyleEffect__BuildRandomSprites,
@@ -150,7 +150,7 @@ four call sites); `StyleEffect__StyleEffect` (table +0x008, the ctor) stores it 
 +0x054. `StyleEffect` is the table-address class name, the
 `SceneNode`/`TodActor` convention.
 
-Globals named in this pass: `gTrackedYSnapshot` (was D_8008ACB0, tier B:
+Globals named in this pass: `gStyleEffectBaseViewY` (was D_8008ACB0, tier B:
 written here from gStyleEffectViewport's +0x018 word, subtracted from it again by
 StyleEffect__UpdateByKind; only this unit references it).
 

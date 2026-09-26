@@ -57,11 +57,11 @@ extern void NoOpIgnoreArgs();
  * +0x080 getSetUnk10Flag8 as that function calls it; gStyleEffectTim is
  * forwarded opaquely to New_VariantSprite as its third argument; gStyleEffectViewport's
  * pointee has a field at +0x018 that StyleEffect__InitByKind and
- * StyleEffect__UpdateByKind snapshot/diff via gTrackedYSnapshot. */
+ * StyleEffect__UpdateByKind snapshot/diff via gStyleEffectBaseViewY. */
 extern Actor *gStyleEffectTmd; /* the Actor Actor__func_56f5c ran on */
 extern void *gStyleEffectTim;
 extern void *gStyleEffectViewport;
-extern s32 gTrackedYSnapshot;
+extern s32 gStyleEffectBaseViewY;
 extern s32 gStyleEffectModelIds[];
 
 /* Called once, from the class's ctor (StyleEffect__StyleEffect): place self under
@@ -74,7 +74,7 @@ void StyleEffect__InitByKind(StyleEffect *self, SceneNode *parent, LongVec3 *pos
     LongVec3 local;
     s32 state;
 
-    gTrackedYSnapshot = *(s32 *)((u8 *)gStyleEffectViewport + 0x18);
+    gStyleEffectBaseViewY = *(s32 *)((u8 *)gStyleEffectViewport + 0x18);
     AddVec3(&local, pos, &self->params.offset);
     AttachWithRotScale((Actor *)self, parent, &local, self->params.rotation, self->params.scale);
 
@@ -109,7 +109,7 @@ void StyleEffect__UpdateByKind(StyleEffect *self, LongVec3 *pos) {
     LongVec3 local;
 
     AddVec3(&local, pos, &self->params.offset);
-    local.y += *(s32 *)((u8 *)gStyleEffectViewport + 0x18) - gTrackedYSnapshot;
+    local.y += *(s32 *)((u8 *)gStyleEffectViewport + 0x18) - gStyleEffectBaseViewY;
     self->methods->setTranslation(self, &local);
 
     switch (self->pendingExtra) {
