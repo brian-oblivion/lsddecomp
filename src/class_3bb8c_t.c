@@ -43,6 +43,7 @@
 #include "BoxFill.h"
 #include "DreamSys.h"
 #include "Class879C4.h"
+#include "VabStreamObj.h"
 
 extern void *BMemPMgrAlloc(s32 size);
 
@@ -71,19 +72,6 @@ Class879C4Methods *GetClass879C4Methods(void) {
 /* GraphRoom's object, table and methods: include/GraphRoom.h (track 4,
  * round 87). The base implementations are reached through
  * Get_vtable_TaskCore() with `self` upcast. */
-
-/* TaskCore::sound's pointee, a VabStreamObj (New_VabStreamObj): its +0x09C
- * is VabStreamObj__SetPitchOffset (`tools/classtable.py
- * gVabStreamObjMethods`). The ctor is the one caller here, so only that
- * slot is typed. VabStreamObj has no header yet; `sound` is cast to this. */
-typedef struct GraphRoomSoundObj GraphRoomSoundObj;
-typedef struct GraphRoomSoundMethods {
-    u8 pad00[0x9C];
-    /* +0x09C */ void (*setPitchOffset)(GraphRoomSoundObj *self, s32 offset); /* VabStreamObj__SetPitchOffset; the ctor passes -1 */
-} GraphRoomSoundMethods;
-struct GraphRoomSoundObj {
-    GraphRoomSoundMethods *methods;
-};
 
 /* What DreamSys__GetSaveBlock (the DreamSys's +0x1B0) returns: &saveMagic,
  * the 0x700-byte save block. This record reads it from there; the offsets
@@ -120,7 +108,7 @@ extern char D_8001176C[];
 void GraphRoom__GraphRoom(GraphRoom *self, struct DreamSys *dreamSys) {
     Get_vtable_TaskCore()->ctor((TaskCore *)self, 0, D_8001176C, 0);
     self->methods = GetGraphRoomMethods();
-    ((GraphRoomSoundObj *)self->sound)->methods->setPitchOffset((GraphRoomSoundObj *)self->sound, -1);
+    ((VabStreamObj *)self->sound)->methods->setPitchOffset((VabStreamObj *)self->sound, -1); /* TaskCore::sound is a VabStreamObj */
     self->dreamSys = dreamSys;
     self->methods->setTarget(self, 0);
     ((GraphRoomResetCallFn)self->methods->resetCounters)(self, dreamSys);
