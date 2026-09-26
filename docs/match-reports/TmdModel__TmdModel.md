@@ -34,3 +34,13 @@ Stores after a call that go through `$a0` (freshly `move a0, sN` just before the
 ctor at slot +0x008 of the TmdModel class table (gTmdModelMethods): base ctor
 through `Get_vtable_BasicClass`, installs the method table, stores the
 object-table entry and the TMD data header, marks the class constructed.
+
+## Track 4 (2026-09-26, round 87, delta)
+
+Parameter retyped `void *arg` -> `TmdObject *object` (include/TmdModel.h),
+byte-identical. Callers checked: `LinkResource__BuildModels` (code_33808)
+is the only caller of `New_TmdModel`, passing entry `i` of the loaded TMD's
+0x1C-byte object table (buffer + 0xC); `New_TmdModel` is the only caller of
+the ctor, through slot +0x008. The ctor stores the argument in `object` and
+`object - 0xC` in `data` (a TmdFile, the real header when the entry is the
+first).

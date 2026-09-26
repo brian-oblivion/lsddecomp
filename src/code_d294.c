@@ -22,7 +22,7 @@
 #define TAG_PAD          2   /* gPadMethods, PadMethods (include/Pad.h) */
 #define TAG_CLASS6B5CC   4   /* this class and every subclass of it */
 #define TAG_CLASS6EF50   5   /* D_8006EF50 */
-#define TAG_CLASS6BEA0   9   /* gTmdModelMethods: the object Class6B5CC__LinkModel links */
+#define TAG_TMDMODEL     9   /* gTmdModelMethods (include/TmdModel.h): the object Class6B5CC__LinkModel links */
 
 /* Bit positions in GsDOBJ2.attribute (self->unk10), include/psyq/LIBGS.H. */
 #define ATTR_LIGHTMODE_SHIFT  3   /* GsFOG|GsMATE|GsLLMOD, 3 bits */
@@ -82,13 +82,13 @@ void Class6B5CC__Finalize(Class6B5CC *self) {
 
 void Class6B5CC__AddChild(Class6B5CC *self, BasicClass *child) {
     Get_vtable_BasicClass()->addChild((BasicClass *)self, child);
-    if ((child->methods->header & CLASS_TAG_MASK) == TAG_CLASS6BEA0) {
+    if ((child->methods->header & CLASS_TAG_MASK) == TAG_TMDMODEL) {
         Class6B5CC__LinkModel(self, child);
     }
 }
 
 void Class6B5CC__RemoveChild(Class6B5CC *self, BasicClass *child) {
-    if ((child->methods->header & CLASS_TAG_MASK) == TAG_CLASS6BEA0) {
+    if ((child->methods->header & CLASS_TAG_MASK) == TAG_TMDMODEL) {
         Class6B5CC__UnlinkModel(self);
     }
     Get_vtable_BasicClass()->removeChild((BasicClass *)self, child);

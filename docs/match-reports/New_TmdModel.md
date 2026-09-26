@@ -52,3 +52,13 @@ argument becomes: `self->object = arg;` in the ctor, and every reader
 object-table entry (`TmdObject_fa50 *`) the class wraps. Unit-local field;
 renamed in the struct definition only, compiler-verified accessor list
 (5 sites, all in this unit), build and check-nonmatching.sh green.
+
+## Track 4 (2026-09-26, round 87, delta)
+
+Parameter retyped `void *arg` -> `TmdObject *object` (include/TmdModel.h),
+byte-identical. Callers checked: `LinkResource__BuildModels` (code_33808)
+is the only caller of `New_TmdModel`, passing entry `i` of the loaded TMD's
+0x1C-byte object table (buffer + 0xC); `New_TmdModel` is the only caller of
+the ctor, through slot +0x008. The ctor stores the argument in `object` and
+`object - 0xC` in `data` (a TmdFile, the real header when the entry is the
+first).
