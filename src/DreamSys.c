@@ -45,6 +45,8 @@
  * touches exactly one field or global that nothing in any carved unit ever
  * reads back, so there is nothing to name them after. */
 #include "common.h"
+#include <memory.h>
+#include <rand.h>
 #include "DreamSys.h"
 #include "LinkResource.h"
 #include "Class866E8.h"
@@ -841,10 +843,6 @@ void DreamSys__SoundCueCallback(void *arg0, SoundCueCallbackArg *arg1) {
         }
     }
 }
-
-/* Also declared in code_2cc8c_f.c with the same signature (that unit's own
-   local view of the same libc-style function). */
-extern void *memset(unsigned char *dst, unsigned char c, int n);
 
 /* A constant read out of .sdata and copied whole into
    this->saveMagic -- naming convention matches (the field's own
@@ -1872,10 +1870,6 @@ s32 GenerateInitialSpawn(PlayerSpawnPoint *dest, s32 *timeLimit, MoodGraphPoint 
     *timeLimit = STAGE_TIME_LIMITS[stage];
     return stage;
 }
-
-/* rand() is not declared by any header this unit includes; Entity.h's own
-   local view is s32 rand(void). */
-extern s32 rand(void);
 
 MoodGraphPoint *IsDaySpecial(CinematicCall *cinematic, int day) {
     s32 i;
