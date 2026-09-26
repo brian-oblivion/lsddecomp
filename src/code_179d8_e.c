@@ -25,17 +25,14 @@
  * `code_171e0.c`'s own `GetActiveDataSourceMethods` returns `GetVabDriverMethods()` (this
  * unit) exactly when `gActiveDataSource == 0x23`, and `VabStreamObj`'s own
  * constructor/close (below) chain their base-class calls through that
- * accessor's return -- so `gVabDriverMethods` genuinely is the generic
- * driver-interface base class this backend's stream object derives from, not
- * an unrelated table that happens to live in the same file.  Its own
- * ctor/dtor (`VabDriver__VabDriver`/`VabDriver__Destroy`, `code_179d8_d.c`, not this
- * unit) and the six interface slots this unit defines
+ * accessor's return.  ROUND 87 CORRECTION (track 4): that does not make
+ * gVabDriverMethods VabStreamObj's base.  Both are Class6D430 subclasses
+ * (ids 0x23 and 0xA03, parent 0x3); VabStreamObj chains to whichever driver
+ * is active, as every data source does.  VabDriver is now declared once, in
+ * `include/VabDriver.h`: its ctor/dtor (`code_179d8_d.c`) and the eleven
+ * interface slots it overrides, six of them defined in this unit
  * (`VabDriver__Read`/`LoadFile`/`RunRequestQueue`/`RequestLoadFile`/
- * `StopService`/`CancelRequests`, named for their slots in round 87) are all
- * empty no-ops: this backend needs no extra generic
- * setup beyond BasicClass's own, which is exactly what "the base class for
- * whichever data source is active" should look like when the active source
- * needs nothing extra.
+ * `StopService`/`CancelRequests`), are all empty no-ops.
  *
  * `gVabStreamObjMethods` is the real work: `VabStreamObj__VabStreamObj` is
  * its constructor, `VabStreamObj__Close` its close, `VabStreamObj__Update`
@@ -73,9 +70,11 @@
  * unnamed too, so there's nothing to name it AS a stand-in for.
  */
 #include "common.h"
+#include "VabDriver.h"
 
 /* ------------------------------------------------------------------------
- * The two class tables (gVabDriverMethods / gVabStreamObjMethods).  Only the
+ * gVabStreamObjMethods's table (gVabDriverMethods is include/VabDriver.h's
+ * since round 87).  Only the
  * slots and fields THIS unit's functions actually touch are named;
  * everything else is opaque padding, per this project's local-reading
  * convention (see code_179d8_d.c's Table6D940/Obj6D940 for the same idiom
@@ -84,23 +83,6 @@
  * cannot collide with this one on merge.
  * ------------------------------------------------------------------------ */
 typedef struct VabStreamObj VabStreamObj;
-
-/* gVabDriverMethods's own methods table -- the generic driver-interface base
- * class VabStreamObj chains its own ctor/close through (see the unit header
- * comment).  Its own ctor/dtor slots (+0x08/+0x0C) are code_179d8_d.c's
- * VabDriver__VabDriver/VabDriver__Destroy, not this unit's to type; only the slots this
- * unit itself defines are named here. */
-typedef struct VabDriverMethods {
-    u8 pad000[0x054];
-    s32 (*slot54)(void);  /* VabDriver__Read -- empty (return 0), no call site in this unit */
-    void (*slot58)(void); /* VabDriver__LoadFile -- empty, no call site in this unit */
-    u8 pad05C[0x068 - 0x05C];
-    void (*slot68)(void); /* VabDriver__RunRequestQueue -- empty, no call site in this unit */
-    void (*slot6C)(void); /* VabDriver__RequestLoadFile -- empty, no call site in this unit */
-    void (*slot70)(void); /* VabDriver__StopService -- empty, no call site in this unit */
-    void (*slot74)(void); /* VabDriver__CancelRequests -- empty, no call site in this unit */
-} VabDriverMethods;
-extern VabDriverMethods gVabDriverMethods;
 
 /* gVabStreamObjMethods's own methods table -- the class VabStreamObj below
  * dispatches through.  Only the slots this unit's own functions call or are
