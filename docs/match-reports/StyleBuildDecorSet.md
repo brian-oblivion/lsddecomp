@@ -53,7 +53,7 @@ void StyleBuildDecorSet(void) {
     if (gStyleDecorVariant == 2) {
         paramA.y += 0x1E;
     }
-    paramB = *(PairXY *) &gStyleDecorPosBX;
+    paramB = *(PairXY *) &gStyleDecorSizeW;
     gStyleDecorSlots[0] = New_BoxFill(&paramB, (void *) gStyleDecorColors, 0x1FFF);
     for (i = 1; i < 0x12; i++) {
         obj = New_BoxFill(&paramB, (void *) (gStyleDecorColors + i * 3), 0x1FFF);
@@ -117,7 +117,7 @@ paramA = *(PairXY *) &gStyleDecorPosX;      /* NOT paramA[0] = ..; paramA[1] = .
 if (gStyleDecorVariant == 2) {
     paramA.y += 0x1E;
 }
-paramB = *(PairXY *) &gStyleDecorPosBX;
+paramB = *(PairXY *) &gStyleDecorSizeW;
 ```
 
 **Mechanism.** A struct assignment is a BLKmode `set`. gcc 2.6.3's `cse.c`
@@ -221,7 +221,7 @@ side effect of the image moving. The honest figures are the two in the title:
 ## Preserved near-miss body (1 word short, `#if 0` in `src/class_3bb8c_n.c`)
 
 Needs, already present earlier in the unit in strict ROM order:
-`extern s32 gStyleDecorVariant, gStyleDecorPosX, gStyleDecorPosY, gStyleDecorPosBX, gStyleDecorPosBY,
+`extern s32 gStyleDecorVariant, gStyleDecorPosX, gStyleDecorPosY, gStyleDecorSizeW, gStyleDecorPosBY,
 gStyleTargetObj, gStyleDecorColors;`, `extern void *gStyleDecorSlots[];`,
 `extern void *New_BoxFill(void *a0, void *a1, s32 a2);`, and the
 `ObjSlot4C` / `ObjSlotAC` method-table views. `PairXY` is declared just above
@@ -252,7 +252,7 @@ void StyleBuildDecorSet(void) {
     if (gStyleDecorVariant == 2) {
         paramA.y += 0x1E;
     }
-    paramB = *(PairXY *) &gStyleDecorPosBX;
+    paramB = *(PairXY *) &gStyleDecorSizeW;
     i = 1;
     s1 = 3;
     obj = New_BoxFill(&paramB, (void *) gStyleDecorColors, 0x1FFF);
