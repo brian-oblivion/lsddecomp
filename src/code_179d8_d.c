@@ -87,198 +87,97 @@
  */
 #include "common.h"
 #include "VabDriver.h"
+#include "Class6D940.h"
 
-/*
- * D_8006D940: a REAL 30-slot Class6D430-derived class-framework vtable
- * (see the round-77 correction in the unit header comment above --
- * `tools/classtable.py 0x8006D940` confirms it, contradicting the earlier
- * round-16 "no classtable.py hit" finding). `Class6D940Methods`/`Class6D940`
- * are this unit's own local names (kept address-based: no game-purpose
- * evidence yet for what the class represents). Only the slots this unit's
- * own functions define or dispatch through are typed here; the inherited
- * BasicClass/Class6D430 slots (+0x010..+0x038, +0x05C, +0x060) are left as
- * opaque padding since nothing in this unit calls them directly -- see
- * `include/code_171e0.h`/`class_16334.h` for their own typed views of the
- * same physical layout. Kept LOCAL to this file, not a shared header, per
- * this round's rule for code_179d8 slices (independent local views are
- * this project's convention; unifying is track 4's job).
- */
-typedef struct Class6D940Methods Class6D940Methods;
-struct Class6D940Methods {
-    u8 pad000[0x008];
-    /* +0x008, New_Class6D940's own dispatch -- this IS Class6D940__Class6D940
-     * itself (same 2-arg (self, arg1) shape). */
-    void (*slot08)(void *self, s32 arg1);
-    u8 pad00C[0x06C - 0x00C];
-    /* +0x06C, Class6D940__Class6D940's own conditional dispatch. */
-    void (*slot6C)(void *self, s32 arg1);
-};
-extern Class6D940Methods D_8006D940;
-
-/* Forward-declared: defined below at its own ROM address (GetClass6D940Methods),
- * but called here (New_Class6D940, Class6D940__Class6D940) before that point in the
- * file. Without this, cc1 implicitly declares it `int`, which happens to be
- * byte-identical on this ABI but is a lie about the real signature. */
-Class6D940Methods *GetClass6D940Methods(void);
-
-/* The 0x34-byte object New_Class6D940 allocates. Only the fields
- * Class6D940__Class6D940 itself touches are named. */
-typedef struct Class6D940 Class6D940;
-struct Class6D940 {
-    Class6D940Methods *methods; /* +0x000, Class6D940__Class6D940 */
-    u8 pad004[0x02C - 0x004];
-    s32 unk2C;            /* +0x02C, Class6D940__Class6D940: zeroed */
-    s32 unk30;             /* +0x030, Class6D940__Class6D940: zeroed */
-};
-
-/*
- * A second, DIFFERENT function-pointer table, reached only via the
- * uncarved accessor `GetActiveDataSourceMethods()` (not this unit's function to
- * define). Only the three slots this unit's functions dispatch through
- * are typed.
- */
-typedef struct BaseTable6D940 BaseTable6D940;
-struct BaseTable6D940 {
-    u8 pad000[0x008];
-    void (*slot08)(void *self); /* +0x008, Class6D940__Class6D940's own base-chain call */
-    /* +0x00C, Class6D940__Finalize's own dispatch -- that function's whole body
-     * is this one call with nothing after it, so its own return type is
-     * genuinely ambiguous (a void wrapper around an s32 tail call is
-     * byte-identical); typed s32 here per CLAUDE.md's rule to default to
-     * `return callee(...)` absent positive void evidence. */
-    s32 (*slot0C)(void *self);
-    u8 pad010[0x064 - 0x010];
-    /* +0x064, Class6D940__SetFlag's own dispatch -- same tail-call ambiguity as
-     * slot0C above. */
-    s32 (*slot64)(void *self);
-};
-extern BaseTable6D940 *GetActiveDataSourceMethods(void);
+/* Class6D430's, code_171e0.c: the active driver's table, through which
+ * Class6D940's ctor, finalize and setFlag reach their parent's. */
+extern Class6D430Methods *GetActiveDataSourceMethods(void);
 
 /* Pool allocator, already established elsewhere (e.g.
  * include/class_16334.h, include/code_8220.h) -- declared LOCAL here since
  * this unit does not include either header. */
 extern void *BMemPMgrAlloc(s32 size);
 
-void *New_Class6D940(s32 arg1)
+/* LinkResource's (D_8006F13C) table as Class6D940__ResolveEntry reaches it
+ * through `linkResource`: only +0x080 (LinkResource__GetEntry), called with
+ * four arguments because retail keeps `placement` in $a3 across the call
+ * (the round-76 match). A view of LinkResource, for that class's job to
+ * retire, not of this one. */
+typedef struct LinkResourceView_179d8_d LinkResourceView_179d8_d;
+typedef struct LinkResourceViewMethods_179d8_d {
+    u8 pad000[0x080];
+    s32 (*getEntry)(LinkResourceView_179d8_d *self, s32 model, s32 cell, Class6D940Placement *placement);
+} LinkResourceViewMethods_179d8_d;
+struct LinkResourceView_179d8_d {
+    LinkResourceViewMethods_179d8_d *methods;
+};
+
+Class6D940 *New_Class6D940(char *name)
 {
-    void *self;
+    Class6D940 *self;
     Class6D940Methods *table;
 
     self = BMemPMgrAlloc(0x34);
     if (self != NULL) {
         table = GetClass6D940Methods();
-        table->slot08(self, arg1);
+        table->ctor(self, name);
         return self;
     }
     return NULL;
 }
 
-void Class6D940__Class6D940(Class6D940 *self, s32 arg1)
+void Class6D940__Class6D940(Class6D940 *self, char *name)
 {
-    GetActiveDataSourceMethods()->slot08(self);
+    GetActiveDataSourceMethods()->ctor((Class6D430 *)self);
     self->methods = GetClass6D940Methods();
-    self->unk2C = 0;
-    self->unk30 = 0;
-    if (arg1 != 0) {
-        self->methods->slot6C(self, arg1);
+    self->linkResource = NULL;
+    self->loaded = 0;
+    if (name != NULL) {
+        self->methods->requestLoadFile(self, name);
     }
 }
 
-s32 Class6D940__Finalize(void *self)
+void Class6D940__Finalize(Class6D940 *self)
 {
-    return GetActiveDataSourceMethods()->slot0C(self);
+    GetActiveDataSourceMethods()->finalize((Class6D430 *)self);
 }
 
-s32 Class6D940__SetFlag(s32 *self)
+void Class6D940__SetFlag(Class6D940 *self)
 {
-    self[0xC] = 1;
-    return GetActiveDataSourceMethods()->slot64(self);
+    self->loaded = 1;
+    GetActiveDataSourceMethods()->setFlag((Class6D430 *)self);
 }
 
-/*
- * Class6D940__ResolveEntry's own "descriptor" pointer, resolved either from a cached
- * byte offset (Obj278::unk34) or freshly from `index*12+8` into
- * Ctx278::unk10's byte array. Field meaning unestablished beyond
- * offset/width -- this region reads as raw hardware/SIO register staging
- * (no classtable.py hit anywhere nearby), not class-framework data.
- */
-typedef struct Entry278 {
-    u8 unk0;   /* +0x0, tag/kind: zero means "not present", tested first */
-    u8 unk1;   /* +0x1 */
-    u16 unk2;  /* +0x2 */
-    u8 unk4;   /* +0x4 */
-    u8 unk5;   /* +0x5 */
-    s16 unk6;  /* +0x6 */
-    s32 unk8;  /* +0x8 */
-} Entry278;
-
-/* Class6D940__ResolveEntry's own object (its own `arg1`). Only the fields this
- * function itself touches are named. */
-typedef struct Obj278 {
-    u8 pad0[0xC];
-    s32 unkC;   /* +0xC */
-    s32 unk10;  /* +0x10 */
-    s32 unk14;  /* +0x14 */
-    u8 pad18[0x1A - 0x18];
-    s16 unk1A;  /* +0x1A */
-    u8 pad1C[0x2C - 0x1C];
-    s16 unk2C;  /* +0x2C */
-    s16 unk2E;  /* +0x2E */
-    s32 unk30;  /* +0x30, cache-hit flag: 1 if unk34 was reused, 0 if freshly computed */
-    s32 unk34;  /* +0x34, BEFORE resolution: a cached byte offset into Ctx278::unk10; AFTER: Entry278::unk8 */
-    s32 unk38;  /* +0x38 */
-} Obj278;
-
-/* Opaque target of Ctx278::unk2C -- only the one dispatched slot named. */
-typedef struct Ctx278SubMethods Ctx278SubMethods;
-typedef struct Ctx278Sub Ctx278Sub;
-struct Ctx278SubMethods {
-    u8 pad000[0x080];
-    /* (self, desc->unk2, index, obj): the last two are forwarded from
-     * Class6D940__ResolveEntry's own parameters, so they emit no set-up code. */
-    s32 (*slot80)(Ctx278Sub *self, s32 unk2, s32 index, Obj278 *obj);
-};
-struct Ctx278Sub {
-    Ctx278SubMethods *methods;
-};
-
-/* Class6D940__ResolveEntry's own `arg0`. Only the fields this function itself
- * touches are named. */
-typedef struct Ctx278 {
-    u8 pad0[0x10];
-    u8 *unk10;       /* +0x10, byte-addressed base for the Entry278 table */
-    u8 pad14[0x2C - 0x14];
-    Ctx278Sub *unk2C; /* +0x2C */
-} Ctx278;
-
-s32 Class6D940__ResolveEntry(Ctx278 *ctx, Obj278 *self, s32 index)
+s32 Class6D940__ResolveEntry(Class6D940 *self, Class6D940Placement *placement, s32 cell)
 {
-    Entry278 *desc;
-    s32 whole;
-    s32 frac;
-    s32 unk2;
+    Class6D940Record *rec;
+    LinkResourceView_179d8_d *link;
+    s32 row;
+    s32 col;
+    s32 model;
 
-    if (index < 0x190) {
-        if (self->unk34 != 0) {
-            desc = (Entry278 *)(ctx->unk10 + self->unk34);
-            self->unk30 = 1;
+    if (cell < 0x190) {
+        if (placement->next != 0) {
+            rec = (Class6D940Record *)((u8 *)self->buffer + placement->next);
+            placement->chained = 1;
         } else {
-            desc = (Entry278 *)(index * 12 + 8 + ctx->unk10);
-            self->unk30 = 0;
+            rec = (Class6D940Record *)(cell * 12 + 8 + (u8 *)self->buffer);
+            placement->chained = 0;
         }
-        self->unk34 = desc->unk8;
-        if (desc->unk0 != 0) {
-            whole = index / 20;
-            frac = index - whole * 20;
-            self->unkC = (frac << 11) + 0x400;
-            self->unk10 = (s32)desc->unk6 << 11;
-            self->unk14 = (whole << 11) + 0x400;
-            self->unk1A = desc->unk5 << 10;
-            self->unk2C = desc->unk1;
-            self->unk2E = desc->unk4;
-            unk2 = desc->unk2;
-            self->unk38 = unk2;
-            return ctx->unk2C->methods->slot80(ctx->unk2C, unk2, index, self);
+        placement->next = rec->next;
+        if (rec->present != 0) {
+            row = cell / 20;
+            col = cell - row * 20;
+            placement->x = (col << 11) + 0x400;
+            placement->y = (s32)rec->y << 11;
+            placement->z = (row << 11) + 0x400;
+            placement->rotY = rec->rotY << 10;
+            placement->unk2C = rec->unk1;
+            placement->unk2E = rec->unk4;
+            model = rec->model;
+            placement->model = model;
+            link = (LinkResourceView_179d8_d *)self->linkResource;
+            return link->methods->getEntry(link, model, cell, placement);
         }
         return -1;
     }
