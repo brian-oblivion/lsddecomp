@@ -56,7 +56,7 @@ void StageMap__AddScaleStepToCell(Obj866E8 *self, Unk10ChildObj_3bb8c_b *item) {
 - New type `Unk10ChildObj_3bb8c_b` / `Unk10ChildMethods_3bb8c_b` — the
   object type held in `Elem::unk10[]`. Only `slot48` is typed
   (`void (*slot48)(Unk10ChildObj_3bb8c_b *self, s32 arg1, void *arg2)`),
-  resolved from this function and its sibling `StageMap__ResetChildRate`.
+  resolved from this function and its sibling `StageMap__ResetCellScale`.
 - `Elem::unk10` (`Unk10ChildObj_3bb8c_b **`, +0x010) — same real field
   `class_3ac78.h`'s independent view already names `unk10`
   (`GenericObject **`) on its own `UnkSlotEntry_3ac78` type; both
@@ -91,4 +91,4 @@ to `StageMap__ForEachElem`/`StageMap__ForEachEntryChild` by
 `StageMap__StepScaleRamp`. Body: `item->methods->slot48(item, 0,
 self->rateEntry)`. Named for what it does to each child entry (forwards
 the parent's current rate entry to it), mirrored by
-`StageMap__ResetChildRate`'s sibling shape.
+`StageMap__ResetCellScale`'s sibling shape.

@@ -113,7 +113,7 @@ extern Ratio16 D_800869A8[3];
 extern Ratio16 D_800869B4[3];
 extern Ratio16 D_800869C0[3];
 
-/* 1/1, 1/1, 1/1: the scale StageMap__ResetChildRate sets on every cell. */
+/* 1/1, 1/1, 1/1: the scale StageMap__ResetCellScale sets on every cell. */
 extern Ratio16 D_800869CC[3];
 
 /* -------------------------------------------------------------------

@@ -173,7 +173,7 @@ byte-exact first half, and useful for whoever picks this back up.
 - `D_8008699C`, `D_800869A8`, `D_800869B4`, `D_800869C0` — four static
   instances of `EntryDesc866E8`, addresses confirmed 0xC apart. The
   existing `D_800869CC` (`extern s32 D_800869CC[3]`, declared by an
-  earlier round from `StageMap__ResetChildRate`) is a plausible fifth entry of the
+  earlier round from `StageMap__ResetCellScale`) is a plausible fifth entry of the
   same table by the same stride, but is left independently declared —
   nothing in this unit reaches it through the `EntryDesc866E8` type.
 - **`Obj866E8::unk1E4` retyped** from `void *` to `EntryDesc866E8 *`.

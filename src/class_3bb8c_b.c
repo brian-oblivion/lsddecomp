@@ -413,7 +413,7 @@ void StageMap__StepScaleRamp(StageMap *self) {
 
 void StageMap__EndScaleRamp(StageMap *self) {
     if (self->rateCountdown != 0) {
-        StageMap__ForEachElem(self, StageMap__ResetChildRate, 0);
+        StageMap__ForEachElem(self, StageMap__ResetCellScale, 0);
         self->rateCountdown = 0;
     }
 }
@@ -422,7 +422,7 @@ void StageMap__AddScaleStepToCell(StageMap *self, GridCell *item) {
     item->methods->updateScale(item, 0, self->scaleStep);
 }
 
-void StageMap__ResetChildRate(StageMap *self, GridCell *item) {
+void StageMap__ResetCellScale(StageMap *self, GridCell *item) {
     item->methods->updateScale(item, 1, D_800869CC);
 }
 

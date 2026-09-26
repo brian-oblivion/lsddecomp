@@ -56,7 +56,7 @@ void StageMap__StepScaleRamp(Obj866E8 *self) {
 
 `StageMap__AddScaleStepToCell` is defined later in this file (ROM order), so it needs a
 forward declaration here — same pattern already used for
-`StageMap__ResetChildRate` in `StageMap__EndScaleRamp`.
+`StageMap__ResetCellScale` in `StageMap__EndScaleRamp`.
 
 ## New struct knowledge
 

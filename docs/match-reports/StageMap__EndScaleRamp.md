@@ -21,8 +21,8 @@ sw    $ra, 0x14($sp)
 lw    $v0, 0x1E0($s0)     ; v0 = self->unk1E0
 beqz  $v0, .skip
  nop
-lui   $a1, %hi(StageMap__ResetChildRate)
-addiu $a1, $a1, %lo(StageMap__ResetChildRate)
+lui   $a1, %hi(StageMap__ResetCellScale)
+addiu $a1, $a1, %lo(StageMap__ResetCellScale)
 jal   StageMap__ForEachElem
  move $a2, $zero
 sw    $zero, 0x1E0($s0)    ; self->unk1E0 = 0 (unconditional on this path)
@@ -35,7 +35,7 @@ sw    $zero, 0x1E0($s0)    ; self->unk1E0 = 0 (unconditional on this path)
 ```c
 void StageMap__EndScaleRamp(Obj866E8 *self) {
     if (self->unk1E0 != 0) {
-        StageMap__ForEachElem(self, StageMap__ResetChildRate, 0);
+        StageMap__ForEachElem(self, StageMap__ResetCellScale, 0);
         self->unk1E0 = 0;
     }
 }

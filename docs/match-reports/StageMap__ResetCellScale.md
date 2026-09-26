@@ -1,4 +1,6 @@
-# StageMap__ResetChildRate — MATCHED (14/14 words)
+# StageMap__ResetCellScale — MATCHED (14/14 words)
+
+> Renamed from `StageMap__ResetChildRate` on 2026-09-26 (tools/rename.py). Address 0x8004d108.
 
 > Renamed from `Class866E8__ResetChildRate` on 2026-09-26 (tools/rename.py). Address 0x8004d108.
 
@@ -37,7 +39,7 @@ same call shape, same two-parameter signature required by the eventual
 ## Final C
 
 ```c
-void StageMap__ResetChildRate(Obj866E8 *self, Unk10ChildObj_3bb8c_b *item) {
+void StageMap__ResetCellScale(Obj866E8 *self, Unk10ChildObj_3bb8c_b *item) {
     item->methods->slot48(item, 1, D_800869CC);
 }
 ```
