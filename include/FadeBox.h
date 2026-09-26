@@ -4,32 +4,47 @@
 #include "BoxFill.h"
 
 /*
- * FadeBox -- a BoxFill that fades its colour (class id 0x164, method table
- * gFadeBoxMethods). BoxFill's one subclass; no class derives from it. Methods in
- * src/code_2cc8c_e.c, New_FadeBox to GetFadeBoxMethods. The ctor calls
- * GetBoxFillMethods()->ctor first, so the id parent (0x64) is the ctor-chain
- * parent. What its own methods do:
- *  - A channel mask selects the colour: `channels` (4 = r, 2 = g, 1 = b;
- *    0 is stored as 0xF, "all") indexes D_8006EA90, eight 3-byte RGB
- *    entries (1 = 0000FF, 2 = 00FF00, 4 = FF0000, 0 and 7 = FFFFFF in the
- *    retail bytes); 0xF selects D_8006EAA8 instead, whose entries are black.
- *  - configure(source, channels, unk7C) adds `source` as a child, stores the
- *    mask, sets `ticksLeft` to 0x100 / step (less 1/divisor of it in
- *    altMode) and turns the box's semi-transparency on (setSemiTransRate 1
- *    for a mask, 2 for 0) and its display on.
- *  - startFadeDown sets the box to the mask's colour and negates `step`;
- *    startFadeUp sets it black (unless altMode). update(sender, 2) then
- *    adds `(u8)step` to each selected channel byte of BoxFill's `color`
- *    once per call, and calls stop(sender) when `ticksLeft` runs out.
- *  - stop removes the source child, makes `step` positive again, and
- *    notifies its parents with event 5 (after a fade down) or 6 (up).
- *  - pushPosition/popPosition save and restore BoxFill's size and position.
- * Its users: Viewport's subHandle (code_2cc8c_c, 320x240 at the relative
- * (-100, -100)) and Entity's `unk100` (Entity.c; the MoodCue handlers
- * start fades with the entity's `companion2` as the source).
+ * FadeBox -- a BoxFill whose colour ramps a step per update until a tick
+ * count runs out: a screen fade (class id 0x164, method table
+ * gFadeBoxMethods, parent BoxFill; methods in src/code_2cc8c_e.c; no
+ * subclasses). The ctor chains to BoxFill's ctor, then Reset stores the
+ * default channel mask, a step of 10, and turns the box's display and
+ * semi-transparency off.
+ *
+ * A channel mask (4 = r, 2 = g, 1 = b; 0 means all, stored as 0xF) picks
+ * the colour: it indexes D_8006EA90, eight 3-byte RGB entries whose bytes
+ * are the mask's channels at 0xFF (0 and 7 are white); D_8006EAA8's are
+ * black.
+ *
+ * One fade:
+ *  - configure(source, channels, arg3) adds `source` as a child (the node
+ *    whose updates drive the fade), stores the mask (a negative one means
+ *    `defaultChannels`), sets `ticksLeft` to 0x100 / step, and turns the
+ *    box's display and semi-transparency on: rate 1 (added to what is
+ *    behind it) for a mask, rate 2 (subtracted) for 0.
+ *  - startFadeDown starts at the mask's colour and negates `step`;
+ *    startFadeUp starts at black. So with mask 0 a fade down is a fade in
+ *    from black and a fade up a fade out to black; with a mask, a coloured
+ *    flash that fades out, or builds up.
+ *  - update(sender, 2) adds `(u8)step` to each selected byte of BoxFill's
+ *    `color`, and calls stop(sender) once `ticksLeft` runs out.
+ *  - stop removes the source child, hides the box after a fade down, makes
+ *    `step` positive again and notifies its parents with 5 (fade down done)
+ *    or 6 (fade up done). getColor returns the colour the screen shows
+ *    once a fade up is done: the mask's, or black for mask 0.
+ * In altMode (setDivisorMode) a fade runs 1/divisor fewer ticks, a fade up
+ * keeps the current colour, and stop leaves the box shown after a fade down.
+ * pushPosition/popPosition save and restore BoxFill's size and position.
+ *
+ * Its users: Viewport makes one as its subHandle (320x240 at the relative
+ * (-100, -100)), which ObjM fades and whose 5/6 it handles
+ * (ObjM__OnFadeNotify; ObjM__EnterStyleSession sets altMode from the
+ * DreamSys's flashback session). Entity makes one on demand as its
+ * `unk100` (Entity__GetOrCreateUnk100); the MoodCue handlers fade it with
+ * the entity's ticker as the source.
  *
  * Overrides whose parameter list differs from the inherited slot keep the
- * slot's type (FINISHING-PLAN track 4 step 6); the caller casts:
+ * slot's type; the caller casts:
  *  - +0x040 reset: FadeBox__Reset takes the ctor's channel mask; the ctor
  *    calls it through FadeBoxResetFn.
  * The ctor returns nothing where the inherited slot returns `void *`, as
