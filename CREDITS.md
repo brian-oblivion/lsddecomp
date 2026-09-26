@@ -19,10 +19,10 @@ stood at `c677d8f4e5df` (2024-09-13):**
   since.
 - **146 symbol names**, merged from lsddecomp's two symbol files
   (`config/symbols.slps01556.lsdde.txt` and `symbols_addrs_manual.txt`) into
-  ours. Three of their names were dropped in the merge because they were an
-  earlier guess at an address the other file named again (`new_GameManager`,
-  `GameManager__GameManager`, `new_DreamEntity`); the symbols file's own header
-  records this.
+  ours. The merge dropped four entries, as the symbols file's own header
+  records: three were an earlier guess at an address the other file named
+  again (`new_GameManager`, `GameManager__GameManager`, `new_DreamEntity`), and
+  the fourth was a second copy of `CalcNavigationScore`, which is kept.
 - The **project headers** `types.h`, `common.h`, `StageGrid.h` and
   `DreamSys.h`, which encode struct layouts derived from the disassembly.
   `types.h` and `common.h` are byte-identical to lsddecomp's today.
