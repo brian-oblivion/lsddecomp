@@ -13,6 +13,12 @@
 #include "code_8220.h"
 #include "gte.h"
 
+/* The widest or tallest screen extent, in pixels, a face may have and still
+ * be linked into the OT as one primitive; FlagLargePolyForDivide sends
+ * anything larger through Sony's RCpoly* subdivision. 256 is also the width
+ * of one texture page. */
+#define MAX_UNDIVIDED_SPAN 256
+
 typedef struct PolyDrawCtx {
     u8 pad000[0x030 - 0x000];
     /* +0x030 */ u_long *otSlot;
@@ -264,10 +270,10 @@ void FlagLargePolyForDivide(void *ctxIn, s32 count) {
         } while (xp < end);
     }
 
-    if (ctx->bboxMax.vx - ctx->bboxMin.vx >= 0x101) {
+    if (ctx->bboxMax.vx - ctx->bboxMin.vx > MAX_UNDIVIDED_SPAN) {
         ctx->divide = 1;
     }
-    if (ctx->bboxMax.vy - ctx->bboxMin.vy >= 0x101) {
+    if (ctx->bboxMax.vy - ctx->bboxMin.vy > MAX_UNDIVIDED_SPAN) {
         ctx->divide = 1;
     }
 }
