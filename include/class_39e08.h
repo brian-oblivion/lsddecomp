@@ -360,11 +360,6 @@ extern Class865C8Methods *GetObj865C8Methods(void);
  * class_16334.h for the other units that also declare it locally. */
 extern void *BMemPMgrAlloc(s32 size);
 
-/* VabStreamObj's allocator (src/code_179d8_e.c): a 0x64-byte instance ctored
- * with the one forwarded path. Only call site here is Class86668__Class86668,
- * which stores the result in Class86668::sound. */
-extern BasicClass *New_VabStreamObj(char *path);
-
 /* Rodata symbols right next to this unit's own gClass86668Methods/D_800865C8
  * vtables (0x80086650, 0x8008665C -- 0x18 and 0xC bytes before gClass86668Methods
  * respectively). Only their ADDRESSES are taken, as the 2nd/3rd args to

@@ -1,5 +1,6 @@
 #include "common.h"
 #include "class_39e08.h"
+#include "VabStreamObj.h"
 
 Obj865C8 *New_Obj865C8(Obj0C *arg1, SubObjD *arg2, s32 arg3)
 {
@@ -274,7 +275,7 @@ void Class86668__Class86668(Class86668 *self, char *soundBankPath, BasicClass *s
     Get_vtable_IntermediateBase()->ctor((IntermediateBase *)self);
     self->methods = GetClass86668Methods();
     if (soundBankPath != NULL) {
-        self->sound = New_VabStreamObj(soundBankPath);
+        self->sound = (BasicClass *)New_VabStreamObj(soundBankPath);
     } else {
         self->sound = sound;
     }

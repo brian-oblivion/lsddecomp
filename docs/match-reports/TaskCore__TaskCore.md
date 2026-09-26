@@ -147,3 +147,10 @@ overwrites it). `Class__Class` convention, same precedent as
 ## Track 4 (2026-09-25, round 84, alpha)
 
 Renamed from TaskCoreObj__TaskCoreObj (tools/rename.py). Occupant of +0x008 (`ctor`). Calls IntermediateBase's ctor first, and each subclass ctor (StreamTaskObj, Class86B60, GraphRoomObj) calls this one first. Parameters named from the body: `target` goes to setTarget (+0x0D8), `soundBankPath` (both subclass ctors pass "ETC\ETCSE") to New_VabStreamObj, whose result, or the caller's `sound`, is +0x048. The class (id 0x130, table gTaskCoreMethods) is unified as `TaskCore` in `include/TaskCore.h`; `self` is `TaskCore *` (it was the `Obj86B60` or `StreamTaskObj` view). Any source block above is the pre-unification spelling; the live body takes the unified types and slot names, byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).
+
+## Track 4 (2026-09-26, round 87, VabStreamObj)
+
+`include/code_2c054.h`'s local `extern StreamTaskUnkB4Obj
+*New_VabStreamObj(char *)` is deleted. `src/code_2c054.c` includes
+`include/VabStreamObj.h` instead. The existing `(BasicClass *)` cast into
+`TaskCore::sound` is unchanged, and the whole image stays byte-identical.
