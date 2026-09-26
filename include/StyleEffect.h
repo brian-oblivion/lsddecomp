@@ -5,48 +5,46 @@
 #include "VariantSprite.h"
 
 /*
- * StyleEffect -- class id 0xEF34, method table gStyleEffectMethods: Actor's
- * subclass (its ctor chains to GetActorMethods()->ctor first, so the id tree
- * 0x34 -> 0xEF34 is the ctor chain). Slot occupants in src/class_3bb8c_r.c
- * (New_, ctor, Finalize, SetParams, Update), the private helpers in
- * src/class_3bb8c_s.c and src/class_3bb8c_o.c (the four sprite-array
- * helpers), the getter in src/class_3bb8c_o.c. No class derives from it.
+ * StyleEffect -- an Actor the style layer (src/class_3bb8c_n.c) places at an
+ * offset from the target position and keeps there: every frame it moves to
+ * pos + offset, plus however far the viewport's viewpoint has risen or
+ * fallen since it was built. Its `kind` picks what it carries (enum
+ * StyleEffectKind): a model, the same model with two copies in a row, or a
+ * cluster of five sprites. Class id 0xEF34, method table
+ * gStyleEffectMethods, getter GetStyleEffectMethods. Its ctor chains to
+ * Actor's (include/Actor.h); no class derives from it.
  *
- * Construction: class_3bb8c_n.c's StyleFillEffectKind0..3 build one per
- * effect slot (gStyleEffectSlots) as New_StyleEffect(kind, params, parent,
- * pos), with `kind` 0..3, `params` the 0x24-byte block at gStyleSpawnOffsetX (seven
- * separately-declared symbols gStyleSpawnOffsetX..gStyleSpawnColors in class_3bb8c_n.c;
- * one StyleEffectParams in the bytes: the callers pass `&gStyleSpawnOffsetX` or
- * `&gStyleSpawnRotation - 0xC`), `parent` gStyleGrid and `pos` the caller's
- * position. The ctor stores `kind`, copies `params` through the reset slot
- * and attaches self under `parent` at pos + params.offset
- * (StyleEffect__InitByKind). Per kind: 0 and 1 link a model fetched through
- * gStyleEffectTmd; 0 also builds two Actor `modelChildren` in a row; 2 and 3 build
- * five VariantSprite `sprites` (2 randomised once, 3 re-randomised every frame).
+ * Who builds it. StyleBuildEffectSlots, on the style layer's first tick,
+ * first calls SetStyleEffectSources with the scene's DREAMER.TMD resource,
+ * ETC.TIM image and viewport (gStyleEffectTmd, gStyleEffectTim,
+ * gStyleEffectViewport), then StyleFillEffectKind0..3 fill
+ * gStyleEffectSlots with New_StyleEffect(kind, params, gStyleGrid, pos):
+ * several of kind 0, of kind 1 for variant 2, then one of kind 3 (variant 0)
+ * or kind 2 (variant 2). `params` is one StyleEffectParams laid over the
+ * separately-declared gStyleSpawnOffsetX .. gStyleSpawnColors, which the
+ * fill functions and SetupStyleSpawnParamsA/B randomise before each build.
+ * StyleUpdateEffectSlots runs every slot's update with the target position,
+ * and StyleReleaseEffectSlots releases them.
  *
- * What it changes, from its own methods (`classtable.py gStyleEffectMethods
- * --vs gActorMethods`):
- *  - +0x040 reset: the occupant, StyleEffect__SetParams, takes the params
- *    block where the slot (SceneNode's) takes none. It copies the block
- *    into `params` and zeroes `tick`, as SceneNode__Reset zeroes `tick`.
- *    The ctor calls it through StyleEffectSetParamsFn (a cast, no code);
- *  - +0x0EC setPendingExtra: the occupant, StyleEffect__Update, is the
- *    per-frame update: it increments `tick` and runs the per-kind update
- *    with its second argument, the position. Its only caller,
- *    StyleUpdateEffectSlots (class_3bb8c_n.c), passes that position and
- *    calls through StyleEffectUpdateFn (a cast, no code). The slot keeps
- *    Actor's type;
- *  - +0x008 ctor and +0x00C finalize (StyleEffect__Finalize releases the
- *    per-kind children, then chains Actor's finalize).
- *
- * Inherited fields it uses differently: the ctor stores `kind` in Actor's
- * +0x054 `pendingExtra` (StyleEffect__StyleEffect; read by every per-kind
- * switch in class_3bb8c_s.c), and it overrides pendingExtra's setter slot
- * (+0x0EC, above), so nothing else writes it. The ctor also zeroes Actor's
- * +0x044 `state` again after Actor's ctor.
- *
- * That says what it builds, not what it is in the game, so the name stays
- * the table's address.
+ * Lifecycle.
+ *   ctor(kind, params, parent, pos)
+ *            Actor's ctor, `state` 0, `kind` into Actor's `pendingExtra`
+ *            (+0x054), then reset(params), then InitByKind: attach under
+ *            `parent` at pos + offset with the params' rotation and scale,
+ *            snapshot the viewpoint y (gStyleEffectBaseViewY), link a model
+ *            from gStyleEffectTmd (kinds 0 and 1, gStyleEffectModelIds[kind])
+ *            and build the kind's children.
+ *   reset (+0x040)
+ *            SetParams: copy the whole params block into `params`, zero
+ *            `tick`. It takes the block where SceneNode's slot takes
+ *            nothing; the ctor calls it through StyleEffectSetParamsFn.
+ *   update (+0x0EC, Actor's setPendingExtra slot)
+ *            Update: `tick` + 1, then UpdateByKind: setTranslation(pos +
+ *            offset + the viewpoint y change), then the kind's per-frame
+ *            step. StyleUpdateEffectSlots calls it through
+ *            StyleEffectUpdateFn; overriding pendingExtra's setter is why
+ *            nothing else rewrites `kind`.
+ *   finalize ReleaseByKind (the kind's child array), then Actor's finalize.
  *
  * The object is 0x98 bytes (New_StyleEffect), exactly where `sprites` ends.
  */
@@ -55,13 +53,24 @@ typedef struct StyleEffect StyleEffect;
 typedef struct StyleEffectMethods StyleEffectMethods;
 typedef struct StyleEffectParams StyleEffectParams;
 
+/* What each `kind` builds and does per frame (the switches in
+ * class_3bb8c_s.c; they still spell the values as numbers). */
+typedef enum StyleEffectKind {
+    STYLE_EFFECT_MODEL_ROW =
+        0, /* model, plus two copies in a row (modelChildren) that spin and drift along z after 500 ticks */
+    STYLE_EFFECT_MODEL = 1, /* model only; nothing per frame */
+    STYLE_EFFECT_SPRITES = 2, /* five sprites shaped once at build (BuildRandomSprites); nothing per frame */
+    STYLE_EFFECT_JITTER_SPRITES =
+        3 /* five sprites, sprites[1..4] given a random scale and rotation every frame (RandomizeSprites) */
+} StyleEffectKind;
+
 /* The 0x24-byte parameter block the reset slot (StyleEffect__SetParams)
  * copies in whole. Every member is 4-aligned, so the whole-struct copy is
  * retail's aligned 4-word-per-iteration block move. */
 struct StyleEffectParams {
     /* +0x000 */ LongVec3 offset; /* added to the caller's position (InitByKind, UpdateByKind) */
-    /* +0x00C */ void *rotation;  /* updateRotation's ratio triple (AttachWithRotScale) */
-    /* +0x010 */ void *scale; /* updateScale's ratio triple; its first s16 also scales the model-child spacing (PlaceModelChildren) */
+    /* +0x00C */ Ratio16 *rotation; /* Ratio16[3] degrees, self's and the model children's updateRotation (AttachWithRotScale) */
+    /* +0x010 */ Ratio16 *scale; /* Ratio16[3], their updateScale; scale[0].num also scales the model-child spacing (PlaceModelChildren) */
     /* +0x014 */ s32 modelChildLayout; /* 0 = no modelChildren, else an index 1..4 into gModelChildSpacing: 1-2 along x, 3-4 along y */
     /* +0x018 */ s32 tableIndex;   /* index into gModelChildDriftZ and gSpriteShiftX */
     /* +0x01C */ SpriteRgb *color; /* every sprite's setColor (SpawnSprites) */
@@ -79,8 +88,8 @@ struct StyleEffectParams {
 #define STYLEEFFECT_FIELDS(Methods)                                                                 \
     ACTOR_FIELDS(Methods);                                                                         \
     /* +0x058 */ StyleEffectParams params; /* the reset slot's copy (StyleEffect__SetParams) */      \
-    /* +0x07C */ Actor *modelChildren[2]; /* kind 0: New_Actor children (PlaceModelChildren) */    \
-    /* +0x084 */ VariantSprite *sprites[5]   /* kinds 2/3: New_VariantSprite children (SpawnSprites). The object is 0x98 bytes (New_StyleEffect) */
+    /* +0x07C */ Actor *modelChildren[2]; /* STYLE_EFFECT_MODEL_ROW: New_Actor children (PlaceModelChildren) */    \
+    /* +0x084 */ VariantSprite *sprites[5]   /* the two sprite kinds: New_VariantSprite children (SpawnSprites). The object is 0x98 bytes (New_StyleEffect) */
 /* clang-format on */
 
 struct StyleEffectMethods {
