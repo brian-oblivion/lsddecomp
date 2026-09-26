@@ -62,3 +62,7 @@ its own 2nd argument straight through to Psy-Q `TmdModel__GetHull`, which
 fills the caller's buffer), but `unk20`'s own real content/purpose is
 still opaque, so the name describes the READ operation, not what is
 actually being read. Purely local to this unit + its header.
+
+## Track 6 (round 91, echo): named `SceneNode__GetModelHull`, tier A
+
+The body is `TmdModel__GetHull(self->model, dest)`: the linked TmdModel's eight-corner hull (TmdHull) into `dest`. Was `ReadUnk20Data` (`unk20` is now `model`). Slot +0x08C kept as `readUnk20Data` (caller in class_3bb8c_o.c); `getModelHull` proposed. The class was renamed Class6B5CC -> SceneNode in the same pass (include/SceneNode.h's banner has the evidence).

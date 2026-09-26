@@ -11,3 +11,7 @@
 ## Naming
 
 Round 71 (alpha). `func_8001D33C` -> `SceneNode__NoOpSlot5C`, **tier C**. Table slot +0x05C: an empty body (`jr $ra; nop`). Finalize calls the slot with (self, 0). Of the 17 tables checked (the tag-4 family plus two others), only gClass869D8Methods overrides +0x05C, with another empty body (func_8003EA74, code_2cc8c_d). Nothing establishes what the slot is for, so it keeps the tier-C `Class__func_xxxxx` form.
+
+## Track 6 (round 91, echo): named `SceneNode__NoOpSlot5C`, tier C
+
+Empty. Slot +0x05C's only caller is SceneNode__Finalize, as `(self, 0)`, and no subclass overrides it, so nothing shows what the slot is for. `NoOpSlotNN` follows MoviePlayer__NoOpSlot5C. Was `SceneNode__func_1d33c`. The class was renamed Class6B5CC -> SceneNode in the same pass (include/SceneNode.h's banner has the evidence).

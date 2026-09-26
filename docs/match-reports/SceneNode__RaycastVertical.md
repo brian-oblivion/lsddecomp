@@ -809,3 +809,7 @@ exposed them. When a stall carries several same-class residues, fixing the
 STRUCTURE first and re-measuring is worth more than attacking any of them
 directly -- here levers 1 and 2 together removed one "register identity"
 residue outright without ever addressing it.
+
+## Track 6 (round 91, echo): named `SceneNode__RaycastVertical`, tier B
+
+A SceneNode method `(self, out, target)`: refreshes coord2's workm.t as coord.t plus every parent's coord.t, rotates `target` minus that into the node's frame (composeAndApplyRotation), then casts TmdModel__RaycastFaces from the point along -Y by 0x400 and, failing that, +Y by 0x400; on a hit writes hit minus point to `out` and returns 1. Mechanics; its one caller is AcceptGridElem (class_3bb8c_p.c), a grid-query filter. Was `func_8001E7BC`, kept tier C by track 3 for want of a verb. The class was renamed Class6B5CC -> SceneNode in the same pass (include/SceneNode.h's banner has the evidence).

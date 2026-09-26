@@ -95,3 +95,7 @@ For the head to apply by type scope. Each one fails to compile in another unit w
 - `SceneNodeObj.unk14` -> `coord2` (tier A): the ctor allocates exactly sizeof(GsCOORDINATE2) = 0x50 for it and Reset runs GsInitCoordinate2 on it; +0x14 of the embedded GsDOBJ2 is `coord2` in LIBGS.H. Accessors: code_d294, code_d294_b, code_d294_c (compiler-measured).
 - `UnkOwner_d294.unk14` and `GenericObj_d294.unk14` -> `coord2` (tier A): the same field on the parent and on a sibling object (AttachToParent copies the parent's into `super`). Accessors: code_d294, code_d294_c.
 - `SceneNodeSub14.unk44` -> `param` (tier A): GsCOORDINATE2.param, the 0x28-byte GsCOORD2PARAM the ctor allocates. Accessors: code_d294, code_d294_b, code_d294_c.
+
+## Track 6 (round 91, echo): the class is SceneNode
+
+Class6B5CC -> SceneNode (`renametype.py`), tier A for what it is: the ctor allocates a GsCOORDINATE2 (0x50) and a GsCOORD2PARAM (0x28) and the object embeds a GsDOBJ2 at +0x010 (SceneNode__LinkModel passes &attribute to GsLinkObject4); attachToParent/detachFromParent maintain `parent` and coord2->super, a libgs transform hierarchy; sixteen classes derive from it (Actor, Sprite, LightRig, BoxFill, ...). The libgs member types (SceneNodeSub14 = GsCOORDINATE2, SceneNodeSub44 = GsCOORD2PARAM, S16Quad_d294 = SVECTOR) are not yet substituted: including <libgs.h> in SceneNode.h breaks 24 units whose headers declare Sony names their own way (measured this round).

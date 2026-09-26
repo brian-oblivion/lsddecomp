@@ -27,3 +27,7 @@ class disables feature X here") that the empty body cannot support --
 exactly the "wrong tier-A name is worse than `func_`" case. What IS
 known (that this is a deliberate no-op override, not missing code) is
 recorded here.
+
+## Track 6 (round 91, echo): named `SceneNode__NoOpSlotB0`, tier C
+
+Empty. Slot +0x0B0 has no caller; Actor and its subclasses null it. `NoOpSlotNN` precedent. Was `func_8001E49C`. The class was renamed Class6B5CC -> SceneNode in the same pass (include/SceneNode.h's banner has the evidence).

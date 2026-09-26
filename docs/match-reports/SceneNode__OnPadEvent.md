@@ -27,3 +27,7 @@ class disables feature X here") that the empty body cannot support --
 exactly the "wrong tier-A name is worse than `func_`" case. What IS
 known (that this is a deliberate no-op override, not missing code) is
 recorded here.
+
+## Track 6 (round 91, echo): named `SceneNode__OnPadEvent`, tier A
+
+Empty default of the onPadEvent slot (+0x094), which SceneNode__OnNotify calls for a Pad sender (class id nibble 2); DreamSys__OnPadEvent overrides it. Was `func_8001D6A4`. The class was renamed Class6B5CC -> SceneNode in the same pass (include/SceneNode.h's banner has the evidence).

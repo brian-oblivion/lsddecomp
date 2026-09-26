@@ -122,3 +122,7 @@ then chains `SceneNode__GetModelHull` (slot `+0x08C`) into
 the gate-then-forward mechanics; purpose of the `a1` range or the
 underlying notification is not established. Purely local to this unit
 + its header.
+
+## Track 6 (round 91, echo): named `SceneNode__NotifyWithHull`, tier B
+
+For `2 <= event < 4`, when a model with bounds is linked, fills a TmdHull through getModelHull and hands it to transformAndNotifyParents with the event. Mechanics only: what events 2 and 3 mean is not established. Overridden by Actor__NotifyMove, DreamSys__NotifyLinkAttempt, Class866E8__OnElementEvent. Was `NotifyIfUnk20Active`. Slot +0x088 kept as `notifyIfUnk20Active` (callers in six units outside this job); `notifyWithHull` proposed. The class was renamed Class6B5CC -> SceneNode in the same pass (include/SceneNode.h's banner has the evidence).

@@ -73,3 +73,7 @@ one `self->methods->slot30` (`BasicClass__NotifyParents`, inherited)
 dispatch. Mechanics measured from the disassembly; the in-game reason
 for notifying parents with a freshly-transformed array is not
 established. Purely local to this unit + its header.
+
+## Track 6 (round 91, echo)
+
+The argument type GenericCountList_d294 (`unk0`, `unk4`) is TmdModel.h's TmdHull (`count`, `v`): the buffer NotifyWithHull passes is TmdModel__GetHull's output. Byte-identical.

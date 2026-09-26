@@ -54,3 +54,7 @@ Renaming would edit that file too, which is out of this round's scope
 (`code_d294_b` only). Posted to the broadcast for the head to apply, or
 for whoever next runs track 3 on `class_3bb8c.h`'s own unit to confirm
 independently.
+
+## Track 6 (round 91, echo): named `SceneNode__SetLightDim`, tier A
+
+`GetSetBitField(&self->attribute, 0, 3, value)`: GsDOBJ2.attribute bits 0-2 are libgs.h's GsLDIM0..GsLDIM7 (light dimming). Was `GetSetUnk10Field0`. Slot +0x074 renamed `setLightDim` (no accessor). The class was renamed Class6B5CC -> SceneNode in the same pass (include/SceneNode.h's banner has the evidence).

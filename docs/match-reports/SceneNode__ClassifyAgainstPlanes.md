@@ -560,3 +560,7 @@ input can fail to distinguish "reads the right value" from "reads a
 different value that happens not to matter for this particular input."
 
 NON_MATCHING body promoted, round 69
+
+## Track 6 (round 91, echo)
+
+AttachCornerList_d294b is TmdModel.h's TmdHull and Vec3S16_d294 is TmdVec3. Byte-identical.
