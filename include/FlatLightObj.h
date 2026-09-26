@@ -6,7 +6,7 @@
 /*
  * FlatLightObj -- one Psy-Q flat light, class id 0x6, method table
  * gFlatLightObjMethods, a direct BasicClass subclass (`tools/classtable.py
- * gFlatLightObjMethods --vs D_8006B58C`: overrides the ctor, adds three
+ * gFlatLightObjMethods --vs gBasicClassMethods`: overrides the ctor, adds three
  * slots). No class derives from it. Methods in src/code_3311c.c, which holds
  * the whole class: allocator, ctor, the three own slots and the getter.
  *

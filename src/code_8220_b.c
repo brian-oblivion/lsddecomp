@@ -73,7 +73,7 @@ void BasicClass__OnNotify(BasicClass *self, void *sender, s32 event) {
 }
 
 BasicClassMethods *Get_vtable_BasicClass(void) {
-    return &D_8006B58C;
+    return &gBasicClassMethods;
 }
 
 void GetNextBasicClass(BasicClass **outValue, BasicClassListNode **cursor) {

@@ -36,7 +36,7 @@ of `code_171e0`'s remaining queue — worth knowing for whoever picks up
 `Class6D430__Release`, `Class6D430__Class6D430`, `Class6D430__Finalize`, `Class6D430__LoadFile`, or
 `Class6D430__FreeBuffer` next: they all dispatch through this same table (see
 `include/code_171e0.h` for the full slot map, and the constructor-called-via
-BasicClass base (`D_8006B58C`, resolved with `--vs`) for the inherited slots).
+BasicClass base (`gBasicClassMethods`, resolved with `--vs`) for the inherited slots).
 
 ## Proposed learning
 

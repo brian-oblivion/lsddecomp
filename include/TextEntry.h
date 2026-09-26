@@ -45,7 +45,7 @@ typedef struct TextEntryMethods TextEntryMethods;
 
 /* BasicClass's slots (overrides: +0x008 TextEntry__TextEntry, +0x00C
  * Finalize, +0x010 AddChild, +0x014 RemoveChild, +0x018 RemoveAllChildren,
- * +0x038 OnNotify; `tools/classtable.py gTextEntryMethods --vs D_8006B58C`),
+ * +0x038 OnNotify; `tools/classtable.py gTextEntryMethods --vs gBasicClassMethods`),
  * then this class's own. +0x064..+0x084 are NULL in the table. */
 struct TextEntryMethods {
     BASICCLASS_SLOTS(TextEntry, (TextEntry * self, char *text, s32 mode));

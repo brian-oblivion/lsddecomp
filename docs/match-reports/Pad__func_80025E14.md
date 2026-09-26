@@ -17,7 +17,7 @@ derivation was needed.
 in this unit -- see `include/class_16334.h`'s header comment), so the
 tier-C form is `Class__func_xxxxx` rather than bare `func_800xxxxx`. Nothing
 beyond "does nothing" is recoverable: `classtable.py`'s diff against
-`D_8006B58C` shows this slot exists only in `gPadMethods` (not inherited
+`gBasicClassMethods` shows this slot exists only in `gPadMethods` (not inherited
 from `BasicClassMethods`), and a tree-wide grep finds no caller anywhere --
 neither this unit nor `src/main.c` (the only place a `Pad *` is used)
 invokes slot `+0x4C` through the vtable. A retail no-op with zero call

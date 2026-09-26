@@ -5,7 +5,7 @@
 
 /*
  * Pad -- a controller port, class id 0x2, method table gPadMethods, a direct
- * BasicClass subclass (`tools/classtable.py gPadMethods --vs D_8006B58C`:
+ * BasicClass subclass (`tools/classtable.py gPadMethods --vs gBasicClassMethods`:
  * overrides ctor and finalize, adds six slots). Methods in src/class_16334.c.
  *
  * A game-side wrapper around the Psy-Q pad library: the first live instance

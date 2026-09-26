@@ -93,7 +93,7 @@ struct ViewportOt {
 };
 
 /* BasicClass's slots, then this class's own. `tools/classtable.py
- * gViewportMethods --vs D_8006B58C` lists the overrides of the inherited
+ * gViewportMethods --vs gBasicClassMethods` lists the overrides of the inherited
  * ones (ctor, finalize, addChild, removeChild, removeAllChildren, onNotify). */
 /* clang-format off */
 #define VIEWPORT_SLOTS(Self, CtorParams)                                                           \

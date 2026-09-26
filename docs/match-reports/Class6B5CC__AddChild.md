@@ -7,7 +7,7 @@
 ## What it does
 
 `Class6B5CC` vtable slot `+0x010`, one of the five BasicClass overrides
-(`tools/classtable.py gClass6B5CCMethods --vs D_8006B58C`). Forwards unconditionally
+(`tools/classtable.py gClass6B5CCMethods --vs gBasicClassMethods`). Forwards unconditionally
 to the base class's own `+0x010` slot (`Get_vtable_BasicClass()->slot10`), then, if
 `other`'s own vtable header tag (`other->methods->header & 0xF`) is `9`,
 additionally calls `Class6B5CC__LinkModel(self, other)` (still uncarved, next

@@ -9,7 +9,7 @@ does.
 ## What it is
 
 `BasicClassMethods` vtable slot `+0x038 - 0x4` = `+0x034`, resolved with
-`tools/classtable.py D_8006B58C`. The body is empty.
+`tools/classtable.py gBasicClassMethods`. The body is empty.
 
 ```c
 void BasicClass__func_18350(void) {

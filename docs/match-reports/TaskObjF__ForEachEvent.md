@@ -16,7 +16,7 @@ this codebase. Established from first principles across this whole batch:
   unmodified `BasicClass` slots** (`include/code_8220.h`'s
   `BasicClassMethods`) — confirmed because `TaskObjF__OnNotify` fetches
   `BasicClass`'s own table directly (`Get_vtable_BasicClass()`, which
-  `include/code_8220.h` already establishes returns `&D_8006B58C`) and
+  `include/code_8220.h` already establishes returns `&gBasicClassMethods`) and
   dispatches its slot +0x038 with a `(self, arg1, arg2)` signature that
   matches `BasicClassMethods::slot38` exactly. `TaskObjF` is therefore a
   `BasicClass` subclass whose own new slots start at +0x044 (the same

@@ -6,7 +6,7 @@
 /*
  * FrameClock -- class id 0x5, method table gFrameClockMethods (22 slots), a
  * direct BasicClass subclass (its ctor calls Get_vtable_BasicClass()->ctor
- * first; `classtable.py gFrameClockMethods --vs D_8006B58C` overrides the
+ * first; `classtable.py gFrameClockMethods --vs gBasicClassMethods` overrides the
  * ctor, finalize, removeParentRef and notifyParents and adds seven slots).
  * Methods in src/code_322b4.c. No class derives from it.
  *

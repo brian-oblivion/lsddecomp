@@ -847,11 +847,6 @@
           "date": "2026-09-26",
           "header": "include/DreamSys.h"
         },
-        "D_8006B58C": {
-          "class": "BasicClass",
-          "date": "2026-09-25",
-          "header": "include/BasicClass.h"
-        },
         "D_8006C070": {
           "class": "DrawSystem",
           "date": "2026-09-26",
@@ -936,6 +931,11 @@
           "class": "Actor",
           "date": "2026-09-25",
           "header": "include/Actor.h"
+        },
+        "gBasicClassMethods": {
+          "class": "BasicClass",
+          "date": "2026-09-25",
+          "header": "include/BasicClass.h"
         },
         "gBoxFillMethods": {
           "class": "BoxFill",
