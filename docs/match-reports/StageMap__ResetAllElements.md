@@ -59,8 +59,8 @@ Walks a 7-element array of 0x1C-byte "slot" records starting at
 `self->methods->slot108(self, entry)`; if the "list" object's
 (`entry->unk8`) field `+0x2C` is non-NULL, refreshes it through its own
 base-class `unk04` slot (same `GenericObject`/`unk04` pattern already
-established by `StageMap__OnElementEvent`); calls `self->methods->slot88(self, 6,
-entry, i)` (dispatches to `StageMap__OnElementEvent`, which per its own already-
+established by `StageMap__OnSlotEvent`); calls `self->methods->slot88(self, 6,
+entry, i)` (dispatches to `StageMap__OnSlotEvent`, which per its own already-
 matched signature only reads 2 of these 4 args — the extra ones are dead
 at the callee, consistent with the "argument register carries no meaning
 if unused by callee" case in DECOMPILATION_LEARNINGS); calls
@@ -69,9 +69,9 @@ zeroes `self->unk1B8`/`unk1B4` and calls `self->methods->slot140(self)`.
 
 New struct/vtable knowledge added regardless of the stall (all verified
 straight from the disassembly): `StageMapMethods::slot88` (declared with
-a 4th `s32 arg3` parameter that the occupant, `StageMap__OnElementEvent`, doesn't
+a 4th `s32 arg3` parameter that the occupant, `StageMap__OnSlotEvent`, doesn't
 read — same "field type need not match every occupant's real signature"
-precedent as `StageMap__OnNotify`/`StageMap__OnElementEvent`'s `GetSceneNodeMethods`), `slot108`
+precedent as `StageMap__OnNotify`/`StageMap__OnSlotEvent`'s `GetSceneNodeMethods`), `slot108`
 (`StageMap__ResetElementCells`, not decompiled), `slot140` (`StageMap__EndScaleRamp`, not
 decompiled — this promotes what was previously just end-of-struct
 padding into a real slot), `StageMap::unkEC[7]` (`UnkSlotEntry_3ac78`,

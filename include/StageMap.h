@@ -41,11 +41,11 @@
  *
  * Inherited slots it overrides (`tools/classtable.py gStageMapMethods --vs
  * gLightRigMethods`): +0x008 the ctor, +0x00C Finalize, +0x038 OnNotify,
- * +0x040 Reset, +0x088 notifyIfUnk20Active (StageMap__OnElementEvent,
+ * +0x040 Reset, +0x088 notifyIfUnk20Active (StageMap__OnSlotEvent,
  * see below), +0x098 update (StageMap__UpdateIfEnabled) and +0x09C
  * DispatchLinkCommand.
  *
- * +0x088: StageMap__OnElementEvent takes (self, command, elem); the slot
+ * +0x088: StageMap__OnSlotEvent takes (self, command, elem); the slot
  * keeps SceneNode's (self, event). Its four callers (Finalize,
  * ResetAllElements, ApplyRateEntries, OnNotifyTag1) pass (self, 6 or 7,
  * elem, index) through StageMapOnSlotEventFn below (no code).
@@ -293,7 +293,7 @@ void StageMap__StageMap(StageMap *self, LongVec3 *origin, s32 autoLoad);
 void StageMap__Finalize(StageMap *self);
 void StageMap__OnNotify(StageMap *self, BasicClass *sender, s32 command);
 void StageMap__Reset(StageMap *self);
-void StageMap__OnElementEvent(StageMap *self, s32 command, ChunkSlot *elem);
+void StageMap__OnSlotEvent(StageMap *self, s32 command, ChunkSlot *elem);
 void StageMap__UpdateIfEnabled(StageMap *self);
 void StageMap__DispatchLinkCommand(StageMap *self, BasicClass *sender, s32 command);
 void StageMap__ResetAllElements(StageMap *self);

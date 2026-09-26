@@ -94,7 +94,7 @@ fields that stalled attempt tentatively introduced. Both are now fixed in
    after the retype: still byte-exact, whole-image SHA1 still green.
 
 Also extended `UnkListObj_3ac78` with `unk0C` (an `s32` gate flag) — safe,
-it was previously undifferentiated padding that `StageMap__OnElementEvent` (the
+it was previously undifferentiated padding that `StageMap__OnSlotEvent` (the
 type's only other user) never touches.
 
 ## Residue and the fixes that closed it (70/79 -> 79/79 in one more attempt)

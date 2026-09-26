@@ -99,7 +99,7 @@ it emits nothing — all three call sites already have the value in the register
 8004a9a0:  jal   8001e57c <GetSceneNodeMethods>   ; StageMap__OnNotify (class_3ac78.c, 2-arg call)
 8004a9a4:  move  s2,a2                             ; callee-save SPILL, not argument setup
 
-8004aa88:  jal   8001e57c <GetSceneNodeMethods>   ; StageMap__OnElementEvent (class_3ac78.c, 2-arg call)
+8004aa88:  jal   8001e57c <GetSceneNodeMethods>   ; StageMap__OnSlotEvent (class_3ac78.c, 2-arg call)
 8004aa8c:  move  s2,a2                             ; ditto
 
 8004d3e8:  jal   8001e57c <GetSceneNodeMethods>   ; GridCell__GridCell (via include/class_3bb8c.h, 1-arg call)

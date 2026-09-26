@@ -25,7 +25,7 @@ very function) only in `StageMapMethods`, not necessarily in whatever
 ## GetSceneNodeMethods's inferred signature
 
 Not decompiled (lives in the still-uncarved `asm/code_d294.s`). Its second
-parameter is passed as a plain `s32` from `StageMap__OnElementEvent` (compared there
+parameter is passed as a plain `s32` from `StageMap__OnSlotEvent` (compared there
 against small integer literals 6/7 — not a pointer-shaped use), so it's
 declared here as `extern void *GetSceneNodeMethods(StageMap *self, s32
 arg1);` and this function casts its own `GenericObject *arg1` to `s32` at

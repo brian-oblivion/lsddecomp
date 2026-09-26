@@ -1,4 +1,6 @@
-# StageMap__OnElementEvent — MATCH
+# StageMap__OnSlotEvent — MATCH
+
+> Renamed from `StageMap__OnElementEvent` on 2026-09-26 (tools/rename.py). Address 0x8004aa6c.
 
 > Renamed from `Class866E8__OnElementEvent` on 2026-09-26 (tools/rename.py). Address 0x8004aa6c.
 
@@ -25,7 +27,7 @@ call — `$a2` is left live/unset). Then:
 ## Final source
 
 ```c
-void StageMap__OnElementEvent(StageMap *self, s32 arg1, UnkListObj_3ac78 *arg2)
+void StageMap__OnSlotEvent(StageMap *self, s32 arg1, UnkListObj_3ac78 *arg2)
 {
     void (*fn)(StageMap *self, s32 arg1);
 
@@ -93,7 +95,7 @@ Round 67 (track 3, naming pass).
 
 | symbol | name | tier | evidence |
 | --- | --- | --- | --- |
-| `func_8004AA6C` | `StageMap__OnElementEvent` | B | Occupant of vtable slot `+0x088`. Three call sites agree on the argument shape `(self, command, elem, index)`: `StageMap__Finalize` and `StageMap__ResetAllElements` here (command 6), and `class_3bb8c`'s `StageMap__OnNotifyTag1` (command 7). The body forwards to the BASE table's `+0x088` -- `SceneNode__NotifyWithHull`, which itself gates on a command code in `{2,3}` -- then, for command 6, releases the element's own held object, and for 6 and 7 records the element in `lastEventElem` and re-emits with `notifyParents(self, command)`. So: an element-scoped event arrives, is handled, and is passed up. Tier B: the mechanics are complete, what commands 6 and 7 MEAN in the game is not established. |
+| `func_8004AA6C` | `StageMap__OnSlotEvent` | B | Occupant of vtable slot `+0x088`. Three call sites agree on the argument shape `(self, command, elem, index)`: `StageMap__Finalize` and `StageMap__ResetAllElements` here (command 6), and `class_3bb8c`'s `StageMap__OnNotifyTag1` (command 7). The body forwards to the BASE table's `+0x088` -- `SceneNode__NotifyWithHull`, which itself gates on a command code in `{2,3}` -- then, for command 6, releases the element's own held object, and for 6 and 7 records the element in `lastEventElem` and re-emits with `notifyParents(self, command)`. So: an element-scoped event arrives, is handled, and is passed up. Tier B: the mechanics are complete, what commands 6 and 7 MEAN in the game is not established. |
 
 Type correction made this round, byte-neutral and oracle-verified: the third
 parameter was typed `UnkListObj_3ac78 *` (this unit's SENDER type). All three

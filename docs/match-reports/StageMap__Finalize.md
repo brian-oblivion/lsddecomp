@@ -140,7 +140,7 @@ form before this duplication happens):
 2. Literal `goto`s mirroring retail's exact label layout (`if (p>=end)
    goto scanEnd; scanLoop: ...; if (obj==NULL) goto scanCheck; ...;
    scanCheck: if (p<end) goto scanLoop; scanEnd:`) — the same lever that
-   fixed `StageMap__OnElementEvent`'s three-way dispatch this round. No effect here;
+   fixed `StageMap__OnSlotEvent`'s three-way dispatch this round. No effect here;
    identical object code to (1).
 3. Plain `while (p < end) { ...; if (obj != NULL) {...} }` — GCC's own
    loop-rotation pass evidently normalizes this to the SAME do-while-with-

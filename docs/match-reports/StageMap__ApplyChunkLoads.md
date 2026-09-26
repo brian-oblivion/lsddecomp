@@ -420,7 +420,7 @@ iterates `arr1[0..count)` (a 0xC-byte-strided array). Per entry:
 1. `e = self->methods->slot118(self, arr1[i].id)` (resolve an `Elem` by
    index/key).
 2. `self->methods->slot88(self, 6, e, i)` -- the SAME already-documented
-   slot88 (dispatches to `StageMap__OnElementEvent`, outside this unit) that
+   slot88 (dispatches to `StageMap__OnSlotEvent`, outside this unit) that
    `StageMap__OnNotifyTag1` also calls, there with a literal `7` instead of `6`. No
    header change needed for this slot, it already existed.
 3. If `arr1[i].ptr0 != 0`: conditionally call `slot108(self, e)` (new slot,

@@ -226,7 +226,7 @@ void StageMap__Reset(StageMap *self) {
     self->unk1D8 = -1;
 }
 
-void StageMap__OnElementEvent(StageMap *self, s32 command, ChunkSlot *elem) {
+void StageMap__OnSlotEvent(StageMap *self, s32 command, ChunkSlot *elem) {
     GetSceneNodeMethods()->notifyWithHull((SceneNode *)self, command);
 
     if (command == 6)
