@@ -50,6 +50,7 @@
 #include "Tod.h"
 #include "TmdModel.h"
 #include "DrawSystem.h"
+#include "CdStream.h"
 
 typedef struct DataSrc33808 DataSrc33808;
 
@@ -1403,15 +1404,6 @@ void *New_MoviePlayer(s32 arg0, s32 arg1, s32 arg2) {
  * the first time any player is built (gMdecInitialized), route its output
  * callback to OnMdecFrameReady, hand the stream the ring buffer at +0x10
  * (0x12000), clear +0x50 and store 1 through its own +0x06C. 0. */
-typedef struct StreamMethods454C4 {
-    /* +0x000 */ u8 pad0[0x40];
-    /* +0x040 */ void (*slot40)();
-} StreamMethods454C4;
-
-typedef struct Stream454C4 {
-    /* +0x000 */ StreamMethods454C4 *methods;
-} Stream454C4;
-
 typedef struct Methods454C4 {
     /* +0x000 */ u8 pad0[0x6C];
     /* +0x06C */ void (*slot6C)();
@@ -1424,10 +1416,9 @@ typedef struct Obj454C4 {
     /* +0x014 */ u8 pad14[0x3C];
     /* +0x050 */ s32 unk50;
     /* +0x054 */ u8 pad54[0xC];
-    /* +0x060 */ Stream454C4 *stream;
+    /* +0x060 */ CdStream *stream;
 } Obj454C4;
 
-extern void *New_CdStream(s32 arg1, s32 arg2, s32 arg3);
 s32 MoviePlayer__InitFrame();
 extern s32 gMdecInitialized;
 extern void DecDCTReset(int mode);
@@ -1445,7 +1436,7 @@ s32 MoviePlayer__MoviePlayer(Obj454C4 *self, s32 arg1, s32 arg2, s32 arg3) {
             }
             gMdecInitialized = 1;
             DecDCToutCallback(OnMdecFrameReady);
-            self->stream->methods->slot40(self->stream, self->ring, 0x12000);
+            self->stream->methods->setRing(self->stream, self->ring, 0x12000);
             self->unk50 = 0;
             self->methods->slot6C(self, 1);
             return 0;
@@ -1458,7 +1449,7 @@ s32 MoviePlayer__MoviePlayer(Obj454C4 *self, s32 arg1, s32 arg2, s32 arg3) {
  * BasicClass's finalize. */
 typedef struct Obj455D4 {
     /* +0x000 */ u8 pad0[0x60];
-    /* +0x060 */ BasicClass *unk60;
+    /* +0x060 */ CdStream *unk60;
 } Obj455D4;
 
 /* LIBPRESS.H */
@@ -1556,15 +1547,6 @@ void MoviePlayer__FreeFrameBuffers(Obj4575C *self) {
  * `arg3`/`arg4` at +0x54/+0x58 and clear the frame rectangle (+0x20) through
  * DrawSystem's clearImage (+0x078), whose color argument is gMovieFrameRect
  * (a zero word: black; the name predates reading the slot). 0. */
-typedef struct StreamMethods457C0 {
-    /* +0x000 */ u8 pad0[0x44];
-    /* +0x044 */ s32 (*open)();
-} StreamMethods457C0;
-
-typedef struct Stream457C0 {
-    /* +0x000 */ StreamMethods457C0 *methods;
-} Stream457C0;
-
 typedef struct Obj457C0 {
     /* +0x000 */ u8 pad0[0x20];
     /* +0x020 */ s16 rect[4];
@@ -1578,7 +1560,7 @@ typedef struct Obj457C0 {
     /* +0x054 */ s32 unk54;
     /* +0x058 */ s32 unk58;
     /* +0x05C */ s32 unk5C;
-    /* +0x060 */ Stream457C0 *unk60;
+    /* +0x060 */ CdStream *unk60;
     /* +0x064 */ s32 unk64;
     /* +0x068 */ s32 unk68;
 } Obj457C0;
@@ -1625,19 +1607,6 @@ void MoviePlayer__MarkPlaying(Obj33808_50 *self) {
 /* D_8006F614 +0x044: when this is the object in gActiveMoviePlayer, reset its
  * state words, hand the object at +0x60 MoviePlayer__MarkStopped (and self) through
  * that object's +0x07C, clear +0x64, and call its +0x058. */
-typedef struct Methods458B8 {
-    /* +0x000 */ u8 pad0[0x48];
-    /* +0x048 */ void (*slot48)();
-    /* +0x04C */ u8 pad4C[0xC];
-    /* +0x058 */ void (*slot58)();
-    /* +0x05C */ u8 pad5C[0x20];
-    /* +0x07C */ void (*slot7C)();
-} Methods458B8;
-
-typedef struct Sub458B8 {
-    /* +0x000 */ Methods458B8 *methods;
-} Sub458B8;
-
 typedef struct Obj458B8 {
     /* +0x000 */ u8 pad0[0x3C];
     /* +0x03C */ s32 unk3C;
@@ -1648,7 +1617,7 @@ typedef struct Obj458B8 {
     /* +0x050 */ s32 unk50;
     /* +0x054 */ s32 unk54;
     /* +0x058 */ u8 pad58[8];
-    /* +0x060 */ Sub458B8 *unk60;
+    /* +0x060 */ CdStream *unk60;
     /* +0x064 */ s32 unk64;
 } Obj458B8;
 
@@ -1666,7 +1635,7 @@ void MoviePlayer__Stop(Obj458B8 *self) {
         cur->unk44 = 0;
         cur->unk60->methods->slot7C(cur->unk60, MoviePlayer__MarkStopped, cur);
         cur->unk64 = 0;
-        cur->unk60->methods->slot58(cur->unk60);
+        cur->unk60->methods->restart(cur->unk60);
     }
 }
 void MoviePlayer__MarkStopped(Obj33808_50 *self) {
@@ -1677,17 +1646,6 @@ void MoviePlayer__MarkStopped(Obj33808_50 *self) {
  * +0x50 then went negative, count down the loops left at +0x58 and at the
  * last one (or with none) call the stream's +0x064; clear +0x50, set +0x64,
  * 0. Stopped with +0x64 set: tail-return its own +0x068. */
-typedef struct StreamMethods45948 {
-    /* +0x000 */ u8 pad0[0x50];
-    /* +0x050 */ void (*slot50)();
-    /* +0x054 */ u8 pad54[0x10];
-    /* +0x064 */ void (*slot64)();
-} StreamMethods45948;
-
-typedef struct Stream45948 {
-    /* +0x000 */ StreamMethods45948 *methods;
-} Stream45948;
-
 typedef struct Methods45948 {
     /* +0x000 */ u8 pad0[0x68];
     /* +0x068 */ s32 (*slot68)();
@@ -1700,7 +1658,7 @@ typedef struct Obj45948 {
     /* +0x054 */ s32 unk54;
     /* +0x058 */ s32 loops;
     /* +0x05C */ s32 unk5C;
-    /* +0x060 */ Stream45948 *unk60;
+    /* +0x060 */ CdStream *unk60;
     /* +0x064 */ s32 unk64;
 } Obj45948;
 
@@ -1713,10 +1671,10 @@ s32 MoviePlayer__Advance(Obj45948 *self) {
                 goto out;
             }
         } else {
-            cur->unk60->methods->slot50(cur->unk60, 1, cur->unk5C);
+            cur->unk60->methods->startRead(cur->unk60, 1, cur->unk5C);
             if (cur->unk50 < 0) {
                 if (cur->loops == 0 || --cur->loops == 0) {
-                    cur->unk60->methods->slot64(cur->unk60);
+                    cur->unk60->methods->mute(cur->unk60);
                 }
             }
             self->unk50 = 0;
@@ -1737,7 +1695,7 @@ void MoviePlayer__Abort(Obj458B8 *self) {
     if (cur == self) {
         cur->unk48 = 1;
         cur->unk54 = 0;
-        cur->unk60->methods->slot48(cur->unk60);
+        cur->unk60->methods->close(cur->unk60);
         cur->unk44 = 1;
         if (cur->unk64 == 0) {
             cur->unk60->methods->slot7C(cur->unk60, 0, 0);
@@ -1755,18 +1713,6 @@ void MoviePlayer__NoOpSlot54(void) {
  * data, flip the frame index at +0x3C and VLC-decode into that frame's
  * buffer, then hand the sector buffer back (+0x070); a negative result
  * marks the end (+0x48) and calls that object's +0x054. 0. */
-typedef struct StreamMethods45AD8 {
-    /* +0x000 */ u8 pad0[0x54];
-    /* +0x054 */ void (*slot54)();
-    /* +0x058 */ u8 pad58[0x14];
-    /* +0x06C */ s32 (*slot6C)();
-    /* +0x070 */ void (*slot70)();
-} StreamMethods45AD8;
-
-typedef struct Stream45AD8 {
-    /* +0x000 */ StreamMethods45AD8 *methods;
-} Stream45AD8;
-
 typedef struct Obj45AD8 {
     /* +0x000 */ u8 pad0[0x14];
     /* +0x014 */ u32 *frames[2];
@@ -1775,7 +1721,7 @@ typedef struct Obj45AD8 {
     /* +0x040 */ u8 pad40[8];
     /* +0x048 */ s32 unk48;
     /* +0x04C */ u8 pad4C[0x14];
-    /* +0x060 */ Stream45AD8 *unk60;
+    /* +0x060 */ CdStream *unk60;
 } Obj45AD8;
 
 /* LIBPRESS.H */
@@ -1787,16 +1733,16 @@ s32 MoviePlayer__PullFrame(Obj45AD8 *self) {
     s32 r;
 
     if (self->unk48 == 0) {
-        r = self->unk60->methods->slot6C(self->unk60, &data, &size, 0x800000);
+        r = self->unk60->methods->getNextFrame(self->unk60, &data, &size, 0x800000);
         if (r != 0) {
             if (size != 0) {
                 self->frameIndex ^= 1;
                 DecDCTvlc(data, self->frames[self->frameIndex]);
             }
-            self->unk60->methods->slot70(self->unk60, data);
+            self->unk60->methods->freeRing(self->unk60, data);
             if (r < 0) {
                 self->unk48 = 1;
-                self->unk60->methods->slot54(self->unk60);
+                self->unk60->methods->stop(self->unk60);
             }
             return 0;
         }
