@@ -1,4 +1,4 @@
-# _card_clear -- NOT GAME CODE. Psy-Q **libcard**, no object on the user's SDK discs. UNMATCHABLE BY CONSTRUCTION -- do not staff, do not permuter, do not attempt.
+# _card_clear -- NOT GAME CODE. Psy-Q **libcard/card** (3.3 disc: same length, shape 1.00; retail's assembly differs, so the object never places). UNMATCHABLE BY CONSTRUCTION -- do not staff, do not permuter, do not attempt.
 
 > Renamed from `func_80050B28` on 2026-09-24 (tools/rename.py). Address 0x80050b28.
 
