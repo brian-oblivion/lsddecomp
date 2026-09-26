@@ -2877,3 +2877,4 @@ gLinkResourceMethods = 0x8006F13C;
 gObjMMethods = 0x80087034;
 ObjM__NoOpSlotBC = 0x800541CC; // type:func
 SortTmdObject = 0x80018464; // type:func
+GsLIGHT_MODE = 0x800902E0;

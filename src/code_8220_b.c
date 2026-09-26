@@ -109,7 +109,7 @@ s32 GetBMemPMgrBusy(void) {
 extern s32 D_80090C18;
 extern s32 D_8008E250;
 extern s32 D_8008E24C;
-extern s32 D_800902E0;
+extern s32 GsLIGHT_MODE;
 
 /* Local views, and each one's STRUCT-ness is load-bearing, not decoration.
  * GCC 2.6.3's alias test lets a struct-field reference pass a store to a
@@ -264,7 +264,7 @@ void SortTmdObject(void *objIn, void *otSrc, s32 otShift, void *ctxIn) {
 
     *(Rgb8 *)(ctx + 0x34) = *(Rgb8 *)D_8008A82C;
 
-    if ((D_8008E250 != 0 && D_800902E0 != 0) || D_8008E24C != 0) {
+    if ((D_8008E250 != 0 && GsLIGHT_MODE != 0) || D_8008E24C != 0) {
         dpShift = 9;
     } else {
         dpShift = 0x10;

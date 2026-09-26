@@ -506,7 +506,7 @@ position.
 extern s32 D_80090C18;
 extern s32 D_8008E250;
 extern s32 D_8008E24C;
-extern s32 D_800902E0;
+extern s32 GsLIGHT_MODE;
 extern s8 D_8008A82C[3];
 extern void *GsOUT_PACKET_P;
 
@@ -626,7 +626,7 @@ void SortTmdObject(void *objIn, void *otSrc, s32 otShift, void *ctxIn)
         *(s8 *)(ctx + 0x36) = tint[2];
     }
 
-    if (D_8008E250 != 0 && D_800902E0 != 0) {
+    if (D_8008E250 != 0 && GsLIGHT_MODE != 0) {
         dpShift = 9;
     } else if (D_8008E24C != 0) {
         dpShift = 9;
@@ -1300,7 +1300,7 @@ extern void *GsOUT_PACKET_P;
 extern s32 D_80090C18;
 extern s32 D_8008E250;
 extern s32 D_8008E24C;
-extern s32 D_800902E0;
+extern s32 GsLIGHT_MODE;
 extern s8 D_8008A82C[3];
 
 extern void InitVtxRecordPtrs(void *arg0, void *arg1, s32 kind);
@@ -1473,7 +1473,7 @@ void SortTmdObject(void *arg0, void *arg1, s32 arg2, void *arg3)
     prim[0x35] = D_8008A82C[1];
     prim[0x36] = D_8008A82C[2];
 
-    if (D_8008E250 != 0 && D_800902E0 != 0) {
+    if (D_8008E250 != 0 && GsLIGHT_MODE != 0) {
         v0 = 9;
     } else if (D_8008E24C != 0) {
         v0 = 9;
