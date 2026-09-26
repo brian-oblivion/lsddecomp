@@ -1,5 +1,9 @@
 # Snd_setVabAttr -- MATCHED (round 49): 179/179, byte-exact
 
+## Round 94 (runner echo, track 6): Sony types
+
+`Scratch_800357B0` is gone: it was already Sony's `VagAtr` field-for-field at the fields it named, so the parameter is now `VagAtr scratch`. Sony's `SsUtGetVagAtr`/`SsUtSetVagAtr`/`SsUtReverbOn`/`SsUtReverbOff`/`SsUtSetReverb*` prototypes come from `<libsnd.h>`. Bytes unchanged; the bodies below keep their original declarations as history.
+
 > Renamed from `func_800357B0` on 2026-09-23 (tools/rename.py). Address 0x800357b0.
 
 **ROUND 49: MATCHED.** See the update at the end of this report. Everything

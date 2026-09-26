@@ -1,5 +1,9 @@
 # ContDataEntry -- STALL (4 words LONG, 380/376; 95/376 raw word-match; first real diff at word 83, vram 0x80035B1C, loop register numbering after a hoisted `a2 & 0x7F`)
 
+## Round 94 (runner echo, track 6): Sony types
+
+The union of the two VagAtr views in `List_800351D0` (`Scratch_800357B0 s; Scratch800351D0 v;`) is now one Sony `VagAtr vag`, and the leading count byte plus padding is Sony's `ProgAtr prog`. The loop fields: `unk4` = `center`, `unk5` = `shift`, `unkC`/`unkD` = `pbmin`/`pbmax`. `ProgAtr` holds `unsigned long`s, so the struct's alignment went from 2 to 4 and its size from 0x42 to 0x44. That moves nothing in the verified build (this function is `INCLUDE_ASM`); the NON_MATCHING body still compiles. Its frame should be re-measured before the next attempt on this function.
+
 > Renamed from `func_800351D0` on 2026-09-23 (tools/rename.py). Address 0x800351d0.
 
 **REVISITED, round 69: STALL, improved (44/376 rebuilt -> 95/376, ins/del

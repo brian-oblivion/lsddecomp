@@ -1,5 +1,9 @@
 # ContNrpn1 -- STALL: length ONE WORD SHORT (76/77); 54/77 raw word-match; first real diff at word 55 (vram 0x80034F38)
 
+## Round 94 (runner echo, track 6): Sony types
+
+`Fn80090368` is gone: `D_80090368` is Sony's mark-callback table, and its element type is Sony's `SsMarkCallbackProc` (`void (*)(short, short, short)`, `include/psyq/libsnd.h`). Retail calls the entry with THREE arguments, `(ch, sl, data)`: `$a1` holds the sign-extended slot at the `jalr`. The old two-argument local type dropped `sl`. That is the "slot index used exactly once" residue described below, so the preserved body's call is now `fn(ch, sl, a2 & 0xFF)`.
+
 > Renamed from `func_80034E5C` on 2026-09-23 (tools/rename.py). Address 0x80034e5c.
 
 `asm/nonmatchings/code_179d8_k/ContNrpn1.s`, vram `0x80034E5C`, unit
