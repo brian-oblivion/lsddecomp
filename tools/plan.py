@@ -691,7 +691,11 @@ def collect_phase2(st, info, t5_status, classes, units_meta):
     rd = readability.collect(info)
     tr = st["tracks"]
     t6, t7, t8, t9 = tr["6"], tr["7"], tr["8"], tr["9"]
-    phase2 = t5_status == "done"
+    # Phase 2 latches on track 5's ticked checklist, not its live status: a
+    # phase 1 track that reopens on a regression (round 93: an Entity polish
+    # retyped seven motion-template externs, reopening 4b) is worked BESIDE
+    # phase 2, since tracks are not gates on each other (FINISHING-PLAN §3).
+    phase2 = t5_status == "done" or all(tr["5"]["checklist"].get(k) for k in TRACK5_ITEMS)
 
     # --- track 6: placeholder class and type names ---------------------------
     parked6 = t6.get("parked", {})
