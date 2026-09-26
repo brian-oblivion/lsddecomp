@@ -32,7 +32,7 @@
  *    (state 0x14, writeMemcardSaveFile).
  *  - setState (+0x07C) runs notifyParents(state) first; the terminal states
  *    0x16/0x17 free the load buffers and return to state 0. TitleMenu's
- *    onTagBValue (the parent) ends the save on them.
+ *    onCardEvent (the parent) ends the save on them.
  *  - onNotify (+0x038) routes a child's notification by the child's class
  *    id, exactly as its AddChild files them: 2 -> onInputEvent, 5 ->
  *    tickStateDelay, 0x10 -> onTextEntryResult, 0x20 -> onItemListResult.
