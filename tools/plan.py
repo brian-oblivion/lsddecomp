@@ -662,6 +662,8 @@ def track4_classes(st):
                         if f != "?"})
         units_ = sorted({u for d in c["objects"].values() for u in d["units"]} |
                         {Path(f).stem for f in files if f.startswith("src/")})
+        if state == "ready":
+            units_ = sorted(set(units_) | class_footprint(c))
         out.append(dict(c, state=state, stray=stray, below=below(c["table"]),
                         nviews=len(c["objects"]) + len(c["tables"]), files=files, units=units_,
                         name=(led or {}).get("class")))
@@ -672,6 +674,46 @@ def track4_classes(st):
     pending = {c["table"] for c in out if c["state"] not in ("unified", "parked")}
     shared = {k: v for k, v in shared.items() if k not in pending}
     return out, shared
+
+
+_fp_texts = None
+
+
+def class_footprint(c):
+    """Every unit a class job may edit (revision 23): the units whose code
+    (comments stripped) names the class's table, a getter of it, an own
+    method or a view type, plus every unit that includes, directly or through
+    another header, a header that does. Track 4 step 7 deletes those views
+    and externs and fixes the accessors the compiler then lists, and those
+    accessors can only be in code that sees a view. Two ready classes whose
+    footprints are disjoint (and pass select_jobs' call-graph test) run in
+    parallel; the old one-class-per-round rule is this test with nothing
+    measured."""
+    global _fp_texts
+    if _fp_texts is None:
+        _fp_texts = {}
+        for f in list(srcpath.src_files()) + list((ROOT / "include").glob("*.h")):
+            t = f.read_text(errors="replace")
+            _fp_texts[f] = (re.sub(r"/\*.*?\*/", " ", t, flags=re.S),
+                            set(re.findall(r'#include\s+"([^"]+)"', t)))
+    syms = {c["table"], *c["owned"], *c["objects"], *c["tables"]}
+    tre = re.escape(c["table"])
+    for t, _ in _fp_texts.values():
+        syms |= set(re.findall(rf"\b(\w+)\s*\(\s*(?:void)?\s*\)\s*\{{\s*return\s+&?\s*{tre}\s*;", t))
+    rx = re.compile(r"\b(?:" + "|".join(sorted(map(re.escape, syms))) + r")\b")
+    hit = {f for f, (t, _) in _fp_texts.items() if rx.search(t)}
+    hdrs = {f.name for f in hit if f.suffix == ".h"}
+    grew = True
+    while grew:                                  # headers that include a hit header, transitively
+        grew = False
+        for f, (_, inc) in _fp_texts.items():
+            if f.suffix == ".h" and f.name not in hdrs and inc & hdrs:
+                hdrs.add(f.name)
+                grew = True
+    if hdrs & {"common.h", "types.h"}:           # headercontention.UBIQUITOUS: every unit sees it
+        return {f.stem for f in _fp_texts if f.suffix == ".c"}
+    return {f.stem for f, (_, inc) in _fp_texts.items()
+            if f.suffix == ".c" and (f in hit or inc & hdrs)}
 
 
 _nm_cache = {}
@@ -783,10 +825,13 @@ def jobs(d, n):
                                  f"the recipe into track 4; {t['4']['local_struct_views']} unit-local struct views remain",
                             MODELS["head_when_new_procedure"]))
         else:
-            # Classes merge SEQUENTIALLY (track 4 staffing): one class job per round.
+            # Classes whose footprints (class_footprint) are disjoint run in
+            # parallel; select_jobs DEFERS any that share a unit or call-graph
+            # contention with a class above it (revision 23; revision 20 ran
+            # one at a time without measuring the overlap).
             ready = sorted((c for c in d["_classes"] if c["state"] == "ready"),
                            key=lambda c: (-c["below"], c["nviews"], c["id"]))
-            for c in ready[:1]:
+            for c in ready:
                 q_types.append(("4", f"unify class {c['table']} (id 0x{c['id']:X}, parent {c['parent']}, "
                                      f"{c['below']} class(es) below it; {c['nviews']} view(s) in "
                                      f"{', '.join(c['files']) or 'none found'}) (units: {','.join(c['units'])})",
