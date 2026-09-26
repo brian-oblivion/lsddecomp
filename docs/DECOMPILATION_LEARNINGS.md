@@ -378,7 +378,7 @@ load through a runtime-indexed global", §"BLOCKED: the `nop_mflo_mfhi` screen r
 
 - **A base-plus-running-offset walk in retail is strength reduction of `&self->arr[i]`**: write
   the index and let GCC produce the walk and its delay-slot increment. Hand-rolling `(u8 *)self +
-  off; off += 0x1C` reproduces the arithmetic but not the schedule (`StageMap__ResetAllElements`,
+  off; off += 0x1C` reproduces the arithmetic but not the schedule (`StageMap__UnloadAllSlots`,
   9/74 -> 74/74 on the first build). (round 71)
   Likewise a register stepping by a constant beside the counter is GCC's own `i * K`: write
   `table + i * 3`, not a hand-stepped counter (`StyleBuildDecorSet`, 17/86 -> 86/86, round 76).

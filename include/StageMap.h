@@ -194,7 +194,7 @@ typedef void *(*ChunkFileFn)(void *ctx, s32 value, s32 arg2, s32 arg3);
 /* LightRig's slots, then this class's own. */
 struct StageMapMethods {
     LIGHTRIG_SLOTS(StageMap, (StageMap * self, LongVec3 *origin, s32 autoLoad));
-    /* +0x0C0 */ void (*resetAllElements)(StageMap *self); /* StageMap__ResetAllElements */
+    /* +0x0C0 */ void (*resetAllElements)(StageMap *self); /* StageMap__UnloadAllSlots */
     /* +0x0C4 */ void (*setChildParams)(StageMap *self, s32 count, s32 dirs,
                                         s32 colors); /* StageMap__SetChildParams */
     /* +0x0C8 */ void (*setCallback)(StageMap *self, ChunkFileFn fn, void *ctx); /* StageMap__SetCallback */
@@ -296,7 +296,7 @@ void StageMap__Reset(StageMap *self);
 void StageMap__OnSlotEvent(StageMap *self, s32 command, ChunkSlot *elem);
 void StageMap__UpdateIfEnabled(StageMap *self);
 void StageMap__DispatchLinkCommand(StageMap *self, BasicClass *sender, s32 command);
-void StageMap__ResetAllElements(StageMap *self);
+void StageMap__UnloadAllSlots(StageMap *self);
 void StageMap__SetChildParams(StageMap *self, s32 count, s32 dirs, s32 colors);
 void StageMap__SetCallback(StageMap *self, ChunkFileFn fn, void *ctx);
 void StageMap__SetAcceptedTags(StageMap *self, s32 *tags);

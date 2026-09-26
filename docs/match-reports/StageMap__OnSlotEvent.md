@@ -95,7 +95,7 @@ Round 67 (track 3, naming pass).
 
 | symbol | name | tier | evidence |
 | --- | --- | --- | --- |
-| `func_8004AA6C` | `StageMap__OnSlotEvent` | B | Occupant of vtable slot `+0x088`. Three call sites agree on the argument shape `(self, command, elem, index)`: `StageMap__Finalize` and `StageMap__ResetAllElements` here (command 6), and `class_3bb8c`'s `StageMap__OnNotifyTag1` (command 7). The body forwards to the BASE table's `+0x088` -- `SceneNode__NotifyWithHull`, which itself gates on a command code in `{2,3}` -- then, for command 6, releases the element's own held object, and for 6 and 7 records the element in `lastEventElem` and re-emits with `notifyParents(self, command)`. So: an element-scoped event arrives, is handled, and is passed up. Tier B: the mechanics are complete, what commands 6 and 7 MEAN in the game is not established. |
+| `func_8004AA6C` | `StageMap__OnSlotEvent` | B | Occupant of vtable slot `+0x088`. Three call sites agree on the argument shape `(self, command, elem, index)`: `StageMap__Finalize` and `StageMap__UnloadAllSlots` here (command 6), and `class_3bb8c`'s `StageMap__OnNotifyTag1` (command 7). The body forwards to the BASE table's `+0x088` -- `SceneNode__NotifyWithHull`, which itself gates on a command code in `{2,3}` -- then, for command 6, releases the element's own held object, and for 6 and 7 records the element in `lastEventElem` and re-emits with `notifyParents(self, command)`. So: an element-scoped event arrives, is handled, and is passed up. Tier B: the mechanics are complete, what commands 6 and 7 MEAN in the game is not established. |
 
 Type correction made this round, byte-neutral and oracle-verified: the third
 parameter was typed `UnkListObj_3ac78 *` (this unit's SENDER type). All three
@@ -104,7 +104,7 @@ callers pass an element, and the field this function reaches is `+0x014` --
 `UnkSlotEntry_3ac78 *elem`, and `UnkSlotEntry_3ac78::unk14` from `s32` to
 `GenericObject *heldObj`, since the body dereferences it as an object with a
 vtable at `+0x000`. Callers checked: `StageMap__Finalize`,
-`StageMap__ResetAllElements` (both in this unit, both pass `&self->elems[i]`),
+`StageMap__UnloadAllSlots` (both in this unit, both pass `&self->elems[i]`),
 and `class_3bb8c`'s `StageMap__OnNotifyTag1` (passes `Elem *entry`). Whole-image SHA1
 green after the change.
 

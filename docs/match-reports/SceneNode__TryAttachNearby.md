@@ -315,12 +315,12 @@ consistent with this report's claim that the frame size itself is
 already correct and the deficit is purely the cross-jump merge) and
 launched a bounded background search -- but two searches were briefly
 running at once (this one alongside an already-in-flight search for
-`StageMap__ResetAllElements`), which violates this round's "one bounded search at a
+`StageMap__UnloadAllSlots`), which violates this round's "one bounded search at a
 time" rule. Killed this function's search immediately upon noticing;
-`StageMap__ResetAllElements`'s continued undisturbed. This function's own permuter
+`StageMap__UnloadAllSlots`'s continued undisturbed. This function's own permuter
 pass is DEFERRED, not run, this round -- the scaffold is left in place
 (`permuter-work/SceneNode__TryAttachNearby`, gitignored) for whoever picks this up
-next, or for a future round of this same runner once `StageMap__ResetAllElements`'s
+next, or for a future round of this same runner once `StageMap__UnloadAllSlots`'s
 search completes.
 
 Inlined the literal per-axis body into `src/code_d294_b.c` as `#if 0`

@@ -18,14 +18,14 @@ words, WITH address drift (not a trustworthy score — see below)
 
 The destructor (`StageMapMethods::dtor`, per the header comment already
 on that field). Calls `self->methods->slot14(self, GetDrawSystem(self))`
-once, then walks the SAME 7-element `unkEC[]` slot array `StageMap__ResetAllElements`
+once, then walks the SAME 7-element `unkEC[]` slot array `StageMap__UnloadAllSlots`
 walks, tearing each entry down: calls `self->methods->slot88(self, 6,
-entry, i)` (same call shape as `StageMap__ResetAllElements`); refreshes-and-discards
+entry, i)` (same call shape as `StageMap__UnloadAllSlots`); refreshes-and-discards
 `entry->unk4` through its base-class `unk04` slot; for `entry->unk8`,
 refreshes-and-discards its OWN `unk2C` field first, then refreshes AND
 STORES BACK `entry->unk8` itself through its own `unk04` slot (note: this
 proves `UnkSlotListObj_3ac78` has a `methods` pointer at offset 0, not
-just the `unk2C` field `StageMap__ResetAllElements` already established); refreshes-
+just the `unk2C` field `StageMap__UnloadAllSlots` already established); refreshes-
 and-discards a new field `entry->unkC`; scans a 0x668-byte array of
 `GenericObject*` at `entry->unk10`, refreshing-and-discarding every
 non-NULL entry; frees `entry->unk10` via `BMemPMgrFree`. After the loop:
@@ -44,7 +44,7 @@ now confirmed on this class too); `StageMapMethods::slot14`
 were converted from anonymous-struct typedefs to named-struct typedefs
 (zero behavior change) so they could be forward-declared for use inside
 `UnkSlotEntry_3ac78`, which itself has to be defined before `StageMap`
-for the SAME reason `StageMap__ResetAllElements`'s commit documented (array member
+for the SAME reason `StageMap__UnloadAllSlots`'s commit documented (array member
 needs a complete type).
 
 ## Best-reached body (does NOT compile to retail bytes — DRIFTED, treat the
@@ -121,10 +121,10 @@ Retail computes the "keep looping" test (`sltu $v0,$s0,$s2`) in exactly
 ONE place — right after the conditional-skip target — and both the
 initial loop-entry check AND the per-iteration continue-check branch to
 that SAME instruction. This function's array-scan loop is structurally
-identical to `StageMap__ResetAllElements`'s own inner "call each non-NULL entry"
+identical to `StageMap__UnloadAllSlots`'s own inner "call each non-NULL entry"
 pattern (`if (obj != NULL) methods->unk04(obj);` inside a walk), which
 matched cleanly there — but HERE, wrapped in an explicit bounded `p < end`
-loop (rather than `StageMap__ResetAllElements`'s simpler fixed-count `for`), every
+loop (rather than `StageMap__UnloadAllSlots`'s simpler fixed-count `for`), every
 reconstruction produces the test in TWO places: once as the shared
 continue-check (matching retail) and AGAIN duplicated right after the
 conditional skip, adding a redundant `sltu` and an extra `j` — 4 extra
@@ -148,7 +148,7 @@ form before this duplication happens):
    byte-identical too.
 
 None of these got far enough to test whether the OUTER per-entry loop
-(the `for (i = 0; i < 7; i++)`) has its own version of `StageMap__ResetAllElements`'s
+(the `for (i = 0; i < 7; i++)`) has its own version of `StageMap__UnloadAllSlots`'s
 still-unresolved "offset increment lands in the wrong delay slot" residue
 — the inner scan loop's drift makes every word past it untrustworthy, so
 that comparison was not reachable this round.
@@ -156,10 +156,10 @@ that comparison was not reachable this round.
 ### What's actually going on (best guess, unconfirmed)
 
 This looks like the SAME class of GCC 2.6.3 quirk noted in
-`StageMap__ResetAllElements.md` — a scheduling/duplication choice that resists control-
+`StageMap__UnloadAllSlots.md` — a scheduling/duplication choice that resists control-
 flow-graph-level source changes (goto vs. loop-construct vs. do-while all
 produced the identical wrong answer here, which is a stronger and more
-useful negative result than `StageMap__ResetAllElements`'s single failed lever). Given
+useful negative result than `StageMap__UnloadAllSlots`'s single failed lever). Given
 THREE different CFG-equivalent spellings compiled identically, the
 duplication is very likely happening in a pass that operates on an
 already-canonicalized internal representation, downstream of anything a
@@ -183,7 +183,7 @@ just one attempt at it.
 
 round 2026-09-02 (head-requested extension), runner ALPHA, unit
 class_3ac78. Struct/vtable knowledge for the whole function fully derived
-and cross-checked against `StageMap__ResetAllElements`'s already-established
+and cross-checked against `StageMap__UnloadAllSlots`'s already-established
 `unkEC[]`/generic-slot patterns; three control-flow-equivalent source
 attempts on the one scan loop that drifts, all byte-identical to each
 other and none matching retail. Moved on to close out the round.

@@ -1,4 +1,6 @@
-# StageMap__ResetAllElements — MATCHED round 71 (charlie): 74/74, byte-exact, whole-image SHA1 green
+# StageMap__UnloadAllSlots — MATCHED round 71 (charlie): 74/74, byte-exact, whole-image SHA1 green
+
+> Renamed from `StageMap__ResetAllElements` on 2026-09-26 (tools/rename.py). Address 0x8004abd0.
 
 > Renamed from `Class866E8__ResetAllElements` on 2026-09-26 (tools/rename.py). Address 0x8004abd0.
 
@@ -43,7 +45,7 @@ for an existing entry on strength reduction first.)
 
 ## Historical record (superseded by the match above)
 
-### (old title) StageMap__ResetAllElements — STALL
+### (old title) StageMap__UnloadAllSlots — STALL
 
 > Renamed from `func_8004ABD0` on 2026-09-22 (tools/rename.py). Address 0x8004abd0.
 
@@ -83,7 +85,7 @@ padding into a real slot), `StageMap::unkEC[7]` (`UnkSlotEntry_3ac78`,
 
 ```c
 #if 0
-void StageMap__ResetAllElements(StageMap *self)
+void StageMap__UnloadAllSlots(StageMap *self)
 {
     s32 i;
     s32 offset;
@@ -350,7 +352,7 @@ not to the shipped bytes.
 
 | symbol | name | tier | evidence |
 | --- | --- | --- | --- |
-| `func_8004ABD0` | `StageMap__ResetAllElements` | B | Occupant of vtable slot `+0x0C0`, and `class_3bb8c`'s matched `StageMap__Disable` calls exactly that slot immediately before clearing `enabled` -- so this is the shutdown/clear path. The body walks all seven `elems[]` entries and for each: dispatches the target's `slot74`, zeroes the entry's `flag`, dispatches `slot108`, releases the list's held object, raises `onElementEvent(self, 6, entry, i)`, dispatches the target's `slot84`. Then zeroes `unk1B4`/`unk1B8` and dispatches `slot140`. Tier B: "reset all elements" is what the loop does; why the object is reset is not established. |
+| `func_8004ABD0` | `StageMap__UnloadAllSlots` | B | Occupant of vtable slot `+0x0C0`, and `class_3bb8c`'s matched `StageMap__Disable` calls exactly that slot immediately before clearing `enabled` -- so this is the shutdown/clear path. The body walks all seven `elems[]` entries and for each: dispatches the target's `slot74`, zeroes the entry's `flag`, dispatches `slot108`, releases the list's held object, raises `onElementEvent(self, 6, entry, i)`, dispatches the target's `slot84`. Then zeroes `unk1B4`/`unk1B8` and dispatches `slot140`. Tier B: "reset all elements" is what the loop does; why the object is reset is not established. |
 
 The preserved `#if 0` body in `src/class_3ac78.c` was updated to the current
 field names in the same round (`entry->unk0` -> `flag`, `entry->unk4` ->

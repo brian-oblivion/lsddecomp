@@ -81,4 +81,4 @@ Round 78 (track 3, naming pass, bravo).
 
 | symbol | name | tier | evidence |
 | --- | --- | --- | --- |
-| `func_8004C0AC` | `StageMap__ResetElementCells` | B | Occupant of `gStageMapMethods` +0x108 (`slot108`), called by `class_3ac78`'s own `StageMap__ResetAllElements` (already matched) once per element. Walks `entry->unk10` over exactly `0x668` bytes -- the SAME 0x668-byte figure `class_3ac78`'s own unit header names as "a 0x668-byte heap block holding that element's grid of CELL objects" -- clearing a flag bit and two fields on every cell. "Reset...Cells" names this directly against that established vocabulary. |
+| `func_8004C0AC` | `StageMap__ResetElementCells` | B | Occupant of `gStageMapMethods` +0x108 (`slot108`), called by `class_3ac78`'s own `StageMap__UnloadAllSlots` (already matched) once per element. Walks `entry->unk10` over exactly `0x668` bytes -- the SAME 0x668-byte figure `class_3ac78`'s own unit header names as "a 0x668-byte heap block holding that element's grid of CELL objects" -- clearing a flag bit and two fields on every cell. "Reset...Cells" names this directly against that established vocabulary. |

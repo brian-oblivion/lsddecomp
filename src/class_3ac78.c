@@ -25,7 +25,7 @@
  * declared once, in include/StageMap.h (track 4, round 89).
  *
  * Every function in the unit is matched C; the last three stalls
- * (StageMap__ResetAllElements, StageMap__SetFootprintRect and
+ * (StageMap__UnloadAllSlots, StageMap__SetFootprintRect and
  * StageMap__DispatchToRectCells) were matched in round 71. func_8004B324 keeps its placeholder name
  * deliberately -- it is an empty vtable stub with no established purpose, the
  * same case as SceneNode__NoOpSlot5C in code_d294_b.
@@ -262,7 +262,7 @@ void StageMap__DispatchLinkCommand(StageMap *self, BasicClass *sender, s32 comma
  * Matched round 71: `&self->elems[i]` is what produces retail's
  * base + running-offset walk (GCC's strength reduction), not a hand-rolled
  * byte offset. */
-void StageMap__ResetAllElements(StageMap *self) {
+void StageMap__UnloadAllSlots(StageMap *self) {
     s32 i;
     ChunkSlot *entry;
     Class6D940 *list;
