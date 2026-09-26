@@ -20,7 +20,7 @@ reports failure (`1`); otherwise dispatches to the class's own `+0x100`
 slot and returns *its* result as the final success/failure code.
 
 ```c
-s32 TodActor__AcquireModelData(TodActor *self, UnkArg1Obj *other)
+s32 TodActor__AcquireModelData(TodActor *self, TodActorDesc *other)
 {
     if (other->unk0C != NULL) {
         self->unk5C = other->unk0C;
@@ -39,12 +39,12 @@ fail:
 }
 ```
 
-Adds `UnkArg1Obj` (`include/code_55dd4.h`) for the constructor's `arg1`,
+Adds `TodActorDesc` (`include/code_55dd4.h`) for the constructor's `arg1`,
 typed only at its `+0x00C` field (a `Unk5CObj *`, borrowed or freshly
 allocated), and retypes the `arg1` parameter all the way from
 `TodActor__TodActor` through `slot_setup5C`/`TodActor__SetupModelData` to here as
-`UnkArg1Obj *` instead of the generic `void *` the first pass used
-(implicit `void *` -> `UnkArg1Obj *` conversions at the two call sites
+`TodActorDesc *` instead of the generic `void *` the first pass used
+(implicit `void *` -> `TodActorDesc *` conversions at the two call sites
 needed no changes). Also adds `New_ModelData`'s prototype (from
 `asm/psyq_memset.s`, itself an allocator wrapping `BMemPMgrAlloc`) and
 `slot100` (`+0x100`, called on success, its own return value threaded
@@ -104,7 +104,7 @@ Round 75 (charlie), track 3.
 
 ## Track 4
 
-2026-09-25, round 84 (delta): ModelData (gModelDataMethods) is unified in `include/ModelData.h`. code_55dd4.c includes it, and include/code_55dd4.h's local `extern Unk5CObj *New_ModelData(UnkArg1Obj *arg)` is deleted. The call reads `self->modelData = (Unk5CObj *)New_ModelData((struct Src6F240 *)other)`, pointer casts with no code. The field's type, Unk5CObj (a view of ModelData), belongs to TodActor and is left for that class's unification. Image byte-identical.
+2026-09-25, round 84 (delta): ModelData (gModelDataMethods) is unified in `include/ModelData.h`. code_55dd4.c includes it, and include/code_55dd4.h's local `extern Unk5CObj *New_ModelData(TodActorDesc *arg)` is deleted. The call reads `self->modelData = (Unk5CObj *)New_ModelData((struct Src6F240 *)other)`, pointer casts with no code. The field's type, Unk5CObj (a view of ModelData), belongs to TodActor and is left for that class's unification. Image byte-identical.
 
 ## Track 4 (2026-09-25, round 85, alpha)
 

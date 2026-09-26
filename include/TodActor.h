@@ -49,7 +49,7 @@ typedef struct TodActorMethods TodActorMethods;
 /* Tags completed in the unit that reads them (include/code_55dd4.h), so
  * that any header may repeat these declarations. */
 struct ModelData;   /* include/ModelData.h */
-struct UnkArg1Obj;  /* the ctor's descriptor: +0x00C a ModelData to borrow */
+struct TodActorDesc;  /* the ctor's descriptor: +0x00C a ModelData to borrow */
 struct UnkArg2Obj;  /* the ctor's second argument: unidentified, its +0x080 slot is called */
 struct TagCheckArg; /* onNotify's sender, read only for its table's low id halfword */
 
@@ -144,7 +144,7 @@ void TodActor__Update(TodActor *self, void *sender, s32 event);
 void TodActor__SetMainPartNotifies(TodActor *self, s32 value);
 s32 TodActor__SetupModelData(TodActor *self, void *desc);
 void TodActor__TeardownModelData(TodActor *self);
-s32 TodActor__AcquireModelData(TodActor *self, struct UnkArg1Obj *desc);
+s32 TodActor__AcquireModelData(TodActor *self, struct TodActorDesc *desc);
 void TodActor__ReleaseModelData(TodActor *self);
 s32 TodActor__FindPartIndex(TodActor *self, s32 id);
 s32 TodActor__SetupParts(TodActor *self);

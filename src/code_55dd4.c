@@ -159,7 +159,7 @@ void TodActor__TeardownModelData(TodActor *self) {
     }
 }
 
-s32 TodActor__AcquireModelData(TodActor *self, UnkArg1Obj *other) {
+s32 TodActor__AcquireModelData(TodActor *self, TodActorDesc *other) {
     if (other->modelData != NULL) {
         self->modelData = other->modelData;
         self->ownsModelData = 0;

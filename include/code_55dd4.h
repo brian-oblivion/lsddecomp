@@ -82,10 +82,10 @@ typedef struct GroupObj {
  * TodActor__AcquireModelData: if its +0x0C already holds a model-data
  * object it is borrowed, otherwise New_ModelData(arg1) makes one that this
  * instance owns. */
-typedef struct UnkArg1Obj {
+typedef struct TodActorDesc {
     u8 pad00[0x0C];
     ModelData *modelData;
-} UnkArg1Obj;
+} TodActorDesc;
 
 extern void *BMemPMgrAlloc(s32 size);
 extern void *BMemPMgrFree(void *ptr);
