@@ -1,4 +1,6 @@
-# TitleMenu__UpdateMemcardSaveStatus -- MATCHED 27/27, round 43
+# TitleMenu__LoadFromCard -- MATCHED 27/27, round 43
+
+> Renamed from `TitleMenu__UpdateMemcardSaveStatus` on 2026-09-26 (tools/rename.py). Address 0x8004e1c4.
 
 > Renamed from `Class86B60__UpdateMemcardSaveStatus` on 2026-09-26 (tools/rename.py). Address 0x8004e1c4.
 
@@ -12,7 +14,7 @@ and no derivation; this round wrote and matched the function from scratch.
 ## Body
 
 ```c
-void TitleMenu__UpdateMemcardSaveStatus(TitleMenu *self)
+void TitleMenu__LoadFromCard(TitleMenu *self)
 {
     self->methods->slot128(self);
     self->unkAC->methods->slot74(self->unkAC, D_8008AA10, D_8008AA18,
@@ -21,7 +23,7 @@ void TitleMenu__UpdateMemcardSaveStatus(TitleMenu *self)
 ```
 
 Byte-exact on the first build: `./build-and-verify.sh` -> `OK: build matches
-retail SLPS_015.56`; `funcdiff.py TitleMenu__UpdateMemcardSaveStatus` -> `27/27 words match (file
+retail SLPS_015.56`; `funcdiff.py TitleMenu__LoadFromCard` -> `27/27 words match (file
 0x3E9C4-0x3EA30)`.
 
 ## Derivation
@@ -87,7 +89,7 @@ with no `dlabel` of its own) may not even be nameable.
 
 ## Naming (round 77, naming runner delta)
 
-Renamed `func_8004E1C4` -> `TitleMenu__UpdateMemcardSaveStatus`. **Tier B, lower confidence**: Calls `slot128` then forwards `self->unkBC`/`unkC0` (no icon handle, no literal flags) through `unkAC`'s `slot74` -- the simpler sibling of `TitleMenu__SaveToCard` and the dispatch target for `TitleMenu__Tick`'s case-3. Purpose beyond "the icon-less variant of the two unkAC dispatch calls" is not established.
+Renamed `func_8004E1C4` -> `TitleMenu__LoadFromCard`. **Tier B, lower confidence**: Calls `slot128` then forwards `self->unkBC`/`unkC0` (no icon handle, no literal flags) through `unkAC`'s `slot74` -- the simpler sibling of `TitleMenu__SaveToCard` and the dispatch target for `TitleMenu__Tick`'s case-3. Purpose beyond "the icon-less variant of the two unkAC dispatch calls" is not established.
 
 ## Track 4 (2026-09-26, round 88, bravo)
 

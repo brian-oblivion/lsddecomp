@@ -100,7 +100,7 @@ the round-77 broadcast.
   unit's own functions establish
   (`TitleMenu__BeginMemcardSave`/`TitleMenu__EndMemcardSave`/
   `TitleMenu__SaveToCard`/
-  `TitleMenu__UpdateMemcardSaveStatus`); the exact protocol is not
+  `TitleMenu__LoadFromCard`); the exact protocol is not
   established.
 
 ## Track 4 (2026-09-25, round 84, alpha)

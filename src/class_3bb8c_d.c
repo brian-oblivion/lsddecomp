@@ -255,7 +255,7 @@ void TitleMenu__SaveToCard(TitleMenu *self) {
                                        self->iconHandle, self->saveBlock, self->saveBlockSize);
 }
 
-void TitleMenu__UpdateMemcardSaveStatus(TitleMenu *self) {
+void TitleMenu__LoadFromCard(TitleMenu *self) {
     self->methods->beginMemcardSave(self);
     self->saveCtrl->methods->beginLoad(self->saveCtrl, D_8008AA10, D_8008AA18, self->saveBlock,
                                        self->saveBlockSize);

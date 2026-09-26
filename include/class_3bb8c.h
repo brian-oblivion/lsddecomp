@@ -198,7 +198,7 @@ extern s32 D_80086DAC;
  * the words are -4, -23, ...). Placeholder s32 type, cast at the call. */
 extern s32 D_8008A9B4;
 
-/* VALUE-of, not address-of, in this unit -- TitleMenu__UpdateMemcardSaveStatus reaches these
+/* VALUE-of, not address-of, in this unit -- TitleMenu__LoadFromCard reaches these
  * through `%gp_rel` loads of the .sdata globals themselves, forwarding
  * whatever they hold. Each holds a pointer into the still-uncarved rodata
  * block at `D_80011434` (`asm/data/1C34.rodata.s`: 0x80011464 and

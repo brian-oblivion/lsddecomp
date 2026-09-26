@@ -39,7 +39,7 @@ SLPS_015.56`.
   `TitleMenu__RefreshViewValue` (stack-buffer-out-parameter call on the same
   `DreamSysView_3bb8c_c::slot19C`), just without that function's own
   leading `Get_vtable_TaskCore()->slot94(self)` base-class call.
-- `self->methods->slot128(self)` -- the slot this round's `TitleMenu__UpdateMemcardSaveStatus`
+- `self->methods->slot128(self)` -- the slot this round's `TitleMenu__LoadFromCard`
   established (single-argument, `self` only).
 - `self->unkA4->methods->slot1AC(self->unkA4)` -- a NEW slot on
   `DreamSysViewMethods_3bb8c_c`, at the offset immediately after
@@ -49,14 +49,14 @@ SLPS_015.56`.
   so a `void` return would be observably wrong.
 - The nonzero-return branch writes a single zero byte through
   `D_8008AA10` (`*(u8 *)D_8008AA10 = 0;`) -- the same `void *` global
-  `TitleMenu__UpdateMemcardSaveStatus` (this round) established as holding a precomputed
+  `TitleMenu__LoadFromCard` (this round) established as holding a precomputed
   pointer into unowned rodata (a `%gp_rel` load of the global's own
   VALUE, reloaded here with an identical `lw`).
 - The final call, `self->unkAC->methods->slot78(...)`, is an 8-argument
   dispatch (four in registers, four on the stack at `0x10`-`0x1C($sp)`):
   `self->unkAC`, `D_8008AA10`, `D_8008AA18`, the literal `0xD`, the
   literal `3`, `self->iconHandle`, `self->unkBC`, `self->unkC0`. The offset
-  (+0x078) falls immediately after this round's `TitleMenu__UpdateMemcardSaveStatus`-derived
+  (+0x078) falls immediately after this round's `TitleMenu__LoadFromCard`-derived
   `slot74` (+0x074, 4 bytes) with no gap, so it was appended there.
   `self->iconHandle` is forwarded opaquely (this slot never dereferences it),
   so its parameter stays `void *` rather than the fuller
@@ -76,7 +76,7 @@ No existing declaration was retyped or resized.
 
 ### Proposed learning
 
-None beyond what round 43's earlier two reports (`TitleMenu__UpdateMemcardSaveStatus`,
+None beyond what round 43's earlier two reports (`TitleMenu__LoadFromCard`,
 `TaskObjF__TaskObjF`) already recorded for this unit -- this function's own
 derivation was routine once those two slots (`slot128`, `D_8008AA10`)
 were on file, and it re-confirmed `slot74`'s exact byte offset by landing
@@ -97,7 +97,7 @@ these are PROPOSALS, not renames. Also posted to the round-77 broadcast.
 
 - **`unkBC` -> `saveInfoWord`, tier B.** The `s32` return value of
   `dreamSysView->methods->slot1B0`, forwarded verbatim by this function
-  (and `TitleMenu__UpdateMemcardSaveStatus`) into `unkAC`'s dispatch
+  (and `TitleMenu__LoadFromCard`) into `unkAC`'s dispatch
   calls alongside the memcard-icon/name buffers. Exact meaning of the
   word not established.
 - **`unkC0` -> `saveInfoBuf`, tier B.** The output-buffer word `slot1B0`
