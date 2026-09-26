@@ -11,7 +11,7 @@ drift. Fresh ground (carved revision 18, no prior report).
 
 Finalize: releases the object at +0x60 through its own release slot (+0x004) and stores the result (NULL) back, DecDCToutCallback(NULL), DecDCTReset(0) (libpress, Sony), MoviePlayer__FreeFrameBuffers(self) (frees four buffers), then Get_vtable_BasicClass()->finalize(self).
 
-Table slot (`tools/classtable.py`): D_8006F614 +0x00C.
+Table slot (`tools/classtable.py`): gMoviePlayerMethods +0x00C.
 
 ## Source
 

@@ -36,7 +36,7 @@ extern u8 D_8006E860[];
 extern u8 gDefaultStreamTaskInitData[];
 extern Vec3_d294 D_8006E86C;
 
-/* StreamTask::player's class, MoviePlayer (New_MoviePlayer, D_8006F614:
+/* StreamTask::player's class, MoviePlayer (New_MoviePlayer, gMoviePlayerMethods:
  * +0x040 Play, +0x048 Advance, +0x04C Abort, +0x06C SetResult), as
  * StreamTask__Finalize, __OnInit, __Update, __SetState and
  * __RefreshViewValue call it; StreamTask.h types the field `BasicClass *`

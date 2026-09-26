@@ -11,7 +11,7 @@ drift. Fresh ground (carved revision 18, no prior report).
 
 Pull the next movie frame: unless the stream has ended (+0x48), ask the stream object at +0x60 (its +0x06C, with &data, &size, 0x800000) for data; with a nonzero result, when size is nonzero flip the frame index at +0x3C and DecDCTvlc the data into that frame's buffer (+0x14[index]), hand the data back (+0x070), and on a negative result mark the end (+0x48 = 1) and call the stream's +0x054; return 0. Return 1 when ended or when there was no data.
 
-Table slot (`tools/classtable.py`): D_8006F614 +0x058.
+Table slot (`tools/classtable.py`): gMoviePlayerMethods +0x058.
 
 ## Source
 
@@ -21,7 +21,7 @@ fields +0x2C..+0x38), `Ctor33808`, `CountedBuf33808` and `Req44858` sit at the
 top of / earlier in `src/code_33808.c`.
 
 ```c
-/* D_8006F614 +0x058: unless the stream has ended (+0x48), pull the next
+/* gMoviePlayerMethods +0x058: unless the stream has ended (+0x48), pull the next
  * frame from the object at +0x60 (its +0x06C); 1 when there is none. With
  * data, flip the frame index at +0x3C and VLC-decode into that frame's
  * buffer, then hand the sector buffer back (+0x070); a negative result

@@ -9,9 +9,9 @@ drift. Fresh ground (carved revision 18, no prior report).
 
 ## What it does
 
-Allocator for D_8006F614: BMemPMgrAlloc(0x6C); if non-NULL, call the table's ctor (GetMoviePlayerMethods +0x008) with (obj, a, b, c); a ZERO result returns obj, nonzero frees it and returns NULL. Not referenced from any data word (a direct-call allocator).
+Allocator for gMoviePlayerMethods: BMemPMgrAlloc(0x6C); if non-NULL, call the table's ctor (GetMoviePlayerMethods +0x008) with (obj, a, b, c); a ZERO result returns obj, nonzero frees it and returns NULL. Not referenced from any data word (a direct-call allocator).
 
-Table slot (`tools/classtable.py`): none (allocator; constructs D_8006F614).
+Table slot (`tools/classtable.py`): none (allocator; constructs gMoviePlayerMethods).
 
 ## Source
 

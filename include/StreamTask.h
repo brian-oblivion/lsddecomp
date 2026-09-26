@@ -12,7 +12,7 @@
  *
  * The name is the table's stem with its `Obj` dropped (track 4 step 2);
  * include/Class6D3C8.h's view already called it StreamTask. What it does,
- * measured: it owns a MoviePlayer (`player`, New_MoviePlayer, D_8006F614)
+ * measured: it owns a MoviePlayer (`player`, New_MoviePlayer, gMoviePlayerMethods)
  * and runs one "ETC\*.STR" stream through it inside TaskCore's fade/state
  * machine. Every caller is code_1677c's Class6D3C8 (intro logo, weekly,
  * GraphRoom and cinematic streams): New_StreamTask(NULL, NULL, NULL, NULL),

@@ -1,4 +1,6 @@
-# MoviePlayer__SetResult -- MATCHED (2/2 words)
+# MoviePlayer__SetAutoPlay -- MATCHED (2/2 words)
+
+> Renamed from `MoviePlayer__SetResult` on 2026-09-26 (tools/rename.py). Address 0x80045e3c.
 
 > Renamed from `func_80045E3C` on 2026-09-25 (tools/rename.py). Address 0x80045e3c.
 
@@ -9,20 +11,20 @@ deletions, no out-of-range drift. Fresh ground (carved revision 18, no prior rep
 
 ## What it does
 
-One-line setter: `sw a1, 0x68(a0)` in the jr delay slot = `self->unk68 = value;` (s32 field; the class of D_8006F614 has no header yet, so a minimal unit-local view `Obj6F614`).
+One-line setter: `sw a1, 0x68(a0)` in the jr delay slot = `self->unk68 = value;` (s32 field; the class of gMoviePlayerMethods has no header yet, so a minimal unit-local view `Obj6F614`).
 
-Table slot (`tools/classtable.py`): `D_8006F614` +0x06C.
+Table slot (`tools/classtable.py`): `gMoviePlayerMethods` +0x06C.
 
 ## Source
 
 ```c
-/* D_8006F614 +0x06C: stores its argument at +0x68. */
+/* gMoviePlayerMethods +0x06C: stores its argument at +0x68. */
 typedef struct Obj6F614 {
     u8 pad0[0x68];
     s32 unk68;
 } Obj6F614;
 
-void MoviePlayer__SetResult(Obj6F614 *self, s32 value) {
+void MoviePlayer__SetAutoPlay(Obj6F614 *self, s32 value) {
     self->unk68 = value;
 }
 ```
@@ -35,4 +37,4 @@ void MoviePlayer__SetResult(Obj6F614 *self, s32 value) {
 
 ## Naming
 
-- **MoviePlayer__SetResult**, tier A. Slot +0x06C: stores its argument into the result field DecodeFrame reads.
+- **MoviePlayer__SetAutoPlay**, tier A. Slot +0x06C: stores its argument into the result field DecodeFrame reads.

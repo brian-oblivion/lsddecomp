@@ -11,7 +11,7 @@ drift. Fresh ground (carved revision 18, no prior report).
 
 Only when self is the object held in the global gActiveMoviePlayer: zero +0x3C/+0x40/+0x44/+0x48, set +0x4C = 1, call the +0x60 object's slot +0x07C with (obj, MoviePlayer__MarkStopped, self) -- MoviePlayer__MarkStopped sets +0x50 = -1, so it is a completion callback --, clear +0x64, then call the +0x60 object's slot +0x058 with it alone. This is the slot +0x044 that MoviePlayer__PollActive calls every ~100 polls.
 
-Table slot (`tools/classtable.py`): D_8006F614 +0x044.
+Table slot (`tools/classtable.py`): gMoviePlayerMethods +0x044.
 
 ## Source
 

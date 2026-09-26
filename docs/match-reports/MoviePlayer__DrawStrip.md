@@ -9,9 +9,9 @@ drift. Fresh ground (carved revision 18, no prior report).
 
 ## What it does
 
-Uploads the strip buffer at +0x1C into the rectangle at +0x2C through the DrawSystem singleton's +0x058 (LoadImage per bravo's round-82 DrawSystem naming), advances rect.x by rect.w; while rect.x is still below +0x20 + +0x24, decodes the next strip (DecDCTout(+0x1C, +0x38), preceded by DrawSync(0) when +0x34 < 0x80); otherwise sets +0x4C = 1, rewinds the rectangle to (+0x20, +0x22), and sets +0x44 when +0x48 is set. The MDEC movie-strip pump of D_8006F614.
+Uploads the strip buffer at +0x1C into the rectangle at +0x2C through the DrawSystem singleton's +0x058 (LoadImage per bravo's round-82 DrawSystem naming), advances rect.x by rect.w; while rect.x is still below +0x20 + +0x24, decodes the next strip (DecDCTout(+0x1C, +0x38), preceded by DrawSync(0) when +0x34 < 0x80); otherwise sets +0x4C = 1, rewinds the rectangle to (+0x20, +0x22), and sets +0x44 when +0x48 is set. The MDEC movie-strip pump of gMoviePlayerMethods.
 
-Table slot (`tools/classtable.py`): D_8006F614 +0x060.
+Table slot (`tools/classtable.py`): gMoviePlayerMethods +0x060.
 
 ## Source
 

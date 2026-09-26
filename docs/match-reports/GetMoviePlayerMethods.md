@@ -9,17 +9,17 @@ deletions, no out-of-range drift. Fresh ground (carved revision 18, no prior rep
 
 ## What it does
 
-Table getter: returns the method table `D_8006F614` (`lui/addiu; jr; nop`), declared locally as `extern s32 D_8006F614[];`.
+Table getter: returns the method table `gMoviePlayerMethods` (`lui/addiu; jr; nop`), declared locally as `extern s32 gMoviePlayerMethods[];`.
 
 Table slot (`tools/classtable.py`): none: no data word references it (reached some other way).
 
 ## Source
 
 ```c
-extern s32 D_8006F614[];
+extern s32 gMoviePlayerMethods[];
 
 void *GetMoviePlayerMethods(void) {
-    return D_8006F614;
+    return gMoviePlayerMethods;
 }
 ```
 

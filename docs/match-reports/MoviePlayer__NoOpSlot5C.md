@@ -1,4 +1,6 @@
-# MoviePlayer__NoOpFreeBuffer -- MATCHED (2/2 words)
+# MoviePlayer__NoOpSlot5C -- MATCHED (2/2 words)
+
+> Renamed from `MoviePlayer__NoOpFreeBuffer` on 2026-09-26 (tools/rename.py). Address 0x80045bc0.
 
 > Renamed from `func_80045BC0` on 2026-09-25 (tools/rename.py). Address 0x80045bc0.
 
@@ -11,12 +13,12 @@ deletions, no out-of-range drift. Fresh ground (carved revision 18, no prior rep
 
 Empty method (`jr ra; nop`).
 
-Table slot (`tools/classtable.py`): `D_8006F614` +0x05C.
+Table slot (`tools/classtable.py`): `gMoviePlayerMethods` +0x05C.
 
 ## Source
 
 ```c
-void MoviePlayer__NoOpFreeBuffer(void) {
+void MoviePlayer__NoOpSlot5C(void) {
 }
 ```
 
@@ -28,4 +30,4 @@ void MoviePlayer__NoOpFreeBuffer(void) {
 
 ## Naming
 
-- **MoviePlayer__NoOpFreeBuffer**, tier B. Empty freeBuffer-shaped override (matches the Class6D430 slot MoviePlayer otherwise repurposes); MoviePlayer needs no buffer freed at this slot.
+- **MoviePlayer__NoOpSlot5C**, tier B. Empty freeBuffer-shaped override (matches the Class6D430 slot MoviePlayer otherwise repurposes); MoviePlayer needs no buffer freed at this slot.

@@ -38,7 +38,7 @@
  *   - BgLayer (D_8006F2C4): a Class6B5CC subclass wrapping one GsBG
  *     scrolling background layer (its own fields are GsBG's own layout;
  *     include/BgLayer.h, track 4, round 88).
- *   - MoviePlayer (D_8006F614): a BasicClass subclass driving CD-streamed,
+ *   - MoviePlayer (gMoviePlayerMethods): a BasicClass subclass driving CD-streamed,
  *     MDEC-decoded FMV playback (open a CD stream, decode/upload strips,
  *     play/stop/tick controls); called from code_2c054.c.
  *
@@ -1247,7 +1247,7 @@ u8 TodSet__ScanPackets(TodSet *self, u8 *out, u32 *sel) {
 TodSetMethods *GetTodSetMethods(void) {
     return &D_8006F590;
 }
-/* Allocate and construct a D_8006F614 object; freed and NULL when the
+/* Allocate and construct a gMoviePlayerMethods object; freed and NULL when the
  * constructor returns nonzero (this ctor reports failure, not self). */
 void *GetMoviePlayerMethods(void);
 
@@ -1262,7 +1262,7 @@ void *New_MoviePlayer(s32 arg0, s32 arg1, s32 arg2) {
     }
     return NULL;
 }
-/* D_8006F614 +0x008: constructor -- BasicClass's, then this table; open a
+/* gMoviePlayerMethods +0x008: constructor -- BasicClass's, then this table; open a
  * CD stream object (New_CdStream(arg2, 15, 0)) at +0x60 and set up the
  * decode buffers (MoviePlayer__InitFrame); 1 when either fails. Then reset the MDEC
  * the first time any player is built (gMdecInitialized), route its output
@@ -1308,7 +1308,7 @@ s32 MoviePlayer__MoviePlayer(Obj454C4 *self, s32 arg1, s32 arg2, s32 arg3) {
     }
     return 1;
 }
-/* D_8006F614 +0x00C: finalize -- release the object at +0x60, detach and
+/* gMoviePlayerMethods +0x00C: finalize -- release the object at +0x60, detach and
  * reset the MDEC decoder, free the four buffers (MoviePlayer__FreeFrameBuffers), then
  * BasicClass's finalize. */
 typedef struct Obj455D4 {
@@ -1404,12 +1404,12 @@ void MoviePlayer__FreeFrameBuffers(Obj4575C *self) {
         BMemPMgrFree(self->unk1C);
     }
 }
-/* D_8006F614 +0x040: start playing -- only when no movie is active
+/* gMoviePlayerMethods +0x040: start playing -- only when no movie is active
  * (gActiveMoviePlayer): optionally MoviePlayer__MarkPlaying first (+0x68), keep `arg2` at
  * +0x5C, open `name` on the stream object at +0x60 (its +0x044, 100); 1 when
  * that fails. Otherwise become the active movie, reset the state words, keep
  * `arg3`/`arg4` at +0x54/+0x58 and clear the frame rectangle (+0x20) through
- * DrawSystem's clearImage (+0x078), whose color argument is gMovieFrameRect
+ * DrawSystem's clearImage (+0x078), whose color argument is gMovieClearColor
  * (a zero word: black; the name predates reading the slot). 0. */
 typedef struct Obj457C0 {
     /* +0x000 */ u8 pad0[0x20];
@@ -1430,7 +1430,7 @@ typedef struct Obj457C0 {
 } Obj457C0;
 
 extern DataSrc33808 *gActiveMoviePlayer;
-extern s32 gMovieFrameRect;
+extern s32 gMovieClearColor;
 void MoviePlayer__MarkPlaying();
 
 s32 MoviePlayer__Play(Obj457C0 *self, char *name, s32 arg2, s32 arg3, s32 arg4) {
@@ -1451,7 +1451,7 @@ s32 MoviePlayer__Play(Obj457C0 *self, char *name, s32 arg2, s32 arg3, s32 arg4) 
             self->unk54 = arg3;
             self->unk58 = arg4;
             ds = GetDrawSystem();
-            ds->methods->clearImage(ds, (u8 *)&gMovieFrameRect, (DrawRect *)self->rect);
+            ds->methods->clearImage(ds, (u8 *)&gMovieClearColor, (DrawRect *)self->rect);
             return 0;
         }
         return 1;
@@ -1468,7 +1468,7 @@ typedef struct Obj33808_50 {
 void MoviePlayer__MarkPlaying(Obj33808_50 *self) {
     self->unk50 = 1;
 }
-/* D_8006F614 +0x044: when this is the object in gActiveMoviePlayer, reset its
+/* gMoviePlayerMethods +0x044: when this is the object in gActiveMoviePlayer, reset its
  * state words, hand the object at +0x60 MoviePlayer__MarkStopped (and self) through
  * that object's +0x07C, clear +0x64, and call its +0x058. */
 typedef struct Obj458B8 {
@@ -1505,7 +1505,7 @@ void MoviePlayer__Stop(Obj458B8 *self) {
 void MoviePlayer__MarkStopped(Obj33808_50 *self) {
     self->unk50 = -1;
 }
-/* D_8006F614 +0x048: when this is the object in gActiveMoviePlayer -- with the
+/* gMoviePlayerMethods +0x048: when this is the object in gActiveMoviePlayer -- with the
  * stream running (+0x50), call the stream object's +0x050 (1, +0x5C); if
  * +0x50 then went negative, count down the loops left at +0x58 and at the
  * last one (or with none) call the stream's +0x064; clear +0x50, set +0x64,
@@ -1550,7 +1550,7 @@ s32 MoviePlayer__Advance(Obj45948 *self) {
 out:
     ;
 }
-/* D_8006F614 +0x04C: when this is the object in gActiveMoviePlayer, set +0x48,
+/* gMoviePlayerMethods +0x04C: when this is the object in gActiveMoviePlayer, set +0x48,
  * clear +0x54, call the +0x60 object's +0x048, set +0x44, and the first
  * time (+0x64 clear) clear that object's +0x07C callback and set +0x64. */
 void MoviePlayer__Abort(Obj458B8 *self) {
@@ -1572,7 +1572,7 @@ void MoviePlayer__NoOpSlot50(void) {
 }
 void MoviePlayer__NoOpSlot54(void) {
 }
-/* D_8006F614 +0x058: unless the stream has ended (+0x48), pull the next
+/* gMoviePlayerMethods +0x058: unless the stream has ended (+0x48), pull the next
  * frame from the object at +0x60 (its +0x06C); 1 when there is none. With
  * data, flip the frame index at +0x3C and VLC-decode into that frame's
  * buffer, then hand the sector buffer back (+0x070); a negative result
@@ -1613,9 +1613,9 @@ s32 MoviePlayer__PullFrame(Obj45AD8 *self) {
     }
     return 1;
 }
-void MoviePlayer__NoOpFreeBuffer(void) {
+void MoviePlayer__NoOpSlot5C(void) {
 }
-/* D_8006F614 +0x060: upload the decoded strip at +0x1C into the rectangle
+/* gMoviePlayerMethods +0x060: upload the decoded strip at +0x1C into the rectangle
  * at +0x2C (DrawSystem +0x058), step the rectangle right by its width, and
  * while it is still inside the frame (+0x20 + +0x24) decode the next strip
  * (DecDCTout, after a DrawSync when +0x34 is under 0x80); at the end,
@@ -1666,7 +1666,7 @@ void MoviePlayer__DrawStrip(Obj45BC8 *self) {
         }
     }
 }
-/* D_8006F614 +0x064: while +0x54 is set, count calls in gMoviePollCounter and
+/* gMoviePlayerMethods +0x064: while +0x54 is set, count calls in gMoviePollCounter and
  * once the count before the increment passes 100, resets it to 1 and calls
  * slot +0x044; returns 0. Otherwise
  * clears gActiveMoviePlayer and returns 1. */
@@ -1695,7 +1695,7 @@ s32 MoviePlayer__PollActive(Obj45C94 *self) {
     gActiveMoviePlayer = NULL;
     return 1;
 }
-/* D_8006F614 +0x068: when this is the object in gActiveMoviePlayer -- with a
+/* gMoviePlayerMethods +0x068: when this is the object in gActiveMoviePlayer -- with a
  * finished frame pending (+0x44) run its own +0x064 and return that;
  * otherwise, when a frame is going (+0x40), wait for its last strip (+0x4C),
  * clear the flag, DrawSync when +0x34 is under 0x80, and feed the next
@@ -1762,17 +1762,17 @@ void MoviePlayer__WaitFrameReady(Obj45CFC *self) {
     while (self->unk4C == 0) {
     }
 }
-/* D_8006F614 +0x06C: stores its argument at +0x68. */
+/* gMoviePlayerMethods +0x06C: stores its argument at +0x68. */
 typedef struct Obj6F614 {
     u8 pad0[0x68];
     s32 unk68;
 } Obj6F614;
 
-void MoviePlayer__SetResult(Obj6F614 *self, s32 value) {
+void MoviePlayer__SetAutoPlay(Obj6F614 *self, s32 value) {
     self->unk68 = value;
 }
-extern s32 D_8006F614[];
+extern s32 gMoviePlayerMethods[];
 
 void *GetMoviePlayerMethods(void) {
-    return D_8006F614;
+    return gMoviePlayerMethods;
 }
