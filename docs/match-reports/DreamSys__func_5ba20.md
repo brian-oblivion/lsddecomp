@@ -82,3 +82,7 @@ src/code_1677c.c reaches by the field name `func_228` -- Class6D3C8's constructo
 calls it once with `arg->unk14` and discards the result. `unk_0x924` is cleared by
 `DreamSys__ResetSessionState` and read by nothing in carved code, and the one caller
 names its argument no better, so there is nothing to name it after.
+
+Re-checked round 92 (runner delta, track 7): still no reader of `unk_0x924`
+anywhere in src/, and the slot has no caller that names its argument, so the
+tier-C placeholder stays.

@@ -151,3 +151,14 @@ Replaced in the source by a comment that says what the code does; kept here as w
  * touches exactly one field or global that nothing in any carved unit ever
  * reads back, so there is nothing to name them after. */
 ```
+
+## Naming (round 92, track 7)
+
+- Parameters `modelSource`, `soundObj`, `viewport` (were `arg1..arg3`): the
+  ctor stores the second and third in `soundObj` / `viewport` (both also
+  reachable through `setSoundObj` / `setViewport`), and takes model 0 of the
+  first -- the LinkResource Class6D3C8__Class6D3C8 builds from
+  "ETC\DREAME5.TMD" -- as its child.
+- Field `DreamSys::unk_0x60` -> `modelSource` (tier A: its one writer is this
+  ctor, storing that LinkResource; nothing reads it back). Every accessor is in
+  src/DreamSys.c.

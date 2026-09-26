@@ -98,3 +98,13 @@ register too (`$v1` vs `$a0` for the switch's own dispatch constant); no
 ## Naming
 
 - **Tier B.** Symmetric setter for callback_0x98's own small menu; additionally, when the mode was already 2 on entry, calls DreamSys__StopDrift(this, 0) first, and its own mode-2 case wires up an InitSoundCueSet call.
+
+## Naming (round 92, track 7)
+
+Fields `callback_0x98 / callback98Mode` -> `moveCallback / moveCallbackMode` (tier A): mode 1 of the one installs the
+look step and of the other the movement step, and RunTickCallbacks calls them
+in that order each tick. The switch cases are enum DreamSysMoveCallback: 0 none, 1 tickMove, 2 tickDrift (which also starts the sound cue set; leaving mode 2 calls stopDrift), in include/DreamSys.h.
+Every accessor of the fields is in src/DreamSys.c. The method names stay: they
+are reached through the slots `selectCallback80` / `selectCallback98`, and
+`DreamSys__SelectLookCallback` / `DreamSys__SelectMoveCallback` is a proposal
+for the head.
