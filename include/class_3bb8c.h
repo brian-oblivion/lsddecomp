@@ -5,6 +5,7 @@
 #include "BasicClass.h"
 #include "TaskCore.h"
 #include "StageMap.h"
+#include "DrawSystem.h"
 
 /*
  * class_3bb8c.c and class_3bb8c_b.c hold the back half of StageMap (the
@@ -109,28 +110,7 @@ extern void *BMemPMgrAlloc(s32 size);
 
 
 /* TitleMenu (gTitleMenuMethods, a TaskCore) is defined in
- * include/TitleMenu.h (round 88, track 4). Two views of OTHER classes
- * its methods call stay here, named for the TitleMenu field that holds
- * them: */
-
-/* The class of IntermediateBaseInitArgs::unk0 (a BasicClass * there), as
- * TitleMenu__OnDeinit calls its +0x078; TaskCore__OnDeinit makes the same
- * call through code_2c054.h's TaskTextObj. */
-typedef struct TitleMenuUnkC0ObjMethods_3bb8c_d TitleMenuUnkC0ObjMethods_3bb8c_d;
-typedef struct TitleMenuUnkC0Obj_3bb8c_d TitleMenuUnkC0Obj_3bb8c_d;
-
-struct TitleMenuUnkC0ObjMethods_3bb8c_d {
-    u8 pad000[0x078];
-    /* +0x078, TitleMenu__OnDeinit's own call: `(childObj, &self->unk93,
-     * tableEntry)`, where `tableEntry` walks a fixed external table
-     * (`D_80086DAC`, stride 0xC) starting fresh each call to this
-     * function. */
-    void (*slot78)(TitleMenuUnkC0Obj_3bb8c_d *self, void *arg1, void *arg2);
-};
-
-struct TitleMenuUnkC0Obj_3bb8c_d {
-    TitleMenuUnkC0ObjMethods_3bb8c_d *methods; /* +0x000 */
-};
+ * include/TitleMenu.h (round 88, track 4). */
 
 /* TitleMenu::saveCtrl is a TaskObjF (include/TaskObjF.h). */
 
@@ -159,11 +139,9 @@ extern const char D_800114E8[];
  * already emitted as a symbol). */
 extern const char D_800114F8[];
 
-/* Address-of only in this unit -- TitleMenu__OnDeinit walks it with an
- * explicit 0xC-byte stride, passing each entry's address on to
- * `TitleMenuUnkC0ObjMethods_3bb8c_d::slot78`, but never dereferences it
- * itself. Placeholder s32 type; real element layout unknown. */
-extern s32 D_80086DAC;
+/* The two 320 x 240 display buffers, stacked in VRAM at y 0 and y 240:
+ * TitleMenu__OnDeinit clears each with the DrawSystem's clearImage. */
+extern DrawRect D_80086DAC[2];
 
 /* Address-of only in this unit (TitleMenu__AttachSaveTitle passes &D_8008A9B4 to
  * the name field's attachToParent, TextRow +0x04C, as its LongVec3 offset;
