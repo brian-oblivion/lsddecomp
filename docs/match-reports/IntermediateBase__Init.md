@@ -54,7 +54,7 @@ void IntermediateBase__Init(Obj86B60 *self, Obj86B60InitArgs *arg1, s32 arg2)
     if (arg2 == 0) {
         obj18->methods->slot10(obj18, arg1->unk0);
         obj18->methods->slot10(obj18, (void *)self->unk10);
-        ((SplitCoord2 *)self->unk14)->methods->slot10((SplitCoord2 *)self->unk14, (void *)self->unk10);
+        ((Unk14Obj *)self->unk14)->methods->slot10((Unk14Obj *)self->unk14, (void *)self->unk10);
         methods->slot60(self, 2);
         methods->slot48(self);
     }
@@ -88,17 +88,17 @@ the next build.
 - `Obj86B60.unk10`/`unk14`: BOTH were previously modelled as opaque
   generic words (`Viewport__RemoveAllChildren`/`TaskCore__BeginElementScroll` in a sibling unit). This
   function CONFIRMS both are pointer-valued in this unit's own reading too
-  -- `unk10` is forwarded as an `addChild`-style child and as `SplitCoord2::
-  slot10`'s 2nd arg; `unk14` is dispatched through as `SplitCoord2 *`. Kept
+  -- `unk10` is forwarded as an `addChild`-style child and as `Unk14Obj::
+  slot10`'s 2nd arg; `unk14` is dispatched through as `Unk14Obj *`. Kept
   `s32` in the struct (the more general reading) per this header's
   established "keep the general field, cast locally" convention -- see
-  `SplitCoord2`'s own header comment.
+  `Unk14Obj`'s own header comment.
 - `Obj86B60.unk18`: newly typed `Unk18Obj *` (was unobserved padding).
   Constructed either from `arg1->unk10` or from this unit's own New_X
   allocator `New_Viewport` (queued later this round).
 - `Obj86B60.unk24`: new field, `s32`, set to `arg2`; also the gate for this
   function's second half.
-- `Unk18Obj`/`Unk18ObjMethods`, `SplitCoord2`/`SplitCoord2Methods`: new minimal
+- `Unk18Obj`/`Unk18ObjMethods`, `Unk14Obj`/`Unk14ObjMethods`: new minimal
   types, one dispatch slot (`slot10`) each, both OBSERVED only by this
   function.
 - `Obj86B60Methods`: added `slot10` (inherited BasicClass `addChild`),

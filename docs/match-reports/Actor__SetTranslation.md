@@ -38,7 +38,7 @@ None -- see `Actor__UpdateTranslation`'s report for the real work.
 `Actor__UpdateTranslation(self, 1, arg1)` -- the flag literal `1` selects
 `UpdateVec14`'s overwrite (`vec18 = *v`) branch, so "Set" is exactly what
 this wrapper causes to happen. `Vec14` names the field it writes
-(`self->vecTarget->vec18`, at `SplitCoord2O`'s `+0x018`, reached through
+(`self->vecTarget->vec18`, at `Unk14ObjO`'s `+0x018`, reached through
 `BaseObjO`'s own `+0x014` `vecTarget` pointer).
 
 ## Track 4 (2026-09-25, round 82, delta)

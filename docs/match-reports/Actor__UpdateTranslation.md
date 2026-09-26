@@ -11,15 +11,15 @@ into `self->unk14->vec18`, then clears `self->unk14->unk0`.
 ## Final source
 
 ```c
-typedef struct SplitCoord2O {
+typedef struct Unk14ObjO {
     s32 unk0;      /* +0x000 */
     u8 pad4[0x14];   /* +0x004 .. +0x017, unknown */
     Vec3O vec18;      /* +0x018 .. +0x023 */
-} SplitCoord2O;
+} Unk14ObjO;
 
 void Actor__UpdateTranslation(BaseObjO *self, s32 flag, Vec3O *v) {
     BaseObjO *t = self;
-    SplitCoord2O *u = t->unk14;
+    Unk14ObjO *u = t->unk14;
 
     if (flag) {
         u->vec18 = *v;
@@ -43,7 +43,7 @@ Two residues, both closed:
    words per iteration cycling temp registers" idiom. Writing
    `u->vec18[0]=v->x; u->vec18[1]=v->y; u->vec18[2]=v->z;` (per-field,
    `vec18` as an `s32[3]`) instead compiles to interleaved load/store
-   pairs -- wrong shape. Retyping `SplitCoord2O::vec18` from `s32[3]` to a
+   pairs -- wrong shape. Retyping `Unk14ObjO::vec18` from `s32[3]` to a
    plain `Vec3O` and writing `u->vec18 = *v;` reproduces the batched
    load-then-store shape directly (this project's compiler emits a
    genuine block-move for a whole-struct assignment). The accumulate
