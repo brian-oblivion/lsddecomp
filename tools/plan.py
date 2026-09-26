@@ -1138,6 +1138,19 @@ def jobs(d, n):
             if not done:
                 q6.append(("6", f"HEAD (premium) setup {k}: {TRACK6_SETUP[k]} (FINISHING-PLAN track 6)", P))
         if all(t["6"]["setup"].values()):
+            # A file defining a type the head FLAGGED goes first: a flag is a
+            # decision the patterns cannot rank, usually because other jobs'
+            # debt waits on it (round 92: EntityMoodHandlerArg is SoundCueSet,
+            # and six Entity_* polish passes read its unk fields).
+            def is_flagged(n):
+                return p2["_types"].get(n, ("",))[0].startswith("flagged:")
+            first = {f for f, names in p2["_homes"].items() if any(is_flagged(n) for n in names)}
+            for f in sorted(first):
+                names = p2["_homes"][f]
+                u = Path(f).stem if f.startswith("src/") else f
+                why = "; ".join(p2["_types"][n][0] for n in sorted(names) if is_flagged(n))
+                q6.append(("6", f"name {len(names)} placeholder type(s) defined in {f}: {', '.join(sorted(names))}"
+                                f" ({why}){sony_note(f)} (units: {u})", MODELS["types_runner"]))
             # A class whose own name is fine but whose TABLE is D_/ALLCAPS is one
             # rename.py each: batched into one mechanical job, not a runner per table.
             tables = [j for j in p2["_class_jobs"] if not j["ph_name"]]
@@ -1155,6 +1168,8 @@ def jobs(d, n):
                 q6.append(("6", f"name class {j['class']}{tab} (parent {j['parent'] or 'none'}, {j['methods']} own "
                                 f"methods, {j['header']}{extra}) (units: {j['header']})", MODELS["types_runner"]))
             for f, names in sorted(p2["_homes"].items(), key=lambda kv: (-len(kv[1]), kv[0])):
+                if f in first:
+                    continue
                 u = Path(f).stem if f.startswith("src/") else f
                 q6.append(("6", f"name {len(names)} placeholder type(s) defined in {f}: {', '.join(sorted(names))}"
                                 f"{sony_note(f)} (units: {u})", MODELS["types_runner"]))

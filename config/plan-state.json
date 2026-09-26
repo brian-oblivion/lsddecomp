@@ -2,7 +2,7 @@
   "models": {
     "match_runner": null,
     "naming_runner": "sonnet",
-    "polish_runner": "sonnet"
+    "polish_runner": "opus"
   },
   "stop_rule": {
     "attempts_per_model": 6,
@@ -1259,7 +1259,9 @@
       "checklist": {
         "sdk-headers": true
       },
-      "flagged": {},
+      "flagged": {
+        "EntityMoodHandlerArg": "it is SoundCueSet (Entity.h's own comment; code_179d8_e.c and code_179d8_l.c each define SoundCueSet locally): unify into one header, fields become slots[n].note/pitchOffset (2026-09-26)"
+      },
       "parked": {
         "S16Quad_d294": "IS Sony's SVECTOR by layout and use (echo, round 91, SceneNode__SceneNode.md); substitution blocked while SceneNode.h's includers re-declare Sony names (python3 tools/sonyheaders.py: 24 units broke with <libgs.h> in SceneNode.h). Unpark (--undo) when sonyheaders.py lists none of them, then use Sony's type. (2026-09-26)",
         "SceneNodeSub14": "IS Sony's GsCOORDINATE2 by layout and use (echo, round 91, SceneNode__SceneNode.md); substitution blocked while SceneNode.h's includers re-declare Sony names (python3 tools/sonyheaders.py: 24 units broke with <libgs.h> in SceneNode.h). Unpark (--undo) when sonyheaders.py lists none of them, then use Sony's type. (2026-09-26)",
