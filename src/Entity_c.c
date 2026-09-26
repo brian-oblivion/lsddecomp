@@ -7,23 +7,22 @@
  * heavily typed and these functions are the same class family -- extend that
  * header rather than starting a new one.
  *
- * Named, round 78: all 20 functions are `gEntityMoodHandlerTable`
- * mood-dispatch callbacks, `Entity__MoodCueNN` where NN is the table row
- * (`asm/data/79528.data.s`, base 0x80089EB0, stride 0x10; row = (slot
- * address - base) / 0x10) -- same family and naming convention as
- * Entity_b/_d/_e/_g. Row order does not track code address, so this unit's
- * rows (19-27, 29-38, plus 119) are not contiguous with each other or with
- * source order; `Entity__MoodCue119` sits far from its neighbours by address
- * alone, confirmed against the table rather than assumed from proximity
- * (Entity_d/round 76's lesson). `Entity__MoodCue30` additionally occupies
- * row 122 with the same handler and different data words -- one function
- * shared by two distinct mood-row configurations, named for its lower row
- * (same precedent as `Entity__MoodCue81`, Entity_e).
+ * All 20 functions are `gEntityMoodHandlerTable` mood-dispatch callbacks,
+ * `Entity__MoodCueNN` where NN is the table row (`asm/data/79528.data.s`,
+ * stride 0x10) -- same family and naming convention as Entity_b/_d/_e/_g.
+ * Row order does not track code address, so this unit's rows (19-27, 29-38,
+ * plus 119) are not contiguous with each other or with source order;
+ * `Entity__MoodCue119` sits far from its neighbours by address alone,
+ * confirmed against the table rather than assumed from proximity.
+ * `Entity__MoodCue30` additionally occupies row 122 with the same handler
+ * and different data words -- one function shared by two distinct mood-row
+ * configurations, named for its lower row (same precedent as
+ * `Entity__MoodCue81`, Entity_e).
  *
- * Fields and slots are the unified Entity's (include/Entity.h, track 4
- * round 88): the inherited ones carry TodActor's, Actor's and
- * SceneNode's names (`state`, `linkTarget`, `peer`, moveLocalZ/X/Y,
- * moveLocalZOrFindLink, ...), Entity's own are named for their occupants.
+ * Fields and slots are the unified Entity's (include/Entity.h): the
+ * inherited ones carry TodActor's, Actor's and SceneNode's names (`state`,
+ * `linkTarget`, `peer`, moveLocalZ/X/Y, moveLocalZOrFindLink, ...), Entity's
+ * own are named for their occupants.
  *
  * The literals are left unnamed where they are one handler's tuning: tick
  * counts, distances in world units, TOD frame numbers, VAB program numbers,
