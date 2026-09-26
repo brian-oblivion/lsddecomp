@@ -34,231 +34,224 @@
  */
 
 /*
- * WHAT THIS UNIT IS (round 61, track 3; revised round 85, track 4). Its 17
- * functions are the bottom two links of `Class6B5CC -> BoxFill ->
+ * WHAT THIS UNIT IS (round 61, track 3; revised rounds 85 and 87, track 4).
+ * Its 17 functions are the bottom two links of `Class6B5CC -> BoxFill ->
  * Class6E99C`: first Class6E99C's (D_8006E99C, 0x164, `New_Class6E99C` to
- * `GetClass6E99CMethods`, through this unit family's own Class6E99CObj view
- * in include/code_2cc8c.h), then BoxFill's allocator, ctor and Reset (0x64,
- * include/BoxFill.h, a GsBOXF screen rectangle; the rest of its methods open
- * code_2cc8c_f).
+ * `GetClass6E99CMethods`, include/Class6E99C.h), then BoxFill's allocator,
+ * ctor and Reset (0x64, include/BoxFill.h, a GsBOXF screen rectangle; the
+ * rest of its methods open code_2cc8c_f).
  *
- * `Class6E99C`'s own functions add a start/stop pair over an indexed and a
- * fixed color table (`Class6E99C__StartFadeDown`/
- * `Class6E99C__StartFadeUp`/`Class6E99C__Stop`), a per-tick
- * `step`-driven accumulator into BoxFill's r/g/b bytes gated by a countdown
- * (`Class6E99C__Update`), and a save/restore of BoxFill's position and size
- * (`Class6E99C__PushPosition`/`Class6E99C__PopPosition`): a colour fade over
- * the box (tier B). See each function's own `## Naming` section.
+ * Class6E99C fades the box's colour: configure picks the channels (a
+ * 4/2/1 = r/g/b mask) and a tick count, StartFadeDown/StartFadeUp set the
+ * start colour and the step's sign, Update steps the selected channels once
+ * per call until Stop, and PushPosition/PopPosition save and restore the
+ * box's size and position (tier B; include/Class6E99C.h's banner has the
+ * evidence). See each function's own `## Naming` section.
  */
 
-Class6E99CObj *New_Class6E99C(void *a1, s32 a2, s32 a3) {
-    Class6E99CObj *self;
+Class6E99C *New_Class6E99C(void *size, s32 channels, s32 pri) {
+    Class6E99C *self;
 
     self = BMemPMgrAlloc(0xA0);
     if (self != NULL) {
-        GetClass6E99CMethods()->ctor(self, a1, a2, a3);
+        GetClass6E99CMethods()->ctor(self, size, channels, pri);
         return self;
     }
     return NULL;
 }
 
-void Class6E99C__Class6E99C(Class6E99CObj *self, void *a1, s32 a2, s32 a3) {
+void Class6E99C__Class6E99C(Class6E99C *self, void *size, s32 channels, s32 pri) {
     BoxFillMethods *base;
-    void *tableEntry;
+    void *color;
 
     base = GetBoxFillMethods();
-    if (a2 != 0) {
-        tableEntry = &D_8006EA90[a2 * 3];
+    if (channels != 0) {
+        color = &D_8006EA90[channels * 3];
     } else {
-        tableEntry = D_8006EAA8;
+        color = D_8006EAA8;
     }
-    base->ctor((BoxFill *)self, a1, tableEntry, a3);
+    base->ctor((BoxFill *)self, size, color, pri);
     self->methods = GetClass6E99CMethods();
-    self->methods->finishConstruct(self, a2);
+    ((Class6E99CResetFn)self->methods->reset)(self, channels);
 }
 
-void Class6E99C__Reset(Class6E99CObj *self, s32 a1) {
-    self->unk70 = a1;
+void Class6E99C__Reset(Class6E99C *self, s32 channels) {
+    self->defaultChannels = channels;
     self->state = 0;
     self->step = 0xA;
-    self->unk78 = 0;
+    self->channels = 0;
     self->unk7C = 0;
-    self->methods->slot60(self, 0);
-    self->methods->slot64(self, 0);
+    self->methods->setDisplay(self, 0);
+    self->methods->setSemiTrans(self, 0);
     self->altMode = 0;
 }
 
-void Class6E99C__Update(Class6E99CObj *self, void *a1, s32 a2) {
+void Class6E99C__Update(Class6E99C *self, void *sender, s32 event) {
     s32 old;
 
-    if (a2 != 2) {
+    if (event != 2) {
         return;
     }
-    old = self->unk80;
-    self->unk80 = old - 1;
+    old = self->ticksLeft;
+    self->ticksLeft = old - 1;
     if (old > 0) {
         if (self->unk7C == 9) {
             return;
         }
-        if (self->unk78 & 4) {
-            self->unk64 += (u8)self->step;
+        if (self->channels & 4) {
+            self->color[0] += (u8)self->step;
         }
-        if (self->unk78 & 2) {
-            self->unk65 += (u8)self->step;
+        if (self->channels & 2) {
+            self->color[1] += (u8)self->step;
         }
-        if (self->unk78 & 1) {
-            self->unk66 += (u8)self->step;
+        if (self->channels & 1) {
+            self->color[2] += (u8)self->step;
         }
     } else {
-        self->methods->stop(self, a1);
+        self->methods->stop(self, sender);
     }
 }
 
-void Class6E99C__SetStep(Class6E99CObj *self, s32 a1) {
-    self->step = a1;
+void Class6E99C__SetStep(Class6E99C *self, s32 step) {
+    self->step = step;
 }
 
-/* `configure`'s occupant, Class6E99C__Configure, reads all four argument
- * registers, and both StartFade* functions forward their own a1..a3 to it
- * untouched (no argument register is set before that jalr). The shared
- * Class6E99CMethods slot is declared `(self)` only, so the call goes through
- * this file-local view instead of retyping the shared header. Spelling the
- * forward is load-bearing: the `(self)`-only call compiles to the same
+/* Both StartFade functions forward their own three arguments to configure
+ * untouched (no argument register is set before that jalr), and spelling
+ * the forward is load-bearing: a `(self)`-only call compiles to the same
  * instructions in a different order (29/35; round 73). */
-typedef s32 (*Configure6E99CFn)(Class6E99CObj *self, s32 a1, s32 a2, s32 a3);
-
-void Class6E99C__StartFadeDown(Class6E99CObj *self, s32 a1, s32 a2, s32 a3) {
+void Class6E99C__StartFadeDown(Class6E99C *self, BasicClass *source, s32 channels, s32 arg3) {
     s32 idx;
 
     if (self->state != 0) {
         return;
     }
-    idx = ((Configure6E99CFn)self->methods->configure)(self, a1, a2, a3);
-    self->methods->slotB8(self, 1, &D_8006EA90[idx * 3]);
+    idx = self->methods->configure(self, source, channels, arg3);
+    self->methods->setColor(self, 1, &D_8006EA90[idx * 3]);
     self->state = 1;
     self->step = -self->step;
 }
 
-void Class6E99C__StartFadeUp(Class6E99CObj *self, s32 a1, s32 a2, s32 a3) {
+void Class6E99C__StartFadeUp(Class6E99C *self, BasicClass *source, s32 channels, s32 arg3) {
     if (self->state != 0) {
         return;
     }
-    a2 = ((Configure6E99CFn)self->methods->configure)(self, a1, a2, a3);
+    channels = self->methods->configure(self, source, channels, arg3);
     if (self->altMode != 0) {
-        self->unk80--;
+        self->ticksLeft--;
     } else {
-        self->methods->slotB8(self, 1, &D_8006EAA8[a2 * 3]);
+        self->methods->setColor(self, 1, &D_8006EAA8[channels * 3]);
     }
     self->state = 2;
 }
 
-s32 Class6E99C__Configure(Class6E99CObj *self, s32 a1, s32 a2, s32 a3) {
+s32 Class6E99C__Configure(Class6E99C *self, BasicClass *source, s32 channels, s32 arg3) {
     Class6E99CMethods *methods;
-    s32 flag;
+    s32 rate;
     s32 q1, q2;
 
     methods = self->methods;
-    if (a2 < 0) {
-        a2 = self->unk70;
+    if (channels < 0) {
+        channels = self->defaultChannels;
     } else {
-        self->unk70 = a2;
+        self->defaultChannels = channels;
     }
-    flag = 1;
-    if (a2 != 0) {
-        self->unk78 = a2;
+    rate = 1;
+    if (channels != 0) {
+        self->channels = channels;
     } else {
-        flag = 2;
-        self->unk78 = 0xF;
+        rate = 2;
+        self->channels = 0xF;
     }
-    self->unk78 = a2;
-    if (a2 == 0) {
-        self->unk78 = 0xF;
+    self->channels = channels;
+    if (channels == 0) {
+        self->channels = 0xF;
     }
     q1 = 0x100 / self->step;
-    self->unk7C = a3;
-    self->unk80 = q1;
+    self->unk7C = arg3;
+    self->ticksLeft = q1;
     if (self->altMode != 0) {
         q2 = q1 / self->divisor;
-        self->unk80 = q1 - (s16)q2;
+        self->ticksLeft = q1 - (s16)q2;
     }
-    q2 = self->unk68;
-    q2 = q2 / self->unk80;
+    q2 = self->mask;
+    q2 = q2 / self->ticksLeft;
     self->unk84 = q2;
-    methods->slot10(self);
-    methods->slot64(self, 1);
-    methods->slot68(self, flag);
-    methods->slot60(self, 1);
-    return a2;
+    methods->addChild(self, source);
+    methods->setSemiTrans(self, 1);
+    methods->setSemiTransRate(self, rate);
+    methods->setDisplay(self, 1);
+    return channels;
 }
 
-void Class6E99C__Stop(Class6E99CObj *self, void *a1) {
+void Class6E99C__Stop(Class6E99C *self, BasicClass *source) {
     Class6E99CMethods *methods;
-    s32 mode;
+    s32 event;
 
     methods = self->methods;
     if (self->state == 0) {
         return;
     }
     if (self->state == 1) {
-        mode = 5;
+        event = 5;
         if (self->altMode == 0) {
-            methods->slot60(self, 0);
-            methods->slot64(self, 0);
+            methods->setDisplay(self, 0);
+            methods->setSemiTrans(self, 0);
         }
     } else {
-        mode = 6;
+        event = 6;
         if (self->altMode != 0) {
-            if (self->unk78 == 0xF) {
-                methods->slotB8(self, 1, D_8006EAA8);
+            if (self->channels == 0xF) {
+                methods->setColor(self, 1, D_8006EAA8);
             }
-            methods->slot64(self, 0);
+            methods->setSemiTrans(self, 0);
         }
     }
-    methods->slot14(self, a1);
+    methods->removeChild(self, source);
     if (self->step < 0) {
         self->step = -self->step;
     }
     self->state = 0;
-    methods->slot30(self, mode);
+    methods->notifyParents(self, event);
 }
 
-void *Class6E99C__GetColor(Class6E99CObj *self) {
-    if (self->unk78 == 0xF) {
+void *Class6E99C__GetColor(Class6E99C *self) {
+    if (self->channels == 0xF) {
         return D_8006EAA8;
     }
-    return &D_8006EA90[self->unk78 * 3];
+    return &D_8006EA90[self->channels * 3];
 }
 
 /* Both s32 pairs are copied as whole structs. GCC 2.6.3's MIPS
- * `movstrsi_internal` clobbers $v0/$v1/$a0/$a1, so `self` and `a1`, live
+ * `movstrsi_internal` clobbers $v0/$v1/$a0/$a1, so `self` and `size`, live
  * across the first copy, cannot stay in their incoming registers: that is
  * retail's entry `move $a3,$a0` / delay-slot `move $t0,$a1` (round 73). */
-void Class6E99C__PushPosition(Class6E99CObj *self, SkipShort2 *a1, Pair32E99C *a2) {
-    if (self->unkC != 0) {
-        self->unk88 = self->unk60;
-        self->unk8C = self->unk62;
-        *(Pair32E99C *)&self->unk90 = *(Pair32E99C *)&self->unk50;
-        self->unk60 = a1->x;
-        self->unk62 = a1->y;
-        *(Pair32E99C *)&self->unk50 = *a2;
+void Class6E99C__PushPosition(Class6E99C *self, SkipShort2 *size, Pair32E99C *pos) {
+    if (self->parent != 0) {
+        self->savedW = self->boxW;
+        self->savedH = self->boxH;
+        *(Pair32E99C *)&self->savedPosX = *(Pair32E99C *)&self->posX;
+        self->boxW = size->x;
+        self->boxH = size->y;
+        *(Pair32E99C *)&self->posX = *pos;
     }
 }
 
-void Class6E99C__PopPosition(Class6E99CObj *self) {
+void Class6E99C__PopPosition(Class6E99C *self) {
     s32 t0, t1;
 
-    t0 = self->unk90;
-    t1 = self->unk94;
-    self->unk50 = t0;
-    self->unk54 = t1;
+    t0 = self->savedPosX;
+    t1 = self->savedPosY;
+    self->posX = t0;
+    self->posY = t1;
     __asm__("" ::: "memory");
-    self->unk60 = self->unk88;
-    self->unk62 = self->unk8C;
+    self->boxW = self->savedW;
+    self->boxH = self->savedH;
 }
 
-void Class6E99C__SetDivisorMode(Class6E99CObj *self, s32 a1, s32 a2) {
-    self->altMode = a1;
-    self->divisor = a2;
+void Class6E99C__SetDivisorMode(Class6E99C *self, s32 altMode, s32 divisor) {
+    self->altMode = altMode;
+    self->divisor = divisor;
 }
 
 Class6E99CMethods *GetClass6E99CMethods(void) {
