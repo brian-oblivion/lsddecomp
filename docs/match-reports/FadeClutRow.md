@@ -11,7 +11,7 @@ drift. Fresh ground (carved revision 18, no prior report).
 
 Fade one 256-colour CLUT row toward the entry's colour. StoreImage reads the row (x 0, y (index << gTimBlockClutShift) + 0x1E0, 256 x 1) into a local buffer; then for each of mask - 1 steps, with f = (step + 1) << (12 - shift), every non-zero 15-bit colour is blended channel by channel ((c * (0x1000 - f) + colour * f) >> 15 on the <<3-scaled 5-bit channels, keeping the STP bit) into a second buffer, which LoadImage uploads to the next row down (dst.y = src.y + step + src.h), DrawSync between. Also copies the entry's mask to its +0x0A.
 
-Table slot (`tools/classtable.py`): not in any method table (called by TimBlockSrc__FadeEntry, D_8006F0B8 +0x080).
+Table slot (`tools/classtable.py`): not in any method table (called by TimBlockSrc__FadeEntry, gTimBlockSrcMethods +0x080).
 
 ## Source
 
@@ -109,4 +109,4 @@ Seventh build. Levers, each measured: (1) the colour held in a `u32 c` read ONCE
 
 ## Track 4 (2026-09-25, round 83, bravo)
 
-Takes `TimBlockSrcEntry *` (merged from the unit's Ent43068/Ent6F0B8 views); +0x0A is `clutH`, set to `mask` here, +0x0C `color`. The class (id 0xF03, table `D_8006F0B8`) is unified as `TimBlockSrc` in `include/TimBlockSrc.h`. Any source block above is the pre-unification spelling; the live body in `src/code_33808.c` takes the unified types, byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).
+Takes `TimBlockSrcEntry *` (merged from the unit's Ent43068/Ent6F0B8 views); +0x0A is `clutH`, set to `mask` here, +0x0C `color`. The class (id 0xF03, table `gTimBlockSrcMethods`) is unified as `TimBlockSrc` in `include/TimBlockSrc.h`. Any source block above is the pre-unification spelling; the live body in `src/code_33808.c` takes the unified types, byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).

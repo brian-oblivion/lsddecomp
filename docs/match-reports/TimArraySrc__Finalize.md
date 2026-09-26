@@ -20,7 +20,7 @@ The unit-local view `DataSrc33808` (a Class6D430 subclass built with the unified
 fields +0x2C..+0x38) and `CountedBuf33808` sit at the top of `src/code_33808.c`.
 
 ```c
-/* gTimArraySrcMethods +0x00C: finalize -- same shape as D_8006F0B8's. */
+/* gTimArraySrcMethods +0x00C: finalize -- same shape as gTimBlockSrcMethods's. */
 void TimArraySrc__Finalize(DataSrc33808 *self) {
     ReleaseBasicClassArray((BasicClass **)self->unk30, self->unk2C);
     BMemPMgrFree(self->unk30);

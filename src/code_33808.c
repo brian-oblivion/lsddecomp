@@ -11,7 +11,7 @@
  * reached through nine of D_8006D430's own `Get...Methods` getter slots
  * (from +0x07C):
  *
- *   - TimBlockSrc  (D_8006F0B8): a sector-header + block loader with four
+ *   - TimBlockSrc  (gTimBlockSrcMethods): a sector-header + block loader with four
  *     CLUT palette-fade channels (FadeClutRow).
  *   - LinkResource (gLinkResourceMethods): a NULL-ended array of TMD models
  *     (New_TmdModel), one per object of a loaded TMD (include/LinkResource.h,
@@ -85,7 +85,7 @@ typedef struct Ctor33808 {
     /* +0x008 */ s32 (*ctor)();
 } Ctor33808;
 
-/* Allocate and construct a D_8006F0B8 object. */
+/* Allocate and construct a gTimBlockSrcMethods object. */
 void *New_TimBlockSrc(s32 arg0) {
     void *obj = BMemPMgrAlloc(0x84);
 
@@ -96,7 +96,7 @@ void *New_TimBlockSrc(s32 arg0) {
     return NULL;
 }
 
-/* D_8006F0B8 +0x008: constructor -- the active driver's, then this table;
+/* gTimBlockSrcMethods +0x008: constructor -- the active driver's, then this table;
  * clear +0x2C..+0x3C and lay out the four channel entries at +0x40 (shift
  * gTimBlockClutShift, its mask, consecutive slots from 0x1E0); then adopt a 0x24-byte
  * header buffer (state 9 at +0x2A), allocate the 0x800-byte sector buffer
@@ -145,7 +145,7 @@ void TimBlockSrc__TimBlockSrc(TimBlockSrc *self, char *name) {
     }
 }
 
-/* D_8006F0B8 +0x00C: finalize -- release the object array at +0x30 (+0x2C
+/* gTimBlockSrcMethods +0x00C: finalize -- release the object array at +0x30 (+0x2C
  * entries), free it, then the active driver's. */
 void TimBlockSrc__Finalize(TimBlockSrc *self) {
     ReleaseBasicClassArray((BasicClass **)self->blocks, self->blockCount);
@@ -153,7 +153,7 @@ void TimBlockSrc__Finalize(TimBlockSrc *self) {
     GetActiveDataSourceMethods()->finalize((Class6D430 *)self);
 }
 
-/* D_8006F0B8 +0x064: the loader's state machine, under the data-source
+/* gTimBlockSrcMethods +0x064: the loader's state machine, under the data-source
  * lock. State 9 (header sector read): copy the 0x24-byte header (a count
  * and eight file offsets) out of the sector buffer into the buffer, free
  * the sector, allocate the object array (+0x30) and a sector buffer of the
@@ -251,7 +251,7 @@ u32 MaxOfBufferWords(Class6D430 *self) {
     return max;
 }
 
-/* D_8006F0B8 +0x078: set entry `index`'s shift, and its mask from it. */
+/* gTimBlockSrcMethods +0x078: set entry `index`'s shift, and its mask from it. */
 void TimBlockSrc__SetEntryShift(TimBlockSrc *self, s32 index, s32 shift) {
     TimBlockSrcEntry *e = &self->entries[index];
 
@@ -259,7 +259,7 @@ void TimBlockSrc__SetEntryShift(TimBlockSrc *self, s32 index, s32 shift) {
     e->mask = 1 << e->shift;
 }
 
-/* D_8006F0B8 +0x07C: slot +0x080 for entries 0..3, under the data-source
+/* gTimBlockSrcMethods +0x07C: slot +0x080 for entries 0..3, under the data-source
  * lock. */
 extern void LockActiveDataSource(void);
 extern void UnlockActiveDataSource(void);
@@ -274,7 +274,7 @@ void TimBlockSrc__FadeAllEntries(TimBlockSrc *self, TimBlockSrcColor *color) {
     UnlockActiveDataSource();
 }
 
-/* D_8006F0B8 +0x080: under the data-source lock, set entry `index`'s
+/* gTimBlockSrcMethods +0x080: under the data-source lock, set entry `index`'s
  * three-byte vector and hand the entry to FadeClutRow. */
 void TimBlockSrc__FadeEntry(TimBlockSrc *self, s32 index, TimBlockSrcColor *src) {
     TimBlockSrcEntry *e;
@@ -364,7 +364,7 @@ void FadeClutRow(TimBlockSrcEntry *e, s32 index) {
 }
 
 TimBlockSrcMethods *GetTimBlockSrcMethods(void) {
-    return &D_8006F0B8;
+    return &gTimBlockSrcMethods;
 }
 
 /* A data source's construction descriptor: an existing buffer to adopt, or
@@ -505,7 +505,7 @@ void TimArraySrc__TimArraySrc(TimArraySrc *self, char *name) {
     }
 }
 
-/* gTimArraySrcMethods +0x00C: finalize -- same shape as D_8006F0B8's. */
+/* gTimArraySrcMethods +0x00C: finalize -- same shape as gTimBlockSrcMethods's. */
 void TimArraySrc__Finalize(TimArraySrc *self) {
     ReleaseBasicClassArray((BasicClass **)self->images, self->count);
     BMemPMgrFree(self->images);

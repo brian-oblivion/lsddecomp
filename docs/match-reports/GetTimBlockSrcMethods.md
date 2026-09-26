@@ -9,17 +9,17 @@ deletions, no out-of-range drift. Fresh ground (carved revision 18, no prior rep
 
 ## What it does
 
-Table getter: returns the method table `D_8006F0B8` (`lui/addiu; jr; nop`), declared locally as `extern s32 D_8006F0B8[];`.
+Table getter: returns the method table `gTimBlockSrcMethods` (`lui/addiu; jr; nop`), declared locally as `extern s32 gTimBlockSrcMethods[];`.
 
 Table slot (`tools/classtable.py`): `D_8006D430` +0x090 (the Class6D430 `Get...Methods` getter list).
 
 ## Source
 
 ```c
-extern s32 D_8006F0B8[];
+extern s32 gTimBlockSrcMethods[];
 
 void *GetTimBlockSrcMethods(void) {
-    return D_8006F0B8;
+    return gTimBlockSrcMethods;
 }
 ```
 
@@ -35,4 +35,4 @@ void *GetTimBlockSrcMethods(void) {
 
 ## Track 4 (2026-09-25, round 83, bravo)
 
-Now `TimBlockSrcMethods *GetTimBlockSrcMethods(void) { return &D_8006F0B8; }` against `extern TimBlockSrcMethods D_8006F0B8;` in the header (was `void *` over `extern s32 D_8006F0B8[]`), byte-identical. The class (id 0xF03, table `D_8006F0B8`) is unified as `TimBlockSrc` in `include/TimBlockSrc.h`. Any source block above is the pre-unification spelling; the live body in `src/code_33808.c` takes the unified types, byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).
+Now `TimBlockSrcMethods *GetTimBlockSrcMethods(void) { return &gTimBlockSrcMethods; }` against `extern TimBlockSrcMethods gTimBlockSrcMethods;` in the header (was `void *` over `extern s32 gTimBlockSrcMethods[]`), byte-identical. The class (id 0xF03, table `gTimBlockSrcMethods`) is unified as `TimBlockSrc` in `include/TimBlockSrc.h`. Any source block above is the pre-unification spelling; the live body in `src/code_33808.c` takes the unified types, byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).

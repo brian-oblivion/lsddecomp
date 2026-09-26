@@ -9,9 +9,9 @@ drift. Fresh ground (carved revision 18, no prior report).
 
 ## What it does
 
-The D_8006F0B8 loader's state machine, run under Lock/UnlockActiveDataSource and only once the read has completed (flags bit 0x80). State 9 (header sector read by the ctor TimBlockSrc__TimBlockSrc): copy the 0x24-byte header -- a u32 block count and eight u32 file offsets -- from the sector buffer (+0x34) into the 0x24-byte buffer, free the sector buffer, take the largest offset (MaxOfBufferWords) as the new sector-buffer size, allocate the object array (+0x30, count words) and the sector buffer (+0x34, size at +0x38), seek (own +0x04C) to offset[0] and read (own +0x054) one block: state 10. State 10: wrap the block in a new gTimArraySrcMethods source (New_TimArraySrc(NULL)), buffer = the sector buffer, size 0, its +0x34 = &self->entries (+0x40, the CLUT base TimArraySrc__BuildImages adds to), run its setFlag (TimArraySrc__BuildImages, which builds the TimImages) and +0x078; count it at +0x2C, then seek/read the next block (state 10 again) or, after the last, free the sector buffer, clear +0x34/+0x38/+0x2A, set +0x3C and call the active driver's setFlag. Either allocation failing sets +0x80.
+The gTimBlockSrcMethods loader's state machine, run under Lock/UnlockActiveDataSource and only once the read has completed (flags bit 0x80). State 9 (header sector read by the ctor TimBlockSrc__TimBlockSrc): copy the 0x24-byte header -- a u32 block count and eight u32 file offsets -- from the sector buffer (+0x34) into the 0x24-byte buffer, free the sector buffer, take the largest offset (MaxOfBufferWords) as the new sector-buffer size, allocate the object array (+0x30, count words) and the sector buffer (+0x34, size at +0x38), seek (own +0x04C) to offset[0] and read (own +0x054) one block: state 10. State 10: wrap the block in a new gTimArraySrcMethods source (New_TimArraySrc(NULL)), buffer = the sector buffer, size 0, its +0x34 = &self->entries (+0x40, the CLUT base TimArraySrc__BuildImages adds to), run its setFlag (TimArraySrc__BuildImages, which builds the TimImages) and +0x078; count it at +0x2C, then seek/read the next block (state 10 again) or, after the last, free the sector buffer, clear +0x34/+0x38/+0x2A, set +0x3C and call the active driver's setFlag. Either allocation failing sets +0x80.
 
-Table slot (`tools/classtable.py`): D_8006F0B8 +0x064 (setFlag override).
+Table slot (`tools/classtable.py`): gTimBlockSrcMethods +0x064 (setFlag override).
 
 ## Source
 
@@ -21,7 +21,7 @@ fields +0x2C..+0x38), `Ctor33808`, `CountedBuf33808` and `Req44858` sit at the
 top of / earlier in `src/code_33808.c`.
 
 ```c
-/* D_8006F0B8 +0x064: the loader's state machine, under the data-source
+/* gTimBlockSrcMethods +0x064: the loader's state machine, under the data-source
  * lock. State 9 (header sector read): copy the 0x24-byte header (a count
  * and eight file offsets) out of the sector buffer into the buffer, free
  * the sector, allocate the object array (+0x30) and a sector buffer of the
@@ -111,7 +111,7 @@ Second build (the first was already 183/183; the second only added local Lock/Un
 
 ## Track 4 (2026-09-25, round 83, bravo)
 
-Occupant of Class6D430's `setFlag` slot (+0x064); keeps its name because the body is the whole loader state machine, not a flag set. Correction to the prose above: the 0x24-byte header is a count, four file offsets (+0x04) and four sizes (+0x14, what MaxOfBufferWords maximises), not eight offsets. The class (id 0xF03, table `D_8006F0B8`) is unified as `TimBlockSrc` in `include/TimBlockSrc.h`. Any source block above is the pre-unification spelling; the live body in `src/code_33808.c` takes the unified types, byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).
+Occupant of Class6D430's `setFlag` slot (+0x064); keeps its name because the body is the whole loader state machine, not a flag set. Correction to the prose above: the 0x24-byte header is a count, four file offsets (+0x04) and four sizes (+0x14, what MaxOfBufferWords maximises), not eight offsets. The class (id 0xF03, table `gTimBlockSrcMethods`) is unified as `TimBlockSrc` in `include/TimBlockSrc.h`. Any source block above is the pre-unification spelling; the live body in `src/code_33808.c` takes the unified types, byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).
 
 
 ## Track 4 (2026-09-26, round 88, runner alpha)

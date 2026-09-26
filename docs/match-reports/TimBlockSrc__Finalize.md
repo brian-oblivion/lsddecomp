@@ -11,7 +11,7 @@ drift. Fresh ground (carved revision 18, no prior report).
 
 Releases the BasicClass array at +0x30 (+0x2C entries), frees that allocation, then calls the active data-source driver's finalize.
 
-Table slot (`tools/classtable.py`): D_8006F0B8 +0x00C (finalize).
+Table slot (`tools/classtable.py`): gTimBlockSrcMethods +0x00C (finalize).
 
 ## Source
 
@@ -20,7 +20,7 @@ The unit-local view `DataSrc33808` (a Class6D430 subclass built with the unified
 fields +0x2C..+0x38) and `CountedBuf33808` sit at the top of `src/code_33808.c`.
 
 ```c
-/* D_8006F0B8 +0x00C: finalize -- release the object array at +0x30 (+0x2C
+/* gTimBlockSrcMethods +0x00C: finalize -- release the object array at +0x30 (+0x2C
  * entries), free it, then the active driver's. */
 void TimBlockSrc__Finalize(DataSrc33808 *self) {
     ReleaseBasicClassArray((BasicClass **)self->unk30, self->unk2C);
@@ -43,4 +43,4 @@ void TimBlockSrc__Finalize(DataSrc33808 *self) {
 
 ## Track 4 (2026-09-25, round 83, bravo)
 
-Occupant of +0x00C: releases `blocks` (`blockCount` entries), frees it, then the active driver's finalize. The class (id 0xF03, table `D_8006F0B8`) is unified as `TimBlockSrc` in `include/TimBlockSrc.h`. Any source block above is the pre-unification spelling; the live body in `src/code_33808.c` takes the unified types, byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).
+Occupant of +0x00C: releases `blocks` (`blockCount` entries), frees it, then the active driver's finalize. The class (id 0xF03, table `gTimBlockSrcMethods`) is unified as `TimBlockSrc` in `include/TimBlockSrc.h`. Any source block above is the pre-unification spelling; the live body in `src/code_33808.c` takes the unified types, byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).

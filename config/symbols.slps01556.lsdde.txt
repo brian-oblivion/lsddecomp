@@ -2882,3 +2882,4 @@ gBgLayerMethods = 0x8006F2C4;
 gTileMapMethods = 0x8006F498;
 gTileAtlasMethods = 0x8006F514;
 gTimArraySrcMethods = 0x8006F1C4;
+gTimBlockSrcMethods = 0x8006F0B8;
