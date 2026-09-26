@@ -20,7 +20,7 @@
 #include "VabStreamObj.h"
 #include "Class6EED8.h"
 
-/* Local view of D_8006E48C's objects: a background-music SEQ player. Fields
+/* Local view of gWBgmMethods's objects: a background-music SEQ player. Fields
  * named from the libsnd calls they feed. */
 typedef struct WBgm WBgm;
 typedef struct WBgmMethods WBgmMethods;
@@ -68,7 +68,7 @@ WBgmMethods *Get_vtable_WBgm(void);
 extern s32 func_8002CC28(void);
 s32 WBgm__HandleMonitorEvent(WBgm *self);
 
-extern WBgmMethods D_8006E48C;
+extern WBgmMethods gWBgmMethods;
 extern s32 gWBgmActive;
 extern u8 gSsSizeTableBuf[];
 
@@ -219,7 +219,7 @@ void WBgm__SetVab(WBgm *self, s32 arg) {
     }
 }
 WBgmMethods *Get_vtable_WBgm(void) {
-    return &D_8006E48C;
+    return &gWBgmMethods;
 }
 s32 IsWBgmActive(void) {
     return gWBgmActive;

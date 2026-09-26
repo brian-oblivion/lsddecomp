@@ -5,7 +5,7 @@
 Round 81, runner delta. Unit `src/code_2a0e0.c` (carved from `psyq_2a0e0` in
 FINISHING-PLAN revision 18). Fresh ground, no prior attempt.
 
-- **Where:** D_8006E48C slot +0x05C (setSeq) (slots resolved with `tools/classtable.py D_8006E48C`).
+- **Where:** gWBgmMethods slot +0x05C (setSeq) (slots resolved with `tools/classtable.py gWBgmMethods`).
 - **What:** set the SEQ data: stop if playing, release and clear +0x10, and if the argument is non-zero load `New_Class6EED8(arg)` into +0x10 and try-open; on success play if auto-play (+0x20), on failure mark `openState = 1` if it was 0.
 - **Result:** byte-exact on the first build. `funcdiff.py` reports 58/58
   words, 0 insertions / 0 deletions, and the whole-image SHA1 is green
@@ -55,7 +55,7 @@ The unit-local view it needs, from the top of `src/code_2a0e0.c`:
 ```c
 #include "BasicClass.h"
 
-/* Local view of D_8006E48C's objects: a SEQ player. Fields named from the
+/* Local view of gWBgmMethods's objects: a SEQ player. Fields named from the
  * libsnd calls they feed. */
 typedef struct WBgm WBgm;
 typedef struct WBgmMethods WBgmMethods;
@@ -124,7 +124,7 @@ WBgmMethods *Get_vtable_WBgm(void);
 extern s32 func_8002CC28(void);
 s32 WBgm__HandleMonitorEvent(WBgm *self);
 
-extern WBgmMethods D_8006E48C;
+extern WBgmMethods gWBgmMethods;
 extern s32 gWBgmActive;
 extern u8 gSsSizeTableBuf[];
 ```

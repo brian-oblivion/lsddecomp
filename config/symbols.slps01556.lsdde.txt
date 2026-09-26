@@ -2866,3 +2866,4 @@ Class869D8__InitDefaults = 0x8004D2F8; // type:func
 gClass6EED8Methods = 0x8006EED8;
 gClass81940Methods = 0x80081940;
 Class86AA0__Reset = 0x8004D42C; // type:func
+gWBgmMethods = 0x8006E48C;

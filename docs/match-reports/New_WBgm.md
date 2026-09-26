@@ -5,7 +5,7 @@
 Round 81, runner delta. Unit `src/code_2a0e0.c` (carved from `psyq_2a0e0` in
 FINISHING-PLAN revision 18). Fresh ground, no prior attempt.
 
-- **Where:** D_8006E48C slot none (not in the table); allocator (slots resolved with `tools/classtable.py D_8006E48C`).
+- **Where:** gWBgmMethods slot none (not in the table); allocator (slots resolved with `tools/classtable.py gWBgmMethods`).
 - **What:** `New_` wrapper: `BMemPMgrAlloc(0x24)`, then the ctor through `Get_vtable_WBgm()->ctor` (slot +0x008) with the three arguments, `return self` / `return NULL`.
 - **Result:** byte-exact on the first build. `funcdiff.py` reports 31/31
   words, 0 insertions / 0 deletions, and the whole-image SHA1 is green
@@ -46,7 +46,7 @@ The unit-local view it needs, from the top of `src/code_2a0e0.c`:
 ```c
 #include "BasicClass.h"
 
-/* Local view of D_8006E48C's objects: a SEQ player. Fields named from the
+/* Local view of gWBgmMethods's objects: a SEQ player. Fields named from the
  * libsnd calls they feed. */
 typedef struct WBgm WBgm;
 typedef struct WBgmMethods WBgmMethods;
@@ -115,7 +115,7 @@ WBgmMethods *Get_vtable_WBgm(void);
 extern s32 func_8002CC28(void);
 s32 WBgm__HandleMonitorEvent(WBgm *self);
 
-extern WBgmMethods D_8006E48C;
+extern WBgmMethods gWBgmMethods;
 extern s32 gWBgmActive;
 extern u8 gSsSizeTableBuf[];
 ```

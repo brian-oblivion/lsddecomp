@@ -5,7 +5,7 @@
 Round 81, runner delta. Unit `src/code_2a0e0.c` (carved from `psyq_2a0e0` in
 FINISHING-PLAN revision 18). Fresh ground, no prior attempt.
 
-- **Where:** D_8006E48C slot none (called from +0x040, +0x05C, +0x060) (slots resolved with `tools/classtable.py D_8006E48C`).
+- **Where:** gWBgmMethods slot none (called from +0x040, +0x05C, +0x060) (slots resolved with `tools/classtable.py gWBgmMethods`).
 - **What:** try-open: needs the +0x0C VAB object (+0x58 u16 ready, +0x54 s16 vab id) and the +0x10 SEQ data object (+0x2C loaded flag, +0x10 data address); `SsSeqOpen`, prints rodata `D_80010FEC` ("Seq Open error in WBgmHandleMonitorEvent") on -1, sets volume 0x34/0x34, `openState = 2`, returns 1; every failed guard returns 0.
 - **Result:** byte-exact on the first build. `funcdiff.py` reports 46/46
   words, 0 insertions / 0 deletions, and the whole-image SHA1 is green
@@ -31,7 +31,7 @@ still matches after the change.
 ```c
 s32 WBgm__HandleMonitorEvent(WBgm *self);
 
-extern WBgmMethods D_8006E48C;
+extern WBgmMethods gWBgmMethods;
 extern s32 gWBgmActive;
 extern u8 gSsSizeTableBuf[];
 
@@ -52,7 +52,7 @@ The unit-local view it needs, from the top of `src/code_2a0e0.c`:
 ```c
 #include "BasicClass.h"
 
-/* Local view of D_8006E48C's objects: a SEQ player. Fields named from the
+/* Local view of gWBgmMethods's objects: a SEQ player. Fields named from the
  * libsnd calls they feed. */
 typedef struct WBgm WBgm;
 typedef struct WBgmMethods WBgmMethods;
@@ -121,7 +121,7 @@ WBgmMethods *Get_vtable_WBgm(void);
 extern s32 func_8002CC28(void);
 s32 WBgm__HandleMonitorEvent(WBgm *self);
 
-extern WBgmMethods D_8006E48C;
+extern WBgmMethods gWBgmMethods;
 extern s32 gWBgmActive;
 extern u8 gSsSizeTableBuf[];
 ```
