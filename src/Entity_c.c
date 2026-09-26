@@ -30,7 +30,7 @@
 #include "DreamSys.h"
 
 extern u8 ROTATION_XPLUS_EIGHTH[];
-extern u8 D_80089E74[];
+extern u8 SCALE_TRIPLE[];
 extern LongVec3 TRANSLATE_Y_MINUS1500_Z_PLUS1024[];
 extern LongVec3 TRANSLATE_X_MINUS64[];
 extern LongVec3 TRANSLATE_Y_MINUS4096[];
@@ -191,7 +191,7 @@ void Entity__MoodCue119(Entity *this) {
 void Entity__MoodCue29(Entity *this) {
     if (this->moodTimer == 0) {
         if (((DreamSys *)this->peer)->methods->getDreamColor((DreamSys *)this->peer) == 7) {
-            this->methods->updateScale(this, 1, D_80089E74);
+            this->methods->updateScale(this, 1, SCALE_TRIPLE);
             this->methods->moveLocalY(this, -0x7800, 0);
         }
         this->state = rand() % 5;
