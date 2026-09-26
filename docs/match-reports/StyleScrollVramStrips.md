@@ -1,4 +1,6 @@
-# DrawStyleTables -- MATCHED, round 46 (2026-09-15)
+# StyleScrollVramStrips -- MATCHED, round 46 (2026-09-15)
+
+> Renamed from `DrawStyleTables` on 2026-09-26 (tools/rename.py). Address 0x80055a24.
 
 > Renamed from `func_80055A24` on 2026-09-23 (tools/rename.py). Address 0x80055a24.
 
@@ -55,7 +57,7 @@ extern s32 gStyleStripScratchA[];
 extern s32 gStyleStripRectB[];
 extern s32 gStyleStripScratchB[];
 
-void DrawStyleTables(void) {
+void StyleScrollVramStrips(void) {
     void *a0, *a2;
     s32 a1;
 
@@ -99,7 +101,7 @@ call.
 
 ## Naming
 
-**`DrawStyleTables`, tier B.**
+**`StyleScrollVramStrips`, tier B.**
 
 Selects one of two 12-byte-tuple table pairs by `gStyleStage` (`== 2`, or
 `3..5`) and forwards them to `func_8003B624`, a not-yet-carved routine this

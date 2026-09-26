@@ -191,7 +191,7 @@ s32 TickStyle(void *arg0, void *arg1, s32 arg2) {
     }
     StyleUpdateDecorSet();
     StyleUpdateEffectSlots(ctx);
-    DrawStyleTables();
+    StyleScrollVramStrips();
     gStyleCueRecordIndex = 0;
     for (i = 0; i < 2; i++) {
         if (gStyleCueSlots[i] != 0) {
@@ -214,7 +214,7 @@ above; `extern s32 gStyleGrid;`, `extern s32 gStyleTickCount;`,
 `extern void StyleBuildDecorSet(void);`/`extern void StyleUpdateDecorSet(void);`
 (forward, own unit, still cold), `void StyleBuildEffectSlots(void *arg0);` (matched
 earlier this unit, this round), `void StyleUpdateEffectSlots(void *arg0);` (matched,
-this unit), `extern void DrawStyleTables(void);` (forward, matched, this
+this unit), `extern void StyleScrollVramStrips(void);` (forward, matched, this
 unit, defined later), `extern s32 gStyleCueRecordIndex;`, `extern u8 gStyleCueSlotPool[];`,
 `extern ObjN14 *TryStartStyleCue(ObjN14 *arg0, s32 *arg1, void *arg2, void
 *arg3);`, `extern s32 StopStyleCueIfNear(ObjN14 *arg0, void *arg1, void
@@ -251,7 +251,7 @@ residue); reverted to the best body and restored `INCLUDE_ASM`.
 The per-frame orchestrator: on the FIRST call (`gStyleTickCount++ == 0`)
 runs `ApplyStyleDecorationIfSet`/`StyleBuildDecorSet`/`StyleBuildEffectSlots`
 (one-time setup), then every call runs `StyleUpdateDecorSet`/
-`StyleUpdateEffectSlots`/`DrawStyleTables` and the two `gStyleCueSlots`
+`StyleUpdateEffectSlots`/`StyleScrollVramStrips` and the two `gStyleCueSlots`
 flush-or-start steps. Called from `src/class_3bb8c_l.c`'s `ObjM__TickStyle`
 (the call this unit had already forward-declared as its own entry point),
 which is a genuine per-tick call site -- the evidence for "Tick" over a

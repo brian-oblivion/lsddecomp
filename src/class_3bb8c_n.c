@@ -801,7 +801,7 @@ s32 IsStyleCueNear(StyleCueSlot *arg0, void *arg1) {
 
 extern void StyleBuildDecorSet(void);
 extern void StyleUpdateDecorSet(void);
-extern void DrawStyleTables(void);
+extern void StyleScrollVramStrips(void);
 extern s32 gStyleTickCount;
 extern s32 gStyleCueRecordIndex;
 extern u8 gStyleCueSlotPool[];
@@ -825,7 +825,7 @@ s32 TickStyle(void *arg0, void *arg1, s32 arg2) {
     }
     StyleUpdateDecorSet();
     StyleUpdateEffectSlots(ctx);
-    DrawStyleTables();
+    StyleScrollVramStrips();
     gStyleCueRecordIndex = 0;
     for (i = 0; i < 2; i++) {
         if (gStyleCueSlots[i] != 0) {
@@ -858,7 +858,7 @@ extern s32 gStyleStripScratchA[];
 extern s32 gStyleStripRectB[];
 extern s32 gStyleStripScratchB[];
 
-void DrawStyleTables(void) {
+void StyleScrollVramStrips(void) {
     void *a0, *a2;
     s32 a1;
 

@@ -21,7 +21,7 @@
  * Also holds `func_8003B624`, not a TimImage method (`classtable.py
  * D_8006E558` lists it nowhere): a free function that circularly scrolls a
  * VRAM rectangle right by one column at a time through the draw singleton's
- * `moveImage` slot, called from `class_3bb8c_n.c`'s `DrawStyleTables`.
+ * `moveImage` slot, called from `class_3bb8c_n.c`'s `StyleScrollVramStrips`.
  *
  * Fully matched in round 81 (runner echo). Naming pass round 81 (runner
  * bravo): every function and the class table named; see each function's

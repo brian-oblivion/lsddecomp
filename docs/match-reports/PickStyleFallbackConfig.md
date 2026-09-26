@@ -18,7 +18,7 @@ fresh copy (same reasoning as `StyleUpdateEffectSlots`/`TryStartStyleCue`/
 
 ```c
 extern s32 gStyleDay;         /* already s32 in class_3bb8c_m.c */
-extern s32 gStyleStage;         /* already s32 in class_3bb8c_m.c and this unit's own DrawStyleTables */
+extern s32 gStyleStage;         /* already s32 in class_3bb8c_m.c and this unit's own StyleScrollVramStrips */
 extern s8 gStyleVariantPicks[];        /* 16-entry table, indexed by (gStyleDay+gStyleStage)&0xF */
 extern s32 gStyleVariant;
 extern s8 gStyleVariantConfigCounts[];        /* divisor table, indexed by "kind" -- raw index, no scale */
