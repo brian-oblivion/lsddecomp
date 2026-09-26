@@ -27,7 +27,7 @@
  * parameter list from the slot they fill, so the slot keeps the inherited
  * type and the caller casts (FINISHING-PLAN track 4 step 6):
  *   +0x040 setScreenDims <- GameApplication__SeedRandom (self only);
- *          the ctor calls it through GameApplicationSetDayFn.
+ *          the ctor calls it through GameApplicationSeedRandomFn.
  *   +0x044 initSystems   <- GameApplication__InitSystems (no 4th argument);
  *          main calls it through GameApplicationInitSystemsFn.
  *
@@ -67,7 +67,7 @@ struct GameApplication {
 };
 
 /* The two overrides whose parameter lists differ from their slots'. */
-typedef void (*GameApplicationSetDayFn)(GameApplication *self);
+typedef void (*GameApplicationSeedRandomFn)(GameApplication *self);
 typedef void (*GameApplicationInitSystemsFn)(GameApplication *self, DrawSystem *drawSystem, struct Pad *pad);
 
 extern GameApplicationMethods gGameApplicationMethods;

@@ -118,7 +118,7 @@ void GameApplication__GameApplication(GameApplication *self, GameApplicationCtor
     self->dreamSys = New_DreamSys(New_LinkResource((struct Src6F240 *)&req), 0, 0);
     self->skipGraphRoomPoll = 0;
     self->dreamSys->methods->slot228(self->dreamSys, arg->unk14);
-    ((GameApplicationSetDayFn)self->methods->setScreenDims)(self);
+    ((GameApplicationSeedRandomFn)self->methods->setScreenDims)(self);
 }
 
 extern void SeedAndRandom(s32 day, s32 unused);
