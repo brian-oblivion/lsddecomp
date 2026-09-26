@@ -1,4 +1,6 @@
-# StageMap__ForEachElem — MATCHED (36/36 words)
+# StageMap__ForEachSlot — MATCHED (36/36 words)
+
+> Renamed from `StageMap__ForEachElem` on 2026-09-26 (tools/rename.py). Address 0x8004d140.
 
 > Renamed from `Class866E8__ForEachElem` on 2026-09-26 (tools/rename.py). Address 0x8004d140.
 
@@ -18,7 +20,7 @@ repeated `self->arr[i]` field access.
 ## Final C
 
 ```c
-void StageMap__ForEachElem(Obj866E8 *self, void (*arg1)(Obj866E8 *self, EntryChildObj *item), void (*arg2)(Obj866E8 *self, Elem *item)) {
+void StageMap__ForEachSlot(Obj866E8 *self, void (*arg1)(Obj866E8 *self, EntryChildObj *item), void (*arg2)(Obj866E8 *self, Elem *item)) {
     s32 i;
     Elem *e;
 

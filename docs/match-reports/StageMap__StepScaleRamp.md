@@ -22,7 +22,7 @@ blez  $v0, .skip
  nop
 lui   $a1, %hi(StageMap__AddScaleStepToCell)
 addiu $a1, $a1, %lo(StageMap__AddScaleStepToCell)
-jal   StageMap__ForEachElem
+jal   StageMap__ForEachSlot
  move $a2, $zero
 lw    $v0, 0x1E0($s0)         ; reload
 addiu $v0, $v0, -1
@@ -45,7 +45,7 @@ new value unconditionally, and the branch-not-taken path (decrement hit
 ```c
 void StageMap__StepScaleRamp(Obj866E8 *self) {
     if (self->unk1E0 > 0) {
-        StageMap__ForEachElem(self, StageMap__AddScaleStepToCell, 0);
+        StageMap__ForEachSlot(self, StageMap__AddScaleStepToCell, 0);
         self->unk1E0 -= 1;
         if (self->unk1E0 == 0) {
             self->unk1E0 = -1;

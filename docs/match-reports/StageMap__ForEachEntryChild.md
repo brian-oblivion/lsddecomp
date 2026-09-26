@@ -11,7 +11,7 @@ Walks `item->unk10[]` (an array of `EntryChildObj *`, `0x668` bytes /
 `0x19A` elements from the base pointer read at `item->unk10`), calling
 `callback(self, element)` for each. Prototype came from a previous round
 (traced through `StageMap__AddScaleStepToCell`/`StageMap__ResetCellScale` two hops via
-`StageMap__ForEachElem`); this round supplied the body.
+`StageMap__ForEachSlot`); this round supplied the body.
 
 ## RESOLUTION — mention the field twice, bound first
 
@@ -126,5 +126,5 @@ incoming arguments vs. `self`-relative loads).
 
 **Tier A.** Not a vtable slot -- walks one `Elem`'s `unk10[]`
 `EntryChildObj*` array (`0x668` bytes from the base) invoking a callback
-per entry. Same reasoning as `StageMap__ForEachElem`: a generic iterator
+per entry. Same reasoning as `StageMap__ForEachSlot`: a generic iterator
 whose name is its mechanics.

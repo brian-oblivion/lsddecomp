@@ -7,7 +7,7 @@
 > Renamed from `func_8004D108` on 2026-09-24 (tools/rename.py). Address 0x8004d108.
 
 Sibling of `StageMap__AddScaleStepToCell` (see that report for how the true call chain —
-`StageMap__ForEachElem` forwards to `StageMap__ForEachEntryChild`, which does the actual
+`StageMap__ForEachSlot` forwards to `StageMap__ForEachEntryChild`, which does the actual
 `jalr` — was resolved). Same `Unk10ChildMethods_3bb8c_b::slot48` slot,
 different literal arguments.
 
@@ -32,7 +32,7 @@ function genuinely ignores its own `self` argument, unlike its sibling
 `StageMap__AddScaleStepToCell` which uses it (`self->unk1E4`). Confirmed real, not a
 missing-parameter bug, by cross-checking the only caller
 (`StageMap__EndScaleRamp`, which passes this function's address to
-`StageMap__ForEachElem` exactly like `StageMap__StepScaleRamp` passes `StageMap__AddScaleStepToCell`'s —
+`StageMap__ForEachSlot` exactly like `StageMap__StepScaleRamp` passes `StageMap__AddScaleStepToCell`'s —
 same call shape, same two-parameter signature required by the eventual
 `StageMap__ForEachEntryChild` dispatcher).
 

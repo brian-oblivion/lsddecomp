@@ -91,7 +91,7 @@ void StageMap__SetFootprintCellFlag(Obj866E8 *self, s32 setBit) {
    image shifted). Two separate residues, addressed one at a time below.
 2. Switched from array indexing to an explicit incrementing pointer
    (`slot = self->slots8C; for (...; ...; slot++)`), matching how
-   `StageMap__ForEachElem`'s `&self->arr[i]` idiom generalizes to "increment a
+   `StageMap__ForEachSlot`'s `&self->arr[i]` idiom generalizes to "increment a
    pointer" rather than "recompute `base + i*stride`" when the loop is
    this register-heavy — fixed most of the size gap (14 words -> 1 word).
 3. Replaced the cached `obj` local with direct `(*cell)->...` dereferences

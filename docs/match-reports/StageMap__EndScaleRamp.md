@@ -23,7 +23,7 @@ beqz  $v0, .skip
  nop
 lui   $a1, %hi(StageMap__ResetCellScale)
 addiu $a1, $a1, %lo(StageMap__ResetCellScale)
-jal   StageMap__ForEachElem
+jal   StageMap__ForEachSlot
  move $a2, $zero
 sw    $zero, 0x1E0($s0)    ; self->unk1E0 = 0 (unconditional on this path)
 .skip:
@@ -35,26 +35,26 @@ sw    $zero, 0x1E0($s0)    ; self->unk1E0 = 0 (unconditional on this path)
 ```c
 void StageMap__EndScaleRamp(Obj866E8 *self) {
     if (self->unk1E0 != 0) {
-        StageMap__ForEachElem(self, StageMap__ResetCellScale, 0);
+        StageMap__ForEachSlot(self, StageMap__ResetCellScale, 0);
         self->unk1E0 = 0;
     }
 }
 ```
 
-`StageMap__ForEachElem` is still `INCLUDE_ASM` in this unit; forward-declared per
+`StageMap__ForEachSlot` is still `INCLUDE_ASM` in this unit; forward-declared per
 the established "calling into a still-INCLUDE_ASM function is fine"
 convention. Its own signature was derived from THIS call site plus
 `StageMap__StepScaleRamp`'s (own report): `(Obj866E8 *self, void
 (*itemCallback)(Obj866E8*, Unk10ChildObj_3bb8c_b*), void
 (*perArrCallback)(Obj866E8*, Elem*))` — both known callers pass 0 for the
-third argument, so its true type is inferred from `StageMap__ForEachElem`'s own
+third argument, so its true type is inferred from `StageMap__ForEachSlot`'s own
 body (still unmatched) rather than confirmed live.
 
 ## New struct/global knowledge
 
 - `Obj866E8::unk1E0` (`s32`, +0x1E0) — a gate/countdown value, also used
   by the sibling `StageMap__StepScaleRamp` (own report).
-- `extern void StageMap__ForEachElem(...)` added (still raw asm in this unit).
+- `extern void StageMap__ForEachSlot(...)` added (still raw asm in this unit).
 
 ## Attempts
 
