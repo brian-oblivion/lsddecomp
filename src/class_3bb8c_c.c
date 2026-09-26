@@ -58,7 +58,7 @@ void NodeGuardedViewport__NoOpSlotB8(void) {}
 
 void NodeGuardedViewport__NoOpSlotBC(void) {}
 
-void func_8004D36C(void) {}
+void NodeGuardedViewport__NoOpSlotC0(void) {}
 
 void func_8004D374(void) {}
 

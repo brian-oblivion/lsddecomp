@@ -1,4 +1,6 @@
-# func_8004D36C
+# NodeGuardedViewport__NoOpSlotC0
+
+> Renamed from `func_8004D36C` on 2026-09-26 (tools/rename.py). Address 0x8004d36c.
 
 **Unit:** class_3bb8c_c · **Size:** 2 words · **Status:** MATCHED (2/2)
 
@@ -10,7 +12,7 @@ body (`jr $ra; nop`) -- no logic, no arguments read, nothing to derive.
 ## The C
 
 ```c
-void func_8004D36C(void) {}
+void NodeGuardedViewport__NoOpSlotC0(void) {}
 ```
 
 ## Notes
@@ -21,7 +23,7 @@ report per function, matched ones included.
 
 ## Naming
 
-**func_8004D36C** -- tier C, kept deliberately. This project's established
+**NodeGuardedViewport__NoOpSlotC0** -- tier C, kept deliberately. This project's established
 precedent for a genuinely empty, no-established-purpose vtable stub is to
 keep the bare `func_` name even when the occupying class IS known
 (`func_8004B324` in `src/class_3ac78.c`, `SceneNode__NoOpSlot5C` in
