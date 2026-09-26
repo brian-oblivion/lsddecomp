@@ -109,7 +109,7 @@ tier B rather than A.
 Renamed `VabStreamObj__Update` -> `VabStreamObj__AdvanceLoadState` with
 `rename.py`. The slot is +0x064, Class6D430's `setFlag`. It is not a
 per-frame poll. The CD driver calls `self->methods->setFlag(self)` when a
-request completes (`src/code_179d8_s.c`: `Class6D4E8__LoadFile` and the
+request completes (`src/code_179d8_s.c`: `CdDriver__LoadFile` and the
 request-queue completion, each right after it ORs a `CD_FLAG_*_DONE` bit
 into `flags`). The 0x200 this body tests is `CD_FLAG_LOAD_FILE_DONE`. So the
 state machine moves forward once per completed file load. First the `.VH`

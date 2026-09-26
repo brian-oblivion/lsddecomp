@@ -1,4 +1,6 @@
-# Class6D4E8__RunRequestQueue -- MATCHED (round 67, bravo): length exact (0x25C/151 words), 151/151 words match, no diff
+# CdDriver__RunRequestQueue -- MATCHED (round 67, bravo): length exact (0x25C/151 words), 151/151 words match, no diff
+
+> Renamed from `Class6D4E8__RunRequestQueue` on 2026-09-26 (tools/rename.py). Address 0x80027a24.
 
 > Renamed from `func_80027A24` on 2026-09-25 (tools/rename.py). Address 0x80027a24.
 
@@ -19,8 +21,8 @@ Round 47's preserved body was rebuilt verbatim (its `slot48` is the in-tree
 ```
 build exit=2
  17 off=0x018268 vram=0x80027A68 DIFF retail=35004010 built=13004010
-Class6D4E8__RunRequestQueue: 150/151 words match (file 0x18224-0x18480)
-Class6D4E8__RunRequestQueue: insertions 0 / deletions 0 (opcode-level; positional skeleton diffs 0)
+CdDriver__RunRequestQueue: 150/151 words match (file 0x18224-0x18480)
+CdDriver__RunRequestQueue: insertions 0 / deletions 0 (opcode-level; positional skeleton diffs 0)
 WARNING: the build differs OUTSIDE this range too (2 bytes)
 ```
 
@@ -28,7 +30,7 @@ So: **insertions 0 / deletions 0, positional skeleton diffs 0.** Round 47's repr
 is exact.
 
 **The `len-off` tag was wrong and the round-47 title was right.** Measured three ways:
-the splat header says `nonmatching Class6D4E8__RunRequestQueue, 0x25C` (= 151 words); the rebuilt body
+the splat header says `nonmatching CdDriver__RunRequestQueue, 0x25C` (= 151 words); the rebuilt body
 assembled to 151 words; and `cmp -l build/SLPS_015.56 disk/SLPS_015.56` returned exactly
 **three bytes** across the whole image, so there was no size change and no address drift
 anywhere. `len-off` is an artifact of `plan.py`'s `EXACT_RE`
@@ -62,7 +64,7 @@ maspsx | as`, maspsx flags `sed`-ed out of the Makefile per CLAUDE.md, plus `-Ii
 on `as` for `labels.inc` -- with only the struct/extern declarations it needs:
 
 ```
-  44:	10400013 	beqz	v0,94 <Class6D4E8__RunRequestQueue+0x94>
+  44:	10400013 	beqz	v0,94 <CdDriver__RunRequestQueue+0x94>
 ```
 
 151 words, and `beqz` to +0x94 = 0x80027AB8: **the isolated compile reproduces the wrong
@@ -148,8 +150,8 @@ source constructs, and are unaffected.
 
 ```
 build exit=0
-Class6D4E8__RunRequestQueue: 151/151 words match (file 0x18224-0x18480)
-Class6D4E8__RunRequestQueue: insertions 0 / deletions 0 (positional skeleton diffs 0)
+CdDriver__RunRequestQueue: 151/151 words match (file 0x18224-0x18480)
+CdDriver__RunRequestQueue: insertions 0 / deletions 0 (positional skeleton diffs 0)
 OK: build matches retail SLPS_015.56
 ```
 
@@ -170,7 +172,7 @@ whole-image build above.
    is right. What tells you is where the `default:` label lands: with the copies real,
    GCC 2.6.3 cross-jumps `default:`'s copy onto the first identical tail, moving the
    switch's bounds-check branch target and the jump-table slot for the unhandled in-range
-   value, and nothing else. Round 67, `Class6D4E8__RunRequestQueue`.
+   value, and nothing else. Round 67, `CdDriver__RunRequestQueue`.
 
 2. **A "both directions" reading of Gate 3 check 3 is only as good as the scaffold, and a
    direct pinned-pipeline isolation is cheaper and more trustworthy than a permuter base
@@ -201,7 +203,7 @@ Round 79 (charlie), FINISHING-PLAN track 3.
 
 | was | now | tier |
 | --- | --- | --- |
-| `func_80027A24` | `Class6D4E8__RunRequestQueue` | A |
+| `func_80027A24` | `CdDriver__RunRequestQueue` | A |
 
 **Evidence.** Called every service tick through the class table by
 `ServiceCdDriver` (code_179d8_q), whose local view already names the slot
@@ -216,8 +218,8 @@ is empty. "Run" rather than "drain": one call advances only the head node.
 It takes no `self`; the object it works on is the node's owner.
 
 **Class prefix.** `Class6D4E8` is the placeholder token for the method
-table `D_8006D4E8` (the convention `Class6D4E8__RequestLoadFile` and its two
-siblings already use); `tools/classtable.py D_8006D4E8` lists this function
+table `gCdDriverMethods` (the convention `CdDriver__RequestLoadFile` and its two
+siblings already use); `tools/classtable.py gCdDriverMethods` lists this function
 at slot `+0x068`. The prefix names the table, not the developers' class.
 
 ## Proposed field names
@@ -229,3 +231,6 @@ For the head to apply by type scope (out of unit):
 | code_179d8_o | `Obj6D4E8` | `unk28` | `inQueueDispatch` | A | the constructor's clear of the same field this function raises around each dispatch (note that view types it `s16`, this unit `u16`) |
 | include/code_171e0.h | `Class6D430` | `unk28` | `inQueueDispatch` | B | the base ctor zeroes it; only this derived class reads it |
 | include/code_171e0.h | `Class6D430` | `unk22` | `pendingRequests` | B | the base ctor zeroes it; EnqueueCdRequest/this function count it |
+
+
+Track 4, 2026-09-26 (round 88). The class of gCdDriverMethods (was D_8006D4E8, id 0x13 = DATASOURCE_CD) is CdDriver, in include/CdDriver.h: its ctor calls InitCdDrive, its slots enqueue CD_OP_* requests and drive the CD read state machine, and it is VabDriver's sibling. The object views this function was typed against are replaced by CdDriver, whose fields are all Class6D430's (the driver runs on its clients' objects; Class6D430's +0x018/+0x01C were named pos/size for it). Byte-identical. `Class6D4E8__RunRequestQueue` -> `CdDriver__RunRequestQueue` by rename.py. The +0x070 call passes `self` through the StopServiceSelfFn cast (Class6D430's stopService slot takes no arguments; retail loads $a0): without it 150/151 words.

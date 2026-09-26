@@ -1,20 +1,22 @@
-# Class6D4E8__Class6D4E8 -- MATCHED (19/19 words)
+# CdDriver__CdDriver -- MATCHED (19/19 words)
+
+> Renamed from `Class6D4E8__Class6D4E8` on 2026-09-26 (tools/rename.py). Address 0x80027228.
 
 > Renamed from `func_80027228` on 2026-09-25 (tools/rename.py). Address 0x80027228.
 
 Unit `code_179d8_o`, round 26 (2026-09-09). This class's constructor --
 confirmed via `tools/classtable.py 0x8006D4E8 --vs 0x8006B58C` as the
 override of the base "BasicClass" hierarchy's constructor slot (`+0x008`);
-see `New_Class6D4E8.md` for the full table-comparison finding shared by
+see `New_CdDriver.md` for the full table-comparison finding shared by
 this whole unit.
 
 ## What it is
 
 ```c
-void Class6D4E8__Class6D4E8(Obj6D4E8 *self)
+void CdDriver__CdDriver(Obj6D4E8 *self)
 {
     GetClass6D430Methods(self)->ctor(self);
-    self->methods = GetClass6D4E8Methods();
+    self->methods = GetCdDriverMethods();
     self->unk28 = 0;
     InitCdDrive();
 }
@@ -39,19 +41,22 @@ retail instruction sequence (no scheduling residue to fight).
 
 Round 79 (delta).
 
-- **`Class6D4E8__Class6D4E8`** (was `func_80027228`) -- **tier A**. It is
-  table slot +0x008 of D_8006D4E8 (`tools/classtable.py 0x8006D4E8 --vs
+- **`CdDriver__CdDriver`** (was `func_80027228`) -- **tier A**. It is
+  table slot +0x008 of gCdDriverMethods (`tools/classtable.py 0x8006D4E8 --vs
   0x8006D430`), the slot that holds `Class6D430__Class6D430` in the parent
   table and `BasicClass__BasicClass` in the root table. The body is the
   project's constructor shape exactly: parent ctor first
   (`GetClass6D430Methods()->ctor(self)`), then install its own table
-  (`self->methods = GetClass6D4E8Methods()`), then its own fields
+  (`self->methods = GetCdDriverMethods()`), then its own fields
   (`unk28 = 0`), then `InitCdDrive()` (code_179d8_q: one-shot
-  `CdSetDebug(0)` + set double-speed mode). `New_Class6D4E8` dispatches it.
-- The two externs' notes that `GetClass6D4E8Methods` and `InitCdDrive` are
+  `CdSetDebug(0)` + set double-speed mode). `New_CdDriver` dispatches it.
+- The two externs' notes that `GetCdDriverMethods` and `InitCdDrive` are
   "still INCLUDE_ASM" were stale (both are matched C in code_179d8_q.c) and
   are corrected in the unit.
 - `unk28` (+0x28, s16) is kept: cleared here and by Class6D430's own ctor,
   read nowhere in this unit, so nothing establishes a meaning.
 - The parent-table view `BaseCtorTable6D4E8` is renamed `Class6D430CtorView`
   (it IS D_8006D430 seen down to +0x008).
+
+
+Track 4, 2026-09-26 (round 88). The class of gCdDriverMethods (was D_8006D4E8, id 0x13 = DATASOURCE_CD) is CdDriver, in include/CdDriver.h: its ctor calls InitCdDrive, its slots enqueue CD_OP_* requests and drive the CD read state machine, and it is VabDriver's sibling. The object views this function was typed against are replaced by CdDriver, whose fields are all Class6D430's (the driver runs on its clients' objects; Class6D430's +0x018/+0x01C were named pos/size for it). Byte-identical. `Class6D4E8__Class6D4E8` -> `CdDriver__CdDriver` by rename.py.

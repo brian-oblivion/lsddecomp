@@ -1,4 +1,6 @@
-# New_Class6D4E8 -- MATCHED (20/20 words)
+# New_CdDriver -- MATCHED (20/20 words)
+
+> Renamed from `New_Class6D4E8` on 2026-09-26 (tools/rename.py). Address 0x800271d8.
 
 > Renamed from `new_class_6d4e8` on 2026-09-25 (tools/rename.py). Address 0x800271d8.
 
@@ -8,32 +10,32 @@ table.
 
 ## Class-table finding (name is a hypothesis, resolution is not)
 
-The FirecatFG name is drawn from `D_8006D4E8`, this class's own 29-slot method
+The FirecatFG name is drawn from `gCdDriverMethods`, this class's own 29-slot method
 table. Per CLAUDE.md, that name is a hypothesis, not evidence -- resolved
 instead with `tools/classtable.py 0x8006D4E8 --vs 0x8006B58C` (comparing
 against `D_8006B58C`, the 14-slot table for the project's "BasicClass"
 hierarchy, whose constructor `BasicClass__BasicClass` sits at `+0x008`).
-`D_8006D4E8` overrides exactly three slots relative to `D_8006B58C`
-(`+0x004`, `+0x008`, `+0x00C` -- `Class6D430__Release`, `Class6D4E8__Class6D4E8`,
-`Class6D4E8__Destroy`), inherits `+0x010..+0x038` verbatim (identical
+`gCdDriverMethods` overrides exactly three slots relative to `D_8006B58C`
+(`+0x004`, `+0x008`, `+0x00C` -- `Class6D430__Release`, `CdDriver__CdDriver`,
+`CdDriver__Finalize`), inherits `+0x010..+0x038` verbatim (identical
 `BasicClass__func_*` addresses in both tables), and adds new slots from
 `+0x040` up that `D_8006B58C` doesn't have at all (including this unit's own
-`Class6D4E8__NoOpSlot40`). Since `+0x008` is confirmed as the constructor slot in the
-BASE table, `New_Class6D4E8` allocating and then calling through that same
-slot on ITS OWN table (which resolves to `Class6D4E8__Class6D4E8`, this unit's next
+`CdDriver__NoOpSlot40`). Since `+0x008` is confirmed as the constructor slot in the
+BASE table, `New_CdDriver` allocating and then calling through that same
+slot on ITS OWN table (which resolves to `CdDriver__CdDriver`, this unit's next
 function) is a genuine "allocate + construct" pair -- confirmed by the table
 lookup, not assumed from the name.
 
 ## What it is
 
 ```c
-Obj6D4E8 *New_Class6D4E8(void)
+Obj6D4E8 *New_CdDriver(void)
 {
     Obj6D4E8 *self;
 
     self = BMemPMgrAlloc(0x2C);
     if (self != NULL) {
-        GetClass6D4E8Methods()->ctor(self);
+        GetCdDriverMethods()->ctor(self);
         return self;
     }
     return NULL;
@@ -42,10 +44,10 @@ Obj6D4E8 *New_Class6D4E8(void)
 
 `BMemPMgrAlloc` is the project's already-established Psy-Q allocator
 (`extern void *BMemPMgrAlloc(s32 size);`, same signature used throughout the
-codebase). `GetClass6D4E8Methods` (still `INCLUDE_ASM` in the `code_179d8`
-remainder) returns this class's own table, `&D_8006D4E8`, typed here as
+codebase). `GetCdDriverMethods` (still `INCLUDE_ASM` in the `code_179d8`
+remainder) returns this class's own table, `&gCdDriverMethods`, typed here as
 `Obj6D4E8Methods *` (a local view -- see the unit header comment and the
-sibling reports for `Class6D4E8__Class6D4E8`/`Class6D4E8__Destroy`, which establish the
+sibling reports for `CdDriver__CdDriver`/`CdDriver__Finalize`, which establish the
 struct's other slots).
 
 ## A residue worth recording: return-statement PLACEMENT, not phrasing
@@ -83,10 +85,10 @@ a function.
 
 Round 79 (delta).
 
-- **`New_Class6D4E8`** (was FirecatFG's `new_class_6d4e8`) -- **tier A**.
+- **`New_CdDriver`** (was FirecatFG's `new_class_6d4e8`) -- **tier A**.
   Body alone: `BMemPMgrAlloc(0x2C)`, and on success dispatches
-  `GetClass6D4E8Methods()->ctor` (table +0x008, which classtable.py
-  resolves to `Class6D4E8__Class6D4E8`) on the new block, returning it, or
+  `GetCdDriverMethods()->ctor` (table +0x008, which classtable.py
+  resolves to `CdDriver__CdDriver`) on the new block, returning it, or
   NULL. The inherited hypothesis is confirmed; only the spelling changes to
   the project's `New_Class` convention. No direct caller in `asm/` or `src/`
   (grep for the name and for `800271D8`), so the caller is not known; the
@@ -97,3 +99,6 @@ Round 79 (delta).
 - Local types renamed to the tree's class prefix: `Obj6D4E8` ->
   `Class6D4E8`, `Obj6D4E8Methods` -> `Class6D4E8Methods` (the prefix every
   other method of this class already carries in code_179d8_q.c).
+
+
+Track 4, 2026-09-26 (round 88). The class of gCdDriverMethods (was D_8006D4E8, id 0x13 = DATASOURCE_CD) is CdDriver, in include/CdDriver.h: its ctor calls InitCdDrive, its slots enqueue CD_OP_* requests and drive the CD read state machine, and it is VabDriver's sibling. The object views this function was typed against are replaced by CdDriver, whose fields are all Class6D430's (the driver runs on its clients' objects; Class6D430's +0x018/+0x01C were named pos/size for it). Byte-identical. `New_Class6D4E8` -> `New_CdDriver` by rename.py.

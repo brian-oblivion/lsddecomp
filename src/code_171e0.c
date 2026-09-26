@@ -5,7 +5,7 @@
  * Class6D430 (include/Class6D430.h) is the data-source base class: a
  * BasicClass subclass holding one file buffer (buffer/bufferSize, managed by
  * Class6D430__LoadFile/FreeBuffer) plus a flags word, and declaring the file-
- * I/O interface the CD driver (D_8006D4E8) and the SPU/VAB driver
+ * I/O interface the CD driver (gCdDriverMethods) and the SPU/VAB driver
  * (gVabDriverMethods) implement; sixteen classes derive from it.
  *
  * Most of this unit's remaining functions dispatch between those same two
@@ -24,10 +24,11 @@
 #include "common.h"
 #include "code_171e0.h"
 #include "VabDriver.h"
+#include "CdDriver.h"
 #include "Class6D3C8.h"
 
 /* gActiveDataSource's two observed values are the header words of the two
- * sibling classes it selects between: D_8006D4E8 (the CD-ROM read driver,
+ * sibling classes it selects between: gCdDriverMethods (the CD-ROM read driver,
  * code_179d8_q.c) and gVabDriverMethods (VabDriver, the SPU/VAB driver, include/VabDriver.h). */
 #define DATASOURCE_CD  0x13
 #define DATASOURCE_SPU 0x23
@@ -114,13 +115,12 @@ Class6D430Methods *GetClass6D430Methods(void) {
 }
 
 extern s32 gActiveDataSource;
-extern void *GetClass6D4E8Methods(void);
 
 void *GetActiveDataSourceMethods(void) {
     if (gActiveDataSource == DATASOURCE_SPU) {
         return GetVabDriverMethods();
     } else {
-        return GetClass6D4E8Methods();
+        return GetCdDriverMethods();
     }
 }
 
@@ -144,7 +144,7 @@ void SetActiveDataSource(s32 arg0) {
     entry = gDataSourceClientGetters;
     gActiveDataSource = arg0;
     if (arg0 == DATASOURCE_CD) {
-        src = GetClass6D4E8Methods();
+        src = (Class6D430Methods *)GetCdDriverMethods();
     } else {
         src = (Class6D430Methods *)GetVabDriverMethods();
     }

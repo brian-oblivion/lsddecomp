@@ -107,15 +107,15 @@ which appends to the `gCdRequestQueue` list), fills five of its fields from the
 parameters, bumps the requesting object's pending count, clears its flags and
 calls `StartCdService`. Every caller is a class method taking its
 asynchronous path (`code_179d8_s` at op 2/3/4/5/7,
-`Class6D4E8__RequestLoadFile` at op 7). Append a request and make sure the
+`CdDriver__RequestLoadFile` at op 7). Append a request and make sure the
 service runs: tier A.
 
 **Parameter and field names established here**, all local to this `.c`:
 
 | field | name | tier | evidence |
 | --- | --- | --- | --- |
-| `+0x08` | `op` | A | the five call sites pass 2, 3, 4, 5, 7 -- one constant per class method, and `Class6D4E8__RunRequestQueue` switches on it when it drains the queue |
-| `+0x0C` | `owner` | A | the requesting object; `Class6D4E8__CancelRequests` matches on it to cancel one object's requests |
+| `+0x08` | `op` | A | the five call sites pass 2, 3, 4, 5, 7 -- one constant per class method, and `CdDriver__RunRequestQueue` switches on it when it drains the queue |
+| `+0x0C` | `owner` | A | the requesting object; `CdDriver__CancelRequests` matches on it to cancel one object's requests |
 | `+0x10` | `fileIndex` | A | `FindCdFileIndex`'s return -- an index into `gFileTable` -- at the two ops that name a file, 0 at the others |
 | `+0x14` | `param0` | B | the op's first extra argument: `arg2` for op 2, a byte count for op 4, a buffer for op 5 |
 | `+0x18` | `param1` | B | the op's second extra argument, same call sites |

@@ -95,3 +95,10 @@ The function is now `void`, like the finalize slot it fills, and the chained
 `Class6D430__Release`, through the finalize slot, and it does not read the
 return value. The unit's `DriverBaseMethods` view still declares that slot
 as s32. That is Class6D430's view, left as it was.
+
+Track 4, 2026-09-26 (round 88, CdDriver). `DriverBaseMethods` is gone:
+`GetActiveDataSourceMethods` returns gCdDriverMethods or gVabDriverMethods,
+both CLASS6D430_SLOTS tables, so code_179d8_e.c declares it
+`Class6D430Methods *` like every other caller, and the chained call is
+`GetActiveDataSourceMethods()->finalize((Class6D430 *)self)` (void, as the
+slot is). Byte-identical.

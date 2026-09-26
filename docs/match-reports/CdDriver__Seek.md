@@ -1,4 +1,6 @@
-# Class6D4E8__Seek -- MATCHED (round 47, alpha)
+# CdDriver__Seek -- MATCHED (round 47, alpha)
+
+> Renamed from `Class6D4E8__Seek` on 2026-09-26 (tools/rename.py). Address 0x80027528.
 
 > Renamed from `func_80027528` on 2026-09-25 (tools/rename.py). Address 0x80027528.
 
@@ -17,7 +19,7 @@ extern void CdIntToPos(s32 i, void *pos);
 extern void CdControl(s32 arg0, void *buf, s32 arg2);
 extern s32 CdSync(s32 mode, void *result);
 
-s32 Class6D4E8__Seek(Obj80027480 *self, u32 arg1, s32 arg2) {
+s32 CdDriver__Seek(Obj80027480 *self, u32 arg1, s32 arg2) {
     s32 v0;
     u32 s0tmp;
 
@@ -72,8 +74,8 @@ below.
 
 1. **`if (arg2 != 0) { ...; return X; } if (gCdAsyncEnabled...) {...} else {...}`
    vs `if (arg2 == 0) {...} else { ...; return X; }`** -- the same
-   nested-if/else-if-vs-nested-if POLARITY lever as `Class6D4E8__Close` and
-   `Class6D4E8__Read`, on a THIRD shape this time (an early-return `if` next to
+   nested-if/else-if-vs-nested-if POLARITY lever as `CdDriver__Close` and
+   `CdDriver__Read`, on a THIRD shape this time (an early-return `if` next to
    unconditional fall-through code, not two sibling `if`s). The fall-through
    arm (immediately after the `bnez`/`beqz` test) must be the `arg2==0`
    branch (the CdControl retry / gp_rel-store code); the branch TARGET,
@@ -85,10 +87,10 @@ below.
    duplicates a call pair that also appears on the fall-through path is this
    same polarity bug, not two independent residues.
 
-2. **The `Class6D4E8__Read` goto-instead-of-do-while lever does NOT apply here,
+2. **The `CdDriver__Read` goto-instead-of-do-while lever does NOT apply here,
    and this is the important negative.** This function has a SECOND
    CdControl/CdSync retry loop, structurally identical in shape to
-   `Class6D4E8__Read`'s CdRead/CdReadSync loop (a `do { call; do { v = call2();
+   `CdDriver__Read`'s CdRead/CdReadSync loop (a `do { call; do { v = call2();
    } while (v cond); } while (v == CONST);` retry pattern). Reflexively
    applying the same `goto`-based rewrite (to defeat GCC's loop-invariant
    hoist of the retry constant) produced the WRONG shape here: retail's own
@@ -103,7 +105,7 @@ below.
    vs `goto`, rather than carrying the previous function's answer forward.
 
 3. Everything else (the `srl` vs `sra` unsigned-shift lever from
-   `Class6D4E8__Read`, applied to `arg1 >> 11`/`self->unk1C >> 11`; the
+   `CdDriver__Read`, applied to `arg1 >> 11`/`self->unk1C >> 11`; the
    round-up-to-sector idiom `x>>11; if (x&0x7FF) x++;`; the
    `EnqueueCdRequest`/`StartCdOperation` call shapes) matched on the first
    build once 1 and 2 above were fixed.
@@ -126,11 +128,11 @@ direction.
 
 **Do not generalize a loop-shape lever across two structurally-identical
 loops in the SAME function without checking each one's own retail bytes.**
-`Class6D4E8__Seek` has two nearly-identical retry loops in spirit (both
+`CdDriver__Seek` has two nearly-identical retry loops in spirit (both
 "do a CD op, poll for completion, retry on a specific status code"), and
 retail hoists the retry constant in ONE of them and not the other analog
 found in the previous function. The `goto`-defeats-loop.c's-invariant-motion
-lever from `Class6D4E8__Read` is real, but its APPLICATION is per-loop: read
+lever from `CdDriver__Read` is real, but its APPLICATION is per-loop: read
 whether retail's own `.s` shows a `li $sN,<const>` sitting above the retry
 label before reaching for `goto` instead of `do`/`while`.
 
@@ -140,7 +142,7 @@ Round 79 (charlie), FINISHING-PLAN track 3.
 
 | was | now | tier |
 | --- | --- | --- |
-| `func_80027528` | `Class6D4E8__Seek` | B |
+| `func_80027528` | `CdDriver__Seek` | B |
 
 **Evidence.** `(self, offset, mode)`. Inside a queue dispatch on an open
 file it converts `self->pos` to a sector number (`CdPosToInt`), adds
@@ -160,8 +162,8 @@ callers, not an established `whence` enumeration. The name covers the
 async body and the rewind use; the size query is the other half of it.
 
 **Class prefix.** `Class6D4E8` is the placeholder token for the method
-table `D_8006D4E8` (the convention `Class6D4E8__RequestLoadFile` and its two
-siblings already use); `tools/classtable.py D_8006D4E8` lists this function
+table `gCdDriverMethods` (the convention `CdDriver__RequestLoadFile` and its two
+siblings already use); `tools/classtable.py gCdDriverMethods` lists this function
 at slot `+0x04C`. The prefix names the table, not the developers' class.
 
 ## Track 4b (2026-09-25, round 85)
@@ -171,3 +173,6 @@ The CD driver's shared globals and records are now declared once, in
 global's type comes from its accessors (`gFileTable` is walked at the 0x1C
 `CdFileEntry` stride; `gCdSeekParam` is read for `->size` and sought to at
 `+0x14`, i.e. `pos`). Byte-identical; no new `-Wall` warning.
+
+
+Track 4, 2026-09-26 (round 88). The class of gCdDriverMethods (was D_8006D4E8, id 0x13 = DATASOURCE_CD) is CdDriver, in include/CdDriver.h: its ctor calls InitCdDrive, its slots enqueue CD_OP_* requests and drive the CD read state machine, and it is VabDriver's sibling. The object views this function was typed against are replaced by CdDriver, whose fields are all Class6D430's (the driver runs on its clients' objects; Class6D430's +0x018/+0x01C were named pos/size for it). Byte-identical. `Class6D4E8__Seek` -> `CdDriver__Seek` by rename.py.

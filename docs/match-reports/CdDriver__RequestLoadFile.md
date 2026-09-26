@@ -1,9 +1,11 @@
-# Class6D4E8__RequestLoadFile — MATCHED (48/48 words)
+# CdDriver__RequestLoadFile — MATCHED (48/48 words)
+
+> Renamed from `Class6D4E8__RequestLoadFile` on 2026-09-26 (tools/rename.py). Address 0x80027c80.
 
 > Renamed from `func_80027C80` on 2026-09-17 (tools/rename.py). Address 0x80027c80.
 
 Round 45, runner echo (third sitting), `src/code_179d8_q.c`. This class's own
-slot +0x06C of `D_8006D4E8`.
+slot +0x06C of `gCdDriverMethods`.
 
 ## Result
 
@@ -17,8 +19,8 @@ carries the evidence for each one.
 
 ```c
 /* The class's method table down to +0x058: the one slot
- * Class6D4E8__RequestLoadFile dispatches. `tools/classtable.py D_8006D4E8`
- * resolves that slot to Class6D4E8__LoadFile (code_179d8_s), which loads a named
+ * CdDriver__RequestLoadFile dispatches. `tools/classtable.py gCdDriverMethods`
+ * resolves that slot to CdDriver__LoadFile (code_179d8_s), which loads a named
  * file off the disc, so the slot is named for the method it dispatches to.
  * The sibling class D_8006D430 (include/code_171e0.h's
  * Class6D430Methods) leaves the identical offset unnamed -- this
@@ -39,7 +41,7 @@ struct Obj6D4E8_C80 {
 };
 
 /* +0x04 of whatever object a still-uninitialized local $s2 points at on this
- * path -- see the Class6D4E8__RequestLoadFile report for why that local is
+ * path -- see the CdDriver__RequestLoadFile report for why that local is
  * never assigned. Only the one field this store touches is typed, and the
  * object's identity is unknowable from here, so the name stays a
  * placeholder. */
@@ -60,7 +62,7 @@ extern void EnqueueCdRequest(struct Obj6D4E8_282AC *owner, s32 fileIndex,
 extern s32 FindCdFileIndex(char *name); /* code_179d8_r: name -> table index */
 extern s32 gCdAsyncEnabled;
 
-void Class6D4E8__RequestLoadFile(Obj6D4E8_C80 *self, char *name)
+void CdDriver__RequestLoadFile(Obj6D4E8_C80 *self, char *name)
 {
     UnkC80 *s2;
     s32 idx;
@@ -137,7 +139,7 @@ allows.
 - `FindCdFileIndex` (still `INCLUDE_ASM` in `code_179d8_r.c`, foxtrot's unit)
   takes a single `char *` argument that it passes straight to `strstr` as
   the needle — read from its own disassembly, not guessed — hence `char
-  *arg0` here rather than `void *`. `arg1` of `Class6D4E8__RequestLoadFile` is typed the
+  *arg0` here rather than `void *`. `arg1` of `CdDriver__RequestLoadFile` is typed the
   same way, since it flows unchanged into both `FindCdFileIndex` and
   `self->methods->loadFile` (spelled `slot58` when this was written).
 - `EnqueueCdRequest` (already matched this round, later in this file) takes its
@@ -178,13 +180,13 @@ Round 51 (alpha), FINISHING-PLAN track 3.
 
 | was | now | tier |
 | --- | --- | --- |
-| `func_80027C80` | `Class6D4E8__RequestLoadFile` | B |
+| `func_80027C80` | `CdDriver__RequestLoadFile` | B |
 
-**Evidence.** Slot `+0x06C` of `D_8006D4E8` (`tools/classtable.py`). Given a
+**Evidence.** Slot `+0x06C` of `gCdDriverMethods` (`tools/classtable.py`). Given a
 file name, it either enqueues a `CD_OP_LOAD_FILE` (7) request through
 `EnqueueCdRequest` with `FindCdFileIndex`'s file-table index, or -- when
 `gCdAsyncEnabled` is 0 -- calls the class's own `+0x058` slot
-(`Class6D4E8__LoadFile`, code_179d8_s) directly, which is the synchronous
+(`CdDriver__LoadFile`, code_179d8_s) directly, which is the synchronous
 load-this-file-by-name method that enqueues the identical op 7 on its own
 async path. So both arms request the same thing, which is what `Request`
 names; `LoadFile` is the op, read off the slot it dispatches to and off the
@@ -195,7 +197,7 @@ is not: `Class6D4E8` is a placeholder token for the table address, following
 the existing `Class6B5CC__RotateLocalVector` convention in the symbols file.
 The unit as a whole is demonstrably the CD-ROM read driver, but no evidence
 here says what the developers called this class -- see
-`GetClass6D4E8Methods.md`.
+`GetCdDriverMethods.md`.
 
 **Names left alone.** `UnkC80` and its `unk04`: the store goes through a
 register the function never assigns (the shipped bug this report documents),
@@ -219,5 +221,8 @@ views; proposing rather than renaming, since those units are not mine:
 
 | unit | type | field | proposed | tier | evidence |
 | --- | --- | --- | --- | --- | --- |
-| code_179d8_s | `Obj80027480` | `unk22` | `pendingRequests` | A | `EnqueueCdRequest` increments it per queued request; `Class6D4E8__CancelRequests` decrements it once per node it unlinks |
-| code_179d8_s | `Obj80027480` | `unk24` | `flags` | A | only ever `|=` a bit (4 here, 0x200 in `Class6D4E8__LoadFile`) or cleared |
+| code_179d8_s | `Obj80027480` | `unk22` | `pendingRequests` | A | `EnqueueCdRequest` increments it per queued request; `CdDriver__CancelRequests` decrements it once per node it unlinks |
+| code_179d8_s | `Obj80027480` | `unk24` | `flags` | A | only ever `|=` a bit (4 here, 0x200 in `CdDriver__LoadFile`) or cleared |
+
+
+Track 4, 2026-09-26 (round 88). The class of gCdDriverMethods (was D_8006D4E8, id 0x13 = DATASOURCE_CD) is CdDriver, in include/CdDriver.h: its ctor calls InitCdDrive, its slots enqueue CD_OP_* requests and drive the CD read state machine, and it is VabDriver's sibling. The object views this function was typed against are replaced by CdDriver, whose fields are all Class6D430's (the driver runs on its clients' objects; Class6D430's +0x018/+0x01C were named pos/size for it). Byte-identical. `Class6D4E8__RequestLoadFile` -> `CdDriver__RequestLoadFile` by rename.py.

@@ -41,7 +41,7 @@ from.
 Named for its slot, FINISHING-PLAN track 4 step 6. `classtable.py
 gVabDriverMethods --vs D_8006D430` puts this function at `+0x058`, one of
 Class6D430's run-time-bound driver-interface slots (`include/Class6D430.h`
-names it `loadFile`; the CD driver's occupant is `Class6D4E8__LoadFile (Class6D430__LoadFile in the base table)`).
+names it `loadFile`; the CD driver's occupant is `CdDriver__LoadFile (Class6D430__LoadFile in the base table)`).
 `SetActiveDataSource` (code_171e0.c) copies the active driver's interface
 slots into Class6D430's table and every client table, and takes this table
 (`GetVabDriverMethods()`) whenever `gActiveDataSource != DATASOURCE_CD`, so

@@ -51,7 +51,7 @@ Round 52 (alpha), FINISHING-PLAN track 3.
 | `func_80026C9C` | `GetClass6D430Methods` | A |
 
 **Evidence.** `return D_8006D430;` -- the same "get my own vtable" shape as
-`GetClass6D3C8Methods` (this round) and `GetClass6D4E8Methods` (round 51).
+`GetClass6D3C8Methods` (this round) and `GetCdDriverMethods` (round 51).
 Pure leaf, mechanics are its purpose.
 
 ## Proposed type names
@@ -88,7 +88,7 @@ declarations; same shape and same discriminator as `GetClass6B5CCMethods`.
 No argument register is read. The definition is
 `void *GetClass6D430Methods(void)`.
 
-**The extra argument is not byte-load-bearing.** `Class6D4E8__Class6D4E8`
+**The extra argument is not byte-load-bearing.** `CdDriver__CdDriver`
 (src/code_179d8_o.c) calls it as `GetClass6D430Methods(self)->ctor(self)`:
 
 ```
@@ -97,7 +97,7 @@ No argument register is read. The definition is
                                           self, not argument setup
 ```
 
-`$a0` still holds `Class6D4E8__Class6D4E8`'s incoming `self` at the `jal` either way, so
+`$a0` still holds `CdDriver__CdDriver`'s incoming `self` at the `jal` either way, so
 the declaration's parameter list is free and must agree with the definition.
 
 **Declaration site changed:** `src/code_179d8_o.c:99` —

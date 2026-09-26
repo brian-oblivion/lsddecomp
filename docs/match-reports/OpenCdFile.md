@@ -511,7 +511,7 @@ before deciding whether to spend a search on it at all, not only after.
   open, builds the CD path (`BuildCdFilePath`), retries `CdSearchFile` up to
   100 times, and on success records the result and marks the object open.
   Not derived from this function's own (stalled) body alone: independently
-  confirmed by `src/code_179d8_s.c`'s `Class6D4E8__Open`, which calls this
+  confirmed by `src/code_179d8_s.c`'s `CdDriver__Open`, which calls this
   function directly when CD-async mode is off, and otherwise reimplements
   the identical algorithm (same field offsets, same `CdSearchFile`/`CdControl`
   sequence) for its own async path. Paired with `CloseCdFile`/`GetCdFileSize`/

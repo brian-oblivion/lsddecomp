@@ -90,7 +90,7 @@ Round 52 (alpha), FINISHING-PLAN track 3.
 **Track 4 (2026-09-25, Class6D430 unification): renamed from `DestroyChained`, tier A.** Occupies BasicClass's `release` slot (+0x004), inherited by all sixteen Class6D430 subclasses; like `BasicClass__Release` it finalizes (its own `finalize` slot, then BasicClass's) and frees the object, returning NULL. An override is named for the slot it occupies (FINISHING-PLAN track 4).
 
 **Evidence.** `D_8006D430`'s `+0x004` own-class slot -- but verbatim-shared
-with `D_8006D4E8` at the identical offset (`docs/match-reports/GetClass6D4E8Methods.md`),
+with `gCdDriverMethods` at the identical offset (`docs/match-reports/GetCdDriverMethods.md`),
 so it is not really "Class6D430's own" and a `Class6D430__` prefix would
 misattribute it. Clears the busy flag, then explicitly chains its own dtor
 (`this->methods->dtor`) and the base BasicClass dtor before releasing the

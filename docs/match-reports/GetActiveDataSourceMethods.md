@@ -22,7 +22,7 @@ returning its result:
 lw    $v1, %gp_rel(gActiveDataSource)($gp)
 ori   $v0, $zero, 0x23
 beq   $v1, $v0, .L80026CD0     # gActiveDataSource == 0x23 -> the "then" arm
-  jal GetClass6D4E8Methods             # fallthrough (not equal) -- called first in ROM order
+  jal GetCdDriverMethods             # fallthrough (not equal) -- called first in ROM order
   j .L80026CD8
 .L80026CD0:
   jal GetVabDriverMethods             # equal-to-0x23 arm
@@ -38,7 +38,7 @@ try, with the straightforward `if`/`else` written in source order.
 `GetVabDriverMethods` is confirmed elsewhere in the repo
 (`src/code_179d8_e.c`: `TableD9BC *GetVabDriverMethods(void) { return &gVabDriverMethods; }`)
 to return a pointer, not void -- direct positive evidence this whole function
-is non-void per CLAUDE.md's tail-call caution. `GetClass6D4E8Methods` is still
+is non-void per CLAUDE.md's tail-call caution. `GetCdDriverMethods` is still
 uncarved (`asm/code_179d8.s`) but is declared elsewhere in the repo
 (`code_179d8_h.c`, `code_179d8_o.c`) as returning a table pointer too, under
 each unit's own independent local type -- this report follows the same
@@ -49,13 +49,13 @@ each unit's own independent local type -- this report follows the same
 ```c
 extern s32 gActiveDataSource;
 extern void *GetVabDriverMethods(void);
-extern void *GetClass6D4E8Methods(void);
+extern void *GetCdDriverMethods(void);
 
 void *GetActiveDataSourceMethods(void) {
     if (gActiveDataSource == 0x23) {
         return GetVabDriverMethods();
     } else {
-        return GetClass6D4E8Methods();
+        return GetCdDriverMethods();
     }
 }
 ```
@@ -84,7 +84,7 @@ Round 52 (alpha), FINISHING-PLAN track 3.
 | `GetActiveDataSourceMethods` | `GetActiveDataSourceMethods` | B |
 
 **Evidence.** `if (gActiveDataSource == DATASOURCE_SPU) return GetVabDriverMethods();
-else return GetClass6D4E8Methods();` -- returns whichever of the two sibling
+else return GetCdDriverMethods();` -- returns whichever of the two sibling
 data-source classes' vtables is currently active. Part of the family of
 `ActiveDataSource`-named wrappers this round derived from `gActiveDataSource`
 (the renamed `gActiveDataSource`); see that global's own naming note. Mechanics

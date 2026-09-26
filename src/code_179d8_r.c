@@ -23,8 +23,8 @@
  *     steps ServiceCdDriver (code_179d8_q) dispatches on gCdTickStep (1 / 2).
  *     TickCdStateMachine is the default, used by code_179d8_s.c's open,
  *     explicit-seek and straight-read call sites. TickCdLoadFileStateMachine
- *     is used exclusively by that unit's Class6D4E8__LoadFile (the
- *     Class6D4E8__RequestLoadFile worker, per its own report): on the
+ *     is used exclusively by that unit's CdDriver__LoadFile (the
+ *     CdDriver__RequestLoadFile worker, per its own report): on the
  *     "still busy" signal at phase 2 it proceeds straight into the read
  *     phase instead of resetting, and on a successful read it restores the
  *     caller's saved gCdSeekParam from gCdSavedSeekParam -- both differences
@@ -34,7 +34,7 @@
  *   - AllocCdRequestNode / FreeCdRequestNode allocate+link / unlink+free a
  *     request-queue node (CdRequestNode, 0x24 bytes), list head
  *     gCdRequestQueue -- the queue code_179d8_q.c's EnqueueCdRequest and
- *     Class6D4E8__CancelRequests drive from the other end.
+ *     CdDriver__CancelRequests drive from the other end.
  *   - FindCdFileEntry / FindCdFileIndex / GetCdFileEntry are linear-scan /
  *     index helpers over the file table (CdFileEntry, 0x1C bytes each) based
  *     at gFileTable, count gFileTableCount. That type, CdRequestNode and the

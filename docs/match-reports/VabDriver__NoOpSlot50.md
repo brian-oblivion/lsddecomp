@@ -33,7 +33,7 @@ covers +0x000..+0x054 with no per-slot field). Kept `func_`, not renamed.
 Named for its slot, FINISHING-PLAN track 4 step 6. `classtable.py
 gVabDriverMethods --vs D_8006D430` puts this function at `+0x050`, one of
 Class6D430's run-time-bound driver-interface slots (`include/Class6D430.h`
-names it `slot50`; the CD driver's occupant is `Class6D4E8__NoOpSlot50`).
+names it `slot50`; the CD driver's occupant is `CdDriver__NoOpSlot50`).
 `SetActiveDataSource` (code_171e0.c) copies the active driver's interface
 slots into Class6D430's table and every client table, and takes this table
 (`GetVabDriverMethods()`) whenever `gActiveDataSource != DATASOURCE_CD`, so

@@ -27,7 +27,7 @@ Straight read of the disassembly: `beqz $a0, .L80027F0C` guards a store of
 `D_8008A860` (gp_rel) into `*a0`; fallthrough loads `gCdAsyncEnabled` (gp_rel) into
 `$v0` and returns it unconditionally. Both globals are in the same
 `gCdAsyncEnabled..gCdQueueEnabled` sdata block this unit's other getter/setters touch
-(see `GetClass6D4E8Methods`'s header comment in the `.c` for the class map). No
+(see `GetCdDriverMethods`'s header comment in the `.c` for the class map). No
 class/struct involvement — plain scalar globals, plain optional-out-param
 shape.
 
@@ -59,7 +59,7 @@ specific to the CD. Tier B: the pairing is certain, the second value is not.
 it is non-zero, the class's methods in `code_179d8_s` set up the state machine
 (or `EnqueueCdRequest` a node) and return immediately; when it is zero they
 run a blocking `do { v = CdSync(0,0); } while (v == 0);` spin to completion.
-`Class6D4E8__RequestLoadFile` shows the same split -- queue a request versus
+`CdDriver__RequestLoadFile` shows the same split -- queue a request versus
 call the method directly. `SetCdDriverMode` also uses it to decide whether to
 install or clear the service callback. Asynchronous operation is what the
 flag switches on; tier A.

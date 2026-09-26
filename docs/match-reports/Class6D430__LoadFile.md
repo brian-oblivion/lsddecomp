@@ -144,7 +144,7 @@ Round 52 (alpha), FINISHING-PLAN track 3.
 | --- | --- | --- |
 | `func_80026B08` | `Class6D430__LoadFile` | B |
 
-**Track 4 (2026-09-25, Class6D430 unification): renamed from `Class6D430__AllocBuffer`, tier A.** The body opens the file named by its argument (`open(this, name, 1, 0)`), seeks to the end for the size (`seek(this, 0, 2)`), allocates that much, rewinds, reads the whole file into `buffer` and closes: it loads a file. It also occupies +0x058, the slot the CD driver fills with `Class6D4E8__LoadFile`. The argument is `char *name`, matching `open`'s.
+**Track 4 (2026-09-25, Class6D430 unification): renamed from `Class6D430__AllocBuffer`, tier A.** The body opens the file named by its argument (`open(this, name, 1, 0)`), seeks to the end for the size (`seek(this, 0, 2)`), allocates that much, rewinds, reads the whole file into `buffer` and closes: it loads a file. It also occupies +0x058, the slot the CD driver fills with `CdDriver__LoadFile`. The argument is `char *name`, matching `open`'s.
 
 **Evidence.** `+0x058` slot: a lazy (re)allocation routine. No-ops if
 `this->unk10` is already set; otherwise sizes and commits a new buffer
@@ -210,7 +210,7 @@ forwarded to `this->methods->configureBuffer(this, arg1, 1, 0)` at `0x80026B48`
 real arguments.
 
 **Why the `(void)` extern is right anyway.** The one caller,
-`Class6D4E8__LoadFile` (this unit, matched), passes nothing at all:
+`CdDriver__LoadFile` (this unit, matched), passes nothing at all:
 
 ```
 8002780c:  move  s0,a0          <- its own self, only spilled
@@ -219,7 +219,7 @@ real arguments.
 80027838:  nop                  <- no argument setup, in retail
 ```
 
-`$a0` and `$a1` still hold `Class6D4E8__LoadFile`'s own incoming arguments, which the
+`$a0` and `$a1` still hold `CdDriver__LoadFile`'s own incoming arguments, which the
 callee then consumes. This is the textbook dead-argument idiom: byte-exact
 either way, and writing the two arguments out at the call site would change
 nothing *only* if the values happened to match — they do here by accident of

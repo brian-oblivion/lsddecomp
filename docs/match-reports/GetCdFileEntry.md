@@ -102,7 +102,7 @@ tend to skip.
 **Tier A.** Direct index-to-pointer helper over the same `gFileTable` table
 (`gFileTable + index * 0x1C`), no search -- distinguished from
 `FindCdFileEntry`/`FindCdFileIndex` (which scan) by the Get/Find naming
-convention. Called from `Class6D4E8__RunRequestQueue` (code_179d8_s.c, still `INCLUDE_ASM`)
+convention. Called from `CdDriver__RunRequestQueue` (code_179d8_s.c, still `INCLUDE_ASM`)
 by table index.
 
 ## Track 4b (2026-09-25, round 85)

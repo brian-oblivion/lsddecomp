@@ -34,7 +34,7 @@ table `Class6D940__Finalize` uses.
 Renamed `func_8002C238 -> Class6D940__SetFlag`, tier B (mechanics, not
 purpose). Occupies `+0x064` of `D_8006D940` -- the exact slot
 `Class6D430__SetFlag` fills in the base class (`tools/classtable.py
-0x8006D430`) and its own verbatim-shared copy in `D_8006D4E8`
+0x8006D430`) and its own verbatim-shared copy in `gCdDriverMethods`
 (`tools/classtable.py 0x8006D4E8`). Named by SLOT POSITION, not by
 asserted behavior: this override does NOT just OR in a flag bit like the
 base -- it sets `self[0xC]` (offset 0x30, a field beyond `Class6D430`'s

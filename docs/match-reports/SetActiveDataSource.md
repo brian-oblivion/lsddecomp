@@ -111,13 +111,13 @@ assignment (undefined behavior), not a legitimate reshape.
 ## What it does
 
 Dispatches on `gActiveDataSource` to pick one of two "ret" objects
-(`GetClass6D4E8Methods()` if `arg0 == 0x13`, else `GetVabDriverMethods()`), stores `arg0`
+(`GetCdDriverMethods()` if `arg0 == 0x13`, else `GetVabDriverMethods()`), stores `arg0`
 into `gActiveDataSource`, then walks the function-pointer table `gDataSourceClientGetters`
 (14 entries + a NULL sentinel, confirmed in `asm/data/5DB70.data.s`),
 calling `CopyDataSourceSlots(val, ret)` before EVERY table read (including the
 first, before any table entry is even inspected), and — for every NON-NULL
 entry — calling that entry as `val = entry(val)` before advancing to the
-next slot and repeating. All 4 callees are cross-unit: `GetClass6D4E8Methods` /
+next slot and repeating. All 4 callees are cross-unit: `GetCdDriverMethods` /
 `GetVabDriverMethods` are shared with `GetActiveDataSourceMethods` (see that report), and the
 14 table entries are ordinary game functions elsewhere in the image.
 
@@ -206,7 +206,7 @@ void SetActiveDataSource(s32 arg0) {
 
     gActiveDataSource = arg0;
     if (arg0 == 0x13) {
-        ret = GetClass6D4E8Methods();
+        ret = GetCdDriverMethods();
     } else {
         ret = GetVabDriverMethods();
     }
@@ -223,7 +223,7 @@ void SetActiveDataSource(s32 arg0) {
 ```
 
 (`extern s32 gActiveDataSource;`, `extern void *GetVabDriverMethods(void);` and
-`extern void *GetClass6D4E8Methods(void);` are declared once earlier in this file,
+`extern void *GetCdDriverMethods(void);` are declared once earlier in this file,
 above `GetActiveDataSourceMethods`.)
 
 ## Proposed learning
@@ -258,7 +258,7 @@ Round 52 (alpha), FINISHING-PLAN track 3.
 | `SetActiveDataSource` | `SetActiveDataSource` | B (STALL -- named without matching) |
 
 **Evidence.** Stores the new mode into `gActiveDataSource`, resolves the
-newly-active source's vtable (the same `GetClass6D4E8Methods`/`GetVabDriverMethods`
+newly-active source's vtable (the same `GetCdDriverMethods`/`GetVabDriverMethods`
 pair `GetActiveDataSourceMethods` uses), then walks a table of 14 callbacks,
 calling `CopyDataSourceSlots(val, ret)` before each and threading each
 non-NULL entry's return value into the next call. The control flow and every
@@ -272,7 +272,7 @@ byte-exact. Per the brief, named without attempting to match it.
 this function's own `gActiveDataSource = arg0;` write is the clearest evidence for
 what the global holds -- a mode tag whose two observed values (`0x13`,
 `0x23`) are exactly the header words of the two sibling classes it selects
-between (`D_8006D4E8` and `gVabDriverMethods`; confirmed by `tools/classtable.py`).
+between (`gCdDriverMethods` and `gVabDriverMethods`; confirmed by `tools/classtable.py`).
 Every other function in this unit that reads it forwards to one sibling's
 real implementation or the other's fallback, which is where the whole
 `ActiveDataSource` naming family comes from.

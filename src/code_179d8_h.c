@@ -36,17 +36,17 @@
  *   - `Class6D430__InstallCdReadDriver`/`Class6D430__DestroyCdReadDriver`
  *     (ctor/dtor pair, `Class6D430*` self): chains `Class6D430`'s own
  *     ctor/dtor (`include/code_171e0.h`) then, on the ctor side, overwrites
- *     `self->methods` with `GetClass6D4E8Methods()`'s table -- `D_8006D4E8`,
+ *     `self->methods` with `GetCdDriverMethods()`'s table -- `gCdDriverMethods`,
  *     independently confirmed elsewhere (`src/code_179d8_q.c`) as "the
  *     CD-ROM read driver".  No caller is visible yet (referenced only from
  *     the still-uncarved `code_179d8` remainder), so WHICH broader purpose
  *     this reclassification serves is open; see both reports' `## Naming`.
  *   - `OpenCdFile`/`CloseCdFile`/`GetCdFileSize`/`ReadCdFile` (the
- *     `ObjA34_179D8H` quad, all four matched): resolves a CD-ROM file
+ *     `CdDriver *self` quad, all four matched; `ObjA34_179D8H` until round 88): resolves a CD-ROM file
  *     by name, tracks whether it is open, reports its sector-rounded size,
  *     and reads from it.  Not inferred from this unit alone --
- *     `src/code_179d8_s.c`'s `Class6D4E8__Open`/`Class6D4E8__Close`/
- *     `Class6D4E8__Seek`/`Class6D4E8__Read` call the sync version of exactly one
+ *     `src/code_179d8_s.c`'s `CdDriver__Open`/`CdDriver__Close`/
+ *     `CdDriver__Seek`/`CdDriver__Read` call the sync version of exactly one
  *     of these apiece when CD-async mode is off, and independently
  *     reimplement the identical algorithm (same field offsets) for the
  *     async path otherwise -- see `OpenCdFile.md` for the full mapping.
@@ -62,7 +62,7 @@
  * The 43 functions in FRONT of this slice (still `code_179d8`) are
  * gp_rel-saturated -- 33 of 43 blocked, RESOLVED per the ROUND 42 CORRECTION
  * -- and that remainder also owns this segment's ONLY switch jump table
- * (Class6D4E8__RunRequestQueue, which will need the Gate 2 rodata attach/split when it is
+ * (CdDriver__RunRequestQueue, which will need the Gate 2 rodata attach/split when it is
  * carved).  The cut is placed here to leave both debts behind: THIS slice
  * owns no jump table and needs no rodata attach.
  *
@@ -70,12 +70,11 @@
  * prior claim here ("zero functions in this slice reference any of the 60
  * method tables") was wrong by the time it was written -- `python3
  * tools/classtable.py --scan` lists BOTH `D_8006D430` (44 slots, header 3)
- * and `D_8006D4E8` (29 slots, header 0x13) among the 60, and
+ * and `gCdDriverMethods` (29 slots, header 0x13) among the 60, and
  * `Class6D430__InstallCdReadDriver`/`Class6D430__DestroyCdReadDriver`
- * dispatch through both via `GetClass6D430Methods()`/`GetClass6D4E8Methods()`.
- * `ObjA34_179D8H` additionally carries its OWN per-instance `methods`
- * pointer (dispatched by `ReadCdFile`'s `close` slot), not yet tied to
- * either scanned table.  The sibling slice code_179d8_e also contains two
+ * dispatch through both via `GetClass6D430Methods()`/`GetCdDriverMethods()`.
+ * The quad's object (round 88: a `CdDriver`, include/CdDriver.h) dispatches
+ * `ReadCdFile`'s `close` through its own `methods`, Class6D430's +0x048.  The sibling slice code_179d8_e also contains two
  * class-table accessors -- so "code_179d8 is not class-framework code" was
  * never true of this neighbourhood; run the check for your own functions
  * rather than inheriting any verdict here.
@@ -85,69 +84,14 @@
 /* Class6D430 and its table come from include/Class6D430.h, through code_171e0.h. */
 #include "code_171e0.h"
 
-/* GetClass6D4E8Methods is still uncarved (asm/code_179d8.s) -- returns &D_8006D4E8,
- * a DIFFERENT class table (tools/classtable.py --scan: 29 slots, header
- * 0x13) than D_8006D430. Class6D430__InstallCdReadDriver chains Class6D430's base ctor
- * then overwrites self->methods with this class's own table -- the
- * standard "call base ctor, then install the derived vtable" idiom. Typed
- * against Class6D430Methods for the assignment's sake; the two
- * tables are different classes but share the base's slot layout. */
-extern Class6D430Methods *GetClass6D4E8Methods(void);
-
-/* CloseCdFile/GetCdFileSize's own `self` -- offsets +0xC/+0x1C happen to
- * coincide with Class6D430::unk0C and its documented-unknown pad18
- * gap, but that header is code_171e0.c's shared reading and is off-limits
- * to edit here (out of unit) -- kept as this unit's own LOCAL, narrower
- * view per the project's multiple-independent-local-views convention. */
-/* A 4-byte, alignment-2 pair -- the idiom CLAUDE.md documents for a struct
- * whose whole-struct assignment compiles to lwl/lwr + swl/swr instead of a
- * plain lw/sw (OpenCdFile's own unk18 copy needs this). Field meaning
- * unestablished beyond width/alignment. */
-typedef struct Pair16_179D8H {
-    s16 unk0;
-    s16 unk2;
-} Pair16_179D8H;
-
-typedef struct ObjA34_179D8H ObjA34_179D8H;
-
-/* ObjA34_179D8H's own methods table -- only the one slot ReadCdFile
- * dispatches through is named. Total leading padding through +0xC is
- * unchanged from before this slot was identified (0x4 + 0x8 = 0xC), so
- * this is not a shifting edit -- confirmed by re-verifying CloseCdFile
- * and GetCdFileSize (both already matched, both readers of this struct)
- * after adding it. Named `onError` in round 64 from two give-up call sites
- * at +0x48; renamed `close` in round 79 (charlie's code_179d8_s pass):
- * `tools/classtable.py D_8006D4E8` resolves +0x48 to Class6D4E8__Close,
- * and Class6D430__LoadFile also calls it on its SUCCESS path, so the
- * give-up paths were closing the file, not reporting an error. */
-typedef struct MethodsA34_179D8H {
-    u8 pad000[0x48];
-    void (*close)(ObjA34_179D8H *self);
-} MethodsA34_179D8H;
-
-struct ObjA34_179D8H {
-    MethodsA34_179D8H *methods;
-    u8 pad4[0x0C - 0x04];
-    s32 isOpen;   /* was unk0C -- 0/nonzero, set by OpenCdFile on a successful
-                   * CdSearchFile, cleared by CloseCdFile; GetCdFileSize
-                   * returns 0 when this is 0. Named from src/code_179d8_s.c's
-                   * independent async reimplementation of the same three
-                   * operations (Class6D4E8__Open/Class6D4E8__Close/Class6D4E8__Seek),
-                   * which sets/clears the identical field (its own
-                   * Obj80027480::unk0C) around the identical CD-search /
-                   * CdControl+CdSync sequence -- not guessed from this unit
-                   * alone. */
-    u8 pad10[0x18 - 0x10];
-    Pair16_179D8H pos;   /* was unk18 -- the resolved file's CD position,
-                          * copied from CdSearchFile's stat buffer (below) by
-                          * OpenCdFile and read by ReadCdFile's CdControl
-                          * seek; matches code_179d8_s.c's own field `Pos18
-                          * unk18` at the identical offset in its Obj80027480
-                          * view, commented there as a CdlLOC-shaped position. */
-    u32 size;    /* was unk1C -- the resolved file's byte size, copied from
-                  * the same stat buffer; GetCdFileSize rounds this up to the
-                  * next 0x800 (one CD sector) boundary. */
-};
+/* GetCdDriverMethods, gCdDriverMethods and CdDriver are include/CdDriver.h's
+ * (track 4, round 88). OpenCdFile/CloseCdFile/GetCdFileSize/ReadCdFile take
+ * the object CdDriver's methods were handed (any Class6D430 client: see
+ * CdDriver.h's banner); they were typed against this unit's own
+ * ObjA34_179D8H view, whose isOpen/pos/size are Class6D430's +0x00C/+0x018/
+ * +0x01C and whose `close` slot is Class6D430's +0x048 (CdDriver__Close
+ * in gCdDriverMethods; Class6D430__LoadFile calls it on its success path
+ * too, so the give-up paths below close the file). */
 
 /* func_8002B640's own stat-like output buffer (OpenCdFile's local
  * `sp+0x10`). Only the two fields OpenCdFile itself copies out are
@@ -155,8 +99,8 @@ struct ObjA34_179D8H {
  * string buffer starts, so it's at least 0x18 bytes -- the rest is
  * unestablished. */
 typedef struct StatBuf179D8H {
-    Pair16_179D8H pos;   /* was unk0 -- copied into ObjA34_179D8H::pos */
-    u32 size;            /* was unk4 -- copied into ObjA34_179D8H::size */
+    CdLoc16 pos;         /* was unk0 -- copied into CdDriver::pos */
+    u32 size;            /* was unk4 -- copied into CdDriver::size */
     u8 pad8[0x18 - 0x8];
 } StatBuf179D8H;
 
@@ -188,7 +132,7 @@ extern char gCdFileVersionSuffix[]; /* ";1", the ISO9660 CD file-version suffix 
 
 void Class6D430__InstallCdReadDriver(Class6D430 *self) {
     GetClass6D430Methods()->ctor(self);
-    self->methods = GetClass6D4E8Methods();
+    self->methods = (Class6D430Methods *)GetCdDriverMethods();
     self->isOpen = 0;
 }
 
@@ -204,7 +148,7 @@ void NoOp2(void) {
  * and CSEs it with BuildCdFilePath's argument (one word long, rotated
  * saved registers). Retail recomputes &path inside the loop body --
  * docs/match-reports/OpenCdFile.md. */
-void OpenCdFile(ObjA34_179D8H *self, char *suffix) {
+void OpenCdFile(CdDriver *self, char *suffix) {
     s32 i;
     StatBuf179D8H statBuf;
     char path[0x40];
@@ -234,13 +178,13 @@ char *BuildCdFilePath(char *dest, char *suffix) {
     return dest;
 }
 
-void CloseCdFile(ObjA34_179D8H *self) {
+void CloseCdFile(CdDriver *self) {
     if (self->isOpen != 0) {
         self->isOpen = 0;
     }
 }
 
-s32 GetCdFileSize(ObjA34_179D8H *self) {
+s32 GetCdFileSize(CdDriver *self) {
     u32 result;
 
     if (self->isOpen == 0) {
@@ -256,7 +200,7 @@ void NoOp3(void) {
 
 /* libcd/sys entry points (lib/libcd/sys.o, linked since round 34) -- this
  * unit's own per-call-site typing for ReadCdFile's calls, kept local. */
-extern void CdControl(s32 arg0, Pair16_179D8H *buf, s32 arg2);
+extern void CdControl(s32 arg0, CdLoc16 *buf, s32 arg2);
 extern s32 CdSync(s32 arg0, void *buf);
 extern s32 CdRead(s32 arg0, void *arg1, s32 arg2);
 extern s32 CdReadSync(s32 arg0, s32 arg1);
@@ -268,7 +212,7 @@ extern s32 CdReadSync(s32 arg0, s32 arg1);
  * slot, a goto loop's branch targets the argument setup itself --
  * docs/match-reports/ReadCdFile.md. `scratch` is never touched; it only
  * sizes the frame (retail's `buf` sits at sp+0x810). */
-s32 ReadCdFile(ObjA34_179D8H *self, char *arg1, s32 arg2) {
+s32 ReadCdFile(CdDriver *self, char *arg1, s32 arg2) {
     s32 hi;
     s32 status;
     char scratch[0x800];

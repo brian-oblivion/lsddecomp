@@ -1,10 +1,12 @@
-# Class6D4E8__CancelRequests — MATCHED (62/62 words)
+# CdDriver__CancelRequests — MATCHED (62/62 words)
+
+> Renamed from `Class6D4E8__CancelRequests` on 2026-09-26 (tools/rename.py). Address 0x80027d70.
 
 > Renamed from `func_80027D70` on 2026-09-17 (tools/rename.py). Address 0x80027d70.
 
 Round 45, runner echo (second sitting), `src/code_179d8_q.c`. This class's
 own method-table slot **+0x074** (see the class-map comment above
-`GetClass6D4E8Methods` in the `.c`).
+`GetCdDriverMethods` in the `.c`).
 
 ## Result
 
@@ -46,7 +48,7 @@ extern void CdFlush(void);
 extern void ResetCdStateMachine(void); /* code_179d8_r: reset the state machine */
 extern void FreeCdRequestNode(CdRequest_D70 *req); /* code_179d8_r: unlink+free */
 
-void Class6D4E8__CancelRequests(Obj6D4E8_D70 *self)
+void CdDriver__CancelRequests(Obj6D4E8_D70 *self)
 {
     CdRequest_D70 *entry;
     CdRequest_D70 *node;
@@ -142,9 +144,9 @@ Round 51 (alpha), FINISHING-PLAN track 3.
 
 | was | now | tier |
 | --- | --- | --- |
-| `func_80027D70` | `Class6D4E8__CancelRequests` | A |
+| `func_80027D70` | `CdDriver__CancelRequests` | A |
 
-**Evidence.** Slot `+0x074` of `D_8006D4E8`. It walks the `gCdRequestQueue`
+**Evidence.** Slot `+0x074` of `gCdDriverMethods`. It walks the `gCdRequestQueue`
 request list and, for every node whose `owner` is this object, calls
 `FreeCdRequestNode` (code_179d8_r: unlink + free) and decrements the object's own
 pending count. Before that, if the HEAD node is this object's and is already
@@ -164,7 +166,7 @@ function; the `Cancel` is not an inference about purpose but a description of
 - `CdRequest_D70.owner` (`+0x0C`): `EnqueueCdRequest` stores the requesting
   object there. Tier A. (Already named `owner` in round 45; confirmed.)
 - `Obj6D4E8_D70.pendingRequests` / `.flags`: see
-  `Class6D4E8__RequestLoadFile.md`.
+  `CdDriver__RequestLoadFile.md`.
 
 ## Proposed field names
 
@@ -189,3 +191,6 @@ The CD driver's shared globals and records are now declared once, in
 global's type comes from its accessors (`gFileTable` is walked at the 0x1C
 `CdFileEntry` stride; `gCdSeekParam` is read for `->size` and sought to at
 `+0x14`, i.e. `pos`). Byte-identical; no new `-Wall` warning.
+
+
+Track 4, 2026-09-26 (round 88). The class of gCdDriverMethods (was D_8006D4E8, id 0x13 = DATASOURCE_CD) is CdDriver, in include/CdDriver.h: its ctor calls InitCdDrive, its slots enqueue CD_OP_* requests and drive the CD read state machine, and it is VabDriver's sibling. The object views this function was typed against are replaced by CdDriver, whose fields are all Class6D430's (the driver runs on its clients' objects; Class6D430's +0x018/+0x01C were named pos/size for it). Byte-identical. `Class6D4E8__CancelRequests` -> `CdDriver__CancelRequests` by rename.py.

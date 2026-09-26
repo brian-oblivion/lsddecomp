@@ -1,4 +1,6 @@
-# Class6D4E8__Open -- MATCHED (round 47, alpha)
+# CdDriver__Open -- MATCHED (round 47, alpha)
+
+> Renamed from `Class6D4E8__Open` on 2026-09-26 (tools/rename.py). Address 0x800272d0.
 
 > Renamed from `func_800272D0` on 2026-09-25 (tools/rename.py). Address 0x800272d0.
 
@@ -6,7 +8,7 @@
 in ROM order in this unit, so the shared `Obj80027480` local struct and
 `gCdAsyncEnabled`/`D_8008A860`/`gCdBusy`/`LockCd`/`StartCdOperation`/
 `ResetCdStateMachine`/`EnqueueCdRequest`/`UnlockCd` externs were moved ahead of
-it (they were previously declared between it and `Class6D4E8__Close`).
+it (they were previously declared between it and `CdDriver__Close`).
 
 ## Source
 
@@ -42,7 +44,7 @@ typedef struct StatBuf80027 {
     u8 pad8[0x18 - 8];
 } StatBuf80027;
 
-void Class6D4E8__Open(Obj80027480 *self, char *suffix, s32 arg2, s32 arg3) {
+void CdDriver__Open(Obj80027480 *self, char *suffix, s32 arg2, s32 arg3) {
     char path[0x40];
     StatBuf80027 statBuf;
     Rec80028448 *rec;
@@ -99,8 +101,8 @@ void Class6D4E8__Open(Obj80027480 *self, char *suffix, s32 arg2, s32 arg3) {
    established alignment-2 `lwl`/`lwr` + `swl`/`swr` idiom), matching
    retail's unaligned 4-byte copies at both call sites. This is a shared-file
    type used by three OTHER already-matched functions in the unit
-   (`Class6D4E8__Close`, `Class6D4E8__Read`, `Class6D4E8__Seek`); only
-   `Class6D4E8__Seek`'s `CdPosToInt(self->unk18)` needed updating to
+   (`CdDriver__Close`, `CdDriver__Read`, `CdDriver__Seek`); only
+   `CdDriver__Seek`'s `CdPosToInt(self->unk18)` needed updating to
    `CdPosToInt(&self->unk18)` since the field no longer decays to a pointer
    on its own. Re-verified all three still match after the type change.
 
@@ -137,7 +139,7 @@ void Class6D4E8__Open(Obj80027480 *self, char *suffix, s32 arg2, s32 arg3) {
    in the sibling `else` branch. That produced an EXTRA `move v1,v0` right
    after the `CdSync` call, with the loop's own comparisons then reading
    `$v1` -- retail reads `$v0` directly, with no move at all (like
-   `Class6D4E8__Seek`'s analogous loop). Isolated through the pinned pipeline
+   `CdDriver__Seek`'s analogous loop). Isolated through the pinned pipeline
    (`/tmp/.../t6.c` through `t8.c`): the SAME retry-loop code, byte-for-byte,
    produces the extra `move` when the sibling branch also assigns into a
    variable named `v0`, and produces retail's exact no-move shape when that
@@ -185,7 +187,7 @@ Round 79 (charlie), FINISHING-PLAN track 3.
 
 | was | now | tier |
 | --- | --- | --- |
-| `func_800272D0` | `Class6D4E8__Open` | A |
+| `func_800272D0` | `CdDriver__Open` | A |
 
 **Evidence.** With the driver in plain sync mode it tail-forwards to
 `OpenCdFile` (code_179d8_h). Otherwise, outside a queue dispatch, it
@@ -200,8 +202,8 @@ open one", hence tier A. `arg2`/`arg3` are only passed through to the
 queued request and are not read otherwise, so they stay unnamed.
 
 **Class prefix.** `Class6D4E8` is the placeholder token for the method
-table `D_8006D4E8` (the convention `Class6D4E8__RequestLoadFile` and its two
-siblings already use); `tools/classtable.py D_8006D4E8` lists this function
+table `gCdDriverMethods` (the convention `CdDriver__RequestLoadFile` and its two
+siblings already use); `tools/classtable.py gCdDriverMethods` lists this function
 at slot `+0x044`. The prefix names the table, not the developers' class.
 
 ## Field, slot and type names (this unit's local views, APPLIED)
@@ -213,8 +215,8 @@ oracles green after.
 
 | type (was) | field (was) | now | tier | evidence |
 | --- | --- | --- | --- | --- |
-| `Obj80027480` | -- | `Class6D4E8` | A | the object whose methods are `D_8006D4E8`'s slots |
-| `Methods80027480` | -- | `Class6D4E8Methods` | A | `D_8006D4E8` itself |
+| `Obj80027480` | -- | `Class6D4E8` | A | the object whose methods are `gCdDriverMethods`'s slots |
+| `Methods80027480` | -- | `Class6D4E8Methods` | A | `gCdDriverMethods` itself |
 | `Pos18` | -- | `CdLoc16` | A | code_179d8_q's name for the same 2-aligned CdlLOC shape |
 | `Rec80028448` | -- | `CdFileEntry` | A | code_179d8_q's name for the 0x1C-byte file-table record |
 | `StatBuf80027` | -- | `CdFileInfo` | A | code_179d8_q's name for CdSearchFile's CdlFILE output |
@@ -228,13 +230,13 @@ oracles green after.
 | `Class6D4E8` | `unk22` | `pendingRequests` | A | code_179d8_q's name; RunRequestQueue decrements it per completion |
 | `Class6D4E8` | `unk24` | `flags` | A | code_179d8_q's name; only ORed with CD_FLAG_* bits |
 | `Class6D4E8` | `unk28` | `inQueueDispatch` | A | written only by the ctor (0) and RunRequestQueue (1 around the dispatch call, 0 after); every method starts its operation when set, enqueues when clear |
-| `Class6D4E8Methods` | `slot44` | `open` | A | resolves to `Class6D4E8__Open` |
-| `Class6D4E8Methods` | `onError` | `close` | A | resolves to `Class6D4E8__Close` (see that report) |
-| `Class6D4E8Methods` | `slot4C` | `seek` | B | resolves to `Class6D4E8__Seek` |
-| `Class6D4E8Methods` | `slot54` | `read` | A | resolves to `Class6D4E8__Read` |
-| `Class6D4E8Methods` | `slot58` | `loadFile` | A | resolves to `Class6D4E8__LoadFile`; code_179d8_q's name |
+| `Class6D4E8Methods` | `slot44` | `open` | A | resolves to `CdDriver__Open` |
+| `Class6D4E8Methods` | `onError` | `close` | A | resolves to `CdDriver__Close` (see that report) |
+| `Class6D4E8Methods` | `slot4C` | `seek` | B | resolves to `CdDriver__Seek` |
+| `Class6D4E8Methods` | `slot54` | `read` | A | resolves to `CdDriver__Read` |
+| `Class6D4E8Methods` | `slot58` | `loadFile` | A | resolves to `CdDriver__LoadFile`; code_179d8_q's name |
 | `Class6D4E8Methods` | `slot64` | `setFlag` | A | resolves to `Class6D430__SetFlag` |
-| `Class6D4E8Methods` | `slot70` | `stopCdService` | A | resolves to `Class6D4E8__StopCdService` |
+| `Class6D4E8Methods` | `slot70` | `stopCdService` | A | resolves to `CdDriver__StopService` |
 | `CdFileEntry` | `pad0`/`unk14`/`unk18` | `name`/`pos`/`size` | A | code_179d8_q's CdFileEntry |
 | `CdFileInfo` | `unk0`/`unk4` | `pos`/`size` | A | code_179d8_q's CdFileInfo |
 | `CdRequestNode` | `unk0`,`unk8`,`unkC`,`unk10`,`unk14`,`unk18` | `active`,`op`,`owner`,`fileIndex`,`param0`,`param1` | A (params B) | EnqueueCdRequest's writes and StartCdOperation's `active = 1`, per their reports' proposals |
@@ -245,7 +247,10 @@ identified (code_179d8_q's `UnkC80::unk04` store goes through an
 uninitialised pointer).
 
 Globals: `D_8006D574` -> `gCdSeekLoc` (A: 8 bytes of .data written only by
-`Class6D4E8__Seek`'s `CdIntToPos` and used as its CdlSetloc target).
+`CdDriver__Seek`'s `CdIntToPos` and used as its CdlSetloc target).
 `D_8008A860` keeps its placeholder for code_179d8_q's stated reason: every
 read here is the `gCdAsyncEnabled == 0 && D_8008A860 == 0` sync-mode test and
 nothing names the second mode.
+
+
+Track 4, 2026-09-26 (round 88). The class of gCdDriverMethods (was D_8006D4E8, id 0x13 = DATASOURCE_CD) is CdDriver, in include/CdDriver.h: its ctor calls InitCdDrive, its slots enqueue CD_OP_* requests and drive the CD read state machine, and it is VabDriver's sibling. The object views this function was typed against are replaced by CdDriver, whose fields are all Class6D430's (the driver runs on its clients' objects; Class6D430's +0x018/+0x01C were named pos/size for it). Byte-identical. `Class6D4E8__Open` -> `CdDriver__Open` by rename.py.

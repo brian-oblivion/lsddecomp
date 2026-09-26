@@ -37,6 +37,6 @@ unit's header comment.
 Renamed `func_8002C438` -> `GetVabDriverMethods`, tier A. Pure getter --
 mechanics ARE its purpose (CLAUDE.md/FINISHING-PLAN's own tier-A rule for a
 leaf getter). Matches the naming already in use for its sibling accessor
-`GetVabStreamObjMethods` and the same-round precedent `GetClass6D4E8Methods`
+`GetVabStreamObjMethods` and the same-round precedent `GetCdDriverMethods`
 (alpha, code_171e0.c) for "return the address of a known class's own
 methods table."
