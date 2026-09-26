@@ -81,7 +81,6 @@ code_1677c: warning: which is probably not what you want.
 code_171e0: warning: assignment from incompatible pointer type
 code_179d8_d: warning: unused variable `buf'
 code_179d8_d: warning: unused variable `buf'
-code_179d8_e: warning: passing arg 2 makes pointer from integer without a cast
 code_179d8_e: warning: passing arg 4 of `BuildFileName' discards `const' from pointer target type
 code_179d8_e: warning: passing arg 4 of `BuildFileName' discards `const' from pointer target type
 code_179d8_g: warning: passing arg 2 of `CD_cw' makes integer from pointer without a cast

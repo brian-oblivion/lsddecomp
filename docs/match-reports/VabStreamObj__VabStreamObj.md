@@ -149,3 +149,16 @@ for a constructor whose allocating entry point already has its own
 optionally, the VAB header-load chain) -- the class itself
 (`VabStreamObj`, an SPU/VAB sound-streaming object) is established at the
 unit level, not guessed here.
+
+## Track 4 (2026-09-26, round 87)
+
+The unit's local `VabStreamObj`/`VabStreamObjMethods` views are replaced by
+`include/VabStreamObj.h`, and the whole image stays byte-identical. The
+slots this ctor calls now carry their inherited Class6D430 names:
+`slot9C` -> `setPitchOffset`, `slot6C` -> `requestLoadFile`, and
+`self->loadState` -> `self->unk2A`, which is Class6D430's field.
+`New_VabStreamObj`'s dispatch is `ctor` (was `slot08`), and it now takes
+`char *path` (was `s32`). The slot table above calls +0x58 and +0x6C "null
+in retail". That is true of the static table only: SetActiveDataSource binds
+the active driver's `loadFile`/`requestLoadFile` there
+(`GetVabStreamObjMethods` is in `gDataSourceClientGetters`).

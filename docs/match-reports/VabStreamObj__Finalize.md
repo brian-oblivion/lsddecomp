@@ -87,3 +87,11 @@ a finalize: it releases what the ctor acquired and chains to the active
 driver's finalize, as `Class6D430__Finalize` does. "Close" also named a
 different slot: Class6D430's +0x048 is `close`. Track 4 step 6 names an
 override for its slot.
+
+Return type (same day, when the unit's view became `include/VabStreamObj.h`).
+The function is now `void`, like the finalize slot it fills, and the chained
+`GetActiveDataSourceMethods()->slot0C(self)` is a statement rather than a
+`return`. The whole image stays byte-identical. The one caller is
+`Class6D430__Release`, through the finalize slot, and it does not read the
+return value. The unit's `DriverBaseMethods` view still declares that slot
+as s32. That is Class6D430's view, left as it was.
