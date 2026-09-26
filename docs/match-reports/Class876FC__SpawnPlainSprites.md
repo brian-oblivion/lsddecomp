@@ -104,3 +104,5 @@ five-element array at +0x084 ("links") is `Class876FC::sprites`, filled by
 another name; RandomizeSprites' `slot48` is Class879C4's inherited
 `updateScale` and its `angle` (+0x084) is `sprite.rotate` (Sprite, +0x064 +
 0x020, 4096 per degree -- the `(rand() % 360) << 12` it stores).
+
+View replaced the same day: the `LinkOwnerObj`/`LinkElemObj` views in class_3bb8c_o.c are deleted and the unit includes include/Class876FC.h (`this` is `Class876FC *self`; `links` is `sprites`, `slot48` is `updateScale`, `angle` is `sprite.rotate`). Image byte-identical.

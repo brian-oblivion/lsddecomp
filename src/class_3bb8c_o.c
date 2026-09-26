@@ -9,12 +9,9 @@
  * Named round 52 (runner bravo). SPANS TWO CLASSES, cut at a ROM address,
  * not a class boundary (`tools/classtable.py`, confirmed round 17/52):
  *
- *  - `LinkOwnerObj`/`LinkElemObj` (`NoOpIgnoreArgs`, `Class876FC__ReleaseSprites[B]`,
- *    `Class876FC__RandomizeSprites`, `Class876FC__SpawnPlainSprites`): a small
- *    object holding an inline 5-element link array (`links`). This is the
- *    SAME node `class_3bb8c_s.c` independently calls `LinkNode` -- kept as
- *    this unit's own local view per the multiple-independent-local-views
- *    convention, unrelated to the class below.
+ *  - Class876FC's sprite-array helpers (`NoOpIgnoreArgs`,
+ *    `Class876FC__ReleaseSprites[B]`, `Class876FC__RandomizeSprites`,
+ *    `Class876FC__SpawnPlainSprites`; include/Class876FC.h, round 88).
  *  - `Actor` (`GetClass876FCMethods` onward; include/Actor.h, unified round
  *    82): the base class of `DreamSys`, `Class65650` and `Class876FC`.
  *    `Actor__Actor` is the BASE's own constructor: `Class65650__Class65650`
@@ -25,25 +22,18 @@
 #include "common.h"
 #include "Actor.h"
 #include "TmdModel.h"
+#include "Class876FC.h"
 
 void NoOpIgnoreArgs(void) {
 }
 
 /* ------------------------------------------------------------------ *
- * Group 1: Class876FC__ReleaseSprites / Class876FC__ReleaseSpritesB /
- * Class876FC__RandomizeSprites / Class876FC__SpawnPlainSprites.
- * Self is some larger object with an inline 5-element `BasicClass *`
- * array at +0x084 (`links`). ReleaseLinks/ReleaseLinksB (two identical,
- * separate ROM functions -- see their own reports) release the whole
- * array via ReleaseBasicClassArray, already established elsewhere as
- * `void ReleaseBasicClassArray(BasicClass **array, s32 count)` in
- * code_8220_b.c -- kept generic `void **` here per this project's
- * per-unit convention for that symbol, e.g. code_2cc8c.h's own looser
- * reading. RandomizeLinks walks array indices [1..4] (self+0x88 ..
- * self+0x94), which is exactly inside the same 5-element array, and for
- * each element calls its own vtable slot +0x048 with a random Vec3-ish
- * table entry, then sets the element's own `angle` field to a random
- * value (`(rand() % 360) << 12`, a degrees->fixed-point conversion).
+ * Group 1: Class876FC's sprite-array helpers (include/Class876FC.h), called
+ * only from its per-kind dispatch in class_3bb8c_s.c. ReleaseSprites and
+ * ReleaseSpritesB are two identical, separate ROM functions (see their
+ * reports). RandomizeSprites walks sprites[1..4]: each gets a random scale
+ * ratio table through its updateScale slot (Class879C4__UpdateScale) and a
+ * random sprite.rotate, `(rand() % 360) << 12` (4096 per degree).
  * ------------------------------------------------------------------ */
 
 extern void ReleaseBasicClassArray(void **array, s32 count);
@@ -53,50 +43,32 @@ typedef struct Vec3O {
     s32 x, y, z;
 } Vec3O;
 
-/* A rand()-indexed table of 6 Vec3-shaped entries, passed to each link
- * element's own slot48. */
+/* A rand()-indexed table of 6 Vec3-shaped entries, handed to each sprite's
+ * updateScale. */
 extern Vec3O gLinkElemVec3Table[];
 
-typedef struct LinkElemObj LinkElemObj;
-typedef struct LinkElemMethods {
-    u8 pad0[0x48];
-    void (*slot48)(LinkElemObj *self, s32 arg1, Vec3O *arg2); /* +0x048 */
-} LinkElemMethods;
-struct LinkElemObj {
-    LinkElemMethods *methods; /* +0x000 */
-    u8 pad4[0x80];             /* +0x004 .. +0x083, unknown */
-    s32 angle;                   /* +0x084, a random "angle" set by Class876FC__RandomizeSprites */
-};
-
-typedef struct LinkOwnerObj {
-    u8 pad0[0x84];              /* +0x000 .. +0x083, unknown */
-    LinkElemObj *links[5];        /* +0x084 .. +0x097 */
-} LinkOwnerObj;
-
-void Class876FC__ReleaseSprites(LinkOwnerObj *this) {
-    ReleaseBasicClassArray((void **)this->links, 5);
+void Class876FC__ReleaseSprites(Class876FC *self) {
+    ReleaseBasicClassArray((void **)self->sprites, 5);
 }
 
-extern void Class876FC__SpawnSprites(void *arg0, s32 arg1, s32 arg2, s32 arg3);
-
-void Class876FC__SpawnPlainSprites(void *this) {
-    Class876FC__SpawnSprites(this, 0, 0, 0);
+void Class876FC__SpawnPlainSprites(Class876FC *self) {
+    Class876FC__SpawnSprites(self, 0, 0, 0);
 }
 
-void Class876FC__RandomizeSprites(LinkOwnerObj *this) {
-    LinkElemObj **p = &this->links[1];
+void Class876FC__RandomizeSprites(Class876FC *self) {
+    Class879C4 **p = &self->sprites[1];
     s32 i;
 
     for (i = 0; i < 4; i++, p++) {
         u32 r = rand();
 
-        (*p)->methods->slot48(*p, 1, &gLinkElemVec3Table[r % 6]);
-        (*p)->angle = (rand() % 360) << 12;
+        (*p)->methods->updateScale(*p, 1, &gLinkElemVec3Table[r % 6]);
+        (*p)->sprite.rotate = (rand() % 360) << 12;
     }
 }
 
-void Class876FC__ReleaseSpritesB(LinkOwnerObj *this) {
-    ReleaseBasicClassArray((void **)this->links, 5);
+void Class876FC__ReleaseSpritesB(Class876FC *self) {
+    ReleaseBasicClassArray((void **)self->sprites, 5);
 }
 
 /* ------------------------------------------------------------------ *
@@ -113,10 +85,8 @@ typedef struct Buf38O {
     u8 raw[0x38];
 } Buf38O;
 
-/* Class876FC's table (class_3bb8c_r/s); typed as its parent's layout. */
-extern ActorMethods gClass876FCMethods;
-
-ActorMethods *GetClass876FCMethods(void) {
+/* Class876FC's getter (include/Class876FC.h), placed here by ROM address. */
+Class876FCMethods *GetClass876FCMethods(void) {
     return &gClass876FCMethods;
 }
 
