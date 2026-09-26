@@ -103,7 +103,6 @@ D_8008AC1C
 D_8008AC68
 D_8008AC78
 D_8008ACA0
-D_8008ACA8
 D_8008ACAC
 LINK_ANGLE_180
 SAVE_MAGIC
@@ -187,6 +186,7 @@ gStyleDecorSizeH
 gStyleDecorSizeW
 gStyleDecorVariant
 gStyleEffectSlotCount
+gStyleEffectTim
 gStyleEffectTmd
 gStyleGrid
 gStyleSceneRefs

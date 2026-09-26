@@ -54,12 +54,12 @@ extern void NoOpIgnoreArgs();
 /* Three globals class_3bb8c_o.c's Actor__func_56f5c captures once from its
  * parameters (declared there with the same types; track 4b, round 85):
  * gStyleEffectTmd is the Actor it ran on, called here through SceneNode's
- * +0x080 getSetUnk10Flag8 as that function calls it; D_8008ACA8 is
+ * +0x080 getSetUnk10Flag8 as that function calls it; gStyleEffectTim is
  * forwarded opaquely to New_VariantSprite as its third argument; D_8008ACAC's
  * pointee has a field at +0x018 that StyleEffect__InitByKind and
  * StyleEffect__UpdateByKind snapshot/diff via gTrackedYSnapshot. */
 extern Actor *gStyleEffectTmd; /* the Actor Actor__func_56f5c ran on */
-extern void *D_8008ACA8;
+extern void *gStyleEffectTim;
 extern void *D_8008ACAC;
 extern s32 gTrackedYSnapshot;
 extern s32 D_8008AB98[];
@@ -309,7 +309,7 @@ void StyleEffect__SpawnSprites(void *self, s32 unused, s32 variant, void *scale)
     s32 i;
 
     for (i = 0; i < 5; i++, p++) {
-        node = New_VariantSprite(variant, 0, D_8008ACA8);
+        node = New_VariantSprite(variant, 0, gStyleEffectTim);
         *p = node;
         node->methods->attachToParent(node, self, 0);
         (*p)->methods->setColor(*p, ((StyleEffect *)self)->params.color);

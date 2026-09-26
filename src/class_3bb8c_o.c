@@ -93,7 +93,7 @@ StyleEffectMethods *GetStyleEffectMethods(void) {
  * the same three with the same types; track 4b, round 85): the Actor this
  * runs on, and two objects passed through. */
 extern Actor *gStyleEffectTmd;
-extern void *D_8008ACA8;
+extern void *gStyleEffectTim;
 extern void *D_8008ACAC;
 extern s32 D_8008AB98[3];
 extern s32 D_8008AB94;
@@ -105,7 +105,7 @@ void Actor__func_56f5c(s32 unused, Actor *self, s32 arg2, s32 arg3) {
     void *ret;
 
     gStyleEffectTmd = self;
-    D_8008ACA8 = (void *)arg2;
+    gStyleEffectTim = (void *)arg2;
     D_8008ACAC = (void *)arg3;
     i = 0;
     do {
