@@ -499,7 +499,7 @@ Gate 2.
    one shared header that breaks. **The convention ends, class by class, in
    track 4:** a class `plan.py classes` lists as UNIFIED has exactly one
    definition, `include/<Class>.h`, and no unit declares its own view of it
-   again (FINISHING-PLAN track 4; `include/BasicClass.h` is the model). `python3 tools/headercontention.py` shows
+   again (FINISHING-PLAN §3, the class model; `include/BasicClass.h`). `python3 tools/headercontention.py` shows
    which units share a header and would therefore see each other's
    declarations.
 
@@ -727,6 +727,10 @@ make extract                       # regenerate asm/ from the executable
 python3 tools/progress.py          # where the project is
 python3 tools/plan.py              # the finishing plan, measured: tracks, ready jobs, models
 python3 tools/rename.py OLD NEW    # rename a symbol everywhere, re-extract, re-verify
+python3 tools/renametype.py OLD NEW   # rename a type or class family everywhere, re-verify
+python3 tools/unitfile.py rename|merge ...   # rename or merge source files, re-verify
+python3 tools/readability.py       # phase 2 debt: placeholder types and files, literals, locals, history
+python3 tools/tuboundary.py        # original file boundaries, from the rodata
 tools/check-nonmatching.sh         # the #ifdef NON_MATCHING bodies still compile and link-resolve
 python3 tools/funcdiff.py <func>   # per-function score
 python3 tools/uncarved.py          # uncarved ground, screened (Gate 2)

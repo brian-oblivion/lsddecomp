@@ -14,8 +14,12 @@ and on which model.
     python3 tools/plan.py mark-class --table <sym> --class <Name> [--park "reason"] [--undo]  # track 4 class unified
     python3 tools/plan.py classes              # track 4: every class, its state and its views
     python3 tools/plan.py set-track --track N --status open|parked|done --reason "..."
-    python3 tools/plan.py check --item <id> [--undo]              # track 5 checklist
-    python3 tools/plan.py set-model --role naming_runner|match_runner --model sonnet|opus
+    python3 tools/plan.py check --item <id> [--undo]              # checklists: track 5, 6/7 setup, track 9
+    python3 tools/plan.py set-model --role naming_runner|match_runner|polish_runner --model sonnet|opus
+    python3 tools/plan.py mark-unit --unit <unit> --track 7 [--undo]   # track 7 polish pass done
+    python3 tools/plan.py flag-type --name <Type> --reason "..." [--undo]   # track 6: a name the patterns miss
+    python3 tools/plan.py park-type --name <Type> --reason "..." [--undo]   # track 6: kept, with the reason
+    python3 tools/plan.py regions              # track 8: every region of game units, evidence and state
 
 This is the companion to docs/FINISHING-PLAN.md the way progress.py is the
 companion to CLAUDE.md: the DOC holds the rules and quotes no counts; this
@@ -64,6 +68,9 @@ MODELS = {
     "match_runner_default": "sonnet",
     "naming_runner_default": "opus",
     "mechanical_runner": "sonnet",
+    "types_runner": "opus",
+    "polish_runner_default": "opus",
+    "files_runner": "opus",
 }
 
 # WORD budgets. A doc over budget is a warning here and a job in track 5.
@@ -91,6 +98,28 @@ TRACK5_ITEMS = {
     "nonmatching-clean": "tools/check-nonmatching.sh green and every stall has a NON_MATCHING body or a written reason",
 }
 
+# Phase 2 (plan revision 27, 2026-09-26): the code reads like a game's source.
+# One-time setup items a PREMIUM head does before its track staffs runners
+# (operator decisions of 2026-09-26), then the close-out.
+TRACK6_SETUP = {
+    "sdk-headers": "include/psyq/*.H normalized to LF and include/types.h reconciled, so game code can "
+                   "#include LIBGTE.H/LIBGS.H/LIBGPU.H; proven byte-identical (docs/research/psyq-header-crlf-blocker.md)",
+}
+TRACK7_SETUP = {
+    "format": ".clang-format checked in matching the house style, every src/include file formatted once "
+              "between rounds (byte-identical), `make format` then `git diff --exit-code` clean",
+}
+TRACK9_ITEMS = {
+    "layout": "src/ grouped into subsystem directories; README's code map says which directory holds what",
+    "readme": "README.md describes the code by its final names and layout, no counts",
+    "comments": "no project history in src/include comments (readability.py history 0, headers too)",
+    "style": "`make format` leaves no diff",
+    "docs-budget": "every doc within its word budget",
+    "nonmatching-clean": "tools/check-nonmatching.sh green",
+}
+CHECK_ITEMS = {"5": TRACK5_ITEMS, "6": TRACK6_SETUP, "7": TRACK7_SETUP, "9": TRACK9_ITEMS}
+TABLE_NAME = re.compile(r"^g[A-Z]\w*Methods$")
+
 DEFAULT_STATE = {
     "stop_rule": {"attempts_per_model": 6, "min_matches": 3},
     "models": {"match_runner": None, "naming_runner": None},
@@ -101,6 +130,10 @@ DEFAULT_STATE = {
         "3": {"status": "open", "reason": "", "units_done": {}},
         "4": {"status": "auto", "reason": "", "classes": {}},
         "5": {"status": "auto", "reason": "", "checklist": {}},
+        "6": {"status": "auto", "reason": "", "checklist": {}, "flagged": {}, "parked": {}},
+        "7": {"status": "auto", "reason": "", "checklist": {}, "units_done": {}},
+        "8": {"status": "auto", "reason": "", "parked": {}},
+        "9": {"status": "auto", "reason": "", "checklist": {}},
     },
 }
 
@@ -119,13 +152,56 @@ def load_state():
     # fill in any key a newer version of this tool added
     for k, v in DEFAULT_STATE.items():
         st.setdefault(k, v)
-    for t, v in DEFAULT_STATE["tracks"].items():
+    for t, v in json.loads(json.dumps(DEFAULT_STATE["tracks"])).items():
         st["tracks"].setdefault(t, v)
+        for key, val in v.items():
+            st["tracks"][t].setdefault(key, val)
     return st
 
 
 def save_state(st):
     STATE.write_text(json.dumps(st, indent=2, sort_keys=True) + "\n")
+
+
+# The ledger names things: track 3/7 units, track 4 tables, classes and
+# headers, track 6 flagged/parked types. A rename that leaves it behind turns
+# a unified class into a class with STRAY VIEWS and a passed unit into an
+# unpassed one. rename.py, renametype.py and unitfile.py call this; narrative
+# fields (a round's note, a reason) are history and are not rewritten.
+LEDGER_NARRATIVE = {"note", "reason", "rounds", "amended", "why", "was"}
+
+
+def ledger_rename(mapping, drop_duplicates=False):
+    """Rewrite whole tokens OLD -> NEW in the ledger's keys and name values.
+    With drop_duplicates (a unit merge), a key that now collides keeps the
+    surviving unit's entry."""
+    if not STATE.exists() or not mapping:
+        return
+    rxs = [(re.compile(rf"(?<![A-Za-z0-9_]){re.escape(o)}(?![A-Za-z0-9_])"), n)
+           for o, n in sorted(mapping.items(), key=lambda kv: -len(kv[0]))]
+
+    def fix(x):
+        for rx, n in rxs:
+            x = rx.sub(n, x)
+        return x
+
+    def walk(x):
+        if isinstance(x, dict):
+            out = {}
+            for k, v in x.items():
+                nk = k if k in LEDGER_NARRATIVE else fix(k)
+                nv = v if k in LEDGER_NARRATIVE else walk(v)
+                if nk in out and drop_duplicates:
+                    continue
+                out[nk] = nv
+            return out
+        if isinstance(x, list):
+            return [walk(v) for v in x]
+        return fix(x) if isinstance(x, str) else x
+    st = json.loads(STATE.read_text())
+    new = walk(st)
+    if new != st:
+        save_state(new)
 
 
 def run_json(cmd):
@@ -558,6 +634,7 @@ def collect(st):
         sony_named = [n for n, _, _ in sonydata.flagged()]
     except Exception:
         sony_named = []
+    p2 = collect_phase2(st, info, t5_status, classes, units)
     ec = subprocess.run([sys.executable, "tools/externcheck.py"], capture_output=True, text=True, cwd=ROOT).stdout
     m_ec = re.search(r"^(\d+) function\(s\) with conflicting arity", ec, re.M)
     return {
@@ -583,7 +660,7 @@ def collect(st):
                   "d_refs": sum(u["d_refs"] for u in units.values()),
                   "naming_model": st["models"].get("naming_runner") or MODELS["naming_runner_default"]},
             "4": {"status": t4_status,
-                  "local_struct_views": sum(len(re.findall(r"^typedef struct", (ROOT / "src" / f"{u}.c").read_text(errors='replace'), re.M)) for u in units),
+                  "local_struct_views": sum(len(re.findall(r"^typedef struct", srcpath.unit_src(u).read_text(errors='replace'), re.M)) for u in units),
                   "classes_total": len(classes),
                   "classes_unified": sum(c["state"] == "unified" for c in classes),
                   "classes_parked": sum(c["state"] == "parked" for c in classes),
@@ -591,7 +668,9 @@ def collect(st):
                   "classes_incomplete": [c["table"] for c in classes if c["state"] == "unified" and c["stray"]],
                   "shared_globals": len(shared)},
             "5": {"status": t5_status, "checklist": {k: bool(ticked.get(k)) for k in TRACK5_ITEMS}},
+            **{k: v for k, v in p2.items() if not k.startswith("_")},
         },
+        "_p2": p2,
         "docs": docs,
         "units": units,
         "_fresh": fresh_funcs, "_stalls": stall_rows, "_promotable": promotable,
@@ -599,6 +678,152 @@ def collect(st):
         "_t4_rounds": st["tracks"]["4"].get("rounds", []),
         "_classes": classes, "_shared_globals": shared,
         "_globals_recipe": st["tracks"].get("4b", {}).get("status") in ("open", "done"),
+    }
+
+
+def collect_phase2(st, info, t5_status, classes, units_meta):
+    """Tracks 6 to 9 (plan revision 27): names for types, a polish pass per
+    unit, files that are real translation units, and the close-out. Every
+    count comes from tools/readability.py and tools/tuboundary.py; the ledger
+    holds only setup ticks, passed units, and flagged/parked names."""
+    import readability
+    import tuboundary
+    rd = readability.collect(info)
+    tr = st["tracks"]
+    t6, t7, t8, t9 = tr["6"], tr["7"], tr["8"], tr["9"]
+    phase2 = t5_status == "done"
+
+    # --- track 6: placeholder class and type names ---------------------------
+    parked6 = t6.get("parked", {})
+    types = {n: (why, list(fs)) for n, (why, fs) in rd["types"].items() if n not in parked6}
+    flagged = {n: w for n, w in t6.get("flagged", {}).items() if n not in parked6}
+    if flagged:
+        for p in readability.game_headers() + list(srcpath.src_files()):
+            rel = p.relative_to(ROOT).as_posix()
+            for n in readability.type_names(p.read_text(errors="replace")) & set(flagged):
+                types.setdefault(n, (f"flagged: {flagged[n]}", []))[1].append(rel)
+    depth = {}
+
+    def dep(c):
+        if c["table"] not in depth:
+            par = next((x for x in classes if x["table"] == c["parent"]), None)
+            depth[c["table"]] = 0 if par is None else dep(par) + 1
+        return depth[c["table"]]
+    class_jobs, covered = [], set()
+    byt = {c["table"]: c for c in classes}
+    for c in sorted(classes, key=lambda c: (dep(c), c["id"])):
+        name = c.get("name") or c["table"]
+        hdr = f"include/{name}.h"
+        ph_name = name in types
+        ph_table = not TABLE_NAME.match(c["table"])
+        if c["table"] in parked6 or not (ph_name or ph_table):
+            continue
+        own = sorted(n for n, (_, fs) in types.items() if hdr in fs)
+        covered |= set(own)
+        par = byt.get(c["parent"])
+        class_jobs.append({"class": name, "table": c["table"], "header": hdr, "types": own,
+                           "parent": (par.get("name") or par["table"]) if par else None,
+                           "methods": len(c.get("owned", [])), "ph_name": ph_name, "ph_table": ph_table})
+    homes = {}
+    for n, (why, fs) in types.items():
+        if n in covered:
+            continue
+        homes.setdefault(sorted(fs)[0] if fs else "?", []).append(n)
+    t6_setup = all(t6["checklist"].get(k) for k in TRACK6_SETUP)
+    left6 = len(class_jobs) + sum(len(v) for v in homes.values())
+    if t6["status"] != "auto":
+        s6 = t6["status"]
+    elif not phase2:
+        s6 = "waiting (phase 2 opens when track 5 is done)"
+    else:
+        s6 = "done" if (t6_setup and not left6) else "open"
+
+    # --- track 7: one polish pass per unit -----------------------------------
+    done7 = t7.get("units_done", {})
+    keys = readability.DEBT_KEYS
+    todo7 = sorted((u for u, m in rd["units"].items() if m["defs"] and u not in done7),
+                   key=lambda u: (-sum(rd["units"][u][k] for k in keys), u))
+    t7_setup = all(t7["checklist"].get(k) for k in TRACK7_SETUP)
+    if t7["status"] != "auto":
+        s7 = t7["status"]
+    elif not phase2:
+        s7 = "waiting (phase 2 opens when track 5 is done)"
+    else:
+        s7 = "done" if (t7_setup and not todo7) else "open"
+
+    # --- track 8: files, region by region ------------------------------------
+    text, _, _ = tuboundary.map_sections()
+    regions, cur = [], []
+    for _, _, path in text:
+        u = tuboundary.unit_of(path) if path.startswith("build/src/") else None
+        if u:
+            cur.append(u)
+        elif cur:
+            regions.append(cur)
+            cur = []
+    if cur:
+        regions.append(cur)
+    try:
+        rows, gaps, forced, contra, val = tuboundary.analyse()
+        rep = {r["unit"]: r for r in tuboundary.unit_report(rows, gaps, forced)}
+        tu_ok = not val["bad_edges"] and not val["bad_forced"] and not contra
+    except SystemExit:
+        rep, tu_ok = {}, False
+    ph_type_files = {f for _, fs in types.values() for f in fs}
+    parked8 = t8.get("parked", {})
+    region_rows = []
+    for reg in regions:
+        ph_units = [u for u in reg if readability.PLACEHOLDER_FILE.match(u)]
+        ph_hdrs = [f"include/{u}.h" for u in reg if f"{u}.h" in rd["placeholder_headers"]]
+        blockers = []
+        for u in reg:
+            m = rd["units"].get(u, {})
+            if m.get("defs") and u not in done7:
+                blockers.append(f"{u}: track 7")
+            src_rel = srcpath.unit_src(u).relative_to(ROOT).as_posix() if srcpath.unit_src(u) else f"src/{u}.c"
+            if m.get("ph_prefix") or src_rel in ph_type_files or f"include/{u}.h" in ph_type_files:
+                blockers.append(f"{u}: track 6 names")
+        joins = [u for u in reg[1:] if rep.get(u, {}).get("start_possible") is False]
+        splits = [s_ for u in reg for s_ in rep.get(u, {}).get("forced_inside", [])]
+        state = ("parked" if reg[0] in parked8 else "done" if not (ph_units or ph_hdrs)
+                 else "ready" if not blockers else "waiting")
+        region_rows.append({"units": reg, "ph_units": ph_units, "ph_headers": ph_hdrs, "state": state,
+                            "blockers": blockers, "joins": joins, "splits": splits})
+    open8 = [r for r in region_rows if r["state"] in ("ready", "waiting")]
+    if t8["status"] != "auto":
+        s8 = t8["status"]
+    elif not phase2:
+        s8 = "waiting (phase 2 opens when track 5 is done)"
+    else:
+        s8 = "done" if not open8 else "open"
+
+    # --- track 9: close-out ---------------------------------------------------
+    ticked9 = t9["checklist"]
+    if t9["status"] != "auto":
+        s9 = t9["status"]
+    elif not (s6 == "done" and s7 == "done" and s8 == "done"):
+        s9 = "waiting (opens when tracks 6, 7 and 8 are done)"
+    else:
+        s9 = "done" if all(ticked9.get(k) for k in TRACK9_ITEMS) else "open"
+
+    return {
+        "6": {"status": s6, "setup": {k: bool(t6["checklist"].get(k)) for k in TRACK6_SETUP},
+              "placeholder_types": len(types), "class_jobs": len(class_jobs),
+              "type_homes": len(homes), "parked": len(parked6), "flagged": len(flagged),
+              "ph_prefix_defs": rd["totals"]["ph_prefix"]},
+        "7": {"status": s7, "setup": {k: bool(t7["checklist"].get(k)) for k in TRACK7_SETUP},
+              "units_done": len(done7), "units_total": len(done7) + len(todo7),
+              "totals": {k: rd["totals"][k] for k in keys},
+              "model": st["models"].get("polish_runner") or MODELS["polish_runner_default"]},
+        "8": {"status": s8, "regions": len(region_rows),
+              "regions_done": sum(r["state"] == "done" for r in region_rows),
+              "regions_ready": sum(r["state"] == "ready" for r in region_rows),
+              "placeholder_units": rd["totals"]["placeholder_units"],
+              "placeholder_headers": rd["totals"]["placeholder_headers"], "tu_model_valid": tu_ok},
+        "9": {"status": s9, "checklist": {k: bool(ticked9.get(k)) for k in TRACK9_ITEMS},
+              "history": rd["totals"]["history"] + rd["totals"]["header_history"]},
+        "_class_jobs": class_jobs, "_homes": homes, "_types": types, "_todo7": todo7,
+        "_rd": rd, "_regions": region_rows,
     }
 
 
@@ -767,6 +992,7 @@ def nm_defined(unit):
 
 # a fresh job carries this many functions of one unit (revision 18)
 FRESH_PER_RUNNER = 10
+REGION_UNITS = 6        # track 8: units per files job
 STALLS_PER_RUNNER = 3
 
 
@@ -890,7 +1116,73 @@ def jobs(d, n):
                                 "opus"))
     q_close = [("5", f"{k}: {TRACK5_ITEMS[k]}", "opus")
                for k, done in t["5"]["checklist"].items() if not done] if t["5"]["status"] == "open" else []
-    queues = [q_fresh, q_naming, q_stall, q_sdk, q_revisit, q_promote, q_types, q_close]
+    p2 = d["_p2"]
+    P = MODELS["head_when_new_procedure"]
+    q6, q7, q8, q9 = [], [], [], []
+    if t["6"]["status"] == "open":
+        for k, done in t["6"]["setup"].items():
+            if not done:
+                q6.append(("6", f"HEAD (premium) setup {k}: {TRACK6_SETUP[k]} (FINISHING-PLAN track 6)", P))
+        if all(t["6"]["setup"].values()):
+            # A class whose own name is fine but whose TABLE is D_/ALLCAPS is one
+            # rename.py each: batched into one mechanical job, not a runner per table.
+            tables = [j for j in p2["_class_jobs"] if not j["ph_name"]]
+            if tables:
+                q6.append(("6", f"rename {len(tables)} method table(s) of named classes to g<Class>Methods with "
+                                "rename.py, one commit each (FINISHING-PLAN track 6 step 3): "
+                                + ", ".join(f"{j['table']} ({j['class']})" for j in tables)
+                                + f" (units: {','.join(j['header'] for j in tables)})", MODELS["mechanical_runner"]))
+            for j in p2["_class_jobs"]:
+                if not j["ph_name"]:
+                    continue
+                extra = f"; placeholder types in its header: {', '.join(j['types'])}" if j["types"] else ""
+                tab = f" and table {j['table']}" if j["ph_table"] else ""
+                q6.append(("6", f"name class {j['class']}{tab} (parent {j['parent'] or 'none'}, {j['methods']} own "
+                                f"methods, {j['header']}{extra}) (units: {j['header']})", MODELS["types_runner"]))
+            for f, names in sorted(p2["_homes"].items(), key=lambda kv: (-len(kv[1]), kv[0])):
+                u = Path(f).stem if f.startswith("src/") else f
+                q6.append(("6", f"name {len(names)} placeholder type(s) defined in {f}: {', '.join(sorted(names))} "
+                                f"(units: {u})", MODELS["types_runner"]))
+    if t["7"]["status"] == "open":
+        for k, done in t["7"]["setup"].items():
+            if not done:
+                q7.append(("7", f"HEAD (premium) setup {k}: {TRACK7_SETUP[k]} (FINISHING-PLAN track 7)", P))
+        if all(t["7"]["setup"].values()):
+            rdu = p2["_rd"]["units"]
+            for u in p2["_todo7"]:
+                m = rdu[u]
+                debt = ", ".join(f"{m[k]} {k}" for k in ("func_", "D_", "unk", "magic", "rawoff", "m2c", "history")
+                                 if m[k])
+                q7.append(("7", f"polish pass on {u} ({m['defs']} defs; {debt or 'no measured debt'}) (units: {u})",
+                           t["7"]["model"]))
+    if t["8"]["status"] == "open":
+        # Ready regions in text order, batched to about REGION_UNITS units a
+        # job: most regions are one small unit between two Sony objects.
+        batch = []
+
+        def flush():
+            if not batch:
+                return
+            us = [u for r in batch for u in r["units"]]
+            ev = [f"rodata proves one file across {', '.join(r['joins'])} and its predecessor"
+                  for r in batch if r["joins"]]
+            ev += [f"{len(r['splits'])} forced split(s) in {r['units'][0]}.." for r in batch if r["splits"]]
+            regs = "; ".join(f"{r['units'][0]}..{r['units'][-1]}" if len(r["units"]) > 1 else r["units"][0]
+                             for r in batch)
+            q8.append(("8", f"files for {len(batch)} region(s) [{regs}] ({len(us)} unit(s)"
+                            f"{'; ' + '; '.join(ev) if ev else ''}) (units: {','.join(us)})",
+                       MODELS["files_runner"]))
+            batch.clear()
+        for r in p2["_regions"]:
+            if r["state"] != "ready":
+                continue
+            batch.append(r)
+            if sum(len(x["units"]) for x in batch) >= REGION_UNITS:
+                flush()
+        flush()
+    if t["9"]["status"] == "open":
+        q9 = [("9", f"{k}: {TRACK9_ITEMS[k]}", "opus") for k, done in t["9"]["checklist"].items() if not done]
+    queues = [q_fresh, q_naming, q_stall, q_sdk, q_revisit, q_promote, q_types, q_close, q6, q7, q8, q9]
     order = []
     while any(queues):
         for q in queues:
@@ -907,7 +1199,7 @@ RENAMES = RENAMES + ("unify class", "unify global")   # rewrites accessors in ev
 def job_units(d, desc):
     """The units a job's runner edits: its one unit, or for the track-2 batch
     every unit holding one of the listed functions."""
-    m = re.search(r"\(units: ([\w,]*)\)$", desc)
+    m = re.search(r"\(units: ([\w,./-]*)\)$", desc)
     if m:
         return set(filter(None, m.group(1).split(",")))
     for rx in JOB_UNIT_RES:
@@ -1017,6 +1309,26 @@ def print_status(d, n, st):
               " (plan.py classes)")
     c5 = t["5"]["checklist"]
     print(f"  5      {t['5']['status']:<10} close-out: {sum(c5.values())}/{len(c5)} items ticked")
+    t6, t7, t8, t9 = t["6"], t["7"], t["8"], t["9"]
+    setup = lambda tt: "; setup " + ", ".join(f"{k} {'ticked' if v else 'NOT DONE'}" for k, v in tt["setup"].items())
+    print("  -- phase 2: the code reads like a game's source (revision 27; python3 tools/readability.py)")
+    print(f"  6      {t6['status'].split(' (')[0]:<10} type names: {t6['placeholder_types']} placeholder type name(s), "
+          f"{t6['class_jobs']} class(es) with a placeholder name or table, {t6['type_homes']} other file(s) defining them; "
+          f"{t6['ph_prefix_defs']} defs under a placeholder class prefix; {t6['parked']} parked"
+          f"{setup(t6)}")
+    tt7 = t7["totals"]
+    print(f"  7      {t7['status'].split(' (')[0]:<10} polish: {t7['units_done']}/{t7['units_total']} units passed; "
+          + ", ".join(f"{tt7[k]} {k}" for k in tt7) + f"; polish runner {t7['model']}{setup(t7)}")
+    print(f"  8      {t8['status'].split(' (')[0]:<10} files: {t8['regions_done']}/{t8['regions']} regions done, "
+          f"{t8['regions_ready']} ready; {t8['placeholder_units']} unit(s) and {t8['placeholder_headers']} "
+          f"header(s) still code_/class_<hex>; TU evidence model "
+          f"{'valid' if t8['tu_model_valid'] else 'INVALID (tools/tuboundary.py validation failed)'}")
+    c9 = t9["checklist"]
+    print(f"  9      {t9['status'].split(' (')[0]:<10} close-out: {sum(c9.values())}/{len(c9)} items ticked; "
+          f"{t9['history']} history mention(s) left in comments")
+    for k in ("6", "7", "8", "9"):
+        if t[k]["status"].startswith("waiting"):
+            print(f"         track {k}: {t[k]['status']}")
     print()
     over = [(k, v) for k, v in d["docs"].items() if v["over"]]
     if over:
@@ -1047,7 +1359,7 @@ def print_status(d, n, st):
             ref = f"#{shown.index(tj) + 1}" if tj in shown else "the premium job"
             why = why.replace("{#}", ref)
             print(f"        [{track:<2}] {model:<7} {desc[:90]}{'...' if len(desc) > 90 else ''}  <- {why}")
-    review = [u for u in d["_todo3"] if not any(d["units"][u][k] for k in
+    review = [u for u in d["_todo3"] if t["3"]["status"] != "done" and not any(d["units"][u][k] for k in
               ("func_named", "unk_refs", "slot_refs", "d_refs"))]
     if review:
         print(f"  REVIEW-ONLY (unmarked, zero measured naming debt; the head reviews and mark-units, no runner):")
@@ -1055,7 +1367,8 @@ def print_status(d, n, st):
     print()
     print("  Models: head runs on", MODELS["head"], "unless the round writes a new procedure, tool or doc,",
           "or adjudicates a HARD RULE or toolchain lead: then", MODELS["head_when_new_procedure"] + ".")
-    print("  Ledger: config/plan-state.json (record-round / mark-unit / mark-class / set-track / check / set-model).")
+    print("  Ledger: config/plan-state.json (record-round / mark-unit [--track 7] / mark-class / flag-type / park-type"
+          " / set-track / check / set-model).")
 
 
 def print_classes(d):
@@ -1082,6 +1395,23 @@ def print_classes(d):
     print("\n  C=a/b: a of the class's b own methods are C. 'no C': no own method is C and no view exists;")
     print("  'no C yet': the same, but its methods are carved INCLUDE_ASM game code, track 1's ground")
     print("  (revision 18). Neither blocks its subclasses; a 'no C yet' class turns ready once one matches.")
+
+
+def print_regions(d):
+    """Track 8: every run of game units between two non-game objects, text order."""
+    for r in d["_p2"]["_regions"]:
+        head = f"{r['units'][0]}..{r['units'][-1]}" if len(r["units"]) > 1 else r["units"][0]
+        print(f"  [{r['state']:<7}] {head}  ({len(r['units'])} unit(s), {len(r['ph_units'])} placeholder)")
+        if len(r["units"]) > 1:
+            print(f"            {' '.join(r['units'])}")
+        for j in r["joins"]:
+            print(f"            rodata: {j} is one file with the unit before it")
+        for s_ in r["splits"]:
+            print(f"            rodata: a file boundary lies between {s_[0]} and {s_[1]}")
+        if r["state"] == "waiting":
+            print(f"            waits for: {'; '.join(r['blockers'][:4])}{' ...' if len(r['blockers']) > 4 else ''}")
+    print("\n  Evidence: python3 tools/tuboundary.py --unit <unit>. 'waiting' = a unit still needs track 7's pass or")
+    print("  track 6's names (FINISHING-PLAN track 8: a file is named once its contents are).")
 
 
 def print_units(d):
@@ -1128,16 +1458,24 @@ def main():
     am.add_argument("--why", required=True, help="what was wrong; kept in the entry's `amended` list")
     m = sub.add_parser("mark-unit")
     m.add_argument("--unit", required=True)
+    m.add_argument("--track", default="3", choices=["3", "7"])
     m.add_argument("--undo", action="store_true")
+    sub.add_parser("regions")
+    for cmd in ("flag-type", "park-type"):
+        ft = sub.add_parser(cmd)
+        ft.add_argument("--name", required=True)
+        ft.add_argument("--reason", default="")
+        ft.add_argument("--undo", action="store_true")
     s = sub.add_parser("set-track")
     s.add_argument("--track", required=True)
     s.add_argument("--status", required=True, choices=["open", "parked", "done", "auto"])
     s.add_argument("--reason", default="")
     c = sub.add_parser("check")
-    c.add_argument("--item", required=True, choices=sorted(TRACK5_ITEMS))
+    c.add_argument("--item", required=True, choices=sorted({k for v in CHECK_ITEMS.values() for k in v}))
+    c.add_argument("--track", choices=sorted(CHECK_ITEMS), help="only needed when two tracks share an item name")
     c.add_argument("--undo", action="store_true")
     sm = sub.add_parser("set-model")
-    sm.add_argument("--role", required=True, choices=["match_runner", "naming_runner"])
+    sm.add_argument("--role", required=True, choices=["match_runner", "naming_runner", "polish_runner"])
     sm.add_argument("--model", required=True, choices=["sonnet", "opus", "auto"])
     a = ap.parse_args()
     if getattr(a, "n_jobs", None):
@@ -1177,13 +1515,25 @@ def main():
     if a.cmd == "mark-unit":
         if not srcpath.unit_src(a.unit):
             sys.exit(f"FATAL: no such unit {a.unit}")
-        ud = st["tracks"]["3"]["units_done"]
+        ud = st["tracks"][a.track].setdefault("units_done", {})
         if a.undo:
             ud.pop(a.unit, None)
         else:
             ud[a.unit] = today
         save_state(st)
-        print(f"track 3: {a.unit} {'un' if a.undo else ''}marked")
+        print(f"track {a.track}: {a.unit} {'un' if a.undo else ''}marked")
+        return
+    if a.cmd in ("flag-type", "park-type"):
+        key = "flagged" if a.cmd == "flag-type" else "parked"
+        led = st["tracks"]["6"].setdefault(key, {})
+        if a.undo:
+            led.pop(a.name, None)
+        else:
+            if not a.reason:
+                sys.exit("FATAL: --reason is required (what the name hides, or why it stays)")
+            led[a.name] = f"{a.reason} ({today})"
+        save_state(st)
+        print(f"track 6: {a.name} {'un' if a.undo else ''}{key}")
         return
     if a.cmd == "mark-class":
         led = st["tracks"]["4"].setdefault("classes", {})
@@ -1214,9 +1564,12 @@ def main():
         print(f"track {a.track}: {a.status}")
         return
     if a.cmd == "check":
-        st["tracks"]["5"]["checklist"][a.item] = not a.undo
+        owners = [t for t, items in CHECK_ITEMS.items() if a.item in items and (not a.track or t == a.track)]
+        if len(owners) != 1:
+            sys.exit(f"FATAL: item {a.item} belongs to track(s) {owners}; pass --track")
+        st["tracks"][owners[0]].setdefault("checklist", {})[a.item] = not a.undo
         save_state(st)
-        print(f"track 5: {a.item} {'un' if a.undo else ''}ticked")
+        print(f"track {owners[0]}: {a.item} {'un' if a.undo else ''}ticked")
         return
     if a.cmd == "set-model":
         st["models"][a.role] = None if a.model == "auto" else a.model
@@ -1238,6 +1591,8 @@ def main():
         print_units(d)
     elif a.cmd == "classes":
         print_classes(d)
+    elif a.cmd == "regions":
+        print_regions(d)
     else:
         print_status(d, a.n, st)
 

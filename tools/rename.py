@@ -65,7 +65,7 @@ def text_files():
     out = []
     for pat in ("src/**/*.c", "include/*.h", "include/*.inc",
                 "docs/*.md", "docs/match-reports/*.md", "docs/research/*.md",
-                "CLAUDE.md", "config/gp-symbols.txt"):
+                "CLAUDE.md", "config/gp-symbols.txt", "config/typeviews-warnings.txt"):
         out.extend(ROOT.glob(pat))
     # docs/PROGRESS.md is the append-only NARRATIVE: a past round's entry
     # describes what was observed under the name in use at the time, and
@@ -361,6 +361,12 @@ def main():
         for i, line in enumerate(text.split("\n"), 1):
             if vacuous.search(line):
                 print(f"  note: {p.relative_to(ROOT)}:{i} now says {new} -> {new}; delete that proposal note")
+
+    # the ledger keys track 4 classes by TABLE symbol: renaming D_8006D430
+    # without it would list the unified class as never unified (revision 27)
+    sys.path.insert(0, str(ROOT / "tools"))
+    import plan
+    plan.ledger_rename({old: new})
 
     # 4. the report
     if report_old.exists():

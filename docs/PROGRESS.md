@@ -6,6 +6,63 @@ stale, prose elsewhere is not.
 
 ---
 
+## 2026-09-26 — premium session: plan revision 27, phase 2 (the code reads like a game's source)
+
+Operator: every track is done but the project is not. Files are named for
+addresses, classes for table addresses, and bodies are full of magic numbers
+and project history; done means code that looks like a game's source. This
+answers round 89's escalation. Measured with the new `tools/readability.py`
+at d0aec882: 170 placeholder type names, 300 definitions under a placeholder
+class prefix, 76 of 86 units and 10 headers named `code_`/`class_<hex>`,
+2262 literals of 10 or more, 268 byte-pointer casts, 321 m2c locals, 891
+history mentions (`round NN`, retail addresses) in comments.
+
+- **Operator decisions (2026-09-26).** Sony's types by Sony's names from
+  Sony's headers, so the CRLF escalation is resolved as "normalise"
+  (research doc status updated; setup item `sdk-headers`). History moves
+  out of code comments into the reports, and a matching-only construct keeps
+  a `/* MATCHING: */` line. `src/` is grouped into subsystem directories at
+  the end. clang-format is adopted once, early (setup item `format`).
+- **Plan.** Tracks 6 (type names, per class root first, plus files defining
+  other placeholder types), 7 (one polish pass per unit: globals, fields,
+  raw offsets, locals, constants, comments), 8 (files per region between
+  Sony objects: merge and rename from TU evidence, then content), 9
+  (close-out: layout, readme, comments, style, budgets). New rule: renames
+  REPLAY, meaning a tool commit carries its command and a conflicted hunk is
+  re-run on the merged tree, so jobs defer only on edit sets. Prompts
+  §4.8-4.10; §4.1 unchanged. Tracks 3-5 archived verbatim
+  (`docs/archive/FINISHING-PLAN-tracks-3-5-2026-09-26.md`); the naming rules
+  and class model stay live in §3. FINISHING-PLAN 5561 -> 4434 words.
+- **Tools.** `readability.py` (debt per unit and type). `tuboundary.py`
+  (file boundaries from rodata, the parasite-eve-2 rule, re-derived here
+  through cc1: jump tables `.align 3`, strings `.align 2`, both in function
+  order). Its validation passes: 135 edges between placed Sony objects, none
+  called impossible, 0 parity contradictions, 25 jump tables, 11 at 4 mod 8.
+  It proves code_179d8_s/q/r/h and code_179d8_b/n/g were one file each. The
+  soft single-user-data signal first failed 135/135 Sony edges (sections
+  mixed, then library bss), and after restricting it to .data/.sdata still
+  wrongly calls 6 of them unlikely, so it is labelled a hint. `renametype.py`
+  (a class family: types, macros, guard, header file, method symbols through
+  rename.py, ledger, warnings baseline). `unitfile.py rename|merge` (yaml,
+  git mv, same-stem header, INCLUDE_ASM paths, ledger; refuses a unit named
+  like a class, non-adjacent merges, and rodata it would have to absorb).
+  `plan.py`: tracks 6-9, `regions`, `flag-type`/`park-type`, `mark-unit
+  --track 7`, setup items through `check`, and `ledger_rename`, which
+  rename.py now calls: renaming a class's table symbol used to orphan its
+  track-4 ledger entry. rename.py also rewrites the warnings baseline.
+- **Proven in a throwaway worktree**, then torn down: `renametype.py
+  Class6B5CC SceneNode` (42 symbols, 271 files, 26 s) byte-identical, class
+  still UNIFIED, 0 new warnings, nonmatching green. Merging code_179d8_n and
+  code_179d8_g into code_179d8_b, and renaming it `cd/CdTestFile` into a
+  subdirectory, came out byte-identical after one conflicting local view
+  (`D_8006D620` as `s32[4]` against `char *[]`) was deleted. That is the
+  runner work the merge prompt describes. `plan.py` then ran with a
+  subdirectory unit (two flat-path assumptions fixed).
+- **Next round needs a premium head**: the two setup items gate tracks 6 and
+  7. Until then an Opus head can staff only the ready track 8 regions.
+
+---
+
 ## 2026-09-26 — round 89: track 4 and track 5 done (premium head), every track closed
 
 Premium head (Opus 5.5; the operator started it as premium), operator cap 5.

@@ -1,6 +1,8 @@
 # The Psy-Q inline macro layer is silently inert (CRLF line endings)
 
-**Status: OPEN, escalated, NOT acted on. Operator's call.**
+**Status: DECIDED 2026-09-26 by the operator: normalise the headers to LF so game code
+includes Sony's types by Sony's names (FINISHING-PLAN track 6, setup item `sdk-headers`,
+a premium head's job). Until `plan.py` shows that item ticked, the finding below still holds.**
 **Found: round 12, 2026-09-03, by the head while adjudicating a runner's
 proposed learning about GTE stores.**
 

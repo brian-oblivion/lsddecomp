@@ -81,7 +81,7 @@ tools/setup-worktree.sh alpha     # -> ../<checkout>-wt-alpha, branch runner/alp
    reports (round 61: three-file conflict). Never pair a naming runner with
    any runner on a unit that references its definitions; if unavoidable, merge
    the other runner first. The extern-review job touches many units and runs
-   alone or merges last.
+   alone or merges last. Phase 2 renames replay instead (FINISHING-PLAN §3).
 
    At merge time, expect two runners' views of one struct to be complementary
    and union them; unify a field that got two type names; then re-verify
@@ -97,8 +97,8 @@ tools/setup-worktree.sh alpha     # -> ../<checkout>-wt-alpha, branch runner/alp
    `DECOMPILATION_LEARNINGS.md`, `MATCHING-GUIDE.md`, `PROGRESS.md`,
    `FINISHING-PLAN.md`, the symbols file, or the splat yaml. A generalisable
    finding goes in the match report under `### Proposed learning`; the head
-   consolidates. Exception: a NAMING runner edits the symbols file through
-   `tools/rename.py` only, for symbols in its own unit (FINISHING-PLAN track 3).
+   consolidates. Exceptions: the symbols file through the rename tools only,
+   and a files runner's own yaml lines through `unitfile.py` (FINISHING-PLAN §3).
 
 4. **Commit per match on the runner branch; never push.** A branch strictly
    behind `main` may `git merge main --ff-only`. A diverged branch never
