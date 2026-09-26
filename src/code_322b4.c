@@ -29,7 +29,7 @@
  * a BasicClass subclass ticked once per DrawSystem frame that tells its
  * parents event 2 (counted), 3 (paused) or 4 (flag14); its own methods
  * (New_FrameClock, FrameClock__*, Get_vtable_FrameClock) live here. Class6EED8 (include/Class6EED8.h, gClass6EED8Methods, id 0xB03)
- * is unified: a Class6D430 data source that requests one named file and
+ * is unified: a FileResource data source that requests one named file and
  * sets `loaded` when the driver reports it done; its own methods
  * (New_Class6EED8, Class6EED8__*, GetClass6EED8Methods) live here.
  * LightRig (include/LightRig.h, gLightRigMethods, id 0x14) is unified too: a
@@ -62,7 +62,7 @@ extern SpriteRect D_8006ED40;
 extern u32 GetSetBitField(u32 *word, s32 shift, s32 width, u32 value);
 extern void *BMemPMgrAlloc(s32 size);
 
-extern Class6D430Methods *GetActiveDataSourceMethods(void);
+extern FileResourceMethods *GetActiveDataSourceMethods(void);
 
 /* Allocate and construct a CharSprite (0xAC bytes): one character cell. */
 CharSprite *New_CharSprite(void *texture, u8 cell) {
@@ -309,7 +309,7 @@ Class6EED8 *New_Class6EED8(char *name) {
 void Class6EED8__Class6EED8(Class6EED8 *self, char *name) {
     char buf[32];
 
-    GetActiveDataSourceMethods()->ctor((Class6D430 *)self);
+    GetActiveDataSourceMethods()->ctor((FileResource *)self);
     self->methods = GetClass6EED8Methods();
     self->loaded = 0;
     if (name != NULL) {
@@ -322,7 +322,7 @@ void Class6EED8__Class6EED8(Class6EED8 *self, char *name) {
  * driver's finalize. */
 void Class6EED8__Finalize(Class6EED8 *self) {
     self->loaded = 0;
-    GetActiveDataSourceMethods()->finalize((Class6D430 *)self);
+    GetActiveDataSourceMethods()->finalize((FileResource *)self);
 }
 
 /* gClass6EED8Methods slot +0x064 (setFlag): the driver reports the requested

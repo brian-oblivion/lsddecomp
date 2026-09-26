@@ -6,7 +6,7 @@ REVISITED, round 75: MATCHED 35/35, whole image `OK: build matches retail`, 3 bu
 
 **Game code check.** 0x80026CFC is not in `config/sdk-in-game.txt`, has no
 `config/psyq-objects.ld` pin and no `identified` comment; it sits among this
-unit's own Class6D430 methods, calls only game functions, and reads no strings.
+unit's own FileResource methods, calls only game functions, and reads no strings.
 Game code.
 
 **Baseline.** The preserved body below, rebuilt live (with the
@@ -125,7 +125,7 @@ next slot and repeating. All 4 callees are cross-unit: `GetCdDriverMethods` /
 
 Retail's compiled loop uses exactly **2** callee-saved registers (`$s0` =
 the `gDataSourceClientGetters` walk pointer, `$s1` = `ret`) plus `$ra`. The loop-carried
-"call argument" value (`val`, first produced by `GetClass6D430Methods()`, then by
+"call argument" value (`val`, first produced by `GetFileResourceMethods()`, then by
 each table-entry call) flows **directly through `$a0`/`$v0`**, with no
 callee-saved register of its own, EVEN THOUGH it is read and written at a
 control-flow JOIN with two predecessors (the initial path and the loop
@@ -133,11 +133,11 @@ back-edge):
 
 ```
 .L80026D3C:
-  jal   GetClass6D430Methods
+  jal   GetFileResourceMethods
    addu $s1, $v0, $zero      ; s1 = ret (from the EARLIER branch's return,
                               ;   in the delay slot -- BEFORE this call runs)
   j     .L80026D58
-   addu $a0, $v0, $zero      ; a0 = GetClass6D430Methods()'s return (val, initial)
+   addu $a0, $v0, $zero      ; a0 = GetFileResourceMethods()'s return (val, initial)
 .L80026D4C:                  ; loop back-edge target
   jalr  $v0
    addiu $s0, $s0, 0x4       ; entry++ (delay slot)
@@ -154,13 +154,13 @@ Every structurally-equivalent C rewrite tried in round 43 (a `for(;;)` with
 same with the formal parameter `arg0` reused as the `val` slot to try to
 pin it to `$a0`'s "home" register, dropping the named `fn` variable and
 calling through `*entry` directly, and typing `val`/`ret` as
-`Class6D430 *` instead of `void *`) makes this project's pinned GCC
+`FileResource *` instead of `void *`) makes this project's pinned GCC
 2.6.3 allocate a THIRD callee-saved register (`$s2`) for `val` and round-trip
 it through TWO extra `move` instructions per production/consumption instead
 of flowing straight through `$a0`/`$v0` -- consistently **38 words (3 over)**
 regardless of which of these was tried. One rewrite (producing `val` in the
 `for(...)` loop's own increment clause, i.e.
-`for (val = GetClass6D430Methods(); ; val = fn(val)) { ... }`) got closest, at
+`for (val = GetFileResourceMethods(); ; val = fn(val)) { ... }`) got closest, at
 **38 words** with the extra register shuffle moved to a slightly different
 point in the schedule -- still not zero.
 
@@ -196,7 +196,7 @@ covers and a longer or differently-seeded run might still find something.
 ```c
 extern void *gDataSourceClientGetters[];
 
-void CopyDataSourceSlots(Class6D430 *dst, Class6D430 *src);
+void CopyDataSourceSlots(FileResource *dst, FileResource *src);
 
 void SetActiveDataSource(s32 arg0) {
     void *ret;
@@ -211,7 +211,7 @@ void SetActiveDataSource(s32 arg0) {
         ret = GetVabDriverMethods();
     }
     entry = gDataSourceClientGetters;
-    for (val = GetClass6D430Methods(); ; val = fn(val)) {
+    for (val = GetFileResourceMethods(); ; val = fn(val)) {
         CopyDataSourceSlots(val, ret);
         fn = *entry;
         if (fn == NULL) {

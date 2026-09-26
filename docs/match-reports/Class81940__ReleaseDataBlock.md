@@ -17,7 +17,7 @@ Method slot +0x084 of gClass81940Methods (table word at 0x800819C4). Clears `dat
 
 ```c
 /* DataSrc39094: the local view at the top of src/code_39094.c --
- * CLASS6D430_FIELDS, then u16 headerReady, u16 dataReady, u8 pad30[4], void *dataBuffer, s32 autoLoadData. */
+ * FILERESOURCE_FIELDS, then u16 headerReady, u16 dataReady, u8 pad30[4], void *dataBuffer, s32 autoLoadData. */
 extern void *BMemPMgrFree(void *ptr);
 
 /* slot +0x084 of gClass81940Methods */
@@ -47,4 +47,4 @@ void Class81940__ReleaseDataBlock(DataSrc39094 *self) {
 
 ## Track 4 (2026-09-26, round 87)
 
-Renamed `DataSrc39094__ReleaseDataBlock` -> `Class81940__ReleaseDataBlock` with `rename.py` (class rename only; +0x084). Callers: Class81940__Finalize, Class81940__LoadDataBlock, Class866E8__ResetAllElements and ObjM__CheckAuxTrigger. The class (method table gClass81940Methods, id 0x903, a Class6D430 subclass) was named `Class81940` for its table address, 0x80081940 (renamed from `D_80081940` to `gClass81940Methods`), as Class6D940 is (FINISHING-PLAN track 4 step 2); the old `DataSrc39094` was the unit's local view name, and dropping its unit suffix leaves `DataSrc`, which every Class6D430 subclass is. The unified definition is `include/Class81940.h`.
+Renamed `DataSrc39094__ReleaseDataBlock` -> `Class81940__ReleaseDataBlock` with `rename.py` (class rename only; +0x084). Callers: Class81940__Finalize, Class81940__LoadDataBlock, Class866E8__ResetAllElements and ObjM__CheckAuxTrigger. The class (method table gClass81940Methods, id 0x903, a FileResource subclass) was named `Class81940` for its table address, 0x80081940 (renamed from `D_80081940` to `gClass81940Methods`), as Class6D940 is (FINISHING-PLAN track 4 step 2); the old `DataSrc39094` was the unit's local view name, and dropping its unit suffix leaves `DataSrc`, which every FileResource subclass is. The unified definition is `include/Class81940.h`.

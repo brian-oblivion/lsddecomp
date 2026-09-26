@@ -15,8 +15,8 @@ Table slot (`tools/classtable.py`): D_8006F514 +0x00C (finalize).
 
 ## Source
 
-The unit-local view `DataSrc33808` (a Class6D430 subclass built with the unified
-`CLASS6D430_SLOTS`/`CLASS6D430_FIELDS` macros, plus `slot7C`/`slot80`, and own
+The unit-local view `DataSrc33808` (a FileResource subclass built with the unified
+`FILERESOURCE_SLOTS`/`FILERESOURCE_FIELDS` macros, plus `slot7C`/`slot80`, and own
 fields +0x2C..+0x38) and `CountedBuf33808` sit at the top of `src/code_33808.c`.
 
 ```c
@@ -25,7 +25,7 @@ fields +0x2C..+0x38) and `CountedBuf33808` sit at the top of `src/code_33808.c`.
 void TileAtlas__Finalize(DataSrc33808 *self) {
     BMemPMgrFree((void *)self->unk34);
     BMemPMgrFree((void *)self->unk2C);
-    GetActiveDataSourceMethods()->finalize((Class6D430 *)self);
+    GetActiveDataSourceMethods()->finalize((FileResource *)self);
 }
 ```
 
@@ -42,4 +42,4 @@ void TileAtlas__Finalize(DataSrc33808 *self) {
 
 ## Track 4 (2026-09-26, round 88, alpha)
 
-Class unified in `include/TileAtlas.h` (D_8006F514, 0x303, a Class6D430 subclass, 0x38 bytes). `self` is `TileAtlas *` (was the generic unit-local `DataSrc33808` view): frees `unk34` (now `void *`) and `cells` without casts. No rename. Byte-identical.
+Class unified in `include/TileAtlas.h` (D_8006F514, 0x303, a FileResource subclass, 0x38 bytes). `self` is `TileAtlas *` (was the generic unit-local `DataSrc33808` view): frees `unk34` (now `void *`) and `cells` without casts. No rename. Byte-identical.

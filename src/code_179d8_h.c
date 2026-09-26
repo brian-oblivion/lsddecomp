@@ -33,8 +33,8 @@
  *
  * ROUND 64 (naming pass, runner alpha): what the unit IS, now that every
  * function has a report.  Eleven functions split into three groups:
- *   - `Class6D430__InstallCdReadDriver`/`Class6D430__DestroyCdReadDriver`
- *     (ctor/dtor pair, `Class6D430*` self): chains `Class6D430`'s own
+ *   - `FileResource__InstallCdReadDriver`/`FileResource__DestroyCdReadDriver`
+ *     (ctor/dtor pair, `FileResource*` self): chains `FileResource`'s own
  *     ctor/dtor (`include/code_171e0.h`) then, on the ctor side, overwrites
  *     `self->methods` with `GetCdDriverMethods()`'s table -- `gCdDriverMethods`,
  *     independently confirmed elsewhere (`src/code_179d8_q.c`) as "the
@@ -71,26 +71,26 @@
  * method tables") was wrong by the time it was written -- `python3
  * tools/classtable.py --scan` lists BOTH `D_8006D430` (44 slots, header 3)
  * and `gCdDriverMethods` (29 slots, header 0x13) among the 60, and
- * `Class6D430__InstallCdReadDriver`/`Class6D430__DestroyCdReadDriver`
- * dispatch through both via `GetClass6D430Methods()`/`GetCdDriverMethods()`.
+ * `FileResource__InstallCdReadDriver`/`FileResource__DestroyCdReadDriver`
+ * dispatch through both via `GetFileResourceMethods()`/`GetCdDriverMethods()`.
  * The quad's object (round 88: a `CdDriver`, include/CdDriver.h) dispatches
- * `ReadCdFile`'s `close` through its own `methods`, Class6D430's +0x048.  The sibling slice code_179d8_e also contains two
+ * `ReadCdFile`'s `close` through its own `methods`, FileResource's +0x048.  The sibling slice code_179d8_e also contains two
  * class-table accessors -- so "code_179d8 is not class-framework code" was
  * never true of this neighbourhood; run the check for your own functions
  * rather than inheriting any verdict here.
  */
 #include "common.h"
 #include "CdDriver.h"
-/* Class6D430 and its table come from include/Class6D430.h, through code_171e0.h. */
+/* FileResource and its table come from include/FileResource.h, through code_171e0.h. */
 #include "code_171e0.h"
 
 /* GetCdDriverMethods, gCdDriverMethods and CdDriver are include/CdDriver.h's
  * (track 4, round 88). OpenCdFile/CloseCdFile/GetCdFileSize/ReadCdFile take
- * the object CdDriver's methods were handed (any Class6D430 client: see
+ * the object CdDriver's methods were handed (any FileResource client: see
  * CdDriver.h's banner); they were typed against this unit's own
- * ObjA34_179D8H view, whose isOpen/pos/size are Class6D430's +0x00C/+0x018/
- * +0x01C and whose `close` slot is Class6D430's +0x048 (CdDriver__Close
- * in gCdDriverMethods; Class6D430__LoadFile calls it on its success path
+ * ObjA34_179D8H view, whose isOpen/pos/size are FileResource's +0x00C/+0x018/
+ * +0x01C and whose `close` slot is FileResource's +0x048 (CdDriver__Close
+ * in gCdDriverMethods; FileResource__LoadFile calls it on its success path
  * too, so the give-up paths below close the file). */
 
 /* func_8002B640's own stat-like output buffer (OpenCdFile's local
@@ -130,14 +130,14 @@ extern char *strcpy(char *dest, char *src);
 extern char *strcat(char *dest, char *src);
 extern char gCdFileVersionSuffix[]; /* ";1", the ISO9660 CD file-version suffix */
 
-void Class6D430__InstallCdReadDriver(Class6D430 *self) {
-    GetClass6D430Methods()->ctor(self);
-    self->methods = (Class6D430Methods *)GetCdDriverMethods();
+void FileResource__InstallCdReadDriver(FileResource *self) {
+    GetFileResourceMethods()->ctor(self);
+    self->methods = (FileResourceMethods *)GetCdDriverMethods();
     self->isOpen = 0;
 }
 
-void Class6D430__DestroyCdReadDriver(Class6D430 *self) {
-    GetClass6D430Methods()->finalize(self);
+void FileResource__DestroyCdReadDriver(FileResource *self) {
+    GetFileResourceMethods()->finalize(self);
 }
 
 void NoOp2(void) {}

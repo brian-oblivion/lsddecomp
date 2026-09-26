@@ -15,12 +15,12 @@ Round 81, runner echo. Unit `src/code_2bb9c.c`. Fresh ground, no prior attempt.
 
 ```c
 void TimImage__Finalize(TimImage *self) {
-    GetActiveDataSourceMethods()->finalize((Class6D430 *)self);
+    GetActiveDataSourceMethods()->finalize((FileResource *)self);
 }
 ```
 
 ## Naming
 
 - **`TimImage__Finalize`**, tier A: dispatched from slot +0x00C
-  (`Class6D430`'s `finalize` slot), a pure forward to the active
+  (`FileResource`'s `finalize` slot), a pure forward to the active
   data-source driver's own finalize -- mechanics are the whole purpose.

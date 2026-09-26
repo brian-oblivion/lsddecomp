@@ -1,16 +1,16 @@
 #ifndef CLASS81940_H
 #define CLASS81940_H
 
-#include "Class6D430.h"
+#include "FileResource.h"
 
 /*
- * Class81940 -- a Class6D430 data source (class id 0x903, method table
+ * Class81940 -- a FileResource data source (class id 0x903, method table
  * gClass81940Methods at 0x80081940) that streams one file in two stages: a
  * header block into its own 0xB358-byte `buffer`, then, if the header says
  * there is one, a data block into a second allocation. Methods in
  * src/code_39094.c. No classes derive from it. Named for its table address:
  * the old local view was `DataSrc39094`, and without its unit suffix that is
- * what every Class6D430 subclass is.
+ * what every FileResource subclass is.
  *
  * PARENT BY CTOR CHAIN: Class81940__Class81940's first call is
  * GetActiveDataSourceMethods()->ctor, and finalize, setFlag and
@@ -40,7 +40,7 @@
  *
  * Three calls do not match their occupant's parameter list and cast through
  * a typedef below (no code; FINISHING-PLAN track 4 step 6):
- *  - +0x078 is Class6D430's `void *slot78`; Class866E8__ApplyRateEntries
+ *  - +0x078 is FileResource's `void *slot78`; Class866E8__ApplyRateEntries
  *    calls it as Class81940LoadHeaderFn.
  *  - Class81940__AdvanceLoadState calls +0x080 and Class81940__LoadDataBlock
  *    calls +0x084 with NO argument: retail sets no $a0 for either jalr ($a0
@@ -68,8 +68,8 @@ typedef struct Class81940Header {
 } Class81940Header;
 
 struct Class81940Methods {
-    CLASS6D430_SLOTS(Class81940, (Class81940 * self));
-    /* +0x078 is Class6D430's slot78; this table's occupant is
+    FILERESOURCE_SLOTS(Class81940, (Class81940 * self));
+    /* +0x078 is FileResource's slot78; this table's occupant is
      * Class81940__LoadHeader (Class81940LoadHeaderFn). */
     /* +0x07C */ void (*releaseHeader)(Class81940 *self); /* Class81940__ReleaseHeader */
     /* +0x080 */ s32 (*loadDataBlock)(Class81940 *self); /* Class81940__LoadDataBlock: 1 when a read was started */
@@ -78,7 +78,7 @@ struct Class81940Methods {
 }; /* 34 slots, 0x8C bytes */
 
 struct Class81940 {
-    CLASS6D430_FIELDS(Class81940Methods); /* buffer: the 0xB358 header block (Class81940Header); unk2A is the load state: 0 idle, 9 header, 10 data block */
+    FILERESOURCE_FIELDS(Class81940Methods); /* buffer: the 0xB358 header block (Class81940Header); unk2A is the load state: 0 idle, 9 header, 10 data block */
     /* +0x02C */ s16 headerReady; /* 1 when the header is read; Class866E8__OnNotifyTag1 sets 2 once consumed */
     /* +0x02E */ s16 dataReady; /* 1 when the data block is read; cleared by Class866E8__OnNotifyTag1 */
     /* +0x030 */ s16 ownerRate; /* the owner's: Class866E8__ApplyRateEntries' setup-entry rate; -1 from the ctor and ReleaseHeader */

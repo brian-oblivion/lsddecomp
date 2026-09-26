@@ -15,8 +15,8 @@ Table slot (`tools/classtable.py`): D_8006F384 +0x07C.
 
 ## Source
 
-The unit-local views `DataSrc33808` (Class6D430 subclass via the unified
-`CLASS6D430_SLOTS`/`CLASS6D430_FIELDS` macros plus `slot7C`/`slot80` and own
+The unit-local views `DataSrc33808` (FileResource subclass via the unified
+`FILERESOURCE_SLOTS`/`FILERESOURCE_FIELDS` macros plus `slot7C`/`slot80` and own
 fields +0x2C..+0x38), `Ctor33808` and `CountedBuf33808` sit at the top of
 `src/code_33808.c`.
 
@@ -47,4 +47,4 @@ First build. +0x2C is `s32` in the unit-local DataSrc33808 view (other classes s
 
 ## Track 4
 
-2026-09-25, round 84 (delta): ModelData (D_8006F384) is unified in `include/ModelData.h`; the unit-shared `DataSrc33808` view no longer types it. Its slot, +0x07C, is named `releaseResources` for this function. Both releases now go through the unified Class6D430 table (`linkResource->methods->release`, `todSet->methods->release`); before, they went through `DataSrc33808` casts. Image byte-identical.
+2026-09-25, round 84 (delta): ModelData (D_8006F384) is unified in `include/ModelData.h`; the unit-shared `DataSrc33808` view no longer types it. Its slot, +0x07C, is named `releaseResources` for this function. Both releases now go through the unified FileResource table (`linkResource->methods->release`, `todSet->methods->release`); before, they went through `DataSrc33808` casts. Image byte-identical.

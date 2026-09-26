@@ -61,16 +61,16 @@
  * ROUND 77 CORRECTION (naming pass, charlie): the paragraph below (round 16,
  * libcd_bios's sibling-slice finding) is WRONG for this unit and must not
  * be trusted for it again. `python3 tools/classtable.py --scan` DOES hit
- * this unit's own globals: `D_8006D940` is a real 30-slot Class6D430-derived
+ * this unit's own globals: `D_8006D940` is a real 30-slot FileResource-derived
  * vtable (header word 0x00000E03), confirmed by `tools/classtable.py
  * 0x8006D940` -- slots +0x004/+0x05C/+0x060 are the SAME
- * `Class6D430__Release`/`Class6D430__FreeBuffer`/`NoOp` symbols the base class and
+ * `FileResource__Release`/`FileResource__FreeBuffer`/`NoOp` symbols the base class and
  * its CD-driver sibling (`gCdDriverMethods`, code_179d8_q.c) share verbatim, +0x008
  * is a genuine ctor (`Class6D940__Class6D940`), +0x00C a genuine dtor
  * (`Class6D940__Finalize`), and `D_8006D940`'s own getter (`GetClass6D940Methods`,
  * ex-`func_8002C3A8`) is registered in `gDataSourceClientGetters` (code_171e0.c) -- the
  * NULL-terminated array of "class-method-table getters of every
- * Class6D430-derived client" -- as that array's FIRST entry
+ * FileResource-derived client" -- as that array's FIRST entry
  * (`asm/data/5DB70.data.s`). So this unit's own class (kept address-named
  * `Class6D940`, no game-purpose evidence yet) is a real, registered
  * `SetActiveDataSource`-client sibling of `VabStreamObj`
@@ -90,9 +90,9 @@
 #include "Class6D940.h"
 #include "LinkResource.h"
 
-/* Class6D430's, code_171e0.c: the active driver's table, through which
+/* FileResource's, code_171e0.c: the active driver's table, through which
  * Class6D940's ctor, finalize and setFlag reach their parent's. */
-extern Class6D430Methods *GetActiveDataSourceMethods(void);
+extern FileResourceMethods *GetActiveDataSourceMethods(void);
 
 /* Pool allocator, already established elsewhere (e.g.
  * include/class_16334.h, include/code_8220.h) -- declared LOCAL here since
@@ -120,7 +120,7 @@ Class6D940 *New_Class6D940(char *name) {
 }
 
 void Class6D940__Class6D940(Class6D940 *self, char *name) {
-    GetActiveDataSourceMethods()->ctor((Class6D430 *)self);
+    GetActiveDataSourceMethods()->ctor((FileResource *)self);
     self->methods = GetClass6D940Methods();
     self->linkResource = NULL;
     self->loaded = 0;
@@ -130,12 +130,12 @@ void Class6D940__Class6D940(Class6D940 *self, char *name) {
 }
 
 void Class6D940__Finalize(Class6D940 *self) {
-    GetActiveDataSourceMethods()->finalize((Class6D430 *)self);
+    GetActiveDataSourceMethods()->finalize((FileResource *)self);
 }
 
 void Class6D940__SetFlag(Class6D940 *self) {
     self->loaded = 1;
-    GetActiveDataSourceMethods()->setFlag((Class6D430 *)self);
+    GetActiveDataSourceMethods()->setFlag((FileResource *)self);
 }
 
 s32 Class6D940__ResolveEntry(Class6D940 *self, Class6D940Placement *placement, s32 cell) {

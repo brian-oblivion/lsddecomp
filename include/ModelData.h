@@ -1,10 +1,10 @@
 #ifndef MODELDATA_H
 #define MODELDATA_H
 
-#include "Class6D430.h"
+#include "FileResource.h"
 
 /*
- * ModelData -- a Class6D430 data source (class id 0x5F03, method table
+ * ModelData -- a FileResource data source (class id 0x5F03, method table
  * D_8006F384) that splits one loaded file into a LinkResource (gLinkResourceMethods,
  * an array of TMD models) and a TodSet (D_8006F590, an array of TOD
  * animations), and forwards TOD packet scanning to the TodSet. Methods in
@@ -23,16 +23,16 @@
  * PARENT BY CTOR CHAIN, NOT BY ID. The id 0x5F03 puts it under TimBlockSrc
  * (0xF03), but ModelData__ModelData's first call is
  * GetActiveDataSourceMethods()->ctor, as TimBlockSrc__TimBlockSrc's is: it is
- * TimBlockSrc's sibling under Class6D430, and carries none of TimBlockSrc's
+ * TimBlockSrc's sibling under FileResource, and carries none of TimBlockSrc's
  * layout. That parent ctor is chosen at RUN TIME: the CD driver's
- * (CdDriver__CdDriver, which chains to Class6D430__Class6D430; its
+ * (CdDriver__CdDriver, which chains to FileResource__FileResource; its
  * object is 0x2C bytes, New_CdDriver) or, while gActiveDataSource is
  * DATASOURCE_SPU, the VAB driver's (VabDriver__VabDriver, an empty body).
- * The fields below assume Class6D430's own 0x2C-byte layout, which is the
+ * The fields below assume FileResource's own 0x2C-byte layout, which is the
  * CD driver's whole object: ModelData's own fields start at +0x02C.
  *
  * The ctor returns self or NULL (New_ModelData tests it), but
- * CLASS6D430_SLOTS declares +0x008 returning void, as Class6D430's own ctor
+ * FILERESOURCE_SLOTS declares +0x008 returning void, as FileResource's own ctor
  * does; the allocators reach the ctor through code_33808.c's unprototyped
  * Ctor33808 view instead.
  *
@@ -46,12 +46,12 @@ struct Src6F240;
 typedef struct ModelData ModelData;
 typedef struct ModelDataMethods ModelDataMethods;
 
-/* +0x078 is Class6D430's slot78 (NULL there): this table's occupant is
+/* +0x078 is FileResource's slot78 (NULL there): this table's occupant is
  * ModelData__BuildResources(self), s32, 0 when both sources exist; the
  * callers cast it (an inherited slot keeps the parent's name). */
 /* clang-format off */
 #define MODELDATA_SLOTS(Self, CtorParams)                                                          \
-    CLASS6D430_SLOTS(Self, CtorParams);                                                            \
+    FILERESOURCE_SLOTS(Self, CtorParams);                                                            \
     /* +0x07C */ void (*releaseResources)(Self *self);          /* ModelData__ReleaseResources */  \
     /* +0x080 */ u8 (*scanPackets)(Self *self, s32 arg1, s32 arg2); /* ModelData__ForwardScanPackets: todSet's +0x078 */ \
     /* +0x084 */ void *(*decodePacketWord)(Self *self, s32 arg1, s32 arg2, s32 arg3, s32 arg4, s32 arg5) /* ModelData__ForwardDecodePacketWord: todSet's +0x080 */
@@ -59,9 +59,9 @@ typedef struct ModelDataMethods ModelDataMethods;
 
 /* clang-format off */
 #define MODELDATA_FIELDS(Methods)                                                                  \
-    CLASS6D430_FIELDS(Methods);                                                                    \
+    FILERESOURCE_FIELDS(Methods);                                                                    \
     /* +0x02C */ struct LinkResource *linkResource; /* New_LinkResource (include/LinkResource.h); released by ReleaseResources */ \
-    /* +0x030 */ Class6D430 *todSet;       /* New_TodSet (D_8006F590); +0x080/+0x084 forward to it */ \
+    /* +0x030 */ FileResource *todSet;       /* New_TodSet (D_8006F590); +0x080/+0x084 forward to it */ \
     /* +0x034 */ s32 ownsResources         /* the ctor's third argument: New_ModelData 1, TriggerWorld 0; BuildResources and ReleaseResources act only while it is set. The object is 0x38 bytes (New_ModelData): TriggerWorld's own fields start at +0x038 */
 /* clang-format on */
 

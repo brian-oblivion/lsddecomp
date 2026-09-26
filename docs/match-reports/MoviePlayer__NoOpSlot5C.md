@@ -30,7 +30,7 @@ void MoviePlayer__NoOpSlot5C(void) {
 
 ## Naming
 
-- **MoviePlayer__NoOpSlot5C**, tier B. Empty occupant of MoviePlayer's own slot +0x05C, named like its siblings NoOpSlot50/54. (Was `MoviePlayer__NoOpFreeBuffer`, after Class6D430's +0x05C freeBuffer; MoviePlayer is a direct BasicClass subclass, so that slot name never applied. Round 89.)
+- **MoviePlayer__NoOpSlot5C**, tier B. Empty occupant of MoviePlayer's own slot +0x05C, named like its siblings NoOpSlot50/54. (Was `MoviePlayer__NoOpFreeBuffer`, after FileResource's +0x05C freeBuffer; MoviePlayer is a direct BasicClass subclass, so that slot name never applied. Round 89.)
 
 ## Track 4 (2026-09-26, round 89)
 

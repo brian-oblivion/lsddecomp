@@ -161,7 +161,7 @@ independent checks agree:
   slots with it is an id-relative (parent, child, sibling, or in two cases a
   grandchild), and `classtable.py <child> --vs <parent>` reads as the parent's
   table with slots replaced (the CD and SPU drivers replace 14 of
-  Class6D430's 30) and, in 54 of 57, slots appended.
+  FileResource's 30) and, in 54 of 57, slots appended.
 - **The game's own tests.** `(methods->header & 0xFFF) == id`,
   `(header & 0xFFFFF) == 0x1F234` and `(header & 0xF) == 4` are
   is-kind-of tests: a prefix match on the path, at the width of the level

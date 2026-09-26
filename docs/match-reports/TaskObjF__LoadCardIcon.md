@@ -158,6 +158,6 @@ or cache-fill.
 
 TimImage is unified (`include/TimImage.h`); this unit's local `extern
 ChildObj86ED0 *New_TimImage(char *)` is deleted. `handle` is `TimImage *`:
-+0x078 (Class6D430's `void *slot78`, occupant TimImage__Upload) is called
++0x078 (FileResource's `void *slot78`, occupant TimImage__Upload) is called
 through `TimImageUploadFn`, +0x004 is TimImage's inherited `release`.
 Image byte-identical.

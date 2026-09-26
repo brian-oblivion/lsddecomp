@@ -41,7 +41,7 @@ the "defined later in ROM order" clause is stale -- it is declared LOCAL
 here (per-call-site typed) the same way `CdSearchFile`/`printf` are
 elsewhere in this unit, never defined in this file. `strcat` is already
 declared identically in `code_171e0.h` (included for
-`Class6D430__InstallCdReadDriver`), so the local `extern` here is a
+`FileResource__InstallCdReadDriver`), so the local `extern` here is a
 harmless duplicate, not a conflict.
 
 ## Naming (round 64, runner alpha)

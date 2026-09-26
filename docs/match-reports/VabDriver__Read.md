@@ -55,10 +55,10 @@ a wrong tier-A guess here would be worse than the placeholder.
 
 Named for its slot, FINISHING-PLAN track 4 step 6. `classtable.py
 gVabDriverMethods --vs D_8006D430` puts this function at `+0x054`, one of
-Class6D430's run-time-bound driver-interface slots (`include/Class6D430.h`
+FileResource's run-time-bound driver-interface slots (`include/FileResource.h`
 names it `read`; the CD driver's occupant is `CdDriver__Read`).
 `SetActiveDataSource` (code_171e0.c) copies the active driver's interface
-slots into Class6D430's table and every client table, and takes this table
+slots into FileResource's table and every client table, and takes this table
 (`GetVabDriverMethods()`) whenever `gActiveDataSource != DATASOURCE_CD`, so
 when the SPU/VAB source is active every `methods->read(...)` in the game
 reaches this body. The purpose evidence the tier-C verdict above lacked is

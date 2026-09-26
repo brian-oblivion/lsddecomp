@@ -20,7 +20,7 @@ the WHOLE table, not just this one slot:
 | +0x08 | `VabStreamObj__VabStreamObj` | `New_VabStreamObj` (`new_class_da34`) |
 | +0x0C | `VabStreamObj__Finalize` | data only (a subclass's own "close" chain) |
 | +0x58 | **null in retail** | `VabStreamObj__AdvanceLoadState`'s own case-1 dispatch |
-| +0x5C | `Class6D430__FreeBuffer` (uncarved) | `VabStreamObj__LoadVagAttrs`'s own opening call |
+| +0x5C | `FileResource__FreeBuffer` (uncarved) | `VabStreamObj__LoadVagAttrs`'s own opening call |
 | +0x6C | **null in retail** | `VabStreamObj__VabStreamObj`'s own final dispatch |
 | +0x78 | `VabStreamObj__OnBodyReady` | already matched |
 | +0x7C | `VabStreamObj__LoadVagAttrs` | already matched (as data) |
@@ -154,9 +154,9 @@ unit level, not guessed here.
 
 The unit's local `VabStreamObj`/`VabStreamObjMethods` views are replaced by
 `include/VabStreamObj.h`, and the whole image stays byte-identical. The
-slots this ctor calls now carry their inherited Class6D430 names:
+slots this ctor calls now carry their inherited FileResource names:
 `slot9C` -> `setPitchOffset`, `slot6C` -> `requestLoadFile`, and
-`self->loadState` -> `self->unk2A`, which is Class6D430's field.
+`self->loadState` -> `self->unk2A`, which is FileResource's field.
 `New_VabStreamObj`'s dispatch is `ctor` (was `slot08`), and it now takes
 `char *path` (was `s32`). The slot table above calls +0x58 and +0x6C "null
 in retail". That is true of the static table only: SetActiveDataSource binds

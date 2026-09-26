@@ -7,7 +7,7 @@
  * fingerprint). All 97 functions matched in round 82; named in round 83
  * (track 3 naming pass).
  *
- * Eleven method tables, nine of them Class6D430 (data-source) subclasses
+ * Eleven method tables, nine of them FileResource (data-source) subclasses
  * reached through nine of D_8006D430's own `Get...Methods` getter slots
  * (from +0x07C):
  *
@@ -33,7 +33,7 @@
  *     together in src/code_2c054.c's TaskCore__TaskCore (include/TileMap.h,
  *     include/TileAtlas.h, track 4, round 88).
  *
- * Two more classes, not Class6D430 subclasses:
+ * Two more classes, not FileResource subclasses:
  *
  *   - BgLayer (D_8006F2C4): a Class6B5CC subclass wrapping one GsBG
  *     scrolling background layer (its own fields are GsBG's own layout;
@@ -48,7 +48,7 @@
 #include "common.h"
 #include "BasicClass.h"
 #include "Class6B5CC.h"
-#include "Class6D430.h"
+#include "FileResource.h"
 #include "TimBlockSrc.h"
 #include "ModelData.h"
 #include "Tod.h"
@@ -72,7 +72,7 @@ typedef struct CountedBuf33808 {
     /* +0x08 */ s32 entries[1];
 } CountedBuf33808;
 
-extern Class6D430Methods *GetActiveDataSourceMethods(void);
+extern FileResourceMethods *GetActiveDataSourceMethods(void);
 extern void ReleaseBasicClassArray(BasicClass **array, s32 count);
 extern void BMemPMgrFree(void *arg);
 extern void *BMemPMgrAlloc(s32 size);
@@ -111,7 +111,7 @@ void TimBlockSrc__TimBlockSrc(TimBlockSrc *self, char *name) {
     s16 shift;
     u16 mask;
 
-    GetActiveDataSourceMethods()->ctor((Class6D430 *)self);
+    GetActiveDataSourceMethods()->ctor((FileResource *)self);
     self->methods = GetTimBlockSrcMethods();
     self->blockCount = 0;
     self->blocks = NULL;
@@ -150,7 +150,7 @@ void TimBlockSrc__TimBlockSrc(TimBlockSrc *self, char *name) {
 void TimBlockSrc__Finalize(TimBlockSrc *self) {
     ReleaseBasicClassArray((BasicClass **)self->blocks, self->blockCount);
     BMemPMgrFree(self->blocks);
-    GetActiveDataSourceMethods()->finalize((Class6D430 *)self);
+    GetActiveDataSourceMethods()->finalize((FileResource *)self);
 }
 
 /* D_8006F0B8 +0x064: the loader's state machine, under the data-source
@@ -169,7 +169,7 @@ typedef struct Hdr43200 {
 
 extern void LockActiveDataSource(void);
 extern void UnlockActiveDataSource(void);
-u32 MaxOfBufferWords(Class6D430 *self);
+u32 MaxOfBufferWords(FileResource *self);
 
 void TimBlockSrc__AdvanceLoadState(TimBlockSrc *self) {
     TimArraySrc **p;
@@ -182,7 +182,7 @@ void TimBlockSrc__AdvanceLoadState(TimBlockSrc *self) {
             if (self->flags & 0x80) {
                 *(Hdr43200 *)self->buffer = *(Hdr43200 *)self->sector;
                 BMemPMgrFree(self->sector);
-                max = MaxOfBufferWords((Class6D430 *)self);
+                max = MaxOfBufferWords((FileResource *)self);
                 self->blocks = BMemPMgrAlloc(*(u32 *)self->buffer * 4);
                 if (self->blocks == NULL) {
                     goto fail;
@@ -219,7 +219,7 @@ void TimBlockSrc__AdvanceLoadState(TimBlockSrc *self) {
                     self->sectorSize = 0;
                     self->unk2A = 0;
                     self->loaded = 1;
-                    GetActiveDataSourceMethods()->setFlag((Class6D430 *)self);
+                    GetActiveDataSourceMethods()->setFlag((FileResource *)self);
                 }
             }
             break;
@@ -238,7 +238,7 @@ typedef struct Buf434DC {
     /* +0x14 */ u32 vals[1];
 } Buf434DC;
 
-u32 MaxOfBufferWords(Class6D430 *self) {
+u32 MaxOfBufferWords(FileResource *self) {
     Buf434DC *buf = self->buffer;
     u32 i;
     u32 max = 0;
@@ -391,7 +391,7 @@ LinkResource *New_LinkResource(Src6F240 *src) {
  * with a descriptor, adopt its buffer (size 0) and run its own +0x064, whose
  * nonzero result fails the construction (NULL), or else request its file. */
 void *LinkResource__LinkResource(LinkResource *self, Src6F240 *src) {
-    GetActiveDataSourceMethods()->ctor((Class6D430 *)self);
+    GetActiveDataSourceMethods()->ctor((FileResource *)self);
     self->methods = GetLinkResourceMethods();
     if (src != NULL) {
         if (src->buffer != NULL) {
@@ -419,7 +419,7 @@ void LinkResource__Finalize(LinkResource *self) {
         models++;
     }
     BMemPMgrFree(self->models);
-    GetActiveDataSourceMethods()->finalize((Class6D430 *)self);
+    GetActiveDataSourceMethods()->finalize((FileResource *)self);
 }
 
 /* gLinkResourceMethods +0x064: build a NULL-ended array at +0x2C of one
@@ -451,7 +451,7 @@ s32 LinkResource__BuildModels(LinkResource *self) {
         models++;
     }
     *models = NULL;
-    GetActiveDataSourceMethods()->setFlag((Class6D430 *)self);
+    GetActiveDataSourceMethods()->setFlag((FileResource *)self);
     return 0;
 }
 
@@ -470,7 +470,7 @@ TmdObject *LinkResource__GetTmdObject(LinkResource *self, s32 index) {
 }
 
 /* gLinkResourceMethods +0x080: model `index` of the array BuildModels
- * filled at +0x2C (the first field past the 0x2C-byte Class6D430 base). */
+ * filled at +0x2C (the first field past the 0x2C-byte FileResource base). */
 TmdModel *LinkResource__GetModel(LinkResource *self, s32 index) {
     return self->models[index];
 }
@@ -495,7 +495,7 @@ TimArraySrc *New_TimArraySrc(char *name) {
 /* D_8006F1C4 +0x008: constructor -- the active driver's, then this table,
  * clear count/images/ready, and request `name` when there is one. */
 void TimArraySrc__TimArraySrc(TimArraySrc *self, char *name) {
-    GetActiveDataSourceMethods()->ctor((Class6D430 *)self);
+    GetActiveDataSourceMethods()->ctor((FileResource *)self);
     self->methods = GetTimArraySrcMethods();
     self->count = 0;
     self->images = NULL;
@@ -509,7 +509,7 @@ void TimArraySrc__TimArraySrc(TimArraySrc *self, char *name) {
 void TimArraySrc__Finalize(TimArraySrc *self) {
     ReleaseBasicClassArray((BasicClass **)self->images, self->count);
     BMemPMgrFree(self->images);
-    GetActiveDataSourceMethods()->finalize((Class6D430 *)self);
+    GetActiveDataSourceMethods()->finalize((FileResource *)self);
 }
 
 /* D_8006F1C4 +0x064: when the buffer is there (or flag 0x200 is set),
@@ -543,7 +543,7 @@ void TimArraySrc__BuildImages(TimArraySrc *self) {
                 objs++;
             }
             self->ready = 1;
-            GetActiveDataSourceMethods()->setFlag((Class6D430 *)self);
+            GetActiveDataSourceMethods()->setFlag((FileResource *)self);
         }
     }
 }
@@ -578,7 +578,7 @@ Tod *New_Tod(Src6F240 *src) {
  * adopt a buffer handed in (size 0) and run its own +0x064, or else request
  * the named file. */
 void Tod__Tod(Tod *self, Src6F240 *src) {
-    GetActiveDataSourceMethods()->ctor((Class6D430 *)self);
+    GetActiveDataSourceMethods()->ctor((FileResource *)self);
     self->methods = GetTodMethods();
     if (src->buffer != NULL) {
         self->buffer = src->buffer;
@@ -591,7 +591,7 @@ void Tod__Tod(Tod *self, Src6F240 *src) {
 
 /* D_8006F240 +0x00C: finalize, straight to the active driver's. */
 void Tod__Finalize(Tod *self) {
-    GetActiveDataSourceMethods()->finalize((Class6D430 *)self);
+    GetActiveDataSourceMethods()->finalize((FileResource *)self);
 }
 
 /* D_8006F240 +0x078: slot +0x07C over the buffer past its first two words. */
@@ -833,7 +833,7 @@ ModelData *New_ModelData(Src6F240 *src) {
  * +0x064, whose nonzero result fails the construction (NULL), or else
  * request its file. */
 void *ModelData__ModelData(ModelData *self, Src6F240 *src, s32 owns) {
-    GetActiveDataSourceMethods()->ctor((Class6D430 *)self);
+    GetActiveDataSourceMethods()->ctor((FileResource *)self);
     self->methods = GetModelDataMethods();
     self->ownsResources = owns;
     if (src->buffer != NULL) {
@@ -853,12 +853,12 @@ fail:
 /* D_8006F384 +0x00C: finalize -- slot +0x07C, then the active driver's. */
 void ModelData__Finalize(ModelData *self) {
     self->methods->releaseResources(self);
-    GetActiveDataSourceMethods()->finalize((Class6D430 *)self);
+    GetActiveDataSourceMethods()->finalize((FileResource *)self);
 }
 
 /* D_8006F384 +0x064: the active driver's setFlag, then slot +0x078. */
 void ModelData__Load(ModelData *self) {
-    GetActiveDataSourceMethods()->setFlag((Class6D430 *)self);
+    GetActiveDataSourceMethods()->setFlag((FileResource *)self);
     ((s32 (*)())self->methods->slot78)(self);
 }
 
@@ -888,7 +888,7 @@ s32 ModelData__BuildResources(ModelData *self) {
         self->linkResource = New_LinkResource((Src6F240 *)&req);
         if (self->linkResource != NULL) {
             req.buffer = (u8 *)self->buffer + 0xC;
-            self->todSet = (Class6D430 *)New_TodSet((Src6F240 *)&req);
+            self->todSet = (FileResource *)New_TodSet((Src6F240 *)&req);
             if (self->todSet != NULL) {
                 return 0;
             }
@@ -1038,7 +1038,7 @@ TileMap *New_TileMap(s32 arg0, TileAtlas *atlas) {
 void TileMap__TileMap(TileMap *self, s32 arg1, TileAtlas *atlas) {
     s32 unused[8];
 
-    GetActiveDataSourceMethods()->ctor((Class6D430 *)self);
+    GetActiveDataSourceMethods()->ctor((FileResource *)self);
     self->methods = GetTileMapMethods();
     self->atlas = atlas;
     self->loaded = 0;
@@ -1053,7 +1053,7 @@ void TileMap__TileMap(TileMap *self, s32 arg1, TileAtlas *atlas) {
  * active driver's. */
 void TileMap__Finalize(TileMap *self) {
     BMemPMgrFree(self->map.index);
-    GetActiveDataSourceMethods()->finalize((Class6D430 *)self);
+    GetActiveDataSourceMethods()->finalize((FileResource *)self);
 }
 
 /* D_8006F498 +0x064: unless +0x2A is set, slot +0x078 (BuildMap) and mark
@@ -1115,7 +1115,7 @@ TileAtlas *New_TileAtlas(s32 arg0) {
 void TileAtlas__TileAtlas(TileAtlas *self, s32 arg1) {
     s32 unused[8];
 
-    GetActiveDataSourceMethods()->ctor((Class6D430 *)self);
+    GetActiveDataSourceMethods()->ctor((FileResource *)self);
     self->methods = GetTileAtlasMethods();
     self->unk34 = 0;
     self->loaded = 0;
@@ -1131,7 +1131,7 @@ void TileAtlas__TileAtlas(TileAtlas *self, s32 arg1) {
 void TileAtlas__Finalize(TileAtlas *self) {
     BMemPMgrFree(self->unk34);
     BMemPMgrFree(self->cells);
-    GetActiveDataSourceMethods()->finalize((Class6D430 *)self);
+    GetActiveDataSourceMethods()->finalize((FileResource *)self);
 }
 
 /* D_8006F514 +0x064: unless +0x2A is set, slot +0x078 (BuildCells) and

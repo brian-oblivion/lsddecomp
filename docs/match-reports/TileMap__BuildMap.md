@@ -17,14 +17,14 @@ Table slot (`tools/classtable.py`): D_8006F498 +0x078 (called by its setFlag ove
 
 ## Source
 
-The unit-local views `DataSrc33808` (Class6D430 subclass via the unified
-`CLASS6D430_SLOTS`/`CLASS6D430_FIELDS` macros plus `slot7C`/`slot80` and own
+The unit-local views `DataSrc33808` (FileResource subclass via the unified
+`FILERESOURCE_SLOTS`/`FILERESOURCE_FIELDS` macros plus `slot7C`/`slot80` and own
 fields +0x2C..+0x38), `Ctor33808` and `CountedBuf33808` sit at the top of
 `src/code_33808.c`.
 
 ```c
 typedef struct Obj6F498 {
-    CLASS6D430_FIELDS(DataSrc33808Methods);
+    FILERESOURCE_FIELDS(DataSrc33808Methods);
     /* +0x02C */ u8 unk2C;
     /* +0x02D */ u8 unk2D;
     /* +0x02E */ u16 unk2E;
@@ -78,4 +78,4 @@ Matched on build 2. **Lever: `mult` by a register holding a constant the functio
 
 Class unified in `include/TileMap.h`. `self` is `TileMap *` (was `Obj6F498`); +0x02C..+0x03B are the GsMAP `map` (cellw, cellh, ncellw, ncellh, base, index; were unk2C, unk2D, unk2E, unk30, unk34, unk38 -- LIBGS.H's own layout, the pad at +0x032 is its alignment gap), +0x03C `atlas`, +0x040 `defaultGrid`. The atlas's +0x02C is still read through the unit-local `DataSrc33808` cast (TileAtlas, D_8006F514, is not unified) and cast to `struct GsCELL *`. Byte-identical.
 
-Later the same round (alpha, third class): TileAtlas unified (`include/TileAtlas.h`). TileMap::atlas (+0x03C) is `struct TileAtlas *` (was `Class6D430 *`), so the base is read as `self->atlas->cells` -- no `DataSrc33808` cast and no `struct GsCELL *` cast. Byte-identical.
+Later the same round (alpha, third class): TileAtlas unified (`include/TileAtlas.h`). TileMap::atlas (+0x03C) is `struct TileAtlas *` (was `FileResource *`), so the base is read as `self->atlas->cells` -- no `DataSrc33808` cast and no `struct GsCELL *` cast. Byte-identical.

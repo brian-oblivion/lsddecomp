@@ -4,7 +4,6 @@
 #if !defined(M2CTX) && !defined(PERMUTER)
 
 #ifndef INCLUDE_ASM
-/* clang-format off */
 #define INCLUDE_ASM(FOLDER, NAME) \
     __asm__( \
         ".section .text\n" \
@@ -14,17 +13,14 @@
         "    .set reorder\n" \
         "    .set at\n" \
     )
-/* clang-format on */
 #endif
 #ifndef INCLUDE_RODATA
-/* clang-format off */
 #define INCLUDE_RODATA(FOLDER, NAME) \
     __asm__( \
         ".section .rodata\n" \
         "    .include \"" FOLDER "/" #NAME ".s\"\n" \
         ".section .text" \
     )
-/* clang-format on */
 #endif
 
 #if INCLUDE_ASM_USE_MACRO_INC

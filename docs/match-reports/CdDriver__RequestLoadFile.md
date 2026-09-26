@@ -23,7 +23,7 @@ carries the evidence for each one.
  * resolves that slot to CdDriver__LoadFile (code_179d8_s), which loads a named
  * file off the disc, so the slot is named for the method it dispatches to.
  * The sibling class D_8006D430 (include/code_171e0.h's
- * Class6D430Methods) leaves the identical offset unnamed -- this
+ * FileResourceMethods) leaves the identical offset unnamed -- this
  * stays an independent local view, per the project's multiple-local-views
  * convention, rather than an edit to that shared header. */
 typedef struct Methods6D4E8_C80 Methods6D4E8_C80;
@@ -152,7 +152,7 @@ allows.
   prototypes are identical types and nothing conflicts.
 - `self`'s own `+0x58` method-table slot is the identical offset the sibling
   class `D_8006D430` leaves as an unnamed pad in
-  `include/code_171e0.h`'s `Class6D430Methods` ("Class6D430__LoadFile's own
+  `include/code_171e0.h`'s `FileResourceMethods` ("FileResource__LoadFile's own
   slot, unused here"). Rather than editing that shared header — which
   `code_179d8_h.c` and `code_171e0.c` also include —
   this unit keeps its own local view (`Methods6D4E8_C80`/`Obj6D4E8_C80`), per the
@@ -210,7 +210,7 @@ would be invention.
 and all five vtable slots below are now in the tree, each one applied
 separately with `./build-and-verify.sh` green and byte-exact after it. One
 mis-hit had to be resolved by receiver type: `src/code_179d8_h.c:143`
-accesses `pendingGeneration` on a `Class6D430 *self`, while the same file's
+accesses `pendingGeneration` on a `FileResource *self`, while the same file's
 lines 97/174/175/182 are its OWN `ObjA34_179D8H::unk0C` and were left alone.
 The compiler named that mis-hit (`structure has no member named 'unk0C'`),
 which is the procedure working in the direction where it can work.
@@ -225,4 +225,4 @@ views; proposing rather than renaming, since those units are not mine:
 | code_179d8_s | `Obj80027480` | `unk24` | `flags` | A | only ever `|=` a bit (4 here, 0x200 in `CdDriver__LoadFile`) or cleared |
 
 
-Track 4, 2026-09-26 (round 88). The class of gCdDriverMethods (was D_8006D4E8, id 0x13 = DATASOURCE_CD) is CdDriver, in include/CdDriver.h: its ctor calls InitCdDrive, its slots enqueue CD_OP_* requests and drive the CD read state machine, and it is VabDriver's sibling. The object views this function was typed against are replaced by CdDriver, whose fields are all Class6D430's (the driver runs on its clients' objects; Class6D430's +0x018/+0x01C were named pos/size for it). Byte-identical. `Class6D4E8__RequestLoadFile` -> `CdDriver__RequestLoadFile` by rename.py.
+Track 4, 2026-09-26 (round 88). The class of gCdDriverMethods (was D_8006D4E8, id 0x13 = DATASOURCE_CD) is CdDriver, in include/CdDriver.h: its ctor calls InitCdDrive, its slots enqueue CD_OP_* requests and drive the CD read state machine, and it is VabDriver's sibling. The object views this function was typed against are replaced by CdDriver, whose fields are all FileResource's (the driver runs on its clients' objects; FileResource's +0x018/+0x01C were named pos/size for it). Byte-identical. `Class6D4E8__RequestLoadFile` -> `CdDriver__RequestLoadFile` by rename.py.

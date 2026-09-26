@@ -15,8 +15,8 @@ Table slot (`tools/classtable.py`): D_8006F0B8 +0x064 (setFlag override).
 
 ## Source
 
-The unit-local views `DataSrc33808` (Class6D430 subclass via the unified
-`CLASS6D430_SLOTS`/`CLASS6D430_FIELDS` macros plus `slot7C`/`slot80` and own
+The unit-local views `DataSrc33808` (FileResource subclass via the unified
+`FILERESOURCE_SLOTS`/`FILERESOURCE_FIELDS` macros plus `slot7C`/`slot80` and own
 fields +0x2C..+0x38), `Ctor33808`, `CountedBuf33808` and `Req44858` sit at the
 top of / earlier in `src/code_33808.c`.
 
@@ -37,7 +37,7 @@ typedef struct Hdr43200 {
 
 extern void LockActiveDataSource(void);
 extern void UnlockActiveDataSource(void);
-u32 MaxOfBufferWords(Class6D430 *self);
+u32 MaxOfBufferWords(FileResource *self);
 void *New_TimArraySrc(s32 arg0);
 
 void TimBlockSrc__AdvanceLoadState(Obj43068 *self) {
@@ -51,7 +51,7 @@ void TimBlockSrc__AdvanceLoadState(Obj43068 *self) {
             if (self->flags & 0x80) {
                 *(Hdr43200 *)self->buffer = *(Hdr43200 *)self->sector;
                 BMemPMgrFree(self->sector);
-                max = MaxOfBufferWords((Class6D430 *)self);
+                max = MaxOfBufferWords((FileResource *)self);
                 self->unk30 = (s32)BMemPMgrAlloc(*(u32 *)self->buffer * 4);
                 if (self->unk30 == 0) {
                     goto fail;
@@ -88,7 +88,7 @@ void TimBlockSrc__AdvanceLoadState(Obj43068 *self) {
                     self->unk38 = 0;
                     self->unk2A = 0;
                     self->unk3C = 1;
-                    GetActiveDataSourceMethods()->setFlag((Class6D430 *)self);
+                    GetActiveDataSourceMethods()->setFlag((FileResource *)self);
                 }
             }
             break;
@@ -111,7 +111,7 @@ Second build (the first was already 183/183; the second only added local Lock/Un
 
 ## Track 4 (2026-09-25, round 83, bravo)
 
-Occupant of Class6D430's `setFlag` slot (+0x064); keeps its name because the body is the whole loader state machine, not a flag set. Correction to the prose above: the 0x24-byte header is a count, four file offsets (+0x04) and four sizes (+0x14, what MaxOfBufferWords maximises), not eight offsets. The class (id 0xF03, table `D_8006F0B8`) is unified as `TimBlockSrc` in `include/TimBlockSrc.h`. Any source block above is the pre-unification spelling; the live body in `src/code_33808.c` takes the unified types, byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).
+Occupant of FileResource's `setFlag` slot (+0x064); keeps its name because the body is the whole loader state machine, not a flag set. Correction to the prose above: the 0x24-byte header is a count, four file offsets (+0x04) and four sizes (+0x14, what MaxOfBufferWords maximises), not eight offsets. The class (id 0xF03, table `D_8006F0B8`) is unified as `TimBlockSrc` in `include/TimBlockSrc.h`. Any source block above is the pre-unification spelling; the live body in `src/code_33808.c` takes the unified types, byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).
 
 
 ## Track 4 (2026-09-26, round 88, runner alpha)

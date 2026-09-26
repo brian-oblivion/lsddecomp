@@ -22,7 +22,7 @@
  * The table is 0x68 bytes, not the 19 slots classtable.py prints: six NULL
  * words at +0x050..+0x064 follow +0x04C in the data, and runMainLoop calls
  * all six through self->methods. They are abstract here; the subclass fills
- * them. Their names are the subclass's occupants (as Class6D430's interface
+ * them. Their names are the subclass's occupants (as FileResource's interface
  * slots are named for the CD driver's).
  *
  * Object size 0x20: no allocator, but the subclass's first own field

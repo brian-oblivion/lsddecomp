@@ -17,7 +17,7 @@
  * TodSet__ScanPackets (+0x078) runs Tod's +0x07C scanner over the data past
  * the counted array. ModelData builds one over its buffer past +0x0C
  * (ModelData__BuildResources: New_TodSet) and forwards its TOD packet scans
- * to it (ModelData.todSet, still declared `Class6D430 *` in
+ * to it (ModelData.todSet, still declared `FileResource *` in
  * include/ModelData.h).
  *
  * NO OWN SLOTS: the table is Tod's 0x84 bytes, with +0x008, +0x00C, +0x064
@@ -25,7 +25,7 @@
  * +0x064 keeps the inherited name `setFlag` and its void type; the occupant
  * TodSet__BuildTods returns s32 (0 when every Tod was built), and the ctor
  * casts the call, as ModelData__ModelData casts its own. +0x078 is
- * Class6D430's slot78 (NULL there); TodSet__ScanPackets occupies it, as
+ * FileResource's slot78 (NULL there); TodSet__ScanPackets occupies it, as
  * Tod__ScanPackets does in Tod's table.
  *
  * NO OWN FIELDS: the object is 0x2C bytes (New_TodSet), Tod's size.

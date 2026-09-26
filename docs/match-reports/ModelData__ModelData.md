@@ -15,8 +15,8 @@ Table slot (`tools/classtable.py`): D_8006F384 +0x008 (the allocator New_ModelDa
 
 ## Source
 
-The unit-local views `DataSrc33808` (Class6D430 subclass via the unified
-`CLASS6D430_SLOTS`/`CLASS6D430_FIELDS` macros plus `slot7C`/`slot80` and own
+The unit-local views `DataSrc33808` (FileResource subclass via the unified
+`FILERESOURCE_SLOTS`/`FILERESOURCE_FIELDS` macros plus `slot7C`/`slot80` and own
 fields +0x2C..+0x38), `Ctor33808` and `CountedBuf33808` sit at the top of
 `src/code_33808.c`.
 
@@ -28,7 +28,7 @@ fields +0x2C..+0x38), `Ctor33808` and `CountedBuf33808` sit at the top of
  * +0x064, whose nonzero result fails the construction (NULL), or else
  * request its file. */
 void *ModelData__ModelData(ModelData *self, Src6F240 *src, s32 owns) {
-    GetActiveDataSourceMethods()->ctor((Class6D430 *)self);
+    GetActiveDataSourceMethods()->ctor((FileResource *)self);
     self->methods = GetModelDataMethods();
     self->ownsResources = owns;
     if (src->buffer != NULL) {
@@ -56,4 +56,4 @@ First build, using the `goto fail` lever just found on LinkResource__LinkResourc
 
 ## Track 4
 
-2026-09-25, round 84 (delta): ModelData (D_8006F384) is unified in `include/ModelData.h`; the unit-shared `DataSrc33808` view no longer types it. +0x034 is `ownsResources` (was `unk34`). Callers settle what it means: New_ModelData passes 1 and TriggerWorld__TriggerWorld passes 0, and only while it is set do BuildResources build, and ReleaseResources release, the two sub-sources. The ctor's first call is `GetActiveDataSourceMethods()->ctor`, the same call TimBlockSrc__TimBlockSrc makes, which is the evidence that the class sits under Class6D430 and not under TimBlockSrc (whose id, 0xF03, 0x5F03 extends). Image byte-identical.
+2026-09-25, round 84 (delta): ModelData (D_8006F384) is unified in `include/ModelData.h`; the unit-shared `DataSrc33808` view no longer types it. +0x034 is `ownsResources` (was `unk34`). Callers settle what it means: New_ModelData passes 1 and TriggerWorld__TriggerWorld passes 0, and only while it is set do BuildResources build, and ReleaseResources release, the two sub-sources. The ctor's first call is `GetActiveDataSourceMethods()->ctor`, the same call TimBlockSrc__TimBlockSrc makes, which is the evidence that the class sits under FileResource and not under TimBlockSrc (whose id, 0xF03, 0x5F03 extends). Image byte-identical.

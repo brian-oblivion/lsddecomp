@@ -151,7 +151,7 @@ file it converts `self->pos` to a sector number (`CdPosToInt`), adds
 (CdlSetloc, or queues the seek on the state machine) and returns 0; with
 `mode != 0` it instead returns `self->size` rounded up to a whole sector.
 Outside a dispatch it enqueues op 4 with both arguments. The base-class
-caller agrees with that reading: `Class6D430__LoadFile` calls this slot
+caller agrees with that reading: `FileResource__LoadFile` calls this slot
 as `(0, 2)` to get the size it allocates and `(0, 0)` to rewind before
 reading, the shape of `lseek(fd, 0, SEEK_END)` / `lseek(fd, 0, SEEK_SET)`.
 
@@ -175,4 +175,4 @@ global's type comes from its accessors (`gFileTable` is walked at the 0x1C
 `+0x14`, i.e. `pos`). Byte-identical; no new `-Wall` warning.
 
 
-Track 4, 2026-09-26 (round 88). The class of gCdDriverMethods (was D_8006D4E8, id 0x13 = DATASOURCE_CD) is CdDriver, in include/CdDriver.h: its ctor calls InitCdDrive, its slots enqueue CD_OP_* requests and drive the CD read state machine, and it is VabDriver's sibling. The object views this function was typed against are replaced by CdDriver, whose fields are all Class6D430's (the driver runs on its clients' objects; Class6D430's +0x018/+0x01C were named pos/size for it). Byte-identical. `Class6D4E8__Seek` -> `CdDriver__Seek` by rename.py.
+Track 4, 2026-09-26 (round 88). The class of gCdDriverMethods (was D_8006D4E8, id 0x13 = DATASOURCE_CD) is CdDriver, in include/CdDriver.h: its ctor calls InitCdDrive, its slots enqueue CD_OP_* requests and drive the CD read state machine, and it is VabDriver's sibling. The object views this function was typed against are replaced by CdDriver, whose fields are all FileResource's (the driver runs on its clients' objects; FileResource's +0x018/+0x01C were named pos/size for it). Byte-identical. `Class6D4E8__Seek` -> `CdDriver__Seek` by rename.py.

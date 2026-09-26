@@ -27,7 +27,7 @@
  *
  * SLOTS (`classtable.py D_8006F40C --vs D_8006F384`: 34 against 33): the
  * overrides are +0x008 (ctor), +0x00C (TriggerWorld__Finalize), +0x064
- * (setFlag: TriggerWorld__Load, which only runs +0x078), +0x078 (Class6D430's
+ * (setFlag: TriggerWorld__Load, which only runs +0x078), +0x078 (FileResource's
  * slot78: TriggerWorld__BuildResources, s32, as ModelData__BuildResources
  * there; callers cast it) and +0x07C (releaseResources:
  * TriggerWorld__ReleaseResources). +0x080/+0x084 are ModelData's forwarders
@@ -38,7 +38,7 @@
  * ModelData's is 0x38.
  *
  * The ctor returns self or NULL (New_TriggerWorld tests it), but
- * MODELDATA_SLOTS declares +0x008 returning void, as Class6D430's own ctor
+ * MODELDATA_SLOTS declares +0x008 returning void, as FileResource's own ctor
  * does; the allocator reaches it through code_33808.c's unprototyped
  * Ctor33808 view, as every allocator in that unit does. The descriptor is
  * code_33808.c's Src6F240 ({buffer to adopt, file name to request}); only the

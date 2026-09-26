@@ -12,7 +12,7 @@ deletions, no out-of-range drift. Fresh ground (carved revision 18, no prior rep
 ## What it does
 
 Indexed getter: `lw v0,0x2C(a0); sll a1,2; addu; lw v0,0(a1)` = `return self->entries[index];`
-with `entries` an `s32 *` at +0x2C. Class6D430 (UNIFIED, `include/Class6D430.h`) is 0x2C
+with `entries` an `s32 *` at +0x2C. FileResource (UNIFIED, `include/FileResource.h`) is 0x2C
 bytes, so +0x2C is the LinkResource subclass's own first field; a unit-local minimal
 view `Obj6F13C` (pad to +0x2C, then the pointer) carries it rather than touching the
 shared header. Return type `s32` is a reading of one `lw`, not a proven type.
@@ -23,7 +23,7 @@ Table slot (`tools/classtable.py gLinkResourceMethods`): `gLinkResourceMethods` 
 
 ```c
 /* gLinkResourceMethods +0x080: returns entry `index` of the word array at +0x2C
- * (the first field past the 0x2C-byte Class6D430 base). */
+ * (the first field past the 0x2C-byte FileResource base). */
 typedef struct Obj6F13C {
     /* +0x000 */ u8 pad0[0x2C];
     /* +0x02C */ s32 *entries;

@@ -15,8 +15,8 @@ Table slot (`tools/classtable.py`): gLinkResourceMethods +0x064 (setFlag overrid
 
 ## Source
 
-The unit-local views `DataSrc33808` (Class6D430 subclass via the unified
-`CLASS6D430_SLOTS`/`CLASS6D430_FIELDS` macros plus `slot7C`/`slot80` and own
+The unit-local views `DataSrc33808` (FileResource subclass via the unified
+`FILERESOURCE_SLOTS`/`FILERESOURCE_FIELDS` macros plus `slot7C`/`slot80` and own
 fields +0x2C..+0x38), `Ctor33808`, `CountedBuf33808` and `Req44858` sit at the
 top of / earlier in `src/code_33808.c`.
 
@@ -58,7 +58,7 @@ s32 LinkResource__BuildModels(DataSrc33808 *self) {
         objs++;
     }
     *objs = NULL;
-    GetActiveDataSourceMethods()->setFlag((Class6D430 *)self);
+    GetActiveDataSourceMethods()->setFlag((FileResource *)self);
     return 0;
 }
 ```

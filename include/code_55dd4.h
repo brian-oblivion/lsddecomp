@@ -65,7 +65,7 @@ typedef struct TimeTargetObj {
 #define TOD_COORD_TRANSLATE 8
 
 /* self->modelData->todSet (Class65650__SetTod, Class65650__Tick): its
- * buffer (Class6D430 +0x010) + 8 + i * 4 holds a pointer to the i-th TOD's
+ * buffer (FileResource +0x010) + 8 + i * 4 holds a pointer to the i-th TOD's
  * holder, whose +0x10 is the TOD data itself: +0x4 the frame count, frames
  * starting at +0x8. */
 typedef struct EntryObj2 {

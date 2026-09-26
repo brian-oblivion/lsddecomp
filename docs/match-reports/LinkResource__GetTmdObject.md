@@ -11,14 +11,14 @@ drift. Fresh ground (carved revision 18, no prior report).
 
 ## What it does
 
-`sll 3; subu; sll 2` (index*28), `lw 0x10(a0)` (Class6D430 `buffer`), `addiu 0xC`, `addu` = `&((Buf6F13C *)self->buffer)->recs[index]` with 0x1C-byte records from +0x0C of the buffer. Same shape as charlie's round-82 lever in code_fa50.
+`sll 3; subu; sll 2` (index*28), `lw 0x10(a0)` (FileResource `buffer`), `addiu 0xC`, `addu` = `&((Buf6F13C *)self->buffer)->recs[index]` with 0x1C-byte records from +0x0C of the buffer. Same shape as charlie's round-82 lever in code_fa50.
 
 Table slot (`tools/classtable.py`): gLinkResourceMethods +0x07C.
 
 ## Source
 
-The unit-local view `DataSrc33808` (a Class6D430 subclass built with the unified
-`CLASS6D430_SLOTS`/`CLASS6D430_FIELDS` macros, plus `slot7C`/`slot80`, and own
+The unit-local view `DataSrc33808` (a FileResource subclass built with the unified
+`FILERESOURCE_SLOTS`/`FILERESOURCE_FIELDS` macros, plus `slot7C`/`slot80`, and own
 fields +0x2C..+0x38) and `CountedBuf33808` sit at the top of `src/code_33808.c`.
 Slot +0x078 is `void *slot78` in the unified macro, so calls cast it.
 
@@ -34,14 +34,14 @@ typedef struct Buf6F13C {
     /* +0x0C */ Rec6F13C recs[1];
 } Buf6F13C;
 
-Rec6F13C *LinkResource__GetTmdObject(Class6D430 *self, s32 index) {
+Rec6F13C *LinkResource__GetTmdObject(FileResource *self, s32 index) {
     return &((Buf6F13C *)self->buffer)->recs[index];
 }
 ```
 
 ## Notes
 
-- No shared header was edited. `Class6D430.h`, `Class6B5CC.h`, `BasicClass.h` are
+- No shared header was edited. `FileResource.h`, `Class6B5CC.h`, `BasicClass.h` are
   included; prototypes for other units' functions (GetActiveDataSourceMethods,
   ReleaseBasicClassArray, BMemPMgrFree) are local to the unit.
 - Types of arguments and returns are readings of the registers used, not proven.

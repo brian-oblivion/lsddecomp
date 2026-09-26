@@ -1,10 +1,10 @@
 #ifndef TIMBLOCKSRC_H
 #define TIMBLOCKSRC_H
 
-#include "Class6D430.h"
+#include "FileResource.h"
 
 /*
- * TimBlockSrc -- a Class6D430 data source (class id 0xF03, method table
+ * TimBlockSrc -- a FileResource data source (class id 0xF03, method table
  * D_8006F0B8) that loads a file of TIM blocks one sector-buffer at a time
  * and fades up to four 256-colour CLUT rows. Methods in src/code_33808.c.
  *
@@ -28,7 +28,7 @@
  * to TimBlockSrc__TimBlockSrc, and their +0x07C/+0x080 occupants have other
  * signatures (ScanTodPackets returns a u8 from four arguments where
  * TimBlockSrc__FadeAllEntries takes two and returns nothing). None of them
- * carries a byte of this class's layout, so they expand CLASS6D430's macros
+ * carries a byte of this class's layout, so they expand FILERESOURCE's macros
  * directly (round 83).
  */
 
@@ -56,8 +56,8 @@ typedef struct TimBlockSrcEntry {
 } TimBlockSrcEntry;
 
 struct TimBlockSrcMethods {
-    CLASS6D430_SLOTS(TimBlockSrc, (TimBlockSrc * self, char *name));
-    /* +0x078 is Class6D430's slot78; this table's occupant is
+    FILERESOURCE_SLOTS(TimBlockSrc, (TimBlockSrc * self, char *name));
+    /* +0x078 is FileResource's slot78; this table's occupant is
      * TimBlockSrc__SetEntryShift(self, index, shift). */
     /* +0x07C */ void (*fadeAllEntries)(TimBlockSrc *self, TimBlockSrcColor *color); /* TimBlockSrc__FadeAllEntries */
     /* +0x080 */ void (*fadeEntry)(TimBlockSrc *self, s32 index,
@@ -65,7 +65,7 @@ struct TimBlockSrcMethods {
 };
 
 struct TimBlockSrc {
-    CLASS6D430_FIELDS(TimBlockSrcMethods); /* unk2A is the load state: 9 header, 10 blocks, 0 done */
+    FILERESOURCE_FIELDS(TimBlockSrcMethods); /* unk2A is the load state: 9 header, 10 blocks, 0 done */
     /* +0x02C */ s32 blockCount;           /* TimArraySrcs built so far */
     /* +0x030 */ struct TimArraySrc **blocks; /* one per block; ReleaseBasicClassArray'd by Finalize */
     /* +0x034 */ void *sector; /* the read buffer: 0x800 for the header, then the largest block size */

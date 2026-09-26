@@ -15,8 +15,8 @@ Table slot (`tools/classtable.py`): none (allocator for D_8006F590, object size 
 
 ## Source
 
-The unit-local view `DataSrc33808` (a Class6D430 subclass built with the unified
-`CLASS6D430_SLOTS`/`CLASS6D430_FIELDS` macros, plus `slot7C`/`slot80`, and own
+The unit-local view `DataSrc33808` (a FileResource subclass built with the unified
+`FILERESOURCE_SLOTS`/`FILERESOURCE_FIELDS` macros, plus `slot7C`/`slot80`, and own
 fields +0x2C..+0x38) and `CountedBuf33808` sit at the top of `src/code_33808.c`.
 
 ```c
@@ -48,4 +48,4 @@ void *New_TodSet(s32 arg0) {
 
 ## Track 4 (2026-09-26, round 88, delta)
 
-Now `TodSet *New_TodSet(struct Src6F240 *src)` (include/TodSet.h): the argument is the construction descriptor TodSet__TodSet hands straight to Tod__Tod, and the object is a TodSet (0x2C bytes, no own fields). The ctor is still reached through the unprototyped Ctor33808 view, because TOD_SLOTS types +0x008 returning void while this ctor returns self or NULL. ModelData__BuildResources, the one caller, casts `(Src6F240 *)&req` in and `(Class6D430 *)` out (ModelData.todSet is still `Class6D430 *`). Bytes unchanged.
+Now `TodSet *New_TodSet(struct Src6F240 *src)` (include/TodSet.h): the argument is the construction descriptor TodSet__TodSet hands straight to Tod__Tod, and the object is a TodSet (0x2C bytes, no own fields). The ctor is still reached through the unprototyped Ctor33808 view, because TOD_SLOTS types +0x008 returning void while this ctor returns self or NULL. ModelData__BuildResources, the one caller, casts `(Src6F240 *)&req` in and `(FileResource *)` out (ModelData.todSet is still `FileResource *`). Bytes unchanged.

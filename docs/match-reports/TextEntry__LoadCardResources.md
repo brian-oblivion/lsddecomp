@@ -165,6 +165,6 @@ Class unified as `TextEntry` (include/TextEntry.h; table gObj86ED0Methods -> gTe
 
 TimImage is unified (`include/TimImage.h`); this unit's local `extern
 ChildObj86ED0 *New_TimImage(char *)` is deleted. `handle1`/`handle2` are
-`TimImage *`: +0x078 (Class6D430's `void *slot78`, occupant
+`TimImage *`: +0x078 (FileResource's `void *slot78`, occupant
 TimImage__Upload) through `TimImageUploadFn`, +0x004 the inherited
 `release`. `ChildObj86ED0` stays for `textRow`. Image byte-identical.

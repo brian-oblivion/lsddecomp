@@ -15,8 +15,8 @@ Table slot (`tools/classtable.py`): D_8006F0B8 +0x00C (finalize).
 
 ## Source
 
-The unit-local view `DataSrc33808` (a Class6D430 subclass built with the unified
-`CLASS6D430_SLOTS`/`CLASS6D430_FIELDS` macros, plus `slot7C`/`slot80`, and own
+The unit-local view `DataSrc33808` (a FileResource subclass built with the unified
+`FILERESOURCE_SLOTS`/`FILERESOURCE_FIELDS` macros, plus `slot7C`/`slot80`, and own
 fields +0x2C..+0x38) and `CountedBuf33808` sit at the top of `src/code_33808.c`.
 
 ```c
@@ -25,7 +25,7 @@ fields +0x2C..+0x38) and `CountedBuf33808` sit at the top of `src/code_33808.c`.
 void TimBlockSrc__Finalize(DataSrc33808 *self) {
     ReleaseBasicClassArray((BasicClass **)self->unk30, self->unk2C);
     BMemPMgrFree(self->unk30);
-    GetActiveDataSourceMethods()->finalize((Class6D430 *)self);
+    GetActiveDataSourceMethods()->finalize((FileResource *)self);
 }
 ```
 
@@ -39,7 +39,7 @@ void TimBlockSrc__Finalize(DataSrc33808 *self) {
 
 ## Naming
 
-- **TimBlockSrc__Finalize**, tier B. Class6D430 finalize override for TimBlockSrc: releases the block array and the active driver's finalize.
+- **TimBlockSrc__Finalize**, tier B. FileResource finalize override for TimBlockSrc: releases the block array and the active driver's finalize.
 
 ## Track 4 (2026-09-25, round 83, bravo)
 

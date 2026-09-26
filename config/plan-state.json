@@ -863,9 +863,9 @@
           "header": "include/Class6D3C8.h"
         },
         "D_8006D430": {
-          "class": "Class6D430",
+          "class": "FileResource",
           "date": "2026-09-25",
-          "header": "include/Class6D430.h"
+          "header": "include/FileResource.h"
         },
         "D_8006D940": {
           "class": "Class6D940",

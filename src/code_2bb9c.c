@@ -5,15 +5,15 @@
  * into game code, a method-table entry beside game methods, or contiguity with
  * those, and no Sony fingerprint).
  *
- * What it holds: TimImage, a Class6D430 (data-source) subclass -- 12 of its
+ * What it holds: TimImage, a FileResource (data-source) subclass -- 12 of its
  * own methods (table `gTimImageMethods`, id 0x103), plus the class's own
  * alloc-then-ctor helper (`New_TimImage`, "new TimImage(name)") and table
  * getter (`GetTimImageMethods`). Every call site project-wide that reaches
  * TimImage does so by building "CARD\\<name>.TIM" or another `.TIM` path and
  * handing it to `New_TimImage`, then calling the returned handle's slot78
- * (`TimImage__Upload`) and usually slot5C (`Class6D430__FreeBuffer`) --
+ * (`TimImage__Upload`) and usually slot5C (`FileResource__FreeBuffer`) --
  * TimImage is the game's TIM-image loader: `buffer` (inherited from
- * Class6D430) holds the raw file, `TimImage__GetTimInfo` describes it with
+ * FileResource) holds the raw file, `TimImage__GetTimInfo` describes it with
  * Sony's `GsGetTimInfo`, and `TimImage__Upload` uploads the pixel block and,
  * when present, the CLUT to the draw singleton (DrawSystem, `include/DrawSystem.h`)
  * through its loadImage slot.
@@ -30,7 +30,7 @@
  * `New_TimImage` was renamed in track 4 (round 88).
  */
 #include "common.h"
-#include "Class6D430.h"
+#include "FileResource.h"
 #include "DrawSystem.h"
 #include "TimImage.h"
 
@@ -44,7 +44,7 @@ typedef struct DrawPoint {
 } DrawPoint;
 
 extern void *BMemPMgrAlloc(s32 size);
-extern Class6D430Methods *GetActiveDataSourceMethods(void);
+extern FileResourceMethods *GetActiveDataSourceMethods(void);
 
 /* new TimImage(name). */
 TimImage *New_TimImage(char *name) {
@@ -60,7 +60,7 @@ TimImage *New_TimImage(char *name) {
 
 /* TimImage +0x008: the ctor. */
 void TimImage__TimImage(TimImage *self, char *name) {
-    GetActiveDataSourceMethods()->ctor((Class6D430 *)self);
+    GetActiveDataSourceMethods()->ctor((FileResource *)self);
     self->methods = GetTimImageMethods();
     self->unk48 = 0;
     self->clutBase = 0;
@@ -71,7 +71,7 @@ void TimImage__TimImage(TimImage *self, char *name) {
 
 /* TimImage +0x00C: finalize, straight to the active driver's. */
 void TimImage__Finalize(TimImage *self) {
-    GetActiveDataSourceMethods()->finalize((Class6D430 *)self);
+    GetActiveDataSourceMethods()->finalize((FileResource *)self);
 }
 
 /* TimImage +0x078: describe the TIM, then upload its pixel block and, when

@@ -154,7 +154,7 @@ typedef struct IconFrame {
     u8 raw[0x80];
 } IconFrame;
 
-/* The icon TimImage's file buffer (its Class6D430 `buffer`, +0x010) --
+/* The icon TimImage's file buffer (its FileResource `buffer`, +0x010) --
  * only the two palette halves (+0x14/+0x24) and the three icon frames
  * (+0x40/+0xC0/+0x140) are ever read by this function; nothing here
  * establishes the leading 0x14 bytes or the 0xC-byte gap at +0x34 (a TIM's

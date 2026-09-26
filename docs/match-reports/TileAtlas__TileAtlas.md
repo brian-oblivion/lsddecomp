@@ -15,14 +15,14 @@ Table slot (`tools/classtable.py`): D_8006F514 +0x008.
 
 ## Source
 
-The unit-local views `DataSrc33808` (Class6D430 subclass via the unified
-`CLASS6D430_SLOTS`/`CLASS6D430_FIELDS` macros plus `slot7C`/`slot80` and own
+The unit-local views `DataSrc33808` (FileResource subclass via the unified
+`FILERESOURCE_SLOTS`/`FILERESOURCE_FIELDS` macros plus `slot7C`/`slot80` and own
 fields +0x2C..+0x38), `Ctor33808` and `CountedBuf33808` sit at the top of
 `src/code_33808.c`.
 
 ```c
 typedef struct Obj6F514 {
-    CLASS6D430_FIELDS(DataSrc33808Methods);
+    FILERESOURCE_FIELDS(DataSrc33808Methods);
     /* +0x02C */ u8 pad2C[4];
     /* +0x030 */ u16 unk30;
     /* +0x032 */ u16 unk32;
@@ -35,7 +35,7 @@ typedef struct Obj6F514 {
 void TileAtlas__TileAtlas(Obj6F514 *self, s32 arg) {
     s32 unused[8];
 
-    GetActiveDataSourceMethods()->ctor((Class6D430 *)self);
+    GetActiveDataSourceMethods()->ctor((FileResource *)self);
     self->methods = GetTileAtlasMethods();
     self->unk34 = 0;
     self->unk32 = 0;
@@ -57,4 +57,4 @@ First build. The 0x40 frame with nothing on the stack past ra/s0/s1 is the unuse
 
 ## Track 4 (2026-09-26, round 88, alpha)
 
-Class unified in `include/TileAtlas.h` (D_8006F514, 0x303, a Class6D430 subclass, 0x38 bytes). `self` is `TileAtlas *` (was the unit-local `Obj6F514`). +0x030 unk30 -> `defaultCells` (set to 1 here when arg1 == 0; TileAtlas__BuildCells builds only when it is set, the counterpart of TileMap's `defaultGrid`), +0x032 unk32 -> `loaded` (0 here, 1 from TileAtlas__Load), +0x034 `unk34` retyped `s32` -> `void *` (zeroed here, freed by Finalize, set by no TileAtlas method). The setFlag call needs no cast. No rename. Byte-identical.
+Class unified in `include/TileAtlas.h` (D_8006F514, 0x303, a FileResource subclass, 0x38 bytes). `self` is `TileAtlas *` (was the unit-local `Obj6F514`). +0x030 unk30 -> `defaultCells` (set to 1 here when arg1 == 0; TileAtlas__BuildCells builds only when it is set, the counterpart of TileMap's `defaultGrid`), +0x032 unk32 -> `loaded` (0 here, 1 from TileAtlas__Load), +0x034 `unk34` retyped `s32` -> `void *` (zeroed here, freed by Finalize, set by no TileAtlas method). The setFlag call needs no cast. No rename. Byte-identical.

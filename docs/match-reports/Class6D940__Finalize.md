@@ -32,7 +32,7 @@ is a documented choice, not a measured one.
 
 Renamed `func_8002C200 -> Class6D940__Finalize`, tier A. `+0x00C` (dtor)
 slot of `D_8006D940` (confirmed by `tools/classtable.py 0x8006D940`),
-matching the `Class6D430__Finalize` naming precedent at the same slot
+matching the `FileResource__Finalize` naming precedent at the same slot
 position in the base class.
 
 ## Track 4 (2026-09-26, round 87, echo)
@@ -40,7 +40,7 @@ position in the base class.
 Renamed `Class6D940__Destroy -> Class6D940__Finalize`: it occupies slot
 +0x00C of D_8006D940, which is `finalize` in every class
 (`include/BasicClass.h`; `tools/classtable.py D_8006D940 --vs D_8006D430`
-shows it overriding `Class6D430__Finalize`), and its body is only the
+shows it overriding `FileResource__Finalize`), and its body is only the
 parent's finalize, reached through the active data source's table
 (`GetActiveDataSourceMethods()->finalize`). The slot is `void`, so the
 function is now `void` too: byte-identical, which settles the tail-call

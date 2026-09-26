@@ -42,11 +42,11 @@ Matched on the first attempt.
 Round 79 (delta).
 
 - **`CdDriver__Finalize`** (was `func_80027274`) -- **tier A**. Table slot
-  +0x00C of gCdDriverMethods, overriding `Class6D430__Finalize` in the parent
+  +0x00C of gCdDriverMethods, overriding `FileResource__Finalize` in the parent
   table (and `BasicClass__Finalize` in the root). The body cancels this
   object's queued CD requests (+0x074, `CdDriver__CancelRequests`) and
-  then frees its buffer (+0x05C, inherited `Class6D430__FreeBuffer`) -- the
-  same two-dispatch shape as `Class6D430__Finalize` (`onBufferChanged` then
+  then frees its buffer (+0x05C, inherited `FileResource__FreeBuffer`) -- the
+  same two-dispatch shape as `FileResource__Finalize` (`onBufferChanged` then
   `freeBuffer`). Named after the slot it overrides, following the parent.
 - Slots, in the unit's local `Class6D4E8Methods` view (only this unit
   accesses it, so renamed directly; both oracles green): `slot74` ->
@@ -63,7 +63,7 @@ copies it and leaves `$a0` intact), and `CdDriver__CancelRequests`
 (code_179d8_q.c) reads `self` from `$a0`. So the call does pass `self`.
 Retyped to `void (*cancelRequests)(void *self)` and called as
 `self->methods->cancelRequests(self)`: **byte-identical** (build exit 0,
-SHA1 OK, check-nonmatching green). `Class6D430__Finalize` in code_171e0.c
+SHA1 OK, check-nonmatching green). `FileResource__Finalize` in code_171e0.c
 has the identical compiled shape with `this` passed explicitly, which is
 the precedent. The nop delay slot said only that no argument register
 needed LOADING, not that none was read.
@@ -76,4 +76,4 @@ needed LOADING, not that none was read.
   the slot zero-argument.
 
 
-Track 4, 2026-09-26 (round 88). The class of gCdDriverMethods (was D_8006D4E8, id 0x13 = DATASOURCE_CD) is CdDriver, in include/CdDriver.h: its ctor calls InitCdDrive, its slots enqueue CD_OP_* requests and drive the CD read state machine, and it is VabDriver's sibling. The object views this function was typed against are replaced by CdDriver, whose fields are all Class6D430's (the driver runs on its clients' objects; Class6D430's +0x018/+0x01C were named pos/size for it). Byte-identical. `Class6D4E8__Destroy` -> `CdDriver__Finalize` by rename.py. Renamed from Destroy for its slot, +0x00C finalize (track 4 step 6): the body cancels the object's requests and frees its buffer, which is what the slot does.
+Track 4, 2026-09-26 (round 88). The class of gCdDriverMethods (was D_8006D4E8, id 0x13 = DATASOURCE_CD) is CdDriver, in include/CdDriver.h: its ctor calls InitCdDrive, its slots enqueue CD_OP_* requests and drive the CD read state machine, and it is VabDriver's sibling. The object views this function was typed against are replaced by CdDriver, whose fields are all FileResource's (the driver runs on its clients' objects; FileResource's +0x018/+0x01C were named pos/size for it). Byte-identical. `Class6D4E8__Destroy` -> `CdDriver__Finalize` by rename.py. Renamed from Destroy for its slot, +0x00C finalize (track 4 step 6): the body cancels the object's requests and frees its buffer, which is what the slot does.

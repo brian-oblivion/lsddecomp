@@ -17,8 +17,8 @@ Table slot (`tools/classtable.py`): none (allocator for D_8006F498, object size 
 
 ## Source
 
-The unit-local view `DataSrc33808` (a Class6D430 subclass built with the unified
-`CLASS6D430_SLOTS`/`CLASS6D430_FIELDS` macros, plus `slot7C`/`slot80`, and own
+The unit-local view `DataSrc33808` (a FileResource subclass built with the unified
+`FILERESOURCE_SLOTS`/`FILERESOURCE_FIELDS` macros, plus `slot7C`/`slot80`, and own
 fields +0x2C..+0x38) and `CountedBuf33808` sit at the top of `src/code_33808.c`.
 
 ```c
@@ -48,6 +48,6 @@ void *New_TileMap(s32 arg0, s32 arg1) {
 
 ## Track 4 (2026-09-26, round 88, alpha)
 
-Class unified in `include/TileMap.h`. Returns `TileMap *` (was `void *`); the second parameter is `Class6D430 *atlas` (was `s32 arg1`: a TileAtlas, D_8006F514, typed by its nearest unified ancestor); the ctor is reached through `GetTileMapMethods()->ctor` (was the unit-local `Ctor33808` cast). The prototype `extern StreamTaskUnkB4Obj *New_TileMap(...)` in include/code_2c054.h is gone. Byte-identical.
+Class unified in `include/TileMap.h`. Returns `TileMap *` (was `void *`); the second parameter is `FileResource *atlas` (was `s32 arg1`: a TileAtlas, D_8006F514, typed by its nearest unified ancestor); the ctor is reached through `GetTileMapMethods()->ctor` (was the unit-local `Ctor33808` cast). The prototype `extern StreamTaskUnkB4Obj *New_TileMap(...)` in include/code_2c054.h is gone. Byte-identical.
 
-Later the same round (alpha, third class): TileAtlas unified; the `atlas` parameter is `TileAtlas *` (was `Class6D430 *`), in the prototype in include/TileMap.h (`struct TileAtlas *`, by tag) and in the ctor slot's parameter list. Byte-identical.
+Later the same round (alpha, third class): TileAtlas unified; the `atlas` parameter is `TileAtlas *` (was `FileResource *`), in the prototype in include/TileMap.h (`struct TileAtlas *`, by tag) and in the ctor slot's parameter list. Byte-identical.

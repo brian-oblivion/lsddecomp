@@ -1,10 +1,10 @@
 #ifndef TIMIMAGE_H
 #define TIMIMAGE_H
 
-#include "Class6D430.h"
+#include "FileResource.h"
 
 /*
- * TimImage -- a Class6D430 data source (class id 0x103, method table
+ * TimImage -- a FileResource data source (class id 0x103, method table
  * gTimImageMethods) whose buffer holds one TIM image. Methods in
  * src/code_2bb9c.c. No classes derive from it (`typeviews.py --tree`), so
  * there are no FIELDS/SLOTS macros.
@@ -27,7 +27,7 @@
  * src/code_33808.c) makes them with New_TimImage(NULL), points `buffer`
  * into its own block and sets `clutBase`.
  *
- * +0x078 is Class6D430's `void *slot78` (NULL there); this table's occupant
+ * +0x078 is FileResource's `void *slot78` (NULL there); this table's occupant
  * is TimImage__Upload, called through TimImageUploadFn (no code; FINISHING-
  * PLAN track 4 step 6).
  */
@@ -53,8 +53,8 @@ typedef struct GsIMAGE {
 } GsIMAGE;
 
 struct TimImageMethods {
-    CLASS6D430_SLOTS(TimImage, (TimImage * self, char *name));
-    /* +0x078 is Class6D430's slot78; this table's occupant is
+    FILERESOURCE_SLOTS(TimImage, (TimImage * self, char *name));
+    /* +0x078 is FileResource's slot78; this table's occupant is
      * TimImage__Upload (TimImageUploadFn). */
     /* +0x07C..+0x094: empty bodies (TimImage__func_8003B5AC..5DC); no C
      * caller names them. */
@@ -70,7 +70,7 @@ struct TimImageMethods {
 }; /* 39 slots, 0xA0 bytes */
 
 struct TimImage {
-    CLASS6D430_FIELDS(TimImageMethods); /* buffer: the TIM file */
+    FILERESOURCE_FIELDS(TimImageMethods); /* buffer: the TIM file */
     /* +0x02C */ GsIMAGE tim; /* TimImage__Upload describes the TIM here; a Sprite's reset keeps its address */
     /* +0x048 */ s32 unk48; /* 0 from the ctor, 1 from slot98; no reader found */
     /* +0x04C */ s32 clutBase; /* 0 from the ctor; TimArraySrc__BuildImages: from the CLUT row GsGetTimInfo reports */

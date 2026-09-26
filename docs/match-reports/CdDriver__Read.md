@@ -125,7 +125,7 @@ Round 79 (charlie), FINISHING-PLAN track 3.
 otherwise it enqueues op 5 with `buf`/`size`, or inside a queue dispatch on
 an open file reads `size >> 11` sectors into `buf` (CdRead + CdReadSync
 retry loop, or hands `gCdReadSectorCount`/`gCdReadBuffer` to the state
-machine). `Class6D430__LoadFile` calls this slot with the buffer it just
+machine). `FileResource__LoadFile` calls this slot with the buffer it just
 allocated and its size, between the rewind and the close.
 
 **Class prefix.** `Class6D4E8` is the placeholder token for the method
@@ -134,4 +134,4 @@ siblings already use); `tools/classtable.py gCdDriverMethods` lists this functio
 at slot `+0x054`. The prefix names the table, not the developers' class.
 
 
-Track 4, 2026-09-26 (round 88). The class of gCdDriverMethods (was D_8006D4E8, id 0x13 = DATASOURCE_CD) is CdDriver, in include/CdDriver.h: its ctor calls InitCdDrive, its slots enqueue CD_OP_* requests and drive the CD read state machine, and it is VabDriver's sibling. The object views this function was typed against are replaced by CdDriver, whose fields are all Class6D430's (the driver runs on its clients' objects; Class6D430's +0x018/+0x01C were named pos/size for it). Byte-identical. `Class6D4E8__Read` -> `CdDriver__Read` by rename.py.
+Track 4, 2026-09-26 (round 88). The class of gCdDriverMethods (was D_8006D4E8, id 0x13 = DATASOURCE_CD) is CdDriver, in include/CdDriver.h: its ctor calls InitCdDrive, its slots enqueue CD_OP_* requests and drive the CD read state machine, and it is VabDriver's sibling. The object views this function was typed against are replaced by CdDriver, whose fields are all FileResource's (the driver runs on its clients' objects; FileResource's +0x018/+0x01C were named pos/size for it). Byte-identical. `Class6D4E8__Read` -> `CdDriver__Read` by rename.py.

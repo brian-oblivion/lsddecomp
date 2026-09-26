@@ -1,10 +1,10 @@
 #ifndef TILEMAP_H
 #define TILEMAP_H
 
-#include "Class6D430.h"
+#include "FileResource.h"
 
 /*
- * TileMap -- a Class6D430 data source (class id 0x203, method table
+ * TileMap -- a FileResource data source (class id 0x203, method table
  * D_8006F498) whose own fields, +0x02C..+0x03B, are exactly libgs's GsMAP
  * (LIBGS.H: cellw, cellh, ncellw, ncellh, base, index). Methods in
  * src/code_33808.c. No classes derive from it (`typeviews.py --tree`), so
@@ -37,7 +37,7 @@
  *  - +0x064 setFlag, TileMap__Load: unless unk2A is set, +0x078 and
  *    loaded = 1. It calls +0x078 with NO argument ($a0 is never set up;
  *    TileMap__Load's report), through TileMapBuildMapFn;
- *  - +0x078 is Class6D430's `void *slot78` (NULL there); this table's
+ *  - +0x078 is FileResource's `void *slot78` (NULL there); this table's
  *    occupant is TileMap__BuildMap. No own slots past it.
  *
  * FIELDS: the GsMAP at +0x02C, then the atlas, then two u16 flags; the
@@ -62,13 +62,13 @@ typedef struct GsMAP {
 } GsMAP;
 
 struct TileMapMethods {
-    CLASS6D430_SLOTS(TileMap, (TileMap * self, s32 arg1, struct TileAtlas *atlas));
-    /* +0x078 is Class6D430's slot78; this table's occupant is
+    FILERESOURCE_SLOTS(TileMap, (TileMap * self, s32 arg1, struct TileAtlas *atlas));
+    /* +0x078 is FileResource's slot78; this table's occupant is
      * TileMap__BuildMap, called through TileMapBuildMapFn. */
 }; /* 30 slots, 0x7C bytes */
 
 struct TileMap {
-    CLASS6D430_FIELDS(TileMapMethods);
+    FILERESOURCE_FIELDS(TileMapMethods);
     /* +0x02C */ GsMAP map; /* TileMap__BuildMap fills it; BgLayer__Reset points its GsBG here */
     /* +0x03C */ struct TileAtlas *atlas; /* include/TileAtlas.h: the ctor's third argument; BuildMap reads its cells */
     /* +0x040 */ u16 defaultGrid; /* 1 from the ctor when arg1 == 0; BuildMap lays out the 20 x 15 grid only when set */

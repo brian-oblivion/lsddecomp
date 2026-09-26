@@ -1,12 +1,12 @@
 #ifndef VABSTREAMOBJ_H
 #define VABSTREAMOBJ_H
 
-#include "Class6D430.h"
+#include "FileResource.h"
 
 /*
  * VabStreamObj -- one VAB sound bank, loaded from disc through the active
  * data source and played through Sony's libsnd (class id 0xA03, method table
- * gVabStreamObjMethods). It is a Class6D430 subclass and a sibling of the
+ * gVabStreamObjMethods). It is a FileResource subclass and a sibling of the
  * drivers (VabDriver 0x23, the CD driver 0x13), not derived from either. Like
  * every data source, its ctor and finalize chain to the ACTIVE driver's
  * (GetActiveDataSourceMethods). Methods in src/code_179d8_e.c.
@@ -57,14 +57,14 @@ typedef struct VabStreamVabHdr {
     /* +0x16 */ u8 pad16[0x20 - 0x16];
 } VabStreamVabHdr;
 
-/* slot78 is Class6D430's `void *slot78` (NULL there). This class's occupant,
+/* slot78 is FileResource's `void *slot78` (NULL there). This class's occupant,
  * VabStreamObj__OnBodyReady, is called through this typedef. That takes no
  * code (FINISHING-PLAN track 4 step 6). */
 typedef s32 (*VabStreamObjOnBodyReadyFn)(VabStreamObj *self, s32 done);
 
 struct VabStreamObjMethods {
     /* ctor: New_VabStreamObj passes the bank's base path (no extension). */
-    CLASS6D430_SLOTS(VabStreamObj, (VabStreamObj * self, char *path));
+    FILERESOURCE_SLOTS(VabStreamObj, (VabStreamObj * self, char *path));
     /* +0x07C */ void (*loadVagAttrs)(VabStreamObj *self); /* VabStreamObj__LoadVagAttrs */
     /* +0x080 */ s32 (*playTone)(VabStreamObj *self, s32 index, s32 vol,
                                  s32 endVol); /* VabStreamObj__PlayTone: the voice, or -1 */
@@ -79,7 +79,7 @@ struct VabStreamObjMethods {
 }; /* 39 slots, 0xA0 bytes */
 
 struct VabStreamObj {
-    CLASS6D430_FIELDS(VabStreamObjMethods); /* buffer: the loaded .VH, then the .VB; unk2A is the load state: 0 idle, 1 header, 6 body */
+    FILERESOURCE_FIELDS(VabStreamObjMethods); /* buffer: the loaded .VH, then the .VB; unk2A is the load state: 0 idle, 1 header, 6 body */
     /* +0x02C */ VabStreamVabHdr vabHdr;       /* SsUtGetVabHdr */
     /* +0x04C */ VabStreamVagAtr *vagAttrPool; /* vabHdr.vs records */
     /* +0x050 */ VabStreamVagAtr **progVagTable; /* vabHdr.ts pointers into vagAttrPool, one per program */

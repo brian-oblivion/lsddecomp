@@ -1,10 +1,10 @@
 #ifndef CLASS6EED8_H
 #define CLASS6EED8_H
 
-#include "Class6D430.h"
+#include "FileResource.h"
 
 /*
- * Class6EED8 -- a Class6D430 data source (class id 0xB03, method table
+ * Class6EED8 -- a FileResource data source (class id 0xB03, method table
  * gClass6EED8Methods) that requests one named file at construction and
  * records when the load has completed. Methods in src/code_322b4.c. No
  * classes derive from it. Its getter is an entry of
@@ -21,7 +21,7 @@
  * CD driver calls setFlag when a queued operation completes
  * (CdDriver__LoadFile, the request-queue dispatch in code_179d8_s) --
  * and finalize clears it again. Nothing overrides loadFile (+0x058 is NULL
- * in the static table), so the file lands in Class6D430's `buffer`.
+ * in the static table), so the file lands in FileResource's `buffer`.
  *
  * Its one user is WBgm (src/code_2a0e0.c): WBgm__SetSeq makes one per SEQ
  * name, and WBgm__HandleMonitorEvent waits for `loaded` before passing
@@ -33,11 +33,11 @@ typedef struct Class6EED8 Class6EED8;
 typedef struct Class6EED8Methods Class6EED8Methods;
 
 struct Class6EED8Methods {
-    CLASS6D430_SLOTS(Class6EED8, (Class6EED8 * self, char *name));
+    FILERESOURCE_SLOTS(Class6EED8, (Class6EED8 * self, char *name));
 };
 
 struct Class6EED8 {
-    CLASS6D430_FIELDS(Class6EED8Methods);
+    FILERESOURCE_FIELDS(Class6EED8Methods);
     /* +0x02C */ s32 loaded; /* 1 once setFlag reports the requested file loaded; cleared by the ctor and Class6EED8__Finalize */
 }; /* 0x30 bytes: New_Class6EED8 */
 

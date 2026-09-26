@@ -17,8 +17,8 @@ Table slot (`tools/classtable.py`): D_8006F1C4 +0x078.
 
 ## Source
 
-The unit-local views `DataSrc33808` (Class6D430 subclass via the unified
-`CLASS6D430_SLOTS`/`CLASS6D430_FIELDS` macros plus `slot7C`/`slot80` and own
+The unit-local views `DataSrc33808` (FileResource subclass via the unified
+`FILERESOURCE_SLOTS`/`FILERESOURCE_FIELDS` macros plus `slot7C`/`slot80` and own
 fields +0x2C..+0x38), `Ctor33808` and `CountedBuf33808` sit at the top of
 `src/code_33808.c`.
 
@@ -48,7 +48,7 @@ First build. Pointer walk with the increment after the call (the addiu lands in 
 
 The array at +0x30 holds TimImages (TimArraySrc__BuildImages fills it with
 New_TimImage(NULL)), so `objs` is `TimImage **` and the +0x078 call goes
-through `TimImageUploadFn` (include/TimImage.h: Class6D430's `void *slot78`,
+through `TimImageUploadFn` (include/TimImage.h: FileResource's `void *slot78`,
 whose occupant here is TimImage__Upload) instead of an unprototyped cast of
 DataSrc33808's slot. Image byte-identical.
 
