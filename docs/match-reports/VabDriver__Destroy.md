@@ -26,5 +26,5 @@ Renamed `func_8002C3C8 -> VabDriver__Destroy`, tier A, same evidence and
 same cross-unit-ownership note as `VabDriver__VabDriver`'s report
 (code_179d8_e.c's own comments already identified this slot by its old
 placeholder name; matches the `FileResource__Finalize` naming precedent at the
-same `+0x00C` slot position in the base class and in `D_8006D940`'s own
-`Class6D940__Finalize`, this unit, this round).
+same `+0x00C` slot position in the base class and in `gPlacementGridMethods`'s own
+`PlacementGrid__Finalize`, this unit, this round).

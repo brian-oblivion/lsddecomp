@@ -49,7 +49,7 @@ void LbdFile__ReleaseDataBlock(DataSrc39094 *self) {
 
 ## Track 4 (2026-09-26, round 87)
 
-Renamed `DataSrc39094__ReleaseDataBlock` -> `LbdFile__ReleaseDataBlock` with `rename.py` (class rename only; +0x084). Callers: LbdFile__Finalize, LbdFile__LoadDataBlock, Class866E8__ResetAllElements and ObjM__CheckAuxTrigger. The class (method table gLbdFileMethods, id 0x903, a FileResource subclass) was named `LbdFile` for its table address, 0x80081940 (renamed from `D_80081940` to `gLbdFileMethods`), as Class6D940 is (FINISHING-PLAN track 4 step 2); the old `DataSrc39094` was the unit's local view name, and dropping its unit suffix leaves `DataSrc`, which every FileResource subclass is. The unified definition is `include/LbdFile.h`.
+Renamed `DataSrc39094__ReleaseDataBlock` -> `LbdFile__ReleaseDataBlock` with `rename.py` (class rename only; +0x084). Callers: LbdFile__Finalize, LbdFile__LoadDataBlock, Class866E8__ResetAllElements and ObjM__CheckAuxTrigger. The class (method table gLbdFileMethods, id 0x903, a FileResource subclass) was named `LbdFile` for its table address, 0x80081940 (renamed from `D_80081940` to `gLbdFileMethods`), as PlacementGrid is (FINISHING-PLAN track 4 step 2); the old `DataSrc39094` was the unit's local view name, and dropping its unit suffix leaves `DataSrc`, which every FileResource subclass is. The unified definition is `include/LbdFile.h`.
 
 
 ## Track 6 (2026-09-26, round 92, echo)

@@ -464,7 +464,7 @@ load through a runtime-indexed global", §"BLOCKED: the `nop_mflo_mfhi` screen r
   the converse fails, so type a slot from its CALL SITES. (a §"3. A bare `nop` in a call's delay
   slot", §"Round 11")
   A parameter `move`d into `$a2`/`$a3` at ENTRY is a forwarded argument of a later call until shown
-  otherwise: `Class6D940__ResolveEntry`'s four-round "register identity" was `slot80` missing its fourth argument
+  otherwise: `PlacementGrid__ResolveEntry`'s four-round "register identity" was `slot80` missing its fourth argument
   (54/76 -> 76/76, round 76).
 - **A discarded return value is never evidence of `void`, and an empty-bodied occupant is never
   evidence the slot takes no arguments** — bytes constrain the return type only where the caller
@@ -718,7 +718,7 @@ minimally, search-tail inert forms). Distilled out round 67: §"The arm-order le
 cheap COUNTER-indication", §"An explicit alias can force the parameter copy cc1 would
 otherwise coalesce away", §"Retail reuses the same counter pseudo-registers across sibling
 loops and SWAPS their outer/inner roles". Distilled out round 68: §"Two independent
-CFG/scheduling levers, both from `func_8002C278`" (now `Class6D940__ResolveEntry`), §"The `mention a value twice` lever needs a
+CFG/scheduling levers, both from `func_8002C278`" (now `PlacementGrid__ResolveEntry`), §"The `mention a value twice` lever needs a
 genuine SECOND, INDEPENDENT USE POINT" (it reconciles the round-19 close with the INERT entry in
 3d), §"HImode constant narrowing". Distilled out round 69: §"Two long-standing near-misses closed by
 DELETING a named value" (the local-count entries in 3d carry the lever), §"When the residue

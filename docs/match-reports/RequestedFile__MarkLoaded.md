@@ -44,7 +44,7 @@ views `Slot0CMethods_322b4`, `Slot08Arg0Methods_322b4` and
 body in `src/code_322b4.c` is byte-identical.
 
 Renamed from `D8006EED8__SetFlag2C` with rename.py: the occupant of
-FileResource's +0x064 `setFlag`, named for its slot as `Class6D940__SetFlag`
+FileResource's +0x064 `setFlag`, named for its slot as `PlacementGrid__SetFlag`
 is; the body does nothing beyond what the slot says. The field it sets is
 `loaded` (see RequestedFile__RequestedFile's Track 4 paragraph for the evidence:
 setFlag is the driver's completion callback).

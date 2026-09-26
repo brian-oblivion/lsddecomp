@@ -1,4 +1,6 @@
-# Class6D940__ResolveEntry -- MATCHED (round 76, REVISIT-2; 76/76, length exact, 0 insertions / 0 deletions)
+# PlacementGrid__ResolveEntry -- MATCHED (round 76, REVISIT-2; 76/76, length exact, 0 insertions / 0 deletions)
+
+> Renamed from `Class6D940__ResolveEntry` on 2026-09-26 (tools/rename.py). Address 0x8002c278.
 
 > Renamed from `func_8002C278` on 2026-09-24 (tools/rename.py). Address 0x8002c278.
 
@@ -73,7 +75,7 @@ No permuter search this round (not needed: 12 builds to the match). No
 /* in Ctx278SubMethods */
     s32 (*slot80)(Ctx278Sub *self, s32 unk2, s32 index, Obj278 *obj);
 
-s32 Class6D940__ResolveEntry(Ctx278 *ctx, Obj278 *self, s32 index)
+s32 PlacementGrid__ResolveEntry(Ctx278 *ctx, Obj278 *self, s32 index)
 {
     Entry278 *desc;
     s32 whole;
@@ -133,7 +135,7 @@ arity that mattered was the callee's, not the function's own.
 
 ## History: the stall as filed through round 60 (superseded)
 
-Original title: Class6D940__ResolveEntry -- STALL (length EXACT; 54/76 words; 0 insertions / 0 deletions -- every instruction is retail's, only register identity differs; first real diff 0x1CA88 `move a3,a1` vs `move t0,a1`)
+Original title: PlacementGrid__ResolveEntry -- STALL (length EXACT; 54/76 words; 0 insertions / 0 deletions -- every instruction is retail's, only register identity differs; first real diff 0x1CA88 `move a3,a1` vs `move t0,a1`)
 
 NON_MATCHING body promoted, round 73.
 
@@ -157,7 +159,7 @@ correction.
 ```c
 #if 0
 /*
- * Class6D940__ResolveEntry's own "descriptor" pointer, resolved either from a cached
+ * PlacementGrid__ResolveEntry's own "descriptor" pointer, resolved either from a cached
  * byte offset (Obj278::unk34) or freshly from `index*12+8` into
  * Ctx278::unk10's byte array. Field meaning unestablished beyond
  * offset/width -- this region reads as raw hardware/SIO register staging
@@ -173,7 +175,7 @@ typedef struct Entry278 {
     s32 unk8;  /* +0x8 */
 } Entry278;
 
-/* Class6D940__ResolveEntry's own object (its own `arg1`). Only the fields this
+/* PlacementGrid__ResolveEntry's own object (its own `arg1`). Only the fields this
  * function itself touches are named. */
 typedef struct Obj278 {
     u8 pad0[0xC];
@@ -201,7 +203,7 @@ struct Ctx278Sub {
     Ctx278SubMethods *methods;
 };
 
-/* Class6D940__ResolveEntry's own `arg0`. Only the fields this function itself
+/* PlacementGrid__ResolveEntry's own `arg0`. Only the fields this function itself
  * touches are named. */
 typedef struct Ctx278 {
     u8 pad0[0x10];
@@ -210,7 +212,7 @@ typedef struct Ctx278 {
     Ctx278Sub *unk2C; /* +0x2C */
 } Ctx278;
 
-s32 Class6D940__ResolveEntry(Ctx278 *ctx, Obj278 *self, s32 index)
+s32 PlacementGrid__ResolveEntry(Ctx278 *ctx, Obj278 *self, s32 index)
 {
     Entry278 *desc;
     s32 cached;
@@ -467,8 +469,8 @@ On the revisit hypothesis specifically: this unit's own types and names
 (`Entry278`, `Obj278`, `Ctx278`, `Ctx278Sub`) were authored BY this
 function's own earlier attempts and were already live in
 `src/code_179d8_d.c`, so there was nothing newer to import; the unit's
-other matched functions (`New_Class6D940`, `Class6D940__Class6D940`,
-`Class6D940__Finalize`, `Class6D940__SetFlag`) touch a different object family
+other matched functions (`New_PlacementGrid`, `PlacementGrid__PlacementGrid`,
+`PlacementGrid__Finalize`, `PlacementGrid__SetFlag`) touch a different object family
 (`Obj6D940`/`Table6D940`) and share no field with this one. **Nothing in
 the four rounds of names and types since the stall was filed changed
 anything here.** What moved the score was re-reading the diff instead of
@@ -670,7 +672,7 @@ needs is in `src/code_179d8_d.c` already (`Entry278`, `Obj278`, `Ctx278`,
 
 ```c
 #if 0
-s32 Class6D940__ResolveEntry(Ctx278 *ctx, Obj278 *self, s32 index)
+s32 PlacementGrid__ResolveEntry(Ctx278 *ctx, Obj278 *self, s32 index)
 {
     Entry278 *desc;
     Obj278 *p;
@@ -726,7 +728,7 @@ both green.
 
 ```c
 #if 0
-s32 Class6D940__ResolveEntry(Ctx278 *ctx, Obj278 *self, s32 index)
+s32 PlacementGrid__ResolveEntry(Ctx278 *ctx, Obj278 *self, s32 index)
 {
     Entry278 *desc;
     s32 cached;
@@ -803,8 +805,8 @@ Two sub-lessons, both independently reusable:
 
 ## Naming (round 77, charlie -- track 3)
 
-Renamed `func_8002C278 -> Class6D940__ResolveEntry`, tier B (mechanics
-established, purpose not). This is `D_8006D940`'s own `+0x078` slot -- a
+Renamed `func_8002C278 -> PlacementGrid__ResolveEntry`, tier B (mechanics
+established, purpose not). This is `gPlacementGridMethods`'s own `+0x078` slot -- a
 unique extension beyond FileResource's base layout, confirmed by
 `tools/classtable.py 0x8006D940`. Resolves an `Entry278` descriptor for a
 grid-cell-shaped index (cached byte offset, or fresh `index*12+8` lookup),
@@ -823,14 +825,57 @@ built and scored).
 
 ## Track 4 (2026-09-26, round 87, echo)
 
-Retyped, byte-identical, with the class unified in `include/Class6D940.h`. `Ctx278` was the Class6D940 object itself: this is slot +0x078 of D_8006D940 (`classtable.py D_8006D940 --vs gFileResourceMethods`), called only by Class866E8__LoadElementResources as `target->methods->slot78(target, &outBuf, i)` on the object New_Class6D940 built. So `unk10` is FileResource's `buffer` (the caller points it into a loaded resource), `unk2C` is `linkResource` (the caller stores New_LinkResource there), and `Ctx278Sub`'s +0x080 is LinkResource__GetModel (gLinkResourceMethods). `Obj278` is the caller's 0x40-byte stack record, now `Class6D940Placement` (x/y/z at +0x0C..+0x14 go to the GPU coordinate, rotY +0x1A, `chained` +0x30, `next` +0x34 the offset of the cell's next record, which the caller loops on without advancing the cell); `Entry278` is `Class6D940Record`. The cell index splits as row = cell / 20, column = cell % 20, a 20x20 grid of 0x800-unit cells. The four-argument LinkResource call stays: `placement` must be in $a3.
+Retyped, byte-identical, with the class unified in `include/PlacementGrid.h`. `Ctx278` was the PlacementGrid object itself: this is slot +0x078 of gPlacementGridMethods (`classtable.py gPlacementGridMethods --vs gFileResourceMethods`), called only by Class866E8__LoadElementResources as `target->methods->slot78(target, &outBuf, i)` on the object New_PlacementGrid built. So `unk10` is FileResource's `buffer` (the caller points it into a loaded resource), `unk2C` is `linkResource` (the caller stores New_LinkResource there), and `Ctx278Sub`'s +0x080 is LinkResource__GetModel (gLinkResourceMethods). `Obj278` is the caller's 0x40-byte stack record, now `CellPlacement` (x/y/z at +0x0C..+0x14 go to the GPU coordinate, rotY +0x1A, `chained` +0x30, `next` +0x34 the offset of the cell's next record, which the caller loops on without advancing the cell); `Entry278` is `PlacementGridRecord`. The cell index splits as row = cell / 20, column = cell % 20, a 20x20 grid of 0x800-unit cells. The four-argument LinkResource call stays: `placement` must be in $a3.
 
 ## Track 4 (LinkResource)
 
 2026-09-26, round 89 (delta): LinkResource is unified in
-`include/LinkResource.h`, and Class6D940's `linkResource` is now
+`include/LinkResource.h`, and PlacementGrid's `linkResource` is now
 `struct LinkResource *`. The unit-local `LinkResourceView_179d8_d` is gone:
 the call reaches `link->methods->getModel` (+0x080, occupant
-LinkResource__GetModel(self, index)) through `Class6D940GetModelFn`, a
+LinkResource__GetModel(self, index)) through `PlacementGridGetModelFn`, a
 four-argument cast that keeps `placement` in $a3 exactly as the view's
 prototype did. Byte-identical.
+
+
+## Track 6 (2026-09-26, round 93, charlie)
+
+Renamed with `python3 tools/renametype.py Class6D940 PlacementGrid` (the
+whole family: object, `Class6D940Methods`, the getter, constructors,
+methods, `Class6D940Record` -> `PlacementGridRecord`,
+`Class6D940ResolveEntryFn` -> `PlacementGridResolveEntryFn`,
+`Class6D940GetModelFn` -> `PlacementGridGetModelFn`, the header
+`include/Class6D940.h` -> `include/PlacementGrid.h`), then
+`python3 tools/rename.py D_8006D940 gPlacementGridMethods` (the table,
+g<Class>Methods) and
+`python3 tools/renametype.py PlacementGridPlacement CellPlacement --any-stem`
+(ex-`Class6D940Placement`). The tools rewrote every old token in these
+reports too, history lines included, so an earlier section above that says
+`PlacementGrid`/`gPlacementGridMethods`/`CellPlacement` named
+`Class6D940`/`D_8006D940`/`Class6D940Placement` at the time (pending an
+operator decision on renametype.py and history prose; not hand-edited).
+
+**Class name `PlacementGrid`, tier A.** From the body of
+PlacementGrid__ResolveEntry and its only caller, which agree: the buffer
+is a row-major 20 x 20 grid of 12-byte records (cell < 400, row = cell / 20,
+column = cell % 20, record at buffer + 8 + cell * 12), each holding a model
+index, a height, a y rotation and a byte of flags, with `next` chaining
+further records in the same cell; ResolveEntry places the record at the
+cell's centre (column/row * 0x800 + 0x400) and returns the model
+linkResource's getModel gives for its index. Class866E8__LoadElementResources
+points `buffer` at the grid element's LbdFile header block +
+`placementsOffset` (LbdFileHeader's own field name) and puts each result
+into that element's GridCell lattice (20 x 20, 0x800 apart: GridCell.h),
+chained records into the overflow cells. So the class is the placements of
+one grid element's cells. **`CellPlacement`** is ResolveEntry's output, one
+model's placement in one cell. The name says what the records are, not
+what the game draws with them (terrain tiles is plausible, not shown).
+
+**Field `PlacementGridRecord.cellFlags` (ex-`unk4`), tier B.** This
+function copies it to CellPlacement +0x02E, and Class866E8__LoadElementResources
+stores that in the GridCell's `flags36`, whose bit 0x80 NotifyGridCell tests
+and whose low seven bits DreamSys__NotifyLinkAttempt reads as a voice
+select. Named for where it goes; what the bits mean in the map is not
+established. `CellPlacement.unk2E` -> `cellFlags` is PROPOSED, not applied:
+its reader is in class_3bb8c.c. `unk1` / `unk2C` stay: written here, read
+nowhere.

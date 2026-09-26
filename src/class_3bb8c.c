@@ -35,7 +35,7 @@
  */
 #include "common.h"
 #include "class_3bb8c.h"
-#include "Class6D940.h"
+#include "PlacementGrid.h"
 #include "LinkResource.h"
 #include "LbdFile.h"
 #include "GridCell.h"
@@ -388,7 +388,7 @@ void Class866E8__OnNotifyTag1(Class866E8 *self, void *arg1, s32 mode) {
  * records reached only from here. Kept in this .c, not class_3bb8c.h: none
  * of the 11 sibling units sharing that header touch these. */
 
-/* Class6D940__ResolveEntry's non-0/non-(-1) return value (what
+/* PlacementGrid__ResolveEntry's non-0/non-(-1) return value (what
  * LinkResource__GetModel returns): a TmdModel (include/TmdModel.h), read
  * only for its +0x010, TmdModel's `object`. A view of TmdModel, left for
  * that class (round 89, LinkResource's unification did not retype it). */
@@ -408,7 +408,7 @@ void Class866E8__LoadElementResources(Class866E8 *self, Class866E8Elem *entry) {
     LbdFileHeader *info;
     LbdFileHeader *info2;
     LbdFile *hdr;
-    Class6D940 *target;
+    PlacementGrid *target;
     LinkResource *res;
     GridCell **slot;
     u8 *base;
@@ -423,7 +423,7 @@ void Class866E8__LoadElementResources(Class866E8 *self, Class866E8Elem *entry) {
     s32 i;
     s32 off1;
     s32 off2;
-    Class6D940Placement outBuf;
+    CellPlacement outBuf;
     BE54LoadReq req;
 
     hdr = entry->loader;
@@ -445,7 +445,7 @@ void Class866E8__LoadElementResources(Class866E8 *self, Class866E8Elem *entry) {
     off1 = 0;
     off2 = 0x640;
     for (;;) {
-        idxVal = ((Class6D940ResolveEntryFn)target->methods->processBuffer)(target, &outBuf, i);
+        idxVal = ((PlacementGridResolveEntryFn)target->methods->processBuffer)(target, &outBuf, i);
         if (idxVal == 0) {
             return;
         }

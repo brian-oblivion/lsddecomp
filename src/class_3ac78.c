@@ -36,7 +36,7 @@
 #include "LightRig.h"
 #include "TimedTask.h"
 #include "DrawSystem.h"
-#include "Class6D940.h"
+#include "PlacementGrid.h"
 #include "LinkResource.h"
 #include "LbdFile.h"
 #include "GridCell.h"
@@ -116,7 +116,7 @@ void Class866E8__Class866E8(Class866E8 *self, Unk54Struct *origin, s32 autoLoad)
         entry->key = i;
         entry->flag = 0;
 
-        entry->placements = New_Class6D940(0);
+        entry->placements = New_PlacementGrid(0);
         entry->cellParent = New_GridCell();
         entry->cellParent->methods->attachToParent(entry->cellParent, (SceneNode *)self,
                                                    (LongVec3 *)&self->origin);
@@ -266,7 +266,7 @@ void Class866E8__DispatchLinkCommand(Class866E8 *self, BasicClass *sender, s32 c
 void Class866E8__ResetAllElements(Class866E8 *self) {
     s32 i;
     Class866E8Elem *entry;
-    Class6D940 *list;
+    PlacementGrid *list;
 
     for (i = 0; i < 7; i++) {
         entry = &self->elems[i];
