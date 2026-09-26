@@ -24,7 +24,7 @@
  * which are each handler's own phases. The named motion templates
  * (ROTATION_YAW_PLUS1, ROTATION_ZPLUS4, SCALE_EIGHTH, SCALE_QUARTER,
  * SCALE_THIRTY_SECOND, SCALE_UNIT) are declared once in include/Entity.h.
- * Five more data constants (ROTATION_YAW_MINUS_THIRD, ROTATION_YAW_MINUS_HALF, D_80089DE4, D_80089E2C,
+ * Five more data constants (ROTATION_YAW_MINUS_THIRD, ROTATION_YAW_MINUS_HALF, SCALE_X_FOUR_FIFTHS_Y_SIX_FIFTHS, D_80089E2C,
  * D_80089E44) are left unnamed for lack of a naming precedent -- a
  * non-whole-degree rotation or a non-uniform/non-unit-fraction scale; see
  * each function's match report (`## Naming` / `## Data constant(s) ...
@@ -42,7 +42,7 @@
  * Entity_c.c/Entity_e.c (each unit keeps its own extern, not shared).
  * The named motion templates (ROTATION_*, SCALE_*) are in include/Entity.h. */
 extern u8 ROTATION_YAW_MINUS_THIRD[];
-extern u8 D_80089DE4[];
+extern u8 SCALE_X_FOUR_FIFTHS_Y_SIX_FIFTHS[];
 extern u8 ROTATION_YAW_MINUS_HALF[];
 extern u8 D_80089E2C[];
 extern u8 D_80089E44[];
@@ -79,7 +79,7 @@ void Entity__MoodCue102(Entity *this, SoundCueSet *out) {
         if (this->moodTimer >= 1936) {
             a2 = SCALE_UNIT;
         } else if (this->moodTimer >= 1931) {
-            a2 = D_80089DE4;
+            a2 = SCALE_X_FOUR_FIFTHS_Y_SIX_FIFTHS;
         } else if (this->moodTimer >= 1926) {
             a2 = SCALE_HALF;
         } else if (this->moodTimer >= 1921) {

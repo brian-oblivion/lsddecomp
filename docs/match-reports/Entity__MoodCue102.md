@@ -45,7 +45,7 @@ void Entity__MoodCue102(Entity *this, EntityMoodHandlerArg *out) {
         if (this->unkFC >= 0x790) {
             a2 = SCALE_UNIT;
         } else if (this->unkFC >= 0x78B) {
-            a2 = D_80089DE4;
+            a2 = SCALE_X_FOUR_FIFTHS_Y_SIX_FIFTHS;
         } else if (this->unkFC >= 0x786) {
             a2 = SCALE_HALF;
         } else if (this->unkFC >= 0x781) {
@@ -159,7 +159,7 @@ elsewhere in this unit -- same symbol, not redecoded per call site.
   `SCALE_ONE` used by `SceneNode__UpdateScale`. Not renamed to `SCALE_ONE`
   or a variant: two differently-addressed, differently-shaped symbols
   sharing one implied meaning is confusing, not clarifying.
-- `D_80089DE4` (`updateScale` arg, `moodTimer >= 0x78B` arm): decoded
+- `SCALE_X_FOUR_FIFTHS_Y_SIX_FIFTHS` (`updateScale` arg, `moodTimer >= 0x78B` arm): decoded
   `(4,5, 6,5, 5,5, 2,1)` -- X=4/5, Y=6/5, Z=1, not uniform, so it is not
   one of this project's single-ratio `SCALE_*` names.
 

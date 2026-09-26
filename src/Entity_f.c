@@ -28,7 +28,7 @@
 
 /* An unnamed table from the motion-template range this unit passes to
  * updateScale; the named templates are declared in include/Entity.h. */
-extern u8 D_80089DE4[];
+extern u8 SCALE_X_FOUR_FIFTHS_Y_SIX_FIFTHS[];
 
 /* Forward declarations: both are defined later in this file (in ROM
  * order), but Entity__MoodCue85 and Entity__MoodCue86 call them before their own
@@ -276,7 +276,7 @@ void Entity__MoodCue91(Entity *this, SoundCueSet *out) {
         out->attenuation = 0;
         out->slots[0].program = 0x15;
     }
-    this->methods->updateScale(this, 1, D_80089DE4);
+    this->methods->updateScale(this, 1, SCALE_X_FOUR_FIFTHS_Y_SIX_FIFTHS);
 }
 
 void Entity__MoodCue92(Entity *this, SoundCueSet *out) {
@@ -301,7 +301,7 @@ void Entity__MoodCue92(Entity *this, SoundCueSet *out) {
             this->methods->notifyParents(this, 0xA);
         }
     }
-    this->methods->updateScale(this, 1, D_80089DE4);
+    this->methods->updateScale(this, 1, SCALE_X_FOUR_FIFTHS_Y_SIX_FIFTHS);
 }
 
 void Entity__MoodCue93(Entity *this, SoundCueSet *out) {
