@@ -13,7 +13,7 @@ One construct, carried over from `StyleBuildDecorSet` earlier in this same sessi
 assignment, not field by field.**
 
 ```c
-pos = *(PairXY *) &gStyleDecorPosAX;      /* NOT pos.x = gStyleDecorPosAX; pos.y = gStyleDecorPosAY; */
+pos = *(PairXY *) &gStyleDecorPosX;      /* NOT pos.x = gStyleDecorPosX; pos.y = gStyleDecorPosY; */
 ```
 
 A struct assignment is a BLKmode `set`, and gcc 2.6.3's `cse.c` answers a
@@ -41,7 +41,7 @@ read off the raw `.s` rather than guessed:
 | the output buffer is 8 bytes, not 3 or 4 | it occupies sp+0x10..0x17, because `pos` sits at sp+0x18. `AdjustRgbByDelta` writes only `[0..2]`, so the SIZE is inferred from the stack layout and nothing else -- see the comment at the definition. |
 
 Round 46's `s3` name is kept as `shift` and `s1` as `srcOfs`; `srcOfs` walks a
-3-byte-stride table (the same stride `StyleFillEffectKind3` uses on `D_8008721C`),
+3-byte-stride table (the same stride `StyleFillEffectKind3` uses on `gStyleKind3Colors`),
 which is consistent with `AdjustRgbByDelta`'s three byte writes.
 
 ## What round 46 got right, and is worth keeping
@@ -54,7 +54,7 @@ proposed -- brute-force the divisor rather than reverse the reciprocal math --
 stands.
 
 The struct-and-flow recovery (call targets, method slots +0xB8/+0xBC/+0x64,
-`gStyleTargetObj + 0xC` chased one field further, the loop bounds) was also correct
+`gStyleSceneRefs + 0xC` chased one field further, the loop bounds) was also correct
 throughout. **What was wrong was only the VERDICT**, and specifically the part
 of it that named an unfalsifiable cause. "Register pressure" identifies no
 construct, suggests no experiment, and ends the investigation; two rounds
@@ -77,13 +77,13 @@ void StyleUpdateDecorSet(void) {
     if (gStyleDecorVariant == 0) {
         return;
     }
-    self = *(ObjAC7CSub **) (gStyleTargetObj + 0xC);
+    self = *(ObjAC7CSub **) (gStyleSceneRefs + 0xC);
     delta = self->field18 - self->field24;
     shift = (delta / 600) * 3;
     if (shift <= 0) {
         return;
     }
-    pos = *(PairXY *) &gStyleDecorPosAX;
+    pos = *(PairXY *) &gStyleDecorPosX;
     i = 0;
     if (gStyleDecorVariant == 2) {
         pos.y += 0x1E;
@@ -92,7 +92,7 @@ void StyleUpdateDecorSet(void) {
     srcOfs = 0;
     pos.y += shift * 3;
     do {
-        AdjustRgbByDelta(rgb, (u8 *) (srcOfs + gStyleColorTable), shift);
+        AdjustRgbByDelta(rgb, (u8 *) (srcOfs + gStyleDecorColors), shift);
         obj = (ObjSlotB8B8 *) *wp;
         obj->methods->slotB8(obj, 1, rgb);
         obj = (ObjSlotB8B8 *) *wp;
@@ -102,7 +102,7 @@ void StyleUpdateDecorSet(void) {
         pos.y += 3;
         wp++;
     } while (i < 0x12);
-    AdjustRgbByDelta(rgb, (u8 *) gStyleFlushColor, shift);
+    AdjustRgbByDelta(rgb, (u8 *) gStyleClearColor, shift);
     self->methods->slot64(self, rgb);
 }
 ```
@@ -139,3 +139,25 @@ Computes a time-based `shift` from an `ObjAC7CSub` object's `field18`/
 `field24` delta, then per-element recolors (`AdjustRgbByDelta`) and
 repositions (`slotB8`/`slotBC`) all 18 objects every frame. MATCHED,
 93/93.
+
+## Round 93 polish (delta, track 7)
+
+### Naming
+
+| old | new | tier | evidence |
+| --- | --- | --- | --- |
+| `600` | `STYLE_DECOR_FADE_HEIGHT` | B | divisor of the viewport's `refView.vp.y - refView.vr.y` (view-point y less reference-point y; which way is up in this world is not established here) giving the fade step. |
+
+The local views were Viewport (`+0x018`/`+0x024` are `refView.vp.y`/`refView.vr.y`; `+0x064` is setClearColor) and BoxFill (`+0x0B8` setColor, `+0x0BC` setPosition). Locals: `height`, `fade`, `colorOfs`, `slot`, `band`.
+
+### Comments moved here from src/class_3bb8c_n.c
+
+Verbatim as they stood before the round-93 comment pass (identifiers already carry this round's renames).
+
+```c
+/* MATCHED round 61 (bravo), first attempt, after the BLKmode-struct-copy
+ * lever found on StyleBuildDecorSet -- see docs/match-reports/StyleUpdateDecorSet.md.
+ * `rgb` is written only at [0..2] (by AdjustRgbByDelta); its declared size of 8
+ * is inferred from the STACK LAYOUT (it occupies sp+0x10..0x17, with `pos`
+ * at sp+0x18), not from any access. */
+```

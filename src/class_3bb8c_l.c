@@ -59,7 +59,7 @@ void ObjM__DetachTarget(ObjM *self) {
 /* Cross-unit helpers, src/code_39094.c (PickVariant, PickDailyVariant:
  * `Rec1C *(s32 index, ...)`, read here as the value handed on),
  * src/code_d294_c.c (func_8001EF60) and class_3bb8c_m (RegisterStyleConfig,
- * whose third argument is kept as gStyleTargetObj). */
+ * whose third argument is kept as gStyleSceneRefs). */
 extern s32 PickVariant(s32 index, s32 arg1);
 extern s32 PickDailyVariant(s32 index, s32 arg1, s32 day);
 extern void func_8001EF60(s32 arg0);

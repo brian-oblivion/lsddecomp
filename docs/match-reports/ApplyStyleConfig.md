@@ -8,14 +8,14 @@ and `addiu_at` are resolved), never attempted before this round.
 ## What it does
 
 Looks up a "cfg" byte-array pointer for the current style index
-(`gStyleKind`, set by `RegisterStyleConfig`) in the 14-entry pointer table
+(`gStyleStage`, set by `RegisterStyleConfig`) in the 14-entry pointer table
 `D_800873EC`; if the slot is NULL, falls back to `PickStyleFallbackConfig()` to
 produce one. Feeds `cfg` into the already-matched `FillStyleFromConfig(style,
 cfg)` against the fixed global `D_80087424` (a `StyleM` instance, split by
-splat into two adjacent labels `D_80087424`/`D_80087430` purely because
+splat into two adjacent labels `D_80087424`/`gStyleKind2AltColor` purely because
 something else references the middle of it -- the object is one 0x20-byte
 struct). Then does its own separate raw-byte read of `cfg[1]`/`cfg[2]`: if
-`cfg[1] >= 4`, stores a `D_800872C4[cfg[2]]` colour-table entry pointer into
+`cfg[1] >= 4`, stores a `gStylePalette[cfg[2]]` colour-table entry pointer into
 `gStyleDecorColor`. Always returns `&D_80087424`.
 
 ```c
@@ -26,18 +26,18 @@ extern s32 D_80087424;
 extern s8 *D_800873EC[];
 extern s8 *PickStyleFallbackConfig(void);
 extern void FillStyleFromConfig(struct StyleM *style, s8 *cfg);
-extern u8 D_800872C4[][3];
+extern u8 gStylePalette[][3];
 extern const u8 *gStyleDecorColor;
 
 void *ApplyStyleConfig(void) {
-    s8 *cfg = D_800873EC[gStyleKind];
+    s8 *cfg = D_800873EC[gStyleStage];
 
     if (cfg == 0) {
         cfg = PickStyleFallbackConfig();
     }
     FillStyleFromConfig((struct StyleM *) &D_80087424, cfg);
     if (cfg[1] >= 4) {
-        gStyleDecorColor = D_800872C4[cfg[2]];
+        gStyleDecorColor = gStylePalette[cfg[2]];
     }
     return &D_80087424;
 }
@@ -51,13 +51,13 @@ First attempt wrote the natural-looking guard form:
 if (cfg[1] < 4) {
     return &D_80087424;
 }
-gStyleDecorColor = D_800872C4[cfg[2]];
+gStyleDecorColor = gStylePalette[cfg[2]];
 return &D_80087424;
 ```
 
 This built 40/41 words with the tail one word SHORT: retail has an extra
 `move v0,s1` immediately before falling into the shared epilogue, which my
-version didn't emit. Cause: retail's `D_800872C4[cfg[2]]` address
+version didn't emit. Cause: retail's `gStylePalette[cfg[2]]` address
 computation clobbers `v0` as scratch (it's a 3-way live register at that
 point -- the delay slot of the `bnez` unconditionally sets `v0 = s1` before
 either path runs), so retail needs to explicitly restore `v0 = s1` before
@@ -90,4 +90,4 @@ before anything more invasive.
 
 ## Naming
 
-**ApplyStyleConfig** -- tier B. Looks up the current style's config-byte pointer (`D_800873EC[gStyleKind]`), falling back to the uncarved `PickStyleFallbackConfig` if unset, fills the shared `StyleM` global via `FillStyleFromConfig`, and conditionally sets a colour-table pointer. Same tier and caveat as `RegisterStyleConfig`.
+**ApplyStyleConfig** -- tier B. Looks up the current style's config-byte pointer (`D_800873EC[gStyleStage]`), falling back to the uncarved `PickStyleFallbackConfig` if unset, fills the shared `StyleM` global via `FillStyleFromConfig`, and conditionally sets a colour-table pointer. Same tier and caveat as `RegisterStyleConfig`.

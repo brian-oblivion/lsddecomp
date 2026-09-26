@@ -17,18 +17,18 @@ fresh copy (same reasoning as `StyleUpdateEffectSlots`/`TryStartStyleCue`/
 ## New externs
 
 ```c
-extern s32 gStyleCounter;         /* already s32 in class_3bb8c_m.c */
-extern s32 gStyleKind;         /* already s32 in class_3bb8c_m.c and this unit's own DrawStyleTables */
-extern s8 D_800873DC[];        /* 16-entry table, indexed by (gStyleCounter+gStyleKind)&0xF */
+extern s32 gStyleDay;         /* already s32 in class_3bb8c_m.c */
+extern s32 gStyleStage;         /* already s32 in class_3bb8c_m.c and this unit's own StyleScrollVramStrips */
+extern s8 gStyleVariantPicks[];        /* 16-entry table, indexed by (gStyleDay+gStyleStage)&0xF */
 extern s32 gStyleVariant;
-extern s8 D_800873D8[];        /* divisor table, indexed by "kind" -- raw index, no scale */
-extern s32 D_8008AC84;
-extern s32 D_800873C8[];       /* array of raw base addresses, indexed by "kind" (scaled x4) */
-extern s32 gStyleFlushColor;
-extern u8 D_8008726C[];        /* address only taken */
-extern u8 D_800872C4[];        /* 3-byte-stride table, indexed by a byte field */
-extern s32 gStyleColorTable;
-extern u8 D_80087234[];        /* address only taken */
+extern s8 gStyleVariantConfigCounts[];        /* divisor table, indexed by "kind" -- raw index, no scale */
+extern s32 gStyleConfigIndex;
+extern s32 gStyleVariantConfigs[];       /* array of raw base addresses, indexed by "kind" (scaled x4) */
+extern s32 gStyleClearColor;
+extern u8 gStyleDecorColorsB[];        /* address only taken */
+extern u8 gStylePalette[];        /* 3-byte-stride table, indexed by a byte field */
+extern s32 gStyleDecorColors;
+extern u8 gStyleDecorColorsA[];        /* address only taken */
 extern s32 gStyleDecorVariant;
 ```
 
@@ -45,22 +45,22 @@ void *PickStyleFallbackConfig(void) {
     s32 b2;
     u8 *tab;
 
-    sum = gStyleCounter + gStyleKind;
-    kind = D_800873DC[sum & 0xF];
+    sum = gStyleDay + gStyleStage;
+    kind = gStyleVariantPicks[sum & 0xF];
     gStyleVariant = kind;
-    divisor = D_800873D8[kind];
+    divisor = gStyleVariantConfigCounts[kind];
     remainder = sum % divisor;
-    D_8008AC84 = remainder;
-    result = (s8 *) D_800873C8[kind] + remainder * 4;
+    gStyleConfigIndex = remainder;
+    result = (s8 *) gStyleVariantConfigs[kind] + remainder * 4;
     if (kind == 0) {
         b3 = result[3];
-        gStyleFlushColor = (s32) (D_800872C4 + b3 * 3);
+        gStyleClearColor = (s32) (gStylePalette + b3 * 3);
         b2 = result[2];
-        tab = D_8008726C;
+        tab = gStyleDecorColorsB;
         if (b2 != 0x12) {
-            tab = D_80087234;
+            tab = gStyleDecorColorsA;
         }
-        gStyleColorTable = (s32) tab;
+        gStyleDecorColors = (s32) tab;
         if (remainder < 4) {
             gStyleDecorVariant = 1;
         } else if (remainder < 6) {
@@ -73,9 +73,9 @@ void *PickStyleFallbackConfig(void) {
 
 Notes:
 
-- `D_800873C8[kind]` is loaded as a raw `s32` *value* (not an address-of),
+- `gStyleVariantConfigs[kind]` is loaded as a raw `s32` *value* (not an address-of),
   then used as a base address for further byte-granular pointer arithmetic
-  (`+ remainder * 4`) -- exactly the `gStyleTargetObj` "pointer stored as a plain
+  (`+ remainder * 4`) -- exactly the `gStyleSceneRefs` "pointer stored as a plain
   scalar" idiom already established elsewhere in this unit, just for a
   different global.
 - The `sum % divisor` compiles to the standard MIPS `div`/`break 7`
@@ -84,7 +84,7 @@ Notes:
   only `%`, never `/`, on this pair -- writing an unused `quotient = sum /
   divisor;` alongside it would be wrong (and would very likely emit a
   spurious `mflo`).
-- `D_800873D8[kind]` and `D_800873DC[idx]` are indexed with NO scale factor
+- `gStyleVariantConfigCounts[kind]` and `gStyleVariantPicks[idx]` are indexed with NO scale factor
   in retail (`addu $at,$at,$a0`, not `sll`+`addu`) because both are `s8`
   arrays -- plain C array indexing on a 1-byte element type already
   reproduces this without any special casting.
@@ -92,20 +92,20 @@ Notes:
 ## Lever: a ternary's branch/default assignment ORDER is not guaranteed to
 match source intent -- write it as an explicit default-then-override
 
-First attempt used `tab = (b2 == 0x12) ? D_8008726C : D_80087234;`, which
+First attempt used `tab = (b2 == 0x12) ? gStyleDecorColorsB : gStyleDecorColorsA;`, which
 compiled to the OPPOSITE physical layout from retail: GCC chose
-`D_80087234` as the unconditional default and `D_8008726C` as the
+`gStyleDecorColorsA` as the unconditional default and `gStyleDecorColorsB` as the
 conditional override (with the branch polarity flipped to match, `bne`
 where retail has `beq`) -- functionally identical, but two words differ
 because the *constant addresses* land in the swapped slots and the branch
 test is inverted. Retail's actual shape is imperative, not ternary-shaped:
-compute the default (`D_8008726C`) unconditionally, then overwrite it with
-`D_80087234` only when `b2 != 0x12`:
+compute the default (`gStyleDecorColorsB`) unconditionally, then overwrite it with
+`gStyleDecorColorsA` only when `b2 != 0x12`:
 
 ```c
-tab = D_8008726C;
+tab = gStyleDecorColorsB;
 if (b2 != 0x12) {
-    tab = D_80087234;
+    tab = gStyleDecorColorsA;
 }
 ```
 
@@ -132,11 +132,30 @@ inverted branch; second: explicit default-then-override, byte-exact).
 **`PickStyleFallbackConfig`, tier B.**
 
 Literal call site in `ApplyStyleConfig` (class_3bb8c_m.c, already matched):
-`cfg = func_80054758();`, used only when the direct per-`gStyleKind` config
-table entry (`D_800873EC[gStyleKind]`) is NULL -- i.e. this is the fallback
-path. Body hashes `gStyleCounter + gStyleKind` into a 16-entry table to pick
+`cfg = func_80054758();`, used only when the direct per-`gStyleStage` config
+table entry (`D_800873EC[gStyleStage]`) is NULL -- i.e. this is the fallback
+path. Body hashes `gStyleDay + gStyleStage` into a 16-entry table to pick
 a `gStyleVariant` ("kind"), then a per-variant divisor/remainder select a
 config row. "Fallback" is evidenced by the call site; "kind"/variant
 selection mechanics are evidenced by the body; WHY a fallback is needed, or
 what the variant means in gameplay terms, is not established (tier B, not
 A).
+
+## Round 93 polish (delta, track 7)
+
+### Naming
+
+| old | new | tier | evidence |
+| --- | --- | --- | --- |
+| `D_800873DC` | `gStyleVariantPicks` | B | 16 bytes, each 0..3, indexed `(day + stage) & 0xF`; the byte read is stored as `gStyleVariant`. |
+| `D_800873D8` | `gStyleVariantConfigCounts` | A | 4 bytes {7, 10, 12, 5}, indexed by the variant, the divisor of the config index; they are exactly the record counts of the four tables `gStyleVariantConfigs` points at (0x80087340: 7 words, ...735C: 10, ...7384: 12, ...73B4: 5). |
+| `D_800873C8` | `gStyleVariantConfigs` | A | 4 pointers, one per variant, to arrays of 4-byte config records; the function returns `table[variant] + index * 4`, the record ApplyStyleConfig/FillStyleFromConfig read. |
+| `D_8008AC84` | `gStyleConfigIndex` | A | written with the config index `(day + stage) % count`; nothing reads it. |
+| `D_800872C4` | `gStylePalette` | A | 24 RGB triples (FillStyleFromConfig, ApplyStyleConfig and this function index it by a config byte); this function takes byte 3's entry as `gStyleClearColor`. |
+| `D_80087234`, `D_8008726C` | `gStyleDecorColorsA`, `gStyleDecorColorsB` | B | two 18-triple colour tables (one per decor band); B when config byte 2 is palette entry 18 (`STYLE_DECOR_B_PALETTE_INDEX`), A otherwise. Which look each is, is not established, hence the letters. |
+| `gStyleFlushColor` | `gStyleClearColor` | A | its only reader, StyleUpdateDecorSet, hands the adjusted copy to the viewport's setClearColor. |
+| `gStyleColorTable` | `gStyleDecorColors` | A | the current band colour table: StyleBuildDecorSet colours band i from entry i. |
+| `gStyleKind` | `gStyleStage` | A | RegisterStyleConfig stores its arg1 there, and its one caller, ObjM__InitStyleAndWorld, passes `self->stage`. |
+| `gStyleCounter` | `gStyleDay` | A | RegisterStyleConfig stores its arg3 there; its one caller passes `DreamSys__GetCurrentDayAndYear()` (`currentDay + 1`). |
+
+Locals: `seed` (day + stage), `variant`, `count`, `index`, `config`, `clearIndex`/`decorIndex` (config bytes 3 and 2), `decorColors`.

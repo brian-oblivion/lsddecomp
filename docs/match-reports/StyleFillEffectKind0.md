@@ -26,7 +26,7 @@ void **StyleFillEffectKind0(void **arg0, s32 arg1, void *arg2) {
     ...
     for (i = 0; i < arg1; i++) {
         fp(arg2, (void *) t3);
-        *arg0 = New_Class876FC((void *) 0, &D_8008E0A4, (void *) gStyleCueSelf, arg2);
+        *arg0 = New_Class876FC((void *) 0, &gStyleSpawnOffsetX, (void *) gStyleGrid, arg2);
         arg0++;
     }
     return arg0;
@@ -124,11 +124,11 @@ the output array walked and returned one slot advanced (the same
 ## What the function does (recovered from the raw disassembly)
 
 ```c
-extern u8 D_800871C8[];
-extern s32 D_80087328[];
-extern u8 *D_8008E0B4;
-extern s32 D_8008E0BC;
-extern u8 D_8008E0A4[];
+extern u8 gStyleSpawnScales[];
+extern s32 gStyleSpawnYChoices[];
+extern u8 *gStyleSpawnScale;
+extern s32 gStyleSpawnTableIndex;
+extern u8 gStyleSpawnOffsetX[];
 extern void SetupStyleSpawnParamsA(void *arg0, void *arg1);   /* this unit, cold */
 extern void SetupStyleSpawnParamsB(void *arg0, void *arg1);   /* this unit, cold,
                                                          signature widened */
@@ -141,19 +141,19 @@ void *StyleFillEffectKind0(void *arg0, s32 arg1, void *arg2) {
     void (*fp)(void *, void *);
 
     arr = (void **) arg0;
-    D_8008E0BC = rand() % 7;
-    D_8008E0B4 = (u8 *) D_800871C8 + ((u32) rand() % 5) * 12;
+    gStyleSpawnTableIndex = rand() % 7;
+    gStyleSpawnScale = (u8 *) gStyleSpawnScales + ((u32) rand() % 5) * 12;
     t3 = (u32) rand() % 5;
     if (t3 != 0) {
-        t3 = D_80087328[t3];
+        t3 = gStyleSpawnYChoices[t3];
     }
     fp = SetupStyleSpawnParamsB;
-    if (gStyleCounter % 7 != 0) {
+    if (gStyleDay % 7 != 0) {
         fp = SetupStyleSpawnParamsA;
     }
     for (i = 0; i < arg1; i++) {
         fp(arg2, (void *) t3);
-        *arr = New_Class876FC((void *) 0, D_8008E0A4, (void *) gStyleCueSelf, arg2);
+        *arr = New_Class876FC((void *) 0, gStyleSpawnOffsetX, (void *) gStyleGrid, arg2);
         arr++;
     }
     return (void *) arr;
@@ -165,7 +165,7 @@ Every value confirmed directly off the raw bytes:
 - `rand() % 7` uses the signed reciprocal `0x92492493`/`sra 2` (the standard
   GCC signed-divide-by-7 idiom); `rand() % 5` (twice) uses the unsigned
   reciprocal `0xCCCCCCCD`/`srl 2`.
-- The `D_80087328` table lookup is a **word**-stride array (`sll v0,s1,2`
+- The `gStyleSpawnYChoices` table lookup is a **word**-stride array (`sll v0,s1,2`
   before the `lw`), and the guard `beqz s1,...` skips the lookup only when
   the `rand()%5` remainder is exactly 0 -- matching the `if (t3 != 0)`
   reassignment shape.
@@ -173,7 +173,7 @@ Every value confirmed directly off the raw bytes:
   `s3` is reused: first as the `%7` magic constant, then unconditionally
   loaded with `&SetupStyleSpawnParamsB` (filling the `mult`'s latency slot for free),
   then conditionally overwritten to `&SetupStyleSpawnParamsA` if
-  `gStyleCounter % 7 != 0`. This is the **same shared-dispatch idiom
+  `gStyleDay % 7 != 0`. This is the **same shared-dispatch idiom
   `TickStyle` uses via `ObjAB4C::slotE8`**, except here the two
   candidates are plain functions (not vtable slots), selected by a modulo
   test rather than a self-object's own state.
@@ -239,9 +239,35 @@ literal FIRST argument of `0`. That argument is confirmed (by reading
 object's `kind` field -- so "Kind0" in the name is the literal tag value
 this function passes, not a guessed category. Selects which of two
 "spawn-parameter" setup functions (`SetupStyleSpawnParamsA`/`B`) to call each
-iteration via a `gStyleCounter % 7` test. STALL, 93/99, whole-function
+iteration via a `gStyleDay % 7` test. STALL, 93/99, whole-function
 3-register rotation; naming from mechanics, unaffected by match state.
 
 ## Track 4 (2026-09-26, round 88, charlie)
 
-`gStyleEffectSlots` holds Class876FC objects (New_Class876FC), so the walking pointer is `Class876FC **` and the position `LongVec3 *`; `kind` is passed as a plain `s32` (was `(void *) N`), the params block as `(Class876FCParams *)` over the separately-declared D_8008E0A4.. symbols (one 0x24-byte Class876FCParams in the bytes; left as they are, a track 4b job), and gStyleCueSelf as the `SceneNode *` parent. Image byte-identical.
+`gStyleEffectSlots` holds Class876FC objects (New_Class876FC), so the walking pointer is `Class876FC **` and the position `LongVec3 *`; `kind` is passed as a plain `s32` (was `(void *) N`), the params block as `(Class876FCParams *)` over the separately-declared gStyleSpawnOffsetX.. symbols (one 0x24-byte Class876FCParams in the bytes; left as they are, a track 4b job), and gStyleGrid as the `SceneNode *` parent. Image byte-identical.
+
+## Round 93 polish (delta, track 7)
+
+### Naming
+
+| old | new | tier | evidence |
+| --- | --- | --- | --- |
+| `D_8008E0A4`..`D_8008E0C0` | `gStyleSpawnOffsetX`, `...OffsetY`, `...OffsetZ`, `gStyleSpawnRotation`, `gStyleSpawnScale`, `gStyleSpawnModelLayout`, `gStyleSpawnTableIndex`, `gStyleSpawnColors` | A | the 0x24-byte block passed to New_Class876FC as its `Class876FCParams` (include/Class876FC.h, which names each member: offset x/y/z, rotation, scale, modelChildLayout, tableIndex, color/altColor). Kept as separate symbols: SetupStyleSpawnParamsA's match depends on the scalar declarations. |
+| `D_800871C8` | `gStyleSpawnScales` | A | 5 Ratio16 triples, one picked by `rand() % 5` into the params' scale. |
+| `D_80087328` | `gStyleSpawnYChoices` | A | 4 words {-0x1800, -0x2800, -0x3800, -0x5000}: the offset-y values SetupStyleSpawnParamsA picks from. |
+
+Note: the offset-y pick is `rand() % 5`, and 0 means "let SetupStyleSpawnParamsA choose"; index 4 reads one word past the 4-entry table (0x80087338, the next symbol, D_80087338: 0x0A0A0200). That is retail's behaviour, reproduced as written.
+
+Locals: `slots`, `count`, `pos`, `offsetY`, `setup`.
+
+### Comments moved here from src/class_3bb8c_n.c
+
+Verbatim as they stood before the round-93 comment pass (identifiers already carry this round's renames).
+
+```c
+/* Fills arg1 slots with New_Class876FC(kind 0, ...) objects, first setting
+ * up the random style parameters and choosing the per-slot setup function by
+ * gStyleDay % 7; returns the next free slot. Matched round 75: arg0 is
+ * the walking pointer itself (a separate `arr = arg0` copy reordered the
+ * prologue's argument moves). */
+```

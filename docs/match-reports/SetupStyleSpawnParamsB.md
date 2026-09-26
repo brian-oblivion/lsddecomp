@@ -13,8 +13,8 @@ shape rounds 46-48 recovered was already correct.**
 
 The inherited body did not rebuild at its recorded 25/87, for a reason that
 has nothing to do with this function: earlier in the same session I retyped
-the shared global `D_8008E0A4` from `extern u8 D_8008E0A4[]` to
-`extern s32 D_8008E0A4` to close `SetupStyleSpawnParamsA`, and this body writes that
+the shared global `gStyleSpawnOffsetX` from `extern u8 gStyleSpawnOffsetX[]` to
+`extern s32 gStyleSpawnOffsetX` to close `SetupStyleSpawnParamsA`, and this body writes that
 symbol too. So the first figure below is the inherited body under the
 already-changed declaration, and the second is the inherited body's own
 recorded state, which I recovered afterwards by experiment.
@@ -40,12 +40,12 @@ The body carried `s32 r` and reused it for all three `rand()` results:
 
 ```c
 r = rand();
-D_8008E0A4 = (r % 20) << 11;
+gStyleSpawnOffsetX = (r % 20) << 11;
 ...
 r = rand();
-D_8008E0B0 = D_80087174 + ((u32) r % 7) * 12;
+gStyleSpawnRotation = gStyleSpawnRotations + ((u32) r % 7) * 12;
 r = rand();
-D_8008E0B8 = r % 5;
+gStyleSpawnModelLayout = r % 5;
 ```
 
 `r` is one pseudo whose live range spans the calls, so cc1 2.6.3 cannot
@@ -72,30 +72,30 @@ round 60's alias entry draws between a local that earns its name and one that
 merely holds a value in transit.
 
 ```c
-extern s32 D_8008E0A8;
-extern s32 D_8008732C;
-extern s32 D_8008E0A4;
-extern s32 gStyleCounter;
-extern s32 D_8008E0AC;
-extern u8 *D_8008E0B0;
-extern u8 D_80087174[];
-extern s32 D_8008E0B8;
+extern s32 gStyleSpawnOffsetY;
+extern s32 gStyleSpawnYChoice1;
+extern s32 gStyleSpawnOffsetX;
+extern s32 gStyleDay;
+extern s32 gStyleSpawnOffsetZ;
+extern u8 *gStyleSpawnRotation;
+extern u8 gStyleSpawnRotations[];
+extern s32 gStyleSpawnModelLayout;
 
 void SetupStyleSpawnParamsB(void *arg0, void *arg1) {
     s32 mod3;
 
     rand();
-    D_8008E0A8 = D_8008732C;
-    D_8008E0A4 = (rand() % 20) << 11;
-    mod3 = gStyleCounter % 3;
-    D_8008E0AC = 0xA000;
+    gStyleSpawnOffsetY = gStyleSpawnYChoice1;
+    gStyleSpawnOffsetX = (rand() % 20) << 11;
+    mod3 = gStyleDay % 3;
+    gStyleSpawnOffsetZ = 0xA000;
     if (mod3 == 1) {
-        D_8008E0AC = -0xA000;
+        gStyleSpawnOffsetZ = -0xA000;
     } else if (mod3 == 2) {
-        D_8008E0AC = 0x800;
+        gStyleSpawnOffsetZ = 0x800;
     }
-    D_8008E0B0 = D_80087174 + ((u32) rand() % 7) * 12;
-    D_8008E0B8 = rand() % 5;
+    gStyleSpawnRotation = gStyleSpawnRotations + ((u32) rand() % 7) * 12;
+    gStyleSpawnModelLayout = rand() % 5;
 }
 ```
 
@@ -127,7 +127,7 @@ the only axis it had.
 The interim row in the table above is a trap I walked into and measured my way
 out of, so it is recorded rather than quietly dropped.
 
-The `D_8008E0A4` retype moved this function **25/87 -> 10/87** and 2 words
+The `gStyleSpawnOffsetX` retype moved this function **25/87 -> 10/87** and 2 words
 long -> 3 words long. Read at face value that is a regression, and the
 standing rule (`DECOMPILATION_LEARNINGS` 3d, "Levers do not commute: if a
 residue MOVES rather than SHRINKS, revert before the next") says revert it.
@@ -212,6 +212,41 @@ use.
 **`SetupStyleSpawnParamsB`, tier B.**
 
 The other function-pointer target `StyleFillEffectKind0` dispatches
-through (selected when `gStyleCounter % 7 == 0`, the ~1/7 branch). Same
+through (selected when `gStyleDay % 7 == 0`, the ~1/7 branch). Same
 scratch-global cluster as `SetupStyleSpawnParamsA`, different constants.
 MATCHED, 87/87, ins 0/del 0.
+
+## Round 93 polish (delta, track 7)
+
+### Naming
+
+| old | new | tier | evidence |
+| --- | --- | --- | --- |
+| `D_8008732C` | `gStyleSpawnYChoice1` | A | the word at `gStyleSpawnYChoices[1]` (-0x2800), a separate splat symbol. |
+| `0xA000`, `0x800` | `40960`, `2048` | -- | offsets, decimal. |
+
+Parameters `(LongVec3 *pos, s32 offsetY)`, both unused (see SetupStyleSpawnParamsA); local `dayMod3`.
+
+### Comments moved here from src/class_3bb8c_n.c
+
+Verbatim as they stood before the round-93 comment pass (identifiers already carry this round's renames).
+
+```c
+/* MATCHED round 64 (charlie), 87/87, ins 0 / del 0.  The round-46..48
+ * residue -- filed as "pervasive $v0/$v1/$a0/$a1 temp-register renaming" and
+ * searched for 900s / 136367 permuter iterations without a zero -- was ONE
+ * named local.  The body used a single `s32 r` for all three `rand()`
+ * results, whose live range spans the calls, so cc1 could not coalesce
+ * `rand`'s `$v0` into it and emitted `move $a1,$v0` after each `jal rand`
+ * (two visible, a third word from the knock-on).  Deleting `r` and calling
+ * `rand()` inline in each expression -- exactly the idiom the matched
+ * sibling SetupStyleSpawnParamsA above already uses -- keeps the value in `$v0` and
+ * recolours the whole body to retail's.  `mod3` stays a local: it has two
+ * genuine use points.  A permuter mutates a body but never deletes its
+ * locals, which is why the 136367-iteration negative bounded the search and
+ * not the function (round 63's LOCAL COUNT corollary).
+ * The signature keeps round 47's two dead void* params: StyleFillEffectKind0
+ * dispatches this through a function pointer shared with SetupStyleSpawnParamsA, so
+ * the ABI slot is call-site-determined.  Dead params cost nothing here.
+ * See docs/match-reports/SetupStyleSpawnParamsB.md. */
+```

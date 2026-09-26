@@ -10,9 +10,9 @@ Round 46 (second sitting, alpha). Byte-exact, whole-image SHA1 verified.
 s32 IsStyleCueNear(ObjN14 *arg0, void *arg1);
 ```
 
-Called from `StopStyleCueIfNear` in this unit (already matched, forward-declared
+Called from `ServiceStyleCueIfNear` in this unit (already matched, forward-declared
 this signature). `arg0` is the same `ObjN14 *` local-view type this unit
-carries for `FlushStyleCue`/`StopStyleCueIfNear`; this function is the first to
+carries for `FlushStyleCue`/`ServiceStyleCueIfNear`; this function is the first to
 touch its padding region, so the local struct grows three named fields.
 
 ## Struct: `ObjN14` grows three fields
@@ -143,3 +143,9 @@ under the `gStyleCueDistanceTable[-idx]` threshold (`idx` from the claimed entry
 `countSign`) else 0. Not tier A despite the boolean-getter shape: it has a
 real side effect (`lastDist` write) beyond the return value, so it is not a
 "pure leaf" by track 3's tier-A test. MATCHED, 31/31.
+
+## Round 93 polish (delta, track 7)
+
+### Naming
+
+Round 93: `posX`/`posZ` are `pos.x`/`pos.z` of the slot's LongVec3 (StyleCueSlot +0x004..+0x00F; the out-parameter FindNextStyleCueInRange fills); the target is a `LongVec3 *`. Locals `dx`, `dz`, `cue`.

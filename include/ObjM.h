@@ -53,7 +53,7 @@
  *
  * The +0x06C..+0x07B words are read as one block from outside:
  * ObjM__InitStyleAndWorld passes &ctorSound to RegisterStyleConfig, which
- * keeps it in gStyleTargetObj, and ApplyStyleDecorationIfSet
+ * keeps it in gStyleSceneRefs, and ApplyStyleDecorationIfSet
  * (class_3bb8c_m) calls +0x0AC on that block's +0x00C, cachedViewport
  * (Viewport's getFadeBox). The fields are kept flat.
  */

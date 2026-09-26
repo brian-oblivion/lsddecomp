@@ -26,7 +26,7 @@ function -- no globals, no calls.
 Three independent byte ops on two 3-byte buffers with a shared delta --
 reads like an RGB colour nudge (two channels subtracted, one added), which
 fits this class's neighbourhood: `class_3bb8c_m.c` (the sibling unit just
-before this one) reads a 3-byte-stride colour table (`D_800872C4`) into the
+before this one) reads a 3-byte-stride colour table (`gStylePalette`) into the
 same region of globals this unit's other functions touch.
 
 ```c

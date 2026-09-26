@@ -19,15 +19,15 @@ see `StyleTeardown`'s per-index rewrite of `gStyleCueSlots`).
 ## New externs
 
 ```c
-extern s32 D_80087330;             /* only element [0] read here */
-extern u8 D_80087204[];            /* address only taken, never indexed */
-extern u8 D_8008E0A4[];            /* address only taken, passed to New_X */
-extern u8 *D_8008E0B4;             /* set to &D_80087204 unconditionally */
+extern s32 gStyleSpawnYChoice2;             /* only element [0] read here */
+extern u8 gStyleKind1Scale[];            /* address only taken, never indexed */
+extern u8 gStyleSpawnOffsetX[];            /* address only taken, passed to New_X */
+extern u8 *gStyleSpawnScale;             /* set to &gStyleKind1Scale unconditionally */
 extern void *SetupStyleSpawnParamsA(void *arg0, void *arg1);   /* forward decl, own unit, cold */
 extern void *New_Class876FC(void *arg0, void *arg1, void *arg2, void *arg3); /* class_3bb8c_r.c, ALREADY MATCHED */
 ```
 
-`D_80087330` is a 2-word dlabel in `asm/data/76DC8.data.s`; only the first
+`gStyleSpawnYChoice2` is a 2-word dlabel in `asm/data/76DC8.data.s`; only the first
 word is read here (`lw`, not indexed), so it is declared scalar rather than
 an array -- if a sibling function later indexes `[1]`, retype there, not
 here (no other unit references any of these four symbols currently).
@@ -46,11 +46,11 @@ void **StyleFillEffectKind1(void **arg0, s32 arg1, void *arg2) {
     s32 i;
     s32 val;
 
-    val = D_80087330;
-    D_8008E0B4 = D_80087204;
+    val = gStyleSpawnYChoice2;
+    gStyleSpawnScale = gStyleKind1Scale;
     for (i = 0; i < arg1; i++) {
         SetupStyleSpawnParamsA(arg2, (void *) val);
-        *arg0 = New_Class876FC((void *) 1, D_8008E0A4, (void *) gStyleCueSelf, arg2);
+        *arg0 = New_Class876FC((void *) 1, gStyleSpawnOffsetX, (void *) gStyleGrid, arg2);
         arg0++;
     }
     return arg0;
@@ -60,13 +60,13 @@ void **StyleFillEffectKind1(void **arg0, s32 arg1, void *arg2) {
 ## Lever: capture a global into a local BEFORE a loop that calls through it,
 even when the call's return value is discarded
 
-First attempt read `D_80087330` directly inside the loop body
-(`SetupStyleSpawnParamsA(arg2, (void *) D_80087330)`), which is semantically identical
+First attempt read `gStyleSpawnYChoice2` directly inside the loop body
+(`SetupStyleSpawnParamsA(arg2, (void *) gStyleSpawnYChoice2)`), which is semantically identical
 -- but GCC 2.6.3 can't prove `SetupStyleSpawnParamsA` doesn't write back to
-`D_80087330`, so it reloads the global from memory on every iteration
+`gStyleSpawnYChoice2`, so it reloads the global from memory on every iteration
 (`lui`/`lw` inside the loop, one fewer callee-saved register overall: 39
 words instead of retail's 42). Retail hoists the read to a local
-(`s32 val = D_80087330;`) *before* the loop, which is picked up into a
+(`s32 val = gStyleSpawnYChoice2;`) *before* the loop, which is picked up into a
 saved register ($s4) that survives across the loop's two calls -- 3 extra
 words (the load-once-and-keep pattern) and matches exactly.
 
@@ -94,9 +94,20 @@ Sibling of `StyleFillEffectKind0`: fills `arg1` slots of `gStyleEffectSlots`
 via the same `New_Class876FC` allocator, this time with a literal kind
 argument of `1`. Called unconditionally (every `gStyleVariant`) from
 `StyleBuildEffectSlots`, right after `StyleFillEffectKind0`. MATCHED,
-42/42, second build (one lever: hoist the read of `D_80087330` out of the
+42/42, second build (one lever: hoist the read of `gStyleSpawnYChoice2` out of the
 loop).
 
 ## Track 4 (2026-09-26, round 88, charlie)
 
-`gStyleEffectSlots` holds Class876FC objects (New_Class876FC), so the walking pointer is `Class876FC **` and the position `LongVec3 *`; `kind` is passed as a plain `s32` (was `(void *) N`), the params block as `(Class876FCParams *)` over the separately-declared D_8008E0A4.. symbols (one 0x24-byte Class876FCParams in the bytes; left as they are, a track 4b job), and gStyleCueSelf as the `SceneNode *` parent. Image byte-identical.
+`gStyleEffectSlots` holds Class876FC objects (New_Class876FC), so the walking pointer is `Class876FC **` and the position `LongVec3 *`; `kind` is passed as a plain `s32` (was `(void *) N`), the params block as `(Class876FCParams *)` over the separately-declared gStyleSpawnOffsetX.. symbols (one 0x24-byte Class876FCParams in the bytes; left as they are, a track 4b job), and gStyleGrid as the `SceneNode *` parent. Image byte-identical.
+
+## Round 93 polish (delta, track 7)
+
+### Naming
+
+| old | new | tier | evidence |
+| --- | --- | --- | --- |
+| `D_80087204` | `gStyleKind1Scale` | A | stored as the params' scale for every kind-1 effect. |
+| `D_80087330` | `gStyleSpawnYChoice2` | A | the word at `gStyleSpawnYChoices[2]` (-0x3800), a separate splat symbol; spelling it as the array element changes StyleFillEffectKind2's bytes (measured round 93), so the symbol stays. |
+
+Locals: `slots`, `count`, `pos`, `offsetY`.

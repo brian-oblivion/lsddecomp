@@ -29,7 +29,7 @@ jr $ra
 
 `gStyleDecorColor` is a `.sdata` pointer, already established in
 `src/class_3bb8c_m.c` as `extern const u8 *gStyleDecorColor;`, and used there as an
-actual colour-table pointer (`gStyleDecorColor = D_800872C4[cfg[2]];`). Here it is
+actual colour-table pointer (`gStyleDecorColor = gStylePalette[cfg[2]];`). Here it is
 only ever tested against zero, so it reads as a one-shot "pending" flag on
 top of the same storage. `gStyleDecorObj` is that unit's `LocalM4D0Obj *`
 (round 15's own local type, unrelated to this unit) with named slots at
@@ -93,3 +93,15 @@ callee's.
 ## Track 4 (2026-09-25, round 85, charlie)
 
 gStyleDecorObj is a BoxFill (include/BoxFill.h); the deleted `ObjAB54` view's +0x004 is release. Zero bytes.
+
+## Round 93 polish (delta, track 7)
+
+### Comments moved here from src/class_3bb8c_n.c
+
+Verbatim as they stood before the round-93 comment pass (identifiers already carry this round's renames).
+
+```c
+/* gStyleDecorObj and gStyleDecorSlots[] hold BoxFill objects
+ * (include/BoxFill.h, New_BoxFill), in globals typed `s32`/`void *[]`
+ * (track 4b's to retype). */
+```

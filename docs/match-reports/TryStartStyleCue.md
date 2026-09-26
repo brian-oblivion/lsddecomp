@@ -6,15 +6,15 @@ Round 46 (second sitting, alpha). Byte-exact, whole-image SHA1 verified.
 
 ## Round 47 (bravo) addendum: signature widened again, this time NOT a dead param
 
-While deriving `FindNearestStyleCueEntry` (this unit, cold-fresh this round -- see its
+While deriving `FindNextStyleCueInRange` (this unit, cold-fresh this round -- see its
 own report), found that its first real instruction reads and branches on
 `$a2`, and objdump of THIS function's already-matched object shows nothing
 sets `$a2` before that call -- `$a2` still holds `TryStartStyleCue`'s own third
 parameter (`ctx`, called "dead" in `TickStyle`'s round-46 report,
 correctly, from `TryStartStyleCue`'s OWN body's point of view) forwarded
 silently because no other value needed that register in between. Widened
-the call site from `FindNearestStyleCueEntry(&arg0->unk4, &arg0->unk10)` to
-`FindNearestStyleCueEntry(&arg0->unk4, &arg0->unk10, arg2)`, and widened the forward
+the call site from `FindNextStyleCueInRange(&arg0->unk4, &arg0->unk10)` to
+`FindNextStyleCueInRange(&arg0->unk4, &arg0->unk10, arg2)`, and widened the forward
 declaration accordingly. Rebuilt: **`TryStartStyleCue` still scores 45/45**,
 whole-image SHA1 still verifies -- the added argument costs nothing because
 the register already held the right value. This is the argument-side
@@ -40,10 +40,10 @@ the epilogue: the null path sets `v0 = 0`, the success path sets
 ## New externs
 
 ```c
-extern s32 gStyleTargetObj;                                 /* fresh copy -- see below */
-extern void *FindNearestStyleCueEntry(void *arg0, s32 *arg1, void *arg2);  /* forward decl, own unit,
+extern s32 gStyleSceneRefs;                                 /* fresh copy -- see below */
+extern void *FindNextStyleCueInRange(void *arg0, s32 *arg1, void *arg2);  /* forward decl, own unit,
                                                           111w, STALL -- widened round 47,
-                                                          see FindNearestStyleCueEntry.md */
+                                                          see FindNextStyleCueInRange.md */
 extern s32 gStyleCueCallbacks[];                                /* 14-slot table, class_3bb8c_r.c's gStyleCueCallbacks */
 extern s32 InitSoundCueSet(s32 arg0, void *arg1, s32 arg2, void *arg3, s32 arg4);
 ```
@@ -53,8 +53,8 @@ extern s32 InitSoundCueSet(s32 arg0, void *arg1, s32 arg2, void *arg3, s32 arg4)
 arg4)`); this call site only needs `void *`/`s32` at the ABI level (matches
 the looser local signatures `Entity.c` and `DreamSys.c` already use for the
 same cross-unit call, per the multiple-independent-local-views convention).
-`gStyleTargetObj` is redeclared fresh here (not reusing the copy later in this
-file for `FlushStyleCue`/`StopStyleCueIfNear`) because this function's ROM
+`gStyleSceneRefs` is redeclared fresh here (not reusing the copy later in this
+file for `FlushStyleCue`/`ServiceStyleCueIfNear`) because this function's ROM
 address is earlier -- same pattern as `StyleUpdateEffectSlots`'s fresh `gStyleVariant`
 copy. `gStyleCueCallbacks` is `class_3bb8c_r.c`'s already-identified 14-function
 table (its own `ParamMethods` slot list); here it is read as a raw `s32`
@@ -69,10 +69,10 @@ nothing here calls through it.
 ObjN14 *TryStartStyleCue(ObjN14 *arg0, s32 *arg1, void *arg2, void *arg3) {
     ObjN14Sub *sub;
 
-    sub = (ObjN14Sub *) FindNearestStyleCueEntry(&arg0->unk4, &arg0->unk10, arg2);
+    sub = (ObjN14Sub *) FindNextStyleCueInRange(&arg0->unk4, &arg0->unk10, arg2);
     if (sub != 0) {
         arg0->unk0 = sub;
-        InitSoundCueSet(*(s32 *) gStyleTargetObj, &arg0->unk14, sub->unk6, arg0, gStyleCueCallbacks[sub->unk6]);
+        InitSoundCueSet(*(s32 *) gStyleSceneRefs, &arg0->unk14, sub->unk6, arg0, gStyleCueCallbacks[sub->unk6]);
         if (sub->unk6 == *arg1) {
             *arg1 = -sub->unk6;
         }
@@ -136,7 +136,7 @@ first idiom, byte-exact).
 
 **`TryStartStyleCue`, tier B.**
 
-Looks up a nearby record via `FindNearestStyleCueEntry`; on success,
+Looks up a nearby record via `FindNextStyleCueInRange`; on success,
 claims it into `arg0->entry`, starts `InitSoundCueSet` on the slot's
 embedded `cueSet`, and toggles the claimed entry's sign tag so it will not
 be picked twice. Called from `TickStyle` for each of the two
@@ -145,3 +145,9 @@ because failure (returning `NULL`) is a real, handled path, not an error --
 the slot stays empty and `TickStyle` retries next frame (implicit from the
 call site's `gStyleCueSlots[i] = TryStartStyleCue(...)` pattern, no
 error-log or assert on failure). MATCHED, 45/45.
+
+## Round 93 polish (delta, track 7)
+
+### Naming
+
+Parameters: `slot`, `lastCue` (TickStyle's third argument, by address: set to the negated cue when the started cue equals it), `target` (the grid target's world position), `unused`. `gStyleCueCallbacks` typed `SoundCueCallbackFn[]` and InitSoundCueSet given its real prototype (SoundCueSet.h); `EntrySlot::count`/`StyleCueEntryView::countSign` renamed `cue`: it is the record's cue index (gStyleCueCallbacks row, InitSoundCueSet tag, gStyleCueDistanceTable row), positive while free, negated while a slot holds it.

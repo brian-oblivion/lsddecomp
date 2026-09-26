@@ -1,4 +1,6 @@
-# FindNearestStyleCueEntry -- MATCHED round 48 (alpha), 111/111 words
+# FindNextStyleCueInRange -- MATCHED round 48 (alpha), 111/111 words
+
+> Renamed from `FindNearestStyleCueEntry` on 2026-09-26 (tools/rename.py). Address 0x80055620.
 
 > Renamed from `func_80055620` on 2026-09-23 (tools/rename.py). Address 0x80055620.
 
@@ -28,7 +30,7 @@ that line landed; log growth stopped at iteration 96740 in step with the
 `resource_tracker` warning, which is `timeout`'s SIGTERM signature --
 treating the raw search as rc=124-equivalent (bound fired).
 
-**But the score-10 candidate (`permuter-work/FindNearestStyleCueEntry/output-10-1`) was
+**But the score-10 candidate (`permuter-work/FindNextStyleCueInRange/output-10-1`) was
 a genuine, correct lead, and applying it by hand closed the function.** Two
 changes, read straight off that candidate's mutated source:
 
@@ -60,7 +62,7 @@ changes, read straight off that candidate's mutated source:
 **Final body (matched):**
 
 ```c
-void *FindNearestStyleCueEntry(void *arg0, s32 *arg1, void *arg2) {
+void *FindNextStyleCueInRange(void *arg0, s32 *arg1, void *arg2) {
     s32 j, n;
     u8 *base;
     EntrySlot *entry;
@@ -71,15 +73,15 @@ void *FindNearestStyleCueEntry(void *arg0, s32 *arg1, void *arg2) {
     if (arg2 == 0) {
         goto fail;
     }
-    base = D_800876B4[gStyleKind];
-    n = D_800876EC[gStyleKind] - gStyleCueRecordIndex;
+    base = gStyleCueRecordLists[gStyleStage];
+    n = gStyleCueRecordCounts[gStyleStage] - gStyleCueRecordIndex;
     entry = (EntrySlot *) (gStyleCueRecordIndex * 8 + (s32) base);
     for (j = 0; j < n; j++, entry++) {
         gStyleCueRecordIndex++;
         if (entry->count > 0) {
             buf.pos = entry->pos;
-            buf.tab = *(TabEntry *) (D_800874EC + entry->idx * 6);
-            self = (void *) gStyleCueSelf;
+            buf.tab = *(TabEntry *) (gStyleCueOffsets + entry->idx * 6);
+            self = (void *) gStyleGrid;
             ((ObjAB4C *) self)->methods->slotE8((ObjAB4C *) self, arg0, &buf);
             d1 = *(s32 *) arg0 - *(s32 *) arg2;
             if (d1 < 0) {
@@ -104,8 +106,8 @@ fail:
 
 Needs (already present earlier in the unit, in strict ROM order): the
 `ObjAB4C`/`ObjAB4CMethods`/`Pos4`/`TabEntry`/`EntrySlot`/`LocalBuf` types and
-`extern s32 gStyleKind, gStyleCueRecordIndex, gStyleCueSelf, gStyleCueDistanceTable[];`,
-`extern u8 *D_800876B4[], D_800876EC[], D_800874EC[];` (all already
+`extern s32 gStyleStage, gStyleCueRecordIndex, gStyleGrid, gStyleCueDistanceTable[];`,
+`extern u8 *gStyleCueRecordLists[], gStyleCueRecordCounts[], gStyleCueOffsets[];` (all already
 declared in `src/class_3bb8c_n.c` ahead of this function).
 
 ### Proposed learning
@@ -144,7 +146,7 @@ several instructions later).
 ## Signature (recovered with confidence) -- widened from the existing 2-arg forward declaration
 
 ```c
-void *FindNearestStyleCueEntry(void *arg0, s32 *arg1, void *arg2);
+void *FindNextStyleCueInRange(void *arg0, s32 *arg1, void *arg2);
 ```
 
 The pre-existing forward declaration in this unit (`TryStartStyleCue`'s block,
@@ -155,12 +157,12 @@ very first real instruction), and objdump of the ALREADY-MATCHED
 still holds whatever `TryStartStyleCue` itself received as ITS OWN third
 argument (`ctx`, a genuinely dead-looking parameter per
 `TickStyle`'s report) when `TryStartStyleCue` was entered. So `ctx` is
-silently forwarded as `FindNearestStyleCueEntry`'s third argument, at zero cost (no
+silently forwarded as `FindNextStyleCueInRange`'s third argument, at zero cost (no
 instruction sets `$a2`, since it already holds the right value from
 function entry).
 
 **Updated `TryStartStyleCue`'s call site to make this explicit**
-(`FindNearestStyleCueEntry(&arg0->unk4, &arg0->unk10, arg2)`), and confirmed this does
+(`FindNextStyleCueInRange(&arg0->unk4, &arg0->unk10, arg2)`), and confirmed this does
 NOT disturb `TryStartStyleCue`'s own already-matched bytes: rebuilt the whole
 image with the change and `TryStartStyleCue` still scores 45/45 with a clean
 `OK: build matches retail SLPS_015.56`. This is the "a call argument that's
@@ -175,11 +177,11 @@ Scans a run of 8-byte records starting at a base pointer for one whose
 returning the first such record or `NULL`.
 
 ```c
-extern s32 gStyleKind;
+extern s32 gStyleStage;
 extern s32 gStyleCueRecordIndex;
-extern u8 *D_800876B4[];    /* word array of base pointers, indexed by gStyleKind */
-extern u8 D_800876EC[];    /* byte array of counts, same index */
-extern u8 D_800874EC[];    /* table, 6-byte stride entries */
+extern u8 *gStyleCueRecordLists[];    /* word array of base pointers, indexed by gStyleStage */
+extern u8 gStyleCueRecordCounts[];    /* byte array of counts, same index */
+extern u8 gStyleCueOffsets[];    /* table, 6-byte stride entries */
 extern s32 gStyleCueDistanceTable[];   /* word table, indexed by entry->count */
 
 typedef struct Pos4 { s16 hi, lo; } Pos4;              /* 4B, alignment 2 */
@@ -189,7 +191,7 @@ typedef struct EntrySlot {                              /* 8B stride */
 } EntrySlot;
 typedef struct LocalBuf { Pos4 pos; TabEntry tab; } LocalBuf;   /* 10B */
 
-void *FindNearestStyleCueEntry(void *arg0, s32 *arg1, void *arg2) {
+void *FindNextStyleCueInRange(void *arg0, s32 *arg1, void *arg2) {
     s32 j, n;
     u8 *base;
     EntrySlot *entry;
@@ -200,8 +202,8 @@ void *FindNearestStyleCueEntry(void *arg0, s32 *arg1, void *arg2) {
     if (arg2 == 0) {
         goto fail;
     }
-    base = D_800876B4[gStyleKind];
-    n = D_800876EC[gStyleKind] - gStyleCueRecordIndex;
+    base = gStyleCueRecordLists[gStyleStage];
+    n = gStyleCueRecordCounts[gStyleStage] - gStyleCueRecordIndex;
     if (n <= 0) {
         goto fail;
     }
@@ -210,8 +212,8 @@ void *FindNearestStyleCueEntry(void *arg0, s32 *arg1, void *arg2) {
         gStyleCueRecordIndex++;
         if (entry->count > 0) {
             buf.pos = entry->pos;
-            buf.tab = *(TabEntry *) (D_800874EC + entry->idx * 6);
-            self = (void *) gStyleCueSelf;
+            buf.tab = *(TabEntry *) (gStyleCueOffsets + entry->idx * 6);
+            self = (void *) gStyleGrid;
             ((ObjAB4C *) self)->methods->slotE8((ObjAB4C *) self, arg0, &buf);
             d1 = *(s32 *) arg0 - *(s32 *) arg2;
             if (d1 < 0) {
@@ -244,7 +246,7 @@ Notes on the recovery:
   `lwl 3(s1)/lwr 0(s1)` + `swl 0x13(sp)/swr 0x10(sp)` sequences.
 - **The `ObjAB4C`/`ObjAB4CMethods` local view (self-dispatch through method
   slot `+0xE8`) is the SAME idiom `TickStyle` establishes** for
-  `gStyleCueSelf` -- moved that typedef earlier in the unit (it originally sat
+  `gStyleGrid` -- moved that typedef earlier in the unit (it originally sat
   just before `TickStyle`, which is ROM-later) since this function,
   ROM-earlier, also needs it. No behavioural change, pure reordering of a
   type declaration.
@@ -260,7 +262,7 @@ Notes on the recovery:
 ## The stall: preamble scheduling order
 
 Retail places `j = 0` (as `move $s2,zero`) as the literal first instruction
-after the `ctx == 0` guard, BEFORE either of the two `gStyleKind`-indexed
+after the `ctx == 0` guard, BEFORE either of the two `gStyleStage`-indexed
 lookups. My build computes both lookups first and initializes `j` last
 (as part of the `for`'s own init clause), which is semantically identical
 but produces a different instruction SCHEDULE around the two lookups (see
@@ -309,7 +311,7 @@ shared-label unification still doesn't happen for free.
 
 ## Naming
 
-**`FindNearestStyleCueEntry`, tier B.**
+**`FindNextStyleCueInRange`, tier B.**
 
 Scans a run of 8-byte `EntrySlot` records (`gStyleCueRecordIndex` onward)
 for one whose `count` field is positive and whose Manhattan-style distance
@@ -320,3 +322,32 @@ record under threshold in scan order, not a true nearest-of-all-candidates
 search -- named for the dominant behaviour (early-return on first hit) since
 no caller distinguishes "first under threshold" from "globally nearest".
 MATCHED, 111/111.
+
+## Round 93 polish (delta, track 7)
+
+### Naming
+
+**Renamed from `FindNearestStyleCueEntry`, tier A.** The loop returns the FIRST unclaimed record (cue > 0) whose X+Z distance to the target is under its cue's `gStyleCueDistanceTable` entry, advancing `gStyleCueRecordIndex` past every record it looks at; it never compares candidates, so "nearest" said more than the body does.
+
+| old | new | tier | evidence |
+| --- | --- | --- | --- |
+| `D_800876B4` | `gStyleCueRecordLists` | A | per-stage pointer to the stage's 8-byte cue records. |
+| `D_800876EC` | `gStyleCueRecordCounts` | A | per-stage record count, the loop bound. |
+| `D_800874EC` | `gStyleCueOffsets` | A | 6-byte s16 x/y/z entries, indexed by the record's byte 4; copied after the record's 4 cell bytes to make the 10-byte cell key (Class866E8's Descriptor10 shape) computeCellOffsets turns into a world position. |
+
+The `+0x0E8` local view on `gStyleGrid` is Class866E8's computeCellOffsets. Locals: `pos`, `outDist`, `target`, `remaining`, `records`, `dx`, `dz`, `grid`.
+
+### Comments moved here from src/class_3bb8c_n.c
+
+Verbatim as they stood before the round-93 comment pass (identifiers already carry this round's renames).
+
+```c
+/* MATCHED round 48 (alpha), 111/111 -- see docs/match-reports/FindNextStyleCueInRange.md
+ * for the round 47 (bravo) recovery and the round 48 permuter lead that
+ * closed it: the `if (n <= 0) goto fail;` early exit is redundant (the
+ * `for (j = 0; j < n; ...)` loop already falls through to the same
+ * `fail: return 0;` when n <= 0) and dropping it, plus writing the
+ * `entry` pointer's address computation as `offset + (s32) base` instead
+ * of `base + offset`, closed the last word (a pure commutative-operand
+ * encoding-order residue in the `addu`). */
+```

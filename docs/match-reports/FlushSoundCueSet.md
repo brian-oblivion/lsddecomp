@@ -33,7 +33,7 @@ Byte-exact, 33/33 words.
 
 `gVabStreamObjMethods`'s vtable slot +0x084 is NOT this function -- `FlushSoundCueSet`
 itself is called directly (its only caller,
-`asm/class_3bb8c_n.s:FlushStyleCue`, passes `(*gStyleTargetObj, &param0->unk14)`
+`asm/class_3bb8c_n.s:FlushStyleCue`, passes `(*gStyleSceneRefs, &param0->unk14)`
 with no vtable indirection), while `FlushSoundCueSet`'s OWN body dispatches
 THROUGH `self`'s vtable to slot `+0x084` (`VabStreamObj__StopVoice`, this unit,
 matched separately). `set` is the same `SoundCueSet` struct

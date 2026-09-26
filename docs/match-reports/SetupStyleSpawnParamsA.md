@@ -44,13 +44,13 @@ structural cause with a long tail.
 
 ### The cause: an INCOMPLETE-ARRAY declaration, not register allocation
 
-The inherited body accessed `D_8008E0A4` through the unit's local view
-`extern u8 D_8008E0A4[];` plus a cast:
+The inherited body accessed `gStyleSpawnOffsetX` through the unit's local view
+`extern u8 gStyleSpawnOffsetX[];` plus a cast:
 
 ```c
-*(s32 *) D_8008E0A4 = (rand() % 23) << 11;
+*(s32 *) gStyleSpawnOffsetX = (rand() % 23) << 11;
 if (rand() & 1) {
-    *(s32 *) D_8008E0A4 = -*(s32 *) D_8008E0A4;
+    *(s32 *) gStyleSpawnOffsetX = -*(s32 *) gStyleSpawnOffsetX;
 }
 ```
 
@@ -72,9 +72,9 @@ three accesses, which is what cc1 emits for a plain scalar global assigned
 **by name**:
 
 ```
-lui $at, %hi(D_8008E0A4);  sw $v0, %lo(D_8008E0A4)($at)
-lui $v0, %hi(D_8008E0A4);  lw $v0, %lo(D_8008E0A4)($v0)
-lui $at, %hi(D_8008E0A4);  sw $v0, %lo(D_8008E0A4)($at)
+lui $at, %hi(gStyleSpawnOffsetX);  sw $v0, %lo(gStyleSpawnOffsetX)($at)
+lui $v0, %hi(gStyleSpawnOffsetX);  lw $v0, %lo(gStyleSpawnOffsetX)($v0)
+lui $at, %hi(gStyleSpawnOffsetX);  sw $v0, %lo(gStyleSpawnOffsetX)($at)
 ```
 
 With `$s0` spent on the address, the magic constant `0xB21642C9` was pushed
@@ -89,10 +89,10 @@ mechanism it implies.
 
 | # | declaration | expression | result |
 | --- | --- | --- | --- |
-| 1 | `extern u8 D_8008E0A4[];` | `*(s32 *) D_8008E0A4 = v` | **5/110 RED** -- frame `-0x20`, extra `$s1`, ins 5 / del 5, 102 skeleton diffs |
-| 2 | `extern s32 D_8008E0A4[];` | `D_8008E0A4[0] = v` | **5/110 RED** -- byte-for-byte the SAME residue as (1) |
-| 3 | `extern s32 D_8008E0A4;` | `*(s32 *) &D_8008E0A4 = v` | **110/110 GREEN**, image green |
-| 4 | `extern s32 D_8008E0A4;` | `D_8008E0A4 = v` | **110/110 GREEN**, image green -- shipped |
+| 1 | `extern u8 gStyleSpawnOffsetX[];` | `*(s32 *) gStyleSpawnOffsetX = v` | **5/110 RED** -- frame `-0x20`, extra `$s1`, ins 5 / del 5, 102 skeleton diffs |
+| 2 | `extern s32 gStyleSpawnOffsetX[];` | `gStyleSpawnOffsetX[0] = v` | **5/110 RED** -- byte-for-byte the SAME residue as (1) |
+| 3 | `extern s32 gStyleSpawnOffsetX;` | `*(s32 *) &gStyleSpawnOffsetX = v` | **110/110 GREEN**, image green |
+| 4 | `extern s32 gStyleSpawnOffsetX;` | `gStyleSpawnOffsetX = v` | **110/110 GREEN**, image green -- shipped |
 
 Read off the table directly:
 
@@ -137,18 +137,18 @@ One declaration -- array to scalar. The casts went with it for readability,
 but per row (3) of the table they were not carrying any weight:
 
 ```c
-extern s32 D_8008E0A4;          /* was: extern u8 D_8008E0A4[]; */
+extern s32 gStyleSpawnOffsetX;          /* was: extern u8 gStyleSpawnOffsetX[]; */
 ...
-D_8008E0A4 = (rand() % 23) << 11;
+gStyleSpawnOffsetX = (rand() % 23) << 11;
 if (rand() & 1) {
-    D_8008E0A4 = -D_8008E0A4;
+    gStyleSpawnOffsetX = -gStyleSpawnOffsetX;
 }
 ```
 
-`D_8008E0A4` is a file-scope local view shared by four bodies in this unit,
+`gStyleSpawnOffsetX` is a file-scope local view shared by four bodies in this unit,
 so the retype is not local to this function. The two live pointer-take call
-sites were rewritten `New_Class876FC(..., D_8008E0A4, ...)` ->
-`New_Class876FC(..., &D_8008E0A4, ...)` (array decay and `&scalar` both
+sites were rewritten `New_Class876FC(..., gStyleSpawnOffsetX, ...)` ->
+`New_Class876FC(..., &gStyleSpawnOffsetX, ...)` (array decay and `&scalar` both
 compile to `lui`/`addiu`, so this is free), and the two preserved `#if 0`
 bodies that use the symbol (`StyleFillEffectKind3`, `SetupStyleSpawnParamsB`) were updated
 to the same spelling. **`StyleFillEffectKind1` is live and already matched and
@@ -158,29 +158,29 @@ the retype, so the retype cost it nothing.
 ### The matched body
 
 ```c
-extern s32 D_80087328[];
-extern s32 D_8008E0A4;
-extern s32 D_8008E0A8;
-extern s32 D_8008E0AC;
-extern u8 *D_8008E0B0;
-extern u8 D_80087174[];
-extern s32 D_8008E0B8;
+extern s32 gStyleSpawnYChoices[];
+extern s32 gStyleSpawnOffsetX;
+extern s32 gStyleSpawnOffsetY;
+extern s32 gStyleSpawnOffsetZ;
+extern u8 *gStyleSpawnRotation;
+extern u8 gStyleSpawnRotations[];
+extern s32 gStyleSpawnModelLayout;
 
 void SetupStyleSpawnParamsA(void *arg0, void *arg1) {
     if (arg1 == 0) {
-        arg1 = (void *) D_80087328[rand() & 3];
+        arg1 = (void *) gStyleSpawnYChoices[rand() & 3];
     }
-    D_8008E0A8 = (s32) arg1;
-    D_8008E0A4 = (rand() % 23) << 11;
+    gStyleSpawnOffsetY = (s32) arg1;
+    gStyleSpawnOffsetX = (rand() % 23) << 11;
     if (rand() & 1) {
-        D_8008E0A4 = -D_8008E0A4;
+        gStyleSpawnOffsetX = -gStyleSpawnOffsetX;
     }
-    D_8008E0AC = (rand() % 23) << 11;
+    gStyleSpawnOffsetZ = (rand() % 23) << 11;
     if (rand() & 1) {
-        D_8008E0AC = -D_8008E0AC;
+        gStyleSpawnOffsetZ = -gStyleSpawnOffsetZ;
     }
-    D_8008E0B0 = D_80087174 + ((u32) rand() % 7) * 12;
-    D_8008E0B8 = rand() % 5;
+    gStyleSpawnRotation = gStyleSpawnRotations + ((u32) rand() % 7) * 12;
+    gStyleSpawnModelLayout = rand() % 5;
 }
 ```
 
@@ -194,7 +194,7 @@ declaration moved.
 
 Round 47/48 recorded two negatives on this residue and both stand:
 
-1. `*(volatile s32 *) D_8008E0A4` -- inert. Correct: `volatile` governs
+1. `*(volatile s32 *) gStyleSpawnOffsetX` -- inert. Correct: `volatile` governs
    whether the MEMORY ACCESS may be elided or reordered, and the thing being
    cached here is the ADDRESS-OF computation, which is not the access.
 2. A bare `__asm__("")` after the first store -- inert. Correct, and per
@@ -209,9 +209,9 @@ source shape, spelled as a cast.
 ### The interesting asymmetry from round 48, now explained
 
 Round 48 flagged, unexplained, that the textually identical
-write/conditional-negate pattern on `D_8008E0AC` did **not** get an address
+write/conditional-negate pattern on `gStyleSpawnOffsetZ` did **not** get an address
 cached in either build, and guessed at register-pressure/CSE-table state.
-The real reason is that `D_8008E0AC` was declared `extern s32 D_8008E0AC;`
+The real reason is that `gStyleSpawnOffsetZ` was declared `extern s32 gStyleSpawnOffsetZ;`
 and assigned by name all along, one statement below the `u8[]`-plus-cast
 spelling. The two globals differed only in their declarations, and that
 difference was the whole residue. The discriminator was sitting in the same
@@ -252,7 +252,7 @@ practice. Confirmed here whole-image green with an already-matched sibling
   by that pair. When ins/del is entirely prologue/epilogue, the residue is
   ONE structural cause, not a diffuse allocation difference.
 - **Look for a sibling global in the SAME function that already gets retail's
-  shape.** Here `D_8008E0AC`, one statement later, was already correct; the
+  shape.** Here `gStyleSpawnOffsetZ`, one statement later, was already correct; the
   only difference between the two was the declaration. Round 63's "check
   whether a sibling loop in the SAME function already uses the correct idiom"
   applies to declarations too.
@@ -302,7 +302,7 @@ removed on the way to commit, which is what shipped.
 **`SetupStyleSpawnParamsA`, tier B.**
 
 One of two function-pointer targets `StyleFillEffectKind0` dispatches
-through per iteration, selected when `gStyleCounter % 7 != 0` (the more
+through per iteration, selected when `gStyleDay % 7 != 0` (the more
 common ~6/7 branch; the other is `SetupStyleSpawnParamsB`). Sets a cluster of
 `gStyleE0*`-region scratch globals (spawn range/offset parameters consumed
 by the `New_Class876FC` allocator's `ctx` argument) from `rand()`. Named "A"
@@ -313,3 +313,29 @@ from an earlier `SetupStyleKind0Params`, which wrongly implied a link to the
 `Obj876FC` kind-tag axis (`StyleFillEffectKind0`/`1`/`2`/`3`'s literal
 first-argument values) -- this function has no such tag, it is selected by
 an unrelated modulo test. MATCHED, 110/110, ins 0/del 0.
+
+## Round 93 polish (delta, track 7)
+
+### Naming
+
+Parameters: `(LongVec3 *pos, s32 offsetY)` -- the type StyleFillEffectKind0's shared function pointer calls both setups with (round 93; `void *` before). `pos` is unused; `offsetY == 0` picks one of `gStyleSpawnYChoices`.
+
+### Comments moved here from src/class_3bb8c_n.c
+
+Verbatim as they stood before the round-93 comment pass (identifiers already carry this round's renames).
+
+```c
+/* MATCHED round 64 (charlie), 110/110, ins 0 / del 0, one build.  The
+ * round-46..48 residue (an extra callee-saved register caching
+ * `gStyleSpawnOffsetX`'s address, frame -0x18 -> -0x20) was NOT register identity:
+ * `gStyleSpawnOffsetX` was declared as an INCOMPLETE ARRAY.  Every reference to
+ * `extern T gStyleSpawnOffsetX[]` is an array decay, i.e. an address-take VALUE,
+ * which cc1 2.6.3's CSE promotes into a callee-saved register across the
+ * intervening `rand()` calls; declared `extern s32 gStyleSpawnOffsetX` it emits
+ * retail's absolute `lui $at, %hi / sw %lo($at)` fresh at each of the three
+ * accesses.  Four in-tree variants pin the axis to ARRAY vs SCALAR: the
+ * element type (`u8[]` vs `s32[]`) and the cast spelling (`*(s32 *) &D_X`
+ * vs `D_X`) are both measurably INERT.  Do not restate this as "the
+ * declared type" -- that was the first, wrong, reading.
+ * See docs/match-reports/SetupStyleSpawnParamsA.md. */
+```

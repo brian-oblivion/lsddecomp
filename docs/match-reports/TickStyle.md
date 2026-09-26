@@ -36,7 +36,7 @@ worth translating).
 **The lever, translated and verified against the REAL build (not just the
 scaffold):** a dead `i++; i--;` pair, placed as the LAST two statements
 inside the `if (gStyleCueSlots[i] != 0) { ... }` arm (after the
-`StopStyleCueIfNear`/`FlushStyleCue` handling, before that arm's closing brace),
+`ServiceStyleCueIfNear`/`FlushStyleCue` handling, before that arm's closing brace),
 perturbs GCC 2.6.3's register allocator enough to swap `ctx`/`i` back into
 retail's colours -- with zero net effect on either variable's value at any
 point downstream (`i` is immediately re-read by the `for`'s own increment
@@ -94,11 +94,11 @@ stack slot by hand -- GCC picks that slot on its own once `&arg2` is taken.
 ## Two already-matched sibling functions turned out to take EXTRA dead
 parameters -- both signatures corrected in this file (safe, verified)
 
-Both `StopStyleCueIfNear` and `TryStartStyleCue` (already matched earlier this
+Both `ServiceStyleCueIfNear` and `TryStartStyleCue` (already matched earlier this
 round/sitting) are called here with MORE live argument registers than their
 recorded signatures declare:
 
-- `StopStyleCueIfNear(ObjN14 *arg0, void *arg1)` is called here with `$a2` also
+- `ServiceStyleCueIfNear(ObjN14 *arg0, void *arg1)` is called here with `$a2` also
   set (to this function's own `ctx` local). Confirmed by objdump on the
   already-matched body: `$a2` is never referenced inside it. Added a third,
   genuinely-unused `void *arg2` parameter to its definition -- a dead
@@ -131,8 +131,8 @@ struct ObjAB4C {
 };
 ```
 
-`gStyleCueSelf`'s value is another "pointer stored as a plain `s32`" global
-(same idiom as `gStyleTargetObj`), dispatched here as a self object through
+`gStyleGrid`'s value is another "pointer stored as a plain `s32`" global
+(same idiom as `gStyleSceneRefs`), dispatched here as a self object through
 method slot `+0xE8` -- the third such `ObjXXXX`/`ObjXXXXMethods` local view
 in this unit (`ObjAB54`, `ObjE0C8`, now `ObjAB4C`).
 
@@ -182,7 +182,7 @@ s32 TickStyle(void *arg0, void *arg1, s32 arg2) {
     ctx = 0;
     if (arg0 != 0) {
         ctx = buf;
-        ((ObjAB4C *) gStyleCueSelf)->methods->slotE8((ObjAB4C *) gStyleCueSelf, ctx, arg0);
+        ((ObjAB4C *) gStyleGrid)->methods->slotE8((ObjAB4C *) gStyleGrid, ctx, arg0);
     }
     if (gStyleTickCount++ == 0) {
         ApplyStyleDecorationIfSet();
@@ -191,11 +191,11 @@ s32 TickStyle(void *arg0, void *arg1, s32 arg2) {
     }
     StyleUpdateDecorSet();
     StyleUpdateEffectSlots(ctx);
-    DrawStyleTables();
+    StyleScrollVramStrips();
     gStyleCueRecordIndex = 0;
     for (i = 0; i < 2; i++) {
         if (gStyleCueSlots[i] != 0) {
-            if (StopStyleCueIfNear(gStyleCueSlots[i], ctx, arg1) == 0) {
+            if (ServiceStyleCueIfNear(gStyleCueSlots[i], ctx, arg1) == 0) {
                 gStyleCueSlots[i] = (ObjN14 *) FlushStyleCue(gStyleCueSlots[i]);
             }
         } else {
@@ -209,15 +209,15 @@ s32 TickStyle(void *arg0, void *arg1, s32 arg2) {
 
 Needs (already present earlier in the unit, in strict ROM order, at the
 point this body would compile): the `ObjAB4C`/`ObjAB4CMethods` local view
-above; `extern s32 gStyleCueSelf;`, `extern s32 gStyleTickCount;`,
+above; `extern s32 gStyleGrid;`, `extern s32 gStyleTickCount;`,
 `extern void ApplyStyleDecorationIfSet(void);` (matched, `class_3bb8c_m.c`),
 `extern void StyleBuildDecorSet(void);`/`extern void StyleUpdateDecorSet(void);`
 (forward, own unit, still cold), `void StyleBuildEffectSlots(void *arg0);` (matched
 earlier this unit, this round), `void StyleUpdateEffectSlots(void *arg0);` (matched,
-this unit), `extern void DrawStyleTables(void);` (forward, matched, this
+this unit), `extern void StyleScrollVramStrips(void);` (forward, matched, this
 unit, defined later), `extern s32 gStyleCueRecordIndex;`, `extern u8 gStyleCueSlotPool[];`,
 `extern ObjN14 *TryStartStyleCue(ObjN14 *arg0, s32 *arg1, void *arg2, void
-*arg3);`, `extern s32 StopStyleCueIfNear(ObjN14 *arg0, void *arg1, void
+*arg3);`, `extern s32 ServiceStyleCueIfNear(ObjN14 *arg0, void *arg1, void
 *arg2);`.
 
 ### Proposed learning
@@ -251,10 +251,82 @@ residue); reverted to the best body and restored `INCLUDE_ASM`.
 The per-frame orchestrator: on the FIRST call (`gStyleTickCount++ == 0`)
 runs `ApplyStyleDecorationIfSet`/`StyleBuildDecorSet`/`StyleBuildEffectSlots`
 (one-time setup), then every call runs `StyleUpdateDecorSet`/
-`StyleUpdateEffectSlots`/`DrawStyleTables` and the two `gStyleCueSlots`
+`StyleUpdateEffectSlots`/`StyleScrollVramStrips` and the two `gStyleCueSlots`
 flush-or-start steps. Called from `src/class_3bb8c_l.c`'s `ObjM__TickStyle`
 (the call this unit had already forward-declared as its own entry point),
 which is a genuine per-tick call site -- the evidence for "Tick" over a
 generic "Update", matching this codebase's existing `TickDreamAuxSlots2`
 convention. MATCHED, 77/77 (round 47, permuter-closed register-colour
 swap).
+
+## Round 93 polish (delta, track 7)
+
+### Naming
+
+Round 93: parameters `(Descriptor10 *cell, void *unused, s32 lastCue)` -- ObjM__TickStyle passes the grid's getTargetDescriptor result, 0, 0; `cell` goes through Class866E8's computeCellOffsets into `targetPos` (a LongVec3; was `u8 buf[0x10]`, same bytes). The pool is `StyleCueSlot gStyleCueSlotPool[]` (0x68-byte slots, now that `cueSet` is a SoundCueSet).
+
+### Comments moved here from src/class_3bb8c_n.c
+
+Verbatim as they stood before the round-93 comment pass (identifiers already carry this round's renames).
+
+```c
+/*
+ * class_3bb8c_n -- functions 0..22 of the old 113-function class_3bb8c
+ * remainder, 0x44F14..0x46288.  23 functions (19 matched, 4 STALL), 1245
+ * words.  Carved round 45 (2026-09-15); staffed round 46.
+ *
+ * NAMING PASS, round 72 (runner alpha).  Every function, and the thirteen
+ * globals its functions set up or gate on, renamed via `tools/rename.py`,
+ * tree-wide.  The evidence for the `Style` prefix: this unit's global-state
+ * cluster (`gStyleStage`/`gStyleDay`/`gStyleSceneRefs`/`gStyleVariant`/
+ * `gStyleDecorObj`/`gStyleGrid`/`gStyleTickCount`, formerly
+ * `D_8008AC6C`/`74`/`7C`/`80`/`94`, `D_8008AB4C`/`70`) is the SAME cluster
+ * `class_3bb8c_m.c`'s already-confirmed "Style" subsystem sets
+ * (`RegisterStyleConfig`/`ApplyStyleConfig`/`FillStyleFromConfig`/
+ * `ApplyStyleDecorationIfSet`, round 69) -- a cross-unit fact, not a guess
+ * made here.
+ *
+ * None of this unit's functions are themselves class methods (no vtable
+ * self-dispatch on their OWN symbol); they are free functions dispatching
+ * into THREE separate object families through local method-table views: a
+ * decoration object (`gStyleDecorObj`, `New_BoxFill`-allocated), an
+ * 18-slot "decor set" array (`gStyleDecorSlots`, same allocator) and an
+ * Class876FC "effect slots" array (`gStyleEffectSlots`, include/
+ * Class876FC.h, `New_Class876FC`-allocated, kind-tagged 0..3 by
+ * `StyleFillEffectKind0`..`3`'s literal first argument), plus a two-slot
+ * positional sound-cue subsystem (`gStyleCueSlots`, `TryStartStyleCue`/
+ * `FindNextStyleCueInRange`/`FlushStyleCue`/`ServiceStyleCueIfNear`/
+ * `IsStyleCueNear`). `TickStyle` is the per-frame entry point (called from
+ * `src/class_3bb8c_l.c`); `StyleTeardown` is the scene-exit release of
+ * everything `TickStyle` builds.
+ *
+ * What the "Style" subsystem is FOR in gameplay terms -- which dream/link
+ * property `gStyleStage` actually selects -- remains UNESTABLISHED; every
+ * name above describes MECHANICS, not a guessed purpose, per track 3's
+ * naming rule. Full evidence and tier per function: `docs/match-reports/
+ * <name>.md`, `## Naming`.
+ *
+ * Owns NO switch jump table (zero `jtbl_` references). All four blocker
+ * constructs (`gp_rel`, `addiu_at`, `nop_mflo_mfhi`, `nop_at_expansion`) are
+ * RESOLVED project-wide (CLAUDE.md, "Open toolchain blockers"); this unit's
+ * remaining stalls are ordinary matching residues, not toolchain blockers --
+ * see their own reports (`StyleFillEffectKind0` matched round 75).
+ *
+ * This unit includes include/class_3bb8c.h, which eleven other units also
+ * include. Whoever edits this unit's C should be the ONLY runner in the
+ * class_3bb8c block that round, or price the contention with
+ * `python3 tools/headercontention.py` first.
+ */
+```
+
+```c
+/* INERT ON PURPOSE -- DO NOT DELETE. This pair is a semantic
+             * no-op (`i` is the initialized loop counter, so nothing here is
+             * an uninitialized read), and it exists solely because it
+             * perturbs GCC 2.6.3's allocator back into retail's register
+             * colours for `target`/`i`. Found by the permuter at iteration 4
+             * and kept because the WHOLE-IMAGE SHA1 verifies with it, not
+             * because the permuter's own scorer liked it (round 41: a
+             * scorer zero is a lead, an `OK: build matches retail` is an
+             * answer). Removing these two lines re-breaks TickStyle. */
+```

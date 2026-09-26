@@ -204,12 +204,12 @@ ObjMMethods *GetObjMMethods(void) {
 
 struct StyleM;
 
-extern s32 gStyleCueSelf;
-extern s32 gStyleKind;
+extern s32 gStyleGrid;
+extern s32 gStyleStage;
 extern s32 gStyleTickCount;
-extern s32 gStyleCounter;
+extern s32 gStyleDay;
 extern s32 D_8008AC78;
-extern s32 gStyleTargetObj;
+extern s32 gStyleSceneRefs;
 extern s32 gStyleVariant;
 extern s32 D_8008ACA0;
 
@@ -219,14 +219,14 @@ s32 RegisterStyleConfig(s32 a0, s32 a1, s32 a2, s32 a3, s32 arg4) {
     s32 *p;
     s32 i;
 
-    if (gStyleCueSelf == 0) {
+    if (gStyleGrid == 0) {
         i = 1;
         p = &D_8008ACA0;
-        gStyleCueSelf = a0;
-        gStyleKind = a1;
-        gStyleTargetObj = a2;
+        gStyleGrid = a0;
+        gStyleStage = a1;
+        gStyleSceneRefs = a2;
         gStyleVariant = -1;
-        gStyleCounter = a3;
+        gStyleDay = a3;
         D_8008AC78 = arg4;
         gStyleTickCount = 0;
         do {
@@ -243,18 +243,18 @@ extern s32 D_80087424;
 extern s8 *D_800873EC[];
 extern s8 *PickStyleFallbackConfig(void);
 extern void FillStyleFromConfig(struct StyleM *style, s8 *cfg);
-extern u8 D_800872C4[][3];
+extern u8 gStylePalette[][3];
 extern const u8 *gStyleDecorColor;
 
 void *ApplyStyleConfig(void) {
-    s8 *cfg = D_800873EC[gStyleKind];
+    s8 *cfg = D_800873EC[gStyleStage];
 
     if (cfg == 0) {
         cfg = PickStyleFallbackConfig();
     }
     FillStyleFromConfig((struct StyleM *)&D_80087424, cfg);
     if (cfg[1] >= 4) {
-        gStyleDecorColor = D_800872C4[cfg[2]];
+        gStyleDecorColor = gStylePalette[cfg[2]];
     }
     return &D_80087424;
 }
@@ -266,25 +266,25 @@ void *ApplyStyleConfig(void) {
  * stay separate here: the record is not a class, and merging them is a
  * global's type (track 4b).
  *
- * D_800872C4 is a table of 24 three-byte entries (0x48 bytes; the first four
+ * gStylePalette is a table of 24 three-byte entries (0x48 bytes; the first four
  * are 00/00/00, 40/40/40, 80/80/80, FF/FF/FF -- a greyscale ramp, so RGB
  * triples). Indexing it as `u8[][3]` is what produces retail's `i*2 + i + base`
  * stride-3 address arithmetic. D_8008730C is six words, 0x6800 down to 0x0800. */
 struct StyleM {
     u8 pad000[0x00C];
-    const u8 *unkC; /* +0x00C, a D_800872C4 entry */
+    const u8 *unkC; /* +0x00C, a gStylePalette entry */
     u8 pad010[0x014 - 0x010];
     s32 unk14;       /* +0x014, cfg[0] sign-extended */
-    const u8 *unk18; /* +0x018, a D_800872C4 entry */
+    const u8 *unk18; /* +0x018, a gStylePalette entry */
     s32 unk1C;       /* +0x01C, a D_8008730C value */
 };
 
-extern u8 D_800872C4[][3];
+extern u8 gStylePalette[][3];
 extern s32 D_8008730C[];
 
 void FillStyleFromConfig(struct StyleM *style, s8 *cfg) {
-    style->unkC = D_800872C4[cfg[3]];
-    style->unk18 = D_800872C4[cfg[2]];
+    style->unkC = gStylePalette[cfg[3]];
+    style->unk18 = gStylePalette[cfg[2]];
     style->unk1C = D_8008730C[cfg[1]];
     style->unk14 = cfg[0];
 }
@@ -292,7 +292,7 @@ void FillStyleFromConfig(struct StyleM *style, s8 *cfg) {
 /* gStyleDecorObj is a BoxFill (include/BoxFill.h), kept in an s32 global
  * (track 4b's to retype). */
 
-/* gStyleTargetObj's own local reading here: only its +0xC field (a "self"
+/* gStyleSceneRefs's own local reading here: only its +0xC field (a "self"
  * pointer into a THIRD object, dispatched only through +0xAC) is ever
  * touched by this function. */
 typedef struct LocalSubObj LocalSubObj;
@@ -324,8 +324,8 @@ void ApplyStyleDecorationIfSet(void) {
         ((BoxFill *)gStyleDecorObj)->methods->setSemiTrans((BoxFill *)gStyleDecorObj, 1);
         ((BoxFill *)gStyleDecorObj)->methods->setSemiTransRate((BoxFill *)gStyleDecorObj, 0);
 
-        tmp = ((FieldAC7CHolder *)gStyleTargetObj)
-                  ->unkC->methods->slotAC(((FieldAC7CHolder *)gStyleTargetObj)->unkC);
+        tmp = ((FieldAC7CHolder *)gStyleSceneRefs)
+                  ->unkC->methods->slotAC(((FieldAC7CHolder *)gStyleSceneRefs)->unkC);
 
         ((BoxFillAttachToParentFn)((BoxFill *)gStyleDecorObj)->methods->attachToParent)(
             (BoxFill *)gStyleDecorObj, (SceneNode *)tmp, (Pair32E99C *)&D_8008AB58);
