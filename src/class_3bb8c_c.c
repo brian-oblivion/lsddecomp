@@ -1,7 +1,7 @@
 /*
  * class_3bb8c_c -- three small sibling classes, each built by its own
  * New_X/ctor pair (allocate, chain a base ctor, install the class's own
- * vtable): Class869D8, Class86AA0 and Class86B60. All three follow the
+ * vtable): NodeGuardedViewport, Class86AA0 and Class86B60. All three follow the
  * same class-framework shape documented in docs/research/class-framework.md
  * and already used elsewhere in this codebase (e.g. class_3ac78.c's
  * Class866E8). Class86B60 (include/Class86B60.h, a TaskCore) is the
@@ -24,31 +24,31 @@
 #include "DreamSys.h"
 #include "SceneNode.h"
 #include "Viewport.h"
-#include "Class869D8.h"
+#include "NodeGuardedViewport.h"
 #include "Class86AA0.h"
 #include "Class86B60.h"
 #include "VabStreamObj.h"
 
-Class869D8 *New_Class869D8(void) {
-    Class869D8 *self;
+NodeGuardedViewport *New_NodeGuardedViewport(void) {
+    NodeGuardedViewport *self;
 
     self = BMemPMgrAlloc(0xDC);
     if (self != NULL) {
-        GetClass869D8Methods()->ctor(self);
+        GetNodeGuardedViewportMethods()->ctor(self);
         return self;
     }
     return NULL;
 }
 
-void Class869D8__Class869D8(Class869D8 *self) {
+void NodeGuardedViewport__NodeGuardedViewport(NodeGuardedViewport *self) {
     GetViewportMethods()->ctor((Viewport *)self);
-    self->methods = GetClass869D8Methods();
+    self->methods = GetNodeGuardedViewportMethods();
     self->methods->initDefaults(self);
 }
 
-void Class869D8__InitDefaults(void) {}
+void NodeGuardedViewport__InitDefaults(void) {}
 
-void Class869D8__Update(Class869D8 *self) {
+void NodeGuardedViewport__Update(NodeGuardedViewport *self) {
     if (self->viewNode != NULL && self->otReady != 0) {
         GetViewportMethods()->update((Viewport *)self);
     }
@@ -62,8 +62,8 @@ void func_8004D36C(void) {}
 
 void func_8004D374(void) {}
 
-Class869D8Methods *GetClass869D8Methods(void) {
-    return &gClass869D8Methods;
+NodeGuardedViewportMethods *GetNodeGuardedViewportMethods(void) {
+    return &gNodeGuardedViewportMethods;
 }
 
 Class86AA0 *New_Class86AA0(void) {

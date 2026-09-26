@@ -64,10 +64,10 @@ sltiu $a0, $s4, 0x1                   ; a0 = (unsigned)(arg3 < 1)   -- func_8004
 ori   $a1, $zero, 0x1
 jal   SetActiveDataSourceDriverMode
  ori  $a2, $zero, 0x1                   ; SetActiveDataSourceDriverMode(arg3<1u, 1, 1), discarded
-jal   New_Class869D8
+jal   New_NodeGuardedViewport
  sw   $s3, 0xC($s1)                       ; self->unk0C = arg1
 jal   New_FrameClock
- sw   $v0, 0x10($s3)                       ; arg1->unk10 = New_Class869D8()
+ sw   $v0, 0x10($s3)                       ; arg1->unk10 = New_NodeGuardedViewport()
 addu  $a0, $zero, $zero
 ori   $a1, $zero, 0x1
 jal   New_Class866E8
@@ -119,7 +119,7 @@ void Class865C8__Class865C8(Obj865C8 *self, Obj0C *arg1, SubObjD *arg2, s32 arg3
     func_8004A070(1);
     SetActiveDataSourceDriverMode((u32)arg3 < 1, 1, 1);
     self->unk0C = arg1;
-    arg1->unk10 = New_Class869D8();
+    arg1->unk10 = New_NodeGuardedViewport();
     arg1->unk8 = New_FrameClock();
     arg1->unkC = (SubObjG *)New_Class866E8(0, 1);
     self->unk38 = arg2;
@@ -162,7 +162,7 @@ needed anywhere in this 107-word function.
   dereferenced there), so a `(Obj4C *)` cast at that one call site
   reconciles the two established types without disturbing either.
 - Six independent "New_X"-shaped allocator calls (`New_TimImage`,
-  `New_LinkResource`, `New_WBgm`, `New_Class869D8`, `New_FrameClock`,
+  `New_LinkResource`, `New_WBgm`, `New_NodeGuardedViewport`, `New_FrameClock`,
   `New_Class866E8`) populate six different fields (`self->unk40/44/48`,
   `arg1->unk8/unkC/unk10`) that this unit's OWN dtor (`Class865C8__Finalize`,
   earlier this round) already established as a uniform `SubObjG` family via
@@ -176,10 +176,10 @@ needed anywhere in this 107-word function.
   class. Casts at the `New_Class866E8` call site reconcile the two
   independent local views, per this project's established
   multiple-local-views convention.
-- Two calls (`New_Class869D8`, `New_FrameClock`) and one more
+- Two calls (`New_NodeGuardedViewport`, `New_FrameClock`) and one more
   (`InitDreamAux`) are invoked with NO argument-loading instructions
   immediately before their `jal` at all — confirmed genuinely zero-argument
-  by reading each callee's OWN prologue (`New_Class869D8`/`New_FrameClock`
+  by reading each callee's OWN prologue (`New_NodeGuardedViewport`/`New_FrameClock`
   are `New_X` allocators whose own ctor dispatch passes only the freshly
   allocated `self`, no forwarded arguments; `InitDreamAux` is
   independently established elsewhere as `void InitDreamAux(void)`,
@@ -212,7 +212,7 @@ needed anywhere in this 107-word function.
   somewhere else (`Class6D3C8.h` or `code_1677c.c`); this unit keeps its
   own local view rather than cross-including, per established policy. The
   other five (`GetSoundEffectDir`, `InitDreamAux`, `New_TimImage`,
-  `PickWeeklyGroup`, `New_WBgm`, `New_Class869D8`, `New_FrameClock`) are
+  `PickWeeklyGroup`, `New_WBgm`, `New_NodeGuardedViewport`, `New_FrameClock`) are
   new to the project entirely (the first is a genuine one-off; the rest
   come from uncarved Psy-Q segments or `class_3bb8c`).
 

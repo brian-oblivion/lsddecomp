@@ -24,7 +24,7 @@
 #include "DreamSys.h"
 #include "ObjM.h"
 #include "Class866E8.h"
-#include "Class869D8.h"
+#include "NodeGuardedViewport.h"
 #include "Class6E99C.h"
 #include "TimBlockSrc.h"
 #include "WBgm.h"
@@ -74,7 +74,7 @@ extern s32 D_80087150;
 
 /* onInit (IntermediateBase__Init passes 0, 0, 0). */
 void ObjM__InitStyleAndWorld(ObjM *self, s32 gridSpan, Unk50Struct_3bb8c_l *style, s32 arg3) {
-    Class869D8 *vp = (Class869D8 *)self->viewport;
+    NodeGuardedViewport *vp = (NodeGuardedViewport *)self->viewport;
     s32 ret1;
     s32 flag;
 
@@ -296,7 +296,7 @@ extern s32 D_8008AB34;
 extern s32 D_8008710C;
 
 void ObjM__SetupSceneStyle(ObjM *self) {
-    Class869D8 *vp = (Class869D8 *)self->viewport;
+    NodeGuardedViewport *vp = (NodeGuardedViewport *)self->viewport;
     Unk50Struct_3bb8c_l *style = self->styleConfig;
     UnkCObj_3bb8c_l *obj;
     s32 val;
@@ -328,14 +328,14 @@ void ObjM__ExitSceneStyle(ObjM *self) {
     self->methods->teardownPauseOverlay(self);
     self->dreamSys->methods->blockMovement(self->dreamSys);
     self->dreamSys->methods->detachFromParent(self->dreamSys);
-    ((Class869D8 *)self->viewport)->methods->detachViewChild((Class869D8 *)self->viewport);
+    ((NodeGuardedViewport *)self->viewport)->methods->detachViewChild((NodeGuardedViewport *)self->viewport);
     self->methods->removeChild(self, self->unk14);
 }
 
 void ObjM__EnterStyleSession(ObjM *self) {
-    Class869D8Methods *m;
+    NodeGuardedViewportMethods *m;
     Class6E99CMethods *m2;
-    Class869D8 *vp;
+    NodeGuardedViewport *vp;
     Class6E99C *fade;
     Unk50Struct_3bb8c_l *style;
     s32 local10;
@@ -347,7 +347,7 @@ void ObjM__EnterStyleSession(ObjM *self) {
     self->dreamSys->methods->resetLinkState(self->dreamSys, self->unk44, self->unk40);
     ((Class866E8 *)self->unk14)->methods->enable((Class866E8 *)self->unk14);
 
-    vp = (Class869D8 *)self->viewport;
+    vp = (NodeGuardedViewport *)self->viewport;
     style = self->styleConfig;
     vp->methods->setLightMode(vp, 1);
     vp->methods->setClearColor(vp, style->unkC);

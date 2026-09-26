@@ -10,7 +10,7 @@ Byte-exact, whole-image SHA1 green (`./build-and-verify.sh`: OK), `tools/check-n
 ## What it is
 
 Slot +0x0A0 of Unk18Obj's method table (`tools/classtable.py gViewportMethods`; the same entry is
-inherited by `gClass869D8Methods`). `self` is the Unk18Obj view/renderer, `node` a scene node.
+inherited by `gNodeGuardedViewportMethods`). `self` is the Unk18Obj view/renderer, `node` a scene node.
 It draws `node` into `self->ot[self->buf]` (the GsOT pointers at +0x78, index at +0x74):
 
 1. Early out: class-id low byte 0x24 with the GsDOBJ2 attribute's sign bit (GsDOFF) set.
@@ -67,7 +67,7 @@ Six builds; no permuter search was spent.
 
 Renamed `func_80012064` -> `Unk18Obj__DrawNode` (round 81, charlie), tier B: confirmed as slot
 +0x0A0 of Unk18Obj's method table (`tools/classtable.py gViewportMethods`, inherited by
-`gClass869D8Methods`), behaviour (draws one scene node and its 0x4-nibble children into the
+`gNodeGuardedViewportMethods`), behaviour (draws one scene node and its 0x4-nibble children into the
 current OT) read from the body. `Unk18Obj` itself is still a placeholder class name -- the
 prefix is inherited, not re-derived here -- so the method name is tier B rather than A.
 

@@ -214,7 +214,7 @@ typedef struct {
    ProjectPointAtDistance interpolates between), +0x018 vp.y and +0x024
    vr.y (AdvanceMoveCycle's view bob moves both; StepLookOffset, StopDrift
    and TickDrift move vr.y, i.e. look up and down). Class865C8__Init installs
-   a New_Class869D8 through setViewport, and Entity__MoodCue74 calls its
+   a New_NodeGuardedViewport through setViewport, and Entity__MoodCue74 calls its
    setClearColor (+0x064). */
 struct Viewport;
 

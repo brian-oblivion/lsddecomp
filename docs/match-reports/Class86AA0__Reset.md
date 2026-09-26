@@ -24,8 +24,8 @@ report per function, matched ones included.
 ## Naming
 
 **Class86AA0__Reset** -- tier C, kept deliberately. Same shape and same
-precedent as `Class869D8__InitDefaults`/`func_8004D35C`/`func_8004D364`/
-`func_8004D36C`/`func_8004D374` above (this unit's own `Class869D8`
+precedent as `NodeGuardedViewport__InitDefaults`/`func_8004D35C`/`func_8004D364`/
+`func_8004D36C`/`func_8004D374` above (this unit's own `NodeGuardedViewport`
 siblings) and as `func_8004B324`/`SceneNode__NoOpSlot5C` elsewhere in the project:
 a genuinely empty, no-argument, no-established-purpose vtable stub keeps
 its bare `func_` name rather than a `Class86AA0__func_...` form that would
@@ -41,4 +41,4 @@ gSceneNodeMethods` puts it at +0x040, where SceneNode's table has
 replaces the inherited reset with nothing. The "tier C, kept deliberately"
 paragraph above predates the class's unification; the tie to the class is
 the table slot, which is the evidence it lacked. Precedent:
-`Class869D8__InitDefaults`, an empty occupant named for its slot.
+`NodeGuardedViewport__InitDefaults`, an empty occupant named for its slot.

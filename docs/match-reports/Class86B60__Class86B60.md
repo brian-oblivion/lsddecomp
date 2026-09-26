@@ -52,7 +52,7 @@ presence anywhere in the project. Placed as one new block right before the
   function's own second-to-last call). Vtable is `gClass86B60Methods`, resolved
   via `GetClass86B60Methods` (still raw asm in the uncarved
   `asm/class_3bb8c_d.s`, called directly by `jal` -- same "vtable getter"
-  shape as `GetClass869D8Methods`/`GetClass86AA0Methods`).
+  shape as `GetNodeGuardedViewportMethods`/`GetClass86AA0Methods`).
 - `Class86B60` struct fields: `unk48` (`Class86B60Unk48Obj *`, set up by
   the base ctor chain, read here), `unkA4` (`void *`, stores `dreamSys`
   raw), `unkAC` (`s32`, zeroed), `unkBC` (`s32`, holds `slot1B0`'s return),
@@ -133,8 +133,8 @@ site (`src/class_3bb8c_c.c`, this function's own last statement) --
 nothing in `class_3bb8c_d.c` or anywhere else references this specific
 slot. Fixed the one call site, oracle green. Same name and same evidence
 shape ("runs right after self->methods is installed") as
-`Class869D8Methods::onConstruct`, which this unit's other ctor
-(`Class869D8__Class869D8`) already established.
+`NodeGuardedViewportMethods::onConstruct`, which this unit's other ctor
+(`NodeGuardedViewport__NodeGuardedViewport`) already established.
 
 ## Track 4 (2026-09-25, round 84, alpha)
 

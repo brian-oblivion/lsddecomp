@@ -38,7 +38,7 @@
 #include "TextRow.h"
 #include "ObjM.h"
 #include "Class866E8.h"
-#include "Class869D8.h"
+#include "NodeGuardedViewport.h"
 #include "Class6E99C.h"
 #include "FrameClock.h"
 #include "WBgm.h"
@@ -80,11 +80,11 @@ void ObjM__NotifyParentsCodeB(ObjM *self) {
     self->methods->notifyParents(self, 0xB);
 }
 
-/* The viewport (IntermediateBase::viewport, a Class869D8) hands out its fade
+/* The viewport (IntermediateBase::viewport, a NodeGuardedViewport) hands out its fade
  * box (getSubHandle, Viewport's New_Class6E99C). */
 void ObjM__StartFadeUp(ObjM *self, s32 channels, s32 arg2, s32 step, s32 addChild) {
     Class6E99C *fade =
-        (Class6E99C *)((Class869D8 *)self->viewport)->methods->getSubHandle((Class869D8 *)self->viewport);
+        (Class6E99C *)((NodeGuardedViewport *)self->viewport)->methods->getSubHandle((NodeGuardedViewport *)self->viewport);
     if (step != 0) {
         fade->methods->setStep(fade, step);
     }
@@ -105,8 +105,8 @@ void ObjM__OnFadeNotify(ObjM *self, Class6E99C *sender, s32 event) {
         case 6:
             self->methods->removeChild(self, (BasicClass *)sender);
             color = sender->methods->getColor(sender);
-            ((Class869D8 *)self->viewport)
-                ->methods->setClearColor((Class869D8 *)self->viewport, (ViewportRgb *)color);
+            ((NodeGuardedViewport *)self->viewport)
+                ->methods->setClearColor((NodeGuardedViewport *)self->viewport, (ViewportRgb *)color);
             if (self->state != 5 && self->state != 8 && self->state == 0xA) {
                 self->dreamSys->methods->stopDrift(self->dreamSys, 1);
                 self->dreamSys->methods->setMoveOverride(self->dreamSys, 0);
@@ -181,7 +181,7 @@ void ObjM__AdvancePauseSetup(ObjM *self) {
     if (state != 4) {
         return;
     }
-    ((Class869D8 *)self->viewport)->methods->setDrawEnabled((Class869D8 *)self->viewport, 0);
+    ((NodeGuardedViewport *)self->viewport)->methods->setDrawEnabled((NodeGuardedViewport *)self->viewport, 0);
     ((FrameClock *)self->unk10)->methods->pause((FrameClock *)self->unk10);
     self->bgm->methods->pause(self->bgm);
     ((VabStreamObj *)self->sound)->methods->mute((VabStreamObj *)self->sound);
@@ -194,7 +194,7 @@ void ObjM__TeardownPauseOverlay(ObjM *self) {
     ((VabStreamObj *)self->sound)->methods->unmute((VabStreamObj *)self->sound);
     self->bgm->methods->resume(self->bgm);
     ((FrameClock *)self->unk10)->methods->resume((FrameClock *)self->unk10);
-    ((Class869D8 *)self->viewport)->methods->setDrawEnabled((Class869D8 *)self->viewport, 1);
+    ((NodeGuardedViewport *)self->viewport)->methods->setDrawEnabled((NodeGuardedViewport *)self->viewport, 1);
     self->pauseSetupStep = 0;
 }
 

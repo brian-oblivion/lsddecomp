@@ -121,8 +121,8 @@ extern s32 D_800869CC[3];
  * its own New_X/ctor pair (allocator + base-chain + own-vtable-set, the
  * same shape as Class86668__Class86668 in class_39e08.c). Named by their
  * vtable's address, same convention as Class866E8/Class86668. The first
- * of them, Class869D8 (gClass869D8Methods, a Viewport), is defined in
- * include/Class869D8.h (round 87, track 4).
+ * of them, NodeGuardedViewport (gNodeGuardedViewportMethods, a Viewport), is defined in
+ * include/NodeGuardedViewport.h (round 87, track 4).
  * ------------------------------------------------------------------- */
 
 extern void *BMemPMgrAlloc(s32 size);
@@ -368,7 +368,7 @@ extern s32 CopyMemcardIconTemplate(s32 arg0, s32 arg1); /* TaskObjF__WriteMemcar
  * round 89). The views `ObjM` (class_3bb8c_m) and `Obj87034_3bb8c_l`, and
  * their helper views of the objects ObjM holds (FieldM14/18/34/50/7C,
  * ChildM_AC, ChildM114, ParamM, Obj14/StyleWorldObj/RegistrantObj_3bb8c_l)
- * are gone: those objects are the unified Class866E8, Class869D8,
+ * are gone: those objects are the unified Class866E8, NodeGuardedViewport,
  * Class6E99C, TimBlockSrc, VabStreamObj, FrameClock, WBgm and TextRow. */
 
 /* ObjM::styleConfig's pointee (include/ObjM.h): not a class, a plain

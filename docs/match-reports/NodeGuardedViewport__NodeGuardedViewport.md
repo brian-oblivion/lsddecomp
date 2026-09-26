@@ -1,4 +1,6 @@
-# Class869D8__Class869D8
+# NodeGuardedViewport__NodeGuardedViewport
+
+> Renamed from `Class869D8__Class869D8` on 2026-09-26 (tools/rename.py). Address 0x8004d2a4.
 
 > Renamed from `func_8004D2A4` on 2026-09-22 (tools/rename.py). Address 0x8004d2a4.
 
@@ -6,20 +8,20 @@
 
 ## What it does
 
-The constructor (`ctor`, slot +0x008) for `Class869D8`. Standard
+The constructor (`ctor`, slot +0x008) for `NodeGuardedViewport`. Standard
 class-framework shape, same as e.g. class_39e08.c's `Class86668__Class86668`: chain
 to a base class's ctor (fetched via `GetViewportMethods()`), install this
 class's own vtable, then call the just-installed vtable's own
-post-construct hook (slot +0x040, currently `Class869D8__InitDefaults` -- already
+post-construct hook (slot +0x040, currently `NodeGuardedViewport__InitDefaults` -- already
 matched, an empty body).
 
 ## The C
 
 ```c
-void Class869D8__Class869D8(Class869D8 *self)
+void NodeGuardedViewport__NodeGuardedViewport(NodeGuardedViewport *self)
 {
     GetViewportMethods()->ctor(self);
-    self->methods = GetClass869D8Methods();
+    self->methods = GetNodeGuardedViewportMethods();
     self->methods->slot40(self);
 }
 ```
@@ -43,9 +45,9 @@ whole unit; `./build-and-verify.sh` reports a clean whole-image SHA1 match.
 
 ## Naming
 
-**Class869D8__Class869D8** -- tier A. Canonical ctor (`Class__Class`
+**NodeGuardedViewport__NodeGuardedViewport** -- tier A. Canonical ctor (`Class__Class`
 convention, e.g. `Class866E8__Class866E8`): chains the base ctor, installs
-this class's own vtable via `GetClass869D8Methods()`, then dispatches the
+this class's own vtable via `GetNodeGuardedViewportMethods()`, then dispatches the
 freshly-installed table's own post-construct hook. The identity of the
 class and the fact that this occupies its own `ctor` slot (+0x008) are both
 evident from the body and from the vtable dump (`tools/classtable.py
@@ -53,4 +55,4 @@ evident from the body and from the vtable dump (`tools/classtable.py
 
 ## Track 4 (2026-09-25, round 85, bravo)
 
-Class869D8's parent is Viewport (id 0x7, include/Viewport.h, round 85): the base ctor call is `GetViewportMethods()->ctor((Viewport *)self)`, replacing class_3bb8c.h's BaseCtorTable_3bb8c_c view. This is the ctor chain that makes 0x17 Viewport's subclass. Class869D8's own views are unchanged. Byte-identical.
+NodeGuardedViewport's parent is Viewport (id 0x7, include/Viewport.h, round 85): the base ctor call is `GetViewportMethods()->ctor((Viewport *)self)`, replacing class_3bb8c.h's BaseCtorTable_3bb8c_c view. This is the ctor chain that makes 0x17 Viewport's subclass. NodeGuardedViewport's own views are unchanged. Byte-identical.

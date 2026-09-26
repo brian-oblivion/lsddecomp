@@ -8,7 +8,7 @@
 
 ## What it does
 
-Not a `Class869D8`/`Class86AA0` method -- called directly (`jal`) from the
+Not a `NodeGuardedViewport`/`Class86AA0` method -- called directly (`jal`) from the
 still-uncarved `Class86B60__CommitNameEntry` in `asm/class_3bb8c_d.s`. Given a caller-side
 context struct and a result struct, reaches through the context to an
 `Obj866E8` instance, checks one of its fields against a large constant

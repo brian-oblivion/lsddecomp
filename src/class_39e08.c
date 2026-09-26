@@ -1,7 +1,7 @@
 #include "common.h"
 #include "class_39e08.h"
 #include "VabStreamObj.h"
-#include "Class869D8.h"
+#include "NodeGuardedViewport.h"
 #include "Class866E8.h"
 #include "WBgm.h"
 #include "TimImage.h"
@@ -46,7 +46,7 @@ void Class865C8__Class865C8(Class865C8 *self, IntermediateBaseInitArgs *initArgs
     func_8004A070(1);
     SetActiveDataSourceDriverMode((u32)arg3 < 1, 1, 1);
     self->initArgs = initArgs;
-    initArgs->viewport = (BasicClass *)New_Class869D8();
+    initArgs->viewport = (BasicClass *)New_NodeGuardedViewport();
     initArgs->unk8 = (BasicClass *)New_FrameClock();
     initArgs->unkC = (BasicClass *)New_Class866E8(NULL, 1);
     self->dreamSys = dreamSys;

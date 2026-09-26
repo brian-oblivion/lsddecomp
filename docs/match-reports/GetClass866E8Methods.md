@@ -56,7 +56,7 @@ None new — confirms the already-established "extern Methods D_xxx; return
 **Tier A.** `lui`/`addiu` of `&gClass866E8Methods`, no dereference -- the class's
 get-vtable helper. Matches this project's established
 `GetClass<addr>Methods` convention for these helpers exactly (e.g.
-`GetClass86668Methods`, `GetClass86F88Methods`, `GetClass869D8Methods`),
+`GetClass86668Methods`, `GetClass86F88Methods`, `GetNodeGuardedViewportMethods`),
 which class_3ac78.h's own extern for this SAME real function already
 anticipated under this exact name pattern (previously documented there as
 an unnamed extern for "the get-vtable helper... lives in class_3bb8c").
