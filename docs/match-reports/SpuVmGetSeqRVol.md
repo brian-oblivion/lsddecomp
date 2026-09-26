@@ -34,3 +34,13 @@ s32 SpuVmGetSeqRVol(s32 p0)
 
 (`Entry90902E8` is declared once, above `SpuVmGetSeqVol` in the unit --
 see that function's or `SpuVmGetSeqLVol`'s report for the full typedef.)
+
+## asm sites
+
+Round 89 (runner delta, track 5 `asm-sites`): the bare `__asm__("")` before
+`D_8008EA22 = p0;` is **justified** and now commented at the site. Measured by
+deleting it alone: the image went red (48 bytes, same length), `funcdiff` 6/21,
+and asm-differ shows the `D_800902E8[(u8) p0]` table load (`lui/addiu/addu at`,
+`lw v1,0(at)`) sunk from before the `sh a0,-0x15de(at)` store to `D_8008EA22`
+down to after the whole index multiply chain. Retail loads first, then stores.
+Instruction order.

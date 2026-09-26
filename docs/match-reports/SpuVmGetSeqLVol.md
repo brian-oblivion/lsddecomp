@@ -91,3 +91,14 @@ mask.** Writing the same expression inline at the use site (no named local)
 preserves the signed-shift form. Confirmed on three sibling functions in
 this unit (`SpuVmGetSeqLVol`, `SpuVmGetSeqRVol`, `SpuVmGetSeqVol`) and
 independently reproduced in isolation through the pinned pipeline.
+
+## asm sites
+
+Round 89 (runner delta, track 5 `asm-sites`): the bare `__asm__("")` before
+`D_8008EA22 = channel;` is **justified** and now commented at the site.
+Measured by deleting it alone: the image went red (49 bytes, same length),
+`funcdiff` 6/21, and asm-differ shows the `sh v1,-0x15de(at)` store to
+`D_8008EA22` hoisted to the second instruction of the function, ahead of the
+`D_800902E8[channel]` load and the `recIdx` multiply chain that retail performs
+first (retail's store sits just before the final `addu`/`lh`). The register
+differences in that diff follow from the moved store. Instruction order.
