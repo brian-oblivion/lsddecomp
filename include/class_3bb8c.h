@@ -281,7 +281,7 @@ typedef struct SaveBlock678_3bb8c_c {
 
 /*
  * First argument of CheckSaveScoreFlag: its one caller,
- * TitleMenu__CommitNameEntry (class_3bb8c_d), passes its own self, so
+ * TitleMenu__RefreshMenu (class_3bb8c_d), passes its own self, so
  * +0x0BC is TitleMenu::saveBlock (include/TitleMenu.h).
  */
 typedef struct Ctx678_3bb8c_c {

@@ -199,7 +199,7 @@ void TitleMenu__TickNameFieldCursor(TitleMenu *self, SpriteRgb *color) {
 extern void CheckSaveScoreFlag(void *arg0, void *arg1,
                                void *arg2); /* arity-ok: the definition is 2-parameter and the callee WRITES $a2 (`li a2,0x1` at 0x8004D690) before reading it, but the 3rd argument is byte-load-bearing here -- retail emits `lw a2,164(s0)` at 0x8004DE74 */
 
-void TitleMenu__CommitNameEntry(TitleMenu *self) {
+void TitleMenu__RefreshMenu(TitleMenu *self) {
     s32 size;
     s32 origSlot;
     char *buf1;

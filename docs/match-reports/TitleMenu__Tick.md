@@ -99,7 +99,7 @@ compiler-ownership recipe (renamed the field alone in the `TitleMenu`
 struct definition, rebuilt default build and
 `tools/check-nonmatching.sh`): the accessor set landed entirely inside
 `src/class_3bb8c_d.c` (this function's own `switch`, and
-`TitleMenu__CommitNameEntry`'s read/write), so this was renamed directly
+`TitleMenu__RefreshMenu`'s read/write), so this was renamed directly
 rather than proposed. `unk58` also names unrelated fields on other structs
 in this same header (e.g. `TaskObjF::unk58`) -- untouched, since their own
 definitions were not edited.

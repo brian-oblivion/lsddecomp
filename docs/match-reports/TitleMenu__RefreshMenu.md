@@ -1,4 +1,6 @@
-# TitleMenu__CommitNameEntry -- MATCHED 87/87, round 43
+# TitleMenu__RefreshMenu -- MATCHED 87/87, round 43
+
+> Renamed from `TitleMenu__CommitNameEntry` on 2026-09-26 (tools/rename.py). Address 0x8004de08.
 
 > Renamed from `Class86B60__CommitNameEntry` on 2026-09-26 (tools/rename.py). Address 0x8004de08.
 
@@ -13,7 +15,7 @@ and no derivation; this round wrote and matched the function from scratch.
 ```c
 extern void CheckSaveScoreFlag(void *arg0, void *arg1, void *arg2);
 
-void TitleMenu__CommitNameEntry(TitleMenu *self)
+void TitleMenu__RefreshMenu(TitleMenu *self)
 {
     s32 size;
     s32 origState;
@@ -38,7 +40,7 @@ void TitleMenu__CommitNameEntry(TitleMenu *self)
 }
 ```
 
-Byte-exact on the first build: `funcdiff.py TitleMenu__CommitNameEntry` -> `87/87 words
+Byte-exact on the first build: `funcdiff.py TitleMenu__RefreshMenu` -> `87/87 words
 match (file 0x3E608-0x3E764)`; whole-image `OK: build matches retail
 SLPS_015.56`. (Measured with the unit's other stall, `TitleMenu__TickNameFieldCursor`,
 temporarily restored to `INCLUDE_ASM` so its own known length residue could
@@ -75,7 +77,7 @@ the whole image after any further edit there.)
   local 3-argument extern matches what THIS call site actually needs;
   class_3bb8c_c.c's 2-argument declaration is untouched. (`include/class_
   3bb8c.h`'s own comment on `Ctx678_3bb8c_c`, written when this call site
-  was still uncarved asm, already named `TitleMenu__CommitNameEntry` as CheckSaveScoreFlag's
+  was still uncarved asm, already named `TitleMenu__RefreshMenu` as CheckSaveScoreFlag's
   "one caller" -- now confirmed and closed.)
 - `self->methods->slotE0(self, self->unk14);` -- a NEW slot at +0x0E0 on
   `TitleMenuMethods` (inside the previous `pad0DC[0xF0-0xDC]` gap),
@@ -128,13 +130,13 @@ than changed.
 ### Proposed learning
 
 **A stalled sibling function's own drift can hide a clean match on the
-function next to it in the SAME unit.** `TitleMenu__CommitNameEntry` scored 6/87 with a
+function next to it in the SAME unit.** `TitleMenu__RefreshMenu` scored 6/87 with a
 128324-byte out-of-range warning on the first build -- not because of
-anything wrong in `TitleMenu__CommitNameEntry` itself, but because `TitleMenu__TickNameFieldCursor`
+anything wrong in `TitleMenu__RefreshMenu` itself, but because `TitleMenu__TickNameFieldCursor`
 (this unit's OTHER round-43 target, still an unresolved 2-word-short
 residue at the time) sits immediately before it in ROM order and was
 shifting every address after it. Restoring `TitleMenu__TickNameFieldCursor` to
-`INCLUDE_ASM` in isolation revealed `TitleMenu__CommitNameEntry` was byte-exact all
+`INCLUDE_ASM` in isolation revealed `TitleMenu__RefreshMenu` was byte-exact all
 along. When a function's own diff looks structurally wrong immediately
 after editing an UNRELATED, EARLIER function in the same unit, check
 whether that earlier function is still drifting before assuming the
@@ -145,7 +147,7 @@ round 20, just triggered by a same-unit sibling instead of a forgotten
 
 ## Naming (round 77, naming runner delta)
 
-Renamed `func_8004DE08` -> `TitleMenu__CommitNameEntry`. **Tier B**: Allocates/fills/frees a temp buffer via `BMemPMgrAlloc`/`DecodeFullWidthSjis`/`BMemPMgrFree` and pushes it through `self->nameField->methods->slotCC`, then calls `CheckSaveScoreFlag`, sets `state = 5`, and runs two `TitleMenu__SetState` calls (0xB then 0xF) bracketing a refresh of the DreamSysView. Read as committing the entered name-field text and advancing state; the two literal state values are not otherwise established.
+Renamed `func_8004DE08` -> `TitleMenu__RefreshMenu`. **Tier B**: Allocates/fills/frees a temp buffer via `BMemPMgrAlloc`/`DecodeFullWidthSjis`/`BMemPMgrFree` and pushes it through `self->nameField->methods->slotCC`, then calls `CheckSaveScoreFlag`, sets `state = 5`, and runs two `TitleMenu__SetState` calls (0xB then 0xF) bracketing a refresh of the DreamSysView. Read as committing the entered name-field text and advancing state; the two literal state values are not otherwise established.
 
 ## Track 4 (2026-09-26, round 88, bravo)
 

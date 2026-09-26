@@ -76,7 +76,7 @@ struct TaskObjF;
 
 struct TitleMenuMethods {
     TASKCORE_SLOTS(TitleMenu, (TitleMenu * self, struct DreamSys *dreamSys));
-    /* +0x124 */ void (*commitNameEntry)(TitleMenu *self, s32 arg1); /* TitleMenu__CommitNameEntry; both callers pass
+    /* +0x124 */ void (*commitNameEntry)(TitleMenu *self, s32 arg1); /* TitleMenu__RefreshMenu; both callers pass
                                                                          arg1 (setState: 0, onTagBValue: 0x16) and the
                                                                          occupant reads self alone */
     /* +0x128 */ void (*beginMemcardSave)(TitleMenu *self); /* TitleMenu__BeginCardAccess; updateMemcardSave* call it first */
@@ -120,7 +120,7 @@ void TitleMenu__CreateNameField(TitleMenu *self, TaskCoreTarget *target);
 void TitleMenu__DestroyNameField(TitleMenu *self);
 void TitleMenu__ForwardToNameField(TitleMenu *self, void *parent);
 void TitleMenu__TickNameFieldCursor(TitleMenu *self, struct SpriteRgb *color);
-void TitleMenu__CommitNameEntry(TitleMenu *self);
+void TitleMenu__RefreshMenu(TitleMenu *self);
 void TitleMenu__BeginCardAccess(TitleMenu *self);
 void TitleMenu__EndCardAccess(TitleMenu *self);
 void TitleMenu__SaveToCard(TitleMenu *self);

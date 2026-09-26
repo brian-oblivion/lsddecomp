@@ -18,7 +18,7 @@
  *
  * Two free functions round out the unit: CheckSaveScoreFlag, called
  * directly (not through any vtable) from
- * TitleMenu__CommitNameEntry, computes a 0/1 flag from its save block (TitleMenu::saveBlock); and
+ * TitleMenu__RefreshMenu, computes a 0/1 flag from its save block (TitleMenu::saveBlock); and
  * FormatNumberIntoBuffer, called from TitleMenu's own ctor, formats a
  * number into a shared buffer whose broader role (nearby rodata strings
  * hint at a memory-card save label) is not established from this unit

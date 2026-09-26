@@ -68,4 +68,4 @@ Its up-calls to TaskCore (include/TaskCore.h, track 4 round 84) now go through `
 
 ## Track 4 (2026-09-26, round 88, bravo)
 
-TitleMenu is unified in include/TitleMenu.h (TASKCORE_SLOTS/TASKCORE_FIELDS plus its own). Slots at their names: slot124 is this class's own `commitNameEntry` (+0x124, TitleMenu__CommitNameEntry; the call passes 0 the occupant does not read), slot7C onPadCancel, slotF0 setActiveSlot (its first argument is `target->unk8`, TaskCoreTarget, s32), slot78 onPadConfirm. Byte-identical (whole image green, 0 new warnings, nonmatching green).
+TitleMenu is unified in include/TitleMenu.h (TASKCORE_SLOTS/TASKCORE_FIELDS plus its own). Slots at their names: slot124 is this class's own `commitNameEntry` (+0x124, TitleMenu__RefreshMenu; the call passes 0 the occupant does not read), slot7C onPadCancel, slotF0 setActiveSlot (its first argument is `target->unk8`, TaskCoreTarget, s32), slot78 onPadConfirm. Byte-identical (whole image green, 0 new warnings, nonmatching green).
