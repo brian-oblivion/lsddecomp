@@ -63,7 +63,7 @@ without a register-pressure iteration this time.
 ## Struct/table knowledge established
 
 - `Obj86B60Methods`: added `slot14` (inherited BasicClass removeChild) and
-  `slot50` (external `Class86B60__RegisterHandlers`, unobserved elsewhere).
+  `slot50` (external `Class86B60__OnDeinit`, unobserved elsewhere).
 - `Unk14Obj`/`Unk18Obj`: both confirmed to ALSO expose the inherited
   BasicClass `slot4` (release) and `slot14` (removeChild) -- same universal
   low-offset BasicClass layout every class in this game shares. Both types

@@ -1,14 +1,16 @@
-# Class86B60__RegisterHandlers -- MATCH
+# Class86B60__OnDeinit -- MATCH
+
+> Renamed from `Class86B60__RegisterHandlers` on 2026-09-26 (tools/rename.py). Address 0x8004d898.
 
 > Renamed from `func_8004D898` on 2026-09-24 (tools/rename.py). Address 0x8004d898.
 
 Unit `class_3bb8c_d`, round 14. `./build-and-verify.sh` exit 0; whole-image
-SHA1 matches retail. `funcdiff.py Class86B60__RegisterHandlers`: 29/29 words match.
+SHA1 matches retail. `funcdiff.py Class86B60__OnDeinit`: 29/29 words match.
 
 ## Source
 
 ```c
-void Class86B60__RegisterHandlers(Class86B60 *self)
+void Class86B60__OnDeinit(Class86B60 *self)
 {
     u32 i;
     u8 *entry;
@@ -63,4 +65,15 @@ rather than as new bullets.
 
 ## Naming (round 77, naming runner delta)
 
-Renamed `func_8004D898` -> `Class86B60__RegisterHandlers`. **Tier B**: Walks a fixed 2-entry external table (`D_80086DAC`, 0xC-byte stride), dispatching each entry's address through `self->handlerTable->unk0`'s own vtable slot alongside `&self->unk93`. Named from the mechanics only (registering fixed table entries with a sub-object); no purpose established for what is being registered.
+Renamed `func_8004D898` -> `Class86B60__OnDeinit`. **Tier B**: Walks a fixed 2-entry external table (`D_80086DAC`, 0xC-byte stride), dispatching each entry's address through `self->handlerTable->unk0`'s own vtable slot alongside `&self->unk93`. Named from the mechanics only (registering fixed table entries with a sub-object); no purpose established for what is being registered.
+
+## Track 4 (2026-09-26, round 88, bravo)
+
+Renamed `Class86B60__RegisterHandlers` -> `Class86B60__OnDeinit` (tools/rename.py):
+it is the occupant of gClass86B60Methods +0x050, IntermediateBase's
+`onDeinit` slot (IntermediateBase__Deinit's first call), overriding
+TaskCore__OnDeinit without an up-call. TaskCore__OnDeinit's own last step is
+the same call, `initArgs->unk0`'s +0x078 with `unk93` (and 0); this one makes
+it twice with the two 0xC-byte entries of D_80086DAC as the third argument.
+`handlerTable` was TaskCore's `initArgs` (IntermediateBaseInitArgs, +0x00C)
+all along; `&self->unk93` is TaskCore's `u8 unk93[3]`.

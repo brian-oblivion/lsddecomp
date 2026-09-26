@@ -43,7 +43,7 @@ constant after the call in either reading.
   only) inserted between `slot6C` and `slotD4`, and `slotF0`/`slot124`
   inserted between `slotD8` and `slot138`. `slotF0` here is `Class86B60`'s
   OWN vtable slot, distinct from `DreamSysViewMethods_3bb8c_c::slotF0`
-  established by `Class86B60__ShowTitleIcon`'s report -- same offset number on two
+  established by `Class86B60__Reset`'s report -- same offset number on two
   unrelated tables, not a conflict.
 - New type `Class86B60Unk4CObj_3bb8c_d` (self->unk4C's pointee, only
   `unk8` reached, an opaque value forwarded verbatim).

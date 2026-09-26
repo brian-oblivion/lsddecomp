@@ -28,7 +28,7 @@
 #include "TextRow.h"
 #include "TimImage.h"
 
-void Class86B60__Dtor(Class86B60 *self)
+void Class86B60__Finalize(Class86B60 *self)
 {
     if (self->saveCtrl != NULL) {
         self->saveCtrl->methods->release(self->saveCtrl);
@@ -37,7 +37,7 @@ void Class86B60__Dtor(Class86B60 *self)
     Get_vtable_TaskCore()->finalize((TaskCore *)self);
 }
 
-void Class86B60__ForwardIfTagB(Class86B60 *self, GenericHeaderObj_3bb8c_d *arg1, s32 arg2)
+void Class86B60__OnNotify(Class86B60 *self, GenericHeaderObj_3bb8c_d *arg1, s32 arg2)
 {
     Get_vtable_TaskCore()->onNotify((TaskCore *)self, arg1, arg2);
     if ((arg1->methods->header & 0xF) == 0xB) {
@@ -45,7 +45,7 @@ void Class86B60__ForwardIfTagB(Class86B60 *self, GenericHeaderObj_3bb8c_d *arg1,
     }
 }
 
-void Class86B60__ShowTitleIcon(Class86B60 *self)
+void Class86B60__Reset(Class86B60 *self)
 {
     self->unk34 = 0;
     self->unk2C = 0x190;
@@ -54,7 +54,7 @@ void Class86B60__ShowTitleIcon(Class86B60 *self)
     self->dreamSys->methods->getSetFlashbackSession(self->dreamSys, 0, 0);
 }
 
-void Class86B60__RegisterHandlers(Class86B60 *self)
+void Class86B60__OnDeinit(Class86B60 *self)
 {
     u32 i;
     u8 *entry;

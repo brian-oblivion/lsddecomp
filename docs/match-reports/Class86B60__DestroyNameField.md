@@ -15,7 +15,7 @@ void Class86B60__DestroyNameField(Class86B60 *self)
 }
 ```
 
-First attempt, byte-exact. Same shape as `Class86B60__Dtor` (this unit's
+First attempt, byte-exact. Same shape as `Class86B60__Finalize` (this unit's
 destructor): release an owned sub-object through the shared BasicClass-
 family `release` slot, then forward to the base class table. This one has
 no null check at all (unconditional release, no guard), and only one
@@ -24,7 +24,7 @@ sub-object.
 ## Struct changes (additive, `include/class_3bb8c.h`)
 
 - `Class86B60::nameField` -- new field, `GenericReleaseObj_3bb8c_d *`,
-  reusing the same release-only view established by `Class86B60__Dtor`.
+  reusing the same release-only view established by `Class86B60__Finalize`.
   Carved from the `pad0B0` gap (now `pad0B4`).
 - `BaseTaskCtorTable_3bb8c_c::slotDC` -- new slot, `void (*)(void *self)`.
 
@@ -34,7 +34,7 @@ None new.
 
 ## Naming (round 77, naming runner delta)
 
-Renamed `func_8004DC08` -> `Class86B60__DestroyNameField`. **Tier B**: Unconditionally releases `self->nameField` (the sub-object `Class86B60__CreateNameField` constructs) then forwards to the base class's own `slotDC`. Mirror-image counterpart to `CreateNameField`; not the class's own destructor (that is `Class86B60__Dtor`, a different base slot).
+Renamed `func_8004DC08` -> `Class86B60__DestroyNameField`. **Tier B**: Unconditionally releases `self->nameField` (the sub-object `Class86B60__CreateNameField` constructs) then forwards to the base class's own `slotDC`. Mirror-image counterpart to `CreateNameField`; not the class's own destructor (that is `Class86B60__Finalize`, a different base slot).
 
 ## Track 4 (2026-09-25, round 84, alpha)
 

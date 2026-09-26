@@ -817,7 +817,7 @@ struct DreamSys;
 
 /*
  * self->unkC's pointee. `unk0` is itself a pointer to a small vtable
- * object (`slot78`, reached by Class86B60__RegisterHandlers in a fixed 2-iteration loop
+ * object (`slot78`, reached by Class86B60__OnDeinit in a fixed 2-iteration loop
  * alongside a table walk); `unk4` is an opaque value forwarded verbatim
  * by Class86B60__EndMemcardSave as an argument to `Class86B60Methods::slot10`.
  */
@@ -827,7 +827,7 @@ typedef struct Class86B60UnkC0Obj_3bb8c_d Class86B60UnkC0Obj_3bb8c_d;
 
 struct Class86B60UnkC0ObjMethods_3bb8c_d {
     u8 pad000[0x078];
-    /* +0x078, Class86B60__RegisterHandlers's own call: `(childObj, &self->unk93,
+    /* +0x078, Class86B60__OnDeinit's own call: `(childObj, &self->unk93,
      * tableEntry)`, where `tableEntry` walks a fixed external table
      * (`D_80086DAC`, stride 0xC) starting fresh each call to this
      * function. */
@@ -839,7 +839,7 @@ struct Class86B60UnkC0Obj_3bb8c_d {
 };
 
 struct Class86B60UnkCObj_3bb8c_d {
-    Class86B60UnkC0Obj_3bb8c_d *unk0; /* +0x000, Class86B60__RegisterHandlers */
+    Class86B60UnkC0Obj_3bb8c_d *unk0; /* +0x000, Class86B60__OnDeinit */
     void *unk4;                        /* +0x004, Class86B60__EndMemcardSave: opaque, forwarded verbatim */
 };
 
@@ -871,7 +871,7 @@ struct Class86B60Unk60Obj_3bb8c_d {
  * release` in include/code_8220.h -- "virtual finalize, then free self")
  * on an object whose concrete class this unit does not otherwise need to
  * know. Local, independent view per this project's established
- * multiple-independent-views convention. Class86B60__Dtor calls this on both `Class86B60::unkA8` and
+ * multiple-independent-views convention. Class86B60__Finalize calls this on both `Class86B60::unkA8` and
  * `Class86B60::unkAC`.
  */
 typedef struct GenericReleaseMethods_3bb8c_d GenericReleaseMethods_3bb8c_d;
@@ -934,7 +934,7 @@ struct Class86B60UnkB0Obj_3bb8c_d {
 
 /*
  * Class86B60::unkAC's fuller shape -- shares the same `release` slot at
- * `+0x004` as the generic view (established by Class86B60__Dtor), but
+ * `+0x004` as the generic view (established by Class86B60__Finalize), but
  * Class86B60__EndMemcardSave also reaches `+0x070`. Same reasoning as
  * `Class86B60UnkB0Obj_3bb8c_d` above: kept a dedicated type rather than
  * assuming `unkA8` shares this fuller interface too, since nothing in
@@ -945,7 +945,7 @@ typedef struct Class86B60UnkACObj_3bb8c_d Class86B60UnkACObj_3bb8c_d;
 
 struct Class86B60UnkACObjMethods_3bb8c_d {
     u8 pad000[0x004];
-    void (*release)(Class86B60UnkACObj_3bb8c_d *self); /* +0x004, Class86B60__Dtor */
+    void (*release)(Class86B60UnkACObj_3bb8c_d *self); /* +0x004, Class86B60__Finalize */
     u8 pad008[0x06C - 0x008];
     /* +0x06C, Class86B60__BeginMemcardSave's own call: `(self, D_8008A9D0, &D_80086D6C,
      * self->unkC->unk4, self->unk10, self->unk14, self->unk48)` -- 7
@@ -981,7 +981,7 @@ struct Class86B60UnkACObj_3bb8c_d {
  * vtable header WORD (the full `s32` at the vtable's own `+0x000`), the
  * same "arg->methods->header" runtime-type-id shape already documented
  * project-wide. Distinct from a read of
- * only the LOW BYTE of the same word (a `lbu`, Class86AA0__DispatchLinkCommand) -- Class86B60__ForwardIfTagB loads and
+ * only the LOW BYTE of the same word (a `lbu`, Class86AA0__DispatchLinkCommand) -- Class86B60__OnNotify loads and
  * masks the FULL WORD (`lw` then `andi ..,0xF`), so a byte-typed
  * struct here would emit the wrong load width.
  */
@@ -1025,7 +1025,7 @@ struct Class86B60Methods {
      * later in the same function. */
     void (*slot60)(Class86B60 *self, s32 arg1);
     u8 pad064[0x06C - 0x064];
-    void (*slot6C)(Class86B60 *self, s32 arg1); /* +0x06C, Class86B60__ShowTitleIcon's own 2nd call, arg1 = 0xA */
+    void (*slot6C)(Class86B60 *self, s32 arg1); /* +0x06C, Class86B60__Reset's own 2nd call, arg1 = 0xA */
     u8 pad070[0x078 - 0x070];
     void (*slot78)(Class86B60 *self); /* +0x078, Class86B60__SetState's own last call, `self` only */
     void (*slot7C)(Class86B60 *self); /* +0x07C, Class86B60__SetState's own 2nd call, `self` only */
@@ -1037,7 +1037,7 @@ struct Class86B60Methods {
      * SAME call site with the same signature. */
     void (*slot94)(Class86B60 *self);
     u8 pad098[0x0D4 - 0x098];
-    /* +0x0D4, Class86B60__ShowTitleIcon's own first call, arg1 = &D_800114E8, arg2 = 0. */
+    /* +0x0D4, Class86B60__Reset's own first call, arg1 = &D_800114E8, arg2 = 0. */
     void (*slotD4)(Class86B60 *self, void *arg1, s32 arg2);
     void (*slotD8)(Class86B60 *self, void *arg1);      /* +0x0D8, Class86B60__Class86B60's own call, arg1 = &D_80086D44 */
     u8 pad0DC[0x0E0 - 0x0DC];
@@ -1047,7 +1047,7 @@ struct Class86B60Methods {
     u8 pad0E4[0x0F0 - 0x0E4];
     /* +0x0F0, Class86B60__SetState's own 3rd call: `(self, self->unk4C->unk8,
      * 1)`. Distinct from DreamSys's +0x0F0 (getSetFlashbackSession, see
-     * Class86B60__ShowTitleIcon's report) -- same offset number, unrelated table.
+     * Class86B60__Reset's report) -- same offset number, unrelated table.
      * Class86B60__CommitNameEntry (this round) also reaches this slot, forwarding an
      * `s32` (its own saved pre-overwrite copy of `self->unk58`) through
      * the SAME `void *arg1` parameter, cast at that call site rather than
@@ -1066,24 +1066,24 @@ struct Class86B60Methods {
     void (*slot12C)(Class86B60 *self); /* +0x12C, Class86B60__OnTagBValue's own first call, `self` only */
     void (*slot130)(Class86B60 *self); /* +0x130, Class86B60__Tick's `unk58==2` tail target */
     void (*slot134)(Class86B60 *self); /* +0x134, Class86B60__Tick's `unk58==3` tail target */
-    /* +0x138, Class86B60__ForwardIfTagB's forward target, only reached when its own
+    /* +0x138, Class86B60__OnNotify's forward target, only reached when its own
      * arg1's header-word low nibble == 0xB (a runtime-type-id gate) --
-     * called with all three of Class86B60__ForwardIfTagB's own parameters verbatim. */
+     * called with all three of Class86B60__OnNotify's own parameters verbatim. */
     void (*slot138)(Class86B60 *self, void *arg1, s32 arg2);
 };
 
 struct Class86B60 {
     Class86B60Methods *methods;    /* +0x000 */
     u8 pad004[0x00C - 0x004];
-    Class86B60UnkCObj_3bb8c_d *handlerTable; /* +0x00C, Class86B60__RegisterHandlers/Class86B60__EndMemcardSave.
+    Class86B60UnkCObj_3bb8c_d *handlerTable; /* +0x00C, Class86B60__OnDeinit/Class86B60__EndMemcardSave.
                                         RENAMED from unkC -- the fixed-entry table object
-                                        Class86B60__RegisterHandlers walks. */
+                                        Class86B60__OnDeinit walks. */
     void *unk10;                     /* +0x010, Class86B60__EndMemcardSave: opaque, forwarded verbatim */
     void *unk14;                     /* +0x014, Class86B60__BeginMemcardSave: opaque, forwarded verbatim to unkAC->methods->slot6C */
     u8 pad018[0x02C - 0x018];
-    s32 unk2C;                      /* +0x02C, Class86B60__ShowTitleIcon: set to 0x190 */
+    s32 unk2C;                      /* +0x02C, Class86B60__Reset: set to 0x190 */
     u8 pad030[0x034 - 0x030];
-    s32 unk34;                      /* +0x034, Class86B60__ShowTitleIcon: zeroed */
+    s32 unk34;                      /* +0x034, Class86B60__Reset: zeroed */
     /* +0x038, Class86B60__Tick: set to 0 on the `unk58==1` path and to the
      * literal 2 on the `unk58==4` path -- read by nothing else in this
      * unit. The literal 2 is the SAME constant `Class86B60__Tick` compares
@@ -1111,7 +1111,7 @@ struct Class86B60 {
     u8 pad05C[0x060 - 0x05C];
     Class86B60Unk60Obj_3bb8c_d *unk60; /* +0x060, Class86B60__RefreshViewValue */
     u8 pad064[0x093 - 0x064];
-    /* +0x093, Class86B60__RegisterHandlers: address-of only, forwarded as
+    /* +0x093, Class86B60__OnDeinit: address-of only, forwarded as
      * `Class86B60UnkC0ObjMethods_3bb8c_d::slot78`'s 2nd argument each
      * loop iteration; real extent beyond one byte unknown. */
     u8 unk93;
@@ -1122,21 +1122,21 @@ struct Class86B60 {
      * getSetFlashbackSession, getSetScreenShake, getCurrentDayAndYear,
      * clearNewGameFlag, getNewGameFlag and getSaveBlock). */
     struct DreamSys *dreamSys;
-    /* +0x0A8/+0x0AC, Class86B60__Dtor (this unit's destructor): two owned
+    /* +0x0A8/+0x0AC, Class86B60__Finalize (this unit's destructor): two owned
      * sub-objects, each released through their own shared `release` slot.
      * BOTH releases sit inside the SAME `unkAC != NULL` guard -- retail's
      * single branch skips over both calls together, not just the first;
      * there is no separate null check on `unkA8`. `unkAC` was previously
      * typed a bare `s32` from Class86B60__Class86B60's `zeroed` write alone, which
      * is consistent with either a scalar 0 or a null pointer -- this
-     * round's Class86B60__Dtor is what proves it is dereferenced through a
+     * round's Class86B60__Finalize is what proves it is dereferenced through a
      * vtable, so it is retyped a pointer here (same size, no layout
      * change). */
-    GenericReleaseObj_3bb8c_d *iconHandle; /* +0x0A8, Class86B60__Dtor: released iff unkAC != NULL.
+    GenericReleaseObj_3bb8c_d *iconHandle; /* +0x0A8, Class86B60__Finalize: released iff unkAC != NULL.
                                         RENAMED from unkA8 -- the `New_TimImage(D_800114F8)`
                                         return value (D_800114F8 = "CARD\FILEICN1.TIM"), see
                                         Class86B60__BeginMemcardSave. */
-    /* +0x0AC, Class86B60__Class86B60: zeroed; Class86B60__Dtor: guards both releases.
+    /* +0x0AC, Class86B60__Class86B60: zeroed; Class86B60__Finalize: guards both releases.
      * RETYPED from the minimal `GenericReleaseObj_3bb8c_d *` to the
      * dedicated `Class86B60UnkACObj_3bb8c_d *` -- Class86B60__EndMemcardSave reaches a
      * second slot (`+0x070`) on it. Same size, no layout change. */
@@ -1190,7 +1190,7 @@ extern s32 D_80086D44;
  * here. */
 extern s32 D_800114DC;
 
-/* Address-of only in this unit (Class86B60__ShowTitleIcon passes &D_800114E8 to
+/* Address-of only in this unit (Class86B60__Reset passes &D_800114E8 to
  * `Class86B60Methods::slotD4`). Placeholder s32 type since only the
  * address is taken here. */
 extern s32 D_800114E8;
@@ -1201,7 +1201,7 @@ extern s32 D_800114E8;
  * already emitted as a symbol). */
 extern const char D_800114F8[];
 
-/* Address-of only in this unit -- Class86B60__RegisterHandlers walks it with an
+/* Address-of only in this unit -- Class86B60__OnDeinit walks it with an
  * explicit 0xC-byte stride, passing each entry's address on to
  * `Class86B60UnkC0ObjMethods_3bb8c_d::slot78`, but never dereferences it
  * itself. Placeholder s32 type; real element layout unknown. */

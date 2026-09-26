@@ -33,7 +33,7 @@ SLPS_015.56`.
 ## Derivation
 
 - Lazy-init guard: `if (self->unkAC == NULL) { ... }`, the mirror image of
-  `Class86B60__Dtor`'s destructor guard on the same two fields
+  `Class86B60__Finalize`'s destructor guard on the same two fields
   (`iconHandle`/`unkAC`).
 - `New_TimImage(D_800114F8)` -- `New_TimImage` is already matched
   project-wide under many independent local arities/return types (see
