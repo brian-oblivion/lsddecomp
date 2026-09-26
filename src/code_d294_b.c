@@ -1,38 +1,13 @@
-/* code_d294_b -- the second carve of the SceneNode segment (see
- * include/code_d294.h's own banner and code_d294_c.c's file header for the
- * class-identity derivation: SceneNode is this game's POSITIONED 3D OBJECT
- * base class, MEASURED onto Psy-Q's GsDOBJ2/GsCOORDINATE2/GsCOORD2PARAM).
- *
- * Covers method-table slots +0x074 through +0x0B4 (tools/classtable.py
- * gSceneNodeMethods) -- the table's own LAST 17 slots. In ROM order: four more
- * self->unk10 bitfield accessors (the sibling family code_d294.c starts;
- * two renamed this round, `SceneNode__SetUseZ`/`Field9`, two
- * held back as `func_` -- proposed `Field0`/`Flag8` -- because their
- * symbol is comment-referenced from other units' own vtable census notes);
- * a rotation-matrix builder (`SceneNode__GetRotMatrix`, proposed
- * `SceneNode__GetRotMatrix`); a gated read-transform-notify chain
- * (`SceneNode__GetModelHull` -> `SceneNode__NotifyWithHull` ->
- * `SceneNode__TransformAndNotifyParents`); two vtable no-op stubs
- * (`SceneNode__OnPadEvent`/`D6AC`, kept `func_` per this class's own
- * `SceneNode__NoOpSlot5C` no-op precedent); a command dispatcher over the same
- * "attach" state (`SceneNode__DispatchLinkCommand`, proposed `SceneNode__DispatchLinkCommand`);
- * a proximity-attach attempt (`SceneNode__TryAttachNearby`, MATCHED round
- * 76) that hands off to a rotation compose-and-
- * apply step (`SceneNode__ComposeAndApplyRotation`), a corner-list AABB
- * overlap test (`SceneNode__CheckBoundsOverlap`, MATCHED round 73), and a
- * plane-classification test (`SceneNode__ClassifyAgainstPlanes`, MATCHED
- * round 76); a third no-op stub
- * (`SceneNode__NoOpSlotB0`); a parent-list notify walk (`SceneNode__NotifyTaggedParents`,
- * MATCHED round 76); this unit's own
- * vtable getter (`GetSceneNodeMethods`, proposed `GetSceneNodeMethods`,
- * cross-unit); and a small free-function pair for segment/AABB clipping
- * (`ClipSegmentToBox`/`BisectSegmentToBox`, both MATCHED, no `self` at
- * all) that `SceneNode__CheckBoundsOverlap` and `SceneNode__ClassifyAgainstPlanes` build on.
- *
- * Every function in this unit is matched. (`SceneNode__CheckBoundsOverlap`
- * matched round 73; `SceneNode__TryAttachNearby`,
- * `SceneNode__ClassifyAgainstPlanes` and `SceneNode__NotifyTaggedParents`
- * round 76.)
+/*
+ * code_d294_b -- SceneNode (include/SceneNode.h), part 2 of 3: slots +0x074
+ * to +0x0B4. The last four attribute setters; GetRotMatrix; the hull
+ * notification chain (NotifyWithHull fills the model's TmdHull through
+ * GetModelHull and hands it to TransformAndNotifyParents); the empty
+ * onPadEvent/update defaults; DispatchLinkCommand and the proximity test it
+ * runs (TryAttachNearby, with ComposeAndApplyRotation, CheckBoundsOverlap
+ * and ClassifyAgainstPlanes); NotifyTaggedParents; the table getter; and
+ * the free segment-against-box clippers the bounds tests use
+ * (ClipSegmentToBox, BisectSegmentToBox).
  */
 
 #include "common.h"

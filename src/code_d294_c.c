@@ -1,22 +1,10 @@
-/* code_d294_c -- the third and last carve of the SceneNode segment.
- *
- * SceneNode (method table gSceneNodeMethods, class tag 4) is this game's
- * POSITIONED 3D OBJECT base class. Every instance embeds a Psy-Q `GsDOBJ2`
- * at +0x10 (attribute / coord2 / tmd) and owns the `GsCOORDINATE2` that
- * GsDOBJ2 points at -- MEASURED, see the "PSY-Q IDENTIFICATION" note in
- * include/code_d294.h, which pins SceneNodeSub14 == GsCOORDINATE2 and
- * SceneNodeSub44 == GsCOORD2PARAM field by field. DreamSys, Entity and the
- * class_3bb8c object family all carry that same layout, which is why this
- * unit's helpers are called from a dozen other units.
- *
- * NONE of this unit's functions is a vtable slot (`tools/classtable.py
- * gSceneNodeMethods` stops at SceneNode__NotifyTaggedParents). It is the class's FREE-FUNCTION tail:
- * five instance helpers that dispatch through the table (`SceneNode__*`)
- * and eight standalone leaves -- vector, matrix, fixed-point, bounding-box
- * and bitfield primitives -- that the rest of the game calls by symbol.
- *
- * Every function in this unit is now decompiled; SceneNode__RaycastVertical, the last
- * INCLUDE_ASM, matched in round 57 (docs/match-reports/SceneNode__RaycastVertical.md).
+/*
+ * code_d294_c -- SceneNode (include/SceneNode.h), part 3 of 3: no slots.
+ * The class's non-virtual methods (RotateLocalVector, LocalOffsetToWorldPos,
+ * RaycastVertical, GetRotationDegrees, FaceTarget, LinkModel, UnlinkModel)
+ * and the free helpers the rest of the game calls by symbol: vector and
+ * matrix array transforms, RatioToFixed12, CalcBoxOutcode and
+ * GetSetBitField, the packed-field accessor behind the attribute setters.
  */
 
 #include "common.h"
@@ -118,13 +106,7 @@ void SceneNode__UnlinkModel(SceneNode *self) {
 
 extern void SubVec3S16(s32 *dest, s16 *from, s16 *to);
 
-/* MATCHED round 57 (revisit) -- see docs/match-reports/SceneNode__RaycastVertical.md.
- *
- * Kept as `SceneNode__RaycastVertical` on purpose (track 3, tier C): the whole second
- * half hangs off `TmdModel__RaycastFaces` (code_fa50, a segment cast against
- * every face of the model; round 82 found it game code, not Psy-Q), and no
- * verb for the function as a whole has been established.
- * What it DOES is settled. First it maintains the object's world
+/* First it maintains the object's world
  * translation: `unk14->unk38` is GsCOORDINATE2.workm.t, and the guarded
  * block rewrites it as this object's own coord.t plus every owner's
  * coord.t, walking the `self->unkC` owner list. Then it takes the target

@@ -1,18 +1,12 @@
 /*
- * code_d294 -- 0xD294.., the first 20 methods of SceneNode (method table
- * gSceneNodeMethods, class tag 4), a BasicClass subclass and the base of
- * every class table whose tag nibble is 4 (DreamSys, Entity, BaseObjO and
- * about a dozen more, per tools/classtable.py --scan). An instance embeds a libgs GsDOBJ2 at +0x10
- * (attribute, coord2, tmd) and owns its GsCOORDINATE2 and GsCOORD2PARAM.
- * This slice holds: New / ctor / Finalize; the BasicClass child-list
- * overrides, which link or unlink a tag-9 model child as it is added or
- * removed; OnNotify, which fans a notification out by the sender's tag;
- * Reset (identity transform); UpdateRotation / UpdateScale (set or
- * accumulate a ratio triple into the GsCOORD2PARAM); attach to and detach
- * from a parent's coordinate; and five setters over GsDOBJ2.attribute.
- * The class continues in code_d294_b (slots +0x074..+0x0B4) and its free
- * helpers in code_d294_c. All 20 functions are matched. Named round 71;
- * tiers and evidence in each function's match report.
+ * code_d294 -- SceneNode (include/SceneNode.h), part 1 of 3: slots +0x000
+ * to +0x070. New, the ctor (allocates the GsCOORDINATE2 and GsCOORD2PARAM)
+ * and Finalize; the BasicClass child-list overrides, which link or unlink a
+ * TmdModel child as it is added or removed; OnNotify, which dispatches on
+ * the sender's class id; Reset (identity transform); UpdateRotation and
+ * UpdateScale (set or add three Ratio16s into the GsCOORD2PARAM); attach to
+ * and detach from a parent's coordinate; and the first five setters over
+ * GsDOBJ2.attribute. Part 2 is code_d294_b.c, part 3 code_d294_c.c.
  */
 #include "common.h"
 #include "code_d294.h"
@@ -20,7 +14,7 @@
 /* The low nibble of a class table's header word is its class tag. */
 #define CLASS_TAG_MASK 0xF
 #define TAG_PAD 2        /* gPadMethods, PadMethods (include/Pad.h) */
-#define TAG_SCENENODE 4 /* this class and every subclass of it */
+#define TAG_SCENENODE 4  /* this class and every subclass of it */
 #define TAG_CLASS6EF50 5 /* gFrameClockMethods */
 #define TAG_TMDMODEL \
     9 /* gTmdModelMethods (include/TmdModel.h): the object SceneNode__LinkModel links */
