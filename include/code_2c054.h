@@ -55,8 +55,7 @@ struct TaskTextObj {
 /* The viewport (TaskCore::viewport, `BasicClass *` in IntermediateBase.h) is a
  * Viewport: TaskCore__OnInit/OnDeinit cast it to include/Viewport.h's type.
  * Its local view here (StreamTaskUnk18Obj) was merged there in round 85.
- * StreamTask::player (`BasicClass *` in StreamTask.h) is a MoviePlayer:
- * code_2c054.c's PLAYER() casts it to include/MoviePlayer.h's type. Its local
+ * StreamTask::player is a MoviePlayer (include/MoviePlayer.h); its local
  * view here (StreamTaskUnkB4Obj) was merged there in round 89. */
 
 

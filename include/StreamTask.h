@@ -18,7 +18,7 @@
  * GraphRoom and cinematic streams): New_StreamTask(NULL, NULL, NULL, NULL),
  * optionally setFrameBound / setSkipOnConfirm(0), then init with the stream,
  * then release. The player's slots as this class calls them
- * (include/MoviePlayer.h; code_2c054.c's PLAYER() casts `player` to it):
+ * (include/MoviePlayer.h):
  * +0x040 play, +0x048 advance, +0x04C abort, +0x06C setAutoPlay, and
  * +0x004 release.
  *
@@ -104,7 +104,7 @@ struct StreamTask {
     TASKCORE_FIELDS(StreamTaskMethods);
     /* +0x0A4 */ s32 playDone;          /* OnInit: 0; Update: the player's Advance until nonzero */
     /* +0x0A8 */ StreamTaskInitData initData; /* the ctor's fifth argument or the default */
-    /* +0x0B4 */ BasicClass *player;    /* New_MoviePlayer(GetDefaultStreamTaskInitData(), 0, 0); finalize releases it */
+    /* +0x0B4 */ struct MoviePlayer *player; /* New_MoviePlayer(GetDefaultStreamTaskInitData(), 0, 0); finalize releases it */
     /* +0x0B8 */ s32 streamName;        /* Init's; the player's Play name. ctor: 0 */
     /* +0x0BC */ s32 streamGroup;       /* Init's (GetStreamGroupForType, or -1); Play's second argument */
     /* +0x0C0 */ s32 autoPlay;          /* Init's (every caller 1); the player's setAutoPlay (MoviePlayer::autoPlay, +0x068), which Play tests to MarkPlaying at once */
