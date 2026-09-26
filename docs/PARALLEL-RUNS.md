@@ -362,7 +362,10 @@ git rev-parse -q --verify MERGE_HEAD >/dev/null && echo "MERGE IN PROGRESS"
 A green build on top of `MERGE IN PROGRESS` means nothing (CLAUDE.md, fourth
 way a score lies). Resolve first, verify after. Expect `modify/delete`
 conflicts on report files the head stubbed and a runner then wrote; take the
-runner's. Then, for every function the runner attempted, confirm its report
+runner's. Parallel `rename.py` runs conflict in the symbols file: resolve
+per ADDRESS against the merge base (`git show :1:<file>`), each side keeping
+the lines it changed; an address both sides changed is a real conflict
+(round 87, eleven merges, none). Then, for every function the runner attempted, confirm its report
 no longer carries an `-- ASSIGNABLE` marker (`grep -l -- '-- ASSIGNABLE'
 docs/match-reports/<func>.md`); a spent marker left in place re-ranks the
 next round's queue on ground that is no longer fresh.
