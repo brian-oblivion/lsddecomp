@@ -10,8 +10,8 @@
 > function is still game code and still MATCHED; it simply lives in a
 > different file. Seven of `code_2cc8c_e`'s functions turned out to be Sony's
 > and are now linked from SDK objects, which left this one wedged between
-> `o` segments -- so it has its own one-function unit, **`code_2cc8c_e1`**
-> (`src/code_2cc8c_e1.c`). The body below is unchanged and still compiles
+> `o` segments -- so it has its own one-function unit, **`libgs_gs_124`**
+> (`src/libgs_gs_124.c`). The body below is unchanged and still compiles
 > byte-exact. `include/code_2cc8c.h` still declares it for its one caller,
 > but that new file does NOT include the header, so the two are no longer
 > cross-checked by the compiler and must be kept in step by hand.
@@ -42,7 +42,7 @@ shows.
 
 `GsOUT_PACKET_P` is Sony's global (pinned; not renamed -- CLAUDE.md/FINISHING-PLAN
 track 3, "do not rename a Sony symbol"). Referenced from two units
-(`code_2cc8c_e1.c` here, `code_8220_b.c`), so it is a genuine cross-unit
+(`libgs_gs_124.c` here, `code_8220_b.c`), so it is a genuine cross-unit
 global, not unit-static -- moot here since it already carries its Sony name.
 
 ### Sibling note

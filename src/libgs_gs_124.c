@@ -1,5 +1,5 @@
 /*
- * code_2cc8c_e1 -- ONE function, Sony's GsSetWorkBase (libgs/gs_124), 4 words,
+ * libgs_gs_124 -- ONE function, Sony's GsSetWorkBase (libgs/gs_124), 4 words,
  * 0x303E4..0x303F4 (vram 0x8003FBE4..0x8003FBF4).
  *
  * SONY CODE, written as C. Round 78's head identified it under FINISHING-PLAN
