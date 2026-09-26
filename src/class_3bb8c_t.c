@@ -58,7 +58,7 @@ void VariantSprite__NoOpSlotBC(void) {}
 
 void VariantSprite__NoOpSlotC0(void) {}
 
-void VariantSprite__func_57f50(void) {}
+void VariantSprite__NoOpSlotC4(void) {}
 
 VariantSpriteMethods *GetVariantSpriteMethods(void) {
     return &gVariantSpriteMethods;

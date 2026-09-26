@@ -44,7 +44,7 @@ typedef struct VariantSpriteMethods VariantSpriteMethods;
     SPRITE_SLOTS(Self, CtorParams);                                                                \
     /* +0x0BC */ void (*slotBC)(void); /* VariantSprite__NoOpSlotBC, empty; never called */           \
     /* +0x0C0 */ void (*slotC0)(void); /* VariantSprite__NoOpSlotC0, empty; never called */           \
-    /* +0x0C4 */ void (*slotC4)(void)  /* VariantSprite__func_57f50, empty; never called */
+    /* +0x0C4 */ void (*slotC4)(void)  /* VariantSprite__NoOpSlotC4, empty; never called */
 /* clang-format on */
 
 /* clang-format off */
@@ -76,6 +76,6 @@ void VariantSprite__UpdateScale(VariantSprite *self, s32 set, s16 *ratios);
 void VariantSprite__Update(VariantSprite *self, void *sender, s32 event);
 void VariantSprite__NoOpSlotBC(void);
 void VariantSprite__NoOpSlotC0(void);
-void VariantSprite__func_57f50(void);
+void VariantSprite__NoOpSlotC4(void);
 
 #endif
