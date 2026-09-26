@@ -80,6 +80,6 @@ Why `MoodCueNN`: the function's address sits in `gEntityMoodHandlerTable` row 36
 
 `EntityMethods::slot144` -- this unit's `slot144(this, this->unk94) < 0x7000`
 is a bare distance-threshold check, consistent with the existing tier-B
-proposal `distanceToRegion` (occupant `Entity__DistanceToRegion`,
+proposal `distanceToRegion` (occupant `Entity__DistanceToPeer`,
 `Entity__MoodCue11.md`, Entity_d). Not re-proposed here, just corroborated
 with a fourth independent call site.

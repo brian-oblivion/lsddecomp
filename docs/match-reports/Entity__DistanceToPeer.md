@@ -1,4 +1,6 @@
-# Entity__DistanceToRegion
+# Entity__DistanceToPeer
+
+> Renamed from `Entity__DistanceToRegion` on 2026-09-26 (tools/rename.py). Address 0x8005d7fc.
 
 > Renamed from `func_8005D7FC` on 2026-09-19 (tools/rename.py). Address 0x8005d7fc.
 
@@ -29,7 +31,7 @@ return (dz >= 0) ? (dx + dz) : (dx - dz);
 ## Final C
 
 ```c
-s32 Entity__DistanceToRegion(Entity *this, EntityRegionRef *region) {
+s32 Entity__DistanceToPeer(Entity *this, EntityRegionRef *region) {
     EntityRegionSlot *range;
     EntityPos *pos;
     s32 dx;

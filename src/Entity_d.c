@@ -12,7 +12,7 @@
  * exception, `Entity__func_80060710`, is not itself a table row -- it is a
  * private helper Entity__MoodCue43/44 both call directly (`jal`, not
  * through any vtable or table), tier C because its own purpose beyond
- * "sometimes bump scale, sometimes queue a delayed addVec14" is not
+ * "sometimes bump scale, sometimes queue a delayed addTranslation" is not
  * established.
  *
  * `Entity__MoodCue45` is a real, matched, genuinely empty function (`{}`,
@@ -25,17 +25,6 @@
 
 extern s16 sScaleTemplateZDenom;
 
-/* Still uncarved (asm/Entity_e.s). Called directly by name (jal), not
- * through a vtable -- typed from this function's own call site: a0=this,
- * a1=the mood-dispatch "out" struct, a2=0xBB8, a3=0x1F4, and the LITERAL
- * -0x100 goes on the STACK as the 5th argument (not into a2, despite being
- * computed first in the instruction stream -- the compiler filled a2/a3
- * from the later two literals and left the stack slot for the first).
- * Return value is unused at this, its only known call site, so void is a
- * safe read regardless of the real return type (same caveat CLAUDE.md notes
- * for every other such wrapper in this unit). */
-extern void Entity__StepYawInWindowsThenDeactivate(Entity *this, EntityMoodHandlerArg *out, s32 arg2, s32 arg3, s32 arg4);
-
 /* Data tables reached with a raw pointer by this unit's mood-dispatch
  * handlers -- same convention as Entity_c.c's own SCALE_Y2/SCALE_SIX/etc
  * externs (separate local view per translation unit, not shared via the
@@ -43,7 +32,7 @@ extern void Entity__StepYawInWindowsThenDeactivate(Entity *this, EntityMoodHandl
 extern u8 ROTATION_YAW_PLUS9[];
 extern u8 ROTATION_YAW_MINUS9[];
 extern u8 SCALE_X3[];
-extern u8 TRANSLATE_Z_MINUS256[];
+extern Vec3_d294 TRANSLATE_Z_MINUS256[];
 extern u8 SCALE_Y2[];
 extern u8 SCALE_SIX[];
 extern u8 ROTATION_YAW_PLUS180[];
@@ -60,7 +49,7 @@ void Entity__MoodCue39(Entity *this, EntityMoodHandlerArg *out) {
     s32 r;
 
     if (this->moodTimer == 0) {
-        r = this->target->methods->slot1A0(this->target, 0) % 3;
+        r = ((Unk94Obj *)this->peer)->methods->slot1A0((Unk94Obj *)this->peer, 0) % 3;
         if (r == 0) {
             if (rand() % 3 != 0) {
                 goto skip48;
@@ -78,7 +67,7 @@ skip48:
     if (rand() % 12 == 0) {
         this->methods->stopTod(this);
     } else if (rand() % 6 == 0) {
-        this->methods->playTod(this);
+        ((EntityPlayTodFn)this->methods->playTod)(this);
     }
 }
 
@@ -104,9 +93,9 @@ void Entity__MoodCue40(Entity *this, EntityMoodHandlerArg *out) {
     if (table != NULL) {
         this->methods->updateRotation(this, 0, table);
     }
-    this->methods->slotD0(this, -0x1E, 0);
-    if (this->unk28 != 0) {
-        this->methods->slotCC(this, -0xC8, 0);
+    this->methods->moveLocalZOrFindLink(this, -0x1E, 0);
+    if (this->linkTarget != 0) {
+        this->methods->moveLocalY(this, -0xC8, 0);
     }
 }
 
@@ -115,13 +104,13 @@ void Entity__MoodCue41(Entity *this, EntityMoodHandlerArg *out) {
     s16 *tablePtr;
 
     if (this->moodTimer == 0) {
-        this->moodState = rand() % 5 + 0xA;
+        this->state = rand() % 5 + 0xA;
     }
-    if (this->moodState < 0xE || this->moodTimer < 0x140) {
+    if (this->state < 0xE || this->moodTimer < 0x140) {
         Entity__StepYawInWindowsThenDeactivate(this, out, 0xBB8, 0x1F4, -0x100);
         return;
     }
-    if (this->moodState == 0xE) {
+    if (this->state == 0xE) {
         if ((this->moodTimer & 3) == 0) {
             rv = rand();
             tablePtr = &sScaleTemplateZDenom;
@@ -136,9 +125,9 @@ void Entity__MoodCue42(Entity *this, EntityMoodHandlerArg *out) {
 
     if (this->moodTimer < 0x14) {
         this->methods->stopTod(this);
-        this->methods->slotC4(this, -0x1E, 0);
+        this->methods->moveLocalZ(this, -0x1E, 0);
     } else if (this->moodTimer == 0x14) {
-        this->methods->playTod(this);
+        ((EntityPlayTodFn)this->methods->playTod)(this);
         out->unk10 = 0;
         out->unk1C = 5;
     } else {
@@ -163,7 +152,7 @@ void Entity__MoodCue43(Entity *this, EntityMoodHandlerArg *out) {
     }
     if (this->moodTimer >= 0x141) {
         a1val = (rand() & 1) ? -0x3C : 0x3C;
-        this->methods->slotC8(this, a1val, 0);
+        this->methods->moveLocalX(this, a1val, 0);
         r2 = rand();
         table = ROTATION_YAW_PLUS9;
         if ((r2 & 3) != 0) {
@@ -185,7 +174,7 @@ void Entity__MoodCue44(Entity *this, EntityMoodHandlerArg *out) {
         out->unk1C = 3;
     }
     if ((u32)(this->moodTimer - 0x12C) < 0x14) {
-        this->methods->slotC4(this, -0x3C, 0);
+        this->methods->moveLocalZ(this, -0x3C, 0);
     } else if ((u32)(this->moodTimer - 0x141) < 0x13) {
         this->methods->updateRotation(this, 0, ROTATION_YAW_MINUS9);
     } else if (this->moodTimer >= 0x141) {
@@ -194,7 +183,7 @@ void Entity__MoodCue44(Entity *this, EntityMoodHandlerArg *out) {
         if ((r1 & 1) != 0) {
             a1val = 0x80;
         }
-        this->methods->slotC8(this, a1val, 1);
+        this->methods->moveLocalX(this, a1val, (void *)1);
         r2 = rand();
         table = ROTATION_YAW_PLUS9;
         if ((r2 & 3) != 0) {
@@ -212,11 +201,11 @@ void Entity__func_80060710(Entity *this) {
         if (r >= 8) {
             this->methods->updateScale(this, 1, SCALE_X3);
         } else if (r >= 5) {
-            this->moodState = 0xA;
+            this->state = 0xA;
         }
     }
-    if (this->moodState == 0xA && this->moodTimer >= 0xC9) {
-        this->methods->addVec14(this, TRANSLATE_Z_MINUS256);
+    if (this->state == 0xA && this->moodTimer >= 0xC9) {
+        this->methods->addTranslation(this, TRANSLATE_Z_MINUS256);
     }
 }
 
@@ -227,7 +216,7 @@ void Entity__MoodCue46(Entity *this, EntityMoodHandlerArg *out) {
     s32 r;
 
     if (this->moodTimer == 0) {
-        r = this->target->methods->slot1A0(this->target, 0) % 3;
+        r = ((Unk94Obj *)this->peer)->methods->slot1A0((Unk94Obj *)this->peer, 0) % 3;
         if (r == 0) {
             if (rand() % 3 != 0) {
                 goto skip48;
@@ -242,34 +231,34 @@ skip48:
         out->unk10 = 0;
         out->unk1C = 0x12;
     }
-    Class6B5CC__FaceTarget((Class6B5CC *)this, (Class6B5CC *)this->target, 1, 0, 0);
+    Class6B5CC__FaceTarget((Class6B5CC *)this, (Class6B5CC *)this->peer, 1, 0, 0);
 }
 
 void Entity__MoodCue47(Entity *this) {
     if (this->targetReached == 0) {
         return;
     }
-    if (this->moodState == 0) {
-        this->moodState = 0xC;
+    if (this->state == 0) {
+        this->state = 0xC;
         this->moodTimer = 0;
         return;
     }
-    if (this->moodState == 0xC) {
+    if (this->state == 0xC) {
         if (this->moodTimer < 0x1E) {
-            if (this->target->methods->slot100(this->target) != 0) {
-                this->target->methods->slot130(this->target, 0);
+            if (((Unk94Obj *)this->peer)->methods->slot100((Unk94Obj *)this->peer) != 0) {
+                ((Unk94Obj *)this->peer)->methods->slot130((Unk94Obj *)this->peer, 0);
                 this->moodTimer = 0;
-                this->moodState = 0xB;
+                this->state = 0xB;
             }
         } else {
             this->methods->notifyParents(this, 0xB);
-            this->moodState = 0xA;
+            this->state = 0xA;
         }
-    } else if (this->moodState == 0xB) {
+    } else if (this->state == 0xB) {
         if (this->moodTimer == 0x64) {
             this->methods->notifyParents(this, 0xC);
         } else {
-            this->target->methods->slotCC(this->target, -0x64, 0);
+            ((Unk94Obj *)this->peer)->methods->slotCC((Unk94Obj *)this->peer, -0x64, 0);
         }
     }
 }
@@ -279,14 +268,14 @@ void Entity__MoodCue48(Entity *this, EntityMoodHandlerArg *out) {
     EntityMethods *methods;
 
     if (this->todFrame == 0x26) {
-        Class6B5CC__FaceTarget((Class6B5CC *)this, (Class6B5CC *)this->target, 1, 0, 0);
+        Class6B5CC__FaceTarget((Class6B5CC *)this, (Class6B5CC *)this->peer, 1, 0, 0);
         out->unk10 = this->methods->getProximityRatio(this);
         out->unk1C = 6;
     }
     methods = this->methods;
     a1val = (this->moodTimer % 10 < 5) ? -0x1E : 0x1E;
-    methods->slotCC(this, a1val, 0);
-    this->methods->slotC4(this, -0x1E, 1);
+    methods->moveLocalY(this, a1val, 0);
+    this->methods->moveLocalZ(this, -0x1E, (void *)1);
 }
 
 void Entity__MoodCue49(Entity *this, EntityMoodHandlerArg *out) {
@@ -300,31 +289,31 @@ void Entity__MoodCue49(Entity *this, EntityMoodHandlerArg *out) {
         out->unk44 = 4;
     }
     if (this->targetReached != 0) {
-        if (this->moodState == 0) {
-            this->moodState = 0xA;
+        if (this->state == 0) {
+            this->state = 0xA;
             this->moodTimer = 0;
-        } else if (this->moodState == 0xA) {
+        } else if (this->state == 0xA) {
             if (this->moodTimer == 0xA) {
                 this->methods->notifyParents(this, 0xA);
-            } else if (this->target->methods->slot100(this->target) != 0) {
-                methods94 = this->target->methods;
-                a1 = this->unk0C ? (u8 *)this->unk14 + 0x38 : NULL;
-                methods94->slotB8(this->target, a1);
-                this->target->methods->slot44(this->target, 1, ROTATION_YAW_MINUS90);
-                this->target->methods->slot130(this->target, 0);
+            } else if (((Unk94Obj *)this->peer)->methods->slot100((Unk94Obj *)this->peer) != 0) {
+                methods94 = ((Unk94Obj *)this->peer)->methods;
+                a1 = this->parent ? this->coord2->unk38 : NULL;
+                methods94->slotB8((Unk94Obj *)this->peer, a1);
+                ((Unk94Obj *)this->peer)->methods->slot44((Unk94Obj *)this->peer, 1, ROTATION_YAW_MINUS90);
+                ((Unk94Obj *)this->peer)->methods->slot130((Unk94Obj *)this->peer, 0);
                 this->moodTimer = 0;
-                this->moodState = 0xB;
+                this->state = 0xB;
             }
-        } else if (this->moodState == 0xB) {
-            methods94 = this->target->methods;
-            a1 = this->unk0C ? (u8 *)this->unk14 + 0x38 : NULL;
-            methods94->slotB8(this->target, a1);
+        } else if (this->state == 0xB) {
+            methods94 = ((Unk94Obj *)this->peer)->methods;
+            a1 = this->parent ? this->coord2->unk38 : NULL;
+            methods94->slotB8((Unk94Obj *)this->peer, a1);
             if (this->moodTimer == 0x64) {
                 this->methods->notifyParents(this, 0xA);
             }
         }
     }
-    this->methods->slotC4(this, -0x100, 0);
+    this->methods->moveLocalZ(this, -0x100, 0);
 }
 
 void Entity__MoodCue50(Entity *this, EntityMoodHandlerArg *out) {
@@ -337,17 +326,17 @@ void Entity__MoodCue50(Entity *this, EntityMoodHandlerArg *out) {
         }
     } else {
         this->methods->deactivate(this);
-        this->moodState = 1;
+        this->state = 1;
     }
 }
 
 void Entity__MoodCue51(Entity *this, EntityMoodHandlerArg *out) {
     void *table;
 
-    if (this->moodTimer == 0 && rand() % 5 == 0 && this->moodState == 0) {
+    if (this->moodTimer == 0 && rand() % 5 == 0 && this->state == 0) {
         this->methods->updateScale(this, 1, SCALE_SIX);
-        this->methods->slotCC(this, 0x320, 0);
-        this->moodState = 0xB;
+        this->methods->moveLocalY(this, 0x320, 0);
+        this->state = 0xB;
     }
     table = NULL;
     if (out->unk4 % 5 == 0) {
@@ -366,7 +355,7 @@ void Entity__MoodCue51(Entity *this, EntityMoodHandlerArg *out) {
     if (table != NULL) {
         this->methods->updateRotation(this, 0, table);
     }
-    this->methods->slotC4(this, -0x50, 1);
+    this->methods->moveLocalZ(this, -0x50, (void *)1);
 }
 
 void Entity__MoodCue52(Entity *this, EntityMoodHandlerArg *out) {
@@ -383,9 +372,9 @@ void Entity__MoodCue52(Entity *this, EntityMoodHandlerArg *out) {
     } else {
         this->methods->deactivate(this);
         out->unk30 = 0x1E;
-        this->moodState = 1;
+        this->state = 1;
     }
-    this->methods->slotD0(this, -0x200, 0);
+    this->methods->moveLocalZOrFindLink(this, -0x200, 0);
 }
 
 void Entity__MoodCue55(Entity *this, EntityMoodHandlerArg *out) {
@@ -410,7 +399,7 @@ void Entity__MoodCue55(Entity *this, EntityMoodHandlerArg *out) {
 
 void Entity__MoodCue56(Entity *this) {
     if (this->moodTimer == 0) {
-        this->methods->slotCC(this, -0xC8, 0);
+        this->methods->moveLocalY(this, -0xC8, 0);
     }
 }
 
@@ -418,14 +407,14 @@ void Entity__MoodCue57(Entity *this, EntityMoodHandlerArg *out) {
     s32 mood;
 
     if (this->moodTimer == 0) {
-        this->moodState = rand() % 3;
-        if (this->moodState == 0) {
+        this->state = rand() % 3;
+        if (this->state == 0) {
             this->methods->stopTod(this);
-            this->methods->slotCC(this, 0x1800, 0);
+            this->methods->moveLocalY(this, 0x1800, 0);
         }
     }
     out->unk10 = this->methods->getProximityRatio(this);
-    if (this->moodState != 0) {
+    if (this->state != 0) {
         mood = this->todFrame;
         if (mood < 0x1E) {
             out->unk1C = 0xC;
@@ -436,9 +425,9 @@ void Entity__MoodCue57(Entity *this, EntityMoodHandlerArg *out) {
             out->unk44 = 0x16;
             out->unk48 = -2;
         } else if (mood == 0x30) {
-            if (Entity__IsNearTarget(this, &this->unk14->x, 0xF, 0xA)) {
+            if (Entity__IsNearTarget(this, &this->coord2->tx, 0xF, 0xA)) {
                 if (Entity__GetOrCreateUnk100(this, NULL, NULL, (void *)0xA, 0) != NULL) {
-                    this->unk100->methods->startFadeDown(this->unk100, (BasicClass *)this->companion2, 4, 0);
+                    this->unk100->methods->startFadeDown(this->unk100, (BasicClass *)this->ticker, 4, 0);
                 }
                 if (rand() & 1) {
                     this->methods->notifyParents(this, 0xB);
@@ -446,18 +435,18 @@ void Entity__MoodCue57(Entity *this, EntityMoodHandlerArg *out) {
             }
         } else if (mood == 0x3B) {
             this->methods->deactivate(this);
-            this->moodState = 1;
+            this->state = 1;
         }
         return;
     }
     out->unk1C = 0xC;
     out->unk20 = -1;
-    this->methods->slotC4(this, -0x200, 0);
+    this->methods->moveLocalZ(this, -0x200, 0);
     if ((u32)(this->moodTimer - 0x80) < 0xC2) {
-        this->methods->slotCC(this, -0x80, 0);
+        this->methods->moveLocalY(this, -0x80, 0);
     } else if (this->moodTimer == 0x142) {
-        this->methods->playTod(this);
-        this->moodState = 1;
+        ((EntityPlayTodFn)this->methods->playTod)(this);
+        this->state = 1;
     }
 }
 
@@ -465,10 +454,10 @@ void Entity__MoodCue58(Entity *this, EntityMoodHandlerArg *out) {
     if (this->moodTimer == 0) {
         out->unk10 = 0;
         out->unk1C = 0xC;
-        if (this->target->methods->slot200(this->target) == 6) {
-            this->moodState = 0xB;
+        if (((Unk94Obj *)this->peer)->methods->slot200((Unk94Obj *)this->peer) == 6) {
+            this->state = 0xB;
         } else if (rand() % 3 == 0) {
-            this->moodState = 0xC;
+            this->state = 0xC;
         }
     }
     if (out->unk4 % 100 == 0) {
@@ -476,31 +465,31 @@ void Entity__MoodCue58(Entity *this, EntityMoodHandlerArg *out) {
         out->unk1C = 0xC;
         out->unk20 = -1;
     }
-    if (this->moodState == 0xB) {
-        if (this->methods->distanceToRegion(this, this->target) < 0x400) {
-            this->target->methods->slot130(this->target, 0);
-            this->moodState = 0xD;
+    if (this->state == 0xB) {
+        if (this->methods->distanceToPeer(this, this->peer) < 0x400) {
+            ((Unk94Obj *)this->peer)->methods->slot130((Unk94Obj *)this->peer, 0);
+            this->state = 0xD;
             this->moodTimer = 0;
         }
-    } else if (this->moodState == 0xC) {
-        if (this->methods->distanceToRegion(this, this->target) < 0x400) {
+    } else if (this->state == 0xC) {
+        if (this->methods->distanceToPeer(this, this->peer) < 0x400) {
             this->methods->stopTod(this);
-            this->moodState = 0xE;
+            this->state = 0xE;
             this->moodTimer = 0;
         }
     }
-    if (this->moodState == 0xD) {
+    if (this->state == 0xD) {
         if (this->moodTimer < 0x32) {
-            this->target->methods->slotCC(this->target, -0x14, 0);
+            ((Unk94Obj *)this->peer)->methods->slotCC((Unk94Obj *)this->peer, -0x14, 0);
         } else if (this->moodTimer < 0x1F4) {
-            this->target->methods->slotC8(this->target, (this->moodTimer % 40 < 0x14) ? -5 : 5, 0);
+            ((Unk94Obj *)this->peer)->methods->slotC8((Unk94Obj *)this->peer, (this->moodTimer % 40 < 0x14) ? -5 : 5, 0);
         } else if (this->moodTimer == 0x1F4) {
             this->methods->notifyParents(this, 0xC);
         }
     }
-    if (this->moodState == 0xE) {
+    if (this->state == 0xE) {
         if (this->moodTimer < 0xA) {
-            this->methods->slotCC(this, 0xC8, 0);
+            this->methods->moveLocalY(this, 0xC8, 0);
             return;
         }
         if (this->moodTimer == 0xA) {
@@ -508,29 +497,29 @@ void Entity__MoodCue58(Entity *this, EntityMoodHandlerArg *out) {
             out->unk10 = 0;
             out->unk30 = 3;
             this->methods->updateRotation(this, 1, ROTATION_ZMINUS90);
-            this->methods->slotC8(this, 0x960, 0);
-            this->methods->slotCC(this, 0x5DC, 0);
-            this->unk70->unk4->methods->slot60(this->unk70->unk4, 0);
-            this->moodState = 1;
+            this->methods->moveLocalX(this, 0x960, 0);
+            this->methods->moveLocalY(this, 0x5DC, 0);
+            this->parts[1]->methods->setDisplay(this->parts[1], 0);
+            this->state = 1;
         }
     }
 }
 
 void Entity__MoodCue115(Entity *this, EntityMoodHandlerArg *out) {
-    if (this->moodState == 0) {
+    if (this->state == 0) {
         if (Entity__IsTargetInRange(this, 0x800) != 0) {
-            this->moodState = 0xB;
-            Class6B5CC__FaceTarget((Class6B5CC *)this, (Class6B5CC *)this->target, 1, 0, 0);
-            Class6B5CC__FaceTarget((Class6B5CC *)this->target, (Class6B5CC *)this, 1, 1, 0);
+            this->state = 0xB;
+            Class6B5CC__FaceTarget((Class6B5CC *)this, (Class6B5CC *)this->peer, 1, 0, 0);
+            Class6B5CC__FaceTarget((Class6B5CC *)this->peer, (Class6B5CC *)this, 1, 1, 0);
             this->methods->activate(this);
             this->methods->startSoundCue(this);
-            this->target->methods->slot130(this->target, 1);
+            ((Unk94Obj *)this->peer)->methods->slot130((Unk94Obj *)this->peer, 1);
             out->unk10 = 0;
             out->unk1C = 0xC;
             this->moodTimer = 0;
         }
     }
-    if (this->moodState == 0) {
+    if (this->state == 0) {
         this->methods->deactivate(this);
         this->methods->stopSoundCue(this);
         goto tail;
@@ -541,31 +530,31 @@ void Entity__MoodCue115(Entity *this, EntityMoodHandlerArg *out) {
         out->unk20 = -1;
     }
     if (this->moodTimer < 3) {
-        this->methods->slotCC(this, 0x96, 0);
+        this->methods->moveLocalY(this, 0x96, 0);
     } else if (this->moodTimer < 7) {
-        this->methods->slotCC(this, (this->moodTimer & 1) ? -0x32 : 0x32, 0);
+        this->methods->moveLocalY(this, (this->moodTimer & 1) ? -0x32 : 0x32, 0);
     } else if (this->moodTimer == 0x64) {
         if (rand() & 1) {
-            this->moodState = 0xC;
+            this->state = 0xC;
             this->methods->stopTod(this);
         }
     } else if (this->moodTimer == 0xF0) {
-        this->target->methods->slot134(this->target, 1, 1);
+        ((Unk94Obj *)this->peer)->methods->slot134((Unk94Obj *)this->peer, 1, 1);
     }
-    if (this->moodState == 0xC) {
+    if (this->state == 0xC) {
         if (this->moodTimer < 0x82) {
-            this->methods->slotCC(this, 0xA, 0);
+            this->methods->moveLocalY(this, 0xA, 0);
         } else if (this->moodTimer < 0xA0) {
-            this->methods->slotC4(this, -0x1E, 0);
+            this->methods->moveLocalZ(this, -0x1E, 0);
         } else if (this->moodTimer < 0x12D) {
             /* nothing */
         } else {
-            Class6B5CC__FaceTarget((Class6B5CC *)this, (Class6B5CC *)this->target, 1, 0, 0);
-            this->methods->slotC4(this, -0x1E, 0);
+            Class6B5CC__FaceTarget((Class6B5CC *)this, (Class6B5CC *)this->peer, 1, 0, 0);
+            this->methods->moveLocalZ(this, -0x1E, 0);
         }
     }
 tail:
-    if (this->methods->distanceToRegion(this, this->target) < 0x200) {
+    if (this->methods->distanceToPeer(this, this->peer) < 0x200) {
         this->methods->deactivate(this);
         this->methods->notifyParents(this, 0xA);
     }

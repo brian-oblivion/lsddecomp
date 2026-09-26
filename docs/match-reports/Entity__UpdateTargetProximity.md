@@ -76,7 +76,7 @@ sibling `Entity__UpdateSoundCueStart`) surfaced three reusable residues:
 3. **Negation idiom: `~x + 1`, not `-x`.** `dist = -dist;` compiles to a
    single `negu` (`subu $rd,$zero,$rs`); retail's bytes are the two-instruction
    `nor $v0,$zero,$a2` / `addiu $v0,$v0,1` sequence. Already known from
-   `Entity__DistanceToRegion` in Entity.c, confirmed again here.
+   `Entity__DistanceToPeer` in Entity.c, confirmed again here.
 4. **The position pointer (`&this->unk14->x`) needs a dedicated local,
    computed BEFORE the sign-check on `dist`, evaluated in that order.**
    Retail loads `this->unk14` and adds the `+0x18` field offset back-to-back,
