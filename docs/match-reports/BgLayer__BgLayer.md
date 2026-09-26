@@ -11,7 +11,7 @@ drift. Fresh ground (carved revision 18, no prior report).
 
 Class6B5CC's constructor through GetClass6B5CCMethods(), then installs this class's table (GetBgLayerMethods) and calls slot +0x040 with (self, arg1, arg2). GCC forwards the stored table pointer, so `self->methods->reset` compiles to a use of the getter's return value, as retail has it. Slot +0x040 is Class6B5CC's `reset(self)` in the unified macro; this class's occupant takes two more arguments, so the call casts rather than retyping the shared slot.
 
-Table slot (`tools/classtable.py`): D_8006F2C4 +0x008 (constructor).
+Table slot (`tools/classtable.py`): gBgLayerMethods +0x008 (constructor).
 
 ## Source
 
@@ -20,7 +20,7 @@ The unit-local view `DataSrc33808` (a Class6D430 subclass built with the unified
 fields +0x2C..+0x38) and `CountedBuf33808` sit at the top of `src/code_33808.c`.
 
 ```c
-/* A three-byte vector, and the D_8006F2C4 object (a Class6B5CC subclass). */
+/* A three-byte vector, and the gBgLayerMethods object (a Class6B5CC subclass). */
 typedef struct Vec3S8 {
     s8 x;
     s8 y;
@@ -33,7 +33,7 @@ typedef struct Obj6F2C4 {
     /* +0x054 */ Vec3S8 unk54;
 } Obj6F2C4;
 
-/* D_8006F2C4 +0x008: constructor -- Class6B5CC's, then this table, then
+/* gBgLayerMethods +0x008: constructor -- Class6B5CC's, then this table, then
  * slot +0x040 with the two arguments. */
 void BgLayer__BgLayer(Obj6F2C4 *self, s32 arg1, s32 arg2) {
     GetClass6B5CCMethods()->ctor((Class6B5CC *)self);

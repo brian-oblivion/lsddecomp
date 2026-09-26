@@ -887,11 +887,6 @@
           "date": "2026-09-26",
           "header": "include/Tod.h"
         },
-        "D_8006F2C4": {
-          "class": "BgLayer",
-          "date": "2026-09-26",
-          "header": "include/BgLayer.h"
-        },
         "D_8006F384": {
           "class": "ModelData",
           "date": "2026-09-25",
@@ -931,6 +926,11 @@
           "class": "BasicClass",
           "date": "2026-09-25",
           "header": "include/BasicClass.h"
+        },
+        "gBgLayerMethods": {
+          "class": "BgLayer",
+          "date": "2026-09-26",
+          "header": "include/BgLayer.h"
         },
         "gBoxFillMethods": {
           "class": "BoxFill",

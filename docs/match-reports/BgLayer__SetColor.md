@@ -11,7 +11,7 @@ drift. Fresh ground (carved revision 18, no prior report).
 
 `if (enable) self->unk54 = *src;` with a 3 x s8 struct. All three `lb` issue before any `sb`, and the three loads need v0/v1/a0, which is why self is moved to a3 in the branch delay slot. FIRST build used three explicit s8 field copies: `lbu`/nop/`sb` interleaved, 3 words LONGER (13 vs 10); the whole-struct assignment matched on the second build.
 
-Table slot (`tools/classtable.py`): D_8006F2C4 +0x0B8 (a Class6B5CC subclass, not a data source).
+Table slot (`tools/classtable.py`): gBgLayerMethods +0x0B8 (a Class6B5CC subclass, not a data source).
 
 ## Source
 
@@ -21,7 +21,7 @@ fields +0x2C..+0x38) and `CountedBuf33808` sit at the top of `src/code_33808.c`.
 Slot +0x078 is `void *slot78` in the unified macro, so calls cast it.
 
 ```c
-/* D_8006F2C4 (a Class6B5CC subclass) +0x0B8: when `enable`, copy a
+/* gBgLayerMethods (a Class6B5CC subclass) +0x0B8: when `enable`, copy a
  * three-byte vector to +0x54. */
 typedef struct Vec3S8 {
     s8 x;

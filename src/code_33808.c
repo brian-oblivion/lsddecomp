@@ -35,7 +35,7 @@
  *
  * Two more classes, not Class6D430 subclasses:
  *
- *   - BgLayer (D_8006F2C4): a Class6B5CC subclass wrapping one GsBG
+ *   - BgLayer (gBgLayerMethods): a Class6B5CC subclass wrapping one GsBG
  *     scrolling background layer (its own fields are GsBG's own layout;
  *     include/BgLayer.h, track 4, round 88).
  *   - MoviePlayer (gMoviePlayerMethods): a BasicClass subclass driving CD-streamed,
@@ -668,7 +668,7 @@ TodMethods *GetTodMethods(void) {
     return &D_8006F240;
 }
 
-/* Allocate and construct a D_8006F2C4 object. */
+/* Allocate and construct a gBgLayerMethods object. */
 BgLayer *New_BgLayer(TileMap *src, s32 mode) {
     BgLayer *obj = BMemPMgrAlloc(0x68);
 
@@ -679,7 +679,7 @@ BgLayer *New_BgLayer(TileMap *src, s32 mode) {
     return NULL;
 }
 
-/* D_8006F2C4 +0x008: constructor -- Class6B5CC's, then this table, then
+/* gBgLayerMethods +0x008: constructor -- Class6B5CC's, then this table, then
  * slot +0x040 with the two arguments. */
 void BgLayer__BgLayer(BgLayer *self, TileMap *src, s32 mode) {
     GetClass6B5CCMethods()->ctor((Class6B5CC *)self);
@@ -687,7 +687,7 @@ void BgLayer__BgLayer(BgLayer *self, TileMap *src, s32 mode) {
     ((BgLayerResetFn)self->methods->reset)(self, src, mode);
 }
 
-/* D_8006F2C4 +0x040: reset -- lay out the GsBG at +0x044 over a map
+/* gBgLayerMethods +0x040: reset -- lay out the GsBG at +0x044 over a map
  * source: mode 0 sizes it to the map (cell size x cell count), mode 1 to a
  * 320 x 240 screen (with its own attribute); then zero position and
  * scroll, take the colour in gBgLayerDefaultColor, point it at the source's GsMAP
@@ -718,7 +718,7 @@ void BgLayer__Reset(BgLayer *self, TileMap *src, s32 mode) {
     self->my = self->h / 2;
 }
 
-/* D_8006F2C4 +0x044 (updateRotation): entry [2] (the z angle) of the
+/* gBgLayerMethods +0x044 (updateRotation): entry [2] (the z angle) of the
  * {num, den} ratio table Class6B5CC's updateRotation reads, in 20.12 fixed
  * point, stored in the GsBG's rotate when `set`, else added. */
 void BgLayer__UpdateRotation(BgLayer *self, s32 set, WholeFrac_d294 *table) {
@@ -733,7 +733,7 @@ void BgLayer__UpdateRotation(BgLayer *self, s32 set, WholeFrac_d294 *table) {
     }
 }
 
-/* D_8006F2C4 +0x048 (updateScale): ratio-table entries [0] and [1] in
+/* gBgLayerMethods +0x048 (updateScale): ratio-table entries [0] and [1] in
  * 20.12 fixed point become the GsBG's scale -- stored when `set` (0x1000
  * for a zero divisor, at most 30000), else added, a sum over 30000 giving
  * 30000, or 1 when either term of that ratio was negative. */
@@ -801,7 +801,7 @@ void BgLayer__UpdateScale(BgLayer *self, s32 set, WholeFrac_d294 *src) {
     }
 }
 
-/* D_8006F2C4 (a Class6B5CC subclass) +0x0B8: when `enable`, copy a
+/* gBgLayerMethods (a Class6B5CC subclass) +0x0B8: when `enable`, copy a
  * three-byte vector to +0x54. */
 void BgLayer__SetColor(BgLayer *self, s32 enable, BgLayerRgb *rgb) {
     if (enable) {
@@ -812,7 +812,7 @@ void BgLayer__SetColor(BgLayer *self, s32 enable, BgLayerRgb *rgb) {
 void BgLayer__NoOp(void) {}
 
 BgLayerMethods *GetBgLayerMethods(void) {
-    return &D_8006F2C4;
+    return &gBgLayerMethods;
 }
 
 /* Allocate and construct a D_8006F384 object (second constructor argument 1); freed and NULL when the constructor fails. */

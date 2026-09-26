@@ -13,7 +13,7 @@ drift. Fresh ground (carved revision 18, no prior report).
 
 Computes the 20.12 fixed-point ratio of two s16 fields of the third argument (+0x08 / +0x0A) as (q << 12) + ((r << 12) / den) from one div's quotient and remainder, and stores it at +0x64 when the second argument is nonzero, otherwise adds it to +0x64.
 
-Table slot (`tools/classtable.py`): D_8006F2C4 +0x044 (a Class6B5CC subclass; slot +0x044 is its first own slot past the Class6B5CC reset slot at +0x040).
+Table slot (`tools/classtable.py`): gBgLayerMethods +0x044 (a Class6B5CC subclass; slot +0x044 is its first own slot past the Class6B5CC reset slot at +0x040).
 
 ## Source
 
@@ -60,4 +60,4 @@ First build. `/` and `%` of the same operands share one div (mflo then mfhi). Th
 
 ## Track 4 (2026-09-26, round 88, alpha)
 
-Renamed from `BgLayer__SetRotation` for the slot it overrides: D_8006F2C4 +0x044 is Class6B5CC's `updateRotation` (Class6B5CC__UpdateRotation), and the body does what that slot does, set (flag nonzero) or add, from the same three-entry `WholeFrac_d294` {num, den} ratio table Class6B5CC's version reads through RatioToFixed12 (entries at +0/+4/+8). A GsBG has one rotation, so this override reads only entry [2], the z angle: the `Ratio44380` view's +0x08/+0x0A. That view is gone; the live body takes `WholeFrac_d294 *table` and reads `table[2].whole` / `table[2].frac`, `self` is `BgLayer *` (include/BgLayer.h) and +0x064 is `rotate` (GsBG.rotate; was unk64). Byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).
+Renamed from `BgLayer__SetRotation` for the slot it overrides: gBgLayerMethods +0x044 is Class6B5CC's `updateRotation` (Class6B5CC__UpdateRotation), and the body does what that slot does, set (flag nonzero) or add, from the same three-entry `WholeFrac_d294` {num, den} ratio table Class6B5CC's version reads through RatioToFixed12 (entries at +0/+4/+8). A GsBG has one rotation, so this override reads only entry [2], the z angle: the `Ratio44380` view's +0x08/+0x0A. That view is gone; the live body takes `WholeFrac_d294 *table` and reads `table[2].whole` / `table[2].frac`, `self` is `BgLayer *` (include/BgLayer.h) and +0x064 is `rotate` (GsBG.rotate; was unk64). Byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).

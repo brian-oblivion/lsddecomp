@@ -2878,3 +2878,4 @@ gObjMMethods = 0x80087034;
 ObjM__NoOpSlotBC = 0x800541CC; // type:func
 gBasicClassMethods = 0x8006B58C;
 gDrawSystemMethods = 0x8006C070;
+gBgLayerMethods = 0x8006F2C4;

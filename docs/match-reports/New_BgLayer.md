@@ -11,7 +11,7 @@ drift. Fresh ground (carved revision 18, no prior report).
 
 Allocator shape: `BMemPMgrAlloc(size)`, then the constructor (+0x008) through the class's table getter, called through the unit-local `Ctor33808` view (an unprototyped `s32 (*ctor)()` at +0x008, declared at the top of the unit with the getter prototypes), since each class's constructor takes different arguments. Shape: `if (obj != NULL) { ctor; return obj; } return NULL;`.
 
-Table slot (`tools/classtable.py`): none (allocator for D_8006F2C4, object size 0x68, two constructor arguments).
+Table slot (`tools/classtable.py`): none (allocator for gBgLayerMethods, object size 0x68, two constructor arguments).
 
 ## Source
 
@@ -20,7 +20,7 @@ The unit-local view `DataSrc33808` (a Class6D430 subclass built with the unified
 fields +0x2C..+0x38) and `CountedBuf33808` sit at the top of `src/code_33808.c`.
 
 ```c
-/* Allocate and construct a D_8006F2C4 object. */
+/* Allocate and construct a gBgLayerMethods object. */
 void *New_BgLayer(s32 arg0, s32 arg1) {
     void *obj = BMemPMgrAlloc(0x68);
 
@@ -42,7 +42,7 @@ void *New_BgLayer(s32 arg0, s32 arg1) {
 
 ## Naming
 
-- **New_BgLayer**, tier B. Allocator for D_8006F2C4, a Class6B5CC subclass whose own fields (bgAttribute, x/y/w/h, scrollx/scrolly, scalex/scaley, a 20.12 fixed-point rotate word) are GsBG's own layout.
+- **New_BgLayer**, tier B. Allocator for gBgLayerMethods, a Class6B5CC subclass whose own fields (bgAttribute, x/y/w/h, scrollx/scrolly, scalex/scaley, a 20.12 fixed-point rotate word) are GsBG's own layout.
 
 ## Track 4 (2026-09-26, round 88, alpha)
 
