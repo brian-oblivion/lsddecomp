@@ -1,4 +1,6 @@
-# CdStreamObj__SetRing -- MATCHED (exact length, 19/19 words), round 81
+# CdStream__SetRing -- MATCHED (exact length, 19/19 words), round 81
+
+> Renamed from `CdStreamObj__SetRing` on 2026-09-26 (tools/rename.py). Address 0x800470c8.
 
 > Renamed from `func_800470C8` on 2026-09-25 (tools/rename.py). Address 0x800470c8.
 
@@ -6,19 +8,19 @@ Round 81, runner echo. Unit `src/code_3770c.c` (carved from psyq_3770c in
 FINISHING-PLAN revision 18). Fresh ground, no prior attempt. Byte-exact on
 the first build; whole-image SHA1 green.
 
-- **Where:** slot +0x040 of gCdStreamObjMethods.
+- **Where:** slot +0x040 of gCdStreamMethods.
 - **What:** if the object has no ring yet (+0x2C == 0), `StSetRing(ring, size >> 11)` (bytes to 2048-byte sectors, unsigned: `srl`) and remember the ring at +0x50.
 - **Levers:** none needed.
 - **Context:** local view `CdStreamObj` (BASICCLASS_FIELDS + `cdResult[8]` at +0x24, `s32 unk2C` at +0x2C, `u32 *ring` at +0x50) and the libcd/libspu externs are in `src/code_3770c.c`, declared from the Psy-Q prototypes.
 
 ## Naming
 
-Tier A. `CdStreamObj__SetRing` -- slot +0x040. Evidence: tail-wraps `StSetRing(ring, size >> 11)` and remembers the ring pointer; the libcd call itself names the operation.
+Tier A. `CdStream__SetRing` -- slot +0x040. Evidence: tail-wraps `StSetRing(ring, size >> 11)` and remembers the ring pointer; the libcd call itself names the operation.
 
 ## Source
 
 ```c
-void CdStreamObj__SetRing(CdStreamObj *self, u32 *ring, u32 size) {
+void CdStream__SetRing(CdStreamObj *self, u32 *ring, u32 size) {
     if (self->unk2C == 0) {
         StSetRing(ring, size >> 11);
         self->ring = ring;

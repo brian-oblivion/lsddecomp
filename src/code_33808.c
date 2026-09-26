@@ -1398,7 +1398,7 @@ void *New_MoviePlayer(s32 arg0, s32 arg1, s32 arg2) {
     return NULL;
 }
 /* D_8006F614 +0x008: constructor -- BasicClass's, then this table; open a
- * CD stream object (New_CdStreamObj(arg2, 15, 0)) at +0x60 and set up the
+ * CD stream object (New_CdStream(arg2, 15, 0)) at +0x60 and set up the
  * decode buffers (MoviePlayer__InitFrame); 1 when either fails. Then reset the MDEC
  * the first time any player is built (gMdecInitialized), route its output
  * callback to OnMdecFrameReady, hand the stream the ring buffer at +0x10
@@ -1427,7 +1427,7 @@ typedef struct Obj454C4 {
     /* +0x060 */ Stream454C4 *stream;
 } Obj454C4;
 
-extern void *New_CdStreamObj(s32 arg1, s32 arg2, s32 arg3);
+extern void *New_CdStream(s32 arg1, s32 arg2, s32 arg3);
 s32 MoviePlayer__InitFrame();
 extern s32 gMdecInitialized;
 extern void DecDCTReset(int mode);
@@ -1437,7 +1437,7 @@ void OnMdecFrameReady(void);
 s32 MoviePlayer__MoviePlayer(Obj454C4 *self, s32 arg1, s32 arg2, s32 arg3) {
     Get_vtable_BasicClass()->ctor((BasicClass *)self);
     self->methods = GetMoviePlayerMethods();
-    self->stream = New_CdStreamObj(arg2, 15, 0);
+    self->stream = New_CdStream(arg2, 15, 0);
     if (self->stream != NULL) {
         if (MoviePlayer__InitFrame(self, arg1, arg3) == 0) {
             if (gMdecInitialized == 0) {
