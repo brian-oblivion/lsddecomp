@@ -165,7 +165,7 @@ the GTE, delegates the transform and the cull decision to
 `TransformAndCullPoly`, writes each vertex's screen Z into a sort slot, has
 the caller's callback write the screen XY into the primitive, computes the
 screen bounding box, and returns 0 drawn / 1 culled. That is "project one
-triangle and say whether it survived". Its caller `func_80018464` iterates
+triangle and say whether it survived". Its caller `SortTmdObject` iterates
 a list of records each carrying three or four vertex indices, which is a
 face list.
 

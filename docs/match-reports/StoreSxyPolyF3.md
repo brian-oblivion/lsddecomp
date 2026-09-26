@@ -112,7 +112,7 @@ independent measurements.
 1. **Layout.** The `swc2` offsets `+0x8`/`+0xC`/`+0x10` are POLY_F3's
    `xy0`/`xy1`/`xy2` (tag, then one colour/code word, then three packed
    screen-XY words).
-2. **Call site.** In `asm/nonmatchings/code_8220_b/func_80018464.s`, the
+2. **Call site.** In `asm/nonmatchings/code_8220_b/SortTmdObject.s`, the
    two cases that pass this function as `ProjectTriFace`'s callback (at
    0x8001889C and 0x80018A28) write `len = 4`, `code = 0x20` into the
    primitive first -- POLY_F3's length and GPU command byte exactly.

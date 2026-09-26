@@ -28,7 +28,7 @@ last halfword of the primitive. The other arm falls into the epilogue after
 | preserved void body | 80/88 |
 | `void *`, `if (!= 0) { calls; stores; return RCpolyFT4(..); } splice; return arg0 + 0x28;` | **88/88** on the first build, whole image `OK: build matches retail` |
 
-**Callers checked:** `func_80018464` in `src/code_8220_b.c` (two call sites,
+**Callers checked:** `SortTmdObject` in `src/code_8220_b.c` (two call sites,
 `prim = (u8 *)SubmitPolyFT4(prim, ctx);`), declared there as
 `extern void *SubmitPolyFT4(void *prim, void *ctx);`. The return type agrees.
 `RCpolyFT4` stays declared `void` in `include/code_8220.h` and is called
@@ -353,7 +353,7 @@ family root: base = **260** (100 insertion + 100 deletion + 12x5 register
 diffs). Not independently full-searched this pass; time budget went to a
 deep single search on `SubmitPolyF3` (40000 iterations, floor held at
 260, two false leads found and falsified against the real oracle) plus
-reading `code_8220_b`'s `func_80018464` for `self`'s real type -- see that
+reading `code_8220_b`'s `SortTmdObject` for `self`'s real type -- see that
 report's new section for the trace, and `SubmitPolyGT4.md` for the one
 sibling where the caller's own field writes independently confirm the
 size formula. Permuter scaffold left provisioned at

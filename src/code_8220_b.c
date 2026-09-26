@@ -1,6 +1,6 @@
 /*
  * code_8220_b -- the tail of the BasicClass block, then the game's own
- * per-face polygon renderer. Two unrelated halves, split at func_80018464.
+ * per-face polygon renderer. Two unrelated halves, split at SortTmdObject.
  *
  * 0x80018288..0x80018458 finishes BasicClass, the hand-rolled base class
  * whose framework and 14-slot method table live in code_8220.c and
@@ -10,7 +10,7 @@
  * at +0x030 and BasicClass__OnNotify at +0x038) and the empty +0x034 hook,
  * plus the accessor pair for the pool allocator's re-entrancy flag.
  *
- * 0x80018464..0x8001974C is the renderer. func_80018464 (the unit's one
+ * 0x80018464..0x8001974C is the renderer. SortTmdObject (the unit's one
  * stall, still INCLUDE_ASM) walks a model's face groups, dispatches on each
  * group's tag to one of 13 cases, and per face calls SetupPrimCode, then
  * ProjectTriFace or ProjectQuadFace, then one of Sony's RCpoly* packers via
@@ -205,7 +205,7 @@ void StoreSxyPolyG4(void *dst, s32 storeFirst3);
  * all. `ctx` is assigned after the early return for the same reason retail
  * copies a3 through a1 into s2 there.
  */
-void func_80018464(void *objIn, void *otSrc, s32 otShift, void *ctxIn) {
+void SortTmdObject(void *objIn, void *otSrc, s32 otShift, void *ctxIn) {
     u8 *obj = (u8 *)objIn;
     u8 *ctx;
     u8 *prim;
@@ -668,7 +668,7 @@ void func_80018464(void *objIn, void *otSrc, s32 otShift, void *ctxIn) {
 /*
  * Finish the GPU command byte of the POLY_xx primitive `prim`, then cache it
  * in the draw context. `prim[3]` is the P_TAG length byte and `prim[7]` is
- * the GPU command byte; func_80018464 writes the (len, code) pair for the
+ * the GPU command byte; SortTmdObject writes the (len, code) pair for the
  * primitive type immediately before every one of its 13 calls to this, and
  * all eight pairs it uses are Sony's exactly -- (4, 0x20) POLY_F3, (6, 0x30)
  * POLY_G3, (7, 0x24) POLY_FT3, (5, 0x28) POLY_F4, (9, 0x2C) POLY_FT4,
@@ -677,7 +677,7 @@ void func_80018464(void *objIn, void *otSrc, s32 otShift, void *ctxIn) {
  * Bit 0x2 of the command byte is the GPU's ABE (semi-transparency) bit and
  * is taken from the context's own flag at +0x1C; bit 0x1 is the shade-texture
  * bit (Psy-Q SetShadeTex) and is taken from the global D_8008E248, which
- * func_80018464 sets from bit 6 of the object's flags word. The two updates
+ * SortTmdObject sets from bit 6 of the object's flags word. The two updates
  * are deliberately independent statements -- see this function's match
  * report, factoring them through one local costs the match.
  *
@@ -795,7 +795,7 @@ fail:
 /*
  * This unit's local view of the draw context TransformAndCullPoly works on
  * (the `ctx` its callers hand it -- one per-object scratch block, which
- * func_80018464's own caller places in the PS1 scratchpad at 0x1F800000).
+ * SortTmdObject's own caller places in the PS1 scratchpad at 0x1F800000).
  * Only the fields this function touches are typed; the callers still address
  * the rest by offset, and the offsets outside this view that this unit does
  * use are +0x0C the vertex array, +0x1C the semi-transparency flag,

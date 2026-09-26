@@ -179,7 +179,7 @@ future round with a genuinely new hypothesis — most plausibly one that
 recovers `self`'s TRUE type from a not-yet-carved caller unit, since round
 13's runner pass already showed the filler formula matches a real record
 stride visible in `SubmitPolyGT4`'s own preceding GTE code in
-`code_8220_b`'s `func_80018464` — is the only kind of attempt likely to
+`code_8220_b`'s `SortTmdObject` — is the only kind of attempt likely to
 move this family. Spending this round's attempt budget re-running any of
 the above would not have been a new experiment.
 
@@ -698,7 +698,7 @@ nested, not about arithmetic.
 And the runner's own closing observation still stands and is probably the
 cheapest route: this is most likely determined by `self`'s real TYPE, which
 is knowable from the family's CALLER rather than from any member of the
-family. `func_80018464` in `code_8220_b` — the deprioritized 958-instruction
+family. `SortTmdObject` in `code_8220_b` — the deprioritized 958-instruction
 body — calls two of these siblings, and is where that type is visible.
 
 ## RUNNER PASS, permuter round (alpha, code_8220_c): base confirmed, no zero, one lead falsified, self-type partially recovered
@@ -784,9 +784,9 @@ residue remains open, not exhausted, and not disproven-reachable — it simply
 was not closed by 40000 blind iterations or by the specific "cache the OT
 pointer once" reshaping.
 
-**`self`'s real type, read from `code_8220_b`'s `func_80018464` (read-only;
+**`self`'s real type, read from `code_8220_b`'s `SortTmdObject` (read-only;
 no edit made, per parallel-mode rules — nobody holds that unit this round).**
-Traced all eight `jal` call sites to this family inside `func_80018464`
+Traced all eight `jal` call sites to this family inside `SortTmdObject`
 (`SubmitPolyF3` at two sites, `SubmitPolyG3`/`SubmitPolyFT3`/
 `SubmitPolyF4`/`SubmitPolyFT4`/`SubmitPolyGT3`/`SubmitPolyG4`/
 `SubmitPolyGT4` at one each) — confirms `$s0` (this caller's own `arg0`) is
@@ -803,9 +803,9 @@ round 13's `align_up_4(...)` formula is measuring a genuine record boundary
 in `self`'s true type, not a coincidence of this function's own reads.
 
 **What this does NOT do: explain the missing C-level mention.** `self`'s
-role in `func_80018464` never advances by exactly `N` bytes — `func_80018464`
+role in `SortTmdObject` never advances by exactly `N` bytes — `SortTmdObject`
 loops over its OWN cursors (`$s3`/`$s1`, stride `0x2C`, unrelated to `self`),
-not over `self` itself, and after each call `func_80018464` reassigns
+not over `self` itself, and after each call `SortTmdObject` reassigns
 `$s0 = $v0` (this family's own — void — return value; likely incidental
 reuse of a dead register, not a real "next self" pointer). So there is no
 `self + 1`/`&self[1]`-shaped expression anywhere in the caller either. The

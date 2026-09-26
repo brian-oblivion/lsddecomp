@@ -108,7 +108,7 @@ extern s32 GetBMemPMgrBusy(void);
 extern const char D_8001028C[];
 
 /* Global boolean flag read by SetupPrimCode, asm/data (bss/data, not yet
- * carved). Read by SetupPrimCode, written by func_80018464 (both code_8220_b)
+ * carved). Read by SetupPrimCode, written by SortTmdObject (both code_8220_b)
  * from bit 6 of the drawn object's flags word; SetupPrimCode ORs it into bit
  * 0x1 of the GPU command byte, which is the shade-texture bit Psy-Q's
  * SetShadeTex() sets. PROPOSED RENAME (round 51, tier B): gShadeTex.

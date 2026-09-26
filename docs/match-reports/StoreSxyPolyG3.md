@@ -51,7 +51,7 @@ Specific to this one:
 
 1. **Layout.** `+0x8`/`+0x10`/`+0x18` -- stride 8, POLY_G3's `xy0`/`xy1`/
    `xy2` with a per-vertex RGB word between each.
-2. **Call site.** `func_80018464` hoists this function's address into `$s6`
+2. **Call site.** `SortTmdObject` hoists this function's address into `$s6`
    once at 0x80018758 and passes it as the callback for the two cases that
    write `len = 6`, `code = 0x30` -- POLY_G3 exactly.
 

@@ -167,7 +167,7 @@ Transform, then cull. Both callers use the return value for exactly that.
 
 **`GteCullOwner` -> `GpuPrim`, and why the old name had to go.** The old
 name asserted that `arg0` is "the owner object" of the cull, which is not
-what it is. It is the Psy-Q GPU primitive being filled in: `func_80018464`
+what it is. It is the Psy-Q GPU primitive being filled in: `SortTmdObject`
 writes a `(len, code)` pair into its bytes `+0x3` and `+0x7` before every
 face, and all eight pairs it uses are Sony's POLY_xx values exactly (the
 table is in `docs/match-reports/SetupPrimCode.md`). So the field this
@@ -182,7 +182,7 @@ is not cull scratch, it is the per-object draw context that both
 `ProjectTriFace` and `ProjectQuadFace` thread through everything -- vertex
 array at `+0x0C`, semi-transparency flag at `+0x1C`, cached tag/code at
 `+0x14`/`+0x15`, per-vertex sort records at `+0x88..0xA0`, vertex slots at
-`+0xA4..0xB0`. `func_80018464`'s own caller puts it in the PS1 scratchpad
+`+0xA4..0xB0`. `SortTmdObject`'s own caller puts it in the PS1 scratchpad
 (`lui $a3, 0x1F80` at 0x80012368 in `asm/psyq_2864.s`).
 
 No offsets moved and no types changed -- both structs keep the exact layout

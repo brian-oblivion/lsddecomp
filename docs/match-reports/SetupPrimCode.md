@@ -3,7 +3,7 @@
 > Renamed from `func_8001934C` on 2026-09-17 (tools/rename.py). Address 0x8001934c.
 
 Unit: `src/code_8220_b.c`. Not previously declared in `include/code_8220.h`;
-called only from the still-`INCLUDE_ASM` giant `func_80018464` (13 call
+called only from the still-`INCLUDE_ASM` giant `SortTmdObject` (13 call
 sites), so its two arguments' real struct types are unknown outside this
 function's own body. Treated both as raw byte-offset accesses rather than
 guessing an unverified struct layout.
@@ -74,7 +74,7 @@ half, and nothing establishes what the original called it.
 `arg0`.** The round-13 report treated both arguments as opaque byte
 offsets because "their real struct types are unknown outside this
 function's own body". They are not unknown any more. In
-`asm/nonmatchings/code_8220_b/func_80018464.s`, every one of the 13
+`asm/nonmatchings/code_8220_b/SortTmdObject.s`, every one of the 13
 dispatch cases writes a constant into `arg0`'s byte `+0x3` and another into
 byte `+0x7` in the two instructions immediately before `jal
 func_8001934C`, and the eight distinct pairs are Sony's Psy-Q primitive
@@ -105,7 +105,7 @@ onto the primitive from `ctx+0x14` on every face.
 
 ### Proposed global name for the head
 
-`D_8008E248` -> `gShadeTex`. **Tier B.** `func_80018464` writes it from bit
+`D_8008E248` -> `gShadeTex`. **Tier B.** `SortTmdObject` writes it from bit
 6 of the drawn object's flags word (`srl $a0,$a0,6; andi $a0,$a0,0x1; sw
 $a0, %lo(D_8008E248)` at 0x800186D8) and this function is its only reader,
 ORing it into the shade-texture bit; `gShadeTex` is Sony's own vocabulary

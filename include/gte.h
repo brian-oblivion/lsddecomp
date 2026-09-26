@@ -167,7 +167,7 @@
  * 0x0000133f/0x133e/0x133e` is the ASPSX macro-CALL encoding (only Sony's
  * assembler expands it, see the file banner above), and is a different
  * value from the actual COP2 cofun word. The word below is retail's own
- * three occurrences in func_80018464 (splat already decodes them as
+ * three occurrences in SortTmdObject (splat already decodes them as
  * `mvmva 1, 0, 3, 3, 0`), and it fails to assemble under the pinned `as`
  * with a bare "mvmva" mnemonic (Error: unrecognized opcode) -- confirmed
  * with the reproducer in CLAUDE.md's "Escalate, do not experiment", so this
@@ -183,7 +183,7 @@
         ".word 0x4A49E012")
 /* clang-format on */
 
-/* Depth-cue / color-lookup cofun ops used by func_80018464's per-face
+/* Depth-cue / color-lookup cofun ops used by SortTmdObject's per-face
  * dispatch (one per PS1 GPU primitive flavor: NCDS for flat-shaded,
  * DPCS/DPCT for depth-cued single/triple). Same raw-word convention as the
  * transform ops above -- the pinned `as` rejects all three mnemonics
@@ -216,7 +216,7 @@
  * depth-cue and normal-colour ops read); 20/21/22 are RGB0/RGB1/RGB2, the
  * three colour OUTPUTS. These are Sony's own operand shapes, read off
  * include/psyq/inline.h and confirmed instruction-for-instruction against
- * retail in func_80018464:
+ * retail in SortTmdObject:
  *
  *   gte_ldrgb(p)          one pointer,   1 op
  *   gte_ldrgb3(p0,p1,p2)  three pointers, 4 ops (the 4th reloads p2 into RGB)
@@ -231,7 +231,7 @@
  * forms are not interchangeable. The pointer forms take their address at
  * offset 0x0, so a call site spelling `gte_strgb(prim + 0x4)` makes GCC
  * materialise the sum with its own `addiu`. That is exactly what retail
- * shows, fifteen times over in func_80018464. Open-coding the same store as
+ * shows, fifteen times over in SortTmdObject. Open-coding the same store as
  * `swc2 $22, 0x4(%0)` on the base pointer drops the addiu, and the function
  * then assembles short by one word per call site.
  *
@@ -297,7 +297,7 @@
  * Sony's include/psyq/inline.h settles which op belongs to which name by
  * operand count and op count even though its macro-call words say nothing
  * about the encodings: gte_ReadRotMatrix is 16 ops, gte_SetRotMatrix 10,
- * gte_ldclmv and gte_stclmv 6 each. Retail's func_80018464 preamble has
+ * gte_ldclmv and gte_stclmv 6 each. Retail's SortTmdObject preamble has
  * blocks of exactly 16, 10, 6, 6 and 10 in that order, so the mapping is not
  * a guess.
  *

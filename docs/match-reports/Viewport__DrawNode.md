@@ -21,7 +21,7 @@ It draws `node` into `self->ot[self->buf]` (the GsOT pointers at +0x78, index at
 4. Dispatch on the class-id low byte: 0x54 `GsSortBg(node+0x44, ot, (1<<otLen)-1)`;
    0x64 box fill (optionally percent-of-half-screen positioned) through `GsSortBoxFill`;
    anything but 0x44 a model (`GsGetLws`, `GsSetLightMatrix`, `GsSetLsMatrix`, then
-   `func_80018464(&obj, ot, 14 - otLen, scratchpad 0x1F800000)` if it has a TMD);
+   `SortTmdObject(&obj, ot, 14 - otLen, scratchpad 0x1F800000)` if it has a TMD);
    0x144 a screen-space sprite; other 0x44 a world-space sprite (`GsGetLs`, depth range check,
    optional `ApplyMatrixToLVArray` offset when the parent has a parent, perspective divide by
    `self->projH`, clamp to +-0x200, `GsSortSprite` with a depth-derived priority).

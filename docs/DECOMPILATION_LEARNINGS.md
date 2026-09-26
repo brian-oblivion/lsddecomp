@@ -124,7 +124,7 @@ load through a runtime-indexed global", §"BLOCKED: the `nop_mflo_mfhi` screen r
   rounds filed them as CSE plus register rotation; round 54's "does not reach" was wrong. (a round 54)
   The gate also covers STRENGTH REDUCTION: a function 28 words LONG with an eighth saved register
   and a bigger frame, every loop carrying a second induction variable, closed at 954/954 once all
-  13 inner loops were `label: ...; if (--n != 0) goto label;` (`func_80018464`, round 76).
+  13 inner loops were `label: ...; if (--n != 0) goto label;` (`SortTmdObject`, round 76).
   The MIRROR: a constant retail hoists into `$sN` before a loop (`li s1,4`) needs a `do/while`, since
   loop.c cannot see a goto loop (`Class6B5CC__NotifyTaggedParents`, 48/54 -> 54/54 first build).
 - **A redundant guard is NOT dead code — 2.6.3 compiles it literally.** GCC does not dedupe an
@@ -336,7 +336,7 @@ load through a runtime-indexed global", §"BLOCKED: the `nop_mflo_mfhi` screen r
   wrapping is a SMALL-BODY lever")
   **It also restores LOOP-DEPTH weighting**: local-alloc weights a pseudo by the loop nesting it sits in,
   so after goto loops remove a level, a `v0`/`v1` swap repeating at every site of one statement closes
-  by wrapping just that statement in `do { } while (0)` (`func_80018464`'s six CLUT updates, round 76).
+  by wrapping just that statement in `do { } while (0)` (`SortTmdObject`'s six CLUT updates, round 76).
 - **Levers measured INERT — do not re-derive.** C89 `register` (the legal form) is a no-op for
   allocation; a clobber-bearing barrier is no better than an empty one; a dummy unused SCALAR cannot
   nudge frame allocation; a same-valued alias is collapsed by copy propagation and an algebraic
@@ -617,7 +617,7 @@ load through a runtime-indexed global", §"BLOCKED: the `nop_mflo_mfhi` screen r
   matches, store through a pointer to a one-field struct: `q->p = x`, not `*q = x`. The same rule
   in the other direction: read a flags word through a struct field to let loads hoist above global
   stores. Discriminator: the built code has the store first and the load after, with identical words.
-  Three closes in round 76 (`StyleFillEffectKind3` 81/81, `StyleFillEffectKind2`, `func_80018464`).
+  Three closes in round 76 (`StyleFillEffectKind3` 81/81, `StyleFillEffectKind2`, `SortTmdObject`).
 
 - **`volatile` is the NARROW instrument for the instruction-ORDER class, not the banned construct**
   — it names no register, exactly like the sanctioned bare `__asm__("")`. Where three barrier

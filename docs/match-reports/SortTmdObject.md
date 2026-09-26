@@ -1,4 +1,6 @@
-# func_80018464 — MATCHED 954/954 (round 76)
+# SortTmdObject — MATCHED 954/954 (round 76)
+
+> Renamed from `func_80018464` on 2026-09-26 (tools/rename.py). Address 0x80018464.
 
 REVISITED, round 76: MATCHED 954/954, whole image OK, 0 permuter iterations (about 45 cc1/whole-image builds); names/types not relevant
 
@@ -82,7 +84,7 @@ plausible reading of the original source.
   extra per-iteration increment, and one more callee-saved register than
   retail, while retail addresses every use off a single pointer. Every
   syntactic loop form splits the same way (round 56 measured twelve).
-  `func_80018464` went from 982 to 954 words in one edit.
+  `SortTmdObject` went from 982 to 954 words in one edit.
 - **Its side effect is a loop-depth level, and that can flip local-alloc.**
   Once a function's loops are goto loops, a residue that is a pure register
   swap between two short-lived quantities can be the missing depth weighting.
@@ -559,7 +561,7 @@ void StoreSxyPolyG4(void *dst, s32 storeFirst3);
  * and not `swc2 $22, 0x4(prim)`: the addiu that materialises the sum is part
  * of retail.
  */
-void func_80018464(void *objIn, void *otSrc, s32 otShift, void *ctxIn)
+void SortTmdObject(void *objIn, void *otSrc, s32 otShift, void *ctxIn)
 {
     u8 *obj = (u8 *)objIn;
     u8 *ctx = (u8 *)ctxIn;
@@ -1131,7 +1133,7 @@ mnemonic, confirmed with the reproducer" story for all three. Added as
 
 Round 45's report said "roughly nine ~37-word blocks" and asked whether they
 are unrolled named slots or loop iterations. Reading the full phase 3
-disassembly line by line (`asm/nonmatchings/code_8220_b/func_80018464.s`,
+disassembly line by line (`asm/nonmatchings/code_8220_b/SortTmdObject.s`,
 roughly lines 148–940) settles it completely:
 
 - There are **13 distinct dispatch targets**, not 9 (one per PS1 GPU
@@ -1206,7 +1208,7 @@ stale: every one of the eight falls straight from `jal RCpolyXX` into its
 own epilogue with **no intervening store to `$v0`** (checked
 `SubmitPolyF3.s`'s tail directly). That means whatever value Sony's own
 `RCpolyXX` leaves in `$v0` — the well-known Psy-Q `p = RCpolyF3(p);`
-work-buffer-advance idiom — IS this function's return value. `func_80018464`
+work-buffer-advance idiom — IS this function's return value. `SortTmdObject`
 relies on exactly that value (`self = SubmitPolyF3(self, prim);`, advancing
 the packet-buffer write cursor every submit), so this file declares its own
 `void *`-returning prototypes for all eight per CLAUDE.md's cross-unit
@@ -1224,7 +1226,7 @@ per-face cases) using the two resolutions above, per the assignment's
 whole-image SHA1 mismatch) but is **not close to byte-exact**:
 
 ```
-func_80018464: 44/954 words match (file 0x8C64-0x9B4C)
+SortTmdObject: 44/954 words match (file 0x8C64-0x9B4C)
 WARNING: the build differs OUTSIDE this range too (323295 bytes) ...
 ```
 
@@ -1288,7 +1290,7 @@ against the current tree (with the `gte_llir`/`gte_ncds`/`gte_dpcs`/`gte_dpct`
 macros added to `include/gte.h` this round) and needs the forward
 declarations included below (they are NOT installed in the tree — only the
 `include/gte.h` macro additions are committed this round). Building on this
-means placing it back as the body of `func_80018464` in `src/code_8220_b.c`,
+means placing it back as the body of `SortTmdObject` in `src/code_8220_b.c`,
 in the same ROM-order position, and continuing from "one extra saved
 register" above.
 
@@ -1333,7 +1335,7 @@ extern void *SubmitPolyFT4(void *arg0, void *arg1);
 extern void *SubmitPolyGT3(void *arg0, void *arg1);
 extern void *SubmitPolyGT4(void *arg0, void *arg1);
 
-void func_80018464(void *arg0, void *arg1, s32 arg2, void *arg3)
+void SortTmdObject(void *arg0, void *arg1, s32 arg2, void *arg3)
 {
     u8 *self = (u8 *)arg0;
     u8 *prim = (u8 *)arg3;
@@ -1962,12 +1964,12 @@ file, which is out of this round's scope.
 ## Naming (round 51, bravo) — NAME DELIBERATELY NOT CHANGED, and one of the two reasons is a head decision
 
 The track-3 naming pass renamed all 19 other definitions in
-`src/code_8220_b.c`. This one kept `func_80018464`. Two reasons, in order
+`src/code_8220_b.c`. This one kept `SortTmdObject`. Two reasons, in order
 of weight.
 
 ### 1. Its only caller sits in an SDK segment, and that is a head call
 
-`grep -rn 'func_80018464' src/ asm/` finds exactly one call site outside
+`grep -rn 'SortTmdObject' src/ asm/` finds exactly one call site outside
 this function's own `.s`: `asm/psyq_2864.s:225`, inside `Viewport__DrawNode`.
 That caller calls `GsSortBoxFill`, `GsGetLws`, `GsSetLightMatrix` and
 `GsSetLsMatrix` and nothing else identifiable, and it passes
