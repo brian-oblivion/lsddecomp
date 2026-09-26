@@ -157,3 +157,7 @@ The class is IntermediateBase (class id 0x30, gIntermediateBaseMethods; `tools/c
 ## Track 4 (2026-09-26, round 86, delta)
 
 Class 0x14 (was D_8006EFAC) unified as LightRig in `include/LightRig.h`; its NULL-args fallback is `self->unk14 = (BasicClass *)New_LightRig();`, the allocator's prototype now coming from include/LightRig.h (was `void *New_LightRig(void)` in include/code_2cc8c.h). `unk14` stays IntermediateBase's `BasicClass *`; a pointer cast emits no code; image byte-identical.
+
+## Track 4 (2026-09-26, round 88, delta: FrameClock)
+
+`New_D8006EF50` is now `New_FrameClock` (include/FrameClock.h), returning `FrameClock *`; the store into `unk10` (`BasicClass *`, field unchanged) upcasts it. Byte-identical.
