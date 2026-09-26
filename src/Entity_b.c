@@ -1,18 +1,31 @@
-/* Entity_b -- second slice of the Entity class (include/Entity.h, table
- * gEntityMethods; `tools/classtable.py gEntityMethods`).
+/* Entity_b: the last of Entity's own methods, and fifteen of its MoodCue
+ * handlers (include/Entity.h).
  *
- *  - gEntityMethods' last three slots, run every tick by Entity__Update:
- *    Entity__UpdateTargetProximity (+0x178, raises targetReached via setTargetReached once
- *    the target is within the mood row's proximityRange) and
- *    Entity__UpdateSoundCueStart/Stop (+0x17C/+0x180, start the sound cue
- *    when the target enters the row's cueRange, stop it when it leaves);
- *    two range helpers; the vtable accessor Get_vtable_Entity.
- *  - Entity__MoodCue00..17: gEntityMoodHandlerTable's callbacks, NN = the
- *    row. Entity__StartSoundCue gives the row's callback to InitSoundCueSet,
- *    and ServiceSoundCueSet calls it once per tick as callback(owner, set): it
- *    picks tones for the set's three voices and moves/rotates/scales the
- *    entity on moodTimer thresholds. Which dream object owns each row is
- *    not established.
+ * The methods. Entity__Update runs the table's last three slots every tick:
+ * Entity__UpdateTargetProximity (+0x178) latches targetReached through
+ * setTargetReached once the player (`peer`) is within the mood row's
+ * proximityRange, Entity__UpdateSoundCueStart (+0x17C) starts the sound cue
+ * when the player comes within the row's cueRange, and
+ * Entity__UpdateSoundCueStop (+0x180) stops it again when the player leaves
+ * that range. Entity__NotifyIfTargetInRange and Entity__IsTargetInRange are
+ * the range test Entity__UpdateDeactivationState makes on the row's
+ * gEntityEventVideoTable entry; Get_vtable_Entity is the table's getter.
+ *
+ * The handlers. Each Entity__MoodCueNN is the `handler` of
+ * gEntityMoodHandlerTable's row NN: rows 0, 1, 5 and 7 to 17 (rows 2 to 4
+ * and 6 have none). An Entity whose moodIndex selects the row installs it as
+ * its SoundCueSet callback, so ServiceSoundCueSet calls it once per tick
+ * with the Entity and its cue set. A handler requests tones by filling the
+ * set's slots (a VAB program of the cue's sound object, or SOUND_CUE_STOP),
+ * moves, turns and scales the entity on moodTimer (the ticks since
+ * startSoundCue), on the cue set's own `tick`, or on todFrame (the frame of
+ * its TOD animation), and sends the dream an EntityEffect through
+ * notifyParents. Which dream object owns each row is not established.
+ *
+ * The literals are left unnamed where they are one handler's tuning: tick
+ * counts, distances in world units, TOD frame numbers, VAB program numbers,
+ * and the `state` values other than 0 and ENTITY_STATE_DONE, which are each
+ * handler's own phases (same convention as Entity_c to Entity_g).
  */
 #include "common.h"
 #include "Entity.h"
@@ -64,9 +77,11 @@ s32 Entity__UpdateSoundCueStart(Entity *this) {
     return this->soundCueActive;
 }
 
-/* arg1 is unused here; the canonical declaration in include/Entity.h has it
- * and its one caller, Entity__UpdateDeactivationState, passes 0. Do not drop
- * it -- `conflicting types`. */
+/* For a row with no link stage (a negative gEntityLinkStageTable entry) and
+ * an event video, sends ENTITY_EFFECT_LINK_STAGE while the player is within
+ * the video entry times 512 world units (Entity__IsTargetInRange). `unused`
+ * is Entity.h's declared second parameter; the one caller,
+ * Entity__UpdateDeactivationState, passes 0. */
 void Entity__NotifyIfTargetInRange(Entity *this, s32 unused) {
     if (gEntityLinkStageTable[this->moodIndex * 16] < 0 &&
         gEntityEventVideoTable[this->moodIndex * 16] != 0 &&
@@ -75,6 +90,8 @@ void Entity__NotifyIfTargetInRange(Entity *this, s32 unused) {
     }
 }
 
+/* 1 when the player is within 512 world units of this entity's height and
+ * distanceToPeer (|dx| + |dz|) is below `range`. */
 s32 Entity__IsTargetInRange(Entity *this, s32 range) {
     TodActor *other;
     s32 oy, ty;
@@ -132,7 +149,7 @@ void Entity__MoodCue00(Entity *this, SoundCueSet *out) {
             out->slots[0].octave = -2;
         }
         if (this->moodTimer == 2400) {
-            this->moodTimer = -1;
+            this->moodTimer = -1; /* Entity__TickSoundCue counts it back to 0: the cycle restarts */
         } else if (this->moodTimer < 1200) {
             this->methods->moveLocalZ(this, 50, 0);
         } else {
@@ -309,6 +326,7 @@ void Entity__MoodCue12(Entity *this) {
             this->state = 12;
         }
     } else if (this->state == 12) {
+        /* Counted here as well as by Entity__TickSoundCue: two per tick. */
         timer = this->moodTimer;
         this->moodTimer = timer + 1;
         if (timer == 300) {
@@ -323,7 +341,7 @@ void Entity__MoodCue13(Entity *this, SoundCueSet *out) {
         out->slots[0].program = 12;
         this->state++;
     } else if (out->tick >= this->todFrameCount - 1) {
-        out->tick = -1;
+        out->tick = -1; /* the cue's tick restarts every todFrameCount ticks */
     }
     if (this->state == 36) {
         if (rand() % 3 == 0) {
