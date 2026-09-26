@@ -12,7 +12,7 @@ Looks up a "cfg" byte-array pointer for the current style index
 `D_800873EC`; if the slot is NULL, falls back to `PickStyleFallbackConfig()` to
 produce one. Feeds `cfg` into the already-matched `FillStyleFromConfig(style,
 cfg)` against the fixed global `D_80087424` (a `StyleM` instance, split by
-splat into two adjacent labels `D_80087424`/`D_80087430` purely because
+splat into two adjacent labels `D_80087424`/`gStyleKind2AltColor` purely because
 something else references the middle of it -- the object is one 0x20-byte
 struct). Then does its own separate raw-byte read of `cfg[1]`/`cfg[2]`: if
 `cfg[1] >= 4`, stores a `gStylePalette[cfg[2]]` colour-table entry pointer into

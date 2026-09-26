@@ -16,11 +16,11 @@ local. Four separate things were wrong, found in this order:
 | 1 | `D_8008E0BC = randval % 6;` | retail's magic is `0x2AAAAAAB` with no shift = signed **/6**; the preserved `randval - (randval / 3) * 6` computed a different function. 49 -> 51/79 |
 | 2 | first `D_8008E0C0` store through `S32BoxK2 *slot` (`slot->v = ...`) | the whole `% 20` prefix (`lui 0x6666`, `lw gStyleCounter`, `mult`) now interleaves into the `% 3`'s `multu` latency exactly as retail. Same mechanism as StyleFillEffectKind3 this round: a store through a plain `s32 *` is an opaque `(mem (reg))` the scheduler will not hoist a global load above; an in-struct store at a varying address does not conflict with a scalar at a fixed address. Went 1 word short (the if/else, below). |
 | 3 | `r = rand();` then `(u32) r % 3`, instead of inlining `rand()` or a separate `idx = rand() % 3` | inline put `slot` in `$s0`; `idx` put the remainder in `$a0`. With the rand RESULT in a local, both `$a2` (slot) and `$v0` (remainder) are retail's. |
-| 4 | `val = (gStyleCounter / 20) * 20; if (gStyleCounter != val) val = D_80087430; else val = 0;` | **79/79**, `OK: build matches retail` |
+| 4 | `val = (gStyleCounter / 20) * 20; if (gStyleCounter != val) val = gStyleKind2AltColor; else val = 0;` | **79/79**, `OK: build matches retail` |
 
 ### Step 4: the if/else was being rewritten by jump.c
 
-Retail keeps both arms: `beq a1,v0 -> zero-arm; lw v0,D_80087430; j join;
+Retail keeps both arms: `beq a1,v0 -> zero-arm; lw v0,gStyleKind2AltColor; j join;
 nop; zero-arm: move v0,zero; join:`. Every `% 20` spelling with the load arm
 first (if/else, `!= 0`, ternary either way, `switch` with `default` first)
 compiled to `move a3,zero` ahead of the branch and a one-armed skip:
@@ -70,7 +70,7 @@ void **StyleFillEffectKind2(void **arg0, void *arg1) {
     slot++;
     val = (gStyleCounter / 20) * 20;
     if (gStyleCounter != val) {
-        val = D_80087430;
+        val = gStyleKind2AltColor;
     } else {
         val = 0;
     }
@@ -217,11 +217,11 @@ image verified green with it in place.
 **Negative 1: inverting the if/else arm order. Measured twice, on two
 different bodies, both worse and both reintroducing length drift.**
 
-Retail's block layout is unambiguous -- the `D_80087430` load is physically
+Retail's block layout is unambiguous -- the `gStyleKind2AltColor` load is physically
 FIRST and jumps (`j` with a `nop` delay), the `move v0,zero` arm is physically
 LAST and falls through -- which by section 3a's rule ("GCC 2.6.3 gives the
 fallthrough to whichever candidate is LAST in source order") says retail's
-source is `if (gStyleCounter % 20 != 0) { v0 = D_80087430; } else { v0 = 0; }`,
+source is `if (gStyleCounter % 20 != 0) { v0 = gStyleKind2AltColor; } else { v0 = 0; }`,
 the inverse of the inherited body. Applying it:
 
 | body it was applied to | before | after |
@@ -381,7 +381,7 @@ window.
 ```c
 extern s32 gStyleCounter;
 extern s32 gStyleCueSelf;
-extern s32 D_80087430;
+extern s32 gStyleKind2AltColor;
 extern s32 D_80087330;
 extern u8 gStyleKind2Colors[];
 extern s32 D_8008E0C0[];
@@ -405,7 +405,7 @@ void **StyleFillEffectKind2(void **arg0, void *arg1) {
     if (gStyleCounter % 20 == 0) {
         v0 = 0;
     } else {
-        v0 = D_80087430;
+        v0 = gStyleKind2AltColor;
     }
     *slot = v0;
     SetupStyleSpawnParamsA(arg1, (void *) D_80087330);

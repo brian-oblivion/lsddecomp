@@ -2918,3 +2918,4 @@ gStyleSpawnYChoices = 0x80087328;
 gStyleVariantConfigs = 0x800873C8;
 gStyleVariantConfigCounts = 0x800873D8;
 gStyleVariantPicks = 0x800873DC;
+gStyleKind2AltColor = 0x80087430;

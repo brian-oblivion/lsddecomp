@@ -505,7 +505,7 @@ Class876FC **StyleFillEffectKind3(Class876FC **arg0, LongVec3 *arg1) {
     return arg0;
 }
 
-extern s32 D_80087430;
+extern s32 gStyleKind2AltColor;
 extern u8 gStyleKind2Colors[];
 extern s32 D_8008E0C0[];
 extern u8 *D_8008E0B0;
@@ -521,11 +521,11 @@ typedef struct S32BoxK2 {
 } S32BoxK2;
 
 /* Appends one kind-2 New_Class876FC object after picking a random colour
- * triple and a per-20-ticks D_80087430 value.  MATCHED round 76 (charlie).
+ * triple and a per-20-ticks gStyleKind2AltColor value.  MATCHED round 76 (charlie).
  * `val = (gStyleCounter / 20) * 20; if (gStyleCounter != val)` is the
  * load-bearing spelling of `% 20 != 0`: because the tested variable is also
  * the assigned one, jump.c cannot rewrite the if/else into `val = 0; if (..)
- * val = D_80087430;`, which is what every `% 20` spelling compiles to. */
+ * val = gStyleKind2AltColor;`, which is what every `% 20` spelling compiles to. */
 Class876FC **StyleFillEffectKind2(Class876FC **arg0, LongVec3 *arg1) {
     s32 r;
     s32 val;
@@ -538,7 +538,7 @@ Class876FC **StyleFillEffectKind2(Class876FC **arg0, LongVec3 *arg1) {
     slot++;
     val = (gStyleCounter / 20) * 20;
     if (gStyleCounter != val) {
-        val = D_80087430;
+        val = gStyleKind2AltColor;
     } else {
         val = 0;
     }
