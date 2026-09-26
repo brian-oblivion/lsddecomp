@@ -1,4 +1,6 @@
-# Class876FC__BuildRandomSprites -- MATCHED 87/87 (head adjudication of a mis-classified stall)
+# StyleEffect__BuildRandomSprites -- MATCHED 87/87 (head adjudication of a mis-classified stall)
+
+> Renamed from `Class876FC__BuildRandomSprites` on 2026-09-26 (tools/rename.py). Address 0x80056bbc.
 
 > Renamed from `func_80056BBC` on 2026-09-23 (tools/rename.py). Address 0x80056bbc.
 
@@ -112,8 +114,8 @@ own entry point and would not have resolved for the next reader.
 
 ## Final body
 
-Lives in `src/class_3bb8c_s.c` in ROM order between `Class876FC__ReleaseModelChildren` and
-`Class876FC__SpawnSprites`.
+Lives in `src/class_3bb8c_s.c` in ROM order between `StyleEffect__ReleaseModelChildren` and
+`StyleEffect__SpawnSprites`.
 
 ### Proposed learning
 
@@ -135,28 +137,28 @@ stays.
 
 **Callee evidence** (`0x80056BBC`, and the matched definition *in this same
 file*, ROM-later at line 379): entry is `move s1,a0` and `$a1` is never read —
-one real argument, as `void Class876FC__BuildRandomSprites(LinkNode *self)` says.
+one real argument, as `void StyleEffect__BuildRandomSprites(LinkNode *self)` says.
 
-**Why the extern must stay unprototyped.** `Class876FC__InitByKind`'s dispatch passes a
+**Why the extern must stay unprototyped.** `StyleEffect__InitByKind`'s dispatch passes a
 second argument, and retail emits it:
 
 ```
 8005660c:  move  a0,s1
-80056610:  jal   80056bbc <Class876FC__BuildRandomSprites>
+80056610:  jal   80056bbc <StyleEffect__BuildRandomSprites>
 80056614:  move  a1,zero          <- the dead 2nd argument, in retail
 ```
 
-This is the same uniform `(self, 0)` switch as the `Class876FC__SpawnPlainSprites`
+This is the same uniform `(self, 0)` switch as the `StyleEffect__SpawnPlainSprites`
 arm two cases down (`move a1,zero` at `0x80056624`).
 
 **What makes this one different from the rest of the round.** The declaration
 and the definition are in the SAME translation unit — the extern at line 146
-exists only because `Class876FC__InitByKind` (ROM-earlier) calls a function defined
+exists only because `StyleEffect__InitByKind` (ROM-earlier) calls a function defined
 ROM-later in the file, and CLAUDE.md requires strict ROM-address order. So
 this is not two units holding different views; it is one unit that must
 declare its own function with an argument list its own definition contradicts.
 The unspecified parameter list is what lets both coexist: a full prototype at
-line 146 would make the `Class876FC__BuildRandomSprites(self, 0)` call at line 192 a
+line 146 would make the `StyleEffect__BuildRandomSprites(self, 0)` call at line 192 a
 `too many arguments` error against the definition 187 lines further down.
 
 **Declaration sites changed:** none (arity unchanged). `/* arity-ok: ... */`
@@ -164,16 +166,16 @@ added to `src/class_3bb8c_s.c:146`. Oracle green.
 
 ## Naming
 
-Round 70 (alpha). `func_80056BBC` -> `Class876FC__BuildRandomSprites`, **tier B**.
+Round 70 (alpha). `func_80056BBC` -> `StyleEffect__BuildRandomSprites`, **tier B**.
 
-Only caller Class876FC__InitByKind, kind 2. Body: parity = rand() % 2;
-Class876FC__SpawnSprites with gSpriteScaleHalf on parity 0, NULL otherwise;
+Only caller StyleEffect__InitByKind, kind 2. Body: parity = rand() % 2;
+StyleEffect__SpawnSprites with gSpriteScaleHalf on parity 0, NULL otherwise;
 then tableIndex >= 2: sprites[1] gets Actor__AddTranslation by
 (gSpriteShiftX[tableIndex], 0, 0) and slotB8 with altColor or color; else
 sprites[1] gets setSemiTrans(1), setSemiTransRate(0) and updateScale(set,
 parity ? gSpriteScaleLarge : gSpriteScaleSmall); finally sprites[2]
 setDisplay(0). "Sprites" rests on the D800879C4 reading (see
-Class876FC__SpawnSprites); B.
+StyleEffect__SpawnSprites); B.
 
 Globals named in this pass (only this unit references them, tier B, named by
 their ratio-triple values): `gSpriteShiftX` (was D_80087844, s32[6]),
@@ -184,4 +186,4 @@ their ratio-triple values): `gSpriteShiftX` (was D_80087844, s32[6]),
 
 ## Track 4 (2026-09-26, round 88, charlie)
 
-class_3bb8c_s.c's `LinkNode` view (owner and children under one type) is gone: the owner is `Class876FC` (include/Class876FC.h), `modelChildren` are `Actor *`, `sprites` are `VariantSprite *`, and the local `Vec3S` is `LongVec3`. Accessor renames: `kind` is Actor's `pendingExtra` (+0x054, where the ctor stores it); `offset`/`rotation`/`scale`/`modelChildLayout`/`tableIndex`/`color`/`altColor` are `params.*`; slot `slotB8` is Actor's `setTranslation` on the owner and model children and Sprite's `setColor` on sprites; `*coord2 = 0` is `coord2->flg = 0`. Image byte-identical.
+class_3bb8c_s.c's `LinkNode` view (owner and children under one type) is gone: the owner is `StyleEffect` (include/StyleEffect.h), `modelChildren` are `Actor *`, `sprites` are `VariantSprite *`, and the local `Vec3S` is `LongVec3`. Accessor renames: `kind` is Actor's `pendingExtra` (+0x054, where the ctor stores it); `offset`/`rotation`/`scale`/`modelChildLayout`/`tableIndex`/`color`/`altColor` are `params.*`; slot `slotB8` is Actor's `setTranslation` on the owner and model children and Sprite's `setColor` on sprites; `*coord2 = 0` is `coord2->flg = 0`. Image byte-identical.

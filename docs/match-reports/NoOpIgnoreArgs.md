@@ -20,7 +20,7 @@ void NoOpIgnoreArgs(void) {
 
 Whole body is the trivial `jr $ra; nop` epilogue with nothing in between --
 splat emits this shape itself for any zero-instruction function. Called from
-`src/class_3bb8c_s.c`'s `Class876FC__UpdateByKind` as the `self->unk54 == 2` handler,
+`src/class_3bb8c_s.c`'s `StyleEffect__UpdateByKind` as the `self->unk54 == 2` handler,
 alongside two real handlers for `case 0` and `case 3` -- i.e. retail's own
 source really does dispatch to an empty function for this state, this is not
 a decompilation artifact.
@@ -29,8 +29,8 @@ a decompilation artifact.
 
 **`NoOpIgnoreArgs` -- tier A.** A pure leaf whose mechanics ARE its purpose: the body
 does nothing, and it is reached as the `case 2:` arm of the state switch on
-`self->unk54` in `class_3bb8c_s.c:Class876FC__UpdateByKind`, beside real arms
-(`Class876FC__DriftModelChildren`, `Class876FC__RandomizeSprites`) that take the same
+`self->unk54` in `class_3bb8c_s.c:StyleEffect__UpdateByKind`, beside real arms
+(`StyleEffect__DriftModelChildren`, `StyleEffect__RandomizeSprites`) that take the same
 `(self, arg1)` shape -- which rules out "this is just an unextracted stub" as
 the alternative reading. No class prefix: the function takes no `self` (a
 bare `void(void)`), and every call site passes a dead second argument the

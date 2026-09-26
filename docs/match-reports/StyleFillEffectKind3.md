@@ -28,7 +28,7 @@ PtrBoxK3 *q;
 ...
 q = (PtrBoxK3 *) &gStyleSpawnRotation;
 q->p = gStyleSpawnRotations;
-*arg0 = New_Class876FC((void *) 3, (u8 *) q - 0xC, (void *) gStyleGrid, arg1);
+*arg0 = New_StyleEffect((void *) 3, (u8 *) q - 0xC, (void *) gStyleGrid, arg1);
 ```
 
 No `t` at all, and the else value goes back to being an anonymous
@@ -180,7 +180,7 @@ retail                              built
 458e8  addiu v0,v0,%lo(gStyleSpawnRotations)  458e8  addiu v0,v0,%lo(gStyleSpawnRotations)
 458ec  lw    a2,%gp_rel(gStyleGrid) 458ec  sw    v0,0(v1)          <-- here
 458f0  move  a3,s1                  458f0  lw    a2,%gp_rel(gStyleGrid)
-458f4  jal   New_Class876FC          458f4  jal   New_Class876FC
+458f4  jal   New_StyleEffect          458f4  jal   New_StyleEffect
 458f8   sw   v0,0(v1)   (delay)     458f8   move a3,s1   (delay)
 ```
 
@@ -216,7 +216,7 @@ as a limit.
     q = &gStyleSpawnRotation;
     t = gStyleGrid;                                    /* s32 t; */
     *q = gStyleSpawnRotations;
-    *arg0 = New_Class876FC((void *) 3, (u8 *) q - 0xC, (void *) t, arg1);
+    *arg0 = New_StyleEffect((void *) 3, (u8 *) q - 0xC, (void *) t, arg1);
 ```
 
 Every instruction and every placement matches retail. The only diff is a
@@ -342,7 +342,7 @@ extern s32 gStyleSpawnOffsetY;
 extern s32 gStyleSpawnOffsetZ;
 extern u8 gStyleKind3Colors[];
 extern s32 rand(void);
-extern void *New_Class876FC(void *arg0, void *arg1, void *arg2, void *arg3);
+extern void *New_StyleEffect(void *arg0, void *arg1, void *arg2, void *arg3);
 
 void **StyleFillEffectKind3(void **arg0, void *arg1) {
     s32 t;
@@ -369,7 +369,7 @@ void **StyleFillEffectKind3(void **arg0, void *arg1) {
     t = gStyleGrid;
     q = &gStyleSpawnRotation;
     *q = gStyleSpawnRotations;
-    *arg0 = New_Class876FC((void *) 3, (u8 *) q - 0xC, (void *) t, arg1);
+    *arg0 = New_StyleEffect((void *) 3, (u8 *) q - 0xC, (void *) t, arg1);
     arg0++;
     return arg0;
 }
@@ -431,14 +431,14 @@ means the real difference is upstream of the schedule.
 
 Called only when `gStyleVariant == 0`, from `StyleBuildEffectSlots`, as
 the kind-0-exclusive finishing fill. Passes a literal kind argument of `3`
-to `New_Class876FC` and appends exactly one slot (`*arg0 = ...; arg0++;
+to `New_StyleEffect` and appends exactly one slot (`*arg0 = ...; arg0++;
 return arg0;`). STALL, 79/81 words (length exact), register-identity
 residue only; naming from the literal `3` argument, confirmed the same way
 as `StyleFillEffectKind0`/`1`/`2`.
 
 ## Track 4 (2026-09-26, round 88, charlie)
 
-`gStyleEffectSlots` holds Class876FC objects (New_Class876FC), so the walking pointer is `Class876FC **` and the position `LongVec3 *`; `kind` is passed as a plain `s32` (was `(void *) N`), the params block as `(Class876FCParams *)` over the separately-declared gStyleSpawnOffsetX.. symbols (one 0x24-byte Class876FCParams in the bytes; left as they are, a track 4b job), and gStyleGrid as the `SceneNode *` parent. Image byte-identical.
+`gStyleEffectSlots` holds StyleEffect objects (New_StyleEffect), so the walking pointer is `StyleEffect **` and the position `LongVec3 *`; `kind` is passed as a plain `s32` (was `(void *) N`), the params block as `(StyleEffectParams *)` over the separately-declared gStyleSpawnOffsetX.. symbols (one 0x24-byte StyleEffectParams in the bytes; left as they are, a track 4b job), and gStyleGrid as the `SceneNode *` parent. Image byte-identical.
 
 ## Round 93 polish (delta, track 7)
 
@@ -449,7 +449,7 @@ as `StyleFillEffectKind0`/`1`/`2`.
 | `D_8008721C` | `gStyleKind3Colors` | A | 3 RGB triples stored as the params' color for kind 3. |
 | `D_80087174` | `gStyleSpawnRotations` | A | 7 Ratio16 triples, each (0/1, y/1, 0/1) with y = 0, 60, 120, 180, 230, -5 and (last) -3 with z 180: the params' rotation (SetupStyleSpawnParamsA/B pick one by `rand() % 7`); kinds 2 and 3 then take entry 0. |
 | `0xFFFF5000`, `-0x2000`, `-0x7800` | `-45056`, `-8192`, `-30720` | -- | offsets, decimal per the base rule; a name would restate them. |
-| `0xC` | `offsetof(Class876FCParams, rotation)` | A | the params block's address taken back from its rotation member. |
+| `0xC` | `offsetof(StyleEffectParams, rotation)` | A | the params block's address taken back from its rotation member. |
 
 Locals: `slots`, `pos`, `offsetZ`, `rotation`.
 
@@ -468,7 +468,7 @@ Verbatim as they stood before the round-93 comment pass (identifiers already car
 ```
 
 ```c
-/* Appends one kind-3 New_Class876FC object; with the decor variant active
+/* Appends one kind-3 New_StyleEffect object; with the decor variant active
  * and the default colour table it pins the spawn parameters, otherwise it
  * clamps gStyleSpawnOffsetZ and picks a random colour triple.  MATCHED round 76
  * (charlie). */

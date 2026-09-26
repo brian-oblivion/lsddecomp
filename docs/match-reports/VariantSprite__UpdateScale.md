@@ -127,7 +127,7 @@ set, s16 *ratios)` with `spriteScaleX`/`spriteScaleY`, byte-identical.
 
 | name | tier | evidence |
 | --- | --- | --- |
-| `VariantSprite__UpdateScale` (was `func_80057DF4`) | A | Slot `+0x048` of `gVariantSpriteMethods`; `tools/classtable.py gVariantSpriteMethods --vs gSceneNodeMethods` shows it overriding `SceneNode__UpdateScale`, and the name follows the slot. Every caller agrees it is a scale: class_3bb8c_s.c calls it through `updateScale` on the sprites with `gSpriteScaleLarge` ({6,5},{6,5},{1,1}) / `gSpriteScaleSmall` ({4,6},{4,6},{1,1}) or a caller-supplied table (`Class876FC__SpawnSprites`), always `set = 1`. The body turns two num/den ratios into 20.12 and (unk58 == 0) stores them at `+0x80`/`+0x82`, which are GsSPRITE.scalex/scaley at `+0x64` (layout evidence in `VariantSprite__SetVariantClut`'s report). |
+| `VariantSprite__UpdateScale` (was `func_80057DF4`) | A | Slot `+0x048` of `gVariantSpriteMethods`; `tools/classtable.py gVariantSpriteMethods --vs gSceneNodeMethods` shows it overriding `SceneNode__UpdateScale`, and the name follows the slot. Every caller agrees it is a scale: class_3bb8c_s.c calls it through `updateScale` on the sprites with `gSpriteScaleLarge` ({6,5},{6,5},{1,1}) / `gSpriteScaleSmall` ({4,6},{4,6},{1,1}) or a caller-supplied table (`StyleEffect__SpawnSprites`), always `set = 1`. The body turns two num/den ratios into 20.12 and (unk58 == 0) stores them at `+0x80`/`+0x82`, which are GsSPRITE.scalex/scaley at `+0x64` (layout evidence in `VariantSprite__SetVariantClut`'s report). |
 | param `set` | A | The base method's name for `$a1` (1 = assign, 0 = accumulate); this override never reads it. |
 | param `ratios` | A | Two s16 {num, den} pairs, x then y. The round-47 description "`{s16 whole; s16 frac;}`" was wrong: the body computes `num / den` in 20.12, and the caller tables hold {6,5} and {4,6}. |
 | fields `spriteScaleX` / `spriteScaleY` (`+0x80`/`+0x82`) | A | GsSPRITE.scalex/scaley. Unit-local struct: renamed in place. |
@@ -153,7 +153,7 @@ mechanics are certain and are the whole of what the class adds to Sprite --
 `variant` (0 or 1) picks the texture cell the Sprite ctor binds
 (`gVariantSpriteCells`) and the CLUT row the reset slot sets
 (`gVariantSpriteClutX/Y`). What the sprites are in the game is not
-established (their only builder is Class876FC, kinds 2 and 3, and every
+established (their only builder is StyleEffect, kinds 2 and 3, and every
 path passes variant 0), which is why it is not tier A. The table, getter,
 allocator, methods and the three data tables followed the class name.
 The same tool run rewrote `Class879C4` tokens inside this report's older

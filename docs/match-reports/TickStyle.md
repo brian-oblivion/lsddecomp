@@ -291,8 +291,8 @@ Verbatim as they stood before the round-93 comment pass (identifiers already car
  * into THREE separate object families through local method-table views: a
  * decoration object (`gStyleDecorObj`, `New_BoxFill`-allocated), an
  * 18-slot "decor set" array (`gStyleDecorSlots`, same allocator) and an
- * Class876FC "effect slots" array (`gStyleEffectSlots`, include/
- * Class876FC.h, `New_Class876FC`-allocated, kind-tagged 0..3 by
+ * StyleEffect "effect slots" array (`gStyleEffectSlots`, include/
+ * StyleEffect.h, `New_StyleEffect`-allocated, kind-tagged 0..3 by
  * `StyleFillEffectKind0`..`3`'s literal first argument), plus a two-slot
  * positional sound-cue subsystem (`gStyleCueSlots`, `TryStartStyleCue`/
  * `FindNextStyleCueInRange`/`FlushStyleCue`/`ServiceStyleCueIfNear`/

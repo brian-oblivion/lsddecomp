@@ -1,9 +1,11 @@
-# Class876FC__SetParams -- MATCHED (20/20 words)
+# StyleEffect__SetParams -- MATCHED (20/20 words)
+
+> Renamed from `Class876FC__SetParams` on 2026-09-26 (tools/rename.py). Address 0x800564a4.
 
 > Renamed from `func_800564A4` on 2026-09-23 (tools/rename.py). Address 0x800564a4.
 
-Unit: `class_3bb8c_r` (round 17 continuation). `Class876FCMethods::slot40`
-(vtable offset `+0x040` of `gClass876FCMethods`) -- a plain 0x24-byte block copy
+Unit: `class_3bb8c_r` (round 17 continuation). `StyleEffectMethods::slot40`
+(vtable offset `+0x040` of `gStyleEffectMethods`) -- a plain 0x24-byte block copy
 from the caller's argument into `self+0x58`, plus a single word clear.
 
 ## Final source
@@ -17,7 +19,7 @@ typedef struct Block24 {
     s32 raw[0x24 / 4];
 } Block24;
 
-void Class876FC__SetParams(Class876FC *self, Block24 *src) {
+void StyleEffect__SetParams(StyleEffect *self, Block24 *src) {
     self->block58 = *src;
     self->unk24 = 0;
 }
@@ -31,7 +33,7 @@ void Class876FC__SetParams(Class876FC *self, Block24 *src) {
   `self->methods->slot40(self)` (a plain no-argument dispatch, since its
   OWN concrete class -- a different sibling -- happens to call slot40
   with no extra argument); THIS class's own ctor
-  (`Class876FC__Class876FC`, this unit) calls the SAME shared slot with a real
+  (`StyleEffect__StyleEffect`, this unit) calls the SAME shared slot with a real
   second argument, `slot40(self, arg2)`. Both are correct about their own
   call sites: the slot's real arity is 1 argument beyond `self`, and the
   DreamSys-family sibling in `class_3bb8c_o.c` simply never had a value
@@ -65,8 +67,8 @@ void Class876FC__SetParams(Class876FC *self, Block24 *src) {
 
 ## Naming
 
-**Tier A.** Renamed from the report's own `Obj876FCMethods::slot40` description: the body sets the class's own param block from the caller's argument and resets the tick counter -- "SetParams" is what the body does, not a guess at why. Struct field `setParams` (this unit's `Class876FCMethods` local view) renamed to match.
+**Tier A.** Renamed from the report's own `Obj876FCMethods::slot40` description: the body sets the class's own param block from the caller's argument and resets the tick counter -- "SetParams" is what the body does, not a guess at why. Struct field `setParams` (this unit's `StyleEffectMethods` local view) renamed to match.
 
 ## Track 4 (2026-09-26, round 88, charlie)
 
-Occupies SceneNode's +0x040 `reset` slot; kept its name because it does more than reset (it copies the 0x24-byte block). The block is now `Class876FCParams` (include/Class876FC.h), a struct of 4-aligned members, 0x24 bytes: the whole-struct copy compiles to the same aligned block move the old `Block24` word array gave. Image byte-identical.
+Occupies SceneNode's +0x040 `reset` slot; kept its name because it does more than reset (it copies the 0x24-byte block). The block is now `StyleEffectParams` (include/StyleEffect.h), a struct of 4-aligned members, 0x24 bytes: the whole-struct copy compiles to the same aligned block move the old `Block24` word array gave. Image byte-identical.

@@ -1,4 +1,6 @@
-# Class876FC__DriftModelChildren -- MATCHED round 75 (121/121, whole image OK). Lever: read the step straight from the table in the guard, and take the loop pointer again AFTER the call (CSE makes retail's `move s4,s1`); the named pre-branch `tab70` pointer was the "commutative register-identity swap"
+# StyleEffect__DriftModelChildren -- MATCHED round 75 (121/121, whole image OK). Lever: read the step straight from the table in the guard, and take the loop pointer again AFTER the call (CSE makes retail's `move s4,s1`); the named pre-branch `tab70` pointer was the "commutative register-identity swap"
+
+> Renamed from `Class876FC__DriftModelChildren` on 2026-09-26 (tools/rename.py). Address 0x800569a8.
 
 REVISITED, round 75: MATCHED (3 builds); names/types not relevant (source shape only).
 
@@ -62,7 +64,7 @@ both guards and a third bound check on `self->unk24` pass, it forwards a
 table handle to `self` and to each of the two `arr7C` children, folds a
 per-child Vec3 offset and dispatches it through vtable slot `slotBC`, then
 runs a modulus check against a `24500 / gModelChildDriftZ[idx]` quotient to decide
-whether to call `Class876FC__PlaceModelChildren(self, 1)`. Always zeroes `*self->unk14` on
+whether to call `StyleEffect__PlaceModelChildren(self, 1)`. Always zeroes `*self->unk14` on
 every exit path.
 
 ## Round 44 correction to round 26's field reading
@@ -88,10 +90,10 @@ from what round 26 assumed.
  * layout. Always marks self's coord2 for recompute.
  *
  * round 44 (2026-09-15): best-reached body, 117/121 words, NOT byte-exact.
- * See docs/match-reports/Class876FC__DriftModelChildren.md for the residue and what was
+ * See docs/match-reports/StyleEffect__DriftModelChildren.md for the residue and what was
  * tried. Kept here per the hard rule -- restore this ahead of any future
  * attempt rather than re-deriving from scratch. */
-void Class876FC__DriftModelChildren(Class876FC *self)
+void StyleEffect__DriftModelChildren(StyleEffect *self)
 {
     s32 idx;
     s32 *tab70;
@@ -125,12 +127,12 @@ void Class876FC__DriftModelChildren(Class876FC *self)
             modend = self->tick;
             if (divq >= 0) {
                 if ((u32) modend % (u32) divq == 0) {
-                    Class876FC__PlaceModelChildren(self, 1);
+                    StyleEffect__PlaceModelChildren(self, 1);
                 }
             } else {
                 u32 adivq = ~divq + 1;
                 if ((u32) modend % adivq == 0) {
-                    Class876FC__PlaceModelChildren(self, 1);
+                    StyleEffect__PlaceModelChildren(self, 1);
                 }
             }
         }
@@ -155,7 +157,7 @@ s32 modelChildLayout;       /* +0x06C */
 s32 tableIndex;             /* +0x070 */
 LinkNode *modelChildren[2]; /* +0x07C */
 
-typedef struct LinkNode Class876FC;
+typedef struct LinkNode StyleEffect;
 extern s32 gModelChildDriftZ[];
 extern Vec3S gModelChildDriftInit;
 extern s32 gSpinRotStep[];
@@ -187,7 +189,7 @@ before the next was tried:
    existed) and it regressed the score, which is why the report at the time
    concluded "neither ordering is reliably predictable." In the CURRENT
    context it closed the entire back half of the function (the whole
-   divide/modulo/`Class876FC__PlaceModelChildren`-call tail) — 96 -> 109/121. **This directly
+   divide/modulo/`StyleEffect__PlaceModelChildren`-call tail) — 96 -> 109/121. **This directly
    confirms MATCHING-GUIDE.md's own caution that the "arm that must jump"
    polarity is not context-independent**: the same source-level change was a
    regression in one register-allocation context and the correct fix in
@@ -238,7 +240,7 @@ Tried this round, both inert (byte-identical output to the array form):
 This is the same "commutative operand order, not independently reachable"
 class as `code_179d8_j`'s `SsUtKeyOff` (per round 26's own note), which
 needed the permuter to close. Set up this round with
-`tools/setup-permuter.sh Class876FC__DriftModelChildren <seed>` using the 117/121 body above
+`tools/setup-permuter.sh StyleEffect__DriftModelChildren <seed>` using the 117/121 body above
 as the seed. `--debug --stack-diffs` measured a base score of 30 (a single,
 tightly-scoped residue — a MUCH better-posed base than round 26's 790,
 consistent with the three levers above having eliminated everything else).
@@ -247,7 +249,7 @@ this round's own correction to round 26's unbounded-search mistake) and
 reached **19712 iterations with zero errors on most candidates, but the
 score never dropped below its starting value of 30** — i.e. **not closed in
 ~19700 iterations under this session's load**, not "permuter-exhausted."
-The search process was scoped to this worktree (`permuter-work/Class876FC__DriftModelChildren`
+The search process was scoped to this worktree (`permuter-work/StyleEffect__DriftModelChildren`
 under `lsddecomp2-wt-charlie`) and left to self-terminate on its own
 `timeout` rather than killed by PID-guessing.
 
@@ -293,15 +295,15 @@ the same function."
 
 ## Naming
 
-Round 70 (alpha). `func_800569A8` -> `Class876FC__DriftModelChildren`, **tier B**.
+Round 70 (alpha). `func_800569A8` -> `StyleEffect__DriftModelChildren`, **tier B**.
 
 Named from its preserved body and asm (still a stall, so B): gated on
 modelChildLayout != 0, gModelChildDriftZ[tableIndex] != 0 and tick >= 501;
 adds gSpinRotStep via updateRotation(.., 0, ..) to self and both children,
 adds a z delta via each child's slot +0x0BC (Actor__AddTranslation in
 gActorMethods), and every 24500 / step frames calls
-Class876FC__PlaceModelChildren(self, 1) to snap them back. Always stores 0
-to `*coord2` (GsCOORDINATE2.flg). Caller: Class876FC__UpdateByKind, kind 0.
+StyleEffect__PlaceModelChildren(self, 1) to snap them back. Always stores 0
+to `*coord2` (GsCOORDINATE2.flg). Caller: StyleEffect__UpdateByKind, kind 0.
 
 Globals named in this pass (only this unit references them, tier B):
 `gModelChildDriftZ` (was D_8008780C, s32[8] = {0, 0, 0, -1, -2, -4, -16,
@@ -328,7 +330,7 @@ both green with the body in its NON_MATCHING branch.
 
 `tools/externcheck.py` flagged this function once it matched: the definition
 takes one parameter and the file's forward `extern` is unprototyped, because
-`Class876FC__UpdateByKind` calls it as `(self, pos)`. Measured: the body writes
+`StyleEffect__UpdateByKind` calls it as `(self, pos)`. Measured: the body writes
 `$a1` (`move a1,zero`) before any read, and retail's caller emits `move a1,s1`
 in the `jal` delay slot at 0x800566D8, so the dead second argument is
 byte-load-bearing. Same idiom as the three sibling externs above it; annotated
@@ -336,4 +338,4 @@ byte-load-bearing. Same idiom as the three sibling externs above it; annotated
 
 ## Track 4 (2026-09-26, round 88, charlie)
 
-class_3bb8c_s.c's `LinkNode` view (owner and children under one type) is gone: the owner is `Class876FC` (include/Class876FC.h), `modelChildren` are `Actor *`, `sprites` are `VariantSprite *`, and the local `Vec3S` is `LongVec3`. Accessor renames: `kind` is Actor's `pendingExtra` (+0x054, where the ctor stores it); `offset`/`rotation`/`scale`/`modelChildLayout`/`tableIndex`/`color`/`altColor` are `params.*`; slot `slotB8` is Actor's `setTranslation` on the owner and model children and Sprite's `setColor` on sprites; `*coord2 = 0` is `coord2->flg = 0`. Image byte-identical.
+class_3bb8c_s.c's `LinkNode` view (owner and children under one type) is gone: the owner is `StyleEffect` (include/StyleEffect.h), `modelChildren` are `Actor *`, `sprites` are `VariantSprite *`, and the local `Vec3S` is `LongVec3`. Accessor renames: `kind` is Actor's `pendingExtra` (+0x054, where the ctor stores it); `offset`/`rotation`/`scale`/`modelChildLayout`/`tableIndex`/`color`/`altColor` are `params.*`; slot `slotB8` is Actor's `setTranslation` on the owner and model children and Sprite's `setColor` on sprites; `*coord2 = 0` is `coord2->flg = 0`. Image byte-identical.

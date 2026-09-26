@@ -8,7 +8,7 @@
  * gActorMethods): a SceneNode subclass. Methods in src/class_3bb8c_o.c and
  * src/class_3bb8c_p.c. Three classes derive from it directly
  * (`typeviews.py --tree`): TodActor (0x234, code_55dd4; Entity below it),
- * DreamSys (0x1F34) and Class876FC (0xEF34, class_3bb8c_r/s).
+ * DreamSys (0x1F34) and StyleEffect (0xEF34, class_3bb8c_r/s).
  *
  * Children and companions. addChild/removeChild/removeAllChildren chain
  * SceneNode's and also record two companions by the child's class id:
@@ -96,7 +96,7 @@ extern ActorMethods *GetActorMethods(void); /* returns &gActorMethods */
 /* The class's own methods, in ROM order (class_3bb8c_o, then class_3bb8c_p),
  * then its non-slot helpers. A subclass reaches the base ones through
  * GetActorMethods() and upcasts. */
-void Actor__func_56f5c(s32 unused, Actor *self, s32 arg2, s32 arg3);
+void SetStyleEffectSources(s32 unused, Actor *self, s32 arg2, s32 arg3);
 void *New_Actor(void);
 Actor *Actor__Actor(Actor *self);
 void Actor__AddChild(Actor *self, BasicClass *child);

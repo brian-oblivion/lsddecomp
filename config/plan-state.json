@@ -893,11 +893,6 @@
           "date": "2026-09-26",
           "header": "include/Class866E8.h"
         },
-        "gClass876FCMethods": {
-          "class": "Class876FC",
-          "date": "2026-09-26",
-          "header": "include/Class876FC.h"
-        },
         "gDrawSystemMethods": {
           "class": "DrawSystem",
           "date": "2026-09-26",
@@ -1027,6 +1022,11 @@
           "class": "StreamTask",
           "date": "2026-09-26",
           "header": "include/StreamTask.h"
+        },
+        "gStyleEffectMethods": {
+          "class": "StyleEffect",
+          "date": "2026-09-26",
+          "header": "include/StyleEffect.h"
         },
         "gTaskCoreMethods": {
           "class": "TaskCore",

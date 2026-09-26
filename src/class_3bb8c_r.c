@@ -14,10 +14,10 @@
  *    (ComputeStyleCueFalloff) and, on the ticks its pattern selects,
  *    requests programs on the three voices; most restart the pattern by setting
  *    `tick` to -1 once it passes a limit.
- *  - Class876FC (include/Class876FC.h, unified round 88), an Actor
- *    subclass (id 0xEF34, parent 0x34): this unit supplies its slot
- *    occupants (Class876FC__Class876FC/__Finalize/__SetParams/__Update)
- *    and the `New_Class876FC` allocator; its private helpers are in
+ *  - StyleEffect (include/StyleEffect.h), the Actor subclass the style
+ *    layer keeps at an offset from its target: this unit supplies its slot
+ *    occupants (StyleEffect__StyleEffect/__Finalize/__SetParams/__Update)
+ *    and the `New_StyleEffect` allocator; its per-kind work is in
  *    class_3bb8c_s.c and class_3bb8c_o.c.
  *
  * Named round 73 (charlie); tiers and evidence in each function's match
@@ -25,7 +25,7 @@
  */
 #include "common.h"
 #include "Actor.h"
-#include "Class876FC.h"
+#include "StyleEffect.h"
 #include "SoundCueSet.h"
 
 /* ------------------------------------------------------------------ *
@@ -296,18 +296,18 @@ s32 IsStyleVariantEven(void) {
 }
 
 /* ------------------------------------------------------------------ *
- * Class876FC's slot occupants (ctor, finalize, reset = SetParams, +0x0EC =
- * Update), plus its `New_` allocator. The class: include/Class876FC.h.
+ * StyleEffect's slot occupants (ctor, finalize, reset = SetParams, +0x0EC =
+ * Update), plus its `New_` allocator. The class: include/StyleEffect.h.
  * ------------------------------------------------------------------ */
 
 extern void *BMemPMgrAlloc(s32 size);
 extern void *BMemPMgrFree(void *ptr);
 
-Class876FC *New_Class876FC(s32 kind, Class876FCParams *params, SceneNode *parent, LongVec3 *pos) {
-    Class876FC *self = BMemPMgrAlloc(0x98);
+StyleEffect *New_StyleEffect(s32 kind, StyleEffectParams *params, SceneNode *parent, LongVec3 *pos) {
+    StyleEffect *self = BMemPMgrAlloc(0x98);
 
     if (self != NULL) {
-        if (GetClass876FCMethods()->ctor(self, kind, params, parent, pos) != NULL) {
+        if (GetStyleEffectMethods()->ctor(self, kind, params, parent, pos) != NULL) {
             return self;
         }
         BMemPMgrFree(self);
@@ -316,17 +316,17 @@ Class876FC *New_Class876FC(s32 kind, Class876FCParams *params, SceneNode *parent
     return NULL;
 }
 
-/* `kind` goes into Actor's pendingExtra (+0x054): see include/Class876FC.h. */
-Class876FC *Class876FC__Class876FC(Class876FC *self, s32 kind, Class876FCParams *params,
-                                   SceneNode *parent, LongVec3 *pos) {
+/* `kind` goes into Actor's pendingExtra (+0x054): see include/StyleEffect.h. */
+StyleEffect *StyleEffect__StyleEffect(StyleEffect *self, s32 kind, StyleEffectParams *params,
+                                      SceneNode *parent, LongVec3 *pos) {
     if (GetActorMethods()->ctor((Actor *)self) == NULL) {
         goto fail;
     }
-    self->methods = GetClass876FCMethods();
+    self->methods = GetStyleEffectMethods();
     self->state = 0;
     self->pendingExtra = kind;
-    ((Class876FCSetParamsFn)self->methods->reset)(self, params);
-    Class876FC__InitByKind(self, parent, pos);
+    ((StyleEffectSetParamsFn)self->methods->reset)(self, params);
+    StyleEffect__InitByKind(self, parent, pos);
     return self;
 fail:
     return NULL;
@@ -334,19 +334,19 @@ fail:
 
 /* The base finalize is SceneNode__Finalize, which returns nothing: the old
  * view's `return base->dtor(self)` forwarded a $v0 no one sets. */
-void Class876FC__Finalize(Class876FC *self) {
-    Class876FC__ReleaseByKind(self);
+void StyleEffect__Finalize(StyleEffect *self) {
+    StyleEffect__ReleaseByKind(self);
     GetActorMethods()->finalize((Actor *)self);
 }
 
-void Class876FC__SetParams(Class876FC *self, Class876FCParams *params) {
+void StyleEffect__SetParams(StyleEffect *self, StyleEffectParams *params) {
     self->params = *params;
     self->tick = 0;
 }
 
 /* `pos` arrives from StyleUpdateEffectSlots and is forwarded untouched in
  * $a1 (retail's jal at 0x80056508 sets no $a1). */
-void Class876FC__Update(Class876FC *self, LongVec3 *pos) {
+void StyleEffect__Update(StyleEffect *self, LongVec3 *pos) {
     self->tick = self->tick + 1;
-    Class876FC__UpdateByKind(self, pos);
+    StyleEffect__UpdateByKind(self, pos);
 }

@@ -147,8 +147,8 @@ if (rand() & 1) {
 
 `gStyleSpawnOffsetX` is a file-scope local view shared by four bodies in this unit,
 so the retype is not local to this function. The two live pointer-take call
-sites were rewritten `New_Class876FC(..., gStyleSpawnOffsetX, ...)` ->
-`New_Class876FC(..., &gStyleSpawnOffsetX, ...)` (array decay and `&scalar` both
+sites were rewritten `New_StyleEffect(..., gStyleSpawnOffsetX, ...)` ->
+`New_StyleEffect(..., &gStyleSpawnOffsetX, ...)` (array decay and `&scalar` both
 compile to `lui`/`addiu`, so this is free), and the two preserved `#if 0`
 bodies that use the symbol (`StyleFillEffectKind3`, `SetupStyleSpawnParamsB`) were updated
 to the same spelling. **`StyleFillEffectKind1` is live and already matched and
@@ -305,7 +305,7 @@ One of two function-pointer targets `StyleFillEffectKind0` dispatches
 through per iteration, selected when `gStyleDay % 7 != 0` (the more
 common ~6/7 branch; the other is `SetupStyleSpawnParamsB`). Sets a cluster of
 `gStyleE0*`-region scratch globals (spawn range/offset parameters consumed
-by the `New_Class876FC` allocator's `ctx` argument) from `rand()`. Named "A"
+by the `New_StyleEffect` allocator's `ctx` argument) from `rand()`. Named "A"
 rather than by its selection condition because the condition is a plain
 modulo test with no established game meaning -- naming it "the common one"
 or "the 6/7 one" would assert more than the mechanics show. Renamed away

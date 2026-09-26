@@ -14,7 +14,7 @@ void StyleBuildEffectSlots(void *arg0);
 ## New externs
 
 ```c
-extern void Actor__func_56f5c(s32 arg0, void *arg1, s32 arg2, s32 arg3); /* class_3bb8c_o.c, ALREADY MATCHED */
+extern void SetStyleEffectSources(s32 arg0, void *arg1, s32 arg2, s32 arg3); /* class_3bb8c_o.c, ALREADY MATCHED */
 extern s32 rand(void);                                               /* libc, shared local view used project-wide */
 extern s8 gStyleKind0Counts[];                                              /* 4-entry table, forward-indexed by rand()&3 */
 extern void *StyleFillEffectKind0(void *arg0, s32 arg1, void *arg2);        /* forward decl, own unit, cold */
@@ -23,8 +23,8 @@ extern void StyleFillEffectKind3(void *arg0, void *arg1);                   /* f
 extern void StyleFillEffectKind2(void *arg0, void *arg1);                   /* forward decl, own unit, cold */
 ```
 
-`Actor__func_56f5c` is `class_3bb8c_o.c`'s already-matched
-`void Actor__func_56f5c(s32 arg0, BaseObjO *self, s32 arg2, s32 arg3)`; this
+`SetStyleEffectSources` is `class_3bb8c_o.c`'s already-matched
+`void SetStyleEffectSources(s32 arg0, BaseObjO *self, s32 arg2, s32 arg3)`; this
 call site only needs the ABI shape (`s32,void*,s32,s32`), matching the
 project's convention of a looser cross-unit local signature. `gStyleVariant`,
 `gStyleSceneRefs`, `gStyleEffectSlotCount` and `gStyleEffectSlots` are fresh copies of externs
@@ -44,7 +44,7 @@ void StyleBuildEffectSlots(void *arg0) {
         return;
     }
     base = gStyleSceneRefs;
-    Actor__func_56f5c(gStyleVariant, (void *) *(s32 *) (base + 4), *(s32 *) (base + 8), *(s32 *) (base + 0xC));
+    SetStyleEffectSources(gStyleVariant, (void *) *(s32 *) (base + 4), *(s32 *) (base + 8), *(s32 *) (base + 0xC));
     val = gStyleKind0Counts[rand() & 3];
     count = (gStyleVariant == 2) ? 0x10 - val : 0;
     gStyleEffectSlotCount = val + count;
@@ -86,17 +86,17 @@ in the `else` reproduces that skip.
 **`StyleBuildEffectSlots`, tier B.**
 
 Dispatches on `gStyleVariant` (`PickStyleFallbackConfig`'s "kind") to
-`Actor__func_56f5c`, then fills `gStyleEffectSlots` via
+`SetStyleEffectSources`, then fills `gStyleEffectSlots` via
 `StyleFillEffectKind0`/`StyleFillEffectKind1`, then finishes via
 `StyleFillEffectKind3` (variant 0) or `StyleFillEffectKind2` (variant 2).
 The build/update/release triad naming mirrors `StyleBuildDecorSet` above,
 for the SEPARATE `gStyleEffectSlots` array (a different object class --
-`Obj876FC`, allocated through `class_3bb8c_r.c`'s `New_Class876FC`, not
+`Obj876FC`, allocated through `class_3bb8c_r.c`'s `New_StyleEffect`, not
 `New_BoxFill`). MATCHED, 60/60, first build.
 
 ## Track 4 (2026-09-26, round 88, charlie)
 
-`gStyleEffectSlots` retyped `void *[]` -> `Class876FC *[]` (every element is a New_Class876FC object); ReleaseBasicClassArray takes it as `(void **)`. Image byte-identical.
+`gStyleEffectSlots` retyped `void *[]` -> `StyleEffect *[]` (every element is a New_StyleEffect object); ReleaseBasicClassArray takes it as `(void **)`. Image byte-identical.
 
 ## Round 93 polish (delta, track 7)
 

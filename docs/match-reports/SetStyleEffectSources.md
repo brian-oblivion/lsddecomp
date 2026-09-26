@@ -1,4 +1,6 @@
-# Actor__func_56f5c -- MATCHED, round 44 (2026-09-15)
+# SetStyleEffectSources -- MATCHED, round 44 (2026-09-15)
+
+> Renamed from `Actor__func_56f5c` on 2026-09-26 (tools/rename.py). Address 0x80056f5c.
 
 > Renamed from `BaseObjO__func_56f5c` on 2026-09-25 (tools/rename.py). Address 0x80056f5c.
 
@@ -10,8 +12,8 @@ never attempted before this round.
 ## What it does
 
 Stashes `self` (arg1) and two more scalar args (arg2, arg3) into `.sbss`
-globals `D_8008ACA4`/`D_8008ACA8`/`D_8008ACAC`, then runs a fixed 2-iteration
-loop calling `self->methods->slot80(self, D_8008AB98[i])` and feeding the
+globals `gStyleEffectTmd`/`gStyleEffectTim`/`gStyleEffectViewport`, then runs a fixed 2-iteration
+loop calling `self->methods->slot80(self, gStyleEffectModelIds[i])` and feeding the
 result plus `&D_8008AB94` (a 1-word `.sdata` constant, address-only, never
 loaded) to library function `SetTargetOffset` (still `psyq_fa50.s`, unrenamed
 Psy-Q object; called with an unused return value). `arg0` (the function's
@@ -20,24 +22,24 @@ same as its caller (`StyleBuildEffectSlots`, unaddressed `class_3bb8c_n.s`) pass
 its own unrelated `self` there without any indication of shared meaning.
 
 ```c
-extern s32 D_8008ACA4;
-extern s32 D_8008ACA8;
-extern s32 D_8008ACAC;
-extern s32 D_8008AB98[3];
+extern s32 gStyleEffectTmd;
+extern s32 gStyleEffectTim;
+extern s32 gStyleEffectViewport;
+extern s32 gStyleEffectModelIds[3];
 extern s32 D_8008AB94;
 
 extern void SetTargetOffset(void *arg0, void *arg1);
 
-void Actor__func_56f5c(s32 arg0, BaseObjO *self, s32 arg2, s32 arg3) {
+void SetStyleEffectSources(s32 arg0, BaseObjO *self, s32 arg2, s32 arg3) {
     s32 i;
     void *ret;
 
-    D_8008ACA4 = (s32) self;
-    D_8008ACA8 = arg2;
-    D_8008ACAC = arg3;
+    gStyleEffectTmd = (s32) self;
+    gStyleEffectTim = arg2;
+    gStyleEffectViewport = arg3;
     i = 0;
     do {
-        ret = self->methods->slot80(self, D_8008AB98[i]);
+        ret = self->methods->slot80(self, gStyleEffectModelIds[i]);
         SetTargetOffset(ret, &D_8008AB94);
         i++;
     } while (i < 2);
@@ -46,7 +48,7 @@ void Actor__func_56f5c(s32 arg0, BaseObjO *self, s32 arg2, s32 arg3) {
 
 ## New vtable slot
 
-`tools/classtable.py gClass876FCMethods` shows `+0x080` occupied by
+`tools/classtable.py gStyleEffectMethods` shows `+0x080` occupied by
 `SceneNode__SetBackClip` (a `BasicClass`-range function outside this unit, same
 inherited-base pattern as the sibling occupied slots already documented on
 `BaseObjOMethods`). That offset previously sat inside this unit's own
@@ -67,7 +69,7 @@ slot (return/argument shape) without derivation risk.
 
 ## Naming
 
-**`Actor__func_56f5c` -- tier C.** Class is known (`self` is `BaseObjO`,
+**`SetStyleEffectSources` -- tier C.** Class is known (`self` is `BaseObjO`,
 confirmed by the `self->methods->slot80` dispatch), and the mechanics are
 fully described in this report (stash `self`/two scalars into three
 globals, then loop twice through the still-unresolved `slot80` occupant
@@ -78,11 +80,28 @@ not a finding. Kept the tier-C `Class__func_xxxxx` form.
 
 ## Track 4 (2026-09-25, round 82, delta)
 
-Renamed from `BaseObjO__func_56f5c`. Prefix only: the second parameter is an Actor (it calls getSetUnk10Flag8, +0x080, through its table; the s32 result is cast to the void * SetTargetOffset takes). Still tier C. The class (id 0x34, table `gActorMethods`, formerly `D_800878D4`) is unified as `Actor` in `include/Actor.h`: a SceneNode subclass and the base of TodActor/Entity, DreamSys and Class876FC. Any source block above is the pre-unification spelling; the live body in `src/class_3bb8c_o.c` takes the unified types and field/slot names, byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).
+Renamed from `BaseObjO__func_56f5c`. Prefix only: the second parameter is an Actor (it calls getSetUnk10Flag8, +0x080, through its table; the s32 result is cast to the void * SetTargetOffset takes). Still tier C. The class (id 0x34, table `gActorMethods`, formerly `D_800878D4`) is unified as `Actor` in `include/Actor.h`: a SceneNode subclass and the base of TodActor/Entity, DreamSys and StyleEffect. Any source block above is the pre-unification spelling; the live body in `src/class_3bb8c_o.c` takes the unified types and field/slot names, byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).
 
 ## Track 4b (2026-09-25, round 85)
 
-`D_8008ACA4`/`D_8008ACA8`/`D_8008ACAC` were `s32` in class_3bb8c_o.c and
+`gStyleEffectTmd`/`gStyleEffectTim`/`gStyleEffectViewport` were `s32` in class_3bb8c_o.c and
 `D_8008ACA4Obj *`/`void *`/`void *` in class_3bb8c_s.c. Both units now
 declare `Actor *`/`void *`/`void *`: this function stores its own `Actor *self` into the first, the two scalars go in through a `(void *)` cast. Byte-identical; no new `-Wall`
 warning.
+
+## Track 6 (round 93, bravo)
+
+`Actor__func_56f5c` -> `SetStyleEffectSources` (`python3 tools/rename.py
+Actor__func_56f5c SetStyleEffectSources`). **Tier B.** It is not an Actor
+method: its one caller, StyleBuildEffectSlots, passes the variant (unused),
+ObjM's DREAMER.TMD resource (a LinkResource, cast to Actor), ETC.TIM and the
+viewport, and it only stores them for StyleEffect's methods and prepares
+the two models the TMD's +0x080 slot (LinkResource's getModel) returns for
+gStyleEffectModelIds[0..1] (SetTargetOffset with D_8008AB94). The stored
+globals were renamed with it (one rename.py run each): D_8008ACA4 ->
+gStyleEffectTmd, D_8008ACA8 -> gStyleEffectTim, D_8008ACAC ->
+gStyleEffectViewport, D_8008AB98 -> gStyleEffectModelIds. PROPOSED (not
+applied, a prototype and body outside the header): its `Actor *self`
+parameter and the `Actor *` view of gStyleEffectTmd in class_3bb8c_o.c/_s.c
+are really `LinkResource *`, and the `setBackClip` calls through it are
+`getModel`; its prototype belongs in include/StyleEffect.h, not Actor.h.

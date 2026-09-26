@@ -9,25 +9,28 @@
  * Named round 52 (runner bravo). SPANS TWO CLASSES, cut at a ROM address,
  * not a class boundary (`tools/classtable.py`, confirmed round 17/52):
  *
- *  - Class876FC's sprite-array helpers (`NoOpIgnoreArgs`,
- *    `Class876FC__ReleaseSprites[B]`, `Class876FC__RandomizeSprites`,
- *    `Class876FC__SpawnPlainSprites`; include/Class876FC.h, round 88).
- *  - `Actor` (`GetClass876FCMethods` onward; include/Actor.h, unified round
- *    82): the base class of `DreamSys`, `TodActor` and `Class876FC`.
+ *  - StyleEffect's sprite-array helpers (`NoOpIgnoreArgs`,
+ *    `StyleEffect__ReleaseSprites[B]`, `StyleEffect__RandomizeSprites`,
+ *    `StyleEffect__SpawnPlainSprites`; include/StyleEffect.h). Two more of
+ *    its pieces sit inside the Actor group by ROM address: its table getter
+ *    `GetStyleEffectMethods`, and `SetStyleEffectSources`, which stores the
+ *    TMD resource, TIM image and viewport its methods read.
+ *  - `Actor` (`GetStyleEffectMethods` onward; include/Actor.h, unified round
+ *    82): the base class of `DreamSys`, `TodActor` and `StyleEffect`.
  *    `Actor__Actor` is the BASE's own constructor: `TodActor__TodActor`
  *    calls it to chain to the base first, then overwrites `self->methods`
- *    with its own table. `GetClass876FCMethods` is the Class876FC
+ *    with its own table. `GetStyleEffectMethods` is the StyleEffect
  *    subclass's table getter (named round 73), placed here by ROM address.
  */
 #include "common.h"
 #include "Actor.h"
 #include "TmdModel.h"
-#include "Class876FC.h"
+#include "StyleEffect.h"
 
 void NoOpIgnoreArgs(void) {}
 
 /* ------------------------------------------------------------------ *
- * Group 1: Class876FC's sprite-array helpers (include/Class876FC.h), called
+ * Group 1: StyleEffect's sprite-array helpers (include/StyleEffect.h), called
  * only from its per-kind dispatch in class_3bb8c_s.c. ReleaseSprites and
  * ReleaseSpritesB are two identical, separate ROM functions (see their
  * reports). RandomizeSprites walks sprites[1..4]: each gets a random scale
@@ -46,15 +49,15 @@ typedef struct Vec3O {
  * updateScale. */
 extern Vec3O gLinkElemVec3Table[];
 
-void Class876FC__ReleaseSprites(Class876FC *self) {
+void StyleEffect__ReleaseSprites(StyleEffect *self) {
     ReleaseBasicClassArray((void **)self->sprites, 5);
 }
 
-void Class876FC__SpawnPlainSprites(Class876FC *self) {
-    Class876FC__SpawnSprites(self, 0, 0, 0);
+void StyleEffect__SpawnPlainSprites(StyleEffect *self) {
+    StyleEffect__SpawnSprites(self, 0, 0, 0);
 }
 
-void Class876FC__RandomizeSprites(Class876FC *self) {
+void StyleEffect__RandomizeSprites(StyleEffect *self) {
     VariantSprite **p = &self->sprites[1];
     s32 i;
 
@@ -66,13 +69,13 @@ void Class876FC__RandomizeSprites(Class876FC *self) {
     }
 }
 
-void Class876FC__ReleaseSpritesB(Class876FC *self) {
+void StyleEffect__ReleaseSpritesB(StyleEffect *self) {
     ReleaseBasicClassArray((void **)self->sprites, 5);
 }
 
 /* ------------------------------------------------------------------ *
- * Group 2: GetClass876FCMethods onward -- Actor (include/Actor.h), the
- * shared base of DreamSys, TodActor and Class876FC.
+ * Group 2: GetStyleEffectMethods onward -- Actor (include/Actor.h), the
+ * shared base of DreamSys, TodActor and StyleEffect.
  * ------------------------------------------------------------------ */
 
 /* Actor__NotifyMove's model-data buffer, filled by readUnk20Data and handed
@@ -84,32 +87,32 @@ typedef struct Buf38O {
     u8 raw[0x38];
 } Buf38O;
 
-/* Class876FC's getter (include/Class876FC.h), placed here by ROM address. */
-Class876FCMethods *GetClass876FCMethods(void) {
-    return &gClass876FCMethods;
+/* StyleEffect's getter (include/StyleEffect.h), placed here by ROM address. */
+StyleEffectMethods *GetStyleEffectMethods(void) {
+    return &gStyleEffectMethods;
 }
 
-/* Captured here for Class876FC's methods (class_3bb8c_s.c, which declares
+/* Captured here for StyleEffect's methods (class_3bb8c_s.c, which declares
  * the same three with the same types; track 4b, round 85): the Actor this
  * runs on, and two objects passed through. */
-extern Actor *D_8008ACA4;
-extern void *D_8008ACA8;
-extern void *D_8008ACAC;
-extern s32 D_8008AB98[3];
+extern Actor *gStyleEffectTmd;
+extern void *gStyleEffectTim;
+extern void *gStyleEffectViewport;
+extern s32 gStyleEffectModelIds[3];
 extern s32 D_8008AB94;
 
 extern void SetTargetOffset(void *arg0, void *arg1);
 
-void Actor__func_56f5c(s32 unused, Actor *self, s32 arg2, s32 arg3) {
+void SetStyleEffectSources(s32 unused, Actor *self, s32 arg2, s32 arg3) {
     s32 i;
     void *ret;
 
-    D_8008ACA4 = self;
-    D_8008ACA8 = (void *)arg2;
-    D_8008ACAC = (void *)arg3;
+    gStyleEffectTmd = self;
+    gStyleEffectTim = (void *)arg2;
+    gStyleEffectViewport = (void *)arg3;
     i = 0;
     do {
-        ret = (void *)self->methods->setBackClip(self, D_8008AB98[i]);
+        ret = (void *)self->methods->setBackClip(self, gStyleEffectModelIds[i]);
         SetTargetOffset(ret, &D_8008AB94);
         i++;
     } while (i < 2);
