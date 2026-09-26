@@ -201,3 +201,14 @@ Round 78 (charlie), FINISHING-PLAN track 3.
 ## Track 4 (2026-09-26, round 89, echo)
 
 The class is unified as ObjM in include/ObjM.h (table gObjMMethods, was D_80087034); the class_3bb8c_k/_l/_m views (ObjM_3bb8c_k, Obj87034_3bb8c_l, ObjM) and class_39e08.h's Obj4C/SubObjB/EventArg are gone. Byte-identical. The onInit override: `world` was IntermediateBase::viewport (Class869D8: detachViewChild, attachViewChild), `unk54` the bgm (WBgm setSeq), `pendingOther` the New_TimBlockSrc object (`timBlockSrc`), `unk38` the stage, `unk48` gridSpan (the Class866E8's setGridSpan), `unk14` the Class866E8 (setBounds); `&ctorSound` is RegisterStyleConfig's third argument.
+
+## asm sites
+
+Round 89 (runner delta, track 5 `asm-sites`): the bare `__asm__("")` after
+`three = 3;` is **justified**; its existing site comment already says what it
+forces, and a re-measurement confirms it. Deleting it alone turned the image
+red (161210 bytes: the function came out one word shorter and everything after
+drifted), `funcdiff` 74/136, and asm-differ shows `li a0,0x3` moved from above
+`sw v0,0x40(s1)` (the `self->unk40 = 0x10` store) to below the `stage` compare,
+where it displaces `move a1,zero` and pulls `sw a0,0x44(s1)` along with it.
+No source change.
