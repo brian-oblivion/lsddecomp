@@ -302,19 +302,22 @@ extern s32 CopyMemcardIconTemplate(s32 arg0, s32 arg1); /* TaskObjF__WriteMemcar
  * are gone: those objects are the unified StageMap, NodeGuardedViewport,
  * FadeBox, TimBlockSrc, VabStreamObj, FrameClock, WBgm and TextRow. */
 
-/* ObjM::styleConfig's pointee (include/ObjM.h): not a class, a plain
- * record, the same memory class_3bb8c_m's local StyleM describes
- * (D_80087424, which ApplyStyleConfig fills and RegisterStyleConfig
- * returns). What ObjM's methods do with each word: */
+/* ObjM::styleConfig's pointee (include/ObjM.h): the day's scene style, a
+ * plain record. RegisterStyleConfig returns D_80087424 after
+ * FillStyleFromConfig fills its last four words from the stage's config
+ * bytes (class_3bb8c_m, whose local StyleM views the same words), or
+ * InitStyleAndWorld's caller supplies one. ObjM__SetupSceneStyle hands the
+ * first three to the StageMap's lights, ObjM__EnterStyleSession the rest to
+ * the viewport, ObjM__PollTimBlockLoad a colour to the TimBlockSrc. */
 typedef struct StyleConfig {
-    s32 unk0;   /* +0x000, SetupSceneStyle: the StageMap's setChildParams `dirs` */
-    s32 unk4;   /* +0x004, SetupSceneStyle: setChildParams `colors` */
-    s32 unk8;   /* +0x008, SetupSceneStyle: the StageMap's setAmbientColor rgb (a pointer) */
-    void *unkC; /* +0x00C, a colour: the viewport's setClearColor (EnterStyleSession); the TimBlockSrc's fadeAllEntries when unk14 is 2 (PollTimBlockLoad); StyleM's gStylePalette entry */
+    s32 lightDirs;    /* +0x000, SetupSceneStyle: the StageMap's setChildParams `dirs` */
+    s32 lightColors;  /* +0x004, SetupSceneStyle: setChildParams `colors` */
+    s32 ambientColor; /* +0x008, SetupSceneStyle: setAmbientColor's rgb (a pointer) */
+    void *clearColor; /* +0x00C, EnterStyleSession: the viewport's setClearColor; a gStylePalette entry */
     u8 pad10[0x014 - 0x010];
-    s32 unk14; /* +0x014, selects unkC or unk18: PollTimBlockLoad against 2, EnterStyleSession against 1 */
-    void *unk18; /* +0x018, a colour: setFarColor, or fadeAllEntries, when unk14 does not select unkC */
-    s32 unk1C; /* +0x01C, EnterStyleSession: the viewport's setFogNear (StyleM: a D_8008730C value) */
+    s32 colorMode; /* +0x014, EnterStyleSession: 1 makes the far colour clearColor; PollTimBlockLoad: 2 fades to clearColor, else farColor */
+    void *farColor; /* +0x018, EnterStyleSession: setFarColor unless colorMode is 1; a gStylePalette entry */
+    s32 fogNear; /* +0x01C, EnterStyleSession: the viewport's setFogNear; a D_8008730C value */
 } StyleConfig;
 
 /* ObjM__OnRegistrantEvent's own two helpers -- MATCHED, src/code_39094.c.

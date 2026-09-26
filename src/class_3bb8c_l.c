@@ -92,8 +92,8 @@ void ObjM__InitStyleAndWorld(ObjM *self, s32 gridSpan, StyleConfig *style, s32 a
 
     self->cachedViewport = vp;
     ret1 = self->dreamSys->methods->getCurrentDayAndYear(self->dreamSys, 0);
-    self->styleConfig = (StyleConfig *)RegisterStyleConfig(self->unk14, self->stage,
-                                                                   (s32 *)&self->ctorSound, ret1, 0);
+    self->styleConfig =
+        (StyleConfig *)RegisterStyleConfig(self->unk14, self->stage, (s32 *)&self->ctorSound, ret1, 0);
     if (style != 0) {
         self->styleConfig = style;
     }
@@ -175,12 +175,12 @@ void ObjM__PollTimBlockLoad(ObjM *self, TimBlockSrc *src) {
             ret = self->dreamSys->methods->getDreamTimerScaled(self->dreamSys);
             self->dreamSys->methods->getSetDreamTimeLimit(self->dreamSys, ret + 0x1E);
         } else if (src->loaded != 0) {
-            sel = self->styleConfig->unk14;
+            sel = self->styleConfig->colorMode;
             m = src->methods;
             if (sel != 2) {
-                color = self->styleConfig->unk18;
+                color = self->styleConfig->farColor;
             } else {
-                color = self->styleConfig->unkC;
+                color = self->styleConfig->clearColor;
             }
             m->fadeAllEntries(src, color);
             src->methods->release(src);
@@ -315,8 +315,8 @@ void ObjM__SetupSceneStyle(ObjM *self) {
     rig = (StageMap *)self->unk14;
     self->methods->addChild(self, (BasicClass *)rig);
 
-    rig->methods->setAmbientColor(rig, (LightRigRgb *)style->unk8, 0);
-    rig->methods->setChildParams(rig, 3, style->unk0, style->unk4);
+    rig->methods->setAmbientColor(rig, (LightRigRgb *)style->ambientColor, 0);
+    rig->methods->setChildParams(rig, 3, style->lightDirs, style->lightColors);
     rig->methods->setConfig(rig, GetStageGridDimensions(self->stage));
     ((DreamSysAttachToParentFn)self->dreamSys->methods->attachToParent)(self->dreamSys, rig);
     rig->methods->setGridSpan(rig, self->gridSpan);
@@ -349,13 +349,13 @@ void ObjM__EnterStyleSession(ObjM *self) {
     vp = (NodeGuardedViewport *)self->viewport;
     style = self->styleConfig;
     vp->methods->setLightMode(vp, 1);
-    vp->methods->setClearColor(vp, style->unkC);
-    vp->methods->setFogNear(vp, style->unk1C);
+    vp->methods->setClearColor(vp, style->clearColor);
+    vp->methods->setFogNear(vp, style->fogNear);
     m = vp->methods;
-    if (style->unk14 != 1) {
-        a1 = style->unk18;
+    if (style->colorMode != 1) {
+        a1 = style->farColor;
     } else {
-        a1 = style->unkC;
+        a1 = style->clearColor;
     }
     m->setFarColor(vp, a1);
     vp->methods->setUnkB4(vp, 0);
