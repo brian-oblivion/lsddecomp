@@ -458,7 +458,7 @@ extern s32 D_80087330;
 extern void SetupStyleSpawnParamsA(void *arg0, void *arg1);
 extern s32 D_8008E0C0[];
 extern u8 *D_8008E0B0;
-extern u8 D_80087174[];
+extern u8 gStyleSpawnRotations[];
 extern s32 D_8008E0A8;
 extern s32 D_8008E0AC;
 extern u8 D_8008721C[];
@@ -499,7 +499,7 @@ Class876FC **StyleFillEffectKind3(Class876FC **arg0, LongVec3 *arg1) {
         D_8008E0C0[0] = (s32)(D_8008721C + ((u32)rand() % 3) * 3);
     }
     q = (PtrBoxK3 *)&D_8008E0B0;
-    q->p = D_80087174;
+    q->p = gStyleSpawnRotations;
     *arg0 = New_Class876FC(3, (Class876FCParams *)((u8 *)q - 0xC), (SceneNode *)gStyleCueSelf, arg1);
     arg0++;
     return arg0;
@@ -509,7 +509,7 @@ extern s32 D_80087430;
 extern u8 D_80087228[];
 extern s32 D_8008E0C0[];
 extern u8 *D_8008E0B0;
-extern u8 D_80087174[];
+extern u8 gStyleSpawnRotations[];
 extern s32 D_8008E0BC;
 
 /* Local view, same reason as PtrBoxK3 above: the first D_8008E0C0 store goes
@@ -545,7 +545,7 @@ Class876FC **StyleFillEffectKind2(Class876FC **arg0, LongVec3 *arg1) {
     slot->v = val;
     SetupStyleSpawnParamsA(arg1, (void *)D_80087330);
     q = &D_8008E0B0;
-    *q = D_80087174;
+    *q = gStyleSpawnRotations;
     D_8008E0BC = rand() % 6;
     *arg0 = New_Class876FC(2, (Class876FCParams *)((u8 *)q - 0xC), (SceneNode *)gStyleCueSelf, arg1);
     arg0++;
@@ -555,7 +555,7 @@ Class876FC **StyleFillEffectKind2(Class876FC **arg0, LongVec3 *arg1) {
 extern s32 D_8008E0A8;
 extern s32 D_8008E0AC;
 extern u8 *D_8008E0B0;
-extern u8 D_80087174[];
+extern u8 gStyleSpawnRotations[];
 extern s32 D_8008E0B8;
 
 /* MATCHED round 64 (charlie), 110/110, ins 0 / del 0, one build.  The
@@ -584,7 +584,7 @@ void SetupStyleSpawnParamsA(void *arg0, void *arg1) {
     if (rand() & 1) {
         D_8008E0AC = -D_8008E0AC;
     }
-    D_8008E0B0 = D_80087174 + ((u32)rand() % 7) * 12;
+    D_8008E0B0 = gStyleSpawnRotations + ((u32)rand() % 7) * 12;
     D_8008E0B8 = rand() % 5;
 }
 
@@ -621,7 +621,7 @@ void SetupStyleSpawnParamsB(void *arg0, void *arg1) {
     } else if (mod3 == 2) {
         D_8008E0AC = 0x800;
     }
-    D_8008E0B0 = D_80087174 + ((u32)rand() % 7) * 12;
+    D_8008E0B0 = gStyleSpawnRotations + ((u32)rand() % 7) * 12;
     D_8008E0B8 = rand() % 5;
 }
 

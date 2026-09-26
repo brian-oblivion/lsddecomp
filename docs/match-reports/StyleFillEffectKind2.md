@@ -77,7 +77,7 @@ void **StyleFillEffectKind2(void **arg0, void *arg1) {
     slot->v = val;
     SetupStyleSpawnParamsA(arg1, (void *) D_80087330);
     q = &D_8008E0B0;
-    *q = D_80087174;
+    *q = gStyleSpawnRotations;
     D_8008E0BC = rand() % 6;
     *arg0 = New_Class876FC((void *) 2, (u8 *) q - 0xC, (void *) gStyleCueSelf, arg1);
     arg0++;
@@ -133,7 +133,7 @@ exactly. From the disassembly, retail:
 
 ```
 lui   s0,%hi(D_8008E0B0) ; addiu s0,s0,%lo(D_8008E0B0)   /* $s0 = &D_8008E0B0 */
-lui   v0,%hi(D_80087174) ; addiu v0,v0,%lo(D_80087174)
+lui   v0,%hi(gStyleSpawnRotations) ; addiu v0,v0,%lo(gStyleSpawnRotations)
 jal   rand
  sw   v0,0x0($s0)                      /* the store rides rand's delay slot */
 ...
@@ -144,7 +144,7 @@ The inherited body wrote the global by name and re-materialised the second
 address absolutely, which costs a word and wastes the delay slot:
 
 ```
-lui v0,%hi(D_80087174) ; addiu v0,v0,%lo(D_80087174)
+lui v0,%hi(gStyleSpawnRotations) ; addiu v0,v0,%lo(gStyleSpawnRotations)
 lui at,%hi(D_8008E0B0) ; sw v0,%lo(D_8008E0B0)(at)      /* 2 words */
 jal rand
  nop                                                     /* delay slot wasted */
@@ -165,7 +165,7 @@ carries in its own preserved body:
 u8 **q;
 ...
 q = &D_8008E0B0;
-*q = D_80087174;
+*q = gStyleSpawnRotations;
 ...
 New_Class876FC((void *) 2, (u8 *) q - 0xC, (void *) gStyleCueSelf, arg1);
 ```
@@ -386,7 +386,7 @@ extern s32 D_80087330;
 extern u8 D_80087228[];
 extern s32 D_8008E0C0[];
 extern u8 *D_8008E0B0;
-extern u8 D_80087174[];
+extern u8 gStyleSpawnRotations[];
 extern s32 D_8008E0BC;
 extern void SetupStyleSpawnParamsA(void *arg0, void *arg1);
 extern void *New_Class876FC(void *arg0, void *arg1, void *arg2, void *arg3);
@@ -410,7 +410,7 @@ void **StyleFillEffectKind2(void **arg0, void *arg1) {
     *slot = v0;
     SetupStyleSpawnParamsA(arg1, (void *) D_80087330);
     q = &D_8008E0B0;
-    *q = D_80087174;
+    *q = gStyleSpawnRotations;
     randval = rand();
     D_8008E0BC = randval - (randval / 3) * 6;
     *arg0 = New_Class876FC((void *) 2, (u8 *) q - 0xC, (void *) gStyleCueSelf, arg1);

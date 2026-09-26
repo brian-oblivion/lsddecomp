@@ -11,7 +11,7 @@ exit=2`, no compile-error grep hits, **79/81, `insertions 0 / deletions 0`
 
 **The shared `t` was a workaround for the real residue, and the real residue
 was aliasing, not registers.** Round 61 established (correctly) that the
-78/81 body's problem was one instruction: the `*q = D_80087174` store has to
+78/81 body's problem was one instruction: the `*q = gStyleSpawnRotations` store has to
 come AFTER the `lw a2, gStyleCueSelf` so it lands in the `jal` delay slot, and
 that a plain `u8 **q` store is an opaque `(mem (reg))` the scheduler will not
 move a global load across. Round 61 then forced the order by hoisting the
@@ -27,7 +27,7 @@ typedef struct PtrBoxK3 { u8 *p; } PtrBoxK3;
 PtrBoxK3 *q;
 ...
 q = (PtrBoxK3 *) &D_8008E0B0;
-q->p = D_80087174;
+q->p = gStyleSpawnRotations;
 *arg0 = New_Class876FC((void *) 3, (u8 *) q - 0xC, (void *) gStyleCueSelf, arg1);
 ```
 
@@ -177,7 +177,7 @@ Three words differ, and they are one instruction moved:
 
 ```
 retail                              built
-458e8  addiu v0,v0,%lo(D_80087174)  458e8  addiu v0,v0,%lo(D_80087174)
+458e8  addiu v0,v0,%lo(gStyleSpawnRotations)  458e8  addiu v0,v0,%lo(gStyleSpawnRotations)
 458ec  lw    a2,%gp_rel(gStyleCueSelf) 458ec  sw    v0,0(v1)          <-- here
 458f0  move  a3,s1                  458f0  lw    a2,%gp_rel(gStyleCueSelf)
 458f4  jal   New_Class876FC          458f4  jal   New_Class876FC
@@ -194,7 +194,7 @@ address gcc 2.6.3's `sched_analyze` will not disambiguate -- so the
 gp-relative load of `gStyleCueSelf` cannot hoist across it and the store cannot
 sink below it. Two independent experiments prove it is this and nothing else:
 
-- Write the store as a plain global (`D_8008E0B0 = D_80087174;`, a
+- Write the store as a plain global (`D_8008E0B0 = gStyleSpawnRotations;`, a
   `(mem (symbol_ref))` the scheduler CAN disambiguate) and **the load hoists
   immediately** -- but the `q` pointer then folds away and the address
   argument regresses to `lui a1; addiu a1,%lo(D_8008E0A4)` (73/81).
@@ -215,7 +215,7 @@ as a limit.
 ```c
     q = &D_8008E0B0;
     t = gStyleCueSelf;                                    /* s32 t; */
-    *q = D_80087174;
+    *q = gStyleSpawnRotations;
     *arg0 = New_Class876FC((void *) 3, (u8 *) q - 0xC, (void *) t, arg1);
 ```
 
@@ -227,8 +227,8 @@ Every instruction and every placement matches retail. The only diff is a
 458d8  lui   v1,%hi(D_8008E0B0)     |  lui   v0,%hi(D_8008E0B0)
 458dc  addiu v1,v1,%lo(D_8008E0B0)  |  addiu v0,v0,%lo(D_8008E0B0)
 458e0  addiu a1,v1,-0xc             |  addiu a1,v0,-0xc
-458e4  lui   v0,%hi(D_80087174)     |  lui   v1,%hi(D_80087174)
-458e8  addiu v0,v0,%lo(D_80087174)  |  addiu v1,v1,%lo(D_80087174)
+458e4  lui   v0,%hi(gStyleSpawnRotations)     |  lui   v1,%hi(gStyleSpawnRotations)
+458e8  addiu v0,v0,%lo(gStyleSpawnRotations)  |  addiu v1,v1,%lo(gStyleSpawnRotations)
 458f8  sw    v0,0(v1)               |  sw    v1,0(v0)
 ```
 
@@ -241,7 +241,7 @@ it forward as the residue.
 Axes varied against it, all 75/81, all identical output (so the colour is
 invariant to every one of them, not merely unimproved):
 
-- statement order over `{q = &D_8008E0B0, t = gStyleCueSelf, val = D_80087174}` --
+- statement order over `{q = &D_8008E0B0, t = gStyleCueSelf, val = gStyleSpawnRotations}` --
   every order that keeps the load before the store;
 - declaration order of `q`, `t`, `val`;
 - naming the stored value in a local vs leaving it anonymous;
@@ -337,7 +337,7 @@ extern s32 D_80087330;
 extern void SetupStyleSpawnParamsA(void *arg0, void *arg1);
 extern s32 D_8008E0C0[];
 extern u8 *D_8008E0B0;
-extern u8 D_80087174[];
+extern u8 gStyleSpawnRotations[];
 extern s32 D_8008E0A8;
 extern s32 D_8008E0AC;
 extern u8 D_8008721C[];
@@ -368,7 +368,7 @@ void **StyleFillEffectKind3(void **arg0, void *arg1) {
     }
     t = gStyleCueSelf;
     q = &D_8008E0B0;
-    *q = D_80087174;
+    *q = gStyleSpawnRotations;
     *arg0 = New_Class876FC((void *) 3, (u8 *) q - 0xC, (void *) t, arg1);
     arg0++;
     return arg0;
