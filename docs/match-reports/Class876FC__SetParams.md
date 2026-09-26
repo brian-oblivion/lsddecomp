@@ -69,4 +69,4 @@ void Class876FC__SetParams(Class876FC *self, Block24 *src) {
 
 ## Track 4 (2026-09-26, round 88, charlie)
 
-Occupies Class6B5CC's +0x040 `reset` slot; kept its name because it does more than reset (it copies the 0x24-byte block). The block is now `Class876FCParams` (include/Class876FC.h), a struct of 4-aligned members, 0x24 bytes: the whole-struct copy compiles to the same aligned block move the old `Block24` word array gave. Image byte-identical.
+Occupies SceneNode's +0x040 `reset` slot; kept its name because it does more than reset (it copies the 0x24-byte block). The block is now `Class876FCParams` (include/Class876FC.h), a struct of 4-aligned members, 0x24 bytes: the whole-struct copy compiles to the same aligned block move the old `Block24` word array gave. Image byte-identical.

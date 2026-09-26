@@ -111,7 +111,7 @@ void Class865C8__Deinit(Class865C8 *self) {
 void Class865C8__OnInit(Class865C8 *self) {
     SubObjE *obj;
     Viewport *vp;
-    Class6B5CC *ret;
+    SceneNode *ret;
     ViewportSize *size;
 
     obj = (SubObjE *)self->initArgs->unk0;

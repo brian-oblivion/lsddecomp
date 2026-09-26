@@ -49,7 +49,7 @@ struct Class86F88;
 struct ScreenSprite;
 struct VabStreamObj;
 struct TimImage;
-struct Class6B5CC;
+struct SceneNode;
 
 typedef struct TaskObjF TaskObjF;
 typedef struct TaskObjFMethods TaskObjFMethods;
@@ -82,7 +82,7 @@ struct TaskObjFMethods {
                                              s32 size); /* TaskObjF__WriteMemcardSaveFile; setState(0x14) */
     /* +0x06C */ void (*init)(TaskObjF *self, char *namePrefix, char **nameSuffixes,
                               BasicClass *inputSource, BasicClass *tickSource,
-                              struct Class6B5CC *spriteParent, struct VabStreamObj *sound); /* TaskObjF__Init */
+                              struct SceneNode *spriteParent, struct VabStreamObj *sound); /* TaskObjF__Init */
     /* +0x070 */ void (*deinit)(TaskObjF *self); /* TaskObjF__Deinit */
     /* +0x074 */ void (*beginLoad)(TaskObjF *self, char *fileName, char *title, void *data,
                                    s32 size); /* TaskObjF__BeginLoad */
@@ -132,7 +132,7 @@ struct TaskObjF {
     /* +0x05C */ s32 waitCounter; /* setState zeroes; tickStateDelay counts to 6 */
     /* +0x060 */ BasicClass *inputSource; /* AddChild: the child whose class id's low nibble is 2; its events go to onInputEvent */
     /* +0x064 */ BasicClass *tickSource; /* ... low nibble 5; its events go to tickStateDelay */
-    /* +0x068 */ struct Class6B5CC *spriteParent; /* init; the widgets' and the card icon's sprite parent; with inputSource, gates attach/detach */
+    /* +0x068 */ struct SceneNode *spriteParent; /* init; the widgets' and the card icon's sprite parent; with inputSource, gates attach/detach */
     /* +0x06C */ struct VabStreamObj *sound; /* init; playSound's playTone target, the widgets' target too */
     /* +0x070 */ struct ScreenSprite *cardIcon; /* loadCardIcon: New_ScreenSprite of a CARD\*.TIM; releaseCardIcon */
     /* +0x074 */ s32 ownsWidget; /* attachTextEntry/attachItemList set it when they made the widget; detach then releases it */
@@ -179,7 +179,7 @@ s32 TaskObjF__TestEvents(TaskObjF *self);
 s32 TaskObjF__ForEachEvent(TaskObjF *self, s32 (*callback)(s32), s32 flag);
 s32 TaskObjF__WaitForReadyEvent(TaskObjF *self);
 void TaskObjF__Init(TaskObjF *self, char *namePrefix, char **nameSuffixes, BasicClass *inputSource,
-                    BasicClass *tickSource, struct Class6B5CC *spriteParent, struct VabStreamObj *sound);
+                    BasicClass *tickSource, struct SceneNode *spriteParent, struct VabStreamObj *sound);
 void TaskObjF__Deinit(TaskObjF *self);
 void TaskObjF__BeginLoad(TaskObjF *self, char *fileName, char *title, void *data, s32 size);
 void TaskObjF__AllocBuffers(TaskObjF *self);

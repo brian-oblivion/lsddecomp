@@ -132,7 +132,7 @@ void *New_Actor(void) {
 }
 
 Actor *Actor__Actor(Actor *self) {
-    if (GetClass6B5CCMethods()->ctor((Class6B5CC *)self) == NULL) {
+    if (GetSceneNodeMethods()->ctor((SceneNode *)self) == NULL) {
         goto fail;
     }
     self->methods = GetActorMethods();
@@ -148,7 +148,7 @@ fail:
 void Actor__AddChild(Actor *self, BasicClass *child) {
     s32 tag;
 
-    GetClass6B5CCMethods()->addChild((Class6B5CC *)self, child);
+    GetSceneNodeMethods()->addChild((SceneNode *)self, child);
     tag = child->methods->header;
     if ((tag & 0xFFF) == 0x114) {
         self->grid = (struct Class866E8 *)child;
@@ -165,13 +165,13 @@ void Actor__RemoveChild(Actor *self, BasicClass *child) {
     } else if ((tag & 0xF) == 5) {
         self->ticker = NULL;
     }
-    GetClass6B5CCMethods()->removeChild((Class6B5CC *)self, child);
+    GetSceneNodeMethods()->removeChild((SceneNode *)self, child);
 }
 
 void Actor__RemoveAllChildren(Actor *self) {
     self->grid = NULL;
     self->ticker = NULL;
-    GetClass6B5CCMethods()->removeAllChildren((Class6B5CC *)self);
+    GetSceneNodeMethods()->removeAllChildren((SceneNode *)self);
 }
 
 void Actor__Reset(Actor *self) {
@@ -182,7 +182,7 @@ void Actor__Reset(Actor *self) {
 extern void RotateAndOffsetHullList(Buf38O *out, s32 arg1, s32 arg2, s32 arg3);
 
 void Actor__NotifyMove(Actor *self, s32 event) {
-    GetClass6B5CCMethods()->notifyIfUnk20Active((Class6B5CC *)self, event);
+    GetSceneNodeMethods()->notifyIfUnk20Active((SceneNode *)self, event);
     /* Written as two nested guards, not a combined `event >= 5 && event < 9`
      * range test -- the combined form optimizes into a single unsigned
      * `(event-5) < 4` comparison, which is not what retail does (two
@@ -247,7 +247,7 @@ void Actor__AddTranslation(Actor *self, Vec3_d294 *delta) {
  * is a whole-Vec3 copy. */
 void Actor__UpdateTranslation(Actor *self, s32 set, Vec3_d294 *v) {
     Actor *t = self;
-    Class6B5CCSub14 *u = t->coord2;
+    SceneNodeSub14 *u = t->coord2;
 
     if (set) {
         *(Vec3_d294 *)&u->tx = *v;
@@ -262,7 +262,7 @@ void Actor__UpdateTranslation(Actor *self, s32 set, Vec3_d294 *v) {
 void Actor__AddLocalTranslation(Actor *self, s16 *local) {
     Vec3_d294 buf;
 
-    Class6B5CC__RotateLocalVector((Class6B5CC *)self, &buf, local);
+    SceneNode__RotateLocalVector((SceneNode *)self, &buf, local);
     self->methods->addTranslation(self, &buf);
 }
 

@@ -21,9 +21,9 @@
 #include "code_2cc8c.h"
 #include "TextRow.h"
 
-void BoxFill__AttachToParent(BoxFill *self, Class6B5CC *parent, Pair32E99C *pos) {
+void BoxFill__AttachToParent(BoxFill *self, SceneNode *parent, Pair32E99C *pos) {
     if (self->parent == NULL) {
-        GetClass6B5CCMethods()->attachToParent((Class6B5CC *)self, parent, 0);
+        GetSceneNodeMethods()->attachToParent((SceneNode *)self, parent, 0);
         self->methods->setPosition(self, pos);
     }
 }
@@ -76,7 +76,7 @@ void BoxFill__SetSize(BoxFill *self, s32 *size) {
 /* +0x04C is called with FOUR arguments through an unprototyped pointer: its
  * occupant reads three, and the fourth is this function's own a3, already in
  * $a3 (BoxFill.h's banner). */
-void BoxFill__AttachAbsolute(BoxFill *self, Class6B5CC *parent, Pair32E99C *pos, s32 arg3) {
+void BoxFill__AttachAbsolute(BoxFill *self, SceneNode *parent, Pair32E99C *pos, s32 arg3) {
     void (*fn)();
     BoxFill *q;
 
@@ -149,7 +149,7 @@ void TextRow__Reset(TextRow *self, char *text) {
     self->methods->setText(self, text);
 }
 
-void TextRow__AttachToParent(TextRow *self, Class6B5CC *parent, ScreenSpritePos *pos) {
+void TextRow__AttachToParent(TextRow *self, SceneNode *parent, ScreenSpritePos *pos) {
     ScreenSpritePos buf;
     s32 i, bound;
     CharSprite **elemp;
@@ -167,7 +167,7 @@ void TextRow__AttachToParent(TextRow *self, Class6B5CC *parent, ScreenSpritePos 
             if (self->gapIndex != 0 && i == self->gapIndex) {
                 buf.x += 0x10;
             }
-            (*elemp)->methods->attachToParent(*elemp, (Class6B5CC *)self, (Vec3_d294 *)&buf);
+            (*elemp)->methods->attachToParent(*elemp, (SceneNode *)self, (Vec3_d294 *)&buf);
             buf.x += self->cellPitch;
             bound = self->firstVisible;
             elemp++;

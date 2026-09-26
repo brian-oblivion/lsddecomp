@@ -54,7 +54,7 @@ extern const s8 sFootprintResultRemap[8];
 extern TargetSpec866E8 *sFootprintResultPtrTable[7];
 
 /*
- * A GsCOORDINATE2 (Class6B5CCSub14) read as the element's origin: an
+ * A GsCOORDINATE2 (SceneNodeSub14) read as the element's origin: an
  * element's cellParent->coord2, reached through a cast. tx (+0x018) and tz
  * (+0x020) are unions because Class866E8__ComputeFootprintDescriptor reads
  * each whole (the cell) and, later, as its low halfword (the offset):
@@ -127,10 +127,10 @@ extern s32 D_800869CC[3];
 
 extern void *BMemPMgrAlloc(s32 size);
 
-/* Class86AA0 (gClass86AA0Methods, a Class6B5CC) is defined in
+/* Class86AA0 (gClass86AA0Methods, a SceneNode) is defined in
  * include/Class86AA0.h (round 88, track 4). */
 
-/* GetClass6B5CCMethods and its table: include/Class6B5CC.h (track 4, round
+/* GetSceneNodeMethods and its table: include/SceneNode.h (track 4, round
  * 81). The local BaseCtorTableB_3bb8c_c view and the unprototyped getter that
  * lived here are gone; round 59 measured both arguments class_3bb8c_c.c passed
  * to the no-argument getter as zero-cost (docs/match-reports/Class86AA0__Class86AA0.md). */

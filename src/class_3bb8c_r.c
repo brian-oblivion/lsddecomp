@@ -323,7 +323,7 @@ s32 IsStyleVariantEven(void) {
 extern void *BMemPMgrAlloc(s32 size);
 extern void *BMemPMgrFree(void *ptr);
 
-Class876FC *New_Class876FC(s32 kind, Class876FCParams *params, Class6B5CC *parent, Vec3_d294 *pos) {
+Class876FC *New_Class876FC(s32 kind, Class876FCParams *params, SceneNode *parent, Vec3_d294 *pos) {
     Class876FC *self = BMemPMgrAlloc(0x98);
 
     if (self != NULL) {
@@ -338,7 +338,7 @@ Class876FC *New_Class876FC(s32 kind, Class876FCParams *params, Class6B5CC *paren
 
 /* `kind` goes into Actor's pendingExtra (+0x054): see include/Class876FC.h. */
 Class876FC *Class876FC__Class876FC(Class876FC *self, s32 kind, Class876FCParams *params,
-                                   Class6B5CC *parent, Vec3_d294 *pos) {
+                                   SceneNode *parent, Vec3_d294 *pos) {
     if (GetActorMethods()->ctor((Actor *)self) == NULL) {
         goto fail;
     }
@@ -352,7 +352,7 @@ fail:
     return NULL;
 }
 
-/* The base finalize is Class6B5CC__Finalize, which returns nothing: the old
+/* The base finalize is SceneNode__Finalize, which returns nothing: the old
  * view's `return base->dtor(self)` forwarded a $v0 no one sets. */
 void Class876FC__Finalize(Class876FC *self) {
     Class876FC__ReleaseByKind(self);

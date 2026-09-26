@@ -31,7 +31,7 @@ u8 ModelData__ForwardScanPackets(ModelData *self, s32 arg1, s32 arg2) {
 
 ## Notes
 
-- No shared header was edited. `Class6D430.h`, `Class6B5CC.h`, `BasicClass.h` are
+- No shared header was edited. `Class6D430.h`, `SceneNode.h`, `BasicClass.h` are
   included; prototypes for other units' functions (GetActiveDataSourceMethods,
   ReleaseBasicClassArray, BMemPMgrFree) are local to the unit.
 - Types of arguments and returns are readings of the registers used, not proven.

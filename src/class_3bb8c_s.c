@@ -53,7 +53,7 @@ extern void NoOpIgnoreArgs();
 
 /* Three globals class_3bb8c_o.c's Actor__func_56f5c captures once from its
  * parameters (declared there with the same types; track 4b, round 85):
- * D_8008ACA4 is the Actor it ran on, called here through Class6B5CC's
+ * D_8008ACA4 is the Actor it ran on, called here through SceneNode's
  * +0x080 getSetUnk10Flag8 as that function calls it; D_8008ACA8 is
  * forwarded opaquely to New_Class879C4 as its third argument; D_8008ACAC's
  * pointee has a field at +0x018 that Class876FC__InitByKind and
@@ -70,7 +70,7 @@ extern s32 D_8008AB98[];
  * gets two model children, kind 2 five randomised sprites, kind 3 five
  * plain sprites (Class876FC__SpawnPlainSprites is Class876FC__SpawnSprites(self,
  * 0, 0, NULL)). */
-void Class876FC__InitByKind(Class876FC *self, Class6B5CC *parent, Vec3_d294 *pos) {
+void Class876FC__InitByKind(Class876FC *self, SceneNode *parent, Vec3_d294 *pos) {
     Vec3_d294 local;
     s32 state;
 
@@ -81,7 +81,7 @@ void Class876FC__InitByKind(Class876FC *self, Class6B5CC *parent, Vec3_d294 *pos
     state = self->pendingExtra;
     if (state < 2) {
         s32 ret = D_8008ACA4->methods->getSetUnk10Flag8(D_8008ACA4, D_8008AB98[state]);
-        Class6B5CC__LinkModel((Class6B5CC *)self, (void *)ret);
+        SceneNode__LinkModel((SceneNode *)self, (void *)ret);
         state = self->pendingExtra;
     }
 
@@ -192,7 +192,7 @@ void Class876FC__PlaceModelChildren(Class876FC *self, s32 reuse) {
         } else {
             Actor *child = New_Actor();
             *p = child;
-            Class6B5CC__LinkModel((Class6B5CC *)child, self->model);
+            SceneNode__LinkModel((SceneNode *)child, self->model);
             AttachWithRotScale(*p, self, &accum, self->params.rotation, self->params.scale);
         }
     }
@@ -283,7 +283,7 @@ void Class876FC__BuildRandomSprites(Class876FC *self) {
         gSpriteShiftScratch.x = gSpriteShiftX[self->params.tableIndex];
         /* Called directly, not through the child's table: the child is a
          * sprite (Class879C4, a Sprite), not an Actor, and the function only
-         * touches the Class6B5CC coord2 both share. */
+         * touches the SceneNode coord2 both share. */
         Actor__AddTranslation((Actor *)child, &gSpriteShiftScratch);
         m = child->methods;
         arg = (self->params.altColor != NULL) ? self->params.altColor : self->params.color;

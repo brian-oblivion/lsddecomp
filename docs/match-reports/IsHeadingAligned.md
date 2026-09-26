@@ -53,8 +53,8 @@ entry are left as `unkN` padding.
 Both callers of this function (`DreamSys__CheckTunnelHeading`, `DreamSys__CheckStaircaseHeading`, both
 themselves stalled on the `gp_rel` blocker per their own reports) pass down,
 two levels removed, the `s32 local[4]` buffer that `DreamSys.c:727` fills via
-`Class6B5CC__GetRotationDegrees(this, local)`. That function's own report
-(`docs/match-reports/Class6B5CC__GetRotationDegrees.md`, unit `code_d294_c`) establishes it
+`SceneNode__GetRotationDegrees(this, local)`. That function's own report
+(`docs/match-reports/SceneNode__GetRotationDegrees.md`, unit `code_d294_c`) establishes it
 writes a 3-entry `WholeFrac_d294 {s16 whole; s16 frac;}` table there, so byte
 offset +4 of `local` is `out[1].whole` — a degrees value.
 

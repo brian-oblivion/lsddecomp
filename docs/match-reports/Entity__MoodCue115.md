@@ -104,7 +104,7 @@ A mood-dispatch handler in this unit's family (`Entity *this,
 EntityMoodHandlerArg *out`). On `this->unk44 == 0`, calls
 `Entity__IsTargetInRange(this, 0x800)` (matched in `Entity_b.c`; this is its first
 cross-unit caller); on a nonzero result it runs a "detach" burst (two
-`Class6B5CC__FaceTarget` calls with swapped first/second arguments — see the
+`SceneNode__FaceTarget` calls with swapped first/second arguments — see the
 round-13 head finding below —, `activate`, `startSoundCue`,
 `target->slot130(target, 1)`, resets `out`/`moodTimer`) and sets
 `unk44 = 0xB`. A re-check of `this->unk44 == 0` then runs
@@ -123,7 +123,7 @@ before anyone "fixes" it in either direction.
 Otherwise: `out->unk4 % 100` reseeds `out`'s fields; a `moodTimer` dispatch
 (`<3`, `<7`, `==0x64`, `==0xF0`) drives `slotCC`/`slot130`/`target->slot134`;
 a further `unk44 == 0xC` sub-dispatch on `moodTimer` drives
-`slotCC`/`slotC4`/a `Class6B5CC__FaceTarget` call. The shared tail (reached
+`slotCC`/`slotC4`/a `SceneNode__FaceTarget` call. The shared tail (reached
 from every path) is a `slot144(this, target) < 0x200` check driving
 `deactivate` + `notifyParents(this, 0xA)`.
 
@@ -137,8 +137,8 @@ void Entity__MoodCue115(Entity *this, EntityMoodHandlerArg *out) {
     if (this->unk44 == 0) {
         if (Entity__IsTargetInRange(this, 0x800) != 0) {
             this->unk44 = 0xB;
-            Class6B5CC__FaceTarget(this, this->target, 1, 0, 0);
-            Class6B5CC__FaceTarget(this->target, this, 1, 1, 0);
+            SceneNode__FaceTarget(this, this->target, 1, 0, 0);
+            SceneNode__FaceTarget(this->target, this, 1, 1, 0);
             this->methods->activate(this);
             this->methods->startSoundCue(this);
             this->target->methods->slot130(this->target, 1);
@@ -177,7 +177,7 @@ void Entity__MoodCue115(Entity *this, EntityMoodHandlerArg *out) {
         } else if (this->moodTimer < 0x12D) {
             /* nothing */
         } else {
-            Class6B5CC__FaceTarget(this, this->target, 1, 0, 0);
+            SceneNode__FaceTarget(this, this->target, 1, 0, 0);
             this->methods->slotC4(this, -0x1E, 0);
         }
     }
@@ -259,10 +259,10 @@ cause.** When a residue description bottoms out at "the compiler just chose
 differently", the next question is what the compiler was told, not what it
 emitted.
 
-## HEAD FINDING, round 13: the reversed `Class6B5CC__FaceTarget` arguments are a DIRECTION FLAG
+## HEAD FINDING, round 13: the reversed `SceneNode__FaceTarget` arguments are a DIRECTION FLAG
 
 Runner echo (`Entity__MoodCue115`, `Entity_d`) and runner bravo (`Entity__MoodCue81`,
-`Entity_e`) each independently flagged a `Class6B5CC__FaceTarget` call site
+`Entity_e`) each independently flagged a `SceneNode__FaceTarget` call site
 whose first two arguments are swapped relative to every other known site. Both
 verified it against raw disassembly. The head then surveyed **every** call site
 in the executable, and the swap is not an outlier convention — it is perfectly
@@ -273,7 +273,7 @@ correlated with the FOURTH argument:
 | 0 | `this` | `this->target` | 9 in asm + 19 already matched as C |
 | 1 | `this->target` | `this` | 2 (the two flagged sites) |
 
-Reading: `Class6B5CC__FaceTarget` is **symmetric in its first two
+Reading: `SceneNode__FaceTarget` is **symmetric in its first two
 parameters**, and `$a3` names which way round the operation runs. The caller
 pre-swaps the operands rather than the callee branching on the flag. The
 extern signature is CORRECT as it stands; do not "fix" a swapped site back to
@@ -330,7 +330,7 @@ still queued before spending a round on it.
 **Where the lever should actually be tried.** 15 live stall reports mention
 cross-jumping or tail-merging (`grep -rilE 'cross-?jump|tail[ -]merg'
 docs/match-reports/`, then filter to the ones whose first lines say STALL):
-`Class6B5CC__TryAttachNearby`, `DreamSys__StepLookYaw`,
+`SceneNode__TryAttachNearby`, `DreamSys__StepLookYaw`,
 `DreamSys__TryInstantTeleportLink`, `cd_read_retry`, `func_80032148`,
 `func_80033AB0`, `Snd_decrescendo`, `_SsSetControlChange`, `ContDataEntry`,
 `TaskCore__CommitElementScroll`, `Class866E8__SplitFootprintSlot`, `TaskObjF__CheckCardStatus`, `StyleFillEffectKind3`,

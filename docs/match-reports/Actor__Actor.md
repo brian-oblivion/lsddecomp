@@ -6,14 +6,14 @@
 
 Unit: `class_3bb8c_o` (round 17). The constructor of the shared
 intermediate base class this unit implements from here onward -- chains to
-the base-class ctor via the fixed `GetClass6B5CCMethods()` table, installs this
+the base-class ctor via the fixed `GetSceneNodeMethods()` table, installs this
 class's own vtable, zeroes three fields and dispatches its own `slot40`.
 
 ## Final source
 
 ```c
 BaseObjO *Actor__Actor(BaseObjO *self) {
-    if (GetClass6B5CCMethods()->ctor(self) == NULL) {
+    if (GetSceneNodeMethods()->ctor(self) == NULL) {
         goto fail;
     }
     self->methods = GetActorMethods();
@@ -53,18 +53,18 @@ discipline and the file banner), so this unit keeps its own local reading,
 
 ## Derivation
 
-- **`GetClass6B5CCMethods()` needed a NON-VOID `ctor`, forcing a fresh local
+- **`GetSceneNodeMethods()` needed a NON-VOID `ctor`, forcing a fresh local
   table type rather than reusing `class_3bb8c.h`'s existing
   `BaseCtorTableB_3bb8c_c`.** That header's own `ctor` field is typed
   `void (*ctor)(void *self)` (established from a DIFFERENT unit's call site
   that discards the return), but THIS call site checks
-  `GetClass6B5CCMethods()->ctor(self) == NULL` -- an outright arity/return-type
+  `GetSceneNodeMethods()->ctor(self) == NULL` -- an outright arity/return-type
   conflict at the same slot, same shape as the project's other
-  `GetClass6B5CCMethods` per-call-site-typing precedent already written up in
+  `GetSceneNodeMethods` per-call-site-typing precedent already written up in
   that very header (see its own long comment on why the arg list "is what
   THIS call site's bytes need", not the callee's true signature). Declared
   a fresh local `FixedBaseTable` here instead of touching the shared
-  header. `code_d294.h`'s OWN independent view (`Class6B5CCMethods::ctor`,
+  header. `code_d294.h`'s OWN independent view (`SceneNodeMethods::ctor`,
   `void *(*ctor)(void *self)`) already needed the same non-void return for
   the same reason, confirming this is not a one-off.
 - **`goto fail; ... fail: return NULL;`, not `if (cond) return NULL;`.**
@@ -83,7 +83,7 @@ discipline and the file banner), so this unit keeps its own local reading,
 
 ### Proposed learning
 
-- **`GetClass6B5CCMethods`'s per-call-site-typing precedent is not unique to
+- **`GetSceneNodeMethods`'s per-call-site-typing precedent is not unique to
   `class_3bb8c.h`/`code_d294.h`/`class_3ac78.c`.** A fourth, independent
   local reading (`FixedBaseTable` here) needed the SAME non-void-vs-void
   fork on the SAME slot (`ctor`, offset `+0x008`) for the identical reason
@@ -97,7 +97,7 @@ discipline and the file banner), so this unit keeps its own local reading,
 
 **`Actor__Actor` -- tier A.** The raw `Class__Class` constructor form:
 takes an already-allocated `self`, chains to the true root
-(`GetClass6B5CCMethods()->ctor`), installs `self->methods`, zeroes three fields
+(`GetSceneNodeMethods()->ctor`), installs `self->methods`, zeroes three fields
 and dispatches `slot40`. The report's own "Class identification" section
 establishes THREE independent ways that this is the shared intermediate
 base's own constructor, not `Class65650`'s: (1) it installs the exact
@@ -112,4 +112,4 @@ i.e. `Class65650` derives from this class, it is not this class.
 
 ## Track 4 (2026-09-25, round 82, delta)
 
-Renamed from `BaseObjO__BaseObjO`. Occupant of +0x008 in gActorMethods: the ctor, named for its slot. Chains Class6B5CC's ctor, zeroes state/grid/ticker, calls reset. The class (id 0x34, table `gActorMethods`, formerly `D_800878D4`) is unified as `Actor` in `include/Actor.h`: a Class6B5CC subclass and the base of Class65650/Entity, DreamSys and Class876FC. Any source block above is the pre-unification spelling; the live body in `src/class_3bb8c_o.c` takes the unified types and field/slot names, byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).
+Renamed from `BaseObjO__BaseObjO`. Occupant of +0x008 in gActorMethods: the ctor, named for its slot. Chains SceneNode's ctor, zeroes state/grid/ticker, calls reset. The class (id 0x34, table `gActorMethods`, formerly `D_800878D4`) is unified as `Actor` in `include/Actor.h`: a SceneNode subclass and the base of Class65650/Entity, DreamSys and Class876FC. Any source block above is the pre-unification spelling; the live body in `src/class_3bb8c_o.c` takes the unified types and field/slot names, byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).

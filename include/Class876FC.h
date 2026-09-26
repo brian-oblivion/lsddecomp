@@ -27,8 +27,8 @@
  * What it changes, from its own methods (`classtable.py gClass876FCMethods
  * --vs gActorMethods`):
  *  - +0x040 reset: the occupant, Class876FC__SetParams, takes the params
- *    block where the slot (Class6B5CC's) takes none. It copies the block
- *    into `params` and zeroes `tick`, as Class6B5CC__Reset zeroes `tick`.
+ *    block where the slot (SceneNode's) takes none. It copies the block
+ *    into `params` and zeroes `tick`, as SceneNode__Reset zeroes `tick`.
  *    The ctor calls it through Class876FCSetParamsFn (a cast, no code);
  *  - +0x0EC setPendingExtra: the occupant, Class876FC__Update, is the
  *    per-frame update: it increments `tick` and runs the per-kind update
@@ -85,7 +85,7 @@ struct Class876FCParams {
 
 struct Class876FCMethods {
     CLASS876FC_SLOTS(Class876FC, (Class876FC * self, s32 kind, Class876FCParams *params,
-                                  Class6B5CC *parent, Vec3_d294 *pos));
+                                  SceneNode *parent, Vec3_d294 *pos));
 };
 
 struct Class876FC {
@@ -103,14 +103,14 @@ extern Class876FCMethods *GetClass876FCMethods(void); /* class_3bb8c_o.c; return
  * Four are declared WITHOUT a prototype on purpose: each is one-parameter,
  * but a caller in class_3bb8c_s.c passes a dead second argument that is
  * byte-load-bearing (the `arity-ok` notes there and in the reports). */
-Class876FC *New_Class876FC(s32 kind, Class876FCParams *params, Class6B5CC *parent,
+Class876FC *New_Class876FC(s32 kind, Class876FCParams *params, SceneNode *parent,
                            Vec3_d294 *pos); /* BMemPMgrAlloc(0x98), then ctor */
 Class876FC *Class876FC__Class876FC(Class876FC *self, s32 kind, Class876FCParams *params,
-                                   Class6B5CC *parent, Vec3_d294 *pos);
+                                   SceneNode *parent, Vec3_d294 *pos);
 void Class876FC__Finalize(Class876FC *self);
 void Class876FC__SetParams(Class876FC *self, Class876FCParams *params);
 void Class876FC__Update(Class876FC *self, Vec3_d294 *pos);
-void Class876FC__InitByKind(Class876FC *self, Class6B5CC *parent, Vec3_d294 *pos);
+void Class876FC__InitByKind(Class876FC *self, SceneNode *parent, Vec3_d294 *pos);
 void Class876FC__UpdateByKind(Class876FC *self, Vec3_d294 *pos);
 void Class876FC__ReleaseByKind(Class876FC *self);
 void Class876FC__PlaceModelChildren(Class876FC *self, s32 reuse);

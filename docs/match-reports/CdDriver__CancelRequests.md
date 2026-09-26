@@ -133,7 +133,7 @@ share live range with each other, are not necessarily "the same variable"
 even when semantically interchangeable — they can get different registers,
 and forcing them into one C local can pin the allocator to the wrong one.**
 This is the struct/global analogue of the do-while-loop-scratch idiom
-already on file (round 44's `Class6B5CC__UpdateRotation`): when a near-miss is
+already on file (round 44's `SceneNode__UpdateRotation`): when a near-miss is
 length-correct but register-swapped only at sites that don't overlap in
 lifetime, try splitting a reused local into two independently-named ones
 before suspecting anything structural.

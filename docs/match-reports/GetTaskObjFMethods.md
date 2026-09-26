@@ -36,5 +36,5 @@ First attempt, byte-exact.
 `GetTaskObjFMethods` (was `func_800507E8`), tier A: a bare
 `return &gTaskObjFMethods;` vtable-getter, the exact `GetClass<X>Methods` shape
 already used tree-wide for this pattern (`GetClass86668Methods`,
-`GetClass869D8Methods`, `GetClass6B5CCMethods`) -- mechanics fully IS the
+`GetClass869D8Methods`, `GetSceneNodeMethods`) -- mechanics fully IS the
 name for a pure getter.

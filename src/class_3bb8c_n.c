@@ -431,7 +431,7 @@ Class876FC **StyleFillEffectKind0(Class876FC **arg0, s32 arg1, Vec3_d294 *arg2) 
     }
     for (i = 0; i < arg1; i++) {
         fp(arg2, (void *)t3);
-        *arg0 = New_Class876FC(0, (Class876FCParams *)&D_8008E0A4, (Class6B5CC *)gStyleCueSelf, arg2);
+        *arg0 = New_Class876FC(0, (Class876FCParams *)&D_8008E0A4, (SceneNode *)gStyleCueSelf, arg2);
         arg0++;
     }
     return arg0;
@@ -448,7 +448,7 @@ Class876FC **StyleFillEffectKind1(Class876FC **arg0, s32 arg1, Vec3_d294 *arg2) 
     D_8008E0B4 = D_80087204;
     for (i = 0; i < arg1; i++) {
         SetupStyleSpawnParamsA(arg2, (void *)val);
-        *arg0 = New_Class876FC(1, (Class876FCParams *)&D_8008E0A4, (Class6B5CC *)gStyleCueSelf, arg2);
+        *arg0 = New_Class876FC(1, (Class876FCParams *)&D_8008E0A4, (SceneNode *)gStyleCueSelf, arg2);
         arg0++;
     }
     return arg0;
@@ -500,7 +500,7 @@ Class876FC **StyleFillEffectKind3(Class876FC **arg0, Vec3_d294 *arg1) {
     }
     q = (PtrBoxK3 *)&D_8008E0B0;
     q->p = D_80087174;
-    *arg0 = New_Class876FC(3, (Class876FCParams *)((u8 *)q - 0xC), (Class6B5CC *)gStyleCueSelf, arg1);
+    *arg0 = New_Class876FC(3, (Class876FCParams *)((u8 *)q - 0xC), (SceneNode *)gStyleCueSelf, arg1);
     arg0++;
     return arg0;
 }
@@ -547,7 +547,7 @@ Class876FC **StyleFillEffectKind2(Class876FC **arg0, Vec3_d294 *arg1) {
     q = &D_8008E0B0;
     *q = D_80087174;
     D_8008E0BC = rand() % 6;
-    *arg0 = New_Class876FC(2, (Class876FCParams *)((u8 *)q - 0xC), (Class6B5CC *)gStyleCueSelf, arg1);
+    *arg0 = New_Class876FC(2, (Class876FCParams *)((u8 *)q - 0xC), (SceneNode *)gStyleCueSelf, arg1);
     arg0++;
     return arg0;
 }

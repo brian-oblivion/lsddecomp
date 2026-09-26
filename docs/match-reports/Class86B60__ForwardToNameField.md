@@ -47,4 +47,4 @@ Its up-calls to TaskCore (include/TaskCore.h, track 4 round 84) now go through `
 
 ## Track 4 (2026-09-26, round 88, bravo)
 
-Class86B60 is unified in include/Class86B60.h (TASKCORE_SLOTS/TASKCORE_FIELDS plus its own). The updateSlotElements override (+0x0E0). Its argument is typed as the slot's `void *parent`; the name field's +0x04C is TextRow's attachToParent (Class6B5CC's), so the call casts parent to Class6B5CC * and &D_8008A9B4 to Vec3_d294 * (its offset). No code from either cast. Byte-identical (whole image green, 0 new warnings, nonmatching green).
+Class86B60 is unified in include/Class86B60.h (TASKCORE_SLOTS/TASKCORE_FIELDS plus its own). The updateSlotElements override (+0x0E0). Its argument is typed as the slot's `void *parent`; the name field's +0x04C is TextRow's attachToParent (SceneNode's), so the call casts parent to SceneNode * and &D_8008A9B4 to Vec3_d294 * (its offset). No code from either cast. Byte-identical (whole image green, 0 new warnings, nonmatching green).

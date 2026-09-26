@@ -1,11 +1,11 @@
 #ifndef BOXFILL_H
 #define BOXFILL_H
 
-#include "Class6B5CC.h"
+#include "SceneNode.h"
 
 /*
  * BoxFill -- a flat-coloured screen rectangle (class id 0x64, method table
- * gBoxFillMethods): a Class6B5CC subclass holding one libgs GsBOXF.
+ * gBoxFillMethods): a SceneNode subclass holding one libgs GsBOXF.
  * Methods in src/code_2cc8c_e.c (New_BoxFill, the ctor, Reset) and
  * src/code_2cc8c_f.c (the rest, up to GetBoxFillMethods). The name is for
  * what the class does, and the evidence is this:
@@ -17,7 +17,7 @@
  *  - The class's own slots set exactly those: setColor (the GsBOXF r,g,b),
  *    setPosition, setSize (w, h), setPri, and attachAbsolute, which attaches
  *    and clears `relative`. Its setDisplay/setSemiTrans/setSemiTransRate
- *    overrides are Class6B5CC's GetSetBitField accessors at the same bit
+ *    overrides are SceneNode's GetSetBitField accessors at the same bit
  *    positions (31, 30, 28..29), over the GsBOXF attribute instead of the
  *    GsDOBJ2 one.
  *  - Its users: TaskCore's listView (the frame behind a scrolled list:
@@ -26,7 +26,7 @@
  *    class_3bb8c_m/_n (class_3bb8c_m makes its box semi-transparent:
  *    setSemiTrans(1), setSemiTransRate(0)).
  *
- * Ctor chain: BoxFill__BoxFill calls GetClass6B5CCMethods()->ctor first, so
+ * Ctor chain: BoxFill__BoxFill calls GetSceneNodeMethods()->ctor first, so
  * the id parent (0x4) is the ctor-chain parent. One class derives from it,
  * Class6E99C (D_8006E99C, 0x164, a colour fade over the box; unified in
  * include/Class6E99C.h, round 87), whose ctor calls this one's first
@@ -39,13 +39,13 @@
  *    initialises the box from them; the ctor calls it through
  *    BoxFillResetFn.
  *  - +0x04C attachToParent: BoxFill__AttachToParent's third argument is a
- *    screen position (a Pair32E99C) where the slot, Class6B5CC's, types a
+ *    screen position (a Pair32E99C) where the slot, SceneNode's, types a
  *    Vec3_d294 offset; it attaches with a NULL offset, then setPosition.
  *    Callers cast to BoxFillAttachToParentFn (class_3bb8c_m/_n,
- *    code_2cc8c_b) or, through a Class6B5CC pointer, cast the argument
+ *    code_2cc8c_b) or, through a SceneNode pointer, cast the argument
  *    (Viewport__SetSubHandle). BoxFill__AttachAbsolute calls it with FOUR
  *    arguments through an unprototyped pointer (see its match report).
- * The ctor itself returns nothing where Class6B5CC's slot returns `void *`;
+ * The ctor itself returns nothing where SceneNode's slot returns `void *`;
  * every caller ignores the value.
  *
  * The object is 0x6C bytes (New_BoxFill); Class6E99C's own fields start at
@@ -76,25 +76,25 @@ struct Pair32E99C {
     s32 b; /* +0x004, y */
 };
 
-/* Class6B5CC's slots, then this class's own. `tools/classtable.py
- * gBoxFillMethods --vs gClass6B5CCMethods` lists the overrides of the
+/* SceneNode's slots, then this class's own. `tools/classtable.py
+ * gBoxFillMethods --vs gSceneNodeMethods` lists the overrides of the
  * inherited ones: +0x008 (BoxFill__BoxFill), +0x040 (BoxFill__Reset), +0x04C
  * (BoxFill__AttachToParent), +0x060 (BoxFill__SetDisplay), +0x064
  * (BoxFill__SetSemiTrans), +0x068 (BoxFill__SetSemiTransRate). */
 /* clang-format off */
 #define BOXFILL_SLOTS(Self, CtorParams)                                                            \
-    CLASS6B5CC_SLOTS(Self, CtorParams);                                                            \
+    SCENENODE_SLOTS(Self, CtorParams);                                                            \
     /* +0x0B8 */ void (*setColor)(Self *self, s32 overwrite, void *rgb);  /* BoxFill__SetColor: copy the 3 bytes, or add them when overwrite is 0 */ \
     /* +0x0BC */ void (*setPosition)(Self *self, Pair32E99C *pos);        /* BoxFill__SetPosition: only while attached */ \
     /* +0x0C0 */ void (*setSize)(Self *self, s32 *size);                  /* BoxFill__SetSize: {w, h} words, low halves; only while attached */ \
-    /* +0x0C4 */ void (*attachAbsolute)(Self *self, Class6B5CC *parent, Pair32E99C *pos, s32 arg3); /* BoxFill__AttachAbsolute: attachToParent, relative = 0, unk4C = arg3 */ \
+    /* +0x0C4 */ void (*attachAbsolute)(Self *self, SceneNode *parent, Pair32E99C *pos, s32 arg3); /* BoxFill__AttachAbsolute: attachToParent, relative = 0, unk4C = arg3 */ \
     /* +0x0C8 */ void (*setPri)(Self *self, s32 pri);                     /* BoxFill__SetPri */          \
     /* +0x0CC */ s32 (*setMask)(Self *self, s32 bits)                     /* BoxFill__SetMask: mask = (1 << bits) - 1; Reset passes 13 */
 /* clang-format on */
 
 /* clang-format off */
 #define BOXFILL_FIELDS(Methods)                                                                    \
-    CLASS6B5CC_FIELDS(Methods);                                                                    \
+    SCENENODE_FIELDS(Methods);                                                                    \
     /* +0x044 */ s32 pri;          /* setPri, the ctor's third argument; DrawNode's GsSortBoxFill pri (its low halfword) */ \
     /* +0x048 */ s32 relative;     /* 1 from Reset, 0 from attachAbsolute: DrawNode reads posX/posY as percent of half the screen while set */ \
     /* +0x04C */ s32 unk4C;        /* zeroed by Reset; attachAbsolute's fourth argument; no reader */ \
@@ -124,14 +124,14 @@ extern BoxFillMethods *GetBoxFillMethods(void); /* returns &gBoxFillMethods */
 /* +0x040's and +0x04C's occupants, as a caller reaching them through the
  * inherited slots casts them (see the banner). */
 typedef void (*BoxFillResetFn)(BoxFill *self, SkipShort2 *size, void *color, s32 pri);
-typedef void (*BoxFillAttachToParentFn)(BoxFill *self, Class6B5CC *parent, Pair32E99C *pos);
+typedef void (*BoxFillAttachToParentFn)(BoxFill *self, SceneNode *parent, Pair32E99C *pos);
 
 /* The class's own methods, in ROM order (code_2cc8c_e, then code_2cc8c_f).
  * A subclass reaches the base ones through GetBoxFillMethods() and upcasts. */
 BoxFill *New_BoxFill(void *size, void *color, s32 pri);
 void BoxFill__BoxFill(BoxFill *self, SkipShort2 *size, void *color, s32 pri);
 void BoxFill__Reset(BoxFill *self, SkipShort2 *size, void *color, s32 pri);
-void BoxFill__AttachToParent(BoxFill *self, Class6B5CC *parent, Pair32E99C *pos);
+void BoxFill__AttachToParent(BoxFill *self, SceneNode *parent, Pair32E99C *pos);
 s32 BoxFill__SetDisplay(BoxFill *self, s32 on);
 s32 BoxFill__SetSemiTrans(BoxFill *self, s32 on);
 s32 BoxFill__SetSemiTransRate(BoxFill *self, s32 rate);
@@ -139,7 +139,7 @@ void BoxFill__SetColor(BoxFill *self, s32 overwrite, u8 *rgb);
 void BoxFill__ApplyColor(BoxFill *self, u8 *dst, u8 *src, s32 overwrite);
 void BoxFill__SetPosition(BoxFill *self, Pair32E99C *pos);
 void BoxFill__SetSize(BoxFill *self, s32 *size);
-void BoxFill__AttachAbsolute(BoxFill *self, Class6B5CC *parent, Pair32E99C *pos, s32 arg3);
+void BoxFill__AttachAbsolute(BoxFill *self, SceneNode *parent, Pair32E99C *pos, s32 arg3);
 void BoxFill__SetPri(BoxFill *self, s32 pri);
 s32 BoxFill__SetMask(BoxFill *self, s32 bits);
 

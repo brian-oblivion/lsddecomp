@@ -7,9 +7,9 @@
 Round 82, runner alpha (fifth slot on code_322b4). Unit `src/code_322b4.c`. Fresh ground, no prior body attempt.
 
 - **Where:** gLightRigMethods slot +0x008 (ctor) (`tools/classtable.py`).
-- **What:** Class6B5CC ctor via `GetClass6B5CCMethods()`, installs `GetLightRigMethods()`'s table, creates `New_FlatLightObj(0..2)` into +0x044..+0x04C and adds each as a child (slot +0x010), then calls reset (+0x040).
+- **What:** SceneNode ctor via `GetSceneNodeMethods()`, installs `GetLightRigMethods()`'s table, creates `New_FlatLightObj(0..2)` into +0x044..+0x04C and adds each as a child (slot +0x010), then calls reset (+0x040).
 - **Result:** byte-exact; 43/43 words, 0 insertions / 0 deletions, whole-image SHA1 green (`./build-and-verify.sh` OK).
-- **Types:** new unit-local view `D_8006EFACObj` (CLASS6B5CC_FIELDS/SLOTS + `lights[3]` +0x044, `SpriteRgb ambient` +0x050, slot +0x0B8 `getChild`); `New_FlatLightObj` and `GsSetAmbient` declared locally. No shared header touched.
+- **Types:** new unit-local view `D_8006EFACObj` (SCENENODE_FIELDS/SLOTS + `lights[3]` +0x044, `SpriteRgb ambient` +0x050, slot +0x0B8 `getChild`); `New_FlatLightObj` and `GsSetAmbient` declared locally. No shared header touched.
 
 ## Lever
 
@@ -18,13 +18,13 @@ About ten builds on the loop's source shape, all equal length. `self->lights[i]`
 ## Source
 
 ```c
-/* LightRig slot +0x008 (ctor): the Class6B5CC ctor, install the table,
+/* LightRig slot +0x008 (ctor): the SceneNode ctor, install the table,
  * create and add the three flat lights, then reset. */
 void LightRig__LightRig(LightRig *self) {
     s32 i;
     BasicClass **light;
 
-    GetClass6B5CCMethods()->ctor((Class6B5CC *)self);
+    GetSceneNodeMethods()->ctor((SceneNode *)self);
     self->methods = GetLightRigMethods();
     for (i = 0, light = self->lights; i < 3; i++, light++) {
         *light = New_FlatLightObj(i);
@@ -40,7 +40,7 @@ With a counter and a pointer walking together, the order of the comma operands i
 
 ## Naming
 
-- `D8006EFAC__D8006EFAC` -- tier A. Ctor (slot +0x008): the Class6B5CC ctor, installs the table, creates and adds three FlatLightObj children (round-82 broadcast: "holds three FlatLightObj children"), then resets.
+- `D8006EFAC__D8006EFAC` -- tier A. Ctor (slot +0x008): the SceneNode ctor, installs the table, creates and adds three FlatLightObj children (round-82 broadcast: "holds three FlatLightObj children"), then resets.
 
 ## Track 4
 

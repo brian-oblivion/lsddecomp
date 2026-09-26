@@ -238,7 +238,7 @@ void TaskCore__OnInit(TaskCore *self) {
     viewport = (Viewport *)self->viewport;
     core = viewport->methods;
     self->methods->updateSlotElements(self, self->unk14);
-    self->bgLayer->methods->attachToParent(self->bgLayer, (Class6B5CC *)self->unk14, NULL);
+    self->bgLayer->methods->attachToParent(self->bgLayer, (SceneNode *)self->unk14, NULL);
     if (self->fadeInCallback != 0) {
         self->methods->broadcastToSlots(self, self->baseColor);
         self->bgLayer->methods->setColor(self->bgLayer, 1, (BgLayerRgb *)self->baseColor);

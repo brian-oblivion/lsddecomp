@@ -84,7 +84,7 @@ round 2026-08-30-b, runner ALPHA, address range
 ## Track 4 (2026-09-26, round 88)
 
 Renamed from `DreamSys__UnlinkLinkMgr`. It is DREAMSYS_METHODS +0x050,
-the override of Class6B5CC's `detachFromParent`, and it ends by chaining
+the override of SceneNode's `detachFromParent`, and it ends by chaining
 Actor's (`GetActorMethods()->detachFromParent`). The "link manager" it
 unlinks first is Actor's `grid` field (+0x04C, the class-0x114 child
 Actor__AddChild records): it calls the grid's +0x0F0 and removes it as a

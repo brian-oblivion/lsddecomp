@@ -194,7 +194,7 @@ residue, before spending a permuter budget on it.
 - Corroborated at scale: thirteen one-line wrappers across `code_d294.c`,
   `code_d294_b.c` and `code_2cc8c_f.c` call it at fixed, non-overlapping
   (shift, width) pairs over one word -- the per-field setters of a packed
-  register. That word is `Class6B5CCObj::unk10`, which the PSY-Q
+  register. That word is `SceneNodeObj::unk10`, which the PSY-Q
   IDENTIFICATION note in include/code_d294.h pins as `GsDOBJ2.attribute`.
 - The mask is built by a loop rather than `(1 << width) - 1`; that is
   retail's own source shape and the name does not assert otherwise.

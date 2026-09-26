@@ -23,12 +23,12 @@ void DreamSys__SpawnAtLink(DreamSys *this, DreamSysFunc58968ArgObj *arg1)
 	this->vt->slot10(this, arg1);
 	if (this->unknwon_int_0x44 == 0xE) {
 		FlashbackEntry *entry = &this->storedFlasbacks[this->currentFlashbackIndex];
-		this->vt->Class6B5CC__UpdateRotation(this, 1, &entry->rotation);
+		this->vt->SceneNode__UpdateRotation(this, 1, &entry->rotation);
 		this->vt->GetSetDreamTimeLimit(this, entry->timeLimit + 4);
 		this->currentFlashbackIndex++;
 	}
 	if (this->unk_0x6c != 0 && this->unk_0x888 != 0) {
-		this->vt->Class6B5CC__UpdateRotation(this, 1, (void *)this->unk_0x888);
+		this->vt->SceneNode__UpdateRotation(this, 1, (void *)this->unk_0x888);
 	}
 }
 ```

@@ -66,7 +66,7 @@ retail's literal shape over the "cleaner" idiomatic form.
   trailing `return 1` are the whole body.
 - Corroborated by its one caller: `DreamSys.c`'s `DreamSys__ProjectPointAtDistance` calls it
   as `IsVec3WithinRange(local, tolerance, reference)`, where `local` is a
-  position it has just computed via `Class6B5CC__LocalOffsetToWorldPos` --
+  position it has just computed via `SceneNode__LocalOffsetToWorldPos` --
   a tolerance test between two positions, which is what the name says.
 - Parameters left as `(a, range, b)`: the test is symmetric in `a` and `b`,
   so naming one "actual" and the other "expected" would assert a direction

@@ -36,7 +36,7 @@
  *    calls it through its own view, include/class_3bb8c.h's ChildObj86ED0).
  *  - setDisplay (+0x060) is TextRow__SetDisplay(self, on, result): the value
  *    it returns with no visible cell is the caller's untouched $a2.
- * attachToParent's position is a ScreenSpritePos where Class6B5CC's slot
+ * attachToParent's position is a ScreenSpritePos where SceneNode's slot
  * types a Vec3_d294 offset, the cast ScreenSprite's banner describes.
  *
  * The object is 0xB8 bytes (New_TextRow). Its own fields start at +0x0A9,
@@ -83,7 +83,7 @@ TextRow *New_TextRow(void *texture, s32 count, char *text);
 void TextRow__TextRow(TextRow *self, void *texture, s32 count, char *text);
 void TextRow__Finalize(TextRow *self);
 void TextRow__Reset(TextRow *self, char *text);
-void TextRow__AttachToParent(TextRow *self, Class6B5CC *parent, ScreenSpritePos *pos);
+void TextRow__AttachToParent(TextRow *self, SceneNode *parent, ScreenSpritePos *pos);
 void TextRow__DetachFromParent(TextRow *self);
 s32 TextRow__SetDisplay(TextRow *self, s32 on, s32 result);
 void TextRow__SetColor(TextRow *self, SpriteRgb *rgb);

@@ -118,7 +118,7 @@ Renamed from `D800879C4__SetVariantClut` (tools/rename.py); the class is
 slot (+0x040) and keeps its own name: the body does something narrower and
 different from Sprite__Reset (it never binds a texture; it records the
 variant and repoints the CLUT), so the slot-name rule's exception applies.
-The slot keeps Class6B5CC's type; the ctor calls this through
+The slot keeps SceneNode's type; the ctor calls this through
 `Class879C4ResetFn` because it passes the variant. Return type `void` (the
 merge's +0x040 CONFLICT: the old `void *` was the ctor's local reading; see
 `Class879C4__Class879C4`'s report). The local view's `spriteClutX/Y` are

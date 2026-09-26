@@ -29,7 +29,7 @@ return type in this unit's own local reading (a fresh `void *` field
 alongside `ctor`) purely because THIS call site's return value is used;
 per the shared getter's already-established per-call-site-typing
 precedent (`class_3bb8c_o.c`, and `class_3bb8c.h`/`code_d294.h`'s own
-notes on the sibling symbol `GetClass6B5CCMethods`).
+notes on the sibling symbol `GetSceneNodeMethods`).
 
 ### Proposed learning
 
@@ -38,11 +38,11 @@ report explicitly contrasts against.
 
 ## Naming
 
-**Tier A.** `+0x00C` is the "finalize" slot convention this project already uses (`Class6B5CC__Finalize`, `Class866E8__Finalize`, `Viewport__Finalize`), and the body matches: teardown helper then forward the shared base dtor's return.
+**Tier A.** `+0x00C` is the "finalize" slot convention this project already uses (`SceneNode__Finalize`, `Class866E8__Finalize`, `Viewport__Finalize`), and the body matches: teardown helper then forward the shared base dtor's return.
 
 ## Track 4 (2026-09-25, round 82, delta)
 
-The base class is unified as `Actor` (`include/Actor.h`). Its +0x00C is the inherited Class6B5CC `finalize`, whose occupant Class6B5CC__Finalize returns nothing, so this function no longer returns the base call's value: it is `void`, and the base call a plain statement (`GetActorMethods()->finalize((Actor *)self)`). Same bytes: nothing touches $v0 after the jalr either way. Class876FC's own table view (`Class876FCMethods` in class_3bb8c_r.c) still types +0x00C as returning `void *`; that is the subclass's to settle.
+The base class is unified as `Actor` (`include/Actor.h`). Its +0x00C is the inherited SceneNode `finalize`, whose occupant SceneNode__Finalize returns nothing, so this function no longer returns the base call's value: it is `void`, and the base call a plain statement (`GetActorMethods()->finalize((Actor *)self)`). Same bytes: nothing touches $v0 after the jalr either way. Class876FC's own table view (`Class876FCMethods` in class_3bb8c_r.c) still types +0x00C as returning `void *`; that is the subclass's to settle.
 
 ## Track 4 (2026-09-26, round 88, charlie)
 

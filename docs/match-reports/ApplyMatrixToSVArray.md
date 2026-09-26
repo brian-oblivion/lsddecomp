@@ -72,7 +72,7 @@ DIFFERENT source-level construct than a byte-strided struct-pointer walk
 project's C89 rewrite cannot directly express (a genuinely 6-byte-packed
 struct type, which this toolchain has no visible packing attribute for,
 per every other struct in this project being naturally aligned to its own
-stride). This is the same FAMILY of problem as `Class6B5CC__GetRotationDegrees`'s
+stride). This is the same FAMILY of problem as `SceneNode__GetRotationDegrees`'s
 "redundant move" residue and `ApplyMatrixToLVArray`'s frame-size gap in this
 same unit's queue -- three residues in one round where the pinned
 toolchain's actual instruction-selection behavior diverged from a
@@ -206,7 +206,7 @@ comment**, invisible until this function was actually matched: the
 matched code reads FROM `dest` into the stack buffer and forwards `src`
 raw (unchanged) to `func_80015D58` -- the OPPOSITE of the header's
 earlier prose ("reading from `src`... into `dest`"). This asymmetry was
-undetectable from `ApplyMatrixToSVArray`'s one known caller (`Class6B5CC__TransformAndNotifyParents`),
+undetectable from `ApplyMatrixToSVArray`'s one known caller (`SceneNode__TransformAndNotifyParents`),
 which always passes `src == dest`. The header comment is updated; the
 declared C signature (`void *src, void *dest, ...`) is UNCHANGED, only
 the prose describing which parameter plays which role.
@@ -251,7 +251,7 @@ swap between a function's own parameters.
 - **Parameters corrected to `(dst, src, count, m)`.** The previous names had
   destination and source the wrong way round: the loop copies an element out
   of the 2nd argument and calls `ApplyMatrixSV(m, &buf, dst)`, so the 1st
-  argument is written. Both call sites (`Class6B5CC__TransformAndNotifyParents`, `Class6B5CC__ComposeAndApplyRotation`,
+  argument is written. Both call sites (`SceneNode__TransformAndNotifyParents`, `SceneNode__ComposeAndApplyRotation`,
   code_d294_b) pass the same address for both, which is why it was
   invisible. Names only -- no type, arity or order change; byte-identical.
 - **The local `Rec6_d294` typedef is gone**, replaced by the existing

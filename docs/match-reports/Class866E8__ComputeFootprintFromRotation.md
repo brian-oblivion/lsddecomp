@@ -636,11 +636,11 @@ Notes on the derivation, for whoever revisits this:
   raw disassembly (`sp+0x60`, holding `flag`, is never written before
   that path reaches the code that reads it back). This matches retail's
   own apparent behavior exactly; it is not a bug in the derivation.
-- `Class6B5CC__FaceTarget`-style dual argument-order surprises were checked for at
+- `SceneNode__FaceTarget`-style dual argument-order surprises were checked for at
   both library calls and NOT found: `func_800160B0`'s and
   `func_80015618`'s argument registers are unambiguous and match a
   straightforward reading (no swapped self/arg1 pattern like Entity_d's
-  `Class6B5CC__FaceTarget` anomaly this round).
+  `SceneNode__FaceTarget` anomaly this round).
 
 ## Header additions (`include/class_3bb8c.h`, additive only, except one retype)
 

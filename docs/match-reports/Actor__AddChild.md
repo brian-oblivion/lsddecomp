@@ -25,7 +25,7 @@ typedef struct TagWordObjO {
 void Actor__AddChild(BaseObjO *self, TagWordObjO *arg) {
     s32 tag;
 
-    GetClass6B5CCMethods()->slot10(self, arg);
+    GetSceneNodeMethods()->slot10(self, arg);
     tag = arg->methods->header;
     if ((tag & 0xFFF) == 0x114) {
         self->unk4C = arg;
@@ -38,15 +38,15 @@ void Actor__AddChild(BaseObjO *self, TagWordObjO *arg) {
 ## Derivation
 
 - **Order matters: chain to the fixed table FIRST, tag-check SECOND.**
-  Retail calls `GetClass6B5CCMethods()->slot10(self, arg)` before ever reading
+  Retail calls `GetSceneNodeMethods()->slot10(self, arg)` before ever reading
   `arg`'s own vtable header, then re-derives `arg->methods->header` fresh
   afterward. Reversing the order (tag-check first) does not reproduce this
   and was not needed -- writing the statements in retail's own order was
   sufficient first try.
-- **`GetClass6B5CCMethods()` called with implicit `self` in `$a0`.** At the call
+- **`GetSceneNodeMethods()` called with implicit `self` in `$a0`.** At the call
   site nothing has touched `$a0` yet (it still holds this function's own
   first parameter), matching the project's established "MEASURED:
-  `GetClass6B5CCMethods` takes no real arguments" 0-argument declaration -- no
+  `GetSceneNodeMethods` takes no real arguments" 0-argument declaration -- no
   spurious `move` is emitted.
 - **Tag classification reads a full WORD (`arg->methods->header`), masked
   `& 0xFFF` / `& 0xF`, not a byte.** This is a DIFFERENT tag check than
@@ -85,4 +85,4 @@ half, right after it in ROM order.
 
 ## Track 4 (2026-09-25, round 82, delta)
 
-Renamed from `BaseObjO__LinkCompanion`. Override of +0x010 (addChild), named for its slot: chains Class6B5CC's addChild, then records the child as `grid` when its class id & 0xFFF is 0x114 (Class866E8, the grid manager) or as `ticker` when id & 0xF is 5 (FrameClock). The class (id 0x34, table `gActorMethods`, formerly `D_800878D4`) is unified as `Actor` in `include/Actor.h`: a Class6B5CC subclass and the base of Class65650/Entity, DreamSys and Class876FC. Any source block above is the pre-unification spelling; the live body in `src/class_3bb8c_o.c` takes the unified types and field/slot names, byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).
+Renamed from `BaseObjO__LinkCompanion`. Override of +0x010 (addChild), named for its slot: chains SceneNode's addChild, then records the child as `grid` when its class id & 0xFFF is 0x114 (Class866E8, the grid manager) or as `ticker` when id & 0xF is 5 (FrameClock). The class (id 0x34, table `gActorMethods`, formerly `D_800878D4`) is unified as `Actor` in `include/Actor.h`: a SceneNode subclass and the base of Class65650/Entity, DreamSys and Class876FC. Any source block above is the pre-unification spelling; the live body in `src/class_3bb8c_o.c` takes the unified types and field/slot names, byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).

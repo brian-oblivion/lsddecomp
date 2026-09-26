@@ -7,14 +7,14 @@
  *
  * Holds the TmdModel class (include/TmdModel.h; method table
  * gTmdModelMethods, class tag 9): one object of a TMD file (the "model"
- * Class6B5CC__LinkModel, src/code_d294_c.c, links into a GsDOBJ2). Its
+ * SceneNode__LinkModel, src/code_d294_c.c, links into a GsDOBJ2). Its
  * methods map the TMD to the GS (TmdModel__MapModelingData), walk its
  * primitives (TmdModel__NextPrimitive, owns jtbl_80010354), compute an
  * axis-aligned bounding box or its eight corners (TmdModel__ComputeBounds,
  * TmdModel__GetHull, and the shared buffer of gTmdModelBoundsCount boxes,
  * TmdModel__UpdateBoundsBuffer / TmdModel__GetBoundsBuffer /
  * TmdModel__GetBoundsCount), and ray-cast a segment against every face
- * (TmdModel__RaycastFaces) for Class6B5CC's own collision helpers in
+ * (TmdModel__RaycastFaces) for SceneNode's own collision helpers in
  * code_d294_b.c/code_d294_c.c. Track 4 unified it in round 87.
  *
  * RotateAndOffsetHullList takes a hull list, not a TmdModel, and is a free

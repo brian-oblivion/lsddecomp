@@ -143,8 +143,8 @@ local `Unk100Obj`/`Unk100Methods` view and Entity.h's own
 `extern Unk100Obj *New_Class6E99C` are deleted. This function's four slot
 calls resolve through D_8006E99C (`tools/classtable.py D_8006E99C`) and now
 use the unified names: slot50 -> `detachFromParent`
-(Class6B5CC__DetachFromParent), slot4C -> `attachToParent`
-(BoxFill__AttachToParent, `this` upcast to `Class6B5CC *`), slotD0 ->
+(SceneNode__DetachFromParent), slot4C -> `attachToParent`
+(BoxFill__AttachToParent, `this` upcast to `SceneNode *`), slotD0 ->
 `setStep` (Class6E99C__SetStep; `arg3` passed `(s32)`, no code). What the
 arguments are, from the occupants: `name` is New_Class6E99C's SIZE (read as
 two low halfwords into boxW/boxH; the default gEntityDefaultPos is

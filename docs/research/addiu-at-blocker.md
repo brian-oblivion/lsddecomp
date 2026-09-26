@@ -12,7 +12,7 @@ want a nop" the census worried about are all either INCLUDE_ASM bytes or load
 delay slots — none is a matched-C `mflo` hazard. Then `IsDaySpecial`'s
 preserved body, unchanged, **52/52 on the first build**. `InterpolateKeyframeValue`'s
 preserved body went 17/33 → 30/33 (the nops gone; a register-allocation
-residue in the `/ 0x400` preamble remains); `Class6B5CC__UpdateRotation`'s preserved body
+residue in the `/ 0x400` preamble remains); `SceneNode__UpdateRotation`'s preserved body
 is NOT a match and its report is corrected. Eleven queued functions and one
 uncarved function are unblocked. The `nop_mflo_mfhi` screen in
 `tools/nearmiss.py`/`tools/uncarved.py` is kept and tagged
@@ -848,7 +848,7 @@ re-measured, re-measured.** That section closed with: *"Revisit if the 7
 uncarved hits turn into queued ones as carving proceeds — that is the number to
 re-measure, not this paragraph."* Carving has proceeded, so here it is.
 
-Round 13's runner bravo stalled `Class6B5CC__UpdateRotation` (`code_d294`) on exactly this
+Round 13's runner bravo stalled `SceneNode__UpdateRotation` (`code_d294`) on exactly this
 construct — the pinned pipeline inserting two `nop`s between an `mfhi` and a
 following `mult` that retail's own bytes do not have — and correctly declined
 to act on it. It found the construct with the tighter screen this document
@@ -871,7 +871,7 @@ an uncarved top-level `asm/*.s`.
 | Psy-Q library (`psyq_*`, outside the game denominator) | not counted | 11 |
 
 The four queued hits are `InterpolateKeyframeValue`, `DreamSys__GetPreviousDayMood`,
-**`IsDaySpecial`** and **`Class6B5CC__UpdateRotation`** — the last two new since round 11.
+**`IsDaySpecial`** and **`SceneNode__UpdateRotation`** — the last two new since round 11.
 All four now carry match-report files, so `progress.py` counts them as
 documented stalls rather than fresh ground.
 
@@ -885,7 +885,7 @@ documented stalls rather than fresh ground.
   before every attempt, for the reason round 11 gave: the 30-attempt cap
   already bounds the cost of walking into one.
 - **But round 11's cost model was wrong about the cost, in one direction.** It
-  assumed walking into this blocker costs bounded attempts. `Class6B5CC__UpdateRotation`
+  assumed walking into this blocker costs bounded attempts. `SceneNode__UpdateRotation`
   cost bravo a *full derivation* — three field reads, a dispatch structure, and
   a `/360` division verified against the pinned `cc1` — before the construct
   surfaced. That is not what a 30-attempt cap bounds cheaply.
@@ -894,7 +894,7 @@ documented stalls rather than fresh ground.
 document already applies to the flag itself, one layer up. The screen belongs
 where it is paid for ONCE PER ROUND instead of once per function per runner:
 the head's Gate 1 triage, as a single loop over the queue. It is seconds, and
-it would have moved `Class6B5CC__UpdateRotation` out of bravo's queue before assignment
+it would have moved `SceneNode__UpdateRotation` out of bravo's queue before assignment
 without costing any runner anything. Added to `docs/PARALLEL-RUNS.md` Gate 1;
 deliberately NOT added to CLAUDE.md's per-function screen, where round 11
 correctly declined to put it.

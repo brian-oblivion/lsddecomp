@@ -23,7 +23,7 @@
  * Class6D3C8__PollStatusObj); the subclass overrides return a result field
  * (Class86668__Init: +0x028 result; TaskCore__Init: +0x038 result).
  *
- * onNotify splits by the SENDER's root class nibble, as Class6B5CC's does:
+ * onNotify splits by the SENDER's root class nibble, as SceneNode's does:
  * a D_8006C070 (1) goes to onTag1Notify, a Pad (2) to onPadEvent, a
  * FrameClock (5) to update, which here only counts frames. setState stores
  * the state, passes it to notifyParents and runs onState2 or onState3 for 2

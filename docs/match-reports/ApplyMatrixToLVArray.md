@@ -14,7 +14,7 @@ the wrong hypothesis.
 Unit: `code_d294_c` (round 14). A paired-array iteration: `count`
 iterations, 0xC bytes/element, calling `func_80015618(fixed, b, a)` once
 per element and advancing both `a`/`b` by 0xC each time while `fixed`
-stays constant. Called by `Class6B5CC__RotateLocalVector` (this unit, matched this
+stays constant. Called by `SceneNode__RotateLocalVector` (this unit, matched this
 round) as `ApplyMatrixToLVArray(dst, dst, 1, buf)`.
 `void ApplyMatrixToLVArray(void *a, void *b, s32 count, void *fixed)`.
 
@@ -22,7 +22,7 @@ Blocker screen clean: no `gp_rel`, no `addiu $at,$at,%lo`, no
 `mfhi`/`mflo`-adjacent-`mult`/`div` hit.
 
 ## Best-reached source (compiles, builds green; restored to `INCLUDE_ASM`
-## per project rule -- `Class6B5CC__RotateLocalVector`'s own call site still resolves and
+## per project rule -- `SceneNode__RotateLocalVector`'s own call site still resolves and
 ## scores 29/29 against this function's retail bytes regardless)
 
 ```c
@@ -138,12 +138,12 @@ is a stack-relative immediate off by a uniform 8 (`d0ffbd27`/`d8ffbd27` =
 bytes). Restored to `INCLUDE_ASM` immediately after (build re-verified
 green).
 
-**The "29/29" in the prior write-up is `Class6B5CC__RotateLocalVector` (the CALLER,
+**The "29/29" in the prior write-up is `SceneNode__RotateLocalVector` (the CALLER,
 already matched, a different, unrelated function) -- not a claim about
 this function at all.** A `jal ApplyMatrixToLVArray` instruction encodes only the
-callee's symbol address, never its internal bytes, so `Class6B5CC__RotateLocalVector`
+callee's symbol address, never its internal bytes, so `SceneNode__RotateLocalVector`
 reads as a full match regardless of whether `ApplyMatrixToLVArray` itself is
-right, wrong, or still `INCLUDE_ASM`. Running `funcdiff.py Class6B5CC__RotateLocalVector`
+right, wrong, or still `INCLUDE_ASM`. Running `funcdiff.py SceneNode__RotateLocalVector`
 to sanity-check this function's fix would be a category error -- it is
 CLAUDE.md's "still-`INCLUDE_ASM`"/stale-signal trap wearing a different
 mask: not a stale build and not literal `INCLUDE_ASM`-vs-`INCLUDE_ASM`,

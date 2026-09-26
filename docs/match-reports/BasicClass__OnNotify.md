@@ -56,14 +56,14 @@ Evidence:
   notifying. Hence `sender`.
 - `arg2` is not a boolean, and that is why `event` and not `isFinalizing`.
   Two overrides in other units forward to the base and then keep using the
-  same value: `Class6B5CC__OnNotify` (`src/code_d294.c`) calls
+  same value: `SceneNode__OnNotify` (`src/code_d294.c`) calls
   `Get_vtable_BasicClass()->slot38(self, other, arg2)` and then dispatches
   to slot `+0x094`/`+0x098`/`+0x09C` **by the sender's class tag**, passing
   `arg2` through each time; `Class65650__OnNotify` (`src/code_55dd4.c`) calls the
   base and then tests `arg1->tagged->tag == 0x5F03 && arg2 == 1`.
 - Slot census (`tools/classtable.py`, all 60 tables): 27 tables use this
   base implementation at `+0x038` and 14 more override it with
-  `Class6B5CC__OnNotify` alone, so the slot is heavily used and genuinely
+  `SceneNode__OnNotify` alone, so the slot is heavily used and genuinely
   polymorphic -- which is the reason the name describes the PROTOCOL
   ("something notified me") rather than the base's one action
   ("remove a child").

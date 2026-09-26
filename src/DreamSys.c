@@ -122,9 +122,9 @@ void DreamSys__ResetSessionState(DreamSys *this) {
 void DreamSys__SpawnAtLink(DreamSys *this, Class866E8 *arg1) {
     s32 local[4];
 
-    arg1->methods->setTargetAndBuildRates(arg1, local, (Class6B5CC *)this,
+    arg1->methods->setTargetAndBuildRates(arg1, local, (SceneNode *)this,
                                           (Descriptor10 *)&this->linkCoordinates);
-    GetActorMethods()->attachToParent((Actor *)this, (Class6B5CC *)arg1, (Vec3_d294 *)local);
+    GetActorMethods()->attachToParent((Actor *)this, (SceneNode *)arg1, (Vec3_d294 *)local);
     this->methods->addChild(this, (BasicClass *)arg1);
     if (this->state == 0xE) {
         FlashbackEntry *entry = &this->storedFlasbacks[this->currentFlashbackIndex];
@@ -349,7 +349,7 @@ void DreamSys__ResetLinkState(DreamSys *this, s32 arg1, s32 arg2) {
     this->staircaseMoveGate = 0;
     this->staircaseTickFn = 0;
     this->unk_0x78 = 0;
-    Class6B5CC__GetRotationDegrees((Class6B5CC *)this, (WholeFrac_d294 *)&local);
+    SceneNode__GetRotationDegrees((SceneNode *)this, (WholeFrac_d294 *)&local);
 
     local.field_0x8 = 0;
     local.field_0xA = 1;
@@ -406,18 +406,18 @@ void DreamSys__RunTickCallbacks(DreamSys *this) {
         this->callback_0x98(this);
 }
 
-/* Local prototypes, own local view (Class6B5CC__LocalOffsetToWorldPos is a different unit's
+/* Local prototypes, own local view (SceneNode__LocalOffsetToWorldPos is a different unit's
  * already-matched function taking an unrelated class as arg0; InterpolateKeyframeValue
  * is this unit's own next-in-queue function, forward-declared per
  * CLAUDE.md's convention for calling into a not-yet-preceding definition).
- * Class6B5CC__LocalOffsetToWorldPos's unused 4th parameter IS set (to 0) by
- * this call site's own disassembly; include/Class6B5CC.h declares it. */
+ * SceneNode__LocalOffsetToWorldPos's unused 4th parameter IS set (to 0) by
+ * this call site's own disassembly; include/SceneNode.h declares it. */
 extern s32 InterpolateKeyframeValue(DreamSysInterpPoint *a, DreamSysInterpPoint *b, s32 at);
 extern s32 IsVec3WithinRange(s32 *a, s32 range, s32 *b);
 
 /* `dist` was called `day` until round 66, which was a transcription of the
    caller-less m2c signature and is wrong: it is written into the z word of
-   the global scratch vector that Class6B5CC__LocalOffsetToWorldPos converts
+   the global scratch vector that SceneNode__LocalOffsetToWorldPos converts
    from a LOCAL OFFSET to a world position, and it is also the abscissa
    InterpolateKeyframeValue evaluates the viewport's two refView points at -- whose
    own `position` fields are what it is compared against. It is a distance
@@ -430,7 +430,7 @@ s32 DreamSys__ProjectPointAtDistance(DreamSys *this, s32 *out, s32 dist, s32 *re
 
     p = &gProjectOffsetZ;
     *p = dist;
-    Class6B5CC__LocalOffsetToWorldPos((Class6B5CC *)this, local, p - 2, 0);
+    SceneNode__LocalOffsetToWorldPos((SceneNode *)this, local, p - 2, 0);
 
     ret = InterpolateKeyframeValue((void *)&this->viewport->refView.vp,
                                    (void *)&this->viewport->refView.vr, dist);
@@ -1010,7 +1010,7 @@ bool DreamSys__TryTunnelLink(DreamSys *this, PlayerSpawnPoint *currentPos) {
     result = Test4TunnelLinks(&this->linkCoordinates, currentPos, this->currentStage);
     if (result < 0)
         return false;
-    Class6B5CC__GetRotationDegrees((Class6B5CC *)this, (WholeFrac_d294 *)local);
+    SceneNode__GetRotationDegrees((SceneNode *)this, (WholeFrac_d294 *)local);
     if (!DreamSys__CheckTunnelHeading(&this->exitRotation, &this->enterRotation, local))
         return false;
     if (this->moveCommandLatch == 0)
@@ -1102,7 +1102,7 @@ bool DreamSys__TryStaircaseLink(DreamSys *this, PlayerSpawnPoint *currentPos) {
                 }
             }
         } else if (Test4StaircaseNodes(&this->linkCoordinates, currentPos, this->currentStage) >= 0) {
-            Class6B5CC__GetRotationDegrees((Class6B5CC *)this, (WholeFrac_d294 *)local);
+            SceneNode__GetRotationDegrees((SceneNode *)this, (WholeFrac_d294 *)local);
             if (DreamSys__CheckStaircaseHeading(&this->exitRotation, &this->enterRotation, local) &&
                 this->moveCommandLatch != 0) {
                 *(PlayerSpawnPoint *)&this->staircaseGridPos = *currentPos;
@@ -1483,7 +1483,7 @@ void DreamSys__FlashbackSaving(DreamSys *this, s32 arg1, s32 arg2) {
 
     if (this->grid != NULL && rand() % 3 == 0) {
         pos = (PlayerSpawnPoint *)this->grid->methods->getTargetDescriptor(this->grid, 0, 0);
-        Class6B5CC__GetRotationDegrees((Class6B5CC *)this, (WholeFrac_d294 *)local);
+        SceneNode__GetRotationDegrees((SceneNode *)this, (WholeFrac_d294 *)local);
         this->methods->addFlashback(this, this->currentStage, pos, local, arg1, arg2, this->currentDay);
     }
 }
@@ -1493,14 +1493,14 @@ void DreamSys__ResetFlashbackList(DreamSys *this) {
 }
 
 void DreamSys__SaveLinkSnapshot(DreamSys *this) {
-    Class6B5CCSub14 *p = this->coord2;
+    SceneNodeSub14 *p = this->coord2;
 
     this->coord2Snapshot = *p;
     this->coord2ParamSnapshot = *p->param;
 }
 
 void DreamSys__RestoreLinkSnapshot(DreamSys *this) {
-    Class6B5CCSub14 *p = this->coord2;
+    SceneNodeSub14 *p = this->coord2;
 
     *p = this->coord2Snapshot;
     *p->param = this->coord2ParamSnapshot;
@@ -1595,9 +1595,9 @@ s32 Test4TunnelLinks(PlayerSpawnPoint *target, PlayerSpawnPoint *currentPos, s32
 }
 
 /* Unit-local reading of the second parameter: the caller (DreamSys__CheckTunnelHeading)
-   passes down a `s32 local[4]` buffer that Class6B5CC__GetRotationDegrees (code_d294_c) fills
+   passes down a `s32 local[4]` buffer that SceneNode__GetRotationDegrees (code_d294_c) fills
    with a 3-entry WholeFrac_d294 table; the byte offset +4 read here lands on
-   that table's `out[1].whole` (a degrees value, per Class6B5CC__GetRotationDegrees's own
+   that table's `out[1].whole` (a degrees value, per SceneNode__GetRotationDegrees's own
    report). This function reads it unsigned (`lhu`), independent of
    WholeFrac_d294's own `s16 whole` -- a second, disjoint view of the same
    bytes, so it is kept local rather than folded into that shared struct.
@@ -1616,7 +1616,7 @@ typedef struct DirectionCheckArg {
    CARDINAL_ROTATIONS[i].y.numerator, and `unk2` is its denominator (always
    1). The two views are kept separate because this one reads the angle as a
    bare u16 for arithmetic while the other is only ever address-taken and
-   handed to Class6B5CC__UpdateRotation as a rotation. */
+   handed to SceneNode__UpdateRotation as a rotation. */
 typedef struct DirectionTableEntry {
     u16 angle;
     u16 unk2;
@@ -1646,11 +1646,11 @@ extern u8 *TUNNEL_EXIT_HEADINGS[];
    underlying data is two different tables. Round 66 types it
    `RotationRatios` (include/DreamSys.h) rather than as a stride-only
    placeholder: every entry is three {numerator, denominator} degree ratios
-   in exactly the form Class6B5CC__UpdateRotation consumes, and the four entries' yaw
+   in exactly the form SceneNode__UpdateRotation consumes, and the four entries' yaw
    numerators are 0, 0x5A, 0xB4, 0x10E -- 0, 90, 180 and 270 degrees. That is
    also what the two functions below do with an element: they store its
    ADDRESS into DreamSys::enterRotation / ::exitRotation, and the only things
-   those two fields are ever used for are Class6B5CC__UpdateRotation(this, 1, ptr) calls
+   those two fields are ever used for are SceneNode__UpdateRotation(this, 1, ptr) calls
    in DreamSys__SetMoveOverride, DreamSys__SpawnAtLink and
    DreamSys__TryStaircaseLink. */
 extern RotationRatios CARDINAL_ROTATIONS[];

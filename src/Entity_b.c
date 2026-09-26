@@ -56,7 +56,7 @@ s32 Entity__UpdateTargetProximity(Entity *this) {
             }
         }
         if (row->proximityRange < 0) {
-            Class6B5CC__FaceTarget((Class6B5CC *)this, (Class6B5CC *)this->peer, 1, 0, 0);
+            SceneNode__FaceTarget((SceneNode *)this, (SceneNode *)this->peer, 1, 0, 0);
         }
     }
     return this->targetReached;
@@ -185,7 +185,7 @@ void Entity__MoodCue01(Entity *this, EntityMoodHandlerArg *out) {
         out->unk44 = 0x14;
         ((DreamSys *)this->peer)->methods->clearTickCallbacks((DreamSys *)this->peer, 1);
     }
-    Class6B5CC__FaceTarget((Class6B5CC *)this, (Class6B5CC *)this->peer, 1, 0, 0);
+    SceneNode__FaceTarget((SceneNode *)this, (SceneNode *)this->peer, 1, 0, 0);
     this->methods->moveLocalZ(this, -0x5A, 0);
     if (this->moodTimer == 0x1E) {
         this->methods->notifyParents(this, 0xA);
@@ -217,10 +217,10 @@ void Entity__MoodCue07(Entity *this, EntityMoodHandlerArg *out) {
     } else if (this->moodTimer >= 0x38 || Entity__IsNearTarget(this, &this->coord2->tx, 1, 1) != 0) {
         this->methods->addTranslation(this, TRANSLATE_Y_MINUS64);
     } else if (this->moodTimer >= 0xA) {
-        Class6B5CC__FaceTarget((Class6B5CC *)this, (Class6B5CC *)this->peer, 1, 0, 0);
+        SceneNode__FaceTarget((SceneNode *)this, (SceneNode *)this->peer, 1, 0, 0);
         this->methods->moveLocalZ(this, -0x100, 0);
     } else {
-        Class6B5CC__FaceTarget((Class6B5CC *)this, (Class6B5CC *)this->peer, 1, 0, 0);
+        SceneNode__FaceTarget((SceneNode *)this, (SceneNode *)this->peer, 1, 0, 0);
     }
 }
 
@@ -279,7 +279,7 @@ void Entity__MoodCue11(Entity *this, EntityMoodHandlerArg *out) {
         }
     } else if (this->state == 0xD) {
         this->lastOffsetValue = -0x78;
-        Class6B5CC__FaceTarget((Class6B5CC *)this, (Class6B5CC *)this->peer, 1, 0, 0);
+        SceneNode__FaceTarget((SceneNode *)this, (SceneNode *)this->peer, 1, 0, 0);
         this->methods->updateScale(this, 1, SCALE_HALF);
         if (this->methods->distanceToPeer(this, this->peer) < 0x400) {
             this->methods->notifyParents(this, 0xB);
@@ -317,7 +317,7 @@ void Entity__MoodCue12(Entity *this) {
     }
     y = this->coord2->ty;
     if (y < 0x7D0) {
-        Class6B5CC__FaceTarget((Class6B5CC *)this, (Class6B5CC *)this->peer, 1, 0, 0);
+        SceneNode__FaceTarget((SceneNode *)this, (SceneNode *)this->peer, 1, 0, 0);
     }
     if (this->state == 0xB) {
         result = this->methods->distanceToPeer(this, this->peer);

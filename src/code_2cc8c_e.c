@@ -35,7 +35,7 @@
 
 /*
  * WHAT THIS UNIT IS (round 61, track 3; revised rounds 85 and 87, track 4).
- * Its 17 functions are the bottom two links of `Class6B5CC -> BoxFill ->
+ * Its 17 functions are the bottom two links of `SceneNode -> BoxFill ->
  * Class6E99C`: first Class6E99C's (D_8006E99C, 0x164, `New_Class6E99C` to
  * `GetClass6E99CMethods`, include/Class6E99C.h), then BoxFill's allocator,
  * ctor and Reset (0x64, include/BoxFill.h, a GsBOXF screen rectangle; the
@@ -272,7 +272,7 @@ BoxFill *New_BoxFill(void *size, void *color, s32 pri) {
 }
 
 void BoxFill__BoxFill(BoxFill *self, SkipShort2 *size, void *color, s32 pri) {
-    GetClass6B5CCMethods()->ctor((Class6B5CC *)self);
+    GetSceneNodeMethods()->ctor((SceneNode *)self);
     self->methods = GetBoxFillMethods();
     ((BoxFillResetFn)self->methods->reset)(self, size, color, pri);
 }

@@ -27,7 +27,7 @@ skip48:
         out->unk10 = 0;
         out->unk1C = 0x12;
     }
-    Class6B5CC__FaceTarget(this, this->unk94, 1, 0, 0);
+    SceneNode__FaceTarget(this, this->unk94, 1, 0, 0);
 }
 ```
 

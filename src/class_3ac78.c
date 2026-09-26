@@ -1,7 +1,7 @@
 /*
  * class_3ac78 -- the front half of Class866E8, the class whose method table is
  * gClass866E8Methods (80 slots, header 0x114; tools/classtable.py gClass866E8Methods). It
- * derives from Class6B5CC (code_d294) through LightRig (include/LightRig.h,
+ * derives from SceneNode (code_d294) through LightRig (include/LightRig.h,
  * gLightRigMethods: the three flat lights and the ambient colour), whose ctor
  * and finalize its own chain to, and the game builds exactly one, at boot, in class_39e08's Class865C8__Class865C8 via New_Class866E8(0, 1).
  *
@@ -26,7 +26,7 @@
  * (Class866E8__ResetAllElements, Class866E8__SetFootprintRect and
  * Class866E8__DispatchToRectCells) were matched in round 71. func_8004B324 keeps its placeholder name
  * deliberately -- it is an empty vtable stub with no established purpose, the
- * same case as Class6B5CC__func_1d33c in code_d294_b.
+ * same case as SceneNode__func_1d33c in code_d294_b.
  */
 #include "common.h"
 #include "Class866E8.h"
@@ -116,7 +116,7 @@ void Class866E8__Class866E8(Class866E8 *self, Unk54Struct *origin, s32 autoLoad)
 
         entry->placements = New_Class6D940(0);
         entry->cellParent = New_Class86AA0();
-        entry->cellParent->methods->attachToParent(entry->cellParent, (Class6B5CC *)self,
+        entry->cellParent->methods->attachToParent(entry->cellParent, (SceneNode *)self,
                                                    (Vec3_d294 *)&self->origin);
 
         entry->cells = (Class86AA0 **)BMemPMgrAlloc(0x668);
@@ -134,7 +134,7 @@ void Class866E8__Class866E8(Class866E8 *self, Unk54Struct *origin, s32 autoLoad)
         while (p < end) {
             obj = New_Class86AA0();
             *(Class86AA0 **)p = obj;
-            obj->methods->attachToParent(obj, (Class6B5CC *)entry->cellParent, (Vec3_d294 *)buf);
+            obj->methods->attachToParent(obj, (SceneNode *)entry->cellParent, (Vec3_d294 *)buf);
 
             buf[0] += 0x800;
             if (buf[0] > 0xA400) {
@@ -200,12 +200,12 @@ void Class866E8__Finalize(Class866E8 *self) {
     GetLightRigMethods()->finalize((LightRig *)self);
 }
 
-/* GetClass6B5CCMethods: include/Class6B5CC.h. Round 59 measured the two
+/* GetSceneNodeMethods: include/SceneNode.h. Round 59 measured the two
  * arguments these calls used to pass the no-argument getter as zero-cost (the
  * jal's delay slot holds a callee-save spill); track 4 dropped them. */
 
 void Class866E8__OnNotify(Class866E8 *self, BasicClass *sender, s32 command) {
-    GetClass6B5CCMethods()->onNotify((Class6B5CC *)self, sender, command);
+    GetSceneNodeMethods()->onNotify((SceneNode *)self, sender, command);
 
     if ((sender->methods->header & 0xF) == 1) {
         self->methods->onNotifyTag1(self, sender, command);
@@ -226,7 +226,7 @@ void Class866E8__Reset(Class866E8 *self) {
 }
 
 void Class866E8__OnElementEvent(Class866E8 *self, s32 command, Class866E8Elem *elem) {
-    GetClass6B5CCMethods()->notifyIfUnk20Active((Class6B5CC *)self, command);
+    GetSceneNodeMethods()->notifyIfUnk20Active((SceneNode *)self, command);
 
     if (command == 6)
         goto handle6;
@@ -336,7 +336,7 @@ void Class866E8__ForwardAcceptedCommand(Class866E8 *self, void *sender, s32 comm
     } while (*p != 0);
 }
 
-void Class866E8__ApplyToSenderFootprint(Class866E8 *self, Class6B5CC *sender, s32 command) {
+void Class866E8__ApplyToSenderFootprint(Class866E8 *self, SceneNode *sender, s32 command) {
     QueryPos866E8 *pos;
     GridSlotList866E8 saved;
     Descriptor10Ext buf;
@@ -425,7 +425,7 @@ void Class866E8__SetFootprintRect(Class866E8 *self, Descriptor10Ext *desc, s32 s
  * each cell. Matched round 71: the ORDER of the comma-separated increments
  * is load-bearing in both loops (`entry++, i++` and `cell++, col++`); the
  * reverse order was the whole 95/117 residue. */
-void Class866E8__DispatchToRectCells(Class866E8 *self, Class6B5CC *sender, s32 command) {
+void Class866E8__DispatchToRectCells(Class866E8 *self, SceneNode *sender, s32 command) {
     s32 i;
     s32 row;
     s32 col;
@@ -458,14 +458,14 @@ void Class866E8__DispatchToRectCells(Class866E8 *self, Class6B5CC *sender, s32 c
 /* Widened this round (Class866E8__DispatchToRectCells) from a single-param signature to
  * accept two more, unused, forwarded params: Class866E8__DispatchToRectCells's own call
  * sites explicitly set up $a1/$a2 before every call here (unlike
- * GetClass6B5CCMethods's "leftover, already-there" args -- these are real,
+ * GetSceneNodeMethods's "leftover, already-there" args -- these are real,
  * explicit `move` instructions), so the call itself needs a matching
  * 3-param prototype to compile. Confirmed harmless to THIS function's own
  * already-matched body: neither extra param is read, and GCC does not
  * reserve stack space for unused trailing integer/pointer args on this
  * target, so the definition's own bytes are unaffected (reverified
  * 18/18 after the widening). */
-void NotifyGridCell(Class86AA0 *cell, Class6B5CC *sender, s32 command) {
+void NotifyGridCell(Class86AA0 *cell, SceneNode *sender, s32 command) {
     if (cell != NULL && (cell->flags36 & 0x80)) {
         cell->methods->onNotify(cell, sender, command);
     }

@@ -6,7 +6,7 @@
 
 ## What it does
 
-On `this->unk7C == 0`: if `this->unkF4 != 0`, calls `Class6B5CC__FaceTarget`,
+On `this->unk7C == 0`: if `this->unkF4 != 0`, calls `SceneNode__FaceTarget`,
 `slot128(this,1)`, and `this->unk94->methods->slot130(this->unk94,1)`;
 else if `this->unk84 == 0`, runs the same `slot134` do-while loop as
 `Entity__MoodCue91` (this unit). On `this->unk7C != 0`: if `this->unk84 == 0`,

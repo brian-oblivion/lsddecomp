@@ -2,7 +2,7 @@
 #define VIEWPORT_H
 
 #include "BasicClass.h"
-#include "Class6B5CC.h"
+#include "SceneNode.h"
 #include "DrawSystem.h"
 
 /*
@@ -16,12 +16,12 @@
  *  - it holds a libgs GsRVIEW2 at +0x014: AttachViewChild and Update hand
  *    &refView to GsSetRefView2, setViewPoint/setViewRef/setTwist write its
  *    vp, vr and rz, and AddChild points its `super` at the view node's
- *    GsCOORDINATE2 (Class6B5CC::coord2), which Update marks for recompute
+ *    GsCOORDINATE2 (SceneNode::coord2), which Update marks for recompute
  *    (flg = 0) every frame;
  *  - Update sets the projection distance, near clip, light mode and fog
  *    (GsSetProjection(projH), GsSetNearClip(nearZ), GsSetLightMode,
  *    SetFarColor, SetFogNear) and draws the scene tree through drawNode:
- *    the view node, `sceneRoot` (a New_Class6B5CC), and the root of the view
+ *    the view node, `sceneRoot` (a New_SceneNode), and the root of the view
  *    node's parent chain (GetRootNode);
  *  - InitOt allocates a double-buffered pair of 0x14-byte GsOT headers, each
  *    followed by its 1 << otLength tags and its packet area; drawNode sorts
@@ -30,9 +30,9 @@
  *    getActiveBuffer and swapBuffers slots.
  *
  * Children are cached by their class-id nibble (AddChild/RemoveChild): 1 is
- * the DrawSystem (D_8006C070, id 0x1), 4 a Class6B5CC, the node the view is
+ * the DrawSystem (D_8006C070, id 0x1), 4 a SceneNode, the node the view is
  * attached to. Each is typed by its class (include/DrawSystem.h,
- * include/Class6B5CC.h); round 87 retired code_2cc8c.h's GenericObj view of
+ * include/SceneNode.h); round 87 retired code_2cc8c.h's GenericObj view of
  * the DrawSystem.
  *
  * The ctor chains to BasicClass's first (Get_vtable_BasicClass()->ctor),
@@ -42,7 +42,7 @@
  *
  * Not settled here: subHandle is a Class6E99C (0x164, below gBoxFillMethods,
  * 0x64), whose +0x04C override (BoxFill__AttachToParent) takes a two-word screen
- * position where Class6B5CC's attachToParent slot takes a Vec3_d294 offset;
+ * position where SceneNode's attachToParent slot takes a Vec3_d294 offset;
  * the ctor and SetSubHandle pass D_8008A904 (-100, -100) through the
  * inherited slot with a pointer cast. unk44 and unk48 multiply to each
  * buffer's packet area (InitOt; defaults 2000 and 64); which is the count
@@ -82,7 +82,7 @@ struct ViewportRefView {
     Vec3_d294 vp;           /* +0x000, viewpoint: setViewPoint */
     Vec3_d294 vr;           /* +0x00C, reference point: setViewRef */
     s32 rz;                 /* +0x018, twist, 20.12 (setTwist) */
-    Class6B5CCSub14 *super; /* +0x01C, the view node's GsCOORDINATE2 (AddChild) */
+    SceneNodeSub14 *super; /* +0x01C, the view node's GsCOORDINATE2 (AddChild) */
 };
 
 /* libgs GsOT header, 0x14 bytes: InitOt fills the two words it sets. */
@@ -122,10 +122,10 @@ struct ViewportOt {
     /* +0x094 */ void (*onNotifyTag5)(Self *self, BasicClass *sender, s32 event); /* Viewport__OnNotifyTag5: onNotify's class-5 (FrameClock) case */ \
     /* +0x098 */ void (*onNotifyTag1)(Self *self, BasicClass *sender, s32 event); /* Viewport__OnNotifyTag1: onNotify's DrawSystem (1) case */ \
     /* +0x09C */ void (*update)(Self *self);                       /* Viewport__Update; Class869D8__Update */ \
-    /* +0x0A0 */ void (*drawNode)(Self *self, Class6B5CC *node);   /* Viewport__DrawNode (code_2864) */ \
+    /* +0x0A0 */ void (*drawNode)(Self *self, SceneNode *node);   /* Viewport__DrawNode (code_2864) */ \
     /* +0x0A4 */ void (*flip)(Self *self);                         /* Viewport__Flip */              \
-    /* +0x0A8 */ void (*setSubHandle)(Self *self, Class6B5CC *handle); /* Viewport__SetSubHandle */  \
-    /* +0x0AC */ Class6B5CC *(*getSubHandle)(Self *self);          /* Viewport__GetSubHandle */      \
+    /* +0x0A8 */ void (*setSubHandle)(Self *self, SceneNode *handle); /* Viewport__SetSubHandle */  \
+    /* +0x0AC */ SceneNode *(*getSubHandle)(Self *self);          /* Viewport__GetSubHandle */      \
     /* +0x0B0 */ void (*setUnkB4)(Self *self, s32 value);          /* Viewport__SetUnkB4 */          \
     /* +0x0B4 */ void (*setDrawEnabled)(Self *self, s32 on)        /* Viewport__SetDrawEnabled */
 /* clang-format on */
@@ -134,7 +134,7 @@ struct ViewportOt {
 #define VIEWPORT_FIELDS(Methods)                                                                   \
     BASICCLASS_FIELDS(Methods);                                                                    \
     /* +0x00C */ DrawSystem *drawSystem;  /* the class-1 child (AddChild); Flip's getActiveBuffer/swapBuffers */ \
-    /* +0x010 */ Class6B5CC *viewNode;    /* the class-4 child (AddChild); refView.super is its coord2 */ \
+    /* +0x010 */ SceneNode *viewNode;    /* the class-4 child (AddChild); refView.super is its coord2 */ \
     /* +0x014 */ ViewportRefView refView; /* GsSetRefView2's argument */                          \
     /* +0x034 */ ViewportSize screenSize;                                                          \
     /* +0x03C */ s32 otLength;            /* GsOT length: 1 << otLength tags; drawNode's priority range */ \
@@ -158,8 +158,8 @@ struct ViewportOt {
     /* +0x094 */ u8 pad094[0x098 - 0x094];                                                         \
     /* +0x098 */ s32 zDiv;                /* Update: the depth per OT tag; drawNode's sprite z */  \
     /* +0x09C */ u8 pad09C[0x0AC - 0x09C];                                                         \
-    /* +0x0AC */ Class6B5CC *sceneRoot;   /* the ctor's New_Class6B5CC; Update draws it; finalize releases it */ \
-    /* +0x0B0 */ Class6B5CC *subHandle;   /* the ctor's New_Class6E99C, attached under sceneRoot */ \
+    /* +0x0AC */ SceneNode *sceneRoot;   /* the ctor's New_SceneNode; Update draws it; finalize releases it */ \
+    /* +0x0B0 */ SceneNode *subHandle;   /* the ctor's New_Class6E99C, attached under sceneRoot */ \
     /* +0x0B4 */ s32 unkB4;               /* Flip: nonzero swaps once more on buffer 0 */          \
     /* +0x0B8 */ s32 drawEnabled          /* Flip: 0 skips the clear and draw; default 1 */
 /* clang-format on */
@@ -209,12 +209,12 @@ void Viewport__OnNotifyTag5(Viewport *self, BasicClass *sender, s32 event);
 void Viewport__OnNotifyTag1(Viewport *self, BasicClass *sender, s32 event);
 void Viewport__Update(Viewport *self);
 void Viewport__Flip(Viewport *self);
-void Viewport__SetSubHandle(Viewport *self, Class6B5CC *handle);
-Class6B5CC *Viewport__GetSubHandle(Viewport *self);
+void Viewport__SetSubHandle(Viewport *self, SceneNode *handle);
+SceneNode *Viewport__GetSubHandle(Viewport *self);
 void Viewport__SetUnkB4(Viewport *self, s32 value);
 void Viewport__SetDrawEnabled(Viewport *self, s32 on);
 
 Viewport *New_Viewport(void);              /* BMemPMgrAlloc(0xBC), then ctor */
-Class6B5CC *GetRootNode(Class6B5CC *node); /* follow `parent` to the top */
+SceneNode *GetRootNode(SceneNode *node); /* follow `parent` to the top */
 
 #endif

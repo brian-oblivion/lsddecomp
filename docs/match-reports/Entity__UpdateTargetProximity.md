@@ -16,7 +16,7 @@ Occupies `EntityMethods` slot `+0x178` (dispatched by `Entity__Update` in
   row->unk9)`, and if that returns non-zero, dispatches
   `this->methods->slot164(this, 1)`.
 - independently (not `else`), if `row->unk6 < 0`: calls
-  `Class6B5CC__FaceTarget(this, this->unk94, 1, 0, 0)` (still uncarved, `code_d294.s`).
+  `SceneNode__FaceTarget(this, this->unk94, 1, 0, 0)` (still uncarved, `code_d294.s`).
 
 Returns `this->unkF4` regardless of whether the `if (this->unkF0 != 0)` body
 ran — the one known caller (`Entity__Update`) discards the result, but that is
@@ -44,7 +44,7 @@ s32 Entity__UpdateTargetProximity(Entity *this) {
             }
         }
         if (row->unk6 < 0) {
-            Class6B5CC__FaceTarget(this, this->unk94, 1, 0, 0);
+            SceneNode__FaceTarget(this, this->unk94, 1, 0, 0);
         }
     }
     return this->unkF4;
@@ -110,7 +110,7 @@ assignment.
 
 `Entity__UpdateTargetProximity` -- tier B (round 71, runner echo, FINISHING-PLAN track 3). Renamed from `func_8005DE18`.
 
-ENTITY_METHODS +0x178 (`tools/classtable.py ENTITY_METHODS`); its one caller is `Entity__Update`, every tick. While `active`, and only while `unkF4` is still 0, it calls `Entity__IsNearTarget` with `|row->proximityRange|` and `row->unk9`; on a hit it calls slot +0x164 (occupant `Entity__SetTargetReached`) with 1, which notifies parents with 9 and latches `unkF4`. A negative `proximityRange` also makes the entity face its target (`Class6B5CC__FaceTarget`) every active tick. It returns `unkF4`. Tier B: what the code does is clear, what the `unkF4` latch means in the game is not.
+ENTITY_METHODS +0x178 (`tools/classtable.py ENTITY_METHODS`); its one caller is `Entity__Update`, every tick. While `active`, and only while `unkF4` is still 0, it calls `Entity__IsNearTarget` with `|row->proximityRange|` and `row->unk9`; on a hit it calls slot +0x164 (occupant `Entity__SetTargetReached`) with 1, which notifies parents with 9 and latches `unkF4`. A negative `proximityRange` also makes the entity face its target (`SceneNode__FaceTarget`) every active tick. It returns `unkF4`. Tier B: what the code does is clear, what the `unkF4` latch means in the game is not.
 
 Also renamed here: `EntityMoodRow::unk6` -> `proximityRange` (compiler-checked: this function is its only accessor in the default and NON_MATCHING builds).
 

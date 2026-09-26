@@ -1,7 +1,7 @@
 #include "common.h"
 #include "Entity.h"
 #include "code_4cd08.h"
-#include "Class6B5CC.h"
+#include "SceneNode.h"
 #include "ModelData.h"
 #include "TriggerWorld.h"
 #include "DreamSys.h"
@@ -424,10 +424,10 @@ void DespawnDreamAuxEntity(DreamAuxSlot *a0) {
         s32 localPos[3];
 
         a0->entity->methods->detachFromParent(a0->entity);
-        Class6B5CC__LocalOffsetToWorldPos((Class6B5CC *)gDreamAuxWorld, localPos, a0->pos, 0);
+        SceneNode__LocalOffsetToWorldPos((SceneNode *)gDreamAuxWorld, localPos, a0->pos, 0);
         ((Class65650AttachToParentFn)a0->entity->methods->attachToParent)(
             (Class65650 *)a0->entity, (Class65650 *)gDreamAuxWorld, (void *)D_8008AC08,
             (void *)D_8008ABFC, localPos);
-        Class6B5CC__FaceTarget((Class6B5CC *)a0->entity, (Class6B5CC *)gDreamAuxWorld, 1, 0, 0);
+        SceneNode__FaceTarget((SceneNode *)a0->entity, (SceneNode *)gDreamAuxWorld, 1, 0, 0);
     }
 }

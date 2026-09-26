@@ -12,11 +12,11 @@
  * argument; LinkResource__BuildModels, code_33808, builds one per entry of a
  * loaded TMD). `data` is that entry minus 0xC, i.e. the file header when the
  * entry is the first one; GetObject indexes the table from there and
- * MapModelingData hands `&data->flags` to GsMapModelingData. Class6B5CC's
- * `model` (+0x020) holds one: Class6B5CC__LinkModel links `object` into its
+ * MapModelingData hands `&data->flags` to GsMapModelingData. SceneNode's
+ * `model` (+0x020) holds one: SceneNode__LinkModel links `object` into its
  * GsDOBJ2 (GsLinkObject4(data->objects, ...), GsDOBJ2.tmd = object).
  *
- * Besides its table the class has non-virtual methods Class6B5CC's collision
+ * Besides its table the class has non-virtual methods SceneNode's collision
  * code calls directly: a bounding box over the object's vertices
  * (ComputeBounds, GetHull), a shared bounds buffer holding
  * gTmdModelBoundsCount boxes (always 1, set by the ctor), and a segment cast

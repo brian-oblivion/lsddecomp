@@ -27,7 +27,7 @@ a `do { ... } while (0)`:
 ```c
 void Class86AA0__OnActorLinkCommand(Class86AA0 *self, GenericTagInst_3bb8c_c *arg1, s32 arg2)
 {
-    GetClass6B5CCMethods(self)->slot9C(self, arg1, arg2);
+    GetSceneNodeMethods(self)->slot9C(self, arg1, arg2);
     if (arg2 >= 9) {
         return;
     }
@@ -95,7 +95,7 @@ to `self`'s own `+0x0A0` slot.
 ```c
 void Class86AA0__OnActorLinkCommand(Class86AA0 *self, GenericTagInst_3bb8c_c *arg1, s32 arg2)
 {
-    GetClass6B5CCMethods(self)->slot9C(self, arg1, arg2);
+    GetSceneNodeMethods(self)->slot9C(self, arg1, arg2);
     if (arg2 >= 9) {
         return;
     }
@@ -162,7 +162,7 @@ near-miss):
   typedef name even to an identical type -- `include/class_3bb8c.h:577:
   redefinition of 'GenericTagInst_3bb8c_c'`. No byte-level effect: the
   named type is unchanged, only which line introduces the typedef name.
-- **`GetClass6B5CCMethods`'s return type changed from `BaseCtorTable_3bb8c_c *` to
+- **`GetSceneNodeMethods`'s return type changed from `BaseCtorTable_3bb8c_c *` to
   a NEW type, `BaseCtorTableB_3bb8c_c *`.** This function's own body reaches
   `+0x09C` on that getter's table with a 3-argument call
   (`self, arg1, arg2`), which conflicts in arity with
@@ -172,7 +172,7 @@ near-miss):
   class, per this project's established split policy (see
   `TaskCoreObjMethods` in `include/code_2c054.h` for the precedent this
   follows). This is a type-NAME change only: `Class86AA0__Class86AA0`'s own
-  already-matched call (`GetClass6B5CCMethods(self)->ctor(self)`) only touches the
+  already-matched call (`GetSceneNodeMethods(self)->ctor(self)`) only touches the
   `+0x008 ctor` slot, whose layout is byte-identical in both names, so
   renaming changes no bytes and does not disturb that match (confirmed:
   `./build-and-verify.sh` stays green with `Class86AA0__OnActorLinkCommand` back on
@@ -200,21 +200,21 @@ that are not this class. Corrected below.
 work.** GCC 2.6.3's local allocator prioritises pseudos by reference count, and
 in retail `arg2` is read four times (two `slti`, two `addu $a2`) against two
 each for `self` and `arg1`, which is consistent with `arg2` earning `$s0`.
-Retail also emits **no `$a0` setup at all** before `jal GetClass6B5CCMethods` — it
+Retail also emits **no `$a0` setup at all** before `jal GetSceneNodeMethods` — it
 lets the incoming `$a0` stand — so retail's source called that getter with zero
-arguments here, while the attempt writes `GetClass6B5CCMethods(self)` and spends a
+arguments here, while the attempt writes `GetSceneNodeMethods(self)` and spends a
 reference on `self`. Making the two reference counts match therefore looked
 like the whole game.
 
 Both ways of doing it failed:
 
-1. **Block-scope `extern BaseCtorTableB_3bb8c_c *GetClass6B5CCMethods();`** inside
+1. **Block-scope `extern BaseCtorTableB_3bb8c_c *GetSceneNodeMethods();`** inside
    `Class86AA0__OnActorLinkCommand`, so the zero-argument call could coexist with
    `Class86AA0__Class86AA0`'s one-argument call in the same unit. Does not compile:
    C89 keeps the outer prototype in scope and applies its arity —
-   `too few arguments to function 'GetClass6B5CCMethods'`. A block-scope
+   `too few arguments to function 'GetSceneNodeMethods'`. A block-scope
    redeclaration cannot narrow an outer prototype.
-2. **File-scope declaration changed to empty parens** (`GetClass6B5CCMethods()`), no
+2. **File-scope declaration changed to empty parens** (`GetSceneNodeMethods()`), no
    prototype, each call site passing its own argument list — which is what
    round 9 concluded retail's own source must have had. This compiles and is
    *worse*: `Class86AA0__OnActorLinkCommand` drops **23/33 -> 15/33**, and it regresses
@@ -287,12 +287,12 @@ Renamed `Class86AA0__ForwardIfArg2InRange` -> `Class86AA0__OnActorLinkCommand`
 (tools/rename.py). It is the sole occupant of gClass86AA0Methods's own slot
 +0x0B8, and its only caller is `Class86AA0__DispatchLinkCommand`'s branch for
 a sender whose class id byte is 0x34 (gActorMethods). The body is the same
-as Actor's `onActorLinkCommand` base occupant: chain Class6B5CC's
+as Actor's `onActorLinkCommand` base occupant: chain SceneNode's
 dispatchLinkCommand, then for events 5..8 run `tryAttachNearby` with the
 sender and event. The slot is named `onActorLinkCommand` after Actor's
 +0x0DC, which handles the same sender class the same way. The call named
-`slotA0` above is Class6B5CC's inherited `tryAttachNearby` (+0x0A0, occupant
-`Class6B5CC__TryAttachNearby`); the unified header keeps Class6B5CC's slot
+`slotA0` above is SceneNode's inherited `tryAttachNearby` (+0x0A0, occupant
+`SceneNode__TryAttachNearby`); the unified header keeps SceneNode's slot
 type and this caller casts at the call, as `Actor__OnActorLinkCommand` does.
 The 1-argument `slotB8` declaration and the "not reconciled" note above are
 retired: the call site has the three arguments in $a0..$a2 already.
@@ -302,7 +302,7 @@ The C since round 88 (byte-identical, whole image verified):
 ```c
 void Class86AA0__OnActorLinkCommand(Class86AA0 *self, void *sender, s32 event)
 {
-    GetClass6B5CCMethods()->dispatchLinkCommand((Class6B5CC *)self, sender, event);
+    GetSceneNodeMethods()->dispatchLinkCommand((SceneNode *)self, sender, event);
     if (event >= 9) {
         return;
     }

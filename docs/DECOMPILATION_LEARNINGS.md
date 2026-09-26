@@ -126,7 +126,7 @@ load through a runtime-indexed global", §"BLOCKED: the `nop_mflo_mfhi` screen r
   and a bigger frame, every loop carrying a second induction variable, closed at 954/954 once all
   13 inner loops were `label: ...; if (--n != 0) goto label;` (`func_80018464`, round 76).
   The MIRROR: a constant retail hoists into `$sN` before a loop (`li s1,4`) needs a `do/while`, since
-  loop.c cannot see a goto loop (`Class6B5CC__NotifyTaggedParents`, 48/54 -> 54/54 first build).
+  loop.c cannot see a goto loop (`SceneNode__NotifyTaggedParents`, 48/54 -> 54/54 first build).
 - **A redundant guard is NOT dead code — 2.6.3 compiles it literally.** GCC does not dedupe an
   explicit `if` against a loop's implicit entry test (where retail has ONE check, `guard + do-while`
   says so), and a provably-dead `x != 5 && x != 8 && x == 0xA` chain is byte-exact while its
@@ -420,7 +420,7 @@ load through a runtime-indexed global", §"BLOCKED: the `nop_mflo_mfhi` screen r
 - **An array or struct gets its stack slot when its declaration expands; an address-taken SCALAR only
   at its first `&`**, so a lone scalar always lands after every array and no declaration order moves it.
   A scalar/array slot swap that resists reordering is ONE struct (`{s32 count; Vec3S16 v[8];}` in
-  `Class6B5CC__TryAttachNearby`, 140/143 -> 143/143 after seven order variants failed, round 76).
+  `SceneNode__TryAttachNearby`, 140/143 -> 143/143 after seven order variants failed, round 76).
 
 - **An unused stack frame is reserved by an unused local ARRAY, never a scalar.** `s32 unused[2]`
   and `s16 unused[4]` green at 8 bytes; one scalar, two scalars, a 4-byte array and no local all
@@ -514,7 +514,7 @@ load through a runtime-indexed global", §"BLOCKED: the `nop_mflo_mfhi` screen r
   byte-load-bearing: keep the arity, annotate `/* arity-ok: */`. Delay slot a callee-save spill or a
   bare `nop` with the register already loaded? Then a disagreement with the definition is false. 15
   of 17 were the idiom (round 59; 11 of 18 in round 58). **The fix that touches no call site is an
-  unspecified list `()`, not `(void)`.** (a docs/match-reports/GetClass6B5CCMethods.md, round 59)
+  unspecified list `()`, not `(void)`.** (a docs/match-reports/GetSceneNodeMethods.md, round 59)
 - **A literal argument "scheduled late" after a call that sets only `$a0` can be a
   FORWARDED-PARAMETER arity defect.** Check the previous call: if its callee reads `$aN` and the
   caller never writes it, declare and pass the caller's own parameter (a file-local fn-pointer view

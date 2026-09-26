@@ -130,7 +130,7 @@ Byte-exact on that build.
 ```c
 } else {
     this->target->methods->slot130(this->target, 1);
-    Class6B5CC__FaceTarget((Entity *)this->target, this, 1, 1, 0);
+    SceneNode__FaceTarget((Entity *)this->target, this, 1, 1, 0);
     if (this->unk44 == 2) {
         if (this->methods->slot144(this, this->target) < 0x960) {
             this->unk44 = 0xB;
@@ -269,7 +269,7 @@ $ grep -nE 'gp_rel|addiu *\$at, *\$at, *%lo' asm/nonmatchings/Entity_e/Entity__M
 ```
 
 **The entire control-flow structure, every field, every vtable slot, both
-`Class6B5CC__FaceTarget` call shapes (including one with REVERSED argument roles),
+`SceneNode__FaceTarget` call shapes (including one with REVERSED argument roles),
 and three separate division-by-constant idioms were all derived and
 verified correct.** The only residue is ONE missing instruction in a run
 of seven struct-field stores: retail materializes the constant `-1` into
@@ -306,7 +306,7 @@ void Entity__MoodCue81(Entity *this, EntityMoodHandlerArg *out) {
             out->unk30 = -2;
             out->unk44 = -2;
         }
-        Class6B5CC__FaceTarget(this, this->unk94, 1, 0, 0);
+        SceneNode__FaceTarget(this, this->unk94, 1, 0, 0);
         mood = this->unk44;
         if (mood == 1) {
             this->methods->slot48(this, 0, D_80089E08);
@@ -317,7 +317,7 @@ void Entity__MoodCue81(Entity *this, EntityMoodHandlerArg *out) {
             }
         } else {
             this->unk94->methods->slot130(this->unk94, 1);
-            Class6B5CC__FaceTarget((Entity *)this->unk94, this, 1, 1, 0);
+            SceneNode__FaceTarget((Entity *)this->unk94, this, 1, 1, 0);
             mod = 0;
             if (this->unk44 == 2) {
                 mod = -0x60;
@@ -333,7 +333,7 @@ void Entity__MoodCue81(Entity *this, EntityMoodHandlerArg *out) {
             out->unk1C = 0x1C;
         }
         if (this->unkFC >= 0x1F5) {
-            Class6B5CC__FaceTarget(this, this->unk94, 1, 0, 0);
+            SceneNode__FaceTarget(this, this->unk94, 1, 0, 0);
         }
         if (this->methods->slot144(this, this->unk94) < 0x800) {
             this->unk94->methods->slotC4(this->unk94, -0x800, 0);
@@ -379,7 +379,7 @@ void Entity__MoodCue81(Entity *this, EntityMoodHandlerArg *out) {
             out->unk30 = -2;
             out->unk44 = -2;
         }
-        Class6B5CC__FaceTarget(this, this->unk94, 1, 0, 0);
+        SceneNode__FaceTarget(this, this->unk94, 1, 0, 0);
         mood = this->unk44;
         if (mood == 1) {
             this->methods->slot48(this, 0, D_80089E08);
@@ -390,7 +390,7 @@ void Entity__MoodCue81(Entity *this, EntityMoodHandlerArg *out) {
             }
         } else {
             this->unk94->methods->slot130(this->unk94, 1);
-            Class6B5CC__FaceTarget((Entity *)this->unk94, this, 1, 1, 0);
+            SceneNode__FaceTarget((Entity *)this->unk94, this, 1, 1, 0);
             mod = 0;
             if (this->unk44 == 2) {
                 mod = -0x60;
@@ -406,7 +406,7 @@ void Entity__MoodCue81(Entity *this, EntityMoodHandlerArg *out) {
             out->unk1C = 0x1C;
         }
         if (this->unkFC >= 0x1F5) {
-            Class6B5CC__FaceTarget(this, this->unk94, 1, 0, 0);
+            SceneNode__FaceTarget(this, this->unk94, 1, 0, 0);
         }
         if (this->methods->slot144(this, this->unk94) < 0x800) {
             this->unk94->methods->slotC4(this->unk94, -0x800, 0);
@@ -524,11 +524,11 @@ tried). Flag it as a permuter target and move on -- consistent with, and
 now with a fourth confirmed instance supporting, the standing guidance in
 `docs/MATCHING-GUIDE.md`.
 
-## HEAD FINDING, round 13: the reversed `Class6B5CC__FaceTarget` arguments are a DIRECTION FLAG
+## HEAD FINDING, round 13: the reversed `SceneNode__FaceTarget` arguments are a DIRECTION FLAG
 
 Runner echo (`Entity__MoodCue115`, `Entity_d`) and runner bravo
 (`Entity__MoodCue81`, `Entity_e`) each independently flagged a
-`Class6B5CC__FaceTarget` call site whose first two arguments are swapped relative
+`SceneNode__FaceTarget` call site whose first two arguments are swapped relative
 to every other known site. Both verified it against raw disassembly. The
 head then surveyed **every** call site in the executable, and the swap is
 not an outlier convention -- it is perfectly correlated with the FOURTH
@@ -542,10 +542,10 @@ argument:
 Nine of nine `a3 == 0` sites pass `(this, unk94)`; two of two `a3 == 1`
 sites pass `(unk94, this)`. Every matched C call site in `src/Entity_b.c`,
 `src/Entity_c.c`, `src/Entity_d.c` and `src/Entity_e.c` is
-`Class6B5CC__FaceTarget(this, this->unk94, 1, 0, 0)` -- byte-verified, so those 19
+`SceneNode__FaceTarget(this, this->unk94, 1, 0, 0)` -- byte-verified, so those 19
 are evidence, not transcription.
 
-Reading: `Class6B5CC__FaceTarget` is **symmetric in its first two parameters**, and
+Reading: `SceneNode__FaceTarget` is **symmetric in its first two parameters**, and
 `$a3` names which way round the operation runs. The caller pre-swaps the
 operands rather than the callee branching on the flag.
 
@@ -674,7 +674,7 @@ void Entity__MoodCue81(Entity *this, EntityMoodHandlerArg *out) {
             out->unk30 = -2;
             out->unk44 = -2;
         }
-        Class6B5CC__FaceTarget(this, this->unk94, 1, 0, 0);
+        SceneNode__FaceTarget(this, this->unk94, 1, 0, 0);
         mood = this->unk44;
         if (mood == 1) {
             this->methods->slot48(this, 0, D_80089E08);
@@ -685,7 +685,7 @@ void Entity__MoodCue81(Entity *this, EntityMoodHandlerArg *out) {
             }
         } else {
             this->unk94->methods->slot130(this->unk94, 1);
-            Class6B5CC__FaceTarget((Entity *)this->unk94, this, 1, 1, 0);
+            SceneNode__FaceTarget((Entity *)this->unk94, this, 1, 1, 0);
             mod = 0;
             if (this->unk44 == 2) {
                 mod = -0x60;
@@ -701,7 +701,7 @@ void Entity__MoodCue81(Entity *this, EntityMoodHandlerArg *out) {
             out->unk1C = 0x1C;
         }
         if (this->unkFC >= 0x1F5) {
-            Class6B5CC__FaceTarget(this, this->unk94, 1, 0, 0);
+            SceneNode__FaceTarget(this, this->unk94, 1, 0, 0);
         }
         if (this->methods->slot144(this, this->unk94) < 0x800) {
             this->unk94->methods->slotC4(this->unk94, -0x800, 0);
@@ -816,7 +816,7 @@ void Entity__MoodCue81(Entity *this, EntityMoodHandlerArg *out) {
             out->unk30 = -2;
             out->unk44 = -2;
         }
-        Class6B5CC__FaceTarget(this, this->unk94, 1, 0, 0);
+        SceneNode__FaceTarget(this, this->unk94, 1, 0, 0);
         mood = this->unk44;
         if (mood == 1) {
             this->methods->slot48(this, 0, D_80089E08);
@@ -827,7 +827,7 @@ void Entity__MoodCue81(Entity *this, EntityMoodHandlerArg *out) {
             }
         } else {
             this->unk94->methods->slot130(this->unk94, 1);
-            Class6B5CC__FaceTarget((Entity *)this->unk94, this, 1, 1, 0);
+            SceneNode__FaceTarget((Entity *)this->unk94, this, 1, 1, 0);
             mod = 0;
             if (this->unk44 == 2) {
                 mod = -0x60;
@@ -843,7 +843,7 @@ void Entity__MoodCue81(Entity *this, EntityMoodHandlerArg *out) {
             out->unk1C = 0x1C;
         }
         if (this->unkFC >= 0x1F5) {
-            Class6B5CC__FaceTarget(this, this->unk94, 1, 0, 0);
+            SceneNode__FaceTarget(this, this->unk94, 1, 0, 0);
         }
         if (this->methods->slot144(this, this->unk94) < 0x800) {
             this->unk94->methods->slotC4(this->unk94, -0x800, 0);
@@ -1016,7 +1016,7 @@ twice (round 19's derivation and this round's from-scratch rebuild):
   region, the drift byte count would have changed by more than #1's own
   contribution). Divergence #1's block (the `out->unk4 % 20 == 0` store
   sequence) is upstream of and structurally unrelated to divergence #2's
-  block (the `mood != 1` else-branch's `slot130`/`Class6B5CC__FaceTarget`
+  block (the `mood != 1` else-branch's `slot130`/`SceneNode__FaceTarget`
   sequence) -- they sit in different, non-overlapping basic blocks with
   no shared value or register between them (confirmed: divergence #1's
   fix touches only `out->`-relative stores; divergence #2 is entirely

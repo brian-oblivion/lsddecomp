@@ -8,7 +8,7 @@ Unit `code_2cc8c_f`. `Obj6EAC0Methods::slot4C`'s own occupant (this is the
 FUNCTION the vtable slot points to, not a caller of it -- the header's
 existing "IS BoxFill__AttachToParent" note on that slot already said as much before
 this round). Body: when `self->unkC == 0`, forwards to the shared
-"default handler" table's own `slot4C` (`GetClass6B5CCMethods()`, already typed
+"default handler" table's own `slot4C` (`GetSceneNodeMethods()`, already typed
 in `include/code_2cc8c.h` as `D6B5CCGetterMethodsCC8C`, with a `slot4C`
 member at the exact offset/arity this call site needs -- no header changes
 were necessary), then dispatches `self->methods->slotBC(self, a2)` --
@@ -18,7 +18,7 @@ pointer").
 ```c
 void BoxFill__AttachToParent(Obj6EAC0 *self, s32 a1, void *a2) {
     if (self->unkC == 0) {
-        GetClass6B5CCMethods()->slot4C(self, a1, 0);
+        GetSceneNodeMethods()->slot4C(self, a1, 0);
         self->methods->slotBC(self, a2);
     }
 }
@@ -58,4 +58,4 @@ meaning here, which is not established -- tier B.
 
 ## Track 4 (2026-09-25, round 85, charlie)
 
-Class 0x64 (was D_8006EAC0) is unified as BoxFill in include/BoxFill.h: Viewport__DrawNode draws a node whose class-id low byte is 0x64 with GsSortBoxFill over the GsBOXF at +0x058 (pri +0x044, `relative` +0x048, x/y +0x050/+0x054). The body now takes `BoxFill *`; zero bytes changed. Renamed from `Obj6EAC0__Layout`: the +0x04C occupant (Class6B5CC's attachToParent), named for its slot as Class65650__AttachToParent and ScreenSprite__AttachToParent are (tier A). While `parent` (+0x00C, the word the old view called `hasChildren`) is NULL it attaches through Class6B5CC's own slot with a NULL offset, then setPosition(pos). Its third parameter is a two-word screen position where the slot types a Vec3_d294 offset: the slot keeps Class6B5CC's type and callers cast to BoxFillAttachToParentFn (TaskCore__RefreshSlotView, ApplyStyleDecorationIfSet, StyleBuildDecorSet); Viewport__SetSubHandle, through a Class6B5CC pointer, casts the argument.
+Class 0x64 (was D_8006EAC0) is unified as BoxFill in include/BoxFill.h: Viewport__DrawNode draws a node whose class-id low byte is 0x64 with GsSortBoxFill over the GsBOXF at +0x058 (pri +0x044, `relative` +0x048, x/y +0x050/+0x054). The body now takes `BoxFill *`; zero bytes changed. Renamed from `Obj6EAC0__Layout`: the +0x04C occupant (SceneNode's attachToParent), named for its slot as Class65650__AttachToParent and ScreenSprite__AttachToParent are (tier A). While `parent` (+0x00C, the word the old view called `hasChildren`) is NULL it attaches through SceneNode's own slot with a NULL offset, then setPosition(pos). Its third parameter is a two-word screen position where the slot types a Vec3_d294 offset: the slot keeps SceneNode's type and callers cast to BoxFillAttachToParentFn (TaskCore__RefreshSlotView, ApplyStyleDecorationIfSet, StyleBuildDecorSet); Viewport__SetSubHandle, through a SceneNode pointer, casts the argument.

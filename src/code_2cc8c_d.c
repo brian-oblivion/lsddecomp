@@ -303,7 +303,7 @@ extern void GsClearOt(s32 a0, s32 a1, ViewportOt *ot);
 
 void Viewport__Update(Viewport *self) {
     s32 idx;
-    Class6B5CC *root;
+    SceneNode *root;
 
     if (self->otReady == 0) {
         return;
@@ -404,9 +404,9 @@ tail_check:
 /* Only while no view node is set: releases the current subHandle, installs
  * `handle`, and attaches it under sceneRoot at D_8008A904 (-100, -100). The
  * occupant of handle's +0x04C (BoxFill__AttachToParent, a Class6E99C's) takes a
- * screen position where Class6B5CC's attachToParent slot types a Vec3_d294
+ * screen position where SceneNode's attachToParent slot types a Vec3_d294
  * offset, hence the cast (include/Viewport.h, "Not settled here"). */
-void Viewport__SetSubHandle(Viewport *self, Class6B5CC *handle) {
+void Viewport__SetSubHandle(Viewport *self, SceneNode *handle) {
     if (self->viewNode != NULL) {
         return;
     }
@@ -421,7 +421,7 @@ void Viewport__SetSubHandle(Viewport *self, Class6B5CC *handle) {
     }
 }
 
-Class6B5CC *Viewport__GetSubHandle(Viewport *self) {
+SceneNode *Viewport__GetSubHandle(Viewport *self) {
     return self->subHandle;
 }
 
@@ -440,7 +440,7 @@ ViewportMethods *GetViewportMethods(void) {
 
 /* Follows `parent` from `node` to the top of its hierarchy. Not a method
  * (in no table): Viewport__Update passes it the view node. */
-Class6B5CC *GetRootNode(Class6B5CC *node) {
+SceneNode *GetRootNode(SceneNode *node) {
     while (node->parent != NULL) {
         node = node->parent;
     }

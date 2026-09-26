@@ -79,8 +79,8 @@ nested `if`s before suspecting anything else.
 
 This unit declared `extern s32 func_8001E7BC(void);` and called it with no
 arguments. In the SAME round, `code_d294_c` matched `func_8001E7BC` and
-established its real signature: `s32 func_8001E7BC(Class6B5CCObj *self,
-s32 *arg1, s32 *arg2)`, a Class6B5CC method. The two readings met at merge.
+established its real signature: `s32 func_8001E7BC(SceneNodeObj *self,
+s32 *arg1, s32 *arg2)`, a SceneNode method. The two readings met at merge.
 
 `arg1`/`arg2` were therefore never "unused parameters that exist to match
 the calling convention" -- they are FORWARDED. `AcceptGridElem(arg0, arg1,
@@ -115,4 +115,4 @@ and docs/match-reports/func_8001E7BC.md, round 57)
 
 ## Track 4 (2026-09-25, round 82, delta)
 
-Renamed from `DreamSys__AcceptGridElem`. Helper of Actor__ScanGridWindow. No self parameter, so no class prefix. The class (id 0x34, table `gActorMethods`, formerly `D_800878D4`) is unified as `Actor` in `include/Actor.h`: a Class6B5CC subclass and the base of Class65650/Entity, DreamSys and Class876FC. Any source block above is the pre-unification spelling; the live body in `src/class_3bb8c_p.c` takes the unified types and field/slot names, byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).
+Renamed from `DreamSys__AcceptGridElem`. Helper of Actor__ScanGridWindow. No self parameter, so no class prefix. The class (id 0x34, table `gActorMethods`, formerly `D_800878D4`) is unified as `Actor` in `include/Actor.h`: a SceneNode subclass and the base of Class65650/Entity, DreamSys and Class876FC. Any source block above is the pre-unification spelling; the live body in `src/class_3bb8c_p.c` takes the unified types and field/slot names, byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).

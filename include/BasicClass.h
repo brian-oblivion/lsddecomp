@@ -48,7 +48,7 @@
  * slot differs between a class and its subclasses: an override that needed a
  * different return type or parameter list would be a different slot. The one
  * exception is the ctor's return type, for the same reason as its parameters:
- * BASICCLASS_SLOTS_R takes it (include/Class6B5CC.h, whose ctor returns self).
+ * BASICCLASS_SLOTS_R takes it (include/SceneNode.h, whose ctor returns self).
  */
 
 typedef struct BasicClass BasicClass;
@@ -68,8 +68,8 @@ struct BasicClassListNode {
 #define BASICCLASS_SLOTS(Self, CtorParams) BASICCLASS_SLOTS_R(Self, void, CtorParams)
 
 /* The same fifteen slots with the ctor's RETURN type as a parameter too: a
- * class whose constructor returns self or NULL (Class6B5CC and everything
- * below it: New_Class6B5CC tests `ctor(obj) != NULL`) passes `void *`.
+ * class whose constructor returns self or NULL (SceneNode and everything
+ * below it: New_SceneNode tests `ctor(obj) != NULL`) passes `void *`.
  * BasicClass's own ctor returns nothing, so BASICCLASS_SLOTS passes `void`. */
 /* clang-format off */
 #define BASICCLASS_SLOTS_R(Self, CtorRet, CtorParams)                                              \

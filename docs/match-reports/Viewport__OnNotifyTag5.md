@@ -31,7 +31,7 @@ void Viewport__OnNotifyTag5(Unk18Obj *self, GenericObj *arg1, s32 arg2) {
 
 Note: retail's own `(unsigned)(arg2 - 2) < 2` range-check fold (a single
 `sltiu`) is exactly what `arg2 == 2 || arg2 == 3` compiles to here — the
-OPPOSITE lesson from this round's `Class6B5CC__TryAttachNearby`/`Class6B5CC__NotifyIfUnk20Active` (a
+OPPOSITE lesson from this round's `SceneNode__TryAttachNearby`/`SceneNode__NotifyIfUnk20Active` (a
 different unit), where the same fold was UNWANTED and had to be avoided
 with guard clauses. Whether the fold is wanted is purely a property of
 what retail's own disassembly shows, not a general rule either way.

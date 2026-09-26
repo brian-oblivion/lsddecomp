@@ -7,7 +7,7 @@
 ## What it does
 
 The constructor (`ctor`, slot +0x008) for `Class86AA0`. Chains to a base
-ctor (fetched via `GetClass6B5CCMethods(self)`), installs this class's own vtable,
+ctor (fetched via `GetSceneNodeMethods(self)`), installs this class's own vtable,
 then zeroes three of its own fields (`unk34` u16, `unk36` u16, `unk38`
 s32) directly -- unlike Class869D8__Class869D8's sibling ctor, there is no
 post-construct hook call here (the retail instruction stream ends right
@@ -18,7 +18,7 @@ after the zero-stores).
 ```c
 void Class86AA0__Class86AA0(Class86AA0 *self)
 {
-    GetClass6B5CCMethods(self)->ctor(self);
+    GetSceneNodeMethods(self)->ctor(self);
     self->methods = GetClass86AA0Methods();
     self->unk34 = 0;
     self->unk36 = 0;
@@ -26,15 +26,15 @@ void Class86AA0__Class86AA0(Class86AA0 *self)
 }
 ```
 
-## Notes on GetClass6B5CCMethods's declared arity
+## Notes on GetSceneNodeMethods's declared arity
 
-`GetClass6B5CCMethods` is already declared elsewhere in the codebase
+`GetSceneNodeMethods` is already declared elsewhere in the codebase
 (`include/class_3ac78.h`) with a two-argument signature,
-`void *GetClass6B5CCMethods(Class866E8 *self, s32 arg1)`. This unit's own call
+`void *GetSceneNodeMethods(Class866E8 *self, s32 arg1)`. This unit's own call
 site never sets up a second argument register (`$a1`) before the `jal` --
 the instruction immediately after is a plain `lw` on the return value, not
 an `addu $a1, ...` -- so it is declared here, file-locally, as single-
-argument: `extern BaseCtorTable_3bb8c_c *GetClass6B5CCMethods(void *self);`. This
+argument: `extern BaseCtorTable_3bb8c_c *GetSceneNodeMethods(void *self);`. This
 is safe: each translation unit gets its own extern prototype for a given
 external symbol in this project (no shared declaration is enforced across
 units), and the only thing that has to be right for THIS unit's codegen to
@@ -51,18 +51,18 @@ match is what THIS call site's own register usage requires.
 declarations of one symbol means nobody has established the real signature
 yet, and settling it is one `cat` away: read the CALLEE.**
 
-Here that read settles it flatly. `GetClass6B5CCMethods`'s entire body
+Here that read settles it flatly. `GetSceneNodeMethods`'s entire body
 (`asm/code_d294.s`) is:
 
 ```
-lui   $v0, %hi(gClass6B5CCMethods)
-addiu $v0, $v0, %lo(gClass6B5CCMethods)
+lui   $v0, %hi(gSceneNodeMethods)
+addiu $v0, $v0, %lo(gSceneNodeMethods)
 jr    $ra
  nop
 ```
 
 It reads **neither `$a0` nor `$a1`**. It takes **no arguments** and returns
-`&gClass6B5CCMethods` — the plain no-parameter vtable getter already documented in
+`&gSceneNodeMethods` — the plain no-parameter vtable getter already documented in
 `docs/research/class-framework.md`, the same shape as `GetClass6D3C8Methods`. So the
 2-argument declaration in `src/class_3ac78.c` and the 1-argument declaration
 in `include/class_3bb8c.h` are **both wrong about the function**, and both are
@@ -101,15 +101,15 @@ question.
 ## Naming
 
 **Class86AA0__Class86AA0** -- tier A. Canonical ctor (`Class__Class`
-convention): chains a base ctor (`GetClass6B5CCMethods`), installs this
+convention): chains a base ctor (`GetSceneNodeMethods`), installs this
 class's own vtable, zeroes three of its own fields. Same shape and
 evidence class as `Class869D8__Class869D8`.
 
 ## Track 4 (2026-09-26, round 88, alpha)
 
 Class86AA0 is unified in `include/Class86AA0.h` and expands
-CLASS6B5CC_FIELDS: the three fields this ctor zeroes are Class6B5CC's, so
+SCENENODE_FIELDS: the three fields this ctor zeroes are SceneNode's, so
 `unk36` -> `flags36` and `unk38` (s32) -> `nextInCell` (void *, written as
 `NULL`; Class866E8__DispatchToRectCells walks it as a pointer). The store is
 `sw $zero` either way; image byte-identical. Class86AA0 has no own fields:
-New_Class86AA0 allocates 0x3C bytes, shorter than Class6B5CC's 0x44.
+New_Class86AA0 allocates 0x3C bytes, shorter than SceneNode's 0x44.

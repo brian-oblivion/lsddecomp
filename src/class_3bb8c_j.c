@@ -274,7 +274,7 @@ extern const char D_800116E4[]; /* "FONTICON" */
  * round-18/19 stall (75/95, both addresses and the handle swapped among
  * $s0-$s2). Same shape as class_3bb8c_i's TextEntry__LoadCardResources.
  */
-void Class86F88__LoadResources(Class86F88 *self, Class6B5CC *parent) {
+void Class86F88__LoadResources(Class86F88 *self, SceneNode *parent) {
     char path[0x20];
     const char *dir;
     const char *ext;

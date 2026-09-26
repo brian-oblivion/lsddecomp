@@ -13,7 +13,7 @@ void Entity__MoodCue48(Entity *this, EntityMoodHandlerArg *out) {
     EntityMethods *methods;
 
     if (this->unk84 == 0x26) {
-        Class6B5CC__FaceTarget(this, this->unk94, 1, 0, 0);
+        SceneNode__FaceTarget(this, this->unk94, 1, 0, 0);
         out->unk10 = this->methods->slot148(this);
         out->unk1C = 6;
     }
@@ -26,7 +26,7 @@ void Entity__MoodCue48(Entity *this, EntityMoodHandlerArg *out) {
 
 ## Derivation notes
 
-- `Class6B5CC__FaceTarget(this, this->unk94, 1, 0, 0)` reuses the exact call shape
+- `SceneNode__FaceTarget(this, this->unk94, 1, 0, 0)` reuses the exact call shape
   already documented on that extern's declaration in `include/Entity.h`
   (second arg `this->unk94`, third literal `1`, fourth `0`, fifth `0` on the
   stack) -- same pattern as `Entity__UpdateTargetProximity` elsewhere in the Entity family.

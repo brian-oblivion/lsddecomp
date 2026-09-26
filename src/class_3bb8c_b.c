@@ -71,7 +71,7 @@ void Class866E8__RefreshFootprint(Class866E8 *self) {
 }
 
 void Class866E8__ComputeFootprintFromRotation(Class866E8 *self, s32 arg1, s32 arg2) {
-    Class6B5CCSub44 *sub;
+    SceneNodeSub44 *sub;
     Descriptor10Ext buf;
     s32 point0;
     s32 point1;

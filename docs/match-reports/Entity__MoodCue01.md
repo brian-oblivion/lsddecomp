@@ -13,7 +13,7 @@ EntityMoodHandlerArg *out)`. Unconditionally zeroes `out->unk10`, then — only
 when `out->unk4 == 0` — sets three `out` fields to `0x14` and fires a call
 through a SECOND, DIFFERENT object's vtable: `this->unk94->methods->slot130`,
 not `this->methods->slot130`. Unconditionally calls the still-uncarved
-`Class6B5CC__FaceTarget`, then `this->methods->slotC4`, then conditionally
+`SceneNode__FaceTarget`, then `this->methods->slotC4`, then conditionally
 `this->methods->slot30` when `this->unkFC == 0x1E`.
 
 The `this->unk94->methods->slot130(this->unk94, 1)` call is the interesting
@@ -29,7 +29,7 @@ broken that OTHER unit's already-matched function.
 
 `Entity::unk94` was previously `void *`, described only as "a pointer to SOME
 object, real type unconfirmed" (known from `Entity__UpdateTargetProximity`'s call into the
-still-uncarved `Class6B5CC__FaceTarget`, which dereferences it at `+0xC`/`+0x14`).
+still-uncarved `SceneNode__FaceTarget`, which dereferences it at `+0xC`/`+0x14`).
 This function's own disassembly resolves two more facts about it:
 
 - `lw $v0, 0(a0)` / `lw $v0, 0x130($v0)` / `jalr $v0` (with `a0` = the loaded
@@ -40,7 +40,7 @@ This function's own disassembly resolves two more facts about it:
   per this round's "MIPS o32 fills argument registers left to right" learning,
   that is positive evidence of a real second argument, not leftover garbage.
 
-Since `Class6B5CC__FaceTarget`'s body dereferences this object at `+0xC` as a pointer,
+Since `SceneNode__FaceTarget`'s body dereferences this object at `+0xC` as a pointer,
 and `Entity::unk0C` (`this`'s OWN `+0xC`) is a plain `s32` flag, `unk94` is
 provably NOT another `Entity` — despite `Entity__IsTargetInRange` (attempted the same
 round, see its stall report) also reading `+0x14` off it as an `EntityPos *`,
@@ -72,7 +72,7 @@ void Entity__MoodCue01(Entity *this, EntityMoodHandlerArg *out) {
         out->unk44 = 0x14;
         this->unk94->methods->slot130(this->unk94, 1);
     }
-    Class6B5CC__FaceTarget(this, this->unk94, 1, 0, 0);
+    SceneNode__FaceTarget(this, this->unk94, 1, 0, 0);
     this->methods->slotC4(this, -0x5A, 0);
     if (this->unkFC == 0x1E) {
         this->methods->slot30(this, 0xA);

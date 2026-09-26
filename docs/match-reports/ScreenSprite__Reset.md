@@ -7,12 +7,12 @@
 Round 82, runner alpha (re-staffed slot). Unit `src/code_322b4.c`. Fresh
 ground (carved in FINISHING-PLAN revision 18), no prior attempt.
 
-- **Where:** gScreenSpriteMethods slot +0x040 (reset, over Class6B5CC__Reset) (`tools/classtable.py`).
+- **Where:** gScreenSpriteMethods slot +0x040 (reset, over SceneNode__Reset) (`tools/classtable.py`).
 - **What:** empty override: `jr $ra; nop`.
 - **Result:** byte-exact on the FIRST build; 2/2 words, 0 insertions /
   0 deletions, whole-image SHA1 green. No levers needed.
-- **Types:** Class6B5CC-derived methods take `Class6B5CC *` from the UNIFIED
-  `include/Class6B5CC.h` (untouched). The FrameClock and Class6EED8 objects use
+- **Types:** SceneNode-derived methods take `SceneNode *` from the UNIFIED
+  `include/SceneNode.h` (untouched). The FrameClock and Class6EED8 objects use
   unit-local views (`D_8006EF50Obj`, `D_8006EED8Obj`) declared at the top of
   the unit; nothing was added to a shared header.
 

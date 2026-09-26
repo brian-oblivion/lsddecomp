@@ -962,11 +962,6 @@
           "date": "2026-09-25",
           "header": "include/Class65650.h"
         },
-        "gClass6B5CCMethods": {
-          "class": "Class6B5CC",
-          "date": "2026-09-25",
-          "header": "include/Class6B5CC.h"
-        },
         "gClass6EED8Methods": {
           "class": "Class6EED8",
           "date": "2026-09-26",
@@ -1066,6 +1061,11 @@
           "class": "Pad",
           "date": "2026-09-25",
           "header": "include/Pad.h"
+        },
+        "gSceneNodeMethods": {
+          "class": "SceneNode",
+          "date": "2026-09-25",
+          "header": "include/SceneNode.h"
         },
         "gScreenSpriteMethods": {
           "class": "ScreenSprite",

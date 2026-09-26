@@ -18,7 +18,7 @@ void DreamSys__FlashbackSaving(DreamSys *this, s32 arg1, s32 arg2)
 
 	if (this->unk_0x4C != NULL && rand() % 3 == 0) {
 		pos = this->unk_0x4C->methods->slot0x10C(this->unk_0x4C, 0, 0);
-		Class6B5CC__GetRotationDegrees(this, local);
+		SceneNode__GetRotationDegrees(this, local);
 		this->vt->AddFlashback(this, this->currentStage, pos, local, arg1, arg2, this->currentDay);
 	}
 }
@@ -50,9 +50,9 @@ Matched first attempt — no reshaping needed.
   `sp+0x18`) — an ordinary o32 ABI overflow-argument case once you recognise
   it; nothing exotic, just more parameters than fit in registers.
 - Confirms the already-documented "delay slot after a `jalr` captures the
-  PRECEDING call's return value" idiom again: the `jal Class6B5CC__GetRotationDegrees`
+  PRECEDING call's return value" idiom again: the `jal SceneNode__GetRotationDegrees`
   instruction's delay slot (`addu $s0, $v0, $zero`) captures `pos`, the return
-  of the *preceding* `slot0x10C` call, not an argument to `Class6B5CC__GetRotationDegrees`.
+  of the *preceding* `slot0x10C` call, not an argument to `SceneNode__GetRotationDegrees`.
 - The `rand() % 3 == 0` reproduces retail's `mult`/`mfhi`/`sra`-`subu`
   sign-correction magic-multiply exactly, per the already-confirmed "`x % N`
   for compile-time-constant `N`: just write `%`" idiom — another instance,

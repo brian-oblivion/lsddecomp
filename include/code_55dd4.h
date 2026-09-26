@@ -41,7 +41,7 @@ typedef struct UnkArg2Obj {
     UnkArg2Methods *methods;
 } UnkArg2Obj;
 
-/* A part's coord2->param (Class6B5CCSub44, GsCOORD2PARAM) as
+/* A part's coord2->param (SceneNodeSub44, GsCOORD2PARAM) as
  * Class65650__ApplyTodPacket writes it from a TOD coordinate packet: the
  * scale, rotate and trans vectors as arrays. */
 typedef struct TimeTargetObj {

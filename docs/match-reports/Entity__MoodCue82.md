@@ -10,7 +10,7 @@ Mood-dispatch handler (`Entity *this, EntityMoodHandlerArg *out`). On
 `this->unk44==0 && this->unkFC==0`, rolls a `%3`: on a hit, fires
 `slot16C`/`slotC4(-0x5000,0)` and discards a bare `rand()` call; on a miss,
 sets `this->unk44` to `0xB` or `0xC` via a `rand()&1` ternary. Then, on
-`unk44==0xC`, calls `Class6B5CC__FaceTarget` and drives `out`/`slotC4`/`slot30` off
+`unk44==0xC`, calls `SceneNode__FaceTarget` and drives `out`/`slotC4`/`slot30` off
 `unkFC` range checks; on `unk44==0xB`, calls `slot130` and, if
 `slot144(this,this->unk94) < 0x200`, rolls another `%3` to pick between
 `slot16C`/`slot160`.

@@ -189,7 +189,7 @@ void Class86F88__CursorDown(Class86F88 *self, s32 arg1, s32 arg2, s32 arg3) {
 extern s32 gClass86F88RowOriginX;
 extern s32 gClass86F88RowOriginY;
 
-void Class86F88__CreateRows(Class86F88 *self, Class6B5CC *parent, TimImage *font, s32 top,
+void Class86F88__CreateRows(Class86F88 *self, SceneNode *parent, TimImage *font, s32 top,
                             s32 column, s32 cursor) {
     char buf[0x20];
     ScreenSpritePos pos;

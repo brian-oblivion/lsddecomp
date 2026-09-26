@@ -14,7 +14,7 @@ Same generic packed-bitfield-word accessor already documented in
 `include/code_d294.h` (`GetSetBitField(word, shift, width, value)`),
 here over `self->unk58` (a fresh field, not `code_d294`'s `unk10`).
 Shift/width/negate shape matches `code_d294.c`'s own
-`Class6B5CC__SetDisplay` verbatim (`GetSetBitField(&self->unk10, 0x1F, 1,
+`SceneNode__SetDisplay` verbatim (`GetSetBitField(&self->unk10, 0x1F, 1,
 a1 == 0) == 0`), just against a different field.
 
 ### Proposed learning
@@ -37,7 +37,7 @@ Round 54 (alpha), FINISHING-PLAN track 3.
 shift, width, value)` (see `include/code_2cc8c.h`'s own comment on
 `flags`, renamed from `unk58` this round), the SAME generic
 packed-bitfield-word accessor `code_d294.c`'s own sibling functions
-(`Class6B5CC__SetDisplay`/`D374`/`D3A0`) wrap -- and those, the FIRST instances
+(`SceneNode__SetDisplay`/`D374`/`D3A0`) wrap -- and those, the FIRST instances
 of this exact idiom in the project, are still unnamed too, for the same
 reason: `GetSetBitField` returns the bit's OLD value while setting a
 NEW one, and without knowing what the individual bit MEANS, a name can
@@ -48,4 +48,4 @@ consistent with this project's own precedent on the sibling group.
 
 ## Track 4 (2026-09-25, round 85, charlie)
 
-Class 0x64 (was D_8006EAC0) is unified as BoxFill in include/BoxFill.h: Viewport__DrawNode draws a node whose class-id low byte is 0x64 with GsSortBoxFill over the GsBOXF at +0x058 (pri +0x044, `relative` +0x048, x/y +0x050/+0x054). The body now takes `BoxFill *`; zero bytes changed. Renamed from `func_800406E4`: the +0x060 occupant (Class6B5CC's setDisplay), and the body is Class6B5CC__SetDisplay's own (GetSetBitField shift 31, width 1, `on == 0`, result `== 0`) over the GsBOXF attribute at +0x058 instead of the GsDOBJ2 one (tier A). GraphRoom__Update calls it on points[0] with the hour's low bit (a blink).
+Class 0x64 (was D_8006EAC0) is unified as BoxFill in include/BoxFill.h: Viewport__DrawNode draws a node whose class-id low byte is 0x64 with GsSortBoxFill over the GsBOXF at +0x058 (pri +0x044, `relative` +0x048, x/y +0x050/+0x054). The body now takes `BoxFill *`; zero bytes changed. Renamed from `func_800406E4`: the +0x060 occupant (SceneNode's setDisplay), and the body is SceneNode__SetDisplay's own (GetSetBitField shift 31, width 1, `on == 0`, result `== 0`) over the GsBOXF attribute at +0x058 instead of the GsDOBJ2 one (tier A). GraphRoom__Update calls it on points[0] with the hour's low bit (a blink).

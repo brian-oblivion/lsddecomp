@@ -14,7 +14,7 @@
  *    Actor__ScanLinkCandidates, Actor__ScanGridWindow, AcceptGridElem) when
  *    the move alone did not set linkTarget.
  *  - The link-command pair (Actor__OnActorLinkCommand,
- *    Actor__OnClass86AA0LinkCommand) forwarding through the Class6B5CC base
+ *    Actor__OnClass86AA0LinkCommand) forwarding through the SceneNode base
  *    table and, for an event in [5,9), the object's own tryAttachNearby.
  *  - Actor__SetLastOffsetValue/SetPendingExtra, GetActorMethods: plain
  *    setters/getter.
@@ -42,7 +42,7 @@
  * this unit's own reading -- kept local rather than added to a shared
  * header. It is the x and y of Actor's local move vector: the z is the next
  * halfword, D_8008ABA8, which class_3bb8c_o's Actor__MoveLocalZ writes, and
- * Class6B5CC__RotateLocalVector reads src[0..2]. */
+ * SceneNode__RotateLocalVector reads src[0..2]. */
 extern s16 D_8008ABA4[2];
 
 void Actor__MoveLocalX(Actor *self, s32 val, void *notify) {
@@ -305,7 +305,7 @@ void *Actor__ScanGridWindow(Actor *self, void *arg1, void *arg2, GridQuery *quer
 }
 
 /* The real signature, established when code_d294_c matched this function in
- * round 57: it is a Class6B5CC method taking (self, out, target). This unit
+ * round 57: it is a SceneNode method taking (self, out, target). This unit
  * had long declared it `(void)` and called it with no arguments, which is
  * byte-identical here only because arg0-arg2 are already in $a0-$a2 -- the
  * byte oracle cannot see a wrong prototype. Spelled out so the forwarding is
@@ -321,12 +321,12 @@ void *AcceptGridElem(void *arg0, void *arg1, void *arg2) {
     return NULL;
 }
 
-/* tryAttachNearby is called with (self, sender, event): Class6B5CC's slot
+/* tryAttachNearby is called with (self, sender, event): SceneNode's slot
  * declares self alone (its occupant's second parameter arrives in the
  * caller's untouched $a1), and here both are reloaded after the base call,
  * so the call spells them out through a cast. */
 void Actor__OnActorLinkCommand(Actor *self, void *sender, s32 event) {
-    GetClass6B5CCMethods()->dispatchLinkCommand((Class6B5CC *)self, sender, event);
+    GetSceneNodeMethods()->dispatchLinkCommand((SceneNode *)self, sender, event);
     if (event < 9) {
         if (event >= 5) {
             ((void (*)(Actor *, void *, s32))self->methods->tryAttachNearby)(self, sender, event);
@@ -335,7 +335,7 @@ void Actor__OnActorLinkCommand(Actor *self, void *sender, s32 event) {
 }
 
 void Actor__OnClass86AA0LinkCommand(Actor *self, void *sender, s32 event) {
-    GetClass6B5CCMethods()->dispatchLinkCommand((Class6B5CC *)self, sender, event);
+    GetSceneNodeMethods()->dispatchLinkCommand((SceneNode *)self, sender, event);
 }
 
 void Actor__SetLastOffsetValue(Actor *self, s16 val) {

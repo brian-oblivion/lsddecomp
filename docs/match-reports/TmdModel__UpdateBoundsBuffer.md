@@ -29,4 +29,4 @@ dispatched): forwards `self` and the shared static buffer
 
 ## Track 4 (2026-09-26, round 87, delta)
 
-Renamed from `UpdateTmdModelBoundsBuffer`: tier A, convention only (`Class__Method`): its `self` is a TmdModel, forwarded to `TmdModel__ComputeBounds(self, gTmdModelBoundsBuf)`. Callers: `Class6B5CC__CheckBoundsOverlap` with `self->model`.
+Renamed from `UpdateTmdModelBoundsBuffer`: tier A, convention only (`Class__Method`): its `self` is a TmdModel, forwarded to `TmdModel__ComputeBounds(self, gTmdModelBoundsBuf)`. Callers: `SceneNode__CheckBoundsOverlap` with `self->model`.

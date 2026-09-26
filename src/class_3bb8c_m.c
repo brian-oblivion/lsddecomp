@@ -171,7 +171,7 @@ void ObjM__AdvancePauseSetup(ObjM *self) {
     s32 state = self->pauseSetupStep;
     if (state == 0) {
         self->pauseText = New_TextRow(self->etcTim, 5, &D_8008AB44[0]);
-        self->pauseText->methods->attachToParent(self->pauseText, (Class6B5CC *)self->unk14,
+        self->pauseText->methods->attachToParent(self->pauseText, (SceneNode *)self->unk14,
                                                  (Vec3_d294 *)&D_8008AB38);
         self->pauseText->methods->setColor(self->pauseText, (SpriteRgb *)&D_8008AB40);
         self->pauseSetupStep = state + 1;
@@ -328,6 +328,6 @@ void ApplyStyleDecorationIfSet(void) {
                   ->unkC->methods->slotAC(((FieldAC7CHolder *)gStyleTargetObj)->unkC);
 
         ((BoxFillAttachToParentFn)((BoxFill *)gStyleDecorObj)->methods->attachToParent)(
-            (BoxFill *)gStyleDecorObj, (Class6B5CC *)tmp, (Pair32E99C *)&D_8008AB58);
+            (BoxFill *)gStyleDecorObj, (SceneNode *)tmp, (Pair32E99C *)&D_8008AB58);
     }
 }

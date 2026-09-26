@@ -312,7 +312,7 @@ as dead code (confirmed: adding it produced no instruction at all).
 
 - **The established "address-taken local" idiom**
   (`docs/DECOMPILATION_LEARNINGS.md`: *"GCC 2.6.3 at -O2 does not eliminate
-  a dead store into an address-taken local"*, `Class6B5CC__DetachAttachedChildren`). Considered
+  a dead store into an address-taken local"*, `SceneNode__DetachAttachedChildren`). Considered
   and rejected on reasoning rather than tried: that idiom's own precedent
   is for a value that ends up in a real MEMORY location either way: taking
   a local's address forces it out of pure-register treatment, which is the

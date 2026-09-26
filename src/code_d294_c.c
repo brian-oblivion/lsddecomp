@@ -1,17 +1,17 @@
-/* code_d294_c -- the third and last carve of the Class6B5CC segment.
+/* code_d294_c -- the third and last carve of the SceneNode segment.
  *
- * Class6B5CC (method table gClass6B5CCMethods, class tag 4) is this game's
+ * SceneNode (method table gSceneNodeMethods, class tag 4) is this game's
  * POSITIONED 3D OBJECT base class. Every instance embeds a Psy-Q `GsDOBJ2`
  * at +0x10 (attribute / coord2 / tmd) and owns the `GsCOORDINATE2` that
  * GsDOBJ2 points at -- MEASURED, see the "PSY-Q IDENTIFICATION" note in
- * include/code_d294.h, which pins Class6B5CCSub14 == GsCOORDINATE2 and
- * Class6B5CCSub44 == GsCOORD2PARAM field by field. DreamSys, Entity and the
+ * include/code_d294.h, which pins SceneNodeSub14 == GsCOORDINATE2 and
+ * SceneNodeSub44 == GsCOORD2PARAM field by field. DreamSys, Entity and the
  * class_3bb8c object family all carry that same layout, which is why this
  * unit's helpers are called from a dozen other units.
  *
  * NONE of this unit's functions is a vtable slot (`tools/classtable.py
- * gClass6B5CCMethods` stops at Class6B5CC__NotifyTaggedParents). It is the class's FREE-FUNCTION tail:
- * five instance helpers that dispatch through the table (`Class6B5CC__*`)
+ * gSceneNodeMethods` stops at SceneNode__NotifyTaggedParents). It is the class's FREE-FUNCTION tail:
+ * five instance helpers that dispatch through the table (`SceneNode__*`)
  * and eight standalone leaves -- vector, matrix, fixed-point, bounding-box
  * and bitfield primitives -- that the rest of the game calls by symbol.
  *
@@ -25,11 +25,11 @@
 
 /* Rotates a 3-element s16 vector, given in the object's own local frame,
  * by the object's own orientation, widening it into `dst`. `slot84`
- * (Class6B5CC__GetRotMatrix, code_d294_b) builds that rotation with RotMatrix from
+ * (SceneNode__GetRotMatrix, code_d294_b) builds that rotation with RotMatrix from
  * GsCOORD2PARAM.rotate; its `0` argument selects the un-negated angles,
  * i.e. local -> parent, not the inverse. `dst` is a bare 3-word vector:
  * class_3bb8c_o's own call site (Actor__AddLocalTranslation) passes a local `Vec3O`. */
-void Class6B5CC__RotateLocalVector(Class6B5CC *self, Vec3_d294 *dst, s16 *src) {
+void SceneNode__RotateLocalVector(SceneNode *self, Vec3_d294 *dst, s16 *src) {
     u8 buf[0x20];
 
     self->methods->getRotMatrix(self, buf, 0);
@@ -41,7 +41,7 @@ void Class6B5CC__RotateLocalVector(Class6B5CC *self, Vec3_d294 *dst, s16 *src) {
 
 /* Turns an offset given in the object's own local frame into a world
  * position: rotate `src` by the object's orientation (slot84, un-negated
- * angles, same as Class6B5CC__RotateLocalVector above) and add the object's
+ * angles, same as SceneNode__RotateLocalVector above) and add the object's
  * accumulated world translation. That translation is `unk14->unk38`, which
  * is GsCOORDINATE2.workm.t -- the composed world matrix's own translation
  * (+0x24 workm, +0x14 into MATRIX = +0x38). func_8001E7BC is the function
@@ -51,7 +51,7 @@ void Class6B5CC__RotateLocalVector(Class6B5CC *self, Vec3_d294 *dst, s16 *src) {
  * three additions rather than hoisted: retail genuinely redoes the NULL
  * test and the address computation three times. When `unkC` is NULL the
  * resulting NULL is still dereferenced, exactly as retail does. */
-void Class6B5CC__LocalOffsetToWorldPos(Class6B5CC *self, s32 *dst, s32 *src, s32 unused) {
+void SceneNode__LocalOffsetToWorldPos(SceneNode *self, s32 *dst, s32 *src, s32 unused) {
     u8 buf[0x20];
     s32 *table;
 
@@ -73,14 +73,14 @@ void Class6B5CC__LocalOffsetToWorldPos(Class6B5CC *self, s32 *dst, s32 *src, s32
  * as a 3-entry ratio table in DEGREES: `whole = angle * 45 >> 9`, which is
  * exactly `angle * 360 / 4096`, with `frac` (the denominator RatioToFixed12
  * divides by, below) a constant 1. The same {degrees, 1} shape
- * Class6B5CC__FaceTarget builds and updateRotation consumes.
+ * SceneNode__FaceTarget builds and updateRotation consumes.
  *
  * Statement order is load-bearing and counter-intuitive: `.whole` is
  * written BEFORE `.frac` even though retail EMITS the `frac` store first
  * (the compiler sinks the constant store into the delay slot itself).
- * See docs/match-reports/Class6B5CC__GetRotationDegrees.md. */
-void Class6B5CC__GetRotationDegrees(Class6B5CC *self, WholeFrac_d294 *out) {
-    Class6B5CCSub44 *src;
+ * See docs/match-reports/SceneNode__GetRotationDegrees.md. */
+void SceneNode__GetRotationDegrees(SceneNode *self, WholeFrac_d294 *out) {
+    SceneNodeSub44 *src;
 
     src = self->coord2->param;
     out[0].whole = src->rotate.x * 45 >> 9;
@@ -92,7 +92,7 @@ void Class6B5CC__GetRotationDegrees(Class6B5CC *self, WholeFrac_d294 *out) {
 }
 
 /* Attaches model data to the object and hands it to the GS. `&self->attribute`
- * is the GsDOBJ2 embedded in every Class6B5CC instance (attribute at +0x10,
+ * is the GsDOBJ2 embedded in every SceneNode instance (attribute at +0x10,
  * coord2 at +0x14, tmd at +0x18), and Sony's GsLinkObject4(tmd_base, objp,
  * n) links object `n` of a TMD to it. `model` is a TmdModel
  * (include/TmdModel.h): its `data->objects` is the object table past the
@@ -102,16 +102,16 @@ void Class6B5CC__GetRotationDegrees(Class6B5CC *self, WholeFrac_d294 *out) {
  * Retail RE-READS `self->model` for the call's first argument instead of
  * reusing the `model` register it stored one statement earlier; writing it
  * through the field is what matches. */
-void Class6B5CC__LinkModel(Class6B5CC *self, void *model) {
+void SceneNode__LinkModel(SceneNode *self, void *model) {
     self->model = model;
     self->tmd = (s32)((TmdModel *)model)->object;
     GsLinkObject4(((TmdModel *)self->model)->data->objects, &self->attribute, 0);
 }
 
-/* Clears exactly the two fields Class6B5CC__LinkModel sets: the GsDOBJ2's
+/* Clears exactly the two fields SceneNode__LinkModel sets: the GsDOBJ2's
  * tmd pointer (+0x18) and the source object (+0x20). No GS call -- the
  * pairing with LinkModel is by construction, not by a Sony API. */
-void Class6B5CC__UnlinkModel(Class6B5CC *self) {
+void SceneNode__UnlinkModel(SceneNode *self) {
     self->tmd = 0;
     self->model = 0;
 }
@@ -129,7 +129,7 @@ extern void SubVec3S16(s32 *dest, s16 *from, s16 *to);
  * block rewrites it as this object's own coord.t plus every owner's
  * coord.t, walking the `self->unkC` owner list. Then it takes the target
  * point `arg2` relative to that world translation, rotates the delta into
- * the object's own frame through slotA4 (Class6B5CC__ComposeAndApplyRotation, the
+ * the object's own frame through slotA4 (SceneNode__ComposeAndApplyRotation, the
  * inverse-chain matrix), and probes `TmdModel__RaycastFaces` twice -- Y minus 0x400
  * and, on failure, Y plus 0x400, i.e. -90 and +90 degrees in BAM. On
  * success `arg1` receives `buf28 - buf18` and the function returns 1.
@@ -163,14 +163,14 @@ extern void SubVec3S16(s32 *dest, s16 *from, s16 *to);
  *
  * `(u8 *)node + 0x38 != NULL` is retail's own check, not a typo for
  * `node != NULL`: the disassembly forms the sum first and tests THAT. */
-s32 func_8001E7BC(Class6B5CC *self, s32 *arg1, s32 *arg2) {
+s32 func_8001E7BC(SceneNode *self, s32 *arg1, s32 *arg2) {
     s32 *table;
     s16 buf18[4];
     s16 delta[4];
     s16 buf28[4];
     s16 buf30[4];
-    Class6B5CCSub14 *node;
-    Class6B5CC *cur;
+    SceneNodeSub14 *node;
+    SceneNode *cur;
 
     if (self->model != NULL) {
         if ((s32)self->attribute < 0 && self->parent != NULL) {
@@ -237,7 +237,7 @@ void SubVec3S16(s32 *dest, s16 *from, s16 *to) {
 /* Points the object at `target`: two ratan2 calls over `target`'s world
  * position minus `self`'s own coord translation give yaw and pitch, both
  * converted to degrees, packed into a {pitch, yaw, 0} ratio triple and
- * dispatched to updateRotation (Class6B5CC__UpdateRotation, the rotation setter that writes
+ * dispatched to updateRotation (SceneNode__UpdateRotation, the rotation setter that writes
  * GsCOORD2PARAM.rotate). `arg2 != 0` zeroes the pitch entry; `arg3 == 0`
  * adds 180 degrees to yaw; a non-NULL `arg4` fires a second updateRotation with the
  * caller's own table forwarded verbatim.
@@ -246,8 +246,8 @@ void SubVec3S16(s32 *dest, s16 *from, s16 *to) {
  * target minus self -- and the `arg3 == 0` half-turn is exactly the
  * correction for a caller that already swapped the two at the call site.
  * That is the mechanism behind the argument-swap correlation Entity.h
- * records; see docs/match-reports/Class6B5CC__FaceTarget.md. */
-void Class6B5CC__FaceTarget(Class6B5CC *self, Class6B5CC *target, s32 arg2, s32 arg3, void *arg4) {
+ * records; see docs/match-reports/SceneNode__FaceTarget.md. */
+void SceneNode__FaceTarget(SceneNode *self, SceneNode *target, s32 arg2, s32 arg3, void *arg4) {
     s32 *pos;
     s32 *table;
     s32 dx;
@@ -449,7 +449,7 @@ extern s32 D_8008A838;
  * of the global `D_8008A838` (read old, store new, return old), the shape
  * the project spells `GetSet...` elsewhere. What the global MEANS is not
  * established, so there is no noun to put in the name: its only known
- * reader is Class6B5CC__ClassifyAgainstPlanes (code_d294_b), where `D_8008A838 == 0 || outWord
+ * reader is SceneNode__ClassifyAgainstPlanes (code_d294_b), where `D_8008A838 == 0 || outWord
  * >= 0x201` gates accepting a hit, and its only known writer is
  * class_3bb8c_l.c's ObjM__InitStyleAndWorld, which passes a flag derived from a
  * stage/mode value of 3, 5 or 6. Two call sites, neither naming the thing.

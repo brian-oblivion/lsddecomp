@@ -20,13 +20,13 @@
  *
  * Settled from the bytes (round 87, track 4):
  *  - +0x040 reset: the occupant, Class879C4__SetVariantClut, takes a
- *    variant where the slot (Class6B5CC's) takes none, so the ctor calls it
+ *    variant where the slot (SceneNode's) takes none, so the ctor calls it
  *    through Class879C4ResetFn (a cast, no code). It returns nothing, and
  *    the ctor ends in that call without setting $v0, so the ctor returns
  *    nothing either (ScreenSprite's precedent), where the slot, from
- *    Class6B5CC, returns `void *`. New_Class879C4 does not read it.
+ *    SceneNode, returns `void *`. New_Class879C4 does not read it.
  *  - +0x048 updateScale: the occupant reads `table` as two s16 num/den
- *    ratio pairs (x, y) where Class6B5CC's reads three.
+ *    ratio pairs (x, y) where SceneNode's reads three.
  *
  * The object is 0xA8 bytes (New_Class879C4).
  */

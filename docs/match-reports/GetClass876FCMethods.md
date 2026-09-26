@@ -44,7 +44,7 @@ reasoning this getter's typing depends on.
 **`GetClass876FCMethods` -- NOT renamed, tier C.** A pure singleton vtable getter
 (`return &gClass876FCMethods;`), exactly the same shape as this codebase's other
 unnamed getters this unit calls but does not define --
-`GetClass6B5CCMethods`/`GetActorMethods`/`Get_vtable_Class65650` -- none of which carry a
+`GetSceneNodeMethods`/`GetActorMethods`/`Get_vtable_Class65650` -- none of which carry a
 name either. The getter's own body establishes nothing about the identity
 of `gClass876FCMethods`'s class beyond "it is a sibling of `Class65650`/`BaseObjO`
 built on the same base" (see the file header comment); naming the FUNCTION

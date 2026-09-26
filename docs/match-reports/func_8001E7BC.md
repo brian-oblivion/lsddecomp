@@ -2,13 +2,13 @@
 
 Unit: `code_d294_c` (round 14). By far the largest function in this
 round's queue (200 asm lines, 0x2D0 bytes / 180 words -- more than 60%
-bigger than the next-largest, `Class6B5CC__FaceTarget` at 110 words). Blocker
+bigger than the next-largest, `SceneNode__FaceTarget` at 110 words). Blocker
 screen clean: no `gp_rel`, no `addiu $at,$at,%lo`, no `mfhi`/`mflo`-
 adjacent-`mult`/`div` hit.
 
 **No C was written or built for this function.** Given the size, the two
 still-uncarved callees it depends on (`TmdModel__RaycastFaces`, `slotA4`'s
-occupant `Class6B5CC__ComposeAndApplyRotation`), and the amount of genuinely new field/struct
+occupant `SceneNode__ComposeAndApplyRotation`), and the amount of genuinely new field/struct
 derivation needed, a full structural read was the higher-value use of
 this session's remaining time over a first, likely-incomplete C attempt.
 This does NOT count against the 30-attempt budget -- the analysis below
@@ -17,7 +17,7 @@ writing C directly instead of re-deriving the shape from scratch.
 
 ## Signature and top-level shape
 
-`s32 func_8001E7BC(Class6B5CCObj *self, void *arg1, void *arg2)`
+`s32 func_8001E7BC(SceneNodeObj *self, void *arg1, void *arg2)`
 (return value is 0 or 1; `arg1`/`arg2` types not yet pinned down --
 `arg2` is read as a 3-entry `u16`-ish table, `arg1` is forwarded whole
 into `SubVec3S16`'s own `dest` parameter, already `s32*` per that
@@ -29,7 +29,7 @@ if (self->unk10 < 0) {
     <accumulate self's own "attached node" list into self->unk14->unk38>
 }
 <compute a 3-entry s16 delta between arg2 and self->unk14->unk38 (or {0,0,0} if self->unkC==0)>
-self->methods->slotA4(self, 0, /* &sp+0x18-ish scratch */, /* &delta */, 1);  /* 5 args, occupant Class6B5CC__ComposeAndApplyRotation, code_d294_b, out of scope */
+self->methods->slotA4(self, 0, /* &sp+0x18-ish scratch */, /* &delta */, 1);  /* 5 args, occupant SceneNode__ComposeAndApplyRotation, code_d294_b, out of scope */
 if (!TmdModel__RaycastFaces(self->unk20, &scratch1, &scratch2, 0, &scratch3, delta_minus_1024)) {
     if (!TmdModel__RaycastFaces(self->unk20, &scratch1, &scratch2, 0, &scratch3, delta_plus_1024)) {
         return 0;
@@ -42,9 +42,9 @@ return 1;
 ## New field/struct knowledge NOT yet committed (needs verification against
 ## real C before adding to `include/code_d294.h`)
 
-- **`Class6B5CCObj` gains (at least) THREE new fields**, all read directly
+- **`SceneNodeObj` gains (at least) THREE new fields**, all read directly
   off `self` (not through `unk14`):
-  - `+0x20`: ALREADY typed `void *unk20` (round 12, `Class6B5CC__ReadUnk20Data`) --
+  - `+0x20`: ALREADY typed `void *unk20` (round 12, `SceneNode__ReadUnk20Data`) --
     this function is a SECOND confirming use, null-checked at entry (a
     `return 0` guard) and later passed as `TmdModel__RaycastFaces`'s own first
     argument. No retype needed, just a second confirmed non-NULL-checked
@@ -53,11 +53,11 @@ return 1;
     not `u32`) -- gates the entire "accumulate list into `unk38`" block
     (only runs when `< 0`).
   - `+0xC`: **CONFLICTS with the ALREADY-TYPED `UnkOwner_d294 *unkC`**
-    (an owner back-reference, established by `Class6B5CC__AttachToParent`/
-    `Class6B5CC__DetachFromParent` in `code_d294.c`). This function's OWN use --
+    (an owner back-reference, established by `SceneNode__AttachToParent`/
+    `SceneNode__DetachFromParent` in `code_d294.c`). This function's OWN use --
     null-checked, then (when non-null) `self->unk14` is read and treated
     as the base for a `+0x38` sub-table, exactly the SAME
-    `Class6B5CCSub14::unk38` field `Class6B5CC__LocalOffsetToWorldPos`/`Class6B5CC__FaceTarget`
+    `SceneNodeSub14::unk38` field `SceneNode__LocalOffsetToWorldPos`/`SceneNode__FaceTarget`
     already established this round -- is CONSISTENT with `unkC` staying
     a simple null/non-null gate (its own POINTER value is never
     dereferenced here, only tested against 0), so this is likely NOT a
@@ -72,11 +72,11 @@ return 1;
   of its own) OR `UnkOwner_d294` itself needs a `+0xC` "next" field added.
   Each list node also has its own `+0x14` pointing to a Vec3-shaped
   structure (`+0x18`/`+0x1C`/`+0x20`, read via `node->unk14->unk18` etc.)
-  -- the SAME `EntityPos`/`Class6B5CCSub14`-family "position vector
+  -- the SAME `EntityPos`/`SceneNodeSub14`-family "position vector
   pointer at `+0x14`" convention seen throughout this project. This
   needs its own type, not yet named.
-- **`Class6B5CCSub14::unk38`'s element type needs reconciling across TWO
-  different access widths.** `Class6B5CC__LocalOffsetToWorldPos` (matched, this round) reads
+- **`SceneNodeSub14::unk38`'s element type needs reconciling across TWO
+  different access widths.** `SceneNode__LocalOffsetToWorldPos` (matched, this round) reads
   and writes it as `s32[3]` (full-word arithmetic, `dst[i] += table[i]`).
   THIS function reads the SAME field via `lhu` (unsigned HALFWORD) at the
   same stride-4 offsets (0, 4, 8) -- i.e., only the LOW 16 bits of each
@@ -104,9 +104,9 @@ return 1;
   BAM offset), tried in sequence until one returns nonzero; reads as a
   "does this candidate angle lead to something valid" test, but that's
   inference, not confirmed.
-- **New `Class6B5CCMethods` slot needed: `+0xA4`** (occupant
-  `Class6B5CC__ComposeAndApplyRotation`, `code_d294_b`, confirmed via `tools/classtable.py
-  gClass6B5CCMethods`, out of this carve's scope) -- called with 5 arguments
+- **New `SceneNodeMethods` slot needed: `+0xA4`** (occupant
+  `SceneNode__ComposeAndApplyRotation`, `code_d294_b`, confirmed via `tools/classtable.py
+  gSceneNodeMethods`, out of this carve's scope) -- called with 5 arguments
   (`self`, `0`, two scratch pointers, `1`), signature not yet pinned down
   precisely enough to commit.
 
@@ -119,7 +119,7 @@ return 1;
   as a single repeated statement with only the 6th argument's
   construction differing (`-0x400` vs `+0x400` on one axis), similar in
   spirit to this unit's other "manually unrolled 3x/2x repetition"
-  functions this round (`Class6B5CC__GetRotationDegrees`, `Class6B5CC__LocalOffsetToWorldPos`).
+  functions this round (`SceneNode__GetRotationDegrees`, `SceneNode__LocalOffsetToWorldPos`).
 - The delta-table construction before `slotA4` (`out[i] = arg2[i] -
   table[i]`, `u16` reads, `s16` stores) is structurally identical to
   `SubVec3S16`'s OWN body (already matched, this unit) -- worth
@@ -177,8 +177,8 @@ backup-copy + loop, not the whole block** -- `if ((u8 *)self->unk14 + 0x38
 
 **Closed: the ternary `(self->unkC != 0) ? self->unk14->unk38 : NULL`
 (the "backup" pointer, ALREADY a committed `s32 unk38[3]` field on
-`Class6B5CCSub14` per this unit's own header, established independently
-by `Class6B5CC__LocalOffsetToWorldPos`/`Class6B5CC__FaceTarget` this same round) is recomputed FRESH,
+`SceneNodeSub14` per this unit's own header, established independently
+by `SceneNode__LocalOffsetToWorldPos`/`SceneNode__FaceTarget` this same round) is recomputed FRESH,
 inline, at FOUR separate points**: once per axis (x/y/z) inside the
 accumulation loop, plus once more after the loop for the final delta
 computation -- never cached in a named local, each occurrence re-testing
@@ -215,20 +215,20 @@ live, not dead code).
 
 **Open, and the reason a build was still not attempted: `UnkOwner_d294::
 unk14` needs to be usable as a POINTER here** (`node->unk14->unk18/
-unk1C/unk20`, the same "position" shape as `Class6B5CCObj::unk14`'s own
-`Class6B5CCSub14 *`), but it is currently typed `s32` in
-`include/code_d294.h`, established by `Class6B5CC__AttachToParent` (already matched,
+unk1C/unk20`, the same "position" shape as `SceneNodeObj::unk14`'s own
+`SceneNodeSub14 *`), but it is currently typed `s32` in
+`include/code_d294.h`, established by `SceneNode__AttachToParent` (already matched,
 this unit) which only ever COPIES the raw value
 (`self->unk14->unk48 = owner->unk14;`, both currently `s32`) and never
 dereferences it. A straight `lw`/`sw` word copy is emitted identically
 whether the field is `s32` or a pointer, so retyping it to
-`Class6B5CCSub14 *` (matching the exact field-access shape this function
-needs) is very likely SAFE for `Class6B5CC__AttachToParent`'s existing match -- but
+`SceneNodeSub14 *` (matching the exact field-access shape this function
+needs) is very likely SAFE for `SceneNode__AttachToParent`'s existing match -- but
 "very likely safe" is exactly the kind of shared-struct-edit CLAUDE.md
 says to verify with the full oracle before trusting, not assume. This is
 the concrete next step for whoever attempts the C: retype
 `UnkOwner_d294::unk14`, immediately re-run `./build-and-verify.sh` to
-confirm `Class6B5CC__AttachToParent` (and anything else touching that field) is
+confirm `SceneNode__AttachToParent` (and anything else touching that field) is
 unaffected, THEN write this function's body using the four-buffer stack
 layout and the four-times-repeated ternary above.
 
@@ -249,8 +249,8 @@ before real C-writing can start, not more open-ended derivation.
 ## the retype done and verified
 
 Went ahead with the retype flagged above: `UnkOwner_d294::unk14` changed
-from `s32` to `Class6B5CCSub14 *` in `include/code_d294.h`. **Verified
-safe immediately** -- `Class6B5CC__AttachToParent` (`src/code_d294.c`, a DIFFERENT
+from `s32` to `SceneNodeSub14 *` in `include/code_d294.h`. **Verified
+safe immediately** -- `SceneNode__AttachToParent` (`src/code_d294.c`, a DIFFERENT
 unit this runner does not own for editing, but the shared header is
 owned by this runner this round) still compiles (one new warning,
 "assignment makes integer from pointer without a cast", not an error --
@@ -260,7 +260,7 @@ units) and the whole-image SHA1 stayed green. This is now committed.
 Wrote the full function body per the structural analysis above and
 built it. **First result: 19/180, and the ENTIRE `self->unk10 < 0`
 guarded block (backup copy + accumulation loop) was silently eliminated
-by the compiler** -- traced to `Class6B5CCObj::unk10` already being
+by the compiler** -- traced to `SceneNodeObj::unk10` already being
 typed `u32` (a packed bit-flags word, established by other already-
 matched functions this project round using it that way) in the shared
 header. Writing `self->unk10 < 0` against an unsigned field is a
@@ -321,7 +321,7 @@ outside range)** -- honest, matching the report's own history.
 
 The loop backs up `self->unk14->unk38[i] += cur->unk14->{unk18,unk1C,unk20}`
 for each axis, gated by `self->unkC != 0` (a "backup owner" ternary this
-unit's `Class6B5CC__LocalOffsetToWorldPos`/`Class6B5CC__FaceTarget` also use, both matched). Retail's
+unit's `SceneNode__LocalOffsetToWorldPos`/`SceneNode__FaceTarget` also use, both matched). Retail's
 disassembly shows the ternary's `lui`/reload-and-branch sequence computed
 **TWICE per axis** -- once for the STORE address, once for the LOAD value --
 with **NOTHING cached across them**. My first attempt cached it in a named
@@ -358,8 +358,8 @@ writing it out literally, all measured, none matched retail's own timing:**
 **The ONLY shape that reproduced retail's double computation is writing the
 ternary expression out twice, verbatim, at the SOURCE level.** This project
 already has one documented precedent for "write it twice, don't cache it"
-(round 19's own note on this same function, and `Class6B5CC__FaceTarget`/
-`Class6B5CC__LocalOffsetToWorldPos`'s per-axis-but-not-per-read/write reassignment) -- this
+(round 19's own note on this same function, and `SceneNode__FaceTarget`/
+`SceneNode__LocalOffsetToWorldPos`'s per-axis-but-not-per-read/write reassignment) -- this
 round establishes that the "twice" can mean twice **per statement**, not
 just once per axis, when the ternary is used as both an l-value and an
 r-value target within one update.
@@ -433,7 +433,7 @@ so a search will be slow) or a head-level read.
 ### Header/struct state
 
 No NEW struct knowledge this round -- everything used
-(`Class6B5CCObj::unk20/unk10/unkC/unk14`, `Class6B5CCSub14::unk18/1C/20/38`,
+(`SceneNodeObj::unk20/unk10/unkC/unk14`, `SceneNodeSub14::unk18/1C/20/38`,
 `UnkOwner_d294::next/unk14`) was already committed by round 19 or earlier
 in this unit. This round is pure codegen-shape derivation.
 
@@ -505,7 +505,7 @@ re-reading the new diff: the first real difference is still at vram
 both still appear at their same addresses. The permuter's search, run to
 completion (56437 iterations), never found anything touching any of the
 three -- consistent with round 41's own finding on a DIFFERENT function in
-this unit's neighborhood (`Class6B5CC__NotifyTaggedParents`) that a pure register-identity
+this unit's neighborhood (`SceneNode__NotifyTaggedParents`) that a pure register-identity
 residue lies outside what a bounded source-mutation search can reach.
 
 **Verdict: the search closed one real, independent lever (statement
@@ -533,13 +533,13 @@ the eventual lever will take.
 extern s32 TmdModel__RaycastFaces(void *arg0, void *arg1, void *arg2, s32 arg3, void *arg4, s16 *arg5);
 extern void SubVec3S16(s32 *dest, s16 *b, s16 *a);
 
-s32 func_8001E7BC(Class6B5CCObj *self, s32 *arg1, s32 *arg2) {
+s32 func_8001E7BC(SceneNodeObj *self, s32 *arg1, s32 *arg2) {
     s32 *table;
     s16 buf18[4];
     s16 delta[4];
     s16 buf28[4];
     s16 buf30[4];
-    Class6B5CCSub14 *node;
+    SceneNodeSub14 *node;
     UnkOwner_d294 *cur;
 
     if (self->unk20 == NULL) {
@@ -594,16 +594,16 @@ s32 func_8001E7BC(Class6B5CCObj *self, s32 *arg1, s32 *arg2) {
 
 - **KEPT as `func_8001E7BC`. Tier C.** What IS known, written down so the
   next reader does not re-derive it:
-  - It is a **method of Class6B5CC** (first parameter `Class6B5CCObj *`,
+  - It is a **method of SceneNode** (first parameter `SceneNodeObj *`,
     dispatches `slotA4`), and it is the function that MAINTAINS the world
     position: its first block rewrites `unk14->unk38` (== Sony's
     `GsCOORDINATE2.workm.t`, see the PSY-Q IDENTIFICATION note in
     include/code_d294.h) as `coord.t` plus every owner's `coord.t`, walking
-    the `self->unkC` list. `Class6B5CC__LocalOffsetToWorldPos` and
-    `Class6B5CC__FaceTarget` are both consumers of that field.
+    the `self->unkC` list. `SceneNode__LocalOffsetToWorldPos` and
+    `SceneNode__FaceTarget` are both consumers of that field.
   - The rest computes the target point `arg2` relative to that world
     position, rotates the delta into the object's own frame via `slotA4`
-    (Class6B5CC__ComposeAndApplyRotation, the inverse-chain matrix: `slot84` with the NEGATED
+    (SceneNode__ComposeAndApplyRotation, the inverse-chain matrix: `slot84` with the NEGATED
     angle flag, composed down the owner list with `MulMatrix2`), then calls
     `TmdModel__RaycastFaces` twice -- once with the Y component minus 0x400 and, on
     failure, once plus 0x400, i.e. +/- 90 degrees -- and finally returns
@@ -613,7 +613,7 @@ s32 func_8001E7BC(Class6B5CCObj *self, s32 *arg1, s32 *arg2) {
     half; without it, any verb for this function ("probe", "trace", "clip",
     "aim") is a guess about what the two +/-90-degree attempts are FOR. The
     first half alone would justify something like
-    `Class6B5CC__UpdateWorldPos`, but that would name a third of the body
+    `SceneNode__UpdateWorldPos`, but that would name a third of the body
     and mislead about the return value, which is the second half's result.
   - Reopening it is cheap once `TmdModel__RaycastFaces` is identified (track 2).
 - Naming touched nothing in this function's preserved `#if 0` body except
@@ -701,8 +701,8 @@ displacement. Round 44's two properties are not in tension at all; they were
 only in tension while the axis was expressed as an index.
 
 `Vec3_d294` is the unit's own committed `{s32 x, y, z}` (include/code_d294.h),
-and `Class6B5CCSub14::unk38` is deliberately `s32 unk38[3]` rather than a
-`Vec3_d294` because `Class6B5CC__LocalOffsetToWorldPos` needs to index it.
+and `SceneNodeSub14::unk38` is deliberately `s32 unk38[3]` rather than a
+`Vec3_d294` because `SceneNode__LocalOffsetToWorldPos` needs to index it.
 Nothing about the header changed here -- the CAST is local to this function,
 which is exactly the split that header note anticipates.
 
@@ -741,7 +741,7 @@ reference it -- enough to change where it sorts in `global_alloc` and which
 hard register it is offered.
 
 The header already says these three words ARE a vector ("copied wholesale
-into `Class6B5CCSub14::unk18/unk1C/unk20`"), so the struct copy is also the
+into `SceneNodeSub14::unk18/unk1C/unk20`"), so the struct copy is also the
 more faithful source shape, not a trick.
 
 ### Negatives measured this round (all at the 172 base unless noted)

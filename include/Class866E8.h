@@ -45,7 +45,7 @@
  * DispatchLinkCommand.
  *
  * +0x088: Class866E8__OnElementEvent takes (self, command, elem); the slot
- * keeps Class6B5CC's (self, event). Its four callers (Finalize,
+ * keeps SceneNode's (self, event). Its four callers (Finalize,
  * ResetAllElements, ApplyRateEntries, OnNotifyTag1) pass (self, 6 or 7,
  * elem, index) through Class866E8OnElementEventFn below (no code).
  * +0x0D4 getCurrentCellKey and +0x0F8 buildRateEntries keep their CALLERS'
@@ -221,7 +221,7 @@ struct Class866E8Methods {
     /* +0x0D8 */ void (*slotD8)(void); /* func_8004B324, empty; never called */
     /* +0x0DC */ void (*setGridSpan)(Class866E8 *self, s32 span); /* Class866E8__SetGridSpan */
     /* +0x0E0 */ void (*setConfig)(Class866E8 *self, Unk68Struct *config); /* Class866E8__SetConfig */
-    /* +0x0E4 */ s32 (*setTargetAndBuildRates)(Class866E8 *self, void *outPos, Class6B5CC *target,
+    /* +0x0E4 */ s32 (*setTargetAndBuildRates)(Class866E8 *self, void *outPos, SceneNode *target,
                                                Descriptor10 *cell); /* Class866E8__SetTargetAndBuildRates */
     /* +0x0E8 */ s32 (*computeCellOffsets)(Class866E8 *self, void *outPos,
                                            void *cell); /* Class866E8__ComputeCellOffsets */
@@ -246,7 +246,7 @@ struct Class866E8Methods {
     /* +0x120 */ s32 (*findElemIndexByUnk32)(Class866E8 *self, s32 key); /* Class866E8__FindElemIndexByUnk32 */
     /* +0x124 */ s32 (*findElemIndexByUnk30)(Class866E8 *self, s32 key); /* Class866E8__FindElemIndexByUnk30: an index or -1 */
     /* +0x128 */ void (*refreshFootprint)(Class866E8 *self); /* Class866E8__RefreshFootprint */
-    /* +0x12C */ void (*applyToSenderFootprint)(Class866E8 *self, Class6B5CC *sender,
+    /* +0x12C */ void (*applyToSenderFootprint)(Class866E8 *self, SceneNode *sender,
                                                 s32 command); /* Class866E8__ApplyToSenderFootprint */
     /* +0x130 */ void *(*getUnk1CC)(Class866E8 *self);        /* Class866E8__GetUnk1CC */
     /* +0x134 */ void (*setBounds)(Class866E8 *self, Bounds866E8_3bb8c_b *bounds); /* Class866E8__SetBounds */
@@ -262,7 +262,7 @@ struct Class866E8 {
     /* +0x060 */ Class866E8ValueFn valueFn; /* setCallback */
     /* +0x064 */ void *valueFnCtx;          /* setCallback */
     /* +0x068 */ Unk68Struct *config;       /* setConfig; NULL after Reset */
-    /* +0x06C */ Class6B5CC *target; /* setTargetAndBuildRates (DreamSys__SpawnAtLink passes the DreamSys); its coord2 is the tracked position */
+    /* +0x06C */ SceneNode *target; /* setTargetAndBuildRates (DreamSys__SpawnAtLink passes the DreamSys); its coord2 is the tracked position */
     /* +0x070 */ s32 enabled;        /* enable/disable; gates UpdateIfEnabled */
     /* +0x074 */ s32 gridSpan;       /* setGridSpan: gDefaultGridSpan = 0xA000 */
     /* +0x078 */ s16 gridHalfCells;  /* gridSpan >> 12 = 10 */
@@ -317,16 +317,16 @@ void Class866E8__SetChildParams(Class866E8 *self, s32 count, s32 dirs, s32 color
 void Class866E8__SetCallback(Class866E8 *self, Class866E8ValueFn fn, void *ctx);
 void Class866E8__SetAcceptedTags(Class866E8 *self, s32 *tags);
 void Class866E8__ForwardAcceptedCommand(Class866E8 *self, void *sender, s32 command);
-void Class866E8__ApplyToSenderFootprint(Class866E8 *self, Class6B5CC *sender, s32 command);
+void Class866E8__ApplyToSenderFootprint(Class866E8 *self, SceneNode *sender, s32 command);
 void Class866E8__SetFootprintFromCell(Class866E8 *self, Descriptor10Ext *desc, s32 span);
 void Class866E8__SetFootprintRect(Class866E8 *self, Descriptor10Ext *desc, s32 span);
-void Class866E8__DispatchToRectCells(Class866E8 *self, Class6B5CC *sender, s32 command);
-void NotifyGridCell(struct Class86AA0 *cell, Class6B5CC *sender, s32 command);
+void Class866E8__DispatchToRectCells(Class866E8 *self, SceneNode *sender, s32 command);
+void NotifyGridCell(struct Class86AA0 *cell, SceneNode *sender, s32 command);
 Descriptor10 *Class866E8__GetCurrentCellKey(Class866E8 *self);
 void func_8004B324(void);
 void Class866E8__SetGridSpan(Class866E8 *self, s32 span);
 void Class866E8__SetConfig(Class866E8 *self, Unk68Struct *config);
-s32 Class866E8__SetTargetAndBuildRates(Class866E8 *self, void *outPos, Class6B5CC *target,
+s32 Class866E8__SetTargetAndBuildRates(Class866E8 *self, void *outPos, SceneNode *target,
                                        Descriptor10 *cell);
 s32 Class866E8__ComputeCellOffsets(Class866E8 *self, void *outPos, void *cell);
 s32 ComputeCellWorldOffsets(s32 *outPos, s32 *outBuf, Unk68Struct *config, Unk54Struct *origin,

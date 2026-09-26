@@ -251,10 +251,10 @@ The objects this ctor builds with `New_Class86AA0()` are typed as what they
 are: `UnkSlotEntry_3ac78::cellParent` is `struct Class86AA0 *` and the
 cell-building local `obj` is `Class86AA0 *` (include/Class86AA0.h), and the
 local `extern GenericObject *New_Class86AA0(void)` is gone. The generic
-slots resolve to Class6B5CC's: `slot4C` is `attachToParent` (the cellParent
+slots resolve to SceneNode's: `slot4C` is `attachToParent` (the cellParent
 attached to the Class866E8 at `origin`, each cell attached to the
 cellParent at `buf`), `slot70` is `setLightMode(obj, 1)`, and `unk10` is
-`attribute`. Casts at the two attachToParent calls (`(Class6B5CC *)`,
+`attribute`. Casts at the two attachToParent calls (`(SceneNode *)`,
 `(Vec3_d294 *)`) emit no code; image byte-identical. `cells` is still
 declared `Class866E8 **` although it holds these same Class86AA0 objects:
 that field, NotifyGridCell's parameter and Class866E8__DispatchToRectCells

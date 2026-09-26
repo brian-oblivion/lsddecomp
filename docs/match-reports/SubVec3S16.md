@@ -30,7 +30,7 @@ First-try match, no residue. Parameter naming follows the register order
 (`a0`=`dest`, `a1`=`b`, subtracted; `a2`=`a`, subtracted from) rather than
 guessing semantic names, since nothing here indicates what `a`/`b`
 represent (possibly a target-minus-current delta for the same kind of
-16-bit angle triple `Class6B5CCSub44::unk10/12/14` holds, given the
+16-bit angle triple `SceneNodeSub44::unk10/12/14` holds, given the
 matching element count and halfword source width, but that is a guess,
 not evidence -- left unstated).
 

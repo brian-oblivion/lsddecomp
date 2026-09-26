@@ -25,8 +25,8 @@
  * chain. One class derives from it: TextRow (0x11144, include/TextRow.h),
  * which expands these macros.
  *
- * reset (+0x040) is overridden with a parameter list Class6B5CC's slot does
- * not have: CharSprite__Reset takes the cell. The slot keeps Class6B5CC's
+ * reset (+0x040) is overridden with a parameter list SceneNode's slot does
+ * not have: CharSprite__Reset takes the cell. The slot keeps SceneNode's
  * type; the ctor, which passes the cell, casts to CharSpriteResetFn (no
  * code).
  *

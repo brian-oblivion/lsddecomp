@@ -42,10 +42,10 @@ void *New_BgLayer(s32 arg0, s32 arg1) {
 
 ## Naming
 
-- **New_BgLayer**, tier B. Allocator for D_8006F2C4, a Class6B5CC subclass whose own fields (bgAttribute, x/y/w/h, scrollx/scrolly, scalex/scaley, a 20.12 fixed-point rotate word) are GsBG's own layout.
+- **New_BgLayer**, tier B. Allocator for D_8006F2C4, a SceneNode subclass whose own fields (bgAttribute, x/y/w/h, scrollx/scrolly, scalex/scaley, a 20.12 fixed-point rotate word) are GsBG's own layout.
 
 ## Track 4 (2026-09-26, round 88, alpha)
 
-Class unified in `include/BgLayer.h`. Returns `BgLayer *` and takes `(struct Map44294 *src, s32 mode)` (was `void *` / `s32, s32`); the ctor is called through the typed `GetBgLayerMethods()->ctor` (was the unit-local unprototyped `Ctor33808` view). The slot keeps Class6B5CC's `void *` return; the value is ignored, as before. The local views of it in include/code_2c054.h are gone. Byte-identical.
+Class unified in `include/BgLayer.h`. Returns `BgLayer *` and takes `(struct Map44294 *src, s32 mode)` (was `void *` / `s32, s32`); the ctor is called through the typed `GetBgLayerMethods()->ctor` (was the unit-local unprototyped `Ctor33808` view). The slot keeps SceneNode's `void *` return; the value is ignored, as before. The local views of it in include/code_2c054.h are gone. Byte-identical.
 
 Later the same round (alpha, second class): TileMap unified too (`include/TileMap.h`, same round): `src` is `TileMap *` (was `struct Map44294 *`). Byte-identical.

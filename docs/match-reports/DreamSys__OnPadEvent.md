@@ -134,8 +134,8 @@ matching `default`, not a body/order defect. Add one past the table's known
 ## Track 4 (2026-09-26, round 88)
 
 Renamed from `DreamSys__ApplyLinkCommand`. It is DREAMSYS_METHODS +0x094,
-the slot Class6B5CC__OnNotify routes a Pad (class 2) sender's events to
-(`onPadEvent`, include/Class6B5CC.h); gActorMethods leaves it at the empty
+the slot SceneNode__OnNotify routes a Pad (class 2) sender's events to
+(`onPadEvent`, include/SceneNode.h); gActorMethods leaves it at the empty
 func_8001D6A4. The body is exactly a pad handler: `mode` is the event code,
 mapped to move/turn/look commands. Nothing in it touches a link;
 Entity__MoodCue123 drives the player the same way, sending (0, 2) and

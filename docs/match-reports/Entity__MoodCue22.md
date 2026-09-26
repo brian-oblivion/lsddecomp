@@ -7,7 +7,7 @@ whole-image build verified byte-exact)
 
 ## What it does
 
-`(Entity *this) -> void`. A one-line wrapper: `Class6B5CC__FaceTarget(this,
+`(Entity *this) -> void`. A one-line wrapper: `SceneNode__FaceTarget(this,
 this->unk94, 1, 0, 0);` -- the exact same call shape `Entity__MoodCue01`/
 `Entity__MoodCue12`/`Entity__MoodCue11` (all in `Entity_b.c`) already established.
 
@@ -15,7 +15,7 @@ this->unk94, 1, 0, 0);` -- the exact same call shape `Entity__MoodCue01`/
 
 ```c
 void Entity__MoodCue22(Entity *this) {
-    Class6B5CC__FaceTarget(this, this->unk94, 1, 0, 0);
+    SceneNode__FaceTarget(this, this->unk94, 1, 0, 0);
 }
 ```
 

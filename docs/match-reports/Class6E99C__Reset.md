@@ -54,7 +54,7 @@ this one function alone.
 ## Track 4 (2026-09-26, round 87, echo)
 
 Renamed from `Class6E99C__FinishConstruct` to `Class6E99C__Reset`: it is the
-override of the inherited +0x040 slot, which Class6B5CC names `reset` and
+override of the inherited +0x040 slot, which SceneNode names `reset` and
 whose BoxFill occupant is `BoxFill__Reset` (`tools/classtable.py D_8006E99C
 --vs gBoxFillMethods`: +0x040 OVERRIDDEN, `BoxFill__Reset` ->
 this function). FINISHING-PLAN track 4 step 6 names an override for its

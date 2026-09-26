@@ -47,7 +47,7 @@ void Actor__func_56f5c(s32 arg0, BaseObjO *self, s32 arg2, s32 arg3) {
 ## New vtable slot
 
 `tools/classtable.py gClass876FCMethods` shows `+0x080` occupied by
-`Class6B5CC__GetSetUnk10Flag8` (a `BasicClass`-range function outside this unit, same
+`SceneNode__GetSetUnk10Flag8` (a `BasicClass`-range function outside this unit, same
 inherited-base pattern as the sibling occupied slots already documented on
 `BaseObjOMethods`). That offset previously sat inside this unit's own
 `pad44[0x8C - 0x44]` gap. Split it additively into
@@ -78,7 +78,7 @@ not a finding. Kept the tier-C `Class__func_xxxxx` form.
 
 ## Track 4 (2026-09-25, round 82, delta)
 
-Renamed from `BaseObjO__func_56f5c`. Prefix only: the second parameter is an Actor (it calls getSetUnk10Flag8, +0x080, through its table; the s32 result is cast to the void * SetTargetOffset takes). Still tier C. The class (id 0x34, table `gActorMethods`, formerly `D_800878D4`) is unified as `Actor` in `include/Actor.h`: a Class6B5CC subclass and the base of Class65650/Entity, DreamSys and Class876FC. Any source block above is the pre-unification spelling; the live body in `src/class_3bb8c_o.c` takes the unified types and field/slot names, byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).
+Renamed from `BaseObjO__func_56f5c`. Prefix only: the second parameter is an Actor (it calls getSetUnk10Flag8, +0x080, through its table; the s32 result is cast to the void * SetTargetOffset takes). Still tier C. The class (id 0x34, table `gActorMethods`, formerly `D_800878D4`) is unified as `Actor` in `include/Actor.h`: a SceneNode subclass and the base of Class65650/Entity, DreamSys and Class876FC. Any source block above is the pre-unification spelling; the live body in `src/class_3bb8c_o.c` takes the unified types and field/slot names, byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).
 
 ## Track 4b (2026-09-25, round 85)
 

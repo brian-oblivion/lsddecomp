@@ -31,7 +31,7 @@ s32 DreamSys__TickStaircaseCase3(DreamSys *this)
 		if (this->unk_0x914 >= 0x13)
 			return 1;
 		if ((u32)(this->unk_0x914 - 6) < 2 || (u32)(this->unk_0x914 - 0xF) < 2) {
-			this->vt->Class6B5CC__UpdateRotation(this, 0, &ROTATION_YAW_MINUS45);
+			this->vt->SceneNode__UpdateRotation(this, 0, &ROTATION_YAW_MINUS45);
 		}
 		flag = (u32)this->unk_0x914 < 9;
 	}
@@ -47,7 +47,7 @@ s32 DreamSys__TickStaircaseCase3(DreamSys *this)
 | arm | band guard | in-band windows | in-band action | shared "flag" test |
 | --- | --- | --- | --- | --- |
 | `unk_0xAC != 4` | `< 0x71` | `0x1E..0x2C`, `0x52..0x60` | `unk_0xA4 = 1` | `(unk_0x914-0x1E) < 0x34` |
-| `unk_0xAC == 4` | `< 0x13` | `6..7`, `0xF..0x10` | `vt->Class6B5CC__UpdateRotation(this,0,&ROTATION_YAW_MINUS45)` | `unk_0x914 < 9` |
+| `unk_0xAC == 4` | `< 0x13` | `6..7`, `0xF..0x10` | `vt->SceneNode__UpdateRotation(this,0,&ROTATION_YAW_MINUS45)` | `unk_0x914 < 9` |
 
 Matched first attempt, with the `DreamSys__TimerTick`/`DreamSys__TickStaircaseCase0`
 guard-clause lever (invert the band test, early `return 1;`, let the
@@ -64,7 +64,7 @@ additional coaxing.
   as `DreamSys__TickStaircaseCase2`'s `STAIRCASE_OFFSET_2` and `DreamSys__TickStaircaseCase0`'s `STAIRCASE_OFFSET_0`,
   passed as `DreamSys__ApplyRelativeOffset`'s `a` argument.
 - **`ROTATION_YAW_MINUS45`**, another opaque forwarded-pointer constant for
-  `vt->Class6B5CC__UpdateRotation`'s `arg2`, same shape as the already-known
+  `vt->SceneNode__UpdateRotation`'s `arg2`, same shape as the already-known
   `ROTATION_YAW_PLUS45`.
 - **A single flag value can be computed from TWO DIFFERENT numeric
   expressions depending on which arm set it** (`(unk_0x914-0x1E) < 0x34` in

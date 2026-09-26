@@ -59,7 +59,7 @@ shows the same two-`div`-block disassembly pattern.
   names `whole`/`frac` on `WholeFrac_d294` (include/code_d294.h) describe a
   mixed number; this body divides the first field BY the second, so they are
   numerator and denominator. Every producer in this unit
-  (`Class6B5CC__GetRotationDegrees`, `Class6B5CC__FaceTarget`) writes a
+  (`SceneNode__GetRotationDegrees`, `SceneNode__FaceTarget`) writes a
   degrees value and a constant 1, which is consistent with both readings and
   is why the weaker one survived. Renaming the type and its two fields is
   left to track 4: `WholeFrac_d294` is also used by `src/DreamSys.c` and

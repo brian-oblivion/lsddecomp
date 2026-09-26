@@ -9,7 +9,7 @@ drift. Fresh ground (carved revision 18, no prior report).
 
 ## What it does
 
-Class6B5CC's constructor through GetClass6B5CCMethods(), then installs this class's table (GetBgLayerMethods) and calls slot +0x040 with (self, arg1, arg2). GCC forwards the stored table pointer, so `self->methods->reset` compiles to a use of the getter's return value, as retail has it. Slot +0x040 is Class6B5CC's `reset(self)` in the unified macro; this class's occupant takes two more arguments, so the call casts rather than retyping the shared slot.
+SceneNode's constructor through GetSceneNodeMethods(), then installs this class's table (GetBgLayerMethods) and calls slot +0x040 with (self, arg1, arg2). GCC forwards the stored table pointer, so `self->methods->reset` compiles to a use of the getter's return value, as retail has it. Slot +0x040 is SceneNode's `reset(self)` in the unified macro; this class's occupant takes two more arguments, so the call casts rather than retyping the shared slot.
 
 Table slot (`tools/classtable.py`): D_8006F2C4 +0x008 (constructor).
 
@@ -20,7 +20,7 @@ The unit-local view `DataSrc33808` (a Class6D430 subclass built with the unified
 fields +0x2C..+0x38) and `CountedBuf33808` sit at the top of `src/code_33808.c`.
 
 ```c
-/* A three-byte vector, and the D_8006F2C4 object (a Class6B5CC subclass). */
+/* A three-byte vector, and the D_8006F2C4 object (a SceneNode subclass). */
 typedef struct Vec3S8 {
     s8 x;
     s8 y;
@@ -28,15 +28,15 @@ typedef struct Vec3S8 {
 } Vec3S8;
 
 typedef struct Obj6F2C4 {
-    CLASS6B5CC_FIELDS(Class6B5CCMethods);
+    SCENENODE_FIELDS(SceneNodeMethods);
     /* +0x044 */ u8 pad44[0x10];
     /* +0x054 */ Vec3S8 unk54;
 } Obj6F2C4;
 
-/* D_8006F2C4 +0x008: constructor -- Class6B5CC's, then this table, then
+/* D_8006F2C4 +0x008: constructor -- SceneNode's, then this table, then
  * slot +0x040 with the two arguments. */
 void BgLayer__BgLayer(Obj6F2C4 *self, s32 arg1, s32 arg2) {
-    GetClass6B5CCMethods()->ctor((Class6B5CC *)self);
+    GetSceneNodeMethods()->ctor((SceneNode *)self);
     self->methods = GetBgLayerMethods();
     ((void (*)())self->methods->reset)(self, arg1, arg2);
 }
@@ -52,7 +52,7 @@ void BgLayer__BgLayer(Obj6F2C4 *self, s32 arg1, s32 arg2) {
 
 ## Naming
 
-- **BgLayer__BgLayer**, tier B. Constructor: Class6B5CC's ctor, then this table, then Reset with the two arguments.
+- **BgLayer__BgLayer**, tier B. Constructor: SceneNode's ctor, then this table, then Reset with the two arguments.
 
 ## Track 4 (2026-09-26, round 88, alpha)
 

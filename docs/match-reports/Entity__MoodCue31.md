@@ -14,7 +14,7 @@ check against `this->unk80` instead of the usual `slotC4` nudge:
 
 ```c
 void Entity__MoodCue31(Entity *this, EntityMoodHandlerArg *out) {
-    Class6B5CC__FaceTarget(this, this->unk94, 1, 0, 0);
+    SceneNode__FaceTarget(this, this->unk94, 1, 0, 0);
     this->unk94->methods->slot130(this->unk94, 1);
     if ((out->unk4 % 10) < 3) {
         out->unk10 = 0;

@@ -5,7 +5,7 @@ Round 82, runner alpha (fifth slot on code_322b4). Unit `src/code_322b4.c`. Fres
 - **Where:** gSpriteMethods slot +0x044 (updateRotation) (`tools/classtable.py`).
 - **What:** Takes table[2] (the WholeFrac_d294 z entry) as a quotient, angle = ((whole / frac) << 12) + ((whole % frac) << 12) / frac -- degrees in 4096ths -- and sets or adds it to sprite.rotate (+0x084). First build.
 - **Result:** byte-exact; 39/39 words, 0 insertions / 0 deletions, whole-image SHA1 green (`./build-and-verify.sh` OK). First build.
-- **Types:** typed through the UNIFIED `Sprite` and Class6B5CC.h's `WholeFrac_d294`, unchanged; matches the Sprite.h prototype.
+- **Types:** typed through the UNIFIED `Sprite` and SceneNode.h's `WholeFrac_d294`, unchanged; matches the Sprite.h prototype.
 
 ## Source
 

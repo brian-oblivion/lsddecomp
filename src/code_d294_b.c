@@ -1,37 +1,37 @@
-/* code_d294_b -- the second carve of the Class6B5CC segment (see
+/* code_d294_b -- the second carve of the SceneNode segment (see
  * include/code_d294.h's own banner and code_d294_c.c's file header for the
- * class-identity derivation: Class6B5CC is this game's POSITIONED 3D OBJECT
+ * class-identity derivation: SceneNode is this game's POSITIONED 3D OBJECT
  * base class, MEASURED onto Psy-Q's GsDOBJ2/GsCOORDINATE2/GsCOORD2PARAM).
  *
  * Covers method-table slots +0x074 through +0x0B4 (tools/classtable.py
- * gClass6B5CCMethods) -- the table's own LAST 17 slots. In ROM order: four more
+ * gSceneNodeMethods) -- the table's own LAST 17 slots. In ROM order: four more
  * self->unk10 bitfield accessors (the sibling family code_d294.c starts;
- * two renamed this round, `Class6B5CC__GetSetUnk10Flag7`/`Field9`, two
+ * two renamed this round, `SceneNode__GetSetUnk10Flag7`/`Field9`, two
  * held back as `func_` -- proposed `Field0`/`Flag8` -- because their
  * symbol is comment-referenced from other units' own vtable census notes);
- * a rotation-matrix builder (`Class6B5CC__GetRotMatrix`, proposed
- * `Class6B5CC__GetRotMatrix`); a gated read-transform-notify chain
- * (`Class6B5CC__ReadUnk20Data` -> `Class6B5CC__NotifyIfUnk20Active` ->
- * `Class6B5CC__TransformAndNotifyParents`); two vtable no-op stubs
+ * a rotation-matrix builder (`SceneNode__GetRotMatrix`, proposed
+ * `SceneNode__GetRotMatrix`); a gated read-transform-notify chain
+ * (`SceneNode__ReadUnk20Data` -> `SceneNode__NotifyIfUnk20Active` ->
+ * `SceneNode__TransformAndNotifyParents`); two vtable no-op stubs
  * (`func_8001D6A4`/`D6AC`, kept `func_` per this class's own
- * `Class6B5CC__func_1d33c` no-op precedent); a command dispatcher over the same
- * "attach" state (`Class6B5CC__DispatchLinkCommand`, proposed `Class6B5CC__DispatchLinkCommand`);
- * a proximity-attach attempt (`Class6B5CC__TryAttachNearby`, MATCHED round
+ * `SceneNode__func_1d33c` no-op precedent); a command dispatcher over the same
+ * "attach" state (`SceneNode__DispatchLinkCommand`, proposed `SceneNode__DispatchLinkCommand`);
+ * a proximity-attach attempt (`SceneNode__TryAttachNearby`, MATCHED round
  * 76) that hands off to a rotation compose-and-
- * apply step (`Class6B5CC__ComposeAndApplyRotation`), a corner-list AABB
- * overlap test (`Class6B5CC__CheckBoundsOverlap`, MATCHED round 73), and a
- * plane-classification test (`Class6B5CC__ClassifyAgainstPlanes`, MATCHED
+ * apply step (`SceneNode__ComposeAndApplyRotation`), a corner-list AABB
+ * overlap test (`SceneNode__CheckBoundsOverlap`, MATCHED round 73), and a
+ * plane-classification test (`SceneNode__ClassifyAgainstPlanes`, MATCHED
  * round 76); a third no-op stub
- * (`func_8001E49C`); a parent-list notify walk (`Class6B5CC__NotifyTaggedParents`,
+ * (`func_8001E49C`); a parent-list notify walk (`SceneNode__NotifyTaggedParents`,
  * MATCHED round 76); this unit's own
- * vtable getter (`GetClass6B5CCMethods`, proposed `GetClass6B5CCMethods`,
+ * vtable getter (`GetSceneNodeMethods`, proposed `GetSceneNodeMethods`,
  * cross-unit); and a small free-function pair for segment/AABB clipping
  * (`ClipSegmentToBox`/`BisectSegmentToBox`, both MATCHED, no `self` at
- * all) that `Class6B5CC__CheckBoundsOverlap` and `Class6B5CC__ClassifyAgainstPlanes` build on.
+ * all) that `SceneNode__CheckBoundsOverlap` and `SceneNode__ClassifyAgainstPlanes` build on.
  *
- * Every function in this unit is matched. (`Class6B5CC__CheckBoundsOverlap`
- * matched round 73; `Class6B5CC__TryAttachNearby`,
- * `Class6B5CC__ClassifyAgainstPlanes` and `Class6B5CC__NotifyTaggedParents`
+ * Every function in this unit is matched. (`SceneNode__CheckBoundsOverlap`
+ * matched round 73; `SceneNode__TryAttachNearby`,
+ * `SceneNode__ClassifyAgainstPlanes` and `SceneNode__NotifyTaggedParents`
  * round 76.)
  */
 
@@ -39,31 +39,31 @@
 #include "code_d294.h"
 #include "TmdModel.h"
 
-/* Sibling of Class6B5CC__SetDisplay/D374/D3A0/D3CC/D3F8 (code_d294.c): a thin
+/* Sibling of SceneNode__SetDisplay/D374/D3A0/D3CC/D3F8 (code_d294.c): a thin
  * wrapper around GetSetBitField over &self->unk10, shift 0 width 3. Raw
  * pass-through value and raw pass-through result -- same shape as
- * Class6B5CC__SetSemiTrans/D3A0/D3F8 (no `== 0` on either side). */
-u32 Class6B5CC__GetSetUnk10Field0(Class6B5CC *self, u32 a1) {
+ * SceneNode__SetSemiTrans/D3A0/D3F8 (no `== 0` on either side). */
+u32 SceneNode__GetSetUnk10Field0(SceneNode *self, u32 a1) {
     return GetSetBitField(&self->attribute, 0, 3, a1);
 }
 
-/* Sibling of Class6B5CC__SetDisplay (the ONLY one of the five already-matched
+/* Sibling of SceneNode__SetDisplay (the ONLY one of the five already-matched
  * self->unk10 bitfield accessors that both converts its input to a boolean
  * (`a1 == 0`) AND inverts its own result (`== 0`)). This function does
  * exactly that double-inversion, at shift 7 width 1, hence the same `s32`
- * return type as Class6B5CC__SetDisplay rather than the plain `u32` of the other
+ * return type as SceneNode__SetDisplay rather than the plain `u32` of the other
  * three siblings. */
-s32 Class6B5CC__GetSetUnk10Flag7(Class6B5CC *self, s32 a1) {
+s32 SceneNode__GetSetUnk10Flag7(SceneNode *self, s32 a1) {
     return GetSetBitField(&self->attribute, 7, 1, a1 == 0) == 0;
 }
 
-/* Same family as Class6B5CC__GetSetUnk10Field0, shift 9 width 3. Raw pass-through. */
-u32 Class6B5CC__GetSetUnk10Field9(Class6B5CC *self, u32 a1) {
+/* Same family as SceneNode__GetSetUnk10Field0, shift 9 width 3. Raw pass-through. */
+u32 SceneNode__GetSetUnk10Field9(SceneNode *self, u32 a1) {
     return GetSetBitField(&self->attribute, 9, 3, a1);
 }
 
-/* Same family as Class6B5CC__GetSetUnk10Flag7: double-inversion shape, shift 8 width 1. */
-s32 Class6B5CC__GetSetUnk10Flag8(Class6B5CC *self, s32 a1) {
+/* Same family as SceneNode__GetSetUnk10Flag7: double-inversion shape, shift 8 width 1. */
+s32 SceneNode__GetSetUnk10Flag8(SceneNode *self, s32 a1) {
     return GetSetBitField(&self->attribute, 8, 1, a1 == 0) == 0;
 }
 
@@ -73,7 +73,7 @@ s32 Class6B5CC__GetSetUnk10Flag8(Class6B5CC *self, s32 a1) {
  * own negate path never stores to it) or copying the quad verbatim, then
  * forwards the result -- plus a1, passed straight through -- to the PsyQ
  * helper RotMatrix. */
-void Class6B5CC__GetRotMatrix(Class6B5CC *self, s32 a1, s32 a2) {
+void SceneNode__GetRotMatrix(SceneNode *self, s32 a1, s32 a2) {
     S16Quad_d294 buf;
     S16Quad_d294 *src = &self->coord2->param->rotate;
 
@@ -89,13 +89,13 @@ void Class6B5CC__GetRotMatrix(Class6B5CC *self, s32 a1, s32 a2) {
 
 /* a1 gates a small range (2 <= a1 < 4). When self->model is set and
  * TmdModel__GetBoundsCount(self->model) reports true, fills a stack buffer through
- * this class's own +0x8C slot (Class6B5CC__ReadUnk20Data, already matched in this
+ * this class's own +0x8C slot (SceneNode__ReadUnk20Data, already matched in this
  * unit -- fills it via TmdModel__GetHull(self->model, dest)) then forwards
  * that same buffer, retyped as a GenericCountList_d294, into +0x90
- * (Class6B5CC__TransformAndNotifyParents, also already matched in this unit), with the original
- * a1 passed through as Class6B5CC__TransformAndNotifyParents's own a2. */
-void Class6B5CC__NotifyIfUnk20Active(Class6B5CC *self, s32 a1) {
-    /* Sized to reproduce retail's own frame (0x58): Class6B5CC__ReadUnk20Data's own
+ * (SceneNode__TransformAndNotifyParents, also already matched in this unit), with the original
+ * a1 passed through as SceneNode__TransformAndNotifyParents's own a2. */
+void SceneNode__NotifyIfUnk20Active(SceneNode *self, s32 a1) {
+    /* Sized to reproduce retail's own frame (0x58): SceneNode__ReadUnk20Data's own
      * target (TmdModel__GetHull, code_fa50) writes a TmdHull
      * (include/TmdModel.h: a count word and eight 6-byte corners, 0x34
      * bytes) into its `dest`, so the true destination struct is bigger than
@@ -118,10 +118,10 @@ void Class6B5CC__NotifyIfUnk20Active(Class6B5CC *self, s32 a1) {
     self->methods->transformAndNotifyParents(self, (GenericCountList_d294 *)buf, a1);
 }
 
-/* Forwards self->model (the TmdModel, held as `void *` in Class6B5CC.h) and
+/* Forwards self->model (the TmdModel, held as `void *` in SceneNode.h) and
  * its own 2nd argument straight through to TmdModel__GetHull, untouched.
  * TmdModel__GetHull (code_fa50) is void, so this wrapper is void too. */
-void Class6B5CC__ReadUnk20Data(Class6B5CC *self, void *dest) {
+void SceneNode__ReadUnk20Data(SceneNode *self, void *dest) {
     TmdModel__GetHull(self->model, dest);
 }
 
@@ -131,7 +131,7 @@ void Class6B5CC__ReadUnk20Data(Class6B5CC *self, void *dest) {
  * for the duration of a single self->methods->slot30(self, a2) dispatch
  * (an inherited BasicClass slot, not this unit's own code), then clears
  * unk30 again. */
-void Class6B5CC__TransformAndNotifyParents(Class6B5CC *self, GenericCountList_d294 *a1, s32 a2) {
+void SceneNode__TransformAndNotifyParents(SceneNode *self, GenericCountList_d294 *a1, s32 a2) {
     ApplyMatrixToSVArray(&a1->unk4, &a1->unk4, a1->unk0 * 8, &self->coord2->unk24);
     self->linkTarget = 0;
     self->hitMask = 0;
@@ -147,7 +147,7 @@ void func_8001D6AC(void) {}
 /* a2 selects one of three behaviors: 2 or 3 dispatches through the vtable
  * (self->methods->slotA0), exactly 4 stores a1 into self->linkTarget, and
  * anything else (< 2 or > 4) is a no-op. */
-void Class6B5CC__DispatchLinkCommand(Class6B5CC *self, void *sender, s32 event) {
+void SceneNode__DispatchLinkCommand(SceneNode *self, void *sender, s32 event) {
     switch (event) {
         case 2:
         case 3:
@@ -163,14 +163,14 @@ void Class6B5CC__DispatchLinkCommand(Class6B5CC *self, void *sender, s32 event) 
  * header and eight corners are ONE local (count at sp+0x50, corners at
  * sp+0x54); round 76. Same layout as CornerList_d294 with the array made
  * explicit. */
-/* AttachCornerList_d294b: include/Class6B5CC.h. */
+/* AttachCornerList_d294b: include/SceneNode.h. */
 
 /* Range-checks `other` against `self` (each axis of position difference
  * must fit in +/-0x4000), then hands off to three vtable slots
- * (+0xA4 = Class6B5CC__ComposeAndApplyRotation, +0xA8 = Class6B5CC__CheckBoundsOverlap, +0xAC = Class6B5CC__ClassifyAgainstPlanes)
+ * (+0xA4 = SceneNode__ComposeAndApplyRotation, +0xA8 = SceneNode__CheckBoundsOverlap, +0xAC = SceneNode__ClassifyAgainstPlanes)
  * with the resulting Vec3S16 difference, before registering `other` into
  * self->linkTarget and notifying it via its own +0x038 slot. */
-void Class6B5CC__TryAttachNearby(Class6B5CC *self, Class6B5CC *other) {
+void SceneNode__TryAttachNearby(SceneNode *self, SceneNode *other) {
     Vec3_d294 *posA;
     Vec3_d294 *posB;
     Vec3_d294 diffRaw;
@@ -260,10 +260,10 @@ z_done:
  * MulMatrix2) before using buf1 as ApplyMatrixToSVArray's own "out" argument,
  * twice: once for (arg2, arg3, count), once more for (arg1, arg1, 1) when
  * arg1 is non-NULL. */
-void Class6B5CC__ComposeAndApplyRotation(Class6B5CC *self, void *arg1, void *arg2, void *arg3, s32 count) {
+void SceneNode__ComposeAndApplyRotation(SceneNode *self, void *arg1, void *arg2, void *arg3, s32 count) {
     u8 buf2[0x20];
     u8 buf1[0x20];
-    Class6B5CC *node;
+    SceneNode *node;
 
     self->methods->getRotMatrix(self, buf1, 1);
 
@@ -288,7 +288,7 @@ void Class6B5CC__ComposeAndApplyRotation(Class6B5CC *self, void *arg1, void *arg
  * three axes. Each running min/max is a ternary stored back unconditionally
  * (retail stores every field every iteration), and the source compares
  * with `>` for a min so the slt operands load in retail's order. */
-s32 Class6B5CC__CheckBoundsOverlap(Class6B5CC *self, void *arg1, Vec3S16_d294 *d) {
+s32 SceneNode__CheckBoundsOverlap(SceneNode *self, void *arg1, Vec3S16_d294 *d) {
     CornerList_d294 *list;
     Vec3S16_d294 *v;
     Vec3S16_d294 *end;
@@ -355,7 +355,7 @@ s32 Class6B5CC__CheckBoundsOverlap(Class6B5CC *self, void *arg1, Vec3S16_d294 *d
  * `p`, `v` and `hi` as pointers. */
 extern s32 D_8008A838;
 
-s32 Class6B5CC__ClassifyAgainstPlanes(Class6B5CC *self, s32 *outFlag, Vec3S16_d294 *diff,
+s32 SceneNode__ClassifyAgainstPlanes(SceneNode *self, s32 *outFlag, Vec3S16_d294 *diff,
                                       AttachCornerList_d294b *list) {
     Vec3S16_d294 mid[2];
     Vec3S16_d294 *p;
@@ -580,8 +580,8 @@ void func_8001E49C(void) {}
  * the two nested do/while loops are real loops for loop.c, which hoists the
  * literal 4 into $s1. The goto form of earlier rounds had no loop notes, so
  * it needed a named `tag` and could not get retail's register order. */
-void Class6B5CC__NotifyTaggedParents(Class6B5CC *self, void *node) {
-    Class6B5CC *entry;
+void SceneNode__NotifyTaggedParents(SceneNode *self, void *node) {
+    SceneNode *entry;
     void *cursor;
 
     entry = NULL;
@@ -601,7 +601,7 @@ void Class6B5CC__NotifyTaggedParents(Class6B5CC *self, void *node) {
 }
 
 /* This unit's own no-argument vtable getter -- see the extended note on
- * gClass6B5CCMethods in include/code_d294.h and the file banner up top. */
-Class6B5CCMethods *GetClass6B5CCMethods(void) {
-    return &gClass6B5CCMethods;
+ * gSceneNodeMethods in include/code_d294.h and the file banner up top. */
+SceneNodeMethods *GetSceneNodeMethods(void) {
+    return &gSceneNodeMethods;
 }

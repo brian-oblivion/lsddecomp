@@ -4,7 +4,7 @@
 
 Unit: `Entity_e` (round 13). Dispatches `slot148`, and on `out->unk4 == 0`
 picks one of three `slotC8` variants via `rand() % 3`; separately fires
-`Class6B5CC__FaceTarget` once `unkFC` crosses a threshold, then unconditionally
+`SceneNode__FaceTarget` once `unkFC` crosses a threshold, then unconditionally
 calls `slotC4`. `void Entity__MoodCue71(Entity *this, EntityMoodHandlerArg *out)`.
 
 ## Final source
@@ -20,7 +20,7 @@ void Entity__MoodCue71(Entity *this, EntityMoodHandlerArg *out) {
         this->methods->slotC8(this, r * 51200, 0);
     }
     if (this->unkFC >= 0x961) {
-        Class6B5CC__FaceTarget(this, this->unk94, 1, 0, 0);
+        SceneNode__FaceTarget(this, this->unk94, 1, 0, 0);
     }
     this->methods->slotC4(this, -0x1E, 0);
 }

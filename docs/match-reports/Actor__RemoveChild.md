@@ -19,7 +19,7 @@ void Actor__RemoveChild(BaseObjO *self, TagWordObjO *arg) {
     } else if ((tag & 0xF) == 5) {
         self->unk50 = NULL;
     }
-    GetClass6B5CCMethods()->slot14(self, arg);
+    GetSceneNodeMethods()->slot14(self, arg);
 }
 ```
 
@@ -30,13 +30,13 @@ Mirror image of `Actor__AddChild`'s order: here the tag check runs FIRST
 and the chain to the fixed table's `slot14` runs LAST. Confirmed directly
 against the disassembly's own instruction order -- no iteration needed.
 
-`GetClass6B5CCMethods()`'s call site here passes `$a0` = leftover garbage from the
+`GetSceneNodeMethods()`'s call site here passes `$a0` = leftover garbage from the
 preceding tag-check code (`arg->methods->header`, not `self`) -- retail
 itself sets up no explicit `$a0` before this `jal` either, which is exactly
 the established "declare it 0-argument and let whatever is already resident
 in `$a0` go along for the ride, because the callee ignores it regardless"
 precedent. Matching this required NOT adding any argument-setup code before
-the call, i.e. leaving `GetClass6B5CCMethods()` as a plain 0-argument call at every
+the call, i.e. leaving `GetSceneNodeMethods()` as a plain 0-argument call at every
 site, not just the ones where `self` happens to still be resident.
 
 ### Proposed learning
@@ -44,11 +44,11 @@ site, not just the ones where `self` happens to still be resident.
 - **The same fixed-table getter can be called with visibly different
   garbage in its ignored argument register across different call sites in
   the SAME function's sibling, and both reproduce retail exactly.**
-  `Actor__AddChild` calls `GetClass6B5CCMethods()` with `self` still resident;
+  `Actor__AddChild` calls `GetSceneNodeMethods()` with `self` still resident;
   `Actor__RemoveChild` calls it with the tag-check's leftover header word
   resident instead. Both are correct because the callee provably ignores
   its input -- reinforces (rather than extends) the existing
-  `GetClass6B5CCMethods` precedent, but from the "it doesn't matter what's
+  `GetSceneNodeMethods` precedent, but from the "it doesn't matter what's
   there" side rather than the "self happens to be there" side.
 
 ## Naming
@@ -61,4 +61,4 @@ occupant.
 
 ## Track 4 (2026-09-25, round 82, delta)
 
-Renamed from `BaseObjO__UnlinkCompanion`. Override of +0x014 (removeChild), named for its slot: clears `grid`/`ticker` by the same class-id tests, then chains Class6B5CC's removeChild. The class (id 0x34, table `gActorMethods`, formerly `D_800878D4`) is unified as `Actor` in `include/Actor.h`: a Class6B5CC subclass and the base of Class65650/Entity, DreamSys and Class876FC. Any source block above is the pre-unification spelling; the live body in `src/class_3bb8c_o.c` takes the unified types and field/slot names, byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).
+Renamed from `BaseObjO__UnlinkCompanion`. Override of +0x014 (removeChild), named for its slot: clears `grid`/`ticker` by the same class-id tests, then chains SceneNode's removeChild. The class (id 0x34, table `gActorMethods`, formerly `D_800878D4`) is unified as `Actor` in `include/Actor.h`: a SceneNode subclass and the base of Class65650/Entity, DreamSys and Class876FC. Any source block above is the pre-unification spelling; the live body in `src/class_3bb8c_o.c` takes the unified types and field/slot names, byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).

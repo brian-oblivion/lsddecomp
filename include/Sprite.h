@@ -1,11 +1,11 @@
 #ifndef SPRITE_H
 #define SPRITE_H
 
-#include "Class6B5CC.h"
+#include "SceneNode.h"
 
 /*
  * Sprite -- the base of the game's 2-D sprites (class id 0x44, method table
- * gSpriteMethods): a Class6B5CC subclass that draws a libgs GsSPRITE embedded
+ * gSpriteMethods): a SceneNode subclass that draws a libgs GsSPRITE embedded
  * at +0x064 instead of its GsDOBJ2 model. Viewport__DrawNode hands
  * `self + 0x64` to GsSortSprite for every class whose id's low byte is 0x44:
  * screen-space for 0x144 (ScreenSprite and below), otherwise world-space,
@@ -22,16 +22,16 @@
  * py), clut from the image, w/h and u/v from the cell, rgb 0x80, the pivot
  * (mx, my) at the cell's centre and scale 1.0.
  *
- * The inherited slots that act on the GsDOBJ2 in Class6B5CC act on the
+ * The inherited slots that act on the GsDOBJ2 in SceneNode act on the
  * GsSPRITE here: setDisplay/setSemiTrans/setSemiTransRate edit
  * sprite.attribute (bit 31 inverted, bit 30, bits 28-29: GsDOFF, GsALON,
  * the semitrans rate), updateRotation writes sprite.rotate.
  *
  * Not settled here: the ctor passes reset FIVE arguments after self and
- * reset reads three, where Class6B5CC's reset takes none (Class879C4's
+ * reset reads three, where SceneNode's reset takes none (Class879C4's
  * ctor, round 87, is void: its +0x040 occupant sets no $v0). The slot keeps
- * Class6B5CC's type (it is that class's to change), so a C call through it
- * with arguments needs a cast until Class6B5CC's slot is retyped.
+ * SceneNode's type (it is that class's to change), so a C call through it
+ * with arguments needs a cast until SceneNode's slot is retyped.
  *
  * The object is 0xA0 bytes (New_Sprite).
  */
@@ -84,20 +84,20 @@ struct SpriteGs {
     /* +0x020 */ s32 rotate; /* updateRotation (Sprite__UpdateRotation): 4096 per degree */
 };
 
-/* Class6B5CC's slots, then this class's own. Occupants in gSpriteMethods
+/* SceneNode's slots, then this class's own. Occupants in gSpriteMethods
  * named at each own slot; `tools/classtable.py gSpriteMethods --vs
- * gClass6B5CCMethods` lists the overrides of the inherited ones (Sprite__Sprite,
+ * gSceneNodeMethods` lists the overrides of the inherited ones (Sprite__Sprite,
  * Sprite__Reset, Sprite__UpdateRotation, Sprite__SetDisplay,
  * Sprite__SetSemiTrans, Sprite__SetSemiTransRate, Sprite__Update). */
 /* clang-format off */
 #define SPRITE_SLOTS(Self, CtorParams)                                                             \
-    CLASS6B5CC_SLOTS(Self, CtorParams);                                                            \
+    SCENENODE_SLOTS(Self, CtorParams);                                                            \
     /* +0x0B8 */ void (*setColor)(Self *self, SpriteRgb *rgb) /* Sprite__SetColor; gTextRowMethods: TextRow__SetColor */
 /* clang-format on */
 
 /* clang-format off */
 #define SPRITE_FIELDS(Methods)                                                                     \
-    CLASS6B5CC_FIELDS(Methods);                                                                    \
+    SCENENODE_FIELDS(Methods);                                                                    \
     /* +0x044 */ u8 pad44[4];                                                                      \
     /* +0x048 */ struct GsIMAGE *image; /* reset: &texture->tim (the TimImage's +0x02C) */          \
     /* +0x04C */ SpriteRect rect;       /* reset: a copy of the ctor's cell */                     \

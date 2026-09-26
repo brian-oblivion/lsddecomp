@@ -29,7 +29,7 @@ void Class65650__Reset(Class65650 *self)
     self->methods->slot130(self);
     self->methods->slot128(self, 0);
     if (self->unk68 != NULL) {
-        Class6B5CC__LinkModel(self, self->unk68->unk20);
+        SceneNode__LinkModel(self, self->unk68->unk20);
     }
 }
 ```
@@ -39,7 +39,7 @@ Resolves six new `Class65650Methods` slots (`+0xE4`, `+0xF0`, `+0x10C`,
 regions) and one new `D800878D4Methods` slot (`+0x060`, alongside the
 already-known `+0x038`/`+0x04C`/`+0x050`/`+0x070`). Also adds a real data
 field to `Unk68Obj`: `+0x020 s32 unk20`, read directly off the object (not
-through its vtable) and forwarded verbatim as `Class6B5CC__LinkModel`'s second
+through its vtable) and forwarded verbatim as `SceneNode__LinkModel`'s second
 argument.
 
 ## The unconditional-load-in-a-delay-slot detail
@@ -50,7 +50,7 @@ UNCONDITIONALLY, even on the path where `self->unk68` is NULL and the
 branch is about to skip the call that would use it. This is ordinary
 MIPS1 delay-slot scheduling (the compiler proved the load itself has no
 side effect worth avoiding) and needed no special handling: writing the
-natural `if (self->unk68 != NULL) { Class6B5CC__LinkModel(self, self->unk68->unk20); }`
+natural `if (self->unk68 != NULL) { SceneNode__LinkModel(self, self->unk68->unk20); }`
 reproduced it directly, with GCC choosing on its own to schedule the field
 load into the branch's delay slot.
 
@@ -72,4 +72,4 @@ Round 75 (charlie), track 3.
 
 ## Track 4 (2026-09-25, round 85, alpha)
 
-Renamed from `Class65650__InitDefaults`. Override of +0x040, Class6B5CC's `reset` (Actor's occupant is Actor__Reset, renamed from InitDefaults the same way in round 82), named for its slot: it sets the object's defaults through its own and inherited slots, which is what the slot does in both parents. The class (id 0x234, table `gClass65650Methods`) is unified as `Class65650` in `include/Class65650.h`. Any source block above is the pre-unification spelling; the live body in `src/code_55dd4.c` takes the unified types and slot names, byte-identical.
+Renamed from `Class65650__InitDefaults`. Override of +0x040, SceneNode's `reset` (Actor's occupant is Actor__Reset, renamed from InitDefaults the same way in round 82), named for its slot: it sets the object's defaults through its own and inherited slots, which is what the slot does in both parents. The class (id 0x234, table `gClass65650Methods`) is unified as `Class65650` in `include/Class65650.h`. Any source block above is the pre-unification spelling; the live body in `src/code_55dd4.c` takes the unified types and slot names, byte-identical.

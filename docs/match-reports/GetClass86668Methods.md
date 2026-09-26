@@ -38,7 +38,7 @@ Round 67 (track 3, naming pass).
 
 | symbol | name | tier | evidence |
 | --- | --- | --- | --- |
-| `func_8004A4B8` | `GetClass86668Methods` | A | The whole body materializes `&gClass86668Methods` and returns it. `tools/classtable.py D_80086668` resolves that address as a 28-slot method table (header 0x230). Same shape and same name form as the already-established `GetClass6B5CCMethods` / `Get_vtable_BasicClass`. |
+| `func_8004A4B8` | `GetClass86668Methods` | A | The whole body materializes `&gClass86668Methods` and returns it. `tools/classtable.py D_80086668` resolves that address as a 28-slot method table (header 0x230). Same shape and same name form as the already-established `GetSceneNodeMethods` / `Get_vtable_BasicClass`. |
 | `D_80086668` | `gClass86668Methods` | A | Classtable-verified method table; `gName` per the project's global convention, `Methods` per `gVabDriverMethods` / `gTaskCoreMethods`. The class itself keeps its address-derived placeholder name `Class86668` (tier C) -- nothing establishes what that class is. |
 
 ## Track 4

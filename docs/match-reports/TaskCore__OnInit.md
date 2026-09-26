@@ -162,4 +162,4 @@ The viewport is cast to `Viewport *` (include/Viewport.h, round 85) instead of t
 
 ## Track 4 (2026-09-26, round 88, alpha)
 
-bgLayer is a `BgLayer *` (include/BgLayer.h): the StreamTaskUnk78Obj casts are gone, and the two calls are by slot name, `attachToParent(bgLayer, (Class6B5CC *)unk14, NULL)` (+0x04C, Class6B5CC's; returns Class6B5CC *, discarded, where the view said void) and `setColor(bgLayer, 1, (BgLayerRgb *)baseColor)` (+0x0B8). Byte-identical.
+bgLayer is a `BgLayer *` (include/BgLayer.h): the StreamTaskUnk78Obj casts are gone, and the two calls are by slot name, `attachToParent(bgLayer, (SceneNode *)unk14, NULL)` (+0x04C, SceneNode's; returns SceneNode *, discarded, where the view said void) and `setColor(bgLayer, 1, (BgLayerRgb *)baseColor)` (+0x0B8). Byte-identical.

@@ -125,7 +125,7 @@ set, s16 *ratios)` with `spriteScaleX`/`spriteScaleY`, byte-identical.
 
 | name | tier | evidence |
 | --- | --- | --- |
-| `Class879C4__UpdateScale` (was `func_80057DF4`) | A | Slot `+0x048` of `gClass879C4Methods`; `tools/classtable.py gClass879C4Methods --vs gClass6B5CCMethods` shows it overriding `Class6B5CC__UpdateScale`, and the name follows the slot. Every caller agrees it is a scale: class_3bb8c_s.c calls it through `updateScale` on the sprites with `gSpriteScaleLarge` ({6,5},{6,5},{1,1}) / `gSpriteScaleSmall` ({4,6},{4,6},{1,1}) or a caller-supplied table (`Class876FC__SpawnSprites`), always `set = 1`. The body turns two num/den ratios into 20.12 and (unk58 == 0) stores them at `+0x80`/`+0x82`, which are GsSPRITE.scalex/scaley at `+0x64` (layout evidence in `Class879C4__SetVariantClut`'s report). |
+| `Class879C4__UpdateScale` (was `func_80057DF4`) | A | Slot `+0x048` of `gClass879C4Methods`; `tools/classtable.py gClass879C4Methods --vs gSceneNodeMethods` shows it overriding `SceneNode__UpdateScale`, and the name follows the slot. Every caller agrees it is a scale: class_3bb8c_s.c calls it through `updateScale` on the sprites with `gSpriteScaleLarge` ({6,5},{6,5},{1,1}) / `gSpriteScaleSmall` ({4,6},{4,6},{1,1}) or a caller-supplied table (`Class876FC__SpawnSprites`), always `set = 1`. The body turns two num/den ratios into 20.12 and (unk58 == 0) stores them at `+0x80`/`+0x82`, which are GsSPRITE.scalex/scaley at `+0x64` (layout evidence in `Class879C4__SetVariantClut`'s report). |
 | param `set` | A | The base method's name for `$a1` (1 = assign, 0 = accumulate); this override never reads it. |
 | param `ratios` | A | Two s16 {num, den} pairs, x then y. The round-47 description "`{s16 whole; s16 frac;}`" was wrong: the body computes `num / den` in 20.12, and the caller tables hold {6,5} and {4,6}. |
 | fields `spriteScaleX` / `spriteScaleY` (`+0x80`/`+0x82`) | A | GsSPRITE.scalex/scaley. Unit-local struct: renamed in place. |
@@ -137,7 +137,7 @@ Could not name: `unk58`/`unk5C`/`unk60`, above.
 
 Renamed from `D800879C4__UpdateScale` (tools/rename.py); the class is
 `Class879C4` (`include/Class879C4.h`). The override is named for its slot
-(+0x048 `updateScale`), which it already was. The slot keeps Class6B5CC's
+(+0x048 `updateScale`), which it already was. The slot keeps SceneNode's
 `void *table`; the occupant reads it as `s16 *ratios` (two num/den pairs).
 The local view's `spriteScaleX/Y` are now `sprite.scalex` /
 `sprite.scaley` (SpriteGs, s16 at +0x080 / +0x082); `unk58/5C/60` are

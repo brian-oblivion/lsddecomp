@@ -35,7 +35,7 @@
  *
  * Two more classes, not Class6D430 subclasses:
  *
- *   - BgLayer (D_8006F2C4): a Class6B5CC subclass wrapping one GsBG
+ *   - BgLayer (D_8006F2C4): a SceneNode subclass wrapping one GsBG
  *     scrolling background layer (its own fields are GsBG's own layout;
  *     include/BgLayer.h, track 4, round 88).
  *   - MoviePlayer (gMoviePlayerMethods): a BasicClass subclass driving CD-streamed,
@@ -47,7 +47,7 @@
  */
 #include "common.h"
 #include "BasicClass.h"
-#include "Class6B5CC.h"
+#include "SceneNode.h"
 #include "Class6D430.h"
 #include "TimBlockSrc.h"
 #include "ModelData.h"
@@ -679,10 +679,10 @@ BgLayer *New_BgLayer(TileMap *src, s32 mode) {
     return NULL;
 }
 
-/* D_8006F2C4 +0x008: constructor -- Class6B5CC's, then this table, then
+/* D_8006F2C4 +0x008: constructor -- SceneNode's, then this table, then
  * slot +0x040 with the two arguments. */
 void BgLayer__BgLayer(BgLayer *self, TileMap *src, s32 mode) {
-    GetClass6B5CCMethods()->ctor((Class6B5CC *)self);
+    GetSceneNodeMethods()->ctor((SceneNode *)self);
     self->methods = GetBgLayerMethods();
     ((BgLayerResetFn)self->methods->reset)(self, src, mode);
 }
@@ -719,7 +719,7 @@ void BgLayer__Reset(BgLayer *self, TileMap *src, s32 mode) {
 }
 
 /* D_8006F2C4 +0x044 (updateRotation): entry [2] (the z angle) of the
- * {num, den} ratio table Class6B5CC's updateRotation reads, in 20.12 fixed
+ * {num, den} ratio table SceneNode's updateRotation reads, in 20.12 fixed
  * point, stored in the GsBG's rotate when `set`, else added. */
 void BgLayer__UpdateRotation(BgLayer *self, s32 set, WholeFrac_d294 *table) {
     s32 num = table[2].whole;
@@ -801,7 +801,7 @@ void BgLayer__UpdateScale(BgLayer *self, s32 set, WholeFrac_d294 *src) {
     }
 }
 
-/* D_8006F2C4 (a Class6B5CC subclass) +0x0B8: when `enable`, copy a
+/* D_8006F2C4 (a SceneNode subclass) +0x0B8: when `enable`, copy a
  * three-byte vector to +0x54. */
 void BgLayer__SetColor(BgLayer *self, s32 enable, BgLayerRgb *rgb) {
     if (enable) {
