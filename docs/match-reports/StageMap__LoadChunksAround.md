@@ -761,3 +761,11 @@ earlier sections' history prose in this and sibling reports (known, pending
 an operator decision; not hand-reverted).
 
 This function: `StageMap__BuildRateEntries` -> `StageMap__LoadChunksAround` (`python3 tools/rename.py StageMap__BuildRateEntries StageMap__LoadChunksAround`, tier B): assigns every slot its neighbour key; each slot marked `load` moves its cellParent to centre + `sNeighbourOffsets[key]` and gets a ChunkLoadEntry; then applyChunkLoads.
+
+## Round 94 (track 6, charlie)
+
+`Unk14Obj` is `SplitCoord2` (include/class_3bb8c.h): the slot's
+cellParent->coord2, a GsCOORDINATE2 with tx/tz as word-or-halfword unions.
+Its fields are named for the GsCOORDINATE2 words they overlay: `unk18` ->
+`tx` (coord.t[0]), `unk1C` -> `ty`, `unk20` -> `tz`; `unk0` (flg) had no
+accessor through this view and is padding. Zero bytes changed.

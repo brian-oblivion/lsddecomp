@@ -643,3 +643,11 @@ earlier sections' history prose in this and sibling reports (known, pending
 an operator decision; not hand-reverted).
 
 This function: `StageMap__FindElementForPosition` -> `StageMap__FindSlotForPosition` (`python3 tools/rename.py StageMap__FindElementForPosition StageMap__FindSlotForPosition`, tier A): a lookup: the slot whose cellParent square (0xA000 in x and z from its position) holds the point; in a vertical grid also a y band of 0x800 per neighbour key. (The rename commit's message says "loaded slot" and "gridSpan": both wrong, the body tests neither.)
+
+## Round 94 (track 6, charlie)
+
+`Unk14Obj` is `SplitCoord2` (include/class_3bb8c.h): the slot's
+cellParent->coord2, a GsCOORDINATE2 with tx/tz as word-or-halfword unions.
+Its fields are named for the GsCOORDINATE2 words they overlay: `unk18` ->
+`tx` (coord.t[0]), `unk1C` -> `ty`, `unk20` -> `tz`; `unk0` (flg) had no
+accessor through this view and is padding. Zero bytes changed.

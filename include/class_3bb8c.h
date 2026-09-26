@@ -54,28 +54,28 @@ extern const s8 sFootprintResultRemap[8];
 extern ChunkSlotSpec *sFootprintResultPtrTable[7];
 
 /*
- * A GsCOORDINATE2 (SceneNodeSub14) read as the element's origin: an
- * element's cellParent->coord2, reached through a cast. tx (+0x018) and tz
- * (+0x020) are unions because StageMap__ComputeFootprintDescriptor reads
- * each whole (the cell) and, later, as its low halfword (the offset):
- * retail reloads at the narrower width. StageMap__LoadChunksAround writes
- * all three and clears `flg` (+0x000).
+ * A chunk slot's origin: its cellParent->coord2, a GsCOORDINATE2
+ * (SceneNodeSub14, include/SceneNode.h), with the translation's x and z
+ * readable as the whole word or its low halfword, as SplitLongVec3's are.
+ * StageMap__LoadChunksAround writes all three words;
+ * StageMap__ComputeFootprintDescriptor reads tx/tz whole for the cell and
+ * as halfwords for the offset inside it.
+ * MATCHING: the unions; retail reloads tx/tz at the narrower width.
  */
 struct SplitCoord2 {
-    s32 unk0; /* +0x000, GsCOORDINATE2.flg */
-    u8 pad4[0x18 - 0x4];
+    u8 pad00[0x018]; /* +0x000, flg and coord.m */
 
     union {
         s32 w;
         u16 h;
-    } unk18; /* +0x018, tx */
+    } tx; /* +0x018, coord.t[0] */
 
-    s32 unk1C; /* +0x01C, ty */
+    s32 ty; /* +0x01C, coord.t[1] */
 
     union {
         s32 w;
         u16 h;
-    } unk20; /* +0x020, tz */
+    } tz; /* +0x020, coord.t[2] */
 };
 
 /* The four scale steps (Ratio16[3], x/y/z) startScaleRamp picks for
