@@ -52,3 +52,21 @@ takes `char *name` and returns `RequestedFile *`: the ctor it forwards to
 copies the argument with `strcpy`, so it is a name; the only caller,
 `WBgm__SetSeq`, casts its `s32` argument. No cast view is needed any more,
 `GetRequestedFileMethods()->ctor(obj, name)` is the inherited ctor slot.
+
+## Track 6 (2026-09-26, round 93, alpha)
+
+The class `Class6EED8` (table `gClass6EED8Methods`, id 0xB03) is now
+`RequestedFile` (`python3 tools/renametype.py Class6EED8 RequestedFile`,
+tier A): its whole behaviour is to request one named file from the active
+driver at construction (the ctor's requestLoadFile, +0x06C) and record in
+`loaded` that the driver's setFlag (+0x064) reported it read; the ctor and
+finalize clear `loaded`. It adds no buffer-consuming step, so the name says
+what the methods do and no more. Round 87's header kept the address-derived
+name because the only thing known beyond those mechanics was the caller's use
+(WBgm loads SEQ files through it); a mechanics name sidesteps that objection
+rather than overriding it, and `SeqFile` was rejected for the same reason.
+The table and getter followed (`gRequestedFileMethods`,
+`GetRequestedFileMethods`), and the header moved to `include/RequestedFile.h`.
+renametype.py also rewrote the old class name inside earlier sections'
+history prose in this and sibling reports (known, pending an operator
+decision; not hand-reverted).
