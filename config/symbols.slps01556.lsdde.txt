@@ -2932,3 +2932,4 @@ gStyleSpawnOffsetY = 0x8008E0A8;
 gStyleSpawnOffsetZ = 0x8008E0AC;
 gStyleSpawnRotation = 0x8008E0B0;
 gStyleSpawnScale = 0x8008E0B4;
+gStyleSpawnModelLayout = 0x8008E0B8;

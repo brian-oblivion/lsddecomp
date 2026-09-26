@@ -558,7 +558,7 @@ extern s32 gStyleSpawnOffsetY;
 extern s32 gStyleSpawnOffsetZ;
 extern u8 *gStyleSpawnRotation;
 extern u8 gStyleSpawnRotations[];
-extern s32 D_8008E0B8;
+extern s32 gStyleSpawnModelLayout;
 
 /* MATCHED round 64 (charlie), 110/110, ins 0 / del 0, one build.  The
  * round-46..48 residue (an extra callee-saved register caching
@@ -587,11 +587,11 @@ void SetupStyleSpawnParamsA(void *arg0, void *arg1) {
         gStyleSpawnOffsetZ = -gStyleSpawnOffsetZ;
     }
     gStyleSpawnRotation = gStyleSpawnRotations + ((u32)rand() % 7) * 12;
-    D_8008E0B8 = rand() % 5;
+    gStyleSpawnModelLayout = rand() % 5;
 }
 
 extern s32 D_8008732C;
-extern s32 D_8008E0B8;
+extern s32 gStyleSpawnModelLayout;
 
 /* MATCHED round 64 (charlie), 87/87, ins 0 / del 0.  The round-46..48
  * residue -- filed as "pervasive $v0/$v1/$a0/$a1 temp-register renaming" and
@@ -624,7 +624,7 @@ void SetupStyleSpawnParamsB(void *arg0, void *arg1) {
         gStyleSpawnOffsetZ = 0x800;
     }
     gStyleSpawnRotation = gStyleSpawnRotations + ((u32)rand() % 7) * 12;
-    D_8008E0B8 = rand() % 5;
+    gStyleSpawnModelLayout = rand() % 5;
 }
 
 extern s32 gStyleTargetObj;
