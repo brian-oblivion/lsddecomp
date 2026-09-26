@@ -45,7 +45,7 @@
  * Only the slots this unit's functions actually call through are given
  * concrete field types; the rest stay opaque `void *`/`u8 pad` so the
  * struct keeps the right size/offsets without requiring every method to be
- * typed up front (same policy as include/Class6D3C8.h).
+ * typed up front.
  */
 /* Tag-only forward declaration: Obj0C is fully defined further down, but
  * Class865C8Methods::ctor below needs to name it first. A tag-only decl
@@ -82,8 +82,8 @@ typedef struct Class865C8Methods {
      * Obj865C8__Obj865C8's own, defined just below. */
     void (*ctor)(Obj865C8 *self, struct Obj0C *arg1, struct DreamSys *arg2, s32 arg3); /* +0x008 Obj865C8__Obj865C8 */
     void (*dtor)(Obj865C8 *self);                  /* +0x00C Obj865C8__Dtor */
-    /* BasicClass-inherited (BasicClass__AddChild -- same address as
-     * Class6D3C8.h's own local unk10 view of this same shared slot).
+    /* BasicClass-inherited (BasicClass__AddChild -- BasicClass's
+     * addChild slot, include/BasicClass.h).
      * Called by Obj865C8__EnterState2 as self->methods->slot10(self, newObj). */
     void (*slot10)(Obj865C8 *self, Obj4C *arg1);   /* +0x010 */
     /* Called by Obj865C8__Dtor as self->methods->slot14(self, self->unk38). */
@@ -358,7 +358,7 @@ extern void InitDreamAux(void);
 extern const char D_800113EC[];
 extern const char D_800113F8[];
 
-/* Same request-block shape `Class6D3C8.h` already established at
+/* Same request-block shape src/code_1677c.c established at
  * `Class6D3C8__Class6D3C8`'s call site (`LoadModelRequest`, learned there to be
  * 0x10 bytes even though only the first two fields are ever written --
  * "local struct SIZE matters, not shape"). This unit's own local view,
@@ -370,8 +370,8 @@ typedef struct LoadRequest {
     s32 unk0C;
 } LoadRequest;
 
-/* Uncarved, asm/psyq_memset.s: loads a resource named by `req->path`,
- * returns a handle/object. Already declared elsewhere (Class6D3C8.h) as
+/* src/code_33808.c (LinkResource allocator): loads a resource named by
+ * `req->path`, returns a handle/object. Also declared in src/code_1677c.c as
  * `extern void *New_LinkResource(void *arg)`; this unit's own local view types
  * the return `SubObjG *` to match where it's stored here
  * (`Obj865C8::unk48`). */
@@ -387,7 +387,7 @@ extern s32 PickWeeklyGroup(s32 arg1);
  * Return value discarded at this call site. */
 extern s32 func_8004A070(s32 arg1);
 
-/* Already declared elsewhere (Class6D3C8.h) with this exact signature; this
+/* Also declared in src/code_1677c.c with this exact signature; this
  * unit's own local view. Return value discarded at this call site. */
 extern s32 SetActiveDataSourceDriverMode(s32 arg1, s32 arg2, s32 arg3);
 

@@ -71,7 +71,7 @@ struct Class866E8;
 
 #define ACTOR_FIELDS(Methods)                                                                      \
     CLASS6B5CC_FIELDS(Methods);                                                                    \
-    /* +0x044 */ s32 state;               /* zeroed by the ctor; a subclass's state code (DreamSys: pendingLinkType, Entity: moodState) */ \
+    /* +0x044 */ s32 state;               /* zeroed by the ctor; a subclass's state code (DreamSys and Entity: include/DreamSys.h, include/Entity.h) */ \
     /* +0x048 */ s16 lastOffsetValue;     /* MoveAlongLocalAxis's val, setLastOffsetValue; Reset: 300; NotifyMove's magnitude */ \
     /* +0x04A */ u8 pad4A[2];                                                                      \
     /* +0x04C */ struct Class866E8 *grid; /* the class-0x114 child addChild recorded; FindNearbyLink queries it */ \
