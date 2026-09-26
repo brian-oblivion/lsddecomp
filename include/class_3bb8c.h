@@ -1764,8 +1764,6 @@ typedef struct FieldM14 FieldM14;
 typedef struct FieldM14Methods FieldM14Methods;
 typedef struct FieldM18 FieldM18;
 typedef struct FieldM18Methods FieldM18Methods;
-typedef struct DreamSysObj_3bb8c_m DreamSysObj_3bb8c_m;
-typedef struct DreamSysMethods_3bb8c_m DreamSysMethods_3bb8c_m;
 typedef struct ChildM_AC ChildM_AC;
 typedef struct ChildM_ACMethods ChildM_ACMethods;
 typedef struct ChildM114 ChildM114;
@@ -1777,41 +1775,6 @@ typedef struct FieldM50 FieldM50;
 typedef struct FieldM50Methods FieldM50Methods;
 typedef struct FieldM7C FieldM7C;
 typedef struct FieldM7CMethods FieldM7CMethods;
-
-/* self->unk3C's target (ObjM__EnterState7/ObjM__EnterState8/ObjM__EnterStateA/
- * ObjM__HandleEvent5Or6/ObjM__CheckAuxTrigger). CONFIRMED DreamSys*, not just
- * a plausible guess: `tools/classtable.py 0x80087BDC` (DreamSys's real vtable,
- * include/DreamSys.h) resolves every one of the six offsets this unit
- * dispatches to a REAL, already-named DreamSys method, exact offset and exact
- * argument count both:
- *   +0x0F0 DreamSys__GetSetFlashbackSession   +0x0F4 DreamSys__SetMoveOverride
- *   +0x0FC DreamSys__BlockMovement            +0x13C DreamSys__SelectCallback98
- *   +0x17C DreamSys__StopDrift                +0x1A0 DreamSys__GetCurrentDayAndYear
- * DreamSys.h is a different, actively-shared unit's header (its own six
- * offsets above sit inside ITS padding arrays, so nothing there collides),
- * so this keeps its own minimal, independently-named LOCAL view rather than
- * `#include "DreamSys.h"`, per the project's established
- * multiple-independent-local-views convention -- the same choice
- * class_3bb8c_l already made for its own partial DreamSys view
- * (DreamSysMethods_3bb8c_l, matched against six DIFFERENT confirmed
- * offsets). Field names below are DreamSys's own REAL method names,
- * lower-camel-cased, not invented ones. */
-struct DreamSysMethods_3bb8c_m {
-    u8 pad000[0x0F0];
-    void (*getSetFlashbackSession)(DreamSysObj_3bb8c_m *self, s32 *out, s32 arg2); /* +0x0F0, ObjM__EnterState7: writes *out */
-    void (*setMoveOverride)(DreamSysObj_3bb8c_m *self, s32 arg1);           /* +0x0F4, ObjM__EnterState8/ObjM__EnterStateA/ObjM__HandleEvent5Or6 */
-    u8 pad0F8[0x0FC - 0x0F8];
-    void (*blockMovement)(DreamSysObj_3bb8c_m *self);                     /* +0x0FC, ObjM__EnterState7 */
-    u8 pad100[0x13C - 0x100];
-    void (*selectCallback98)(DreamSysObj_3bb8c_m *self, s32 arg1);          /* +0x13C, ObjM__EnterStateA */
-    u8 pad140[0x17C - 0x140];
-    void (*stopDrift)(DreamSysObj_3bb8c_m *self, s32 arg1);                 /* +0x17C, ObjM__HandleEvent5Or6 */
-    u8 pad180[0x1A0 - 0x180];
-    void *(*getCurrentDayAndYear)(DreamSysObj_3bb8c_m *self, s32 arg1);     /* +0x1A0, ObjM__CheckAuxTrigger (return discarded there) */
-};
-struct DreamSysObj_3bb8c_m {
-    DreamSysMethods_3bb8c_m *methods;   /* +0x000 */
-};
 
 /* self->unk18's target (ObjM__ForwardToSubChild/ObjM__HandleEvent5Or6). */
 struct FieldM18Methods {
@@ -1869,7 +1832,7 @@ struct ParamM {
  * only external call. Typed purely from that call site's own register
  * setup: (value, out-pointer, opaque-object) -> s32, whose result is
  * stored into a ChildM114's unk14 and tested for zero. The third arg is
- * DreamSysMethods_3bb8c_m::getCurrentDayAndYear's own return value (not `self->unk14`'s
+ * DreamSys's getCurrentDayAndYear (+0x1A0) return value (not `self->unk14`'s
  * child), so it stays void* rather than ChildM114* -- nothing ties the
  * two together. */
 extern s32 TryDreamAuxTrigger(s32 arg0, s32 *arg1, void *arg2);
@@ -1966,7 +1929,7 @@ struct ObjM {
     u8 pad024[0x034 - 0x024];
     FieldM34 *unk34;          /* +0x034, ObjM__TeardownPauseOverlay/ObjM__AdvancePauseSetup */
     u8 pad038[0x03C - 0x038];
-    DreamSysObj_3bb8c_m *dreamSys; /* +0x03C, ObjM__EnterState7/ObjM__EnterState8/ObjM__EnterStateA/ObjM__HandleEvent5Or6/ObjM__CheckAuxTrigger -- CONFIRMED DreamSys* via classtable.py, see DreamSysMethods_3bb8c_m above */
+    struct DreamSys *dreamSys; /* +0x03C, ObjM__EnterState7/ObjM__EnterState8/ObjM__EnterStateA/ObjM__HandleEvent5Or6/ObjM__CheckAuxTrigger: the six slots called on it (+0x0F0/+0x0F4/+0x0FC/+0x13C/+0x17C/+0x1A0) are DreamSys occupants (include/DreamSys.h) */
     u8 pad040[0x054 - 0x040];
     FieldM50 *unk54;          /* +0x054, ObjM__TeardownPauseOverlay/ObjM__AdvancePauseSetup -- same type as unk10 above */
     u8 pad058[0x074 - 0x058];

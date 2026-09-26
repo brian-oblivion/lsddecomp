@@ -28,12 +28,8 @@
  *     (0xF0/0xF4/0xFC/0x13C/0x17C/0x1A0) land EXACTLY on
  *     DreamSys__GetSetFlashbackSession/SetMoveOverride/BlockMovement/
  *     SelectCallback98/StopDrift/GetCurrentDayAndYear, both offset and
- *     argument count. Kept as this unit's own minimal local view
- *     (`DreamSysObj_3bb8c_m`/`DreamSysMethods_3bb8c_m` in
- *     include/class_3bb8c.h) rather than `#include "DreamSys.h"`, per the
- *     project's multiple-independent-local-views convention -- the same
- *     choice class_3bb8c_l already made for a different six DreamSys
- *     offsets of its own.
+ *     argument count. Since track 4 (round 88) it is typed with the
+ *     unified header, include/DreamSys.h.
  *
  * What the class itself IS remains TIER B, not asserted further:
  * `ObjM__AdvancePauseSetup`/`ObjM__TeardownPauseOverlay` build and tear down
@@ -60,6 +56,7 @@
  */
 #include "common.h"
 #include "class_3bb8c.h"
+#include "DreamSys.h"
 #include "Class81940.h"
 #include "BoxFill.h"
 #include "TextRow.h"
@@ -71,7 +68,7 @@ extern void ObjM__ForwardToSubChild(ObjM *self, s32 arg1, s32 arg2, s32 arg3, s3
 void ObjM__EnterState7(ObjM *self) {
     s32 val;
     self->mode = 7;
-    self->dreamSys->methods->getSetFlashbackSession(self->dreamSys, &val, -1);
+    self->dreamSys->methods->getSetFlashbackSession(self->dreamSys, (DreamColors *)&val, -1);
     ObjM__ForwardToSubChild(self, val, 0, 5, 1);
     self->dreamSys->methods->blockMovement(self->dreamSys);
 }
@@ -136,7 +133,7 @@ s32 ObjM__CheckAuxTrigger(ObjM *self) {
     s32 out;
     s32 result;
     ChildM114 *child = self->unk14->methods->slot114(self->unk14, &out);
-    void *thing = self->dreamSys->methods->getCurrentDayAndYear(self->dreamSys, 0);
+    void *thing = (void *)self->dreamSys->methods->getCurrentDayAndYear(self->dreamSys, 0);
     result = TryDreamAuxTrigger((s32)child->unk4->dataBuffer, &out, thing);
     child->unk14 = result;
     if (result != 0) {
