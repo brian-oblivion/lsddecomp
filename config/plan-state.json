@@ -1164,6 +1164,16 @@
           "note": "Premium head, cap 5, plan revision 23: classes run in parallel when plan.py's measured footprints are disjoint (class_footprint). Three waves, 13 Opus runner sessions, 16 classes unified: VabDriver, FlatLightObj, TmdModel, DrawSystem, Class6E99C; GraphRoom, TextEntry, VabStreamObj, Class6D940, Class879C4; Class869D8, CdStream, Class81940, Class6EED8, StreamTask. Head close-outs: code_2cc8c.h GenericObj (DrawSystem) and class_3bb8c_t GraphRoomSoundObj (VabStreamObj) views retired. Every conflict was the symbols-file tail or adjacent includes (resolved per address). All merges byte-identical, 0 new warnings (baseline 165 -> 161), nonmatching green.",
           "round": 87,
           "runners": 13
+        },
+        {
+          "attempts": 18,
+          "calibration": false,
+          "date": "2026-09-26",
+          "matches": 18,
+          "model": "opus",
+          "note": "Premium head, cap 5, 18 Opus runner sessions in six waves, 18 classes unified: TodSet, Class6D3C8, Class86AA0, TextRow (ex Obj6EAC0), WBgm, TriggerWorld, Entity, TimImage, BgLayer, FrameClock (ex D_8006EF50), Class876FC, TileMap, TileAtlas, DreamSys, TimArraySrc, Class86B60, CdDriver (ex Class6D4E8), Class865C8 (ex Obj865C8). Plan revision 25: class_footprint counts allocator callers and ignores unified ancestors' types (a one-job list became four). Runner tool fixes: typeviews.py parses every parameter stab and local-variable stabs. Head: Class6D430 +0x070 stopService takes self. All merges byte-identical (clean rebuilds after header-heavy merges), 0 new warnings (baseline 155 -> 141), nonmatching green.",
+          "round": 88,
+          "runners": 18
         }
       ],
       "status": "auto"
