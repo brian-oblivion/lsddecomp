@@ -5,7 +5,7 @@
  * attaches itself under a parent at pos + offset, links a model for kinds
  * 0-1, and owns up to two child arrays -- two Actor model children laid
  * out in a row that spin and drift along z after frame 500 (kind 0), or
- * five D800879C4 sprites (a GsSPRITE at +0x64) that are randomised at build
+ * five Class879C4 sprites (a GsSPRITE at +0x64) that are randomised at build
  * time (kind 2) or every frame (kind 3, class_3bb8c_o.c). Entry points are
  * the class's ctor, update slot (+0x0EC) and dtor in class_3bb8c_r.c, via
  * Class876FC__InitByKind / __UpdateByKind / __ReleaseByKind.
@@ -15,13 +15,14 @@
  */
 #include "common.h"
 #include "Actor.h"
+#include "Class879C4.h"
 
 /* ------------------------------------------------------------------ *
  * LinkNode is this unit's ONE local view of every object it touches: the
  * owner (a gClass876FCMethods instance, 0x98 bytes -- the size New_Class876FC
  * allocates, which is exactly where `sprites` ends) and, for vtable
  * calls only, its children (`modelChildren`: Actor, table gActorMethods;
- * `sprites`: D800879C4 objects). Class876FC is the same struct under the
+ * `sprites`: Class879C4 objects). Class876FC is the same struct under the
  * owner's name, used in the owner's method signatures. Fields +0x058..
  * +0x07B are the 0x24-byte parameter block the class's slot +0x040
  * (Class876FC__SetParams, class_3bb8c_r.c) copies in whole.
@@ -35,13 +36,13 @@ typedef struct Vec3S {
 } Vec3S;
 
 /* Slot names follow the base implementation they dispatch to (resolved with
- * tools/classtable.py on gClass876FCMethods / gActorMethods / D_800879C4). `set` is
+ * tools/classtable.py on gClass876FCMethods / gActorMethods / gClass879C4Methods). `set` is
  * 1 = assign, 0 = accumulate; `data` is a triple of s16 num/den ratios
  * (RatioToFixed12). */
 typedef struct LinkNodeMethods {
     u8 pad0[0x44];
     void (*updateRotation)(LinkNode *self, s32 set, s32 data);  /* +0x044, Class6B5CC__UpdateRotation (degrees; sprites: Sprite__UpdateRotation, rotate) */
-    void (*updateScale)(LinkNode *self, s32 set, void *data);   /* +0x048, Class6B5CC__UpdateScale (GsCOORD2PARAM.scale; sprites: D800879C4__UpdateScale) */
+    void (*updateScale)(LinkNode *self, s32 set, void *data);   /* +0x048, Class6B5CC__UpdateScale (GsCOORD2PARAM.scale; sprites: Class879C4__UpdateScale) */
     void (*attachToParent)(LinkNode *self, void *parent, void *trans); /* +0x04C, Class6B5CC__AttachToParent (coord2 super = parent's, coord.t = trans) */
     u8 pad50[0x60 - 0x50];
     void (*setDisplay)(LinkNode *self, s32 on);                 /* +0x060, Class6B5CC__SetDisplay: GsDOFF = !on */
@@ -78,7 +79,7 @@ struct LinkNode {
     void *color;                /* +0x074, passed to every sprite's slotB8 (RGB) */
     void *altColor;             /* +0x078, sprites[1]'s colour instead, when non-NULL */
     LinkNode *modelChildren[2]; /* +0x07C..+0x083, Actor children (New_Actor) */
-    LinkNode *sprites[5];       /* +0x084..+0x097, D800879C4 children; class_3bb8c_o.c's
+    LinkNode *sprites[5];       /* +0x084..+0x097, Class879C4 children; class_3bb8c_o.c's
                                    LinkOwnerObj::links is the same array */
 };
 
@@ -114,15 +115,13 @@ extern void LinkOwnerObj__RandomizeLinks(); /* arity-ok: definition is 1-paramet
 extern void Class876FC__BuildRandomSprites(); /* arity-ok: the definition is 1-parameter and LIVES IN THIS FILE (below, ROM-later), the body reading only $a0 (`move s1,a0`); Class876FC__InitByKind's dead 2nd argument is byte-load-bearing -- retail emits `move a1,zero` at 0x80056614 */
 extern void Class876FC__DriftModelChildren(); /* arity-ok: the definition is 1-parameter and LIVES IN THIS FILE (below, ROM-later), the body writing $a1 (`move a1,zero`) before any read; Class876FC__UpdateByKind's dead 2nd argument is byte-load-bearing -- retail emits `move a1,s1` in the jal delay slot at 0x800566D8 (round 75) */
 
-/* class_3bb8c_p.c; fully prototyped since every call site here uses all
- * three arguments for real. */
-extern void *New_D800879C4(void *arg1, void *arg2, void *arg3);
+/* New_Class879C4: include/Class879C4.h. */
 
 /* Three globals class_3bb8c_o.c's Actor__func_56f5c captures once from its
  * parameters (declared there with the same types; track 4b, round 85):
  * D_8008ACA4 is the Actor it ran on, called here through Class6B5CC's
  * +0x080 getSetUnk10Flag8 as that function calls it; D_8008ACA8 is
- * forwarded opaquely to New_D800879C4 as its third argument; D_8008ACAC's
+ * forwarded opaquely to New_Class879C4 as its third argument; D_8008ACAC's
  * pointee has a field at +0x018 that Class876FC__InitByKind and
  * Class876FC__UpdateByKind snapshot/diff via gTrackedYSnapshot. */
 extern Actor *D_8008ACA4; /* the Actor Actor__func_56f5c ran on */
@@ -354,7 +353,7 @@ void Class876FC__BuildRandomSprites(Class876FC *self) {
         child = self->sprites[1];
         gSpriteShiftScratch.x = gSpriteShiftX[self->tableIndex];
         /* Called directly, not through the child's table: the child is a
-         * sprite (D800879C4, a Sprite), not an Actor, and the function only
+         * sprite (Class879C4, a Sprite), not an Actor, and the function only
          * touches the Class6B5CC coord2 both share. */
         Actor__AddTranslation((Actor *)child, (Vec3_d294 *)&gSpriteShiftScratch);
         m = child->methods;
@@ -370,7 +369,7 @@ void Class876FC__BuildRandomSprites(Class876FC *self) {
     self->sprites[2]->methods->setDisplay(self->sprites[2], 0);
 }
 
-/* Create the five sprites (New_D800879C4), attach each to self at no offset,
+/* Create the five sprites (New_Class879C4), attach each to self at no offset,
  * give each self's colour (a sprite's slotB8 sets GsSPRITE r,g,b), and
  * assign `tbl` as their scale when non-NULL. `self` stays `void *`: it is
  * the prototype class_3bb8c_o.c calls through, and a typed local alias of
@@ -381,7 +380,7 @@ void Class876FC__SpawnSprites(void *self, s32 a1, s32 a2, void *tbl) {
     s32 i;
 
     for (i = 0; i < 5; i++, p++) {
-        node = New_D800879C4((void *)a2, 0, D_8008ACA8);
+        node = (LinkNode *)New_Class879C4(a2, 0, D_8008ACA8);
         *p = node;
         node->methods->attachToParent(node, self, 0);
         (*p)->methods->slotB8(*p, ((LinkNode *)self)->color);

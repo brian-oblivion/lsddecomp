@@ -26,7 +26,7 @@
  * pseudo-class-name convention (`D8006EF50__X`, matching the existing
  * `D800879C4__X` precedent in class_3bb8c_p.c) rather than inventing a real
  * name ahead of the types pass. D_8006EB90 (0x11144, below CharSprite) and
- * D_800879C4 (0x1F44, class_3bb8c_p/q/t) are Sprite subclasses too but own
+ * gClass879C4Methods (0x1F44, class_3bb8c_p/q/t) are Sprite subclasses too but own
  * no methods in this unit.
  * D_8006EF50 (class id 0x5) is a BasicClass subclass holding a parentRefs
  * cursor; NotifyParents walks it, picking event 4/3/2 from two flags and a
@@ -327,7 +327,7 @@ s32 Sprite__SetSemiTransRate(Sprite *self, s32 a1) {
 /* D_8006EB90 and gCharSpriteMethods slot +0x098 (update): empty override. */
 void Sprite__Update(Sprite *self, void *sender, s32 event) {
 }
-/* Slot +0x0B8 of gCharSpriteMethods, gScreenSpriteMethods, gSpriteMethods and D_800879C4 (the
+/* Slot +0x0B8 of gCharSpriteMethods, gScreenSpriteMethods, gSpriteMethods and gClass879C4Methods (the
  * sprite classes): copy three bytes into the embedded GsSPRITE's r,g,b. */
 void Sprite__SetColor(Sprite *self, SpriteRgb *rgb) {
     self->sprite.rgb = *rgb;
