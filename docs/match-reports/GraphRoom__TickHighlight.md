@@ -1,4 +1,6 @@
-# GraphRoomObj__TickHighlight -- MATCHED (52/52)
+# GraphRoom__TickHighlight -- MATCHED (52/52)
+
+> Renamed from `GraphRoomObj__TickHighlight` on 2026-09-26 (tools/rename.py). Address 0x80058694.
 
 > Renamed from `func_80058694` on 2026-09-24 (tools/rename.py). Address 0x80058694.
 
@@ -8,7 +10,7 @@ Unit: `src/class_3bb8c_t.c`. Class: `gGraphRoomMethods`, own vtable slot `+0x124
 ## Signature
 
 ```c
-void GraphRoomObj__TickHighlight(D_80087AACObj *self);
+void GraphRoom__TickHighlight(D_80087AACObj *self);
 ```
 
 ## Body
@@ -16,7 +18,7 @@ void GraphRoomObj__TickHighlight(D_80087AACObj *self);
 ```c
 extern s32 D_8008ABBC;
 
-void GraphRoomObj__TickHighlight(D_80087AACObj *self) {
+void GraphRoom__TickHighlight(D_80087AACObj *self) {
     if (self->unk_0x238 != 0) {
         if (self->unk_0x1C >= 0x1F) {
             if (self->unk_0x23C < 4) {
@@ -34,7 +36,7 @@ void GraphRoomObj__TickHighlight(D_80087AACObj *self) {
 Four nested guards, all gating a single call through
 `self->unk_0xA8[idx]->methods->slotB8` (a new opaque entry type,
 `D_80087AACEntry`, for the 100-entry `unk_0xA8` array this unit's own
-`GraphRoomObj__BuildGraphPoints`/`GraphRoomObj__Destroy` build/destroy). `self->unk_0x1C % 24 ==
+`GraphRoom__BuildGraphPoints`/`GraphRoom__ReleaseGraphPoints` build/destroy). `self->unk_0x1C % 24 ==
 0` reproduces retail's `multu`/`mfhi`/reconstruct-and-compare magic-number
 sequence with a plain `%`, per the existing `x % N for a compile-time
 constant N` learning.
@@ -59,12 +61,12 @@ constant N` learning.
 
 ```
 ./build-and-verify.sh   # build exit=0, OK: build matches retail
-tools/funcdiff.py GraphRoomObj__TickHighlight   # 52/52
+tools/funcdiff.py GraphRoom__TickHighlight   # 52/52
 ```
 
 ## Naming (round 75, track 3)
 
-**`GraphRoomObj__TickHighlight`** -- tier B. Own vtable slot +0x124
+**`GraphRoom__TickHighlight`** -- tier B. Own vtable slot +0x124
 (`tools/classtable.py gGraphRoomMethods` -- the class's own highest slot,
 past the inherited range). Four nested guards gate a single call through
 `points[idx]->methods->highlight`, advancing `highlightCount` (0..3) once

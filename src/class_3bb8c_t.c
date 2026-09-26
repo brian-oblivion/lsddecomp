@@ -22,7 +22,7 @@
  *
  * `GraphRoomObj`'s identity (round 75, track 3 naming pass; tier B -- the
  * MECHANICS below are certain, the in-game name is a strong but unconfirmed
- * read): `GraphRoomObj__InitDisplay` loads the literal texture string
+ * read): `GraphRoom__Reset` loads the literal texture string
  * `"ETC\HGRAPH.TIM"`. The class owns a 100-entry array of small coloured
  * `New_BoxFill` point objects (`points`) built by `BuildGraphPoints` and
  * positioned by `PopulateGraphPoints` from a backwards walk of a 365-entry
@@ -44,7 +44,7 @@
 #include "TaskCore.h"
 #include "BoxFill.h"
 
-/* The class allocated by this unit's own New_GraphRoomObj, table D_800879C4
+/* The class allocated by this unit's own New_GraphRoom, table D_800879C4
  * (49 slots, resolved via tools/classtable.py). Its ctor (D800879C4__D800879C4)
  * and its own funcs 80057F38/40/48/50 live in the neighbouring
  * `class_3bb8c_p` unit (round 2026-09-04 earlier this round), which
@@ -103,34 +103,34 @@ D_800879C4Table *func_80057F58(void) {
  * name. */
 typedef struct GraphRoomMethods {
     u8 pad00[0x8];
-    /* +0x008, this unit's own ctor (GraphRoomObj__GraphRoomObj). */
+    /* +0x008, this unit's own ctor (GraphRoom__GraphRoom). */
     GraphRoomObj *(*ctor)(GraphRoomObj *self, void *arg1);
     u8 pad0C[0x40 - 0xC];
-    /* +0x040, called by this unit's own GraphRoomObj__GraphRoomObj as (self, arg1) --
-     * a TAIL CALL, its return value forwarded as GraphRoomObj__GraphRoomObj's own.
+    /* +0x040, called by this unit's own GraphRoom__GraphRoom as (self, arg1) --
+     * a TAIL CALL, its return value forwarded as GraphRoom__GraphRoom's own.
      * Same "ctor ends by calling another of its own class's slot +0x040"
      * shape, at the SAME offset, as the sibling class_3bb8c_p's own
      * D800879C4Methods::setVariantClut, which was called postConstruct when
      * this slot was named to match it (renamed after its occupant, round 79). */
     void *(*postConstruct)(GraphRoomObj *self, void *arg1);
     u8 pad44[0x6C - 0x44];
-    /* +0x06C, called by this unit's own GraphRoomObj__InitDisplay as (self, flag). */
+    /* +0x06C, called by this unit's own GraphRoom__Reset as (self, flag). */
     void (*slot6C)(GraphRoomObj *self, s32 arg1);
-    /* +0x070, called by this unit's own GraphRoomObj__HandleUnscored as (self, size). */
+    /* +0x070, called by this unit's own GraphRoom__OnPadConfirm as (self, size). */
     void (*slot70)(GraphRoomObj *self, s32 arg1);
     u8 pad74[0x94 - 0x74];
-    /* +0x094, called by this unit's own GraphRoomObj__HandleUnscored as (self). */
+    /* +0x094, called by this unit's own GraphRoom__OnPadConfirm as (self). */
     void (*slot94)(GraphRoomObj *self);
     u8 pad98[0xD4 - 0x98];
-    /* +0x0D4, called by this unit's own GraphRoomObj__InitDisplay as
+    /* +0x0D4, called by this unit's own GraphRoom__Reset as
      * (self, "ETC\HGRAPH.TIM", 0) -- a resource-path string, so this reads
      * as the texture loader for the room's own graph background. */
     void (*loadTexture)(GraphRoomObj *self, char *str, s32 arg2);
-    /* +0x0D8, called by this unit's own GraphRoomObj__GraphRoomObj as (self, 0). */
+    /* +0x0D8, called by this unit's own GraphRoom__GraphRoom as (self, 0). */
     void (*slotD8)(GraphRoomObj *self, s32 arg1);
     u8 padDC[0x124 - 0xDC];
-    /* +0x124, this unit's own GraphRoomObj__TickHighlight, called by
-     * GraphRoomObj__UpdateFromLog as (self) on every log update. */
+    /* +0x124, this unit's own GraphRoom__TickHighlight, called by
+     * GraphRoom__Update as (self) on every log update. */
     void (*tick)(GraphRoomObj *self);
 } GraphRoomMethods;
 extern GraphRoomMethods *GetGraphRoomMethods(void);
@@ -139,7 +139,7 @@ extern GraphRoomMethods *GetGraphRoomMethods(void);
  * BoxFill objects (include/BoxFill.h, New_BoxFill). */
 
 /* Object pointed to by GraphRoomObj::unk48 -- only the one slot this
- * unit's own GraphRoomObj__GraphRoomObj dispatches through is typed.
+ * unit's own GraphRoom__GraphRoom dispatches through is typed.
  * Called with -1 right after the ctor sets its own vtable and before
  * anything else touches `self`, which reads as some kind of reset/detach
  * step, but that is not established evidence of what the object itself
@@ -147,7 +147,7 @@ extern GraphRoomMethods *GetGraphRoomMethods(void);
 typedef struct GraphRoomUnk48Obj GraphRoomUnk48Obj;
 typedef struct GraphRoomUnk48Methods {
     u8 pad00[0x9C];
-    /* +0x09C, called by this unit's own GraphRoomObj__GraphRoomObj as (self, -1). */
+    /* +0x09C, called by this unit's own GraphRoom__GraphRoom as (self, -1). */
     void (*slot9C)(GraphRoomUnk48Obj *self, s32 arg1);
 } GraphRoomUnk48Methods;
 struct GraphRoomUnk48Obj {
@@ -155,18 +155,18 @@ struct GraphRoomUnk48Obj {
 };
 
 /* Object pointed to by GraphRoomObj::dayLog -- passed in as this unit's
- * own ctor's `arg1` (GraphRoomObj__GraphRoomObj) and dispatched through by
- * GraphRoomObj__UpdateFromLog/GraphRoomObj__PopulateGraphPoints (both
+ * own ctor's `arg1` (GraphRoom__GraphRoom) and dispatched through by
+ * GraphRoom__Update/GraphRoom__PopulateGraphPoints (both
  * still queued at slot +0x1B0). Only that one slot is typed. */
 typedef struct DayLogObj DayLogObj;
 /* Return type of DayLogMethods::getData.
  *
- * It is a DAY-LOG object, established by GraphRoomObj__ScoreDayLog (round 24): the two
- * fields GraphRoomObj__UpdateFromLog reads at +0x4/+0x8 are a mode flag and a live day
+ * It is a DAY-LOG object, established by GraphRoom__ScoreDayLog (round 24): the two
+ * fields GraphRoom__Update reads at +0x4/+0x8 are a mode flag and a live day
  * count, and +0x18 is a 365-entry halfword year ring whose length is fixed
- * by GraphRoomObj__ScoreDayLog's wrap constant (the index resets to 0x16C == 364 when
+ * by GraphRoom__ScoreDayLog's wrap constant (the index resets to 0x16C == 364 when
  * it goes negative, so 365 entries).  Extended ADDITIVELY -- +0x4 and +0x8
- * keep their offsets, so GraphRoomObj__UpdateFromLog's codegen is unaffected.
+ * keep their offsets, so GraphRoom__Update's codegen is unaffected.
  *
  * LEAD, not a claim: a 365-entry log of 2-byte points is the shape of
  * `MoodGraphPoint moodPreviousDays[365]` in include/DreamSys.h, and the
@@ -187,12 +187,12 @@ typedef struct DayLog {
     /* +0x018, the year ring, walked backwards from dayCount - 1. */
     s16 days[365];
     u8 pad2F2[0x467 - 0x2F2];
-    /* +0x467, set once GraphRoomObj__ScoreDayLog's scan has succeeded. */
+    /* +0x467, set once GraphRoom__ScoreDayLog's scan has succeeded. */
     s8 scored;
 } DayLog;
 typedef struct DayLogMethods {
     u8 pad00[0x1B0];
-    /* +0x1B0, called by this unit's own GraphRoomObj__UpdateFromLog/GraphRoomObj__PopulateGraphPoints as
+    /* +0x1B0, called by this unit's own GraphRoom__Update/GraphRoom__PopulateGraphPoints as
      * (self, 0). */
     DayLog *(*getData)(DayLogObj *self, s32 arg1);
 } DayLogMethods;
@@ -203,51 +203,51 @@ struct DayLogObj {
 struct GraphRoomObj {
     GraphRoomMethods *methods;
     u8 pad04[0x1C - 0x4];
-    /* +0x01C, read by this unit's own GraphRoomObj__TickHighlight (unsigned
+    /* +0x01C, read by this unit's own GraphRoom__TickHighlight (unsigned
      * comparisons -- `sltiu`, >= 0x1F and, elsewhere, % 24) -- reads as an
      * elapsed-hours counter (24 hours/day), gating the highlight tick. */
     u32 elapsedHours;
     u8 pad20[0x2C - 0x20];
-    /* +0x02C, written by this unit's own GraphRoomObj__InitDisplay. */
+    /* +0x02C, written by this unit's own GraphRoom__Reset. */
     s32 unk_0x2C;
     u8 pad30[0x38 - 0x30];
-    /* +0x038, read by this unit's own GraphRoomObj__func_80058390. */
+    /* +0x038, read by this unit's own GraphRoom__Init. */
     s32 unk_0x38;
-    /* +0x03C, read by this unit's own GraphRoomObj__UpdateFromLog. */
+    /* +0x03C, read by this unit's own GraphRoom__Update. */
     s32 unk_0x3C;
     u8 pad40[0x48 - 0x40];
-    /* +0x048, read by this unit's own GraphRoomObj__GraphRoomObj. */
+    /* +0x048, read by this unit's own GraphRoom__GraphRoom. */
     GraphRoomUnk48Obj *unk48;
     u8 pad4C[0x84 - 0x4C];
-    /* +0x084, written by this unit's own GraphRoomObj__InitDisplay. */
+    /* +0x084, written by this unit's own GraphRoom__Reset. */
     s32 unk_0x84;
     u8 pad88[0xA4 - 0x88];
-    /* +0x0A4, set by this unit's own ctor (GraphRoomObj__GraphRoomObj) to its own
-     * `arg1`; dispatched through by GraphRoomObj__UpdateFromLog/GraphRoomObj__PopulateGraphPoints. */
+    /* +0x0A4, set by this unit's own ctor (GraphRoom__GraphRoom) to its own
+     * `arg1`; dispatched through by GraphRoom__Update/GraphRoom__PopulateGraphPoints. */
     DayLogObj *dayLog;
     /* +0x0A8, a 100-entry array of `BoxFill *` -- the graph's own
      * coloured dots, built by this unit's own
-     * GraphRoomObj__BuildGraphPoints, destroyed by GraphRoomObj__Destroy,
-     * positioned by GraphRoomObj__PopulateGraphPoints and indexed by
-     * GraphRoomObj__TickHighlight. */
+     * GraphRoom__BuildGraphPoints, destroyed by GraphRoom__ReleaseGraphPoints,
+     * positioned by GraphRoom__PopulateGraphPoints and indexed by
+     * GraphRoom__TickHighlight. */
     BoxFill *points[100];
-    /* +0x238, GraphRoomObj__ScoreDayLog's own success/fail return, stashed
-     * here by GraphRoomObj__PopulateGraphPoints; read by
-     * GraphRoomObj__HandleUnscored/GraphRoomObj__func_80058390 and
-     * GraphRoomObj__TickHighlight. */
+    /* +0x238, GraphRoom__ScoreDayLog's own success/fail return, stashed
+     * here by GraphRoom__PopulateGraphPoints; read by
+     * GraphRoom__OnPadConfirm/GraphRoom__Init and
+     * GraphRoom__TickHighlight. */
     s32 scored;
     /* +0x23C, how many of the 4 ScoreDayLog targets have been highlighted
-     * so far; read/written by this unit's own GraphRoomObj__TickHighlight
+     * so far; read/written by this unit's own GraphRoom__TickHighlight
      * (unsigned comparison -- `sltiu`, < 4). */
     u32 highlightCount;
     /* +0x240, a 4-entry array (BMemPMgrAlloc(4) in BuildGraphPoints) of the
      * day-of-graph index each of ScoreDayLog's 4 targets matched at;
-     * written by GraphRoomObj__ScoreDayLog, read by
-     * GraphRoomObj__TickHighlight indexed by highlightCount. */
+     * written by GraphRoom__ScoreDayLog, read by
+     * GraphRoom__TickHighlight indexed by highlightCount. */
     s8 *matchedDayIndices;
 };
 
-void *New_GraphRoomObj(void *arg1) {
+void *New_GraphRoom(void *arg1) {
     void *obj = BMemPMgrAlloc(0x244);
     if (obj != NULL) {
         GetGraphRoomMethods()->ctor(obj, arg1);
@@ -258,7 +258,7 @@ void *New_GraphRoomObj(void *arg1) {
 
 extern char D_8001176C[];
 
-void *GraphRoomObj__GraphRoomObj(GraphRoomObj *self, void *arg1) {
+void *GraphRoom__GraphRoom(GraphRoomObj *self, void *arg1) {
     Get_vtable_TaskCore()->ctor((TaskCore *)self, 0, D_8001176C, 0);
     self->methods = GetGraphRoomMethods();
     self->unk48->methods->slot9C(self->unk48, -1);
@@ -269,14 +269,14 @@ void *GraphRoomObj__GraphRoomObj(GraphRoomObj *self, void *arg1) {
 
 extern char D_80011778[];
 
-void GraphRoomObj__InitDisplay(GraphRoomObj *self) {
+void GraphRoom__Reset(GraphRoomObj *self) {
     self->unk_0x84 = 5;
     self->unk_0x2C = 0x190;
     self->methods->loadTexture(self, D_80011778, 0);
     self->methods->slot6C(self, 0xA);
 }
 
-void GraphRoomObj__UpdateFromLog(GraphRoomObj *self, void *arg1, void *arg2) {
+void GraphRoom__Update(GraphRoomObj *self, void *arg1, void *arg2) {
     Get_vtable_TaskCore()->update((TaskCore *)self, arg1, (s32)arg2);
     if (self->unk_0x3C == 1) {
         DayLog *result = self->dayLog->methods->getData(self->dayLog, 0);
@@ -287,7 +287,7 @@ void GraphRoomObj__UpdateFromLog(GraphRoomObj *self, void *arg1, void *arg2) {
     self->methods->tick(self);
 }
 
-void GraphRoomObj__HandleUnscored(GraphRoomObj *self) {
+void GraphRoom__OnPadConfirm(GraphRoomObj *self) {
     if (self->scored == 0) {
         self->methods->slot70(self, 0x10);
         self->methods->slot94(self);
@@ -308,7 +308,7 @@ extern u8 D_8008ABAC;
 extern u8 D_8008ABB4;
 extern D_8008ABB8Color D_8008ABB8;
 
-void GraphRoomObj__BuildGraphPoints(GraphRoomObj *self) {
+void GraphRoom__BuildGraphPoints(GraphRoomObj *self) {
     D_8008ABB8Color rgb;
     s32 i;
 
@@ -331,7 +331,7 @@ void GraphRoomObj__BuildGraphPoints(GraphRoomObj *self) {
 
 extern void BMemPMgrFree(void *arg);
 
-void GraphRoomObj__Destroy(GraphRoomObj *self) {
+void GraphRoom__ReleaseGraphPoints(GraphRoomObj *self) {
     s32 i;
 
     BMemPMgrFree(self->matchedDayIndices);
@@ -341,7 +341,7 @@ void GraphRoomObj__Destroy(GraphRoomObj *self) {
     Get_vtable_TaskCore()->releaseTarget((TaskCore *)self);
 }
 
-s32 GraphRoomObj__func_80058390(GraphRoomObj *self, void *arg1, void *arg2) {
+s32 GraphRoom__Init(GraphRoomObj *self, void *arg1, void *arg2) {
     s32 result;
     Get_vtable_TaskCore()->init((TaskCore *)self, arg1, (s32)arg2);
     result = 2;
@@ -351,15 +351,15 @@ s32 GraphRoomObj__func_80058390(GraphRoomObj *self, void *arg1, void *arg2) {
     return result;
 }
 
-extern s32 GraphRoomObj__ScoreDayLog(GraphRoomObj *self, DayLog *arg1);
+extern s32 GraphRoom__ScoreDayLog(GraphRoomObj *self, DayLog *arg1);
 
-/* A 2-word {x, y}-shaped point, matching what this unit's own GraphRoomObj__PopulateGraphPoints
+/* A 2-word {x, y}-shaped point, matching what this unit's own GraphRoom__PopulateGraphPoints
  * passes to BoxFill's attachAbsolute (round 19). */
 typedef struct Point2 {
     s32 x, y;
 } Point2;
 
-void GraphRoomObj__PopulateGraphPoints(GraphRoomObj *self, void *arg1) {
+void GraphRoom__PopulateGraphPoints(GraphRoomObj *self, void *arg1) {
     DayLog *result;
     s32 count;
     s32 i;
@@ -370,7 +370,7 @@ void GraphRoomObj__PopulateGraphPoints(GraphRoomObj *self, void *arg1) {
 
     Get_vtable_TaskCore()->updateSlotElements((TaskCore *)self, arg1);
     result = self->dayLog->methods->getData(self->dayLog, 0);
-    self->scored = GraphRoomObj__ScoreDayLog(self, result);
+    self->scored = GraphRoom__ScoreDayLog(self, result);
 
     flag = 0;
     if (result->fullScan != 0) {
@@ -429,7 +429,7 @@ extern s16 D_80087BD4[4];
  * 41 confirmed both empirically, byte-exact with them, off by dozens of
  * words without). Do not "simplify" this without re-running
  * ./build-and-verify.sh. */
-s32 GraphRoomObj__ScoreDayLog(GraphRoomObj *self, DayLog *log)
+s32 GraphRoom__ScoreDayLog(GraphRoomObj *self, DayLog *log)
 {
     u32 i;
     s16 *days;
@@ -484,7 +484,7 @@ fail:
 
 extern s32 D_8008ABBC;
 
-void GraphRoomObj__TickHighlight(GraphRoomObj *self) {
+void GraphRoom__TickHighlight(GraphRoomObj *self) {
     if (self->scored != 0) {
         if (self->elapsedHours >= 0x1F) {
             if (self->highlightCount < 4) {

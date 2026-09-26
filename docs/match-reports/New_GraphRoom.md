@@ -1,4 +1,6 @@
-# New_GraphRoomObj -- MATCHED (24/24)
+# New_GraphRoom -- MATCHED (24/24)
+
+> Renamed from `New_GraphRoomObj` on 2026-09-26 (tools/rename.py). Address 0x80057f68.
 
 > Renamed from `func_80057F68` on 2026-09-24 (tools/rename.py). Address 0x80057f68.
 
@@ -8,13 +10,13 @@ allocator/constructor wrapper (`New_X` shape), not a vtable slot.
 ## Signature
 
 ```c
-void *New_GraphRoomObj(void *arg1);
+void *New_GraphRoom(void *arg1);
 ```
 
 ## Body
 
 ```c
-void *New_GraphRoomObj(void *arg1) {
+void *New_GraphRoom(void *arg1) {
     void *obj = BMemPMgrAlloc(0x244);
     if (obj != NULL) {
         GetGraphRoomMethods()->ctor(obj, arg1);
@@ -42,12 +44,12 @@ matched.
 
 ```
 ./build-and-verify.sh   # build exit=0, OK: build matches retail
-tools/funcdiff.py New_GraphRoomObj   # 24/24
+tools/funcdiff.py New_GraphRoom   # 24/24
 ```
 
 ## Naming (round 75, track 3)
 
-**`New_GraphRoomObj`** -- tier B. `New_X`-shaped allocator (allocate
+**`New_GraphRoom`** -- tier B. `New_X`-shaped allocator (allocate
 `0x244` bytes, null-check, dispatch the ctor slot) for the class named
 `GraphRoomObj` this round -- see `src/class_3bb8c_t.c`'s own header
 comment for the class-identity evidence (loads "ETC\HGRAPH.TIM", builds

@@ -1,4 +1,6 @@
-# GraphRoomObj__InitDisplay -- MATCHED (26/26)
+# GraphRoom__Reset -- MATCHED (26/26)
+
+> Renamed from `GraphRoomObj__InitDisplay` on 2026-09-26 (tools/rename.py). Address 0x80058078.
 
 > Renamed from `func_80058078` on 2026-09-24 (tools/rename.py). Address 0x80058078.
 
@@ -8,7 +10,7 @@ Unit: `src/class_3bb8c_t.c`. Class: `gGraphRoomMethods`, own vtable slot `+0x040
 ## Signature
 
 ```c
-void GraphRoomObj__InitDisplay(D_80087AACObj *self);
+void GraphRoom__Reset(D_80087AACObj *self);
 ```
 
 ## Body
@@ -16,7 +18,7 @@ void GraphRoomObj__InitDisplay(D_80087AACObj *self);
 ```c
 extern char D_80011778[];
 
-void GraphRoomObj__InitDisplay(D_80087AACObj *self) {
+void GraphRoom__Reset(D_80087AACObj *self) {
     self->unk_0x84 = 5;
     self->unk_0x2C = 0x190;
     self->methods->slotD4(self, D_80011778, 0);
@@ -34,12 +36,12 @@ and `D_80087AACObj::unk_0x2C/unk_0x84` (additive extensions).
 
 ```
 ./build-and-verify.sh   # build exit=0, OK: build matches retail
-tools/funcdiff.py GraphRoomObj__InitDisplay   # 26/26
+tools/funcdiff.py GraphRoom__Reset   # 26/26
 ```
 
 ## Naming (round 75, track 3)
 
-**`GraphRoomObj__InitDisplay`** -- tier B. Own vtable slot +0x040. Loads
+**`GraphRoom__Reset`** -- tier B. Own vtable slot +0x040. Loads
 the literal texture string `"ETC\HGRAPH.TIM"` through the renamed
 `loadTexture` slot (+0x0D4) -- this call site is the primary evidence for
 the whole class being named `GraphRoomObj` (a "Graph"-labelled texture

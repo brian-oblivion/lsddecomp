@@ -1,16 +1,18 @@
-# GraphRoomObj__GraphRoomObj -- MATCHED (44/44)
+# GraphRoom__GraphRoom -- MATCHED (44/44)
+
+> Renamed from `GraphRoomObj__GraphRoomObj` on 2026-09-26 (tools/rename.py). Address 0x80057fc8.
 
 > Renamed from `func_80057FC8` on 2026-09-24 (tools/rename.py). Address 0x80057fc8.
 
 Unit: `src/class_3bb8c_t.c`. Class: `gGraphRoomMethods`, own vtable slot `+0x008`
 -- THIS is `gGraphRoomMethods`'s own ctor (resolved via `tools/classtable.py
-gGraphRoomMethods`), the callee of this unit's own `New_GraphRoomObj`'s `ctor(...)`
+gGraphRoomMethods`), the callee of this unit's own `New_GraphRoom`'s `ctor(...)`
 call.
 
 ## Signature
 
 ```c
-void *GraphRoomObj__GraphRoomObj(D_80087AACObj *self, void *arg1);
+void *GraphRoom__GraphRoom(D_80087AACObj *self, void *arg1);
 ```
 
 ## Body
@@ -18,7 +20,7 @@ void *GraphRoomObj__GraphRoomObj(D_80087AACObj *self, void *arg1);
 ```c
 extern char D_8001176C[];
 
-void *GraphRoomObj__GraphRoomObj(D_80087AACObj *self, void *arg1) {
+void *GraphRoom__GraphRoom(D_80087AACObj *self, void *arg1) {
     Get_vtable_TaskCore()->slot8(self, 0, D_8001176C, 0);
     self->methods = GetGraphRoomMethods();
     self->unk_0x48->methods->slot9C(self->unk_0x48, -1);
@@ -58,12 +60,12 @@ directly at both use sites matched exactly.
 
 ```
 ./build-and-verify.sh   # build exit=0, OK: build matches retail
-tools/funcdiff.py GraphRoomObj__GraphRoomObj   # 44/44
+tools/funcdiff.py GraphRoom__GraphRoom   # 44/44
 ```
 
 ## Naming (round 75, track 3)
 
-**`GraphRoomObj__GraphRoomObj`** -- tier B. `Class__Class` ctor
+**`GraphRoom__GraphRoom`** -- tier B. `Class__Class` ctor
 convention; this IS `GraphRoomObj`'s own vtable slot +0x008
 (`tools/classtable.py gGraphRoomMethods`). Class identity: see
 `src/class_3bb8c_t.c`'s header comment.

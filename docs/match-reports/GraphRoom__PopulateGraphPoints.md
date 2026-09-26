@@ -1,10 +1,12 @@
-# GraphRoomObj__PopulateGraphPoints — MATCH (108/108 words, whole-image SHA1 confirmed)
+# GraphRoom__PopulateGraphPoints — MATCH (108/108 words, whole-image SHA1 confirmed)
+
+> Renamed from `GraphRoomObj__PopulateGraphPoints` on 2026-09-26 (tools/rename.py). Address 0x80058404.
 
 > Renamed from `func_80058404` on 2026-09-24 (tools/rename.py). Address 0x80058404.
 
 Unit `class_3bb8c_t`. Byte-exact. Genuinely fresh ground — no prior
 attempt, no inherited verdict, no preserved body (this round's fourth
-pass incorrectly named `GraphRoomObj__BuildGraphPoints` as the fresh one; see that
+pass incorrectly named `GraphRoom__BuildGraphPoints` as the fresh one; see that
 function's own report for the correction — this is the one that actually
 was).
 
@@ -16,8 +18,8 @@ several places:
 1. Calls the shared base class's `+0xE0` slot (a new slot, this unit's
    first call through it) with `(self, arg1)`.
 2. Fetches `result = self->unk_0xA4->methods->slot1B0(self->unk_0xA4, 0)`
-   (same already-documented call `GraphRoomObj__UpdateFromLog` also makes).
-3. Calls `GraphRoomObj__ScoreDayLog` (still `addiu_at`-blocked, this unit) with
+   (same already-documented call `GraphRoom__Update` also makes).
+3. Calls `GraphRoom__ScoreDayLog` (still `addiu_at`-blocked, this unit) with
    `(self, result)`, storing its return into `self->unk_0x238`.
 4. Computes a vertex count: 100 if `result->unk_0x4 != 0`, otherwise
    `result->unk_0x8` clamped to 100.
@@ -35,21 +37,21 @@ several places:
 ## Final body
 
 ```c
-/* +0x0E0, called by this unit's own GraphRoomObj__PopulateGraphPoints as (self, arg1) -- the
+/* +0x0E0, called by this unit's own GraphRoom__PopulateGraphPoints as (self, arg1) -- the
  * FIRST thing that function does, before touching anything else. */
 /* (added to D_8006E730Methods, see include comment in src/class_3bb8c_t.c) */
 
-/* +0x0C4, called by this unit's own GraphRoomObj__PopulateGraphPoints as (self, arg1, &point,
+/* +0x0C4, called by this unit's own GraphRoom__PopulateGraphPoints as (self, arg1, &point,
  * 0), where `point` is a 2-word {x, y}-shaped local. */
 /* (added to D_80087AACEntryMethods) */
 
-extern s32 GraphRoomObj__ScoreDayLog(D_80087AACObj *self, D_80087AACUnkA4Result *arg1);
+extern s32 GraphRoom__ScoreDayLog(D_80087AACObj *self, D_80087AACUnkA4Result *arg1);
 
 typedef struct Point2 {
     s32 x, y;
 } Point2;
 
-void GraphRoomObj__PopulateGraphPoints(D_80087AACObj *self, void *arg1) {
+void GraphRoom__PopulateGraphPoints(D_80087AACObj *self, void *arg1) {
     D_80087AACUnkA4Result *result;
     s32 count;
     s32 i;
@@ -60,7 +62,7 @@ void GraphRoomObj__PopulateGraphPoints(D_80087AACObj *self, void *arg1) {
 
     Get_vtable_TaskCore()->slotE0(self, arg1);
     result = self->unk_0xA4->methods->slot1B0(self->unk_0xA4, 0);
-    self->unk_0x238 = GraphRoomObj__ScoreDayLog(self, result);
+    self->unk_0x238 = GraphRoom__ScoreDayLog(self, result);
 
     flag = 0;
     if (result->unk_0x4 != 0) {
@@ -198,8 +200,8 @@ above closed the residues found while verifying against the real oracle.
 
 ## Naming (round 75, track 3)
 
-**`GraphRoomObj__PopulateGraphPoints`** -- tier B. Own vtable slot +0x0E0.
-Fetches the day-log, scores it (`GraphRoomObj__ScoreDayLog`), then walks
+**`GraphRoom__PopulateGraphPoints`** -- tier B. Own vtable slot +0x0E0.
+Fetches the day-log, scores it (`GraphRoom__ScoreDayLog`), then walks
 the day ring backwards computing each `{x, y}` point and dispatching it to
 the matching `points[i]`'s `setPosition` slot -- the function that
 actually lays the graph's dots out on screen, matching the class's own

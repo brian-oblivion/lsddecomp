@@ -4,7 +4,7 @@
 
 Unit: `src/class_3bb8c_t.c`. Class: `gGraphRoomMethods` -- plain no-argument
 getter, `return &gGraphRoomMethods;`. Not itself a vtable slot; called by this
-unit's own `New_GraphRoomObj` (already matched) and `GraphRoomObj__GraphRoomObj` (still
+unit's own `New_GraphRoom` (already matched) and `GraphRoom__GraphRoom` (still
 queued).
 
 ## Body

@@ -1,4 +1,6 @@
-# GraphRoomObj__ScoreDayLog -- MATCHED (56/56 words, byte-exact)
+# GraphRoom__ScoreDayLog -- MATCHED (56/56 words, byte-exact)
+
+> Renamed from `GraphRoomObj__ScoreDayLog` on 2026-09-26 (tools/rename.py). Address 0x800585b4.
 
 > Renamed from `func_800585B4` on 2026-09-24 (tools/rename.py). Address 0x800585b4.
 
@@ -123,7 +125,7 @@ extern s16 D_80087BD4[4];
  * 41 confirmed both empirically, byte-exact with them, off by dozens of
  * words without). Do not "simplify" this without re-running
  * ./build-and-verify.sh. */
-s32 GraphRoomObj__ScoreDayLog(D_80087AACObj *self, D_80087AACUnkA4Result *log)
+s32 GraphRoom__ScoreDayLog(D_80087AACObj *self, D_80087AACUnkA4Result *log)
 {
     u32 i;
     s16 *days;
@@ -225,9 +227,9 @@ byte count.
 
 ## Naming (round 75, track 3)
 
-**`GraphRoomObj__ScoreDayLog`** -- tier B (name carried over verbatim from
-its round-41 provenance, `func_800585B4` -> `GraphRoomObj__ScoreDayLog` via
+**`GraphRoom__ScoreDayLog`** -- tier B (name carried over verbatim from
+its round-41 provenance, `func_800585B4` -> `GraphRoom__ScoreDayLog` via
 `tools/rename.py` this round). Scans the day-log's 365-entry ring for four
 fixed day-type targets (`D_80087BD4`) and records, per target, the most
 recent matching day index into `matchedDayIndices` -- exactly "scoring"
-the log against those four targets, feeding `GraphRoomObj__TickHighlight`.
+the log against those four targets, feeding `GraphRoom__TickHighlight`.

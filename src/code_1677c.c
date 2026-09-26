@@ -127,7 +127,7 @@ void Class6D3C8__StartWeeklyStreamTask(Class6D3C8 *self) {
 
 /* Gated by self->arg->unk10. Checks the DreamSys's own status slot
  * (+0x1A0); if it isn't already "1" and self->unk24 hasn't latched, kicks
- * off one PollTask (New_GraphRoomObj) and, if THAT reports "2", runs
+ * off one PollTask (New_GraphRoom) and, if THAT reports "2", runs
  * Class6D3C8__StartGraphRoomStreamTask. Then polls a second PollTask (New_Class86B60) in a loop,
  * restarting the first PollTask each time it reports "2", until it
  * reports anything else; clears self->unk24 and returns 0 or 2 depending
@@ -142,7 +142,7 @@ s32 Class6D3C8__PollGraphRoomStatus(Class6D3C8 *self) {
         status = self->dreamSys->vt->DreamSys__GetCurrentDayAndYear(self->dreamSys, 0);
         if (status != 1) {
             if (self->unk24 == 0) {
-                status = Class6D3C8__RunPollTask(New_GraphRoomObj, self->dreamSys, self->unk1C);
+                status = Class6D3C8__RunPollTask(New_GraphRoom, self->dreamSys, self->unk1C);
                 if (status == 2) {
                     Class6D3C8__StartGraphRoomStreamTask(self);
                 }
@@ -153,7 +153,7 @@ s32 Class6D3C8__PollGraphRoomStatus(Class6D3C8 *self) {
     retry:
         status = Class6D3C8__RunPollTask(New_Class86B60, self->dreamSys, self->unk1C);
         if (status == pollDone) {
-            Class6D3C8__RunPollTask(New_GraphRoomObj, self->dreamSys, self->unk1C);
+            Class6D3C8__RunPollTask(New_GraphRoom, self->dreamSys, self->unk1C);
             goto retry;
         }
 

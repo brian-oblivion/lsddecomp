@@ -1,4 +1,6 @@
-# GraphRoomObj__UpdateFromLog -- MATCHED (57/57)
+# GraphRoom__Update -- MATCHED (57/57)
+
+> Renamed from `GraphRoomObj__UpdateFromLog` on 2026-09-26 (tools/rename.py). Address 0x800580e0.
 
 > Renamed from `func_800580E0` on 2026-09-24 (tools/rename.py). Address 0x800580e0.
 
@@ -8,13 +10,13 @@ Unit: `src/class_3bb8c_t.c`. Class: `gGraphRoomMethods`, own vtable slot `+0x05C
 ## Signature
 
 ```c
-void GraphRoomObj__UpdateFromLog(D_80087AACObj *self, void *arg1, void *arg2);
+void GraphRoom__Update(D_80087AACObj *self, void *arg1, void *arg2);
 ```
 
 ## Body
 
 ```c
-void GraphRoomObj__UpdateFromLog(D_80087AACObj *self, void *arg1, void *arg2) {
+void GraphRoom__Update(D_80087AACObj *self, void *arg1, void *arg2) {
     Get_vtable_TaskCore()->slot5C(self, arg1, arg2);
     if (self->unk_0x3C == 1) {
         D_80087AACUnkA4Result *result = self->unk_0xA4->methods->slot1B0(self->unk_0xA4, 0);
@@ -32,7 +34,7 @@ Chains through the shared base class's `+0x05C` slot, and -- if
 named) and, if either of those fields is nonzero, dispatches through
 `self->unk_0xA8[0]` (the FIRST entry of the 100-entry array, `unk_0xA8`)
 at its own `+0x060` slot. Always ends by calling `self->methods->slot124`
--- this unit's own `GraphRoomObj__TickHighlight` (already matched).
+-- this unit's own `GraphRoom__TickHighlight` (already matched).
 
 Matched on the first attempt with no residues.
 
@@ -40,15 +42,15 @@ Matched on the first attempt with no residues.
 
 ```
 ./build-and-verify.sh   # build exit=0, OK: build matches retail
-tools/funcdiff.py GraphRoomObj__UpdateFromLog   # 57/57
+tools/funcdiff.py GraphRoom__Update   # 57/57
 ```
 
 ## Naming (round 75, track 3)
 
-**`GraphRoomObj__UpdateFromLog`** -- tier B. Own vtable slot +0x05C.
+**`GraphRoom__Update`** -- tier B. Own vtable slot +0x05C.
 Fetches the day-log's current data (`dayLog->methods->getData`),
 conditionally toggles the first graph point, then always calls the
-class's own `tick` slot (`GraphRoomObj__TickHighlight`). Named for what it
+class's own `tick` slot (`GraphRoom__TickHighlight`). Named for what it
 does (pulls from the log, then drives the tick), not a confirmed in-game
 trigger point (e.g. "on room enter" is plausible but not proven from the
 body alone).

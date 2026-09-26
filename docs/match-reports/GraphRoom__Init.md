@@ -1,4 +1,6 @@
-# GraphRoomObj__func_80058390 -- MATCHED (29/29)
+# GraphRoom__Init -- MATCHED (29/29)
+
+> Renamed from `GraphRoomObj__func_80058390` on 2026-09-26 (tools/rename.py). Address 0x80058390.
 
 > Renamed from `func_80058390` on 2026-09-24 (tools/rename.py). Address 0x80058390.
 
@@ -8,13 +10,13 @@ Unit: `src/class_3bb8c_t.c`. Class: `gGraphRoomMethods`, own vtable slot `+0x044
 ## Signature
 
 ```c
-s32 GraphRoomObj__func_80058390(D_80087AACObj *self, void *arg1, void *arg2);
+s32 GraphRoom__Init(D_80087AACObj *self, void *arg1, void *arg2);
 ```
 
 ## Body
 
 ```c
-s32 GraphRoomObj__func_80058390(D_80087AACObj *self, void *arg1, void *arg2) {
+s32 GraphRoom__Init(D_80087AACObj *self, void *arg1, void *arg2) {
     s32 result;
     Get_vtable_TaskCore()->slot44(self, arg1, arg2);
     result = 2;
@@ -49,12 +51,12 @@ Names `D_80087AACObj::unk_0x38` (additive split of the class struct's pad).
 
 ```
 ./build-and-verify.sh   # build exit=0, OK: build matches retail
-tools/funcdiff.py GraphRoomObj__func_80058390   # 29/29
+tools/funcdiff.py GraphRoom__Init   # 29/29
 ```
 
 ## Naming (round 75, track 3)
 
-**`GraphRoomObj__func_80058390`** -- tier C. Own vtable slot +0x044
+**`GraphRoom__Init`** -- tier C. Own vtable slot +0x044
 (`tools/classtable.py gGraphRoomMethods`), so the `Class__func_xxxxx` form
 applies now that the class is named. Body: chains through the base
 class's own +0x044 slot, then returns `unk_0x38` if `scored == 0`, else
