@@ -40,7 +40,7 @@ has, instead of folding the loop variable into the loaded register.
 ## Why this stalled, and it is the head's fault not the runner's
 
 This exact lever was **derived last round** by runner charlie on
-`StageMap__ResetElementCells`, in this same class block, and written up in that function's
+`StageMap__ClearSlotCells`, in this same class block, and written up in that function's
 `### Proposed learning` — "try mentioning the SAME source expression TWICE, in
 the order [dependent-quantity-first, loop-variable-second]". **The head did
 not promote it into `DECOMPILATION_LEARNINGS.md` during round-8

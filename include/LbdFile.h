@@ -43,7 +43,7 @@
  *  - AdvanceLoadState calls +0x080 and LoadDataBlock calls +0x084 with no
  *    argument (retail sets no $a0; it still holds self):
  *    LbdFileLoadDataBlockNoArgFn and LbdFileReleaseDataBlockNoArgFn.
- *  - StageMap__ResetElementCells passes +0x07C a second argument, the
+ *  - StageMap__ClearSlotCells passes +0x07C a second argument, the
  *    element, that LbdFile__ReleaseHeader never reads:
  *    LbdFileReleaseHeaderElemFn.
  */

@@ -26,8 +26,8 @@ after a call to a non-`INCLUDE_ASM` function, not anything that needed a
 barrier or an explicit local.
 
 `self->unk1BC->unk4` turned out to be the same `ElemTarget` type already
-established from `StageMap__ResetElementCells`/`StageMap__FindSlotByNeighbour` (its own `+0x030` field lines
-up with `ElemTarget::unk30`, itself first seen in `StageMap__ResetElementCells`'s
+established from `StageMap__ClearSlotCells`/`StageMap__FindSlotByNeighbour` (its own `+0x030` field lines
+up with `ElemTarget::unk30`, itself first seen in `StageMap__ClearSlotCells`'s
 `entry->unk4->unk30` read). New struct: `Unk1BCObj { u8 pad[4]; ElemTarget
 *unk4; }` for `self->unk1BC`'s pointee.
 
@@ -41,7 +41,7 @@ None beyond what's already documented -- this one was a clean, quick match
 that confirmed cross-referencing `ElemTarget`/`Elem` field offsets across this
 unit's own functions is a reliable way to spot repeated struct fields (here,
 `+0x030` on the target object, seen independently from two different call
-chains: `self->arr[i].unk4->unk30` in `StageMap__ResetElementCells` and
+chains: `self->arr[i].unk4->unk30` in `StageMap__ClearSlotCells` and
 `self->unk1BC->unk4->unk30` here).
 
 ## Naming

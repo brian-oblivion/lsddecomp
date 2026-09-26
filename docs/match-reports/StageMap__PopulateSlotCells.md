@@ -310,7 +310,7 @@ one real call site, `StageMap__OnNotifyTag1`'s `self->methods->slot104(self, e)`
      see residue below); `GsLinkObject4(tmd, (u8*)ent + 0x10, 0)` -- `ent`
      has an embedded `GsDOBJ2` at its own `+0x010` (its existing
      `unk10`/bitflags field IS `GsDOBJ2::attribute`, already established
-     by `StageMap__ResetElementCells`); fill `ent->unk14` (**new field**, a
+     by `StageMap__ClearSlotCells`); fill `ent->unk14` (**new field**, a
      `GsCOORDINATE2`-shaped `EntryGpu*`) from the loop's outBuf, then its
      own `unk44` sub-object (**new type** `EntryGpuVec`, three halfwords),
      then `ent->unk36` (**new field**, a halfword written DIRECTLY on

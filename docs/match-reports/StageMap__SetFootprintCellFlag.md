@@ -37,7 +37,7 @@ the finer-grained field layout from the READ side.
   `EntryChildObj`'s existing `pad1C[0x20-0x1C]`/`unk20` tail with a new
   `pad24[0x38-0x24]` before it.
 - `EntryChildObj::unk10`'s existing comment (already `u32`, bit-31 OR'd by
-  `StageMap__ResetElementCells`) extended to note this function also touches it
+  `StageMap__ClearSlotCells`) extended to note this function also touches it
   (set/cleared per its own `setBit` argument).
 
 ## Final C

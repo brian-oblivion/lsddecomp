@@ -22,7 +22,7 @@
  * GsLinkObject4 on `attribute`), setting its coord2 translation and y
  * rotation and its `flags36`; a record flagged as chained goes into one of
  * the overflow cells and is hung off the lattice cell through `nextInCell`.
- * StageMap__ResetElementCells clears them again. Two walks read a cell
+ * StageMap__ClearSlotCells clears them again. Two walks read a cell
  * and its chain: StageMap__DispatchToRectCells hands a command to every
  * cell under a footprint rectangle (NotifyGridCell: only a cell with
  * flags36 bit 0x80), and Actor__ScanGridWindow raycasts vertically against

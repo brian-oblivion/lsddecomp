@@ -387,7 +387,7 @@ the report and to the preserved body's identifiers, not to the shipped bytes.
 `StageMap *`. `class_3bb8c`'s independently derived view says
 `EntryChildObj *`, and its evidence is better: the ctor here ORs `0x80000000`
 into each freshly built cell's `+0x010`, which is `EntryChildObj::unk10`
-exactly (`StageMap__ResetElementCells` sets the same bit, matched `StageMap__SetFootprintCellFlag` clears
+exactly (`StageMap__ClearSlotCells` sets the same bit, matched `StageMap__SetFootprintCellFlag` clears
 it), and `flags36`/`nextInCell` line up with `EntryChildObj::unk36`/`unk38`.
 Unifying the two views is track-4 work, so the declared type is unchanged and
 a note sits on the field in `include/class_3ac78.h`. Posted to the broadcast.

@@ -14,7 +14,7 @@
  * / StageMap__ComputeNeighbourMask / StageMap__ComputeChunkLoadEntry /
  * StageMap__ApplyChunkLoads build and apply a per-element rate table from
  * a ChunkSlotSpec key/flag array (sDefaultTargetSpecs); and
- * StageMap__PopulateSlotCells / StageMap__ResetElementCells own an
+ * StageMap__PopulateSlotCells / StageMap__ClearSlotCells own an
  * element's resource-load and GPU-link cell array (the same 0x668-byte grid
  * class_3ac78 calls out) and its teardown. StageMap__Enable/Disable set
  * the `enabled` flag class_3ac78 gates all of this on (cross-confirmed
@@ -500,7 +500,7 @@ void StageMap__PopulateSlotCells(StageMap *self, ChunkSlot *entry) {
     }
 }
 
-void StageMap__ResetElementCells(StageMap *self, ChunkSlot *entry) {
+void StageMap__ClearSlotCells(StageMap *self, ChunkSlot *entry) {
     GridCell **p;
     GridCell **end;
 

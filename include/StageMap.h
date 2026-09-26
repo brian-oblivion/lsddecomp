@@ -219,7 +219,7 @@ struct StageMapMethods {
     /* +0x100 */ void (*onNotifyTag1)(StageMap *self, void *sender,
                                       s32 mode); /* StageMap__OnNotifyTag1; OnNotify's class-1 sender case */
     /* +0x104 */ void (*loadElementResources)(StageMap *self, ChunkSlot *elem); /* StageMap__PopulateSlotCells */
-    /* +0x108 */ void (*resetElementCells)(StageMap *self, ChunkSlot *elem); /* StageMap__ResetElementCells */
+    /* +0x108 */ void (*resetElementCells)(StageMap *self, ChunkSlot *elem); /* StageMap__ClearSlotCells */
     /* +0x10C */ Descriptor10 *(*getTargetDescriptor)(StageMap *self, Descriptor10Ext *out,
                                                       void **outPos); /* StageMap__GetTargetDescriptor */
     /* +0x110 */ s32 (*computeFootprintDescriptor)(StageMap *self, Descriptor10Ext *out,
@@ -326,7 +326,7 @@ void StageMap__ApplyChunkLoads(StageMap *self, ChunkLoadEntry *entries, s32 coun
 s32 StageMap__CountPendingLoads(StageMap *self);
 void StageMap__OnNotifyTag1(StageMap *self, void *sender, s32 mode);
 void StageMap__PopulateSlotCells(StageMap *self, ChunkSlot *elem);
-void StageMap__ResetElementCells(StageMap *self, ChunkSlot *elem);
+void StageMap__ClearSlotCells(StageMap *self, ChunkSlot *elem);
 Descriptor10 *StageMap__GetTargetDescriptor(StageMap *self, Descriptor10Ext *out, void **outPos);
 s32 StageMap__ComputeFootprintDescriptor(StageMap *self, Descriptor10Ext *out, SplitLongVec3 *pos);
 void StageMap__SplitChunkIndex(StageMap *self, u8 *out, s32 val);
