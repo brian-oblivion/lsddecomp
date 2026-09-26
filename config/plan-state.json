@@ -888,6 +888,11 @@
           "date": "2026-09-26",
           "header": "include/BoxFill.h"
         },
+        "gCdStreamMethods": {
+          "class": "CdStream",
+          "date": "2026-09-26",
+          "header": "include/CdStream.h"
+        },
         "gCharSpriteMethods": {
           "class": "CharSprite",
           "date": "2026-09-26",
