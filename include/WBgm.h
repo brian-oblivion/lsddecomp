@@ -28,7 +28,7 @@
  * New_WBgm(PickWeeklyGroup(0), NULL, 1): the VAB path is one of the seven
  * gWeeklyGroupTable strings ("SND\\AMBIENT" ... "SND\\STANDERD",
  * asm/data/1B84.rodata.s), no SEQ yet, autoPlay on. That caller keeps the
- * object in a view of its own class (Obj865C8::unk40, `SubObjG *`), and
+ * object as Class865C8::bgm (include/Class865C8.h), and
  * hands it to New_ObjM, whose ObjM keeps it at +0x054 and calls +0x04C
  * pause and +0x050 resume on it (ObjM__AdvancePauseSetup,
  * ObjM__TeardownPauseOverlay; include/class_3bb8c.h's FieldM50 view).

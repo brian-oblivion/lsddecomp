@@ -10,7 +10,7 @@
  * class derives from it. Its one construction site is Class865C8__Class865C8
  * (src/class_39e08.c), which stores it as the viewport of an
  * IntermediateBase init argument block (IntermediateBaseInitArgs +0x010;
- * class_39e08.h's Obj0C::unk10); IntermediateBase reaches it only through
+ * which class_39e08.h once viewed as Obj0C::unk10); IntermediateBase reaches it only through
  * Viewport's slots.
  *
  * What it changes, from its own methods (`classtable.py gClass869D8Methods
