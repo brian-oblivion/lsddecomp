@@ -338,13 +338,13 @@ void Class866E8__ForwardAcceptedCommand(Class866E8 *self, void *sender, s32 comm
 }
 
 void Class866E8__ApplyToSenderFootprint(Class866E8 *self, SceneNode *sender, s32 command) {
-    QueryPos866E8 *pos;
+    SplitLongVec3 *pos;
     GridSlotList866E8 saved;
     Descriptor10Ext buf;
     s32 savedRectCount;
 
     if (sender->parent != NULL) {
-        pos = (QueryPos866E8 *)sender->coord2->unk38;
+        pos = (SplitLongVec3 *)sender->coord2->unk38;
     } else {
         pos = NULL;
     }

@@ -3,7 +3,7 @@
 > Renamed from `func_8004C1C0` on 2026-09-24 (tools/rename.py). Address 0x8004c1c0.
 
 REVISITED, round 63: MATCHED 106/106, whole-image SHA1 green; names/types used
-(the existing `Descriptor10Ext` / `QueryPos866E8` / `Unk14Obj` declarations
+(the existing `Descriptor10Ext` / `SplitLongVec3` / `Unk14Obj` declarations
 were correct and unchanged -- the stall was purely source SHAPE).
 
 > **ROUND 63 (delta): MATCHED, 72/106 -> 106/106 in five builds.** This
@@ -320,7 +320,7 @@ Unit: `class_3bb8c`. Slot `Obj866E8Methods::slot110` (verified against
 
 ## What it does
 
-Resolves a query (`in`, a `QueryPos866E8*`) via `self->methods->slot11C`
+Resolves a query (`in`, a `SplitLongVec3*`) via `self->methods->slot11C`
 (still `INCLUDE_ASM`, `Class866E8__FindElementForPosition`). On a miss, returns `1`. On a hit
 (`e`), fills `out` (`Descriptor10Ext*`):
 
@@ -343,7 +343,7 @@ Resolves a query (`in`, a `QueryPos866E8*`) via `self->methods->slot11C`
 
 Full derivation, including the exact retail instruction trace this was built
 from, is in this report's body below and in the header comments for
-`Descriptor10Ext`/`QueryPos866E8`/`Unk14Obj` in `include/class_3bb8c.h`.
+`Descriptor10Ext`/`SplitLongVec3`/`Unk14Obj` in `include/class_3bb8c.h`.
 
 ## SUPERSEDED by round 63 -- the matching body
 
@@ -354,7 +354,7 @@ computed value), the `0x400` sits inside the subtracted group, and
 `out->unk24 = e;` is the last statement. Matching body:
 
 ```c
-s32 Class866E8__ComputeFootprintDescriptor(Obj866E8 *self, Descriptor10Ext *out, QueryPos866E8 *in) {
+s32 Class866E8__ComputeFootprintDescriptor(Obj866E8 *self, Descriptor10Ext *out, SplitLongVec3 *in) {
     Elem *e;
     Unk14Obj *u14a;
     Unk14Obj *u14b;
@@ -407,7 +407,7 @@ s32 Class866E8__ComputeFootprintDescriptor(Obj866E8 *self, Descriptor10Ext *out,
 ## HISTORICAL -- best body reached before round 63 (72/106 words)
 
 ```c
-s32 Class866E8__ComputeFootprintDescriptor(Obj866E8 *self, Descriptor10Ext *out, QueryPos866E8 *in) {
+s32 Class866E8__ComputeFootprintDescriptor(Obj866E8 *self, Descriptor10Ext *out, SplitLongVec3 *in) {
     Elem *e;
     Unk14Obj *u14a;
     Unk14Obj *u14b;
@@ -457,7 +457,7 @@ s32 Class866E8__ComputeFootprintDescriptor(Obj866E8 *self, Descriptor10Ext *out,
 }
 ```
 
-This needs `Descriptor10Ext`, `QueryPos866E8` and the retyped `Unk14Obj`
+This needs `Descriptor10Ext`, `SplitLongVec3` and the retyped `Unk14Obj`
 (`unk18`/`unk20` as `union { s32 w; u16 h; }`, plus new `unk1C`) from
 `include/class_3bb8c.h`, and the retyped `slot110`/new `slot11C` in
 `Obj866E8Methods` (same file). All already committed to the header; this
@@ -576,4 +576,4 @@ Round 78 (track 3, naming pass, bravo).
 
 | symbol | name | tier | evidence |
 | --- | --- | --- | --- |
-| `func_8004C1C0` | `Class866E8__ComputeFootprintDescriptor` | B | Occupant of `gClass866E8Methods` +0x110 (`slot110`). `class_3ac78`'s own `Class866E8__ApplyToSenderFootprint` (already matched) calls this exact slot to fill a `buf` that is then fed DIRECTLY to `Class866E8__SetFootprintFromCell`/`Class866E8__SetFootprintRect` as their own `desc` parameter -- i.e. this function's output IS the footprint descriptor those two already-named functions consume. Computes cell row/column (`base.b2`/`base.b3`) and sub-cell offsets (`base.h4`/`h6`/`h8`) from a `QueryPos866E8` world position via `Class866E8__FindElementForPosition` and an `Unk14Obj` position pair -- a position-to-grid-cell conversion, matching the caller-side evidence exactly. |
+| `func_8004C1C0` | `Class866E8__ComputeFootprintDescriptor` | B | Occupant of `gClass866E8Methods` +0x110 (`slot110`). `class_3ac78`'s own `Class866E8__ApplyToSenderFootprint` (already matched) calls this exact slot to fill a `buf` that is then fed DIRECTLY to `Class866E8__SetFootprintFromCell`/`Class866E8__SetFootprintRect` as their own `desc` parameter -- i.e. this function's output IS the footprint descriptor those two already-named functions consume. Computes cell row/column (`base.b2`/`base.b3`) and sub-cell offsets (`base.h4`/`h6`/`h8`) from a `SplitLongVec3` world position via `Class866E8__FindElementForPosition` and an `Unk14Obj` position pair -- a position-to-grid-cell conversion, matching the caller-side evidence exactly. |

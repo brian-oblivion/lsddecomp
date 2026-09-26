@@ -93,7 +93,7 @@ typedef struct Descriptor10Ext {
 /* computeFootprintDescriptor's world position: each word is read whole (the
  * cell) and, later, as its low halfword (the offset), which is why each is
  * a union: retail reloads at the narrower width. */
-typedef struct QueryPos866E8 {
+typedef struct SplitLongVec3 {
     union {
         s32 w;
         u16 h;
@@ -108,7 +108,7 @@ typedef struct QueryPos866E8 {
         s32 w;
         u16 h;
     } z; /* +0x008 */
-} QueryPos866E8;
+} SplitLongVec3;
 
 /* The step from a centre chunk's index (row * columns + column) to one of
  * the seven chunks around it, indexed by TargetSpec866E8::key
@@ -223,7 +223,7 @@ struct Class866E8Methods {
     /* +0x10C */ Descriptor10 *(*getTargetDescriptor)(Class866E8 *self, Descriptor10Ext *out,
                                                       void **outPos); /* Class866E8__GetTargetDescriptor */
     /* +0x110 */ s32 (*computeFootprintDescriptor)(Class866E8 *self, Descriptor10Ext *out,
-                                                   QueryPos866E8 *pos); /* Class866E8__ComputeFootprintDescriptor: 0, or 1 when no element holds pos */
+                                                   SplitLongVec3 *pos); /* Class866E8__ComputeFootprintDescriptor: 0, or 1 when no element holds pos */
     /* +0x114 */ ChunkSlot *(*getLastTargetRateSplit)(Class866E8 *self, u8 *out); /* Class866E8__GetLastTargetRateSplit */
     /* +0x118 */ ChunkSlot *(*findElemByUnk32)(Class866E8 *self, s32 key); /* Class866E8__FindElemByUnk32 */
     /* +0x11C */ ChunkSlot *(*findElementForPosition)(Class866E8 *self, LongVec3 *pos); /* Class866E8__FindElementForPosition */
@@ -328,7 +328,7 @@ void Class866E8__OnNotifyTag1(Class866E8 *self, void *sender, s32 mode);
 void Class866E8__LoadElementResources(Class866E8 *self, ChunkSlot *elem);
 void Class866E8__ResetElementCells(Class866E8 *self, ChunkSlot *elem);
 Descriptor10 *Class866E8__GetTargetDescriptor(Class866E8 *self, Descriptor10Ext *out, void **outPos);
-s32 Class866E8__ComputeFootprintDescriptor(Class866E8 *self, Descriptor10Ext *out, QueryPos866E8 *pos);
+s32 Class866E8__ComputeFootprintDescriptor(Class866E8 *self, Descriptor10Ext *out, SplitLongVec3 *pos);
 void Class866E8__ComputeDivisorSplit(Class866E8 *self, u8 *out, s32 val);
 ChunkSlot *Class866E8__GetLastTargetRateSplit(Class866E8 *self, u8 *out);
 ChunkSlot *Class866E8__FindElemByUnk32(Class866E8 *self, s32 key);

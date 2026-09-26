@@ -7,7 +7,7 @@
  * math and the per-element resource/GPU work that `class_3ac78`'s own unit
  * header (src/class_3ac78.c) describes as living in "class_3bb8c*" --
  * Class866E8__ComputeFootprintDescriptor converts a world position
- * (QueryPos866E8) into a grid-cell descriptor (Descriptor10, byte row/column
+ * (SplitLongVec3) into a grid-cell descriptor (Descriptor10, byte row/column
  * plus sub-cell halfword offsets); Class866E8__UpdateFootprintTracking runs
  * every enabled tick (paired with class_3ac78's Class866E8__AdvanceRateCountdown)
  * to refresh that descriptor and notify on change; Class866E8__BuildRateEntries
@@ -544,7 +544,7 @@ Descriptor10 *Class866E8__GetTargetDescriptor(Class866E8 *self, Descriptor10Ext 
  *   3. `out->unk24 = e;` is the LAST statement of the block. Every earlier
  *      placement schedules its `sw` too early; only trailing it after the
  *      h8 store reproduces retail's order. */
-s32 Class866E8__ComputeFootprintDescriptor(Class866E8 *self, Descriptor10Ext *out, QueryPos866E8 *in) {
+s32 Class866E8__ComputeFootprintDescriptor(Class866E8 *self, Descriptor10Ext *out, SplitLongVec3 *in) {
     ChunkSlot *e;
     Unk14Obj *u14a;
     Unk14Obj *u14b;
