@@ -15,66 +15,11 @@
  * type below is still a LOCAL view.
  */
 #include "common.h"
+#include <libgte.h>
+#include <libgpu.h>
+#include <libgs.h>
 #include "BasicClass.h"
 #include "Viewport.h"
-
-/* Psy-Q LIBGTE.H / LIBGS.H shapes, declared locally. */
-typedef struct {
-    s16 m[3][3];
-    s32 t[3];
-} MATRIX_2864;
-
-typedef struct {
-    s32 vx, vy, vz, pad;
-} VECTOR_2864;
-
-typedef struct {
-    s16 vx, vy, vz, pad;
-} SVECTOR_2864;
-
-typedef struct {
-    u32 scale[4];        /* +0x00 VECTOR scale, read as unsigned */
-    SVECTOR_2864 rotate; /* +0x10 */
-    VECTOR_2864 trans;   /* +0x18 */
-} GsCOORD2PARAM_2864;
-
-typedef struct GsCOORDINATE2_2864 GsCOORDINATE2_2864;
-
-struct GsCOORDINATE2_2864 {
-    u32 flg;                   /* +0x00 */
-    MATRIX_2864 coord;         /* +0x04 */
-    MATRIX_2864 workm;         /* +0x24 */
-    GsCOORD2PARAM_2864 *param; /* +0x44 */
-    GsCOORDINATE2_2864 *super; /* +0x48 */
-    GsCOORDINATE2_2864 *sub;   /* +0x4C */
-};
-
-typedef struct {
-    u32 attribute;
-    s16 x, y;
-    u16 w, h;
-    u16 tpage;
-    u8 u, v;
-    s16 cx, cy;
-    u8 r, g, b;
-    s16 mx, my;
-    s16 scalex, scaley;
-    s32 rotate;
-} GsSPRITE_2864;
-
-typedef struct {
-    u32 attribute;
-    s16 x, y;
-    u16 w, h;
-    u8 r, g, b;
-} GsBOXF_2864;
-
-typedef struct {
-    u32 attribute;              /* +0x10 */
-    GsCOORDINATE2_2864 *coord2; /* +0x14 */
-    u32 *tmd;                   /* +0x18 */
-    u32 id;                     /* +0x1C */
-} GsDOBJ2_2864;
 
 /* A drawable scene node: a BasicClass whose +0x00C is its parent and whose
  * class-id low byte picks the draw path in Viewport__DrawNode (0x54 background,
@@ -85,11 +30,11 @@ typedef struct DrawNode DrawNode;
 struct DrawNode {
     BASICCLASS_FIELDS(BasicClassMethods);
     DrawNode *parent; /* +0x00C */
-    GsDOBJ2_2864 obj; /* +0x010 */
+    GsDOBJ2 obj; /* +0x010 */
     u8 pad20[0x44 - 0x20];
 
     union {
-        u8 bg[0x28]; /* tag 0x54: GsBG at +0x44 */
+        GsBG bg; /* tag 0x54, +0x044 */
 
         struct {     /* tag 0x64 */
             u16 pri; /* +0x044 */
@@ -98,12 +43,12 @@ struct DrawNode {
             u8 pad4C[4];
             s32 x;           /* +0x050 */
             s32 y;           /* +0x054 */
-            GsBOXF_2864 box; /* +0x058 */
+            GsBOXF box; /* +0x058 */
         } boxf;
 
         struct { /* tag 0x44 */
             u8 pad44[0x64 - 0x44];
-            GsSPRITE_2864 sprite; /* +0x064 */
+            GsSPRITE sprite; /* +0x064 */
             u8 pad88[0xA0 - 0x88];
             s32 ratioX; /* +0x0A0 */
             s32 ratioY; /* +0x0A4 */
@@ -111,16 +56,10 @@ struct DrawNode {
     } u;
 };
 
-extern void RotMatrix(SVECTOR_2864 *r, MATRIX_2864 *m);
-extern void GsGetLs(GsCOORDINATE2_2864 *m, MATRIX_2864 *out);
-extern void GsGetLws(GsCOORDINATE2_2864 *m, MATRIX_2864 *outw, MATRIX_2864 *outs);
-extern void GsSetLightMatrix(MATRIX_2864 *mp);
-extern void GsSetLsMatrix(MATRIX_2864 *mp);
-extern void GsSortBg(void *bg, void *ot, u16 pri);
-extern void GsSortBoxFill(GsBOXF_2864 *bp, void *ot, u16 pri);
-extern void GsSortSprite(GsSPRITE_2864 *sp, void *ot, u16 pri);
+/* code_d294_c.c (include/code_d294.h) */
 extern void ApplyMatrixToLVArray(void *dst, void *src, s32 count, void *m);
-extern void SortTmdObject(void *objIn, void *otSrc, s32 otShift, void *ctxIn);
+/* code_8220_b.c */
+extern void SortTmdObject(GsDOBJ2 *obj, GsOT *ot, s32 otShift, void *scratch);
 
 /*
  * Draw `node` into self's current ordering table, after first drawing every
@@ -137,14 +76,14 @@ extern void SortTmdObject(void *objIn, void *otSrc, s32 otShift, void *ctxIn);
  *    is the delay-slot filler's); `~v + 1` is retail's nor/addiu negate.
  */
 void Viewport__DrawNode(Viewport *self, DrawNode *node) {
-    MATRIX_2864 lsBuf;
-    MATRIX_2864 lwBuf;
-    MATRIX_2864 *ls;
-    MATRIX_2864 *lw;
+    MATRIX lsBuf;
+    MATRIX lwBuf;
+    MATRIX *ls;
+    MATRIX *lw;
     DrawNode *child;
     BasicClassListNode *cursor;
     s32 dirty;
-    GsCOORDINATE2_2864 *c;
+    GsCOORDINATE2 *c;
     s16 *m;
     s16 *end;
     u32 *sc;
@@ -160,7 +99,7 @@ void Viewport__DrawNode(Viewport *self, DrawNode *node) {
     c = node->obj.coord2;
     if (c->flg == 0) {
         m = &c->coord.m[0][0];
-        sc = c->param->scale;
+        sc = (u32 *)&c->param->scale; /* MATCHING: read unsigned (srl) */
         dirty = 1;
         end = &c->coord.m[3][0];
         RotMatrix(&c->param->rotate, &c->coord);
@@ -200,7 +139,7 @@ void Viewport__DrawNode(Viewport *self, DrawNode *node) {
 
     tag = node->methods->header;
     if ((tag & 0xFF) == 0x54) {
-        GsSortBg(node->u.bg, self->ot[self->otIndex], (1 << self->otLength) - 1);
+        GsSortBg(&node->u.bg, (GsOT *)self->ot[self->otIndex], (1 << self->otLength) - 1);
     } else if ((tag & 0xFF) == 0x64) {
         DrawNode *b = node;
         if (b->u.boxf.relative) {
@@ -210,26 +149,26 @@ void Viewport__DrawNode(Viewport *self, DrawNode *node) {
             b->u.boxf.box.x = b->u.boxf.x;
             b->u.boxf.box.y = b->u.boxf.y;
         }
-        GsSortBoxFill(&b->u.boxf.box, self->ot[self->otIndex], b->u.boxf.pri);
+        GsSortBoxFill(&b->u.boxf.box, (GsOT *)self->ot[self->otIndex], b->u.boxf.pri);
     } else if ((tag & 0xFF) != 0x44) {
         GsGetLws(node->obj.coord2, lw, ls);
         GsSetLightMatrix(lw);
         GsSetLsMatrix(ls);
         if (node->obj.tmd != NULL) {
-            SortTmdObject(&node->obj, self->ot[self->otIndex], 14 - self->otLength, (void *)0x1F800000);
+            SortTmdObject(&node->obj, (GsOT *)self->ot[self->otIndex], 14 - self->otLength, (void *)0x1F800000);
         }
     } else if ((tag & 0xFFF) == 0x144) {
         DrawNode *n = node;
-        GsSPRITE_2864 *sp = &n->u.spr.sprite;
+        GsSPRITE *sp = &n->u.spr.sprite;
         s32 *size = &self->screenSize.width;
         sp->x = (n->u.spr.ratioX != 0) ? ((size[0] >> 1) * 100) / (10000 / n->u.spr.ratioX) : 0;
         sp->y = (n->u.spr.ratioY != 0) ? ((size[1] >> 1) * 100) / (10000 / n->u.spr.ratioY) : 0;
         sp->x += sp->mx;
         sp->y += sp->my;
-        GsSortSprite(sp, self->ot[self->otIndex], 0);
+        GsSortSprite(sp, (GsOT *)self->ot[self->otIndex], 0);
     } else {
-        VECTOR_2864 pos;
-        SVECTOR_2864 scr; /* never used; reserves retail's 8 unused frame bytes */
+        VECTOR pos;
+        SVECTOR scr; /* never used; reserves retail's 8 unused frame bytes */
         DrawNode *n;
 
         GsGetLs(node->obj.coord2, ls);
@@ -261,7 +200,7 @@ void Viewport__DrawNode(Viewport *self, DrawNode *node) {
             } else {
                 n->u.spr.sprite.y = 0x200;
             }
-            GsSortSprite(&n->u.spr.sprite, self->ot[self->otIndex], pos.vz);
+            GsSortSprite(&n->u.spr.sprite, (GsOT *)self->ot[self->otIndex], pos.vz);
         }
     }
 }
