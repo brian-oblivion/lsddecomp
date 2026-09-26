@@ -14,10 +14,10 @@
  *    (ComputeStyleCueFalloff) and, on the ticks its pattern selects,
  *    requests programs on the three voices; most restart the pattern by setting
  *    `tick` to -1 once it passes a limit.
- *  - StyleEffect (include/StyleEffect.h, unified round 88), an Actor
- *    subclass (id 0xEF34, parent 0x34): this unit supplies its slot
+ *  - StyleEffect (include/StyleEffect.h), the Actor subclass the style
+ *    layer keeps at an offset from its target: this unit supplies its slot
  *    occupants (StyleEffect__StyleEffect/__Finalize/__SetParams/__Update)
- *    and the `New_StyleEffect` allocator; its private helpers are in
+ *    and the `New_StyleEffect` allocator; its per-kind work is in
  *    class_3bb8c_s.c and class_3bb8c_o.c.
  *
  * Named round 73 (charlie); tiers and evidence in each function's match

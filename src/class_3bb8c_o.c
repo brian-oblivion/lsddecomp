@@ -11,7 +11,10 @@
  *
  *  - StyleEffect's sprite-array helpers (`NoOpIgnoreArgs`,
  *    `StyleEffect__ReleaseSprites[B]`, `StyleEffect__RandomizeSprites`,
- *    `StyleEffect__SpawnPlainSprites`; include/StyleEffect.h, round 88).
+ *    `StyleEffect__SpawnPlainSprites`; include/StyleEffect.h). Two more of
+ *    its pieces sit inside the Actor group by ROM address: its table getter
+ *    `GetStyleEffectMethods`, and `SetStyleEffectSources`, which stores the
+ *    TMD resource, TIM image and viewport its methods read.
  *  - `Actor` (`GetStyleEffectMethods` onward; include/Actor.h, unified round
  *    82): the base class of `DreamSys`, `TodActor` and `StyleEffect`.
  *    `Actor__Actor` is the BASE's own constructor: `TodActor__TodActor`

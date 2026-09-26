@@ -1,17 +1,12 @@
 /*
- * class_3bb8c_s -- 0x46D20..0x475F0, the private methods of the class whose
- * table is gStyleEffectMethods: StyleEffect, include/StyleEffect.h (round 88).
- * A 0x98-byte scene object built by New_StyleEffect with a `kind` 0..3: it
- * attaches itself under a parent at pos + offset, links a model for kinds
- * 0-1, and owns up to two child arrays -- two Actor model children laid
- * out in a row that spin and drift along z after frame 500 (kind 0), or
- * five VariantSprite sprites (a GsSPRITE at +0x64) that are randomised at build
- * time (kind 2) or every frame (kind 3, class_3bb8c_o.c). Entry points are
- * the class's ctor, update slot (+0x0EC) and dtor in class_3bb8c_r.c, via
- * StyleEffect__InitByKind / __UpdateByKind / __ReleaseByKind.
- *
- * All 10 matched (StyleEffect__DriftModelChildren, the last, in round 75).
- * Named round 70; tiers in the reports. Game-level role unknown.
+ * class_3bb8c_s -- StyleEffect's per-kind work (include/StyleEffect.h): the
+ * three switches its ctor, update and finalize run (InitByKind,
+ * UpdateByKind, ReleaseByKind), and what they call for the model kinds --
+ * laying out, drifting and releasing the two model children -- and for the
+ * sprite kinds, building the five sprites. Two small helpers every kind
+ * uses sit among them: AddVec3 and AttachWithRotScale (attach, then set the
+ * rotation and scale). The slot occupants themselves are in
+ * class_3bb8c_r.c; the rest of the sprite helpers in class_3bb8c_o.c.
  */
 #include "common.h"
 #include "Actor.h"
