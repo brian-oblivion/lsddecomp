@@ -6,6 +6,63 @@ stale, prose elsewhere is not.
 
 ---
 
+## 2026-09-26 — round 92: six classes named, SoundCueSet unified, Sonnet polish sent back (premium head, plan revision 30)
+
+Premium head (Opus 5.5), cap 5, two waves of five. Gate 0 green.
+
+- **Track 6, seven jobs, none sent back.** alpha: `Class86F88` to
+  `ItemList` (A: the memory-card load picker's string list). charlie:
+  `Class6E4F0` to `Application` (A: CdInit, display/sound/3D bring-up,
+  the never-returning main loop); its `Class6E4F0Aux` was
+  `IntermediateBaseInitArgs`. echo: `Class869D8` to `NodeGuardedViewport`
+  (B), and it corrected the old banner (Viewport's ctor installs its own
+  table before `initDefaults`). Wave 2: bravo `Class86AA0` to `GridCell`
+  (B: 410 per grid element, indexed `row * 20 + col`); charlie
+  `Class86668` to `TimedTask` (B: the timeout is complete and never armed);
+  echo `Class81940` to `LbdFile` (A: its file names are the stage records'
+  `STGnn\Mnnn.LBD`, both cited strings read from retail).
+- **SoundCueSet.** Reviewing delta's first-wave pass, the head found
+  `Entity.h`'s `EntityMoodHandlerArg` was a third local view of
+  `code_179d8_e`/`_l`'s `SoundCueSet`, and said so in its own comment.
+  `plan.py` ranked it #52 behind the six Entity polish passes it feeds, so
+  the head flagged it and `plan.py` now ranks a flagged type's file first.
+  alpha unified it in `include/SoundCueSet.h`: slots are VAB
+  `program`/`octave`/`vol`/`endVol` (PlayTone's `SsUtKeyOn(vab, hi, lo)`
+  split checked), 358 accessors across 8 units, and class_3bb8c_r's cue
+  callbacks. The head then moved DreamSys onto it (`SoundCueCallbackArg`
+  deleted). Track 7's `unk` total fell from 821 to 359.
+- **Track 7.** Wave 1 on Sonnet: bravo (Entity_e) and delta (Entity_d)
+  merged local renames and banners but left step 4 undone: every hex
+  timer and distance stayed hex ("per-cue tuning values"), so no names and
+  no decimal rewrite. **Both sent back**; the polish runner is Opus again
+  (§2), and revision 30 says the base rule holds for every literal, named
+  or not. Neither unit is marked. Wave 2, delta on Opus: DreamSys, brief
+  carrying that finding. Magic 118 to 80, rawoff 4 to 0, m2c 45 to 7,
+  history 13 to 0; `ARRAY_COUNT` in `common.h`. Five sampled against their
+  evidence (`DreamSysLinkCode` against its setters, `DREAMSYS_SAVE_SIZE`,
+  `DREAM_TICKS_PER_SECOND` against the whole-minute `STAGE_TIME_LIMITS`,
+  `SetEtcTim`, `GetTeleportTimeBonus`); marked.
+- **Head at merge, by type scope:** `IntermediateBaseInitArgs`
+  drawSystem/pad/frameClock/lightRig (43 accessors; `Class866E8` is a
+  LightRig subclass), `TimedTask` `togglePause`, `LbdFile` `chunkIndex`/
+  `elemKey`, `LbdFileHeader` `placementsOffset`/`placementsSize`. Three
+  merges conflicted, all rename-only except DreamSys.c (taken from its
+  owner); replay re-applied the rest. Typeviews 80, 0 new, all round.
+- **Deferred:** Entity_e/Entity_d re-polish (now at the top of the list,
+  on Opus), and `TimedTask.sound` to `VabStreamObj *` with ObjM's ctor
+  parameters (charlie). Also DreamSys's slot `slot114` to `setEtcTim`, the
+  class-id test constants (a track 6 convention) and the pad-event enum's
+  owner (delta).
+
+For the operator: `renametype.py`, like `rename.py`, rewrites old names in
+report history prose, so echo's reports now say the class "was named
+`LbdFile` for its table address" (flagged in each report's Track 6
+section; bravo restored two such lines by hand). Revision 28 kept
+`rename.py`'s convention on purpose; whether renametype should skip history
+sections, as `unitfile.py` does, is yours to decide.
+
+---
+
 ## 2026-09-26 — round 91: phase 2 setup done, first track 6 and 7 runners (premium head, plan revision 29)
 
 Premium head (Opus 5.5), cap 5. Gate 0 green; the only ready jobs were the

@@ -117,7 +117,7 @@ Read each named class's header first; its banner points to the units.
 
 - **Boot and the main loop.** `src/main.c` sets up the `BMemPMgr` pool
   allocator (`src/code_8220.c`), the `DrawSystem` screen singleton and a
-  `Pad`, then runs the root object, `Class6D3C8` (over `Class6E4F0`,
+  `Pad`, then runs the root object, `Class6D3C8` (a subclass of `Application`,
   `src/code_1677c.c`). Its loop plays the intro logos and the day-of-week
   movie, polls the graph-screen tasks against the dream's status, and can
   start a cinematic.
@@ -145,7 +145,7 @@ Read each named class's header first; its banner points to the units.
 - **Memory-card saves.** `Class86B60` (`src/class_3bb8c_c.c`, `_d.c`) owns a
   `TaskObjF` (`src/class_3bb8c_d.c` to `_g.c`), the save/load controller: a
   state machine over the BIOS memory-card calls, which shows its choices in a
-  `Class86F88` scrolling list (`src/class_3bb8c_j.c`, `_k.c`).
+  `ItemList` scrolling list (`src/class_3bb8c_j.c`, `_k.c`).
 - **CD and data sources.** `FileResource` is the base of every class loaded
   from a file; its file interface is bound at run time to the active driver: `CdDriver`
   (`src/code_179d8_o.c`, `_q.c`, `_s.c`: the CD request queue and file table)

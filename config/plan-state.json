@@ -1278,6 +1278,16 @@
           "note": "Premium head, cap 5. Head did both setup items first (sdk-headers: include/psyq LF+lowercase, types.h guards, tools/sonyheaders.py; format: .clang-format + make format, byte-identical, every tool's output unchanged). Track 6 runners: alpha (sonnet, mechanical) 13 method tables -> g<Class>Methods; charlie Class6D430 -> FileResource (tier A; CdLoc16=CdlLOC parked on libcd collisions); echo Class6B5CC -> SceneNode (tier A) plus LongVec3, Ratio16, TmdHull/TmdVec3 and 11 methods; SceneNodeSub14/Sub44/S16Quad_d294 are Sony's GsCOORDINATE2/GsCOORD2PARAM/SVECTOR, parked until sonyheaders.py clears their includers. Head applied 5 proposed fields/slots by type scope. replay.py fixed (it rewrote each side's own history lines).",
           "round": 91,
           "runners": 3
+        },
+        {
+          "attempts": 7,
+          "calibration": true,
+          "date": "2026-09-26",
+          "matches": 7,
+          "model": "opus",
+          "note": "Premium head, cap 5, two waves. Types (all Opus, all accepted): Class86F88 -> ItemList (A), Class6E4F0 -> Application (A; its aux is IntermediateBaseInitArgs), Class869D8 -> NodeGuardedViewport (B), Class86AA0 -> GridCell (B), Class86668 -> TimedTask (B), Class81940 -> LbdFile (A, STGnn\\Mnnn.LBD record paths checked in retail), and EntityMoodHandlerArg flagged by the head and unified as SoundCueSet (include/SoundCueSet.h; three local views and DreamSys's SoundCueCallbackArg deleted; slots are VAB program/octave/vol/endVol, PlayTone's SsUtKeyOn split checked). Head applied by type scope: IntermediateBaseInitArgs drawSystem/pad/frameClock/lightRig, TimedTask togglePause, LbdFile chunkIndex/elemKey and placementsOffset/Size, DreamSys onto SoundCueSet. plan.py now ranks a head-flagged type's file first in track 6.",
+          "round": 92,
+          "runners": 7
         }
       ],
       "status": "auto"
@@ -1297,10 +1307,21 @@
           "note": "First polish round. bravo code_8220_c (magic 239->1, rawoff 101->1: the unit is Sony-typed end to end, DIVPOLYGON3/4, RVECTOR, POLY_*, addPrim); delta code_8220_b (magic 229->11, rawoff 30->1: SortTmdObject named, libgpu macros and GsDOFF/GPU codes adopted). Head reviewed names against evidence (DIVPOLYGON3 size 0x218 and cr[0].r0 at 0xA8 recomputed from libgte.h; GsLIGHT_MODE pin checked), sent none back; polish runner set to sonnet per section 2.",
           "round": 91,
           "runners": 2
+        },
+        {
+          "attempts": 3,
+          "calibration": true,
+          "date": "2026-09-26",
+          "matches": 1,
+          "model": "opus",
+          "note": "Wave 1 on Sonnet: Entity_e (bravo) and Entity_d (delta) SENT BACK: both left step 4 undone (hex timers/distances, no decimal rewrite, no names) and delta missed the SoundCueSet reading Entity.h spelled out; their local renames and banners merged, units NOT marked. Polish runner back to opus (section 2). Wave 2 on Opus: DreamSys (delta) accepted after sampling five (DreamSysLinkCode against its setters, DREAMSYS_SAVE_SIZE, DREAM_TICKS_PER_SECOND against STAGE_TIME_LIMITS, SetEtcTim, GetTeleportTimeBonus): magic 118->80, rawoff 4->0, m2c 45->7, history 13->0; ARRAY_COUNT added to common.h.",
+          "round": 92,
+          "runners": 3
         }
       ],
       "status": "auto",
       "units_done": {
+        "DreamSys": "2026-09-26",
         "code_8220_b": "2026-09-26",
         "code_8220_c": "2026-09-26"
       }

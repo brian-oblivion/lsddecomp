@@ -19,8 +19,8 @@ and wrong for every round after. Run the tool. The mechanics of a round
 the per-function matching loop is CLAUDE.md and `docs/MATCHING-GUIDE.md`.
 This file does not repeat them.
 
-Plan revision: 29 (2026-09-26, round 91's premium head: both setup items
-done; `tools/sonyheaders.py`; replay leaves each side's own lines alone).
+Plan revision: 30 (2026-09-26, round 92's premium head: a flagged type
+ranks first in track 6; step 4's base rule stands without a name).
 Changing the plan is a premium head task (§2); record the change in
 `docs/PROGRESS.md` and bump this line.
 
@@ -194,7 +194,9 @@ Sony's declaration, never a rename of Sony's.
 **Jobs**, from `plan.py`, root class first: one per class whose type or table
 name is a placeholder, carrying the placeholder types its header defines, and
 one per other file that defines placeholder types. The head adds a name the
-patterns cannot see (an opaque one such as `ObjM`) with `plan.py flag-type`.
+patterns cannot see (an opaque one such as `ObjM`, or a local view of a type
+another file defines) with `plan.py flag-type`; its file's job then ranks
+first, since other jobs' debt usually waits on it (round 92: SoundCueSet).
 
 **The pass, per class** (prompt §4.8):
 1. Read the header banner, every own method and its report, the subclasses
@@ -248,8 +250,10 @@ unchanged, measured, after fixing two that did.
    `enum` for states, kinds, commands and `switch` cases, in the header that
    owns the value; a `#define` for sizes, limits and masks; `ARRAY_COUNT()`
    for element counts. Decimal for counts, sizes, timers and colours; hex for
-   masks, flags and addresses. A literal stays when a name would only
-   restate it. A helper macro (fixed point, `ARRAY_COUNT`) lives in
+   masks, flags and addresses, for EVERY literal, named or not: "a tuning
+   value with no shared meaning" excuses a name, never the base (round 92
+   sent two passes back for leaving `moodTimer == 0xC8`). A literal stays
+   when a name would only restate it. A helper macro (fixed point, `ARRAY_COUNT`) lives in
    `include/common.h`, added by the first runner who needs it.
 5. Comments and banner, per the phase 2 rules.
 6. `clang-format -i`, oracle, commit.
