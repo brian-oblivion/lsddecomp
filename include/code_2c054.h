@@ -16,8 +16,6 @@
  */
 typedef struct StreamTaskUnkB4Obj StreamTaskUnkB4Obj;
 typedef struct StreamTaskUnkB4Methods StreamTaskUnkB4Methods;
-typedef struct StreamTaskUnk78Obj StreamTaskUnk78Obj;
-typedef struct StreamTaskUnk78Methods StreamTaskUnk78Methods;
 typedef struct TaskTextObj TaskTextObj;
 typedef struct TaskTextMethods TaskTextMethods;
 
@@ -44,9 +42,10 @@ extern Vec3_d294 D_8006E86C;
  * __RefreshViewValue call it; StreamTask.h types the field `BasicClass *`
  * and they cast. Until round 84 it also stood for TaskCore's
  * sound/subHandle/tileMap/tileAtlas, which TaskCore.h types `BasicClass *`
- * (only their +0x004 release is ever called). The BgLayer (TaskCore::bgLayer)
- * is StreamTaskUnk78Obj below: its +0x04C takes three arguments where this
- * class's takes one. */
+ * (only their +0x004 release is ever called). The BgLayer (TaskCore::bgLayer,
+ * include/BgLayer.h since round 88) is not this class: its +0x04C
+ * (Class6B5CC's attachToParent) takes three arguments where this class's
+ * takes one. */
 struct StreamTaskUnkB4Methods {
     u8 pad00[0x04];
     void (*slot04)(StreamTaskUnkB4Obj *self); /* +0x004 */
@@ -59,7 +58,7 @@ struct StreamTaskUnkB4Methods {
                                         return stored into StreamTask::playDone there */
     void (*slot4C)(StreamTaskUnkB4Obj *self); /* +0x04C, StreamTask__RefreshViewValue's forward target;
                                         1 argument -- see the struct comment for why this
-                                        is NOT the same slot as StreamTaskUnk78Methods::slot4C */
+                                        is NOT the same slot as BgLayer's attachToParent */
     u8 pad50[0x06C - 0x050];
     void (*slot6C)(StreamTaskUnkB4Obj *self, s32 a1); /* +0x06C, StreamTask__OnInit's forward target */
 };
@@ -67,26 +66,6 @@ struct StreamTaskUnkB4Methods {
 struct StreamTaskUnkB4Obj {
     StreamTaskUnkB4Methods *methods; /* +0x000 */
 };
-
-/* TaskCore::bgLayer's class, BgLayer (D_8006F2C4: +0x04C/+0x050 are
- * Class6B5CC__AttachToParent/DetachFromParent, +0x0B8 BgLayer__SetColor), as
- * TaskCore__OnInit/OnDeinit call it. */
-struct StreamTaskUnk78Methods {
-    u8 pad00[0x04];
-    void (*slot04)(StreamTaskUnk78Obj *self); /* +0x004, TaskCore__Finalize's forward target */
-    u8 pad08[0x04C - 0x008];
-    void (*slot4C)(StreamTaskUnk78Obj *self, BasicClass *parent, s32 a2); /* +0x04C, TaskCore__OnInit's
-                                        forward target -- 3 arguments, see above */
-    void (*slot50)(StreamTaskUnk78Obj *self); /* +0x050, TaskCore__OnDeinit's forward target */
-    u8 pad54[0x0B8 - 0x054];
-    void (*slotB8)(StreamTaskUnk78Obj *self, s32 a1, u8 *a2); /* +0x0B8, TaskCore__OnInit's
-                                        forward target */
-};
-
-struct StreamTaskUnk78Obj {
-    StreamTaskUnk78Methods *methods; /* +0x000 */
-};
-
 
 /* initArgs->unk0's class (IntermediateBaseInitArgs, BasicClass * there) as
  * TaskCore__OnInit/OnDeinit call its +0x078 with baseColor or unk93. */
@@ -116,12 +95,12 @@ struct TaskTextObj {
  * and return types are modeled. */
 extern StreamTaskUnkB4Obj *New_MoviePlayer(StreamTaskInitData *a0, s32 a1, s32 a2);
 
-/* Three more externs reached only by TaskCore__TaskCore, none of them in
+/* Two more externs reached only by TaskCore__TaskCore, none of them in
  * this unit; local views of their allocators. The ctor stores each result
- * into a `BasicClass *` field (tileAtlas, tileMap, bgLayer); the fourth,
- * New_VabStreamObj (sound), is include/VabStreamObj.h's. */
+ * into a `BasicClass *` field (tileAtlas, tileMap); the other two,
+ * New_VabStreamObj (sound) and New_BgLayer (bgLayer), are
+ * include/VabStreamObj.h's and include/BgLayer.h's. */
 extern StreamTaskUnkB4Obj *New_TileAtlas(s32 a0);
 extern StreamTaskUnkB4Obj *New_TileMap(s32 a0, StreamTaskUnkB4Obj *a1);
-extern StreamTaskUnk78Obj *New_BgLayer(StreamTaskUnkB4Obj *a0, s32 a1);
 
 #endif
