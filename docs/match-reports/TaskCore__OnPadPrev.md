@@ -60,7 +60,7 @@ merge retail is doing that the C fails to express.
   while matching `TaskCore__GetActiveSlotCount`, then the head):
 
   ```sh
-  python3 tools/classtable.py gClass86B60Methods
+  python3 tools/classtable.py gTitleMenuMethods
   #   +0x118  0x8003DE30 TaskCore__RetreatSlotCursor
   #   +0x120  0x8003DFA0 TaskCore__GetActiveSlotCount
   ```

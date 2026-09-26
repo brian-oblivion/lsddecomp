@@ -18,7 +18,7 @@
  *    before cell `gapIndex`.
  *  - Its callers make one per string: TaskCore's slot and item widgets (one
  *    per name, TaskCore__CreateSlotElements), ItemList's 26-character rows,
- *    Class86B60's name field, TextEntry's `textRow`, ObjM's "Pause".
+ *    TitleMenu's name field, TextEntry's `textRow`, ObjM's "Pause".
  *
  * The ctor chains to CharSprite's first (GetCharSpriteMethods()->ctor with
  * cell 0x20), so the id tree (0x1144 -> 0x11144) is the ctor chain. No class
@@ -62,7 +62,7 @@ struct TextRowMethods {
 struct TextRow {
     CHARSPRITE_FIELDS(TextRowMethods);
     /* +0x0A9 */ u8 cellCount; /* the ctor's count: cells allocated; finalize releases them, setPosition walks them */
-    /* +0x0AA */ u8 gapIndex; /* 0: none; else attachToParent adds 0x10 before this cell (Class86B60's name field: 9) */
+    /* +0x0AA */ u8 gapIndex; /* 0: none; else attachToParent adds 0x10 before this cell (TitleMenu's name field: 9) */
     /* +0x0AB */ u8 visibleCount; /* the window attach/detach/setDisplay/setColor walk; the ctor sets it to count (name field: 8) */
     /* +0x0AC */ u8 firstVisible; /* its first cell; the ctor sets 0 (name field: 4) */
     /* +0x0AD */ u8 padAD[3];

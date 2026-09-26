@@ -140,16 +140,16 @@ wrong rather than the C.
 ## Naming (round 78, delta)
 
 **Tier A.** `func_8003C63C` -> `Obj86B60__SetState`. Occupies slot60 in
-`gTaskCoreMethods`; `gClass86B60Methods` overrides the SAME slot with the
-independently-named `Class86B60__SetState` (`tools/classtable.py
-gClass86B60Methods`), which is what settles both the slot's role (a
+`gTaskCoreMethods`; `gTitleMenuMethods` overrides the SAME slot with the
+independently-named `TitleMenu__SetState` (`tools/classtable.py
+gTitleMenuMethods`), which is what settles both the slot's role (a
 `reason`-coded state-transition entry point, signature `(self, s32 reason)`
 matching `Obj86B60Methods::slot60`) and this function's name as the class
 family's DEFAULT implementation a sibling class overrides -- not something
-`Class86B60` or `GraphRoomObj` introduces (both keep it: `GraphRoomObj`'s own
+`TitleMenu` or `GraphRoomObj` introduces (both keep it: `GraphRoomObj`'s own
 table has this exact occupant at slot60, unoverridden). See
 `include/code_2cc8c.h`'s round-78 header comment for the full derivation and
-why this rules out a `Class86B60__`/`GraphRoomObj__` prefix.
+why this rules out a `TitleMenu__`/`GraphRoomObj__` prefix.
 
 ## Proposed field names (round 78, delta -- NOT applied, cross-unit)
 

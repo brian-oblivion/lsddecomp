@@ -136,69 +136,69 @@ extern void *BMemPMgrAlloc(s32 size);
  * to the no-argument getter as zero-cost (docs/match-reports/GridCell__GridCell.md). */
 
 
-/* Class86B60 (gClass86B60Methods, a TaskCore) is defined in
- * include/Class86B60.h (round 88, track 4). Two views of OTHER classes
- * its methods call stay here, named for the Class86B60 field that holds
+/* TitleMenu (gTitleMenuMethods, a TaskCore) is defined in
+ * include/TitleMenu.h (round 88, track 4). Two views of OTHER classes
+ * its methods call stay here, named for the TitleMenu field that holds
  * them: */
 
 /* The class of IntermediateBaseInitArgs::unk0 (a BasicClass * there), as
- * Class86B60__OnDeinit calls its +0x078; TaskCore__OnDeinit makes the same
+ * TitleMenu__OnDeinit calls its +0x078; TaskCore__OnDeinit makes the same
  * call through code_2c054.h's TaskTextObj. */
-typedef struct Class86B60UnkC0ObjMethods_3bb8c_d Class86B60UnkC0ObjMethods_3bb8c_d;
-typedef struct Class86B60UnkC0Obj_3bb8c_d Class86B60UnkC0Obj_3bb8c_d;
+typedef struct TitleMenuUnkC0ObjMethods_3bb8c_d TitleMenuUnkC0ObjMethods_3bb8c_d;
+typedef struct TitleMenuUnkC0Obj_3bb8c_d TitleMenuUnkC0Obj_3bb8c_d;
 
-struct Class86B60UnkC0ObjMethods_3bb8c_d {
+struct TitleMenuUnkC0ObjMethods_3bb8c_d {
     u8 pad000[0x078];
-    /* +0x078, Class86B60__OnDeinit's own call: `(childObj, &self->unk93,
+    /* +0x078, TitleMenu__OnDeinit's own call: `(childObj, &self->unk93,
      * tableEntry)`, where `tableEntry` walks a fixed external table
      * (`D_80086DAC`, stride 0xC) starting fresh each call to this
      * function. */
-    void (*slot78)(Class86B60UnkC0Obj_3bb8c_d *self, void *arg1, void *arg2);
+    void (*slot78)(TitleMenuUnkC0Obj_3bb8c_d *self, void *arg1, void *arg2);
 };
 
-struct Class86B60UnkC0Obj_3bb8c_d {
-    Class86B60UnkC0ObjMethods_3bb8c_d *methods; /* +0x000 */
+struct TitleMenuUnkC0Obj_3bb8c_d {
+    TitleMenuUnkC0ObjMethods_3bb8c_d *methods; /* +0x000 */
 };
 
-/* Class86B60::saveCtrl is a TaskObjF (include/TaskObjF.h). */
+/* TitleMenu::saveCtrl is a TaskObjF (include/TaskObjF.h). */
 
 
-/* Class86B60's menu description (include/TaskCore.h): Class86B60__Class86B60
+/* TitleMenu's menu description (include/TaskCore.h): TitleMenu__TitleMenu
  * passes &D_80086D44 as TaskCore's ctor's `target` and again to setTarget.
  * 0x28 bytes in asm/data/76DC8.data.s, a path word, three zero words, the two
  * colour triples and four pointers: the TaskCoreTarget layout. RETYPED from a
  * placeholder `s32` in round 88 (address-of only; no byte change). */
 extern TaskCoreTarget D_80086D44;
 
-/* "ETC\ETCSE" (asm/data/1C34.rodata.s), Class86B60__Class86B60's
+/* "ETC\ETCSE" (asm/data/1C34.rodata.s), TitleMenu__TitleMenu's
  * soundBankPath for TaskCore's ctor. RETYPED from a placeholder `s32` in
  * round 88 (address-of only); the ctor casts away the const for the
  * ctor's `char *`. */
 extern const char D_800114DC[];
 
-/* "ETC\TITLE.TIM" (asm/data/1C34.rodata.s), Class86B60__Reset's path for
+/* "ETC\TITLE.TIM" (asm/data/1C34.rodata.s), TitleMenu__Reset's path for
  * setSubHandle. RETYPED from a placeholder `s32` in round 88 (address-of
  * only). */
 extern const char D_800114E8[];
 
-/* Class86B60__BeginMemcardSave's own path string, passed to New_TimImage -- a real
+/* TitleMenu__BeginCardAccess's own path string, passed to New_TimImage -- a real
  * dlabel (`asm/data/1C34.rodata.s`: "CARD\FILEICN1.TIM"), so this is the
  * ONLY correct spelling (CLAUDE.md: never re-write a string splat has
  * already emitted as a symbol). */
 extern const char D_800114F8[];
 
-/* Address-of only in this unit -- Class86B60__OnDeinit walks it with an
+/* Address-of only in this unit -- TitleMenu__OnDeinit walks it with an
  * explicit 0xC-byte stride, passing each entry's address on to
- * `Class86B60UnkC0ObjMethods_3bb8c_d::slot78`, but never dereferences it
+ * `TitleMenuUnkC0ObjMethods_3bb8c_d::slot78`, but never dereferences it
  * itself. Placeholder s32 type; real element layout unknown. */
 extern s32 D_80086DAC;
 
-/* Address-of only in this unit (Class86B60__ForwardToNameField passes &D_8008A9B4 to
+/* Address-of only in this unit (TitleMenu__AttachSaveTitle passes &D_8008A9B4 to
  * the name field's attachToParent, TextRow +0x04C, as its LongVec3 offset;
  * the words are -4, -23, ...). Placeholder s32 type, cast at the call. */
 extern s32 D_8008A9B4;
 
-/* VALUE-of, not address-of, in this unit -- Class86B60__UpdateMemcardSaveStatus reaches these
+/* VALUE-of, not address-of, in this unit -- TitleMenu__LoadFromCard reaches these
  * through `%gp_rel` loads of the .sdata globals themselves, forwarding
  * whatever they hold. Each holds a pointer into the still-uncarved rodata
  * block at `D_80011434` (`asm/data/1C34.rodata.s`: 0x80011464 and
@@ -206,7 +206,7 @@ extern s32 D_8008A9B4;
  * be spelled by the address they point to and are typed opaque `void *`
  * instead.
  *
- * `D_8008AA18` is also read by round 43's `Class86B60__CreateNameField`, which
+ * `D_8008AA18` is also read by round 43's `TitleMenu__CreateSaveTitle`, which
  * `strcpy`s INTO `(char *)D_8008AA18 + 0x18` and reads it with `strlen` --
  * both require the RUNTIME value to be a writable buffer, not the .rodata
  * address the ROM image happens to initialise it to. Nothing in this unit
@@ -222,7 +222,7 @@ extern void *D_8008AA18;
  * writable-buffer placeholder rather than the real runtime value. */
 extern void *D_8008AA24;
 
-/* Same VALUE-of `%gp_rel` pattern, read only by round 43's `Class86B60__CreateNameField`
+/* Same VALUE-of `%gp_rel` pattern, read only by round 43's `TitleMenu__CreateSaveTitle`
  * as `strcpy`'s SOURCE argument. Holds `0x80011474` in the ROM image
  * (immediately past `D_8008AA10`'s own "BISLPS-01556xxx" string, i.e. the
  * start of the font-glyph word table in `D_80011434`) -- likely also a
@@ -230,28 +230,28 @@ extern void *D_8008AA24;
  * table is not plausible `strcpy` input. */
 extern void *D_8008AA14;
 
-/* Same VALUE-of `%gp_rel` pattern, read only by round 43's `Class86B60__BeginMemcardSave`
- * as `Class86B60UnkACObjMethods_3bb8c_d::slot6C`'s own `arg1`. Holds
+/* Same VALUE-of `%gp_rel` pattern, read only by round 43's `TitleMenu__BeginCardAccess`
+ * as `TitleMenuUnkACObjMethods_3bb8c_d::slot6C`'s own `arg1`. Holds
  * `0x80011454` in the ROM image -- the "BISLPS-01556" string in
  * `D_80011434`, again with no `dlabel` of its own. */
 extern void *D_8008A9D0;
 
-/* Address-of only, round 43's `Class86B60__BeginMemcardSave`
- * (`Class86B60UnkACObjMethods_3bb8c_d::slot6C`'s own `arg2`) -- a real
+/* Address-of only, round 43's `TitleMenu__BeginCardAccess`
+ * (`TitleMenuUnkACObjMethods_3bb8c_d::slot6C`'s own `arg2`) -- a real
  * 16-entry pointer table (`asm/data/76DC8.data.s`, `D_8008AA0C` down to
  * `D_8008A9D4` then a NULL terminator), reached only by its own address
  * here, never walked. Placeholder `s32` type since only the address is
  * taken. */
 extern s32 D_80086D6C;
 
-/* Class86B60__TickNameFieldCursor's own rolling byte index (0/1/2, wraps to 0 at 3) into
+/* TitleMenu__CycleSaveTitleColor's own rolling byte index (0/1/2, wraps to 0 at 3) into
  * that function's own 3-byte stack buffer -- declared in the ROM image
  * as a full `.word` (`asm/data/7B12C.sdata.s`), but accessed only via
  * `lbu`/`sb` here, so `u8` is the correct C type for this unit's own
  * reference regardless of the underlying storage's full width. */
 extern u8 D_8008AA28;
 
-/* Class86B60__TickNameFieldCursor's own rolling word counter (wraps to 0 at 0x101). */
+/* TitleMenu__CycleSaveTitleColor's own rolling word counter (wraps to 0 at 0x101). */
 extern s32 D_8008AA2C;
 
 /* TaskObjF__TaskObjF's own one-shot init guard: read, then unconditionally
@@ -262,12 +262,12 @@ extern s32 D_8008AA30;
 
 /* Still raw asm in this unit (gp-relative-blocked, see
  * docs/match-reports/FormatNumberIntoBuffer.md) -- not this round's function, but
- * Class86B60__Class86B60 calls it with one forwarded s32 argument (the return
+ * TitleMenu__TitleMenu calls it with one forwarded s32 argument (the return
  * value of dreamSys->methods->slot1A0); return value unused there. */
 extern void FormatNumberIntoBuffer(s32 arg0);
 
 /*
- * The block CheckSaveScoreFlag reads: its caller's Class86B60::saveBlock
+ * The block CheckSaveScoreFlag reads: its caller's TitleMenu::saveBlock
  * (the DreamSys's getSaveBlock, &saveMagic). +0x00C from saveMagic is
  * DreamSys's totalFlasbackUnlockScore (include/DreamSys.h); +0x2F4 is
  * unnamed there.
@@ -281,8 +281,8 @@ typedef struct SaveBlock678_3bb8c_c {
 
 /*
  * First argument of CheckSaveScoreFlag: its one caller,
- * Class86B60__CommitNameEntry (class_3bb8c_d), passes its own self, so
- * +0x0BC is Class86B60::saveBlock (include/Class86B60.h).
+ * TitleMenu__RefreshMenu (class_3bb8c_d), passes its own self, so
+ * +0x0BC is TitleMenu::saveBlock (include/TitleMenu.h).
  */
 typedef struct Ctx678_3bb8c_c {
     u8 pad00[0x0BC];

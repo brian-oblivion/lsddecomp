@@ -95,7 +95,7 @@ None new -- `slot7C` was already declared while surveying the unit
 function-pointer local" and it is not "duplicate everything" either --
 it is "write the full call statement in each branch and let the compiler
 decide how much of it to share."** The round-12 "local function pointer
-variable" lever (used successfully for `Class86B60__Tick`'s DIFFERENTLY-typed
+variable" lever (used successfully for `TitleMenu__Tick`'s DIFFERENTLY-typed
 slots colliding on one call site) is for the case where the branches call
 DIFFERENT typed slots; here they call the SAME slot with different
 arguments, and forcing it through one shared fetch under-duplicates

@@ -7,7 +7,7 @@
  * IntermediateBase -- class id 0x30, method table gIntermediateBaseMethods: a
  * BasicClass subclass that runs one attached job to a result. Methods in
  * src/code_2cc8c_c.c. Two classes derive from it (`typeviews.py --tree`):
- * TaskCore (0x130, gTaskCoreMethods: StreamTask, Class86B60, GraphRoom
+ * TaskCore (0x130, gTaskCoreMethods: StreamTask, TitleMenu, GraphRoom
  * below it) and TimedTask (0x230: gClass865C8Methods's Class865C8 and gObjMMethods's ObjM
  * below it). It is abstract: +0x04C, +0x050 and +0x058 are NULL in its own
  * table, and init/deinit call the first two. It has no allocator; the object
@@ -56,7 +56,7 @@ struct IntermediateBaseInitArgs {
     /* +0x054 */ void (*onTag1Notify)(Self *self, BasicClass *sender, s32 event); /* IntermediateBase__OnTag1Notify: onNotify's gDrawSystemMethods (1) case */ \
     /* +0x058 */ void (*onPadEvent)(Self *self, BasicClass *sender, s32 event);   /* NULL; onNotify's Pad (2) case */ \
     /* +0x05C */ void (*update)(Self *self, BasicClass *sender, s32 event);       /* IntermediateBase__IncrementFrameCounter: onNotify's FrameClock (5) case */ \
-    /* +0x060 */ void (*setState)(Self *self, s32 state);    /* IntermediateBase__SetState; TaskCore__SetState, Class86B60__SetState */ \
+    /* +0x060 */ void (*setState)(Self *self, s32 state);    /* IntermediateBase__SetState; TaskCore__SetState, TitleMenu__SetState */ \
     /* +0x064 */ void (*onState2)(Self *self);               /* IntermediateBase__OnState2 */    \
     /* +0x068 */ void (*onState3)(Self *self)                /* IntermediateBase__OnState3 */
 /* clang-format on */

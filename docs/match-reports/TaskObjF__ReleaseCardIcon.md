@@ -32,7 +32,7 @@ reusing the shared release-only view.
 This is the first function in a brand new 29-slot class table
 (`D_80086E00`, resolved with `tools/classtable.py 0x80086E00`), unrelated
 by inheritance to any table already known in this header (`--vs` against
-`gBasicClassMethods`/`gClass866E8Methods`/`gClass86B60Methods`/`gTaskObjFMethods` showed no shared run of
+`gBasicClassMethods`/`gClass866E8Methods`/`gTitleMenuMethods`/`gTaskObjFMethods` showed no shared run of
 slots). Found by searching the retail binary for raw pointer values
 matching this unit's own function addresses (each of the 12 fresh
 functions plus the 3 non-`gp_rel` blocked ones appears EXACTLY ONCE, in one
@@ -43,7 +43,7 @@ for those function names) -- this round's other two runners sharing
 `include/class_3bb8c.h`.
 
 **Every new type is suffixed `_3bb8c_g`, including the class name itself**
--- unlike the single-owner `Class86B60`/`NodeGuardedViewport`/`GridCell` already
+-- unlike the single-owner `TitleMenu`/`NodeGuardedViewport`/`GridCell` already
 in this header. Since three units reach into this ONE real table this
 round, an unsuffixed `Class86E00` risks a same-named, differently-shaped
 definition arriving from `class_3bb8c_e` or `class_3bb8c_f` at merge time

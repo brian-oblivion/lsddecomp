@@ -8,7 +8,7 @@
 
 ## What it does
 
-`gIntermediateBaseMethods+0x054` (and `gClass86B60Methods`'s own verbatim-inherited `+0x054`):
+`gIntermediateBaseMethods+0x054` (and `gTitleMenuMethods`'s own verbatim-inherited `+0x054`):
 `self->methods->slot54`'s occupant, and one of `IntermediateBase__OnNotify`'s own
 3-way `arg1->target->header` dispatch targets. `arg1` is entirely unused in
 the body -- only `arg2` is read. Gated on `arg2 == 2`: dispatches `slot44`

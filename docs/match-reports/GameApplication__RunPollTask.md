@@ -74,7 +74,7 @@ a clean instance of the same idiom with no new residue.
 purpose: constructs a `PollTask` via the caller-supplied `ctor`, dispatches
 `slot44(task, extra, 0)` and `slot4(task)` on it (fire-and-forget teardown),
 returns `slot44`'s result. Generic across both call sites
-(`New_GraphRoom`/`New_Class86B60`, both used only by
+(`New_GraphRoom`/`New_TitleMenu`, both used only by
 `GameApplication__PollGraphRoomStatus`), so it is named for what it mechanically
 does (build, query, dispose a PollTask) rather than for either specific
 caller.

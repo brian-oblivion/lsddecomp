@@ -13,7 +13,7 @@
 #include "TaskCore.h"
 #include "StreamTask.h"
 #include "GraphRoom.h"
-#include "Class86B60.h"
+#include "TitleMenu.h"
 #include "Class865C8.h"
 
 /* The game's allocator, in the uncarved code_8220 block. Returns void *
@@ -46,7 +46,7 @@ extern s32 PickWeeklyStreamChannel(s32 *out, s32 param2); /* psyq_memset.s: day/
 extern const char sLogoPathAsmk[]; /* "ETC\ASMKLOGO.TIM" */
 extern const char sLogoPathOsd[];  /* "ETC\OSDLOGO.TIM" */
 
-/* The PollTasks GameApplication__RunPollTask runs (New_GraphRoom, New_Class86B60)
+/* The PollTasks GameApplication__RunPollTask runs (New_GraphRoom, New_TitleMenu)
  * are TaskCore-family classes; this is this unit's own minimal view of
  * them: +0x004 is BasicClass's release, +0x044 IntermediateBase's init.
  * Constructed directly by a caller-supplied function pointer
@@ -72,8 +72,8 @@ s32 GameApplication__RunPollTask(PollTaskCtor ctor, void *dreamSys, Intermediate
 
 /* PollTask constructors (not this unit's to write). Called directly (not
  * through any vtable) as GameApplication__RunPollTask's `ctor` argument.
- * New_GraphRoom is include/GraphRoom.h's and New_Class86B60
- * include/Class86B60.h's, each cast to PollTaskCtor. */
+ * New_GraphRoom is include/GraphRoom.h's and New_TitleMenu
+ * include/TitleMenu.h's, each cast to PollTaskCtor. */
 
 extern s32 GetGraphRoomStreamChannel(s32 *out, s32 a1, s32 a2); /* psyq_memset.s: writes a derived count to *out, returns a separate derived value */
 /* code_39094.c: same "write to *out, return a separate value" shape as
@@ -216,7 +216,7 @@ void GameApplication__StartWeeklyStreamTask(GameApplication *self) {
 /* Gated by self->config->pollGraphRoom. Checks the DreamSys's own status slot
  * (+0x1A0); if it isn't already "1" and self->skipGraphRoomPoll hasn't latched, kicks
  * off one PollTask (New_GraphRoom) and, if THAT reports "2", runs
- * GameApplication__StartGraphRoomStreamTask. Then polls a second PollTask (New_Class86B60) in a loop,
+ * GameApplication__StartGraphRoomStreamTask. Then polls a second PollTask (New_TitleMenu) in a loop,
  * restarting the first PollTask each time it reports "2", until it
  * reports anything else; clears self->skipGraphRoomPoll and returns 0 or 2 depending
  * on whether that final status was below 1. */
@@ -240,7 +240,7 @@ s32 GameApplication__PollGraphRoomStatus(GameApplication *self) {
 
         pollDone = 2;
     retry:
-        status = GameApplication__RunPollTask((PollTaskCtor)New_Class86B60, self->dreamSys,
+        status = GameApplication__RunPollTask((PollTaskCtor)New_TitleMenu, self->dreamSys,
                                               (IntermediateBaseInitArgs *)self->aux);
         if (status == pollDone) {
             GameApplication__RunPollTask((PollTaskCtor)New_GraphRoom, self->dreamSys,

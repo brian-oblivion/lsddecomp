@@ -25,7 +25,7 @@
  * Shape: this is class-framework code. Every function in this file is
  * TaskCore's own (include/TaskCore.h, track 4 round 84; its object was
  * viewed here as `Obj86B60` until then), the default for its slot in
- * gTaskCoreMethods, which StreamTask, Class86B60 and GraphRoom
+ * gTaskCoreMethods, which StreamTask, TitleMenu and GraphRoom
  * inherit or override. TaskCore__OnPadEvent is IntermediateBase's Pad
  * case, switching on the event to the five onPad* handlers;
  * TaskCore__Update and TaskCore__SetState drive the state machine the

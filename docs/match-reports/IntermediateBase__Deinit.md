@@ -9,7 +9,7 @@ round's queue)
 
 ## What it does
 
-`gIntermediateBaseMethods+0x048` (and `gClass86B60Methods`'s own verbatim-inherited `+0x048`, per
+`gIntermediateBaseMethods+0x048` (and `gTitleMenuMethods`'s own verbatim-inherited `+0x048`, per
 `tools/classtable.py`): the teardown counterpart to `IntermediateBase__Init`'s
 init/registration -- calls `slot50` (external, unobserved elsewhere),
 unconditionally removes the three children `IntermediateBase__Init` added
@@ -63,7 +63,7 @@ without a register-pressure iteration this time.
 ## Struct/table knowledge established
 
 - `Obj86B60Methods`: added `slot14` (inherited BasicClass removeChild) and
-  `slot50` (external `Class86B60__OnDeinit`, unobserved elsewhere).
+  `slot50` (external `TitleMenu__OnDeinit`, unobserved elsewhere).
 - `Unk14Obj`/`Unk18Obj`: both confirmed to ALSO expose the inherited
   BasicClass `slot4` (release) and `slot14` (removeChild) -- same universal
   low-offset BasicClass layout every class in this game shares. Both types

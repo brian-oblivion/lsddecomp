@@ -21,7 +21,7 @@
  *    sources (added as children; TaskObjF__AddChild files each child by its
  *    class id: low nibble 2 -> inputSource, 5 -> tickSource, 0x10 ->
  *    textEntry, 0x20 -> itemList), the sprite parent and the sound. Its one
- *    caller is Class86B60__BeginMemcardSave: initArgs->unk4, unk10 (a
+ *    caller is TitleMenu__BeginCardAccess: initArgs->unk4, unk10 (a
  *    FrameClock, id 0x5), unk14, and TaskCore's `sound` (a VabStreamObj).
  *  - beginLoad (+0x074, opMode 1) lists the save files that exist
  *    (collectExistingMemcardFiles into `titles`/`foundSuffixes`), lets the
@@ -31,7 +31,7 @@
  *    TextEntry (state 0x11), then writes the save file with its icon
  *    (state 0x14, writeMemcardSaveFile).
  *  - setState (+0x07C) runs notifyParents(state) first; the terminal states
- *    0x16/0x17 free the load buffers and return to state 0. Class86B60's
+ *    0x16/0x17 free the load buffers and return to state 0. TitleMenu's
  *    onTagBValue (the parent) ends the save on them.
  *  - onNotify (+0x038) routes a child's notification by the child's class
  *    id, exactly as its AddChild files them: 2 -> onInputEvent, 5 ->

@@ -1,8 +1,12 @@
-# Class86B60__BeginMemcardSave -- MATCHED 60/60, round 43
+# TitleMenu__BeginCardAccess -- MATCHED 60/60, round 43
+
+> Renamed from `TitleMenu__BeginMemcardSave` on 2026-09-26 (tools/rename.py). Address 0x8004df64.
+
+> Renamed from `Class86B60__BeginMemcardSave` on 2026-09-26 (tools/rename.py). Address 0x8004df64.
 
 > Renamed from `func_8004DF64` on 2026-09-24 (tools/rename.py). Address 0x8004df64.
 
-Unit `class_3bb8c_d`, class `Class86B60`. **REOPENED -- ASSIGNABLE** from
+Unit `class_3bb8c_d`, class `TitleMenu`. **REOPENED -- ASSIGNABLE** from
 round 42's `gp_rel` resolution. The round-14 stub recorded 1 `gp_rel` hit
 and no derivation; this round wrote and matched the function from scratch.
 
@@ -11,7 +15,7 @@ and no derivation; this round wrote and matched the function from scratch.
 ```c
 extern GenericReleaseObj_3bb8c_d *New_TimImage(const char *path);
 
-void Class86B60__BeginMemcardSave(Class86B60 *self)
+void TitleMenu__BeginCardAccess(TitleMenu *self)
 {
     if (self->unkAC == NULL) {
         self->iconHandle = New_TimImage(D_800114F8);
@@ -26,14 +30,14 @@ void Class86B60__BeginMemcardSave(Class86B60 *self)
 }
 ```
 
-Byte-exact on the first build: `funcdiff.py Class86B60__BeginMemcardSave` -> `60/60 words
+Byte-exact on the first build: `funcdiff.py TitleMenu__BeginCardAccess` -> `60/60 words
 match (file 0x3E764-0x3E854)`; whole-image `OK: build matches retail
 SLPS_015.56`.
 
 ## Derivation
 
 - Lazy-init guard: `if (self->unkAC == NULL) { ... }`, the mirror image of
-  `Class86B60__Finalize`'s destructor guard on the same two fields
+  `TitleMenu__Finalize`'s destructor guard on the same two fields
   (`iconHandle`/`unkAC`).
 - `New_TimImage(D_800114F8)` -- `New_TimImage` is already matched
   project-wide under many independent local arities/return types (see
@@ -47,9 +51,9 @@ SLPS_015.56`.
   arguments (`1`, `0`); return type `void *` needs no cast into
   `self->unkAC`.
 - `self->unkAC->methods->slot6C(...)` -- a NEW 7-argument slot (4 in
-  registers, 3 on the stack) at `Class86B60UnkACObjMethods_3bb8c_d`'s
+  registers, 3 on the stack) at `TitleMenuUnkACObjMethods_3bb8c_d`'s
   +0x06C, immediately before the already-known `slot70`
-  (`Class86B60__EndMemcardSave`) with no gap. Every non-`self` argument is forwarded
+  (`TitleMenu__EndCardAccess`) with no gap. Every non-`self` argument is forwarded
   opaquely: `D_8008A9D0` (a NEW `%gp_rel` VALUE-of global, same pattern as
   `D_8008AA10`/`D_8008AA18`/`D_8008AA14` -- holds `0x80011454`, the
   "BISLPS-01556" string in the same unowned `D_80011434` rodata block,
@@ -58,7 +62,7 @@ SLPS_015.56`.
   `self->handlerTable->unk4` (already `void *`), `self->unk10` (already `void
   *`), a NEW field `self->unk14` (`void *`, established here -- lands
   exactly at +0x014, right after `unk10` with no gap), and `self->unk48`
-  (already typed `struct Class86B60Unk48Obj *`).
+  (already typed `struct TitleMenuUnk48Obj *`).
 - The three trailing calls reuse two ALREADY-established slots verbatim:
   `self->methods->slot10(self, self->unkAC)` and two calls to
   `self->methods->slot14`, once with `self->handlerTable->unk4` and once with
@@ -69,9 +73,9 @@ SLPS_015.56`.
 
 `include/class_3bb8c.h`, all additive:
 
-- `Class86B60`: new field `unk14` (`void *`) at +0x014, splitting the
+- `TitleMenu`: new field `unk14` (`void *`) at +0x014, splitting the
   existing `pad014[0x02C-0x014]` gap (now `pad018[0x02C-0x018]`).
-- `Class86B60UnkACObjMethods_3bb8c_d`: new `slot6C` (7 args) inserted
+- `TitleMenuUnkACObjMethods_3bb8c_d`: new `slot6C` (7 args) inserted
   before `slot70`, splitting the existing `pad008[0x070-0x008]` gap into
   `pad008[0x06C-0x008]` + the new slot (0x06C-0x070, exactly 4 bytes, no
   remainder).
@@ -96,17 +100,17 @@ blocker itself was the only thing stopping them.
 
 ## Naming (round 77, naming runner delta)
 
-Renamed `func_8004DF64` -> `Class86B60__BeginMemcardSave`. **Tier B**: Lazy-inits `self->iconHandle` (`New_TimImage(D_800114F8)`, a real dlabel "CARD\\FILEICN1.TIM") and `self->unkAC` (`New_TaskObjF`), then dispatches `unkAC`'s `slot6C` with `D_8008A9D0` (VALUE-of, holds "BISLPS-01556" -- Sony's memcard save-header game-ID convention) plus filename-related fields. Named from the game-ID string as the strongest evidence this is the start of a memory-card save operation; the exact protocol is not established.
+Renamed `func_8004DF64` -> `TitleMenu__BeginCardAccess`. **Tier B**: Lazy-inits `self->iconHandle` (`New_TimImage(D_800114F8)`, a real dlabel "CARD\\FILEICN1.TIM") and `self->unkAC` (`New_TaskObjF`), then dispatches `unkAC`'s `slot6C` with `D_8008A9D0` (VALUE-of, holds "BISLPS-01556" -- Sony's memcard save-header game-ID convention) plus filename-related fields. Named from the game-ID string as the strongest evidence this is the start of a memory-card save operation; the exact protocol is not established.
 
 ## Track 4 (2026-09-26, round 88)
 
 TimImage is unified (`include/TimImage.h`); this unit's local `extern
 GenericReleaseObj_3bb8c_d *New_TimImage(const char *)` is deleted. The call
 casts its argument to `char *` and its result to
-`GenericReleaseObj_3bb8c_d *`, the type Class86B60's own view gives
-`iconHandle` (a TimImage; retyping Class86B60's field is that class's job).
+`GenericReleaseObj_3bb8c_d *`, the type TitleMenu's own view gives
+`iconHandle` (a TimImage; retyping TitleMenu's field is that class's job).
 Image byte-identical.
 
 ## Track 4 (2026-09-26, round 88, bravo)
 
-Class86B60 is unified in include/Class86B60.h (TASKCORE_SLOTS/TASKCORE_FIELDS plus its own). `handlerTable->unk4` is TaskCore's `initArgs->unk4`, `unk48` its `sound`; slot10/slot14 are BasicClass's addChild/removeChild (saveCtrl upcast to BasicClass *); iconHandle is a `struct TimImage *`, so the New_TimImage cast is gone. Byte-identical (whole image green, 0 new warnings, nonmatching green).
+TitleMenu is unified in include/TitleMenu.h (TASKCORE_SLOTS/TASKCORE_FIELDS plus its own). `handlerTable->unk4` is TaskCore's `initArgs->unk4`, `unk48` its `sound`; slot10/slot14 are BasicClass's addChild/removeChild (saveCtrl upcast to BasicClass *); iconHandle is a `struct TimImage *`, so the New_TimImage cast is gone. Byte-identical (whole image green, 0 new warnings, nonmatching green).

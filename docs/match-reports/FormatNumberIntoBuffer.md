@@ -102,7 +102,7 @@ struct-copy question.
 ## Naming
 
 **FormatNumberIntoBuffer** -- tier B. Free function (called directly by
-`Class86B60__Class86B60`, not through any vtable), `VerbNoun`. Mechanics are
+`TitleMenu__TitleMenu`, not through any vtable), `VerbNoun`. Mechanics are
 fully evident: formats `arg0` via `FormatFullWidthNumber` into
 `D_8008AA24`'s buffer, then copies 6 raw bytes of that buffer into
 `D_8008AA18`'s buffer at `+0x12`. Purpose is explicitly NOT established --

@@ -38,7 +38,7 @@ read (compared against `unk1C`) by `TaskCore__Update`.
 
 round 2026-09-02, runner echo, unit code_2cc8c (first function of the unit,
 established `include/code_2cc8c.h` and the `Obj86B60` struct name from the
-class's base method table gClass86B60Methods).
+class's base method table gTitleMenuMethods).
 
 ## Naming (round 78, delta)
 
