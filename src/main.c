@@ -40,14 +40,7 @@ extern void *BMemPMgrInit(); /* arity-ok: the dead 2nd argument IS byte-load-bea
  * existed until now). */
 extern void SetDefaultBMemPMgr(BMemPMgr *pool);
 
-/* Still asm (psyq_10ee0, game-code allocator, not yet carved). Zero
- * arguments -- its own asm never reads $a0/$a1, and the `addu $a0,$0,$0` /
- * `addu $a1,$0,$0` right after this call's `jal` are argument setup for the
- * NEXT call (`New_Pad(0, 0)`), not for this one. Its return IS used
- * here though: retail's delay slot for the *following* `jal` (`move
- * s0,v0`) captures it before that call can clobber v0 -- the return value
- * of THIS call, not of the one whose delay slot it sits in. */
-extern void *New_DrawSystem(void);
+/* New_DrawSystem comes from include/DrawSystem.h (through Class6D3C8.h). */
 
 extern BMemPMgr *gStartupBMemPMgr;
 extern Class6D3C8 *gClass6D3C8;
@@ -59,7 +52,7 @@ extern Class6D3C8 *New_Class6D3C8(Class6D3C8CtorArgs *arg);
 
 void main(void)
 {
-    void *obj;
+    DrawSystem *obj;
     Pad *pad;
 
     SetMem(2);

@@ -27,6 +27,10 @@
  * every function and both gp-variable accessors renamed via
  * tools/rename.py, method-table slots named for the methods they hold. See
  * each function's report `## Naming` for tier and evidence.
+ *
+ * Round 87 (bravo, track 4): the class is unified. Its one definition is
+ * include/DrawSystem.h (object, table, both value types); this unit keeps
+ * only libgpu's RECT and the SDK prototypes it calls.
  */
 #include "common.h"
 #include "DrawSystem.h"
