@@ -226,7 +226,7 @@ The corrected, LINKABLE snapshot (identical to what's live in
 
 ```c
 #if 0
-/* A 2-s16 pair (alignment 2, not 4) -- see UpdatePolyBBoxAndCull's stall report for
+/* A 2-s16 pair (alignment 2, not 4) -- see FlagLargePolyForDivide's stall report for
  * why this is needed even at accidentally-4-aligned offsets. */
 typedef struct {
     s16 x, y;
@@ -302,7 +302,7 @@ records, two full passes of `u16` widen-stores). Calls `func_8001C474`
 > discusses the rename is fine and is deliberately not marked.
 
 #if 0
-/* A 2-s16 pair (alignment 2, not 4) -- see UpdatePolyBBoxAndCull's stall report for
+/* A 2-s16 pair (alignment 2, not 4) -- see FlagLargePolyForDivide's stall report for
  * why this is needed even at accidentally-4-aligned offsets. */
 typedef struct {
     s16 x, y;

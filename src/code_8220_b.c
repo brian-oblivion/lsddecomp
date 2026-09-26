@@ -714,7 +714,7 @@ void SetupPrimCode(void *prim, void *ctx) {
  * Z goes into the sort slot at +0x14 of the three per-vertex records the
  * context lists at +0x88/+0x8C/+0x90, `storeSxy` writes the screen XY into
  * `prim` at that primitive type's own offsets (one of the StoreSxyPoly**
- * leaves at the bottom of this file), and UpdatePolyBBoxAndCull computes the screen
+ * leaves at the bottom of this file), and FlagLargePolyForDivide computes the screen
  * bounding box over the 3 vertices. Returns 0 drawn, 1 culled.
  *
  * `prim` is only ever handed straight through, so it stays void * here.
@@ -738,7 +738,7 @@ s32 ProjectTriFace(void *prim, u8 *ctx, u16 idx0, u16 idx1, u16 idx2, void (*sto
         gte_stsz3(p0, p1, p2);
     }
     storeSxy(prim);
-    UpdatePolyBBoxAndCull(ctx, 3);
+    FlagLargePolyForDivide(ctx, 3);
     return 0;
 fail:
     return 1;
@@ -786,7 +786,7 @@ s32 ProjectQuadFace(void *prim, u8 *ctx, u16 idx0, u16 idx1, u16 idx2, u16 idx3,
 
     gte_stsxy2(ctx + 0x6c);
 
-    UpdatePolyBBoxAndCull(ctx, 4);
+    FlagLargePolyForDivide(ctx, 4);
     return 0;
 fail:
     return 1;

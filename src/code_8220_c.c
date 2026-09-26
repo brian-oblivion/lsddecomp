@@ -18,7 +18,7 @@
 #include "gte.h"
 
 /* A 2-s16 pair (alignment 2, not 4). Unit-local: six leaves below (four
- * SubmitPoly* wrappers, UpdatePolyBBoxAndCull) each need it to force the
+ * SubmitPoly* wrappers, FlagLargePolyForDivide) each need it to force the
  * unaligned lwl/lwr whole-struct copy retail uses even at offsets that are
  * accidentally 4-aligned -- the compiler only knows the DECLARED alignment
  * of the type, not the runtime address (DECOMPILATION_LEARNINGS, "A struct
@@ -299,7 +299,7 @@ void InitDivPolygonPtrs(void *dst, void *table, s32 kind) {
  * ctx+0x70/0x72/0x74/0x76 (min x/y, max x/y) and sets the cull flag when
  * either span reaches 0x101 -- i.e. when the primitive's screen extent in
  * either axis would exceed what a single draw primitive can represent. */
-void UpdatePolyBBoxAndCull(void *ctx, s32 count) {
+void FlagLargePolyForDivide(void *ctx, s32 count) {
     u8 *self = (u8 *)ctx;
     s16 *xp, *yp, *end;
 

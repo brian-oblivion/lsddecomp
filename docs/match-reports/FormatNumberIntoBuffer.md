@@ -46,7 +46,7 @@ structurally distinct attempts to land:
 1. **First attempt** — a struct of `s16 a, b; s8 c, d;` (alignment 2, size
    6), copied in one whole-struct assignment. This produced the right
    leading `lwl`/`lwr` unaligned word copy for the first 4 bytes (same idiom
-   as `Vec2s16` in `UpdatePolyBBoxAndCull`), but the DECLARED alignment of 2 let GCC
+   as `Vec2s16` in `FlagLargePolyForDivide`), but the DECLARED alignment of 2 let GCC
    trust a safe halfword move for the trailing 2 bytes, emitting a single
    `lh`/`sh` where retail has two individual `lb`/`sb` pairs. Wrong: retail
    never merges those two bytes.

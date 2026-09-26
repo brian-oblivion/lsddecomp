@@ -174,7 +174,7 @@ remaining 8-word gap the same way, not as an open lead).
 
 ```c
 #if 0
-/* A 2-s16 pair (alignment 2, not 4) -- see UpdatePolyBBoxAndCull's stall report for
+/* A 2-s16 pair (alignment 2, not 4) -- see FlagLargePolyForDivide's stall report for
  * why this is needed even at accidentally-4-aligned offsets. */
 typedef struct {
     s16 x, y;
@@ -312,7 +312,7 @@ match-report convention):
 
 ```c
 #if 0
-/* A 2-s16 pair (alignment 2, not 4) -- see UpdatePolyBBoxAndCull's stall report for
+/* A 2-s16 pair (alignment 2, not 4) -- see FlagLargePolyForDivide's stall report for
  * why this is needed even at accidentally-4-aligned offsets. */
 typedef struct {
     s16 x, y;
@@ -390,7 +390,7 @@ SDK, `asm/psyq_rcpolyg3.s`, Gouraud-flavored sibling of `func_8001A564`/
 > discusses the rename is fine and is deliberately not marked.
 
 #if 0
-/* A 2-s16 pair (alignment 2, not 4) -- see UpdatePolyBBoxAndCull's stall report for
+/* A 2-s16 pair (alignment 2, not 4) -- see FlagLargePolyForDivide's stall report for
  * why this is needed even at accidentally-4-aligned offsets. */
 typedef struct {
     s16 x, y;
@@ -427,7 +427,7 @@ void SubmitPolyG3(void *arg0, void *arg1)
 #endif
 ```
 
-Build compiles clean, no address drift. `UpdatePolyBBoxAndCull`'s `Vec2s16`
+Build compiles clean, no address drift. `FlagLargePolyForDivide`'s `Vec2s16`
 alignment-2-struct-copy idiom reproduced the three unaligned 4-byte copies
 correctly on the first try (confirmed structurally correct against the
 disassembly — the residue below is entirely register CHOICE, never a wrong

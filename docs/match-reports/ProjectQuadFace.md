@@ -9,7 +9,7 @@ pointers (vs. three), transforms the first three as a triangle through
 vertex `rtps` transform for the fourth vertex, writes four Z outputs (vs.
 three) via `swc2 $16`-`$19` into `prim->0x94/0x98/0x9c/0xa0`, stores the
 fourth vertex's transformed screen XY into `prim->0x6c`, and calls
-`UpdatePolyBBoxAndCull(prim, 4)` (code `4` = "quad", vs. `ProjectTriFace`'s `3` =
+`FlagLargePolyForDivide(prim, 4)` (code `4` = "quad", vs. `ProjectTriFace`'s `3` =
 "triangle"). Also confirms `callback`'s real signature: this function makes
 TWO calls to it with explicit different second arguments (`callback(self,
 1)` before the fourth-vertex work, `callback(self, 0)` after) — so it is
@@ -77,7 +77,7 @@ s32 ProjectQuadFace(void *arg0, u8 *prim, u16 idx0, u16 idx1, u16 idx2, u16 idx3
         : "r" (prim + 0x6c)
         : "memory");
 
-    UpdatePolyBBoxAndCull(prim, 4);
+    FlagLargePolyForDivide(prim, 4);
     return 0;
 fail:
     return 1;
@@ -146,7 +146,7 @@ what is specific to the four-vertex form is below.
   (store the first three screen XYs) and `0` after (store the fourth).
   Hence the callback parameter name `storeFirst3` on the two quad store
   leaves, `StoreSxyPolyF4` and `StoreSxyPolyG4`.
-- `UpdatePolyBBoxAndCull(ctx, 4)` -- again a vertex count, not a kind code.
+- `FlagLargePolyForDivide(ctx, 4)` -- again a vertex count, not a kind code.
 - This function is what already established `storeSxy`'s real two-argument
   signature; the triangle form's single call site could not distinguish it
   from an unused second parameter.

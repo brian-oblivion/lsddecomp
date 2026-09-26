@@ -4,11 +4,11 @@
 
 > Renamed from `func_8001A224` on 2026-09-24 (tools/rename.py). Address 0x8001a224.
 
-Unit: `src/code_8220_c.c`. Immediately precedes `UpdatePolyBBoxAndCull` in ROM
-order — likely a helper it calls, though `UpdatePolyBBoxAndCull` itself is not yet
+Unit: `src/code_8220_c.c`. Immediately precedes `FlagLargePolyForDivide` in ROM
+order — likely a helper it calls, though `FlagLargePolyForDivide` itself is not yet
 matched (queued next). `kind` is the same "primitive kind" code seen
 already in `code_8220_b` (`ProjectTriFace`/`ProjectQuadFace` pass `3`
-triangle / `4` quad to `UpdatePolyBBoxAndCull`): here it doubles as the LOOP COUNT
+triangle / `4` quad to `FlagLargePolyForDivide`): here it doubles as the LOOP COUNT
 too, since a triangle needs 3 slots written and a quad 4 — one register,
 two jobs, matching how compactly retail keeps live values.
 

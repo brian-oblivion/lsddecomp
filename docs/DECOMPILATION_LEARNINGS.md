@@ -176,7 +176,7 @@ load through a runtime-indexed global", §"BLOCKED: the `nop_mflo_mfhi` screen r
   loop kind, and a plain `for` fixes all three symptoms** (prologue store order, the early
   `move $sN,$aN`, frame size): three `code_55dd4` stalls, one with 192k permuter iterations on the
   wrong shape. Where `i++` sits decides whether its `addiu` fills the `jalr` slot. The reverse also
-  occurs (`UpdatePolyBBoxAndCull`: a value computed before the loop-skip test took the slot from the stack
+  occurs (`FlagLargePolyForDivide`: a value computed before the loop-skip test took the slot from the stack
   adjustment), and a retry loop testing its counter AFTER the call is a `while`, not a goto loop
   (`TaskObjF__CheckCardStatus`). Whatever precedes a branch in the source decides its delay slot. (round 75)
 - **Two argument set-ups sharing one `jal`, reached by a `j` whose delay slot sets the differing

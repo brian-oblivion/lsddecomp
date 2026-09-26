@@ -634,7 +634,7 @@ concrete hypotheses tried and rejected:
    own length. 0/54, WARNING: drift.
 2. Compute it as a purely local, `(void)`-cast, unused expression scoped
    inside the `if` branch only — eliminated entirely by `-O2`, reproducing
-   exactly what `UpdatePolyBBoxAndCull`'s report already found for a genuinely
+   exactly what `FlagLargePolyForDivide`'s report already found for a genuinely
    unused local: GCC 2.6.3 does perform basic dead-store/dead-expression
    elimination for a value with no read whatsoever, so a plain "mention the
    address and do nothing with it" does not survive to be schedulable.
@@ -1034,7 +1034,7 @@ every GTE/COP2 mnemonic.**
 ```
 grep -cE 'swc2|lwc2|mfc2|mtc2|cfc2|ctc2|rtps|rtpt|nclip|gte' \
   asm/nonmatchings/code_8220_c/{FillRVectors4,SubmitPolyF3,SubmitPolyF4,\
-  UpdatePolyBBoxAndCull,SubmitPolyFT3,SubmitPolyG3,SubmitPolyFT4,SubmitPolyG4,\
+  FlagLargePolyForDivide,SubmitPolyFT3,SubmitPolyG3,SubmitPolyFT4,SubmitPolyG4,\
   SubmitPolyGT3,SubmitPolyGT4}.s
 ```
 
@@ -1079,7 +1079,7 @@ So the two residue classes on this unit's work list are genuinely distinct:
 sibling's own idiom) and closed completely; this nine-function family's is
 a residue INSIDE already-correct-shape C that six-plus reshaping axes and
 two bounded permuter searches (this function: 40000 iterations, floor 260,
-no zero; `UpdatePolyBBoxAndCull`: ~8600+ iterations, floor 120→60 on a lead later
+no zero; `FlagLargePolyForDivide`: ~8600+ iterations, floor 120→60 on a lead later
 falsified against the real oracle) have not moved. Both are genuine
 findings about this unit, not one contaminating the other.
 
@@ -1095,7 +1095,7 @@ commented out the matching `INCLUDE_ASM` line, ran `build-and-verify.sh` +
 | `SubmitPolyGT4` | 104/112 | **104/112, no drift warning** |
 
 Both check out exactly. The remaining seven siblings' scores
-(`SubmitPolyF3` 46/54, `SubmitPolyF4` 48/56, `UpdatePolyBBoxAndCull` 53/70,
+(`SubmitPolyF3` 46/54, `SubmitPolyF4` 48/56, `FlagLargePolyForDivide` 53/70,
 `SubmitPolyG3` 48/84 or 405/415 permuter-scale depending on section,
 `SubmitPolyFT4` 80/88, `SubmitPolyG4` 88/96, `SubmitPolyGT3` 88/96) were
 not independently re-verified this pass; the two spot-checked here were
