@@ -23,7 +23,7 @@
  * Class876FC.h, `New_Class876FC`-allocated, kind-tagged 0..3 by
  * `StyleFillEffectKind0`..`3`'s literal first argument), plus a two-slot
  * positional sound-cue subsystem (`gStyleCueSlots`, `TryStartStyleCue`/
- * `FindNearestStyleCueEntry`/`FlushStyleCue`/`ServiceStyleCueIfNear`/
+ * `FindNextStyleCueInRange`/`FlushStyleCue`/`ServiceStyleCueIfNear`/
  * `IsStyleCueNear`). `TickStyle` is the per-frame entry point (called from
  * `src/class_3bb8c_l.c`); `StyleTeardown` is the scene-exit release of
  * everything `TickStyle` builds.
@@ -322,7 +322,7 @@ void StyleReleaseEffectSlots(void) {
 
 /* Local view only: `FlushStyleCue` (defined later in this unit, in strict
  * ROM order) takes one of these two per-slot objects. `StyleCueEntryView`
- * is the SAME record `FindNearestStyleCueEntry` returns as `EntrySlot *`
+ * is the SAME record `FindNextStyleCueInRange` returns as `EntrySlot *`
  * below -- a second independent local view of one struct, per the
  * multiple-independent-local-views convention, not merged with it: this
  * view only ever touches `cue` (+0x6, an `EntrySlot::count`-typed
@@ -331,7 +331,7 @@ void StyleReleaseEffectSlots(void) {
  * `FlushStyleCue`/`ServiceStyleCueIfNear`. `posX`/`posZ` are the slot's own 2D
  * (X/Z) position, read by `IsStyleCueNear`'s distance check; `lastDist` is
  * that check's own last-computed distance (also the out-parameter
- * `FindNearestStyleCueEntry` writes). `cueSet` is only ever address-taken,
+ * `FindNextStyleCueInRange` writes). `cueSet` is only ever address-taken,
  * as an embedded sub-object handed to `FlushSoundCueSet`/`ServiceSoundCueSet`
  * (same discard-return caveat as `include/Entity.h`'s `unk9C` -- a field
  * only ever address-taken carries no evidence about its own declared
@@ -596,7 +596,7 @@ void SetupStyleSpawnParamsB(void *arg0, void *arg1) {
 }
 
 extern StyleSceneRefs *gStyleTargetObj;
-extern void *FindNearestStyleCueEntry(LongVec3 *arg0, s32 *arg1, LongVec3 *arg2);
+extern void *FindNextStyleCueInRange(LongVec3 *arg0, s32 *arg1, LongVec3 *arg2);
 extern SoundCueCallbackFn gStyleCueCallbacks[];
 extern s32 InitSoundCueSet(void *sound, SoundCueSet *set, s32 tag, void *owner,
                            SoundCueCallbackFn callback);
@@ -604,7 +604,7 @@ extern s32 InitSoundCueSet(void *sound, SoundCueSet *set, s32 tag, void *owner,
 StyleCueSlot *TryStartStyleCue(StyleCueSlot *arg0, s32 *arg1, LongVec3 *arg2, void *arg3) {
     StyleCueEntryView *sub;
 
-    sub = (StyleCueEntryView *)FindNearestStyleCueEntry(&arg0->pos, &arg0->lastDist, arg2);
+    sub = (StyleCueEntryView *)FindNextStyleCueInRange(&arg0->pos, &arg0->lastDist, arg2);
     if (sub != 0) {
         arg0->entry = sub;
         InitSoundCueSet(gStyleTargetObj->sound, &arg0->cueSet, sub->cue, arg0,
@@ -657,7 +657,7 @@ struct LocalBuf {
     TabEntry tab;
 };
 
-/* MATCHED round 48 (alpha), 111/111 -- see docs/match-reports/FindNearestStyleCueEntry.md
+/* MATCHED round 48 (alpha), 111/111 -- see docs/match-reports/FindNextStyleCueInRange.md
  * for the round 47 (bravo) recovery and the round 48 permuter lead that
  * closed it: the `if (n <= 0) goto fail;` early exit is redundant (the
  * `for (j = 0; j < n; ...)` loop already falls through to the same
@@ -665,7 +665,7 @@ struct LocalBuf {
  * `entry` pointer's address computation as `offset + (s32) base` instead
  * of `base + offset`, closed the last word (a pure commutative-operand
  * encoding-order residue in the `addu`). */
-void *FindNearestStyleCueEntry(LongVec3 *arg0, s32 *arg1, LongVec3 *arg2) {
+void *FindNextStyleCueInRange(LongVec3 *arg0, s32 *arg1, LongVec3 *arg2) {
     s32 j, n;
     u8 *base;
     EntrySlot *entry;

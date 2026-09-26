@@ -1,4 +1,6 @@
-# FindNearestStyleCueEntry -- MATCHED round 48 (alpha), 111/111 words
+# FindNextStyleCueInRange -- MATCHED round 48 (alpha), 111/111 words
+
+> Renamed from `FindNearestStyleCueEntry` on 2026-09-26 (tools/rename.py). Address 0x80055620.
 
 > Renamed from `func_80055620` on 2026-09-23 (tools/rename.py). Address 0x80055620.
 
@@ -28,7 +30,7 @@ that line landed; log growth stopped at iteration 96740 in step with the
 `resource_tracker` warning, which is `timeout`'s SIGTERM signature --
 treating the raw search as rc=124-equivalent (bound fired).
 
-**But the score-10 candidate (`permuter-work/FindNearestStyleCueEntry/output-10-1`) was
+**But the score-10 candidate (`permuter-work/FindNextStyleCueInRange/output-10-1`) was
 a genuine, correct lead, and applying it by hand closed the function.** Two
 changes, read straight off that candidate's mutated source:
 
@@ -60,7 +62,7 @@ changes, read straight off that candidate's mutated source:
 **Final body (matched):**
 
 ```c
-void *FindNearestStyleCueEntry(void *arg0, s32 *arg1, void *arg2) {
+void *FindNextStyleCueInRange(void *arg0, s32 *arg1, void *arg2) {
     s32 j, n;
     u8 *base;
     EntrySlot *entry;
@@ -144,7 +146,7 @@ several instructions later).
 ## Signature (recovered with confidence) -- widened from the existing 2-arg forward declaration
 
 ```c
-void *FindNearestStyleCueEntry(void *arg0, s32 *arg1, void *arg2);
+void *FindNextStyleCueInRange(void *arg0, s32 *arg1, void *arg2);
 ```
 
 The pre-existing forward declaration in this unit (`TryStartStyleCue`'s block,
@@ -155,12 +157,12 @@ very first real instruction), and objdump of the ALREADY-MATCHED
 still holds whatever `TryStartStyleCue` itself received as ITS OWN third
 argument (`ctx`, a genuinely dead-looking parameter per
 `TickStyle`'s report) when `TryStartStyleCue` was entered. So `ctx` is
-silently forwarded as `FindNearestStyleCueEntry`'s third argument, at zero cost (no
+silently forwarded as `FindNextStyleCueInRange`'s third argument, at zero cost (no
 instruction sets `$a2`, since it already holds the right value from
 function entry).
 
 **Updated `TryStartStyleCue`'s call site to make this explicit**
-(`FindNearestStyleCueEntry(&arg0->unk4, &arg0->unk10, arg2)`), and confirmed this does
+(`FindNextStyleCueInRange(&arg0->unk4, &arg0->unk10, arg2)`), and confirmed this does
 NOT disturb `TryStartStyleCue`'s own already-matched bytes: rebuilt the whole
 image with the change and `TryStartStyleCue` still scores 45/45 with a clean
 `OK: build matches retail SLPS_015.56`. This is the "a call argument that's
@@ -189,7 +191,7 @@ typedef struct EntrySlot {                              /* 8B stride */
 } EntrySlot;
 typedef struct LocalBuf { Pos4 pos; TabEntry tab; } LocalBuf;   /* 10B */
 
-void *FindNearestStyleCueEntry(void *arg0, s32 *arg1, void *arg2) {
+void *FindNextStyleCueInRange(void *arg0, s32 *arg1, void *arg2) {
     s32 j, n;
     u8 *base;
     EntrySlot *entry;
@@ -309,7 +311,7 @@ shared-label unification still doesn't happen for free.
 
 ## Naming
 
-**`FindNearestStyleCueEntry`, tier B.**
+**`FindNextStyleCueInRange`, tier B.**
 
 Scans a run of 8-byte `EntrySlot` records (`gStyleCueRecordIndex` onward)
 for one whose `count` field is positive and whose Manhattan-style distance

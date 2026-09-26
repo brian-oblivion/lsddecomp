@@ -80,7 +80,7 @@ s32 ComputeStyleCueFalloff(StyleCueParam *ctx) {
 
 ## Naming
 
-**Tier B.** Free function (called with `ctx`, not a `self` of its own type in the class-method sense), so no `Class__` prefix. The name reflects the mechanism, not the game meaning: `gStyleCueDistanceTable` (the same table `IsStyleCueNear`/`FindNearestStyleCueEntry`, code_8220_b.c/class_3bb8c_n.c, index with `dist < table[...]` -- confirming it holds distance thresholds) is read at a NEGATIVE tag index, divided down, and used as the divisor for `ctx->falloff`'s own value; `falloff` is used by every `StyleCueNN` occupant that calls this helper first. What the resulting scaled quantity represents in the running game (a cue repeat count? a duration?) is not established.
+**Tier B.** Free function (called with `ctx`, not a `self` of its own type in the class-method sense), so no `Class__` prefix. The name reflects the mechanism, not the game meaning: `gStyleCueDistanceTable` (the same table `IsStyleCueNear`/`FindNextStyleCueInRange`, code_8220_b.c/class_3bb8c_n.c, index with `dist < table[...]` -- confirming it holds distance thresholds) is read at a NEGATIVE tag index, divided down, and used as the divisor for `ctx->falloff`'s own value; `falloff` is used by every `StyleCueNN` occupant that calls this helper first. What the resulting scaled quantity represents in the running game (a cue repeat count? a duration?) is not established.
 
 ## Track 6 (2026-09-26, round 92, alpha): `set` is a SoundCueSet
 
