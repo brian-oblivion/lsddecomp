@@ -69,17 +69,17 @@ git show 50e62526:config/symbols.slps01556.lsdde.txt \
 grep -oE '^[A-Za-z_][A-Za-z0-9_]* = 0x[0-9A-Fa-f]+' config/symbols.slps01556.lsdde.txt \
   | sort > /tmp/current
 wc -l < /tmp/inherited                    # 146 inherited
-comm -12 /tmp/inherited /tmp/current      # 125 still in use
-comm -23 /tmp/inherited /tmp/current      # 21 renamed (every address is still named)
+comm -12 /tmp/inherited /tmp/current      # 124 still in use
+comm -23 /tmp/inherited /tmp/current      # 22 renamed (every address is still named)
 ```
 
-- **21 renamed.** The 12 `BasicClass__func_*` placeholders now say what each
+- **22 renamed.** The 12 `BasicClass__func_*` placeholders now say what each
   method does (`BasicClass__AddChild`, `BasicClass__NotifyParents`, ...); the
   six `new_class_*` / `class_65650__*` names became `New_TmdModel`,
   `New_DrawSystem`, `New_CdDriver`, `New_Class6D3C8`, `New_Class6D940`,
   `New_Class65650` and `Class65650__Class65650`; and two `DreamSys__func_*`
   became `DreamSys__ResetSessionState` and `DreamSys__SpawnAtLink`.
-- **25 of the 125 survivors are Sony's names for Sony's code**, not guesses:
+- **25 of the 124 survivors are Sony's names for Sony's code**, not guesses:
   each sits in a Psy-Q object the build links (`build/lsdde.map`), in a
   `psyq_*` disassembly segment (`GsLinkObject4`, `ResetGraph`), or in
   `config/sdk-in-game.txt` (`SetRCnt`), and where the object is linked its own
@@ -88,12 +88,13 @@ comm -23 /tmp/inherited /tmp/current      # 21 renamed (every address is still n
 - **59 are game function names**, every one with a match report under
   `docs/match-reports/`. `BasicClass__func_18350` is the one placeholder among
   them.
-- **41 are data names**: lsddecomp's stage tables (`STAGE_*`, `STGnn_*`,
+- **40 are data names**: lsddecomp's stage tables (`STAGE_*`, `STGnn_*`,
   `LEN_*`, `SPECIAL_*`, `SPAWN_POS_ADJUST`), `DREAMSYS_METHODS`, and the
-  globals `gpNavChallengesComplete`, `gpDinamicLinkPenalty` and
-  `Small__rand`. The last names the word at `0x8008AC68`, which the build
-  places as `libc2/rand.o`'s `.sbss` (`config/psyq-objects.ld`), where Sony's
-  object calls it `n`.
+  globals `gpNavChallengesComplete` and `gpDinamicLinkPenalty`. A 41st,
+  `Small__rand`, named the word at `0x8008AC68`, which the build places as
+  `libc2/rand.o`'s `.sbss` (`config/psyq-objects.ld`), where Sony's object
+  calls it `n`; round 89 returned it to the placeholder `D_8008AC68`, since
+  Sony's data takes no game name.
 
 Surviving is not the same as confirmed. Whether a name was checked against
 the code is recorded in that function's match report, not here.
