@@ -1,4 +1,6 @@
-# Class865C8__ResetState
+# Class865C8__ResetPhase
+
+> Renamed from `Class865C8__ResetState` on 2026-09-26 (tools/rename.py). Address 0x80049a14.
 
 > Renamed from `Obj865C8__ResetState` on 2026-09-26 (tools/rename.py). Address 0x80049a14.
 
@@ -21,7 +23,7 @@ jr    $ra
 A one-instruction leaf, the store living in the branch delay slot. Written as:
 
 ```c
-void Class865C8__ResetState(Obj865C8 *self) {
+void Class865C8__ResetPhase(Obj865C8 *self) {
     self->unk3C = 0;
 }
 ```
@@ -35,4 +37,4 @@ None beyond what's already documented for this residue-free shape.
 
 ## Naming
 
-`Class865C8__ResetState` -- tier A. Pure one-line setter (`state = 0`); mechanics are its purpose. Occupies the class's own +0x040 override; the field it resets is used as a 0-3 state code by `Class865C8__AdvanceState`/`Class865C8__OnObjMNotify`.
+`Class865C8__ResetPhase` -- tier A. Pure one-line setter (`state = 0`); mechanics are its purpose. Occupies the class's own +0x040 override; the field it resets is used as a 0-3 state code by `Class865C8__AdvancePhase`/`Class865C8__OnObjMNotify`.

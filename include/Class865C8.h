@@ -21,9 +21,9 @@
  *    viewport, keeps the DreamSys as a child and hands it `sound` and etcTim;
  *  - init hands the DreamSys the init args' children and viewport, onInit
  *    sets up the viewport and attaches the DreamSys to it (phase 1);
- *  - onTag1Notify's event 2 (Class865C8__AdvanceState) runs the DreamSys's
+ *  - onTag1Notify's event 2 (Class865C8__AdvancePhase) runs the DreamSys's
  *    startDay (or, from phase 3, releases the old objM and asks for the
- *    current stage) and EnterState2 builds a New_ObjM (D_80087034, 0x2F230)
+ *    current stage) and StartObjM builds a New_ObjM (D_80087034, 0x2F230)
  *    from sound, bgm, etcTim and dreamerTmd, adds it as a child and inits it
  *    (phase 2);
  *  - onObjMNotify (+0x084, the notifications of a 0x2F230 sender) ends the
@@ -48,8 +48,8 @@ struct TimImage;
 struct Obj4C; /* D_80087034's object as class_39e08.h views it (New_ObjM's result) */
 
 /* Class86668's slots, then this class's own. Overridden: ctor, finalize,
- * onNotify, resetCounters (Class865C8__ResetState), init, deinit, onInit,
- * onDeinit, onTag1Notify (Class865C8__AdvanceState) and onState4. */
+ * onNotify, resetCounters (Class865C8__ResetPhase), init, deinit, onInit,
+ * onDeinit, onTag1Notify (Class865C8__AdvancePhase) and onState4. */
 #define CLASS865C8_SLOTS(Self, CtorParams)                                                         \
     CLASS86668_SLOTS(Self, CtorParams);                                                            \
     /* +0x080 */ void (*onDreamSysNotify)(Self *self, BasicClass *sender, s32 event); /* Class865C8__OnDreamSysNotify, empty; onNotify's 0x1F34 (DreamSys) sender */ \
@@ -58,11 +58,11 @@ struct Obj4C; /* D_80087034's object as class_39e08.h views it (New_ObjM's resul
 #define CLASS865C8_FIELDS(Methods)                                                                 \
     CLASS86668_FIELDS(Methods);                                                                    \
     /* +0x038 */ struct DreamSys *dreamSys; /* the ctor's; a child; init/deinit hand it the init args' objects */ \
-    /* +0x03C */ s32 phase;                 /* 0 ResetState, 1 OnInit, 2 EnterState2, 3 OnObjMNotify; not IntermediateBase::state */ \
+    /* +0x03C */ s32 phase;                 /* 0 ResetPhase, 1 OnInit, 2 StartObjM, 3 OnObjMNotify; not IntermediateBase::state */ \
     /* +0x040 */ struct WBgm *bgm;          /* New_WBgm(PickWeeklyGroup(0), NULL, 1); New_ObjM's 2nd argument; finalize releases it */ \
     /* +0x044 */ struct TimImage *etcTim;   /* New_TimImage("ETC\ETC.TIM"), uploaded and its buffer freed; DreamSys +0x114; New_ObjM's 3rd */ \
     /* +0x048 */ BasicClass *dreamerTmd;    /* New_LinkResource("ETC\DREAMER.TMD"); New_ObjM's 4th; finalize releases it */ \
-    /* +0x04C */ struct Obj4C *objM         /* EnterState2's New_ObjM(...); a child; released by AdvanceState/OnObjMNotify */
+    /* +0x04C */ struct Obj4C *objM         /* StartObjM's New_ObjM(...); a child; released by AdvancePhase/OnObjMNotify */
 
 struct Class865C8Methods {
     CLASS865C8_SLOTS(Class865C8, (Class865C8 *self, IntermediateBaseInitArgs *initArgs, struct DreamSys *dreamSys, s32 arg3));
@@ -83,13 +83,13 @@ Class865C8 *New_Class865C8(IntermediateBaseInitArgs *initArgs, struct DreamSys *
 void Class865C8__Class865C8(Class865C8 *self, IntermediateBaseInitArgs *initArgs, struct DreamSys *dreamSys, s32 arg3);
 void Class865C8__Finalize(Class865C8 *self);
 void Class865C8__OnNotify(Class865C8 *self, BasicClass *sender, s32 event);
-void Class865C8__ResetState(Class865C8 *self);
+void Class865C8__ResetPhase(Class865C8 *self);
 s32 Class865C8__Init(Class865C8 *self);
 void Class865C8__Deinit(Class865C8 *self);
 void Class865C8__OnInit(Class865C8 *self);
 void Class865C8__OnDeinit(Class865C8 *self);
-void Class865C8__AdvanceState(Class865C8 *self, BasicClass *sender, s32 event);
-void Class865C8__EnterState2(Class865C8 *self, s32 stage);
+void Class865C8__AdvancePhase(Class865C8 *self, BasicClass *sender, s32 event);
+void Class865C8__StartObjM(Class865C8 *self, s32 stage);
 void Class865C8__OnState4(void);              /* +0x07C; empty, reads no argument */
 void Class865C8__OnDreamSysNotify(void);      /* +0x080; empty, reads no argument */
 void Class865C8__OnObjMNotify(Class865C8 *self, BasicClass *sender, s32 event);

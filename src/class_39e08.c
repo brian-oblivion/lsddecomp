@@ -83,7 +83,7 @@ void Class865C8__OnNotify(Class865C8 *self, BasicClass *sender, s32 event) {
     }
 }
 
-void Class865C8__ResetState(Class865C8 *self) {
+void Class865C8__ResetPhase(Class865C8 *self) {
     self->phase = 0;
 }
 
@@ -130,7 +130,7 @@ void Class865C8__OnDeinit(Class865C8 *self) {
     vp->methods->detachViewChild(vp);
 }
 
-void Class865C8__AdvanceState(Class865C8 *self, BasicClass *sender, s32 event) {
+void Class865C8__AdvancePhase(Class865C8 *self, BasicClass *sender, s32 event) {
     s32 result;
 
     GetClass86668Methods()->onTag1Notify((Class86668 *)self, sender, event);
@@ -144,7 +144,7 @@ void Class865C8__AdvanceState(Class865C8 *self, BasicClass *sender, s32 event) {
                 self->methods->setState(self, 3);
                 return;
             }
-            Class865C8__EnterState2(self, result);
+            Class865C8__StartObjM(self, result);
             break;
         case 2:
             break;
@@ -152,13 +152,13 @@ void Class865C8__AdvanceState(Class865C8 *self, BasicClass *sender, s32 event) {
             self->objM->methods->slot48(self->objM);
             self->objM->methods->slot4(self->objM);
             result = self->dreamSys->methods->getCurrentStage(self->dreamSys);
-            Class865C8__EnterState2(self, result);
+            Class865C8__StartObjM(self, result);
             break;
         }
     }
 }
 
-void Class865C8__EnterState2(Class865C8 *self, s32 stage) {
+void Class865C8__StartObjM(Class865C8 *self, s32 stage) {
     self->objM = New_ObjM((SubObjB *)self->sound, (s32)self->bgm, (s32)self->etcTim, (s32)self->dreamerTmd, stage);
     self->methods->addChild(self, (BasicClass *)self->objM);
     self->objM->methods->slot44(self->objM, (s32)self->initArgs, (s32)self->dreamSys);

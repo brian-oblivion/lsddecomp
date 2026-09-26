@@ -156,7 +156,7 @@ needed anywhere in this 107-word function.
 - `arg2` (`SubObjD *`) is stored into `self->unk38` (its established type
   from `Class865C8__Deinit`/`Class865C8__Init` this round) AND separately passed to
   `self->methods->slot10`, whose established signature (from
-  `Class865C8__EnterState2`, an EARLIER round) expects `Obj4C *` — a different type
+  `Class865C8__StartObjM`, an EARLIER round) expects `Obj4C *` — a different type
   entirely. Both usages are of the SAME raw pointer value (just a
   register-forwarded call argument on the `slot10` side, never
   dereferenced there), so a `(Obj4C *)` cast at that one call site
@@ -185,7 +185,7 @@ needed anywhere in this 107-word function.
   independently established elsewhere as `void InitDreamAux(void)`,
   itself a documented STALL in `code_4cd08` unrelated to this unit).
   Reading the CALLEE's prologue was the right move here, same lesson
-  `Class865C8__EnterState2` used earlier this round for the opposite question (an
+  `Class865C8__StartObjM` used earlier this round for the opposite question (an
   argument that looked unused turning out to be real).
 
 ## New struct/extern knowledge (`include/class_39e08.h`)
@@ -245,9 +245,9 @@ data point ruling out the naive "any double-write is suspect" reading.
 ### Session summary note
 
 This closes out the round: all 5 of this session's assigned functions
-(`Class865C8__OnNotify`, `Class865C8__OnInit`, `Class865C8__Finalize`, `Class865C8__AdvanceState`,
+(`Class865C8__OnNotify`, `Class865C8__OnInit`, `Class865C8__Finalize`, `Class865C8__AdvancePhase`,
 `Class865C8__Class865C8`) matched, none stalled — including the two the head
-expected residues to survive on. `Class865C8__AdvanceState`'s residue (a GCC
+expected residues to survive on. `Class865C8__AdvancePhase`'s residue (a GCC
 switch-case-balancing quirk) took 9 attempts; every other function in this
 session matched within 1-2.
 

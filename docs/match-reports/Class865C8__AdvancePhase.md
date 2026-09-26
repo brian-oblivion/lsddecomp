@@ -1,4 +1,6 @@
-# Class865C8__AdvanceState — MATCHED (94/94 words)
+# Class865C8__AdvancePhase — MATCHED (94/94 words)
+
+> Renamed from `Class865C8__AdvanceState` on 2026-09-26 (tools/rename.py). Address 0x80049ca8.
 
 > Renamed from `Obj865C8__AdvanceState` on 2026-09-26 (tools/rename.py). Address 0x80049ca8.
 
@@ -81,8 +83,8 @@ jalr  $v0
  nop                          ; result = self->unk38->methods->slot1E0(self->unk38)
 addu  $a0, $s1, $zero
 .L80049DFC:                  ; shared tail
-jal   Class865C8__EnterState2
- addu $a1, $v0, $zero        ; Class865C8__EnterState2(self, result)
+jal   Class865C8__StartObjM
+ addu $a1, $v0, $zero        ; Class865C8__StartObjM(self, result)
 END:
 ...
 jr $ra
@@ -91,9 +93,9 @@ jr $ra
 ## Final C
 
 ```c
-extern void Class865C8__EnterState2(Obj865C8 *self, s32 arg1);
+extern void Class865C8__StartObjM(Obj865C8 *self, s32 arg1);
 
-void Class865C8__AdvanceState(Obj865C8 *self, s32 arg1, s32 arg2) {
+void Class865C8__AdvancePhase(Obj865C8 *self, s32 arg1, s32 arg2) {
     s32 result;
 
     GetClass86668Methods()->slot54(self, arg1, arg2);
@@ -107,7 +109,7 @@ void Class865C8__AdvanceState(Obj865C8 *self, s32 arg1, s32 arg2) {
                 self->methods->onEventArg(self, 3);
                 return;
             }
-            Class865C8__EnterState2(self, result);
+            Class865C8__StartObjM(self, result);
             break;
         case 2:
             break;
@@ -115,14 +117,14 @@ void Class865C8__AdvanceState(Obj865C8 *self, s32 arg1, s32 arg2) {
             self->unk4C->methods->slot48(self->unk4C);
             self->unk4C->methods->slot4(self->unk4C);
             result = self->unk38->methods->slot1E0(self->unk38);
-            Class865C8__EnterState2(self, result);
+            Class865C8__StartObjM(self, result);
             break;
         }
     }
 }
 ```
 
-`Class865C8__EnterState2` is defined LATER in this file (ROM order requires the C
+`Class865C8__StartObjM` is defined LATER in this file (ROM order requires the C
 definition to stay where it is), so a local `extern` forward prototype was
 added right above this function -- same "calling into a function that is
 still being written elsewhere" convention CLAUDE.md documents, applied to a
@@ -190,7 +192,7 @@ double-branch tail, or vice versa:
 - `SubObjDMethods` extended with `slot1B4` (`s32 (*)(SubObjD *self)`,
   return value used — genuinely non-void) and `slot1B8` (`void (*)(SubObjD
   *self, s32 arg1)`), and `slot1E0` (`s32 (*)(SubObjD *self)`, return value
-  forwarded straight into `Class865C8__EnterState2`'s own argument).
+  forwarded straight into `Class865C8__StartObjM`'s own argument).
 - `Obj4CMethods` extended with `slot4` and `slot48` (both `void (*)(Obj4C
   *self)`, return discarded at both call sites here).
 
@@ -224,4 +226,4 @@ the visible cases is itself informative about a missing empty case.
 
 ## Naming
 
-`Class865C8__AdvanceState` -- tier B. Occupies +0x054, `IntermediateBase__OnTag1Notify`'s slot in the base -- the state machine's main per-tag transition function (cases on `state` 1/2/3, transitioning via `Class865C8__EnterState2`). The state machine's shape is clear from the body; what each state represents in-game is not.
+`Class865C8__AdvancePhase` -- tier B. Occupies +0x054, `IntermediateBase__OnTag1Notify`'s slot in the base -- the state machine's main per-tag transition function (cases on `state` 1/2/3, transitioning via `Class865C8__StartObjM`). The state machine's shape is clear from the body; what each state represents in-game is not.

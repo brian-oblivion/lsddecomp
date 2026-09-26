@@ -54,7 +54,7 @@ void Class865C8__OnObjMNotify(Obj865C8 *self, s32 arg1, s32 arg2) {
 ```
 
 `arg1` is genuinely unused — same shape as the already-matched sibling
-`Class865C8__AdvanceState`, which this function closely parallels. Codes 9 and 0xB map to
+`Class865C8__AdvancePhase`, which this function closely parallels. Codes 9 and 0xB map to
 the epilogue (no-ops). The two `onEventArg(self, 3)` calls cross-jump into one
 site, which falls out of the shape and needed no encouragement.
 
@@ -102,11 +102,11 @@ Two corroborating details, both needed before writing it that way:
   positive evidence the slot is non-void.
 
   **This is the round-7 shared-vtable-slot hazard and it was checked as such,
-  not assumed.** The unit's other caller, `Class865C8__AdvanceState`, is already matched
+  not assumed.** The unit's other caller, `Class865C8__AdvancePhase`, is already matched
   and DISCARDS the return — exactly the configuration where retyping
   `void` -> `s32` stopped GCC tail-merging two identical discarded calls and
   cost 4 words. Here it came back clean: whole-image SHA1 green, and
-  `Class865C8__AdvanceState` (94/94) and `Class865C8__EnterState2` (33/33) re-verified individually
+  `Class865C8__AdvancePhase` (94/94) and `Class865C8__StartObjM` (33/33) re-verified individually
   after the retype. The check is per-slot and cannot be reasoned by analogy —
   round 7 had two symmetric slots that needed opposite answers.
 

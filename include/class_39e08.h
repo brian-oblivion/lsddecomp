@@ -73,7 +73,7 @@ struct Obj4C {
 
 /* Allocator in class_3bb8c_k: allocates an 0x88-byte instance, ctors it
  * with the 5 forwarded arguments, and returns it (or 0 on allocation
- * failure). Class865C8__EnterState2 passes sound, bgm, etcTim, dreamerTmd
+ * failure). Class865C8__StartObjM passes sound, bgm, etcTim, dreamerTmd
  * and a stage number. */
 extern Obj4C *New_ObjM(SubObjB *a0, s32 a1, s32 a2, s32 a3, s32 a4);
 
