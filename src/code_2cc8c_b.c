@@ -74,7 +74,7 @@ void TaskCore__SetTarget(TaskCore *self, TaskCoreTarget *a1)
     char **list;
     s32 count;
     s32 size;
-    Unk64Elem **arr;
+    TextRow **arr;
     Unk74Obj *handle;
     s32 i;
 
@@ -128,7 +128,7 @@ void TaskCore__SetTarget(TaskCore *self, TaskCoreTarget *a1)
 
 void TaskCore__ReleaseTarget(TaskCore *self)
 {
-    Unk64Elem **arr;
+    TextRow **arr;
     s32 i;
 
     if (self->target == NULL) {
@@ -139,16 +139,16 @@ void TaskCore__ReleaseTarget(TaskCore *self)
         o->methods->slot4(o);
     }
     self->listView->methods->release(self->listView);
-    arr = (Unk64Elem **)self->slotElements;
+    arr = (TextRow **)self->slotElements;
     for (i = 0; i < self->slotCount; arr++) {
-        Unk64Elem *elem;
+        TextRow *elem;
 
         if (self->target->unk24[i] != NULL) {
             self->activeSlot = i;
             self->methods->releaseSlotElements(self);
         }
         elem = *arr;
-        elem->methods->slot4(elem);
+        elem->methods->release(elem);
         i++;
     }
     BMemPMgrFree(self->itemLists);
@@ -159,28 +159,28 @@ void TaskCore__ReleaseTarget(TaskCore *self)
 
 void TaskCore__UpdateSlotElements(TaskCore *self, void *a1)
 {
-    Unk64Elem **arr;
+    TextRow **arr;
     u8 *ptr;
     s32 i;
 
     if (self->target == NULL) {
         return;
     }
-    arr = (Unk64Elem **)self->slotElements;
+    arr = (TextRow **)self->slotElements;
     ptr = self->target->externalRecords;
     for (i = 0; i < self->slotCount; i++, arr++, ptr += 8) {
         if (self->target->registrationSlots[i] == NULL) {
-            Unk64Elem *elem = *arr;
+            TextRow *elem = *arr;
 
-            elem->methods->slot4C(elem, a1, ptr);
+            elem->methods->attachToParent(elem, a1, (Vec3_d294 *)ptr);
             if (self->target->unk24[i] != NULL) {
                 self->activeSlot = i;
                 self->methods->refreshSlotView(self, a1, 0);
             }
         } else {
-            Unk64Elem *elem = *arr;
+            TextRow *elem = *arr;
 
-            elem->methods->slot50(elem);
+            elem->methods->detachFromParent(elem);
         }
     }
 }
@@ -188,19 +188,19 @@ void TaskCore__UpdateSlotElements(TaskCore *self, void *a1)
 void TaskCore__BroadcastToSlots(TaskCore *self, void *a1)
 {
     s32 origIdx;
-    Unk64Elem **arr;
+    TextRow **arr;
     s32 i;
 
     if (self->target == NULL) {
         return;
     }
-    arr = (Unk64Elem **)self->slotElements;
+    arr = (TextRow **)self->slotElements;
     origIdx = self->activeSlot;
     for (i = 0; i < self->slotCount;) {
-        Unk64Elem *elem = *arr;
+        TextRow *elem = *arr;
 
         arr++;
-        elem->methods->slotB8(elem, a1);
+        elem->methods->setColor(elem, a1);
         if (self->target->unk24[i] != NULL) {
             self->activeSlot = i;
             self->methods->broadcastToSlotElements(self, a1);
@@ -264,19 +264,19 @@ void TaskCore__FindPrevFreeSlot(TaskCore *self)
 void TaskCore__SetActiveSlot(TaskCore *self, s32 a1, void *a2)
 {
     s32 idx;
-    Unk64Elem *elemB;
-    Unk64Elem *elemA;
+    TextRow *elemB;
+    TextRow *elemA;
 
     if (self->target == NULL) {
         return;
     }
     idx = self->activeSlot;
-    elemB = ((Unk64Elem **)self->slotElements)[idx];
-    elemA = ((Unk64Elem **)self->slotElements)[a1];
+    elemB = ((TextRow **)self->slotElements)[idx];
+    elemA = ((TextRow **)self->slotElements)[a1];
     if (idx >= 0) {
-        elemB->methods->slotB8(elemB, self->target->unselectedColor);
+        elemB->methods->setColor(elemB, (SpriteRgb *)self->target->unselectedColor);
     }
-    elemA->methods->slotB8(elemA, self->target->selectedColor);
+    elemA->methods->setColor(elemA, (SpriteRgb *)self->target->selectedColor);
     self->activeSlot = a1;
     if (a2 != NULL) {
         self->methods->playSound(self, 0);
@@ -294,7 +294,7 @@ void TaskCore__CreateSlotElements(TaskCore *self, void *desc, void *a2)
     char **list;
     s32 idx;
     s32 count;
-    Unk64Elem **buf;
+    TextRow **buf;
 
     list = ((SrcDesc *)desc)->unk18;
     idx = self->activeSlot;
@@ -328,14 +328,14 @@ void TaskCore__ReleaseSlotElements(TaskCore *self)
 void TaskCore__RefreshSlotView(TaskCore *self, void *a1, s32 a2)
 {
     s32 idx;
-    Unk64Elem **arr;
+    TextRow **arr;
     s32 count;
     s32 counter;
     SlotPos pos;
     s32 i;
 
     idx = self->activeSlot;
-    arr = (Unk64Elem **)self->itemLists[idx];
+    arr = (TextRow **)self->itemLists[idx];
     {
         SlotEntry *target = (SlotEntry *)self->target->unk24[idx];
 
@@ -344,7 +344,7 @@ void TaskCore__RefreshSlotView(TaskCore *self, void *a1, s32 a2)
     }
 
     for (i = 0; i < count; i++) {
-        (*arr)->methods->slot50(*arr);
+        (*arr)->methods->detachFromParent(*arr);
         arr++;
     }
 
@@ -363,36 +363,36 @@ void TaskCore__RefreshSlotView(TaskCore *self, void *a1, s32 a2)
         ((BoxFill *)self->listView)->methods->detachFromParent((BoxFill *)self->listView);
     }
 
-    arr = (Unk64Elem **)self->itemLists[idx];
+    arr = (TextRow **)self->itemLists[idx];
     for (i = 0; i < count; i++) {
-        (*arr)->methods->slot4C(*arr, a1, &pos);
-        (*arr)->methods->slot60(*arr, a2);
+        (*arr)->methods->attachToParent(*arr, a1, (Vec3_d294 *)&pos);
+        (*arr)->methods->setDisplay(*arr, a2);
         pos.y += 10;
         arr++;
     }
 
-    arr = (Unk64Elem **)self->itemLists[idx];
-    arr[counter]->methods->slot60(arr[counter], 1);
+    arr = (TextRow **)self->itemLists[idx];
+    arr[counter]->methods->setDisplay(arr[counter], 1);
 }
 
 void TaskCore__BroadcastToSlotElements(TaskCore *self, void *a1)
 {
     s32 idx = self->activeSlot;
-    Unk64Elem **arr = (Unk64Elem **)self->itemLists[idx];
+    TextRow **arr = (TextRow **)self->itemLists[idx];
     s32 count = self->itemCounts[idx];
     s32 i;
 
     for (i = 0; i < count; i++) {
-        Unk64Elem *elem = *arr;
+        TextRow *elem = *arr;
         arr++;
-        elem->methods->slotB8(elem, a1);
+        elem->methods->setColor(elem, a1);
     }
 }
 
 void TaskCore__BeginElementScroll(TaskCore *self)
 {
     s32 idx;
-    Unk64Elem *elem;
+    TextRow *elem;
     u8 *buf;
 
     if (self->inputMode != 1) {
@@ -400,9 +400,9 @@ void TaskCore__BeginElementScroll(TaskCore *self)
     }
     idx = self->activeSlot;
     self->methods->refreshSlotView(self, self->unk14, 1);
-    elem = ((Unk64Elem **)self->itemLists[idx])[self->slotCounts[idx]];
+    elem = ((TextRow **)self->itemLists[idx])[self->slotCounts[idx]];
     buf = (u8 *)self->target->unk24[idx] + 8;
-    elem->methods->slotB8(elem, buf);
+    elem->methods->setColor(elem, (SpriteRgb *)buf);
     self->inputMode = 2;
     self->methods->setState(self, 14);
 }
@@ -412,7 +412,7 @@ void TaskCore__CommitElementScroll(TaskCore *self)
     s32 idx;
     s32 counter;
     SlotPos pos;
-    Unk64Elem **arr;
+    TextRow **arr;
     s32 count;
     s32 i;
 
@@ -424,20 +424,20 @@ void TaskCore__CommitElementScroll(TaskCore *self)
     pos = SLOT_POS((SlotEntry *)self->target->unk24[idx]);
     pos.y -= counter * 10;
 
-    arr = (Unk64Elem **)self->itemLists[idx];
+    arr = (TextRow **)self->itemLists[idx];
     count = self->itemCounts[idx];
     for (i = 0; i < count; i++) {
-        (*arr)->methods->slot60(*arr, 0);
-        (*arr)->methods->slotBC(*arr, &pos);
+        (*arr)->methods->setDisplay(*arr, 0);
+        (*arr)->methods->setPosition(*arr, (ScreenSpritePos *)&pos);
         pos.y += 10;
         arr++;
     }
 
     {
-        Unk64Elem *elem = ((Unk64Elem **)self->itemLists[idx])[counter];
+        TextRow *elem = ((TextRow **)self->itemLists[idx])[counter];
 
-        elem->methods->slot60(elem, 1);
-        elem->methods->slotB8(elem, self->target->unselectedColor);
+        elem->methods->setDisplay(elem, 1);
+        elem->methods->setColor(elem, (SpriteRgb *)self->target->unselectedColor);
     }
 
     ((SlotEntry *)self->target->unk24[idx])->savedCursor = counter;
@@ -452,9 +452,9 @@ void TaskCore__CancelElementScroll(TaskCore *self)
 {
     s32 idx;
     s32 counter;
-    Unk64Elem **arr;
-    Unk64Elem *elem1;
-    Unk64Elem *elem2;
+    TextRow **arr;
+    TextRow *elem1;
+    TextRow *elem2;
     s32 newVal;
 
     if (self->inputMode != 2) {
@@ -463,13 +463,13 @@ void TaskCore__CancelElementScroll(TaskCore *self)
     idx = self->activeSlot;
     counter = self->slotCounts[idx];
     self->methods->refreshSlotView(self, self->unk14, 0);
-    arr = (Unk64Elem **)self->itemLists[idx];
+    arr = (TextRow **)self->itemLists[idx];
     elem1 = arr[counter];
-    elem1->methods->slotB8(elem1, self->target->unselectedColor);
+    elem1->methods->setColor(elem1, (SpriteRgb *)self->target->unselectedColor);
     newVal = ((s32 *)self->target->unk24[idx])[1];
     self->slotCounts[idx] = newVal;
     elem2 = arr[newVal];
-    elem2->methods->slot60(elem2, 1);
+    elem2->methods->setDisplay(elem2, 1);
     self->inputMode = 1;
     self->methods->setState(self, 17);
 }
@@ -502,19 +502,19 @@ void TaskCore__SetSlotCursor(TaskCore *self, s32 a1, void *a2)
 {
     s32 idx;
     s32 counter;
-    Unk64Elem **arr;
-    Unk64Elem *elem1;
-    Unk64Elem *elem2;
+    TextRow **arr;
+    TextRow *elem1;
+    TextRow *elem2;
     u8 *buf;
 
     idx = self->activeSlot;
     counter = self->slotCounts[idx];
-    arr = (Unk64Elem **)self->itemLists[idx];
+    arr = (TextRow **)self->itemLists[idx];
     elem1 = arr[counter];
     elem2 = arr[a1];
-    elem1->methods->slotB8(elem1, self->target->unselectedColor);
+    elem1->methods->setColor(elem1, (SpriteRgb *)self->target->unselectedColor);
     buf = (u8 *)self->target->unk24[idx] + 8;
-    elem2->methods->slotB8(elem2, buf);
+    elem2->methods->setColor(elem2, (SpriteRgb *)buf);
     self->slotCounts[idx] = a1;
     if (a2 != NULL) {
         self->methods->playSound(self, 0);

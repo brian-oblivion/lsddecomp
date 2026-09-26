@@ -8,6 +8,7 @@
 #include "Class6E99C.h"
 #include "IntermediateBase.h"
 #include "TaskCore.h"
+#include "TextRow.h"
 
 /* Forward typedefs, used by `extern` declarations further up this file
  * than their own struct bodies (round 14, code_2cc8c_e's own local views,
@@ -25,16 +26,14 @@ typedef struct TexPageDesc TexPageDesc;
  * holds and has no header for yet: TaskCore.h types those fields
  * `BasicClass *` and the accessors here cast to the view (`sound`, a
  * VabStreamObj, is cast to include/VabStreamObj.h's type; `Unk78Obj`: `bgLayer`; `Unk74Obj`: `subHandle`
- * and TaskCoreTarget's `handle`; `Unk64Elem`: the slot and item widgets,
- * New_TextRow; `listView` is a BoxFill, include/BoxFill.h). `SlotEntry` and
+ * and TaskCoreTarget's `handle`; the slot and item widgets are TextRows,
+ * include/TextRow.h; `listView` is a BoxFill, include/BoxFill.h). `SlotEntry` and
  * `SrcDesc` are two readings of one TaskCoreTarget::unk24[] record.
  */
 typedef struct Unk78Obj Unk78Obj;
 typedef struct Unk78ObjMethods Unk78ObjMethods;
 typedef struct Unk74Obj Unk74Obj;
 typedef struct Unk74ObjMethods Unk74ObjMethods;
-typedef struct Unk64Elem Unk64Elem;
-typedef struct Unk64ElemMethods Unk64ElemMethods;
 typedef struct SrcDesc SrcDesc;
 typedef struct HeaderObj HeaderObj;
 typedef struct EventArg EventArg;
@@ -111,7 +110,7 @@ struct SlotEntry {
     s32 unk10;   /* +0x010 */
     s32 unk14;   /* +0x014, combined with unk10 and a per-slot counter into
                     a 2-word stack buffer (`{unk10, unk14 - counter*10}`)
-                    passed by address to an Unk64Elem slotBC call, then
+                    passed by address to a TextRow setPosition call, then
                     incremented by 10 per loop iteration -- see
                     TaskCore__CommitElementScroll/TaskCore__RefreshSlotView */
 };
@@ -200,58 +199,7 @@ struct SrcDesc {
 
 extern s32 strlen(char *s); /* Psy-Q libc2/strlen, linked from Sony's
                                         own object; local view here */
-extern Unk64Elem *New_TextRow(void *ctx, s32 len, char *name); /* not
-                                        yet seen elsewhere; typed from
-                                        TaskCore__CreateSlotElements's own call site --
-                                        its return value is stored directly
-                                        into the same self->unk64[idx]
-                                        array TaskCore__BroadcastToSlotElements/TaskCore__BroadcastToSlots/
-                                        TaskCore__BeginElementScroll/TaskCore__SetSlotCursor walk as
-                                        Unk64Elem * */
 
-/*
- * self->unk64[idx]'s pointee, as walked by TaskCore__BroadcastToSlotElements -- a DIFFERENT
- * reading of the same field TaskCore__ReleaseSlotElements/TaskCore__AdvanceSlotCursor/TaskCore__RetreatSlotCursor use
- * as an opaque resource handle. TaskCore__BroadcastToSlotElements reinterprets that handle as
- * `Unk64Elem **` (an array of `self->unk5C[idx]` object pointers) and
- * dispatches through each element's own +0x0B8 slot. Both readings are
- * kept -- the field itself stays `void **` in `TaskCore` (the generic,
- * more common usage) and this function alone casts locally, per this
- * project's "empty-bodied vtable occupant is not evidence the SLOT takes
- * no arguments" family of narrow-evidence cautions applied to a field
- * instead of a slot.
- */
-struct Unk64ElemMethods {
-    u8 pad000[0x004];
-    void (*slot4)(Unk64Elem *self);            /* +0x004, OBSERVED:
-                                                    TaskCore__ReleaseTarget (round 12) */
-    u8 pad008[0x04C - 0x008];
-    void (*slot4C)(Unk64Elem *self, void *a1, void *buf); /* +0x04C,
-                                                    OBSERVED: TaskCore__UpdateSlotElements
-                                                    and TaskCore__RefreshSlotView
-                                                    (round 12) -- both pass a
-                                                    raw buffer pointer as the
-                                                    3rd arg (an 8-byte-stride
-                                                    external record in
-                                                    TaskCore__UpdateSlotElements, the
-                                                    address of a 2-word stack
-                                                    pair in TaskCore__RefreshSlotView),
-                                                    so `buf` stays untyped */
-    void (*slot50)(Unk64Elem *self);            /* +0x050, OBSERVED:
-                                                    TaskCore__RefreshSlotView (round 12) */
-    u8 pad054[0x060 - 0x054];
-    void (*slot60)(Unk64Elem *self, s32 a1);   /* +0x060, OBSERVED:
-                                                    TaskCore__CancelElementScroll */
-    u8 pad064[0x0B8 - 0x064];
-    void (*slotB8)(Unk64Elem *self, void *a1); /* +0x0B8 */
-    void (*slotBC)(Unk64Elem *self, void *a1); /* +0x0BC, OBSERVED:
-                                                    TaskCore__CommitElementScroll (round 12),
-                                                    address of a 2-word
-                                                    stack pair */
-};
-struct Unk64Elem {
-    Unk64ElemMethods *methods; /* +0x000 */
-};
 
 /* listView (+0x068) is a BoxFill (include/BoxFill.h): the accessors cast
  * TaskCore's `BasicClass *` to it. */
@@ -366,169 +314,22 @@ extern void *New_D8006EF50(void); /* external, no args; local view returns
  */
 
 /*
- * `Obj6EAC0` -- code_2cc8c_f's view of gTextRowMethods's class (id 0x11144), the
- * methods from New_TextRow to GetTextRowMethods. Round 14 read
- * gTextRowMethods as an override table of D_8006EAC0 and named this view after
- * the latter; the class ids say otherwise, and so do the ctors:
- * TextRow__TextRow chains to GetCharSpriteMethods()->ctor, and CharSprite
- * (0x1144) is a ScreenSprite (0x144, include/ScreenSprite.h) subclass. So
- * 0x11144 is NOT below BoxFill (0x64, gBoxFillMethods, include/BoxFill.h):
- * the thirteen 0x64 methods that used this view now use BoxFill, and the
- * fields only they touched are padding here. Slot comments below that name
- * a BoxFill__* occupant "(base)" date from the old reading; those occupants
- * are BoxFill's, in gBoxFillMethods, not this class's. This view is
- * 0x11144's job (FINISHING-PLAN track 4) and is otherwise left as it was.
- *
- * Its reading (round 54, tier B, this unit's evidence only): an N-child
- * text row. `New_TextRow(ctx, count, text)` makes `count` CharSprite cells
- * (New_CharSprite) in `children`; TextRow__SetText hands one byte of a
- * NUL-terminated string to each child's +0x0C4; the layout slots walk
- * `children[childStart .. childStart + childCount)`, advancing a running
- * position by `childPitch`, with one extra +0x10 gap at `gapIndex`. The
- * +0x00C word called `hasChildren` here is at Class6B5CC's `parent` offset.
- *
- * Slot arity is per-CALL-SITE: `slot4C` and `slotC4` are called here with
- * different argument counts, so both stay unprototyped.
+ * TextRow (class id 0x11144, gTextRowMethods) is declared once, in
+ * include/TextRow.h (track 4, round 88): code_2cc8c_f's New_TextRow to
+ * GetTextRowMethods are its methods. This header's two views of it are gone:
+ * `Obj6EAC0` (named after BoxFill's old table address; the class is below
+ * CharSprite, not BoxFill) and `Unk64Elem`, the slot and item widgets
+ * TaskCore holds (`slotElements`, `itemLists`), which New_TextRow makes.
  */
-typedef struct Obj6EAC0 Obj6EAC0;
-typedef struct Obj6EAC0Methods Obj6EAC0Methods;
-struct Obj6EAC0Methods {
-    u8 pad000[0x008];
-    void (*slot08)(Obj6EAC0 *self, s32 a1, s32 a2, s32 a3); /* +0x008,
-                                  ctor-shaped: OBSERVED forwarded 3 raw
-                                  args by New_TextRow's New_X wrapper.
-                                  IS TextRow__TextRow (this unit, STALL) in
-                                  the derived table. */
-    void (*slot0C)(Obj6EAC0 *self); /* +0x00C, IS TextRow__Finalize (derived,
-                                  this unit) -- takes no extra args */
-    u8 pad010[0x040 - 0x010];
-    void (*slot40)(Obj6EAC0 *self, s32 a1); /* +0x040, IS TextRow__Reset
-                                  (derived, this unit) */
-    u8 pad044[0x04C - 0x044];
-    void (*slot4C)(); /* +0x04C, DELIBERATELY UNPROTOTYPED (K&R style):
-                                  call sites in this unit need it at BOTH
-                                  3 and 4 explicit arguments
-                                  (BoxFill__AttachAbsolute forwards 4;
-                                  TextRow__AttachToParent calls it at 3, twice, with
-                                  different argument MEANINGS each time)
-                                  and C requires an exact arg-count match
-                                  through a prototyped function-pointer
-                                  type, which no single prototype here
-                                  could satisfy. IS BoxFill__AttachToParent (base,
-                                  this unit, reads 3) and TextRow__AttachToParent
-                                  (derived, this unit, reads 3) */
-    void (*slot50)(Obj6EAC0 *self); /* +0x050, IS TextRow__DetachFromParent (derived,
-                                  this unit) */
-    u8 pad054[0x060 - 0x054];
-    s32 (*slot60)(Obj6EAC0 *self, s32 a1); /* +0x060, IS TextRow__SetDisplay
-                                  (derived, this unit), which recurses
-                                  into a child's own slot60 with the same
-                                  a1 and threads the return value through
-                                  as its own return (last-iteration wins) */
-    s32 (*slot64)(Obj6EAC0 *self, s32 a1); /* +0x064, IS BoxFill__SetSemiTrans
-                                  (base, this unit) -- tail-returns a
-                                  packed-bitfield accessor */
-    s32 (*slot68)(Obj6EAC0 *self, s32 a1); /* +0x068, IS BoxFill__SetSemiTransRate
-                                  (base, this unit), same shape as
-                                  slot64 */
-    u8 pad06C[0x0B8 - 0x06C];
-    void (*slotB8)(Obj6EAC0 *self, s32 a1); /* +0x0B8, the only OBSERVED
-                                  CALL through this slot is
-                                  TextRow__SetColor's own child dispatch, at
-                                  2 args. BoxFill__SetColor (base occupant)
-                                  takes a 3rd (`u8 *src`) in its own
-                                  definition, which is fine -- an
-                                  occupant's own arity need not match a
-                                  narrower call site (nothing in this
-                                  unit calls slotB8 at 3 args) */
-    void (*slotBC)(Obj6EAC0 *self, Pair32E99C *a1); /* +0x0BC, IS BoxFill__SetPosition
-                                  (base, this unit) and TextRow__SetPosition
-                                  (derived, this unit); a1 a 2-word
-                                  struct pointer in both -- same shape as
-                                  Class6E99C's saved position (see
-                                  Class6E99C__PushPosition) */
-    void (*slotC0)(Obj6EAC0 *self, void *a1); /* +0x0C0, IS BoxFill__SetSize
-                                  (base, this unit); a1 a 2-halfword
-                                  struct pointer */
-    void (*slotC4)(); /* +0x0C4, DELIBERATELY UNPROTOTYPED, same reason as
-                                  slot4C above: BoxFill__AttachAbsolute forwards 4
-                                  args, TextRow__SetText dispatches a CHILD's
-                                  slotC4 at only 2. IS BoxFill__AttachAbsolute
-                                  (base, this unit, reads 3) and
-                                  TextRow__SetCellAt (derived, this unit,
-                                  reads 2) */
-    void (*slotC8)(Obj6EAC0 *self, s32 a1); /* +0x0C8, IS BoxFill__SetPri
-                                  (base, this unit, setter) and
-                                  TextRow__NoOpGetCell (derived, this unit,
-                                  splat-generated trivial jr $ra; nop) */
-    s32 (*slotCC)(Obj6EAC0 *self, s32 a1); /* +0x0CC, IS BoxFill__SetMask
-                                  (base, this unit) and TextRow__SetText
-                                  (derived, this unit) */
-    void (*slotD0)(Obj6EAC0 *self); /* +0x0D0, derived-only, IS
-                                  TextRow__NoOpSlotD0 (this unit, splat-
-                                  generated trivial) */
-    void (*slotD4)(Obj6EAC0 *self, s32 a1); /* +0x0D4, derived-only, IS
-                                  TextRow__SetCellPitch (this unit, setter) */
-};
-
-struct Obj6EAC0 {
-    Obj6EAC0Methods *methods; /* +0x000 */
-    u8 pad004[0x00C - 0x004];
-    s32 hasChildren;           /* +0x00C, OBSERVED: tested by
-                                  TextRow__AttachToParent, TextRow__DetachFromParent,
-                                  TextRow__SetPosition (Class6B5CC's
-                                  `parent` offset; see the banner) */
-    u8 pad010[0x0A9 - 0x010];
-    u8 totalChildCount;         /* +0x0A9, OBSERVED: TextRow__Finalize (passed
-                                  as ReleaseBasicClassArray's count arg),
-                                  TextRow__SetPosition (loop bound) */
-    u8 gapIndex;                /* +0x0AA, OBSERVED: TextRow__AttachToParent -- a
-                                  one-shot "extra offset" gate compared
-                                  against the loop index */
-    u8 childCount;               /* +0x0AB, OBSERVED: a per-slice element
-                                  COUNT, paired with childStart as the base
-                                  index -- TextRow__AttachToParent, TextRow__DetachFromParent,
-                                  TextRow__SetDisplay, TextRow__SetColor */
-    u8 childStart;               /* +0x0AC, OBSERVED: a per-slice element
-                                  START INDEX into children, paired with
-                                  childCount above */
-    u8 padAD[0x0B0 - 0x0AD];
-    s32 childPitch;             /* +0x0B0, OBSERVED: TextRow__SetCellPitch (setter);
-                                  read and added into a local running total
-                                  by TextRow__AttachToParent/TextRow__SetPosition */
-    Obj6EAC0 **children;        /* +0x0B4, OBSERVED: an array of child
-                                  objects of this SAME class, indexed by
-                                  childStart..childStart+childCount and dispatched
-                                  through their own `->methods` */
-};
 
 /* The packed-bitfield accessor Class6B5CC's attribute setters use
  * (code_d294), reached here by BoxFill's over `&self->boxAttribute`. */
 extern u32 GetSetBitField(u32 *word, s32 shift, s32 width, u32 value);
 
 /* gBoxFillMethods and GetBoxFillMethods: include/BoxFill.h. */
-extern Obj6EAC0Methods gTextRowMethods; /* the override table itself, so
-                                       GetTextRowMethods's own definition
-                                       (this unit) can return &gTextRowMethods */
-/* GetCharSpriteMethods, New_CharSprite and their table: include/CharSprite.h
- * (track 4, round 86), included by code_2cc8c_f, the one unit that calls
- * them. */
+/* gTextRowMethods, GetTextRowMethods and New_TextRow: include/TextRow.h.
+ * GetCharSpriteMethods and New_CharSprite: include/CharSprite.h. */
 
-/*
- * MEASURED elsewhere (round 9, include/class_3bb8c.h / src/class_3ac78.c):
- * GetClass6B5CCMethods takes NO arguments and its whole body is a fixed
- * `lui/addiu %hi/%lo(gClass6B5CCMethods); jr $ra` -- it always returns the SAME
- * global table regardless of caller, a shared "default handler" utility
- * reached the same way IntermediateBaseMethods/TaskUtilMethods are
- * reached elsewhere in this project. This unit's own call touches only
- * slot 0x04C, at a NARROWER 2-extra-argument arity than
- * Obj6EAC0Methods::slot4C's widest use, so it gets its own tiny local
- * view rather than reusing that struct (same per-call-site-arity
- * reasoning as slot4C/slotC4 above). Do not reconcile this declaration
- * with code_d294.h's or class_3ac78.h's own differently-typed views of
- * the same symbol -- see class_3ac78.c's comment on GetClass6B5CCMethods for
- * why that is expected.
- */
 /* GetClass6B5CCMethods and its table: include/Class6B5CC.h (track 4, round 81). */
 
 /* Class6E99C (class id 0x164, D_8006E99C): include/Class6E99C.h (track 4,
