@@ -9,7 +9,7 @@ and no derivation; this round wrote and matched the function from scratch.
 ## Body
 
 ```c
-extern void CheckObj866E8CountFlag(void *arg0, void *arg1, void *arg2);
+extern void CheckSaveScoreFlag(void *arg0, void *arg1, void *arg2);
 
 void Class86B60__CommitNameEntry(Class86B60 *self)
 {
@@ -24,7 +24,7 @@ void Class86B60__CommitNameEntry(Class86B60 *self)
     DecodeFullWidthSjis(buf1, D_8008AA18);
     self->nameField->methods->slotCC(self->nameField, buf1);
     BMemPMgrFree(buf1);
-    CheckObj866E8CountFlag(self, self->unk4C, self->unkA4);
+    CheckSaveScoreFlag(self, self->unk4C, self->unkA4);
     self->methods->slotE0(self, self->unk14);
     self->unkA4->methods->slot19C(self->unkA4, &buf2);
     self->state = 5;
@@ -63,7 +63,7 @@ the whole image after any further edit there.)
   `slotCC` is a NEW slot on `Class86B60UnkB0ObjMethods_3bb8c_d`, landing at
   +0x0CC, 0x10 bytes after this round's `slotB8` (+0x0B8) with an
   intervening pad.
-- `CheckObj866E8CountFlag(self, self->unk4C, self->unkA4);` -- `CheckObj866E8CountFlag` is
+- `CheckSaveScoreFlag(self, self->unk4C, self->unkA4);` -- `CheckSaveScoreFlag` is
   ALREADY MATCHED, in a DIFFERENT unit (`src/class_3bb8c_c.c`), as a
   genuinely 2-parameter function (`Ctx678_3bb8c_c *ctx, Result678_3bb8c_c
   *out`). This call site sets up a THIRD argument (`self->unkA4` in `$a2`)
@@ -73,7 +73,7 @@ the whole image after any further edit there.)
   local 3-argument extern matches what THIS call site actually needs;
   class_3bb8c_c.c's 2-argument declaration is untouched. (`include/class_
   3bb8c.h`'s own comment on `Ctx678_3bb8c_c`, written when this call site
-  was still uncarved asm, already named `Class86B60__CommitNameEntry` as CheckObj866E8CountFlag's
+  was still uncarved asm, already named `Class86B60__CommitNameEntry` as CheckSaveScoreFlag's
   "one caller" -- now confirmed and closed.)
 - `self->methods->slotE0(self, self->unk14);` -- a NEW slot at +0x0E0 on
   `Class86B60Methods` (inside the previous `pad0DC[0xF0-0xDC]` gap),
@@ -116,7 +116,7 @@ the whole image after any further edit there.)
   `slot11C` (+0x11C, `pad0F4` split).
 
 `src/class_3bb8c_d.c`: local (not shared-header) 3-argument extern for
-`CheckObj866E8CountFlag`, matching this call site; `class_3bb8c_c.c`'s own
+`CheckSaveScoreFlag`, matching this call site; `class_3bb8c_c.c`'s own
 2-argument declaration for the same real function is untouched.
 
 No existing declaration was retyped or resized; `slotF0`'s existing `void
@@ -143,7 +143,7 @@ round 20, just triggered by a same-unit sibling instead of a forgotten
 
 ## Naming (round 77, naming runner delta)
 
-Renamed `func_8004DE08` -> `Class86B60__CommitNameEntry`. **Tier B**: Allocates/fills/frees a temp buffer via `BMemPMgrAlloc`/`DecodeFullWidthSjis`/`BMemPMgrFree` and pushes it through `self->nameField->methods->slotCC`, then calls `CheckObj866E8CountFlag`, sets `state = 5`, and runs two `Class86B60__SetState` calls (0xB then 0xF) bracketing a refresh of the DreamSysView. Read as committing the entered name-field text and advancing state; the two literal state values are not otherwise established.
+Renamed `func_8004DE08` -> `Class86B60__CommitNameEntry`. **Tier B**: Allocates/fills/frees a temp buffer via `BMemPMgrAlloc`/`DecodeFullWidthSjis`/`BMemPMgrFree` and pushes it through `self->nameField->methods->slotCC`, then calls `CheckSaveScoreFlag`, sets `state = 5`, and runs two `Class86B60__SetState` calls (0xB then 0xF) bracketing a refresh of the DreamSysView. Read as committing the entered name-field text and advancing state; the two literal state values are not otherwise established.
 
 ## Track 4 (2026-09-26, round 88, bravo)
 

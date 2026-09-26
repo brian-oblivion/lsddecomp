@@ -1,5 +1,5 @@
 /* First slice of the 365-function class_3bb8c block -- 20 functions,
- * 0x3BB8C..0x3CD88, all matched C, occupants of `D_800866E8` +0x0E4..+0x11C
+ * 0x3BB8C..0x3CD88, all matched C, occupants of `gClass866E8Methods` +0x0E4..+0x11C
  * (`tools/classtable.py 0x800866E8`). The remainder is `class_3bb8c_b` and
  * is still a monolithic asm segment.
  *

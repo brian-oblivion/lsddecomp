@@ -63,4 +63,4 @@ Round 78 (track 3, naming pass, bravo).
 
 | symbol | name | tier | evidence |
 | --- | --- | --- | --- |
-| `func_8004C158` | `Class866E8__GetTargetDescriptor` | B | Occupant of `D_800866E8` +0x10C. Resolves `self->unk6C`'s own position substruct, optionally hands it to `slot110` (`Class866E8__ComputeFootprintDescriptor`) to fill a caller-supplied `Descriptor10Ext`, and always returns `&self->unkBC` -- this object's own current footprint descriptor. "Get...Descriptor" names the return value's role; "Target" reflects `self->unk6C`'s established role as the stored position source (`Class866E8__SetTargetAndBuildRates` sets it). |
+| `func_8004C158` | `Class866E8__GetTargetDescriptor` | B | Occupant of `gClass866E8Methods` +0x10C. Resolves `self->unk6C`'s own position substruct, optionally hands it to `slot110` (`Class866E8__ComputeFootprintDescriptor`) to fill a caller-supplied `Descriptor10Ext`, and always returns `&self->unkBC` -- this object's own current footprint descriptor. "Get...Descriptor" names the return value's role; "Target" reflects `self->unk6C`'s established role as the stored position source (`Class866E8__SetTargetAndBuildRates` sets it). |

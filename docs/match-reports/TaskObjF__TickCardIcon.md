@@ -30,7 +30,7 @@ reusing the shared release-only view.
 This is the first function in a brand new 29-slot class table
 (`D_80086E00`, resolved with `tools/classtable.py 0x80086E00`), unrelated
 by inheritance to any table already known in this header (`--vs` against
-`D_8006B58C`/`D_800866E8`/`gClass86B60Methods`/`gTaskObjFMethods` showed no shared run of
+`D_8006B58C`/`gClass866E8Methods`/`gClass86B60Methods`/`gTaskObjFMethods` showed no shared run of
 slots). Found by searching the retail binary for raw pointer values
 matching this unit's own function addresses (each of the 12 fresh
 functions plus the 3 non-`gp_rel` blocked ones appears EXACTLY ONCE, in one

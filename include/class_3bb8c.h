@@ -6,7 +6,7 @@
 #include "TaskCore.h"
 
 /*
- * The class whose method table is D_800866E8 (80 slots, resolved with
+ * The class whose method table is gClass866E8Methods (80 slots, resolved with
  * tools/classtable.py 0x800866E8). No FirecatFG name survives, so fields
  * are named by offset until real names are known. This unit (class_3bb8c)
  * is the FIRST to write any of this class's own methods -- a different
@@ -298,7 +298,7 @@ extern s32 *sFootprintResultPtrTable[7];
 typedef struct Obj866E8Methods {
     u8 pad000[0x30];
     /* = BasicClass::notifyParents (`BasicClass__NotifyParents`, classtable-
-     * verified against `D_800866E8`'s own +0x030 entry) -- this class
+     * verified against `gClass866E8Methods`'s own +0x030 entry) -- this class
      * inherits the base BasicClassMethods layout for its low slots (see
      * `include/code_8220.h`). Called by Class866E8__UpdateFootprintTracking as
      * `self->methods->slot30(self, 5)` when the just-copied descriptor's
@@ -331,7 +331,7 @@ typedef struct Obj866E8Methods {
     void (*slotC0)(Obj866E8 *self);            /* +0x0C0 */
     u8 pad0C4[0xF8 - 0xC4];
     /* = Class866E8__BuildRateEntries. This IS Class866E8__BuildRateEntries's own identity slot
-     * (verified via classtable, `D_800866E8`'s own +0x0F8 entry) -- its real
+     * (verified via classtable, `gClass866E8Methods`'s own +0x0F8 entry) -- its real
      * signature (self, s32 val, Unk54Struct *arg2, TargetSpec866E8 *arg3, void
      * return) is established by that function's own body, not by this call
      * site's placeholder types. Called by Class866E8__SetTargetAndBuildRates with
@@ -404,7 +404,7 @@ typedef struct Obj866E8Methods {
     /* = Class866E8__RefreshFootprint (class_3bb8c_b, already matched: `void
      * Class866E8__RefreshFootprint(Obj866E8 *self)`). Called by Class866E8__UpdateFootprintTracking as
      * `self->methods->slot128(self)`, return unused. Classtable-verified
-     * (`D_800866E8`'s own +0x128 entry). */
+     * (`gClass866E8Methods`'s own +0x128 entry). */
     void (*slot128)(Obj866E8 *self);               /* +0x128 */
 } Obj866E8Methods;
 
@@ -598,7 +598,7 @@ extern void ApplyMatrixLV(QueryTemplate866E8 *arg0, s32 *arg1, s32 *arg2); /* ar
 /*
  * Opaque target of Obj866E8::bounds (Class866E8__SetBounds stores it raw;
  * IsPointOutOfBounds -- a plain, non-virtual helper, NOT a vtable slot, see
- * tools/classtable.py D_800866E8 -- dereferences it as a min/max bounding
+ * tools/classtable.py gClass866E8Methods -- dereferences it as a min/max bounding
  * box against an [x,y] byte pair). Field meaning inferred from the four
  * comparisons in IsPointOutOfBounds: `unk0`/`unk2` gate the LOW side, `unk4`/
  * `unk8` the HIGH side, of the point's two axes respectively.
@@ -673,7 +673,7 @@ typedef struct CC74QueryBuf {
 struct Obj866E8 {
     Obj866E8Methods *methods;      /* +0x000 */
     u8 pad04[0x0C - 0x04];
-    s32 unkC;                      /* +0x00C, CheckObj866E8CountFlag (compared against 9999999) */
+    s32 unkC;                      /* +0x00C, CheckSaveScoreFlag (compared against 9999999) */
     /*
      * +0x010..+0x048: a "countdown/flush" subsystem, established by
      * class_3bb8c_j (round 15) from four functions (TextEntry__PrevChar,
@@ -745,7 +745,7 @@ struct Obj866E8 {
     s32 rateCountdown;                    /* +0x1E0, Class866E8__AdvanceRateCountdown/Class866E8__FlushRateLatch: a countdown gate */
     EntryDesc866E8 *rateEntry;        /* +0x1E4, Class866E8__ApplyRateToChild (forwarded opaquely)/Class866E8__ConfigureRateEntry (selects one of four statics and reads +0x6) */
     u8 pad1E8[0x2F4 - 0x1E8];
-    s32 unk2F4;                    /* +0x2F4, CheckObj866E8CountFlag: zero-checked when unkC > 9999999 */
+    s32 unk2F4;                    /* +0x2F4, CheckSaveScoreFlag: zero-checked when unkC > 9999999 */
 };
 
 /* Get-vtable helper, same shape and same real function as
@@ -753,7 +753,7 @@ struct Obj866E8 {
  * return type Obj866E8Methods, not Class866E8Methods). It now has a real
  * body in this unit (class_3bb8c_b); class_3ac78 still calls it via `jal`
  * as a raw external. */
-extern Obj866E8Methods D_800866E8;
+extern Obj866E8Methods gClass866E8Methods;
 
 /* Still raw asm in this unit (not this round's target): walks
  * item->unk10[] (an array of EntryChildObj*, up to +0x668 bytes
@@ -966,7 +966,7 @@ extern s32 D_8008AA30;
 extern void FormatNumberIntoBuffer(s32 arg0);
 
 /*
- * First argument of CheckObj866E8CountFlag: an unrelated, larger caller-side
+ * First argument of CheckSaveScoreFlag: an unrelated, larger caller-side
  * struct (only seen from its one caller, Class86B60__CommitNameEntry in the still-
  * uncarved asm/class_3bb8c_d.s) whose own +0x0BC field is a pointer to
  * the Obj866E8 instance this function actually operates on -- NOT
@@ -980,12 +980,12 @@ typedef struct Ctx678_3bb8c_c {
 } Ctx678_3bb8c_c;
 
 /*
- * Second argument of CheckObj866E8CountFlag: holds a pointer at +0x018 to a small
- * result block whose word at +0x004 is the flag CheckObj866E8CountFlag computes.
+ * Second argument of CheckSaveScoreFlag: holds a pointer at +0x018 to a small
+ * result block whose word at +0x004 is the flag CheckSaveScoreFlag computes.
  */
 typedef struct Result678_3bb8c_c {
     u8 pad00[0x018];
-    s32 *block;                                 /* +0x018, CheckObj866E8CountFlag writes block[1] */
+    s32 *block;                                 /* +0x018, CheckSaveScoreFlag writes block[1] */
 } Result678_3bb8c_c;
 
 /*

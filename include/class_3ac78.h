@@ -149,8 +149,8 @@ struct Vec3_3ac78 {
 /*
  * Class866E8 -- constructed by New_Class866E8 (New_Class866E8: allocates
  * 0x1E8 bytes, gets the vtable via GetClass866E8Methods, calls ctor slot +0x008).
- * Vtable is D_800866E8 (80 slots, header 0x114), resolved with
- * tools/classtable.py D_800866E8. Ctor is Class866E8__Class866E8 (177 words,
+ * Vtable is gClass866E8Methods (80 slots, header 0x114), resolved with
+ * tools/classtable.py gClass866E8Methods. Ctor is Class866E8__Class866E8 (177 words,
  * MATCHED) and the finalize slot (+0x00C) is Class866E8__Finalize (113 words, MATCHED round 19 --
  * see its match report; mirrors the ctor's own per-slot teardown, one
  * `elems[]` entry at a time).
@@ -197,7 +197,7 @@ struct Class866E8Methods {
     /* +0x08C */ u8 pad08C[0x0B8 - 0x08C];
     /* +0x0B8 */ UnkChildObj_3ac78 *(*getChild)(Class866E8 *self, s32 index);      /* LightRig__GetLight; called by Class866E8__SetChildParams */
     /* +0x0BC */ u8 pad0BC[0x0D0 - 0x0BC];
-    /* +0x0D0 */ void (*forwardAcceptedCommand)(Class866E8 *self, void *sender, s32 command);        /* Class866E8__ForwardAcceptedCommand; called by Class866E8__OnCommand */
+    /* +0x0D0 */ void (*forwardAcceptedCommand)(Class866E8 *self, void *sender, s32 command);        /* Class866E8__ForwardAcceptedCommand; called by Class866E8__DispatchLinkCommand */
     /* +0x0D4 */ u8 pad0D4[0x0DC - 0x0D4];
     /* +0x0DC */ void (*setGridSpan)(Class866E8 *self, s32 span);                    /* Class866E8__Reset; called with self and the loaded value of gDefaultGridSpan (a lone .word, 0x0000A000, no other reference in the image) */
     /* +0x0E0 */ u8 pad0E0[0x0F4 - 0x0E0];
@@ -299,7 +299,7 @@ struct UnkArgObj_3ac78 {
 
 /*
  * Generic "object with a vtable pointer at offset 0" view, used only by
- * Class866E8__OnCommand to read the low byte of another object's vtable header
+ * Class866E8__DispatchLinkCommand to read the low byte of another object's vtable header
  * word as a type tag (0x34 here). Several unrelated class tables share
  * that low byte (gActorMethods and DREAMSYS_METHODS among them, per
  * docs/research/class-framework.md), so this reads as a family/base-class

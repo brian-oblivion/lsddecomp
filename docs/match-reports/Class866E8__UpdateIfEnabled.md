@@ -9,7 +9,7 @@
 A guard-and-dispatch method: if `self->unk70` is set, calls two of its own
 vtable slots (`+0xF4`, `+0x13C`) back to back with just `self`.
 
-Slot resolution used `tools/classtable.py D_800866E8` (the whole vtable was
+Slot resolution used `tools/classtable.py gClass866E8Methods` (the whole vtable was
 resolved in the previous commit for this unit): `+0xF4` -> `Class866E8__UpdateFootprintTracking`,
 `+0x13C` -> `Class866E8__AdvanceRateCountdown`. Neither is decompiled yet; only the slot
 existence/signature (self-only) was needed here.

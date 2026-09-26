@@ -13,7 +13,7 @@ attempt once rebuilt against the fixed toolchain, alongside its sibling
 
 ## ROUND 75 CORRECTION
 
-This report originally typed `self` as `Obj866E8` (D_800866E8) and typed
+This report originally typed `self` as `Obj866E8` (gClass866E8Methods) and typed
 `self->unk44` through a unit-local `Unk44Obj866E8`/`Unk44Obj866E8Methods`
 duplicate. Both were wrong, for the same reason as its sibling
 `TextEntry__SetCursorPos` (see that report and

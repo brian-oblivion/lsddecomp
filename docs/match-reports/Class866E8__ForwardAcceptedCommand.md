@@ -7,7 +7,7 @@
 ## What it does
 
 `Class866E8Methods` slot `+0x0D0` (`slotD0`, already documented as such by
-`Class866E8__OnCommand`'s comment before this round). Gates on `count`: only
+`Class866E8__DispatchLinkCommand`'s comment before this round). Gates on `count`: only
 proceeds for `count` in `{2,3,5,6,7,8}` (`count < 2`, `count == 4`, and
 `count >= 9` all bail early). If the gate passes, walks `self->unkE8` as a
 NUL-terminated `s32` array of tag values; for every entry equal to

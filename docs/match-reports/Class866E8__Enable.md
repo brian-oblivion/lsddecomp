@@ -4,7 +4,7 @@
 
 > Renamed from `func_8004B570` on 2026-09-24 (tools/rename.py). Address 0x8004b570.
 
-`Obj866E8`'s vtable slot +0x0EC (`D_800866E8`, resolved with
+`Obj866E8`'s vtable slot +0x0EC (`gClass866E8Methods`, resolved with
 `tools/classtable.py 0x800866E8` — a different, independently-typed local
 view of the same table already exists in `include/class_3ac78.h` as
 `Class866E8Methods`; see `include/class_3bb8c.h`'s header comment for why
@@ -39,7 +39,7 @@ byte-identical", in its store-instead-of-tail-call form: the value in `$v0`
 is a side effect of needing a register, not a returned result.
 
 What broke the tie is the slot, not this function. `Class866E8__Enable` occupies
-`+0x0EC` of `D_800866E8`, and a cross-table survey of that offset
+`+0x0EC` of `gClass866E8Methods`, and a cross-table survey of that offset
 (`tools/classtable.py` over all 60 tables) finds five distinct occupants —
 `TaskCore__FindPrevFreeSlot` (the base implementation, shared by four separate class
 tables), `Class6E99C__PopPosition`, `Class876FC__Update`, `Actor__SetPendingExtra` and this one.
@@ -70,7 +70,7 @@ Round 78 (track 3, naming pass, bravo).
 
 | symbol | name | tier | evidence |
 | --- | --- | --- | --- |
-| `func_8004B570` | `Class866E8__Enable` | A | Occupant of `D_800866E8` +0x0EC. Body is exactly `self->enabled = 1;`. Paired with `Class866E8__Disable` (+0x0F0, same struct, clears the same field) and cross-confirmed by `class_3ac78`'s own INDEPENDENT local view of the same field, already named `enabled` there (`docs/match-reports/Class866E8__UpdateIfEnabled.md`, round 67) from the identical set/clear evidence. A pure setter of a named boolean field is tier A by the naming rule's own "getter/clamp/list-push" clause. |
+| `func_8004B570` | `Class866E8__Enable` | A | Occupant of `gClass866E8Methods` +0x0EC. Body is exactly `self->enabled = 1;`. Paired with `Class866E8__Disable` (+0x0F0, same struct, clears the same field) and cross-confirmed by `class_3ac78`'s own INDEPENDENT local view of the same field, already named `enabled` there (`docs/match-reports/Class866E8__UpdateIfEnabled.md`, round 67) from the identical set/clear evidence. A pure setter of a named boolean field is tier A by the naming rule's own "getter/clamp/list-push" clause. |
 
 | field | name | tier | evidence |
 | --- | --- | --- | --- |

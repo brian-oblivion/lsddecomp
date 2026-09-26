@@ -2,7 +2,7 @@
 
 > Renamed from `func_8004C434` on 2026-09-24 (tools/rename.py). Address 0x8004c434.
 
-Not a vtable slot (not in `D_800866E8`), a plain non-virtual helper —
+Not a vtable slot (not in `gClass866E8Methods`), a plain non-virtual helper —
 companion to `Class866E8__CountFlaggedElements`, walking the same `self->arr` array but
 searching a different field.
 
@@ -97,4 +97,4 @@ Round 78 (track 3, naming pass, bravo).
 
 | symbol | name | tier | evidence |
 | --- | --- | --- | --- |
-| `func_8004C434` | `Class866E8__FindElemByUnk32` | A | Occupant of `D_800866E8` +0x118 (`slot118`). Pure linear search: loops `self->arr[7]`, returns the first `Elem *` whose `unk4->unk32 == key`. Named to parallel the already-matched sibling `Class866E8__FindElemIndexByUnk32` (+0x120), which searches the SAME field (`ElemTarget::unk32`) but returns an index rather than the element pointer -- consistent family naming for two functions doing the identical field comparison with a different return shape. A pure search-and-return is tier A by the "getter" clause. |
+| `func_8004C434` | `Class866E8__FindElemByUnk32` | A | Occupant of `gClass866E8Methods` +0x118 (`slot118`). Pure linear search: loops `self->arr[7]`, returns the first `Elem *` whose `unk4->unk32 == key`. Named to parallel the already-matched sibling `Class866E8__FindElemIndexByUnk32` (+0x120), which searches the SAME field (`ElemTarget::unk32`) but returns an index rather than the element pointer -- consistent family naming for two functions doing the identical field comparison with a different return shape. A pure search-and-return is tier A by the "getter" clause. |

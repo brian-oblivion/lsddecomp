@@ -23,7 +23,7 @@ jalr $v0                      ; self->methods->slot38(self), no extra args
 
 Slot +0x038 is `Class866E8__OnNotify` (also this unit, still `INCLUDE_ASM`, not
 implemented this round). No literal/forwarded args are set up before the
-`jalr` beyond `self` itself (unlike `Class866E8__OnCommand`/`Class86668__PlaySound`, this
+`jalr` beyond `self` itself (unlike `Class866E8__DispatchLinkCommand`/`Class86668__PlaySound`, this
 function has no second parameter to forward — nothing else reads `$a1` in
 its body), so the call is `slot38(self)` only.
 

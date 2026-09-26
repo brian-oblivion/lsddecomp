@@ -23,7 +23,7 @@
  * Who holds one: IntermediateBase__Init makes one with New_LightRig() when
  * its init args bring none (IntermediateBase's +0x014) and, in mode 0, adds
  * its FrameClock object (+0x010) to it as a child. One class derives from
- * it: Class866E8 (D_800866E8, 0x114, the grid manager), whose ctor and
+ * it: Class866E8 (gClass866E8Methods, 0x114, the grid manager), whose ctor and
  * finalize chain to this class's first and whose table inherits getLight
  * unchanged; its views are its own (include/class_3ac78.h,
  * include/class_3bb8c.h) and do not expand these macros yet.

@@ -230,7 +230,7 @@ block live after any checkout.
 > this file's other functions included changes the picture, rather than
 > retrying with fresh RNG on the same isolated seed.
 
-Not a vtable slot (confirmed absent from `D_800866E8` via
+Not a vtable slot (confirmed absent from `gClass866E8Methods` via
 `tools/classtable.py`) — a plain, non-virtual bounding-box test. Only
 caller: `Class866E8__SetFootprintFromQuery` (`IsPointOutOfBounds(self->unk1DC, &stackBuf[0x12])`),
 which established `Obj866E8::unk1DC`'s type (see `Class866E8__SetBounds`'s
@@ -784,7 +784,7 @@ re-attempted by hand this round).
 
 ## Naming
 
-**Tier A.** Confirmed NOT a vtable slot (`tools/classtable.py D_800866E8`
+**Tier A.** Confirmed NOT a vtable slot (`tools/classtable.py gClass866E8Methods`
 has no entry at this address) -- a plain, non-virtual helper, so it takes
 no `self` and gets no `Class866E8__` prefix. Still `INCLUDE_ASM` (a
 documented STALL), named per this round's brief since the evidence for

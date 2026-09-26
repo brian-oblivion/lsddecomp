@@ -36,7 +36,7 @@
  * Class6B5CC subclass owning three FlatLightObj children and an ambient
  * colour (SetAmbientColor -> GsSetAmbient); its own methods (New_LightRig,
  * LightRig__*, GetLightRigMethods) live here. Its getLight (+0x0B8) is
- * inherited unchanged by Class866E8's own table (D_800866E8), which is why
+ * inherited unchanged by Class866E8's own table (gClass866E8Methods), which is why
  * one function occupies the same slot in both.
  */
 #include "common.h"
@@ -439,7 +439,7 @@ void LightRig__Reset(LightRig *self) {
 /* LightRig slot +0x09C (dispatchLinkCommand): empty override. */
 void LightRig__DispatchLinkCommand(LightRig *self, void *sender, s32 event) {
 }
-/* LightRig slot +0x0B8 (getLight), inherited unchanged by D_800866E8. */
+/* LightRig slot +0x0B8 (getLight), inherited unchanged by gClass866E8Methods. */
 BasicClass *LightRig__GetLight(LightRig *self, s32 index) {
     return self->lights[index];
 }

@@ -198,13 +198,13 @@ void Class86B60__TickNameFieldCursor(Class86B60 *self, SpriteRgb *color)
     self->nameField->methods->setColor(self->nameField, &buf);
 }
 
-/* CheckObj866E8CountFlag is ALREADY MATCHED (src/class_3bb8c_c.c), as a genuinely
+/* CheckSaveScoreFlag is ALREADY MATCHED (src/class_3bb8c_c.c), as a genuinely
  * 2-argument function -- but THIS call site sets up a 3rd argument
  * (self->dreamSys, in $a2) that the other unit's own 2-parameter view never
  * receives. Same independent-arities situation already documented for
  * Get_vtable_TaskCore until round 84: this unit's own local view
  * matches what THIS call site needs. */
-extern void CheckObj866E8CountFlag(void *arg0, void *arg1, void *arg2); /* arity-ok: the definition is 2-parameter and the callee WRITES $a2 (`li a2,0x1` at 0x8004D690) before reading it, but the 3rd argument is byte-load-bearing here -- retail emits `lw a2,164(s0)` at 0x8004DE74 */
+extern void CheckSaveScoreFlag(void *arg0, void *arg1, void *arg2); /* arity-ok: the definition is 2-parameter and the callee WRITES $a2 (`li a2,0x1` at 0x8004D690) before reading it, but the 3rd argument is byte-load-bearing here -- retail emits `lw a2,164(s0)` at 0x8004DE74 */
 
 void Class86B60__CommitNameEntry(Class86B60 *self)
 {
@@ -219,7 +219,7 @@ void Class86B60__CommitNameEntry(Class86B60 *self)
     DecodeFullWidthSjis(buf1, D_8008AA18);
     self->nameField->methods->setText(self->nameField, buf1);
     BMemPMgrFree(buf1);
-    CheckObj866E8CountFlag(self, self->target, self->dreamSys);
+    CheckSaveScoreFlag(self, self->target, self->dreamSys);
     self->methods->updateSlotElements(self, self->unk14);
     self->dreamSys->methods->getSetScreenShake(self->dreamSys, &buf2);
     self->activeSlot = 5;

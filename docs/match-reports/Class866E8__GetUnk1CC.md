@@ -3,7 +3,7 @@
 > Renamed from `func_8004CFA8` on 2026-09-24 (tools/rename.py). Address 0x8004cfa8.
 
 Two-instruction leaf: `jr $ra` / `addiu $v0, $a0, 0x1CC`. Not a vtable slot
-(not in `D_800866E8`, per `tools/classtable.py`), and no caller found
+(not in `gClass866E8Methods`, per `tools/classtable.py`), and no caller found
 anywhere in the executable (only reference is its own `.s` file) — an
 unused or not-yet-carved accessor.
 

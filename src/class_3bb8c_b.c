@@ -1,5 +1,5 @@
 /* Second slice of the 365-function class_3bb8c block, 0x3CD88..0x3DA54 --
- * same class (Obj866E8, D_800866E8, "Class866E8" in class_3ac78's own
+ * same class (Obj866E8, gClass866E8Methods, "Class866E8" in class_3ac78's own
  * independent view of the same vtable) as class_3bb8c.c's first slice,
  * split only for parallel runners, so this unit reuses that unit's header
  * (same convention as Entity.c/Entity_b.c).
@@ -484,5 +484,5 @@ void Class866E8__ForEachEntryChild(Obj866E8 *self, void (*callback)(Obj866E8 *se
 }
 
 Obj866E8Methods *GetClass866E8Methods(void) {
-    return &D_800866E8;
+    return &gClass866E8Methods;
 }

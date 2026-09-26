@@ -44,8 +44,8 @@ void Class86B60__Class86B60(Class86B60 *self, void *dreamSys)
 
 All new declarations -- this class (`Class86B60`) had no prior C-level
 presence anywhere in the project. Placed as one new block right before the
-`Ctx678_3bb8c_c`/`CheckObj866E8CountFlag` section, since ROM order puts
-`New_Class86B60`/`Class86B60__Class86B60` right before `CheckObj866E8CountFlag`.
+`Ctx678_3bb8c_c`/`CheckSaveScoreFlag` section, since ROM order puts
+`New_Class86B60`/`Class86B60__Class86B60` right before `CheckSaveScoreFlag`.
 
 - `Class86B60`/`Class86B60Methods`: `ctor` (+0x008, this function),
   `slot40` (+0x040, this function's own last call), `slotD8` (+0x0D8, this

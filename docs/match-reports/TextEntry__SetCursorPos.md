@@ -12,10 +12,10 @@ attempt once rebuilt against the fixed toolchain.
 
 ## ROUND 75 CORRECTION
 
-This report originally typed `self` as `Obj866E8` (D_800866E8) and typed
+This report originally typed `self` as `Obj866E8` (gClass866E8Methods) and typed
 `self->unk40` through a unit-local `Unk40Obj866E8`/`Unk40Obj866E8Methods`
 duplicate. Both were wrong. `tools/classtable.py gTextEntryMethods` places this
-function at that table's +0x0A4 (`D_800866E8`'s 80 slots hold none of this
+function at that table's +0x0A4 (`gClass866E8Methods`'s 80 slots hold none of this
 group's six addresses) -- `self` is `Obj86ED0` (class_3bb8c_i's shared
 type), whose OWN struct in `include/class_3bb8c.h` already types
 `self->unk40` as `ChildObj86ED0 *`. The `+0x0BC` slot this function

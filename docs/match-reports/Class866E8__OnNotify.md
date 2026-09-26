@@ -11,12 +11,12 @@
 segment) and calls that table's OWN slot `+0x038` with `(self, arg1,
 arg2)`. Then, if `arg1`'s own vtable header's low nibble is `1` (the
 family/base-class tag pattern from `docs/research/class-framework.md`,
-already used by `Class866E8__OnCommand` in this unit), also calls
+already used by `Class866E8__DispatchLinkCommand` in this unit), also calls
 `self->methods->slot100(self, arg1, arg2)`.
 
 Note this does NOT recurse into itself: the table returned by
 `GetClass6B5CCMethods` is a *different* class's vtable from `self->methods`
-(`D_800866E8`) — slot `+0x038` there happens to be `Class866E8__OnNotify` (this
+(`gClass866E8Methods`) — slot `+0x038` there happens to be `Class866E8__OnNotify` (this
 very function) only in `Class866E8Methods`, not necessarily in whatever
 `GetClass6B5CCMethods` returns.
 

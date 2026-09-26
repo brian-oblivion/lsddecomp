@@ -26,7 +26,7 @@ Class869D8Methods *GetClass869D8Methods(void)
 as every other one in this codebase: header word (0x17), then a
 `BasicClass__Release` slot at +0x004, then a ctor at +0x008. Resolved by
 reading the table directly (it isn't registered with `tools/classtable.py`,
-since it isn't `D_800866E8`'s own table -- this is a distinct, smaller
+since it isn't `gClass866E8Methods`'s own table -- this is a distinct, smaller
 class). Only the slots this unit's own functions reach are typed:
 +0x008 (`ctor`, Class869D8__Class869D8) and +0x040 (a post-construct hook,
 Class869D8__InitDefaults, already matched as an empty body). See

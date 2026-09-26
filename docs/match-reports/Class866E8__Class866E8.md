@@ -137,7 +137,7 @@ here since this function only DISPATCHES to it, never inlines its body).
   `unk32` (new fields carved out of existing opaque padding).
 - `GenericMethodsHeader::slot4C`/`slot70` and `GenericObject::unk10` --
   additive extensions of a struct already used by two OTHER already-matched
-  functions in this unit (`Class866E8__OnNotify`, `Class866E8__OnCommand`). Verified safe:
+  functions in this unit (`Class866E8__OnNotify`, `Class866E8__DispatchLinkCommand`). Verified safe:
   neither touches the new slots/fields, and the whole-image SHA1 stayed
   green immediately after this specific edit, before any of this function's
   own body was written.
@@ -258,4 +258,4 @@ cellParent at `buf`), `slot70` is `setLightMode(obj, 1)`, and `unk10` is
 `(Vec3_d294 *)`) emit no code; image byte-identical. `cells` is still
 declared `Class866E8 **` although it holds these same Class86AA0 objects:
 that field, NotifyGridCell's parameter and Class866E8__DispatchToRectCells
-are Class866E8's own track 4 job (D_800866E8) and were left alone.
+are Class866E8's own track 4 job (gClass866E8Methods) and were left alone.

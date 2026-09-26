@@ -3,7 +3,7 @@
 > Renamed from `func_8004C588` on 2026-09-24 (tools/rename.py). Address 0x8004c588.
 
 Not a vtable slot by call-site inspection needed — it IS one, per
-`tools/classtable.py D_800866E8` (`+0x120`), though nothing in this unit
+`tools/classtable.py gClass866E8Methods` (`+0x120`), though nothing in this unit
 dispatches through that slot itself. A plain linear-search helper: walks
 `self->arr` looking for the element whose `unk4->unk32` matches a key,
 returning its index (or 0 if never found — the loop's initial `result`
@@ -82,7 +82,7 @@ pattern for this project, not a one-off.
 
 ## Naming
 
-**Tier A.** Vtable slot +0x120 of `D_800866E8` (`tools/classtable.py`),
+**Tier A.** Vtable slot +0x120 of `gClass866E8Methods` (`tools/classtable.py`),
 class prefix `Class866E8` confirmed against that same table's other
 already-named slots (e.g. `Class866E8__ApplyToSenderFootprint` at +0x12C).
 Pure linear-search leaf: the body IS the evidence -- walk `self->arr`,

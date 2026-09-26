@@ -1,6 +1,6 @@
 /*
  * class_3ac78 -- the front half of Class866E8, the class whose method table is
- * D_800866E8 (80 slots, header 0x114; tools/classtable.py D_800866E8). It
+ * gClass866E8Methods (80 slots, header 0x114; tools/classtable.py gClass866E8Methods). It
  * derives from Class6B5CC (code_d294) through LightRig (include/LightRig.h,
  * gLightRigMethods: the three flat lights and the ambient colour), whose ctor
  * and finalize its own chain to, and the game builds exactly one, at boot, in class_39e08's Class865C8__Class865C8 via New_Class866E8(0, 1).
@@ -14,7 +14,7 @@
  * class_3bb8c_b's byte-matched Class866E8__SetFootprintCellFlag walks.
  *
  * Work reaches the cells through a rectangle list (rects[4]/rectCount): a
- * notification arrives at Class866E8__OnNotify or Class866E8__OnCommand,
+ * notification arrives at Class866E8__OnNotify or Class866E8__DispatchLinkCommand,
  * Class866E8__ForwardAcceptedCommand filters the sender against acceptedTags,
  * Class866E8__ApplyToSenderFootprint turns the sender's position into one
  * rectangle, and Class866E8__DispatchToRectCells re-notifies every cell in it
@@ -256,7 +256,7 @@ void Class866E8__UpdateIfEnabled(Class866E8 *self)
     }
 }
 
-void Class866E8__OnCommand(Class866E8 *self, GenericObject *sender, s32 command)
+void Class866E8__DispatchLinkCommand(Class866E8 *self, GenericObject *sender, s32 command)
 {
     if ((u8)sender->methods->header == 0x34) {
         self->methods->forwardAcceptedCommand(self, sender, command);
