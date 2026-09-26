@@ -1,16 +1,18 @@
-# Entity__func_80060710 -- MATCHED (58/58 words)
+# Entity__RollScaleOrDelayedDrift -- MATCHED (58/58 words)
+
+> Renamed from `Entity__func_80060710` on 2026-09-26 (tools/rename.py). Address 0x80060710.
 
 > Renamed from `func_80060710` on 2026-09-24 (tools/rename.py). Address 0x80060710.
 
 Unit: `Entity_d` (fresh carve, round 2026-09-03). Mood-dispatch helper called
 by `Entity__MoodCue43`, but itself takes only `Entity *this` -- no `out`
 parameter, despite the family convention. Signature: `void
-Entity__func_80060710(Entity *this)`.
+Entity__RollScaleOrDelayedDrift(Entity *this)`.
 
 ## Final source
 
 ```c
-void Entity__func_80060710(Entity *this) {
+void Entity__RollScaleOrDelayedDrift(Entity *this) {
     s32 r;
 
     if (this->unkFC == 0) {
@@ -79,7 +81,7 @@ void Entity__func_80060710(Entity *this) {
 
 ## Naming
 
-`Entity__func_80060710` -- tier C (round 76, runner delta, FINISHING-PLAN
+`Entity__RollScaleOrDelayedDrift` -- tier C (round 76, runner delta, FINISHING-PLAN
 track 3). Renamed from `func_80060710`; class confirmed Entity by every
 call in its body going through `this->methods->...`. NOT itself a
 `gEntityMoodHandlerTable` row (checked against every row's handler word in

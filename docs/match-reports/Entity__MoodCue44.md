@@ -3,7 +3,7 @@
 > Renamed from `func_800605D0` on 2026-09-24 (tools/rename.py). Address 0x800605d0.
 
 Unit: `Entity_d` (second pass, round 2026-09-03). Mood-dispatch handler,
-calls `Entity__func_80060710` (already matched, earlier ROM address) as a helper:
+calls `Entity__RollScaleOrDelayedDrift` (already matched, earlier ROM address) as a helper:
 `void Entity__MoodCue44(Entity *this, EntityMoodHandlerArg *out)`.
 
 ## Final source
@@ -15,7 +15,7 @@ void Entity__MoodCue44(Entity *this, EntityMoodHandlerArg *out) {
     s32 r2;
     u8 *table;
 
-    Entity__func_80060710(this);
+    Entity__RollScaleOrDelayedDrift(this);
     out->unk10 = this->methods->slot148(this);
     if (this->unk84 == 7 || this->unk84 == 0x16) {
         out->unk1C = 3;

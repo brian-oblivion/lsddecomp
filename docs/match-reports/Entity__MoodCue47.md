@@ -4,7 +4,7 @@
 
 Unit: `Entity_d` (second pass, round 2026-09-03). State-machine-style
 dispatch on `this->unk44`, no "out" parameter (confirmed from its own body,
-same as `Entity__func_80060710`/`Entity__MoodCue56` earlier in this unit).
+same as `Entity__RollScaleOrDelayedDrift`/`Entity__MoodCue56` earlier in this unit).
 `void Entity__MoodCue47(Entity *this)`.
 
 ## Final source

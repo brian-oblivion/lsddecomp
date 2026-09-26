@@ -11,7 +11,7 @@
  * each row's `handler` word (the arithmetic and addresses are in each
  * function's docs/match-reports/Entity__MoodCueNN.md), and it was checked
  * against every candidate function's own address. The one
- * exception, `Entity__func_80060710`, is not itself a table row -- it is a
+ * exception, `Entity__RollScaleOrDelayedDrift`, is not itself a table row -- it is a
  * private helper Entity__MoodCue43/44 both call directly (`jal`, not
  * through any vtable or table), tier C because its own purpose beyond
  * "sometimes bump scale, sometimes queue a delayed addTranslation" is not
@@ -44,9 +44,9 @@ extern u8 ROTATION_YAW_PLUS90[];
 extern u8 SCALE_Y4[];
 extern u8 ROTATION_ZMINUS90[];
 
-/* Forward declaration: Entity__func_80060710 is defined later in this file (higher
+/* Forward declaration: Entity__RollScaleOrDelayedDrift is defined later in this file (higher
  * ROM address) but Entity__MoodCue43, at a lower address, calls it directly. */
-void Entity__func_80060710(Entity *this);
+void Entity__RollScaleOrDelayedDrift(Entity *this);
 
 void Entity__MoodCue39(Entity *this, SoundCueSet *out) {
     s32 dayYearPhase;
@@ -153,7 +153,7 @@ void Entity__MoodCue43(Entity *this, SoundCueSet *out) {
     s32 rotPick;
     u8 *table;
 
-    Entity__func_80060710(this);
+    Entity__RollScaleOrDelayedDrift(this);
     out->attenuation = this->methods->getProximityRatio(this);
     if (this->todFrame == 0 || this->todFrame == 0xF) {
         out->slots[0].program = 0x12;
@@ -177,7 +177,7 @@ void Entity__MoodCue44(Entity *this, SoundCueSet *out) {
     s32 rotPick;
     u8 *table;
 
-    Entity__func_80060710(this);
+    Entity__RollScaleOrDelayedDrift(this);
     out->attenuation = this->methods->getProximityRatio(this);
     if (this->todFrame == 7 || this->todFrame == 0x16) {
         out->slots[0].program = 3;
@@ -202,7 +202,7 @@ void Entity__MoodCue44(Entity *this, SoundCueSet *out) {
     }
 }
 
-void Entity__func_80060710(Entity *this) {
+void Entity__RollScaleOrDelayedDrift(Entity *this) {
     s32 r;
 
     if (this->moodTimer == 0) {
