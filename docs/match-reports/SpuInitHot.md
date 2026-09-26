@@ -100,7 +100,7 @@ verbatim, as it stood before the rename.
  * NO RODATA ATTACH CAME WITH THIS HALF, and that is measured, not assumed:
  * the old code_179d8_f owned zero `jtbl_` references and the splat yaml's
  * rodata slot list names no `.rodata, code_179d8_f` line at all. So unlike
- * round 33's code_179d8_c_b there was nothing to move, and a link failure of
+ * round 33's libsnd_ssinit_libapi_counter there was nothing to move, and a link failure of
  * the form `undefined reference to '.L8003....'` would mean something else.
  *
  * Declarations: keep anything that encodes THIS unit's reading next to the

@@ -416,7 +416,7 @@ semantic-preserving mutations were (a) routing the `else`-branch's
 *(new_var2 = &v1);`) and (b) routing the `SetRCnt` rate argument through
 an `unsigned char` intermediate instead of a direct `(s16)` cast
 (`u8 new_var = (s16)s0; SetRCnt(s1, new_var, 0x1000);`). Applied
-verbatim to `src/code_179d8_c_b.c` and rebuilt: **14/164 words match,
+verbatim to `src/libsnd_ssinit_libapi_counter.c` and rebuilt: **14/164 words match,
 WITH drift** -- markedly WORSE than the 65/164 baseline, not better.
 Reverted immediately; confirmed the file returns to the documented
 65/164 no-drift state afterward.
@@ -501,7 +501,7 @@ default-case value composition). No new lever identified within this
 round's time budget; not re-attempted, to avoid burning attempts without
 a concrete new idea. Still restored to `INCLUDE_ASM`, 65/164.
 
-round 41 (2026-09-14), runner delta, unit `code_179d8_c_b` (renamed from
+round 41 (2026-09-14), runner delta, unit `libsnd_ssinit_libapi_counter` (renamed from
 `code_179d8_c` in round 33's SDK split). Re-verified the inherited
 65/164 body builds clean and matches this report's own figure. Tried the
 report's own named next step (case-body reorder to `5, 3, 2, 0, default`,
@@ -525,7 +525,7 @@ libsnd/ssinit's internal `_SsStart` (disc 3.3). This is Sony's SDK code, not
 decompiled game logic; track 2 names those functions and moves them out of
 tracks 1/1b/3.
 
-Round 69 (delta), track 3 pass on `code_179d8_c_b`.
+Round 69 (delta), track 3 pass on `libsnd_ssinit_libapi_counter`.
 
 | name | tier | evidence |
 | --- | --- | --- |

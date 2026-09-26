@@ -4,7 +4,7 @@
 
 > Renamed from `func_80032588` on 2026-09-23 (tools/rename.py). Address 0x80032588.
 
-Unit: `code_179d8_c_b`. Round 41, runner delta. Owns `jtbl_80010CD8`
+Unit: `libsnd_ssinit_libapi_counter`. Round 41, runner delta. Owns `jtbl_80010CD8`
 (attached rodata, not touched by this round).
 
 Superseded round-23 stall report: this round re-derived from that report's
@@ -218,7 +218,7 @@ libsnd/ssinit `SsSetTickMode` (disc 3.3), confirming the hypothesis round 69
 already recorded below. This is Sony's SDK code, not decompiled game logic;
 track 2 names those functions and moves them out of tracks 1/1b/3.
 
-Round 69 (delta), track 3 pass on `code_179d8_c_b`.
+Round 69 (delta), track 3 pass on `libsnd_ssinit_libapi_counter`.
 
 | name | tier | evidence |
 | --- | --- | --- |

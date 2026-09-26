@@ -361,7 +361,7 @@ lines). `sys` has a 5-byte `.rdata` ("none", 0x1040) and a 0x80-byte `.data`
 **`libcd/iso9660` + `libc2/strcmp` + `libc2/strncmp`** (0x1BE40..0x1C92C,
 crossing `libcd_bios` / `code_179d8_d`): nine functions, three stalls
 (`CdSearchFile`, `CD_newmedia`, `CD_cachefile`, ~1300 lines). `.rdata` 0x1EA
-at 0x12EC with a 2-byte pad before `code_179d8_c_b`'s jump table; `.data`
+at 0x12EC with a 2-byte pad before `libsnd_ssinit_libapi_counter`'s jump table; `.data`
 8 bytes at 0x5E138 (a byte search finds the same two DMA register addresses
 four times -- the relocation derivation picks the right one); `.bss` 0x2400 at
 0x8008B3F0 is the CD directory cache the game's own asm names as `D_8008B3F0`

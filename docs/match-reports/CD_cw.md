@@ -299,7 +299,7 @@ like CLAUDE.md's "a struct edit for one function's sake silently breaks a
 different, already-matched function" hazard, and cost a real diagnostic
 detour (`cmp -l` against `disk/SLPS_015.56`, converting the position,
 finding it landed on `jtbl_80010CD8` in a totally unrelated unit,
-`code_179d8_c_b`). **It is not that hazard.** This function is still not
+`libsnd_ssinit_libapi_counter`). **It is not that hazard.** This function is still not
 byte-exact (1 word short, not 0), so the whole image downstream of it is
 still not byte-exact either -- exactly as it was before this change, just
 by a different remaining margin (4 bytes instead of 16). A jump table's

@@ -30,7 +30,7 @@
  * code_179d8_i owned zero `jtbl_` references and the splat yaml's rodata slot
  * list names no `.rodata, code_179d8_i` line at all -- both of the old
  * code_179d8_tail's jump tables went to code_179d8_k. So unlike round 33's
- * code_179d8_c_b there was nothing to move, and a link failure of the form
+ * libsnd_ssinit_libapi_counter there was nothing to move, and a link failure of the form
  * `undefined reference to '.L8003....'` would mean something else.
  *
  * BLOCKER PROFILE: screen with `python3 tools/nearmiss.py`, never by

@@ -1,5 +1,5 @@
 /*
- * code_179d8_c_b -- the sound-driver "sequencer timer" cluster: a software
+ * libsnd_ssinit_libapi_counter -- the sound-driver "sequencer timer" cluster: a software
  * playback clock built on the PSX root counters (RCnt) and interrupt
  * controller (IRQ), used to pace the game's music sequencer independently
  * of vsync. `SsSetTickMode`/`_SsStart` (the latter still a stall)
@@ -29,7 +29,7 @@
  * COMMENT EXISTS. `SsSetTickMode` owns `jtbl_80010CD8`, whose sub-slot of the
  * 0xFD8 rodata region is attached in the splat yaml. That attach pointed at
  * `code_179d8_c`; SsSetTickMode is now HERE, so the attach was moved to
- * `code_179d8_c_b`. Left behind it would have produced
+ * `libsnd_ssinit_libapi_counter`. Left behind it would have produced
  * `undefined reference to '.L800325xx'` -- the routine carve failure Gate 2
  * in docs/PARALLEL-RUNS.md documents. Leave it alone.
  *
@@ -124,7 +124,7 @@ void SsSetTickMode(s32 a0)
     VBLANK_MINUS = cmd;
 }
 
-INCLUDE_ASM("asm/nonmatchings/code_179d8_c_b", _SsStart);
+INCLUDE_ASM("asm/nonmatchings/libsnd_ssinit_libapi_counter", _SsStart);
 
 extern void _SsStart(s32 arg0);
 

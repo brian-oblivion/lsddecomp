@@ -18,7 +18,7 @@ damage; it does not link:
 
 ```
 ld: small-data section too large; lower small-data size limit (see option -G)
-src/code_179d8_c_b.c:(.text+0x29c): relocation truncated to fit: R_MIPS_GPREL16 against `_snd_seq_no_tick'
+src/libsnd_ssinit_libapi_counter.c:(.text+0x29c): relocation truncated to fit: R_MIPS_GPREL16 against `_snd_seq_no_tick'
 ```
 
 `_snd_seq_no_tick` is `.data`, 0x1CB60 from `$gp`. A non-zero `-G` makes cc1 emit

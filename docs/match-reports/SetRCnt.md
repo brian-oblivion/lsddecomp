@@ -34,7 +34,7 @@ Returns `1` on success, `0` if `n` was out of range.
 32 replaced the barrier with `volatile` on all three `RCntEntry` fields
 (load-bearing for those two functions, and it subsumes this function's own
 barrier -- removed, `SetRCnt` still verifies 40/40). The struct in
-`src/code_179d8_c_b.c` is now:
+`src/libsnd_ssinit_libapi_counter.c` is now:
 
 ```c
 typedef struct {
