@@ -987,6 +987,11 @@
           "date": "2026-09-25",
           "header": "include/Class86668.h"
         },
+        "gClass866E8Methods": {
+          "class": "Class866E8",
+          "date": "2026-09-26",
+          "header": "include/Class866E8.h"
+        },
         "gClass869D8Methods": {
           "class": "Class869D8",
           "date": "2026-09-26",
