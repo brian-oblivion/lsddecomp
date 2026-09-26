@@ -58,3 +58,19 @@ four once someone gets to them.
 ## Provenance
 
 round 2026-08-30-c, runner ALPHA, unit DreamSys (whole-unit second pass).
+
+## Comment moved from src/DreamSys.c (round 92, track 7)
+
+Replaced in the source by a comment that says what the code does; kept here as written.
+
+```c
+/* Forward declarations for two of this unit's OWN functions, both called
+   around line 450 but not defined until ~200 lines later, in ROM order.
+   Without these, C89 implicitly declares them as `int ()` at the call site
+   and cpp emits "implicit declaration of function". The implicit type
+   happens to agree with the real one here, so nothing miscompiled -- but an
+   implicit declaration also disables argument checking, which is precisely
+   what caught Entity__IsNearTarget's over-narrow `s8` parameters in include/Entity.h
+   this round. A declaration is not a definition, so this does NOT affect the
+   strict ROM-address ordering of the definitions below. */
+```

@@ -599,3 +599,21 @@ The view had typed stopVoice `void`, but its occupant returns s32 (always
 -1). The whole image stays byte-identical with the s32 slot, because the one
 call site discards the value. `soundObj` itself stays `s32`: it is
 DreamSys's field.
+
+## Comment moved from src/DreamSys.c (round 92, track 7)
+
+Replaced in the source by a comment that says what the code does; kept here as written.
+
+```c
+/* `headingArg` and `scratch` are not superfluous: they were found by a
+   permuter search (round 37, 2026-09-12, runner charlie) after 20+ hand
+   attempts across three rounds failed to reproduce retail's whole-function
+   this/obj/vt/heading register allocation. Both are ordinary, valid C89 --
+   `headingArg` is a second copy of `heading` used at its two call sites,
+   giving the two logical uses disjoint live ranges so GCC 2.6.3's
+   allocator lands them in the SAME register retail does; `scratch` plays
+   the same role for the raw `VOICE_BY_SELECT[idx]` read and, independently, for
+   the literal `0x90` argument at the very end. Removing either variable
+   (rebuilding the "obvious" simpler form) reproduces a real, measured
+   regression -- see docs/match-reports/DreamSys__StartVoice.md. */
+```

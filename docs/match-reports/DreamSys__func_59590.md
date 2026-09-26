@@ -43,3 +43,7 @@ Renamed from `func_80059590`.
 Tier-C placeholder. Known: `this->unk_0x7C = 0`, vtable slot
 +0x124. `unk_0x7C` has no other writer and no reader anywhere in carved code -- not
 even a clear at construction -- so nothing names it.
+
+Re-checked round 92 (runner delta, track 7): still no reader of `unk_0x7C`
+anywhere in src/, and the slot has no caller that names its argument, so the
+tier-C placeholder stays.

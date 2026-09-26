@@ -44,3 +44,7 @@ Tier-C placeholder. Known: `this->unk_0x78 = 0`, vtable slot
 +0x128. `unk_0x78` is cleared in two other places (`DreamSys__ResetSessionState` and
 `DreamSys__ResetLinkState`) and read nowhere in carved code, so all three writers
 agree it is state to clear and none says what state.
+
+Re-checked round 92 (runner delta, track 7): still no reader of `unk_0x78`
+anywhere in src/, and the slot has no caller that names its argument, so the
+tier-C placeholder stays.

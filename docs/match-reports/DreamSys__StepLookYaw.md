@@ -718,3 +718,16 @@ permuter searches (round 37, round 49) that both converged on the same
 uninitialized-alias candidate and rejected it -- not a permuter output.
 
 NON_MATCHING body promoted, round 70.
+
+## Comment moved from src/DreamSys.c (round 92, track 7)
+
+Replaced in the source by a comment that says what the code does; kept here as written.
+
+```c
+    /* A second name for `this`, set on each path just before the shared
+       tail call. It is load-bearing: `this` dies at the copy, so the
+       decay arm's `lookYaw` store goes through $a0 (retail's
+       `sw v0,0x94(a0)`) and every path reaches the jal with $a0 already
+       set. Every earlier body passing `this` directly was one word short
+       (round 73). */
+```

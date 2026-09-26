@@ -264,3 +264,26 @@ m2c having no caller to type against. It is the abscissa of a curve whose keyfra
 carry `position` fields, and the z component of a local offset -- a distance.
 Tier B: the computation is certain, what the projected point is FOR is not (it has
 no carved caller; the vtable slot is +0x120).
+
+## Comment moved from src/DreamSys.c (round 92, track 7)
+
+Replaced in the source by a comment that says what the code does; kept here as written.
+
+```c
+/* Local prototypes, own local view (SceneNode__LocalOffsetToWorldPos is a different unit's
+ * already-matched function taking an unrelated class as arg0; InterpolateKeyframeValue
+ * is this unit's own next-in-queue function, forward-declared per
+ * CLAUDE.md's convention for calling into a not-yet-preceding definition).
+ * SceneNode__LocalOffsetToWorldPos's unused 4th parameter IS set (to 0) by
+ * this call site's own disassembly; include/SceneNode.h declares it. */
+```
+
+```c
+/* `dist` was called `day` until round 66, which was a transcription of the
+   caller-less m2c signature and is wrong: it is written into the z word of
+   the global scratch vector that SceneNode__LocalOffsetToWorldPos converts
+   from a LOCAL OFFSET to a world position, and it is also the abscissa
+   InterpolateKeyframeValue evaluates the viewport's two refView points at -- whose
+   own `position` fields are what it is compared against. It is a distance
+   along the local axis, not a day index. */
+```

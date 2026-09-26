@@ -602,3 +602,15 @@ consumed early and one late, that the natural C fails to make simultaneously
 live) and simply has nothing to attach to on this class of residue. This
 unit contributed three of round 39's clearest confirmations that the lever's
 precondition is a real filter, not just a label to check after the fact.
+
+## Comment moved from src/DreamSys.c (round 92, track 7)
+
+Replaced in the source by a comment that says what the code does; kept here as written.
+
+```c
+/* MATCHED round 75 (alpha): case 4's +0x38 method takes `effect` as a third
+   argument. Forwarding it keeps `effect` live in $a2 past the switch, so the
+   bounds-check index gets its own register ($v1) instead of being computed
+   in place on $a2 -- the "switch-index register" and "case-4 delay slot"
+   residues were both this missing argument. */
+```

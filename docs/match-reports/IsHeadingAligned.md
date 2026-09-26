@@ -94,3 +94,31 @@ instruction over the precedent.
 ## Naming
 
 - **Tier A.** Pure leaf: normalizes a heading delta to [-180,180) and tests it against a fixed window. Mechanics are the whole story; free function shared by DreamSys__CheckTunnelHeading and DreamSys__CheckStaircaseHeading.
+
+## Comment moved from src/DreamSys.c (round 92, track 7)
+
+Replaced in the source by a comment that says what the code does; kept here as written.
+
+```c
+/* Unit-local reading of the second parameter: the caller (DreamSys__CheckTunnelHeading)
+   passes down a `s32 local[4]` buffer that SceneNode__GetRotationDegrees (code_d294_c) fills
+   with a 3-entry Ratio16 table; the byte offset +4 read here lands on
+   that table's `out[1].whole` (a degrees value, per SceneNode__GetRotationDegrees's own
+   report). This function reads it unsigned (`lhu`), independent of
+   Ratio16's own `s16 whole` -- a second, disjoint view of the same
+   bytes, so it is kept local rather than folded into that shared struct.
+   Moved above DreamSys__CheckTunnelHeading (round 43) because that function's own arg2 is
+   cast to this type before being forwarded to IsHeadingAligned below. */
+```
+
+```c
+/* 4-entry cardinal-direction table (12-byte stride); only the first u16 of
+   each entry (the angle: 0/90/180/270) is read anywhere in this unit's
+   queue. Kept local for the same reason as DirectionCheckArg above.
+   Round 66: this view is a window into CARDINAL_ROTATIONS (below), 4 bytes
+   further on -- `angle` is that entry's yaw NUMERATOR, i.e.
+   CARDINAL_ROTATIONS[i].y.numerator, and `unk2` is its denominator (always
+   1). The two views are kept separate because this one reads the angle as a
+   bare u16 for arithmetic while the other is only ever address-taken and
+   handed to SceneNode__UpdateRotation as a rotation. */
+```

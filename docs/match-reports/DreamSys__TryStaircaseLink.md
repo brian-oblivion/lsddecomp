@@ -541,3 +541,20 @@ expression."
 ## Naming
 
 - **Tier B.** STALL (still INCLUDE_ASM). Wraps Test4StaircaseNodes and DreamSys__CheckStaircaseHeading, and on success wires up the DreamSys__TickStaircaseCase0..3 dispatch via GetLastSpawnExtra, per the preserved #if 0 body; same family as DreamSys__TryTunnelLink.
+
+## Comment moved from src/DreamSys.c (round 92, track 7)
+
+Replaced in the source by a comment that says what the code does; kept here as written.
+
+```c
+/* MATCHED round 75 (alpha): the body is one nested `if` chain, not a run of
+   early `return false;` guards. Each early return leaves a CODE_LABEL after
+   its jump, and a label between the entry `move s0,a0` and the first
+   `staircaseTickFn(this)` call stops jump2's find_equiv_reg from seeing
+   that $a0 still holds `this` -- so the redundant `move a0,s0` survives,
+   $a0 goes dead on that path, and reorg steals the staircase arm's
+   `addiu a0,s0,0x16c` into the `beqz` delay slot. Nested, the move is
+   deleted and both slots stay `nop`, as retail. The 10-byte copy into
+   staircaseGridPos/staircaseOrigin is ONE whole-PlayerSpawnPoint copy
+   (load-all-then-store-all), hence the local cast. */
+```

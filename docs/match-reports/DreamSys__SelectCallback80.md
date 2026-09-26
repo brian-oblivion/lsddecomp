@@ -88,3 +88,13 @@ this->vt;`), not over-fitting.
 ## Naming
 
 - **Tier B.** Sets DreamSys::callback80Mode to its own argument, then picks one of a fixed small menu of vtable functions (or NULL) for callback_0x80 based on that same argument.
+
+## Naming (round 92, track 7)
+
+Fields `callback_0x80 / callback80Mode` -> `lookCallback / lookCallbackMode` (tier A): mode 1 of the one installs the
+look step and of the other the movement step, and RunTickCallbacks calls them
+in that order each tick. The switch cases are enum DreamSysLookCallback: 0 none, 1 stepLook, 2 and 3 the two empty slots +0x14C/+0x150, in include/DreamSys.h.
+Every accessor of the fields is in src/DreamSys.c. The method names stay: they
+are reached through the slots `selectCallback80` / `selectCallback98`, and
+`DreamSys__SelectLookCallback` / `DreamSys__SelectMoveCallback` is a proposal
+for the head.
