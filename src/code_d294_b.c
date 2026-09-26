@@ -58,7 +58,7 @@ s32 SceneNode__GetSetUnk10Flag7(SceneNode *self, s32 a1) {
 }
 
 /* Same family as SceneNode__SetLightDim, shift 9 width 3. Raw pass-through. */
-u32 SceneNode__GetSetUnk10Field9(SceneNode *self, u32 a1) {
+u32 SceneNode__SetSubdivision(SceneNode *self, u32 a1) {
     return GetSetBitField(&self->attribute, 9, 3, a1);
 }
 
