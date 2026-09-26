@@ -286,7 +286,7 @@ void StyleReleaseDecorSet(void) {
 extern s32 gStyleVariant;
 extern s32 gStyleTargetObj;
 extern s32 rand(void);
-extern s8 D_80087324[];
+extern s8 gStyleKind0Counts[];
 extern s32 gStyleEffectSlotCount;
 extern Class876FC *gStyleEffectSlots[];
 extern Class876FC **StyleFillEffectKind0(Class876FC **arg0, s32 arg1, LongVec3 *arg2);
@@ -306,7 +306,7 @@ void StyleBuildEffectSlots(LongVec3 *arg0) {
     base = gStyleTargetObj;
     Actor__func_56f5c(gStyleVariant, (void *)*(s32 *)(base + 4), *(s32 *)(base + 8),
                       *(s32 *)(base + 0xC));
-    val = D_80087324[rand() & 3];
+    val = gStyleKind0Counts[rand() & 3];
     count = (gStyleVariant == 2) ? 0x10 - val : 0;
     gStyleEffectSlotCount = val + count;
     filled = StyleFillEffectKind0(gStyleEffectSlots, val, arg0);

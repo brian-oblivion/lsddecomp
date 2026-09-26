@@ -16,7 +16,7 @@ void StyleBuildEffectSlots(void *arg0);
 ```c
 extern void Actor__func_56f5c(s32 arg0, void *arg1, s32 arg2, s32 arg3); /* class_3bb8c_o.c, ALREADY MATCHED */
 extern s32 rand(void);                                               /* libc, shared local view used project-wide */
-extern s8 D_80087324[];                                              /* 4-entry table, forward-indexed by rand()&3 */
+extern s8 gStyleKind0Counts[];                                              /* 4-entry table, forward-indexed by rand()&3 */
 extern void *StyleFillEffectKind0(void *arg0, s32 arg1, void *arg2);        /* forward decl, own unit, cold */
 extern void **StyleFillEffectKind1(void **arg0, s32 arg1, void *arg2);      /* forward decl, own unit, ALREADY MATCHED this round */
 extern void StyleFillEffectKind3(void *arg0, void *arg1);                   /* forward decl, own unit, cold */
@@ -45,7 +45,7 @@ void StyleBuildEffectSlots(void *arg0) {
     }
     base = gStyleTargetObj;
     Actor__func_56f5c(gStyleVariant, (void *) *(s32 *) (base + 4), *(s32 *) (base + 8), *(s32 *) (base + 0xC));
-    val = D_80087324[rand() & 3];
+    val = gStyleKind0Counts[rand() & 3];
     count = (gStyleVariant == 2) ? 0x10 - val : 0;
     gStyleEffectSlotCount = val + count;
     filled = (void **) StyleFillEffectKind0(gStyleEffectSlots, val, arg0);
