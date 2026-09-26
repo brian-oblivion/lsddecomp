@@ -461,7 +461,7 @@ extern u8 *D_8008E0B0;
 extern u8 gStyleSpawnRotations[];
 extern s32 D_8008E0A8;
 extern s32 D_8008E0AC;
-extern u8 D_8008721C[];
+extern u8 gStyleKind3Colors[];
 
 /* Local view: D_8008E0B0 stored through a pointer to a ONE-FIELD STRUCT, not
  * a plain `u8 **`.  Load-bearing: a store through a plain pointer is an
@@ -487,7 +487,7 @@ Class876FC **StyleFillEffectKind3(Class876FC **arg0, LongVec3 *arg1) {
         D_8008E0A4 = 0xFFFF5000;
         D_8008E0A8 = -0x2000;
         D_8008E0AC = 0;
-        D_8008E0C0[0] = (s32)(D_8008721C + 3);
+        D_8008E0C0[0] = (s32)(gStyleKind3Colors + 3);
     } else {
         p = &D_8008E0AC;
         if (*p > 0) {
@@ -496,7 +496,7 @@ Class876FC **StyleFillEffectKind3(Class876FC **arg0, LongVec3 *arg1) {
         if (*p < -0x7800) {
             *p = -0x7800;
         }
-        D_8008E0C0[0] = (s32)(D_8008721C + ((u32)rand() % 3) * 3);
+        D_8008E0C0[0] = (s32)(gStyleKind3Colors + ((u32)rand() % 3) * 3);
     }
     q = (PtrBoxK3 *)&D_8008E0B0;
     q->p = gStyleSpawnRotations;

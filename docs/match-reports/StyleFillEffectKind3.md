@@ -123,7 +123,7 @@ read the drift as a verdict, and reverted the fix.
 
 The `idx` local changed nothing semantically; it changed which registers the
 `% 3` sequence landed in. Retail leaves the remainder in `$v0` and builds
-`idx*3 + &D_8008721C` into `$v1`; the `idx` local made my build route the
+`idx*3 + &gStyleKind3Colors` into `$v1`; the `idx` local made my build route the
 remainder through `$a0` and build the sum in `$v0`. That single colour
 difference is what enabled the cross-jump: **gcc 2.6.3 cross-jumps after
 reload, comparing HARD registers**, so retail's `sw $v1, %lo(D_8008E0C0)($at)`
@@ -166,7 +166,7 @@ by project rule.**
 Five further spellings were tried against it, all 79/81 and all
 byte-identical, so the colour is invariant rather than merely unimproved:
 `t` typed `s32` vs `void *`; the else value written as
-`(s32) &D_8008721C[n*3]` vs `(s32) (D_8008721C + n*3)`; `t = gStyleCueSelf`
+`(s32) &gStyleKind3Colors[n*3]` vs `(s32) (gStyleKind3Colors + n*3)`; `t = gStyleCueSelf`
 before vs after `q = &D_8008E0B0`; `t` declared first vs last. Reusing the
 `s32 *p` pointer for all three roles instead of adding `t` regresses to
 73/81.
@@ -340,7 +340,7 @@ extern u8 *D_8008E0B0;
 extern u8 gStyleSpawnRotations[];
 extern s32 D_8008E0A8;
 extern s32 D_8008E0AC;
-extern u8 D_8008721C[];
+extern u8 gStyleKind3Colors[];
 extern s32 rand(void);
 extern void *New_Class876FC(void *arg0, void *arg1, void *arg2, void *arg3);
 
@@ -354,7 +354,7 @@ void **StyleFillEffectKind3(void **arg0, void *arg1) {
         *(s32 *) D_8008E0A4 = 0xFFFF5000;
         D_8008E0A8 = -0x2000;
         D_8008E0AC = 0;
-        D_8008E0C0[0] = (s32) (D_8008721C + 3);
+        D_8008E0C0[0] = (s32) (gStyleKind3Colors + 3);
     } else {
         p = &D_8008E0AC;
         if (*p > 0) {
@@ -363,7 +363,7 @@ void **StyleFillEffectKind3(void **arg0, void *arg1) {
         if (*p < -0x7800) {
             *p = -0x7800;
         }
-        t = (s32) (D_8008721C + ((u32) rand() % 3) * 3);
+        t = (s32) (gStyleKind3Colors + ((u32) rand() % 3) * 3);
         D_8008E0C0[0] = t;
     }
     t = gStyleCueSelf;

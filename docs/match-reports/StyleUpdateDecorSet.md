@@ -41,7 +41,7 @@ read off the raw `.s` rather than guessed:
 | the output buffer is 8 bytes, not 3 or 4 | it occupies sp+0x10..0x17, because `pos` sits at sp+0x18. `AdjustRgbByDelta` writes only `[0..2]`, so the SIZE is inferred from the stack layout and nothing else -- see the comment at the definition. |
 
 Round 46's `s3` name is kept as `shift` and `s1` as `srcOfs`; `srcOfs` walks a
-3-byte-stride table (the same stride `StyleFillEffectKind3` uses on `D_8008721C`),
+3-byte-stride table (the same stride `StyleFillEffectKind3` uses on `gStyleKind3Colors`),
 which is consistent with `AdjustRgbByDelta`'s three byte writes.
 
 ## What round 46 got right, and is worth keeping

@@ -2909,3 +2909,4 @@ gStylePalette = 0x800872C4;
 gStyleSpawnRotations = 0x80087174;
 gStyleSpawnScales = 0x800871C8;
 gStyleKind1Scale = 0x80087204;
+gStyleKind3Colors = 0x8008721C;
