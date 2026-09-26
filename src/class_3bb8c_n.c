@@ -79,12 +79,12 @@ typedef struct StyleSceneRefs {
 } StyleSceneRefs;
 
 extern const u8 *gStyleDecorColor;
-extern BoxFill *gStyleDecorObj;
+extern s32 gStyleDecorObj; /* a BoxFill; class_3bb8c_m.c declares it s32 too */
 
 /* Releases the decoration box, if ApplyStyleDecorationIfSet made one. */
 void StyleFlushDecoration(void) {
     if (gStyleDecorColor != 0) {
-        gStyleDecorObj->methods->release(gStyleDecorObj);
+        ((BoxFill *)gStyleDecorObj)->methods->release((BoxFill *)gStyleDecorObj);
         gStyleDecorColor = 0;
     }
 }
@@ -147,7 +147,7 @@ extern s32 gStyleDecorPosY;
 extern s32 gStyleDecorSizeW;
 extern s32 gStyleDecorSizeH;
 extern BoxFill *gStyleDecorSlots[STYLE_DECOR_BANDS];
-extern StyleSceneRefs *gStyleTargetObj;
+extern s32 gStyleTargetObj; /* a StyleSceneRefs *; class_3bb8c_m.c declares it s32 too */
 
 /* gStyleDecorPosX/Y and gStyleDecorSizeW/H are adjacent word pairs.
  * MATCHING: copied whole, never field by field (a BLKmode copy makes cse
@@ -188,7 +188,7 @@ void StyleBuildDecorSet(void) {
         size.y -= 7;
     }
 
-    viewport = gStyleTargetObj->viewport;
+    viewport = ((StyleSceneRefs *)gStyleTargetObj)->viewport;
     parent = viewport->methods->getSubHandle(viewport);
     ((BoxFillAttachToParentFn)gStyleDecorSlots[0]->methods->attachToParent)(
         gStyleDecorSlots[0], parent, (Pair32E99C *)&pos);
@@ -214,7 +214,7 @@ void StyleUpdateDecorSet(void) {
     if (gStyleDecorVariant == 0) {
         return;
     }
-    viewport = gStyleTargetObj->viewport;
+    viewport = ((StyleSceneRefs *)gStyleTargetObj)->viewport;
     height = viewport->refView.vp.y - viewport->refView.vr.y;
     fade = (height / STYLE_DECOR_FADE_HEIGHT) * 3;
     if (fade <= 0) {
@@ -263,7 +263,7 @@ void StyleReleaseDecorSet(void) {
 }
 
 extern s32 gStyleVariant;
-extern StyleSceneRefs *gStyleTargetObj;
+extern s32 gStyleTargetObj;
 extern s32 rand(void);
 extern s8 gStyleKind0Counts[];
 extern s32 gStyleEffectSlotCount;
@@ -286,7 +286,7 @@ void StyleBuildEffectSlots(LongVec3 *pos) {
     if (gStyleVariant < 0) {
         return;
     }
-    refs = gStyleTargetObj;
+    refs = (StyleSceneRefs *)gStyleTargetObj;
     Actor__func_56f5c(gStyleVariant, (Actor *)refs->dreamerTmd, (s32)refs->etcTim, (s32)refs->viewport);
     kind0Count = gStyleKind0Counts[rand() & 3];
     kind1Count = (gStyleVariant == 2) ? STYLE_VARIANT2_EFFECTS - kind0Count : 0;
@@ -354,7 +354,7 @@ struct StyleCueSlot {
 
 extern StyleCueSlot *FlushStyleCue(StyleCueSlot *slot);
 
-extern Class866E8 *gStyleGrid;
+extern s32 gStyleGrid; /* a Class866E8; class_3bb8c_m.c declares it s32 too */
 extern StyleCueSlot *gStyleCueSlots[2];
 
 /* Releases everything TickStyle built and unregisters the scene. */
@@ -576,7 +576,7 @@ void SetupStyleSpawnParamsB(LongVec3 *pos, s32 offsetY) {
     gStyleSpawnModelLayout = rand() % 5;
 }
 
-extern StyleSceneRefs *gStyleTargetObj;
+extern s32 gStyleTargetObj;
 extern void *FindNextStyleCueInRange(LongVec3 *pos, s32 *outDist, LongVec3 *target);
 extern SoundCueCallbackFn gStyleCueCallbacks[];
 extern s32 InitSoundCueSet(void *sound, SoundCueSet *set, s32 tag, void *owner,
@@ -590,7 +590,7 @@ StyleCueSlot *TryStartStyleCue(StyleCueSlot *slot, s32 *lastCue, LongVec3 *targe
     entry = (StyleCueEntryView *)FindNextStyleCueInRange(&slot->pos, &slot->lastDist, target);
     if (entry != 0) {
         slot->entry = entry;
-        InitSoundCueSet(gStyleTargetObj->sound, &slot->cueSet, entry->cue, slot,
+        InitSoundCueSet(((StyleSceneRefs *)gStyleTargetObj)->sound, &slot->cueSet, entry->cue, slot,
                         gStyleCueCallbacks[entry->cue]);
         if (entry->cue == *lastCue) {
             *lastCue = -entry->cue;
@@ -667,7 +667,7 @@ void *FindNextStyleCueInRange(LongVec3 *pos, s32 *outDist, LongVec3 *target) {
         if (entry->cue > 0) {
             buf.pos = entry->pos;
             buf.tab = gStyleCueOffsets[entry->offsetIndex];
-            grid = gStyleGrid;
+            grid = (Class866E8 *)gStyleGrid;
             grid->methods->computeCellOffsets(grid, pos, &buf);
             dx = pos->x - target->x;
             if (dx < 0) {
@@ -689,12 +689,12 @@ fail:
     return 0;
 }
 
-extern StyleSceneRefs *gStyleTargetObj;
+extern s32 gStyleTargetObj;
 extern void FlushSoundCueSet(void *sound, SoundCueSet *set);
 
 /* Stops the slot's cue and frees its record. Returns NULL for the slot. */
 StyleCueSlot *FlushStyleCue(StyleCueSlot *slot) {
-    FlushSoundCueSet(gStyleTargetObj->sound, &slot->cueSet);
+    FlushSoundCueSet(((StyleSceneRefs *)gStyleTargetObj)->sound, &slot->cueSet);
     slot->entry->cue = -slot->entry->cue;
     return 0;
 }
@@ -705,7 +705,7 @@ extern void ServiceSoundCueSet(void *sound, SoundCueSet *set);
 /* One service pass of the slot's cue while the target is in range; 0 otherwise. */
 s32 ServiceStyleCueIfNear(StyleCueSlot *slot, LongVec3 *target, void *unused) {
     if (IsStyleCueNear(slot, target) != 0) {
-        ServiceSoundCueSet(gStyleTargetObj->sound, &slot->cueSet);
+        ServiceSoundCueSet(((StyleSceneRefs *)gStyleTargetObj)->sound, &slot->cueSet);
         return 1;
     }
     return 0;
@@ -761,7 +761,7 @@ s32 TickStyle(Descriptor10 *cell, void *unused, s32 lastCue) {
     target = 0;
     if (cell != 0) {
         target = &targetPos;
-        gStyleGrid->methods->computeCellOffsets(gStyleGrid, target, cell);
+        ((Class866E8 *)gStyleGrid)->methods->computeCellOffsets((Class866E8 *)gStyleGrid, target, cell);
     }
     if (gStyleTickCount++ == 0) {
         ApplyStyleDecorationIfSet();
