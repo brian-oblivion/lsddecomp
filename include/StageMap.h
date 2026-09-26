@@ -329,7 +329,7 @@ void StageMap__LoadElementResources(StageMap *self, ChunkSlot *elem);
 void StageMap__ResetElementCells(StageMap *self, ChunkSlot *elem);
 Descriptor10 *StageMap__GetTargetDescriptor(StageMap *self, Descriptor10Ext *out, void **outPos);
 s32 StageMap__ComputeFootprintDescriptor(StageMap *self, Descriptor10Ext *out, SplitLongVec3 *pos);
-void StageMap__ComputeDivisorSplit(StageMap *self, u8 *out, s32 val);
+void StageMap__SplitChunkIndex(StageMap *self, u8 *out, s32 val);
 ChunkSlot *StageMap__GetLastTargetRateSplit(StageMap *self, u8 *out);
 ChunkSlot *StageMap__FindSlotByNeighbour(StageMap *self, s32 key);
 ChunkSlot *StageMap__FindElementForPosition(StageMap *self, LongVec3 *pos);

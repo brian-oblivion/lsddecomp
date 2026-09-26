@@ -326,7 +326,7 @@ Resolves a query (`in`, a `SplitLongVec3*`) via `self->methods->slot11C`
 (still `INCLUDE_ASM`, `StageMap__FindElementForPosition`). On a miss, returns `1`. On a hit
 (`e`), fills `out` (`Descriptor10Ext*`):
 
-- `out->base.b0`/`b1` via `StageMap__ComputeDivisorSplit(self, out, e->unk4->unk30)` (mod/div
+- `out->base.b0`/`b1` via `StageMap__SplitChunkIndex(self, out, e->unk4->unk30)` (mod/div
   by `self->unk68->divisor`), and `out->unk28` = the same raw rate.
 - `out->unkC/unk10/unk14` from `self->methods->slot118(self, e->unk4->unk32)
   ->unkC->unk14` (a *different* `Elem`'s `Unk14Obj`, called `u14a` below):
@@ -369,7 +369,7 @@ s32 StageMap__ComputeFootprintDescriptor(Obj866E8 *self, Descriptor10Ext *out, S
     if (e != 0) {
         rate = e->unk4->unk30;
         out->unk28 = rate;
-        StageMap__ComputeDivisorSplit(self, (u8 *)out, rate);
+        StageMap__SplitChunkIndex(self, (u8 *)out, rate);
 
         u14a = self->methods->slot118(self, e->unk4->unk32)->unkC->unk14;
         out->unkC = u14a->unk18.w + 0x5000;
@@ -422,7 +422,7 @@ s32 StageMap__ComputeFootprintDescriptor(Obj866E8 *self, Descriptor10Ext *out, S
     if (e != 0) {
         rate = e->unk4->unk30;
         out->unk28 = rate;
-        StageMap__ComputeDivisorSplit(self, (u8 *)out, rate);
+        StageMap__SplitChunkIndex(self, (u8 *)out, rate);
 
         u14a = self->methods->slot118(self, e->unk4->unk32)->unkC->unk14;
         out->unkC = u14a->unk18.w + 0x5000;

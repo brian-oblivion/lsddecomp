@@ -83,7 +83,7 @@ begin with a path, and record 9 of every stage group is its M000.LBD
 (stage 0: gRecordIndexTable[0] = 16, record 25 at 0x80081CC0 =
 "STG00\M000.LBD"; stage 1: record 39 at 0x80081E48 = "STG01\M000.LBD").
 The same index goes into `ownerRate` and is split into column and row
-(StageMap__ComputeDivisorSplit). LBD is the game's own extension, and the
+(StageMap__SplitChunkIndex). LBD is the game's own extension, and the
 name follows the siblings named for the format they load (TimImage, Tod,
 VabStreamObj). What the header block's two regions and the data block hold
 beyond what their consumers do with them is not established here.
@@ -130,7 +130,7 @@ apply by type scope.
   stores in it the same entry value it passed to the grid callback to get
   the file's record (GetGridRecordAt(stage, value)); it is -1 exactly when
   no chunk is held (this ctor, LbdFile__ReleaseHeader; ResetElementCells
-  tests `>= 0`); StageMap__ComputeDivisorSplit splits it into column
+  tests `>= 0`); StageMap__SplitChunkIndex splits it into column
   (`% divisor`) and row (`/ divisor`); StageMap__FindSlotIndexByChunk
   finds the element holding a given chunk by it. Accessors: code_39094.c
   (LbdFile__LbdFile, LbdFile__ReleaseHeader), class_3bb8c.c

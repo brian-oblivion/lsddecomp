@@ -557,7 +557,7 @@ s32 StageMap__ComputeFootprintDescriptor(StageMap *self, Descriptor10Ext *out, S
     if (e != 0) {
         rate = e->loader->chunkIndex;
         out->chunkIndex = rate;
-        StageMap__ComputeDivisorSplit(self, (u8 *)out, rate);
+        StageMap__SplitChunkIndex(self, (u8 *)out, rate);
 
         u14a = (Unk14Obj *)self->methods->findElemByUnk32(self, e->loader->elemKey)->cellParent->coord2;
         out->chunkCentre.x = u14a->unk18.w + 0x5000;
@@ -593,13 +593,13 @@ s32 StageMap__ComputeFootprintDescriptor(StageMap *self, Descriptor10Ext *out, S
     return 1;
 }
 
-void StageMap__ComputeDivisorSplit(StageMap *self, u8 *out, s32 val) {
+void StageMap__SplitChunkIndex(StageMap *self, u8 *out, s32 val) {
     out[0] = val % self->config->columns;
     out[1] = val / self->config->columns;
 }
 
 ChunkSlot *StageMap__GetLastTargetRateSplit(StageMap *self, u8 *out) {
-    StageMap__ComputeDivisorSplit(self, out, self->lastEventElem->loader->chunkIndex);
+    StageMap__SplitChunkIndex(self, out, self->lastEventElem->loader->chunkIndex);
     return self->lastEventElem;
 }
 

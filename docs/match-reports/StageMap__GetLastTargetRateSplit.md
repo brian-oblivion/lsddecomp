@@ -10,7 +10,7 @@
 
 ```c
 Unk1BCObj *StageMap__GetLastTargetRateSplit(Obj866E8 *self, u8 *out) {
-    StageMap__ComputeDivisorSplit(self, out, self->unk1BC->unk4->unk30);
+    StageMap__SplitChunkIndex(self, out, self->unk1BC->unk4->unk30);
     return self->unk1BC;
 }
 ```
@@ -48,4 +48,4 @@ Round 78 (track 3, naming pass, bravo).
 
 | symbol | name | tier | evidence |
 | --- | --- | --- | --- |
-| `func_8004C3F0` | `StageMap__GetLastTargetRateSplit` | B | `func_8004C368(self, out, self->unk1BC->unk4->unk30); return self->unk1BC;` -- splits `self->unk1BC`'s own target rate (`unk4->unk30`, the same `ElemTarget::unk30` field `StageMap__FindSlotIndexByChunk` and others already read as a rate) via `StageMap__ComputeDivisorSplit`, and returns `self->unk1BC` itself. "GetLastTarget..." reflects `unk1BC`'s established role (set by `StageMap__FindElementForPosition`'s callers elsewhere, read only here) as a stashed "most recently resolved" target pointer; "...RateSplit" names the mod/div computation performed on it. Tier B: the field's exact update site is outside this unit's matched functions, so "last" is inferred from usage pattern, not directly observed here. |
+| `func_8004C3F0` | `StageMap__GetLastTargetRateSplit` | B | `func_8004C368(self, out, self->unk1BC->unk4->unk30); return self->unk1BC;` -- splits `self->unk1BC`'s own target rate (`unk4->unk30`, the same `ElemTarget::unk30` field `StageMap__FindSlotIndexByChunk` and others already read as a rate) via `StageMap__SplitChunkIndex`, and returns `self->unk1BC` itself. "GetLastTarget..." reflects `unk1BC`'s established role (set by `StageMap__FindElementForPosition`'s callers elsewhere, read only here) as a stashed "most recently resolved" target pointer; "...RateSplit" names the mod/div computation performed on it. Tier B: the field's exact update site is outside this unit's matched functions, so "last" is inferred from usage pattern, not directly observed here. |

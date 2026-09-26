@@ -1,4 +1,6 @@
-# StageMap__ComputeDivisorSplit
+# StageMap__SplitChunkIndex
+
+> Renamed from `StageMap__ComputeDivisorSplit` on 2026-09-26 (tools/rename.py). Address 0x8004c368.
 
 > Renamed from `Class866E8__ComputeDivisorSplit` on 2026-09-26 (tools/rename.py). Address 0x8004c368.
 
@@ -9,7 +11,7 @@
 ## Result
 
 ```c
-void StageMap__ComputeDivisorSplit(Obj866E8 *self, u8 *out, s32 val) {
+void StageMap__SplitChunkIndex(Obj866E8 *self, u8 *out, s32 val) {
     out[0] = val % self->unk68->divisor;
     out[1] = val / self->unk68->divisor;
 }
@@ -48,4 +50,4 @@ Round 78 (track 3, naming pass, bravo).
 
 | symbol | name | tier | evidence |
 | --- | --- | --- | --- |
-| `func_8004C368` | `StageMap__ComputeDivisorSplit` | A | Takes `self` first (a method). Pure two-line computation: `out[0] = val % self->unk68->divisor; out[1] = val / self->unk68->divisor;` -- a mod/div split against the object's own divisor, no other side effect. Mechanics-only name, tier A by the "getter/clamp" clause (a pure, unconditional computation whose mechanics fully describe it). |
+| `func_8004C368` | `StageMap__SplitChunkIndex` | A | Takes `self` first (a method). Pure two-line computation: `out[0] = val % self->unk68->divisor; out[1] = val / self->unk68->divisor;` -- a mod/div split against the object's own divisor, no other side effect. Mechanics-only name, tier A by the "getter/clamp" clause (a pure, unconditional computation whose mechanics fully describe it). |

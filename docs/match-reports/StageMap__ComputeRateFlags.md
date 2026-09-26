@@ -50,7 +50,7 @@ s32 StageMap__ComputeRateFlags(Obj866E8 *self, s32 val, s32 flag) {
 (`divisor`/`count`/`unk4`) read UNCONDITIONALLY at the top, before the branch
 on `unk4` -- even `divisor`, which only the `unk4 == 0` path uses. This
 confirmed `Unk68Struct`'s full layout: `s16 divisor @0`, `s16 count @2`, `s32
-unk4 @4` (corroborated independently by `StageMap__ComputeDivisorSplit` and by
+unk4 @4` (corroborated independently by `StageMap__SplitChunkIndex` and by
 `ComputeCellWorldOffsets`'s own `arg2` parameter, fed this exact pointer at its one call
 site).
 
