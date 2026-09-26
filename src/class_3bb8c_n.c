@@ -405,7 +405,7 @@ extern u8 gStyleSpawnScales[];
 extern s32 gStyleSpawnYChoices[];
 extern u8 *D_8008E0B4;
 extern s32 D_8008E0BC;
-extern s32 D_8008E0A4;
+extern s32 gStyleSpawnOffsetX;
 extern void SetupStyleSpawnParamsA(void *arg0, void *arg1);
 extern void SetupStyleSpawnParamsB(void *arg0, void *arg1);
 
@@ -431,7 +431,8 @@ Class876FC **StyleFillEffectKind0(Class876FC **arg0, s32 arg1, LongVec3 *arg2) {
     }
     for (i = 0; i < arg1; i++) {
         fp(arg2, (void *)t3);
-        *arg0 = New_Class876FC(0, (Class876FCParams *)&D_8008E0A4, (SceneNode *)gStyleCueSelf, arg2);
+        *arg0 = New_Class876FC(0, (Class876FCParams *)&gStyleSpawnOffsetX,
+                               (SceneNode *)gStyleCueSelf, arg2);
         arg0++;
     }
     return arg0;
@@ -448,7 +449,8 @@ Class876FC **StyleFillEffectKind1(Class876FC **arg0, s32 arg1, LongVec3 *arg2) {
     D_8008E0B4 = gStyleKind1Scale;
     for (i = 0; i < arg1; i++) {
         SetupStyleSpawnParamsA(arg2, (void *)val);
-        *arg0 = New_Class876FC(1, (Class876FCParams *)&D_8008E0A4, (SceneNode *)gStyleCueSelf, arg2);
+        *arg0 = New_Class876FC(1, (Class876FCParams *)&gStyleSpawnOffsetX,
+                               (SceneNode *)gStyleCueSelf, arg2);
         arg0++;
     }
     return arg0;
@@ -484,7 +486,7 @@ Class876FC **StyleFillEffectKind3(Class876FC **arg0, LongVec3 *arg1) {
 
     SetupStyleSpawnParamsA(arg1, (void *)D_80087330);
     if (gStyleDecorVariant != 0 && gStyleColorTable == (s32)gStyleDecorColorsB) {
-        D_8008E0A4 = 0xFFFF5000;
+        gStyleSpawnOffsetX = 0xFFFF5000;
         D_8008E0A8 = -0x2000;
         D_8008E0AC = 0;
         D_8008E0C0[0] = (s32)(gStyleKind3Colors + 3);
@@ -560,11 +562,11 @@ extern s32 D_8008E0B8;
 
 /* MATCHED round 64 (charlie), 110/110, ins 0 / del 0, one build.  The
  * round-46..48 residue (an extra callee-saved register caching
- * `D_8008E0A4`'s address, frame -0x18 -> -0x20) was NOT register identity:
- * `D_8008E0A4` was declared as an INCOMPLETE ARRAY.  Every reference to
- * `extern T D_8008E0A4[]` is an array decay, i.e. an address-take VALUE,
+ * `gStyleSpawnOffsetX`'s address, frame -0x18 -> -0x20) was NOT register identity:
+ * `gStyleSpawnOffsetX` was declared as an INCOMPLETE ARRAY.  Every reference to
+ * `extern T gStyleSpawnOffsetX[]` is an array decay, i.e. an address-take VALUE,
  * which cc1 2.6.3's CSE promotes into a callee-saved register across the
- * intervening `rand()` calls; declared `extern s32 D_8008E0A4` it emits
+ * intervening `rand()` calls; declared `extern s32 gStyleSpawnOffsetX` it emits
  * retail's absolute `lui $at, %hi / sw %lo($at)` fresh at each of the three
  * accesses.  Four in-tree variants pin the axis to ARRAY vs SCALAR: the
  * element type (`u8[]` vs `s32[]`) and the cast spelling (`*(s32 *) &D_X`
@@ -576,9 +578,9 @@ void SetupStyleSpawnParamsA(void *arg0, void *arg1) {
         arg1 = (void *)gStyleSpawnYChoices[rand() & 3];
     }
     D_8008E0A8 = (s32)arg1;
-    D_8008E0A4 = (rand() % 23) << 11;
+    gStyleSpawnOffsetX = (rand() % 23) << 11;
     if (rand() & 1) {
-        D_8008E0A4 = -D_8008E0A4;
+        gStyleSpawnOffsetX = -gStyleSpawnOffsetX;
     }
     D_8008E0AC = (rand() % 23) << 11;
     if (rand() & 1) {
@@ -613,7 +615,7 @@ void SetupStyleSpawnParamsB(void *arg0, void *arg1) {
 
     rand();
     D_8008E0A8 = D_8008732C;
-    D_8008E0A4 = (rand() % 20) << 11;
+    gStyleSpawnOffsetX = (rand() % 20) << 11;
     mod3 = gStyleCounter % 3;
     D_8008E0AC = 0xA000;
     if (mod3 == 1) {

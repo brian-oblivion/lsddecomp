@@ -137,7 +137,7 @@ lui   v0,%hi(gStyleSpawnRotations) ; addiu v0,v0,%lo(gStyleSpawnRotations)
 jal   rand
  sw   v0,0x0($s0)                      /* the store rides rand's delay slot */
 ...
-addiu a1,s0,-0xc                       /* D_8008E0A4's address, ONE word */
+addiu a1,s0,-0xc                       /* gStyleSpawnOffsetX's address, ONE word */
 ```
 
 The inherited body wrote the global by name and re-materialised the second
@@ -149,7 +149,7 @@ lui at,%hi(D_8008E0B0) ; sw v0,%lo(D_8008E0B0)(at)      /* 2 words */
 jal rand
  nop                                                     /* delay slot wasted */
 ...
-lui a1,%hi(D_8008E0A4) ; addiu a1,a1,%lo(D_8008E0A4)    /* 2 words */
+lui a1,%hi(gStyleSpawnOffsetX) ; addiu a1,a1,%lo(gStyleSpawnOffsetX)    /* 2 words */
 ```
 
 Retail 6 words with a free store; built 7 words. **And the prologue was 2
@@ -499,4 +499,4 @@ per the round-64 revisit.
 
 ## Track 4 (2026-09-26, round 88, charlie)
 
-`gStyleEffectSlots` holds Class876FC objects (New_Class876FC), so the walking pointer is `Class876FC **` and the position `LongVec3 *`; `kind` is passed as a plain `s32` (was `(void *) N`), the params block as `(Class876FCParams *)` over the separately-declared D_8008E0A4.. symbols (one 0x24-byte Class876FCParams in the bytes; left as they are, a track 4b job), and gStyleCueSelf as the `SceneNode *` parent. Image byte-identical.
+`gStyleEffectSlots` holds Class876FC objects (New_Class876FC), so the walking pointer is `Class876FC **` and the position `LongVec3 *`; `kind` is passed as a plain `s32` (was `(void *) N`), the params block as `(Class876FCParams *)` over the separately-declared gStyleSpawnOffsetX.. symbols (one 0x24-byte Class876FCParams in the bytes; left as they are, a track 4b job), and gStyleCueSelf as the `SceneNode *` parent. Image byte-identical.

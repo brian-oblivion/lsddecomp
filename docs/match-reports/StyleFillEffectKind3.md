@@ -39,17 +39,17 @@ new -- a TYPE on the store's lvalue controlling scheduler motion.
 | build | body | score |
 | --- | --- | --- |
 | 1 | preserved (shared `t`) | 79/81, ins 0 / del 0 |
-| 2 | struct view over D_8008E0A4..B0, direct field store `SP->fC = ...` | 73/81 (store goes direct `lui at`, loses retail's `q` register) |
+| 2 | struct view over gStyleSpawnOffsetX..B0, direct field store `SP->fC = ...` | 73/81 (store goes direct `lui at`, loses retail's `q` register) |
 | 3-5 | `p` reused as `q`, dedicated `t`, orders | 76/81, `li a0,3` falls out of the reorg-stolen join slot |
 | 6 | no `t` at all, plain `u8 **q` | 75/81 |
-| 7 | `q = &SP->fC` (struct view) + `&D_8008E0A4` arg | 78/81 -- CSE `related_value` reproduces `addiu a1,v1,-0xc` from `&base.fC`; residue back to the store placement |
+| 7 | `q = &SP->fC` (struct view) + `&gStyleSpawnOffsetX` arg | 78/81 -- CSE `related_value` reproduces `addiu a1,v1,-0xc` from `&base.fC`; residue back to the store placement |
 | 9-10 | store inside a comma expression in arg 2 / arg 4 | 78/81, 73/81 |
 | 11 | **`PtrBoxK3 *q`, `q->p = ...`, no `t`** | **81/81, `OK: build matches retail`** |
-| 12 | same, with `q = &SP->fC` (struct view whose +0xC is a `PtrBoxK3`) and `&D_8008E0A4` as the argument | 81/81 too |
+| 12 | same, with `q = &SP->fC` (struct view whose +0xC is a `PtrBoxK3`) and `&gStyleSpawnOffsetX` as the argument | 81/81 too |
 
 Build 11's form is the one committed (smaller local view, no struct laid
 over four separately-declared externs). Build 12 is recorded because it says
-the `- 0xC` was very probably `&struct` in the original: D_8008E0A4..C0
+the `- 0xC` was very probably `&struct` in the original: gStyleSpawnOffsetX..C0
 look like one spawn-parameter struct whose +0xC member is itself a struct.
 Whole image green, `tools/check-nonmatching.sh` green.
 
@@ -197,7 +197,7 @@ sink below it. Two independent experiments prove it is this and nothing else:
 - Write the store as a plain global (`D_8008E0B0 = gStyleSpawnRotations;`, a
   `(mem (symbol_ref))` the scheduler CAN disambiguate) and **the load hoists
   immediately** -- but the `q` pointer then folds away and the address
-  argument regresses to `lui a1; addiu a1,%lo(D_8008E0A4)` (73/81).
+  argument regresses to `lui a1; addiu a1,%lo(gStyleSpawnOffsetX)` (73/81).
 - Keep the pointer store and hoist the load by hand instead
   (`t = gStyleCueSelf;` as a local placed BEFORE the store): the ordering becomes
   **byte-for-byte retail's**, delay slot included, with *zero* structural
@@ -331,7 +331,7 @@ done would have produced.
 extern s32 gStyleDecorVariant;
 extern s32 gStyleColorTable;
 extern u8 gStyleDecorColorsB[];
-extern u8 D_8008E0A4[];
+extern u8 gStyleSpawnOffsetX[];
 extern s32 gStyleCueSelf;
 extern s32 D_80087330;
 extern void SetupStyleSpawnParamsA(void *arg0, void *arg1);
@@ -351,7 +351,7 @@ void **StyleFillEffectKind3(void **arg0, void *arg1) {
 
     SetupStyleSpawnParamsA(arg1, (void *) D_80087330);
     if (gStyleDecorVariant != 0 && gStyleColorTable == (s32) gStyleDecorColorsB) {
-        *(s32 *) D_8008E0A4 = 0xFFFF5000;
+        *(s32 *) gStyleSpawnOffsetX = 0xFFFF5000;
         D_8008E0A8 = -0x2000;
         D_8008E0AC = 0;
         D_8008E0C0[0] = (s32) (gStyleKind3Colors + 3);
@@ -438,4 +438,4 @@ as `StyleFillEffectKind0`/`1`/`2`.
 
 ## Track 4 (2026-09-26, round 88, charlie)
 
-`gStyleEffectSlots` holds Class876FC objects (New_Class876FC), so the walking pointer is `Class876FC **` and the position `LongVec3 *`; `kind` is passed as a plain `s32` (was `(void *) N`), the params block as `(Class876FCParams *)` over the separately-declared D_8008E0A4.. symbols (one 0x24-byte Class876FCParams in the bytes; left as they are, a track 4b job), and gStyleCueSelf as the `SceneNode *` parent. Image byte-identical.
+`gStyleEffectSlots` holds Class876FC objects (New_Class876FC), so the walking pointer is `Class876FC **` and the position `LongVec3 *`; `kind` is passed as a plain `s32` (was `(void *) N`), the params block as `(Class876FCParams *)` over the separately-declared gStyleSpawnOffsetX.. symbols (one 0x24-byte Class876FCParams in the bytes; left as they are, a track 4b job), and gStyleCueSelf as the `SceneNode *` parent. Image byte-identical.

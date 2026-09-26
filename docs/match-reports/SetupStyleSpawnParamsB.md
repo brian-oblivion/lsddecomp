@@ -13,8 +13,8 @@ shape rounds 46-48 recovered was already correct.**
 
 The inherited body did not rebuild at its recorded 25/87, for a reason that
 has nothing to do with this function: earlier in the same session I retyped
-the shared global `D_8008E0A4` from `extern u8 D_8008E0A4[]` to
-`extern s32 D_8008E0A4` to close `SetupStyleSpawnParamsA`, and this body writes that
+the shared global `gStyleSpawnOffsetX` from `extern u8 gStyleSpawnOffsetX[]` to
+`extern s32 gStyleSpawnOffsetX` to close `SetupStyleSpawnParamsA`, and this body writes that
 symbol too. So the first figure below is the inherited body under the
 already-changed declaration, and the second is the inherited body's own
 recorded state, which I recovered afterwards by experiment.
@@ -40,7 +40,7 @@ The body carried `s32 r` and reused it for all three `rand()` results:
 
 ```c
 r = rand();
-D_8008E0A4 = (r % 20) << 11;
+gStyleSpawnOffsetX = (r % 20) << 11;
 ...
 r = rand();
 D_8008E0B0 = gStyleSpawnRotations + ((u32) r % 7) * 12;
@@ -74,7 +74,7 @@ merely holds a value in transit.
 ```c
 extern s32 D_8008E0A8;
 extern s32 D_8008732C;
-extern s32 D_8008E0A4;
+extern s32 gStyleSpawnOffsetX;
 extern s32 gStyleCounter;
 extern s32 D_8008E0AC;
 extern u8 *D_8008E0B0;
@@ -86,7 +86,7 @@ void SetupStyleSpawnParamsB(void *arg0, void *arg1) {
 
     rand();
     D_8008E0A8 = D_8008732C;
-    D_8008E0A4 = (rand() % 20) << 11;
+    gStyleSpawnOffsetX = (rand() % 20) << 11;
     mod3 = gStyleCounter % 3;
     D_8008E0AC = 0xA000;
     if (mod3 == 1) {
@@ -127,7 +127,7 @@ the only axis it had.
 The interim row in the table above is a trap I walked into and measured my way
 out of, so it is recorded rather than quietly dropped.
 
-The `D_8008E0A4` retype moved this function **25/87 -> 10/87** and 2 words
+The `gStyleSpawnOffsetX` retype moved this function **25/87 -> 10/87** and 2 words
 long -> 3 words long. Read at face value that is a regression, and the
 standing rule (`DECOMPILATION_LEARNINGS` 3d, "Levers do not commute: if a
 residue MOVES rather than SHRINKS, revert before the next") says revert it.
