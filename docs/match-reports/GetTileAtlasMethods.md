@@ -31,3 +31,7 @@ void *GetTileAtlasMethods(void) {
 ## Naming
 
 - **GetTileAtlasMethods**, tier A. Table getter.
+
+## Track 4 (2026-09-26, round 88, alpha)
+
+Class unified in `include/TileAtlas.h` (D_8006F514, 0x303, a Class6D430 subclass, 0x38 bytes). Returns `TileAtlasMethods *` and `&D_8006F514` (was `void *` returning a local `extern s32 D_8006F514[]`, deleted, as is the unit's own `void *GetTileAtlasMethods(void)` prototype). No rename. Byte-identical.

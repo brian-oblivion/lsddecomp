@@ -87,3 +87,7 @@ Eleventh build. The cell is LIBGS.H's GsCELL (u, v, cba, flag, tpage), unit-loca
 ## Naming
 
 - **TileAtlas__BuildCells**, tier A. Slot +0x078: builds 300 GsCELLs (16x16 texels each) tiling the texture pages from x 0x280, wrapping rows and switching texture pages every 64 texels.
+
+## Track 4 (2026-09-26, round 88, alpha)
+
+Class unified in `include/TileAtlas.h` (D_8006F514, 0x303, a Class6D430 subclass, 0x38 bytes). `self` is `TileAtlas *` (was `Obj6F514`); the cell type is LIBGS.H's `GsCELL`, now defined in the header (was the unit-local `Cell450B4`, same layout), and the flag at +0x030 is `defaultCells`. `cells` is the array TileMap__BuildMap takes as its GsMAP base. No rename. Byte-identical.

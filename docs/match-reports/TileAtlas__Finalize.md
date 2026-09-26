@@ -39,3 +39,7 @@ void TileAtlas__Finalize(DataSrc33808 *self) {
 ## Naming
 
 - **TileAtlas__Finalize**, tier A. Slot +0x00C: frees the cell array, then the active driver's finalize.
+
+## Track 4 (2026-09-26, round 88, alpha)
+
+Class unified in `include/TileAtlas.h` (D_8006F514, 0x303, a Class6D430 subclass, 0x38 bytes). `self` is `TileAtlas *` (was the generic unit-local `DataSrc33808` view): frees `unk34` (now `void *`) and `cells` without casts. No rename. Byte-identical.

@@ -41,8 +41,8 @@ extern Vec3_d294 D_8006E86C;
  * StreamTask__Finalize, __OnInit, __Update, __SetState and
  * __RefreshViewValue call it; StreamTask.h types the field `BasicClass *`
  * and they cast. Until round 84 it also stood for TaskCore's
- * sound/subHandle/tileMap/tileAtlas, which TaskCore.h types `BasicClass *`
- * (only their +0x004 release is ever called). The BgLayer (TaskCore::bgLayer,
+ * sound/subHandle/tileMap/tileAtlas (only their +0x004 release is ever
+ * called). The BgLayer (TaskCore::bgLayer,
  * include/BgLayer.h since round 88) is not this class: its +0x04C
  * (Class6B5CC's attachToParent) takes three arguments where this class's
  * takes one. */
@@ -94,12 +94,5 @@ struct TaskTextObj {
  * own function (no INCLUDE_ASM here), so only the call site's own argument
  * and return types are modeled. */
 extern StreamTaskUnkB4Obj *New_MoviePlayer(StreamTaskInitData *a0, s32 a1, s32 a2);
-
-/* One more extern reached only by TaskCore__TaskCore, not in this unit; a
- * local view of its allocator. The ctor stores the result into a
- * `BasicClass *` field (tileAtlas); the other three, New_VabStreamObj
- * (sound), New_TileMap (tileMap) and New_BgLayer (bgLayer), are
- * include/VabStreamObj.h's, include/TileMap.h's and include/BgLayer.h's. */
-extern StreamTaskUnkB4Obj *New_TileAtlas(s32 a0);
 
 #endif

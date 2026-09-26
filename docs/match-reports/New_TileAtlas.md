@@ -43,3 +43,7 @@ void *New_TileAtlas(s32 arg0) {
 ## Naming
 
 - **New_TileAtlas**, tier A. src/code_2c054.c builds this object first and hands it to New_TileMap; its BuildCells lays out exactly the 300-cell (20x15) atlas TileMap__BuildMap indexes.
+
+## Track 4 (2026-09-26, round 88, alpha)
+
+Class unified in `include/TileAtlas.h` (D_8006F514, 0x303, a Class6D430 subclass, 0x38 bytes). Returns `TileAtlas *` (was `void *`; include/code_2c054.h's local view returned `StreamTaskUnkB4Obj *` and is deleted); the ctor is reached through the typed `TileAtlasMethods` ctor slot `(TileAtlas *self, s32 arg1)` instead of the unit's `Ctor33808` cast. One caller, TaskCore__TaskCore (src/code_2c054.c), which stores the result in TaskCore::tileAtlas and passes it to New_TileMap. No rename. Byte-identical.
