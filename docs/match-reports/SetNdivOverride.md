@@ -1,4 +1,6 @@
-# SetPolyOtCodeOverride -- MATCHED (round 44, 6/6 words)
+# SetNdivOverride -- MATCHED (round 44, 6/6 words)
+
+> Renamed from `SetPolyOtCodeOverride` on 2026-09-26 (tools/rename.py). Address 0x8001a54c.
 
 > Renamed from `func_8001A54C` on 2026-09-24 (tools/rename.py). Address 0x8001a54c.
 
@@ -12,7 +14,7 @@ stub, which recorded no attempt and no score.
 Matched on the first build, no permuter needed.
 
 ```
-SetPolyOtCodeOverride: 6/6 words match (file 0xAD4C-0xAD64)
+SetNdivOverride: 6/6 words match (file 0xAD4C-0xAD64)
 ```
 
 Whole-image `./build-and-verify.sh` passes (`build exit=0`).
@@ -43,7 +45,7 @@ further, so they are declared `s32`.
 extern s32 sNdivOverrideSet;
 extern s32 sNdivOverride;
 
-void SetPolyOtCodeOverride(s32 arg0, s32 arg1)
+void SetNdivOverride(s32 arg0, s32 arg1)
 {
     sNdivOverrideSet = arg0;
     if (arg0) {
@@ -68,7 +70,7 @@ them.
 
 ## Naming (round 77, alpha)
 
-`func_8001A54C` -> `SetPolyOtCodeOverride`, parameters (`arg0`, `arg1`) ->
+`func_8001A54C` -> `SetNdivOverride`, parameters (`arg0`, `arg1`) ->
 (`enable`, `code`). **Tier A**: a two-field setter whose read side
 (FillRCPolyHeader, this unit) is fully derived -- `enable` gates whether
 FillRCPolyHeader's header word 0 comes from `code` (stored only when

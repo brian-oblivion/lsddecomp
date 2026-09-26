@@ -95,7 +95,7 @@ full oracle in isolation, reverted: `build exit=2`, zero compile-error hits,
 revert.
 
 Not re-attempted beyond the mandatory reproduction. This round's two sibling
-`gp_rel`-reopened functions in this unit (`SetPolyOtCodeOverride`, `FillRCPolyHeader`)
+`gp_rel`-reopened functions in this unit (`SetNdivOverride`, `FillRCPolyHeader`)
 both matched clean once the `gp_rel` toolchain fix (round 42) was accounted
 for — but this function's own residue was never a `gp_rel` hit (it carries
 none), so that fix is irrelevant to it and nothing here changes. Per the

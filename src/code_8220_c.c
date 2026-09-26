@@ -428,7 +428,7 @@ extern s32 sNdivOverride;
  * FillRCPolyHeader's header word 0 comes from `code` (this call's second
  * argument, stored only when `enable` is set) or from the per-object
  * D_80090C18 default. Tier A. */
-void SetPolyOtCodeOverride(s32 enable, s32 code) {
+void SetNdivOverride(s32 enable, s32 code) {
     sNdivOverrideSet = enable;
     if (enable) {
         sNdivOverride = code;
