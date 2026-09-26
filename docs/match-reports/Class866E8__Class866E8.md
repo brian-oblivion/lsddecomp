@@ -244,3 +244,18 @@ unknown. Do not "correct" the stride to 21 on this function's evidence alone.
 ## Track 4 (2026-09-26, round 87, bravo)
 
 The local GetDrawSystem/New_DrawSystem extern this unit carried is gone; it comes from `include/DrawSystem.h` (D_8006C070 unified), with a pointer cast where this unit's own slot type asks for one. Byte-identical.
+
+## Track 4 (2026-09-26, round 88, alpha: Class86AA0's unification)
+
+The objects this ctor builds with `New_Class86AA0()` are typed as what they
+are: `UnkSlotEntry_3ac78::cellParent` is `struct Class86AA0 *` and the
+cell-building local `obj` is `Class86AA0 *` (include/Class86AA0.h), and the
+local `extern GenericObject *New_Class86AA0(void)` is gone. The generic
+slots resolve to Class6B5CC's: `slot4C` is `attachToParent` (the cellParent
+attached to the Class866E8 at `origin`, each cell attached to the
+cellParent at `buf`), `slot70` is `setLightMode(obj, 1)`, and `unk10` is
+`attribute`. Casts at the two attachToParent calls (`(Class6B5CC *)`,
+`(Vec3_d294 *)`) emit no code; image byte-identical. `cells` is still
+declared `Class866E8 **` although it holds these same Class86AA0 objects:
+that field, NotifyGridCell's parameter and Class866E8__DispatchToRectCells
+are Class866E8's own track 4 job (D_800866E8) and were left alone.

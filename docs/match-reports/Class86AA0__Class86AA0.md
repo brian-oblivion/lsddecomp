@@ -104,3 +104,12 @@ question.
 convention): chains a base ctor (`GetClass6B5CCMethods`), installs this
 class's own vtable, zeroes three of its own fields. Same shape and
 evidence class as `Class869D8__Class869D8`.
+
+## Track 4 (2026-09-26, round 88, alpha)
+
+Class86AA0 is unified in `include/Class86AA0.h` and expands
+CLASS6B5CC_FIELDS: the three fields this ctor zeroes are Class6B5CC's, so
+`unk36` -> `flags36` and `unk38` (s32) -> `nextInCell` (void *, written as
+`NULL`; Class866E8__DispatchToRectCells walks it as a pointer). The store is
+`sw $zero` either way; image byte-identical. Class86AA0 has no own fields:
+New_Class86AA0 allocates 0x3C bytes, shorter than Class6B5CC's 0x44.

@@ -29,7 +29,7 @@ struct UnkSlotEntry_3ac78 {
     u16 key;                         /* Class866E8__Class866E8 (ctor): set to the loop index (0..6), and copied on into target->ownerKey. class_3bb8c's independent view (Elem::unk2) has Class866E8__BuildRateEntries copy a caller-supplied key byte into the same field. */
     struct Class81940 *target;       /* New_Class81940(); include/Class81940.h */
     struct Class6D940 *list;         /* New_Class6D940(0); include/Class6D940.h */
-    GenericObject *cellParent;             /* Class866E8__Finalize: refreshed (discarded) through ->methods->release when non-NULL */
+    struct Class86AA0 *cellParent;   /* New_Class86AA0() (include/Class86AA0.h), attached to the Class866E8; every cell's parent. Class866E8__Finalize releases it when non-NULL */
     /* RETYPED from `GenericObject **` (Class866E8__Finalize's earlier,
      * still-unconfirmed, INCLUDE_ASM-only comment) to `Class866E8 **`: a 2D
      * grid of pointers, row stride 20 cells (0x50 bytes), each cell holding

@@ -37,6 +37,7 @@
 #include "DrawSystem.h"
 #include "Class6D940.h"
 #include "Class81940.h"
+#include "Class86AA0.h"
 
 /* Class86668::sound is BasicClass * (it may be the ctor's own argument); when
  * it is a New_VabStreamObj object, +0x080 is VabStreamObj__PlayTone. */
@@ -71,7 +72,6 @@ Class866E8 *New_Class866E8(s32 arg1, s32 arg2)
  * Class866E8__Class866E8's own helpers -- all still-uncarved elsewhere, typed
  * purely from this call site's own register usage.
  */
-extern GenericObject *New_Class86AA0(void);
 extern void BMemPMgrFree(void *arg1);
 extern Vec3_3ac78 gDefaultOrigin;
 
@@ -79,7 +79,7 @@ void Class866E8__Class866E8(Class866E8 *self, Vec3_3ac78 *arg1, s32 arg2)
 {
     s32 i;
     UnkSlotEntry_3ac78 *entry;
-    GenericObject *obj;
+    Class86AA0 *obj;
     Class866E8 **cellp;
     u8 *p;
     u8 *end;
@@ -117,7 +117,7 @@ void Class866E8__Class866E8(Class866E8 *self, Vec3_3ac78 *arg1, s32 arg2)
 
         entry->list = New_Class6D940(0);
         entry->cellParent = New_Class86AA0();
-        entry->cellParent->methods->slot4C(entry->cellParent, self, &self->origin);
+        entry->cellParent->methods->attachToParent(entry->cellParent, (Class6B5CC *)self, (Vec3_d294 *)&self->origin);
 
         entry->cells = (Class866E8 **)BMemPMgrAlloc(0x668);
         if (entry->cells == NULL) {
@@ -133,8 +133,8 @@ void Class866E8__Class866E8(Class866E8 *self, Vec3_3ac78 *arg1, s32 arg2)
         p = (u8 *)cellp;
         while (p < end) {
             obj = New_Class86AA0();
-            *(GenericObject **)p = obj;
-            obj->methods->slot4C(obj, entry->cellParent, buf);
+            *(Class86AA0 **)p = obj;
+            obj->methods->attachToParent(obj, (Class6B5CC *)entry->cellParent, (Vec3_d294 *)buf);
 
             buf[0] += 0x800;
             if (buf[0] > 0xA400) {
@@ -142,11 +142,11 @@ void Class866E8__Class866E8(Class866E8 *self, Vec3_3ac78 *arg1, s32 arg2)
                 buf[2] += 0x800;
             }
 
-            obj = *(GenericObject **)p;
-            obj->methods->slot70(obj, 1);
-            obj = *(GenericObject **)p;
+            obj = *(Class86AA0 **)p;
+            obj->methods->setLightMode(obj, 1);
+            obj = *(Class86AA0 **)p;
             p += 4;
-            obj->unk10 |= 0x80000000;
+            obj->attribute |= 0x80000000;
         }
     }
 

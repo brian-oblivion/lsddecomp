@@ -38,3 +38,10 @@ purpose... is tier A by definition"). Kept the `Class86AA0__` prefix
 found only as one of `gClass86AA0Methods`'s own vtable slots (+0x0BC, the
 table's last entry) with no evidence it is shared by any other class's
 table.
+
+## Track 4 (2026-09-26, round 88, alpha)
+
+Parameter retyped `void *` -> `Class86AA0 *` (a slot occupant takes its
+class as `self`); the header names the slot +0x0BC `returnSelf`. Still no
+known caller; bytes unchanged. The "+0x0FC" in "What it does" above is a
+typo for +0x0BC (the table has 47 slots, `classtable.py gClass86AA0Methods`).
