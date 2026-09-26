@@ -36,9 +36,9 @@
  * the DrawSystem.
  *
  * The ctor chains to BasicClass's first (Get_vtable_BasicClass()->ctor),
- * and gClass869D8Methods's (0x17, include/class_3bb8c.h) chains to this one,
- * so the id tree (0x0 -> 0x7 -> 0x17) is the ctor chain. Class869D8's own
- * views are its own and do not expand these macros yet.
+ * and gClass869D8Methods's (0x17, include/Class869D8.h) chains to this one,
+ * so the id tree (0x0 -> 0x7 -> 0x17) is the ctor chain. Class869D8 expands
+ * these macros (round 87).
  *
  * Not settled here: subHandle is a Class6E99C (0x164, below gBoxFillMethods,
  * 0x64), whose +0x04C override (BoxFill__AttachToParent) takes a two-word screen
