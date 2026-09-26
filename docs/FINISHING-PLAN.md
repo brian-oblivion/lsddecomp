@@ -19,8 +19,9 @@ and wrong for every round after. Run the tool. The mechanics of a round
 the per-function matching loop is CLAUDE.md and `docs/MATCHING-GUIDE.md`.
 This file does not repeat them.
 
-Plan revision: 23 (2026-09-26, round 87, premium head: track 4 classes run
-in parallel when `plan.py`'s measured footprints are disjoint).
+Plan revision: 24 (2026-09-26, operator review of rounds 85 to 87: revisions
+21 to 23 kept; a premium head may make plan changes; track 4 retypes the
+globals that hold a class's objects; `plan.py amend-round`).
 Changing the plan is a premium head task (§2); record the change in
 `docs/PROGRESS.md` and bump this line.
 
@@ -298,7 +299,10 @@ ordinary class when track 1 matches one.
    table, getter and methods; include the class header where needed. Fix
    what the compiler lists: accessor renames, base-table calls upcast
    (`typeviews.py --upcast <getter> <Base> <files>`; a pointer cast emits no
-   code), slot renames.
+   code), slot renames. Retype the globals that hold this class's objects
+   (assigned from `New_<Class>()`, or passed as a method's `self`): one
+   consistent wrong type is invisible to `--globals` (round 85:
+   gStyleDecorObj/gStyleDecorSlots held BoxFills as `s32`/`void *`).
 8. After every step: `./build-and-verify.sh` byte-identical,
    `typeviews.py --warnings` 0 new (a GONE warning is progress: rewrite the
    baseline with `--baseline` in that commit and say so),
@@ -382,7 +386,9 @@ Opens when tracks 3 and 4 are done. Items, ticked with `plan.py check --item`:
 > applies), write the PROGRESS.md entry, update any doc line the round
 > invalidated, commit, push, tear down. Report: what moved on each track, what
 > `plan.py` says next, and anything that needs my decision (toolchain leads,
-> a HARD RULE tension, a plan change). Never act on those yourself.
+> a HARD RULE tension, a plan change). Never act on those yourself, except
+> that a head I started as premium (§2) makes a plan change as a recorded
+> revision; toolchain leads and HARD RULE tensions come to me either way.
 
 ### 4.2 Naming runner prompt (track 3; head fills in `<>`)
 

@@ -6,6 +6,35 @@ stale, prose elsewhere is not.
 
 ---
 
+## 2026-09-26 — premium session: plan revision 24 (operator review of rounds 85 to 87)
+
+- **Revisions 21 to 23 are kept.** They were made by heads the operator
+  started as premium: the 4b recipe, the Sony-data rule with
+  `sonydata.py`, and parallel track 4 on disjoint footprints. Round 87 ran
+  16 classes in three waves with no colliding edits and every oracle green,
+  which is the measurement the change needed. The mandate question all three
+  heads raised is settled in §4.1: a head started as premium makes a plan
+  change as a recorded revision, and an ordinary head still escalates.
+  Toolchain leads and HARD RULE tensions go to the operator either way.
+- **Game names on Sony data (round 85, 1).** Round 86 already resolved it.
+  `_svm_envx_ptr`/`_svm_envx_hist` carry Sony's names, the gVoiceEnv*/
+  gVoiceFade* field symbols are gone, and `sonydata.py --check` reports 0.
+- **Consistently mis-typed globals (round 85, 2).** No new tool. Track 4
+  step 7 now retypes the globals that hold the class's objects (assigned from
+  `New_<Class>()` or passed as `self`), which is where the evidence is and
+  who has it in hand.
+- **A bss segment in the splat yaml (round 86, 1).** Not adopted. The gain
+  is the display of asm/ labels and a name for `_ss_spu_vm_rec`. Naming Sony
+  data beyond the call surface is not a done criterion, and the risk is a
+  segmentation change under a byte-exact build. Revisit it in track 5 if a
+  reader needs the asm/ labels.
+- **3.3 vs 3.5 names for ssinit's data (round 86, 2).** 3.3 is confirmed. Its
+  code aligns 1.00 and its declaration order holds. The 3.5 fold into
+  `_snd_seq_tick_env` stays recorded as the alternative.
+- **Ledger amend (round 86, 3).** `plan.py amend-round` corrects a recorded
+  round and keeps the old values under `amended` with the reason. Round 86's
+  track-2 note now says 29 (was 43).
+
 ## 2026-09-26 — round 87: track 4 in parallel (premium head), sixteen classes unified
 
 Premium head (Opus 5.5; the operator started it as premium), operator cap 5.

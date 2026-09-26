@@ -9,6 +9,7 @@ and on which model.
 
     python3 tools/plan.py record-round --track 1 --round N --model sonnet|opus \\
                           --runners R --attempts A --matches M [--note "..."] [--not-calibration]
+    python3 tools/plan.py amend-round --track T --round N [--note ...] [--attempts A] --why "..."
     python3 tools/plan.py mark-unit --unit <unit> [--undo]        # track 3 pass done
     python3 tools/plan.py mark-class --table <sym> --class <Name> [--park "reason"] [--undo]  # track 4 class unified
     python3 tools/plan.py classes              # track 4: every class, its state and its views
@@ -1083,6 +1084,14 @@ def main():
                    help="this round's attempts were NOT from the ranked stall band (fresh "
                         "giants, revisits); recorded, but not counted toward calibration "
                         "or the stop rule. Any number of band attempts counts, even one.")
+    am = sub.add_parser("amend-round", help="correct a recorded round (round 86: a wrong figure in a note)")
+    am.add_argument("--track", required=True)
+    am.add_argument("--round", type=int, required=True)
+    am.add_argument("--note", help="replacement note")
+    am.add_argument("--attempts", type=int)
+    am.add_argument("--matches", type=int)
+    am.add_argument("--runners", type=int)
+    am.add_argument("--why", required=True, help="what was wrong; kept in the entry's `amended` list")
     m = sub.add_parser("mark-unit")
     m.add_argument("--unit", required=True)
     m.add_argument("--undo", action="store_true")
@@ -1115,6 +1124,21 @@ def main():
                   "use --not-calibration for fresh giants or revisits).")
         print(f"recorded round {a.round} on track {a.track}: {a.matches} match(es) from "
               f"{a.attempts} attempt(s) by {a.runners} {a.model} runner(s)")
+        return
+    if a.cmd == "amend-round":
+        rs = [r for r in st["tracks"].get(a.track, {}).get("rounds", []) if r.get("round") == a.round]
+        if len(rs) != 1:
+            sys.exit(f"FATAL: {len(rs)} recorded round(s) {a.round} on track {a.track}; need exactly one")
+        r, old_ = rs[0], {}
+        for k in ("note", "attempts", "matches", "runners"):
+            v = getattr(a, k)
+            if v is not None and v != r.get(k):
+                old_[k], r[k] = r.get(k), v
+        if not old_:
+            sys.exit("nothing to change")
+        r.setdefault("amended", []).append({"date": today, "why": a.why, "was": old_})
+        save_state(st)
+        print(f"amended round {a.round} on track {a.track}: {', '.join(old_)} ({a.why})")
         return
     if a.cmd == "mark-unit":
         if not srcpath.unit_src(a.unit):

@@ -534,12 +534,21 @@
           "runners": 1
         },
         {
+          "amended": [
+            {
+              "date": "2026-09-26",
+              "was": {
+                "note": "Game names off Sony DATA (operator request). tools/sonydata.py lists gName/sName data whose every accessor is library code and aligns each accessor against the SDK objects for Sony's name (lead until anchored). 43 symbols: alpha merged libsnd vmanager's per-field symbols into _svm_voice/_svm_sreg_buf/_svm_sreg_dirty (include/SvmData.h; 12 gVoiceEnv*/gVoiceFade* gone, one struct = zero bytes, three NON_MATCHING bodies closer); head: gVoiceActivityRing/Idx -> _svm_envx_hist/_ptr, ssinit gSeqTimer*/gVideoMode -> _snd_* (7), gDisableVoiceStarveScan -> _svm_auto_kof_mode, gMasterVolL/R + D_8008E258/5C -> _svm_rattr fields (reverb depth), 5 statics to placeholders (counter.o x3, ssinit, _ss_spu_vm_rec+8). rename.py now refuses the pattern; plan.py tracks it. Track 2 done again."
+              },
+              "why": "the note said 43 symbols; the round removed 29 game names (PROGRESS round 86)"
+            }
+          ],
           "attempts": 43,
           "calibration": false,
           "date": "2026-09-26",
           "matches": 43,
           "model": "premium",
-          "note": "Game names off Sony DATA (operator request). tools/sonydata.py lists gName/sName data whose every accessor is library code and aligns each accessor against the SDK objects for Sony's name (lead until anchored). 43 symbols: alpha merged libsnd vmanager's per-field symbols into _svm_voice/_svm_sreg_buf/_svm_sreg_dirty (include/SvmData.h; 12 gVoiceEnv*/gVoiceFade* gone, one struct = zero bytes, three NON_MATCHING bodies closer); head: gVoiceActivityRing/Idx -> _svm_envx_hist/_ptr, ssinit gSeqTimer*/gVideoMode -> _snd_* (7), gDisableVoiceStarveScan -> _svm_auto_kof_mode, gMasterVolL/R + D_8008E258/5C -> _svm_rattr fields (reverb depth), 5 statics to placeholders (counter.o x3, ssinit, _ss_spu_vm_rec+8). rename.py now refuses the pattern; plan.py tracks it. Track 2 done again.",
+          "note": "Game names off Sony DATA (operator request). tools/sonydata.py lists gName/sName data whose every accessor is library code and aligns each accessor against the SDK objects for Sony's name (lead until anchored). 29 game names removed (43 was a miscount; PROGRESS round 86): alpha merged libsnd vmanager's per-field symbols into _svm_voice/_svm_sreg_buf/_svm_sreg_dirty (include/SvmData.h; 12 gVoiceEnv*/gVoiceFade* gone, one struct = zero bytes, three NON_MATCHING bodies closer); head: gVoiceActivityRing/Idx -> _svm_envx_hist/_ptr, ssinit gSeqTimer*/gVideoMode -> _snd_* (7), gDisableVoiceStarveScan -> _svm_auto_kof_mode, gMasterVolL/R + D_8008E258/5C -> _svm_rattr fields (reverb depth), 5 statics to placeholders (counter.o x3, ssinit, _ss_spu_vm_rec+8). rename.py now refuses the pattern; plan.py tracks it. Track 2 done again.",
           "round": 86,
           "runners": 1
         }
