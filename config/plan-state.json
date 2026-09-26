@@ -1223,6 +1223,7 @@
     },
     "5": {
       "checklist": {
+        "asm-sites": true,
         "credits": true,
         "docs-budget": true,
         "nonmatching-clean": true,
