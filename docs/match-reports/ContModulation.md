@@ -1,5 +1,9 @@
 # ContModulation -- MATCHED: 79/79, byte-exact
 
+## Round 94 (runner echo, track 6): Sony types
+
+`NoteList_800349B0` and `Scratch_800349B0` are gone: they were reduced views of Sony's `ProgAtr` and `VagAtr` (`include/psyq/libsnd.h`), and the unit now includes `<libsnd.h>` and uses those types and Sony's `SsUtGetProgAtr`/`SsUtGetVagAtr`/`SsUtSetVagAtr` prototypes. `unk0` is `ProgAtr.tones`, the stamped `+0x08` byte is `VagAtr.vibW` (vibrato depth). Bytes unchanged. The bodies below keep their original declarations as history.
+
 > Renamed from `func_800349B0` on 2026-09-23 (tools/rename.py). Address 0x800349b0.
 
 `asm/nonmatchings/code_179d8_k/ContModulation.s`, vram `0x800349B0`, unit

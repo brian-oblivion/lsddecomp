@@ -1,5 +1,11 @@
 # Snd_setVabAttr -- MATCHED (round 49): 179/179, byte-exact
 
+## Round 94 (runner echo, track 6): Sony types
+
+`Scratch_800357B0` is gone: it was already Sony's `VagAtr` field-for-field at the fields it named, so the parameter is now `VagAtr scratch`. Sony's `SsUtGetVagAtr`/`SsUtSetVagAtr`/`SsUtReverbOn`/`SsUtReverbOff`/`SsUtSetReverb*` prototypes come from `<libsnd.h>`. Bytes unchanged; the bodies below keep their original declarations as history.
+
+`AdsrRaw_800357B0` is now `AdsrFields`, and its fields are named for the SPU ADSR1/ADSR2 bit fields that `_SsUtResolveADSR` unpacks and `_SsUtBuildADSR` repacks (`func_80035F3C.md`, `func_80035F98.md`). The mapping: unk0 `attackRate` (ADSR1 14-8), unk2 `decayRate` (7-4), unk4 `sustainLevel` (3-0), unk6 `sustainRate` (ADSR2 12-6), unk8 `releaseRate` (4-0), unkA `attackMode` (ADSR1 bit 15), unkC `sustainMode` (ADSR2 bit 15), unkE `releaseMode` (bit 5), unk10 `sustainDir` (bit 14). This function's arms agree with it: 4/5 set attack rate with linear/exponential mode, 6 decay, 7 sustain level, 8/9 sustain rate+mode, 10/11 release rate+mode, and 12 the sustain direction.
+
 > Renamed from `func_800357B0` on 2026-09-23 (tools/rename.py). Address 0x800357b0.
 
 **ROUND 49: MATCHED.** See the update at the end of this report. Everything
@@ -91,10 +97,10 @@ typedef struct {
 typedef struct {
     s16 unk0; s16 unk2; s16 unk4; s16 unk6; s16 unk8;
     s16 unkA; s16 unkC; s16 unkE; s16 unk10;
-} AdsrRaw_800357B0;   /* same shape as code_179d8_f.c's UnkStruct80035F3C, renamed per unit */
+} AdsrFields;   /* same shape as code_179d8_f.c's UnkStruct80035F3C, renamed per unit */
 
 void Snd_setVabAttr(s16 channel, s16 slot, s16 kind, Scratch_800357B0 scratch,
-                    AdsrRaw_800357B0 resolved, s16 arg5, u8 arg6);
+                    AdsrFields resolved, s16 arg5, u8 arg6);
 ```
 
 **Prototype-typing correction needed for the by-value calls to land right**:
@@ -224,10 +230,10 @@ typedef struct {
     s16 unkC;
     s16 unkE;
     s16 unk10;
-} AdsrRaw_800357B0;
+} AdsrFields;
 
-extern void _SsUtResolveADSR(s32 a0, s32 a1, AdsrRaw_800357B0 *out);
-extern void _SsUtBuildADSR(AdsrRaw_800357B0 *in, u16 *adsr1, u16 *adsr2);
+extern void _SsUtResolveADSR(s32 a0, s32 a1, AdsrFields *out);
+extern void _SsUtBuildADSR(AdsrFields *in, u16 *adsr1, u16 *adsr2);
 extern void SsUtReverbOn(void);
 extern s16 SsUtSetReverbType(s16 a0);
 extern void SsUtSetReverbFeedback(s16 a0);
@@ -239,7 +245,7 @@ extern void SsUtSetReverbDelay(s16 a0);
  * byte-identical. */
 
 void Snd_setVabAttr(s16 channel, s16 slot, s16 kind, Scratch_800357B0 scratch,
-                    AdsrRaw_800357B0 resolved, s16 arg5, u8 arg6)
+                    AdsrFields resolved, s16 arg5, u8 arg6)
 {
     SsUtGetVagAtr(channel, slot, kind, &scratch);
 
@@ -404,7 +410,7 @@ zero out-of-range drift, matching the title exactly.
 
 Set up a fresh `tools/setup-permuter.sh` scaffold from a minimal seed (only
 the types/externs this function's own body needs -- `Scratch_800357B0`,
-`AdsrRaw_800357B0`, the ten Psy-Q externs). Sanity check (`--debug
+`AdsrFields`, the ten Psy-Q externs). Sanity check (`--debug
 --stack-diffs`): **base score 453**, no stack differences reported as
 anomalous, consistent with a clean small-residue scaffold. Searched
 `-j 6 --stack-diffs --stop-on-zero --best-only` for the full 240s budget
@@ -643,7 +649,7 @@ guess at `Snd_setVabAttr`'s signature from the CALLER's side: a
 three-way decomposition of the by-value argument blob (`u32 a3,
 Blk1_800351D0 blk1, Blk2_800351D0 blk2`) that sums to the same 50 bytes
 as this function's own real two-struct signature (`Scratch_800357B0
-scratch` (0x20) + `AdsrRaw_800357B0 resolved` (0x12)), just sliced at a
+scratch` (0x20) + `AdsrFields resolved` (0x12)), just sliced at a
 different byte boundary -- both are "correct" in the sense of matching
 the retail stack layout, but they are TWO DIFFERENT extern declarations
 of the SAME identifier in ONE translation unit, which C does not permit
@@ -661,7 +667,7 @@ choice. Resolved by REMOVING the stale forward declaration (dead code:
 `ContDataEntry`'s own body that used it is itself inert, wrapped in `#if
 0`, so nothing live referenced it) rather than trying to reconcile two
 by-value struct decompositions that would require moving
-`Scratch_800357B0`/`AdsrRaw_800357B0`'s typedefs earlier in the file.
+`Scratch_800357B0`/`AdsrFields`'s typedefs earlier in the file.
 Left an inline comment at the removal site for whoever next attempts
 `ContDataEntry`: its own call site will need reshaping to the two-struct
 signature, and a fresh forward declaration (declared after the two

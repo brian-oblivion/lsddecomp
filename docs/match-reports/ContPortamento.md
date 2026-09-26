@@ -1,5 +1,9 @@
 # ContPortamento -- MATCHED: 90/90, byte-exact
 
+## Round 94 (runner echo, track 6): Sony types
+
+`Scratch_80034C28` is gone: a reduced view of Sony's `VagAtr`; the `+0x01` byte (called a velocity-curve flag below) is `VagAtr.mode`, the tone's play mode. `NoteList_800349B0` became `ProgAtr`. Sony's prototypes from `<libsnd.h>` replace the local ones. Bytes unchanged; the bodies below keep their original declarations as history.
+
 > Renamed from `func_80034C28` on 2026-09-23 (tools/rename.py). Address 0x80034c28.
 
 `asm/nonmatchings/code_179d8_k/ContPortamento.s`, vram `0x80034C28`, unit

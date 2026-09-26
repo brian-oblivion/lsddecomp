@@ -1,5 +1,9 @@
 # ContPortaTime -- MATCHED: 79/79, byte-exact
 
+## Round 94 (runner echo, track 6): Sony types
+
+`Scratch_80034AEC` is gone: a reduced view of Sony's `VagAtr`; the stamped `+0x0B` byte is `VagAtr.porT` (portamento time). `NoteList_800349B0` became `ProgAtr` (`unk0` = `tones`). Sony's prototypes from `<libsnd.h>` replace the local ones. Bytes unchanged; the bodies below keep their original declarations as history.
+
 > Renamed from `func_80034AEC` on 2026-09-23 (tools/rename.py). Address 0x80034aec.
 
 `asm/nonmatchings/code_179d8_k/ContPortaTime.s`, vram `0x80034AEC`, unit

@@ -1,61 +1,35 @@
 /*
- * ROUND 42 CORRECTION (2026-09-15) -- READ BEFORE ANY "BLOCKED" LINE BELOW:
- * every claim in this comment that a function is BLOCKED by `gp_rel`,
- * `nop_mflo_mfhi` or `addiu_at` is STALE.  All three constructs are RESOLVED
- * by pinned maspsx flags (CLAUDE.md, "Open toolchain blockers");
- * `tools/nearmiss.py` reports them tagged (RESOLVED-not-a-blocker) and counts
- * none of them.  Any "do NOT spend attempts on these" directive below is
- * therefore RETRACTED: those functions are ordinary matching work, and most
- * carry a mechanism-correct partial derivation already.  The rest of this
- * comment still stands -- only the blocker verdicts are withdrawn.
- * Screen: `python3 tools/nearmiss.py`, round 43 (2026-09-15).
+ * code_179d8_k -- Sony libsnd `seqread`: the SEQ event interpreter.
  *
- * code_179d8_k -- functions 238..255 of the original 274-function code_179d8
- * monolith, 0x24938..0x2673C (vram 0x80034138..0x80035F3C).  Carved round 24
- * (2026-09-08) out of what had been the `code_179d8_tail` asm remainder,
- * which this unit consumes WHOLE -- there is no remainder left on either
- * side (code_179d8_i in front, code_179d8_f behind).
+ * Every function here is Sony's. Retail links libsnd 3.3's seqread with one
+ * function changed (_SsSetControlChange), so the object never placed and the
+ * module is carried as C. progress.py counts all of it as library by address
+ * (config/sdk-in-game.txt, and the `identified` symbols entry for
+ * _SsSetControlChange). The functions keep Sony's names and are never retyped
+ * as game code.
  *
- * WHY IT WAS UNCARVED FOR SIX ROUNDS, AND WHY THAT VERDICT IS DEAD.
- * The splat comment on the old remainder read "17 of its 18 functions are
- * addiu-$at blocked".  `addiu_at` was RESOLVED in round 21 (maspsx
- * `--addiu-at`; docs/research/addiu-at-blocker.md), so that census measured
- * an obstruction that no longer exists.  Re-censused 2026-09-08 with
- * `python3 tools/nearmiss.py`'s four screens, canonical shell forms
- * (`grep -A2` FORWARD for nop_mflo_mfhi -- the direction is load-bearing):
+ * Each sequence track is an Entry90902E8 record, reached as
+ * D_800902E8[access][seq] (Sony's `_ss_score`, pinned in
+ * config/psyq-objects.ld). SeqPlay is the per-tick scheduler. GetSeqData
+ * decodes one event from the byte stream at rec->unk4 and dispatches it to:
+ *   - NoteOn / SetProgramChange / SetPitchBend, the channel-voice events;
+ *   - _SsSetControlChange, the MIDI CC dispatcher, which routes to the Cont*
+ *     handlers: data entry, portamento, NRPN/RPN, reset-all-controllers;
+ *   - GetMetaEvent, for End of Track (repeat or stop) and Set Tempo.
+ * ReadDeltaValue reads the delta time that follows every event and schedules
+ * the next one.
  *
- *   18 of 18 CLEAN.  Zero gp_rel, zero nop_mflo_mfhi, zero `jr $t2`
- *   trampolines.  This is the single best carve left in the executable.
+ * The controller handlers edit the VAB in place through Sony's SsUtGet/Set
+ * ProgAtr/VagAtr calls. Snd_setVabAttr is ContDataEntry's per-NRPN VagAtr
+ * editor, and it unpacks the ADSR registers into an AdsrFields to do so.
+ * ContModulation and ContPortaTime have no caller in this executable.
  *
- * Sizes, cheapest first -- six functions at 31..51 words, which is the
- * cheap seam the `fresh` queue had run out of:
- *   SetProgramChange  31w   ContRpn1  31w   ContRpn2  31w
- *   SetPitchBend  44w   ReadDeltaValue  47w   ContResetAll  51w
- *   SeqPlay  69w   NoteOn  70w   ContNrpn1  77w
- *   ContModulation  79w   ContPortaTime  79w   ContNrpn2  82w
- *   ContPortamento  90w   GetSeqData 172w   Snd_setVabAttr 179w
- *   _SsSetControlChange 200w   GetMetaEvent 213w   ContDataEntry 376w
- *
- * THIS UNIT OWNS THREE SWITCH JUMP TABLES, not the two the old remainder
- * comment claimed: _SsSetControlChange -> jtbl_80010CF0, and Snd_setVabAttr ->
- * jtbl_80010ED8 AND jtbl_80010F38 (a double switch).  The 0x14F0 rodata
- * slot holds exactly those three tables and nothing else, is referenced
- * from nowhere outside this unit, and is attached whole in the splat yaml.
- * You do not need to do anything about it -- but if you match either
- * function, remember a `%lo(jtbl_*)` load is ordinary matchable code now.
- *
- * Boundary checks at carve time, both sides: no function has more than one
- * `addiu $sp, $sp, -N`, every one ends in its own `jr $ra`, zero `alabel`,
- * and the one frameless function (ReadDeltaValue) opens on
- * `sll $a0, $a0, 16` -- leaf argument narrowing, not a caller-frame read.
- *
- * Expect this slice to span more than one class; a ~20-function slice cut
- * at ROM-address boundaries has no reason to align with class boundaries.
- * Identify each with tools/classtable.py rather than assuming the unit has
- * one.  Expect low-level driver-shaped code rather than class-framework
- * code, as elsewhere in code_179d8; confirm, do not assume.
+ * This unit owns three switch jump tables in rodata: jtbl_80010CF0
+ * (_SsSetControlChange), and jtbl_80010ED8 and jtbl_80010F38
+ * (Snd_setVabAttr's nested switch).
  */
 #include "common.h"
+#include <libsnd.h>
 
 /* Cross-unit calls, typed per-call-site from the registers loaded before
  * each `jal` -- none of these callees have an established prototype from
@@ -69,11 +43,7 @@ extern void SpuVmPitchBend(s32 a0, s16 a1, u8 a2, u8 a3); /* code_179d8_m, not y
 extern s32 SpuVmKeyOn(s32 a0, s16 a1, s16 a2, u16 a3, u16 a4,
                       u16 a5); /* code_179d8_m, not yet matched: local guess, matches code_179d8_j's independent reading of the same call shape */
 extern s32 SpuVmKeyOff(s32 a0, s16 a1, s16 a2, u16 a3); /* code_179d8_m, not yet matched: local guess, ditto */
-/* Psy-Q libsnd, linked from the SDK objects (round 34): `ut_rev` and
- * `vm_doff`. Both were carried as matched C in code_179d8_f.c until that
- * unit's prefix was given back to Sony; these are local views, as a Psy-Q
- * prototype must never go into a header this unit's siblings share. */
-extern s32 SsUtReverbOff(void);
+/* Sony libsnd/vm_doff, internal: no public LIBSND.H prototype. */
 extern void SpuVmDamperOff(void);
 
 /* A 172 (0xAC)-byte record; D_800902E8 is an array of pointers to arrays of
@@ -382,7 +352,6 @@ void SetProgramChange(s16 a0, s16 a1, u8 a2) {
  * "packed (slot<<8)|channel" first argument this file's siblings already
  * use. */
 extern void SpuVmDamperOn(void);
-extern void SsUtSetReverbDepth(s16 a0, s16 a1);
 extern s32 SpuVmSetProgVol(s16 p0, s16 p1, s32 p2);
 extern void SpuVmSetVol(s32 packed, s16 note, u8 vol, s32 arg3, s32 arg4);
 
@@ -498,108 +467,66 @@ void _SsSetControlChange(s16 a0, s16 a1, u8 a2) {
     rec->unk88 = ReadDeltaValue(a0, a1);
 }
 
-/* A stack-local buffer this function passes to three cross-unit callees:
- * `SsUtGetProgAtr(ch, byte, out)` (established elsewhere as
- * `s16 SsUtGetProgAtr(s16, s16, Entry8E968 *)` in code_179d8_i.c, a
- * different unit's own reduced view -- this unit's own view only needs
- * `unk0`, an item count) fills the FIRST 0x10 bytes; `SsUtGetVagAtr` and
- * `SsUtSetVagAtr` are then called once per item with a pointer to the NEXT
- * 0x28 bytes of the SAME object.  ALL THREE ARE SONY'S, linked from the SDK
- * objects since round 34 -- `libsnd/ut_gpa`, `libsnd/ut_gva` and
- * `libsnd/ut_sva`.  The signatures below stay as this call site's own reading
- * (the return types and the second argument's width are what retail's code
- * here uses); they are LOCAL views and must never move into a shared header
- * next to include/psyq/libsnd.h's real prototypes.  Modeled as one struct, not two separate
- * locals, because the loop's exit test re-reads `unk0` from memory on
- * every iteration even though nothing in this function's own source
- * writes it after the first call -- the per-item pointer passed to the
- * other two callees aliases the same object, so the compiler cannot prove
- * `unk0` is unchanged and must reload it. */
-typedef struct {
-    u8 unk0; /* +0x00: item count, written by SsUtGetProgAtr */
-    u8 pad1[0x10 - 0x1];
-} NoteList_800349B0;
-
-typedef struct {
-    u8 pad0[0x8];
-    u8 unk8; /* +0x08: byte stamped between the two per-item calls -- the
-                 * struct's TOTAL size is 0x20, not the 0x28 that offset
-                 * alone would suggest; see ContModulation.md's round-31
-                 * update for why the two are decoupled once the
-                 * register-rescue fix below is applied. */
-    u8 pad9[0x20 - 0x9];
-} Scratch_800349B0;
-
-extern s16 SsUtGetProgAtr(s16 a0, s16 a1, void *out);
-extern void SsUtGetVagAtr(s16 a0, s16 a1, s16 a2, void *out);
-extern void SsUtSetVagAtr(s16 a0, s16 a1, s16 a2, void *out);
-
+/* The three per-controller VagAtr editors below share one shape: fetch the
+ * channel's program with SsUtGetProgAtr, then for each of its `tones` read
+ * the tone's VagAtr, overwrite one field from the controller value and
+ * write it back. `tones` is re-read from memory on every iteration because
+ * the compiler cannot prove the SsUt calls leave the ProgAtr alone.
+ *
+ * ContModulation: the value becomes every tone's vibrato depth (vibW).
+ * Neither it nor ContPortaTime has a caller in this executable. */
 void ContModulation(s16 a0, s16 a1, u8 a2) {
     Entry90902E8 *rec = &D_800902E8[a0][a1];
     u8 offset;
-    NoteList_800349B0 list;
-    Scratch_800349B0 scratch;
+    ProgAtr list;
+    VagAtr scratch;
     s32 i;
 
     SsUtGetProgAtr(rec->unk4C, ((u8 *)rec + (offset = rec->unk12))[0x2C], &list);
-    for (i = 0; i < list.unk0; i++) {
+    for (i = 0; i < list.tones; i++) {
         SsUtGetVagAtr(rec->unk4C, ((u8 *)rec + offset)[0x2C], (s16)i, &scratch);
-        scratch.unk8 = a2;
+        scratch.vibW = a2;
         SsUtSetVagAtr(rec->unk4C, ((u8 *)rec + offset)[0x2C], (s16)i, &scratch);
     }
     rec->unk88 = ReadDeltaValue(a0, a1);
 }
 
-/* Same shape as ContModulation -- see that function's own struct comment.
- * Only the scratch byte's offset differs (0xB here vs 0x8 there). */
-typedef struct {
-    u8 pad0[0xB];
-    u8 unkB; /* +0x0B: byte stamped between the two per-item calls */
-    u8 pad9[0x20 - 0xC];
-} Scratch_80034AEC;
-
+/* The value becomes every tone's portamento time (porT). */
 void ContPortaTime(s16 a0, s16 a1, u8 a2) {
     Entry90902E8 *rec = &D_800902E8[a0][a1];
     u8 offset;
-    NoteList_800349B0 list;
-    Scratch_80034AEC scratch;
+    ProgAtr list;
+    VagAtr scratch;
     s32 i;
 
     SsUtGetProgAtr(rec->unk4C, ((u8 *)rec + (offset = rec->unk12))[0x2C], &list);
-    for (i = 0; i < list.unk0; i++) {
+    for (i = 0; i < list.tones; i++) {
         SsUtGetVagAtr(rec->unk4C, ((u8 *)rec + offset)[0x2C], (s16)i, &scratch);
-        scratch.unkB = a2;
+        scratch.porT = a2;
         SsUtSetVagAtr(rec->unk4C, ((u8 *)rec + offset)[0x2C], (s16)i, &scratch);
     }
     rec->unk88 = ReadDeltaValue(a0, a1);
 }
 
-/* Same NoteList/callee shape as ContModulation/ContPortaTime, plus a
- * range check on this function's own third parameter that picks a
- * one-byte flag written into the scratch buffer at relative offset 1. */
-typedef struct {
-    u8 pad0[0x1];
-    u8 unk1; /* +0x01: velocity-curve flag, 2 / 0 / left untouched */
-    u8 pad2[0x20 - 0x2];
-} Scratch_80034C28;
-
+/* CC65 (portamento): a value below 0x40 sets every tone's play mode
+ * to 2, a value in 0x40..0x7F sets it to 0, anything else leaves it. */
 void ContPortamento(s16 a0, s16 a1, s32 a2) {
     Entry90902E8 *rec = &D_800902E8[a0][a1];
     u8 offset;
-    NoteList_800349B0 list;
-    Scratch_80034C28 scratch;
+    ProgAtr list;
+    VagAtr scratch;
     s32 i;
     s32 wrap;
 
     SsUtGetProgAtr(rec->unk4C, ((u8 *)rec + (offset = rec->unk12))[0x2C], &list);
-    for (i = 0; i < list.unk0; i++) {
+    for (i = 0; i < list.tones; i++) {
         SsUtGetVagAtr(rec->unk4C, ((u8 *)rec + offset)[0x2C], (s16)i, &scratch);
         if ((u8)a2 < 0x40) {
-            scratch.unk1 = 2;
+            scratch.mode = 2;
         } else {
             wrap = 0xC0;
             if ((u8)(a2 + wrap) < 0x40) {
-                scratch.unk1 = 0;
+                scratch.mode = 0;
             }
         }
         SsUtSetVagAtr(rec->unk4C, ((u8 *)rec + offset)[0x2C], (s16)i, &scratch);
@@ -625,57 +552,41 @@ void ContResetAll(s16 a0, s16 a1) {
     rec->unk88 = ReadDeltaValue(a0, a1);
 }
 
-/* A per-(channel,slot) dispatch table of function pointers, row-major with
- * a 0x40 (64)-byte stride (16 pointers per row) -- also referenced from
- * code_179d8_c's _SsInit. Not yet given a real element count; the
- * outer dimension is left open. */
-typedef void (*Fn80090368)(s32 channel, u8 arg1);
-extern Fn80090368 D_80090368[][16];
+/* The mark callbacks SsSetMarkCallback installs, one per (access number,
+ * sequence number); ContNrpn1 calls the entry with (access, seq, data). */
+extern SsMarkCallbackProc D_80090368[][16];
 
-/* STALL -- see docs/match-reports/ContNrpn1.md. Compiled length ONE WORD
- * SHORT (76/77), 54/77 raw word-match, first real content diff at word 55/56:
- * GCC folds the "slot" array-index multiply into the sign-extension in one
- * shift pair because the slot value is used exactly once, where retail
- * materializes the sign-extended slot into its own register first and
- * multiplies separately (the same two-instruction shape retail also uses for
- * the "channel" index, which IS reused later and so never gets fused here
- * either) -- a register/instruction-count residue, not a logic difference. */
-#if 0
-void ContNrpn1(s16 a0, s16 a1, u8 a2)
-{
+/* CC98 (NRPN LSB). While a loop start set by ContNrpn2's kind 0x14 still
+ * waits for its count (unk27 == 1, unk10 == 0), the value becomes the loop
+ * count unk28. Otherwise, unless the current NRPN kind is 0x14 or 0x1E, it
+ * is cached in unk15 and bumps the unk2A step counter. Under kind 0x28 the
+ * value also goes to the sequence's mark callback. */
+void ContNrpn1(s16 a0, s16 a1, u8 a2) {
     Entry90902E8 *rec = &D_800902E8[a0][a1];
     u8 kind;
-    Fn80090368 fn;
+    SsMarkCallbackProc fn;
 
-    if (rec->unk27 == 1) {
-        if (rec->unk10 == 0) {
-            rec->unk28 = a2;
-            rec->unk10 = 1;
-            goto check;
+    if (rec->unk27 == 1 && rec->unk10 == 0) {
+        rec->unk28 = a2;
+        rec->unk10 = 1;
+    } else {
+        kind = rec->unk16;
+        if (kind != 0x1E && kind != 0x14) {
+            rec->unk15 = a2;
+            rec->unk2A = rec->unk2A + 1;
         }
     }
-    kind = rec->unk16;
-    if (kind != 0x1E && kind != 0x14) {
-        rec->unk15 = a2;
-        rec->unk2A = rec->unk2A + 1;
-    }
-check:
-    if (rec->unk16 != 0x28) {
-        goto skip_call;
-    }
-    {
+    if (rec->unk16 == 0x28) {
         s16 ch = a0;
         s16 sl = a1;
+
         fn = D_80090368[ch][sl];
         if (fn != NULL) {
-            fn(ch, a2 & 0xFF);
+            fn(ch, sl, a2);
         }
     }
-skip_call:
     rec->unk88 = ReadDeltaValue(a0, a1);
 }
-#endif
-INCLUDE_ASM("asm/nonmatchings/code_179d8_k", ContNrpn1);
 
 /* STALL -- see docs/match-reports/ContNrpn2.md. Compiled length EXACT
  * (82/82), 77/82 raw word-match, first real diff at word 40: a single
@@ -747,78 +658,40 @@ void ContRpn2(s16 a0, s16 a1, u8 a2) {
     rec->unk88 = ReadDeltaValue(a0, a1);
 }
 
-/* This unit's own reduced view of the VagAtr SsUtGetVagAtr/SsUtSetVagAtr
- * fill (round 35): only the 8 fields this function actually touches, at
- * their real include/psyq/libsnd.h VagAtr offsets. Total size (0x20) is
- * load-bearing -- Snd_setVabAttr receives it as a BY-VALUE 4th parameter
- * (its first word arrives in $a3, the rest already spilled to the stack by
- * the caller), and its own incoming value is immediately discarded: every
- * byte is refilled by the unconditional SsUtGetVagAtr call at function
- * entry before any case reads it. */
+/* The SPU envelope registers ADSR1/ADSR2 (VagAtr.adsr1/adsr2) split into
+ * their bit fields: _SsUtResolveADSR unpacks a pair into one, and
+ * _SsUtBuildADSR packs one back. The rates and the level are the field
+ * values shifted down; the four modes hold the masked bit as-is (nonzero
+ * means exponential, or decreasing for sustainDir). */
 typedef struct {
-    u8 prior; /* +0x0 */
-    u8 mode;  /* +0x1 */
-    u8 pad2[0x6 - 0x2];
-    u8 min; /* +0x6 */
-    u8 max; /* +0x7 */
-    u8 pad8[0x9 - 0x8];
-    u8 vibT; /* +0x9 */
-    u8 porW; /* +0xA */
-    u8 padB[0x10 - 0xB];
-    u16 adsr1; /* +0x10 */
-    u16 adsr2; /* +0x12 */
-    u8 pad14[0x20 - 0x14];
-} Scratch_800357B0;
-
-/* Same 9-halfword ADSR-decode layout as code_179d8_f.c's independent,
- * already-matched `UnkStruct80035F3C` (docs/match-reports/func_80035F3C.md)
- * -- a fresh LOCAL (uninitialized), filled by `_SsUtResolveADSR` from
- * `scratch.adsr1`/`adsr2` and consumed by `_SsUtBuildADSR`, never by the
- * caller. Renamed per-unit per project convention, not shared. */
-typedef struct {
-    s16 unk0;
-    s16 unk2;
-    s16 unk4;
-    s16 unk6;
-    s16 unk8;
-    s16 unkA;
-    s16 unkC;
-    s16 unkE;
-    s16 unk10;
-} AdsrRaw_800357B0;
-
-/* This function's own view of the same VagAtr buffer: only the four bytes
- * its unk29==2 loops touch. */
-typedef struct {
-    u8 pad0[0x4];
-    u8 unk4; /* +0x4: read back and stored unchanged in the unk13==2 loop -- see report */
-    u8 unk5; /* +0x5: read back and stored unchanged in the unk13==1 loop -- see report */
-    u8 pad6[0xC - 0x6];
-    u8 unkC; /* +0xC */
-    u8 unkD; /* +0xD */
-    u8 pad0E[0x20 - 0xE];
-} Scratch800351D0;
+    s16 attackRate;   /* ADSR1 bits 14-8 */
+    s16 decayRate;    /* ADSR1 bits 7-4 */
+    s16 sustainLevel; /* ADSR1 bits 3-0 */
+    s16 sustainRate;  /* ADSR2 bits 12-6 */
+    s16 releaseRate;  /* ADSR2 bits 4-0 */
+    s16 attackMode;   /* ADSR1 bit 15 */
+    s16 sustainMode;  /* ADSR2 bit 15 */
+    s16 releaseMode;  /* ADSR2 bit 5 */
+    s16 sustainDir;   /* ADSR2 bit 14 */
+} AdsrFields;
 
 /* SsUtGetProgAtr's fill at function entry. From +0x10 the SAME memory is
  * both the VagAtr buffer the unk29==2 loops hand to SsUtGet/SetVagAtr
  * (retail addresses it at sp+0x58 = list+0x10) and, with the 18 bytes
  * after it, the two by-value arguments of Snd_setVabAttr (round 69). */
 typedef struct {
-    u8 count; /* +0x00: item count, SsUtGetProgAtr's usual field */
-    u8 pad1[0x10 - 0x1];
+    ProgAtr prog; /* +0x00: SsUtGetProgAtr's fill */
 
-    union {
-        Scratch_800357B0 s; /* +0x10: passed by value to Snd_setVabAttr */
-        Scratch800351D0 v;  /* +0x10: SsUtGet/SetVagAtr's buffer in the unk29==2 loops */
-    } scratch;
+    VagAtr vag; /* +0x10: passed by value to Snd_setVabAttr, and the
+                 * SsUtGet/SetVagAtr buffer of the unk29==2 loops */
 
-    AdsrRaw_800357B0 adsr; /* +0x30: passed by value to Snd_setVabAttr */
-} List_800351D0;
+    AdsrFields adsr; /* +0x30: passed by value to Snd_setVabAttr */
+} DataEntryLocals;
 
 /* Snd_setVabAttr is defined later in this unit; its own definition fixes
  * this signature (round 49). */
-extern void Snd_setVabAttr(s16 channel, s16 slot, s16 kind, Scratch_800357B0 scratch,
-                           AdsrRaw_800357B0 resolved, s16 arg5, u8 arg6);
+extern void Snd_setVabAttr(s16 channel, s16 slot, s16 kind, VagAtr scratch, AdsrFields resolved,
+                           s16 arg5, u8 arg6);
 
 #ifdef NON_MATCHING
 /* NON_MATCHING: 380/376 words, 4 LONG; 95/376 raw, frame exact (-0x108).
@@ -834,7 +707,7 @@ void ContDataEntry(s16 a0, s16 a1, u8 a2) {
     s16 slot = a1;
     Entry90902E8 *rec = &D_800902E8[ch][slot];
     u8 off = rec->unk12;
-    List_800351D0 list;
+    DataEntryLocals list;
     s32 i;
     u8 kind;
 
@@ -854,10 +727,10 @@ void ContDataEntry(s16 a0, s16 a1, u8 a2) {
     }
     if (rec->unk29 == 2) {
         if (rec->unk13 == 0 && rec->unk14 == 0) {
-            for (i = 0; i < list.count; i++) {
-                SsUtGetVagAtr(rec->unk4C, ((u8 *)rec + off)[0x2C], i, &list.scratch.v);
-                list.scratch.v.unkC = list.scratch.v.unkD = a2 & 0x7F;
-                SsUtSetVagAtr(rec->unk4C, ((u8 *)rec + off)[0x2C], i, &list.scratch.v);
+            for (i = 0; i < list.prog.tones; i++) {
+                SsUtGetVagAtr(rec->unk4C, ((u8 *)rec + off)[0x2C], i, &list.vag);
+                list.vag.pbmin = list.vag.pbmax = a2 & 0x7F;
+                SsUtSetVagAtr(rec->unk4C, ((u8 *)rec + off)[0x2C], i, &list.vag);
             }
         }
         if (rec->unk13 == 1 && rec->unk14 == 0) {
@@ -871,10 +744,10 @@ void ContDataEntry(s16 a0, s16 a1, u8 a2) {
             } else {
                 unused = 0;
             }
-            for (i = 0; i < list.count; i++) {
-                SsUtGetVagAtr(rec->unk4C, ((u8 *)rec + off)[0x2C], i, &list.scratch.v);
-                list.scratch.v.unk5 = list.scratch.v.unk5;
-                SsUtSetVagAtr(rec->unk4C, ((u8 *)rec + off)[0x2C], i, &list.scratch.v);
+            for (i = 0; i < list.prog.tones; i++) {
+                SsUtGetVagAtr(rec->unk4C, ((u8 *)rec + off)[0x2C], i, &list.vag);
+                list.vag.shift = list.vag.shift;
+                SsUtSetVagAtr(rec->unk4C, ((u8 *)rec + off)[0x2C], i, &list.vag);
             }
         }
         if (rec->unk13 == 2 && rec->unk14 == 0) {
@@ -884,10 +757,10 @@ void ContDataEntry(s16 a0, s16 a1, u8 a2) {
             } else {
                 unused = 0;
             }
-            for (i = 0; i < list.count; i++) {
-                SsUtGetVagAtr(rec->unk4C, ((u8 *)rec + off)[0x2C], i, &list.scratch.v);
-                list.scratch.v.unk4 = list.scratch.v.unk4;
-                SsUtSetVagAtr(rec->unk4C, ((u8 *)rec + off)[0x2C], i, &list.scratch.v);
+            for (i = 0; i < list.prog.tones; i++) {
+                SsUtGetVagAtr(rec->unk4C, ((u8 *)rec + off)[0x2C], i, &list.vag);
+                list.vag.center = list.vag.center;
+                SsUtSetVagAtr(rec->unk4C, ((u8 *)rec + off)[0x2C], i, &list.vag);
             }
         }
         rec->unk88 = ReadDeltaValue(ch, slot);
@@ -897,13 +770,13 @@ void ContDataEntry(s16 a0, s16 a1, u8 a2) {
     if (rec->unk2A == 2) {
         kind = rec->unk16;
         if (kind == 0x10) {
-            for (i = 0; i < list.count; i++) {
-                Snd_setVabAttr(rec->unk4C, ((u8 *)rec + off)[0x2C], i, list.scratch.s, list.adsr,
+            for (i = 0; i < list.prog.tones; i++) {
+                Snd_setVabAttr(rec->unk4C, ((u8 *)rec + off)[0x2C], i, list.vag, list.adsr,
                                rec->unk15, a2 & 0xFF);
             }
         } else {
-            Snd_setVabAttr(rec->unk4C, ((u8 *)rec + off)[0x2C], (s16)kind, list.scratch.s,
-                           list.adsr, rec->unk15, a2 & 0xFF);
+            Snd_setVabAttr(rec->unk4C, ((u8 *)rec + off)[0x2C], (s16)kind, list.vag, list.adsr,
+                           rec->unk15, a2 & 0xFF);
         }
         rec->unk88 = ReadDeltaValue(ch, slot);
         rec->unk2A = 0;
@@ -930,21 +803,20 @@ INCLUDE_ASM("asm/nonmatchings/code_179d8_k", ContDataEntry);
 /* Both linked from Sony's `libsnd/adsr.o` (round 34) -- see
  * func_80035F3C.md / func_80035F98.md for the derivation of this shape,
  * fixed as those units' independent local views: */
-extern void _SsUtResolveADSR(s32 a0, s32 a1, AdsrRaw_800357B0 *out);
-extern void _SsUtBuildADSR(AdsrRaw_800357B0 *in, u16 *adsr1, u16 *adsr2);
-extern void SsUtReverbOn(void);
-extern s16 SsUtSetReverbType(s16 a0);
-extern void SsUtSetReverbFeedback(s16 a0);
-extern void SsUtSetReverbDelay(s16 a0);
+extern void _SsUtResolveADSR(s32 a0, s32 a1, AdsrFields *out);
+extern void _SsUtBuildADSR(AdsrFields *in, u16 *adsr1, u16 *adsr2);
 
 /* MIDI CC91 (Reverb Depth)/98/99/100/101 (NRPN/RPN LSB/MSB) and friends'
  * per-parameter handler, reached only from ContDataEntry (still a stall;
  * see its own report) via a double jump-table dispatch this unit owns
  * (jtbl_80010ED8 outer, jtbl_80010F38 inner). `kind` selects which VagAtr
  * (per program-tone) is fetched/stored; `arg5` is the outer parameter
- * selector (0..22), `arg6` the value byte nearly every arm uses. */
-void Snd_setVabAttr(s16 channel, s16 slot, s16 kind, Scratch_800357B0 scratch,
-                    AdsrRaw_800357B0 resolved, s16 arg5, u8 arg6) {
+ * selector (0..22), `arg6` the value byte nearly every arm uses.
+ * `scratch` and `resolved` arrive by value and serve only as local buffers:
+ * SsUtGetVagAtr refills `scratch` before any arm reads it, and
+ * _SsUtResolveADSR fills `resolved`. */
+void Snd_setVabAttr(s16 channel, s16 slot, s16 kind, VagAtr scratch, AdsrFields resolved, s16 arg5,
+                    u8 arg6) {
     SsUtGetVagAtr(channel, slot, kind, &scratch);
 
     switch (arg5) {
@@ -997,44 +869,44 @@ void Snd_setVabAttr(s16 channel, s16 slot, s16 kind, Scratch_800357B0 scratch,
             new_var = channel;
             switch (arg5) {
                 case 4:
-                    resolved.unkA = 0;
-                    resolved.unk0 = arg6;
+                    resolved.attackMode = 0;
+                    resolved.attackRate = arg6;
                     break;
                 case 5:
-                    resolved.unkA = 1;
-                    resolved.unk0 = arg6;
+                    resolved.attackMode = 1;
+                    resolved.attackRate = arg6;
                     break;
                 case 6:
-                    resolved.unk2 = arg6;
+                    resolved.decayRate = arg6;
                     break;
                 case 7:
-                    resolved.unk4 = arg6;
+                    resolved.sustainLevel = arg6;
                     break;
                 case 8:
-                    resolved.unkC = 0;
-                    resolved.unk6 = arg6;
+                    resolved.sustainMode = 0;
+                    resolved.sustainRate = arg6;
                     break;
                 case 9:
-                    resolved.unkC = 1;
-                    resolved.unk6 = arg6;
+                    resolved.sustainMode = 1;
+                    resolved.sustainRate = arg6;
                     break;
                 case 10:
-                    resolved.unkE = 0;
-                    resolved.unk8 = arg6;
+                    resolved.releaseMode = 0;
+                    resolved.releaseRate = arg6;
                     break;
                 case 11:
-                    resolved.unkE = 1;
-                    resolved.unk8 = arg6;
+                    resolved.releaseMode = 1;
+                    resolved.releaseRate = arg6;
                     break;
                 case 12: {
                     if (arg6 == 0) {
                         /* nothing -- falls to the shared check below */
                     } else if (arg6 < 0x40) {
-                        resolved.unk10 = 0;
+                        resolved.sustainDir = 0;
                         break;
                     }
                     if ((u32)(arg6 - 0x40) < 0x40) {
-                        resolved.unk10 = 1;
+                        resolved.sustainDir = 1;
                     }
                     break;
                 }
