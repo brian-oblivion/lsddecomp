@@ -72,7 +72,7 @@ void Actor__MoveLocalY(Actor *self, s32 val, void *notify) {
  * retail's callee-saved register assignment for `slot`/`extra`
  * (confirmed with a standalone reproducer: inline truncation swaps which
  * of s0/s1 holds which, round 2026-09-04). */
-void Actor__MoveAlongLocalAxis(Actor *self, s16 *axis, s32 val, void *notify, volatile s32 event) {
+void Actor__MoveAlongLocalAxis(Actor *self, s16 *axis, s32 val, void *notify, s32 event) {
     s16 val16 = (s16)val;
     *axis = val16;
     self->lastOffsetValue = val16;

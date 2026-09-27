@@ -110,7 +110,7 @@ void Actor__AddTranslation(Actor *self, LongVec3 *delta);
 void Actor__UpdateTranslation(Actor *self, s32 set, LongVec3 *v);
 void Actor__AddLocalTranslation(Actor *self, s16 *local);
 void Actor__MoveLocalZ(Actor *self, s32 val, void *notify);
-void Actor__MoveAlongLocalAxis(Actor *self, s16 *axis, s32 val, void *notify, volatile s32 event);
+void Actor__MoveAlongLocalAxis(Actor *self, s16 *axis, s32 val, void *notify, s32 event);
 void Actor__MoveLocalX(Actor *self, s32 val, void *notify);
 void Actor__MoveLocalY(Actor *self, s32 val, void *notify);
 void Actor__MoveLocalZOrFindLink(Actor *self, s32 val, void *notify);
