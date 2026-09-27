@@ -16,7 +16,7 @@ extern void *BuildFileName(void *out, void *a1, void *a2, void *a3);
 extern ItemListHandle_3bb8c_j *New_TimImage(void *arg0);
 extern ItemListHandle_3bb8c_j *New_ScreenSprite(ItemListHandle_3bb8c_j *arg0, void *arg1, s32 arg2);
 extern s32 sStrSelect;
-extern s32 D_8008AB1C;
+extern s32 sItemListCardPathPrefix;
 extern s32 D_8008AB24;
 extern s32 gItemListPanelRect;
 extern s32 gItemListPanelPos;
@@ -34,13 +34,13 @@ void ItemList__LoadResources(ItemList_3bb8c_j *self, void *arg1)
         return;
     }
 
-    h = New_TimImage(BuildFileName(local, &sStrSelect, &D_8008AB1C, &D_8008AB24));
+    h = New_TimImage(BuildFileName(local, &sStrSelect, &sItemListCardPathPrefix, &D_8008AB24));
     h->methods->slot78(h);
     self->unk50 = New_ScreenSprite(h, &gItemListPanelRect, 0);
     h->methods->slot4(h);
     self->unk50->methods->slot4C(self->unk50, arg1, &gItemListPanelPos);
 
-    h = New_TimImage(BuildFileName(local, &sItemListStrFontIcon, &D_8008AB1C, &D_8008AB24));
+    h = New_TimImage(BuildFileName(local, &sItemListStrFontIcon, &sItemListCardPathPrefix, &D_8008AB24));
     h->methods->slot78(h);
     self->methods->slot8C(self, arg1, h, self->unk20, self->unk24, self->unk28);
     h->methods->slot4(h);
@@ -72,9 +72,9 @@ deletions, only 28 register differences** (base score 140, purely
 `REGDIFF` penalties). Every mismatching word is the identical instruction
 on a different register:
 
-- Retail: the address of `D_8008AB1C` lives in `$s2`, `D_8008AB24` in
+- Retail: the address of `sItemListCardPathPrefix` lives in `$s2`, `D_8008AB24` in
   `$s1`, and each of the two "handle" values in `$s0` in turn.
-- This body: `D_8008AB1C` lands in `$s1`, `D_8008AB24` in `$s0`, and the
+- This body: `sItemListCardPathPrefix` lands in `$s1`, `D_8008AB24` in `$s0`, and the
   handle in `$s2`.
 
 A clean three-way rotation of the same three long-lived values across
@@ -87,8 +87,8 @@ differently.
 ## What was tried
 
 - Naming the two repeated global addresses as their own locals
-  (`p1 = &D_8008AB1C; p2 = &D_8008AB24;`, reused across both
-  `BuildFileName` calls instead of writing `&D_8008AB1C`/`&D_8008AB24`
+  (`p1 = &sItemListCardPathPrefix; p2 = &D_8008AB24;`, reused across both
+  `BuildFileName` calls instead of writing `&sItemListCardPathPrefix`/`&D_8008AB24`
   twice inline) -- no change at all (identical 75/95, byte-for-byte
   identical diff list). Register allocation is apparently indifferent to
   this particular source-level factoring.
@@ -112,7 +112,7 @@ Given the residue is a THREE-WAY rotation with `self`/`arg1` already
 correct, the lever is most likely in exactly WHICH new value gets
 introduced FIRST after `self`/`arg1` are already live -- try writing the
 FIRST `BuildFileName`/`New_TimImage` pair's result assignment before
-computing `&D_8008AB1C`/`&D_8008AB24` at all (i.e. reorder so the
+computing `&sItemListCardPathPrefix`/`&D_8008AB24` at all (i.e. reorder so the
 call happens before the two address-of expressions are bound to named
 locals, forcing GCC to allocate the handle's register before the two
 addresses' rather than after) -- not yet tried due to time. A longer
@@ -144,7 +144,7 @@ PERMUTATION with zero address drift." Two more attempts, both real-oracle
 verified (`build-and-verify.sh`), both **byte-for-byte identical** to the
 existing 75/95 diff -- not one instruction moved:
 
-1. Named locals `p1 = &D_8008AB1C; p2 = &D_8008AB24;` assigned in
+1. Named locals `p1 = &sItemListCardPathPrefix; p2 = &D_8008AB24;` assigned in
    REVERSED order (`p2` first, then `p1`) immediately before the first
    `BuildFileName` call, hypothesis being that GCC 2.6.3's local-alloc
    assigns pseudo-hard-registers in an order tied to which value is

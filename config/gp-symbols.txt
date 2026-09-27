@@ -40,7 +40,6 @@ D_8008AA7C
 D_8008AA84
 D_8008AA8C
 D_8008AAE0
-D_8008AB1C
 D_8008AB24
 D_8008AB78
 D_8008AB7C
@@ -194,6 +193,7 @@ sCardPathPrefix
 sCdDriveInited
 sDivClipHeight
 sDivClipWidth
+sItemListCardPathPrefix
 sListViewColor
 sListViewSize
 sMcTempFileSuffix
