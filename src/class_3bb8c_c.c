@@ -15,7 +15,7 @@
  * only its allocator and ctor are here, its other methods in
  * class_3bb8c_d.c.
  *
- * Two free functions serve TitleMenu: CheckSaveScoreFlag (called from
+ * Two free functions serve TitleMenu: UpdateFlashbackLock (called from
  * TitleMenu__RefreshMenu) writes the menu's FLASHBACK lock,
  * registrationSlots[1], from two words of the save block; and
  * FormatNumberIntoBuffer (called from the ctor with the current day) writes
@@ -154,7 +154,7 @@ void TitleMenu__TitleMenu(TitleMenu *self, struct DreamSys *dreamSys) {
     ((TitleMenuResetCallFn)self->methods->resetCounters)(self, dreamSys);
 }
 
-void CheckSaveScoreFlag(TitleMenu *self, TaskCoreTarget *target) {
+void UpdateFlashbackLock(TitleMenu *self, TaskCoreTarget *target) {
     DreamSaveBlock *save = (DreamSaveBlock *)self->saveBlock;
     s32 locked = 1;
 

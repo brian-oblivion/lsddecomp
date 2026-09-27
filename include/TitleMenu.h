@@ -33,7 +33,7 @@
  *  - 2 SAVE runs saveToCard, 3 LOAD loadFromCard.
  *  - 5 SHAKE is the one entry with an item list (the target's unk24[5]).
  *  - FLASHBACK starts locked (registrationSlots[1] = 1); refreshMenu clears
- *    the lock through CheckSaveScoreFlag when the save block allows it.
+ *    the lock through UpdateFlashbackLock when the save block allows it.
  * setState(5), the menu becoming active, runs refreshMenu: the save title's
  * text reloaded, FLASHBACK's lock recomputed, the widgets re-attached and
  * SHAKE's cursor set from DreamSys. setState(0xA) cancels, reselects the

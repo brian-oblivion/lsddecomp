@@ -1,4 +1,6 @@
-# CheckSaveScoreFlag
+# UpdateFlashbackLock
+
+> Renamed from `CheckSaveScoreFlag` on 2026-09-27 (tools/rename.py). Address 0x8004d678.
 
 > Renamed from `CheckObj866E8CountFlag` on 2026-09-26 (tools/rename.py). Address 0x8004d678.
 
@@ -18,7 +20,7 @@ result.
 ## The C
 
 ```c
-void CheckSaveScoreFlag(Ctx678_3bb8c_c *ctx, Result678_3bb8c_c *out)
+void UpdateFlashbackLock(Ctx678_3bb8c_c *ctx, Result678_3bb8c_c *out)
 {
     Obj866E8 *target = ctx->target;
     s32 flag = 1;
@@ -43,7 +45,7 @@ void CheckSaveScoreFlag(Ctx678_3bb8c_c *ctx, Result678_3bb8c_c *out)
 
 ## New types: Ctx678_3bb8c_c / Result678_3bb8c_c
 
-`CheckSaveScoreFlag`'s first argument is NOT `Obj866E8` itself -- it is a
+`UpdateFlashbackLock`'s first argument is NOT `Obj866E8` itself -- it is a
 larger, unrelated caller-side struct (only visible from its one caller,
 `TitleMenu__RefreshMenu`, which reads its own fields at +0x4C/+0x58/+0xA4/+0xB0
 around the call) whose own +0x0BC field is a pointer to the `Obj866E8`
@@ -104,7 +106,7 @@ before ever reading it:
 ```
 
 Two real arguments, exactly as the definition
-(`void CheckSaveScoreFlag(Ctx678_3bb8c_c *ctx, Result678_3bb8c_c *out)`) says.
+(`void UpdateFlashbackLock(Ctx678_3bb8c_c *ctx, Result678_3bb8c_c *out)`) says.
 `$a2` is a local flag, not an argument.
 
 **Why the extern must keep the third parameter.** `TitleMenu__RefreshMenu`'s call site
@@ -113,7 +115,7 @@ loads it, and retail emits that load:
 ```
 8004de70:  lw    a1,76(s0)
 8004de74:  lw    a2,164(s0)       <- the dead 3rd argument, in retail
-8004de78:  jal   8004d678 <CheckSaveScoreFlag>
+8004de78:  jal   8004d678 <UpdateFlashbackLock>
 ```
 
 `self->unkA4` is a memory load, not a value already in `$a2`, so this is
@@ -127,7 +129,7 @@ added to `src/class_3bb8c_d.c:219`. Oracle green.
 
 ## Naming
 
-**CheckSaveScoreFlag** -- tier B. Free function (not a vtable method --
+**UpdateFlashbackLock** -- tier B. Free function (not a vtable method --
 called directly by `jal` from the still-uncarved `TitleMenu__RefreshMenu`), so named
 `VerbNoun`. Mechanics are fully evident: reaches an `Obj866E8` through a
 caller-side context struct, compares one field (`unkC`) against a large
@@ -144,7 +146,7 @@ without stronger cause.
 
 ## Track 4 (2026-09-26, round 89)
 
-Renamed `CheckObj866E8CountFlag` -> `CheckSaveScoreFlag` with tools/rename.py
+Renamed `CheckObj866E8CountFlag` -> `UpdateFlashbackLock` with tools/rename.py
 while unifying StageMap (include/StageMap.h). The old name claimed the
 object it reads is a StageMap; it is not. Its one caller,
 `TitleMenu__RefreshMenu`, passes its own `self` as `ctx`, so

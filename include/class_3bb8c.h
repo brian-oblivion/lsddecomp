@@ -23,7 +23,7 @@
  * What is here, in that order: StageMap's lookup tables and SplitCoord2,
  * the view of a slot's origin its methods read; TitleMenu's data (menu
  * description, paths, the save title's buffers, the colour cycle) and
- * DreamSaveBlock, the save-block view CheckSaveScoreFlag reads; TaskObjF's
+ * DreamSaveBlock, the save-block view UpdateFlashbackLock reads; TaskObjF's
  * event table, the memory-card device names (McDevicePath) and helpers;
  * ObjM's StyleConfig record and the helpers its methods call.
  *
@@ -175,7 +175,7 @@ extern void FormatNumberIntoBuffer(s32 arg0);
 /*
  * The save block DreamSys's getSaveBlock returns (TitleMenu::saveBlock):
  * DreamSys from `saveMagic` (+0x178) on, so each field here is the DreamSys
- * field (include/DreamSys.h) 0x178 bytes further in. CheckSaveScoreFlag
+ * field (include/DreamSys.h) 0x178 bytes further in. UpdateFlashbackLock
  * reads the two below.
  */
 typedef struct DreamSaveBlock {

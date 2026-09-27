@@ -46,8 +46,8 @@ void TitleMenu__TitleMenu(TitleMenu *self, void *dreamSys)
 
 All new declarations -- this class (`TitleMenu`) had no prior C-level
 presence anywhere in the project. Placed as one new block right before the
-`Ctx678_3bb8c_c`/`CheckSaveScoreFlag` section, since ROM order puts
-`New_TitleMenu`/`TitleMenu__TitleMenu` right before `CheckSaveScoreFlag`.
+`Ctx678_3bb8c_c`/`UpdateFlashbackLock` section, since ROM order puts
+`New_TitleMenu`/`TitleMenu__TitleMenu` right before `UpdateFlashbackLock`.
 
 - `TitleMenu`/`TitleMenuMethods`: `ctor` (+0x008, this function),
   `slot40` (+0x040, this function's own last call), `slotD8` (+0x0D8, this
@@ -162,7 +162,7 @@ data the class itself reads:
 - refreshViewValue stores slotCounts[5] (SHAKE, the one slot with an item
   list, unk24[5] = D_80086CA8) through getSetScreenShake;
 - registrationSlots D_80086CDC = {0, 1, 0, ...}: FLASHBACK starts locked, and
-  CheckSaveScoreFlag (called from RefreshMenu with `self->target`) writes
+  UpdateFlashbackLock (called from RefreshMenu with `self->target`) writes
   registrationSlots[1];
 - the TextRow shows gSaveTitle's buffer, 0x8001149C, SJIS "LSD   Day001",
   the memory-card save title; FormatNumberIntoBuffer writes the day at +0x12.
