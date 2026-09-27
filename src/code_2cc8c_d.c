@@ -266,8 +266,7 @@ void Viewport__Update(Viewport *self) {
     GsSetLightMode(self->lightMode);
 
     if (self->lightMode == 1 || self->lightMode == 3) {
-        u8 *rawBytes = (u8 *)&self->farColor;
-        SetFarColor(rawBytes[0], rawBytes[1], rawBytes[2]);
+        SetFarColor((u8)self->farColor.r, (u8)self->farColor.g, (u8)self->farColor.b);
         SetFogNear(self->fogNear, self->projH);
     }
 
@@ -277,7 +276,7 @@ void Viewport__Update(Viewport *self) {
     self->zDiv = (u32)(self->farZ - self->nearZ) / (u32)(1 << self->otLength) + 1;
 
     idx = self->otIndex;
-    GsSetWorkBase((unsigned char *)self->workBase[idx]);
+    GsSetWorkBase((PACKET *)self->workBase[idx]);
 
     idx = self->otIndex;
     GsClearOt(0, 0, (GsOT *)self->ot[idx]);
@@ -296,7 +295,6 @@ void Viewport__Update(Viewport *self) {
  * again on buffer 0 with unkB4); then flips otIndex to the other half. */
 void Viewport__Flip(Viewport *self) {
     s32 idx;
-    u8 *rawBytes;
 
     if (self->otReady == 0) {
         return;
@@ -317,8 +315,7 @@ void Viewport__Flip(Viewport *self) {
     }
 
     idx = self->otIndex;
-    rawBytes = (u8 *)&self->clearColor;
-    GsSortClear(rawBytes[0], rawBytes[1], rawBytes[2], (GsOT *)self->ot[idx]);
+    GsSortClear(self->clearColor.r, self->clearColor.g, self->clearColor.b, (GsOT *)self->ot[idx]);
 
     idx = self->otIndex;
     GsDrawOt((GsOT *)self->ot[idx]);
