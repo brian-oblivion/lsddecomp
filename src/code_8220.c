@@ -1,57 +1,44 @@
 #include "common.h"
 #include "code_8220.h"
+#include <malloc.h>
 
-/* This unit holds two unrelated things, decomp-adjacent by ROM address
- * only:
+/* Two things that share this file:
  *
- *  - The `BMemPMgr` pool allocator: `BMemPMgrInit` carves a block out of
- *    the Psy-Q heap (`malloc`) and hands it to `SetupBMemPMgrFreeList`,
- *    which threads it onto a single doubly-linked free list of
- *    `BMemBlockHdr` nodes. `BMemPMgrAlloc`/`BMemPMgrFree` split and
- *    coalesce blocks off that list; both resolve their target pool
- *    through the global `gDefaultBMemPMgr` (set by `SetDefaultBMemPMgr`)
- *    when the caller doesn't name one directly. It is the game's
- *    general-purpose small-object allocator -- called from a wide
- *    cross-section of units, not just this one.
- *  - `BasicClass`, the game's hand-rolled root class
- *    (`docs/research/class-framework.md`; full design in the
- *    `BasicClass`/`BasicClassMethods` comment in `code_8220.h`). Its
- *    fourteen virtual methods live here; `PushBasicClassListNode`/
- *    `RemoveBasicClassListNode` are the pool-backed list primitives both
- *    of its linked lists (`children`, `parentRefs`) share.
- *
- * See `code_8220_b`/`code_8220_c` for this unit's siblings (GTE/GPU
- * primitive code, unrelated to either of the above).
+ *  - The BMemPMgr pool allocator, the game's general-purpose allocator.
+ *    BMemPMgrInit mallocs one area, a BMemPMgr header followed by the pool's
+ *    blocks (the layout is in code_8220.h), and SetupBMemPMgrFreeList makes
+ *    the whole pool one free block. BMemPMgrAlloc and BMemPMgrFree split and
+ *    merge blocks on the pool's free list. SetupBMemPMgrFreeList,
+ *    BMemPMgrAlloc and BMemPMgrFree work on gDefaultBMemPMgr
+ *    (SetDefaultBMemPMgr) and fall back to their pool argument only while
+ *    no default is set.
+ *  - Eleven of BasicClass's methods (include/BasicClass.h), and
+ *    PushBasicClassListNode/RemoveBasicClassListNode, the pool-backed list
+ *    primitives its `children` and `parentRefs` lists share. The rest of its
+ *    methods are in code_8220_b.c.
  */
 
-/* Psy-Q heap, linked from Sony's own object (`_obj/malloc`) rather than
- * decompiled, so these carry Sony's exported names. The real prototypes are
- * in <malloc.h>; they are restated here rather than included because no unit
- * in this project pulls in the SDK headers yet. Local and not in
- * code_8220.h deliberately -- that header is shared with five other units,
- * and a second `free`/`malloc` declaration there would collide with
- * <malloc.h> in whichever of them includes it first. */
-extern void *malloc(unsigned int size);
-extern void free(void *ptr);
-
-/* Psy-Q printf (libc2/printf). Variadic, and declared here with the argument
- * shape THIS call site passes -- the project's four other printf call sites
- * each declare their own, which is why no single declaration is shared. */
+/* Psy-Q printf, declared with the argument shape this call site passes:
+ * it is variadic, and each unit that calls it declares its own. */
 extern void printf(const char *fmt, void *arg1, s32 arg2);
+
+/* "bMemPMgr = %p, poolSize = %ld in BMemPMgrInit\n", BMemPMgrInit's
+ * malloc-failure message. */
+extern const char sBMemPMgrInitFailFmt[];
 
 void *BMemPMgrInit(s32 poolSize) {
     BMemPMgr *pool;
 
-    if ((u32)poolSize < 0x400) {
-        poolSize = 0x400;
+    if ((u32)poolSize < BMEMPMGR_MIN_POOL_SIZE) {
+        poolSize = BMEMPMGR_MIN_POOL_SIZE;
     }
-    pool = malloc(poolSize + 0x20);
+    pool = malloc(BMEMPMGR_HEADER_SIZE + poolSize + BMEMPMGR_SENTINEL_SIZE);
     if (pool != NULL) {
-        pool->freeListHead = (u8 *)pool + 0x1C;
+        pool->firstBlock = (u8 *)pool + BMEMPMGR_HEADER_SIZE;
         pool->poolSize = poolSize;
         SetupBMemPMgrFreeList(pool);
     } else {
-        printf(D_8001028C, NULL, poolSize);
+        printf(sBMemPMgrInitFailFmt, NULL, poolSize);
     }
     return pool;
 }
@@ -67,34 +54,41 @@ void FreeMem(void *ptr) {
 void SetupBMemPMgrFreeList(BMemPMgr *pool) {
     BMemPMgr *mgr;
     BMemBlockHdr *header;
-    u8 *end;
+    BMemBlockHdr *sentinel;
 
     mgr = gDefaultBMemPMgr;
     if (mgr == NULL) {
         mgr = pool;
     }
-    mgr->unk10 = 1;
-    header = mgr->freeListHead;
-    mgr->freeListStart = header;
-    mgr->freeListEnd = header;
-    header->sizeAndFlags = mgr->poolSize | 0x40000000;
-    mgr->freeListStart->prev = NULL;
-    mgr->freeListEnd->next = NULL;
-    end = (u8 *)header + (header->sizeAndFlags & 0xFFFFFFF);
-    *(BMemBlockHdr **)(end - 4) = header;
-    *(u32 *)end = 0x80000000;
+    mgr->initialized = 1;
+    header = mgr->firstBlock;
+    mgr->freeListTail = header;
+    mgr->freeListHead = header;
+    header->sizeAndFlags = mgr->poolSize | BMEM_FREE;
+    mgr->freeListTail->prev = NULL;
+    mgr->freeListHead->next = NULL;
+    sentinel = BMEM_NEXT_BLOCK(header);
+    BMEM_PREV_FOOTER(sentinel) = header;
+    sentinel->sizeAndFlags = BMEM_PREV_FREE;
 }
 
+/* First fit, searching the free list from its tail. `size` is rounded up to
+ * a word and to BMEM_MIN_PAYLOAD; a block that would leave less than
+ * BMEM_MIN_BLOCK over is taken whole, otherwise its top is split off as a new
+ * free block that replaces it on the list. Returns the payload, or NULL.
+ *
+ * Defined K&R so the body can read the second argument that callers never
+ * pass (code_8220.h, at the declaration). */
 /* clang-format off */
 void *BMemPMgrAlloc(size, pool)
     s32 size;
-    void *pool;
+    BMemPMgr *pool;
 {
     /* clang-format on */
     BMemPMgr *mgr;
     BMemBlockHdr *cursor;
-    BMemBlockHdr *result;
-    BMemBlockHdr *remainder;
+    void *result;
+    BMemBlockHdr *nextBlock;
     BMemBlockHdr *unused;
     u32 blockSize;
     u32 padded;
@@ -107,22 +101,25 @@ void *BMemPMgrAlloc(size, pool)
     }
     if (size != 0) {
         if (size & 0x3) {
+            /* MATCHING: one expression reassociates the + 4 into the subtract. */
             padded = size + 4;
             size = padded - (size & 0x3);
         }
-        if ((u32)size < 0xC) {
-            size = 0xC;
+        if ((u32)size < BMEM_MIN_PAYLOAD) {
+            size = BMEM_MIN_PAYLOAD;
         }
-        cursor = mgr->freeListStart;
-        size += 4;
+        cursor = mgr->freeListTail;
+        size += BMEM_HEADER_SIZE;
         while (cursor != NULL) {
-            blockSize = cursor->sizeAndFlags & 0xFFFFFFF;
+            blockSize = BMEM_BLOCK_SIZE(cursor);
             if (blockSize >= (u32)size) {
-                cursor->sizeAndFlags &= 0xBFFFFFFF;
-                result = (BMemBlockHdr *)((u8 *)cursor + 4);
-                if (blockSize < (u32)size + 0x10) {
-                    remainder = (BMemBlockHdr *)((u8 *)cursor + (cursor->sizeAndFlags & 0xFFFFFFF));
-                    remainder->sizeAndFlags &= 0x7FFFFFFF;
+                cursor->sizeAndFlags &= ~BMEM_FREE;
+                result = BMEM_PAYLOAD(cursor);
+                if (blockSize < (u32)size + BMEM_MIN_BLOCK) {
+                    /* MATCHING: nextBlock is one variable in both arms, or it takes the wrong register. */
+                    nextBlock = BMEM_NEXT_BLOCK(cursor);
+                    nextBlock->sizeAndFlags &= ~BMEM_PREV_FREE;
+                    /* MATCHING: every unlink scopes its own n/p; shared locals take other registers. */
                     {
                         BMemBlockHdr *n = cursor->next;
                         BMemBlockHdr *p = cursor->prev;
@@ -130,46 +127,46 @@ void *BMemPMgrAlloc(size, pool)
                         if (p != NULL) {
                             p->next = n;
                         } else {
-                            mgr->freeListEnd = n;
+                            mgr->freeListHead = n;
                         }
                     }
                     {
                         BMemBlockHdr *n = cursor->next;
                         BMemBlockHdr *p;
 
+                        /* MATCHING: the dead store to `unused` picks the store's register. */
                         p = unused = cursor->prev;
                         if (n != NULL) {
                             n->prev = p;
                         } else {
-                            mgr->freeListStart = p;
+                            mgr->freeListTail = p;
                         }
                     }
                 } else {
-                    cursor->sizeAndFlags = (cursor->sizeAndFlags & 0xF0000000) | (u32)size;
-                    remainder = (BMemBlockHdr *)((u8 *)cursor + (cursor->sizeAndFlags & 0xFFFFFFF));
-                    remainder->sizeAndFlags = (blockSize - (u32)size) | 0x40000000;
-                    remainder->prev = cursor->prev;
-                    remainder->next = cursor->next;
+                    cursor->sizeAndFlags = (cursor->sizeAndFlags & BMEM_FLAG_MASK) | (u32)size;
+                    nextBlock = BMEM_NEXT_BLOCK(cursor);
+                    nextBlock->sizeAndFlags = (blockSize - (u32)size) | BMEM_FREE;
+                    nextBlock->prev = cursor->prev;
+                    nextBlock->next = cursor->next;
                     {
                         BMemBlockHdr *p = cursor->prev;
 
                         if (p != NULL) {
-                            p->next = remainder;
+                            p->next = nextBlock;
                         } else {
-                            mgr->freeListEnd = remainder;
+                            mgr->freeListHead = nextBlock;
                         }
                     }
                     {
                         BMemBlockHdr *n = cursor->next;
 
                         if (n != NULL) {
-                            n->prev = remainder;
+                            n->prev = nextBlock;
                         } else {
-                            mgr->freeListStart = remainder;
+                            mgr->freeListTail = nextBlock;
                         }
                     }
-                    *(BMemBlockHdr **)((u8 *)remainder + (remainder->sizeAndFlags & 0xFFFFFFF) - 4) =
-                        remainder;
+                    BMEM_FOOTER(nextBlock) = nextBlock;
                 }
                 break;
             }
@@ -180,10 +177,13 @@ void *BMemPMgrAlloc(size, pool)
     return result;
 }
 
+/* Merges the block with a free lower neighbour (found through that block's
+ * footer) and a free upper neighbour, then appends the result to the free
+ * list's tail. K&R for the same reason as BMemPMgrAlloc. */
 /* clang-format off */
 void *BMemPMgrFree(ptr, pool)
     void *ptr;
-    void *pool;
+    BMemPMgr *pool;
 {
     /* clang-format on */
     BMemPMgr *mgr;
@@ -197,15 +197,16 @@ void *BMemPMgrFree(ptr, pool)
         mgr = pool;
     }
     if (ptr != NULL) {
-        header = (BMemBlockHdr *)((u8 *)ptr - 4);
-        next = (BMemBlockHdr *)((u8 *)header + (header->sizeAndFlags & 0xFFFFFFF));
-        nextFree = next->sizeAndFlags & 0x40000000;
-        if ((s32)header->sizeAndFlags < 0) {
-            u32 freedSize = header->sizeAndFlags & 0xFFFFFFF;
+        header = BMEM_HEADER_OF(ptr);
+        next = BMEM_NEXT_BLOCK(header);
+        nextFree = next->sizeAndFlags & BMEM_FREE;
+        if (header->sizeAndFlags & BMEM_PREV_FREE) {
+            u32 freedSize = BMEM_BLOCK_SIZE(header);
 
-            header = *(BMemBlockHdr **)((u8 *)ptr - 8);
-            header->sizeAndFlags = (header->sizeAndFlags & 0xF0000000) |
-                                   (freedSize + (header->sizeAndFlags & 0xFFFFFFF));
+            header = BMEM_PREV_FOOTER(header);
+            header->sizeAndFlags =
+                (header->sizeAndFlags & BMEM_FLAG_MASK) | (freedSize + BMEM_BLOCK_SIZE(header));
+            /* MATCHING: every unlink scopes its own n/p; shared locals take other registers. */
             {
                 BMemBlockHdr *n = header->next;
                 BMemBlockHdr *p = header->prev;
@@ -213,7 +214,7 @@ void *BMemPMgrFree(ptr, pool)
                 if (p != NULL) {
                     p->next = n;
                 } else {
-                    mgr->freeListEnd = n;
+                    mgr->freeListHead = n;
                 }
             }
             {
@@ -223,15 +224,15 @@ void *BMemPMgrFree(ptr, pool)
                 if (n != NULL) {
                     n->prev = p;
                 } else {
-                    mgr->freeListStart = p;
+                    mgr->freeListTail = p;
                 }
             }
         }
         if (nextFree) {
-            u32 nextSize = next->sizeAndFlags & 0xFFFFFFF;
+            u32 nextSize = BMEM_BLOCK_SIZE(next);
 
-            header->sizeAndFlags = (header->sizeAndFlags & 0xF0000000) |
-                                   (nextSize + (header->sizeAndFlags & 0xFFFFFFF));
+            header->sizeAndFlags =
+                (header->sizeAndFlags & BMEM_FLAG_MASK) | (nextSize + BMEM_BLOCK_SIZE(header));
             {
                 BMemBlockHdr *n = next->next;
                 BMemBlockHdr *p = next->prev;
@@ -239,44 +240,40 @@ void *BMemPMgrFree(ptr, pool)
                 if (p != NULL) {
                     p->next = n;
                 } else {
-                    mgr->freeListEnd = n;
+                    mgr->freeListHead = n;
                 }
             }
             {
                 BMemBlockHdr *p = next->prev;
                 BMemBlockHdr *n = next->next;
 
-                /* nextSize is dead by this point (its one real use, the
-                 * sizeAndFlags fold above, already happened); reusing it
-                 * to hold the branch condition here -- instead of a fresh
-                 * anonymous temporary -- is what puts this comparison in
-                 * the register retail uses. Found by permuter search. */
+                /* MATCHING: reusing the dead nextSize for the test picks its register. */
                 nextSize = n != NULL;
                 if (nextSize) {
                     n->prev = p;
                 } else {
-                    mgr->freeListStart = p;
+                    mgr->freeListTail = p;
                 }
             }
-            next = (BMemBlockHdr *)((u8 *)header + (header->sizeAndFlags & 0xFFFFFFF));
+            next = BMEM_NEXT_BLOCK(header);
         }
-        header->prev = mgr->freeListStart;
-        mgr->freeListStart = header;
+        header->prev = mgr->freeListTail;
+        mgr->freeListTail = header;
         header->next = NULL;
         if (header->prev != NULL) {
             header->prev->next = header;
         } else {
-            mgr->freeListEnd = header;
+            mgr->freeListHead = header;
         }
-        *(BMemBlockHdr **)((u8 *)next - 4) = header;
-        header->sizeAndFlags |= 0x40000000;
-        next->sizeAndFlags |= 0x80000000;
+        BMEM_PREV_FOOTER(next) = header;
+        header->sizeAndFlags |= BMEM_FREE;
+        next->sizeAndFlags |= BMEM_PREV_FREE;
     }
     SetBMemPMgrBusy(0);
     return NULL;
 }
 
-void func_80017EA8(void) {}
+void NoOp5(void) {}
 
 void *BasicClass__Release(BasicClass *self) {
     self->methods->finalize(self);
@@ -291,7 +288,7 @@ void BasicClass__BasicClass(BasicClass *self) {
 }
 
 void BasicClass__Finalize(BasicClass *self) {
-    self->methods->notifyParents(self, 1);
+    self->methods->notifyParents(self, BASICCLASS_EVENT_FINALIZED);
     self->methods->removeAllChildren(self);
     self->methods->clearParentRefs(self);
 }
@@ -312,6 +309,8 @@ void BasicClass__RemoveAllChildren(BasicClass *self) {
     BasicClass **childPtr;
     BasicClassListNode *cursor;
 
+    /* MATCHING: the named childPtr and the if/do-while with comma tests keep
+     * &child in one saved register and the loop body first. */
     childPtr = &child;
     cursor = self->children;
     if (GetNextBasicClass(childPtr, &cursor), child != NULL) {
@@ -352,7 +351,7 @@ s32 PushBasicClassListNode(BasicClassListNode **head, BasicClass *value) {
     BasicClassListNode *node;
     BasicClassListNode *oldHead;
 
-    node = BMemPMgrAlloc(0x8);
+    node = BMemPMgrAlloc(sizeof(BasicClassListNode));
     if (node != NULL) {
         oldHead = *head;
         node->value = value;

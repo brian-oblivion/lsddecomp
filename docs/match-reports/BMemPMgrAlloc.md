@@ -751,3 +751,34 @@ encoding. Called from a wide cross-section of units (`code_171e0`,
 `code_179d8_*`, `code_2c054`, `code_2cc8c_*`, `code_55dd4`, `code_d294`,
 `main`, plus this unit's own `PushBasicClassListNode`) — confirming it is
 the game's general small-object pool allocator, not something narrower.
+
+## Polish (round 97, runner delta)
+
+Zero bytes changed; whole-image SHA1 green after each step.
+
+- Pool parameter typed `BMemPMgr *`, `result` typed `void *`; `remainder` ->
+  `nextBlock`, since it is the block after `cursor` in both arms (the
+  split-off remainder in one, the neighbour whose `BMEM_PREV_FREE` is cleared
+  in the other). The single-variable requirement from round 73 is kept as a
+  `/* MATCHING: */` line, as are the `padded` temporary, the per-unlink
+  scoped `n`/`p` and the `unused` dead store.
+- Literals: 0xC -> `BMEM_MIN_PAYLOAD` (12), 4 -> `BMEM_HEADER_SIZE`,
+  0x10 -> `BMEM_MIN_BLOCK` (16: the smallest block that can be free, header
+  word plus two links plus footer), 0xFFFFFFF -> `BMEM_BLOCK_SIZE()`,
+  0xBFFFFFFF -> `~BMEM_FREE`, 0x7FFFFFFF -> `~BMEM_PREV_FREE`,
+  0xF0000000 -> `BMEM_FLAG_MASK`, 0x40000000 -> `BMEM_FREE`. The payload,
+  next-block and footer arithmetic go through `BMEM_PAYLOAD`,
+  `BMEM_NEXT_BLOCK`, `BMEM_FOOTER`.
+- Fields (struct `BMemPMgr`): `freeListStart` -> `freeListTail`,
+  `freeListEnd` -> `freeListHead`. Evidence: the unlink code sets +0xC when
+  the node has no `prev` and +0x8 when it has no `next`, and BMemPMgrFree
+  appends at +0x8, so +0xC is the head and +0x8 the tail. This function
+  searches from the tail backward through `prev`.
+
+The constants are defined, with their evidence, in `include/code_8220.h`:
+`BMEM_SIZE_MASK` 0x0FFFFFFF and `BMEM_FLAG_MASK` 0xF0000000 split
+`sizeAndFlags`; `BMEM_FREE` 0x40000000 is set on every block put on the free
+list (SetupBMemPMgrFreeList, BMemPMgrFree, the split remainder) and cleared
+when BMemPMgrAlloc takes one; `BMEM_PREV_FREE` 0x80000000 is set on the block
+above a freed one and on the sentinel, cleared on the block above an allocated
+one, and tested by BMemPMgrFree before it reads the lower neighbour's footer.

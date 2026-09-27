@@ -11,7 +11,7 @@ initializes the pool header (`freeListHead = pool + 0x1C`, `poolSize`) and
 hands off to `SetupBMemPMgrFreeList` (gp_rel-blocked, see its own report) to build
 the initial single free block covering the rest of the allocation. On
 allocation failure, logs an error via the Psy-Q printf wrapper
-(`func_80012C20`) using the rodata format string at `D_8001028C`
+(`func_80012C20`) using the rodata format string at `sBMemPMgrInitFailFmt`
 (`"bMemPMgr = %p, poolSize = %ld in BMemPMgrInit\n"`) and returns `NULL`.
 
 This confirms the unit's premise from the runner prompt: the format string
@@ -34,11 +34,20 @@ void *BMemPMgrInit(s32 poolSize)
         pool->poolSize = poolSize;
         SetupBMemPMgrFreeList(pool);
     } else {
-        func_80012C20(D_8001028C, NULL, poolSize);
+        func_80012C20(sBMemPMgrInitFailFmt, NULL, poolSize);
     }
     return pool;
 }
 ```
+
+## Naming (round 97)
+
+- `D_8001028C` -> `sBMemPMgrInitFailFmt`, tier A (`tools/rename.py`,
+  runner delta). The rodata string is
+  `"bMemPMgr = %p, poolSize = %ld in BMemPMgrInit\n"`, and its one reader is
+  this function's malloc-failed branch. `s` prefix: unit-static data, read
+  by no other unit (precedent `sStrComInput`; `gCdFileNotFoundFmt` is the
+  same shape of name for a string another unit shares).
 
 ## Three levers, each confirmed by objdump before moving to the next
 
@@ -139,3 +148,18 @@ the same idiom `include/code_8220.h` uses for `BMemPMgrAlloc`/`BMemPMgrFree`.
 
 **Declaration sites changed:** none (arity unchanged). `/* arity-ok: ... */`
 added to `src/main.c:24`. Oracle green after the edit.
+
+## Polish (round 97, runner delta)
+
+Zero bytes changed.
+
+- 0x400 -> `BMEMPMGR_MIN_POOL_SIZE` (1024). 0x20 ->
+  `BMEMPMGR_HEADER_SIZE + BMEMPMGR_SENTINEL_SIZE` (28 + 4): the malloc'd area
+  is the pool header, `poolSize` bytes of blocks, and the sentinel word
+  SetupBMemPMgrFreeList writes at `firstBlock + poolSize`. 0x1C ->
+  `BMEMPMGR_HEADER_SIZE`: where the first block starts, 8 bytes past the
+  fields any code touches (the struct stays 0x14; its size was not moved).
+- The Psy-Q `malloc`/`free` declarations are now `#include <malloc.h>`
+  (Sony's header, `include/psyq/`), byte-identical; `printf` stays local.
+- `pool->firstBlock = (u8 *)pool + BMEMPMGR_HEADER_SIZE` is the unit's one
+  remaining `rawoff` hit, left: the area has no struct past the header.
