@@ -118,7 +118,7 @@ extern const char sSaveIconTimPath[];
 
 /* The two 320 x 240 display buffers, stacked in VRAM at y 0 and y 240:
  * TitleMenu__OnDeinit clears each with the DrawSystem's clearImage. */
-extern DrawRect D_80086DAC[2];
+extern DrawRect sDisplayBufferRects[2];
 
 /* TitleMenu__AttachSaveTitle's offset for the name field's attachToParent
  * (TextRow +0x04C), passed as a LongVec3 (the words are -4, -23, ...). */

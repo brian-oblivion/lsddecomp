@@ -50,7 +50,7 @@ void TitleMenu__OnDeinit(TitleMenu *self) {
     DrawRect *rect;
 
     i = 0;
-    rect = D_80086DAC;
+    rect = sDisplayBufferRects;
     for (; i < 2; i++) {
         ((DrawSystem *)self->initArgs->drawSystem)
             ->methods->clearImage((DrawSystem *)self->initArgs->drawSystem, self->unk93, rect);
