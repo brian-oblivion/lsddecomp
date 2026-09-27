@@ -43,7 +43,7 @@ PlacementGrid *New_PlacementGrid(char *name) {
     PlacementGrid *self;
     PlacementGridMethods *table;
 
-    self = BMemPMgrAlloc(0x34);
+    self = BMemPMgrAlloc(sizeof(PlacementGrid));
     if (self != NULL) {
         table = GetPlacementGridMethods();
         table->ctor(self, name);
@@ -78,7 +78,7 @@ s32 PlacementGrid__ResolveEntry(PlacementGrid *self, CellPlacement *placement, s
     s32 col;
     s32 model;
 
-    if (cell < 0x190) {
+    if (cell < STAGE_SLOT_LATTICE_CELLS) {
         if (placement->next != 0) {
             rec = (PlacementGridRecord *)((u8 *)self->buffer + placement->next);
             placement->chained = 1;
@@ -88,12 +88,12 @@ s32 PlacementGrid__ResolveEntry(PlacementGrid *self, CellPlacement *placement, s
         }
         placement->next = rec->next;
         if (rec->present != 0) {
-            row = cell / 20;
-            col = cell - row * 20;
-            placement->x = (col << 11) + 0x400;
-            placement->y = (s32)rec->y << 11;
-            placement->z = (row << 11) + 0x400;
-            placement->rotY = rec->rotY << 10;
+            row = cell / STAGE_CHUNK_CELLS;
+            col = cell - row * STAGE_CHUNK_CELLS;
+            placement->x = (col << STAGE_CELL_SHIFT) + STAGE_CELL_SIZE / 2;
+            placement->y = (s32)rec->y << STAGE_CELL_SHIFT;
+            placement->z = (row << STAGE_CELL_SHIFT) + STAGE_CELL_SIZE / 2;
+            placement->rotY = rec->rotY * ANGLE_DEG(90);
             placement->unk2C = rec->unk1;
             placement->cellFlags = rec->cellFlags;
             model = rec->model;
@@ -119,11 +119,11 @@ void VabDriver__VabDriver(void) {}
 void VabDriver__Destroy(void) {}
 
 void VabDriver__NoOpSlot40(void) {
-    char unused[0x40];
+    char unused[64];
 }
 
 void VabDriver__Open(void) {
-    char unused[0x40];
+    char unused[64];
 }
 
 void VabDriver__Close(void) {}
