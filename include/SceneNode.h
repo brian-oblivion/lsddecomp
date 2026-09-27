@@ -41,10 +41,10 @@
  *
  * Three member types are libgs's and are parked under project names:
  * SceneNodeSub14 is GsCOORDINATE2, SceneNodeSub44 GsCOORD2PARAM and
- * S16Quad_d294 SVECTOR, offset for offset (include/code_d294.h). Using
- * Sony's needs <libgs.h> here, and 24 of the units that include this header
- * do not yet compile beside it: their headers declare Sony names their own
- * way (`python3 tools/sonyheaders.py`).
+ * S16Quad_d294 SVECTOR, offset for offset (the table is in
+ * docs/match-reports/SceneNode__SceneNode.md). Using Sony's needs <libgs.h>
+ * here, which waits until every unit that includes this header compiles
+ * beside it (`python3 tools/sonyheaders.py`).
  */
 
 typedef struct SceneNode SceneNode;

@@ -42,8 +42,9 @@ typedef struct SpriteRgb SpriteRgb;
 typedef struct SpriteRect SpriteRect;
 typedef struct SpriteGs SpriteGs;
 
-/* The GsIMAGE a TimImage describes its TIM into (defined in include/TimImage.h);
- * only its address is kept here. */
+/* The GsIMAGE a TimImage describes its TIM into: Sony's untagged typedef
+ * (<libgs.h>), spelled by tag until this header takes Sony's headers
+ * (`python3 tools/sonyheaders.py`); only its address is kept here. */
 struct GsIMAGE;
 
 /* A 3-byte colour. All-s8 members give it alignment 1, which is what makes

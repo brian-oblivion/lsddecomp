@@ -6,6 +6,70 @@ stale, prose elsewhere is not.
 
 ---
 
+## 2026-09-27 — round 95: eight Sony-collision files cleared, six units polished, first region renamed (premium head, plan revision 33)
+
+Premium head (Opus 5.5), cap 5, slots refilled as runners reported: 14
+jobs, all Opus, none sent back. Gate 0 green.
+
+- **Track 6, seven jobs** (three names sampled each). Sony's headers in:
+  `class_16334.h` (libetc; the Pad ctor's `void *arg1` is Sony's
+  `PadInit(int mode)`), `TileAtlas.h`/`TileMap.h`/`TimImage.h` as ONE job
+  (alpha found code_33808 includes all three, so none lands green alone;
+  layouts checked field by field against libgs.h), `code_d294.h` (its
+  three types were `TmdBox`/`TmdHull`), code_2cc8c_d (the last blocker of
+  `ViewportOt`, now READY) and code_179d8_j_b (libsnd's `VagAtr`/`ProgAtr`/
+  `VabHdr`, pinned `_svm_*`; new `include/SsScore.h` for `_ss_score`'s
+  0xAC = `SS_SEQ_TABSIZ` record). Types: code_2864's `DrawNode` view
+  retired for SceneNode and its subclasses by class id; code_fa50's eight
+  (`TmdModel`, `TmdObject`, Sony's `TMD_P_TF3`, `TmdHull`; `BoxCorners`,
+  `BoxList`, `Ray`, `VectorOrBox`); code_33808's seven (`ResourceSource`,
+  `ModelDataHeader`, `TimBlockHeader`, ...).
+- **Track 7, six units marked** (five samples each): Entity_f, class_3bb8c
+  (`STAGE_*` geometry, `ChunkNeighbour`, `StageMapEvent`), class_3bb8c_l
+  (`PadButton` in libetc's mask order, checked word by word against
+  `D_80010764`), code_2cc8c_d (`FrameClockEvent`), class_3bb8c_g and
+  class_3bb8c_f. Both of the last two added `TaskObjFState` to
+  `TaskObjF.h` after the head gave it to charlie; git merged the second
+  copy without a conflict (different hunks), so the duplicate showed only
+  on reading the header. Charlie's kept; echo's differed in one member.
+- **Track 8, one region:** code_fa50 to `src/TmdModel.c` (both edges placed
+  Sony objects, one class's methods).
+- **Head at merge:** `DRAWSYSTEM_EVENT_VSYNC` at three sites;
+  `StampSaveTitleFileLetter(char *, char *)` dropping three casts;
+  `TaskObjF__AbortFromState`; resetLinkState's prototype names. Three
+  symbols-file conflicts, each two append-only blocks, both kept.
+- **Plan revision 33 (premium, tools):** (1) a Sony-collision header job's
+  edit set is the header plus every unit including it, and headers
+  sharing an includer are one job (TileAtlas/TileMap/TimImage); (2) such a
+  header that also defines placeholder types ranks with them (code_d294.h
+  was eighth); (3) a WAITING job's blocking unit has its polish pass
+  ranked first (code_2cc8c_d was 22nd); (4) `sonyheaders.py` lists `struct
+  GsIMAGE`-style tag spellings of Sony's untagged typedefs, which compile
+  and leave the type incomplete (Sprite.h, found by alpha); (5) the polish
+  runner stays on Opus: Sonnet passes were accepted 1 of 5 (rounds 92,
+  94), Opus 16 of 16, and §2's switch rule would have sent it back to
+  Sonnet this round.
+- **Measured** (`plan.py`, against round 94's entry): placeholder type
+  names 48 to 24; files re-declaring a Sony name 22 to 14; track 7 units 11
+  to 16 of 68, D_ 133 to 116, unk 200 to 192, magic 1540 to 1407, m2c 204
+  to 166, history 436 to 386; track 8 regions 7 to 8 of 34. Typeviews 72
+  to 71 (charlie's pass removed one), 0 new at every merge.
+- **Deferred proposals** (in the reports): Sprite.h's `image` and
+  `InitGsSprite` to `GsIMAGE *` (now #1, drops code_322b4's two casts);
+  `ViewportOt`/`ViewportRefView`/`workBase` to `GsOT`/`GsRVIEW2`/`PACKET *`
+  (drops seven casts in code_2cc8c_d, five in code_2864); SceneNode.h's
+  `SceneNodeSub14`/`Sub44`/`S16Quad_d294` are `GsCOORDINATE2`/
+  `GsCOORD2PARAM`/`SVECTOR` and its four GsDOBJ2 words one embedded
+  `GsDOBJ2` (bravo); Viewport `unk44`/`unk48`/`unk90`/`unkB4` and
+  `IntermediateBase` `unk10`/`unk14` (alpha, echo); the `_ss_score` views in
+  code_179d8_f/_i/_k/_l/_m onto `SsScore`, and `D_8008E968/70/78` to the
+  pinned `_svm_*` (delta); `ChunkLoadEntry.chunkIndex` as `s32`,
+  `gCardEventSpecs` sized four words (charlie); class-id constants per
+  class header (alpha, charlie); retiring `UnprototypedCtorTable` by
+  typing the ctor slots' returns (bravo).
+
+---
+
 ## 2026-09-26 — round 94: the last placeholder class, Sony types in three files, two Sonnet passes sent back (premium head, plan revision 32)
 
 Premium head (Opus 5.5), cap 5, slots refilled as runners reported: 11
