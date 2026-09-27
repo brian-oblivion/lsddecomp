@@ -63,3 +63,10 @@ round 11 (2026-09-03), runner delta, unit code_8220 (fresh carve).
 `BasicClass__Finalize`, **tier A**: matches vtable slot `+0x00C`
 (`finalize`), already documented in `code_8220.h`'s `BasicClassMethods`
 comment. Called by `BasicClass__Release` before freeing `self`.
+
+## Polish (round 97, runner delta)
+
+`notifyParents(self, 1)` -> `BASICCLASS_EVENT_FINALIZED`, a new enum in
+`include/BasicClass.h`. Evidence: the base `BasicClass__OnNotify`
+(`code_8220_b.c`) acts on event 1 and only 1, by removing the sender from its
+children, and this function, the base finalizer, is its sender. Byte-identical.

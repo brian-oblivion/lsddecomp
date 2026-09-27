@@ -72,69 +72,32 @@ struct BMemPMgr {
 #define BMEMPMGR_SENTINEL_SIZE 4
 #define BMEMPMGR_MIN_POOL_SIZE 1024
 
-/* The generic pool allocator/free pair, established already by
- * include/DreamSys.h, include/Entity.h etc. --
- * all single-argument, and every one of those ~15 headers declares its
- * own full ANSI prototype (`s32 size` / `void *ptr`), per this project's
- * multiple-independent-local-views convention -- none of them get their
- * declaration from this header.
- *
- * THIS header, uniquely, declares both with UNSPECIFIED parameters
- * (empty parens). Round 45 (BMemPMgrAlloc/BMemPMgrFree, matched): each
- * function's own BODY genuinely reads a second argument ($a1, a fallback
- * pool pointer used only when the global default pool gDefaultBMemPMgr is
- * unset -- dead in practice at every decoded call site, confirmed by
- * SetupBMemPMgrFreeList/A9C setting that global before either is ever called).
- * Both are therefore DEFINED in code_8220.c with an old-style
- * (K&R identifier-list) parameter list, which is the only way to expose
- * that second parameter to their own bodies without contradicting the
- * ~15 external single-argument prototypes OR this same unit's own
- * single-argument call sites (PushBasicClassListNode's `BMemPMgrAlloc(0x8)`,
- * RemoveBasicClassListNode's `BMemPMgrFree(node)`) that appear LATER in
- * code_8220.c. A K&R-style definition does not install a prototype, so
- * those later 1-argument calls stay uncheck-and-compile clean; an
- * unspecified-parameter declaration here does the same for everything
- * before the definition. Do not "fix" this back to a full prototype --
- * that reintroduces the conflict this was written to route around. */
-extern void *BMemPMgrAlloc(); /* arity-ok: re-measured round 59 -- the body really does read $a1 -- `move s1,a1` at 0x80017B40, consumed as `move t0,s1` at 0x80017B68 only when the gp default pool is unset. The ~22 one-parameter declarations elsewhere are right about THEIR call sites (retail emits $a0 only, e.g. `move a0,s2` at 0x80026B74); this unprototyped pair is required by the K&R definitions in code_8220.c. */
-extern void *BMemPMgrFree(); /* arity-ok: re-measured round 59, same -- `move s1,a1` at 0x80017D0C, consumed as `move t0,s1` at 0x80017D2C on the unset-default-pool path. */
+/* The pool allocator and its free. Both bodies read a second argument, a
+ * fallback pool used only while gDefaultBMemPMgr is unset, that no caller
+ * passes: every other unit declares its own one-argument prototype for its
+ * own call sites. code_8220.c defines them K&R so their bodies can name the
+ * second parameter while its own later one-argument calls still compile; an
+ * unprototyped declaration here keeps the earlier ones compiling too. A full
+ * prototype here breaks one side or the other. */
+extern void *BMemPMgrAlloc(); /* arity-ok: the body reads $a1 as the fallback pool (BMemPMgrAlloc.md, "Extern arity") */
+extern void *BMemPMgrFree(); /* arity-ok: same as BMemPMgrAlloc (BMemPMgrFree.md, "Extern arity") */
 
-/* BMemPMgr setup, gp_rel-blocked (docs/research/gp-relative-blocker.md).
- * Called only by BMemPMgrInit in this unit. Genuinely ONE argument: its
- * own body's $a1 is a fallback pool pointer (defaulting to $a0/self) used
- * only when the global default pool gDefaultBMemPMgr is unset, and
- * BMemPMgrInit's call site never sets $a1 before the `jal` -- confirmed
- * by objdump: declaring a second parameter here forces the caller to
- * materialise a spurious `move a1,s1`, one word too many. */
+/* Makes the whole pool one free block. One argument: the body also reads a
+ * fallback pool from $a1 while gDefaultBMemPMgr is unset, but BMemPMgrInit,
+ * its only caller, never loads $a1, and a second parameter here would make it
+ * load one. */
 extern void SetupBMemPMgrFreeList(BMemPMgr *pool);
 
-/* The default-pool global itself (see the comment above). Setter is
- * SetDefaultBMemPMgr(BMemPMgr *pool), a one-line `gDefaultBMemPMgr = pool;`. Not yet
- * called from any carved C -- BMemPMgrInit never calls it, so whoever
- * establishes the game's one default pool is still asm. */
+/* The pool SetupBMemPMgrFreeList, BMemPMgrAlloc and BMemPMgrFree work on;
+ * set by SetDefaultBMemPMgr (main.c, right after BMemPMgrInit). */
 extern BMemPMgr *gDefaultBMemPMgr;
 
-/* Pool allocator/free critical-section flag, code_8220_b (setter
- * SetBMemPMgrBusy, getter GetBMemPMgrBusy). BMemPMgrAlloc/BMemPMgrFree in
- * THIS unit bracket their free-list walk with SetBMemPMgrBusy(1) on entry
- * and SetBMemPMgrBusy(0) on exit -- an enter/exit pair, not a real lock
- * (no busy-wait or check on entry visible in either caller). */
+/* Set to 1 by BMemPMgrAlloc and BMemPMgrFree for the length of their free-list
+ * work and back to 0 after (setter and getter in code_8220_b.c). Nothing in
+ * either waits on it. */
 extern s32 gBMemPMgrBusy;
 extern void SetBMemPMgrBusy(s32 val);
 extern s32 GetBMemPMgrBusy(void);
-
-/* The Psy-Q declarations that used to sit here (func_80011D34 is malloc,
- * func_80011F68 is free, func_80012C20 is printf) moved into src/code_8220.c
- * when the SDK objects were linked. They are deliberately NOT shared:
- * printf is variadic and five units each declare the argument shape their
- * own call site passes, and malloc/free now have Sony's real names, so a
- * copy in this header would collide with <malloc.h> in whichever sibling
- * unit includes the SDK header first. See CLAUDE.md, "To include/ has one
- * exception". */
-
-/* The "bMemPMgr = %p, poolSize = %ld in BMemPMgrInit\n" format string,
- * asm/data/A8C.rodata.s. */
-extern const char sBMemPMgrInitFailFmt[];
 
 /* Global boolean flag read by SetupPrimCode, asm/data (bss/data, not yet
  * carved). Read by SetupPrimCode, written by SortTmdObject (both code_8220_b)

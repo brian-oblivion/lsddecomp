@@ -108,3 +108,27 @@ derived (round 45 above) -- it seeds `freeListStart`/`freeListEnd` from
 the two boundary sentinels used for coalescing. Called only by
 `BMemPMgrInit` (this unit), which is exactly what the name says: the
 free-list half of pool setup.
+
+## Polish (round 97, runner delta)
+
+Zero bytes changed.
+
+- `u8 *end` -> `BMemBlockHdr *sentinel` (`BMEM_NEXT_BLOCK(header)`): the
+  word past the pool is a zero-size block header whose only content is
+  `BMEM_PREV_FREE`, which stops BMemPMgrFree's upward merge at the pool's end.
+  `*(BMemBlockHdr **)(end - 4)` -> `BMEM_PREV_FOOTER(sentinel)`.
+- Fields: `freeListHead` (+0x0) -> `firstBlock` (it is the pool's first
+  block, written by BMemPMgrInit, not a free-list end);
+  `freeListStart`/`freeListEnd` -> `freeListTail`/`freeListHead`; `unk10` ->
+  `initialized`, tier B: this function writes 1 to it and no code reads it.
+- The `include/code_8220.h` comment that called this function
+  "gp_rel-blocked" is gone: that blocker was resolved (CLAUDE.md) and the
+  function is matched.
+
+The constants are defined, with their evidence, in `include/code_8220.h`:
+`BMEM_SIZE_MASK` 0x0FFFFFFF and `BMEM_FLAG_MASK` 0xF0000000 split
+`sizeAndFlags`; `BMEM_FREE` 0x40000000 is set on every block put on the free
+list (SetupBMemPMgrFreeList, BMemPMgrFree, the split remainder) and cleared
+when BMemPMgrAlloc takes one; `BMEM_PREV_FREE` 0x80000000 is set on the block
+above a freed one and on the sentinel, cleared on the block above an allocated
+one, and tested by BMemPMgrFree before it reads the lower neighbour's footer.

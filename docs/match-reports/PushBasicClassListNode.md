@@ -70,3 +70,8 @@ from `BMemPMgrAlloc` and prepends it to `*head`; used identically for both
 of `BasicClass`'s lists (`children` via `BasicClass__AddChild`/AddChild,
 `parentRefs` via `BasicClass__AddParentRef`/AddParentRef), confirming it is
 the shared list-push primitive rather than something list-specific.
+
+## Polish (round 97, runner delta)
+
+`BMemPMgrAlloc(0x8)` -> `BMemPMgrAlloc(sizeof(BasicClassListNode))`, the
+node it fills in; byte-identical.

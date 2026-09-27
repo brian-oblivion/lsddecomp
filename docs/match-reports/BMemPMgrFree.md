@@ -391,3 +391,31 @@ blocks and re-links the free list, the mirror of `BMemPMgrAlloc`. Called
 across the same wide set of units as `BMemPMgrAlloc` (`code_2cc8c_f`,
 `code_55dd4`, `code_d294`, `code_8220_b`, `main`, plus this unit's own
 `RemoveBasicClassListNode`), confirming the general-purpose pool pairing.
+
+## Polish (round 97, runner delta)
+
+Zero bytes changed; whole-image SHA1 green after each step.
+
+- Pool parameter typed `BMemPMgr *`. The `nextSize` reuse and the
+  per-unlink scoped `n`/`p` keep `/* MATCHING: */` lines; the permuter
+  history that was in the source comment is in this report's round-46
+  section already.
+- `(s32)header->sizeAndFlags < 0` -> `header->sizeAndFlags & BMEM_PREV_FREE`,
+  byte-identical.
+- `*(BMemBlockHdr **)((u8 *)ptr - 8)` -> `BMEM_PREV_FOOTER(header)`, i.e.
+  `(u8 *)header - 4`, byte-identical in the matched body. Round 45's lever 2
+  above (computing it from `ptr` saves a `move`) was measured on the 99/107
+  body and no longer holds in the 107/107 one: `funcdiff.py` 107/107 and the
+  whole image green with the `header` form.
+- The other literals and offsets: `BMEM_HEADER_OF`, `BMEM_NEXT_BLOCK`,
+  `BMEM_BLOCK_SIZE`, `BMEM_FLAG_MASK`, `BMEM_FREE`, `BMEM_PREV_FREE`.
+- Fields: `freeListStart`/`freeListEnd` -> `freeListTail`/`freeListHead`
+  (evidence in BMemPMgrAlloc.md, "Polish").
+
+The constants are defined, with their evidence, in `include/code_8220.h`:
+`BMEM_SIZE_MASK` 0x0FFFFFFF and `BMEM_FLAG_MASK` 0xF0000000 split
+`sizeAndFlags`; `BMEM_FREE` 0x40000000 is set on every block put on the free
+list (SetupBMemPMgrFreeList, BMemPMgrFree, the split remainder) and cleared
+when BMemPMgrAlloc takes one; `BMEM_PREV_FREE` 0x80000000 is set on the block
+above a freed one and on the sentinel, cleared on the block above an allocated
+one, and tested by BMemPMgrFree before it reads the lower neighbour's footer.

@@ -148,3 +148,18 @@ the same idiom `include/code_8220.h` uses for `BMemPMgrAlloc`/`BMemPMgrFree`.
 
 **Declaration sites changed:** none (arity unchanged). `/* arity-ok: ... */`
 added to `src/main.c:24`. Oracle green after the edit.
+
+## Polish (round 97, runner delta)
+
+Zero bytes changed.
+
+- 0x400 -> `BMEMPMGR_MIN_POOL_SIZE` (1024). 0x20 ->
+  `BMEMPMGR_HEADER_SIZE + BMEMPMGR_SENTINEL_SIZE` (28 + 4): the malloc'd area
+  is the pool header, `poolSize` bytes of blocks, and the sentinel word
+  SetupBMemPMgrFreeList writes at `firstBlock + poolSize`. 0x1C ->
+  `BMEMPMGR_HEADER_SIZE`: where the first block starts, 8 bytes past the
+  fields any code touches (the struct stays 0x14; its size was not moved).
+- The Psy-Q `malloc`/`free` declarations are now `#include <malloc.h>`
+  (Sony's header, `include/psyq/`), byte-identical; `printf` stays local.
+- `pool->firstBlock = (u8 *)pool + BMEMPMGR_HEADER_SIZE` is the unit's one
+  remaining `rawoff` hit, left: the area has no struct past the header.

@@ -1,43 +1,30 @@
 #include "common.h"
 #include "code_8220.h"
+#include <malloc.h>
 
-/* This unit holds two unrelated things, decomp-adjacent by ROM address
- * only:
+/* Two things that share this file:
  *
- *  - The `BMemPMgr` pool allocator: `BMemPMgrInit` carves a block out of
- *    the Psy-Q heap (`malloc`) and hands it to `SetupBMemPMgrFreeList`,
- *    which threads it onto a single doubly-linked free list of
- *    `BMemBlockHdr` nodes. `BMemPMgrAlloc`/`BMemPMgrFree` split and
- *    coalesce blocks off that list; both resolve their target pool
- *    through the global `gDefaultBMemPMgr` (set by `SetDefaultBMemPMgr`)
- *    when the caller doesn't name one directly. It is the game's
- *    general-purpose small-object allocator -- called from a wide
- *    cross-section of units, not just this one.
- *  - `BasicClass`, the game's hand-rolled root class
- *    (`docs/research/class-framework.md`; full design in the
- *    `BasicClass`/`BasicClassMethods` comment in `code_8220.h`). Its
- *    fourteen virtual methods live here; `PushBasicClassListNode`/
- *    `RemoveBasicClassListNode` are the pool-backed list primitives both
- *    of its linked lists (`children`, `parentRefs`) share.
- *
- * See `code_8220_b`/`code_8220_c` for this unit's siblings (GTE/GPU
- * primitive code, unrelated to either of the above).
+ *  - The BMemPMgr pool allocator, the game's general-purpose allocator.
+ *    BMemPMgrInit mallocs one area, a BMemPMgr header followed by the pool's
+ *    blocks (the layout is in code_8220.h), and SetupBMemPMgrFreeList makes
+ *    the whole pool one free block. BMemPMgrAlloc and BMemPMgrFree split and
+ *    merge blocks on the pool's free list. SetupBMemPMgrFreeList,
+ *    BMemPMgrAlloc and BMemPMgrFree work on gDefaultBMemPMgr
+ *    (SetDefaultBMemPMgr) and fall back to their pool argument only while
+ *    no default is set.
+ *  - Eleven of BasicClass's methods (include/BasicClass.h), and
+ *    PushBasicClassListNode/RemoveBasicClassListNode, the pool-backed list
+ *    primitives its `children` and `parentRefs` lists share. The rest of its
+ *    methods are in code_8220_b.c.
  */
 
-/* Psy-Q heap, linked from Sony's own object (`_obj/malloc`) rather than
- * decompiled, so these carry Sony's exported names. The real prototypes are
- * in <malloc.h>; they are restated here rather than included because no unit
- * in this project pulls in the SDK headers yet. Local and not in
- * code_8220.h deliberately -- that header is shared with five other units,
- * and a second `free`/`malloc` declaration there would collide with
- * <malloc.h> in whichever of them includes it first. */
-extern void *malloc(unsigned int size);
-extern void free(void *ptr);
-
-/* Psy-Q printf (libc2/printf). Variadic, and declared here with the argument
- * shape THIS call site passes -- the project's four other printf call sites
- * each declare their own, which is why no single declaration is shared. */
+/* Psy-Q printf, declared with the argument shape this call site passes:
+ * it is variadic, and each unit that calls it declares its own. */
 extern void printf(const char *fmt, void *arg1, s32 arg2);
+
+/* "bMemPMgr = %p, poolSize = %ld in BMemPMgrInit\n", BMemPMgrInit's
+ * malloc-failure message. */
+extern const char sBMemPMgrInitFailFmt[];
 
 void *BMemPMgrInit(s32 poolSize) {
     BMemPMgr *pool;
@@ -85,6 +72,13 @@ void SetupBMemPMgrFreeList(BMemPMgr *pool) {
     sentinel->sizeAndFlags = BMEM_PREV_FREE;
 }
 
+/* First fit, searching the free list from its tail. `size` is rounded up to
+ * a word and to BMEM_MIN_PAYLOAD; a block that would leave less than
+ * BMEM_MIN_BLOCK over is taken whole, otherwise its top is split off as a new
+ * free block that replaces it on the list. Returns the payload, or NULL.
+ *
+ * Defined K&R so the body can read the second argument that callers never
+ * pass (code_8220.h, at the declaration). */
 /* clang-format off */
 void *BMemPMgrAlloc(size, pool)
     s32 size;
@@ -107,6 +101,7 @@ void *BMemPMgrAlloc(size, pool)
     }
     if (size != 0) {
         if (size & 0x3) {
+            /* MATCHING: one expression reassociates the + 4 into the subtract. */
             padded = size + 4;
             size = padded - (size & 0x3);
         }
@@ -121,8 +116,10 @@ void *BMemPMgrAlloc(size, pool)
                 cursor->sizeAndFlags &= ~BMEM_FREE;
                 result = BMEM_PAYLOAD(cursor);
                 if (blockSize < (u32)size + BMEM_MIN_BLOCK) {
+                    /* MATCHING: nextBlock is one variable in both arms, or it takes the wrong register. */
                     nextBlock = BMEM_NEXT_BLOCK(cursor);
                     nextBlock->sizeAndFlags &= ~BMEM_PREV_FREE;
+                    /* MATCHING: every unlink scopes its own n/p; shared locals take other registers. */
                     {
                         BMemBlockHdr *n = cursor->next;
                         BMemBlockHdr *p = cursor->prev;
@@ -137,6 +134,7 @@ void *BMemPMgrAlloc(size, pool)
                         BMemBlockHdr *n = cursor->next;
                         BMemBlockHdr *p;
 
+                        /* MATCHING: the dead store to `unused` picks the store's register. */
                         p = unused = cursor->prev;
                         if (n != NULL) {
                             n->prev = p;
@@ -179,6 +177,9 @@ void *BMemPMgrAlloc(size, pool)
     return result;
 }
 
+/* Merges the block with a free lower neighbour (found through that block's
+ * footer) and a free upper neighbour, then appends the result to the free
+ * list's tail. K&R for the same reason as BMemPMgrAlloc. */
 /* clang-format off */
 void *BMemPMgrFree(ptr, pool)
     void *ptr;
@@ -205,6 +206,7 @@ void *BMemPMgrFree(ptr, pool)
             header = BMEM_PREV_FOOTER(header);
             header->sizeAndFlags =
                 (header->sizeAndFlags & BMEM_FLAG_MASK) | (freedSize + BMEM_BLOCK_SIZE(header));
+            /* MATCHING: every unlink scopes its own n/p; shared locals take other registers. */
             {
                 BMemBlockHdr *n = header->next;
                 BMemBlockHdr *p = header->prev;
@@ -245,11 +247,7 @@ void *BMemPMgrFree(ptr, pool)
                 BMemBlockHdr *p = next->prev;
                 BMemBlockHdr *n = next->next;
 
-                /* nextSize is dead by this point (its one real use, the
-                 * sizeAndFlags fold above, already happened); reusing it
-                 * to hold the branch condition here -- instead of a fresh
-                 * anonymous temporary -- is what puts this comparison in
-                 * the register retail uses. Found by permuter search. */
+                /* MATCHING: reusing the dead nextSize for the test picks its register. */
                 nextSize = n != NULL;
                 if (nextSize) {
                     n->prev = p;
@@ -311,6 +309,8 @@ void BasicClass__RemoveAllChildren(BasicClass *self) {
     BasicClass **childPtr;
     BasicClassListNode *cursor;
 
+    /* MATCHING: the named childPtr and the if/do-while with comma tests keep
+     * &child in one saved register and the loop body first. */
     childPtr = &child;
     cursor = self->children;
     if (GetNextBasicClass(childPtr, &cursor), child != NULL) {

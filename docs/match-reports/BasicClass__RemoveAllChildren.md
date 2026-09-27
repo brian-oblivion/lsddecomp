@@ -156,3 +156,8 @@ build/measure iterations before landing on the final shape; well inside the
 (`removeAllChildren`), already documented in `code_8220.h`. Iterates
 `self->children` via `GetNextBasicClass`, dispatching `removeChild` on
 each until exhausted.
+
+## Polish (round 97, runner delta)
+
+The named `childPtr` and the `if`/`do`-`while` with comma tests (levers 1 and 2
+above) carry one `/* MATCHING: */` line in the source.
