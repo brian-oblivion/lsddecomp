@@ -73,7 +73,8 @@ void TodActor__OnNotify(TodActor *self, TagCheckArg *sender, s32 event) {
 
     base = GetActorMethods();
     base->onNotify((Actor *)self, sender, event);
-    if (sender->methods->header == MODEL_DATA_CLASS_HEADER && event == 1 && self->ownsModelData == 0) {
+    if (sender->methods->header == MODEL_DATA_CLASS_HEADER && event == BASICCLASS_EVENT_FINALIZED &&
+        self->ownsModelData == 0) {
         self->methods->release(self);
     }
 }
@@ -141,10 +142,10 @@ void TodActor__SetLightMode(TodActor *self, void *mode) {
 }
 
 void TodActor__Update(TodActor *self, void *sender, s32 event) {
-    if (event == 2) {
+    if (event == FRAMECLOCK_EVENT_RUNNING) {
         self->methods->tick(self);
     }
-    if (event == 4) {
+    if (event == FRAMECLOCK_EVENT_FLAG14) {
         self->methods->release(self);
     }
 }

@@ -58,3 +58,7 @@ Round 75 (charlie), track 3.
 ## Track 4 (2026-09-25, round 85, alpha)
 
 The class (id 0x234, table `gTodActorMethods`) is unified as `TodActor` in `include/TodActor.h`: an Actor subclass (its ctor chains to Actor's first) and Entity's base. Any source block above is the pre-unification spelling (the local `TodActorMethods` of `include/code_55dd4.h`, `linkCompanion`/`unlinkCompanion`, `companion2`, `Unk5CObj`/`Unk70ElemObj`); the live body in `src/code_55dd4.c` takes the unified types and the inherited slot and field names (`addChild`/`removeChild`, Actor's `ticker`, `Actor *` parts, `ModelData *` modelData), byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).
+
+## Track 7 (round 99, bravo)
+
+`sender`, `event`; event 1 is `BASICCLASS_EVENT_FINALIZED` (include/BasicClass.h: the sender is finalizing), so a borrowed ModelData going away releases this object. Byte-identical.

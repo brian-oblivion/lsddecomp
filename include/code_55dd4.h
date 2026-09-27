@@ -7,6 +7,7 @@
 #include "Tod.h"
 #include "LinkResource.h"
 #include "VabStreamObj.h"
+#include "FrameClock.h"
 
 /*
  * code_55dd4's own readings of what TodActor (include/TodActor.h) reaches
