@@ -20,7 +20,7 @@ extern s32 D_8008AB1C;
 extern s32 D_8008AB24;
 extern s32 gItemListPanelRect;
 extern s32 gItemListPanelPos;
-extern s32 D_800116E4;
+extern s32 sItemListStrFontIcon;
 
 void ItemList__LoadResources(ItemList_3bb8c_j *self, void *arg1)
 {
@@ -40,7 +40,7 @@ void ItemList__LoadResources(ItemList_3bb8c_j *self, void *arg1)
     h->methods->slot4(h);
     self->unk50->methods->slot4C(self->unk50, arg1, &gItemListPanelPos);
 
-    h = New_TimImage(BuildFileName(local, &D_800116E4, &D_8008AB1C, &D_8008AB24));
+    h = New_TimImage(BuildFileName(local, &sItemListStrFontIcon, &D_8008AB1C, &D_8008AB24));
     h->methods->slot78(h);
     self->methods->slot8C(self, arg1, h, self->unk20, self->unk24, self->unk28);
     h->methods->slot4(h);
@@ -56,7 +56,7 @@ same type `ItemList__ReleaseResources` -- matched this round -- also uses via
 derived handle into `self->unk50` via `New_ScreenSprite`, releases the FIRST
 handle (`slot4`), then forwards `arg1` and a literal global pointer into
 `self->unk50`'s own `slot4C`. Repeats the whole build (with a different
-global, `D_800116E4` instead of `sStrSelect`) to make a THIRD handle,
+global, `sItemListStrFontIcon` instead of `sStrSelect`) to make a THIRD handle,
 which is passed into `self->methods->slot8C` (established this round)
 alongside `arg1` and three of `self`'s own fields, then released.
 
