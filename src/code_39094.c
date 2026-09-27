@@ -175,18 +175,18 @@ s32 SeedAndRandom(s32 seed, s32 unused) {
     return rand();
 }
 
-void SetPickOverrides(s32 a, s32 b) {
-    if (a >= 0) {
-        gForcedSoundBank = a;
+void SetPickOverrides(s32 soundBank, s32 stageBgm) {
+    if (soundBank >= 0) {
+        gForcedSoundBank = soundBank;
     }
-    if (b >= 0) {
-        gForcedStageBgm = b;
+    if (stageBgm >= 0) {
+        gForcedStageBgm = stageBgm;
     }
 }
 
-void *GetRecordTable(s32 *out) {
-    if (out != NULL) {
-        *out = 0x230;
+void *GetRecordTable(s32 *countOut) {
+    if (countOut != NULL) {
+        *countOut = 0x230;
     }
     return gRecordTable;
 }
@@ -195,8 +195,8 @@ void *GetSoundBankPaths(void) {
     return gSoundBankPaths;
 }
 
-s32 PickSoundBank(s32 arg) {
-    u32 r = (u32)SeedAndRandom(0, arg) % 7;
+s32 PickSoundBank(s32 unused) {
+    u32 r = (u32)SeedAndRandom(0, unused) % 7;
     s32 *table = GetSoundBankPaths();
     s32 *entry;
     s32 index;
@@ -217,28 +217,28 @@ char *GetSoundEffectDir(void) {
     return *GetSoundEffectDirRef();
 }
 
-Rec1C *GetStageRecords(s32 index) {
-    return &((Rec1C *)GetRecordTable(NULL))[gStageFirstRecord[index]];
+Rec1C *GetStageRecords(s32 stage) {
+    return &((Rec1C *)GetRecordTable(NULL))[gStageFirstRecord[stage]];
 }
 
-Rec1C *GetStageTextureRecords(s32 index) {
-    return GetStageRecords(index);
+Rec1C *GetStageTextureRecords(s32 stage) {
+    return GetStageRecords(stage);
 }
 
-Rec1C *PickStageTexture(s32 index, s32 arg1, s32 day) {
-    s32 n = ((day - 1) % 40) / 10 + 1;
-    s32 r = SeedAndRandom(0, arg1) % n;
-    return &GetStageTextureRecords(index)[r];
+Rec1C *PickStageTexture(s32 stage, s32 unused, s32 day) {
+    s32 textureCount = ((day - 1) % 40) / 10 + 1;
+    s32 r = SeedAndRandom(0, unused) % textureCount;
+    return &GetStageTextureRecords(stage)[r];
 }
 
-Rec1C *GetStageBgmRecords(s32 index) {
-    return &GetStageRecords(index)[4];
+Rec1C *GetStageBgmRecords(s32 stage) {
+    return &GetStageRecords(stage)[4];
 }
 
-Rec1C *PickStageBgm(s32 index, s32 arg1) {
-    u32 r = (u32)SeedAndRandom(0, arg1) % 5; /* arg1 only forwarded, like PickStageTexture's */
+Rec1C *PickStageBgm(s32 stage, s32 unused) {
+    u32 r = (u32)SeedAndRandom(0, unused) % 5;
     Rec1C *rec;
-    if (index == 9) {
+    if (stage == 9) {
         if (r == 2) {
             r = 3;
         }
@@ -246,84 +246,84 @@ Rec1C *PickStageBgm(s32 index, s32 arg1) {
             gForcedStageBgm = 4;
         }
     }
-    rec = GetStageBgmRecords(index);
+    rec = GetStageBgmRecords(stage);
     return &rec[gForcedStageBgm != 0 ? gForcedStageBgm - 1 : r];
 }
 
-Rec1C *GetStageMapChunkRecords(s32 index) {
-    return &GetStageRecords(index)[9];
+Rec1C *GetStageMapChunkRecords(s32 stage) {
+    return &GetStageRecords(stage)[9];
 }
 
-Rec1C *GetStageMapChunkRecord(s32 index, s32 sub) {
-    return &GetStageMapChunkRecords(index)[sub];
+Rec1C *GetStageMapChunkRecord(s32 stage, s32 chunk) {
+    return &GetStageMapChunkRecords(stage)[chunk];
 }
 
-Rec1C *GetStageMapChunkRecordXY(s32 index, s32 x, s32 y) {
-    return GetStageMapChunkRecord(index, x + GetStageGridDimensions(index)->columns * y);
+Rec1C *GetStageMapChunkRecordXY(s32 stage, s32 x, s32 y) {
+    return GetStageMapChunkRecord(stage, x + GetStageGridDimensions(stage)->columns * y);
 }
 
-const char *GetAsmkMovie(s32 *typeCodeOut) {
-    if (typeCodeOut != NULL) {
-        *typeCodeOut = 0x31;
+const char *GetAsmkMovie(s32 *movieIdOut) {
+    if (movieIdOut != NULL) {
+        *movieIdOut = 0x31;
     }
     return sAsmkMoviePath;
 }
 
-Rec1C *GetOpeningMovieRecords(s32 *countOut) {
-    if (countOut != NULL) {
-        *countOut = 0;
+Rec1C *GetOpeningMovieRecords(s32 *movieIdOut) {
+    if (movieIdOut != NULL) {
+        *movieIdOut = 0;
     }
     return &((Rec1C *)GetRecordTable(NULL))[0x230];
 }
 
-Rec1C *PickOpeningMovie(s32 *countOut, s32 arg1) {
-    u32 r = (u32)SeedAndRandom(0, arg1) % 7; /* arg1 only forwarded, like PickStageTexture's */
-    s32 count;
-    Rec1C *rec = GetOpeningMovieRecords(&count);
-    if (countOut != NULL) {
-        *countOut = r + count;
+Rec1C *PickOpeningMovie(s32 *movieIdOut, s32 unused) {
+    u32 r = (u32)SeedAndRandom(0, unused) % 7;
+    s32 firstMovieId;
+    Rec1C *rec = GetOpeningMovieRecords(&firstMovieId);
+    if (movieIdOut != NULL) {
+        *movieIdOut = r + firstMovieId;
     }
     return &rec[r];
 }
 
-Rec1C *GetEndingMovieRecord(s32 *countOut) {
-    if (countOut != NULL) {
-        *countOut = 7;
+Rec1C *GetEndingMovieRecord(s32 *movieIdOut) {
+    if (movieIdOut != NULL) {
+        *movieIdOut = 7;
     }
     return &((Rec1C *)GetRecordTable(NULL))[0x237];
 }
 
-Rec1C *GetEndingMovie(s32 *countOut) {
-    s32 count;
-    Rec1C *rec = GetEndingMovieRecord(&count);
-    if (countOut != NULL) {
-        *countOut = count;
+Rec1C *GetEndingMovie(s32 *movieIdOut) {
+    s32 movieId;
+    Rec1C *rec = GetEndingMovieRecord(&movieId);
+    if (movieIdOut != NULL) {
+        *movieIdOut = movieId;
     }
     return rec;
 }
 
-Rec1C *GetEventMovieRecords(s32 *countOut) {
-    if (countOut != NULL) {
-        *countOut = 8;
+Rec1C *GetEventMovieRecords(s32 *movieIdOut) {
+    if (movieIdOut != NULL) {
+        *movieIdOut = 8;
     }
     return &((Rec1C *)GetRecordTable(NULL))[0x238];
 }
 
-Rec1C *GetEventMovie(s32 *countOut, s32 sub) {
-    s32 count;
-    Rec1C *rec = GetEventMovieRecords(&count);
-    if (countOut != NULL) {
-        *countOut = sub + count;
+Rec1C *GetEventMovie(s32 *movieIdOut, s32 event) {
+    s32 firstMovieId;
+    Rec1C *rec = GetEventMovieRecords(&firstMovieId);
+    if (movieIdOut != NULL) {
+        *movieIdOut = event + firstMovieId;
     }
-    return &rec[sub];
+    return &rec[event];
 }
 
-Rec1C *GetSpecialDayRecords(s32 *countOut, s32 n) {
+Rec1C *GetSpecialDayRecords(s32 *movieIdOut, s32 day) {
     Rec1C *rec = &((Rec1C *)GetRecordTable(NULL))[0x23E];
-    if (countOut != NULL) {
-        *countOut = n * 2 + 0xE;
+    if (movieIdOut != NULL) {
+        *movieIdOut = day * 2 + 0xE;
     }
-    return &rec[n * 6];
+    return &rec[day * 6];
 }
 
 /* two s16 halves passed by value in one register */
@@ -332,35 +332,35 @@ typedef struct RecPick {
     s16 sub;
 } RecPick;
 
-Rec1C *GetSpecialDayOrEventRecord(s32 *countOut, RecPick pick) {
-    s32 count;
+Rec1C *GetSpecialDayOrEventRecord(s32 *movieIdOut, RecPick pick) {
+    s32 firstMovieId;
     Rec1C *rec;
     if (pick.group >= 0) {
-        rec = GetSpecialDayRecords(&count, pick.group);
-        if (countOut != NULL) {
-            *countOut = ((u16)pick.sub < 2) ? pick.sub + count : -1;
+        rec = GetSpecialDayRecords(&firstMovieId, pick.group);
+        if (movieIdOut != NULL) {
+            *movieIdOut = ((u16)pick.sub < 2) ? pick.sub + firstMovieId : -1;
         }
         return &rec[pick.sub];
     }
-    return GetEventMovie(countOut, pick.sub);
+    return GetEventMovie(movieIdOut, pick.sub);
 }
 
-s32 GetMovieFrameCount(s32 index) {
-    return gMovieFrameCounts[index];
+s32 GetMovieFrameCount(s32 movieId) {
+    return gMovieFrameCounts[movieId];
 }
 
-Rec1C *GetSpecialDayMovieSpan(s32 *total, s32 n, s32 len) {
-    s32 count;
-    s32 i;
+Rec1C *GetSpecialDayMovieSpan(s32 *frameTotal, s32 day, s32 dayCount) {
+    s32 firstMovieId;
+    s32 movieId;
     s32 start;
-    Rec1C *rec = GetSpecialDayRecords(&count, n);
-    len *= 2;
-    *total = 0;
-    start = count;
-    len += start;
-    for (i = start; i < len; i++) {
-        *total += gMovieFrameCounts[i] + 10;
+    Rec1C *rec = GetSpecialDayRecords(&firstMovieId, day);
+    dayCount *= 2; /* MATCHING: one variable; becomes the end movie id */
+    *frameTotal = 0;
+    start = firstMovieId;
+    dayCount += start;
+    for (movieId = start; movieId < dayCount; movieId++) {
+        *frameTotal += gMovieFrameCounts[movieId] + 10;
     }
-    *total -= 10;
+    *frameTotal -= 10;
     return rec;
 }
