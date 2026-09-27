@@ -58,14 +58,14 @@ void StyleEffect__SpawnPlainSprites(StyleEffect *self) {
 }
 
 void StyleEffect__RandomizeSprites(StyleEffect *self) {
-    VariantSprite **p = &self->sprites[1];
+    VariantSprite **sprite = &self->sprites[1];
     s32 i;
 
-    for (i = 0; i < 4; i++, p++) {
-        u32 r = rand();
+    for (i = 0; i < 4; i++, sprite++) {
+        u32 pick = rand();
 
-        (*p)->methods->updateScale(*p, 1, gStyleEffectJitterScales[r % 6]);
-        (*p)->sprite.rotate = (rand() % 360) << 12;
+        (*sprite)->methods->updateScale(*sprite, 1, gStyleEffectJitterScales[pick % 6]);
+        (*sprite)->sprite.rotate = (rand() % 360) << 12;
     }
 }
 
@@ -104,17 +104,17 @@ extern s16 gStyleEffectClutPos[2];
 
 extern void TmdModel__SetFirstPrimClut(TmdModel *self, s16 *xy);
 
-void SetStyleEffectSources(s32 unused, Actor *self, s32 arg2, s32 arg3) {
+void SetStyleEffectSources(s32 unused, Actor *tmd, s32 tim, s32 viewport) {
     s32 i;
-    TmdModel *ret;
+    TmdModel *model;
 
-    gStyleEffectTmd = self;
-    gStyleEffectTim = (void *)arg2;
-    gStyleEffectViewport = (void *)arg3;
+    gStyleEffectTmd = tmd;
+    gStyleEffectTim = (void *)tim;
+    gStyleEffectViewport = (void *)viewport;
     i = 0;
     do {
-        ret = (TmdModel *)self->methods->setBackClip(self, gStyleEffectModelIds[i]);
-        TmdModel__SetFirstPrimClut(ret, gStyleEffectClutPos);
+        model = (TmdModel *)tmd->methods->setBackClip(tmd, gStyleEffectModelIds[i]);
+        TmdModel__SetFirstPrimClut(model, gStyleEffectClutPos);
         i++;
     } while (i < 2);
 }
@@ -150,23 +150,23 @@ fail:
 }
 
 void Actor__AddChild(Actor *self, BasicClass *child) {
-    s32 tag;
+    s32 classId;
 
     GetSceneNodeMethods()->addChild((SceneNode *)self, child);
-    tag = child->methods->header;
-    if ((tag & 0xFFF) == 0x114) {
+    classId = child->methods->header;
+    if ((classId & 0xFFF) == 0x114) {
         self->grid = (struct StageMap *)child;
-    } else if ((tag & 0xF) == 5) {
+    } else if ((classId & 0xF) == 5) {
         self->ticker = child;
     }
 }
 
 void Actor__RemoveChild(Actor *self, BasicClass *child) {
-    s32 tag = child->methods->header;
+    s32 classId = child->methods->header;
 
-    if ((tag & 0xFFF) == 0x114) {
+    if ((classId & 0xFFF) == 0x114) {
         self->grid = NULL;
-    } else if ((tag & 0xF) == 5) {
+    } else if ((classId & 0xF) == 5) {
         self->ticker = NULL;
     }
     GetSceneNodeMethods()->removeChild((SceneNode *)self, child);
@@ -193,29 +193,29 @@ void Actor__NotifyMove(Actor *self, s32 event) {
      * separate `slti`s). */
     if (event < 9) {
         if (event >= 5) {
-            Buf38O buf;
+            Buf38O hullBuf;
 
             if (self->model != NULL && TmdModel__GetBoundsCount(self->model)) {
-                self->methods->getModelHull(self, &buf);
+                self->methods->getModelHull(self, &hullBuf);
                 if (event != 5) {
-                    s16 h = self->lastOffsetValue;
-                    s32 isSeven = (event == 7);
-                    s32 nonneg = (h >= 0);
-                    s32 adjusted;
+                    s16 offset = self->lastOffsetValue;
+                    s32 alongX = (event == 7);
+                    s32 forward = (offset >= 0);
+                    s32 delta;
 
                     /* `goto`, not `if/else`, to match retail's actual
                      * branch shape (see the match report). */
-                    if (h < 0) {
-                        goto negative;
+                    if (offset < 0) {
+                        goto backward;
                     }
-                    adjusted = h + self->pendingExtra;
-                    goto joinAdjust;
-                negative:
-                    adjusted = h - self->pendingExtra;
-                joinAdjust:
-                    RotateAndOffsetHullList(&buf.hull, isSeven, nonneg, adjusted);
+                    delta = offset + self->pendingExtra;
+                    goto offsetHull;
+                backward:
+                    delta = offset - self->pendingExtra;
+                offsetHull:
+                    RotateAndOffsetHullList(&hullBuf.hull, alongX, forward, delta);
                 }
-                self->methods->transformAndNotifyParents(self, &buf.hull, event);
+                self->methods->transformAndNotifyParents(self, &hullBuf.hull, event);
                 /* The link target's class byte: an Actor gets slotE8. */
                 if (self->linkTarget != NULL) {
                     if ((u8)self->linkTarget->methods->header == 0x34) {
@@ -250,24 +250,24 @@ void Actor__AddTranslation(Actor *self, LongVec3 *delta) {
  * to, then flg is cleared so the coordinate is recomputed. The assignment
  * is a whole-Vec3 copy. */
 void Actor__UpdateTranslation(Actor *self, s32 set, LongVec3 *v) {
-    Actor *t = self;
-    GsCOORDINATE2 *u = t->coord2;
+    Actor *actor = self; /* MATCHING: a second name for self; without it $a0 is used, not $t0 */
+    GsCOORDINATE2 *coord = actor->coord2;
 
     if (set) {
-        *(LongVec3 *)u->coord.t = *v;
+        *(LongVec3 *)coord->coord.t = *v;
     } else {
-        u->coord.t[0] += v->x;
-        u->coord.t[1] += v->y;
-        u->coord.t[2] += v->z;
+        coord->coord.t[0] += v->x;
+        coord->coord.t[1] += v->y;
+        coord->coord.t[2] += v->z;
     }
-    t->coord2->flg = 0;
+    actor->coord2->flg = 0;
 }
 
 void Actor__AddLocalTranslation(Actor *self, s16 *local) {
-    LongVec3 buf;
+    LongVec3 delta;
 
-    SceneNode__RotateLocalVector((SceneNode *)self, &buf, local);
-    self->methods->addTranslation(self, &buf);
+    SceneNode__RotateLocalVector((SceneNode *)self, &delta, local);
+    self->methods->addTranslation(self, &delta);
 }
 
 /* z component of the local move vector gActorLocalMove (class_3bb8c_p.c). */

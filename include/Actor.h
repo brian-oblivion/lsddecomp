@@ -101,7 +101,7 @@ extern ActorMethods *GetActorMethods(void); /* returns &gActorMethods */
 /* The class's own methods, in ROM order (class_3bb8c_o, then class_3bb8c_p),
  * then its non-slot helpers. A subclass reaches the base ones through
  * GetActorMethods() and upcasts. */
-void SetStyleEffectSources(s32 unused, Actor *self, s32 arg2, s32 arg3);
+void SetStyleEffectSources(s32 unused, Actor *tmd, s32 tim, s32 viewport);
 void *New_Actor(void);
 Actor *Actor__Actor(Actor *self);
 void Actor__AddChild(Actor *self, BasicClass *child);
