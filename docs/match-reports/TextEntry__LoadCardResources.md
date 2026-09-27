@@ -22,7 +22,7 @@ extern const char sTimExt[]; /* ".TIM" */
 extern s32 gTextEntryPanelRect; /* 3-word opaque block, New_ScreenSprite's arg1, address-only here */
 extern s32 gTextEntryTextColor; /* opaque block, slotB8's arg1, address-only here */
 extern s32 gTextEntryPanelPos; /* opaque block, self->unk48's slot4C arg2, address-only here */
-extern s32 D_8008AAD4; /* opaque block, self->unk44's slot4C arg2, address-only here */
+extern s32 gTextEntryTextPos; /* opaque block, self->unk44's slot4C arg2, address-only here */
 extern s32 D_8008AADC; /* opaque block, self->unk40's slot4C arg2, address-only here */
 
 void TextEntry__LoadCardResources(Obj86ED0 *self, void *arg1)
@@ -54,7 +54,7 @@ void TextEntry__LoadCardResources(Obj86ED0 *self, void *arg1)
     self->unk44 = New_TextRow(handle2, self->unk10, self->unk28);
     self->unk40 = (ChildObj86ED0 *)New_CharSprite(handle2, 0x5F);
     handle2->methods->release(handle2);
-    self->unk44->methods->slot4C(self->unk44, arg1, (void *)&D_8008AAD4);
+    self->unk44->methods->slot4C(self->unk44, arg1, (void *)&gTextEntryTextPos);
     self->unk44->methods->slotB8(self->unk44, (void *)&gTextEntryTextColor);
     self->unk40->methods->slot4C(self->unk40, arg1, (void *)&D_8008AADC);
 }

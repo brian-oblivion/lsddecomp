@@ -172,7 +172,7 @@ extern const char sTimExt[];         /* ".TIM" */
 extern s32 gTextEntryPanelRect; /* 3 words, New_ScreenSprite's rect: a SpriteRect {0, 0, 224, 120} */
 extern s32 gTextEntryTextColor; /* opaque block, slotB8's arg1, address-only here */
 extern s32 gTextEntryPanelPos; /* panelSprite's attachToParent position, address-only here */
-extern s32 D_8008AAD4; /* textRow's slot4C position, address-only here */
+extern s32 gTextEntryTextPos; /* textRow's slot4C position, address-only here */
 extern s32 D_8008AADC; /* cursorSprite's attachToParent position; class_3bb8c_j reads its x */
 
 void TextEntry__LoadCardResources(TextEntry *self, void *arg1) {
@@ -204,7 +204,7 @@ void TextEntry__LoadCardResources(TextEntry *self, void *arg1) {
     self->textRow = New_TextRow(handle2, self->textLen, self->editBuf);
     self->cursorSprite = New_CharSprite(handle2, 0x5F);
     handle2->methods->release(handle2);
-    self->textRow->methods->attachToParent(self->textRow, (SceneNode *)arg1, (LongVec3 *)&D_8008AAD4);
+    self->textRow->methods->attachToParent(self->textRow, (SceneNode *)arg1, (LongVec3 *)&gTextEntryTextPos);
     self->textRow->methods->setColor(self->textRow, (SpriteRgb *)&gTextEntryTextColor);
     self->cursorSprite->methods->attachToParent(self->cursorSprite, (SceneNode *)arg1,
                                                 (LongVec3 *)&D_8008AADC);

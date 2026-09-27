@@ -3016,3 +3016,4 @@ gGraphScoreMoods = 0x80087BD4;
 gTextEntryPanelRect = 0x80086F7C;
 gTextEntryTextColor = 0x8008AAC8;
 gTextEntryPanelPos = 0x8008AACC;
+gTextEntryTextPos = 0x8008AAD4;
