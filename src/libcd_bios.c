@@ -576,7 +576,7 @@ extern volatile s32 *D_8006D934;
 
 /* Still INCLUDE_ASM elsewhere -- not this unit's to carve. */
 extern void ResetCallback(void);                                          /* lib/libetc/intr.o */
-extern void (*InterruptCallback(s32 arg0, void (*callback)(void)))(void); /* lib/libetc/intr.o, per code_179d8_c.c */
+extern void (*InterruptCallback(s32 arg0, void (*callback)(void)))(void); /* lib/libetc/intr.o, per libsnd_ssinit.c */
 extern s32 VSync(s32 arg0);                                               /* asm/psyq_15d04.s */
 extern void puts(const char *arg0);                                       /* asm/psyq_15d04.s */
 extern void printf(const char *fmt, ...);                                 /* Psy-Q printf wrapper */

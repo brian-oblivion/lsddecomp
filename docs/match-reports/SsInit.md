@@ -4,7 +4,7 @@
 
 > Renamed from `func_80032368` on 2026-09-24 (tools/rename.py). Address 0x80032368.
 
-**Unit:** code_179d8_c · **Size:** 8 instructions · **Status:** MATCHED (8/8 words)
+**Unit:** libsnd_ssinit · **Size:** 8 instructions · **Status:** MATCHED (8/8 words)
 
 ## What it does
 
@@ -38,7 +38,7 @@ sets `$v0`, so `void` is correct, not `s32`.
 
 ## Provenance
 
-round 16 (2026-09-04), runner delta, unit code_179d8_c (fresh carve).
+round 16 (2026-09-04), runner delta, unit libsnd_ssinit (fresh carve).
 Matched first attempt.
 
 ## Naming (round 78, runner alpha)

@@ -4,7 +4,7 @@
 
 > Renamed from `func_80032AD0` on 2026-09-23 (tools/rename.py). Address 0x80032ad0.
 
-**Unit:** code_179d8_c · **Size:** 18 instructions · **Status:** MATCHED (18/18 words)
+**Unit:** libsnd_ssinit · **Size:** 18 instructions · **Status:** MATCHED (18/18 words)
 
 ## What it does
 
@@ -49,7 +49,7 @@ order, not just polarity.**
 
 ## Provenance
 
-round 16 (2026-09-04), runner delta, unit code_179d8_c (fresh carve).
+round 16 (2026-09-04), runner delta, unit libsnd_ssinit (fresh carve).
 Matched second attempt (one branch-direction flip).
 
 ## Naming

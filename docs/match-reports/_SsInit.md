@@ -22,7 +22,7 @@ in two statements. See "ROUND 63" at the bottom for the levers. Everything
 between here and there is the stall history, kept verbatim because the
 negatives in it are what made the right shape findable.
 
-Unit `code_179d8_c`, carved round 16 (2026-09-04). **Attempted, restored
+Unit `libsnd_ssinit`, carved round 16 (2026-09-04). **Attempted, restored
 to `INCLUDE_ASM`.** Callee-saved register screen: 1 (`$s0`) -- well under
 the deprioritisation band; register count was not why this stalled (see
 "Answering the head's question" below).
@@ -261,7 +261,7 @@ brief closes this function; confirmed stall, restored to `INCLUDE_ASM`.
 
 ## Provenance
 
-round 16 (2026-09-04), runner delta, unit code_179d8_c (fresh carve,
+round 16 (2026-09-04), runner delta, unit libsnd_ssinit (fresh carve,
 second pass, head-directed follow-up on the big-three queue). ~8
 attempts; restored to `INCLUDE_ASM` per the hard rule against register
 pinning.
@@ -463,7 +463,7 @@ changes did).
 
 `_SsInit` is already Sony's own identified name (matched round 63) --
 untouched this round. Confirmed the unit as a whole has no class
-(`tools/classtable.py --scan` has no `code_179d8_c` entry): it is plain
+(`tools/classtable.py --scan` has no `libsnd_ssinit` entry): it is plain
 Sony sound-init C sandwiched between the placed `libsnd/vm_vsu` and
 `libsnd/sstable` objects.
 

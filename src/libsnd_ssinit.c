@@ -10,7 +10,7 @@
  * comment still stands -- only the blocker verdicts are withdrawn.
  * Screen: `python3 tools/nearmiss.py`, round 43 (2026-09-15).
  *
- * code_179d8_c -- window [200..219] of the original 274-function code_179d8
+ * libsnd_ssinit -- window [200..219] of the original 274-function code_179d8
  * monolith, now 0x22A1C..0x22BA8 (vram 0x8003221C..0x800323A8).
  *
  * ROUND 33: this slice lost TWO functions to Sony and was split in half.
@@ -18,7 +18,7 @@
  *     (`libsnd/vm_vsu.o`, Psy-Q 3.3), linked from the object.
  *   - func_800323A8 (120w) is `SsSetTableSize` (`libsnd/sstable.o`, Psy-Q
  *     3.5), linked from the object. It sat in the MIDDLE, so the slice became
- *     [c code_179d8_c][o sstable][c libsnd_ssinit_libapi_counter] and everything from
+ *     [c libsnd_ssinit][o sstable][c libsnd_ssinit_libapi_counter] and everything from
  *     SsSetTickMode on now lives in `src/libsnd_ssinit_libapi_counter.c`.
  * Neither was ever matchable as C; both stall reports are kept, re-titled
  * CONVERTED. This unit is now three functions: _SsInit and its two

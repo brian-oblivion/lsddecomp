@@ -6,7 +6,7 @@
 
 > Renamed from `func_80032A7C` on 2026-09-23 (tools/rename.py). Address 0x80032a7c.
 
-**Unit:** code_179d8_c · **Size:** 8 instructions · **Status:** MATCHED (8/8 words)
+**Unit:** libsnd_ssinit · **Size:** 8 instructions · **Status:** MATCHED (8/8 words)
 
 ## What it does
 
@@ -31,7 +31,7 @@ void SsQuit(void)
 
 ## Provenance
 
-round 16 (2026-09-04), runner delta, unit code_179d8_c (fresh carve).
+round 16 (2026-09-04), runner delta, unit libsnd_ssinit (fresh carve).
 Matched first attempt.
 
 ## Naming

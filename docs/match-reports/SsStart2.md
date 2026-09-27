@@ -4,7 +4,7 @@
 
 > Renamed from `func_800329B8` on 2026-09-23 (tools/rename.py). Address 0x800329b8.
 
-**Unit:** code_179d8_c · **Size:** 8 instructions · **Status:** MATCHED (8/8 words)
+**Unit:** libsnd_ssinit · **Size:** 8 instructions · **Status:** MATCHED (8/8 words)
 
 ## What it does
 
@@ -23,11 +23,11 @@ void SsStart2(void)
 ```
 
 (shares the `extern void _SsStart(s32 arg0);` prototype declared
-above `SsStart` in `src/code_179d8_c.c`.)
+above `SsStart` in `src/libsnd_ssinit.c`.)
 
 ## Provenance
 
-round 16 (2026-09-04), runner delta, unit code_179d8_c (fresh carve).
+round 16 (2026-09-04), runner delta, unit libsnd_ssinit (fresh carve).
 Matched first attempt, alongside `SsStart`.
 
 ## Naming

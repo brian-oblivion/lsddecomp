@@ -4,7 +4,7 @@
 
 > Renamed from `func_800329D8` on 2026-09-23 (tools/rename.py). Address 0x800329d8.
 
-**Unit:** code_179d8_c · **Size:** 41 instructions · **Status:** MATCHED (41/41 words)
+**Unit:** libsnd_ssinit · **Size:** 41 instructions · **Status:** MATCHED (41/41 words)
 
 ## What it does
 
@@ -97,7 +97,7 @@ already what retail compiles to and flipping regresses.
 
 ## Provenance
 
-round 16 (2026-09-04), runner delta, unit code_179d8_c (fresh carve,
+round 16 (2026-09-04), runner delta, unit libsnd_ssinit (fresh carve,
 second pass, head-directed follow-up). Matched second attempt (one
 if/else block-order flip after the head's `_SsSeqCalledTbyT_1per2` lever
 generalisation request surfaced the same axis here).

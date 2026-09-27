@@ -117,7 +117,7 @@ it names a register. Two practical consequences:
 The residue measurement and the barrier census below are accurate and are why
 this function was closable at all. Only the verdict is superseded.
 
-Unit `code_179d8_c`, carved round 16 (2026-09-04). **Attempted, restored
+Unit `libsnd_ssinit`, carved round 16 (2026-09-04). **Attempted, restored
 to `INCLUDE_ASM`.**
 
 ## What it does
@@ -308,7 +308,7 @@ a scheduling choice, not a combined expression). Still restored to
 
 ## Provenance
 
-round 16 (2026-09-04), runner delta, unit code_179d8_c (fresh carve). ~6
+round 16 (2026-09-04), runner delta, unit libsnd_ssinit (fresh carve). ~6
 attempts (statement-order fix reached the 1-instruction residue; 2
 barrier placements and 1 head-directed control-flow flip all regressed
 and were reverted); restored to `INCLUDE_ASM`.
