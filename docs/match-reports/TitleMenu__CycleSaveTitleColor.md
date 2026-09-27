@@ -24,15 +24,15 @@ round-43 body could not show because its `lbu`s were read as `lb`s-with-renames.
 | --- | --- | --- | --- |
 | 0 | preserved body | 3/78, ins/del 9/9, 2 words short | baseline |
 | 1 | `base = buf;` moved ABOVE `Get_vtable_TaskCore()->slotE4(...)` | 47/78, 7/7, length exact | `$s1` appears: `base` now crosses a call, so it gets a callee-saved reg; sched1 still sinks the `addiu s1,sp,0x10` into the `beqz` delay slot, which is why retail shows it after the call |
-| 2 | separate `p = base + D_8008AA28` per arm (not `base += ...`) | 40/78, 7/7 | store address in `$v1` like retail; s1/s2 swapped (transient) |
+| 2 | separate `p = base + sSaveTitleColorChannel` per arm (not `base += ...`) | 40/78, 7/7 | store address in `$v1` like retail; s1/s2 swapped (transient) |
 | 3 | `v` typed `s32` | same | `addiu 0x80` instead of `-0x80` (QImode const canonicalisation) |
 | 4 | `s32` temps for the three bytes | drift | `lb` appears (retail loads are SIGN-extending) but CSE then reuses the register for `buf[0]+0x80` where retail reloads with `lbu` |
 | 5 | one reused temp | drift | reload appears, but one register instead of retail's three |
 | 6 | **`buf` is an `Arg1DCD0_3bb8c_d` and `buf = *arg1;`** | drift, only regs + one extra reload left | the 3-byte BLKmode struct copy is lb,lb,lb then sb,sb,sb into three regs, and CSE does not know memory after it -> `lbu 0x10(sp)` reload |
-| 7 | `if (++D_8008AA28 >= 3)` instead of `D_8008AA28++; if (D_8008AA28 >= 3)` | 71/78, 0/0 | `andi v0,0xff` instead of a reload of the global |
+| 7 | `if (++sSaveTitleColorChannel >= 3)` instead of `sSaveTitleColorChannel++; if (sSaveTitleColorChannel >= 3)` | 71/78, 0/0 | `andi v0,0xff` instead of a reload of the global |
 | 8 | drop `v`/`goto store`: `*p = 0x80;` and `*p += 0x80;` in if/else arms (GCC cross-jumps the shared `sb v0,0(v1)`) | 70/78, 1/1 | `v` now in `$v0` like retail; index reg wrong |
-| 9 | `p = D_8008AA28 + base` | 70/78, 1/1 | no change |
-| 10 | **no `p`: `base[D_8008AA28] = 0x80;` / `base[D_8008AA28] += 0x80;`** | **78/78, build exit=0, whole image OK** | index loaded straight into the address register |
+| 9 | `p = sSaveTitleColorChannel + base` | 70/78, 1/1 | no change |
+| 10 | **no `p`: `base[sSaveTitleColorChannel] = 0x80;` / `base[sSaveTitleColorChannel] += 0x80;`** | **78/78, build exit=0, whole image OK** | index loaded straight into the address register |
 
 ## Matched source
 
@@ -55,21 +55,21 @@ void TitleMenu__CycleSaveTitleColor(TitleMenu *self, Arg1DCD0_3bb8c_d *arg1)
         base[0] = 0;
         base[1] = 0;
         base[2] = 0;
-        base[D_8008AA28] = 0x80;
+        base[sSaveTitleColorChannel] = 0x80;
     } else {
         buf = *arg1;
-        if (D_8008AA2C < 0x80) {
+        if (sSaveTitleColorFrame < 0x80) {
             base[0] += 0x80;
         } else {
-            base[D_8008AA28] += 0x80;
+            base[sSaveTitleColorChannel] += 0x80;
         }
     }
-    if (++D_8008AA28 >= 3) {
-        D_8008AA28 = 0;
+    if (++sSaveTitleColorChannel >= 3) {
+        sSaveTitleColorChannel = 0;
     }
-    D_8008AA2C++;
-    if (D_8008AA2C >= 0x101) {
-        D_8008AA2C = 0;
+    sSaveTitleColorFrame++;
+    if (sSaveTitleColorFrame >= 0x101) {
+        sSaveTitleColorFrame = 0;
     }
     self->nameField->methods->slotB8(self->nameField, &buf);
 }
@@ -154,29 +154,29 @@ void TitleMenu__CycleSaveTitleColor(TitleMenu *self, Arg1DCD0_3bb8c_d *arg1)
         base[0] = 0;
         base[1] = 0;
         base[2] = 0;
-        base += D_8008AA28;
+        base += sSaveTitleColorChannel;
         v = 0x80;
         goto store;
     }
     base[0] = arg1->b0;
     base[1] = arg1->b1;
     base[2] = arg1->b2;
-    if (D_8008AA2C < 0x80) {
+    if (sSaveTitleColorFrame < 0x80) {
         base[0] = base[0] + 0x80;
         goto skip;
     }
-    base += D_8008AA28;
+    base += sSaveTitleColorChannel;
     v = *base + 0x80;
 store:
     *base = v;
 skip:
-    D_8008AA28++;
-    if (D_8008AA28 >= 3) {
-        D_8008AA28 = 0;
+    sSaveTitleColorChannel++;
+    if (sSaveTitleColorChannel >= 3) {
+        sSaveTitleColorChannel = 0;
     }
-    D_8008AA2C++;
-    if (D_8008AA2C >= 0x101) {
-        D_8008AA2C = 0;
+    sSaveTitleColorFrame++;
+    if (sSaveTitleColorFrame >= 0x101) {
+        sSaveTitleColorFrame = 0;
     }
     self->nameField->methods->slotB8(self->nameField, buf);
 }
@@ -209,11 +209,11 @@ This is preserved verbatim, `#if 0`-wrapped, immediately above the
   biggest lever that took the function from a totally different
   instruction stream (an earlier attempt without the `goto`, which
   diverged from word 1) to the near-miss reported here.
-- `D_8008AA28` (`u8`, rolling 0/1/2 index, `asm/data/7B12C.sdata.s` --
+- `sSaveTitleColorChannel` (`u8`, rolling 0/1/2 index, `asm/data/7B12C.sdata.s` --
   declared as a full `.word` there but accessed only via `lbu`/`sb`) and
-  `D_8008AA2C` (`s32`, rolling counter) -- both **confirmed correct**,
+  `sSaveTitleColorFrame` (`s32`, rolling counter) -- both **confirmed correct**,
   including the `andi v0,v0,0xff` re-mask retail emits after storing
-  `D_8008AA28` back (the ordinary compiled shape of an unsigned-char
+  `sSaveTitleColorChannel` back (the ordinary compiled shape of an unsigned-char
   increment-and-wrap).
 - `self->nameField->methods->slotB8(self->nameField, buf)` -- reuses this round's
   `TitleMenu__CycleSaveTitleColor`... (no -- reuses the slot round 43 ALSO establishes
@@ -221,7 +221,7 @@ This is preserved verbatim, `#if 0`-wrapped, immediately above the
 
 ## The one open residue
 
-Retail keeps the pointer `base = buf` (used at `base[D_8008AA28]` in TWO
+Retail keeps the pointer `base = buf` (used at `base[sSaveTitleColorChannel]` in TWO
 different, non-adjacent basic blocks) in a THIRD callee-saved register
 (`$s1`, alongside `self`=`$s2` and `arg1`=`$s0`) for the whole function --
 saved in the prologue, restored in the epilogue, 2 extra words (8 bytes)
@@ -233,22 +233,22 @@ and therefore 2 words short of retail's length.
 **Four variants tried, all producing the IDENTICAL registerclass outcome**
 (confirmed via `tools/asm-differ/diff.py`, not just funcdiff's score):
 
-1. `p = &buf[D_8008AA28]` computed fresh in each branch, no `base`
+1. `p = &buf[sSaveTitleColorChannel]` computed fresh in each branch, no `base`
    variable at all -- gave a COMPLETELY different, much worse mismatch
    (diverges from word 1; this is what "no explicit goto" looks like, see
    above).
 2. `base = buf;` (unconditional, before the `if`) + a separate `p =
-   &base[D_8008AA28];` pointer per branch -- 76/78, `base` in `$a1`.
+   &base[sSaveTitleColorChannel];` pointer per branch -- 76/78, `base` in `$a1`.
 3. Same as (2) but using `base[i]` consistently everywhere (including the
    plain `buf[0]`/`buf[1]`/`buf[2]` writes) instead of mixing `buf[i]`/
    `base[i]` -- identical result, `base` still in `$a1`.
-4. `base += D_8008AA28;` (folding the offset into `base` itself, no
+4. `base += sSaveTitleColorChannel;` (folding the offset into `base` itself, no
    separate `p`) -- identical result again, still `$a1`.
-5. Removing `base` entirely, reading `D_8008AA28` and computing the store
-   address only at a SINGLE shared point (`buf[D_8008AA28] = v;` after the
+5. Removing `base` entirely, reading `sSaveTitleColorChannel` and computing the store
+   address only at a SINGLE shared point (`buf[sSaveTitleColorChannel] = v;` after the
    goto, with `v` computed per-branch) -- this changes which BLOCK reads
-   `D_8008AA28` (once, not twice), which does NOT match retail (retail's
-   disassembly has two separate `lbu` reads of `D_8008AA28`, one per
+   `sSaveTitleColorChannel` (once, not twice), which does NOT match retail (retail's
+   disassembly has two separate `lbu` reads of `sSaveTitleColorChannel`, one per
    branch) -- rejected on structural grounds, not just score.
 
 None of these is a register-identity mismatch in the sense CLAUDE.md's
@@ -297,7 +297,7 @@ project-wide from a runner worktree.
 
 ## Naming (round 77, naming runner delta)
 
-Renamed `func_8004DCD0` -> `TitleMenu__CycleSaveTitleColor`. **Tier B**: Guarded by `self->unk3C`, cycles a 3-byte colour-like buffer through a rolling index (`D_8008AA28`, 0-2) and a counter (`D_8008AA2C`, wraps at 0x101), then forwards the buffer to `self->nameField`'s `slotB8`. Read as a counter-driven colour/blink update on the name field's cursor; the exact visual effect is not established.
+Renamed `func_8004DCD0` -> `TitleMenu__CycleSaveTitleColor`. **Tier B**: Guarded by `self->unk3C`, cycles a 3-byte colour-like buffer through a rolling index (`sSaveTitleColorChannel`, 0-2) and a counter (`sSaveTitleColorFrame`, wraps at 0x101), then forwards the buffer to `self->nameField`'s `slotB8`. Read as a counter-driven colour/blink update on the name field's cursor; the exact visual effect is not established.
 
 ## Track 4 (2026-09-25, round 84, alpha)
 
@@ -306,3 +306,18 @@ Its up-calls to TaskCore (include/TaskCore.h, track 4 round 84) now go through `
 ## Track 4 (2026-09-26, round 88, bravo)
 
 TitleMenu is unified in include/TitleMenu.h (TASKCORE_SLOTS/TASKCORE_FIELDS plus its own). The broadcastToSlots override (+0x0E4). Arg1DCD0_3bb8c_d was SpriteRgb (include/Sprite.h: three `s8`, the same layout), and the name field's +0x0B8 is setColor(SpriteRgb *); `unk3C` is TaskCore's `inputMode`. Byte-identical (whole image green, 0 new warnings, nonmatching green).
+
+## Track 7 (round 96, echo)
+
+Naming: `D_8008AA28` -> `sSaveTitleColorChannel`, `D_8008AA2C` ->
+`sSaveTitleColorFrame` (tier A: the lit channel 0..2 and the frame
+counter, both read only here). Locals `buf` -> `rgb`, `base` ->
+`channels`. Constants (unit-local, decimal): `SAVE_TITLE_LIT` 128 (the
+lit level and what is added), `SAVE_TITLE_RED_FRAMES` 128,
+`SAVE_TITLE_CYCLE_FRAMES` 257.
+
+Comment moved here from the unit: "MATCHED round 75 (was STALL round
+43). `base` is taken BEFORE the first call (so it crosses a call and gets
+$s1), `buf = *color` is one struct copy (SpriteRgb is three `s8`: three
+`lb`, then three `sb`), and each arm indexes `base[D_8008AA28]` directly."
+The unit keeps a one-line MATCHING note.

@@ -1273,7 +1273,7 @@
       "flagged": {
         "DrawNode": "code_2864's local view of the scene node Viewport.h's drawNode slot types as SceneNode * (echo, round 94) (2026-09-26)",
         "EntityMoodHandlerArg": "it is SoundCueSet (Entity.h's own comment; code_179d8_e.c and code_179d8_l.c each define SoundCueSet locally): unify into one header, fields become slots[n].note/pitchOffset (2026-09-26)",
-        "ResourceRequest": "the 0x0C member of FileResource.h's ResourceSource family: make it { ResourceSource src; s32 mode; } in the header owning it and retire the other 0x0C views onto it (GraphicsResources.c ResourceSourceArgs, code_4cd08.h DreamAuxLoadReq and its stale SetVec3 comment, code_55dd4.c TodActorDesc's leading words if they are the same record), dropping the (ResourceSource *) casts where the bytes agree (delta and alpha, round 96) (2026-09-27)"
+        "ResourceRequest": "the 0x0C member of FileResource.h's ResourceSource family: make it { ResourceSource src; s32 mode; } in the header owning it and retire the other 0x0C views onto it (GraphicsResources.c ResourceSourceArgs, code_4cd08.h DreamAuxLoadReq and its stale ResourceRequest__Set comment, code_55dd4.c TodActorDesc's leading words if they are the same record), dropping the (ResourceSource *) casts where the bytes agree (delta and alpha, round 96) (2026-09-27)"
       },
       "parked": {
         "S16Quad_d294": "IS Sony's SVECTOR by layout and use (echo, round 91, SceneNode__SceneNode.md); substitution blocked while SceneNode.h's includers re-declare Sony names (python3 tools/sonyheaders.py: 24 units broke with <libgs.h> in SceneNode.h). Unpark (--undo) when sonyheaders.py lists none of them, then use Sony's type. (2026-09-26)",

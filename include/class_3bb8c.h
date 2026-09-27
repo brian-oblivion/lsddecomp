@@ -109,61 +109,64 @@ extern TaskCoreTarget D_80086D44;
 extern const char D_800114DC[];
 
 /* "ETC\TITLE.TIM", TitleMenu__Reset's path for setSubHandle. */
-extern const char D_800114E8[];
+extern const char sTitleTimPath[];
 
 /* "CARD\FILEICN1.TIM", TitleMenu__BeginCardAccess's path for New_TimImage.
  * A string splat already emitted as a symbol: a literal would emit a
  * second copy. */
-extern const char D_800114F8[];
+extern const char sSaveIconTimPath[];
 
 /* The two 320 x 240 display buffers, stacked in VRAM at y 0 and y 240:
  * TitleMenu__OnDeinit clears each with the DrawSystem's clearImage. */
-extern DrawRect D_80086DAC[2];
+extern DrawRect sDisplayBufferRects[2];
 
-/* TitleMenu__AttachSaveTitle's offset for the name field's attachToParent
- * (TextRow +0x04C), passed as a LongVec3 (the words are -4, -23, ...). */
-extern s32 D_8008A9B4;
+/* TitleMenu__AttachSaveTitle's position for the save title's attachToParent
+ * (-4, -23: percent of half the screen from the centre). A TextRow's
+ * position is a ScreenSpritePos (include/TextRow.h), passed through
+ * SceneNode's LongVec3 slot. */
+extern struct ScreenSpritePos sSaveTitleOffset;
 
 /*
- * The save file's name and title buffers, read by value (%gp_rel) and
- * forwarded: TitleMenu__SaveToCard and TitleMenu__LoadFromCard pass both to
- * TaskObjF's beginSave/beginLoad as `fileName` and `title`. The ROM image
- * points each into the rodata block at D_80011434 (0x80011464, 0x8001149C;
- * no symbol of their own there), so they are opaque `void *`.
- * TitleMenu__CreateSaveTitle strcpy's into D_8008AA18 + 0x18 and strlen's
- * it, so at run time D_8008AA18 holds a writable buffer; nothing in these
- * units sets it.
+ * The save file's name and title, as TaskObjF's beginSave/beginLoad take
+ * them (`fileName`, `title`): TitleMenu__SaveToCard and
+ * TitleMenu__LoadFromCard pass both. The ROM image points them into the
+ * rodata block at D_80011434: sSaveFileName at "BISLPS-01556xxx", which
+ * SaveToCard empties on a new game; gSaveTitle at the full-width
+ * "LSD   Day001" followed by 19 full-width spaces, which
+ * TitleMenu__CreateSaveTitle reblanks from its 12th character on a new game
+ * and FormatNumberIntoBuffer writes the day into.
  */
-extern void *D_8008AA10;
-extern void *D_8008AA18;
+extern char *sSaveFileName;
+extern char *gSaveTitle;
 
 /* The buffer FormatNumberIntoBuffer formats the day into
- * (FormatFullWidthNumber) before copying it into D_8008AA18's title. The
+ * (FormatFullWidthNumber) before copying it into gSaveTitle's title. The
  * ROM image points it at the "7654321" string D_8008AA1C. */
 extern void *D_8008AA24;
 
-/* TitleMenu__CreateSaveTitle's strcpy source for the save title. The ROM
- * image holds 0x80011474, just past D_8008AA10's "BISLPS-01556xxx" string. */
-extern void *D_8008AA14;
+/* 19 full-width spaces, the tail TitleMenu__CreateSaveTitle copies over
+ * gSaveTitle's on a new game (the ROM image points it just past
+ * sSaveFileName's string). */
+extern char *sSaveTitleBlanks;
 
 /* TaskObjF's init `namePrefix` (TitleMenu__BeginCardAccess): the ROM image
- * points it at the "BISLPS-01556" string in D_80011434. */
-extern void *D_8008A9D0;
+ * points it at the product code "BISLPS-01556" in D_80011434. */
+extern char *sCardFilePrefix;
 
-/* TaskObjF's init `nameSuffixes` (TitleMenu__BeginCardAccess): 16 string
- * pointers, D_8008AA0C down to D_8008A9D4, then NULL. Address only. */
-extern s32 D_80086D6C;
+/* TaskObjF's init `nameSuffixes` (TitleMenu__BeginCardAccess): the 15 file
+ * suffixes "-01" (D_8008AA0C) to "-15" (D_8008A9D4), then NULL. */
+extern char *sSaveFileSuffixes[];
 
 /* TitleMenu__CycleSaveTitleColor's index (0, 1, 2) into its 3-byte colour.
  * The storage is a word; every access is a byte (lbu/sb). */
-extern u8 D_8008AA28;
+extern u8 sSaveTitleColorChannel;
 
 /* TitleMenu__CycleSaveTitleColor's frame counter (wraps to 0 at 0x101). */
-extern s32 D_8008AA2C;
+extern s32 sSaveTitleColorFrame;
 
 /* TaskObjF__TaskObjF's construction count: InitCARD/StartCARD/_bu_init run
  * only on the first construction, when it was 0 before the increment. */
-extern s32 D_8008AA30;
+extern s32 sTaskObjFCount;
 
 /* Formats the current day into the save title (src/class_3bb8c_c.c);
  * TitleMenu__TitleMenu calls it with DreamSys's getCurrentDayAndYear. */

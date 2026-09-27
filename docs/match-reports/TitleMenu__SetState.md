@@ -69,3 +69,16 @@ Its up-calls to TaskCore (include/TaskCore.h, track 4 round 84) now go through `
 ## Track 4 (2026-09-26, round 88, bravo)
 
 TitleMenu is unified in include/TitleMenu.h (TASKCORE_SLOTS/TASKCORE_FIELDS plus its own). Slots at their names: slot124 is this class's own `commitNameEntry` (+0x124, TitleMenu__RefreshMenu; the call passes 0 the occupant does not read), slot7C onPadCancel, slotF0 setActiveSlot (its first argument is `target->unk8`, TaskCoreTarget, s32), slot78 onPadConfirm. Byte-identical (whole image green, 0 new warnings, nonmatching green).
+
+## Track 7 (round 96, echo)
+
+No change in this body. The state literals 5, 0xA, 0xB and 0xF are
+TaskCore's states and stay until TaskCore.h has an enum (proposed to the
+head: 5 active, 6 timed out, 0xB runs tick, 0xF commitElementScroll, 0x11
+cancelElementScroll; 9..0x11 all return to 5).
+
+## Proposed field names
+
+`TaskCoreTarget::unk8` (include/TaskCore.h; TaskCore__SetState reads it)
+-> `initialSlot`: TaskCore selects it on becoming active, and this
+setState(0xA) reselects it before confirming.

@@ -323,7 +323,7 @@ TaskObjFMethods *GetTaskObjFMethods(void) {
 }
 
 /* The save title is full-width (2-byte SJIS) characters. TitleMenu's (the
- * buffer D_8008AA18 points at) starts as "LSD   Day001", all full-width:
+ * buffer gSaveTitle points at) starts as "LSD   Day001", all full-width:
  * "LSD" (0..2), the letter field (3..5), "Day" (6..8), the day number
  * (9..11), then padding. */
 #define SAVE_TITLE_LETTER_FIELD 3

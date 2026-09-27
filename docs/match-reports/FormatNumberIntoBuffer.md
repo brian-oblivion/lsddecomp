@@ -22,7 +22,7 @@ typedef struct {
 void FormatNumberIntoBuffer(s32 arg0)
 {
     FormatFullWidthNumber(D_8008AA24, arg0, 3, 0);
-    *(Buf6_3bb8c_c *)((s8 *)D_8008AA18 + 0x12) = *(Buf6_3bb8c_c *)D_8008AA24;
+    *(Buf6_3bb8c_c *)((s8 *)gSaveTitle + 0x12) = *(Buf6_3bb8c_c *)D_8008AA24;
 }
 ```
 
@@ -35,7 +35,7 @@ project's independent-local-view convention.
 
 `D_8008AA24` is a new declaration in `include/class_3bb8c.h`
 (`extern void *D_8008AA24;`), added additively next to the existing
-`D_8008AA10`/`D_8008AA18` VALUE-of `%gp_rel` globals — same pattern: the ROM
+`sSaveFileName`/`gSaveTitle` VALUE-of `%gp_rel` globals — same pattern: the ROM
 image initializes it to a rodata placeholder (`D_8008AA1C`, the "7654321"
 string in `asm/data/7B12C.sdata.s`) but the runtime value is a writable
 buffer that `FormatFullWidthNumber` formats into.
@@ -105,8 +105,8 @@ struct-copy question.
 `TitleMenu__TitleMenu`, not through any vtable), `VerbNoun`. Mechanics are
 fully evident: formats `arg0` via `FormatFullWidthNumber` into
 `D_8008AA24`'s buffer, then copies 6 raw bytes of that buffer into
-`D_8008AA18`'s buffer at `+0x12`. Purpose is explicitly NOT established --
-the header's own comments on `D_8008AA18`/`D_8008AA24` document both as
+`gSaveTitle`'s buffer at `+0x12`. Purpose is explicitly NOT established --
+the header's own comments on `gSaveTitle`/`D_8008AA24` document both as
 "writable-buffer placeholders" whose real runtime role is outside this
 unit's own carved ground (a nearby string, "CARD\FILEICN1.TIM", and the
 disc's own product-code string sit in the same rodata block, which is
@@ -114,7 +114,7 @@ disc's own product-code string sit in the same rodata block, which is
 that is exactly the kind of purpose-guess the naming rule forbids without
 a function that actually establishes it). Named for the one certain
 mechanic -- format a number, copy it into another buffer -- and nothing
-more. `D_8008AA24`/`D_8008AA18` themselves are left unrenamed for the same
+more. `D_8008AA24`/`gSaveTitle` themselves are left unrenamed for the same
 reason.
 
 ## Track 6 (2026-09-27, round 96)
@@ -129,18 +129,18 @@ same record class_3bb8c_g's StampSaveTitleFileLetter copies, so the three
 types (`FullWidthChar`, `FullWidthChars3`, `FullWidthChars6`) moved from
 class_3bb8c_g.c into `include/TitleMenu.h`: the save title is TitleMenu's
 buffer (its banner: createSaveTitle builds `saveTitle` from the SJIS title
-in D_8008AA18's buffer; both writers serve it), and `TaskObjF.h` only sees
+in gSaveTitle's buffer; both writers serve it), and `TaskObjF.h` only sees
 a `char *title` passed in. Alignment is still 1 (all-`s8` leaves), so the
 copy is still one `lwl`/`lwr` word plus two `lb`/`sb` pairs, as derived
 above; the header keeps the one `MATCHING:` line. Image byte-identical.
 
-Left for track 7 (this unit's polish): the raw `(s8 *)D_8008AA18 + 0x12`
-(could read `&((FullWidthChar *)D_8008AA18)[9]`) and the
-`D_8008AA18`/`D_8008AA24` names.
+Left for track 7 (this unit's polish): the raw `(s8 *)gSaveTitle + 0x12`
+(could read `&((FullWidthChar *)gSaveTitle)[9]`) and the
+`gSaveTitle`/`D_8008AA24` names.
 
 Comment moved out of the source (verbatim), on the old local type:
 "The 6-byte value formatted into D_8008AA24's buffer by FormatFullWidthNumber
-above, copied whole into D_8008AA18's buffer at +0x12 as ONE struct
+above, copied whole into gSaveTitle's buffer at +0x12 as ONE struct
 assignment. All-`s8` fields (alignment 1, not 2 or 4) is what makes
 retail's block-move split this way: the leading 4 bytes go via the
 unaligned lwl/lwr word copy regardless of declared alignment (same

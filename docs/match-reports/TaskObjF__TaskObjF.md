@@ -26,8 +26,8 @@ void TaskObjF__TaskObjF(GenericCtorObj_3bb8c_d *self, s32 arg1, s32 arg2)
 
     Get_vtable_BasicClass()->ctor(self);
     self->methods = GetTaskObjFMethods();
-    count = D_8008AA30;
-    D_8008AA30 = count + 1;
+    count = sTaskObjFCount;
+    sTaskObjFCount = count + 1;
     if (count == 0) {
         InitCARD(arg1);
         StartCARD();
@@ -51,7 +51,7 @@ SLPS_015.56`.
    `&gTaskObjFMethods`, i.e. this class sets its OWN `methods` pointer directly
    to its own table, the same "base-ctor-chain" pattern already documented
    for `TitleMenu::TitleMenu__TitleMenu` in this same header.
-3. A one-shot init guard: `D_8008AA30` (a plain `.sdata` `s32`, zero-
+3. A one-shot init guard: `sTaskObjFCount` (a plain `.sdata` `s32`, zero-
    initialized, `asm/data/7B12C.sdata.s`) is read, incremented
    unconditionally, and the PRE-increment value gates a block that runs
    `InitCARD(arg1)`/`StartCARD()`/`_bu_init()` -- all three PSX libcard
@@ -78,7 +78,7 @@ SLPS_015.56`.
 - New `GenericCtorObj_3bb8c_d` instance struct (just `methods` at +0x000)
   -- this unit's own minimal, independent local view of the same real
   object `class_3bb8c_e.c` calls `Node3bb8cE`.
-- New extern `D_8008AA30` (`s32`, the one-shot init counter).
+- New extern `sTaskObjFCount` (`s32`, the one-shot init counter).
 
 `src/class_3bb8c_d.c`: local (not shared-header) externs for
 `TaskObjF__ClearResourceSlots` (already matched elsewhere, under this unit's own `void *`
@@ -109,3 +109,14 @@ somewhere else.
 ## Naming (round 77, naming runner delta)
 
 Renamed `func_8004E34C` -> `TaskObjF__TaskObjF`. **Tier A**: `tools/classtable.py 0x80086DC4` places this function exactly at `gTaskObjFMethods`'s own +0x008 ctor slot -- the constructor for the class `class_3bb8c_f.c`/`class_3bb8c_g.c` already name `TaskObjF` tree-wide. Follows the `New_Class`/`Class__Class` constructor convention.
+
+## Track 7 (round 96, echo)
+
+Naming: `D_8008AA30` -> `sTaskObjFCount` (tier A: the count of TaskObjF
+constructions; the card libraries start when it was 0).
+
+Comment moved here from the unit: InitCARD/StartCARD/_bu_init are
+libcard, linked SDK objects (config/psyq-objects.txt: libcard/a74,
+libcard/a75, libcard/c112), declared locally rather than in the shared
+header, the same policy as malloc/free/printf (CLAUDE.md, "To include/
+has one exception").

@@ -13,7 +13,7 @@
  * the two operations (+0x064..+0x078, +0x038) in src/class_3bb8c_f.c, the
  * state machine (+0x07C..+0x0B0) in src/class_3bb8c_g.c.
  *
- *  - The ctor runs InitCARD/StartCARD/_bu_init once per boot (D_8008AA30)
+ *  - The ctor runs InitCARD/StartCARD/_bu_init once per boot (sTaskObjFCount)
  *    and setCardSlot(cardSlot); +0x040..+0x068 wrap the PS-X memory-card
  *    BIOS: events (OpenEvent x4), _card_info/_card_load, format, and
  *    open/read/write/delete on "bu00:"/"bu10:" paths (BuildMemcardPath).
@@ -117,8 +117,8 @@ struct TaskObjF {
     /* +0x024 */ s32 opMode; /* 1 beginLoad, 2 beginSave; the terminal states clear it. advanceState retries the one that is set */
     /* +0x028 */ s32 state;  /* setState; init clears it */
     /* +0x02C */ s32 bufCount; /* collectExistingMemcardFiles's count; how many `titles` buffers are kept */
-    /* +0x030 */ char *namePrefix; /* init: the product code ("BISLPS-01556", D_8008A9D0); file names are prefix + suffix */
-    /* +0x034 */ char **nameSuffixes; /* init: a NULL-terminated table of candidate suffixes (D_80086D6C) */
+    /* +0x030 */ char *namePrefix; /* init: the product code ("BISLPS-01556", sCardFilePrefix); file names are prefix + suffix */
+    /* +0x034 */ char **nameSuffixes; /* init: a NULL-terminated table of candidate suffixes (sSaveFileSuffixes) */
     /* +0x038 */ char **titles; /* AllocBuffers: 16 pointers, 15 buffers of 0x41; the existing files' titles; the item list's strings */
     /* +0x03C */ char **foundSuffixes; /* AllocBuffers: 0x40 bytes; the suffix of each file in `titles` */
     /* +0x040 */ char *fileName; /* beginLoad/beginSave; advanceState builds it from the chosen entry */
@@ -140,6 +140,11 @@ struct TaskObjF {
     /* +0x07C */ struct ItemList *itemList; /* attachItemList: New_ItemList(titles, 1); AddChild's class 0x20 */
     /* +0x080 */ s32 selectedIndex; /* onItemListResult: the list's getCursorIndex */
 };
+
+/* TaskObjF's class id (gTaskObjFMethods word +0x000). A single nibble, so
+ * `(header & 0xF) == TASKOBJF_CLASS_ID` is its is-kind-of test
+ * (TitleMenu__OnNotify). */
+#define TASKOBJF_CLASS_ID 0xB
 
 /* TaskObjF::opMode: the operation beginLoad or beginSave started. */
 enum TaskObjFOpMode {

@@ -74,3 +74,9 @@ own +0x138 (`onTagBValue`, TitleMenu__OnCardEvent) with the same
 are now onNotify's: `BasicClass *sender` (the `GenericHeaderObj_3bb8c_d`
 view is gone; BasicClassMethods::header is the same full `s32` word, `lw`
 then `andi 0xF`) and `s32 event`.
+
+## Track 7 (round 96, echo)
+
+Constant: the `0xB` is `TASKOBJF_CLASS_ID` (include/TaskObjF.h, added:
+gTaskObjFMethods word +0x000 is 0xB, a single-nibble id, so `& 0xF` is its
+kind-of test). The 0xF mask stays a literal.

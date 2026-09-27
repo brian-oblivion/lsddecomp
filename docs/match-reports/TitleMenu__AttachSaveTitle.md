@@ -15,7 +15,7 @@ SHA1 matches retail. `funcdiff.py TitleMenu__AttachSaveTitle`: 27/27 words match
 void TitleMenu__AttachSaveTitle(TitleMenu *self, s32 arg1)
 {
     Get_vtable_TaskCore()->slotE0(self, arg1);
-    self->nameField->methods->slot4C(self->nameField, arg1, &D_8008A9B4);
+    self->nameField->methods->slot4C(self->nameField, arg1, &sSaveTitleOffset);
 }
 ```
 
@@ -35,7 +35,7 @@ slot on `self->nameField` (the sub-object `TitleMenu__DestroySaveTitle` releases
   interface onto the other two.
 - `BaseTaskCtorTable_3bb8c_c::slotE0` -- new slot, `void (*)(void *self,
   s32 arg1)`.
-- New `extern s32 D_8008A9B4;` (address-of only, placeholder type).
+- New `extern s32 sSaveTitleOffset;` (address-of only, placeholder type).
 
 ### Proposed learning
 
@@ -43,7 +43,7 @@ None new.
 
 ## Naming (round 77, naming runner delta)
 
-Renamed `func_8004DC64` -> `TitleMenu__AttachSaveTitle`. **Tier B**: Forwards `arg1` to the base class's `slotE0`, then dispatches `arg1` and a fixed global (`&D_8008A9B4`) through `self->nameField`'s own `slot4C`. Purpose of the forwarded value/event not established.
+Renamed `func_8004DC64` -> `TitleMenu__AttachSaveTitle`. **Tier B**: Forwards `arg1` to the base class's `slotE0`, then dispatches `arg1` and a fixed global (`&sSaveTitleOffset`) through `self->nameField`'s own `slot4C`. Purpose of the forwarded value/event not established.
 
 ## Track 4 (2026-09-25, round 84, alpha)
 
@@ -51,4 +51,12 @@ Its up-calls to TaskCore (include/TaskCore.h, track 4 round 84) now go through `
 
 ## Track 4 (2026-09-26, round 88, bravo)
 
-TitleMenu is unified in include/TitleMenu.h (TASKCORE_SLOTS/TASKCORE_FIELDS plus its own). The updateSlotElements override (+0x0E0). Its argument is typed as the slot's `void *parent`; the name field's +0x04C is TextRow's attachToParent (SceneNode's), so the call casts parent to SceneNode * and &D_8008A9B4 to LongVec3 * (its offset). No code from either cast. Byte-identical (whole image green, 0 new warnings, nonmatching green).
+TitleMenu is unified in include/TitleMenu.h (TASKCORE_SLOTS/TASKCORE_FIELDS plus its own). The updateSlotElements override (+0x0E0). Its argument is typed as the slot's `void *parent`; the name field's +0x04C is TextRow's attachToParent (SceneNode's), so the call casts parent to SceneNode * and &sSaveTitleOffset to LongVec3 * (its offset). No code from either cast. Byte-identical (whole image green, 0 new warnings, nonmatching green).
+
+## Track 7 (round 96, echo)
+
+Naming: `D_8008A9B4` -> `sSaveTitleOffset` (tier A: the position
+attachToParent places the save title at, -4, -23). Retyped `s32` ->
+`struct ScreenSpritePos` in include/class_3bb8c.h: a TextRow's position
+is a ScreenSpritePos (include/TextRow.h's banner) passed through
+SceneNode's LongVec3 slot, so the `(LongVec3 *)` cast stays.

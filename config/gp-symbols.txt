@@ -24,8 +24,6 @@ D_8008A994
 D_8008A99C
 D_8008A9A4
 D_8008A9AC
-D_8008A9B4
-D_8008A9D0
 D_8008A9D4
 D_8008A9D8
 D_8008A9DC
@@ -41,14 +39,8 @@ D_8008AA00
 D_8008AA04
 D_8008AA08
 D_8008AA0C
-D_8008AA10
-D_8008AA14
-D_8008AA18
 D_8008AA1C
 D_8008AA24
-D_8008AA28
-D_8008AA2C
-D_8008AA30
 D_8008AA34
 D_8008AA3C
 D_8008AA44
@@ -166,6 +158,7 @@ gNameCharTable
 gObjMProjectionBias
 gOpenVabCount
 gPendingVabBuffer
+gSaveTitle
 gSaveTitleGlyphs
 gSoundEffectDirPtr
 gStartupBMemPMgr
@@ -207,6 +200,7 @@ gVabVolumeInited
 gWBgmActive
 gpDinamicLinkPenalty
 gpNavChallengesComplete
+sCardFilePrefix
 sCardPathPrefix
 sCdDriveInited
 sDivClipHeight
@@ -217,4 +211,10 @@ sMoodCue78TransitionDone
 sNdivOverride
 sNdivOverrideSet
 sPadRefCount
+sSaveFileName
+sSaveTitleBlanks
+sSaveTitleColorChannel
+sSaveTitleColorFrame
+sSaveTitleOffset
+sTaskObjFCount
 sTimExt
