@@ -21,7 +21,7 @@ void BoxFill__Reset(ClassEAC0Obj *self, BoxFillSize *a1, void *a2, s32 a3) {
     self->unk62 = a1->y;
     methods = self->methods;
     if (a2 == NULL) {
-        a2 = D_8008A924;
+        a2 = gBoxFillDefaultColor;
     }
     methods->slotB8(self, 1, a2);
     self->methods->slotCC(self, 0xD);
@@ -47,11 +47,11 @@ a byte-offset shift.
 ## Misread caught before committing
 
 First reading treated `a2` as a MODE flag (0 vs nonzero) selecting between
-two fixed tables (`D_8008A924`/`gFadeBoxBlackColors`). Re-reading the raw
+two fixed tables (`gBoxFillDefaultColor`/`gFadeBoxBlackColors`). Re-reading the raw
 instructions closely: retail's `bnez $a2, .L80040628` branches on `a2`
 ITSELF being nonzero, and when `a2 == 0` the fallthrough OVERWRITES `a2`
-with `&D_8008A924` before the shared call -- i.e. `a2` isn't a flag at
-all, it IS the `tableEntry` pointer, with `D_8008A924` only as the
+with `&gBoxFillDefaultColor` before the shared call -- i.e. `a2` isn't a flag at
+all, it IS the `tableEntry` pointer, with `gBoxFillDefaultColor` only as the
 default when the caller passes `NULL`. Same family as the project's
 established "a discarded/defaulted value is not evidence of the wrong
 type" caution, just for a parameter rather than a return.
@@ -68,7 +68,7 @@ full three-occupant cross-check.
 
 ## Track 4 (2026-09-25, round 85, charlie)
 
-Class 0x64 (was D_8006EAC0) is unified as BoxFill in include/BoxFill.h: Viewport__DrawNode draws a node whose class-id low byte is 0x64 with GsSortBoxFill over the GsBOXF at +0x058 (pri +0x044, `relative` +0x048, x/y +0x050/+0x054). The body now takes `BoxFill *`; zero bytes changed. Renamed from `ClassEAC0__FinishConstruct`: the +0x040 occupant, SceneNode's `reset` slot, named for its slot (FINISHING-PLAN track 4 step 6; tier A for the slot, the body initialises every BoxFill field: pri from the ctor's third argument, relative = 1, GsBOXF attribute/x/y = 0, w/h from the size pair, colour (default D_8008A924) through setColor, mask through setMask(13)). Its parameter list differs from the slot's (self only); the slot keeps SceneNode's type and the ctor casts to BoxFillResetFn. Unlike SceneNode__Reset it does not reset the coordinate; it never calls the base.
+Class 0x64 (was D_8006EAC0) is unified as BoxFill in include/BoxFill.h: Viewport__DrawNode draws a node whose class-id low byte is 0x64 with GsSortBoxFill over the GsBOXF at +0x058 (pri +0x044, `relative` +0x048, x/y +0x050/+0x054). The body now takes `BoxFill *`; zero bytes changed. Renamed from `ClassEAC0__FinishConstruct`: the +0x040 occupant, SceneNode's `reset` slot, named for its slot (FINISHING-PLAN track 4 step 6; tier A for the slot, the body initialises every BoxFill field: pri from the ctor's third argument, relative = 1, GsBOXF attribute/x/y = 0, w/h from the size pair, colour (default gBoxFillDefaultColor) through setColor, mask through setMask(13)). Its parameter list differs from the slot's (self only); the slot keeps SceneNode's type and the ctor casts to BoxFillResetFn. Unlike SceneNode__Reset it does not reset the coordinate; it never calls the base.
 
 ## Track 6 (round 99, alpha)
 

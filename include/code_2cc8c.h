@@ -255,10 +255,10 @@ struct TexPageDesc {
  * stride by a channel mask (`i*3`, no further scaling). Retail bytes:
  * gFadeBoxMaskColors is eight RGB entries (0 and 7 FFFFFF, 1 0000FF, 2 00FF00,
  * 4 FF0000); gFadeBoxBlackColors follows it and its entries are black (0x00), indexed
- * by FadeBox__StartFadeUp and used whole for mask 0xF. `D_8008A924` is
+ * by FadeBox__StartFadeUp and used whole for mask 0xF. `gBoxFillDefaultColor` is
  * BoxFill__Reset's default colour, 808080, one use. */
 extern u8 gFadeBoxMaskColors[];
 extern u8 gFadeBoxBlackColors[];
-extern u8 D_8008A924[3];
+extern u8 gBoxFillDefaultColor[3];
 
 #endif

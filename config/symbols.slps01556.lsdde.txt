@@ -3137,3 +3137,4 @@ _svm_okon1 = 0x8008E228;
 gCdSyncQueueMode = 0x8008A860;
 gFadeBoxMaskColors = 0x8006EA90;
 gFadeBoxBlackColors = 0x8006EAA8;
+gBoxFillDefaultColor = 0x8008A924;
