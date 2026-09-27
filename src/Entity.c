@@ -97,7 +97,7 @@ void Entity__Finalize(Entity *this) {
 void Entity__Reset(Entity *this) {
     s32 kind;
 
-    kind = ((u8 *)gEntityUnlockKindTable)[this->moodIndex * 0x10];
+    kind = (u8)gEntityMoodTable[this->moodIndex].unlockKind;
     if ((u32)(kind - 1) < 9) {
         this->methods->setLightMode(this, 1);
     }
@@ -145,7 +145,7 @@ void Entity__Update(Entity *this, void *a1, s32 a2) {
 void Entity__NotifyLinkStage(Entity *this, void *arg1, s32 arg2) {
     s32 linkStage;
 
-    linkStage = gEntityLinkStageTable[this->moodIndex * 0x10];
+    linkStage = gEntityMoodTable[this->moodIndex].linkStage;
     if ((u32)(arg2 - 2) < 7) {
         if (linkStage <= 0) {
             return;
@@ -160,7 +160,7 @@ void Entity__NotifyLinkStage(Entity *this, void *arg1, s32 arg2) {
     }
     if (linkStage != 0x7F) {
         arg2 = 0xA;
-    } else if (gEntityEventVideoTable[this->moodIndex * 0x10] != 0) {
+    } else if (gEntityMoodTable[this->moodIndex].eventVideo != 0) {
         arg2 = 0xB;
     } else {
         arg2 = 0xC;
@@ -180,20 +180,12 @@ void Entity__TickSoundCue(Entity *this) {
     this->moodTimer++;
 }
 
-typedef struct EntityVec3 EntityVec3;
-
-struct EntityVec3 {
-    s32 x;
-    s32 y;
-    s32 z;
-};
-
 s32 Entity__IsNearTarget(Entity *this, void *pos, s32 arg2, s32 arg3) {
-    EntityVec3 local;
+    LongVec3 local;
     s32 kind;
 
-    local = *(EntityVec3 *)pos;
-    kind = ((u8 *)gEntityUnlockKindTable)[this->moodIndex * 0x10];
+    local = *(LongVec3 *)pos;
+    kind = (u8)gEntityMoodTable[this->moodIndex].unlockKind;
     if ((u32)((kind + 9) & 0xFF) < 9) {
         local.y += (s8)kind * 1024;
     }
@@ -237,7 +229,7 @@ s32 Entity__GetProximityRatio(Entity *this) {
     } while (0);
     self = this;
     result = this->methods->distanceToPeer(this, self->peer);
-    threshold = gEntityProximityThresholdTable[self->moodIndex * 0x10] << 11;
+    threshold = gEntityMoodTable[self->moodIndex].proximityThreshold << 11;
     if (threshold < result) {
         return -1;
     }
@@ -249,11 +241,11 @@ EntityMoodRow *Entity__GetMoodEffect(Entity *this) {
 }
 
 s32 Entity__GetUnlockEffect(Entity *this) {
-    return gEntityUnlockKindTable[this->moodIndex * 0x10] * 1000;
+    return gEntityMoodTable[this->moodIndex].unlockKind * 1000;
 }
 
 s32 Entity__GetLinkStage(Entity *this) {
-    s32 linkStage = gEntityLinkStageTable[this->moodIndex * 0x10];
+    s32 linkStage = gEntityMoodTable[this->moodIndex].linkStage;
 
     if (linkStage < 0) {
         return ~linkStage;
@@ -262,7 +254,7 @@ s32 Entity__GetLinkStage(Entity *this) {
 }
 
 s32 Entity__GetEventVideo(Entity *this) {
-    return gEntityEventVideoTable[this->moodIndex * 0x10] - 1;
+    return gEntityMoodTable[this->moodIndex].eventVideo - 1;
 }
 
 void Entity__Activate(Entity *this) {
@@ -285,19 +277,13 @@ void Entity__SetTargetReached(Entity *this, s32 arg1) {
     this->targetReached = arg1;
 }
 
-typedef struct EntityMoodHandlerRow EntityMoodHandlerRow;
-
-struct EntityMoodHandlerRow {
-    void *handler; /* +0x00 */
-    u8 pad04[0x10 - 0x04];
-};
-
-extern EntityMoodHandlerRow gEntityMoodHandlerTable[];
-extern void InitSoundCueSet(void *sound, void *set, s32 tag, Entity *owner, void *callback);
+/* code_179d8_e.c's; SoundCueSet.h does not declare it. */
+extern s32 InitSoundCueSet(struct VabStreamObj *sound, SoundCueSet *set, s32 tag, void *owner,
+                           SoundCueCallbackFn callback);
 
 void Entity__StartSoundCue(Entity *this) {
     InitSoundCueSet(this->sound, &this->soundCueSet, this->moodIndex + 1, this,
-                    gEntityMoodHandlerTable[this->moodIndex].handler);
+                    gEntityMoodTable[this->moodIndex].handler);
     ((EntityPlayTodFn)this->methods->playTod)(this);
     this->methods->enableTickCallback(this);
     this->moodTimer = 0;
@@ -322,8 +308,9 @@ s32 Entity__UpdateActivationState(Entity *this) {
             if (row->detachKind == 4) {
                 goto randCheck;
             }
-            if (row->unk5 != 0) {
-                if (Entity__IsNearTarget(this, &this->coord2->tx, row->unk5, row->nearTolerance) != 0) {
+            if (row->activeRange != 0) {
+                if (Entity__IsNearTarget(this, &this->coord2->tx, row->activeRange,
+                                         row->nearTolerance) != 0) {
                     if (row->detachKind == 1) {
                         doDetach = 1;
                     } else if (row->detachKind == 3) {
@@ -365,8 +352,8 @@ s32 Entity__UpdateDeactivationState(Entity *this) {
                 if ((scaled ^ (row->linkKind * 15)) == 0) {
                     doDetach = 1;
                 }
-            } else if (row->unk5 != 0) {
-                dist = Entity__IsNearTarget(this, &this->coord2->tx, row->unk5, row->nearTolerance);
+            } else if (row->activeRange != 0) {
+                dist = Entity__IsNearTarget(this, &this->coord2->tx, row->activeRange, row->nearTolerance);
                 if (dist != 0) {
                     if (row->linkKind == 1) {
                         doDetach = 1;

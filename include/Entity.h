@@ -145,37 +145,33 @@ extern EntityMethods *Get_vtable_Entity(void); /* returns &gEntityMethods */
 extern s32 gEntityDefaultPos[2];
 extern s32 gEntityDefaultOffset[2];
 
-/* The mood-indexed table lookups. `gEntityMoodTable` is a real struct array (16
- * bytes/entry, `this->moodIndex` selects the row) -- Entity__UpdateActivationState reads
- * its +0x3 (signed) and Entity__UpdateDeactivationState its +0x4 (UNSIGNED) as two DIFFERENT
- * small-enum fields, not the same byte reinterpreted; both also read +0x5
- * (signed) and +0x9 (signed). `gEntityUnlockKindTable`/`gEntityLinkStageTable`/`gEntityEventVideoTable` are
- * SEPARATE global arrays (own base symbols, own `lui`/`addiu`), each also
- * 16-byte/entry and independently `this->moodIndex`-indexed -- despite the
- * base addresses' proximity, they are not sub-fields of the gEntityMoodTable row.
- * Table element types past what's listed here are `s8` (signed byte loads),
- * not `char`, despite `-funsigned-char` making plain `char` unsigned project-
- * wide -- these tables are explicitly `lb`, not `lbu`, in every user seen so
- * far (contrast `linkKind`, `gEntityUnlockKindTable`, both `lbu`/`lb`-mixed by design,
- * not by the project's usual char convention). */
+/* One row of the mood table (16 bytes): New_Entity's moodIndex selects it, and
+ * every per-mood setting of an Entity is a column of it. Signed columns are
+ * `s8` (`lb`); plain `char` would be unsigned here (-funsigned-char).
+ *
+ * gEntityLinkStageTable and gEntityEventVideoTable are two of its columns
+ * seen as flat arrays (the row base + 7 and + 8, indexed moodIndex * 16):
+ * GCC spells a constant-offset field of a global array as `%hi`/`%lo(sym +
+ * off)`, which splat labels as a symbol of its own. Entity_b still reads them
+ * that way; the field spelling compiles to the same bytes. */
 struct EntityMoodRow {
-    u8 pad00[0x03];
+    u8 pad00[0x02];
+    s8 unlockKind; /* +0x02, Entity__GetUnlockEffect: times 1000 is the unlock score; 1 to 9: Entity__Reset turns fog on; -9 to -1: Entity__IsNearTarget moves the tested point by it times 1024 in y */
     s8 detachKind; /* +0x03, read by Entity__UpdateActivationState; 0: Entity__AttachToParent activates at once */
-    u8 linkKind;       /* +0x04, read by Entity__UpdateDeactivationState (unsigned load) */
-    s8 unk5;           /* +0x05 */
-    s8 proximityRange; /* +0x06, read by Entity__UpdateTargetProximity only (compiler-checked, round 71): magnitude (after abs) is Entity__IsNearTarget's distance arg for raising targetReached via setTargetReached; a NEGATIVE value also makes the entity face its target every tick */
-    u8 pad07[0x02];
+    u8 linkKind;    /* +0x04, read by Entity__UpdateDeactivationState (unsigned load) */
+    s8 activeRange; /* +0x05, Entity__IsNearTarget's distance for the activation and deactivation range tests; 0: no range test */
+    s8 proximityRange; /* +0x06, read by Entity__UpdateTargetProximity: magnitude (after abs) is Entity__IsNearTarget's distance arg for raising targetReached via setTargetReached; a NEGATIVE value also makes the entity face its target every tick */
+    s8 linkStage; /* +0x07, Entity__GetLinkStage and Entity__NotifyLinkStage (gEntityLinkStageTable) */
+    s8 eventVideo; /* +0x08, Entity__GetEventVideo and Entity__NotifyLinkStage (gEntityEventVideoTable) */
     s8 nearTolerance; /* +0x09, Entity__IsNearTarget's tolerance for every range test on this row (activation, deactivation, proximity, cue start/stop) */
-    u8 pad0A[0x01];
+    s8 proximityThreshold; /* +0x0A, Entity__GetProximityRatio's range */
     s8 cueRange; /* +0x0B, read by Entity__UpdateSoundCueStart/Entity__UpdateSoundCueStop and Entity__AttachToParent: 0 = the cue starts at attach (when the entity activated there) and never on range; magnitude (after abs) is Entity__IsNearTarget's distance arg for starting the sound cue; a NEGATIVE value also stops it again once the target leaves that range. SEPARATE field from proximityRange (+0x06) */
-    u8 pad0C[0x04];
+    SoundCueCallbackFn handler; /* +0x0C, the Entity__MoodCueNN Entity__StartSoundCue installs (symbol gEntityMoodHandlerTable, 0x80089EB0) */
 };
 
 extern EntityMoodRow gEntityMoodTable[];
-extern s8 gEntityUnlockKindTable[]; /* GetUnlockEffect */
-extern s8 gEntityLinkStageTable[];  /* GetLinkStage */
-extern s8 gEntityEventVideoTable[]; /* GetEventVideo */
-extern s8 gEntityProximityThresholdTable[]; /* read by Entity__GetProximityRatio, moodIndex*0x10-indexed like the rest of this family */
+extern s8 gEntityLinkStageTable[];  /* the linkStage column (Entity_b) */
+extern s8 gEntityEventVideoTable[]; /* the eventVideo column (Entity_b) */
 
 /* The class's own methods, in ROM order (Entity, then Entity_b). A caller
  * reaching the base ones goes through GetTodActorMethods() and upcasts. */
