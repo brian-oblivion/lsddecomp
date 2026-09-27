@@ -3,6 +3,7 @@
 #include <libgpu.h>
 #include <libgs.h>
 #include "code_2c054.h"
+#include "BMemPMgr.h"
 #include "VabStreamObj.h"
 #include "BgLayer.h"
 #include "TileMap.h"
@@ -12,7 +13,7 @@ StreamTask *New_StreamTask(TaskCoreTarget *target, char *soundBankPath, BasicCla
                            StreamTaskInitData *initData) {
     StreamTask *self;
 
-    self = BMemPMgrAlloc(0xDC);
+    self = BMemPMgrAlloc(sizeof(StreamTask));
     if (self != NULL) {
         Get_vtable_StreamTask()->ctor(self, target, soundBankPath, sound, initData);
         return self;
@@ -79,24 +80,24 @@ void StreamTask__Update(StreamTask *self, BasicClass *sender, s32 event) {
     if (self->fadingOut != 0) {
         return;
     }
-    self->methods->setState(self, 7);
+    self->methods->setState(self, TASKCORE_STATE_FADE_OUT);
 }
 
 void StreamTask__SetState(StreamTask *self, s32 state) {
     Get_vtable_TaskCore()->setState((TaskCore *)self, state);
     switch (state) {
-        case 5:
+        case TASKCORE_STATE_ACTIVE:
             self->fadingOut = 0;
             break;
-        case 7:
+        case TASKCORE_STATE_FADE_OUT:
             self->fadingOut = 1;
             break;
-        case 8:
+        case TASKCORE_STATE_FADED_OUT:
             if (self->abortBeforeFade == 0) {
                 self->player->methods->abort(self->player);
             }
             break;
-        case 0x12:
+        case STREAMTASK_STATE_SKIPPED:
             self->methods->refreshViewValue(self);
             break;
     }
@@ -105,15 +106,15 @@ void StreamTask__SetState(StreamTask *self, s32 state) {
 void StreamTask__SetFrameBound(StreamTask *self, s32 bound) {
     self->frameBound = bound;
     if (bound >= 0) {
-        self->frameBound = bound * 15;
+        self->frameBound = bound * STREAMTASK_FRAMES_PER_SECOND;
     }
 }
 
 void StreamTask__OnPadConfirm(StreamTask *self) {
     Get_vtable_TaskCore()->onPadConfirm((TaskCore *)self);
     if (self->skipOnConfirm != 0) {
-        self->result = 2;
-        self->methods->setState(self, 0x12);
+        self->result = STREAMTASK_RESULT_SKIPPED;
+        self->methods->setState(self, STREAMTASK_STATE_SKIPPED);
     }
 }
 
@@ -133,7 +134,7 @@ void StreamTask__RefreshViewValue(StreamTask *self) {
     if (self->abortBeforeFade != 0) {
         self->player->methods->abort(self->player);
     } else {
-        self->methods->setState(self, 7);
+        self->methods->setState(self, TASKCORE_STATE_FADE_OUT);
     }
 }
 
@@ -165,7 +166,7 @@ StreamTaskMethods *Get_vtable_StreamTask(void) {
 TaskCore *New_TaskCore(TaskCoreTarget *target, char *soundBankPath, BasicClass *sound) {
     TaskCore *self;
 
-    self = BMemPMgrAlloc(0xA4);
+    self = BMemPMgrAlloc(sizeof(TaskCore));
     if (self != NULL) {
         Get_vtable_TaskCore()->ctor(self, target, soundBankPath, sound);
         return self;
@@ -182,13 +183,13 @@ void TaskCore__TaskCore(TaskCore *self, TaskCoreTarget *target, char *soundBankP
     methods = Get_vtable_TaskCore();
     self->methods = methods;
     methods->setTarget(self, target);
-    if (soundBankPath != 0) {
+    if (soundBankPath != NULL) {
         self->sound = (BasicClass *)New_VabStreamObj(soundBankPath);
     } else {
         self->sound = sound;
     }
     self->soundBankPath = soundBankPath;
-    self->methods->setSubHandle(self, 0, 0);
+    self->methods->setSubHandle(self, NULL, NULL);
     atlas = New_TileAtlas(0);
     self->tileAtlas = atlas;
     tileMap = New_TileMap(0, atlas);
@@ -201,10 +202,10 @@ void TaskCore__Finalize(TaskCore *self) {
     self->bgLayer->methods->release(self->bgLayer);
     self->tileMap->methods->release(self->tileMap);
     self->tileAtlas->methods->release(self->tileAtlas);
-    if (self->soundBankPath != 0) {
+    if (self->soundBankPath != NULL) {
         self->sound->methods->release(self->sound);
     }
-    if (self->subHandlePath != 0) {
+    if (self->subHandlePath != NULL) {
         self->subHandle->methods->release(self->subHandle);
     }
     self->methods->releaseTarget(self);
@@ -214,18 +215,18 @@ void TaskCore__Finalize(TaskCore *self) {
 void TaskCore__Reset(TaskCore *self) {
     TaskCoreMethods *methods = self->methods;
     methods->setFrameBound(self, -1);
-    methods->setColors(self, &sTaskCoreDefaultColors[0], &sTaskCoreDefaultColors[3],
-                       &sTaskCoreDefaultColors[6]);
+    methods->setColors(self, sTaskCoreDefaultColors[0], sTaskCoreDefaultColors[1],
+                       sTaskCoreDefaultColors[2]);
     methods->setFadeCallbackEnabled(self, 1);
     methods->setFadeOutCallbackEnabled(self, 1);
     self->fadeRate = 9;
     self->otLength = 3;
-    self->unk2C = 0x12C;
-    self->packetSize = 0x40;
+    self->unk2C = 300;
+    self->packetSize = 64;
     self->viewCallback = NULL;
     self->viewCallbackCtx = NULL;
     self->unk34 = 1;
-    self->inputMode = 0;
+    self->inputMode = TASKCORE_INPUT_NONE;
 }
 
 s32 TaskCore__Init(TaskCore *self, IntermediateBaseInitArgs *args, s32 mode) {
@@ -243,11 +244,11 @@ void TaskCore__OnInit(TaskCore *self) {
     viewportMethods = viewport->methods;
     self->methods->updateSlotElements(self, self->unk14);
     self->bgLayer->methods->attachToParent(self->bgLayer, (SceneNode *)self->unk14, NULL);
-    if (self->fadeInCallback != 0) {
+    if (self->fadeInCallback != NULL) {
         self->methods->broadcastToSlots(self, self->baseColor);
         self->bgLayer->methods->setColor(self->bgLayer, 1, (BgLayerRgb *)self->baseColor);
     }
-    if (self->subHandle == 0) {
+    if (self->subHandle == NULL) {
         ((DrawSystem *)self->initArgs->drawSystem)
             ->methods->clearImage((DrawSystem *)self->initArgs->drawSystem, self->baseColor,
                                   &gDefaultStreamTaskInitData);
@@ -258,7 +259,7 @@ void TaskCore__OnInit(TaskCore *self) {
     viewportMethods->setUnk44(viewport, self->unk2C);
     viewportMethods->setUnk48(viewport, self->packetSize);
     viewportMethods->attachViewChild(viewport, self->unk14, &sTaskCoreViewOrigin,
-                                     &sTaskCoreViewOrigin, 0);
+                                     &sTaskCoreViewOrigin, NULL);
     viewportMethods->initOt(viewport);
     self->result = 0;
 }

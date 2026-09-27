@@ -76,6 +76,20 @@ typedef struct StreamTask StreamTask;
 typedef struct StreamTaskMethods StreamTaskMethods;
 typedef struct StreamTaskInitData StreamTaskInitData;
 
+/* StreamTask's own state, past TaskCore's (enum TaskCoreState): onPadConfirm
+ * sets it when skipOnConfirm is on, and setState answers it with
+ * refreshViewValue, which aborts the player at once or fades out first. */
+enum StreamTaskState { STREAMTASK_STATE_SKIPPED = 18 };
+
+/* `result` after a confirm press skipped the stream (TaskCore's timeout
+ * sets 1). */
+#define STREAMTASK_RESULT_SKIPPED 2
+
+/* setFrameBound's unit in this override: bound * 15 frames, where
+ * TaskCore's is TASKCORE_FRAMES_PER_SECOND (20). Read as seconds of 15-frame
+ * movie time, as TaskCore's bound is seconds; no caller's value shows it. */
+#define STREAMTASK_FRAMES_PER_SECOND 15
+
 /* Three words: the ctor's optional fifth (stack) argument, else
  * GetDefaultStreamTaskInitData()'s default (&gDefaultStreamTaskInitData,
  * which TaskCore__OnInit also passes). Copied whole into `initData`

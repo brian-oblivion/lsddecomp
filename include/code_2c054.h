@@ -20,7 +20,7 @@ extern StreamTaskInitData *GetDefaultStreamTaskInitData(void);
 
 /* resetCounters' colours for setColors, three RGB triples back to back:
  * baseColor {0, 0, 0}, the clear colour {0, 0, 0}, the third {128, 128, 128}. */
-extern u8 sTaskCoreDefaultColors[];
+extern u8 sTaskCoreDefaultColors[3][3];
 
 /* {x 640, y 0, w 320, h 240}: the default movie frame. TaskCore__OnInit clears
  * it to baseColor when the task has no sub handle. The same three words are
