@@ -65,6 +65,7 @@
  */
 
 #include "common.h"
+#include <libsnd.h>
 #include "SvmData.h"
 
 /* 0x20-byte-stride record indexed by `D_8008EA18 + D_8008EA13*16`
@@ -306,7 +307,7 @@ INCLUDE_ASM("asm/nonmatchings/code_179d8_j_b", SpuVmSetVol);
  * busy-lock guard's branch polarity, with the rest not re-characterised
  * since `--nop-at-expansion` closed the old length gap
  * (docs/match-reports/SsUtKeyOn.md). Hand-derived. */
-s32 SsUtKeyOn(s16 p0, s16 p1, s16 p2, s16 p3, u16 p4, s16 p5, s16 p6) {
+s16 SsUtKeyOn(s16 p0, s16 p1, s16 p2, s16 p3, s16 p4, s16 p5, s16 p6) {
     SlotE968 *slot;
     RecordE978 *rec;
     s32 result;
@@ -384,7 +385,7 @@ s32 SsUtKeyOn(s16 p0, s16 p1, s16 p2, s16 p3, u16 p4, s16 p5, s16 p6) {
     if ((s16)D_8008EA24 == 0xFF) {
         vmNoiseOn((u8)result);
     } else {
-        s32 ret = note2pitch2((u16)p3, p4);
+        s32 ret = note2pitch2((u16)p3, (u16)p4);
         SpuVmKeyOnNow(1, (u16)ret);
     }
     _snd_ev_flag = 0;
@@ -399,7 +400,7 @@ fail_nolock:
 INCLUDE_ASM("asm/nonmatchings/code_179d8_j_b", SsUtKeyOn);
 #endif
 
-s32 SsUtKeyOff(s16 idx, s16 p1, s16 p2, s16 p3, s16 p4) {
+s16 SsUtKeyOff(s16 idx, s16 p1, s16 p2, s16 p3, s16 p4) {
     u16 chan;
     u32 mask0;
     u16 mask1;
@@ -453,7 +454,7 @@ fail_nolock:
  * flip; the 5-word gap is not re-characterised since
  * `--nop-at-expansion` closed 11 of the old 16
  * (docs/match-reports/SsUtKeyOnV.md). Hand-derived. */
-s32 SsUtKeyOnV(s16 idx, s16 p0, s16 p1, s16 p2, u16 p3, u16 p4, s16 p5, s16 p6) {
+s16 SsUtKeyOnV(s16 idx, s16 p0, s16 p1, s16 p2, s16 p3, s16 p4, s16 p5, s16 p6) {
     RecordE978 *rec;
     u16 note;
     u8 pending18;
@@ -526,7 +527,7 @@ s32 SsUtKeyOnV(s16 idx, s16 p0, s16 p1, s16 p2, u16 p3, u16 p4, s16 p5, s16 p6) 
     if ((s16)D_8008EA24 == 0xFF) {
         vmNoiseOn((u8)idx);
     } else {
-        s32 ret = note2pitch2(p3, p4);
+        s32 ret = note2pitch2((u16)p3, (u16)p4);
         SpuVmKeyOnNow(1, (u16)ret);
     }
     _snd_ev_flag = 0;
@@ -551,7 +552,7 @@ INCLUDE_ASM("asm/nonmatchings/code_179d8_j_b", SsUtKeyOnV);
  * released BEFORE the mask block rather than after it (retail's
  * `sw zero, _snd_ev_flag` sits at 0x80031950, between the D_8008E228 load and
  * the first `or`). See docs/match-reports/SsUtKeyOffV.md. */
-s32 SsUtKeyOffV(s16 idx) {
+s16 SsUtKeyOffV(s16 idx) {
     u16 chan;
     u32 mask0;
     u16 mask1;
