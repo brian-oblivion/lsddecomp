@@ -97,3 +97,14 @@ Renamed from `Unk18Obj__DrawNode`. Slot +0x0A0 `drawNode`. `self` is now `Viewpo
   long) through a `u32 *`, because retail shifts the products with `srl`; and the ordering-table
   arguments are cast to `GsOT *` because include/Viewport.h still carries its own ViewportOt view.
 
+- Round 95 (delta, track 6): the local `DrawNode` view of the node (a BasicClass with a GsDOBJ2 at
+  +0x010 and a union of the three tag-specific tails) was deleted. `node` is a `SceneNode *`, the
+  type Viewport.h's drawNode slot already gave it, and each draw arm downcasts to the class its
+  id names: 0x54 `BgLayer` (`bgAttribute` is the GsBG's first word), 0x64 `BoxFill` (`pri`,
+  `relative`, `posX`/`posY`, `boxX`/`boxY`, GsBOXF at `boxAttribute`), 0x144 `ScreenSprite`
+  (`screenPos.x`/`.y`, the old `ratioX`/`ratioY`), other 0x44 `Sprite` (`sprite`, a SpriteGs).
+  Every field the local view named sits at the same offset in those headers, so no header was
+  edited. The GsDOBJ2 is `(GsDOBJ2 *)&node->attribute` at the SortTmdObject call, as
+  SceneNode__LinkModel spells it for GsLinkObject4; coord2 is cast to `GsCOORDINATE2 *` where
+  its matrix or param is read (SceneNode.h's SceneNodeSub14 is still the parked view). Byte-exact
+  on the first build.
