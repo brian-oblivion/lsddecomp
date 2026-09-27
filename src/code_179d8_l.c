@@ -19,10 +19,15 @@
  */
 #include "common.h"
 #include <libsnd.h>
+#include <libspu.h>
 #include "SsScore.h"
 #include "SvmData.h"
 #include "VabStreamObj.h"
 #include "SoundCueSet.h"
+
+/* Tones per VAB program: playTone's index is program * 16 + tone
+ * (token-identical to code_179d8_e.c's, which owns PlayTone). */
+#define VAB_TONES_PER_PROG 16
 
 void ServiceSoundCueSet(VabStreamObj *sound, SoundCueSet *set) {
     s32 i;
@@ -36,12 +41,12 @@ void ServiceSoundCueSet(VabStreamObj *sound, SoundCueSet *set) {
         slot = &set->slots[0];
         do {
             i++;
-            slot->program = -1;
+            slot->program = SOUND_CUE_NONE;
             slot->octave = 0;
-            slot->vol = 0x7F;
-            slot->endVol = 0x40;
+            slot->vol = SOUND_CUE_DEFAULT_VOL;
+            slot->endVol = SOUND_CUE_DEFAULT_END_VOL;
             slot++;
-        } while (i < 3);
+        } while (i < ARRAY_COUNT(set->slots));
 
         set->attenuation = 0;
         if (set->callback != NULL) {
@@ -57,16 +62,16 @@ void ServiceSoundCueSet(VabStreamObj *sound, SoundCueSet *set) {
                         sound->methods->stopVoice(sound, slot->voice);
                     }
                     sound->methods->setPitchOffset(sound, slot->octave);
-                    toneIndex = slot->program * 16;
+                    toneIndex = slot->program * VAB_TONES_PER_PROG;
                     vol = slot->vol - (slot->vol / set->attenuationSteps) * set->attenuation;
                     endVol = slot->endVol - (slot->endVol / set->attenuationSteps) * set->attenuation;
                     slot->voice = sound->methods->playTone(sound, toneIndex, vol, endVol);
-                } else if (slot->program == -2 && slot->voice >= 0) {
+                } else if (slot->program == SOUND_CUE_STOP && slot->voice >= 0) {
                     sound->methods->stopVoice(sound, slot->voice);
                 }
                 i++;
                 slot++;
-            } while (i < 3);
+            } while (i < ARRAY_COUNT(set->slots));
         }
         set->tick++;
     }
@@ -81,7 +86,6 @@ void ServiceSoundCueSet(VabStreamObj *sound, SoundCueSet *set) {
  * Hand-derived. */
 extern u8 spuVmMaxVoice;
 extern u8 D_8008EA1B;
-extern void SpuSetNoiseVoice(s32 a0, s32 a1);
 
 s32 SpuVmAlloc(void) {
     s32 chosen;
@@ -95,11 +99,11 @@ s32 SpuVmAlloc(void) {
     u32 newSec;
     u32 count;
 
-    chosen = 0x63;
+    chosen = 99;
     bestSec = 0xFFFF;
     found = 0;
     bestTer = 0;
-    bestIdx = 0x63;
+    bestIdx = 99;
     threshold = D_8008EA1B;
 
     for (idx = 0; (u8)idx < spuVmMaxVoice; idx++) {
@@ -130,7 +134,7 @@ s32 SpuVmAlloc(void) {
         }
     }
 
-    if ((u8)chosen == 0x63) {
+    if ((u8)chosen == 99) {
         if ((u8)found != 0) {
             chosen = bestIdx;
         } else {
@@ -148,7 +152,7 @@ s32 SpuVmAlloc(void) {
         _svm_voice[(u8)chosen].unk02 = 0;
         _svm_voice[(u8)chosen].unk18 = D_8008EA1B;
         if (_svm_voice[(u8)chosen].unk1B == 2) {
-            SpuSetNoiseVoice(0, 0xFFFFFF);
+            SpuSetNoiseVoice(SPU_OFF, SPU_ALLCH);
         }
     }
     return (u8)chosen;
@@ -207,7 +211,7 @@ void SpuVmKeyOnNow(s32 unused, s32 pitch) {
     s32 lowBit;
     s32 highBit;
 
-    masterVol = _svm_vh->mvol * 0x3FFF;
+    masterVol = _svm_vh->mvol * 16383;
     toneVol = D_8008EA10 * masterVol / 16129;
     vol = (u32)toneVol * D_8008EA16 * D_8008EA19 / 16129;
 
@@ -216,27 +220,27 @@ void SpuVmKeyOnNow(s32 unused, s32 pitch) {
     score = &_ss_score[D_8008EA22 & 0xFF][D_8008EA22 >> 8];
     volL = vol;
     volR = vol;
-    if ((s16)D_8008EA22 != 0x21) {
+    if ((s16)D_8008EA22 != 33) {
         volL = vol * score->unk74 / 127;
         volR = vol * score->unk76 / 127;
     }
 
-    if ((u8)D_8008EA1A < 0x40) {
+    if ((u8)D_8008EA1A < 64) {
         volR = (volR * D_8008EA1A) / 63;
     } else {
-        volL = (volL * (0x7F - D_8008EA1A)) / 63;
+        volL = (volL * (127 - D_8008EA1A)) / 63;
     }
 
-    if ((u8)D_8008EA17 < 0x40) {
+    if ((u8)D_8008EA17 < 64) {
         volR = (volR * D_8008EA17) / 63;
     } else {
-        volL = (volL * (0x7F - D_8008EA17)) / 63;
+        volL = (volL * (127 - D_8008EA17)) / 63;
     }
 
-    if ((u8)D_8008EA11 < 0x40) {
+    if ((u8)D_8008EA11 < 64) {
         volR = (D_8008EA11 * volR) / 63;
     } else {
-        volL = (volL * (0x7F - D_8008EA11)) / 63;
+        volL = (volL * (127 - D_8008EA11)) / 63;
     }
 
     if (_svm_stereo_mono == 1) {
@@ -258,12 +262,12 @@ void SpuVmKeyOnNow(s32 unused, s32 pitch) {
     _svm_voice[D_8008EA26[0]].unk04 = (s16)pitch;
     _svm_voice[D_8008EA26[0]].unk1B = 1;
 
-    if (D_8008EA26[0] < 0x10) {
+    if (D_8008EA26[0] < 16) {
         lowBit = 1 << D_8008EA26[0];
         highBit = 0;
     } else {
         lowBit = 0;
-        highBit = 1 << (D_8008EA26[0] - 0x10);
+        highBit = 1 << (D_8008EA26[0] - 16);
     }
 
     if (D_8008EA20 & 4) {
@@ -371,7 +375,7 @@ s32 note2pitch(void) {
     u8 step;
     u16 pitch;
 
-    semitones = (s16)(D_8008EA0E + 0x3C - D_8008EA1C);
+    semitones = (s16)(D_8008EA0E + 60 - D_8008EA1C);
     octave = semitones / 12;
     step = D_8008EA1D >> 3;
     semitone = semitones - octave * 12;
@@ -413,7 +417,7 @@ s32 note2pitch2(s32 note, s32 fine) {
         carry = 1;
         step = steps - 16;
     }
-    semitones = (s16)(carry + (note + 0x3C - tone->center));
+    semitones = (s16)(carry + (note + 60 - tone->center));
     octave = semitones / 12;
     semitone = semitones - octave * 12;
     tableIndex = semitone * 16;
