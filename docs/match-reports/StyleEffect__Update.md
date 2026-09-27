@@ -63,3 +63,9 @@ next touches this function or its caller.
 ## Track 4 (2026-09-26, round 88, charlie)
 
 Occupies Actor's +0x0EC `setPendingExtra` slot; kept its name because it is the per-frame update, not a setter. Now declared `(StyleEffect *self, LongVec3 *pos)` and forwards `pos` to StyleEffect__UpdateByKind: its only caller, StyleUpdateEffectSlots (class_3bb8c_n.c), passes the position in $a1 and UpdateByKind reads it, so the "arity-ok" 1-argument call above was the same bytes spelled with the argument implicit. Byte-identical with the argument explicit.
+
+## Track 7 (2026-09-27, round 96, charlie)
+
+The source comment's disassembly evidence moved here: retail's `jal` to
+StyleEffect__UpdateByKind at 0x80056508 sets no `$a1`, so `pos` reaches it in
+the register StyleUpdateEffectSlots loaded. Zero bytes.

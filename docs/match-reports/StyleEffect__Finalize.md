@@ -49,3 +49,9 @@ The base class is unified as `Actor` (`include/Actor.h`). Its +0x00C is the inhe
 ## Track 4 (2026-09-26, round 88, charlie)
 
 The class's view is now include/StyleEffect.h (round 88); body unchanged, image byte-identical.
+
+## Track 7 (2026-09-27, round 96, charlie)
+
+The source comment no longer carries the old view's history; what it said:
+"The base finalize is SceneNode__Finalize, which returns nothing: the old
+view's `return base->dtor(self)` forwarded a $v0 no one sets." Zero bytes.

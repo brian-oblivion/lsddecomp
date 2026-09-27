@@ -108,3 +108,33 @@ the two now have different types:
   distance limit, as Entity__GetProximityRatio does for Entity.
 
 Locals `kind` became `tick`. Zero bytes.
+
+## Track 7 (2026-09-27, round 96, charlie)
+
+- Locals `t` / `q` are now `range` / `stepDist`: `range` is the cue's
+  `gStyleCueDistanceTable` row, the same threshold `IsStyleCueNear` and
+  `FindNextStyleCueInRange` compare `dist < table[...]` against, and
+  `stepDist` is that range split into `attenuationSteps` (10) steps, so the
+  result is the target's distance counted in steps: 0 at the slot, 10 at the
+  edge of the range (SoundCueSet.h: attenuation 10 leaves only `vol % 10`).
+  Zero bytes (a local's name is not in the object).
+
+Two comments in `src/class_3bb8c_r.c` lost their history (it is in the
+Derivation above) and now read as documentation. What they said, verbatim:
+
+```c
+/* ComputeStyleCueFalloff's own ROM address (0x8005627C) is AFTER all 14 slot
+ * occupants below (it sits right before the blocked IsStyleVariantEven), so
+ * its definition lives in that position further down this file to keep
+ * strict ROM-address order -- forward-declared here since every occupant
+ * calls it. */
+
+/* A 15-entry table indexed with the NEGATIVE of `ctx->entry->countSign`
+ * (`gStyleCueDistanceTable - tag*4`, i.e. `gStyleCueDistanceTable[-tag]` for `tag` in [-14, 0]).
+ * `asm/data/76DC8.data.s` confirms exactly 15 words at this address. */
+```
+
+The unit-local record view's +0x006 field is `cue`, not `countSign`: the
+name class_3bb8c_n.c's own view (`StyleCueEntryView::cue`) already gives the
+same byte, which IsStyleCueNear reads as `gStyleCueDistanceTable[-cue]`
+exactly as this function does. It is a cue index, not a count. Zero bytes.

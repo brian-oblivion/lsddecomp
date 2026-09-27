@@ -55,3 +55,8 @@ this time reached through a vtable dispatch rather than a bare `jal`.
 ## Track 4 (2026-09-26, round 88, charlie)
 
 Retyped with the class's unification (include/StyleEffect.h): returns `StyleEffect *` and takes `(s32 kind, StyleEffectParams *params, SceneNode *parent, LongVec3 *pos)` -- kind 0..3 from StyleFillEffectKind0..3's constants, params the gStyleSpawnOffsetX block the reset slot copies, parent gStyleGrid (attachToParent's parent), pos the caller's position (AddVec3's input). Image byte-identical.
+
+## Track 7 (2026-09-27, round 96, charlie)
+
+- `BMemPMgrAlloc(0x98)` is `BMemPMgrAlloc(sizeof(StyleEffect))`: the struct
+  is 0x98 bytes (include/StyleEffect.h), byte-exact. Zero bytes.

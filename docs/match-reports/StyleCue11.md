@@ -78,3 +78,12 @@ the two now have different types:
   distance limit, as Entity__GetProximityRatio does for Entity.
 
 Locals `kind` became `tick`. Zero bytes.
+
+## Track 7 (2026-09-27, round 96, charlie)
+
+- Every literal is decimal (VAB program numbers, volumes and tick counts are
+  counts, not masks; the `% 70` phase windows). None is named: a program number's sound is not
+  established, and a name like `PROGRAM_30` would only restate it. Zero bytes.
+- `(u32)(rem - 54) < 5` is now `rem >= 54 && rem < 59`, byte-exact (44/44
+  and the whole image, measured this round): GCC folds it to the same
+  unsigned range test.

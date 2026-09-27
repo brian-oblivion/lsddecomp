@@ -100,3 +100,14 @@ the two now have different types:
   distance limit, as Entity__GetProximityRatio does for Entity.
 
 Locals `kind` became `tick`. Zero bytes.
+
+## Track 7 (2026-09-27, round 96, charlie)
+
+- Every literal is decimal (VAB program numbers, volumes and tick counts are
+  counts, not masks). None is named: a program number's sound is not
+  established, and a name like `PROGRAM_30` would only restate it. Zero bytes.
+- `(u32)(set->tick - 0x65) < 9` is now `set->tick >= 101 && set->tick < 110`,
+  byte-exact (56/56 and the whole image, measured this round): GCC 2.6.3
+  folds the two comparisons into the same `addiu`/`sltiu` pair itself. The
+  Derivation above says the two-comparison form costs an instruction; that
+  was never measured and is wrong.

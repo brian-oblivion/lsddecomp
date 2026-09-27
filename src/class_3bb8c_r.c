@@ -1,27 +1,24 @@
 /*
- * class_3bb8c_r -- 0x46288..0x46D20 (vram 0x80055A88..0x80056520), the tail
- * of the `class_3bb8c_n` remainder (carved round 17). All 21 functions are
- * MATCHED. Two unrelated classes share the slice, cut at ROM addresses
- * rather than at a class boundary (tools/classtable.py, round 17):
+ * class_3bb8c_r -- the style layer's sound cues and StyleEffect's lifecycle.
+ * Two unrelated groups share this file, with one predicate between them:
  *
- *  - StyleCue00..StyleCue13, the complete 14-slot table `gStyleCueCallbacks`,
- *    and their helper ComputeStyleCueFalloff. They are SoundCueSet
- *    callbacks (include/SoundCueSet.h): TryStartStyleCue (class_3bb8c_n.c)
- *    starts a style-cue slot's embedded set with the claimed record's cue
- *    index as the tag and that row of the table as the callback, as
- *    Entity does with gEntityMoodHandlerTable's MoodCueNN handlers. Each
- *    tick a callback sets the set's attenuation from the slot's distance
+ *  - StyleCue00..StyleCue13, the 14 rows of gStyleCueCallbacks, and their
+ *    helper ComputeStyleCueFalloff. Each is a SoundCueSet callback
+ *    (include/SoundCueSet.h): TryStartStyleCue (class_3bb8c_n.c) starts a
+ *    style-cue slot's embedded set with the claimed cue record's index as the
+ *    tag and that row of the table as the callback, as Entity does with its
+ *    Entity__MoodCueNN handlers. Every tick a callback sets the set's
+ *    attenuation from the slot's distance to the target
  *    (ComputeStyleCueFalloff) and, on the ticks its pattern selects,
- *    requests programs on the three voices; most restart the pattern by setting
- *    `tick` to -1 once it passes a limit.
- *  - StyleEffect (include/StyleEffect.h), the Actor subclass the style
- *    layer keeps at an offset from its target: this unit supplies its slot
- *    occupants (StyleEffect__StyleEffect/__Finalize/__SetParams/__Update)
- *    and the `New_StyleEffect` allocator; its per-kind work is in
- *    class_3bb8c_s.c and class_3bb8c_o.c.
- *
- * Named round 73 (charlie); tiers and evidence in each function's match
- * report.
+ *    requests VAB programs on the three voices; most restart the pattern by
+ *    setting `tick` to -1 once it passes a limit.
+ *  - IsStyleVariantEven: whether the variant PickStyleFallbackConfig chose
+ *    (gStyleVariant, class_3bb8c_n.c) is even.
+ *  - StyleEffect (include/StyleEffect.h), the Actor subclass the style layer
+ *    keeps at an offset from its target: its ctor, finalize, reset
+ *    (StyleEffect__SetParams) and update slot occupants, and the
+ *    New_StyleEffect allocator. The per-kind work is in class_3bb8c_s.c and
+ *    class_3bb8c_o.c.
  */
 #include "common.h"
 #include <libgte.h>
@@ -46,10 +43,10 @@ typedef struct StyleCueParam StyleCueParam;
  * `StyleCueEntryView`). */
 typedef struct StyleCueParamMethods {
     u8 pad0[0x6];
-    s8 countSign; /* +0x006, the record's cue index (its gStyleCueCallbacks
-                   * row and InitSoundCueSet tag), negated while a slot has
-                   * it claimed; ComputeStyleCueFalloff indexes
-                   * gStyleCueDistanceTable with its negative. */
+    s8 cue; /* +0x006, the record's cue index (its gStyleCueCallbacks row
+             * and InitSoundCueSet tag), negated while a slot has it
+             * claimed; ComputeStyleCueFalloff indexes gStyleCueDistanceTable
+             * with its negative. */
 } StyleCueParamMethods;
 
 struct StyleCueParam {
@@ -59,11 +56,7 @@ struct StyleCueParam {
     SoundCueSet cueSet; /* +0x014 */
 };
 
-/* ComputeStyleCueFalloff's own ROM address (0x8005627C) is AFTER all 14 slot
- * occupants below (it sits right before the blocked IsStyleVariantEven), so
- * its definition lives in that position further down this file to keep
- * strict ROM-address order -- forward-declared here since every occupant
- * calls it. */
+/* Every callback calls this first; it is defined after them, in ROM order. */
 s32 ComputeStyleCueFalloff(StyleCueParam *ctx);
 
 void StyleCue00(StyleCueParam *ctx, SoundCueSet *set) {
@@ -91,9 +84,9 @@ void StyleCue01(StyleCueParam *ctx, SoundCueSet *set) {
     set->attenuation = ComputeStyleCueFalloff(ctx);
     tick = set->tick;
     if (tick == 0) {
-        set->slots[0].program = 0x18;
+        set->slots[0].program = 24;
         set->slots[0].octave = -2;
-    } else if (tick >= 0x401) {
+    } else if (tick >= 1025) {
         set->tick = -1;
     }
 }
@@ -104,7 +97,7 @@ void StyleCue02(StyleCueParam *ctx, SoundCueSet *set) {
     set->attenuation = ComputeStyleCueFalloff(ctx);
     tick = set->tick;
     if (tick == 0) {
-        set->slots[0].program = 0xC;
+        set->slots[0].program = 12;
         set->slots[0].octave = 2;
     } else if (tick >= 5) {
         set->tick = -1;
@@ -114,57 +107,57 @@ void StyleCue02(StyleCueParam *ctx, SoundCueSet *set) {
 void StyleCue03(StyleCueParam *ctx, SoundCueSet *set) {
     set->attenuation = ComputeStyleCueFalloff(ctx);
     if (set->tick % 20 == 0) {
-        set->slots[0].program = 0x1E;
-        set->slots[0].vol = 0x20;
+        set->slots[0].program = 30;
+        set->slots[0].vol = 32;
         set->slots[0].octave = 0;
-        set->slots[0].endVol = 0xA;
+        set->slots[0].endVol = 10;
     }
     if (set->tick % 400 == 0) {
-        set->slots[1].program = 0x1E;
+        set->slots[1].program = 30;
         set->slots[1].octave = 0;
     }
     set->slots[2].program = 6;
-    set->slots[2].vol = 0x20;
+    set->slots[2].vol = 32;
     set->slots[2].octave = 0;
-    set->slots[2].endVol = 0xA;
+    set->slots[2].endVol = 10;
 }
 
 void StyleCue04(StyleCueParam *ctx, SoundCueSet *set) {
     set->attenuation = ComputeStyleCueFalloff(ctx);
     if (set->tick % 3 == 0) {
-        set->slots[0].program = 0x1E;
+        set->slots[0].program = 30;
         set->slots[0].octave = 0;
     }
     if (set->tick % 5 == 0) {
-        set->slots[1].program = 0x1E;
+        set->slots[1].program = 30;
         set->slots[1].octave = 0;
-        set->slots[1].vol = 0x18;
-        set->slots[1].endVol = 0x18;
+        set->slots[1].vol = 24;
+        set->slots[1].endVol = 24;
     }
     if (set->tick % 7 == 0) {
-        set->slots[0].program = 0x1E;
+        set->slots[0].program = 30;
         set->slots[0].octave = 0;
     }
     set->slots[2].program = 6;
     set->slots[2].octave = 1;
-    set->slots[2].vol = 0x2A;
-    set->slots[2].endVol = 0xA;
+    set->slots[2].vol = 42;
+    set->slots[2].endVol = 10;
 }
 
 void StyleCue05(StyleCueParam *ctx, SoundCueSet *set) {
     set->attenuation = ComputeStyleCueFalloff(ctx);
     if (set->tick == 0) {
-        set->slots[0].program = 0x1E;
+        set->slots[0].program = 30;
         set->slots[0].octave = -1;
-    } else if (set->tick < 0x32 && set->tick % 5 == 4) {
-        set->slots[1].program = 0x1E;
+    } else if (set->tick < 50 && set->tick % 5 == 4) {
+        set->slots[1].program = 30;
         set->slots[1].octave = 0;
         set->slots[1].vol = set->slots[1].vol - set->tick * 2;
         set->slots[1].endVol = set->slots[1].vol;
-    } else if ((u32)(set->tick - 0x65) < 9) {
-        set->slots[2].program = 0xD;
+    } else if (set->tick >= 101 && set->tick < 110) {
+        set->slots[2].program = 13;
         set->slots[2].octave = 1;
-    } else if (set->tick >= 0xC9) {
+    } else if (set->tick >= 201) {
         set->tick = -1;
     }
 }
@@ -177,7 +170,7 @@ void StyleCue06(StyleCueParam *ctx, SoundCueSet *set) {
     if (tick == 0) {
         set->slots[0].program = 7;
         set->slots[0].octave = 2;
-    } else if (tick >= 0x1B) {
+    } else if (tick >= 27) {
         set->tick = -1;
     }
 }
@@ -188,14 +181,14 @@ void StyleCue07(StyleCueParam *ctx, SoundCueSet *set) {
     set->attenuation = ComputeStyleCueFalloff(ctx);
     tick = set->tick;
     if (tick == 0) {
-        set->slots[0].program = 0x14;
+        set->slots[0].program = 20;
         set->slots[0].octave = 1;
     } else if (tick == 3) {
         set->slots[0].octave = 2;
-        set->slots[0].vol = 0x18;
-        set->slots[0].program = tick;
-        set->slots[0].endVol = 0x14;
-    } else if (tick >= 0x33) {
+        set->slots[0].vol = 24;
+        set->slots[0].program = 3;
+        set->slots[0].endVol = 20;
+    } else if (tick >= 51) {
         set->tick = -1;
     }
 }
@@ -205,8 +198,8 @@ void StyleCue08(StyleCueParam *ctx, SoundCueSet *set) {
     if (set->tick % 20 == 0) {
         set->slots[0].program = 9;
         set->slots[0].octave = 0;
-        set->slots[0].vol = 0x40;
-        set->slots[0].endVol = 0x40;
+        set->slots[0].vol = 64;
+        set->slots[0].endVol = 64;
     }
 }
 
@@ -238,10 +231,10 @@ void StyleCue11(StyleCueParam *ctx, SoundCueSet *set) {
     StyleCue10(ctx, set);
     rem = set->tick % 70;
     if (rem == 50) {
-        set->slots[2].program = 0x14;
+        set->slots[2].program = 20;
         set->slots[2].octave = 1;
-    } else if ((u32)(rem - 54) < 5) {
-        set->slots[2].program = 0xD;
+    } else if (rem >= 54 && rem < 59) {
+        set->slots[2].program = 13;
         set->slots[2].octave = 1;
     } else if (rem == 61) {
         set->slots[2].program = 9;
@@ -255,19 +248,19 @@ void StyleCue12(StyleCueParam *ctx, SoundCueSet *set) {
     set->attenuation = ComputeStyleCueFalloff(ctx);
     tick = set->tick;
     if (tick == 0) {
-        set->slots[0].program = 0x14;
+        set->slots[0].program = 20;
         set->slots[0].octave = -2;
-        set->slots[1].program = 0x14;
+        set->slots[1].program = 20;
         set->slots[1].octave = -2;
     } else if (tick == 4) {
-        set->slots[1].program = 0x14;
+        set->slots[1].program = 20;
         set->slots[1].octave = -2;
-    } else if (tick == 0x14) {
-        set->slots[0].program = 0x10;
+    } else if (tick == 20) {
+        set->slots[0].program = 16;
         set->slots[0].octave = -2;
-        set->slots[1].program = 0x12;
+        set->slots[1].program = 18;
         set->slots[1].octave = -2;
-    } else if (tick >= 0xC9) {
+    } else if (tick >= 201) {
         set->tick = -1;
     }
 }
@@ -275,21 +268,21 @@ void StyleCue12(StyleCueParam *ctx, SoundCueSet *set) {
 void StyleCue13(StyleCueParam *ctx, SoundCueSet *set) {
     set->attenuation = ComputeStyleCueFalloff(ctx);
     if (set->tick == 0) {
-        set->slots[0].program = 0x18;
+        set->slots[0].program = 24;
         set->slots[0].octave = 0;
     }
 }
 
-/* A 15-entry table indexed with the NEGATIVE of `ctx->entry->countSign`
- * (`gStyleCueDistanceTable - tag*4`, i.e. `gStyleCueDistanceTable[-tag]` for `tag` in [-14, 0]).
- * `asm/data/76DC8.data.s` confirms exactly 15 words at this address. */
+/* One range per cue record (15), indexed by the record's cue index: the
+ * negative of `cue` while a slot has the record claimed. IsStyleCueNear
+ * tests the slot's distance against the same row. */
 extern s32 gStyleCueDistanceTable[];
 
 s32 ComputeStyleCueFalloff(StyleCueParam *ctx) {
-    s32 t = gStyleCueDistanceTable[-ctx->entry->countSign];
-    s32 q = t / ctx->cueSet.attenuationSteps;
+    s32 range = gStyleCueDistanceTable[-ctx->entry->cue];
+    s32 stepDist = range / ctx->cueSet.attenuationSteps;
 
-    return ctx->lastDist / q;
+    return ctx->lastDist / stepDist;
 }
 
 extern s32 gStyleVariant;
@@ -307,7 +300,7 @@ extern void *BMemPMgrAlloc(s32 size);
 extern void *BMemPMgrFree(void *ptr);
 
 StyleEffect *New_StyleEffect(s32 kind, StyleEffectParams *params, SceneNode *parent, LongVec3 *pos) {
-    StyleEffect *self = BMemPMgrAlloc(0x98);
+    StyleEffect *self = BMemPMgrAlloc(sizeof(StyleEffect));
 
     if (self != NULL) {
         if (GetStyleEffectMethods()->ctor(self, kind, params, parent, pos) != NULL) {
@@ -335,8 +328,7 @@ fail:
     return NULL;
 }
 
-/* The base finalize is SceneNode__Finalize, which returns nothing: the old
- * view's `return base->dtor(self)` forwarded a $v0 no one sets. */
+/* Actor's finalize (SceneNode__Finalize) returns nothing, so neither does this. */
 void StyleEffect__Finalize(StyleEffect *self) {
     StyleEffect__ReleaseByKind(self);
     GetActorMethods()->finalize((Actor *)self);
@@ -347,8 +339,7 @@ void StyleEffect__SetParams(StyleEffect *self, StyleEffectParams *params) {
     self->tick = 0;
 }
 
-/* `pos` arrives from StyleUpdateEffectSlots and is forwarded untouched in
- * $a1 (retail's jal at 0x80056508 sets no $a1). */
+/* `pos` arrives from StyleUpdateEffectSlots and is forwarded untouched. */
 void StyleEffect__Update(StyleEffect *self, LongVec3 *pos) {
     self->tick = self->tick + 1;
     StyleEffect__UpdateByKind(self, pos);
