@@ -280,12 +280,12 @@ s32 GetActiveDataSourceUseVSyncCallback(void) {
 }
 
 extern s32 gFileTableRegistered;
-extern void SetFileTable(void *arg0);
+extern void SetFileTable(CdFileEntry *table);
 extern s32 GetFileTableCount(void);
-extern void SetFileTableCount(s32 arg0);
-extern s32 ResolveFileEntries(void *arg0, s32 arg1);
+extern void SetFileTableCount(s32 count);
+extern s32 ResolveFileEntries(CdFileEntry *entries, s32 count);
 
-s32 RegisterFileTableEntries(void *arg0, s32 arg1) {
+s32 RegisterFileTableEntries(CdFileEntry *arg0, s32 arg1) {
     s32 idx;
 
     if (gActiveDataSource == DATASOURCE_CD) {
@@ -293,7 +293,7 @@ s32 RegisterFileTableEntries(void *arg0, s32 arg1) {
         SetFileTable(arg0);
         idx = GetFileTableCount();
         SetFileTableCount(idx + arg1);
-        return ResolveFileEntries((u8 *)arg0 + idx * 0x1C, arg1);
+        return ResolveFileEntries(&arg0[idx], arg1);
     }
     return 1;
 }
