@@ -2,6 +2,15 @@
  * GameFiles -- the LbdFile class, and the getters over the game's table of
  * file names.
  *
+ * Edges: the file sits between two placed Sony objects, libcd/c_007
+ * (StFreeRing) and libc2/rand, so neither edge is a choice. Inside it no
+ * rodata crosses and no jump-table parity forces a boundary; tuboundary.py
+ * calls every gap "boundary possible" except GetRecordTable..GetSoundEffectDir,
+ * "boundary unlikely (single-user data)". Content reads as two subjects,
+ * LbdFile up to GetLbdFileMethods and the path getters from
+ * GetDefaultDataDirectory, but no tool splits a unit, so it stays one file
+ * named for both (FINISHING-PLAN track 8, park rule).
+ *
  * LbdFile (include/LbdFile.h, which documents the class): New_LbdFile to
  * LbdFile__SetAutoLoadData and GetLbdFileMethods, the loader for one stage
  * map chunk, STGnn\Mnnn.LBD.
