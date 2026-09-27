@@ -119,7 +119,7 @@ void TimImage__NoOpSlot8C(void) {}
 void TimImage__NoOpSlot90(void) {}
 
 /* TimImage slot (tools/classtable.py); empty body. */
-void TimImage__func_8003B5DC(void) {}
+void TimImage__NoOpSlot94(void) {}
 
 /* TimImage +0x098: sets unk48 to 1; unk48's purpose beyond that flag is
  * unestablished (no caller reads it outside the ctor/this setter). */
