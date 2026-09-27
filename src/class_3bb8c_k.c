@@ -50,7 +50,7 @@ end:
 }
 
 void ItemList__TickClosing(ItemList *self) {
-    s32 old;
+    s32 prevTicks;
 
     if (self->result >= 4) {
         return;
@@ -58,9 +58,9 @@ void ItemList__TickClosing(ItemList *self) {
     if (self->result < 2) {
         return;
     }
-    old = self->closeTicks;
-    self->closeTicks = old + 1;
-    if (old == 0) {
+    prevTicks = self->closeTicks;
+    self->closeTicks = prevTicks + 1;
+    if (prevTicks == 0) {
         return;
     }
     self->methods->setState(self, 4);
@@ -101,14 +101,14 @@ void ItemList__ForwardToTarget(ItemList *self, s32 code) {
 
 void ItemList__ScrollRight(ItemList *self) {
     ItemListMethods *methods;
-    s32 tmp;
+    s32 current;
     s32 column;
 
     if (!self->panelSprite) {
         return;
     }
-    tmp = self->column;
-    column = tmp;
+    current = self->column;
+    column = current;
     if (column + 0x1A >= self->maxTextLen) {
         return;
     }
@@ -132,7 +132,7 @@ void ItemList__ScrollLeft(ItemList *self) {
     self->methods->refreshRows(self, self->topIndex, column, self->cursorIndex, 1);
 }
 
-void ItemList__CursorUp(ItemList *self, s32 arg1, s32 arg2, s32 arg3) {
+void ItemList__CursorUp(ItemList *self, s32 unused1, s32 unused2, s32 forwarded) {
     s32 cursor;
     s32 newTop;
     s32 newCursor;
@@ -145,7 +145,7 @@ void ItemList__CursorUp(ItemList *self, s32 arg1, s32 arg2, s32 arg3) {
         return;
     }
     if (cursor - self->topIndex > 0) {
-        self->methods->stepCursorInView(self, 0, 1, arg3);
+        self->methods->stepCursorInView(self, 0, 1, forwarded);
     } else {
         self->topIndex--;
         newTop = self->topIndex;
@@ -155,7 +155,7 @@ void ItemList__CursorUp(ItemList *self, s32 arg1, s32 arg2, s32 arg3) {
     }
 }
 
-void ItemList__CursorDown(ItemList *self, s32 arg1, s32 arg2, s32 arg3) {
+void ItemList__CursorDown(ItemList *self, s32 unused1, s32 unused2, s32 forwarded) {
     s32 newTop;
     s32 newCursor;
     s32 prevTop;
@@ -168,7 +168,7 @@ void ItemList__CursorDown(ItemList *self, s32 arg1, s32 arg2, s32 arg3) {
     }
     prevTop = self->topIndex - 1;
     if (self->cursorIndex - prevTop < 4) {
-        self->methods->stepCursorInView(self, 1, 1, arg3);
+        self->methods->stepCursorInView(self, 1, 1, forwarded);
     } else {
         self->topIndex++;
         newTop = self->topIndex;
@@ -187,7 +187,7 @@ void ItemList__CreateRows(ItemList *self, SceneNode *parent, TimImage *font, s32
                           s32 cursor) {
     char buf[0x20];
     ScreenSpritePos pos;
-    TextRow **p;
+    TextRow **row;
     s32 count;
     s32 i;
 
@@ -198,18 +198,18 @@ void ItemList__CreateRows(ItemList *self, SceneNode *parent, TimImage *font, s32
     pos.x = gItemListRowOriginX;
     pos.y = gItemListRowOriginY;
     count = self->itemCount;
-    p = &self->rows[0];
+    row = &self->rows[0];
     if (count >= 5) {
         count = 4;
     }
 
     for (i = 0; i < count; i++) {
         ItemList__FormatRowText(self, buf, i, top, column);
-        *p = New_TextRow(font, 0x1A, buf);
-        (*p)->methods->attachToParent(*p, parent, (LongVec3 *)&pos);
-        (*p)->methods->setColor(*p, &gItemListRowColor);
+        *row = New_TextRow(font, 0x1A, buf);
+        (*row)->methods->attachToParent(*row, parent, (LongVec3 *)&pos);
+        (*row)->methods->setColor(*row, &gItemListRowColor);
         pos.y += 0xA;
-        p++;
+        row++;
     }
 
     ItemList__SetView(self, top, column, cursor, 1);
@@ -260,20 +260,20 @@ void ItemList__RefreshRows(ItemList *self, s32 top, s32 column, s32 cursor, s32 
     s32 count;
     s32 i;
     char buf[0x20];
-    TextRow **p;
+    TextRow **row;
 
     if (!self->panelSprite) {
         return;
     }
     count = self->itemCount;
-    p = &self->rows[0];
+    row = &self->rows[0];
     if (count >= 5) {
         count = 4;
     }
     for (i = 0; i < count; i++) {
         ItemList__FormatRowText(self, buf, i, top, column);
-        (*p)->methods->setText(*p, buf);
-        p++;
+        (*row)->methods->setText(*row, buf);
+        row++;
     }
     ItemList__SetView(self, top, column, cursor, 0);
     if (notify) {
@@ -282,15 +282,15 @@ void ItemList__RefreshRows(ItemList *self, s32 top, s32 column, s32 cursor, s32 
 }
 
 char *ItemList__FormatRowText(ItemList *self, char *dest, s32 row, s32 top, s32 column) {
-    s32 idx = top + row;
+    s32 item = top + row;
     s32 len;
     s32 i;
 
-    len = strlen(self->texts[idx] + column);
+    len = strlen(self->texts[item] + column);
     if (len >= 0x1B) {
         len = 0x1A;
     }
-    memcpy(dest, self->texts[idx] + column, len);
+    memcpy(dest, self->texts[item] + column, len);
     i = len;
     if (i < 0x1A) {
         for (; i < 0x1A; i++) {
@@ -302,38 +302,37 @@ char *ItemList__FormatRowText(ItemList *self, char *dest, s32 row, s32 top, s32 
 }
 
 void ItemList__SetView(ItemList *self, s32 top, s32 column, s32 cursor, s32 highlight) {
-    TextRow *elem;
-    s32 flag = highlight;
+    TextRow *row;
 
     self->topIndex = top;
     self->column = column;
     self->cursorIndex = cursor;
-    if (flag == 0) {
+    if (highlight == 0) {
         return;
     }
     cursor -= top;
-    elem = self->rows[cursor];
-    elem->methods->setColor(elem, &gItemListCursorColor);
+    row = self->rows[cursor];
+    row->methods->setColor(row, &gItemListCursorColor);
 }
 
 void ItemList__StepCursorInView(ItemList *self, s32 dir, s32 notify) {
-    TextRow **p;
+    TextRow **row;
     s32 idx;
 
     if (!self->panelSprite) {
         return;
     }
     idx = self->cursorIndex - self->topIndex;
-    p = &self->rows[idx];
-    (*p)->methods->setColor(*p, &gItemListRowColor);
+    row = &self->rows[idx];
+    (*row)->methods->setColor(*row, &gItemListRowColor);
     if (dir) {
         self->cursorIndex++;
-        p++;
+        row++;
     } else {
         self->cursorIndex--;
-        p--;
+        row--;
     }
-    (*p)->methods->setColor(*p, &gItemListCursorColor);
+    (*row)->methods->setColor(*row, &gItemListCursorColor);
     if (notify) {
         self->methods->forwardToTarget(self, 0);
     }

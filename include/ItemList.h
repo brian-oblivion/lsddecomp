@@ -90,7 +90,7 @@ struct ItemListMethods {
     /* +0x094 */ void (*refreshRows)(ItemList *self, s32 top, s32 column, s32 cursor,
                                      s32 notify); /* ItemList__RefreshRows */
     /* +0x098 */ void (*stepCursorInView)(ItemList *self, s32 dir, s32 notify,
-                                          s32 arg3); /* ItemList__StepCursorInView (see the banner) */
+                                          s32 forwarded); /* ItemList__StepCursorInView (see the banner) */
     /* +0x09C */ s32 (*getCursorIndex)(ItemList *self); /* ItemList__GetCursorIndex */
 };
 
@@ -147,8 +147,8 @@ void ItemList__HandleInputCode(ItemList *self, void *source, s32 code);
 void ItemList__ForwardToTarget(ItemList *self, s32 code);
 void ItemList__ScrollRight(ItemList *self);
 void ItemList__ScrollLeft(ItemList *self);
-void ItemList__CursorUp(ItemList *self, s32 arg1, s32 arg2, s32 arg3);
-void ItemList__CursorDown(ItemList *self, s32 arg1, s32 arg2, s32 arg3);
+void ItemList__CursorUp(ItemList *self, s32 unused1, s32 unused2, s32 forwarded);
+void ItemList__CursorDown(ItemList *self, s32 unused1, s32 unused2, s32 forwarded);
 void ItemList__CreateRows(ItemList *self, struct SceneNode *parent, struct TimImage *font, s32 top,
                           s32 column, s32 cursor);
 void ItemList__ReleaseRows(ItemList *self);
