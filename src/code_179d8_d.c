@@ -2,7 +2,7 @@
  * code_179d8_d -- PlacementGrid's methods (include/PlacementGrid.h: one
  * grid element's 20 x 20 cells of model placements), then the first seven
  * of VabDriver's empty driver methods (include/VabDriver.h; the rest, and
- * its getter, are in code_179d8_e.c), with func_8002C3B8, a free-standing
+ * its getter, are in code_179d8_e.c), with ReturnZero, a free-standing
  * `return 0` with no caller, between them.
  *
  * Declarations that encode this unit's reading of its callees stay in this
@@ -98,7 +98,7 @@ PlacementGridMethods *GetPlacementGridMethods(void) {
     return &gPlacementGridMethods;
 }
 
-s32 func_8002C3B8(void) {
+s32 ReturnZero(void) {
     return 0;
 }
 

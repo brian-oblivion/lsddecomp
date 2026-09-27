@@ -3135,3 +3135,4 @@ gDefaultDataDirectory = 0x8008A960;
 // Report: SpuVmKeyOnNow.md.
 _svm_okon1 = 0x8008E228;
 gCdSyncQueueMode = 0x8008A860;
+ReturnZero = 0x8002C3B8; // type:func
