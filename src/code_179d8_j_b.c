@@ -66,6 +66,7 @@
 
 #include "common.h"
 #include <libsnd.h>
+#include "SsScore.h"
 #include "SvmData.h"
 
 /* libsnd vmanager's _svm_tn (pinned at this address): the current VAB's
@@ -147,19 +148,6 @@ extern u16 D_80090C60;
 extern u16 D_80090C64;
 extern u16 D_8008E228;
 extern u16 D_8008E22C;
-
-/* Shared with vmNoiseOn/SpuVmKeyOnNow in code_179d8_l.c (same
- * two-level entry table, same blend-cascade shape); this unit's own
- * reduced view, per the project's per-unit-local-view convention --
- * only the two fields SpuVmSetVol itself touches are named. */
-typedef struct {
-    u8 pad0[0x74];
-    u16 unk74;
-    u16 unk76;
-    u8 pad78[0xAC - 0x78];
-} SsScore;
-
-extern SsScore *_ss_score[];
 
 /* libsnd vmanager's _svm_vh (pinned at this address): the current VAB's
  * header. */
