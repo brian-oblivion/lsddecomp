@@ -31,7 +31,7 @@ s32 StageMap__FindSlotIndexByNeighbour(StageMap *self, s32 key) {
     ChunkSlot *slot;
 
     index = 0;
-    for (i = 0; i < 7; i++) {
+    for (i = 0; i < ARRAY_COUNT(self->slots); i++) {
         slot = &self->slots[i];
         if (slot->loader->elemKey == key) {
             index = i;
@@ -45,7 +45,7 @@ s32 StageMap__FindSlotIndexByChunk(StageMap *self, s32 chunkIndex) {
     s32 i;
     ChunkSlot *slot;
 
-    for (i = 0; i < 7; i++) {
+    for (i = 0; i < ARRAY_COUNT(self->slots); i++) {
         slot = &self->slots[i];
         if (slot->loader->chunkIndex == chunkIndex && slot->loader->headerReady != 0) {
             return i;
@@ -90,7 +90,7 @@ void StageMap__ComputeFootprintFromRotation(StageMap *self, s32 acrossCells, s32
     cellRow = desc.base.b3;
     angle = param->rotate.y;
     if (param->rotate.y < 0) {
-        angle += 0x1000;
+        angle += ONE;
     }
 
     mat = GsIDMATRIX;
@@ -101,7 +101,7 @@ void StageMap__ComputeFootprintFromRotation(StageMap *self, s32 acrossCells, s32
     /* (0, 0, gridSpan) rotated in place: t is both the input and the output. */
     ApplyMatrixLV(&mat, (VECTOR *)mat.t, (VECTOR *)mat.t);
 
-    if ((u16)(angle - 0x200) < 0x400 || (u16)(angle - 0xA00) < 0x400) {
+    if ((u16)(angle - ANGLE_DEG(45)) < ANGLE_DEG(90) || (u16)(angle - ANGLE_DEG(225)) < ANGLE_DEG(90)) {
         lateral = mat.t[2];
         self->footprintWidth = aheadCells;
         self->footprintHeight = acrossCells;
@@ -109,7 +109,8 @@ void StageMap__ComputeFootprintFromRotation(StageMap *self, s32 acrossCells, s32
         self->footprintRow = (mat.t[2] > 0) ? cellRow - (u16)self->gridHalfCells - 1
                                             : cellRow - (u16)self->gridHalfCells + 1;
         shiftCol = 0;
-    } else if ((u16)(angle - 0x600) < 0x400 || (u16)(angle - 0x200) >= 0xC00) {
+    } else if ((u16)(angle - ANGLE_DEG(135)) < ANGLE_DEG(90) ||
+               (u16)(angle - ANGLE_DEG(45)) >= ANGLE_DEG(270)) {
         lateral = mat.t[0];
         self->footprintWidth = acrossCells;
         self->footprintHeight = aheadCells;
@@ -120,7 +121,7 @@ void StageMap__ComputeFootprintFromRotation(StageMap *self, s32 acrossCells, s32
     }
 
     half = self->gridHalfCells;
-    lateral >>= 11;
+    lateral >>= STAGE_CELL_SHIFT;
     if (lateral >= half) {
         lateral = half - 1;
     }
@@ -160,24 +161,24 @@ void StageMap__BuildFootprintRects(StageMap *self) {
     col = self->footprintCol;
     width = self->footprintWidth;
     height = self->footprintHeight;
-    key = 3;
+    key = CHUNK_NEIGHBOUR_CENTRE;
     if (col < 0) {
-        col += 0x14;
+        col += STAGE_CHUNK_CELLS;
         wrappedCol = 1;
-        key = 2;
+        key = CHUNK_NEIGHBOUR_PREV_COL;
     }
     row = self->footprintRow;
     if (row < 0) {
-        row += 0x14;
+        row += STAGE_CHUNK_CELLS;
         if (wrappedCol != 0) {
-            col -= 0xA;
-            key = 0;
-        } else if (col < 0xA) {
-            col += 0xA;
-            key = 0;
+            col -= STAGE_CHUNK_HALF_CELLS;
+            key = CHUNK_NEIGHBOUR_PREV_ROW_LO;
+        } else if (col < STAGE_CHUNK_HALF_CELLS) {
+            col += STAGE_CHUNK_HALF_CELLS;
+            key = CHUNK_NEIGHBOUR_PREV_ROW_LO;
         } else {
-            col -= 0xA;
-            key = 1;
+            col -= STAGE_CHUNK_HALF_CELLS;
+            key = CHUNK_NEIGHBOUR_PREV_ROW_HI;
         }
     }
     rect = &self->rects.e[0];
@@ -185,8 +186,8 @@ void StageMap__BuildFootprintRects(StageMap *self) {
     rect->col = (col >= 0) ? col : 0;
     rect->row = row;
     span = col + width;
-    if (span >= 0x15) {
-        over = span - 0x14;
+    if (span > STAGE_CHUNK_CELLS) {
+        over = span - STAGE_CHUNK_CELLS;
         rect->width = width - over;
         count = StageMap__SplitFootprintRect(self, rect, 0, key, col, row, width, height);
         count += 1;
@@ -211,45 +212,45 @@ s32 StageMap__SplitFootprintRect(StageMap *self, CellRect *rect, s32 count, s32 
     s32 belowKey;
     s32 widthLeft;
 
-    if (row + height >= 21) {
+    if (row + height > STAGE_CHUNK_CELLS) {
         /* The rectangle runs past the bottom edge (row 20): clip this rect
          * and open a new one for the part below. */
-        rowsBelow = (row + height) - 20;
+        rowsBelow = (row + height) - STAGE_CHUNK_CELLS;
         span = rowsBelow;
         rect->height = height - rowsBelow;
         count = count + 1;
         rect = &self->rects.e[count];
 
-        if (col < 10) {
+        if (col < STAGE_CHUNK_HALF_CELLS) {
             belowKey = key + 2;
             rect->slotIndex = self->methods->findSlotIndexByNeighbour(self, belowKey);
-            rect->col = col + 10;
+            rect->col = col + STAGE_CHUNK_HALF_CELLS;
             /* Stored in BOTH arms: cross-jumping merges the copies, and
              * the join label keeps the col reload below after it. */
             rect->height = span;
         } else {
             belowKey = key + 3;
             rect->slotIndex = self->methods->findSlotIndexByNeighbour(self, belowKey);
-            rect->col = col - 10;
+            rect->col = col - STAGE_CHUNK_HALF_CELLS;
             rect->height = span;
         }
 
         span = rect->col + width;
         rect->row = 0;
-        if (span >= 21) {
+        if (span > STAGE_CHUNK_CELLS) {
             /* ...and past the right edge (column 20) too. */
             count = count + 1;
             /* Two statements, not `(width + 20) - span`: fold rewrites
              * that tree as `width - (span - 20)` and CSE then shares
              * `span - 20` with the store below (round 71). */
-            widthLeft = width + 20;
+            widthLeft = width + STAGE_CHUNK_CELLS;
             widthLeft = widthLeft - span;
             rect->width = widthLeft;
             rect = &self->rects.e[count];
             rect->slotIndex = self->methods->findSlotIndexByNeighbour(self, belowKey + 1);
             rect->col = 0;
             rect->row = 0;
-            rect->width = span - 20;
+            rect->width = span - STAGE_CHUNK_CELLS;
             rect->height = rowsBelow;
         } else {
             rect->width = width;
@@ -316,26 +317,26 @@ void StageMap__SetFootprintVisible(StageMap *self, s32 visible) {
         if (slot->loader->headerReady == 0) {
             continue;
         }
-        cell = slot->cells + rect->col + rect->row * 20;
+        cell = slot->cells + rect->col + rect->row * STAGE_CHUNK_CELLS;
         for (j = 0; j < rect->height; j++) {
             for (k = 0; k < rect->width; k++) {
                 if (visible != 0) {
-                    (*cell)->attribute &= 0x7FFFFFFF;
+                    (*cell)->attribute &= ~GsDOFF;
                 } else {
-                    (*cell)->attribute |= 0x80000000;
+                    (*cell)->attribute |= GsDOFF;
                 }
                 next = (*cell)->nextInCell;
-                while (next != 0) {
+                while (next != NULL) {
                     if (visible != 0) {
-                        next->attribute &= 0x7FFFFFFF;
+                        next->attribute &= ~GsDOFF;
                     } else {
-                        next->attribute |= 0x80000000;
+                        next->attribute |= GsDOFF;
                     }
                     next = next->nextInCell;
                 }
                 cell++;
             }
-            cell += 20 - rect->width;
+            cell += STAGE_CHUNK_CELLS - rect->width;
         }
     }
 }
@@ -430,7 +431,7 @@ void StageMap__ForEachSlot(StageMap *self, StageMapCellFn cellFn, ChunkSlotFn sl
     s32 i;
     ChunkSlot *slot;
 
-    for (i = 0; i < 7; i++) {
+    for (i = 0; i < ARRAY_COUNT(self->slots); i++) {
         slot = &self->slots[i];
         if (slotFn != 0) {
             slotFn(self, slot);
@@ -443,7 +444,7 @@ void StageMap__ForEachSlotCell(StageMap *self, StageMapCellFn cellFn, ChunkSlot 
     GridCell **cell;
     GridCell **end;
 
-    end = slot->cells + (0x668 / 4);
+    end = slot->cells + STAGE_SLOT_CELLS;
     cell = slot->cells;
     for (; cell < end; cell++) {
         cellFn(self, *cell);

@@ -110,6 +110,11 @@ typedef struct ChunkSlot ChunkSlot;
 #define STAGE_CHUNK_CELLS 20
 #define STAGE_CHUNK_SIZE (STAGE_CHUNK_CELLS * STAGE_CELL_SIZE)
 
+/* Half a chunk, in cells: the odd-row stagger, which is how far a cell
+ * column moves when the drawn window crosses into the row above or below
+ * (BuildFootprintRects, SplitFootprintRect). */
+#define STAGE_CHUNK_HALF_CELLS (STAGE_CHUNK_CELLS / 2)
+
 /* A slot's `cells`: the lattice, row stride STAGE_CHUNK_CELLS, then 10
  * overflow cells PopulateSlotCells hangs chained placements in; 410 in all
  * (the ctor's BMemPMgrAlloc(0x668), ClearSlotCells' walk). */

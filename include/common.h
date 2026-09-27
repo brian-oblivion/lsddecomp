@@ -15,6 +15,10 @@
  * would. */
 #define ARRAY_COUNT(arr) ((s32)(sizeof(arr) / sizeof((arr)[0])))
 
+/* `deg` degrees as a PlayStation angle, 4096 (libgte's ONE) to the turn.
+ * Exact for multiples of 45 degrees; a constant expression to cc1. */
+#define ANGLE_DEG(deg) ((deg) * 4096 / 360)
+
 typedef union MoodGraphPoint {
     s16 value;
 
