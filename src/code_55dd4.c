@@ -299,7 +299,8 @@ void TodActor__Tick(TodActor *self) {
         self->todFrame = self->todFrame + 1;
         if (self->todFrame >= self->todFrameCount) {
             self->todFrame = 0;
-            self->todFramePtr = (u8 *)TODSET_TOD(self->modelData->todSet, self->todIndex)->buffer + 8;
+            self->todFramePtr =
+                ((TodHeader *)TODSET_TOD(self->modelData->todSet, self->todIndex)->buffer)->frames;
         }
     }
     self->coord2->flg = 0;
@@ -350,7 +351,8 @@ void TodActor__PlayTone(TodActor *self, s32 index) {
 void TodActor__SetTod(TodActor *self, s32 index) {
     self->todIndex = index;
     self->todFrameCount = ((TodHeader *)TODSET_TOD(self->modelData->todSet, index)->buffer)->frameCount;
-    self->todFramePtr = (u8 *)TODSET_TOD(self->modelData->todSet, self->todIndex)->buffer + 8;
+    self->todFramePtr =
+        ((TodHeader *)TODSET_TOD(self->modelData->todSet, self->todIndex)->buffer)->frames;
     self->todFrame = 0;
     self->methods->applyTodFrame(self, self->todFramePtr, 0);
 }
@@ -367,8 +369,8 @@ void *TodActor__ApplyTodFrame(TodActor *self, void *hdr, void *extra) {
     s32 count;
     u32 i;
 
-    count = *(u16 *)((u8 *)hdr + 2);
-    hdr = (u8 *)hdr + 8;
+    count = ((TodFrame *)hdr)->packetCount;
+    hdr = ((TodFrame *)hdr)->packets;
     for (i = 0; i < count;) {
         i++;
         hdr = self->methods->applyTodPacket(self, hdr, extra);
@@ -377,17 +379,18 @@ void *TodActor__ApplyTodFrame(TodActor *self, void *hdr, void *extra) {
 }
 
 void *TodActor__ApplyTodPacket(TodActor *self, void *acc, void *extra) {
-    u8 outbuf[4];
-    void *data;
+    TodPacketHeader head;
+    s32 *data;
     s32 idx;
     Actor *elem;
     GsCOORDINATE2 *coord;
     GsCOORD2PARAM *param;
     s32 i;
 
-    data = self->modelData->methods->decodePacketWord(
-        self->modelData, (s32)acc, (s32)&outbuf[0], (s32)&outbuf[1], (s32)&outbuf[2], (s32)&outbuf[3]);
-    idx = TodActor__FindPartIndex(self, outbuf[0]);
+    data = self->modelData->methods->decodePacketWord(self->modelData, (s32)acc,
+                                                      (s32)&head.objectId, (s32)&head.type,
+                                                      (s32)&head.flag, (s32)&head.length);
+    idx = TodActor__FindPartIndex(self, head.objectId);
     if (idx < 0) {
         goto end;
     }
@@ -396,67 +399,67 @@ void *TodActor__ApplyTodPacket(TodActor *self, void *acc, void *extra) {
     coord->flg = 0;
     param = coord->param;
 
-    switch (outbuf[1]) {
+    switch (head.type) {
         case TOD_PACKET_ATTRIBUTE:
-            elem->attribute = (elem->attribute & ((s32 *)data)[0]) | ((s32 *)data)[1];
+            elem->attribute = (elem->attribute & data[0]) | data[1];
             break;
         case TOD_PACKET_COORDINATE: {
-            if (outbuf[2] & TOD_COORD_DIFFERENTIAL) {
-                if (outbuf[2] & TOD_COORD_ROTATE) {
+            if (head.flag & TOD_COORD_DIFFERENTIAL) {
+                if (head.flag & TOD_COORD_ROTATE) {
                     s16 *p16 = &param->rotate.vx;
 
                     for (i = 0; i < 3; i++, p16++) {
                         s16 tmp;
 
-                        tmp = *p16 + ((s32 *)data)[i] / 360;
+                        tmp = *p16 + data[i] / 360;
                         *p16 = tmp;
                         *p16 = tmp % 4096;
                     }
-                    data = (u8 *)data + 0xC;
+                    data += 3;
                 }
-                if (outbuf[2] & TOD_COORD_SCALE) {
+                if (head.flag & TOD_COORD_SCALE) {
                     long *p32 = &param->scale.vx;
 
                     for (i = 0; i < 3; i++, p32++) {
                         *p32 = (((s16 *)data)[i] * *p32) / 4096;
                     }
-                    data = (u8 *)data + 8;
+                    data += 2;
                 }
-                if (!(outbuf[2] & TOD_COORD_TRANSLATE)) {
+                if (!(head.flag & TOD_COORD_TRANSLATE)) {
                     goto end;
                 }
                 {
                     long *p32 = &param->trans.vx;
 
                     for (i = 0; i < 3; i++, p32++) {
-                        *p32 += ((s32 *)data)[i];
+                        *p32 += data[i];
                     }
                 }
             } else {
-                if (outbuf[2] & TOD_COORD_ROTATE) {
+                if (head.flag & TOD_COORD_ROTATE) {
                     s16 *p16 = &param->rotate.vx;
 
                     for (i = 0; i < 3; i++, p16++) {
-                        *p16 = ((s32 *)data)[i] / 360;
+                        *p16 = data[i] / 360;
                     }
-                    data = (u8 *)data + 0xC;
+                    data += 3;
                 }
-                if (outbuf[2] & TOD_COORD_SCALE) {
+                if (head.flag & TOD_COORD_SCALE) {
                     long *p32 = &param->scale.vx;
 
                     for (i = 0; i < 3; i++, p32++) {
                         *p32 = ((s16 *)data)[i];
                     }
-                    data = (u8 *)data + 8;
+                    data += 2;
                 }
-                if (!(outbuf[2] & TOD_COORD_TRANSLATE)) {
+                if (!(head.flag & TOD_COORD_TRANSLATE)) {
                     goto end;
                 }
                 {
                     long *p32 = &param->trans.vx;
 
                     for (i = 0; i < 3; i++, p32++) {
-                        *p32 = ((s32 *)data)[i];
+                        *p32 = data[i];
                     }
                 }
             }
@@ -493,7 +496,7 @@ void *TodActor__ApplyTodPacket(TodActor *self, void *acc, void *extra) {
         case TOD_PACKET_PARENT: {
             s32 v1;
 
-            v1 = *(s32 *)data;
+            v1 = data[0];
             if (v1 == 0 || v1 == 0xFFFF) {
                 elem->methods->attachToParent(elem, (SceneNode *)self, NULL);
             } else {
@@ -507,7 +510,7 @@ void *TodActor__ApplyTodPacket(TodActor *self, void *acc, void *extra) {
     }
 
 end:
-    return (u8 *)acc + outbuf[3] * 4;
+    return (u8 *)acc + head.length * 4;
 }
 
 void TodActor__LinkPeer(TodActor *self, TodActor *other) {
