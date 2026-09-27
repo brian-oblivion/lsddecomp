@@ -18,6 +18,34 @@
  * event).
  */
 
+/* dispatchEvents' event codes: one base per edge plus the button's index
+ * in sButtonMasks (PAD_EVENT_PRESSED + PAD_BUTTON_START is Start going
+ * down). */
+#define PAD_EVENT_HELD 0x02
+#define PAD_EVENT_PRESSED 0x12
+#define PAD_EVENT_RELEASED 0x22
+
+/* sButtonMasks' indices. Pad__LoadButtonTable fills it from one fixed
+ * table (D_80010764), whose words are libetc's masks in this order. */
+enum PadButton {
+    PAD_BUTTON_LUP = 0,     /* PADLup */
+    PAD_BUTTON_LDOWN = 1,   /* PADLdown */
+    PAD_BUTTON_LLEFT = 2,   /* PADLleft */
+    PAD_BUTTON_LRIGHT = 3,  /* PADLright */
+    PAD_BUTTON_RUP = 4,     /* PADRup (triangle) */
+    PAD_BUTTON_RDOWN = 5,   /* PADRdown (cross) */
+    PAD_BUTTON_RLEFT = 6,   /* PADRleft (square) */
+    PAD_BUTTON_RRIGHT = 7,  /* PADRright (circle) */
+    PAD_BUTTON_I = 8,       /* PADi */
+    PAD_BUTTON_J = 9,       /* PADj */
+    PAD_BUTTON_SELECT = 10, /* PADk, PADselect */
+    PAD_BUTTON_R1 = 11,     /* PADl, PADR1 */
+    PAD_BUTTON_R2 = 12,     /* PADm, PADR2 */
+    PAD_BUTTON_L1 = 13,     /* PADn, PADL1 */
+    PAD_BUTTON_L2 = 14,     /* PADo, PADL2 */
+    PAD_BUTTON_START = 15   /* PADh, PADstart */
+};
+
 typedef struct Pad Pad;
 typedef struct PadMethods PadMethods;
 

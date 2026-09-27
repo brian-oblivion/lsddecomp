@@ -28,6 +28,7 @@
 #include "FadeBox.h"
 #include "TimBlockSrc.h"
 #include "WBgm.h"
+#include "Pad.h"
 
 void ObjM__NoOpSlot40(void) {}
 
@@ -72,6 +73,11 @@ extern LongVec3 gObjMViewRefPoint;
 extern s32 gStagePendingExtras[];
 extern CellBounds gStage0Bounds;
 
+/* onInit's gridSpan when it is passed 0: gDefaultGridSpan's value, the one
+ * the StageMap starts with (10 half-cells: StageMap::gridHalfCells is
+ * gridSpan >> 12). */
+#define DEFAULT_GRID_SPAN 40960
+
 /* onInit (IntermediateBase__Init passes 0, 0, 0). */
 void ObjM__InitStyleAndWorld(ObjM *self, s32 gridSpan, StyleConfig *style, s32 arg3) {
     NodeGuardedViewport *vp = (NodeGuardedViewport *)self->viewport;
@@ -112,7 +118,7 @@ void ObjM__InitStyleAndWorld(ObjM *self, s32 gridSpan, StyleConfig *style, s32 a
          * D_8008EA26's `*(u8 *)&sym`, used here in the opposite
          * direction (forcing a reload instead of permitting a fold). */
         stage = *(s32 volatile *)&self->stage;
-        self->tickPeriod = 0x10;
+        self->tickPeriod = 16;
         three = 3;
         /* Order-only: without this barrier the scheduler moves `three`'s
          * `li` past the `self->tickPeriod` store; removing it does not change
@@ -128,7 +134,7 @@ void ObjM__InitStyleAndWorld(ObjM *self, s32 gridSpan, StyleConfig *style, s32 a
         }
         ((StageMap *)self->unk14)->methods->setBounds((StageMap *)self->unk14, 0);
     } else {
-        self->tickPeriod = 0x10;
+        self->tickPeriod = 16;
         self->moveMode = 2;
         flag = 1;
         ((StageMap *)self->unk14)->methods->setBounds((StageMap *)self->unk14, &gStage0Bounds);
@@ -136,7 +142,7 @@ void ObjM__InitStyleAndWorld(ObjM *self, s32 gridSpan, StyleConfig *style, s32 a
 
     self->gridSpan = gridSpan;
     if (gridSpan == 0) {
-        self->gridSpan = 0xA000;
+        self->gridSpan = DEFAULT_GRID_SPAN;
     }
     func_8001EF60(flag);
 
@@ -174,7 +180,7 @@ void ObjM__PollTimBlockLoad(ObjM *self, TimBlockSrc *src) {
             self->timBlockPending = 0;
             self->methods->setupSceneStyle(self);
             timer = self->dreamSys->methods->getDreamTimerScaled(self->dreamSys);
-            self->dreamSys->methods->getSetDreamTimeLimit(self->dreamSys, timer + 0x1E);
+            self->dreamSys->methods->getSetDreamTimeLimit(self->dreamSys, timer + 30);
         } else if (src->loaded != 0) {
             colorMode = self->styleConfig->colorMode;
             m = src->methods;
@@ -206,19 +212,19 @@ void ObjM__DispatchPadEvent(ObjM *self, void *sender, s32 code) {
     if (self->inSession == 0) {
         return;
     }
-    if (code == 0x16) {
+    if (code == PAD_EVENT_PRESSED + PAD_BUTTON_RUP) {
         goto closeAndNotify;
     }
-    if (code < 0x17) {
-        if (code == 0xC) {
+    if (code <= PAD_EVENT_PRESSED + PAD_BUTTON_RUP) {
+        if (code == PAD_EVENT_HELD + PAD_BUTTON_SELECT) {
             goto updateCloseReady;
         }
         return;
     }
-    if (code == 0x21) {
+    if (code == PAD_EVENT_PRESSED + PAD_BUTTON_START) {
         goto togglePause;
     }
-    if (code == 0x2C) {
+    if (code == PAD_EVENT_RELEASED + PAD_BUTTON_SELECT) {
         goto clearCloseReady;
     }
     return;
@@ -334,7 +340,7 @@ void ObjM__EnterStyleSession(ObjM *self) {
 
     vp = (NodeGuardedViewport *)self->viewport;
     style = self->styleConfig;
-    vp->methods->setLightMode(vp, 1);
+    vp->methods->setLightMode(vp, 1); /* GsFOG */
     vp->methods->setClearColor(vp, style->clearColor);
     vp->methods->setFogNear(vp, style->fogNear);
     m = vp->methods;
@@ -371,33 +377,33 @@ void ObjM__TickStyle(ObjM *self) {
  * state (Actor::state). */
 void ObjM__OnDreamSysNotify(ObjM *self, BasicClass *sender, s32 code) {
     if (self->state == 0) {
-        switch (code - 0xA) {
-            case 0:
+        switch (code) {
+            case DREAMSYS_TIME_UP:
                 self->methods->enterState4(self);
                 break;
-            case 1:
+            case DREAMSYS_LINK_DAY_START:
                 break;
-            case 2:
+            case DREAMSYS_LINK_DYNAMIC:
                 self->methods->enterState5(self);
                 break;
-            case 3:
+            case DREAMSYS_LINK_WALL:
                 self->methods->enterState6(self);
                 break;
-            case 4:
+            case DREAMSYS_LINK_FLASHBACK:
                 self->methods->enterState7(self);
                 break;
-            case 5:
+            case DREAMSYS_LINK_TUNNEL:
                 self->methods->enterState8(self);
                 break;
-            case 6:
+            case DREAMSYS_LINK_STAGE_TIMER:
                 self->methods->enterStateA(self);
                 break;
-            case 7:
+            case DREAMSYS_LINK_TELEPORT:
                 self->methods->notifyParentsCodeB(self);
                 break;
         }
     } else if (code >= 9) {
-        self->dreamSys->state = 0;
+        self->dreamSys->state = DREAMSYS_NO_LINK;
     }
 }
 
@@ -415,23 +421,23 @@ void ObjM__EnterState4(ObjM *self) {
             self->methods->notifyParents(self, 4);
             return;
         }
-        step = 0xA;
+        step = 10;
         switch (t) {
             case 1:
-                color = 0;
+                color = DREAM_COLOR_BLACK;
                 break;
             case 2:
-                color = 4;
+                color = DREAM_COLOR_RED;
                 break;
             case 3:
-                color = 7;
+                color = DREAM_COLOR_WHITE;
                 step = 5;
                 break;
         }
         ObjM__StartFadeUp(self, color, 0, step, 1);
         return;
     }
-    ObjM__StartFadeUp(self, 0, 0, 5, 1);
+    ObjM__StartFadeUp(self, DREAM_COLOR_BLACK, 0, 5, 1);
 }
 
 void ObjM__EnterState5(ObjM *self) {
@@ -442,7 +448,7 @@ void ObjM__EnterState5(ObjM *self) {
     } else {
         self->state = 5;
         color = self->dreamSys->methods->getDreamColor(self->dreamSys);
-        ObjM__StartFadeUp(self, color, 0, 0xA, 1);
+        ObjM__StartFadeUp(self, color, 0, 10, 1);
         self->dreamSys->methods->blockMovement(self->dreamSys);
     }
 }
@@ -452,6 +458,6 @@ void ObjM__EnterState6(ObjM *self) {
 
     self->state = 6;
     color = self->dreamSys->methods->getDreamColor(self->dreamSys);
-    ObjM__StartFadeUp(self, color, 0, 0x1E, 1);
+    ObjM__StartFadeUp(self, color, 0, 30, 1);
     self->dreamSys->methods->blockMovement(self->dreamSys);
 }
