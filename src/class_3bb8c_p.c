@@ -265,7 +265,7 @@ void *Actor__ScanLinkCandidates(Actor *self, void *arg1, void *arg2, s32 count, 
                 return result;
             }
         }
-        arr1 = (GridQuery *)((u8 *)arr1 + 0xC);
+        arr1++;
         arr2++;
     }
     return NULL;
@@ -285,7 +285,7 @@ void *Actor__ScanGridWindow(Actor *self, void *arg1, void *arg2, GridQuery *quer
     s32 row, col;
     GridCell **bucket;
 
-    bucket = (GridCell **)((u8 *)source->cells + query->startRow * 0x50 + query->startCol * 4);
+    bucket = source->cells + query->startRow * STAGE_CHUNK_CELLS + query->startCol;
     for (row = 0; row < query->numRows; row++) {
         for (col = 0; col < query->numCols; col++) {
             GridCell *node;
@@ -300,7 +300,7 @@ void *Actor__ScanGridWindow(Actor *self, void *arg1, void *arg2, GridQuery *quer
             }
             bucket++;
         }
-        bucket = (GridCell **)((u8 *)bucket - (query->numCols * 4 + 0x50));
+        bucket -= query->numCols + STAGE_CHUNK_CELLS;
     }
     return NULL;
 }
