@@ -344,36 +344,18 @@ void DisableCdQueue(void) {
     UnlockCd();
 }
 
-/* The same 0x24-byte queue node CdRequestNode above is a view of, from the
- * writing side: AllocCdRequestNode (code_179d8_r) allocates one and links it onto
- * gCdRequestQueue, and only the fields this call site writes are typed here
- * (padded to their offsets, per this unit's convention). `op` takes the
- * CD_OP_* values, `fileIndex` is FindCdFileIndex's index into gFileTable (0
- * when the op does not name a file), and param0/param1 are the two per-op
- * arguments code_179d8_s passes through: a byte count and a flag for op 4, a
- * buffer and a size for op 5. */
-typedef struct CdRequest_282AC CdRequest_282AC;
+extern CdRequestNode *AllocCdRequestNode(void); /* code_179d8_r: alloc + link */
 
-struct CdRequest_282AC {
-    u8 pad00[0x08];
-    /* +0x08 */ s32 op;
-    /* +0x0C */ s32 owner;
-    /* +0x10 */ s32 fileIndex;
-    /* +0x14 */ s32 param0;
-    /* +0x18 */ s32 param1;
-};
-
-extern CdRequest_282AC *AllocCdRequestNode(void); /* code_179d8_r: alloc + link */
-
-/* The store order below is retail's own (+0x08, +0x14, +0x0C, +0x10, +0x18),
- * not ascending offset -- see the match report: this compiler keeps
- * statement order for these, so the statements are in retail's order. */
+/* Fills a node AllocCdRequestNode has already linked onto gCdRequestQueue,
+ * counts it against its owner and starts the service tick.
+ * MATCHING: the stores are in retail's order (+0x08, +0x14, +0x0C, +0x10,
+ * +0x18); this compiler keeps statement order. */
 void EnqueueCdRequest(CdDriver *owner, s32 fileIndex, s32 op, s32 param0, s32 param1) {
-    CdRequest_282AC *entry = AllocCdRequestNode();
+    CdRequestNode *entry = AllocCdRequestNode();
 
     entry->op = op;
     entry->param0 = param0;
-    entry->owner = (s32)owner;
+    entry->owner = owner;
     entry->fileIndex = fileIndex;
     entry->param1 = param1;
 

@@ -142,3 +142,12 @@ which is the procedure working in the direction where it can work.
 | code_179d8_s | `Node8008A894` | `unk10` | `fileIndex` | A | as above |
 | code_179d8_s | `Node8008A894` | `unk14`/`unk18` | `param0`/`param1` | B | as above |
 | code_179d8_r | `Node8008A894` | `unk4` | *(no proposal)* | C | this unit never touches `+0x04`; only `AllocCdRequestNode` zeroes it |
+
+## Round 96 (track 6, echo): `CdRequest_282AC` is `CdRequestNode`
+
+The unit-local placeholder `CdRequest_282AC` (op/owner/fileIndex/param0/param1
+at +0x08..+0x18, padded) was a writing-side view of include/CdDriver.h's
+`CdRequestNode`, the same 0x24-byte node AllocCdRequestNode (code_179d8_r)
+returns: same offsets, same allocator. The view is deleted and `entry` is a
+`CdRequestNode *`; `owner` is that struct's `CdDriver *`, so the `(s32)` cast
+on the store went too. Byte-exact.
