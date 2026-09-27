@@ -9,7 +9,7 @@ before this round.
 
 Takes no arguments; gated entirely on the global `gStyleDecorColor` (set by
 `ApplyStyleConfig`, matched earlier this round). If it's non-NULL: builds an
-object via `New_BoxFill(&D_8008AB60, gStyleDecorColor, 0)` (already known
+object via `New_BoxFill(&sStyleDecorBoxSize, gStyleDecorColor, 0)` (already known
 elsewhere as returning `ClassEAC0Obj *` from `include/code_2cc8c.h`, a header
 this unit doesn't own -- see below), stashes it in `gStyleDecorObj`, and
 dispatches three method calls on it (`slot64(obj,1)`, `slot68(obj,0)`,
@@ -50,7 +50,7 @@ typedef struct FieldAC7CHolder {
 } FieldAC7CHolder;
 
 extern s32 gStyleDecorObj;
-extern s32 D_8008AB60;
+extern s32 sStyleDecorBoxSize;
 extern s32 sStyleDecorBoxPos;
 extern LocalM4D0Obj *New_BoxFill(void *a0, void *a1, s32 a2);
 
@@ -58,7 +58,7 @@ void ApplyStyleDecorationIfSet(void) {
     s32 tmp;
 
     if (gStyleDecorColor != 0) {
-        gStyleDecorObj = (s32) New_BoxFill(&D_8008AB60, (void *) gStyleDecorColor, 0);
+        gStyleDecorObj = (s32) New_BoxFill(&sStyleDecorBoxSize, (void *) gStyleDecorColor, 0);
         ((LocalM4D0Obj *) gStyleDecorObj)->methods->slot64((LocalM4D0Obj *) gStyleDecorObj, 1);
         ((LocalM4D0Obj *) gStyleDecorObj)->methods->slot68((LocalM4D0Obj *) gStyleDecorObj, 0);
 

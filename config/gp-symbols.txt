@@ -62,7 +62,6 @@ D_8008AAF8
 D_8008AB14
 D_8008AB1C
 D_8008AB24
-D_8008AB60
 D_8008AB78
 D_8008AB7C
 D_8008AB80
@@ -216,5 +215,6 @@ sSaveTitleColorChannel
 sSaveTitleColorFrame
 sSaveTitleOffset
 sStyleDecorBoxPos
+sStyleDecorBoxSize
 sTaskObjFCount
 sTimExt

@@ -312,14 +312,14 @@ typedef struct StyleSceneRefs {
 } StyleSceneRefs;
 
 extern s32 gStyleDecorObj;
-extern s32 D_8008AB60;
+extern s32 sStyleDecorBoxSize;
 extern s32 sStyleDecorBoxPos;
 
 void ApplyStyleDecorationIfSet(void) {
     SceneNode *fadeBox;
 
     if (gStyleDecorColor != 0) {
-        gStyleDecorObj = (s32)New_BoxFill(&D_8008AB60, (void *)gStyleDecorColor, 0);
+        gStyleDecorObj = (s32)New_BoxFill(&sStyleDecorBoxSize, (void *)gStyleDecorColor, 0);
         ((BoxFill *)gStyleDecorObj)->methods->setSemiTransOn((BoxFill *)gStyleDecorObj, 1);
         ((BoxFill *)gStyleDecorObj)->methods->setSemiTransRate((BoxFill *)gStyleDecorObj, 0);
 
