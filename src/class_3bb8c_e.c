@@ -136,15 +136,12 @@ extern void ExitCriticalSection(void);
 
 s32 TaskObjF__OpenEvents(TaskObjF *self) {
     s32 i;
-    TaskObjF *cur;
 
     EnterCriticalSection();
     i = 0;
-    cur = self;
     do {
-        cur->events[0] = OpenEvent(0xF4000001, gCardEventSpecs[i], 0x2000, 0);
+        self->events[i] = OpenEvent(0xF4000001, gCardEventSpecs[i], 0x2000, 0);
         i++;
-        cur = (TaskObjF *)((u8 *)cur + 4);
     } while (i < 4);
     ExitCriticalSection();
     TaskObjF__EnableEvents(self);
