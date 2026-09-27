@@ -19,7 +19,7 @@ Table slot (`tools/classtable.py`): gTriggerWorldMethods +0x078.
 
 The unit-local views `DataSrc33808` (FileResource subclass via the unified
 `FILERESOURCE_SLOTS`/`FILERESOURCE_FIELDS` macros plus `slot7C`/`slot80` and own
-fields +0x2C..+0x38), `UnprototypedCtorTable`, `CountedBuf33808` and `ResourceSourceArgs` sit at the
+fields +0x2C..+0x38), `UnprototypedCtorTable`, `SubBlockTable` and `ResourceSourceArgs` sit at the
 top of / earlier in `src/code_33808.c`.
 
 ```c
@@ -29,7 +29,7 @@ top of / earlier in `src/code_33808.c`.
  * (release) and 1. */
 s32 TriggerWorld__BuildResources(DataSrc33808 *self) {
     ResourceSourceArgs req;
-    CountedBuf33808 *buf;
+    SubBlockTable *buf;
     s32 *p;
     s32 i;
     s32 n;
@@ -41,7 +41,7 @@ s32 TriggerWorld__BuildResources(DataSrc33808 *self) {
     p = buf->entries;
     self->unk38 = 0;
     for (; i < n; i++) {
-        req.buffer = (u8 *)self->buffer + ((CountedBuf33808 *)self->buffer)->entries[i];
+        req.buffer = (u8 *)self->buffer + ((SubBlockTable *)self->buffer)->entries[i];
         *p = (s32)New_ModelData((ResourceSource *)&req);
         if (*p == 0) {
             goto fail;

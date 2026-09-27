@@ -17,7 +17,7 @@ Table slot (`tools/classtable.py`): none (allocator for gTodSetMethods, object s
 
 The unit-local view `DataSrc33808` (a FileResource subclass built with the unified
 `FILERESOURCE_SLOTS`/`FILERESOURCE_FIELDS` macros, plus `slot7C`/`slot80`, and own
-fields +0x2C..+0x38) and `CountedBuf33808` sit at the top of `src/code_33808.c`.
+fields +0x2C..+0x38) and `SubBlockTable` sit at the top of `src/code_33808.c`.
 
 ```c
 /* Allocate and construct a gTodSetMethods object; freed and NULL when the constructor fails. */

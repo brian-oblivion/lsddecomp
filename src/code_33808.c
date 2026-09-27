@@ -101,11 +101,11 @@
 /* A TodSet's or TriggerWorld's buffer: a word, a count, then that many
  * offsets from the buffer's start, which BuildTods / BuildResources
  * overwrite with the objects built over them. */
-typedef struct CountedBuf33808 {
+typedef struct SubBlockTable {
     /* +0x00 */ u8 pad0[4];
     /* +0x04 */ u32 count;
     /* +0x08 */ s32 entries[1];
-} CountedBuf33808;
+} SubBlockTable;
 
 extern FileResourceMethods *GetActiveDataSourceMethods(void);
 extern void ReleaseBasicClassArray(BasicClass **array, s32 count);
@@ -994,7 +994,7 @@ void TriggerWorld__Load(TriggerWorld *self) {
  * of its offset; 1, with those built released, when one fails. */
 s32 TriggerWorld__BuildResources(TriggerWorld *self) {
     ResourceSourceArgs req;
-    CountedBuf33808 *buf;
+    SubBlockTable *buf;
     s32 *p;
     s32 i;
     s32 n;
@@ -1006,7 +1006,7 @@ s32 TriggerWorld__BuildResources(TriggerWorld *self) {
     p = buf->entries;
     self->modelDataCount = 0;
     for (; i < n; i++) {
-        req.buffer = (u8 *)self->buffer + ((CountedBuf33808 *)self->buffer)->entries[i];
+        req.buffer = (u8 *)self->buffer + ((SubBlockTable *)self->buffer)->entries[i];
         *p = (s32)New_ModelData((ResourceSource *)&req);
         if (*p == 0) {
             goto fail;
@@ -1022,14 +1022,13 @@ fail:
 
 /* releaseResources (+0x07C): release the ModelData built so far. */
 void TriggerWorld__ReleaseResources(TriggerWorld *self) {
-    ReleaseBasicClassArray((BasicClass **)((CountedBuf33808 *)self->buffer)->entries,
-                           self->modelDataCount);
+    ReleaseBasicClassArray((BasicClass **)((SubBlockTable *)self->buffer)->entries, self->modelDataCount);
     self->modelDataCount = 0;
 }
 
 /* +0x088: ModelData `index`, NULL when out of range. */
 ModelData *TriggerWorld__GetModelData(TriggerWorld *self, u32 index) {
-    CountedBuf33808 *buf = self->buffer;
+    SubBlockTable *buf = self->buffer;
 
     if (index < buf->count) {
         return (ModelData *)buf->entries[index];
@@ -1237,7 +1236,7 @@ void *TodSet__TodSet(TodSet *self, ResourceSource *src) {
 
 /* finalize (+0x00C): release the Tods. */
 void TodSet__Finalize(TodSet *self) {
-    CountedBuf33808 *buf = self->buffer;
+    SubBlockTable *buf = self->buffer;
 
     ReleaseBasicClassArray((BasicClass **)buf->entries, buf->count);
     GetTodMethods()->finalize((Tod *)self);
@@ -1247,7 +1246,7 @@ void TodSet__Finalize(TodSet *self) {
  * place of its offset; 1, with those built released, when one fails. */
 s32 TodSet__BuildTods(TodSet *self) {
     ResourceSourceArgs req;
-    CountedBuf33808 *buf;
+    SubBlockTable *buf;
     Tod **p;
     s32 i;
     s32 n;
@@ -1258,7 +1257,7 @@ s32 TodSet__BuildTods(TodSet *self) {
     n = buf->count;
     p = (Tod **)buf->entries;
     for (; i < n; i++) {
-        req.buffer = (u8 *)self->buffer + ((CountedBuf33808 *)self->buffer)->entries[i];
+        req.buffer = (u8 *)self->buffer + ((SubBlockTable *)self->buffer)->entries[i];
         *p = New_Tod((ResourceSource *)&req);
         if (*p == NULL) {
             while (i != 0) {
@@ -1276,7 +1275,7 @@ s32 TodSet__BuildTods(TodSet *self) {
 /* +0x078: scanTodPackets over the first frame of the TOD that follows the
  * counted array. */
 u8 TodSet__ScanPackets(TodSet *self, u8 *out, u32 *tmdId) {
-    CountedBuf33808 *buf = self->buffer;
+    SubBlockTable *buf = self->buffer;
 
     return self->methods->scanTodPackets(self, out, tmdId, ((TodFile *)&buf->entries[buf->count])->frames);
 }
