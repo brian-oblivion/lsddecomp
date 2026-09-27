@@ -257,7 +257,7 @@ void ItemList__ResetView(ItemList *self) {
 }
 
 extern char *BuildFileName(char *dest, const char *arg1, const char *arg2, const char *arg3);
-extern const char D_8008AB14[]; /* "SELECT" */
+extern const char sStrSelect[]; /* "SELECT" */
 extern const char D_8008AB1C[]; /* "CARD\\" */
 extern const char D_8008AB24[]; /* ".TIM" */
 extern s32 gItemListPanelRect; /* 3 words, New_ScreenSprite's rect: a SpriteRect {0, 0, 256, 160} */
@@ -287,7 +287,7 @@ void ItemList__LoadResources(ItemList *self, SceneNode *parent) {
     dir = D_8008AB1C;
     ext = D_8008AB24;
 
-    handle1 = New_TimImage(BuildFileName(path, D_8008AB14, dir, ext));
+    handle1 = New_TimImage(BuildFileName(path, sStrSelect, dir, ext));
     ((TimImageUploadFn)handle1->methods->processBuffer)(handle1);
     self->panelSprite = New_ScreenSprite(handle1, (SpriteRect *)&gItemListPanelRect, 0);
     handle1->methods->release(handle1);
