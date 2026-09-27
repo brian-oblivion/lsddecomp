@@ -29,7 +29,7 @@ addiu $a0, $sp, 0x18
 jal  GetAsmkMovie                          ; writes 0x31 to local, returns &sAsmkStreamPath
  (delay: s1 = v0, i.e. the PRECEDING call's return = task)
 lw   $a0, 0x18($sp)                          ; reload the type code (0x31) GetAsmkMovie just wrote
-jal  GetStreamGroupForType(a0=0x31)                    ; halfword lookup in gStreamTypeToGroupTable
+jal  GetMovieFrameCount(a0=0x31)                    ; halfword lookup in gStreamTypeToGroupTable
  (delay: s0 = v0, i.e. the PRECEDING call's return = streamName, &sAsmkStreamPath)
 move $a0, $s1                                    ; a0 = task
 move $a2, $s0                                     ; a2 = streamName
@@ -39,7 +39,7 @@ sw   $v1, 0x10($sp)                                  ; 5th argument, stack-spill
 lw   $a1, 0x1C($s2)                                    ; a1 = self->unk1C
 lw   $v1, 0x44($a3)                                     ; v1 = task->methods->slot44
 jalr $v1
- (delay: a3 = v0)                                        ; a3 OVERWRITTEN with GetStreamGroupForType's
+ (delay: a3 = v0)                                        ; a3 OVERWRITTEN with GetMovieFrameCount's
                                                             ; return value -- the REAL 4th argument
 lw   $v0, 0x0($s1)                                          ; reload task->methods
 lw   $v0, 0x4($v0)                                           ; slot4
@@ -60,7 +60,7 @@ void GameApplication__LoadIntroLogoSequence(GameApplication *self) {
         GameApplication__StartLoaderTask(self, sLogoPathAsmk);
         task = New_StreamTask(0, 0, 0, 0);
         streamName = GetAsmkMovie(&typeCode);
-        typeLookup = GetStreamGroupForType(typeCode);
+        typeLookup = GetMovieFrameCount(typeCode);
         task->methods->slot44(task, self->unk1C, streamName, typeLookup, 1);
         task->methods->slot4(task);
         GameApplication__StartLoaderTask(self, sLogoPathOsd);
@@ -75,11 +75,11 @@ void GameApplication__LoadIntroLogoSequence(GameApplication *self) {
 preceding instructions.** `lw $a3, 0x0($s1)` (task->methods) is used to
 *compute the call target* (`v1 = task->methods->slot44`), but by the time
 the `jalr` actually transfers control, its own delay slot (`move $a3, $v0`)
-has already replaced `$a3` with `GetStreamGroupForType`'s return value. A naive read
+has already replaced `$a3` with `GetMovieFrameCount`'s return value. A naive read
 sees "`a3` = task's own vtable pointer, passed as an argument" and that
 reading is wrong — the vtable pointer was only ever a scratch value for the
 indirect call computation, immediately clobbered before the callee sees it.
-The first C attempt (discarding `GetStreamGroupForType`'s return and passing
+The first C attempt (discarding `GetMovieFrameCount`'s return and passing
 `task->methods` as the 4th argument) built and even scored 44/57 — plausible
 enough to be mistaken for a near-miss — before the diff against retail's
 actual delay-slot value (`move a3,v0` where `v0` is the *call's* return, not

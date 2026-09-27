@@ -345,7 +345,7 @@ Rec1C *GetSpecialDayOrEventRecord(s32 *countOut, RecPick pick) {
     return GetEventMovie(countOut, pick.sub);
 }
 
-s32 GetStreamGroupForType(s32 index) {
+s32 GetMovieFrameCount(s32 index) {
     return gStreamTypeToGroupTable[index];
 }
 

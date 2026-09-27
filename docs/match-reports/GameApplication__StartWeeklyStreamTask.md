@@ -12,7 +12,7 @@
 second boolean/pointer gate on the ctor argument, sibling to
 `GameApplication__LoadIntroLogoSequence`'s `unk0C` gate): builds a `StreamTask`, derives a type code
 via `PickOpeningMovie` (a day/week-style calculation, unrelated unit,
-`psyq_memset.s`), looks it up via `GetStreamGroupForType`, and initializes+starts
+`psyq_memset.s`), looks it up via `GetMovieFrameCount`, and initializes+starts
 the task the same way `GameApplication__LoadIntroLogoSequence` does -- minus that function's two
 `GameApplication__StartLoaderTask` loader-task registrations.
 
@@ -33,7 +33,7 @@ void GameApplication__StartWeeklyStreamTask(GameApplication *self) {
         SetActiveDataSourceDriverMode(0, 0, 0);
         task = New_StreamTask(0, 0, 0, 0);
         derivedValue = PickOpeningMovie(&typeCode, 0);
-        typeLookup = GetStreamGroupForType(typeCode);
+        typeLookup = GetMovieFrameCount(typeCode);
         task->methods->slot44(task, self->unk1C, derivedValue, typeLookup, 1);
         task->methods->slot4(task);
     }

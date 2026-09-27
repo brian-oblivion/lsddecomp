@@ -41,7 +41,7 @@ void GameApplication__StartCinematicStream(GameApplication *self) {
             StreamTask *streamTask = New_StreamTask(0, 0, 0, 0);
 
             streamTask->methods->slot12C(streamTask, 0);
-            lookup = GetStreamGroupForType(chanBuf.chan);
+            lookup = GetMovieFrameCount(chanBuf.chan);
             streamTask->methods->slot44(streamTask, self->unk1C, groupId, lookup, 1);
             streamTask->methods->slot4(streamTask);
         }

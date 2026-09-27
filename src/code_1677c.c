@@ -33,7 +33,7 @@ extern s32 SetActiveDataSourceDriverMode(s32 a0, s32 a1, s32 a2); /* code_171e0,
                                                        GameApplication__LoadIntroLogoSequence/GameApplication__StartWeeklyStreamTask discard it, but
                                                        GameApplication__StartCinematicStream keeps it */
 extern const char *GetAsmkMovie(s32 *typeCodeOut); /* psyq_memset.s: writes 0x31 to *typeCodeOut if non-NULL, always returns &sAsmkStreamPath */
-extern s32 GetStreamGroupForType(s32 index); /* psyq_memset.s: signed-halfword lookup into gStreamTypeToGroupTable[index] */
+extern s32 GetMovieFrameCount(s32 index); /* psyq_memset.s: signed-halfword lookup into gStreamTypeToGroupTable[index] */
 extern s32 PickOpeningMovie(s32 *out, s32 param2); /* psyq_memset.s: day/week-style calculation (divides SeedAndRandom's result by 7); writes a related index to *out if non-NULL, returns a separate derived value */
 
 extern const char sLogoPathAsmk[]; /* "ETC\ASMKLOGO.TIM" */
@@ -156,7 +156,7 @@ void GameApplication__LoadIntroLogoSequence(GameApplication *self) {
         GameApplication__StartLoaderTask(self, sLogoPathAsmk);
         task = New_StreamTask(0, 0, 0, 0);
         streamName = GetAsmkMovie(&typeCode);
-        typeLookup = GetStreamGroupForType(typeCode);
+        typeLookup = GetMovieFrameCount(typeCode);
         ((StreamTaskInitFn)task->methods->init)(task, (IntermediateBaseInitArgs *)self->aux,
                                                 streamName, typeLookup, 1);
         task->methods->release(task);
@@ -201,7 +201,7 @@ void GameApplication__StartWeeklyStreamTask(GameApplication *self) {
         SetActiveDataSourceDriverMode(0, 0, 0);
         task = New_StreamTask(0, 0, 0, 0);
         derivedValue = PickOpeningMovie(&typeCode, 0);
-        typeLookup = GetStreamGroupForType(typeCode);
+        typeLookup = GetMovieFrameCount(typeCode);
         ((StreamTaskInitFn)task->methods->init)(task, (IntermediateBaseInitArgs *)self->aux,
                                                 derivedValue, typeLookup, 1);
         task->methods->release(task);
@@ -371,7 +371,7 @@ void GameApplication__StartCinematicStream(GameApplication *self) {
             StreamTask *streamTask = New_StreamTask(0, 0, 0, 0);
 
             streamTask->methods->setSkipOnConfirm(streamTask, 0);
-            lookup = GetStreamGroupForType(chanBuf.chan);
+            lookup = GetMovieFrameCount(chanBuf.chan);
             ((StreamTaskInitFn)streamTask->methods->init)(
                 streamTask, (IntermediateBaseInitArgs *)self->aux, groupId, lookup, 1);
             streamTask->methods->release(streamTask);
@@ -387,7 +387,7 @@ void GameApplication__StartCinematicStream(GameApplication *self) {
 
 /* GameApplicationMethods slot +0x064. Gated by self->config->playStreams (same gate as
  * GameApplication__StartWeeklyStreamTask/GameApplication__StartGraphRoomStreamTask). Builds a StreamTask, clears its skipOnConfirm,
- * derives a type code via GetEndingMovie, looks it up via GetStreamGroupForType,
+ * derives a type code via GetEndingMovie, looks it up via GetMovieFrameCount,
  * initializes the task with it, then starts it -- the same shape as
  * GameApplication__LoadIntroLogoSequence/GameApplication__StartWeeklyStreamTask, but with setSkipOnConfirm(0) added and GetEndingMovie
  * in place of GetAsmkMovie/PickOpeningMovie. */
@@ -402,7 +402,7 @@ void GameApplication__StartStreamTaskWithInit(GameApplication *self) {
         task = New_StreamTask(0, 0, 0, 0);
         task->methods->setSkipOnConfirm(task, 0);
         outerValue = GetEndingMovie(&typeCode, 0);
-        typeLookup = GetStreamGroupForType(typeCode);
+        typeLookup = GetMovieFrameCount(typeCode);
         ((StreamTaskInitFn)task->methods->init)(task, (IntermediateBaseInitArgs *)self->aux,
                                                 outerValue, typeLookup, 1);
         task->methods->release(task);

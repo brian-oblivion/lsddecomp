@@ -1,4 +1,6 @@
-# GetStreamGroupForType -- MATCHED (7/7 words), round 81
+# GetMovieFrameCount -- MATCHED (7/7 words), round 81
+
+> Renamed from `GetStreamGroupForType` on 2026-09-27 (tools/rename.py). Address 0x800493c8.
 
 > Renamed from `func_800493C8` on 2026-09-25 (tools/rename.py). Address 0x800493c8.
 
@@ -14,13 +16,13 @@ the first build; whole-image SHA1 green.
 ## Source
 
 ```c
-s32 GetStreamGroupForType(s32 index) {
+s32 GetMovieFrameCount(s32 index) {
     return gStreamTypeToGroupTable[index];
 }
 ```
 
 ## Naming
 
-- **Name:** `GetStreamGroupForType`
+- **Name:** `GetMovieFrameCount`
 - **Tier:** A
-- **Evidence:** every one of its 4 call sites in code_1677c.c reads `typeLookup = GetStreamGroupForType(typeCode)` immediately before a StreamTask configure() call; matches exactly.
+- **Evidence:** every one of its 4 call sites in code_1677c.c reads `typeLookup = GetMovieFrameCount(typeCode)` immediately before a StreamTask configure() call; matches exactly.
