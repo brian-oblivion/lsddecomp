@@ -86,3 +86,7 @@ The class is unified in `include/GraphRoom.h` (class id 0x2F130, table `gGraphRo
 
 - **Naming: `D_8008ABBC` -> `gGraphPointHighlightColor`** (tier A): sdata `00 FF 00`, green; this function `setColor(1, ...)`s (overwrite) each matched dot to it. Its only user. Declared `GraphPointColor` instead of `s32`: zero bytes changed.
 - Local `idx` -> `dot`; `highlightCount < GRAPH_SCORE_MOOD_COUNT`; `0x1F` is decimal 31. The 31 and 24 stay literals (one highlight every 24 frames once frameCounter passes 30): a name would only restate them.
+
+## Track 6 (2026-09-27, round 98, delta): `GraphPointColor` -> `BoxFillRgb`
+
+The local `GraphPointColor` (round 97) is retired onto include/BoxFill.h's `BoxFillRgb`: it is New_BoxFill's and setColor's colour argument, the same record BoxFill__ApplyColor copies whole into the GsBOXF r, g, b (code_2cc8c_f's `RGB80040790`, retired onto it the same round). Same layout (signed, three bytes); `gGraphPointNewestColor`, `gGraphPointBaseColor`, `gGraphPointHighlightColor` and the local `rgb` are now declared `BoxFillRgb`. Zero bytes changed: whole image green, 0 new typeviews warnings, nonmatching green.
