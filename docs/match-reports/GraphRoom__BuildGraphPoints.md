@@ -28,7 +28,7 @@ Builds a 100-entry array of allocated `D_80087AACEntry` objects
 (`self->unk_0xA8[0..99]`), each constructed via `New_BoxFill` (already
 matched, `code_2cc8c_e.c`) with a colour-like 3-byte argument: entry 0
 gets the constant `D_8008ABB4` directly; entries 1-99 get successive
-values of a mutable local copy of `D_8008ABB8` (also 3 bytes), decremented
+values of a mutable local copy of `gGraphPointBaseColor` (also 3 bytes), decremented
 by 0x14 for the first 6 loop iterations and by 1 thereafter. Finally
 allocates a 4-byte scratch buffer into `self->unk_0x240`.
 
@@ -40,22 +40,22 @@ allocates a 4-byte scratch buffer into `self->unk_0x240`.
  * the natural sequential order is what matches, no reordering needed).
  * Field names are a plausible RGB reading of a colour-cycling table
  * builder, not confirmed evidence. */
-typedef struct D_8008ABB8Color {
+typedef struct GraphPointColor {
     s8 r;
     s8 g;
     s8 b;
-} D_8008ABB8Color;
+} GraphPointColor;
 extern u8 D_8008ABAC;
 extern u8 D_8008ABB4;
-extern D_8008ABB8Color D_8008ABB8;
+extern GraphPointColor gGraphPointBaseColor;
 extern D_80087AACEntry *New_BoxFill(void *a0, void *a1, s32 a2);
 
 void GraphRoom__BuildGraphPoints(D_80087AACObj *self) {
-    D_8008ABB8Color rgb;
+    GraphPointColor rgb;
     s32 i;
 
     self->unk_0xA8[0] = New_BoxFill(&D_8008ABAC, &D_8008ABB4, 0);
-    rgb = D_8008ABB8;
+    rgb = gGraphPointBaseColor;
     for (i = 1; i < 100; i++) {
         s32 dec;
 
@@ -162,11 +162,11 @@ where the build stores at `+0x12`.
 ```c
 #if 0
 void GraphRoom__BuildGraphPoints(D_80087AACObj *self) {
-    D_8008ABB8Color rgb;
+    GraphPointColor rgb;
     s32 i;
 
     self->unk_0xA8[0] = New_BoxFill(D_8008ABAC, &D_8008ABB4, 0);
-    rgb = D_8008ABB8;
+    rgb = gGraphPointBaseColor;
     for (i = 1; i < 100; i++) {
         s32 dec;
 
@@ -205,3 +205,10 @@ The points are New_BoxFill boxes (include/BoxFill.h): size &D_8008ABAC, colour &
 ## Track 4 (2026-09-26, round 87, alpha): renamed `GraphRoomObj__BuildGraphPoints` -> `GraphRoom__BuildGraphPoints`
 
 The class is unified in `include/GraphRoom.h` (class id 0x2F130, table `gGraphRoomMethods`, parent TaskCore; `tools/classtable.py gGraphRoomMethods --vs gTaskCoreMethods`). The class name drops round 75's `Obj` suffix (FINISHING-PLAN track 4 step 2); every function prefix moved with it. The unit's GraphRoomObj/GraphRoomMethods views are deleted and `self` is `GraphRoom *`; inherited fields and slots carry TaskCore's and IntermediateBase's names. Zero bytes changed (build-and-verify OK, typeviews --warnings 0 new). Prefix only. Occupies +0x0D8, TaskCore's `setTarget`, and keeps its own name (step 6: the body sets no target, it builds the 100 BoxFill dots and matchedDayIndices). The ctor reaches it as setTarget(self, NULL).
+
+## Track 6 (2026-09-27, round 97, delta): `D_8008ABB8Color` -> `GraphPointColor`, `D_8008ABB8` -> `gGraphPointBaseColor`
+
+- **`GraphPointColor`** (tier A for what it is): the colour argument this function hands `New_BoxFill`; `BoxFill__SetColor` copies its three bytes into the box's `GsBOXF` r, g, b (`include/BoxFill.h`, `color[3]`), which confirms round 19's "plausible RGB reading" of the field names. It is the only user of the type (`grep -rn` over `src/`, no other view).
+- **Not Sony's `CVECTOR`**: `CVECTOR` is `u_char r, g, b, cd`, four bytes. Retail copies the global into the local with three `lb`/`sb` pairs (signed, three bytes), so a four-byte unsigned struct would not compile to it. Kept as its own `s8` triple, like `BgLayerRgb`/`ViewportRgb`.
+- **`gGraphPointBaseColor`** (tier A): 4 bytes of sdata `FF FF FF 00`, white. This function is its only reader: points 1..99 start from a copy of it and darken by 0x14 per point for the first six, then by 1. (Point 0 takes `D_8008ABB4`, `FF 00 00`, red -- left unnamed, outside the job.)
+- The type's comment moved round 19's history here and says what the type is; zero bytes changed.

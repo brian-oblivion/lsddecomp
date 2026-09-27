@@ -77,7 +77,6 @@ D_8008AB94
 D_8008ABA8
 D_8008ABAC
 D_8008ABB4
-D_8008ABB8
 D_8008ABBC
 D_8008ABFC
 D_8008AC04
@@ -140,6 +139,7 @@ gFileTableCount
 gForcedVariant
 gForcedWeeklyGroup
 gGameApplication
+gGraphPointBaseColor
 gInstantTeleportersEnabled
 gItemListCursorColor
 gItemListRowColor
