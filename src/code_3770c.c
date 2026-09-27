@@ -1,20 +1,15 @@
 /*
- * code_3770c -- CdStream, a BasicClass subclass that drives streamed CD-XA
- * playback over libcd (StSetRing/StFreeRing/CdSync/CdControl) and libspu
- * (SpuSetCommonAttr for the CD audio mix). Carved from psyq_3770c on
- * 2026-09-25 (FINISHING-PLAN revision 18): counted as Psy-Q SDK by segment
- * name, but tools/gameinsdk.py measured it as game code (a method-table entry
- * beside game methods, contiguous with them, no Sony fingerprint).
- * 0x3770C..0x38110 (vram 0x80046F0C..0x80047910), all 18 methods of
- * gCdStreamMethods plus their helpers, matched round 82 (no INCLUDE_ASM
- * left) and named round 82. The class is declared once, in
- * include/CdStream.h (track 4, round 87).
+ * CdStream's methods: one streamed CD file (an FMV's sectors) read through
+ * libcd's streaming library (StSetRing, StSetStream, StGetNext, StFreeRing)
+ * with the CD audio routed into the SPU mix. The class, its fields and its
+ * slots are declared in include/CdStream.h; MoviePlayer is the one holder.
  *
- * One global `gActiveCdStream` is the single active stream: most methods
- * are no-ops unless `self` is that pointer, so only one CdStream streams
- * at a time. The state machine (CdStream.state) runs Open -> Seek(1) ->
- * StartRead(2) -> Stop(4) -> Restart(0, re-seeks) and Close tears it down
- * from any state.
+ * One global, gActiveCdStream, is the stream that owns the drive: open sets
+ * it, close clears it, and seek, startRead, stop, restart, mute and demute do
+ * nothing unless `self` is that stream, so only one CdStream streams at a
+ * time. `state` (enum CdStreamState) runs open -> SEEKING -> startRead ->
+ * READING -> stop -> STOPPED -> restart -> IDLE and seeks again; close tears
+ * the stream down from any state.
  */
 #include "common.h"
 #include <libcd.h>
@@ -32,7 +27,7 @@
  * this. Not CD_SECTOR_SIZE (2048); what the extra 6 bytes count is not
  * established. */
 #define CDSTREAM_FRAME_UNIT 2054
-/* open: "\\<data directory><name>;1" must fit. */
+/* open: "\<data directory><name>;1" must fit. */
 #define CDSTREAM_PATH_SIZE 32
 /* SetupCdStreamAudio: master volume at half scale, CD input at full. */
 #define CDSTREAM_MASTER_VOLUME 0x3FFF
@@ -40,7 +35,7 @@
 /* startRead: stream with XA-ADPCM on, at double or normal speed. */
 #define CDSTREAM_MODE_2X (CdlModeStream | CdlModeSpeed | CdlModeRT)
 #define CDSTREAM_MODE_1X (CdlModeStream | CdlModeRT)
-/* getNextFrame: polls when `tries` is negative. */
+/* getNextFrame's poll count when `tries` is negative. */
 #define CDSTREAM_NEXT_FRAME_TRIES 8388608
 
 /* Defined in other units: func_800270B8 (code_171e0.c) returns the data
@@ -54,6 +49,8 @@ extern void *BMemPMgrAlloc(s32 size);
 extern s32 gCdStreamAudioMixSet;
 extern char gCdStreamVersionSuffix[]; /* ";1" */
 
+/* MATCHING: the ctor call and return sit inside `if (obj != NULL)`; an early
+ * `return NULL` adds a jump. */
 CdStream *New_CdStream(s32 cdSpeed, s32 fps, s32 reserved) {
     CdStream *obj = BMemPMgrAlloc(sizeof(CdStream));
 
@@ -64,6 +61,8 @@ CdStream *New_CdStream(s32 cdSpeed, s32 fps, s32 reserved) {
     return NULL;
 }
 
+/* MATCHING: the sectors-a-second choice stays an inline conditional; a local
+ * lets cc1 hoist its load and reorder the stores. */
 void CdStream__CdStream(CdStream *self, u32 cdSpeed, s32 fps, s32 reserved) {
     Get_vtable_BasicClass()->ctor((BasicClass *)self);
     self->methods = Get_vtable_CdStream();
@@ -93,11 +92,17 @@ void CdStream__SetRing(CdStream *self, u32 *ring, u32 size) {
     }
 }
 
+/* Only while idle and with a ring set: looks up "\<data directory><name>;1",
+ * retrying up to `tries` more times (forever if negative), counts the file's frames,
+ * sets up the CD audio mix and seeks to the file. Returns 0 once seeking, or
+ * when another stream owns the drive; 1 otherwise.
+ * MATCHING: the whole body nests in `if (idle) { ...; return 0; } return 1;`;
+ * flat early returns merge or reorder the two `return 1` paths. */
 s32 CdStream__Open(CdStream *self, char *name, s32 tries) {
     char path[CDSTREAM_PATH_SIZE];
     s32 n;
 
-    n = tries;
+    n = tries; /* the sign test; `tries` is what counts down */
     if (self->state == CDSTREAM_IDLE) {
         if (self->ring == NULL) {
             return 1;
@@ -109,6 +114,7 @@ s32 CdStream__Open(CdStream *self, char *name, s32 tries) {
         strcpy(&path[1], func_800270B8());
         strcat(path, name);
         strcat(path, gCdStreamVersionSuffix);
+        /* CdStreamFile is CdlFILE's layout (CdStream.h). */
         while (CdSearchFile((CdlFILE *)&self->file, path) == 0) {
             if (n >= 0 && --tries < 0) {
                 return 1;
@@ -137,6 +143,7 @@ s32 SetupCdStreamAudio(CdStream *self) {
     return 1;
 }
 
+/* MATCHING: every access goes through `cur`, the loaded global, not `self`. */
 void CdStream__Close(CdStream *self) {
     CdStream *cur;
 
@@ -150,6 +157,8 @@ void CdStream__Close(CdStream *self) {
     }
 }
 
+/* With onSeekDone set the seek is asynchronous and OnCdSeekComplete reports
+ * it; otherwise it blocks until the drive takes the command. */
 void CdStream__Seek(CdStream *self, u8 *pos) {
     if (self->state != CDSTREAM_READING && gActiveCdStream == self) {
         if (self->onSeekDone != NULL) {
@@ -204,6 +213,7 @@ void CdStream__Stop(CdStream *self) {
     }
 }
 
+/* MATCHING: every access goes through `cur`, the loaded global, not `self`. */
 void CdStream__Restart(CdStream *self) {
     CdStream *cur;
 
@@ -236,6 +246,11 @@ void CdStream__Demute(CdStream *self) {
     }
 }
 
+/* Waits up to `tries` polls for the next frame's sectors. Returns 1 with the
+ * frame in *addr and its number in *frame; 0 when none came (the ring is
+ * freed); -1 at the end of the stream (a frame number past totalFrames, or
+ * lower than the last one, which reports frame 0), after which the stream
+ * closes if onStreamEnd is set. */
 s32 CdStream__GetNextFrame(CdStream *self, u32 **addr, u32 *frame, s32 tries) {
     u32 *header;
     u32 n;
@@ -273,6 +288,7 @@ void CdStream__ReleaseFrame(CdStream *self, u32 *base, u32 frame) {
     }
 }
 
+/* Tests onStreamEnd but calls onFrameReady, as retail does. */
 void CdStream__OnStreamEnd(CdStream *self) {
     if (self->onStreamEnd != NULL) {
         self->onFrameReady(self->cbArg);

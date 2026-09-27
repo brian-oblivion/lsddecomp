@@ -36,3 +36,18 @@ CdStreamObj *New_CdStream(s32 arg1, s32 arg2, s32 arg3) {
 Class unified as `CdStream` (include/CdStream.h; table gCdStreamObjMethods -> gCdStreamMethods, type CdStreamObj -> CdStream, the Obj suffix dropped per FINISHING-PLAN track 4 step 2). The unit's local view is gone; slots +0x044 open, +0x050 startRead and +0x06C getNextFrame are typed from their occupants, and the object's +0x00C `seekLoc[0x18]` is the CdlFILE `file` (CdStreamFile) that CdSearchFile fills. Zero bytes changed.
 
 Renamed from New_CdStreamObj (tools/rename.py), the class rename. The size 0x5C here is the class's size. One caller, MoviePlayer__MoviePlayer.
+
+## History (moved from the unit banner of src/code_3770c.c, 2026-09-27)
+
+The unit banner carried this until track 7's polish pass (round 99), which
+rewrote the banner to say only what the file holds:
+
+- Carved from `psyq_3770c` on 2026-09-25 (FINISHING-PLAN revision 18): the
+  segment was counted as Psy-Q SDK by name, but `tools/gameinsdk.py`
+  measured it as game code (a method-table entry beside game methods,
+  contiguous with them, no Sony fingerprint).
+- Extent 0x3770C..0x38110 (vram 0x80046F0C..0x80047910): all 18 methods of
+  gCdStreamMethods plus their helpers, matched and named in round 82, no
+  `INCLUDE_ASM` left.
+- The class has been declared once, in include/CdStream.h, since track 4
+  (round 87).
