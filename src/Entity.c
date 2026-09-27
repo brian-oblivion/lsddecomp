@@ -63,7 +63,7 @@ FadeBox *Entity__GetOrCreateFadeBox(Entity *this, void *name, void *arg2, void *
     cached = this->fadeBox;
     if (cached == NULL) {
         if (name == NULL) {
-            name = gEntityDefaultPos;
+            name = gEntityFadeBoxDefaultSize;
         }
         sub = New_FadeBox(name, 0, arg4);
         if (sub == NULL) {

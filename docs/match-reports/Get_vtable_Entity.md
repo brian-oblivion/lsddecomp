@@ -27,7 +27,7 @@ extern EntityMethods gEntityMethods;
 `gEntityMethods` itself stays a raw asm data blob (`asm/data/79528.data.s`,
 offsets `0x000`..`0x180`) — only a correctly-typed `extern` was needed here,
 per this unit's own convention for still-uncarved data (same as
-`gEntityDefaultPos`/`gEntityDefaultOffset` already in this header).
+`gEntityFadeBoxDefaultSize`/`gEntityDefaultOffset` already in this header).
 
 ## Attempt log
 

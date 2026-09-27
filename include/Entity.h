@@ -142,7 +142,7 @@ extern EntityMethods *Get_vtable_Entity(void); /* returns &gEntityMethods */
  * `name`/`arg2` parameters are NULL -- both plain 2-word buffers
  * (asm/data/7B3F8.sdata.s): {0x140, 0xF0} (320, 240) and {-100, -100}, the
  * size and offset Viewport gives its FadeBox (FadeBox.h). */
-extern s32 gEntityDefaultPos[2];
+extern s32 gEntityFadeBoxDefaultSize[2];
 extern s32 gEntityDefaultOffset[2];
 
 /* One row of the mood table (16 bytes): New_Entity's moodIndex selects it, and

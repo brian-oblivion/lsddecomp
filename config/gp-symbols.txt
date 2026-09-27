@@ -141,7 +141,7 @@ gDrawSystem
 gDreamAuxStage
 gDreamAuxWorld
 gEntityDefaultOffset
-gEntityDefaultPos
+gEntityFadeBoxDefaultSize
 gFadeBoxAttachPos
 gFileTable
 gFileTableCount

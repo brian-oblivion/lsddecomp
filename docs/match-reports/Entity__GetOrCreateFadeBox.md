@@ -15,7 +15,7 @@ through it: `slot50(sub)`, `slot4C(sub, this, arg2-or-default)`,
 `slotD0(sub, arg3)`. Returns the object (new or cached), or NULL if
 allocation failed.
 
-`name` defaults to `gEntityDefaultPos` (`{320, 240}`) and `arg2` defaults to
+`name` defaults to `gEntityFadeBoxDefaultSize` (`{320, 240}`) and `arg2` defaults to
 `gEntityDefaultOffset` (`{-100, -100}`) when the caller passes NULL — both plain
 2-word data buffers, not strings, in `asm/data/7B3F8.sdata.s`.
 
@@ -43,7 +43,7 @@ Unk100Obj *Entity__GetOrCreateFadeBox(Entity *this, void *name, void *arg2, void
     cached = this->unk100;
     if (cached == NULL) {
         if (name == NULL) {
-            name = gEntityDefaultPos;
+            name = gEntityFadeBoxDefaultSize;
         }
         sub = New_FadeBox(name, 0, arg4);
         if (sub == NULL) {
@@ -149,7 +149,7 @@ use the unified names: slot50 -> `detachFromParent`
 (BoxFill__AttachToParent, `this` upcast to `SceneNode *`), slotD0 ->
 `setStep` (FadeBox__SetStep; `arg3` passed `(s32)`, no code). What the
 arguments are, from the occupants: `name` is New_FadeBox's SIZE (read as
-two low halfwords into boxW/boxH; the default gEntityDefaultPos is
+two low halfwords into boxW/boxH; the default gEntityFadeBoxDefaultSize is
 {320, 240}), `arg2` is the attach position (BoxFill__AttachToParent's
 Pair32E99C; default {-100, -100}, the relative top-left, the same pair
 Viewport passes, gFadeBoxAttachPos) and `arg3` the fade step. The parameter names
