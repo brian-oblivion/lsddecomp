@@ -118,7 +118,7 @@ returns the just-nulled pointer.
 
 ## Provenance
 
-round 11 (2026-09-03), runner delta, unit BMemPMgr (fresh carve, first
+round 11 (2026-09-03), runner delta, unit code_8220 (fresh carve, first
 function).
 
 ## Extern arity (round 59)

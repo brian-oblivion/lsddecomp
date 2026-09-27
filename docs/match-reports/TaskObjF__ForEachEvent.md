@@ -13,10 +13,10 @@ this codebase. Established from first principles across this whole batch:
 
 - `TaskObjF`'s vtable pointer sits at offset 0, and its first several
   slots (+0x010 `addChild`, +0x014 `removeChild`) are **inherited,
-  unmodified `BasicClass` slots** (`include/BMemPMgr.h`'s
+  unmodified `BasicClass` slots** (`include/code_8220.h`'s
   `BasicClassMethods`) — confirmed because `TaskObjF__OnNotify` fetches
   `BasicClass`'s own table directly (`Get_vtable_BasicClass()`, which
-  `include/BMemPMgr.h` already establishes returns `&gBasicClassMethods`) and
+  `include/code_8220.h` already establishes returns `&gBasicClassMethods`) and
   dispatches its slot +0x038 with a `(self, arg1, arg2)` signature that
   matches `BasicClassMethods::slot38` exactly. `TaskObjF` is therefore a
   `BasicClass` subclass whose own new slots start at +0x044 (the same
@@ -67,7 +67,7 @@ forwarding `self` unchanged with a different callback
 - New local view `BasicMethods866E8F` (a minimal `BasicClass` vtable slice,
   just slot +0x038) and `extern BasicMethods866E8F *Get_vtable_BasicClass(void);`
   — **an extern for a function declared elsewhere with a different return
-  type** (`include/BMemPMgr.h`'s `BasicClassMethods *Get_vtable_BasicClass(void)`,
+  type** (`include/code_8220.h`'s `BasicClassMethods *Get_vtable_BasicClass(void)`,
   and several other units' own local views) — deliberately NOT unified
   with that header, same "independent local view" policy as everywhere
   else in this project; flagged per the round's header-collision rule

@@ -500,7 +500,7 @@ position.
 ```c
 #if 0
 /* Globals this renderer publishes for SetupPrimCode and the code_8220_c
- * submit wrappers to read back. D_8008E248 is already in BMemPMgr.h; the
+ * submit wrappers to read back. D_8008E248 is already in code_8220.h; the
  * other four are this unit's own view and stay local per CLAUDE.md's
  * cross-unit-declaration rule. */
 extern s32 D_80090C18;
@@ -1982,7 +1982,7 @@ Evidence the other way, which is why this is a question and not a verdict:
   this function (it prints "No live stalled function overlaps a placed
   Sony object" for the whole queue).
 - The splat layout puts this function inside a contiguous game run:
-  `0x8220` `BMemPMgr` (the BasicClass framework, unambiguously game code)
+  `0x8220` `code_8220` (the BasicClass framework, unambiguously game code)
   → `0x8A88` `code_8220_b` → `0x9F74` `code_8220_c` → `psyq_rcpolyf3`. The
   renderer sits directly between the game's own class framework and Sony's
   RCpoly primitives, which is what a game-written `GsSortObject4`
@@ -2024,7 +2024,7 @@ per-group element lists are. Tier B rather than A because what `arg0` and
   That is what named the six store leaves; see
   `docs/match-reports/SetupPrimCode.md`.
 - This report describes `FlagLargePolyForDivide`'s second argument as a
-  "primitive kind" code following `include/BMemPMgr.h`'s old wording. It
+  "primitive kind" code following `include/code_8220.h`'s old wording. It
   is a **vertex count**: that function walks `count` screen-XY pairs and
   computes their 2D bounding box (its own report derives the body). The
   numbers 3 and 4 are right; the reason given for them was not. The header

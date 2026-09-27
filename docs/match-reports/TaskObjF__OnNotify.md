@@ -11,7 +11,7 @@
 `void TaskObjF__OnNotify(TaskObjF *self, void *arg1, s32 arg2)`. First forwards
 `(self, arg1, arg2)` to the BASE class's own generic notification slot —
 `Get_vtable_BasicClass()` returns `BasicClass`'s method table
-(`include/BMemPMgr.h`), and its slot +0x038 (`BasicClassMethods::slot38`)
+(`include/code_8220.h`), and its slot +0x038 (`BasicClassMethods::slot38`)
 is dispatched directly on `self` cast as a `BasicClass` (this is the
 `notifyParents`-style "notify every parent" mechanism that class documents).
 Then reads a type tag from `**(s32 **)arg1` and dispatches one of four of
@@ -63,7 +63,7 @@ See `TaskObjF__ForEachEvent`'s report for the `TaskObjF` class and the
 `func_8004FB04` -> `TaskObjF__OnNotify`. **Tier A.** Forwards `(self, arg1,
 arg2)` to the inherited `BasicClass` notify slot
 (`Get_vtable_BasicClass()->slot38`, the project's own established
-"notify every parent" mechanism, `include/BMemPMgr.h`), then reads a
+"notify every parent" mechanism, `include/code_8220.h`), then reads a
 type tag out of `arg1` and dispatches one of this class's own four
 vtable slots (+0x088/+0x098/+0x0A4/+0x0B0) accordingly -- a message
 dispatcher, directly evident from the body and the established

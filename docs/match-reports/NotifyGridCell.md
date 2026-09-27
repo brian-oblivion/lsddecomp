@@ -40,7 +40,7 @@ Round 67 (track 3, naming pass).
 
 | symbol | name | tier | evidence |
 | --- | --- | --- | --- |
-| `func_8004B2D4` | `NotifyGridCell` | B | A free function, not a vtable slot and not a method of `StageMap` -- its `self` is a GRID CELL, which is why it is named `VerbNoun` rather than `Class__Method`. Its only caller is `StageMap__DispatchToRectCells`, which passes a cell out of an element's grid and then every cell chained behind it. The body dispatches the cell's own `+0x038` slot when the cell is non-NULL and its `flags36 & 0x80` is set; `include/BMemPMgr.h` establishes `+0x038` as `BasicClassMethods::onNotify`. The two extra parameters are forwarded implicitly -- the call sets up no registers, so `$a1`/`$a2` still hold this function's own incoming arguments, which is exactly why the signature was widened in an earlier round. |
+| `func_8004B2D4` | `NotifyGridCell` | B | A free function, not a vtable slot and not a method of `StageMap` -- its `self` is a GRID CELL, which is why it is named `VerbNoun` rather than `Class__Method`. Its only caller is `StageMap__DispatchToRectCells`, which passes a cell out of an element's grid and then every cell chained behind it. The body dispatches the cell's own `+0x038` slot when the cell is non-NULL and its `flags36 & 0x80` is set; `include/code_8220.h` establishes `+0x038` as `BasicClassMethods::onNotify`. The two extra parameters are forwarded implicitly -- the call sets up no registers, so `$a1`/`$a2` still hold this function's own incoming arguments, which is exactly why the signature was widened in an earlier round. |
 
 Parameters renamed: `self` -> `cell`, `arg1` -> `sender`, `arg2` -> `command`.
 A parameter rename does not move a byte; whole-image SHA1 re-verified.

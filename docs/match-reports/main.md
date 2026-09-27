@@ -29,7 +29,7 @@ correctly left untouched per the runner brief).
 #include "GameApplication.h"
 #include "class_16334.h"
 
-/* Local, opaque: BMemPMgr.h can't be included alongside class_16334.h
+/* Local, opaque: code_8220.h can't be included alongside class_16334.h
  * (both define `struct BasicClassMethods`, per this project's
  * multiple-independent-local-views convention -- headercontention.py
  * confirms the two units' local views collide), and nothing here
@@ -47,11 +47,11 @@ extern void SetMem(s32 mode);
  * 31/31 words). THIS call site pushes a second, dead argument (0) that the
  * matched body never reads -- an unspecified-parameter declaration lets the
  * call carry it without contradicting the real prototype, the same idiom
- * BMemPMgr.h already uses for BMemPMgrAlloc/BMemPMgrFree. */
+ * code_8220.h already uses for BMemPMgrAlloc/BMemPMgrFree. */
 extern void *BMemPMgrInit();
 
 /* SetDefaultBMemPMgr(BMemPMgr *pool) -- one-line `gDefaultBMemPMgr = pool;`, matched
- * in BMemPMgr.c but not yet declared in BMemPMgr.h (no carved caller
+ * in code_8220.c but not yet declared in code_8220.h (no carved caller
  * existed until now). */
 extern void SetDefaultBMemPMgr(BMemPMgr *pool);
 
@@ -216,7 +216,7 @@ by any carved C before this) is retyped from `void *` to `void
    unspecified-parameter (`void *BMemPMgrInit();`) local declaration lets
    the call push two arguments without contradicting the real, ANSI,
    single-argument definition seen from `BMemPMgr.c`'s own translation
-   unit -- the exact idiom `BMemPMgr.h` already documents for
+   unit -- the exact idiom `code_8220.h` already documents for
    `BMemPMgrAlloc`/`BMemPMgrFree`. First guess (passing only
    `BMemPMgrInit(0x166C00)`) simply omitted the dead `$a1` instruction and
    the whole build stayed silently one word short there; adding the extra

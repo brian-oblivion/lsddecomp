@@ -264,11 +264,11 @@ function's prologue and body together from ordinary C. There was never a
 all; that diagnosis was a symptom of comparing GCC's real prologue against a
 hand-written asm block's necessarily-different one.
 
-**Header change:** `FillRVectors4`'s declaration in `include/BMemPMgr.h`
+**Header change:** `FillRVectors4`'s declaration in `include/code_8220.h`
 retyped from six `void *` parameters to `PolyVtx **dst, PolyVtx **src,
 PolyUV4 *uv0, PolyUV4 *uv1, PolyUV4 *uv2, PolyUV4 *uv3` (matching
 `FillRVectors3`'s own signature plus the 4th UV). This is a change to an
-EXISTING declaration; `include/BMemPMgr.h` is shared by three units this
+EXISTING declaration; `include/code_8220.h` is shared by three units this
 round but no other runner holds one this round, and the build after the
 change is `build exit=0` (whole-image SHA1 match), so no other unit's
 compile was disturbed. Call sites in this same file already passed

@@ -42,7 +42,7 @@ allocator would be a guess from proximity, not evidence.
 
 ## Provenance
 
-round 11 (2026-09-03), runner delta, unit BMemPMgr (fresh carve).
+round 11 (2026-09-03), runner delta, unit code_8220 (fresh carve).
 round 74 (2026-09-24), runner alpha: renamed `func_80017AA8` ->
 `FreeMem`, corrected the callee identity (`func_80011F68` -> `free`) and
 return type in this report to match the current source.

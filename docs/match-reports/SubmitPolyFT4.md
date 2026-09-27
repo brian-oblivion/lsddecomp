@@ -31,7 +31,7 @@ last halfword of the primitive. The other arm falls into the epilogue after
 **Callers checked:** `SortTmdObject` in `src/TmdRenderer.c` (two call sites,
 `prim = (u8 *)SubmitPolyFT4(prim, ctx);`), declared there as
 `extern void *SubmitPolyFT4(void *prim, void *ctx);`. The return type agrees.
-`RCpolyFT4` stays declared `void` in `include/BMemPMgr.h` and is called
+`RCpolyFT4` stays declared `void` in `include/code_8220.h` and is called
 through the local cast.
 
 ## Earlier history
@@ -215,7 +215,7 @@ void SubmitPolyFT4(void *arg0, void *arg1) {
 INCLUDE_ASM("asm/nonmatchings/TmdRenderer", SubmitPolyFT4);
 ```
 
-(`OtTag` and `RCpolyFT4`'s prototype come from `include/BMemPMgr.h`,
+(`OtTag` and `RCpolyFT4`'s prototype come from `include/code_8220.h`,
 already included by the unit.)
 
 Unit: `src/TmdRenderer.c`. Sixth sibling of the `SubmitPolyF3` OT-splice-
@@ -313,7 +313,7 @@ which apply to this function too:
    re-reads it before the second store, because `addPrim(ot, p)` expands `ot`
    twice.
 
-`OtTag` is already declared in `include/BMemPMgr.h`.
+`OtTag` is already declared in `include/code_8220.h`.
 
 **So this function is not known to be unreachable, and the analogy that
 retired it no longer holds.** The residue's SHAPE was correctly identified as

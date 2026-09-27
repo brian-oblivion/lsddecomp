@@ -8,7 +8,7 @@
 
 `void TaskObjF__Finalize(Node3bb8cE *self)`. A one-line base-class forward:
 fetches the shared `BasicClass`-style vtable via the no-argument getter
-`Get_vtable_BasicClass()` (same base-class framework as `include/BMemPMgr.h`'s
+`Get_vtable_BasicClass()` (same base-class framework as `include/code_8220.h`'s
 `BasicClassMethods`, this unit's own independent local view named
 `BaseMethods3bb8cE`) and calls its `finalize` slot (+0x00C) on `self`.
 Almost certainly this class's own destructor/finalize override, chaining

@@ -30,7 +30,7 @@ immediately continuing `class_3bb8c_c`'s work on the same class). Structure:
 - `self->unkAC` and `self->iconHandle` are two owned sub-objects, each released
   through the shared BasicClass-family `release` slot at `+0x004`
   (`GenericReleaseObj_3bb8c_d`, a local independent view of the same shared
-  slot `include/BMemPMgr.h`'s `BasicClassMethods::release` occupies).
+  slot `include/code_8220.h`'s `BasicClassMethods::release` occupies).
 - `Get_vtable_TaskCore()` is the class hierarchy's shared base-class method table
   getter (same real global, `gTaskCoreMethods`, as `include/code_2c054.h`'s
   `TaskCoreMethods`). Its `+0x00C` slot is called unconditionally last —

@@ -56,12 +56,12 @@ caching `self->methods` first and then have to undo it.
 
 ## Provenance
 
-round 11 (2026-09-03), runner delta, unit BMemPMgr (fresh carve).
+round 11 (2026-09-03), runner delta, unit code_8220 (fresh carve).
 
 ## Naming (round 74)
 
 `BasicClass__Finalize`, **tier A**: matches vtable slot `+0x00C`
-(`finalize`), already documented in `BMemPMgr.h`'s `BasicClassMethods`
+(`finalize`), already documented in `code_8220.h`'s `BasicClassMethods`
 comment. Called by `BasicClass__Release` before freeing `self`.
 
 ## Polish (round 97, runner delta)

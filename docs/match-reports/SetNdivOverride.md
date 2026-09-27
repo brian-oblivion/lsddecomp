@@ -63,7 +63,7 @@ any GTE macro.
 ### Proposed learning
 
 `sNdivOverrideSet`/`sNdivOverride` are declared locally in `src/TmdRenderer.c` (not in
-`include/BMemPMgr.h`) per the project convention: nothing outside this unit
+`include/code_8220.h`) per the project convention: nothing outside this unit
 currently references them, so putting the extern in a shared header would
 just be an unused collision surface for a sibling unit that never touches
 them.

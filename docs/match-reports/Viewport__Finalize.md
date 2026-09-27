@@ -76,7 +76,7 @@ alpha). Tier A: calls its own teardown steps (`slot90`, `slot74`, releases
 `self->unkAC` via `Unk18AcObjMethods::release` (renamed from
 `slot4`, exclusive to this unit, tier A), `slotA8(self, 0)`) and THEN forwards to
 `Get_vtable_BasicClass()->finalize` (that base slot's own confirmed name,
-matching `include/BMemPMgr.h`'s canonical `BasicClassMethods::finalize`
+matching `include/code_8220.h`'s canonical `BasicClassMethods::finalize`
 at the identical offset `+0x00C`) -- the standard "derived finalize does
 its own cleanup, then calls the base finalize" idiom, which is what
 licenses the name despite `slot90`/`slot74`/`slotA8`'s own occupants being

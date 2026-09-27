@@ -31,11 +31,11 @@ Matched first attempt — a plain field-name swap of `BasicClass__GetNextChild`.
 
 ## Provenance
 
-round 11 (2026-09-03), runner delta, unit BMemPMgr, second pass.
+round 11 (2026-09-03), runner delta, unit code_8220, second pass.
 
 ## Naming (round 74)
 
 `BasicClass__GetNextParentRef`, **tier A**: matches vtable slot `+0x02C`
-(`getNextParentRef`), already documented in `BMemPMgr.h`. Identical
+(`getNextParentRef`), already documented in `code_8220.h`. Identical
 shape to `BasicClass__GetNextChild`, over `parentRefs` instead of
 `children`.

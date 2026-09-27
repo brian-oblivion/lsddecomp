@@ -33,7 +33,7 @@ return value, never a register choice.
 **Callers checked:** `SortTmdObject` in `src/TmdRenderer.c` (two call sites,
 `prim = (u8 *)SubmitPolyFT3(prim, ctx);`), declared there as
 `extern void *SubmitPolyFT3(void *prim, void *ctx);`. The return type agrees.
-`RCpolyFT3` stays declared `void` in `include/BMemPMgr.h` and is called
+`RCpolyFT3` stays declared `void` in `include/code_8220.h` and is called
 through the local cast, as the matched siblings do.
 
 ## Earlier history
@@ -193,7 +193,7 @@ INCLUDE_ASM("asm/nonmatchings/TmdRenderer", SubmitPolyFT3);
 ```
 
 (`OtTag`, `PolyVtx`, `PolyUV4` and `RCpolyFT3`'s prototype come from
-`include/BMemPMgr.h`, already included by the unit.)
+`include/code_8220.h`, already included by the unit.)
 
 Unit: `src/TmdRenderer.c`. Gouraud-triangle-flavored sibling of
 `SubmitPolyF3`/`SubmitPolyF4`/`SubmitPolyG3` (this unit, all stalled at
@@ -301,7 +301,7 @@ which apply to this function too:
    re-reads it before the second store, because `addPrim(ot, p)` expands `ot`
    twice.
 
-`OtTag` is already declared in `include/BMemPMgr.h`.
+`OtTag` is already declared in `include/code_8220.h`.
 
 **So this function is not known to be unreachable, and the analogy that
 retired it no longer holds.** The residue's SHAPE was correctly identified as

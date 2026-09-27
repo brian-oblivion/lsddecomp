@@ -28,7 +28,7 @@ child from `self`'s own `children` list — a flag-gated notification hook
 unit, but the check exists in the retail binary so it's kept literally
 rather than assumed always-true).
 
-`arg1` is `void *` at the vtable-slot level (see `BMemPMgr.h`'s
+`arg1` is `void *` at the vtable-slot level (see `code_8220.h`'s
 `BasicClassMethods::slot38`) and gets cast to `BasicClass *` only at the
 `removeChild` call site — the caller and this callee agree on what's really
 being passed, but the slot's own declared type stays generic.

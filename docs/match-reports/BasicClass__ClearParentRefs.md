@@ -30,12 +30,12 @@ void BasicClass__ClearParentRefs(BasicClass *self)
 
 ## Provenance
 
-round 11 (2026-09-03), runner delta, unit BMemPMgr, second pass. Matched
+round 11 (2026-09-03), runner delta, unit code_8220, second pass. Matched
 first attempt.
 
 ## Naming (round 74)
 
 `BasicClass__ClearParentRefs`, **tier A**: matches vtable slot `+0x028`
-(`clearParentRefs`), already documented in `BMemPMgr.h`. Frees every
+(`clearParentRefs`), already documented in `code_8220.h`. Frees every
 node in `self->parentRefs` via `FreeBasicClassList`, then clears the
 head pointer.

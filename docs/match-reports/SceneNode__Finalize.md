@@ -51,7 +51,7 @@ that point; the WARNING about out-of-range bytes was entirely
 
 ## Naming
 
-Round 71 (alpha). `func_8001CBA4` -> `SceneNode__Finalize`, **tier A**. Table slot +0x00C, which BasicClass names `finalize` (include/BMemPMgr.h). Body: detachFromParent, detachAttachedChildren, the empty +0x05C slot, frees the GsCOORD2PARAM and GsCOORDINATE2, then forwards to BasicClass finalize. Does not free self, matching the base slot's meaning; same name as Viewport__Finalize/StageMap__Finalize on their tables.
+Round 71 (alpha). `func_8001CBA4` -> `SceneNode__Finalize`, **tier A**. Table slot +0x00C, which BasicClass names `finalize` (include/code_8220.h). Body: detachFromParent, detachAttachedChildren, the empty +0x05C slot, frees the GsCOORD2PARAM and GsCOORDINATE2, then forwards to BasicClass finalize. Does not free self, matching the base slot's meaning; same name as Viewport__Finalize/StageMap__Finalize on their tables.
 
 ## Round 97 (alpha): Sony's GsCOORDINATE2
 

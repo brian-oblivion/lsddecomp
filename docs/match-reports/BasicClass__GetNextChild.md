@@ -45,11 +45,11 @@ sibling (`BasicClass__GetNextParentRef`) needed no reshaping at all.
 
 ## Provenance
 
-round 11 (2026-09-03), runner delta, unit BMemPMgr, second pass.
+round 11 (2026-09-03), runner delta, unit code_8220, second pass.
 
 ## Naming (round 74)
 
 `BasicClass__GetNextChild`, **tier A**: matches vtable slot `+0x01C`
-(`getNextChild`), already documented in `BMemPMgr.h`. Seeds `*cursor`
+(`getNextChild`), already documented in `code_8220.h`. Seeds `*cursor`
 from `self->children` on the caller's first call, then pop-advances via
 `GetNextBasicClass`.

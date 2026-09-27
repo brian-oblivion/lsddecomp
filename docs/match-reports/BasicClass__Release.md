@@ -52,13 +52,13 @@ Two things had to be gotten right before this compiled to the right shape:
 
 ## Provenance
 
-round 11 (2026-09-03), runner delta, unit BMemPMgr (fresh carve). Matched
-first attempt once `BMemPMgr.h`'s `BasicClass`/`BasicClassMethods` types
+round 11 (2026-09-03), runner delta, unit code_8220 (fresh carve). Matched
+first attempt once `code_8220.h`'s `BasicClass`/`BasicClassMethods` types
 existed.
 
 ## Naming (round 74)
 
 `BasicClass__Release`, **tier A**: matches vtable slot `+0x004`
-(`release`), already documented in `BMemPMgr.h`'s `BasicClassMethods`
+(`release`), already documented in `code_8220.h`'s `BasicClassMethods`
 comment. Dispatches `finalize` then frees `self` via `BMemPMgrFree`;
 always returns `NULL`.

@@ -4,7 +4,7 @@
 
 Unit: `src/TmdRenderer.c`. This is `BasicClassMethods` vtable slot `+0x030`,
 `notifyParents(self, s32 flag)` (already documented in
-`include/BMemPMgr.h`'s struct comment). Walks `self->parentRefs` and, for
+`include/code_8220.h`'s struct comment). Walks `self->parentRefs` and, for
 each parent, calls that parent's own `slot38` (`BasicClass__OnNotify`,
 already matched in this unit) with `self` as its `arg1` and `flag` passed
 through as `arg2`. Since `slot38` only acts `if (arg2 == 1)`, calling

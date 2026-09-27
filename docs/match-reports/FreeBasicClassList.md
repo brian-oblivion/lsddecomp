@@ -2,7 +2,7 @@
 
 > Renamed from `func_80018288` on 2026-09-17 (tools/rename.py). Address 0x80018288.
 
-Unit: `src/TmdRenderer.c`. Signature (already in `include/BMemPMgr.h`):
+Unit: `src/TmdRenderer.c`. Signature (already in `include/code_8220.h`):
 `void FreeBasicClassList(BasicClassListNode **head);` — free every node in a
 `BasicClassListNode` singly-linked list, without clearing `*head` itself.
 
@@ -65,5 +65,5 @@ the pool allocator and nothing else. Its two callers in `BMemPMgr.c` are
 (clearParentRefs), and both do `FreeBasicClassList(&self->list);
 self->list = NULL;` -- i.e. the caller, not this function, clears the head
 pointer. The name says "free the list", and the "does not clear `*head`"
-caveat stays in the declaration comment in `include/BMemPMgr.h` because
+caveat stays in the declaration comment in `include/code_8220.h` because
 it is the one thing the name cannot carry.

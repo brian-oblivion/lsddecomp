@@ -236,7 +236,7 @@ whether the function itself matched)
   directly here (not through a vtable) — same "verbatim inherited BasicClass
   method, called by symbol" pattern already established for
   `BasicClass__Release` etc. Declared locally with this unit's own
-  opaque/pointer types rather than `#include "BMemPMgr.h"`.
+  opaque/pointer types rather than `#include "code_8220.h"`.
 
 ## Header changes kept
 

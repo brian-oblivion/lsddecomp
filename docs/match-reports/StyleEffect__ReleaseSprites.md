@@ -43,7 +43,7 @@ address of `this+0x84` is passed directly (not loaded through it), so
 already established elsewhere (`TmdRenderer.c`) as
 `void ReleaseBasicClassArray(BasicClass **array, s32 count)` -- a release-all-N loop.
 Kept generic `void **` here rather than pulling in `BasicClass` from
-`BMemPMgr.h`, matching this project's existing looser per-unit reading of
+`code_8220.h`, matching this project's existing looser per-unit reading of
 the same symbol (`code_2cc8c.h`'s `void ReleaseBasicClassArray(void *a0, void *a1)`).
 
 `this` is NOT the same class as `BaseObjO` (the shared intermediate base

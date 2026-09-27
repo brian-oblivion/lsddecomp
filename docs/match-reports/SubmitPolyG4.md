@@ -35,7 +35,7 @@ copies (`lwl`/`lwr` + `swl`/`swr`) are kept unchanged from the old body.
 `prim = (u8 *)SubmitPolyG4(prim, ctx);`), declared there as
 `extern void *SubmitPolyG4(void *prim, void *ctx);`. No other reference in `src/`,
 `asm/` or `config/`. The return type agrees. `RCpolyG4` stays declared `void` in
-`include/BMemPMgr.h` and is called through the local cast.
+`include/code_8220.h` and is called through the local cast.
 
 ## Earlier history
 
@@ -238,7 +238,7 @@ void SubmitPolyG4(void *arg0, void *arg1) {
 INCLUDE_ASM("asm/nonmatchings/TmdRenderer", SubmitPolyG4);
 ```
 
-(`OtTag` and `RCpolyG4`'s prototype come from `include/BMemPMgr.h`, already
+(`OtTag` and `RCpolyG4`'s prototype come from `include/code_8220.h`, already
 included by the unit.)
 
 Unit: `src/TmdRenderer.c`. Gouraud-quad-flavored sibling of the same OT-
@@ -345,7 +345,7 @@ which apply to this function too:
    re-reads it before the second store, because `addPrim(ot, p)` expands `ot`
    twice.
 
-`OtTag` is already declared in `include/BMemPMgr.h`.
+`OtTag` is already declared in `include/code_8220.h`.
 
 **So this function is not known to be unreachable, and the analogy that
 retired it no longer holds.** The residue's SHAPE was correctly identified as
