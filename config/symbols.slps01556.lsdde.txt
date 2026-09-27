@@ -2963,3 +2963,4 @@ SCALE_TWO_FIFTHS = 0x80089E44;
 gObjMAcceptedClassIds = 0x8008710C;
 gStagePendingExtras = 0x80087118;
 gStage0Bounds = 0x80087150;
+gObjMViewPoint = 0x8008715C;

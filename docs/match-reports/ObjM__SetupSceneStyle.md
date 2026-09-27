@@ -40,7 +40,7 @@ void ObjM__SetupSceneStyle(Obj87034_3bb8c_l *self) {
     val = *obj->methods->slot7C(obj, 0);
     unk18->methods->slot54(unk18, val / 2 * 5 / 3 + D_8008AB34);
 
-    unk18->methods->slot70(unk18, self->unk3C, &D_8008715C, &D_80087168, 0);
+    unk18->methods->slot70(unk18, self->unk3C, &gObjMViewPoint, &D_80087168, 0);
 
     SetDreamAuxWorld((s32)self->unk38, (s32)self->unk14, (s32)self->unk3C, self->unk34, self->unk10);
 

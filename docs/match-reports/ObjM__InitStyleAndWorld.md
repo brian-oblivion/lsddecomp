@@ -22,7 +22,7 @@ extern s32 New_TimBlockSrc(s32 arg0);
 extern void func_8001EF60(s32 arg0);
 extern s32 RegisterStyleConfig(void *arg0, s32 arg1, s32 *arg2, s32 arg3, s32 arg4);
 
-extern s32 D_8008715C;
+extern s32 gObjMViewPoint;
 extern s32 D_80087168;
 extern s32 gStagePendingExtras[];
 extern s32 gStage0Bounds;
@@ -41,7 +41,7 @@ void ObjM__InitStyleAndWorld(Obj87034_3bb8c_l *self, s32 arg1, StyleConfig *arg2
     ret1 = PickDailyVariant(self->unk38, 0, ret1);
     self->unk58 = (Obj87034_3bb8c_l *) New_TimBlockSrc(ret1);
 
-    unk18->methods->slot70(unk18, self->unk3C, &D_8008715C, &D_80087168, 0);
+    unk18->methods->slot70(unk18, self->unk3C, &gObjMViewPoint, &D_80087168, 0);
 
     self->unk78 = unk18;
     ret1 = self->unk3C->methods->slot1A0(self->unk3C, 0);
@@ -89,7 +89,7 @@ void ObjM__InitStyleAndWorld(Obj87034_3bb8c_l *self, s32 arg1, StyleConfig *arg2
 Cross-unit helpers (`PickVariant`, `PickDailyVariant`, `New_TimBlockSrc`,
 `func_8001EF60`, `RegisterStyleConfig`) have no established prototypes anywhere
 else in the project (all still `INCLUDE_ASM` in their own units), so they
-are declared locally per CLAUDE.md's rule. `D_8008715C`/`D_80087168` are
+are declared locally per CLAUDE.md's rule. `gObjMViewPoint`/`D_80087168` are
 referenced only by address (never loaded), so their real type is unknown;
 `gStagePendingExtras` is a plain word array indexed by `self->unk38`;
 `gStage0Bounds` is likewise referenced only by address.
