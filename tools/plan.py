@@ -1184,8 +1184,14 @@ def jobs(d, n):
             # take <libgs.h> until both are fixed (round 95: TileAtlas.h,
             # TileMap.h and TimImage.h all reach code_33808, and alpha could not
             # land the first two green without the third).
+            # A header that ALSO defines placeholder types (code_d294.h) is
+            # the same blocker, so it ranks here too and carries its types
+            # (round 95: it had ranked eighth, behind polish passes).
+            class_hdrs = {j["header"] for j in p2["_class_jobs"]}
+            sony_hdrs = {f: n for f, n in p2["_sony"].items()
+                         if f.startswith("include/") and f not in class_hdrs}
             groups = []   # [(set of includer units, [(header, names)])]
-            for f, names in sorted(p2["_sony_left"].items()):
+            for f, names in sorted(sony_hdrs.items()):
                 us, fs = set(sony_includers(f)), [(f, names)]
                 for g in [g for g in groups if g[0] & us]:
                     groups.remove(g)
@@ -1193,7 +1199,9 @@ def jobs(d, n):
                     fs = g[1] + fs
                 groups.append((us, sorted(fs)))
             for us, fs in sorted(((sorted(u), f) for u, f in groups), key=lambda g: g[1][0][0]):
-                what = "; ".join(f"{f}: it re-declares {', '.join(names)}" for f, names in fs)
+                what = "; ".join(f"{f}: it re-declares {', '.join(names)}"
+                                 + (f", and name its placeholder type(s) {', '.join(sorted(p2['_homes'][f]))}"
+                                    if f in p2["_homes"] else "") for f, names in fs)
                 q6.append(("6", f"use Sony's own declarations in {what} "
                                 f"(FINISHING-PLAN track 6 step 4; tools/sonyheaders.py) "
                                 f"(units: {','.join([f for f, _ in fs] + list(us))})",
@@ -1231,7 +1239,7 @@ def jobs(d, n):
                 q6.append(("6", f"name class {j['class']}{tab} (parent {j['parent'] or 'none'}, {j['methods']} own "
                                 f"methods, {j['header']}{extra}) (units: {','.join([j['header']] + j['units'])})", MODELS["types_runner"]))
             for f, names in sorted(p2["_homes"].items(), key=lambda kv: (-len(kv[1]), kv[0])):
-                if f in first:
+                if f in first or f in sony_hdrs:
                     continue
                 u = Path(f).stem if f.startswith("src/") else f
                 q6.append(("6", f"name {len(names)} placeholder type(s) defined in {f}: {', '.join(sorted(names))}"
