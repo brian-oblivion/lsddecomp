@@ -169,7 +169,7 @@ extern const char sStrComInput[];    /* "COMINPUT" */
 extern const char sStrFontIcon[];    /* "FONTICON" */
 extern const char sCardPathPrefix[]; /* "CARD\\" */
 extern const char sTimExt[];         /* ".TIM" */
-extern s32 D_80086F7C; /* 3 words, New_ScreenSprite's rect: a SpriteRect {0, 0, 224, 120} */
+extern s32 gTextEntryPanelRect; /* 3 words, New_ScreenSprite's rect: a SpriteRect {0, 0, 224, 120} */
 extern s32 D_8008AAC8; /* opaque block, slotB8's arg1, address-only here */
 extern s32 D_8008AACC; /* panelSprite's attachToParent position, address-only here */
 extern s32 D_8008AAD4; /* textRow's slot4C position, address-only here */
@@ -194,7 +194,7 @@ void TextEntry__LoadCardResources(TextEntry *self, void *arg1) {
 
     handle1 = New_TimImage(BuildFileName(path, sStrComInput, dir, ext));
     ((TimImageUploadFn)handle1->methods->processBuffer)(handle1);
-    self->panelSprite = New_ScreenSprite(handle1, (SpriteRect *)&D_80086F7C, 0);
+    self->panelSprite = New_ScreenSprite(handle1, (SpriteRect *)&gTextEntryPanelRect, 0);
     handle1->methods->release(handle1);
     self->panelSprite->methods->attachToParent(self->panelSprite, (SceneNode *)arg1,
                                                (LongVec3 *)&D_8008AACC);
