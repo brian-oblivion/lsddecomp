@@ -59,7 +59,7 @@ extern ViewportRgb gDefaultViewportColorAlias __asm__("gDefaultViewportColor");
 
 /* Every field's default; both colours start black (gDefaultViewportColor). */
 void Viewport__InitDefaults(Viewport *self) {
-    self->unk90 = 0;
+    self->clockEventCount = 0;
     self->otReady = 0;
     /* MATCHING: without it both loads hoist above the two zero stores. */
     __asm__("");
@@ -68,8 +68,8 @@ void Viewport__InitDefaults(Viewport *self) {
     /* MATCHING: without it both stores sink below the constant stores. */
     __asm__("");
     self->otLength = 13;
-    self->unk44 = 2000;
-    self->unk48 = 64;
+    self->packetCount = 2000;
+    self->packetSize = 64;
     self->projH = 256;
     self->nearZ = 10;
     self->farZ = 65536;
@@ -77,7 +77,7 @@ void Viewport__InitDefaults(Viewport *self) {
     self->fogNear = 20000;
     self->farColor = gDefaultViewportColor;
     self->clearColor = gDefaultViewportColorAlias;
-    self->unkB4 = 0;
+    self->extraSwapOnBuffer0 = 0;
     self->drawEnabled = 1;
 }
 
@@ -89,17 +89,17 @@ void Viewport__SetOtLength(Viewport *self, s32 length) {
     self->otLength = length;
 }
 
-/* Takes only before InitOt: unk44 is one factor of each packet area. */
+/* Takes only before InitOt: packetCount is one factor of each packet area. */
 void Viewport__SetPacketCount(Viewport *self, s32 value) {
     if (self->otReady == 0) {
-        self->unk44 = value;
+        self->packetCount = value;
     }
 }
 
-/* The same guard, for the other factor, unk48. */
+/* The same guard, for the other factor, packetSize. */
 void Viewport__SetPacketSize(Viewport *self, s32 value) {
     if (self->otReady == 0) {
-        self->unk48 = value;
+        self->packetSize = value;
     }
 }
 
@@ -184,7 +184,7 @@ void Viewport__NoOpSlot84(void) {}
 void Viewport__NoOpSlot88(void) {}
 
 /* One-time allocation of the two ordering tables. Each half of the buffer
- * is a GsOT header, its 1 << otLength four-byte tags, then unk48 * unk44
+ * is a GsOT header, its 1 << otLength four-byte tags, then packetSize * packetCount
  * bytes of packet area. */
 void Viewport__InitOt(Viewport *self) {
     s32 size;
@@ -197,7 +197,7 @@ void Viewport__InitOt(Viewport *self) {
         return;
     }
 
-    size = (4 << self->otLength) + (self->unk48 * self->unk44 + hdrSize);
+    size = (4 << self->otLength) + (self->packetSize * self->packetCount + hdrSize);
 
     buf = (s32)BMemPMgrAlloc(size * 2);
     if (buf == 0) {
@@ -234,10 +234,10 @@ void Viewport__DeinitOt(Viewport *self) {
     }
 }
 
-/* A FrameClock event: counts every one in unk90, and runs update on a tick
+/* A FrameClock event: counts every one in clockEventCount, and runs update on a tick
  * whether the clock is running or paused (not on FRAMECLOCK_EVENT_FLAG14). */
 void Viewport__OnNotifyTag5(Viewport *self, BasicClass *sender, s32 event) {
-    self->unk90 = self->unk90 + 1;
+    self->clockEventCount = self->clockEventCount + 1;
     if (event == FRAMECLOCK_EVENT_RUNNING || event == FRAMECLOCK_EVENT_PAUSED) {
         self->methods->update(self);
     }
@@ -297,9 +297,9 @@ void Viewport__Update(Viewport *self) {
 }
 
 /* Takes otIndex from the DrawSystem's getActiveBuffer; when drawing is
- * enabled, resets the GPU, swaps (once more on buffer 0 when unkB4 is set),
+ * enabled, resets the GPU, swaps (once more on buffer 0 when extraSwapOnBuffer0 is set),
  * sorts the clear into this half's OT and draws it (and swaps again on
- * buffer 0 with unkB4); then flips otIndex to the other half. */
+ * buffer 0 with extraSwapOnBuffer0); then flips otIndex to the other half. */
 void Viewport__Flip(Viewport *self) {
     s32 idx;
 
@@ -315,7 +315,7 @@ void Viewport__Flip(Viewport *self) {
     ResetGraph(1);
     self->drawSystem->methods->swapBuffers(self->drawSystem);
 
-    if (self->unkB4 != 0) {
+    if (self->extraSwapOnBuffer0 != 0) {
         if (self->otIndex == 0) {
             self->drawSystem->methods->swapBuffers(self->drawSystem);
         }
@@ -327,7 +327,7 @@ void Viewport__Flip(Viewport *self) {
     idx = self->otIndex;
     GsDrawOt(self->ot[idx]);
 
-    if (self->unkB4 != 0 && self->otIndex == 0) {
+    if (self->extraSwapOnBuffer0 != 0 && self->otIndex == 0) {
         self->drawSystem->methods->swapBuffers(self->drawSystem);
     }
 
@@ -360,7 +360,7 @@ SceneNode *Viewport__GetFadeBox(Viewport *self) {
 }
 
 void Viewport__SetExtraSwapOnBuffer0(Viewport *self, s32 value) {
-    self->unkB4 = value;
+    self->extraSwapOnBuffer0 = value;
 }
 
 void Viewport__SetDrawEnabled(Viewport *self, s32 on) {

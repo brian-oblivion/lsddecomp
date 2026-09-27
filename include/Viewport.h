@@ -43,9 +43,10 @@
  * 0x64), whose +0x04C override (BoxFill__AttachToParent) takes a two-word screen
  * position where SceneNode's attachToParent slot takes a LongVec3 offset;
  * the ctor and Viewport__SetFadeBox pass gFadeBoxAttachPos (-100, -100) through the
- * inherited slot with a pointer cast. unk44 and unk48 multiply to each
- * buffer's packet area (InitOt; defaults 2000 and 64); which is the count
- * and which the size is not shown. drawNode (Viewport__DrawNode) reads its
+ * inherited slot with a pointer cast. packetCount and packetSize multiply
+ * to each buffer's packet area (InitOt; defaults 2000 and 64); which is the
+ * count and which the size is Sony's PACKETMAX * size idiom and the values
+ * callers pass, not the code. drawNode (Viewport__DrawNode) reads its
  * node through code_2864.c's own DrawNode view, so it is not prototyped
  * here.
  *
@@ -139,8 +140,8 @@ struct ViewportRefView {
     /* +0x034 */ ViewportSize screenSize;                                                          \
     /* +0x03C */ s32 otLength;            /* GsOT length: 1 << otLength tags; drawNode's priority range */ \
     /* +0x040 */ s32 projH;               /* GsSetProjection's h; drawNode's sprite projection */  \
-    /* +0x044 */ s32 unk44;               /* unk44 * unk48: each buffer's packet area */           \
-    /* +0x048 */ s32 unk48;                                                                        \
+    /* +0x044 */ s32 packetCount;         /* packetCount * packetSize: each buffer's packet area */ \
+    /* +0x048 */ s32 packetSize;          /* bytes per packet (see the banner) */                  \
     /* +0x04C */ s32 nearZ;               /* GsSetNearClip; drawNode's sprite near limit */        \
     /* +0x050 */ s32 farZ;                /* zDiv = (farZ - nearZ) / (1 << otLength) + 1 */        \
     /* +0x054 */ s32 lightMode;           /* GsSetLightMode; 1 or 3 also sets the fog */           \
@@ -154,13 +155,13 @@ struct ViewportRefView {
     /* +0x078 */ GsOT *ot[2];             /* InitOt's two GsOT headers */                          \
     /* +0x080 */ GsOT_TAG *otTags[2];     /* each header's org: its tag array */                   \
     /* +0x088 */ PACKET *workBase[2];     /* each half's packet area: GsSetWorkBase */             \
-    /* +0x090 */ s32 unk90;               /* counts class-5 notifications (OnNotifyTag5) */        \
+    /* +0x090 */ s32 clockEventCount;     /* counts FrameClock notifications (OnNotifyTag5) */     \
     /* +0x094 */ u8 pad094[0x098 - 0x094];                                                         \
     /* +0x098 */ s32 zDiv;                /* Update: the depth per OT tag; drawNode's sprite z */  \
     /* +0x09C */ u8 pad09C[0x0AC - 0x09C];                                                         \
     /* +0x0AC */ SceneNode *sceneRoot;   /* the ctor's New_SceneNode; Update draws it; finalize releases it */ \
     /* +0x0B0 */ SceneNode *fadeBox;   /* the ctor's New_FadeBox, attached under sceneRoot */ \
-    /* +0x0B4 */ s32 unkB4;               /* Flip: nonzero swaps once more on buffer 0 */          \
+    /* +0x0B4 */ s32 extraSwapOnBuffer0;  /* Flip: nonzero swaps before and after drawing buffer 0 */ \
     /* +0x0B8 */ s32 drawEnabled          /* Flip: 0 skips the clear and draw; default 1 */
 /* clang-format on */
 
