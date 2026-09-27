@@ -102,3 +102,7 @@ earlier sections' history prose in this and sibling reports (known, pending
 an operator decision; not hand-reverted).
 
 This function: `StageMap__FlushRateLatch` -> `StageMap__EndScaleRamp` (`python3 tools/rename.py StageMap__FlushRateLatch StageMap__EndScaleRamp`, tier B): after a ramp, sets every cell's scale to 1/1 x3 and zeroes the count.
+
+## Round 96 (track 7, delta)
+
+Nothing to change.

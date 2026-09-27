@@ -819,3 +819,19 @@ new `ChunkNeighbourDelta` for `sChunkNeighbourDeltas` (was typed as the
 3-word placeholder). renametype.py also rewrote the old names inside
 earlier sections' history prose in this and sibling reports (known, pending
 an operator decision; not hand-reverted).
+
+## Round 96 (track 7, delta)
+
+Moved here from the unit, verbatim (history, derivation or retail addresses a
+source comment no longer carries; the code keeps one `MATCHING:` line):
+
+```c
+/* The in-range test is written as the NEGATION returning 0, with `return 1`
+ * as the else arm: that is jump.c's "if (...) x = a; else x = b;" shape with
+ * x = $v0 and b = 1, so the constant is preset into $v0 ahead of the first
+ * test and stays live across every check block (keeping the block temps out
+ * of $v0, and pushing `bounds` to $a2), and the final `>=` folds back into
+ * the store-flag `slt`. See docs/match-reports/IsPointOutOfBounds.md. */
+```
+
+Replaced by what the function returns and a `MATCHING:` line.

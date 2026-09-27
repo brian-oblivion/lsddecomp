@@ -149,3 +149,9 @@ earlier sections' history prose in this and sibling reports (known, pending
 an operator decision; not hand-reverted).
 
 This function: `StageMap__FindElemIndexByUnk30` -> `StageMap__FindSlotIndexByChunk` (`python3 tools/rename.py StageMap__FindElemIndexByUnk30 StageMap__FindSlotIndexByChunk`, tier A): a lookup leaf: the index of the loaded slot whose `loader->chunkIndex` is the key, or -1.
+
+## Round 96 (track 7, delta)
+
+Parameter `key` -> `chunkIndex` (compared with LbdFile::chunkIndex; also
+the prototype and slot +0x124 in StageMap.h), `e` -> `slot`; loop bound
+`ARRAY_COUNT(self->slots)`. Zero bytes.

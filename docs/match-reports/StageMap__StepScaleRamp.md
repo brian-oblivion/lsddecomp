@@ -111,3 +111,7 @@ earlier sections' history prose in this and sibling reports (known, pending
 an operator decision; not hand-reverted).
 
 This function: `StageMap__AdvanceRateCountdown` -> `StageMap__StepScaleRamp` (`python3 tools/rename.py StageMap__AdvanceRateCountdown StageMap__StepScaleRamp`, tier B): while `scaleRampTicks` > 0, adds the step to every cell's scale (updateScale, add) and counts down; -1 when done.
+
+## Round 96 (track 7, delta)
+
+Nothing to change.

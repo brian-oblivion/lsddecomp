@@ -101,3 +101,10 @@ new `ChunkNeighbourDelta` for `sChunkNeighbourDeltas` (was typed as the
 3-word placeholder). renametype.py also rewrote the old names inside
 earlier sections' history prose in this and sibling reports (known, pending
 an operator decision; not hand-reverted).
+
+## Round 96 (track 7, delta)
+
+Renamed from `StageMap__InitFootprintSlot` (tools/rename.py), tier A: it
+fills rects[index] (a CellRect) with gFullSlotRect and the slot index of the
+chunk. Parameters `key` -> `index`, `arg3` -> `chunkIndex` (passed to
+findSlotIndexByChunk), `slot` -> `rect`; the prototype follows.

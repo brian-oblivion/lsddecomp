@@ -705,3 +705,40 @@ new `ChunkNeighbourDelta` for `sChunkNeighbourDeltas` (was typed as the
 3-word placeholder). renametype.py also rewrote the old names inside
 earlier sections' history prose in this and sibling reports (known, pending
 an operator decision; not hand-reverted).
+
+## Round 96 (track 7, delta)
+
+Moved here from the unit, verbatim (history, derivation or retail addresses a
+source comment no longer carries; the code keeps one `MATCHING:` line):
+
+```c
+/* Matched round 75. Three source-shape levers closed what was filed since
+ * round 19 as a whole-function register rotation
+ * (docs/match-reports/StageMap__BuildFootprintRects.md): ONE slot pointer reused for the
+ * second slot (no separate slot1), assigned once at the join after the
+ * row<0 test (reorg fills the bgez delay slot from it and deletes the
+ * redundant copy on the other path -- no barrier, no duplicate); the
+ * clipped remainder in its own local `over` rather than `span -= 0x14`;
+ * and `count += 1` as a statement in each arm plus at the join. */
+```
+
+Kept as a one-line `MATCHING:` note under a new descriptive comment.
+
+### Naming
+
+- Renamed from `StageMap__BuildFootprintSlots` (tools/rename.py), tier A:
+  it builds `rects` (CellRects) from the footprint; in this class "slot" is
+  a ChunkSlot, which these are not.
+- Locals: `quadrant` -> `key`: the value goes to findSlotIndexByNeighbour,
+  which compares it with LbdFile::elemKey, a neighbour key (enum
+  ChunkNeighbour). `flag` -> `wrappedCol` (the column was negative and moved
+  into the chunk to the left). `slot` -> `rect`.
+
+### Constants
+
+- `3`, `2`, `0`, `1` -> `CHUNK_NEIGHBOUR_CENTRE`, `_PREV_COL` (start left
+  of the chunk), `_PREV_ROW_LO`/`_PREV_ROW_HI` (start above it).
+  `key + 1`, the slot of the part past the right edge, stays arithmetic.
+- `0x14` -> `STAGE_CHUNK_CELLS`; `>= 0x15` -> `> STAGE_CHUNK_CELLS` (same
+  code); `0xA` -> `STAGE_CHUNK_HALF_CELLS`, new in StageMap.h (additive,
+  `STAGE_CHUNK_CELLS / 2`, the odd-row stagger).

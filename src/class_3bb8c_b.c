@@ -1,20 +1,28 @@
 /*
- * class_3bb8c_b -- the last third of StageMap (include/StageMap.h),
- * sharing include/class_3bb8c.h with class_3bb8c.c.
+ * class_3bb8c_b -- StageMap's drawn window and scale ramp: the last of the
+ * class's methods (include/StageMap.h; the others are in class_3ac78.c and
+ * class_3bb8c.c).
  *
- *  - FindSlotIndexByNeighbour, FindSlotIndexByChunk: slot lookups.
- *  - The footprint: once every chunk is loaded, RefreshFootprint sets bit
- *    31 of `attribute` (libgs GsDOFF, display off) on the cells of the
- *    current `rects` and every cell chained behind them, rebuilds `rects`,
- *    the up to four cell rectangles around the target
- *    (ComputeFootprintFromRotation and BuildFootprintSlots/
- *    SplitFootprintSlot in a flat grid, SetFootprintFromQuery and
- *    InitFootprintSlot in a vertical one), and clears the bit on the new
- *    ones (SetFootprintCellFlag). IsPointOutOfBounds tests a cell against
- *    `bounds` (SetBounds).
- *  - The scale ramp: StartScaleRamp, StepScaleRamp, EndScaleRamp and their
- *    per-cell callbacks AddScaleStepToCell and ResetCellScale, run over
- *    every cell by ForEachSlot/ForEachSlotCell.
+ *  - FindSlotIndexByNeighbour, FindSlotIndexByChunk: which of the seven
+ *    slots holds a neighbour key, or a loaded chunk.
+ *  - The footprint, the window of cells that is drawn. Once every chunk is
+ *    loaded, RefreshFootprint hides the cells of the current `rects`, and
+ *    every cell chained behind them, rebuilds `rects` and shows the cells of
+ *    the new ones (SetFootprintVisible: GsDOFF in each cell's `attribute`).
+ *    `rects` is up to four CellRects, one per slot the window overlaps. In
+ *    a flat grid the window lies ahead of the target along the axis nearest
+ *    its facing and is shifted sideways toward where it looks
+ *    (ComputeFootprintFromRotation); BuildFootprintRects and
+ *    SplitFootprintRect clip it at the chunk's right and bottom edges into
+ *    the neighbouring slots. In a vertical grid it is whole chunks: the
+ *    target's, the previous one, and the next one when the target's cell
+ *    lies outside `bounds` (SetFootprintFromQuery, InitFootprintRect,
+ *    IsPointOutOfBounds; SetBounds).
+ *  - The scale ramp: StartScaleRamp picks a step and a tick count,
+ *    StepScaleRamp adds the step to every cell's scale once a tick, and
+ *    EndScaleRamp sets every cell back to 1/1 (AddScaleStepToCell and
+ *    ResetCellScale, run on every cell of every slot by ForEachSlot and
+ *    ForEachSlotCell).
  *  - GetUnk1CC, and GetStageMapMethods.
  */
 #include "common.h"
@@ -25,6 +33,19 @@
 #include "LbdFile.h"
 #include "GridCell.h"
 
+/* The four scale steps (Ratio16[3], x/y/z) StartScaleRamp picks for
+ * `scaleStep`: y +1/64 and +1/4 for a positive rate (fast 0, nonzero),
+ * -1/64 and -1/4 otherwise; x and z 0/1. */
+extern Ratio16 sScaleStepUpSlow[3];
+extern Ratio16 sScaleStepUpFast[3];
+extern Ratio16 sScaleStepDownSlow[3];
+extern Ratio16 sScaleStepDownFast[3];
+
+/* 1/1, 1/1, 1/1: the scale ResetCellScale sets on every cell. */
+extern Ratio16 sScaleOne[3];
+
+/* The index of the slot whose chunk is at neighbour key `key`; 0 when
+ * none is. */
 s32 StageMap__FindSlotIndexByNeighbour(StageMap *self, s32 key) {
     s32 index;
     s32 i;
@@ -41,6 +62,8 @@ s32 StageMap__FindSlotIndexByNeighbour(StageMap *self, s32 key) {
     return index;
 }
 
+/* The index of the slot holding chunk chunkIndex with its header read; -1
+ * when none does. */
 s32 StageMap__FindSlotIndexByChunk(StageMap *self, s32 chunkIndex) {
     s32 i;
     ChunkSlot *slot;
@@ -70,13 +93,19 @@ void StageMap__RefreshFootprint(StageMap *self) {
     StageMap__SetFootprintVisible(self, 1);
 }
 
+/* The flat grid's window, from the target's cell and its y rotation: a
+ * window aheadCells deep along whichever of x and z the target faces
+ * (within 45 degrees), starting at the target's cell and running the way it
+ * faces, and acrossCells wide, centred on the target and shifted by the
+ * off-axis part of a gridSpan-long facing vector, in cells, kept inside half
+ * the grid. The window goes to BuildFootprintRects as footprintCol/Row and
+ * footprintWidth/Height. MATCHING: the (u16) casts are retail's lhu. */
 void StageMap__ComputeFootprintFromRotation(StageMap *self, s32 acrossCells, s32 aheadCells) {
     SceneNodeSub44 *param;
     Descriptor10Ext desc;
     s32 cellCol;
     s32 cellRow;
-    u16 angle; /* u16, not s32: the s32 form is byte-identical except
-                     * for an 8-byte-smaller frame (round 71) */
+    u16 angle; /* MATCHING: u16; s32 makes the frame 8 bytes smaller */
     MATRIX mat;
     s32 lateral;
     s32 shiftCol;
@@ -84,7 +113,7 @@ void StageMap__ComputeFootprintFromRotation(StageMap *self, s32 acrossCells, s32
     void *rot;
 
     param = self->target->coord2->param;
-    rot = &param->rotate;
+    rot = &param->rotate; /* MATCHING: here, before the call, so it lives across it */
     self->methods->getTargetDescriptor(self, &desc, 0);
     cellCol = desc.base.b2;
     cellRow = desc.base.b3;
@@ -93,14 +122,17 @@ void StageMap__ComputeFootprintFromRotation(StageMap *self, s32 acrossCells, s32
         angle += ONE;
     }
 
+    /* The facing vector: (0, 0, gridSpan) turned by the target's rotation,
+     * in place (t is both ApplyMatrixLV's input and its output). */
     mat = GsIDMATRIX;
     mat.t[0] = 0;
     mat.t[1] = 0;
     mat.t[2] = self->gridSpan;
     RotMatrix(rot, &mat);
-    /* (0, 0, gridSpan) rotated in place: t is both the input and the output. */
     ApplyMatrixLV(&mat, (VECTOR *)mat.t, (VECTOR *)mat.t);
 
+    /* Facing +-x, then facing +-z. MATCHING: the second test is retail's; the
+     * two cover every angle. */
     if ((u16)(angle - ANGLE_DEG(45)) < ANGLE_DEG(90) || (u16)(angle - ANGLE_DEG(225)) < ANGLE_DEG(90)) {
         lateral = mat.t[2];
         self->footprintWidth = aheadCells;
@@ -137,14 +169,14 @@ void StageMap__ComputeFootprintFromRotation(StageMap *self, s32 acrossCells, s32
     StageMap__BuildFootprintRects(self);
 }
 
-/* Matched round 75. Three source-shape levers closed what was filed since
- * round 19 as a whole-function register rotation
- * (docs/match-reports/StageMap__BuildFootprintRects.md): ONE slot pointer reused for the
- * second slot (no separate slot1), assigned once at the join after the
- * row<0 test (reorg fills the bgez delay slot from it and deletes the
- * redundant copy on the other path -- no barrier, no duplicate); the
- * clipped remainder in its own local `over` rather than `span -= 0x14`;
- * and `count += 1` as a statement in each arm plus at the join. */
+/* Splits the window (footprintCol/Row, footprintWidth/Height) into
+ * `rects`: a window that starts left of the centre chunk or above it starts
+ * in that neighbour's slot, with its column and row moved into that chunk
+ * (rows above are staggered by half a chunk); a part past the right edge
+ * goes to the slot of key + 1, and SplitFootprintRect splits off the part
+ * past the bottom edge. MATCHING: one `rect` pointer reused for the second
+ * rectangle, `over` its own local, and `count += 1` in each arm and again at
+ * the join. */
 void StageMap__BuildFootprintRects(StageMap *self) {
     s32 wrappedCol;
     s32 col;
@@ -213,8 +245,8 @@ s32 StageMap__SplitFootprintRect(StageMap *self, CellRect *rect, s32 count, s32 
     s32 widthLeft;
 
     if (row + height > STAGE_CHUNK_CELLS) {
-        /* The rectangle runs past the bottom edge (row 20): clip this rect
-         * and open a new one for the part below. */
+        /* The rectangle runs past the chunk's bottom edge: clip this rect
+         * and open a new one, in the slot below, for the rest. */
         rowsBelow = (row + height) - STAGE_CHUNK_CELLS;
         span = rowsBelow;
         rect->height = height - rowsBelow;
@@ -225,8 +257,8 @@ s32 StageMap__SplitFootprintRect(StageMap *self, CellRect *rect, s32 count, s32 
             belowKey = key + 2;
             rect->slotIndex = self->methods->findSlotIndexByNeighbour(self, belowKey);
             rect->col = col + STAGE_CHUNK_HALF_CELLS;
-            /* Stored in BOTH arms: cross-jumping merges the copies, and
-             * the join label keeps the col reload below after it. */
+            /* MATCHING: stored in both arms (cross-jumping merges them, and
+             * the join keeps the col reload below after it). */
             rect->height = span;
         } else {
             belowKey = key + 3;
@@ -238,11 +270,10 @@ s32 StageMap__SplitFootprintRect(StageMap *self, CellRect *rect, s32 count, s32 
         span = rect->col + width;
         rect->row = 0;
         if (span > STAGE_CHUNK_CELLS) {
-            /* ...and past the right edge (column 20) too. */
+            /* ...and past the right edge too. */
             count = count + 1;
-            /* Two statements, not `(width + 20) - span`: fold rewrites
-             * that tree as `width - (span - 20)` and CSE then shares
-             * `span - 20` with the store below (round 71). */
+            /* MATCHING: two statements; one expression shares span - 20
+             * with the store below. */
             widthLeft = width + STAGE_CHUNK_CELLS;
             widthLeft = widthLeft - span;
             rect->width = widthLeft;
@@ -262,7 +293,7 @@ s32 StageMap__SplitFootprintRect(StageMap *self, CellRect *rect, s32 count, s32 
 }
 
 void StageMap__SetFootprintFromQuery(StageMap *self) {
-    s32 junk;
+    s32 junk; /* MATCHING: never set; InitFootprintRect ignores the argument */
     Descriptor10Ext desc;
 
     self->methods->getTargetDescriptor(self, &desc, 0);
@@ -279,12 +310,9 @@ void StageMap__SetFootprintFromQuery(StageMap *self) {
     }
 }
 
-/* The in-range test is written as the NEGATION returning 0, with `return 1`
- * as the else arm: that is jump.c's "if (...) x = a; else x = b;" shape with
- * x = $v0 and b = 1, so the constant is preset into $v0 ahead of the first
- * test and stays live across every check block (keeping the block temps out
- * of $v0, and pushing `bounds` to $a2), and the final `>=` folds back into
- * the store-flag `slt`. See docs/match-reports/IsPointOutOfBounds.md. */
+/* 1 when there are no bounds or the point (cell column, row) lies outside
+ * them, else 0. MATCHING: the in-range test returns 0 and `return 1`
+ * follows it; the other order allocates differently. */
 s32 IsPointOutOfBounds(CellBounds *bounds, s8 *point) {
     if (bounds != NULL && point[0] >= bounds->minCol && bounds->maxCol >= point[0] &&
         point[1] >= bounds->minRow && bounds->maxRow >= point[1]) {
@@ -293,6 +321,8 @@ s32 IsPointOutOfBounds(CellBounds *bounds, s8 *point) {
     return 1;
 }
 
+/* rects[index] becomes the whole of the slot holding chunkIndex; returns the
+ * next index. */
 s32 StageMap__InitFootprintRect(StageMap *self, s32 unused, s32 index, s32 chunkIndex) {
     CellRect *rect;
 
@@ -349,27 +379,11 @@ void StageMap__SetBounds(StageMap *self, CellBounds *bounds) {
     self->bounds = bounds;
 }
 
-/* Picks one of the four static Ratio16[3] scale steps by the sign of
- * `rate` and by `flag`, then sets scaleRampTicks to |rate| scaled by the chosen
- * step's y denominator (scaleStep[1].den).
- *
- * Two source shapes here are load-bearing and neither is cosmetic:
- *
- *  - The `goto` ladder, and its asymmetry. Retail emits TWO stores to
- *    scaleStep: the rate>0/flag!=0 path has its own (in a `j`'s delay slot at
- *    0x8004CFDC) and the other three SHARE one (0x8004CFF8). Writing the
- *    field directly on that one path and going through `table` on the other
- *    three is what reproduces that split. Byte-exact since round 9.
- *  - `scale` and `val`. Retail loads the step's y denominator ONCE (`lh $v1,6($v0)`)
- *    before the sign branch and keeps a single `mflo` after the join, with a
- *    `mult` in each arm. Caching the load in `scale` and letting an explicit
- *    if/else assign a local `val` is what defers that `mflo`; the
- *    default-then-overwrite spelling makes cc1 extract it eagerly, and
- *    storing to self->scaleRampTicks directly instead of through `val` perturbs the
- *    table-selection half as well. Both were measured -- round 58 and
- *    docs/match-reports/StageMap__StartScaleRamp.md.
- *
- * `~rate + 1` is retail's own negation (`nor`/`addiu`), not `-rate`. */
+/* Picks the scale step by the sign of `rate` and by `fast`, and runs the
+ * ramp for |rate| times the step's y denominator ticks (scaleStep[1].den).
+ * MATCHING: the goto ladder (retail stores scaleStep on the fast positive
+ * path and once for the other three), `scale` loaded once before the sign
+ * test, and `val` set in an if/else; `~rate + 1` is retail's negation. */
 void StageMap__StartScaleRamp(StageMap *self, s32 rate, s32 fast) {
     Ratio16 *table;
     s32 val;

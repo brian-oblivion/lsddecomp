@@ -780,3 +780,52 @@ includes (the header's own `void RotMatrix(void *, QueryTemplate866E8 *)` and
 `void ApplyMatrixLV(QueryTemplate866E8 *, s32 *, s32 *)` re-declarations are
 gone). `extern MATRIX D_8008E98C;` moved into class_3bb8c_b.c, its only
 reader. Byte-exact, zero bytes changed.
+
+## Round 96 (track 7, delta)
+
+Moved here from the unit, verbatim (history, derivation or retail addresses a
+source comment no longer carries; the code keeps one `MATCHING:` line):
+
+```c
+    u16 angle; /* u16, not s32: the s32 form is byte-identical except
+                     * for an 8-byte-smaller frame (round 71) */
+
+    /* (0, 0, gridSpan) rotated in place: t is both the input and the output. */
+```
+
+The first is kept as `/* MATCHING: u16; s32 makes the frame 8 bytes smaller */`;
+new one-liners mark the `rot` assignment before the getTargetDescriptor call
+(round 71's lever, above), the (u16) casts (retail's `lhu`), and the second
+`else if` test (the two tests cover every angle, so a plain `else` would drop
+retail's compare).
+
+### Naming (locals and parameters)
+
+- `arg1`/`arg2` -> `acrossCells`/`aheadCells`, tier B. Evidence: facing +-x
+  (first arm) the column starts at the target's cell (t[0] > 0) and the
+  window is aheadCells wide, the row is centred (cellRow - gridHalfCells +-1)
+  and acrossCells high; facing +-z (second arm) the same with rows and
+  columns swapped. RefreshFootprint passes gridHalfCells * 2 and gridCells,
+  equal (20) at the default span. The backward start in the first arm,
+  `cellCol - acrossCells + 1`, uses acrossCells where aheadCells is the
+  width: retail's own, harmless while the two are equal. StageMap.h's
+  prototype said `width, height`, which each arm contradicts; it now says
+  `acrossCells, aheadCells`.
+- `sub` -> `param` (the coord2's GsCOORD2PARAM), `buf` -> `desc`,
+  `point0`/`point1` -> `cellCol`/`cellRow` (Descriptor10 b2/b3),
+  `offset` -> `lateral` (the facing vector's off-axis component, in cells
+  after `>> STAGE_CELL_SHIFT`, clamped to within half the grid),
+  `flag` -> `shiftCol` (1: the shift moves the column).
+
+### Constants
+
+- `0x1000` -> `ONE` (libgte; a full turn, added to a negative angle).
+- `0x200`, `0x400`, `0x600`, `0xA00`, `0xC00` -> `ANGLE_DEG(45)`, `(90)`,
+  `(135)`, `(225)`, `(270)`: new in include/common.h,
+  `((deg) * 4096 / 360)`, exact at multiples of 45. The tests read: facing
+  within 45 degrees of 90 or 270 (x), else of 180 or 0 (z).
+- `>> 11` -> `>> STAGE_CELL_SHIFT` (StageMap.h: world units to cells).
+- `D_8008E98C` -> Sony's `GsIDMATRIX` (config/psyq-objects.ld pins it for
+  nine libgs objects); the unit includes `<libgpu.h>` and `<libgs.h>`, the
+  local extern is gone. The old extern's comment called it bss; it is libgs
+  data, the identity matrix.

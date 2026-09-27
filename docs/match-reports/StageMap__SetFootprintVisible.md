@@ -185,3 +185,19 @@ new `ChunkNeighbourDelta` for `sChunkNeighbourDeltas` (was typed as the
 3-word placeholder). renametype.py also rewrote the old names inside
 earlier sections' history prose in this and sibling reports (known, pending
 an operator decision; not hand-reverted).
+
+## Round 96 (track 7, delta)
+
+### Naming
+
+Renamed from `StageMap__SetFootprintCellFlag` (tools/rename.py), tier A:
+the flag is libgs's GsDOFF (bit 31 of GsDOBJ2 attribute, display off);
+nonzero clears it on every cell under `rects` and every cell chained behind
+it (`nextInCell`), zero sets it. RefreshFootprint calls it with 0 before
+rebuilding `rects` and with 1 after. Parameter `setBit` -> `visible`;
+locals `slot` -> `rect` (CellRect), `e` -> `slot` (ChunkSlot).
+
+### Constants
+
+`0x7FFFFFFF`/`0x80000000` -> `~GsDOFF`/`GsDOFF` (libgs.h); `20` ->
+`STAGE_CHUNK_CELLS` (the row stride); `next != 0` -> `!= NULL`.

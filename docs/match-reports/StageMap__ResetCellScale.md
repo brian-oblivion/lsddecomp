@@ -93,3 +93,11 @@ earlier sections' history prose in this and sibling reports (known, pending
 an operator decision; not hand-reverted).
 
 This function: `StageMap__ResetChildRate` -> `StageMap__ResetCellScale` (`python3 tools/rename.py StageMap__ResetChildRate StageMap__ResetCellScale`, tier A): one-line callback: `updateScale(cell, 1 = set, 1/1 x3)`.
+
+## Round 96 (track 7, delta)
+
+Parameter `item` -> `cell`. `D_800869CC` -> `sScaleOne` (tools/rename.py,
+first as sScaleOneStep, then sScaleOne; tier A: 1/1, 1/1, 1/1, set with
+updateScale's `set` = 1). Its extern moved from include/class_3bb8c.h into
+class_3bb8c_b.c, the only reader. SceneNode's SCALE_ONE holds the same
+values at another address.

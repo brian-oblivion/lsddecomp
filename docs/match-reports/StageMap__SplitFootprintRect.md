@@ -961,3 +961,39 @@ new `ChunkNeighbourDelta` for `sChunkNeighbourDeltas` (was typed as the
 3-word placeholder). renametype.py also rewrote the old names inside
 earlier sections' history prose in this and sibling reports (known, pending
 an operator decision; not hand-reverted).
+
+## Round 96 (track 7, delta)
+
+Moved here from the unit, verbatim (history, derivation or retail addresses a
+source comment no longer carries; the code keeps one `MATCHING:` line):
+
+```c
+        /* The rectangle runs past the bottom edge (row 20): clip this rect
+         * and open a new one for the part below. */
+
+            /* Stored in BOTH arms: cross-jumping merges the copies, and
+             * the join label keeps the col reload below after it. */
+
+            /* ...and past the right edge (column 20) too. */
+
+            /* Two statements, not `(width + 20) - span`: fold rewrites
+             * that tree as `width - (span - 20)` and CSE then shares
+             * `span - 20` with the store below (round 71). */
+```
+
+The first and third stay without the literal edges; the second and fourth
+are `MATCHING:` lines.
+
+### Naming
+
+- Renamed from `StageMap__SplitFootprintSlot` (tools/rename.py), tier A: it
+  splits a CellRect at the chunk's bottom (and then right) edge.
+- Parameters and locals: `slot` -> `rect`, `baseIdx` -> `key` (the first
+  rect's neighbour key; the part below takes key + 2 or key + 3, and its own
+  right part that key + 1), `elemArg` -> `belowKey`, `overflow` ->
+  `rowsBelow`.
+
+### Constants
+
+`21`/`20` -> `> STAGE_CHUNK_CELLS`/`STAGE_CHUNK_CELLS`, `10` ->
+`STAGE_CHUNK_HALF_CELLS`.

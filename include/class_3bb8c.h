@@ -36,8 +36,8 @@ typedef struct SplitCoord2 SplitCoord2;
 
 /* ---- StageMap ---------------------------------------------------- */
 
-/* The rectangle StageMap__InitFootprintRect copies into rects[key] before
- * setting its element: no element (-1), the whole 20 x 20 cells from (0, 0). */
+/* The rectangle StageMap__InitFootprintRect copies into rects[index] before
+ * setting its slotIndex: no slot (-1), the whole 20 x 20 cells from (0, 0). */
 extern CellRect gFullSlotRect;
 
 /* The default "enable every element" spec table SetTargetAndLoadChunks
@@ -93,17 +93,6 @@ struct SplitCoord2 {
         u16 h;
     } tz; /* +0x020, coord.t[2] */
 };
-
-/* The four scale steps (Ratio16[3], x/y/z) startScaleRamp picks for
- * `scaleStep`: y +1/64, +1/4 (rate > 0; flag 0, nonzero), -1/64, -1/4
- * (rate <= 0); x and z 0/1. */
-extern Ratio16 sScaleStepUpSlow[3];
-extern Ratio16 sScaleStepUpFast[3];
-extern Ratio16 sScaleStepDownSlow[3];
-extern Ratio16 sScaleStepDownFast[3];
-
-/* 1/1, 1/1, 1/1: the scale StageMap__ResetCellScale sets on every cell. */
-extern Ratio16 sScaleOne[3];
 
 /* ---- the pool allocator ------------------------------------------ */
 

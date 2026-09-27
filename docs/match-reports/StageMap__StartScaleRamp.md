@@ -554,3 +554,46 @@ earlier sections' history prose in this and sibling reports (known, pending
 an operator decision; not hand-reverted).
 
 This function: `StageMap__ConfigureRateEntry` -> `StageMap__StartScaleRamp` (`python3 tools/rename.py StageMap__ConfigureRateEntry StageMap__StartScaleRamp`, tier B): picks one of four Ratio16[3] steps (y +1/64, +1/4, -1/64, -1/4 by the sign of the amount and the flag) and sets `scaleRampTicks` to |amount| times the step's y den, so the ramp changes every cell's y scale by the amount. Callers: Entity_b/e/g with (1,1), (-1,0), (4,0).
+
+## Round 96 (track 7, delta)
+
+Moved here from the unit, verbatim (history, derivation or retail addresses a
+source comment no longer carries; the code keeps one `MATCHING:` line):
+
+```c
+/* Picks one of the four static Ratio16[3] scale steps by the sign of
+ * `rate` and by `flag`, then sets scaleRampTicks to |rate| scaled by the chosen
+ * step's y denominator (scaleStep[1].den).
+ *
+ * Two source shapes here are load-bearing and neither is cosmetic:
+ *
+ *  - The `goto` ladder, and its asymmetry. Retail emits TWO stores to
+ *    scaleStep: the rate>0/flag!=0 path has its own (in a `j`'s delay slot at
+ *    0x8004CFDC) and the other three SHARE one (0x8004CFF8). Writing the
+ *    field directly on that one path and going through `table` on the other
+ *    three is what reproduces that split. Byte-exact since round 9.
+ *  - `scale` and `val`. Retail loads the step's y denominator ONCE (`lh $v1,6($v0)`)
+ *    before the sign branch and keeps a single `mflo` after the join, with a
+ *    `mult` in each arm. Caching the load in `scale` and letting an explicit
+ *    if/else assign a local `val` is what defers that `mflo`; the
+ *    default-then-overwrite spelling makes cc1 extract it eagerly, and
+ *    storing to self->scaleRampTicks directly instead of through `val` perturbs the
+ *    table-selection half as well. Both were measured -- round 58 and
+ *    docs/match-reports/StageMap__StartScaleRamp.md.
+ *
+ * `~rate + 1` is retail's own negation (`nor`/`addiu`), not `-rate`. */
+```
+
+Replaced by a short description and a `MATCHING:` line naming the three
+load-bearing shapes.
+
+### Naming
+
+- `flag` -> `fast` (parameter; also the prototype and slot +0x138): nonzero
+  picks the 1/4 step over 1/64. Callers pass (1, 1), (-1, 0), (4, 0).
+- The tables (tools/rename.py, tier A, their contents): `D_8008699C`
+  `sScaleStepUpSlow` (y +1/64), `D_800869A8` `sScaleStepUpFast` (+1/4),
+  `D_800869B4` `sScaleStepDownSlow` (-1/64), `D_800869C0`
+  `sScaleStepDownFast` (-1/4); x and z 0/1 in each. Unit-static data: this
+  unit alone reads them, so their externs moved from include/class_3bb8c.h
+  into class_3bb8c_b.c.

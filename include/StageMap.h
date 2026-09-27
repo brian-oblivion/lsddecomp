@@ -57,7 +57,7 @@
  * window of cells that is drawn: it sets GsDOFF (bit 31 of `attribute`) on
  * the cells of the old `rects`, rebuilds `rects`, the up to four cell
  * rectangles around the target, and clears it on theirs
- * (SetFootprintCellFlag); every other cell stays hidden (the ctor and
+ * (SetFootprintVisible); every other cell stays hidden (the ctor and
  * ClearSlotCells set the bit). forwardAcceptedCommand and
  * applyToSenderFootprint hand a sender's command to every cell under its
  * rectangle (DispatchToRectCells, NotifyGridCell).
@@ -342,12 +342,12 @@ struct StageMap {
     /* +0x074 */ s32 gridSpan;      /* setGridSpan: gDefaultGridSpan = 0xA000 */
     /* +0x078 */ s16 gridHalfCells; /* gridSpan >> 12 = 10 */
     /* +0x07A */ s16 gridCells;     /* gridSpan >> 11 = 20, the row stride */
-    /* +0x07C */ s16 footprintCol; /* BuildFootprintSlots' input: a signed column, clamped into [0,20) */
+    /* +0x07C */ s16 footprintCol; /* BuildFootprintRects' input: a signed column, clamped into [0,20) */
     /* +0x07E */ s16 footprintRow; /* the same, vertical */
     /* +0x080 */ s32 footprintWidth;
     /* +0x084 */ s32 footprintHeight;
     /* +0x088 */ s32 rectCount;     /* how many of rects[] are live */
-    /* +0x08C */ CellRectSet rects; /* BuildFootprintSlots, SetFootprintRect, InitFootprintSlot write; DispatchToRectCells, SetFootprintCellFlag walk */
+    /* +0x08C */ CellRectSet rects; /* BuildFootprintRects, SetFootprintRect, InitFootprintRect write; DispatchToRectCells, SetFootprintVisible walk */
     /* +0x0BC */ Descriptor10Ext targetCell; /* UpdateFootprintTracking: the target's last descriptor; SetTargetAndLoadChunks sets .base; getTargetDescriptor returns &.base */
     /* +0x0E8 */ s32 *acceptedTags; /* setAcceptedTags: a 0-terminated list of class ids ForwardAcceptedCommand accepts */
     /* +0x0EC */ ChunkSlot slots[7];
