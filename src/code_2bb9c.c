@@ -62,7 +62,7 @@ TimImage *New_TimImage(char *name) {
 void TimImage__TimImage(TimImage *self, char *name) {
     GetActiveDataSourceMethods()->ctor((FileResource *)self);
     self->methods = GetTimImageMethods();
-    self->unk48 = 0;
+    self->flag48 = 0;
     self->clutBase = 0;
     if (name != NULL) {
         self->methods->requestLoadFile(self, name);
@@ -124,7 +124,7 @@ void TimImage__NoOpSlot94(void) {}
 /* TimImage +0x098: sets unk48 to 1; unk48's purpose beyond that flag is
  * unestablished (no caller reads it outside the ctor/this setter). */
 void TimImage__SetFlag48(TimImage *self) {
-    self->unk48 = 1;
+    self->flag48 = 1;
 }
 
 /* TimImage +0x09C: describe the TIM held in the buffer. */
