@@ -17,55 +17,21 @@
  * from any state.
  */
 #include "common.h"
+#include <libcd.h>
+#include <libspu.h>
 #include "BasicClass.h"
 #include "CdStream.h"
 
-/* LIBCD.H */
-extern void StSetRing(u32 *ring_addr, u32 ring_size);
-extern void StClearRing(void);
-extern void StUnSetRing(void);
-extern u32 StFreeRing(u32 *base);
-extern int CdSync(int mode, u8 *result);
-extern void *CdSyncCallback(void (*func)(u8 status, u8 *result));
-extern int CdControl(u8 com, u8 *param, u8 *result);
-extern int CdControlF(u8 com, u8 *param);
-extern int CdRead2(u32 mode);
-extern int StGetNext(u32 **addr, u32 **header);
-extern void *CdSearchFile(void *fp, char *name);
-
-/* libc2 (Sony's, linked) */
+/* Defined in other units: func_800270B8 (code_171e0.c) returns the data
+ * directory's name; strcpy and strcat are Sony's libc2; BMemPMgrAlloc is the
+ * game's heap allocator. */
+void *func_800270B8(void);
 extern char *strcpy(char *dest, char *src);
 extern char *strcat(char *dest, char *src);
-
-void *func_800270B8(void); /* code_171e0.c: the data directory string */
-extern s32 gCdStreamAudioMixSet;
-extern char gCdStreamVersionSuffix[]; /* ";1" */
-extern void StSetStream(u32 mode, u32 start_frame, u32 end_frame, void (*func1)(), void (*func2)());
-
 extern void *BMemPMgrAlloc(s32 size);
 
-/* LIBSPU.H */
-typedef struct {
-    s16 left;
-    s16 right;
-} SpuVolume;
-
-typedef struct {
-    SpuVolume volume;
-    s32 reverb;
-    s32 mix;
-} SpuExtAttr;
-
-typedef struct {
-    u32 mask;
-    SpuVolume mvol;
-    SpuVolume mvolmode;
-    SpuVolume mvolx;
-    SpuExtAttr cd;
-    SpuExtAttr ext;
-} SpuCommonAttr;
-
-extern void SpuSetCommonAttr(SpuCommonAttr *attr);
+extern s32 gCdStreamAudioMixSet;
+extern char gCdStreamVersionSuffix[]; /* ";1" */
 
 CdStream *New_CdStream(s32 speed, s32 fps, s32 arg3) {
     CdStream *obj = BMemPMgrAlloc(0x5C);
@@ -119,7 +85,7 @@ s32 CdStream__Open(CdStream *self, char *name, s32 tries) {
         strcpy(&path[1], func_800270B8());
         strcat(path, name);
         strcat(path, gCdStreamVersionSuffix);
-        while (CdSearchFile(&self->file, path) == 0) {
+        while (CdSearchFile((CdlFILE *)&self->file, path) == 0) {
             if (n >= 0 && --tries < 0) {
                 return 1;
             }
