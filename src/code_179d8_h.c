@@ -94,12 +94,12 @@
  * in gCdDriverMethods; FileResource__LoadFile calls it on its success path
  * too, so the give-up paths below close the file). */
 
-extern void printf(const char *fmt, void *arg1);
+extern void printf(const char *fmt, void *arg);
 extern char gCdFileNotFoundFmt[];
 
 /* Forward declaration: BuildCdFilePath is defined later in this file (ROM
  * order), but OpenCdFile (earlier in ROM order) calls it. */
-char *BuildCdFilePath(char *dest, char *suffix);
+char *BuildCdFilePath(char *dest, char *name);
 
 /* func_800270B8 is code_171e0.c's; strcpy and strcat are Sony's
  * (lib/libc2/strcpy.o, lib/libc2/strcat.o, linked since round 34) --
@@ -126,33 +126,33 @@ void NoOp2(void) {}
  * and CSEs it with BuildCdFilePath's argument (one word long, rotated
  * saved registers). Retail recomputes &path inside the loop body --
  * docs/match-reports/OpenCdFile.md. */
-void OpenCdFile(CdDriver *self, char *suffix) {
-    s32 i;
-    CdlFILE statBuf;
+void OpenCdFile(CdDriver *self, char *name) {
+    s32 retries;
+    CdlFILE file;
     char path[0x40];
 
-    i = 0;
+    retries = 0;
     if (self->isOpen == 0) {
-        BuildCdFilePath(path, suffix);
+        BuildCdFilePath(path, name);
     retry:
-        if (CdSearchFile(&statBuf, path) == 0) {
-            if (i++ < 100) {
+        if (CdSearchFile(&file, path) == 0) {
+            if (retries++ < 100) {
                 goto retry;
             }
             printf(gCdFileNotFoundFmt, path);
             return;
         }
         /* CdLoc16 is the project's spelling of CdlLOC's four bytes (FileResource.h). */
-        self->pos = *(CdLoc16 *)&statBuf.pos;
-        self->size = statBuf.size;
+        self->pos = *(CdLoc16 *)&file.pos;
+        self->size = file.size;
         self->isOpen = 1;
     }
 }
 
-char *BuildCdFilePath(char *dest, char *suffix) {
+char *BuildCdFilePath(char *dest, char *name) {
     dest[0] = '\\';
     strcpy(dest + 1, func_800270B8());
-    strcat(dest, suffix);
+    strcat(dest, name);
     strcat(dest, gCdFileVersionSuffix);
     return dest;
 }
@@ -183,26 +183,26 @@ void NoOp3(void) {}
  * slot, a goto loop's branch targets the argument setup itself --
  * docs/match-reports/ReadCdFile.md. `scratch` is never touched; it only
  * sizes the frame (retail's `buf` sits at sp+0x810). */
-s32 ReadCdFile(CdDriver *self, char *arg1, s32 arg2) {
-    s32 hi;
+s32 ReadCdFile(CdDriver *self, void *buf, s32 size) {
+    s32 sectors;
     s32 status;
     char scratch[0x800];
-    u_char buf[0x10];
+    u_char syncResult[0x10];
 
     if (self->isOpen != 0) {
     retry:
-        hi = (u32)arg2 >> 11;
+        sectors = (u32)size >> 11;
         CdControl(CdlSetloc, (u_char *)&self->pos, 0);
     sync:
-        status = CdSync(0, buf);
+        status = CdSync(0, syncResult);
         if (status == 0) {
             goto sync;
         }
         if (status == 5) {
             goto retry;
         }
-        if (hi != 0) {
-            CdRead(hi, (u_long *)arg1, CdlModeSpeed);
+        if (sectors != 0) {
+            CdRead(sectors, (u_long *)buf, CdlModeSpeed);
             do {
                 status = CdReadSync(0, 0);
             } while (status > 0);
