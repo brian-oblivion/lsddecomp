@@ -173,14 +173,14 @@ it is *downstream* of the shape difference above, not the thing to attack.
 ## Best-derived body (315/324 words, 10/324 raw, ins 76 / del 76; preserved for the next attempt)
 
 Declarations used, all of them already present in `src/code_179d8_j_b.c`
-before this round (`Rec34D994`, `SlotE968`, `RecordE978`, `D800902E8Entry`,
+before this round (`Rec34D994`, `SlotE968`, `RecordE978`, `SsScore`,
 `ObjE970`, `D_8008E9D0`, `D_8008EA22`, `D_8008E8C0`, `_svm_sreg_buf`,
 `_svm_sreg_dirty`, `SpuVmVSetUp`).
 
 ```c
 #if 0
 s32 SpuVmSetVol(s32 a0, s32 a1, s32 a2, s32 a3, u16 a4) {
-    D800902E8Entry *e;
+    SsScore *e;
     u8 i;
     s32 result;
     u32 pan1;
@@ -439,8 +439,8 @@ typedef struct {
     u16 unk74;
     u16 unk76;
     u8 pad78[0xAC - 0x78];
-} D800902E8Entry;
-extern D800902E8Entry *_ss_score[];
+} SsScore;
+extern SsScore *_ss_score[];
 
 typedef struct {
     u8 pad0[0x18];
@@ -458,7 +458,7 @@ extern Rec34D994 D_8008D990[];   /* added round 45, in this unit's existing Rec3
 
 ```c
 s32 SpuVmSetVol(s32 a0, s32 a1, s32 a2, s32 a3, u16 a4) {
-    D800902E8Entry *e;
+    SsScore *e;
     s32 i;
     s32 result;
     u32 pan1;
@@ -671,7 +671,7 @@ oracle, no scaffold used):
     regressed hard to 343/324. Reverted -- matches `vmNoiseOn`'s own
     finding that `volatile` on `pan1`/`pan2`-equivalent values ("regressed
     sharply, to 340/311") is the wrong direction on this shape too.
-13. **`D800902E8Entry * volatile e`** (the entry pointer, function-scope):
+13. **`SsScore * volatile e`** (the entry pointer, function-scope):
     regressed to 327/324. Reverted.
 
 None of steps 6, 7, 11, 12, 13 improved on step 8's 324/324; the
@@ -754,7 +754,7 @@ signed 16-bit values). On a match:
 - Calls `SpuVmVSetUp((s16)a1, (s16)a2)` and writes `D_8008EA22 = (u16)a0`
   (write-only here, matching this unit's existing `D_8008EA22` comment
   about which functions write it).
-- Looks up a `D800902E8Entry` via the SAME two-level `_ss_score[lowbyte]
+- Looks up a `SsScore` via the SAME two-level `_ss_score[lowbyte]
   [highbyte]` indexing `vmNoiseOn`/`SpuVmKeyOnNow` already established
   (declared locally here, not shared, per this project's convention).
 - Computes a base level through a THREE-STAGE division chain that is a new
@@ -817,8 +817,8 @@ typedef struct {
     u16 unk74;
     u16 unk76;
     u8 pad78[0xAC - 0x78];
-} D800902E8Entry;
-extern D800902E8Entry *_ss_score[];
+} SsScore;
+extern SsScore *_ss_score[];
 
 typedef struct {
     u8 pad0[0x18];
@@ -836,7 +836,7 @@ extern Rec34D994 D_8008D990[];   /* added to this unit's existing Rec34D994 bloc
 
 ```c
 s32 SpuVmSetVol(s32 a0, s32 a1, s32 a2, s32 a3, u16 a4) {
-    D800902E8Entry *e;
+    SsScore *e;
     s32 i;
     s32 t0;
     u8 e968FromD998;

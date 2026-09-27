@@ -103,8 +103,8 @@ typedef struct {
     u16 unk74;
     u16 unk76;
     u8 pad78[0xAC - 0x78];
-} D800902E8Entry;
-extern D800902E8Entry *_ss_score[];   /* array of pointers, indexed by D_8008EA22's low byte;
+} SsScore;
+extern SsScore *_ss_score[];   /* array of pointers, indexed by D_8008EA22's low byte;
                                            each points to a 0xAC-stride array indexed by the high byte */
 
 extern u8 D_8008EA16;
@@ -150,8 +150,8 @@ typedef struct {
     u16 unk74;
     u16 unk76;
     u8 pad78[0xAC - 0x78];
-} D800902E8Entry;
-extern D800902E8Entry *_ss_score[];
+} SsScore;
+extern SsScore *_ss_score[];
 
 extern u8 D_8008EA16;
 extern u8 D_8008EA19;
@@ -179,7 +179,7 @@ extern u8 D_8008EA20;
 
 void vmNoiseOn(s32 a0) {
     s32 chanRaw;
-    D800902E8Entry *e;
+    SsScore *e;
     u32 pAttack;
     u32 pDecay;
     volatile u32 lvl1;
@@ -324,7 +324,7 @@ void vmNoiseOn(s32 a0) {
    HARD RULE 6 if they'd pin identity, but a plain non-volatile local that
    GCC chooses to spill on its own (rather than being forced to) has not
    been searched for by varying which EXPRESSION computes each value (e.g.
-   introducing the `D800902E8Entry` read as two separate loads instead of
+   introducing the `SsScore` read as two separate loads instead of
    one `e->unk74`/`e->unk76` pair, on the chance that changes which two
    temporaries end up register-starved enough to spill naturally).
 
@@ -470,7 +470,7 @@ fix the scaffold/real-build codegen mismatch first (compare declaration
 order/content between the seed and the real unit), or (b) go back to
 searching for the actual retail-matching spill pair by hand (varying which
 EXPRESSION computes each intermediate, per residue 2's still-untried
-"introduce the `D800902E8Entry` read as two separate loads" idea), which
+"introduce the `SsScore` read as two separate loads" idea), which
 remains the most concrete un-tried lever that doesn't depend on the
 permuter at all.
 

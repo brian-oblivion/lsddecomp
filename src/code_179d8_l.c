@@ -169,9 +169,9 @@ typedef struct {
     u16 unk74;
     u16 unk76;
     u8 pad78[0xAC - 0x78];
-} D800902E8Entry;
+} SsScore;
 
-extern D800902E8Entry *_ss_score[];
+extern SsScore *_ss_score[];
 
 extern u8 D_8008EA16;
 extern u8 D_8008EA19;
@@ -215,7 +215,7 @@ extern u8 D_8008EA10;
 extern s16 D_8008EA26[];
 
 void SpuVmKeyOnNow(s32 a0, s32 a1) {
-    D800902E8Entry *e;
+    SsScore *e;
     s32 prio;
     s32 lvl0;
     u32 lvl1;
@@ -328,7 +328,7 @@ extern D8008E978Entry *D_8008E978;
 
 INCLUDE_ASM("asm/nonmatchings/code_179d8_l", SpuVmDoAllocate);
 
-/* D800902E8Entry, _ss_score and the blend-cascade globals
+/* SsScore, _ss_score and the blend-cascade globals
  * (D_8008EA16/17/19/1A/11/20/22, D_8008E8C0, D_8008E228/22C, D_80090C60/64,
  * D_8008E230/234, _svm_sreg_dirty/98C/9A3) are already declared above, before
  * SpuVmKeyOnNow (ROM-earlier, same shapes) -- reused here, not redeclared. */

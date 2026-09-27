@@ -157,9 +157,9 @@ typedef struct {
     u16 unk74;
     u16 unk76;
     u8 pad78[0xAC - 0x78];
-} D800902E8Entry;
+} SsScore;
 
-extern D800902E8Entry *_ss_score[];
+extern SsScore *_ss_score[];
 
 /* libsnd vmanager's _svm_vh (pinned at this address): the current VAB's
  * header. */
@@ -174,7 +174,7 @@ extern s16 D_8008E8C0;
  * `D_8008E978[_svm_voice[i].unk14]` address plus two loop-invariant
  * hoists (docs/match-reports/SpuVmSetVol.md). Hand-derived. */
 s32 SpuVmSetVol(s32 a0, s32 a1, s32 a2, s32 a3, u16 a4) {
-    D800902E8Entry *e;
+    SsScore *e;
     u8 i;
     s32 result;
     u32 pan1;
