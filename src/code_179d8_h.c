@@ -27,10 +27,10 @@
 /* FileResource and its table come from include/FileResource.h, through code_171e0.h. */
 #include "code_171e0.h"
 
-/* Defined in other units: func_800270B8 (code_171e0.c) returns the data
+/* Defined in other units: GetDataDirectory (code_171e0.c) returns the data
  * directory's name; strcpy and strcat are Sony's libc2. */
 extern void printf(const char *fmt, void *arg);
-extern char *func_800270B8(void);
+extern char *GetDataDirectory(void);
 extern char *strcpy(char *dest, char *src);
 extern char *strcat(char *dest, char *src);
 
@@ -82,7 +82,7 @@ void OpenCdFile(CdDriver *self, char *name) {
 
 char *BuildCdFilePath(char *dest, char *name) {
     dest[0] = '\\';
-    strcpy(dest + 1, func_800270B8());
+    strcpy(dest + 1, GetDataDirectory());
     strcat(dest, name);
     strcat(dest, gCdFileVersionSuffix);
     return dest;

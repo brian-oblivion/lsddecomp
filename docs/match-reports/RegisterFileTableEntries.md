@@ -53,7 +53,7 @@ polarity.
 
 ## What it does
 
-Mode-gated: if `gActiveDataSource == 0x13`, sets `D_8008A850 = 1`, forwards
+Mode-gated: if `gActiveDataSource == 0x13`, sets `gFileTableRegistered = 1`, forwards
 `arg0` to `SetFileTable`, fetches an index via `GetFileTableCount()`, adds it
 to `arg1` and forwards to `SetFileTableCount`, then tail-calls `ResolveFileEntries`
 with `arg0` advanced by `idx * 0x1C` (28 bytes -- computed by retail via
@@ -66,7 +66,7 @@ element). Otherwise returns `1`. All four callees
 ## Final body
 
 ```c
-extern s32 D_8008A850;
+extern s32 gFileTableRegistered;
 extern void SetFileTable(void *arg0);
 extern s32 GetFileTableCount(void);
 extern void SetFileTableCount(s32 arg0);
@@ -76,7 +76,7 @@ s32 RegisterFileTableEntries(void *arg0, s32 arg1) {
     s32 idx;
 
     if (gActiveDataSource == 0x13) {
-        D_8008A850 = 1;
+        gFileTableRegistered = 1;
         SetFileTable(arg0);
         idx = GetFileTableCount();
         SetFileTableCount(idx + arg1);
@@ -113,3 +113,15 @@ the new entries' disc positions via `ResolveFileEntries`; otherwise a no-op
 returning `1`. Mechanics fully derived from the body and the callees'
 already-established names (`SetFileTable`/`GetFileTableCount`/
 `SetFileTableCount`/`ResolveFileEntries`).
+
+## Naming (round 99, charlie, track 7)
+
+| was | now | tier |
+| --- | --- | --- |
+| `D_8008A850` | `gFileTableRegistered` | B |
+
+**Evidence.** It is a `.sdata` word, zero in retail. This function's CD arm
+sets it to 1 before installing the table, and that is the only access in
+the image: `grep -rl D_8008A850 asm/` found only its definition and this
+function. The name says what the one write does. Nothing reads the flag,
+so what it was for is not known (tier B).

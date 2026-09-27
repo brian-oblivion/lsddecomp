@@ -43,10 +43,10 @@
 /* getNextFrame's poll count when `tries` is negative. */
 #define CDSTREAM_NEXT_FRAME_TRIES 8388608
 
-/* Defined in other units: func_800270B8 (code_171e0.c) returns the data
+/* Defined in other units: GetDataDirectory (code_171e0.c) returns the data
  * directory's name; strcpy and strcat are Sony's libc2; BMemPMgrAlloc is the
  * game's heap allocator. */
-void *func_800270B8(void);
+void *GetDataDirectory(void);
 extern char *strcpy(char *dest, char *src);
 extern char *strcat(char *dest, char *src);
 extern void *BMemPMgrAlloc(s32 size);
@@ -116,7 +116,7 @@ s32 CdStream__Open(CdStream *self, char *name, s32 tries) {
             return 0;
         }
         path[0] = '\\';
-        strcpy(&path[1], func_800270B8());
+        strcpy(&path[1], GetDataDirectory());
         strcat(path, name);
         strcat(path, gCdStreamVersionSuffix);
         /* CdStreamFile is CdlFILE's layout (CdStream.h). */

@@ -396,3 +396,26 @@ this one a real instance of the class rather than a misread. See
 `New_GameApplication.md` (23/24) for the other. Both are one instruction, both
 resist reshaping and barriers, and together they are the project's best-posed
 permuter target.
+
+## History moved from src/code_171e0.c (round 99, charlie, track 7)
+
+This block sat at the end of `src/code_171e0.c`, where `strcat` used to be
+defined, until the track-7 pass. It is moved here unchanged:
+
+> ROUND 34: `strcat` (0x80027130, this unit's last function, 42 words) LEFT
+> THIS FILE. It is Sony's -- `libc2/strcat.o`, Psy-Q 3.3, 0xA8 of text
+> covering exactly it -- and the unit's segment now ends at 0x17930 with an
+> `o` entry after it. It had been matched as C since round 8, and the head
+> had noticed at the time that it reads as library code rather than game
+> code ("carries a guard textbook strcat has no reason to"); it was right,
+> and the reclassification is the correction CLAUDE.md asks for, not a
+> regression.
+>
+> The C body and the two load-bearing source shapes it turned on (the
+> post-increment scan, worth 25 words; `return dest` rather than
+> `return NULL` on the NULL-dest path, worth one) are preserved in full in
+> docs/match-reports/strcat.md. Nothing is lost by deleting them here.
+>
+> Callers in this unit (BuildFileName, just above) keep calling `strcat`
+> under that name -- the declaration in include/code_171e0.h still serves,
+> and now resolves to the linked object.

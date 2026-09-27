@@ -3123,3 +3123,7 @@ SsUtVibrateOff = 0x8002E300; // type:func
 // index by semitone * 16 + fine step. Anchored by _svm_sreg at .data+0 and
 // the object's .data bytes found at 0x8006DAD4. Kept as its placeholder.
 D_8006DAD8 = 0x8006DAD8;
+SetDataDirectory = 0x800270AC; // type:func
+GetDataDirectory = 0x800270B8; // type:func
+gDataDirectory = 0x8008A854;
+gFileTableRegistered = 0x8008A850;

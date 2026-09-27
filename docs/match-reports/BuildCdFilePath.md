@@ -9,14 +9,14 @@ Unit: `code_179d8_h`. Runner: echo, round 17 (second assignment).
 ```c
 char *BuildCdFilePath(char *dest, char *suffix) {
     dest[0] = '\\';
-    strcpy(dest + 1, func_800270B8());
+    strcpy(dest + 1, GetDataDirectory());
     strcat(dest, suffix);
     strcat(dest, gCdFileVersionSuffix);
     return dest;
 }
 ```
 
-with `extern char *func_800270B8(void);`, `extern char *strcpy(char *dest,
+with `extern char *GetDataDirectory(void);`, `extern char *strcpy(char *dest,
 char *src);`, and `extern char gCdFileVersionSuffix[];` declared locally.
 
 Byte-exact, 26/26 words.
@@ -24,7 +24,7 @@ Byte-exact, 26/26 words.
 ## Notes
 
 Builds a CD-ROM path string: a leading `\` (0x5C), the directory/disc-label
-string `func_800270B8()` returns (`code_171e0.c`, still `func_`-named,
+string `GetDataDirectory()` returns (`code_171e0.c`, still `func_`-named,
 carved), the caller-supplied filename `suffix`, and a fixed `";1"` suffix
 from `gCdFileVersionSuffix` -- the ISO9660 file-version-number convention
 (`FILE.EXT;1`), strong confirmation of this unit's CD-ROM theme alongside
@@ -57,5 +57,5 @@ pure string-building leaf whose mechanics are its whole purpose. Called by
 Parameter `suffix` -> `name`, tier A: both callers (`OpenCdFile`,
 `CdDriver__Open`/`ResolveFileEntries`) pass a file name, and the body builds
 `"\\" + <data directory> + name + ";1"`; the suffix is
-`gCdFileVersionSuffix`. `func_800270B8` (code_171e0.c) is the data directory
+`gCdFileVersionSuffix`. `GetDataDirectory` (code_171e0.c) is the data directory
 getter; its name is proposed, not applied (not this unit's function).

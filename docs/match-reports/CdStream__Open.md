@@ -10,7 +10,7 @@ ground, no prior attempt. Byte-exact on build 4; whole-image SHA1 green.
 - **Where:** slot +0x044 of gCdStreamMethods (open a stream file by name).
 - **What:** only when idle (state 0): fail (return 1) with no ring set;
   return 0 if another stream is active. Otherwise build
-  `"\" + func_800270B8() + name + ";1"` in a 0x20-byte stack buffer and retry
+  `"\" + GetDataDirectory() + name + ";1"` in a 0x20-byte stack buffer and retry
   `CdSearchFile(&self->loc, path)` (a negative `tries` retries forever;
   timeout returns 1). On success: +0x40 = file size (`CdlFILE.size`, +0x10)
   / +0x38; `gCdStreamAudioMixSet = SetupCdStreamAudio(self)` (SPU CD-volume setup);
@@ -31,7 +31,7 @@ ground, no prior attempt. Byte-exact on build 4; whole-image SHA1 green.
   here as `*(u32 *)&self->loc[4]`, left untyped in the shared local view
   because the ten earlier methods pass `loc` as a `u8 *`. Unit-local
   externs: `CdSearchFile`, `strcpy`/`strcat` (Sony libc2, linked),
-  `func_800270B8` (code_171e0.c), `gCdStreamAudioMixSet` (s32, sdata), `gCdStreamVersionSuffix`
+  `GetDataDirectory` (code_171e0.c), `gCdStreamAudioMixSet` (s32, sdata), `gCdStreamVersionSuffix`
   (`char[]`, the rodata-style `";1"` in sdata, referenced as a symbol and
   never retyped). Added a prototype for `SetupCdStreamAudio`. Unit header comment
   updated: all 18 methods matched.
@@ -56,7 +56,7 @@ s32 CdStream__Open(CdStreamObj *self, char *name, s32 tries) {
             return 0;
         }
         path[0] = '\\';
-        strcpy(&path[1], func_800270B8());
+        strcpy(&path[1], GetDataDirectory());
         strcat(path, name);
         strcat(path, gCdStreamVersionSuffix);
         while (CdSearchFile(self->loc, path) == 0) {
