@@ -283,7 +283,9 @@ void ObjM__NoOpSlot7C(void) {}
 /* src/code_4cd08.c's; no header declares it. It keeps the stage, the
  * StageMap, the DreamSys (gDreamAuxWorld), the sound and the FrameClock for
  * the dream's aux entities. */
-extern void SetDreamAuxWorld(s32 stage, s32 grid, DreamSys *world, s32 sound, s32 clock);
+struct FrameClock;
+extern void SetDreamAuxWorld(s32 stage, StageMap *stageMap, DreamSys *world,
+                             struct VabStreamObj *sound, struct FrameClock *frameClock);
 
 /* Added to the viewport's projection distance; 0 in the image and never
  * written. */
@@ -309,7 +311,8 @@ void ObjM__SetupSceneStyle(ObjM *self) {
     vp->methods->attachViewChild(vp, (BasicClass *)self->dreamSys, &gObjMViewPoint,
                                  &gObjMViewRefPoint, 0);
 
-    SetDreamAuxWorld(self->stage, (s32)self->unk14, self->dreamSys, (s32)self->sound, (s32)self->unk10);
+    SetDreamAuxWorld(self->stage, (StageMap *)self->unk14, self->dreamSys,
+                     (struct VabStreamObj *)self->sound, (struct FrameClock *)self->unk10);
 
     rig = (StageMap *)self->unk14;
     self->methods->addChild(self, (BasicClass *)rig);

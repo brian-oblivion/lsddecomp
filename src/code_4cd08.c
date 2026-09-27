@@ -86,15 +86,16 @@ extern struct FrameClock *gDreamAuxFrameClock;
 
 void SetTeleportsEnabled(s32 stage);
 
-void SetDreamAuxWorld(s32 stage, s32 stageMap, DreamSys *world, s32 sound, s32 frameClock) {
+void SetDreamAuxWorld(s32 stage, StageMap *stageMap, DreamSys *world, struct VabStreamObj *sound,
+                      struct FrameClock *frameClock) {
     DreamAuxSlot *slot = gDreamAuxSlots;
     u32 i;
 
     gDreamAuxStage = stage;
-    gDreamAuxStageMap = (StageMap *)stageMap;
+    gDreamAuxStageMap = stageMap;
     gDreamAuxWorld = world;
-    gDreamAuxSound = (struct VabStreamObj *)sound;
-    gDreamAuxFrameClock = (struct FrameClock *)frameClock;
+    gDreamAuxSound = sound;
+    gDreamAuxFrameClock = frameClock;
 
     for (i = 0; i < ARRAY_COUNT(gDreamAuxSlots); i++) {
         s32 desc[4]; /* New_Entity's descriptor: word +0x00C the ModelData */
