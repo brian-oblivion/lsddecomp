@@ -123,7 +123,7 @@ void TimImage__NoOpSlot94(void) {}
 
 /* TimImage +0x098: sets unk48 to 1; unk48's purpose beyond that flag is
  * unestablished (no caller reads it outside the ctor/this setter). */
-void TimImage__func_8003B5E4(TimImage *self) {
+void TimImage__SetFlag48(TimImage *self) {
     self->unk48 = 1;
 }
 
