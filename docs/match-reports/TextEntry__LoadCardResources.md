@@ -21,7 +21,7 @@ extern const char sCardPathPrefix[]; /* "CARD\\" */
 extern const char sTimExt[]; /* ".TIM" */
 extern s32 gTextEntryPanelRect; /* 3-word opaque block, New_ScreenSprite's arg1, address-only here */
 extern s32 gTextEntryTextColor; /* opaque block, slotB8's arg1, address-only here */
-extern s32 D_8008AACC; /* opaque block, self->unk48's slot4C arg2, address-only here */
+extern s32 gTextEntryPanelPos; /* opaque block, self->unk48's slot4C arg2, address-only here */
 extern s32 D_8008AAD4; /* opaque block, self->unk44's slot4C arg2, address-only here */
 extern s32 D_8008AADC; /* opaque block, self->unk40's slot4C arg2, address-only here */
 
@@ -47,7 +47,7 @@ void TextEntry__LoadCardResources(Obj86ED0 *self, void *arg1)
     handle1->methods->slot78(handle1);
     self->unk48 = New_ScreenSprite(handle1, (void *)&gTextEntryPanelRect, 0);
     handle1->methods->release(handle1);
-    self->unk48->methods->slot4C(self->unk48, arg1, (void *)&D_8008AACC);
+    self->unk48->methods->slot4C(self->unk48, arg1, (void *)&gTextEntryPanelPos);
 
     handle2 = New_TimImage(BuildFileName(path, sStrFontIcon, dir, ext));
     handle2->methods->slot78(handle2);
@@ -153,7 +153,7 @@ three-value swap was resolved by touching only the non-persistent one.
 
 ## Track 4
 
-2026-09-25, round 84 (charlie): The class `New_D8006ED4C` constructs is unified as ScreenSprite in `include/ScreenSprite.h`; the unit includes it and its local extern is gone. The call reads `self->unk48 = (ChildObj86ED0 *)New_ScreenSprite(handle1, (SpriteRect *)&gTextEntryPanelRect, 0)`: gTextEntryPanelRect is the rect (words 0, 224, 120), and unk48's +0x04C call passes the screen position D_8008AACC = (-70, -60). Image byte-identical.
+2026-09-25, round 84 (charlie): The class `New_D8006ED4C` constructs is unified as ScreenSprite in `include/ScreenSprite.h`; the unit includes it and its local extern is gone. The call reads `self->unk48 = (ChildObj86ED0 *)New_ScreenSprite(handle1, (SpriteRect *)&gTextEntryPanelRect, 0)`: gTextEntryPanelRect is the rect (words 0, 224, 120), and unk48's +0x04C call passes the screen position gTextEntryPanelPos = (-70, -60). Image byte-identical.
 
 2026-09-26, round 86 (bravo): CharSprite (class 0x1144, formerly D_8006EC74) is unified in `include/CharSprite.h`. The local `extern ChildObj86ED0 *New_CharSprite(ChildObj86ED0 *, s32)` is gone; the unit includes the header and casts the result to `unk40`'s `ChildObj86ED0 *`, as it does for New_ScreenSprite. The 0x5F cell it asks for on FONTICON.TIM is '_', one of the facts behind the class name. Image byte-identical.
 
