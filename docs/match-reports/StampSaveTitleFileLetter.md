@@ -19,13 +19,13 @@ extern u8 *gSaveTitleGlyphs;
 
 typedef struct {
     s8 raw[6];
-} Buf6_3bb8c_g;
+} FullWidthChars3;
 typedef struct {
     s8 raw[12];
-} Buf12_3bb8c_g;
+} FullWidthChars6;
 typedef struct {
     s8 a, b;
-} Pair2_3bb8c_g;
+} FullWidthChar;
 
 s32 StampSaveTitleFileLetter(s32 arg0, s32 arg1)
 {
@@ -38,17 +38,17 @@ s32 StampSaveTitleFileLetter(s32 arg0, s32 arg1)
     if (src != NULL) {
         t0 = ((u32)(src[0xE] - 0x38) < 2) ? 0xE : 0xD;
 
-        *(Pair2_3bb8c_g *)(self + 0x18) = *(Pair2_3bb8c_g *)(gSaveTitleGlyphs + 0x1E);
-        *(Buf12_3bb8c_g *)(self + 0x6) = *(Buf12_3bb8c_g *)(gSaveTitleGlyphs + 0x1E);
+        *(FullWidthChar *)(self + 0x18) = *(FullWidthChar *)(gSaveTitleGlyphs + 0x1E);
+        *(FullWidthChars6 *)(self + 0x6) = *(FullWidthChars6 *)(gSaveTitleGlyphs + 0x1E);
 
         idx = atoi((char *)(src + t0)) - 1;
         p = gSaveTitleGlyphs + idx * 2;
-        *(Pair2_3bb8c_g *)(self + 0x8) = *(Pair2_3bb8c_g *)p;
+        *(FullWidthChar *)(self + 0x8) = *(FullWidthChar *)p;
         return (s32)p;
     } else {
         u8 *q = gSaveTitleGlyphs;
 
-        *(Buf6_3bb8c_g *)(self + 0x6) = *(Buf6_3bb8c_g *)(q + 0x1E);
+        *(FullWidthChars3 *)(self + 0x6) = *(FullWidthChars3 *)(q + 0x1E);
         return (s32)q;
     }
 }
@@ -66,13 +66,13 @@ is pointer arithmetic. Cast `arg0`/`arg1` to `u8 *` locally instead.
 alignment is 1, which is what makes GCC use the unaligned `lwl`/`lwr` word
 chunk(s) retail has, with any leftover non-multiple-of-4 bytes as
 individual loads/stores rather than a merged halfword.
-- `Pair2_3bb8c_g` (2 bytes) — used twice: copying the raw 2-byte prefix
+- `FullWidthChar` (2 bytes) — used twice: copying the raw 2-byte prefix
   `gSaveTitleGlyphs[0x1E..0x20)` into `self[0x18..0x1A)`, and copying a 2-byte
   entry out of a `gSaveTitleGlyphs`-relative lookup table (indexed by
   `atoi(...)  - 1`, doubled) into `self[0x8..0xA)`.
-- `Buf12_3bb8c_g` (12 bytes, exactly 3 word chunks, no tail) — the `src !=
+- `FullWidthChars6` (12 bytes, exactly 3 word chunks, no tail) — the `src !=
   NULL` path's bulk copy `self[0x6..0x12) = gSaveTitleGlyphs[0x1E..0x2A)`.
-- `Buf6_3bb8c_g` (6 bytes, one word chunk + 2 tail bytes) — the `src ==
+- `FullWidthChars3` (6 bytes, one word chunk + 2 tail bytes) — the `src ==
   NULL` path's shorter copy `self[0x6..0xC) = gSaveTitleGlyphs[0x1E..0x24)`,
   identical shape to `FormatNumberIntoBuffer`'s own struct this round.
 
@@ -144,10 +144,10 @@ screen is not shown by a consumer). `gSaveTitleGlyphs`, tier A, by what it
 holds.
 
 Locals: `arg0`/`arg1` -> `titleAddr`/`fileNameAddr`, `self` -> `title`
-(now `Pair2_3bb8c_g *`, one full-width character per element, so the raw
+(now `FullWidthChar *`, one full-width character per element, so the raw
 byte offsets 0x18/0x6/0x8 are indices 12/3/4), `src` -> `fileName`
 (`char *`), `t0` -> `numberPos`, `idx` -> `letter`, `p` -> `glyph`, `q` ->
-`glyphs`; `gSaveTitleGlyphs` declared `Pair2_3bb8c_g *` (offset 0x1E is
+`glyphs`; `gSaveTitleGlyphs` declared `FullWidthChar *` (offset 0x1E is
 glyph 15). The positions are unit-local `#define`s: SAVE_TITLE_LETTER_FIELD
 3, SAVE_TITLE_LETTER 4, SAVE_TITLE_PADDING 12, SAVE_TITLE_GLYPH_SPACES 15,
 SAVE_FILE_NAME_NUMBER 13. Image byte-identical at every step.
@@ -186,3 +186,31 @@ Comments moved out of the source (verbatim):
 
 The `## Naming` section above (tier B, "template copy") is superseded by
 this one.
+
+## Track 6 (2026-09-27, round 96)
+
+The three copy types, named for what they hold (tools/renametype.py, image
+byte-identical at every step):
+
+- `Pair2_3bb8c_g` -> `FullWidthChar`, tier A: every `gSaveTitleGlyphs`
+  element and every title position is one 2-byte full-width Shift-JIS
+  character (the data measured in round 95, above). Fields `a`, `b` ->
+  `lead`, `trail` (the SJIS lead and trail bytes); no code accesses either,
+  every use is a whole-struct copy.
+- `Buf6_3bb8c_g` -> `FullWidthChars3`, tier A: three full-width characters,
+  the title's letter field (characters 3..5) blanked from three spaces.
+  Now `FullWidthChar chars[3]` in place of `s8 raw[6]`.
+- `Buf12_3bb8c_g` -> `FullWidthChars6`, tier A: six full-width characters,
+  "   Day" into characters 3..8. Now `FullWidthChar chars[6]` in place of
+  `s8 raw[12]`.
+
+Alignment stays 1 (all-`s8` leaves), which is the whole reason these are
+structs: the source keeps its one `MATCHING:` line. No existing type in
+`include/` or `src/` named a full-width character (grepped for
+Sjis/FullWidth/Glyph), so these are new and stay unit-local.
+
+`class_3bb8c_c`'s `Buf6_3bb8c_c` (`s8 a..f`, the formatted day number
+copied into the same title at +0x12, characters 9..11) is the same record
+as `FullWidthChars3`: a later job, left untouched here. If a second unit
+takes these types they move to the header that owns the save title
+(proposed: `include/TitleMenu.h`, which describes the SJIS title buffer).
