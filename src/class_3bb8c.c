@@ -376,17 +376,8 @@ void StageMap__OnNotifyTag1(StageMap *self, void *arg1, s32 mode) {
  * records reached only from here. Kept in this .c, not class_3bb8c.h: none
  * of the 11 sibling units sharing that header touch these. */
 
-/* PlacementGrid__ResolveEntry's non-0/non-(-1) return value (what
- * LinkResource__GetModel returns): a TmdModel (include/TmdModel.h), read
- * only for its +0x010, TmdModel's `object`. A view of TmdModel, left for
- * that class (round 89, LinkResource's unification did not retype it). */
-typedef struct LinkResEntry {
-    u8 pad0[0x10];
-    s32 unk10; /* +0x010 */
-} LinkResEntry;
-
 typedef struct BE54LoadReq {
-    s32 field0;
+    void *buffer; /* +0x000, New_LinkResource's descriptor's buffer (code_33808.c's Src6F240) */
     u8 pad4[0xC];
 } BE54LoadReq;
 
@@ -422,7 +413,7 @@ void StageMap__PopulateSlotCells(StageMap *self, ChunkSlot *entry) {
         res->methods->release(res);
     }
     info2 = hdr->buffer;
-    req.field0 = (s32)info2 + info2->placementsOffset + info2->placementsSize;
+    req.buffer = (u8 *)info2 + info2->placementsOffset + info2->placementsSize;
     target->linkResource = New_LinkResource((struct Src6F240 *)&req);
     outBuf.next = 0;
 
@@ -451,8 +442,9 @@ void StageMap__PopulateSlotCells(StageMap *self, ChunkSlot *entry) {
                 slot = (GridCell **)(base + off1);
             }
             (*slot)->model = (void *)idxVal;
-            (*slot)->tmd = ((LinkResEntry *)(*slot)->model)->unk10;
-            GsLinkObject4(((LinkResEntry *)(*slot)->model)->unk10, (GsDOBJ2 *)&(*slot)->attribute, 0);
+            (*slot)->tmd = (s32)((TmdModel *)(*slot)->model)->object;
+            GsLinkObject4((u_long)((TmdModel *)(*slot)->model)->object,
+                          (GsDOBJ2 *)&(*slot)->attribute, 0);
             gpu = (*slot)->coord2;
             /* Keeps the outBuf.x/.y/.z stack loads below the load of
              * (*slot)->coord2; without it GCC hoists all three above it. */

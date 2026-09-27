@@ -876,3 +876,23 @@ earlier sections' history prose in this and sibling reports (known, pending
 an operator decision; not hand-reverted).
 
 This function: `StageMap__LoadElementResources` -> `StageMap__PopulateSlotCells` (`python3 tools/rename.py StageMap__LoadElementResources StageMap__PopulateSlotCells`, tier B): links the slot's loaded chunk header's placements and models into its cells.
+
+## Track 7 (2026-09-27, round 95, charlie)
+
+Unit-local views. `LinkResEntry` is gone: it was a view of TmdModel read only
+for its +0x010, and the body now reads `((TmdModel *)(*slot)->model)->object`
+(include/TmdModel.h), cast to `s32` for SceneNode's `tmd` and to `u_long` for
+Sony's `GsLinkObject4`. The comment that stood on it, moved here: *"PlacementGrid__ResolveEntry's
+non-0/non-(-1) return value (what LinkResource__GetModel returns): a TmdModel
+(include/TmdModel.h), read only for its +0x010, TmdModel's `object`. A view of
+TmdModel, left for that class (round 89, LinkResource's unification did not
+retype it)."* `BE54LoadReq.field0` is `buffer` (tier A: it is the first word of
+New_LinkResource's descriptor, code_33808.c's `Src6F240 { void *buffer; char
+*name; }`, and holds the address of the chunk header's model block). The type
+keeps its placeholder name (track 6); its 0x10 size is kept, not measured as
+load-bearing. Byte-identical.
+
+Sony's `GsLinkObject4` now comes from `<libgs.h>` (the unit takes libgte,
+libgpu, libgs after common.h) instead of a local `(s32, void *, s32)`
+prototype; the cell is passed as `(GsDOBJ2 *)&(*slot)->attribute`, SceneNode's
++0x010..+0x01C being GsDOBJ2's attribute/coord2/tmd/id. Byte-identical.
