@@ -62,6 +62,8 @@ First build. The redundant `sw zero, 0x30` on the second failure is an explicit 
 ## Naming
 
 - **ModelData__BuildResources**, tier A. Slot +0x078: builds the LinkResource (tmd) and TodSet (tods) sub-objects over the buffer's two sub-blocks.
+- **ResourceSourceArgs** (type, was `Req44858`), tier B (round 95, bravo, track 6). The 12-byte local SetVec3 fills with (buffer, name, mode) and that is passed cast to `ResourceSource *` to New_LinkResource, New_TodSet (here), New_ModelData (TriggerWorld__BuildResources) and New_Tod (TodSet__BuildTods). Only `buffer` is written directly; the name and mode words are written only by SetVec3 and never read by a ctor, so they stay padding. include/code_4cd08.h's `DreamAuxLoadReq` is the same three words in the same role (InitDreamAux: SetVec3 then New_ModelData) but names word 0 `flag`; unifying the two is proposed, not applied (another unit's header).
+- **ModelDataHeader** (type, was `Buf44858`), tier A (round 95, bravo, track 6). ModelData's buffer as this body reads it: the word at +0x08 is the offset of the TMD New_LinkResource is built over, and +0x0C is where New_TodSet's data starts. Words +0x00 and +0x04 are read by no code (padding). The buffer is a .MOM file by the one file-name caller (InitDreamAux: `ETC\SYMSPY.MOM`), but the name is the class's so it claims no more than the code.
 
 ## Track 4
 

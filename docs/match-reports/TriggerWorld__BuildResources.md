@@ -63,6 +63,7 @@ First build. The loop pointer walks `buf->entries` while the offset is re-read t
 ## Naming
 
 - **TriggerWorld__BuildResources**, tier A. Slot +0x078: builds a ModelData (not owning) over each sub-block of the buffer's counted offset table, counting them at +0x38.
+- **SubBlockTable** (type, was `CountedBuf33808`), tier B (round 95, bravo, track 6). TriggerWorld's and TodSet's buffer as their bodies read it: `count` at +0x04, then `entries[count]`, each an offset from the buffer's start to a sub-block, which this body (ModelData) and TodSet__BuildTods (Tod) overwrite in place with the object built over it; Finalize/ReleaseResources release them from the same array, GetModelData indexes it, and TodSet__ScanPackets reads the TOD that follows it. The word at +0x00 is read by no code (padding). Tier B: what the game keeps in these containers is not established here.
 
 ## Track 4
 

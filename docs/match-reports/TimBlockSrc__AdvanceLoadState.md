@@ -108,6 +108,8 @@ Second build (the first was already 183/183; the second only added local Lock/Un
 ## Naming
 
 - **TimBlockSrc__AdvanceLoadState**, tier B. setFlag override implementing the two-state (9 header-read, 10 block-read) loader state machine described in the function's own header comment.
+- **TimBlockHeader** (type, was `Buf434DC`), tier A (round 95, bravo, track 6). The 36-byte header this body copies out of the first sector: `count` bounds the block loop, `offsets[n]` is what each block read seeks to, and `sizes[]` is what FindMaxTimBlockSize maximises to size the block buffer. A TimBlockSrc's file header, named for the class that reads it.
+- **TimBlockHeaderBytes** (type, was `Hdr43200`), tier A (round 95, bravo, track 6). The same 36 bytes as a byte array: the ctor allocates `sizeof` it for the header buffer and this body copies the header through it (the MATCHING line: the byte-aligned copy is what gives retail's runtime alignment test). Kept separate from TimBlockHeader for that reason.
 
 ## Track 4 (2026-09-25, round 83, bravo)
 
