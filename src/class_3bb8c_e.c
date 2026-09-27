@@ -22,7 +22,7 @@
  *     TaskObjF__FormatCard, TaskObjF__ProbeMemcardFile,
  *     TaskObjF__FindUnusedMemcardName, TaskObjF__CollectExistingMemcardFiles,
  *     TaskObjF__CheckCardSpace
- * -- and the other six (`TaskObjF__ClearResourceSlots`,
+ * -- and the other six (`TaskObjF__ClearLinks`,
  * `TaskObjF__CardInfoAndLoadStatus`, `TaskObjF__CardInfoStatus`,
  * `TaskObjF__CardLoadStatus`, `TaskObjF__OpenAndReadMemcardFile`,
  * `TaskObjF__ProbeCardFreeSpace`) are private helpers the slotted functions
@@ -62,7 +62,7 @@ extern void *BMemPMgrFree(void *ptr);
 extern char *strcpy(char *dest, char *src);
 extern char *strcat(char *dest, char *src);
 
-void TaskObjF__ClearResourceSlots(TaskObjF *self) {
+void TaskObjF__ClearLinks(TaskObjF *self) {
     self->inputSource = NULL;
     self->tickSource = NULL;
     self->spriteParent = NULL;

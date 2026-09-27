@@ -324,6 +324,6 @@ void TaskObjF__TaskObjF(TaskObjF *self, s32 padEnable, s32 cardSlot) {
         StartCARD();
         _bu_init();
     }
-    TaskObjF__ClearResourceSlots(self);
+    TaskObjF__ClearLinks(self);
     self->methods->setCardSlot(self, cardSlot);
 }

@@ -213,7 +213,7 @@ extern TaskObjFMethods *GetTaskObjFMethods(void); /* returns &gTaskObjFMethods *
 /* The class's own methods, in address order. */
 TaskObjF *New_TaskObjF(s32 padEnable, s32 cardSlot);
 void TaskObjF__TaskObjF(TaskObjF *self, s32 padEnable, s32 cardSlot);
-void TaskObjF__ClearResourceSlots(TaskObjF *self);
+void TaskObjF__ClearLinks(TaskObjF *self);
 void TaskObjF__Finalize(TaskObjF *self);
 void TaskObjF__AddChild(TaskObjF *self, BasicClass *child);
 void TaskObjF__RemoveChild(TaskObjF *self, BasicClass *child);
