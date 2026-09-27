@@ -703,10 +703,17 @@ def collect_phase2(st, info, t5_status, classes, units_meta):
     types = {n: (why, list(fs)) for n, (why, fs) in rd["types"].items() if n not in parked6}
     flagged = {n: w for n, w in t6.get("flagged", {}).items() if n not in parked6}
     if flagged:
+        # A flag is the head's decision and wins over a pattern's reason for
+        # the same name: an unparked placeholder flagged `--after` must reach
+        # the flagged-job path (round 96: SceneNodeSub14 and its siblings).
+        for n in set(flagged) & set(types):
+            types[n] = (f"flagged: {flagged[n]}", types[n][1])
         for p in readability.game_headers() + list(srcpath.src_files()):
             rel = p.relative_to(ROOT).as_posix()
             for n in readability.type_names(p.read_text(errors="replace")) & set(flagged):
-                types.setdefault(n, (f"flagged: {flagged[n]}", []))[1].append(rel)
+                fs = types.setdefault(n, (f"flagged: {flagged[n]}", []))[1]
+                if rel not in fs:
+                    fs.append(rel)
     depth = {}
 
     def dep(c):
