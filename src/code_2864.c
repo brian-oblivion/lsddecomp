@@ -52,7 +52,7 @@ extern void SortTmdObject(GsDOBJ2 *obj, GsOT *ot, s32 otShift, void *scratch);
  *  - `pos` and the unused `scr` live in the world-space-sprite block: that
  *    puts them ABOVE child/cursor in the frame, and `scr` is the 8 bytes of
  *    frame retail reserves and never touches.
- *  - `b`/`n` are separate copies of `node` (retail's move a3/a1/a0,s2);
+ *  - `box`/`screenSprite` are separate copies of `node` (retail's move a3/a1/a0,s2);
  *    the ratio ternaries are one store each (the second copy of the store
  *    is the delay-slot filler's); `~v + 1` is retail's nor/addiu negate.
  */
@@ -64,11 +64,11 @@ void Viewport__DrawNode(Viewport *self, SceneNode *node) {
     SceneNode *child;
     BasicClassListNode *cursor;
     s32 dirty;
-    GsCOORDINATE2 *c;
-    s16 *m;
+    GsCOORDINATE2 *coord2;
+    s16 *elem;
     s16 *end;
-    u32 *sc;
-    u32 tag;
+    u32 *scale;
+    u32 classId;
 
     dirty = 0;
     ls = &lsBuf;
@@ -77,21 +77,21 @@ void Viewport__DrawNode(Viewport *self, SceneNode *node) {
         return;
     }
 
-    c = node->coord2;
-    if (c->flg == 0) {
-        m = &c->coord.m[0][0];
-        sc = (u32 *)&c->param->scale; /* MATCHING: read unsigned (srl) */
+    coord2 = node->coord2;
+    if (coord2->flg == 0) {
+        elem = &coord2->coord.m[0][0];
+        scale = (u32 *)&coord2->param->scale; /* MATCHING: read unsigned (srl) */
         dirty = 1;
-        end = &c->coord.m[3][0];
-        RotMatrix(&c->param->rotate, &c->coord);
-        while (m < end) {
-            *m = (*m * *sc++) >> 12;
-            m++;
-            *m = (*m * *sc++) >> 12;
-            m++;
-            *m = (*m * *sc++) >> 12;
-            m++;
-            sc -= 3;
+        end = &coord2->coord.m[3][0];
+        RotMatrix(&coord2->param->rotate, &coord2->coord);
+        while (elem < end) {
+            *elem = (*elem * *scale++) >> 12;
+            elem++;
+            *elem = (*elem * *scale++) >> 12;
+            elem++;
+            *elem = (*elem * *scale++) >> 12;
+            elem++;
+            scale -= 3;
         }
     }
 
@@ -118,21 +118,21 @@ void Viewport__DrawNode(Viewport *self, SceneNode *node) {
         }
     } while (cursor != NULL);
 
-    tag = node->methods->header;
-    if ((tag & 0xFF) == 0x54) {
+    classId = node->methods->header;
+    if ((classId & 0xFF) == 0x54) {
         GsSortBg((GsBG *)&((BgLayer *)node)->bgAttribute, self->ot[self->otIndex],
                  (1 << self->otLength) - 1);
-    } else if ((tag & 0xFF) == 0x64) {
-        BoxFill *b = (BoxFill *)node;
-        if (b->relative) {
-            b->boxX = ((self->screenSize.width >> 1) * b->posX) / 100;
-            b->boxY = ((self->screenSize.height >> 1) * b->posY) / 100;
+    } else if ((classId & 0xFF) == 0x64) {
+        BoxFill *box = (BoxFill *)node;
+        if (box->relative) {
+            box->boxX = ((self->screenSize.width >> 1) * box->posX) / 100;
+            box->boxY = ((self->screenSize.height >> 1) * box->posY) / 100;
         } else {
-            b->boxX = b->posX;
-            b->boxY = b->posY;
+            box->boxX = box->posX;
+            box->boxY = box->posY;
         }
-        GsSortBoxFill((GsBOXF *)&b->boxAttribute, self->ot[self->otIndex], b->pri);
-    } else if ((tag & 0xFF) != 0x44) {
+        GsSortBoxFill((GsBOXF *)&box->boxAttribute, self->ot[self->otIndex], box->pri);
+    } else if ((classId & 0xFF) != 0x44) {
         GsGetLws(node->coord2, lw, ls);
         GsSetLightMatrix(lw);
         GsSetLsMatrix(ls);
@@ -140,19 +140,23 @@ void Viewport__DrawNode(Viewport *self, SceneNode *node) {
             SortTmdObject((GsDOBJ2 *)&node->attribute, self->ot[self->otIndex], 14 - self->otLength,
                           (void *)0x1F800000);
         }
-    } else if ((tag & 0xFFF) == 0x144) {
-        ScreenSprite *n = (ScreenSprite *)node;
-        GsSPRITE *sp = (GsSPRITE *)&n->sprite;
-        s32 *size = &self->screenSize.width;
-        sp->x = (n->screenPos.x != 0) ? ((size[0] >> 1) * 100) / (10000 / n->screenPos.x) : 0;
-        sp->y = (n->screenPos.y != 0) ? ((size[1] >> 1) * 100) / (10000 / n->screenPos.y) : 0;
-        sp->x += sp->mx;
-        sp->y += sp->my;
-        GsSortSprite(sp, self->ot[self->otIndex], 0);
+    } else if ((classId & 0xFFF) == 0x144) {
+        ScreenSprite *screenSprite = (ScreenSprite *)node;
+        GsSPRITE *gsSprite = (GsSPRITE *)&screenSprite->sprite;
+        s32 *screen = &self->screenSize.width;
+        gsSprite->x = (screenSprite->screenPos.x != 0)
+                          ? ((screen[0] >> 1) * 100) / (10000 / screenSprite->screenPos.x)
+                          : 0;
+        gsSprite->y = (screenSprite->screenPos.y != 0)
+                          ? ((screen[1] >> 1) * 100) / (10000 / screenSprite->screenPos.y)
+                          : 0;
+        gsSprite->x += gsSprite->mx;
+        gsSprite->y += gsSprite->my;
+        GsSortSprite(gsSprite, self->ot[self->otIndex], 0);
     } else {
         VECTOR pos;
         SVECTOR scr; /* never used; reserves retail's 8 unused frame bytes */
-        Sprite *n;
+        Sprite *worldSprite;
 
         GsGetLs(node->coord2, ls);
         if (ls->t[2] < 1 || ls->t[2] > 0xFFFF) {
@@ -172,18 +176,18 @@ void Viewport__DrawNode(Viewport *self, SceneNode *node) {
             pos.vx = (pos.vx * self->projH) / pos.vz;
             pos.vy = (pos.vy * self->projH) / pos.vz;
             pos.vz = (pos.vz - self->nearZ) / self->zDiv;
-            n = (Sprite *)node;
+            worldSprite = (Sprite *)node;
             if ((pos.vx < 0 ? ~pos.vx + 1 : pos.vx) <= 0x200) {
-                n->sprite.x = pos.vx;
+                worldSprite->sprite.x = pos.vx;
             } else {
-                n->sprite.x = 0x200;
+                worldSprite->sprite.x = 0x200;
             }
             if ((pos.vy < 0 ? ~pos.vy + 1 : pos.vy) <= 0x200) {
-                n->sprite.y = pos.vy;
+                worldSprite->sprite.y = pos.vy;
             } else {
-                n->sprite.y = 0x200;
+                worldSprite->sprite.y = 0x200;
             }
-            GsSortSprite((GsSPRITE *)&n->sprite, self->ot[self->otIndex], pos.vz);
+            GsSortSprite((GsSPRITE *)&worldSprite->sprite, self->ot[self->otIndex], pos.vz);
         }
     }
 }
