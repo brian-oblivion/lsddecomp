@@ -4,13 +4,13 @@
 
 > Renamed from `func_8002E4D8` on 2026-09-20 (tools/rename.py). Address 0x8002e4d8.
 
-Unit: `src/code_179d8_m.c`. Round 26 (second pass), runner bravo, applying
+Unit: `src/libsnd_vmanager.c`. Round 26 (second pass), runner bravo, applying
 the HEAD's "split scaled index" diagnosis per the work order.
 
 ## Screens (clean)
 
 ```
-grep -n 'gp_rel' asm/nonmatchings/code_179d8_m/SetAutoVol.s            -> no hits
+grep -n 'gp_rel' asm/nonmatchings/libsnd_vmanager/SetAutoVol.s            -> no hits
 grep -A2 -nE '\b(mflo|mfhi)\b' ... | grep -E '\b(mult|multu|div|divu)\b'  -> no hits
 ```
 
@@ -141,7 +141,7 @@ parameter reaching a home-slot spill vs. a dedicated `$sN`, see
 candidate. Checked directly rather than inferred from the frame-size gap:
 
 ```sh
-grep -oE 'sw +\$(s[0-7]|fp),' asm/nonmatchings/code_179d8_m/SetAutoVol.s
+grep -oE 'sw +\$(s[0-7]|fp),' asm/nonmatchings/libsnd_vmanager/SetAutoVol.s
 # -> no hits at all
 ```
 
@@ -199,7 +199,7 @@ Re-spliced this exact preserved body (typedef names local to the splice
 were renamed only to route around unrelated duplicate-declaration
 conflicts with OTHER still-`INCLUDE_ASM` functions sharing the file; the
 reported C itself is unchanged) and rebuilt from scratch. **All title
-figures reconfirmed:** `objdump -t build/src/code_179d8_m.c.o` shows
+figures reconfirmed:** `objdump -t build/src/libsnd_vmanager.c.o` shows
 `SetAutoVol` at `0x3b4` bytes = **237 words**, against retail's 231 (6
 long, exactly as titled). No new axis attempted this round: this function
 was already worked twice in the immediately preceding rounds (26 and 27)
@@ -248,7 +248,7 @@ Round 27's update named a specific untried next step for the remaining
 sign-extension residue: swap the `incS`/`incU` derivation order, or derive
 `incU` from `incS` via a cast rather than as an independent load. Read the
 raw `.s` directly first to confirm the exact shape at this site (lines
-1ED70-1EDB0 of `asm/nonmatchings/code_179d8_m/SetAutoVol.s`): retail
+1ED70-1EDB0 of `asm/nonmatchings/libsnd_vmanager/SetAutoVol.s`): retail
 issues TWO separate loads of `D_8008D9A6[a1]` — one `lhu` into `incU`, one
 `lh` into `incS` (a different register) — immediately adjacent, then adds
 `incU` into `accumU`.
@@ -284,7 +284,7 @@ the round's "build the inherited body before you trust its score"
 instruction, this exact preserved body was re-spliced into the live unit
 and rebuilt from scratch.
 
-**This function sits FIRST in `code_179d8_m.c`**, so the shared
+**This function sits FIRST in `libsnd_vmanager.c`**, so the shared
 `Rec34Half`/`Rec34HalfU`/`Rec16D7F0`/`ObjE970`/scratch-global declarations
 this body needs (originally written for a standalone splice with their
 own flat externs) are declared LATER in the file, after `SeAutoPan`
@@ -308,7 +308,7 @@ ROM order, which this move does not disturb (no function moved). This is
 believed to generalize as a documented pattern below.
 
 **All title figures reconfirmed exactly:** `objdump -t
-build/src/code_179d8_m.c.o` shows `SetAutoVol` at `0x3b4` bytes = **237
+build/src/libsnd_vmanager.c.o` shows `SetAutoVol` at `0x3b4` bytes = **237
 words** (retail 231, 6 words LONG, exactly as titled).
 
 ### Permuter search
@@ -370,7 +370,7 @@ callee-saved-lever check, above): built `-0x10` vs retail `-0x18`, an
 8-byte gap. Direct grep confirms the textbook shape:
 
 ```sh
-grep -oE '0x[0-9a-fA-F]+\(\$sp\)|\$sp,\$sp,' asm/nonmatchings/code_179d8_m/SetAutoVol.s
+grep -oE '0x[0-9a-fA-F]+\(\$sp\)|\$sp,\$sp,' asm/nonmatchings/libsnd_vmanager/SetAutoVol.s
 # -> only the prologue "addiu $sp,$sp,-0x18" and epilogue "addiu $sp,$sp,0x18"
 ```
 
@@ -397,7 +397,7 @@ frame did not reveal anything beyond what was already on file.
 padding idiom recovers frame byte-alignment exactly every time (four
 measured cases: `SpuVmFlush`, `SetAutoPan`, `SpuVmKeyOn`, and
 this function), and has closed a missing-WORD-COUNT gap on none of them.**
-Every one of `code_179d8_m`'s frame gaps is pure unaddressed
+Every one of `libsnd_vmanager`'s frame gaps is pure unaddressed
 register-save-area padding — confirmed directly by grep in three of the
 four cases (`SetAutoVol`, `SpuVmFlush` here; `SetAutoPan` and
 `SpuVmKeyOn`'s own permuter `--stack-diffs` runs independently
@@ -429,7 +429,7 @@ green after the revert.
 
 ### Proposed learning (fourth data point, unit-wide conclusion)
 
-**`code_179d8_m` closes out this round's frame-padding-lever test at 0-for-4
+**`libsnd_vmanager` closes out this round's frame-padding-lever test at 0-for-4
 on length closure, 4-for-4 on frame-byte-alignment recovery.** The lever's
 reliable, repeatable value on this unit was diagnostic — it makes an
 otherwise length-misaligned diff readable — and it directly PAID OFF once
@@ -484,7 +484,7 @@ extern u8 D_8008EA1A;
 
 extern s16 _svm_stereo_mono;
 
-/* Same 0x10-byte-stride record family code_179d8_j.c documents as
+/* Same 0x10-byte-stride record family libsnd_vmanager.c documents as
  * Rec16D7F0 -- accessed here through a flat `s16 *` halfword-indexed
  * cast (the `woff` idiom below), so only a plain extern is needed. */
 extern s16 _svm_sreg_buf[];
@@ -621,7 +621,7 @@ pair, clear an active flag on reaching the limit, then compute and write
 a stereo output level from the result) but over its own `_svm_voice +0x1C..+0x26`
 family, and with no "Begin"-style setup function in this unit -- nothing
 here writes `D_8008D9A4`, `D_8008D9A6` or `D_8008D9AE`.
-`SeAutoVol` in `code_179d8_l` opens with the identical prologue and
+`SeAutoVol` in `libsnd_vmanager` opens with the identical prologue and
 argument-narrowing shape this unit's header already calls out as a
 register-pressure sibling, not a coincidence worth re-deriving; worth
 checking directly whether it is the missing "BeginVoiceEnvelope".
@@ -631,7 +631,7 @@ is ADSR-shaped in the audio sense.
 
 ## NON_MATCHING body promoted, round 67
 
-Placed in `src/code_179d8_m.c` under `#ifdef NON_MATCHING`, `INCLUDE_ASM`
+Placed in `src/libsnd_vmanager.c` under `#ifdef NON_MATCHING`, `INCLUDE_ASM`
 kept in `#else`. This function is first in ROM order in the unit, so its
 own preserved body's local `Rec34Half`/`Rec34HalfU`/plain-byte-global
 declarations duplicate the unit's shared prelude that already sits above
@@ -644,7 +644,7 @@ own flat `extern s16 _svm_sreg_buf[]/D_8008D7F2[]` declarations were also
 dropped -- the shared prelude already declares both as `Rec16D7F0[]`, and
 the body already casts to `(s16 *)` before indexing, so no code change was
 needed there. `./build-and-verify.sh` green (zero bytes changed) and
-`tools/check-nonmatching.sh code_179d8_m` green.
+`tools/check-nonmatching.sh libsnd_vmanager` green.
 
 ## Round 73 (delta): REVISIT -- 238/231 (7 long) -> 231/231 length-exact, ins 1 / del 1
 

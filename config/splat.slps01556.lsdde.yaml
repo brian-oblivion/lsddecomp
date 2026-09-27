@@ -794,7 +794,7 @@ segments:
       # Owns NO jump table (the 0xFD8 slot's seven jtbl blocks all fall
       # outside 0x8002BC40..0x8002C408), so unlike _b and _c it needs no
       # rodata attach.
-      - [0x1C92C, c, code_179d8_d]     # now 0x1C92C..0x1CC08 (new_class_6d940 onward, 14 functions)
+      - [0x1C92C, c, PlacementGridVabSound]     # now 0x1C92C..0x1CC08 (new_class_6d940 onward, 14 functions)
       # code_179d8_e: functions 120..148 of the original, 0x1CC08..0x1D508
       # (29 functions).  Census 2026-09-04, three-grep screen per function:
       # 21/29 clean, the eight blocked all gp_rel (func_8002C448/C468/C4E0/
@@ -802,7 +802,6 @@ segments:
       # are 2-instruction `jr $ra; nop` leaves splat generates itself, so
       # the real queue is ~11 bodies.  Owns NO switch jump table (zero
       # `jtbl_` references in the slice), so no rodata attach.
-      - [0x1CC08, c, code_179d8_e]
       # code_179d8_l: FRONT half of what was the `code_179d8_mid_c`
       # remainder -- functions 149..160 of the original,
       # 0x1D508..0x1ECD8 (12 functions, func_8002CD08 .. func_8002E308).
@@ -841,7 +840,7 @@ segments:
       #
       # Expect this slice to span more than one class; identify each with
       # tools/classtable.py rather than assuming the unit has one.
-      - [0x1D508, c, code_179d8_l]
+      - [0x1D508, c, libsnd_vmanager]
       # code_179d8_m: BACK half of the old `code_179d8_mid_c` remainder --
       # functions 161..172 of the original, 0x1ECD8..0x20ADC (12 functions,
       # func_8002E4D8 .. func_800300D0).  Carved round 24 (2026-09-08),
@@ -863,7 +862,6 @@ segments:
       #
       # Expect this slice to span more than one class; identify each with
       # tools/classtable.py rather than assuming the unit has one.
-      - [0x1ECD8, c, code_179d8_m]
       # code_179d8_j: TAIL slice of the old code_179d8_mid_c, functions
       # 173..198 of the original monolith, 0x20ADC..0x2273C (26 functions,
       # func_800302DC .. func_80031EE8).  Carved round 21 (2026-09-06).
@@ -905,7 +903,6 @@ segments:
       # family owns one and the rodata slot list above names none of them.
       # This is the one respect in which the split differs from round 33's
       # code_179d8_c_b, which DID have to carry its attach across.
-      - [0x20ADC, c, code_179d8_j]
       - [0x20FF0, o, libsnd/vm_prog]    # SpuVmSet/GetProgVol, SpuVmSet/GetProgPan
       - [0x21180, c, libsnd_vm_vol_ut_key_ut_keyv]
       # ROUND 34, SECOND split of the same original slice: `libsnd/ut_pb`
@@ -1325,10 +1322,9 @@ segments:
       - [0x30470, o, libgs/gs_108]      # GsSetLightMode  (was func_8003FC70)
       - [0x304FC, o, libgte/fgo_00]     # TransposeMatrix (was func_8003FCFC)
       - [0x3054C, o, libgte/fog_01]     # SetFogNear      (was func_8003FD4C)
-      - [0x305B0, c, code_2cc8c_e]
+      - [0x305B0, c, ScreenWidgets]
       # code_2cc8c_f: #30..#59, 0x30E64..0x3197C (psyq_memset follows, so no
       # data tail). Zero blocked functions.
-      - [0x30E64, c, code_2cc8c_f]
       # psyq_memset chunk A: libc2 memory / formatted-output helpers.
       - [0x3197C, o, libc2/memset]     # memset
       - [0x319A8, o, libc2/itoa]       # itoa

@@ -4,7 +4,7 @@
 
 > Renamed from `func_80040D74` on 2026-09-18 (tools/rename.py). Address 0x80040d74.
 
-Unit: `src/code_2cc8c_f.c`.
+Unit: `src/ScreenWidgets.c`.
 
 ## Final body
 
@@ -135,7 +135,7 @@ confirmed, hence tier B rather than A.
 
 ## Track 4 (2026-09-26, round 88, charlie)
 
-2026-09-26, round 88 (charlie): class 0x11144 unified as TextRow in `include/TextRow.h` (a row of CharSprite cells: the ctor makes `count` New_CharSprite cells, setText hands each the next byte of a string, the layout slots step `cellPitch` along x). The view `Obj6EAC0` (named after BoxFill's old table address) is gone; its +0x00C `hasChildren` is SceneNode's `parent` (--merge CONFLICT s32 vs pointer: only tested against 0, bytes unchanged), `children` (+0x0B4) is `CharSprite **cells`, and the per-cell calls go through CharSprite's slots by name. Renamed from `Obj6EAC0__PropagateColor`: the +0x0B8 setColor occupant, `(TextRow *self, SpriteRgb *rgb)`, forwarded to each visible cell. Callers pass TaskCoreTarget's 3-byte selected/unselected colours and ItemList's row colours. Image byte-identical; the current source is src/code_2cc8c_f.c.
+2026-09-26, round 88 (charlie): class 0x11144 unified as TextRow in `include/TextRow.h` (a row of CharSprite cells: the ctor makes `count` New_CharSprite cells, setText hands each the next byte of a string, the layout slots step `cellPitch` along x). The view `Obj6EAC0` (named after BoxFill's old table address) is gone; its +0x00C `hasChildren` is SceneNode's `parent` (--merge CONFLICT s32 vs pointer: only tested against 0, bytes unchanged), `children` (+0x0B4) is `CharSprite **cells`, and the per-cell calls go through CharSprite's slots by name. Renamed from `Obj6EAC0__PropagateColor`: the +0x0B8 setColor occupant, `(TextRow *self, SpriteRgb *rgb)`, forwarded to each visible cell. Callers pass TaskCoreTarget's 3-byte selected/unselected colours and ItemList's row colours. Image byte-identical; the current source is src/ScreenWidgets.c.
 
 ## Track 7 (round 99, bravo)
 

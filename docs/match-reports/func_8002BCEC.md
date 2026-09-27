@@ -6,7 +6,7 @@
 > `src/` and the game-code count shrank by it -- the correction CLAUDE.md asks
 > for, not a regression. The run `libcd/iso9660` + `libc2/strcmp` +
 > `libc2/strncmp` tiles 0x1BE40..0x1C92C and crosses the libcd_bios /
-> code_179d8_d boundary; both units trimmed. Whole-image SHA1 green. Nothing
+> PlacementGridVabSound boundary; both units trimmed. Whole-image SHA1 green. Nothing
 > here is assignable and there is no stall left to work. The text below is the
 > pre-conversion record.
 
@@ -46,7 +46,7 @@ it, and the corrected finding is below under "Residue 1, corrected". The
 selection trade-off, not identity, and the next attempt should not be told
 "do not try" on this one.
 
-`code_179d8_d`, vram `0x8002BCEC`, file offset `0x1C4EC`, 175 instructions
+`PlacementGridVabSound`, vram `0x8002BCEC`, file offset `0x1C4EC`, 175 instructions
 (0x2BC bytes). Blocker-clean per the carve census (no `gp_rel`, no forward
 `mflo`/`mfhi`-then-`mult`/`div`). FRESH ground, no report existed before this
 round, no prior attempt history to inherit.
@@ -535,7 +535,7 @@ incoming parameter's own storage. Negative result, reported as requested.
 
 ## Round 31 update (runner echo) — figures rebuilt, a stale symbol name found and fixed, one more variant tried
 
-Rebuilt the preserved body by splicing it into `src/code_179d8_d.c` (via
+Rebuilt the preserved body by splicing it into `src/PlacementGridVabSound.c` (via
 `#if 0`/`#endif`) and reproduced the title's figures exactly: `funcdiff.py`
 reports **49/175** raw word-match with the drift warning firing (~299428
 bytes outside range this round vs. the ~299450 quoted before — the small
@@ -557,9 +557,9 @@ object was linked in the interim (rounds 29-30's SDK-objects work; see
 "moved into src/BMemPMgr.c when the SDK objects were linked"). Every other
 unit that calls this function now declares it as `printf` directly (see
 `src/libcd_bios.c`, `src/code_179d8_h.c`, `src/class_3bb8c_f.c`,
-`src/code_2cc8c_e.c`, each with the argument shape their own call site
+`src/ScreenWidgets.c`, each with the argument shape their own call site
 needs — per-unit local views, not a shared header, matching this project's
-convention). Fixed in `src/code_179d8_d.c` by declaring
+convention). Fixed in `src/PlacementGridVabSound.c` by declaring
 `extern void printf(const char *fmt, ...);` and renaming all four call
 sites in the preserved body from `func_80012C20(...)` to `printf(...)` —
 this is a pure symbol-name fix, not a codegen change, and the rebuilt score

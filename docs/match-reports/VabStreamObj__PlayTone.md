@@ -123,7 +123,7 @@ names m2c/the original derivation actually saw.)
 This structure (control flow, argument counts -- including the double-`arg2`
 7th argument to `SsUtKeyOn`, which m2c independently confirmed -- field
 offsets, and the `self->unk50[hi][lo]` addressing) is corroborated by
-`.venv/bin/python3 tools/m2ctx.py code_179d8_e --sig 's32
+`.venv/bin/python3 tools/m2ctx.py PlacementGridVabSound --sig 's32
 VabStreamObj__PlayTone(ObjDA34 *self, s32 index, s32 arg2, s32 arg3)' --run`, which
 produces the same shape independently from the raw instructions. I am
 confident this part is right.
@@ -275,7 +275,7 @@ same-named bytes. Bytes/derivation unchanged.)
 Needs, from this unit's top-of-file scaffolding: `VabStreamObj`,
 `VagAtrView`, `extern s16 SsUtKeyOn(s16, s16, s16, s16, s32, s32,
 s32);`, `extern void SsUtAutoVol(s16, s16, s16, s32);` -- all already
-present in `src/code_179d8_e.c`.
+present in `src/PlacementGridVabSound.c`.
 
 ### Proposed learning
 
@@ -344,7 +344,7 @@ sll   v0, v0, 0x2       hi * 4, off the UNTRUNCATED int hi
 lw    a2, 0(v0)
 ```
 
-Compare retail (`asm/nonmatchings/code_179d8_e/VabStreamObj__PlayTone.s`, 0x8002CA64
+Compare retail (`asm/nonmatchings/PlacementGridVabSound/VabStreamObj__PlayTone.s`, 0x8002CA64
 onward):
 
 ```
@@ -419,7 +419,7 @@ established from this unit alone, so not tier A.
 
 Promoted the "Preserved best-effort body" above (the `hi = index / 16;
 lo = index - hi * 16;` form, 5/55 words, byte-drift outside range) into
-`src/code_179d8_e.c` under `#ifdef NON_MATCHING ... #else INCLUDE_ASM ...
+`src/PlacementGridVabSound.c` under `#ifdef NON_MATCHING ... #else INCLUDE_ASM ...
 #endif`, per docs/FINISHING-PLAN.md track 1b. This is the body actually
 verified against the real function in this unit; the HEAD ADJUDICATION's
 narrowing probe above it is a generic reproducer that was never re-applied

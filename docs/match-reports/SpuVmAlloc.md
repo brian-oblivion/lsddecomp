@@ -2,7 +2,7 @@
 
 > Renamed from `func_8002CF18` on 2026-09-24 (tools/rename.py). Address 0x8002cf18.
 
-Unit `src/code_179d8_l.c` (carved round 24). Size: 167 words (0x29C bytes).
+Unit `src/libsnd_vmanager.c` (carved round 24). Size: 167 words (0x29C bytes).
 Round 26, runner delta.
 
 ## What it is
@@ -148,8 +148,8 @@ s32 SpuVmAlloc(void)
 }
 ```
 
-Restored to `INCLUDE_ASM("asm/nonmatchings/code_179d8_l", SpuVmAlloc);` in
-`src/code_179d8_l.c` -- the struct/extern declarations above were removed
+Restored to `INCLUDE_ASM("asm/nonmatchings/libsnd_vmanager", SpuVmAlloc);` in
+`src/libsnd_vmanager.c` -- the struct/extern declarations above were removed
 along with it (none are shared with any other function in this unit).
 
 ## Attempts and what each one fixed
@@ -473,7 +473,7 @@ s32 SpuVmAlloc(void)
 ## Round 35 update (runner bravo): inherited body re-verified real (link, size, and content); one new lever tried, negative
 
 Re-verified the inherited round-33 body first, including the
-`SpuSetNoiseVoice` link fix: `objdump -t` on `build/src/code_179d8_l.c.o`
+`SpuSetNoiseVoice` link fix: `objdump -t` on `build/src/libsnd_vmanager.c.o`
 confirms `SpuVmAlloc` compiles and LINKS to `0x28c` bytes = 163 words,
 matching round 33's corrected figure exactly (not the never-linking round-26
 number).
@@ -737,7 +737,7 @@ FULL diff is not the same as its MINIMAL fix.
 
 Re-verified the inherited 167/167-length body (with the round-37
 `do-while(0)`/`newVar` fix intact): `objdump -t` on
-`build/src/code_179d8_l.c.o` confirms `SpuVmAlloc` compiles to `0x29c`
+`build/src/libsnd_vmanager.c.o` confirms `SpuVmAlloc` compiles to `0x29c`
 bytes = 167 words, matching retail's length exactly, and `funcdiff.py`
 confirms 47/167 raw match with NO outside-range drift, exactly as round 37
 left it. Given three prior rounds' worth of levers already tried against
@@ -754,7 +754,7 @@ unchanged.
 file.
 
 **Callee evidence.** `SpuVmAlloc` is still `INCLUDE_ASM`
-(`src/code_179d8_l.c`), so the disassembly is the only evidence. It reads NONE
+(`src/libsnd_vmanager.c`), so the disassembly is the only evidence. It reads NONE
 of `$a0`-`$a3`: the prologue writes every register it uses from constants and
 `%hi`/`%lo` globals before any read.
 
@@ -771,7 +771,7 @@ of `$a0`-`$a3`: the prologue writes every register it uses from constants and
 
 So the function takes zero arguments in the sense of what it consumes.
 
-**Why `src/code_179d8_m.c`'s one-parameter declaration stays.** Its two call
+**Why `src/libsnd_vmanager.c`'s one-parameter declaration stays.** Its two call
 sites write `SpuVmAlloc(0xFF)`, and that argument is byte-load-bearing:
 
 ```
@@ -798,7 +798,7 @@ review, but a later reader should know the two declarations were never in
 tension: one describes the callee, the other describes a call site.
 
 **Declaration sites changed:** none (arity unchanged). `/* arity-ok: ... */`
-added to `src/code_179d8_m.c:375`. Oracle green.
+added to `src/libsnd_vmanager.c:375`. Oracle green.
 
 ## Round 65 update (runner bravo): REVISIT — the round-37 "exact length" was reached by two PADDING artifacts; removing both and finding three real levers keeps 167/167 while cutting asm-differ 3255 -> 1250 and funcdiff insertions/deletions 29/29 -> 16/16
 
@@ -1068,7 +1068,7 @@ asm-differ (1250 vs 1375) and worse on word-match (74 vs 79).
 
 ## NON_MATCHING body promoted, round 69
 
-Promoted the round-65 (`u16 bestSec`) preserved body into `src/code_179d8_l.c`
+Promoted the round-65 (`u16 bestSec`) preserved body into `src/libsnd_vmanager.c`
 under `#ifdef NON_MATCHING` (verified build unchanged, keeps `INCLUDE_ASM`);
 `./build-and-verify.sh` and `tools/check-nonmatching.sh` both green. Two
 mechanical adjustments from the literal preserved text, both semantics-
@@ -1084,7 +1084,7 @@ preserving:
   short-circuit into the same `pri = ...` block in the same order as the
   original `goto` pair, and the free-channel case is now the explicit `else`.
 - **The `Rec34*`-typed struct declarations were replaced with plain pointer
-  arithmetic on `u8[]`.** `src/code_179d8_l.c` already declares
+  arithmetic on `u8[]`.** `src/libsnd_vmanager.c` already declares
   `D_8008D9A3` and `spuVmMaxVoice` (plain `u8[]`/`u8`) for `vmNoiseOn2`'s and
   `SpuVmKeyOnNow`'s own preserved bodies, later in the SAME file; a
   struct-typed re-declaration of `D_8008D9A3` here would be a `conflicting

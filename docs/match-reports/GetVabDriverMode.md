@@ -2,7 +2,7 @@
 
 > Renamed from `func_8002C448` on 2026-09-18 (tools/rename.py). Address 0x8002c448.
 
-Unit `code_179d8_e`. Previously filed as a `gp_rel` stall (round 17); reopened
+Unit `PlacementGridVabSound`. Previously filed as a `gp_rel` stall (round 17); reopened
 round 42 once `--gp-symbols`/`--no-nop-mflo-mfhi` resolved that blocker for the
 whole project (see `docs/research/gp-relative-blocker.md`, "RESOLVED").
 
@@ -78,7 +78,7 @@ itself) is not established, only that it's read/written alongside the mode.
 Identical in shape to `GetCdDriverMode`, its sibling on the previous line.
 
 **Callee evidence** (`0x8002C448`): the first instruction is `beqz a0,...`, so
-`$a0` is read before it is written. The definition in `src/code_179d8_e.c`
+`$a0` is read before it is written. The definition in `src/PlacementGridVabSound.c`
 (`s32 GetVabDriverMode(s32 *arg0)`) is right: one real argument, an optional
 out-pointer written only when non-NULL.
 

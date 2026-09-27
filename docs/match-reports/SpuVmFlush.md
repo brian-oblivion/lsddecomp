@@ -4,12 +4,12 @@
 
 > Renamed from `func_8002F700` on 2026-09-20 (tools/rename.py). Address 0x8002f700.
 
-Unit: `src/code_179d8_m.c`. Round 26, runner bravo.
+Unit: `src/libsnd_vmanager.c`. Round 26, runner bravo.
 
 ## Screens (clean)
 
 ```
-grep -n 'gp_rel' asm/nonmatchings/code_179d8_m/SpuVmFlush.s            -> no hits
+grep -n 'gp_rel' asm/nonmatchings/libsnd_vmanager/SpuVmFlush.s            -> no hits
 grep -A2 -nE '\b(mflo|mfhi)\b' ... | grep -E '\b(mult|multu|div|divu)\b'  -> no hits
 ```
 
@@ -17,7 +17,7 @@ grep -A2 -nE '\b(mflo|mfhi)\b' ... | grep -E '\b(mult|multu|div|divu)\b'  -> no 
 
 `./build-and-verify.sh` GREEN with `INCLUDE_ASM` restored. Best attempt
 compiled clean and reached **237 words against retail's 241** (measured via
-`objdump -t build/src/code_179d8_m.c.o`, the reliable way once any drift
+`objdump -t build/src/libsnd_vmanager.c.o`, the reliable way once any drift
 appears). The body below got the overwhelming majority of the function's
 CONTENT and CONTROL FLOW byte-correct — five separate structural fixes each
 moved the length substantially closer to retail (see "Axes tried" below) —
@@ -38,14 +38,14 @@ every fix below.
 
 Re-spliced this exact preserved body and rebuilt from scratch. **All title
 figures reconfirmed:** built length **237 words** (`objdump -t
-build/src/code_179d8_m.c.o` shows `SpuVmFlush` at `0x3b4` bytes = 237
+build/src/libsnd_vmanager.c.o` shows `SpuVmFlush` at `0x3b4` bytes = 237
 words, retail is 241, so 4 short exactly as titled), `funcdiff.py`'s
 in-range figure **49/241** with its own drift warning firing (matching the
 report's own caution not to trust that number as a distance measure).
 
 **One correction found during the rebuild, cosmetic only (does not affect
 the score): the preserved body's `func_800375E8(0, 0xFFFFFF)` call used a
-STALE placeholder name.** `asm/nonmatchings/code_179d8_m/SpuVmFlush.s`
+STALE placeholder name.** `asm/nonmatchings/libsnd_vmanager/SpuVmFlush.s`
 now names this call `SpuSetNoiseVoice` (`config/symbols.slps01556.lsdde.txt`
 line 263, Psy-Q `libspu`, from the SDK-object-linking work in later
 rounds) — same staleness class found in `SpuVmInit`'s two SPU calls
@@ -257,7 +257,7 @@ and everything it needs was already declared upstream) and rebuilt from
 scratch.
 
 **All title figures reconfirmed exactly:** `objdump -t
-build/src/code_179d8_m.c.o` shows `SpuVmFlush` at `0x3b4` bytes = **237
+build/src/libsnd_vmanager.c.o` shows `SpuVmFlush` at `0x3b4` bytes = **237
 words** (retail 241, 4 short, exactly as titled), `funcdiff.py` reports
 **49/241** in-range with its drift warning firing, matching this report's
 own caution not to trust that figure as a distance measure.
@@ -473,7 +473,7 @@ typedef struct {
 /* _svm_sreg, already declared above as `SpuRegs *` (one struct, fields
  * at +0x194/+0x196), is ALSO the base of an array of 0x10-byte
  * per-channel records here -- another independent local view of the
- * same pointed-to object (see also code_179d8_j.c's own array-of-0x10
+ * same pointed-to object (see also libsnd_vmanager.c's own array-of-0x10
  * reading of a sibling symbol). */
 typedef struct {
     s16 unk0; /* +0x0 */
@@ -653,7 +653,7 @@ typedef struct {
 /* _svm_sreg, already declared above as `SpuRegs *` (one struct, fields
  * at +0x194/+0x196), is ALSO the base of an array of 0x10-byte
  * per-channel records here -- another independent local view of the
- * same pointed-to object (see also code_179d8_j.c's own array-of-0x10
+ * same pointed-to object (see also libsnd_vmanager.c's own array-of-0x10
  * reading of a sibling symbol). */
 typedef struct {
     s16 unk0; /* +0x0 */
@@ -823,14 +823,14 @@ here -- proposing for the head to apply once no runner is live on
   `SpuVmAlloc` all compare against `2` for "noise voice").
 - `_svm_sreg` (and this unit's two local views `SpuRegs`/`SpuRegsEdd4`)
   -> `gSpuRegs`: confirmed to be the PS1 SPU's own hardware base address
-  `0x1F801C00` by `vmNoiseOn2`'s report in `code_179d8_l`.
+  `0x1F801C00` by `vmNoiseOn2`'s report in `libsnd_vmanager`.
 
 Posted to the broadcast this round; see also SpuVmInit.md's own
 `## Proposed field names`.
 
 ## NON_MATCHING body promoted, round 67
 
-Placed in `src/code_179d8_m.c` under `#ifdef NON_MATCHING`, `INCLUDE_ASM`
+Placed in `src/libsnd_vmanager.c` under `#ifdef NON_MATCHING`, `INCLUDE_ASM`
 kept in `#else`. Used the CURRENT best preserved body (round 48 echo,
 236/241 words, 5 short) rather than the older superseded 237/241 one kept
 at the end of this report for reference. All of its supporting
@@ -844,7 +844,7 @@ adding to a shared header; everything else it touches (`D_8008D9A3`,
 `_svm_auto_kof_mode`, `D_8008D9A4`, `D_8008D9B0`) was
 already declared earlier in the unit and needed no change.
 `./build-and-verify.sh` green (zero bytes changed) and
-`tools/check-nonmatching.sh code_179d8_m` green.
+`tools/check-nonmatching.sh libsnd_vmanager` green.
 
 ## Track 2 (round 86, 2026-09-26, alpha)
 
@@ -868,4 +868,4 @@ because splat names only addresses some asm references. Byte-identical.
 
 ## Track 6 (round 96, charlie)
 
-Round 96 (charlie, track 6) moved `src/code_179d8_m.c` onto Sony's headers (`<libsnd.h>`, `<libspu.h>`) and Sony's types; zero bytes changed, whole-image SHA1 green, NON_MATCHING bodies compile. The preserved body's `Rec16DAD4C` (0x10-byte records over `_svm_sreg`) is `SpuVoiceRegs`, one element of `SpuRegs.voice[24]` (the SPU register block at 0x1F801C00; `ObjDAD4` renamed `SpuRegs`). The activity walk reads `envx` (+0xC, the current envelope level); the dirty copy-out writes `voice[i].volL/volR/pitch/addr/adsr1/adsr2`; the tail's byte-offset stores are `keyOff[0..1]` (+0x18C, from _svm_okof1/64), `keyOn[0..1]` (+0x188, from _svm_okon1/22C) and `reverbOn[0..1]` (+0x198, from _svm_orev1/234). `SpuSetNoiseVoice` now comes from `<libspu.h>`. `Rec34HalfU2` (the 0x34-stride walk over `_svm_voice[].unk06`) is kept: it is the walk's own element type.
+Round 96 (charlie, track 6) moved `src/libsnd_vmanager.c` onto Sony's headers (`<libsnd.h>`, `<libspu.h>`) and Sony's types; zero bytes changed, whole-image SHA1 green, NON_MATCHING bodies compile. The preserved body's `Rec16DAD4C` (0x10-byte records over `_svm_sreg`) is `SpuVoiceRegs`, one element of `SpuRegs.voice[24]` (the SPU register block at 0x1F801C00; `ObjDAD4` renamed `SpuRegs`). The activity walk reads `envx` (+0xC, the current envelope level); the dirty copy-out writes `voice[i].volL/volR/pitch/addr/adsr1/adsr2`; the tail's byte-offset stores are `keyOff[0..1]` (+0x18C, from _svm_okof1/64), `keyOn[0..1]` (+0x188, from _svm_okon1/22C) and `reverbOn[0..1]` (+0x198, from _svm_orev1/234). `SpuSetNoiseVoice` now comes from `<libspu.h>`. `Rec34HalfU2` (the 0x34-stride walk over `_svm_voice[].unk06`) is kept: it is the walk's own element type.

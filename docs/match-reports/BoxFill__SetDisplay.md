@@ -2,7 +2,7 @@
 
 > Renamed from `func_800406E4` on 2026-09-25 (tools/rename.py). Address 0x800406e4.
 
-Unit: `src/code_2cc8c_f.c`. First attempt.
+Unit: `src/ScreenWidgets.c`. First attempt.
 
 ```c
 s32 BoxFill__SetDisplay(Obj6EAC0 *self, s32 a1) {

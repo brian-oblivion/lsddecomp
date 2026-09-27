@@ -2,7 +2,7 @@
 
 > Renamed from `func_8002C3B8` on 2026-09-27 (tools/rename.py). Address 0x8002c3b8.
 
-**Unit:** code_179d8_d · **Size:** 2 instructions (0x8 bytes) ·
+**Unit:** PlacementGridVabSound · **Size:** 2 instructions (0x8 bytes) ·
 **Status: MATCHED 2/2**, whole-image SHA1 green.
 
 ## Role

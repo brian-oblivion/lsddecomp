@@ -4,7 +4,7 @@
 
 > Renamed from `func_800404D0` on 2026-09-20 (tools/rename.py). Address 0x800404d0.
 
-Unit `code_2cc8c_e`, carved round 14.
+Unit `ScreenWidgets`, carved round 14.
 
 > **UPDATE (targeted permuter pass, round 17).** MATCHED, no permuter
 > needed -- same fix as its sibling `New_FadeBox`, applied in the same

@@ -225,7 +225,7 @@ and 22 genuinely differ, in the two clusters described below (the
 are independent register-identity/scheduling residues, not an artifact of
 address drift.
 
-Unit `code_179d8_j`, round 23 (2026-09-07). Not a class method. Bounds-checks
+Unit `libsnd_vmanager`, round 23 (2026-09-07). Not a class method. Bounds-checks
 `idx` against 0x18 under a `_snd_ev_flag` reentrancy lock (same lock/idiom as
 `libsnd_decre.c`'s `func_80033738`), converts the channel into a 32-bit-wide
 `(loBit, hiBit)` bitmask pair, clears three per-channel fields, then ORs the
@@ -285,7 +285,7 @@ fail_locked:
 (Uses this unit's already-shared `_snd_ev_flag`, `Rec34Byte D_8008D9A3[]`,
 `Rec34Half _svm_voice[]`/`D_8008D98C[]`, and the scalar `_svm_okof1`,
 `_svm_okof2`, `_svm_okon1`, `_svm_okon2` globals declared near the top of
-`code_179d8_j.c`.)
+`libsnd_vmanager.c`.)
 
 ## Two findings worth keeping regardless of the stall
 

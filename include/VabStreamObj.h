@@ -9,7 +9,7 @@
  * gVabStreamObjMethods). It is a FileResource subclass and a sibling of the
  * drivers (VabDriver 0x23, the CD driver 0x13), not derived from either. Like
  * every data source, its ctor and finalize chain to the ACTIVE driver's
- * (GetActiveDataSourceMethods). Methods in src/code_179d8_e.c.
+ * (GetActiveDataSourceMethods). Methods in src/PlacementGridVabSound.c.
  *
  * Loading. The ctor copies the base path (`baseFilename`) and asks the
  * driver for "<base>.VH" (requestLoadFile, +0x06C), with `loadState` set to

@@ -143,7 +143,7 @@ void TextRow__AttachToParent(Obj6EAC0 *self, s32 a1, s32 *a2) {
 At the best form reached, retail is **70 words** (`0x118`, confirmed
 against the `.s` file's `nonmatching TextRow__AttachToParent, 0x118`); my
 compiled form is **72 words** (confirmed via
-`objdump -d build/src/code_2cc8c_f.c.o`: spans `0x484`-`0x5a4` =
+`objdump -d build/src/ScreenWidgets.c.o`: spans `0x484`-`0x5a4` =
 `0x120` bytes = 72 words) -- 2 words LONG, not a same-length pure
 rename. The word-level diff also shows retail using `$s1` for BOTH the
 short-lived `a1` (only live until the first call) AND the loop index
@@ -224,4 +224,4 @@ advances), not for that specific guess.
 
 ## Track 4 (2026-09-26, round 88, charlie)
 
-2026-09-26, round 88 (charlie): class 0x11144 unified as TextRow in `include/TextRow.h` (a row of CharSprite cells: the ctor makes `count` New_CharSprite cells, setText hands each the next byte of a string, the layout slots step `cellPitch` along x). The view `Obj6EAC0` (named after BoxFill's old table address) is gone; its +0x00C `hasChildren` is SceneNode's `parent` (--merge CONFLICT s32 vs pointer: only tested against 0, bytes unchanged), `children` (+0x0B4) is `CharSprite **cells`, and the per-cell calls go through CharSprite's slots by name. Renamed from `Obj6EAC0__LayoutChildrenWithGap`: the +0x04C attachToParent occupant, `(TextRow *self, SceneNode *parent, ScreenSpritePos *pos)`. While `parent` is NULL it attaches itself through CharSprite's slot, then attaches each visible cell to self at a running position, adding `cellPitch` to x per cell and 0x10 more before cell `gapIndex`. The slot keeps SceneNode's LongVec3 offset type; the position is cast (ScreenSprite's banner). Image byte-identical; the current source is src/code_2cc8c_f.c.
+2026-09-26, round 88 (charlie): class 0x11144 unified as TextRow in `include/TextRow.h` (a row of CharSprite cells: the ctor makes `count` New_CharSprite cells, setText hands each the next byte of a string, the layout slots step `cellPitch` along x). The view `Obj6EAC0` (named after BoxFill's old table address) is gone; its +0x00C `hasChildren` is SceneNode's `parent` (--merge CONFLICT s32 vs pointer: only tested against 0, bytes unchanged), `children` (+0x0B4) is `CharSprite **cells`, and the per-cell calls go through CharSprite's slots by name. Renamed from `Obj6EAC0__LayoutChildrenWithGap`: the +0x04C attachToParent occupant, `(TextRow *self, SceneNode *parent, ScreenSpritePos *pos)`. While `parent` is NULL it attaches itself through CharSprite's slot, then attaches each visible cell to self at a running position, adding `cellPitch` to x per cell and 0x10 more before cell `gapIndex`. The slot keeps SceneNode's LongVec3 offset type; the position is cast (ScreenSprite's banner). Image byte-identical; the current source is src/ScreenWidgets.c.

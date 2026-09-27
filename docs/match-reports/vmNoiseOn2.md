@@ -12,7 +12,7 @@ cause). **First real diff is at the very first instruction**, vram
 all in the derived body — confirmed with `tools/asm-differ/diff.py
 vmNoiseOn2`, not inferred.
 
-`code_179d8_l`, vram `0x8002DDBC`, file offset `0x1E5BC`, 112 words
+`libsnd_vmanager`, vram `0x8002DDBC`, file offset `0x1E5BC`, 112 words
 (0x1C0 bytes). No `nop_mflo_mfhi` or `gp_rel` hits — this is a "clean"
 function per the carve census; the residue is purely codegen-shape, not a
 toolchain blocker.
@@ -329,7 +329,7 @@ void vmNoiseOn2(s32 a0, s32 a1, s32 a2) {
 **The "narrow-cast defeats loop strength reduction" idiom
 (`SpuVmAlloc`'s report) is unit-wide, not local to the function that
 found it** — it closed 10 of 14 missing words here, in a different
-function, the very next round. Any function in `code_179d8_l`/`_m` with a
+function, the very next round. Any function in `libsnd_vmanager`/`_m` with a
 "my loop is N words short and retail recomputes a multiply I don't" shape
 should try this FIRST, before barriers or permuter time, and should match
 the cast width to whatever the surrounding comparison already uses for
@@ -338,7 +338,7 @@ the same variable rather than picking the narrowest type that compiles.
 ## Round 35 update (runner bravo): inherited body re-verified real; frame-allocation lever tried, negative; confirmed the remaining gap is entirely the register-identity residue
 
 Re-verified the inherited 108/112 body first: `objdump -t` on
-`build/src/code_179d8_l.c.o` confirms `vmNoiseOn2` compiles to `0x1b0`
+`build/src/libsnd_vmanager.c.o` confirms `vmNoiseOn2` compiles to `0x1b0`
 bytes = 108 words, matching round 33's figure exactly. Realigned
 `asm-differ` diff confirms residues 1 (the `a3`/`a0` register swap) and 4
 (the missing `addiu sp,sp,-8`/`+8` frame) at the exact positions this
@@ -396,7 +396,7 @@ that works on this compiler's allocator.
 ## Round 44 update (runner delta): inherited body re-verified real; first permuter search, negative
 
 Re-verified the inherited 108/112 body first: `objdump -t` on
-`build/src/code_179d8_l.c.o` confirms `vmNoiseOn2` compiles to `0x1b0`
+`build/src/libsnd_vmanager.c.o` confirms `vmNoiseOn2` compiles to `0x1b0`
 bytes = 108 words, matching rounds 26/33/35's figure exactly. Realigned
 `asm-differ` confirms the same residues (the `a3`/`a0` register swap, the
 missing `addiu sp,sp,-8`/`+8` frame) at the exact positions already named.
@@ -448,7 +448,7 @@ not relevant.**
 Inherited round-33/35/44 body spliced back in verbatim and built through the
 real oracle:
 
-- `objdump -t build/src/code_179d8_l.c.o` -> `0x1b0` = **108 words**,
+- `objdump -t build/src/libsnd_vmanager.c.o` -> `0x1b0` = **108 words**,
   reproducing rounds 33/35/44 exactly. 4 words short of retail's 112.
 - `tools/funcdiff.py vmNoiseOn2`:
   `insertions 18 / deletions 18 (opcode-level ...; positional skeleton
@@ -688,7 +688,7 @@ two of the three findings above fall straight out of that.
 
 ## NON_MATCHING body promoted, round 69
 
-Promoted the round-65 preserved body into `src/code_179d8_l.c` under `#ifdef NON_MATCHING` (verified build unchanged, keeps `INCLUDE_ASM`); `./build-and-verify.sh` and `tools/check-nonmatching.sh` both green.
+Promoted the round-65 preserved body into `src/libsnd_vmanager.c` under `#ifdef NON_MATCHING` (verified build unchanged, keeps `INCLUDE_ASM`); `./build-and-verify.sh` and `tools/check-nonmatching.sh` both green.
 
 ## Naming (round 75, runner alpha, FINISHING-PLAN track 3)
 
@@ -696,7 +696,7 @@ Already carries its real name: identified round 74 (track 2, runner bravo)
 as `libsnd/vmanager vmNoiseOn2` (shape 0.96 vs the disc-3.3 reference, 103w
 reference vs our 112w; libsnd neighborhood, right after `vmNoiseOn` as its
 paired helper -- matching this function's own position immediately after
-`vmNoiseOn` in `src/code_179d8_l.c`). Sony symbol; this pass does not rename
+`vmNoiseOn` in `src/libsnd_vmanager.c`). Sony symbol; this pass does not rename
 it further. The function remains a STALL (5 words short, see above).
 
 ## Track 2 (round 86, 2026-09-26, alpha)

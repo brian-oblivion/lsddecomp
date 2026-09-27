@@ -1,17 +1,532 @@
 /*
- * code_179d8_m -- Sony libsnd `vmanager`, second half: voice key-on/off,
- * noise voices, pitch bend, the volume/pan ramps and the per-tick flush.
+ * libsnd_vmanager -- Sony's libsnd voice manager (`libsnd/vmanager`),
+ * carried as C, with one game function ahead of it.
  *
- * Every function here is Sony's. Retail's vmanager is a build no SDK disc
- * carries, so its object never placed and the module is carried as C (the
- * symbols file identifies each function against discs 3.3/3.5); progress.py
- * counts all of it as library by address. The functions keep Sony's names
- * and the data keeps Sony's types: the current VAB's header, programs and
- * tones are <libsnd.h>'s VabHdr/ProgAtr/VagAtr behind libsnd's _svm_vh,
- * _svm_pg and _svm_tn (pinned in config/psyq-objects.ld, spelled here by
- * their D_ addresses), a sequence is include/SsScore.h's record, and the
- * per-voice state is include/SvmData.h's _svm_voice/_svm_sreg_buf. _svm_sreg
- * points at the SPU's own register block, SvmData.h's SpuRegs.
+ * ServiceSoundCueSet (game code) runs one tick of a SoundCueSet
+ * (include/SoundCueSet.h): it resets the set's three cue slots, lets the
+ * set's callback fill them, then stops, retunes and replays each slot's tone
+ * through the VabStreamObj's method table (include/VabStreamObj.h), scaled
+ * down by the set's attenuation. Its siblings InitSoundCueSet and
+ * FlushSoundCueSet end PlacementGridVabSound.c.
+ *
+ * Everything from SpuVmAlloc on is Sony's, under Sony's names. Retail's
+ * build of the voice manager is on no SDK disc, so it never placed as
+ * objects; the symbols file identifies each function against discs 3.3/3.5
+ * and progress.py counts them as library by address. On the 3.0/3.3/3.5
+ * discs every function here is in one object, vmanager.o; on the 3.6 disc
+ * they are sixteen, in this order: vm_aloc1 (SpuVmAlloc), vm_nowon
+ * (SpuVmKeyOnNow), vm_aloc2 (SpuVmDoAllocate), vm_no1 (vmNoiseOn), vm_no2
+ * (vmNoiseOn2), vm_n2p (note2pitch, note2pitch2), vm_spb (SePitchBend),
+ * vm_vib (SsUtVibrateOn/Off), vm_autov (SeAutoVol, SetAutoVol), vm_autop
+ * (SeAutoPan, SetAutoPan), vm_init (SpuVmInit), vm_noise
+ * (SpuVmNoiseOnWithAdsr, SpuVmNoiseOff, SpuVmNoiseOn), vm_pb (SpuVmPBVoice,
+ * SpuVmPitchBend), vm_f (SpuVmFlush), vm_key (SpuVmKeyOn, SpuVmKeyOff,
+ * SpuVmSeKeyOn, SpuVmSeKeyOff, KeyOnCheck) and vm_seq (the SpuVm*SeqVol
+ * accessors and SpuVmSeqKeyOff).
+ *
+ * What decided its edges (python3 tools/tuboundary.py): every edge from
+ * PlacementGridVabSound.c to the placed object libsnd/vm_prog, which follows
+ * this file, is "boundary possible"; the binary is silent. Content decided:
+ * the carve edges code_179d8_l|m and m|j were staffing cuts, and each fell
+ * inside one object on every disc (vm_autov between SeAutoVol and
+ * SetAutoVol, vm_key between SpuVmKeyOff and SpuVmSeKeyOn), so the three
+ * units were merged. PARKED: the content puts a file boundary after
+ * ServiceSoundCueSet (game code cannot sit in Sony's object) and, on the 3.6
+ * reading, at each module edge above; a split is a new carve, so the file
+ * keeps them and is named for the Sony object, as FINISHING-PLAN track 8
+ * names Sony code carried as C.
+ *
+ * The data keeps Sony's types: the key-on request in _svm_cur, the current
+ * VAB through <libsnd.h>'s VabHdr, ProgAtr and VagAtr (_svm_vh, _svm_pg,
+ * _svm_tn), the voice tables in include/SvmData.h and the sequence records
+ * in include/SsScore.h. A key-on or key-off is not written to the SPU when
+ * it is requested: it is collected in the _svm_okon/_svm_okof masks, which
+ * SpuVmFlush writes out once per tick. No jump table and no rodata attach.
+ */
+#include "common.h"
+#include <libsnd.h>
+#include <libspu.h>
+#include "SsScore.h"
+#include "SvmData.h"
+#include "VabStreamObj.h"
+#include "SoundCueSet.h"
+
+/* Tones per VAB program: playTone's index is program * 16 + tone
+ * (token-identical to PlacementGridVabSound.c's, which owns PlayTone). */
+#define VAB_TONES_PER_PROG 16
+
+/*
+ * libsnd's _svm_cur (pinned in config/psyq-objects.ld, 0x20 bytes): the
+ * key-on request the voice manager is working on, which the key-on paths
+ * (SpuVmKeyOn, SsUtKeyOn, SsUtKeyOnV) fill before they call in here. Sony's struct type is not on any
+ * SDK disc, so each byte this file reads is its own extern, named by
+ * address; beside each, its offset in _svm_cur and what the code here does
+ * with it. The three pans cut the right channel below 64 and the left one
+ * above.
+ */
+extern u8 D_8008EA0E; /* +0x02: the note to key */
+extern u8 D_8008EA10; /* +0x04: volume, scaled by the VAB's mvol */
+extern u8 D_8008EA11; /* +0x05: third pan */
+extern u8 D_8008EA13; /* +0x07: program */
+extern u8 D_8008EA16; /* +0x0A: first volume factor, out of 127 */
+extern u8 D_8008EA17; /* +0x0B: second pan */
+extern u8 D_8008EA18; /* +0x0C: tone within the program */
+extern u8 D_8008EA19; /* +0x0D: second volume factor, out of 127 */
+extern u8 D_8008EA1A; /* +0x0E: first pan */
+extern u8 D_8008EA1B; /* +0x0F: priority, which SpuVmAlloc compares */
+extern u8 D_8008EA1C; /* +0x10: the tone's centre note */
+extern u8 D_8008EA1D; /* +0x11: the tone's fine tune, 8 per pitch-table step */
+extern u8 D_8008EA20; /* +0x14: mode bits; bit 2 sends the voice to reverb */
+extern u16 D_8008EA22; /* +0x16: _ss_score index, low byte then high byte; 33 from SsUtKeyOn/SsUtKeyOnV: no score */
+/* +0x1A: the voice being keyed. volatile u16, the spelling SpuVmInit,
+ * SpuVmNoiseOn and SpuVmKeyOff need (the note above SpuVmNoiseOnWithAdsr);
+ * SpuVmKeyOnNow's NON_MATCHING body reads it as a plain s16 through a cast
+ * (SpuVmKeyOnNow.md: neither scalar nor volatile). */
+extern volatile u16 D_8008EA26;
+
+/* The rest of libsnd/vmanager's globals this file reads, under Sony's names
+ * where a disc gives one (the voice tables are in SvmData.h). The key masks
+ * are two halfwords each, voices 0-15 then 16-23. */
+extern VabHdr *_svm_vh;      /* the header of the VAB being played */
+extern VagAtr *_svm_tn;      /* that VAB's tone attributes, 16 per program */
+extern u8 spuVmMaxVoice;     /* voices the allocator may hand out */
+extern s16 _svm_stereo_mono; /* 1: mono, both channels at the louder volume */
+extern u16 _svm_okon1;       /* Sony's _svm_okon1: voices 0-15 to key on at the next flush */
+extern u16 _svm_okon2;
+extern u16 _svm_okof1; /* voices to key off at the next flush */
+extern u16 _svm_okof2;
+extern u16 _svm_orev1; /* voices sent to reverb */
+extern u16 _svm_orev2;
+extern SpuRegs *_svm_sreg; /* the SPU's register block */
+/* vmanager's static pitch table: 12 semitones x 16 fine steps, the SPU
+ * pitch of each at octave 5. */
+extern u16 D_8006DAD8[];
+
+void ServiceSoundCueSet(VabStreamObj *sound, SoundCueSet *set) {
+    s32 i;
+    SoundCueSlot *slot;
+    s32 vol;
+    s32 endVol;
+    s32 toneIndex;
+
+    if (set->tag > 0) {
+        i = 0;
+        slot = &set->slots[0];
+        do {
+            i++;
+            slot->program = SOUND_CUE_NONE;
+            slot->octave = 0;
+            slot->vol = SOUND_CUE_DEFAULT_VOL;
+            slot->endVol = SOUND_CUE_DEFAULT_END_VOL;
+            slot++;
+        } while (i < ARRAY_COUNT(set->slots));
+
+        set->attenuation = 0;
+        if (set->callback != NULL) {
+            set->callback(set->owner, set);
+        }
+
+        if (set->attenuation >= 0) {
+            slot = &set->slots[0];
+            i = 0;
+            do {
+                if (slot->program >= 0) {
+                    if (slot->voice >= 0) {
+                        sound->methods->stopVoice(sound, slot->voice);
+                    }
+                    sound->methods->setPitchOffset(sound, slot->octave);
+                    toneIndex = slot->program * VAB_TONES_PER_PROG;
+                    vol = slot->vol - (slot->vol / set->attenuationSteps) * set->attenuation;
+                    endVol = slot->endVol - (slot->endVol / set->attenuationSteps) * set->attenuation;
+                    slot->voice = sound->methods->playTone(sound, toneIndex, vol, endVol);
+                } else if (slot->program == SOUND_CUE_STOP && slot->voice >= 0) {
+                    sound->methods->stopVoice(sound, slot->voice);
+                }
+                i++;
+                slot++;
+            } while (i < ARRAY_COUNT(set->slots));
+        }
+        set->tick++;
+    }
+}
+
+#ifdef NON_MATCHING
+/* NON_MATCHING: 167/167 words, length exact; the residue is a register
+ * rotation through the whole function (docs/match-reports/SpuVmAlloc.md). */
+
+/* `unused`: nothing here reads it, but SpuVmNoiseOn and
+ * SpuVmNoiseOnWithAdsr pass one (their prototype's arity-ok note). */
+s32 SpuVmAlloc(s32 unused) {
+    s32 chosen;
+    u16 bestSec;
+    s32 found;
+    s32 bestTer;
+    s32 bestIdx;
+    u32 idx;
+    s32 threshold;
+    s32 pri;
+    u32 newSec;
+    u32 count;
+
+    chosen = 99;
+    bestSec = 0xFFFF;
+    found = 0;
+    bestTer = 0;
+    bestIdx = 99;
+    threshold = D_8008EA1B;
+
+    for (idx = 0; (u8)idx < spuVmMaxVoice; idx++) {
+        if (_svm_voice[(u8)idx].unk1B != 0 || _svm_voice[(u8)idx].unk06 != 0) {
+            pri = _svm_voice[(u8)idx].unk18;
+            if (pri < (s32)(u16)threshold) {
+                threshold = pri;
+                bestIdx = idx;
+                bestSec = _svm_voice[(u8)idx].unk06;
+                bestTer = _svm_voice[(u8)idx].unk02;
+                found = 1;
+            } else if (pri == (s32)(u16)threshold) {
+                found++;
+                newSec = _svm_voice[(u8)idx].unk06;
+                if (newSec < bestSec) {
+                    bestTer = _svm_voice[(u8)idx].unk02;
+                    bestSec = newSec;
+                    bestIdx = idx;
+                } else if (newSec == bestSec) {
+                    if (bestTer < (s16)_svm_voice[(u8)idx].unk02) {
+                        bestTer = (s16)_svm_voice[(u8)idx].unk02;
+                        bestIdx = idx;
+                    }
+                }
+            }
+        } else {
+            chosen = idx;
+        }
+    }
+
+    if ((u8)chosen == 99) {
+        if ((u8)found != 0) {
+            chosen = bestIdx;
+        } else {
+            chosen = spuVmMaxVoice;
+        }
+    }
+
+    count = spuVmMaxVoice;
+    if ((u8)chosen < count) {
+        if (count != 0) {
+            for (idx = 0; (u8)idx < count; idx++) {
+                _svm_voice[(u8)idx].unk02 = _svm_voice[(u8)idx].unk02 + 1;
+            }
+        }
+        _svm_voice[(u8)chosen].unk02 = 0;
+        _svm_voice[(u8)chosen].unk18 = D_8008EA1B;
+        if (_svm_voice[(u8)chosen].unk1B == 2) {
+            SpuSetNoiseVoice(SPU_OFF, SPU_ALLCH);
+        }
+    }
+    return (u8)chosen;
+}
+#else
+INCLUDE_ASM("asm/nonmatchings/libsnd_vmanager", SpuVmAlloc);
+#endif
+
+#ifdef NON_MATCHING
+/* NON_MATCHING: 316/316 words, length exact; the residue is the frame size
+ * (8 bytes against retail's 16) and this unit's register-identity class
+ * (docs/match-reports/SpuVmKeyOnNow.md). */
+/* Sets the voice's volumes from _svm_cur's volumes and pans, and its pitch,
+ * then marks it to be keyed on (and to or from reverb) at the next flush. */
+#define KEYON_VOICE (*(s16 *)&D_8008EA26)
+void SpuVmKeyOnNow(s32 unused, s32 pitch) {
+    SsScore *score;
+    s32 masterVol;
+    s32 toneVol;
+    u32 vol;
+    u32 volL;
+    u32 volR;
+    u32 volLSq;
+    u32 volRSq;
+    s16 outL;
+    s32 sregIndex;
+    s32 lowBit;
+    s32 highBit;
+
+    masterVol = _svm_vh->mvol * 16383;
+    toneVol = D_8008EA10 * masterVol / 16129;
+    vol = (u32)toneVol * D_8008EA16 * D_8008EA19 / 16129;
+
+    sregIndex = KEYON_VOICE * 8;
+
+    score = &_ss_score[D_8008EA22 & 0xFF][D_8008EA22 >> 8];
+    volL = vol;
+    volR = vol;
+    if ((s16)D_8008EA22 != 33) {
+        volL = vol * score->unk74 / 127;
+        volR = vol * score->unk76 / 127;
+    }
+
+    if ((u8)D_8008EA1A < 64) {
+        volR = (volR * D_8008EA1A) / 63;
+    } else {
+        volL = (volL * (127 - D_8008EA1A)) / 63;
+    }
+
+    if ((u8)D_8008EA17 < 64) {
+        volR = (volR * D_8008EA17) / 63;
+    } else {
+        volL = (volL * (127 - D_8008EA17)) / 63;
+    }
+
+    if ((u8)D_8008EA11 < 64) {
+        volR = (D_8008EA11 * volR) / 63;
+    } else {
+        volL = (volL * (127 - D_8008EA11)) / 63;
+    }
+
+    if (_svm_stereo_mono == 1) {
+        if (volL < volR) {
+            volL = volR;
+        } else {
+            volR = volL;
+        }
+    }
+    volLSq = volL * volL;
+    outL = (s16)(volLSq / 16383);
+    volRSq = volR * volR;
+
+    ((s16 *)_svm_sreg_buf)[(u16)sregIndex + 2] = (s16)pitch;
+    ((s16 *)_svm_sreg_buf)[(u16)sregIndex] = outL;
+    ((s16 *)_svm_sreg_buf)[(u16)sregIndex + 1] = (s16)(volRSq / 16383);
+
+    _svm_sreg_dirty[KEYON_VOICE] |= 7;
+    _svm_voice[KEYON_VOICE].unk04 = (s16)pitch;
+    _svm_voice[KEYON_VOICE].unk1B = 1;
+
+    if (KEYON_VOICE < 16) {
+        lowBit = 1 << KEYON_VOICE;
+        highBit = 0;
+    } else {
+        lowBit = 0;
+        highBit = 1 << (KEYON_VOICE - 16);
+    }
+
+    if (D_8008EA20 & 4) {
+        _svm_orev1 = lowBit | _svm_orev1;
+        _svm_orev2 = highBit | _svm_orev2;
+    } else {
+        _svm_orev1 = _svm_orev1 & ~lowBit;
+        _svm_orev2 = _svm_orev2 & ~highBit;
+    }
+
+    _svm_okon1 = lowBit | _svm_okon1;
+    _svm_okon2 = highBit | _svm_okon2;
+    _svm_okof1 = _svm_okof1 & ~_svm_okon1;
+    _svm_okof2 = _svm_okof2 & ~_svm_okon2;
+}
+#undef KEYON_VOICE
+#else
+INCLUDE_ASM("asm/nonmatchings/libsnd_vmanager", SpuVmKeyOnNow);
+#endif
+
+/* Not yet C: the best body (142/143 words) is in
+ * docs/match-reports/SpuVmDoAllocate.md. */
+INCLUDE_ASM("asm/nonmatchings/libsnd_vmanager", SpuVmDoAllocate);
+
+/* Not yet C: the best body (309/311 words) is in
+ * docs/match-reports/vmNoiseOn.md. */
+INCLUDE_ASM("asm/nonmatchings/libsnd_vmanager", vmNoiseOn);
+
+#ifdef NON_MATCHING
+/* NON_MATCHING: 107/112 words, 5 short; the residue is a register role swap
+ * between the voice argument and its copy, and an 8-byte frame retail
+ * allocates (docs/match-reports/vmNoiseOn2.md, which also has the order-only
+ * __asm__("") barrier this copy omits). */
+/* Switches the voice to the noise generator at volumes volL/volR and keys it
+ * on. It becomes the only noise voice: any other is marked off (state 2 & 1),
+ * and the SPU's noise mask gets this voice's bit alone. */
+
+/* The last two parameters are the ADSR words SpuVmNoiseOnWithAdsr and
+ * SpuVmNoiseOn pass; retail's body reads neither. */
+void vmNoiseOn2(s32 voice, s32 volL, s32 volR, s32 unusedAdsr1, s32 unusedAdsr2) {
+    s32 voiceArg;
+    s32 dirty;
+    s32 lowBit;
+    s32 highBit;
+    s32 i;
+    s32 n;
+
+    voiceArg = voice;
+    voice = (u8)voice;
+    _svm_sreg_buf[voice].unk2 = volR;
+    dirty = _svm_sreg_dirty[voice];
+    _svm_sreg_buf[voice].unk0 = volL;
+    dirty |= 3;
+    _svm_sreg_dirty[voice] = dirty;
+    if ((u32)voice < 16) {
+        lowBit = 1 << voice;
+        highBit = 0;
+    } else {
+        lowBit = 0;
+        highBit = 1 << (voice - 16);
+    }
+
+    n = spuVmMaxVoice;
+    _svm_voice[(u8)voiceArg].unk04 = 10;
+    if (n != 0) {
+        i = 0;
+        do {
+            _svm_voice[(u16)i].unk1B = _svm_voice[(u16)i].unk1B & 1;
+            i++;
+        } while ((u16)i < spuVmMaxVoice);
+    }
+    _svm_voice[(u8)voiceArg].unk1B = 2;
+
+    _svm_voice[(u8)voiceArg].unk02 = 0;
+    _svm_okon1 = lowBit | _svm_okon1;
+    _svm_okon2 = highBit | _svm_okon2;
+    _svm_okof1 = _svm_okof1 & ~_svm_okon1;
+    _svm_okof2 = _svm_okof2 & ~_svm_okon2;
+    _svm_sreg->noiseOn[0] = lowBit;
+    _svm_sreg->noiseOn[1] = highBit;
+}
+#else
+INCLUDE_ASM("asm/nonmatchings/libsnd_vmanager", vmNoiseOn2);
+#endif
+
+/* The SPU pitch of _svm_cur's note on its tone: semitones from the centre
+ * note, looked up at octave 5 and shifted to the note's octave. */
+s32 note2pitch(void) {
+    s32 semitones;
+    s32 octave;
+    s16 semitone;
+    u8 step;
+    u16 pitch;
+
+    semitones = (s16)(D_8008EA0E + 60 - D_8008EA1C);
+    octave = semitones / 12;
+    step = D_8008EA1D >> 3;
+    semitone = semitones - octave * 12;
+    if (step >= 16) {
+        step = 15;
+    }
+    pitch = D_8006DAD8[step + semitone * 16];
+    if ((s16)(octave - 5) > 0) {
+        pitch <<= (s16)(octave - 5);
+    } else if ((s16)(octave - 5) < 0) {
+        pitch = (u16)pitch >> -(s16)(octave - 5);
+    }
+    return pitch;
+}
+
+/* note2pitch for an explicit note and fine tune, on _svm_cur's tone: the
+ * fine tune plus the tone's shift is in 8ths of a table step, carrying into
+ * the next semitone past 16 steps. */
+s32 note2pitch2(s32 note, s32 fine) {
+    s32 toneIndex;
+    s32 tableIndex;
+    VagAtr *tone;
+    s32 fineTotal;
+    s32 steps;
+    u8 carry;
+    s16 step;
+    s32 semitones;
+    s32 octave;
+    s16 semitone;
+    u16 pitch;
+
+    toneIndex = D_8008EA18 + (D_8008EA13 << 4);
+    tone = &_svm_tn[toneIndex];
+    fineTotal = (u16)fine + tone->shift;
+    steps = fineTotal / 8;
+    step = steps;
+    carry = 0;
+    if (steps >= 16) {
+        carry = 1;
+        step = steps - 16;
+    }
+    semitones = (s16)(carry + (note + 60 - tone->center));
+    octave = semitones / 12;
+    semitone = semitones - octave * 12;
+    tableIndex = semitone * 16;
+    tableIndex = tableIndex + step;
+    pitch = D_8006DAD8[tableIndex];
+    if ((s16)(octave - 5) > 0) {
+        pitch <<= (s16)(octave - 5);
+    } else if ((s16)(octave - 5) < 0) {
+        pitch = (u16)pitch >> -(s16)(octave - 5);
+    }
+    return pitch;
+}
+
+/* Bends a keyed voice by `bend` (signed, 127 = the tone's full pbmax
+ * semitones up; below 0, its pbmin down) and retunes it. */
+void SePitchBend(s32 chan, s32 bend) {
+    s32 sregIndex;
+    s32 prod;
+    s32 q;
+    s32 note;
+    s32 fine;
+    s16 amount;
+    s32 toneIndex;
+    u8 *curProg;
+
+    sregIndex = (chan & 0xFF) * 8;
+    if ((u32)(chan & 0xFF) < 24) {
+        /* MATCHING: the direct D_8008EA13 spelling does not match. */
+        curProg = &D_8008EA13;
+        *curProg = (u8)_svm_voice[(chan & 0xFF)].unk10;
+        D_8008EA18 = (u8)_svm_voice[(chan & 0xFF)].unk14;
+        D_8008EA26 = (u8)chan;
+        toneIndex = D_8008EA18 + (*curProg << 4);
+        amount = bend;
+        if (amount >= 0) {
+            prod = amount * _svm_tn[toneIndex].pbmax;
+            note = (u16)_svm_voice[(chan & 0xFF)].unk0C + prod / 127;
+            fine = prod % 127;
+        } else {
+            q = (amount * _svm_tn[toneIndex].pbmin) / 127;
+            note = (u16)_svm_voice[(chan & 0xFF)].unk0C + q - 1;
+            fine = q + 127;
+        }
+        ((u16 *)_svm_sreg_buf)[sregIndex + 2] = note2pitch2((u16)note, (u16)fine);
+        _svm_sreg_dirty[(chan & 0xFF)] |= 4;
+    }
+}
+
+void SsUtVibrateOn(short vc, short vibW, short vibT) {}
+
+void SsUtVibrateOff(short vc) {}
+
+/* Starts a volume ramp on a voice from `from` to `to` over `duration`
+ * ticks, which SetAutoVol steps. Same body as SeAutoPan (below),
+ * over _svm_voice +0x1C..+0x26 instead of +0x28..+0x32. */
+void SeAutoVol(s16 voice, s16 from, s16 to, s16 duration) {
+    s16 q;
+
+    if (from == to) {
+        return;
+    }
+    _svm_voice[voice].unk1C = 1;
+    _svm_voice[voice].unk24 = from;
+    _svm_voice[voice].unk26 = to;
+    if ((from - to < 0 ? to - from : from - to) < duration) {
+        q = duration / (from - to);
+        _svm_voice[voice].unk1E = 1;
+        _svm_voice[voice].unk20 = q;
+        _svm_voice[voice].unk22 = q;
+    } else {
+        q = (from - to) / duration;
+        _svm_voice[voice].unk20 = 0;
+        _svm_voice[voice].unk1E = q;
+    }
+}
+
+/*
+ * From SetAutoVol to SpuVmKeyOff: voice key-on/off, noise voices, pitch
+ * bend, the volume/pan ramps and the per-tick flush. _svm_pg and _svm_tn are
+ * pinned in config/psyq-objects.ld and spelled here by their D_ addresses;
+ * the per-voice state is include/SvmData.h's _svm_voice/_svm_sreg_buf, and
+ * _svm_sreg points at the SPU's own register block, SvmData.h's SpuRegs.
  *
  *   - SpuVmInit: resets the voice manager: every voice, its shadow
  *     registers and the SPU voice registers, the reverb depth to 0x3FFF,
@@ -21,27 +536,21 @@
  *     calls SpuVmKeyOff instead. SpuVmKeyOff releases every voice playing
  *     that sequence, VAB, program and note, and returns how many.
  *   - SpuVmNoiseOnWithAdsr / SpuVmNoiseOn: allocate a voice and key it on
- *     the noise generator (vmNoiseOn2, code_179d8_l); SpuVmNoiseOff
+ *     the noise generator (vmNoiseOn2, above); SpuVmNoiseOff
  *     releases every noise voice.
  *   - SpuVmPBVoice: bends one matching voice's pitch by a 0..127 value
  *     centred on 0x40, scaled by the tone's pbmin/pbmax; SpuVmPitchBend
  *     applies it to every voice and returns how many matched.
  *   - SeAutoPan sets a pan ramp; SetAutoVol / SetAutoPan step a voice's
- *     volume/pan ramp once (SeAutoVol, the volume setter, is in
- *     code_179d8_l).
+ *     volume/pan ramp once (SeAutoVol, the volume setter, is above).
  *   - SpuVmFlush, once per tick: records which voices' envelopes have died,
  *     releases voices silent across that history (unless _svm_auto_kof_mode
  *     is set), steps the ramps, copies dirty shadow registers to the SPU
  *     and writes the key-on/key-off/reverb masks.
  *
- * No jump table and no rodata attach. Five functions are preserved
- * NON_MATCHING bodies; each report gives its residue.
+ * Five functions in this stretch are preserved NON_MATCHING bodies; each
+ * report gives its residue.
  */
-#include "common.h"
-#include <libsnd.h>
-#include <libspu.h>
-#include "SsScore.h"
-#include "SvmData.h"
 
 /* libsnd's _svm_vh (pinned at this address): the header of the VAB bank
  * currently selected. SetAutoVol/SetAutoPan scale by its master volume;
@@ -142,7 +651,7 @@ void SetAutoVol(s16 voice) {
     _svm_sreg_dirty[v] |= 3;
 }
 #else
-INCLUDE_ASM("asm/nonmatchings/code_179d8_m", SetAutoVol);
+INCLUDE_ASM("asm/nonmatchings/libsnd_vmanager", SetAutoVol);
 #endif
 
 void SeAutoPan(s16 a0, s16 a1, s16 a2, s16 a3) {
@@ -250,7 +759,7 @@ void SetAutoPan(s16 voice) {
     _svm_sreg_dirty[v] |= 3;
 }
 #else
-INCLUDE_ASM("asm/nonmatchings/code_179d8_m", SetAutoPan);
+INCLUDE_ASM("asm/nonmatchings/libsnd_vmanager", SetAutoPan);
 #endif
 
 extern void _spu_setInTransfer(s32 a0);
@@ -260,14 +769,11 @@ extern char D_8008DEB0[]; /* Sony's _ss_spu_vm_rec + 8 (libsnd/vmanager.o bss; s
 
 extern s16 D_8008E9FC;
 extern s16 _svm_damper;
-extern s16 _svm_orev1;
-extern s16 _svm_orev2;
 
 extern SpuReverbAttr _svm_rattr; /* pinned in config/psyq-objects.ld (libsnd/vm_g.o) */
 extern u8 _svm_auto_kof_mode;
 extern s16 kMaxPrograms;
 
-extern volatile u16 D_8008EA26;
 extern u8 spuVmMaxVoice;
 extern s16 _svm_vab_count;
 extern u8 _svm_vab_used[];
@@ -391,8 +897,8 @@ void SpuVmInit(s32 a0) {
 
 /* "Currently selected channel" scratch global: written as a side
  * effect, then re-read from the global (not a cached register) a few
- * instructions later -- same idiom, and same `volatile u16` type,
- * code_179d8_j.c documents for this symbol.  Genuinely needs
+ * instructions later; this is why the declaration at the top of the file
+ * is `volatile u16`.  Genuinely needs
  * `volatile`: without it, this compiler proves (from the narrow range
  * of the values stored here) that the re-read is redundant and elides
  * it entirely, which retail's disassembly shows it does NOT do.
@@ -403,10 +909,6 @@ void SpuVmInit(s32 a0) {
  * VOLATILE-QUALIFIED POINTER TYPE (`volatile u8 *`) that defeats the
  * addressing fold, not the underlying object's volatility. */
 extern volatile u16 D_8008EA26;
-/* Loop bound / threshold, read fresh each call -- same symbol
- * code_179d8_j.c documents as "loop bound for a small table of active
- * objects". */
-extern u8 spuVmMaxVoice;
 /* Flag byte forced on unconditionally at entry. */
 extern u8 D_8008EA1B;
 
@@ -460,7 +962,6 @@ extern VagAtr *_svm_tn;
 /* _svm_cur + 0xC: the current tone number within the program. */
 extern u8 D_8008EA18;
 
-extern s16 note2pitch2(u16 a0, u16 a1);
 
 #ifdef NON_MATCHING
 /* NON_MATCHING: 77/138 words, length exact. Residue: register-class
@@ -523,13 +1024,9 @@ s16 SpuVmPBVoice(s16 a0, s16 a1, s16 a2, s16 a3, u16 a4) {
     return 1;
 }
 #else
-INCLUDE_ASM("asm/nonmatchings/code_179d8_m", SpuVmPBVoice);
+INCLUDE_ASM("asm/nonmatchings/libsnd_vmanager", SpuVmPBVoice);
 #endif
 
-/* "Currently selected channel" scratch global -- same idiom as
- * D_8008EA26 above, write-only here (see code_179d8_j.c's own reading
- * of this symbol). */
-extern u16 D_8008EA22;
 
 extern s32 SpuVmVSetUp(s16 a0, s16 a1);
 extern s16 SpuVmPBVoice(s16 a0, s16 a1, s16 a2, s16 a3, u16 a4);
@@ -687,7 +1184,7 @@ void SpuVmFlush(void) {
     }
 }
 #else
-INCLUDE_ASM("asm/nonmatchings/code_179d8_m", SpuVmFlush);
+INCLUDE_ASM("asm/nonmatchings/libsnd_vmanager", SpuVmFlush);
 #endif
 
 #ifdef NON_MATCHING
@@ -721,8 +1218,7 @@ extern u16 D_8008EA24;
 extern void SpuVmDoAllocate(void);
 extern void vmNoiseOn(s32 a0);
 extern s32 note2pitch(void);
-extern void SpuVmKeyOnNow(s32 a0, u16 a1);
-extern u8 SpuVmKeyOff(s16 a0, s16 a1, s16 a2, u16 a3);
+extern s32 SpuVmKeyOff(s16 a0, s16 a1, s16 a2, u16 a3);
 
 s32 SpuVmKeyOn(s32 a0, s16 a1, s16 a2, u16 a3, u16 a4, u16 a5) {
     SsScore *s6;
@@ -841,19 +1337,11 @@ s32 SpuVmKeyOn(s32 a0, s16 a1, s16 a2, u16 a3, u16 a4, u16 a5) {
     return s3;
 }
 #else
-INCLUDE_ASM("asm/nonmatchings/code_179d8_m", SpuVmKeyOn);
+INCLUDE_ASM("asm/nonmatchings/libsnd_vmanager", SpuVmKeyOn);
 #endif
 
-/* A pair of 16-bit bitmasks split across a 0..0x1F channel space (low
- * 16 channels in the first word, next 16 in the second), each paired
- * with an "active mask" word cleared wherever the channel mask bit is
- * set -- same symbols and reading code_179d8_j.c already documents. */
-extern u16 _svm_okof1;
-extern u16 _svm_okof2;
-extern u16 _svm_okon1;
-extern u16 _svm_okon2;
 
-u8 SpuVmKeyOff(s16 a0, s16 a1, s16 a2, u16 a3) {
+s32 SpuVmKeyOff(s16 a0, s16 a1, s16 a2, u16 a3) {
     u8 i;
     u8 count;
 
@@ -902,3 +1390,101 @@ u8 SpuVmKeyOff(s16 a0, s16 a1, s16 a2, u16 a3) {
     }
     return count;
 }
+
+/*
+ * The last eight functions:
+ *
+ *   SpuVmSeKeyOn    keys on a sound effect: SpuVmKeyOn on the SE pseudo-
+ *                   sequence, with the louder of the two channel volumes as
+ *                   the volume and their ratio as the pan.
+ *   SpuVmSeKeyOff   keys off a sound effect SpuVmSeKeyOn started.
+ *   KeyOnCheck      vmanager's empty internal hook.
+ *   SpuVmSetSeqVol  sets one sequence's L/R volume (SsScore unk74/unk76,
+ *                   clamped to 127) and rescales the voices it is playing.
+ *   SpuVmGetSeqVol, SpuVmGetSeqLVol, SpuVmGetSeqRVol
+ *                   read that volume back.
+ *   SpuVmSeqKeyOff  keys off every voice one sequence is playing.
+ *
+ * A sequence is named by one packed number: the SEQ/SEP access in the low
+ * byte, the sequence within it in the high byte, reaching
+ * _ss_score[access][seq] (include/SsScore.h). Each volume accessor
+ * records it in D_8008EA22, vmanager's current-sequence global
+ * (SpuVmGetSeqLVol records only the access byte).
+ */
+
+/* vmanager internals, absent from <libsnd.h>; signatures read from the
+ * registers each call site loads. */
+extern s32 SpuVmKeyOn(s32 seqSepNo, s16 vabId, s16 prog, u16 note, u16 vol, u16 pan);
+
+/* The packed number of the sequence vmanager is working on. */
+extern u16 D_8008EA22;
+
+/* The pseudo-sequence number sound effects are keyed on and off under;
+ * libsnd's SE paths store it in D_8008EA22 and in a voice's owner field. */
+#define SPUVM_SE_SEQ 0x21
+
+/* Keys on note of vabId's program prog as a sound effect. The pan is 64
+ * (centre) for equal volumes and leans toward the louder side by the ratio
+ * of the quieter to the louder, 64ths of the way; the fourth argument is
+ * unused. */
+s32 SpuVmSeKeyOn(s32 vabId, s32 prog, s32 note, s32 unused, u16 volL, u16 volR) {
+    u16 vol;
+    u16 pan;
+
+    if (volL == volR) {
+        pan = 64;
+        vol = volL;
+    } else if (volR < volL) {
+        vol = volL;
+        pan = (volR << 6) / volL;
+    } else {
+        vol = volR;
+        pan = 127 - ((volL << 6) / volR);
+    }
+    return SpuVmKeyOn(SPUVM_SE_SEQ, (s16)vabId, (s16)prog, (u16)note, vol, pan);
+}
+
+s32 SpuVmSeKeyOff(s16 vabId, s16 prog, u16 note) {
+    return SpuVmKeyOff(SPUVM_SE_SEQ, vabId, prog, note);
+}
+
+void KeyOnCheck(void) {}
+
+INCLUDE_ASM("asm/nonmatchings/libsnd_vmanager", SpuVmSetSeqVol);
+
+/* Returns the packed number, read back through D_8008EA22. */
+s32 SpuVmGetSeqVol(s32 seqSepNo, s16 *volL, s16 *volR) {
+    SsScore *seqs = _ss_score[(u8)seqSepNo];
+    s16 *cur = (s16 *)&D_8008EA22;
+
+    *cur = (s16)seqSepNo;
+    *volL = seqs[(seqSepNo & 0xFF00) >> 8].unk74;
+    *volR = seqs[(seqSepNo & 0xFF00) >> 8].unk76;
+    return *cur;
+}
+
+s32 SpuVmGetSeqLVol(s32 seqSepNo) {
+    s32 access = seqSepNo & 0xFF;
+    SsScore *seqs = _ss_score[access];
+    s32 seq = (seqSepNo & 0xFF00) >> 8;
+
+    /* MATCHING: keeps the D_8008EA22 store after the index arithmetic;
+     * without it GCC hoists the store to the top. */
+    __asm__("");
+    D_8008EA22 = access;
+    /* MATCHING: s16, for retail's sign-extending lh of the u16 field. */
+    return (s16)seqs[seq].unk74;
+}
+
+s32 SpuVmGetSeqRVol(s32 seqSepNo) {
+    SsScore *seqs = _ss_score[(u8)seqSepNo];
+
+    /* MATCHING: keeps the _ss_score load above the D_8008EA22 store;
+     * without it the load sinks below the store and the index arithmetic. */
+    __asm__("");
+    D_8008EA22 = seqSepNo;
+    /* MATCHING: s16, for retail's sign-extending lh of the u16 field. */
+    return (s16)seqs[(seqSepNo & 0xFF00) >> 8].unk76;
+}
+
+INCLUDE_ASM("asm/nonmatchings/libsnd_vmanager", SpuVmSeqKeyOff);

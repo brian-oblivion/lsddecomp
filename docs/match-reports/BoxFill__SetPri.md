@@ -2,7 +2,7 @@
 
 > Renamed from `func_800408A0` on 2026-09-25 (tools/rename.py). Address 0x800408a0.
 
-Unit: `src/code_2cc8c_f.c`. Trivial setter, first attempt.
+Unit: `src/ScreenWidgets.c`. Trivial setter, first attempt.
 
 ```c
 void BoxFill__SetPri(Obj6EAC0 *self, s32 a1) {
@@ -13,7 +13,7 @@ void BoxFill__SetPri(Obj6EAC0 *self, s32 a1) {
 Base-table occupant of `Obj6EAC0Methods::slot0xC8` (see
 `include/Task.h`); the derived table's slot0xC8 is
 `TextRow__NoOpGetCell`, a splat-generated trivial `jr $ra; nop` already present
-in `src/code_2cc8c_f.c` before this unit was carved.
+in `src/ScreenWidgets.c` before this unit was carved.
 
 ### Proposed learning
 

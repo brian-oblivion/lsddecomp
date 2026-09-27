@@ -120,7 +120,7 @@ the same lever applied twice. Given two independent permuter searches
 rounds 18/19, not re-spending a further search without a genuinely new
 angle. Restored to `INCLUDE_ASM`; full oracle re-confirmed green.
 
-Unit `code_2cc8c_e`, carved round 14. `FadeBoxMethods::pushPosition` (`+0x0E8`).
+Unit `ScreenWidgets`, carved round 14. `FadeBoxMethods::pushPosition` (`+0x0E8`).
 
 **Correction to an earlier version of this report**, which claimed a full
 25/25 match under the stale-build window described in `New_FadeBox.md`.
@@ -518,7 +518,7 @@ confirms it, the same discipline already applied to permuter zeros and
 
 NON_MATCHING body promoted, round 59. The exact preserved body above (22/25
 words, length exact, permuter-exhausted redundant-move residue) is now live
-in `src/code_2cc8c_e.c` under `#ifdef NON_MATCHING`, with the verified build
+in `src/ScreenWidgets.c` under `#ifdef NON_MATCHING`, with the verified build
 still taking the `#else INCLUDE_ASM` branch. `./build-and-verify.sh` and
 `tools/check-nonmatching.sh` both green.
 

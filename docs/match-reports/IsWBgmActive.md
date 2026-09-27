@@ -14,7 +14,7 @@ FINISHING-PLAN revision 18). This was fresh ground with no prior attempt.
 
 ## Naming
 
-`IsWBgmActive`, tier A. returns `gWBgmActive`, set to 1 in `WBgm__WBgm` and 0 in `WBgm__Finalize`; its only caller (`VabStreamObj__Finalize`, code_179d8_e.c) gates `SsEnd`/`SsQuit` on it being 0 -- "is a WBgm still open" is exactly the condition it tests.
+`IsWBgmActive`, tier A. returns `gWBgmActive`, set to 1 in `WBgm__WBgm` and 0 in `WBgm__Finalize`; its only caller (`VabStreamObj__Finalize`, PlacementGridVabSound.c) gates `SsEnd`/`SsQuit` on it being 0 -- "is a WBgm still open" is exactly the condition it tests.
 
 ## Source
 

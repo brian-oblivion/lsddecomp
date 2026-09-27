@@ -4,7 +4,7 @@
 
 > Renamed from `new_class_6d940` on 2026-09-24 (tools/rename.py). Address 0x8002c12c.
 
-**Unit:** code_179d8_d · **Size:** 24 instructions (0x60 bytes) ·
+**Unit:** PlacementGridVabSound · **Size:** 24 instructions (0x60 bytes) ·
 **Status: MATCHED 24/24**, whole-image SHA1 green. Matched on the first
 attempt.
 

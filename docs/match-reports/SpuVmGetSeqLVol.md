@@ -2,7 +2,7 @@
 
 > Renamed from `func_800305F4` on 2026-09-23 (tools/rename.py). Address 0x800305f4.
 
-Unit `code_179d8_j`, round 22 (2026-09-06). Not a class method. Sibling of
+Unit `libsnd_vmanager`, round 22 (2026-09-06). Not a class method. Sibling of
 `SpuVmGetSeqRVol` and `SpuVmGetSeqVol` -- all three index the same
 `_ss_score[screen][slot]` array already established in `libsnd_cres.c` /
 `libsnd_decre.c` (an array of pointers to 172 (0xAC)-byte records), reading

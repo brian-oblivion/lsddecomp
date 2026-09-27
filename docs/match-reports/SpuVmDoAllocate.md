@@ -2,7 +2,7 @@
 
 > Renamed from `func_8002D6A4` on 2026-09-24 (tools/rename.py). Address 0x8002d6a4.
 
-Unit `src/code_179d8_l.c` (carved round 24). Size: 143 words (0x23C bytes).
+Unit `src/libsnd_vmanager.c` (carved round 24). Size: 143 words (0x23C bytes).
 Round 26, runner delta.
 
 **Read the raw-word-match caveat before trusting the 10/143 figure at face
@@ -103,7 +103,7 @@ to `addiu $t0, $v1, -0x2` reusing `$v1` (D_8008EA28's own materialized
 `lui`/`addiu`) — a literal displacement off ANOTHER symbol's base is only
 emittable when the SOURCE writes exactly that pointer arithmetic (cc1 has
 no knowledge of the two symbols' relative addresses otherwise; see
-`SsUtSetDetVVol`'s report in `code_179d8_j.c` for the general form of this
+`SsUtSetDetVVol`'s report in `libsnd_vmanager.c` for the general form of this
 discriminator). This does NOT mean the two should be modeled as one
 struct/array — `D_8008EA26` is read directly by its OWN symbol at three
 other points in this same function, so both a named `D_8008EA26` extern
@@ -116,7 +116,7 @@ the same symbol with no intervening write to it — including two full
 `D_8008EA13`+`D_8008EA18` recomputations back-to-back separated only by an
 unrelated array store, and re-deriving `D_8008EA28*2`'s address twice for
 two adjacent but distinct destination arrays. `volatile` reproduces all of
-this uniformly; see `code_179d8_m.c`'s own note on `D_8008EA26` needing
+this uniformly; see `libsnd_vmanager.c`'s own note on `D_8008EA26` needing
 `volatile` for the identical reason (a re-read the compiler would otherwise
 prove redundant and elide).
 
@@ -173,7 +173,7 @@ void SpuVmDoAllocate(void)
 }
 ```
 
-Restored to `INCLUDE_ASM("asm/nonmatchings/code_179d8_l", SpuVmDoAllocate);`.
+Restored to `INCLUDE_ASM("asm/nonmatchings/libsnd_vmanager", SpuVmDoAllocate);`.
 The `D8008E978Entry` typedef was reverted to its ORIGINAL (pre-this-attempt)
 shape ahead of `note2pitch2`, which still needs it and is otherwise
 unaffected.
@@ -207,7 +207,7 @@ unaffected.
 4. **`D_8008EA26` must be declared `volatile s16` (not `u16`).** Every
    read of it in this function is an `lh` (signed); a `u16` declaration
    reads via `lhu`. (This is a DIFFERENT independent local view than
-   `code_179d8_j.c`/`code_179d8_m.c`'s own `volatile u16 D_8008EA26` — both
+   `code_179d8_j.c`/`libsnd_vmanager.c`'s own `volatile u16 D_8008EA26` — both
    are legitimate per the project's per-unit reduced-view convention; only
    the instructions THIS function emits decide THIS unit's view.)
 5. **`D_8008EA28` must ALSO be `volatile`.** Without it, GCC proves the
@@ -246,7 +246,7 @@ differences that don't change instruction count but do change bytes.**
     REGRESSES the earlier `chan = D_8008EA26; *p28 = chan << 3;` sequence
     from a clean `lh` to the same `lhu`+extend pattern — so `s32` is
     strictly worse and was reverted.
-  - `*(u8 *) &D_8008EA26` (the idiom `code_179d8_m.c` documents for
+  - `*(u8 *) &D_8008EA26` (the idiom `libsnd_vmanager.c` documents for
     reading this exact global's low byte through a plain, non-volatile
     pointer, specifically to fold to a compact `lui`+`lbu`): tried at one
     call site in isolation. It did **not** produce the compact form here —
@@ -290,7 +290,7 @@ name and a plain-typed copy. This is the natural next lever.
 - **An idiom that fixes a residue in one function is not portable to a
   different call site of the SAME symbol without re-measuring the WHOLE
   function's byte count.** `*(u8 *) &D_8008EA26` is confirmed correct and
-  necessary in `code_179d8_m.c`; applied here it regressed a distant,
+  necessary in `libsnd_vmanager.c`; applied here it regressed a distant,
   unrelated block by 3 words. Register pressure is global, not local to
   the statement being edited — CLAUDE.md already says this for struct
   edits; this is the same fact for a single-expression idiom swap.
@@ -350,7 +350,7 @@ load + manual extend), never both together the way retail's source
 apparently got for free.
 
 **Disposition: closing this lever, not just "not tried" anymore.** Restored
-to `INCLUDE_ASM`; `src/code_179d8_l.c` is otherwise unchanged from before
+to `INCLUDE_ASM`; `src/libsnd_vmanager.c` is otherwise unchanged from before
 this follow-up (confirmed via `git diff --stat` showing no diff after
 reverting). If this function is picked up again, the productive angle is
 almost certainly NOT this lh/lhu residue in isolation — per variant 1's
@@ -363,7 +363,7 @@ next move, not another cast variant.
 ## Round 35 update (runner bravo): inherited body re-verified real; one genuine byte-level fix found (still 142/143, unchanged total)
 
 Re-verified the inherited 142/143 body first: `objdump -t` on
-`build/src/code_179d8_l.c.o` confirms `SpuVmDoAllocate` compiles to `0x238`
+`build/src/libsnd_vmanager.c.o` confirms `SpuVmDoAllocate` compiles to `0x238`
 bytes = 142 words, matching the report's figure exactly.
 
 **Found and fixed one previously-undocumented byte-level mismatch while
@@ -598,14 +598,14 @@ skippable.
 
 Re-verified the inherited 142/143 body (with the round-35 `blez` fix and
 the round-37 struct-sharing note both intact): `objdump -t` on
-`build/src/code_179d8_l.c.o` confirms `SpuVmDoAllocate` compiles to `0x238`
+`build/src/libsnd_vmanager.c.o` confirms `SpuVmDoAllocate` compiles to `0x238`
 bytes = 142 words, matching the report exactly, and `note2pitch2`
 (already matched, sharing the same `D8008E978Entry` typedef) is
 unaffected at `0x100` bytes = 64 words.
 
 **The shared `D8008E978Entry` typedef this report's round-37 section noted
 as "requires moving the struct's declaration point earlier in the file" is
-now PERMANENTLY relocated in `src/code_179d8_l.c`**, ahead of
+now PERMANENTLY relocated in `src/libsnd_vmanager.c`**, ahead of
 `SpuVmDoAllocate`'s own (still-`INCLUDE_ASM`) slot, with the extended
 `unk16`/`unk18` fields this function's derivation needs -- committed
 separately this round as a byte-exact, zero-functional-change struct move

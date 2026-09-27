@@ -2,7 +2,7 @@
 
 > Renamed from `func_8002C410` on 2026-09-26 (tools/rename.py). Address 0x8002c410.
 
-Unit: `code_179d8_e`. Report written round 52 (naming pass) -- this function
+Unit: `PlacementGridVabSound`. Report written round 52 (naming pass) -- this function
 had no report before; it was matched (an empty `void` body, `jr $ra; nop`)
 as part of the unit's original round-17 pass but never separately written
 up. `tools/progress.py` counts a matched function like this without a

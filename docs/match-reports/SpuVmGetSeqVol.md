@@ -2,7 +2,7 @@
 
 > Renamed from `func_80030584` on 2026-09-23 (tools/rename.py). Address 0x80030584.
 
-Unit `code_179d8_j`, round 22 (2026-09-06). Third sibling of
+Unit `libsnd_vmanager`, round 22 (2026-09-06). Third sibling of
 `SpuVmGetSeqLVol`/`SpuVmGetSeqRVol` -- the "get both fields" form: writes both
 `+0x74` and `+0x76` through output pointers, and returns the full packed
 `p0` (read back from `D_8008EA22` rather than the parameter register

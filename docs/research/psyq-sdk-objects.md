@@ -109,9 +109,9 @@ helpers and 16-byte `libapi`/`libcard` BIOS stubs:
 
 | where | what |
 | --- | --- |
-| code_171e0, code_179d8_d/_h | `strcat`, `strcpy`, `strstr`, `strcmp`, `strncmp` |
+| code_171e0, PlacementGridVabSound/_h | `strcat`, `strcpy`, `strstr`, `strcmp`, `strncmp` |
 | code_179d8, _c, _f, _i, _j | 19 `libsnd` objects (`sscall`, `stop`, `adsr`, `sstable`, …) |
-| code_2cc8c_e | `libgs/gs_133`, `gs_111`, `gs_113`, `gs_108`, `libgte/fgo_00`, `fog_01` |
+| ScreenWidgets | `libgs/gs_133`, `gs_111`, `gs_113`, `gs_108`, `libgte/fgo_00`, `fog_01` |
 | class_3bb8c_h, _h_b, _h_c | 13 BIOS trampolines: `libapi/a5x`, `libcard/a7x`, `c17x`, `c112` |
 
 Two consequences. `func_8003FC70`, closed as a game match in round 20 (35/35),
@@ -349,7 +349,7 @@ back. Decisions and measurements made on the way:
 
 Head work while two runners converted the text-only game-unit runs
 (`libsnd` in `libsnd_decre/_j/_f`; the 13 BIOS trampolines, `strcat`, and
-the `libgs`/`libgte` objects in `code_2cc8c_e`).
+the `libgs`/`libgte` objects in `ScreenWidgets`).
 
 **`libc2/strcpy` + `libc2/strstr` + `libcd/sys`** (0x19378..0x19C78, crossing
 `code_179d8_h` / `libcd_bios`): 27 functions, 22 of them matched C and three
@@ -359,7 +359,7 @@ lines). `sys` has a 5-byte `.rdata` ("none", 0x1040) and a 0x80-byte `.data`
 `.rdata` with a 3-byte `pad`. `libcd_bios` is left with ONE function.
 
 **`libcd/iso9660` + `libc2/strcmp` + `libc2/strncmp`** (0x1BE40..0x1C92C,
-crossing `libcd_bios` / `code_179d8_d`): nine functions, three stalls
+crossing `libcd_bios` / `PlacementGridVabSound`): nine functions, three stalls
 (`CdSearchFile`, `CD_newmedia`, `CD_cachefile`, ~1300 lines). `.rdata` 0x1EA
 at 0x12EC with a 2-byte pad before `libsnd_ssinit_libapi_counter`'s jump table; `.data`
 8 bytes at 0x5E138 (a byte search finds the same two DMA register addresses
@@ -400,7 +400,7 @@ placed object inside a game unit -- the `SUSPECT` `ssinit_c` false positive.
   the pieces do not tile; `libsnd/next` is 3.5-only; `libsnd/vm_prog` and
   `libsnd/ut_pb` are **3.6-only**.
 - **An attached rodata slot can stop existing rather than move.**
-  `jtbl_80011108` (`0x1908`) was attached to `code_2cc8c_e` since round 14
+  `jtbl_80011108` (`0x1908`) was attached to `ScreenWidgets` since round 14
   because its `.L` words are local to `Gssub_make_matrix`'s `.s`. That table is
   `libgs/gs_123.o`'s own `.rdata`, so table and indexing code now arrive in
   one object and no label crosses a boundary in either direction; the tail

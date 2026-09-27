@@ -29,7 +29,7 @@ void TimImage__TimImage(TimImage *self, char *name) {
 
 `extern FileResourceMethods *GetActiveDataSourceMethods(void);` is a unit-local
 declaration (the definition in `code_171e0.c` returns `void *`), following
-the local-view convention `code_179d8_d.c` / `_e.c` already use.
+the local-view convention `PlacementGridVabSound.c` / `_e.c` already use.
 
 ## Naming
 

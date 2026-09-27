@@ -163,7 +163,7 @@ void UpdateFlashbackLock(TitleMenu *self, TaskCoreTarget *target) {
     target->registrationSlots[TITLEMENU_FLASHBACK] = (void *)locked;
 }
 
-/* src/code_2cc8c_f.c: `value` as `width` full-width decimal digits into dst,
+/* src/ScreenWidgets.c: `value` as `width` full-width decimal digits into dst,
  * zero-padded unless `unpadded`. */
 extern void FormatFullWidthNumber(u8 *dst, s32 value, s32 width, s32 unpadded);
 

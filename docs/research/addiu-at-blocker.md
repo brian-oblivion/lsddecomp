@@ -70,7 +70,7 @@ unchanged.
    Four instructions, unfolded, exactly as retail.
 
 4. **A previously-blocked function was taken as a live test.**
-   `SpuVmGetSeqLVol` (`code_179d8_j`, 21 words) had a stub report reading
+   `SpuVmGetSeqLVol` (`libsnd_vmanager`, 21 words) had a stub report reading
    "addiu-$at blocker, not attempted". With the flag it compiles to the
    correct length with no drift, and the previously-impossible sequence
    matches word for word — the build emits `e8022124`

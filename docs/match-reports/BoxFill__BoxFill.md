@@ -4,7 +4,7 @@
 
 > Renamed from `func_8004054C` on 2026-09-20 (tools/rename.py). Address 0x8004054c.
 
-Unit `code_2cc8c_e`, carved round 14. `ClassEAC0Obj`'s own constructor
+Unit `ScreenWidgets`, carved round 14. `ClassEAC0Obj`'s own constructor
 (`ClassEAC0Methods::ctor`, slot `+0x008`) -- one level further down the
 same "call the further-base ctor first, reset methods, redispatch finishConstruct"
 chain `FadeBox__FadeBox` uses one level up:

@@ -2,7 +2,7 @@
 
 > Renamed from `func_8002E300` on 2026-09-27 (tools/rename.py). Address 0x8002e300.
 
-Unit: `src/code_179d8_l.c`. Address `0x8002E300`.
+Unit: `src/libsnd_vmanager.c`. Address `0x8002E300`.
 
 Trivially matched: the empty C body compiles to retail's own `jr $ra; nop`
 -- splat emitted this body itself when the unit was carved (round 24,

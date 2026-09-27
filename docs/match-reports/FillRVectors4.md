@@ -303,7 +303,7 @@ whole-function raw-register `__asm__`).
 ## ROUND 20 (runner echo): raw-`__asm__` audit, secondary assignment
 
 Per the coordinator's secondary assignment, audited every `__asm__` block
-in `src/libsnd_ssinit.c`, `src/code_179d8_d.c`, `src/class_16334.c`,
+in `src/libsnd_ssinit.c`, `src/PlacementGridVabSound.c`, `src/class_16334.c`,
 `src/Entity_b.c`, `src/Entity_c.c`, `src/DreamSys.c`, and
 `src/TmdRenderer.c` (this unit's own family) for the same mistake found
 in this function -- a whole-function raw-register transcription standing
@@ -313,7 +313,7 @@ sibling.
 **21 blocks total, 21/21 legitimate, zero reworkable.**
 
 - **6 bare `__asm__("");` scheduling barriers**, one each in
-  `libsnd_ssinit.c` (`SetRCnt`), `code_179d8_d.c`, `class_16334.c`,
+  `libsnd_ssinit.c` (`SetRCnt`), `PlacementGridVabSound.c`, `class_16334.c`,
   `Entity_b.c`, `Entity_c.c`, `DreamSys.c`. Every one is a no-operand,
   no-clobber ordering barrier -- exactly HARD RULE 6's always-permitted
   form ("if it only changes instruction ORDER, it is allowed"), each

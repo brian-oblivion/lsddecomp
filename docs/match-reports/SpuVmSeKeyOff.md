@@ -2,7 +2,7 @@
 
 > Renamed from `func_800303C8` on 2026-09-23 (tools/rename.py). Address 0x800303c8.
 
-Unit `code_179d8_j`, round 21 (2026-09-06). One-line tail-call wrapper.
+Unit `libsnd_vmanager`, round 21 (2026-09-06). One-line tail-call wrapper.
 
 ```c
 extern s32 SpuVmKeyOff(s32 a0, s16 a1, s16 a2, u16 a3);

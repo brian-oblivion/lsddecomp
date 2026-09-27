@@ -4,7 +4,7 @@
 
 > Renamed from `func_8002F610` on 2026-09-20 (tools/rename.py). Address 0x8002f610.
 
-Unit: `src/code_179d8_m.c`. Round 24, runner bravo.
+Unit: `src/libsnd_vmanager.c`. Round 24, runner bravo.
 
 ## Result
 
@@ -70,9 +70,9 @@ alone, are what the narrowing instructions are conversions between) but its
 central claim -- "the callee's 2nd parameter must be wider" -- did not
 survive independent verification against the callee's own body.
 
-## Deriving the parameter widths from `code_179d8_j.c`'s cross-unit guesses
+## Deriving the parameter widths from `libsnd_vmanager.c`'s cross-unit guesses
 
-`code_179d8_j.c` already carries prototype GUESSES for both callees, typed
+`libsnd_vmanager.c` already carries prototype GUESSES for both callees, typed
 per-call-site from that unit's own register setup (its own comment: "none
 of these callees have an established prototype yet, so these are local
 guesses"):
@@ -111,7 +111,7 @@ of them change inside the loop:
 0xffff`), never sign-extended, matching a `u16`-declared parameter passed
 to `SpuVmPBVoice`'s fifth (`u16`, stack-passed) argument.
 
-Without `code_179d8_j.c`'s prototype already on record, the natural first
+Without `libsnd_vmanager.c`'s prototype already on record, the natural first
 guess would have been "all four call arguments are `s32`" (no narrowing
 needed at the call, contradicting the disassembly) or "the callee's second
 parameter is `s16` like its siblings" (which would make `a0`'s repeated

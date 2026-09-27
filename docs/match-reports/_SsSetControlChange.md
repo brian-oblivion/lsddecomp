@@ -119,8 +119,8 @@ since the base address is only known at runtime).
 Cross-unit prototypes added (local guesses, kept in this .c only, per
 project convention): `func_800363FC(void)` and `func_80036118(s32, s32)`
 (both matched in `libsnd_cres.c`), `func_800307F0(s16, s16, s32) -> s32`
-(matched in `code_179d8_j.c`), and `SpuVmSetVol(s16 packed, s16 note,
-u8 vol, s32 arg3, s32 arg4)` -- still `INCLUDE_ASM` in `code_179d8_j.c`,
+(matched in `libsnd_vmanager.c`), and `SpuVmSetVol(s16 packed, s16 note,
+u8 vol, s32 arg3, s32 arg4)` -- still `INCLUDE_ASM` in `libsnd_vmanager.c`,
 so this is this call site's own reading: a 5th argument spills to
 `0x10($sp)`, alongside the "packed = (slot<<8)|channel" first-argument
 idiom this file's siblings already use (`NoteOn`, `SetPitchBend`).
@@ -495,7 +495,7 @@ function and no new manual axis was found. `INCLUDE_ASM` unchanged,
 
 code_179d8_k's local `Entry90902E8` view retired onto `include/SsScore.h`:
 the same 0xAC-byte (`SS_SEQ_TABSIZ`) `_ss_score[access][seq]` record that
-libsnd_cres, libsnd_decre and code_179d8_j already use. The header gained
+libsnd_cres, libsnd_decre and libsnd_vmanager already use. The header gained
 this unit's fields by splitting padding (no offset, size or existing type
 moved); field names stay offset-only (`unkNN`) as the header's convention for
 Sony-only fields, with each one's mechanics in its comment. The unit's

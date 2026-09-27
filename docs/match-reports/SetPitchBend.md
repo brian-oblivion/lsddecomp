@@ -130,7 +130,7 @@ A per-channel/slot "dispatch event" function. Reads the active state
 block's `unk2C` byte (via `rec + rec->unk12`, this unit's recurring
 runtime-offset idiom), the record's `unk4C` field, and the current byte
 at the sequencer cursor, packs `(slot << 8) | channel` into one word, and
-calls a cross-unit function (`SpuVmPitchBend`, defined in `code_179d8_m`,
+calls a cross-unit function (`SpuVmPitchBend`, defined in `libsnd_vmanager`,
 NOT YET MATCHED there as of this round -- so its real prototype is
 unverified) with those four values. It then calls the shared
 `ReadDeltaValue` VLQ-decode helper and caches the return into `rec->unk88`,
@@ -282,7 +282,7 @@ match, compiled length exact (44/44, re-verified round 25).
 
 code_179d8_k's local `Entry90902E8` view retired onto `include/SsScore.h`:
 the same 0xAC-byte (`SS_SEQ_TABSIZ`) `_ss_score[access][seq]` record that
-libsnd_cres, libsnd_decre and code_179d8_j already use. The header gained
+libsnd_cres, libsnd_decre and libsnd_vmanager already use. The header gained
 this unit's fields by splitting padding (no offset, size or existing type
 moved); field names stay offset-only (`unkNN`) as the header's convention for
 Sony-only fields, with each one's mechanics in its comment. The unit's

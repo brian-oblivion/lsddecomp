@@ -2,10 +2,10 @@
 
 > Renamed from `func_800302DC` on 2026-09-23 (tools/rename.py). Address 0x800302dc.
 
-Unit `code_179d8_j`, round 21 (2026-09-06). Not a class method (no
+Unit `libsnd_vmanager`, round 21 (2026-09-06). Not a class method (no
 `classtable.py` hit on either global it touches) -- plain utility code.
 
-m2c's seed (`.venv/bin/python3 tools/m2ctx.py code_179d8_j --sig 's32
+m2c's seed (`.venv/bin/python3 tools/m2ctx.py libsnd_vmanager --sig 's32
 SpuVmSeKeyOn(s32 p0, s32 p1, s32 p2, s32 p3, u16 p4, u16 p5)' --run`)
 came back essentially byte-identical to the final source on the first
 try; only the local variable names were changed for clarity.

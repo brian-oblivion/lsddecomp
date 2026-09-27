@@ -4,7 +4,7 @@
 
 > Renamed from `func_8002F20C` on 2026-09-20 (tools/rename.py). Address 0x8002f20c.
 
-Unit: `src/code_179d8_m.c`. Round 24, runner bravo.
+Unit: `src/libsnd_vmanager.c`. Round 24, runner bravo.
 
 ## Result
 
@@ -74,9 +74,9 @@ libsnd/vmanager `SpuVmNoiseOnWithAdsr` (discs 3.3/3.5; `libsnd/vm_noise` on
 those functions and moves them out of tracks 1/1b/3.
 
 **SpuVmNoiseOnWithAdsr** (was `func_8002F20C`) -- Tier B. Allocates a free voice via
-`SpuVmAlloc` (code_179d8_l, "voice-steal candidate scan") and, if one
+`SpuVmAlloc` (libsnd_vmanager, "voice-steal candidate scan") and, if one
 is available (`v0 < spuVmMaxVoice`, the voice count), keys it on via
-`vmNoiseOn2` (code_179d8_l, confirmed to write the PS1 SPU's key-on
+`vmNoiseOn2` (libsnd_vmanager, confirmed to write the PS1 SPU's key-on
 registers) forwarding all four caller-supplied parameters unchanged. The
 generic name reflects that this is the "just play it" wrapper, in
 contrast to SpuVmNoiseOn's hardcoded-parameter variant.

@@ -6,7 +6,7 @@
 > `src/` and the game-code count shrank by it -- the correction CLAUDE.md asks
 > for, not a regression. The run `libcd/iso9660` + `libc2/strcmp` +
 > `libc2/strncmp` tiles 0x1BE40..0x1C92C and crosses the libcd_bios /
-> code_179d8_d boundary; both units trimmed. Whole-image SHA1 green. Nothing
+> PlacementGridVabSound boundary; both units trimmed. Whole-image SHA1 green. Nothing
 > here is assignable and there is no stall left to work. The text below is the
 > pre-conversion record.
 
@@ -14,7 +14,7 @@
 
 # func_8002C0AC -- MATCHED (32/32 words), round 17 permuter pass
 
-**Unit:** code_179d8_d · **Size:** 32 instructions (0x80 bytes) ·
+**Unit:** PlacementGridVabSound · **Size:** 32 instructions (0x80 bytes) ·
 **Status: MATCHED.** The report below documents a real stall at 30/32,
 explicitly recommended in its own text as "a legitimate permuter
 candidate" -- a round-17 permuter pass closed it in ~40s. Full history

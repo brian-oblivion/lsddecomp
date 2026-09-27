@@ -49,12 +49,12 @@
  * guesses, not authoritative.  Per this project's convention, a prototype
  * for a function ANOTHER unit defines stays in this .c, not in a shared
  * header. */
-extern void SpuVmPitchBend(s32 a0, s16 a1, u8 a2, u8 a3); /* code_179d8_m, not yet matched: local guess */
+extern void SpuVmPitchBend(s32 a0, s16 a1, u8 a2, u8 a3); /* libsnd_vmanager, not yet matched: local guess */
 /* SpuVmKeyOn (round 76, was StartNote): Sony libsnd/vmanager INTERNAL,
  * no public LIBSND.H prototype (unlike SsUtKeyOn) -- kept byte-exact. */
 extern s32 SpuVmKeyOn(s32 a0, s16 a1, s16 a2, u16 a3, u16 a4,
-                      u16 a5); /* code_179d8_m, not yet matched: local guess, matches code_179d8_j's independent reading of the same call shape */
-extern s32 SpuVmKeyOff(s32 a0, s16 a1, s16 a2, u16 a3); /* code_179d8_m, not yet matched: local guess, ditto */
+                      u16 a5); /* libsnd_vmanager, not yet matched: local guess, matches libsnd_vmanager's independent reading of the same call shape */
+extern s32 SpuVmKeyOff(s32 a0, s16 a1, s16 a2, u16 a3); /* libsnd_vmanager, not yet matched: local guess, ditto */
 /* Sony libsnd/vm_doff, internal: no public LIBSND.H prototype. */
 extern void SpuVmDamperOff(void);
 
@@ -282,7 +282,7 @@ void SetProgramChange(s16 a0, s16 a1, u8 a2) {
  * for a function another unit defines stays in this .c). SpuVmDamperOn and
  * SsUtSetReverbDepth are Psy-Q libsnd (`vm_don`, `ut_rev`), linked from the
  * SDK objects since round 34 -- never write C for them.  So is
- * `SpuVmSetProgVol` (`libsnd/vm_prog`, 3.6), which was code_179d8_j.c's
+ * `SpuVmSetProgVol` (`libsnd/vm_prog`, 3.6), which was libsnd_vmanager.c's
  * matched func_800307F0 until the same round; SpuVmSetVol is still
  * INCLUDE_ASM
  * there, so its signature below is this call site's own reading -- a 5th
@@ -903,7 +903,7 @@ void SetPitchBend(s16 a0, s16 a1) {
 #endif
 
 /* Cross-unit calls, local guesses per project convention. SpuVmSeqKeyOff is
- * matched in code_179d8_j.c and already has this exact "(slot<<8)|channel"
+ * matched in libsnd_vmanager.c and already has this exact "(slot<<8)|channel"
  * single-argument reading in both libsnd_cres.c and libsnd_decre.c;
  * _SsSndNextSep is Sony's `libsnd/next`, linked from the SDK object since
  * round 34; this signature is the one libsnd_cres.c's matched C used

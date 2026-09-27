@@ -26,7 +26,7 @@ beq $v1, $v0(0x13), .L80026FD0   # equal -> GetCdDriverMode
 ```
 
 Both callees (`GetCdDriverMode`, `GetVabDriverMode`) are still uncarved
-(`asm/code_179d8.s` / `asm/nonmatchings/code_179d8_e/GetVabDriverMode.s`).
+(`asm/code_179d8.s` / `asm/nonmatchings/PlacementGridVabSound/GetVabDriverMode.s`).
 Treated as `s32`-returning per CLAUDE.md's tail-call caution (no positive
 void evidence, so default to non-void).
 

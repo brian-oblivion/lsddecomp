@@ -63,14 +63,14 @@ already passes it a second argument:
 ```
 src/class_3bb8c_m.c:72   self->unk18->methods->slot64(self->unk18, v);
 src/Entity_e.c:244       this->unk94->unk5C->methods->slot64(..., sMoodCue74ClearColor);
-src/code_2cc8c_e.c:319   self->methods->slot64(self, 0);
-src/code_2cc8c_e.c:419   methods->slot64(self, 1);
-src/code_2cc8c_e.c:437   methods->slot64(self, 0);
-src/code_2cc8c_e.c:445   methods->slot64(self, 0);
+src/ScreenWidgets.c:319   self->methods->slot64(self, 0);
+src/ScreenWidgets.c:419   methods->slot64(self, 1);
+src/ScreenWidgets.c:437   methods->slot64(self, 0);
+src/ScreenWidgets.c:445   methods->slot64(self, 0);
 src/class_3bb8c_l.c:207  unk18->methods->slot64(unk18, unk50->unkC);
 ```
 
-(`code_179d8_d.c`'s `s32 (*slot64)(void *)` is a different class's table and
+(`PlacementGridVabSound.c`'s `s32 (*slot64)(void *)` is a different class's table and
 not evidence either way.) Six matched call sites in four units agree on the
 arity; this unit's one-argument view was the outlier, and the project's
 multiple-independent-local-views convention is exactly what makes checking the

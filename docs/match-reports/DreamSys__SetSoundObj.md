@@ -43,7 +43,7 @@ Renamed from `func_8005937C`.
 A pure setter for `soundObj`. The field's identity is the
 evidence, and it is cross-unit, three ways:
   1. `FlushSoundCueSet(this->soundObj, this->soundCueSet)` -- that function is
-     matched in src/code_179d8_e.c with the signature
+     matched in src/PlacementGridVabSound.c with the signature
      `void FlushSoundCueSet(VabStreamObj *self, SoundCueSet *set)`.
   2. This unit reads the same field as an object with a vtable at offset 0 and
      calls +0x84 through it (`DreamSys__StopVoice`). `VabStreamObjMethods::slot84`

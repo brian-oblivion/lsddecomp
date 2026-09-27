@@ -6,7 +6,7 @@
 
 > Renamed from `func_8002C200` on 2026-09-24 (tools/rename.py). Address 0x8002c200.
 
-**Unit:** code_179d8_d · **Size:** 14 instructions (0x38 bytes) ·
+**Unit:** PlacementGridVabSound · **Size:** 14 instructions (0x38 bytes) ·
 **Status: MATCHED 14/14**, whole-image SHA1 green.
 
 ## Role

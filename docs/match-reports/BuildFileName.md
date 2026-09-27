@@ -85,7 +85,7 @@ Round 52 (alpha), FINISHING-PLAN track 3.
 (`arg2`, only if non-NULL); unconditionally `strcat`s `arg1` then `arg3`;
 returns `dest`. Confirmed against real call sites across the tree
 (`class_3bb8c_i.c`: memory-card icon/font paths with a directory prefix and
-an extension suffix; `code_179d8_e.c`: name+suffix with no prefix) that this
+an extension suffix; `PlacementGridVabSound.c`: name+suffix with no prefix) that this
 is a general-purpose "optional-prefix + name + suffix" path/filename
 composer, not guessed from this function's body alone. Pure string
 composition whose mechanics are its purpose.

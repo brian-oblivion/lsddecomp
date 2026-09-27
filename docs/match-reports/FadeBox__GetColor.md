@@ -4,7 +4,7 @@
 
 > Renamed from `func_800403F8` on 2026-09-20 (tools/rename.py). Address 0x800403f8.
 
-Unit `code_2cc8c_e`, carved round 14. `FadeBoxMethods::getColor` (`+0x0E4`).
+Unit `ScreenWidgets`, carved round 14. `FadeBoxMethods::getColor` (`+0x0E4`).
 
 ```c
 void *FadeBox__GetColor(FadeBoxObj *self) {

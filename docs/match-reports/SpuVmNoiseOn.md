@@ -4,7 +4,7 @@
 
 > Renamed from `func_8002F368` on 2026-09-20 (tools/rename.py). Address 0x8002f368.
 
-Unit: `src/code_179d8_m.c`. Round 24, runner bravo.
+Unit: `src/libsnd_vmanager.c`. Round 24, runner bravo.
 
 ## Result
 
@@ -39,13 +39,13 @@ void SpuVmNoiseOn(s32 a0, s32 a1) {
 Straight-line leaf, one conditional call:
 
 1. Force flag byte `D_8008EA1B = 0x7F` unconditionally.
-2. Call `SpuVmAlloc(0xFF)` (a `code_179d8_l`/charlie function, still
+2. Call `SpuVmAlloc(0xFF)` (a `libsnd_vmanager`/charlie function, still
    `INCLUDE_ASM` there), mask the result to a byte, store it into
    `D_8008EA26` (a 16-bit store -- the value is always 0..0xFF here, so the
    upper byte written is always 0).
 3. Compare that masked value against `spuVmMaxVoice` (loop-bound/threshold byte,
-   documented in `code_179d8_j.c`). If it is `< spuVmMaxVoice`, call
-   `vmNoiseOn2` (also owned by `code_179d8_l`) with five arguments: the
+   documented in `libsnd_vmanager.c`). If it is `< spuVmMaxVoice`, call
+   `vmNoiseOn2` (also owned by `libsnd_vmanager`) with five arguments: the
    LOW BYTE re-read from `D_8008EA26` (register `$a0`), this function's own
    two arguments narrowed to `u16` (`$a1`, `$a2`), the constant `0x80FF`
    (`$a3`), and the constant `0x5FC8` passed on the stack (5th argument,

@@ -461,7 +461,7 @@ See the shared writeup in `docs/match-reports/cd_read_retry.md` (filed
 there since that function is the round's primary target for this
 question); this function's own residue 2 above is cited there as a fourth,
 independently-found data point (partial-improvement, not full-transfer)
-alongside the three code_179d8_l reductions and the three libcd_bios
+alongside the three libsnd_vmanager reductions and the three libcd_bios
 stalls read for the question.
 
 ### Proposed learnings

@@ -2,7 +2,7 @@
 
 > Renamed from `VabStreamObj__func_2cbdc` on 2026-09-26 (tools/rename.py). Address 0x8002cbdc.
 
-Unit: `code_179d8_e`. Report written round 52 (naming pass) -- no report
+Unit: `PlacementGridVabSound`. Report written round 52 (naming pass) -- no report
 before; matched (empty `void` body, `jr $ra; nop`) as part of the unit's
 original round-17 pass, renamed this round from `func_8002CBDC` once the
 class was established (`tools/rename.py func_8002CBDC

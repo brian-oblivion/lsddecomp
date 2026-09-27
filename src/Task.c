@@ -15,7 +15,7 @@
  *  - Sony's GsSetProjection (libgs/gs_106), carried as C because no SDK
  *    object places it.
  * include/Task.h holds the declarations this file shares with
- * code_2cc8c_e.c and code_2cc8c_f.c, which follow it.
+ * ScreenWidgets.c and ScreenWidgets.c, which follow it.
  *
  * Edges (tools/tuboundary.py). The start edge is libgs/gs_122, a placed Sony
  * object. Inside, no rodata crossing and no forced boundary, and every edge

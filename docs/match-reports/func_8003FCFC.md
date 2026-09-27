@@ -3,7 +3,7 @@
 > **ROUND 34 (2026-09-12), runner bravo. THIS FUNCTION IS NOW LINKED FROM
 > SONY'S OWN OBJECT `libgte/fgo_00.o` (Psy-Q 3.3) AND IS NAMED
 > `TransposeMatrix`.** Its 0x50 of text covers exactly these 20 words. The
-> `INCLUDE_ASM` is gone from `src/code_2cc8c_e.c`, the object sits in the yaml
+> `INCLUDE_ASM` is gone from `src/ScreenWidgets.c`, the object sits in the yaml
 > at 0x304FC, and the whole image is byte-exact. **There is no stall left to
 > work and nothing here is assignable.**
 >
@@ -44,7 +44,7 @@ _Previously: func_8003FCFC -- STALL, MISFILED CLASS CORRECTED (return-type fix f
 Restored attempt 6's exact preserved body (`s16 *func_8003FCFC(s16*,s16*)`,
 `return dst;`) and rebuilt fresh before touching anything: reproduces
 `2/20 words match` exactly. Cross-checked the ASSEMBLED SOURCE against
-retail's own `.s` (`asm/nonmatchings/code_2cc8c_e/func_8003FCFC.s`),
+retail's own `.s` (`asm/nonmatchings/ScreenWidgets/func_8003FCFC.s`),
 which the prior rounds' reports describe but do not quote directly: the
 `t1`/`t2`/`t3` reuse PATTERN in the preserved C body matches retail's
 own load/store interleaving instruction-for-instruction (both cycle
@@ -198,7 +198,7 @@ Restored to `INCLUDE_ASM`. Full oracle re-confirmed green
 (`build exit=0`, `OK: build matches retail`) before moving on to the
 next assigned unit.
 
-Unit `code_2cc8c_e`, carved round 14. Screened clean (no `gp_rel`, no
+Unit `ScreenWidgets`, carved round 14. Screened clean (no `gp_rel`, no
 `addiu $at,$at,%lo`, 0 callee-saved registers) -- not a toolchain blocker.
 
 ## Shape

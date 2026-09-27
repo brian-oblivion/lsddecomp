@@ -2,7 +2,7 @@
 
 > Renamed from `func_8002CC84` on 2026-09-18 (tools/rename.py). Address 0x8002cc84.
 
-Unit: `code_179d8_e`. Runner: echo, round 17.
+Unit: `PlacementGridVabSound`. Runner: echo, round 17.
 
 ## Result
 
@@ -90,8 +90,8 @@ sit) isn't established from this unit alone.
 ## Track 6 (2026-09-26, round 92, alpha): one SoundCueSet
 
 `include/SoundCueSet.h` now holds the one definition of `SoundCueSet` and
-`SoundCueSlot`. It replaced three views: code_179d8_e.c's (named
-`tag`/`owner`/`callback`/`slots[].index` only), code_179d8_l.c's (named
+`SoundCueSlot`. It replaced three views: PlacementGridVabSound.c's (named
+`tag`/`owner`/`callback`/`slots[].index` only), libsnd_vmanager.c's (named
 `note`/`pitchOffset`/`word2`/`word3`, `unk4`/`unk10`/`unk14`) and
 include/Entity.h's `EntityMoodHandlerArg` (all `unkNN`). Zero bytes; the
 whole-image SHA1 is unchanged.
@@ -119,7 +119,7 @@ Names, tier A, each from what its readers do:
 | - / `unk10` / `unk10` | `attenuation` | zeroed per tick, then each volume loses (vol / attenuationSteps) per unit; < 0 skips keying; handlers store a proximity ratio in 0..10 |
 | `unk14` / `unk14` / `unk14` | `attenuationSteps` | set to 10 by Init; the divisor above, and the scale both proximity helpers map a distance onto |
 
-Why not `note`/`pitchOffset` (code_179d8_l.c) or the earlier proposal's
+Why not `note`/`pitchOffset` (libsnd_vmanager.c) or the earlier proposal's
 `voiceNTone`/`voiceNPitch` (Entity__MoodCue07.md): the value is neither a
 note nor a tone. VabStreamObj__PlayTone's `index` is program << 4 | tone,
 and ServiceSoundCueSet always sends tone 0, so what the callback writes is a

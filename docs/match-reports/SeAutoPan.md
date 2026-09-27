@@ -4,7 +4,7 @@
 
 > Renamed from `func_8002E874` on 2026-09-20 (tools/rename.py). Address 0x8002e874.
 
-Unit: `src/code_179d8_m.c`. Round 24, runner bravo.
+Unit: `src/libsnd_vmanager.c`. Round 24, runner bravo.
 
 ## Result
 
@@ -51,7 +51,7 @@ void SeAutoPan(s16 a0, s16 a1, s16 a2, s16 a3) {
 ## Sibling note (see the unit header and the round prompt)
 
 This function IS the "near-identical sibling of `SeAutoVol` in
-`code_179d8_l`" the unit header calls out: same prologue shape (`addu
+`libsnd_vmanager`" the unit header calls out: same prologue shape (`addu
 t3,a0,zero` / `addu t0,a1,zero` / `addu t1,a2,zero`), same `s16`
 argument-narrowing (`sll #16`/`sra #16` on `a1`, `a2` before the compare),
 same early-out branch comparing the two narrowed arguments (`beq a1,a2,
@@ -60,11 +60,11 @@ pressure from four `s16` parameters kept live across a `div`-heavy body,
 not a BIOS trampoline** -- there is no `jr $t2` anywhere in this function,
 and the body is ordinary arithmetic (two variable divisions with the
 standard div-by-zero/`INT_MIN`-overflow `break` guards), not a jump
-through a table. `code_179d8_l`'s runner (charlie, this round) is deriving
+through a table. `libsnd_vmanager`'s runner (charlie, this round) is deriving
 the same opening shape from the sibling side; this confirms it.
 
 `D_8008D9B0`..`D_8008D9BA` are six 2-bytes-apart symbols in the SAME
-0x34-byte-stride channel-configuration record family `code_179d8_j.c`
+0x34-byte-stride channel-configuration record family `libsnd_vmanager.c`
 documents (`Rec34D994`, `Rec34Byte`) -- this unit's own local
 `Rec34Half` type (already declared for `SpuVmNoiseOff`'s `D_8008D98C`,
 hoisted above this function since it is the earlier ROM-order user).
@@ -164,7 +164,7 @@ CC-driven volume slide? an automatic release curve?) is not established --
 only that the destination of the ramp feeds into a stereo-volume
 computation (see SetAutoPan's own report), which is why "Fade" rather
 than a more specific term. See the unit header comment in
-`src/code_179d8_m.c` for the cross-function picture.
+`src/libsnd_vmanager.c` for the cross-function picture.
 
 ## Track 2 (round 86, 2026-09-26, alpha)
 

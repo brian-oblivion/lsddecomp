@@ -4,7 +4,7 @@
 
 > Renamed from `func_80040664` on 2026-09-18 (tools/rename.py). Address 0x80040664.
 
-Unit `code_2cc8c_f`. `Obj6EAC0Methods::slot4C`'s own occupant (this is the
+Unit `ScreenWidgets`. `Obj6EAC0Methods::slot4C`'s own occupant (this is the
 FUNCTION the vtable slot points to, not a caller of it -- the header's
 existing "IS BoxFill__AttachToParent" note on that slot already said as much before
 this round). Body: when `self->unkC == 0`, forwards to the shared
@@ -30,7 +30,7 @@ low-yield. Matched on the first attempt with a direct transliteration of
 the disassembly -- both vtable slot types needed were already established
 by earlier rounds' work on sibling functions in this same unit
 (`BoxFill__SetPosition`/`TextRow__SetPosition` for `slotBC`'s struct shape;
-`code_2cc8c_e`'s ctor call for `D6B5CCGetterMethodsCC8C::slot4C`), so
+`ScreenWidgets`'s ctor call for `D6B5CCGetterMethodsCC8C::slot4C`), so
 there was no struct derivation left to do here -- just reading the
 existing header carefully enough to recognize both slots were already on
 file.

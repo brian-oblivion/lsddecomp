@@ -6,13 +6,13 @@
 19/31 after rebuilding the preserved body; a bare `__asm__("")` barrier tried
 at two positions, both inert (no score or diff-set change).**
 
-Unit: `src/code_2cc8c_f.c`. Round 27 (second pass), runner bravo, off the
+Unit: `src/ScreenWidgets.c`. Round 27 (second pass), runner bravo, off the
 head's fresh-ground list.
 
 ## Screens (clean)
 
 ```
-grep -n 'gp_rel' asm/nonmatchings/code_2cc8c_f/EncodeFullWidthSjis.s            -> no hits
+grep -n 'gp_rel' asm/nonmatchings/ScreenWidgets/EncodeFullWidthSjis.s            -> no hits
 grep -A2 -nE '\b(mflo|mfhi)\b' ... | grep -E '\b(mult|multu|div|divu)\b'  -> no hits
 ```
 
@@ -196,7 +196,7 @@ u8 *EncodeFullWidthSjis(u8 *dst, u8 *src) {
 
 ## Round 35 confirmation: reconfirmed, barrier lever tried at two positions, both inert
 
-Runner delta, `code_2cc8c_f`, off the head's fresh-ground list.
+Runner delta, `ScreenWidgets`, off the head's fresh-ground list.
 
 Rebuilt the preserved body first (per this round's "build any inherited body
 once before trusting its score" instruction): links and scores exactly

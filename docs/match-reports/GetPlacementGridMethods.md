@@ -4,7 +4,7 @@
 
 > Renamed from `func_8002C3A8` on 2026-09-24 (tools/rename.py). Address 0x8002c3a8.
 
-**Unit:** code_179d8_d · **Size:** 4 instructions (0x10 bytes) ·
+**Unit:** PlacementGridVabSound · **Size:** 4 instructions (0x10 bytes) ·
 **Status: MATCHED 4/4**, whole-image SHA1 green.
 
 ## Role
@@ -38,7 +38,7 @@ Also added `BaseTable6D940` (this file only) -- a SEPARATE table reached
 only via the uncarved accessor `GetActiveDataSourceMethods()`, with three known slots
 (`+0x008`, `+0x00C`, `+0x064`) used by `PlacementGrid__PlacementGrid`/`PlacementGrid__Finalize`/
 `PlacementGrid__SetFlag` respectively (all this unit, this round). Kept entirely
-local to `code_179d8_d.c`, no shared header, per this round's rule for the
+local to `PlacementGridVabSound.c`, no shared header, per this round's rule for the
 `code_179d8` slices.
 
 ## Naming (round 77, charlie -- track 3)
