@@ -9,9 +9,13 @@
  * file; the code_179d8_* slices share no header.
  */
 #include "common.h"
+#include <libgte.h>
+#include <libgpu.h>
+#include <libgs.h>
 #include "VabDriver.h"
 #include "PlacementGrid.h"
 #include "LinkResource.h"
+#include "StageMap.h"
 
 /* FileResource's, code_171e0.c: the active driver's table, through which
  * PlacementGrid's ctor, finalize and setFlag reach their parent's. */
@@ -20,6 +24,14 @@ extern FileResourceMethods *GetActiveDataSourceMethods(void);
 /* The pool allocator (include/class_16334.h, include/BMemPMgr.h, neither
  * included here). */
 extern void *BMemPMgrAlloc(s32 size);
+
+/* What `buffer` points at: 8 bytes nothing here reads, then each cell's
+ * first record, one per cell of the chunk's 20 x 20 lattice, row-major. A
+ * cell's further records are reached by the byte offset in `next`. */
+typedef struct PlacementGridBuffer {
+    u8 pad0[8];
+    PlacementGridRecord cells[STAGE_SLOT_LATTICE_CELLS];
+} PlacementGridBuffer;
 
 /* LinkResource__GetModel as PlacementGrid__ResolveEntry calls it through
  * `linkResource`'s getModel (+0x080). The occupant reads only (self, index);
@@ -71,7 +83,7 @@ s32 PlacementGrid__ResolveEntry(PlacementGrid *self, CellPlacement *placement, s
             rec = (PlacementGridRecord *)((u8 *)self->buffer + placement->next);
             placement->chained = 1;
         } else {
-            rec = (PlacementGridRecord *)(cell * 12 + 8 + (u8 *)self->buffer);
+            rec = &((PlacementGridBuffer *)self->buffer)->cells[cell];
             placement->chained = 0;
         }
         placement->next = rec->next;
