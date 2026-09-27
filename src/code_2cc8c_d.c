@@ -10,7 +10,7 @@
  * code_2cc8c_d -- Viewport's methods from onNotify (+0x038) to the end of
  * gViewportMethods (include/Viewport.h, whose banner says what the class
  * is); the ctor, finalize and the child overrides are in code_2cc8c_c.c,
- * drawNode in code_2864.c. In table order:
+ * drawNode in ViewportDraw.c. In table order:
  *  - onNotify and its two per-sender handlers: a FrameClock event runs
  *    update, the DrawSystem's VSync event runs flip;
  *  - initDefaults and the field setters (screen size, OT length, the two
