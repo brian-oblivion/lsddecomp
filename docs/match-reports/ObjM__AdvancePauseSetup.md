@@ -24,9 +24,9 @@ A small state machine gated on `self->unk80`:
 void ObjM__AdvancePauseSetup(ObjM *self) {
     s32 state = self->unk80;
     if (state == 0) {
-        self->unk7C = New_TextRow(self->unk74, 5, &D_8008AB44[0]);
-        self->unk7C->methods->slot4C(self->unk7C, self->unk14, &D_8008AB38);
-        self->unk7C->methods->slotB8(self->unk7C, &D_8008AB40);
+        self->unk7C = New_TextRow(self->unk74, 5, &sPauseText[0]);
+        self->unk7C->methods->slot4C(self->unk7C, self->unk14, &sPauseTextPos);
+        self->unk7C->methods->slotB8(self->unk7C, &sPauseTextColor);
         self->unk80 = state + 1;
         return;
     }
@@ -41,8 +41,8 @@ void ObjM__AdvancePauseSetup(ObjM *self) {
 }
 ```
 
-`D_8008AB44` is the string `"Pause"` (`asm/data/7B008.sdata.s`); the two
-other literal-address arguments (`D_8008AB38`, `D_8008AB40`) are small
+`sPauseText` is the string `"Pause"` (`asm/data/7B008.sdata.s`); the two
+other literal-address arguments (`sPauseTextPos`, `sPauseTextColor`) are small
 opaque blocks, address-only in this unit.
 
 ## The residue: the function is `void`, not `s32` -- found by the permuter after 18 failed manual reshapes
@@ -134,9 +134,27 @@ in this session; the reproducers themselves were scratch files under
 
 ## Naming
 
-**ObjM__AdvancePauseSetup** -- tier B. A 5-step counter (`self->unk80`, 0..4) driving a state machine: on step 0, builds an object literally named "Pause" (`New_TextRow(self->unk74, 5, &D_8008AB44[0])`, `D_8008AB44` == "Pause", asm/data/7B008.sdata.s); on the final step (4), notifies several sibling components. The literal string is strong, concrete evidence for the "pause overlay" reading, but the class's exact game role stays tier B.
+**ObjM__AdvancePauseSetup** -- tier B. A 5-step counter (`self->unk80`, 0..4) driving a state machine: on step 0, builds an object literally named "Pause" (`New_TextRow(self->unk74, 5, &sPauseText[0])`, `sPauseText` == "Pause", asm/data/7B008.sdata.s); on the final step (4), notifies several sibling components. The literal string is strong, concrete evidence for the "pause overlay" reading, but the class's exact game role stays tier B.
 
 
 ## Track 4 (2026-09-26, round 89, echo)
 
 The class is unified as ObjM in include/ObjM.h (table gObjMMethods, was D_80087034); the class_3bb8c_k/_l/_m views (ObjM_3bb8c_k, Obj87034_3bb8c_l, ObjM) and class_39e08.h's Obj4C/SubObjB/EventArg are gone. Byte-identical. Holders now typed: pauseText (+0x07C, TextRow: attachToParent, setColor), etcTim (+0x074, New_TextRow's font), viewport (NodeGuardedViewport setDrawEnabled), unk10 (FrameClock pause), bgm (WBgm pause), sound (VabStreamObj mute).
+
+## Track 7 (2026-09-27, round 98, delta)
+
+Names, tier A (the literals' only reader is this function, and their
+contents are what setColor/attachToParent/New_TextRow take):
+
+| old | new | evidence |
+| --- | --- | --- |
+| `D_8008AB44` | `sPauseText` | the `.asciz "Pause"`, New_TextRow's text |
+| `D_8008AB38` | `sPauseTextPos` | two words (-20, -50), attachToParent's position; now declared `ScreenSpritePos` (TextRow's attach reads one) |
+| `D_8008AB40` | `sPauseTextColor` | bytes FF 00 00, setColor's SpriteRgb; now declared `SpriteRgb`, no cast |
+
+The local `state` is `step` (it is pauseSetupStep). The `5` passed to
+New_TextRow stays a literal: it is the text's length, which the comment
+on `sPauseText` shows. All through `tools/rename.py`, zero bytes.
+
+Moved from the source comment: sPauseText's definition is in
+asm/data/7B12C.sdata.s (the comment said 7B008, which was wrong).

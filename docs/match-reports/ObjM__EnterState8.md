@@ -39,3 +39,11 @@ round 15 (2026-09-04), runner echo, fresh carve `class_3bb8c_m`.
 ## Track 4 (2026-09-26, round 89, echo)
 
 The class is unified as ObjM in include/ObjM.h (table gObjMMethods, was D_80087034); the class_3bb8c_k/_l/_m views (ObjM_3bb8c_k, Obj87034_3bb8c_l, ObjM) and class_39e08.h's Obj4C/SubObjB/EventArg are gone. Byte-identical.
+
+## Track 7 (2026-09-27, round 98, delta)
+
+`OBJM_STATE_LINK_TUNNEL` for 8, `DREAM_COLOR_BLACK` for the zero channel
+mask (FadeBox's mask 0; ObjM__EnterState4 already spells it this way),
+`MOVE_OVERRIDE_FORCED` for setMoveOverride's 1 (enum DreamSysMoveOverride,
+include/DreamSys.h, added this round from DreamSys__TickMove: 0 runs
+tickMoveFree, 1 tickMoveForced, 2 tickMoveHeld). Zero bytes.

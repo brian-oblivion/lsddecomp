@@ -85,3 +85,20 @@ round 15 (2026-09-04), runner echo, fresh carve `class_3bb8c_m`.
 ## Track 4 (2026-09-26, round 89, echo)
 
 The class is unified as ObjM in include/ObjM.h (table gObjMMethods, was D_80087034); the class_3bb8c_k/_l/_m views (ObjM_3bb8c_k, Obj87034_3bb8c_l, ObjM) and class_39e08.h's Obj4C/SubObjB/EventArg are gone. Byte-identical. `unk14` is the StageMap: +0x114 is getLastTargetRateSplit, returning a ChunkSlot whose +0x004 is `loader` (the LbdFile) and +0x014 `heldObj`, which takes TryDreamAuxTrigger's result (cast to BasicClass *).
+
+## Track 7 (2026-09-27, round 98, delta)
+
+The out-parameter getLastEventSlotChunk fills was an `s32` passed as
+`(u8 *)&out`; StageMap__SplitChunkIndex writes two bytes into it (column,
+row), and TryDreamAuxTrigger reads the pair as one `s16` key. It is now a
+unit-local `ChunkCoord { u8 column; u8 row; }` passed as `&coord.column`,
+and TryDreamAuxTrigger's local prototype takes `(s32 data, ChunkCoord
+*coord, s32 day)` -- its definition (src/code_4cd08.c) takes `(s32, s16 *,
+s32)`, and the third argument is getCurrentDayAndYear's s32, not the
+`void *` the old prototype said. Locals `elem`/`result`/`thing` became
+`slot`/`held`/`day`. Byte-exact on the first build: the two-byte struct
+takes the same stack slot as the s32.
+
+Moved from the source comment: "ObjM__CheckAuxTrigger's one external call,
+src/code_4cd08.c (MATCHED; its definition reads the second argument as
+`s16 *`)."

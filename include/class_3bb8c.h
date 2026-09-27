@@ -227,7 +227,7 @@ extern s32 StampSaveTitleFileLetter(char *titleText, char *fileName);
 /* ---- ObjM -------------------------------------------------------- */
 
 /* ObjM::styleConfig's pointee (include/ObjM.h): the day's scene style, a
- * plain record. RegisterStyleConfig returns D_80087424 after
+ * plain record. RegisterStyleConfig returns sStyleConfig after
  * FillStyleFromConfig fills its last four words from the stage's config
  * bytes (class_3bb8c_m, whose local StyleM views the same words), or
  * InitStyleAndWorld's caller supplies one. ObjM__SetupSceneStyle hands the
@@ -241,7 +241,7 @@ typedef struct StyleConfig {
     u8 pad10[0x014 - 0x010];
     s32 colorMode; /* +0x014, EnterStyleSession: 1 makes the far colour clearColor; PollTimBlockLoad: 2 fades to clearColor, else farColor */
     void *farColor; /* +0x018, EnterStyleSession: setFarColor unless colorMode is 1; a gStylePalette entry */
-    s32 fogNear; /* +0x01C, EnterStyleSession: the viewport's setFogNear; a D_8008730C value */
+    s32 fogNear; /* +0x01C, EnterStyleSession: the viewport's setFogNear; a sStyleFogNears value */
 } StyleConfig;
 
 /* ObjM__GetGridRecord's grid lookups (src/code_39094.c): a

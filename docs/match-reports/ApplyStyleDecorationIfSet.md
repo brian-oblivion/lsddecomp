@@ -9,11 +9,11 @@ before this round.
 
 Takes no arguments; gated entirely on the global `gStyleDecorColor` (set by
 `ApplyStyleConfig`, matched earlier this round). If it's non-NULL: builds an
-object via `New_BoxFill(&D_8008AB60, gStyleDecorColor, 0)` (already known
+object via `New_BoxFill(&sStyleDecorBoxSize, gStyleDecorColor, 0)` (already known
 elsewhere as returning `ClassEAC0Obj *` from `include/code_2cc8c.h`, a header
 this unit doesn't own -- see below), stashes it in `gStyleDecorObj`, and
 dispatches three method calls on it (`slot64(obj,1)`, `slot68(obj,0)`,
-`slot4C(obj,tmp,&D_8008AB58)`) plus one call on a completely different
+`slot4C(obj,tmp,&sStyleDecorBoxPos)`) plus one call on a completely different
 object reached through `gStyleSceneRefs->unkC` (`slotAC(sub)`, whose return
 feeds the `slot4C` call's middle argument).
 
@@ -50,22 +50,22 @@ typedef struct FieldAC7CHolder {
 } FieldAC7CHolder;
 
 extern s32 gStyleDecorObj;
-extern s32 D_8008AB60;
-extern s32 D_8008AB58;
+extern s32 sStyleDecorBoxSize;
+extern s32 sStyleDecorBoxPos;
 extern LocalM4D0Obj *New_BoxFill(void *a0, void *a1, s32 a2);
 
 void ApplyStyleDecorationIfSet(void) {
     s32 tmp;
 
     if (gStyleDecorColor != 0) {
-        gStyleDecorObj = (s32) New_BoxFill(&D_8008AB60, (void *) gStyleDecorColor, 0);
+        gStyleDecorObj = (s32) New_BoxFill(&sStyleDecorBoxSize, (void *) gStyleDecorColor, 0);
         ((LocalM4D0Obj *) gStyleDecorObj)->methods->slot64((LocalM4D0Obj *) gStyleDecorObj, 1);
         ((LocalM4D0Obj *) gStyleDecorObj)->methods->slot68((LocalM4D0Obj *) gStyleDecorObj, 0);
 
         tmp = ((FieldAC7CHolder *) gStyleSceneRefs)->unkC->methods->slotAC(
                 ((FieldAC7CHolder *) gStyleSceneRefs)->unkC);
 
-        ((LocalM4D0Obj *) gStyleDecorObj)->methods->slot4C((LocalM4D0Obj *) gStyleDecorObj, tmp, &D_8008AB58);
+        ((LocalM4D0Obj *) gStyleDecorObj)->methods->slot4C((LocalM4D0Obj *) gStyleDecorObj, tmp, &sStyleDecorBoxPos);
     }
 }
 ```
@@ -155,3 +155,15 @@ Not applied (outside the edit set): hoisting `StyleSceneRefs` into one
 shared header (ObjM.h, beside the block it views) and dropping both unit
 copies; retyping the `gStyleSceneRefs` global from `s32` to
 `StyleSceneRefs *` (track 4b, it would remove every cast in _m and _n).
+
+## Track 7 (2026-09-27, round 98, delta)
+
+| old | new | tier | evidence |
+| --- | --- | --- | --- |
+| `D_8008AB58` | `sStyleDecorBoxPos` | A | (-100, -100), the box's attachToParent position; now declared `BoxFillPos`, no cast (Viewport places its own fade box there) |
+| `D_8008AB60` | `sStyleDecorBoxSize` | A | (320, 240), New_BoxFill's size pair; now `s32[2]` |
+
+The colour goes in as `(BoxFillRgb *)gStyleDecorColor` (BoxFill.h's
+record, this round) instead of `(void *)`. Zero bytes. The comment "(track
+4b's to retype)" on gStyleDecorObj is gone; the declaration says it holds
+a BoxFill *.

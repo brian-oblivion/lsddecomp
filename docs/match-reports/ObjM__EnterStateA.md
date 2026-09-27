@@ -37,3 +37,9 @@ round 15 (2026-09-04), runner echo, fresh carve `class_3bb8c_m`.
 ## Track 4 (2026-09-26, round 89, echo)
 
 The class is unified as ObjM in include/ObjM.h (table gObjMMethods, was D_80087034); the class_3bb8c_k/_l/_m views (ObjM_3bb8c_k, Obj87034_3bb8c_l, ObjM) and class_39e08.h's Obj4C/SubObjB/EventArg are gone. Byte-identical.
+
+## Track 7 (2026-09-27, round 98, delta)
+
+`OBJM_STATE_LINK_STAGE_TIMER` for 0xA, `DREAM_COLOR_BLACK` for the zero
+mask, `MOVE_CALLBACK_TICK_DRIFT` for selectCallback98's 2 (DreamSys.h's
+existing enum), `MOVE_OVERRIDE_HELD` for setMoveOverride's 2. Zero bytes.

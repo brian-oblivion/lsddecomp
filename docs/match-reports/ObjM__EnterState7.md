@@ -66,3 +66,24 @@ round 15 (2026-09-04), runner echo, fresh carve `class_3bb8c_m`.
 ## Track 4 (2026-09-26, round 89, echo)
 
 The class is unified as ObjM in include/ObjM.h (table gObjMMethods, was D_80087034); the class_3bb8c_k/_l/_m views (ObjM_3bb8c_k, Obj87034_3bb8c_l, ObjM) and class_39e08.h's Obj4C/SubObjB/EventArg are gone. Byte-identical.
+
+## Track 7 (2026-09-27, round 98, delta)
+
+`self->state = OBJM_STATE_LINK_FLASHBACK` (enum ObjMState, include/ObjM.h,
+added this round: every link state is the DreamSys code that started it
+less 6, from ObjM__OnDreamSysNotify, and DayTask__OnObjMNotify's cases
+agree). The out-parameter is the `DreamColors` getSetFlashbackSession
+fills, so the old `s32 val` and its `(DreamColors *)` cast went. Zero bytes.
+
+### The unit banner's history (moved from src/class_3bb8c_m.c)
+
+The banner said: seventh carved slice of the class_3bb8c block
+(0x44518..0x44F14, vram 0x80053D18..0x80054714), 20 functions, all 20
+matched (0 INCLUDE_ASM, 0 NON_MATCHING). Carved round 15; all four former
+toolchain-blocker functions matched round 23/44, once `addiu_at` and
+`gp_rel` were resolved project-wide (CLAUDE.md, "Open toolchain
+blockers"). The unit owns no switch jump table. Track 4 (round 89) unified
+the class_3bb8c_k/_l/_m views of ObjM in include/ObjM.h. The banner also
+said "include/class_3bb8c.h is SHARED with every other class_3bb8c_*
+slice. Header edits must be strictly ADDITIVE" -- a rule for editors,
+which lives in docs, not in the banner.

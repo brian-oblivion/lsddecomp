@@ -133,7 +133,7 @@ inverted branch; second: explicit default-then-override, byte-exact).
 
 Literal call site in `ApplyStyleConfig` (class_3bb8c_m.c, already matched):
 `cfg = func_80054758();`, used only when the direct per-`gStyleStage` config
-table entry (`D_800873EC[gStyleStage]`) is NULL -- i.e. this is the fallback
+table entry (`sStyleStageConfigs[gStyleStage]`) is NULL -- i.e. this is the fallback
 path. Body hashes `gStyleDay + gStyleStage` into a 16-entry table to pick
 a `gStyleVariant` ("kind"), then a per-variant divisor/remainder select a
 config row. "Fallback" is evidenced by the call site; "kind"/variant

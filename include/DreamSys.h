@@ -102,6 +102,14 @@ enum DreamSysMoveCallback {
     MOVE_CALLBACK_TICK_DRIFT = 2 /* tickDrift, with the sound cue set running */
 };
 
+/* DreamSys::moveOverride, setMoveOverride's value: which movement tickMove
+ * runs (DreamSys__TickMove). */
+enum DreamSysMoveOverride {
+    MOVE_OVERRIDE_NONE = 0,   /* applyPendingTurn, then tickMoveFree */
+    MOVE_OVERRIDE_FORCED = 1, /* tickMoveForced */
+    MOVE_OVERRIDE_HELD = 2    /* tickMoveHeld */
+};
+
 /* The dream clock counts DreamSys::tick 15 times per unit of
  * dreamTimeLimit's public value (GetSetDreamTimeLimit scales both ways). The
  * unit is seconds: every STAGE_TIME_LIMITS entry is a whole number of

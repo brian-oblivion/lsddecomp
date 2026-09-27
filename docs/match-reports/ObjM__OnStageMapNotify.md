@@ -43,3 +43,8 @@ round 15 (2026-09-04), runner echo, fresh carve `class_3bb8c_m`.
 ## Track 4 (2026-09-26, round 89, echo)
 
 Renamed from `ObjM__HandleEvent7` (rename.py): it occupies +0x0B4, which `ObjM__OnNotify` runs for a sender of class id 0x114, StageMap; event 7 runs checkAuxTrigger (+0x0B8). The second parameter is now `BasicClass *sender` (was `s32`). Tier A for the mechanics.
+
+## Track 7 (2026-09-27, round 98, delta)
+
+`event == 7` is `STAGEMAP_EVENT_SLOT_DATA_READY` (include/StageMap.h's
+existing enum: the slot's LbdFile has read its data block). Zero bytes.

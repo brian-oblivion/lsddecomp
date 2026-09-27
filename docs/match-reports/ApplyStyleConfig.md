@@ -9,37 +9,37 @@ and `addiu_at` are resolved), never attempted before this round.
 
 Looks up a "cfg" byte-array pointer for the current style index
 (`gStyleStage`, set by `RegisterStyleConfig`) in the 14-entry pointer table
-`D_800873EC`; if the slot is NULL, falls back to `PickStyleFallbackConfig()` to
+`sStyleStageConfigs`; if the slot is NULL, falls back to `PickStyleFallbackConfig()` to
 produce one. Feeds `cfg` into the already-matched `FillStyleFromConfig(style,
-cfg)` against the fixed global `D_80087424` (a `StyleM` instance, split by
-splat into two adjacent labels `D_80087424`/`gStyleKind2AltColor` purely because
+cfg)` against the fixed global `sStyleConfig` (a `StyleM` instance, split by
+splat into two adjacent labels `sStyleConfig`/`gStyleKind2AltColor` purely because
 something else references the middle of it -- the object is one 0x20-byte
 struct). Then does its own separate raw-byte read of `cfg[1]`/`cfg[2]`: if
 `cfg[1] >= 4`, stores a `gStylePalette[cfg[2]]` colour-table entry pointer into
-`gStyleDecorColor`. Always returns `&D_80087424`.
+`gStyleDecorColor`. Always returns `&sStyleConfig`.
 
 ```c
 struct StyleM;   /* forward tag; full definition stays where it already is,
                   * right before FillStyleFromConfig further down this unit */
 
-extern s32 D_80087424;
-extern s8 *D_800873EC[];
+extern s32 sStyleConfig;
+extern s8 *sStyleStageConfigs[];
 extern s8 *PickStyleFallbackConfig(void);
 extern void FillStyleFromConfig(struct StyleM *style, s8 *cfg);
 extern u8 gStylePalette[][3];
 extern const u8 *gStyleDecorColor;
 
 void *ApplyStyleConfig(void) {
-    s8 *cfg = D_800873EC[gStyleStage];
+    s8 *cfg = sStyleStageConfigs[gStyleStage];
 
     if (cfg == 0) {
         cfg = PickStyleFallbackConfig();
     }
-    FillStyleFromConfig((struct StyleM *) &D_80087424, cfg);
+    FillStyleFromConfig((struct StyleM *) &sStyleConfig, cfg);
     if (cfg[1] >= 4) {
         gStyleDecorColor = gStylePalette[cfg[2]];
     }
-    return &D_80087424;
+    return &sStyleConfig;
 }
 ```
 
@@ -49,10 +49,10 @@ First attempt wrote the natural-looking guard form:
 
 ```c
 if (cfg[1] < 4) {
-    return &D_80087424;
+    return &sStyleConfig;
 }
 gStyleDecorColor = gStylePalette[cfg[2]];
-return &D_80087424;
+return &sStyleConfig;
 ```
 
 This built 40/41 words with the tail one word SHORT: retail has an extra
@@ -67,7 +67,7 @@ the delay slot -- so GCC correctly elided the now-redundant restore, but
 that made the two versions different LENGTHS, not just different register
 names, and the whole build shifted the same way every drift bug in this
 project does. **Rewriting the two-return form as a single-join form** (`if
-(cfg[1] >= 4) { store; } return &D_80087424;`) changed which registers GCC
+(cfg[1] >= 4) { store; } return &sStyleConfig;`) changed which registers GCC
 picked for the store's address arithmetic, which coincidentally restored the
 exact retail register assignment and the redundant `move` reappeared,
 matching byte-for-byte on the next build.
@@ -90,4 +90,20 @@ before anything more invasive.
 
 ## Naming
 
-**ApplyStyleConfig** -- tier B. Looks up the current style's config-byte pointer (`D_800873EC[gStyleStage]`), falling back to the uncarved `PickStyleFallbackConfig` if unset, fills the shared `StyleM` global via `FillStyleFromConfig`, and conditionally sets a colour-table pointer. Same tier and caveat as `RegisterStyleConfig`.
+**ApplyStyleConfig** -- tier B. Looks up the current style's config-byte pointer (`sStyleStageConfigs[gStyleStage]`), falling back to the uncarved `PickStyleFallbackConfig` if unset, fills the shared `StyleM` global via `FillStyleFromConfig`, and conditionally sets a colour-table pointer. Same tier and caveat as `RegisterStyleConfig`.
+
+## Track 7 (2026-09-27, round 98, delta)
+
+| old | new | tier | evidence |
+| --- | --- | --- | --- |
+| `D_800873EC` | `sStyleStageConfigs` | A | indexed by gStyleStage; NULL entries fall back to PickStyleFallbackConfig |
+| `D_80087424` | `sStyleConfig` | A | the StyleConfig record this returns and ObjM keeps as `styleConfig`; now declared `StyleConfig` |
+| `cfg[1] >= 4` | `cfg->fogLevel >= STYLE_DECOR_FOG_LEVEL` | B | the byte indexes sStyleFogNears; 4 and 5 are its two nearest distances (4096, 2048) |
+
+The config pointer is a unit-local `StyleStageConfig` (four `s8`:
+colorMode, fogLevel, farColorIndex, clearColorIndex -- what
+FillStyleFromConfig stores each byte as). Zero bytes.
+
+Proposal: `gStyleKind2AltColor` (0x80087430, class_3bb8c_n) is
+`sStyleConfig + 0x00C`, i.e. `sStyleConfig.clearColor`: its "alternate
+colour" is the current config's clear colour.
