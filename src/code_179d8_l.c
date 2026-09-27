@@ -170,7 +170,7 @@ extern u16 _svm_okon2;
 extern u16 D_80090C60;
 extern u16 D_80090C64;
 extern u16 _svm_orev1;
-extern u16 D_8008E234;
+extern u16 _svm_orev2;
 
 /* STALL -- see docs/match-reports/SpuVmKeyOnNow.md. Best body reached
  * (332/316 built words, 16 words LONG; 33/316 raw word-match, drift-
@@ -268,10 +268,10 @@ void SpuVmKeyOnNow(s32 a0, s32 a1) {
 
     if (D_8008EA20 & 4) {
         _svm_orev1 = lowBit | _svm_orev1;
-        D_8008E234 = highBit | D_8008E234;
+        _svm_orev2 = highBit | _svm_orev2;
     } else {
         _svm_orev1 = _svm_orev1 & ~lowBit;
-        D_8008E234 = D_8008E234 & ~highBit;
+        _svm_orev2 = _svm_orev2 & ~highBit;
     }
 
     D_8008E228 = lowBit | D_8008E228;

@@ -3039,3 +3039,4 @@ sListViewColor = 0x8008A8F0;
 gCharSpriteCellRect = 0x8006ED40;
 _svm_okon2 = 0x8008E22C;
 _svm_orev1 = 0x8008E230;
+_svm_orev2 = 0x8008E234;

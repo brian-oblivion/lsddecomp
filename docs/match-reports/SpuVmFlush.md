@@ -99,7 +99,7 @@ window:
    different problem at the time), but is the established idiom project-
    wide and was kept removed on principle.
 7. Unconditional tail: read `D_80090C60`/`D_80090C64`/`D_8008E228`/
-   `_svm_okon2`/`_svm_orev1`/`D_8008E234` into locals, zero the first four
+   `_svm_okon2`/`_svm_orev1`/`_svm_orev2` into locals, zero the first four
    globals, then store all six into fixed offsets of the SAME `D_8006DAD4`
    object phase 2 read as an array (`+0x18C`/`+0x18E`/`+0x188`/`+0x18A`/
    `+0x198`/`+0x19A` — a THIRD independent view of `D_8006DAD4`, alongside
@@ -129,7 +129,7 @@ window:
   other multi-width symbol in this file).
 - `D_8008D7F6[]`: a NEW 0x10-byte-stride array, same shape as the already-
   established `Rec16D7F4`/`D_8008D7F4`.
-- `_svm_auto_kof_mode` (`u8` flag), `_svm_orev1`/`D_8008E234` (`s16`).
+- `_svm_auto_kof_mode` (`u8` flag), `_svm_orev1`/`_svm_orev2` (`s16`).
 
 ## Axes tried, in order, with effect on built length (retail is 241 words)
 
@@ -581,7 +581,7 @@ void SpuVmFlush(void) {
         u16 lowActive = D_8008E228;
         u16 highActive = _svm_okon2;
         s16 v230 = _svm_orev1;
-        s16 v234 = D_8008E234;
+        s16 v234 = _svm_orev2;
 
         D_80090C60 = 0;
         D_80090C64 = 0;
@@ -627,7 +627,7 @@ extern u16 D_80090C64;
 extern u16 D_8008E228;
 extern u16 _svm_okon2;
 extern s16 _svm_orev1;
-extern s16 D_8008E234;
+extern s16 _svm_orev2;
 extern s32 D_8008E258;
 extern s32 D_8008E25C;
 
@@ -756,7 +756,7 @@ void SpuVmFlush(void) {
         u16 lowActive = D_8008E228;
         u16 highActive = _svm_okon2;
         s16 v230 = _svm_orev1;
-        s16 v234 = D_8008E234;
+        s16 v234 = _svm_orev2;
 
         D_80090C60 = 0;
         D_80090C64 = 0;

@@ -126,7 +126,7 @@ extern u16 _svm_okon2;
 extern u16 D_80090C60;
 extern u16 D_80090C64;
 extern u16 _svm_orev1;
-extern u16 D_8008E234;
+extern u16 _svm_orev2;
 
 /* Object holding a per-note "priority"-ish scale byte at +0x18; only field
  * this function needs. */
@@ -219,10 +219,10 @@ void SpuVmKeyOnNow(s32 a0, s32 a1) {
 
     if (D_8008EA20 & 4) {
         _svm_orev1 |= lowBit;
-        D_8008E234 |= highBit;
+        _svm_orev2 |= highBit;
     } else {
         _svm_orev1 &= ~lowBit;
-        D_8008E234 &= ~highBit;
+        _svm_orev2 &= ~highBit;
     }
 
     D_8008E228 |= lowBit;
@@ -485,7 +485,7 @@ several times in one function.
   round-65 section): write `G = x | G;` not `G |= x;` (retail's `or $v1,$a2,$v1`
   puts the loaded value SECOND), and order the four global updates by retail's
   LOAD order `E228, E22C, C60, C64` rather than `E228, C60, E22C, C64`. The
-  same applies to the `_svm_orev1`/`D_8008E234` pair in the `D_8008EA20 & 4`
+  same applies to the `_svm_orev1`/`_svm_orev2` pair in the `D_8008EA20 & 4`
   arm. 4240 -> 3765.
 
 ### Levers tried and their verdicts
@@ -627,10 +627,10 @@ void SpuVmKeyOnNow(s32 a0, s32 a1) {
 
     if (D_8008EA20 & 4) {
         _svm_orev1 = lowBit | _svm_orev1;
-        D_8008E234 = highBit | D_8008E234;
+        _svm_orev2 = highBit | _svm_orev2;
     } else {
         _svm_orev1 = _svm_orev1 & ~lowBit;
-        D_8008E234 = D_8008E234 & ~highBit;
+        _svm_orev2 = _svm_orev2 & ~highBit;
     }
 
     D_8008E228 = lowBit | D_8008E228;
@@ -834,10 +834,10 @@ void SpuVmKeyOnNow(s32 a0, s32 a1) {
 
     if (D_8008EA20 & 4) {
         _svm_orev1 = lowBit | _svm_orev1;
-        D_8008E234 = highBit | D_8008E234;
+        _svm_orev2 = highBit | _svm_orev2;
     } else {
         _svm_orev1 = _svm_orev1 & ~lowBit;
-        D_8008E234 = D_8008E234 & ~highBit;
+        _svm_orev2 = _svm_orev2 & ~highBit;
     }
 
     D_8008E228 = lowBit | D_8008E228;
@@ -889,7 +889,7 @@ placeholder"); recorded here rather than guessed into a rename:
   Candidate pan/balance-style controls; three of them cascaded suggests a
   main/aux/reverb-style stack, not confirmed.
 - `D_8008EA20` -- single bit (`& 4`) selects which direction
-  `_svm_orev1`/`D_8008E234` gets updated. Candidate per-voice routing/output
+  `_svm_orev1`/`_svm_orev2` gets updated. Candidate per-voice routing/output
   flag byte; not confirmed.
 
 These recur identically in `vmNoiseOn` (same unit, matching cascade shape --
