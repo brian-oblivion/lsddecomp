@@ -117,6 +117,21 @@ typedef struct CdRequestNode {
 #define CD_TICK_STATE_MACHINE 1 /* TickCdStateMachine */
 #define CD_TICK_LOAD_FILE 2     /* TickCdLoadFileStateMachine */
 
+/* A CD-ROM data sector's user data (2048 bytes; <libcd.h>'s CdlModeSize0/1
+ * clear). CdRead counts sectors, so byte sizes and offsets are shifted by
+ * CD_SECTOR_SHIFT (ReadCdFile, CdDriver__Seek), and GetCdFileSize reports a
+ * file's size in whole sectors. CD_SECTOR_SIZE is spelled exactly as
+ * GraphicsResources.c's own definition, so the two may meet. */
+#define CD_SECTOR_SIZE 2048
+#define CD_SECTOR_SHIFT 11
+
+/* A path buffer for BuildCdFilePath's "\\<data directory><name>;1". */
+#define CD_PATH_SIZE 64
+
+/* The file lookups call CdSearchFile this many times before they print
+ * "File not found" and give up (OpenCdFile, ResolveFileEntries). */
+#define CD_SEARCH_ATTEMPTS 101
+
 /* The module state. Every global here was declared in two or more of the
  * units above, with up to three different types; the types below are the
  * ones their accessors need. A global only one unit touches stays a local

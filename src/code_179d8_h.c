@@ -129,14 +129,14 @@ void NoOp2(void) {}
 void OpenCdFile(CdDriver *self, char *name) {
     s32 retries;
     CdlFILE file;
-    char path[0x40];
+    char path[CD_PATH_SIZE];
 
     retries = 0;
     if (self->isOpen == 0) {
         BuildCdFilePath(path, name);
     retry:
         if (CdSearchFile(&file, path) == 0) {
-            if (retries++ < 100) {
+            if (retries++ < CD_SEARCH_ATTEMPTS - 1) {
                 goto retry;
             }
             printf(gCdFileNotFoundFmt, path);
@@ -169,7 +169,7 @@ s32 GetCdFileSize(CdDriver *self) {
     if (self->isOpen == 0) {
         result = 0;
     } else {
-        result = ((self->size >> 11) + 1) << 11;
+        result = ((self->size >> CD_SECTOR_SHIFT) + 1) << CD_SECTOR_SHIFT;
     }
     return result;
 }
@@ -186,19 +186,19 @@ void NoOp3(void) {}
 s32 ReadCdFile(CdDriver *self, void *buf, s32 size) {
     s32 sectors;
     s32 status;
-    char scratch[0x800];
-    u_char syncResult[0x10];
+    char scratch[2048];
+    u_char syncResult[16];
 
     if (self->isOpen != 0) {
     retry:
-        sectors = (u32)size >> 11;
+        sectors = (u32)size >> CD_SECTOR_SHIFT;
         CdControl(CdlSetloc, (u_char *)&self->pos, 0);
     sync:
         status = CdSync(0, syncResult);
-        if (status == 0) {
+        if (status == CdlNoIntr) {
             goto sync;
         }
-        if (status == 5) {
+        if (status == CdlDiskError) {
             goto retry;
         }
         if (sectors != 0) {
