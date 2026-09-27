@@ -117,6 +117,38 @@ typedef struct CdRequestNode {
 #define CD_TICK_STATE_MACHINE 1 /* TickCdStateMachine */
 #define CD_TICK_LOAD_FILE 2     /* TickCdLoadFileStateMachine */
 
+/* gCdOperation: which method's request the state machine is running,
+ * StartCdOperation's first argument and GetCdOperation's (and so
+ * GetActiveDataSourceOperation's) result. Each value is passed by exactly one
+ * of code_179d8_s.c's methods. 0 is also what ResetCdStateMachine leaves
+ * when nothing runs: Close resets straight after starting. */
+#define CD_OPERATION_CLOSE 0
+#define CD_OPERATION_OPEN 1
+#define CD_OPERATION_SEEK 2
+#define CD_OPERATION_READ 3
+#define CD_OPERATION_LOAD_FILE 4
+
+/* gCdState: the state machines' phase, StartCdOperation's second argument
+ * (code_179d8_r.c's banner; that unit still spells them as literals). */
+#define CD_STATE_IDLE 0        /* ResetCdStateMachine's value */
+#define CD_STATE_SETLOC 1      /* issue CdControl(CdlSetloc) */
+#define CD_STATE_SETLOC_WAIT 2 /* poll CdSync for it */
+#define CD_STATE_READ 7        /* issue CdRead */
+#define CD_STATE_READ_WAIT 8   /* poll CdReadSync */
+
+/* Bits CdDriver__RunRequestQueue ORs into a client's FileResource::flags
+ * when one of its requests completes; the clients poll them
+ * (GraphicsResources.c and code_179d8_e.c define the two they read the same
+ * way). Bit 0 (1) is left a literal: it is also FileResource__SetFlag's bit,
+ * and the queue node field that sets it (`unk4`) has no established meaning. */
+#define CD_FLAG_DONE 0x002         /* some request completed */
+#define CD_FLAG_NONE_PENDING 0x004 /* ... and pendingRequests reached 0 */
+#define CD_FLAG_OPEN_DONE 0x010
+#define CD_FLAG_CLOSE_DONE 0x020
+#define CD_FLAG_SEEK_DONE 0x040
+#define CD_FLAG_READ_DONE 0x080
+#define CD_FLAG_LOAD_FILE_DONE 0x200
+
 /* A CD-ROM data sector's user data (2048 bytes; <libcd.h>'s CdlModeSize0/1
  * clear). CdRead counts sectors, so byte sizes and offsets are shifted by
  * CD_SECTOR_SHIFT (ReadCdFile, CdDriver__Seek), and GetCdFileSize reports a
