@@ -90,16 +90,16 @@ void Viewport__SetOtLength(Viewport *self, s32 length) {
 }
 
 /* Takes only before InitOt: packetCount is one factor of each packet area. */
-void Viewport__SetPacketCount(Viewport *self, s32 value) {
+void Viewport__SetPacketCount(Viewport *self, s32 count) {
     if (self->otReady == 0) {
-        self->packetCount = value;
+        self->packetCount = count;
     }
 }
 
 /* The same guard, for the other factor, packetSize. */
-void Viewport__SetPacketSize(Viewport *self, s32 value) {
+void Viewport__SetPacketSize(Viewport *self, s32 size) {
     if (self->otReady == 0) {
-        self->packetSize = value;
+        self->packetSize = size;
     }
 }
 
@@ -359,8 +359,8 @@ SceneNode *Viewport__GetFadeBox(Viewport *self) {
     return self->fadeBox;
 }
 
-void Viewport__SetExtraSwapOnBuffer0(Viewport *self, s32 value) {
-    self->extraSwapOnBuffer0 = value;
+void Viewport__SetExtraSwapOnBuffer0(Viewport *self, s32 on) {
+    self->extraSwapOnBuffer0 = on;
 }
 
 void Viewport__SetDrawEnabled(Viewport *self, s32 on) {
