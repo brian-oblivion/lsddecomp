@@ -148,7 +148,7 @@ Round 89 (runner delta, track 5 `asm-sites`): both bare `__asm__("")`
 barriers (levers 2 and 3 above, now between the `_svm_sreg_buf[idx].unk8` and
 `.unkA` stores and before the `_svm_sreg_dirty[idx] |= 0x30`) are **retired**.
 Measured one at a time: deleting the first alone, then the second as well, each
-rebuild left `build/src/code_179d8_j_c.c.o` byte-identical to the object built
+rebuild left `build/src/libsnd_ut_cp_ut_cadsr_ut_vvol_ut_autov_ut_autop.c.o` byte-identical to the object built
 with both (`cmp`), and `./build-and-verify.sh` stayed green both times. In the
 current source the order no longer depends on them (what changed since they
 were needed was not measured; the `SvmSreg` retype above is a candidate); lever 1 (the `dead[2]` frame idiom) was not touched. `SsUtChangeADSR`

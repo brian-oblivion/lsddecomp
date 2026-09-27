@@ -61,7 +61,7 @@ source object and a DIFFERENT tail:
   loads, which is why the model here is `D_8008D7F4[idx-2]` rather than
   reusing `_svm_sreg_buf`/`D_8008D7F2` (those ARE separate, independently-named
   16-byte-stride tables elsewhere in the project -- see
-  `src/code_179d8_j_c.c`'s own `_svm_sreg_buf`/`D_8008D7F4` pair, declared
+  `src/libsnd_ut_cp_ut_cadsr_ut_vvol_ut_autov_ut_autop.c`'s own `_svm_sreg_buf`/`D_8008D7F4` pair, declared
   "independent array, same shape" there -- so this is NOT presumed to be the
   same physical memory as D8E0's pair, just a THIRD table with the same
   stride).

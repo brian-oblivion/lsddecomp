@@ -2,7 +2,7 @@
 
 > Renamed from `func_80031DF8` on 2026-09-23 (tools/rename.py). Address 0x80031df8.
 
-Unit: `src/code_179d8_j_c.c` · vram `0x80031DF8` · file `0x225F8-0x22694` · 39 words.
+Unit: `src/libsnd_ut_cp_ut_cadsr_ut_vvol_ut_autov_ut_autop.c` · vram `0x80031DF8` · file `0x225F8-0x22694` · 39 words.
 
 Closed in round 38. Whole-image SHA1 green; `funcdiff` 39/39 with zero
 out-of-range bytes.

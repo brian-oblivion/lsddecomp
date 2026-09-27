@@ -1,5 +1,5 @@
 /*
- * code_179d8_j_c -- libsnd vmanager's per-voice utility calls, Sony's code
+ * libsnd_ut_cp_ut_cadsr_ut_vvol_ut_autov_ut_autop -- libsnd vmanager's per-voice utility calls, Sony's code
  * (tools/progress.py counts every function here as library, so each keeps
  * Sony's name and <libsnd.h>'s prototype):
  *
@@ -33,7 +33,7 @@ extern void SeAutoPan(s16 a0, s16 a1, s16 a2, s16 a3);
 extern SpuRegs *D_8006DAD4;
 
 /* STALL -- docs/match-reports/SsUtChangePitch.md (84/88 words). */
-INCLUDE_ASM("asm/nonmatchings/code_179d8_j_c", SsUtChangePitch);
+INCLUDE_ASM("asm/nonmatchings/libsnd_ut_cp_ut_cadsr_ut_vvol_ut_autov_ut_autop", SsUtChangePitch);
 
 /* MATCHING: `dead` only makes GCC reserve retail's unused 8-byte frame,
  * which puts the stack arguments at 0x18/0x1C($sp); nothing else may be added. */
