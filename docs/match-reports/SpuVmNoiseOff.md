@@ -31,8 +31,8 @@ typedef struct {
     u8 pad[0x194];
     u16 unk194; /* +0x194 */
     u16 unk196; /* +0x196 */
-} ObjDAD4;
-extern ObjDAD4 *D_8006DAD4;
+} SpuRegs;
+extern SpuRegs *D_8006DAD4;
 
 void SpuVmNoiseOff(void) {
     s16 i;
@@ -64,7 +64,7 @@ shared header). `D_8006DAD4` is the same symbol `code_179d8_j.c` reads as
 `EntryDAD4 *` (an array of 0x10-byte records indexed by channel); this
 function instead reads two FIXED offsets (`+0x194`, `+0x196`) off the same
 pointer's value with no index scaling at all -- a different reading of the
-same base pointer, so it gets its own local type (`ObjDAD4`, padded out to
+same base pointer, so it gets its own local type (`SpuRegs`, padded out to
 0x194 bytes) rather than reusing `code_179d8_j.c`'s `EntryDAD4`.
 
 ## The one snag: two width truncations of the same loop variable

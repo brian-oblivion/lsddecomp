@@ -251,7 +251,7 @@ near-misses project-wide already have a search logged, none of this unit's
 did before this round). Per the round's "build the inherited body before
 you trust its score" instruction, this exact preserved body was
 re-spliced into the live unit (reusing this file's already-declared
-`Rec34Half`/`Rec16D7F0`/`ObjDAD4` types via casts rather than the isolated
+`Rec34Half`/`Rec16D7F0`/`SpuRegs` types via casts rather than the isolated
 splice's own flat externs, since this function is not first in the file
 and everything it needs was already declared upstream) and rebuilt from
 scratch.
@@ -470,7 +470,7 @@ typedef struct {
     u8 padC[0x10 - 0xC];
 } Rec16D7F0Wide;
 
-/* D_8006DAD4, already declared above as `ObjDAD4 *` (one struct, fields
+/* D_8006DAD4, already declared above as `SpuRegs *` (one struct, fields
  * at +0x194/+0x196), is ALSO the base of an array of 0x10-byte
  * per-channel records here -- another independent local view of the
  * same pointed-to object (see also code_179d8_j.c's own array-of-0x10
@@ -575,7 +575,7 @@ void SpuVmFlush(void) {
     }
 
     {
-        ObjDAD4 *rec = D_8006DAD4;
+        SpuRegs *rec = D_8006DAD4;
         u16 lowMask = D_80090C60;
         u16 highMask = D_80090C64;
         u16 lowActive = D_8008E228;
@@ -650,7 +650,7 @@ typedef struct {
     u8 padC[0x10 - 0xC];
 } Rec16D7F0Wide;
 
-/* D_8006DAD4, already declared above as `ObjDAD4 *` (one struct, fields
+/* D_8006DAD4, already declared above as `SpuRegs *` (one struct, fields
  * at +0x194/+0x196), is ALSO the base of an array of 0x10-byte
  * per-channel records here -- another independent local view of the
  * same pointed-to object (see also code_179d8_j.c's own array-of-0x10
@@ -750,7 +750,7 @@ void SpuVmFlush(void) {
     }
 
     {
-        ObjDAD4 *rec = D_8006DAD4;
+        SpuRegs *rec = D_8006DAD4;
         u16 lowMask = D_80090C60;
         u16 highMask = D_80090C64;
         u16 lowActive = D_8008E228;
@@ -821,7 +821,7 @@ here -- proposing for the head to apply once no runner is live on
   several functions in this cluster; never fully decoded here).
 - `D_8008D9A3` -> `gVoiceState` (the byte SpuVmKeyOff/SpuVmNoiseOff/
   `SpuVmAlloc` all compare against `2` for "noise voice").
-- `D_8006DAD4` (and this unit's two local views `ObjDAD4`/`ObjDAD4Edd4`)
+- `D_8006DAD4` (and this unit's two local views `SpuRegs`/`SpuRegsEdd4`)
   -> `gSpuRegs`: confirmed to be the PS1 SPU's own hardware base address
   `0x1F801C00` by `vmNoiseOn2`'s report in `code_179d8_l`.
 

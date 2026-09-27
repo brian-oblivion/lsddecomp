@@ -60,7 +60,7 @@ extern u8 D_8008E9D0;
  * sound driver.  Indexed as HALFWORDS: `D_8006DAD4[woff + N]` with
  * `s16 woff = i * 8`, i.e. 8 halfwords (0x10 bytes) per voice, which is the
  * SPU's own per-voice register stride.  code_179d8_m.c reads the SAME symbol
- * as a fixed-offset object pointer (its own ObjDAD4, offsets 0x194/0x196) --
+ * as a fixed-offset object pointer (its own SpuRegs, offsets 0x194/0x196) --
  * a different, valid reading per the project's convention.
  *
  * ROUND 66: the POINTEE MUST BE `volatile`.  These are hardware registers, and

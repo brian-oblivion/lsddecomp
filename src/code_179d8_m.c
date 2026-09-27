@@ -311,9 +311,9 @@ typedef struct {
     u8 pad[0x194];
     u16 unk194; /* +0x194 */
     u16 unk196; /* +0x196 */
-} ObjDAD4;
+} SpuRegs;
 
-extern ObjDAD4 *D_8006DAD4;
+extern SpuRegs *D_8006DAD4;
 
 /* MATCHED round 32 (bravo), 270/270 -- closes the register-identity stall
  * every prior round's hand-reshaping (10 axes) and one earlier permuter
@@ -622,7 +622,7 @@ typedef struct {
 extern void SetAutoVol(s16 a0);
 extern void SetAutoPan(s16 a0);
 
-/* D_8006DAD4, already declared above as `ObjDAD4 *` (one struct, fields
+/* D_8006DAD4, already declared above as `SpuRegs *` (one struct, fields
  * at +0x194/+0x196), is ALSO the base of an array of 0x10-byte
  * per-channel records here -- another independent local view of the
  * same pointed-to object (see also code_179d8_j.c's own array-of-0x10
@@ -727,7 +727,7 @@ void SpuVmFlush(void) {
     }
 
     {
-        ObjDAD4 *rec = D_8006DAD4;
+        SpuRegs *rec = D_8006DAD4;
         u16 lowMask = D_80090C60;
         u16 highMask = D_80090C64;
         u16 lowActive = D_8008E228;

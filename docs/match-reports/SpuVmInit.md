@@ -353,8 +353,8 @@ typedef struct {
     u8 pad[0x194];
     u16 unk194; /* +0x194 */
     u16 unk196; /* +0x196 */
-} ObjDAD4;
-extern ObjDAD4 *D_8006DAD4;
+} SpuRegs;
+extern SpuRegs *D_8006DAD4;
 
 void SpuVmInit(s32 a0) {
     s16 i;
@@ -756,11 +756,11 @@ because splat names only addresses some asm references. Byte-identical.
 
 Round 89 (runner delta, track 5 `asm-sites`), two sites:
 
-- **Retired: the asm-label alias** `extern ObjDAD4Edd4 *D_8006DAD4Edd4
+- **Retired: the asm-label alias** `extern SpuRegsEdd4 *D_8006DAD4Edd4
   __asm__("D_8006DAD4");`. SpuVmInit was its only user (six `(s16 *)`/`(u16 *)`
-  cast stores). The unit's `ObjDAD4` typedef and `extern ObjDAD4 *D_8006DAD4;`
+  cast stores). The unit's `SpuRegs` typedef and `extern SpuRegs *D_8006DAD4;`
   moved up to where the alias stood (SpuVmNoiseOff, later in the unit, still
-  uses them), the identical `ObjDAD4Edd4` typedef was dropped, and SpuVmInit
+  uses them), the identical `SpuRegsEdd4` typedef was dropped, and SpuVmInit
   now names `D_8006DAD4` directly. `build/src/code_179d8_m.c.o` came out
   byte-identical (`cmp`), `./build-and-verify.sh` green, and
   `tools/check-nonmatching.sh code_179d8_m` still passes.
