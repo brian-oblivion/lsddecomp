@@ -19,7 +19,8 @@
  * TitleMenu__RefreshMenu) writes the menu's FLASHBACK lock,
  * registrationSlots[1], from two words of the save block; and
  * FormatNumberIntoBuffer (called from the ctor with the current day) writes
- * the day as three full-width digits into the save title, "LSD   Day001".
+ * the day as three full-width digits into the save title, "LSD   Day001"
+ * (FullWidthChars3, include/TitleMenu.h's type for the title's characters).
  *
  * All 20 definitions here are matched, 0 INCLUDE_ASM.
  */
@@ -171,20 +172,9 @@ void CheckSaveScoreFlag(TitleMenu *self, TaskCoreTarget *target) {
  * This unit's own local view keeps it `void *`. */
 extern void FormatFullWidthNumber(void *self, s32 a1, s32 width, s32 unpadded);
 
-/* The 6-byte value formatted into D_8008AA24's buffer by FormatFullWidthNumber
- * above, copied whole into D_8008AA18's buffer at +0x12 as ONE struct
- * assignment. All-`s8` fields (alignment 1, not 2 or 4) is what makes
- * retail's block-move split this way: the leading 4 bytes go via the
- * unaligned lwl/lwr word copy regardless of declared alignment (same
- * idiom as Vec2s16, FlagLargePolyForDivide), but the trailing 2 bytes can no
- * longer be proven 2-byte aligned, so there is no safe halfword move for
- * them and the compiler falls back to two individual signed-byte
- * loads/stores. See docs/match-reports/FormatNumberIntoBuffer.md. */
-typedef struct {
-    s8 a, b, c, d, e, f;
-} Buf6_3bb8c_c;
-
+/* Formats the day as three full-width digits in D_8008AA24's buffer and
+ * copies them into the save title's day number, characters 9..11. */
 void FormatNumberIntoBuffer(s32 arg0) {
     FormatFullWidthNumber(D_8008AA24, arg0, 3, 0);
-    *(Buf6_3bb8c_c *)((s8 *)D_8008AA18 + 0x12) = *(Buf6_3bb8c_c *)D_8008AA24;
+    *(FullWidthChars3 *)((s8 *)D_8008AA18 + 0x12) = *(FullWidthChars3 *)D_8008AA24;
 }

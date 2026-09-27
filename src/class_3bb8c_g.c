@@ -26,6 +26,7 @@
 #include "TimImage.h"
 #include "VabStreamObj.h"
 #include "TaskObjF.h"
+#include "TitleMenu.h"
 #include "Pad.h"
 
 /* MATCHING: `methods` is cached, and the cases are in retail's code order
@@ -337,22 +338,6 @@ TaskObjFMethods *GetTaskObjFMethods(void) {
 
 /* Sony's (libc2). A leading 0 makes it parse octal. */
 extern s32 atoi(char *s);
-
-/* One full-width (2-byte Shift-JIS) character, and runs of 3 and 6 of them
- * that the title is written in whole.
- * MATCHING: all-s8 (alignment 1), so a copy is lwl/lwr words plus single
- * bytes; alignment 2 would merge a two-byte tail into a halfword. */
-typedef struct {
-    s8 lead, trail;
-} FullWidthChar;
-
-typedef struct {
-    FullWidthChar chars[3];
-} FullWidthChars3;
-
-typedef struct {
-    FullWidthChar chars[6];
-} FullWidthChars6;
 
 extern FullWidthChar *gSaveTitleGlyphs;
 

@@ -101,6 +101,24 @@ struct TitleMenu {
     /* +0x0C0 */ s32 saveBlockSize; /* the ctor: getSaveBlock's *outSize (0x700); the object is 0xC4 bytes */
 };
 
+/* One full-width (2-byte Shift-JIS) character of the save title, and runs of
+ * 3 and 6 of them that are written into it whole: FormatNumberIntoBuffer's
+ * day number (characters 9..11), StampSaveTitleFileLetter's letter field
+ * (3..5) and letter field plus "Day" (3..8).
+ * MATCHING: all-s8 (alignment 1), so a copy is lwl/lwr words plus single
+ * bytes; alignment 2 would merge a two-byte tail into a halfword. */
+typedef struct {
+    s8 lead, trail;
+} FullWidthChar;
+
+typedef struct {
+    FullWidthChar chars[3];
+} FullWidthChars3;
+
+typedef struct {
+    FullWidthChar chars[6];
+} FullWidthChars6;
+
 /* The ctor's resetCounters call, as the retail bytes make it: the slot is
  * (self), the call also passes dreamSys (see the banner). No code. */
 typedef void (*TitleMenuResetCallFn)(TitleMenu *self, struct DreamSys *dreamSys);
