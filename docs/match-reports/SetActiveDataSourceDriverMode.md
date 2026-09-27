@@ -85,3 +85,18 @@ Round 52 (alpha), FINISHING-PLAN track 3.
 active source, then spins (`do { } while (fn(...) == 0)`) until the call
 reports success. Same family as the Lock/Unlock/Is* wrappers, generalised to
 a 3-argument setter with a retry loop.
+
+### Type naming (round 97, bravo, track 6)
+
+| was | now | tier |
+| --- | --- | --- |
+| `Func80026F34Fn` | `DataSourceSetDriverModeFn` | A |
+
+**Evidence.** The typedef's only use is this function's local `fn`, and it
+has exactly two occupants, one per branch of `gActiveDataSource ==
+DATASOURCE_CD`: `SetCdDriverMode` (CD driver, `code_179d8_q.c`, 3 args) and
+`SetVabDriverMode` (SPU/VAB driver, `code_179d8_e.c`, 2 args, ignores the
+third). Both occupants agree on what they do -- set the selected data
+source's driver mode, returning 0 while not yet accepted, which the caller
+polls. The name says that and nothing about why; the placeholder was the
+address of this function (`func_80026F34`) before it was named.
