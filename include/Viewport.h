@@ -9,7 +9,7 @@
  * Viewport -- the object that renders a scene (class id 0x7, method table
  * gViewportMethods): a BasicClass subclass. Methods in src/code_2cc8c_c.c
  * (ctor, finalize and the child overrides), src/code_2cc8c_d.c (everything
- * from +0x038 on) and src/code_2864.c (drawNode). IntermediateBase and
+ * from +0x038 on) and src/ViewportDraw.c (drawNode). IntermediateBase and
  * TaskCore hold one as `viewport` (New_Viewport, or the caller's own).
  *
  * The name is for what the class's own methods do:
@@ -46,7 +46,7 @@
  * inherited slot with a pointer cast. unk44 and unk48 multiply to each
  * buffer's packet area (InitOt; defaults 2000 and 64); which is the count
  * and which the size is not shown. drawNode (Viewport__DrawNode) reads its
- * node through code_2864.c's own DrawNode view, so it is not prototyped
+ * node through ViewportDraw.c's own DrawNode view, so it is not prototyped
  * here.
  *
  * The OT pair is Sony's (GsOT headers, GsOT_TAG arrays, PACKET areas), so an
@@ -122,7 +122,7 @@ struct ViewportRefView {
     /* +0x094 */ void (*onNotifyTag5)(Self *self, BasicClass *sender, s32 event); /* Viewport__OnNotifyTag5: onNotify's class-5 (FrameClock) case */ \
     /* +0x098 */ void (*onNotifyTag1)(Self *self, BasicClass *sender, s32 event); /* Viewport__OnNotifyTag1: onNotify's DrawSystem (1) case */ \
     /* +0x09C */ void (*update)(Self *self);                       /* Viewport__Update; NodeGuardedViewport__Update */ \
-    /* +0x0A0 */ void (*drawNode)(Self *self, SceneNode *node);   /* Viewport__DrawNode (code_2864) */ \
+    /* +0x0A0 */ void (*drawNode)(Self *self, SceneNode *node);   /* Viewport__DrawNode (ViewportDraw) */ \
     /* +0x0A4 */ void (*flip)(Self *self);                         /* Viewport__Flip */              \
     /* +0x0A8 */ void (*setFadeBox)(Self *self, SceneNode *handle); /* Viewport__SetFadeBox */  \
     /* +0x0AC */ SceneNode *(*getFadeBox)(Self *self);          /* Viewport__GetFadeBox */      \

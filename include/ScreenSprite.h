@@ -8,7 +8,7 @@
  * table gScreenSpriteMethods): Sprite's direct subclass, adding a screen
  * position and a pivot anchor. Methods in src/Sprite.c. The name is for
  * what the class does, and the evidence is this:
- *  - Viewport__DrawNode (code_2864.c) takes a separate path for
+ *  - Viewport__DrawNode (ViewportDraw.c) takes a separate path for
  *    `(tag & 0xFFF) == 0x144`, i.e. this class and everything below it: the
  *    GsSPRITE's x/y are `screenPos` read as a percentage of half the screen
  *    width/height from the centre, plus the pivot (mx, my), with no
