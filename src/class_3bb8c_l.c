@@ -68,7 +68,7 @@ extern s32 RegisterStyleConfig(void *arg0, s32 arg1, s32 *arg2, s32 arg3, s32 ar
  * (attachViewChild), the StageMap's bounds; and gStagePendingExtras, one
  * setPendingExtra value per stage. */
 extern s32 gObjMViewPoint;
-extern s32 D_80087168;
+extern s32 gObjMViewRefPoint;
 extern s32 gStagePendingExtras[];
 extern s32 gStage0Bounds;
 
@@ -88,7 +88,7 @@ void ObjM__InitStyleAndWorld(ObjM *self, s32 gridSpan, StyleConfig *style, s32 a
     self->timBlockSrc = (TimBlockSrc *)New_TimBlockSrc(ret1);
 
     vp->methods->attachViewChild(vp, (BasicClass *)self->dreamSys, (LongVec3 *)&gObjMViewPoint,
-                                 (LongVec3 *)&D_80087168, 0);
+                                 (LongVec3 *)&gObjMViewRefPoint, 0);
 
     self->cachedViewport = vp;
     ret1 = self->dreamSys->methods->getCurrentDayAndYear(self->dreamSys, 0);
@@ -308,7 +308,7 @@ void ObjM__SetupSceneStyle(ObjM *self) {
     vp->methods->setProjection(vp, val / 2 * 5 / 3 + D_8008AB34);
 
     vp->methods->attachViewChild(vp, (BasicClass *)self->dreamSys, (LongVec3 *)&gObjMViewPoint,
-                                 (LongVec3 *)&D_80087168, 0);
+                                 (LongVec3 *)&gObjMViewRefPoint, 0);
 
     SetDreamAuxWorld(self->stage, (s32)self->unk14, self->dreamSys, (s32)self->sound, (s32)self->unk10);
 

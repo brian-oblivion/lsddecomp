@@ -2964,3 +2964,4 @@ gObjMAcceptedClassIds = 0x8008710C;
 gStagePendingExtras = 0x80087118;
 gStage0Bounds = 0x80087150;
 gObjMViewPoint = 0x8008715C;
+gObjMViewRefPoint = 0x80087168;
