@@ -15,12 +15,12 @@ Unit: `src/class_3bb8c_j.c`. `self` is `ItemList_3bb8c_j`.
 extern void *BuildFileName(void *out, void *a1, void *a2, void *a3);
 extern ItemListHandle_3bb8c_j *New_TimImage(void *arg0);
 extern ItemListHandle_3bb8c_j *New_ScreenSprite(ItemListHandle_3bb8c_j *arg0, void *arg1, s32 arg2);
-extern s32 D_8008AB14;
-extern s32 D_8008AB1C;
-extern s32 D_8008AB24;
-extern s32 D_80087028;
-extern s32 D_8008AAF8;
-extern s32 D_800116E4;
+extern s32 sStrSelect;
+extern s32 sItemListCardPathPrefix;
+extern s32 sItemListTimExt;
+extern s32 gItemListPanelRect;
+extern s32 gItemListPanelPos;
+extern s32 sItemListStrFontIcon;
 
 void ItemList__LoadResources(ItemList_3bb8c_j *self, void *arg1)
 {
@@ -34,13 +34,13 @@ void ItemList__LoadResources(ItemList_3bb8c_j *self, void *arg1)
         return;
     }
 
-    h = New_TimImage(BuildFileName(local, &D_8008AB14, &D_8008AB1C, &D_8008AB24));
+    h = New_TimImage(BuildFileName(local, &sStrSelect, &sItemListCardPathPrefix, &sItemListTimExt));
     h->methods->slot78(h);
-    self->unk50 = New_ScreenSprite(h, &D_80087028, 0);
+    self->unk50 = New_ScreenSprite(h, &gItemListPanelRect, 0);
     h->methods->slot4(h);
-    self->unk50->methods->slot4C(self->unk50, arg1, &D_8008AAF8);
+    self->unk50->methods->slot4C(self->unk50, arg1, &gItemListPanelPos);
 
-    h = New_TimImage(BuildFileName(local, &D_800116E4, &D_8008AB1C, &D_8008AB24));
+    h = New_TimImage(BuildFileName(local, &sItemListStrFontIcon, &sItemListCardPathPrefix, &sItemListTimExt));
     h->methods->slot78(h);
     self->methods->slot8C(self, arg1, h, self->unk20, self->unk24, self->unk28);
     h->methods->slot4(h);
@@ -56,7 +56,7 @@ same type `ItemList__ReleaseResources` -- matched this round -- also uses via
 derived handle into `self->unk50` via `New_ScreenSprite`, releases the FIRST
 handle (`slot4`), then forwards `arg1` and a literal global pointer into
 `self->unk50`'s own `slot4C`. Repeats the whole build (with a different
-global, `D_800116E4` instead of `D_8008AB14`) to make a THIRD handle,
+global, `sItemListStrFontIcon` instead of `sStrSelect`) to make a THIRD handle,
 which is passed into `self->methods->slot8C` (established this round)
 alongside `arg1` and three of `self`'s own fields, then released.
 
@@ -72,9 +72,9 @@ deletions, only 28 register differences** (base score 140, purely
 `REGDIFF` penalties). Every mismatching word is the identical instruction
 on a different register:
 
-- Retail: the address of `D_8008AB1C` lives in `$s2`, `D_8008AB24` in
+- Retail: the address of `sItemListCardPathPrefix` lives in `$s2`, `sItemListTimExt` in
   `$s1`, and each of the two "handle" values in `$s0` in turn.
-- This body: `D_8008AB1C` lands in `$s1`, `D_8008AB24` in `$s0`, and the
+- This body: `sItemListCardPathPrefix` lands in `$s1`, `sItemListTimExt` in `$s0`, and the
   handle in `$s2`.
 
 A clean three-way rotation of the same three long-lived values across
@@ -87,8 +87,8 @@ differently.
 ## What was tried
 
 - Naming the two repeated global addresses as their own locals
-  (`p1 = &D_8008AB1C; p2 = &D_8008AB24;`, reused across both
-  `BuildFileName` calls instead of writing `&D_8008AB1C`/`&D_8008AB24`
+  (`p1 = &sItemListCardPathPrefix; p2 = &sItemListTimExt;`, reused across both
+  `BuildFileName` calls instead of writing `&sItemListCardPathPrefix`/`&sItemListTimExt`
   twice inline) -- no change at all (identical 75/95, byte-for-byte
   identical diff list). Register allocation is apparently indifferent to
   this particular source-level factoring.
@@ -112,7 +112,7 @@ Given the residue is a THREE-WAY rotation with `self`/`arg1` already
 correct, the lever is most likely in exactly WHICH new value gets
 introduced FIRST after `self`/`arg1` are already live -- try writing the
 FIRST `BuildFileName`/`New_TimImage` pair's result assignment before
-computing `&D_8008AB1C`/`&D_8008AB24` at all (i.e. reorder so the
+computing `&sItemListCardPathPrefix`/`&sItemListTimExt` at all (i.e. reorder so the
 call happens before the two address-of expressions are bound to named
 locals, forcing GCC to allocate the handle's register before the two
 addresses' rather than after) -- not yet tried due to time. A longer
@@ -144,7 +144,7 @@ PERMUTATION with zero address drift." Two more attempts, both real-oracle
 verified (`build-and-verify.sh`), both **byte-for-byte identical** to the
 existing 75/95 diff -- not one instruction moved:
 
-1. Named locals `p1 = &D_8008AB1C; p2 = &D_8008AB24;` assigned in
+1. Named locals `p1 = &sItemListCardPathPrefix; p2 = &sItemListTimExt;` assigned in
    REVERSED order (`p2` first, then `p1`) immediately before the first
    `BuildFileName` call, hypothesis being that GCC 2.6.3's local-alloc
    assigns pseudo-hard-registers in an order tied to which value is
@@ -304,7 +304,7 @@ cross-unit sibling with the same call skeleton first.
 
 ## Track 4
 
-2026-09-25, round 84 (charlie): The class `New_D8006ED4C` constructs is unified as ScreenSprite in `include/ScreenSprite.h`; the unit includes it and its local extern is gone. The call reads `self->unk50 = (ItemListHandle_3bb8c_j *)New_ScreenSprite(handle1, (SpriteRect *)&D_80087028, 0)`: D_80087028 is the rect (words 0, 256, 160), and unk50's +0x04C call passes the screen position D_8008AAF8 = (-100, -60). Image byte-identical.
+2026-09-25, round 84 (charlie): The class `New_D8006ED4C` constructs is unified as ScreenSprite in `include/ScreenSprite.h`; the unit includes it and its local extern is gone. The call reads `self->unk50 = (ItemListHandle_3bb8c_j *)New_ScreenSprite(handle1, (SpriteRect *)&gItemListPanelRect, 0)`: gItemListPanelRect is the rect (words 0, 256, 160), and unk50's +0x04C call passes the screen position gItemListPanelPos = (-100, -60). Image byte-identical.
 
 ## Track 4 (2026-09-26, round 88)
 
@@ -314,3 +314,31 @@ ItemListHandle_3bb8c_j *New_TimImage(char *)` is deleted. `handle1`/
 TimImage__Upload), `slot4` -> the inherited `release`; `handle2` is cast to
 `ItemListHandle_3bb8c_j *` for slot8C, whose parameter is this class's
 own view (not TimImage's to retype). Image byte-identical.
+
+## History (moved from src/class_3bb8c_j.c, round 100)
+
+The comment above this function read: "Two handle variables, not one:
+handle1 and handle2 are disjoint live ranges, and merging them into one `h`
+gives the rotation filed as the round-18/19 stall (75/95, both addresses
+and the handle swapped among $s0-$s2). Same shape as class_3bb8c_i's
+TextEntry__LoadCardResources." It is now a one-line MATCHING comment on the
+two declarations, which are renamed `panelTim`/`fontTim` as in
+TextEntry__LoadCardResources.
+
+## Naming (track 7, round 100, charlie)
+
+Data this function reads, renamed with tools/rename.py:
+
+| old | new | tier | evidence |
+| --- | --- | --- | --- |
+| D_80087028 | gItemListPanelRect | A | the only reference is this New_ScreenSprite call's rect: SELECT.TIM's cell, SpriteRect {0, 0, 256, 160}; sibling of gTextEntryPanelRect |
+| D_8008AAF8 | gItemListPanelPos | A | the panel's attachToParent position (-100, -60), a ScreenSpritePos; sibling of gTextEntryPanelPos |
+| D_8008AB14 | sStrSelect | A | the string "SELECT", the panel TIM's name; sibling of sStrComInput |
+| D_800116E4 | sItemListStrFontIcon | A | this unit's copy of "FONTICON" (class_3bb8c_i's is sStrFontIcon, 0x8001161C) |
+| D_8008AB1C | sItemListCardPathPrefix | A | this unit's copy of "CARD\\" (class_3bb8c_i's is sCardPathPrefix) |
+| D_8008AB24 | sItemListTimExt | A | this unit's copy of ".TIM" (class_3bb8c_i's is sTimExt) |
+
+The path buffer's 0x20 is `CARD_TIM_PATH_SIZE` (32, unit-local). The two
+data externs are typed as what they are (`SpriteRect`, `ScreenSpritePos`,
+were `s32`), so the rect needs no cast; the position keeps its `LongVec3 *`
+cast, which SceneNode's attachToParent slot demands (include/ScreenSprite.h).

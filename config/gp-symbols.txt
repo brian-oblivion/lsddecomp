@@ -39,10 +39,6 @@ D_8008AA7C
 D_8008AA84
 D_8008AA8C
 D_8008AAE0
-D_8008AAF8
-D_8008AB14
-D_8008AB1C
-D_8008AB24
 D_8008AB78
 D_8008AB7C
 D_8008AB80
@@ -124,6 +120,7 @@ gGraphPointSize
 gHitHeightGate
 gInstantTeleportersEnabled
 gItemListCursorColor
+gItemListPanelPos
 gItemListRowColor
 gItemListRowOriginX
 gItemListRowOriginY
@@ -195,6 +192,8 @@ sCdDriveInited
 sDayDigits
 sDivClipHeight
 sDivClipWidth
+sItemListCardPathPrefix
+sItemListTimExt
 sListViewColor
 sListViewSize
 sMcTempFileSuffix
@@ -213,6 +212,7 @@ sSaveTitleBlanks
 sSaveTitleColorChannel
 sSaveTitleColorFrame
 sSaveTitleOffset
+sStrSelect
 sStyleDecorBoxPos
 sStyleDecorBoxSize
 sStyleUnreadArg

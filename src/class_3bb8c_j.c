@@ -9,19 +9,24 @@
  *    resource methods resetView, loadResources, releaseResources,
  *    attachTarget and detachTarget. Its list methods are in class_3bb8c_k.
  *
- * include/class_3bb8c.h is shared with every other class_3bb8c_* unit; edits
- * to it must be strictly additive.
+ * Both classes keep their input and tick children by kind (Pad, FrameClock)
+ * and draw through a ScreenSprite panel and TextRows built from CARD\ TIMs;
+ * their editing and list methods do nothing until loading has made
+ * `panelSprite`.
  */
 #include "common.h"
 #include <libgte.h>
 #include <libgpu.h>
 #include <libgs.h>
+#include <strings.h>
 #include "class_3bb8c.h"
 #include "TextEntry.h"
 #include "ItemList.h"
 #include "ScreenSprite.h"
 #include "TimImage.h"
 #include "TextRow.h"
+#include "Pad.h"
+#include "FrameClock.h"
 
 void TextEntry__PrevChar(TextEntry *self) {
     s32 count;
@@ -55,27 +60,23 @@ void TextEntry__ResetAllChars(TextEntry *self) {
 
     if (self->panelSprite) {
         self->charIndex = 0;
-        i = self->textLen - 1;
-        if (i >= 0) {
-            do {
-                self->cursorIndex = i;
-                self->methods->setCharAt(self, i, self->charIndex, 0);
-                i--;
-            } while (i >= 0);
+        for (i = self->textLen - 1; i >= 0; i--) {
+            self->cursorIndex = i;
+            self->methods->setCharAt(self, i, self->charIndex, 0);
         }
         self->methods->setCursorPos(self, self->cursorIndex, 1);
     }
 }
 
 void TextEntry__SetCursorPos(TextEntry *self, s32 pos, s32 notify) {
-    ScreenSpritePos local;
-    CharSprite *obj;
+    ScreenSpritePos screenPos;
+    CharSprite *cursor;
 
     if (self->panelSprite) {
-        local.y = gTextEntryCursorPos.y;
-        local.x = pos * 7 + gTextEntryCursorPos.x;
-        obj = self->cursorSprite;
-        obj->methods->setPosition(obj, &local);
+        screenPos.y = gTextEntryCursorPos.y;
+        screenPos.x = pos * TEXTROW_DEFAULT_PITCH + gTextEntryCursorPos.x;
+        cursor = self->cursorSprite;
+        cursor->methods->setPosition(cursor, &screenPos);
         self->cursorIndex = pos;
         if (notify) {
             self->methods->playSound(self, 0);
@@ -83,17 +84,17 @@ void TextEntry__SetCursorPos(TextEntry *self, s32 pos, s32 notify) {
     }
 }
 
-/* VALUE-of `%gp_rel`, round 45's TextEntry__SetCharAt only -- a byte lookup table
- * (ROM image initialises it to D_800115D0, still-uncarved rodata). */
+/* The characters an entry can hold, in the order nextChar/prevChar step
+ * through them: a pointer to a NUL-terminated byte string (TextEntry.h). */
 extern u8 *gNameCharTable;
 
 void TextEntry__SetCharAt(TextEntry *self, s32 pos, s32 charIndex, s32 notify) {
-    TextRow *obj;
+    TextRow *row;
 
     if (self->panelSprite) {
         self->editBuf[pos] = gNameCharTable[charIndex];
-        obj = self->textRow;
-        ((TextRowSetCellAtFn)obj->methods->setCell)(obj, gNameCharTable[charIndex], pos);
+        row = self->textRow;
+        ((TextRowSetCellAtFn)row->methods->setCell)(row, gNameCharTable[charIndex], pos);
         self->cursorIndex = pos;
         self->charIndex = charIndex;
         if (notify) {
@@ -109,18 +110,14 @@ TextEntryMethods *GetTextEntryMethods(void) {
 }
 
 /*
- * New_ItemList onward: ItemList's allocator, ctor, child and resource
- * methods (include/ItemList.h; the rest of the class is class_3bb8c_k).
- *
- * BasicClass's method table and its getter are include/BasicClass.h's
- * (through class_3bb8c.h); the base-class calls below upcast `self`.
+ * ItemList from here on. The base-class calls go through BasicClass's table
+ * (include/BasicClass.h) and upcast `self`.
  */
-extern void *BMemPMgrAlloc(s32 size);
-extern void *BMemPMgrFree(void *ptr);
 
 ItemList *New_ItemList(char **items, s32 mode) {
-    ItemList *self = BMemPMgrAlloc(0x54);
+    ItemList *self = BMemPMgrAlloc(sizeof(ItemList));
 
+    /* MATCHING: goto, not an early return: NULL fills the branch's delay slot. */
     if (self == NULL) {
         goto fail;
     }
@@ -131,54 +128,49 @@ fail:
 }
 
 /*
- * The ctor. `items` is a NULL-terminated array of string pointers; `mode`
- * (0 or 1) is also stashed into self->mode. First pass counts entries; then
- * allocates two parallel itemCount-length arrays (texts: one
- * individually-allocated buffer per entry; textLens: one s32 length per
- * entry, computed by strlen -- halved when mode==1). Each buffer is filled
- * either via DecodeFullWidthSjis (mode==1) or strcpy (otherwise), and
- * maxTextLen tracks the running max of the computed lengths. The max is a
- * ternary, not an `if`: retail stores the old value back unconditionally
- * before the conditional store of len.
+ * The ctor. `items` is a NULL-terminated array of strings, copied into
+ * buffers of the list's own: `texts[i]` holds item i and `textLens[i]` its
+ * length in characters (bytes, halved for full-width SJIS), and
+ * `maxTextLen` is the longest. Ends with resetView.
  */
-extern s32 strlen(void *arg0);
-extern void DecodeFullWidthSjis(void *dst, void *src);
-extern char *strcpy(char *dest, char *src);
+extern char *DecodeFullWidthSjis(char *dest, char *src);
 
 void ItemList__ItemList(ItemList *self, char **items, s32 mode) {
-    char **p;
+    char **item;
     s32 i;
     s32 len;
 
+    /* MATCHING: both set before the base ctor call. */
     i = 0;
-    p = items;
+    item = items;
     Get_vtable_BasicClass()->ctor((BasicClass *)self);
     self->methods = GetItemListMethods();
 
-    while (*p++ != NULL) {
+    while (*item++ != NULL) {
         i++;
     }
 
     self->itemCount = i;
-    self->texts = BMemPMgrAlloc(i * 4);
-    p = items;
-    self->textLens = BMemPMgrAlloc(self->itemCount * 4);
+    self->texts = BMemPMgrAlloc(i * sizeof(*self->texts));
+    item = items;
+    self->textLens = BMemPMgrAlloc(self->itemCount * sizeof(*self->textLens));
     self->maxTextLen = 0;
 
     for (i = 0; i < self->itemCount; i++) {
-        len = strlen(*p);
-        if (mode == 1) {
+        len = strlen(*item);
+        if (mode == ITEMLIST_MODE_FULLWIDTH) {
             len /= 2;
         }
         self->textLens[i] = len;
         self->texts[i] = BMemPMgrAlloc(len + 4);
-        if (mode == 1) {
-            DecodeFullWidthSjis(self->texts[i], *p);
+        if (mode == ITEMLIST_MODE_FULLWIDTH) {
+            DecodeFullWidthSjis(self->texts[i], *item);
         } else {
-            strcpy(self->texts[i], *p);
+            strcpy(self->texts[i], *item);
         }
+        /* MATCHING: a ternary, not an `if`: the old value is stored back. */
         self->maxTextLen = (self->maxTextLen < len) ? len : self->maxTextLen;
-        p++;
+        item++;
     }
 
     self->mode = mode;
@@ -208,10 +200,10 @@ void ItemList__AddChild(ItemList *self, void *child) {
 
     if (child) {
         Get_vtable_BasicClass()->addChild((BasicClass *)self, (BasicClass *)child);
-        tag = **(s32 **)child & 0xF;
-        if (tag == 2) {
+        tag = ((BasicClass *)child)->methods->header & CLASS_ID_ROOT_MASK;
+        if (tag == PAD_CLASS_ID) {
             self->inputSource = child;
-        } else if (tag == 5) {
+        } else if (tag == FRAMECLOCK_CLASS_ID) {
             self->tickSource = child;
         }
     }
@@ -221,10 +213,10 @@ void ItemList__RemoveChild(ItemList *self, void *child) {
     s32 tag;
 
     if (child) {
-        tag = **(s32 **)child & 0xF;
-        if (tag == 2) {
+        tag = ((BasicClass *)child)->methods->header & CLASS_ID_ROOT_MASK;
+        if (tag == PAD_CLASS_ID) {
             self->inputSource = NULL;
-        } else if (tag == 5) {
+        } else if (tag == FRAMECLOCK_CLASS_ID) {
             self->tickSource = NULL;
         }
         Get_vtable_BasicClass()->removeChild((BasicClass *)self, (BasicClass *)child);
@@ -242,10 +234,10 @@ void ItemList__OnNotify(ItemList *self, void *sender, s32 event) {
     s32 tag;
 
     Get_vtable_BasicClass()->onNotify((BasicClass *)self, sender, event);
-    tag = **(s32 **)sender & 0xF;
-    if (tag == 2) {
+    tag = ((BasicClass *)sender)->methods->header & CLASS_ID_ROOT_MASK;
+    if (tag == PAD_CLASS_ID) {
         self->methods->handleInputCode(self, sender, event);
-    } else if (tag == 5) {
+    } else if (tag == FRAMECLOCK_CLASS_ID) {
         self->methods->tickClosing(self, sender, event);
     }
 }
@@ -256,26 +248,29 @@ void ItemList__ResetView(ItemList *self) {
     self->cursorIndex = 0;
 }
 
-extern char *BuildFileName(char *dest, const char *arg1, const char *arg2, const char *arg3);
-extern const char D_8008AB14[]; /* "SELECT" */
-extern const char D_8008AB1C[]; /* "CARD\\" */
-extern const char D_8008AB24[]; /* ".TIM" */
-extern s32 D_80087028; /* 3 words, New_ScreenSprite's rect: a SpriteRect {0, 0, 256, 160} */
-extern s32 D_8008AAF8;
-extern const char D_800116E4[]; /* "FONTICON" */
+/* loadResources' path buffer, BuildFileName's dest: "CARD\\" + name + ".TIM". */
+#define CARD_TIM_PATH_SIZE 32
+
+extern char *BuildFileName(char *dest, const char *name, const char *dir, const char *ext);
+extern const char sStrSelect[];              /* "SELECT" */
+extern const char sItemListCardPathPrefix[]; /* "CARD\\" */
+extern const char sItemListTimExt[];         /* ".TIM" */
+extern SpriteRect gItemListPanelRect;        /* SELECT's cell: 256 x 160 from (0, 0) */
+extern ScreenSpritePos gItemListPanelPos;    /* (-100, -60) */
+extern const char sItemListStrFontIcon[];    /* "FONTICON" */
 
 /*
- * Two handle variables, not one: handle1 and handle2 are disjoint live
- * ranges, and merging them into one `h` gives the rotation filed as the
- * round-18/19 stall (75/95, both addresses and the handle swapped among
- * $s0-$s2). Same shape as class_3bb8c_i's TextEntry__LoadCardResources.
+ * Loads CARD\SELECT.TIM as the panel sprite, placed at gItemListPanelPos
+ * under `parent`, and has createRows build the rows from CARD\FONTICON.TIM.
+ * Does nothing without a parent or when already loaded. The same shape as
+ * TextEntry__LoadCardResources (class_3bb8c_i).
  */
 void ItemList__LoadResources(ItemList *self, SceneNode *parent) {
-    char path[0x20];
+    char path[CARD_TIM_PATH_SIZE];
     const char *dir;
     const char *ext;
-    TimImage *handle1;
-    TimImage *handle2;
+    TimImage *panelTim; /* MATCHING: two handles, not one reused */
+    TimImage *fontTim;
 
     if (parent == NULL) {
         return;
@@ -284,19 +279,19 @@ void ItemList__LoadResources(ItemList *self, SceneNode *parent) {
         return;
     }
 
-    dir = D_8008AB1C;
-    ext = D_8008AB24;
+    dir = sItemListCardPathPrefix;
+    ext = sItemListTimExt;
 
-    handle1 = New_TimImage(BuildFileName(path, D_8008AB14, dir, ext));
-    ((TimImageUploadFn)handle1->methods->processBuffer)(handle1);
-    self->panelSprite = New_ScreenSprite(handle1, (SpriteRect *)&D_80087028, 0);
-    handle1->methods->release(handle1);
-    self->panelSprite->methods->attachToParent(self->panelSprite, parent, (LongVec3 *)&D_8008AAF8);
+    panelTim = New_TimImage(BuildFileName(path, sStrSelect, dir, ext));
+    ((TimImageUploadFn)panelTim->methods->processBuffer)(panelTim);
+    self->panelSprite = New_ScreenSprite(panelTim, &gItemListPanelRect, 0);
+    panelTim->methods->release(panelTim);
+    self->panelSprite->methods->attachToParent(self->panelSprite, parent, (LongVec3 *)&gItemListPanelPos);
 
-    handle2 = New_TimImage(BuildFileName(path, D_800116E4, dir, ext));
-    ((TimImageUploadFn)handle2->methods->processBuffer)(handle2);
-    self->methods->createRows(self, parent, handle2, self->topIndex, self->column, self->cursorIndex);
-    handle2->methods->release(handle2);
+    fontTim = New_TimImage(BuildFileName(path, sItemListStrFontIcon, dir, ext));
+    ((TimImageUploadFn)fontTim->methods->processBuffer)(fontTim);
+    self->methods->createRows(self, parent, fontTim, self->topIndex, self->column, self->cursorIndex);
+    fontTim->methods->release(fontTim);
 }
 
 void ItemList__ReleaseResources(ItemList *self) {
@@ -306,17 +301,20 @@ void ItemList__ReleaseResources(ItemList *self) {
     }
 }
 
-/* The first addChild passes all four words through (ItemListAddChildWideFn,
- * no code): see this function's report for the do/while. */
-void ItemList__AttachTarget(ItemList *self, void *child1, void *child2, struct VabStreamObj *target) {
-    ItemListAddChildWideFn fn;
+/* Adds the input and tick children, keeps the sound as `target` and zeroes
+ * `result`. The first addChild is handed all four words (its occupant reads
+ * only the first; ItemListAddChildWideFn). */
+void ItemList__AttachTarget(ItemList *self, void *inputSource, void *tickSource,
+                            struct VabStreamObj *target) {
+    ItemListAddChildWideFn addChildWide;
     s32 zero;
 
+    /* MATCHING: the cached slot and zero and the do/while (0) fill a delay slot. */
     zero = 0;
-    fn = (ItemListAddChildWideFn)self->methods->addChild;
+    addChildWide = (ItemListAddChildWideFn)self->methods->addChild;
     do {
-        fn(self, child1, child2, target);
-        self->methods->addChild(self, child2);
+        addChildWide(self, inputSource, tickSource, target);
+        self->methods->addChild(self, tickSource);
         self->target = target;
         self->result = zero;
     } while (0);

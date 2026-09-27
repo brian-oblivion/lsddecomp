@@ -42,3 +42,10 @@ disassembly rather than assuming a shared order.
 ## Naming
 
 - `ItemList__AddChild` -- tier A. The addChild occupant (classtable.py gItemListMethods +0x010): chains the base addChild then caches arg1 into unk34/unk38 by its own tag nibble. Matches the BasicClass addChild-override convention used throughout this header.
+
+## Track 7 (round 100, charlie)
+
+`**(s32 **)child & 0xF` is `((BasicClass *)child)->methods->header &
+CLASS_ID_ROOT_MASK`, and the kinds 2/5 are PAD_CLASS_ID/FRAMECLOCK_CLASS_ID,
+as TextEntry__AddChild (class_3bb8c_i) already spells them. Zero bytes
+changed. The same change is in RemoveChild and OnNotify.

@@ -371,3 +371,27 @@ field. (ItemList__ItemList, one word, 66 -> 98/107.)
   (round 92, `tools/renametype.py Class86F88 ItemList`): a list of strings
   with a scrolling cursor whose parent reads the chosen index, made only by
   TaskObjF__AttachItemList from the memory card's save-file titles.
+
+## History (moved from src/class_3bb8c_j.c, round 100)
+
+The comment above the ctor read: "The ctor. `items` is a NULL-terminated
+array of string pointers; `mode` (0 or 1) is also stashed into self->mode.
+First pass counts entries; then allocates two parallel itemCount-length
+arrays (texts: one individually-allocated buffer per entry; textLens: one
+s32 length per entry, computed by strlen -- halved when mode==1). Each
+buffer is filled either via DecodeFullWidthSjis (mode==1) or strcpy
+(otherwise), and maxTextLen tracks the running max of the computed lengths.
+The max is a ternary, not an `if`: retail stores the old value back
+unconditionally before the conditional store of len." The description is
+shortened in place; the ternary and the before-the-base-ctor init keep
+MATCHING lines (derivation: "Round 73 (delta) -- REVISIT" above).
+
+## Track 7 (round 100, charlie)
+
+Local `p` renamed `item`. Constants: `mode == 1` is
+`ITEMLIST_MODE_FULLWIDTH` (enum ItemListMode, added to include/ItemList.h);
+the two allocation sizes are `i * sizeof(*self->texts)` and
+`self->itemCount * sizeof(*self->textLens)` (were `* 4`). strlen/strcpy now
+come from Sony's `<strings.h>`, and DecodeFullWidthSjis's extern is
+`char *(char *dest, char *src)`, as class_3bb8c_i spells it. Zero bytes
+changed.
