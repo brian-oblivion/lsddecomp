@@ -108,3 +108,13 @@ the two now have different types:
   distance limit, as Entity__GetProximityRatio does for Entity.
 
 Locals `kind` became `tick`. Zero bytes.
+
+## Track 7 (2026-09-27, round 96, charlie)
+
+- Locals `t` / `q` are now `range` / `stepDist`: `range` is the cue's
+  `gStyleCueDistanceTable` row, the same threshold `IsStyleCueNear` and
+  `FindNextStyleCueInRange` compare `dist < table[...]` against, and
+  `stepDist` is that range split into `attenuationSteps` (10) steps, so the
+  result is the target's distance counted in steps: 0 at the slot, 10 at the
+  edge of the range (SoundCueSet.h: attenuation 10 leaves only `vol % 10`).
+  Zero bytes (a local's name is not in the object).

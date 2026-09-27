@@ -286,10 +286,10 @@ void StyleCue13(StyleCueParam *ctx, SoundCueSet *set) {
 extern s32 gStyleCueDistanceTable[];
 
 s32 ComputeStyleCueFalloff(StyleCueParam *ctx) {
-    s32 t = gStyleCueDistanceTable[-ctx->entry->countSign];
-    s32 q = t / ctx->cueSet.attenuationSteps;
+    s32 range = gStyleCueDistanceTable[-ctx->entry->countSign];
+    s32 stepDist = range / ctx->cueSet.attenuationSteps;
 
-    return ctx->lastDist / q;
+    return ctx->lastDist / stepDist;
 }
 
 extern s32 gStyleVariant;
