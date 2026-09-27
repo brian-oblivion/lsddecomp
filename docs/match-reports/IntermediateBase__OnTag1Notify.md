@@ -90,3 +90,37 @@ The class is IntermediateBase (class id 0x30, gIntermediateBaseMethods; `tools/c
 ## Track 4 (2026-09-26, round 88, delta: FrameClock)
 
 The `self->unk10` call is FrameClock's +0x044 `tick` (include/FrameClock.h): the call now casts to `FrameClock *` and names the slot, instead of the `IntermediateBaseLinked` view's `slot44` (that view still covers initArgs->unk4). Byte-identical.
+
+## Track 7 (round 98, echo)
+
+The object at initArgs->pad is a Pad (Application__InitSystems passes the
+Pad; include/IntermediateBase.h names the field for it), so the two calls
+are Pad's +0x044 `updateMasks` and +0x048 `dispatchEvents`
+(include/Pad.h), not the unit-local `slot44`/`slot48`. The event test is
+DrawSystem.h's `DRAWSYSTEM_EVENT_VSYNC` (2): this is onNotify's DrawSystem
+case, and DrawSystem__RunLoop sends 2 every VSync pass. Local `obj4` ->
+`pad`. Byte-identical.
+
+The unit-local view these calls went through was removed; it read, verbatim
+(the only history in it is the "not established" claim, which Pad.h and
+DrawSystem.h have since settled):
+
+```c
+/* One local reading of the objects IntermediateBase calls outside
+ * BasicClass's slots: initArgs->unk0 (+0x048 in onState2, +0x04C in
+ * onState3), initArgs->unk4 (+0x044, +0x048 in onTag1Notify) and unk10
+ * (+0x044 in onTag1Notify). Their classes are not established; every call
+ * passes the object alone. */
+typedef struct IntermediateBaseLinked IntermediateBaseLinked;
+
+typedef struct IntermediateBaseLinkedMethods {
+    u8 pad000[0x044];
+    void (*slot44)(IntermediateBaseLinked *self); /* +0x044 */
+    void (*slot48)(IntermediateBaseLinked *self); /* +0x048 */
+    void (*slot4C)(IntermediateBaseLinked *self); /* +0x04C */
+} IntermediateBaseLinkedMethods;
+
+struct IntermediateBaseLinked {
+    IntermediateBaseLinkedMethods *methods; /* +0x000 */
+};
+```

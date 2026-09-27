@@ -73,3 +73,9 @@ unit).
 ## Track 4 (2026-09-25, round 82, charlie)
 
 The class is IntermediateBase (class id 0x30, gIntermediateBaseMethods; `tools/classtable.py gIntermediateBaseMethods` lists this function as one of its own occupants), declared once in include/IntermediateBase.h. `self` is now `IntermediateBase *`, not TaskCore's `Obj86B60` view; byte-identical. The ctor (+0x008). `self->methods = Get_vtable_IntermediateBase()` needs no cast now.
+
+## Unit banner history (round 98, echo, track 7)
+
+The unit banner's history paragraphs (address range, the round 55 naming
+pass, the round 82/85 track-4 unification of IntermediateBase) moved to
+`TaskCore__GetActiveSlotCount.md`, the unit's first function.

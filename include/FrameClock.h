@@ -47,6 +47,11 @@ enum FrameClockEvent {
     FRAMECLOCK_EVENT_FLAG14 = 4   /* flag14 set: not counted, takes precedence */
 };
 
+/* FrameClock's class id (gFrameClockMethods word +0x000). A single nibble,
+ * so `(header & 0xF) == FRAMECLOCK_CLASS_ID` is its is-kind-of test (the
+ * listeners above; TextEntry's addChild/removeChild/onNotify). */
+#define FRAMECLOCK_CLASS_ID 0x5
+
 /* BasicClass's slots, then this class's own, named for their occupants. */
 struct FrameClockMethods {
     BASICCLASS_SLOTS(FrameClock, (FrameClock * self)); /* FrameClock__FrameClock */

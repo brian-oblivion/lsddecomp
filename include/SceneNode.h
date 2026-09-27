@@ -50,6 +50,10 @@
 typedef struct SceneNode SceneNode;
 typedef struct SceneNodeMethods SceneNodeMethods;
 
+/* SceneNode's class id (gSceneNodeMethods word +0x000). A single nibble, so
+ * `(header & CLASS_ID_ROOT_MASK) == SCENENODE_CLASS_ID` tests for it or a subclass. */
+#define SCENENODE_CLASS_ID 0x4
+
 /* Three 32-bit components (Sony's "long vector" without VECTOR's pad word;
  * arrays of it have a 0xC stride): positions, offsets and translations. */
 typedef struct LongVec3 {

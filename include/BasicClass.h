@@ -60,6 +60,11 @@ typedef struct BasicClassListNode BasicClassListNode;
  * Subclasses number their own events (DreamSys.h, Entity.h). */
 enum { BASICCLASS_EVENT_FINALIZED = 1 };
 
+/* A class id's lowest nibble: which direct subclass of BasicClass (id 0x0)
+ * a class is or derives from. `(header & CLASS_ID_ROOT_MASK) == <CLASS>_CLASS_ID`
+ * is the is-kind-of test for a class one level below BasicClass. */
+#define CLASS_ID_ROOT_MASK 0xF
+
 /* One node of either list. 8 bytes: the size PushBasicClassListNode asks the
  * pool allocator for. */
 struct BasicClassListNode {

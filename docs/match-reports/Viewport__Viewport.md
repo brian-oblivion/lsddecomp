@@ -30,7 +30,7 @@ void Viewport__Viewport(Unk18Obj *self)
     self->unkC = 0;
     self->unk10 = 0;
     self->unkAC = New_SceneNode();
-    obj = New_FadeBox(D_8008A90C, 0, 0);
+    obj = New_FadeBox(gViewportFadeBoxSize, 0, 0);
     self->unkB0 = obj;
     obj->methods->slot4C(obj, self->unkAC, gFadeBoxAttachPos);
     self->methods->slot40(self);
@@ -72,7 +72,7 @@ before the byte-level score did.
 - `New_SceneNode`: local view added, returning `void *` (this unit never
   dereferences it) -- `include/code_d294.h`'s own view types it
   `SceneNodeObj *`, unaffected since it's a separate header.
-- `D_8008A90C`/`gFadeBoxAttachPos`: two new address-taken-only globals.
+- `gViewportFadeBoxSize`/`gFadeBoxAttachPos`: two new address-taken-only globals.
 
 ## Head-broadcast levers (round 13): applicability check
 
@@ -99,3 +99,18 @@ construction shape.
 ## Track 4 (2026-09-25, round 85, bravo)
 
 Renamed from `Unk18Obj__Unk18Obj`. The +0x008 ctor. Chains to BasicClass's ctor first (Get_vtable_BasicClass()->ctor); NodeGuardedViewport__NodeGuardedViewport chains to this one, so the id tree 0x0 -> 0x7 -> 0x17 is the ctor chain. Fields: +0x00C drawSystem, +0x010 viewNode, +0x0AC sceneRoot (New_SceneNode), +0x0B0 subHandle (New_FadeBox, attached under sceneRoot through SceneNode's attachToParent slot with gFadeBoxAttachPos cast to LongVec3 *, because the occupant, BoxFill__AttachToParent, takes a screen position), then the +0x040 initDefaults slot. The class (id 0x7, table `gViewportMethods`, formerly `D_8006E8E4`) is unified as `Viewport` in `include/Viewport.h`, whose banner gives the evidence for the name: its methods hold a GsRVIEW2 (GsSetRefView2), the projection and near clip, a double-buffered GsOT pair, draw the scene tree into it and flip it; IntermediateBase and TaskCore already called the field holding it `viewport`. Any source block above is the pre-unification spelling; the live body takes the unified types and field and slot names, byte-identical.
+
+## Unit banner history (round 98, echo, track 7)
+
+The unit banner's history paragraphs (address range, the round 55 naming
+pass, the round 82/85 track-4 unification of Viewport) moved to
+`TaskCore__GetActiveSlotCount.md`, the unit's first function.
+
+## Naming (round 98, echo, track 7)
+
+| old | new | tier | evidence |
+| --- | --- | --- | --- |
+| `D_8008A90C` | `gViewportFadeBoxSize` | A | Its only reader is this ctor, which passes it as New_FadeBox's `size`; FadeBox's ctor hands it to BoxFill__Reset, which reads `size->x`/`size->y` into boxW/boxH. The words are (320, 240), the full screen. splat's symbol runs 24 bytes (then (10, 10), (-10, -10)); nothing here reads past the first two words. |
+
+Local `obj` -> `fadeBox` (it is stored in `self->fadeBox`); pointer
+stores of 0 spelled NULL. Byte-identical.

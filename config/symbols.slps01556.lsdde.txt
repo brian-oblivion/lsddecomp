@@ -3013,3 +3013,4 @@ gGraphPointSize = 0x8008ABAC;
 gGraphPointNewestColor = 0x8008ABB4;
 gGraphPointHighlightColor = 0x8008ABBC;
 gGraphScoreMoods = 0x80087BD4;
+gViewportFadeBoxSize = 0x8008A90C;

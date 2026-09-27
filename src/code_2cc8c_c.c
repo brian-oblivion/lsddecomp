@@ -1,30 +1,21 @@
-/* code_2cc8c_c -- third slice of the 0x2CC8C block (0x8003DFA0..0x8003E874,
- * 19 functions plus one stall), continuing directly from code_2cc8c_b.
+/* code_2cc8c_c -- IntermediateBase's methods, the start of Viewport's, and
+ * three accessors ahead of them.
  *
- * After TaskCore's TaskCore__GetActiveSlotCount and the two getters come
- * IntermediateBase's own methods, the ctor through OnState3 and its getter
- * Get_vtable_IntermediateBase (class id 0x30, gIntermediateBaseMethods, the
- * parent of TaskCore and TimedTask). The class is declared once, in
- * include/IntermediateBase.h, whose banner says what it does (track 4,
- * round 82); these functions take `IntermediateBase *self`.
+ * TaskCore__GetActiveSlotCount, Get_vtable_TaskCore and
+ * GetDefaultStreamTaskInitData come first: one TaskCore method and two plain
+ * accessors for data used far more widely (code_2c054.c, class_3bb8c_t.c).
  *
- * The remaining functions are Viewport's (class id 0x7, gViewportMethods,
- * include/Viewport.h; track 4, round 85): New_Viewport, the ctor, finalize
- * and the addChild/removeChild/removeAllChildren overrides, which cache a
- * child by its class-id nibble. code_2cc8c_d.c holds the rest of its table. `Get_vtable_TaskCore`/`GetDefaultStreamTaskInitData`
- * are plain accessors for tables SHARED far more widely (code_2c054.c,
- * class_3bb8c_t.c) that simply happen to live in this unit's address range.
+ * Then IntermediateBase (include/IntermediateBase.h, whose banner says what
+ * the class does): the ctor, onNotify's split by the sender's root class,
+ * the counters, init and deinit, the VSync handler that ticks the frame
+ * clock and polls the pad, setState with its two state hooks (which start
+ * and stop the DrawSystem), and the table getter.
  *
- * Round 55 (runner alpha): full track-3 naming pass. Every definition named;
- * see each function's own match report for the `## Naming` evidence.
- * Unk18Obj (now Viewport, include/Viewport.h) and until round 84 the
- * TaskCore view Obj86B60 (now include/TaskCore.h) were
- * SHARED with one or more of code_2cc8c.c, code_2cc8c_b.c and
- * code_2cc8c_d.c (same classes, split by address range across sibling
- * units), so most field/slot renames on those particular structs are
- * PROPOSALS in this round's report, not direct edits -- only the
- * fields/slots this unit's own functions touch AND no sibling reaches were
- * renamed here.
+ * Last, Viewport (include/Viewport.h): New_Viewport, the ctor, finalize, and
+ * the addChild/removeChild/removeAllChildren overrides, which cache a
+ * DrawSystem child and a SceneNode child (the view node, whose coord2 the
+ * reference view hangs from) by root class id. code_2cc8c_d.c holds the rest
+ * of Viewport's table.
  */
 
 #include "common.h"
@@ -35,6 +26,7 @@
 #include "Viewport.h"
 #include "LightRig.h"
 #include "FrameClock.h"
+#include "Pad.h"
 
 s32 TaskCore__GetActiveSlotCount(TaskCore *self) {
     return self->slotCounts[self->activeSlot];
@@ -53,24 +45,6 @@ void *GetDefaultStreamTaskInitData(void) {
     return gDefaultStreamTaskInitData;
 }
 
-/* One local reading of the objects IntermediateBase calls outside
- * BasicClass's slots: initArgs->unk0 (+0x048 in onState2, +0x04C in
- * onState3), initArgs->unk4 (+0x044, +0x048 in onTag1Notify) and unk10
- * (+0x044 in onTag1Notify). Their classes are not established; every call
- * passes the object alone. */
-typedef struct IntermediateBaseLinked IntermediateBaseLinked;
-
-typedef struct IntermediateBaseLinkedMethods {
-    u8 pad000[0x044];
-    void (*slot44)(IntermediateBaseLinked *self); /* +0x044 */
-    void (*slot48)(IntermediateBaseLinked *self); /* +0x048 */
-    void (*slot4C)(IntermediateBaseLinked *self); /* +0x04C */
-} IntermediateBaseLinkedMethods;
-
-struct IntermediateBaseLinked {
-    IntermediateBaseLinkedMethods *methods; /* +0x000 */
-};
-
 void IntermediateBase__IntermediateBase(IntermediateBase *self) {
     Get_vtable_BasicClass()->ctor((BasicClass *)self);
     self->methods = Get_vtable_IntermediateBase();
@@ -78,15 +52,15 @@ void IntermediateBase__IntermediateBase(IntermediateBase *self) {
 }
 
 void IntermediateBase__OnNotify(IntermediateBase *self, BasicClass *sender, s32 event) {
-    s32 header;
+    s32 rootClass;
 
     Get_vtable_BasicClass()->onNotify((BasicClass *)self, sender, event);
-    header = sender->methods->header & 0xF;
-    if (header == 1) {
+    rootClass = sender->methods->header & CLASS_ID_ROOT_MASK;
+    if (rootClass == DRAWSYSTEM_CLASS_ID) {
         self->methods->onTag1Notify(self, sender, event);
-    } else if (header == 2) {
+    } else if (rootClass == PAD_CLASS_ID) {
         self->methods->onPadEvent(self, sender, event);
-    } else if (header == 5) {
+    } else if (rootClass == FRAMECLOCK_CLASS_ID) {
         self->methods->update(self, sender, event);
     }
 }
@@ -159,13 +133,13 @@ void IntermediateBase__Deinit(IntermediateBase *self) {
 }
 
 void IntermediateBase__OnTag1Notify(IntermediateBase *self, BasicClass *sender, s32 event) {
-    IntermediateBaseLinked *obj4;
+    Pad *pad;
 
-    if (event == 2) {
+    if (event == DRAWSYSTEM_EVENT_VSYNC) {
         ((FrameClock *)self->unk10)->methods->tick((FrameClock *)self->unk10);
-        obj4 = (IntermediateBaseLinked *)self->initArgs->pad;
-        obj4->methods->slot44(obj4);
-        obj4->methods->slot48(obj4);
+        pad = (Pad *)self->initArgs->pad;
+        pad->methods->updateMasks(pad);
+        pad->methods->dispatchEvents(pad);
     }
 }
 
@@ -173,11 +147,8 @@ void IntermediateBase__IncrementFrameCounter(IntermediateBase *self) {
     self->frameCounter++;
 }
 
-/* Matched round 72: the two state-dependent calls are ONE call through a
- * slot picked per arm (self then has 5 refs, not 6, so global-alloc ranks
- * state above it: state -> $s0, self -> $s1).  The `__asm__("" ::: "memory")`
- * it carried after the methods load was retired in round 89: removing it
- * left the object byte-identical. */
+/* MATCHING: the two state hooks are ONE call through a slot picked per arm;
+ * two direct calls give self a sixth reference and swap $s0/$s1. */
 void IntermediateBase__SetState(IntermediateBase *self, s32 state) {
     IntermediateBaseMethods *methods;
     void (*fn)(IntermediateBase *);
@@ -196,18 +167,18 @@ void IntermediateBase__SetState(IntermediateBase *self, s32 state) {
 }
 
 void IntermediateBase__OnState2(IntermediateBase *self) {
-    IntermediateBaseLinked *obj0;
+    DrawSystem *drawSystem;
 
     self->frameCounter = 0;
-    obj0 = (IntermediateBaseLinked *)self->initArgs->drawSystem;
-    obj0->methods->slot48(obj0);
+    drawSystem = (DrawSystem *)self->initArgs->drawSystem;
+    drawSystem->methods->start(drawSystem);
 }
 
 void IntermediateBase__OnState3(IntermediateBase *self) {
-    IntermediateBaseLinked *obj0;
+    DrawSystem *drawSystem;
 
-    obj0 = (IntermediateBaseLinked *)self->initArgs->drawSystem;
-    obj0->methods->slot4C(obj0);
+    drawSystem = (DrawSystem *)self->initArgs->drawSystem;
+    drawSystem->methods->stop(drawSystem);
     self->frameCounter = 0;
 }
 
@@ -218,7 +189,7 @@ IntermediateBaseMethods *Get_vtable_IntermediateBase(void) {
 Viewport *New_Viewport(void) {
     Viewport *self;
 
-    self = BMemPMgrAlloc(0xBC);
+    self = BMemPMgrAlloc(sizeof(Viewport));
     if (self != NULL) {
         GetViewportMethods()->ctor(self);
         return self;
@@ -227,16 +198,16 @@ Viewport *New_Viewport(void) {
 }
 
 void Viewport__Viewport(Viewport *self) {
-    SceneNode *obj;
+    SceneNode *fadeBox;
 
     Get_vtable_BasicClass()->ctor((BasicClass *)self);
     self->methods = GetViewportMethods();
-    self->drawSystem = 0;
-    self->viewNode = 0;
+    self->drawSystem = NULL;
+    self->viewNode = NULL;
     self->sceneRoot = New_SceneNode();
-    obj = (SceneNode *)New_FadeBox(D_8008A90C, 0, 0);
-    self->fadeBox = obj;
-    obj->methods->attachToParent(obj, self->sceneRoot, (LongVec3 *)gFadeBoxAttachPos);
+    fadeBox = (SceneNode *)New_FadeBox(gViewportFadeBoxSize, 0, 0);
+    self->fadeBox = fadeBox;
+    fadeBox->methods->attachToParent(fadeBox, self->sceneRoot, (LongVec3 *)gFadeBoxAttachPos);
     self->methods->initDefaults(self);
 }
 
@@ -249,26 +220,26 @@ void Viewport__Finalize(Viewport *self) {
 }
 
 void Viewport__AddChild(Viewport *self, BasicClass *child) {
-    s32 header;
+    s32 rootClass;
 
     Get_vtable_BasicClass()->addChild((BasicClass *)self, child);
-    header = child->methods->header & 0xF;
-    if (header == 4) {
+    rootClass = child->methods->header & CLASS_ID_ROOT_MASK;
+    if (rootClass == SCENENODE_CLASS_ID) {
         self->viewNode = (SceneNode *)child;
         self->refView.super = ((SceneNode *)child)->coord2;
-    } else if (header == 1) {
+    } else if (rootClass == DRAWSYSTEM_CLASS_ID) {
         self->drawSystem = (DrawSystem *)child;
     }
 }
 
 void Viewport__RemoveChild(Viewport *self, BasicClass *child) {
-    s32 header;
+    s32 rootClass;
 
-    header = child->methods->header & 0xF;
-    if (header == 4) {
-        self->refView.super = 0;
+    rootClass = child->methods->header & CLASS_ID_ROOT_MASK;
+    if (rootClass == SCENENODE_CLASS_ID) {
+        self->refView.super = NULL;
         self->viewNode = NULL;
-    } else if (header == 1) {
+    } else if (rootClass == DRAWSYSTEM_CLASS_ID) {
         self->drawSystem = NULL;
     }
     Get_vtable_BasicClass()->removeChild((BasicClass *)self, child);
@@ -278,8 +249,8 @@ void Viewport__RemoveChild(Viewport *self, BasicClass *child) {
  * gNodeGuardedViewportMethods): clears the three child caches AddChild fills, then
  * the base. */
 void Viewport__RemoveAllChildren(Viewport *self) {
-    self->refView.super = 0;
-    self->viewNode = 0;
+    self->refView.super = NULL;
+    self->viewNode = NULL;
     self->drawSystem = NULL;
     Get_vtable_BasicClass()->removeAllChildren((BasicClass *)self);
 }
