@@ -315,13 +315,13 @@ struct StageMapMethods {
     /* +0x118 */ ChunkSlot *(*findSlotByNeighbour)(StageMap *self, s32 key); /* StageMap__FindSlotByNeighbour */
     /* +0x11C */ ChunkSlot *(*findSlotForPosition)(StageMap *self, LongVec3 *pos); /* StageMap__FindSlotForPosition */
     /* +0x120 */ s32 (*findSlotIndexByNeighbour)(StageMap *self, s32 key); /* StageMap__FindSlotIndexByNeighbour */
-    /* +0x124 */ s32 (*findSlotIndexByChunk)(StageMap *self, s32 key); /* StageMap__FindSlotIndexByChunk: an index or -1 */
+    /* +0x124 */ s32 (*findSlotIndexByChunk)(StageMap *self, s32 chunkIndex); /* StageMap__FindSlotIndexByChunk: an index or -1 */
     /* +0x128 */ void (*refreshFootprint)(StageMap *self); /* StageMap__RefreshFootprint */
     /* +0x12C */ void (*applyToSenderFootprint)(StageMap *self, SceneNode *sender,
                                                 s32 command); /* StageMap__ApplyToSenderFootprint */
     /* +0x130 */ void *(*getUnk1CC)(StageMap *self);          /* StageMap__GetUnk1CC */
     /* +0x134 */ void (*setBounds)(StageMap *self, CellBounds *bounds); /* StageMap__SetBounds */
-    /* +0x138 */ void (*startScaleRamp)(StageMap *self, s32 rate, s32 flag); /* StageMap__StartScaleRamp */
+    /* +0x138 */ void (*startScaleRamp)(StageMap *self, s32 rate, s32 fast); /* StageMap__StartScaleRamp */
     /* +0x13C */ void (*stepScaleRamp)(StageMap *self); /* StageMap__StepScaleRamp */
     /* +0x140 */ void (*endScaleRamp)(StageMap *self);  /* StageMap__EndScaleRamp */
 }; /* 80 slots */
@@ -420,24 +420,24 @@ ChunkSlot *StageMap__GetLastEventSlotChunk(StageMap *self, u8 *out);
 ChunkSlot *StageMap__FindSlotByNeighbour(StageMap *self, s32 key);
 ChunkSlot *StageMap__FindSlotForPosition(StageMap *self, LongVec3 *pos);
 s32 StageMap__FindSlotIndexByNeighbour(StageMap *self, s32 key);
-s32 StageMap__FindSlotIndexByChunk(StageMap *self, s32 key);
+s32 StageMap__FindSlotIndexByChunk(StageMap *self, s32 chunkIndex);
 void StageMap__RefreshFootprint(StageMap *self);
-void StageMap__ComputeFootprintFromRotation(StageMap *self, s32 width, s32 height);
+void StageMap__ComputeFootprintFromRotation(StageMap *self, s32 acrossCells, s32 aheadCells);
 void StageMap__BuildFootprintRects(StageMap *self);
-s32 StageMap__SplitFootprintRect(StageMap *self, CellRect *slot, s32 count, s32 baseIdx, s32 col,
+s32 StageMap__SplitFootprintRect(StageMap *self, CellRect *rect, s32 count, s32 key, s32 col,
                                  s32 row, s32 width, s32 height);
 void StageMap__SetFootprintFromQuery(StageMap *self);
 s32 IsPointOutOfBounds(CellBounds *bounds, s8 *point);
-s32 StageMap__InitFootprintRect(StageMap *self, s32 unused, s32 key, s32 arg3);
-void StageMap__SetFootprintVisible(StageMap *self, s32 setBit);
+s32 StageMap__InitFootprintRect(StageMap *self, s32 unused, s32 index, s32 chunkIndex);
+void StageMap__SetFootprintVisible(StageMap *self, s32 visible);
 void *StageMap__GetUnk1CC(StageMap *self);
 void StageMap__SetBounds(StageMap *self, CellBounds *bounds);
-void StageMap__StartScaleRamp(StageMap *self, s32 rate, s32 flag);
+void StageMap__StartScaleRamp(StageMap *self, s32 rate, s32 fast);
 void StageMap__StepScaleRamp(StageMap *self);
 void StageMap__EndScaleRamp(StageMap *self);
 void StageMap__AddScaleStepToCell(StageMap *self, struct GridCell *cell);
 void StageMap__ResetCellScale(StageMap *self, struct GridCell *cell);
-void StageMap__ForEachSlot(StageMap *self, StageMapCellFn cellFn, ChunkSlotFn elemFn);
+void StageMap__ForEachSlot(StageMap *self, StageMapCellFn cellFn, ChunkSlotFn slotFn);
 void StageMap__ForEachSlotCell(StageMap *self, StageMapCellFn cellFn, ChunkSlot *slot);
 
 #endif

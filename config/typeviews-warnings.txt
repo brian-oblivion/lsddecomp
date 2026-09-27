@@ -5,9 +5,9 @@ TmdModel: warning: `size' might be used uninitialized in this function
 TmdModel: warning: unused variable `unused'
 class_3ac78: warning: unused variable `unused'
 class_3bb8c: warning: control reaches end of non-void function
-class_3bb8c_b: warning: `flag' might be used uninitialized in this function
 class_3bb8c_b: warning: `junk' might be used uninitialized in this function
-class_3bb8c_b: warning: `offset' might be used uninitialized in this function
+class_3bb8c_b: warning: `lateral' might be used uninitialized in this function
+class_3bb8c_b: warning: `shiftCol' might be used uninitialized in this function
 class_3bb8c_e: warning: control reaches end of non-void function
 class_3bb8c_f: warning: `state' might be used uninitialized in this function
 class_3bb8c_g: warning: implicit declaration of function `strcpy'
