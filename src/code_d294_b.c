@@ -16,6 +16,7 @@
 #include <libgs.h>
 #include "code_d294.h"
 #include "TmdModel.h"
+#include "Actor.h"
 
 /* Sibling of SceneNode__SetDisplay/D374/D3A0/D3CC/D3F8 (code_d294.c): a thin
  * wrapper around GetSetBitField over &self->unk10, shift 0 width 3. Raw
@@ -564,13 +565,13 @@ void SceneNode__AddToActorParents(SceneNode *self, void *node) {
     do {
         do {
             BasicClass__GetNextParentRef(node, (BasicClass **)&entry, (BasicClassListNode **)&cursor);
-            if (entry != NULL && (entry->methods->header & 0xF) == 4) {
+            if (entry != NULL && (entry->methods->header & CLASS_ID_ROOT_MASK) == SCENENODE_CLASS_ID) {
                 goto found;
             }
         } while (cursor != NULL);
         entry = NULL;
     found:
-        if (entry != NULL && *(u8 *)entry->methods == 0x34) {
+        if (entry != NULL && (u8)entry->methods->header == ACTOR_CLASS_ID) {
             entry->methods->addChild(entry, (BasicClass *)self);
         }
     } while (cursor != NULL);
