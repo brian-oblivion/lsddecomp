@@ -194,3 +194,7 @@ TimImage's: +0x004 `release`, +0x05C `freeBuffer` (was `slot5C`), and
 +0x078, FileResource's `void *slot78` whose occupant is TimImage__Upload,
 called through `TimImageUploadFn`. `path` is cast to `char *` for
 New_TimImage. Image byte-identical.
+
+## Track 7 (2026-09-27, round 98, bravo)
+
+D_8008A8E8 -> sListViewSize (tier A: the two words are {320, 240}, New_BoxFill's size argument for listView), D_8008A8F0 -> sListViewColor (tier A: bytes 20 20 40, New_BoxFill's colour, now declared a BoxFillRgb and passed as &sListViewColor). Both via rename.py, both declared in this unit now (they were in code_2cc8c.h, used nowhere else). `size = count * 4` is `count * sizeof(void *)`. Locals: a1 -> target, list -> names, arr -> widget, handle -> texture, extra -> itemList. The two `(char *)path` casts stay: New_TimImage takes `char *` (proposal: `const char *`, TimImage.h).

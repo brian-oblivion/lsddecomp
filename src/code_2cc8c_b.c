@@ -7,31 +7,25 @@
 #include "BgLayer.h"
 
 /*
- * code_2cc8c_b -- 20 of TaskCore's own methods (gTaskCoreMethods +0x0C4 to
- * +0x11C; the class is include/TaskCore.h, track 4 round 84). Round 78 naming
- * pass (runner echo): every function in this file MATCHED before this round;
- * the pass renamed all 20 and five exclusively-owned fields, no stalls.
+ * TaskCore's menu methods, gTaskCoreMethods +0x0C4 to +0x11C (the class is
+ * include/TaskCore.h): the fade-out tick, the sub handle, and a two-level
+ * picker over the menu description in `target`, a TaskCoreTarget.
  *
- * What this slice of the class implements: a tab/slot picker with a
- * scrollable item list inside each tab. `self->activeSlot` selects the tab;
- * `self->slotElements[i]` is each tab's own representative widget (walked/
- * broadcast to by TaskCore__BroadcastToSlots, switched by
- * TaskCore__SetActiveSlot); `self->itemLists[idx]`/`self->itemCounts[idx]`
- * hold the item list WITHIN tab idx (built by TaskCore__CreateSlotElements,
- * torn down by TaskCore__ReleaseSlotElements, positioned/shown by
- * TaskCore__RefreshSlotView through `self->listView`); `self->slotCounts[idx]`
- * is a ring cursor into that per-tab item list.
- * TaskCore__BeginElementScroll/TaskCore__CommitElementScroll/
- * TaskCore__CancelElementScroll form a `self->inputMode` state-1<->2 trio that
- * opens interactive scrolling, then either commits the new cursor position
- * back into the target descriptor (`SlotEntry::savedCursor`) or cancels back
- * to the last-committed one; TaskCore__AdvanceSlotCursor/
- * TaskCore__RetreatSlotCursor step the cursor by one (wrapping) and forward
- * through TaskCore__SetSlotCursor (setSlotCursor, +0x11C), which does the actual
- * old/new element highlight swap -- the same shape TaskCore__SetActiveSlot
- * uses one level up, switching which TAB is active instead of which item.
- * TaskCore__SetTarget/TaskCore__ReleaseTarget are the constructor/teardown
- * pair for `self->target` (a TaskCoreTarget, include/TaskCore.h).
+ * The first level is the slots. setTarget makes one TextRow per
+ * target->names entry (slotElements); findNextFreeSlot/findPrevFreeSlot step,
+ * wrapping, to the next slot whose registrationSlots entry is NULL; and
+ * setActiveSlot moves the highlight from unselectedColor to selectedColor.
+ * A slot whose target->unk24 entry is non-NULL also has a list of items,
+ * described by a SlotEntry: createSlotElements makes its rows (itemLists,
+ * itemCounts) and starts its cursor (slotCounts) at savedCursor.
+ *
+ * The second level scrolls that list. beginElementScroll (inputMode
+ * CHOOSING_SLOT to SCROLLING) shows every row with listView's frame behind
+ * them and the cursor's row in cursorColor; advanceSlotCursor/
+ * retreatSlotCursor move the cursor, wrapping, through setSlotCursor;
+ * commitElementScroll keeps the cursor in savedCursor and leaves only its
+ * row shown, cancelElementScroll goes back to savedCursor. The list is laid
+ * out so that the cursor's row sits at SlotEntry::pos.
  */
 
 /* Psy-Q libc2's strlen, linked from Sony's object. */
@@ -235,8 +229,7 @@ void TaskCore__BroadcastToSlots(TaskCore *self, void *color) {
             self->methods->broadcastToSlotElements(self, color);
         }
         i++;
-        /* Keeps i++ ahead of the self->slotCount reload, leaving retail's nop
-         * in that load's delay slot; without it GCC moves i++ into the slot. */
+        /* MATCHING: without it GCC moves i++ into the slotCount load's delay slot. */
         __asm__("");
     }
     self->activeSlot = savedSlot;
