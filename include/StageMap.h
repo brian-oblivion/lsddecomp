@@ -18,7 +18,7 @@
  * New_StageMap(NULL, 1)). ObjM configures it for its stage: setConfig
  * with the stage's StageGridDimensions (GetStageGridDimensions),
  * setCallback with ObjM__GetGridRecord (a chunk index -> that chunk's
- * file record, GetGridRecordAt), setGridSpan, setAcceptedTags,
+ * file record, GetStageMapChunkRecord), setGridSpan, setAcceptedTags,
  * setChildParams, setBounds, and enables it.
  * DreamSys__SpawnAtLink hands it the target (setTargetAndLoadChunks);
  * Actor keeps it as `grid` (include/Actor.h) when addChild sees a

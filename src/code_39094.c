@@ -254,12 +254,12 @@ Rec1C *GetStageMapChunkRecords(s32 index) {
     return &GetStageRecords(index)[9];
 }
 
-Rec1C *GetGridRecordAt(s32 index, s32 sub) {
+Rec1C *GetStageMapChunkRecord(s32 index, s32 sub) {
     return &GetStageMapChunkRecords(index)[sub];
 }
 
 Rec1C *GetGridRecordXY(s32 index, s32 x, s32 y) {
-    return GetGridRecordAt(index, x + GetStageGridDimensions(index)->columns * y);
+    return GetStageMapChunkRecord(index, x + GetStageGridDimensions(index)->columns * y);
 }
 
 const char *GetIntroStreamName(s32 *typeCodeOut) {

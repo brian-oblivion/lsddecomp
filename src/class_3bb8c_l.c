@@ -58,7 +58,7 @@ void ObjM__AttachTarget(ObjM *self, IntermediateBaseInitArgs *args, DreamSys *dr
  * value for the StageMap (GetGridRecordXY is declared void). */
 void ObjM__GetGridRecord(ObjM *self, s32 cell, s32 x, s32 y) {
     if (cell >= 0) {
-        GetGridRecordAt(self->stage, cell);
+        GetStageMapChunkRecord(self->stage, cell);
     } else {
         GetGridRecordXY(self->stage, x, y);
     }

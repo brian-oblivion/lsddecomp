@@ -77,7 +77,7 @@ stage's map chunks, STGnn\Mnnn.LBD: StageMap__ApplyChunkLoads calls
 loadHeader (+0x078) with each rate entry's `ptr0`, which
 StageMap__ComputeChunkLoadEntry takes from the grid's callback, and that
 callback is ObjM__GetGridRecord (ObjM__AttachTarget installs it), whose
-tail call GetGridRecordAt(stage, chunk) / GetGridRecordXY leaves
+tail call GetStageMapChunkRecord(stage, chunk) / GetGridRecordXY leaves
 `&group[9 + chunk]` of gRecordTable in $v0. gRecordTable's 0x1C-byte records
 begin with a path, and record 9 of every stage group is its M000.LBD
 (stage 0: gStageFirstRecord[0] = 16, record 25 at 0x80081CC0 =
@@ -128,7 +128,7 @@ apply by type scope.
 
 - `LbdFile.ownerRate` (+0x030) -> `chunkIndex`. StageMap__ApplyChunkLoads
   stores in it the same entry value it passed to the grid callback to get
-  the file's record (GetGridRecordAt(stage, value)); it is -1 exactly when
+  the file's record (GetStageMapChunkRecord(stage, value)); it is -1 exactly when
   no chunk is held (this ctor, LbdFile__ReleaseHeader; ResetElementCells
   tests `>= 0`); StageMap__SplitChunkIndex splits it into column
   (`% divisor`) and row (`/ divisor`); StageMap__FindSlotIndexByChunk

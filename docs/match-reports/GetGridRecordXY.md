@@ -9,7 +9,7 @@ out-of-range drift.
 
 ## What it does
 
-Grid-cell record: `GetGridRecordAt(index, x + GetStageGridDimensions(index)->columns * y)`. Uses `StageGrid.h`'s `StageGridDimensions` (first field `s16 columns`); the header is now included by this unit (additive).
+Grid-cell record: `GetStageMapChunkRecord(index, x + GetStageGridDimensions(index)->columns * y)`. Uses `StageGrid.h`'s `StageGridDimensions` (first field `s16 columns`); the header is now included by this unit (additive).
 
 ## Source
 
@@ -18,7 +18,7 @@ Declarations it needs are the local views at the top of `src/code_39094.c`
 
 ```c
 Rec1C *GetGridRecordXY(s32 index, s32 x, s32 y) {
-    return GetGridRecordAt(index, x + GetStageGridDimensions(index)->columns * y);
+    return GetStageMapChunkRecord(index, x + GetStageGridDimensions(index)->columns * y);
 }
 ```
 
@@ -39,4 +39,4 @@ Rec1C *GetGridRecordXY(s32 index, s32 x, s32 y) {
 
 - **Name:** `GetGridRecordXY`
 - **Tier:** B
-- **Evidence:** calls GetGridRecordAt(index, x + GetStageGridDimensions(index)->columns * y) -- the strongest evidence in this family that the record group is addressed as a 2-D grid over StageGrid.h's own dimensions.
+- **Evidence:** calls GetStageMapChunkRecord(index, x + GetStageGridDimensions(index)->columns * y) -- the strongest evidence in this family that the record group is addressed as a 2-D grid over StageGrid.h's own dimensions.

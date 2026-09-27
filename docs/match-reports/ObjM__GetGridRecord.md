@@ -16,7 +16,7 @@ the filename these are not Psy-Q library code).
 ```c
 void ObjM__GetGridRecord(Obj87034_3bb8c_l *self, s32 code, s32 arg2, s32 arg3) {
     if (code >= 0) {
-        GetGridRecordAt(self->unk38, code);
+        GetStageMapChunkRecord(self->unk38, code);
     } else {
         GetGridRecordXY(self->unk38, arg2, arg3);
     }
@@ -37,12 +37,12 @@ void ObjM__GetGridRecord(Obj87034_3bb8c_l *self, s32 code, s32 arg2, s32 arg3) {
   the branch TARGET. To match a specific target/fallthrough placement,
   solve for the written `C` that makes `NOT(C)` equal the actual machine
   test, don't guess from the semantics alone.
-- `GetGridRecordAt(index, sub)` (now matched, code_39094.c) reads both `$a0`
+- `GetStageMapChunkRecord(index, sub)` (now matched, code_39094.c) reads both `$a0`
   and `$a1`, and this function writes nothing to `$a1` before the jal, so
   the value the callee uses as `sub` is `code`. Until round 82 this call was
   written with one argument against a K&R declaration, reading `code` as a
   leftover register. Round 82's externcheck pass (alpha) made the forwarding
-  explicit -- `GetGridRecordAt(self->unk38, code)` against a full prototype
+  explicit -- `GetStageMapChunkRecord(self->unk38, code)` against a full prototype
   in `include/class_3bb8c.h` -- byte-identical, and it reads as what the
   dispatch means: a non-negative code is a linear cell index, a negative one
   hands x/y to GetGridRecordXY.
@@ -70,7 +70,7 @@ Round 78 (charlie), FINISHING-PLAN track 3.
 
 ## Track 4 (2026-09-26, round 89, echo)
 
-The class is unified as ObjM in include/ObjM.h (table gObjMMethods, was D_80087034); the class_3bb8c_k/_l/_m views (ObjM_3bb8c_k, Obj87034_3bb8c_l, ObjM) and class_39e08.h's Obj4C/SubObjB/EventArg are gone. Byte-identical. It is the StageMap's value callback (ChunkFileFn, cast at ObjM__AttachTarget); StageMap's ComputeRateEntry keeps the callback's return as an entry's name, and this body leaves GetGridRecordAt's result in $v0, so its real return is likely that Rec1C pointer. The return type is left `void` (not changed this round). The first argument of GetGridRecordAt/XY is now `s32 index`, as their definitions take it.
+The class is unified as ObjM in include/ObjM.h (table gObjMMethods, was D_80087034); the class_3bb8c_k/_l/_m views (ObjM_3bb8c_k, Obj87034_3bb8c_l, ObjM) and class_39e08.h's Obj4C/SubObjB/EventArg are gone. Byte-identical. It is the StageMap's value callback (ChunkFileFn, cast at ObjM__AttachTarget); StageMap's ComputeRateEntry keeps the callback's return as an entry's name, and this body leaves GetStageMapChunkRecord's result in $v0, so its real return is likely that Rec1C pointer. The return type is left `void` (not changed this round). The first argument of GetStageMapChunkRecord/XY is now `s32 index`, as their definitions take it.
 
 ## Round 94 (track 6, charlie): history moved from include/class_3bb8c.h
 
@@ -86,8 +86,8 @@ body is a lookup leaf, and its one use is as the StageMap's chunkFileFn
 (ObjM__AttachTarget's setCallback; StageMap.h: ComputeChunkLoadEntry calls
 `chunkFileFn(ctx, value, 0, 0)` and keeps the result as the entry's file
 record). The name mirrors the two functions it forwards to,
-GetGridRecordAt and GetGridRecordXY. "Registrant event" described nothing
-the body does. Parameters: `code, arg2, arg3` -> `cell, x, y` (GetGridRecordAt's
+GetStageMapChunkRecord and GetGridRecordXY. "Registrant event" described nothing
+the body does. Parameters: `code, arg2, arg3` -> `cell, x, y` (GetStageMapChunkRecord's
 `sub` is a linear cell index; GetGridRecordXY takes x, y). ObjM.h's
 prototype follows.
 
