@@ -156,7 +156,7 @@ extern s32 sSaveFileSuffixes;
 
 /* TitleMenu__CycleSaveTitleColor's index (0, 1, 2) into its 3-byte colour.
  * The storage is a word; every access is a byte (lbu/sb). */
-extern u8 D_8008AA28;
+extern u8 sSaveTitleColorChannel;
 
 /* TitleMenu__CycleSaveTitleColor's frame counter (wraps to 0 at 0x101). */
 extern s32 D_8008AA2C;

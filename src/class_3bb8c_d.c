@@ -156,7 +156,7 @@ void TitleMenu__AttachSaveTitle(TitleMenu *self, void *parent) {
  * docs/match-reports/TitleMenu__CycleSaveTitleColor.md. `base` is taken BEFORE the first call
  * (so it crosses a call and gets $s1), `buf = *color` is one struct copy
  * (SpriteRgb is three `s8`: three `lb`, then three `sb`), and each arm
- * indexes `base[D_8008AA28]` directly. */
+ * indexes `base[sSaveTitleColorChannel]` directly. */
 void TitleMenu__CycleSaveTitleColor(TitleMenu *self, SpriteRgb *color) {
     SpriteRgb buf;
     u8 *base;
@@ -167,17 +167,17 @@ void TitleMenu__CycleSaveTitleColor(TitleMenu *self, SpriteRgb *color) {
         base[0] = 0;
         base[1] = 0;
         base[2] = 0;
-        base[D_8008AA28] = 0x80;
+        base[sSaveTitleColorChannel] = 0x80;
     } else {
         buf = *color;
         if (D_8008AA2C < 0x80) {
             base[0] += 0x80;
         } else {
-            base[D_8008AA28] += 0x80;
+            base[sSaveTitleColorChannel] += 0x80;
         }
     }
-    if (++D_8008AA28 >= 3) {
-        D_8008AA28 = 0;
+    if (++sSaveTitleColorChannel >= 3) {
+        sSaveTitleColorChannel = 0;
     }
     D_8008AA2C++;
     if (D_8008AA2C >= 0x101) {

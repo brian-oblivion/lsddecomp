@@ -2993,3 +2993,4 @@ sCardFilePrefix = 0x8008A9D0;
 sSaveFileName = 0x8008AA10;
 sSaveTitleBlanks = 0x8008AA14;
 gSaveTitle = 0x8008AA18;
+sSaveTitleColorChannel = 0x8008AA28;
