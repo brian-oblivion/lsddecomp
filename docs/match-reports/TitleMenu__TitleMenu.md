@@ -199,7 +199,7 @@ The header's comments on this function's data carried their history; the
 comments now say only what the data is. Moved here:
 - `D_80086D44` (the menu description, a TaskCoreTarget: 0x28 bytes in
   asm/data/76DC8.data.s, a path word, three zero words, the two colour
-  triples and four pointers), `D_800114DC` ("ETC\ETCSE") and `D_800114E8`
+  triples and four pointers), `D_800114DC` ("ETC\ETCSE") and `sTitleTimPath`
   ("ETC\TITLE.TIM") were RETYPED from placeholder `s32`s in round 88
   (address-of only; no byte change).
 - The `FormatNumberIntoBuffer` prototype's comment still called it raw asm,

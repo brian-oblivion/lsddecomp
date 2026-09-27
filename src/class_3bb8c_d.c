@@ -40,7 +40,7 @@ void TitleMenu__OnNotify(TitleMenu *self, BasicClass *sender, s32 event) {
 void TitleMenu__Reset(TitleMenu *self) {
     self->unk34 = 0;
     self->unk2C = 0x190;
-    self->methods->setSubHandle(self, D_800114E8, 0);
+    self->methods->setSubHandle(self, sTitleTimPath, 0);
     self->methods->setFrameBound(self, 0xA);
     self->dreamSys->methods->getSetFlashbackSession(self->dreamSys, 0, 0);
 }

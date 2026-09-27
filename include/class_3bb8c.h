@@ -109,7 +109,7 @@ extern TaskCoreTarget D_80086D44;
 extern const char D_800114DC[];
 
 /* "ETC\TITLE.TIM", TitleMenu__Reset's path for setSubHandle. */
-extern const char D_800114E8[];
+extern const char sTitleTimPath[];
 
 /* "CARD\FILEICN1.TIM", TitleMenu__BeginCardAccess's path for New_TimImage.
  * A string splat already emitted as a symbol: a literal would emit a

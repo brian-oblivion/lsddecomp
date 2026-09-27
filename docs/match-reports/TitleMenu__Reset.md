@@ -16,7 +16,7 @@ void TitleMenu__Reset(TitleMenu *self)
 {
     self->unk34 = 0;
     self->unk2C = 0x190;
-    self->methods->slotD4(self, &D_800114E8, 0);
+    self->methods->slotD4(self, &sTitleTimPath, 0);
     self->methods->slot6C(self, 0xA);
     self->unkA4->methods->slotF0(self->unkA4, 0, 0);
 }
@@ -48,7 +48,7 @@ reshaping needed.
   call-site arguments literal `0`) -- new slot. Distinct from
   `TitleMenuMethods::slotF0` (see `TitleMenu__SetState`'s report) -- same
   offset number, two unrelated tables, no conflict.
-- New `extern s32 D_800114E8;` (address-of only, placeholder type, same
+- New `extern s32 sTitleTimPath;` (address-of only, placeholder type, same
   convention as the neighbouring `D_80086D44`/`D_800114DC`).
 
 ### Proposed learning
@@ -57,7 +57,7 @@ None new.
 
 ## Naming (round 77, naming runner delta)
 
-Renamed `func_8004D814` -> `TitleMenu__Reset`. **Tier B**: Passes `&D_800114E8` (a real dlabel string, "ETC\\TITLE.TIM" -- `asm/data/1C34.rodata.s`) to `slotD4`, sets `slot6C(self, 0xA)`, and resets `unk34`/`unk2C`. Named from the one concrete piece of evidence available (the TIM filename); the rest of the sequence's purpose is not established.
+Renamed `func_8004D814` -> `TitleMenu__Reset`. **Tier B**: Passes `&sTitleTimPath` (a real dlabel string, "ETC\\TITLE.TIM" -- `asm/data/1C34.rodata.s`) to `slotD4`, sets `slot6C(self, 0xA)`, and resets `unk34`/`unk2C`. Named from the one concrete piece of evidence available (the TIM filename); the rest of the sequence's purpose is not established.
 
 ## Proposed field names
 
