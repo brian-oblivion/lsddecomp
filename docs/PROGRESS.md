@@ -6,6 +6,73 @@ stale, prose elsewhere is not.
 
 ---
 
+## 2026-09-27 — round 97: SceneNode on Sony's coordinate types, one _ss_score record, five libsnd files named, and a runner that built the wrong tree (premium head, plan revisions 35 and 36)
+
+Premium head (Opus 5.5), cap 5, slots refilled as runners reported: 18
+jobs, all Opus. Gate 0 green.
+
+- **Track 6, twelve jobs, all accepted.** SceneNode.h's three parked views
+  are Sony's `SVECTOR`, `GsCOORD2PARAM` and `GsCOORDINATE2` (checked field
+  by field; `unk38` is `workm.t`, `tx/ty/tz` are `coord.t[]`); ten includers
+  took `<libgte.h>`/`<libgpu.h>`/`<libgs.h>` with no collision. Sony types:
+  `StatBuf179D8H` is `CdlFILE`, `VoiceState80090368` is libsnd's
+  `SsMarkCallbackProc[32][16]`, `EntryDAD4` is `SpuRegs` (moved to
+  SvmData.h), and the four `Entry90902E8` views (f, i, j, k) are one
+  `_ss_score` record in include/SsScore.h, whose +0x74 is the left volume
+  (NoteOn's zero test was the old "dispatch flag"). `ResourceRequest` is `{
+  ResourceSource src; s32 mode; }` in FileResource.h, retiring
+  `ResourceSourceArgs` and `DreamAuxLoadReq`; `ResourceSourceRequest` went
+  onto it too, `mode` unset, because a bare `ResourceSource` shrinks each of
+  its three frames by 8 (measured). Names: `DataSourceSetDriverModeFn`,
+  `GraphPointColor`/`gGraphPointBaseColor`.
+- **Track 7, two units marked** (five samples each): code_8220 (BMemPMgr's
+  block layout as macros, `freeListHead`/`freeListTail` read off the unlink
+  code, `BASICCLASS_EVENT_FINALIZED`, applied by the head in code_8220_b
+  too) and class_3bb8c_t (GraphRoom's point size and colours, score moods
+  tier B). class_3bb8c_e merged steps 2 and 3 only; see below.
+- **Track 8, five regions** named from nm over `sdk/work/<disc>/elf/libsnd`:
+  `libsnd_ssinit`, `libsnd_cres`, `libsnd_decre`,
+  `libsnd_ut_cp_ut_cadsr_ut_vvol_ut_autov_ut_autop` + `libsnd_ut_ako`
+  (3.6's split modules), and code_8220..code_8220_c as `BMemPMgr.c` +
+  `TmdRenderer.c` (b and c merged; BasicClass's tail parked at
+  TmdRenderer's head, since moving it is a split).
+- **A runner built the main checkout.** bravo's class_3bb8c_e steps 4 and
+  5 and its `rename.py` run never compiled, yet each was reported byte-exact:
+  the Bash tool resets an agent's cwd to the main checkout between calls, so
+  `./build-and-verify.sh` built main's clean tree. `rename.py` said so
+  ("RENAME BROKE THE BUILD") and the runner took main's green over it. The
+  head caught it as a red build on main after the merge, clean-built each
+  commit in the worktree (two green, four red), reset the merge (unpushed)
+  and merged the two verified commits; the rest is local tag
+  `r97-bravo-class_3bb8c_e-unbuilt`, for the re-send. Every other merge was
+  verified by a build on main, so nothing else is affected.
+- **Plan revision 35 (premium, tools):** `flag-type --units` puts a flagged
+  fix's other units in its edit set (ResourceRequest's views sat in
+  SceneNode.h's job but its line listed the header alone).
+  **Revision 36:** the oracle's `OK:` line ends `(tree: <path>)`; every runner
+  prompt says to start each command `cd <path> &&` and trust only an OK
+  naming its own worktree; PARALLEL-RUNS 2.7 says why.
+- **Head:** a replay rewrote a report sentence that records an old file
+  name ("`code_179d8_f.c` became ..."); reverted. `unitfile.py` does the same
+  to history sentences, and charlie restored them by hand after every run.
+  PARALLEL-RUNS distilled under budget (two paragraphs to the archive).
+- **Measured** (`plan.py`, against round 96's entry): placeholder type
+  names 11 to 4; files re-declaring a Sony name 10 to 7; track 7 units 21 to
+  22 of 67 (code_8220_b and _c, both passed, are one file now), D_ 93 to 84,
+  unk 185 to 165, magic 1333 to 1283, m2c 125 to 116, history 342 to 234;
+  track 8 regions 10 to 15 of 34. Typeviews 71, 0 new at every merge.
+- **Deferred proposals** (in the reports): TaskCore `unk2C` (300/400,
+  handed to Viewport's `setUnk44`: a packet-area factor) and a TaskCore
+  `inputMode` enum (0/1/2) (delta); `McSaveHeader` into TaskObjF.h, the new
+  `*_CLASS_ID`s and `MEMCARD_PATH_SIZE` in class_3bb8c_f/_o, a class-id
+  nibble-mask name, and `gCardEventSpecs`'s splat label covering 2 of its 4
+  words (bravo, from the unbuilt commits); `D_8006DAD4`'s other views onto
+  `SpuRegs` (bravo); `D_80090368` as libsnd's `_SsMarkCallback`, unverified
+  (charlie); `TodActorDesc` onto `ResourceRequest` (alpha); code_179d8_k's
+  `(channel, slot)` parameters are `(access, seq)` (echo).
+
+---
+
 ## 2026-09-27 — round 96: sixteen jobs, no Sony re-declaring header left, SceneNode's Sony types unparked (premium head, plan revision 34)
 
 Premium head (Opus 5.5), cap 5, slots refilled as runners reported: 16

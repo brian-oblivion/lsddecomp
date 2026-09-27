@@ -365,15 +365,11 @@ docs/match-reports/<func>.md`); a spent marker left in place re-ranks the
 next round's queue on ground that is no longer fresh.
 
 **`make extract` again after merging any branch that changed the symbols
-file** — i.e. every track 3 naming merge. `asm/` is untracked, so the runner's
-`rename.py` re-extract happened in ITS worktree and `main`'s disassembly still
-carries the old names; the link then fails on `undefined reference to
-func_OLD` from whichever unit has an `INCLUDE_ASM` calling the renamed
-function. Gate 0 covers this at the START of a round, not at merge (round 50,
-merging `runner/charlie`: `src/code_55dd4.c` against `func_8001E770`).
-`make extract` also regenerates `config/gp-symbols.txt`, and every object
-depends on it, so a changed file recompiles what it must; commit it if
-`git status` shows it (round 73's red merge was that file stale by hand).
+file or a unit name**: `asm/` is untracked, so the runner's re-extract
+happened in ITS worktree and `main`'s disassembly still carries the old
+names, and the link fails on `undefined reference` (round 50). It also
+regenerates `config/gp-symbols.txt`; commit it if `git status` shows it
+(round 73).
 
 **Do not pipe `build-and-verify.sh` into `tail`/`head`:** `$?` is then the
 pipe's and always 0. Redirect to your own log and echo `$?` before grepping
