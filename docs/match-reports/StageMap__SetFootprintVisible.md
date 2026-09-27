@@ -1,4 +1,6 @@
-# StageMap__SetFootprintCellFlag — MATCHED (97/97 words)
+# StageMap__SetFootprintVisible — MATCHED (97/97 words)
+
+> Renamed from `StageMap__SetFootprintCellFlag` on 2026-09-27 (tools/rename.py). Address 0x8004ce24.
 
 > Renamed from `Class866E8__SetFootprintCellFlag` on 2026-09-26 (tools/rename.py). Address 0x8004ce24.
 
@@ -43,7 +45,7 @@ the finer-grained field layout from the READ side.
 ## Final C
 
 ```c
-void StageMap__SetFootprintCellFlag(Obj866E8 *self, s32 setBit) {
+void StageMap__SetFootprintVisible(Obj866E8 *self, s32 setBit) {
     s32 i;
     s32 j;
     s32 k;

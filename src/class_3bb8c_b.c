@@ -61,13 +61,13 @@ void StageMap__RefreshFootprint(StageMap *self) {
         return;
     }
     idx = self->gridHalfCells * 2;
-    StageMap__SetFootprintCellFlag(self, 0);
+    StageMap__SetFootprintVisible(self, 0);
     if (self->config->isVertical == 0) {
         StageMap__ComputeFootprintFromRotation(self, idx, self->gridCells);
     } else {
         StageMap__SetFootprintFromQuery(self);
     }
-    StageMap__SetFootprintCellFlag(self, 1);
+    StageMap__SetFootprintVisible(self, 1);
 }
 
 void StageMap__ComputeFootprintFromRotation(StageMap *self, s32 arg1, s32 arg2) {
@@ -301,7 +301,7 @@ s32 StageMap__InitFootprintSlot(StageMap *self, s32 unused, s32 key, s32 arg3) {
     return key + 1;
 }
 
-void StageMap__SetFootprintCellFlag(StageMap *self, s32 setBit) {
+void StageMap__SetFootprintVisible(StageMap *self, s32 setBit) {
     s32 i;
     s32 j;
     s32 k;

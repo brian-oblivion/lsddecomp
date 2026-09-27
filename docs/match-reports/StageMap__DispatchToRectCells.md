@@ -381,13 +381,13 @@ the report and to the preserved body's identifiers, not to the shipped bytes.
 | `StageMap+0x1C0` | `curCellTag` | B | Written per cell visit; `StageMap__GetCurrentCellKey` returns its address. |
 | `StageMap+0x1C2` | `curCellCol` | A | Written per cell visit with the rectangle's start column plus the inner loop offset. |
 | `StageMap+0x1C3` | `curCellRow` | A | Same, row. |
-| `StageMap+0x038` | `nextInCell` | B | The chain this function walks off each grid cell; `class_3bb8c`'s `StageMap__SetFootprintCellFlag` walks the identical chain off `EntryChildObj::unk38`. |
+| `StageMap+0x038` | `nextInCell` | B | The chain this function walks off each grid cell; `class_3bb8c`'s `StageMap__SetFootprintVisible` walks the identical chain off `EntryChildObj::unk38`. |
 
 **Type caveat, recorded not fixed.** This unit declares the cell type as
 `StageMap *`. `class_3bb8c`'s independently derived view says
 `EntryChildObj *`, and its evidence is better: the ctor here ORs `0x80000000`
 into each freshly built cell's `+0x010`, which is `EntryChildObj::unk10`
-exactly (`StageMap__ClearSlotCells` sets the same bit, matched `StageMap__SetFootprintCellFlag` clears
+exactly (`StageMap__ClearSlotCells` sets the same bit, matched `StageMap__SetFootprintVisible` clears
 it), and `flags36`/`nextInCell` line up with `EntryChildObj::unk36`/`unk38`.
 Unifying the two views is track-4 work, so the declared type is unchanged and
 a note sits on the field in `include/class_3ac78.h`. Posted to the broadcast.

@@ -429,7 +429,7 @@ s32 StageMap__SplitFootprintSlot(StageMap *self, CellRect *slot, s32 count, s32 
 void StageMap__SetFootprintFromQuery(StageMap *self);
 s32 IsPointOutOfBounds(CellBounds *bounds, s8 *point);
 s32 StageMap__InitFootprintSlot(StageMap *self, s32 unused, s32 key, s32 arg3);
-void StageMap__SetFootprintCellFlag(StageMap *self, s32 setBit);
+void StageMap__SetFootprintVisible(StageMap *self, s32 setBit);
 void *StageMap__GetUnk1CC(StageMap *self);
 void StageMap__SetBounds(StageMap *self, CellBounds *bounds);
 void StageMap__StartScaleRamp(StageMap *self, s32 rate, s32 flag);

@@ -240,7 +240,7 @@ STALL (best 8/92 words; frame size off by 8 bytes)
 The biggest attempted this round (97 words) and the one that resisted
 byte-exactness. An 8-parameter function that populates one or two
 `CellRect` entries (the same type established this round from
-`StageMap__SetFootprintCellFlag`/`StageMap__InitFootprintSlot`), advancing and returning `self->unk88`
+`StageMap__SetFootprintVisible`/`StageMap__InitFootprintSlot`), advancing and returning `self->unk88`
 (the slot count) as it goes.
 
 ## What the function does (control flow and semantics, not in doubt)
@@ -314,7 +314,7 @@ own `-0x38` frame, i.e. the 5th-8th arguments):
 
 Confirmed against the raw asm line-by-line: every branch target, every
 field write (`elemIdx`@0, `h4`@4, `h6`@6, `h8`@8, `hA`@0xA — the SAME
-`CellRect` layout `StageMap__SetFootprintCellFlag` established), and every arithmetic
+`CellRect` layout `StageMap__SetFootprintVisible` established), and every arithmetic
 op matches retail's OPERATIONS. The residue is a REGISTER ALLOCATION /
 frame-size difference, not a logic difference.
 
