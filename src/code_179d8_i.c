@@ -1,6 +1,6 @@
 /*
  * code_179d8_i -- Snd_decrescendo, libsnd's per-tick volume fade-out for one
- * sequence, the mirror of Snd_crescendo (code_179d8_f.c). Sony's code carried
+ * sequence, the mirror of Snd_crescendo (libsnd_cres.c). Sony's code carried
  * as disassembly: the linked libsnd objects call it by this name
  * (config/psyq-objects.ld), and the libsnd/decre object that holds it on the
  * 3.0 and 3.3 discs is a different build (0x474 and 0x4B0 bytes of text
