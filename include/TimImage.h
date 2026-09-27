@@ -42,7 +42,7 @@ struct TimImageMethods {
     FILERESOURCE_SLOTS(TimImage, (TimImage * self, char *name));
     /* +0x078 is FileResource's slot78; this table's occupant is
      * TimImage__Upload (TimImageUploadFn). */
-    /* +0x07C..+0x094: empty bodies (TimImage__func_8003B5AC..5DC); no C
+    /* +0x07C..+0x094: empty bodies (TimImage__NoOpSlot7C..TimImage__NoOpSlot94); no C
      * caller names them. */
     /* +0x07C */ void (*slot7C)(void);
     /* +0x080 */ void (*slot80)(void);
@@ -51,18 +51,22 @@ struct TimImageMethods {
     /* +0x08C */ void (*slot8C)(void);
     /* +0x090 */ void (*slot90)(void);
     /* +0x094 */ void (*slot94)(void);
-    /* +0x098 */ void (*slot98)(TimImage *self); /* TimImage__func_8003B5E4: unk48 = 1 */
+    /* +0x098 */ void (*setFlag48)(TimImage *self); /* TimImage__SetFlag48: flag48 = 1 */
     /* +0x09C */ void (*getTimInfo)(TimImage *self, GsIMAGE *tim); /* TimImage__GetTimInfo */
 }; /* 39 slots, 0xA0 bytes */
 
 struct TimImage {
     FILERESOURCE_FIELDS(TimImageMethods); /* buffer: the TIM file */
     /* +0x02C */ GsIMAGE tim; /* TimImage__Upload describes the TIM here; a Sprite's reset keeps its address */
-    /* +0x048 */ s32 unk48; /* 0 from the ctor, 1 from slot98; no reader found */
+    /* +0x048 */ s32 flag48; /* 0 from the ctor, 1 from setFlag48; no reader found */
     /* +0x04C */ s32 clutBase; /* 0 from the ctor; TimArraySrc__BuildImages: from the CLUT row GsGetTimInfo reports */
 }; /* 0x50 bytes: New_TimImage */
 
 typedef void (*TimImageUploadFn)(TimImage *self);
+
+/* GsIMAGE.pmode is the TIM file's flag word: the low bits the pixel mode, bit 3
+ * (CF) set when the file carries a CLUT (TimImage__Upload uploads it then). */
+#define TIM_PMODE_CLUT_BIT 3
 
 extern TimImageMethods gTimImageMethods;
 extern TimImageMethods *GetTimImageMethods(void);
@@ -71,14 +75,14 @@ TimImage *New_TimImage(char *name);
 void TimImage__TimImage(TimImage *self, char *name);
 void TimImage__Finalize(TimImage *self);
 void TimImage__Upload(TimImage *self);
-void TimImage__func_8003B5AC(void);
-void TimImage__func_8003B5B4(void);
-void TimImage__func_8003B5BC(void);
-void TimImage__func_8003B5C4(void);
-void TimImage__func_8003B5CC(void);
-void TimImage__func_8003B5D4(void);
-void TimImage__func_8003B5DC(void);
-void TimImage__func_8003B5E4(TimImage *self);
+void TimImage__NoOpSlot7C(void);
+void TimImage__NoOpSlot80(void);
+void TimImage__NoOpSlot84(void);
+void TimImage__NoOpSlot88(void);
+void TimImage__NoOpSlot8C(void);
+void TimImage__NoOpSlot90(void);
+void TimImage__NoOpSlot94(void);
+void TimImage__SetFlag48(TimImage *self);
 void TimImage__GetTimInfo(TimImage *self, GsIMAGE *tim);
 
 #endif

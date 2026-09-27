@@ -88,3 +88,41 @@ void RotateVramRectRight(DrawRect *r, s32 count, DrawPoint *p) {
 ## Track 4 (2026-09-26, round 87, bravo)
 
 The local view of the DrawSystem singleton quoted above is gone; the unit takes DrawSystem, its method table and GetDrawSystem from `include/DrawSystem.h` (gDrawSystemMethods unified). Byte-identical.
+
+## History: the unit banner before track 7 (moved from src/code_2bb9c.c, round 100)
+
+The banner of `src/code_2bb9c.c` as it stood before the track-7 pass; the new banner keeps only what the file holds. The carve and naming history it carried lives here.
+
+```c
+/*
+ * code_2bb9c -- GAME code carved from psyq_2bb9c on 2026-09-25 (FINISHING-PLAN
+ * revision 18). 0x2BB9C..0x2BF70 (vram 0x8003B39C..0x8003B770). It was counted
+ * as Psy-Q SDK by segment name; tools/gameinsdk.py measured it as game (a call
+ * into game code, a method-table entry beside game methods, or contiguity with
+ * those, and no Sony fingerprint).
+ *
+ * What it holds: TimImage, a FileResource (data-source) subclass -- 12 of its
+ * own methods (table `gTimImageMethods`, id 0x103), plus the class's own
+ * alloc-then-ctor helper (`New_TimImage`, "new TimImage(name)") and table
+ * getter (`GetTimImageMethods`). Every call site project-wide that reaches
+ * TimImage does so by building "CARD\\<name>.TIM" or another `.TIM` path and
+ * handing it to `New_TimImage`, then calling the returned handle's slot78
+ * (`TimImage__Upload`) and usually slot5C (`FileResource__FreeBuffer`) --
+ * TimImage is the game's TIM-image loader: `buffer` (inherited from
+ * FileResource) holds the raw file, `TimImage__GetTimInfo` describes it with
+ * Sony's `GsGetTimInfo`, and `TimImage__Upload` uploads the pixel block and,
+ * when present, the CLUT to the draw singleton (DrawSystem, `include/DrawSystem.h`)
+ * through its loadImage slot.
+ *
+ * Also holds `RotateVramRectRight`, not a TimImage method (`classtable.py
+ * D_8006E558` lists it nowhere): a free function that circularly scrolls a
+ * VRAM rectangle right by one column at a time through the draw singleton's
+ * `moveImage` slot, called from `class_3bb8c_n.c`'s `StyleScrollVramStrips`.
+ *
+ * Fully matched in round 81 (runner echo). Naming pass round 81 (runner
+ * bravo): every function and the class table named; see each function's
+ * report `## Naming` for tier and evidence. `RotateVramRectRight` kept its
+ * `func_` name (proposed `ScrollImageRight`, recorded in its report);
+ * `New_TimImage` was renamed in track 4 (round 88).
+ */
+```

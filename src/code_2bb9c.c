@@ -1,33 +1,19 @@
 /*
- * code_2bb9c -- GAME code carved from psyq_2bb9c on 2026-09-25 (FINISHING-PLAN
- * revision 18). 0x2BB9C..0x2BF70 (vram 0x8003B39C..0x8003B770). It was counted
- * as Psy-Q SDK by segment name; tools/gameinsdk.py measured it as game (a call
- * into game code, a method-table entry beside game methods, or contiguity with
- * those, and no Sony fingerprint).
+ * TimImage: the game's TIM-image loader, a FileResource data source (class id
+ * 0x103, table gTimImageMethods, include/TimImage.h), plus one free VRAM
+ * helper.
  *
- * What it holds: TimImage, a FileResource (data-source) subclass -- 12 of its
- * own methods (table `gTimImageMethods`, id 0x103), plus the class's own
- * alloc-then-ctor helper (`New_TimImage`, "new TimImage(name)") and table
- * getter (`GetTimImageMethods`). Every call site project-wide that reaches
- * TimImage does so by building "CARD\\<name>.TIM" or another `.TIM` path and
- * handing it to `New_TimImage`, then calling the returned handle's slot78
- * (`TimImage__Upload`) and usually slot5C (`FileResource__FreeBuffer`) --
- * TimImage is the game's TIM-image loader: `buffer` (inherited from
- * FileResource) holds the raw file, `TimImage__GetTimInfo` describes it with
- * Sony's `GsGetTimInfo`, and `TimImage__Upload` uploads the pixel block and,
- * when present, the CLUT to the draw singleton (DrawSystem, `include/DrawSystem.h`)
- * through its loadImage slot.
+ * Every caller builds a ".TIM" path and hands it to New_TimImage (the ctor
+ * requests the file into `buffer`), then calls the handle's upload slot
+ * (TimImage__Upload, +0x078) and usually FileResource__FreeBuffer (+0x05C).
+ * TimImage__GetTimInfo describes the file with Sony's GsGetTimInfo; Upload
+ * sends its pixel block and, when the TIM carries one, its CLUT to the draw
+ * singleton (include/DrawSystem.h) through the loadImage slot. The slots at
+ * +0x07C..+0x094 are empty, and +0x098 only sets flag48, which no code reads.
  *
- * Also holds `RotateVramRectRight`, not a TimImage method (`classtable.py
- * D_8006E558` lists it nowhere): a free function that circularly scrolls a
- * VRAM rectangle right by one column at a time through the draw singleton's
- * `moveImage` slot, called from `class_3bb8c_n.c`'s `StyleScrollVramStrips`.
- *
- * Fully matched in round 81 (runner echo). Naming pass round 81 (runner
- * bravo): every function and the class table named; see each function's
- * report `## Naming` for tier and evidence. `RotateVramRectRight` kept its
- * `func_` name (proposed `ScrollImageRight`, recorded in its report);
- * `New_TimImage` was renamed in track 4 (round 88).
+ * RotateVramRectRight is not a TimImage method (no method table lists it): it
+ * circularly scrolls a VRAM rectangle right, one column at a time, through the
+ * draw singleton's moveImage slot, for class_3bb8c_n.c's StyleScrollVramStrips.
  */
 #include "common.h"
 #include <libgte.h>
@@ -50,7 +36,7 @@ extern FileResourceMethods *GetActiveDataSourceMethods(void);
 TimImage *New_TimImage(char *name) {
     TimImage *self;
 
-    self = BMemPMgrAlloc(0x50);
+    self = BMemPMgrAlloc(sizeof(TimImage));
     if (self != NULL) {
         GetTimImageMethods()->ctor(self, name);
         return self;
@@ -62,7 +48,7 @@ TimImage *New_TimImage(char *name) {
 void TimImage__TimImage(TimImage *self, char *name) {
     GetActiveDataSourceMethods()->ctor((FileResource *)self);
     self->methods = GetTimImageMethods();
-    self->unk48 = 0;
+    self->flag48 = 0;
     self->clutBase = 0;
     if (name != NULL) {
         self->methods->requestLoadFile(self, name);
@@ -90,7 +76,7 @@ void TimImage__Upload(TimImage *self) {
         rect.w = self->tim.pw;
         rect.h = self->tim.ph;
         draw->methods->loadImage(draw, &rect, (u32 *)self->tim.pixel);
-        if ((self->tim.pmode >> 3) & 1) {
+        if ((self->tim.pmode >> TIM_PMODE_CLUT_BIT) & 1) {
             rect.x = self->tim.cx;
             rect.y = self->tim.cy;
             rect.w = self->tim.cw;
@@ -100,34 +86,33 @@ void TimImage__Upload(TimImage *self) {
     }
 }
 
-/* TimImage slot (tools/classtable.py); empty body. */
-void TimImage__func_8003B5AC(void) {}
+/* TimImage +0x07C: empty. */
+void TimImage__NoOpSlot7C(void) {}
 
-/* TimImage slot (tools/classtable.py); empty body. */
-void TimImage__func_8003B5B4(void) {}
+/* TimImage +0x080: empty. */
+void TimImage__NoOpSlot80(void) {}
 
-/* TimImage slot (tools/classtable.py); empty body. */
-void TimImage__func_8003B5BC(void) {}
+/* TimImage +0x084: empty. */
+void TimImage__NoOpSlot84(void) {}
 
-/* TimImage slot (tools/classtable.py); empty body. */
-void TimImage__func_8003B5C4(void) {}
+/* TimImage +0x088: empty. */
+void TimImage__NoOpSlot88(void) {}
 
-/* TimImage slot (tools/classtable.py); empty body. */
-void TimImage__func_8003B5CC(void) {}
+/* TimImage +0x08C: empty. */
+void TimImage__NoOpSlot8C(void) {}
 
-/* TimImage slot (tools/classtable.py); empty body. */
-void TimImage__func_8003B5D4(void) {}
+/* TimImage +0x090: empty. */
+void TimImage__NoOpSlot90(void) {}
 
-/* TimImage slot (tools/classtable.py); empty body. */
-void TimImage__func_8003B5DC(void) {}
+/* TimImage +0x094: empty. */
+void TimImage__NoOpSlot94(void) {}
 
-/* TimImage +0x098: sets unk48 to 1; unk48's purpose beyond that flag is
- * unestablished (no caller reads it outside the ctor/this setter). */
-void TimImage__func_8003B5E4(TimImage *self) {
-    self->unk48 = 1;
+/* TimImage +0x098: sets flag48 (the ctor clears it); no code reads it. */
+void TimImage__SetFlag48(TimImage *self) {
+    self->flag48 = 1;
 }
 
-/* TimImage +0x09C: describe the TIM held in the buffer. */
+/* TimImage +0x09C: describe the TIM held in the buffer (past its id word). */
 void TimImage__GetTimInfo(TimImage *self, GsIMAGE *tim) {
     GsGetTimInfo((unsigned long *)self->buffer + 1, tim);
 }
@@ -137,34 +122,34 @@ TimImageMethods *GetTimImageMethods(void) {
     return &gTimImageMethods;
 }
 
-/* Rotates the VRAM rectangle r one column to the right, count times, through
- * the one-column scratch area at p: the last column goes to p, the rest moves
- * right by one, and p comes back as column 0 (three moveImage calls each). */
-void RotateVramRectRight(DrawRect *r, s32 count, DrawPoint *p) {
+/* Rotates the VRAM rectangle `area` one column to the right, count times, through
+ * the one-column scratch area at `scratch`: the last column goes there, the rest moves
+ * right by one, and the scratch column comes back as column 0 (three moveImage calls each). */
+void RotateVramRectRight(DrawRect *area, s32 count, DrawPoint *scratch) {
     DrawSystem *draw;
-    void (*fn)(DrawSystem *, DrawRect *, s32, s32);
+    void (*moveImage)(DrawSystem *, DrawRect *, s32, s32);
     DrawRect rect;
     s32 i;
 
     draw = GetDrawSystem();
-    fn = draw->methods->moveImage;
+    moveImage = draw->methods->moveImage;
     if (count != 0) {
         for (i = 0; i < count; i++) {
-            rect.x = r->x + r->w - 1;
-            rect.y = r->y;
+            rect.x = area->x + area->w - 1;
+            rect.y = area->y;
             rect.w = 1;
-            rect.h = r->h;
-            fn(draw, &rect, p->x, p->y);
-            rect.x = r->x;
-            rect.y = r->y;
-            rect.w = r->w - 1;
-            rect.h = r->h;
-            fn(draw, &rect, r->x + 1, r->y);
-            rect.x = p->x;
-            rect.y = p->y;
+            rect.h = area->h;
+            moveImage(draw, &rect, scratch->x, scratch->y);
+            rect.x = area->x;
+            rect.y = area->y;
+            rect.w = area->w - 1;
+            rect.h = area->h;
+            moveImage(draw, &rect, area->x + 1, area->y);
+            rect.x = scratch->x;
+            rect.y = scratch->y;
             rect.w = 1;
-            rect.h = r->h;
-            fn(draw, &rect, r->x, r->y);
+            rect.h = area->h;
+            moveImage(draw, &rect, area->x, area->y);
         }
     }
 }

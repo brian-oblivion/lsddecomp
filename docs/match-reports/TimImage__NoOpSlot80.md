@@ -1,4 +1,6 @@
-# TimImage__func_8003B5B4 -- MATCHED (2/2 words), round 81
+# TimImage__NoOpSlot80 -- MATCHED (2/2 words), round 81
+
+> Renamed from `TimImage__func_8003B5B4` on 2026-09-27 (tools/rename.py). Address 0x8003b5b4.
 
 > Renamed from `func_8003B5B4` on 2026-09-25 (tools/rename.py). Address 0x8003b5b4.
 
@@ -9,7 +11,7 @@ FINISHING-PLAN revision 18). This was fresh ground with no prior attempt.
 - **What:** empty slot override: `jr $ra; nop`.
 - **Result:** byte-exact on the first build. `funcdiff.py` reports 2/2,
   and the whole-image SHA1 is green (`OK: build matches retail`).
-- **Name:** `TimImage__func_8003B5B4`, tier C (round 81 naming pass, runner bravo): the
+- **Name:** `TimImage__NoOpSlot80`, tier C (round 81 naming pass, runner bravo): the
   class is confirmed as `TimImage` (see `## Naming` below), but this slot's
   body is empty (`jr $ra; nop`) and no caller relies on it doing anything, so
   its purpose is unknown -- the tier-C `Class__func_xxxxx` form applies.
@@ -17,7 +19,7 @@ FINISHING-PLAN revision 18). This was fresh ground with no prior attempt.
 ## Source
 
 ```c
-void TimImage__func_8003B5B4(void) {
+void TimImage__NoOpSlot80(void) {
 }
 ```
 
@@ -39,9 +41,21 @@ extern FileResourceMethods gTimImageMethods;
 
 ## Naming
 
-- **`TimImage__func_8003B5B4`**, tier C: class confirmed as `TimImage` (this round; see
+- **`TimImage__NoOpSlot80`**, tier C: class confirmed as `TimImage` (this round; see
   `docs/match-reports/TimImage__TimImage.md`), slot +0x080. Empty body
   (`jr $ra; nop`), no caller overrides it with anything else, so its
   purpose is unknown -- `Class__func_xxxxx` per the tier-C convention for a
   method whose class is known but mechanics are not (an empty slot has no
   mechanics to describe).
+
+## Naming (track 7, round 100, delta)
+
+Renamed `TimImage__func_8003B5B4` -> `TimImage__NoOpSlot80` with `tools/rename.py`
+(the tier-C lines above predate it and name the old form). **Tier A**: a pure
+leaf whose mechanics are its purpose -- the body is `jr $ra; nop`, it does
+nothing -- named by the project's empty-slot convention
+(`CdDriver__NoOpSlot40`, `VabStreamObj__NoOpSlot90`, `Viewport__NoOpSlot58`,
+`StreamTask__NoOpSlot88`): the class and the table offset it fills
+(gTimImageMethods +0x080, `tools/classtable.py gTimImageMethods`). What the
+slot is for in the class tree is not established; no C calls it. The table
+field stays `slot80`, as the other empty slots' fields do (`include/CdStream.h`).
