@@ -115,8 +115,8 @@ gFadeBoxAttachPos
 gFileTable
 gFileTableCount
 gFileTableRegistered
-gForcedVariant
-gForcedWeeklyGroup
+gForcedSoundBank
+gForcedStageBgm
 gGameApplication
 gGraphPointBaseColor
 gGraphPointHighlightColor

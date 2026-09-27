@@ -46,7 +46,7 @@ void LbdFile__LbdFile(DataSrc39094 *self) {
   `pad30[4]` is split into `s16 unk30` (init -1) and `u16 unk32`. Byte-neutral
   for the ten functions matched earlier this round (whole image green).
 - `SeedAndRandom`'s local definition gained an unused second parameter
-  (`s32 unused`): PickWeeklyGroup passes one in `$a1`, as code_1677c's own
+  (`s32 unused`): PickSoundBank passes one in `$a1`, as code_1677c's own
   prototype already says. Byte-neutral for SeedAndRandom.
 - No shared header was edited. Other units' prototypes for these functions
   (class_39e08.h, class_3bb8c.h, GameApplication.h) are independent and untouched.
@@ -77,10 +77,10 @@ stage's map chunks, STGnn\Mnnn.LBD: StageMap__ApplyChunkLoads calls
 loadHeader (+0x078) with each rate entry's `ptr0`, which
 StageMap__ComputeChunkLoadEntry takes from the grid's callback, and that
 callback is ObjM__GetGridRecord (ObjM__AttachTarget installs it), whose
-tail call GetGridRecordAt(stage, chunk) / GetGridRecordXY leaves
+tail call GetStageMapChunkRecord(stage, chunk) / GetStageMapChunkRecordXY leaves
 `&group[9 + chunk]` of gRecordTable in $v0. gRecordTable's 0x1C-byte records
 begin with a path, and record 9 of every stage group is its M000.LBD
-(stage 0: gRecordIndexTable[0] = 16, record 25 at 0x80081CC0 =
+(stage 0: gStageFirstRecord[0] = 16, record 25 at 0x80081CC0 =
 "STG00\M000.LBD"; stage 1: record 39 at 0x80081E48 = "STG01\M000.LBD").
 The same index goes into `ownerRate` and is split into column and row
 (StageMap__SplitChunkIndex). LBD is the game's own extension, and the
@@ -110,11 +110,11 @@ renamed):
  *    turned that off.
  * 2. Free functions over gRecordTable, a table of 0x230+ fixed 0x1C-byte
  *    records (Rec1C): random-or-forced pickers (SeedAndRandom,
- *    SetPickOverrides/gForcedWeeklyGroup/gForcedVariant), record-group
- *    accessors indexed by gRecordIndexTable and, for GetGridRecordXY, by
+ *    SetPickOverrides/gForcedSoundBank/gForcedStageBgm), record-group
+ *    accessors indexed by gStageFirstRecord and, for GetStageMapChunkRecordXY, by
  *    StageGrid.h's cell columns, and a family of "stream channel" lookups
- *    (GetIntroStreamName, PickWeeklyStreamChannel, GetStreamChannelInit,
- *    ResolveCinematicChannel, GetGraphRoomStreamChannel) whose shapes match
+ *    (GetAsmkMovie, PickOpeningMovie, GetEndingMovie,
+ *    GetSpecialDayOrEventRecord, GetSpecialDayMovieSpan) whose shapes match
  *    their exact call sites in code_1677c.c one for one. The records' own
  *    fields and the channels' in-game meaning are not established.
  */
@@ -128,7 +128,7 @@ apply by type scope.
 
 - `LbdFile.ownerRate` (+0x030) -> `chunkIndex`. StageMap__ApplyChunkLoads
   stores in it the same entry value it passed to the grid callback to get
-  the file's record (GetGridRecordAt(stage, value)); it is -1 exactly when
+  the file's record (GetStageMapChunkRecord(stage, value)); it is -1 exactly when
   no chunk is held (this ctor, LbdFile__ReleaseHeader; ResetElementCells
   tests `>= 0`); StageMap__SplitChunkIndex splits it into column
   (`% divisor`) and row (`/ divisor`); StageMap__FindSlotIndexByChunk

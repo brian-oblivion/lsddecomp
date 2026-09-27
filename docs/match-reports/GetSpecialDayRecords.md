@@ -1,4 +1,6 @@
-# GetCinematicBank -- MATCHED (25/25 words)
+# GetSpecialDayRecords -- MATCHED (25/25 words)
+
+> Renamed from `GetCinematicBank` on 2026-09-27 (tools/rename.py). Address 0x800492d0.
 
 > Renamed from `func_800492D0` on 2026-09-25 (tools/rename.py). Address 0x800492d0.
 
@@ -17,7 +19,7 @@ Declarations it needs are the local views at the top of `src/code_39094.c`
 (`D_80081940Obj`, `D_80081940Methods`, `Rec1C`) and `include/FileResource.h`.
 
 ```c
-Rec1C *GetCinematicBank(s32 *countOut, s32 n) {
+Rec1C *GetSpecialDayRecords(s32 *countOut, s32 n) {
     Rec1C *rec = &((Rec1C *)GetRecordTable(NULL))[0x23E];
     if (countOut != NULL) {
         *countOut = n * 2 + 0xE;
@@ -34,13 +36,17 @@ Rec1C *GetCinematicBank(s32 *countOut, s32 n) {
   `pad30[4]` is split into `s16 unk30` (init -1) and `u16 unk32`. Byte-neutral
   for the ten functions matched earlier this round (whole image green).
 - `SeedAndRandom`'s local definition gained an unused second parameter
-  (`s32 unused`): PickWeeklyGroup passes one in `$a1`, as code_1677c's own
+  (`s32 unused`): PickSoundBank passes one in `$a1`, as code_1677c's own
   prototype already says. Byte-neutral for SeedAndRandom.
 - No shared header was edited. Other units' prototypes for these functions
   (class_39e08.h, class_3bb8c.h, GameApplication.h) are independent and untouched.
 
 ## Naming
 
-- **Name:** `GetCinematicBank`
-- **Tier:** B (head review, round 82: was A. The mechanics are this body's; the purpose word comes from the callers' inherited names in code_1677c.c / GameApplication.h, which are themselves hypotheses, so the name is consistent but not established)
-- **Evidence:** used by both ResolveCinematicChannel (bank/entry resolve) and GetGraphRoomStreamChannel with a bank id `n`; base 0x23E, stride 6 records, matches both callers' own naming.
+- **Name:** `GetSpecialDayRecords`
+- **Tier:** A
+- **Evidence:** &gRecordTable[574 + 6 * day], the six SPDAYnn records of special day `day` (FILM\SPDAYnnA/B.STR, IMG1\SPDAYnnC..F.TIM; the record paths are retail's gRecordTable data (0x80081A04), read from disk/SLPS_015.56 in round 100), and movie id 14 + 2 * day, its A movie's. `Special day` is the files' own SPDAY.
+
+## Naming history
+
+- Round 100 (bravo, polish): renamed from `GetCinematicBank` with tools/rename.py, on the record paths and callers above; previous tier B (head review, round 82: was A. The mechanics are this body's; the purpose word comes from the callers' inherited names in code_1677c.c / GameApplication.h, which are themselves hypotheses, so the name is consistent but not established).

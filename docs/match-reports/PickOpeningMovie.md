@@ -1,4 +1,6 @@
-# PickWeeklyStreamChannel -- MATCHED (36/36 words)
+# PickOpeningMovie -- MATCHED (36/36 words)
+
+> Renamed from `PickWeeklyStreamChannel` on 2026-09-27 (tools/rename.py). Address 0x8004913c.
 
 > Renamed from `func_8004913C` on 2026-09-25 (tools/rename.py). Address 0x8004913c.
 
@@ -9,7 +11,7 @@ Byte-exact on the first build; whole-image SHA1 green, funcdiff 36/36,
 ## What it does
 
 Random pick within the record block at 0x230: `r = (u32)SeedAndRandom(0, ?) % 7`,
-`rec = GetWeeklyStreamPool(&count)` (the record at index 0x230, count 0); writes
+`rec = GetOpeningMovieRecords(&count)` (the record at index 0x230, count 0); writes
 `r + count` through the optional out pointer and returns `&rec[r]`.
 
 ## Source
@@ -17,10 +19,10 @@ Random pick within the record block at 0x230: `r = (u32)SeedAndRandom(0, ?) % 7`
 Declarations: the local views at the top of `src/code_39094.c` (`Rec1C`).
 
 ```c
-Rec1C *PickWeeklyStreamChannel(s32 *countOut, s32 arg1) {
-    u32 r = (u32)SeedAndRandom(0, arg1) % 7;  /* arg1 only forwarded, like PickDailyVariant's */
+Rec1C *PickOpeningMovie(s32 *countOut, s32 arg1) {
+    u32 r = (u32)SeedAndRandom(0, arg1) % 7;  /* arg1 only forwarded, like PickStageTexture's */
     s32 count;
-    Rec1C *rec = GetWeeklyStreamPool(&count);
+    Rec1C *rec = GetOpeningMovieRecords(&count);
     if (countOut != NULL) {
         *countOut = r + count;
     }
@@ -38,14 +40,18 @@ unused), so the call passes an uninitialised local: it emits no instruction.
 Matched first as a 1-parameter function passing an uninitialised local as
 SeedAndRandom's second argument (cc1: ``'unused' might be used
 uninitialized``). The body never writes `$a1` before `jal SeedAndRandom`, so
-SeedAndRandom receives PickWeeklyStreamChannel's own incoming `$a1`, and its
+SeedAndRandom receives PickOpeningMovie's own incoming `$a1`, and its
 caller (code_1677c.c, via GameApplication.h's 2-parameter extern) loads it
 explicitly (`move a1,zero` at the jal). Forwarding idiom: the definition now
-takes `s32 arg1` and forwards it, as PickDailyVariant does. Byte-identical;
+takes `s32 arg1` and forwards it, as PickStageTexture does. Byte-identical;
 the warning is gone and the extern agrees with the definition.
 
 ## Naming
 
-- **Name:** `PickWeeklyStreamChannel`
-- **Tier:** B (head review, round 82: was A. The mechanics are this body's; the purpose word comes from the callers' inherited names in code_1677c.c / GameApplication.h, which are themselves hypotheses, so the name is consistent but not established)
-- **Evidence:** its one caller, GameApplication__StartWeeklyStreamTask, uses the return value as the StreamTask's group id directly; matches exactly.
+- **Name:** `PickOpeningMovie`
+- **Tier:** A
+- **Evidence:** random one of the seven GetOpeningMovieRecords (`% OPENING_MOVIE_COUNT`), with its movie id; its caller (GameApplication__StartWeeklyStreamTask) streams it. The pick is `rand() % 7` with no seed, not a day of the week.
+
+## Naming history
+
+- Round 100 (bravo, polish): renamed from `PickWeeklyStreamChannel` with tools/rename.py, on the record paths and callers above; previous tier B (head review, round 82: was A. The mechanics are this body's; the purpose word comes from the callers' inherited names in code_1677c.c / GameApplication.h, which are themselves hypotheses, so the name is consistent but not established).

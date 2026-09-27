@@ -95,7 +95,7 @@ enum DayTaskResult {
     TIMEDTASK_FIELDS(Methods);                                                                    \
     /* +0x038 */ struct DreamSys *dreamSys; /* the ctor's; a child; init/deinit hand it the init args' objects */ \
     /* +0x03C */ s32 phase;                 /* 0 ResetPhase, 1 OnInit, 2 StartObjM, 3 OnObjMNotify; not IntermediateBase::state */ \
-    /* +0x040 */ struct WBgm *bgm;          /* New_WBgm(PickWeeklyGroup(0), NULL, 1); New_ObjM's 2nd argument; finalize releases it */ \
+    /* +0x040 */ struct WBgm *bgm;          /* New_WBgm(PickSoundBank(0), NULL, 1); New_ObjM's 2nd argument; finalize releases it */ \
     /* +0x044 */ struct TimImage *etcTim;   /* New_TimImage("ETC\ETC.TIM"), uploaded and its buffer freed; DreamSys +0x114; New_ObjM's 3rd */ \
     /* +0x048 */ struct LinkResource *dreamerTmd;    /* New_LinkResource("ETC\DREAMER.TMD"); New_ObjM's 4th; finalize releases it */ \
     /* +0x04C */ struct ObjM *objM          /* StartObjM's New_ObjM(...); a child; released by AdvancePhase/OnObjMNotify */

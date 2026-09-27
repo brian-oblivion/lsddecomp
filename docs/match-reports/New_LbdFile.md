@@ -40,7 +40,7 @@ DataSrc39094 *New_LbdFile(void) {
   `pad30[4]` is split into `s16 unk30` (init -1) and `u16 unk32`. Byte-neutral
   for the ten functions matched earlier this round (whole image green).
 - `SeedAndRandom`'s local definition gained an unused second parameter
-  (`s32 unused`): PickWeeklyGroup passes one in `$a1`, as code_1677c's own
+  (`s32 unused`): PickSoundBank passes one in `$a1`, as code_1677c's own
   prototype already says. Byte-neutral for SeedAndRandom.
 - No shared header was edited. Other units' prototypes for these functions
   (class_39e08.h, class_3bb8c.h, GameApplication.h) are independent and untouched.
@@ -71,10 +71,10 @@ stage's map chunks, STGnn\Mnnn.LBD: StageMap__ApplyChunkLoads calls
 loadHeader (+0x078) with each rate entry's `ptr0`, which
 StageMap__ComputeChunkLoadEntry takes from the grid's callback, and that
 callback is ObjM__GetGridRecord (ObjM__AttachTarget installs it), whose
-tail call GetGridRecordAt(stage, chunk) / GetGridRecordXY leaves
+tail call GetStageMapChunkRecord(stage, chunk) / GetStageMapChunkRecordXY leaves
 `&group[9 + chunk]` of gRecordTable in $v0. gRecordTable's 0x1C-byte records
 begin with a path, and record 9 of every stage group is its M000.LBD
-(stage 0: gRecordIndexTable[0] = 16, record 25 at 0x80081CC0 =
+(stage 0: gStageFirstRecord[0] = 16, record 25 at 0x80081CC0 =
 "STG00\M000.LBD"; stage 1: record 39 at 0x80081E48 = "STG01\M000.LBD").
 The same index goes into `ownerRate` and is split into column and row
 (StageMap__SplitChunkIndex). LBD is the game's own extension, and the

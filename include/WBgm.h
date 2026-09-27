@@ -25,8 +25,8 @@
  * to +0x040 update, which retries on event 2.
  *
  * Its one construction: DayTask__DayTask (src/class_39e08.c),
- * New_WBgm(PickWeeklyGroup(0), NULL, 1): the VAB path is one of the seven
- * gWeeklyGroupTable strings ("SND\\AMBIENT" ... "SND\\STANDERD",
+ * New_WBgm(PickSoundBank(0), NULL, 1): the VAB path is one of the seven
+ * gSoundBankPaths strings ("SND\\AMBIENT" ... "SND\\STANDERD",
  * asm/data/1B84.rodata.s), no SEQ yet, autoPlay on. That caller keeps the
  * object as DayTask::bgm (include/DayTask.h), and
  * hands it to New_ObjM, whose ObjM keeps it at +0x054 and calls +0x04C

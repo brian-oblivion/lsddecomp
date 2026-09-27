@@ -8,7 +8,7 @@
  * one element of the grid manager (class id 0x903, method table
  * gLbdFileMethods, parent FileResource; methods in src/code_39094.c; no
  * subclasses). The files it is handed are the gRecordTable records
- * GetGridRecordAt(stage, chunk) returns: StageMap__ComputeChunkLoadEntry takes
+ * GetStageMapChunkRecord(stage, chunk) returns: StageMap__ComputeChunkLoadEntry takes
  * each entry's name from the grid's callback, ObjM__GetGridRecord, whose
  * tail call leaves that record in $v0, and the record's first bytes are the
  * path ("STG00\M000.LBD" is record 9 of stage 0's group).
@@ -54,6 +54,17 @@ typedef struct LbdFileMethods LbdFileMethods;
 /* `headerReady` once StageMap__OnNotifyTag1 has linked the header's
  * placements into the slot's cells (1 is "read, not yet consumed"). */
 #define LBDFILE_HEADER_CONSUMED 2
+
+/* LbdFile's steps in FileResource's loadState. */
+enum LbdFileLoadState {
+    LBDFILE_LOAD_IDLE = 0,   /* nothing pending */
+    LBDFILE_LOAD_HEADER = 9, /* loadHeader's read into `buffer` is pending */
+    LBDFILE_LOAD_DATA = 10   /* loadDataBlock's read into `dataBuffer` is pending */
+};
+
+/* The header block: loadHeader's read size and the ctor's `buffer`
+ * allocation (0xB358). */
+#define LBDFILE_HEADER_BLOCK_SIZE 45912
 
 /* The start of the header block loadHeader reads into `buffer`. */
 typedef struct LbdFileHeader {

@@ -23,14 +23,14 @@
  *                  startWeeklyStreamTask and the pollGraphRoomStatus loop.
  * The hooks, in the order runMainLoop calls them:
  *   +0x050 loadIntroLogoSequence  the ASMK logo, the ASMK stream, the OSD logo
- *   +0x054 startWeeklyStreamTask  the stream PickWeeklyStreamChannel picks
+ *   +0x054 startWeeklyStreamTask  the stream PickOpeningMovie picks
  *   +0x058 pollGraphRoomStatus    runs GraphRoom and TitleMenu against the
  *                                 DreamSys; returns 0, 1 or 2 to the loop
  *   +0x05C slot5C                 empty (GameApplication__NoOpSlot5C)
  *   +0x060 pollStatusObj          runs one DayTask (include/DayTask.h)
  *                                 and may start the current cinematic's stream;
  *                                 nonzero runs +0x064
- *   +0x064 startStreamTaskWithInit  the stream GetStreamChannelInit names
+ *   +0x064 startStreamTaskWithInit  the stream GetEndingMovie names
  * Every task these start is given the parent's `aux` as its
  * IntermediateBaseInitArgs, and every stream is gated by config->playStreams.
  *

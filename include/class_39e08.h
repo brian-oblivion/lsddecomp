@@ -45,10 +45,10 @@ extern void InitDreamAux(void);
 extern const char sEtcTimPath[];
 extern const char sDreamerTmdPath[];
 
-/* src/code_39094.c: one of the seven gWeeklyGroupTable words, each a VAB
+/* src/code_39094.c: one of the seven gSoundBankPaths words, each a VAB
  * path string ("SND\\AMBIENT" ... "SND\\STANDERD"), which DayTask's ctor
  * passes to New_WBgm as its vabPath. */
-extern s32 PickWeeklyGroup(s32 unused);
+extern s32 PickSoundBank(s32 unused);
 
 /* Defined in src/class_39e08.c, after DayTask's methods; code_1677c.c
  * declares it too. */

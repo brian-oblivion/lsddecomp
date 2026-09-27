@@ -1,4 +1,6 @@
-# GetStreamChannelInit -- MATCHED (17/17 words)
+# GetEndingMovie -- MATCHED (17/17 words)
+
+> Renamed from `GetStreamChannelInit` on 2026-09-27 (tools/rename.py). Address 0x800491fc.
 
 > Renamed from `func_800491FC` on 2026-09-25 (tools/rename.py). Address 0x800491fc.
 
@@ -9,7 +11,7 @@ out-of-range drift.
 
 ## What it does
 
-Record accessor: calls GetStreamPool2(&count) (which writes 7 and returns record 0x237 of GetRecordTable's table), forwards the count to `*countOut` when non-NULL, returns the record pointer.
+Record accessor: calls GetEndingMovieRecord(&count) (which writes 7 and returns record 0x237 of GetRecordTable's table), forwards the count to `*countOut` when non-NULL, returns the record pointer.
 
 ## Source
 
@@ -17,9 +19,9 @@ Declarations it needs are the local views at the top of `src/code_39094.c`
 (`D_80081940Obj`, `D_80081940Methods`, `Rec1C`) and `include/FileResource.h`.
 
 ```c
-Rec1C *GetStreamChannelInit(s32 *countOut) {
+Rec1C *GetEndingMovie(s32 *countOut) {
     s32 count;
-    Rec1C *rec = GetStreamPool2(&count);
+    Rec1C *rec = GetEndingMovieRecord(&count);
     if (countOut != NULL) {
         *countOut = count;
     }
@@ -35,7 +37,7 @@ Rec1C *GetStreamChannelInit(s32 *countOut) {
   `pad30[4]` is split into `s16 unk30` (init -1) and `u16 unk32`. Byte-neutral
   for the ten functions matched earlier this round (whole image green).
 - `SeedAndRandom`'s local definition gained an unused second parameter
-  (`s32 unused`): PickWeeklyGroup passes one in `$a1`, as code_1677c's own
+  (`s32 unused`): PickSoundBank passes one in `$a1`, as code_1677c's own
   prototype already says. Byte-neutral for SeedAndRandom.
 - No shared header was edited. Other units' prototypes for these functions
   (class_39e08.h, class_3bb8c.h, GameApplication.h) are independent and untouched.
@@ -44,13 +46,17 @@ Rec1C *GetStreamChannelInit(s32 *countOut) {
 
 externcheck flags GameApplication.h's 2-parameter extern against this
 1-parameter definition. The body reads only `$a0` and does not forward
-`$a1` (GetStreamPool2 takes one argument), so this is not the forwarding
+`$a1` (GetEndingMovieRecord takes one argument), so this is not the forwarding
 idiom; but the caller's second argument is retail (`move a1,zero` in the
 jal's delay slot at 0x80026974), so the extern cannot drop it. The extern
 line carries `/* arity-ok: ... */`.
 
 ## Naming
 
-- **Name:** `GetStreamChannelInit`
+- **Name:** `GetEndingMovie`
 - **Tier:** A
-- **Evidence:** its one caller, GameApplication__StartStreamTaskWithInit, uses the return value as the StreamTask's group id directly; matches exactly.
+- **Evidence:** wrapper of GetEndingMovieRecord that forwards the movie id; its caller (GameApplication__StartStreamTaskWithInit, slot +0x064) streams it.
+
+## Naming history
+
+- Round 100 (bravo, polish): renamed from `GetStreamChannelInit` with tools/rename.py, on the record paths and callers above; previous tier A.

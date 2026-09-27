@@ -1,4 +1,6 @@
-# GetGridRecordAt -- MATCHED (14/14 words)
+# GetStageMapChunkRecord -- MATCHED (14/14 words)
+
+> Renamed from `GetGridRecordAt` on 2026-09-27 (tools/rename.py). Address 0x80049060.
 
 > Renamed from `func_80049060` on 2026-09-25 (tools/rename.py). Address 0x80049060.
 
@@ -9,16 +11,16 @@ Byte-exact on the FIRST build; whole-image SHA1 green
 
 ## What it does
 
-`&GetGridRecordBase(index)[sub]`: the `sll 3 / subu / sll 2` is the x28 multiply of a 0x1C-byte record index. `sub` is kept in `$s0` across the call and `index` passes through untouched in `$a0`.
+`&GetStageMapChunkRecords(index)[sub]`: the `sll 3 / subu / sll 2` is the x28 multiply of a 0x1C-byte record index. `sub` is kept in `$s0` across the call and `index` passes through untouched in `$a0`.
 
 ## Source
 
 ```c
 typedef struct Rec1C { u8 data[0x1C]; } Rec1C;
-Rec1C *GetGridRecordBase(s32 index);
+Rec1C *GetStageMapChunkRecords(s32 index);
 
-Rec1C *GetGridRecordAt(s32 index, s32 sub) {
-    return &GetGridRecordBase(index)[sub];
+Rec1C *GetStageMapChunkRecord(s32 index, s32 sub) {
+    return &GetStageMapChunkRecords(index)[sub];
 }
 ```
 
@@ -34,6 +36,10 @@ Rec1C *GetGridRecordAt(s32 index, s32 sub) {
 
 ## Naming
 
-- **Name:** `GetGridRecordAt`
+- **Name:** `GetStageMapChunkRecord`
 - **Tier:** A
-- **Evidence:** pure getter: &GetGridRecordBase(index)[sub].
+- **Evidence:** record `chunk` of GetStageMapChunkRecords: STGnn\Mnnn.LBD, which StageMap hands an LbdFile (include/LbdFile.h).
+
+## Naming history
+
+- Round 100 (bravo, polish): renamed from `GetGridRecordAt` with tools/rename.py, on the record paths and callers above; previous tier A.

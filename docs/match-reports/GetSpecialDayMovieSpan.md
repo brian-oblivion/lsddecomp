@@ -1,4 +1,6 @@
-# GetGraphRoomStreamChannel -- MATCHED (39/39 words)
+# GetSpecialDayMovieSpan -- MATCHED (39/39 words)
+
+> Renamed from `GetGraphRoomStreamChannel` on 2026-09-27 (tools/rename.py). Address 0x800493e4.
 
 > Renamed from `func_800493E4` on 2026-09-25 (tools/rename.py). Address 0x800493e4.
 
@@ -7,26 +9,26 @@ Byte-exact on build 12; whole-image SHA1 green, funcdiff 39/39.
 
 ## What it does
 
-`rec = GetCinematicBank(&count, n)`; sums `gStreamTypeToGroupTable[i] + 10` (s16 table) over
+`rec = GetSpecialDayRecords(&count, n)`; sums `gMovieFrameCounts[i] + 10` (s16 table) over
 `i` in `[count, count + len*2)` into `*total`, subtracts 10 (so: widths plus
 a 10-unit gap between entries), returns `rec`.
 
 ## Source
 
-Declarations: `Rec1C` and `extern s16 gStreamTypeToGroupTable[];` in `src/code_39094.c`.
+Declarations: `Rec1C` and `extern s16 gMovieFrameCounts[];` in `src/code_39094.c`.
 
 ```c
-Rec1C *GetGraphRoomStreamChannel(s32 *total, s32 n, s32 len) {
+Rec1C *GetSpecialDayMovieSpan(s32 *total, s32 n, s32 len) {
     s32 count;
     s32 i;
     s32 start;
-    Rec1C *rec = GetCinematicBank(&count, n);
+    Rec1C *rec = GetSpecialDayRecords(&count, n);
     len *= 2;
     *total = 0;
     start = count;
     len += start;
     for (i = start; i < len; i++) {
-        *total += gStreamTypeToGroupTable[i] + 10;
+        *total += gMovieFrameCounts[i] + 10;
     }
     *total -= 10;
     return rec;
@@ -56,6 +58,10 @@ extends (`len += start`) rather than a fresh `end`.
 
 ## Naming
 
-- **Name:** `GetGraphRoomStreamChannel`
-- **Tier:** B (head review, round 82: was A. The mechanics are this body's; the purpose word comes from the callers' inherited names in code_1677c.c / GameApplication.h, which are themselves hypotheses, so the name is consistent but not established)
-- **Evidence:** its one caller, GameApplication__StartGraphRoomStreamTask, uses the returned record and *total (divided by 15) as the StreamTask's channel and ring size; matches exactly.
+- **Name:** `GetSpecialDayMovieSpan`
+- **Tier:** B
+- **Evidence:** returns special day `day`'s first movie and writes the sum of (frame count + 10) over the 2 * dayCount movies from it, minus 10. Its caller (GameApplication__StartGraphRoomStreamTask, (0, 10)) streams it with frameBound = total / 15, so the span covers SPDAY01A..SPDAY10B. Why 10 frames per movie is not established.
+
+## Naming history
+
+- Round 100 (bravo, polish): renamed from `GetGraphRoomStreamChannel` with tools/rename.py, on the record paths and callers above; previous tier B (head review, round 82: was A. The mechanics are this body's; the purpose word comes from the callers' inherited names in code_1677c.c / GameApplication.h, which are themselves hypotheses, so the name is consistent but not established).

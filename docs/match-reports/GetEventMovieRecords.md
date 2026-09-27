@@ -1,6 +1,8 @@
-# GetStreamPool2 -- MATCHED (12/12 words)
+# GetEventMovieRecords -- MATCHED (12/12 words)
 
-> Renamed from `func_800491CC` on 2026-09-25 (tools/rename.py). Address 0x800491cc.
+> Renamed from `GetStreamPool3` on 2026-09-27 (tools/rename.py). Address 0x80049240.
+
+> Renamed from `func_80049240` on 2026-09-25 (tools/rename.py). Address 0x80049240.
 
 Round 82, runner echo, 2026-09-25. Unit `code_39094` (carved revision 18).
 Byte-exact on the FIRST build; whole-image SHA1 green
@@ -9,7 +11,7 @@ Byte-exact on the FIRST build; whole-image SHA1 green
 
 ## What it does
 
-Same shape as GetWeeklyStreamPool: `*out = 7`, returns record 0x237 (offset 0x3E04). Positive constant stored through a pointer compiles as `ori $v0,$zero,7` + `sw` in the guarded block, as expected.
+Same shape as GetOpeningMovieRecords: `*out = 8`, returns record 0x238 (offset 0x3E20).
 
 ## Source
 
@@ -17,11 +19,11 @@ Same shape as GetWeeklyStreamPool: `*out = 7`, returns record 0x237 (offset 0x3E
 typedef struct Rec1C { u8 data[0x1C]; } Rec1C;
 void *GetRecordTable(s32 *out);   /* defined earlier in this unit */
 
-Rec1C *GetStreamPool2(s32 *countOut) {
+Rec1C *GetEventMovieRecords(s32 *countOut) {
     if (countOut != NULL) {
-        *countOut = 7;
+        *countOut = 8;
     }
-    return &((Rec1C *)GetRecordTable(NULL))[0x237];
+    return &((Rec1C *)GetRecordTable(NULL))[0x238];
 }
 ```
 
@@ -37,6 +39,10 @@ Rec1C *GetStreamPool2(s32 *countOut) {
 
 ## Naming
 
-- **Name:** `GetStreamPool2`
-- **Tier:** B
-- **Evidence:** pure getter: &gRecordTable[0x237], count 7; only used internally by GetStreamChannelInit.
+- **Name:** `GetEventMovieRecords`
+- **Tier:** A
+- **Evidence:** &gRecordTable[568], FILM\EVENT1..6.STR (the record paths are retail's gRecordTable data (0x80081A04), read from disk/SLPS_015.56 in round 100), and movie id 8, the first event movie's.
+
+## Naming history
+
+- Round 100 (bravo, polish): renamed from `GetStreamPool3` with tools/rename.py, on the record paths and callers above; previous tier B.

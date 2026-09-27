@@ -1,6 +1,8 @@
-# GetStreamPool3 -- MATCHED (12/12 words)
+# GetEndingMovieRecord -- MATCHED (12/12 words)
 
-> Renamed from `func_80049240` on 2026-09-25 (tools/rename.py). Address 0x80049240.
+> Renamed from `GetStreamPool2` on 2026-09-27 (tools/rename.py). Address 0x800491cc.
+
+> Renamed from `func_800491CC` on 2026-09-25 (tools/rename.py). Address 0x800491cc.
 
 Round 82, runner echo, 2026-09-25. Unit `code_39094` (carved revision 18).
 Byte-exact on the FIRST build; whole-image SHA1 green
@@ -9,7 +11,7 @@ Byte-exact on the FIRST build; whole-image SHA1 green
 
 ## What it does
 
-Same shape as GetWeeklyStreamPool: `*out = 8`, returns record 0x238 (offset 0x3E20).
+Same shape as GetOpeningMovieRecords: `*out = 7`, returns record 0x237 (offset 0x3E04). Positive constant stored through a pointer compiles as `ori $v0,$zero,7` + `sw` in the guarded block, as expected.
 
 ## Source
 
@@ -17,11 +19,11 @@ Same shape as GetWeeklyStreamPool: `*out = 8`, returns record 0x238 (offset 0x3E
 typedef struct Rec1C { u8 data[0x1C]; } Rec1C;
 void *GetRecordTable(s32 *out);   /* defined earlier in this unit */
 
-Rec1C *GetStreamPool3(s32 *countOut) {
+Rec1C *GetEndingMovieRecord(s32 *countOut) {
     if (countOut != NULL) {
-        *countOut = 8;
+        *countOut = 7;
     }
-    return &((Rec1C *)GetRecordTable(NULL))[0x238];
+    return &((Rec1C *)GetRecordTable(NULL))[0x237];
 }
 ```
 
@@ -37,6 +39,10 @@ Rec1C *GetStreamPool3(s32 *countOut) {
 
 ## Naming
 
-- **Name:** `GetStreamPool3`
-- **Tier:** B
-- **Evidence:** pure getter: &gRecordTable[0x238], count 8; no cross-unit caller found for it or GetStreamPool3Channel, named for the mechanics it has.
+- **Name:** `GetEndingMovieRecord`
+- **Tier:** A
+- **Evidence:** &gRecordTable[567], ETC\ENDING.STR (the record paths are retail's gRecordTable data (0x80081A04), read from disk/SLPS_015.56 in round 100), and movie id 7.
+
+## Naming history
+
+- Round 100 (bravo, polish): renamed from `GetStreamPool2` with tools/rename.py, on the record paths and callers above; previous tier B.

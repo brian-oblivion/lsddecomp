@@ -32,9 +32,9 @@ extern s32 SetActiveDataSourceDriverMode(s32 a0, s32 a1, s32 a2); /* code_171e0,
                                                        the last value its internal dispatch loop got --
                                                        GameApplication__LoadIntroLogoSequence/GameApplication__StartWeeklyStreamTask discard it, but
                                                        GameApplication__StartCinematicStream keeps it */
-extern const char *GetIntroStreamName(s32 *typeCodeOut); /* psyq_memset.s: writes 0x31 to *typeCodeOut if non-NULL, always returns &sAsmkStreamPath */
-extern s32 GetStreamGroupForType(s32 index); /* psyq_memset.s: signed-halfword lookup into gStreamTypeToGroupTable[index] */
-extern s32 PickWeeklyStreamChannel(s32 *out, s32 param2); /* psyq_memset.s: day/week-style calculation (divides SeedAndRandom's result by 7); writes a related index to *out if non-NULL, returns a separate derived value */
+extern const char *GetAsmkMovie(s32 *typeCodeOut); /* psyq_memset.s: writes 0x31 to *typeCodeOut if non-NULL, always returns &sAsmkMoviePath */
+extern s32 GetMovieFrameCount(s32 index); /* psyq_memset.s: signed-halfword lookup into gMovieFrameCounts[index] */
+extern s32 PickOpeningMovie(s32 *out, s32 param2); /* psyq_memset.s: day/week-style calculation (divides SeedAndRandom's result by 7); writes a related index to *out if non-NULL, returns a separate derived value */
 
 extern const char sLogoPathAsmk[]; /* "ETC\ASMKLOGO.TIM" */
 extern const char sLogoPathOsd[];  /* "ETC\OSDLOGO.TIM" */
@@ -68,11 +68,11 @@ s32 GameApplication__RunPollTask(PollTaskCtor ctor, void *dreamSys, Intermediate
  * New_GraphRoom is include/GraphRoom.h's and New_TitleMenu
  * include/TitleMenu.h's, each cast to PollTaskCtor. */
 
-extern s32 GetGraphRoomStreamChannel(s32 *out, s32 a1, s32 a2); /* psyq_memset.s: writes a derived count to *out, returns a separate derived value */
+extern s32 GetSpecialDayMovieSpan(s32 *out, s32 a1, s32 a2); /* psyq_memset.s: writes a derived count to *out, returns a separate derived value */
 /* code_39094.c: same "write to *out, return a separate value" shape as
- * GetIntroStreamName/PickWeeklyStreamChannel/GetGraphRoomStreamChannel. */
-extern s32 GetStreamChannelInit(s32 *out, s32 unused); /* arity-ok: the definition is 1-parameter and reads only $a0 (it neither reads nor forwards $a1), but the 2nd argument IS byte-load-bearing -- retail emits `move a1,zero` in the jal's delay slot at 0x80026974 */
-extern s32 ResolveCinematicChannel(s32 *out, s32 packedBankEntry); /* psyq_memset.s: resolves a packed
+ * GetAsmkMovie/PickOpeningMovie/GetSpecialDayMovieSpan. */
+extern s32 GetEndingMovie(s32 *out, s32 unused); /* arity-ok: the definition is 1-parameter and reads only $a0 (it neither reads nor forwards $a1), but the 2nd argument IS byte-load-bearing -- retail emits `move a1,zero` in the jal's delay slot at 0x80026974 */
+extern s32 GetSpecialDayOrEventRecord(s32 *out, s32 packedBankEntry); /* psyq_memset.s: resolves a packed
     {bank; entry} CinematicCall (low 16 bits = bank, high 16 = entry) to a channel index written
     to *out (-1 if unresolved); the packing must zero-extend both halves before combining
     (retail loads them with lhu, not lh) since the result is bitwise-composed, not a value read
@@ -143,7 +143,7 @@ void GameApplication__InitSystems(GameApplication *self, DrawSystem *drawSystem,
 
 /* Optional stream-load block, gated by self->config->showIntroLogos: registers a
  * "loader" task for "ETC\ASMKLOGO.TIM" (GameApplication__StartLoaderTask), then a separate
- * "stream" task for whatever type code GetIntroStreamName hands back
+ * "stream" task for whatever type code GetAsmkMovie hands back
  * ("ETC\ASMK.STR"), then a second loader task for "ETC\OSDLOGO.TIM". */
 void GameApplication__LoadIntroLogoSequence(GameApplication *self) {
     const char *streamName;
@@ -155,8 +155,8 @@ void GameApplication__LoadIntroLogoSequence(GameApplication *self) {
         SetActiveDataSourceDriverMode(0, 0, 0);
         GameApplication__StartLoaderTask(self, sLogoPathAsmk);
         task = New_StreamTask(0, 0, 0, 0);
-        streamName = GetIntroStreamName(&typeCode);
-        typeLookup = GetStreamGroupForType(typeCode);
+        streamName = GetAsmkMovie(&typeCode);
+        typeLookup = GetMovieFrameCount(typeCode);
         ((StreamTaskInitFn)task->methods->init)(task, (IntermediateBaseInitArgs *)self->aux,
                                                 streamName, typeLookup, 1);
         task->methods->release(task);
@@ -189,8 +189,8 @@ s32 GameApplication__LoaderTaskDoneCallback(void) {
 
 /* Optional stream-task init block, gated by self->config->playStreams (the same
  * shape as GameApplication__LoadIntroLogoSequence's self->config->showIntroLogos gate, minus the two
- * GameApplication__StartLoaderTask loader-task calls, and using PickWeeklyStreamChannel instead of
- * GetIntroStreamName to derive the type code). */
+ * GameApplication__StartLoaderTask loader-task calls, and using PickOpeningMovie instead of
+ * GetAsmkMovie to derive the type code). */
 void GameApplication__StartWeeklyStreamTask(GameApplication *self) {
     s32 derivedValue;
     s32 typeCode;
@@ -200,8 +200,8 @@ void GameApplication__StartWeeklyStreamTask(GameApplication *self) {
     if (self->config->playStreams != 0) {
         SetActiveDataSourceDriverMode(0, 0, 0);
         task = New_StreamTask(0, 0, 0, 0);
-        derivedValue = PickWeeklyStreamChannel(&typeCode, 0);
-        typeLookup = GetStreamGroupForType(typeCode);
+        derivedValue = PickOpeningMovie(&typeCode, 0);
+        typeLookup = GetMovieFrameCount(typeCode);
         ((StreamTaskInitFn)task->methods->init)(task, (IntermediateBaseInitArgs *)self->aux,
                                                 derivedValue, typeLookup, 1);
         task->methods->release(task);
@@ -262,7 +262,7 @@ s32 GameApplication__RunPollTask(PollTaskCtor ctor, void *dreamSys, Intermediate
 
 /* Called by GameApplication__PollGraphRoomStatus when its first PollTask reports "2". Gated by
  * self->config->playStreams (same gate as GameApplication__StartWeeklyStreamTask). Builds a StreamTask,
- * derives a count via GetGraphRoomStreamChannel, sets the task's frame bound
+ * derives a count via GetSpecialDayMovieSpan, sets the task's frame bound
  * to that count / 15 and clears skipOnConfirm, then runs its init (stream
  * group -1, unlike the other call sites) and releases it. */
 void GameApplication__StartGraphRoomStreamTask(GameApplication *self) {
@@ -279,7 +279,7 @@ void GameApplication__StartGraphRoomStreamTask(GameApplication *self) {
     if (self->config->playStreams != 0) {
         SetActiveDataSourceDriverMode(0, 0, 0);
         task = New_StreamTask(0, 0, 0, 0);
-        extra = GetGraphRoomStreamChannel(&buf.count, 0, 10);
+        extra = GetSpecialDayMovieSpan(&buf.count, 0, 10);
         task->methods->setFrameBound(task, buf.count / 15);
         task->methods->setSkipOnConfirm(task, 0);
         ((StreamTaskInitFn)task->methods->init)(task, (IntermediateBaseInitArgs *)self->aux, extra,
@@ -345,7 +345,7 @@ s32 GameApplication__PollStatusObj(GameApplication *self) {
 }
 
 /* Reads DreamSys's current cinematic slot, resolves it to a channel index
- * (ResolveCinematicChannel); if that fails (-1), starts a LoaderTask on the fixed
+ * (GetSpecialDayOrEventRecord); if that fails (-1), starts a LoaderTask on the fixed
  * "no cinematic" path; otherwise, if self->config->playStreams gates it, starts a
  * StreamTask on the resolved channel. Either branch finishes by starting
  * whichever task it built; if neither branch runs, nothing happens. */
@@ -363,7 +363,7 @@ void GameApplication__StartCinematicStream(GameApplication *self) {
     TaskCore *task;
 
     cc = self->dreamSys->methods->getCinematic(self->dreamSys);
-    groupId = ResolveCinematicChannel(&chanBuf.chan, (u16)cc.bank | ((u32)(u16)cc.entry << 16));
+    groupId = GetSpecialDayOrEventRecord(&chanBuf.chan, (u16)cc.bank | ((u32)(u16)cc.entry << 16));
     SetActiveDataSourceDriverMode(0, 0, 0);
 
     if (chanBuf.chan != -1) {
@@ -371,7 +371,7 @@ void GameApplication__StartCinematicStream(GameApplication *self) {
             StreamTask *streamTask = New_StreamTask(0, 0, 0, 0);
 
             streamTask->methods->setSkipOnConfirm(streamTask, 0);
-            lookup = GetStreamGroupForType(chanBuf.chan);
+            lookup = GetMovieFrameCount(chanBuf.chan);
             ((StreamTaskInitFn)streamTask->methods->init)(
                 streamTask, (IntermediateBaseInitArgs *)self->aux, groupId, lookup, 1);
             streamTask->methods->release(streamTask);
@@ -387,10 +387,10 @@ void GameApplication__StartCinematicStream(GameApplication *self) {
 
 /* GameApplicationMethods slot +0x064. Gated by self->config->playStreams (same gate as
  * GameApplication__StartWeeklyStreamTask/GameApplication__StartGraphRoomStreamTask). Builds a StreamTask, clears its skipOnConfirm,
- * derives a type code via GetStreamChannelInit, looks it up via GetStreamGroupForType,
+ * derives a type code via GetEndingMovie, looks it up via GetMovieFrameCount,
  * initializes the task with it, then starts it -- the same shape as
- * GameApplication__LoadIntroLogoSequence/GameApplication__StartWeeklyStreamTask, but with setSkipOnConfirm(0) added and GetStreamChannelInit
- * in place of GetIntroStreamName/PickWeeklyStreamChannel. */
+ * GameApplication__LoadIntroLogoSequence/GameApplication__StartWeeklyStreamTask, but with setSkipOnConfirm(0) added and GetEndingMovie
+ * in place of GetAsmkMovie/PickOpeningMovie. */
 void GameApplication__StartStreamTaskWithInit(GameApplication *self) {
     StreamTask *task;
     s32 typeCode;
@@ -401,8 +401,8 @@ void GameApplication__StartStreamTaskWithInit(GameApplication *self) {
         SetActiveDataSourceDriverMode(0, 0, 0);
         task = New_StreamTask(0, 0, 0, 0);
         task->methods->setSkipOnConfirm(task, 0);
-        outerValue = GetStreamChannelInit(&typeCode, 0);
-        typeLookup = GetStreamGroupForType(typeCode);
+        outerValue = GetEndingMovie(&typeCode, 0);
+        typeLookup = GetMovieFrameCount(typeCode);
         ((StreamTaskInitFn)task->methods->init)(task, (IntermediateBaseInitArgs *)self->aux,
                                                 outerValue, typeLookup, 1);
         task->methods->release(task);

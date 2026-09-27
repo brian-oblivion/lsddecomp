@@ -66,7 +66,7 @@ void DayTask__DayTask(DayTask *self, IntermediateBaseInitArgs *initArgs, DreamSy
     req.src.buffer = NULL;
     req.src.name = (char *)sDreamerTmdPath;
     self->dreamerTmd = New_LinkResource(&req.src);
-    vabPath = PickWeeklyGroup(0);
+    vabPath = PickSoundBank(0);
     self->bgm = New_WBgm((char *)vabPath, NULL, 1);
     RegisterRecordTableFiles(1);
     SetActiveDataSourceDriverMode(syncDriver == 0, 1, 1);

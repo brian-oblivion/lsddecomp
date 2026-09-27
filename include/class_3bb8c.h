@@ -245,10 +245,10 @@ typedef struct StyleConfig {
 } StyleConfig;
 
 /* ObjM__GetGridRecord's grid lookups (src/code_39094.c): a
- * non-negative code is a linear cell index (GetGridRecordAt(index, code)),
- * a negative one sends x/y to GetGridRecordXY. */
-extern s32 GetGridRecordAt(s32 index, s32 sub);
-extern void GetGridRecordXY(s32 index, s32 x, s32 y);
+ * non-negative code is a linear cell index (GetStageMapChunkRecord(index, code)),
+ * a negative one sends x/y to GetStageMapChunkRecordXY. */
+extern s32 GetStageMapChunkRecord(s32 index, s32 sub);
+extern void GetStageMapChunkRecordXY(s32 index, s32 x, s32 y);
 
 /* ObjM__TickStyle's helper (src/class_3bb8c_n.c), typed from that call. */
 extern void TickStyle(void *arg0, void *arg1, s32 arg2);

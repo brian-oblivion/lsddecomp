@@ -1,4 +1,6 @@
-# GetRecordGroup -- MATCHED (21/21 words)
+# GetStageRecords -- MATCHED (21/21 words)
+
+> Renamed from `GetRecordGroup` on 2026-09-27 (tools/rename.py). Address 0x80048e2c.
 
 > Renamed from `func_80048E2C` on 2026-09-25 (tools/rename.py). Address 0x80048e2c.
 
@@ -9,7 +11,7 @@ out-of-range drift.
 
 ## What it does
 
-Record lookup: `gRecordIndexTable` is an s16 table of record indices; returns `&table[gRecordIndexTable[index]]` where `table` is GetRecordTable(NULL). The call precedes the index load in retail, which is the natural evaluation order.
+Record lookup: `gStageFirstRecord` is an s16 table of record indices; returns `&table[gStageFirstRecord[index]]` where `table` is GetRecordTable(NULL). The call precedes the index load in retail, which is the natural evaluation order.
 
 ## Source
 
@@ -17,8 +19,8 @@ Declarations it needs are the local views at the top of `src/code_39094.c`
 (`D_80081940Obj`, `D_80081940Methods`, `Rec1C`) and `include/FileResource.h`.
 
 ```c
-Rec1C *GetRecordGroup(s32 index) {
-    return &((Rec1C *)GetRecordTable(NULL))[gRecordIndexTable[index]];
+Rec1C *GetStageRecords(s32 index) {
+    return &((Rec1C *)GetRecordTable(NULL))[gStageFirstRecord[index]];
 }
 ```
 
@@ -30,13 +32,17 @@ Rec1C *GetRecordGroup(s32 index) {
   `pad30[4]` is split into `s16 unk30` (init -1) and `u16 unk32`. Byte-neutral
   for the ten functions matched earlier this round (whole image green).
 - `SeedAndRandom`'s local definition gained an unused second parameter
-  (`s32 unused`): PickWeeklyGroup passes one in `$a1`, as code_1677c's own
+  (`s32 unused`): PickSoundBank passes one in `$a1`, as code_1677c's own
   prototype already says. Byte-neutral for SeedAndRandom.
 - No shared header was edited. Other units' prototypes for these functions
   (class_39e08.h, class_3bb8c.h, GameApplication.h) are independent and untouched.
 
 ## Naming
 
-- **Name:** `GetRecordGroup`
+- **Name:** `GetStageRecords`
 - **Tier:** A
-- **Evidence:** pure getter: &gRecordTable[gRecordIndexTable[index]]; a getter is tier A by the leaf-mechanics rule, purpose of the group itself not established.
+- **Evidence:** returns &gRecordTable[gStageFirstRecord[stage]] (gStageFirstRecord renamed from gRecordIndexTable); the record paths are retail's gRecordTable data (0x80081A04), read from disk/SLPS_015.56 in round 100: record 0 of each group is STGnn\TEXA.TIX, and gStageFirstRecord[0] = 16 is the first record after the sound banks. Every caller passes ObjM::stage.
+
+## Naming history
+
+- Round 100 (bravo, polish): renamed from `GetRecordGroup` with tools/rename.py, on the record paths and callers above; previous tier A.

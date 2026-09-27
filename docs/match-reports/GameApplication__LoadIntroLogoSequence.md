@@ -26,11 +26,11 @@ jal  SetActiveDataSourceDriverMode(0, 0, 0)
 jal  GameApplication__StartLoaderTask(self, sLogoPathAsmk)     ; "ETC\ASMKLOGO.TIM"
 jal  New_StreamTask(0, 0, 0, 0)            ; -> s1 = task (New_X shape, 0xDC bytes)
 addiu $a0, $sp, 0x18
-jal  GetIntroStreamName                          ; writes 0x31 to local, returns &sAsmkStreamPath
+jal  GetAsmkMovie                          ; writes 0x31 to local, returns &sAsmkMoviePath
  (delay: s1 = v0, i.e. the PRECEDING call's return = task)
-lw   $a0, 0x18($sp)                          ; reload the type code (0x31) GetIntroStreamName just wrote
-jal  GetStreamGroupForType(a0=0x31)                    ; halfword lookup in gStreamTypeToGroupTable
- (delay: s0 = v0, i.e. the PRECEDING call's return = streamName, &sAsmkStreamPath)
+lw   $a0, 0x18($sp)                          ; reload the type code (0x31) GetAsmkMovie just wrote
+jal  GetMovieFrameCount(a0=0x31)                    ; halfword lookup in gMovieFrameCounts
+ (delay: s0 = v0, i.e. the PRECEDING call's return = streamName, &sAsmkMoviePath)
 move $a0, $s1                                    ; a0 = task
 move $a2, $s0                                     ; a2 = streamName
 lw   $a3, 0x0($s1)                                 ; a3 = task->methods (scratch, to fetch the slot)
@@ -39,7 +39,7 @@ sw   $v1, 0x10($sp)                                  ; 5th argument, stack-spill
 lw   $a1, 0x1C($s2)                                    ; a1 = self->unk1C
 lw   $v1, 0x44($a3)                                     ; v1 = task->methods->slot44
 jalr $v1
- (delay: a3 = v0)                                        ; a3 OVERWRITTEN with GetStreamGroupForType's
+ (delay: a3 = v0)                                        ; a3 OVERWRITTEN with GetMovieFrameCount's
                                                             ; return value -- the REAL 4th argument
 lw   $v0, 0x0($s1)                                          ; reload task->methods
 lw   $v0, 0x4($v0)                                           ; slot4
@@ -59,8 +59,8 @@ void GameApplication__LoadIntroLogoSequence(GameApplication *self) {
         SetActiveDataSourceDriverMode(0, 0, 0);
         GameApplication__StartLoaderTask(self, sLogoPathAsmk);
         task = New_StreamTask(0, 0, 0, 0);
-        streamName = GetIntroStreamName(&typeCode);
-        typeLookup = GetStreamGroupForType(typeCode);
+        streamName = GetAsmkMovie(&typeCode);
+        typeLookup = GetMovieFrameCount(typeCode);
         task->methods->slot44(task, self->unk1C, streamName, typeLookup, 1);
         task->methods->slot4(task);
         GameApplication__StartLoaderTask(self, sLogoPathOsd);
@@ -75,11 +75,11 @@ void GameApplication__LoadIntroLogoSequence(GameApplication *self) {
 preceding instructions.** `lw $a3, 0x0($s1)` (task->methods) is used to
 *compute the call target* (`v1 = task->methods->slot44`), but by the time
 the `jalr` actually transfers control, its own delay slot (`move $a3, $v0`)
-has already replaced `$a3` with `GetStreamGroupForType`'s return value. A naive read
+has already replaced `$a3` with `GetMovieFrameCount`'s return value. A naive read
 sees "`a3` = task's own vtable pointer, passed as an argument" and that
 reading is wrong — the vtable pointer was only ever a scratch value for the
 indirect call computation, immediately clobbered before the callee sees it.
-The first C attempt (discarding `GetStreamGroupForType`'s return and passing
+The first C attempt (discarding `GetMovieFrameCount`'s return and passing
 `task->methods` as the 4th argument) built and even scored 44/57 — plausible
 enough to be mistaken for a near-miss — before the diff against retail's
 actual delay-slot value (`move a3,v0` where `v0` is the *call's* return, not
@@ -88,7 +88,7 @@ a memory load) exposed the real data flow. Always check what the delay slot
 
 **2. Register (s0 vs s1) assignment for two callee-saved temporaries tracked
 declaration order, not statement/liveness order.** `task` (from
-`New_StreamTask`) and `streamName` (from `GetIntroStreamName`) are both live
+`New_StreamTask`) and `streamName` (from `GetAsmkMovie`) are both live
 across further calls, `task` for longer (reloaded twice more). The first
 attempt declared `task` before `streamName` and code assigned `task` first
 (chronologically first live); GCC put `task` in `s0` and `streamName` in
@@ -123,7 +123,7 @@ register, a different axis).
 **`GameApplication__LoadIntroLogoSequence` -- tier B.** Mechanics established
 from the body and its string constants: gated by `arg->unk0C`, registers a
 loader task for `"ETC\ASMKLOGO.TIM"`, then a stream task for whatever
-`GetIntroStreamName` resolves (`"ETC\ASMK.STR"` per the header comment), then a
+`GetAsmkMovie` resolves (`"ETC\ASMK.STR"` per the header comment), then a
 second loader task for `"ETC\OSDLOGO.TIM"` -- three named boot-time assets
 loaded in sequence. "Intro logo sequence" describes what the function DOES
 (loads these three specific assets, gated, in this order); it does not

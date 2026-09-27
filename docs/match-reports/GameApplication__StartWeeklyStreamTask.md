@@ -11,16 +11,16 @@
 `GameApplicationMethods` slot `+0x054`. Gated by `self->arg->unk08 != 0` (a
 second boolean/pointer gate on the ctor argument, sibling to
 `GameApplication__LoadIntroLogoSequence`'s `unk0C` gate): builds a `StreamTask`, derives a type code
-via `PickWeeklyStreamChannel` (a day/week-style calculation, unrelated unit,
-`psyq_memset.s`), looks it up via `GetStreamGroupForType`, and initializes+starts
+via `PickOpeningMovie` (a day/week-style calculation, unrelated unit,
+`psyq_memset.s`), looks it up via `GetMovieFrameCount`, and initializes+starts
 the task the same way `GameApplication__LoadIntroLogoSequence` does -- minus that function's two
 `GameApplication__StartLoaderTask` loader-task registrations.
 
 ## Derivation
 
 Structurally identical to the second half of `GameApplication__LoadIntroLogoSequence` (already
-matched), with `PickWeeklyStreamChannel(&typeCode, 0)` in place of
-`GetIntroStreamName(&typeCode)`:
+matched), with `PickOpeningMovie(&typeCode, 0)` in place of
+`GetAsmkMovie(&typeCode)`:
 
 ```c
 void GameApplication__StartWeeklyStreamTask(GameApplication *self) {
@@ -32,8 +32,8 @@ void GameApplication__StartWeeklyStreamTask(GameApplication *self) {
     if (self->arg->unk08 != 0) {
         SetActiveDataSourceDriverMode(0, 0, 0);
         task = New_StreamTask(0, 0, 0, 0);
-        derivedValue = PickWeeklyStreamChannel(&typeCode, 0);
-        typeLookup = GetStreamGroupForType(typeCode);
+        derivedValue = PickOpeningMovie(&typeCode, 0);
+        typeLookup = GetMovieFrameCount(typeCode);
         task->methods->slot44(task, self->unk1C, derivedValue, typeLookup, 1);
         task->methods->slot4(task);
     }
@@ -52,9 +52,9 @@ argument from the start).
 `include/GameApplication.h`: split `GameApplicationConfig`'s `+0x04..+0x0B` padding
 to expose `+0x08` (`unk08`, this function's gate) as its own field,
 matching the existing `+0x0C` (`unk0C`, `GameApplication__LoadIntroLogoSequence`'s gate). Declared
-`PickWeeklyStreamChannel` (day/week-style helper, `psyq_memset.s`, same "write an
+`PickOpeningMovie` (day/week-style helper, `psyq_memset.s`, same "write an
 index to *out, return a related but different value" shape as
-`GetIntroStreamName`).
+`GetAsmkMovie`).
 
 ## Proposed learning
 
@@ -77,10 +77,10 @@ for the same shape before re-deriving from scratch.
 
 **`GameApplication__StartWeeklyStreamTask` -- tier B.** Mechanics: gated by
 `arg->unk08`, builds a `StreamTask`, derives its type code via
-`PickWeeklyStreamChannel` -- documented in this unit's header as "day/week-style
+`PickOpeningMovie` -- documented in this unit's header as "day/week-style
 calculation (divides SeedAndRandom's result by 7)" -- looks it up, then
 configures and starts the task. "Weekly" is grounded in that documented
-`/7` derivation inside `PickWeeklyStreamChannel` (real evidence, not a guess from the
+`/7` derivation inside `PickOpeningMovie` (real evidence, not a guess from the
 function's own body, which is otherwise the same generic StreamTask-launch
 shape as its three siblings in this unit).
 

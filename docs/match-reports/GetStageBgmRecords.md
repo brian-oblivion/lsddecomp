@@ -1,4 +1,6 @@
-# GetVariantBlock -- MATCHED (9/9 words)
+# GetStageBgmRecords -- MATCHED (9/9 words)
+
+> Renamed from `GetVariantBlock` on 2026-09-27 (tools/rename.py). Address 0x80048f60.
 
 > Renamed from `func_80048F60` on 2026-09-25 (tools/rename.py). Address 0x80048f60.
 
@@ -9,16 +11,16 @@ Byte-exact on the FIRST build; whole-image SHA1 green
 
 ## What it does
 
-Record index arithmetic: `GetRecordGroup(index) + 0x70` is four 0x1C-byte records past the record GetRecordGroup selects.
+Record index arithmetic: `GetStageRecords(index) + 0x70` is four 0x1C-byte records past the record GetStageRecords selects.
 
 ## Source
 
 ```c
 typedef struct Rec1C { u8 data[0x1C]; } Rec1C;
-Rec1C *GetRecordGroup(s32 index);   /* INCLUDE_ASM in this unit */
+Rec1C *GetStageRecords(s32 index);   /* INCLUDE_ASM in this unit */
 
-Rec1C *GetVariantBlock(s32 index) {
-    return &GetRecordGroup(index)[4];
+Rec1C *GetStageBgmRecords(s32 index) {
+    return &GetStageRecords(index)[4];
 }
 ```
 
@@ -34,6 +36,10 @@ Rec1C *GetVariantBlock(s32 index) {
 
 ## Naming
 
-- **Name:** `GetVariantBlock`
+- **Name:** `GetStageBgmRecords`
 - **Tier:** A
-- **Evidence:** pure getter: &GetRecordGroup(index)[4].
+- **Evidence:** &GetStageRecords(stage)[4]: records 4..8 of every group are BGA..BGE.SEQ (the record paths are retail's gRecordTable data (0x80081A04), read from disk/SLPS_015.56 in round 100).
+
+## Naming history
+
+- Round 100 (bravo, polish): renamed from `GetVariantBlock` with tools/rename.py, on the record paths and callers above; previous tier A.

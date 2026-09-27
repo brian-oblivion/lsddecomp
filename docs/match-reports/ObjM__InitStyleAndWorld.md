@@ -16,8 +16,8 @@ unit's other functions also write with 4/5/6 -- see
 `docs/match-reports/ObjM__OnDreamSysNotify.md` and the header's own comment on it).
 
 ```c
-extern s32 PickVariant(void *arg0, s32 arg1);
-extern s32 PickDailyVariant(void *arg0, s32 arg1, s32 arg2);
+extern s32 PickStageBgm(void *arg0, s32 arg1);
+extern s32 PickStageTexture(void *arg0, s32 arg1, s32 arg2);
 extern s32 New_TimBlockSrc(s32 arg0);
 extern void GetSetHitHeightGate(s32 arg0);
 extern s32 RegisterStyleConfig(void *arg0, s32 arg1, s32 *arg2, s32 arg3, s32 arg4);
@@ -34,11 +34,11 @@ void ObjM__InitStyleAndWorld(Obj87034_3bb8c_l *self, s32 arg1, StyleConfig *arg2
 
     unk18->methods->slot74(unk18);
     self->unk60 = 1;
-    ret1 = PickVariant(self->unk38, 0);
+    ret1 = PickStageBgm(self->unk38, 0);
     self->unk54->methods->slot5C(self->unk54, ret1);
 
     ret1 = self->unk3C->methods->slot1A0(self->unk3C, 0);
-    ret1 = PickDailyVariant(self->unk38, 0, ret1);
+    ret1 = PickStageTexture(self->unk38, 0, ret1);
     self->unk58 = (Obj87034_3bb8c_l *) New_TimBlockSrc(ret1);
 
     unk18->methods->slot70(unk18, self->unk3C, &gObjMViewPoint, &gObjMViewRefPoint, 0);
@@ -86,7 +86,7 @@ void ObjM__InitStyleAndWorld(Obj87034_3bb8c_l *self, s32 arg1, StyleConfig *arg2
 }
 ```
 
-Cross-unit helpers (`PickVariant`, `PickDailyVariant`, `New_TimBlockSrc`,
+Cross-unit helpers (`PickStageBgm`, `PickStageTexture`, `New_TimBlockSrc`,
 `GetSetHitHeightGate`, `RegisterStyleConfig`) have no established prototypes anywhere
 else in the project (all still `INCLUDE_ASM` in their own units), so they
 are declared locally per CLAUDE.md's rule. `gObjMViewPoint`/`gObjMViewRefPoint` are
@@ -248,7 +248,7 @@ Naming, all zero bytes:
   and DreamSys__ResetLinkState's own parameters are `(moveMode,
   tickPeriod)`: getSetMoveMode(moveMode), setTickPeriod(tickPeriod). moveMode
   2/3 index MOVE_MODE_SPEEDS {0, 24, 64, 128, 384}. Tier A (mechanics).
-- local `ret1` split into `record` (PickVariant / PickDailyVariant results)
+- local `ret1` split into `record` (PickStageBgm / PickStageTexture results)
   and `day` (getCurrentDayAndYear); the split compiled identically.
 - `0x10` -> 16, `0xA000` -> `DEFAULT_GRID_SPAN` (40960, unit-local; the value
   of gDefaultGridSpan, what StageMap starts with; StageMap::gridHalfCells is

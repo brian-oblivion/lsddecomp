@@ -1,4 +1,6 @@
-# GetWeeklyStreamPool -- MATCHED (11/11 words)
+# GetOpeningMovieRecords -- MATCHED (11/11 words)
+
+> Renamed from `GetWeeklyStreamPool` on 2026-09-27 (tools/rename.py). Address 0x80049110.
 
 > Renamed from `func_80049110` on 2026-09-25 (tools/rename.py). Address 0x80049110.
 
@@ -9,7 +11,7 @@ Byte-exact on the FIRST build; whole-image SHA1 green
 
 ## What it does
 
-`if (out) *out = 0; return records + 0x230;` -- the end of GetRecordTable's 0x230-record table (0x3D40 = 0x230 * 0x1C). Siblings GetStreamPool2/GetStreamPool3 are the same shape with counts 7 and 8 at records 0x237 and 0x238: a count plus a pointer to a sub-table that follows the main one.
+`if (out) *out = 0; return records + 0x230;` -- the end of GetRecordTable's 0x230-record table (0x3D40 = 0x230 * 0x1C). Siblings GetEndingMovieRecord/GetEventMovieRecords are the same shape with counts 7 and 8 at records 0x237 and 0x238: a count plus a pointer to a sub-table that follows the main one.
 
 ## Source
 
@@ -17,7 +19,7 @@ Byte-exact on the FIRST build; whole-image SHA1 green
 typedef struct Rec1C { u8 data[0x1C]; } Rec1C;
 void *GetRecordTable(s32 *out);   /* defined earlier in this unit */
 
-Rec1C *GetWeeklyStreamPool(s32 *countOut) {
+Rec1C *GetOpeningMovieRecords(s32 *countOut) {
     if (countOut != NULL) {
         *countOut = 0;
     }
@@ -37,6 +39,10 @@ Rec1C *GetWeeklyStreamPool(s32 *countOut) {
 
 ## Naming
 
-- **Name:** `GetWeeklyStreamPool`
-- **Tier:** B
-- **Evidence:** pure getter: &gRecordTable[0x230], count 0; only used internally by PickWeeklyStreamChannel.
+- **Name:** `GetOpeningMovieRecords`
+- **Tier:** A
+- **Evidence:** &gRecordTable[560] and movie id 0: records 560..566 are ETC\OPENINGA..G.STR (the record paths are retail's gRecordTable data (0x80081A04), read from disk/SLPS_015.56 in round 100).
+
+## Naming history
+
+- Round 100 (bravo, polish): renamed from `GetWeeklyStreamPool` with tools/rename.py, on the record paths and callers above; previous tier B.

@@ -1,4 +1,6 @@
-# GetStreamPool3Channel -- MATCHED (24/24 words)
+# GetEventMovie -- MATCHED (24/24 words)
+
+> Renamed from `GetStreamPool3Channel` on 2026-09-27 (tools/rename.py). Address 0x80049270.
 
 > Renamed from `func_80049270` on 2026-09-25 (tools/rename.py). Address 0x80049270.
 
@@ -9,7 +11,7 @@ out-of-range drift.
 
 ## What it does
 
-Record accessor: calls GetStreamPool3(&count) (writes 8, returns record 0x238), writes `sub + count` to `*countOut` when non-NULL, returns `&rec[sub]`.
+Record accessor: calls GetEventMovieRecords(&count) (writes 8, returns record 0x238), writes `sub + count` to `*countOut` when non-NULL, returns `&rec[sub]`.
 
 ## Source
 
@@ -17,9 +19,9 @@ Declarations it needs are the local views at the top of `src/code_39094.c`
 (`D_80081940Obj`, `D_80081940Methods`, `Rec1C`) and `include/FileResource.h`.
 
 ```c
-Rec1C *GetStreamPool3Channel(s32 *countOut, s32 sub) {
+Rec1C *GetEventMovie(s32 *countOut, s32 sub) {
     s32 count;
-    Rec1C *rec = GetStreamPool3(&count);
+    Rec1C *rec = GetEventMovieRecords(&count);
     if (countOut != NULL) {
         *countOut = sub + count;
     }
@@ -35,13 +37,17 @@ Rec1C *GetStreamPool3Channel(s32 *countOut, s32 sub) {
   `pad30[4]` is split into `s16 unk30` (init -1) and `u16 unk32`. Byte-neutral
   for the ten functions matched earlier this round (whole image green).
 - `SeedAndRandom`'s local definition gained an unused second parameter
-  (`s32 unused`): PickWeeklyGroup passes one in `$a1`, as code_1677c's own
+  (`s32 unused`): PickSoundBank passes one in `$a1`, as code_1677c's own
   prototype already says. Byte-neutral for SeedAndRandom.
 - No shared header was edited. Other units' prototypes for these functions
   (class_39e08.h, class_3bb8c.h, GameApplication.h) are independent and untouched.
 
 ## Naming
 
-- **Name:** `GetStreamPool3Channel`
-- **Tier:** B
-- **Evidence:** pure getter: index into GetStreamPool3(); no cross-unit caller found (only reached internally via ResolveCinematicChannel's negative-group fallback).
+- **Name:** `GetEventMovie`
+- **Tier:** A
+- **Evidence:** record `event` of GetEventMovieRecords, with movie id 8 + event.
+
+## Naming history
+
+- Round 100 (bravo, polish): renamed from `GetStreamPool3Channel` with tools/rename.py, on the record paths and callers above; previous tier B.

@@ -41,9 +41,9 @@ The source block above had drifted from `src/code_39094.c`, which has
 always compiled the 2-parameter form. The second parameter is dead in the
 body (`$a1` is never read), but it is real at every call: two callers load
 it explicitly (GameApplication__SeedRandom: `move a1,zero` at
-0x800260F4; PickWeeklyGroup: `move a1,a0` at 0x80048D78), and the other
-three (PickDailyVariant, PickVariant, PickWeeklyStreamChannel) forward their
-own incoming second parameter. PickVariant and PickWeeklyStreamChannel used
+0x800260F4; PickSoundBank: `move a1,a0` at 0x80048D78), and the other
+three (PickStageTexture, PickStageBgm, PickOpeningMovie) forward their
+own incoming second parameter. PickStageBgm and PickOpeningMovie used
 to pass an uninitialised local instead; round 82 gave each the parameter it
 forwards (byte-identical, two cc1 warnings gone). So the dead parameter
 stays: dropping it would make both explicit callers' loads unexplainable.

@@ -11,7 +11,7 @@
 Called by `GameApplication__PollStatusObj` when its `StatusObj` slot44 result is `2` (per
 that function's still-stalled derivation). Reads `DreamSys`'s current
 cinematic slot (`GetCinematic`), packs its two 16-bit fields and resolves
-them to a channel index (`ResolveCinematicChannel`, which also returns a second,
+them to a channel index (`GetSpecialDayOrEventRecord`, which also returns a second,
 unrelated `s32` used later as `groupId`). If the channel is unresolved
 (`-1`), starts a `LoaderTask` on a fixed "no cinematic" path. Otherwise, if
 `self->arg->unk08` gates it, starts a `StreamTask` on the resolved channel.
@@ -33,7 +33,7 @@ void GameApplication__StartCinematicStream(GameApplication *self) {
     LoaderTask *task;
 
     cc = self->dreamSys->vt->GetCinematic(self->dreamSys);
-    groupId = ResolveCinematicChannel(&chanBuf.chan, (u16) cc.bank | ((u32) (u16) cc.entry << 16));
+    groupId = GetSpecialDayOrEventRecord(&chanBuf.chan, (u16) cc.bank | ((u32) (u16) cc.entry << 16));
     SetActiveDataSourceDriverMode(0, 0, 0);
 
     if (chanBuf.chan != -1) {
@@ -41,7 +41,7 @@ void GameApplication__StartCinematicStream(GameApplication *self) {
             StreamTask *streamTask = New_StreamTask(0, 0, 0, 0);
 
             streamTask->methods->slot12C(streamTask, 0);
-            lookup = GetStreamGroupForType(chanBuf.chan);
+            lookup = GetMovieFrameCount(chanBuf.chan);
             streamTask->methods->slot44(streamTask, self->unk1C, groupId, lookup, 1);
             streamTask->methods->slot4(streamTask);
         }
@@ -91,10 +91,10 @@ void GameApplication__StartCinematicStream(GameApplication *self) {
    residue (2 words) was an instruction-order swap around
    `SetActiveDataSourceDriverMode(0,0,0)`'s call setup. Reading it closely: retail's
    `move s2,v0` sits in `SetActiveDataSourceDriverMode`'s OWN call's delay slot, using
-   whatever `v0` held immediately before -- which is `ResolveCinematicChannel`'s
+   whatever `v0` held immediately before -- which is `GetSpecialDayOrEventRecord`'s
    return, not `SetActiveDataSourceDriverMode`'s. My first attempt had it backwards
    (`groupId` assigned from `SetActiveDataSourceDriverMode`'s return, called after
-   discarding `ResolveCinematicChannel`'s) -- swapping which call's return feeds
+   discarding `GetSpecialDayOrEventRecord`'s) -- swapping which call's return feeds
    `groupId`, and discarding `SetActiveDataSourceDriverMode`'s (matching its established
    "called for side effect, return unused" role in `GameApplication__LoadIntroLogoSequence` and
    `GameApplication__StartWeeklyStreamTask`), closed the last two words.
@@ -104,7 +104,7 @@ void GameApplication__StartCinematicStream(GameApplication *self) {
 `include/GameApplication.h`: `SetActiveDataSourceDriverMode`'s extern retyped from `void` to
 `s32` (it does return a meaningful value -- whatever its internal dispatch
 loop last produced -- confirmed here even though this call site, like
-`GameApplication__LoadIntroLogoSequence`/`GameApplication__StartWeeklyStreamTask`, discards it). Added `ResolveCinematicChannel`
+`GameApplication__LoadIntroLogoSequence`/`GameApplication__StartWeeklyStreamTask`, discards it). Added `GetSpecialDayOrEventRecord`
 (psyq_memset.s: resolves a packed `{bank,entry}` `CinematicCall` to a
 channel index via an out-param, **and** returns a second, separate `s32`
 kept by this function -- easy to miss since most callers of "write to
@@ -113,8 +113,8 @@ kept by this function -- easy to miss since most callers of "write to
 ## Proposed learning
 
 When a "write to `*out`, also returns a value" helper (this unit has
-several: `GetIntroStreamName`, `PickWeeklyStreamChannel`, `GetGraphRoomStreamChannel`, now
-`ResolveCinematicChannel`) is followed immediately by ANOTHER call whose own return
+several: `GetAsmkMovie`, `PickOpeningMovie`, `GetSpecialDayMovieSpan`, now
+`GetSpecialDayOrEventRecord`) is followed immediately by ANOTHER call whose own return
 is discarded, check which call's return actually lands in the next
 persistent register via the delay-slot-capture idiom before assuming it's
 the SECOND (most recently called) function's return -- it can just as
