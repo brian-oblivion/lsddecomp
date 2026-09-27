@@ -3050,3 +3050,4 @@ sEtcTimPath = 0x800113EC;
 sDreamerTmdPath = 0x800113F8;
 sTaskCoreDefaultColors = 0x8006E860;
 sTaskCoreViewOrigin = 0x8006E86C;
+SetDataDirectory = 0x800270AC; // type:func

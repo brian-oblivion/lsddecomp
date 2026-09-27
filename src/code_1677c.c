@@ -25,8 +25,8 @@ extern void *BMemPMgrAlloc(s32 size);
 
 extern const char sModelPathDreamE5[]; /* "ETC\DREAME5.TMD", asm/data/FA4.rodata.s */
 
-extern s32 func_80048CF0(void);       /* reads a small-data global, unnamed so far */
-extern void func_800270AC(s32 value); /* stores its arg to a small-data global */
+extern s32 func_80048CF0(void);          /* reads a small-data global, unnamed so far */
+extern void SetDataDirectory(s32 value); /* stores its arg to a small-data global */
 
 extern s32 SetActiveDataSourceDriverMode(s32 a0, s32 a1, s32 a2); /* code_171e0, still INCLUDE_ASM there; returns
                                                        the last value its internal dispatch loop got --
@@ -115,7 +115,7 @@ void GameApplication__GameApplication(GameApplication *self, GameApplicationConf
     GetApplicationMethods()->ctor((Application *)self, arg->dataSource);
     self->methods = GetGameApplicationMethods();
     self->config = arg;
-    func_800270AC(func_80048CF0());
+    SetDataDirectory(func_80048CF0());
     req.src.buffer = NULL;
     req.src.name = (char *)sModelPathDreamE5;
     self->dreamSys = New_DreamSys(New_LinkResource(&req.src), 0, 0);

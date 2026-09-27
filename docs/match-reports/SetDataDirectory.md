@@ -1,4 +1,6 @@
-# func_800270AC -- MATCHED 3/3 words, round 42 (2026-09-15)
+# SetDataDirectory -- MATCHED 3/3 words, round 42 (2026-09-15)
+
+> Renamed from `func_800270AC` on 2026-09-27 (tools/rename.py). Address 0x800270ac.
 
 > **VERDICT CORRECTED, round 42 (2026-09-15). THIS FUNCTION IS MATCHED.**
 > It was blocked by `gp_rel`, which is RESOLVED this round: maspsx gained
@@ -16,7 +18,7 @@
 > derivation may still be right, its VERDICT is not. Rebuild before believing
 > any score in it.
 
-# func_800270AC
+# SetDataDirectory
 
 **Unit:** code_171e0 · **Size:** 3 instructions · **Status:** STALLED, class TOOLCHAIN
 
@@ -34,7 +36,7 @@ here.
 ## Residue
 
 Retail: `sw $a0, %gp_rel(D_8008A854)($gp)` — one instruction. Compiling
-`extern void *D_8008A854; void func_800270AC(void *value) { D_8008A854 = value; }`
+`extern void *D_8008A854; void SetDataDirectory(void *value) { D_8008A854 = value; }`
 under this project's pinned `-G0` produces the two-instruction absolute
 `lui`/`sw` form instead — same root cause as `LockActiveDataSource` (full isolated
 reproducer there): cc1's own `-G` value gates whether it emits the
@@ -52,7 +54,7 @@ else in the unit.
 ```c
 extern void *D_8008A854;
 
-void func_800270AC(void *value) {
+void SetDataDirectory(void *value) {
     D_8008A854 = value;
 }
 ```
@@ -72,7 +74,7 @@ before trusting anything downstream.
 
 Round 52 (alpha), FINISHING-PLAN track 3.
 
-Not renamed. `func_800270AC` is a setter (`D_8008A854 = value;`) and
+Not renamed. `SetDataDirectory` is a setter (`D_8008A854 = value;`) and
 `func_800270B8` its getter (`return D_8008A854;`). `D_8008A854` is a real
 `.sdata` global initialized to `0x8006D4A8`, which sits at (or just past)
 the tail of the gFileResourceMethods method table as splat has it carved -- possibly
@@ -81,5 +83,5 @@ separate, unidentified global. No caller of either function was found
 anywhere in the tree, so there is no usage evidence to lean on either. A
 wrong tier-A/B guess here (e.g. asserting this is some kind of shared-vtable
 pointer cache) would be worse than the placeholder. Kept as
-`func_800270AC`/`func_800270B8`; write down what is known and revisit once
+`SetDataDirectory`/`func_800270B8`; write down what is known and revisit once
 `D_8006D4A8` or a caller is identified.

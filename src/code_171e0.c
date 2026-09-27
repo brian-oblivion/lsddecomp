@@ -20,7 +20,7 @@
  * ResourceRequest__Set fills the {buffer, name, mode} descriptor the
  * resource classes' ctors take (include/FileResource.h's ResourceRequest).
  * GetGameApplicationMethods and BuildFileName are unrelated utilities that
- * happen to live in this segment; func_800270AC/func_800270B8 (a
+ * happen to live in this segment; SetDataDirectory/func_800270B8 (a
  * getter/setter pair for D_8008A854) are left unnamed -- see their reports.
  */
 #include "common.h"
@@ -300,7 +300,7 @@ s32 RegisterFileTableEntries(void *arg0, s32 arg1) {
 
 extern void *D_8008A854;
 
-void func_800270AC(void *value) {
+void SetDataDirectory(void *value) {
     D_8008A854 = value;
 }
 
