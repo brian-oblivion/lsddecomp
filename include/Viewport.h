@@ -58,7 +58,6 @@ typedef struct ViewportMethods ViewportMethods;
 typedef struct ViewportSize ViewportSize;
 typedef struct ViewportRgb ViewportRgb;
 typedef struct ViewportRefView ViewportRefView;
-typedef struct ViewportOt ViewportOt;
 
 /* The screen size: drawNode reads it as the width and height the box and
  * screen-space sprite paths take percentages of. Defaults 256 x 240
@@ -83,13 +82,6 @@ struct ViewportRefView {
     LongVec3 vr;           /* +0x00C, reference point: setViewRef */
     s32 rz;                /* +0x018, twist, 20.12 (setTwist) */
     SceneNodeSub14 *super; /* +0x01C, the view node's GsCOORDINATE2 (AddChild) */
-};
-
-/* libgs GsOT header, 0x14 bytes: InitOt fills the two words it sets. */
-struct ViewportOt {
-    s32 length; /* +0x000, otLength */
-    s32 org;    /* +0x004, this half's otTags */
-    u8 pad08[0x14 - 0x08];
 };
 
 /* BasicClass's slots, then this class's own. `tools/classtable.py
@@ -151,9 +143,9 @@ struct ViewportOt {
     /* +0x064 */ u8 pad064[0x070 - 0x064];                                                         \
     /* +0x070 */ s32 otReady;             /* InitOt sets, DeinitOt clears; Update/Flip need it */  \
     /* +0x074 */ s32 otIndex;             /* the half being drawn; Flip takes the next one */      \
-    /* +0x078 */ ViewportOt *ot[2];       /* InitOt's two GsOT headers */                          \
-    /* +0x080 */ s32 otTags[2];           /* each header's org: its tag array */                   \
-    /* +0x088 */ s32 workBase[2];         /* each half's packet area: GsSetWorkBase */             \
+    /* +0x078 */ GsOT *ot[2];             /* InitOt's two GsOT headers */                          \
+    /* +0x080 */ GsOT_TAG *otTags[2];     /* each header's org: its tag array */                   \
+    /* +0x088 */ PACKET *workBase[2];     /* each half's packet area: GsSetWorkBase */             \
     /* +0x090 */ s32 unk90;               /* counts class-5 notifications (OnNotifyTag5) */        \
     /* +0x094 */ u8 pad094[0x098 - 0x094];                                                         \
     /* +0x098 */ s32 zDiv;                /* Update: the depth per OT tag; drawNode's sprite z */  \

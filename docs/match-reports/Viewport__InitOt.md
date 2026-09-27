@@ -716,3 +716,33 @@ The 0x14 header is `sizeof(GsOT)` (the unit now includes `<libgs.h>`). The local
  * literal, fold() reassociates the constant to the outside of the sum and
  * the final addu/addiu pair swaps (round 71). */
 ```
+
+Round 96 (alpha, track 6). include/Viewport.h's local `ViewportOt` (a
+0x14-byte view of the GsOT header: length, org, pad) is deleted: `ot[2]` is
+Sony's `GsOT *`, `otTags[2]` Sony's `GsOT_TAG *` (each header's `org`) and
+`workBase[2]` Sony's `PACKET *` (GsSetWorkBase's argument), and every unit
+including Viewport.h takes Sony's headers after common.h. The `(GsOT *)`
+casts at GsClearOt, GsSortClear, GsDrawOt and drawNode's five sort calls and
+Update's `(PACKET *)` cast are gone. Byte-identical (whole image green).
+
+InitOt's carve, with Sony's types (73/73 on the first build; `buf` stays the
+s32 address the allocation arithmetic is written in):
+
+```c
+    self->ot[0] = (GsOT *)buf;
+    self->otTags[0] = (GsOT_TAG *)(buf + sizeof(GsOT));
+    self->workBase[0] = (PACKET *)self->otTags[0] + (4 << self->otLength);
+
+    self->ot[1] = (GsOT *)((PACKET *)self->ot[0] + size);
+    self->otTags[1] = (GsOT_TAG *)((PACKET *)self->otTags[0] + size);
+    self->workBase[1] = self->workBase[0] + size;
+
+    self->ot[0]->length = self->otLength;
+    self->ot[0]->org = self->otTags[0];
+
+    self->ot[1]->length = self->otLength;
+    self->ot[1]->org = self->otTags[1];
+
+    GsClearOt(0, 0, self->ot[0]);
+    GsClearOt(0, 0, self->ot[1]);
+```

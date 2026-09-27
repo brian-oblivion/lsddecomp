@@ -26,6 +26,9 @@
  * edits to it are additive.
  */
 #include "common.h"
+#include <libgte.h>
+#include <libgpu.h>
+#include <libgs.h>
 #include "class_3bb8c.h"
 #include "TimedTask.h"
 #include "DreamSys.h"

@@ -24,6 +24,9 @@
  * All 20 definitions here are matched, 0 INCLUDE_ASM.
  */
 #include "common.h"
+#include <libgte.h>
+#include <libgpu.h>
+#include <libgs.h>
 #include "class_3bb8c.h"
 #include "DreamSys.h"
 #include "SceneNode.h"

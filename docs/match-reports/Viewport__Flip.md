@@ -130,3 +130,11 @@ extern void GsSortClear(u8 a0, u8 a1, u8 a2, ViewportOt *ot);
 ## Track 7 (round 95, alpha, polish pass)
 
 The clear colour is passed as `self->clearColor.r/.g/.b` (GsSortClear's own `unsigned char` parameters make the load `lbu`), no `u8 *` over the struct; the slot-offset notes (+0x050, +0x054) are gone from the comment, the slot names say it. Byte-identical.
+
+Round 96 (alpha, track 6). include/Viewport.h's local `ViewportOt` (a
+0x14-byte view of the GsOT header: length, org, pad) is deleted: `ot[2]` is
+Sony's `GsOT *`, `otTags[2]` Sony's `GsOT_TAG *` (each header's `org`) and
+`workBase[2]` Sony's `PACKET *` (GsSetWorkBase's argument), and every unit
+including Viewport.h takes Sony's headers after common.h. The `(GsOT *)`
+casts at GsClearOt, GsSortClear, GsDrawOt and drawNode's five sort calls and
+Update's `(PACKET *)` cast are gone. Byte-identical (whole image green).
