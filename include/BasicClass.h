@@ -55,6 +55,11 @@ typedef struct BasicClass BasicClass;
 typedef struct BasicClassMethods BasicClassMethods;
 typedef struct BasicClassListNode BasicClassListNode;
 
+/* The one notifyParents event the base class defines: finalize sends it, and
+ * the base onNotify answers it by dropping the sender from its children.
+ * Subclasses number their own events (DreamSys.h, Entity.h). */
+enum { BASICCLASS_EVENT_FINALIZED = 1 };
+
 /* One node of either list. 8 bytes: the size PushBasicClassListNode asks the
  * pool allocator for. */
 struct BasicClassListNode {

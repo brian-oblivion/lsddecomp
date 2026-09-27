@@ -290,7 +290,7 @@ void BasicClass__BasicClass(BasicClass *self) {
 }
 
 void BasicClass__Finalize(BasicClass *self) {
-    self->methods->notifyParents(self, 1);
+    self->methods->notifyParents(self, BASICCLASS_EVENT_FINALIZED);
     self->methods->removeAllChildren(self);
     self->methods->clearParentRefs(self);
 }
