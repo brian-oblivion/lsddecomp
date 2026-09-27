@@ -54,11 +54,11 @@ void BasicClass__func_18350(void) {}
 
 /* BasicClassMethods slot +0x038, the receiving half of NotifyParents:
  * `sender` is telling `self` that `event` happened. The base class treats
- * event 1 as "sender is going away" and drops it from its own children.
+ * BASICCLASS_EVENT_FINALIZED as "sender is going away" and drops it from its own children.
  * Subclasses override it, call this first, then look at the sender's class
  * tag as well, so `event` is a notification code, not a boolean. */
 void BasicClass__OnNotify(BasicClass *self, void *sender, s32 event) {
-    if (event == 1) {
+    if (event == BASICCLASS_EVENT_FINALIZED) {
         self->methods->removeChild(self, (BasicClass *)sender);
     }
 }
