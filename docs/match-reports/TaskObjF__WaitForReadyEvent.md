@@ -22,3 +22,7 @@ object's 4 events is ready (per `TestEvent`). Name mirrors the callee.
 the reason is in `docs/match-reports/WaitForReadyEvent.md` -- the callee's
 outer loop has no exit but its `return`, so this blocks rather than
 searches. Byte-identical.
+
+## Round 95 (track 7, charlie)
+
+`WaitForReadyEvent(self->events, 4)` -> `ARRAY_COUNT(self->events)`. Zero bytes.

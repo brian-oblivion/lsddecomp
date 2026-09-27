@@ -25,3 +25,7 @@ in a local) exactly.
 BEYOND how many buffers a just-finished operation actually used, keeping
 the used ones (`[0, bufCount)`) allocated. Distinguished from
 `TaskObjF__FreeBuffers` (full teardown) by name.
+
+## Round 95 (track 7, charlie)
+
+`15` -> `TASKOBJF_MAX_FILES`, the terminator stored as `NULL`. Zero bytes.

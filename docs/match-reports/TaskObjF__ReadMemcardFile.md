@@ -46,3 +46,38 @@ See `TaskObjF__TryReadMemcardFile`'s report for the callee's own signature and t
 early on the first success -- both the retry mechanics and the purpose
 (read a memory-card file, tolerating transient failures) are evident from
 the body plus the callee's own established behaviour.
+
+## Round 95 (track 7, charlie)
+
+### Naming
+
+`count` -> `retries`; the `10` is `MEMCARD_RETRIES` (include/TaskObjF.h:
+attempts after the first; the loop runs 11 times). Zero bytes.
+
+### Moved from src/class_3bb8c_f.c
+
+The unit banner before track 7 (its history -- "track 4 round 89" -- is
+here; the new banner describes the file only):
+
+```c
+/*
+ * class_3bb8c_f: `TaskObjF` methods (include/TaskObjF.h, track 4 round 89),
+ * slots +0x064..+0x078 and the +0x038 onNotify override, with the unit's
+ * helpers:
+ *
+ * - The memory-card file API (BuildMemcardPath,
+ *   TaskObjF__ReadMemcardFile/TryReadMemcardFile,
+ *   TaskObjF__WriteMemcardSaveFile/TryWriteMemcardSaveFile): opens BIOS
+ *   `bu00:`/`bu10:` paths directly to read save data and to write a save
+ *   file whose header is structurally exact to the standard PS1 memory-
+ *   card save format (magic, icon-frame count, block count, title, icon
+ *   palette, up to three icon frames).
+ * - The event helpers over `events[4]` (EnableEvents/DisableEvents/
+ *   TestEvents/ForEachEvent/WaitForReadyEvent).
+ * - The two operations the parent starts, TaskObjF__BeginLoad and
+ *   TaskObjF__BeginSave, with their card check (TaskObjF__Validate) and the
+ *   16-entry title buffer pool (Alloc/FreeUnused/FreeBuffers); TaskObjF__Init
+ *   and Deinit; TaskObjF__OnNotify, which routes a child's notification by
+ *   the child's class id.
+ */
+```

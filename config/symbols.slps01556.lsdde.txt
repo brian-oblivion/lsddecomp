@@ -2975,3 +2975,5 @@ gDefaultViewportColor = 0x8008A8F8;
 gDefaultViewportWidth = 0x8008A8FC;
 gDefaultViewportHeight = 0x8008A900;
 gFadeBoxAttachPos = 0x8008A904;
+gCardEventSpecs = 0x80086E78;
+sFileNotCreatedMsg = 0x80011530;

@@ -22,3 +22,9 @@ evident from the body: if `self->bufArray` is unallocated, allocates it
 (16 entries), fills the first 15 with individually-allocated 0x41-byte
 buffers, and allocates `self->scratchBuf` (a single 0x40-byte buffer).
 Mirror of `TaskObjF__FreeBuffers`.
+
+## Round 95 (track 7, charlie)
+
+`0x40` (twice) is `(TASKOBJF_MAX_FILES + 1) * sizeof(char *)` -- sixteen
+pointers, the last left NULL by FreeUnusedBuffers -- `15` is
+`TASKOBJF_MAX_FILES` and `0x41` `TASKOBJF_TITLE_SIZE` (65). Zero bytes.

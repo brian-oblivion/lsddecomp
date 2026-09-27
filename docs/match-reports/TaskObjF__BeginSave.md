@@ -493,3 +493,24 @@ project-wide to `TaskObjF`.
 ## Track 4 (2026-09-26, round 89)
 
 Renamed from `TaskObjF__func_8004F8A4`. Slot +0x078. It stores (fileName, title, titleEditPos, iconFrames, iconImage, data, dataSize), sets opMode 2, validates the card, then asks +0x054 TaskObjF__ProbeMemcardFile whether `fileName` exists and +0x060 TaskObjF__CheckCardSpace whether `dataSize` fits (code 9 when not). The codes lead to 0x11 (TaskObjF__AttachTextEntry: edit the title) and 0xB, which TaskObjF__TickStateDelay turns into 0x14, and SetState(0x14) calls +0x068 TaskObjF__WriteMemcardSaveFile with exactly these fields. Its one outside caller is TitleMenu__SaveToCard (the save block, its size, and a TIM icon with 3 frames).
+
+## Round 95 (track 7, charlie)
+
+### Naming and constants
+
+`code` -> `state`, `m` -> `methods`. States: 0xA
+`TASKOBJF_STATE_SAVE_OVERWRITE_WARNING` ("SAVEWAR": probeMemcardFile found
+the file), 0x11 `EDIT_TITLE`, 0xB `SAVING`, 9 `SAVE_NO_SPACE` ("SAVEEMPT":
+checkCardSpace failed); opMode 2 `TASKOBJF_OP_SAVE`; probeMemcardFile's
+`0` destination is `NULL`. Zero bytes.
+
+### Moved from src/class_3bb8c_f.c
+
+Replaced in the unit by a MATCHING line:
+
+```c
+/* MATCHED round 75 (docs/match-reports/TaskObjF__BeginSave.md): the
+ * function returns nothing -- the early exit falls straight into the
+ * epilogue with Validate's own $v0 -- and each of the three leaves makes its
+ * own setState call, which GCC cross-jumps down to one shared `jalr`. */
+```

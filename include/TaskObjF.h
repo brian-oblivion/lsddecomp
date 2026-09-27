@@ -113,7 +113,7 @@ struct TaskObjF {
     BASICCLASS_FIELDS(TaskObjFMethods);
     /* +0x00C */ s32 cardSlot; /* setCardSlot; 0 or 1: BuildMemcardPath's "bu00:"/"bu10:" */
     /* +0x010 */ s32 cardHandle; /* setCardSlot: cardSlot << 4, the _card_info/_card_load/_card_clear channel */
-    /* +0x014 */ s32 events[4]; /* openEvents: OpenEvent per D_80086E78 entry; ForEachEvent/WaitForReadyEvent walk them */
+    /* +0x014 */ s32 events[4]; /* openEvents: OpenEvent per gCardEventSpecs entry; ForEachEvent/WaitForReadyEvent walk them */
     /* +0x024 */ s32 opMode; /* 1 beginLoad, 2 beginSave; the terminal states clear it. advanceState retries the one that is set */
     /* +0x028 */ s32 state;  /* setState; init clears it */
     /* +0x02C */ s32 bufCount; /* collectExistingMemcardFiles's count; how many `titles` buffers are kept */
@@ -140,6 +140,67 @@ struct TaskObjF {
     /* +0x07C */ struct ItemList *itemList; /* attachItemList: New_ItemList(titles, 1); AddChild's class 0x20 */
     /* +0x080 */ s32 selectedIndex; /* onItemListResult: the list's getCursorIndex */
 };
+
+/* TaskObjF::opMode: the operation beginLoad or beginSave started. */
+enum TaskObjFOpMode {
+    TASKOBJF_OP_NONE = 0, /* init, and the terminal states */
+    TASKOBJF_OP_LOAD = 1, /* beginLoad */
+    TASKOBJF_OP_SAVE = 2  /* beginSave */
+};
+
+/* TaskObjF::state, setState's argument. 0x02..0x10 show a message:
+ * loadCardIcon indexes gCardIconNames by the state, and the quoted name is
+ * the CARD\<name>.TIM each one loads. 0x11..0x15 run an entry action in
+ * setState. 0x16 and 0x17 are terminal: setState clears state and opMode
+ * on either, and frees beginLoad's buffers. No code sets state 1. */
+enum TaskObjFState {
+    TASKOBJF_STATE_IDLE = 0x00,
+    TASKOBJF_STATE_NO_CARD = 0x02,      /* "NOCONECT": checkCardStatus failed (timeout or error) */
+    TASKOBJF_STATE_CARD_ERROR = 0x03,   /* "ERROR": the card answered EvSpERROR */
+    TASKOBJF_STATE_CARD_CHANGED = 0x04, /* "CHANGE": _card_info reported a new card */
+    TASKOBJF_STATE_UNFORMATTED_LOAD = 0x05, /* "UNFORM1": unformatted card, opMode LOAD */
+    TASKOBJF_STATE_UNFORMATTED_SAVE = 0x06, /* "UNFORM2": unformatted card, opMode SAVE; confirming formats it */
+    TASKOBJF_STATE_FORMATTING = 0x07,    /* "FORMING": tickStateDelay, then FORMAT */
+    TASKOBJF_STATE_FORMAT_ERROR = 0x08,  /* "FORMERR": formatCard failed */
+    TASKOBJF_STATE_SAVE_NO_SPACE = 0x09, /* "SAVEEMPT": checkCardSpace failed */
+    TASKOBJF_STATE_SAVE_OVERWRITE_WARNING = 0x0A, /* "SAVEWAR": the file exists; confirming re-runs beginSave */
+    TASKOBJF_STATE_SAVING = 0x0B,                 /* "SAVING": tickStateDelay, then WRITE */
+    TASKOBJF_STATE_SAVE_ERROR = 0x0C,             /* "SAVEERR": writeMemcardSaveFile failed */
+    TASKOBJF_STATE_LOAD_NOT_FOUND = 0x0D, /* "NOTFOUND": collectExistingMemcardFiles found none */
+    TASKOBJF_STATE_LOAD_WARNING = 0x0E, /* "LOADWAR": a file was chosen; confirming re-runs beginLoad */
+    TASKOBJF_STATE_LOADING = 0x0F,      /* "LOADING": tickStateDelay, then READ */
+    TASKOBJF_STATE_LOAD_ERROR = 0x10,  /* "LOADERR": readMemcardFile failed */
+    TASKOBJF_STATE_EDIT_TITLE = 0x11,  /* attachTextEntry: the player edits the save title */
+    TASKOBJF_STATE_CHOOSE_FILE = 0x12, /* attachItemList: the player picks the file to load */
+    TASKOBJF_STATE_FORMAT = 0x13,      /* formatCard, then EDIT_TITLE or FORMAT_ERROR */
+    TASKOBJF_STATE_WRITE = 0x14,       /* writeMemcardSaveFile, then DONE or SAVE_ERROR */
+    TASKOBJF_STATE_READ = 0x15,        /* readMemcardFile, then DONE or LOAD_ERROR */
+    TASKOBJF_STATE_DONE = 0x16,        /* the write or the read succeeded */
+    TASKOBJF_STATE_ABORTED = 0x17 /* cancelled, an error dismissed, or setState to the current state */
+};
+
+/* beginLoad's title buffers (AllocBuffers): `titles` and `foundSuffixes`
+ * hold TASKOBJF_MAX_FILES + 1 pointers, the last one NULL, and each title
+ * buffer is TASKOBJF_TITLE_SIZE bytes. beginLoad sets bufCount to
+ * TASKOBJF_MAX_FILES when no file was found, so FreeBuffers frees them all. */
+#define TASKOBJF_MAX_FILES 15
+#define TASKOBJF_TITLE_SIZE 65
+
+/* PS-X memory-card geometry, as this class's file I/O computes it. A file
+ * is read and written in 128-byte sectors and allocated in 8192-byte
+ * blocks; its first 512 bytes are the save header (the title sector, then
+ * up to three icon frames of one sector each), whose byte 2 is
+ * MEMCARD_ICON_FLAG_BASE plus the icon frame count. */
+#define MEMCARD_SECTOR_SIZE 128
+#define MEMCARD_SECTOR_SHIFT 7
+#define MEMCARD_BLOCK_SIZE 8192
+#define MEMCARD_BLOCK_SHIFT 13
+#define MEMCARD_SAVE_HEADER_SIZE 512
+#define MEMCARD_ICON_FLAG_BASE 0x10
+/* open()'s create mode carries the new file's block count in its high half. */
+#define MEMCARD_OPEN_BLOCKS(blocks) ((blocks) << 16)
+/* Attempts after the first before a card operation gives up. */
+#define MEMCARD_RETRIES 10
 
 extern TaskObjFMethods gTaskObjFMethods;
 extern TaskObjFMethods *GetTaskObjFMethods(void); /* returns &gTaskObjFMethods */

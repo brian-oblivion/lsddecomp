@@ -43,3 +43,15 @@ tier-C form rather than guessing.
 ## Track 4 (2026-09-26, round 89)
 
 Renamed from `TaskObjF__func_8004F638`. Round 60 left it tier C because slot +0x05C looked like a subclass's; `tools/classtable.py gTaskObjFMethods` shows every slot is this class's own, so the chain is readable: +0x05C is TaskObjF__CollectExistingMemcardFiles (fills `titles`/`foundSuffixes` with the save files that exist, returns the count), code 0x12 opens the item list of those titles (TaskObjF__AttachItemList via SetState), the list's result 2 stores the choice and sets state 0xE, TaskObjF__AdvanceState builds `fileName`/`title` from the chosen entry and calls this slot (+0x074) again, which now takes code 0xF: TaskObjF__TickStateDelay turns 0xF into 0x15 and SetState(0x15) calls +0x064 TaskObjF__ReadMemcardFile(fileName, data, dataSize). opMode 1 marks this operation. It starts a load; the name says no more than that.
+
+## Round 95 (track 7, charlie)
+
+### Naming and constants
+
+`result` -> `found` (collectExistingMemcardFiles' count), `code` -> `state`.
+States: 0xE `TASKOBJF_STATE_LOAD_WARNING` ("LOADWAR", the state
+onItemListResult sets after a pick; advanceState re-runs beginLoad from it),
+0xF `LOADING`, 0x12 `CHOOSE_FILE`, 0xD `LOAD_NOT_FOUND`; opMode 1
+`TASKOBJF_OP_LOAD`; `bufCount = 0xF` is `TASKOBJF_MAX_FILES`, so
+FreeBuffers frees all fifteen title buffers AllocBuffers made. Evidence for
+each state name is its comment in include/TaskObjF.h. Zero bytes.

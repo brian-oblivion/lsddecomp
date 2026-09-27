@@ -45,7 +45,7 @@ extern void *BuildMemcardPath(void *dest, s32 selector, void *suffix);
  * OpenTh-style thread it starts). Address-only-derived walk (lui/addiu then
  * plain lw at increasing offsets), never gp-relative, so unaffected by the
  * project's gp_rel blocker. */
-extern s32 D_80086E78[4];
+extern s32 gCardEventSpecs[4];
 extern s32 OpenEvent(s32 arg0, s32 arg1, s32 arg2, s32 arg3);
 
 /* Literal "TEMP" (asm/data/7B12C.sdata.s) -- the throwaway suffix
@@ -139,7 +139,7 @@ s32 TaskObjF__OpenEvents(TaskObjF *self) {
     i = 0;
     cur = self;
     do {
-        cur->events[0] = OpenEvent(0xF4000001, D_80086E78[i], 0x2000, 0);
+        cur->events[0] = OpenEvent(0xF4000001, gCardEventSpecs[i], 0x2000, 0);
         i++;
         cur = (TaskObjF *)((u8 *)cur + 4);
     } while (i < 4);

@@ -76,3 +76,36 @@ selects `bu00:`/`bu10:`), opens it, reads an 0x80-byte header, computes a
 seek offset from the header's own byte 2, seeks, reads the caller's
 payload, closes. Mechanics and purpose both directly evident from the
 body.
+
+## Round 95 (track 7, charlie)
+
+### Naming and constants
+
+`hdr` -> `header`, now typed `McSaveHeader *` (the unit-local save-header
+struct), so `((u8 *)hdr)[2]` reads `header->iconDisplayFlag` (the PS-X save
+format's name for byte 2: 0x11..0x13 for one to three icon frames). `raw` ->
+`iconFlag`. `open(path, 1)` is Sony's `O_RDONLY` and `lseek(..., 0)`
+`SEEK_SET` (`<sys/file.h>`); the `0x80` alloc and read are
+`MEMCARD_SECTOR_SIZE`; `pathBuf[0x20]` is `[32]`.
+
+The seek position `(raw << 7) - 0x780` is `(flag - 0x10 + 1) * 128`: past the
+title sector and the icon frames. Written
+`(iconFlag << MEMCARD_SECTOR_SHIFT) - ((MEMCARD_ICON_FLAG_BASE - 1) << MEMCARD_SECTOR_SHIFT)`
+with a MATCHING line: the readable
+`(iconFlag - MEMCARD_ICON_FLAG_BASE + 1) * MEMCARD_SECTOR_SIZE` built
+54/56 (two words reordered), measured this round.
+
+### Moved from src/class_3bb8c_f.c
+
+The BIOS file-call declarations' comment, whose history is this:
+
+```c
+/* PSX BIOS file trampolines, linked from Sony's own objects since round 34
+ * (libapi/a50,a52,a51,a54,a69 -- one 0x10-byte object per stub). These used
+ * to live as `func_8005xxxx` prototypes in include/class_3bb8c.h; they are
+ * LOCAL here on purpose, because a shared header eleven units include is the
+ * wrong place for names this generic, and because class_3bb8c_e.c's view of
+ * `open` takes a `void *` where this unit's takes a `char *`. Two local
+ * views are legitimate; one shared declaration would not be.
+ * These are C89 identifiers under -fno-builtin, nothing else claims them. */
+```

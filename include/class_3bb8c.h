@@ -202,10 +202,10 @@ typedef struct DreamSaveBlock {
 /* Per TaskObjF::events slot: the event spec TaskObjF__OpenEvents passes to
  * OpenEvent, and the value WaitForReadyEvent returns for that slot.
  * Unsized: only the four slots are read. */
-extern s32 D_80086E78[];
+extern s32 gCardEventSpecs[];
 
 /* Loops until one of `count` events tests ready (TestEvent) and returns its
- * D_80086E78 entry. TaskObjF__WaitForReadyEvent passes TaskObjF::events. */
+ * gCardEventSpecs entry. TaskObjF__WaitForReadyEvent passes TaskObjF::events. */
 extern s32 WaitForReadyEvent(s32 *arr, s32 count);
 
 /* Returns a pointer, which TaskObjF__FreeUnusedBuffers stores back into the

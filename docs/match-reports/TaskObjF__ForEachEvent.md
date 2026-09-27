@@ -106,3 +106,23 @@ src/class_3bb8c_f.c only. An older comment called them "SPU routines"; they
 are kernel event-queue calls, only their neighbours in the block are libspu.
 WaitForReadyEvent's callback was `func_800390F4` until round 34 linked it as
 Sony's TestEvent, and TaskObjF's `field14` became `events` in round 60.
+
+## Round 95 (track 7, charlie)
+
+### Naming
+
+`flag` -> `critical` (it brackets the loop in Enter/ExitCriticalSection);
+`i < 4` -> `i < ARRAY_COUNT(self->events)`. Zero bytes.
+
+### Moved from src/class_3bb8c_f.c
+
+```c
+/* Psy-Q's kernel critical-section pair (libapi/a36, libapi/a37, linked from
+ * Sony's own SDK objects), called with no arguments around this unit's scan
+ * loop when its `flag` argument is set. These belong to another translation
+ * unit, so they are declared LOCAL here rather than in class_3bb8c.h, which
+ * twenty units include (CLAUDE.md's header-contention rule). Sony's
+ * EnterCriticalSection returns int; no call site here reads it, so the local
+ * view stays `void` -- per-call-site typing, the convention this block of
+ * units already uses. */
+```

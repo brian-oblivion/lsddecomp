@@ -113,3 +113,36 @@ game code, src/class_3bb8c_g.c, matched round 45 (60/60 words; was
 gp_rel-blocked, resolved round 42). `DeviceName866E8` is `McDevicePath`
 (round 94); its comment's pointer to "the same idiom documented for
 Descriptor10 above" was stale and is gone.
+
+## Round 95 (track 7, charlie)
+
+### Naming
+
+`selector` -> `cardSlot` (both callers pass `self->cardSlot`), `src` ->
+`device`. The `(char *)dest` casts stay: `McDevicePath` is an all-`s8`
+struct (include/class_3bb8c.h, alignment 1 for the whole-struct copy), so it
+has no `char` member to name. Zero bytes.
+
+### Moved from src/class_3bb8c_f.c
+
+The forward declaration's comment, replaced by one line:
+
+```c
+/* Forward declarations: these are defined later in this file (strict
+ * ROM-address order), but earlier functions call them. The class's own
+ * methods are prototyped in include/TaskObjF.h (track 4, round 89); these
+ * two are the unit's plain helpers.
+ *
+ * `BuildMemcardPath`'s entry here fixes a real Gate-0 warning (round 60):
+ * `TaskObjF__TryReadMemcardFile` (line ~52) calls it before its line-226 definition, and
+ * without a prototype in scope cc1 implicitly declares it as returning
+ * `int`, then complains at the real definition ("type mismatch with
+ * previous implicit declaration", "was previously implicitly declared to
+ * return `int'"). This is a same-file forward-declaration gap, not a
+ * cross-unit signature disagreement -- both the call site and the
+ * definition are in this .c, so the fix is simply adding the prototype
+ * here like its neighbours. Confirmed byte-identical after the fix
+ * (`TaskObjF__TryReadMemcardFile` is already MATCHED and stays MATCHED): a pointer
+ * return value lives in `$v0` either way, so the implicit-int reading
+ * never produced different code, only a diagnostic. */
+```

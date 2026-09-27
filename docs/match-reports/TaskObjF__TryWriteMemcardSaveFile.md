@@ -59,7 +59,7 @@ s32 TaskObjF__TryWriteMemcardSaveFile(TaskObjF *self, s32 a1, s32 handle, u8 a3,
     openMode = ((((u32)arg7 + 0x21FF) >> 13) << 16) | 0x200;
     fileHandle = open(path, openMode);
     if (fileHandle == -1) {
-        printf(D_80011530);
+        printf(sFileNotCreatedMsg);
         return 0;
     }
     close(fileHandle);
@@ -187,7 +187,7 @@ is ALREADY MATCHED -- no parameter type here was changed in a way that
 touches that caller's own compiled bytes, see the header-discipline note
 below). Reads as a **"WriteFile" memory-card/CD streaming write** (the
 error string this function logs on failure is literally `"File not create
-in WriteFile\n"`, confirmed in rodata at `D_80011530`):
+in WriteFile\n"`, confirmed in rodata at `sFileNotCreatedMsg`):
 
 1. Builds a device path via `BuildMemcardPath(pathBuf, self->cardSlot, (char
    *)a1)` (already-matched sibling; `a1` is really a `char *` suffix
@@ -298,7 +298,7 @@ the copy as a generic runtime-alignment-checked memcpy loop instead"*.
 Both idioms transferred to this function unchanged, on the first attempt,
 for all five copy regions.
 
-Also new: `extern const char D_80011530[];` (the rodata error string --
+Also new: `extern const char sFileNotCreatedMsg[];` (the rodata error string --
 referenced, not retyped, per this round's broadcast) and two
 project-external prototypes local to this call site's own shape (neither
 declared elsewhere in the project): `extern s32 func_80013488(s32 handle,
@@ -328,7 +328,7 @@ s32 TaskObjF__TryWriteMemcardSaveFile(TaskObjF *self, s32 a1, s32 handle, s32 a3
     fileHandle = open(path, openMode);
     flagCopy = a3;
     if (fileHandle == -1) {
-        printf(D_80011530);
+        printf(sFileNotCreatedMsg);
         return 0;
     }
     close(fileHandle);
@@ -530,3 +530,121 @@ a syntax error here).
 ## Track 4 (2026-09-26, round 89)
 
 Parameters retyped with TaskObjF's unification (include/TaskObjF.h), byte-identical: `a1` is `char *fileName` (TaskObjF::fileName; BuildMemcardPath's suffix), `handle` is `char *title` (TaskObjF::title; strcpy'd into the header), `arg5` is `struct TimImage *icon` (TaskObjF::iconImage, from TitleMenu's iconHandle; the icon source is its FileResource `buffer`, +0x010, so the local McIconSourceRef view is gone), `arg6` is `void *data` and `arg7` is `s32 size`. Only CopyMemcardIconTemplate's own `(s32, s32)` view still takes casts.
+
+## Round 95 (track 7, charlie)
+
+### Naming and constants
+
+`a3` -> `iconFrames`, `req` -> `header`, `src` -> `iconSrc`;
+`McSaveHeader::iconFrameFlag` -> `iconDisplayFlag` (the save format's name
+for byte 2). `D_80011530` -> `sFileNotCreatedMsg` (rename.py; the string
+"File not create in WriteFile\n", this function its only reader).
+
+Constants: `open(path, 2)` is `O_WRONLY`, the create mode's `0x200` is
+`O_CREAT` (`<sys/file.h>`), and its `<< 16` is `MEMCARD_OPEN_BLOCKS()`, the
+block count the BIOS open takes in the high half. `0x21FF`/`13` are
+`MEMCARD_SAVE_HEADER_SIZE + MEMCARD_BLOCK_SIZE - 1` and
+`MEMCARD_BLOCK_SHIFT` (the file's size in 8192-byte blocks, header
+included); `0x1FFF` the same without the header, for the header's own
+block-count byte; `0x7F`/`7` round the data up to 128-byte sectors;
+`0x10` is `MEMCARD_ICON_FLAG_BASE`; the `0x200` alloc is
+`sizeof(McSaveHeader)`. The header write's `(a3 << 7) + 0x80` keeps its
+shift form with a MATCHING line: `(iconFrames + 1) * MEMCARD_SECTOR_SIZE`
+built 238/240, measured this round. `strcpy` now has a local prototype
+(Sony's libc2), which removed this unit's "implicit declaration" warning
+from the typeviews baseline.
+
+`McSaveHeader::title` is `char title[92]` (was `[0x5C]`): offsets 0x04..0x5F,
+the format's 64-byte title and its reserved bytes, which this code treats
+as one field. `McIconSource` reads as a 4bpp TIM with one 16-colour CLUT:
+8-byte TIM header + 12-byte CLUT block header = the 0x14 pad, 32 bytes of
+CLUT to 0x34, a 12-byte pixel block header to 0x40, pixels after -- which
+is why the frames sit at 0x40/0xC0/0x140.
+
+### Moved from src/class_3bb8c_f.c
+
+The type block's naming note, the types' comments, and the comments on
+the function's local declarations, as they stood before track 7:
+
+```c
+/* TaskObjF__TryWriteMemcardSaveFile's own local types -- none shared
+ * elsewhere in this unit.
+ *
+ * NAMING (round 60): the submitted 0x200-byte buffer is structurally
+ * exact to the well-documented PS1 memory-card save FILE HEADER format
+ * -- 'S'/'C' magic, an icon-frame-count byte, a block-count byte, a
+ * 0x5C title field, a 16-colour icon palette (2 x 8-colour halves,
+ * matching this function's own back-to-back-pair copy shape), and up to
+ * three 0x80-byte (16x16 4bpp) icon animation frames, for exactly
+ * 4+0x5C+0x20+3*0x80 = 0x200 bytes. Named on that structural match, not
+ * on any string or symbol table -- Tier B. */
+
+/* Half of the 16-colour icon CLUT (8 x s16 = 0x10 bytes) -- all s16
+ * members (alignment 2, no s32) so a whole-struct copy compiles to the
+ * unaligned lwl/lwr + swl/swr idiom already documented (Descriptor10 in
+ * class_3bb8c.h, Block24 in class_3bb8c_r.c). Two of these sit back to
+ * back (0x14..0x33) in the source object and (0x60..0x7F) in the request
+ * buffer -- copied as an array of 2, not a loop (matches retail: fully
+ * unrolled, no branch, no runtime alignment check). */
+typedef struct IconPaletteHalf {
+    s16 color[8];
+} IconPaletteHalf;
+
+/* One 16x16 4bpp icon animation frame -- a raw, opaque 0x80-byte span
+ * (alignment 1, a plain byte array), so a whole-struct copy compiles to
+ * the RUNTIME-alignment-checked lw/sw-vs-lwl/lwr dual path retail shows
+ * for these three chunks (the same idiom src/class_3bb8c_r.c's Block24
+ * documents: "a byte array... compiles the copy as a generic
+ * runtime-alignment-checked memcpy loop instead"). Three of these are
+ * copied in sequence. */
+typedef struct IconFrame {
+    u8 raw[0x80];
+} IconFrame;
+
+/* The icon TimImage's file buffer (its FileResource `buffer`, +0x010) --
+ * only the two palette halves (+0x14/+0x24) and the three icon frames
+ * (+0x40/+0xC0/+0x140) are ever read by this function; nothing here
+ * establishes the leading 0x14 bytes or the 0xC-byte gap at +0x34 (a TIM's
+ * 8-byte header and 12-byte CLUT block header would put the CLUT at +0x14). */
+typedef struct McIconSource {
+    u8 pad0[0x14];
+    IconPaletteHalf palette[2]; /* +0x14 */
+    u8 pad34[0x40 - 0x34];
+    IconFrame frame0; /* +0x40 */
+    IconFrame frame1; /* +0xC0 */
+    IconFrame frame2; /* +0x140 */
+} McIconSource;
+
+/* The 0x200-byte memory-card save FILE HEADER this function builds and
+ * submits -- see the NAMING note above. magic0/magic1 are the literal
+ * bytes 'S'/'C'; iconDisplayFlag/blockCount are computed size/mode bytes;
+ * title is a strcpy target (source: this function's own `title`
+ * parameter, TaskObjF::title; typed `char *` in track 4, round 89, where it
+ * had been an `s32` named `handle`, byte-identical). */
+typedef struct McSaveHeader {
+    u8 magic0;
+    u8 magic1;
+    u8 iconDisplayFlag;
+    u8 blockCount;
+    char title[0x5C];
+    IconPaletteHalf palette[2];
+    IconFrame frame0;
+    IconFrame frame1;
+    IconFrame frame2;
+} McSaveHeader;
+```
+
+```c
+/* TaskObjF__TryWriteMemcardSaveFile -- MATCHED round 75 (see its report).
+ * `a3` is a `u8` parameter: the caller's promoted word lives in one
+ * register for the `sb` of a3+0x10 and GCC's QImode copy in another for
+ * the zero-extended `(a3 << 7)` size, which is retail's `move $s7,$s4`
+ * and its late `andi 0xFF`. */
+extern const char sFileNotCreatedMsg[]; /* rodata string "File not create in WriteFile\n" */
+extern s32 write(s32 handle, void *buf,
+                 s32 size); /* CD/streaming read-request submit; own local view, not yet declared elsewhere in this project */
+extern void printf(const char *fmt); /* own local view: this call site passes only the format string, no variadic args (code_8220.h's 3-arg view is a DIFFERENT call site's shape) */
+```
+
+The `write` comment ("CD/streaming read-request submit") was wrong: this is
+the BIOS `write`, B(0x35), linked from libapi/a53 (config/psyq-objects.txt).
