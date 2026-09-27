@@ -63,6 +63,7 @@
 #include "common.h"
 #include <libsnd.h>
 #include <libspu.h>
+#include "SsScore.h"
 #include "SvmData.h"
 
 /* libsnd's _svm_vh (pinned at this address): the header of the VAB bank
@@ -763,23 +764,9 @@ INCLUDE_ASM("asm/nonmatchings/code_179d8_m", SpuVmFlush);
  * renamed-to-SpuVmVSetUp call (was func_80032148) and D_8008EA0D, which
  * has no linker symbol of its own and is read through the already-linked
  * D_8008EA24 base pointer instead. */
-typedef struct {
-    u8 unk0; /* +0x0 */
-    u8 unk1; /* +0x1 */
-    u8 pad2[0x4 - 0x2];
-    u8 unk4; /* +0x4 */
-    u8 pad5[0x10 - 0x5];
-} SlotE968M;
-
-extern SlotE968M *D_8008E968;
-
-typedef struct {
-    u8 pad0[0x12];
-    u8 unk12; /* +0x12 */
-    u8 pad13[0xAC - 0x13];
-} Entry90902E8M;
-
-extern Entry90902E8M *_ss_score[];
+/* libsnd's _svm_pg (pinned at this address): the current VAB's program
+ * attributes. */
+extern ProgAtr *D_8008E968;
 
 extern u8 D_8008EA0C;
 extern u8 D_8008EA0E;
@@ -799,8 +786,8 @@ extern void SpuVmKeyOnNow(s32 a0, u16 a1);
 extern u8 SpuVmKeyOff(s16 a0, s16 a1, s16 a2, u16 a3);
 
 s32 SpuVmKeyOn(s32 a0, s16 a1, s16 a2, u16 a3, u16 a4, u16 a5) {
-    Entry90902E8M *s6;
-    SlotE968M *slot;
+    SsScore *s6;
+    ProgAtr *slot;
     s32 s3;
     s32 chan;
     u8 matchCount;
@@ -830,9 +817,9 @@ s32 SpuVmKeyOn(s32 a0, s16 a1, s16 a2, u16 a3, u16 a4, u16 a5) {
     D_8008EA0F = 0;
     D_8008EA10 = (u8)a4;
     D_8008EA11 = (u8)a5;
-    D_8008EA16 = slot->unk1;
-    D_8008EA17 = slot->unk4;
-    D_8008EA0C = slot->unk0;
+    D_8008EA16 = slot->mvol;
+    D_8008EA17 = slot->mpan;
+    D_8008EA0C = slot->tones;
 
     if ((u32)D_8008EA13 >= D_8008E970->ps) {
         return -1;
@@ -887,7 +874,7 @@ s32 SpuVmKeyOn(s32 a0, s16 a1, s16 a2, u16 a3, u16 a4, u16 a5) {
                     _svm_voice[D_8008EA26].unk12 = origA2;
 
                     if ((s16)a0 != 0x21) {
-                        s16 speed = *(s16 *)((u8 *)s6 + 0x4E + s6->unk12 * 2);
+                        s16 speed = s6->unk4E[s6->unk12];
 
                         _svm_voice[D_8008EA26].unk08 = s2 / speed;
                     }
