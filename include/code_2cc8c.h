@@ -170,7 +170,7 @@ extern s32 strlen(char *s); /* Psy-Q libc2/strlen, linked from Sony's
 
 /* New_BoxFill: include/BoxFill.h. */
 extern s32 sListViewSize[2];  /* address-taken only by this unit */
-extern char D_8008A8F0[4]; /* address-taken only by this unit */
+extern char sListViewColor[4]; /* address-taken only by this unit */
 
 /* New_FadeBox: include/FadeBox.h. */
 /* New_SceneNode: include/SceneNode.h (it was a local Unk18AcObj view). */
