@@ -71,7 +71,7 @@ void SceneNode__LocalOffsetToWorldPos(SceneNode *self, s32 *dst, s32 *src, s32 u
  * (the compiler sinks the constant store into the delay slot itself).
  * See docs/match-reports/SceneNode__GetRotationDegrees.md. */
 void SceneNode__GetRotationDegrees(SceneNode *self, Ratio16 *out) {
-    SceneNodeSub44 *src;
+    GsCOORD2PARAM *src;
 
     src = self->coord2->param;
     out[0].num = src->rotate.vx * 45 >> 9;

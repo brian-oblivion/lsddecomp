@@ -123,7 +123,7 @@ void SceneNode__Reset(SceneNode *self) {
 
 void SceneNode__UpdateRotation(SceneNode *self, s32 flag, void *data) {
     s32 vals[3];
-    SceneNodeSub44 *dst;
+    GsCOORD2PARAM *dst;
     s16 *field;
 
     vals[0] = RatioToFixed12(data);
@@ -153,20 +153,20 @@ void SceneNode__UpdateRotation(SceneNode *self, s32 flag, void *data) {
 
 void SceneNode__UpdateScale(SceneNode *self, s32 flag, void *data) {
     s32 r0, r1, r2;
-    SceneNodeSub44 *dst;
+    GsCOORD2PARAM *dst;
 
     r0 = RatioToFixed12(data);
     r1 = RatioToFixed12((u8 *)data + 4);
     r2 = RatioToFixed12((u8 *)data + 8);
     dst = self->coord2->param;
     if (flag) {
-        dst->scaleX = (s16)r0;
-        dst->scaleY = (s16)r1;
-        dst->scaleZ = (s16)r2;
+        dst->scale.vx = (s16)r0;
+        dst->scale.vy = (s16)r1;
+        dst->scale.vz = (s16)r2;
     } else {
-        dst->scaleX += (s16)r0;
-        dst->scaleY += (s16)r1;
-        dst->scaleZ += (s16)r2;
+        dst->scale.vx += (s16)r0;
+        dst->scale.vy += (s16)r1;
+        dst->scale.vz += (s16)r2;
     }
     self->coord2->flg = 0;
 }

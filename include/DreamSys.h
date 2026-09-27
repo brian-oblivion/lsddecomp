@@ -595,7 +595,7 @@ struct DreamSys {
 	   DreamSys__RestoreLinkSnapshot copies them back and then clears
 	   coord2->flg (round 2026-09-02; SceneNode's own types, track 4). */
     SceneNodeSub14 coord2Snapshot;
-    SceneNodeSub44 coord2ParamSnapshot;
+    GsCOORD2PARAM coord2ParamSnapshot;
     s32 staircaseActive;
     /* Compared with an UNSIGNED `< 1` (sltiu) by DreamSys__ApplyMoveCommand (round
 	   2026-09-06) -- typed `u32` rather than `s32` to reproduce that,

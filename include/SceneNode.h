@@ -50,7 +50,6 @@
 typedef struct SceneNode SceneNode;
 typedef struct SceneNodeMethods SceneNodeMethods;
 typedef struct SceneNodeSub14 SceneNodeSub14;
-typedef struct SceneNodeSub44 SceneNodeSub44;
 
 /* Three 32-bit components (Sony's "long vector" without VECTOR's pad word;
  * arrays of it have a 0xC stride): positions, offsets and translations. */
@@ -70,16 +69,6 @@ struct Ratio16 {
     s16 den;
 };
 
-/* GsCOORD2PARAM, 0x28 bytes: the ctor's second allocation. */
-struct SceneNodeSub44 {
-    s32 scaleX; /* +0x000, scale.vx */
-    s32 scaleY; /* +0x004, scale.vy */
-    s32 scaleZ; /* +0x008, scale.vz */
-    u8 padC[0x010 - 0x00C];
-    SVECTOR rotate;          /* +0x010, 4096 per turn */
-    u8 pad18[0x028 - 0x018]; /* +0x018, trans (VECTOR); no accessor */
-};
-
 /* GsCOORDINATE2, 0x50 bytes: the ctor's first allocation. */
 struct SceneNodeSub14 {
     s32 flg;                 /* +0x000, 0 = recompute the matrix */
@@ -89,7 +78,7 @@ struct SceneNodeSub14 {
     s32 tz;                  /* +0x020, coord.t[2] */
     u8 workm[0x038 - 0x024]; /* +0x024, workm.m: the world matrix transformAndNotifyParents applies */
     s32 unk38[3];            /* +0x038, workm.t: the world position */
-    SceneNodeSub44 *param;   /* +0x044 */
+    GsCOORD2PARAM *param;    /* +0x044 */
     SceneNodeSub14 *super;   /* +0x048, the parent's coordinate */
     SceneNodeSub14 *sub;     /* +0x04C; no accessor */
 };
