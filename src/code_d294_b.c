@@ -224,7 +224,7 @@ z_done:
     if (!self->methods->checkBoundsOverlap(self, &list, &diff)) {
         return;
     }
-    if (!self->methods->classifyAgainstPlanes(self, &other->hitMask, &diff, &list)) {
+    if (!self->methods->raycastHullAgainstFaces(self, &other->hitMask, &diff, &list)) {
         return;
     }
 
