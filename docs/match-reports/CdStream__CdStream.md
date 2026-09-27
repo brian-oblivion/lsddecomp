@@ -99,3 +99,16 @@ the same instructions.
 Class unified as `CdStream` (include/CdStream.h; table gCdStreamObjMethods -> gCdStreamMethods, type CdStreamObj -> CdStream, the Obj suffix dropped per FINISHING-PLAN track 4 step 2). The unit's local view is gone; slots +0x044 open, +0x050 startRead and +0x06C getNextFrame are typed from their occupants, and the object's +0x00C `seekLoc[0x18]` is the CdlFILE `file` (CdStreamFile) that CdSearchFile fills. Zero bytes changed.
 
 Renamed from CdStreamObj__CdStreamObj (tools/rename.py), the class rename. Parameters named (speed, fps, arg3): speed < 4 selects 300 sectors a second (double speed) and read mode 0x1C0 in StartRead; the second divides sectors a second into sectors a frame.
+
+## Naming (track 7, round 99)
+
+| old | new | tier | evidence |
+| --- | --- | --- | --- |
+| field `speed`, param `speed` | `cdSpeed` | B | MoviePlayer's ctor passes its own `cdSpeed`; below 4 the ctor counts 300 sectors a second (else 150) and startRead adds `CdlModeSpeed` to the read mode, so it selects the drive speed. The old name also matched readability.py's m2c pattern (`sp` + hex `eed`). |
+| field `unk3C`, param `arg3` | `reserved` | B | the ctor's third argument, stored at +0x03C and read by no code; MoviePlayer passes 0 |
+
+Constants (unit-local `#define`s, evidence on each definition):
+`CDSTREAM_DOUBLE_SPEED_BELOW` 4, `CD_SECTORS_PER_SECOND_2X` 300 and
+`_1X` 150 (the CD-ROM's sector rate at each speed), `CDSTREAM_FRAME_UNIT`
+2054 (kept named but unexplained: not the 2048-byte sector size). `state`
+is `enum CdStreamState` in include/CdStream.h.

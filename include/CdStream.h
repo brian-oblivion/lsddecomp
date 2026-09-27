@@ -17,7 +17,7 @@
  * seek (1) -> startRead (2) -> stop (4) -> restart (back to 0 and re-seek);
  * close tears it down from any state.
  *
- * `speed` < 4 means double speed: the ctor then counts 300 sectors a second
+ * `cdSpeed` < 4 means double speed: the ctor then counts 300 sectors a second
  * (else 150) and startRead reads in mode 0x1C0 (CdlModeStream | CdlModeSpeed
  * | CdlModeRT; else 0x140). `bytesPerFrame` is (sectors a second / fps / 2
  * * 2) * 2054, and open divides the file size by it into `totalFrames`.
@@ -34,6 +34,15 @@
 typedef struct CdStream CdStream;
 typedef struct CdStreamMethods CdStreamMethods;
 
+/* CdStream.state. Open seeks (SEEKING), startRead reads (READING), stop
+ * pauses the drive (STOPPED), restart goes back to IDLE and seeks again. */
+enum CdStreamState {
+    CDSTREAM_IDLE = 0,
+    CDSTREAM_SEEKING = 1,
+    CDSTREAM_READING = 2,
+    CDSTREAM_STOPPED = 4
+};
+
 /* Sony's CdlFILE (include/psyq/libcd.h, 24 bytes), which CdSearchFile fills.
  * Spelled here so this header does not bring in LIBCD.H's prototypes, which
  * the units declare locally. `pos` is the CdlLOC that seek and CdlSetloc take. */
@@ -44,8 +53,8 @@ typedef struct CdStreamFile {
 } CdStreamFile;
 
 struct CdStreamMethods {
-    /* ctor: New_CdStream passes (speed, fps, arg3); MoviePlayer (arg2, 15, 0). */
-    BASICCLASS_SLOTS(CdStream, (CdStream * self, u32 speed, s32 fps, s32 arg3));
+    /* ctor: New_CdStream passes (cdSpeed, fps, reserved); MoviePlayer (cdSpeed, 15, 0). */
+    BASICCLASS_SLOTS(CdStream, (CdStream * self, u32 cdSpeed, s32 fps, s32 reserved));
     /* +0x040 */ void (*setRing)(CdStream *self, u32 *ring,
                                  u32 size); /* CdStream__SetRing: StSetRing(ring, size / 2048) while idle */
     /* +0x044 */ s32 (*open)(CdStream *self, char *name,
@@ -76,11 +85,11 @@ struct CdStream {
     BASICCLASS_FIELDS(CdStreamMethods);
     /* +0x00C */ CdStreamFile file; /* CdSearchFile (open); file.pos goes to seek and CdlSetloc */
     /* +0x024 */ u8 cdResult[8];    /* CdSync result buffer (CdStream__Sync) */
-    /* +0x02C */ s32 state;         /* 0 idle, 1 seeking, 2 reading, 4 stopped */
+    /* +0x02C */ s32 state;         /* enum CdStreamState */
     /* +0x030 */ s32 muted;         /* mute / demute */
-    /* +0x034 */ s32 speed;         /* the ctor's; < 4 is double speed */
+    /* +0x034 */ s32 cdSpeed;       /* the ctor's; < 4 is double speed */
     /* +0x038 */ s32 bytesPerFrame; /* the ctor's, from speed and fps */
-    /* +0x03C */ s32 unk3C;         /* the ctor's arg3; nothing reads it */
+    /* +0x03C */ s32 reserved;      /* the ctor's third argument; nothing reads it */
     /* +0x040 */ s32 totalFrames; /* file.size / bytesPerFrame (open), or startRead's frameCount */
     /* +0x044 */ void *cbArg; /* the argument onFrameReady and onSeekDone are called with; never written */
     /* +0x048 */ void (*onFrameReady)(void *arg); /* called before a frame's sectors go back to the ring */
@@ -94,8 +103,8 @@ extern CdStreamMethods gCdStreamMethods;
 extern CdStreamMethods *Get_vtable_CdStream(void); /* returns &gCdStreamMethods */
 extern CdStream *gActiveCdStream;                  /* the stream that owns the drive, or NULL */
 
-CdStream *New_CdStream(s32 speed, s32 fps, s32 arg3);
-void CdStream__CdStream(CdStream *self, u32 speed, s32 fps, s32 arg3);
+CdStream *New_CdStream(s32 cdSpeed, s32 fps, s32 reserved);
+void CdStream__CdStream(CdStream *self, u32 cdSpeed, s32 fps, s32 reserved);
 void CdStream__Finalize(CdStream *self);
 void CdStream__SetRing(CdStream *self, u32 *ring, u32 size);
 s32 CdStream__Open(CdStream *self, char *name, s32 tries);
