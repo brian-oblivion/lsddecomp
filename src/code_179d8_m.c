@@ -269,7 +269,7 @@ extern s16 kMaxPrograms;
 
 extern volatile u16 D_8008EA26;
 extern u8 D_8008E9D0;
-extern s16 D_80090BD0;
+extern s16 _svm_vab_count;
 extern u8 _svm_vab_used[];
 extern u16 D_80090C60;
 extern u16 D_80090C64;
@@ -323,7 +323,7 @@ void SpuVmInit(s32 a0) {
         _svm_sreg_dirty[(u16)i] = 0;
     }
 
-    D_80090BD0 = 0;
+    _svm_vab_count = 0;
 
     for (i = 0; (u16)i < 0x10; i++) {
         _svm_vab_used[(u16)i] = 0;
