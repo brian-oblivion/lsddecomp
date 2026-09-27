@@ -25,6 +25,7 @@
 #include <libgpu.h>
 #include <libgs.h>
 #include "StageMap.h"
+#include "Actor.h"
 #include "VabStreamObj.h"
 #include "LightRig.h"
 #include "TimedTask.h"
@@ -43,7 +44,7 @@ void TimedTask__PlaySound(TimedTask *self, s32 tone) {
     VabStreamObj *sound = (VabStreamObj *)self->sound;
 
     if (sound != NULL) {
-        sound->methods->playTone(sound, tone, 0x7F, 0x7F);
+        sound->methods->playTone(sound, tone, 127, 127);
     }
 }
 
@@ -54,7 +55,7 @@ TimedTaskMethods *GetTimedTaskMethods(void) {
 StageMap *New_StageMap(LongVec3 *origin, s32 autoLoad) {
     StageMap *self;
 
-    self = BMemPMgrAlloc(0x1E8);
+    self = BMemPMgrAlloc(sizeof(StageMap));
     if (self != NULL) {
         GetStageMapMethods()->ctor(self, origin, autoLoad);
         return self;
@@ -87,10 +88,10 @@ void StageMap__StageMap(StageMap *self, LongVec3 *origin, s32 autoLoad) {
     self->chunksLoaded = 0;
     self->enabled = 0;
     self->target = NULL;
-    self->acceptedTags = 0;
+    self->acceptedTags = NULL;
     self->scaleRampTicks = 0;
 
-    for (i = 0; i < 7; i++) {
+    for (i = 0; i < ARRAY_COUNT(self->slots); i++) {
         slot = &self->slots[i];
 
         slot->loader = New_LbdFile();
@@ -107,34 +108,34 @@ void StageMap__StageMap(StageMap *self, LongVec3 *origin, s32 autoLoad) {
         slot->cellParent = New_GridCell();
         slot->cellParent->methods->attachToParent(slot->cellParent, (SceneNode *)self, &self->origin);
 
-        slot->cells = (GridCell **)BMemPMgrAlloc(0x668);
+        slot->cells = (GridCell **)BMemPMgrAlloc(STAGE_SLOT_CELLS * sizeof(GridCell *));
         if (slot->cells == NULL) {
             return;
         }
 
-        pos.x = 0x400;
+        pos.x = STAGE_CELL_SIZE / 2;
         pos.y = 0;
-        pos.z = 0x400;
+        pos.z = STAGE_CELL_SIZE / 2;
 
         cells = slot->cells;
-        end = cells + 410;
+        end = cells + STAGE_SLOT_CELLS;
         cursor = cells;
         while (cursor < end) {
             cell = New_GridCell();
             *cursor = cell;
             cell->methods->attachToParent(cell, (SceneNode *)slot->cellParent, &pos);
 
-            pos.x += 0x800;
-            if (pos.x > 0xA400) {
-                pos.x = 0x400;
-                pos.z += 0x800;
+            pos.x += STAGE_CELL_SIZE;
+            if (pos.x > STAGE_CHUNK_SIZE + STAGE_CELL_SIZE / 2) {
+                pos.x = STAGE_CELL_SIZE / 2;
+                pos.z += STAGE_CELL_SIZE;
             }
 
             cell = *cursor;
-            cell->methods->setLightMode(cell, 1);
+            cell->methods->setLightMode(cell, 1); /* GsFOG */
             cell = *cursor;
             cursor++;
-            cell->attribute |= 0x80000000;
+            cell->attribute |= GsDOFF;
         }
     }
 
@@ -152,9 +153,10 @@ void StageMap__Finalize(StageMap *self) {
 
     self->methods->removeChild(self, (BasicClass *)GetDrawSystem());
 
-    for (i = 0; i < 7; i++) {
+    for (i = 0; i < ARRAY_COUNT(self->slots); i++) {
         slot = &self->slots[i];
-        ((StageMapOnSlotEventFn)self->methods->notifyWithHull)(self, 6, slot, i);
+        ((StageMapOnSlotEventFn)self->methods->notifyWithHull)(self, STAGEMAP_EVENT_SLOT_RELEASE,
+                                                               slot, i);
 
         if (slot->loader != NULL) {
             slot->loader->methods->release(slot->loader);
@@ -172,7 +174,7 @@ void StageMap__Finalize(StageMap *self) {
         }
 
         cells = slot->cells;
-        end = cells + 410;
+        end = cells + STAGE_SLOT_CELLS;
         cursor = cells;
         while (cursor < end) {
             cell = *cursor;
@@ -204,7 +206,7 @@ extern s32 gDefaultGridSpan;
 
 void StageMap__Reset(StageMap *self) {
     self->config = NULL;
-    self->acceptedTags = 0;
+    self->acceptedTags = NULL;
     self->rectCount = 0;
     self->methods->setGridSpan(self, gDefaultGridSpan);
     self->unk1CC = -1;
@@ -216,18 +218,18 @@ void StageMap__Reset(StageMap *self) {
 void StageMap__OnSlotEvent(StageMap *self, s32 command, ChunkSlot *elem) {
     GetSceneNodeMethods()->notifyWithHull((SceneNode *)self, command);
 
-    if (command == 6)
-        goto handle6;
-    if (command == 7)
-        goto merge;
+    if (command == STAGEMAP_EVENT_SLOT_RELEASE)
+        goto release;
+    if (command == STAGEMAP_EVENT_SLOT_DATA_READY)
+        goto record;
     return;
 
-handle6:
+release:
     if (elem->heldObj != NULL) {
         elem->heldObj = elem->heldObj->methods->release(elem->heldObj);
     }
 
-merge:
+record:
     self->lastEventSlot = elem;
     self->methods->notifyParents(self, command);
 }
@@ -240,7 +242,7 @@ void StageMap__UpdateIfEnabled(StageMap *self) {
 }
 
 void StageMap__DispatchLinkCommand(StageMap *self, BasicClass *sender, s32 command) {
-    if ((u8)sender->methods->header == 0x34) {
+    if ((u8)sender->methods->header == ACTOR_CLASS_ID) {
         self->methods->forwardAcceptedCommand(self, sender, command);
     }
 }
@@ -254,7 +256,7 @@ void StageMap__UnloadAllSlots(StageMap *self) {
     ChunkSlot *slot;
     PlacementGrid *placements;
 
-    for (i = 0; i < 7; i++) {
+    for (i = 0; i < ARRAY_COUNT(self->slots); i++) {
         slot = &self->slots[i];
         slot->loader->methods->cancelRequests(slot->loader);
         slot->loadPending = 0;
@@ -264,7 +266,8 @@ void StageMap__UnloadAllSlots(StageMap *self) {
             placements->linkResource =
                 placements->linkResource->methods->release(placements->linkResource);
         }
-        ((StageMapOnSlotEventFn)self->methods->notifyWithHull)(self, 6, slot, i);
+        ((StageMapOnSlotEventFn)self->methods->notifyWithHull)(self, STAGEMAP_EVENT_SLOT_RELEASE,
+                                                               slot, i);
         slot->loader->methods->releaseDataBlock(slot->loader);
     }
 
@@ -280,9 +283,9 @@ void StageMap__SetChildParams(StageMap *self, s32 count, s32 dirs, s32 colors) {
     for (i = 0; i < count; i++) {
         light = (FlatLightObj *)self->methods->getLight(self, i);
         light->methods->setColor(light, 1, (FlatLightColor *)colors);
-        colors += 3;
+        colors += sizeof(FlatLightColor);
         light->methods->setDirection(light, 1, (s16 *)dirs);
-        dirs += 6;
+        dirs += 3 * sizeof(s16);
     }
 }
 
@@ -389,7 +392,7 @@ void StageMap__SetFootprintRect(StageMap *self, Descriptor10Ext *desc, s32 span)
     } else {
         col--;
     }
-    if (origCol == 0x13) {
+    if (origCol == STAGE_CHUNK_CELLS - 1) {
         width--;
     }
 
@@ -398,7 +401,7 @@ void StageMap__SetFootprintRect(StageMap *self, Descriptor10Ext *desc, s32 span)
     } else {
         row--;
     }
-    if (origRow == 0x13) {
+    if (origRow == STAGE_CHUNK_CELLS - 1) {
         span--;
     }
 
@@ -427,7 +430,7 @@ void StageMap__DispatchToRectCells(StageMap *self, SceneNode *sender, s32 comman
     for (i = 0; i < self->rectCount; rect++, i++) {
         slot = &self->slots[rect->slotIndex];
         if (slot->loader->headerReady != 0) {
-            cell = (slot->cells + rect->col) + rect->row * 20;
+            cell = (slot->cells + rect->col) + rect->row * STAGE_CHUNK_CELLS;
             for (row = 0; row < rect->height; row++) {
                 for (col = 0; col < rect->width; cell++, col++) {
                     *(u16 *)&self->curCell = *(u16 *)&self->targetCell;
@@ -438,7 +441,7 @@ void StageMap__DispatchToRectCells(StageMap *self, SceneNode *sender, s32 comman
                         NotifyGridCell(chained, sender, command);
                     }
                 }
-                cell += 20 - rect->width;
+                cell += STAGE_CHUNK_CELLS - rect->width;
             }
         }
     }
@@ -455,7 +458,7 @@ void StageMap__DispatchToRectCells(StageMap *self, SceneNode *sender, s32 comman
  * target, so the definition's own bytes are unaffected (reverified
  * 18/18 after the widening). */
 void NotifyGridCell(GridCell *cell, SceneNode *sender, s32 command) {
-    if (cell != NULL && (cell->flags36 & 0x80)) {
+    if (cell != NULL && (cell->flags36 & GRIDCELL_FLAG_TAKES_COMMANDS)) {
         cell->methods->onNotify(cell, sender, command);
     }
 }
@@ -468,8 +471,8 @@ void StageMap__NoOpSlotD8(void) {}
 
 void StageMap__SetGridSpan(StageMap *self, s32 span) {
     self->gridSpan = span;
-    self->gridCells = (s16)(span >> 11);
-    self->gridHalfCells = (s16)(span >> 12);
+    self->gridCells = (s16)(span >> STAGE_CELL_SHIFT);
+    self->gridHalfCells = (s16)(span >> (STAGE_CELL_SHIFT + 1));
 }
 
 void StageMap__SetConfig(StageMap *self, StageGridDimensions *config) {
