@@ -154,3 +154,19 @@ dispatched from `code_d294_c.c` (a different unit).
 `MulMatrix2` now comes from `<libgte.h>`, `MATRIX *MulMatrix2(MATRIX *m0,
 MATRIX *m1)`. The two 0x20-byte `u8` stack buffers became `MATRIX` locals,
 passed by address. Byte-identical: same frame, same offsets.
+
+## Round 100 (delta): track 7
+
+Parameters `arg1`/`arg2`/`arg3` -> `vec`/`dst`/`src` (SceneNode.h's names;
+ApplyMatrixToSVArray takes dst first). Locals `buf1`/`buf2`/`node` ->
+`rot`/`parentRot`/`parent`.
+
+### History: the comments in src/code_d294_b.c before this pass, verbatim
+
+```c
+/* Fills buf1 from self's own +0x84 slot, then folds in every node of the
+ * self->unkC list (each node's own +0x84 slot combined into buf1 via
+ * MulMatrix2) before using buf1 as ApplyMatrixToSVArray's own "out" argument,
+ * twice: once for (arg2, arg3, count), once more for (arg1, arg1, 1) when
+ * arg1 is non-NULL. */
+```

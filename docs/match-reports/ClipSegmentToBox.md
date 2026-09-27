@@ -593,3 +593,29 @@ Cohen-Sutherland-style line-segment-vs-AABB clip, using `CalcBoxOutcode`
 segment straddles the box. The algorithm shape is unambiguous from the
 body alone -- this is the textbook mechanism, not a guess about game
 purpose. Purely local to this unit + its header.
+
+## Round 100 (delta): track 7
+
+Locals `r1`/`r2` -> `code1`/`code2`. Returns 0..3 -> `enum ClipResult`
+(`CLIP_MISS`, `CLIP_INSIDE`, `CLIP_P1_INSIDE`, `CLIP_P2_INSIDE`, added to
+include/code_d294.h beside the prototype, whose comment already stated the
+four cases).
+
+### History: the comments in src/code_d294_b.c before this pass, verbatim
+
+```c
+/* Round 41: MATCHED, 118/118, byte-exact. Round 20 got the CFG (a
+ * tail-merge/shared-block dispatch, see the git history for the full
+ * derivation) and the register mapping exactly right, leaving one
+ * standalone residue: an extra `move v1,v0` before the SECOND recursive
+ * call's result test, where retail tests $v0 directly. Closed by a
+ * first-ever permuter search (`docs/match-reports/ClipSegmentToBox.md`,
+ * "Round 41"): the tautological trailing `if (mid.y) return 0; else
+ * return 0;` below is not meaningful control flow -- both arms return 0,
+ * exactly like the plain `return 0;` it replaces -- but it changes
+ * register pressure enough at the tail of the function that GCC 2.6.3
+ * drops the otherwise-unavoidable `move v1,v0` and tests $v0 directly,
+ * matching retail exactly. Kept because it is what's needed for
+ * byte-exactness, not because it means anything; see the report for the
+ * hand-lever history this replaced. */
+```

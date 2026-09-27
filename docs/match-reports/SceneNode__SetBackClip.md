@@ -61,3 +61,13 @@ too, out of this round's scope. Posted to the broadcast.
 ## Track 6 (round 91, echo): named `SceneNode__SetBackClip`, tier A
 
 `GetSetBitField(&self->attribute, 8, 1, on == 0) == 0`: `on` clears libgs.h's GsNBACKC ("no back clip"), the same inverted shape as SetDisplay/GsDOFF and SetLighting/GsLOFF. Was `GetSetUnk10Flag8`. Slot +0x080 kept as `getSetUnk10Flag8`: its callers are in class_3bb8c_o.c and class_3bb8c_s.c, outside this job; `setBackClip` proposed. The class was renamed Class6B5CC -> SceneNode in the same pass (include/SceneNode.h's banner has the evidence).
+
+## Round 100 (delta): track 7
+
+Parameter `a1` -> `on`. Shift 8 -> `ATTR_NBACKC_SHIFT` (GsNBACKC is 1 << 8).
+
+### History: the comments in src/code_d294_b.c before this pass, verbatim
+
+```c
+/* Same family as SceneNode__SetUseZ: double-inversion shape, shift 8 width 1. */
+```

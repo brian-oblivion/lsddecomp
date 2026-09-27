@@ -988,3 +988,32 @@ The local corner list AttachCornerList_d294b and `other->notifyVerts`'s GenericC
 ## Round 97 (alpha): Sony's GsCOORDINATE2
 
 SceneNodeSub14 is deleted: SceneNode.coord2 is Sony's GsCOORDINATE2 (flg; MATRIX coord, whose t is the offset from the parent; MATRIX workm, whose t is the world position; param, super, sub -- 0x50 bytes, offset for offset). Accessors here follow the compiler's list: tx/ty/tz -> coord.t[0]/[1]/[2], unk38 -> workm.t; a local that holds coord.t or workm.t is `long *` (MATRIX.t is long[3]; s32 is int); any cast to GsCOORDINATE2 * is gone. Byte-identical.
+
+## Round 100 (delta): track 7
+
+Locals: `posA`/`posB` -> `otherPos`/`selfPos`, `diffRaw` -> `offset`, `diff`
+-> `delta`, `abs` -> `mag`, `list` -> `hull`, `countList` -> `otherHull`.
+`u8 unused[0x20]` -> `MATRIX unused` (the same 32 bytes at the same place,
+byte-identical; the round-76 note above suggests it may have been an unused
+MATRIX, which is not established, and the MATCHING comment says only that
+it is never read). `0x4001` -> `ATTACH_AXIS_RANGE` 16384, the tests written
+`<= ATTACH_AXIS_RANGE` and `> ATTACH_AXIS_RANGE` (cc1 canonicalizes both to
+the same `slti 0x4001`). `* 8` -> `* HULL_BOX_CORNERS`. The slot it calls at
++0x0AC is `raycastHullAgainstFaces` (was `classifyAgainstPlanes`).
+
+### History: the comments in src/code_d294_b.c before this pass, verbatim
+
+```c
+/* The corner list this function builds and hands to +0xA8/+0xAC is one
+ * TmdHull local: the count header and the eight corners together. */
+
+/* Range-checks `other` against `self` (each axis of position difference
+ * must fit in +/-0x4000), then hands off to three vtable slots
+ * (+0xA4 = SceneNode__ComposeAndApplyRotation, +0xA8 = SceneNode__CheckBoundsOverlap, +0xAC = SceneNode__ClassifyAgainstPlanes)
+ * with the resulting Vec3S16 difference, before registering `other` into
+ * self->linkTarget and notifying it via its own +0x038 slot. */
+
+/* sp+0x30, never referenced; reserves retail's slot */
+```
+
+(The first block sat between DispatchLinkCommand and this function.)

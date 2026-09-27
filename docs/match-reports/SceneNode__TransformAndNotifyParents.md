@@ -77,3 +77,20 @@ established. Purely local to this unit + its header.
 ## Track 6 (round 91, echo)
 
 The argument type GenericCountList_d294 (`unk0`, `unk4`) is TmdModel.h's TmdHull (`count`, `v`): the buffer NotifyWithHull passes is TmdModel__GetHull's output. Byte-identical.
+
+## Round 100 (delta): track 7
+
+Parameters `a1`/`a2` -> `verts`/`event` (SceneNode.h's names). `* 8` ->
+`* HULL_BOX_CORNERS` (new in TmdModel.h: a TmdHull box's eight corners).
+`linkTarget = 0` -> `NULL`.
+
+### History: the comments in src/code_d294_b.c before this pass, verbatim
+
+```c
+/* Copies a1's own count*8 elements into self->unk14->unk24 (via
+ * ApplyMatrixToSVArray, both its src and dest args are &a1->unk4 -- computed once,
+ * copied, per the disassembly), zeroes unk28/unk2C, stashes a1 into unk30
+ * for the duration of a single self->methods->slot30(self, a2) dispatch
+ * (an inherited BasicClass slot, not this unit's own code), then clears
+ * unk30 again. */
+```

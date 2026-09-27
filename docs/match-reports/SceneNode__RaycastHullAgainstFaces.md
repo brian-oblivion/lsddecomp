@@ -566,3 +566,43 @@ NON_MATCHING body promoted, round 69
 ## Track 6 (round 91, echo)
 
 AttachCornerList_d294b is TmdModel.h's TmdHull and Vec3S16_d294 is TmdVec3. Byte-identical.
+
+## Round 100 (delta): track 7
+
+Renamed `SceneNode__ClassifyAgainstPlanes` -> `SceneNode__RaycastHullAgainstFaces`
+(tier B), slot +0x0AC `classifyAgainstPlanes` -> `raycastHullAgainstFaces`.
+Evidence, from the body: the "planes" it walks are TmdModel__GetBoundsBuffer's
+records, which are TmdBoxes (min and max corners), not planes; each is used
+only as a gate (ClipSegmentToBox), and the test that sets the bits is
+TmdModel__RaycastFaces, a segment cast against every face of the model. The
+segments are the hull's centre line (face centre to face centre) and, per
+box, the two edges joining corners 1 and 2 of its first face to the second.
+What the game uses a hit for is not established (tier B).
+
+Parameters: `outFlag` -> `hullHits` (bit k per hull box, or 1 for a
+centre-line hit), `diff` -> `hitPoint` (it is RaycastFaces's `hitOut`: the
+caller's delta is overwritten with the hit point), `list` -> `hull`; the
+prototype and slot follow. Locals: `mid` -> `center`, `p` -> `c`, `hi` ->
+`opposite`, `v` -> `corner`, `count1` -> `boundsCount`, `plane` -> `bounds`,
+`cnt2` -> `hullCount`, `m` -> `j`, `bigConst` -> `nearest`, `outWord` ->
+`height`. Constants: `0x7FFFFFFF` -> `DIST_NONE` (added to TmdModel.h,
+token-identical to TmdModel.c's own define, which cpp accepts; RaycastFaces
+sets `*best = DIST_NONE` itself, so the caller's store is redundant but
+retail's), `>= 0x201` -> `> HIT_HEIGHT_THRESHOLD` 512 (unit-local), the
+corner strides 4 -> `HULL_FACE_CORNERS` (TmdModel.h). The redundant
+`(TmdVec3 *)` casts on TmdVec3 pointers are gone. `u8 pad[0x18]` -> `[24]`.
+
+### History: the comments in src/code_d294_b.c before this pass, verbatim
+
+```c
+/* Tests the corner list against every model plane. Part 1 averages two
+ * diagonal corner pairs into mid[0]/mid[1] and tests that segment against
+ * each plane, setting bit i of self->hitMask on a hit; any hit returns at once.
+ * Otherwise every 8-corner box k in `list` has its two vertical edges
+ * (corner m against corner m+4, m = 1, 2) tested against every plane, and a
+ * hit sets plane bit i in self->hitMask and box bit k in *outFlag. `hit` is
+ * written only as 0, but retail still tests it. Round 76. Byte levers:
+ * the gHitHeightGate gate is two arms that each set the bit, so loop.c sees two
+ * equal constant-1 loads (savings 2) and hoists the 1 into $s1; Part 1 walks
+ * `p`, `v` and `hi` as pointers. */
+```

@@ -126,3 +126,30 @@ underlying notification is not established. Purely local to this unit
 ## Track 6 (round 91, echo): named `SceneNode__NotifyWithHull`, tier B
 
 For `2 <= event < 4`, when a model with bounds is linked, fills a TmdHull through getModelHull and hands it to transformAndNotifyParents with the event. Mechanics only: what events 2 and 3 mean is not established. Overridden by Actor__NotifyMove, DreamSys__NotifyLinkAttempt, StageMap__OnSlotEvent. Was `NotifyIfUnk20Active`. Slot +0x088 kept as `notifyIfUnk20Active` (callers in six units outside this job); `notifyWithHull` proposed. The class was renamed Class6B5CC -> SceneNode in the same pass (include/SceneNode.h's banner has the evidence).
+
+## Round 100 (delta): track 7
+
+Parameter `a1` -> `event`. The local `u8 buf[0x38]` is a `TmdHull hull`
+(0x34 bytes): the frame is unchanged, because 0x34 rounds up to the same
+0x58 frame; the inner comment below claimed 0x38 was needed for it, and the
+whole-image build shows it is not. The `(TmdHull *)` cast went with it.
+Events 2 and 3 stay literals: what they mean is not established (see the
+naming note above).
+
+### History: the comments in src/code_d294_b.c before this pass, verbatim
+
+```c
+/* a1 gates a small range (2 <= a1 < 4). When self->model is set and
+ * TmdModel__GetBoundsCount(self->model) reports true, fills a stack buffer through
+ * this class's own +0x8C slot (SceneNode__GetModelHull, already matched in this
+ * unit -- fills it via TmdModel__GetHull(self->model, dest)) then forwards
+ * that same buffer, retyped as a TmdHull, into +0x90
+ * (SceneNode__TransformAndNotifyParents, also already matched in this unit), with the original
+ * a1 passed through as SceneNode__TransformAndNotifyParents's own a2. */
+
+/* Sized to reproduce retail's own frame (0x58): SceneNode__GetModelHull's own
+     * target (TmdModel__GetHull, TmdModel) writes a TmdHull
+     * (include/TmdModel.h: a count word and eight 6-byte corners, 0x34
+     * bytes) into its `dest`, so the true destination struct is bigger than
+     * the 8 bytes a count and one corner would reserve. */
+```

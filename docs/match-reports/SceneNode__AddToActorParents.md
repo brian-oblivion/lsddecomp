@@ -672,3 +672,29 @@ symbol list cost nothing, re-deriving blind would have cost a full attempt
 cycle for a function whose inputs provably did not change.
 
 NON_MATCHING body promoted, round 69
+
+## Round 100 (delta): track 7
+
+Renamed `SceneNode__NotifyTaggedParents` -> `SceneNode__AddToActorParents`
+(tier B), slot +0x0B4 `notifyTaggedParents` -> `addToActorParents`. Evidence,
+from the body: it walks `node`'s parent refs and, for each whose class id's
+low byte is 0x34 (ACTOR_CLASS_ID, include/Actor.h: Actor and every class
+below it), calls that parent's addChild (+0x010) with self. It notifies
+nothing. Nothing calls the slot in C, so why a node joins another's Actor
+parents is not established (tier B).
+
+`*(u8 *)entry->methods == 0x34` -> `(u8)entry->methods->header ==
+ACTOR_CLASS_ID` (byte-identical: cc1 narrows the load to the same lbu), and
+`& 0xF) == 4` -> `& CLASS_ID_ROOT_MASK) == SCENENODE_CLASS_ID`. Local
+`entry` -> `parent`.
+
+### History: the comments in src/code_d294_b.c before this pass, verbatim
+
+```c
+/* Walks node's parent refs. For each run it finds the next entry whose class
+ * kind (low nibble of its method table's first word) is 4. If that entry's
+ * tag byte is also 0x34, it calls the entry's +0x010 slot with self. Round 76:
+ * the two nested do/while loops are real loops for loop.c, which hoists the
+ * literal 4 into $s1. The goto form of earlier rounds had no loop notes, so
+ * it needed a named `tag` and could not get retail's register order. */
+```

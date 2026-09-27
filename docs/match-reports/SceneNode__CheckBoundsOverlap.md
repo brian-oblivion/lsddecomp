@@ -875,3 +875,21 @@ struct CornerList_d294 {
     TmdVec3 hdr; /* +0x004, corner[0]; corner[1..] follow at +0x00A */
 };
 ```
+
+## Round 100 (delta): track 7
+
+Parameters `arg1`/`d` -> `corners`/`delta`. Locals: `list` -> `hull`, `v`/`end`
+-> `corner`/`cornerEnd`, `mm` -> `hullBox`, `b` -> `grow`, `p`/`end2`/`n` ->
+`bounds`/`boundsEnd`/`boundsCount`, `box` -> `modelBox`, `ret` -> `overlap`.
+`* 8` -> `* HULL_BOX_CORNERS`.
+
+### History: the comments in src/code_d294_b.c before this pass, verbatim
+
+```c
+/* Offsets arg1's corner list by `d` and grows a box `mm` over the moved
+ * corners, grows a second box `box` over the model's own bounds records
+ * (TmdModel__GetBoundsBuffer's array), and returns 1 if the two boxes overlap on all
+ * three axes. Each running min/max is a ternary stored back unconditionally
+ * (retail stores every field every iteration), and the source compares
+ * with `>` for a min so the slt operands load in retail's order. */
+```

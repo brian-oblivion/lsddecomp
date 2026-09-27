@@ -120,3 +120,24 @@ layout) and `a1` to `MATRIX *` (SceneNode.h prototypes the parameter as
 ## Round 97 (alpha): Sony's SVECTOR
 
 S16Quad_d294 is deleted: SceneNode.h now takes Sony's SVECTOR (four shorts vx, vy, vz, pad; 8 bytes, alignment 2 -- the same layout and the same alignment, so the whole-struct copy still compiles to lwl/lwr). `buf` and `src` are SVECTOR, the negate path writes vx/vy/vz, and the `(SVECTOR *)` cast is gone; the `(MATRIX *)a1` cast stays until the prototype types `out`. Byte-identical.
+
+## Round 100 (delta): track 7
+
+Parameters `a1`/`a2` -> `out`/`invert`, locals `buf`/`src` -> `angles`/`rotate`.
+`out` is now `MATRIX *` in the definition and in SceneNode.h's prototype (it
+was `s32`, with a cast at RotMatrix); the slot already typed it `void *`, and
+no caller names the function. Byte-identical.
+
+### History: the comments in src/code_d294_b.c before this pass, verbatim
+
+```c
+/* coord2->param is a 0x28-byte GsCOORD2PARAM whose +0x10 holds the SVECTOR
+ * rotation. a2 selects between negating vx/vy/vz into a local copy (pad left
+ * uninitialised, exactly as retail's own negate path never stores to it) or
+ * copying the vector verbatim, then forwards the result -- plus a1, passed
+ * straight through -- to the PsyQ helper RotMatrix. MATCHING: SVECTOR's
+ * all-short members give it alignment 2, which is what makes the
+ * whole-struct copy compile to lwl/lwr. */
+
+/* Cast: SceneNode.h types `out` as s32. */
+```

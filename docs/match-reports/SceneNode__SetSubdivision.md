@@ -45,3 +45,13 @@ real purpose not established. Purely local to this unit + its header.
 ## Track 6 (round 91, echo): named `SceneNode__SetSubdivision`, tier A
 
 `GetSetBitField(&self->attribute, 9, 3, value)`: bits 9-11 are libgs.h's GsDIV1..GsDIV5 (polygon subdivision). Was `GetSetUnk10Field9`. Slot +0x07C renamed `setSubdivision` (no accessor). The class was renamed Class6B5CC -> SceneNode in the same pass (include/SceneNode.h's banner has the evidence).
+
+## Round 100 (delta): track 7
+
+Parameter `a1` -> `value`. Shift 9 -> `ATTR_DIV_SHIFT` (GsDIV1..5 are 1..5 << 9).
+
+### History: the comments in src/code_d294_b.c before this pass, verbatim
+
+```c
+/* Same family as SceneNode__SetLightDim, shift 9 width 3. Raw pass-through. */
+```

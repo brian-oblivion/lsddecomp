@@ -57,3 +57,20 @@ and this unit's own `SceneNode__SetBackClip.md` report.
 ## Track 6 (round 91, echo): named `SceneNode__SetUseZ`, tier B
 
 `GetSetBitField(&self->attribute, 7, 1, on == 0) == 0`: `on` clears libgs.h's GsZIGNR ("Z ignore"), the SetLighting/GsLOFF shape. The bit is Sony's; what ignoring Z does to this game's draw order is not established, hence B. Was `GetSetUnk10Flag7`. Slot +0x078 renamed `setUseZ` (no accessor). The class was renamed Class6B5CC -> SceneNode in the same pass (include/SceneNode.h's banner has the evidence).
+
+## Round 100 (delta): track 7
+
+Parameter `a1` -> `on`. Shift 7 -> `ATTR_ZIGNR_SHIFT` (GsZIGNR is 1 << 7).
+The function writes `on == 0` into GsZIGNR and returns the old bit inverted,
+so `on` means Z-sorted.
+
+### History: the comments in src/code_d294_b.c before this pass, verbatim
+
+```c
+/* Sibling of SceneNode__SetDisplay (the ONLY one of the five already-matched
+ * self->unk10 bitfield accessors that both converts its input to a boolean
+ * (`a1 == 0`) AND inverts its own result (`== 0`)). This function does
+ * exactly that double-inversion, at shift 7 width 1, hence the same `s32`
+ * return type as SceneNode__SetDisplay rather than the plain `u32` of the other
+ * three siblings. */
+```
