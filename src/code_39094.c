@@ -221,14 +221,14 @@ Rec1C *GetStageRecords(s32 index) {
     return &((Rec1C *)GetRecordTable(NULL))[gStageFirstRecord[index]];
 }
 
-Rec1C *GetRecordGroupAlias(s32 index) {
+Rec1C *GetStageTextureRecords(s32 index) {
     return GetStageRecords(index);
 }
 
 Rec1C *PickDailyVariant(s32 index, s32 arg1, s32 day) {
     s32 n = ((day - 1) % 40) / 10 + 1;
     s32 r = SeedAndRandom(0, arg1) % n;
-    return &GetRecordGroupAlias(index)[r];
+    return &GetStageTextureRecords(index)[r];
 }
 
 Rec1C *GetVariantBlock(s32 index) {
