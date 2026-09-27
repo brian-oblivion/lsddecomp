@@ -1,139 +1,117 @@
 /*
- * code_179d8_s -- the CD-ROM read driver's per-object methods: slots +0x44..
- * +0x58 and +0x68 of gCdDriverMethods (`tools/classtable.py gCdDriverMethods`), the
- * class whose constructor is code_179d8_o and whose module-level half
- * (request queue, service pump, file table) is code_179d8_q/_r.
+ * CdDriver's request methods: open, close, seek, read and loadFile (slots
+ * +0x044..+0x058 of gCdDriverMethods, with the empty slot +0x050) and
+ * runRequestQueue (+0x068), which feeds the queued requests back to them.
+ * The class, its table and the queue's types are include/CdDriver.h's; the
+ * constructor is in code_179d8_o.c, the queue front end and the service tick
+ * in code_179d8_q.c, the state machines in code_179d8_r.c, the blocking file
+ * calls in code_179d8_h.c.
  *
- * Open/Close/Seek/Read/LoadFile share one shape. With the driver in plain
- * synchronous mode (gCdAsyncEnabled and D_8008A860 both 0) each forwards to
- * code_179d8_h.c's blocking OpenCdFile/CloseCdFile/GetCdFileSize/ReadCdFile
- * (LoadFile to the base class's FileResource__LoadFile). Otherwise a call
- * from outside the queue only enqueues a CD_OP_* request; when
- * RunRequestQueue (slot +0x68, ticked by ServiceCdDriver) dispatches that
- * request back through the same slot with inQueueDispatch set, the method
- * starts the operation: on code_179d8_r's state machine if async, or by a
- * CdControl/CdSync/CdRead spin if not. RunRequestQueue then reports the
- * finished request through `flags` (CD_FLAG_*) and frees its node. Slot
- * +0x50 (NoOpSlot50) is empty. RunRequestQueue's two switches own this
- * unit's only jump tables, jtbl_80010810/jtbl_80010828 (carved round 47).
+ * `self` is never a CdDriver of its own: SetActiveDataSource copies these
+ * slots into every FileResource client's table, so `self` is the TimImage,
+ * TodSet, ... that called its own `open`/`read`, and every field used here
+ * is FileResource's.
+ *
+ * Every method but runRequestQueue has one shape, chosen by the driver mode
+ * (SetCdDriverMode):
+ *   - gCdAsyncEnabled and gCdSyncQueueMode both 0: forward to the blocking
+ *     OpenCdFile / CloseCdFile / GetCdFileSize / ReadCdFile, or for loadFile
+ *     to FileResource__LoadFile, and return.
+ *   - otherwise, called from outside the queue (inQueueDispatch 0): append a
+ *     CD_OP_* request for `self` with EnqueueCdRequest.
+ *   - called back by runRequestQueue (inQueueDispatch 1), and the drive not
+ *     busy: StartCdOperation, then either hand the work to the state machine
+ *     through gCdSeekParam / gCdReadSectorCount / gCdReadBuffer and
+ *     gCdTickStep (async mode), or do it on the spot as a CdControl(CdlSetloc)
+ *     / CdSync / CdRead / CdReadSync spin and ResetCdStateMachine (queued
+ *     synchronous mode).
+ *
+ * runRequestQueue looks only at the head node: a node not yet started is
+ * dispatched to its owner's slot; a started one, once the drive is idle, is
+ * reported to its owner as CD_FLAG_* bits in `flags` (then setFlag) and
+ * freed, and the service stops when the queue empties.
  */
 #include "common.h"
+#include <libcd.h>
 #include "CdDriver.h"
 
-/* CdDriver, its table and its methods are include/CdDriver.h's (track 4,
- * round 88); the object's fields are all FileResource's, because the driver
- * runs on its clients' objects (CdDriver.h's banner). */
-
-/* Bits CdDriver__RunRequestQueue ORs into `flags` when a request completes.
- * Bit 0 (1) is left a literal: it is also FileResource__SetFlag's bit, and the
- * queue node field that sets it here (`unk4`) has no established meaning. */
-#define CD_FLAG_DONE 0x002         /* some request completed */
-#define CD_FLAG_NONE_PENDING 0x004 /* ... and pendingRequests reached 0 */
-#define CD_FLAG_OPEN_DONE 0x010
-#define CD_FLAG_CLOSE_DONE 0x020
-#define CD_FLAG_SEEK_DONE 0x040
-#define CD_FLAG_READ_DONE 0x080
-#define CD_FLAG_LOAD_FILE_DONE 0x200
-
-/* gCdState values StartCdOperation's second argument sets
- * (code_179d8_r.c): 1 issues a CdlSetloc seek, 7 issues a CdRead. */
-#define CD_STATE_IDLE 0
-#define CD_STATE_SETLOC 1
-#define CD_STATE_READ 7
-
-/* Psy-Q libcd values, spelled locally as code_179d8_q.c/_r.c do: CdlSetloc
- * (command 2), CdlModeSpeed (0x80, double speed) and CdSync's CdlDiskError
- * (5). */
-#define CD_CMD_SETLOC 2
-#define CD_MODE_DOUBLE_SPEED 0x80
-#define CD_SYNC_DISK_ERROR 5
+/* `pos` (self->pos, CdFileEntry::pos) is FileResource.h's CdLoc16, which is
+ * Sony's CdlLOC by layout; the casts to CdlLOC / u_char * below go away when
+ * that header can take <libcd.h> and use CdlLOC itself. */
 
 
 extern void CloseCdFile(CdDriver *self);
 extern void LockCd(void);
-/* StartCdOperation(op, state): op is the value GetCdOperation later reports
- * (0 Close, 1 Open, 2 Seek, 3 Read, 4 LoadFile, each used by exactly one
- * method below and left literal), state is the first CD_STATE_*. */
+/* op is a CD_OPERATION_* and state the first CD_STATE_* (CdDriver.h). */
 extern void StartCdOperation(s32 op, s32 state);
 extern void ResetCdStateMachine(void);
-extern void EnqueueCdRequest(CdDriver *arg0, s32 arg1, s32 arg2, s32 arg3, s32 arg4);
+extern void EnqueueCdRequest(CdDriver *owner, s32 fileIndex, s32 op, s32 param0, s32 param1);
 extern void UnlockCd(void);
 
-extern void *FindCdFileEntry(char *arg0);
-extern s32 FindCdFileIndex(char *arg0);
+extern void *FindCdFileEntry(char *name);
+extern s32 FindCdFileIndex(char *name);
 
-extern void OpenCdFile(CdDriver *self, char *suffix);
-extern char *BuildCdFilePath(char *dest, char *suffix);
-extern s32 CdSearchFile(void *statBuf, char *path);
-extern void CdControl(s32 arg0, void *buf, s32 arg2);
-extern s32 CdSync(s32 mode, void *result);
+extern void OpenCdFile(CdDriver *self, char *name);
+extern char *BuildCdFilePath(char *dest, char *name);
 
-/* CdSearchFile's output buffer (Sony's CdlFILE, 0x18 bytes); the same name
- * as code_179d8_q.c's own local view. Only the two fields copied out are
- * typed. */
-typedef struct CdFileInfo {
-    /* +0x00 */ CdLoc16 pos;
-    /* +0x04 */ u32 size;
-    u8 pad8[0x18 - 8];
-} CdFileInfo;
+void CdDriver__Open(CdDriver *self, char *name, s32 param0, s32 param1) {
+    char path[CD_PATH_SIZE];
+    CdlFILE statBuf;
+    CdFileEntry *entry;
+    s32 size; /* MATCHING: not shared with status: one local adds a move in the CdSync loop */
+    s32 status;
 
-void CdDriver__Open(CdDriver *self, char *name, s32 arg2, s32 arg3) {
-    char path[0x40];
-    CdFileInfo statBuf;
-    CdFileEntry *rec;
-    s32 size;
-    s32 v0;
-
-    if (gCdAsyncEnabled == 0 && D_8008A860 == 0) {
+    if (gCdAsyncEnabled == 0 && gCdSyncQueueMode == 0) {
         OpenCdFile(self, name);
         return;
     }
     LockCd();
     if (self->inQueueDispatch != 0) {
         if (gCdBusy == 0 && self->isOpen == 0) {
-            StartCdOperation(1, CD_STATE_SETLOC);
+            StartCdOperation(CD_OPERATION_OPEN, CD_STATE_SETLOC);
             if (gCdAsyncEnabled != 0) {
-                rec = FindCdFileEntry(name);
-                gCdSeekParam = rec;
-                if (rec == NULL) {
+                entry = FindCdFileEntry(name);
+                gCdSeekParam = entry;
+                if (entry == NULL) {
                     return;
                 }
-                self->pos = rec->pos;
-                size = ((CdFileEntry *)gCdSeekParam)->size;
+                self->pos = entry->pos;
+                /* MATCHING: re-read through gCdSeekParam, here, not entry->size later */
+                size = gCdSeekParam->size;
                 gCdTickStep = CD_TICK_STATE_MACHINE;
                 self->isOpen = 1;
                 self->size = size;
             } else {
                 BuildCdFilePath(path, name);
                 do {
-                } while (CdSearchFile(&statBuf, path) == 0);
-                self->pos = statBuf.pos;
+                } while (CdSearchFile(&statBuf, path) == NULL);
+                self->pos = *(CdLoc16 *)&statBuf.pos;
                 self->size = statBuf.size;
                 do {
-                    CdControl(CD_CMD_SETLOC, &self->pos, 0);
+                    CdControl(CdlSetloc, (u_char *)&self->pos, 0);
                     do {
-                        v0 = CdSync(0, 0);
-                    } while (v0 == 0);
-                } while (v0 == CD_SYNC_DISK_ERROR);
+                        status = CdSync(0, 0);
+                    } while (status == CdlNoIntr);
+                } while (status == CdlDiskError);
                 self->isOpen = 1;
                 ResetCdStateMachine();
             }
         }
     } else {
-        EnqueueCdRequest(self, FindCdFileIndex(name), CD_OP_OPEN, arg2, arg3);
+        EnqueueCdRequest(self, FindCdFileIndex(name), CD_OP_OPEN, param0, param1);
     }
     UnlockCd();
 }
 
 void CdDriver__Close(CdDriver *self) {
-    if (gCdAsyncEnabled == 0 && D_8008A860 == 0) {
+    if (gCdAsyncEnabled == 0 && gCdSyncQueueMode == 0) {
         CloseCdFile(self);
         return;
     }
     LockCd();
     if (self->inQueueDispatch != 0) {
         if (gCdBusy == 0) {
-            StartCdOperation(0, CD_STATE_IDLE);
+            StartCdOperation(CD_OPERATION_CLOSE, CD_STATE_IDLE);
             self->isOpen = 0;
             ResetCdStateMachine();
         }
@@ -143,51 +121,46 @@ void CdDriver__Close(CdDriver *self) {
     UnlockCd();
 }
 
-extern u8 gCdSeekLoc[8];
+extern CdlLOC gCdSeekLoc;
 
 extern s32 GetCdFileSize(CdDriver *self);
-extern s32 CdPosToInt(void *pos);
-extern void CdIntToPos(s32 i, void *pos);
-extern void CdControl(s32 arg0, void *buf, s32 arg2);
-extern s32 CdSync(s32 mode, void *result);
 
 s32 CdDriver__Seek(CdDriver *self, u32 offset, s32 mode) {
-    s32 v0;
+    s32 status;
     u32 sectors;
 
-    if (gCdAsyncEnabled == 0 && D_8008A860 == 0) {
+    if (gCdAsyncEnabled == 0 && gCdSyncQueueMode == 0) {
         return GetCdFileSize(self);
     }
     LockCd();
     if (self->inQueueDispatch != 0) {
         if (gCdBusy == 0 && self->isOpen != 0) {
-            StartCdOperation(2, CD_STATE_SETLOC);
-            sectors = offset >> 11;
-            if ((offset & 0x7FF) != 0) {
+            StartCdOperation(CD_OPERATION_SEEK, CD_STATE_SETLOC);
+            sectors = offset >> CD_SECTOR_SHIFT;
+            if ((offset & (CD_SECTOR_SIZE - 1)) != 0) {
                 sectors = sectors + 1;
             }
-            v0 = CdPosToInt(&self->pos);
-            CdIntToPos(v0 + sectors, gCdSeekLoc);
+            CdIntToPos(CdPosToInt((CdlLOC *)&self->pos) + sectors, &gCdSeekLoc);
             if (mode == 0) {
                 if (gCdAsyncEnabled != 0) {
-                    /* the state machine seeks to gCdSeekParam + 0x14 (a
-                     * CdFileEntry's pos), so point it 0x14 before the loc */
-                    gCdSeekParam = (CdFileEntry *)(gCdSeekLoc - 0x14);
+                    /* the state machine seeks to &gCdSeekParam->pos: aim it
+                     * at a pretend entry whose pos is gCdSeekLoc */
+                    gCdSeekParam = (CdFileEntry *)((u8 *)&gCdSeekLoc - offsetof(CdFileEntry, pos));
                     gCdTickStep = CD_TICK_STATE_MACHINE;
                 } else {
                     do {
-                        CdControl(CD_CMD_SETLOC, gCdSeekLoc, 0);
+                        CdControl(CdlSetloc, (u_char *)&gCdSeekLoc, 0);
                         do {
-                            v0 = CdSync(0, 0);
-                        } while (v0 == 0);
-                    } while (v0 == CD_SYNC_DISK_ERROR);
+                            status = CdSync(0, 0);
+                        } while (status == CdlNoIntr);
+                    } while (status == CdlDiskError);
                     ResetCdStateMachine();
                 }
             } else {
                 ResetCdStateMachine();
                 UnlockCd();
-                if ((self->size & 0x7FF) != 0) {
-                    return ((self->size >> 11) + 1) << 11;
+                if ((self->size & (CD_SECTOR_SIZE - 1)) != 0) {
+                    return ((self->size >> CD_SECTOR_SHIFT) + 1) << CD_SECTOR_SHIFT;
                 }
                 return self->size;
             }
@@ -201,33 +174,31 @@ s32 CdDriver__Seek(CdDriver *self, u32 offset, s32 mode) {
 
 void CdDriver__NoOpSlot50(void) {}
 
-extern void ReadCdFile(CdDriver *self, void *arg1, s32 arg2);
-extern s32 CdRead(s32 sectors, void *buf, s32 mode);
-extern s32 CdReadSync(s32 mode, s32 result);
-extern void ResetCdStateMachine(void);
+extern s32 ReadCdFile(CdDriver *self, void *buf, s32 size);
 
 s32 CdDriver__Read(CdDriver *self, void *buf, u32 size) {
-    s32 v1;
+    s32 status;
 
-    if (gCdAsyncEnabled == 0 && D_8008A860 == 0) {
+    if (gCdAsyncEnabled == 0 && gCdSyncQueueMode == 0) {
         ReadCdFile(self, buf, size);
         return 0;
     }
     LockCd();
     if (self->inQueueDispatch != 0) {
         if (gCdBusy == 0 && self->isOpen != 0) {
-            StartCdOperation(3, CD_STATE_READ);
+            StartCdOperation(CD_OPERATION_READ, CD_STATE_READ);
             if (gCdAsyncEnabled != 0) {
-                gCdReadSectorCount = size >> 11;
+                gCdReadSectorCount = size >> CD_SECTOR_SHIFT;
                 gCdReadBuffer = buf;
                 gCdTickStep = CD_TICK_STATE_MACHINE;
             } else {
+            /* MATCHING: a goto, not do-while: a do-while hoists the -1 into a saved register */
             retry:
-                CdRead(size >> 11, buf, CD_MODE_DOUBLE_SPEED);
+                CdRead(size >> CD_SECTOR_SHIFT, buf, CdlModeSpeed);
                 do {
-                    v1 = CdReadSync(0, 0);
-                } while (v1 > 0);
-                if (v1 == -1) {
+                    status = CdReadSync(0, 0);
+                } while (status > 0);
+                if (status == -1) {
                     goto retry;
                 }
                 ResetCdStateMachine();
@@ -240,24 +211,22 @@ s32 CdDriver__Read(CdDriver *self, void *buf, u32 size) {
     return 0;
 }
 
-/* FileResource__LoadFile (include/FileResource.h) takes (self, name) and reads
- * both, but CdDriver__LoadFile passes NEITHER -- retail's jal at 0x80027834
- * has a bare nop delay slot and leaves its own incoming $a0/$a1 in place.
- * The call goes through this typedef (a cast of a function address, no
- * code); it was a conflicting local `extern void FileResource__LoadFile(void)`
- * until round 88. */
+/* FileResource__LoadFile takes (self, name), and loadFile's direct path
+ * hands it this method's own self and name by leaving them where they
+ * arrived. MATCHING: called through a no-argument type, so no argument is
+ * reloaded before the jal. */
 typedef void (*LoadFileNoArgsFn)(void);
 
 extern void *BMemPMgrAlloc(s32 size);
 
 void CdDriver__LoadFile(CdDriver *self, char *name) {
-    CdFileEntry *rec;
+    CdFileEntry *entry;
     s32 sectorCount;
     s32 readSize;
-    void *ret;
-    s32 v1;
+    void *buffer;
+    s32 status;
 
-    if (gCdAsyncEnabled == 0 && D_8008A860 == 0) {
+    if (gCdAsyncEnabled == 0 && gCdSyncQueueMode == 0) {
         ((LoadFileNoArgsFn)FileResource__LoadFile)();
         self->flags |= CD_FLAG_LOAD_FILE_DONE;
         self->methods->setFlag(self);
@@ -266,53 +235,53 @@ void CdDriver__LoadFile(CdDriver *self, char *name) {
     LockCd();
     if (self->inQueueDispatch != 0) {
         if (gCdBusy == 0 && (self->buffer == NULL || self->freeGuard != 0)) {
-            StartCdOperation(4, CD_STATE_SETLOC);
+            StartCdOperation(CD_OPERATION_LOAD_FILE, CD_STATE_SETLOC);
             gCdSavedSeekParam = gCdSeekParam;
-            rec = FindCdFileEntry(name);
-            gCdSeekParam = rec;
-            if (rec == NULL) {
+            entry = FindCdFileEntry(name);
+            gCdSeekParam = entry;
+            if (entry == NULL) {
                 return;
             }
-            {
-                sectorCount = rec->size >> 11;
-                gCdReadSectorCount = sectorCount;
-                if ((rec->size & 0x7FF) != 0) {
-                    gCdReadSectorCount = sectorCount + 1;
+            /* MATCHING: entry->size spelled at both uses; one local merges the two loads */
+            sectorCount = entry->size >> CD_SECTOR_SHIFT;
+            gCdReadSectorCount = sectorCount;
+            if ((entry->size & (CD_SECTOR_SIZE - 1)) != 0) {
+                gCdReadSectorCount = sectorCount + 1;
+            }
+            readSize = gCdReadSectorCount << CD_SECTOR_SHIFT;
+            if (self->buffer == NULL) {
+                buffer = BMemPMgrAlloc(readSize);
+                if (buffer == NULL) {
+                    self->methods->close(self);
+                    return;
                 }
-                readSize = gCdReadSectorCount << 11;
-                if (self->buffer == NULL) {
-                    ret = BMemPMgrAlloc(readSize);
-                    if (ret == NULL) {
-                        self->methods->close(self);
-                        return;
-                    }
-                    gCdReadBuffer = ret;
-                    self->buffer = ret;
-                } else {
-                    gCdReadBuffer = self->buffer;
-                }
-                if (gCdAsyncEnabled != 0) {
-                    self->bufferSize = readSize;
-                    gCdTickStep = CD_TICK_LOAD_FILE;
-                } else {
-                retry:
+                gCdReadBuffer = buffer;
+                self->buffer = buffer;
+            } else {
+                gCdReadBuffer = self->buffer;
+            }
+            if (gCdAsyncEnabled != 0) {
+                self->bufferSize = readSize;
+                gCdTickStep = CD_TICK_LOAD_FILE;
+            } else {
+            /* MATCHING: a goto, not do-while, as in CdDriver__Read */
+            retry:
+                do {
+                    CdControl(CdlSetloc, (u_char *)&gCdSeekParam->pos, 0);
                     do {
-                        CdControl(CD_CMD_SETLOC, (u8 *)gCdSeekParam + 0x14, 0);
-                        do {
-                            v1 = CdSync(0, 0);
-                        } while (v1 == 0);
-                    } while (v1 == CD_SYNC_DISK_ERROR);
-                    CdRead(gCdReadSectorCount, self->buffer, CD_MODE_DOUBLE_SPEED);
-                    do {
-                        v1 = CdReadSync(0, 0);
-                    } while (v1 > 0);
-                    if (v1 == -1) {
-                        goto retry;
-                    }
-                    self->bufferSize = readSize;
-                    gCdRequestQueue->active = 1;
-                    ResetCdStateMachine();
+                        status = CdSync(0, 0);
+                    } while (status == CdlNoIntr);
+                } while (status == CdlDiskError);
+                CdRead(gCdReadSectorCount, self->buffer, CdlModeSpeed);
+                do {
+                    status = CdReadSync(0, 0);
+                } while (status > 0);
+                if (status == -1) {
+                    goto retry;
                 }
+                self->bufferSize = readSize;
+                gCdRequestQueue->active = 1;
+                ResetCdStateMachine();
             }
         }
     } else {
@@ -322,6 +291,8 @@ void CdDriver__LoadFile(CdDriver *self, char *name) {
 }
 
 extern void FreeCdRequestNode(CdRequestNode *node);
+/* An entry's name is its first member, so the entry is also the name that
+ * open and loadFile take. */
 extern void *GetCdFileEntry(s32 index);
 
 void CdDriver__RunRequestQueue(void) {
@@ -359,6 +330,7 @@ void CdDriver__RunRequestQueue(void) {
                 self->flags |= 1;
             }
             self->pendingRequests -= 1;
+            /* MATCHING: the two volatile re-reads; plain |= is 3 words short */
             self->flags = *(volatile s32 *)&self->flags | CD_FLAG_DONE;
             if (self->pendingRequests == 0) {
                 self->flags = *(volatile s32 *)&self->flags | CD_FLAG_NONE_PENDING;

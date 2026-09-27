@@ -21,7 +21,7 @@ extern void ResetCdStateMachine(void);
 s32 CdDriver__Read(Obj80027480 *self, void *buf, u32 size) {
     s32 v1;
 
-    if (gCdAsyncEnabled == 0 && D_8008A860 == 0) {
+    if (gCdAsyncEnabled == 0 && gCdSyncQueueMode == 0) {
         ReadCdFile(self, buf, size);
         return 0;
     }
@@ -53,7 +53,7 @@ s32 CdDriver__Read(Obj80027480 *self, void *buf, u32 size) {
 }
 ```
 
-(`Obj80027480`, `gCdAsyncEnabled`, `D_8008A860`, `gCdBusy`, `LockCd`,
+(`Obj80027480`, `gCdAsyncEnabled`, `gCdSyncQueueMode`, `gCdBusy`, `LockCd`,
 `StartCdOperation`, `EnqueueCdRequest`, `UnlockCd` are all declared earlier in
 the unit, ahead of `CdDriver__Close`.)
 

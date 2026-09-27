@@ -67,16 +67,16 @@ CdDriver *New_CdDriver(void);
 void CdDriver__CdDriver(CdDriver *self); /* +0x008 ctor */
 void CdDriver__Finalize(CdDriver *self); /* +0x00C finalize: cancelRequests, freeBuffer */
 void CdDriver__NoOpSlot40(void);         /* +0x040 slot40 */
-void CdDriver__Open(CdDriver *self, char *name, s32 arg2, s32 arg3); /* +0x044 open */
-void CdDriver__Close(CdDriver *self);                                /* +0x048 close */
-s32 CdDriver__Seek(CdDriver *self, u32 offset, s32 mode);            /* +0x04C seek */
-void CdDriver__NoOpSlot50(void);                                     /* +0x050 slot50 */
-s32 CdDriver__Read(CdDriver *self, void *buf, u32 size);             /* +0x054 read: returns 0 */
-void CdDriver__LoadFile(CdDriver *self, char *name);                 /* +0x058 loadFile */
-void CdDriver__RunRequestQueue(void);                                /* +0x068 runRequestQueue */
-void CdDriver__RequestLoadFile(CdDriver *self, char *name);          /* +0x06C requestLoadFile */
-void CdDriver__StopService(void);                                    /* +0x070 stopService */
-void CdDriver__CancelRequests(CdDriver *self);                       /* +0x074 cancelRequests */
+void CdDriver__Open(CdDriver *self, char *name, s32 param0, s32 param1); /* +0x044 open */
+void CdDriver__Close(CdDriver *self);                                    /* +0x048 close */
+s32 CdDriver__Seek(CdDriver *self, u32 offset, s32 mode);                /* +0x04C seek */
+void CdDriver__NoOpSlot50(void);                                         /* +0x050 slot50 */
+s32 CdDriver__Read(CdDriver *self, void *buf, u32 size);    /* +0x054 read: returns 0 */
+void CdDriver__LoadFile(CdDriver *self, char *name);        /* +0x058 loadFile */
+void CdDriver__RunRequestQueue(void);                       /* +0x068 runRequestQueue */
+void CdDriver__RequestLoadFile(CdDriver *self, char *name); /* +0x06C requestLoadFile */
+void CdDriver__StopService(void);                           /* +0x070 stopService */
+void CdDriver__CancelRequests(CdDriver *self);              /* +0x074 cancelRequests */
 
 /* One record of the file table: a name resolved once by ResolveFileEntries
  * (CdSearchFile on BuildCdFilePath(name)) and then reused as a seek target.
@@ -117,6 +117,38 @@ typedef struct CdRequestNode {
 #define CD_TICK_STATE_MACHINE 1 /* TickCdStateMachine */
 #define CD_TICK_LOAD_FILE 2     /* TickCdLoadFileStateMachine */
 
+/* gCdOperation: which method's request the state machine is running,
+ * StartCdOperation's first argument and GetCdOperation's (and so
+ * GetActiveDataSourceOperation's) result. Each value is passed by exactly one
+ * of code_179d8_s.c's methods. 0 is also what ResetCdStateMachine leaves
+ * when nothing runs: Close resets straight after starting. */
+#define CD_OPERATION_CLOSE 0
+#define CD_OPERATION_OPEN 1
+#define CD_OPERATION_SEEK 2
+#define CD_OPERATION_READ 3
+#define CD_OPERATION_LOAD_FILE 4
+
+/* gCdState: the state machines' phase, StartCdOperation's second argument
+ * (code_179d8_r.c's banner; that unit still spells them as literals). */
+#define CD_STATE_IDLE 0        /* ResetCdStateMachine's value */
+#define CD_STATE_SETLOC 1      /* issue CdControl(CdlSetloc) */
+#define CD_STATE_SETLOC_WAIT 2 /* poll CdSync for it */
+#define CD_STATE_READ 7        /* issue CdRead */
+#define CD_STATE_READ_WAIT 8   /* poll CdReadSync */
+
+/* Bits CdDriver__RunRequestQueue ORs into a client's FileResource::flags
+ * when one of its requests completes; the clients poll them
+ * (GraphicsResources.c and code_179d8_e.c define the two they read the same
+ * way). Bit 0 (1) is left a literal: it is also FileResource__SetFlag's bit,
+ * and the queue node field that sets it (`unk4`) has no established meaning. */
+#define CD_FLAG_DONE 0x002         /* some request completed */
+#define CD_FLAG_NONE_PENDING 0x004 /* ... and pendingRequests reached 0 */
+#define CD_FLAG_OPEN_DONE 0x010
+#define CD_FLAG_CLOSE_DONE 0x020
+#define CD_FLAG_SEEK_DONE 0x040
+#define CD_FLAG_READ_DONE 0x080
+#define CD_FLAG_LOAD_FILE_DONE 0x200
+
 /* A CD-ROM data sector's user data (2048 bytes; <libcd.h>'s CdlModeSize0/1
  * clear). CdRead counts sectors, so byte sizes and offsets are shifted by
  * CD_SECTOR_SHIFT (ReadCdFile, CdDriver__Seek), and GetCdFileSize reports a
@@ -137,8 +169,8 @@ typedef struct CdRequestNode {
  * ones their accessors need. A global only one unit touches stays a local
  * extern in that unit (track 4b, round 85). */
 extern s32 gCdAsyncEnabled;
-extern s32 D_8008A860;
-extern s32 gCdBusy;                    /* 0/1 */
+extern s32 gCdSyncQueueMode; /* nonzero with gCdAsyncEnabled 0: requests queue, then run blocking */
+extern s32 gCdBusy;          /* 0/1 */
 extern CdFileEntry *gFileTable;        /* SetFileTable */
 extern s32 gFileTableCount;            /* SetFileTableCount */
 extern s32 gCdIdle;                    /* 0/1 */

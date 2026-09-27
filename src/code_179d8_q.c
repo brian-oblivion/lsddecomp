@@ -145,15 +145,15 @@ s32 GetCdState(void) {
     return gCdState;
 }
 
-/* D_8008A860 keeps its placeholder name: it is written only by
+/* gCdSyncQueueMode keeps its placeholder name: it is written only by
  * SetCdDriverMode's second argument and read back only here and in
- * code_179d8_s, where every read is `gCdAsyncEnabled == 0 && D_8008A860 == 0`
+ * code_179d8_s, where every read is `gCdAsyncEnabled == 0 && gCdSyncQueueMode == 0`
  * -- i.e. "neither mode is on, take the plain synchronous path". Nothing
  * establishes what the second mode IS, so nothing here names it. */
 
 s32 GetCdDriverMode(s32 *outMode2) {
     if (outMode2 != NULL) {
-        *outMode2 = D_8008A860;
+        *outMode2 = gCdSyncQueueMode;
     }
     return gCdAsyncEnabled;
 }
@@ -180,7 +180,7 @@ s32 SetCdDriverMode(s32 async, s32 mode2, s32 useVSyncCallback) {
 
         gCdUseVSyncCallback = useVSyncCallback;
         gCdAsyncEnabled = async;
-        D_8008A860 = mode2;
+        gCdSyncQueueMode = mode2;
 
         return 1;
     }

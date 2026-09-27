@@ -6,7 +6,7 @@
 
 108/108 words, byte-exact, file 0x17AD0-0x17C80. Cold ground. First function
 in ROM order in this unit, so the shared `Obj80027480` local struct and
-`gCdAsyncEnabled`/`D_8008A860`/`gCdBusy`/`LockCd`/`StartCdOperation`/
+`gCdAsyncEnabled`/`gCdSyncQueueMode`/`gCdBusy`/`LockCd`/`StartCdOperation`/
 `ResetCdStateMachine`/`EnqueueCdRequest`/`UnlockCd` externs were moved ahead of
 it (they were previously declared between it and `CdDriver__Close`).
 
@@ -51,7 +51,7 @@ void CdDriver__Open(Obj80027480 *self, char *suffix, s32 arg2, s32 arg3) {
     s32 temp;
     s32 v0;
 
-    if (gCdAsyncEnabled == 0 && D_8008A860 == 0) {
+    if (gCdAsyncEnabled == 0 && gCdSyncQueueMode == 0) {
         OpenCdFile(self, suffix);
         return;
     }
@@ -248,9 +248,40 @@ uninitialised pointer).
 
 Globals: `D_8006D574` -> `gCdSeekLoc` (A: 8 bytes of .data written only by
 `CdDriver__Seek`'s `CdIntToPos` and used as its CdlSetloc target).
-`D_8008A860` keeps its placeholder for code_179d8_q's stated reason: every
-read here is the `gCdAsyncEnabled == 0 && D_8008A860 == 0` sync-mode test and
+`gCdSyncQueueMode` keeps its placeholder for code_179d8_q's stated reason: every
+read here is the `gCdAsyncEnabled == 0 && gCdSyncQueueMode == 0` sync-mode test and
 nothing names the second mode.
 
 
 Track 4, 2026-09-26 (round 88). The class of gCdDriverMethods (was D_8006D4E8, id 0x13 = DATASOURCE_CD) is CdDriver, in include/CdDriver.h: its ctor calls InitCdDrive, its slots enqueue CD_OP_* requests and drive the CD read state machine, and it is VabDriver's sibling. The object views this function was typed against are replaced by CdDriver, whose fields are all FileResource's (the driver runs on its clients' objects; FileResource's +0x018/+0x01C were named pos/size for it). Byte-identical. `Class6D4E8__Open` -> `CdDriver__Open` by rename.py.
+
+### Round 100 (charlie, track 7): `D_8008A860` -> `gCdSyncQueueMode`, tier B
+
+The paragraph above predates this rename (the tool rewrote the name in it).
+What the five methods' bodies show, read together: the mode word only ever
+matters when `gCdAsyncEnabled` is 0. Both 0: each method forwards straight
+to code_179d8_h's blocking call and never touches the queue. `gCdAsyncEnabled`
+0 and this word nonzero: the call is enqueued like an async one, and when
+`CdDriver__RunRequestQueue` dispatches it back the method runs it as a
+blocking CdControl/CdSync/CdRead spin on the spot. So the word selects
+"synchronous, but through the request queue". Its one nonzero writer is
+`SetCdDriverMode(async, 1, 1)` reached from class_39e08 through
+`SetActiveDataSourceDriverMode(syncDriver == 0, 1, 1)`; every other caller
+passes 0. Tier B: the mechanics are the bodies', why the game wants the
+queued blocking mode is not established.
+
+### History (moved from code_179d8_s.c, round 100)
+
+Until round 100 the unit spelled Sony's libcd itself: its own prototypes for
+CdControl, CdIntToPos, CdPosToInt, CdRead, CdReadSync, CdSearchFile and
+CdSync, a local `CdFileInfo` view of CdlFILE (only `pos`/`size` typed), and
+`CD_CMD_SETLOC 2`, `CD_MODE_DOUBLE_SPEED 0x80`, `CD_SYNC_DISK_ERROR 5` for
+CdlSetloc, CdlModeSpeed and CdlDiskError. It now includes `<libcd.h>`;
+`statBuf` is a CdlFILE, and since `self->pos` is still FileResource.h's
+CdLoc16 the copy is `*(CdLoc16 *)&statBuf.pos` (the same 2-aligned struct
+move as before, byte-identical). A comment block "CdDriver, its table and its
+methods are include/CdDriver.h's (track 4, round 88)" was dropped from the
+unit: the banner now says it, and the Track 4 paragraph above has the
+history. `arg2`/`arg3` are now `param0`/`param1`, the queue node fields they
+are stored in. Item 4's `temp` is today's `size`; its `MATCHING:` line is in
+the source.
