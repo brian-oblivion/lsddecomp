@@ -61,68 +61,6 @@ extern s32 lseek(s32 handle, s32 pos, s32 whence); /* B(0x33) */
 extern s32 close(s32 handle);                      /* B(0x36) */
 extern s32 delete (void *path);                    /* B(0x45) */
 
-s32 TaskObjF__ReadMemcardFile(TaskObjF *self, char *suffix, void *outBuf, s32 outSize) {
-    s32 count;
-    s32 result;
-
-    count = 10;
-    do {
-        result = TaskObjF__TryReadMemcardFile(self, suffix, outBuf, outSize);
-        if (result != 0) {
-            break;
-        }
-    } while (count-- != 0);
-    return result;
-}
-
-s32 TaskObjF__TryReadMemcardFile(TaskObjF *self, char *suffix, void *outBuf, s32 outSize) {
-    char pathBuf[0x20];
-    char *path;
-    s32 handle;
-    void *hdr;
-    s32 seekPos;
-    u8 raw;
-
-    path = BuildMemcardPath((McDevicePath *)pathBuf, self->cardSlot, suffix);
-    handle = open(path, 1);
-    if (handle == -1) {
-        return 0;
-    }
-    hdr = BMemPMgrAlloc(0x80);
-    read(handle, hdr, 0x80);
-    raw = ((u8 *)hdr)[2];
-    seekPos = (raw << 7) - 0x780;
-    BMemPMgrFree(hdr);
-    lseek(handle, seekPos, 0);
-    read(handle, outBuf, outSize);
-    close(handle);
-    return 1;
-}
-
-s32 TaskObjF__WriteMemcardSaveFile(TaskObjF *self, char *fileName, char *title, char a3,
-                                   struct TimImage *icon, void *data, s32 size) {
-    s32 count;
-    s32 result;
-
-    count = 10;
-    CopyMemcardIconTemplate((s32)title, (s32)fileName);
-    do {
-        result = TaskObjF__TryWriteMemcardSaveFile(self, fileName, title, a3 & 0xFF, icon, data, size);
-        if (result != 0) {
-            break;
-        }
-    } while (count-- != 0);
-    if (result == 0) {
-        CopyMemcardIconTemplate((s32)title, 0);
-    }
-    return result;
-}
-
-/* TaskObjF__TryWriteMemcardSaveFile -- MATCHED round 75 (see its report).
- * `a3` is a `u8` parameter: the caller's promoted word lives in one
- * register for the `sb` of a3+0x10 and GCC's QImode copy in another for
- * the zero-extended `(a3 << 7)` size, which is retail's `move $s7,$s4`
- * and its late `andi 0xFF`. */
 /* TaskObjF__TryWriteMemcardSaveFile's own local types -- none shared
  * elsewhere in this unit.
  *
@@ -173,14 +111,14 @@ typedef struct McIconSource {
 
 /* The 0x200-byte memory-card save FILE HEADER this function builds and
  * submits -- see the NAMING note above. magic0/magic1 are the literal
- * bytes 'S'/'C'; iconFrameFlag/blockCount are computed size/mode bytes;
+ * bytes 'S'/'C'; iconDisplayFlag/blockCount are computed size/mode bytes;
  * title is a strcpy target (source: this function's own `title`
  * parameter, TaskObjF::title; typed `char *` in track 4, round 89, where it
  * had been an `s32` named `handle`, byte-identical). */
 typedef struct McSaveHeader {
     u8 magic0;
     u8 magic1;
-    u8 iconFrameFlag;
+    u8 iconDisplayFlag;
     u8 blockCount;
     char title[0x5C];
     IconPaletteHalf palette[2];
@@ -189,6 +127,68 @@ typedef struct McSaveHeader {
     IconFrame frame2;
 } McSaveHeader;
 
+s32 TaskObjF__ReadMemcardFile(TaskObjF *self, char *suffix, void *outBuf, s32 outSize) {
+    s32 count;
+    s32 result;
+
+    count = 10;
+    do {
+        result = TaskObjF__TryReadMemcardFile(self, suffix, outBuf, outSize);
+        if (result != 0) {
+            break;
+        }
+    } while (count-- != 0);
+    return result;
+}
+
+s32 TaskObjF__TryReadMemcardFile(TaskObjF *self, char *suffix, void *outBuf, s32 outSize) {
+    char pathBuf[0x20];
+    char *path;
+    s32 handle;
+    McSaveHeader *hdr;
+    s32 seekPos;
+    u8 raw;
+
+    path = BuildMemcardPath((McDevicePath *)pathBuf, self->cardSlot, suffix);
+    handle = open(path, 1);
+    if (handle == -1) {
+        return 0;
+    }
+    hdr = BMemPMgrAlloc(0x80);
+    read(handle, hdr, 0x80);
+    raw = hdr->iconDisplayFlag;
+    seekPos = (raw << 7) - 0x780;
+    BMemPMgrFree(hdr);
+    lseek(handle, seekPos, 0);
+    read(handle, outBuf, outSize);
+    close(handle);
+    return 1;
+}
+
+s32 TaskObjF__WriteMemcardSaveFile(TaskObjF *self, char *fileName, char *title, char a3,
+                                   struct TimImage *icon, void *data, s32 size) {
+    s32 count;
+    s32 result;
+
+    count = 10;
+    CopyMemcardIconTemplate((s32)title, (s32)fileName);
+    do {
+        result = TaskObjF__TryWriteMemcardSaveFile(self, fileName, title, a3 & 0xFF, icon, data, size);
+        if (result != 0) {
+            break;
+        }
+    } while (count-- != 0);
+    if (result == 0) {
+        CopyMemcardIconTemplate((s32)title, 0);
+    }
+    return result;
+}
+
+/* TaskObjF__TryWriteMemcardSaveFile -- MATCHED round 75 (see its report).
+ * `a3` is a `u8` parameter: the caller's promoted word lives in one
+ * register for the `sb` of a3+0x10 and GCC's QImode copy in another for
+ * the zero-extended `(a3 << 7)` size, which is retail's `move $s7,$s4`
+ * and its late `andi 0xFF`. */
 extern const char sFileNotCreatedMsg[]; /* rodata string "File not create in WriteFile\n" */
 extern s32 write(s32 handle, void *buf,
                  s32 size); /* CD/streaming read-request submit; own local view, not yet declared elsewhere in this project */
@@ -220,7 +220,7 @@ s32 TaskObjF__TryWriteMemcardSaveFile(TaskObjF *self, char *fileName, char *titl
     req = (McSaveHeader *)BMemPMgrAlloc(0x200);
     req->magic0 = 'S';
     req->magic1 = 'C';
-    req->iconFrameFlag = a3 + 0x10;
+    req->iconDisplayFlag = a3 + 0x10;
     req->blockCount = ((u32)size + 0x1FFF) >> 13;
     strcpy(req->title, title);
     req->palette[0] = src->palette[0];
@@ -485,7 +485,7 @@ void TaskObjF__OnNotify(TaskObjF *self, void *arg1, s32 arg2) {
     bm = Get_vtable_BasicClass();
     bm->onNotify((BasicClass *)self, arg1, arg2);
 
-    tag = **(s32 **)arg1;
+    tag = ((BasicClass *)arg1)->methods->header;
     mask = tag & 0xF;
     if (mask == 2) {
         methods->onInputEvent(self, arg1, arg2);
