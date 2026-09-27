@@ -34,8 +34,8 @@
 /* A disc position: Psy-Q's CdlLOC (minute, second, sector, track) by
  * layout and by use (CdControl's setloc argument, CdSearchFile's output,
  * CdPosToInt's input). The halves are never read apart. Declared here
- * rather than taken from <libcd.h> only because four CD units
- * (code_179d8_h/q/r/s) still declare the Cd* functions their own way and
+ * rather than taken from <libcd.h> only because two CD units
+ * (code_179d8_r/s) still declare the Cd* functions their own way and
  * would collide with Sony's prototypes; the whole-struct copies compile to
  * the same lwl/lwr + swl/swr with Sony's 1-aligned CdlLOC. It lives in this
  * header because the CD driver's methods run on every client object, so the

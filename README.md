@@ -117,7 +117,7 @@ job).
 Read each named class's header first; its banner points to the units.
 
 - **Boot and the main loop.** `src/main.c` sets up the `BMemPMgr` pool
-  allocator (`src/code_8220.c`), the `DrawSystem` screen singleton and a
+  allocator (`src/BMemPMgr.c`), the `DrawSystem` screen singleton and a
   `Pad`, then runs the root object, `GameApplication` (a subclass of `Application`,
   `src/code_1677c.c`). Its loop plays the intro logos and the day-of-week
   movie, polls the graph-screen tasks against the dream's status, and can
