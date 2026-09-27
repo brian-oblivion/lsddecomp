@@ -552,3 +552,35 @@ discipline earns its keep by ruling things back in cheaply, not by
 guaranteeing they will move.
 
 **NON_MATCHING body promoted, round 66** (runner charlie): permuter-candidate provenance (round 47 `do { return; } while (0)` mutation) reviewed for semantics -- behaviorally identical to the bare `return;` it replaces, no UB, no dead branch. Promoted.
+
+## Round 97 types pass (echo)
+
+code_179d8_k's local `Entry90902E8` view retired onto `include/SsScore.h`:
+the same 0xAC-byte (`SS_SEQ_TABSIZ`) `_ss_score[access][seq]` record that
+libsnd_cres, code_179d8_i and code_179d8_j already use. The header gained
+this unit's fields by splitting padding (no offset, size or existing type
+moved); field names stay offset-only (`unkNN`) as the header's convention for
+Sony-only fields, with each one's mechanics in its comment. The unit's
+`(u8 *)rec + unk12 + 0x17/0x2C` and `(s16 *)((u8 *)rec + 0x4E + ch * 2)`
+arithmetic became the header's per-channel arrays `unk17[16]` (pan),
+`unk2C[16]` (program) and `unk4E[16]` (volume): `unk12` is the event's MIDI
+channel (GetSeqData stores a status byte's low nibble), not a byte offset to
+an "embedded state block" as the old local comment read it. Byte-exact
+unchanged; the NON_MATCHING object is identical too (objdump of
+`build/nonmatching/src/code_179d8_k.c.o` before/after).
+
+`unk74`, settled: the old local view called it a "nonzero-gated dispatch
+enable flag". It is the sequence's left volume (`SpuVmSetSeqVol` stores voll
+there, clamped to 0x7F; `SpuVmSetVol` scales by it / 127). NoteOn's only use
+is `lhu 0x74` then `beqz` to the return, ahead of both the key-on and key-off
+arms, so a sequence whose left volume is 0 plays no note events. That is one
+use of the volume, not a second meaning; SsScore.h's comment now says both.
+No reader needed a signedness change (`lhu` here, `u16` in the header).
+
+The old local comment's other readings, kept for the record: `unk88` "a
+scratch slot every function stores its last computed value into, genuinely
+overloaded" -- it is the ticks to the next event (every handler stores
+ReadDeltaValue's result; SeqPlay counts it down); `unk4C` read as a "note"
+at the SpuVm* call sites -- it is the VAB id (`SsUtGetProgAtr(vabId, prog,
+...)`, and CC0 bank select stores it); the 0x2C byte read as "vol" -- it is
+the channel's program (SetProgramChange stores it).

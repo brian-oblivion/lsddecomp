@@ -8,9 +8,10 @@
  * _SsSetControlChange). The functions keep Sony's names and are never retyped
  * as game code.
  *
- * Each sequence track is an Entry90902E8 record, reached as
- * _ss_score[access][seq] (Sony's `_ss_score`, pinned in
- * config/psyq-objects.ld). SeqPlay is the per-tick scheduler. GetSeqData
+ * Each sequence's play state is an SsScore (include/SsScore.h), reached as
+ * _ss_score[access][seq]; the (a0, a1) pair the event handlers take is that
+ * (access, seq) pair. Per-channel state (pan, program, volume) is indexed by
+ * the event's MIDI channel, unk12. SeqPlay is the per-tick scheduler. GetSeqData
  * decodes one event from the byte stream at rec->unk4 and dispatches it to:
  *   - NoteOn / SetProgramChange / SetPitchBend, the channel-voice events;
  *   - _SsSetControlChange, the MIDI CC dispatcher, which routes to the Cont*
@@ -31,6 +32,8 @@
 #include "common.h"
 #include <libsnd.h>
 
+#include "SsScore.h"
+
 /* Cross-unit calls, typed per-call-site from the registers loaded before
  * each `jal` -- none of these callees have an established prototype from
  * their own unit's side yet except where noted, so these are local
@@ -45,78 +48,6 @@ extern s32 SpuVmKeyOn(s32 a0, s16 a1, s16 a2, u16 a3, u16 a4,
 extern s32 SpuVmKeyOff(s32 a0, s16 a1, s16 a2, u16 a3); /* code_179d8_m, not yet matched: local guess, ditto */
 /* Sony libsnd/vm_doff, internal: no public LIBSND.H prototype. */
 extern void SpuVmDamperOff(void);
-
-/* A 172 (0xAC)-byte record; _ss_score is an array of pointers to arrays of
- * these, indexed [channel][slot]-style, same array documented from
- * libsnd_cres/_i/_j's own independent local readings -- see those units'
- * Entry90902E8 for a different reduced view of the same object; each unit
- * keeps its own per project convention.
- *
- * This unit's own reading is a low-level per-channel "sequencer voice"
- * playback record: unk4 is a cursor into a byte-encoded event stream,
- * unk80 an accumulated tick position, unk88 a scratch slot every function
- * in this file stores its own last computed value into (a pointer in one
- * caller, an updated counter in others -- genuinely overloaded, not a
- * misreading), and unk12 a BYTE OFFSET (already scaled, not an index) to
- * whichever of several embedded state blocks is presently active; several
- * functions here dereference `(u8 *)rec + rec->unk12` and then apply a
- * further FIXED displacement (0x17, 0x2C) from that computed base, which
- * is why those two fields are not named as fixed struct members below --
- * their address is only known at runtime, exactly the case this project's
- * pointer-arithmetic convention is for. */
-typedef struct {
-    u8 unk0; /* +0x0: a byte passed alongside unk3C to _SsSndNextSep on
-                 * end-of-track cleanup */
-    u8 pad1[0x4 - 0x1];
-    u8 *unk4; /* +0x4: cursor into a byte-encoded (7-bit VLQ) event stream */
-    u8 *unk8; /* +0x8: saved "track start" cursor, restored into unk4 (and
-                 * sometimes unkC) on end-of-track / repeat */
-    u8 *unkC; /* +0xC: a saved backup of unk4, restored into it on a "resume" path */
-    u8 unk10; /* +0x10: one-shot latch, set once a "kind 1" retrigger fires */
-    u8 unk11; /* +0x11: cached MIDI-style running-status byte (0xFF standing
-                 * in for a 0xF0 "meta" status) -- read back to interpret a
-                 * later event byte that has its high bit clear */
-    u8 unk12; /* +0x12: byte offset to the active embedded state block */
-    u8 unk13; /* +0x13 */
-    u8 unk14; /* +0x14 */
-    u8 unk15; /* +0x15: a cached byte, written from the "default kind" path */
-    u8 unk16; /* +0x16: event-kind selector (compared against 0x14/0x1E/0x28) */
-    u8 pad17[0x27 - 0x17];
-    u8 unk27; /* +0x27: dispatch-mode selector (compared against 1) */
-    u8 unk28; /* +0x28: a cached byte, written from the "mode 1" latch path */
-    u8 unk29; /* +0x29: a retrigger/step counter */
-    u8 unk2A; /* +0x2A: a second, independent retrigger/step counter */
-    u8 unk2B; /* +0x2B: cleared on end-of-track stop (redundant double store
-                 * in retail -- see GetMetaEvent) */
-    u8 pad2C[0x3C - 0x2C];
-    u8 unk3C; /* +0x3C: compared against 0xFF; a "track/channel select" byte
-                 * passed to _SsSndNextSep on end-of-track stop */
-    u8 pad3D[0x46 - 0x3D];
-    s16 unk46; /* +0x46: repeat-count LIMIT (0 = loop forever) */
-    u16 unk48; /* +0x48: repeat COUNTER, incremented per end-of-track;
-                 * sign-checked via explicit (s16) cast at its compare site,
-                 * same idiom as code_179d8_i.c's unk40 */
-    s16 unk4A; /* +0x4A: a per-tick scaling factor used in the tempo/rate
-                 * recompute on a Set-Tempo meta event */
-    s16 unk4C; /* +0x4C */
-    u8 pad4E[0x6E - 0x4E];
-    s16 unk6E; /* +0x6E: a repeat/skip counter, decremented per catch-up tick */
-    s16 unk70; /* +0x70: next scheduling threshold, compared against unk88 */
-    u8 pad72[0x74 - 0x72];
-    u16 unk74; /* +0x74: nonzero-gated dispatch enable flag */
-    u8 pad76[0x80 - 0x76];
-    s32 unk80; /* +0x80: accumulated tick position */
-    u8 pad84[0x88 - 0x84];
-    s32 unk88; /* +0x88: last-value scratch, overloaded per call site */
-    s32 unk8C; /* +0x8C: recomputed BPM (60000000 / microseconds-per-quarter),
-                 * cached from the last Set-Tempo meta event */
-    u32 unk90; /* +0x90: playback state flags */
-    u8 pad94[0xA8 - 0x94];
-    s16 unkA8; /* +0xA8: a masked-byte parameter cached from a dispatch call */
-    u8 padAA[0xAC - 0xAA];
-} Entry90902E8;
-
-extern Entry90902E8 *_ss_score[];
 
 /* Shared VLQ-style delta-time decoder: reads a 7-bit-per-byte
  * little-endian... no, MIDI-style BIG-endian continuation-bit-first
@@ -139,7 +70,7 @@ extern void GetSeqData(s16 channel, s16 slot);
  * ($a2) to hold rec->unk70 for that store (round 69,
  * docs/match-reports/SeqPlay.md). */
 void SeqPlay(s16 a0, s16 a1, s16 a2) {
-    Entry90902E8 *rec = &_ss_score[a0][a1];
+    SsScore *rec = &_ss_score[a0][a1];
     s16 last = rec->unk70;
     s32 elapsed = rec->unk88;
     s32 delta = elapsed - last;
@@ -196,7 +127,7 @@ extern void GetMetaEvent(s16 a0, s16 a1, u8 a2);
 /* A per-channel/slot "sequencer voice" event-stream byte reader.  Reads one
  * byte from rec->unk4 (advancing the cursor); if it has the high bit set it
  * is a new MIDI-style status byte -- the low nibble becomes rec->unk12 (the
- * active embedded-state-block offset) and the high nibble selects which
+ * MIDI channel) and the high nibble selects which
  * kind of event follows, consuming however many further data bytes that
  * kind needs and recording the high nibble into rec->unk11 as "running
  * status" (0xFF standing in for the 0xF0 kind).  If the high bit is clear,
@@ -214,7 +145,7 @@ extern void GetMetaEvent(s16 a0, s16 a1, u8 a2);
  * reshaping tried and did not move it (docs/match-reports/GetSeqData.md).
  * Hand-derived. */
 void GetSeqData(s16 a0, s16 a1) {
-    Entry90902E8 *rec = &_ss_score[a0][a1];
+    SsScore *rec = &_ss_score[a0][a1];
     u8 *p;
     u8 raw;
     u8 note, vel;
@@ -303,13 +234,12 @@ INCLUDE_ASM("asm/nonmatchings/code_179d8_k", GetSeqData);
  * `do { return; } while (0);`) is in the report, not here: this body is
  * for the reader and the verified build never compiles it. */
 void NoteOn(s16 a0, s16 a1, s32 a2, s32 a3) {
-    Entry90902E8 *rec = &_ss_score[a0][a1];
+    SsScore *rec = &_ss_score[a0][a1];
     u8 offset = rec->unk12;
-    s16 speed = *(s16 *)((u8 *)rec + 0x4E + offset * 2);
+    s16 speed = rec->unk4E[offset];
     s32 divided = ((u8)a3 * (s32)speed) / 127;
-    u8 *ptr = offset + (u8 *)rec;
     u16 flag = rec->unk74;
-    u8 status = ptr[0x17];
+    u8 status = rec->unk17[offset];
 
     speed = a3;
     if (flag == 0) {
@@ -318,13 +248,13 @@ void NoteOn(s16 a0, s16 a1, s32 a2, s32 a3) {
     if ((u8)a3 != 0) {
         s16 packed = (a1 << 8) | a0;
         s16 note = rec->unk4C;
-        u8 vol = ptr[0x2C];
+        u8 vol = rec->unk2C[offset];
         SpuVmKeyOn(packed, note, vol, (u8)a3, (u16)divided, status);
         rec->unkA8 = (u8)speed;
     } else {
         s16 packed = (a1 << 8) | a0;
         s16 note = rec->unk4C;
-        u8 vol = ptr[0x2C];
+        u8 vol = rec->unk2C[offset];
         SpuVmKeyOff(packed, note, vol, (u8)a3);
     }
 }
@@ -333,10 +263,9 @@ INCLUDE_ASM("asm/nonmatchings/code_179d8_k", NoteOn);
 #endif
 
 void SetProgramChange(s16 a0, s16 a1, u8 a2) {
-    Entry90902E8 *rec = &_ss_score[a0][a1];
-    u8 *p = (u8 *)rec + rec->unk12;
+    SsScore *rec = &_ss_score[a0][a1];
 
-    p[0x2C] = a2;
+    rec->unk2C[rec->unk12] = a2;
     rec->unk88 = ReadDeltaValue(a0, a1);
 }
 
@@ -387,7 +316,7 @@ extern void ContResetAll(s16 a0, s16 a1);
  * register and gives each case its own callee-saved copy.
  */
 void _SsSetControlChange(s16 a0, s16 a1, u8 a2) {
-    Entry90902E8 *rec = &_ss_score[a0][a1];
+    SsScore *rec = &_ss_score[a0][a1];
     u8 *p = rec->unk4;
     u8 offset = rec->unk12;
     u8 val;
@@ -404,32 +333,31 @@ void _SsSetControlChange(s16 a0, s16 a1, u8 a2) {
             return;
         case 7: {
             u16 o = offset;
-            u8 *blk = (u8 *)rec + o;
             s32 packed = (a1 << 8) | a0;
 
-            SpuVmSetVol(packed, rec->unk4C, blk[0x2C], val, blk[0x17]);
-            *(s16 *)((u8 *)rec + o * 2 + 0x4E) = val;
+            SpuVmSetVol(packed, rec->unk4C, rec->unk2C[o], val, rec->unk17[o]);
+            rec->unk4E[o] = val;
             rec->unk88 = ReadDeltaValue(a0, a1);
             return;
         }
         case 10: {
             s32 packed = (a1 << 8) | a0;
             u16 o = offset;
+            /* MATCHING: reaching unk2C/unk17 through one base pointer keeps
+             * retail's register allocation; rec->unk2C[o] does not. */
             u8 *blk = (u8 *)rec + o;
-            s16 wide = *(s16 *)((u8 *)rec + o * 2 + 0x4E);
+            s16 wide = rec->unk4E[o];
 
-            SpuVmSetVol(packed, rec->unk4C, blk[0x2C], wide, val);
-            blk[0x17] = val;
+            SpuVmSetVol(packed, rec->unk4C, blk[offsetof(SsScore, unk2C)], wide, val);
+            blk[offsetof(SsScore, unk17)] = val;
             rec->unk88 = ReadDeltaValue(a0, a1);
             return;
         }
         case 11: {
             u16 o = offset;
-            u8 *blk = (u8 *)rec + o;
 
-            SpuVmSetProgVol(rec->unk4C, blk[0x2C], val);
-            SpuVmSetVol((a1 << 8) | a0, rec->unk4C, blk[0x2C], *(s16 *)((u8 *)rec + o * 2 + 0x4E),
-                        blk[0x17]);
+            SpuVmSetProgVol(rec->unk4C, rec->unk2C[o], val);
+            SpuVmSetVol((a1 << 8) | a0, rec->unk4C, rec->unk2C[o], rec->unk4E[o], rec->unk17[o]);
             rec->unk88 = ReadDeltaValue(a0, a1);
             return;
         }
@@ -476,34 +404,34 @@ void _SsSetControlChange(s16 a0, s16 a1, u8 a2) {
  * ContModulation: the value becomes every tone's vibrato depth (vibW).
  * Neither it nor ContPortaTime has a caller in this executable. */
 void ContModulation(s16 a0, s16 a1, u8 a2) {
-    Entry90902E8 *rec = &_ss_score[a0][a1];
+    SsScore *rec = &_ss_score[a0][a1];
     u8 offset;
     ProgAtr list;
     VagAtr scratch;
     s32 i;
 
-    SsUtGetProgAtr(rec->unk4C, ((u8 *)rec + (offset = rec->unk12))[0x2C], &list);
+    SsUtGetProgAtr(rec->unk4C, rec->unk2C[offset = rec->unk12], &list);
     for (i = 0; i < list.tones; i++) {
-        SsUtGetVagAtr(rec->unk4C, ((u8 *)rec + offset)[0x2C], (s16)i, &scratch);
+        SsUtGetVagAtr(rec->unk4C, rec->unk2C[offset], (s16)i, &scratch);
         scratch.vibW = a2;
-        SsUtSetVagAtr(rec->unk4C, ((u8 *)rec + offset)[0x2C], (s16)i, &scratch);
+        SsUtSetVagAtr(rec->unk4C, rec->unk2C[offset], (s16)i, &scratch);
     }
     rec->unk88 = ReadDeltaValue(a0, a1);
 }
 
 /* The value becomes every tone's portamento time (porT). */
 void ContPortaTime(s16 a0, s16 a1, u8 a2) {
-    Entry90902E8 *rec = &_ss_score[a0][a1];
+    SsScore *rec = &_ss_score[a0][a1];
     u8 offset;
     ProgAtr list;
     VagAtr scratch;
     s32 i;
 
-    SsUtGetProgAtr(rec->unk4C, ((u8 *)rec + (offset = rec->unk12))[0x2C], &list);
+    SsUtGetProgAtr(rec->unk4C, rec->unk2C[offset = rec->unk12], &list);
     for (i = 0; i < list.tones; i++) {
-        SsUtGetVagAtr(rec->unk4C, ((u8 *)rec + offset)[0x2C], (s16)i, &scratch);
+        SsUtGetVagAtr(rec->unk4C, rec->unk2C[offset], (s16)i, &scratch);
         scratch.porT = a2;
-        SsUtSetVagAtr(rec->unk4C, ((u8 *)rec + offset)[0x2C], (s16)i, &scratch);
+        SsUtSetVagAtr(rec->unk4C, rec->unk2C[offset], (s16)i, &scratch);
     }
     rec->unk88 = ReadDeltaValue(a0, a1);
 }
@@ -511,16 +439,16 @@ void ContPortaTime(s16 a0, s16 a1, u8 a2) {
 /* CC65 (portamento): a value below 0x40 sets every tone's play mode
  * to 2, a value in 0x40..0x7F sets it to 0, anything else leaves it. */
 void ContPortamento(s16 a0, s16 a1, s32 a2) {
-    Entry90902E8 *rec = &_ss_score[a0][a1];
+    SsScore *rec = &_ss_score[a0][a1];
     u8 offset;
     ProgAtr list;
     VagAtr scratch;
     s32 i;
     s32 wrap;
 
-    SsUtGetProgAtr(rec->unk4C, ((u8 *)rec + (offset = rec->unk12))[0x2C], &list);
+    SsUtGetProgAtr(rec->unk4C, rec->unk2C[offset = rec->unk12], &list);
     for (i = 0; i < list.tones; i++) {
-        SsUtGetVagAtr(rec->unk4C, ((u8 *)rec + offset)[0x2C], (s16)i, &scratch);
+        SsUtGetVagAtr(rec->unk4C, rec->unk2C[offset], (s16)i, &scratch);
         if ((u8)a2 < 0x40) {
             scratch.mode = 2;
         } else {
@@ -529,7 +457,7 @@ void ContPortamento(s16 a0, s16 a1, s32 a2) {
                 scratch.mode = 0;
             }
         }
-        SsUtSetVagAtr(rec->unk4C, ((u8 *)rec + offset)[0x2C], (s16)i, &scratch);
+        SsUtSetVagAtr(rec->unk4C, rec->unk2C[offset], (s16)i, &scratch);
     }
     rec->unk88 = ReadDeltaValue(a0, a1);
 }
@@ -539,16 +467,16 @@ void ContPortamento(s16 a0, s16 a1, s32 a2) {
  * operand-order canonicalization class (2 words). Near-miss body preserved
  * in the report; #if 0 body kept here too so it travels with this .c. */
 void ContResetAll(s16 a0, s16 a1) {
-    Entry90902E8 *rec = &_ss_score[a0][a1];
+    SsScore *rec = &_ss_score[a0][a1];
 
     SsUtReverbOff();
     SpuVmDamperOff();
 
-    *((u8 *)rec + rec->unk12 + 0x2C) = rec->unk12;
+    rec->unk2C[rec->unk12] = rec->unk12;
     rec->unk13 = 0;
     rec->unk14 = 0;
-    *(s16 *)((u8 *)rec + 0x4E + rec->unk12 * 2) = 0x7F;
-    *((u8 *)rec + rec->unk12 + 0x17) = 0x40;
+    rec->unk4E[rec->unk12] = 0x7F;
+    rec->unk17[rec->unk12] = 0x40;
     rec->unk88 = ReadDeltaValue(a0, a1);
 }
 
@@ -562,7 +490,7 @@ extern SsMarkCallbackProc D_80090368[][16];
  * is cached in unk15 and bumps the unk2A step counter. Under kind 0x28 the
  * value also goes to the sequence's mark callback. */
 void ContNrpn1(s16 a0, s16 a1, u8 a2) {
-    Entry90902E8 *rec = &_ss_score[a0][a1];
+    SsScore *rec = &_ss_score[a0][a1];
     u8 kind;
     SsMarkCallbackProc fn;
 
@@ -595,7 +523,7 @@ void ContNrpn1(s16 a0, s16 a1, u8 a2) {
  * instruction-scheduling residue, not a logic or CFG difference. */
 #if 1
 void ContNrpn2(s16 a0, s16 a1, u8 a2) {
-    Entry90902E8 *rec = &_ss_score[a0][a1];
+    SsScore *rec = &_ss_score[a0][a1];
     u8 kind = a2;
     s32 result;
 
@@ -639,7 +567,7 @@ void ContNrpn2(s16 a0, s16 a1, u8 a2) {
 #endif
 
 void ContRpn1(s16 a0, s16 a1, u8 a2) {
-    Entry90902E8 *rec = &_ss_score[a0][a1];
+    SsScore *rec = &_ss_score[a0][a1];
     u8 counter = rec->unk29;
 
     rec->unk13 = a2;
@@ -649,7 +577,7 @@ void ContRpn1(s16 a0, s16 a1, u8 a2) {
 }
 
 void ContRpn2(s16 a0, s16 a1, u8 a2) {
-    Entry90902E8 *rec = &_ss_score[a0][a1];
+    SsScore *rec = &_ss_score[a0][a1];
     u8 counter = rec->unk29;
 
     rec->unk14 = a2;
@@ -705,13 +633,13 @@ extern void Snd_setVabAttr(s16 channel, s16 slot, s16 kind, VagAtr scratch, Adsr
 void ContDataEntry(s16 a0, s16 a1, u8 a2) {
     s16 ch = a0;
     s16 slot = a1;
-    Entry90902E8 *rec = &_ss_score[ch][slot];
+    SsScore *rec = &_ss_score[ch][slot];
     u8 off = rec->unk12;
     DataEntryLocals list;
     s32 i;
     u8 kind;
 
-    SsUtGetProgAtr(rec->unk4C, ((u8 *)rec + off)[0x2C], &list);
+    SsUtGetProgAtr(rec->unk4C, rec->unk2C[off], &list);
 
     if (rec->unk27 == 1 && rec->unk10 == 0) {
         rec->unk28 = a2;
@@ -728,9 +656,9 @@ void ContDataEntry(s16 a0, s16 a1, u8 a2) {
     if (rec->unk29 == 2) {
         if (rec->unk13 == 0 && rec->unk14 == 0) {
             for (i = 0; i < list.prog.tones; i++) {
-                SsUtGetVagAtr(rec->unk4C, ((u8 *)rec + off)[0x2C], i, &list.vag);
+                SsUtGetVagAtr(rec->unk4C, rec->unk2C[off], i, &list.vag);
                 list.vag.pbmin = list.vag.pbmax = a2 & 0x7F;
-                SsUtSetVagAtr(rec->unk4C, ((u8 *)rec + off)[0x2C], i, &list.vag);
+                SsUtSetVagAtr(rec->unk4C, rec->unk2C[off], i, &list.vag);
             }
         }
         if (rec->unk13 == 1 && rec->unk14 == 0) {
@@ -745,9 +673,9 @@ void ContDataEntry(s16 a0, s16 a1, u8 a2) {
                 unused = 0;
             }
             for (i = 0; i < list.prog.tones; i++) {
-                SsUtGetVagAtr(rec->unk4C, ((u8 *)rec + off)[0x2C], i, &list.vag);
+                SsUtGetVagAtr(rec->unk4C, rec->unk2C[off], i, &list.vag);
                 list.vag.shift = list.vag.shift;
-                SsUtSetVagAtr(rec->unk4C, ((u8 *)rec + off)[0x2C], i, &list.vag);
+                SsUtSetVagAtr(rec->unk4C, rec->unk2C[off], i, &list.vag);
             }
         }
         if (rec->unk13 == 2 && rec->unk14 == 0) {
@@ -758,9 +686,9 @@ void ContDataEntry(s16 a0, s16 a1, u8 a2) {
                 unused = 0;
             }
             for (i = 0; i < list.prog.tones; i++) {
-                SsUtGetVagAtr(rec->unk4C, ((u8 *)rec + off)[0x2C], i, &list.vag);
+                SsUtGetVagAtr(rec->unk4C, rec->unk2C[off], i, &list.vag);
                 list.vag.center = list.vag.center;
-                SsUtSetVagAtr(rec->unk4C, ((u8 *)rec + off)[0x2C], i, &list.vag);
+                SsUtSetVagAtr(rec->unk4C, rec->unk2C[off], i, &list.vag);
             }
         }
         rec->unk88 = ReadDeltaValue(ch, slot);
@@ -771,12 +699,11 @@ void ContDataEntry(s16 a0, s16 a1, u8 a2) {
         kind = rec->unk16;
         if (kind == 0x10) {
             for (i = 0; i < list.prog.tones; i++) {
-                Snd_setVabAttr(rec->unk4C, ((u8 *)rec + off)[0x2C], i, list.vag, list.adsr,
-                               rec->unk15, a2 & 0xFF);
+                Snd_setVabAttr(rec->unk4C, rec->unk2C[off], i, list.vag, list.adsr, rec->unk15, a2 & 0xFF);
             }
         } else {
-            Snd_setVabAttr(rec->unk4C, ((u8 *)rec + off)[0x2C], (s16)kind, list.vag, list.adsr,
-                           rec->unk15, a2 & 0xFF);
+            Snd_setVabAttr(rec->unk4C, rec->unk2C[off], (s16)kind, list.vag, list.adsr, rec->unk15,
+                           a2 & 0xFF);
         }
         rec->unk88 = ReadDeltaValue(ch, slot);
         rec->unk2A = 0;
@@ -949,7 +876,7 @@ void Snd_setVabAttr(s16 channel, s16 slot, s16 kind, VagAtr scratch, AdsrFields 
  * report for the round-25 head lever's explicit negative answer). */
 #if 1
 void SetPitchBend(s16 a0, s16 a1) {
-    Entry90902E8 *rec = &_ss_score[a0][a1];
+    SsScore *rec = &_ss_score[a0][a1];
     u8 *cursor = rec->unk4;
     s32 packed;
     u8 b;
@@ -959,7 +886,7 @@ void SetPitchBend(s16 a0, s16 a1) {
     rec->unk4 = cursor;
     packed = (a1 << 8) | a0;
     rec->unk4 = rec->unk4 + 1;
-    vol = *((u8 *)rec + b + 0x2C);
+    vol = rec->unk2C[b];
     b = *cursor;
     SpuVmPitchBend(packed, rec->unk4C, vol, b);
     rec->unk88 = ReadDeltaValue(a0, a1);
@@ -1028,7 +955,7 @@ extern u32 VBLANK_MINUS;
  * iterations) found no zero and never beat the base score, residue
  * marked permuter-exhausted. */
 void GetMetaEvent(s16 a0, s16 a1, u8 a2) {
-    Entry90902E8 *rec = &_ss_score[a0][a1];
+    SsScore *rec = &_ss_score[a0][a1];
 
     if (a2 != 0x2F) {
         if (a2 != 0x51) {
@@ -1118,7 +1045,7 @@ INCLUDE_ASM("asm/nonmatchings/code_179d8_k", GetMetaEvent);
  * source order) is what makes GCC 2.6.3 choose retail's own register for
  * both. See the round-25 head broadcast on if/else arm ordering. */
 s32 ReadDeltaValue(s16 a0, s16 a1) {
-    Entry90902E8 *rec = &_ss_score[a0][a1];
+    SsScore *rec = &_ss_score[a0][a1];
     u8 *cursor = rec->unk4;
     s32 acc;
     s32 val;
