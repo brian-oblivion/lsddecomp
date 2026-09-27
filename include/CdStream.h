@@ -34,6 +34,15 @@
 typedef struct CdStream CdStream;
 typedef struct CdStreamMethods CdStreamMethods;
 
+/* CdStream.state. Open seeks (SEEKING), startRead reads (READING), stop
+ * pauses the drive (STOPPED), restart goes back to IDLE and seeks again. */
+enum CdStreamState {
+    CDSTREAM_IDLE = 0,
+    CDSTREAM_SEEKING = 1,
+    CDSTREAM_READING = 2,
+    CDSTREAM_STOPPED = 4
+};
+
 /* Sony's CdlFILE (include/psyq/libcd.h, 24 bytes), which CdSearchFile fills.
  * Spelled here so this header does not bring in LIBCD.H's prototypes, which
  * the units declare locally. `pos` is the CdlLOC that seek and CdlSetloc take. */
@@ -76,7 +85,7 @@ struct CdStream {
     BASICCLASS_FIELDS(CdStreamMethods);
     /* +0x00C */ CdStreamFile file; /* CdSearchFile (open); file.pos goes to seek and CdlSetloc */
     /* +0x024 */ u8 cdResult[8];    /* CdSync result buffer (CdStream__Sync) */
-    /* +0x02C */ s32 state;         /* 0 idle, 1 seeking, 2 reading, 4 stopped */
+    /* +0x02C */ s32 state;         /* enum CdStreamState */
     /* +0x030 */ s32 muted;         /* mute / demute */
     /* +0x034 */ s32 cdSpeed;       /* the ctor's; < 4 is double speed */
     /* +0x038 */ s32 bytesPerFrame; /* the ctor's, from speed and fps */
