@@ -468,3 +468,38 @@ replaced by `<libcd.h>`'s. Call sites now read
 spelling of `CdlLOC`) and `CdRead(hi, (u_long *)arg1, CdlModeSpeed)`; the
 `CdSync` result buffer is `u_char buf[0x10]` (same size, same frame).
 Byte-exact; whole-image SHA1 green.
+
+## Source comment history (round 99, echo, track 7)
+
+The comment above `ReadCdFile` in `src/code_179d8_h.c` before round 99's
+track 7 pass, kept verbatim; the source now keeps `MATCHING:` lines. Names
+as of round 98 (`arg1`/`arg2` are now `buf`/`size`, `hi` is `sectors`, the
+CdSync result buffer `buf` is `syncResult`).
+
+```c
+/* MATCHED round 74 (charlie). Two of its three loops are label + goto
+ * (the seek retry and the CdSync wait); only the CdReadSync wait is a
+ * do-while. The loop kind is readable from the back-edge: a do-while's
+ * branch targets the jal with the argument setup copied into its delay
+ * slot, a goto loop's branch targets the argument setup itself --
+ * docs/match-reports/ReadCdFile.md. `scratch` is never touched; it only
+ * sizes the frame (retail's `buf` sits at sp+0x810). */
+```
+
+## Naming (round 99, echo, track 7)
+
+- Parameters `arg1`/`arg2` -> `buf`/`size`, tier A: `CdDriver__Read`
+  (`src/code_179d8_s.c`) passes its own `buf`/`size` straight through, and
+  the body hands `buf` to `CdRead` and shifts `size` down to a sector count.
+  `buf` is `void *`, as the caller's declaration has it (was `char *`; zero
+  bytes changed).
+- Locals: `hi` -> `sectors` (the `CdRead` sector count), `buf` ->
+  `syncResult` (`CdSync`'s result buffer).
+- Constants: `>> 11` -> `>> CD_SECTOR_SHIFT` (`include/CdDriver.h`); the
+  `CdSync` results `0`/`5` -> `<libcd.h>`'s `CdlNoIntr`/`CdlDiskError`.
+  `CdReadSync`'s `-1` (error) stays a literal. `scratch[2048]` and
+  `syncResult[16]` stay literals, decimal: `scratch` is never touched and
+  only sizes the frame, so a sector name would claim a use nobody has seen.
+- Left: the `(u_char *)&self->pos` cast. `CdControl`'s parameter is Sony's
+  `u_char *`, and `pos` is the project's `CdLoc16` (FileResource.h) rather
+  than `CdlLOC`; the cast goes when track 6 gives FileResource Sony's type.

@@ -535,3 +535,32 @@ Sony's own fields. `CdDriver::pos` is still the project's `CdLoc16`
 (include/FileResource.h), so the copy is spelled `*(CdLoc16 *)&statBuf.pos`,
 the round 96 precedent in `src/code_179d8_q.c`'s `ResolveFileEntries`.
 Byte-exact; whole-image SHA1 green.
+
+## Source comment history (round 99, echo, track 7)
+
+The comment above `OpenCdFile` in `src/code_179d8_h.c` before round 99's
+track 7 pass, kept verbatim; the source now keeps a one-line `MATCHING:`
+note. Names as of round 98 (the parameter `suffix` is now `name`, the local
+`i` is `retries`, `statBuf` is `file`).
+
+```c
+/* MATCHED round 74 (charlie). The retry loop is a label + backward goto,
+ * not while/for: a real loop gets loop notes, loop.c hoists &path out of it
+ * and CSEs it with BuildCdFilePath's argument (one word long, rotated
+ * saved registers). Retail recomputes &path inside the loop body --
+ * docs/match-reports/OpenCdFile.md. */
+```
+
+## Naming (round 99, echo, track 7)
+
+- Parameter `suffix` -> `name`, tier A: the one caller, `CdDriver__Open`
+  (`src/code_179d8_s.c`), passes its own `name`, and `BuildCdFilePath`
+  appends it after the data directory and before `;1`, so it is the file
+  name, not a suffix.
+- Locals: `i` -> `retries` (counts the lookups after the first), `statBuf` ->
+  `file` (Sony's `CdlFILE`, `CdSearchFile`'s output).
+- Constants: `path[0x40]` -> `path[CD_PATH_SIZE]` (64, `include/CdDriver.h`;
+  `CdDriver__Open` and `ResolveFileEntries` declare the same 0x40 buffer for
+  the same `BuildCdFilePath` call). `100` -> `CD_SEARCH_ATTEMPTS - 1`:
+  `retries++ < 100` searches 101 times in all, the same 101 that
+  `ResolveFileEntries` spells as its local `CD_SEARCH_RETRIES 0x65`.

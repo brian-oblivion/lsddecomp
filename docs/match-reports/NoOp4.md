@@ -26,3 +26,13 @@ PLAN.md track 3's own definition. No caller or vtable-slot evidence found
 (`grep` over `asm/data/*.s`, `tools/classtable.py --scan`: no hit).
 Numbered against `NoOp`/`NoOpIgnoreArgs` (elsewhere in the tree) and this
 unit's own `NoOp2`/`NoOp3`, in ROM order, purely for disambiguation.
+
+## Naming (round 99, echo, track 7)
+
+Measured: the executable holds no `jal` to this function and no 32-bit word
+equal to its address (a scan of every aligned word of `disk/SLPS_015.56`'s
+image for both encodings), so it has no caller and sits in no table. The
+round 64 note that it is "referenced only from the still-uncarved
+`code_179d8` remainder" no longer holds; it is unreferenced, at least by
+`jal` or stored pointer (an address built with `lui`/`addiu` was not
+scanned).

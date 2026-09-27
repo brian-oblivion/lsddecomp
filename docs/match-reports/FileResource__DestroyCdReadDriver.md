@@ -38,3 +38,13 @@ dtor slot -- it does not itself reference `gCdDriverMethods` or
 justified by the PAIRING with the ctor, not by this function's own body;
 flagged explicitly in case a future runner finds a caller that shows these
 two are NOT actually a matched pair.
+
+## Naming (round 99, echo, track 7)
+
+Measured: the executable holds no `jal` to this function and no 32-bit word
+equal to its address (a scan of every aligned word of `disk/SLPS_015.56`'s
+image for both encodings), so it has no caller and sits in no table. The
+round 64 note that it is "referenced only from the still-uncarved
+`code_179d8` remainder" no longer holds; it is unreferenced, at least by
+`jal` or stored pointer (an address built with `lui`/`addiu` was not
+scanned).

@@ -51,3 +51,11 @@ harmless duplicate, not a conflict.
 ISO9660 `;1` version suffix) fully account for what the function returns; a
 pure string-building leaf whose mechanics are its whole purpose. Called by
 `OpenCdFile` (this unit) as the first step of resolving a file by name.
+
+## Naming (round 99, echo, track 7)
+
+Parameter `suffix` -> `name`, tier A: both callers (`OpenCdFile`,
+`CdDriver__Open`/`ResolveFileEntries`) pass a file name, and the body builds
+`"\\" + <data directory> + name + ";1"`; the suffix is
+`gCdFileVersionSuffix`. `func_800270B8` (code_171e0.c) is the data directory
+getter; its name is proposed, not applied (not this unit's function).
