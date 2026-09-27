@@ -57,6 +57,14 @@ typedef struct BoxFillMethods BoxFillMethods;
 typedef struct SkipShort2 SkipShort2;
 typedef struct BoxFillPos BoxFillPos;
 
+/* Bit positions in `boxAttribute`, the GsBOXF attribute word, that the
+ * setDisplay/setSemiTransOn/setSemiTransRate overrides set through
+ * GetSetBitField: libgs's GsDOFF, GsALON and the 2-bit GsAZERO..GsATHREE
+ * rate, the same positions as SceneNode's GsDOBJ2 attribute. */
+#define BOXFILL_ATTR_RATE_SHIFT 28 /* semitransparency rate, 2 bits */
+#define BOXFILL_ATTR_ALON_SHIFT 30 /* GsALON: semitransparency on */
+#define BOXFILL_ATTR_DOFF_SHIFT 31 /* GsDOFF: display off */
+
 /* The ctor's (and Reset's) size argument: two words of which only the low
  * halfwords are read (lhu at +0x000 and +0x004), into boxW and boxH. The
  * callers pass s32 pairs of their own types (class_3bb8c_n's PairXY,

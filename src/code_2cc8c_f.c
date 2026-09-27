@@ -32,15 +32,15 @@ void BoxFill__AttachToParent(BoxFill *self, SceneNode *parent, BoxFillPos *pos) 
 }
 
 s32 BoxFill__SetDisplay(BoxFill *self, s32 on) {
-    return GetSetBitField(&self->boxAttribute, 0x1F, 1, on == 0) == 0;
+    return GetSetBitField(&self->boxAttribute, BOXFILL_ATTR_DOFF_SHIFT, 1, on == 0) == 0;
 }
 
 s32 BoxFill__SetSemiTrans(BoxFill *self, s32 on) {
-    return GetSetBitField(&self->boxAttribute, 0x1E, 1, on != 0);
+    return GetSetBitField(&self->boxAttribute, BOXFILL_ATTR_ALON_SHIFT, 1, on != 0);
 }
 
 s32 BoxFill__SetSemiTransRate(BoxFill *self, s32 rate) {
-    return GetSetBitField(&self->boxAttribute, 0x1C, 2, rate);
+    return GetSetBitField(&self->boxAttribute, BOXFILL_ATTR_RATE_SHIFT, 2, rate);
 }
 
 void BoxFill__SetColor(BoxFill *self, s32 overwrite, u8 *rgb) {
@@ -100,7 +100,7 @@ BoxFillMethods *GetBoxFillMethods(void) {
 }
 
 TextRow *New_TextRow(void *texture, s32 count, char *text) {
-    TextRow *self = BMemPMgrAlloc(0xB8);
+    TextRow *self = BMemPMgrAlloc(sizeof(TextRow));
     if (self != NULL) {
         GetTextRowMethods()->ctor(self, texture, count, text);
         return self;
@@ -112,19 +112,19 @@ void TextRow__TextRow(TextRow *self, void *texture, s32 count, char *text) {
     s32 i;
     CharSprite **cursor;
 
-    GetCharSpriteMethods()->ctor((CharSprite *)self, texture, 0x20);
+    GetCharSpriteMethods()->ctor((CharSprite *)self, texture, ' ');
     self->methods = GetTextRowMethods();
     self->cellCount = count;
     self->visibleCount = count;
     self->firstVisible = 0;
     self->gapIndex = 0;
-    cursor = BMemPMgrAlloc(count * 4);
+    cursor = BMemPMgrAlloc(count * sizeof(CharSprite *));
     if (cursor != NULL) {
         self->cells = cursor;
         i = 0;
         if (i < count) {
             do {
-                *cursor = New_CharSprite(texture, 0x20);
+                *cursor = New_CharSprite(texture, ' ');
                 i++;
                 cursor++;
             } while (i < count);
@@ -140,7 +140,7 @@ void TextRow__Finalize(TextRow *self) {
 }
 
 void TextRow__Reset(TextRow *self, char *text) {
-    self->methods->setCellPitch(self, 7);
+    self->methods->setCellPitch(self, TEXTROW_DEFAULT_PITCH);
     self->methods->setText(self, text);
 }
 
@@ -160,7 +160,7 @@ void TextRow__AttachToParent(TextRow *self, SceneNode *parent, ScreenSpritePos *
     if (i < bound + self->visibleCount) {
         do {
             if (self->gapIndex != 0 && i == self->gapIndex) {
-                buf.x += 0x10;
+                buf.x += TEXTROW_GAP_WIDTH;
             }
             (*elemp)->methods->attachToParent(*elemp, (SceneNode *)self, (LongVec3 *)&buf);
             buf.x += self->cellPitch;
@@ -279,6 +279,16 @@ TextRowMethods *GetTextRowMethods(void) {
     return &gTextRowMethods;
 }
 
+/* The full-width Shift-JIS forms of printable ASCII, as these three convert
+ * them: two bytes a character, a lead byte and ASCII + SJIS_TRAIL_OFFSET as
+ * the trail, one more from SJIS_TRAIL_GAP up because Shift-JIS never uses
+ * 0x7F as a trail byte. */
+#define SJIS_LEAD_SYMBOL 0x81  /* the lead for space and the symbols below '0' */
+#define SJIS_LEAD_ALNUM 0x82   /* the lead from '0' up: digits and Latin letters */
+#define SJIS_TRAIL_OFFSET 0x1F /* ASCII + this is the trail below the gap */
+#define SJIS_TRAIL_GAP 0x7F    /* the trail value Shift-JIS skips */
+#define SJIS_TRAIL_SPACE 0x40 /* the full-width space 0x8140's trail: ' ' + SJIS_TRAIL_OFFSET + 1 */
+
 /* DecodeFullWidthSjis -- MATCHED round 38 (24/24). A permuter search (208
  * iterations, rc=0) closed the last residue: retail materializes the
  * 0x40 comparison constant into its own register BEFORE copying `dst`
@@ -293,16 +303,16 @@ u8 *DecodeFullWidthSjis(u8 *dst, u8 *src) {
     u32 peek;
 
     if (*src++ != 0) {
-        special = 0x40;
+        special = SJIS_TRAIL_SPACE;
         d = dst;
         do {
             d++;
             c = *src;
             dst++;
-            if (c < 0x80 && c != special) {
-                v = c - 0x1F;
+            if (c <= SJIS_TRAIL_GAP && c != special) {
+                v = c - SJIS_TRAIL_OFFSET;
             } else {
-                v = c - 0x20;
+                v = c - (SJIS_TRAIL_OFFSET + 1);
             }
             src++;
             d[-1] = v;
@@ -334,20 +344,20 @@ u8 *EncodeFullWidthSjis(u8 *dst, u8 *src) {
             d = dst;
             dst++;
             c = *src;
-            if (c >= 0x30) {
-                lead = 0x82;
+            if (c >= '0') {
+                lead = SJIS_LEAD_ALNUM;
             } else {
-                lead = 0x81;
+                lead = SJIS_LEAD_SYMBOL;
             }
             *d = lead;
             d = dst;
             dst++;
             c = *src;
             trail = c;
-            if (trail < 0x60 && trail != 0x20) {
-                v = trail + 0x1F;
+            if (trail < SJIS_TRAIL_GAP - SJIS_TRAIL_OFFSET && trail != ' ') {
+                v = trail + SJIS_TRAIL_OFFSET;
             } else {
-                v = trail + 0x20;
+                v = trail + (SJIS_TRAIL_OFFSET + 1);
             }
             src++;
             *d = v;

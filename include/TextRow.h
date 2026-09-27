@@ -46,6 +46,9 @@
 typedef struct TextRow TextRow;
 typedef struct TextRowMethods TextRowMethods;
 
+#define TEXTROW_DEFAULT_PITCH 7 /* reset's cellPitch: pixels from one cell's x to the next */
+#define TEXTROW_GAP_WIDTH 16    /* the extra x attachToParent adds before cell `gapIndex` */
+
 /* CharSprite's slots, then this class's own. `tools/classtable.py
  * gTextRowMethods --vs gCharSpriteMethods` lists the overrides of the
  * inherited ones: TextRow__TextRow, __Finalize, __Reset, __AttachToParent,
