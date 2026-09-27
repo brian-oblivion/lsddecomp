@@ -891,11 +891,11 @@ typedef struct ResourceSourceArgs {
 
 /* A ModelData's buffer: the LinkResource's TMD at `tmdOffset`, the TodSet's
  * data from +0x0C. */
-typedef struct Buf44858 {
+typedef struct ModelDataHeader {
     /* +0x00 */ u8 pad0[8];
     /* +0x08 */ s32 tmdOffset;
     /* +0x0C */ u8 tods[1];
-} Buf44858;
+} ModelDataHeader;
 
 /* code_171e0.c: stores its three words into *req, returns req. */
 extern ResourceSourceArgs *SetVec3(ResourceSourceArgs *req, void *buffer, char *name, s32 mode);
@@ -906,10 +906,10 @@ s32 ModelData__BuildResources(ModelData *self) {
     ResourceSourceArgs req;
 
     if (self->ownsResources != 0) {
-        SetVec3(&req, (u8 *)self->buffer + ((Buf44858 *)self->buffer)->tmdOffset, 0, 1);
+        SetVec3(&req, (u8 *)self->buffer + ((ModelDataHeader *)self->buffer)->tmdOffset, 0, 1);
         self->linkResource = New_LinkResource((ResourceSource *)&req);
         if (self->linkResource != NULL) {
-            req.buffer = ((Buf44858 *)self->buffer)->tods;
+            req.buffer = ((ModelDataHeader *)self->buffer)->tods;
             self->todSet = (FileResource *)New_TodSet((ResourceSource *)&req);
             if (self->todSet != NULL) {
                 return 0;

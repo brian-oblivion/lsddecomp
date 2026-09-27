@@ -29,16 +29,16 @@ typedef struct ResourceSourceArgs {
     /* +0x08 */ s32 unk8;
 } ResourceSourceArgs;
 
-typedef struct Buf44858 {
+typedef struct ModelDataHeader {
     /* +0x00 */ u8 pad0[8];
     /* +0x08 */ s32 offset;
-} Buf44858;
+} ModelDataHeader;
 
 s32 ModelData__BuildResources(ModelData *self) {
     ResourceSourceArgs req;
 
     if (self->ownsResources != 0) {
-        SetVec3(&req, (u8 *)self->buffer + ((Buf44858 *)self->buffer)->offset, 0, 1);
+        SetVec3(&req, (u8 *)self->buffer + ((ModelDataHeader *)self->buffer)->offset, 0, 1);
         self->linkResource = New_LinkResource((s32)&req);
         if (self->linkResource != NULL) {
             req.buffer = (u8 *)self->buffer + 0xC;
@@ -77,6 +77,6 @@ New_TodSet is now prototyped in include/TodSet.h as `TodSet *New_TodSet(struct R
 
 | old | new | tier | evidence |
 | --- | --- | --- | --- |
-| `Buf44858.offset` | `tmdOffset` | A | the sub-block New_LinkResource is built over, which LinkResource__BuildModels reads as a TmdFile |
-| `(u8 *)buffer + 0xC` | `Buf44858.tods` | A | New_TodSet's buffer |
+| `ModelDataHeader.offset` | `tmdOffset` | A | the sub-block New_LinkResource is built over, which LinkResource__BuildModels reads as a TmdFile |
+| `(u8 *)buffer + 0xC` | `ModelDataHeader.tods` | A | New_TodSet's buffer |
 | `ResourceSourceArgs.unk4`, `unk8` | `pad4[8]` | A | no code here reads them; SetVec3 writes the name (NULL) and a 1 there. Its prototype's parameters are now `(buffer, name, mode)`, as include/code_4cd08.h reads the same call |
