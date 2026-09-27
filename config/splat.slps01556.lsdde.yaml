@@ -1113,7 +1113,7 @@ segments:
       - [0x26BFC, o, libsnd/vm_don]     # SpuVmDamperOn
       - [0x26C10, o, libsnd/next]       # _SsSndNextSep
       - [0x26D18, o, libsnd/vm_doff]    # SpuVmDamperOff
-      - [0x26D28, c, code_179d8_f]
+      - [0x26D28, c, libsnd_cres]
       # ROUND 34, second run in the same unit: `libsnd/stop` (3.3, 0x1C0)
       # covers func_800368E8/A54/A7C = `Snd_stop`, `SsSeqStop`, `SsSepStop`,
       # all three previously MATCHED as C.  This one sits in the MIDDLE of

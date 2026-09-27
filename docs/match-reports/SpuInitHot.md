@@ -4,8 +4,8 @@
 
 > Renamed from `func_80036AA8` on 2026-09-24 (tools/rename.py). Address 0x80036aa8.
 
-`asm/nonmatchings/code_179d8_f/SpuInitHot.s`, vram `0x80036AA8`, unit
-`libspu_s_ih` (split off `code_179d8_f` in round 34; this report predates
+`asm/nonmatchings/libsnd_cres/SpuInitHot.s`, vram `0x80036AA8`, unit
+`libspu_s_ih` (split off `libsnd_cres` in round 34; this report predates
 the split and had not been updated). One-line wrapper: `func_80038E44(1)`.
 
 ```c

@@ -88,7 +88,7 @@ extern u16 D_8008EA22;
  * (`libsnd/pause`, linked since round 34; it was code_179d8_i.c's matched
  * func_800339AC), which builds exactly this packing before calling into
  * this unit's SpuVmSeqKeyOff. Reduced local view: only the two leading s16
- * fields this unit's own accessors touch are named. See code_179d8_f.c /
+ * fields this unit's own accessors touch are named. See libsnd_cres.c /
  * code_179d8_i.c's own Entry90902E8 for a fuller layout of the same array;
  * each unit keeps its own independent reading, per project convention. */
 typedef struct {

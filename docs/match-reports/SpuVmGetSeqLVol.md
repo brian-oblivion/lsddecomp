@@ -4,7 +4,7 @@
 
 Unit `code_179d8_j`, round 22 (2026-09-06). Not a class method. Sibling of
 `SpuVmGetSeqRVol` and `SpuVmGetSeqVol` -- all three index the same
-`_ss_score[screen][slot]` array already established in `code_179d8_f.c` /
+`_ss_score[screen][slot]` array already established in `libsnd_cres.c` /
 `code_179d8_i.c` (an array of pointers to 172 (0xAC)-byte records), reading
 the two leading `s16` fields at `+0x74`/`+0x76` this unit hadn't named yet.
 
@@ -59,7 +59,7 @@ not committed) before applying here.
  * high byte, screen in the low byte) -- see code_179d8_i.c's own
  * func_800339AC, which builds exactly this packing before calling into
  * this unit's SpuVmSeqKeyOff. Reduced local view: only the two leading s16
- * fields this unit's own accessors touch are named. See code_179d8_f.c /
+ * fields this unit's own accessors touch are named. See libsnd_cres.c /
  * code_179d8_i.c's own Entry90902E8 for a fuller layout of the same array;
  * each unit keeps its own independent reading, per project convention. */
 typedef struct {

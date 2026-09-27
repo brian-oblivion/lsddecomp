@@ -18,7 +18,7 @@ Original title: STALL: length EXACT (179/179 words); raw word-match 171/179 (rou
 exact type/role of its 4th argument and scratch struct, and total absence of
 independent corroboration for its nine cross-unit calls (all local guesses,
 `func_80036230`/`func_80036044`/etc, per the round-27 report below). **Both
-are now resolved.** Round 34's SDK-object conversion linked `code_179d8_f.c`'s
+are now resolved.** Round 34's SDK-object conversion linked `libsnd_cres.c`'s
 tail against Sony's `libsnd/adsr.o` and placed six more `libsnd` objects
 elsewhere in this game's build, which retyped every one of this function's
 callees from a local guess into a real, named Psy-Q symbol:
@@ -62,7 +62,7 @@ the caller:
   the caller's stack, contiguous) explains the exact byte range with no local
   frame space spent on it at all.
 - The SAME reasoning applies to what the round-27 report called `Blk2`: a
-  second by-value struct, `sp+0x5C..0x6E`, matching `code_179d8_f.c`'s
+  second by-value struct, `sp+0x5C..0x6E`, matching `libsnd_cres.c`'s
   independently-matched `UnkStruct80035F3C` (9 halfwords, offsets `0`, `2`,
   `4`, `6`, `8`, `0xA`, `0xC`, `0xE`, `0x10`) EXACTLY -- this function's
   fifth parameter. `_SsUtResolveADSR(scratch.adsr1, scratch.adsr2, &resolved)`
@@ -97,7 +97,7 @@ typedef struct {
 typedef struct {
     s16 unk0; s16 unk2; s16 unk4; s16 unk6; s16 unk8;
     s16 unkA; s16 unkC; s16 unkE; s16 unk10;
-} AdsrFields;   /* same shape as code_179d8_f.c's UnkStruct80035F3C, renamed per unit */
+} AdsrFields;   /* same shape as libsnd_cres.c's UnkStruct80035F3C, renamed per unit */
 
 void Snd_setVabAttr(s16 channel, s16 slot, s16 kind, Scratch_800357B0 scratch,
                     AdsrFields resolved, s16 arg5, u8 arg6);

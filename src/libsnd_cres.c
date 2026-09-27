@@ -1,10 +1,16 @@
 /*
- * code_179d8_f -- Snd_crescendo, libsnd's per-tick volume fade for one
- * sequence. Sony's code carried as C: the linked libsnd objects call it by
- * this name (config/psyq-objects.ld), and the libsnd/cres object that holds
- * it on the 3.0 and 3.3 discs is a different build (0x474 and 0x57C bytes of
- * text against retail's 0x3C0), so it cannot be linked. Its record is Sony's
- * _ss_score entry, include/SsScore.h.
+ * libsnd_cres -- Sony's libsnd/cres module, carried as C because no SDK disc
+ * carries the build retail linked.
+ *
+ * Snd_crescendo is libsnd's per-tick volume fade for one sequence: the
+ * linked libsnd objects call it by this name (config/psyq-objects.ld). Its
+ * record is Sony's _ss_score entry, include/SsScore.h.
+ *
+ * Which object (nm over sdk/work/<disc>/elf/libsnd): cres.o on every disc,
+ * with this one function as its only text symbol -- Snd_crescendo on 3.0 and
+ * 3.3, renamed _SsSndCrescendo on 3.5 and 3.6. None is retail's build: its
+ * text is 0x474 (3.0), 0x57C (3.3) and 0x2DC (3.5, 3.6) bytes against
+ * retail's 0x3C0, so it cannot be linked.
  *
  * The unit's edges are Sony objects on both sides: libsnd/vm_doff before it,
  * libsnd/stop after it.

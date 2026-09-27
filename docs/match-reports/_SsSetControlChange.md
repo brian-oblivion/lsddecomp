@@ -118,7 +118,7 @@ since the base address is only known at runtime).
 
 Cross-unit prototypes added (local guesses, kept in this .c only, per
 project convention): `func_800363FC(void)` and `func_80036118(s32, s32)`
-(both matched in `code_179d8_f.c`), `func_800307F0(s16, s16, s32) -> s32`
+(both matched in `libsnd_cres.c`), `func_800307F0(s16, s16, s32) -> s32`
 (matched in `code_179d8_j.c`), and `SpuVmSetVol(s16 packed, s16 note,
 u8 vol, s32 arg3, s32 arg4)` -- still `INCLUDE_ASM` in `code_179d8_j.c`,
 so this is this call site's own reading: a 5th argument spills to

@@ -56,7 +56,7 @@ readings).
 
 Cross-unit prototypes added (local guesses, kept in this .c only):
 `SpuVmSeqKeyOff(s32)` and `func_80036410(s32, s32)`, both already matched
-elsewhere (`code_179d8_j.c` and `code_179d8_f.c` respectively) with
+elsewhere (`code_179d8_j.c` and `libsnd_cres.c` respectively) with
 exactly these signatures and this file's own established
 "`(slot<<8)|channel`" packed-argument idiom for the former.
 
