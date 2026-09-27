@@ -1,3 +1,24 @@
+/*
+ * class_39e08 -- the methods of DayTask and of most of its parent TimedTask,
+ * with one free function between them.
+ *
+ * DayTask (include/DayTask.h), New_DayTask through GetDayTaskMethods: the
+ * task GameApplication__PollStatusObj runs for one dream day. Its ctor loads
+ * the day's shared resources (ETC\ETC.TIM, ETC\DREAMER.TMD, the week's
+ * BGM) and fills the init args' viewport, frame clock and light rig; on each
+ * DrawSystem VSync DayTask__AdvancePhase starts the day or replaces the
+ * running ObjM, and DayTask__OnObjMNotify turns ObjM's states into the next
+ * phase or the task's result.
+ *
+ * RegisterRecordTableFiles: registers gRecordTable's file entries with the
+ * CD driver in at most two batches (DayTask's ctor, and the loader-task
+ * callback in code_1677c.c).
+ *
+ * TimedTask (include/TimedTask.h), New_TimedTask through
+ * TimedTask__SetTimeout: an IntermediateBase with a frame timeout, a sound
+ * object and a result. Its last two functions, TimedTask__PlaySound and
+ * GetTimedTaskMethods, open class_3ac78.
+ */
 #include "common.h"
 #include <libgte.h>
 #include <libgpu.h>
@@ -13,9 +34,8 @@
 #include "LinkResource.h"
 #include "ObjM.h"
 
-/* The viewpoint and view-reference vectors DayTask__OnInit hands the
- * viewport's attachViewChild: (0, -1200, 0) and (0, -1200, 10000), the data
- * right before gTimedTaskMethods. */
+/* The viewpoint and view-reference points DayTask__OnInit hands the
+ * viewport's attachViewChild: (0, -1200, 0) and (0, -1200, 10000). */
 extern LongVec3 sDayViewPoint;
 extern LongVec3 sDayViewRef;
 
@@ -49,7 +69,7 @@ void DayTask__DayTask(DayTask *self, IntermediateBaseInitArgs *initArgs, DreamSy
     vabPath = PickWeeklyGroup(0);
     self->bgm = New_WBgm((char *)vabPath, NULL, 1);
     RegisterRecordTableFiles(1);
-    SetActiveDataSourceDriverMode((u32)syncDriver < 1, 1, 1);
+    SetActiveDataSourceDriverMode(syncDriver == 0, 1, 1);
     self->initArgs = initArgs;
     initArgs->viewport = (BasicClass *)New_NodeGuardedViewport();
     initArgs->frameClock = (BasicClass *)New_FrameClock();
@@ -138,6 +158,9 @@ void DayTask__OnDeinit(DayTask *self) {
     vp->methods->detachViewChild(vp);
 }
 
+/* onTag1Notify: on each DrawSystem VSync, starts the day's first ObjM
+ * (READY) or replaces the ObjM a link state ended (REPLACE_OBJM). A day
+ * startDay refuses ends at once. */
 void DayTask__AdvancePhase(DayTask *self, BasicClass *sender, s32 event) {
     s32 result;
 
@@ -154,7 +177,7 @@ void DayTask__AdvancePhase(DayTask *self, BasicClass *sender, s32 event) {
                 }
                 DayTask__StartObjM(self, result);
                 break;
-            case DAYTASK_PHASE_RUNNING:
+            case DAYTASK_PHASE_RUNNING: /* MATCHING: unreachable (phase != RUNNING above), but removing it changes the switch's code */
                 break;
             case DAYTASK_PHASE_REPLACE_OBJM:
                 self->objM->methods->deinit(self->objM);
@@ -205,6 +228,7 @@ void DayTask__OnObjMNotify(DayTask *self, BasicClass *sender, s32 event) {
         case OBJM_NOTIFY_CLOSE_NEW_GAME:
             self->objM->methods->deinit(self->objM);
             self->objM->methods->release(self->objM);
+            /* endDay(1) on CLOSE, endDay(2) (a new game) on CLOSE_NEW_GAME */
             self->dreamSys->methods->endDay(self->dreamSys, event != OBJM_NOTIFY_CLOSE ? 2 : 1);
             self->result = DAYTASK_RESULT_CLOSED;
             self->methods->setState(self, INTERMEDIATEBASE_STATE_STOP);
@@ -216,18 +240,23 @@ DayTaskMethods *GetDayTaskMethods(void) {
     return &gDayTaskMethods;
 }
 
-/* Sony's, from the still-uncarved psyq_39094 SDK segment
- * (asm/psyq_39094.s): `if (out != NULL) *out = 0x230; return &gRecordTable;`
- * -- an unconditional out-param write (the address passed here is always a
- * stack address, never NULL) plus a fixed .data address, unrelated to the
- * write. Declared locally per CLAUDE.md's rule against writing C for
- * SDK-owned code. */
+/* src/code_39094.c: returns gRecordTable and writes its record count to
+ * *out. */
 extern void *GetRecordTable(s32 *out);
+/* src/code_171e0.c: appends `count` records of `table` to the CD driver's
+ * file table and resolves them; returns 0 to be retried, and 1 when the CD
+ * driver is not the active data source. */
 extern s32 RegisterFileTableEntries(void *table, s32 count);
 
+/* How many times RegisterRecordTableFiles has run (a call with `all` set
+ * counts as two), and how many records its first, half-table batch took. */
 extern s32 sRecordRegisterCalls;
 extern s32 sRecordFirstBatchCount;
 
+/* Registers gRecordTable's records with the CD driver, retrying until it
+ * accepts them. The first call registers the whole table when `all` is set,
+ * else its first half; the second call registers the rest; any later call
+ * registers nothing. */
 s32 RegisterRecordTableFiles(s32 all) {
     s32 count;
     void *table;

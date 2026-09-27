@@ -153,3 +153,23 @@ forward-declared struct bodies as a bare `struct X { ... };`, never repeat
 ## Track 4 (2026-09-26, round 88, DayTask)
 
 The class (table D_800865C8, id 0x1F230, TimedTask's subclass) is unified as DayTask in include/DayTask.h; the Obj865C8/DayTaskMethods views in class_39e08.h are gone. Renamed from Obj865C8__StartSubA: it is the +0x04C onInit override (IntermediateBase__Init calls it). subA was IntermediateBase's viewport (+0x018), which holds the NodeGuardedViewport the ctor made, and SubObjA's slots are Viewport's: setScreenSize, getSubHandle (then SceneNode setDisplay(1)), setUnk44(0x4B0), attachViewChild(dreamSys, &sDayViewPoint, &sDayViewRef, NULL), initOt. It takes self alone; the slot keeps (self, s32, s32, s32).
+
+## History moved from comments (track 7, round 99, charlie)
+
+The comment on the two vectors (then `D_80086650`/`D_8008665C`, now
+`sDayViewPoint`/`sDayViewRef`) ended "the data right before
+gTimedTaskMethods"; they are `asm/data/76DC8.data.s`'s words at 0x80086650
+and 0x8008665C.
+
+## Naming (track 7, round 99, charlie)
+
+- `sDayViewPoint` = (0, -1200, 0) and `sDayViewRef` = (0, -1200, 10000)
+  (tier A: they are attachViewChild's `vp` and `vr` arguments, Viewport.h
+  +0x070). Unit-static (`s`): no other code reads them.
+- Locals `obj`/`ret` -> `drawSystem`/`fadeBox`: the init args' `drawSystem`
+  and Viewport's `getFadeBox` result.
+- SubObjE's +0x07C `slot7C` -> `getDims`: the object is the init args'
+  `drawSystem`, and DrawSystem.h's +0x07C is `getDims` (DrawSystem__GetDims).
+- `setUnk44(vp, 1200)`: decimal; Viewport.h says unk44 x unk48 is each
+  buffer's packet area (default 2000) without settling which is the count, so
+  the value keeps no name.

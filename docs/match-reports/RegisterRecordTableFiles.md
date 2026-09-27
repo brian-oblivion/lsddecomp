@@ -106,3 +106,32 @@ resolved), and its own body -- a two-call-deep counter over
 does not establish what it is registering. Per CLAUDE.md, "a wrong tier-A
 name is worse than `func_`"; this stays `RegisterRecordTableFiles` rather than assert
 a guess.
+
+## History moved from comments (track 7, round 99, charlie)
+
+The unit's comment on `GetRecordTable` read: "Sony's, from the
+still-uncarved psyq_39094 SDK segment (asm/psyq_39094.s): `if (out != NULL)
+*out = 0x230; return &gRecordTable;` ... Declared locally per CLAUDE.md's
+rule against writing C for SDK-owned code." That is no longer true:
+GetRecordTable is game code, matched in `src/code_39094.c`, and the comment
+now says so. (The derivation above quotes the old comment as it was.)
+
+## Naming (track 7, round 99, charlie)
+
+`func_8004A070` -> `RegisterRecordTableFiles` (tier B). The body, read with
+its two callees: GetRecordTable returns gRecordTable (0x230 records of 0x1C
+bytes, each a file path first; code_39094.c's banner) and its count;
+RegisterFileTableEntries (code_171e0.c) appends `count` records to the CD
+driver's file table and resolves them, returns 0 to be retried, and 1 when
+the CD driver is not the active source. So the function registers the record
+table's files with the CD driver: on its first call all of them when `all`
+is set (and it then counts itself as two calls), else the first half; on its
+second call the rest; later calls register nothing. The mechanics are
+certain; why the table is registered in halves (DayTask's ctor passes 1,
+GameApplication__LoaderTaskDoneCallback 0) is not, hence B.
+
+- `D_8008A978` -> `sRecordRegisterCalls` (tier A: a call counter, read and
+  written only here).
+- `D_8008A97C` -> `sRecordFirstBatchCount` (tier A: the first batch's record
+  count, which the second call subtracts).
+- Parameter `arg0` -> `all`; locals `local`/`obj` -> `count`/`table`.
