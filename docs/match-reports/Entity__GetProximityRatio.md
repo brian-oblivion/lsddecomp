@@ -211,3 +211,5 @@ wrong: GCC spells a constant-offset field of a global array as
 - Step 3: the local `self = this` copy is gone: without it the function is still 56/56 and the image byte-identical, so it was not load-bearing. The do/while(0) around the peer guard IS (without it 55/56, measured this round); it keeps a MATCHING line.
 
 - Step 4: `<< 11` -> ENTITY_RANGE_SHIFT.
+
+- Step 5: MATCHING lines added for the do/while(0) guard.

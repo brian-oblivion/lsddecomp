@@ -155,3 +155,5 @@ Entity.h's old claim that they were "SEPARATE global arrays (own base
 symbols, own lui/addiu) ... not sub-fields of the gEntityMoodTable row" was
 wrong: GCC spells a constant-offset field of a global array as
 %hi/%lo(sym + off), which splat labels as its own symbol.
+
+- Step 5: a function comment gives the encoding (n - 1 for positive, ~n for negative).

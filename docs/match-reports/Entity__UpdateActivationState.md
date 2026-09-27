@@ -373,3 +373,5 @@ The class (id 0x1F234, table `gEntityMethods`) is unified as `Entity` in `includ
 - Step 2: EntityMoodRow::detachKind -> activateKind (tier A): it selects the condition under which this body calls activate, and Entity__AttachToParent activates at once when it is 0. The Naming section above left it open between two readings; the table slots settle it. Only Entity.c reads it.
 
 - Step 4: activateKind 0..4 -> enum EntityActivateKind (ENTITY_ACTIVATE_AT_ATTACH/NEAR/FAR/NEAR_RANDOM/RANDOM, Entity.h); state 1 -> ENTITY_STATE_DONE (Entity.h already says this function tests it).
+
+- Step 5: MATCHING line for the goto layout (randCheck after the block; see the fix above).

@@ -99,3 +99,9 @@ The class (id 0x1F234, table `gEntityMethods`) is unified as `Entity` in `includ
 - Step 3: parameter arg2 -> sound: it is TodActor's ctor's second argument, the sound bank TodActor keeps in `sound` (TodActor.h). Also in Entity.h's prototype and ctor slot.
 
 - Step 4: BMemPMgrAlloc(0x108) -> sizeof(Entity) (Entity is 0x108 bytes; byte-identical).
+
+- Step 5: the unit banner of src/Entity.c was rewritten as documentation. The history it carried, kept here:
+  - "The Entity class -- fully matched, no INCLUDE_ASM left (round 56 was a track 3 naming pass, not matching work)."
+  - "This is the first 25 of a 142-function block split at Entity__UpdateTargetProximity; the rest (Entity_b through Entity_g, all sharing include/Entity.h) hold the mood-dispatch handler tables and the per-frame behaviour those handlers run."
+  - "Entity's own vtable is gEntityMethods (asm/data/79528.data.s), reached via Get_vtable_Entity (Entity_b.c); `tools/classtable.py gEntityMethods` is the ground truth for which function occupies which slot, including the several self-referential slots this unit's own functions dispatch back into (activate/deactivate/getProximityRatio/startSoundCue/stopSoundCue)."
+  - "The overrides of TodActor's slots are named for their slots (Entity__Finalize, Reset, AttachToParent, DetachFromParent, OnGridCellLinkCommand; track 4, round 88)."

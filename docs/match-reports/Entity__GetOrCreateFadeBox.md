@@ -163,3 +163,5 @@ The class (id 0x1F234, table `gEntityMethods`) is unified as `Entity` in `includ
 ## Polish (round 96, bravo, track 7)
 
 - Step 3: parameters name, arg2, arg3, arg4 -> size, offset, step, pri (from what their receivers do with them: New_FadeBox's size and pri, BoxFill__AttachToParent's offset, FadeBox__SetStep's step); locals sub, m, dispatchArg2 -> box, boxMethods, attachOffset. The two defaults were renamed by tools/rename.py: gEntityDefaultPos -> gEntityFadeBoxDefaultSize (it is New_FadeBox's size, {320, 240}, not a position), gEntityDefaultOffset -> gEntityFadeBoxDefaultOffset. Tier A for both: the body substitutes each for its NULL argument.
+
+- Step 5: Entity.h's comment on the two defaults said they are "both plain 2-word buffers (asm/data/7B3F8.sdata.s): {0x140, 0xF0} (320, 240)"; the comment now gives the values in decimal and the data file location lives here. The body keeps one MATCHING line for its three load-bearing locals (see the attempt log above).

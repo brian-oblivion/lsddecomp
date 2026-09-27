@@ -37,7 +37,7 @@
  * Actor's `grid` field (+0x04C).
  *
  * Sound cues. startSoundCue calls InitSoundCueSet on `soundCueSet` with
- * TodActor's `arg2` (the ctor's third argument; code_4cd08 passes
+ * TodActor's `sound` (the ctor's third argument; code_4cd08 passes
  * D_8008AC04) as the sound object, itself as the owner and the mood row's
  * handler as the callback, and selects tick callback 'B' in reset
  * (Entity__TickSoundCue, +0x11C), which services the set once per tick. So a
@@ -138,10 +138,9 @@ extern EntityMethods *Get_vtable_Entity(void); /* returns &gEntityMethods */
  * is the grid manager, StageMap (include/StageMap.h; code_4cd08 passes
  * D_8008ABFC). Entity_b/_e/_g call its startScaleRamp (+0x138). */
 
-/* Default arguments Entity__GetOrCreateFadeBox substitutes when its own
- * `name`/`arg2` parameters are NULL -- both plain 2-word buffers
- * (asm/data/7B3F8.sdata.s): {0x140, 0xF0} (320, 240) and {-100, -100}, the
- * size and offset Viewport gives its FadeBox (FadeBox.h). */
+/* The size and attach offset Entity__GetOrCreateFadeBox substitutes when its
+ * `size`/`offset` arguments are NULL: {320, 240} and {-100, -100}, what
+ * Viewport gives its FadeBox (FadeBox.h). */
 extern s32 gEntityFadeBoxDefaultSize[2];
 extern s32 gEntityFadeBoxDefaultOffset[2];
 

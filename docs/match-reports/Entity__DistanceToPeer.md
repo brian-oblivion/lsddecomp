@@ -92,3 +92,5 @@ The class (id 0x1F234, table `gEntityMethods`) is unified as `Entity` in `includ
 ## Polish (round 96, bravo, track 7)
 
 - Step 3: locals world, pos -> peerPos, coord.
+
+- Step 5: MATCHING line for `~dx + 1` (as Entity_b writes it for the same idiom).
