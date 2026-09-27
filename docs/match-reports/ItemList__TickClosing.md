@@ -52,3 +52,7 @@ Round 75 (bravo, track 3). `func_8005227C` -> `ItemList__TickClosing`, **tier B*
 Slot +0x058 (`tools/classtable.py gItemListMethods`), which ItemList__OnNotify (class_3bb8c_j) dispatches for notifications from its tag-5 child. While `result` is 2 or 3 it counts calls in `closeTicks` and on the second call dispatches setState(self, 4). What the tag-5 child is (a per-frame tick?) is not established, hence tier B.
 
 ItemList, per the round-75 pass, is a scrolling list selector: up to 4 visible rows of 26-character item text, a highlighted cursor row, a horizontal column offset (see the unit header comment of `src/class_3bb8c_k.c`).
+
+## Round 99 (delta, track 7)
+
+Local `old` -> `prevTicks`, then the read-increment-test written as `if (self->closeTicks++ == 0) return;`: measured byte-identical, so the two-statement form in Source above was not load-bearing. The bounds are `ITEMLIST_STATE_REPORT` and `ITEMLIST_RESULT_CHOSEN`; the dispatch is `setState(self, ITEMLIST_STATE_REPORT)`.

@@ -1,17 +1,16 @@
 /*
- * class_3bb8c_k -- the second half of ItemList, and the start of ObjM.
+ * class_3bb8c_k -- the second half of ItemList's methods and the first of
+ * ObjM's.
  *  - ItemList (include/ItemList.h), the list of strings the player picks one
- *    from: setState, tickClosing, handleInputCode and forwardToTarget, the
- *    cursor and scroll methods, the four visible rows (createRows,
+ *    from: setState and tickClosing (close, then report the result to the
+ *    parents), handleInputCode (the Pad events it answers) and playSound,
+ *    the cursor and scroll methods, the four visible rows (createRows,
  *    releaseRows, refreshRows, and the non-virtual helpers FormatRowText and
  *    SetView), stepCursorInView, getCursorIndex and the table getter
  *    GetItemListMethods. Its ctor and resource methods are in class_3bb8c_j.
  *  - ObjM (include/ObjM.h): its allocator, ctor, finalize and onNotify,
  *    which dispatches on the sender's class id. The rest of ObjM is in
  *    class_3bb8c_l and class_3bb8c_m.
- *
- * include/class_3bb8c.h is shared with every other class_3bb8c_* unit; edits
- * to it must be strictly additive.
  */
 #include "common.h"
 #include <libgte.h>
@@ -25,16 +24,20 @@
 #include "ItemList.h"
 #include "ObjM.h"
 #include "VabStreamObj.h"
+#include "Pad.h"
+#include "FadeBox.h"
+#include "DreamSys.h"
 
 void ItemList__SetState(ItemList *self, s32 state) {
+    /* MATCHING: the gotos keep retail's branch polarity and block order. */
     self->closeTicks = 0;
-    if (state < 2) {
+    if (state < ITEMLIST_RESULT_CHOSEN) {
         goto end;
     }
-    if (state < 4) {
+    if (state < ITEMLIST_STATE_REPORT) {
         goto case_lt4;
     }
-    if (state == 4) {
+    if (state == ITEMLIST_STATE_REPORT) {
         goto case_eq4;
     }
     goto end;
@@ -50,66 +53,63 @@ end:
 }
 
 void ItemList__TickClosing(ItemList *self) {
-    s32 old;
-
-    if (self->result >= 4) {
+    if (self->result >= ITEMLIST_STATE_REPORT) {
         return;
     }
-    if (self->result < 2) {
+    if (self->result < ITEMLIST_RESULT_CHOSEN) {
         return;
     }
-    old = self->closeTicks;
-    self->closeTicks = old + 1;
-    if (old == 0) {
+    if (self->closeTicks++ == 0) {
         return;
     }
-    self->methods->setState(self, 4);
+    self->methods->setState(self, ITEMLIST_STATE_REPORT);
 }
 
 void ItemList__HandleInputCode(ItemList *self, void *source, s32 code) {
+    /* MATCHING: the cases stay in this order; retail lays their bodies out in it. */
     switch (code) {
-        case 25:
-            self->methods->forwardToTarget(self, 0x10);
-            self->methods->setState(self, 2);
+        case PAD_EVENT_PRESSED + PAD_BUTTON_RRIGHT:
+            self->methods->playSound(self, 1 << 4); /* VAB program 1, tone 0 */
+            self->methods->setState(self, ITEMLIST_RESULT_CHOSEN);
             break;
-        case 23:
-            self->methods->forwardToTarget(self, 0x10);
-            self->methods->setState(self, 3);
+        case PAD_EVENT_PRESSED + PAD_BUTTON_RDOWN:
+            self->methods->playSound(self, 1 << 4); /* VAB program 1, tone 0 */
+            self->methods->setState(self, ITEMLIST_RESULT_CANCELLED);
             break;
-        case 5:
+        case PAD_EVENT_HELD + PAD_BUTTON_LRIGHT:
             self->methods->scrollRight(self);
             break;
-        case 4:
+        case PAD_EVENT_HELD + PAD_BUTTON_LLEFT:
             self->methods->scrollLeft(self);
             break;
-        case 18:
+        case PAD_EVENT_PRESSED + PAD_BUTTON_LUP:
             self->methods->cursorUp(self);
             break;
-        case 19:
+        case PAD_EVENT_PRESSED + PAD_BUTTON_LDOWN:
             self->methods->cursorDown(self);
             break;
     }
 }
 
-void ItemList__ForwardToTarget(ItemList *self, s32 code) {
+void ItemList__PlaySound(ItemList *self, s32 tone) {
     struct VabStreamObj *target = self->target;
 
     if (target != NULL) {
-        target->methods->playTone(target, code, 0x60, 0x60);
+        target->methods->playTone(target, tone, 96, 96);
     }
 }
 
 void ItemList__ScrollRight(ItemList *self) {
     ItemListMethods *methods;
-    s32 tmp;
+    s32 current;
     s32 column;
 
     if (!self->panelSprite) {
         return;
     }
-    tmp = self->column;
-    column = tmp;
-    if (column + 0x1A >= self->maxTextLen) {
+    current = self->column; /* MATCHING: the double read keeps retail's registers */
+    column = current;
+    if (column + ITEMLIST_ROW_CHARS >= self->maxTextLen) {
         return;
     }
     methods = self->methods;
@@ -132,7 +132,7 @@ void ItemList__ScrollLeft(ItemList *self) {
     self->methods->refreshRows(self, self->topIndex, column, self->cursorIndex, 1);
 }
 
-void ItemList__CursorUp(ItemList *self, s32 arg1, s32 arg2, s32 arg3) {
+void ItemList__CursorUp(ItemList *self, s32 unused1, s32 unused2, s32 forwarded) {
     s32 cursor;
     s32 newTop;
     s32 newCursor;
@@ -144,8 +144,9 @@ void ItemList__CursorUp(ItemList *self, s32 arg1, s32 arg2, s32 arg3) {
     if (cursor - 1 < 0) {
         return;
     }
+    /* MATCHING: this polarity, and newTop/newCursor, keep retail's block order and registers. */
     if (cursor - self->topIndex > 0) {
-        self->methods->stepCursorInView(self, 0, 1, arg3);
+        self->methods->stepCursorInView(self, 0, 1, forwarded);
     } else {
         self->topIndex--;
         newTop = self->topIndex;
@@ -155,7 +156,7 @@ void ItemList__CursorUp(ItemList *self, s32 arg1, s32 arg2, s32 arg3) {
     }
 }
 
-void ItemList__CursorDown(ItemList *self, s32 arg1, s32 arg2, s32 arg3) {
+void ItemList__CursorDown(ItemList *self, s32 unused1, s32 unused2, s32 forwarded) {
     s32 newTop;
     s32 newCursor;
     s32 prevTop;
@@ -166,28 +167,32 @@ void ItemList__CursorDown(ItemList *self, s32 arg1, s32 arg2, s32 arg3) {
     if (self->cursorIndex + 1 >= self->itemCount) {
         return;
     }
-    prevTop = self->topIndex - 1;
-    if (self->cursorIndex - prevTop < 4) {
-        self->methods->stepCursorInView(self, 1, 1, arg3);
+    prevTop = self->topIndex - 1; /* MATCHING: its own statement, or cc1 folds the -1 */
+    if (self->cursorIndex - prevTop < ARRAY_COUNT(self->rows)) {
+        self->methods->stepCursorInView(self, 1, 1, forwarded);
     } else {
         self->topIndex++;
-        newTop = self->topIndex;
+        newTop = self->topIndex; /* MATCHING: newTop/newCursor keep retail's registers */
         self->cursorIndex++;
         newCursor = self->cursorIndex;
         self->methods->refreshRows(self, newTop, self->column, newCursor, 1);
     }
 }
 
-/* The first row's position, two sdata words (-0x5C, -0xF). Read by value
- * into ItemList__CreateRows's `pos`; each further row is 0xA lower. */
+/* The first row's position, two sdata words (-92, -15). Read by value into
+ * ItemList__CreateRows's `pos`; each further row is ITEMLIST_ROW_SPACING
+ * lower. */
 extern s32 gItemListRowOriginX;
 extern s32 gItemListRowOriginY;
 
+/* The y step from one row to the next (createRows). */
+#define ITEMLIST_ROW_SPACING 10
+
 void ItemList__CreateRows(ItemList *self, SceneNode *parent, TimImage *font, s32 top, s32 column,
                           s32 cursor) {
-    char buf[0x20];
+    char buf[32]; /* MATCHING: declared first, or cc1 keeps its address in a register */
     ScreenSpritePos pos;
-    TextRow **p;
+    TextRow **row;
     s32 count;
     s32 i;
 
@@ -198,18 +203,18 @@ void ItemList__CreateRows(ItemList *self, SceneNode *parent, TimImage *font, s32
     pos.x = gItemListRowOriginX;
     pos.y = gItemListRowOriginY;
     count = self->itemCount;
-    p = &self->rows[0];
-    if (count >= 5) {
-        count = 4;
+    row = &self->rows[0];
+    if (count > ARRAY_COUNT(self->rows)) {
+        count = ARRAY_COUNT(self->rows);
     }
 
     for (i = 0; i < count; i++) {
         ItemList__FormatRowText(self, buf, i, top, column);
-        *p = New_TextRow(font, 0x1A, buf);
-        (*p)->methods->attachToParent(*p, parent, (LongVec3 *)&pos);
-        (*p)->methods->setColor(*p, &gItemListRowColor);
-        pos.y += 0xA;
-        p++;
+        *row = New_TextRow(font, ITEMLIST_ROW_CHARS, buf);
+        (*row)->methods->attachToParent(*row, parent, (LongVec3 *)&pos);
+        (*row)->methods->setColor(*row, &gItemListRowColor);
+        pos.y += ITEMLIST_ROW_SPACING;
+        row++;
     }
 
     ItemList__SetView(self, top, column, cursor, 1);
@@ -218,15 +223,15 @@ void ItemList__CreateRows(ItemList *self, SceneNode *parent, TimImage *font, s32
 void ItemList__ReleaseRows(ItemList *self) {
     s32 count;
     s32 i;
-    u8 unused[8];
+    u8 unused[8]; /* MATCHING: retail's 0x28-byte frame */
 
     if (!self->panelSprite) {
         return;
     }
     count = self->itemCount;
-    i = 0;
-    if (count >= 5) {
-        count = 4;
+    i = 0; /* MATCHING: here and a do/while, as retail tests count once */
+    if (count > ARRAY_COUNT(self->rows)) {
+        count = ARRAY_COUNT(self->rows);
     }
     if (count <= 0) {
         return;
@@ -238,104 +243,87 @@ void ItemList__ReleaseRows(ItemList *self) {
     } while (i < count);
 }
 
-/* Psy-Q strlen and memcpy (libc2/strlen and libc2/memcpy, linked from
- * Sony's own SDK objects). libc2's memcpy guards a NULL dest, copies `n`
- * bytes a byte at a time and returns dest -- which is why this call site
- * was read as strncpy-like before the object gave it its name.
- * Both are declared LOCAL to this unit, not in a shared header, since
- * these are cross-unit prototypes for functions this unit does not define
- * (see CLAUDE.md's header-contention rule). strlen already has a
- * differently-typed local declaration in class_3bb8c_j.c
- * (`s32 strlen(void *arg0)`); this unit's own call site reads its
- * argument as a byte pointer, so it is typed `char *` here instead --
- * per-call-site typing of an undefined function's argument, same
- * convention as DecodeFullWidthSjis (see include/class_3bb8c.h HEAD NOTE).
- * memcpy's return type is `void *` to agree with include/psyq/memory.h's
- * unprototyped declaration should this unit ever include it; the result
- * is discarded at the one call site either way. */
+/* Psy-Q's libc2 strlen and memcpy, linked from Sony's objects, typed as
+ * ItemList__FormatRowText passes them (memcpy's `void *` as <memory.h>). */
 extern s32 strlen(char *s);
 extern void *memcpy(char *dest, char *src, s32 n);
 
 void ItemList__RefreshRows(ItemList *self, s32 top, s32 column, s32 cursor, s32 notify) {
     s32 count;
     s32 i;
-    char buf[0x20];
-    TextRow **p;
+    char buf[32]; /* MATCHING: retail's frame size */
+    TextRow **row;
 
     if (!self->panelSprite) {
         return;
     }
     count = self->itemCount;
-    p = &self->rows[0];
-    if (count >= 5) {
-        count = 4;
+    row = &self->rows[0]; /* MATCHING: before the clamp, in its delay slot */
+    if (count > ARRAY_COUNT(self->rows)) {
+        count = ARRAY_COUNT(self->rows);
     }
     for (i = 0; i < count; i++) {
         ItemList__FormatRowText(self, buf, i, top, column);
-        (*p)->methods->setText(*p, buf);
-        p++;
+        (*row)->methods->setText(*row, buf);
+        row++;
     }
     ItemList__SetView(self, top, column, cursor, 0);
     if (notify) {
-        self->methods->forwardToTarget(self, 0);
+        self->methods->playSound(self, 0);
     }
 }
 
 char *ItemList__FormatRowText(ItemList *self, char *dest, s32 row, s32 top, s32 column) {
-    s32 idx = top + row;
+    s32 item = top + row; /* MATCHING: this operand order */
     s32 len;
     s32 i;
 
-    len = strlen(self->texts[idx] + column);
-    if (len >= 0x1B) {
-        len = 0x1A;
+    len = strlen(self->texts[item] + column);
+    if (len > ITEMLIST_ROW_CHARS) {
+        len = ITEMLIST_ROW_CHARS;
     }
-    memcpy(dest, self->texts[idx] + column, len);
-    i = len;
-    if (i < 0x1A) {
-        for (; i < 0x1A; i++) {
-            dest[i] = ' ';
-        }
+    memcpy(dest, self->texts[item] + column, len);
+    for (i = len; i < ITEMLIST_ROW_CHARS; i++) {
+        dest[i] = ' ';
     }
-    dest[0x1A] = 0;
+    dest[ITEMLIST_ROW_CHARS] = '\0';
     return dest;
 }
 
 void ItemList__SetView(ItemList *self, s32 top, s32 column, s32 cursor, s32 highlight) {
-    TextRow *elem;
-    s32 flag = highlight;
+    TextRow *row;
 
     self->topIndex = top;
     self->column = column;
     self->cursorIndex = cursor;
-    if (flag == 0) {
+    if (highlight == 0) {
         return;
     }
-    cursor -= top;
-    elem = self->rows[cursor];
-    elem->methods->setColor(elem, &gItemListCursorColor);
+    cursor -= top; /* MATCHING: reuses cursor's register for the index */
+    row = self->rows[cursor];
+    row->methods->setColor(row, &gItemListCursorColor);
 }
 
 void ItemList__StepCursorInView(ItemList *self, s32 dir, s32 notify) {
-    TextRow **p;
+    TextRow **row;
     s32 idx;
 
     if (!self->panelSprite) {
         return;
     }
     idx = self->cursorIndex - self->topIndex;
-    p = &self->rows[idx];
-    (*p)->methods->setColor(*p, &gItemListRowColor);
+    row = &self->rows[idx]; /* MATCHING: one address, stepped, as retail */
+    (*row)->methods->setColor(*row, &gItemListRowColor);
     if (dir) {
         self->cursorIndex++;
-        p++;
+        row++;
     } else {
         self->cursorIndex--;
-        p--;
+        row--;
     }
-    (*p)->methods->setColor(*p, &gItemListCursorColor);
+    (*row)->methods->setColor(*row, &gItemListCursorColor);
     if (notify) {
-        self->methods->forwardToTarget(self, 0);
+        self->methods->playSound(self, 0);
     }
 }
 
@@ -352,11 +340,11 @@ ObjM *New_ObjM(BasicClass *sound, struct WBgm *bgm, TimImage *etcTim,
     ObjM *self;
     ObjMMethods *methods;
 
-    self = BMemPMgrAlloc(0x88);
+    self = BMemPMgrAlloc(sizeof(ObjM));
     if (self != NULL) {
         methods = GetObjMMethods();
         methods->ctor(self, sound, bgm, etcTim, dreamerTmd, stage);
-        return self;
+        return self; /* MATCHING: two returns, not one */
     }
     return NULL;
 }
@@ -387,11 +375,11 @@ void ObjM__OnNotify(ObjM *self, BasicClass *sender, s32 event) {
 
     GetTimedTaskMethods()->onNotify((TimedTask *)self, sender, event);
     tag = sender->methods->header;
-    if ((tag & 0xFFF) == 0x114) {
+    if ((tag & 0xFFF) == STAGEMAP_CLASS_ID) {
         self->methods->onStageMapNotify(self, sender, event);
-    } else if ((tag & 0xFFF) == 0x164) {
+    } else if ((tag & 0xFFF) == FADEBOX_CLASS_ID) {
         self->methods->onFadeNotify(self, (struct FadeBox *)sender, event);
-    } else if ((tag & 0xFFFF) == 0x1F34) {
+    } else if ((tag & 0xFFFF) == DREAMSYS_CLASS_ID) {
         self->methods->onDreamSysNotify(self, sender, event);
     }
 }

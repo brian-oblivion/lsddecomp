@@ -102,3 +102,7 @@ Round 75 (bravo, track 3). `func_8005281C` -> `ItemList__RefreshRows`, **tier A*
 Slot +0x094 (`tools/classtable.py gItemListMethods`). (self, top, column, cursor, notify): re-formats every visible row's text for the new top/column (setText), SetView without highlight, and if `notify` calls forwardToTarget(0). Callers: ScrollRight, ScrollLeft, CursorUp, CursorDown (all notify=1).
 
 ItemList, per the round-75 pass, is a scrolling list selector: up to 4 visible rows of 26-character item text, a highlighted cursor row, a horizontal column offset (see the unit header comment of `src/class_3bb8c_k.c`).
+
+## Round 99 (delta, track 7)
+
+Local `p` -> `row`; buffer 32 decimal; clamp `ARRAY_COUNT(self->rows)`. The buffer size and the early `row = &self->rows[0]` keep `MATCHING:` lines. The notify call is now `playSound(self, 0)` (slot renamed from forwardToTarget).

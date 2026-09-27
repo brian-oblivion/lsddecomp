@@ -56,6 +56,11 @@
 typedef struct FadeBox FadeBox;
 typedef struct FadeBoxMethods FadeBoxMethods;
 
+/* FadeBox's class id (gFadeBoxMethods word +0x000). Three nibbles, so
+ * `(header & 0xFFF) == FADEBOX_CLASS_ID` tests for it or a class below it
+ * (ObjM__OnNotify). */
+#define FADEBOX_CLASS_ID 0x164
+
 /* What stop notifies its parents with (ObjM__OnFadeNotify). */
 enum FadeBoxEvent { FADEBOX_EVENT_FADE_DOWN_DONE = 5, FADEBOX_EVENT_FADE_UP_DONE = 6 };
 

@@ -8,7 +8,7 @@ Unit `class_3bb8c_k`, round 15. `./build-and-verify.sh` exit 0; whole-image
 SHA1 matches retail. `funcdiff.py ItemList__ScrollLeft`: 24/24 words match.
 
 This is vtable slot `+0x080` of `gItemListMethods` (`ItemListMethods::slot80`),
-dispatched by `ItemList__ForwardToTarget` (this unit, on a DIFFERENT instance reached
+dispatched by `ItemList__PlaySound` (this unit, on a DIFFERENT instance reached
 through `self->unk3C`) as `other->methods->slot80(other, arg1, 0x60, 0x60)`.
 
 ## Source
@@ -35,7 +35,7 @@ void ItemList__ScrollLeft(ItemList *self)
 The occupant's own body ignores every argument past `self` -- it never
 reads what a caller passes in `arg1`/`arg2`/`arg3` -- which is why it
 compiles cleanly as a plain `(ItemList *self)` function even though
-`ItemList__ForwardToTarget`'s call site (a DIFFERENT instance's copy of this same
+`ItemList__PlaySound`'s call site (a DIFFERENT instance's copy of this same
 slot) passes 3 more arguments. Per this project's established
 per-call-site-arity convention this is not a contradiction: the slot's
 declared pointer type in the header carries the fuller signature the call

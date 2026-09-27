@@ -125,3 +125,7 @@ Round 75 (bravo, track 3). `func_80052644` -> `ItemList__CreateRows`, **tier A**
 Slot +0x08C (`tools/classtable.py gItemListMethods`). Called by ItemList__LoadResources (class_3bb8c_j) as (self, parent, FONTICON handle, topIndex, column, cursorIndex). Builds min(itemCount, 4) row text objects with New_TextRow(font, 26, text), lays each out at (gItemListRowOriginX, gItemListRowOriginY + 0xA*i), colours it gItemListRowColor, then SetView(..., highlight=1).
 
 ItemList, per the round-75 pass, is a scrolling list selector: up to 4 visible rows of 26-character item text, a highlighted cursor row, a horizontal column offset (see the unit header comment of `src/class_3bb8c_k.c`).
+
+## Round 99 (delta, track 7)
+
+Local `p` -> `row`. `0x20` -> 32 (the buffer, decimal as a size), `0x1A` -> `ITEMLIST_ROW_CHARS`, the clamp `>= 5 ... = 4` -> `ARRAY_COUNT(self->rows)`, the row step `0xA` -> `ITEMLIST_ROW_SPACING` (10, unit-local define: only this function uses it). `buf` declared first keeps a `MATCHING:` line.

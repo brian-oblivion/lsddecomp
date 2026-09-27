@@ -62,6 +62,14 @@ typedef struct ItemListMethods ItemListMethods;
  * under the cursor chosen (getCursorIndex), command 23 without one. */
 enum ItemListResult { ITEMLIST_RESULT_CHOSEN = 2, ITEMLIST_RESULT_CANCELLED = 3 };
 
+/* setState's last state: notify the parents with `result`. tickClosing
+ * enters it on the second tick after a close. */
+#define ITEMLIST_STATE_REPORT 4
+
+/* The characters one row shows: New_TextRow's width, and FormatRowText pads
+ * or cuts every item's text at `column` to it. */
+#define ITEMLIST_ROW_CHARS 26
+
 /* BasicClass's slots (overrides: +0x008 ItemList__ItemList, +0x00C
  * Finalize, +0x010 AddChild, +0x014 RemoveChild, +0x018 RemoveAllChildren,
  * +0x038 OnNotify; `tools/classtable.py gItemListMethods --vs gBasicClassMethods`),
@@ -78,10 +86,10 @@ struct ItemListMethods {
     /* +0x058 */ void (*tickClosing)(ItemList *self, void *sender,
                                      s32 event); /* ItemList__TickClosing (reads only self; see the banner) */
     /* +0x05C */ void (*handleInputCode)(ItemList *self, void *source, s32 code); /* ItemList__HandleInputCode */
-    /* +0x060 */ void (*forwardToTarget)(ItemList *self, s32 code); /* ItemList__ForwardToTarget */
-    /* +0x064 */ void *slot64[6];                                   /* NULL */
-    /* +0x07C */ void (*scrollRight)(ItemList *self);               /* ItemList__ScrollRight */
-    /* +0x080 */ void (*scrollLeft)(ItemList *self);                /* ItemList__ScrollLeft */
+    /* +0x060 */ void (*playSound)(ItemList *self, s32 tone); /* ItemList__PlaySound */
+    /* +0x064 */ void *slot64[6];                             /* NULL */
+    /* +0x07C */ void (*scrollRight)(ItemList *self);         /* ItemList__ScrollRight */
+    /* +0x080 */ void (*scrollLeft)(ItemList *self);          /* ItemList__ScrollLeft */
     /* +0x084 */ void (*cursorUp)(ItemList *self);   /* ItemList__CursorUp (see the banner) */
     /* +0x088 */ void (*cursorDown)(ItemList *self); /* ItemList__CursorDown (see the banner) */
     /* +0x08C */ void (*createRows)(ItemList *self, struct SceneNode *parent, struct TimImage *font,
@@ -90,7 +98,7 @@ struct ItemListMethods {
     /* +0x094 */ void (*refreshRows)(ItemList *self, s32 top, s32 column, s32 cursor,
                                      s32 notify); /* ItemList__RefreshRows */
     /* +0x098 */ void (*stepCursorInView)(ItemList *self, s32 dir, s32 notify,
-                                          s32 arg3); /* ItemList__StepCursorInView (see the banner) */
+                                          s32 forwarded); /* ItemList__StepCursorInView (see the banner) */
     /* +0x09C */ s32 (*getCursorIndex)(ItemList *self); /* ItemList__GetCursorIndex */
 };
 
@@ -108,7 +116,7 @@ struct ItemList {
     /* +0x030 */ s32 closeTicks;    /* tickClosing's call counter; setState zeroes */
     /* +0x034 */ void *inputSource; /* addChild/removeChild: the child whose class id's low nibble is 2; onNotify sends its events to handleInputCode */
     /* +0x038 */ void *tickSource; /* ... whose low nibble is 5; onNotify sends its events to tickClosing */
-    /* +0x03C */ struct VabStreamObj *target; /* attachTarget; forwardToTarget plays tone `code` on it (playTone, volume 0x60, 0x60) */
+    /* +0x03C */ struct VabStreamObj *target; /* attachTarget; ItemList__PlaySound plays a tone on it (playTone, volume 96, 96) */
     /* +0x040 */ struct TextRow *rows[4]; /* createRows: New_TextRow(font, 26, ...); index = item - topIndex */
     /* +0x050 */ struct ScreenSprite *panelSprite; /* loadResources: New_ScreenSprite(SELECT); non-NULL gates every list method */
 };
@@ -144,11 +152,11 @@ void ItemList__DetachTarget(ItemList *self);
 void ItemList__SetState(ItemList *self, s32 state);
 void ItemList__TickClosing(ItemList *self);
 void ItemList__HandleInputCode(ItemList *self, void *source, s32 code);
-void ItemList__ForwardToTarget(ItemList *self, s32 code);
+void ItemList__PlaySound(ItemList *self, s32 tone);
 void ItemList__ScrollRight(ItemList *self);
 void ItemList__ScrollLeft(ItemList *self);
-void ItemList__CursorUp(ItemList *self, s32 arg1, s32 arg2, s32 arg3);
-void ItemList__CursorDown(ItemList *self, s32 arg1, s32 arg2, s32 arg3);
+void ItemList__CursorUp(ItemList *self, s32 unused1, s32 unused2, s32 forwarded);
+void ItemList__CursorDown(ItemList *self, s32 unused1, s32 unused2, s32 forwarded);
 void ItemList__CreateRows(ItemList *self, struct SceneNode *parent, struct TimImage *font, s32 top,
                           s32 column, s32 cursor);
 void ItemList__ReleaseRows(ItemList *self);

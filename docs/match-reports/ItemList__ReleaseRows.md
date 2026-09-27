@@ -85,3 +85,7 @@ Round 75 (bravo, track 3). `func_8005278C` -> `ItemList__ReleaseRows`, **tier A*
 Slot +0x090 (`tools/classtable.py gItemListMethods`), called by ItemList__ReleaseResources. Releases each of the min(itemCount, 4) row objects and clears its `rows[]` entry.
 
 ItemList, per the round-75 pass, is a scrolling list selector: up to 4 visible rows of 26-character item text, a highlighted cursor row, a horizontal column offset (see the unit header comment of `src/class_3bb8c_k.c`).
+
+## Round 99 (delta, track 7)
+
+The clamp is `ARRAY_COUNT(self->rows)`. `unused[8]` and the `i = 0` / do-while shape keep `MATCHING:` lines.

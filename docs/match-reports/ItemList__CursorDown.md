@@ -85,3 +85,7 @@ Round 75 (bravo, track 3). `func_80052598` -> `ItemList__CursorDown`, **tier A**
 Slot +0x088 (`tools/classtable.py gItemListMethods`). Mirror of CursorUp: bounded by `itemCount`, steps within the window while cursor-top < 3, else scrolls the window down one item. Dispatched by HandleInputCode on code 19.
 
 ItemList, per the round-75 pass, is a scrolling list selector: up to 4 visible rows of 26-character item text, a highlighted cursor row, a horizontal column offset (see the unit header comment of `src/class_3bb8c_k.c`).
+
+## Round 99 (delta, track 7)
+
+Parameters as in ItemList__CursorUp (`unused1`, `unused2`, `forwarded`). The window test `< 4` is `< ARRAY_COUNT(self->rows)`: the cursor steps inside the view unless it is on the last of the four rows. `prevTop` and newTop/newCursor keep `MATCHING:` lines.
