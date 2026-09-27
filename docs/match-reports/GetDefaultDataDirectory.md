@@ -1,4 +1,6 @@
-# func_80048CF0 -- MATCHED (3/3 words), round 81
+# GetDefaultDataDirectory -- MATCHED (3/3 words), round 81
+
+> Renamed from `func_80048CF0` on 2026-09-27 (tools/rename.py). Address 0x80048cf0.
 
 Round 81, runner echo. Unit `src/code_39094.c` (carved from psyq_39094 in
 FINISHING-PLAN revision 18). Fresh ground, no prior attempt. Byte-exact on
@@ -12,7 +14,7 @@ the first build; whole-image SHA1 green.
 ## Source
 
 ```c
-s32 func_80048CF0(void) {
+s32 GetDefaultDataDirectory(void) {
     return D_8008A960;
 }
 ```

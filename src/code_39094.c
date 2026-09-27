@@ -164,7 +164,7 @@ LbdFileMethods *GetLbdFileMethods(void) {
     return &gLbdFileMethods;
 }
 
-s32 func_80048CF0(void) {
+s32 GetDefaultDataDirectory(void) {
     return D_8008A960;
 }
 

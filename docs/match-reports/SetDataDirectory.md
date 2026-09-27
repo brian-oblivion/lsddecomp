@@ -106,7 +106,7 @@ state before these renames.
   part of an ISO9660 path, and it sits between the root `\` and the file
   name.
 - **Writer.** `GameApplication__GameApplication` (code_1677c) calls
-  `SetDataDirectory(func_80048CF0())` once at startup. `func_80048CF0`
+  `SetDataDirectory(GetDefaultDataDirectory())` once at startup. `GetDefaultDataDirectory`
   returns `D_8008A960`, whose retail initialiser is `&D_8008A958`, the
   `.sdata` string `"CDI\\"`. That string ends in the separator, which is
   what the readers need, because they put nothing between it and the name.

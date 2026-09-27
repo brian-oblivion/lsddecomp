@@ -35,7 +35,7 @@ jalr  $v0                         ; base_ctor(self, arg->unk00), return discarde
 jal   GetGameApplicationMethods                ; -> &gGameApplicationMethods (own vtable)
  nop
 sw    $v0, 0x0($s0)                 ; self->methods = own vtable
-jal   func_80048CF0                  ; reads an unnamed small-data global
+jal   GetDefaultDataDirectory                  ; reads an unnamed small-data global
  sw   $s1, 0x20($s0)                   ; self->arg = arg
 jal   SetDataDirectory                     ; stores its arg into another unnamed global
  addu $a0, $v0, $zero
@@ -76,7 +76,7 @@ void GameApplication__GameApplication(GameApplication *self, GameApplicationConf
     GetApplicationMethods()->ctor(self, arg->unk00);
     self->methods = GetGameApplicationMethods();
     self->arg = arg;
-    SetDataDirectory(func_80048CF0());
+    SetDataDirectory(GetDefaultDataDirectory());
     req.type = 0;
     req.path = sModelPathDreamE5;
     self->dreamSys = New_DreamSys(New_LinkResource(&req), 0, 0);
@@ -122,7 +122,7 @@ another caller is found that writes them.
   opaque `void *` to real callable signatures now that this function
   exercises them, retyped `GameApplication::arg` and `::dreamSys` from `void *`
   to their real pointer types, and declared the small externs this function
-  needed (`GetGameApplicationMethods`, `sModelPathDreamE5`, `func_80048CF0`, `SetDataDirectory`,
+  needed (`GetGameApplicationMethods`, `sModelPathDreamE5`, `GetDefaultDataDirectory`, `SetDataDirectory`,
   `New_LinkResource`).
 - `include/DreamSys.h`: extended `struct vtable_DreamSys` past its
   previously-documented end (`0x21c`) with 3 padding words and a new named
