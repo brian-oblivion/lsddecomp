@@ -110,7 +110,7 @@ own score (77/138 before and after), so it is recorded as a correction to
   SECOND, BYTE width (`lbu`, same offset 0) later in this same function --
   the established `*(u8 *)&sym` idiom (see `SpuVmNoiseOn`'s report)
   applies again, on top of the signed/unsigned split.
-- `Tbl32E978` / `D_8008E978` (pointer variable, `lw`-loaded): a 0x20
+- `Tbl32E978` / `_svm_tn` (pointer variable, `lw`-loaded): a 0x20
   (32)-byte-stride table; only two trailing byte fields are read,
   `unkC`/`unkD`. **Getting the stride wrong (14 bytes, from
   `{u8 pad[0xC]; u8 unkC; u8 unkD;}` with no trailing pad) was the single
@@ -141,7 +141,7 @@ an initial after-the-checks placement was itself a real fix, see below). If
 all three match: combine a debug byte into an index (`someTotal =
 D_8008D99C[a0] + (D_8008EA13 << 4)`), read a `baseValue` from `D_8008D994`
 (unsigned view), then based on `threshold`'s sign, look up a per-table byte
-(`D_8008E978[someTotal].unkD` for positive, `.unkC` for negative) and
+(`_svm_tn[someTotal].unkD` for positive, `.unkC` for negative) and
 combine it with `threshold` through a division (`/63` positive, `/64`
 negative, each producing a quotient/remainder pair fed into `outA2`/`outA1`
 -- see below); `threshold == 0` just leaves `outA2 = baseValue`, `outA1 =
@@ -274,7 +274,7 @@ typedef struct {
     u8 unkD; /* +0xD */
     u8 padE[0x20 - 0xE];
 } Tbl32E978;
-extern Tbl32E978 *D_8008E978;
+extern Tbl32E978 *_svm_tn;
 
 /* Same 0x10-byte-stride record family code_179d8_j.c documents as
  * Rec16D7F0 (that unit's _svm_sreg_buf/D_8008D7F4 pair); local view. */
@@ -320,7 +320,7 @@ s16 SpuVmPBVoice(s16 a0, s16 a1, s16 a2, s16 a3, u16 a4) {
     baseValue = ((Rec34U16 *) D_8008D994)[a0].unk0;
 
     if (threshold > 0) {
-        tableByte = D_8008E978[someTotal].unkD;
+        tableByte = _svm_tn[someTotal].unkD;
         product = threshold * tableByte;
         q = product / 63;
         outA2 = baseValue + q;
@@ -329,7 +329,7 @@ s16 SpuVmPBVoice(s16 a0, s16 a1, s16 a2, s16 a3, u16 a4) {
     } else {
         outA2 = baseValue;
         if (threshold < 0) {
-            tableByte = D_8008E978[someTotal].unkC;
+            tableByte = _svm_tn[someTotal].unkC;
             product = threshold * tableByte;
             q = product / 64;
             outA2 = baseValue + q - 1;
@@ -516,7 +516,7 @@ functions and moves them out of tracks 1/1b/3.
 evident (preserved below, exact length): matches a voice by its
 (track/note/program) identity fields, then computes a curve-table-driven
 bend from a 0-127 depth value centered at `0x40` (`threshold = a4 - 0x40`,
-looked up in `D_8008E978`'s `bendCurveUp`/`bendCurveDown` fields depending
+looked up in `_svm_tn`'s `bendCurveUp`/`bendCurveDown` fields depending
 on sign) applied to a base value, writes the result through
 `note2pitch2`, and returns `1` on match / `0` otherwise -- the return
 value is what `SpuVmPitchBend` sums into its own return.

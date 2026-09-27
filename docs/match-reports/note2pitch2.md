@@ -21,7 +21,7 @@ typedef struct {
     u8 unk6[26];
 } D8008E978Entry;
 
-extern D8008E978Entry *D_8008E978;
+extern D8008E978Entry *_svm_tn;
 
 s32 note2pitch2(s32 a0, s32 a1) {
     s32 origA0;
@@ -39,7 +39,7 @@ s32 note2pitch2(s32 a0, s32 a1) {
 
     origA0 = a0;
     idx = D_8008EA18 + (D_8008EA13 << 4);
-    e = &D_8008E978[idx];
+    e = &_svm_tn[idx];
     v0 = (u16)a1 + e->unk5;
     div8 = v0 / 8;
     a3 = div8;
@@ -64,7 +64,7 @@ s32 note2pitch2(s32 a0, s32 a1) {
 ```
 
 `D8008E978Entry` is a local (this-unit-only) view of the 32-byte-stride
-struct array at `D_8008E978` (indexed via `sll ... 5`); only offsets `+4`
+struct array at `_svm_tn` (indexed via `sll ... 5`); only offsets `+4`
 and `+5` are read here so the rest is left as anonymous padding — a local
 view per the project's multiple-independent-readings convention, not
 placed in a shared header.

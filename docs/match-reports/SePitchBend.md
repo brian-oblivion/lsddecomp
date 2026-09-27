@@ -24,9 +24,9 @@ one item and nothing else:
    retail's `andi $v1,$s0,0xff` with no copy. Ablation: `(u8)chan`
    everywhere gives 113 words.
 2. **Shared index before the branch.** `idx = D_8008EA18 + (*p << 4);`
-   is computed once before `if (b >= 0)`, and `D_8008E978[idx]` is indexed
+   is computed once before `if (b >= 0)`, and `_svm_tn[idx]` is indexed
    in each arm. Retail computes `$a2` before the `bltz`, puts `sll v0,a2,5`
-   in its delay slot, and reloads the `D_8008E978` pointer per arm. Inline
+   in its delay slot, and reloads the `_svm_tn` pointer per arm. Inline
    in each arm, the index is recomputed per arm: 119 words -> 113.
 3. **Unsigned bound test.** `(u32)(chan & 0xFF) < 24` gives `sltiu`. The
    and-form alone gives `slti`, because the QI zero-extend was what made
@@ -104,11 +104,11 @@ void SePitchBend(s32 chan, s32 bend) {
         idx = D_8008EA18 + (*p << 4);
         b = bend;
         if (b >= 0) {
-            prod = b * D_8008E978[idx].unk13;
+            prod = b * _svm_tn[idx].unk13;
             note = D_8008D994[(chan & 0xFF)].unk0 + prod / 127;
             fine = prod % 127;
         } else {
-            q = (b * D_8008E978[idx].unk12) / 127;
+            q = (b * _svm_tn[idx].unk12) / 127;
             note = D_8008D994[(chan & 0xFF)].unk0 + q - 1;
             fine = q + 127;
         }
@@ -163,7 +163,7 @@ Channel setup, called with (channel, pitch-ish `a1`). If `chan < 24`: looks
 up two per-channel bytes from 52-byte-stride tables (`D_8008D998`,
 `D_8008D99C`) into `D_8008EA13`/`D_8008EA18` (also mirrors the raw channel
 byte into `D_8008EA26`), recomputes the same `D_8008EA18 + (D_8008EA13<<4)`
-index `note2pitch2` uses to reach `D_8008E978[]`, then splits on the sign
+index `note2pitch2` uses to reach `_svm_tn[]`, then splits on the sign
 of `(s16)a1`: multiplies it by one of two NEW fields on that struct (offset
 `0xC`/`0xD` — added to `D8008E978Entry` this round, see below) and divides
 the product by **127** (confirmed empirically, see next section), producing
@@ -271,7 +271,7 @@ void SePitchBend(s32 a0, s32 a1) {
 
         idxStruct = D_8008EA18 + (*pEA13 << 4);
         sa1 = (s16)a1;
-        e = &D_8008E978[idxStruct];
+        e = &_svm_tn[idxStruct];
         if (sa1 >= 0) {
             prod = sa1 * e->unk13;
             q = prod / 127;
@@ -332,7 +332,7 @@ very second instruction) at the exact position this report already names.
 
 **Reading further into the realigned diff (past what this report's
 original text covers) found a second, independent, and genuinely fixable
-residue: the `D8008E978Entry *e = &D_8008E978[idxStruct];` pointer
+residue: the `D8008E978Entry *e = &_svm_tn[idxStruct];` pointer
 computation was shared before the `if (sa1 >= 0)`/`else` split, but retail
 recomputes the table's base address FRESH inside each arm** (a distinct
 4-instruction `lui`/`lw`/`nop`/`addu` sequence appears a second time, deep
@@ -341,7 +341,7 @@ compilation). This is the identical "must be textually duplicated in BOTH
 arms, not shared after/before the `if`" idiom already validated for
 `SpuVmDoAllocate` (fix #3 in that report) and referenced generically in
 `SpuVmAlloc`'s report — moving the single
-`e = &D_8008E978[idxStruct];` statement to inside EACH branch (so it's
+`e = &_svm_tn[idxStruct];` statement to inside EACH branch (so it's
 computed twice, once per arm) reproduced retail's double materialization
 exactly and moved the function from **108/112 (4 short) to 113/112 (1
 LONG)** — a swing of 5 words from one fix, all of it on the SAME residue
@@ -417,14 +417,14 @@ void SePitchBend(s32 a0, s32 a1) {
         idxStruct = D_8008EA18 + (*pEA13 << 4);
         sa1 = (s16)a1;
         if (sa1 >= 0) {
-            e = &D_8008E978[idxStruct];
+            e = &_svm_tn[idxStruct];
             prod = sa1 * e->unk13;
             q = prod / 127;
             dval = *(u16 *)(D_8008D994 + idx52);
             arg0 = dval + q;
             arg1 = prod - q * 127;
         } else {
-            e = &D_8008E978[idxStruct];
+            e = &_svm_tn[idxStruct];
             prod = sa1 * e->unk12;
             q = prod / 127;
             dval = *(u16 *)(D_8008D994 + idx52);

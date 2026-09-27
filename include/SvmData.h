@@ -53,7 +53,7 @@ typedef struct SvmVoice {
     s16 unk0E; /* +0x0E -- 0x21 after SsUtKeyOn/SsUtKeyOnV, 0xFF when free */
     s16 unk10; /* +0x10 -- index into _svm_pg (read as a byte by SePitchBend) */
     s16 unk12; /* +0x12 -- compared against a key-off argument */
-    s16 unk14; /* +0x14 -- index into D_8008E978 (read as a byte by SePitchBend), 0xFF when free */
+    s16 unk14; /* +0x14 -- index into _svm_tn (read as a byte by SePitchBend), 0xFF when free */
     s16 unk16; /* +0x16 -- compared against a key-off argument */
     s16 unk18; /* +0x18 -- SpuVmAlloc's priority, loaded from D_8008EA1B */
     u8 pad1A;

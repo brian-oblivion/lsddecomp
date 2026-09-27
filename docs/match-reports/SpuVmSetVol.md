@@ -107,7 +107,7 @@ Built 315 vs retail 324. Localised by an opcode-level alignment of the built
 object against the `.s` (registers ignored), then read directly. It is **not**
 spread across the function -- it is one region:
 
-**The `D_8008E978[D_8008D99C[i].unk0]` address is computed ONCE in our build
+**The `_svm_tn[D_8008D99C[i].unk0]` address is computed ONCE in our build
 and TWICE in retail.**
 
 - `.unk2` read (`e978c`): retail re-uses `$a3`, the `52*(u8)i` byte offset
@@ -115,7 +115,7 @@ and TWICE in retail.**
   Our build re-derives the index and spends 15.
 - `.unk3` read (`e978d`): retail re-derives the ENTIRE chain -- `andi` for
   `(u8)i`, the five-instruction `*0x34`, `lui/addiu/addu/lh` for
-  `D_8008D99C[i]`, `lui/lw` for the `D_8008E978` pointer, `sll 5`, `addu`,
+  `D_8008D99C[i]`, `lui/lw` for the `_svm_tn` pointer, `sll 5`, `addu`,
   `lbu` -- 15 words at 0x80030C0C-0x80030C54. Our build reuses the `.unk2`
   address register and spends **1** (`lbu v1,3(a2)`).
 
@@ -222,14 +222,14 @@ s32 SpuVmSetVol(s32 a0, s32 a1, s32 a2, s32 a3, u16 a4) {
                         lvl1b = lvl1 * e968FromD998;
                     }
 
-                    e978c = D_8008E978[D_8008D99C[i].unk0].unk2;
+                    e978c = _svm_tn[D_8008D99C[i].unk0].unk2;
                     lvl1c = lvl1b * e978c;
                     lvl2 = lvl1c / 16129;
 
                     pan1 = (lvl2 * e->unk74) / 127;
                     pan2 = (lvl2 * e->unk76) / 127;
 
-                    e978d = D_8008E978[D_8008D99C[i].unk0].unk3;
+                    e978d = _svm_tn[D_8008D99C[i].unk0].unk3;
                     if (e978d < 0x40) {
                         pan2 = (pan2 * e978d) / 63;
                     } else {
@@ -338,7 +338,7 @@ worth carrying:
 
 **Restored to `INCLUDE_ASM`**; whole-image oracle green. The revisit is spent.
 The function is better characterised than it has ever been and the next
-attempt has exactly one place to go: the `D_8008E978[D_8008D99C[i].unk0]`
+attempt has exactly one place to go: the `_svm_tn[D_8008D99C[i].unk0]`
 CSE, worth 14 words, with a proven-correct sibling (the `_svm_pg`/`.unk4`
 chain) matching instruction-for-instruction two blocks later as the control.
 Do **not** re-sweep `volatile`, and do not re-open the register-identity
@@ -500,14 +500,14 @@ s32 SpuVmSetVol(s32 a0, s32 a1, s32 a2, s32 a3, u16 a4) {
                         lvl1b = lvl1 * e968FromD998;
                     }
 
-                    e978c = D_8008E978[D_8008D99C[i].unk0].unk2;
+                    e978c = _svm_tn[D_8008D99C[i].unk0].unk2;
                     lvl1c = lvl1b * e978c;
                     lvl2 = lvl1c / 16129;
 
                     pan1 = (lvl2 * e->unk74) / 127;
                     pan2 = (lvl2 * e->unk76) / 127;
 
-                    e978d = D_8008E978[D_8008D99C[i].unk0].unk3;
+                    e978d = _svm_tn[D_8008D99C[i].unk0].unk3;
                     if (e978d < 0x40) {
                         pan2 = (pan2 * e978d) / 63;
                     } else {
@@ -881,14 +881,14 @@ s32 SpuVmSetVol(s32 a0, s32 a1, s32 a2, s32 a3, u16 a4) {
                         lvl1b = lvl1 * e968FromD998;
                     }
 
-                    e978c = D_8008E978[D_8008D99C[i].unk0].unk2;
+                    e978c = _svm_tn[D_8008D99C[i].unk0].unk2;
                     lvl1c = lvl1b * e978c;
                     lvl2 = lvl1c / 16129;
 
                     pan1 = (lvl2 * e->unk74) / 127;
                     pan2 = (lvl2 * e->unk76) / 127;
 
-                    e978d = D_8008E978[D_8008D99C[i].unk0].unk3;
+                    e978d = _svm_tn[D_8008D99C[i].unk0].unk3;
                     if (e978d < 0x40) {
                         pan2 = (pan2 * e978d) / 63;
                     } else {
@@ -967,7 +967,7 @@ s32 SpuVmSetVol(s32 a0, s32 a1, s32 a2, s32 a3, u16 a4) {
    a local variable and reused it for both the `.unk2` and `.unk3` reads;
    retail instead RECOMPUTES the entire index chain (the `i*0x34`
    multiply-by-52 shift-add sequence, the `D_8008D99C` load, AND a FRESH
-   reload of the `D_8008E978` pointer) independently for each of the two
+   reload of the `_svm_tn` pointer) independently for each of the two
    accesses. Removing the cached local and writing both accesses as
    textually independent expressions (see the preserved body above, which
    already reflects this) is closer to retail's shape but did not close
@@ -1094,7 +1094,7 @@ title predates that flag but was never attributed to it).
 `build/lsdde.map`: `SsUtKeyOn` at `0x80030e6c` against retail's
 `0x80030e90`), raw word-match 10/324, insertions 76 / deletions 76.** The
 flag has no effect here, which is expected: this function's residue is
-the GCC 2.6.3 CSE decision on the `D_8008E978[D_8008D99C[i].unk0]` address
+the GCC 2.6.3 CSE decision on the `_svm_tn[D_8008D99C[i].unk0]` address
 (round 62's "Where the remaining 9 words are, exactly" section), not the
 below-cc1 load-delay-nop construct the flag targets. Confirms the title is
 still current -- no correction needed here, unlike this unit's other two

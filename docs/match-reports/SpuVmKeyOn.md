@@ -525,7 +525,7 @@ s32 SpuVmKeyOn(s32 a0, s16 a1, s16 a2, u16 a3, u16 a4, u16 a5)
     if (a4 != 0) {
         matchCount = 0;
         for (chanScan = 0; chanScan < D_8008EA0C; chanScan++) {
-            Tbl32E978 *entry = &D_8008E978[D_8008EA13 * 16 + chanScan];
+            Tbl32E978 *entry = &_svm_tn[D_8008EA13 * 16 + chanScan];
 
             if (D_8008EA0E < entry->unkC) {
                 continue;
@@ -549,7 +549,7 @@ s32 SpuVmKeyOn(s32 a0, s16 a1, s16 a2, u16 a3, u16 a4, u16 a5)
                 D_8008EA24 = idBuf[s1];
                 D_8008EA18 = chanBuf[s1];
 
-                entry2 = &D_8008E978[D_8008EA13 * 16 + D_8008EA18];
+                entry2 = &_svm_tn[D_8008EA13 * 16 + D_8008EA18];
                 D_8008EA1B = entry2->unk0;
                 D_8008EA19 = entry2->unk2;
                 D_8008EA1A = entry2->unk3;
@@ -625,14 +625,14 @@ velocity, pan-split pair, status).
 ## Proposed field names
 
 `_svm_vh`/`ObjE970` (already locally typed with `difficultyThreshold`/
-`masterVolume` field names this round) and `D_8008E978`/`Tbl32E978`
+`masterVolume` field names this round) and `_svm_tn`/`Tbl32E978`
 (`bendCurveUp`/`bendCurveDown`, others still `unk0`..`unk7`/`unk16`) are
 declared in this unit but only used by functions still `INCLUDE_ASM`
 (SetAutoVol, SetAutoPan, SpuVmPBVoice, and this
 function) -- the field renames are live in `src/code_179d8_m.c` now (pure
 documentation, nothing compiled references them yet); the base symbols
-themselves (`_svm_vh`, `D_8008E978`) were not renamed since
-`D_8008E978` is shared with bravo's live `libsnd_vm_vol_ut_key_ut_keyv.c` this round
+themselves (`_svm_vh`, `_svm_tn`) were not renamed since
+`_svm_tn` is shared with bravo's live `libsnd_vm_vol_ut_key_ut_keyv.c` this round
 (see broadcast).
 
 ## NON_MATCHING body promoted, round 67

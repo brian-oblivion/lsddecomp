@@ -479,7 +479,7 @@ extern u8 D_8008EA13;
 
 /* libsnd's _svm_tn (pinned at this address): the current VAB's tone
  * attributes, 16 per program. */
-extern VagAtr *D_8008E978;
+extern VagAtr *_svm_tn;
 
 /* _svm_cur + 0xC: the current tone number within the program. */
 extern u8 D_8008EA18;
@@ -519,7 +519,7 @@ s16 SpuVmPBVoice(s16 a0, s16 a1, s16 a2, s16 a3, u16 a4) {
     baseValue = _svm_voice[a0].unk0C;
 
     if (threshold > 0) {
-        tableByte = D_8008E978[someTotal].pbmax;
+        tableByte = _svm_tn[someTotal].pbmax;
         product = threshold * tableByte;
         q = product / 63;
         outA2 = baseValue + q;
@@ -528,7 +528,7 @@ s16 SpuVmPBVoice(s16 a0, s16 a1, s16 a2, s16 a3, u16 a4) {
     } else {
         outA2 = baseValue;
         if (threshold < 0) {
-            tableByte = D_8008E978[someTotal].pbmin;
+            tableByte = _svm_tn[someTotal].pbmin;
             product = threshold * tableByte;
             q = product / 64;
             outA2 = baseValue + q - 1;
@@ -792,7 +792,7 @@ s32 SpuVmKeyOn(s32 a0, s16 a1, s16 a2, u16 a3, u16 a4, u16 a5) {
     if (a4 != 0) {
         matchCount = 0;
         for (chanScan = 0; chanScan < D_8008EA0C; chanScan++) {
-            VagAtr *entry = &D_8008E978[D_8008EA13 * 16 + chanScan];
+            VagAtr *entry = &_svm_tn[D_8008EA13 * 16 + chanScan];
 
             if (D_8008EA0E < entry->min) {
                 continue;
@@ -816,7 +816,7 @@ s32 SpuVmKeyOn(s32 a0, s16 a1, s16 a2, u16 a3, u16 a4, u16 a5) {
                 D_8008EA24 = idBuf[s1];
                 D_8008EA18 = chanBuf[s1];
 
-                entry2 = &D_8008E978[D_8008EA13 * 16 + D_8008EA18];
+                entry2 = &_svm_tn[D_8008EA13 * 16 + D_8008EA18];
                 D_8008EA1B = entry2->prior;
                 D_8008EA19 = entry2->vol;
                 D_8008EA1A = entry2->pan;

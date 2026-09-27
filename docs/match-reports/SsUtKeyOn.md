@@ -230,7 +230,7 @@ typedef struct {
     u16 unk16; /* +0x16 */
     u8 pad18[0x20 - 0x18];
 } RecordE978;
-extern RecordE978 *D_8008E978;
+extern RecordE978 *_svm_tn;
 
 /* SsUtKeyOn's own scratch globals -- offsets are exact (this unit's
  * own field accesses); names are opaque placeholders. */
@@ -292,7 +292,7 @@ s32 SsUtKeyOn(s16 p0, s16 p1, s16 p2, s16 p3, u16 p4, s16 p5, s16 p6)
     D_8008EA17 = _svm_pg[p1].unk4;
     D_8008EA0C = _svm_pg[p1].unk0;
 
-    rec = &D_8008E978[D_8008EA18 + D_8008EA13 * 16];
+    rec = &_svm_tn[D_8008EA18 + D_8008EA13 * 16];
     D_8008EA1B = rec->unk0;
     note = rec->unk16;
     D_8008EA24 = note;
@@ -354,7 +354,7 @@ nine-table registration block.
   functions in this unit that already use `.unk1`/`.unk4` (offset and
   total size unchanged).
 - New struct `RecordE978`, a 0x20-byte-stride record pointed to by a new
-  global `D_8008E978` (a plain pointer variable, dereferenced with `lw`,
+  global `_svm_tn` (a plain pointer variable, dereferenced with `lw`,
   not an array base computed with `lui`/`addiu`). Indexed by
   `D_8008EA18 + D_8008EA13*16`, confirmed from the exact `sll ...,5`
   (multiply by 32) in the disassembly.
@@ -810,7 +810,7 @@ s32 SsUtKeyOn(s16 p0, s16 p1, s16 p2, s16 p3, u16 p4, s16 p5, s16 p6)
     D_8008EA17 = slot[p1].unk4;
     D_8008EA0C = slot[p1].unk0;
 
-    rec = &D_8008E978[D_8008EA18 + D_8008EA13 * 16];
+    rec = &_svm_tn[D_8008EA18 + D_8008EA13 * 16];
     D_8008EA1B = rec->unk0;
     note = rec->unk16;
     D_8008EA24 = note;
@@ -974,7 +974,7 @@ s32 SsUtKeyOn(s16 p0, s16 p1, s16 p2, s16 p3, u16 p4, s16 p5, s16 p6)
     D_8008EA17 = slot[p1].unk4;
     D_8008EA0C = slot[p1].unk0;
 
-    rec = &D_8008E978[D_8008EA18 + D_8008EA13 * 16];
+    rec = &_svm_tn[D_8008EA18 + D_8008EA13 * 16];
     D_8008EA1B = rec->unk0;
     note = rec->unk16;
     D_8008EA24 = note;
@@ -1139,7 +1139,7 @@ The NON_MATCHING body now stores `_svm_voice[(u8) result].unkNN`; normalized dis
   after: length and instruction sequence unchanged (252/252).
 - `SlotE968` -> Sony's `ProgAtr` (`tones`/`mvol`/`mpan` at +0/+1/+4) and
   `RecordE978` -> Sony's `VagAtr` (`prior mode vol pan center shift min max`
-  at +0..+7, `vag` at +0x16): `_svm_pg`/`D_8008E978` are vmanager's
+  at +0..+7, `vag` at +0x16): `_svm_pg`/`_svm_tn` are vmanager's
   `_svm_pg`/`_svm_tn`, pinned at those addresses. Every staged field's
   offset and width agrees with Sony's layout, and the vag == 0 (no tone) and
   vag == 0xFF (noise) tests read as Sony's field meanings. See SpuVmSetVol.md's Naming for the full evidence.

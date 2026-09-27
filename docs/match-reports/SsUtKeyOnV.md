@@ -68,7 +68,7 @@ s32 SsUtKeyOnV(s16 idx, s16 p0, s16 p1, s16 p2, u16 p3, u16 p4, s16 p5, s16 p6)
     D_8008EA17 = _svm_pg[p1].unk4;
     D_8008EA0C = _svm_pg[p1].unk0;
 
-    rec = &D_8008E978[D_8008EA18 + D_8008EA13 * 16];
+    rec = &_svm_tn[D_8008EA18 + D_8008EA13 * 16];
     D_8008EA1B = rec->unk0;
     note = rec->unk16;
     D_8008EA24 = note;
@@ -305,7 +305,7 @@ s32 SsUtKeyOnV(s16 idx, s16 p0, s16 p1, s16 p2, u16 p3, u16 p4, s16 p5, s16 p6)
     D_8008EA17 = _svm_pg[p1].unk4;
     D_8008EA0C = _svm_pg[p1].unk0;
 
-    rec = &D_8008E978[D_8008EA18 + D_8008EA13 * 16];
+    rec = &_svm_tn[D_8008EA18 + D_8008EA13 * 16];
     D_8008EA1B = rec->unk0;
     note = rec->unk16;
     D_8008EA24 = note;
@@ -447,7 +447,7 @@ s32 SsUtKeyOnV(s16 idx, s16 p0, s16 p1, s16 p2, u16 p3, u16 p4, s16 p5, s16 p6)
     D_8008EA17 = _svm_pg[p1].unk4;
     D_8008EA0C = _svm_pg[p1].unk0;
 
-    rec = &D_8008E978[D_8008EA18 + D_8008EA13 * 16];
+    rec = &_svm_tn[D_8008EA18 + D_8008EA13 * 16];
     D_8008EA1B = rec->unk0;
     note = rec->unk16;
     D_8008EA24 = note;

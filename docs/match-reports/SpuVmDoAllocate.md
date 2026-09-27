@@ -39,7 +39,7 @@ No arguments, no return value. It:
    result into `D_8008D7F6[D_8008EA28]`.
 5. Sets flag bit `0x8` in `_svm_sreg_dirty[D_8008EA26]`.
 6. Copies two more fields (`+0x10`, `+0x12`, the second plus `D_8008E84C`)
-   out of the SAME 0x20-stride `D_8008E978` table `note2pitch2` already
+   out of the SAME 0x20-stride `_svm_tn` table `note2pitch2` already
    established in this unit, into `D_8008D7F8[D_8008EA28]` /
    `D_8008D7FA[D_8008EA28]`.
 7. Sets flag bits `0x30` in `_svm_sreg_dirty[D_8008EA26]`.
@@ -90,7 +90,7 @@ typedef struct {
     u16 unk18; /* +0x12 */
     u8 pad20[0x20 - 20];
 } D8008E978Entry;
-extern D8008E978Entry *D_8008E978;
+extern D8008E978Entry *_svm_tn;
 
 extern s16 D_8008D7F8[];
 extern s16 D_8008D7FA[];
@@ -162,10 +162,10 @@ void SpuVmDoAllocate(void)
     _svm_sreg_dirty[chan] |= 8;
 
     idx = D_8008EA18 + (D_8008EA13 << 4);
-    D_8008D7F8[D_8008EA28] = D_8008E978[idx].unk16;
+    D_8008D7F8[D_8008EA28] = _svm_tn[idx].unk16;
 
     idx = D_8008EA18 + (D_8008EA13 << 4);
-    D_8008D7FA[D_8008EA28] = D_8008E978[idx].unk18 + D_8008E84C;
+    D_8008D7FA[D_8008EA28] = _svm_tn[idx].unk18 + D_8008E84C;
     __asm__("");
 
     chan = D_8008EA26;
@@ -252,7 +252,7 @@ differences that don't change instruction count but do change bytes.**
     call site in isolation. It did **not** produce the compact form here —
     instead it triggered a cascading REGISTER-ALLOCATION change several
     instructions away (a `sra $a0,$a0,0xf` where a `0x10` was expected,
-    in the wholly unrelated `D_8008E978` field-copy block), costing 3 words
+    in the wholly unrelated `_svm_tn` field-copy block), costing 3 words
     at that one site alone. This is the CLAUDE.md-documented hazard of
     treating a local register-pressure change as free — it is not free,
     the allocator's budget is shared across the whole function — and it is
@@ -447,7 +447,7 @@ typedef struct {
     u16 unk18; /* +0x12 */
     u8 pad20[0x20 - 20];
 } D8008E978Entry;
-extern D8008E978Entry *D_8008E978;
+extern D8008E978Entry *_svm_tn;
 
 extern s16 D_8008D7F8[];
 extern s16 D_8008D7FA[];
@@ -492,10 +492,10 @@ void SpuVmDoAllocate(void)
     _svm_sreg_dirty[chan] |= 8;
 
     idx = D_8008EA18 + (D_8008EA13 << 4);
-    D_8008D7F8[D_8008EA28] = D_8008E978[idx].unk16;
+    D_8008D7F8[D_8008EA28] = _svm_tn[idx].unk16;
 
     idx = D_8008EA18 + (D_8008EA13 << 4);
-    D_8008D7FA[D_8008EA28] = D_8008E978[idx].unk18 + D_8008E84C;
+    D_8008D7FA[D_8008EA28] = _svm_tn[idx].unk18 + D_8008E84C;
     __asm__("");
 
     chan = D_8008EA26;

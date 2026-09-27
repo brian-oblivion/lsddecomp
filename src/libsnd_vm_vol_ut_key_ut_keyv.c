@@ -49,7 +49,7 @@
 
 /* libsnd vmanager's _svm_tn (pinned at this address): the current VAB's
  * tone table, 16 VagAtr per program, indexed prog * 16 + tone. */
-extern VagAtr *D_8008E978;
+extern VagAtr *_svm_tn;
 
 /* Holds the base of the SPU register block, 0x1F801C00, indexed in
  * halfwords as code_179d8_p.c's SsUtAllKeyOff indexes it.
@@ -136,7 +136,7 @@ extern s16 D_8008E8C0;
 /* NON_MATCHING: 315/324 words, 9 words short; raw word-match 10/324,
  * insertions 76 / deletions 76 (re-measured round 70, unchanged since
  * round 62). Residue: one GCC CSE decision on the
- * `D_8008E978[_svm_voice[i].unk14]` address plus two loop-invariant
+ * `_svm_tn[_svm_voice[i].unk14]` address plus two loop-invariant
  * hoists (docs/match-reports/SpuVmSetVol.md). Hand-derived. */
 s32 SpuVmSetVol(s32 a0, s32 a1, s32 a2, s32 a3, u16 a4) {
     SsScore *e;
@@ -180,14 +180,14 @@ s32 SpuVmSetVol(s32 a0, s32 a1, s32 a2, s32 a3, u16 a4) {
                         lvl1b = lvl1 * e968FromD998;
                     }
 
-                    e978c = D_8008E978[_svm_voice[i].unk14].vol;
+                    e978c = _svm_tn[_svm_voice[i].unk14].vol;
                     lvl1c = lvl1b * e978c;
                     lvl2 = lvl1c / 16129;
 
                     pan1 = (lvl2 * e->unk74) / 127;
                     pan2 = (lvl2 * e->unk76) / 127;
 
-                    e978d = D_8008E978[_svm_voice[i].unk14].pan;
+                    e978d = _svm_tn[_svm_voice[i].unk14].pan;
                     if (e978d < 0x40) {
                         pan2 = (pan2 * e978d) / 63;
                     } else {
@@ -273,7 +273,7 @@ s16 SsUtKeyOn(s16 p0, s16 p1, s16 p2, s16 p3, s16 p4, s16 p5, s16 p6) {
     D_8008EA17 = slot[p1].mpan;
     D_8008EA0C = slot[p1].tones;
 
-    rec = &D_8008E978[D_8008EA18 + D_8008EA13 * 16];
+    rec = &_svm_tn[D_8008EA18 + D_8008EA13 * 16];
     D_8008EA1B = rec->prior;
     note = rec->vag;
     D_8008EA24 = note;
@@ -420,7 +420,7 @@ s16 SsUtKeyOnV(s16 idx, s16 p0, s16 p1, s16 p2, s16 p3, s16 p4, s16 p5, s16 p6) 
     D_8008EA17 = _svm_pg[p1].mpan;
     D_8008EA0C = _svm_pg[p1].tones;
 
-    rec = &D_8008E978[D_8008EA18 + D_8008EA13 * 16];
+    rec = &_svm_tn[D_8008EA18 + D_8008EA13 * 16];
     D_8008EA1B = rec->prior;
     note = rec->vag;
     D_8008EA24 = note;

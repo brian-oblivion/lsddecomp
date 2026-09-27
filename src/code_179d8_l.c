@@ -324,7 +324,7 @@ typedef struct {
     u8 pad20[0x20 - 20];
 } D8008E978Entry;
 
-extern D8008E978Entry *D_8008E978;
+extern D8008E978Entry *_svm_tn;
 
 INCLUDE_ASM("asm/nonmatchings/code_179d8_l", SpuVmDoAllocate);
 
@@ -441,7 +441,7 @@ s32 note2pitch2(s32 a0, s32 a1) {
 
     origA0 = a0;
     idx = D_8008EA18 + (D_8008EA13 << 4);
-    e = &D_8008E978[idx];
+    e = &_svm_tn[idx];
     v0 = (u16)a1 + e->unk5;
     div8 = v0 / 8;
     a3 = div8;
@@ -486,11 +486,11 @@ void SePitchBend(s32 chan, s32 bend) {
         idx = D_8008EA18 + (*p << 4);
         b = bend;
         if (b >= 0) {
-            prod = b * D_8008E978[idx].unk13;
+            prod = b * _svm_tn[idx].unk13;
             note = (u16)_svm_voice[(chan & 0xFF)].unk0C + prod / 127;
             fine = prod % 127;
         } else {
-            q = (b * D_8008E978[idx].unk12) / 127;
+            q = (b * _svm_tn[idx].unk12) / 127;
             note = (u16)_svm_voice[(chan & 0xFF)].unk0C + q - 1;
             fine = q + 127;
         }
