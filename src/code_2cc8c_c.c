@@ -2,7 +2,7 @@
  * three accessors ahead of them.
  *
  * TaskCore__GetActiveSlotCount, Get_vtable_TaskCore and
- * GetDefaultStreamTaskInitData come first: one TaskCore method and two plain
+ * GetDefaultMovieFrame come first: one TaskCore method and two plain
  * accessors for data used far more widely (code_2c054.c, class_3bb8c_t.c).
  *
  * Then IntermediateBase (include/IntermediateBase.h, whose banner says what
@@ -38,10 +38,10 @@ TaskCoreMethods *Get_vtable_TaskCore(void) {
 
 /* The default movie frame, {640, 0, 320, 240}: StreamTask's default initData
  * and the rect TaskCore__OnInit clears (code_2c054.h). */
-extern DrawRect gDefaultStreamTaskInitData;
+extern DrawRect gDefaultMovieFrame;
 
-void *GetDefaultStreamTaskInitData(void) {
-    return &gDefaultStreamTaskInitData;
+DrawRect *GetDefaultMovieFrame(void) {
+    return &gDefaultMovieFrame;
 }
 
 void IntermediateBase__IntermediateBase(IntermediateBase *self) {

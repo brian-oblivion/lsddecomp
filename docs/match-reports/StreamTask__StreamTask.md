@@ -20,9 +20,9 @@ void StreamTask__StreamTask(StreamTaskObj *self, s32 a1, s32 a2, s32 a3, StreamT
     if (a4 != NULL) {
         self->unkA8 = *a4;
     } else {
-        self->unkA8 = *GetDefaultStreamTaskInitData();
+        self->unkA8 = *GetDefaultMovieFrame();
     }
-    self->unkB4 = New_MoviePlayer(GetDefaultStreamTaskInitData(), 0, 0);
+    self->unkB4 = New_MoviePlayer(GetDefaultMovieFrame(), 0, 0);
     self->unkB8 = 0;
     self->methods->slot40(self);
 }
@@ -38,13 +38,13 @@ void StreamTask__StreamTask(StreamTaskObj *self, s32 a1, s32 a2, s32 a3, StreamT
   occupied by this unit's own already-matched `StreamTask__Reset` (per
   `classtable.py gStreamTaskMethods`) — confirms single-argument arity.
 - `StreamTaskInitData` (new type): a plain 3-word struct. Both the
-  function's optional 5th (stack) argument `a4` and `GetDefaultStreamTaskInitData()`'s
+  function's optional 5th (stack) argument `a4` and `GetDefaultMovieFrame()`'s
   return value are this shape — retail copies whichever one applies
   wholesale into `self->unkA8` (see residue below).
 - `self->unkA8` (`+0x0A8`, `StreamTaskInitData`, embedded by value, 0xC
   bytes): supersedes an earlier plan (never committed) to model it as three
   separate `s32` fields `unkA8`/`unkAC`/`unkB0` — see residue.
-- New externs: `GetDefaultStreamTaskInitData(void)` (returns `StreamTaskInitData *`, a
+- New externs: `GetDefaultMovieFrame(void)` (returns `StreamTaskInitData *`, a
   "default init data" singleton accessor, called twice — once for the `a4 ==
   NULL` fallback copy, once again fresh as `New_MoviePlayer`'s first argument;
   each call's result is consumed immediately, so no local caching needed
@@ -78,7 +78,7 @@ load-all-then-store-all form exactly.
 **Not needed here** in the "value read then re-read after a `jalr`" sense —
 `self->methods` IS written mid-function (`self->methods = Get_vtable_StreamTask();`)
 and read again at the very end after two more calls
-(`GetDefaultStreamTaskInitData`/`New_MoviePlayer`) for `self->methods->slot40(self)`, but that
+(`GetDefaultMovieFrame`/`New_MoviePlayer`) for `self->methods->slot40(self)`, but that
 final read is a **plain, single, natural field dereference** with no earlier
 same-expression read to conflict with — nothing needed caching because
 nothing was read twice. The lever from `TaskCore__OnDeinit`/`TaskCore__Reset` is
@@ -117,4 +117,9 @@ Renamed with the class unification (gStreamTaskObjMethods -> class StreamTask, i
 
 ## Track 4 (2026-09-26, round 89)
 
-The player is a MoviePlayer (`include/MoviePlayer.h`); code_2c054.h's StreamTaskUnkB4Obj view is gone and code_2c054.c's `PLAYER()` casts `player` (still `BasicClass *` in StreamTask.h) to `MoviePlayer *`. The allocation is `New_MoviePlayer((DrawRect *)GetDefaultStreamTaskInitData(), 0, 0)`: the ctor's frame rectangle (a pointer cast, no code). Byte-identical.
+The player is a MoviePlayer (`include/MoviePlayer.h`); code_2c054.h's StreamTaskUnkB4Obj view is gone and code_2c054.c's `PLAYER()` casts `player` (still `BasicClass *` in StreamTask.h) to `MoviePlayer *`. The allocation is `New_MoviePlayer((DrawRect *)GetDefaultMovieFrame(), 0, 0)`: the ctor's frame rectangle (a pointer cast, no code). Byte-identical.
+
+
+## Track 6 (2026-09-27, round 99, runner bravo)
+
+`StreamTaskInitData` was a local spelling of DrawSystem.h's `DrawRect` (the same three words, and `gDefaultMovieFrame`, the fallback, was already `extern DrawRect` in both units that name it); it is deleted. `initData` (+0x0A8), the fifth parameter and `GetDefaultMovieFrame()` are `DrawRect`, so the allocation is `New_MoviePlayer(GetDefaultMovieFrame(), 0, 0)` with no cast. The struct copy is unchanged (both types are 12 bytes, 4-aligned). Byte-identical; `typeviews.py --warnings` 0 new. The getter and the data were renamed this round from `GetDefaultStreamTaskInitData`/`gDefaultStreamTaskInitData` (see GetDefaultMovieFrame.md).

@@ -2,6 +2,7 @@
 #define STREAMTASK_H
 
 #include "TaskCore.h"
+#include "DrawSystem.h"
 
 /*
  * StreamTask -- class id 0x1130, method table gStreamTaskMethods, a TaskCore
@@ -24,8 +25,8 @@
  *
  * Overrides, each named for its slot:
  *   +0x008 ctor           StreamTask__StreamTask: TaskCore's ctor, this
- *                         table, initData copied from the fifth argument or
- *                         GetDefaultStreamTaskInitData(), the player,
+ *                         table, initData (a DrawRect) copied from the
+ *                         fifth argument or GetDefaultMovieFrame(), the player,
  *                         streamName 0, resetCounters.
  *   +0x00C finalize       StreamTask__Finalize: releases the player, then
  *                         TaskCore's.
@@ -74,7 +75,6 @@
 
 typedef struct StreamTask StreamTask;
 typedef struct StreamTaskMethods StreamTaskMethods;
-typedef struct StreamTaskInitData StreamTaskInitData;
 
 /* StreamTask's own state, past TaskCore's (enum TaskCoreState): onPadConfirm
  * sets it when skipOnConfirm is on, and setState answers it with
@@ -90,23 +90,19 @@ enum StreamTaskState { STREAMTASK_STATE_SKIPPED = 18 };
  * movie time, as TaskCore's bound is seconds; no caller's value shows it. */
 #define STREAMTASK_FRAMES_PER_SECOND 15
 
-/* Three words: the ctor's optional fifth (stack) argument, else
- * GetDefaultStreamTaskInitData()'s default (&gDefaultStreamTaskInitData,
- * which TaskCore__OnInit also passes). Copied whole into `initData`
- * (retail loads all three words before storing any: a struct assignment);
- * no method of this class reads it back. */
-struct StreamTaskInitData {
-    /* +0x000 */ s32 unk0;
-    /* +0x004 */ s32 unk4;
-    /* +0x008 */ s32 unk8;
-};
+/* `initData` is a DrawRect (include/DrawSystem.h): the ctor's optional fifth
+ * (stack) argument, else GetDefaultMovieFrame()'s &gDefaultMovieFrame,
+ * {x 640, y 0, w 320, h 240}, the rect the ctor also hands New_MoviePlayer
+ * as the player's frame and TaskCore__OnInit clears. Copied whole (retail
+ * loads all three words before storing any: a struct assignment); no method
+ * of this class reads it back. */
 
 /* The ctor takes FIVE parameters: New_StreamTask dispatches it with
  * $a0-$a3 plus a fifth stored to 0x10($sp), the o32 stack-argument slot
  * (docs/match-reports/New_StreamTask.md). */
 struct StreamTaskMethods {
     TASKCORE_SLOTS(StreamTask, (StreamTask * self, TaskCoreTarget *target, char *soundBankPath,
-                                BasicClass *sound, StreamTaskInitData *initData));
+                                BasicClass *sound, DrawRect *initData));
     /* +0x124 */ void (*setKeepActive)(StreamTask *self, s32 keepActive); /* StreamTask__SetKeepActive */
     /* +0x128 */ void (*setLoopCount)(StreamTask *self, s32 count); /* StreamTask__SetLoopCount */
     /* +0x12C */ void (*setSkipOnConfirm)(StreamTask *self, s32 enable); /* StreamTask__SetSkipOnConfirm; code_1677c passes 0 */
@@ -118,8 +114,8 @@ struct StreamTaskMethods {
 struct StreamTask {
     TASKCORE_FIELDS(StreamTaskMethods);
     /* +0x0A4 */ s32 playDone; /* OnInit: 0; Update: the player's Advance until nonzero */
-    /* +0x0A8 */ StreamTaskInitData initData; /* the ctor's fifth argument or the default */
-    /* +0x0B4 */ struct MoviePlayer *player; /* New_MoviePlayer(GetDefaultStreamTaskInitData(), 0, 0); finalize releases it */
+    /* +0x0A8 */ DrawRect initData; /* the ctor's fifth argument or the default */
+    /* +0x0B4 */ struct MoviePlayer *player; /* New_MoviePlayer(GetDefaultMovieFrame(), 0, 0); finalize releases it */
     /* +0x0B8 */ s32 streamName;  /* Init's; the player's Play name. ctor: 0 */
     /* +0x0BC */ s32 streamGroup; /* Init's (GetStreamGroupForType, or -1); Play's second argument */
     /* +0x0C0 */ s32 autoPlay; /* Init's (every caller 1); the player's setAutoPlay (MoviePlayer::autoPlay, +0x068), which Play tests to MarkPlaying at once */
@@ -139,9 +135,9 @@ extern StreamTaskMethods gStreamTaskMethods;
 extern StreamTaskMethods *Get_vtable_StreamTask(void); /* returns &gStreamTaskMethods */
 
 StreamTask *New_StreamTask(TaskCoreTarget *target, char *soundBankPath, BasicClass *sound,
-                           StreamTaskInitData *initData);
+                           DrawRect *initData);
 void StreamTask__StreamTask(StreamTask *self, TaskCoreTarget *target, char *soundBankPath,
-                            BasicClass *sound, StreamTaskInitData *initData);
+                            BasicClass *sound, DrawRect *initData);
 void StreamTask__Finalize(StreamTask *self);
 void StreamTask__Reset(StreamTask *self);
 void StreamTask__Init(StreamTask *self, IntermediateBaseInitArgs *args, s32 streamName,

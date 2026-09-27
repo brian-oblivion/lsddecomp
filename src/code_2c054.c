@@ -22,7 +22,7 @@
 #include "TileAtlas.h"
 
 StreamTask *New_StreamTask(TaskCoreTarget *target, char *soundBankPath, BasicClass *sound,
-                           StreamTaskInitData *initData) {
+                           DrawRect *initData) {
     StreamTask *self;
 
     self = BMemPMgrAlloc(sizeof(StreamTask));
@@ -34,15 +34,15 @@ StreamTask *New_StreamTask(TaskCoreTarget *target, char *soundBankPath, BasicCla
 }
 
 void StreamTask__StreamTask(StreamTask *self, TaskCoreTarget *target, char *soundBankPath,
-                            BasicClass *sound, StreamTaskInitData *initData) {
+                            BasicClass *sound, DrawRect *initData) {
     Get_vtable_TaskCore()->ctor((TaskCore *)self, target, soundBankPath, sound);
     self->methods = Get_vtable_StreamTask();
     if (initData != NULL) {
         self->initData = *initData;
     } else {
-        self->initData = *GetDefaultStreamTaskInitData();
+        self->initData = *GetDefaultMovieFrame();
     }
-    self->player = New_MoviePlayer((DrawRect *)GetDefaultStreamTaskInitData(), 0, 0);
+    self->player = New_MoviePlayer(GetDefaultMovieFrame(), 0, 0);
     self->streamName = 0;
     self->methods->resetCounters(self);
 }
@@ -268,7 +268,7 @@ void TaskCore__OnInit(TaskCore *self) {
     if (self->subHandle == NULL) {
         ((DrawSystem *)self->initArgs->drawSystem)
             ->methods->clearImage((DrawSystem *)self->initArgs->drawSystem, self->baseColor,
-                                  &gDefaultStreamTaskInitData);
+                                  &gDefaultMovieFrame);
     }
     ((DrawSystem *)self->initArgs->drawSystem)
         ->methods->clearImage((DrawSystem *)self->initArgs->drawSystem, self->baseColor, NULL);
