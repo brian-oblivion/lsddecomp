@@ -18,10 +18,10 @@ void *GraphRoom__GraphRoom(D_80087AACObj *self, void *arg1);
 ## Body
 
 ```c
-extern char D_8001176C[];
+extern char sGraphSoundBankPath[];
 
 void *GraphRoom__GraphRoom(D_80087AACObj *self, void *arg1) {
-    Get_vtable_TaskCore()->slot8(self, 0, D_8001176C, 0);
+    Get_vtable_TaskCore()->slot8(self, 0, sGraphSoundBankPath, 0);
     self->methods = GetGraphRoomMethods();
     self->unk_0x48->methods->slot9C(self->unk_0x48, -1);
     self->unk_0xA4 = arg1;
@@ -40,7 +40,7 @@ opaque object type, `D_80087AACUnk48Obj`), stashes `arg1` into
 calling another of its own class's slots" shape already seen in
 `class_3bb8c_p`'s `VariantSprite__VariantSprite`.
 
-Uses `D_8001176C` (the `"ETC\ETCSE"` string, the other of this unit's two
+Uses `sGraphSoundBankPath` (the `"ETC\ETCSE"` string, the other of this unit's two
 standalone strings named in its own header comment).
 
 ## Shape note: do not cache `self->unk_0x48`

@@ -101,10 +101,10 @@ GraphRoom *New_GraphRoom(struct DreamSys *dreamSys) {
     return NULL;
 }
 
-extern char D_8001176C[];
+extern char sGraphSoundBankPath[];
 
 void GraphRoom__GraphRoom(GraphRoom *self, struct DreamSys *dreamSys) {
-    Get_vtable_TaskCore()->ctor((TaskCore *)self, 0, D_8001176C, 0);
+    Get_vtable_TaskCore()->ctor((TaskCore *)self, 0, sGraphSoundBankPath, 0);
     self->methods = GetGraphRoomMethods();
     ((VabStreamObj *)self->sound)->methods->setPitchOffset((VabStreamObj *)self->sound, -1); /* TaskCore::sound is a VabStreamObj */
     self->dreamSys = dreamSys;
