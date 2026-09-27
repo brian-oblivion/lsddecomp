@@ -32,3 +32,9 @@ per this function's own report, `self->unk60`/`unk64` (the fields
 this function at all, so whatever the real "child" relationship is, it
 is set up by a caller outside this unit, not fully visible from
 `TaskObjF__Init` alone.
+
+## Round 95 (track 7, charlie)
+
+Pointer fields cleared with `NULL`, `state`/`opMode` with
+`TASKOBJF_STATE_IDLE`/`TASKOBJF_OP_NONE` (include/TaskObjF.h, added this
+round). Zero bytes.

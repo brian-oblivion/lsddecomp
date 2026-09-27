@@ -35,3 +35,17 @@ there), and quite possibly the SAME class seen through two independent
 partial local views -- not proof, but strong enough to flag for whoever
 does track 4's class-table unification pass rather than let two separate
 `typedef`s quietly diverge further. Posted to the round-60 broadcast.
+
+## Round 95 (track 7, charlie)
+
+### Moved from src/class_3bb8c_f.c
+
+The kernel event declarations' comment, shortened in the unit:
+
+```c
+/* Psy-Q kernel event queue, linked from libapi/a12, libapi/a13 and
+ * libapi/a11. Local view: these are Sony's, declared in the one unit that
+ * calls them rather than in include/class_3bb8c.h, which 21 units include.
+ * Each takes an event descriptor and returns a status word, which is what
+ * makes them usable as TaskObjF__ForEachEvent's `s32 (*)(s32)` callback. */
+```

@@ -55,3 +55,17 @@ search that can fail and return a sentinel, which is the one thing this body
 never does, and "can this call hang?" is the question a caller most needs
 answered. Byte-identical after `tools/rename.py` (a rename changes zero
 bytes), same for the `TaskObjF__WaitForReadyEvent` forwarder.
+
+## Round 95 (track 7, charlie)
+
+### Naming
+
+`D_80086E78` -> `gCardEventSpecs` (rename.py; **tier A**): TaskObjF__OpenEvents
+passes entry i to `OpenEvent(0xF4000001, spec, 0x2000, 0)` -- SwCARD,
+EvMdNOINTR -- and the four words, read from retail, are 0x0004, 0x8000,
+0x0100, 0x2000: Sony's EvSpIOE, EvSpERROR, EvSpTIMOUT, EvSpNEW, the standard
+card event set. This function returns the entry of the slot that fired,
+and CardInfoStatus/CardLoadStatus compare it against 0x100/0x8000/0x2000.
+Splat sizes the symbol at two words and starts `gCardIconNames` at
+0x80086E80, over the last two specs (the head has the proposal). `arr` ->
+`events`. Zero bytes.

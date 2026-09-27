@@ -72,3 +72,15 @@ dispatcher, directly evident from the body and the established
 ## Track 4 (2026-09-26, round 89)
 
 Renamed from `TaskObjF__Notify`: it occupies BasicClass's onNotify slot (+0x038) and calls the base onNotify first, so it takes the slot's name (FINISHING-PLAN track 4 step 6), as TextEntry__OnNotify and ItemList__OnNotify do for the same tag dispatch. The old +0x088 occupant of that name is now TaskObjF__OnInputEvent.
+
+## Round 95 (track 7, charlie)
+
+### Naming
+
+`arg1`/`arg2` -> `sender`/`event` (BasicClass's onNotify names), `bm` ->
+`base`, `mask` -> `kind`. `**(s32 **)arg1` reads
+`((BasicClass *)sender)->methods->header`, the class id. The ids are
+written 0x2/0x5/0x10/0x20: Pad's, FrameClock's (matched on the low nibble,
+so subclasses too), TextEntry's and ItemList's (include/Pad.h,
+FrameClock.h, TextEntry.h, ItemList.h banners). No class-id constants exist
+yet; proposed. Zero bytes.

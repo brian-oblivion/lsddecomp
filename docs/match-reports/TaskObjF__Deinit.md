@@ -26,3 +26,7 @@ register or type issue.
 children via the inherited `BasicClass::removeChild` slot. Same caveat as
 `TaskObjF__Init`: the children's own purpose is not established from
 this unit alone.
+
+## Round 95 (track 7, charlie)
+
+`sound`/`spriteParent` cleared with `NULL`. Zero bytes.

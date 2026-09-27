@@ -8,99 +8,57 @@
 #include <sys/file.h>
 
 /*
- * class_3bb8c_f: `TaskObjF` methods (include/TaskObjF.h, track 4 round 89),
- * slots +0x064..+0x078 and the +0x038 onNotify override, with the unit's
- * helpers:
+ * TaskObjF's file I/O, card events, load buffers and its two operations
+ * (include/TaskObjF.h: slots +0x064..+0x078 and the +0x038 onNotify
+ * override), in address order:
  *
- * - The memory-card file API (BuildMemcardPath,
- *   TaskObjF__ReadMemcardFile/TryReadMemcardFile,
- *   TaskObjF__WriteMemcardSaveFile/TryWriteMemcardSaveFile): opens BIOS
- *   `bu00:`/`bu10:` paths directly to read save data and to write a save
- *   file whose header is structurally exact to the standard PS1 memory-
- *   card save format (magic, icon-frame count, block count, title, icon
- *   palette, up to three icon frames).
- * - The event helpers over `events[4]` (EnableEvents/DisableEvents/
- *   TestEvents/ForEachEvent/WaitForReadyEvent).
- * - The two operations the parent starts, TaskObjF__BeginLoad and
- *   TaskObjF__BeginSave, with their card check (TaskObjF__Validate) and the
- *   16-entry title buffer pool (Alloc/FreeUnused/FreeBuffers); TaskObjF__Init
- *   and Deinit; TaskObjF__OnNotify, which routes a child's notification by
- *   the child's class id.
+ * - Memory-card files. TaskObjF__ReadMemcardFile and
+ *   TaskObjF__WriteMemcardSaveFile retry TaskObjF__TryReadMemcardFile and
+ *   TaskObjF__TryWriteMemcardSaveFile up to MEMCARD_RETRIES more times.
+ *   Both open a "bu00:"/"bu10:" path (BuildMemcardPath) with the BIOS file
+ *   calls: the write builds the PS-X save header (McSaveHeader) from the
+ *   title and the icon TIM, and the read seeks past it.
+ * - Card events. TaskObjF__EnableEvents/DisableEvents/TestEvents apply one
+ *   kernel call to each of `events` through TaskObjF__ForEachEvent;
+ *   WaitForReadyEvent spins until one tests ready.
+ * - TaskObjF__Init and TaskObjF__Deinit.
+ * - TaskObjF__BeginLoad and TaskObjF__BeginSave store the request, check
+ *   the card (TaskObjF__Validate) and choose the next TaskObjFState;
+ *   TaskObjF__AllocBuffers/FreeUnusedBuffers/FreeBuffers manage the load's
+ *   title buffers.
+ * - TaskObjF__OnNotify routes a child's notification by the child's class
+ *   id, the way TaskObjF__AddChild files the children.
  */
 
-/* Forward declarations: these are defined later in this file (strict
- * ROM-address order), but earlier functions call them. The class's own
- * methods are prototyped in include/TaskObjF.h (track 4, round 89); these
- * two are the unit's plain helpers.
- *
- * `BuildMemcardPath`'s entry here fixes a real Gate-0 warning (round 60):
- * `TaskObjF__TryReadMemcardFile` (line ~52) calls it before its line-226 definition, and
- * without a prototype in scope cc1 implicitly declares it as returning
- * `int`, then complains at the real definition ("type mismatch with
- * previous implicit declaration", "was previously implicitly declared to
- * return `int'"). This is a same-file forward-declaration gap, not a
- * cross-unit signature disagreement -- both the call site and the
- * definition are in this .c, so the fix is simply adding the prototype
- * here like its neighbours. Confirmed byte-identical after the fix
- * (`TaskObjF__TryReadMemcardFile` is already MATCHED and stays MATCHED): a pointer
- * return value lives in `$v0` either way, so the implicit-int reading
- * never produced different code, only a diagnostic. */
+/* Defined below, called earlier in address order. */
 s32 WaitForReadyEvent(s32 *events, s32 count);
 char *BuildMemcardPath(McDevicePath *dest, s32 cardSlot, char *suffix);
 
-/* PSX BIOS file trampolines, linked from Sony's own objects since round 34
- * (libapi/a50,a52,a51,a54,a69 -- one 0x10-byte object per stub). These used
- * to live as `func_8005xxxx` prototypes in include/class_3bb8c.h; they are
- * LOCAL here on purpose, because a shared header eleven units include is the
- * wrong place for names this generic, and because class_3bb8c_e.c's view of
- * `open` takes a `void *` where this unit's takes a `char *`. Two local
- * views are legitimate; one shared declaration would not be.
- * These are C89 identifiers under -fno-builtin, nothing else claims them. */
+/* The PS-X BIOS file calls, linked from Sony's libapi. A local view:
+ * class_3bb8c_e.c declares `open` with a `void *` path. */
 extern s32 open(char *path, s32 mode);             /* B(0x32) */
 extern s32 read(s32 handle, void *buf, s32 size);  /* B(0x34) */
 extern s32 lseek(s32 handle, s32 pos, s32 whence); /* B(0x33) */
 extern s32 close(s32 handle);                      /* B(0x36) */
 extern s32 delete (void *path);                    /* B(0x45) */
 
-/* TaskObjF__TryWriteMemcardSaveFile's own local types -- none shared
- * elsewhere in this unit.
- *
- * NAMING (round 60): the submitted 0x200-byte buffer is structurally
- * exact to the well-documented PS1 memory-card save FILE HEADER format
- * -- 'S'/'C' magic, an icon-frame-count byte, a block-count byte, a
- * 0x5C title field, a 16-colour icon palette (2 x 8-colour halves,
- * matching this function's own back-to-back-pair copy shape), and up to
- * three 0x80-byte (16x16 4bpp) icon animation frames, for exactly
- * 4+0x5C+0x20+3*0x80 = 0x200 bytes. Named on that structural match, not
- * on any string or symbol table -- Tier B. */
-
-/* Half of the 16-colour icon CLUT (8 x s16 = 0x10 bytes) -- all s16
- * members (alignment 2, no s32) so a whole-struct copy compiles to the
- * unaligned lwl/lwr + swl/swr idiom already documented (Descriptor10 in
- * class_3bb8c.h, Block24 in class_3bb8c_r.c). Two of these sit back to
- * back (0x14..0x33) in the source object and (0x60..0x7F) in the request
- * buffer -- copied as an array of 2, not a loop (matches retail: fully
- * unrolled, no branch, no runtime alignment check). */
+/* Half of the icon's 16-colour CLUT.
+ * MATCHING: all-s16 (alignment 2) makes the whole-struct copy retail's
+ * unaligned lwl/lwr + swl/swr pairs. */
 typedef struct IconPaletteHalf {
     s16 color[8];
 } IconPaletteHalf;
 
-/* One 16x16 4bpp icon animation frame -- a raw, opaque 0x80-byte span
- * (alignment 1, a plain byte array), so a whole-struct copy compiles to
- * the RUNTIME-alignment-checked lw/sw-vs-lwl/lwr dual path retail shows
- * for these three chunks (the same idiom src/class_3bb8c_r.c's Block24
- * documents: "a byte array... compiles the copy as a generic
- * runtime-alignment-checked memcpy loop instead"). Three of these are
- * copied in sequence. */
+/* One 16x16 4bpp icon frame, one sector.
+ * MATCHING: a byte array (alignment 1) makes the whole-struct copy retail's
+ * runtime-alignment-checked copy loop. */
 typedef struct IconFrame {
-    u8 raw[0x80];
+    u8 raw[MEMCARD_SECTOR_SIZE];
 } IconFrame;
 
-/* The icon TimImage's file buffer (its FileResource `buffer`, +0x010) --
- * only the two palette halves (+0x14/+0x24) and the three icon frames
- * (+0x40/+0xC0/+0x140) are ever read by this function; nothing here
- * establishes the leading 0x14 bytes or the 0xC-byte gap at +0x34 (a TIM's
- * 8-byte header and 12-byte CLUT block header would put the CLUT at +0x14). */
+/* The icon TimImage's file buffer, a 4bpp TIM with one 16-colour CLUT: the
+ * pads are the TIM header with the CLUT block header, and the pixel block
+ * header. Only the CLUT and the first three frames of pixels are read. */
 typedef struct McIconSource {
     u8 pad0[0x14];
     IconPaletteHalf palette[2]; /* +0x14 */
@@ -110,18 +68,15 @@ typedef struct McIconSource {
     IconFrame frame2; /* +0x140 */
 } McIconSource;
 
-/* The 0x200-byte memory-card save FILE HEADER this function builds and
- * submits -- see the NAMING note above. magic0/magic1 are the literal
- * bytes 'S'/'C'; iconDisplayFlag/blockCount are computed size/mode bytes;
- * title is a strcpy target (source: this function's own `title`
- * parameter, TaskObjF::title; typed `char *` in track 4, round 89, where it
- * had been an `s32` named `handle`, byte-identical). */
+/* The PS-X memory-card save header, MEMCARD_SAVE_HEADER_SIZE bytes: the
+ * title sector ('S', 'C', the icon display flag, the file's size in blocks,
+ * the title field, the CLUT), then up to three icon frames. */
 typedef struct McSaveHeader {
     u8 magic0;
     u8 magic1;
     u8 iconDisplayFlag;
     u8 blockCount;
-    char title[0x5C];
+    char title[92]; /* +0x04..+0x5F: the format's 64-byte title and its reserved bytes */
     IconPaletteHalf palette[2];
     IconFrame frame0;
     IconFrame frame1;
@@ -155,6 +110,7 @@ s32 TaskObjF__TryReadMemcardFile(TaskObjF *self, char *suffix, void *outBuf, s32
     if (handle == -1) {
         return 0;
     }
+    /* Only the title sector: its icon display flag says where the data starts. */
     header = BMemPMgrAlloc(MEMCARD_SECTOR_SIZE);
     read(handle, header, MEMCARD_SECTOR_SIZE);
     iconFlag = header->iconDisplayFlag;
@@ -189,15 +145,18 @@ s32 TaskObjF__WriteMemcardSaveFile(TaskObjF *self, char *fileName, char *title, 
     return result;
 }
 
-/* TaskObjF__TryWriteMemcardSaveFile -- MATCHED round 75 (see its report).
- * `a3` is a `u8` parameter: the caller's promoted word lives in one
- * register for the `sb` of a3+0x10 and GCC's QImode copy in another for
- * the zero-extended `(a3 << 7)` size, which is retail's `move $s7,$s4`
- * and its late `andi 0xFF`. */
-extern const char sFileNotCreatedMsg[]; /* rodata string "File not create in WriteFile\n" */
-extern s32 write(s32 handle, void *buf,
-                 s32 size); /* CD/streaming read-request submit; own local view, not yet declared elsewhere in this project */
-extern void printf(const char *fmt); /* own local view: this call site passes only the format string, no variadic args (code_8220.h's 3-arg view is a DIFFERENT call site's shape) */
+extern const char sFileNotCreatedMsg[]; /* "File not create in WriteFile\n" */
+/* The BIOS write, B(0x35), linked from Sony's libapi/a53. */
+extern s32 write(s32 handle, void *buf, s32 size);
+/* Sony's libc2 functions. A local view of printf: the call here passes
+ * only the format string. */
+extern char *strcpy(char *dest, char *src);
+extern void printf(const char *fmt);
+
+/* Deletes the file, creates it at its full size in blocks, then reopens it
+ * to write the save header and the data, each rounded up to whole sectors.
+ * MATCHING: iconFrames is u8: retail keeps the incoming word and its
+ * zero-extended copy in two registers. */
 
 s32 TaskObjF__TryWriteMemcardSaveFile(TaskObjF *self, char *fileName, char *title, u8 iconFrames,
                                       struct TimImage *icon, void *data, s32 size) {
@@ -258,11 +217,9 @@ char *BuildMemcardPath(McDevicePath *dest, s32 cardSlot, char *suffix) {
     return (char *)dest;
 }
 
-/* Psy-Q kernel event queue, linked from libapi/a12, libapi/a13 and
- * libapi/a11. Local view: these are Sony's, declared in the one unit that
- * calls them rather than in include/class_3bb8c.h, which 21 units include.
- * Each takes an event descriptor and returns a status word, which is what
- * makes them usable as TaskObjF__ForEachEvent's `s32 (*)(s32)` callback. */
+/* Sony's kernel event calls (libapi/a11..a13). Each takes an event
+ * descriptor and returns a status word, which is what lets
+ * TaskObjF__ForEachEvent take them as its callback. */
 extern s32 EnableEvent(s32 event);
 extern s32 DisableEvent(s32 event);
 extern s32 TestEvent(s32 event);
@@ -279,17 +236,13 @@ s32 TaskObjF__TestEvents(TaskObjF *self) {
     return TaskObjF__ForEachEvent(self, TestEvent, 0);
 }
 
-/* Psy-Q's kernel critical-section pair (libapi/a36, libapi/a37, linked from
- * Sony's own SDK objects), called with no arguments around this unit's scan
- * loop when its `flag` argument is set. These belong to another translation
- * unit, so they are declared LOCAL here rather than in class_3bb8c.h, which
- * twenty units include (CLAUDE.md's header-contention rule). Sony's
- * EnterCriticalSection returns int; no call site here reads it, so the local
- * view stays `void` -- per-call-site typing, the convention this block of
- * units already uses. */
+/* Sony's libapi/a36 and a37. EnterCriticalSection returns int; nothing
+ * here reads it. */
 extern void EnterCriticalSection(void);
 extern void ExitCriticalSection(void);
 
+/* Calls `callback` on each event until one returns 0, inside a critical
+ * section when `critical` is set; returns the last result. */
 s32 TaskObjF__ForEachEvent(TaskObjF *self, s32 (*callback)(s32), s32 critical) {
     s32 i;
     s32 result;
@@ -313,6 +266,8 @@ s32 TaskObjF__WaitForReadyEvent(TaskObjF *self) {
     return WaitForReadyEvent(self->events, ARRAY_COUNT(self->events));
 }
 
+/* Spins until one of `count` events tests ready and returns that slot's
+ * gCardEventSpecs entry: which answer the card gave. */
 s32 WaitForReadyEvent(s32 *events, s32 count) {
     s32 i;
 
@@ -346,6 +301,8 @@ void TaskObjF__Deinit(TaskObjF *self) {
     self->methods->removeChild(self, self->tickSource);
 }
 
+/* Re-entered from LOAD_WARNING once the player has chosen a file, which it
+ * then loads; otherwise it offers the files it found. */
 void TaskObjF__BeginLoad(TaskObjF *self, char *fileName, char *title, void *data, s32 size) {
     s32 found;
     s32 state;
@@ -406,14 +363,15 @@ void TaskObjF__FreeBuffers(TaskObjF *self) {
             BMemPMgrFree(self->titles[i]);
         }
         BMemPMgrFree(self->titles);
-        self->titles = 0;
+        self->titles = NULL;
     }
 }
 
-/* MATCHED round 75 (docs/match-reports/TaskObjF__BeginSave.md): the
- * function returns nothing -- the early exit falls straight into the
- * epilogue with Validate's own $v0 -- and each of the three leaves makes its
- * own setState call, which GCC cross-jumps down to one shared `jalr`. */
+/* An existing file first asks to overwrite; confirming re-enters from
+ * SAVE_OVERWRITE_WARNING to edit the title, and the edited title re-enters
+ * from EDIT_TITLE to save.
+ * MATCHING: each branch makes its own setState call, which GCC cross-jumps
+ * to one; the function returns nothing. */
 void TaskObjF__BeginSave(TaskObjF *self, char *fileName, char *title, s32 titleEditPos,
                          u8 iconFrames, struct TimImage *icon, void *data, s32 size) {
     s32 state;
@@ -428,7 +386,7 @@ void TaskObjF__BeginSave(TaskObjF *self, char *fileName, char *title, s32 titleE
     self->data = data;
     self->dataSize = size;
     if (TaskObjF__Validate(self)) {
-        if (self->methods->probeMemcardFile(self, 0, fileName) != 0) {
+        if (self->methods->probeMemcardFile(self, NULL, fileName) != 0) {
             state = TASKOBJF_STATE_SAVE_OVERWRITE_WARNING;
             if (self->state == state) {
                 state = TASKOBJF_STATE_EDIT_TITLE;
@@ -449,24 +407,28 @@ void TaskObjF__BeginSave(TaskObjF *self, char *fileName, char *title, s32 titleE
     }
 }
 
+/* Returns 1 when checkCardStatus succeeds on a formatted, unchanged card;
+ * otherwise sets the state that says why and returns 0.
+ * MATCHING: the unreachable `formatted` branch and the one setState call
+ * reached by goto keep retail's branch layout. */
 s32 TaskObjF__Validate(TaskObjF *self) {
     s32 error;
     s32 cardChanged;
     s32 formatted;
-    s32 responded;
+    s32 ok;
     s32 state;
 
     self->methods->openEvents(self);
-    responded = self->methods->checkCardStatus(self, &error, &cardChanged, &formatted);
+    ok = self->methods->checkCardStatus(self, &error, &cardChanged, &formatted);
     self->methods->closeEvents(self);
 
-    if (responded != 0) {
+    if (ok != 0) {
         if (cardChanged == 0 && formatted != 0) {
             return 1;
         }
     }
 
-    if (responded == 0) {
+    if (ok == 0) {
         state = TASKOBJF_STATE_NO_CARD;
     } else if (error != 0) {
         state = TASKOBJF_STATE_CARD_ERROR;
@@ -495,6 +457,8 @@ void TaskObjF__OnNotify(TaskObjF *self, void *sender, s32 event) {
     base = Get_vtable_BasicClass();
     base->onNotify((BasicClass *)self, sender, event);
 
+    /* Pad's class id is 0x2 and FrameClock's 0x5, matched with their
+     * subclasses on the low nibble; TextEntry's is 0x10, ItemList's 0x20. */
     tag = ((BasicClass *)sender)->methods->header;
     kind = tag & 0xF;
     if (kind == 0x2) {

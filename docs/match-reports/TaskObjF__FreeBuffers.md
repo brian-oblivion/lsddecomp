@@ -20,3 +20,7 @@ teardown of `TaskObjF__AllocBuffers`: if `self->bufArray` is allocated,
 frees `self->scratchBuf`, frees every `self->bufArray[i]` for `i` in
 `[0, self->bufCount)`, frees `self->bufArray` itself, and clears it to 0
 -- a full teardown, unlike `TaskObjF__FreeUnusedBuffers`'s partial trim.
+
+## Round 95 (track 7, charlie)
+
+`titles` compared with and cleared to `NULL`. Zero bytes.

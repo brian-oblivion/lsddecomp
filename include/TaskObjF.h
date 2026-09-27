@@ -155,9 +155,9 @@ enum TaskObjFOpMode {
  * on either, and frees beginLoad's buffers. No code sets state 1. */
 enum TaskObjFState {
     TASKOBJF_STATE_IDLE = 0x00,
-    TASKOBJF_STATE_NO_CARD = 0x02,          /* "NOCONECT": checkCardStatus got no answer */
-    TASKOBJF_STATE_CARD_ERROR = 0x03,       /* "ERROR": the card answered EvSpERROR */
-    TASKOBJF_STATE_CARD_CHANGED = 0x04,     /* "CHANGE": _card_info reported a new card */
+    TASKOBJF_STATE_NO_CARD = 0x02,      /* "NOCONECT": checkCardStatus failed (timeout or error) */
+    TASKOBJF_STATE_CARD_ERROR = 0x03,   /* "ERROR": the card answered EvSpERROR */
+    TASKOBJF_STATE_CARD_CHANGED = 0x04, /* "CHANGE": _card_info reported a new card */
     TASKOBJF_STATE_UNFORMATTED_LOAD = 0x05, /* "UNFORM1": unformatted card, opMode LOAD */
     TASKOBJF_STATE_UNFORMATTED_SAVE = 0x06, /* "UNFORM2": unformatted card, opMode SAVE; confirming formats it */
     TASKOBJF_STATE_FORMATTING = 0x07,    /* "FORMING": tickStateDelay, then FORMAT */

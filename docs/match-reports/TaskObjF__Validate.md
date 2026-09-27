@@ -56,3 +56,19 @@ dispatches through `slot7C` on failure. Mechanics are clear; what the
 three slots' own implementations actually validate (owned by a subclass
 outside this unit) is not established here, so the name describes the
 gate itself rather than what it checks.
+
+## Round 95 (track 7, charlie)
+
+### Naming and constants
+
+`slot4CRet`/`buf10`/`buf14`/`buf18` -> `ok`/`error`/`cardChanged`/
+`formatted`, from what TaskObjF__CheckCardStatus writes (class_3bb8c_e.c):
+its return is 0 when a card call timed out or failed (EvSpTIMOUT, EvSpERROR), the first out is
+set on EvSpERROR, the second when _card_info reports EvSpNEW (a new card),
+the third is cleared when _card_load reports EvSpNEW (unformatted). `code`
+-> `state`: 2 `NO_CARD` ("NOCONECT"), 3 `CARD_ERROR`, 4 `CARD_CHANGED`,
+5/6 `UNFORMATTED_LOAD`/`UNFORMATTED_SAVE` ("UNFORM1"/"UNFORM2", chosen by
+opMode). The `formatted != 0` branch is unreachable (the early return took
+that case) and leaves `state` unset; it stays, with a MATCHING line, as the
+goto that lever 2 above measured. typeviews' baseline warning for it now
+names `state`. Zero bytes.
