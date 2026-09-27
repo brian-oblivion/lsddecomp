@@ -11,7 +11,7 @@
  *    records (Rec1C) whose first bytes are a file path (the sound banks
  *    SND\*.VH/VB; then per stage its TEXx.TIX, BGx.SEQ and Mnnn.LBD files;
  *    then the FILM .STR and IMG .TIM files): random-or-forced
- *    pickers (SeedAndRandom, SetPickOverrides/gForcedWeeklyGroup/
+ *    pickers (SeedAndRandom, SetPickOverrides/gForcedSoundBank/
  *    gForcedVariant), per-stage record-group accessors indexed by
  *    gRecordIndexTable and, for GetGridRecordXY, by StageGrid.h's cell
  *    columns, and a family of "stream channel" lookups (GetIntroStreamName,
@@ -146,7 +146,7 @@ void LbdFile__ReleaseDataBlock(LbdFile *self) {
 }
 
 extern char *gDefaultDataDirectory; /* "CDI\\" (sdata) */
-extern s32 gForcedWeeklyGroup;
+extern s32 gForcedSoundBank;
 extern s32 gForcedVariant;
 extern u8 gSoundBankPaths[];
 extern u8 gRecordTable[];
@@ -177,7 +177,7 @@ s32 SeedAndRandom(s32 seed, s32 unused) {
 
 void SetPickOverrides(s32 a, s32 b) {
     if (a >= 0) {
-        gForcedWeeklyGroup = a;
+        gForcedSoundBank = a;
     }
     if (b >= 0) {
         gForcedVariant = b;
@@ -200,8 +200,8 @@ s32 PickSoundBank(s32 arg) {
     s32 *table = GetSoundBankPaths();
     s32 *entry;
     s32 index;
-    if (gForcedWeeklyGroup != 0) {
-        index = gForcedWeeklyGroup - 1;
+    if (gForcedSoundBank != 0) {
+        index = gForcedSoundBank - 1;
         entry = &table[index];
     } else {
         entry = &table[r];

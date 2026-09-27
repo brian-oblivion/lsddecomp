@@ -11,7 +11,7 @@ out-of-range drift.
 
 ## What it does
 
-Weekly table pick: `r = (u32)SeedAndRandom(0, arg) % 7` (unsigned: retail's multu/mfhi magic 0x24924925), `table = GetSoundBankPaths()` (gSoundBankPaths, words); returns `table[gForcedWeeklyGroup - 1]` when the override global gForcedWeeklyGroup is set, else `table[r]`.
+Weekly table pick: `r = (u32)SeedAndRandom(0, arg) % 7` (unsigned: retail's multu/mfhi magic 0x24924925), `table = GetSoundBankPaths()` (gSoundBankPaths, words); returns `table[gForcedSoundBank - 1]` when the override global gForcedSoundBank is set, else `table[r]`.
 
 ## Source
 
@@ -24,8 +24,8 @@ s32 PickSoundBank(s32 arg) {
     s32 *table = GetSoundBankPaths();
     s32 *entry;
     s32 index;
-    if (gForcedWeeklyGroup != 0) {
-        index = gForcedWeeklyGroup - 1;
+    if (gForcedSoundBank != 0) {
+        index = gForcedSoundBank - 1;
         entry = &table[index];
     } else {
         entry = &table[r];
@@ -72,4 +72,4 @@ shift.
 
 - **Name:** `PickSoundBank`
 - **Tier:** B (head review, round 82: was A. The mechanics are this body's; the purpose word comes from the callers' inherited names in code_1677c.c / GameApplication.h, which are themselves hypotheses, so the name is consistent but not established)
-- **Evidence:** leaf picker: forced-or-random index into GetSoundBankPaths(), gated by gForcedWeeklyGroup; a picker is tier A by the leaf-mechanics rule.
+- **Evidence:** leaf picker: forced-or-random index into GetSoundBankPaths(), gated by gForcedSoundBank; a picker is tier A by the leaf-mechanics rule.

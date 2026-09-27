@@ -110,7 +110,7 @@ renamed):
  *    turned that off.
  * 2. Free functions over gRecordTable, a table of 0x230+ fixed 0x1C-byte
  *    records (Rec1C): random-or-forced pickers (SeedAndRandom,
- *    SetPickOverrides/gForcedWeeklyGroup/gForcedVariant), record-group
+ *    SetPickOverrides/gForcedSoundBank/gForcedVariant), record-group
  *    accessors indexed by gRecordIndexTable and, for GetGridRecordXY, by
  *    StageGrid.h's cell columns, and a family of "stream channel" lookups
  *    (GetIntroStreamName, PickWeeklyStreamChannel, GetStreamChannelInit,
