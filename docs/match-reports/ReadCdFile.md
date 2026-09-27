@@ -459,3 +459,12 @@ from check (b)), not as a spent, failed search.
   this round; posted to the broadcast for the head to apply at merge time
   per FINISHING-PLAN.md track 3 step 3 (rename the field in the struct
   DEFINITION only, rebuild, fix exactly the accessors the compiler lists).
+
+## Round 97 (runner bravo): Sony's `<libcd.h>` prototypes
+
+The unit's local `CdControl`/`CdSync`/`CdRead`/`CdReadSync` declarations were
+replaced by `<libcd.h>`'s. Call sites now read
+`CdControl(CdlSetloc, (u_char *)&self->pos, 0)` (`CdLoc16` is the project's
+spelling of `CdlLOC`) and `CdRead(hi, (u_long *)arg1, CdlModeSpeed)`; the
+`CdSync` result buffer is `u_char buf[0x10]` (same size, same frame).
+Byte-exact; whole-image SHA1 green.
