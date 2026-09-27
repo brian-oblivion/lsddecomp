@@ -62,7 +62,7 @@ shape, not something GCC restructured.
 
 `EntryDAD4` (the unit's local view of `_svm_sreg` as an array of 0x10-byte
 entries, fields `unk0`/`unk2`) is the SPU voice register block: libsnd
-vmanager's first .data word points at 0x1F801C00, and code_179d8_m.c's
+vmanager's first .data word points at 0x1F801C00, and code_179d8_l.c's
 SpuVmInit had already typed it `SpuRegs *` with a 24 x 0x10 `voice[]` array
 at +0. `unk0`/`unk2` are `volL`/`volR`. The type moved to include/SvmData.h.
 

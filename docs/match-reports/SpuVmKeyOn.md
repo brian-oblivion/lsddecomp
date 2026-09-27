@@ -20,15 +20,15 @@
 
 > Renamed from `func_8002FAC4` on 2026-09-20 (tools/rename.py). Address 0x8002fac4.
 
-Unit: `src/code_179d8_m.c`. Round 27, runner bravo. This is the ordered
+Unit: `src/code_179d8_l.c`. Round 27, runner bravo. This is the ordered
 work-list's item 1 -- FRESH ground, no prior report existed for this
 function.
 
 ## Screens (clean)
 
 ```
-grep -n 'gp_rel' asm/nonmatchings/code_179d8_m/SpuVmKeyOn.s            -> no hits
-grep -A2 -nE '\b(mflo|mfhi)\b' asm/nonmatchings/code_179d8_m/SpuVmKeyOn.s \
+grep -n 'gp_rel' asm/nonmatchings/code_179d8_l/SpuVmKeyOn.s            -> no hits
+grep -A2 -nE '\b(mflo|mfhi)\b' asm/nonmatchings/code_179d8_l/SpuVmKeyOn.s \
   | grep -E '\b(mult|multu|div|divu)\b'                                   -> no hits
 ```
 
@@ -37,7 +37,7 @@ grep -A2 -nE '\b(mflo|mfhi)\b' asm/nonmatchings/code_179d8_m/SpuVmKeyOn.s \
 `./build-and-verify.sh` GREEN with `INCLUDE_ASM` restored (self-tested by
 splicing the preserved body below back in and rebuilding). Best attempt
 compiled clean at **402 words against retail's 387** (`objdump -t
-build/src/code_179d8_m.c.o` on the linked object; the `funcdiff.py`
+build/src/code_179d8_l.c.o` on the linked object; the `funcdiff.py`
 in-range figure, 6/387, is **not trustworthy** given the length mismatch
 and its own drift warning -- see CLAUDE.md's four-ways-a-score-lies list).
 `tools/asm-differ/diff.py`, which realigns past the length gap, shows the
@@ -51,7 +51,7 @@ function showed a genuine content/order mismatch in this round's reading.
 ## Round 30 (charlie) update: rebuilt, confirmed accurate
 
 Re-spliced this exact preserved body and rebuilt from scratch. **All title
-figures reconfirmed:** `objdump -t build/src/code_179d8_m.c.o` shows
+figures reconfirmed:** `objdump -t build/src/code_179d8_l.c.o` shows
 `SpuVmKeyOn` at `0x648` bytes = **402 words**, retail 387 (15 long,
 exactly as titled), and `funcdiff.py`'s in-range figure is **6/387** with
 its drift warning firing, matching this report's own caution. No new axis
@@ -287,7 +287,7 @@ content, control flow and field accesses are unaffected -- both are
 symbol-naming bugs that could only be caught by actually linking the
 body**, which is precisely round 33's lesson this round's brief called out
 by name. With both fixed, **the title's length figure reconfirms exactly**:
-`objdump -t build/src/code_179d8_m.c.o` shows `SpuVmKeyOn` at `0x648`
+`objdump -t build/src/code_179d8_l.c.o` shows `SpuVmKeyOn` at `0x648`
 bytes = **402 words** (retail 387, 15 words LONG, exactly as titled).
 
 ### Permuter search
@@ -383,7 +383,7 @@ SHA1 reconfirmed green.
 
 ### Proposed learning (third data point, same unit)
 
-**Three for three on `code_179d8_m` this round: charlie's `dead[N]`/`if(0)`
+**Three for three on `code_179d8_l` this round: charlie's `dead[N]`/`if(0)`
 frame-padding idiom recovers frame byte-alignment exactly every time it is
 applied to a measured frame-size gap, and it has closed a missing-WORD-COUNT
 gap ZERO of three times on this unit** (`SpuVmFlush`, `SetAutoPan`,
@@ -629,7 +629,7 @@ velocity, pan-split pair, status).
 (`bendCurveUp`/`bendCurveDown`, others still `unk0`..`unk7`/`unk16`) are
 declared in this unit but only used by functions still `INCLUDE_ASM`
 (SetAutoVol, SetAutoPan, SpuVmPBVoice, and this
-function) -- the field renames are live in `src/code_179d8_m.c` now (pure
+function) -- the field renames are live in `src/code_179d8_l.c` now (pure
 documentation, nothing compiled references them yet); the base symbols
 themselves (`_svm_vh`, `_svm_tn`) were not renamed since
 `_svm_tn` is shared with bravo's live `libsnd_vm_vol_ut_key_ut_keyv.c` this round
@@ -637,7 +637,7 @@ themselves (`_svm_vh`, `_svm_tn`) were not renamed since
 
 ## NON_MATCHING body promoted, round 67
 
-Placed in `src/code_179d8_m.c` under `#ifdef NON_MATCHING`, `INCLUDE_ASM`
+Placed in `src/code_179d8_l.c` under `#ifdef NON_MATCHING`, `INCLUDE_ASM`
 kept in `#else`. Applied both stale-symbol fixes this report's round-37
 update already diagnosed but the preserved `#if 0` text above still shows
 literally: `func_80032148(a1, a2)` -> `SpuVmVSetUp(a1, a2)` (already
@@ -655,8 +655,8 @@ naming pass gave the same offsets: `_svm_vh->unk12` ->
 `->bendCurveDown` (by OFFSET, not by the field's on-disk polarity --
 this function's usage doesn't depend on which direction the name
 implies). `./build-and-verify.sh` green (zero bytes changed);
-`tools/check-nonmatching.sh code_179d8_m` green; `tools/stalesyms.py`
-shows no stale references left in `src/code_179d8_m.c` (only the report's
+`tools/check-nonmatching.sh code_179d8_l` green; `tools/stalesyms.py`
+shows no stale references left in `src/code_179d8_l.c` (only the report's
 own preserved-block text still carries the old name, expected and
 harmless).
 
@@ -669,7 +669,7 @@ REVISITED, round 73: stopped -- the function is Sony's libsnd `SpuVmKeyOn` (a bu
 The unit's `#ifdef NON_MATCHING` body, switched live for one build and
 reverted: `build exit=2`, no compile-error grep hits.
 
-- built length **414 words** (`objdump -t build/src/code_179d8_m.c.o`,
+- built length **414 words** (`objdump -t build/src/code_179d8_l.c.o`,
   `0x678` bytes) against retail's 387 -- **27 long**, not the 402 the title
   used to carry. The NON_MATCHING body has evidently drifted from the one
   the 402 figure was measured on (two stale-symbol fixes landed in round
@@ -732,7 +732,7 @@ The NON_MATCHING body now stores `_svm_voice[D_8008EA26].unkNN`; normalized disa
 
 ## Track 6 (round 96, charlie)
 
-Round 96 (charlie, track 6) moved `src/code_179d8_m.c` onto Sony's headers (`<libsnd.h>`, `<libspu.h>`) and Sony's types; zero bytes changed, whole-image SHA1 green, NON_MATCHING bodies compile.
+Round 96 (charlie, track 6) moved `src/code_179d8_l.c` onto Sony's headers (`<libsnd.h>`, `<libspu.h>`) and Sony's types; zero bytes changed, whole-image SHA1 green, NON_MATCHING bodies compile.
 
 - `ObjE970` -> `VabHdr` (`_svm_vh`): the bound check reads `D_8008E970->ps` (the program count; was `difficultyThreshold`). `D_8008EA13` is `_svm_cur + 7`, the program number.
 - `SlotE968M` -> `ProgAtr` (`_svm_pg`, 0x8008E968): `unk0`/`unk1`/`unk4` are `tones`/`mvol`/`mpan`.

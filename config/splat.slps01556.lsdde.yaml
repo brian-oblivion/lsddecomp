@@ -862,7 +862,6 @@ segments:
       #
       # Expect this slice to span more than one class; identify each with
       # tools/classtable.py rather than assuming the unit has one.
-      - [0x1ECD8, c, code_179d8_m]
       # code_179d8_j: TAIL slice of the old code_179d8_mid_c, functions
       # 173..198 of the original monolith, 0x20ADC..0x2273C (26 functions,
       # func_800302DC .. func_80031EE8).  Carved round 21 (2026-09-06).

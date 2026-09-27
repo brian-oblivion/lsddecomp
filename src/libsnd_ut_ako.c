@@ -24,7 +24,7 @@
 #include "common.h"
 #include "SvmData.h"
 
-/* code_179d8_m.c's own comment on this exact symbol: "written as a side
+/* code_179d8_l.c's own comment on this exact symbol: "written as a side
  * effect, then re-read from the global (not a cached register) a few
  * instructions later... Genuinely needs volatile: without it, this
  * compiler proves... the re-read is redundant and elides it entirely."
@@ -32,16 +32,16 @@
  * up in this function's own disassembly. */
 extern volatile u16 D_8008EA26;
 
-/* "Loop bound / threshold" -- code_179d8_m.c's own comment on this symbol. */
+/* "Loop bound / threshold" -- code_179d8_l.c's own comment on this symbol. */
 extern u8 spuVmMaxVoice;
 
 /*
  * This function's OWN reading of _svm_sreg: a POINTER VARIABLE (loaded with
  * `lw`, not an array base) into the PS1 SPU voice register block -- the value
- * is 0x1F801C00, established when code_179d8_m was named as the 24-voice
+ * is 0x1F801C00, established when code_179d8_l was named as the 24-voice
  * sound driver.  Indexed as HALFWORDS: `_svm_sreg[woff + N]` with
  * `s16 woff = i * 8`, i.e. 8 halfwords (0x10 bytes) per voice, which is the
- * SPU's own per-voice register stride.  code_179d8_m.c reads the SAME symbol
+ * SPU's own per-voice register stride.  code_179d8_l.c reads the SAME symbol
  * as a fixed-offset object pointer (its own SpuRegs, offsets 0x194/0x196) --
  * a different, valid reading per the project's convention.
  *

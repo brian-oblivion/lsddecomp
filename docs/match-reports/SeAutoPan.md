@@ -4,7 +4,7 @@
 
 > Renamed from `func_8002E874` on 2026-09-20 (tools/rename.py). Address 0x8002e874.
 
-Unit: `src/code_179d8_m.c`. Round 24, runner bravo.
+Unit: `src/code_179d8_l.c`. Round 24, runner bravo.
 
 ## Result
 
@@ -164,7 +164,7 @@ CC-driven volume slide? an automatic release curve?) is not established --
 only that the destination of the ramp feeds into a stereo-volume
 computation (see SetAutoPan's own report), which is why "Fade" rather
 than a more specific term. See the unit header comment in
-`src/code_179d8_m.c` for the cross-function picture.
+`src/code_179d8_l.c` for the cross-function picture.
 
 ## Track 2 (round 86, 2026-09-26, alpha)
 

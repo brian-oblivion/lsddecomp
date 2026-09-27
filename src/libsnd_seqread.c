@@ -49,12 +49,12 @@
  * guesses, not authoritative.  Per this project's convention, a prototype
  * for a function ANOTHER unit defines stays in this .c, not in a shared
  * header. */
-extern void SpuVmPitchBend(s32 a0, s16 a1, u8 a2, u8 a3); /* code_179d8_m, not yet matched: local guess */
+extern void SpuVmPitchBend(s32 a0, s16 a1, u8 a2, u8 a3); /* code_179d8_l, not yet matched: local guess */
 /* SpuVmKeyOn (round 76, was StartNote): Sony libsnd/vmanager INTERNAL,
  * no public LIBSND.H prototype (unlike SsUtKeyOn) -- kept byte-exact. */
 extern s32 SpuVmKeyOn(s32 a0, s16 a1, s16 a2, u16 a3, u16 a4,
-                      u16 a5); /* code_179d8_m, not yet matched: local guess, matches code_179d8_j's independent reading of the same call shape */
-extern s32 SpuVmKeyOff(s32 a0, s16 a1, s16 a2, u16 a3); /* code_179d8_m, not yet matched: local guess, ditto */
+                      u16 a5); /* code_179d8_l, not yet matched: local guess, matches code_179d8_j's independent reading of the same call shape */
+extern s32 SpuVmKeyOff(s32 a0, s16 a1, s16 a2, u16 a3); /* code_179d8_l, not yet matched: local guess, ditto */
 /* Sony libsnd/vm_doff, internal: no public LIBSND.H prototype. */
 extern void SpuVmDamperOff(void);
 

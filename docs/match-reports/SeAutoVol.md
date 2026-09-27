@@ -12,7 +12,7 @@ positional skeleton diffs 114.
 
 **Lever: sibling body.** This report and the unit's carve note both said
 this function is a near-identical sibling of `SeAutoPan` in
-`code_179d8_m`, which is matched. That body was copied with the
+`code_179d8_l`, which is matched. That body was copied with the
 `_svm_voice +0x28..+0x32` arrays renamed to the `_svm_voice +0x1C..+0x26` family, and it matched on
 the first build. The whole five-round residue came from the preserved body
 declaring its parameters `s32` and hand-narrowing them into `s16` locals.
@@ -24,7 +24,7 @@ local were all artifacts of fighting a wrong parameter type. Nothing else
 needed to change: `(from - to < 0 ? to - from : from - to) < duration` is
 retail's two-branch abs compare as written.
 
-This is the counterpart `code_179d8_m`'s header asks about: the "Begin"
+This is the counterpart `code_179d8_l`'s header asks about: the "Begin"
 for `SetAutoVol`. It sets `D_8008D9A4`, `D_8008D9AC`,
 `D_8008D9AE` and then either `Step=1, Interval=Countdown=q` or
 `Interval=0, Step=q`. Naming it (for example `BeginVoiceEnvelope`) is
@@ -102,7 +102,7 @@ the unit's carve-time header comment**, not a BIOS trampoline: the opening
 each of three incoming parameters in a raw (un-narrowed) register BEFORE the
 same three registers get narrowed to `s16` in place (`sll..16`/`sra..16`).
 Confirmed by hand, matching the header's note that `SeAutoPan` in
-`code_179d8_m` (this round's runner bravo) opens with the identical
+`code_179d8_l` (this round's runner bravo) opens with the identical
 three-register preserve-then-narrow prologue and the same early-out branch
 comparing two of the narrowed arguments — **this is the same shape as that
 sibling, derived independently from this side**, exactly as the carve note
@@ -461,7 +461,7 @@ here. Restored to `INCLUDE_ASM` unchanged.
 Already carries its real name: identified round 74 (track 2, runner bravo)
 as `libsnd/vmanager SeAutoVol` (shape 0.97 vs the disc-3.3 reference, 110w
 reference vs our 116w; the same tied candidate at this shape score as its
-own sibling `SeAutoPan` in `code_179d8_m.c` -- see the symbols file for the
+own sibling `SeAutoPan` in `code_179d8_l.c` -- see the symbols file for the
 disambiguation). Sony symbol; this pass does not rename it further. Matched
 round 73, 116/116.
 

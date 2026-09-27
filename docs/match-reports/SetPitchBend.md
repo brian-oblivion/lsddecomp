@@ -130,7 +130,7 @@ A per-channel/slot "dispatch event" function. Reads the active state
 block's `unk2C` byte (via `rec + rec->unk12`, this unit's recurring
 runtime-offset idiom), the record's `unk4C` field, and the current byte
 at the sequencer cursor, packs `(slot << 8) | channel` into one word, and
-calls a cross-unit function (`SpuVmPitchBend`, defined in `code_179d8_m`,
+calls a cross-unit function (`SpuVmPitchBend`, defined in `code_179d8_l`,
 NOT YET MATCHED there as of this round -- so its real prototype is
 unverified) with those four values. It then calls the shared
 `ReadDeltaValue` VLQ-decode helper and caches the return into `rec->unk88`,

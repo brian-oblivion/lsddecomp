@@ -28,7 +28,7 @@ source object and a DIFFERENT tail:
   byte, NOT the per-note `_ss_score` entry) and combines it with
   `D_8008EA10` through a SIGNED division by `16129` (`=127²`, confirmed
   against the SAME magic constant `0x82061029`/shift-13 the sibling unit's
-  own report `SetAutoPan.md` -- `code_179d8_m.c`, read for reference
+  own report `SetAutoPan.md` -- `code_179d8_l.c`, read for reference
   only, not edited -- already brute-force-identified as divisor 16129 via a
   batch-compiled `int f(int){return a/N;}` sweep through the pinned
   pipeline). The result is then multiplied by `D_8008EA16` and `D_8008EA19`
@@ -962,7 +962,7 @@ D_8008E228 _svm_okon1`.
 `D_8008EA22` and `D_8008EA26` lie inside Sony's `_svm_cur` (pinned at
 0x8008EA0C, 0x20 bytes in 3.5's vm_g.o), and `rename.py` refuses them:
 their spelling is `_svm_cur.<field>` once the struct is typed. That is a type
-job (track 6), across this unit, `code_179d8_m.c` and
+job (track 6), across this unit, `code_179d8_l.c` and
 `libsnd_vm_vol_ut_key_ut_keyv.c`, and the `D_8008EA26[]` incomplete-array
 declaration is load-bearing here (see the round 65 section), so the typed
 spelling has to be measured, not assumed. Proposed to the head.

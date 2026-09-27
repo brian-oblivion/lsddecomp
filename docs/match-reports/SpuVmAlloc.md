@@ -771,7 +771,7 @@ of `$a0`-`$a3`: the prologue writes every register it uses from constants and
 
 So the function takes zero arguments in the sense of what it consumes.
 
-**Why `src/code_179d8_m.c`'s one-parameter declaration stays.** Its two call
+**Why `src/code_179d8_l.c`'s one-parameter declaration stays.** Its two call
 sites write `SpuVmAlloc(0xFF)`, and that argument is byte-load-bearing:
 
 ```
@@ -798,7 +798,7 @@ review, but a later reader should know the two declarations were never in
 tension: one describes the callee, the other describes a call site.
 
 **Declaration sites changed:** none (arity unchanged). `/* arity-ok: ... */`
-added to `src/code_179d8_m.c:375`. Oracle green.
+added to `src/code_179d8_l.c:375`. Oracle green.
 
 ## Round 65 update (runner bravo): REVISIT — the round-37 "exact length" was reached by two PADDING artifacts; removing both and finding three real levers keeps 167/167 while cutting asm-differ 3255 -> 1250 and funcdiff insertions/deletions 29/29 -> 16/16
 

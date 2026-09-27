@@ -4,7 +4,7 @@
 
 > Renamed from `func_8002F610` on 2026-09-20 (tools/rename.py). Address 0x8002f610.
 
-Unit: `src/code_179d8_m.c`. Round 24, runner bravo.
+Unit: `src/code_179d8_l.c`. Round 24, runner bravo.
 
 ## Result
 

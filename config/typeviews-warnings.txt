@@ -35,7 +35,7 @@ code_179d8_d: warning: unused variable `unused'
 code_179d8_d: warning: passing arg 4 of `BuildFileName' discards `const' from pointer target type
 code_179d8_d: warning: passing arg 4 of `BuildFileName' discards `const' from pointer target type
 code_179d8_h: warning: unused variable `scratch'
-code_179d8_m: warning: comparison between signed and unsigned
+code_179d8_l: warning: comparison between signed and unsigned
 code_179d8_q: src/code_179d8_q.c: At top level:
 code_179d8_q: warning: `LockCd' was previously implicitly declared to return `int'
 code_179d8_q: warning: `UnlockCd' was previously implicitly declared to return `int'

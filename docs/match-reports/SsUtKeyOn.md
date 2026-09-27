@@ -120,7 +120,7 @@ whose retail bytes are used verbatim.
 | --- | --- |
 | `SsUtKeyOnV` (this unit, this function's near twin) | 11 |
 | **`SsUtKeyOn`** | **9** |
-| `func_8002FAC4` (`code_179d8_m`) | 2 |
+| `func_8002FAC4` (`code_179d8_l`) | 2 |
 | `CD_cw`, `SsUtChangePitch`, `SetupStyleSpawnParamsA`, `SetupStyleSpawnParamsB` | 1 each |
 
 No maspsx option covers it (`--help` on maspsx `e3d5916`; the two closest

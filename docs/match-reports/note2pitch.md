@@ -4,7 +4,7 @@
 
 `code_179d8_l`, vram `0x8002DF7C`, file offset `0x1E77C`. Frameless, 47 words
 (0xBC bytes). Takes no arguments; return value is used by its only caller
-(`SpuVmKeyOn` in `code_179d8_m`) as `andi $a1, $v0, 0xFFFF`, i.e. a 16-bit
+(`SpuVmKeyOn` in `code_179d8_l`) as `andi $a1, $v0, 0xFFFF`, i.e. a 16-bit
 result.
 
 ## What it computes

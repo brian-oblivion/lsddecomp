@@ -116,7 +116,7 @@ the same symbol with no intervening write to it — including two full
 `D_8008EA13`+`D_8008EA18` recomputations back-to-back separated only by an
 unrelated array store, and re-deriving `D_8008EA28*2`'s address twice for
 two adjacent but distinct destination arrays. `volatile` reproduces all of
-this uniformly; see `code_179d8_m.c`'s own note on `D_8008EA26` needing
+this uniformly; see `code_179d8_l.c`'s own note on `D_8008EA26` needing
 `volatile` for the identical reason (a re-read the compiler would otherwise
 prove redundant and elide).
 
@@ -207,7 +207,7 @@ unaffected.
 4. **`D_8008EA26` must be declared `volatile s16` (not `u16`).** Every
    read of it in this function is an `lh` (signed); a `u16` declaration
    reads via `lhu`. (This is a DIFFERENT independent local view than
-   `code_179d8_j.c`/`code_179d8_m.c`'s own `volatile u16 D_8008EA26` — both
+   `code_179d8_j.c`/`code_179d8_l.c`'s own `volatile u16 D_8008EA26` — both
    are legitimate per the project's per-unit reduced-view convention; only
    the instructions THIS function emits decide THIS unit's view.)
 5. **`D_8008EA28` must ALSO be `volatile`.** Without it, GCC proves the
@@ -246,7 +246,7 @@ differences that don't change instruction count but do change bytes.**
     REGRESSES the earlier `chan = D_8008EA26; *p28 = chan << 3;` sequence
     from a clean `lh` to the same `lhu`+extend pattern — so `s32` is
     strictly worse and was reverted.
-  - `*(u8 *) &D_8008EA26` (the idiom `code_179d8_m.c` documents for
+  - `*(u8 *) &D_8008EA26` (the idiom `code_179d8_l.c` documents for
     reading this exact global's low byte through a plain, non-volatile
     pointer, specifically to fold to a compact `lui`+`lbu`): tried at one
     call site in isolation. It did **not** produce the compact form here —
@@ -290,7 +290,7 @@ name and a plain-typed copy. This is the natural next lever.
 - **An idiom that fixes a residue in one function is not portable to a
   different call site of the SAME symbol without re-measuring the WHOLE
   function's byte count.** `*(u8 *) &D_8008EA26` is confirmed correct and
-  necessary in `code_179d8_m.c`; applied here it regressed a distant,
+  necessary in `code_179d8_l.c`; applied here it regressed a distant,
   unrelated block by 3 words. Register pressure is global, not local to
   the statement being edited — CLAUDE.md already says this for struct
   edits; this is the same fact for a single-expression idiom swap.

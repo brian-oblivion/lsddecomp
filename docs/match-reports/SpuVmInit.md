@@ -17,13 +17,13 @@ word-match, first real diff at file 0x1F69C / vram 0x8002EE9C -- pure
 REGISTER-IDENTITY residue (a0 vs s0), same instructions, banned to fix by
 pinning
 
-Unit: `src/code_179d8_m.c`. Round 26 (second pass), runner bravo, incorporating the
+Unit: `src/code_179d8_l.c`. Round 26 (second pass), runner bravo, incorporating the
 HEAD's diagnosis of the "split scaled index" residue (see below).
 
 ## Screens (clean)
 
 ```
-grep -n 'gp_rel' asm/nonmatchings/code_179d8_m/SpuVmInit.s            -> no hits
+grep -n 'gp_rel' asm/nonmatchings/code_179d8_l/SpuVmInit.s            -> no hits
 grep -A2 -nE '\b(mflo|mfhi)\b' ... | grep -E '\b(mult|multu|div|divu)\b'  -> no hits
 ```
 
@@ -58,7 +58,7 @@ same block) with `s0` in place of retail's `a0` and nothing else differing
 the score): the preserved body's two `SPU` calls used STALE placeholder
 names.** `func_80039228(0)` and `func_80039104(0x20, gSpuMallocArea)` were
 written when these two library calls had no symbol yet; `asm/nonmatchings/
-code_179d8_m/SpuVmInit.s` itself now names them `_spu_setInTransfer`
+code_179d8_l/SpuVmInit.s` itself now names them `_spu_setInTransfer`
 and `SpuInitMalloc` (`config/symbols.slps01556.lsdde.txt` lines 287/291,
 Psy-Q `libspu`, from the SDK-object-linking work in later rounds). The
 preserved body below has been updated to the current names; nothing about
@@ -761,9 +761,9 @@ Round 89 (runner delta, track 5 `asm-sites`), two sites:
   cast stores). The unit's `SpuRegs` typedef and `extern SpuRegs *_svm_sreg;`
   moved up to where the alias stood (SpuVmNoiseOff, later in the unit, still
   uses them), the identical `SpuRegsEdd4` typedef was dropped, and SpuVmInit
-  now names `_svm_sreg` directly. `build/src/code_179d8_m.c.o` came out
+  now names `_svm_sreg` directly. `build/src/code_179d8_l.c.o` came out
   byte-identical (`cmp`), `./build-and-verify.sh` green, and
-  `tools/check-nonmatching.sh code_179d8_m` still passes.
+  `tools/check-nonmatching.sh code_179d8_l` still passes.
 - **Justified: the bare `__asm__("")`** before `D_8008EA26 = i;`. Measured by
   deleting it alone: the image went red (281676 bytes differ: the function
   came out one word shorter -- retail's `nop` after the `lhu` reload is gone --
@@ -775,7 +775,7 @@ Round 89 (runner delta, track 5 `asm-sites`), two sites:
 
 ## Track 6 (round 96, charlie)
 
-Round 96 (charlie, track 6) moved `src/code_179d8_m.c` onto Sony's headers (`<libsnd.h>`, `<libspu.h>`) and Sony's types; zero bytes changed, whole-image SHA1 green, NON_MATCHING bodies compile.
+Round 96 (charlie, track 6) moved `src/code_179d8_l.c` onto Sony's headers (`<libsnd.h>`, `<libspu.h>`) and Sony's types; zero bytes changed, whole-image SHA1 green, NON_MATCHING bodies compile.
 
 - The local `SpuVolume`/`SpuReverbAttr` mirrors and the local `SpuInitMalloc(s32, void *)` prototype are gone: `<libspu.h>` supplies all three (`SpuInitMalloc(long, char *)`, so `D_8008DEB0` is declared `char[]`).
 - `ObjDAD4` is now `SpuRegs` (`tools/renametype.py ObjDAD4 SpuRegs`): `_svm_sreg` holds 0x1F801C00, the first `.data` word of libsnd/vmanager.o on disc 3.3 (`001c801f`), the PS1 SPU register block. It is laid out as `SpuVoiceRegs voice[24]` (volL, volR, pitch, addr, adsr1, adsr2, envx at +0x0..+0xC) plus the keyOn (+0x188), keyOff (+0x18C), noiseOn (+0x194) and reverbOn (+0x198) words. The six cast stores here are unchanged (their index spelling carries the match); each comment now names the register: +0x6 addr = 0x200, +0x4 pitch = 0x1000 (44.1 kHz), +0x8 adsr1 = 0x80FF, +0x0/+0x2 volL/volR = 0, +0xA adsr2 = 0x4000.

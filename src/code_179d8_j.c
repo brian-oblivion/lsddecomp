@@ -21,7 +21,7 @@
  * records it in D_8008EA22, vmanager's current-sequence global
  * (SpuVmGetSeqLVol records only the access byte).
  *
- * Edges (python3 tools/tuboundary.py): code_179d8_m before it ("start edge
+ * Edges (python3 tools/tuboundary.py): code_179d8_l before it ("start edge
  * possible"), the placed object libsnd/vm_prog after it; every edge inside
  * is "boundary possible".
  */

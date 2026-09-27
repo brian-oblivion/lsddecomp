@@ -34,7 +34,7 @@ extern SByte3_d294 D_8008A8F8_b __asm__("gDefaultViewportColor");
 `gDefaultViewportColor` again gives the two accesses textually distinct symbols, so
 CSE never fires: two independent `la`/`lui`+`addiu` pairs are emitted,
 matching retail exactly. This is not a new idiom for the project --
-`code_179d8_m.c` already uses `__asm__("D_8008D988")`-style aliasing for
+`code_179d8_l.c` already uses `__asm__("D_8008D988")`-style aliasing for
 array reinterpretation -- but it had not been applied to defeat an
 address CSE before. Verified first in isolation through the pinned
 pipeline (`tools/gcc263/cpp | cc1`) on a 6-line reproducer: the aliased
@@ -140,7 +140,7 @@ pass that keys on syntactic identity, at zero codegen cost elsewhere --
 unlike `volatile`, which defeats the same CSE but by making the compiler
 treat every access as an observable side effect, with a much heavier
 and much less retail-like cost. This project already had the idiom on
-file (`code_179d8_m.c`, for a different purpose: reinterpreting an array
+file (`code_179d8_l.c`, for a different purpose: reinterpreting an array
 element type) but had not connected it to the address-CSE class of
 residue.
 
@@ -401,7 +401,7 @@ Constants in decimal (otLength 13, unk44 2000, unk48 64, projH 256, nearZ 10, fa
  * the two whole-struct copies (two separate lui/addiu pairs); GCC 2.6.3
  * otherwise CSEs that into one shared computation. Declaring a second
  * extern name aliased to the same symbol via `__asm__("gDefaultViewportColor")` (the
- * same alternate-name idiom `code_179d8_m.c` already uses) gives the
+ * same alternate-name idiom `code_179d8_l.c` already uses) gives the
  * second copy a textually distinct symbol, defeating the CSE without
  * `volatile`'s much worse codegen. (2) Two bare `__asm__("")` scheduling
  * barriers pin the two independent zero-inits and the two global-loaded
