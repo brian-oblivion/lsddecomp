@@ -7,6 +7,8 @@
 #include "BasicClass.h"
 #include "class_3bb8c.h"
 #include "TaskObjF.h"
+#include "Pad.h"
+#include "FrameClock.h"
 
 /*
  * class_3bb8c_e (round 14; named round 78, track 3): 19 TaskObjF methods
@@ -82,11 +84,11 @@ void TaskObjF__AddChild(TaskObjF *self, BasicClass *child) {
     }
     Get_vtable_BasicClass()->addChild((BasicClass *)self, child);
     classId = child->methods->header;
-    if ((classId & 0xF) == 2) {
+    if ((classId & CLASS_ID_ROOT_MASK) == PAD_CLASS_ID) {
         self->inputSource = child;
         return;
     }
-    if ((classId & 0xF) == 5) {
+    if ((classId & CLASS_ID_ROOT_MASK) == FRAMECLOCK_CLASS_ID) {
         self->tickSource = child;
         return;
     }
@@ -106,9 +108,9 @@ void TaskObjF__RemoveChild(TaskObjF *self, BasicClass *child) {
         return;
     }
     classId = child->methods->header;
-    if ((classId & 0xF) == 2) {
+    if ((classId & CLASS_ID_ROOT_MASK) == PAD_CLASS_ID) {
         self->inputSource = NULL;
-    } else if ((classId & 0xF) == 5) {
+    } else if ((classId & CLASS_ID_ROOT_MASK) == FRAMECLOCK_CLASS_ID) {
         self->tickSource = NULL;
     } else if ((classId & 0xFF) == 0x10) {
         self->textEntry = NULL;
