@@ -1,27 +1,29 @@
 /*
- * code_171e0 -- FileResource's own module, plus an active-data-source
- * dispatch layer built on top of it.
+ * code_171e0 -- FileResource's own methods, the active-data-source dispatch
+ * layer on top of them, and the data directory that CD paths are built in.
  *
  * FileResource (include/FileResource.h) is the base of every class the
  * game loads from a file: a BasicClass subclass owning one file buffer
  * (FileResource__LoadFile reads a whole named file into it, FreeBuffer
  * releases it) and declaring the file-I/O interface that the CD driver
- * (gCdDriverMethods) and the SPU/VAB driver (gVabDriverMethods) implement.
+ * (gCdDriverMethods, include/CdDriver.h) and the SPU/VAB driver
+ * (gVabDriverMethods, include/VabDriver.h) implement.
  *
- * Most of this unit's remaining functions dispatch between those same two
- * sibling classes by `gActiveDataSource` (DATASOURCE_CD/DATASOURCE_SPU,
- * their own header words): Lock/UnlockActiveDataSource,
- * IsActiveDataSourceBusy/Idle, GetActiveDataSourceOperation/State/
- * DriverMode/Methods/UseVSyncCallback, SetActiveDataSourceDriverMode,
- * RegisterFileTableEntries and SetActiveDataSource all forward
- * to the CD driver's own functions when it is active, and to an SPU/VAB-
- * side fallback otherwise.
+ * gActiveDataSource selects one of those two drivers. SetActiveDataSource
+ * installs one and copies its interface slots into FileResource's table and
+ * into every client table. The Lock/Unlock, IsBusy/Idle, Get.../Set...
+ * functions after it forward to the CD driver when it is active, and
+ * otherwise do nothing, return a fixed value or call the SPU/VAB driver.
+ * RegisterFileTableEntries appends CdFileEntry records to the CD driver's
+ * file table and resolves them.
  *
- * ResourceRequest__Set fills the {buffer, name, mode} descriptor the
- * resource classes' ctors take (include/FileResource.h's ResourceRequest).
- * GetGameApplicationMethods and BuildFileName are unrelated utilities that
- * happen to live in this segment; SetDataDirectory/GetDataDirectory (a
- * getter/setter pair for gDataDirectory) are left unnamed -- see their reports.
+ * SetDataDirectory/GetDataDirectory hold the directory that BuildCdFilePath
+ * and CdStream__Open put between the root `\` and a file name. It is "" until
+ * GameApplication's ctor installs "CDI\". BuildFileName joins an optional
+ * directory, a name and an extension. ResourceRequest__Set fills the
+ * {buffer, name, mode} descriptor the resource classes' ctors take, and
+ * GetGameApplicationMethods is GameApplication's table getter. strcat, which
+ * BuildFileName calls, is Sony's libc2 object, linked after this unit.
  */
 #include "common.h"
 #include "code_171e0.h"
@@ -134,8 +136,7 @@ ResourceRequest *ResourceRequest__Set(ResourceRequest *this, void *buffer, char 
 
 /* Install a new active data source, then copy its method block
  * (CopyDataSourceSlots) into FileResource's own table and into the table of
- * every registered client. The label+goto loop is retail's layout (jump into a
- * bottom test); every while/for spelling tried came out top-tested. */
+ * every registered client. */
 void SetActiveDataSource(s32 source) {
     FileResourceMethods *src;
     FileResourceMethods *methods;
@@ -150,6 +151,7 @@ void SetActiveDataSource(s32 source) {
         src = (FileResourceMethods *)GetVabDriverMethods();
     }
     methods = GetFileResourceMethods();
+    /* MATCHING: a while/for loop compiles top-tested; retail jumps into a bottom test. */
     goto copy;
 next:
     entry++;
@@ -179,7 +181,6 @@ void CopyDataSourceSlots(FileResourceMethods *dst, FileResourceMethods *src) {
     dst->cancelRequests = src->cancelRequests;
 }
 
-extern s32 gActiveDataSource;
 extern s32 LockCd(void);
 
 void LockActiveDataSource(void) {
@@ -233,16 +234,10 @@ s32 GetActiveDataSourceState(void) {
 }
 
 typedef s32 (*DataSourceSetDriverModeFn)(s32, s32, s32);
-/* round 58 (alpha, externcheck.py): SetVabDriverMode's real definition
- * (code_179d8_e.c) takes 2 args; SetCdDriverMode's (code_179d8_q.c)
- * genuinely takes 3. Both are only ever REFERENCED here, never called
- * directly -- `fn` dispatches through the shared 3-arg DataSourceSetDriverModeFn
- * pointer type SetCdDriverMode needs, with SetVabDriverMode's own body
- * simply not reading the 3rd word. Declaring SetVabDriverMode's own
- * arity honestly (2, matching its definition) costs nothing byte-wise --
- * a function-pointer VALUE assignment emits no argument-count-dependent
- * code, just an address load -- and produces only a benign "incompatible
- * pointer type" warning at the `fn = SetVabDriverMode;` line below. */
+/* SetVabDriverMode takes two arguments and SetCdDriverMode three. Both are
+ * called through the three-argument type, and the VAB driver ignores the
+ * third. Assigning SetVabDriverMode to `fn` warns about incompatible pointer
+ * types, and that is harmless. */
 extern s32 SetVabDriverMode(s32 async, s32 mode2);
 extern s32 SetCdDriverMode(s32 async, s32 mode2, s32 useVSyncCallback);
 
@@ -253,12 +248,13 @@ void SetActiveDataSourceDriverMode(s32 async, s32 mode2, s32 useVSyncCallback) {
     if (gActiveDataSource == DATASOURCE_CD) {
         fn = SetCdDriverMode;
     }
+    /* Retry until the driver accepts: SetCdDriverMode refuses while gCdBusy. */
     do {
     } while (fn(async, mode2, useVSyncCallback) == 0);
 }
 
-extern s32 GetCdDriverMode(void); /* arity-ok: the definition takes (s32 *outMode2) and the body reads $a0 (`beqz a0` at 0x80027EF8), but GetActiveDataSourceDriverMode's tail call sets nothing -- retail's jal at 0x80026FD0 has a nop delay slot */
-extern s32 GetVabDriverMode(void); /* arity-ok: same as above -- the definition takes (s32 *arg0) and the body reads $a0 (`beqz a0` at 0x8002C448), but the call at 0x80026FC0 has a nop delay slot and sets nothing */
+extern s32 GetCdDriverMode(void); /* arity-ok: the definition takes (s32 *outMode2); retail's tail call passes nothing */
+extern s32 GetVabDriverMode(void); /* arity-ok: the definition takes (s32 *outMode2); retail's tail call passes nothing */
 
 s32 GetActiveDataSourceDriverMode(void) {
     if (gActiveDataSource == DATASOURCE_CD) {
@@ -317,21 +313,3 @@ char *BuildFileName(char *dest, char *name, char *dir, char *ext) {
     strcat(dest, ext);
     return dest;
 }
-
-/* ROUND 34: `strcat` (0x80027130, this unit's last function, 42 words) LEFT
- * THIS FILE. It is Sony's -- `libc2/strcat.o`, Psy-Q 3.3, 0xA8 of text
- * covering exactly it -- and the unit's segment now ends at 0x17930 with an
- * `o` entry after it. It had been matched as C since round 8, and the head
- * had noticed at the time that it reads as library code rather than game
- * code ("carries a guard textbook strcat has no reason to"); it was right,
- * and the reclassification is the correction CLAUDE.md asks for, not a
- * regression.
- *
- * The C body and the two load-bearing source shapes it turned on (the
- * post-increment scan, worth 25 words; `return dest` rather than
- * `return NULL` on the NULL-dest path, worth one) are preserved in full in
- * docs/match-reports/strcat.md. Nothing is lost by deleting them here.
- *
- * Callers in this unit (BuildFileName, just above) keep calling `strcat`
- * under that name -- the declaration in include/code_171e0.h still serves,
- * and now resolves to the linked object. */

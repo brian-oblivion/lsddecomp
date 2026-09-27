@@ -100,3 +100,22 @@ third). Both occupants agree on what they do -- set the selected data
 source's driver mode, returning 0 while not yet accepted, which the caller
 polls. The name says that and nothing about why; the placeholder was the
 address of this function (`func_80026F34`) before it was named.
+
+## History moved from src/code_171e0.c (round 99, charlie, track 7)
+
+This comment sat above the two driver-mode externs in `src/code_171e0.c`
+until the track-7 pass. It is moved here unchanged:
+
+> round 58 (alpha, externcheck.py): SetVabDriverMode's real definition
+> (code_179d8_e.c) takes 2 args; SetCdDriverMode's (code_179d8_q.c)
+> genuinely takes 3. Both are only ever REFERENCED here, never called
+> directly -- `fn` dispatches through the shared 3-arg DataSourceSetDriverModeFn
+> pointer type SetCdDriverMode needs, with SetVabDriverMode's own body
+> simply not reading the 3rd word. Declaring SetVabDriverMode's own
+> arity honestly (2, matching its definition) costs nothing byte-wise --
+> a function-pointer VALUE assignment emits no argument-count-dependent
+> code, just an address load -- and produces only a benign "incompatible
+> pointer type" warning at the `fn = SetVabDriverMode;` line below.
+
+Round 99 also named the parameters after SetCdDriverMode's definition:
+`(async, mode2, useVSyncCallback)`, with `(async, mode2)` for SetVabDriverMode.

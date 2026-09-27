@@ -61,3 +61,19 @@ Round 52 (alpha), FINISHING-PLAN track 3.
 **Evidence.** Same if/else tail-call shape as `GetActiveDataSourceMethods`,
 forwarding to `GetCdDriverMode`/`func_8002C448` -- the getter side of
 `SetActiveDataSourceDriverMode`.
+
+## History moved from src/code_171e0.c (round 99, charlie, track 7)
+
+The two `arity-ok:` comments on the callee externs carried retail
+addresses. They now keep only the reason `externcheck.py` needs. Moved
+here unchanged:
+
+> `extern s32 GetCdDriverMode(void);` -- arity-ok: the definition takes
+> (s32 *outMode2) and the body reads $a0 (`beqz a0` at 0x80027EF8), but
+> GetActiveDataSourceDriverMode's tail call sets nothing -- retail's jal at
+> 0x80026FD0 has a nop delay slot
+>
+> `extern s32 GetVabDriverMode(void);` -- arity-ok: same as above -- the
+> definition takes (s32 *arg0) and the body reads $a0 (`beqz a0` at
+> 0x8002C448), but the call at 0x80026FC0 has a nop delay slot and sets
+> nothing

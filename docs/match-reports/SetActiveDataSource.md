@@ -276,3 +276,13 @@ between (`gCdDriverMethods` and `gVabDriverMethods`; confirmed by `tools/classta
 Every other function in this unit that reads it forwards to one sibling's
 real implementation or the other's fallback, which is where the whole
 `ActiveDataSource` naming family comes from.
+
+## History moved from src/code_171e0.c (round 99, charlie, track 7)
+
+The function comment's last sentence was matching history. It is now a
+`MATCHING:` line. Moved here unchanged:
+
+> The label+goto loop is retail's layout (jump into a bottom test); every
+> while/for spelling tried came out top-tested.
+
+Round 99 also renamed the parameter `arg0` to `source`.
