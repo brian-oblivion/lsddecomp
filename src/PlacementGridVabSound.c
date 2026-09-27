@@ -1,15 +1,32 @@
 /*
- * PlacementGridVabSound -- PlacementGrid (include/PlacementGrid.h), the model
- * placements of one map chunk's 20 x 20 cells: its allocator, ctor,
- * finalize, read-done flag, the processBuffer occupant that turns one
- * placement record per call into a CellPlacement and its model, and the
- * table getter. Then ReturnZero, which nothing calls or points at, and the
- * first seven of VabDriver's empty driver methods (include/VabDriver.h;
- * the rest, and its getter, are in code_179d8_e.c).
+ * PlacementGridVabSound -- two subjects in one file: PlacementGrid, then the
+ * VAB sound backend (VabDriver, VabStreamObj and the SoundCueSet start/flush
+ * pair), with ReturnZero between them.
+ *
+ * PlacementGrid (include/PlacementGrid.h), New_PlacementGrid to
+ * GetPlacementGridMethods: the model placements of one map chunk's 20 x 20
+ * cells: its allocator, ctor, finalize, read-done flag, the processBuffer
+ * occupant that turns one placement record per call into a CellPlacement and
+ * its model, and the table getter. ReturnZero follows; nothing calls it or
+ * points at it.
+ *
+ * What decided its edges (python3 tools/tuboundary.py): the placed object
+ * libc2/strncmp precedes it ("start edge possible"), and every edge inside
+ * and at its end is "boundary possible", so the binary neither proves nor
+ * forbids a file boundary anywhere here. Content decided: VabDriver's
+ * methods straddled the old carve edge between code_179d8_d and
+ * code_179d8_e (seven empty slots before it, the rest and the getter
+ * after), which was a twenty-function carve window, so the two were merged.
+ * The next file, libsnd_vmanager.c, opens on ServiceSoundCueSet, the third
+ * SoundCueSet function, which belongs with Init/Flush below; it stays there
+ * because Sony's voice manager starts one function later and no tool
+ * splits a unit. PARKED: the content says a file boundary between
+ * PlacementGrid (or ReturnZero) and VabDriver, and a split is a new carve,
+ * so the file keeps both and is named for both.
  *
  * The prototypes for FileResource's active-driver getter and the pool
- * allocator, and the cast for LinkResource's getModel, are this unit's
- * reading of its callees and stay in this file.
+ * allocator, and the cast for LinkResource's getModel, are this file's
+ * reading of its callees and stay in it.
  */
 #include "common.h"
 #include <libgte.h>
@@ -23,8 +40,10 @@
 #include "VabStreamObj.h"
 #include "SoundCueSet.h"
 
-/* FileResource's, code_171e0.c: the active driver's table, through which
- * PlacementGrid's ctor, finalize and setFlag reach their parent's. */
+/* FileResource's, code_171e0.c: the active driver's table (gVabDriverMethods
+ * or gCdDriverMethods, both FileResource tables), through which
+ * PlacementGrid's and VabStreamObj's ctors and finalizes, and PlacementGrid's
+ * setFlag, reach their parent's. */
 extern FileResourceMethods *GetActiveDataSourceMethods(void);
 
 /* The pool allocator (include/class_16334.h, include/BMemPMgr.h, neither
@@ -144,10 +163,8 @@ void VabDriver__Seek(void) {}
 
 void VabDriver__NoOpSlot50(void) {}
 
-/* ---- merged from code_179d8_e ---- */
-
 /*
- * The VAB sound backend: the VabDriver data source's empty slots and mode
+ * The VAB sound backend: the rest of the VabDriver data source's empty slots and mode
  * accessors, the VabStreamObj class (one sound bank, loaded through the
  * active data source and played through libsnd), and the SoundCueSet
  * start/flush pair.
@@ -175,16 +192,12 @@ void VabDriver__NoOpSlot50(void) {}
  */
 
 /* Defined in other units. */
-extern void *BMemPMgrAlloc(s32 size);
 extern void *BMemPMgrFree(void *ptr);
 extern char *BuildFileName(char *dest, char *name, char *dir, char *ext);
 extern s32 strlen(char *s);
 extern char *strcpy(char *dest, char *src);
 extern char *GetSsSizeTableBuf(void);
 extern s32 IsWBgmActive(void);
-/* The active driver's table (code_171e0.c): gVabDriverMethods or
- * gCdDriverMethods, both FileResource tables. */
-extern FileResourceMethods *GetActiveDataSourceMethods(void);
 
 /* ".VH" and ".VB", in .sdata. */
 extern const char gVabHeaderSuffix[];

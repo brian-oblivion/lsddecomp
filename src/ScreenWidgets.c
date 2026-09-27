@@ -1,13 +1,6 @@
-#include "common.h"
-#include <libgte.h>
-#include <libgpu.h>
-#include <libgs.h>
-#include "FrameClock.h"
-#include "Task.h"
-#include "TextRow.h"
-
 /*
- * ScreenWidgets -- the screen fade, and the first methods of the box it draws.
+ * ScreenWidgets -- the screen widgets FadeBox, BoxFill and TextRow, and three
+ * full-width Shift-JIS string helpers.
  *
  * FadeBox (include/FadeBox.h), New_FadeBox to GetFadeBoxMethods: a BoxFill
  * whose colour steps once per FrameClock tick away from a channel mask's
@@ -15,9 +8,38 @@
  * semi-transparency on, and notifies its parents when the ramp runs out.
  * Viewport's fadeBox and Entity's are the two users.
  *
- * Then BoxFill's allocator, ctor and Reset (include/BoxFill.h: a GsBOXF
- * screen rectangle); the rest of BoxFill's methods open code_2cc8c_f.c.
+ * BoxFill (include/BoxFill.h), New_BoxFill to GetBoxFillMethods: a
+ * flat-coloured GsBOXF screen rectangle's allocator, ctor, Reset, attach,
+ * attribute bits, colour, position, size, priority and mask.
+ *
+ * TextRow (include/TextRow.h), New_TextRow to GetTextRowMethods: a row of
+ * CharSprite character cells showing a string. It derives from CharSprite,
+ * not from BoxFill; the two classes only sit next to each other.
+ * TextRow__NoOpGetCell and TextRow__NoOpSlotD0 are empty method-table
+ * occupants.
+ *
+ * Then DecodeFullWidthSjis, EncodeFullWidthSjis and FormatFullWidthNumber:
+ * free functions over plain byte buffers, converting printable ASCII to and
+ * from two-byte full-width Shift-JIS.
+ *
+ * What decided its edges (python3 tools/tuboundary.py): the placed object
+ * libgte/fog_01 precedes it ("start edge possible") and psyq_memset follows
+ * it; every edge inside is "boundary possible". The forced boundary the tool
+ * reports between jump tables 0x80011108 (Task.c) and 0x800111dc (Sprite.c)
+ * is met by those two object edges. Content decided: BoxFill's methods
+ * straddled the old carve edge between code_2cc8c_e and code_2cc8c_f
+ * (allocator, ctor and Reset before it), so the two were merged. PARKED: the
+ * content would put a file boundary before New_TextRow (and perhaps before
+ * the Shift-JIS helpers); a split is a new carve, so the file keeps them and
+ * is named for all it holds.
  */
+#include "common.h"
+#include <libgte.h>
+#include <libgpu.h>
+#include <libgs.h>
+#include "FrameClock.h"
+#include "Task.h"
+#include "TextRow.h"
 
 FadeBox *New_FadeBox(void *size, s32 channels, s32 pri) {
     FadeBox *self;
@@ -260,28 +282,6 @@ void BoxFill__Reset(BoxFill *self, BoxFillSize *size, void *color, s32 pri) {
     methods->setColor(self, 1, color);
     self->methods->setMask(self, 13);
 }
-
-/* ---- merged from code_2cc8c_f ---- */
-
-/*
- * code_2cc8c_f -- the rest of BoxFill, all of TextRow, and three full-width
- * Shift-JIS string helpers.
- *
- * BoxFill (include/BoxFill.h), BoxFill__AttachToParent to GetBoxFillMethods:
- * a flat-coloured GsBOXF screen rectangle's attach, attribute bits, colour,
- * position, size, priority and mask. Its allocator, ctor and Reset are the
- * last functions of ScreenWidgets.
- *
- * TextRow (include/TextRow.h), New_TextRow to GetTextRowMethods: a row of
- * CharSprite character cells showing a string. It derives from CharSprite,
- * not from BoxFill; the two classes only sit next to each other.
- * TextRow__NoOpGetCell and TextRow__NoOpSlotD0 are empty method-table
- * occupants.
- *
- * Then DecodeFullWidthSjis, EncodeFullWidthSjis and FormatFullWidthNumber:
- * free functions over plain byte buffers, converting printable ASCII to and
- * from two-byte full-width Shift-JIS.
- */
 
 void BoxFill__AttachToParent(BoxFill *self, SceneNode *parent, BoxFillPos *pos) {
     if (self->parent == NULL) {

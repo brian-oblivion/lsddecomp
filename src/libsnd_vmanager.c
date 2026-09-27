@@ -1,24 +1,47 @@
 /*
- * libsnd_vmanager -- the front of libsnd's voice manager (Sony's
- * `libsnd/vmanager`), plus one game function ahead of it.
+ * libsnd_vmanager -- Sony's libsnd voice manager (`libsnd/vmanager`),
+ * carried as C, with one game function ahead of it.
  *
  * ServiceSoundCueSet (game code) runs one tick of a SoundCueSet
  * (include/SoundCueSet.h): it resets the set's three cue slots, lets the
  * set's callback fill them, then stops, retunes and replays each slot's tone
  * through the VabStreamObj's method table (include/VabStreamObj.h), scaled
- * down by the set's attenuation.
+ * down by the set's attenuation. Its siblings InitSoundCueSet and
+ * FlushSoundCueSet end PlacementGridVabSound.c.
  *
- * The rest is Sony's, under Sony's names: picking a voice to steal
- * (SpuVmAlloc), keying a tone on (SpuVmKeyOnNow, SpuVmDoAllocate), switching
- * a voice to the noise generator (vmNoiseOn, vmNoiseOn2), turning a note
- * into an SPU pitch (note2pitch, note2pitch2, SePitchBend), two empty
- * LIBSND.H entry points (SsUtVibrateOn, SsUtVibrateOff) and starting a
- * volume ramp (SeAutoVol). They work on the key-on request in _svm_cur, the
- * current VAB through <libsnd.h>'s VabHdr and VagAtr (_svm_vh, _svm_tn), the
- * voice tables in include/SvmData.h and the sequence records in
- * include/SsScore.h. A key-on or key-off is not written to the SPU here: it
- * is collected in the _svm_okon/_svm_okof masks, which SpuVmFlush
- * (code_179d8_m.c) writes out.
+ * Everything from SpuVmAlloc on is Sony's, under Sony's names. Retail's
+ * build of the voice manager is on no SDK disc, so it never placed as
+ * objects; the symbols file identifies each function against discs 3.3/3.5
+ * and progress.py counts them as library by address. On the 3.0/3.3/3.5
+ * discs every function here is in one object, vmanager.o; on the 3.6 disc
+ * they are sixteen, in this order: vm_aloc1 (SpuVmAlloc), vm_nowon
+ * (SpuVmKeyOnNow), vm_aloc2 (SpuVmDoAllocate), vm_no1 (vmNoiseOn), vm_no2
+ * (vmNoiseOn2), vm_n2p (note2pitch, note2pitch2), vm_spb (SePitchBend),
+ * vm_vib (SsUtVibrateOn/Off), vm_autov (SeAutoVol, SetAutoVol), vm_autop
+ * (SeAutoPan, SetAutoPan), vm_init (SpuVmInit), vm_noise
+ * (SpuVmNoiseOnWithAdsr, SpuVmNoiseOff, SpuVmNoiseOn), vm_pb (SpuVmPBVoice,
+ * SpuVmPitchBend), vm_f (SpuVmFlush), vm_key (SpuVmKeyOn, SpuVmKeyOff,
+ * SpuVmSeKeyOn, SpuVmSeKeyOff, KeyOnCheck) and vm_seq (the SpuVm*SeqVol
+ * accessors and SpuVmSeqKeyOff).
+ *
+ * What decided its edges (python3 tools/tuboundary.py): every edge from
+ * PlacementGridVabSound.c to the placed object libsnd/vm_prog, which follows
+ * this file, is "boundary possible"; the binary is silent. Content decided:
+ * the carve edges code_179d8_l|m and m|j were staffing cuts, and each fell
+ * inside one object on every disc (vm_autov between SeAutoVol and
+ * SetAutoVol, vm_key between SpuVmKeyOff and SpuVmSeKeyOn), so the three
+ * units were merged. PARKED: the content puts a file boundary after
+ * ServiceSoundCueSet (game code cannot sit in Sony's object) and, on the 3.6
+ * reading, at each module edge above; a split is a new carve, so the file
+ * keeps them and is named for the Sony object, as FINISHING-PLAN track 8
+ * names Sony code carried as C.
+ *
+ * The data keeps Sony's types: the key-on request in _svm_cur, the current
+ * VAB through <libsnd.h>'s VabHdr, ProgAtr and VagAtr (_svm_vh, _svm_pg,
+ * _svm_tn), the voice tables in include/SvmData.h and the sequence records
+ * in include/SsScore.h. A key-on or key-off is not written to the SPU when
+ * it is requested: it is collected in the _svm_okon/_svm_okof masks, which
+ * SpuVmFlush writes out once per tick. No jump table and no rodata attach.
  */
 #include "common.h"
 #include <libsnd.h>
@@ -475,7 +498,7 @@ void SsUtVibrateOn(short vc, short vibW, short vibT) {}
 void SsUtVibrateOff(short vc) {}
 
 /* Starts a volume ramp on a voice from `from` to `to` over `duration`
- * ticks, which SetAutoVol steps. Same body as SeAutoPan (code_179d8_m.c),
+ * ticks, which SetAutoVol steps. Same body as SeAutoPan (below),
  * over _svm_voice +0x1C..+0x26 instead of +0x28..+0x32. */
 void SeAutoVol(s16 voice, s16 from, s16 to, s16 duration) {
     s16 q;
@@ -498,22 +521,12 @@ void SeAutoVol(s16 voice, s16 from, s16 to, s16 duration) {
     }
 }
 
-/* ---- merged from code_179d8_m ---- */
-
 /*
- * code_179d8_m -- Sony libsnd `vmanager`, second half: voice key-on/off,
- * noise voices, pitch bend, the volume/pan ramps and the per-tick flush.
- *
- * Every function here is Sony's. Retail's vmanager is a build no SDK disc
- * carries, so its object never placed and the module is carried as C (the
- * symbols file identifies each function against discs 3.3/3.5); progress.py
- * counts all of it as library by address. The functions keep Sony's names
- * and the data keeps Sony's types: the current VAB's header, programs and
- * tones are <libsnd.h>'s VabHdr/ProgAtr/VagAtr behind libsnd's _svm_vh,
- * _svm_pg and _svm_tn (pinned in config/psyq-objects.ld, spelled here by
- * their D_ addresses), a sequence is include/SsScore.h's record, and the
- * per-voice state is include/SvmData.h's _svm_voice/_svm_sreg_buf. _svm_sreg
- * points at the SPU's own register block, SvmData.h's SpuRegs.
+ * From SetAutoVol to SpuVmKeyOff: voice key-on/off, noise voices, pitch
+ * bend, the volume/pan ramps and the per-tick flush. _svm_pg and _svm_tn are
+ * pinned in config/psyq-objects.ld and spelled here by their D_ addresses;
+ * the per-voice state is include/SvmData.h's _svm_voice/_svm_sreg_buf, and
+ * _svm_sreg points at the SPU's own register block, SvmData.h's SpuRegs.
  *
  *   - SpuVmInit: resets the voice manager: every voice, its shadow
  *     registers and the SPU voice registers, the reverb depth to 0x3FFF,
@@ -523,21 +536,20 @@ void SeAutoVol(s16 voice, s16 from, s16 to, s16 duration) {
  *     calls SpuVmKeyOff instead. SpuVmKeyOff releases every voice playing
  *     that sequence, VAB, program and note, and returns how many.
  *   - SpuVmNoiseOnWithAdsr / SpuVmNoiseOn: allocate a voice and key it on
- *     the noise generator (vmNoiseOn2, libsnd_vmanager); SpuVmNoiseOff
+ *     the noise generator (vmNoiseOn2, above); SpuVmNoiseOff
  *     releases every noise voice.
  *   - SpuVmPBVoice: bends one matching voice's pitch by a 0..127 value
  *     centred on 0x40, scaled by the tone's pbmin/pbmax; SpuVmPitchBend
  *     applies it to every voice and returns how many matched.
  *   - SeAutoPan sets a pan ramp; SetAutoVol / SetAutoPan step a voice's
- *     volume/pan ramp once (SeAutoVol, the volume setter, is in
- *     libsnd_vmanager).
+ *     volume/pan ramp once (SeAutoVol, the volume setter, is above).
  *   - SpuVmFlush, once per tick: records which voices' envelopes have died,
  *     releases voices silent across that history (unless _svm_auto_kof_mode
  *     is set), steps the ramps, copies dirty shadow registers to the SPU
  *     and writes the key-on/key-off/reverb masks.
  *
- * No jump table and no rodata attach. Five functions are preserved
- * NON_MATCHING bodies; each report gives its residue.
+ * Five functions in this stretch are preserved NON_MATCHING bodies; each
+ * report gives its residue.
  */
 
 /* libsnd's _svm_vh (pinned at this address): the header of the VAB bank
@@ -885,8 +897,8 @@ void SpuVmInit(s32 a0) {
 
 /* "Currently selected channel" scratch global: written as a side
  * effect, then re-read from the global (not a cached register) a few
- * instructions later -- same idiom, and same `volatile u16` type,
- * code_179d8_j.c documents for this symbol.  Genuinely needs
+ * instructions later; this is why the declaration at the top of the file
+ * is `volatile u16`.  Genuinely needs
  * `volatile`: without it, this compiler proves (from the narrow range
  * of the values stored here) that the re-read is redundant and elides
  * it entirely, which retail's disassembly shows it does NOT do.
@@ -897,10 +909,6 @@ void SpuVmInit(s32 a0) {
  * VOLATILE-QUALIFIED POINTER TYPE (`volatile u8 *`) that defeats the
  * addressing fold, not the underlying object's volatility. */
 extern volatile u16 D_8008EA26;
-/* Loop bound / threshold, read fresh each call -- same symbol
- * code_179d8_j.c documents as "loop bound for a small table of active
- * objects". */
-extern u8 spuVmMaxVoice;
 /* Flag byte forced on unconditionally at entry. */
 extern u8 D_8008EA1B;
 
@@ -1019,10 +1027,6 @@ s16 SpuVmPBVoice(s16 a0, s16 a1, s16 a2, s16 a3, u16 a4) {
 INCLUDE_ASM("asm/nonmatchings/libsnd_vmanager", SpuVmPBVoice);
 #endif
 
-/* "Currently selected channel" scratch global -- same idiom as
- * D_8008EA26 above, write-only here (see code_179d8_j.c's own reading
- * of this symbol). */
-extern u16 D_8008EA22;
 
 extern s32 SpuVmVSetUp(s16 a0, s16 a1);
 extern s16 SpuVmPBVoice(s16 a0, s16 a1, s16 a2, s16 a3, u16 a4);
@@ -1336,14 +1340,6 @@ s32 SpuVmKeyOn(s32 a0, s16 a1, s16 a2, u16 a3, u16 a4, u16 a5) {
 INCLUDE_ASM("asm/nonmatchings/libsnd_vmanager", SpuVmKeyOn);
 #endif
 
-/* A pair of 16-bit bitmasks split across a 0..0x1F channel space (low
- * 16 channels in the first word, next 16 in the second), each paired
- * with an "active mask" word cleared wherever the channel mask bit is
- * set -- same symbols and reading code_179d8_j.c already documents. */
-extern u16 _svm_okof1;
-extern u16 _svm_okof2;
-extern u16 _svm_okon1;
-extern u16 _svm_okon2;
 
 s32 SpuVmKeyOff(s16 a0, s16 a1, s16 a2, u16 a3) {
     u8 i;
@@ -1395,13 +1391,8 @@ s32 SpuVmKeyOff(s16 a0, s16 a1, s16 a2, u16 a3) {
     return count;
 }
 
-/* ---- merged from code_179d8_j ---- */
-
 /*
- * code_179d8_j -- eight functions of Sony's libsnd voice manager
- * (libsnd/vmanager), carried as C because retail's build of vmanager is on
- * no SDK disc, so it never placed as an object. progress.py counts them as
- * library by address, and they keep Sony's names.
+ * The last eight functions:
  *
  *   SpuVmSeKeyOn    keys on a sound effect: SpuVmKeyOn on the SE pseudo-
  *                   sequence, with the louder of the two channel volumes as
@@ -1419,12 +1410,7 @@ s32 SpuVmKeyOff(s16 a0, s16 a1, s16 a2, u16 a3) {
  * _ss_score[access][seq] (include/SsScore.h). Each volume accessor
  * records it in D_8008EA22, vmanager's current-sequence global
  * (SpuVmGetSeqLVol records only the access byte).
- *
- * Edges (python3 tools/tuboundary.py): libsnd_vmanager before it ("start edge
- * possible"), the placed object libsnd/vm_prog after it; every edge inside
- * is "boundary possible".
  */
-
 
 /* vmanager internals, absent from <libsnd.h>; signatures read from the
  * registers each call site loads. */
