@@ -90,7 +90,7 @@ void Viewport__SetOtLength(Viewport *self, s32 length) {
 }
 
 /* Takes only before InitOt: unk44 is one factor of each packet area. */
-void Viewport__SetUnk44(Viewport *self, s32 value) {
+void Viewport__SetPacketCount(Viewport *self, s32 value) {
     if (self->otReady == 0) {
         self->unk44 = value;
     }

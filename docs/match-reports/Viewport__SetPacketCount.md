@@ -1,4 +1,6 @@
-# Viewport__SetUnk44 — MATCHED
+# Viewport__SetPacketCount — MATCHED
+
+> Renamed from `Viewport__SetUnk44` on 2026-09-27 (tools/rename.py). Address 0x8003ea2c.
 
 > Renamed from `Unk18Obj__SetUnk44` on 2026-09-25 (tools/rename.py). Address 0x8003ea2c.
 
@@ -9,7 +11,7 @@ Unit: `code_2cc8c_d`. Round 14, runner delta. 7/7 words, full match.
 ## Signature
 
 ```c
-void Viewport__SetUnk44(Unk18Obj *self, s32 a1);
+void Viewport__SetPacketCount(Unk18Obj *self, s32 a1);
 ```
 
 `Unk18ObjMethods`'s own `+0x04C` slot occupant.
@@ -21,7 +23,7 @@ unit's queue never itself sets (its own setter, if any, lies outside this
 carve).
 
 ```c
-void Viewport__SetUnk44(Unk18Obj *self, s32 a1) {
+void Viewport__SetPacketCount(Unk18Obj *self, s32 a1) {
     if (self->unk70 == 0) {
         self->unk44 = a1;
     }

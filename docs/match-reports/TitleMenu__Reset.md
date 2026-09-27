@@ -100,4 +100,4 @@ TaskCore's (include/TaskCore.h, accessed by code_2c054.c/code_2cc8c*.c):
 `unk34` -> `clearOnDeinit` (TaskCore__OnDeinit clears the display with
 `unk93` only when it is nonzero; this Reset sets 0 and TitleMenu's own
 onDeinit clears both buffers instead). `unk2C` stays: it is the viewport's
-+0x04C value (Viewport__SetUnk44) and that setter is unnamed.
++0x04C value (Viewport__SetPacketCount) and that setter is unnamed.
