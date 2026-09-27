@@ -23,11 +23,11 @@ fields +0x2C..+0x38), `UnprototypedCtorTable` and `CountedBuf33808` sit at the t
 ```c
 #include "ModelData.h"
 
-typedef struct Req44858 {
+typedef struct ResourceSourceArgs {
     /* +0x00 */ void *buffer;
     /* +0x04 */ s32 unk4;
     /* +0x08 */ s32 unk8;
-} Req44858;
+} ResourceSourceArgs;
 
 typedef struct Buf44858 {
     /* +0x00 */ u8 pad0[8];
@@ -35,7 +35,7 @@ typedef struct Buf44858 {
 } Buf44858;
 
 s32 ModelData__BuildResources(ModelData *self) {
-    Req44858 req;
+    ResourceSourceArgs req;
 
     if (self->ownsResources != 0) {
         SetVec3(&req, (u8 *)self->buffer + ((Buf44858 *)self->buffer)->offset, 0, 1);
@@ -79,4 +79,4 @@ New_TodSet is now prototyped in include/TodSet.h as `TodSet *New_TodSet(struct R
 | --- | --- | --- | --- |
 | `Buf44858.offset` | `tmdOffset` | A | the sub-block New_LinkResource is built over, which LinkResource__BuildModels reads as a TmdFile |
 | `(u8 *)buffer + 0xC` | `Buf44858.tods` | A | New_TodSet's buffer |
-| `Req44858.unk4`, `unk8` | `pad4[8]` | A | no code here reads them; SetVec3 writes the name (NULL) and a 1 there. Its prototype's parameters are now `(buffer, name, mode)`, as include/code_4cd08.h reads the same call |
+| `ResourceSourceArgs.unk4`, `unk8` | `pad4[8]` | A | no code here reads them; SetVec3 writes the name (NULL) and a 1 there. Its prototype's parameters are now `(buffer, name, mode)`, as include/code_4cd08.h reads the same call |

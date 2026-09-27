@@ -884,10 +884,10 @@ void ModelData__Load(ModelData *self) {
 
 /* A ResourceSource with a third word: SetVec3 also stores the name (NULL here)
  * and a 1 that no constructor here reads. */
-typedef struct Req44858 {
+typedef struct ResourceSourceArgs {
     /* +0x00 */ void *buffer;
     /* +0x04 */ u8 pad4[8];
-} Req44858;
+} ResourceSourceArgs;
 
 /* A ModelData's buffer: the LinkResource's TMD at `tmdOffset`, the TodSet's
  * data from +0x0C. */
@@ -898,12 +898,12 @@ typedef struct Buf44858 {
 } Buf44858;
 
 /* code_171e0.c: stores its three words into *req, returns req. */
-extern Req44858 *SetVec3(Req44858 *req, void *buffer, char *name, s32 mode);
+extern ResourceSourceArgs *SetVec3(ResourceSourceArgs *req, void *buffer, char *name, s32 mode);
 
 /* +0x078: when it owns them, build the LinkResource and the TodSet over
  * the buffer; 1, with both released, when either fails. */
 s32 ModelData__BuildResources(ModelData *self) {
-    Req44858 req;
+    ResourceSourceArgs req;
 
     if (self->ownsResources != 0) {
         SetVec3(&req, (u8 *)self->buffer + ((Buf44858 *)self->buffer)->tmdOffset, 0, 1);
@@ -993,7 +993,7 @@ void TriggerWorld__Load(TriggerWorld *self) {
 /* +0x078: build a ModelData over each of the buffer's sub-blocks, in place
  * of its offset; 1, with those built released, when one fails. */
 s32 TriggerWorld__BuildResources(TriggerWorld *self) {
-    Req44858 req;
+    ResourceSourceArgs req;
     CountedBuf33808 *buf;
     s32 *p;
     s32 i;
@@ -1246,7 +1246,7 @@ void TodSet__Finalize(TodSet *self) {
 /* setFlag (+0x064): build a Tod over each of the buffer's sub-blocks, in
  * place of its offset; 1, with those built released, when one fails. */
 s32 TodSet__BuildTods(TodSet *self) {
-    Req44858 req;
+    ResourceSourceArgs req;
     CountedBuf33808 *buf;
     Tod **p;
     s32 i;

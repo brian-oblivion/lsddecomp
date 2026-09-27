@@ -17,7 +17,7 @@ Table slot (`tools/classtable.py`): gTodSetMethods +0x064.
 
 The unit-local views `DataSrc33808` (FileResource subclass via the unified
 `FILERESOURCE_SLOTS`/`FILERESOURCE_FIELDS` macros plus `slot7C`/`slot80` and own
-fields +0x2C..+0x38), `UnprototypedCtorTable`, `CountedBuf33808` and `Req44858` sit at the
+fields +0x2C..+0x38), `UnprototypedCtorTable`, `CountedBuf33808` and `ResourceSourceArgs` sit at the
 top of / earlier in `src/code_33808.c`.
 
 ```c
@@ -25,7 +25,7 @@ top of / earlier in `src/code_33808.c`.
  * buffer's counted offset table, into the table's own words; 0 when all
  * exist, otherwise release the ones already built and 1. */
 s32 TodSet__BuildTods(DataSrc33808 *self) {
-    Req44858 req;
+    ResourceSourceArgs req;
     CountedBuf33808 *buf;
     DataSrc33808 **p;
     s32 i;
