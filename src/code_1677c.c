@@ -71,7 +71,7 @@ s32 GameApplication__RunPollTask(PollTaskCtor ctor, void *dreamSys, Intermediate
 extern s32 GetGraphRoomStreamChannel(s32 *out, s32 a1, s32 a2); /* psyq_memset.s: writes a derived count to *out, returns a separate derived value */
 /* code_39094.c: same "write to *out, return a separate value" shape as
  * GetAsmkMovie/PickOpeningMovie/GetGraphRoomStreamChannel. */
-extern s32 GetStreamChannelInit(s32 *out, s32 unused); /* arity-ok: the definition is 1-parameter and reads only $a0 (it neither reads nor forwards $a1), but the 2nd argument IS byte-load-bearing -- retail emits `move a1,zero` in the jal's delay slot at 0x80026974 */
+extern s32 GetEndingMovie(s32 *out, s32 unused); /* arity-ok: the definition is 1-parameter and reads only $a0 (it neither reads nor forwards $a1), but the 2nd argument IS byte-load-bearing -- retail emits `move a1,zero` in the jal's delay slot at 0x80026974 */
 extern s32 ResolveCinematicChannel(s32 *out, s32 packedBankEntry); /* psyq_memset.s: resolves a packed
     {bank; entry} CinematicCall (low 16 bits = bank, high 16 = entry) to a channel index written
     to *out (-1 if unresolved); the packing must zero-extend both halves before combining
@@ -387,9 +387,9 @@ void GameApplication__StartCinematicStream(GameApplication *self) {
 
 /* GameApplicationMethods slot +0x064. Gated by self->config->playStreams (same gate as
  * GameApplication__StartWeeklyStreamTask/GameApplication__StartGraphRoomStreamTask). Builds a StreamTask, clears its skipOnConfirm,
- * derives a type code via GetStreamChannelInit, looks it up via GetStreamGroupForType,
+ * derives a type code via GetEndingMovie, looks it up via GetStreamGroupForType,
  * initializes the task with it, then starts it -- the same shape as
- * GameApplication__LoadIntroLogoSequence/GameApplication__StartWeeklyStreamTask, but with setSkipOnConfirm(0) added and GetStreamChannelInit
+ * GameApplication__LoadIntroLogoSequence/GameApplication__StartWeeklyStreamTask, but with setSkipOnConfirm(0) added and GetEndingMovie
  * in place of GetAsmkMovie/PickOpeningMovie. */
 void GameApplication__StartStreamTaskWithInit(GameApplication *self) {
     StreamTask *task;
@@ -401,7 +401,7 @@ void GameApplication__StartStreamTaskWithInit(GameApplication *self) {
         SetActiveDataSourceDriverMode(0, 0, 0);
         task = New_StreamTask(0, 0, 0, 0);
         task->methods->setSkipOnConfirm(task, 0);
-        outerValue = GetStreamChannelInit(&typeCode, 0);
+        outerValue = GetEndingMovie(&typeCode, 0);
         typeLookup = GetStreamGroupForType(typeCode);
         ((StreamTaskInitFn)task->methods->init)(task, (IntermediateBaseInitArgs *)self->aux,
                                                 outerValue, typeLookup, 1);

@@ -30,7 +30,7 @@
  *   +0x060 pollStatusObj          runs one DayTask (include/DayTask.h)
  *                                 and may start the current cinematic's stream;
  *                                 nonzero runs +0x064
- *   +0x064 startStreamTaskWithInit  the stream GetStreamChannelInit names
+ *   +0x064 startStreamTaskWithInit  the stream GetEndingMovie names
  * Every task these start is given the parent's `aux` as its
  * IntermediateBaseInitArgs, and every stream is gated by config->playStreams.
  *

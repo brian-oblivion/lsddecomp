@@ -1,4 +1,6 @@
-# GetStreamChannelInit -- MATCHED (17/17 words)
+# GetEndingMovie -- MATCHED (17/17 words)
+
+> Renamed from `GetStreamChannelInit` on 2026-09-27 (tools/rename.py). Address 0x800491fc.
 
 > Renamed from `func_800491FC` on 2026-09-25 (tools/rename.py). Address 0x800491fc.
 
@@ -17,7 +19,7 @@ Declarations it needs are the local views at the top of `src/code_39094.c`
 (`D_80081940Obj`, `D_80081940Methods`, `Rec1C`) and `include/FileResource.h`.
 
 ```c
-Rec1C *GetStreamChannelInit(s32 *countOut) {
+Rec1C *GetEndingMovie(s32 *countOut) {
     s32 count;
     Rec1C *rec = GetEndingMovieRecord(&count);
     if (countOut != NULL) {
@@ -51,6 +53,6 @@ line carries `/* arity-ok: ... */`.
 
 ## Naming
 
-- **Name:** `GetStreamChannelInit`
+- **Name:** `GetEndingMovie`
 - **Tier:** A
 - **Evidence:** its one caller, GameApplication__StartStreamTaskWithInit, uses the return value as the StreamTask's group id directly; matches exactly.

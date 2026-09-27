@@ -41,4 +41,4 @@ Rec1C *GetEndingMovieRecord(s32 *countOut) {
 
 - **Name:** `GetEndingMovieRecord`
 - **Tier:** B
-- **Evidence:** pure getter: &gRecordTable[0x237], count 7; only used internally by GetStreamChannelInit.
+- **Evidence:** pure getter: &gRecordTable[0x237], count 7; only used internally by GetEndingMovie.
